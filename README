@@ -1,0 +1,3 @@
+This repo will encompass proposed changes to Numeric/Interval/Fractional
+as well as new type classes (Ring/EuclideanRing/Field) as well as some
+new numeric types (Rational/Complex/Interval) and other changes.
