@@ -2,16 +2,25 @@ package numerics.math
 
 import scala.math.{abs, ceil, floor}
 
+/**
+ * TODO
+ * 1. better (e.g. specialized) version of Ordering
+ * 2. OrderingOps, IntegralOps, FractionalOps, NumericOps
+ * 3. LiteralOps? Literal conversions?
+ * 4. Review operator symbols?
+ * 5. Support for more operators?
+ * 6. Start to worry about things like e.g. pow(BigInt, BigInt)
+ */
 
 /**
  *
  */
 trait Ring[@specialized(Int,Long,Float,Double) A] extends ConvertableFrom[A] with ConvertableTo[A] {
   def abs(a:A):A
-  def equiv(a:A, b:A):Boolean
+  def eq(a:A, b:A):Boolean
   def minus(a:A, b:A):A
   def negate(a:A):A
-  def nequiv(a:A, b:A):Boolean
+  def neq(a:A, b:A):Boolean
   def one:A
   def plus(a:A, b:A):A
   def times(a:A, b:A):A
@@ -27,16 +36,21 @@ trait Field[@specialized(Float,Double) A] extends EuclideanRing[A] {
   def div(a:A, b:A):A
 }
 
+trait Integral[@specialized(Int,Long) A] extends EuclideanRing[A] with Ordering[A] {}
+
+trait Fractional[@specialized(Float,Double) A] extends Field[A] with Ordering[A] {}
+
+trait Numeric[@specialized(Int,Long,Float,Double) A] extends Field[A] with Ordering[A] {}
 
 /**
  *
  */
 trait IntIsRing extends Ring[Int] with ConvertableFromInt with ConvertableToInt {
   def abs(a:Int): Int = scala.math.abs(a)
-  def equiv(a:Int, b:Int): Boolean = a == b
+  def eq(a:Int, b:Int): Boolean = a == b
   def minus(a:Int, b:Int): Int = a - b
   def negate(a:Int): Int = -a
-  def nequiv(a:Int, b:Int): Boolean = a != b
+  def neq(a:Int, b:Int): Boolean = a != b
   def one: Int = 1
   def plus(a:Int, b:Int): Int = a + b
   def times(a:Int, b:Int): Int = a * b
@@ -48,16 +62,21 @@ trait IntIsEuclideanRing extends EuclideanRing[Int] with IntIsRing {
   def mod(a:Int, b:Int) = a % b
 }
 
+trait IntIsIntegral extends Integral[Int] with IntIsEuclideanRing with Ordering.IntOrdering {}
+
+trait IntIsNumeric extends Numeric[Int] with IntIsEuclideanRing with Ordering.IntOrdering {
+  def div(a:Int, b:Int) = a / b
+}
 
 /**
  *
  */
 trait LongIsRing extends Ring[Long] with ConvertableFromLong with ConvertableToLong {
   def abs(a:Long): Long = scala.math.abs(a)
-  def equiv(a:Long, b:Long): Boolean = a == b
+  def eq(a:Long, b:Long): Boolean = a == b
   def minus(a:Long, b:Long): Long = a - b
   def negate(a:Long): Long = -a
-  def nequiv(a:Long, b:Long): Boolean = a != b
+  def neq(a:Long, b:Long): Boolean = a != b
   def one: Long = 1L
   def plus(a:Long, b:Long): Long = a + b
   def times(a:Long, b:Long): Long = a * b
@@ -69,16 +88,22 @@ trait LongIsEuclideanRing extends EuclideanRing[Long] with LongIsRing {
   def mod(a:Long, b:Long) = a % b
 }
 
+trait LongIsIntegral extends Integral[Long] with LongIsEuclideanRing with Ordering.LongOrdering {}
+
+trait LongIsNumeric extends Numeric[Long] with LongIsEuclideanRing with Ordering.LongOrdering {
+  def div(a:Long, b:Long) = a / b
+}
+
 
 /**
  *
  */
 trait FloatIsRing extends Ring[Float] with ConvertableFromFloat with ConvertableToFloat {
   def abs(a:Float): Float = scala.math.abs(a)
-  def equiv(a:Float, b:Float): Boolean = a == b
+  def eq(a:Float, b:Float): Boolean = a == b
   def minus(a:Float, b:Float): Float = a - b
   def negate(a:Float): Float = -a
-  def nequiv(a:Float, b:Float): Boolean = a != b
+  def neq(a:Float, b:Float): Boolean = a != b
   def one: Float = 1.0F
   def plus(a:Float, b:Float): Float = a + b
   def times(a:Float, b:Float): Float = a * b
@@ -97,16 +122,20 @@ trait FloatIsField extends Field[Float] with FloatIsEuclideanRing {
   def div(a:Float, b:Float) = a / b
 }
 
+trait FloatIsFractional extends Fractional[Float] with FloatIsField with Ordering.FloatOrdering {}
+
+trait FloatIsNumeric extends Numeric[Float] with FloatIsField with Ordering.FloatOrdering {}
+
 
 /**
  *
  */
 trait DoubleIsRing extends Ring[Double] with ConvertableFromDouble with ConvertableToDouble {
   def abs(a:Double): Double = scala.math.abs(a)
-  def equiv(a:Double, b:Double): Boolean = a == b
+  def eq(a:Double, b:Double): Boolean = a == b
   def minus(a:Double, b:Double): Double = a - b
   def negate(a:Double): Double = -a
-  def nequiv(a:Double, b:Double): Boolean = a != b
+  def neq(a:Double, b:Double): Boolean = a != b
   def one: Double = 1.0
   def plus(a:Double, b:Double): Double = a + b
   def times(a:Double, b:Double): Double = a * b
@@ -125,16 +154,20 @@ trait DoubleIsField extends Field[Double] with DoubleIsEuclideanRing {
   def div(a:Double, b:Double) = a / b
 }
 
+trait DoubleIsFractional extends Fractional[Double] with DoubleIsField with Ordering.DoubleOrdering {}
+
+trait DoubleIsNumeric extends Numeric[Double] with DoubleIsField with Ordering.DoubleOrdering {}
+
 
 /**
  *
  */
 trait BigIntIsRing extends Ring[BigInt] with ConvertableFromBigInt with ConvertableToBigInt {
   def abs(a:BigInt): BigInt = a.abs
-  def equiv(a:BigInt, b:BigInt): Boolean = a == b
+  def eq(a:BigInt, b:BigInt): Boolean = a == b
   def minus(a:BigInt, b:BigInt): BigInt = a - b
   def negate(a:BigInt): BigInt = -a
-  def nequiv(a:BigInt, b:BigInt): Boolean = a != b
+  def neq(a:BigInt, b:BigInt): Boolean = a != b
   def one: BigInt = BigInt(1)
   def plus(a:BigInt, b:BigInt): BigInt = a + b
   def times(a:BigInt, b:BigInt): BigInt = a * b
@@ -146,15 +179,22 @@ trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] with BigIntIsRing {
   def mod(a:BigInt, b:BigInt) = a % b
 }
 
+trait BigIntIsIntegral extends Integral[BigInt] with BigIntIsEuclideanRing with Ordering.BigIntOrdering {}
+
+trait BigIntIsNumeric extends Numeric[BigInt] with BigIntIsEuclideanRing with Ordering.BigIntOrdering {
+  def div(a:BigInt, b:BigInt) = a / b
+}
+
+
 /**
  *
  */
 trait BigDecimalIsRing extends Ring[BigDecimal] with ConvertableFromBigDecimal with ConvertableToBigDecimal {
   def abs(a:BigDecimal): BigDecimal = a.abs
-  def equiv(a:BigDecimal, b:BigDecimal): Boolean = a == b
+  def eq(a:BigDecimal, b:BigDecimal): Boolean = a == b
   def minus(a:BigDecimal, b:BigDecimal): BigDecimal = a - b
   def negate(a:BigDecimal): BigDecimal = -a
-  def nequiv(a:BigDecimal, b:BigDecimal): Boolean = a != b
+  def neq(a:BigDecimal, b:BigDecimal): Boolean = a != b
   def one: BigDecimal = BigDecimal(1.0)
   def plus(a:BigDecimal, b:BigDecimal): BigDecimal = a + b
   def times(a:BigDecimal, b:BigDecimal): BigDecimal = a * b
@@ -170,6 +210,10 @@ trait BigDecimalIsField extends Field[BigDecimal] with BigDecimalIsEuclideanRing
   def div(a:BigDecimal, b:BigDecimal) = a / b
 }
 
+trait BigDecimalIsFractional extends Fractional[BigDecimal] with BigDecimalIsField with Ordering.BigDecimalOrdering {}
+
+trait BigDecimalIsNumeric extends Numeric[BigDecimal] with BigDecimalIsField with Ordering.BigDecimalOrdering {}
+
 
 /**
  *
@@ -181,8 +225,8 @@ trait RingOps[@specialized(Int,Long,Float,Double) A] {
   def abs = n.abs(lhs)
   def unary_- = n.negate(lhs)
 
-  def ===(rhs:A) = n.equiv(lhs, rhs)
-  def !==(rhs:A) = n.nequiv(lhs, rhs)
+  def ===(rhs:A) = n.eq(lhs, rhs)
+  def !==(rhs:A) = n.neq(lhs, rhs)
   def -(rhs:A) = n.minus(lhs, rhs)
   def +(rhs:A) = n.plus(lhs, rhs)
   def *(rhs:A) = n.times(lhs, rhs)
@@ -234,20 +278,48 @@ object Ring {
   implicit object DoubleIsRing extends DoubleIsRing
   implicit object BigIntIsRing extends BigIntIsRing
   implicit object BigDecimalIsRing extends BigDecimalIsRing
+}
 
+object EuclideanRing {
   implicit object IntIsEuclideanRing extends IntIsEuclideanRing
   implicit object LongIsEuclideanRing extends LongIsEuclideanRing
   implicit object FloatIsEuclideanRing extends FloatIsEuclideanRing
   implicit object DoubleIsEuclideanRing extends DoubleIsEuclideanRing
   implicit object BigIntIsEuclideanRing extends BigIntIsEuclideanRing
   implicit object BigDecimalIsEuclideanRing extends BigDecimalIsEuclideanRing
+}
 
+object Field {
   implicit object FloatIsField extends FloatIsField
   implicit object DoubleIsField extends DoubleIsField
   implicit object BigDecimalIsField extends BigDecimalIsField
 }
 
+object Integral {
+  implicit object IntIsIntegral extends IntIsIntegral
+  implicit object LongIsIntegral extends LongIsIntegral
+  implicit object BigIntIsIntegral extends BigIntIsIntegral
+}
 
+object Fractional {
+  implicit object FloatIsFractional extends FloatIsFractional
+  implicit object DoubleIsFractional extends DoubleIsFractional
+  implicit object BigDecimalIsFractional extends BigDecimalIsFractional
+}
+
+object Numeric {
+  implicit object IntIsNumeric extends IntIsNumeric
+  implicit object LongIsNumeric extends LongIsNumeric
+  implicit object FloatIsNumeric extends FloatIsNumeric
+  implicit object DoubleIsNumeric extends DoubleIsNumeric
+  implicit object BigIntIsNumeric extends BigIntIsNumeric
+  implicit object BigDecimalIsNumeric extends BigDecimalIsNumeric
+}
+
+
+/**
+ *
+ */
 object Implicits {
   implicit def ringOps[@specialized(Int, Long, Float, Double) A:Ring](a:A) = new RingOpsImpl(a)
   implicit def euclideanRingOps[@specialized(Int, Long, Float, Double) A:EuclideanRing](a:A) = new EuclideanRingOpsImpl(a)
