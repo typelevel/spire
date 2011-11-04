@@ -77,7 +77,7 @@ object Rational {
   }
 
 
-  trait RationalIsConflicted extends Numeric[Rational] {
+  trait RationalIsConflicted extends scala.math.Numeric[Rational] {
     def plus(x: Rational, y: Rational): Rational = x + y
     def minus(x: Rational, y: Rational): Rational = x - y
     def times(x: Rational, y: Rational): Rational = x * y
@@ -89,10 +89,10 @@ object Rational {
     def toDouble(x: Rational): Double = x.n.toDouble / x.d.toDouble
     def toBigInt(x: Rational): BigInt = x.numerator / x.denominator
   }
-  trait RationalIsFractional extends RationalIsConflicted with Fractional[Rational] {
+  trait RationalIsFractional extends RationalIsConflicted with scala.math.Fractional[Rational] {
     def div(x: Rational, y: Rational): Rational = x / y
   }
-  trait RationalAsIfIntegral extends RationalIsConflicted with Integral[Rational] {
+  trait RationalAsIfIntegral extends RationalIsConflicted with scala.math.Integral[Rational] {
     def quot(x: Rational, y: Rational): Rational = x / y
     def rem(x: Rational, y: Rational): Rational = {
       val q = x / y

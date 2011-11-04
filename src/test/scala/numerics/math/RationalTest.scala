@@ -17,7 +17,7 @@ class RationalTest extends FunSuite {
   }
 
   test("RationalIsFractional implicit exists") {
-    def doStuff[NT](a: NT, b: NT)(implicit n: Fractional[NT]) = {
+    def doStuff[NT](a: NT, b: NT)(implicit n: scala.math.Fractional[NT]) = {
       import n._
       a / b	// Note: a & b are of unknown type NT, not Rational
     }
