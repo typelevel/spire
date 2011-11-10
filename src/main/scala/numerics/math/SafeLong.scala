@@ -105,7 +105,11 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
   def /(y: BigInt): SafeLong = if (y.bitLength > 63) SafeLongLong(0L) else SafeLongLong(x / y.toLong)
   def %(y: BigInt): SafeLong = if (y.bitLength > 63) x else SafeLongLong(x % y.toLong)
 
-  def unary_-(): SafeLong = SafeLongLong(-x)
+  def unary_-(): SafeLong = if (x == Long.MinValue) {
+    SafeLongBigInt(-BigInt(x))
+  } else {
+    SafeLongLong(-x)
+  }
   
   def compare(that: SafeLong): Int = that.fold(x compare _, BigInt(x) compare _)
 
@@ -128,7 +132,7 @@ case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
   def /(y: BigInt): SafeLong = SafeLong(x / y)
   def %(y: BigInt): SafeLong = SafeLong(x % y)
   
-  def unary_-(): SafeLong = SafeLongBigInt(-x)
+  def unary_-(): SafeLong = SafeLong(-x)  // Covers the case where x == Long.MaxValue + 1
 
   def compare(that: SafeLong): Int = that.fold(x compare BigInt(_), x compare _)
 
