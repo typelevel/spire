@@ -218,15 +218,26 @@ trait BigDecimalIsNumeric extends Numeric[BigDecimal] with BigDecimalIsField wit
 /**
  *
  */
+trait OrderingOps[@specialized(Int,Long,Float,Double) A] {
+  val lhs:A
+  val o:Ordering[A]
+
+  def <(rhs:A) = o.lt(lhs, rhs)
+  def <=(rhs:A) = o.lteq(lhs, rhs)
+  def >(rhs:A) = o.gt(lhs, rhs)
+  def >=(rhs:A) = o.gteq(lhs, rhs)
+}
+
 trait RingOps[@specialized(Int,Long,Float,Double) A] {
   val lhs:A
   val n:Ring[A]
 
+  def ===(rhs:A) = n.eq(lhs, rhs)
+  def !==(rhs:A) = n.neq(lhs, rhs)
+
   def abs = n.abs(lhs)
   def unary_- = n.negate(lhs)
 
-  def ===(rhs:A) = n.eq(lhs, rhs)
-  def !==(rhs:A) = n.neq(lhs, rhs)
   def -(rhs:A) = n.minus(lhs, rhs)
   def +(rhs:A) = n.plus(lhs, rhs)
   def *(rhs:A) = n.times(lhs, rhs)
@@ -239,7 +250,7 @@ trait RingOps[@specialized(Int,Long,Float,Double) A] {
   def toBigDecimal = n.toBigDecimal(lhs)
 }
 
-trait EuclideanRingOps[@specialized(Int,Long,Float,Double) A] extends RingOps[A] {
+trait EuclideanRingOps[@specialized(Int,Long,Float,Double) A] {
   val lhs:A
   val n:EuclideanRing[A]
 
@@ -248,11 +259,15 @@ trait EuclideanRingOps[@specialized(Int,Long,Float,Double) A] extends RingOps[A]
   def /%(rhs:A) = (n.quot(lhs, rhs), n.mod(lhs, rhs))
 }
 
-trait FieldOps[@specialized(Int,Long,Float,Double) A] extends EuclideanRingOps[A] {
+trait FieldOps[@specialized(Int,Long,Float,Double) A] {
   val lhs:A
   val n:Field[A]
 
   def /(rhs:A) = n.div(lhs, rhs)
+}
+
+final class OrderingOpsImpl[A:Ordering](val lhs:A) extends OrderingOps[A] {
+  val o = implicitly[Ordering[A]]
 }
 
 final class RingOpsImpl[A:Ring](val lhs:A) extends RingOps[A] {
@@ -321,11 +336,16 @@ object Numeric {
  *
  */
 object Implicits {
+  implicit def orderingOps[@specialized(Int, Long, Float, Double) A:Ordering](a:A) = new OrderingOpsImpl(a)
   implicit def ringOps[@specialized(Int, Long, Float, Double) A:Ring](a:A) = new RingOpsImpl(a)
   implicit def euclideanRingOps[@specialized(Int, Long, Float, Double) A:EuclideanRing](a:A) = new EuclideanRingOpsImpl(a)
   implicit def fieldOps[@specialized(Float, Double) A:Field](a:A) = new FieldOpsImpl(a)
 
+
   def ring[@specialized(Int, Long, Float, Double) A:Ring]:Ring[A] = implicitly[Ring[A]]
   def euclideanRing[@specialized(Int, Long, Float, Double) A:EuclideanRing]:EuclideanRing[A] = implicitly[EuclideanRing[A]]
   def field[@specialized(Float, Double) A:Field]:Field[A] = implicitly[Field[A]]
+  def integral[@specialized(Int, Long) A:Integral]:Integral[A] = implicitly[Integral[A]]
+  def fractional[@specialized(Float, Double) A:Fractional]:Fractional[A] = implicitly[Fractional[A]]
+  def numeric[@specialized(Int, Long, Float, Double) A:Numeric]:Numeric[A] = implicitly[Numeric[A]]
 }
