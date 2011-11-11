@@ -16,6 +16,9 @@ sealed trait Rat extends ScalaNumber with ScalaNumericConversions with Ordered[R
   import LongRats.LongRat
   import BigRats.BigRat
 
+  def numerator: BigInt
+  def denominator: BigInt
+
   def abs: Rat = if (this < Rat.zero) -this else this
   def inverse: Rat = Rat.one / this
   def signum: Int = scala.math.signum(this compare Rat.zero)
@@ -32,10 +35,14 @@ sealed trait Rat extends ScalaNumber with ScalaNumericConversions with Ordered[R
 
   def toBigInt: BigInt
   def toBigDecimal: BigDecimal
+
+  def pow(exp: Int): Rat
 }
 
 
 object Rat {
+  private val RationalString = """^(-?\d+)/(-?\d+)$"""r
+  private val IntegerString = """^(-?\d+)$"""r
 
   import LongRats.LongRat
   import BigRats.BigRat
@@ -46,9 +53,31 @@ object Rat {
   private[math] def apply(n: SafeLong, d: SafeLong): Rat = {
     n.foldWith[Rat,LongRat,BigRat](d)(LongRat(_, _), BigRat(_, _))
   }
-  
+
   def apply(n: BigInt, d: BigInt): Rat = BigRats.build(n, d)
   def apply(n: Long, d: Long): Rat = LongRats.build(n, d)
+
+  implicit def apply(x:Long): Rat = LongRats.build(x, 1L)
+  implicit def apply(x:BigInt): Rat = BigRats.build(x, BigInt(1))
+
+  // TODO: this could probably be faster
+  implicit def apply(x:Double): Rat = apply(BigDecimal(x))
+
+  implicit def apply(x:BigDecimal): Rat = {
+    val n = (x / x.ulp).toBigInt
+    val d = (BigDecimal(1.0) / x.ulp).toBigInt
+    BigRats.build(n, d)
+  }
+
+  def apply(r: String): Rat = r match {
+    case RationalString(n, d) => Rat(BigInt(n), BigInt(d))
+    case IntegerString(n) => Rat(BigInt(n))
+    case s => try {
+      Rat(BigDecimal(s))
+    } catch {
+      case nfe: NumberFormatException => throw new NumberFormatException("For input string: " + s)
+    }
+  }
 }
 
 
@@ -88,7 +117,7 @@ protected abstract class Rats[@specialized(Long) A](implicit integral: Integral[
       val n = integral.toBigInt(num)
       val d = integral.toBigInt(den)
 
-      val sharedLength = min(n.bitLength, d.bitLength)
+      val sharedLength = scala.math.min(n.bitLength, d.bitLength)
       val dLowerLength = d.bitLength - sharedLength
 
       val nShared = n >> (n.bitLength - sharedLength)
@@ -161,6 +190,9 @@ object LongRats extends Rats[Long] {
   case class LongRat private[math] (n: Long, d: Long) extends RatLike {
     def num: Long = n
     def den: Long = d
+
+    def numerator = n.toBigInt
+    def denominator = d.toBigInt
 
     override def unary_-(): Rat = if (n == Long.MinValue) {
       BigRat(-BigInt(Long.MinValue), BigInt(d))
@@ -266,19 +298,31 @@ object LongRats extends Rats[Long] {
     }
 
 
-    def /(r: Rat): Rat = r match {
-      case r: LongRat =>
-        val a = gcd(n, r.n)
-        val b = gcd(d, r.d)
-        val num = SafeLong(n / a) * (r.d / b)
-        val den = SafeLong(d / b) * (r.n / a)
-        if (den < SafeLong.zero) Rat(-num, -den) else Rat(num, den)
-      case r: BigRat =>
-        val a = gcd(n, (r.n % n).toLong)
-        val b = gcd(d, (r.d % d).toLong)
-        val num = SafeLong(n / a) * (r.d / b)
-        val den = SafeLong(d / b) * (r.n / a)
-        if (den < SafeLong.zero) Rat(-num, -den) else Rat(num, den)
+    def /(r: Rat): Rat = {
+      if (r == Rat.zero) throw new IllegalArgumentException("/ by 0")
+      r match {
+        case r: LongRat => {
+          val a = gcd(n, r.n)
+          val b = gcd(d, r.d)
+          val num = SafeLong(n / a) * (r.d / b)
+          val den = SafeLong(d / b) * (r.n / a)
+          if (den < SafeLong.zero) Rat(-num, -den) else Rat(num, den)
+        }
+        case r: BigRat => {
+          val a = gcd(n, (r.n % n).toLong)
+          val b = gcd(d, (r.d % d).toLong)
+          val num = SafeLong(n / a) * (r.d / b)
+          val den = SafeLong(d / b) * (r.n / a)
+          if (den < SafeLong.zero) Rat(-num, -den) else Rat(num, den)
+        }
+      }
+    }
+
+    // FIXME: SafeLong would ideally support pow
+    def pow(exp: Int): Rat = {
+      val num = n.toBigInt.pow(exp.abs)
+      val den = d.toBigInt.pow(exp.abs)
+      if (exp > 0) BigRats.build(num, den) else BigRats.build(den, num)
     }
 
     def compare(r: Rat): Int = r match {
@@ -323,6 +367,9 @@ object BigRats extends Rats[BigInt] {
   case class BigRat private[math] (n: BigInt, d: BigInt) extends RatLike {
     def num: BigInt = n
     def den: BigInt = d
+
+    def numerator = n
+    def denominator = d
 
     override def unary_-(): Rat = Rat(-SafeLong(n), SafeLong(d))
 
@@ -383,6 +430,11 @@ object BigRats extends Rats[BigInt] {
         if (den < SafeLong.zero) Rat(-num, -den) else Rat(num, den)
     }
 
+    def pow(exp: Int): Rat = if (exp < 0) {
+      BigRats.build(d pow exp.abs, n pow exp.abs)
+    } else {
+      BigRats.build(n pow exp, d pow exp)
+    }
 
     def compare(r: Rat): Int = r match {
       case r: LongRat => {

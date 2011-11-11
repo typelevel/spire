@@ -218,6 +218,39 @@ trait BigDecimalIsNumeric extends Numeric[BigDecimal] with BigDecimalIsField wit
 /**
  *
  */
+trait RatOrdering extends Ordering[Rat] {
+  def compare(a:Rat, b:Rat) = a.compare(b)
+}
+
+trait RatIsRing extends Ring[Rat] with ConvertableFromRat with ConvertableToRat {
+  def abs(a:Rat): Rat = a.abs
+  def eq(a:Rat, b:Rat): Boolean = a == b
+  def minus(a:Rat, b:Rat): Rat = a - b
+  def negate(a:Rat): Rat = -a
+  def neq(a:Rat, b:Rat): Boolean = a != b
+  def one: Rat = Rat.one
+  def plus(a:Rat, b:Rat): Rat = a + b
+  def times(a:Rat, b:Rat): Rat = a * b
+  def zero: Rat = Rat.zero
+}
+
+trait RatIsEuclideanRing extends EuclideanRing[Rat] with RatIsRing {
+  def quot(a:Rat, b:Rat) = a.quot(b)
+  def mod(a:Rat, b:Rat) = a % b
+}
+
+trait RatIsField extends Field[Rat] with RatIsEuclideanRing {
+  def div(a:Rat, b:Rat) = a / b
+}
+
+trait RatIsFractional extends Fractional[Rat] with RatIsField with RatOrdering {}
+
+trait RatIsNumeric extends Numeric[Rat] with RatIsField with RatOrdering {}
+
+
+/**
+ *
+ */
 trait OrderingOps[@specialized(Int,Long,Float,Double) A] {
   val lhs:A
   val o:Ordering[A]
@@ -293,6 +326,7 @@ object Ring {
   implicit object DoubleIsRing extends DoubleIsRing
   implicit object BigIntIsRing extends BigIntIsRing
   implicit object BigDecimalIsRing extends BigDecimalIsRing
+  implicit object RatIsRing extends RatIsRing
 }
 
 object EuclideanRing {
@@ -302,12 +336,14 @@ object EuclideanRing {
   implicit object DoubleIsEuclideanRing extends DoubleIsEuclideanRing
   implicit object BigIntIsEuclideanRing extends BigIntIsEuclideanRing
   implicit object BigDecimalIsEuclideanRing extends BigDecimalIsEuclideanRing
+  implicit object RatIsEuclideanRing extends RatIsEuclideanRing
 }
 
 object Field {
   implicit object FloatIsField extends FloatIsField
   implicit object DoubleIsField extends DoubleIsField
   implicit object BigDecimalIsField extends BigDecimalIsField
+  implicit object RatIsField extends RatIsField
 }
 
 object Integral {
@@ -320,6 +356,7 @@ object Fractional {
   implicit object FloatIsFractional extends FloatIsFractional
   implicit object DoubleIsFractional extends DoubleIsFractional
   implicit object BigDecimalIsFractional extends BigDecimalIsFractional
+  implicit object RatIsFractional extends RatIsFractional
 }
 
 object Numeric {
@@ -329,6 +366,7 @@ object Numeric {
   implicit object DoubleIsNumeric extends DoubleIsNumeric
   implicit object BigIntIsNumeric extends BigIntIsNumeric
   implicit object BigDecimalIsNumeric extends BigDecimalIsNumeric
+  implicit object RatIsNumeric extends RatIsNumeric
 }
 
 
