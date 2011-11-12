@@ -1,7 +1,7 @@
 package numerics.math
 
 
-import scala.math.{ScalaNumber, ScalaNumericConversions, abs}
+import scala.math.{ScalaNumber, ScalaNumericConversions, abs, min}
 import Implicits._
 import Ordering.Implicits._
 
@@ -12,7 +12,7 @@ trait Fraction[@specialized(Long) A] {
 }
 
 
-sealed trait Rat extends ScalaNumber with ScalaNumericConversions with Ordered[Rat] {
+sealed abstract class Rat extends ScalaNumber with ScalaNumericConversions with Ordered[Rat] {
   import LongRats.LongRat
   import BigRats.BigRat
 
@@ -60,8 +60,21 @@ object Rat {
   implicit def apply(x:Long): Rat = LongRats.build(x, 1L)
   implicit def apply(x:BigInt): Rat = BigRats.build(x, BigInt(1))
 
-  // TODO: this could probably be faster
-  implicit def apply(x:Double): Rat = apply(BigDecimal(x))
+  implicit def apply(x:Double): Rat = {
+    val bits = java.lang.Double.doubleToLongBits(x)
+    val value = if ((bits >> 63) < 0) -(bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L)
+                else (bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L)
+    val exp = ((bits >> 52) & 0x7FF).toInt - 1075 // 1023 + 52
+    if (exp > 10) {
+        apply(BigInt(value) << exp, BigInt(1))
+    } else if (exp >= 0) {
+      apply(value << exp, 1L)
+    } else if (exp >= -52 && (~((-1L) << (-exp)) & value) == 0L) {
+      apply(value >> (-exp), 1L)
+    } else {
+      apply(BigInt(value), BigInt(1) << (-exp))
+    }
+  }
 
   implicit def apply(x:BigDecimal): Rat = {
     val n = (x / x.ulp).toBigInt
