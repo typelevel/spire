@@ -194,7 +194,7 @@ class RatTest extends FunSuite {
         assert(Rat(-1).toByte === -1)
         assert(Rat(256).toByte === 0)
     }
-    test("toDoubleAndFloat") {
+    test("toDouble and tFloat") {
         assert(Rat(1, 2).toFloat === 0.5f)
         val a = Rat("10000000000000002/10000000000000000")
         assert(a.toDouble === 1.0000000000000002)
@@ -208,9 +208,14 @@ class RatTest extends FunSuite {
     assert(Rat(2, 4).toString === "1/2")
   }
 
-  test("hashCodeIsSameForEquivalentRats") {
+  test("hashCode is the same for equivalent rats") {
     assert(Rat(1, 2).hashCode === Rat(2, 4).hashCode)
     assert(Rat(0).hashCode === Rat(0, 5).hashCode)
     assert(Rat(-1, 2).hashCode === Rat(1, -2).hashCode)
+  }
+
+  test("reverse primitive equality") {
+    assert(1 == Rat.one)
+    assert(-23L == Rat(-23L, 1L))
   }
 }
