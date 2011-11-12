@@ -34,6 +34,8 @@ trait EuclideanRing[@specialized(Int,Long,Float,Double) A] extends Ring[A] {
 
 trait Field[@specialized(Float,Double) A] extends EuclideanRing[A] {
   def div(a:A, b:A):A
+
+  def isWhole(a:A): Boolean = eq(mod(a, one), zero)
 }
 
 trait Integral[@specialized(Int,Long) A] extends EuclideanRing[A] with Ordering[A] {}
@@ -297,6 +299,8 @@ trait FieldOps[@specialized(Int,Long,Float,Double) A] {
   val n:Field[A]
 
   def /(rhs:A) = n.div(lhs, rhs)
+
+  def isWhole = n.isWhole(lhs)
 }
 
 final class OrderingOpsImpl[A:Ordering](val lhs:A) extends OrderingOps[A] {
