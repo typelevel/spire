@@ -5,6 +5,9 @@ import scala.math.{Pi, atan2, cos, exp, log, pow, sin, sqrt}
 
 import Implicits._
 
+// TODO: refactor places where Fractional is converted to Double in order to
+// access functions (e.g. trig, pow, exp, log)
+
 object GComplex {
   def i[T:Fractional] = GComplex(fractional.zero, fractional.one)
   def one[T:Fractional] = GComplex(fractional.one, fractional.zero)
@@ -51,6 +54,13 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   } else {
     19 * real.## + 41 * imag.##
   }
+
+  override def equals(that: Any): Boolean = that match {
+    case that:GComplex[_] => real == that.real && imag == that.imag
+    case that => unifiedPrimitiveEquals(that)
+  }
+
+  override def toString: String = "GComplex(%s, %s)".format(real, imag)
 
   // -------
   lazy val magnitude = f.fromDouble(sqrt((real * real + imag * imag).toDouble))
