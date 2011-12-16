@@ -1,0 +1,457 @@
+=== Updating and Improving Numeric Types in Scala ===
+
+by Erik Osheim
+
+(Working closely with Tom Switzer and others in the Scala community)
+
+Last modified: 2011-12-16
+
+Relevant code bases:
+  1. https://github.com/azavea/numeric
+  An improved Numeric type class that I wrote to test out specialization.
+
+  2. https://github.com/non/scala-numerics-refactor 
+  An in-progress repo that Tom Switzer and I are using to share ideas and work
+  on fleshing out ideas in this proposal.
+
+
+== Background ==
+
+Like in Java, numeric types in Scala (which include most of the AnyVal types
+as well as BigInt and BigDecimal) lack any super class which exposes
+arithmetic operations. The types themselves also lack many methods for common
+operations, which are instead provided by scala.math. Much of scala.math
+simply operates on Double, and relies on automatic conversions from
+Int/Float/Long to Double. This can be a problem when dealing with Long (whose
+values can't always be exactly represented as Double), and is an even bigger
+problem for BigInt or BigDecimal, whose values can easily exceed
+Double.MaxValue.
+
+Part of the problem here is that Scala is trying to stay close to Java (its
+BigInt and BigDecimal types are mostly just wrappers, which suffer from the
+same deficiencies as their Java equivalents). This also explains the paucity
+of methods on AnyVal types: in Java these types are primitives and can only
+be directly worked with via Java's operators (e.g. +, -, /). Scala could
+define methods directly on these types (like abs) but chooses not to in most
+cases.
+
+Finally, Scala has not introduced any numeric types which don't correspond
+directly with a Java equivalent. This means that different libraries that
+want to act use other numeric types (for instance, rational numbers,
+intervals or complex numbers) can't interoperate with each other, and that
+many users end up trying to reimplement these types (which are easy to
+naively implement in inefficient or incorrect ways). It would be better for
+Scala to provide implementations.
+
+Rather than simulating an inheritance hierarchy among numeric types, Scala
+supports abstraction across numeric types via Numeric, Integral and
+Fractional. These type classes which were introduced in 2.8. The basic
+motivation for these seems to have been taken from Haskell (which has Num,
+Integral and Fractional) although it deviates from the actual implementation
+(by mixing in Ordering where Haskell did not). Unfortunately due to
+performance problems, difficulties with the type class interface, and other
+defects Numeric has not seen wide use, either inside Scala's library or
+outside of it.
+
+Much has been written about the problems with the implementation of Numeric,
+Integral and Fractional. Here is a quick run-down:
+
+  1. Poor performance (@specialization could fix this)
+
+  2. Cumbersome to mix concrete and generic numeric types
+     For instance, this fails: def addOne[T:Numeric](t:T) = t + 1
+
+  3. Doesn't support all operators supported by concrete types
+     For instance, Numeric doesn't support division.
+
+  4. Doesn't correctly mirror underlying algebraic properties
+     For instance, complex numbers are unordered but Fractional extends Ordering
+
+  5. Doesn't directly support many/most useful methods:
+     For instance, doing trig with Fractional requires conversion to Double.
+
+In particular, the fact that Scala's own library has mostly avoided using
+these types (and in the case of NumericRange hit major problems [1] by trying
+to support them) should be taken into consideration. Some work has been done
+on redesigning Numeric and there have been many proposals.
+
+[1] https://issues.scala-lang.org/secure/IssueNavigator.jspa?mode=hide&requestId=10905
+
+
+== Proposal ==
+
+Scala has followed Java as far as its decisions around primitives, numbers,
+and functions go. We can do better!
+
+This is a big proposal because the goal is to create a seamless and
+consistent experience that addresses a wide variety of needs in the
+community. Obviously many parts of the proposal could be done individually,
+but the experience of doing math in Scala is already quite fragmented and
+there's a risk of making things even worse. The goal here is to provide a
+complete and integrated vision of how math and numeric types could work in
+Scala. If the whole thing is deemed too ambitious then we can scale back as
+required.
+
+Here is an outline of the proposed changes and additions:
+
+  [changes to scala.math and number types]
+   1. improve support for Long/BigInt/BigDecimal in scala.math
+   2. optionally, move things like abs() from scala.math to Int, Double, etc.
+   3. optionally, rename BigDecimal
+   4. add a Rational type
+   5. add a Complex[T] type
+   6. add an Interval[T] type (maybe interop with or replace NumericRange[T])
+   7. optionally, implement a simple boxed Number type
+
+  [changes to numeric type classes]
+   8. @specialize Ordering, Numeric, etc.
+   9. remove support from numeric types classes for Byte and Short.
+  10. restructure Numeric and related type classes
+  11. create useful conversions for mixing literals and generic values
+
+Each section will discuss one of these items.
+
+
+== Sections ==
+
+
+1. Improve support for Long/BigInt/BigDecimal in scala.math
+
+Most of the functions in scala.math act only on Double. Until recently
+modding a large BigDecimal by 2*Pi threw an Exception [*], which meant you
+couldn't even safely mod and convert to Double. Other missing functions that
+would be especially useful include sqrt, cbrt, ceil, floor, log, etc. There
+are also other problems: BigDecimal's round requires an explicit MathContext
+instance to be passed, even though it could use its own MathContext if none
+was provided.
+
+Types which can't be represented by Double without loss of precision should
+not be converted to Double in order to use functions in scala.math. The
+trigonometry functions should accept BigDecimal, and pow should accept Longs
+as well as Doubles. Even if the decision is made to convert to Double in the
+underlying implementation (e.g. for the sin() method) the user should not
+need to worry about this.
+
+Currently, BigDecimal defines a pow() method whereas Double uses
+scala.math.pow(). Ideally, interfaces would be unified so that the same
+strategy is available both places. One way to do this would be to make both
+methods available to both.
+
+[*] https://issues.scala-lang.org/browse/SI-4981
+
+
+2. Optionally, move methods from scala.math to numeric types
+
+In line with the last point, it might be best to move all of the
+single-argument methods from scala.math onto the relevant types themselves.
+This would allow user-defined numeric types to have similar interfaces to
+built-in numeric types, it would make the interfaces more consistent, and it
+would also make the interface for generic numeric types deviate less from the
+direct types.
+
+The scala.math methods could be left where they are for backwards
+compatibility.
+
+
+3. Optionally, rename BigDecimal
+
+Currently, BigInt and BigDecimal mostly wrap their Java types. This proposal
+changes their interfaces (and possibly presages a better implementation). As
+such, it might be a good idea to rename BigDecimal to avoid confusion or
+ambiguity with the Java version. The proposal would be to change its name to
+Decimal (with a type alias to BigDecimal for backwards compatibility if
+necessary).
+
+
+4. Rational numbers
+
+Rational numbers provide a way to do division without losing precision (as
+opposed to Double or even BigDecimal where this is not guaranteed). Users can
+later convert from Rational to other types with as much (or as little)
+precision as desired.
+
+The implementation proposed uses a pair of Longs to represent the fraction
+until the range of Long is exceeded, at which point it switches over to using
+BigDecimal. This is all transparent to the user. Tests have shown that this
+hybrid approach is both fast in simple cases and robust when handling very
+large values.
+
+
+5. Complex numbers
+
+The proposed implementation of complex numbers uses generic types to support
+any Fractional type:
+
+  Complex[T:Fractional](val real:T, val imag:T) ...
+
+It's useful to have a default implementation of complex numbers to pool
+community resources around one good implementation, to allow libraries to
+easily interoperate around this type, and finally to help motivate good
+design for the numeric type classes.
+
+Since Numeric and Fractional extend Ordering, Complex should not provide
+instances of these by default (since complex numbers are not ordered). Users
+who want to use complex numbers in code parameterized across Numeric or
+Fractional could manually import instances of Numeric[Complex[T]] or
+Fractional[Complex[T]] and risk possible run-time errors (if the code in
+question uses comparison operators).
+
+If desired the implementation could easily support Gaussian integers
+(basically complex integers) by bounding T with Numeric instead of
+Fractional.
+
+
+6. Intervals
+
+This feature was brought up by Paul Phillips [*] and many others have also
+mentioned it. It also relates nicely to Ranges.
+
+The approach proposed is as follows:
+
+  case class Interval[+T:Numeric](lower:Bound[T], upper:Bound[T]) { ... }
+
+  object Interval {
+    def empty[T:Numeric]() = open(zero, zero)
+    def degenerate[T:Numeric](t:T) = closed(t, t)
+    def unbounded[T:Numeric] = Interval[T](Unbound, Unbound)
+
+    def open[T:Numeric](a:T, b:T) = Interval(OpenBound(a), OpenBound(b))
+    def closed[T:Numeric](a:T, b:T) = Interval(ClosedBound(a), ClosedBound(b))
+
+    def leftOpen[T:Numeric](a:T, b:T) = Interval(OpenBound(a), ClosedBound(b))
+    def leftClosed[T:Numeric](a:T, b:T) = Interval(ClosedBound(a), OpenBound(b))
+    def rightOpen[T:Numeric](a:T, b:T) = leftClosed(a, b)
+    def rightClosed[T:Numeric](a:T, b:T) = leftOpen(a, b)
+  }
+
+All math operations that work on the underlying type of an Interval will also
+work on the Interval itself. In addition, Interval and Range instances can be
+translated to each other:
+
+  (0 until 10) corresponds to Interval(Closed(0), Open(10))
+  (0 to 10) corresponds to Interval(Closed(0), Closed(10))
+
+Intervals would provide type class instances corresponding to their
+underlying type. For instance:
+
+  class IntervalIsNumeric[T:Numeric] extends Numeric[Interval[T]]
+  implicit def intervalIsNumeric[T:Numeric] = new IntervalIsNumeric[T]
+
+  class FractionalIntervalIsFractional[T:Fractional] extends Fractional[Interval[T]]
+  implicit def integralIntervalIsIntegral[T:Integral] = new FractionalIntervalIsFractional[T]
+
+  ...
+
+Intervals could have methods to see if they contain a particular value,
+methods to turn themselves into Range objects, etc. This is an exciting but
+speculative type.
+
+[*] http://permalink.gmane.org/gmane.comp.lang.scala.debate/6999
+
+
+7. Optionally, add a simple boxed Number type
+
+This particular proposal is possibly too controversial, but will be included
+because it provides an interesting way around many issues people seem to run
+into. The idea is to provide a Number type, which wraps an underlying number
+type. This is superficially similar to Java, but in this case, it would
+support all math operators and methods, promoting underlying types as
+necessary to avoid truncation errors, overflow and other common pitfalls.
+Many of the ideas people have brought up around changing the way division
+works in Scala could be accommodated. For example:
+
+  Number(3) / Number(4) -> Number(0.75) ...or Number(3/4)
+
+When users require speed or a particular representation (e.g. Int, Double,
+etc) those could be used. However, most users don't particularly care about
+these days, and don't want to consider things like integer overflow. It would
+also allow us to override behaviors like Double.NaN, out-of-range Double's
+becoming Infinity, and floating point error. It could even experiment with
+something like base10 floating-point (which was brought up on the mailing
+list awhile ago).
+
+The reason this proposal is difficult is because unless there is literal
+support (e.g. Scala interprets "3" as a Number) then it will be cumbersome
+enough that most will not use it. Also, anything that first interprets "1.1"
+as Float/Double before converting/wrapping to Number will encounter problems
+like this one:
+
+  Number(1.1) + Number(2.2) != Number(3.3)
+
+Which is something we would want to avoid, if Number was able to use
+rationals, BigDecimal or base-10 floating point under the covers. In any
+case, I think this solution has promise but would require major changes to
+the language and library to be worthwhile, and may not deliver enough
+benefit.
+
+
+8. Specialization
+
+Specializing a generic type parameter avoids the boxing that normally happens
+to AnyVal types are used as type parameters. This boxing is the overriding
+reason that these type classes are slow in 2.9.1 and earlier. Specialization
+is already used in a few places in the Scala library to good effect.
+
+Specializing Numeric has already been well-tested and good results have been
+achieved [*]. Specializing Ordering will have the added benefit of
+speeding up the built-in sort implementations for Long, BigInt, BigDecimal,
+etc.
+
+It will be important to make sure to do profiling and analysis to ensure that
+no boxing is occurring, and to gauge the trade-off between increase
+specialization and jar size.
+
+[*] http://www.azavea.com/blogs/labs/2011/06/scalas-numeric-type-class-pt-2/
+
+
+9. Remove support for Byte, Short and friends (H)
+
+All numeric types smaller than Int have behavior that deviates from the rest
+of the numeric types. For instance, the result of adding two Byte values is
+an Int value (which may exceed Byte.MaxValue):
+
+  Byte.MaxValue + Byte.MaxValue -> Int = 254  //(outside of -128 to 127)
+
+Since few people use these types, and since it will be difficult to achieve
+their "normal" behavior in a type class providing T + T -> T it seems easiest
+to remove them. The JVM already converts values of these types when doing
+math, so it doesn't seem unreasonable to ask users to do the same when using
+them with generic numeric functions. The types already have second-class
+status in the language given that proposals to introduce Byte/Short literal
+syntax have been turned down.
+
+Alternately, we can continue supporting them and accept that they will behave
+differently when generic.
+
+
+10. Restructure Numeric and related type classes
+
+As was said earlier, the numeric types don't share a useful superclass or
+interface, so abstracting across them is tricky. Scala uses a type
+class strategy to make these things possible:
+
+  def addOne[T:Numeric](a:T) = a + 1
+  addOne(3) -> 4
+  addOne(4.0) -> 5.0
+
+  def avg[T](a:T, b:T)(implicit f:Fractional[T]) = (a + b + c) / f.fromInt(2)
+  avg(1.0, 2.0) -> 1.5
+  avg(BigDecimal(100.0), BigDecimal(150.0)) -> BigDecimal(125.0)
+
+Unfortunately, the numeric type classes currently are stuck in sort of an
+uncanny valley. They are torn between Haskell's purity and the flexibility
+provided by a numeric tower. The former view wants to avoid as runtime errors
+(as much as possible) by limiting methods and operators to those known to be
+safe for the given type. The latter view wants to be able to write generic
+code that can work with all number types. Sadly, Scala's type classes
+achieves neither of these goals.
+
+Superficially, Scala's type classes seem to be loosely-based on Haskell's.
+However, they deviate in weird ways. Scala's Numeric and Fractional type
+classes both extend Ordering, although their Haskell equivalents (Num and
+Fractional) do not. Scala's Fractional ends up looking more like Haskell's
+Real. It's possible Scala does without Real because Scala currently lacks a
+complex type, and since all of Scala's type classes bake-in ordering and
+comparison operators, they are incompatible with any future (or user-defined)
+complex type. They also lack many useful methods defined on their Haskell
+counterparts (for instance, Haskell's Fractional type classes support pi,
+exp, sqrt, log, pow, and the trigonometry functions).
+
+For users coming from dynamically-typed languages these type classes will not
+please either. The Numeric type neglects to provide a / operator, forcing
+users to use Integral of Fractional (which is not a distinction these users
+will care to make, especially since Scala uses / for both Int./ and
+Double./). Trying to do actual useful work with these classes invariably
+relies on conversions to concrete types (e.g. Double) which defeats the
+purpose.
+
+Given that both constituencies have valid needs, the approach suggested here
+creates parallel type class hierarchies: one which mirrors the algebraic
+properties of the underlying structures as closely as possible (composed of
+the new type classes Ring, EuclideanRing and Field), and one that is intended
+to allow possible run-time errors in exchange for flexibility (Numeric,
+Fractional, Integral).
+
+None of new traits would extend Ordering, to avoid problems when dealing with
+complex numbers or other unordered types (e.g. vectors). These would be as
+pure as possible--the only runtime errors you might see would be things like
+a divide-by-zero error. Each of the new traits corresponds to an algebraic
+structure of the same name.
+
+Ring, EuclideanRing and Field correspond to Numeric, Integral and Fractional,
+but without comparison operators. EuclideanRing adds quotient and modulus to
+Ring, and Field adds division to EuclideanRing. Thus instances of
+EuclideanRing[T] can be used for Numeric[T], and instances of Field[T] is a
+superset of both.
+
+The Numeric type class represents generic operations across all numeric
+types. Anything that represents a quantity can be included: Int, Double,
+BigInt, Complex, Interval, etc. Operators will do whatever seems appropriate
+to their type: the / operator will use the quotient for Int (5 / 2 -> 2) and
+division for Double (5.0 / 2.0 -> 2.5). Certain operations may throw
+exceptions (for instance, using comparison operators on Complex numbers). The
+goal for Numeric is to allow any algorithm written in terms of a basic
+numeric type (e.g. Int) to be generalized.
+
+We can implement Integral and Fractional in terms of EuclideanRing and
+Integral while (more-or-less) preserving their current behavior:
+
+    trait Integral[T] extends EuclideanRing[T] with Ordering[T] { ... }
+    trait Fractional[T] extends Field[T] with Ordering[T] { ... }
+
+This means that Numeric is maximally flexible, but may in some cases
+introduce imprecision or run-time problems. Fractional and Integral are more
+limited in which types they can work. Ring, EuclideanRing and Field hem
+closely to the algebraic properties in question.
+
+There is a desire in the community to create traits like Magma, Semigroup,
+Group/Monoid, etc. While these are useful, Ring can't easily make use of them
+(since it represents two different groups: [T, +, 0] and [T, *, 1]). There is
+also some confusion over how the operator (and identity in some cases) should
+be described. These types are not dealt with in this proposal, although they
+could be added if these other issues are dealt with.
+
+
+11. Conversion to mix literals and generic values
+
+Numeric should have implicits allowing users to mix literals and generic
+values. For example:
+
+   def adder[T:Numeric](n:T) = n + 1
+
+This is important for clarity and ease-of-use. Ideally any literal could be
+converted to T; if this is problematic support could be reduced to just
+certain literals (e.g. Int). There is some tension between creating really
+convenient and efficient conversions between generic types, and a desire not
+to "hardcode" the types in question into the conversion interfaces.
+
+The latter approach of "baking in" things like toDouble, toBigInt, etc. has
+been tested and does work well, but doesn't permit user-defined types.
+Alternate strategies (such as looking for a whole class of Conversion[From,
+To] instances when needing to convert between two types) have not been
+successful so far. In the absence of a new approach, either baking in some
+privileged types (like Int or Double which can be readily used as literals)
+or limited ourselves to Int seem the best approaches. It's very important
+that integers literals (especially 0 and 1) work as expected.
+
+
+Conclusion
+
+This is not really a SIP, but it is a (large) list of proposals for a way to
+make manipulating numbers and numeric types in Scala easier, more powerful
+and more fun. Obviously interfaces need to be hammered out and particular
+features may not make the cut.
+
+Some other proposals would help this one immensely. For instance, Josh
+Suereth's proposals around implicits and type classes would be invaluable,
+especially if we expand our use of the type class pattern in Scala (and in an
+area where performance is so important). There are syntactic changes that
+could make using type classes with @specialized type members involve less
+boilerplate. There are also bugs in specialization which if fixed could
+enable even better performance.
+
+That said, most of these proposals have already been tested in some capacity
+and all of them are considered plausible and ready to be embarked on. The
+biggest questions are around backwards compatibility with previous APIs,
+moving beyond Java, and willingness to add new numeric types to the Scala
+library.
