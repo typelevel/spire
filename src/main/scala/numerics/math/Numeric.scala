@@ -38,6 +38,8 @@ trait Field[@specialized(Float,Double) A] extends EuclideanRing[A] {
   def isWhole(a:A): Boolean = eq(mod(a, one), zero)
 }
 
+trait OrderedRing[@specialized(Int,Long,Float,Double) A] extends Ring[A] with Ordering[A] {}
+
 trait Integral[@specialized(Int,Long) A] extends EuclideanRing[A] with Ordering[A] {}
 
 trait Fractional[@specialized(Float,Double) A] extends Field[A] with Ordering[A] {}

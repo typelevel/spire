@@ -2,17 +2,18 @@ package numerics.math
 
 import Implicits._
 
-// TODO: finish defining operations, especially division
-// consider whether to restrict T to Fractional or Field instead of Numeric.
-// (integral intervals behave very differently, e.g. division).
+// TODO: we need some kind of generic Interval on Rings without division,
+// which DiscreteInterval and ContinuousInterval can inherit from and provide
+// their own implementations. also, ideally we'd be depending on
+// PartialOrdering[T] rather than the full Ordering[T] that Fractional[T]
+// provides.
 
-// TODO: maybe split Unbound into UnboundBelow and UnboundAbove. this would
-// simplify some of the confusing code and make the comparators more honest.
+// NOTE: Intervals are being removed from the proposal. This is mostly
+// historical at this point.
 
 sealed trait Bound[T] {
   val num:Fractional[T]
 
-  // NOTE: these comparators are a bit weird and should maybe be renamed?
   def <(rhs:Bound[T]):Boolean
   def <=(rhs:Bound[T]):Boolean
   def >(rhs:Bound[T]):Boolean
@@ -40,73 +41,80 @@ sealed trait Bound[T] {
   def /(rhs:Bound[T]) = binop(rhs, (x:T, y:T) => num.div(x, y))
 }
 
-//case class UnboundBelow[T:Fractional]() extends Bound[T] {
-//  val num = implicitly[Fractional[T]]
-//
-//  def <(rhs:Bound[T]) = true
-//  def <=(rhs:Bound[T]) = true
-//  def >(rhs:Bound[T]) = false
-//  def >=(rhs:Bound[T]) = false
-//
-//  def isZero = false
-//  def isAboveZero = false
-//  def isAtOrAboveZero = false
-//  def isBelowZero = true
-//  def isAtOrBelowZero = true
-//
-//  def n = throw new Exception("Unbound has no boundary value")
-//
-//  def unop(f:Function1[T, T]) = UnboundBelow()
-//  def binop(rhs:Bound[T], f:Function2[T, T, T]) = rhs match {
-//    case UnboundAbove() => error("undefined")
-//    case _ => UnboundBelow()
-//  }
-//
-//  def min(rhs:Bound[T]) = UnboundBelow()
-//  def max(rhs:Bound[T]) = rhs
-//}
-
-case class Unbound[T:Fractional]() extends Bound[T] {
+case class UnboundBelow[T:Fractional]() extends Bound[T] {
   val num = implicitly[Fractional[T]]
 
   def <(rhs:Bound[T]) = true
   def <=(rhs:Bound[T]) = true
+  def >(rhs:Bound[T]) = false
+  def >=(rhs:Bound[T]) = false
+
+  def isZero = false
+  def isAboveZero = false
+  def isAtOrAboveZero = false
+  def isBelowZero = true
+  def isAtOrBelowZero = true
+
+  def n = throw new Exception("has no boundary value")
+
+  def unop(f:Function1[T, T]) = this
+  def binop(rhs:Bound[T], f:Function2[T, T, T]) = rhs match {
+    case UnboundAbove() => sys.error("undefined")
+    case _ => this
+  }
+
+  def min(rhs:Bound[T]) = this
+  def max(rhs:Bound[T]) = rhs
+}
+
+case class UnboundAbove[T:Fractional]() extends Bound[T] {
+  val num = implicitly[Fractional[T]]
+
+  def <(rhs:Bound[T]) = false
+  def <=(rhs:Bound[T]) = false
   def >(rhs:Bound[T]) = true
   def >=(rhs:Bound[T]) = true
 
   def isZero = false
   def isAboveZero = true
   def isAtOrAboveZero = true
-  def isBelowZero = true
-  def isAtOrBelowZero = true
+  def isBelowZero = false
+  def isAtOrBelowZero = false
 
-  def n = throw new Exception("Unbound has no boundary value")
+  def n = throw new Exception("has no boundary value")
 
-  def unop(f:Function1[T, T]) = Unbound()
-  def binop(rhs:Bound[T], f:Function2[T, T, T]) = Unbound()
+  def unop(f:Function1[T, T]) = this
+  def binop(rhs:Bound[T], f:Function2[T, T, T]) = rhs match {
+    case UnboundBelow() => sys.error("undefined")
+    case _ => this
+  }
 
-  def min(rhs:Bound[T]) = Unbound()
-  def max(rhs:Bound[T]) = Unbound()
+  def min(rhs:Bound[T]) = rhs
+  def max(rhs:Bound[T]) = this
 }
 
 case class OpenBound[T:Fractional](n:T) extends Bound[T] {
   val num = implicitly[Fractional[T]]
 
   def <(rhs:Bound[T]) = rhs match {
-    case Unbound() => false
+    case UnboundAbove() => true
+    case UnboundBelow() => false
     case _ => n < rhs.n
   }
   def <=(rhs:Bound[T]) = rhs match {
-    case Unbound() => false
+    case UnboundAbove() => true
+    case UnboundBelow() => false
     case OpenBound(m) => n <= m
     case ClosedBound(m) => n < m
   }
   def >(rhs:Bound[T]) = rhs match {
-    case Unbound() => false
+    case UnboundAbove() => false
+    case UnboundBelow() => true
     case _ => n > rhs.n
   }
   def >=(rhs:Bound[T]) = rhs match {
-    case Unbound() => false
+    case UnboundAbove() => false
+    case UnboundBelow() => true
     case OpenBound(m) => n >= m
     case ClosedBound(m) => n > m
   }
@@ -119,16 +127,19 @@ case class OpenBound[T:Fractional](n:T) extends Bound[T] {
 
   def unop(f:Function1[T, T]) = OpenBound(f(n))
   def binop(rhs:Bound[T], f:Function2[T, T, T]) = rhs match {
-    case Unbound() => Unbound()
+    case UnboundAbove() => rhs
+    case UnboundBelow() => rhs
     case _ => OpenBound(f(n, rhs.n))
   }
 
   def min(rhs:Bound[T]) = rhs match {
-    case Unbound() => rhs
+    case UnboundBelow() => rhs
+    case UnboundAbove() => this
     case _ => if (n < rhs.n) this else rhs
   }
   def max(rhs:Bound[T]) = rhs match {
-    case Unbound() => rhs
+    case UnboundBelow() => this
+    case UnboundAbove() => rhs
     case _ => if (n > rhs.n) this else rhs
   }
 }
@@ -137,19 +148,23 @@ case class ClosedBound[T:Fractional](n:T) extends Bound[T] {
   val num = implicitly[Fractional[T]]
 
   def <(rhs:Bound[T]) = rhs match {
-    case Unbound() => false
+    case UnboundAbove() => true
+    case UnboundBelow() => false
     case _ => n < rhs.n
   }
   def <=(rhs:Bound[T]) = rhs match {
-    case Unbound() => false
+    case UnboundAbove() => true
+    case UnboundBelow() => false
     case _ => n <= rhs.n
   }
   def >(rhs:Bound[T]) = rhs match {
-    case Unbound() => false
+    case UnboundAbove() => false
+    case UnboundBelow() => true
     case _ => n > rhs.n
   }
   def >=(rhs:Bound[T]) = rhs match {
-    case Unbound() => false
+    case UnboundAbove() => false
+    case UnboundBelow() => true
     case _ => n >= rhs.n
   }
 
@@ -161,23 +176,28 @@ case class ClosedBound[T:Fractional](n:T) extends Bound[T] {
 
   def unop(f:Function1[T, T]) = ClosedBound(f(n))
   def binop(rhs:Bound[T], f:Function2[T, T, T]):Bound[T] = rhs match {
-    case Unbound() => Unbound()
+    case UnboundAbove() => rhs
+    case UnboundBelow() => rhs
     case OpenBound(m) => OpenBound(f(n, m))
     case ClosedBound(m) => ClosedBound(f(n, m))
   }
 
   def min(rhs:Bound[T]) = rhs match {
-    case Unbound() => rhs
+    case UnboundAbove() => this
+    case UnboundBelow() => rhs
     case _ => if (n <= rhs.n) this else rhs
   }
   def max(rhs:Bound[T]) = rhs match {
-    case Unbound() => rhs
+    case UnboundAbove() => rhs
+    case UnboundBelow() => this
     case _ => if (n >= rhs.n) this else rhs
   }
 }
 
 case class Interval[T:Fractional](lower:Bound[T], upper:Bound[T]) {
   assert (lower <= upper)
+  assert (!lower.isInstanceOf[UnboundAbove[_]])
+  assert (!upper.isInstanceOf[UnboundBelow[_]])
 
   val num = implicitly[Fractional[T]]
 
@@ -187,12 +207,13 @@ case class Interval[T:Fractional](lower:Bound[T], upper:Bound[T]) {
   def containsZero = lower.isAtOrBelowZero && upper.isAtOrAboveZero
   def crossesZero = lower.isBelowZero && upper.isAboveZero
 
-  def splitAtZero = if (lower.isAtOrAboveZero) {
-    // only positive
+  def splitAtZero:(Interval[T], Interval[T]) = if (lower.isAtOrAboveZero) {
+    (Interval.empty, this)
   } else if (upper.isAtOrBelowZero) {
-    // only negative
+    (this, Interval.empty)
   } else {
-    
+    // need to return two new intervals here
+    sys.error("todo")
   }
   
   def abs = {
@@ -237,4 +258,13 @@ case class Interval[T:Fractional](lower:Bound[T], upper:Bound[T]) {
 
     sys.error("todo")
   }
+}
+
+object Interval {
+  def open[T:Fractional](a:T, b:T) = Interval(OpenBound(a), OpenBound(b))
+  def closed[T:Fractional](a:T, b:T) = Interval(ClosedBound(a), ClosedBound(b))
+  def unbounded[T:Fractional] = Interval[T](UnboundBelow(), UnboundAbove())
+
+  def empty[T](implicit num:Fractional[T]) = open(num.zero, num.zero)
+  def degenerate[T:Fractional](t:T) = closed(t, t)
 }

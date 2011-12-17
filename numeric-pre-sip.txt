@@ -101,6 +101,7 @@ Here is an outline of the proposed changes and additions:
    4. add a Rational type
    5. add a Complex[T] type
    6. add an Interval[T] type (maybe interop with or replace NumericRange[T])
+      (NOTE, intervals being removed from proposal)
    7. optionally, implement a simple boxed Number type
 
   [changes to numeric type classes]
@@ -202,6 +203,8 @@ Fractional.
 
 
 6. Intervals
+
+NOTE: this section will be removed from future versions
 
 This feature was brought up by Paul Phillips [*] and many others have also
 mentioned it. It also relates nicely to Ranges.
