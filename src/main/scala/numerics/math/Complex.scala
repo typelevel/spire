@@ -1,87 +1,125 @@
 package numerics.math
 
+import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.math.{Pi, atan2, cos, exp, log, pow, sin, sqrt}
 
+import Implicits._
+
+// TODO: refactor places where Fractional is converted to Double in order to
+// access functions (e.g. trig, pow, exp, log)
+
 object Complex {
-  val i = Complex(0, 1)
-  val one = Complex(1, 0)
-  val zero = Complex(0, 0)
+  def i[T:Fractional] = Complex(fractional.zero, fractional.one)
+  def one[T:Fractional] = Complex(fractional.one, fractional.zero)
+  def zero[T:Fractional] = Complex(fractional.zero, fractional.zero)
 
-  implicit def doubleToComplex(d:Double) = Complex(d, 0)
+  def fractionalToComplex[T:Fractional](t:T) = new Complex(t, fractional.zero)
 
-  val lexicographicOrdering = Ordering.by((c:Complex) => c.asTuple)
+  def lexicographicOrdering[T:Fractional] = Ordering.by((c:Complex[T]) => c.asTuple)
 
-  val realOrdering = Ordering.by((_:Complex).real)
-  val imagOrdering = Ordering.by((_:Complex).imag)
-  val magnitudeOrdering = Ordering.by((_:Complex).magnitude)
+  def realOrdering[T:Fractional] = Ordering.by((_:Complex[T]).real)
+  def imagOrdering[T:Fractional] = Ordering.by((_:Complex[T]).imag)
+  def magnitudeOrdering[T:Fractional] = Ordering.by((_:Complex[T]).magnitude)
 
-  def polar(magnitude:Double, angle:Double) = {
-    val real = magnitude * cos(angle)
-    val imag = magnitude * sin(angle)
-    Complex(real, imag)
+  def polar[T:Fractional](magnitude:T, angle:T) = {
+    val real:T = magnitude * fractional.fromDouble(cos(angle.toDouble))
+    val imag:T = magnitude * fractional.fromDouble(sin(angle.toDouble))
+    Complex[T](real, imag)
   }
+
+  def apply[T:Fractional](real:T, imag:T) = new Complex(real, imag)
 }
 
-case class Complex(real:Double, imag:Double) {
-  lazy val magnitude = sqrt(real * real + imag * imag)
-  lazy val angle = atan2(imag, real)
+class Complex[T](val real:T, val imag:T)(implicit f:Fractional[T])
+extends ScalaNumber with ScalaNumericConversions with Serializable {
 
-  def abs() = magnitude
+  // ugh, ScalaNumericConversions ghetto
+  //
+  // maybe complex numbers are too different...
+  def doubleValue = real.toDouble
+  def floatValue = real.toFloat
+  def longValue = real.toLong
+  def intValue = real.toInt
+  def underlying = List(real, imag)
+  def isWhole = real.isWhole && imag.isWhole
+  def signum: Int = {
+    val i = f.compare(real, f.zero)
+    if (i != 0) i else f.compare(imag, f.zero)
+  }
 
-  def arg() = angle
+  override def hashCode: Int = if (isReal && real.isWhole &&
+                                   real <= f.fromInt(Int.MaxValue) &&
+                                   real >= f.fromInt(Int.MinValue)) {
+    real.toInt.##
+  } else {
+    19 * real.## + 41 * imag.##
+  }
 
-  def conjugate() = Complex(real, -imag)
+  override def equals(that: Any): Boolean = that match {
+    case that:Complex[_] => real == that.real && imag == that.imag
+    case that => unifiedPrimitiveEquals(that)
+  }
 
-  def asTuple() = (real, imag)
+  override def toString: String = "Complex(%s, %s)".format(real, imag)
 
-  def asPolarTuple() = (abs(), arg())
+  // ugh, for very large Fractional values this will totally break
+  lazy val magnitude: T = f.fromDouble(sqrt((real * real + imag * imag).toDouble))
+  lazy val angle: T = f.fromDouble(atan2(imag.toDouble, real.toDouble))
+  def abs: T = magnitude
+  def arg: T = angle
 
-  def equiv(b:Complex) = real == b.real && imag == b.imag
+  def conjugate = Complex(real, -imag)
 
-  def +(b:Complex) = Complex(real + b.real, imag + b.imag)
+  def asTuple: (T, T) = (real, imag)
+  def asPolarTuple: (T, T) = (abs, arg)
 
-  def -(b:Complex) = Complex(real - b.real, imag - b.imag)
+  def isImaginary: Boolean = real == f.zero && imag != f.zero
+  def isReal: Boolean = real != f.zero && imag == f.zero
 
-  // I've commented out the polar forms
+  def eq(b:Complex[T]) = real == b.real && imag == b.imag
 
-  //def *(b:Complex) = Complex.polar(magnitude * b.magnitude, angle + b.angle)
-  def *(b:Complex) = Complex(real * b.real - imag * b.imag,
-                             imag * b.real + real * b.imag)
+  def unary_-() = Complex(-real, -imag)
 
-  //def /(b:Complex) = if (b.equiv(Complex.zero)) {
-  //  throw new Exception("/ by zero")
-  //} else {
-  //  Complex.polar(magnitude / b.magnitude, angle - b.angle)
-  //}
-  def /(b:Complex) = {
-    val abs_breal = math.abs(b.real)
-    val abs_bimag = math.abs(b.imag)
+  def +(b:Complex[T]) = Complex(real + b.real, imag + b.imag)
+
+  def -(b:Complex[T]) = Complex(real - b.real, imag - b.imag)
+
+  def *(b:Complex[T]) = Complex(real * b.real - imag * b.imag,
+                                  imag * b.real + real * b.imag)
+
+  def /(b:Complex[T]) = {
+    val abs_breal = b.real.abs
+    val abs_bimag = b.imag.abs
 
     if (abs_breal >= abs_bimag) {
-      if (abs_breal == 0.0) throw new Exception("/ by zero")
+      if (abs_breal === f.zero) throw new Exception("/ by zero")
       val ratio = b.imag / b.real
       val denom = b.real + b.imag * ratio
       Complex((real + imag * ratio) / denom, (imag - real * ratio) / denom)
+
     } else {
-      if (abs_bimag == 0.0) throw new Exception("/ by zero")
+      if (abs_bimag === f.zero) throw new Exception("/ by zero")
       val ratio = b.real / b.imag
       val denom = b.real * ratio + b.imag
       Complex((real * ratio + imag) / denom, (imag * ratio - real) / denom)
     }
   }
 
-  def pow(b:Complex) = if (b.equiv(Complex.zero)) {
-    Complex.one
-  } else if (this.equiv(Complex.zero)) {
-    if (b.imag != 0 || b.real < 0)
+  def pow(b:Complex[T]) = if (b.eq(Complex.zero[T])) {
+    Complex.one[T]
+
+  } else if (this.eq(Complex.zero[T])) {
+    if ((b.imag !== f.zero) || (b.real < f.zero))
       throw new Exception("raising 0 to negative/complex power")
-    Complex.zero
-  } else if (b.imag != 0.0) {
-    val len = math.pow(abs, b.real) / exp(angle * b.imag)
-    val phase = angle * b.real + log(abs) * b.imag
+    Complex.zero[T]
+
+  } else if (b.imag !== f.zero) {
+    val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble) / exp((angle * b.imag).toDouble))
+    val phase = f.fromDouble(angle.toDouble * b.real.toDouble + log(abs.toDouble) * b.imag.toDouble)
     Complex.polar(len, phase)
+
   } else {
-    val len = math.pow(abs, b.real)
+    val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble))
     val phase = angle * b.real
     Complex.polar(len, phase)
   }
