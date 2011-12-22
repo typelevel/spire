@@ -53,10 +53,10 @@ class ComplexTest extends FunSuite {
   }
 
   // TODO: once Complex stops using conversions to Double to do exp/pow/log,
-  // we should try out Euler's identity with Rat.
+  // we should try out Euler's identity with Rational.
 
   // brings up the point that it would be nice to have functions for e, pi, etc
-  // for Rat/BigDecimal/etc that gave us as much precision as we asked for.
+  // for Rational/BigDecimal/etc that gave us as much precision as we asked for.
   //
   // or, symbolic Real types anyone? why not reimplement mathematica?
 }

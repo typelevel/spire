@@ -222,34 +222,34 @@ trait BigDecimalIsNumeric extends Numeric[BigDecimal] with BigDecimalIsField wit
 /**
  *
  */
-trait RatOrdering extends Ordering[Rat] {
-  def compare(a:Rat, b:Rat) = a.compare(b)
+trait RationalOrdering extends Ordering[Rational] {
+  def compare(a:Rational, b:Rational) = a.compare(b)
 }
 
-trait RatIsRing extends Ring[Rat] with ConvertableFromRat with ConvertableToRat {
-  def abs(a:Rat): Rat = a.abs
-  def eq(a:Rat, b:Rat): Boolean = a == b
-  def minus(a:Rat, b:Rat): Rat = a - b
-  def negate(a:Rat): Rat = -a
-  def neq(a:Rat, b:Rat): Boolean = a != b
-  def one: Rat = Rat.one
-  def plus(a:Rat, b:Rat): Rat = a + b
-  def times(a:Rat, b:Rat): Rat = a * b
-  def zero: Rat = Rat.zero
+trait RationalIsRing extends Ring[Rational] with ConvertableFromRational with ConvertableToRational {
+  def abs(a:Rational): Rational = a.abs
+  def eq(a:Rational, b:Rational): Boolean = a == b
+  def minus(a:Rational, b:Rational): Rational = a - b
+  def negate(a:Rational): Rational = -a
+  def neq(a:Rational, b:Rational): Boolean = a != b
+  def one: Rational = Rational.one
+  def plus(a:Rational, b:Rational): Rational = a + b
+  def times(a:Rational, b:Rational): Rational = a * b
+  def zero: Rational = Rational.zero
 }
 
-trait RatIsEuclideanRing extends EuclideanRing[Rat] with RatIsRing {
-  def quot(a:Rat, b:Rat) = a.quot(b)
-  def mod(a:Rat, b:Rat) = a % b
+trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRing {
+  def quot(a:Rational, b:Rational) = a.quot(b)
+  def mod(a:Rational, b:Rational) = a % b
 }
 
-trait RatIsField extends Field[Rat] with RatIsEuclideanRing {
-  def div(a:Rat, b:Rat) = a / b
+trait RationalIsField extends Field[Rational] with RationalIsEuclideanRing {
+  def div(a:Rational, b:Rational) = a / b
 }
 
-trait RatIsFractional extends Fractional[Rat] with RatIsField with RatOrdering {}
+trait RationalIsFractional extends Fractional[Rational] with RationalIsField with RationalOrdering {}
 
-trait RatIsNumeric extends Numeric[Rat] with RatIsField with RatOrdering {}
+trait RationalIsNumeric extends Numeric[Rational] with RationalIsField with RationalOrdering {}
 
 
 /**
@@ -332,7 +332,7 @@ object Ring {
   implicit object DoubleIsRing extends DoubleIsRing
   implicit object BigIntIsRing extends BigIntIsRing
   implicit object BigDecimalIsRing extends BigDecimalIsRing
-  implicit object RatIsRing extends RatIsRing
+  implicit object RationalIsRing extends RationalIsRing
 }
 
 object EuclideanRing {
@@ -342,14 +342,14 @@ object EuclideanRing {
   implicit object DoubleIsEuclideanRing extends DoubleIsEuclideanRing
   implicit object BigIntIsEuclideanRing extends BigIntIsEuclideanRing
   implicit object BigDecimalIsEuclideanRing extends BigDecimalIsEuclideanRing
-  implicit object RatIsEuclideanRing extends RatIsEuclideanRing
+  implicit object RationalIsEuclideanRing extends RationalIsEuclideanRing
 }
 
 object Field {
   implicit object FloatIsField extends FloatIsField
   implicit object DoubleIsField extends DoubleIsField
   implicit object BigDecimalIsField extends BigDecimalIsField
-  implicit object RatIsField extends RatIsField
+  implicit object RationalIsField extends RationalIsField
 }
 
 object Integral {
@@ -362,7 +362,7 @@ object Fractional {
   implicit object FloatIsFractional extends FloatIsFractional
   implicit object DoubleIsFractional extends DoubleIsFractional
   implicit object BigDecimalIsFractional extends BigDecimalIsFractional
-  implicit object RatIsFractional extends RatIsFractional
+  implicit object RationalIsFractional extends RationalIsFractional
 }
 
 object Numeric {
@@ -372,7 +372,7 @@ object Numeric {
   implicit object DoubleIsNumeric extends DoubleIsNumeric
   implicit object BigIntIsNumeric extends BigIntIsNumeric
   implicit object BigDecimalIsNumeric extends BigDecimalIsNumeric
-  implicit object RatIsNumeric extends RatIsNumeric
+  implicit object RationalIsNumeric extends RationalIsNumeric
 }
 
 

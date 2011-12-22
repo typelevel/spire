@@ -2,14 +2,13 @@ package numerics.math
 
 import org.scalatest.FunSuite
 
-
 class RationalTest extends FunSuite {
+
   test("rational canonical construction") {
     val r = Rational(5,6)
     assert(r.numerator === BigInt(5))
     assert(r.denominator === BigInt(6))
   }
-
   test("rational degenerate construction") {
     val r = Rational(30, 345)
     assert(r.numerator === BigInt(2))
@@ -17,9 +16,9 @@ class RationalTest extends FunSuite {
   }
 
   test("RationalIsFractional implicit exists") {
-    def doStuff[NT](a: NT, b: NT)(implicit n: scala.math.Fractional[NT]) = {
-      import n._
-      a / b	// Note: a & b are of unknown type NT, not Rational
+    import Implicits._
+    def doStuff[NT](a: NT, b: NT)(implicit n: Fractional[NT]) = {
+      a / b    // Note: a & b are of unknown type NT, not Rational
     }
 
     expect(Rational(1, 2)) {
@@ -54,20 +53,20 @@ class RationalTest extends FunSuite {
     assert(a <= d)
     assert(a >= d)
   }
-
-	test("primitive comparisons") {
-		val a = Rational("5000000000")
-		val b = Rational(-123456)
-		val c = Rational(1, 8)
-		assert(a === 5000000000L)
-		assert(5000000000L === a)
-		assert(b === -123456)
-		assert(-123456 === b)
-		assert(c === .125)
-		assert(.125 === c)
-		assert(c === .125f)
-		assert(.125f === c)
-	}
+     
+  test("primitive comparisons") {
+    val a = Rational("5000000000")
+    val b = Rational(-123456)
+    val c = Rational(1, 8)
+    assert(a === 5000000000L)
+    assert(5000000000L === a)
+    assert(b === -123456)
+    assert(-123456 === b)
+    assert(c === 0.125)
+    assert(0.125 === c)
+    assert(c === 0.125f)
+    assert(0.125f === c)
+  }
 
   test("addition") {
     val a = Rational(3, 10)
@@ -166,42 +165,42 @@ class RationalTest extends FunSuite {
     }
   }
 
-	test("pow") {
-		val a = Rational(1, 2)
+    test("pow") {
+        val a = Rational(1, 2)
     expect(Rational(1, BigInt("4294967296"))) {
       a pow 32
     }
 
-		val b = Rational(-3, 1)
+        val b = Rational(-3, 1)
     expect(Rational(9, 1)) {
       b pow 2
     }
     expect(Rational(-27, 1)) {
       b pow 3
     }
-	}
+    }
 
-	test("longValue") { assert(Rational("5000000000").toLong === 5000000000L) }
-	test("intValue") {
-		assert(Rational(3).toInt === 3)
-		assert(Rational(-5, 2).toInt === -2)
-	}
-	test("shortValue") {
-		assert(Rational(65535).toShort === -1)
-		assert(Rational(65536).toShort === 0)
-		assert(Rational(-5).toShort === -5)
-	}
-	test("byteValue") {
-		assert(Rational(-1).toByte === -1)
-		assert(Rational(256).toByte === 0)
-	}
-	test("toDoubleAndFloat") {
-		assert(Rational(1, 2).toFloat === 0.5f)
-		val a = Rational("10000000000000002/10000000000000000")
-		assert(a.toDouble === 1.0000000000000002)
-		assert(a.toFloat === 1.0f)
+    test("longValue") { assert(Rational("5000000000").toLong === 5000000000L) }
+    test("intValue") {
+        assert(Rational(3).toInt === 3)
+        assert(Rational(-5, 2).toInt === -2)
+    }
+    test("shortValue") {
+        assert(Rational(65535).toShort === -1)
+        assert(Rational(65536).toShort === 0)
+        assert(Rational(-5).toShort === -5)
+    }
+    test("byteValue") {
+        assert(Rational(-1).toByte === -1)
+        assert(Rational(256).toByte === 0)
+    }
+    test("toDouble and tFloat") {
+        assert(Rational(1, 2).toFloat === 0.5f)
+        val a = Rational("10000000000000002/10000000000000000")
+        assert(a.toDouble === 1.0000000000000002)
+        assert(a.toFloat === 1.0f)
     assert(Rational(2, 3).toDouble === 2 / 3.0)
-	}
+    }
 
   test("toString") {
     assert(Rational(1, 2).toString === "1/2")
@@ -209,9 +208,14 @@ class RationalTest extends FunSuite {
     assert(Rational(2, 4).toString === "1/2")
   }
 
-  test("hashCodeIsSameForEquivalentRationals") {
+  test("hashCode is the same for equivalent rats") {
     assert(Rational(1, 2).hashCode === Rational(2, 4).hashCode)
     assert(Rational(0).hashCode === Rational(0, 5).hashCode)
     assert(Rational(-1, 2).hashCode === Rational(1, -2).hashCode)
+  }
+
+  test("reverse primitive equality") {
+    assert(1 == Rational.one)
+    assert(-23L == Rational(-23L, 1L))
   }
 }
