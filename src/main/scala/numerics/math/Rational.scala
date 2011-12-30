@@ -1,6 +1,5 @@
 package numerics.math
 
-
 import scala.math.{ScalaNumber, ScalaNumericConversions, abs, min}
 import Implicits._
 import Ordering.Implicits._
@@ -37,6 +36,115 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def toBigDecimal: BigDecimal
 
   def pow(exp: Int): Rational
+
+
+  /**
+   * Returns this `Rational` to the exponent `exp`. Both the numerator and
+   * denominator of `exp` must be valid integers. Anything larger will cause
+   * `pow` to throw an `ArithmeticException`.
+   */
+  def pow(exp: Rational)(implicit ctxt: ApproximationContext[Rational]): Rational = {
+    if (exp < 0) {
+      this.inverse.pow(-exp)(ctxt)
+    } else if (!(exp.numerator.isValidInt) || !(exp.denominator.isValidInt)) {
+      throw new ArithmeticException("Exponent is too large!")
+    } else {
+      
+      // nroot must be done last so the context is still valid, otherwise, we'd
+      // need to adjust the error, as the absolute error would increase,
+      // relatively, by (1 + e)^exp.numerator if nroot was done before the pow.
+
+      (this pow exp.numerator.toInt).nroot(exp.denominator.toInt)(ctxt)
+    }
+  }
+
+
+  /**
+   * Find the n-th root of this `Rational`. This requires an (implicit)
+   * `ApproximationContext` to bound the allowable absolute error of the answer.
+   */
+  def nroot(k: Int)(implicit ctxt: ApproximationContext[Rational]): Rational = if (k == 0) {
+    Rational.one
+  } else if (k < 0) {
+    this.inverse.nroot(-k)(ctxt)
+  } else if (this == 0) {
+    Rational.zero
+  } else {
+    val (low, high) = this match {
+      case LongRational(n, d) => {
+        val n_ = Rational.nroot(n, k)
+        val d_ = Rational.nroot(d, k)
+        (Rational(n_._1, d_._2), Rational(n_._2, d_._1))
+      }
+      case BigRational(n, d) => {
+        val n_ = Rational.nroot(n, k)
+        val d_ = Rational.nroot(d, k)
+        (Rational(n_._1, d_._2), Rational(n_._2, d_._1))
+      }
+    }
+    
+    if (low == high) {
+      low
+    } else {
+      
+      // TODO: Assumes initial relative error is < 1/n.
+      //
+      // Reduction in absolute error from n-th root algorithm:
+      // Let x(k) be the approximation at step k, x(oo) be the n-th root. Let
+      // e(k) be the relative error at step k, thus x(k) = x(oo)(1 + e(k)). If
+      // x(0) > x(oo), then x(k) > x(oo) (this can be seen during the
+      // derivation).
+      //
+      // x(k+1) = 1/n [(n-1) * x(k) + x(oo)^n / x(k)^(n-1)]
+      //          1/n [(n-1) * x(oo) * (1 + e(k)) + x(oo)^n / (x(oo) * (1 + e(k)))^(n-1)]
+      //          x(oo)[(n-1)*(1+e(k)) / n + 1 / (n * (1 + e(k))^(n-1))]
+      //          x(oo)[1 + e(k) + (1 + e(k))/n + 1 / (n * (1 + e(k))^(n-1))]
+      //          x(oo)[1 + e(k) * (1 - ((1 + e(k))^n - 1) / (e(k) * n * (1 + e(k))^(n-1))]
+      //          x(oo)[1 + e(k) * (1 - ((1 + n*e(k) + nC2*e(k)^2 + ... + e(k)^n) - 1) / (.. as above ..))]
+      //          x(oo)[1 + e(k) * (1 - (1 + nC2*e^2/n + ... + e^(n-1)/n) / (1 + e(k))^(n-1))]
+      //        < x(oo)[1 + e(k) * (1 - 1 / (1 + e(k))^(n-1))]
+      //        < x(oo)[1 + e(k) * (1 - 1 / (1 + 1/n)^(n-1))]
+      // Let e = (1 + 1/n)^(n-1).
+      //        < x(oo)[1 + e(k) * (e - 1 / e)]
+      //          
+      // So, we use a = (e - 1) / e as the relative error multiplier.
+
+      val e = Rational(k + 1, k) pow (k - 1)
+      val a = (e - 1) / e   // The relative error is multiplied by this each iter.
+      val error = ctxt.error
+      val absErr = high / k
+
+      // absErr * a^k < error => a^k = error / absErr => k = log(error / absErr) / log(a)
+      val maxiters = math.ceil(math.log((error / absErr).toDouble) / math.log(a.toDouble)).toInt
+      
+      // A single step of the nth-root algorithm.
+      @inline def refine(x: Rational) = (x * (k - 1) + this / (x pow (k - 1))) / k
+
+      def findNthRoot(prev: Rational, i: Int): Rational = if (i == maxiters) {
+        prev
+      } else {
+        val next = refine(prev)
+        
+        // We know x(e0 - e1) > (1 - a)xe0, so xe0 < x(e0 - e1) / (1 - a).
+        // Thus, if we have the difference, we can recalculate our guess of the
+        // absolute error more "accurately" by dividing the difference of the
+        // previous 2 guesses by (1 - a).
+        //
+        // This recalculation helps a lot. The numbers are a lot saner.
+
+        // TODO: If we remove the iters constraint and just use this, will we
+        //       ever perform worse than iters + 1 iterations? Need proof.
+
+        if (prev == next || ((prev - next) / (Rational(1) - a)) < error) {
+          prev
+        } else {
+          findNthRoot(next, i + 1)
+        }
+      }
+
+      findNthRoot(high, 0)
+    }
+  }
 }
 
 
@@ -90,6 +198,80 @@ object Rational {
     } catch {
       case nfe: NumberFormatException => throw new NumberFormatException("For input string: " + s)
     }
+  }
+
+
+  /**
+   * Finds x ^ y in log y multiplications. If `y` is `0`, then `1` is returned.
+   * If `y` is negative, then the result is undefined.
+   *
+   * TODO: This is really-out-of-place here :-\
+   */
+  def pow(x: Long, y: Int): Long = if (y == 0) {
+    1
+  } else if (y == 1) {
+    x
+  } else {
+    val z = pow(x, y >>> 1)
+    if ((y & 1) == 1) z * z * x else z * z
+  }
+
+
+  /**
+   * Returns an interval that bounds the nth-root of the integer x.
+   *
+   * TODO: This is really out-of-place too.
+   */
+  def nroot(x: BigInt, n: Int): (BigInt, BigInt) = {
+    def findnroot(prev: BigInt, add: Int): (BigInt, BigInt) = {
+      val min = prev setBit add
+      val max = min + 1
+
+      val fl = min pow n
+      val cl = max pow n
+
+      if (fl > x) {
+        findnroot(prev, add - 1)
+      } else if (cl < x) {
+        findnroot(min, add - 1)
+      } else if (cl == x) {
+        (max, max)
+      } else if (fl == x) {
+        (min, min)
+      } else {
+        (min, max)
+      }
+    }
+
+    findnroot(BigInt(0), (x.bitLength + n - 1) / n) // ceil(x.bitLength / n)
+  }
+
+
+  /**
+   * Returns an interval that bounds the nth-root of the integer x.
+   */
+  def nroot(x: Long, n: Int): (Long, Long) = {
+    def findnroot(prev: Long, add: Long): (Long, Long) = {
+      val min = prev | add
+      val max = min + 1
+      val fl = pow(min, n)
+      val cl = pow(max, n)
+
+      if (fl <= 0 || fl > x) {
+        findnroot(prev, add >> 1)
+      } else if (cl < x) {
+        findnroot(min, add >> 1)
+      } else if (cl == x) {
+        (max, max)
+      } else if (fl == x) {
+        (min, min)
+      } else {
+        (min, max)
+      }
+    }
+
+    // TODO: Could probably get a better initial add then this.
+    findnroot(0, 1L << ((65 - n) / n))
   }
 }
 
