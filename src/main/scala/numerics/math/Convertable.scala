@@ -120,16 +120,17 @@ trait ConvertableToRational extends ConvertableTo[Rational] {
   def fromRational(a:Rational) = a
 }
 
-object ConvertableTo {
-  implicit object ConvertableToByte extends ConvertableToByte
-  implicit object ConvertableToShort extends ConvertableToShort
-  implicit object ConvertableToInt extends ConvertableToInt
-  implicit object ConvertableToLong extends ConvertableToLong
-  implicit object ConvertableToFloat extends ConvertableToFloat
-  implicit object ConvertableToDouble extends ConvertableToDouble
-  implicit object ConvertableToBigInt extends ConvertableToBigInt
-  implicit object ConvertableToBigDecimal extends ConvertableToBigDecimal
-  implicit object ConvertableToRational extends ConvertableToRational
+trait ConvertableToComplex[A] extends ConvertableTo[Complex[A]] {
+  val f:Fractional[A]
+  def fromByte(a:Byte): Complex[A] = Complex(f.fromByte(a), f.zero)(f)
+  def fromShort(a:Short): Complex[A] = Complex(f.fromShort(a), f.zero)(f)
+  def fromInt(a:Int): Complex[A] = Complex(f.fromInt(a), f.zero)(f)
+  def fromLong(a:Long): Complex[A] = Complex(f.fromLong(a), f.zero)(f)
+  def fromFloat(a:Float): Complex[A] = Complex(f.fromFloat(a), f.zero)(f)
+  def fromDouble(a:Double): Complex[A] = Complex(f.fromDouble(a), f.zero)(f)
+  def fromBigInt(a:BigInt): Complex[A] = Complex(f.fromBigInt(a), f.zero)(f)
+  def fromBigDecimal(a:BigDecimal): Complex[A] = Complex(f.fromBigDecimal(a), f.zero)(f)
+  def fromRational(a:Rational): Complex[A] = Complex(f.fromRational(a), f.zero)(f)
 }
 
 trait ConvertableFrom[@specialized A] {
@@ -272,14 +273,17 @@ trait ConvertableFromRational extends ConvertableFrom[Rational] {
   def toString(a:Rational): String = a.toString
 }
 
-object ConvertableFrom {
-  implicit object ConvertableFromByte extends ConvertableFromByte
-  implicit object ConvertableFromShort extends ConvertableFromShort
-  implicit object ConvertableFromInt extends ConvertableFromInt
-  implicit object ConvertableFromLong extends ConvertableFromLong
-  implicit object ConvertableFromFloat extends ConvertableFromFloat
-  implicit object ConvertableFromDouble extends ConvertableFromDouble
-  implicit object ConvertableFromBigInt extends ConvertableFromBigInt
-  implicit object ConvertableFromBigDecimal extends ConvertableFromBigDecimal
-  implicit object ConvertableFromRational extends ConvertableFromRational
+trait ConvertableFromComplex[A] extends ConvertableFrom[Complex[A]] {
+  val f:Fractional[A]
+  def toByte(a:Complex[A]): Byte = f.toByte(a.real)
+  def toShort(a:Complex[A]): Short = f.toShort(a.real)
+  def toInt(a:Complex[A]): Int = f.toInt(a.real)
+  def toLong(a:Complex[A]): Long = f.toLong(a.real)
+  def toFloat(a:Complex[A]): Float = f.toFloat(a.real)
+  def toDouble(a:Complex[A]): Double = f.toDouble(a.real)
+  def toBigInt(a:Complex[A]): BigInt = f.toBigInt(a.real)
+  def toBigDecimal(a:Complex[A]): BigDecimal = f.toBigDecimal(a.real)
+  def toRational(a:Complex[A]): Rational = f.toRational(a.real)
+
+  def toString(a:Complex[A]): String = a.toString
 }

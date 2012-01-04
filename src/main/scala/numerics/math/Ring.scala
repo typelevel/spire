@@ -3,16 +3,31 @@ package numerics.math
 import scala.{specialized => spec}
 import scala.math.{abs, ceil, floor}
 
-trait Ring[@spec(Int,Long,Float,Double) A] extends ConvertableFrom[A] with ConvertableTo[A] {
+trait Ring[@spec(Int,Long,Float,Double) A] extends Eq[A]
+with ConvertableFrom[A] with ConvertableTo[A] {
+  self =>
+
   def abs(a:A):A
-  def eq(a:A, b:A):Boolean
   def minus(a:A, b:A):A
   def negate(a:A):A
-  def neq(a:A, b:A):Boolean
   def one:A
   def plus(a:A, b:A):A
   def times(a:A, b:A):A
   def zero:A
+
+  def additiveMonoid:Monoid[A] = new Monoid[A] {
+    def identity = self.zero
+    def op(x:A, y:A) = self.plus(x, y)
+    def equiv(x:A, y:A) = self.equiv(x, y)
+    def nequiv(x:A, y:A) = self.nequiv(x, y)
+  }
+
+  def multiplicativeMonoid = new Monoid[A] {
+    def identity = self.one
+    def op(x:A, y:A) = self.times(x, y)
+    def equiv(x:A, y:A) = self.equiv(x, y)
+    def nequiv(x:A, y:A) = self.nequiv(x, y)
+  }
 }
 
 trait RingOps[@spec(Int,Long,Float,Double) A] {
@@ -42,95 +57,94 @@ object Ring {
   implicit object BigIntIsRing extends BigIntIsRing
   implicit object BigDecimalIsRing extends BigDecimalIsRing
   implicit object RationalIsRing extends RationalIsRing
+  implicit def complexIsRing[A:Fractional] = new ComplexIsRing
 }
 
-trait IntIsRing extends Ring[Int]
+trait IntIsRing extends Ring[Int] with IntEq
 with ConvertableFromInt with ConvertableToInt {
   def abs(a:Int): Int = scala.math.abs(a)
-  def eq(a:Int, b:Int): Boolean = a == b
   def minus(a:Int, b:Int): Int = a - b
   def negate(a:Int): Int = -a
-  def neq(a:Int, b:Int): Boolean = a != b
   def one: Int = 1
   def plus(a:Int, b:Int): Int = a + b
   def times(a:Int, b:Int): Int = a * b
   def zero: Int = 0
 }
 
-trait LongIsRing extends Ring[Long]
+trait LongIsRing extends Ring[Long] with LongEq
 with ConvertableFromLong with ConvertableToLong {
   def abs(a:Long): Long = scala.math.abs(a)
-  def eq(a:Long, b:Long): Boolean = a == b
   def minus(a:Long, b:Long): Long = a - b
   def negate(a:Long): Long = -a
-  def neq(a:Long, b:Long): Boolean = a != b
   def one: Long = 1L
   def plus(a:Long, b:Long): Long = a + b
   def times(a:Long, b:Long): Long = a * b
   def zero: Long = 0L
 }
 
-trait FloatIsRing extends Ring[Float]
+trait FloatIsRing extends Ring[Float] with FloatEq
 with ConvertableFromFloat with ConvertableToFloat {
   def abs(a:Float): Float = scala.math.abs(a)
-  def eq(a:Float, b:Float): Boolean = a == b
   def minus(a:Float, b:Float): Float = a - b
   def negate(a:Float): Float = -a
-  def neq(a:Float, b:Float): Boolean = a != b
   def one: Float = 1.0F
   def plus(a:Float, b:Float): Float = a + b
   def times(a:Float, b:Float): Float = a * b
   def zero: Float = 0.0F
 }
 
-trait DoubleIsRing extends Ring[Double]
+trait DoubleIsRing extends Ring[Double] with DoubleEq
 with ConvertableFromDouble with ConvertableToDouble {
   def abs(a:Double): Double = scala.math.abs(a)
-  def eq(a:Double, b:Double): Boolean = a == b
   def minus(a:Double, b:Double): Double = a - b
   def negate(a:Double): Double = -a
-  def neq(a:Double, b:Double): Boolean = a != b
   def one: Double = 1.0
   def plus(a:Double, b:Double): Double = a + b
   def times(a:Double, b:Double): Double = a * b
   def zero: Double = 0.0
 }
 
-trait BigIntIsRing extends Ring[BigInt]
+trait BigIntIsRing extends Ring[BigInt] with BigIntEq
 with ConvertableFromBigInt with ConvertableToBigInt {
   def abs(a:BigInt): BigInt = a.abs
-  def eq(a:BigInt, b:BigInt): Boolean = a == b
   def minus(a:BigInt, b:BigInt): BigInt = a - b
   def negate(a:BigInt): BigInt = -a
-  def neq(a:BigInt, b:BigInt): Boolean = a != b
   def one: BigInt = BigInt(1)
   def plus(a:BigInt, b:BigInt): BigInt = a + b
   def times(a:BigInt, b:BigInt): BigInt = a * b
   def zero: BigInt = BigInt(0)
 }
 
-trait BigDecimalIsRing extends Ring[BigDecimal] 
+trait BigDecimalIsRing extends Ring[BigDecimal] with BigDecimalEq
 with ConvertableFromBigDecimal with ConvertableToBigDecimal {
   def abs(a:BigDecimal): BigDecimal = a.abs
-  def eq(a:BigDecimal, b:BigDecimal): Boolean = a == b
   def minus(a:BigDecimal, b:BigDecimal): BigDecimal = a - b
   def negate(a:BigDecimal): BigDecimal = -a
-  def neq(a:BigDecimal, b:BigDecimal): Boolean = a != b
   def one: BigDecimal = BigDecimal(1.0)
   def plus(a:BigDecimal, b:BigDecimal): BigDecimal = a + b
   def times(a:BigDecimal, b:BigDecimal): BigDecimal = a * b
   def zero: BigDecimal = BigDecimal(0.0)
 }
 
-trait RationalIsRing extends Ring[Rational]
+trait RationalIsRing extends Ring[Rational] with RationalEq
 with ConvertableFromRational with ConvertableToRational {
   def abs(a:Rational): Rational = a.abs
-  def eq(a:Rational, b:Rational): Boolean = a == b
   def minus(a:Rational, b:Rational): Rational = a - b
   def negate(a:Rational): Rational = -a
-  def neq(a:Rational, b:Rational): Boolean = a != b
   def one: Rational = Rational.one
   def plus(a:Rational, b:Rational): Rational = a + b
   def times(a:Rational, b:Rational): Rational = a * b
   def zero: Rational = Rational.zero
+}
+
+class ComplexIsRing[A](implicit val f:Fractional[A])
+extends ComplexEq[A] with Ring[Complex[A]] with ConvertableFromComplex[A]
+with ConvertableToComplex[A] {
+  def abs(a:Complex[A]): Complex[A] = Complex(a.abs, f.zero)(f)
+  def minus(a:Complex[A], b:Complex[A]): Complex[A] = a - b
+  def negate(a:Complex[A]): Complex[A] = -a
+  def one: Complex[A] = Complex.one(f)
+  def plus(a:Complex[A], b:Complex[A]): Complex[A] = a + b
+  def times(a:Complex[A], b:Complex[A]): Complex[A] = a * b
+  def zero: Complex[A] = Complex.zero(f)
 }

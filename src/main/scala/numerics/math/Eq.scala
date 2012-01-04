@@ -5,6 +5,8 @@ import scala.{specialized => spec}
 trait Eq[@spec(Int,Long,Double) A] {
   self =>
 
+  def eq(x:A, y:A) = equiv(x, y)
+
   def equiv(x:A, y:A): Boolean
   def nequiv(x:A, y:A): Boolean
 
@@ -22,6 +24,29 @@ trait EqOps[@spec(Int,Long,Double) A] {
   val e:Eq[A]
   def ===(rhs:A) = e.equiv(lhs, rhs)
   def !==(rhs:A) = e.nequiv(lhs, rhs)
+}
+
+object Eq extends LowPriority {
+  implicit object IntEq extends IntEq
+  implicit object LongEq extends LongEq
+  implicit object FloatEq extends FloatEq
+  implicit object DoubleEq extends DoubleEq
+  implicit object BigIntEq extends BigIntEq
+  implicit object BigDecimalEq extends BigDecimalEq
+  implicit object RationalEq extends RationalEq
+  implicit def complexEq[A:Fractional] = new ComplexEq
+
+  def by[@spec T, @spec S](f:(T) => S)(implicit e:Eq[S]): Eq[T] = new AnonymousEq[T] {
+    def eqv(x:T, y:T) = e.equiv(f(x), f(y))
+  }
+}
+
+trait LowPriority {
+  implicit def generic[@spec A]: Eq[A] = new GenericEq[A]
+}
+
+private[this] class GenericEq[@spec A] extends AnonymousEq[A] {
+  def eqv(x:A, y:A) = x == y
 }
 
 trait IntEq extends Eq[Int] {
@@ -52,25 +77,8 @@ trait RationalEq extends Eq[Rational] {
   def equiv(x:Rational, y:Rational) = x == y
   def nequiv(x:Rational, y:Rational) = x != y
 }
-
-object Eq {
-  implicit object IntEq extends IntEq
-  implicit object LongEq extends LongEq
-  implicit object FloatEq extends FloatEq
-  implicit object DoubleEq extends DoubleEq
-  implicit object BigIntEq extends BigIntEq
-  implicit object BigDecimalEq extends BigDecimalEq
-  implicit object RationalEq extends RationalEq
-
-  def by[@spec T, @spec S](f:(T) => S)(implicit e:Eq[S]): Eq[T] = new AnonymousEq[T] {
-    def eqv(x:T, y:T) = e.equiv(f(x), f(y))
-  }
+class ComplexEq[A](implicit f:Fractional[A]) extends Eq[Complex[A]] {
+  def equiv(x:Complex[A], y:Complex[A]) = x == y
+  def nequiv(x:Complex[A], y:Complex[A]) = x != y
 }
 
-private[this] class GenericEq[@spec A] extends AnonymousEq[A] {
-  def eqv(x:A, y:A) = x == y
-}
-
-trait LowPriority {
-  implicit def generic[@spec A]: Eq[A] = new GenericEq[A]
-}

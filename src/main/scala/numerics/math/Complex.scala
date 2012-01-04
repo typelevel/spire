@@ -28,6 +28,7 @@ object Complex {
   }
 
   def apply[T:Fractional](real:T, imag:T) = new Complex(real, imag)
+  def unapply[T:Fractional](c:Complex[T]) = Some((c.real, c.imag))
 }
 
 class Complex[T](val real:T, val imag:T)(implicit f:Fractional[T])
@@ -36,15 +37,17 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   // ugh, ScalaNumericConversions ghetto
   //
   // maybe complex numbers are too different...
-  def doubleValue = real.toDouble
-  def floatValue = real.toFloat
-  def longValue = real.toLong
-  def intValue = real.toInt
-  def underlying = List(real, imag)
+  def doubleValue = { println("doublev"); real.toDouble }
+  def floatValue = { println("floatv"); real.toFloat }
+  def longValue = { println("longv"); real.toLong }
+  def intValue = { println("intv"); real.toInt }
+  def underlying = (real, imag)
   def isWhole = real.isWhole && imag.isWhole
-  def signum: Int = {
-    val i = f.compare(real, f.zero)
-    if (i != 0) i else f.compare(imag, f.zero)
+  def signum: Int = f.compare(real, f.zero)
+  def complexSignum: Complex[T] = if (magnitude == f.zero) {
+    Complex.zero
+  } else {
+    this / Complex(magnitude, f.zero)
   }
 
   override def hashCode: Int = if (isReal && real.isWhole &&
@@ -76,7 +79,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def isImaginary: Boolean = real == f.zero && imag != f.zero
   def isReal: Boolean = real != f.zero && imag == f.zero
 
-  def eq(b:Complex[T]) = real == b.real && imag == b.imag
+  def equiv(b:Complex[T]) = real == b.real && imag == b.imag
 
   def unary_-() = Complex(-real, -imag)
 

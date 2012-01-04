@@ -6,6 +6,7 @@ import scala.math.{abs, ceil, floor}
 trait EuclideanRing[@spec(Int,Long,Float,Double) A] extends Ring[A] {
   def quot(a:A, b:A):A
   def mod(a:A, b:A):A
+  def quotmod(a:A, b:A) = (quot(a, b), mod(a, b))
 }
 
 trait EuclideanRingOps[@spec(Int,Long,Float,Double) A] {
@@ -25,6 +26,7 @@ object EuclideanRing {
   implicit object BigIntIsEuclideanRing extends BigIntIsEuclideanRing
   implicit object BigDecimalIsEuclideanRing extends BigDecimalIsEuclideanRing
   implicit object RationalIsEuclideanRing extends RationalIsEuclideanRing
+  implicit def complexIsEuclideanRing[A:Fractional] = new ComplexIsEuclideanRing
 }
 
 
@@ -69,3 +71,15 @@ trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRin
   def mod(a:Rational, b:Rational) = a % b
 }
 
+class ComplexIsEuclideanRing[A](implicit f:Fractional[A])
+extends ComplexIsRing[A]()(f) with EuclideanRing[Complex[A]] {
+  override def quotmod(a:Complex[A], b:Complex[A]) = {
+    // TODO: fix this when Fractional has a floor
+    //val quotient = Complex(f.floor((a / b).real), f.zero)
+    val quotient = Complex(f.fromDouble(floor(f.toDouble((a / b).real))), f.zero)(f)
+    val modulus = a - (b * quotient)
+    (quotient, modulus)
+  }
+  def quot(a:Complex[A], b:Complex[A]) = quotmod(a, b)._1
+  def mod(a:Complex[A], b:Complex[A]) = quotmod(a, b)._2
+}
