@@ -15,11 +15,11 @@ object Complex {
 
   def fractionalToComplex[T:Fractional](t:T) = new Complex(t, fractional.zero)
 
-  def lexicographicOrdering[T:Fractional] = Ordering.by((c:Complex[T]) => c.asTuple)
-
-  def realOrdering[T:Fractional] = Ordering.by((_:Complex[T]).real)
-  def imagOrdering[T:Fractional] = Ordering.by((_:Complex[T]).imag)
-  def magnitudeOrdering[T:Fractional] = Ordering.by((_:Complex[T]).magnitude)
+  //def lexicographicOrdering[T:Fractional] = Ordering.by((c:Complex[T]) => c.asTuple)
+  //
+  //def realOrdering[T:Fractional] = Ordering.by((_:Complex[T]).real)
+  //def imagOrdering[T:Fractional] = Ordering.by((_:Complex[T]).imag)
+  //def magnitudeOrdering[T:Fractional] = Ordering.by((_:Complex[T]).magnitude)
 
   def polar[T:Fractional](magnitude:T, angle:T) = {
     val real:T = magnitude * fractional.fromDouble(cos(angle.toDouble))
