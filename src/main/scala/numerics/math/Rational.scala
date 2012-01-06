@@ -70,6 +70,9 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   } else if (this == 0) {
     Rational.zero
   } else {
+
+    // TODO: Is this necessary with the better init. approx in the else?
+
     val (low, high) = this match {
       case LongRational(n, d) => {
         val n_ = Rational.nroot(n, k)
@@ -86,9 +89,22 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     if (low == high) {
       low
     } else {
-      
-      // TODO: Assumes initial relative error is < 1/n.
-      //
+    
+      import Rational.{ nroot => intNroot }
+
+      // To ensure the initial approximation is within (relatively) 1/n of the
+      // actual root, we need to ensure the num. and den. are both >= min.
+      // Otherwise, we need to find a single multiplier for them that can
+      // guarantee this. From there, we can simply use the integer version of
+      // nroot to get a good approximation.
+
+      val min = (BigInt(k) * 2 + 1) pow k
+      val mul = min / (this.numerator min this.denominator) + 1
+      val numIntRt = intNroot(numerator * mul, k)
+      val denIntRt = intNroot(denominator * mul, k)
+      val low = Rational(numIntRt._1, denIntRt._2)
+      val high = Rational(numIntRt._2, denIntRt._1)
+
       // Reduction in absolute error from n-th root algorithm:
       // Let x(k) be the approximation at step k, x(oo) be the n-th root. Let
       // e(k) be the relative error at step k, thus x(k) = x(oo)(1 + e(k)). If
@@ -112,7 +128,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
       val e = Rational(k + 1, k) pow (k - 1)
       val a = (e - 1) / e   // The relative error is multiplied by this each iter.
       val error = ctxt.error
-      val absErr = high / k
+      val absErr = high - low // I have no idea why I had this: high / k
 
       // absErr * a^k < error => a^k = error / absErr => k = log(error / absErr) / log(a)
       val maxiters = math.ceil(math.log((error / absErr).toDouble) / math.log(a.toDouble)).toInt
