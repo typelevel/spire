@@ -1,3 +1,9 @@
-This repo will encompass proposed changes to Numeric/Interval/Fractional
-as well as new type classes (Ring/EuclideanRing/Field) as well as some
-new numeric types (Rational/Complex/Interval) and other changes.
+This is a library intended to support fast, generic math in Scala. It also
+adds some new number types (Complex[T], Rational, etc.).
+
+It began life as a series of proposed changes. At this point the hope is to
+create a useful stand-alone library and only lobby for changes to the Scala's
+core library/language that are either uncontroversial, or which enable better
+performance.
+
+It's a work in progress, primarily by Tom Switzer and Erik Osheim.
