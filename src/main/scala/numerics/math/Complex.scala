@@ -43,6 +43,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def intValue = { println("intv"); real.toInt }
   def isWhole = real.isWhole && imag.isWhole
   def signum: Int = f.compare(real, f.zero)
+  def underlying = (real, imag)
   def complexSignum: Complex[T] = if (magnitude == f.zero) {
     Complex.zero
   } else {
