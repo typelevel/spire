@@ -1,7 +1,8 @@
 package numerics.math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
-import scala.math.{Pi, atan2, cos, exp, log, pow, sin, sqrt}
+//import scala.math.{Pi, atan2, cos, exp, log, pow, sin, sqrt}
+import scala.math.{Pi, atan2, cos, exp, log, sin, sqrt}
 
 import Implicits._
 
@@ -37,10 +38,10 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   // ugh, ScalaNumericConversions ghetto
   //
   // maybe complex numbers are too different...
-  def doubleValue = { println("doublev"); real.toDouble }
-  def floatValue = { println("floatv"); real.toFloat }
-  def longValue = { println("longv"); real.toLong }
-  def intValue = { println("intv"); real.toInt }
+  def doubleValue = { real.toDouble }
+  def floatValue = { real.toFloat }
+  def longValue = { real.toLong }
+  def intValue = { real.toInt }
   def isWhole = real.isWhole && imag.isWhole
   def signum: Int = f.compare(real, f.zero)
   def underlying = (real, imag)

@@ -1,42 +1,38 @@
-package numerics
+package numerics.math
 
-package object math {
+import scala.annotation.tailrec
+
+object fun {
 
   /**
-   * Integral exponentiation function, e.g. x^y
+   *
+   */
+  final def pow(base:Int, exponent:Int):Int = {
+    pow(base.toLong, exponent.toLong).toInt
+  }
+
+  /**
+   * Exponentiation function, e.g. x^y
    *
    * If base^exponent doesn't fit in a Long, the result will overflow (unlike
    * scala.math.pow which will return +/- Infinity). 
    */
-  final def xpow(base:Long, exponent:Long):Long = {
+  final def pow(base:Long, exponent:Long):Long = {
     if (exponent < 0L) sys.error("illegal exponent")
-    else if (base == 0L) 0L
-    else if (base >= 0L) _xpow(base, exponent)
-    else if (base % 2 == 0) _xpow(-base, exponent)
-    else -_xpow(-base, exponent)
+    _pow(1L, base, exponent)
   }
 
-  /**
-   * Internal long exponentiation function. Only works for positive b, e.
-   */
-  private final def _xpow(_b:Long, _e:Long):Long = {
-    var b = _b
-    var e = _e
-    var t = 1L
-    while (true) {
-      if (e % 2 == 1L) t *= b
-      e /= 2L
-      if (t < 0L) sys.error("result exceeds Long")
-      if (e == 0L) return t
-      b *= b
-    }
-    t
+  // tail-recursive helper method for pow(Long, Long)
+  @tailrec private final def _pow(t:Long, b:Long, e:Long): Long = {
+    if (e == 0L) return t
+    _pow(if (e % 2 == 1L) t * b else t, b * b, e / 2L)
   }
 
-  final def xpow(base:Int, exponent:Int):Int = {
-    val longResult = xpow(base.toLong, exponent.toLong)
-    val intResult = longResult.toInt
-    if (intResult != longResult) sys.error("result exceeds Int")
-    intResult
+  final def pow(base:Float, exponent:Float):Float = {
+    java.lang.Math.pow(base.toDouble, exponent.toDouble).toFloat
+  }
+
+  final def pow(base:Double, exponent:Double):Double = {
+    java.lang.Math.pow(base, exponent)
   }
 }
