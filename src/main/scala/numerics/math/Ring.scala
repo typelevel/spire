@@ -5,8 +5,6 @@ import scala.math.{abs, ceil, floor}
 
 trait Ring[@spec(Int,Long,Float,Double) A] extends Eq[A]
 with ConvertableFrom[A] with ConvertableTo[A] {
-  self =>
-
   def abs(a:A):A
   def minus(a:A, b:A):A
   def negate(a:A):A
@@ -15,19 +13,8 @@ with ConvertableFrom[A] with ConvertableTo[A] {
   def times(a:A, b:A):A
   def zero:A
 
-  def additiveMonoid:Monoid[A] = new Monoid[A] {
-    def identity = self.zero
-    def op(x:A, y:A) = self.plus(x, y)
-    def equiv(x:A, y:A) = self.equiv(x, y)
-    def nequiv(x:A, y:A) = self.nequiv(x, y)
-  }
-
-  def multiplicativeMonoid = new Monoid[A] {
-    def identity = self.one
-    def op(x:A, y:A) = self.times(x, y)
-    def equiv(x:A, y:A) = self.equiv(x, y)
-    def nequiv(x:A, y:A) = self.nequiv(x, y)
-  }
+  def additive = new AdditiveMonoid[A]()(this)
+  def multiplicative = new MultiplicativeMonoid[A]()(this)
 }
 
 trait RingOps[@spec(Int,Long,Float,Double) A] {
