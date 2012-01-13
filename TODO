@@ -1,0 +1,9 @@
+1. Profiling!
+2. Test!
+3. Unify package and Rational versions of integral nroot/pow
+4. Implement nroot/pow for BigInt/BigDecimal
+5. Add sqrt/nroot/pow to Numeric, etc.
+6. Avoid overflowing BigDecimal => Double (e.g. in Complex)
+7. Create our own, better, Decimal class, with more methods
+8. Add implicits to put numerics.math.* functionality onto types
+9. Match up concrete and generic APIs
