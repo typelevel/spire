@@ -1,6 +1,8 @@
 package numerics.math
 
 import org.scalatest.FunSuite
+import numerics.math.fun._
+import Implicits.{eqOps => _, _}
 
 class ComplexTest extends FunSuite {
   test("create Complex[Double]") {
@@ -41,9 +43,8 @@ class ComplexTest extends FunSuite {
   }
 
   test("test e^(i * pi) with Double") {
-    import scala.math._
-    val e = Complex(E, 0.0)
-    val pi = Complex(Pi, 0.0)
+    val e = Complex(scala.math.E, 0.0)
+    val pi = Complex(scala.math.Pi, 0.0)
     val i = Complex.i[Double]
     val one = Complex.one[Double]
 
@@ -53,10 +54,12 @@ class ComplexTest extends FunSuite {
   }
 
   // TODO: once Complex stops using conversions to Double to do exp/pow/log,
-  // we should try out Euler's identity with Rational.
+  // we should try out Euler's identity with BigDecimal/Rational/Real.
 
   // brings up the point that it would be nice to have functions for e, pi, etc
   // for Rational/BigDecimal/etc that gave us as much precision as we asked for.
   //
   // or, symbolic Real types anyone? why not reimplement mathematica?
+
+  // Sounds like Tom is on the case!
 }

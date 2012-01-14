@@ -1,9 +1,9 @@
 package numerics.math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
-//import scala.math.{Pi, atan2, cos, exp, log, pow, sin, sqrt}
 import scala.math.{Pi, atan2, cos, exp, log, sin, sqrt}
 
+import numerics.math.fun._
 import Implicits._
 
 // TODO: refactor places where Fractional is converted to Double in order to
@@ -14,13 +14,10 @@ object Complex {
   def one[T:Fractional] = Complex(fractional.one, fractional.zero)
   def zero[T:Fractional] = Complex(fractional.zero, fractional.zero)
 
-  def fractionalToComplex[T:Fractional](t:T) = new Complex(t, fractional.zero)
-
-  //def lexicographicOrdering[T:Fractional] = Ordering.by((c:Complex[T]) => c.asTuple)
-  //
-  //def realOrdering[T:Fractional] = Ordering.by((_:Complex[T]).real)
-  //def imagOrdering[T:Fractional] = Ordering.by((_:Complex[T]).imag)
-  //def magnitudeOrdering[T:Fractional] = Ordering.by((_:Complex[T]).magnitude)
+  implicit def intToComplex(n:Int) = new Complex(n.toDouble, 0.0)
+  implicit def longToComplex(n:Long) = new Complex(n.toDouble, 0.0)
+  implicit def doubleToComplex(n:Float) = new Complex(n, 0.0F)
+  implicit def doubleToComplex(n:Double) = new Complex(n, 0.0)
 
   def polar[T:Fractional](magnitude:T, angle:T) = {
     val real:T = magnitude * fractional.fromDouble(cos(angle.toDouble))
