@@ -2,11 +2,11 @@ package numerics.math
 
 import Implicits._
 
+// TODO: eventaully remove this because we're not using it.
+
 // TODO: we need some kind of generic Interval on Rings without division,
 // which DiscreteInterval and ContinuousInterval can inherit from and provide
-// their own implementations. also, ideally we'd be depending on
-// PartialOrdering[T] rather than the full Ordering[T] that Fractional[T]
-// provides.
+// their own implementations.
 
 // NOTE: Intervals are being removed from the proposal. This is mostly
 // historical at this point.
@@ -254,7 +254,7 @@ case class Interval[T:Fractional](lower:Bound[T], upper:Bound[T]) {
   }
 
   def /(rhs:Interval[T]) = {
-    if (rhs.isZero) throw new Exception("/ by interval containing only 0")
+    if (rhs.containsZero) throw new Exception("/ by interval containing 0")
 
     sys.error("todo")
   }
