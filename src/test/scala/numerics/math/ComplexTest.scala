@@ -62,4 +62,26 @@ class ComplexTest extends FunSuite {
   // or, symbolic Real types anyone? why not reimplement mathematica?
 
   // Sounds like Tom is on the case!
+
+  test("try using FastComplex") {
+    val fc = FastComplex
+
+    val a = fc(3.0, -2.0)
+    val b = fc(2.0, 1.0)
+
+    assert(fc.add(a, b) === fc(5.0, -1.0))
+    assert(fc.subtract(a, b) === fc(1.0, -3.0))
+    assert(fc.multiply(a, b) === fc(8.0, -1.0))
+
+    val e = fc(scala.math.E, 0.0)
+    val pi = fc(scala.math.Pi, 0.0)
+
+    val ipi = fc.multiply(fc.i, pi)
+    val e_ipi = fc.pow(e, ipi)
+    val z = fc.add(e_ipi, fc.one)
+    
+    println(fc.toRepr(z))
+    assert(fc.real(z) == 0.0F)
+    assert(fc.imag(z) < 0.000000001F)
+  }
 }
