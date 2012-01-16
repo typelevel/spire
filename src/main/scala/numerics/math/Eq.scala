@@ -19,11 +19,9 @@ trait AnonymousEq[@spec A] extends Eq[A] {
   def nequiv(x:A, y:A) = !eqv(x, y)
 }
 
-trait EqOps[@spec(Int,Long,Double) A] {
-  val lhs:A
-  val e:Eq[A]
-  def ===(rhs:A) = e.equiv(lhs, rhs)
-  def !==(rhs:A) = e.nequiv(lhs, rhs)
+final class EqOps[@spec(Int,Long,Double) A](lhs:A)(implicit ev:Eq[A]) {
+  def ===(rhs:A) = ev.equiv(lhs, rhs)
+  def !==(rhs:A) = ev.nequiv(lhs, rhs)
 }
 
 object Eq extends LowPriority {

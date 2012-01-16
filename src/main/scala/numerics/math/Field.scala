@@ -2,17 +2,14 @@ package numerics.math
 
 import scala.{specialized => spec}
 
-trait Field[@spec(Float,Double) A] extends EuclideanRing[A] {
+trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] {
   def div(a:A, b:A):A
   def isWhole(a:A): Boolean = eq(mod(a, one), zero)
 }
 
-trait FieldOps[@spec(Int,Long,Float,Double) A] {
-  val lhs:A
-  val n:Field[A]
-
-  def /(rhs:A) = n.div(lhs, rhs)
-  def isWhole = n.isWhole(lhs)
+final class FieldOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Field[A]) {
+  def /(rhs:A) = ev.div(lhs, rhs)
+  def isWhole = ev.isWhole(lhs)
 }
 
 object Field {
@@ -39,6 +36,7 @@ trait RationalIsField extends Field[Rational] with RationalIsEuclideanRing {
   def div(a:Rational, b:Rational) = a / b
 }
 
-class ComplexIsField[A](implicit f:Fractional[A]) extends ComplexIsEuclideanRing[A]()(f) with Field[Complex[A]] {
+class ComplexIsField[A](implicit f:Fractional[A])
+extends ComplexIsEuclideanRing[A]()(f) with Field[Complex[A]] {
   def div(a:Complex[A], b:Complex[A]) = a / b
 }

@@ -34,18 +34,15 @@ trait AnonymousOrder[A] extends Order[A] {
   override def compare(x:A, y:A) = cmp(x, y)
 }
 
-trait OrderOps[@spec A] {
-  val lhs:A
-  val o:Order[A]
+final class OrderOps[@spec A](lhs:A)(implicit ev:Order[A]) {
+  def >(rhs:A) = ev.gt(lhs, rhs)
+  def >=(rhs:A) = ev.gteq(lhs, rhs)
+  def <(rhs:A) = ev.lt(lhs, rhs)
+  def <=(rhs:A) = ev.lteq(lhs, rhs)
 
-  def >(rhs:A) = o.gt(lhs, rhs)
-  def >=(rhs:A) = o.gteq(lhs, rhs)
-  def <(rhs:A) = o.lt(lhs, rhs)
-  def <=(rhs:A) = o.lteq(lhs, rhs)
-
-  def cmp(rhs:A) = o.compare(lhs, rhs)
-  def min(rhs:A) = o.min(lhs, rhs)
-  def max(rhs:A) = o.max(lhs, rhs)
+  def cmp(rhs:A) = ev.compare(lhs, rhs)
+  def min(rhs:A) = ev.min(lhs, rhs)
+  def max(rhs:A) = ev.max(lhs, rhs)
 }
 
 trait IntOrder extends Order[Int] with IntEq {

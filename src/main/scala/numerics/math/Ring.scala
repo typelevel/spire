@@ -10,6 +10,7 @@ with ConvertableFrom[A] with ConvertableTo[A] {
   def negate(a:A):A
   def one:A
   def plus(a:A, b:A):A
+  def pow(a:A, n:Int):A
   def times(a:A, b:A):A
   def zero:A
 
@@ -17,23 +18,24 @@ with ConvertableFrom[A] with ConvertableTo[A] {
   def multiplicative = new MultiplicativeMonoid[A]()(this)
 }
 
-trait RingOps[@spec(Int,Long,Float,Double) A] {
-  val lhs:A
-  val n:Ring[A]
+final class RingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Ring[A]) {
+  def abs = ev.abs(lhs)
+  def unary_- = ev.negate(lhs)
 
-  def abs = n.abs(lhs)
-  def unary_- = n.negate(lhs)
+  def -(rhs:A) = ev.minus(lhs, rhs)
+  def +(rhs:A) = ev.plus(lhs, rhs)
+  def *(rhs:A) = ev.times(lhs, rhs)
 
-  def -(rhs:A) = n.minus(lhs, rhs)
-  def +(rhs:A) = n.plus(lhs, rhs)
-  def *(rhs:A) = n.times(lhs, rhs)
+  def pow(rhs:Int) = ev.pow(lhs, rhs)
+  def **(rhs:Int) = ev.pow(lhs, rhs)
+  def ~^(rhs:Int) = ev.pow(lhs, rhs)
 
-  def toInt = n.toInt(lhs)
-  def toLong = n.toLong(lhs)
-  def toFloat = n.toFloat(lhs)
-  def toDouble = n.toDouble(lhs)
-  def toBigInt = n.toBigInt(lhs)
-  def toBigDecimal = n.toBigDecimal(lhs)
+  def toInt = ev.toInt(lhs)
+  def toLong = ev.toLong(lhs)
+  def toFloat = ev.toFloat(lhs)
+  def toDouble = ev.toDouble(lhs)
+  def toBigInt = ev.toBigInt(lhs)
+  def toBigDecimal = ev.toBigDecimal(lhs)
 }
 
 object Ring {
@@ -54,6 +56,7 @@ with ConvertableFromInt with ConvertableToInt {
   def negate(a:Int): Int = -a
   def one: Int = 1
   def plus(a:Int, b:Int): Int = a + b
+  def pow(a:Int, b:Int): Int = pow(a, b).toInt
   def times(a:Int, b:Int): Int = a * b
   def zero: Int = 0
 }
@@ -65,6 +68,7 @@ with ConvertableFromLong with ConvertableToLong {
   def negate(a:Long): Long = -a
   def one: Long = 1L
   def plus(a:Long, b:Long): Long = a + b
+  def pow(a:Long, b:Int): Long = pow(a, b)
   def times(a:Long, b:Long): Long = a * b
   def zero: Long = 0L
 }
@@ -76,6 +80,7 @@ with ConvertableFromFloat with ConvertableToFloat {
   def negate(a:Float): Float = -a
   def one: Float = 1.0F
   def plus(a:Float, b:Float): Float = a + b
+  def pow(a:Float, b:Int): Float = pow(a, b).toFloat
   def times(a:Float, b:Float): Float = a * b
   def zero: Float = 0.0F
 }
@@ -87,6 +92,7 @@ with ConvertableFromDouble with ConvertableToDouble {
   def negate(a:Double): Double = -a
   def one: Double = 1.0
   def plus(a:Double, b:Double): Double = a + b
+  def pow(a:Double, b:Int): Double = pow(a, b)
   def times(a:Double, b:Double): Double = a * b
   def zero: Double = 0.0
 }
@@ -98,6 +104,7 @@ with ConvertableFromBigInt with ConvertableToBigInt {
   def negate(a:BigInt): BigInt = -a
   def one: BigInt = BigInt(1)
   def plus(a:BigInt, b:BigInt): BigInt = a + b
+  def pow(a:BigInt, b:Int): BigInt = pow(a, b)
   def times(a:BigInt, b:BigInt): BigInt = a * b
   def zero: BigInt = BigInt(0)
 }
@@ -109,6 +116,7 @@ with ConvertableFromBigDecimal with ConvertableToBigDecimal {
   def negate(a:BigDecimal): BigDecimal = -a
   def one: BigDecimal = BigDecimal(1.0)
   def plus(a:BigDecimal, b:BigDecimal): BigDecimal = a + b
+  def pow(a:BigDecimal, b:Int): BigDecimal = a.pow(b)
   def times(a:BigDecimal, b:BigDecimal): BigDecimal = a * b
   def zero: BigDecimal = BigDecimal(0.0)
 }
@@ -120,6 +128,7 @@ with ConvertableFromRational with ConvertableToRational {
   def negate(a:Rational): Rational = -a
   def one: Rational = Rational.one
   def plus(a:Rational, b:Rational): Rational = a + b
+  def pow(a:Rational, b:Int): Rational = a.pow(b)
   def times(a:Rational, b:Rational): Rational = a * b
   def zero: Rational = Rational.zero
 }
@@ -132,6 +141,7 @@ with ConvertableToComplex[A] {
   def negate(a:Complex[A]): Complex[A] = -a
   def one: Complex[A] = Complex.one(f)
   def plus(a:Complex[A], b:Complex[A]): Complex[A] = a + b
+  def pow(a:Complex[A], b:Int):Complex[A] = a.pow(Complex(f.fromInt(b), f.zero))
   def times(a:Complex[A], b:Complex[A]): Complex[A] = a * b
   def zero: Complex[A] = Complex.zero(f)
 }

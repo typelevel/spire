@@ -18,11 +18,19 @@ trait MyBenchmark extends SimpleBenchmark {
     data
   }
 
+  // handy aliases into Random
+  def nextInt() = Random.nextInt()
+  def nextLong() = Random.nextLong()
+  def nextFloat() = Random.nextFloat()
+  def nextDouble() = Random.nextDouble()
+  def nextComplex[@spec A:Fractional](f: =>A) = Complex(f, f)
+
   // sugar for building randomized arrays of various types
-  def initInts(size:Int) = init(size)(Random.nextInt())
-  def initLongs(size:Int) = init(size)(Random.nextLong())
-  def initFloats(size:Int) = init(size)(Random.nextFloat())
-  def initDoubles(size:Int) = init(size)(Random.nextDouble())
+  def initInts(size:Int) = init(size)(nextInt())
+  def initLongs(size:Int) = init(size)(nextLong())
+  def initFloats(size:Int) = init(size)(nextFloat())
+  def initDoubles(size:Int) = init(size)(nextDouble())
+  def initComplexDoubles(size:Int) = init(size)(nextComplex(nextDouble()))
 
   // sugar to run 'f' for 'reps' number of times
   def run(reps:Int)(f: =>Unit) = for(i <- 0 until reps)(f)
@@ -46,16 +54,17 @@ trait MyRunner {
  */
 object AddBenchmarks extends MyRunner { val cls = classOf[AddBenchmarks] }
 class AddBenchmarks extends MyBenchmark {
-  private val size = 10 * 1000 * 1000
+  private val size = 4 * 1000 * 1000
 
   val ints = initInts(size)
   val longs = initLongs(size)
   val floats = initFloats(size)
   val doubles = initDoubles(size)
 
-  val complexes = init(100 * 1000) {
-    Complex(Random.nextDouble(), Random.nextDouble())
-  }
+  val complexes = init(size)(Complex(nextDouble(), nextDouble()))
+  val fcomplexes = init(size)(FastComplex(nextFloat(), nextFloat()))
+
+  println("init done")
 
   def addGeneric[@spec(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
     var total = ring.zero
@@ -105,19 +114,28 @@ class AddBenchmarks extends MyBenchmark {
     total
   }
 
-  def timeAddIntsDirect(reps:Int) = run(reps)(addIntsDirect(ints))
-  def timeAddIntsGeneric(reps:Int) = run(reps)(addGeneric(ints))
+  def addFastComplexes(data:Array[Long]):Long = {
+    var total = FastComplex(0.0F, 0.0F)
+    var i = 0
+    val len = data.length
+    while (i < len) { total = FastComplex.add(total, data(i)); i += 1 }
+    total
+  }
 
-  def timeAddLongsDirect(reps:Int) = run(reps)(addLongsDirect(longs))
-  def timeAddLongsGeneric(reps:Int) = run(reps)(addGeneric(longs))
-
-  def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
-  def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
-
-  def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
-  def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
+  //def timeAddIntsDirect(reps:Int) = run(reps)(addIntsDirect(ints))
+  //def timeAddIntsGeneric(reps:Int) = run(reps)(addGeneric(ints))
+  //
+  //def timeAddLongsDirect(reps:Int) = run(reps)(addLongsDirect(longs))
+  //def timeAddLongsGeneric(reps:Int) = run(reps)(addGeneric(longs))
+  //
+  //def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
+  //def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
+  //
+  //def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
+  //def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
 
   def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
   def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))
+  def timeAddFastComplexes(reps:Int) = run(reps)(addFastComplexes(fcomplexes))
 }
 

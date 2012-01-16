@@ -30,7 +30,6 @@ object Trig {
   implicit object FloatIsTrig extends FloatIsTrig
   implicit object DoubleIsTrig extends DoubleIsTrig
   implicit object BigDecimalIsTrig extends BigDecimalIsTrig
-  //implicit object RationalIsTrig extends >RationalIsTrig
 }
 
 trait FloatIsTrig extends Trig[Float] {
@@ -101,7 +100,7 @@ trait BigDecimalIsTrig extends Trig[BigDecimal] {
   private val two = BigDecimal(2)
   private val twoPi:BigDecimal = two * pi
 
-  // TODO: ugh... BigDecimal has no useful pow() function
+  // TODO: ugh... BigDecimal has no useful pow()/exp() function
   def exp(a:BigDecimal):BigDecimal = BigDecimal(mth.exp(a.toDouble), a.mc)
 
   def toRadians(a:BigDecimal):BigDecimal = (a * twoPi) / BigDecimal(360)

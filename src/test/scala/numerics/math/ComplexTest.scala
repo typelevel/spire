@@ -42,6 +42,30 @@ class ComplexTest extends FunSuite {
     assert(i != one)
   }
 
+  test("complex arithmetic") {
+    val i = Complex.i[Double]
+
+    val a = 4.0 + 3.0*i
+    val b = 1.0 + 2.0*i
+    val c = 2.0 + 0.0*i
+
+    assert(a + b === 5.0+5.0*i)
+    assert(b + c === Complex(3.0, 2.0))
+    assert(b + c === Complex(3.0, 2.0))    
+
+    assert(a - b === Complex(3.0, 1.0))
+    assert(b - c === Complex(-1.0, 2.0))
+    assert(a - c === Complex(2.0, 3.0))
+
+    assert(a * b === Complex(-2.0, 11.0))
+    assert(b * c === Complex(2.0, 4.0))
+    assert(a * c === Complex(8.0, 6.0))
+
+    assert(a / b === Complex(2.0, -1.0))
+    assert(b / c === Complex(0.5, 1.0))
+    assert(a / c === Complex(2.0, 1.5))
+  }
+
   test("test e^(i * pi) with Double") {
     val e = Complex(scala.math.E, 0.0)
     val pi = Complex(scala.math.Pi, 0.0)
@@ -80,7 +104,6 @@ class ComplexTest extends FunSuite {
     val e_ipi = fc.pow(e, ipi)
     val z = fc.add(e_ipi, fc.one)
     
-    println(fc.toRepr(z))
     assert(fc.real(z) == 0.0F)
     assert(fc.imag(z) < 0.000000001F)
   }
