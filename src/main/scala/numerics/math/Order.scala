@@ -25,8 +25,8 @@ trait Order[@spec A] extends Eq[A] {
 trait AnonymousOrder[A] extends Order[A] {
   protected[this] def cmp(x:A, y:A): Int
 
-  def equiv(x:A, y:A) = cmp(x, y) == 0
-  def nequiv(x:A, y:A) = cmp(x, y) != 0
+  def eq(x:A, y:A) = cmp(x, y) == 0
+  def neq(x:A, y:A) = cmp(x, y) != 0
   def gt(x:A, y:A) = cmp(x, y) > 0
   def lt(x:A, y:A) = cmp(x, y) < 0
   def gteq(x:A, y:A) = cmp(x, y) > -1

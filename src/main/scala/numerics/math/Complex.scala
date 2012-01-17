@@ -78,10 +78,11 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def asTuple: (T, T) = (real, imag)
   def asPolarTuple: (T, T) = (abs, arg)
 
-  def isImaginary: Boolean = f.eq(real, f.zero) && f.nequiv(imag, f.zero)
-  def isReal: Boolean = f.nequiv(real, f.zero) && f.eq(imag, f.zero)
+  def isImaginary: Boolean = f.eq(real, f.zero) && f.neq(imag, f.zero)
+  def isReal: Boolean = f.neq(real, f.zero) && f.eq(imag, f.zero)
 
-  def equiv(b:Complex[T]) = f.eq(real, b.real) && f.eq(imag, b.imag)
+  def eq(b:Complex[T]) = f.eq(real, b.real) && f.eq(imag, b.imag)
+  def neq(b:Complex[T]) = f.neq(real, b.real) || f.neq(imag, b.imag)
 
   def unary_-() = Complex(f.negate(real), f.negate(imag))
 
@@ -134,11 +135,11 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     Complex.one[T]
 
   } else if (this.eq(Complex.zero[T])) {
-    if (f.nequiv(b.imag, f.zero) || f.lt(b.real, f.zero))
+    if (f.neq(b.imag, f.zero) || f.lt(b.real, f.zero))
       throw new Exception("raising 0 to negative/complex power")
     Complex.zero[T]
 
-  } else if (f.nequiv(b.imag, f.zero)) {
+  } else if (f.neq(b.imag, f.zero)) {
     val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble) / exp((angle * b.imag).toDouble))
     val phase = f.fromDouble(angle.toDouble * b.real.toDouble + log(abs.toDouble) * b.imag.toDouble)
     Complex.polar(len, phase)
