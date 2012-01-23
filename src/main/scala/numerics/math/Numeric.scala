@@ -38,3 +38,4 @@ trait FloatIsNumeric extends Numeric[Float] with FloatIsField with FloatOrder
 trait DoubleIsNumeric extends Numeric[Double] with DoubleIsField with DoubleOrder
 trait BigDecimalIsNumeric extends Numeric[BigDecimal] with BigDecimalIsField with BigDecimalOrder
 trait RationalIsNumeric extends Numeric[Rational] with RationalIsField with RationalOrder
+trait RealIsNumeric extends Numeric[Real] with RealIsField with RealOrder

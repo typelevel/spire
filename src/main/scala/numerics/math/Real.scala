@@ -53,6 +53,11 @@ sealed trait Real {
     }
   }
 
+  override def equals(that: Any) = that match {
+    case that: Real => (this - that).sign == Zero
+    case _ => false   // TODO: Use unifiedEquals and all that.
+  }
+
   def isRadical: Boolean
 
   def toInt: Int = toBigInt.toInt

@@ -45,6 +45,7 @@ object Ring {
   implicit object BigDecimalIsRing extends BigDecimalIsRing
   implicit object RationalIsRing extends RationalIsRing
   implicit def complexIsRing[A:Fractional] = new ComplexIsRing
+  implicit object RealIsRing extends RealIsRing
 }
 
 trait IntIsRing extends Ring[Int] with IntEq
@@ -140,7 +141,7 @@ trait RealIsRing extends Ring[Real] with RealEq
 with ConvertableFromReal with ConvertableToReal {
   def abs(r: Real): Real = r.abs
   def minus(a: Real, b: Real): Real = a - b
-  def negate(a: Real, b: Real): Real = -a
+  def negate(a: Real): Real = -a
   def one: Real = Real(1)
   def plus(a: Real, b: Real): Real = a + b
   def times(a: Real, b: Real): Real = a * b

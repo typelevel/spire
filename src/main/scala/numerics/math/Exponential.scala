@@ -13,6 +13,7 @@ trait Exponential[@spec(Double) A] {
 object Exponential {
   implicit object DoubleIsExponential extends DoubleIsExponential
   implicit object BigIntIsExponential extends BigIntIsExponential
+  implicit object RealIsExponential extends RealIsExponential
 
   implicit def rationalIsExponential(implicit c: ApproximationContext[Rational]): Exponential[Rational] =
     RationalIsApproxExponential()(c)
@@ -67,6 +68,11 @@ trait BigIntIsExponential extends Exponential[BigInt] {
 
     findNroot(0, a.bitLength - 1)
   }
+}
+
+trait RealIsExponential extends Exponential[Real] {
+  def pow(a: Real, k: Int): Real = a pow k
+  def nroot(a: Real, k: Int): Real = a nroot k
 }
 
 trait BigDecimalIsExponential extends Exponential[BigDecimal] {

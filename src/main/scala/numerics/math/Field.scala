@@ -21,6 +21,7 @@ object Field {
   implicit object BigDecimalIsField extends BigDecimalIsField
   implicit object RationalIsField extends RationalIsField
   implicit def complexIsField[A:Fractional] = new ComplexIsField
+  implicit object RealIsField extends RealIsField
 }
 
 trait FloatIsField extends Field[Float] with FloatIsEuclideanRing {
@@ -42,3 +43,8 @@ trait RationalIsField extends Field[Rational] with RationalIsEuclideanRing {
 class ComplexIsField[A](implicit f:Fractional[A]) extends ComplexIsEuclideanRing[A]()(f) with Field[Complex[A]] {
   def div(a:Complex[A], b:Complex[A]) = a / b
 }
+
+trait RealIsField extends Field[Real] with RealIsEuclideanRing {
+  def div(a:Real, b:Real) = a / b
+}
+

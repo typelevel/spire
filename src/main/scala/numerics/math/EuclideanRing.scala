@@ -27,6 +27,7 @@ object EuclideanRing {
   implicit object BigDecimalIsEuclideanRing extends BigDecimalIsEuclideanRing
   implicit object RationalIsEuclideanRing extends RationalIsEuclideanRing
   implicit def complexIsEuclideanRing[A:Fractional] = new ComplexIsEuclideanRing
+  implicit object RealIsEuclideanRing extends RealIsEuclideanRing
 }
 
 
@@ -82,4 +83,9 @@ extends ComplexIsRing[A]()(f) with EuclideanRing[Complex[A]] {
   }
   def quot(a:Complex[A], b:Complex[A]) = quotmod(a, b)._1
   def mod(a:Complex[A], b:Complex[A]) = quotmod(a, b)._2
+}
+
+trait RealIsEuclideanRing extends EuclideanRing[Real] with RealIsRing {
+  def quot(a: Real, b: Real): Real = (a / b).toBigInt
+  def mod(a: Real, b: Real): Real = a - quot(a, b) * b
 }
