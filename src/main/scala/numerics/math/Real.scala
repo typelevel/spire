@@ -55,9 +55,31 @@ sealed trait Real {
 
   def isRadical: Boolean
 
-  def toInt: Int = (this +/- BigDecimal(0.1)).toInt
-  def toLong: Long = (this +/- BigDecimal(0.1)).toLong
-  def toBigInt: BigInt = (this +/- BigDecimal(0.1)).toBigInt
+  def toInt: Int = toBigInt.toInt
+  def toLong: Long = toBigInt.toLong
+  def toBigInt: BigInt = sign match {
+    case Zero => BigInt(0)
+    case Negative => -((-this).toBigInt)
+    case Positive =>
+      val a = this +/- 0.01
+      val b = a.toBigInt
+
+      if ((BigDecimal(b) + 0.02) >= BigDecimal(b + 1)) {
+        (this - Real(b + 1)).sign match {
+          case Positive => b + 1
+          case Negative => b
+          case Zero => b + 1
+        }
+      } else if ((BigDecimal(b) - 0.02) <= BigDecimal(b)) {
+        (this - Real(b)).sign match {
+          case Positive => b
+          case Negative => b - 1
+          case Zero => b
+        }
+      } else {
+        b
+      }
+  }
   def toDouble: Double = this approximateTo Double
   def toBigDecimal(implicit mc: MathContext): BigDecimal = this approximateTo mc
   def toRational(implicit ac: ApproximationContext[Rational]): Rational = simulate[Rational]
