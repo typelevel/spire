@@ -10,6 +10,7 @@ object Implicits {
   implicit def ringOps[@spec(Int, Long, Float, Double) A:Ring](a:A) = new RingOpsImpl(a)
   implicit def euclideanRingOps[@spec(Int, Long, Float, Double) A:EuclideanRing](a:A) = new EuclideanRingOpsImpl(a)
   implicit def fieldOps[@spec(Float, Double) A:Field](a:A) = new FieldOpsImpl(a)
+  implicit def expOps[@spec(Double) A: Exponential](a: A) = new ExponentialOpsImpl(a)
 
   def ring[@spec(Int, Long, Float, Double) A:Ring]:Ring[A] = implicitly[Ring[A]]
   def euclideanRing[@spec(Int, Long, Float, Double) A:EuclideanRing] = implicitly[EuclideanRing[A]]
@@ -17,6 +18,7 @@ object Implicits {
   def integral[@spec(Int, Long) A:Integral]:Integral[A] = implicitly[Integral[A]]
   def fractional[@spec(Float, Double) A:Fractional]:Fractional[A] = implicitly[Fractional[A]]
   def numeric[@spec(Int, Long, Float, Double) A:Numeric]:Numeric[A] = implicitly[Numeric[A]]
+  def exponential[@spec(Double) A: Exponential]: Exponential[A] = implicitly[Exponential[A]]
 }
 
 final class EqOpsImpl[A](val lhs:A)(implicit val e:Eq[A]) extends EqOps[A]
@@ -25,3 +27,4 @@ final class SemigroupOpsImpl[A](val lhs:A)(implicit val s:Semigroup[A]) extends 
 final class RingOpsImpl[A](val lhs:A)(implicit val n:Ring[A]) extends RingOps[A]
 final class EuclideanRingOpsImpl[A](val lhs:A)(implicit val n:EuclideanRing[A]) extends EuclideanRingOps[A]
 final class FieldOpsImpl[A](val lhs:A)(implicit val n:Field[A]) extends FieldOps[A]
+final class ExponentialOpsImpl[A](val lhs: A)(implicit val exp: Exponential[A]) extends ExponentialOps[A]
