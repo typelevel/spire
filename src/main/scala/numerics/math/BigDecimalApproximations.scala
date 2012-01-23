@@ -51,6 +51,7 @@ object BigDecimalApproximations {
       case Neg(x) => NegAbsApprox(x, mc)
       case KRoot(x, k) => KRootAbsApprox(x, k, mc)
       case IntLit(x) => IntLitAbsApprox(x, mc)
+      case BigIntLit(x) => BigIntLitAbsApprox(x, mc)
       case _ => throw new IllegalArgumentException()
     }
   }
@@ -120,6 +121,10 @@ object BigDecimalApproximations {
 
   case class IntLitAbsApprox(n: Int, mc: MathContext) extends AbsApprox {
     // BigDecimal(n, mc) can/will cause "division impossible" exceptions.
+    val value = BigDecimal(n).round(mc).bigDecimal
+  }
+
+  case class BigIntLitAbsApprox(n: BigInt, mc: MathContext) extends AbsApprox {
     val value = BigDecimal(n).round(mc).bigDecimal
   }
 

@@ -135,3 +135,14 @@ with ConvertableToComplex[A] {
   def times(a:Complex[A], b:Complex[A]): Complex[A] = a * b
   def zero: Complex[A] = Complex.zero(f)
 }
+
+trait RealIsRing extends Ring[Real] with RealEq
+with ConvertableFromReal with ConvertableToReal {
+  def abs(r: Real): Real = r.abs
+  def minus(a: Real, b: Real): Real = a - b
+  def negate(a: Real, b: Real): Real = -a
+  def one: Real = Real(1)
+  def plus(a: Real, b: Real): Real = a + b
+  def times(a: Real, b: Real): Real = a * b
+  def zero: Real = Real(0)
+}

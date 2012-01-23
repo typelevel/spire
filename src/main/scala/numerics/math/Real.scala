@@ -28,6 +28,8 @@ import scala.math.max
 sealed trait Real {
   import Real.transform
 
+  def abs: Real = if (this.sign == Negative) -this else this
+
   def *(that: Real): Real = transform(Mul(this, that))
   def +(that: Real): Real = transform(Add(this, that))
   def -(that: Real): Real = transform(Sub(this, that))
@@ -51,8 +53,14 @@ sealed trait Real {
     }
   }
 
+  def isRadical: Boolean
+
+  def toInt: Int = (this +/- BigDecimal(0.1)).toInt
+  def toLong: Long = (this +/- BigDecimal(0.1)).toLong
+  def toBigInt: BigInt = (this +/- BigDecimal(0.1)).toBigInt
   def toDouble: Double = this approximateTo Double
   def toBigDecimal(implicit mc: MathContext): BigDecimal = this approximateTo mc
+  def toRational(implicit ac: ApproximationContext[Rational]): Rational = simulate[Rational]
 
   def approximateTo[A,B](a: A)(implicit approx: Approximation[Real,A,B]): B =
     approx(this, a)
@@ -95,29 +103,10 @@ sealed trait Real {
     Sign(findSign(0))
   }
 
-  /*
-    val err = 8
-    val init = this approximateTo AbsoluteError(8)
-    val lb = BigDecimal(2) pow this.lowerBound
-
-    val bound = Bounded(this)
-    val lb = bound.lowerBound
-    var prevErr = Rational(2)
-    var currErr = Rational.one
-
-    while (true) {
-      val rat = this.toRational(e)
-      if (rat.abs > e) {
-        return if (rat.signum > 0) Positive else Negative
-      } else if (prevErr <= lb) {
-        return Zero
-      } else {
-        prevErr = currErr
-        currErr = prevErr / 2
-      }
-    }
-  }
-  */
+  /**
+   * Simulates the expression DAG of this `Real` using another number type.
+   */
+  def simulate[A : Field : Exponential]: A = Real.simulate(this)
 }
 
 
@@ -126,9 +115,31 @@ object Real {
   def transform(num: Real): Real = t.transform(num)
 
   implicit def apply(n: Int): Real = IntLit(n)
+  implicit def apply(n: Long): Real = apply(BigInt(n))
+  implicit def apply(n: BigInt): Real = if (n.isValidInt) {
+    IntLit(n.toInt)
+  } else {
+    BigIntLit(n)
+  }
+  implicit def apply(n: Rational): Real = Real(n.numerator) / Real(n.denominator)
+  implicit def apply(n: Double): Real = apply(Rational(n.toString))
+  implicit def apply(n: BigDecimal): Real = apply(Rational(n))
+
+  import Implicits._
+  def simulate[A : Field : Exponential](n: Real): A = n match {
+    case Add(a, b) => simulate(a) + simulate(b)
+    case Sub(a, b) => simulate(a) - simulate(b)
+    case Mul(a, b) => simulate(a) * simulate(b)
+    case Div(a, b) => simulate(a) / simulate(b)
+    case Neg(a) => -simulate(a)
+    case KRoot(a, k) => simulate(a) nroot k
+    case IntLit(n) => ring[A].fromInt(n)
+    case BigIntLit(n) => ring[A].fromBigInt(n)
+  }
 }
 
 sealed trait BinOp {
+  def isRadical: Boolean = lhs.isRadical || rhs.isRadical
   def lhs:Real 
   def rhs:Real 
 }
@@ -145,11 +156,22 @@ case class Add(lhs: Real, rhs: Real) extends Real with BinOp
 case class Sub(lhs: Real, rhs: Real) extends Real with BinOp
 case class Mul(lhs: Real, rhs: Real) extends Real with BinOp
 case class Div(lhs: Real, rhs: Real) extends Real with BinOp
-case class Neg(a: Real) extends Real 
+case class Neg(a: Real) extends Real {
+  def isRadical: Boolean = a.isRadical
+}
 case class KRoot(a: Real, k: Int) extends Real {
   require(k >= 2, "Only positive roots greater than 2 supported.")
+
+  val isRadical: Boolean = true
 }
+
 case class IntLit(value: Int) extends Real {
+  val isRadical: Boolean = false
+  override def sign: Sign = if (value == 0) Zero else if (value > 0) Positive else Negative
+}
+
+case class BigIntLit(value: BigInt) extends Real {
+  val isRadical: Boolean = false
   override def sign: Sign = if (value == 0) Zero else if (value > 0) Positive else Negative
 }
 

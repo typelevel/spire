@@ -133,6 +133,18 @@ trait ConvertableToComplex[A] extends ConvertableTo[Complex[A]] {
   def fromRational(a:Rational): Complex[A] = Complex(f.fromRational(a), f.zero)(f)
 }
 
+trait ConvertableToReal extends ConvertableTo[Real] {
+  def fromByte(a:Byte): Real = Real(a)
+  def fromShort(a:Short): Real = Real(a)
+  def fromInt(a:Int): Real = Real(a)
+  def fromLong(a:Long): Real = Real(a)
+  def fromFloat(a:Float): Real = Real(a)
+  def fromDouble(a:Double): Real = Real(a)
+  def fromBigInt(a:BigInt): Real = Real(a)
+  def fromBigDecimal(a:BigDecimal): Real = Real(a)
+  def fromRational(a:Rational) = Real(a)
+}
+
 trait ConvertableFrom[@specialized A] {
   def toByte(a:A): Byte
   def toShort(a:A): Short
@@ -287,3 +299,20 @@ trait ConvertableFromComplex[A] extends ConvertableFrom[Complex[A]] {
 
   def toString(a:Complex[A]): String = a.toString
 }
+
+trait ConvertableFromReal extends ConvertableFrom[Real] {
+  def toByte(a:Real): Byte = a.toInt.toByte
+  def toShort(a:Real): Short = a.toInt.toShort
+  def toInt(a:Real): Int = a.toInt
+  def toLong(a:Real): Long = a.toLong
+  def toFloat(a:Real): Float = a.toDouble.toFloat
+  def toDouble(a:Real): Double = a.toDouble
+  def toBigInt(a:Real): BigInt = a.toBigInt
+  // TODO: Figure out how to deal with variable approximability.
+  def toBigDecimal(a:Real): BigDecimal = a.toBigDecimal(java.math.MathContext.DECIMAL128)
+  def toRational(a:Real): Rational = a.toRational(ApproximationContext(Rational(1L, 100000000000000000L)))
+
+  def toString(a:Real): String = a.toString
+}
+
+

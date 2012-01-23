@@ -46,12 +46,19 @@ object Bounded extends (Real => Bounded) {
     case Neg(x) => this(x)
     case KRoot(x, k) => BoundedKRoot(this(x), k)
     case IntLit(n) => BoundedIntLit(n)
+    case BigIntLit(n) => BoundedBigIntLit(n)
   }
 }
 
 case class BoundedIntLit(n: Int) extends Bounded {
   lazy val l = BigInt(1)
   lazy val u = if (n < 0) BigInt(-n) else BigInt(n)
+  val weight: Int = 1
+}
+
+case class BoundedBigIntLit(n: BigInt) extends Bounded {
+  lazy val l = BigInt(1)
+  lazy val u = n.abs
   val weight: Int = 1
 }
 
