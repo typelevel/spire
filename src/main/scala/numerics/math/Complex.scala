@@ -11,26 +11,26 @@ import Implicits._
 // access functions (e.g. trig, pow, exp, log)
 
 object Complex {
-  def i[T:Fractional] = Complex(fractional.zero, fractional.one)
-  def one[T:Fractional] = Complex(fractional.one, fractional.zero)
-  def zero[T:Fractional] = Complex(fractional.zero, fractional.zero)
+  def i[T:Fractional:Exponential] = Complex(fractional.zero, fractional.one)
+  def one[T:Fractional:Exponential] = Complex(fractional.one, fractional.zero)
+  def zero[T:Fractional:Exponential] = Complex(fractional.zero, fractional.zero)
 
   implicit def intToComplex(n:Int) = new Complex(n.toDouble, 0.0)
   implicit def longToComplex(n:Long) = new Complex(n.toDouble, 0.0)
   implicit def doubleToComplex(n:Float) = new Complex(n, 0.0F)
   implicit def doubleToComplex(n:Double) = new Complex(n, 0.0)
 
-  def polar[T:Fractional](magnitude:T, angle:T) = {
+  def polar[T:Fractional:Exponential](magnitude:T, angle:T) = {
     val real:T = magnitude * fractional.fromDouble(cos(angle.toDouble))
     val imag:T = magnitude * fractional.fromDouble(sin(angle.toDouble))
     Complex[T](real, imag)
   }
 
-  def apply[T:Fractional](real:T, imag:T) = new Complex(real, imag)
-  def unapply[T:Fractional](c:Complex[T]) = Some((c.real, c.imag))
+  def apply[T:Fractional:Exponential](real:T, imag:T) = new Complex(real, imag)
+  def unapply[T:Fractional:Exponential](c:Complex[T]) = Some((c.real, c.imag))
 }
 
-class Complex[T](val real:T, val imag:T)(implicit f:Fractional[T])
+class Complex[T](val real:T, val imag:T)(implicit f:Fractional[T],e:Exponential[T])
 extends ScalaNumber with ScalaNumericConversions with Serializable {
 
   // ugh, ScalaNumericConversions ghetto
@@ -65,7 +65,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   override def toString: String = "Complex(%s, %s)".format(real, imag)
 
   // ugh, for very large Fractional values this will totally break
-  lazy val magnitude: T = f.fromDouble(sqrt((real * real + imag * imag).toDouble))
+  lazy val magnitude: T = (real * real + imag * imag).sqrt
   lazy val angle: T = f.fromDouble(atan2(imag.toDouble, real.toDouble))
   def abs: T = magnitude
   def arg: T = angle

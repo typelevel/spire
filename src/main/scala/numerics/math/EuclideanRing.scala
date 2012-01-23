@@ -26,7 +26,7 @@ object EuclideanRing {
   implicit object BigIntIsEuclideanRing extends BigIntIsEuclideanRing
   implicit object BigDecimalIsEuclideanRing extends BigDecimalIsEuclideanRing
   implicit object RationalIsEuclideanRing extends RationalIsEuclideanRing
-  implicit def complexIsEuclideanRing[A:Fractional] = new ComplexIsEuclideanRing
+  implicit def complexIsEuclideanRing[A:Fractional:Exponential] = new ComplexIsEuclideanRing
   implicit object RealIsEuclideanRing extends RealIsEuclideanRing
 }
 
@@ -72,12 +72,12 @@ trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRin
   def mod(a:Rational, b:Rational) = a % b
 }
 
-class ComplexIsEuclideanRing[A](implicit f:Fractional[A])
-extends ComplexIsRing[A]()(f) with EuclideanRing[Complex[A]] {
+class ComplexIsEuclideanRing[A](implicit f:Fractional[A], e:Exponential[A])
+extends ComplexIsRing[A]()(f,e) with EuclideanRing[Complex[A]] {
   override def quotmod(a:Complex[A], b:Complex[A]) = {
     // TODO: fix this when Fractional has a floor
     //val quotient = Complex(f.floor((a / b).real), f.zero)
-    val quotient = Complex(f.fromDouble(floor(f.toDouble((a / b).real))), f.zero)(f)
+    val quotient = Complex(f.fromDouble(floor(f.toDouble((a / b).real))), f.zero)(f, e)
     val modulus = a - (b * quotient)
     (quotient, modulus)
   }

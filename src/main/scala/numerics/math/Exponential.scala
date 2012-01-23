@@ -12,6 +12,7 @@ trait Exponential[@spec(Double) A] {
 
 object Exponential {
   implicit object DoubleIsExponential extends DoubleIsExponential
+  implicit object FloatIsExponential extends FloatIsExponential
   implicit object BigIntIsExponential extends BigIntIsExponential
   implicit object RealIsExponential extends RealIsExponential
 
@@ -38,6 +39,13 @@ trait DoubleIsExponential extends Exponential[Double] {
   def nroot(a: Double, k: Int): Double = mth.pow(a, 1 / k.toDouble)
   override def sqrt(a: Double): Double = mth.sqrt(a)
 }
+
+trait FloatIsExponential extends Exponential[Float] {
+  def pow(a: Float, k: Int): Float = mth.pow(a, k).toFloat
+  def nroot(a: Float, k: Int): Float = mth.pow(a, 1 / k.toDouble).toFloat
+  override def sqrt(a: Float): Float = mth.sqrt(a).toFloat
+}
+
 
 trait RationalIsExponential extends Exponential[Rational] {
   implicit def context: ApproximationContext[Rational]

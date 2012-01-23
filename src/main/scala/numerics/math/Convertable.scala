@@ -122,15 +122,16 @@ trait ConvertableToRational extends ConvertableTo[Rational] {
 
 trait ConvertableToComplex[A] extends ConvertableTo[Complex[A]] {
   val f:Fractional[A]
-  def fromByte(a:Byte): Complex[A] = Complex(f.fromByte(a), f.zero)(f)
-  def fromShort(a:Short): Complex[A] = Complex(f.fromShort(a), f.zero)(f)
-  def fromInt(a:Int): Complex[A] = Complex(f.fromInt(a), f.zero)(f)
-  def fromLong(a:Long): Complex[A] = Complex(f.fromLong(a), f.zero)(f)
-  def fromFloat(a:Float): Complex[A] = Complex(f.fromFloat(a), f.zero)(f)
-  def fromDouble(a:Double): Complex[A] = Complex(f.fromDouble(a), f.zero)(f)
-  def fromBigInt(a:BigInt): Complex[A] = Complex(f.fromBigInt(a), f.zero)(f)
-  def fromBigDecimal(a:BigDecimal): Complex[A] = Complex(f.fromBigDecimal(a), f.zero)(f)
-  def fromRational(a:Rational): Complex[A] = Complex(f.fromRational(a), f.zero)(f)
+  val e:Exponential[A]
+  def fromByte(a:Byte): Complex[A] = Complex(f.fromByte(a), f.zero)(f,e)
+  def fromShort(a:Short): Complex[A] = Complex(f.fromShort(a), f.zero)(f,e)
+  def fromInt(a:Int): Complex[A] = Complex(f.fromInt(a), f.zero)(f,e)
+  def fromLong(a:Long): Complex[A] = Complex(f.fromLong(a), f.zero)(f,e)
+  def fromFloat(a:Float): Complex[A] = Complex(f.fromFloat(a), f.zero)(f,e)
+  def fromDouble(a:Double): Complex[A] = Complex(f.fromDouble(a), f.zero)(f,e)
+  def fromBigInt(a:BigInt): Complex[A] = Complex(f.fromBigInt(a), f.zero)(f,e)
+  def fromBigDecimal(a:BigDecimal): Complex[A] = Complex(f.fromBigDecimal(a), f.zero)(f,e)
+  def fromRational(a:Rational): Complex[A] = Complex(f.fromRational(a), f.zero)(f,e)
 }
 
 trait ConvertableToReal extends ConvertableTo[Real] {
