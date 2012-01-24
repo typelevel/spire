@@ -54,15 +54,16 @@ trait MyRunner {
  */
 object AddBenchmarks extends MyRunner { val cls = classOf[AddBenchmarks] }
 class AddBenchmarks extends MyBenchmark {
-  private val size = 4 * 1000 * 1000
+  //private val size = 4 * 1000 * 1000
+  private val size = 10 * 1000 * 1000
 
   val ints = initInts(size)
   val longs = initLongs(size)
   val floats = initFloats(size)
   val doubles = initDoubles(size)
 
-  val complexes = init(size)(Complex(nextDouble(), nextDouble()))
-  val fcomplexes = init(size)(FastComplex(nextFloat(), nextFloat()))
+  //val complexes = init(size)(Complex(nextDouble(), nextDouble()))
+  //val fcomplexes = init(size)(FastComplex(nextFloat(), nextFloat()))
 
   println("init done")
 
@@ -133,9 +134,58 @@ class AddBenchmarks extends MyBenchmark {
   //
   //def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
   //def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
+  //
+  //def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
+  //def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))
+  //def timeAddFastComplexes(reps:Int) = run(reps)(addFastComplexes(fcomplexes))
 
-  def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
-  def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))
-  def timeAddFastComplexes(reps:Int) = run(reps)(addFastComplexes(fcomplexes))
+
+
+  //def quicksortDoubles(data:Array[Double]):Array[Double] = {
+  //  val copy = data.clone()
+  //  scala.util.Sorting.quickSort(copy)
+  //  copy
+  //}
+  //def timeQuicksortDoubles(reps:Int) = run(reps)(quicksortDoubles(doubles))
+  //
+  //def sortDoubles(data:Array[Double]):Array[Double] = Sorting.sort(data)
+  //def timeSortDoubles(reps:Int) = run(reps)(sortDoubles(doubles))
+  //
+  //def sortDoublesInPlace(data:Array[Double]):Array[Double] = {
+  //  val copy = data.clone()
+  //  Sorting.sortInPlace(copy)
+  //  copy
+  //}
+  //def timeSortDoublesInPlace(reps:Int) = run(reps)(sortDoublesInPlace(doubles))
+  //
+  //def mySortDoubles(data:Array[Double]):Array[Double] = {
+  //  val copy = data.clone()
+  //  Sorting.mySort(copy)
+  //  copy
+  //}
+  //def timeMySortDoubles(reps:Int) = run(reps)(mySortDoubles(doubles))
+
+  def quicksortLongs(data:Array[Long]):Array[Long] = {
+    val copy = data.clone()
+    scala.util.Sorting.quickSort(copy)
+    copy
+  }
+  def timeQuicksortLongs(reps:Int) = run(reps)(quicksortLongs(longs))
+  
+  def sortLongs(data:Array[Long]):Array[Long] = Sorting.sort(data)
+  def timeSortLongs(reps:Int) = run(reps)(sortLongs(longs))
+  
+  def sortLongsInPlace(data:Array[Long]):Array[Long] = {
+    val copy = data.clone()
+    Sorting.sortInPlace(copy)
+    copy
+  }
+  def timeSortLongsInPlace(reps:Int) = run(reps)(sortLongsInPlace(longs))
+  
+  def mySortLongs(data:Array[Long]):Array[Long] = {
+    val copy = data.clone()
+    Sorting.mySort(copy)
+    copy
+  }
+  def timeMySortLongs(reps:Int) = run(reps)(mySortLongs(longs))
 }
-
