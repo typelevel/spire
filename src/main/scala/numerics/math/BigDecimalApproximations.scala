@@ -31,120 +31,188 @@ object BigDecimalApproximations {
     def max(omc: MathContext): MathContext = this max omc.getPrecision
   }
 
+  implicit object Absolute extends Approximation[Real,BigDecimal,BigDecimal] {
+    // TODO: Does "scale" always guarantee 10^-scale as a lower bound of err?
+    def apply(num: Real, err: BigDecimal): BigDecimal = AbsApprox(num, err.scale).value
+  }
+
+  implicit object Relative extends Approximation[Real,MathContext,BigDecimal] {
+    def apply(num: Real, mc: MathContext): BigDecimal = BigDecimal(RelApprox(num, mc).value)
+  }
+
 
   /**
    * An absolute approximation to a `Real` number using `java.math.BigDecimal`.
    */
   trait AbsApprox {
+    def bits: Int   // Not really bits, but base 10.
+    def value: BigDecimal
+  }
+
+  object AbsApprox extends Approximation[Real,Int,AbsApprox] {
+    def apply(num: Real, bits: Int): AbsApprox = num match {
+      case Add(lhs, rhs) => AddAbsApprox(lhs, rhs, bits)
+      case Sub(lhs, rhs) => SubAbsApprox(lhs, rhs, bits)
+      case Mul(lhs, rhs) => MulAbsApprox(lhs, rhs, bits)
+      case Div(lhs, rhs) => DivAbsApprox(lhs, rhs, bits)
+      case Neg(x) => NegAbsApprox(x, bits)
+      case KRoot(x, k) => KRootAbsApprox(x, k, bits)
+      case IntLit(x) => IntLitAbsApprox(x, bits)
+      case BigIntLit(x) => BigIntLitAbsApprox(x, bits)
+      case _ => throw new IllegalArgumentException()
+    }
+  }
+
+  case class AddAbsApprox(a: Real, b: Real, bits: Int) extends AbsApprox {
+    lazy val lhs: AbsApprox = AbsApprox(a, bits + 1)
+    lazy val rhs: AbsApprox = AbsApprox(b, bits + 1)
+
+    def value = lhs.value + rhs.value
+  }
+
+  case class SubAbsApprox(a: Real, b: Real, bits: Int) extends AbsApprox {
+    lazy val lhs: AbsApprox = AbsApprox(a, bits + 1)
+    lazy val rhs: AbsApprox = AbsApprox(b, bits + 1)
+
+    def value = lhs.value - rhs.value
+  }
+
+  case class MulAbsApprox(a: Real, b: Real, bits: Int) extends AbsApprox {
+    import Bounded._
+
+    private def ae = (bits + 2) / 2
+    private def be = bits + 2 - ae
+
+    lazy val lhs: AbsApprox = AbsApprox(a, max(ae, bits + 1 + b.decimalUpperBound))
+    lazy val rhs: AbsApprox = AbsApprox(b, max(be, bits + 1 + a.decimalUpperBound))
+
+    def value = lhs.value + rhs.value
+  }
+
+
+  case class DivAbsApprox(a: Real, b: Real, bits: Int) extends AbsApprox {
+    import Bounded._
+
+    private def ae = (bits + 2) / 2
+    private def be = bits + 2 - ae
+
+    lazy val lhs: AbsApprox = AbsApprox(a, bits + 2 - b.decimalLowerBound)
+    lazy val rhs: AbsApprox = AbsApprox(b, max(
+          1 - b.decimalLowerBound,
+          bits + 2 - 2 * b.decimalLowerBound + a.decimalUpperBound))
+
+    def value: BigDecimal = if (b.sign == Zero) {
+      throw new ArithmeticException("/ by zero")
+    } else {
+      val ub = Div(a, b).decimalUpperBound
+      val mc = new MathContext(ub + bits + 1) // bits + 1 absolute digits.
+      BigDecimal(lhs.value.bigDecimal.divide(rhs.value.bigDecimal, mc))
+    }
+  }
+
+  case class NegAbsApprox(a: Real, bits: Int) extends AbsApprox {
+    lazy val x: AbsApprox = AbsApprox(a, bits)
+    def value = -(x.value)
+  }
+
+  case class KRootAbsApprox(a: Real, k: Int, bits: Int) extends AbsApprox {
+    import Implicits._
+    import Bounded._
+
+    lazy val x: AbsApprox = AbsApprox(a, max(bits + 1, 1 - a.decimalLowerBound / 2))
+
+    def value: BigDecimal = {
+      // We need to use the upper bound to determine how many bits we need.
+      val ub = KRoot(a, k).decimalUpperBound
+      implicit val mc = new MathContext(ub + bits + 1)
+      x.value nroot k
+    }
+  }
+
+  case class IntLitAbsApprox(n: Int, bits: Int) extends AbsApprox {
+    // TODO: Worth approximating n???
+    val value = BigDecimal(n)
+  }
+
+  case class BigIntLitAbsApprox(n: BigInt, bits: Int) extends AbsApprox {
+    // TODO: Worth approximating n???
+    val value = BigDecimal(n)
+  }
+
+
+  trait RelApprox {
     implicit def mathContextOps(omc: MathContext) = new MathContextOps(omc)
 
     def mc: MathContext
     def value: BigDec
   }
 
-  object AbsApprox extends Approximation[Real,MathContext,AbsApprox] {
-    def apply(num: Real, mc: MathContext): AbsApprox = num match {
-      case Add(lhs, rhs) => AddAbsApprox(lhs, rhs, mc)
-      case Sub(lhs, rhs) => SubAbsApprox(lhs, rhs, mc)
-      case Mul(lhs, rhs) => MulAbsApprox(lhs, rhs, mc)
-      case Div(lhs, rhs) => DivAbsApprox(lhs, rhs, mc)
-      case Neg(x) => NegAbsApprox(x, mc)
-      case KRoot(x, k) => KRootAbsApprox(x, k, mc)
-      case IntLit(x) => IntLitAbsApprox(x, mc)
-      case BigIntLit(x) => BigIntLitAbsApprox(x, mc)
-      case _ => throw new IllegalArgumentException()
+
+  object RelApprox extends Approximation[Real,MathContext,RelApprox] {
+    def apply(n: Real, mc: MathContext): RelApprox = n match {
+      case n: Add => AddRelApprox(n, mc)
+      case n: Sub => SubRelApprox(n, mc)
+      case n: Mul => MulRelApprox(n, mc)
+      case n: Div => DivRelApprox(n, mc)
+      case n: Neg => NegRelApprox(n, mc)
+      case n: KRoot => KRootRelApprox(n, mc)
+      case IntLit(n) => IntLitRelApprox(n, mc)
+      case BigIntLit(n) => BigIntLitRelApprox(n, mc)
     }
   }
 
-  case class AddAbsApprox(a: Real, b: Real, mc: MathContext) extends AbsApprox {
-    lazy val lhs: AbsApprox = AbsApprox(a, mc + 1)
-    lazy val rhs: AbsApprox = AbsApprox(b, mc + 1)
+  case class AddRelApprox(x: Add, mc: MathContext) extends RelApprox {
+    import Bounded._
+
+    lazy val lhs: RelApprox = RelApprox(x.lhs, mc + 1 - x.decimalLowerBound)
+    lazy val rhs: RelApprox = RelApprox(x.rhs, mc + 1 - x.decimalLowerBound)
 
     def value: BigDec = lhs.value.add(rhs.value, mc)
   }
 
-  case class SubAbsApprox(a: Real, b: Real, mc: MathContext) extends AbsApprox {
-    lazy val lhs: AbsApprox = AbsApprox(a, mc + 1)
-    lazy val rhs: AbsApprox = AbsApprox(b, mc + 1)
+  case class SubRelApprox(x: Sub, mc: MathContext) extends RelApprox {
+    import Bounded._
+
+    lazy val lhs: RelApprox = RelApprox(x.lhs, mc + 1 - x.decimalLowerBound)
+    lazy val rhs: RelApprox = RelApprox(x.rhs, mc + 1 - x.decimalLowerBound)
 
     def value: BigDec = lhs.value.subtract(rhs.value, mc)
   }
 
-  case class MulAbsApprox(a: Real, b: Real, mc: MathContext) extends AbsApprox {
-    import Bounded._
-
-    private def ae = (mc + 2) / 2
-    private def be = mc + 2 - ae.precision
-
-    lazy val lhs: AbsApprox = AbsApprox(a, ae max (mc + 1 + a.decimalUpperBound))
-    lazy val rhs: AbsApprox = AbsApprox(b, be max (mc + 1 + b.decimalUpperBound))
+  case class MulRelApprox(x: Mul, mc: MathContext) extends RelApprox {
+    lazy val lhs = RelApprox(x.lhs, mc + 1)
+    lazy val rhs = RelApprox(x.rhs, mc + 2)
 
     def value: BigDec = lhs.value.multiply(rhs.value, mc)
   }
 
-
-  case class DivAbsApprox(a: Real, b: Real, mc: MathContext) extends AbsApprox {
-    import Bounded._
-
-    private def ae = (mc + 2) / 2
-    private def be = mc + 2 - ae.precision
-
-    lazy val lhs: AbsApprox = AbsApprox(a, mc + 2 - b.decimalLowerBound)
-    lazy val rhs: AbsApprox
-      = AbsApprox(b, new MathContext(1 - b.decimalLowerBound, mc.roundingMode)
-                       max
-                     (mc + 2 - 2 * b.decimalLowerBound + a.decimalUpperBound))
-
-    def value: BigDec = if (b.sign == Zero) {
-      throw new ArithmeticException("/ by zero")
-    } else {
-      lhs.value.divide(rhs.value, mc + 1)
-    }
+  case class DivRelApprox(x: Div, mc: MathContext) extends RelApprox {
+    lazy val lhs = RelApprox(x.lhs, mc + 2)
+    lazy val rhs = RelApprox(x.rhs, mc + 2)
+    def value: BigDec = lhs.value.divide(rhs.value, mc + 2)
   }
 
-  case class NegAbsApprox(a: Real, mc: MathContext) extends AbsApprox {
-    lazy val x: AbsApprox = AbsApprox(a, mc)
-    def value: BigDec = x.value.negate()
+  case class NegRelApprox(x: Neg, mc: MathContext) extends RelApprox {
+    lazy val approx = RelApprox(x.a, mc)
+    def value: BigDec = approx.value.negate()
   }
 
-  case class KRootAbsApprox(a: Real, k: Int, mc: MathContext) extends AbsApprox {
+  case class KRootRelApprox(x: KRoot, mc: MathContext) extends RelApprox {
     import Implicits._
-    import Bounded._
 
-    lazy val x: AbsApprox = AbsApprox(a, (mc + 1) max (1 - a.decimalLowerBound / 2))
-
+    lazy val approx = RelApprox(x.a, mc + 1)
     def value: BigDec = {
       implicit val ctxt = mc + 1
-      (BigDecimal(x.value) nroot k).bigDecimal
+      (BigDecimal(approx.value) nroot x.k).bigDecimal
     }
   }
 
-  case class IntLitAbsApprox(n: Int, mc: MathContext) extends AbsApprox {
-    // BigDecimal(n, mc) can/will cause "division impossible" exceptions.
-    val value = BigDecimal(n).round(mc).bigDecimal
+  case class IntLitRelApprox(n: Int, mc: MathContext) extends RelApprox {
+    val value = BigDecimal(n, mc).bigDecimal
   }
 
-  case class BigIntLitAbsApprox(n: BigInt, mc: MathContext) extends AbsApprox {
-    val value = BigDecimal(n).round(mc).bigDecimal
+  case class BigIntLitRelApprox(n: BigInt, mc: MathContext) extends RelApprox {
+    val value = BigDecimal(n, mc).bigDecimal
   }
-
-
-  /*
-  sealed trait RelativeApprox {
-    def value: BigDecimal
-  }
-
-  // object AbsoluteApproximation extends RelativeApproximation[Real,MathContext,BigDecimal] 
-
-  case class MulRelApprox(a: Real, b: Real, digits: Int) {
-    lazy val lhs = RelativeApprox(a, digits + 1)
-    lazy val rhs = RelativeApprox(b, digits + 2)
-
-    def value: BigDecimal = lhs.value.multiply(rhs.value, mc)
-  }
-  case class IntLitRelApprox(n: Int) extends RelativeApprox {
-    val value = BigDecimal(n)
-  }
-  */
 }
 
