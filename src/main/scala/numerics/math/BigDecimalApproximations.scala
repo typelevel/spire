@@ -86,7 +86,7 @@ object BigDecimalApproximations {
     lazy val lhs: AbsApprox = AbsApprox(a, max(ae, bits + 1 + b.decimalUpperBound))
     lazy val rhs: AbsApprox = AbsApprox(b, max(be, bits + 1 + a.decimalUpperBound))
 
-    def value = lhs.value + rhs.value
+    def value = lhs.value * rhs.value
   }
 
 
