@@ -18,14 +18,14 @@
 package numerics.math
 
 import java.math.{ MathContext, BigInteger, BigDecimal => BigDec }
-import scala.math.max
+import scala.math.{ ScalaNumber, ScalaNumericConversions, max }
 
 
 /**
  * An general Real type. Can be used represent real numbers and approximates
  * them on-demand.
  */
-sealed trait Real {
+sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with Ordered[Real] {
   import Real.transform
 
   def abs: Real = if (this.sign == Negative) -this else this
@@ -53,15 +53,27 @@ sealed trait Real {
     }
   }
 
+  def compare(that: Real): Int = (this - that).signum
+
   override def equals(that: Any) = that match {
     case that: Real => (this - that).sign == Zero
-    case _ => false   // TODO: Use unifiedEquals and all that.
+    case that: Rational => (this - Real(that)).sign == Zero
+    case that: BigInt => isWhole && toBigInt == that
+    case that: BigDecimal => try {
+      toBigDecimal(that.mc) == that
+    } catch {
+      case ae: ArithmeticException => false
+    }
+    case _ => unifiedPrimitiveEquals(that)
   }
+
+  override def hashCode: Int =
+    if (isWhole && toBigInt == toLong) unifiedPrimitiveHashcode
+    else toDouble.##
+
 
   def isRadical: Boolean
 
-  def toInt: Int = toBigInt.toInt
-  def toLong: Long = toBigInt.toLong
   def toBigInt: BigInt = sign match {
     case Zero => BigInt(0)
     case Negative => -((-this).toBigInt)
@@ -85,9 +97,11 @@ sealed trait Real {
         b
       }
   }
-  def toDouble: Double = this approximateTo Double
-  def toBigDecimal(implicit mc: MathContext): BigDecimal = this approximateTo mc
-  def toRational(implicit ac: ApproximationContext[Rational]): Rational = simulate[Rational]
+
+  def toBigDecimal(implicit mc: MathContext = MathContext.DECIMAL128): BigDecimal =
+    this approximateTo mc
+
+  def toRational(implicit ac: ApproximationContext[Rational] = ApproximationContext(Rational(1L, 10000000000000000L))): Rational = simulate[Rational]
 
   def approximateTo[A,B](a: A)(implicit approx: Approximation[Real,A,B]): B =
     approx(this, a)
@@ -96,12 +110,7 @@ sealed trait Real {
    * Returns an absolute approximation to `this` s.t.
    * `this - err <= this +/- err <= this + err`.
    */
-  def +/-(err: BigDecimal): BigDecimal = {
-    import Bounded._
-
-    val mc = new MathContext(max(this.decimalUpperBound + err.scale, 0))
-    this approximateTo mc
-  }
+  def +/-(err: BigDecimal): BigDecimal = this approximateTo err
 
   def signum: Int = sign.toInt
 
@@ -109,15 +118,12 @@ sealed trait Real {
   def sign: Sign = {
     import Bounded._
 
-    // Note: this +/- 10^k -> max(ub - k, 0) digits.
-
-    val ub = this.decimalUpperBound
+    // The separation bound.
     val sep = BigDecimal(1, -this.decimalLowerBound)
 
     def findSign(scale: Int): Int = {
       val err = BigDecimal(1, scale)
-      val digits = max(ub + scale, 0)
-      val a = this approximateTo (new MathContext(digits))
+      val a = this +/- err
       if (a.abs > err) {
         a.signum
       } else if (2 * err <= sep) {
@@ -134,11 +140,23 @@ sealed trait Real {
    * Simulates the expression DAG of this `Real` using another number type.
    */
   def simulate[A : Field : Exponential]: A = Real.simulate(this)
+
+
+  def isWhole: Boolean = {
+    import Implicits._
+    (this % Real(1)).sign == Zero
+  }
+  def underlying: AnyRef = null
+
+  def doubleValue: Double = this approximateTo Double
+  def floatValue: Float = doubleValue.toFloat
+  def intValue: Int = toBigInt.toInt
+  def longValue: Long = toBigInt.toLong
 }
 
 
 object Real {
-  private val t = DivBubbleTransformer
+  private val t = AggregateTransformer(ConstantFolder, DivBubbleTransformer)
   def transform(num: Real): Real = t.transform(num)
 
   implicit def apply(n: Int): Real = IntLit(n)
@@ -239,4 +257,30 @@ object DivBubbleTransformer extends Transformer[Real] {
   }
 }
 
+object ConstantFolder extends Transformer[Real] {
+  private def wrap(n: Long): Real = if (n > Int.MaxValue || n < Int.MinValue) {
+    BigIntLit(BigInt(n))
+  } else {
+    IntLit(n.toInt)
+  }
+
+  private def wrap(n: BigInt): Real =
+    if (n.isValidInt) IntLit(n.toInt) else BigIntLit(n)
+
+  def transform(num: Real): Real = num match {
+    case Add(IntLit(a), IntLit(b)) => wrap((a: Long) + (b: Long))
+    case Add(IntLit(a), BigIntLit(b)) => wrap(b + a)
+    case Add(BigIntLit(a), IntLit(b)) => wrap(a + b)
+    case Add(BigIntLit(a), BigIntLit(b)) => wrap(a + b)
+    case Sub(IntLit(a), IntLit(b)) => wrap((a: Long) - (b: Long))
+    case Sub(IntLit(a), BigIntLit(b)) => wrap(BigInt(a) - b)
+    case Sub(BigIntLit(a), IntLit(b)) => wrap(a - b)
+    case Sub(BigIntLit(a), BigIntLit(b)) => wrap(a - b)
+    case Mul(IntLit(a), IntLit(b)) => wrap((a: Long) * (b: Long))
+    case Mul(IntLit(a), BigIntLit(b)) => wrap(b * a)
+    case Mul(BigIntLit(a), IntLit(b)) => wrap(a * b)
+    case Mul(BigIntLit(a), BigIntLit(b)) => wrap(a * b)
+    case _ => num
+  }
+}
 
