@@ -2,13 +2,12 @@ package numerics.math
 
 import scala.{specialized => spec}
 
-trait Eq[@spec(Int,Long,Double) A] {
-  self =>
+trait Eq[@spec A] {
 
   def eq(x:A, y:A): Boolean
   def neq(x:A, y:A): Boolean
 
-  def on[U](f:(U) => A) = Eq.by(f)(this)
+  def on[@spec B](f:B => A) = Eq.by(f)(this)
 }
 
 trait AnonymousEq[@spec A] extends Eq[A] {
@@ -30,8 +29,10 @@ object Eq extends LowPriority {
   implicit object RationalEq extends RationalEq
   implicit def complexEq[A:Fractional] = new ComplexEq
 
-  def by[@spec T, @spec S](f:(T) => S)(implicit e:Eq[S]): Eq[T] = new AnonymousEq[T] {
-    def eq(x:T, y:T) = e.eq(f(x), f(y))
+  def apply[A](implicit e:Eq[A]):Eq[A] = e
+
+  def by[@spec A, @spec B](f:A => B)(implicit e:Eq[B]): Eq[A] = new AnonymousEq[A] {
+    def eq(x:A, y:A) = e.eq(f(x), f(y))
   }
 }
 

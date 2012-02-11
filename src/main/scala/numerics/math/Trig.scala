@@ -1,7 +1,6 @@
 package numerics.math
 
 import scala.{specialized => spec, math => mth}
-import java.math.MathContext
 
 trait Trig[@spec(Float,Double) A] {
   val f:Fractional[A]
@@ -30,6 +29,8 @@ object Trig {
   implicit object FloatIsTrig extends FloatIsTrig
   implicit object DoubleIsTrig extends DoubleIsTrig
   implicit object BigDecimalIsTrig extends BigDecimalIsTrig
+
+  def apply[A](implicit t:Trig[A]) = t
 }
 
 trait FloatIsTrig extends Trig[Float] {

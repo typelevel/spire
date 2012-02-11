@@ -40,8 +40,8 @@ trait DoubleIsNumeric extends Numeric[Double] with DoubleIsField with DoubleOrde
 trait BigDecimalIsNumeric extends Numeric[BigDecimal] with BigDecimalIsField with BigDecimalOrder
 trait RationalIsNumeric extends Numeric[Rational] with RationalIsField with RationalOrder
 
-class ComplexIsNumeric[A](implicit f:Fractional[A])
-extends ComplexIsField[A]()(f) with Numeric[Complex[A]] with Order[Complex[A]] {
+class ComplexIsNumeric[A](implicit val f:Fractional[A])
+extends ComplexIsField[A] with Numeric[Complex[A]] with Order[Complex[A]] {
   def gt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   def gteq(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")

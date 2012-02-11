@@ -14,8 +14,8 @@ trait Order[@spec A] extends Eq[A] {
   def max(x:A, y:A): A = if (gt(x, y)) x else y
   def compare(x:A, y:A): Int = if (lt(x, y)) -1 else if (gt(x, y)) 1 else 0
 
-  override def on[U](f:(U) => A): Order[U] = new AnonymousOrder[U] {
-    def cmp(x:U, y:U) = self.compare(f(x), f(y))
+  override def on[@spec B](f:B => A): Order[B] = new AnonymousOrder[B] {
+    def cmp(x:B, y:B) = self.compare(f(x), f(y))
   }
   def reverse: Order[A] = new AnonymousOrder[A] {
     def cmp(x:A, y:A) = self.compare(y, x)
@@ -43,6 +43,22 @@ final class OrderOps[@spec A](lhs:A)(implicit ev:Order[A]) {
   def cmp(rhs:A) = ev.compare(lhs, rhs)
   def min(rhs:A) = ev.min(lhs, rhs)
   def max(rhs:A) = ev.max(lhs, rhs)
+}
+
+object Order {
+  implicit object IntOrder extends IntOrder
+  implicit object LongOrder extends LongOrder
+  implicit object FloatOrder extends FloatOrder
+  implicit object DoubleOrder extends DoubleOrder
+  implicit object BigIntOrder extends BigIntOrder
+  implicit object BigDecimalOrder extends BigDecimalOrder
+  implicit object RationalOrder extends RationalOrder
+
+  def by[@spec A, @spec B](f:A => B)(implicit o:Order[B]): Order[A] = o.on(f)
+
+  implicit def ordering[A](implicit o:Order[A]) = new Ordering[A] {
+    def compare(x:A, y:A) = o.compare(x, y)
+  }
 }
 
 trait IntOrder extends Order[Int] with IntEq {
@@ -92,20 +108,4 @@ trait RationalOrder extends Order[Rational] with RationalEq {
   def gteq(x:Rational, y:Rational) = x >= y
   def lt(x:Rational, y:Rational) = x < y
   def lteq(x:Rational, y:Rational) = x <= y
-}
-
-object Order {
-  implicit object IntOrder extends IntOrder
-  implicit object LongOrder extends LongOrder
-  implicit object FloatOrder extends FloatOrder
-  implicit object DoubleOrder extends DoubleOrder
-  implicit object BigIntOrder extends BigIntOrder
-  implicit object BigDecimalOrder extends BigDecimalOrder
-  implicit object RationalOrder extends RationalOrder
-
-  def by[T, S](f:(T) => S)(implicit o:Order[S]): Order[T] = o.on(f)
-
-  implicit def ordering[A](implicit o:Order[A]) = new Ordering[A] {
-    def compare(x:A, y:A) = o.compare(x, y)
-  }
 }

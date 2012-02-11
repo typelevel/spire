@@ -17,6 +17,8 @@ object Fractional {
   implicit object DoubleIsFractional extends DoubleIsFractional
   implicit object BigDecimalIsFractional extends BigDecimalIsFractional
   implicit object RationalIsFractional extends RationalIsFractional
+
+  def apply[A](implicit f:Fractional[A]) = f
 }
 
 trait FloatIsFractional extends Fractional[Float] with FloatIsField with FloatOrder {

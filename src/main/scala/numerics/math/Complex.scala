@@ -36,14 +36,14 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   // ugh, ScalaNumericConversions ghetto
   //
   // maybe complex numbers are too different...
-  def doubleValue = { real.toDouble }
-  def floatValue = { real.toFloat }
-  def longValue = { real.toLong }
-  def intValue = { real.toInt }
+  def doubleValue = real.toDouble
+  def floatValue = real.toFloat
+  def longValue = real.toLong
+  def intValue = real.toInt
   def isWhole = real.isWhole && imag.isWhole
   def signum: Int = f.compare(real, f.zero)
   def underlying = (real, imag)
-  def complexSignum: Complex[T] = if (magnitude == f.zero) {
+  def complexSignum = if (magnitude == f.zero) {
     Complex.zero
   } else {
     this / Complex(magnitude, f.zero)
@@ -152,6 +152,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
 }
 
 
+// TODO: if/when scala gets value types this gets even more interesting
 /**
  * FastComplex is an ugly, beautiful hack.
  *
