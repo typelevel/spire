@@ -12,7 +12,7 @@ object Sorting {
     var j = mid
     var k = start
     while (k < end) {
-      if (i < mid && (j >= end || order.lteq(in(i), in(j)))) {
+      if (i < mid && (j >= end || Order[A].lteq(in(i), in(j)))) {
         out(k) = in(i); i += 1
       } else {
         out(k) = in(j); j += 1
@@ -70,7 +70,7 @@ object Sorting {
     var k = 0
 
     while (k < len) {
-      if (i < llen && (j == rlen || order.lteq(left(i), right(j)))) {
+      if (i < llen && (j == rlen || Order[A].lteq(left(i), right(j)))) {
         data(k) = left(i); i += 1
       } else {
         data(k) = right(j); j += 1

@@ -68,10 +68,10 @@ class AddBenchmarks extends MyBenchmark {
   println("init done")
 
   def addGeneric[@spec(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
-    var total = ring.zero
+    var total = Ring[A].zero
     var i = 0
     val len = data.length
-    while (i < len) { total = ring.plus(total, data(i)); i += 1 }
+    while (i < len) { total = Ring[A].plus(total, data(i)); i += 1 }
     total
   }
 

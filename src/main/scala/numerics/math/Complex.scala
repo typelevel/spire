@@ -11,18 +11,18 @@ import Implicits._
 // access functions (e.g. trig, pow, exp, log)
 
 object Complex {
-  def i[@spec(Float, Double) T:Fractional] = Complex(fractional.zero, fractional.one)
-  def one[@spec(Float, Double) T:Fractional] = Complex(fractional.one, fractional.zero)
-  def zero[@spec(Float, Double) T:Fractional] = Complex(fractional.zero, fractional.zero)
+  def i[@spec(Float, Double) T](implicit f:Fractional[T]) = Complex(f.zero, f.one)
+  def one[@spec(Float, Double) T](implicit f:Fractional[T]) = Complex(f.one, f.zero)
+  def zero[@spec(Float, Double) T](implicit f:Fractional[T]) = Complex(f.zero, f.zero)
 
   implicit def intToComplex(n:Int) = new Complex(n.toDouble, 0.0)
   implicit def longToComplex(n:Long) = new Complex(n.toDouble, 0.0)
   implicit def doubleToComplex(n:Float) = new Complex(n, 0.0F)
   implicit def doubleToComplex(n:Double) = new Complex(n, 0.0)
 
-  def polar[@spec(Float, Double) T:Fractional](magnitude:T, angle:T) = {
-    val real:T = fractional.times(magnitude, fractional.fromDouble(cos(angle.toDouble)))
-    val imag:T = fractional.times(magnitude, fractional.fromDouble(sin(angle.toDouble)))
+  def polar[@spec(Float, Double) T](magnitude:T, angle:T)(implicit f:Fractional[T]) = {
+    val real:T = f.times(magnitude, f.fromDouble(cos(angle.toDouble)))
+    val imag:T = f.times(magnitude, f.fromDouble(sin(angle.toDouble)))
     Complex(real, imag)
   }
 

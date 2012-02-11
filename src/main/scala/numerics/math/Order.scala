@@ -56,6 +56,8 @@ object Order {
 
   def by[@spec A, @spec B](f:A => B)(implicit o:Order[B]): Order[A] = o.on(f)
 
+  def apply[A](implicit o:Order[A]) = o
+
   implicit def ordering[A](implicit o:Order[A]) = new Ordering[A] {
     def compare(x:A, y:A) = o.compare(x, y)
   }
