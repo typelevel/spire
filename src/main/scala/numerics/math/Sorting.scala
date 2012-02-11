@@ -82,37 +82,37 @@ object Sorting {
   def mySort[@spec K:Order](a:Array[K]) { sort1(a, 0, a.length) }
 
   private def sort1[@spec K](x:Array[K], off:Int, len:Int)(implicit ev:Order[K]) {
-    def swap(a: Int, b: Int) {
+    def swap(k:K, a: Int, b: Int) {
       val t = x(a)
       x(a) = x(b)
       x(b) = t
     }
-    def vecswap(_a: Int, _b: Int, n: Int) {
+    def vecswap(k:K, _a: Int, _b: Int, n: Int) {
       var a = _a
       var b = _b
       var i = 0
       while (i < n) {
-        swap(a, b)
+        swap(k, a, b)
         i += 1
         a += 1
         b += 1
       }
     }
-    def med3(a: Int, b: Int, c: Int) = {
+    def med3(k:K, a: Int, b: Int, c: Int) = {
       if (ev.lt(x(a), x(b))) {
         if (ev.lt(x(b), x(c))) b else if (ev.lt(x(a), x(c))) c else a
       } else {
         if (ev.lt(x(b), x(c))) b else if (ev.lt(x(a), x(c))) c else a
       }
     }
-    def sort2(off: Int, len: Int) {
+    def sort2(k:K, off: Int, len: Int) {
       // Insertion sort on smallest arrays
       if (len < 7) {
         var i = off
         while (i < len + off) {
           var j = i
           while (j > off && ev.gt(x(j-1), x(j))) {
-            swap(j, j-1)
+            swap(k, j, j-1)
             j -= 1
           }
           i += 1
@@ -125,11 +125,11 @@ object Sorting {
           var n = off + len - 1
           if (len > 40) {        // Big arrays, pseudomedian of 9
             val s = len / 8
-            l = med3(l, l+s, l+2*s)
-            m = med3(m-s, m, m+s)
-            n = med3(n-2*s, n-s, n)
+            l = med3(k, l, l+s, l+2*s)
+            m = med3(k, m-s, m, m+s)
+            n = med3(k, n-2*s, n-s, n)
           }
-          m = med3(l, m, n) // Mid-size, med of 3
+          m = med3(k, l, m, n) // Mid-size, med of 3
         }
         val v = x(m)
 
@@ -142,14 +142,14 @@ object Sorting {
         while (!done) {
           while (b <= c && ev.lteq(x(b), v)) {
             if (ev.eq(x(b), v)) {
-              swap(a, b)
+              swap(k, a, b)
               a += 1
             }
             b += 1
           }
           while (c >= b && ev.gteq(x(c), v)) {
             if (ev.eq(x(c), v)) {
-              swap(c, d)
+              swap(k, c, d)
               d -= 1
             }
             c -= 1
@@ -157,7 +157,7 @@ object Sorting {
           if (b > c) {
             done = true
           } else {
-            swap(b, c)
+            swap(k, b, c)
             c -= 1
             b += 1
           }
@@ -166,20 +166,20 @@ object Sorting {
         // Swap partition elements back to middle
         val n = off + len
         var s = math.min(a-off, b-a)
-        vecswap(off, b-s, s)
+        vecswap(k, off, b-s, s)
         s = math.min(d-c, n-d-1)
-        vecswap(b,   n-s, s)
+        vecswap(k, b, n-s, s)
 
         // Recursively sort non-partition-elements
         s = b - a
         if (s > 1)
-          sort2(off, s)
+          sort2(k, off, s)
         s = d - c
         if (s > 1)
-          sort2(n-s, s)
+          sort2(k, n-s, s)
       }
     }
-    sort2(off, len)
+    sort2(x(0), off, len)
   }
 
 }
