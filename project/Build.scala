@@ -14,7 +14,7 @@ object MyBuild extends Build {
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "1.6.1",
       "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.0",
-      //"com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT",
+      "com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" from "http://n0d.es/jars/caliper-1.0-SNAPSHOT.jar",
       "com.google.code.gson" % "gson" % "1.7.1"
     ),
 
