@@ -6,7 +6,7 @@ import scala.math.min
 import Implicits._
 
 object Sorting {
-  private final def merge[@spec A:Order](in:Array[A], out:Array[A],
+  @inline private final def merge[@spec A:Order](in:Array[A], out:Array[A],
                                          start:Int, mid:Int, end:Int) {
     var i = start
     var j = mid
@@ -79,9 +79,9 @@ object Sorting {
     }
   }
 
-  def mySort[@spec K:Order](a:Array[K]) { sort1(a, 0, a.length) }
+  final def mySort[@spec K:Order](a:Array[K]) { sort1(a, 0, a.length) }
 
-  private def sort1[@spec K](x:Array[K], off:Int, len:Int)(implicit ev:Order[K]) {
+  final private def sort1[@spec K](x:Array[K], off:Int, len:Int)(implicit ev:Order[K]) {
     def swap(k:K, a: Int, b: Int) {
       val t = x(a)
       x(a) = x(b)
@@ -181,5 +181,4 @@ object Sorting {
     }
     sort2(x(0), off, len)
   }
-
 }
