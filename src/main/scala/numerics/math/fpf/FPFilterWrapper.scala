@@ -24,7 +24,7 @@ trait LowPriorityFPFilterWrappers {
    * instead. Otherwise, the results are undefined (and most likely incorrect).
    */
   implicit def genericFPFilter[A: Ring]: FPFilterWrapper[A] = new FPFilterWrapper[A] {
-    def wrap(a: A): FPFilter[A] = { println("..."); new FPFilter(MaybeDouble.approx(a.toDouble), a) }
+    def wrap(a: A): FPFilter[A] = new FPFilter(MaybeDouble.approx(a.toDouble), a)
   }
 }
 
@@ -36,13 +36,7 @@ trait LowPriorityFPFilterWrappers {
 object FPFilterWrapper extends LowPriorityFPFilterWrappers {
   import FPFilter._
 
-  /*
   implicit object IntFPFilterWrapper extends FPFilterWrapper[Int] {
-    def wrap(a: Int): FPFilter[Int] = new FPFilter(MaybeDouble(a), a)
-  }
-  */
-
-  implicit def IntFPFilterWrapper: FPFilterWrapper[Int] = new FPFilterWrapper[Int] {
     def wrap(a: Int): FPFilter[Int] = new FPFilter(MaybeDouble(a), a)
   }
 
