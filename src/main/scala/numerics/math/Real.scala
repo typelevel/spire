@@ -115,7 +115,7 @@ sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with
   def signum: Int = sign.toInt
 
   // The sign of this `Real`.
-  def sign: Sign = {
+  lazy val sign: Sign = {
     import Bounded._
 
     // The separation bound.
@@ -212,15 +212,13 @@ case class KRoot(a: Real, k: Int) extends Real {
 
 case class IntLit(value: Int) extends Real {
   val isRadical: Boolean = false
-  override def sign: Sign = if (value == 0) Zero else if (value > 0) Positive else Negative
+  override lazy val sign: Sign = if (value == 0) Zero else if (value > 0) Positive else Negative
 }
 
 case class BigIntLit(value: BigInt) extends Real {
   val isRadical: Boolean = false
-  override def sign: Sign = if (value == 0) Zero else if (value > 0) Positive else Negative
+  override lazy val sign: Sign = if (value == 0) Zero else if (value > 0) Positive else Negative
 }
-
-
 
 trait Transformer[A] {
   def transform(a: A): A
