@@ -20,6 +20,8 @@ package numerics.math
 import java.math.{ MathContext, BigInteger, BigDecimal => BigDec }
 import scala.math.{ ScalaNumber, ScalaNumericConversions, max }
 
+import fpf.MaybeDouble
+
 
 /**
  * An general Real type. Can be used represent real numbers and approximates
@@ -27,6 +29,21 @@ import scala.math.{ ScalaNumber, ScalaNumericConversions, max }
  */
 sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with Ordered[Real] {
   import Real.transform
+
+  /**
+   * Used for the internal floating point filter. Though this is public, it
+   * should only be used for good reason.
+   */
+  lazy val fpf: MaybeDouble = this match {
+    case Add(a, b) => a.fpf + b.fpf
+    case Sub(a, b) => a.fpf - b.fpf
+    case Mul(a, b) => a.fpf * b.fpf
+    case Div(a, b) => a.fpf / b.fpf
+    case Neg(a) => -a.fpf
+    case KRoot(a, k) => a.fpf nroot k
+    case IntLit(n) => MaybeDouble(n)
+    case BigIntLit(n) => MaybeDouble(n)
+  }
 
   def abs: Real = if (this.sign == Negative) -this else this
 
@@ -36,7 +53,13 @@ sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with
   def /(that: Real): Real = transform(Div(this, that))
   def unary_-(): Real = transform(Neg(this))
   def sqrt: Real = this nroot 2
-  def nroot(k: Int): Real = transform(KRoot(this, k))
+  def nroot(k: Int): Real = {
+    if (this.sign == Negative && k % 2 == 0) {
+      throw new ArithmeticException("Cannot find an even root of a negative Real.")
+    }
+
+    transform(KRoot(this, k))
+  }
 
   // TODO: Create Pow as a 1st class citizen.
   def pow(k: Int): Real = {
@@ -72,22 +95,35 @@ sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with
     else toDouble.##
 
 
-  def isRadical: Boolean
+  /**
+   * Returns `true` if this is a radical expression, `false` otherwise.
+   */
+  def isRadical: Boolean = this match {
+    case Add(a, b) => a.isRadical || b.isRadical
+    case Sub(a, b) => a.isRadical || b.isRadical
+    case Mul(a, b) => a.isRadical || b.isRadical
+    case Div(a, b) => a.isRadical || b.isRadical
+    case Neg(a) => a.isRadical
+    case KRoot(a, k) => true
+    case IntLit(n) => false
+    case BigIntLit(n) => false
+  }
 
-  def toBigInt: BigInt = sign match {
+
+  def toBigInt: BigInt = fpf.toLong map (BigInt(_)) getOrElse (sign match {
     case Zero => BigInt(0)
     case Negative => -((-this).toBigInt)
     case Positive =>
       val a = this +/- 0.01
       val b = a.toBigInt
 
-      if ((BigDecimal(b) + 0.02) >= BigDecimal(b + 1)) {
+      if ((a + 0.02) >= BigDecimal(b + 1)) {
         (this - Real(b + 1)).sign match {
           case Positive => b + 1
           case Negative => b
           case Zero => b + 1
         }
-      } else if ((BigDecimal(b) - 0.02) <= BigDecimal(b)) {
+      } else if ((a - 0.02) < BigDecimal(b)) {
         (this - Real(b)).sign match {
           case Positive => b
           case Negative => b - 1
@@ -96,7 +132,7 @@ sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with
       } else {
         b
       }
-  }
+  })
 
   def toBigDecimal(implicit mc: MathContext = MathContext.DECIMAL128): BigDecimal =
     this approximateTo mc
@@ -115,7 +151,7 @@ sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with
   def signum: Int = sign.toInt
 
   // The sign of this `Real`.
-  lazy val sign: Sign = {
+  lazy val sign: Sign = fpf.sign getOrElse ({
     import Bounded._
 
     // The separation bound.
@@ -134,7 +170,7 @@ sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with
     }
 
     Sign(findSign(0))
-  }
+  })
 
   /**
    * Simulates the expression DAG of this `Real` using another number type.
@@ -142,16 +178,21 @@ sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with
   def simulate[A : Field : Exponential]: A = Real.simulate(this)
 
 
-  def isWhole: Boolean = {
+  def isWhole: Boolean = fpf.isWhole getOrElse {
     import Implicits._
     (this % Real(1)).sign == Zero
   }
-  def underlying: AnyRef = null
 
-  def doubleValue: Double = this approximateTo Double
-  def floatValue: Float = doubleValue.toFloat
-  def intValue: Int = toBigInt.toInt
-  def longValue: Long = toBigInt.toLong
+  def underlying: AnyRef = this   // Why not?
+
+  def doubleValue: Double = if (fpf.isExact) {
+    fpf.approx
+  } else this approximateTo Double
+
+  def floatValue: Float = fpf.toFloat getOrElse doubleValue.toFloat
+
+  def intValue: Int = fpf.toLong map (_.toInt) getOrElse toBigInt.toInt
+  def longValue: Long = fpf.toLong getOrElse toBigInt.toLong
 }
 
 
@@ -184,7 +225,6 @@ object Real {
 }
 
 sealed trait BinOp {
-  def isRadical: Boolean = lhs.isRadical || rhs.isRadical
   def lhs:Real 
   def rhs:Real 
 }
@@ -196,29 +236,21 @@ object BinOp {
   }
 }
 
-
 case class Add(lhs: Real, rhs: Real) extends Real with BinOp
 case class Sub(lhs: Real, rhs: Real) extends Real with BinOp
 case class Mul(lhs: Real, rhs: Real) extends Real with BinOp
 case class Div(lhs: Real, rhs: Real) extends Real with BinOp
-case class Neg(a: Real) extends Real {
-  def isRadical: Boolean = a.isRadical
-}
-case class KRoot(a: Real, k: Int) extends Real {
-  require(k >= 2, "Only positive roots greater than 2 supported.")
-
-  val isRadical: Boolean = true
-}
+case class Neg(a: Real) extends Real
+case class KRoot(a: Real, k: Int) extends Real
 
 case class IntLit(value: Int) extends Real {
-  val isRadical: Boolean = false
   override lazy val sign: Sign = if (value == 0) Zero else if (value > 0) Positive else Negative
 }
 
 case class BigIntLit(value: BigInt) extends Real {
-  val isRadical: Boolean = false
   override lazy val sign: Sign = if (value == 0) Zero else if (value > 0) Positive else Negative
 }
+
 
 trait Transformer[A] {
   def transform(a: A): A
