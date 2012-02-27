@@ -37,12 +37,6 @@ sealed trait Bounded {
   def decimalLowerBound: Int = (lowerBound * 3 - 9) / 10
 }
 
-final class BMFSSBound(l_ : => BigInt, u_ : => BigInt, w_ : => Int) extends Bounded {
-  lazy val l = l_
-  lazy val u = u_
-  lazy val weight = w_
-}
-
 object Bounded extends (Real => Bounded) {
   implicit def apply(num: Real): Bounded = num match {
     //case IntLit(n) => new BMFSSBound(BigInt(1), n.abs, 1)

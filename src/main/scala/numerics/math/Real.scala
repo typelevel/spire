@@ -21,14 +21,21 @@ import java.math.{ MathContext, BigInteger, BigDecimal => BigDec }
 import scala.math.{ ScalaNumber, ScalaNumericConversions, max }
 
 import fpf.MaybeDouble
+import real._
 
 
 /**
  * An general Real type. Can be used represent real numbers and approximates
  * them on-demand.
  */
-sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with Ordered[Real] {
-  import Real.transform
+sealed abstract class Real extends ScalaNumber
+                           with ScalaNumericConversions
+                           with RealLike
+                           with ConstantFolder
+                           with BubbleUpDivs
+                           with Ordered[Real] {
+//sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with Ordered[Real] {
+  // import Real.transform
 
   /**
    * Used for the internal floating point filter. Though this is public, it
@@ -45,6 +52,7 @@ sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with
     case BigIntLit(n) => MaybeDouble(n)
   }
 
+  /*
   def abs: Real = if (this.sign == Negative) -this else this
 
   def *(that: Real): Real = transform(Mul(this, that))
@@ -77,6 +85,7 @@ sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with
   }
 
   def compare(that: Real): Int = (this - that).signum
+  */
 
   override def equals(that: Any) = that match {
     case that: Real => (this - that).sign == Zero
@@ -148,7 +157,9 @@ sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with
    */
   def +/-(err: BigDecimal): BigDecimal = this approximateTo err
 
+  /*
   def signum: Int = sign.toInt
+  */
 
   // The sign of this `Real`.
   lazy val sign: Sign = fpf.sign getOrElse ({
@@ -197,8 +208,8 @@ sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with
 
 
 object Real {
-  private val t = AggregateTransformer(ConstantFolder, DivBubbleTransformer)
-  def transform(num: Real): Real = t.transform(num)
+  // private val t = AggregateTransformer(ConstantFolder, DivBubbleTransformer)
+  // def transform(num: Real): Real = t.transform(num)
 
   implicit def apply(n: Int): Real = IntLit(n)
   implicit def apply(n: Long): Real = apply(BigInt(n))
@@ -251,7 +262,7 @@ case class BigIntLit(value: BigInt) extends Real {
   override lazy val sign: Sign = if (value == 0) Zero else if (value > 0) Positive else Negative
 }
 
-
+/*
 trait Transformer[A] {
   def transform(a: A): A
 }
@@ -259,11 +270,11 @@ trait Transformer[A] {
 case class AggregateTransformer[A](t1: Transformer[A], t2: Transformer[A]) extends Transformer[A] {
   def transform(a: A): A = t2.transform(t1.transform(a))
 }
-
+*/
 /**
  * Moves division up from the children of a Real to the root. For example,
  * `a/b + c/d` becomes `(a*d + c*b) / (b*d)`.
- */
+ *//*
 object DivBubbleTransformer extends Transformer[Real] {
   def transform(num: Real): Real = num match {
     case _: BinOp => num match {
@@ -313,4 +324,4 @@ object ConstantFolder extends Transformer[Real] {
     case _ => num
   }
 }
-
+*/

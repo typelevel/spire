@@ -13,6 +13,7 @@ trait Approximation[A,B,C] extends ((A,B) => C) {
   def apply(n: A, err: B): C
 }
 
+
 object Approximation {
   def approximate[A,B,C](a: A, b: B)(implicit approx: Approximation[A,B,C]): C =
     approx(a, b)
@@ -33,5 +34,11 @@ object Approximation {
     // def bits: AbsolutePrecision = AbsolutePrecision(k)
     def digits: MathContext = new MathContext(k)
   }
+
+  final class ApproximationOps[A](a: A) {
+    def approximateTo[B,C](b: B)(implicit approx: Approximation[A,B,C]): C = approx(a, b)
+  }
+
+  implicit def approximateAny[A](a: A) = new ApproximationOps(a)
 }
 

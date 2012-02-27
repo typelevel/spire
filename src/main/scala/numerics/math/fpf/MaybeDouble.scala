@@ -13,6 +13,12 @@ import java.lang.Double.{ NaN, isNaN, isInfinite }
  * number type. When performing comparisons then, this can be checked first to
  * save on potentially slow computation.
  *
+ * For this type, if a method returns an `Option`al value, then that indicates
+ * that if `None` is returned, the answer cannot be computed exactly, but if
+ * `Some(x)` is returned, then that is guaranteed to be correct. For example,
+ * `toLong`, `toFloat`, `sign`, `isWhole`, etc. return these types of optional,
+ * only-if-correct, type values.
+ *
  * Most likely you would not use this directly, but just wrap your number type
  * in a `FPFilter` which maintains a `MaybeDouble` and handles all the lazy
  * computation of the more accurate number type for you.
@@ -70,7 +76,7 @@ final class MaybeDouble(val approx: Double, private val mes: Double, private val
   /**
    * FIXME: Implement arbitrary nroots w/ error bounds.
    */
-  def nroot(n: Int): MaybeDouble = if (n == 2) sqrt else new MaybeDouble(NaN, 0, 0)
+  def nroot(n: Int): MaybeDouble = if (n == 2) sqrt else Invalid
    
   def sqrt: MaybeDouble = {
     val x = math.sqrt(approx)
@@ -99,7 +105,7 @@ final class MaybeDouble(val approx: Double, private val mes: Double, private val
       val i = quot.approx.toLong
       new MaybeDouble(i.toDouble, 0.0, 0)
     } else {
-      new MaybeDouble(NaN, 0.0, 0)
+      Invalid
     }
   }
 
@@ -139,6 +145,7 @@ final class MaybeDouble(val approx: Double, private val mes: Double, private val
    */
   def opt: Option[Double] = sign map (_ => approx)
 
+  def toInt: Option[Int] = toLong map (_.toInt)
 
   /**
    * If this can be converted, exactly, into a `Long`, then `Some(n)` will be
@@ -150,6 +157,7 @@ final class MaybeDouble(val approx: Double, private val mes: Double, private val
     if (lb == ub) Some(lb) else None
   } else None
 
+  def toBigInt: Option[BigInt] = toLong map (BigInt(_))
 
   /**
    * Returns `true` if this `MaybeDouble` is both valid and exact (has an
@@ -170,6 +178,12 @@ final class MaybeDouble(val approx: Double, private val mes: Double, private val
       None
     }
 
+  def toDouble: Option[Double] = if (isExact) Some(approx) else None
+
+  def isWhole: Option[Boolean] = if (isExact) {
+    toLong map { _.toDouble == approx }
+  } else None
+
   override def toString: String = "~" + approx.toString
 }
 
@@ -184,6 +198,8 @@ object MaybeDouble {
 
   val maxWhole = java.lang.Double.longBitsToDouble(((-1L) >>> 12) | (1075L << 52))
   val minWhole = -maxWhole
+
+  val Invalid = new MaybeDouble(NaN, 0, 0)
 
 
   def apply(x: Float): MaybeDouble = exact(x.toDouble)

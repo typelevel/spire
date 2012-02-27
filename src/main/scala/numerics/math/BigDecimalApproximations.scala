@@ -14,7 +14,7 @@ import scala.math.max
 object BigDecimalApproximations {
 
   /**
-   * Removes some of the tedium when dealing manipulating the precision of
+   * Removes some of the tedium when dealing with manipulating the precision of
    * `MathContext`s.
    */
   final class MathContextOps(mc: MathContext) {
@@ -115,6 +115,7 @@ object BigDecimalApproximations {
     def value = -(x.value)
   }
 
+
   case class KRootAbsApprox(a: Real, k: Int, bits: Int) extends AbsApprox {
     import Implicits._
     import Bounded._
@@ -181,7 +182,7 @@ object BigDecimalApproximations {
 
   case class MulRelApprox(x: Mul, mc: MathContext) extends RelApprox {
     lazy val lhs = RelApprox(x.lhs, mc + 1)
-    lazy val rhs = RelApprox(x.rhs, mc + 2)
+    lazy val rhs = RelApprox(x.rhs, mc + 2) // Implement heuristic for cost?
 
     def value: BigDec = lhs.value.multiply(rhs.value, mc)
   }
