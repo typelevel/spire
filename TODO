@@ -7,3 +7,5 @@
 7. Create our own, better, Decimal class, with more methods
 8. Add implicits to put numerics.math.* functionality onto types
 9. Match up concrete and generic APIs
+10. Get compiler plugin for inlining implicits/ops working
+11. Unify operators (e.g. /~, %, /%, **, ~^, etc).

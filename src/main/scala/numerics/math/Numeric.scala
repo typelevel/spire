@@ -20,6 +20,9 @@ object Numeric {
   implicit object BigIntIsNumeric extends BigIntIsNumeric
   implicit object BigDecimalIsNumeric extends BigDecimalIsNumeric
   implicit object RationalIsNumeric extends RationalIsNumeric
+  implicit def complexIsNumeric[A:Fractional:Exponential] = new ComplexIsNumeric
+
+  def apply[A](implicit e:Numeric[A]):Numeric[A] = e
 }
 
 trait IntIsNumeric extends Numeric[Int] with IntIsEuclideanRing with IntOrder {
@@ -39,3 +42,11 @@ trait DoubleIsNumeric extends Numeric[Double] with DoubleIsField with DoubleOrde
 trait BigDecimalIsNumeric extends Numeric[BigDecimal] with BigDecimalIsField with BigDecimalOrder
 trait RationalIsNumeric extends Numeric[Rational] with RationalIsField with RationalOrder
 trait RealIsNumeric extends Numeric[Real] with RealIsField with RealOrder
+
+class ComplexIsNumeric[A](implicit val f:Fractional[A], val e:Exponential[A])
+extends ComplexIsField[A] with Numeric[Complex[A]] with Order[Complex[A]] {
+  def gt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
+  def gteq(x:Complex[A], y:Complex[A]) = sys.error("undefined")
+  def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
+  def lteq(x:Complex[A], y:Complex[A]) = sys.error("undefined")
+}

@@ -11,39 +11,38 @@ import Implicits._
 // access functions (e.g. trig, pow, exp, log)
 
 object Complex {
-  def i[T:Fractional:Exponential] = Complex(fractional.zero, fractional.one)
-  def one[T:Fractional:Exponential] = Complex(fractional.one, fractional.zero)
-  def zero[T:Fractional:Exponential] = Complex(fractional.zero, fractional.zero)
-
+  def i[@spec(Float, Double) T](implicit f:Fractional[T], e:Exponential[T]) = Complex(f.zero, f.one)
+  def one[@spec(Float, Double) T](implicit f:Fractional[T], e:Exponential[T]) = Complex(f.one, f.zero)
+  def zero[@spec(Float, Double) T](implicit f:Fractional[T], e:Exponential[T]) = Complex(f.zero, f.zero)
   implicit def intToComplex(n:Int) = new Complex(n.toDouble, 0.0)
   implicit def longToComplex(n:Long) = new Complex(n.toDouble, 0.0)
   implicit def doubleToComplex(n:Float) = new Complex(n, 0.0F)
   implicit def doubleToComplex(n:Double) = new Complex(n, 0.0)
 
-  def polar[T:Fractional:Exponential](magnitude:T, angle:T) = {
-    val real:T = magnitude * fractional.fromDouble(cos(angle.toDouble))
-    val imag:T = magnitude * fractional.fromDouble(sin(angle.toDouble))
-    Complex[T](real, imag)
+  def polar[@spec(Float, Double) T](magnitude:T, angle:T)(implicit f:Fractional[T], e:Exponential[T]) = {
+    val real:T = f.times(magnitude, f.fromDouble(cos(angle.toDouble)))
+    val imag:T = f.times(magnitude, f.fromDouble(sin(angle.toDouble)))
+    Complex(real, imag)
   }
 
-  def apply[T:Fractional:Exponential](real:T, imag:T) = new Complex(real, imag)
-  def unapply[T:Fractional:Exponential](c:Complex[T]) = Some((c.real, c.imag))
+  def apply[@spec(Float, Double) T:Fractional:Exponential](real:T, imag:T) = new Complex(real, imag)
+  def unapply[@spec(Float, Double) T:Fractional:Exponential](c:Complex[T]) = Some((c.real, c.imag))
 }
 
-class Complex[T](val real:T, val imag:T)(implicit f:Fractional[T],e:Exponential[T])
+class Complex[@spec(Float, Double) T](val real:T, val imag:T)(implicit f:Fractional[T], e:Exponential[T])
 extends ScalaNumber with ScalaNumericConversions with Serializable {
 
   // ugh, ScalaNumericConversions ghetto
   //
   // maybe complex numbers are too different...
-  def doubleValue = { real.toDouble }
-  def floatValue = { real.toFloat }
-  def longValue = { real.toLong }
-  def intValue = { real.toInt }
+  def doubleValue = real.toDouble
+  def floatValue = real.toFloat
+  def longValue = real.toLong
+  def intValue = real.toInt
   def isWhole = real.isWhole && imag.isWhole
   def signum: Int = f.compare(real, f.zero)
   def underlying = (real, imag)
-  def complexSignum: Complex[T] = if (magnitude == f.zero) {
+  def complexSignum = if (magnitude == f.zero) {
     Complex.zero
   } else {
     this / Complex(magnitude, f.zero)
@@ -67,67 +66,90 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   // ugh, for very large Fractional values this will totally break
   lazy val magnitude: T = (real * real + imag * imag).sqrt
   lazy val angle: T = f.fromDouble(atan2(imag.toDouble, real.toDouble))
+  
   def abs: T = magnitude
   def arg: T = angle
 
-  def conjugate = Complex(real, -imag)
+  def conjugate = Complex(real, f.negate(imag))
 
   def asTuple: (T, T) = (real, imag)
   def asPolarTuple: (T, T) = (abs, arg)
 
-  def isImaginary: Boolean = real == f.zero && imag != f.zero
-  def isReal: Boolean = real != f.zero && imag == f.zero
+  def isImaginary: Boolean = f.eq(real, f.zero) && f.neq(imag, f.zero)
+  def isReal: Boolean = f.neq(real, f.zero) && f.eq(imag, f.zero)
 
-  def equiv(b:Complex[T]) = real == b.real && imag == b.imag
+  def eq(b:Complex[T]) = f.eq(real, b.real) && f.eq(imag, b.imag)
+  def neq(b:Complex[T]) = f.neq(real, b.real) || f.neq(imag, b.imag)
 
-  def unary_-() = Complex(-real, -imag)
+  def unary_-() = Complex(f.negate(real), f.negate(imag))
 
-  def +(b:Complex[T]) = Complex(real + b.real, imag + b.imag)
+  def +(b:Complex[T]) = Complex(f.plus(real, b.real), f.plus(imag, b.imag))
 
-  def -(b:Complex[T]) = Complex(real - b.real, imag - b.imag)
+  def -(b:Complex[T]) = Complex(f.minus(real, b.real), f.minus(imag, b.imag))
 
-  def *(b:Complex[T]) = Complex(real * b.real - imag * b.imag,
-                                  imag * b.real + real * b.imag)
+  def *(b:Complex[T]) = Complex(f.minus(f.times(real, b.real), f.times(imag, b.imag)),
+                                f.plus(f.times(imag, b.real), f.times(real, b.imag)))
 
   def /(b:Complex[T]) = {
     val abs_breal = b.real.abs
     val abs_bimag = b.imag.abs
 
-    if (abs_breal >= abs_bimag) {
-      if (abs_breal === f.zero) throw new Exception("/ by zero")
-      val ratio = b.imag / b.real
-      val denom = b.real + b.imag * ratio
-      Complex((real + imag * ratio) / denom, (imag - real * ratio) / denom)
+    if (f.gteq(abs_breal, abs_bimag)) {
+      if (f.eq(abs_breal, f.zero)) throw new Exception("/ by zero")
+      val ratio = f.div(b.imag, b.real)
+      val denom = f.plus(b.real, f.times(b.imag, ratio))
+      Complex(f.div(f.plus(real, f.times(imag, ratio)), denom),
+              f.div(f.minus(imag, f.times(real, ratio)), denom))
 
     } else {
-      if (abs_bimag === f.zero) throw new Exception("/ by zero")
-      val ratio = b.real / b.imag
-      val denom = b.real * ratio + b.imag
-      Complex((real * ratio + imag) / denom, (imag * ratio - real) / denom)
+      if (f.eq(abs_bimag, f.zero)) throw new Exception("/ by zero")
+      val ratio = f.div(b.real, b.imag)
+      val denom = f.plus(f.times(b.real, ratio), b.imag)
+      Complex(f.div(f.plus(f.times(real, ratio), imag), denom),
+              f.div(f.minus(f.times(imag, ratio), real), denom))
     }
   }
 
+  // TODO: to avoid creating intermediate objects we should probably implement
+  // all of these directly rather than relying on our previous definitions.
+  //
+  // alternately, could try piecewise functions for the previous things
+  // (e.g. div_real(Complex, Complex) which would return just real part).
+  def quot(b:Complex[T]) = Complex(f.floor((this / b).real), f.zero)
+
+  def /~(b:Complex[T]) = quot(b)
+
+  def %(b:Complex[T]):Complex[T] = this - (b * (this /~ b))
+
+  def /%(b:Complex[T]):(Complex[T], Complex[T]) = {
+    val q = quot(b)
+    (q, this - (b * q))
+  }
+
+  def **(b:Complex[T]) = pow(b)
+  def ~^(b:Complex[T]) = pow(b)
   def pow(b:Complex[T]) = if (b.eq(Complex.zero[T])) {
     Complex.one[T]
 
   } else if (this.eq(Complex.zero[T])) {
-    if ((b.imag !== f.zero) || (b.real < f.zero))
+    if (f.neq(b.imag, f.zero) || f.lt(b.real, f.zero))
       throw new Exception("raising 0 to negative/complex power")
     Complex.zero[T]
 
-  } else if (b.imag !== f.zero) {
+  } else if (f.neq(b.imag, f.zero)) {
     val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble) / exp((angle * b.imag).toDouble))
     val phase = f.fromDouble(angle.toDouble * b.real.toDouble + log(abs.toDouble) * b.imag.toDouble)
     Complex.polar(len, phase)
 
   } else {
     val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble))
-    val phase = angle * b.real
+    val phase = f.times(angle, b.real)
     Complex.polar(len, phase)
   }
 }
 
 
+// TODO: if/when scala gets value types this gets even more interesting
 /**
  * FastComplex is an ugly, beautiful hack.
  *
@@ -251,6 +273,17 @@ object FastComplex {
       val denom = re_b * ratio + im_b
       encode((re_a * ratio + im_a) / denom, (im_a * ratio - re_a) / denom)
     }
+  }
+
+  def quot(a:Long, b:Long):Long = {
+    encode(scala.math.floor(real(divide(a, b))).toFloat, 0.0F)
+  }
+
+  def mod(a:Long, b:Long):Long = subtract(a, multiply(b, quot(a, b)))
+
+  def quotmod(a:Long, b:Long):(Long, Long) = {
+    val q = quot(a, b)
+    (q, subtract(a, multiply(b, quot(a, b))))
   }
 
   // exponentiation

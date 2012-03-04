@@ -14,8 +14,8 @@ trait Order[@spec A] extends Eq[A] {
   def max(x:A, y:A): A = if (gt(x, y)) x else y
   def compare(x:A, y:A): Int = if (lt(x, y)) -1 else if (gt(x, y)) 1 else 0
 
-  override def on[U](f:(U) => A): Order[U] = new AnonymousOrder[U] {
-    def cmp(x:U, y:U) = self.compare(f(x), f(y))
+  override def on[@spec B](f:B => A): Order[B] = new AnonymousOrder[B] {
+    def cmp(x:B, y:B) = self.compare(f(x), f(y))
   }
   def reverse: Order[A] = new AnonymousOrder[A] {
     def cmp(x:A, y:A) = self.compare(y, x)
@@ -25,8 +25,8 @@ trait Order[@spec A] extends Eq[A] {
 trait AnonymousOrder[A] extends Order[A] {
   protected[this] def cmp(x:A, y:A): Int
 
-  def equiv(x:A, y:A) = cmp(x, y) == 0
-  def nequiv(x:A, y:A) = cmp(x, y) != 0
+  def eq(x:A, y:A) = cmp(x, y) == 0
+  def neq(x:A, y:A) = cmp(x, y) != 0
   def gt(x:A, y:A) = cmp(x, y) > 0
   def lt(x:A, y:A) = cmp(x, y) < 0
   def gteq(x:A, y:A) = cmp(x, y) > -1
@@ -34,18 +34,34 @@ trait AnonymousOrder[A] extends Order[A] {
   override def compare(x:A, y:A) = cmp(x, y)
 }
 
-trait OrderOps[@spec A] {
-  val lhs:A
-  val o:Order[A]
+final class OrderOps[@spec A](lhs:A)(implicit ev:Order[A]) {
+  def >(rhs:A) = ev.gt(lhs, rhs)
+  def >=(rhs:A) = ev.gteq(lhs, rhs)
+  def <(rhs:A) = ev.lt(lhs, rhs)
+  def <=(rhs:A) = ev.lteq(lhs, rhs)
 
-  def >(rhs:A) = o.gt(lhs, rhs)
-  def >=(rhs:A) = o.gteq(lhs, rhs)
-  def <(rhs:A) = o.lt(lhs, rhs)
-  def <=(rhs:A) = o.lteq(lhs, rhs)
+  def cmp(rhs:A) = ev.compare(lhs, rhs)
+  def min(rhs:A) = ev.min(lhs, rhs)
+  def max(rhs:A) = ev.max(lhs, rhs)
+}
 
-  def cmp(rhs:A) = o.compare(lhs, rhs)
-  def min(rhs:A) = o.min(lhs, rhs)
-  def max(rhs:A) = o.max(lhs, rhs)
+object Order {
+  implicit object IntOrder extends IntOrder
+  implicit object LongOrder extends LongOrder
+  implicit object FloatOrder extends FloatOrder
+  implicit object DoubleOrder extends DoubleOrder
+  implicit object BigIntOrder extends BigIntOrder
+  implicit object BigDecimalOrder extends BigDecimalOrder
+  implicit object RationalOrder extends RationalOrder
+  implicit object RealOrder extends RealOrder
+
+  def by[@spec A, @spec B](f:A => B)(implicit o:Order[B]): Order[A] = o.on(f)
+
+  def apply[A](implicit o:Order[A]) = o
+
+  implicit def ordering[A](implicit o:Order[A]) = new Ordering[A] {
+    def compare(x:A, y:A) = o.compare(x, y)
+  }
 }
 
 trait IntOrder extends Order[Int] with IntEq {
@@ -105,20 +121,3 @@ trait RealOrder extends Order[Real] with RealEq {
   def lteq(x:Real, y:Real) = cmp(x, y) <= 0
 }
 
-
-object Order {
-  implicit object IntOrder extends IntOrder
-  implicit object LongOrder extends LongOrder
-  implicit object FloatOrder extends FloatOrder
-  implicit object DoubleOrder extends DoubleOrder
-  implicit object BigIntOrder extends BigIntOrder
-  implicit object BigDecimalOrder extends BigDecimalOrder
-  implicit object RationalOrder extends RationalOrder
-  implicit object RealOrder extends RealOrder
-
-  def by[T, S](f:(T) => S)(implicit o:Order[S]): Order[T] = o.on(f)
-
-  implicit def ordering[A](implicit o:Order[A]) = new Ordering[A] {
-    def compare(x:A, y:A) = o.compare(x, y)
-  }
-}

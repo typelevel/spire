@@ -9,13 +9,10 @@ trait EuclideanRing[@spec(Int,Long,Float,Double) A] extends Ring[A] {
   def quotmod(a:A, b:A) = (quot(a, b), mod(a, b))
 }
 
-trait EuclideanRingOps[@spec(Int,Long,Float,Double) A] {
-  val lhs:A
-  val n:EuclideanRing[A]
-
-  def /~(rhs:A) = n.quot(lhs, rhs)
-  def %(rhs:A) = n.mod(lhs, rhs)
-  def /%(rhs:A) = (n.quot(lhs, rhs), n.mod(lhs, rhs))
+final class EuclideanRingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:EuclideanRing[A]) {
+  def /~(rhs:A) = ev.quot(lhs, rhs)
+  def %(rhs:A) = ev.mod(lhs, rhs)
+  def /%(rhs:A) = (ev.quot(lhs, rhs), ev.mod(lhs, rhs))
 }
 
 object EuclideanRing {
@@ -26,8 +23,10 @@ object EuclideanRing {
   implicit object BigIntIsEuclideanRing extends BigIntIsEuclideanRing
   implicit object BigDecimalIsEuclideanRing extends BigDecimalIsEuclideanRing
   implicit object RationalIsEuclideanRing extends RationalIsEuclideanRing
-  implicit def complexIsEuclideanRing[A:Fractional:Exponential] = new ComplexIsEuclideanRing
   implicit object RealIsEuclideanRing extends RealIsEuclideanRing
+  implicit def complexIsEuclideanRingCls[A:Fractional:Exponential] = new ComplexIsEuclideanRingCls
+
+  def apply[A](implicit e:EuclideanRing[A]):EuclideanRing[A] = e
 }
 
 
@@ -72,20 +71,20 @@ trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRin
   def mod(a:Rational, b:Rational) = a % b
 }
 
-class ComplexIsEuclideanRing[A](implicit f:Fractional[A], e:Exponential[A])
-extends ComplexIsRing[A]()(f,e) with EuclideanRing[Complex[A]] {
-  override def quotmod(a:Complex[A], b:Complex[A]) = {
-    // TODO: fix this when Fractional has a floor
-    //val quotient = Complex(f.floor((a / b).real), f.zero)
-    val quotient = Complex(f.fromDouble(floor(f.toDouble((a / b).real))), f.zero)(f, e)
-    val modulus = a - (b * quotient)
-    (quotient, modulus)
-  }
-  def quot(a:Complex[A], b:Complex[A]) = quotmod(a, b)._1
-  def mod(a:Complex[A], b:Complex[A]) = quotmod(a, b)._2
-}
-
 trait RealIsEuclideanRing extends EuclideanRing[Real] with RealIsRing {
   def quot(a: Real, b: Real): Real = (a / b).toBigInt
   def mod(a: Real, b: Real): Real = a - quot(a, b) * b
 }
+
+trait ComplexIsEuclideanRing[@spec(Float,Double) A]
+extends ComplexIsRing[A] with EuclideanRing[Complex[A]] {
+  implicit val f:Fractional[A]
+  implicit val e:Exponential[A]
+
+  override def quotmod(a:Complex[A], b:Complex[A]) = a /% b
+  def quot(a:Complex[A], b:Complex[A]) = a /~ b
+  def mod(a:Complex[A], b:Complex[A]) = a % b
+}
+
+class ComplexIsEuclideanRingCls[@spec(Float,Double) A]
+(implicit val f:Fractional[A], val e:Exponential[A]) extends ComplexIsEuclideanRing[A]
