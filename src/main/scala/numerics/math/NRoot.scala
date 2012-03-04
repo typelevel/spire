@@ -296,7 +296,15 @@ object NRoot {
    * @param ctxt The `MathContext` to bound the precision of the result.
    * @returns A `BigDecimal` approximation to the `k`-th root of `a`.
    */
-  def nroot(a: BigDecimal, k: Int, ctxt: MathContext) = {
+  def nroot(a: BigDecimal, k: Int, ctxt: MathContext): BigDecimal = if (k == 0) {
+    BigDecimal(1)
+  } else if (a.signum < 0) {
+    if (k % 2 == 0) {
+      throw new ArithmeticException("%d-root of negative number" format k)
+    } else {
+      -nroot(-a, k, ctxt)
+    }
+  } else {
     val underlying = BigInt(a.bigDecimal.unscaledValue.toByteArray)
     val scale = BigInt(10) pow a.scale
     val intPart = digitize(underlying / scale, radix)
