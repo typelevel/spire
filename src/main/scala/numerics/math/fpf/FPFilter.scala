@@ -32,10 +32,34 @@ import Implicits._
  * Currently, the only way to operate on an `FPFilter` is by using its various
  * numeric typeclasses.
  *
+ * Note: Don't use `FPFilter`s in hash maps. Getting the `hashCode` will always
+ *       force the evaluation of `value`.
+ *
  * [1] Burnikel, Funke, Seel. Exact Geometric Computation Using Cascading. SoCG 1998.
  */
 final class FPFilter[A](val approx: MaybeDouble, x: => A) {
   lazy val value: A = x
+
+  /**
+   * This will always evalute the underlying `value` and will lead to serious
+   * performance problems if used often.
+   */
+  override def hashCode: Int = value ##
+
+  /**
+   * Returns true if these values are equal. Note that this will only return
+   * `true` on a successful comparison of `this.value == that.value`. However,
+   * it may return `false` based on only the floating point approximations. If
+   * you wish to take advantage of the case where `this.approx == that.approx`
+   * exactly, you'll need to use the `Eq` type class instead.
+   */
+  override def equals(that: Any): Boolean = that match {
+    case that: FPFilter[_] => (this.approx - that.approx).sign match {
+      case Some(Negative) | Some(Positive) => false
+      case _ => this.value == that.value   // This actually differs from Eq[FPFitler[A]].
+    }
+    case _ => false
+  }
 }
 
 

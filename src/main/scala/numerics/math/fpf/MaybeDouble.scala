@@ -184,8 +184,16 @@ final class MaybeDouble(val approx: Double, private val mes: Double, private val
     toLong map { _.toDouble == approx }
   } else None
 
+  override def hashCode: Int = (approx.## + mes.## * 19 + ind * 23)
+  override def equals(that: Any): Boolean = that match {
+    case that: MaybeDouble =>
+      this.approx == that.approx && this.mes == that.mes && this.ind == that.ind
+    case _ => false
+  }
+
   override def toString: String = "~" + approx.toString
 }
+
 
 object MaybeDouble {
 
