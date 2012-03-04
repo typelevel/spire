@@ -9,6 +9,9 @@ import Implicits.{eqOps => _, _}
 // nice alias
 import scala.{specialized => spec}
 
+import numerics.math.fpf.FPFilter
+
+
 class RingTest extends FunSuite {
 
   /**
@@ -26,7 +29,7 @@ class RingTest extends FunSuite {
     def runTest(name:String)(f: => Unit) = test("%s:%s" format(cls, name))(f)
 
     // Ring[A]'s zero
-    val z = ring.zero
+    val z: A = ring.zero
 
     // abs
     runTest("(-3).abs")(assert(a.abs === b))
@@ -62,4 +65,5 @@ class RingTest extends FunSuite {
   runWith[BigDecimal](-3, 3, -9)
   runWith[Rational](-3, 3, -9)
   runWith[Complex[Double]](-3, 3, -9)
+  runWith[FPFilter[BigInt]](FPFilter[BigInt](-3), FPFilter[BigInt](3), FPFilter[BigInt](-9))
 }
