@@ -3,6 +3,7 @@ package numerics.math
 import org.scalatest.FunSuite
 import numerics.math.fun._
 import Implicits.{eqOps => _, _}
+import java.math.MathContext
 
 class ComplexTest extends FunSuite {
   test("create Complex[Double]") {
@@ -14,6 +15,10 @@ class ComplexTest extends FunSuite {
   }
 
   test("create Complex[BigDecimal]") {
+
+    // Exponential[BigDecimal] requires an implicit MathContext.
+    implicit val mc = MathContext.DECIMAL128
+
     val (real, imag) = (BigDecimal(222.0), BigDecimal(3483.0))
     val c = Complex(real, imag)
     assert(c.real === real)
