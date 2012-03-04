@@ -24,7 +24,7 @@ trait BubbleUpDivs extends RealTransform { self: Real =>
     case Div(a, Div(b, c)) => Div(a * c, b)
     case Neg(Div(a, b)) => Div(Neg(a), b)
     case KRoot(Div(a, b), k) => Div(KRoot(a * (b pow (k - 1)), k), b)
-    case _ => num
+    case num => num
   }
 }
 
