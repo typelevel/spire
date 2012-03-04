@@ -194,8 +194,8 @@ object Real {
     case Div(a, b) => simulate(a) / simulate(b)
     case Neg(a) => -simulate(a)
     case KRoot(a, k) => simulate(a) nroot k
-    case IntLit(n) => ring[A].fromInt(n)
-    case BigIntLit(n) => ring[A].fromBigInt(n)
+    case IntLit(n) => Ring[A].fromInt(n)
+    case BigIntLit(n) => Ring[A].fromBigInt(n)
   }
 }
 

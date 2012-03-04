@@ -5,7 +5,6 @@ import java.math.MathContext
 
 
 trait Exponential[@spec(Double) A] {
-  def pow(a: A, k: Int): A
   def nroot(a: A, n: Int): A
   def sqrt(a: A): A = nroot(a, 2)
 }
@@ -21,6 +20,8 @@ object Exponential {
 
   implicit def bigDecimalIsExponential(implicit mc: MathContext): Exponential[BigDecimal] =
     BigDecimalIsApproxExponential()(mc)
+
+  def apply[A](implicit e: Exponential[A]): Exponential[A] = e
 }
 
 
@@ -28,20 +29,17 @@ trait ExponentialOps[@spec(Double) A] {
   val lhs: A
   val exp: Exponential[A]
 
-  def pow(k: Int): A = exp.pow(lhs, k)
   def nroot(k: Int): A = exp.nroot(lhs, k)
   def sqrt: A = exp.sqrt(lhs)
 }
 
 
 trait DoubleIsExponential extends Exponential[Double] {
-  def pow(a: Double, k: Int): Double = mth.pow(a, k)
   def nroot(a: Double, k: Int): Double = mth.pow(a, 1 / k.toDouble)
   override def sqrt(a: Double): Double = mth.sqrt(a)
 }
 
 trait FloatIsExponential extends Exponential[Float] {
-  def pow(a: Float, k: Int): Float = mth.pow(a, k).toFloat
   def nroot(a: Float, k: Int): Float = mth.pow(a, 1 / k.toDouble).toFloat
   override def sqrt(a: Float): Float = mth.sqrt(a).toFloat
 }
@@ -49,15 +47,12 @@ trait FloatIsExponential extends Exponential[Float] {
 
 trait RationalIsExponential extends Exponential[Rational] {
   implicit def context: ApproximationContext[Rational]
-  def pow(a: Rational, k: Int): Rational = a pow k
   def nroot(a: Rational, k: Int): Rational = a nroot k
 }
 
 case class RationalIsApproxExponential(implicit context: ApproximationContext[Rational]) extends RationalIsExponential
 
 trait BigIntIsExponential extends Exponential[BigInt] {
-  def pow(a: BigInt, k: Int): BigInt = a pow k
-
   def nroot(a: BigInt, k: Int): BigInt = if (a < 0 && k % 2 == 1) {
     -nroot(-a, k)
   } else if (a < 0) {
@@ -79,17 +74,12 @@ trait BigIntIsExponential extends Exponential[BigInt] {
 }
 
 trait RealIsExponential extends Exponential[Real] {
-  def pow(a: Real, k: Int): Real = a pow k
   def nroot(a: Real, k: Int): Real = a nroot k
 }
 
 trait BigDecimalIsExponential extends Exponential[BigDecimal] {
   def context: MathContext
 
-  def pow(a: BigDecimal, k: Int): BigDecimal = if (k == 1) a else {
-    val sq = pow(a, k / 2)
-    if (k % 2 == 1) sq * sq * a else sq * sq
-  }
   def nroot(a: BigDecimal, k: Int): BigDecimal = NRoots.nroot(a, k, context)
 }
 

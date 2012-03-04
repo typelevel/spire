@@ -49,7 +49,7 @@ class FPFilterTest extends FunSuite {
   }
 
   test("FPFilter is Exponential") {
-    def powerToTheRoot[A: Exponential](a: A, b: A) {
+    def powerToTheRoot[A: Exponential: Ring](a: A, b: A) {
       assert(a.sqrt == b)
       assert((a pow 2) == (b pow 4))
 

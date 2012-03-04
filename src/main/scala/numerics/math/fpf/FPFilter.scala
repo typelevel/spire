@@ -67,12 +67,12 @@ object FPFilter extends LowPriorityFPFilterWrappers {
   trait FPFilterEq[A] extends Eq[FPFilter[A]] {
     implicit def eq: Eq[A]
 
-    def equiv(a: FPFilter[A], b: FPFilter[A]): Boolean = (a.approx - b.approx).sign match {
+    def eq(a: FPFilter[A], b: FPFilter[A]): Boolean = (a.approx - b.approx).sign match {
       case Some(s) => s == Zero
       case None => a.value === b.value
     }
 
-    def nequiv(a: FPFilter[A], b: FPFilter[A]): Boolean = !equiv(a, b)
+    def neq(a: FPFilter[A], b: FPFilter[A]): Boolean = !eq(a, b)
   }
 
   trait ConvertableToFPFilter[A] extends ConvertableTo[FPFilter[A]] {
@@ -133,6 +133,9 @@ object FPFilter extends LowPriorityFPFilterWrappers {
     def plus(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
       new FPFilter(a.approx + b.approx, a.value + b.value)
 
+    def pow(a: FPFilter[A], k: Int): FPFilter[A] =
+      new FPFilter(a.approx pow k, a.value pow k)
+
     def times(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
       new FPFilter(a.approx * b.approx, a.value * b.value)
 
@@ -159,9 +162,6 @@ object FPFilter extends LowPriorityFPFilterWrappers {
 
   trait FPFilterIsExponential[A] extends Exponential[FPFilter[A]] {
     implicit val exp: Exponential[A]
-
-    def pow(a: FPFilter[A], k: Int): FPFilter[A] =
-      new FPFilter(a.approx pow k, a.value pow k)
 
     def nroot(a: FPFilter[A], n: Int): FPFilter[A] =
       new FPFilter(a.approx nroot n, a.value nroot n)

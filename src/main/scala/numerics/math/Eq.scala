@@ -78,6 +78,6 @@ class ComplexEq[A](implicit f:Fractional[A]) extends Eq[Complex[A]] {
   def neq(x:Complex[A], y:Complex[A]) = x != y
 }
 trait RealEq extends Eq[Real] {
-  def equiv(x: Real, y: Real) = (x - y).sign == Zero
-  def nequiv(x: Real, y: Real) = (x - y).sign != Zero
+  def eq(x: Real, y: Real) = (x - y).sign == Zero
+  def neq(x: Real, y: Real) = (x - y).sign != Zero
 }
