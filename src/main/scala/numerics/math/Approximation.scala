@@ -2,7 +2,7 @@ package numerics.math
 
 import java.math.{ MathContext, BigDecimal => BigDec }
 import scala.math.max
-import BigDecimalApproximations.{ AbsApprox => BigDecAbsApprox }
+import real.BigDecimalApproximations
 
 
 /** 
