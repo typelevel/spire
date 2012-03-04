@@ -3,56 +3,211 @@ package numerics.math
 import scala.{specialized => spec, math => mth}
 import java.math.MathContext
 
-
-trait Exponential[@spec(Double) A] {
+/**
+ * This is a type class for types with n-roots. The value returned by `nroot`
+ * and `sqrt` are only guaranteed to be approximate answers (except in the case
+ * of `Real`).
+ *
+ * Also, generally `nroot`s where `n` is even are not defined for
+ * negative numbers. The behaviour is undefined if this is attempted. It would
+ * be nice to ensure an exception is raised, but some types may defer
+ * computation and testing if a value is negative may not be ideal. So, do not
+ * count on `ArithmeticException`s to save you from bad arithmetic!
+ */
+trait NRoot[@spec(Double,Float,Int,Long) A] {
   def nroot(a: A, n: Int): A
   def sqrt(a: A): A = nroot(a, 2)
 }
 
-object Exponential {
-  implicit object DoubleIsExponential extends DoubleIsExponential
-  implicit object FloatIsExponential extends FloatIsExponential
-  implicit object BigIntIsExponential extends BigIntIsExponential
-  implicit object RealIsExponential extends RealIsExponential
 
-  implicit def rationalIsExponential(implicit c: ApproximationContext[Rational]): Exponential[Rational] =
-    RationalIsApproxExponential()(c)
+/**
+ * A type class for `EuclideanRing`s with `NRoot`s as well. Since the base
+ * requirement is only a `EuclideanRing`, we can provide instances for `Int`,
+ * `Long`, and `BigInt`.
+ */
+trait EuclideanRingWithNRoot[@spec(Int,Long) A] extends EuclideanRing[A] with NRoot[A]
 
-  implicit def bigDecimalIsExponential(implicit mc: MathContext): Exponential[BigDecimal] =
-    BigDecimalIsApproxExponential()(mc)
 
-  def apply[A](implicit e: Exponential[A]): Exponential[A] = e
+/**
+ * A type class for `Field`s with `NRoot`s. These will be `Field`s that have an
+ * additional `nroot` and `sqrt` function.
+ */
+trait FieldWithNRoot[@spec(Double, Float) A] extends EuclideanRingWithNRoot[A] with Field[A]
+
+
+trait NumericWithNRoot[@spec(Float, Double, Int, Long) A] extends Numeric[A] with NRoot[A]
+trait FractionalWithNRoot[@spec(Float, Double) A] extends Fractional[A] with NRoot[A]
+
+
+object EuclideanRingWithNRoot {
+  implicit object IntIsEuclideanRingWithNRoot extends EuclideanRingWithNRoot[Int]
+                                              with IntIsNRoot with IntIsEuclideanRing
+  implicit object LongIsEuclideanRingWithNRoot extends EuclideanRingWithNRoot[Long]
+                                               with LongIsNRoot with LongIsEuclideanRing
+  implicit object BigIntIsEuclideanRingWithNRoot extends EuclideanRingWithNRoot[BigInt]
+                                                 with BigIntIsNRoot
+                                                 with BigIntIsEuclideanRing
+
+  implicit def FieldWithNRootIsEuclideanRingWithNRoot[A]
+  (implicit e: FieldWithNRoot[A]): EuclideanRingWithNRoot[A] = e
+
+  def apply[A](implicit e: EuclideanRingWithNRoot[A]): EuclideanRingWithNRoot[A] = e
 }
 
 
-trait ExponentialOps[@spec(Double) A] {
-  val lhs: A
-  val exp: Exponential[A]
+object FieldWithNRoot {
+  implicit object DoubleIsFieldWithNRoot extends FieldWithNRoot[Double]
+                                         with DoubleIsNRoot with DoubleIsField
+  implicit object FloatIsFieldWithNRoot extends FieldWithNRoot[Float]
+                                        with FloatIsNRoot with FloatIsField
+  implicit object RealIsFieldWithNRoot extends FieldWithNRoot[Real]
+                                       with RealIsNRoot with RealIsField
 
-  def nroot(k: Int): A = exp.nroot(lhs, k)
-  def sqrt: A = exp.sqrt(lhs)
+  implicit def rationalIsFieldWithNRoot(implicit c: ApproximationContext[Rational]): FieldWithNRoot[Rational] =
+    RationalIsFieldWithNRoot()(c)
+
+  implicit def bigDecimalIsFieldWithNRoot(implicit mc: MathContext): FieldWithNRoot[BigDecimal] =
+    BigDecimalIsFieldWithNRoot()(mc)
+
+  def apply[A](implicit e: FieldWithNRoot[A]): FieldWithNRoot[A] = e
 }
 
 
-trait DoubleIsExponential extends Exponential[Double] {
+object NumericWithNRoot {
+  implicit object IntIsNumericWithNRoot extends NumericWithNRoot[Int]
+    with IntIsNumeric with IntIsNRoot
+  implicit object LongIsNumericWithNRoot extends NumericWithNRoot[Long]
+    with LongIsNumeric with LongIsNRoot
+  implicit object BigIntIsNumericWithNRoot extends NumericWithNRoot[BigInt]
+   with BigIntIsNumeric with BigIntIsNRoot
+  implicit object FloatIsNumericWithNRoot extends NumericWithNRoot[Float]
+    with FloatIsNumeric with FloatIsNRoot
+  implicit object DoubleIsNumericWithNRoot extends NumericWithNRoot[Double]
+    with DoubleIsNumeric with DoubleIsNRoot
+  implicit object RealIsNumericWithNRoot extends NumericWithNRoot[Real]
+    with RealIsNumeric with RealIsNRoot
+
+  implicit def RationalIsNumericWithNRoot
+  (implicit ac: ApproximationContext[Rational]): NumericWithNRoot[Rational] =
+    new NumericWithNRoot[Rational] with RationalIsNumeric with RationalIsNRoot {
+      val context = ac
+    }
+
+  implicit def BigDecimalIsNumericWithNRoot
+  (implicit mc: MathContext): NumericWithNRoot[BigDecimal] =
+    new NumericWithNRoot[BigDecimal] with BigDecimalIsNumeric with BigDecimalIsNRoot {
+      val context = mc
+    }
+
+  def apply[A](implicit n: NumericWithNRoot[A]) = n
+}
+
+
+object FractionalWithNRoot {
+  implicit object FloatIsFractionalWithNRoot extends FractionalWithNRoot[Float]
+    with FloatIsFractional with FloatIsNRoot
+  implicit object DoubleIsFractionalWithNRoot extends FractionalWithNRoot[Double]
+    with DoubleIsFractional with DoubleIsNRoot
+  implicit object RealIsFractionalWithNRoot extends FractionalWithNRoot[Real]
+    with RealIsFractional with RealIsNRoot
+
+  implicit def RationalIsFractionalWithNRoot
+  (implicit ac: ApproximationContext[Rational]): FractionalWithNRoot[Rational] =
+    new FractionalWithNRoot[Rational] with RationalIsFractional with RationalIsNRoot {
+      val context = ac
+    }
+
+  implicit def BigDecimalIsFractionalWithNRoot
+  (implicit mc: MathContext): FractionalWithNRoot[BigDecimal] =
+    new FractionalWithNRoot[BigDecimal] with BigDecimalIsFractional with BigDecimalIsNRoot {
+      val context = mc
+    }
+
+  def apply[A](implicit f: FractionalWithNRoot[A]) = f
+}
+
+
+final class NRootOps[@spec(Double, Float, Int, Long) A](lhs: A)(implicit n: NRoot[A]) {
+  def nroot(k: Int): A = n.nroot(lhs, k)
+  def sqrt: A = n.sqrt(lhs)
+}
+
+
+trait DoubleIsNRoot extends NRoot[Double] {
   def nroot(a: Double, k: Int): Double = mth.pow(a, 1 / k.toDouble)
   override def sqrt(a: Double): Double = mth.sqrt(a)
 }
 
-trait FloatIsExponential extends Exponential[Float] {
+trait FloatIsNRoot extends NRoot[Float] {
   def nroot(a: Float, k: Int): Float = mth.pow(a, 1 / k.toDouble).toFloat
   override def sqrt(a: Float): Float = mth.sqrt(a).toFloat
 }
 
 
-trait RationalIsExponential extends Exponential[Rational] {
+trait RationalIsNRoot extends NRoot[Rational] {
   implicit def context: ApproximationContext[Rational]
   def nroot(a: Rational, k: Int): Rational = a nroot k
 }
 
-case class RationalIsApproxExponential(implicit context: ApproximationContext[Rational]) extends RationalIsExponential
+case class RationalIsFieldWithNRoot(implicit context: ApproximationContext[Rational])
+extends FieldWithNRoot[Rational] with RationalIsNRoot with RationalIsField
 
-trait BigIntIsExponential extends Exponential[BigInt] {
+
+trait RealIsNRoot extends NRoot[Real] {
+  def nroot(a: Real, k: Int): Real = a nroot k
+}
+
+
+trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
+  def context: MathContext
+
+  def nroot(a: BigDecimal, k: Int): BigDecimal = NRoot.nroot(a, k, context)
+}
+
+case class BigDecimalIsFieldWithNRoot(implicit context: MathContext)
+extends FieldWithNRoot[BigDecimal] with BigDecimalIsNRoot with BigDecimalIsField
+
+
+trait IntIsNRoot extends NRoot[Int] { self: Ring[Int] =>
+  def nroot(x: Int, n: Int): Int = {
+    def findnroot(prev: Int, add: Int): Int = {
+      val next = prev | add
+      val e = self.pow(next, n)
+
+      if (e == x) {
+        next
+      } else if (e <= 0 || e > x) {
+        findnroot(prev, add >> 1)
+      } else {
+        findnroot(next, add >> 1)
+      }
+    }
+
+    findnroot(0, 1 << ((33 - n) / n))
+  }
+
+}
+
+trait LongIsNRoot extends NRoot[Long] { self: Ring[Long] =>
+  def nroot(x: Long, n: Int): Long = {
+    def findnroot(prev: Long, add: Long): Long = {
+      val next = prev | add
+      val e = self.pow(next, n)
+
+      if (e == x) {
+        next
+      } else if (e <= 0 || e > x) {
+        findnroot(prev, add >> 1)
+      } else {
+        findnroot(next, add >> 1)
+      }
+    }
+
+    findnroot(0, 1L << ((65 - n) / n))
+  }
+}
+
+trait BigIntIsNRoot extends NRoot[BigInt] {
   def nroot(a: BigInt, k: Int): BigInt = if (a < 0 && k % 2 == 1) {
     -nroot(-a, k)
   } else if (a < 0) {
@@ -73,20 +228,9 @@ trait BigIntIsExponential extends Exponential[BigInt] {
   }
 }
 
-trait RealIsExponential extends Exponential[Real] {
-  def nroot(a: Real, k: Int): Real = a nroot k
-}
-
-trait BigDecimalIsExponential extends Exponential[BigDecimal] {
-  def context: MathContext
-
-  def nroot(a: BigDecimal, k: Int): BigDecimal = NRoots.nroot(a, k, context)
-}
-
-case class BigDecimalIsApproxExponential(implicit context: MathContext) extends BigDecimalIsExponential
 
 
-object NRoots {
+object NRoot {
 
   /**
    * This will return the largest integer that meets some criteria. Specifically,
