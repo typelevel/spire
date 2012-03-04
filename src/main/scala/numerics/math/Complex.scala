@@ -29,7 +29,7 @@ object Complex {
   def unapply[@spec(Float, Double) T:Fractional:Exponential](c:Complex[T]) = Some((c.real, c.imag))
 }
 
-class Complex[@spec(Float, Double) T](val real:T, val imag:T)(implicit f:Fractional[T], e:Exponential[T])
+class Complex[@spec(Float, Double) T](val real:T, val imag:T)(implicit f:Fractional[T], val e:Exponential[T])
 extends ScalaNumber with ScalaNumericConversions with Serializable {
 
   // ugh, ScalaNumericConversions ghetto
@@ -64,7 +64,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   override def toString: String = "Complex(%s, %s)".format(real, imag)
 
   // ugh, for very large Fractional values this will totally break
-  lazy val magnitude: T = (real * real + imag * imag).sqrt
+  lazy val magnitude: T = e.sqrt(real * real + imag * imag)
   lazy val angle: T = f.fromDouble(atan2(imag.toDouble, real.toDouble))
   
   def abs: T = magnitude

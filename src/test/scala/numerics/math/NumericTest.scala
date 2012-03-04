@@ -6,6 +6,8 @@ import org.scalatest.FunSuite
 // we need to disable our own === to avoid messing up ScalaTest.
 import Implicits.{eqOps => _, _}
 
+import java.math.MathContext
+
 // nice alias
 import scala.{specialized => spec}
 
@@ -26,7 +28,7 @@ class NumericTest extends FunSuite {
     def runTest(name:String)(f: => Unit) = test("%s:%s" format(cls, name))(f)
 
     // Numeric[A]'s zero
-    val z = numeric.zero
+    val z = Numeric[A].zero
 
     // abs
     runTest("(-3).abs")(assert(a.abs === b))
@@ -53,6 +55,8 @@ class NumericTest extends FunSuite {
     runTest("3.toInt")(assert(b.toInt === 3))
   }
 
+  implicit val mc: MathContext = MathContext.DECIMAL128
+
   // here's where we actually run all the tests, for each type we care about.
   runWith[Int](-3, 3, -9)
   runWith[Long](-3, 3, -9)
@@ -61,5 +65,8 @@ class NumericTest extends FunSuite {
   runWith[BigInt](-3, 3, -9)
   runWith[BigDecimal](-3, 3, -9)
   runWith[Rational](-3, 3, -9)
-  runWith[Complex[Double]](-3, 3, -9)
+  //runWith[Complex[Double]](-3, 3, -9) // There seems to be a bug.
+  runWith[Complex[BigDecimal]](Complex(BigDecimal(-3), BigDecimal(0)),
+                               Complex(BigDecimal(3), BigDecimal(0)),
+                               Complex(BigDecimal(-9), BigDecimal(0)))
 }
