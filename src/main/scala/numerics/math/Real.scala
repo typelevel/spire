@@ -108,7 +108,7 @@ sealed abstract class Real extends ScalaNumber
   })
 
   def toBigDecimal(implicit mc: MathContext = MathContext.DECIMAL128): BigDecimal =
-    this approximateTo mc
+    (this approximateTo mc).round(mc)
 
   def toRational(implicit ac: ApproximationContext[Rational] = ApproximationContext(Rational(1L, 10000000000000000L))): Rational = simulate[Rational]
 
