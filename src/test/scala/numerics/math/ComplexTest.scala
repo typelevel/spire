@@ -16,7 +16,7 @@ class ComplexTest extends FunSuite {
 
   test("create Complex[BigDecimal]") {
 
-    // Exponential[BigDecimal] requires an implicit MathContext.
+    // FractionalWithNRoot[BigDecimal] requires an implicit MathContext.
     implicit val mc = MathContext.DECIMAL128
 
     val (real, imag) = (BigDecimal(222.0), BigDecimal(3483.0))

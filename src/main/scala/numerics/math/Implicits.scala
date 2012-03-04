@@ -30,6 +30,7 @@ class DoubleOps(lhs:Double) {
   def ~^(rhs:Complex[Double]) = c ~^ rhs
 }
 
+
 object Implicits {
   implicit def eqOps[@spec(Int, Long, Float, Double) A:Eq](a:A) = new EqOps(a)
   implicit def orderOps[@spec(Int, Long, Float, Double) A:Order](a:A) = new OrderOps(a)
@@ -43,7 +44,6 @@ object Implicits {
 
   implicit def doubleOps(a:Double) = new DoubleOps(a)
   
-  implicit def expOps[@spec(Float, Double) A: Exponential](a: A) = new ExponentialOpsImpl(a)
+  implicit def euclideanRingWithNRootOps[@spec(Int, Long) A: EuclideanRingWithNRoot](a: A) = new NRootOps(a)
 }
 
-final class ExponentialOpsImpl[A](val lhs: A)(implicit val exp: Exponential[A]) extends ExponentialOps[A]

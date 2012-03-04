@@ -150,7 +150,7 @@ sealed abstract class Real extends ScalaNumber
   /**
    * Simulates the expression DAG of this `Real` using another number type.
    */
-  def simulate[A : Field : Exponential]: A = Real.simulate(this)
+  def simulate[A : FieldWithNRoot]: A = Real.simulate(this)
 
 
   def isWhole: Boolean = fpf.isWhole getOrElse {
@@ -187,7 +187,7 @@ object Real {
   implicit def apply(n: BigDecimal): Real = apply(Rational(n))
 
   import Implicits._
-  def simulate[A : Field : Exponential](n: Real): A = n match {
+  def simulate[A : FieldWithNRoot](n: Real): A = n match {
     case Add(a, b) => simulate(a) + simulate(b)
     case Sub(a, b) => simulate(a) - simulate(b)
     case Mul(a, b) => simulate(a) * simulate(b)

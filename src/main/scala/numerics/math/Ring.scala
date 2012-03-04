@@ -46,7 +46,7 @@ object Ring {
   implicit object BigIntIsRing extends BigIntIsRing
   implicit object BigDecimalIsRing extends BigDecimalIsRing
   implicit object RationalIsRing extends RationalIsRing
-  implicit def complexIsRing[A:Fractional:Exponential] = new ComplexIsRingCls
+  implicit def complexIsRing[A:FractionalWithNRoot] = new ComplexIsRingCls
   implicit object RealIsRing extends RealIsRing
 
   def apply[A](implicit r:Ring[A]):Ring[A] = r
@@ -138,17 +138,16 @@ with ConvertableFromRational with ConvertableToRational {
 
 trait ComplexIsRing[A] extends ComplexEq[A] with Ring[Complex[A]]
 with ConvertableFromComplex[A] with ConvertableToComplex[A] {
-  implicit val f:Fractional[A]
-  implicit val e:Exponential[A]
+  implicit val f:FractionalWithNRoot[A]
 
-  def abs(a:Complex[A]): Complex[A] = Complex(a.abs, f.zero)(f, e)
+  def abs(a:Complex[A]): Complex[A] = Complex(a.abs, f.zero)(f)
   def minus(a:Complex[A], b:Complex[A]): Complex[A] = a - b
   def negate(a:Complex[A]): Complex[A] = -a
-  def one: Complex[A] = Complex.one(f, e)
+  def one: Complex[A] = Complex.one(f)
   def plus(a:Complex[A], b:Complex[A]): Complex[A] = a + b
   def pow(a:Complex[A], b:Int):Complex[A] = a.pow(Complex(f.fromInt(b), f.zero))
   def times(a:Complex[A], b:Complex[A]): Complex[A] = a * b
-  def zero: Complex[A] = Complex.zero(f, e)
+  def zero: Complex[A] = Complex.zero(f)
 }
 
 trait RealIsRing extends Ring[Real] with RealEq
@@ -163,5 +162,5 @@ with ConvertableFromReal with ConvertableToReal {
   def zero: Real = Real(0)
 }
 
-class ComplexIsRingCls[A](implicit val f:Fractional[A], val e:Exponential[A])
+class ComplexIsRingCls[A](implicit val f:FractionalWithNRoot[A])
 extends ComplexIsRing[A]

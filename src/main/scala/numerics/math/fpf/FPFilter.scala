@@ -65,7 +65,7 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
 
 object FPFilter extends LowPriorityFPFilterWrappers {
   trait FPFilterEq[A] extends Eq[FPFilter[A]] {
-    implicit def eq: Eq[A]
+    implicit def ev: Eq[A]
 
     def eq(a: FPFilter[A], b: FPFilter[A]): Boolean = (a.approx - b.approx).sign match {
       case Some(s) => s == Zero
@@ -76,55 +76,55 @@ object FPFilter extends LowPriorityFPFilterWrappers {
   }
 
   trait ConvertableToFPFilter[A] extends ConvertableTo[FPFilter[A]] {
-    implicit def toA: ConvertableTo[A]
+    implicit def ev: ConvertableTo[A]
 
     def fromByte(a: Byte): FPFilter[A] = fromInt(a)
     def fromShort(a: Short): FPFilter[A] = fromInt(a)
-    def fromInt(a: Int): FPFilter[A] = new FPFilter(MaybeDouble(a), toA.fromInt(a))
-    def fromLong(a: Long): FPFilter[A] = new FPFilter(MaybeDouble(a), toA.fromLong(a))
-    def fromFloat(a: Float): FPFilter[A] = new FPFilter(MaybeDouble(a), toA.fromFloat(a))
-    def fromDouble(a: Double): FPFilter[A] = new FPFilter(MaybeDouble(a), toA.fromDouble(a))
-    def fromBigInt(a: BigInt): FPFilter[A] = new FPFilter(MaybeDouble(a), toA.fromBigInt(a))
-    def fromBigDecimal(a: BigDecimal): FPFilter[A] = new FPFilter(MaybeDouble(a), toA.fromBigDecimal(a))
-    def fromRational(a: Rational): FPFilter[A] = new FPFilter(MaybeDouble(a), toA.fromRational(a))
+    def fromInt(a: Int): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromInt(a))
+    def fromLong(a: Long): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromLong(a))
+    def fromFloat(a: Float): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromFloat(a))
+    def fromDouble(a: Double): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromDouble(a))
+    def fromBigInt(a: BigInt): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromBigInt(a))
+    def fromBigDecimal(a: BigDecimal): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromBigDecimal(a))
+    def fromRational(a: Rational): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromRational(a))
   }
 
   trait ConvertableFromFPFilter[A] extends ConvertableFrom[FPFilter[A]] {
-    implicit def fromA: ConvertableFrom[A]
+    implicit def ev: ConvertableFrom[A]
 
     def toByte(a: FPFilter[A]): Byte = toInt(a).toByte
     def toShort(a: FPFilter[A]): Short = toInt(a).toShort
     def toInt(a: FPFilter[A]): Int = toLong(a).toInt
-    def toLong(a: FPFilter[A]): Long = a.approx.toLong getOrElse (fromA.toLong(a.value))
-    def toFloat(a: FPFilter[A]): Float = a.approx.toFloat getOrElse (fromA.toFloat(a.value))
+    def toLong(a: FPFilter[A]): Long = a.approx.toLong getOrElse (ev.toLong(a.value))
+    def toFloat(a: FPFilter[A]): Float = a.approx.toFloat getOrElse (ev.toFloat(a.value))
     def toDouble(a: FPFilter[A]): Double = if (a.approx.isExact) {
       a.approx.approx
     } else {
-      fromA.toDouble(a.value)
+      ev.toDouble(a.value)
     }
 
     def toBigInt(a: FPFilter[A]): BigInt =
-      a.approx.toLong map (BigInt(_)) getOrElse (fromA.toBigInt(a.value))
+      a.approx.toLong map (BigInt(_)) getOrElse (ev.toBigInt(a.value))
 
     def toBigDecimal(a: FPFilter[A]): BigDecimal = if (a.approx.isExact) {
       BigDecimal(a.approx.approx)
     } else {
-      fromA.toBigDecimal(a.value)
+      ev.toBigDecimal(a.value)
     }
 
     def toRational(a: FPFilter[A]): Rational = if (a.approx.isExact) {
       Rational(a.approx.approx)
     } else {
-      fromA.toRational(a.value)
+      ev.toRational(a.value)
     }
 
-    def toString(a: FPFilter[A]): String = fromA.toString(a.value)
+    def toString(a: FPFilter[A]): String = ev.toString(a.value)
   }
 
   trait FPFilterIsRing[A] extends Ring[FPFilter[A]] {
-    implicit def num: Ring[A]
+    implicit def ev: Ring[A]
 
-    def abs(a: FPFilter[A]): FPFilter[A] = new FPFilter(a.approx.abs, num.abs(a.value))
+    def abs(a: FPFilter[A]): FPFilter[A] = new FPFilter(a.approx.abs, ev.abs(a.value))
     def negate(a: FPFilter[A]): FPFilter[A] = new FPFilter(-a.approx, -(a.value))
 
     def minus(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
@@ -139,12 +139,12 @@ object FPFilter extends LowPriorityFPFilterWrappers {
     def times(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
       new FPFilter(a.approx * b.approx, a.value * b.value)
 
-    def zero: FPFilter[A] = new FPFilter(MaybeDouble(0.0), num.fromInt(0))
-    def one: FPFilter[A] = new FPFilter(MaybeDouble(1.0), num.fromInt(1))
+    def zero: FPFilter[A] = new FPFilter(MaybeDouble(0.0), ev.fromInt(0))
+    def one: FPFilter[A] = new FPFilter(MaybeDouble(1.0), ev.fromInt(1))
   }
 
   trait FPFilterIsEuclideanRing[A] extends FPFilterIsRing[A] with EuclideanRing[FPFilter[A]] {
-    implicit def num: EuclideanRing[A]
+    implicit def ev: EuclideanRing[A]
 
     def quot(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
       new FPFilter(a.approx quot b.approx, a.value /~ b.value)
@@ -154,14 +154,15 @@ object FPFilter extends LowPriorityFPFilterWrappers {
   }
 
   trait FPFilterIsField[A] extends FPFilterIsEuclideanRing[A] with Field[FPFilter[A]] {
-    implicit def num: Field[A]
+    implicit def ev: Field[A]
 
     def div(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
       new FPFilter(a.approx / b.approx, a.value / b.value)
   }
 
-  trait FPFilterIsExponential[A] extends Exponential[FPFilter[A]] {
-    implicit val exp: Exponential[A]
+  trait FPFilterIsEuclideanRingWithNRoot[A]
+  extends FPFilterIsEuclideanRing[A] with EuclideanRingWithNRoot[FPFilter[A]] {
+    implicit val ev: EuclideanRingWithNRoot[A]
 
     def nroot(a: FPFilter[A], n: Int): FPFilter[A] =
       new FPFilter(a.approx nroot n, a.value nroot n)
@@ -170,39 +171,54 @@ object FPFilter extends LowPriorityFPFilterWrappers {
       new FPFilter(a.approx.sqrt, a.value.sqrt)
   }
 
+  trait FPFilterIsFieldWithNRoot[A] extends FPFilterIsField[A] with FieldWithNRoot[FPFilter[A]] {
+    implicit val ev: FieldWithNRoot[A]
+
+    def nroot(a: FPFilter[A], n: Int): FPFilter[A] =
+      new FPFilter(a.approx nroot n, a.value nroot n)
+    
+    override def sqrt(a: FPFilter[A]): FPFilter[A] = 
+      new FPFilter(a.approx.sqrt, a.value.sqrt)
+  }
+
+
   implicit def FPFilterIsRing[A](implicit ring: Ring[A]): Ring[FPFilter[A]] =
     new FPFilterIsRing[A] with ConvertableFromFPFilter[A]
                           with ConvertableToFPFilter[A]
                           with FPFilterEq[A] {
-      val num = ring
-      val eq = ring
-      val fromA = ring
-      val toA = ring
+      val ev = ring
     }
 
   implicit def FPFilterIsEuclideanRing[A](implicit erng: EuclideanRing[A]): EuclideanRing[FPFilter[A]] =
     new FPFilterIsEuclideanRing[A] with ConvertableFromFPFilter[A]
                                    with ConvertableToFPFilter[A]
                                    with FPFilterEq[A] {
-      val num = erng
-      val eq = erng
-      val fromA = erng
-      val toA = erng
+      val ev = erng
     }
 
   implicit def FPFilterIsField[A](implicit field: Field[A]): Field[FPFilter[A]] =
     new FPFilterIsField[A] with ConvertableFromFPFilter[A]
                            with ConvertableToFPFilter[A]
                            with FPFilterEq[A] {
-      val num = field
-      val eq = field
-      val fromA = field
-      val toA = field
+      val ev = field
     }
 
-  implicit def FPFilterIsExponential[A](implicit e: Exponential[A]): Exponential[FPFilter[A]] = new FPFilterIsExponential[A] {
-    val exp = e
-  }
+  implicit def FPFilterIsFieldWithNRoot[A]
+  (implicit e: FieldWithNRoot[A]): FieldWithNRoot[FPFilter[A]] =
+    new FPFilterIsFieldWithNRoot[A] with ConvertableFromFPFilter[A]
+                                    with ConvertableToFPFilter[A]
+                                    with FPFilterEq[A] {
+      val ev = e
+    }
+
+  implicit def FPFilterIsEuclideanRingWithNRoot[A]
+  (implicit e: EuclideanRingWithNRoot[A]): EuclideanRingWithNRoot[FPFilter[A]] =
+    new FPFilterIsEuclideanRingWithNRoot[A] with ConvertableFromFPFilter[A]
+                                    with ConvertableToFPFilter[A]
+                                    with FPFilterEq[A] {
+      val ev = e
+    }
+
 
 
   /**
