@@ -34,8 +34,6 @@ sealed abstract class Real extends ScalaNumber
                            with ConstantFolder
                            with BubbleUpDivs
                            with Ordered[Real] {
-//sealed abstract class Real extends ScalaNumber with ScalaNumericConversions with Ordered[Real] {
-  // import Real.transform
 
   /**
    * Used for the internal floating point filter. Though this is public, it
@@ -52,40 +50,6 @@ sealed abstract class Real extends ScalaNumber
     case BigIntLit(n) => MaybeDouble(n)
   }
 
-  /*
-  def abs: Real = if (this.sign == Negative) -this else this
-
-  def *(that: Real): Real = transform(Mul(this, that))
-  def +(that: Real): Real = transform(Add(this, that))
-  def -(that: Real): Real = transform(Sub(this, that))
-  def /(that: Real): Real = transform(Div(this, that))
-  def unary_-(): Real = transform(Neg(this))
-  def sqrt: Real = this nroot 2
-  def nroot(k: Int): Real = {
-    if (this.sign == Negative && k % 2 == 0) {
-      throw new ArithmeticException("Cannot find an even root of a negative Real.")
-    }
-
-    transform(KRoot(this, k))
-  }
-
-  // TODO: Create Pow as a 1st class citizen.
-  def pow(k: Int): Real = {
-    require(k >= 0, "Exponent must be a non-negative integer.")
-
-    if (k == 0) {
-      Real(1)
-    } else if (k == 1) {
-      this
-    } else {
-      val x = this pow (k / 2)
-      val x2 = x * x
-      if (k % 2 == 0) x2 else x2 * this
-    }
-  }
-
-  def compare(that: Real): Int = (this - that).signum
-  */
 
   override def equals(that: Any) = that match {
     case that: Real => (this - that).sign == Zero
@@ -262,66 +226,3 @@ case class BigIntLit(value: BigInt) extends Real {
   override lazy val sign: Sign = if (value == 0) Zero else if (value > 0) Positive else Negative
 }
 
-/*
-trait Transformer[A] {
-  def transform(a: A): A
-}
-
-case class AggregateTransformer[A](t1: Transformer[A], t2: Transformer[A]) extends Transformer[A] {
-  def transform(a: A): A = t2.transform(t1.transform(a))
-}
-*/
-/**
- * Moves division up from the children of a Real to the root. For example,
- * `a/b + c/d` becomes `(a*d + c*b) / (b*d)`.
- *//*
-object DivBubbleTransformer extends Transformer[Real] {
-  def transform(num: Real): Real = num match {
-    case _: BinOp => num match {
-      case Add(Div(a, b), Div(c, d)) => Div(a * d + b * c, b * d)
-      case Add(Div(a, b), c) => Div(a + b * c, b)
-      case Add(a, Div(b, c)) => Div(a * c + b, c)
-      case Sub(Div(a, b), Div(c, d)) => Div(a * d - b * c, b * d)
-      case Sub(Div(a, b), c) => Div(a - b * c, b)
-      case Sub(a, Div(b, c)) => Div(a * c - b, c)
-      case Mul(Div(a, b), Div(c, d)) => Div(a * c, b * d)
-      case Mul(Div(a, b), c) => Div(a * c, b)
-      case Mul(a, Div(b, c)) => Div(a * b, c)
-      case Div(Div(a, b), Div(c, d)) => Div(a * d, b * c)
-      case Div(Div(a, b), c) => Div(a, b * c)
-      case Div(a, Div(b, c)) => Div(a * c, b)
-      case _ => num
-    }
-    case Neg(Div(a, b)) => Div(Neg(a), b)
-    case KRoot(Div(a, b), k) => Div(KRoot(a * (b pow (k - 1)), k), b)
-    case _ => num
-  }
-}
-
-object ConstantFolder extends Transformer[Real] {
-  private def wrap(n: Long): Real = if (n > Int.MaxValue || n < Int.MinValue) {
-    BigIntLit(BigInt(n))
-  } else {
-    IntLit(n.toInt)
-  }
-
-  private def wrap(n: BigInt): Real =
-    if (n.isValidInt) IntLit(n.toInt) else BigIntLit(n)
-
-  def transform(num: Real): Real = num match {
-    case Add(IntLit(a), IntLit(b)) => wrap((a: Long) + (b: Long))
-    case Add(IntLit(a), BigIntLit(b)) => wrap(b + a)
-    case Add(BigIntLit(a), IntLit(b)) => wrap(a + b)
-    case Add(BigIntLit(a), BigIntLit(b)) => wrap(a + b)
-    case Sub(IntLit(a), IntLit(b)) => wrap((a: Long) - (b: Long))
-    case Sub(IntLit(a), BigIntLit(b)) => wrap(BigInt(a) - b)
-    case Sub(BigIntLit(a), IntLit(b)) => wrap(a - b)
-    case Sub(BigIntLit(a), BigIntLit(b)) => wrap(a - b)
-    case Mul(IntLit(a), IntLit(b)) => wrap((a: Long) * (b: Long))
-    case Mul(IntLit(a), BigIntLit(b)) => wrap(b * a)
-    case Mul(BigIntLit(a), IntLit(b)) => wrap(a * b)
-    case Mul(BigIntLit(a), BigIntLit(b)) => wrap(a * b)
-    case _ => num
-  }
-}
-*/

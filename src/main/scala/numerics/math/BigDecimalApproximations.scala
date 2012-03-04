@@ -168,7 +168,13 @@ object BigDecimalApproximations {
     lazy val lhs: RelApprox = RelApprox(x.lhs, mc + 1 - x.decimalLowerBound)
     lazy val rhs: RelApprox = RelApprox(x.rhs, mc + 1 - x.decimalLowerBound)
 
-    def value: BigDec = lhs.value.add(rhs.value, mc)
+    // The lowerbound is only valid if x != 0. So, we need to check if x == 0.
+
+    def value: BigDec = if (x.sign == Zero) {
+      new BigDec(0)
+    } else {
+      lhs.value.add(rhs.value, mc)
+    }
   }
 
   case class SubRelApprox(x: Sub, mc: MathContext) extends RelApprox {
@@ -177,7 +183,11 @@ object BigDecimalApproximations {
     lazy val lhs: RelApprox = RelApprox(x.lhs, mc + 1 - x.decimalLowerBound)
     lazy val rhs: RelApprox = RelApprox(x.rhs, mc + 1 - x.decimalLowerBound)
 
-    def value: BigDec = lhs.value.subtract(rhs.value, mc)
+    def value: BigDec = if (x.sign == Zero) {
+      new BigDec(0)
+    } else {
+      lhs.value.subtract(rhs.value, mc)
+    }
   }
 
   case class MulRelApprox(x: Mul, mc: MathContext) extends RelApprox {
