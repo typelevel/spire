@@ -33,7 +33,7 @@ trait MyRunner {
   val cls:java.lang.Class[_ <: com.google.caliper.Benchmark]
   def main(args:Array[String]) {
     println("starting benchmarks...")
-    Runner.main(cls, args:_*)
+    Runner.main(cls, args)
     println("completed benchmarks.")
   }
 }
