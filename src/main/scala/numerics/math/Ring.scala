@@ -77,9 +77,19 @@ with ConvertableFromLong with ConvertableToLong {
   def negate(a:Long): Long = -a
   def one: Long = 1L
   def plus(a:Long, b:Long): Long = a + b
-  def pow(a: Long, b:Int): Long = if (b < 0) 0 else if (b == 0) 1 else {
-    val c = pow(a, b / 2) * pow(a, b / 2)
-    if ((b & 1) == 1) c * a else c
+  def pow(a: Long, b:Int): Long = b match {
+    case 0 => 1
+    case 1 => a
+    case 2 => a * a
+    case 3 => a * a * a
+    case _ =>
+      if (b > 0) {
+        val e = b >> 1
+        val c = if ((b & 1) == 1) a else 1
+        c * pow(a, e) * pow(a, e)
+      } else {
+        0
+      }
   }
   def signum(a: Long): Int = a.signum
   def times(a:Long, b:Long): Long = a * b
