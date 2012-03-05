@@ -56,6 +56,8 @@ class RingTest extends FunSuite {
 
     // toInt
     runTest("3.toInt")(assert(b.toInt === 3))
+
+    runTest("3 pow 2")(assert((b pow 2) === -c))
   }
 
   implicit val mc: MathContext = MathContext.DECIMAL128

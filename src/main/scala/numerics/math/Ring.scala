@@ -1,7 +1,7 @@
 package numerics.math
 
 import scala.{specialized => spec}
-import scala.math.{abs, ceil, floor}
+import scala.math.{abs, ceil, floor, pow => mpow}
 
 trait Ring[@spec(Int,Long,Float,Double) A] extends Eq[A]
 with ConvertableFrom[A] with ConvertableTo[A] { self =>
@@ -64,7 +64,7 @@ with ConvertableFromInt with ConvertableToInt {
   def negate(a:Int): Int = -a
   def one: Int = 1
   def plus(a:Int, b:Int): Int = a + b
-  def pow(a:Int, b:Int): Int = pow(a, b).toInt
+  def pow(a:Int, b:Int): Int = mpow(a, b).toInt
   def signum(a: Int): Int = a.signum
   def times(a:Int, b:Int): Int = a * b
   def zero: Int = 0
@@ -77,7 +77,7 @@ with ConvertableFromLong with ConvertableToLong {
   def negate(a:Long): Long = -a
   def one: Long = 1L
   def plus(a:Long, b:Long): Long = a + b
-  def pow(a:Long, b:Int): Long = pow(a, b)
+  def pow(a:Long, b:Int): Long = mpow(a, b).toLong // Problem if mpow(a,b) > 53 bits.
   def signum(a: Long): Int = a.signum
   def times(a:Long, b:Long): Long = a * b
   def zero: Long = 0L
@@ -90,7 +90,7 @@ with ConvertableFromFloat with ConvertableToFloat {
   def negate(a:Float): Float = -a
   def one: Float = 1.0F
   def plus(a:Float, b:Float): Float = a + b
-  def pow(a:Float, b:Int): Float = pow(a, b).toFloat
+  def pow(a:Float, b:Int): Float = mpow(a, b).toFloat
   def signum(a: Float): Int = a.signum
   def times(a:Float, b:Float): Float = a * b
   def zero: Float = 0.0F
@@ -103,7 +103,7 @@ with ConvertableFromDouble with ConvertableToDouble {
   def negate(a:Double): Double = -a
   def one: Double = 1.0
   def plus(a:Double, b:Double): Double = a + b
-  def pow(a:Double, b:Int): Double = pow(a, b)
+  def pow(a:Double, b:Int): Double = mpow(a, b)
   def signum(a: Double): Int = a.signum
   def times(a:Double, b:Double): Double = a * b
   def zero: Double = 0.0
@@ -116,7 +116,7 @@ with ConvertableFromBigInt with ConvertableToBigInt {
   def negate(a:BigInt): BigInt = -a
   def one: BigInt = BigInt(1)
   def plus(a:BigInt, b:BigInt): BigInt = a + b
-  def pow(a:BigInt, b:Int): BigInt = pow(a, b)
+  def pow(a:BigInt, b:Int): BigInt = a pow b
   def signum(a: BigInt): Int = a.signum
   def times(a:BigInt, b:BigInt): BigInt = a * b
   def zero: BigInt = BigInt(0)
