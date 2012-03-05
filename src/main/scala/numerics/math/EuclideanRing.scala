@@ -23,7 +23,8 @@ object EuclideanRing {
   implicit object BigIntIsEuclideanRing extends BigIntIsEuclideanRing
   implicit object BigDecimalIsEuclideanRing extends BigDecimalIsEuclideanRing
   implicit object RationalIsEuclideanRing extends RationalIsEuclideanRing
-  implicit def complexIsEuclideanRingCls[A:Fractional] = new ComplexIsEuclideanRingCls
+  implicit object RealIsEuclideanRing extends RealIsEuclideanRing
+  implicit def complexIsEuclideanRingCls[A:FractionalWithNRoot] = new ComplexIsEuclideanRingCls
 
   def apply[A](implicit e:EuclideanRing[A]):EuclideanRing[A] = e
 }
@@ -70,13 +71,19 @@ trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRin
   def mod(a:Rational, b:Rational) = a % b
 }
 
+trait RealIsEuclideanRing extends EuclideanRing[Real] with RealIsRing {
+  def quot(a: Real, b: Real): Real = (a / b).toBigInt
+  def mod(a: Real, b: Real): Real = a - quot(a, b) * b
+}
+
 trait ComplexIsEuclideanRing[@spec(Float,Double) A]
 extends ComplexIsRing[A] with EuclideanRing[Complex[A]] {
-  implicit val f:Fractional[A]
+  implicit val f:FractionalWithNRoot[A]
+
   override def quotmod(a:Complex[A], b:Complex[A]) = a /% b
   def quot(a:Complex[A], b:Complex[A]) = a /~ b
   def mod(a:Complex[A], b:Complex[A]) = a % b
 }
 
 class ComplexIsEuclideanRingCls[@spec(Float,Double) A]
-(implicit val f:Fractional[A]) extends ComplexIsEuclideanRing[A]
+(implicit val f:FractionalWithNRoot[A]) extends ComplexIsEuclideanRing[A]

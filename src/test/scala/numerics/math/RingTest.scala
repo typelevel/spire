@@ -9,6 +9,11 @@ import Implicits.{eqOps => _, _}
 // nice alias
 import scala.{specialized => spec}
 
+import java.math.MathContext
+
+import numerics.math.fpf.FPFilter
+
+
 class RingTest extends FunSuite {
 
   /**
@@ -26,7 +31,7 @@ class RingTest extends FunSuite {
     def runTest(name:String)(f: => Unit) = test("%s:%s" format(cls, name))(f)
 
     // Ring[A]'s zero
-    val z = ring.zero
+    val z: A = Ring[A].zero
 
     // abs
     runTest("(-3).abs")(assert(a.abs === b))
@@ -53,6 +58,8 @@ class RingTest extends FunSuite {
     runTest("3.toInt")(assert(b.toInt === 3))
   }
 
+  implicit val mc: MathContext = MathContext.DECIMAL128
+
   // here's where we actually run all the tests, for each type we care about.
   runWith[Int](-3, 3, -9)
   runWith[Long](-3, 3, -9)
@@ -61,5 +68,9 @@ class RingTest extends FunSuite {
   runWith[BigInt](-3, 3, -9)
   runWith[BigDecimal](-3, 3, -9)
   runWith[Rational](-3, 3, -9)
-  runWith[Complex[Double]](-3, 3, -9)
+  // runWith[Complex[Double]](-3, 3, -9)
+  runWith[Complex[BigDecimal]](Complex(BigDecimal(-3), BigDecimal(0)),
+                               Complex(BigDecimal(3), BigDecimal(0)),
+                               Complex(BigDecimal(-9), BigDecimal(0)))
+  runWith[FPFilter[BigInt]](FPFilter[BigInt](-3), FPFilter[BigInt](3), FPFilter[BigInt](-9))
 }

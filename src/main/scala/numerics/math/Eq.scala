@@ -28,6 +28,7 @@ object Eq extends LowPriority {
   implicit object BigDecimalEq extends BigDecimalEq
   implicit object RationalEq extends RationalEq
   implicit def complexEq[A:Fractional] = new ComplexEq
+  implicit object RealEq extends RealEq
 
   def apply[A](implicit e:Eq[A]):Eq[A] = e
 
@@ -76,4 +77,7 @@ class ComplexEq[A](implicit f:Fractional[A]) extends Eq[Complex[A]] {
   def eq(x:Complex[A], y:Complex[A]) = x == y
   def neq(x:Complex[A], y:Complex[A]) = x != y
 }
-
+trait RealEq extends Eq[Real] {
+  def eq(x: Real, y: Real) = (x - y).sign == Zero
+  def neq(x: Real, y: Real) = (x - y).sign != Zero
+}

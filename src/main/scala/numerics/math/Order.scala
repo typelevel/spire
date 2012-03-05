@@ -53,6 +53,7 @@ object Order {
   implicit object BigIntOrder extends BigIntOrder
   implicit object BigDecimalOrder extends BigDecimalOrder
   implicit object RationalOrder extends RationalOrder
+  implicit object RealOrder extends RealOrder
 
   def by[@spec A, @spec B](f:A => B)(implicit o:Order[B]): Order[A] = o.on(f)
 
@@ -111,3 +112,12 @@ trait RationalOrder extends Order[Rational] with RationalEq {
   def lt(x:Rational, y:Rational) = x < y
   def lteq(x:Rational, y:Rational) = x <= y
 }
+
+trait RealOrder extends Order[Real] with RealEq {
+  private def cmp(x: Real, y: Real): Int = (x - y).signum
+  def gt(x:Real, y:Real) = cmp(x, y) > 0
+  def gteq(x:Real, y:Real) = cmp(x, y) >= 0
+  def lt(x:Real, y:Real) = cmp(x, y) < 0
+  def lteq(x:Real, y:Real) = cmp(x, y) <= 0
+}
+

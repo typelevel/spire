@@ -530,7 +530,7 @@ object LongRationals extends Rationals[Long] {
     }
 
     // FIXME: SafeLong would ideally support pow
-    def pow(exp: Int): Rational = {
+    def pow(exp: Int): Rational = if (exp == 0) Rational.one else {
       val num = n.toBigInt.pow(exp.abs)
       val den = d.toBigInt.pow(exp.abs)
       if (exp > 0) BigRationals.build(num, den) else BigRationals.build(den, num)
@@ -641,7 +641,9 @@ object BigRationals extends Rationals[BigInt] {
         if (den < SafeLong.zero) Rational(-num, -den) else Rational(num, den)
     }
 
-    def pow(exp: Int): Rational = if (exp < 0) {
+    def pow(exp: Int): Rational = if (exp == 0) {
+      Rational.one
+    } else if (exp < 0) {
       BigRationals.build(d pow exp.abs, n pow exp.abs)
     } else {
       BigRationals.build(n pow exp, d pow exp)

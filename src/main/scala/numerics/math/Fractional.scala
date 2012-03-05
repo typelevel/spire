@@ -17,6 +17,7 @@ object Fractional {
   implicit object DoubleIsFractional extends DoubleIsFractional
   implicit object BigDecimalIsFractional extends BigDecimalIsFractional
   implicit object RationalIsFractional extends RationalIsFractional
+  implicit object RealIsFractional extends RealIsFractional
 
   def apply[A](implicit f:Fractional[A]) = f
 }
@@ -31,6 +32,32 @@ trait DoubleIsFractional extends Fractional[Double] with DoubleIsField with Doub
   def floor(a:Double) = scala.math.floor(a)
 }
 
+
+/**
+ * A generic implementation of ceil/floor that can be mixed in.
+ */
+trait GenericCeilAndFloor[A] { self: Fractional[A] =>
+  def ceil(a: A) = {
+    val i = self.fromBigInt(self.toBigInt(a))
+
+    if (i == a || self.lt(a, self.fromInt(0))) {
+      i
+    } else {
+      self.plus(i, self.fromInt(1))
+    }
+  }
+
+  def floor(a: A) = {
+    val i = self.fromBigInt(self.toBigInt(a))
+
+    if (i == a || self.gt(a, self.fromInt(0))) {
+      i
+    } else {
+      self.plus(i, self.fromInt(1))
+    }
+  }
+}
+
 trait BigDecimalIsFractional extends Fractional[BigDecimal]
 with BigDecimalIsField with BigDecimalOrder {
   def ceil(a:BigDecimal) = {
@@ -41,10 +68,7 @@ with BigDecimalIsField with BigDecimalOrder {
 }
 
 trait RationalIsFractional extends Fractional[Rational]
-with RationalIsField with RationalOrder {
-  def ceil(a:Rational) = {
-    val (q, r) = a.toBigDecimal /% 1
-    Rational((if (r > 0) q + BigDecimal(1) else q).toBigInt, 1)
-  }
-  def floor(a:Rational) = Rational(a.toBigInt, 1)
-}
+with RationalIsField with RationalOrder with GenericCeilAndFloor[Rational]
+
+trait RealIsFractional extends Fractional[Real]
+with RealIsField with RealOrder with GenericCeilAndFloor[Real]
