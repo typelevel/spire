@@ -136,6 +136,9 @@ object FPFilter extends LowPriorityFPFilterWrappers {
     def pow(a: FPFilter[A], k: Int): FPFilter[A] =
       new FPFilter(a.approx pow k, a.value pow k)
 
+    override def sign(a: FPFilter[A]): Sign = a.approx.sign getOrElse ev.sign(a.value)
+    def signum(a: FPFilter[A]): Int = a.sign.toInt
+
     def times(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
       new FPFilter(a.approx * b.approx, a.value * b.value)
 
