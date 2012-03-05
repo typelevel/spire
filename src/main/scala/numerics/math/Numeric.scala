@@ -20,6 +20,7 @@ object Numeric {
   implicit object BigIntIsNumeric extends BigIntIsNumeric
   implicit object BigDecimalIsNumeric extends BigDecimalIsNumeric
   implicit object RationalIsNumeric extends RationalIsNumeric
+  implicit object RealIsNumeric extends RealIsNumeric
   implicit def complexIsNumeric[A:FractionalWithNRoot] = new ComplexIsNumeric
 
   def apply[A](implicit e:Numeric[A]):Numeric[A] = e

@@ -1,7 +1,9 @@
-package numerics.math
+package numerics.math.real
 
 import java.math.{ MathContext, BigDecimal => BigDec }
 import scala.math.max
+
+import numerics.math._
 
 /**
  * Provides `Real` approximations to `BigDecimal` using `MathContext` to
