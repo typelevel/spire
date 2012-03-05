@@ -42,10 +42,10 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def isWhole = real.isWhole && imag.isWhole
   def signum: Int = f.compare(real, f.zero)
   def underlying = (real, imag)
-  def complexSignum = if (magnitude == f.zero) {
+  def complexSignum = if (abs == f.zero) {
     Complex.zero
   } else {
-    this / Complex(magnitude, f.zero)
+    this / Complex(abs, f.zero)
   }
 
   override def hashCode: Int = if (isReal && real.isWhole &&
@@ -64,11 +64,14 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   override def toString: String = "Complex(%s, %s)".format(real, imag)
 
   // ugh, for very large Fractional values this will totally break
-  lazy val magnitude: T = f.sqrt(real * real + imag * imag)
-  lazy val angle: T = f.fromDouble(atan2(imag.toDouble, real.toDouble))
-  
-  def abs: T = magnitude
-  def arg: T = angle
+  //lazy val magnitude: T = f.sqrt(real * real + imag * imag)
+  //lazy val angle: T = f.fromDouble(atan2(imag.toDouble, real.toDouble))
+  //def abs: T = magnitude
+  //def arg: T = angle
+
+  // ugh, specialized lazy vals don't work very well
+  def abs: T = f.sqrt(real * real + imag * imag)
+  def arg: T = f.fromDouble(atan2(imag.toDouble, real.toDouble))
 
   def conjugate = Complex(real, f.negate(imag))
 
@@ -137,13 +140,13 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     Complex.zero[T]
 
   } else if (f.neq(b.imag, f.zero)) {
-    val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble) / exp((angle * b.imag).toDouble))
-    val phase = f.fromDouble(angle.toDouble * b.real.toDouble + log(abs.toDouble) * b.imag.toDouble)
+    val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble) / exp((arg * b.imag).toDouble))
+    val phase = f.fromDouble(arg.toDouble * b.real.toDouble + log(abs.toDouble) * b.imag.toDouble)
     Complex.polar(len, phase)
 
   } else {
     val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble))
-    val phase = f.times(angle, b.real)
+    val phase = f.times(arg, b.real)
     Complex.polar(len, phase)
   }
 }

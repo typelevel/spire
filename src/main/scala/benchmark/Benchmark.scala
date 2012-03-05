@@ -23,7 +23,7 @@ trait MyBenchmark extends SimpleBenchmark {
   def nextLong() = Random.nextLong()
   def nextFloat() = Random.nextFloat()
   def nextDouble() = Random.nextDouble()
-  def nextComplex[@spec A:Fractional](f: =>A) = Complex(f, f)
+  def nextComplex[@spec A:FractionalWithNRoot](f: => A) = Complex(f, f)
 
   // sugar for building randomized arrays of various types
   def initInts(size:Int) = init(size)(nextInt())
@@ -41,7 +41,7 @@ trait MyRunner {
   val cls:java.lang.Class[_ <: com.google.caliper.Benchmark]
   def main(args:Array[String]) {
     println("starting benchmarks...")
-    Runner.main(cls, args)
+    Runner.main(cls, args:_*)
     println("completed benchmarks.")
   }
 }
