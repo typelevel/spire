@@ -24,8 +24,13 @@ class RingTest extends FunSuite {
    */
   def runWith[@spec A:Ring:Manifest](a:A, b:A, c:A) {
 
+    val m = implicitly[Manifest[A]]
+
     // the name to use for this A
-    val cls = implicitly[Manifest[A]].erasure.getSimpleName
+    val cls = m.typeArguments match {
+      case Nil => m.erasure.getSimpleName
+      case args => "%s[%s]" format (m.erasure.getSimpleName, args.mkString(","))
+    }
 
     // test runner which constructs a unique name for each test we run.
     def runTest(name:String)(f: => Unit) = test("%s:%s" format(cls, name))(f)
@@ -68,7 +73,8 @@ class RingTest extends FunSuite {
   runWith[BigInt](-3, 3, -9)
   runWith[BigDecimal](-3, 3, -9)
   runWith[Rational](-3, 3, -9)
-  // runWith[Complex[Double]](-3, 3, -9)
+  // commented out due to specialization bug
+  runWith[Complex[Double]](-3, 3, -9)
   runWith[Complex[BigDecimal]](Complex(BigDecimal(-3), BigDecimal(0)),
                                Complex(BigDecimal(3), BigDecimal(0)),
                                Complex(BigDecimal(-9), BigDecimal(0)))
