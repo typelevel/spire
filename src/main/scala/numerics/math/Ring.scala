@@ -77,7 +77,10 @@ with ConvertableFromLong with ConvertableToLong {
   def negate(a:Long): Long = -a
   def one: Long = 1L
   def plus(a:Long, b:Long): Long = a + b
-  def pow(a:Long, b:Int): Long = mpow(a, b).toLong // Problem if mpow(a,b) > 53 bits.
+  def pow(a: Long, b:Int): Long = if (b < 0) 0 else if (b == 0) 1 else {
+    val c = pow(a, b / 2) * pow(a, b / 2)
+    if ((b & 1) == 1) c * a else c
+  }
   def signum(a: Long): Int = a.signum
   def times(a:Long, b:Long): Long = a * b
   def zero: Long = 0L
