@@ -125,10 +125,19 @@ object BigDecimalApproximations {
     lazy val x: AbsApprox = AbsApprox(a, max(bits + 1, 1 - a.decimalLowerBound / 2))
 
     def value: BigDecimal = {
+
       // We need to use the upper bound to determine how many bits we need.
+      
       val ub = KRoot(a, k).decimalUpperBound
       implicit val mc = new MathContext(ub + bits + 1)
-      x.value nroot k
+      
+      val b = x.value
+
+      if (b < 0 && k % 2 == 0 && a.sign == Zero) {
+        BigDecimal(0)
+      } else {
+        x.value nroot k
+      }
     }
   }
 
@@ -214,6 +223,7 @@ object BigDecimalApproximations {
     import Implicits._
 
     lazy val approx = RelApprox(x.a, mc + 1)
+
     def value: BigDec = {
       implicit val ctxt = mc + 1
       (BigDecimal(approx.value) nroot x.k).bigDecimal
