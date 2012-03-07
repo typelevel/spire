@@ -126,25 +126,31 @@ sealed abstract class Real extends ScalaNumber
   */
 
   // The sign of this `Real`.
-  lazy val sign: Sign = fpf.sign getOrElse ({
-    import Bounded._
+  lazy val sign: Sign = fpf.sign getOrElse (this match {
+    case IntLit(n) => Sign(n)
+    case BigIntLit(n) => Sign(n.signum)
+    case Neg(n) => -(n.sign)
+    case Mul(a, b) => a.sign * b.sign
+    case Div(a, b) => a.sign * b.sign
+    case _ =>
+      import Bounded._
 
-    // The separation bound.
-    val sep = BigDecimal(1, -this.decimalLowerBound)
+      // The separation bound.
+      val sep = BigDecimal(1, -this.decimalLowerBound)
 
-    def findSign(scale: Int): Int = {
-      val err = BigDecimal(1, scale)
-      val a = this +/- err
-      if (a.abs > err) {
-        a.signum
-      } else if (2 * err <= sep) {
-        0
-      } else {
-        findSign(scale + 1)
+      def findSign(scale: Int): Int = {
+        val err = BigDecimal(1, scale)
+        val a = this +/- err
+        if (a.abs > err) {
+          a.signum
+        } else if (2 * err <= sep) {
+          0
+        } else {
+          findSign(scale + 1)
+        }
       }
-    }
 
-    Sign(findSign(0))
+      Sign(findSign(0))
   })
 
   /**
@@ -217,12 +223,6 @@ case class Mul(lhs: Real, rhs: Real) extends Real with BinOp
 case class Div(lhs: Real, rhs: Real) extends Real with BinOp
 case class Neg(a: Real) extends Real
 case class KRoot(a: Real, k: Int) extends Real
-
-case class IntLit(value: Int) extends Real {
-  override lazy val sign: Sign = if (value == 0) Zero else if (value > 0) Positive else Negative
-}
-
-case class BigIntLit(value: BigInt) extends Real {
-  override lazy val sign: Sign = if (value == 0) Zero else if (value > 0) Positive else Negative
-}
+case class IntLit(value: Int) extends Real
+case class BigIntLit(value: BigInt) extends Real
 
