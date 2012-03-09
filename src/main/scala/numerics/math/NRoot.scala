@@ -294,7 +294,8 @@ object NRoot {
    * @param a A (positive if k % 2 == 0) `BigDecimal`.
    * @param k A positive `Int` greater than 1.
    * @param ctxt The `MathContext` to bound the precision of the result.
-   * @returns A `BigDecimal` approximation to the `k`-th root of `a`.
+   *
+   * returns A `BigDecimal` approximation to the `k`-th root of `a`.
    */
   def nroot(a: BigDecimal, k: Int, ctxt: MathContext): BigDecimal = if (k == 0) {
     BigDecimal(1)
