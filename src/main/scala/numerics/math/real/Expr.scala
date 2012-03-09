@@ -2,6 +2,8 @@ package numerics.math.real
 
 import numerics.math.fpf.MaybeDouble
 
+import numerics.math._
+
 
 /**
  * An `Expr` describes a simple structure for algebraic expressions. Generally,
@@ -33,6 +35,35 @@ case class SubExpr[A](lhs: A, rhs: A) extends Expr[A]
 case class MulExpr[A](lhs: A, rhs: A) extends Expr[A]
 case class DivExpr[A](lhs: A, rhs: A) extends Expr[A]
 
+object Expr {
+  def apply[A: Coexpr](n: Int): A = IntLit(n)
+  def apply[A: Coexpr](n: Long): A = apply(BigInt(n))
+  def apply[A: Coexpr](n: BigInt): A = if (n.isValidInt) {
+    IntLit(n.toInt)
+  } else {
+    BigIntLit(n)
+  }
+  def apply[A: Coexpr](n: Rational): A = Div(apply[A](n.numerator), apply[A](n.denominator))
+  def apply[A: Coexpr](n: Double): A = apply[A](Rational(n.toString))
+  def apply[A: Coexpr](n: BigDecimal): A = apply[A](Rational(n))
+
+  def toExprString[A: Coexpr](a: A): String = a match {
+    case IntLit(n) => n.toString
+    case BigIntLit(n) => n.toString
+    case Add(a, b) => "%s + %s" format (toExprString(a), toExprString(b))
+    case Sub(a, b) => "%s - %s" format (toExprString(a), toExprString(b))
+    case Mul(a, b) => "(%s) * (%s)" format (toExprString(a), toExprString(b))
+    case Div(a, b) => "(%s) / (%s)" format (toExprString(a), toExprString(b))
+    case Neg(a) => "-%s" format toExprString(a)
+    case KRoot(a, k) =>
+      if (k == 2) {
+        "sqrt(%s)" format (toExprString(a))
+      } else {
+        "%d-root(%s)" format (k, toExprString(a))
+      }
+  }
+}
+
 
 /**
  * A type class that indicates that the type `A` has a structure that can be
@@ -49,10 +80,29 @@ trait Coexpr[A] {
 
 object Coexpr {
   def apply[A](implicit ev: Coexpr[A]): Coexpr[A] = ev
+
+  implicit def CoexprOps[A: Coexpr](a: A) = new {
+    def expr: Expr[A] = Coexpr[A].expr(a)
+  }
+
+  implicit def ExprOps[A: Coexpr](e: Expr[A]) = new {
+    def coexpr: A = Coexpr[A].coexpr(e)
+  }
+
+  def mirror[A: Coexpr, B: Coexpr](a: A): B = a match {
+    case IntLit(n) => IntLit[B](n)
+    case BigIntLit(n) => BigIntLit[B](n)
+    case Neg(a) => Neg[B](mirror[A,B](a))
+    case KRoot(a, k) => KRoot[B](mirror[A,B](a), k)
+    case Add(a, b) => Add[B](mirror[A,B](a), mirror[A,B](b))
+    case Sub(a, b) => Sub[B](mirror[A,B](a), mirror[A,B](b))
+    case Mul(a, b) => Mul[B](mirror[A,B](a), mirror[A,B](b))
+    case Div(a, b) => Div[B](mirror[A,B](a), mirror[A,B](b))
+  }
 }
 
 
-object IntLit2 {
+object IntLit {
   def apply[A: Coexpr](n: Int): A = Coexpr[A].coexpr(IntExpr[A](n))
   def unapply[A: Coexpr](e: A): Option[Int] = Coexpr[A].expr(e) match {
     case IntExpr(n) => Some(n)
@@ -60,7 +110,7 @@ object IntLit2 {
   }
 }
 
-object BigIntLit2 {
+object BigIntLit {
   def apply[A: Coexpr](n: BigInt): A = Coexpr[A].coexpr(BigIntExpr[A](n))
   def unapply[A: Coexpr](e: A): Option[BigInt] = Coexpr[A].expr(e) match {
     case BigIntExpr(n) => Some(n)
@@ -68,7 +118,7 @@ object BigIntLit2 {
   }
 }
 
-object Neg2 {
+object Neg {
   def apply[A: Coexpr](a: A): A = Coexpr[A].coexpr(NegExpr[A](a))
   def unapply[A: Coexpr](e: A): Option[A] = Coexpr[A].expr(e) match {
     case NegExpr(s) => Some(s)
@@ -76,7 +126,7 @@ object Neg2 {
   }
 }
 
-object KRoot2 {
+object KRoot {
   def apply[A: Coexpr](a: A, k: Int): A = Coexpr[A].coexpr(KRootExpr[A](a, k))
   def unapply[A: Coexpr](e: A): Option[(A,Int)] = Coexpr[A].expr(e) match {
     case KRootExpr(a, k) => Some((a, k))
@@ -84,7 +134,7 @@ object KRoot2 {
   }
 }
 
-object Add2 {
+object Add {
   def apply[A: Coexpr](a: A, b: A): A = Coexpr[A].coexpr(AddExpr(a, b))
   def unapply[A: Coexpr](e: A): Option[(A,A)] = Coexpr[A].expr(e) match {
     case AddExpr(a, b) => Some((a, b))
@@ -92,7 +142,7 @@ object Add2 {
   }
 }
 
-object Sub2 {
+object Sub {
   def apply[A: Coexpr](a: A, b: A): A = Coexpr[A].coexpr(SubExpr(a, b))
   def unapply[A: Coexpr](e: A): Option[(A,A)] = Coexpr[A].expr(e) match {
     case SubExpr(a, b) => Some((a, b))
@@ -100,7 +150,7 @@ object Sub2 {
   }
 }
 
-object Mul2 {
+object Mul {
   def apply[A: Coexpr](a: A, b: A): A = Coexpr[A].coexpr(MulExpr(a, b))
   def unapply[A: Coexpr](e: A): Option[(A,A)] = Coexpr[A].expr(e) match {
     case MulExpr(a, b) => Some((a, b))
@@ -108,71 +158,11 @@ object Mul2 {
   }
 }
 
-object Div2 {
+object Div {
   def apply[A: Coexpr](a: A, b: A): A = Coexpr[A].coexpr(DivExpr(a, b))
   def unapply[A: Coexpr](e: A): Option[(A,A)] = Coexpr[A].expr(e) match {
     case DivExpr(a, b) => Some((a, b))
     case _ => None
-  }
-}
-
-
-trait RealLike2[A] { self: A =>
-  implicit def coexpr: Coexpr[A]
-
-  def +(that: A): A = Add2(this, that)
-  def -(that: A): A = Sub2(this, that)
-  def *(that: A): A = Mul2(this, that)
-  def /(that: A): A = Div2(this, that)
-  def nroot(k: Int): A = KRoot2[A](this, k)
-  def unary_-(): A = Neg2[A](this)
-}
-
-trait Real2Transform[A] extends RealLike2[A] { self: A =>
-  def transform(a: A): A = a
-
-  override def +(that: A): A = transform(super.+(that))
-  override def -(that: A): A = transform(super.-(that))
-  override def *(that: A): A = transform(super.*(that))
-  override def /(that: A): A = transform(super./(that))
-  override def nroot(k: Int): A = transform(super.nroot(k)) 
-  override def unary_-(): A = transform(super.unary_-())
-}
-
-trait Real2ConstantFolder[A] extends Real2Transform[A] { self: A =>
-  override def transform(a: A): A = super.transform(a) match {
-    case Add2(IntLit2(x), IntLit2(y)) => IntLit2(x + y)
-    case a => a
-  }
-}
-
-trait Real2FPFilter[A <: Real2FPFilter[A]] extends RealLike2[A] { self: A =>
-  lazy val fpf: MaybeDouble = this match {
-    case Add2(a, b) => a.fpf + b.fpf
-    case Sub2(a, b) => a.fpf - b.fpf
-    case Mul2(a, b) => a.fpf * b.fpf
-    case Div2(a, b) => a.fpf / b.fpf
-    case KRoot2(a, k) => a.fpf nroot k
-    case Neg2(a) => -(a.fpf)
-    case IntLit2(n) => MaybeDouble(n)
-    case BigIntLit2(n) => MaybeDouble(n)
-  }
-}
-
-final class Real2 private (val expr: Expr[Real2]) extends RealLike2[Real2]
-                                                     with Real2FPFilter[Real2]
-                                                     with Real2ConstantFolder[Real2] {
-  val coexpr = Real2.Real2Coexpr
-}
-
-object Real2 {
-
-  def apply(n: Int): Real2 = new Real2(IntExpr[Real2](n))
-  def apply(n: BigInt): Real2 = new Real2(BigIntExpr[Real2](n))
-
-  implicit object Real2Coexpr extends Coexpr[Real2] {
-    def expr(r: Real2): Expr[Real2] = r.expr
-    def coexpr(e: Expr[Real2]): Real2 = new Real2(e)
   }
 }
 

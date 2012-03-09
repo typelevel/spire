@@ -20,36 +20,25 @@ package numerics.math
 import java.math.{ MathContext, BigInteger, BigDecimal => BigDec }
 import scala.math.{ ScalaNumber, ScalaNumericConversions, max }
 
-import fpf.MaybeDouble
 import real._
 
 
 /**
- * An general Real type. Can be used represent real numbers and approximates
+ * An general Real type. Can be used represent real numbers and approximate
  * them on-demand.
  */
-sealed abstract class Real extends ScalaNumber
-                           with ScalaNumericConversions
-                           with RealLike
-                           with ConstantFolder
-                           with BubbleUpDivs
-                           with Ordered[Real] {
+final class Real private (val expr: Expr[Real])
+extends ScalaNumber
+   with ScalaNumericConversions
+   with RealLike[Real]
+   with BMFSSBound[Real]
+   with BigDecimalApprox[Real]
+   with FPFilter[Real]
+   with ConstantFolder[Real]
+   with BubbleUpDivs[Real]
+   with Ordered[Real] {
 
-  /**
-   * Used for the internal floating point filter. Though this is public, it
-   * should only be used for good reason.
-   */
-  lazy val fpf: MaybeDouble = this match {
-    case Add(a, b) => a.fpf + b.fpf
-    case Sub(a, b) => a.fpf - b.fpf
-    case Mul(a, b) => a.fpf * b.fpf
-    case Div(a, b) => a.fpf / b.fpf
-    case Neg(a) => -a.fpf
-    case KRoot(a, k) => a.fpf nroot k
-    case IntLit(n) => MaybeDouble(n)
-    case BigIntLit(n) => MaybeDouble(n)
-  }
-
+  val coexpr: Coexpr[Real] = Real.RealCoexpr
 
   override def equals(that: Any) = that match {
     case that: Real => (this - that).sign == Zero
@@ -65,164 +54,23 @@ sealed abstract class Real extends ScalaNumber
 
   override def hashCode: Int =
     if (isWhole && toBigInt == toLong) unifiedPrimitiveHashcode
-    else toDouble.##
-
-
-  /**
-   * Returns `true` if this is a radical expression, `false` otherwise.
-   */
-  def isRadical: Boolean = this match {
-    case Add(a, b) => a.isRadical || b.isRadical
-    case Sub(a, b) => a.isRadical || b.isRadical
-    case Mul(a, b) => a.isRadical || b.isRadical
-    case Div(a, b) => a.isRadical || b.isRadical
-    case Neg(a) => a.isRadical
-    case KRoot(a, k) => true
-    case IntLit(n) => false
-    case BigIntLit(n) => false
-  }
-
-
-  def toBigInt: BigInt = fpf.toLong map (BigInt(_)) getOrElse (sign match {
-    case Zero => BigInt(0)
-    case Negative => -((-this).toBigInt)
-    case Positive =>
-      val a = this +/- 0.01
-      val b = a.toBigInt
-
-      if ((a + 0.02) >= BigDecimal(b + 1)) {
-        (this - Real(b + 1)).sign match {
-          case Positive => b + 1
-          case Negative => b
-          case Zero => b + 1
-        }
-      } else if ((a - 0.02) < BigDecimal(b)) {
-        (this - Real(b)).sign match {
-          case Positive => b
-          case Negative => b - 1
-          case Zero => b
-        }
-      } else {
-        b
-      }
-  })
-
-  def toBigDecimal(implicit mc: MathContext = MathContext.DECIMAL128): BigDecimal =
-    (this approximateTo mc).round(mc)
-
-  def toRational(implicit ac: ApproximationContext[Rational] = ApproximationContext(Rational(1L, 10000000000000000L))): Rational = simulate[Rational]
-
-  def approximateTo[A,B](a: A)(implicit approx: Approximation[Real,A,B]): B =
-    approx(this, a)
-
-  /**
-   * Returns an absolute approximation to `this` s.t.
-   * `this - err <= this +/- err <= this + err`.
-   */
-  def +/-(err: BigDecimal): BigDecimal = this approximateTo err
-
-  /*
-  def signum: Int = sign.toInt
-  */
-
-  // The sign of this `Real`.
-  lazy val sign: Sign = fpf.sign getOrElse (this match {
-    case IntLit(n) => Sign(n)
-    case BigIntLit(n) => Sign(n.signum)
-    case Neg(n) => -(n.sign)
-    case Mul(a, b) => a.sign * b.sign
-    case Div(a, b) => a.sign * b.sign
-    case _ =>
-      import Bounded._
-
-      // The separation bound.
-      val sep = BigDecimal(1, -this.decimalLowerBound)
-
-      def findSign(scale: Int): Int = {
-        val err = BigDecimal(1, scale)
-        val a = this +/- err
-        if (a.abs > err) {
-          a.signum
-        } else if (2 * err <= sep) {
-          0
-        } else {
-          findSign(scale + 1)
-        }
-      }
-
-      Sign(findSign(0))
-  })
-
-  /**
-   * Simulates the expression DAG of this `Real` using another number type.
-   */
-  def simulate[A : FieldWithNRoot]: A = Real.simulate(this)
-
-
-  def isWhole: Boolean = fpf.isWhole getOrElse {
-    import Implicits._
-    (this % Real(1)).sign == Zero
-  }
-
-  def underlying: AnyRef = this   // Why not?
-
-  def doubleValue: Double = if (fpf.isExact) {
-    fpf.approx
-  } else this approximateTo Double
-
-  def floatValue: Float = fpf.toFloat getOrElse doubleValue.toFloat
-
-  def intValue: Int = fpf.toLong map (_.toInt) getOrElse toBigInt.toInt
-  def longValue: Long = fpf.toLong getOrElse toBigInt.toLong
+    else toFloat.##
 }
 
 
 object Real {
-  // private val t = AggregateTransformer(ConstantFolder, DivBubbleTransformer)
-  // def transform(num: Real): Real = t.transform(num)
 
-  implicit def apply(n: Int): Real = IntLit(n)
-  implicit def apply(n: Long): Real = apply(BigInt(n))
-  implicit def apply(n: BigInt): Real = if (n.isValidInt) {
-    IntLit(n.toInt)
-  } else {
-    BigIntLit(n)
-  }
-  implicit def apply(n: Rational): Real = Real(n.numerator) / Real(n.denominator)
-  implicit def apply(n: Double): Real = apply(Rational(n.toString))
-  implicit def apply(n: BigDecimal): Real = apply(Rational(n))
+  implicit def apply(n: Int): Real = Expr(n)
+  implicit def apply(n: Long): Real = Expr(n)
+  implicit def apply(n: BigInt): Real = Expr(n)
+  implicit def apply(n: Rational): Real = Expr(n)
+  implicit def apply(n: Double): Real = Expr(n)
+  implicit def apply(n: BigDecimal): Real = Expr(n)
 
-  import Implicits._
-  def simulate[A : FieldWithNRoot](n: Real): A = n match {
-    case Add(a, b) => simulate(a) + simulate(b)
-    case Sub(a, b) => simulate(a) - simulate(b)
-    case Mul(a, b) => simulate(a) * simulate(b)
-    case Div(a, b) => simulate(a) / simulate(b)
-    case Neg(a) => -simulate(a)
-    case KRoot(a, k) => simulate(a) nroot k
-    case IntLit(n) => Ring[A].fromInt(n)
-    case BigIntLit(n) => Ring[A].fromBigInt(n)
+
+  implicit object RealCoexpr extends Coexpr[Real] {
+    def expr(r: Real): Expr[Real] = r.expr
+    def coexpr(e: Expr[Real]): Real = new Real(e)
   }
 }
-
-sealed trait BinOp {
-  def lhs:Real 
-  def rhs:Real 
-}
-
-object BinOp {
-  def unapply(n: Real): Option[(Real,Real)] = n match {
-    case n: BinOp => Some((n.lhs, n.rhs))
-    case _ => None
-  }
-}
-
-case class Add(lhs: Real, rhs: Real) extends Real with BinOp
-case class Sub(lhs: Real, rhs: Real) extends Real with BinOp
-case class Mul(lhs: Real, rhs: Real) extends Real with BinOp
-case class Div(lhs: Real, rhs: Real) extends Real with BinOp
-case class Neg(a: Real) extends Real
-case class KRoot(a: Real, k: Int) extends Real
-case class IntLit(value: Int) extends Real
-case class BigIntLit(value: BigInt) extends Real
 
