@@ -35,6 +35,9 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def toBigInt: BigInt
   def toBigDecimal: BigDecimal
 
+  def floor: Rational = Rational(toBigInt)
+  def ceil: Rational = if (denominator == 1) floor else Rational(toBigInt + 1)
+
   def pow(exp: Int): Rational
 
 
