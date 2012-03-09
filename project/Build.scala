@@ -4,7 +4,7 @@ import sbt.Keys._
 object MyBuild extends Build {
   lazy val project = Project("root", file(".")) settings(
     name := "Scala Numerics",
-    organization := "n/a",
+    organization := "na",
 
     scalaVersion := "2.9.1",
     version := "0.1",
