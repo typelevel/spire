@@ -8,8 +8,8 @@ import numerics.math._
  * ensuring there is, at most, one division in a `Real`. This is needed for
  * the BFMSS bound.
  */
-trait BubbleUpDivs extends RealTransform { self: Real =>
- override def transform(num: Real): Real = super.transform(num) match {
+trait BubbleUpDivs[A <: RealLike[A]] extends RealTransform[A] { self: A =>
+ override def transform(num: A): A = super.transform(num) match {
     case Add(Div(a, b), Div(c, d)) => Div(a * d + b * c, b * d)
     case Add(Div(a, b), c) => Div(a + b * c, b)
     case Add(a, Div(b, c)) => Div(a * c + b, c)
