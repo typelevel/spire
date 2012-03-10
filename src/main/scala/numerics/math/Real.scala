@@ -36,6 +36,7 @@ extends ScalaNumber
    with FPFilter[Real]
    with ConstantFolder[Real]
    with BubbleUpDivs[Real]
+   with PrettyToString[Real]
    with Ordered[Real] {
 
   val coexpr: Coexpr[Real] = Real.RealCoexpr

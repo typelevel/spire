@@ -8,6 +8,7 @@ import numerics.math._
  * A mix-in for `RealLike` that adds an internal floating pointer filter.
  */
 trait FPFilter[A <: FPFilter[A]] extends RealLike[A] { self: A =>
+
   lazy val fpf: MaybeDouble = this match {
     case Add(a, b) => a.fpf + b.fpf
     case Sub(a, b) => a.fpf - b.fpf
@@ -27,5 +28,4 @@ trait FPFilter[A <: FPFilter[A]] extends RealLike[A] { self: A =>
   abstract override def intValue: Int = fpf.toLong map (_.toInt) getOrElse super.intValue 
   abstract override def longValue: Long = fpf.toLong getOrElse super.longValue
 }
-
 

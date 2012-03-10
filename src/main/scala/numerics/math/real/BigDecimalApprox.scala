@@ -102,6 +102,12 @@ extends RealLike[A] with SeparationBound[A] { self: A =>
   def floatValue: Float = doubleValue.toFloat
   def intValue: Int = toBigInt.toInt
   def longValue: Long = toBigInt.toLong
+
+  override def toString: String = {
+    val approx = this.toBigDecimal(new MathContext(9))
+    val prefix = if (this == Expr[A](approx)) "" else "~"
+    prefix + approx.toString
+  }
 }
 
 
