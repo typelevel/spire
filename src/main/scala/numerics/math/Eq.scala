@@ -3,7 +3,6 @@ package numerics.math
 import scala.{specialized => spec}
 
 trait Eq[@spec A] {
-
   def eq(x:A, y:A): Boolean
   def neq(x:A, y:A): Boolean
 
@@ -16,7 +15,7 @@ trait AnonymousEq[@spec A] extends Eq[A] {
 
 final class EqOps[@spec(Int,Long,Double) A](lhs:A)(implicit ev:Eq[A]) {
   def ===(rhs:A) = ev.eq(lhs, rhs)
-  def !==(rhs:A) = ev.neq(lhs, rhs)
+  def =!=(rhs:A) = ev.neq(lhs, rhs)
 }
 
 object Eq extends LowPriority {
