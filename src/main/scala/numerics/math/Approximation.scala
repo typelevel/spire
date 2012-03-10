@@ -18,12 +18,17 @@ object Approximation {
   def approximate[A,B,C](a: A, b: B)(implicit approx: Approximation[A,B,C]): C =
     approx(a, b)
 
-  implicit val absBigDecimalApproximation = BigDecimalApproximations.Absolute
-  implicit val relBigDecimalApproximation = BigDecimalApproximations.Relative
+  // We could also, instead, just use `Absolute` and `Relative` as they are in
+  // `BigDecimalApproximations`, but then all types that are
+  // `RealLike[A] with SeparationBound[A]` would have to compete for implicit
+  // priority if they wanted to define their own `Approximation`s.
+
+  implicit val absBigDecimalApproximation = BigDecimalApproximations.Absolute[Real]
+  implicit val relBigDecimalApproximation = BigDecimalApproximations.Relative[Real]
 
   implicit object DoubleApproximation extends Approximation[Real,Double.type,Double] {
     def apply(n: Real, err: Double.type): Double = {
-      val bd: BigDecimal = approximate(n, 17.digits)
+      val bd: BigDecimal = approximate(n, new MathContext(17))
       bd.toDouble
     }
   }

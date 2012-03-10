@@ -2,6 +2,7 @@ package test.scala.numerics.math.real
 
 import numerics.math._
 import Implicits._
+import real._
 
 import org.scalatest.FunSuite
 
@@ -20,7 +21,9 @@ class BubbleUpDivsTest extends FunSuite {
 
   def countDivs(a: Real): Int = a match {
     case Div(a, b) => 1 + countDivs(a) + countDivs(b)
-    case BinOp(a, b) => countDivs(a) + countDivs(b)
+    case Add(a, b) => countDivs(a) + countDivs(b)
+    case Sub(a, b) => countDivs(a) + countDivs(b)
+    case Mul(a, b) => countDivs(a) + countDivs(b)
     case Neg(a) => countDivs(a)
     case KRoot(a, _) => countDivs(a)
     case IntLit(_) => 0

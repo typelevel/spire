@@ -72,8 +72,8 @@ trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRin
 }
 
 trait RealIsEuclideanRing extends EuclideanRing[Real] with RealIsRing {
-  def quot(a: Real, b: Real): Real = (a / b).toBigInt
-  def mod(a: Real, b: Real): Real = a - quot(a, b) * b
+  def quot(a: Real, b: Real): Real = a /~ b
+  def mod(a: Real, b: Real): Real = a % b
 }
 
 trait ComplexIsEuclideanRing[@spec(Float,Double) A]
