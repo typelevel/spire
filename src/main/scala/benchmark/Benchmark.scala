@@ -1,7 +1,7 @@
 package benchmark
 
 import scala.{specialized => spec}
-import scala.util.Random
+import scala.util.Random._
 
 import numerics.math._
 import numerics.math.Implicits._
@@ -9,41 +9,32 @@ import numerics.math.Implicits._
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark
 
-// extend this to create an actual benchmarking class
+/**
+ * Extend this to create an actual benchmarking class.
+ */
 trait MyBenchmark extends SimpleBenchmark {
-  // sugar for building arrays using a per-cell init function
-  def init[A:Manifest](size:Int)(init: =>A) = {
+
+  /**
+   * Sugar for building arrays using a per-cell init function.
+   */
+  def init[A:Manifest](size:Int)(init: => A) = {
     val data = Array.ofDim[A](size)
     for (i <- 0 until size) data(i) = init
     data
   }
 
-  // handy aliases into Random
-  def nextInt() = Random.nextInt()
-  def nextLong() = Random.nextLong()
-  def nextFloat() = Random.nextFloat()
-  def nextDouble() = Random.nextDouble()
-  def nextComplex[@spec A:FractionalWithNRoot](f: => A) = Complex(f, f)
-
-  // sugar for building randomized arrays of various types
-  def initInts(size:Int) = init(size)(nextInt())
-  def initLongs(size:Int) = init(size)(nextLong())
-  def initFloats(size:Int) = init(size)(nextFloat())
-  def initDoubles(size:Int) = init(size)(nextDouble())
-  def initComplexDoubles(size:Int) = init(size)(nextComplex(nextDouble()))
-
-  // sugar to run 'f' for 'reps' number of times
-  def run(reps:Int)(f: =>Unit) = for(i <- 0 until reps)(f)
+  /**
+   * Sugar to run 'f' for 'reps' number of times.
+   */
+  def run(reps:Int)(f: => Unit) = for(i <- 0 until reps)(f)
 }
 
-// extend this to create a main object which will run 'cls' (a benchmark)
+/**
+ * Extend this to create a main object which will run 'cls' (a benchmark).
+ */
 trait MyRunner {
   val cls:java.lang.Class[_ <: com.google.caliper.Benchmark]
-  def main(args:Array[String]) {
-    println("starting benchmarks...")
-    Runner.main(cls, args:_*)
-    println("completed benchmarks.")
-  }
+  def main(args:Array[String]): Unit = Runner.main(cls, args:_*)
 }
 
 
@@ -53,19 +44,21 @@ trait MyRunner {
  * Benchmarks the speed of direct/generic addition.
  */
 object AddBenchmarks extends MyRunner { val cls = classOf[AddBenchmarks] }
-class AddBenchmarks extends MyBenchmark {
-  //private val size = 4 * 1000 * 1000
-  private val size = 10 * 1000 * 1000
 
-  val ints = initInts(size)
-  val longs = initLongs(size)
-  val floats = initFloats(size)
-  val doubles = initDoubles(size)
+class AddBenchmarks extends MyBenchmark {
+  //private val size = 10 * 1000
+  //private val size = 100 * 1000
+  //private val size = 1 * 1000 * 1000
+  //private val size = 4 * 1000 * 1000
+  private val size = 20 * 1000 * 1000
+
+  val ints = init(size)(nextInt)
+  val longs = init(size)(nextLong)
+  val floats = init(size)(nextFloat)
+  val doubles = init(size)(nextDouble)
 
   //val complexes = init(size)(Complex(nextDouble(), nextDouble()))
   //val fcomplexes = init(size)(FastComplex(nextFloat(), nextFloat()))
-
-  println("init done")
 
   def addGeneric[@spec(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
     var total = Ring[A].zero
@@ -123,6 +116,9 @@ class AddBenchmarks extends MyBenchmark {
     total
   }
 
+  //def timeCompareIntsDirect(reps:Int) = run(reps)(compareIntsDirect(ints))
+  //def timeCompareIntsGeneric(reps:Int) = run(reps)(compareGeneric(ints))
+
   //def timeAddIntsDirect(reps:Int) = run(reps)(addIntsDirect(ints))
   //def timeAddIntsGeneric(reps:Int) = run(reps)(addGeneric(ints))
   //
@@ -134,58 +130,32 @@ class AddBenchmarks extends MyBenchmark {
   //
   //def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
   //def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
-  //
+
   //def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
   //def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))
   //def timeAddFastComplexes(reps:Int) = run(reps)(addFastComplexes(fcomplexes))
 
-
-
-  //def quicksortDoubles(data:Array[Double]):Array[Double] = {
-  //  val copy = data.clone()
-  //  scala.util.Sorting.quickSort(copy)
-  //  copy
-  //}
-  //def timeQuicksortDoubles(reps:Int) = run(reps)(quicksortDoubles(doubles))
-  //
-  //def sortDoubles(data:Array[Double]):Array[Double] = Sorting.sort(data)
-  //def timeSortDoubles(reps:Int) = run(reps)(sortDoubles(doubles))
-  //
-  //def sortDoublesInPlace(data:Array[Double]):Array[Double] = {
-  //  val copy = data.clone()
-  //  Sorting.sortInPlace(copy)
-  //  copy
-  //}
-  //def timeSortDoublesInPlace(reps:Int) = run(reps)(sortDoublesInPlace(doubles))
-  //
-  //def mySortDoubles(data:Array[Double]):Array[Double] = {
-  //  val copy = data.clone()
-  //  Sorting.mySort(copy)
-  //  copy
-  //}
-  //def timeMySortDoubles(reps:Int) = run(reps)(mySortDoubles(doubles))
-
-  def quicksortLongs(data:Array[Long]):Array[Long] = {
-    val copy = data.clone()
-    scala.util.Sorting.quickSort(copy)
-    copy
-  }
-  def timeQuicksortLongs(reps:Int) = run(reps)(quicksortLongs(longs))
+  def quickSortInts(data:Array[Int]) = scala.util.Sorting.quickSort(data)
+  def quickSortLongs(data:Array[Long]) = scala.util.Sorting.quickSort(data)
+  def quickSortFloats(data:Array[Float]) = scala.util.Sorting.quickSort(data)
+  def quickSortDoubles(data:Array[Double]) = scala.util.Sorting.quickSort(data)
   
-  def sortLongs(data:Array[Long]):Array[Long] = Sorting.sort(data)
-  def timeSortLongs(reps:Int) = run(reps)(sortLongs(longs))
+  def mergeSortGeneric[@spec T:Order:Manifest](data:Array[T]) = Sorting.mergeSort(data)
+  def quickSortGeneric[@spec T:Order:Manifest](data:Array[T]) = Sorting.quickSort(data)
+
+  def timeQuicksortInts(reps:Int) = run(reps)(quickSortInts(ints.clone))
+  def timeGenMergeSortInts(reps:Int) = run(reps)(mergeSortGeneric(ints.clone))
+  def timeGenQuickSortInts(reps:Int) = run(reps)(quickSortGeneric(ints.clone))
+
+  def timeQuicksortLongs(reps:Int) = run(reps)(quickSortLongs(longs.clone))
+  def timeGenMergeSortLongs(reps:Int) = run(reps)(mergeSortGeneric(longs.clone))
+  def timeGenQuickSortLongs(reps:Int) = run(reps)(quickSortGeneric(longs.clone))
+
+  def timeQuicksortFloats(reps:Int) = run(reps)(quickSortFloats(floats.clone))
+  def timeGenMergeSortFloats(reps:Int) = run(reps)(mergeSortGeneric(floats.clone))
+  def timeGenQuickSortFloats(reps:Int) = run(reps)(quickSortGeneric(floats.clone))
   
-  def sortLongsInPlace(data:Array[Long]):Array[Long] = {
-    val copy = data.clone()
-    Sorting.sortInPlace(copy)
-    copy
-  }
-  def timeSortLongsInPlace(reps:Int) = run(reps)(sortLongsInPlace(longs))
-  
-  def mySortLongs(data:Array[Long]):Array[Long] = {
-    val copy = data.clone()
-    Sorting.mySort(copy)
-    copy
-  }
-  def timeMySortLongs(reps:Int) = run(reps)(mySortLongs(longs))
+  def timeQuicksortDoubles(reps:Int) = run(reps)(quickSortDoubles(doubles.clone))
+  def timeGenMergeSortDoubles(reps:Int) = run(reps)(mergeSortGeneric(doubles.clone))
+  def timeGenQuickSortDoubles(reps:Int) = run(reps)(quickSortGeneric(doubles.clone))
 }
