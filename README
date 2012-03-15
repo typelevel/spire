@@ -1,4 +1,4 @@
-This is a library intended to support fast, generic math in Scala. It also
+Spire a library intended to support fast, generic math in Scala. It also
 adds some new number types (Complex[T], Rational, etc.).
 
 It began life as a series of proposed changes. At this point the hope is to

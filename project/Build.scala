@@ -3,11 +3,10 @@ import sbt.Keys._
 
 object MyBuild extends Build {
   lazy val project = Project("root", file(".")) settings(
-    name := "Scala Numerics",
-    organization := "na",
+    name := "Spire",
 
     scalaVersion := "2.9.1",
-    version := "0.1",
+    version := "0.2.0",
 
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize"),
 
@@ -19,7 +18,7 @@ object MyBuild extends Build {
     ),
 
     resolvers ++= Seq(
-      "Scala-Tools" at "http://www.scala-tools.org/repo-reloases/",
+      //"Scala-Tools" at "http://www.scala-tools.org/repo-reloases/",
       "Sonatype" at "http://oss.sonatype.org/content/repositories/snapshots"
     ),
 

@@ -3,8 +3,8 @@ package benchmark
 import scala.{specialized => spec}
 import scala.util.Random._
 
-import numerics.math._
-import numerics.math.Implicits._
+import spire.math._
+import spire.math.Implicits._
 
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark
