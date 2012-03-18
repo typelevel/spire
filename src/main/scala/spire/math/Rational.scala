@@ -2,8 +2,6 @@ package spire.math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions, abs, min}
 import Implicits._
-//import Ordering.Implicits._
-
 
 trait Fraction[@specialized(Long) A] {
   def num: A
