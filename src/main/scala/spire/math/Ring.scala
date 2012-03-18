@@ -34,13 +34,6 @@ final class RingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Ring[A]) 
   
   def sign: Sign = ev.sign(lhs)
   def signum: Int = ev.signum(lhs)
-
-  def toInt = ev.toInt(lhs)
-  def toLong = ev.toLong(lhs)
-  def toFloat = ev.toFloat(lhs)
-  def toDouble = ev.toDouble(lhs)
-  def toBigInt = ev.toBigInt(lhs)
-  def toBigDecimal = ev.toBigDecimal(lhs)
 }
 
 object Ring {

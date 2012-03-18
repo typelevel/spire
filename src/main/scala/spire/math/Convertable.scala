@@ -286,7 +286,7 @@ trait ConvertableFromRational extends ConvertableFrom[Rational] {
 }
 
 trait ConvertableFromComplex[A] extends ConvertableFrom[Complex[A]] {
-  val f:Fractional[A]
+  def f:Fractional[A]
   def toByte(a:Complex[A]): Byte = f.toByte(a.real)
   def toShort(a:Complex[A]): Short = f.toShort(a.real)
   def toInt(a:Complex[A]): Int = f.toInt(a.real)
@@ -315,4 +315,32 @@ trait ConvertableFromReal extends ConvertableFrom[Real] {
   def toString(a:Real): String = a.toString
 }
 
+object ConvertableFrom {
+  implicit object ConvertableFromByte extends ConvertableFromByte
+  implicit object ConvertableFromShort extends ConvertableFromShort
+  implicit object ConvertableFromInt extends ConvertableFromInt
+  implicit object ConvertableFromLong extends ConvertableFromLong
+  implicit object ConvertableFromFloat extends ConvertableFromFloat
+  implicit object ConvertableFromDouble extends ConvertableFromDouble
+  implicit object ConvertableFromBigInt extends ConvertableFromBigInt
+  implicit object ConvertableFromBigDecimal extends ConvertableFromBigDecimal
+  implicit object ConvertableFromRational extends ConvertableFromRational
+  implicit object ConvertableFromReal extends ConvertableFromReal
 
+  implicit def convertableFromComplex[A](implicit ev:Fractional[A]) = new ConvertableFromComplex[A] {
+    def f = ev
+  }
+}
+
+final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {
+  def toByte: Byte = ev.toByte(lhs)
+  def toShort: Short = ev.toShort(lhs)
+  def toInt: Int = ev.toInt(lhs)
+  def toLong: Long = ev.toLong(lhs)
+  def toFloat: Float = ev.toFloat(lhs)
+  def toDouble: Double = ev.toDouble(lhs)
+  def toBigInt: BigInt = ev.toBigInt(lhs)
+  def toBigDecimal: BigDecimal = ev.toBigDecimal(lhs)
+  def toRational: Rational = ev.toRational(lhs)
+  override def toString: String = ev.toString(lhs)
+}
