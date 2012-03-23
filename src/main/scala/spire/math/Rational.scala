@@ -376,36 +376,8 @@ protected abstract class Rationals[@specialized(Long) A](implicit integral: Inte
 object LongRationals extends Rationals[Long] {
   import BigRationals.BigRational
 
-
-  @tailrec private[math] def gcd(a: Long, b: Long): Long = if (b == 0L) {
-    abs(a)
-  } else {
-    gcd(b, a % b)
-  }
-  //private[math] def gcd(a: Long, b: Long): Long = gcd2(a, b, 0)
-
-  @tailrec private[math] def gcd2(a: Long, b: Long, shifts: Int): Long = {
-    // these are the terminal cases
-    if (a == b) a << shifts
-    else if (a == 0L) b << shifts
-    else if (b == 0L) a << shifts
-
-    // if a is even
-    else if ((~a & 1L) != 0L) {
-      // factor out 2 from a
-      if ((~b & 1L) != 0L) gcd2(a >> 1, b, shifts)
-      // remove out 2 from both, remembering to reapply it at the end.
-      else gcd2(a >> 1, b >> 1, shifts + 1)
-    }
-
-    // if b is even, factor out 2
-    else if ((~b & 1L) != 0L) gcd2(a, b >> 1, shifts)
-
-    // reduce whichever argument is larger
-    else if (a > b) gcd2((a - b) >> 1, b, shifts)
-    else gcd2((b - a) >> 1, a, shifts)
-  }
-
+  // inline the implementation we want to use
+  @inline final def gcd(a: Long, b: Long) = spire.math.fun.euclidGcd(a, b)
 
   def build(n: Long, d: Long): Rational = {
     val divisor = gcd(n, d)
