@@ -2,6 +2,9 @@ package spire.math
 
 import scala.annotation.tailrec
 
+// TODO: in 2.9 there is a bug where package objects break overloading.
+// in 2.10 and beyond this should just be the spire.math package object.
+
 object fun {
   // TODO: add nroot(base:Long, n:Long)
 
@@ -36,5 +39,33 @@ object fun {
 
   final def pow(base:Double, exponent:Double):Double = {
     java.lang.Math.pow(base, exponent)
+  }
+
+  @tailrec def euclidGcd(a: Long, b: Long): Long = if (b == 0L) {
+    scala.math.abs(a)
+  } else {
+    euclidGcd(b, a % b)
+  }
+
+  @tailrec def binaryGcd(a: Long, b: Long, shifts: Int = 0): Long = {
+    // these are the terminal cases
+    if (a == b) a << shifts
+    else if (a == 0L) b << shifts
+    else if (b == 0L) a << shifts
+
+    // if a is even
+    else if ((~a & 1L) != 0L) {
+      // factor out 2 from a
+      if ((b & 1L) != 0L) binaryGcd(a >> 1, b, shifts)
+      // remove out 2 from both, remembering to reapply it at the end.
+      else binaryGcd(a >> 1L, b >> 1L, shifts + 1)
+    }
+
+    // if b is even, factor out 2
+    else if ((~b & 1L) != 0L) binaryGcd(a, b >> 1L, shifts)
+
+    // reduce whichever argument is larger
+    else if (a > b) binaryGcd((a - b) >> 1L, b, shifts)
+    else binaryGcd((b - a) >> 1L, a, shifts)
   }
 }
