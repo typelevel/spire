@@ -37,29 +37,24 @@ trait MyRunner {
   def main(args:Array[String]): Unit = Runner.main(cls, args:_*)
 }
 
+trait BenchmarkData extends MyBenchmark {
+  //val size = 10 * 1000
+  //val size = 100 * 1000
+  //val size = 1 * 1000 * 1000
+  val size = 4 * 1000 * 1000
+  //val size = 20 * 1000 * 1000
 
-/**
- * AddBenchmarks
- *
- * Benchmarks the speed of direct/generic addition.
- */
+  lazy val ints = init(size)(nextInt)
+  lazy val longs = init(size)(nextLong)
+  lazy val floats = init(size)(nextFloat)
+  lazy val doubles = init(size)(nextDouble)
+
+  lazy val complexes = init(size)(Complex(nextDouble(), nextDouble()))
+  lazy val fcomplexes = init(size)(FastComplex(nextFloat(), nextFloat()))
+}
+
 object AddBenchmarks extends MyRunner { val cls = classOf[AddBenchmarks] }
-
-class AddBenchmarks extends MyBenchmark {
-  //private val size = 10 * 1000
-  //private val size = 100 * 1000
-  //private val size = 1 * 1000 * 1000
-  //private val size = 4 * 1000 * 1000
-  private val size = 20 * 1000 * 1000
-
-  val ints = init(size)(nextInt)
-  val longs = init(size)(nextLong)
-  val floats = init(size)(nextFloat)
-  val doubles = init(size)(nextDouble)
-
-  //val complexes = init(size)(Complex(nextDouble(), nextDouble()))
-  //val fcomplexes = init(size)(FastComplex(nextFloat(), nextFloat()))
-
+class AddBenchmarks extends MyBenchmark with BenchmarkData {
   def addGeneric[@spec(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
     var total = Ring[A].zero
     var i = 0
@@ -116,25 +111,25 @@ class AddBenchmarks extends MyBenchmark {
     total
   }
 
-  //def timeCompareIntsDirect(reps:Int) = run(reps)(compareIntsDirect(ints))
-  //def timeCompareIntsGeneric(reps:Int) = run(reps)(compareGeneric(ints))
+  def timeAddIntsDirect(reps:Int) = run(reps)(addIntsDirect(ints))
+  def timeAddIntsGeneric(reps:Int) = run(reps)(addGeneric(ints))
+  
+  def timeAddLongsDirect(reps:Int) = run(reps)(addLongsDirect(longs))
+  def timeAddLongsGeneric(reps:Int) = run(reps)(addGeneric(longs))
+  
+  def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
+  def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
+  
+  def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
+  def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
 
-  //def timeAddIntsDirect(reps:Int) = run(reps)(addIntsDirect(ints))
-  //def timeAddIntsGeneric(reps:Int) = run(reps)(addGeneric(ints))
-  //
-  //def timeAddLongsDirect(reps:Int) = run(reps)(addLongsDirect(longs))
-  //def timeAddLongsGeneric(reps:Int) = run(reps)(addGeneric(longs))
-  //
-  //def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
-  //def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
-  //
-  //def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
-  //def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
+  def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
+  def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))
+  def timeAddFastComplexes(reps:Int) = run(reps)(addFastComplexes(fcomplexes))
+}
 
-  //def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
-  //def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))
-  //def timeAddFastComplexes(reps:Int) = run(reps)(addFastComplexes(fcomplexes))
-
+object SortBenchmarks extends MyRunner { val cls = classOf[SortBenchmarks] }
+class SortBenchmarks extends MyBenchmark with BenchmarkData {
   def quickSortInts(data:Array[Int]) = scala.util.Sorting.quickSort(data)
   def quickSortLongs(data:Array[Long]) = scala.util.Sorting.quickSort(data)
   def quickSortFloats(data:Array[Float]) = scala.util.Sorting.quickSort(data)
@@ -146,11 +141,11 @@ class AddBenchmarks extends MyBenchmark {
   def timeQuicksortInts(reps:Int) = run(reps)(quickSortInts(ints.clone))
   def timeGenMergeSortInts(reps:Int) = run(reps)(mergeSortGeneric(ints.clone))
   def timeGenQuickSortInts(reps:Int) = run(reps)(quickSortGeneric(ints.clone))
-
+  
   def timeQuicksortLongs(reps:Int) = run(reps)(quickSortLongs(longs.clone))
   def timeGenMergeSortLongs(reps:Int) = run(reps)(mergeSortGeneric(longs.clone))
   def timeGenQuickSortLongs(reps:Int) = run(reps)(quickSortGeneric(longs.clone))
-
+  
   def timeQuicksortFloats(reps:Int) = run(reps)(quickSortFloats(floats.clone))
   def timeGenMergeSortFloats(reps:Int) = run(reps)(mergeSortGeneric(floats.clone))
   def timeGenQuickSortFloats(reps:Int) = run(reps)(quickSortGeneric(floats.clone))
@@ -158,4 +153,32 @@ class AddBenchmarks extends MyBenchmark {
   def timeQuicksortDoubles(reps:Int) = run(reps)(quickSortDoubles(doubles.clone))
   def timeGenMergeSortDoubles(reps:Int) = run(reps)(mergeSortGeneric(doubles.clone))
   def timeGenQuickSortDoubles(reps:Int) = run(reps)(quickSortGeneric(doubles.clone))
+}
+
+object GcdBenchmarks extends MyRunner { val cls = classOf[GcdBenchmarks] }
+class GcdBenchmarks extends MyBenchmark with BenchmarkData {
+  def sumEuclidGcds(data:Array[Long]):Long = {
+    var total = 0L
+    var i = 0
+    val len = data.length - 1
+    while (i < len) {
+      total += spire.math.fun.euclidGcd(data(i), data(i + 1))
+      i += 1
+    }
+    total
+  }
+
+  def sumBinaryGcds(data:Array[Long]):Long = {
+    var total = 0L
+    var i = 0
+    val len = data.length - 1
+    while (i < len) {
+      total += spire.math.fun.euclidGcd(data(i), data(i + 1))
+      i += 1
+    }
+    total
+  }
+
+  def timeSumEuclidGcds(reps:Int) = run(reps)(sumEuclidGcds(longs))
+  def timeSumBinaryGcds(reps:Int) = run(reps)(sumBinaryGcds(longs))
 }
