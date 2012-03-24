@@ -10,7 +10,8 @@ import scala.{specialized => spec}
  * 6. Start to worry about things like e.g. pow(BigInt, BigInt)
  */
 
-trait Numeric[@spec(Int,Long,Float,Double) A] extends Field[A] with Order[A]
+trait Numeric[@spec(Int,Long,Float,Double) A]
+extends Field[A] with ConvertableFrom[A] with ConvertableTo[A] with Order[A]
 
 object Numeric {
   implicit object IntIsNumeric extends IntIsNumeric
@@ -26,26 +27,56 @@ object Numeric {
   def apply[A](implicit e:Numeric[A]):Numeric[A] = e
 }
 
-trait IntIsNumeric extends Numeric[Int] with IntIsEuclideanRing with IntOrder {
+trait IntIsNumeric extends Numeric[Int] with IntIsEuclideanRing
+with ConvertableFromInt with ConvertableToInt with IntOrder {
+  override def fromInt(n: Int): Int = n
   def div(a:Int, b:Int) = a / b
 }
 
-trait LongIsNumeric extends Numeric[Long] with LongIsEuclideanRing with LongOrder {
+trait LongIsNumeric extends Numeric[Long] with LongIsEuclideanRing
+with ConvertableFromLong with ConvertableToLong with LongOrder {
+  override def fromInt(n: Int): Long = n
   def div(a:Long, b:Long) = a / b
 }
 
-trait BigIntIsNumeric extends Numeric[BigInt] with BigIntIsEuclideanRing with BigIntOrder {
+trait BigIntIsNumeric extends Numeric[BigInt] with BigIntIsEuclideanRing
+with ConvertableFromBigInt with ConvertableToBigInt with BigIntOrder {
+  override def fromInt(n: Int): BigInt = super[ConvertableToBigInt].fromInt(n)
   def div(a:BigInt, b:BigInt) = a / b
 }
 
-trait FloatIsNumeric extends Numeric[Float] with FloatIsField with FloatOrder
-trait DoubleIsNumeric extends Numeric[Double] with DoubleIsField with DoubleOrder
-trait BigDecimalIsNumeric extends Numeric[BigDecimal] with BigDecimalIsField with BigDecimalOrder
-trait RationalIsNumeric extends Numeric[Rational] with RationalIsField with RationalOrder
-trait RealIsNumeric extends Numeric[Real] with RealIsField with RealOrder
+trait FloatIsNumeric extends Numeric[Float] with FloatIsField
+with ConvertableFromFloat with ConvertableToFloat with FloatOrder {
+  override def fromInt(n: Int): Float = n
+}
+
+trait DoubleIsNumeric extends Numeric[Double] with DoubleIsField
+with ConvertableFromDouble with ConvertableToDouble with DoubleOrder {
+  override def fromInt(n: Int): Double = n
+}
+
+trait BigDecimalIsNumeric extends Numeric[BigDecimal] with BigDecimalIsField
+with ConvertableFromBigDecimal with ConvertableToBigDecimal with BigDecimalOrder {
+  override def fromInt(n: Int): BigDecimal = super[ConvertableToBigDecimal].fromInt(n)
+}
+
+trait RationalIsNumeric extends Numeric[Rational] with RationalIsField
+with ConvertableFromRational with ConvertableToRational with RationalOrder {
+  override def fromInt(n: Int): Rational = super[ConvertableToRational].fromInt(n)
+}
+
+trait RealIsNumeric extends Numeric[Real] with RealIsField
+with ConvertableFromReal with ConvertableToReal with RealOrder {
+  override def fromInt(n: Int): Real = super[ConvertableToReal].fromInt(n)
+}
+
 
 class ComplexIsNumeric[A](implicit val f:FractionalWithNRoot[A])
-extends ComplexIsField[A] with Numeric[Complex[A]] with Order[Complex[A]] {
+extends ComplexIsField[A] with Numeric[Complex[A]]
+with ConvertableFromComplex[A] with ConvertableToComplex[A]
+with Order[Complex[A]] {
+  override def fromInt(n: Int): Complex[A] = super[ConvertableToComplex].fromInt(n)
+
   def gt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   def gteq(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
