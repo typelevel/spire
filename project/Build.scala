@@ -10,6 +10,9 @@ object MyBuild extends Build {
 
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize"),
 
+    // raise memory limits here if necessary
+    //javaOptions in run += "-Xmx4G",
+
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "1.6.1",
       "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.0",

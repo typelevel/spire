@@ -1,9 +1,8 @@
 package spire.math
 
+import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions, abs, min}
 import Implicits._
-//import Ordering.Implicits._
-
 
 trait Fraction[@specialized(Long) A] {
   def num: A
@@ -377,13 +376,8 @@ protected abstract class Rationals[@specialized(Long) A](implicit integral: Inte
 object LongRationals extends Rationals[Long] {
   import BigRationals.BigRational
 
-
-  private[math] def gcd(a: Long, b: Long): Long = if (b == 0L) {
-    abs(a)
-  } else {
-    gcd(b, a % b)
-  }
-
+  // inline the implementation we want to use
+  @inline final def gcd(a: Long, b: Long) = spire.math.fun.euclidGcd(a, b)
 
   def build(n: Long, d: Long): Rational = {
     val divisor = gcd(n, d)

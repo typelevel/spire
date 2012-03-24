@@ -2,238 +2,201 @@ package spire.math
 
 import Implicits._
 
-// TODO: eventaully remove this because we're not using it.
-
-// TODO: we need some kind of generic Interval on Rings without division,
-// which DiscreteInterval and ContinuousInterval can inherit from and provide
-// their own implementations.
-
-// NOTE: Intervals are being removed from the proposal. This is mostly
-// historical at this point.
-
 sealed trait Bound[T] {
-  val num:Fractional[T]
+  implicit def order:Order[T]
 
-  def <(rhs:Bound[T]):Boolean
-  def <=(rhs:Bound[T]):Boolean
-  def >(rhs:Bound[T]):Boolean
-  def >=(rhs:Bound[T]):Boolean
+  def toUpper:Upper[T]
+  def toLower:Lower[T]
 
-  def min(rhs:Bound[T]):Bound[T]
-  def max(rhs:Bound[T]):Bound[T]
+  def compare(rhs:Bound[T]):Int
+  def comparePt(t:T):Int
 
-  def isZero:Boolean
-  def isAboveZero:Boolean
-  def isAtOrAboveZero:Boolean
-  def isBelowZero:Boolean
-  def isAtOrBelowZero:Boolean
+  def unop(f:T => T):Bound[T]
+  def binop(rhs:Bound[T])(f:(T, T) => T):Bound[T]
 
-  def n:T
+  def <(rhs:Bound[T]) = compare(rhs) < 0
+  def <=(rhs:Bound[T]) = compare(rhs) < 1
+  def >(rhs:Bound[T]) = compare(rhs) > 0
+  def >=(rhs:Bound[T]) = compare(rhs) > -1
 
-  def unop(f:Function1[T, T]):Bound[T]
-  def abs:Bound[T] = unop(t => num.abs(t))
-  def negate:Bound[T] = unop(t => num.negate(t))
-
-  def binop(rhs:Bound[T], f:Function2[T, T, T]):Bound[T]
-  def +(rhs:Bound[T]) = binop(rhs, (x:T, y:T) => num.plus(x, y))
-  def -(rhs:Bound[T]) = binop(rhs, (x:T, y:T) => num.minus(x, y))
-  def *(rhs:Bound[T]) = binop(rhs, (x:T, y:T) => num.times(x, y))
-  def /(rhs:Bound[T]) = binop(rhs, (x:T, y:T) => num.div(x, y))
+  def min(rhs:Bound[T]):Bound[T] = if (this < rhs) this else rhs
+  def max(rhs:Bound[T]):Bound[T] = if (this > rhs) this else rhs
 }
 
-case class UnboundBelow[T:Fractional]() extends Bound[T] {
-  val num = implicitly[Fractional[T]]
-
-  def <(rhs:Bound[T]) = true
-  def <=(rhs:Bound[T]) = true
-  def >(rhs:Bound[T]) = false
-  def >=(rhs:Bound[T]) = false
-
-  def isZero = false
-  def isAboveZero = false
-  def isAtOrAboveZero = false
-  def isBelowZero = true
-  def isAtOrBelowZero = true
-
-  def n = throw new Exception("has no boundary value")
-
-  def unop(f:Function1[T, T]) = this
-  def binop(rhs:Bound[T], f:Function2[T, T, T]) = rhs match {
-    case UnboundAbove() => sys.error("undefined")
-    case _ => this
-  }
-
-  def min(rhs:Bound[T]) = this
-  def max(rhs:Bound[T]) = rhs
+class BoundRingOps[T:Ring](lhs:Bound[T]) {
+  def abs = lhs.unop(_.abs)
+  def unary_- = lhs.unop(-_)
+  def +(rhs:T) = lhs.unop(_ + rhs)
+  def -(rhs:T) = lhs.unop(_ - rhs)
+  def *(rhs:T) = lhs.unop(_ * rhs)
+  def +(rhs:Bound[T]) = lhs.binop(rhs)(_ + _)
+  def -(rhs:Bound[T]) = lhs.binop(rhs)(_ - _)
+  def *(rhs:Bound[T]) = lhs.binop(rhs)(_ * _)
+  def pow(rhs:Int) = lhs.unop(_ pow rhs)
 }
 
-case class UnboundAbove[T:Fractional]() extends Bound[T] {
-  val num = implicitly[Fractional[T]]
-
-  def <(rhs:Bound[T]) = false
-  def <=(rhs:Bound[T]) = false
-  def >(rhs:Bound[T]) = true
-  def >=(rhs:Bound[T]) = true
-
-  def isZero = false
-  def isAboveZero = true
-  def isAtOrAboveZero = true
-  def isBelowZero = false
-  def isAtOrBelowZero = false
-
-  def n = throw new Exception("has no boundary value")
-
-  def unop(f:Function1[T, T]) = this
-  def binop(rhs:Bound[T], f:Function2[T, T, T]) = rhs match {
-    case UnboundBelow() => sys.error("undefined")
-    case _ => this
-  }
-
-  def min(rhs:Bound[T]) = rhs
-  def max(rhs:Bound[T]) = this
+class BoundEuclideanRingOps[T:EuclideanRing](lhs:Bound[T]) {
+  def /~(rhs:T) = lhs.unop(_ /~ rhs)
+  def /~(rhs:Bound[T]) = lhs.binop(rhs)(_ /~ _)
 }
 
-case class OpenBound[T:Fractional](n:T) extends Bound[T] {
-  val num = implicitly[Fractional[T]]
+class BoundFieldOps[T:Field](lhs:Bound[T]) {
+  def /(rhs:T) = lhs.unop(_ / rhs)
+  def /(rhs:Bound[T]) = lhs.binop(rhs)(_ / _)
+}
 
-  def <(rhs:Bound[T]) = rhs match {
-    case UnboundAbove() => true
-    case UnboundBelow() => false
-    case _ => n < rhs.n
-  }
-  def <=(rhs:Bound[T]) = rhs match {
-    case UnboundAbove() => true
-    case UnboundBelow() => false
-    case OpenBound(m) => n <= m
-    case ClosedBound(m) => n < m
-  }
-  def >(rhs:Bound[T]) = rhs match {
-    case UnboundAbove() => false
-    case UnboundBelow() => true
-    case _ => n > rhs.n
-  }
-  def >=(rhs:Bound[T]) = rhs match {
-    case UnboundAbove() => false
-    case UnboundBelow() => true
-    case OpenBound(m) => n >= m
-    case ClosedBound(m) => n > m
-  }
+trait Lower[T] extends Bound[T] { def toLower = this }
+trait Upper[T] extends Bound[T] { def toUpper = this }
 
-  def isZero = n == num.zero
-  def isAboveZero = n >= num.zero
-  def isAtOrAboveZero = n >= num.zero
-  def isBelowZero = n <= num.zero
-  def isAtOrBelowZero = n <= num.zero
+trait Unbound[T] extends Bound[T] {
+  def unop(f:T => T):Bound[T] = this
+  def binop(rhs:Bound[T])(f:(T, T) => T):Bound[T] = this
+}
 
-  def unop(f:Function1[T, T]) = OpenBound(f(n))
-  def binop(rhs:Bound[T], f:Function2[T, T, T]) = rhs match {
-    case UnboundAbove() => rhs
-    case UnboundBelow() => rhs
-    case _ => OpenBound(f(n, rhs.n))
+case class UnboundBelow[T]()(implicit val order:Order[T]) extends Lower[T] with Unbound[T] {
+  def compare(rhs:Bound[T]) = rhs match {
+    case UnboundBelow() => 0
+    case _ => -1
   }
+  def comparePt(t:T) = -1
+  def toUpper = UnboundAbove[T]
+}
 
-  def min(rhs:Bound[T]) = rhs match {
-    case UnboundBelow() => rhs
-    case UnboundAbove() => this
-    case _ => if (n < rhs.n) this else rhs
+case class UnboundAbove[T]()(implicit val order:Order[T]) extends Upper[T] with Unbound[T] {
+  def compare(rhs:Bound[T]) = rhs match {
+    case UnboundAbove() => 0
+    case _ => 1
   }
-  def max(rhs:Bound[T]) = rhs match {
-    case UnboundBelow() => this
-    case UnboundAbove() => rhs
-    case _ => if (n > rhs.n) this else rhs
+  def comparePt(t:T) = 1
+  def toLower = UnboundBelow[T]
+}
+
+trait Closed[T] {
+  implicit def order:Order[T]
+  def x:T
+  def compare(rhs:Bound[T]) = rhs match {
+    case UnboundBelow() => 1
+    case UnboundAbove() => -1
+    case ClosedBelow(y) => x cmp y
+    case ClosedAbove(y) => x cmp y
+    case OpenBelow(y) => if (x <= y) -1 else 1
+    case OpenAbove(y) => if (x < y) -1 else 1
+  }
+  def comparePt(t:T) = x cmp t
+  def binop(rhs:Bound[T])(f:(T, T) => T):Bound[T] = rhs match {
+    case UnboundBelow() => UnboundBelow()
+    case UnboundAbove() => UnboundBelow()
+    case OpenBelow(y) => OpenBelow(f(x, y))
+    case OpenAbove(y) => OpenBelow(f(x, y))
+    case ClosedBelow(y) => ClosedBelow(f(x, y))
+    case ClosedAbove(y) => ClosedBelow(f(x, y))
   }
 }
 
-case class ClosedBound[T:Fractional](n:T) extends Bound[T] {
-  val num = implicitly[Fractional[T]]
+case class ClosedBelow[T](x:T)(implicit val order:Order[T]) extends Lower[T] with Closed[T] {
+  def toUpper = ClosedAbove(x)
+  def unop(f:T => T) = ClosedBelow(f(x))
+  override def binop(rhs:Bound[T])(f:(T, T) => T):Lower[T] = super.binop(rhs)(f).toLower
+}
 
-  def <(rhs:Bound[T]) = rhs match {
-    case UnboundAbove() => true
-    case UnboundBelow() => false
-    case _ => n < rhs.n
-  }
-  def <=(rhs:Bound[T]) = rhs match {
-    case UnboundAbove() => true
-    case UnboundBelow() => false
-    case _ => n <= rhs.n
-  }
-  def >(rhs:Bound[T]) = rhs match {
-    case UnboundAbove() => false
-    case UnboundBelow() => true
-    case _ => n > rhs.n
-  }
-  def >=(rhs:Bound[T]) = rhs match {
-    case UnboundAbove() => false
-    case UnboundBelow() => true
-    case _ => n >= rhs.n
-  }
+case class ClosedAbove[T](x:T)(implicit val order:Order[T]) extends Upper[T] with Closed[T] {
+  def toLower = ClosedBelow(x)
+  def unop(f:T => T) = ClosedAbove(f(x))
+  override def binop(rhs:Bound[T])(f:(T, T) => T):Upper[T] = super.binop(rhs)(f).toUpper
+}
 
-  def isZero = n == num.zero
-  def isAboveZero = n > num.zero
-  def isAtOrAboveZero = n >= num.zero
-  def isBelowZero = n < num.zero
-  def isAtOrBelowZero = n <= num.zero
-
-  def unop(f:Function1[T, T]) = ClosedBound(f(n))
-  def binop(rhs:Bound[T], f:Function2[T, T, T]):Bound[T] = rhs match {
-    case UnboundAbove() => rhs
-    case UnboundBelow() => rhs
-    case OpenBound(m) => OpenBound(f(n, m))
-    case ClosedBound(m) => ClosedBound(f(n, m))
-  }
-
-  def min(rhs:Bound[T]) = rhs match {
-    case UnboundAbove() => this
-    case UnboundBelow() => rhs
-    case _ => if (n <= rhs.n) this else rhs
-  }
-  def max(rhs:Bound[T]) = rhs match {
-    case UnboundAbove() => rhs
-    case UnboundBelow() => this
-    case _ => if (n >= rhs.n) this else rhs
+trait Open[T] {
+  implicit def order:Order[T]
+  def x:T
+  def binop(rhs:Bound[T])(f:(T, T) => T):Bound[T] = rhs match {
+    case UnboundBelow() => UnboundBelow()
+    case UnboundAbove() => UnboundBelow()
+    case OpenBelow(y) => OpenBelow(f(x, y))
+    case OpenAbove(y) => OpenBelow(f(x, y))
+    case ClosedBelow(y) => OpenBelow(f(x, y))
+    case ClosedAbove(y) => OpenBelow(f(x, y))
   }
 }
 
-case class Interval[T:Fractional](lower:Bound[T], upper:Bound[T]) {
-  assert (lower <= upper)
-  assert (!lower.isInstanceOf[UnboundAbove[_]])
-  assert (!upper.isInstanceOf[UnboundBelow[_]])
-
-  val num = implicitly[Fractional[T]]
-
-  def isPositive = !lower.isAtOrBelowZero
-  def isNegative = !lower.isAtOrAboveZero
-  def isZero = lower.isZero && upper.isZero
-  def containsZero = lower.isAtOrBelowZero && upper.isAtOrAboveZero
-  def crossesZero = lower.isBelowZero && upper.isAboveZero
-
-  def splitAtZero:(Interval[T], Interval[T]) = if (lower.isAtOrAboveZero) {
-    (Interval.empty, this)
-  } else if (upper.isAtOrBelowZero) {
-    (this, Interval.empty)
-  } else {
-    // need to return two new intervals here
-    sys.error("todo")
+case class OpenBelow[T](x:T)(implicit val order:Order[T]) extends Lower[T] with Open[T] {
+  def compare(rhs:Bound[T]) = rhs match {
+    case UnboundBelow() => 1
+    case UnboundAbove() => -1
+    case ClosedBelow(y) => if (x < y) -1 else 1
+    case ClosedAbove(y) => if (x < y) -1 else 1
+    case OpenBelow(y) => x cmp y
+    case OpenAbove(y) => if (x < y) -1 else 1
   }
-  
+  def comparePt(t:T) = if (x < t) -1 else 1
+  def toUpper = OpenAbove(x)
+  def unop(f:T => T) = OpenBelow(f(x))
+  override def binop(rhs:Bound[T])(f:(T, T) => T):Lower[T] = super.binop(rhs)(f).toLower
+}
+
+case class OpenAbove[T](x:T)(implicit val order:Order[T]) extends Upper[T] with Open[T] {
+  def compare(rhs:Bound[T]) = rhs match {
+    case UnboundBelow() => 1
+    case UnboundAbove() => -1
+    case ClosedBelow(y) => if (x <= y) -1 else 1
+    case ClosedAbove(y) => if (x <= y) -1 else 1
+    case OpenBelow(y) => if (x <= y) -1 else 1
+    case OpenAbove(y) => x cmp y
+  }
+  def comparePt(t:T) = if (x <= t) -1 else 1
+  def toLower = OpenBelow(x)
+  def unop(f:T => T) = OpenAbove(f(x))
+  override def binop(rhs:Bound[T])(f:(T, T) => T):Upper[T] = super.binop(rhs)(f).toUpper
+}
+
+trait GenInterval[T, U <: GenInterval[T, U]] {
+  implicit def order:Order[T]
+
+  def lower:Lower[T]
+  def upper:Upper[T]
+
+  protected[this] def coerce(a:Bound[T], b:Bound[T]):U
+
+  def isAbove(t:T) = 0 < lower.comparePt(t)
+  def isBelow(t:T) = upper.comparePt(t) < 0
+  def isAt(t:T) = lower.comparePt(t) == 0 && 0 == upper.comparePt(t)
+  def contains(t:T) = lower.comparePt(t) <= 0 && 0 <= upper.comparePt(t)
+  def crosses(t:T) = lower.comparePt(t) < 0 && 0 < upper.comparePt(t)
+
+  def mask(rhs:U):U = coerce(lower max rhs.lower, upper min rhs.upper)
+
+  def split(t:T):(U, U) = {
+    val below = coerce(UnboundBelow[T], OpenAbove(t))
+    val above = coerce(OpenBelow(t), UnboundAbove[T])
+    (this mask below, this mask above)
+  }
+}
+
+trait GenRingInterval[T, U <: GenRingInterval[T, U]] extends GenInterval[T, U] {
+  implicit def num:Ring[T]
+
+  implicit def boundRingOps(b:Bound[T]) = new BoundRingOps(b)
+
+  def splitAtZero = split(num.zero)
+
   def abs = {
     val a = lower.abs
     val b = upper.abs
-    if (crossesZero) {
-      Interval(ClosedBound(num.zero), a max b)
-    } else if (a < b) {
-      Interval(a, b)
-    } else {
-      Interval(b, a)
-    }
+    if (crosses(num.zero)) coerce(ClosedBelow(num.zero), a max b)
+    else if (a < b) coerce(a, b)
+    else coerce(b, a)
   }
   
-  def +(rhs:Interval[T]) = Interval(lower + rhs.lower, upper + rhs.upper)
-  def -(rhs:Interval[T]) = Interval(lower - rhs.lower, upper - rhs.upper)
-
-  def *(rhs:Interval[T]):Interval[T] = {
-    val tcz = crossesZero
-    val rcz = rhs.crossesZero
+  def unary_- = coerce(-upper, -lower)
+  
+  def +(rhs:U):U = coerce(lower + rhs.lower, upper + rhs.upper)
+  def +(rhs:T):U = coerce(lower + rhs, upper + rhs)
+  
+  def -(rhs:U):U = coerce(lower - rhs.upper, upper - rhs.lower)
+  def -(rhs:T):U = coerce(lower - rhs, upper - rhs)
+  
+  def *(rhs:U):U = {
+    val tcz = crosses(num.zero)
+    val rcz = rhs.crosses(num.zero)
   
     val ll = lower * rhs.lower
     val lu = lower * rhs.upper
@@ -241,30 +204,117 @@ case class Interval[T:Fractional](lower:Bound[T], upper:Bound[T]) {
     val uu = upper * rhs.upper
   
     if (tcz && rcz) {
-      Interval(lu min ul, ll max uu)
+      coerce(lu min ul, ll max uu)
     } else if (tcz) {
-      Interval(ll min lu, ul max uu)
+      coerce(ll min lu, ul max uu)
     } else if (rcz) {
-      Interval(ll min ul, lu max uu)
-    } else if (isNegative == rhs.isNegative) {
-      Interval(ll min uu, ll max uu)
+      coerce(ll min ul, lu max uu)
+    } else if (isBelow(num.zero) == rhs.isBelow(num.zero)) {
+      coerce(ll min uu, ll max uu)
     } else {
-      Interval(lu min ul, lu max ul)
+      coerce(lu min ul, lu max ul)
     }
   }
+  def *(rhs:T):U = {
+    val a = lower * rhs
+    val b = upper * rhs
+    if (a < b) coerce(a, b) else coerce(b, a)
+  }
 
-  def /(rhs:Interval[T]) = {
-    if (rhs.containsZero) throw new Exception("/ by interval containing 0")
-
-    sys.error("todo")
+  def pow(rhs:Int):U = {
+    val a = lower pow rhs
+    val b = upper pow rhs
+  
+    if (contains(num.zero) && rhs % 2 == 0) {
+      coerce(ClosedBelow(num.zero), a max b)
+    } else {
+      if (a < b) coerce(a, b) else coerce(b, a)
+    }
   }
 }
 
-object Interval {
-  def open[T:Fractional](a:T, b:T) = Interval(OpenBound(a), OpenBound(b))
-  def closed[T:Fractional](a:T, b:T) = Interval(ClosedBound(a), ClosedBound(b))
-  def unbounded[T:Fractional] = Interval[T](UnboundBelow(), UnboundAbove())
+trait GenDiscreteInterval[T, U <: GenDiscreteInterval[T, U]] extends GenRingInterval[T, U] {
+  implicit def num:EuclideanRing[T]
+  implicit def order:Order[T]
 
-  def empty[T](implicit num:Fractional[T]) = open(num.zero, num.zero)
-  def degenerate[T:Fractional](t:T) = closed(t, t)
+  implicit def boundEuclideanRingOps(b:Bound[T]) = new BoundEuclideanRingOps(b)
+
+  def /~(rhs:U):U = {
+    if (rhs.contains(num.zero)) sys.error("divide-by-zero possible")
+
+    val ll = lower /~ rhs.lower
+    val lu = lower /~ rhs.upper
+    val ul = upper /~ rhs.lower
+    val uu = upper /~ rhs.upper
+
+    val bz = rhs.isBelow(num.zero)
+
+    if (crosses(num.zero)) {
+      if (bz) coerce(uu, lu) else coerce(ll, ul)
+    } else if (isAbove(num.zero)) {
+      if (bz) coerce(uu, ll) else coerce(lu, ul)
+    } else {
+      if (bz) coerce(ul, lu) else coerce(ll, uu)
+    }
+  }
+  def /~(rhs:T) = {
+    val a = lower /~ rhs
+    val b = upper /~ rhs
+    if (a < b) coerce(a, b) else coerce(b, a)
+  }
+}
+
+trait GenContinuousInterval[T, U <: GenContinuousInterval[T, U]] extends GenRingInterval[T, U] {
+  implicit def num:Field[T]
+  implicit def order:Order[T]
+
+  implicit def boundFieldOps(b:Bound[T]) = new BoundFieldOps(b)
+
+  def /(rhs:U):U = {
+    if (rhs.contains(num.zero)) sys.error("divide-by-zero possible")
+
+    val ll = lower / rhs.lower
+    val lu = lower / rhs.upper
+    val ul = upper / rhs.lower
+    val uu = upper / rhs.upper
+
+    val bz = rhs.isBelow(num.zero)
+
+    if (crosses(num.zero)) {
+      if (bz) coerce(uu, lu) else coerce(ll, ul)
+    } else if (isAbove(num.zero)) {
+      if (bz) coerce(uu, ll) else coerce(lu, ul)
+    } else {
+      if (bz) coerce(ul, lu) else coerce(ll, uu)
+    }
+  }
+  def /(rhs:T) = {
+    val a = lower / rhs
+    val b = upper / rhs
+    if (a < b) coerce(a, b) else coerce(b, a)
+  }
+}
+
+case class Interval[T](lower:Lower[T], upper:Upper[T])(implicit val order:Order[T])
+extends GenInterval[T, Interval[T]] {
+  protected[this] def coerce(a:Bound[T], b:Bound[T]) = Interval(a.toLower, b.toUpper)
+}
+
+case class RingInterval[T](lower:Lower[T], upper:Upper[T])(implicit val order:Order[T], val num:Ring[T])
+extends GenRingInterval[T, RingInterval[T]] {
+  protected[this] def coerce(a:Bound[T], b:Bound[T]) = RingInterval(a.toLower, b.toUpper)
+}
+
+case class DiscreteInterval[T](lower:Lower[T], upper:Upper[T])(implicit f:Integral[T])
+extends GenDiscreteInterval[T, DiscreteInterval[T]] {
+  implicit def num:EuclideanRing[T] = f
+  implicit def order:Order[T] = f
+  protected[this] def coerce(a:Bound[T], b:Bound[T]) = DiscreteInterval(a.toLower, b.toUpper)
+}
+
+case class ContinuousInterval[T](lower:Lower[T], upper:Upper[T])(implicit f:Fractional[T])
+extends GenContinuousInterval[T, ContinuousInterval[T]] {
+  implicit def num:Field[T] = f
+  implicit def order:Order[T] = f
+  protected[this] def coerce(a:Bound[T], b:Bound[T]) = ContinuousInterval(a.toLower, b.toUpper)
 }
