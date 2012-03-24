@@ -23,7 +23,7 @@ trait LowPriorityFPFilterWrappers {
    * approximately by a `Double`, that it'll return an `Infinity` or `NaN`
    * instead. Otherwise, the results are undefined (and most likely incorrect).
    */
-  implicit def genericFPFilter[A: Ring]: FPFilterWrapper[A] = new FPFilterWrapper[A] {
+  implicit def genericFPFilter[A: Numeric]: FPFilterWrapper[A] = new FPFilterWrapper[A] {
     def wrap(a: A): FPFilter[A] = new FPFilter(MaybeDouble.approx(a.toDouble), a)
   }
 }
@@ -49,19 +49,19 @@ object FPFilterWrapper extends LowPriorityFPFilterWrappers {
   }
 
   implicit object LongFPFilterWrapper extends FPFilterWrapper[Long] {
-    def wrap(a: Long): FPFilter[Long] = FPFilterIsRing[Long].fromLong(a)
+    def wrap(a: Long): FPFilter[Long] = Numeric[FPFilter[Long]].fromLong(a)
   }
 
   implicit object BigIntFPFilterWrapper extends FPFilterWrapper[BigInt] {
-    def wrap(a: BigInt): FPFilter[BigInt] = FPFilterIsRing[BigInt].fromBigInt(a)
+    def wrap(a: BigInt): FPFilter[BigInt] = Numeric[FPFilter[BigInt]].fromBigInt(a)
   }
 
   implicit object BigDecimalFPFilterWrapper extends FPFilterWrapper[BigDecimal] {
-    def wrap(a: BigDecimal): FPFilter[BigDecimal] = FPFilterIsRing[BigDecimal].fromBigDecimal(a)
+    def wrap(a: BigDecimal): FPFilter[BigDecimal] = Numeric[FPFilter[BigDecimal]].fromBigDecimal(a)
   }
 
   implicit object RationalFPFilterWrapper extends FPFilterWrapper[Rational] {
-    def wrap(a: Rational): FPFilter[Rational] = FPFilterIsRing[Rational].fromRational(a)
+    def wrap(a: Rational): FPFilter[Rational] = Numeric[FPFilter[Rational]].fromRational(a)
   }
 }
 

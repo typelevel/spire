@@ -2,7 +2,8 @@ package spire.math
 
 import scala.{specialized => spec}
 
-trait Fractional[@spec(Float,Double) A] extends Field[A] with Order[A] {
+trait Fractional[@spec(Float,Double) A] extends Field[A]
+with ConvertableFrom[A] with ConvertableTo[A] with Order[A] {
   def ceil(a:A):A
   def floor(a:A):A
 }
@@ -22,12 +23,16 @@ object Fractional {
   def apply[A](implicit f:Fractional[A]) = f
 }
 
-trait FloatIsFractional extends Fractional[Float] with FloatIsField with FloatOrder {
+trait FloatIsFractional extends Fractional[Float] with FloatIsField
+with ConvertableFromFloat with ConvertableToFloat with FloatOrder {
+  override def fromInt(n: Int): Float = n
   def ceil(a:Float) = scala.math.ceil(a).toFloat
   def floor(a:Float) = scala.math.floor(a).toFloat
 }
 
-trait DoubleIsFractional extends Fractional[Double] with DoubleIsField with DoubleOrder {
+trait DoubleIsFractional extends Fractional[Double] with DoubleIsField
+with ConvertableFromDouble with ConvertableToDouble with DoubleOrder {
+  override def fromInt(n: Int): Double = n
   def ceil(a:Double) = scala.math.ceil(a)
   def floor(a:Double) = scala.math.floor(a)
 }
@@ -58,8 +63,9 @@ trait GenericCeilAndFloor[A] { self: Fractional[A] =>
   }
 }
 
-trait BigDecimalIsFractional extends Fractional[BigDecimal]
-with BigDecimalIsField with BigDecimalOrder {
+trait BigDecimalIsFractional extends Fractional[BigDecimal] with BigDecimalIsField
+with ConvertableFromBigDecimal with ConvertableToBigDecimal with BigDecimalOrder {
+  override def fromInt(n: Int): BigDecimal = super[ConvertableToBigDecimal].fromInt(n)
   def ceil(a:BigDecimal) = {
     val (q, r) = a /% 1
     if (r > 0) q + BigDecimal(1) else q
@@ -67,8 +73,15 @@ with BigDecimalIsField with BigDecimalOrder {
   def floor(a:BigDecimal) = a.quot(1)
 }
 
-trait RationalIsFractional extends Fractional[Rational]
-with RationalIsField with RationalOrder with GenericCeilAndFloor[Rational]
+trait RationalIsFractional extends Fractional[Rational] with RationalIsField
+with ConvertableFromRational with ConvertableToRational with RationalOrder
+with GenericCeilAndFloor[Rational] {
+  override def fromInt(n: Int): Rational = super[ConvertableToRational].fromInt(n)
+}
 
-trait RealIsFractional extends Fractional[Real]
-with RealIsField with RealOrder with GenericCeilAndFloor[Real]
+
+trait RealIsFractional extends Fractional[Real] with RealIsField
+with ConvertableFromReal with ConvertableToReal with RealOrder
+with GenericCeilAndFloor[Real] {
+  override def fromInt(n: Int): Real = super[ConvertableToReal].fromInt(n)
+}

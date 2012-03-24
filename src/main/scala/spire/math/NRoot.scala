@@ -35,8 +35,9 @@ trait EuclideanRingWithNRoot[@spec(Int,Long) A] extends EuclideanRing[A] with NR
 trait FieldWithNRoot[@spec(Double, Float) A] extends EuclideanRingWithNRoot[A] with Field[A]
 
 
-trait NumericWithNRoot[@spec(Float, Double, Int, Long) A] extends Numeric[A] with NRoot[A]
+trait NumericWithNRoot[@spec(Float, Double, Int, Long) A] extends Numeric[A] with FieldWithNRoot[A]
 trait FractionalWithNRoot[@spec(Float, Double) A] extends Fractional[A] with FieldWithNRoot[A]
+
 
 
 object EuclideanRingWithNRoot {

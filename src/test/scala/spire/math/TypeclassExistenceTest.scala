@@ -71,16 +71,16 @@ class TypeclassExistenceTest extends FunSuite {
     assert(ev != null, "Expected implicit NRoot[%s] instance, but it was not found." format m)
   }
 
-  test("Rings are ConvertableTo") {
-    def check[A: Ring : Manifest] {
+  test("Numeric is ConvertableTo") {
+    def check[A: Numeric : Manifest] {
       hasConvertableTo[A]
     }
 
     check[Int]
   }
 
-  test("Rings are ConvertableFrom") {
-    def check[A: Ring : Manifest] {
+  test("Numeric is ConvertableFrom") {
+    def check[A: Numeric : Manifest] {
       hasConvertableFrom[A]
     }
 

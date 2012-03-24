@@ -1,10 +1,11 @@
 package spire.math
 
+import annotation.tailrec
 import scala.{specialized => spec}
 import scala.math.{abs, ceil, floor, pow => mpow}
 
-trait Ring[@spec(Int,Long,Float,Double) A] extends Eq[A]
-with ConvertableFrom[A] with ConvertableTo[A] { self =>
+
+trait Ring[@spec(Int,Long,Float,Double) A] extends Eq[A] { self =>
   def abs(a:A):A
   def minus(a:A, b:A):A
   def negate(a:A):A
@@ -15,6 +16,29 @@ with ConvertableFrom[A] with ConvertableTo[A] { self =>
   def signum(a: A): Int
   def times(a:A, b:A):A
   def zero:A
+
+  // TODO: Implement log n version.
+  @tailrec private def fromInt(n: Int, a: A): A = {
+    if (n > 0) {
+      fromInt(n - 1, plus(a, one))
+    } else if (n < 0) {
+      fromInt(n + 1, plus(a, negate(one)))
+    } else {
+      a
+    }
+  }
+
+
+  /**
+   * This constructs an `A` from an integer which is equivalent to adding
+   * together `n` `one`'s. If `n` is negative, then it is equivalent to adding
+   * together the additive inverse of `one` `n` times.
+   *
+   * The default implementation is very inefficient, performing `n` adds. Most
+   * likely you will (and should) override the default implementation and
+   * optimize it.
+   */
+  def fromInt(n: Int): A = fromInt(n, zero)
 
   def additive = new AdditiveMonoid[A]()(this)
   def multiplicative = new MultiplicativeMonoid[A]()(this)
@@ -50,8 +74,7 @@ object Ring {
   def apply[A](implicit r:Ring[A]):Ring[A] = r
 }
 
-trait IntIsRing extends Ring[Int] with IntEq
-with ConvertableFromInt with ConvertableToInt {
+trait IntIsRing extends Ring[Int] with IntEq {
   def abs(a:Int): Int = scala.math.abs(a)
   def minus(a:Int, b:Int): Int = a - b
   def negate(a:Int): Int = -a
@@ -61,10 +84,11 @@ with ConvertableFromInt with ConvertableToInt {
   def signum(a: Int): Int = a.signum
   def times(a:Int, b:Int): Int = a * b
   def zero: Int = 0
+
+  override def fromInt(n: Int): Int = n
 }
 
-trait LongIsRing extends Ring[Long] with LongEq
-with ConvertableFromLong with ConvertableToLong {
+trait LongIsRing extends Ring[Long] with LongEq {
   def abs(a:Long): Long = scala.math.abs(a)
   def minus(a:Long, b:Long): Long = a - b
   def negate(a:Long): Long = -a
@@ -87,10 +111,11 @@ with ConvertableFromLong with ConvertableToLong {
   def signum(a: Long): Int = a.signum
   def times(a:Long, b:Long): Long = a * b
   def zero: Long = 0L
+  
+  override def fromInt(n: Int): Long = n
 }
 
-trait FloatIsRing extends Ring[Float] with FloatEq
-with ConvertableFromFloat with ConvertableToFloat {
+trait FloatIsRing extends Ring[Float] with FloatEq {
   def abs(a:Float): Float = scala.math.abs(a)
   def minus(a:Float, b:Float): Float = a - b
   def negate(a:Float): Float = -a
@@ -100,10 +125,11 @@ with ConvertableFromFloat with ConvertableToFloat {
   def signum(a: Float): Int = a.signum
   def times(a:Float, b:Float): Float = a * b
   def zero: Float = 0.0F
+  
+  override def fromInt(n: Int): Float = n
 }
 
-trait DoubleIsRing extends Ring[Double] with DoubleEq
-with ConvertableFromDouble with ConvertableToDouble {
+trait DoubleIsRing extends Ring[Double] with DoubleEq {
   def abs(a:Double): Double = scala.math.abs(a)
   def minus(a:Double, b:Double): Double = a - b
   def negate(a:Double): Double = -a
@@ -113,10 +139,11 @@ with ConvertableFromDouble with ConvertableToDouble {
   def signum(a: Double): Int = a.signum
   def times(a:Double, b:Double): Double = a * b
   def zero: Double = 0.0
+
+  override def fromInt(n: Int): Double = n
 }
 
-trait BigIntIsRing extends Ring[BigInt] with BigIntEq
-with ConvertableFromBigInt with ConvertableToBigInt {
+trait BigIntIsRing extends Ring[BigInt] with BigIntEq {
   def abs(a:BigInt): BigInt = a.abs
   def minus(a:BigInt, b:BigInt): BigInt = a - b
   def negate(a:BigInt): BigInt = -a
@@ -126,10 +153,11 @@ with ConvertableFromBigInt with ConvertableToBigInt {
   def signum(a: BigInt): Int = a.signum
   def times(a:BigInt, b:BigInt): BigInt = a * b
   def zero: BigInt = BigInt(0)
+  
+  override def fromInt(n: Int): BigInt = BigInt(n)
 }
 
-trait BigDecimalIsRing extends Ring[BigDecimal] with BigDecimalEq
-with ConvertableFromBigDecimal with ConvertableToBigDecimal {
+trait BigDecimalIsRing extends Ring[BigDecimal] with BigDecimalEq {
   def abs(a:BigDecimal): BigDecimal = a.abs
   def minus(a:BigDecimal, b:BigDecimal): BigDecimal = a - b
   def negate(a:BigDecimal): BigDecimal = -a
@@ -139,10 +167,11 @@ with ConvertableFromBigDecimal with ConvertableToBigDecimal {
   def signum(a: BigDecimal): Int = a.signum
   def times(a:BigDecimal, b:BigDecimal): BigDecimal = a * b
   def zero: BigDecimal = BigDecimal(0.0)
+
+  override def fromInt(n: Int): BigDecimal = BigDecimal(n)
 }
 
-trait RationalIsRing extends Ring[Rational] with RationalEq
-with ConvertableFromRational with ConvertableToRational {
+trait RationalIsRing extends Ring[Rational] with RationalEq {
   def abs(a:Rational): Rational = a.abs
   def minus(a:Rational, b:Rational): Rational = a - b
   def negate(a:Rational): Rational = -a
@@ -152,10 +181,11 @@ with ConvertableFromRational with ConvertableToRational {
   def signum(a: Rational): Int = a.signum
   def times(a:Rational, b:Rational): Rational = a * b
   def zero: Rational = Rational.zero
+  
+  override def fromInt(n: Int): Rational = Rational(n)
 }
 
-trait ComplexIsRing[A] extends ComplexEq[A] with Ring[Complex[A]]
-with ConvertableFromComplex[A] with ConvertableToComplex[A] {
+trait ComplexIsRing[A] extends ComplexEq[A] with Ring[Complex[A]] {
   implicit val f:FractionalWithNRoot[A]
 
   def abs(a:Complex[A]): Complex[A] = Complex(a.abs, f.zero)(f)
@@ -167,10 +197,11 @@ with ConvertableFromComplex[A] with ConvertableToComplex[A] {
   def signum(a: Complex[A]): Int = a.signum
   def times(a:Complex[A], b:Complex[A]): Complex[A] = a * b
   def zero: Complex[A] = Complex.zero(f)
+
+  override def fromInt(n: Int): Complex[A] = Complex(f.fromInt(n), f.zero)
 }
 
-trait RealIsRing extends Ring[Real] with RealEq
-with ConvertableFromReal with ConvertableToReal {
+trait RealIsRing extends Ring[Real] with RealEq {
   def abs(r: Real): Real = r.abs
   def minus(a: Real, b: Real): Real = a - b
   def negate(a: Real): Real = -a
@@ -181,6 +212,8 @@ with ConvertableFromReal with ConvertableToReal {
   def signum(a: Real): Int = a.signum
   def times(a: Real, b: Real): Real = a * b
   def zero: Real = Real(0)
+  
+  override def fromInt(n: Int): Real = Real(n)
 }
 
 class ComplexIsRingCls[A](implicit val f:FractionalWithNRoot[A])

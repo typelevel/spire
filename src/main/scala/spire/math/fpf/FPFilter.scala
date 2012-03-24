@@ -63,7 +63,17 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
 }
 
 
-object FPFilter extends LowPriorityFPFilterWrappers {
+  trait FPFilterOrder[A] extends Order[FPFilter[A]] with AnonymousOrder[FPFilter[A]] {
+    implicit def ev: Order[A]
+
+    def cmp(a: FPFilter[A], b: FPFilter[A]): Int = (a.approx - b.approx).sign match {
+      case Some(Positive) => 1
+      case Some(Negative) => -1
+      case Some(Zero) => 0
+      case None => ev.compare(a.value, b.value)
+    }
+  }
+
   trait FPFilterEq[A] extends Eq[FPFilter[A]] {
     implicit def ev: Eq[A]
 
@@ -137,13 +147,15 @@ object FPFilter extends LowPriorityFPFilterWrappers {
       new FPFilter(a.approx pow k, a.value pow k)
 
     override def sign(a: FPFilter[A]): Sign = a.approx.sign getOrElse ev.sign(a.value)
-    def signum(a: FPFilter[A]): Int = a.sign.toInt
+    def signum(a: FPFilter[A]): Int = sign(a).toInt
 
     def times(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
       new FPFilter(a.approx * b.approx, a.value * b.value)
 
     def zero: FPFilter[A] = new FPFilter(MaybeDouble(0.0), ev.fromInt(0))
     def one: FPFilter[A] = new FPFilter(MaybeDouble(1.0), ev.fromInt(1))
+
+    override def fromInt(a: Int): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromInt(a))
   }
 
   trait FPFilterIsEuclideanRing[A] extends FPFilterIsRing[A] with EuclideanRing[FPFilter[A]] {
@@ -185,43 +197,121 @@ object FPFilter extends LowPriorityFPFilterWrappers {
   }
 
 
+  trait FPFilterIsNumeric[A] extends Numeric[FPFilter[A]]
+  with FPFilterIsField[A] with FPFilterOrder[A]
+  with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
+    implicit val ev: Numeric[A]
+
+    override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
+  }
+
+  trait FPFilterIsFractional[A] extends Fractional[FPFilter[A]]
+  with FPFilterIsField[A] with GenericCeilAndFloor[FPFilter[A]] with FPFilterOrder[A]
+  with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
+    implicit val ev: Fractional[A]
+    
+    override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
+  }
+
+  trait FPFilterIsNumericWithNRoot[A] extends NumericWithNRoot[FPFilter[A]]
+  with FPFilterIsFieldWithNRoot[A] with FPFilterOrder[A]
+  with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
+    implicit val ev: NumericWithNRoot[A]
+    
+    override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
+  }
+
+  trait FPFilterIsFractionalWithNRoot[A] extends FractionalWithNRoot[FPFilter[A]]
+  with FPFilterIsFieldWithNRoot[A] with GenericCeilAndFloor[FPFilter[A]] with FPFilterOrder[A]
+  with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
+    implicit val ev: FractionalWithNRoot[A]
+    
+    override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
+  }
+
+
+trait LowPriorityFPFilterImplicits {
+  implicit def FPFilterIsNumericWithNRoot[A]
+  (implicit num: NumericWithNRoot[A]): NumericWithNRoot[FPFilter[A]] =
+    new FPFilterIsNumericWithNRoot[A] {
+      val ev = num
+    }
+
+  implicit def FPFilterIsEuclideanRing[A](implicit erng: EuclideanRing[A]): EuclideanRing[FPFilter[A]] =
+    new FPFilterIsEuclideanRing[A] with FPFilterEq[A] {
+      val ev = erng
+    }
+
+  implicit def FPFilterIsNumeric[A](implicit num: Numeric[A]): Numeric[FPFilter[A]] =
+    new FPFilterIsNumeric[A] {
+      val ev = num
+    }
+}
+
+object FPFilter extends LowPriorityFPFilterImplicits with LowPriorityFPFilterWrappers {
+
+  /*
+  implicit def ConvertableToFPFilter[A]
+  (implicit ct: ConvertableTo[A]): ConvertableTo[FPFilter[A]] =
+    new ConvertableToFPFilter[A] {
+      val ev = ct
+    }
+
+  implicit def ConvertableFromFPFilter[A]
+  (implicit cf: ConvertableFrom[A]): ConvertableFrom[FPFilter[A]] =
+    new ConvertableFromFPFilter[A] {
+      val ev = cf
+    }
+
   implicit def FPFilterIsRing[A](implicit ring: Ring[A]): Ring[FPFilter[A]] =
-    new FPFilterIsRing[A] with ConvertableFromFPFilter[A]
-                          with ConvertableToFPFilter[A]
-                          with FPFilterEq[A] {
+    new FPFilterIsRing[A] with FPFilterEq[A] {
       val ev = ring
     }
 
   implicit def FPFilterIsEuclideanRing[A](implicit erng: EuclideanRing[A]): EuclideanRing[FPFilter[A]] =
-    new FPFilterIsEuclideanRing[A] with ConvertableFromFPFilter[A]
-                                   with ConvertableToFPFilter[A]
-                                   with FPFilterEq[A] {
+    new FPFilterIsEuclideanRing[A] with FPFilterEq[A] {
       val ev = erng
     }
 
   implicit def FPFilterIsField[A](implicit field: Field[A]): Field[FPFilter[A]] =
-    new FPFilterIsField[A] with ConvertableFromFPFilter[A]
-                           with ConvertableToFPFilter[A]
-                           with FPFilterEq[A] {
+    new FPFilterIsField[A] with FPFilterEq[A] {
       val ev = field
     }
 
   implicit def FPFilterIsFieldWithNRoot[A]
   (implicit e: FieldWithNRoot[A]): FieldWithNRoot[FPFilter[A]] =
-    new FPFilterIsFieldWithNRoot[A] with ConvertableFromFPFilter[A]
-                                    with ConvertableToFPFilter[A]
-                                    with FPFilterEq[A] {
+    new FPFilterIsFieldWithNRoot[A] with FPFilterEq[A] {
       val ev = e
     }
 
   implicit def FPFilterIsEuclideanRingWithNRoot[A]
   (implicit e: EuclideanRingWithNRoot[A]): EuclideanRingWithNRoot[FPFilter[A]] =
-    new FPFilterIsEuclideanRingWithNRoot[A] with ConvertableFromFPFilter[A]
-                                    with ConvertableToFPFilter[A]
-                                    with FPFilterEq[A] {
+    new FPFilterIsEuclideanRingWithNRoot[A] with FPFilterEq[A] {
       val ev = e
     }
 
+  implicit def FPFilterIsNumeric[A](implicit num: Numeric[A]): Numeric[FPFilter[A]] =
+    new FPFilterIsNumeric[A] {
+      val ev = num
+    }
+
+  implicit def FPFilterIsFractional[A](implicit num: Fractional[A]): Fractional[FPFilter[A]] =
+    new FPFilterIsFractional[A] {
+      val ev = num
+    }
+
+  implicit def FPFilterIsNumericWithNRoot[A]
+  (implicit num: NumericWithNRoot[A]): NumericWithNRoot[FPFilter[A]] =
+    new FPFilterIsNumericWithNRoot[A] {
+      val ev = num
+    }
+  */
+
+  implicit def FPFilterIsFractionalWithNRoot[A]
+  (implicit num: FractionalWithNRoot[A]): FractionalWithNRoot[FPFilter[A]] =
+    new FPFilterIsFractionalWithNRoot[A] {
+      val ev = num
+    }
 
 
   /**
