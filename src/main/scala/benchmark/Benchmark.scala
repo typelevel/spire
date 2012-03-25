@@ -1,13 +1,15 @@
 package benchmark
 
 import scala.{specialized => spec}
-import scala.util.Random._
+import scala.util.Random
+import Random._
 
 import spire.math._
 import spire.math.Implicits._
 
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark
+import com.google.caliper.Param
 
 /**
  * Extend this to create an actual benchmarking class.
@@ -34,14 +36,14 @@ trait MyBenchmark extends SimpleBenchmark {
  */
 trait MyRunner {
   val cls:java.lang.Class[_ <: com.google.caliper.Benchmark]
-  def main(args:Array[String]): Unit = Runner.main(cls, args:_*)
+  def main(args:Array[String]): Unit = Runner.main(cls, args: _*)
 }
 
 trait BenchmarkData extends MyBenchmark {
   //val size = 10 * 1000
-  //val size = 100 * 1000
+  val size = 100 * 1000
   //val size = 1 * 1000 * 1000
-  val size = 4 * 1000 * 1000
+  //val size = 4 * 1000 * 1000
   //val size = 20 * 1000 * 1000
 
   lazy val ints = init(size)(nextInt)
@@ -181,4 +183,47 @@ class GcdBenchmarks extends MyBenchmark with BenchmarkData {
 
   def timeSumEuclidGcds(reps:Int) = run(reps)(sumEuclidGcds(longs))
   def timeSumBinaryGcds(reps:Int) = run(reps)(sumBinaryGcds(longs))
+}
+
+object RationalBenchmarks extends MyRunner { val cls = classOf[RationalBenchmarks] }
+class RationalBenchmarks extends MyBenchmark with BenchmarkData {
+  @Param(Array("8", "16", "24", "32", "40", "48", "56", "64", "80", "96", "112", "128",
+               "144", "160", "176", "192", "208", "224", "240", "256")) 
+  var bits: Int = 0
+
+  private var rats: Array[Rational] = _
+
+  override protected def setUp() {
+    rats = init(size)(Rational(BigInt(bits, Random), BigInt(bits, Random) + 1))
+  }
+
+  def sum(rats: Array[Rational]): Int = {
+    var sign = 1
+    var i = 0
+    var len = rats.length - 1
+
+    while (i < len) {
+      sign *= (rats(i) + rats(i + 1)).signum
+      i += 1
+    }
+
+    sign
+  }
+
+  def prod(rats: Array[Rational]): Int = {
+    var sign = 1
+    var i = 0
+    var len = rats.length - 1
+
+    while (i < len) {
+      sign *= (rats(i) * rats(i + 1)).signum
+      i += 1
+    }
+
+    sign
+  }
+
+
+  def timeRationalSum(reps: Int) = run(reps)(sum(rats))
+  def timeRationalProd(reps: Int) = run(reps)(prod(rats))
 }
