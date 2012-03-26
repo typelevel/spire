@@ -140,11 +140,11 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
   
   def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
   def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
+  def timeAddFastMaybeFloatsDirect(reps:Int) = run(reps)(addFastMaybeFloatsDirect(maybeFloats))
   
   def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
   def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
   def timeAddMaybeDoublesDirect(reps:Int) = run(reps)(addMaybeDoublesDirect(maybeDoubles))
-  def timeAddFastMaybeFloatsDirect(reps:Int) = run(reps)(addFastMaybeFloatsDirect(maybeFloats))
 
   def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
   def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))

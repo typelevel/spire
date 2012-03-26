@@ -30,7 +30,7 @@ object FastMaybeFloat {
   final val Invalid = -1L
  
   // esp = ~0.000015
-  val eps = java.lang.Float.intBitsToFloat((127 - 16) << 23)
+  final val eps = java.lang.Float.intBitsToFloat((127 - 16) << 23)
 
   private final val indexMask   = 0x0000000000007FFFL
   private final val measureMask = 0x0000007FFFFF8000L
@@ -39,6 +39,7 @@ object FastMaybeFloat {
 
   @inline def asFloat(x: Long): Float = java.lang.Float.intBitsToFloat(x.toInt)
   @inline def max(a: Int, b: Int): Int = if (a > b) a else b
+  @inline def min(a: Int, b: Int): Int = if (a < b) a else b
   @inline def invalid(a: Long): Boolean = (a & invalidMask) == invalidMask
 
   final def approx(mf: Long): Float = asFloat((mf & approxMask) >>> 32)
@@ -46,13 +47,22 @@ object FastMaybeFloat {
   @inline final def index(mf: Long): Int = (mf & indexMask).toInt
   final def error(mf: Long): Float = measure(mf) * index(mf) * eps
 
-  private def apply(a: Float, m: Float, i: Int): Long = if (i & indexMask != 0) {
-    Invalid
-  } else {
-    ((jFloat.floatToIntBits(a).toLong << 32) & approxMask) |
-    ((jFloat.floatToIntBits(m).toLong << 8) & measureMask) |
-    (i.toLong & indexMask)
+  @inline private final def applySafe(a: Float, m: Float, i: Int): Long = 
+    apply(a, m, min(i, 1 << 16))
+  
+  /**
+   * This should be used whenever it can be guaranteed that `i < 2^17`. Notably,
+   * this can be used when adding at most 1 to the sum of 2 different indexes.
+   */
+  private final def apply(a: Float, m: Float, i: Int): Long = {
+    val x = ((jFloat.floatToIntBits(a).toLong << 17) & 0xFFFFFF) |
+      (jFloat.floatToIntBits(m) >>> 8).toLong
+    
+    // Sign extends it if bit 16 is set, thus making it invalid.
+    
+    (x << 15) | (i.toLong << 48 >> 48)
   }
+
 
   final def plus(a: Long, b: Long): Long =
     apply(approx(a) + approx(b), measure(a) + measure(b), max(index(a), index(b)) + 1)
