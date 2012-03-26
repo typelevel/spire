@@ -6,6 +6,7 @@ import Random._
 
 import spire.math._
 import spire.math.Implicits._
+import fpf.MaybeDouble
 
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark
@@ -36,13 +37,13 @@ trait MyBenchmark extends SimpleBenchmark {
  */
 trait MyRunner {
   val cls:java.lang.Class[_ <: com.google.caliper.Benchmark]
-  def main(args:Array[String]): Unit = Runner.main(cls, args: _*)
+  def main(args:Array[String]): Unit = Runner.main(cls, args:_*)
 }
 
 trait BenchmarkData extends MyBenchmark {
   //val size = 10 * 1000
-  val size = 100 * 1000
-  //val size = 1 * 1000 * 1000
+  //val size = 100 * 1000
+  val size = 1 * 1000 * 1000
   //val size = 4 * 1000 * 1000
   //val size = 20 * 1000 * 1000
 
@@ -50,6 +51,7 @@ trait BenchmarkData extends MyBenchmark {
   lazy val longs = init(size)(nextLong)
   lazy val floats = init(size)(nextFloat)
   lazy val doubles = init(size)(nextDouble)
+  lazy val maybeDoubles = init(size)(MaybeDouble(nextDouble))
 
   lazy val complexes = init(size)(Complex(nextDouble(), nextDouble()))
   lazy val fcomplexes = init(size)(FastComplex(nextFloat(), nextFloat()))
@@ -97,6 +99,14 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
     total
   }
 
+  def addMaybeDoublesDirect(data: Array[MaybeDouble]): MaybeDouble = {
+    var total = MaybeDouble(0.0)
+    var i = 0
+    val len = data.length
+    while (i < len) { total += data(i); i += 1 }
+    total
+  }
+
   def addComplexesDirect(data:Array[Complex[Double]]):Complex[Double] = {
     var total = Complex.zero[Double]
     var i = 0
@@ -124,6 +134,7 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
   
   def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
   def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
+  def timeAddMaybeDoublesDirect(reps:Int) = run(reps)(addMaybeDoublesDirect(maybeDoubles))
 
   def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
   def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))
@@ -184,6 +195,7 @@ class GcdBenchmarks extends MyBenchmark with BenchmarkData {
   def timeSumEuclidGcds(reps:Int) = run(reps)(sumEuclidGcds(longs))
   def timeSumBinaryGcds(reps:Int) = run(reps)(sumBinaryGcds(longs))
 }
+
 
 object RationalBenchmarks extends MyRunner { val cls = classOf[RationalBenchmarks] }
 class RationalBenchmarks extends MyBenchmark with BenchmarkData {
