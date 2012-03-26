@@ -11,42 +11,7 @@ object MyBuild extends Build {
       //"Scala-Tools" at "http://www.scala-tools.org/repo-reloases/",
       "Sonatype" at "http://oss.sonatype.org/content/repositories/snapshots"
     ),
-    libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "1.6.1"
-
-    )
-
-
-    /*
-    // define the onLoad hook
-    onLoad in Global <<= (onLoad in Global) ?? identity[State],
-    {
-      // attribute key to prevent circular onLoad hook
-      val key = AttributeKey[Boolean]("loaded")
-      val f = (s: State) => {
-        val loaded: Boolean = s get key getOrElse false
-        if (!loaded) {
-          var cpString: String = ""
-          // get the runtime classpath
-          Project.evaluateTask(fullClasspath.in(Runtime), s) match {
-            // make a colon-delimited string of the classpath
-            case Some(Value(cp)) => cpString = cp.files.mkString(":")
-            // probably should handle an error here, but not sure you can
-            //  ever get here with a working sbt
-            case _ => Nil
-          }
-          val extracted: Extracted = Project.extract(s)
-            println(">>> " + cpString)
-          // return a state with loaded = true and javaOptions set correctly
-          extracted.append(Seq(javaOptions in run ++= Seq("-cp", cpString)), s.put(key, true))
-        } else {
-          // return the state, unmodified
-          s
-        }
-      }
-      onLoad in Global ~= (f compose _)
-    }
-    */
+    libraryDependencies += "org.scalatest" %% "scalatest" % "1.6.1"
   )
 
   val key = AttributeKey[Boolean]("javaOptionsPatched")
@@ -83,7 +48,6 @@ object MyBuild extends Build {
           case None =>
             // get the runtime classpath, turn into a colon-delimited string
             val classPath = Project.runTask(fullClasspath in Runtime in benchmark, state).get._2.toEither.right.get.files.mkString(":")
-            println(":-) " + classPath)
             // return a state with javaOptionsPatched = true and javaOptions set correctly
             Project.extract(state).append(Seq(javaOptions in (benchmark, run) ++= Seq("-cp", classPath)), state.put(key, true))
           case Some(_) =>
