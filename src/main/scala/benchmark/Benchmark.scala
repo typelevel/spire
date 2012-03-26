@@ -196,7 +196,6 @@ class GcdBenchmarks extends MyBenchmark with BenchmarkData {
   def timeSumBinaryGcds(reps:Int) = run(reps)(sumBinaryGcds(longs))
 }
 
-
 object RationalBenchmarks extends MyRunner { val cls = classOf[RationalBenchmarks] }
 class RationalBenchmarks extends MyBenchmark with BenchmarkData {
   @Param(Array("8", "16", "24", "32", "40", "48", "56", "64", "80", "96", "112", "128",
@@ -238,4 +237,87 @@ class RationalBenchmarks extends MyBenchmark with BenchmarkData {
 
   def timeRationalSum(reps: Int) = run(reps)(sum(rats))
   def timeRationalProd(reps: Int) = run(reps)(prod(rats))
+
+  val longs2 = ints.map(n => n.toLong)
+  val bigInts2 = ints.map(n => BigInt(n))
+
+  def combineLongRationals1(data:Array[Long])(f:(Rational, Rational) => Rational):Long = {
+    val one:Rational = LongRationals.build(1L, 1L)
+    var count = 0
+    var i = 0
+    val len = data.length - 3
+    while (i < len) {
+      val r1:Rational = LongRationals.build(data(i), data(i + 1))
+      val r2:Rational = LongRationals.build(data(i + 2), data(i + 3))
+      val r3:Rational = f(r1, r2)
+      if (r3 > one) count += 1
+      i += 1
+    }
+    count
+  }
+
+  def combineBigRationals1(data:Array[BigInt])(f:(Rational, Rational) => Rational):Long = {
+    val one:Rational = BigRationals.build(1L, 1L)
+    var count = 0
+    var i = 0
+    val len = data.length - 3
+    while (i < len) {
+      val r1:Rational = BigRationals.build(data(i), data(i + 1))
+      val r2:Rational = BigRationals.build(data(i + 2), data(i + 3))
+      val r3:Rational = f(r1, r2)
+      if (r3 > one) count += 1
+      i += 1
+    }
+    count
+  }
+
+  def timeLongRatAddBases(reps:Int) = run(reps)(combineLongRationals1(longs2)(_ + _))
+  def timeBigRatAddBases(reps:Int) = run(reps)(combineBigRationals1(bigInts2)(_ + _))
+  def timeLongRatSubtractBases(reps:Int) = run(reps)(combineLongRationals1(longs2)(_ - _))
+  def timeBigRatSubtractBases(reps:Int) = run(reps)(combineBigRationals1(bigInts2)(_ - _))
+  def timeLongRatMultiplyBases(reps:Int) = run(reps)(combineLongRationals1(longs2)(_ * _))
+  def timeBigRatMultiplyBases(reps:Int) = run(reps)(combineBigRationals1(bigInts2)(_ * _))
+  def timeLongRatDivideBases(reps:Int) = run(reps)(combineLongRationals1(longs2)(_ / _))
+  def timeBigRatDivideBases(reps:Int) = run(reps)(combineBigRationals1(bigInts2)(_ / _))
+
+  def combineLongRationals2(data:Array[Long])(f:(Rational, Rational) => Rational):Long = {
+    val one:Rational = LongRationals.build(1L, 1L)
+    val denom = data(0)
+    var count = 0
+    var i = 0
+    val len = data.length - 1
+    while (i < len) {
+      val r1:Rational = LongRationals.build(data(i), denom)
+      val r2:Rational = LongRationals.build(data(i + 1), denom)
+      val r3:Rational = f(r1, r2)
+      if (r3 > one) count += 1
+      i += 1
+    }
+    count
+  }
+
+  def combineBigRationals2(data:Array[BigInt])(f:(Rational, Rational) => Rational):Long = {
+    val one:Rational = BigRationals.build(1L, 1L)
+    val denom = data(0)
+    var count = 0
+    var i = 0
+    val len = data.length - 1
+    while (i < len) {
+      val r1:Rational = BigRationals.build(data(i), denom)
+      val r2:Rational = BigRationals.build(data(i + 1), denom)
+      val r3:Rational = f(r1, r2)
+      if (r3 > one) count += 1
+      i += 1
+    }
+    count
+  }
+
+  def timeLongRatAddSameBase(reps:Int) = run(reps)(combineLongRationals2(longs2)(_ + _))
+  def timeBigRatAddSameBase(reps:Int) = run(reps)(combineBigRationals2(bigInts2)(_ + _))
+  def timeLongRatSubtractSameBase(reps:Int) = run(reps)(combineLongRationals2(longs2)(_ - _))
+  def timeBigRatSubtractSameBase(reps:Int) = run(reps)(combineBigRationals2(bigInts2)(_ - _))
+  def timeLongRatMultiplySameBase(reps:Int) = run(reps)(combineLongRationals2(longs2)(_ * _))
+  def timeBigRatMultiplySameBase(reps:Int) = run(reps)(combineBigRationals2(bigInts2)(_ * _))
+  def timeLongRatDivideSameBase(reps:Int) = run(reps)(combineLongRationals2(longs2)(_ / _))
+  def timeBigRatDivideSameBase(reps:Int) = run(reps)(combineBigRationals2(bigInts2)(_ / _))
 }
