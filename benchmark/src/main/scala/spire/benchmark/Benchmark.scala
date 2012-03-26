@@ -111,8 +111,13 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
   def addFastMaybeFloatsDirect(data: Array[Long]): Long = {
     var total = FastMaybeFloat(0f)
     var i = 0
-    val len = data.length
-    while (i < len) { total = FastMaybeFloat.plus(total, data(i)); i += 1 }
+    val len = data.length - 1
+
+    // This is slightly different from the others, because it'll overflow the
+    // FastMaybeFloat and apparently adding NaNs and Infinities is quite a bit
+    // slower than regular fp ops.
+    
+    while (i < len) { total += FastMaybeFloat.plus(data(i), data(i + 1)); i += 1 }
     total
   }
 

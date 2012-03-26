@@ -55,8 +55,8 @@ object FastMaybeFloat {
    * this can be used when adding at most 1 to the sum of 2 different indexes.
    */
   private final def apply(a: Float, m: Float, i: Int): Long = {
-    val x = ((jFloat.floatToIntBits(a).toLong << 17) & 0xFFFFFF) |
-      (jFloat.floatToIntBits(m) >>> 8).toLong
+    val x = ((jFloat.floatToIntBits(a).toLong << 17) & 0xFFFFFFFFFF000000L) |
+      (jFloat.floatToIntBits(m) >>> 7).toLong
     
     // Sign extends it if bit 16 is set, thus making it invalid.
     
