@@ -1,4 +1,4 @@
-package benchmark
+package spire.benchmark
 
 import scala.{specialized => spec}
 import scala.util.Random
@@ -6,7 +6,7 @@ import Random._
 
 import spire.math._
 import spire.math.Implicits._
-import fpf.MaybeDouble
+import fpf._
 
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark
@@ -52,6 +52,7 @@ trait BenchmarkData extends MyBenchmark {
   lazy val floats = init(size)(nextFloat)
   lazy val doubles = init(size)(nextDouble)
   lazy val maybeDoubles = init(size)(MaybeDouble(nextDouble))
+  lazy val maybeFloats = init(size)(FastMaybeFloat(nextFloat))
 
   lazy val complexes = init(size)(Complex(nextDouble(), nextDouble()))
   lazy val fcomplexes = init(size)(FastComplex(nextFloat(), nextFloat()))
@@ -107,6 +108,14 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
     total
   }
 
+  def addFastMaybeFloatsDirect(data: Array[Long]): Long = {
+    var total = FastMaybeFloat(0f)
+    var i = 0
+    val len = data.length
+    while (i < len) { total = FastMaybeFloat.plus(total, data(i)); i += 1 }
+    total
+  }
+
   def addComplexesDirect(data:Array[Complex[Double]]):Complex[Double] = {
     var total = Complex.zero[Double]
     var i = 0
@@ -135,6 +144,7 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
   def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
   def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
   def timeAddMaybeDoublesDirect(reps:Int) = run(reps)(addMaybeDoublesDirect(maybeDoubles))
+  def timeAddFastMaybeFloatsDirect(reps:Int) = run(reps)(addFastMaybeFloatsDirect(maybeFloats))
 
   def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
   def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))
