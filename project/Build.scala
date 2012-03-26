@@ -27,9 +27,8 @@ object MyBuild extends Build {
 
     libraryDependencies ++= Seq(
       "com.google.guava" % "guava" % "r09",
-      "com.google.collections" % "google-collections" % "1.0",
       "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.0",
-      //"com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" from "http://n0d.es/jars/caliper-1.0-SNAPSHOT.jar",
+      "com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" from "http://n0d.es/jars/caliper-1.0-SNAPSHOT.jar",
       "com.google.code.gson" % "gson" % "1.7.1"
     ),
 
