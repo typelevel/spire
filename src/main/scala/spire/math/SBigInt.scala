@@ -3,15 +3,26 @@ package spire.math
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
 import scala.math.{ BigInt => _ }
 import SBigInt._
-
-//final class UInt(val uint: Int) extends AnyVal 
+import scala.collection.immutable.NumericRange
 
 object SBigInt {
-  // 2.10 got this, but 2.9 not.
+  // 2.10 got this, but 2.9 not. So we define it here for now.
   def ??? = throw new UnsupportedOperationException
   
+  /**
+   * While addition, subtraction and multiplication work the same on signed 
+   * and unsigned numbers, this is necessary to convert an signed to an unsigned value.
+   */
+  final val UnsignedMask = 0xFFFFFFFFL
+  
+  /**
+   * 0 is a bit special: It is the only value which is allowed to have
+   * a 0 sign and an empty array as the magnitude.
+   * 
+   * Zero is the only instance of this value.
+   */
   final val Zero: SBigInt = new SBigInt(0, Array[Int]())
-  final val One: SBigInt = SBigInt(1)
+  final val One: SBigInt = new SBigInt(1, Array(1))
   
   def apply(num: Int): SBigInt = {
     if (num == 0) return SBigInt.Zero
@@ -72,19 +83,70 @@ object SBigInt {
   implicit def long2bigInt(l: Long): SBigInt = apply(l)
 }
 
+/**
+ * Number class for signed whole numbers with unlimited precision.
+ * 
+ * Internally, the sign is stored as an Int and the magnitude as the two complement in a BE array.
+ * 
+ * It is made sure, that the same valeu has the same underlying representation.
+ * 
+ * TODO: Verify that private[math] works as intended when used from Java.
+ */
 final class SBigInt private(final val signum: Int, final private[math] val arr: Array[Int]) extends ScalaNumber with ScalaNumericConversions with Ordered[SBigInt] with Serializable {
   
   def isWhole: Boolean = true
   def underlying = SBigInt.this
 
-  def longValue = ???
-  def intValue = ???
-  def floatValue = ???
-  def doubleValue = ???
+  /**
+   * Returns this value as a `Long`.
+   * If the magnitude is too large, the lowest 64 bits will be returned. 
+   */
+  def longValue: Long = ???
+  /**
+   * Returns this value as an `Int`.
+   * If the magnitude is too large, the lowest 32 bits will be returned. 
+   */
+  def intValue: Int = ???
+  /**
+   * Returns this value as a `Float`. Might lose precision.
+   * If the magnitude is too large, `Float.MaxValue` (iff `sign == 1`) 
+   * or `Float.MinValue` (iff `sign == -1`) are returned.
+   */
+  def floatValue: Float = {
+    //TODO: Look up max magnitude representable as a Float.
+    val maxMag = -42
+    if(arr.length <= maxMag) {
+      //Convert to Float
+      ???
+    } else {
+      if(signum == 1) 
+        Float.MaxValue
+      else 
+        Float.MinValue
+    }
+  }
+  /**
+   * Returns this value as a `Double`. Might lose precision.
+   * If the magnitude is too large, `Double.MaxValue` (iff `sign == 1`) 
+   * or `Double.MinValue` (iff `sign == -1`) are returned.
+   */
+  def doubleValue: Double = {
+    //TODO: Look up max magnitude representable as a Double.
+    val maxMag = -42
+    if(arr.length <= maxMag) {
+      //Convert to Double
+      ???
+    } else {
+      if(signum == 1) 
+        Double.MaxValue
+      else 
+        Double.MinValue
+    }
+  }
   
   def compare(rhs: SBigInt): Int = ??? 
     
-  def abs = if (signum < 0) -SBigInt.this else SBigInt.this
+  def abs = if (signum < 0) -this else this
   def unary_! : SBigInt = ???
   def unary_~ : SBigInt = ???
   def unary_- : SBigInt = new SBigInt(-signum, arr)
@@ -180,6 +242,10 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
 
   /** Returns a SBigInt whose value is (`this` raised to the power of `exp`). */
   def pow (exp: Int): SBigInt = ???
+
+  // We don't use Integral, right? What to do here?
+  //def until(end: SBigInt, step: SBigInt = SBigInt(1)) = NumericRange(this, end, step)
+  //def to(end: SBigInt, step: SBigInt = SBigInt(1)) = NumericRange.inclusive(this, end, step)
   
   def isValidLong: Boolean = SBigInt.this >= Long.MinValue && SBigInt.this <= Long.MaxValue
 
@@ -198,6 +264,7 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
     else ???
     
   override def toString = "toString not implemented yet!"
+    
     
   ////////////////////////////////////////////////////////////////////////////////
 
