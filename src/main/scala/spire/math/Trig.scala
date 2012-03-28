@@ -83,23 +83,33 @@ trait DoubleIsTrig extends Trig[Double] {
   def toDegrees(a:Double):Double = (a * 360) / (2 * pi)
 }
 
-// ugh. right now this is SUPER hand-wavy.
-trait BigDecimalIsTrig extends Trig[BigDecimal] {
-  val f = Fractional.BigDecimalIsFractional
-
+object BigDecimalIsTrig {
   // TODO: ugh. use a method of generating pi to arbitrary digits instead of
   // hardcoding the string. although hardcoding the string may be faster in
   // many cases (we could easily hardcode MUCH longer versions of pi and e).
-  private val piString = "3.1415926535897932384626433832795028841972"
-  private val eString = "2.7182818284590452353602874713526624977572"
+  private final val piString = "3.1415926535897932384626433832795028841972"
+  private final val eString = "2.7182818284590452353602874713526624977572"
 
-  val pi:BigDecimal = BigDecimal(piString)
-  val e:BigDecimal = BigDecimal(eString)
+  final val pi = BigDecimal(piString)
+  final val e = BigDecimal(eString)
 
-  private val zero = BigDecimal(0)
-  private val one = BigDecimal(1)
-  private val two = BigDecimal(2)
-  private val twoPi:BigDecimal = two * pi
+  protected[math] final val zero = BigDecimal(0)
+  protected[math] final val one = BigDecimal(1)
+  protected[math] final val two = BigDecimal(2)
+  protected[math] final val twoPi = two * pi
+
+  @inline final def modTwoPi(n:BigDecimal) = (n % twoPi).toDouble
+}
+
+// ugh. right now this is SUPER hand-wavy.
+// we should probably be paying a lot more attention to MathContext, etc.
+trait BigDecimalIsTrig extends Trig[BigDecimal] {
+  import BigDecimalIsTrig._
+
+  val f = Fractional.BigDecimalIsFractional
+
+  def e:BigDecimal = BigDecimalIsTrig.e
+  def pi:BigDecimal = BigDecimalIsTrig.pi
 
   // TODO: ugh... BigDecimal has no useful pow()/exp() function
   def exp(a:BigDecimal):BigDecimal = BigDecimal(mth.exp(a.toDouble), a.mc)
@@ -109,7 +119,6 @@ trait BigDecimalIsTrig extends Trig[BigDecimal] {
 
   // we can avoid overflow and minimize fp-error via %2pi
   // TODO: maybe use a more precise formulation of sin/cos/tan?
-  private def modTwoPi(n:BigDecimal) = (n % twoPi).toDouble
   def sin(a:BigDecimal):BigDecimal = BigDecimal(mth.sin(modTwoPi(a)), a.mc)
   def cos(a:BigDecimal):BigDecimal = BigDecimal(mth.cos(modTwoPi(a)), a.mc)
   def tan(a:BigDecimal):BigDecimal = BigDecimal(mth.tan(modTwoPi(a)), a.mc)
