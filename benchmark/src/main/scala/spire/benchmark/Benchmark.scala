@@ -1,13 +1,16 @@
-package benchmark
+package spire.benchmark
 
 import scala.{specialized => spec}
-import scala.util.Random._
+import scala.util.Random
+import Random._
 
 import spire.math._
 import spire.math.Implicits._
+import fpf._
 
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark
+import com.google.caliper.Param
 
 /**
  * Extend this to create an actual benchmarking class.
@@ -48,6 +51,8 @@ trait BenchmarkData extends MyBenchmark {
   lazy val longs = init(size)(nextLong)
   lazy val floats = init(size)(nextFloat)
   lazy val doubles = init(size)(nextDouble)
+  lazy val maybeDoubles = init(size)(MaybeDouble(nextDouble))
+  lazy val maybeFloats = init(size)(FastMaybeFloat(nextFloat))
 
   lazy val complexes = init(size)(Complex(nextDouble(), nextDouble()))
   lazy val fcomplexes = init(size)(FastComplex(nextFloat(), nextFloat()))
@@ -95,6 +100,27 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
     total
   }
 
+  def addMaybeDoublesDirect(data: Array[MaybeDouble]): MaybeDouble = {
+    var total = MaybeDouble(0.0)
+    var i = 0
+    val len = data.length
+    while (i < len) { total += data(i); i += 1 }
+    total
+  }
+
+  def addFastMaybeFloatsDirect(data: Array[Long]): Long = {
+    var total = FastMaybeFloat(0f)
+    var i = 0
+    val len = data.length - 1
+
+    // This is slightly different from the others, because it'll overflow the
+    // FastMaybeFloat and apparently adding NaNs and Infinities is quite a bit
+    // slower than regular fp ops.
+    
+    while (i < len) { total += FastMaybeFloat.plus(data(i), data(i + 1)); i += 1 }
+    total
+  }
+
   def addComplexesDirect(data:Array[Complex[Double]]):Complex[Double] = {
     var total = Complex.zero[Double]
     var i = 0
@@ -119,9 +145,11 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
   
   def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
   def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
+  def timeAddFastMaybeFloatsDirect(reps:Int) = run(reps)(addFastMaybeFloatsDirect(maybeFloats))
   
   def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
   def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
+  def timeAddMaybeDoublesDirect(reps:Int) = run(reps)(addMaybeDoublesDirect(maybeDoubles))
 
   def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
   def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))
@@ -185,7 +213,45 @@ class GcdBenchmarks extends MyBenchmark with BenchmarkData {
 
 object RationalBenchmarks extends MyRunner { val cls = classOf[RationalBenchmarks] }
 class RationalBenchmarks extends MyBenchmark with BenchmarkData {
-  //override val size = 400 * 1000
+  @Param(Array("8", "16", "24", "32", "40", "48", "56", "64", "80", "96", "112", "128",
+               "144", "160", "176", "192", "208", "224", "240", "256")) 
+  var bits: Int = 0
+
+  private var rats: Array[Rational] = _
+
+  override protected def setUp() {
+    rats = init(size)(Rational(BigInt(bits, Random), BigInt(bits, Random) + 1))
+  }
+
+  def sum(rats: Array[Rational]): Int = {
+    var sign = 1
+    var i = 0
+    var len = rats.length - 1
+
+    while (i < len) {
+      sign *= (rats(i) + rats(i + 1)).signum
+      i += 1
+    }
+
+    sign
+  }
+
+  def prod(rats: Array[Rational]): Int = {
+    var sign = 1
+    var i = 0
+    var len = rats.length - 1
+
+    while (i < len) {
+      sign *= (rats(i) * rats(i + 1)).signum
+      i += 1
+    }
+
+    sign
+  }
+
+
+  def timeRationalSum(reps: Int) = run(reps)(sum(rats))
+  def timeRationalProd(reps: Int) = run(reps)(prod(rats))
 
   val longs2 = ints.map(n => n.toLong)
   val bigInts2 = ints.map(n => BigInt(n))
@@ -269,5 +335,4 @@ class RationalBenchmarks extends MyBenchmark with BenchmarkData {
   def timeBigRatMultiplySameBase(reps:Int) = run(reps)(combineBigRationals2(bigInts2)(_ * _))
   def timeLongRatDivideSameBase(reps:Int) = run(reps)(combineLongRationals2(longs2)(_ / _))
   def timeBigRatDivideSameBase(reps:Int) = run(reps)(combineBigRationals2(bigInts2)(_ / _))
-
 }
