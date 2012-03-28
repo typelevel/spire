@@ -170,7 +170,16 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
  * overhead of using *any* object is HUGE. Since we can't build our own
  * "pass-by-value" types on the JVM we are stuck doing an encoding like this.
  *
- * I haven't profiled the speed of the operations yet. But I have high hopes.
+ * Here are some profiling numbers for summing an array of complex numbers,
+ * timed against a concrete case class implementation using Float (in ms):
+ *
+ *  size | encoded |  class
+ *    1M |     5.1 |    5.8
+ *    5M |    28.5 |   91.7
+ *   10M |    67.7 |  828.1
+ *   20M |   228.0 | 2687.0
+ *
+ * Not bad, eh?
  */
 object FastComplex {
   // note the superstitious use of @inline and final everywhere
