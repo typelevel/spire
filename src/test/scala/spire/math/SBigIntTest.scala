@@ -3,6 +3,7 @@ package spire.math
 import org.scalatest.FunSuite
 import spire.math.fun._
 import Implicits.{eqOps => _, _}
+import java.math.BigInteger
 
 object Const {
   val pos = 1
@@ -21,32 +22,48 @@ class SBigIntTest extends FunSuite {
     assert(SBigInt(0) === SBigInt.Zero)
   }
   
-  ignore("BigInt(1) equal to BigInt.One") {
+  test("BigInt(1) equal to BigInt.One") {
     assert(SBigInt(1) === SBigInt.One)
   }
-  
-//  forAll { (n: Int, d: Int) =>
-//
-//  whenever (d != 0 && d != Integer.MIN_VALUE
-//      && n != Integer.MIN_VALUE) {
-//
-//    val f = new Fraction(n, d)
-//
-//    if (n < 0 && d < 0 || n > 0 && d > 0)
-//      f.numer should be > 0
-//    else if (n != 0)
-//      f.numer should be < 0
-//    else
-//      f.numer should be === 0
-//
-//    f.denom should be > 0
-//  }
-//}
   
   test("create BigInt(42)") {
     val bi = SBigInt(42)
     assert(bi.signum === pos)
     assert(bi.arr === Array(42))
   }
-
+    
+  test("Compare toStrings of values from -100 to 100") {
+    for (i <- -100 to 100) {
+      assert(SBigInt(i).toString === (BigInteger.valueOf(i)).toString)
+    }
+  }
+  
+  test("Compare toStrings of values from Int.MaxValue.toLong -100 to Int.MaxValue.toLong + 100") {
+    for (i <- Int.MaxValue.toLong -100 to Int.MaxValue.toLong + 100) {
+      assert(SBigInt(i).toString === (BigInteger.valueOf(i)).toString)
+    }
+  }
+  
+  test("Compare toStrings of values from Int.MinValue.toLong -100 to Int.MinValue.toLong + 100") {
+    for (i <- Int.MinValue.toLong -100 to Int.MinValue.toLong + 100) {
+      assert(SBigInt(i).toString === (BigInteger.valueOf(i)).toString)
+    }
+  }
+  
+  test("Serialization") {
+    import java.io._
+    
+    val bi= SBigInt(42)
+    
+    val buffer = new ByteArrayOutputStream
+    val out = new ObjectOutputStream(buffer)
+    out writeObject bi
+    out.close()
+    
+    val in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray))
+    val bi2 = in.readObject
+    in.close()
+    
+    assert(bi === bi2)
+  }
 }

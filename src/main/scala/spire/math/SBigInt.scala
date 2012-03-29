@@ -13,7 +13,7 @@ object SBigInt {
    * While addition, subtraction and multiplication work the same on signed 
    * and unsigned numbers, this is necessary to convert an signed to an unsigned value.
    */
-  final val UnsignedMask = 0xFFFFFFFFL
+  final val UnsignedIntMask: Long = 0xFFFFFFFFL
   
   /**
    * 0 is a bit special: It is the only value which is allowed to have
@@ -73,7 +73,9 @@ object SBigInt {
     // We need an array with 1 element
       new SBigInt(newSign, Array(newNum.toInt))
   }
-  def apply(s: String) = ???
+  def fromString(s: String) = ???
+  def fromStringOfRadix(s: String, radix: Int) = ???
+    
   def fromArray(arr: Array[Int]) = ???
   
   /** Implicit conversion from `Int` to `SBigInt`. */
@@ -88,11 +90,12 @@ object SBigInt {
  * 
  * Internally, the sign is stored as an Int and the magnitude as the two complement in a BE array.
  * 
- * It is made sure, that the same valeu has the same underlying representation.
+ * It is made sure that the same value has the same underlying representation.
  * 
  * TODO: Verify that private[math] works as intended when used from Java.
  */
 final class SBigInt private(final val signum: Int, final private[math] val arr: Array[Int]) extends ScalaNumber with ScalaNumericConversions with Ordered[SBigInt] with Serializable {
+  type UInt = Int
   
   def isWhole: Boolean = true
   def underlying = SBigInt.this
@@ -247,23 +250,91 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
   //def until(end: SBigInt, step: SBigInt = SBigInt(1)) = NumericRange(this, end, step)
   //def to(end: SBigInt, step: SBigInt = SBigInt(1)) = NumericRange.inclusive(this, end, step)
   
-  def isValidLong: Boolean = SBigInt.this >= Long.MinValue && SBigInt.this <= Long.MaxValue
+  def isZero: Boolean = this eq SBigInt.Zero 
+  
+  def isValidLong: Boolean = this >= Long.MinValue && this <= Long.MaxValue
 
   /** Compares this SBigInt with the specified value for equality. */
   override def equals(rhs: Any): Boolean = rhs match {
-    case rhs: SBigInt     => SBigInt.this equalsSBigInt rhs
+    case rhs: SBigInt     => this equalsSBigInt rhs
     case rhs: BigDecimal => rhs.toBigIntExact exists (SBigInt.this equals _)
     case x                => isValidLong && unifiedPrimitiveEquals(x)
   }
   
   //private def equalsBigInt(rhs: BigInt): Boolean = compare(rhs) == 0
-  private def equalsSBigInt(rhs: SBigInt): Boolean = (this eq rhs) || compare(rhs) == 0
+  private def equalsSBigInt(rhs: SBigInt): Boolean = 
+    (this eq rhs) || 
+    (this.signum == 0 && rhs.signum == 0) || 
+    (this.signum == rhs.signum) && sameArrayContents(this.arr, rhs.arr)
   
   override def hashCode: Int =
     if (isValidLong) unifiedPrimitiveHashcode
     else ???
     
-  override def toString = "toString not implemented yet!"
+  override def toString = signToString(signum) + intsToString(arr)
+  
+  private def signToString(sign: Int) = if (sign == -1) "-" else ""
+
+  private def intsToString(pArr: Array[Int]): String = {
+    val iArr: Array[Int] = new Array[Int](pArr.length)
+    System.arraycopy(pArr, 0, iArr, 0, pArr.length)
+    val ret: Array[Char] = new Array[Char](10 * iArr.length)
+    var retIndex: Int = ret.length
+    var stop = false
+    var result: String = null
+
+    while (!stop) {
+      var isZero: Boolean = true
+      var carry: Int = 0
+
+      var i: Int = 0
+      while (i < iArr.length) {
+        var value: Long = unsignedIntToLong(iArr(i))
+        if (value != 0L) isZero = false
+        value += carry * Radix
+        carry = (value % 10L).toInt
+        value /= 10L
+        iArr(i) = longToUnsignedInt(value)
+
+        i += 1;
+
+      }
+
+      if (isZero) {
+        if (retIndex == ret.length) {
+          stop = true;
+          result = "0"
+        } else {
+          stop = true;
+          result = new String(ret, retIndex, ret.length - retIndex)
+        }
+      }
+      if (!stop) {
+        assert((retIndex > 0))
+
+        ret(({
+          retIndex -= 1;
+          retIndex //+ 1
+        })) = (carry + '0'.toInt).toChar
+      }
+    }
+
+    result
+  }
+  
+  @inline private final def unsignedIntToLong(unsignedInt: UInt): Long =
+    unsignedInt & UnsignedIntMask
+
+  private def longToUnsignedInt(long: Long): UInt = {
+    assert(long >= 0L)
+    assert(long < Radix)
+    if (long <= Int.MaxValue.toLong) return long.toInt
+    else return (long - Radix).toInt
+  }
+
+  private final val Radix: Long = -2L * Int.MinValue.toLong
+  
+  
     
     
   ////////////////////////////////////////////////////////////////////////////////
@@ -275,5 +346,20 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
   private def multKaratsuba(lhs: Array[Int], rhs: Array[Int]) = ???
   private def multToomCook(lhs: Array[Int], rhs: Array[Int]) = ???
   private def multSchönhageStrassen(lhs: Array[Int], rhs: Array[Int]) = ???
-  
+
+  // Don't trust sameContents.
+  private def sameArrayContents(a: Array[Int], b: Array[Int]): Boolean = {
+    val aLen = a.length
+    if (aLen != b.length)
+      return false
+    var i = 0
+    while (i < aLen) {
+      if (a(i) != b(i)) {
+        return false
+      }
+      i += 1
+    }
+
+    return true
+  }  
 }
