@@ -43,7 +43,8 @@ trait MyRunner {
 trait BenchmarkData extends MyBenchmark {
   //val size = 10 * 1000
   //val size = 100 * 1000
-  val size = 1 * 1000 * 1000
+  val size = 200 * 1000
+  //val size = 1 * 1000 * 1000
   //val size = 4 * 1000 * 1000
   //val size = 20 * 1000 * 1000
 
@@ -213,15 +214,32 @@ class GcdBenchmarks extends MyBenchmark with BenchmarkData {
 
 object RationalBenchmarks extends MyRunner { val cls = classOf[RationalBenchmarks] }
 class RationalBenchmarks extends MyBenchmark with BenchmarkData {
-  @Param(Array("8", "16", "24", "32", "40", "48", "56", "64", "80", "96", "112", "128",
-               "144", "160", "176", "192", "208", "224", "240", "256")) 
+  @Param(Array("8", "16", "24", "32", "40", "48", "56", "64",
+               "80", "96", "112", "128",
+               "160", "192", "224", "256")) 
   var bits: Int = 0
 
   private var rats: Array[Rational] = _
+  private var bigRats: Array[BigIntRational] = _
 
   override protected def setUp() {
     rats = init(size)(Rational(BigInt(bits, Random), BigInt(bits, Random) + 1))
+    bigRats = init(size)(BigIntRational(BigInt(bits, Random), BigInt(bits, Random) + 1))
   }
+
+  def bigSum(rats: Array[BigIntRational]): Int = {
+    var sign = 1
+    var i = 0
+    var len = rats.length - 1
+
+    while (i < len) {
+      sign *= (rats(i) + rats(i + 1)).signum
+      i += 1
+    }
+
+    sign
+  }
+
 
   def sum(rats: Array[Rational]): Int = {
     var sign = 1
@@ -230,6 +248,19 @@ class RationalBenchmarks extends MyBenchmark with BenchmarkData {
 
     while (i < len) {
       sign *= (rats(i) + rats(i + 1)).signum
+      i += 1
+    }
+
+    sign
+  }
+
+  def bigProd(rats: Array[BigIntRational]): Int = {
+    var sign = 1
+    var i = 0
+    var len = rats.length - 1
+
+    while (i < len) {
+      sign *= (rats(i) * rats(i + 1)).signum
       i += 1
     }
 
@@ -253,6 +284,11 @@ class RationalBenchmarks extends MyBenchmark with BenchmarkData {
   def timeRationalSum(reps: Int) = run(reps)(sum(rats))
   def timeRationalProd(reps: Int) = run(reps)(prod(rats))
 
+  def timeBigIntRationalSum(reps: Int) = run(reps)(bigSum(bigRats))
+  def timeBigIntRationalProd(reps: Int) = run(reps)(bigProd(bigRats))
+
+
+  /*
   val longs2 = ints.map(n => n.toLong)
   val bigInts2 = ints.map(n => BigInt(n))
 
@@ -335,4 +371,5 @@ class RationalBenchmarks extends MyBenchmark with BenchmarkData {
   def timeBigRatMultiplySameBase(reps:Int) = run(reps)(combineBigRationals2(bigInts2)(_ * _))
   def timeLongRatDivideSameBase(reps:Int) = run(reps)(combineLongRationals2(longs2)(_ / _))
   def timeBigRatDivideSameBase(reps:Int) = run(reps)(combineBigRationals2(bigInts2)(_ / _))
+  */
 }
