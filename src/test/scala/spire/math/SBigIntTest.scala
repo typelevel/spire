@@ -53,17 +53,20 @@ class SBigIntTest extends FunSuite {
   test("Serialization") {
     import java.io._
     
-    val bi= SBigInt(42)
+    for (i <- -100 to 100) {
     
-    val buffer = new ByteArrayOutputStream
-    val out = new ObjectOutputStream(buffer)
-    out writeObject bi
-    out.close()
+      val bi= SBigInt(i)
     
-    val in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray))
-    val bi2 = in.readObject
-    in.close()
+      val buffer = new ByteArrayOutputStream
+      val out = new ObjectOutputStream(buffer)
+      out writeObject bi
+      out.close()
     
-    assert(bi === bi2)
+      val in = new ObjectInputStream(new ByteArrayInputStream(buffer.toByteArray))
+      val bi2 = in.readObject
+      in.close()
+    
+      assert(bi === bi2)
+    }
   }
 }

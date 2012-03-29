@@ -334,7 +334,50 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
 
   private final val Radix: Long = -2L * Int.MinValue.toLong
   
+  /**
+   * Standard Serialization would work, but we have to make sure
+   * that we sanitize the array to verify our invariant of no leading
+   * “zeroes” in our magnitude.
+   * 
+   * Otherwise all methods depending on it will be broken.
+   * 
+   * TODO: It probably makes sense to write an independent sanitizing method,
+   * which can be shared and call it from here...
+   */
+  @throws(classOf[java.io.IOException]) @throws(classOf[java.lang.ClassNotFoundException])
+  private def readObject(in: java.io.ObjectInputStream): Unit = {
+    @inline def setField(name: String, value: Any) {
+      val field = this.getClass.getDeclaredField(name)
+      field.setAccessible(true)
+      field.set(this, value)
+      field.setAccessible(false)
+    }
+    
+    var sign = in.readByte
+    if(sign > 1 || sign < -1) 
+      throw new java.io.StreamCorruptedException 
+    setField("signum", sign)
+    var inArr = in.readObject.asInstanceOf[Array[UInt]]
+    if(sign == 0 && inArr.length != 0)
+      throw new java.io.StreamCorruptedException
+    setField("arr", stripLeadingZeroes(inArr))
+  }
   
+  @throws(classOf[java.io.ObjectStreamException])
+  private def readReplace(): Object = {
+    if(signum == 0) return SBigInt.Zero
+    else this
+  }
+  
+  @throws(classOf[java.io.IOException])
+  private def writeObject(out: java.io.ObjectOutputStream): Unit = {
+    out.writeByte(signum)
+    out.writeObject(arr)
+    out.close()
+  }
+     
+  //FIXME
+  private def stripLeadingZeroes(arr: Array[UInt]): Array[UInt] = arr
     
     
   ////////////////////////////////////////////////////////////////////////////////
@@ -348,7 +391,7 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
   private def multSchönhageStrassen(lhs: Array[Int], rhs: Array[Int]) = ???
 
   // Don't trust sameContents.
-  private def sameArrayContents(a: Array[Int], b: Array[Int]): Boolean = {
+  @inline private final def sameArrayContents(a: Array[Int], b: Array[Int]): Boolean = {
     val aLen = a.length
     if (aLen != b.length)
       return false
