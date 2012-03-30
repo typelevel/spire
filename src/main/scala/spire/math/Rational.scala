@@ -19,7 +19,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def abs: Rational = if (this < Rational.zero) -this else this
   def inverse: Rational = Rational.one / this
-  def signum: Int = scala.math.signum(this compare Rational.zero)
+  def signum: Int = numerator.signum
 
   def unary_-(): Rational = Rational.zero - this
 
@@ -161,6 +161,100 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
       }
 
       findNthRoot(high, 0)
+    }
+  }
+
+  def sign: Sign = Sign(signum)
+
+
+  /**
+   * Returns a `Rational` whose numerator and denominator both fit in an `Int`.
+   */
+  def limitToInt: Rational = limitTo(BigInt(Int.MaxValue))
+
+
+  /**
+   * Returns a `Rational` whose numerator and denominator both fit in a `Long`.
+   */
+  def limitToLong: Rational = limitTo(BigInt(Long.MaxValue))
+
+
+  /**
+   * Returns a `Rational` whose denominator and numerator are no larger than
+   * `max` and whose value is close to the original. This applies, even if, for
+   * example, this `Rational` is greater than `max`. In that case,
+   * `Rational(max, 1)` is returned.
+   *
+   * @param max A positive integer.
+   */
+  def limitTo(max: BigInt): Rational = if (this.signum < 0) {
+    -((-this).limitTo(max))
+  } else {
+    require(max > 0, "Limit must be a positive integer.")
+
+    val half = max >> 1
+    val floor = this.toBigInt
+    if (floor >= max) {
+      Rational(max)
+    } else if (floor >= (max >> 1)) {
+      Rational(floor.toLong)
+    } else if (this < Rational(1)) {
+      limitDenominatorTo(max)
+    } else {
+      limitDenominatorTo(max * denominator / numerator)
+    }
+  }
+
+
+  /**
+   * Finds the closest `Rational` to this `Rational` whose denominator is no
+   * larger than `limit`.
+   *
+   * See [[http://en.wikipedia.org/wiki/Stern%E2%80%93Brocot_tree#Mediants_and_binary_search]]
+   */
+  def limitDenominatorTo(limit: BigInt): Rational = {
+    require(limit > 0, "Cannot limit denominator to non-positive number.")
+
+    // TODO: We should always perform a binary search from the left or right to
+    //       speed up computation. For example, if in a search, we have a lower
+    //       bound of 1/2 for many steps, then each step will only add 1/2 to
+    //       the upper-bound, and so we'd converge on the number quite slowly.
+    //       However, we can speed this up by tentatively checking if we could
+    //       skip some intermediate values, by performing an adaptive search.
+    //       We'd simply keep doubling the number of steps we're skipping until
+    //       the upper-bound (eg) is now the lower bound, then go back to find
+    //       the greatest lower bound in the steps we missed by binary search.
+    //       Instead of adding 1/2 n times, we would try to add 1/2, 2/4, 4/8,
+    //       8/16, etc., until the upper-bound swiches to a lower bound. Say
+    //       this happens a (1/2)*2^k, then we simply perform a binary search in
+    //       between (1/2)*2^(k-1) and (1/2)*2^k to find the new lower bound.
+    //       This would reduce the number of steps to O(log n).
+
+    @tailrec
+    def closest(l: Rational, u: Rational): Rational = {
+      val mediant = Rational(l.numerator + u.numerator, l.denominator + u.denominator)
+
+      if (mediant.denominator > limit) {
+        if ((this - l).abs > (u - this).abs) {
+          u
+        } else {
+          l
+        }
+      } else if (mediant == this) {
+        mediant
+      } else if (mediant < this) {
+        closest(mediant, u)
+      } else {
+        closest(l, mediant)
+      }
+    }
+
+    this.sign match {
+      case Zero => this
+      case Positive =>
+        closest(Rational(this.toBigInt), Rational(1, 0))
+      case Negative =>
+        closest(Rational(-1, 0), Rational(this.toBigInt))
     }
   }
 }
@@ -402,6 +496,8 @@ object LongRationals extends Rationals[Long] {
     def numerator = n.toBigInt
     def denominator = d.toBigInt
 
+    override def signum: Int = if (n > 0) 1 else if (n < 0) -1 else 0
+
     override def unary_-(): Rational = if (n == Long.MinValue) {
       BigRational(-BigInt(Long.MinValue), BigInt(d))
     } else {
@@ -578,6 +674,8 @@ object BigRationals extends Rationals[BigInt] {
 
     def numerator = n
     def denominator = d
+
+    override def signum: Int = n.signum
 
     override def unary_-(): Rational = Rational(-SafeLong(n), SafeLong(d))
 
