@@ -87,7 +87,7 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
       ((r.d / dgcd) * n - (d / dgcd) * r.n).signum
   }
 
-  def signum: Int = this compare BigIntRational.Zero
+  def signum: Int = n.signum
 }
 
 
