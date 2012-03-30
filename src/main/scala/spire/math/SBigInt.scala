@@ -73,10 +73,68 @@ object SBigInt {
     // We need an array with 1 element
       new SBigInt(newSign, Array(newNum.toInt))
   }
-  def fromString(s: String) = ???
+  
+  def apply(str: String): SBigInt = {
+    //Ugly but potentially faster than Character.isDigit etc.  
+    @inline def fastDigit(c: Char) = 
+      if(c >= '0' && c <= '9') c - '0'
+      else -1
+    
+    val len = str.length
+    if(len == 0)
+      throw new NumberFormatException
+      
+    var start = 0
+    var firstChar = str(0) 
+    
+    val sign = 
+      if(firstChar == '+') {
+       start = 1
+       1
+      } else if(firstChar == '-') {
+        start = 1
+        -1
+      } else
+        1
+
+   /* If there are no more than 9/18 digits (Int/Long.MaxValue.toString.length == 10/19)
+    * the String can safely converted to Int/Long.
+    */
+    if(len-start < 9) return apply(str.toInt)
+    if(len-start < 19) return apply(str.toLong)
+    
+    /*
+     * String is longer ...
+     */
+    
+    println(str)
+    
+    ???
+  }
+  
   def fromStringOfRadix(s: String, radix: Int) = ???
     
   def fromArray(arr: Array[Int]) = ???
+  
+  private def stripLeadingZeroes(arr: Array[Int]): Array[Int] = {
+    var i = arr.length -1
+    var empty = -1
+    var stop = false
+    while(i >= 0 && stop == false){
+      if(arr(i) == 0)
+        empty = i
+      else
+        stop = true
+      i -= 1
+    }
+    if (empty == -1) {
+      arr
+    } else {
+      val newArr = new Array[Int](empty)
+      System.arraycopy(arr, 0, newArr, 0, empty)
+      newArr
+    }
+  }
   
   /** Implicit conversion from `Int` to `SBigInt`. */
   implicit def int2bigInt(i: Int): SBigInt = apply(i)
@@ -94,11 +152,12 @@ object SBigInt {
  * 
  * TODO: Verify that private[math] works as intended when used from Java.
  */
+@SerialVersionUID(1L)
 final class SBigInt private(final val signum: Int, final private[math] val arr: Array[Int]) extends ScalaNumber with ScalaNumericConversions with Ordered[SBigInt] with Serializable {
   type UInt = Int
   
   def isWhole: Boolean = true
-  def underlying = SBigInt.this
+  def underlying = this
 
   /**
    * Returns this value as a `Long`.
@@ -116,7 +175,7 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
    * or `Float.MinValue` (iff `sign == -1`) are returned.
    */
   def floatValue: Float = {
-    //TODO: Look up max magnitude representable as a Float.
+    //TODO: Look up max arr size representable as a Double.
     val maxMag = -42
     if(arr.length <= maxMag) {
       //Convert to Float
@@ -134,7 +193,7 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
    * or `Double.MinValue` (iff `sign == -1`) are returned.
    */
   def doubleValue: Double = {
-    //TODO: Look up max magnitude representable as a Double.
+    //TODO: Look up max arr size representable as a Double.
     val maxMag = -42
     if(arr.length <= maxMag) {
       //Convert to Double
@@ -157,17 +216,17 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
   
   def +(rhs: SBigInt): SBigInt = {
     // Check if one of the numbers are zero and return the other one.
-    if (rhs.signum == 0) return SBigInt.this
-    if (SBigInt.this.signum == 0) return rhs
+    if (rhs.isZero) return this
+    if (this.isZero) return rhs
 
     // Check if both numbers have the same sign.
     // If true, keep the sign and add the numbers.
-    if (SBigInt.this.signum == rhs.signum)
-      return new SBigInt(SBigInt.this.signum,
-        if (SBigInt.this.arr.length >= rhs.arr.length)
-          arrayPlusArray(SBigInt.this.arr, rhs.arr)
+    if (this.signum == rhs.signum)
+      return new SBigInt(this.signum,
+        if (this.arr.length >= rhs.arr.length)
+          arrayPlusArray(this.arr, rhs.arr)
         else
-          arrayPlusArray(rhs.arr, SBigInt.this.arr))
+          arrayPlusArray(rhs.arr, this.arr))
     
     ???
     
@@ -175,41 +234,49 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
   
   def -(rhs: SBigInt): SBigInt = {
     // Check if the other number is zero.
-    if (rhs.signum == 0) return SBigInt.this
+    if (rhs.signum == 0) return this
     // If this is Zero, return the other one, negated.
-    if (SBigInt.this.signum == 0) return -rhs
+    if (this.signum == 0) return -rhs
     // Invariant: Both numbers are non-zero.
 
-    if (SBigInt.this.signum != rhs.signum)
-      return new SBigInt(SBigInt.this.signum,
-        if (SBigInt.this.arr.length >= rhs.arr.length)
-          arrayPlusArray(SBigInt.this.arr, rhs.arr)
+    if (this.signum != rhs.signum)
+      return new SBigInt(this.signum,
+        if (this.arr.length >= rhs.arr.length)
+          arrayPlusArray(this.arr, rhs.arr)
         else
-          arrayPlusArray(rhs.arr, SBigInt.this.arr))
+          arrayPlusArray(rhs.arr, this.arr))
     
     ???
   }
   
   def *(rhs: SBigInt): SBigInt = {
-    if (SBigInt.this.signum == 0 || rhs.signum == 0)
+    if (this.isZero || rhs.isZero)
       return SBigInt.Zero
       
-    if (SBigInt.this == SBigInt.One) 
+    if (this.isOne) 
       return rhs
-    if (rhs == SBigInt.One) 
-      return SBigInt.this
+    if (rhs.isOne) 
+      return this
             
     ???
   }
   
   def /(rhs: SBigInt): SBigInt = {
-    if (rhs == SBigInt.One)
-      return SBigInt.this
+    if(rhs.isZero)
+      throw new ArithmeticException
+    
+    if (this.isZero)
+      return SBigInt.Zero
+      
+    if (this.isOne) 
+      ???
+    if (rhs.isOne) 
+      return this
       
     ???
   }
   def %(rhs: SBigInt): SBigInt = ???
-  def /% (rhs: SBigInt): (SBigInt, SBigInt) = (SBigInt.this / rhs, SBigInt.this % rhs)
+  def /% (rhs: SBigInt): (SBigInt, SBigInt) = (this / rhs, this % rhs)
 
   /** Leftshift of SBigInt */
   def << (n: Int): SBigInt = ???
@@ -251,13 +318,14 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
   //def to(end: SBigInt, step: SBigInt = SBigInt(1)) = NumericRange.inclusive(this, end, step)
   
   def isZero: Boolean = this eq SBigInt.Zero 
+  def isOne: Boolean = signum == 1 && arr.length == 1 && arr(0) == 1
   
   def isValidLong: Boolean = this >= Long.MinValue && this <= Long.MaxValue
 
   /** Compares this SBigInt with the specified value for equality. */
   override def equals(rhs: Any): Boolean = rhs match {
     case rhs: SBigInt     => this equalsSBigInt rhs
-    case rhs: BigDecimal => rhs.toBigIntExact exists (SBigInt.this equals _)
+    case rhs: BigDecimal => rhs.toBigIntExact exists (this equals _)
     case x                => isValidLong && unifiedPrimitiveEquals(x)
   }
   
@@ -346,7 +414,7 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
    */
   @throws(classOf[java.io.IOException]) @throws(classOf[java.lang.ClassNotFoundException])
   private def readObject(in: java.io.ObjectInputStream): Unit = {
-    @inline def setField(name: String, value: Any) {
+    @inline def setField(name: String, value: Any): Unit = {
       val field = this.getClass.getDeclaredField(name)
       field.setAccessible(true)
       field.set(this, value)
@@ -375,23 +443,19 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
     out.writeObject(arr)
     out.close()
   }
-     
-  //FIXME
-  private def stripLeadingZeroes(arr: Array[UInt]): Array[UInt] = arr
-    
     
   ////////////////////////////////////////////////////////////////////////////////
 
-  private def arrayPlusArray(lhs: Array[Int], rhs: Array[Int]): Array[Int] = ???
-  private def arrayMinusArray(lhs: Array[Int], rhs: Array[Int]): Array[Int] = ???
+  private def arrayPlusArray(lhs: Array[UInt], rhs: Array[UInt]): Array[UInt] = ???
+  private def arrayMinusArray(lhs: Array[UInt], rhs: Array[UInt]): Array[UInt] = ???
   
-  private def multLong(lhs: Array[Int], rhs: Array[Int]) = ???
-  private def multKaratsuba(lhs: Array[Int], rhs: Array[Int]) = ???
-  private def multToomCook(lhs: Array[Int], rhs: Array[Int]) = ???
-  private def multSchönhageStrassen(lhs: Array[Int], rhs: Array[Int]) = ???
+  private def multLong(lhs: Array[UInt], rhs: Array[UInt]) = ???
+  private def multKaratsuba(lhs: Array[UInt], rhs: Array[UInt]) = ???
+  private def multToomCook(lhs: Array[UInt], rhs: Array[UInt]) = ???
+  private def multSchönhageStrassen(lhs: Array[UInt], rhs: Array[UInt]) = ???
 
   // Don't trust sameContents.
-  @inline private final def sameArrayContents(a: Array[Int], b: Array[Int]): Boolean = {
+  @inline private final def sameArrayContents(a: Array[UInt], b: Array[UInt]): Boolean = {
     val aLen = a.length
     if (aLen != b.length)
       return false
