@@ -221,10 +221,16 @@ class RationalBenchmarks extends MyBenchmark with BenchmarkData {
 
   private var rats: Array[Rational] = _
   private var bigRats: Array[BigIntRational] = _
+  private var longRats: Array[LongRational] = _
 
   override protected def setUp() {
     rats = init(size)(Rational(BigInt(bits, Random), BigInt(bits, Random) + 1))
     bigRats = init(size)(BigIntRational(BigInt(bits, Random), BigInt(bits, Random) + 1))
+    if (bits <= 32) {
+      longRats = init(size)(LongRational(BigInt(bits, Random).toLong, BigInt(bits, Random).toLong + 1L))
+    } else {
+      longRats = Array[LongRational]()
+    }
   }
 
   def bigSum(rats: Array[BigIntRational]): Int = {
@@ -240,6 +246,18 @@ class RationalBenchmarks extends MyBenchmark with BenchmarkData {
     sign
   }
 
+  def longSum(rats: Array[LongRational]): Int = {
+    var sign = 1
+    var i = 0
+    var len = rats.length - 1
+
+    while (i < len) {
+      sign *= (rats(i) + rats(i + 1)).signum
+      i += 1
+    }
+
+    sign
+  }
 
   def sum(rats: Array[Rational]): Int = {
     var sign = 1
@@ -255,6 +273,19 @@ class RationalBenchmarks extends MyBenchmark with BenchmarkData {
   }
 
   def bigProd(rats: Array[BigIntRational]): Int = {
+    var sign = 1
+    var i = 0
+    var len = rats.length - 1
+
+    while (i < len) {
+      sign *= (rats(i) * rats(i + 1)).signum
+      i += 1
+    }
+
+    sign
+  }
+
+  def longProd(rats: Array[LongRational]): Int = {
     var sign = 1
     var i = 0
     var len = rats.length - 1
@@ -286,6 +317,9 @@ class RationalBenchmarks extends MyBenchmark with BenchmarkData {
 
   def timeBigIntRationalSum(reps: Int) = run(reps)(bigSum(bigRats))
   def timeBigIntRationalProd(reps: Int) = run(reps)(bigProd(bigRats))
+
+  def timeLongRationalSum(reps: Int) = run(reps)(longSum(longRats))
+  def timeLongRationalProd(reps: Int) = run(reps)(longProd(longRats))
 
 
   /*

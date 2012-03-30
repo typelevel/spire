@@ -2,6 +2,9 @@ package spire.math
 
 import org.scalatest.FunSuite
 
+import scala.util.Random
+
+
 class RationalTest extends FunSuite {
 
   test("rational canonical construction") {
@@ -217,5 +220,66 @@ class RationalTest extends FunSuite {
   test("reverse primitive equality") {
     assert(1 == Rational.one)
     assert(-23L == Rational(-23L, 1L))
+  }
+
+  test("limiting 0 to any number returns 0") {
+    assert(Rational.zero.limitDenominatorTo(1234) === Rational.zero)
+    assert(Rational.zero.limitDenominatorTo(1) === Rational.zero)
+    assert(Rational.zero.limitTo(23) === Rational.zero)
+  }
+
+  test("limiting to non-positive number throws exception") {
+    intercept[IllegalArgumentException] {
+      val a = Rational(123, 456).limitDenominatorTo(-1)
+    }
+    
+    intercept[IllegalArgumentException] {
+      val a = Rational(123, 456).limitTo(-1)
+    }
+  }
+
+  /**
+   * Finds the closest `Rational` to `a` whose denominator is no greater than
+   * `limit` by brute-force. This is used to compare with the version used by
+   * `Rational` which is a little harder to reason about. This just literally
+   * tries every denominator between 1 and `limit` and returns the `Rational`
+   * that was closest to `a`.
+   */
+  def bruteForceLimitDen(a: Rational, limit: Int): Rational =
+    (1 to limit) map (BigInt(_)) flatMap { d =>
+      val ln = (a * d).toBigInt
+      List(Rational(ln - 1, d), Rational(ln, d), Rational(ln + 1, d))
+    } minBy (b => (b - a).abs)
+
+  test("limitDenominatorTo valid number returns correct result") {
+    assert(Rational(6, 5) === Rational(23, 19).limitDenominatorTo(10))
+    assert(Rational(-6, 5) === Rational(-23, 19).limitDenominatorTo(10))
+
+    val rng = new Random(9281)
+    val rationals = List.fill(100)(Rational(rng.nextInt, rng.nextInt))
+    rationals foreach { a =>
+      assert(a.limitDenominatorTo(255) === bruteForceLimitDen(a, 255), {
+          "%s != %s (original: %s)" format (
+            a.limitDenominatorTo(255),
+            bruteForceLimitDen(a, 255),
+            a
+          )
+        })
+    }
+  }
+
+  test("limit large number to small number returns small number") {
+    assert(Rational(1231, 2).limitTo(12) === Rational(12))
+    assert(Rational(-321, 3).limitTo(7) === Rational(-7))
+  }
+
+  test("limitToInt makes rationals fit in Ints") {
+    val rng = new Random(2919234)
+    val rationals = List.fill(100)(Rational(BigInt(128, rng), BigInt(128, rng)))
+    rationals foreach { a =>
+      val b = a.limitToInt
+      assert(b.numerator.isValidInt && b.denominator.isValidInt, 
+        "%s (from %s) doesn't fit in Ints" format (b.toString, a.toString))
+    }
   }
 }
