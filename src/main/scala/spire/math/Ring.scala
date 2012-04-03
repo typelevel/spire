@@ -54,7 +54,6 @@ final class RingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Ring[A]) 
 
   def pow(rhs:Int) = ev.pow(lhs, rhs)
   def **(rhs:Int) = ev.pow(lhs, rhs)
-  def ~^(rhs:Int) = ev.pow(lhs, rhs)
   
   def sign: Sign = ev.sign(lhs)
   def signum: Int = ev.signum(lhs)

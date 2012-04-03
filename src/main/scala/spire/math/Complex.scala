@@ -130,7 +130,6 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   }
 
   def **(b:Complex[T]) = pow(b)
-  def ~^(b:Complex[T]) = pow(b)
   def pow(b:Complex[T]) = if (b.eq(Complex.zero[T])) {
     Complex.one[T]
 

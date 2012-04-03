@@ -57,10 +57,8 @@ sealed trait Number extends ScalaNumber with ScalaNumericConversions with Ordere
 
   def pow(rhs:Number):Number
   def **(rhs:Number) = this pow rhs
-  def ~^(rhs:Number) = this pow rhs
 
   def **:(lhs:Number) = this rhs_pow lhs
-  def ~^:(lhs:Number) = this rhs_pow lhs
   protected[math] def rhs_pow(lhs:Number):Number
 }
 

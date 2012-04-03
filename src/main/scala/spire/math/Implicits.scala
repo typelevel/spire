@@ -16,7 +16,6 @@ final class FloatOps(lhs:Float) {
   def /%(rhs:Complex[Float]) = c /% rhs
   def pow(rhs:Complex[Float]) = c pow rhs
   def **(rhs:Complex[Float]) = c ** rhs
-  def ~^(rhs:Complex[Float]) = c ~^ rhs
 }
 
 final class DoubleOps(lhs:Double) {
@@ -30,7 +29,6 @@ final class DoubleOps(lhs:Double) {
   def /%(rhs:Complex[Double]) = c /% rhs
   def pow(rhs:Complex[Double]) = c pow rhs
   def **(rhs:Complex[Double]) = c ** rhs
-  def ~^(rhs:Complex[Double]) = c ~^ rhs
 }
 
 
