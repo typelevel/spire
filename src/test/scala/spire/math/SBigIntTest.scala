@@ -37,7 +37,7 @@ class SBigIntTest extends FunSuite with PrivateMethodTester {
     assert(bi.signum === pos)
     assert(bi.arr === Array(42))
   }
-    
+
   test("Compare toStrings of interesting values") {
     for (i <- interestingValues) {
       assert(SBigInt(i).toString === BigInteger.valueOf(i).toString)

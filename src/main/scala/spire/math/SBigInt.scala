@@ -96,7 +96,7 @@ object SBigInt {
         -1
       } else
         1
-      
+
    /* If there are no more than 9/18 digits (Int/Long.MaxValue.toString.length == 10/19)
     * the String can safely converted to Int/Long.
     */
@@ -160,7 +160,7 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
   type UInt = Int
   
   def isWhole: Boolean = true
-  def underlying = SBigInt.this
+  def underlying = this
   def bigInteger: java.math.BigInteger = {
     // Avoid copying of potentially large arrays.
     val ctor = classOf[java.math.BigInteger].getDeclaredConstructor(classOf[Array[Int]], classOf[Int])
@@ -230,12 +230,12 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
 
     // Check if both numbers have the same sign.
     // If true, keep the sign and add the numbers.
-    if (SBigInt.this.signum == rhs.signum)
-      return new SBigInt(SBigInt.this.signum,
-        if (SBigInt.this.arr.length >= rhs.arr.length)
-          arrayPlusArray(SBigInt.this.arr, rhs.arr)
+    if (this.signum == rhs.signum)
+      return new SBigInt(this.signum,
+        if (this.arr.length >= rhs.arr.length)
+          arrayPlusArray(this.arr, rhs.arr)
         else
-          arrayPlusArray(rhs.arr, SBigInt.this.arr))
+          arrayPlusArray(rhs.arr, this.arr))
     
     ???
     
@@ -243,17 +243,17 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
   
   def -(rhs: SBigInt): SBigInt = {
     // Check if the other number is zero.
-    if (rhs.signum == 0) return SBigInt.this
+    if (rhs.signum == 0) return this
     // If this is Zero, return the other one, negated.
-    if (SBigInt.this.signum == 0) return -rhs
+    if (this.signum == 0) return -rhs
     // Invariant: Both numbers are non-zero.
 
-    if (SBigInt.this.signum != rhs.signum)
-      return new SBigInt(SBigInt.this.signum,
-        if (SBigInt.this.arr.length >= rhs.arr.length)
-          arrayPlusArray(SBigInt.this.arr, rhs.arr)
+    if (this.signum != rhs.signum)
+      return new SBigInt(this.signum,
+        if (this.arr.length >= rhs.arr.length)
+          arrayPlusArray(this.arr, rhs.arr)
         else
-          arrayPlusArray(rhs.arr, SBigInt.this.arr))
+          arrayPlusArray(rhs.arr, this.arr))
     
     ???
   }
@@ -285,7 +285,7 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
     ???
   }
   def %(rhs: SBigInt): SBigInt = ???
-  def /% (rhs: SBigInt): (SBigInt, SBigInt) = (SBigInt.this / rhs, SBigInt.this % rhs)
+  def /% (rhs: SBigInt): (SBigInt, SBigInt) = (this / rhs, this % rhs)
 
   /** Leftshift of SBigInt */
   def << (n: Int): SBigInt = ???
@@ -334,7 +334,7 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
   /** Compares this SBigInt with the specified value for equality. */
   override def equals(rhs: Any): Boolean = rhs match {
     case rhs: SBigInt     => this equalsSBigInt rhs
-    case rhs: BigDecimal => rhs.toBigIntExact exists (SBigInt.this equals _)
+    case rhs: BigDecimal => rhs.toBigIntExact exists (this equals _)
     case x                => isValidLong && unifiedPrimitiveEquals(x)
   }
   
