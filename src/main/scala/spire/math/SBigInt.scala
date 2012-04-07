@@ -116,6 +116,9 @@ object SBigInt {
     
   def fromArray(arr: Array[Int]) = ???
   
+  /**
+   * Returns the original array if unchanged.
+   */
   private def stripLeadingZeroes(arr: Array[Int]): Array[Int] = {
     var i = arr.length -1
     var empty = -1
@@ -158,6 +161,12 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
   
   def isWhole: Boolean = true
   def underlying = SBigInt.this
+  def bigInteger: java.math.BigInteger = {
+    // Avoid copying of potentially large arrays.
+    val ctor = classOf[java.math.BigInteger].getDeclaredConstructor(classOf[Array[Int]], classOf[Int])
+    ctor setAccessible true
+    ctor.newInstance(arr, signum.asInstanceOf[Object])
+  }
 
   /**
    * Returns this value as a `Long`.
@@ -344,8 +353,9 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
   private def signToString(sign: Int) = if (sign == -1) "-" else ""
 
   private def intsToString(pArr: Array[Int]): String = {
+    val Radix: Long = -2L * Int.MinValue.toLong
     val iArr: Array[Int] = new Array[Int](pArr.length)
-    System.arraycopy(pArr, 0, iArr, 0, pArr.length)
+    compat.Platform.arraycopy(pArr, 0, iArr, 0, pArr.length)
     val ret: Array[Char] = new Array[Char](10 * iArr.length)
     var retIndex: Int = ret.length
     var stop = false
@@ -393,14 +403,33 @@ final class SBigInt private(final val signum: Int, final private[math] val arr: 
   @inline private final def unsignedIntToLong(unsignedInt: UInt): Long =
     unsignedInt & UnsignedIntMask
 
-  private def longToUnsignedInt(long: Long): UInt = {
+  @inline private def longToUnsignedInt(long: Long): UInt = {
     assert(long >= 0L)
-    assert(long < Radix)
+    assert(long <= UnsignedIntMask)
     if (long <= Int.MaxValue.toLong) return long.toInt
-    else return (long - Radix).toInt
+    else return (long & UnsignedIntMask).toInt
+  }
+  
+  /**
+   * Iff the value is negative return 0xFFFFFFFF (all bits set),
+   * else 0x00000000 (no bits set).
+   */
+  private def signBits: Int =
+    if (signum < 0) -1
+    else 0
+    
+  /**
+   * TODO: Better name.
+   */
+  private def apply(i: Int): Int = {
+    // Return 0 if i is negative. (Or throw an exception?)
+    if(i < 0) return 0
+    // Return the signBits, if the requested value is larger than the magnitude. 
+    if(i >= arr.length) return signBits
+    //Return the requested parts of the magnitude.
+    ???
   }
 
-  private final val Radix: Long = -2L * Int.MinValue.toLong
   
   /**
    * Standard Serialization would work, but we have to make sure
