@@ -1,9 +1,23 @@
 package spire.buffer
 
+import annotation.tailrec
 import scala.math.{min, max}
 import scala.{specialized => spec}
 
 object Buffer {
+  def mapBufferToArray[@spec A, @spec B:Manifest](src:Buffer[A], s1:Int, len:Int)(f:A => B) = {
+    val bs = Array.ofDim[B](len)
+    var i = s1
+    var j = 0
+    var k = s1 + len
+    while (i < k) {
+      bs(j) = f(src(i))
+      i += 1
+      j += 1
+    }
+    bs
+  }
+
   def alloc[@spec A:Manifest](src:Array[A], s1:Int, len:Int) = {
     val as = Array.ofDim[A](len)
     Buffer.copy(src, as, s1, 0, len)
@@ -30,20 +44,34 @@ object Buffer {
       j -= 1
     }
   }
-
-  //def empty[@spec A:Manifest] = new Buffer2(Array.empty[A], 0)
-  //def ofDim[@spec A:Manifest](n:Int) = new Buffer2(Array.ofDim[A](n), 0)
-  //def apply[@spec A:Manifest](elems:Array[A]) = new Buffer2(elems, elems.length)
 }
 
 trait Buffer[@spec A] {
   def toArray:Array[A]
+  def toList = {
+    @tailrec def f(i:Int, as:List[A]):List[A] = if (i < 0) as else f(i - 1, apply(i) :: as)
+    f(length - 1, Nil)
+  }
+  def toVector:Vector[A] = Vector(toArray:_*)
+
   def length:Int
 
   def apply(i:Int):A
   def get(i:Int):Option[A]
 
   def slice(i:Int, j:Int):Buffer[A]
+  def reverse: Buffer[A]
+
+  def map[@spec B:Manifest](f:A => B): Buffer[B]
+
+  def foreach(f:Function[A, Unit]): Unit = {
+    var i = 0
+    val len = length
+    while (i < len) {
+      f(apply(i))
+      i += 1
+    }
+  }
 
   override def toString = {
     val sb = new StringBuilder()

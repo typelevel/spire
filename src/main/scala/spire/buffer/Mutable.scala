@@ -18,16 +18,14 @@ final class Mutable[@spec A:Manifest](as:Array[A], n:Int) extends Buffer[A] {
 
   def length = len
   def toArray = Buffer.alloc(elems, 0, len)
-  def slice(i:Int, j:Int) = {
-    val n = j - i
-    new Mutable(Buffer.alloc(elems, i, n), n)
-  }
+  def slice(i:Int, j:Int) = Mutable.unsafe(Buffer.alloc(elems, i, j - i))
+  def reverse = Mutable.unsafe(as.reverse)
+  def map[@spec B:Manifest](f:A => B) = Mutable.unsafe(as.map(f))
   def apply(i:Int) = elems(i)
   def get(i:Int) = if (i < len) Some(elems(i)) else None
-
-  def toImmutable = new Immutable(as.clone, 0, n)
-  def toImmutableUnsafe = new Immutable(as, 0, n)
-
+  def update(i:Int, a:A):Unit = elems(i) = a
+  def toImmutable = Immutable(as.clone)
+  def toImmutableUnsafe = Immutable(as)
   def toMutable = new Mutable(as.clone, n)
   def toMutableUnsafe = this
 
@@ -40,8 +38,6 @@ final class Mutable[@spec A:Manifest](as:Array[A], n:Int) extends Buffer[A] {
       elems = as
     }
   }
-
-  def update(i:Int, a:A):Unit = elems(i) = a
 
   def append(a:A):Unit = insert(len, a)
   def prepend(a:A):Unit = insert(0, a)
