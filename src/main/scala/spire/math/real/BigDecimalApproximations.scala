@@ -59,7 +59,7 @@ object BigDecimalApproximations {
       
       case BigIntLit(n) => BigDecimal(n)
       
-      case Neg(a) => apply(a, bits)
+      case Neg(a) => -apply(a, bits)
       
       case Add(a, b) => apply(a, bits + 1) + apply(b, bits + 1)
       

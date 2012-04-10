@@ -7,15 +7,12 @@ import scala.math.{abs, ceil, floor, pow => mpow}
 
 trait Ring[@spec(Int,Long,Float,Double) A] extends Eq[A] {
   self =>
-  def abs(a:A):A = if (signum(a) < 0) negate(a) else a
   def minus(a:A, b:A):A = plus(a, negate(b))
   def negate(a:A):A
   def one:A
   def plus(a:A, b:A):A
   def pow(a:A, n:Int):A = _pow(a, n, one)
-  def sign(a: A): Sign = Sign(self.signum(a))
-  def signum(a: A): Int
-  def times(a:A, b:A):A = _times(a, b, one)
+  def times(a:A, b:A):A // = _times(a, b, one)
   def zero:A
 
   @tailrec private def _pow(a:A, n:Int, sofar:A):A = if (n > 0) {
@@ -26,11 +23,13 @@ trait Ring[@spec(Int,Long,Float,Double) A] extends Eq[A] {
     zero
   }
 
+  /*
   @tailrec private def _times(a:A, b:A, sofar:A):A = signum(b) match {
     case 1 => _times(a, minus(b, one), plus(sofar, a))
     case 0 => sofar
     case -1 => _times(negate(a), negate(b), sofar)
   }
+  */
 
   // TODO: Implement log n version.
   @tailrec private def _fromInt(n: Int, a: A): A = {
@@ -59,7 +58,6 @@ trait Ring[@spec(Int,Long,Float,Double) A] extends Eq[A] {
 }
 
 final class RingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Ring[A]) {
-  def abs = ev.abs(lhs)
   def unary_- = ev.negate(lhs)
 
   def -(rhs:A) = ev.minus(lhs, rhs)
@@ -68,9 +66,6 @@ final class RingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Ring[A]) 
 
   def pow(rhs:Int) = ev.pow(lhs, rhs)
   def **(rhs:Int) = ev.pow(lhs, rhs)
-  
-  def sign: Sign = ev.sign(lhs)
-  def signum: Int = ev.signum(lhs)
 }
 
 object Ring {
@@ -90,13 +85,11 @@ object Ring {
 }
 
 trait ByteIsRing extends Ring[Byte] with ByteEq {
-  override def abs(a:Byte): Byte = scala.math.abs(a).toByte
   override def minus(a:Byte, b:Byte): Byte = (a - b).toByte
   def negate(a:Byte): Byte = (-a).toByte
   def one: Byte = 1.toByte
   def plus(a:Byte, b:Byte): Byte = (a + b).toByte
   override def pow(a: Byte, b:Int): Byte = mpow(a, b).toByte
-  def signum(a: Byte): Int = a.signum
   override def times(a:Byte, b:Byte): Byte = (a * b).toByte
   def zero: Byte = 0.toByte
   
@@ -104,13 +97,11 @@ trait ByteIsRing extends Ring[Byte] with ByteEq {
 }
 
 trait ShortIsRing extends Ring[Short] with ShortEq {
-  override def abs(a:Short): Short = scala.math.abs(a).toShort
   override def minus(a:Short, b:Short): Short = (a - b).toShort
   def negate(a:Short): Short = (-a).toShort
   def one: Short = 1.toShort
   def plus(a:Short, b:Short): Short = (a + b).toShort
   override def pow(a: Short, b:Int): Short = mpow(a, b).toShort
-  def signum(a: Short): Int = a.signum
   override def times(a:Short, b:Short): Short = (a * b).toShort
   def zero: Short = 0.toShort
   
@@ -118,13 +109,11 @@ trait ShortIsRing extends Ring[Short] with ShortEq {
 }
 
 trait IntIsRing extends Ring[Int] with IntEq {
-  override def abs(a:Int): Int = scala.math.abs(a)
   override def minus(a:Int, b:Int): Int = a - b
   def negate(a:Int): Int = -a
   def one: Int = 1
   def plus(a:Int, b:Int): Int = a + b
   override def pow(a:Int, b:Int): Int = mpow(a, b).toInt
-  def signum(a: Int): Int = a.signum
   override def times(a:Int, b:Int): Int = a * b
   def zero: Int = 0
 
@@ -132,7 +121,6 @@ trait IntIsRing extends Ring[Int] with IntEq {
 }
 
 trait LongIsRing extends Ring[Long] with LongEq {
-  override def abs(a:Long): Long = scala.math.abs(a)
   override def minus(a:Long, b:Long): Long = a - b
   def negate(a:Long): Long = -a
   def one: Long = 1L
@@ -151,7 +139,6 @@ trait LongIsRing extends Ring[Long] with LongEq {
         0
       }
   }
-  def signum(a: Long): Int = a.signum
   override def times(a:Long, b:Long): Long = a * b
   def zero: Long = 0L
   
@@ -159,13 +146,11 @@ trait LongIsRing extends Ring[Long] with LongEq {
 }
 
 trait FloatIsRing extends Ring[Float] with FloatEq {
-  override def abs(a:Float): Float = scala.math.abs(a)
   override def minus(a:Float, b:Float): Float = a - b
   def negate(a:Float): Float = -a
   def one: Float = 1.0F
   def plus(a:Float, b:Float): Float = a + b
   override def pow(a:Float, b:Int): Float = mpow(a, b).toFloat
-  def signum(a: Float): Int = a.signum
   override def times(a:Float, b:Float): Float = a * b
   def zero: Float = 0.0F
   
@@ -173,13 +158,11 @@ trait FloatIsRing extends Ring[Float] with FloatEq {
 }
 
 trait DoubleIsRing extends Ring[Double] with DoubleEq {
-  override def abs(a:Double): Double = scala.math.abs(a)
   override def minus(a:Double, b:Double): Double = a - b
   def negate(a:Double): Double = -a
   def one: Double = 1.0
   def plus(a:Double, b:Double): Double = a + b
   override def pow(a:Double, b:Int): Double = mpow(a, b)
-  def signum(a: Double): Int = a.signum
   override def times(a:Double, b:Double): Double = a * b
   def zero: Double = 0.0
 
@@ -187,13 +170,11 @@ trait DoubleIsRing extends Ring[Double] with DoubleEq {
 }
 
 trait BigIntIsRing extends Ring[BigInt] with BigIntEq {
-  override def abs(a:BigInt): BigInt = a.abs
   override def minus(a:BigInt, b:BigInt): BigInt = a - b
   def negate(a:BigInt): BigInt = -a
   def one: BigInt = BigInt(1)
   def plus(a:BigInt, b:BigInt): BigInt = a + b
   override def pow(a:BigInt, b:Int): BigInt = a pow b
-  def signum(a: BigInt): Int = a.signum
   override def times(a:BigInt, b:BigInt): BigInt = a * b
   def zero: BigInt = BigInt(0)
   
@@ -201,13 +182,11 @@ trait BigIntIsRing extends Ring[BigInt] with BigIntEq {
 }
 
 trait BigDecimalIsRing extends Ring[BigDecimal] with BigDecimalEq {
-  override def abs(a:BigDecimal): BigDecimal = a.abs
   override def minus(a:BigDecimal, b:BigDecimal): BigDecimal = a - b
   def negate(a:BigDecimal): BigDecimal = -a
   def one: BigDecimal = BigDecimal(1.0)
   def plus(a:BigDecimal, b:BigDecimal): BigDecimal = a + b
   override def pow(a:BigDecimal, b:Int): BigDecimal = a.pow(b)
-  def signum(a: BigDecimal): Int = a.signum
   override def times(a:BigDecimal, b:BigDecimal): BigDecimal = a * b
   def zero: BigDecimal = BigDecimal(0.0)
 
@@ -215,13 +194,11 @@ trait BigDecimalIsRing extends Ring[BigDecimal] with BigDecimalEq {
 }
 
 trait RationalIsRing extends Ring[Rational] with RationalEq {
-  override def abs(a:Rational): Rational = a.abs
   override def minus(a:Rational, b:Rational): Rational = a - b
   def negate(a:Rational): Rational = -a
   def one: Rational = Rational.one
   def plus(a:Rational, b:Rational): Rational = a + b
   override def pow(a:Rational, b:Int): Rational = a.pow(b)
-  def signum(a: Rational): Int = a.signum
   override def times(a:Rational, b:Rational): Rational = a * b
   def zero: Rational = Rational.zero
   
@@ -231,13 +208,11 @@ trait RationalIsRing extends Ring[Rational] with RationalEq {
 trait ComplexIsRing[A] extends ComplexEq[A] with Ring[Complex[A]] {
   implicit val f:FractionalWithNRoot[A]
 
-  override def abs(a:Complex[A]): Complex[A] = Complex(a.abs, f.zero)(f)
   override def minus(a:Complex[A], b:Complex[A]): Complex[A] = a - b
   def negate(a:Complex[A]): Complex[A] = -a
   def one: Complex[A] = Complex.one(f)
   def plus(a:Complex[A], b:Complex[A]): Complex[A] = a + b
   override def pow(a:Complex[A], b:Int):Complex[A] = a.pow(Complex(f.fromInt(b), f.zero))
-  def signum(a: Complex[A]): Int = a.signum
   override def times(a:Complex[A], b:Complex[A]): Complex[A] = a * b
   def zero: Complex[A] = Complex.zero(f)
 
@@ -245,14 +220,11 @@ trait ComplexIsRing[A] extends ComplexEq[A] with Ring[Complex[A]] {
 }
 
 trait RealIsRing extends Ring[Real] with RealEq {
-  override def abs(r: Real): Real = r.abs
   override def minus(a: Real, b: Real): Real = a - b
   def negate(a: Real): Real = -a
   def one: Real = Real(1)
   def plus(a: Real, b: Real): Real = a + b
   override def pow(a: Real, b: Int): Real = a pow b
-  override def sign(a: Real): Sign = a.sign
-  def signum(a: Real): Int = a.signum
   override def times(a: Real, b: Real): Real = a * b
   def zero: Real = Real(0)
   

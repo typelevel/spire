@@ -26,7 +26,7 @@ extends RealLike[A] with SeparationBound[A] { self: A =>
         val a = this +/- err
         if (a.abs > err) {
           a.signum
-        } else if (err * 2 <= sep) {
+        } else if (err * 2 < sep) {
           0
         } else {
           findSign(scale + 1)

@@ -46,6 +46,8 @@ object Implicits {
   implicit def fractionalOps[@spec(Float, Double) A:Fractional](a:A) = new FractionalOps(a)
 
   implicit def doubleOps(a:Double) = new DoubleOps(a)
+
+  implicit def signedOps[@spec(Float, Double, Int, Long) A: Signed](a: A) = new SignedOps(a)
   
   implicit def euclideanRingWithNRootOps[@spec(Int, Long) A: EuclideanRingWithNRoot](a: A) = new NRootOps(a)
 }
