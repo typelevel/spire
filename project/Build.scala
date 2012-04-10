@@ -5,13 +5,9 @@ object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     name := "Spire",
     version := "0.2.0",
-    scalaVersion := "2.9.1",
+    scalaVersion := "2.9.1-1",
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize"),
-    resolvers ++= Seq(
-      //"Scala-Tools" at "http://www.scala-tools.org/repo-reloases/",
-      "Sonatype" at "http://oss.sonatype.org/content/repositories/snapshots"
-    ),
-    libraryDependencies += "org.scalatest" %% "scalatest" % "1.6.1"
+    libraryDependencies += "org.scalatest" %% "scalatest" % "1.7.1"
   )
 
   val key = AttributeKey[Boolean]("javaOptionsPatched")
