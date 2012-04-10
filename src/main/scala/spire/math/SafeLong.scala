@@ -1,6 +1,7 @@
 package spire.math
 
 import scala.math.{abs, signum}
+import annotation.tailrec
 
 
 /**
@@ -10,6 +11,7 @@ import scala.math.{abs, signum}
  */
 sealed trait SafeLong extends Ordered[SafeLong] {
   def signum: Int = fold(scala.math.signum(_) toInt, _.signum)
+
   def +(rhs: SafeLong): SafeLong = rhs.fold(this + _, this + _)
   def -(rhs: SafeLong): SafeLong = rhs.fold(this - _, this - _)
   def *(rhs: SafeLong): SafeLong = rhs.fold(this * _, this * _)
@@ -28,12 +30,32 @@ sealed trait SafeLong extends Ordered[SafeLong] {
   def /(rhs: BigInt): SafeLong
   def %(rhs: BigInt): SafeLong
 
+  /**
+   * Exponentiation function, e.g. x^y
+   *
+   * If base^exponent doesn't fit in a Long, the result will overflow (unlike
+   * scala.math.pow which will return +/- Infinity). 
+   */
+  final def pow(rhs:Int):SafeLong = {
+    assert (rhs >= 0)
+    _pow(SafeLong.one, this, rhs)
+  }
+
+  // tail-recursive helper method for pow(Long, Long)
+  @tailrec private final def _pow(total:SafeLong, base:SafeLong, exp:Int): SafeLong = {
+    if (exp == 0) return total
+    _pow(if (exp % 2 == 1) total * base else total, base * base, exp / 2)
+  }
+
+  def abs = if (this.compare(SafeLong.zero) < 0) -this else this
+
   def unary_-(): SafeLong
 
   def isLong: Boolean = fold(_ => true, _ => false)
   def isBigInt: Boolean = fold(_ => false, _ => true)
 
   def toBigInt: BigInt
+  def toBigDecimal: BigDecimal
 
   def fold[A,B <: A,C <: A](f: Long => B, g: BigInt => C): A
 
@@ -102,8 +124,8 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
   def +(y: BigInt): SafeLong = SafeLong(y + x)
   def -(y: BigInt): SafeLong = SafeLong(BigInt(x) - y)
   def *(y: BigInt): SafeLong = SafeLong(y * x)
-  def /(y: BigInt): SafeLong = if (y.bitLength > 63) SafeLongLong(0L) else SafeLongLong(x / y.toLong)
-  def %(y: BigInt): SafeLong = if (y.bitLength > 63) x else SafeLongLong(x % y.toLong)
+  def /(y: BigInt): SafeLong = if (y.bitLength > 63) SafeLongLong(0L) else { SafeLongLong(x / y.toLong) }
+  def %(y: BigInt): SafeLong = if (y.bitLength > 63) x else { SafeLongLong(x % y.toLong) }
 
   def unary_-(): SafeLong = if (x == Long.MinValue) {
     SafeLongBigInt(-BigInt(x))
@@ -114,6 +136,7 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
   def compare(that: SafeLong): Int = that.fold(x compare _, BigInt(x) compare _)
 
   def toBigInt: BigInt = BigInt(x)
+  def toBigDecimal = BigDecimal(x)
 
   def fold[A,B <: A,C <: A](f: Long => B, g: BigInt => C): A = f(x)
 }
@@ -137,6 +160,7 @@ case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
   def compare(that: SafeLong): Int = that.fold(x compare BigInt(_), x compare _)
 
   def toBigInt: BigInt = x
+  def toBigDecimal = BigDecimal(x)
 
   def fold[A,B <: A,C <: A](f: Long => B, g: BigInt => C): A = g(x)
 }

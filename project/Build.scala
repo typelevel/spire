@@ -18,10 +18,9 @@ object MyBuild extends Build {
 
   lazy val examples = Project("examples", file("examples")) dependsOn (spire)
 
-
   def benchmarkSettings = Seq(
     // raise memory limits here if necessary
-    //javaOptions in run += "-Xmx4G",
+    javaOptions in run += "-Xmx4G",
 
     libraryDependencies ++= Seq(
       "com.google.guava" % "guava" % "r09",
