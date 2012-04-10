@@ -5,33 +5,24 @@ import scala.{specialized => spec}
 trait Order[@spec A] extends Eq[A] {
   self =>
 
-  def gt(x:A, y:A): Boolean
-  def lt(x:A, y:A): Boolean
-  def gteq(x:A, y:A): Boolean
-  def lteq(x:A, y:A): Boolean
+  //def eq(x:A, y:A): Boolean = compare(x, y) == 0
+  def gt(x:A, y:A): Boolean = compare(x, y) > 0
+  def lt(x:A, y:A): Boolean = compare(x, y) < 0
+  def gteq(x:A, y:A): Boolean = compare(x, y) >= 0
+  def lteq(x:A, y:A): Boolean = compare(x, y) <= 0
 
   def min(x:A, y:A): A = if (lt(x, y)) x else y
   def max(x:A, y:A): A = if (gt(x, y)) x else y
-  def compare(x:A, y:A): Int = if (lt(x, y)) -1 else if (gt(x, y)) 1 else 0
+  def compare(x:A, y:A): Int
 
-  override def on[@spec B](f:B => A): Order[B] = new AnonymousOrder[B] {
-    def cmp(x:B, y:B) = self.compare(f(x), f(y))
+  override def on[@spec B](f:B => A): Order[B] = new Order[B] {
+    def eq(x:B, y:B) = self.eq(f(x), f(y))
+    def compare(x:B, y:B) = self.compare(f(x), f(y))
   }
-  def reverse: Order[A] = new AnonymousOrder[A] {
-    def cmp(x:A, y:A) = self.compare(y, x)
+  def reverse: Order[A] = new Order[A] {
+    def eq(x:A, y:A) = self.eq(y, x)
+    def compare(x:A, y:A) = self.compare(y, x)
   }
-}
-
-trait AnonymousOrder[A] extends Order[A] {
-  protected[this] def cmp(x:A, y:A): Int
-
-  def eq(x:A, y:A) = cmp(x, y) == 0
-  def neq(x:A, y:A) = cmp(x, y) != 0
-  def gt(x:A, y:A) = cmp(x, y) > 0
-  def lt(x:A, y:A) = cmp(x, y) < 0
-  def gteq(x:A, y:A) = cmp(x, y) > -1
-  def lteq(x:A, y:A) = cmp(x, y) < 1
-  override def compare(x:A, y:A) = cmp(x, y)
 }
 
 final class OrderOps[@spec A](lhs:A)(implicit ev:Order[A]) {
@@ -65,59 +56,66 @@ object Order {
 }
 
 trait IntOrder extends Order[Int] with IntEq {
-  def gt(x:Int, y:Int) = x > y
-  def gteq(x:Int, y:Int) = x >= y
-  def lt(x:Int, y:Int) = x < y
-  def lteq(x:Int, y:Int) = x <= y
+  override def gt(x:Int, y:Int) = x > y
+  override def gteq(x:Int, y:Int) = x >= y
+  override def lt(x:Int, y:Int) = x < y
+  override def lteq(x:Int, y:Int) = x <= y
+  def compare(x:Int, y:Int) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 trait LongOrder extends Order[Long] with LongEq {
-  def gt(x:Long, y:Long) = x > y
-  def gteq(x:Long, y:Long) = x >= y
-  def lt(x:Long, y:Long) = x < y
-  def lteq(x:Long, y:Long) = x <= y
+  override def gt(x:Long, y:Long) = x > y
+  override def gteq(x:Long, y:Long) = x >= y
+  override def lt(x:Long, y:Long) = x < y
+  override def lteq(x:Long, y:Long) = x <= y
+  def compare(x:Long, y:Long) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 trait FloatOrder extends Order[Float] with FloatEq {
-  def gt(x:Float, y:Float) = x > y
-  def gteq(x:Float, y:Float) = x >= y
-  def lt(x:Float, y:Float) = x < y
-  def lteq(x:Float, y:Float) = x <= y
+  override def gt(x:Float, y:Float) = x > y
+  override def gteq(x:Float, y:Float) = x >= y
+  override def lt(x:Float, y:Float) = x < y
+  override def lteq(x:Float, y:Float) = x <= y
+  def compare(x:Float, y:Float) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 trait DoubleOrder extends Order[Double] with DoubleEq {
-  def gt(x:Double, y:Double) = x > y
-  def gteq(x:Double, y:Double) = x >= y
-  def lt(x:Double, y:Double) = x < y
-  def lteq(x:Double, y:Double) = x <= y
+  override def gt(x:Double, y:Double) = x > y
+  override def gteq(x:Double, y:Double) = x >= y
+  override def lt(x:Double, y:Double) = x < y
+  override def lteq(x:Double, y:Double) = x <= y
+  def compare(x:Double, y:Double) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 trait BigIntOrder extends Order[BigInt] with BigIntEq {
-  def gt(x:BigInt, y:BigInt) = x > y
-  def gteq(x:BigInt, y:BigInt) = x >= y
-  def lt(x:BigInt, y:BigInt) = x < y
-  def lteq(x:BigInt, y:BigInt) = x <= y
+  override def gt(x:BigInt, y:BigInt) = x > y
+  override def gteq(x:BigInt, y:BigInt) = x >= y
+  override def lt(x:BigInt, y:BigInt) = x < y
+  override def lteq(x:BigInt, y:BigInt) = x <= y
+  def compare(x:BigInt, y:BigInt) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 trait BigDecimalOrder extends Order[BigDecimal] with BigDecimalEq {
-  def gt(x:BigDecimal, y:BigDecimal) = x > y
-  def gteq(x:BigDecimal, y:BigDecimal) = x >= y
-  def lt(x:BigDecimal, y:BigDecimal) = x < y
-  def lteq(x:BigDecimal, y:BigDecimal) = x <= y
+  override def gt(x:BigDecimal, y:BigDecimal) = x > y
+  override def gteq(x:BigDecimal, y:BigDecimal) = x >= y
+  override def lt(x:BigDecimal, y:BigDecimal) = x < y
+  override def lteq(x:BigDecimal, y:BigDecimal) = x <= y
+  def compare(x:BigDecimal, y:BigDecimal) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 trait RationalOrder extends Order[Rational] with RationalEq {
-  def gt(x:Rational, y:Rational) = x > y
-  def gteq(x:Rational, y:Rational) = x >= y
-  def lt(x:Rational, y:Rational) = x < y
-  def lteq(x:Rational, y:Rational) = x <= y
+  override def gt(x:Rational, y:Rational) = x > y
+  override def gteq(x:Rational, y:Rational) = x >= y
+  override def lt(x:Rational, y:Rational) = x < y
+  override def lteq(x:Rational, y:Rational) = x <= y
+  def compare(x:Rational, y:Rational) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 trait RealOrder extends Order[Real] with RealEq {
-  private def cmp(x: Real, y: Real): Int = (x - y).signum
-  def gt(x:Real, y:Real) = cmp(x, y) > 0
-  def gteq(x:Real, y:Real) = cmp(x, y) >= 0
-  def lt(x:Real, y:Real) = cmp(x, y) < 0
-  def lteq(x:Real, y:Real) = cmp(x, y) <= 0
+  override def gt(x:Real, y:Real) = compare(x, y) > 0
+  override def gteq(x:Real, y:Real) = compare(x, y) >= 0
+  override def lt(x:Real, y:Real) = compare(x, y) < 0
+  override def lteq(x:Real, y:Real) = compare(x, y) <= 0
+  def compare(x:Real, y:Real) = (x - y).signum
 }
 

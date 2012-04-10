@@ -13,7 +13,7 @@ class AdditiveMonoid[A:Ring] extends Monoid[A] {
   def identity = ring.zero
   def op(x:A, y:A) = ring.plus(x, y)
   def eq(x:A, y:A) = ring.eq(x, y)
-  def neq(x:A, y:A) = ring.neq(x, y)
+  //def neq(x:A, y:A) = ring.neq(x, y)
 }
 
 class MultiplicativeMonoid[A:Ring] extends Monoid[A] {
@@ -21,5 +21,5 @@ class MultiplicativeMonoid[A:Ring] extends Monoid[A] {
   def identity = ring.one
   def op(x:A, y:A) = ring.times(x, y)
   def eq(x:A, y:A) = ring.eq(x, y)
-  def neq(x:A, y:A) = ring.neq(x, y)
+  //def neq(x:A, y:A) = ring.neq(x, y)
 }

@@ -77,8 +77,9 @@ with ConvertableFromComplex[A] with ConvertableToComplex[A]
 with Order[Complex[A]] {
   override def fromInt(n: Int): Complex[A] = super[ConvertableToComplex].fromInt(n)
 
-  def gt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  def gteq(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  def lteq(x:Complex[A], y:Complex[A]) = sys.error("undefined")
+  override def gt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
+  override def gteq(x:Complex[A], y:Complex[A]) = sys.error("undefined")
+  override def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
+  override def lteq(x:Complex[A], y:Complex[A]) = sys.error("undefined")
+  def compare(x:Complex[A], y:Complex[A]) = sys.error("undefined")
 }

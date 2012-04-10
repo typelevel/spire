@@ -13,13 +13,7 @@ import com.google.caliper.Param
 
 object BufferBenchmarks extends MyRunner { val cls = classOf[BufferBenchmarks] }
 class BufferBenchmarks extends MyBenchmark with BenchmarkData {
-  @Param(
-    Array(
-      "10", "15", "17", "20", "21"//,
-      //"22", "23",
-      //"24", "25"
-    )
-  )
+  @Param(Array("10", "15", "17", "20", "21", "22", "23", "24", "25"))
   var pow:Int = 0
 
   var data:Array[Long] = null

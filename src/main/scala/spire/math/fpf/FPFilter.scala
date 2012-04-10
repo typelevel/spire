@@ -62,18 +62,6 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
   }
 }
 
-
-  trait FPFilterOrder[A] extends Order[FPFilter[A]] with AnonymousOrder[FPFilter[A]] {
-    implicit def ev: Order[A]
-
-    def cmp(a: FPFilter[A], b: FPFilter[A]): Int = (a.approx - b.approx).sign match {
-      case Some(Positive) => 1
-      case Some(Negative) => -1
-      case Some(Zero) => 0
-      case None => ev.compare(a.value, b.value)
-    }
-  }
-
   trait FPFilterEq[A] extends Eq[FPFilter[A]] {
     implicit def ev: Eq[A]
 
@@ -81,8 +69,17 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
       case Some(s) => s == Zero
       case None => a.value === b.value
     }
+  }
 
-    def neq(a: FPFilter[A], b: FPFilter[A]): Boolean = !eq(a, b)
+  trait FPFilterOrder[A] extends FPFilterEq[A] {
+    implicit def ev: Order[A]
+
+    def compare(a: FPFilter[A], b: FPFilter[A]): Int = (a.approx - b.approx).sign match {
+      case Some(Positive) => 1
+      case Some(Negative) => -1
+      case Some(Zero) => 0
+      case None => ev.compare(a.value, b.value)
+    }
   }
 
   trait ConvertableToFPFilter[A] extends ConvertableTo[FPFilter[A]] {
@@ -134,22 +131,22 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
   trait FPFilterIsRing[A] extends Ring[FPFilter[A]] {
     implicit def ev: Ring[A]
 
-    def abs(a: FPFilter[A]): FPFilter[A] = new FPFilter(a.approx.abs, ev.abs(a.value))
+    override def abs(a: FPFilter[A]): FPFilter[A] = new FPFilter(a.approx.abs, ev.abs(a.value))
     def negate(a: FPFilter[A]): FPFilter[A] = new FPFilter(-a.approx, -(a.value))
 
-    def minus(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
+    override def minus(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
       new FPFilter(a.approx - b.approx, a.value - b.value)
 
     def plus(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
       new FPFilter(a.approx + b.approx, a.value + b.value)
 
-    def pow(a: FPFilter[A], k: Int): FPFilter[A] =
+    override def pow(a: FPFilter[A], k: Int): FPFilter[A] =
       new FPFilter(a.approx pow k, a.value pow k)
 
     override def sign(a: FPFilter[A]): Sign = a.approx.sign getOrElse ev.sign(a.value)
     def signum(a: FPFilter[A]): Int = sign(a).toInt
 
-    def times(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
+    override def times(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
       new FPFilter(a.approx * b.approx, a.value * b.value)
 
     def zero: FPFilter[A] = new FPFilter(MaybeDouble(0.0), ev.fromInt(0))
