@@ -128,10 +128,17 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
     def toString(a: FPFilter[A]): String = ev.toString(a.value)
   }
 
+  trait FPFilterIsSigned[A] extends Signed[FPFilter[A]] {
+    implicit def ev: Signed[A]
+
+    override def abs(a: FPFilter[A]): FPFilter[A] = new FPFilter(a.approx.abs, ev.abs(a.value))
+
+    override def sign(a: FPFilter[A]): Sign = a.approx.sign getOrElse ev.sign(a.value)
+  }
+
   trait FPFilterIsRing[A] extends Ring[FPFilter[A]] {
     implicit def ev: Ring[A]
 
-    override def abs(a: FPFilter[A]): FPFilter[A] = new FPFilter(a.approx.abs, ev.abs(a.value))
     def negate(a: FPFilter[A]): FPFilter[A] = new FPFilter(-a.approx, -(a.value))
 
     override def minus(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
@@ -142,9 +149,6 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
 
     override def pow(a: FPFilter[A], k: Int): FPFilter[A] =
       new FPFilter(a.approx pow k, a.value pow k)
-
-    override def sign(a: FPFilter[A]): Sign = a.approx.sign getOrElse ev.sign(a.value)
-    def signum(a: FPFilter[A]): Int = sign(a).toInt
 
     override def times(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
       new FPFilter(a.approx * b.approx, a.value * b.value)
@@ -195,7 +199,7 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
 
 
   trait FPFilterIsNumeric[A] extends Numeric[FPFilter[A]]
-  with FPFilterIsField[A] with FPFilterOrder[A]
+  with FPFilterIsField[A] with FPFilterOrder[A] with FPFilterIsSigned[A]
   with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
     implicit val ev: Numeric[A]
 
@@ -204,14 +208,14 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
 
   trait FPFilterIsFractional[A] extends Fractional[FPFilter[A]]
   with FPFilterIsField[A] with GenericCeilAndFloor[FPFilter[A]] with FPFilterOrder[A]
-  with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
+  with FPFilterIsSigned[A] with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
     implicit val ev: Fractional[A]
     
     override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
   }
 
   trait FPFilterIsNumericWithNRoot[A] extends NumericWithNRoot[FPFilter[A]]
-  with FPFilterIsFieldWithNRoot[A] with FPFilterOrder[A]
+  with FPFilterIsFieldWithNRoot[A] with FPFilterOrder[A] with FPFilterIsSigned[A]
   with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
     implicit val ev: NumericWithNRoot[A]
     
@@ -220,7 +224,7 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
 
   trait FPFilterIsFractionalWithNRoot[A] extends FractionalWithNRoot[FPFilter[A]]
   with FPFilterIsFieldWithNRoot[A] with GenericCeilAndFloor[FPFilter[A]] with FPFilterOrder[A]
-  with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
+  with FPFilterIsSigned[A] with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
     implicit val ev: FractionalWithNRoot[A]
     
     override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)

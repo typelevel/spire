@@ -38,10 +38,6 @@ class RingTest extends FunSuite {
     // Ring[A]'s zero
     val z: A = Ring[A].zero
 
-    // abs
-    runTest("(-3).abs")(assert(a.abs === b))
-    runTest("3.abs")(assert(b.abs === b))
-
     // unary_-
     runTest("-(3)")(assert(-b === a))
     runTest("-(0)")(assert(-z === z))

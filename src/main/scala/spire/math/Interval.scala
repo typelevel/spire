@@ -24,7 +24,7 @@ sealed trait Bound[T] {
 }
 
 class BoundRingOps[T:Ring](lhs:Bound[T]) {
-  def abs = lhs.unop(_.abs)
+  // def abs = lhs.unop(_.abs)
   def unary_- = lhs.unop(-_)
   def +(rhs:T) = lhs.unop(_ + rhs)
   def -(rhs:T) = lhs.unop(_ - rhs)
@@ -178,6 +178,7 @@ trait GenRingInterval[T, U <: GenRingInterval[T, U]] extends GenInterval[T, U] {
 
   def splitAtZero = split(num.zero)
 
+  /* TODO: Required :Signed[T]?
   def abs = {
     val a = lower.abs
     val b = upper.abs
@@ -185,6 +186,7 @@ trait GenRingInterval[T, U <: GenRingInterval[T, U]] extends GenInterval[T, U] {
     else if (a < b) coerce(a, b)
     else coerce(b, a)
   }
+  */
   
   def unary_- = coerce(-upper, -lower)
   
