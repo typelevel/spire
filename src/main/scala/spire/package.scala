@@ -6,7 +6,44 @@ import scala.annotation.tailrec
 // in 2.10 and beyond this should just be the spire.math package object.
 
 object fun {
-  // TODO: add nroot(base:Long, n:Long)
+  // largest possible double as BigDecimal
+  private final val maxDouble = BigDecimal(Double.MaxValue)
+
+  // natural log of largest possible double as BigDecimal
+  private final val logMaxDouble = BigDecimal(scala.math.log(Double.MaxValue))
+
+  // e^logMaxDouble as BigDecimal
+  private final val expLogMaxDouble = BigDecimal(scala.math.exp(scala.math.log(Double.MaxValue)))
+
+  final def log(n:BigDecimal):BigDecimal = if (n < 0) sys.error("!!!") else log(n, BigDecimal(0))
+
+  // Since log(n * x) = log(n) + log(x), we can use scala.math.log to
+  // approximate log for BigDecimal.
+  @tailrec private final def log(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
+    if (n < 0) {
+      log(-n, -sofar)
+    } else if (n <= maxDouble) {
+      BigDecimal(scala.math.log(n.toDouble)) + sofar
+    } else {
+      log(n / maxDouble, logMaxDouble + sofar)
+    }
+  }
+
+  final def exp(n:BigDecimal):BigDecimal = exp(n, BigDecimal(1))
+
+  // Since exp(a + b) = exp(a) * exp(b), we can use scala.math.log to
+  // approximate exp for BigDecimal.
+  @tailrec private final def exp(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
+    if (n <= expLogMaxDouble) {
+      BigDecimal(scala.math.exp(n.toDouble)) * sofar
+    } else {
+      exp(n - expLogMaxDouble, expLogMaxDouble * sofar)
+    }
+  }
+
+  // Since a^b = e^(log(a) * b) we can use exp and log to write pow.
+  // TODO: doesn't make precision guarantees, but it's better than nothing.
+  final def pow(base:BigDecimal, exponent:BigDecimal) = exp(log(base) * exponent)
 
   /**
    * Exponentiation function, e.g. x^y
