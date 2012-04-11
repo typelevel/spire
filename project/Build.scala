@@ -16,9 +16,11 @@ object MyBuild extends Build {
 
   val key = AttributeKey[Boolean]("javaOptionsPatched")
 
-  lazy val spire = Project("root", file("."))
+  lazy val spire = Project("spire", file("."))
 
   lazy val benchmark: Project = Project("benchmark", file("benchmark")) settings (benchmarkSettings: _*) dependsOn (spire)
+
+  lazy val examples = Project("examples", file("examples")) dependsOn (spire)
 
 
   def benchmarkSettings = Seq(
