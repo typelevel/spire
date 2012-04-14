@@ -1,4 +1,6 @@
-package spire.math
+package spire.algebra
+
+import spire.math.{ Order, Real, Rational, Complex }
 
 import scala.{ math => mth }
 import scala.{ specialized => spec }

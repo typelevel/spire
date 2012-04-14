@@ -1,5 +1,6 @@
 package spire.math.fpf
 
+import spire.algebra._
 import spire.math._
 import Implicits._
 

@@ -1,4 +1,4 @@
-package spire.math
+package spire.algebra
 
 /**
  * The `Sign` of a number.

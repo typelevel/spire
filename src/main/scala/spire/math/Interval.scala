@@ -1,5 +1,6 @@
 package spire.math
 
+import spire.algebra._
 import Implicits._
 
 sealed trait Bound[T] {

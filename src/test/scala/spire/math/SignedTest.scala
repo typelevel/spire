@@ -1,9 +1,10 @@
-package spire.math
+package spire.algebra
 
 // scalatest
 import org.scalatest.FunSuite
 
 // we need to disable our own === to avoid messing up ScalaTest.
+import spire.math.{ Rational, Real, Complex, Implicits }
 import Implicits.{eqOps => _, _}
 
 // nice alias

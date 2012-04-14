@@ -1,5 +1,6 @@
 package spire.math.fpf
 
+import spire.algebra.Positive
 import spire.math._
 import org.scalatest.FunSuite
 

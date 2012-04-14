@@ -1,4 +1,6 @@
-package spire.math
+package spire.algebra
+
+import spire.math._
 
 import scala.{specialized => spec}
 import scala.math.{abs, ceil, floor}

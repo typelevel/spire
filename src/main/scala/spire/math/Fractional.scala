@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.algebra._
+
 import scala.{specialized => spec}
 
 trait Fractional[@spec(Float,Double) A] extends Field[A]

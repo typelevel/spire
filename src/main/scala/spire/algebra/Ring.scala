@@ -1,4 +1,6 @@
-package spire.math
+package spire.algebra
+
+import spire.math._
 
 import annotation.tailrec
 import scala.{specialized => spec}

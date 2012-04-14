@@ -1,5 +1,6 @@
 package spire.math.real
 
+import spire.algebra.{ Sign, Positive, Negative, Zero }
 import spire.math._
 
 import java.math.MathContext

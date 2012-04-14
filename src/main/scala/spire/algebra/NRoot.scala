@@ -1,4 +1,6 @@
-package spire.math
+package spire.algebra
+
+import spire.math._
 
 import scala.{specialized => spec, math => mth}
 import java.math.MathContext

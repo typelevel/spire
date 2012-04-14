@@ -2,6 +2,7 @@ package spire.math.real
 
 import spire.math.fpf.MaybeDouble
 import spire.math._
+import spire.algebra.Sign
 
 
 /**

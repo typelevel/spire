@@ -4,6 +4,7 @@ import scala.{specialized => spec}
 import scala.util.Random
 import Random._
 
+import spire.algebra._
 import spire.math._
 import spire.math.Implicits._
 import fpf._

@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.algebra.Zero
+
 import org.scalatest.FunSuite
 import java.math.MathContext
 

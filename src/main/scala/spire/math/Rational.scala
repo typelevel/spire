@@ -1,5 +1,6 @@
 package spire.math
 
+import spire.algebra.{ Sign, Positive, Negative, Zero }
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions, abs, min}
 import Implicits._

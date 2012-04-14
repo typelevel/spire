@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.algebra._
+
 import scala.{specialized => spec}
 
 trait Integral[@spec(Int,Long) A] extends EuclideanRing[A]

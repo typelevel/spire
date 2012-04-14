@@ -3,6 +3,7 @@ package spire.math.fpf
 import scala.math.{ max, abs }
 import java.lang.Double.{ NaN, isNaN, isInfinite }
 
+import spire.algebra._
 import spire.math._
 import Implicits._
 

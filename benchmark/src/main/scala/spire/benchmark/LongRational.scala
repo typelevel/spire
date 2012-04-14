@@ -1,5 +1,6 @@
 package spire.benchmark
 
+import spire.algebra._
 import spire.math._
 import Implicits._
 

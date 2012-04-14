@@ -1,5 +1,6 @@
 package test.scala.spire.math
 
+import spire.algebra._
 import spire.math._
 import Implicits._
 

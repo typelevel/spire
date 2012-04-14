@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.algebra.FractionalWithNRoot
+
 trait ConvertableTo[@specialized A] {
   def fromByte(a:Byte): A
   def fromShort(a:Short): A

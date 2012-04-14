@@ -1,4 +1,6 @@
-package spire.math
+package spire.algebra
+
+import spire.math.Eq
 
 trait Semigroup[A] extends Eq[A] {
   def op(x:A, y:A): A

@@ -1,5 +1,6 @@
 package spire.math
 
+import spire.algebra.{ Zero }
 import scala.{specialized => spec}
 
 trait Eq[@spec A] {

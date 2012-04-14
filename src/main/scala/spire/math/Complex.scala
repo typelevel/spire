@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.algebra._
+
 import scala.{specialized => spec}
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.math.{Pi, atan2, cos, exp, log, sin, sqrt}

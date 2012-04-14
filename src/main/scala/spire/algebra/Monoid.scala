@@ -1,4 +1,4 @@
-package spire.math
+package spire.algebra
 
 trait Monoid[A] extends Semigroup[A] {
   def identity: A
