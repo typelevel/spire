@@ -2,7 +2,7 @@ package spire.algebra
 
 import spire.math.Eq
 
-trait Semigroup[A] extends Eq[A] {
+trait Semigroup[A] {
   def op(x:A, y:A): A
 }
 

@@ -240,7 +240,7 @@ trait LowPriorityFPFilterImplicits {
     }
 
   implicit def FPFilterIsEuclideanRing[A](implicit erng: EuclideanRing[A]): EuclideanRing[FPFilter[A]] =
-    new FPFilterIsEuclideanRing[A] with FPFilterEq[A] {
+    new FPFilterIsEuclideanRing[A] {
       val ev = erng
     }
 

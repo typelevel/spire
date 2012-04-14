@@ -41,7 +41,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def floatValue = real.toFloat
   def longValue = real.toLong
   def intValue = real.toInt
-  def isWhole = real.isWhole && imag.isWhole
+  def isWhole = (f.fromInt(real.toInt) == real) && (imag == f.zero)
   def signum: Int = f.compare(real, f.zero)
   def underlying = (real, imag)
   def complexSignum = if (abs == f.zero) {

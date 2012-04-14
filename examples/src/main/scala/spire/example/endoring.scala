@@ -51,8 +51,6 @@ object EndoRingExample extends App {
   trait EndoRing[A] extends Ring[Endo[A]] {
     def ab: AbGroup[A]
 
-    def eq(f: Endo[A], g: Endo[A]): Boolean = throw new UnsupportedOperationException("!!!")
-
     def plus(f: Endo[A], g: Endo[A]): Endo[A] = a => ab.append(f(a), g(a))
     def negate(f: Endo[A]): Endo[A] = (ab.inverse _) compose f
     def times(f: Endo[A], g: Endo[A]): Endo[A] = f compose g

@@ -25,7 +25,9 @@ object Eq extends LowPriority {
   implicit object BigIntEq extends BigIntEq
   implicit object BigDecimalEq extends BigDecimalEq
   implicit object RationalEq extends RationalEq
-  implicit def complexEq[A:Fractional] = new ComplexEq
+  implicit def complexEq[A:Fractional] = new ComplexEq[A] {
+    val f = Fractional[A]
+  }
   implicit object RealEq extends RealEq
 
   def apply[A](implicit e:Eq[A]):Eq[A] = e
@@ -79,7 +81,8 @@ trait RationalEq extends Eq[Rational] {
   def eq(x:Rational, y:Rational) = x == y
   override def neq(x:Rational, y:Rational) = x != y
 }
-class ComplexEq[A](implicit f:Fractional[A]) extends Eq[Complex[A]] {
+trait ComplexEq[A] extends Eq[Complex[A]] {
+  implicit def f: Fractional[A]
   def eq(x:Complex[A], y:Complex[A]) = x == y
   override def neq(x:Complex[A], y:Complex[A]) = x != y
 }

@@ -7,7 +7,7 @@ import scala.{specialized => spec}
 import scala.math.{abs, ceil, floor, pow => mpow}
 
 
-trait Ring[@spec(Int,Long,Float,Double) A] extends Eq[A] {
+trait Ring[@spec(Int,Long,Float,Double) A] {
   self =>
   def minus(a:A, b:A):A = plus(a, negate(b))
   def negate(a:A):A
@@ -55,7 +55,7 @@ trait Ring[@spec(Int,Long,Float,Double) A] extends Eq[A] {
    */
   def fromInt(n: Int): A = _fromInt(n, zero)
 
-  def additive = new AdditiveMonoid[A]()(this)
+  def additive = new AdditiveGroup[A]()(this)
   def multiplicative = new MultiplicativeMonoid[A]()(this)
 }
 
@@ -86,7 +86,7 @@ object Ring {
   def apply[A](implicit r:Ring[A]):Ring[A] = r
 }
 
-trait ByteIsRing extends Ring[Byte] with ByteEq {
+trait ByteIsRing extends Ring[Byte] {
   override def minus(a:Byte, b:Byte): Byte = (a - b).toByte
   def negate(a:Byte): Byte = (-a).toByte
   def one: Byte = 1.toByte
@@ -98,7 +98,7 @@ trait ByteIsRing extends Ring[Byte] with ByteEq {
   override def fromInt(n: Int): Byte = n.toByte
 }
 
-trait ShortIsRing extends Ring[Short] with ShortEq {
+trait ShortIsRing extends Ring[Short] {
   override def minus(a:Short, b:Short): Short = (a - b).toShort
   def negate(a:Short): Short = (-a).toShort
   def one: Short = 1.toShort
@@ -110,7 +110,7 @@ trait ShortIsRing extends Ring[Short] with ShortEq {
   override def fromInt(n: Int): Short = n.toShort
 }
 
-trait IntIsRing extends Ring[Int] with IntEq {
+trait IntIsRing extends Ring[Int] {
   override def minus(a:Int, b:Int): Int = a - b
   def negate(a:Int): Int = -a
   def one: Int = 1
@@ -122,7 +122,7 @@ trait IntIsRing extends Ring[Int] with IntEq {
   override def fromInt(n: Int): Int = n
 }
 
-trait LongIsRing extends Ring[Long] with LongEq {
+trait LongIsRing extends Ring[Long] {
   override def minus(a:Long, b:Long): Long = a - b
   def negate(a:Long): Long = -a
   def one: Long = 1L
@@ -147,7 +147,7 @@ trait LongIsRing extends Ring[Long] with LongEq {
   override def fromInt(n: Int): Long = n
 }
 
-trait FloatIsRing extends Ring[Float] with FloatEq {
+trait FloatIsRing extends Ring[Float] {
   override def minus(a:Float, b:Float): Float = a - b
   def negate(a:Float): Float = -a
   def one: Float = 1.0F
@@ -159,7 +159,7 @@ trait FloatIsRing extends Ring[Float] with FloatEq {
   override def fromInt(n: Int): Float = n
 }
 
-trait DoubleIsRing extends Ring[Double] with DoubleEq {
+trait DoubleIsRing extends Ring[Double] {
   override def minus(a:Double, b:Double): Double = a - b
   def negate(a:Double): Double = -a
   def one: Double = 1.0
@@ -171,7 +171,7 @@ trait DoubleIsRing extends Ring[Double] with DoubleEq {
   override def fromInt(n: Int): Double = n
 }
 
-trait BigIntIsRing extends Ring[BigInt] with BigIntEq {
+trait BigIntIsRing extends Ring[BigInt] {
   override def minus(a:BigInt, b:BigInt): BigInt = a - b
   def negate(a:BigInt): BigInt = -a
   def one: BigInt = BigInt(1)
@@ -183,7 +183,7 @@ trait BigIntIsRing extends Ring[BigInt] with BigIntEq {
   override def fromInt(n: Int): BigInt = BigInt(n)
 }
 
-trait BigDecimalIsRing extends Ring[BigDecimal] with BigDecimalEq {
+trait BigDecimalIsRing extends Ring[BigDecimal] {
   override def minus(a:BigDecimal, b:BigDecimal): BigDecimal = a - b
   def negate(a:BigDecimal): BigDecimal = -a
   def one: BigDecimal = BigDecimal(1.0)
@@ -195,7 +195,7 @@ trait BigDecimalIsRing extends Ring[BigDecimal] with BigDecimalEq {
   override def fromInt(n: Int): BigDecimal = BigDecimal(n)
 }
 
-trait RationalIsRing extends Ring[Rational] with RationalEq {
+trait RationalIsRing extends Ring[Rational] {
   override def minus(a:Rational, b:Rational): Rational = a - b
   def negate(a:Rational): Rational = -a
   def one: Rational = Rational.one
@@ -207,7 +207,7 @@ trait RationalIsRing extends Ring[Rational] with RationalEq {
   override def fromInt(n: Int): Rational = Rational(n)
 }
 
-trait ComplexIsRing[A] extends ComplexEq[A] with Ring[Complex[A]] {
+trait ComplexIsRing[A] extends Ring[Complex[A]] {
   implicit val f:FractionalWithNRoot[A]
 
   override def minus(a:Complex[A], b:Complex[A]): Complex[A] = a - b
@@ -221,7 +221,7 @@ trait ComplexIsRing[A] extends ComplexEq[A] with Ring[Complex[A]] {
   override def fromInt(n: Int): Complex[A] = Complex(f.fromInt(n), f.zero)
 }
 
-trait RealIsRing extends Ring[Real] with RealEq {
+trait RealIsRing extends Ring[Real] {
   override def minus(a: Real, b: Real): Real = a - b
   def negate(a: Real): Real = -a
   def one: Real = Real(1)

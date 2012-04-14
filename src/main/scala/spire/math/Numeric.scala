@@ -77,7 +77,7 @@ with ConvertableFromReal with ConvertableToReal with RealOrder with RealIsSigned
 
 
 class ComplexIsNumeric[A](implicit val f:FractionalWithNRoot[A])
-extends ComplexIsField[A] with Numeric[Complex[A]]
+extends ComplexIsField[A] with Numeric[Complex[A]] with ComplexEq[A]
 with ConvertableFromComplex[A] with ConvertableToComplex[A]
 with Order[Complex[A]] with ComplexIsSigned[A] {
   override def fromInt(n: Int): Complex[A] = super[ConvertableToComplex].fromInt(n)
