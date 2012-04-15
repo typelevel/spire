@@ -1,7 +1,5 @@
 package spire.math
 
-import spire.algebra.FractionalWithNRoot
-
 trait ConvertableTo[@specialized A] {
   def fromByte(a:Byte): A
   def fromShort(a:Short): A
@@ -123,7 +121,7 @@ trait ConvertableToRational extends ConvertableTo[Rational] {
 }
 
 trait ConvertableToComplex[A] extends ConvertableTo[Complex[A]] {
-  val f:FractionalWithNRoot[A]
+  val f:Fractional[A]
   def fromByte(a:Byte): Complex[A] = Complex(f.fromByte(a), f.zero)(f)
   def fromShort(a:Short): Complex[A] = Complex(f.fromShort(a), f.zero)(f)
   def fromInt(a:Int): Complex[A] = Complex(f.fromInt(a), f.zero)(f)

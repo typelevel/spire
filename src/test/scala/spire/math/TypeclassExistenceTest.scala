@@ -43,19 +43,10 @@ class TypeclassExistenceTest extends FunSuite {
     assert(e != null, "Expected implicit FieldWithNRoot[%s] instance, but it was not found." format m)
   }
  
-  def hasNumericWithNRoot[A](implicit ev: NumericWithNRoot[A] = null, m: Manifest[A]) {
-    assert(ev != null, "Expected implicit NumericWithNRoot[%s] instance, but it was not found." format m)
-  }
-   
-  def hasFractionalWithNRoot[A](implicit ev: FractionalWithNRoot[A] = null, m: Manifest[A]) {
-    assert(ev != null, "Expected implicit FractionalWithNRoot[%s] instance, but it was not found." format m)
-  }
-
   def hasOrder[A](implicit ev: Order[A] = null, m: Manifest[A]) {
     assert(ev != null, "Expected implicit Order[%s] instance, but it was not found." format m)
   }
   
-   
   def hasEq[A](implicit ev: Eq[A] = null, m: Manifest[A]) {
     assert(ev != null, "Expected implicit Eq[%s] instance, but it was not found." format m)
   }
@@ -83,14 +74,6 @@ class TypeclassExistenceTest extends FunSuite {
   test("Numeric is ConvertableFrom") {
     def check[A: Numeric : Manifest] {
       hasConvertableFrom[A]
-    }
-
-    check[Int]
-  }
-
-  test("Rings are Eq") {
-    def check[A: Ring : Manifest] {
-      hasEq[A]
     }
 
     check[Int]
@@ -125,47 +108,29 @@ class TypeclassExistenceTest extends FunSuite {
       hasField[A]
     }
 
-    implicit val mc = MathContext.DECIMAL128
-
     check[BigDecimal]
   }
 
-  test("Numerics have Order, are EuclideanRings and are Fields") {
+  test("Numerics have Order, NRoot, are EuclideanRings and are Fields") {
     def check[A: Numeric: Manifest] {
       hasOrder[A]
       hasEuclideanRing[A]
       hasField[A]
+      hasNRoot[A]
     }
 
     check[Int]
   }
 
-  test("Fractional have Order and are Fields") {
+  test("Fractional have Order, NRoot and are Fields") {
     def check[A: Fractional: Manifest] {
       hasOrder[A]
       hasEuclideanRing[A]
       hasField[A]
+      hasNRoot[A]
     }
 
     check[Double]
-  }
-
-  test("NumericWithNRoot is Numeric with NRoot") {
-    def check[A: NumericWithNRoot: Manifest] {
-      hasNRoot[A]
-      hasNumeric[A]
-    }
-
-    check[Int]
-  }
-
-  test("FractionalWithNRoot is Numeric and FieldWithNRoot") {
-    def check[A: FractionalWithNRoot: Manifest] {
-      hasFieldWithNRoot[A]
-      hasFractional[A]
-    }
-
-    check[Real]
   }
 
   test("Int is EuclideanRingWithNRoot") {
@@ -206,7 +171,6 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("BigDecimal is FieldWithNRoot") {
-    implicit val mc = MathContext.DECIMAL128
     hasEq[BigDecimal]
     hasRing[BigDecimal]
     hasEuclideanRing[BigDecimal]
@@ -233,7 +197,6 @@ class TypeclassExistenceTest extends FunSuite {
 
   test("Everybody is Numeric") {
     implicit val ac = ApproximationContext(Rational(1, 100))
-    implicit val mc = MathContext.DECIMAL128
 
     hasNumeric[Int]
     hasNumeric[Long]
@@ -247,21 +210,12 @@ class TypeclassExistenceTest extends FunSuite {
 
   test("Float, Double, Rational, BigDecimal, and Real are Fractional") {
     implicit val ac = ApproximationContext(Rational(1, 100))
-    implicit val mc = MathContext.DECIMAL128
 
     hasFractional[Float]
     hasFractional[Double]
     hasFractional[BigDecimal]
     hasFractional[Rational]
     hasFractional[Real]
-  }
-
-  test("FieldWithNRoot[BigDecimal] requires implicit MathContext") {
-    def check[A](implicit f: FieldWithNRoot[A] = null) {
-      assert(f == null)
-    }
-
-    check[BigDecimal]
   }
 
   test("FieldWithNRoot[Rational] requires implicit ApproximationContext") {

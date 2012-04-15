@@ -1,6 +1,6 @@
 package spire.algebra
 
-import spire.math.{ Order, Real, Rational, Complex }
+import spire.math.{ Fractional, Order, Real, Rational, Complex }
 
 import scala.{ math => mth }
 import scala.{ specialized => spec }
@@ -37,7 +37,7 @@ object Signed extends SignedLow {
   implicit object BigDecimalIsSigned extends BigDecimalIsSigned
   implicit object RationalIsSigned extends RationalIsSigned
   implicit object RealIsSigned extends RealIsSigned
-  implicit def ComplexIsSigned[A](implicit fr: FractionalWithNRoot[A]) =
+  implicit def ComplexIsSigned[A](implicit fr: Fractional[A]) =
     new ComplexIsSigned[A] { val f = fr }
 
   def apply[A](implicit s: Signed[A]): Signed[A] = s
@@ -117,7 +117,7 @@ trait RealIsSigned extends Signed[Real] {
 }
 
 trait ComplexIsSigned[A] extends Signed[Complex[A]] {
-  implicit val f:FractionalWithNRoot[A]
+  implicit val f:Fractional[A]
 
   override def signum(a: Complex[A]): Int = a.signum
   def abs(a: Complex[A]): Complex[A] = Complex[A](a.abs, f.zero)(f)

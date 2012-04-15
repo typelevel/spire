@@ -13,25 +13,25 @@ import Implicits._
 // access functions (e.g. trig, pow, exp, log)
 
 object Complex {
-  def i[@spec(Float, Double) T](implicit f:FractionalWithNRoot[T]) = Complex(f.zero, f.one)
-  def one[@spec(Float, Double) T](implicit f:FractionalWithNRoot[T]) = Complex(f.one, f.zero)
-  def zero[@spec(Float, Double) T](implicit f:FractionalWithNRoot[T]) = Complex(f.zero, f.zero)
+  def i[@spec(Float, Double) T](implicit f:Fractional[T]) = Complex(f.zero, f.one)
+  def one[@spec(Float, Double) T](implicit f:Fractional[T]) = Complex(f.one, f.zero)
+  def zero[@spec(Float, Double) T](implicit f:Fractional[T]) = Complex(f.zero, f.zero)
   implicit def intToComplex(n:Int) = new Complex(n.toDouble, 0.0)
   implicit def longToComplex(n:Long) = new Complex(n.toDouble, 0.0)
   implicit def doubleToComplex(n:Float) = new Complex(n, 0.0F)
   implicit def doubleToComplex(n:Double) = new Complex(n, 0.0)
 
-  def polar[@spec(Float, Double) T](magnitude:T, angle:T)(implicit f:FractionalWithNRoot[T]) = {
+  def polar[@spec(Float, Double) T](magnitude:T, angle:T)(implicit f:Fractional[T]) = {
     val real:T = f.times(magnitude, f.fromDouble(cos(angle.toDouble)))
     val imag:T = f.times(magnitude, f.fromDouble(sin(angle.toDouble)))
     Complex(real, imag)
   }
 
-  def apply[@spec(Float, Double) T:FractionalWithNRoot](real:T, imag:T) = new Complex(real, imag)
-  def unapply[@spec(Float, Double) T:FractionalWithNRoot](c:Complex[T]) = Some((c.real, c.imag))
+  def apply[@spec(Float, Double) T:Fractional](real:T, imag:T) = new Complex(real, imag)
+  def unapply[@spec(Float, Double) T:Fractional](c:Complex[T]) = Some((c.real, c.imag))
 }
 
-class Complex[@spec(Float, Double) T](val real:T, val imag:T)(implicit f:FractionalWithNRoot[T])
+class Complex[@spec(Float, Double) T](val real:T, val imag:T)(implicit f:Fractional[T])
 extends ScalaNumber with ScalaNumericConversions with Serializable {
 
   // ugh, ScalaNumericConversions ghetto

@@ -80,7 +80,7 @@ object Ring {
   implicit object BigIntIsRing extends BigIntIsRing
   implicit object BigDecimalIsRing extends BigDecimalIsRing
   implicit object RationalIsRing extends RationalIsRing
-  implicit def complexIsRing[A:FractionalWithNRoot] = new ComplexIsRingCls
+  implicit def complexIsRing[A:Fractional] = new ComplexIsRingCls
   implicit object RealIsRing extends RealIsRing
 
   def apply[A](implicit r:Ring[A]):Ring[A] = r
@@ -208,7 +208,7 @@ trait RationalIsRing extends Ring[Rational] {
 }
 
 trait ComplexIsRing[A] extends Ring[Complex[A]] {
-  implicit val f:FractionalWithNRoot[A]
+  implicit val f:Fractional[A]
 
   override def minus(a:Complex[A], b:Complex[A]): Complex[A] = a - b
   def negate(a:Complex[A]): Complex[A] = -a
@@ -233,5 +233,5 @@ trait RealIsRing extends Ring[Real] {
   override def fromInt(n: Int): Real = Real(n)
 }
 
-class ComplexIsRingCls[A](implicit val f:FractionalWithNRoot[A])
+class ComplexIsRingCls[A](implicit val f:Fractional[A])
 extends ComplexIsRing[A]

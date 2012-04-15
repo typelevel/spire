@@ -4,7 +4,7 @@ import spire.algebra._
 
 import scala.{specialized => spec}
 
-trait Fractional[@spec(Float,Double) A] extends Field[A]
+trait Fractional[@spec(Float,Double) A] extends FieldWithNRoot[A]
 with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A] {
   def ceil(a:A):A
   def floor(a:A):A
@@ -19,14 +19,17 @@ object Fractional {
   implicit object FloatIsFractional extends FloatIsFractional
   implicit object DoubleIsFractional extends DoubleIsFractional
   implicit object BigDecimalIsFractional extends BigDecimalIsFractional
-  implicit object RationalIsFractional extends RationalIsFractional
+  implicit def RationalIsFractional(implicit ctx: ApproximationContext[Rational] =
+      ApproximationContext(Rational(1, 1000000000))) = new RationalIsFractional {
+    val context = ctx
+  }
   implicit object RealIsFractional extends RealIsFractional
 
   def apply[A](implicit f:Fractional[A]) = f
 }
 
 trait FloatIsFractional extends Fractional[Float] with FloatIsField
-with ConvertableFromFloat with ConvertableToFloat
+with FloatIsNRoot with ConvertableFromFloat with ConvertableToFloat
 with FloatOrder with FloatIsSigned {
   override def fromInt(n: Int): Float = n
   def ceil(a:Float) = scala.math.ceil(a).toFloat
@@ -34,7 +37,7 @@ with FloatOrder with FloatIsSigned {
 }
 
 trait DoubleIsFractional extends Fractional[Double] with DoubleIsField
-with ConvertableFromDouble with ConvertableToDouble
+with DoubleIsNRoot with ConvertableFromDouble with ConvertableToDouble
 with DoubleOrder with DoubleIsSigned {
   override def fromInt(n: Int): Double = n
   def ceil(a:Double) = scala.math.ceil(a)
@@ -68,7 +71,7 @@ trait GenericCeilAndFloor[A] { self: Fractional[A] =>
 }
 
 trait BigDecimalIsFractional extends Fractional[BigDecimal] with BigDecimalIsField
-with ConvertableFromBigDecimal with ConvertableToBigDecimal
+with BigDecimalIsNRoot with ConvertableFromBigDecimal with ConvertableToBigDecimal
 with BigDecimalOrder with BigDecimalIsSigned {
   override def fromInt(n: Int): BigDecimal = super[ConvertableToBigDecimal].fromInt(n)
   def ceil(a:BigDecimal) = {
@@ -79,14 +82,14 @@ with BigDecimalOrder with BigDecimalIsSigned {
 }
 
 trait RationalIsFractional extends Fractional[Rational] with RationalIsField
-with ConvertableFromRational with ConvertableToRational
+with RationalIsNRoot with ConvertableFromRational with ConvertableToRational
 with RationalOrder with RationalIsSigned with GenericCeilAndFloor[Rational] {
   override def fromInt(n: Int): Rational = super[ConvertableToRational].fromInt(n)
 }
 
 
 trait RealIsFractional extends Fractional[Real] with RealIsField
-with ConvertableFromReal with ConvertableToReal with RealOrder with RealIsSigned
-with GenericCeilAndFloor[Real] {
+with RealIsNRoot with ConvertableFromReal with ConvertableToReal
+with RealOrder with RealIsSigned with GenericCeilAndFloor[Real] {
   override def fromInt(n: Int): Real = super[ConvertableToReal].fromInt(n)
 }

@@ -3,7 +3,7 @@ package spire.math.real
 import java.math.{ MathContext, BigDecimal => BigDec }
 import scala.math.max
 
-import spire.algebra.Zero
+import spire.algebra.{ NRoot, Zero }
 import spire.math._
 
 /**
@@ -98,12 +98,11 @@ object BigDecimalApproximations {
         // We need to use the upper bound to determine how many bits we need.
         
         val ub = e.decimalUpperBound
-        implicit val mc = new MathContext(ub + bits + 1)
         
         if (x < 0 && k % 2 == 0 && a.sign == Zero) {
           BigDecimal(0)
         } else {
-          x nroot k
+          NRoot.nroot(x, k, new MathContext(ub + bits + 1))
         }
     }
   }
@@ -149,9 +148,9 @@ object BigDecimalApproximations {
       case KRoot(a, k) => {
         import Implicits._
 
-        implicit val ctxt = mc + 1
+        val ctxt = mc + 1
         val sub = apply(a, ctxt)
-        sub nroot k
+        NRoot.nroot(sub, k, ctxt)
       }
 
       case IntLit(n) => BigDecimal(n, mc)

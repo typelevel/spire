@@ -82,7 +82,7 @@ extends RealLike[A] with SeparationBound[A] { self: A =>
    * Simulate returns the result of the `Real` if it had instead been replaced
    * by the type `A`. So, this won't provide any type
    */
-  def simulate[B](implicit f: FractionalWithNRoot[B]): B = this match {
+  def simulate[B](implicit f: Fractional[B]): B = this match {
     case IntLit(n) => f.fromInt(n)
     case BigIntLit(n) => f.fromBigInt(n)
     case Add(a, b) => a.simulate[B] + b.simulate[B]
