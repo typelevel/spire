@@ -90,10 +90,10 @@ with NRoot[Complex[A]] with ConvertableFromComplex[A] with ConvertableToComplex[
 with Order[Complex[A]] with ComplexIsSigned[A] {
   override def fromInt(n: Int): Complex[A] = super[ConvertableToComplex].fromInt(n)
 
-  override def nroot(a: Complex[A], n: Int) = sys.error("not implemented")
+  override def nroot(a: Complex[A], n: Int) = a.pow(reciprocal(fromInt(n)))
   override def gt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   override def gteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   override def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   override def lteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  def compare(x:Complex[A], y:Complex[A]) = sys.error("undefined")
+  def compare(x:Complex[A], y:Complex[A]) = if (x == y) 0 else sys.error("undefined")
 }
