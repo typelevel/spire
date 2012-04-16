@@ -7,6 +7,8 @@ import scala.{specialized => spec}
 trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] {
   def div(a:A, b:A):A
   def isWhole(a:A): Boolean = eq(mod(a, one), zero)
+
+  override def multiplicative:Group[A] = new MultiplicativeGroup[A]()(this)
 }
 
 final class FieldOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Field[A]) {
