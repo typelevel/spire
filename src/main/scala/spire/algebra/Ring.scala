@@ -36,7 +36,7 @@ trait Ring[@spec(Int,Long,Float,Double) A] {
     if (n < 0) _fromInt(negate(one), -n, zero)
     else _fromInt(one, n, zero)
 
-  @tailrec private def _pow(a:A, n:Int, sofar:A):A =
+  @tailrec protected[this] final def _pow(a:A, n:Int, sofar:A):A =
     if (n == 0) sofar
     else if (n % 2 == 1) _pow(times(a, a), n / 2, times(sofar, a))
     else _pow(times(a, a), n / 2, sofar)

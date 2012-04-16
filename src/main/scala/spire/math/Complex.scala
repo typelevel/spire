@@ -80,11 +80,11 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def asTuple: (T, T) = (real, imag)
   def asPolarTuple: (T, T) = (abs, arg)
 
-  def isImaginary: Boolean = f.eq(real, f.zero) && f.neq(imag, f.zero)
-  def isReal: Boolean = f.neq(real, f.zero) && f.eq(imag, f.zero)
+  def isImaginary: Boolean = f.eq(real, f.zero) && f.neqv(imag, f.zero)
+  def isReal: Boolean = f.neqv(real, f.zero) && f.eqv(imag, f.zero)
 
-  def eq(b:Complex[T]) = f.eq(real, b.real) && f.eq(imag, b.imag)
-  def neq(b:Complex[T]) = f.neq(real, b.real) || f.neq(imag, b.imag)
+  def eqv(b:Complex[T]) = f.eqv(real, b.real) && f.eqv(imag, b.imag)
+  def neqv(b:Complex[T]) = f.neqv(real, b.real) || f.neqv(imag, b.imag)
 
   def unary_-() = Complex(f.negate(real), f.negate(imag))
 
@@ -99,7 +99,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     val abs_breal = b.real.abs
     val abs_bimag = b.imag.abs
 
-    if (f.gteq(abs_breal, abs_bimag)) {
+    if (f.gteqv(abs_breal, abs_bimag)) {
       if (f.eq(abs_breal, f.zero)) throw new Exception("/ by zero")
       val ratio = f.div(b.imag, b.real)
       val denom = f.plus(b.real, f.times(b.imag, ratio))
@@ -136,11 +136,11 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     Complex.one[T]
 
   } else if (this.eq(Complex.zero[T])) {
-    if (f.neq(b.imag, f.zero) || f.lt(b.real, f.zero))
+    if (f.neqv(b.imag, f.zero) || f.lt(b.real, f.zero))
       throw new Exception("raising 0 to negative/complex power")
     Complex.zero[T]
 
-  } else if (f.neq(b.imag, f.zero)) {
+  } else if (f.neqv(b.imag, f.zero)) {
     val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble) / exp((arg * b.imag).toDouble))
     val phase = f.fromDouble(arg.toDouble * b.real.toDouble + log(abs.toDouble) * b.imag.toDouble)
     Complex.polar(len, phase)

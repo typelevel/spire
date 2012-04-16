@@ -36,12 +36,14 @@ trait IntIsNumeric extends Numeric[Int] with IntIsEuclideanRing with IntIsNRoot
 with ConvertableFromInt with ConvertableToInt with IntOrder with IntIsSigned {
   override def fromInt(n: Int): Int = n
   def div(a:Int, b:Int) = a / b
+  def isWhole(a:Int) = true
 }
 
 trait LongIsNumeric extends Numeric[Long] with LongIsEuclideanRing with LongIsNRoot
 with ConvertableFromLong with ConvertableToLong with LongOrder with LongIsSigned {
   override def fromInt(n: Int): Long = n
   def div(a:Long, b:Long) = a / b
+  def isWhole(a:Long) = true
 }
 
 trait BigIntIsNumeric extends Numeric[BigInt] with BigIntIsEuclideanRing
@@ -49,6 +51,7 @@ with BigIntIsNRoot with ConvertableFromBigInt with ConvertableToBigInt
 with BigIntOrder with BigIntIsSigned {
   override def fromInt(n: Int): BigInt = super[ConvertableToBigInt].fromInt(n)
   def div(a:BigInt, b:BigInt) = a / b
+  def isWhole(a:BigInt) = true
 }
 
 trait FloatIsNumeric extends Numeric[Float] with FloatIsField
@@ -89,8 +92,8 @@ with Order[Complex[A]] with ComplexIsSigned[A] {
 
   override def nroot(a: Complex[A], n: Int) = sys.error("not implemented")
   override def gt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  override def gteq(x:Complex[A], y:Complex[A]) = sys.error("undefined")
+  override def gteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   override def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  override def lteq(x:Complex[A], y:Complex[A]) = sys.error("undefined")
+  override def lteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   def compare(x:Complex[A], y:Complex[A]) = sys.error("undefined")
 }

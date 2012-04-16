@@ -53,7 +53,7 @@ trait OrderedRingIsSigned[A] extends Signed[A] {
   def order: Order[A]
   def ring: Ring[A]
 
-  override def sign(a: A): Sign = if (order.lteq(a, ring.zero)) {
+  override def sign(a: A): Sign = if (order.lteqv(a, ring.zero)) {
     if (order.eq(a, ring.zero)) Zero else Negative
   } else {
     Positive
