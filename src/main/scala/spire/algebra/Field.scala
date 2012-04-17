@@ -10,10 +10,6 @@ trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] {
   def reciprocal(a:A): A = div(one, a)
 
   override def multiplicative:Group[A] = new MultiplicativeGroup[A]()(this)
-
-  override def pow(a:A, n:Int):A =
-    if (n >= 0) _pow(a, n, one)
-    else reciprocal(_pow(a, -n, one))
 }
 
 final class FieldOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Field[A]) {
