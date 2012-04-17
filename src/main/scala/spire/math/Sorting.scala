@@ -64,7 +64,7 @@ object MergeSort extends Sort {
     var jj = mid
     var kk = start
     while (kk < end) {
-      if (ii < mid && (jj >= end || o.lteq(in(ii), in(jj)))) {
+      if (ii < mid && (jj >= end || o.lteqv(in(ii), in(jj)))) {
         out(kk) = in(ii); ii += 1
       } else {
         out(kk) = in(jj); jj += 1
@@ -139,14 +139,14 @@ object QuickSort {
         var d = c
         var done = false
         while (!done) {
-          while (b <= c && o.lteq(x(b), v)) {
+          while (b <= c && o.lteqv(x(b), v)) {
             if (o.eq(x(b), v)) {
               swap(k, a, b)
               a += 1
             }
             b += 1
           }
-          while (c >= b && o.gteq(x(c), v)) {
+          while (c >= b && o.gteqv(x(c), v)) {
             if (o.eq(x(c), v)) {
               swap(k, c, d)
               d -= 1

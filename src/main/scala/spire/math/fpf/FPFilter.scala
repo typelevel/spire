@@ -66,7 +66,7 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
 trait FPFilterEq[A] extends Eq[FPFilter[A]] {
   implicit def ev: Eq[A]
 
-  def eq(a: FPFilter[A], b: FPFilter[A]): Boolean = (a.approx - b.approx).sign match {
+  def eqv(a: FPFilter[A], b: FPFilter[A]): Boolean = (a.approx - b.approx).sign match {
     case Some(s) => s == Zero
     case None => a.value === b.value
   }
@@ -193,7 +193,7 @@ trait FPFilterIsFieldWithNRoot[A] extends FPFilterIsField[A] with FieldWithNRoot
 
   def nroot(a: FPFilter[A], n: Int): FPFilter[A] =
     new FPFilter(a.approx nroot n, a.value nroot n)
-  
+
   override def sqrt(a: FPFilter[A]): FPFilter[A] = 
     new FPFilter(a.approx.sqrt, a.value.sqrt)
 }
@@ -204,6 +204,7 @@ with FPFilterIsFieldWithNRoot[A] with FPFilterOrder[A] with FPFilterIsSigned[A]
 with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   implicit val ev: Numeric[A]
 
+  def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
   override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
 }
 
@@ -213,6 +214,7 @@ with FPFilterOrder[A] with FPFilterIsSigned[A]
 with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   implicit val ev: Fractional[A]
   
+  def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
   override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
 }
 

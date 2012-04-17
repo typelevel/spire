@@ -6,57 +6,45 @@ import annotation.tailrec
 import scala.{specialized => spec}
 import scala.math.{abs, ceil, floor, pow => mpow}
 
-
+/**
+ * Ring represents a set (A) that is a group over addition (+) and a monoid
+ * over multiplication (*).
+ *
+ * Ring implements some methods (for example fromInt) in terms of other more
+ * fundamental methods (zero, one and plus). Where possible, these methods
+ * should be overridden by more efficient implementations.
+ */
 trait Ring[@spec(Int,Long,Float,Double) A] {
   self =>
-  def minus(a:A, b:A):A = plus(a, negate(b))
-  def negate(a:A):A
-  def one:A
-  def plus(a:A, b:A):A
-  def pow(a:A, n:Int):A = _pow(a, n, one)
-  def times(a:A, b:A):A // = _times(a, b, one)
+
   def zero:A
+  def one:A
+  def negate(a:A):A
+  def plus(a:A, b:A):A
+  def times(a:A, b:A):A
 
-  @tailrec private def _pow(a:A, n:Int, sofar:A):A = if (n > 0) {
-    _pow(a, n - 1, times(sofar, a))
-  } else if (n == 0) {
-    sofar
-  } else {
-    zero
-  }
+  def additive:Group[A] = new AdditiveGroup[A]()(this)
+  def multiplicative:Monoid[A] = new MultiplicativeMonoid[A]()(this)
 
-  /*
-  @tailrec private def _times(a:A, b:A, sofar:A):A = signum(b) match {
-    case 1 => _times(a, minus(b, one), plus(sofar, a))
-    case 0 => sofar
-    case -1 => _times(negate(a), negate(b), sofar)
-  }
-  */
+  def minus(a:A, b:A):A = plus(a, negate(b))
 
-  // TODO: Implement log n version.
-  @tailrec private def _fromInt(n: Int, a: A): A = {
-    if (n > 0) {
-      _fromInt(n - 1, plus(a, one))
-    } else if (n < 0) {
-      _fromInt(n + 1, plus(a, negate(one)))
-    } else {
-      a
-    }
-  }
+  def pow(a:A, n:Int):A =
+    if (n < 0) sys.error("illegal exponent: %s" format n)
+    else _pow(a, n, one)
 
-  /**
-   * This constructs an `A` from an integer which is equivalent to adding
-   * together `n` `one`'s. If `n` is negative, then it is equivalent to adding
-   * together the additive inverse of `one` `n` times.
-   *
-   * The default implementation is very inefficient, performing `n` adds. Most
-   * likely you will (and should) override the default implementation and
-   * optimize it.
-   */
-  def fromInt(n: Int): A = _fromInt(n, zero)
+  def fromInt(n: Int): A =
+    if (n < 0) _fromInt(negate(one), -n, zero)
+    else _fromInt(one, n, zero)
 
-  def additive = new AdditiveGroup[A]()(this)
-  def multiplicative = new MultiplicativeMonoid[A]()(this)
+  @tailrec protected[this] final def _pow(a:A, n:Int, sofar:A):A =
+    if (n == 0) sofar
+    else if (n % 2 == 1) _pow(times(a, a), n / 2, times(sofar, a))
+    else _pow(times(a, a), n / 2, sofar)
+
+  @tailrec private def _fromInt(a:A, n:Int, sofar:A):A =
+    if (n == 0) sofar
+    else if (n % 2 == 1) _fromInt(plus(a, a), n / 2, plus(sofar, a))
+    else _fromInt(plus(a, a), n / 2, sofar)
 }
 
 final class RingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Ring[A]) {
