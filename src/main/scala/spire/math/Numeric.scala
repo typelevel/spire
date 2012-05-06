@@ -27,7 +27,7 @@ object Numeric {
     val context = ctx
   }
   implicit object RealIsNumeric extends RealIsNumeric
-  implicit def complexIsNumeric[A:Fractional] = new ComplexIsNumeric
+  implicit def complexIsNumeric[A:Fractional:Trig] = new ComplexIsNumeric
 
   def apply[A](implicit e:Numeric[A]):Numeric[A] = e
 }
@@ -84,7 +84,7 @@ with ConvertableFromReal with ConvertableToReal with RealOrder with RealIsSigned
 }
 
 
-class ComplexIsNumeric[A](implicit val f:Fractional[A])
+class ComplexIsNumeric[A](implicit val f:Fractional[A], val t:Trig[A])
 extends ComplexIsField[A] with Numeric[Complex[A]] with ComplexEq[A]
 with NRoot[Complex[A]] with ConvertableFromComplex[A] with ConvertableToComplex[A]
 with Order[Complex[A]] with ComplexIsSigned[A] {

@@ -59,6 +59,9 @@ sealed trait Number extends ScalaNumber with ScalaNumericConversions with Ordere
 
   def unary_-():Number
 
+  def toBigInt: BigInt
+  def toBigDecimal: BigDecimal
+
   def +(rhs:Number):Number
 
   def *(rhs:Number):Number
@@ -78,10 +81,8 @@ sealed trait Number extends ScalaNumber with ScalaNumericConversions with Ordere
   def /%(rhs:Number) = (this /~ rhs, this % rhs)
   protected[math] def rhs_/%(lhs:Number) = (this rhs_/~ lhs, this rhs_% lhs)
 
-  // FIXME
   def pow(rhs:Number): Number
   def **(rhs:Number) = this.pow(rhs)
-  //protected[math] def rhs_pow(lhs:Number) = Number(math.pow(lhs.doubleValue, this.doubleValue))
 }
 
 
@@ -99,6 +100,9 @@ protected[math] case class IntNumber(n:SafeLong) extends Number {
   def canBeInt = isWhole && withinInt
   def canBeLong = isWhole && withinLong
 
+  def toBigInt: BigInt = n.toBigInt
+  def toBigDecimal: BigDecimal = n.toBigDecimal
+
   private def fold[A](l:Long => A, b:BigInt => A) = n.fold(l, b)
 
   def underlying = fold(x => new java.lang.Long(x), b => b)
@@ -108,7 +112,6 @@ protected[math] case class IntNumber(n:SafeLong) extends Number {
   def floatValue = fold(_.toFloat, _.toFloat)
   def longValue = fold(x => x, _.toLong)
   def intValue = fold(x => x.toInt, _.toInt)
-
 
   def compare(rhs:Number) = rhs match {
     case IntNumber(m) => n.compare(m)
@@ -179,23 +182,9 @@ protected[math] case class IntNumber(n:SafeLong) extends Number {
   }
 
   def pow(rhs:Number) = rhs match {
-    case IntNumber(m) => if (rhs.canBeInt) {
-      Number(n.pow(rhs.intValue)) 
-    } else {
-      Number(fun.pow(n.toBigDecimal, m.toBigDecimal))
-    }
-    case FloatNumber(m) => if (rhs.canBeInt) {
-      Number(n.pow(rhs.intValue))
-    } else if (withinDouble) {
-      Number(fun.pow(doubleValue, BigDecimal(m)))
-    } else {
-      Number(fun.pow(n.toBigDecimal, BigDecimal(m)))
-    }
-    case DecimalNumber(m) => if (rhs.canBeInt) {
-      Number(n.pow(m.intValue))
-    } else {
-      Number(fun.pow(n.toBigDecimal, m))
-    }
+    case _ if rhs.canBeInt => Number(n.pow(rhs.intValue))
+    case FloatNumber(m) if (withinDouble) => Number(fun.pow(doubleValue, m))
+    case _ => Number(fun.pow(this.toBigDecimal, rhs.toBigDecimal))
   }
 }
 
@@ -216,6 +205,9 @@ protected[math] case class FloatNumber(n:Double) extends Number {
   def floatValue = n.toFloat
   def longValue = n.toLong
   def intValue = n.toInt
+
+  def toBigInt: BigInt = BigDecimal(n).toBigInt
+  def toBigDecimal: BigDecimal = BigDecimal(n)
 
   def compare(rhs:Number) = rhs match {
     case IntNumber(m) => BigDecimal(n) compare m.toBigDecimal
@@ -298,13 +290,9 @@ protected[math] case class FloatNumber(n:Double) extends Number {
   }
 
   def pow(rhs:Number) = rhs match {
-    case IntNumber(m) => if (rhs.withinDouble) {
-      Number(fun.pow(n, rhs.doubleValue))
-    } else {
-      Number(fun.pow(BigDecimal(n), m.toBigDecimal))
-    }
     case FloatNumber(m) => Number(fun.pow(n, m))
-    case DecimalNumber(m) => Number(fun.pow(BigDecimal(n), m))
+    case _ if rhs.withinDouble => Number(fun.pow(n, rhs.doubleValue));
+    case _ => Number(fun.pow(BigDecimal(n), rhs.toBigDecimal))
   }
 }
 
@@ -326,6 +314,9 @@ protected[math] case class DecimalNumber(n:BigDecimal) extends Number {
   def floatValue = n.toFloat
   def longValue = n.toLong
   def intValue = n.toInt
+
+  def toBigInt: BigInt = n.toBigInt
+  def toBigDecimal: BigDecimal = n
 
   def compare(rhs:Number) = rhs match {
     case IntNumber(m) => n compare m.toBigDecimal
@@ -408,21 +399,9 @@ protected[math] case class DecimalNumber(n:BigDecimal) extends Number {
     case t => t % this
   }
 
-  def pow(rhs:Number) = rhs match {
-    case IntNumber(m) => if (rhs.canBeInt) {
-      Number(n.pow(rhs.intValue))
-    } else {
-      Number(fun.pow(n, m.toBigDecimal))
-    }
-    case FloatNumber(m) => if (rhs.canBeInt) {
-      Number(n.pow(rhs.intValue))
-    } else {
-      Number(fun.pow(n, BigDecimal(m)))
-    }
-    case DecimalNumber(m) => if (rhs.canBeInt) {
-      Number(n.pow(rhs.intValue))
-    } else {
-      Number(fun.pow(n, m))
-    }
+  def pow(rhs:Number) = if (rhs.canBeInt) {
+    Number(n.pow(rhs.intValue))
+  } else {
+    Number(fun.pow(n, rhs.toBigDecimal))
   }
 }

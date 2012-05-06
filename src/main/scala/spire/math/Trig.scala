@@ -8,6 +8,8 @@ trait Trig[@spec(Float,Double) A] {
   def e:A
   def pi:A
 
+  def exp(a:A):A
+
   def sin(a:A):A
   def cos(a:A):A
   def tan(a:A):A

@@ -13,25 +13,25 @@ import Implicits._
 // access functions (e.g. trig, pow, exp, log)
 
 object Complex {
-  def i[@spec(Float, Double) T](implicit f:Fractional[T]) = Complex(f.zero, f.one)
-  def one[@spec(Float, Double) T](implicit f:Fractional[T]) = Complex(f.one, f.zero)
-  def zero[@spec(Float, Double) T](implicit f:Fractional[T]) = Complex(f.zero, f.zero)
+  def i[@spec(Float, Double) T](implicit f:Fractional[T], t:Trig[T]) = Complex(f.zero, f.one)
+  def one[@spec(Float, Double) T](implicit f:Fractional[T], t:Trig[T]) = Complex(f.one, f.zero)
+  def zero[@spec(Float, Double) T](implicit f:Fractional[T], t:Trig[T]) = Complex(f.zero, f.zero)
   implicit def intToComplex(n:Int) = new Complex(n.toDouble, 0.0)
   implicit def longToComplex(n:Long) = new Complex(n.toDouble, 0.0)
-  implicit def doubleToComplex(n:Float) = new Complex(n, 0.0F)
+  implicit def floatToComplex(n:Float) = new Complex(n, 0.0F)
   implicit def doubleToComplex(n:Double) = new Complex(n, 0.0)
 
-  def polar[@spec(Float, Double) T](magnitude:T, angle:T)(implicit f:Fractional[T]) = {
-    val real:T = f.times(magnitude, f.fromDouble(cos(angle.toDouble)))
-    val imag:T = f.times(magnitude, f.fromDouble(sin(angle.toDouble)))
+  def polar[@spec(Float, Double) T](magnitude:T, angle:T)(implicit f:Fractional[T], t:Trig[T]) = {
+    val real:T = f.times(magnitude, t.cos(angle))
+    val imag:T = f.times(magnitude, t.sin(angle))
     Complex(real, imag)
   }
 
-  def apply[@spec(Float, Double) T:Fractional](real:T, imag:T) = new Complex(real, imag)
-  def unapply[@spec(Float, Double) T:Fractional](c:Complex[T]) = Some((c.real, c.imag))
+  def apply[@spec(Float, Double) T:Fractional:Trig](real:T, imag:T) = new Complex(real, imag)
+  def unapply[@spec(Float, Double) T:Fractional:Trig](c:Complex[T]) = Some((c.real, c.imag))
 }
 
-class Complex[@spec(Float, Double) T](val real:T, val imag:T)(implicit f:Fractional[T])
+class Complex[@spec(Float, Double) T](val real:T, val imag:T)(implicit f:Fractional[T], t:Trig[T])
 extends ScalaNumber with ScalaNumericConversions with Serializable {
 
   // ugh, ScalaNumericConversions ghetto
@@ -50,13 +50,15 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     this / Complex(abs, f.zero)
   }
 
-  override def hashCode: Int = if (isReal && real.isWhole &&
-                                   real <= f.fromInt(Int.MaxValue) &&
-                                   real >= f.fromInt(Int.MinValue)) {
-    real.toInt.##
-  } else {
-    19 * real.## + 41 * imag.##
-  }
+  //override def hashCode: Int = if (isReal && real.isWhole &&
+  //                                 real <= f.fromInt(Int.MaxValue) &&
+  //                                 real >= f.fromInt(Int.MinValue)) {
+  //  real.toInt.##
+  //} else {
+  //  19 * real.## + 41 * imag.##
+  //}
+
+  override def hashCode: Int = 19 * real.## + 41 * imag.##
 
   override def equals(that: Any): Boolean = that match {
     case that:Complex[_] => real == that.real && imag == that.imag
@@ -65,15 +67,11 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
 
   override def toString: String = "Complex(%s, %s)".format(real, imag)
 
-  // ugh, for very large Fractional values this will totally break
-  //lazy val magnitude: T = f.sqrt(real * real + imag * imag)
-  //lazy val angle: T = f.fromDouble(atan2(imag.toDouble, real.toDouble))
-  //def abs: T = magnitude
-  //def arg: T = angle
-
   // ugh, specialized lazy vals don't work very well
+  //lazy val abs: T = f.sqrt(real * real + imag * imag)
+  //lazy val arg: T = t.atan2(imag, real)
   def abs: T = f.sqrt(real * real + imag * imag)
-  def arg: T = f.fromDouble(atan2(imag.toDouble, real.toDouble))
+  def arg: T = t.atan2(imag, real)
 
   def conjugate = Complex(real, f.negate(imag))
 
@@ -141,6 +139,9 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     Complex.zero[T]
 
   } else if (f.neqv(b.imag, f.zero)) {
+    // TODO: is adding frac**frac reasonable? if not, we won't be able to do
+    // this without something hacky like the below.
+    // TODO: we also need log and exp on Field, Fractional, or Trig.
     val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble) / exp((arg * b.imag).toDouble))
     val phase = f.fromDouble(arg.toDouble * b.real.toDouble + log(abs.toDouble) * b.imag.toDouble)
     Complex.polar(len, phase)

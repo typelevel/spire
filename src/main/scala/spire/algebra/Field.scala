@@ -9,11 +9,11 @@ trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] {
   def isWhole(a:A): Boolean
   def reciprocal(a:A): A = div(one, a)
 
-  override def multiplicative:Group[A] = new MultiplicativeGroup[A]()(this)
+  // TODO
+  // def exp(a:A)
+  // def log(a:A)
 
-  override def pow(a:A, n:Int):A =
-    if (n >= 0) _pow(a, n, one)
-    else reciprocal(_pow(a, -n, one))
+  override def multiplicative:Group[A] = new MultiplicativeGroup[A]()(this)
 }
 
 final class FieldOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Field[A]) {
@@ -27,7 +27,7 @@ object Field {
   implicit object BigDecimalIsField extends BigDecimalIsField
   implicit object RationalIsField extends RationalIsField
   implicit object RealIsField extends RealIsField
-  implicit def complexIsField[A:Fractional] = new ComplexIsFieldCls
+  implicit def complexIsField[A:Fractional:Trig] = new ComplexIsFieldCls
 
   def apply[A](implicit f:Field[A]):Field[A] = f
 }
@@ -65,5 +65,5 @@ extends ComplexIsEuclideanRing[A] with Field[Complex[A]] {
 }
 
 class ComplexIsFieldCls[@spec(Float,Double) A]
-(implicit val f:Fractional[A]) extends ComplexIsField[A]
+(implicit val f:Fractional[A], val t:Trig[A]) extends ComplexIsField[A]
 
