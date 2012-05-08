@@ -95,7 +95,7 @@ trait FloatIsSigned extends Signed[Float] {
 
 trait DoubleIsSigned extends Signed[Double] {
   // Note that math.signum(-1d) == -1 in 2.9.2.
-  override def signum(a: Double): Int = if (a == 0.0) 0 else mth.signum(a).toInt
+  override def signum(a: Double): Int = mth.signum(a).toInt
   def abs(a: Double): Double = if (a < 0.0) -a else a
 }
 
