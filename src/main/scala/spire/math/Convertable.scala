@@ -134,6 +134,9 @@ trait ConvertableToComplex[A] extends ConvertableTo[Complex[A]] {
   def fromRational(a:Rational): Complex[A] = Complex(f.fromRational(a), f.zero)
 }
 
+class ConvertableToComplexCls[A](implicit val f:Fractional[A], val t:Trig[A])
+extends ConvertableToComplex[A]
+
 trait ConvertableToReal extends ConvertableTo[Real] {
   def fromByte(a:Byte): Real = Real(a)
   def fromShort(a:Short): Real = Real(a)
@@ -156,11 +159,7 @@ object ConvertableTo {
   implicit object ConvertableToRational extends ConvertableToRational
   implicit object ConvertableToReal extends ConvertableToReal
 
-  implicit def ConvertableToComplex[A]
-  (implicit fr: Fractional[A], tr: Trig[A]) = new ConvertableToComplex[A] {
-    val f = fr
-    val t = tr
-  }
+  implicit def convertableToComplex[A:Fractional:Trig] = new ConvertableToComplexCls[A]
 }
 
 trait ConvertableFrom[@specialized A] {
@@ -318,6 +317,9 @@ trait ConvertableFromComplex[A] extends ConvertableFrom[Complex[A]] {
   def toString(a:Complex[A]): String = a.toString
 }
 
+class ConvertableFromComplexCls[A](implicit val f:Fractional[A])
+extends ConvertableFromComplex[A]
+
 trait ConvertableFromReal extends ConvertableFrom[Real] {
   def toByte(a:Real): Byte = a.toInt.toByte
   def toShort(a:Real): Short = a.toInt.toShort
@@ -345,9 +347,7 @@ object ConvertableFrom {
   implicit object ConvertableFromRational extends ConvertableFromRational
   implicit object ConvertableFromReal extends ConvertableFromReal
 
-  implicit def convertableFromComplex[A](implicit ev:Fractional[A]) = new ConvertableFromComplex[A] {
-    def f = ev
-  }
+  implicit def convertableFromComplex[A:Fractional] = new ConvertableFromComplexCls[A]
 }
 
 final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {
