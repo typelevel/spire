@@ -78,20 +78,11 @@ class ComplexTest extends FunSuite {
     val one = Complex.one[Double]
 
     val z = e.pow(i * pi) + one
-    // TODO: I'm getting z as NaN... why?
-    // assert (z.real === 0.0)
-    // assert (z.imag < 0.000000000000001) // sigh...
+    assert (z.real === 0.0)
+    assert (z.imag < 0.000000000000001) // sigh...
   }
 
-  // TODO: once Complex stops using conversions to Double to do exp/pow/log,
-  // we should try out Euler's identity with BigDecimal/Rational/Real.
-
-  // brings up the point that it would be nice to have functions for e, pi, etc
-  // for Rational/BigDecimal/etc that gave us as much precision as we asked for.
-  //
-  // or, symbolic Real types anyone? why not reimplement mathematica?
-
-  // Sounds like Tom is on the case!
+  // TODO: get a way to get Real values for e and pi, and try this for Real
 
   test("try using FastComplex") {
     val fc = FastComplex
