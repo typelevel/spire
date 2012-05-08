@@ -50,15 +50,14 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     this / Complex(abs, f.zero)
   }
 
-  //override def hashCode: Int = if (isReal && real.isWhole &&
-  //                                 real <= f.fromInt(Int.MaxValue) &&
-  //                                 real >= f.fromInt(Int.MinValue)) {
-  //  real.toInt.##
-  //} else {
-  //  19 * real.## + 41 * imag.##
-  //}
+  override def hashCode: Int = {
+    if (isReal && real.isWhole &&
+        real <= f.fromInt(Int.MaxValue) &&
+        real >= f.fromInt(Int.MinValue)) real.toInt.##
+    else 19 * real.## + 41 * imag.##
+  }
 
-  override def hashCode: Int = 19 * real.## + 41 * imag.##
+  //override def hashCode: Int = 19 * real.## + 41 * imag.##
 
   override def equals(that: Any): Boolean = that match {
     case that:Complex[_] => real == that.real && imag == that.imag
