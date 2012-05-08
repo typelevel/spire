@@ -146,6 +146,23 @@ trait ConvertableToReal extends ConvertableTo[Real] {
   def fromRational(a:Rational) = Real(a)
 }
 
+object ConvertableTo {
+  implicit object ConvertableToInt extends ConvertableToInt
+  implicit object ConvertableToLong extends ConvertableToLong
+  implicit object ConvertableToBigInt extends ConvertableToBigInt
+  implicit object ConvertableToFloat extends ConvertableToFloat
+  implicit object ConvertableToDouble extends ConvertableToDouble
+  implicit object ConvertableToBigDecimal extends ConvertableToBigDecimal
+  implicit object ConvertableToRational extends ConvertableToRational
+  implicit object ConvertableToReal extends ConvertableToReal
+
+  implicit def ConvertableToComplex[A]
+  (implicit fr: Fractional[A], tr: Trig[A]) = new ConvertableToComplex[A] {
+    val f = fr
+    val t = tr
+  }
+}
+
 trait ConvertableFrom[@specialized A] {
   def toByte(a:A): Byte
   def toShort(a:A): Short
