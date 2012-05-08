@@ -53,7 +53,7 @@ trait OrderedRingIsSigned[A] extends Signed[A] {
   def ring: Ring[A]
 
   override def sign(a: A): Sign = if (order.lteqv(a, ring.zero)) {
-    if (order.eq(a, ring.zero)) Zero else Negative
+    if (order.eqv(a, ring.zero)) Zero else Negative
   } else {
     Positive
   }
@@ -94,7 +94,8 @@ trait FloatIsSigned extends Signed[Float] {
 }
 
 trait DoubleIsSigned extends Signed[Double] {
-  override def signum(a: Double): Int = mth.signum(a).toInt
+  // Note that math.signum(-1d) == -1 in 2.9.2.
+  override def signum(a: Double): Int = if (a == 0.0) 0 else mth.signum(a).toInt
   def abs(a: Double): Double = if (a < 0.0) -a else a
 }
 
