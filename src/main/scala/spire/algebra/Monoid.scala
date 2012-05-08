@@ -8,8 +8,12 @@ object Monoid {
   def apply[A](implicit m: Monoid[A]): Monoid[A] = m
 }
 
-class MultiplicativeMonoid[A:Ring] extends Monoid[A] {
-  private val ring = implicitly[Ring[A]]
+class AdditiveMonoid[A](implicit ring:Ring[A]) extends Monoid[A] {
+  def identity = ring.zero
+  def op(x:A, y:A) = ring.plus(x, y)
+}
+
+class MultiplicativeMonoid[A](implicit ring:Ring[A]) extends Monoid[A] {
   def identity = ring.one
   def op(x:A, y:A) = ring.times(x, y)
 }
