@@ -132,9 +132,9 @@ trait ConvertableFromFPFilter[A] extends ConvertableFrom[FPFilter[A]] {
 trait FPFilterIsSigned[A] extends Signed[FPFilter[A]] {
   implicit def ev: Signed[A]
 
-  override def abs(a: FPFilter[A]): FPFilter[A] = new FPFilter(a.approx.abs, ev.abs(a.value))
+  def abs(a: FPFilter[A]): FPFilter[A] = new FPFilter(a.approx.abs, ev.abs(a.value))
 
-  override def sign(a: FPFilter[A]): Sign = a.approx.sign getOrElse ev.sign(a.value)
+  def signum(a: FPFilter[A]): Int = a.approx.sign.getOrElse(ev.sign(a.value)).toInt
 }
 
 trait FPFilterIsRing[A] extends Ring[FPFilter[A]] {
