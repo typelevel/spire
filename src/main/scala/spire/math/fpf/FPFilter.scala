@@ -45,7 +45,7 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
    * This will always evalute the underlying `value` and will lead to serious
    * performance problems if used often.
    */
-  override def hashCode: Int = value ##
+  override def hashCode: Int = value.##
 
   /**
    * Returns true if these values are equal. Note that this will only return

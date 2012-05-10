@@ -5,6 +5,8 @@ import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions, abs, min}
 import Implicits._
 
+import language.implicitConversions
+
 trait Fraction[@specialized(Long) A] {
   def num: A
   def den: A
@@ -262,8 +264,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
 
 object Rational {
-  private val RationalString = """^(-?\d+)/(-?\d+)$"""r
-  private val IntegerString = """^(-?\d+)$"""r
+  private val RationalString = """^(-?\d+)/(-?\d+)$""".r
+  private val IntegerString = """^(-?\d+)$""".r
 
   import LongRationals.LongRational
   import BigRationals.BigRational

@@ -9,6 +9,8 @@ import scala.math.{Pi, atan2, cos, exp, log, sin, sqrt}
 import spire.math.fun._
 import Implicits._
 
+import language.implicitConversions
+
 // TODO: refactor places where Fractional is converted to Double in order to
 // access functions (e.g. trig, pow, exp, log)
 
@@ -77,7 +79,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def asTuple: (T, T) = (real, imag)
   def asPolarTuple: (T, T) = (abs, arg)
 
-  def isImaginary: Boolean = f.eq(real, f.zero) && f.neqv(imag, f.zero)
+  def isImaginary: Boolean = f.eqv(real, f.zero) && f.neqv(imag, f.zero)
   def isReal: Boolean = f.neqv(real, f.zero) && f.eqv(imag, f.zero)
 
   def eqv(b:Complex[T]) = f.eqv(real, b.real) && f.eqv(imag, b.imag)
@@ -97,14 +99,14 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     val abs_bimag = b.imag.abs
 
     if (f.gteqv(abs_breal, abs_bimag)) {
-      if (f.eq(abs_breal, f.zero)) throw new Exception("/ by zero")
+      if (f.eqv(abs_breal, f.zero)) throw new Exception("/ by zero")
       val ratio = f.div(b.imag, b.real)
       val denom = f.plus(b.real, f.times(b.imag, ratio))
       Complex(f.div(f.plus(real, f.times(imag, ratio)), denom),
               f.div(f.minus(imag, f.times(real, ratio)), denom))
 
     } else {
-      if (f.eq(abs_bimag, f.zero)) throw new Exception("/ by zero")
+      if (f.eqv(abs_bimag, f.zero)) throw new Exception("/ by zero")
       val ratio = f.div(b.real, b.imag)
       val denom = f.plus(f.times(b.real, ratio), b.imag)
       Complex(f.div(f.plus(f.times(real, ratio), imag), denom),
@@ -129,10 +131,10 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   }
 
   def **(b:Complex[T]) = pow(b)
-  def pow(b:Complex[T]) = if (b.eq(Complex.zero[T])) {
+  def pow(b:Complex[T]) = if (b.eqv(Complex.zero[T])) {
     Complex.one[T]
 
-  } else if (this.eq(Complex.zero[T])) {
+  } else if (this.eqv(Complex.zero[T])) {
     if (f.neqv(b.imag, f.zero) || f.lt(b.real, f.zero))
       throw new Exception("raising 0 to negative/complex power")
     Complex.zero[T]

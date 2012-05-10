@@ -4,21 +4,7 @@ import spire.algebra._
 
 import scala.{specialized => spec}
 
-final class IntOpts(lhs:Int) {
-}
-
-final class FloatOps(lhs:Float) {
-  @inline private final def c = Complex(lhs, 0.0F)
-  def +(rhs:Complex[Float]) = c + rhs
-  def *(rhs:Complex[Float]) = c * rhs
-  def -(rhs:Complex[Float]) = c - rhs
-  def /(rhs:Complex[Float]) = c / rhs
-  def /~(rhs:Complex[Float]) = c /~ rhs
-  def %(rhs:Complex[Float]) = c % rhs
-  def /%(rhs:Complex[Float]) = c /% rhs
-  def pow(rhs:Complex[Float]) = c pow rhs
-  def **(rhs:Complex[Float]) = c ** rhs
-}
+import language.implicitConversions
 
 final class DoubleOps(lhs:Double) {
   @inline private final def c = Complex(lhs, 0.0)
@@ -33,13 +19,12 @@ final class DoubleOps(lhs:Double) {
   def **(rhs:Complex[Double]) = c ** rhs
 }
 
-
 object Implicits {
   implicit def eqOps[@spec(Int, Long, Float, Double) A:Eq](a:A) = new EqOps(a)
   implicit def orderOps[@spec(Int, Long, Float, Double) A:Order](a:A) = new OrderOps(a)
   implicit def semigroupOps[A:Semigroup](a:A) = new SemigroupOps(a)
 
-  implicit def convertableOps[A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
+  implicit def convertableOps[@spec(Int, Long, Float, Double) A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
 
   implicit def ringOps[@spec(Int, Long, Float, Double) A:Ring](a:A) = new RingOps(a)
   implicit def euclideanRingOps[@spec(Int, Long, Float, Double) A:EuclideanRing](a:A) = new EuclideanRingOps(a)
@@ -50,7 +35,7 @@ object Implicits {
   implicit def doubleOps(a:Double) = new DoubleOps(a)
 
   implicit def signedOps[@spec(Float, Double, Int, Long) A: Signed](a: A) = new SignedOps(a)
-  
-  implicit def euclideanRingWithNRootOps[@spec(Int, Long) A: EuclideanRingWithNRoot](a: A) = new NRootOps(a)
-}
+  implicit def nrootOps[@spec(Int, Long) A: EuclideanRingWithNRoot](a: A) = new NRootOps(a)
 
+  //implicit def literals(s:StringContext) = new Literals(s)
+}

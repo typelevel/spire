@@ -5,9 +5,14 @@ object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     name := "Spire",
     version := "0.2.0",
-    scalaVersion := "2.9.2",
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize"),
-    libraryDependencies += "org.scalatest" %% "scalatest" % "1.7.2" % "test"
+    //scalaVersion := "2.9.2",
+    scalaVersion := "2.10.0-M3",
+    scalaHome := Some(file("/home/erik/scala/build/pack")),
+    //scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize"),
+    //libraryDependencies += "org.scalatest" %% "scalatest" % "1.7.2" % "test"
+    
+    // turn specialization off until SI-5788 is fixed
+    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-no-specialization", "-feature")
   )
 
   val key = AttributeKey[Boolean]("javaOptionsPatched")

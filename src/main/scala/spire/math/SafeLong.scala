@@ -3,6 +3,7 @@ package spire.math
 import scala.math.{abs, signum}
 import annotation.tailrec
 
+import language.implicitConversions
 
 /**
  * Provides a type to do safe long arithmetic. This type will never overflow,
@@ -10,7 +11,7 @@ import annotation.tailrec
  * to a Long when possible.
  */
 sealed trait SafeLong extends Ordered[SafeLong] {
-  def signum: Int = fold(scala.math.signum(_) toInt, _.signum)
+  def signum: Int = fold(scala.math.signum(_).toInt, _.signum)
 
   def +(rhs: SafeLong): SafeLong = rhs.fold(this + _, this + _)
   def -(rhs: SafeLong): SafeLong = rhs.fold(this - _, this - _)

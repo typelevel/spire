@@ -5,7 +5,7 @@ import scala.{specialized => spec}
 
 trait Eq[@spec A] {
   def eqv(x:A, y:A): Boolean
-  def neqv(x:A, y:A): Boolean = !eq(x, y)
+  def neqv(x:A, y:A): Boolean = !eqv(x, y)
 
   def on[@spec B](f:B => A) = Eq.by(f)(this)
 }

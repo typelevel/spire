@@ -1,5 +1,7 @@
 package spire.algebra
 
+import language.implicitConversions
+
 /**
  * The `Sign` of a number.
  *

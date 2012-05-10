@@ -1,6 +1,8 @@
 package spire.math
 
-trait ConvertableTo[@specialized A] {
+import scala.{specialized => spec}
+
+trait ConvertableTo[@spec A] {
   def fromByte(a:Byte): A
   def fromShort(a:Short): A
   def fromInt(a:Int): A
@@ -162,7 +164,7 @@ object ConvertableTo {
   implicit def convertableToComplex[A:Fractional:Trig] = new ConvertableToComplexCls[A]
 }
 
-trait ConvertableFrom[@specialized A] {
+trait ConvertableFrom[@spec A] {
   def toByte(a:A): Byte
   def toShort(a:A): Short
   def toInt(a:A): Int
@@ -350,7 +352,7 @@ object ConvertableFrom {
   implicit def convertableFromComplex[A:Fractional] = new ConvertableFromComplexCls[A]
 }
 
-final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {
+final class ConvertableFromOps[@spec A](lhs:A)(implicit ev:ConvertableFrom[A]) {
   def toByte: Byte = ev.toByte(lhs)
   def toShort: Short = ev.toShort(lhs)
   def toInt: Int = ev.toInt(lhs)

@@ -4,15 +4,15 @@ import scala.math.{min, max}
 import scala.{specialized => spec}
 
 object Mutable {
-  def safe[@spec A:Manifest](as:Array[A]) = new Mutable(as.clone, as.length)
-  def unsafe[@spec A:Manifest](as:Array[A]) = new Mutable(as, as.length)
-  def apply[@spec A:Manifest](as:Array[A]) = unsafe(as)
-  def empty[@spec A:Manifest] = unsafe(Array.empty[A])
-  def ofDim[@spec A:Manifest](n:Int) = unsafe(Array.ofDim[A](n))
-  def fill[@spec A:Manifest](n:Int)(a:A) = unsafe(Array.fill(n)(a))
+  def safe[@spec A:ArrayTag](as:Array[A]) = new Mutable(as.clone, as.length)
+  def unsafe[@spec A:ArrayTag](as:Array[A]) = new Mutable(as, as.length)
+  def apply[@spec A:ArrayTag](as:Array[A]) = unsafe(as)
+  def empty[@spec A:ArrayTag] = unsafe(Array.empty[A])
+  def ofDim[@spec A:ArrayTag](n:Int) = unsafe(Array.ofDim[A](n))
+  def fill[@spec A:ArrayTag](n:Int)(a:A) = unsafe(Array.fill(n)(a))
 }
 
-final class Mutable[@spec A:Manifest](as:Array[A], n:Int) extends Buffer[A] {
+final class Mutable[@spec A:ArrayTag](as:Array[A], n:Int) extends Buffer[A] {
   protected[this] var elems:Array[A] = as
   protected[this] var len:Int = n
 
@@ -20,7 +20,7 @@ final class Mutable[@spec A:Manifest](as:Array[A], n:Int) extends Buffer[A] {
   def toArray = Buffer.alloc(elems, 0, len)
   def slice(i:Int, j:Int) = Mutable.unsafe(Buffer.alloc(elems, i, j - i))
   def reverse = Mutable.unsafe(as.reverse)
-  def map[@spec B:Manifest](f:A => B) = Mutable.unsafe(as.map(f))
+  def map[@spec B:ArrayTag](f:A => B) = Mutable.unsafe(as.map(f))
   def apply(i:Int) = elems(i)
   def get(i:Int) = if (i < len) Some(elems(i)) else None
   def update(i:Int, a:A):Unit = elems(i) = a

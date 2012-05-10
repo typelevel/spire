@@ -3,6 +3,8 @@ package spire.math
 import spire.algebra._
 import Implicits._
 
+import language.implicitConversions
+
 sealed trait Bound[T] {
   implicit def order:Order[T]
 

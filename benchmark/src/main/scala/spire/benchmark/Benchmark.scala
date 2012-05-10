@@ -21,7 +21,7 @@ trait MyBenchmark extends SimpleBenchmark {
   /**
    * Sugar for building arrays using a per-cell init function.
    */
-  def init[A:Manifest](size:Int)(init: => A) = {
+  def init[A:ArrayTag](size:Int)(init: => A) = {
     val data = Array.ofDim[A](size)
     for (i <- 0 until size) data(i) = init
     data
@@ -165,8 +165,8 @@ class SortBenchmarks extends MyBenchmark with BenchmarkData {
   def quickSortFloats(data:Array[Float]) = scala.util.Sorting.quickSort(data)
   def quickSortDoubles(data:Array[Double]) = scala.util.Sorting.quickSort(data)
   
-  def mergeSortGeneric[@spec T:Order:Manifest](data:Array[T]) = Sorting.mergeSort(data)
-  def quickSortGeneric[@spec T:Order:Manifest](data:Array[T]) = Sorting.quickSort(data)
+  def mergeSortGeneric[@spec T:Order:ArrayTag](data:Array[T]) = Sorting.mergeSort(data)
+  def quickSortGeneric[@spec T:Order:ArrayTag](data:Array[T]) = Sorting.quickSort(data)
 
   def timeQuicksortInts(reps:Int) = run(reps)(quickSortInts(ints.clone))
   def timeGenMergeSortInts(reps:Int) = run(reps)(mergeSortGeneric(ints.clone))
