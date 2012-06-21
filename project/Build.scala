@@ -16,7 +16,12 @@ object MyBuild extends Build {
 
   lazy val benchmark: Project = Project("benchmark", file("benchmark")) settings (benchmarkSettings: _*) dependsOn (spire)
 
-  lazy val examples = Project("examples", file("examples")) dependsOn (spire)
+  lazy val examples = Project("examples", file("examples")) settings (examplesSettings: _*) dependsOn (spire)
+
+  def examplesSettings = Seq(
+    libraryDependencies += "com.chuusai" %% "shapeless" % "1.2.0",    
+    scalacOptions += "-Ydependent-method-types"
+  )
 
   def benchmarkSettings = Seq(
     // raise memory limits here if necessary
