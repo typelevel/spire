@@ -116,7 +116,7 @@ trait IntIsNRoot extends NRoot[Int] { self: Ring[Int] =>
       val next = prev | add
       val e = self.pow(next, n)
 
-      if (e == x) {
+      if (e == x || add == 0) {
         next
       } else if (e <= 0 || e > x) {
         findnroot(prev, add >> 1)
