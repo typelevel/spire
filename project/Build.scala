@@ -13,12 +13,11 @@ object MyBuild extends Build {
       "org.scala-lang" % "scala-reflect" % "2.10.0-M4"
     ),
     
-    // turn specialization off until SI-5788 is fixed
-    //scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize"),
     scalacOptions ++= Seq(
       "-deprecation",
       "-unchecked",
       "-optimize",
+      // turn specialization off until SI-5788 is fixed
       "-no-specialization",
       "-feature"
     )
@@ -28,9 +27,12 @@ object MyBuild extends Build {
 
   lazy val spire = Project("spire", file("."))
 
-  lazy val benchmark: Project = Project("benchmark", file("benchmark")) settings (benchmarkSettings: _*) dependsOn (spire)
+  lazy val examples = Project("examples", file("examples"))
+    dependsOn (spire)
 
-  lazy val examples = Project("examples", file("examples")) dependsOn (spire)
+  lazy val benchmark: Project = Project("benchmark", file("benchmark"))
+    settings (benchmarkSettings: _*)
+    dependsOn (spire)
 
   def benchmarkSettings = Seq(
     // raise memory limits here if necessary
@@ -48,10 +50,12 @@ object MyBuild extends Build {
 
     // custom kludge to get caliper to see the right classpath
 
-    // we need to add the runtime classpath as a "-cp" argument to the `javaOptions in run`, otherwise caliper
-    // will not see the right classpath and die with a ConfigurationException
-    // unfortunately `javaOptions` is a SettingsKey and `fullClasspath in Runtime` is a TaskKey, so we need to
-    // jump through these hoops here in order to feed the result of the latter into the former
+    // we need to add the runtime classpath as a "-cp" argument to the
+    // `javaOptions in run`, otherwise caliper will not see the right classpath
+    // and die with a ConfigurationException unfortunately `javaOptions` is a
+    // SettingsKey and `fullClasspath in Runtime` is a TaskKey, so we need to
+    // jump through these hoops here in order to feed the result of the latter
+    // into the former
     onLoad in Global ~= { previous => state =>
       previous {
         state.get(key) match {
@@ -65,7 +69,6 @@ object MyBuild extends Build {
         }
       }
     }
-
 
     // caliper stuff stolen shamelessly from scala-benchmarking-template
   )

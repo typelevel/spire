@@ -1,5 +1,6 @@
 package spire.math
 
+import scala.reflect.ClassTag
 import scala.{specialized => spec}
 import scala.math.min
 
@@ -9,7 +10,7 @@ import scala.math.min
  *  Interface for a sorting strategy object.
  */
 trait Sort {
-  def sort[@spec A:Order:Manifest](data:Array[A]): Unit
+  def sort[@spec A:Order:ClassTag](data:Array[A]): Unit
 }
 
 /**
@@ -20,7 +21,7 @@ trait Sort {
  * This sort is faster than quickSort, but must allocate extra space.
  */
 object MergeSort extends Sort {
-  final def sort[@spec A:Order:Manifest](data:Array[A]) = {
+  final def sort[@spec A:Order:ClassTag](data:Array[A]) = {
     val len = data.length
 
     var buf1:Array[A] = data
@@ -80,7 +81,7 @@ object MergeSort extends Sort {
  * not allocate extra space.
  */
 object QuickSort {
-  final def sort[@spec K](x:Array[K])(implicit o:Order[K], m:Manifest[K]) {
+  final def sort[@spec K](x:Array[K])(implicit o:Order[K], m:ClassTag[K]) {
     def swap(k:K, a: Int, b: Int) {
       val t = x(a)
       x(a) = x(b)
@@ -190,6 +191,6 @@ object QuickSort {
  * uses extra memory. Quicksort is a bit faster but is O(n^2) in worst case.
  */
 object Sorting {
-  final def mergeSort[@spec A:Order:Manifest](data:Array[A]) = MergeSort.sort(data)
-  final def quickSort[@spec K:Order:Manifest](data:Array[K]) = QuickSort.sort(data)
+  final def mergeSort[@spec A:Order:ClassTag](data:Array[A]) = MergeSort.sort(data)
+  final def quickSort[@spec K:Order:ClassTag](data:Array[K]) = QuickSort.sort(data)
 }

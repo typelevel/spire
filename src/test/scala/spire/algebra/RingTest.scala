@@ -1,5 +1,7 @@
 package spire.algebra
 
+import scala.reflect.ClassTag
+
 // scalatest
 import org.scalatest.FunSuite
 
@@ -23,15 +25,18 @@ class RingTest extends FunSuite {
    *
    *   a=-3  b=3  c=-9
    */
-  def runWith[@spec A:Ring:Manifest](a:A, b:A, c:A) {
+  def runWith[@spec A:Ring:ClassTag](cls:String)(a:A, b:A, c:A) {
 
-    val m = implicitly[Manifest[A]]
+    val m = implicitly[ClassTag[A]]
+
+    //// the name to use for this A
+    //val cls = m.typeArguments match {
+    //  case Nil => m.erasure.getSimpleName
+    //  case args => "%s[%s]" format (m.erasure.getSimpleName, args.mkString(","))
+    //}
 
     // the name to use for this A
-    val cls = m.typeArguments match {
-      case Nil => m.erasure.getSimpleName
-      case args => "%s[%s]" format (m.erasure.getSimpleName, args.mkString(","))
-    }
+    //val cls = m.runtimeClass.getName
 
     // test runner which constructs a unique name for each test we run.
     def runTest(name:String)(f: => Unit) = test("%s:%s" format(cls, name))(f)
@@ -67,19 +72,19 @@ class RingTest extends FunSuite {
   implicit val mc: MathContext = MathContext.DECIMAL128
 
   // here's where we actually run all the tests, for each type we care about.
-  runWith[Int](-3, 3, -9)
-  runWith[Long](-3, 3, -9)
-  runWith[Float](-3, 3, -9)
-  runWith[Double](-3, 3, -9)
-  runWith[BigInt](-3, 3, -9)
-  runWith[BigDecimal](-3, 3, -9)
-  runWith[Rational](-3, 3, -9)
+  runWith[Int]("Int")(-3, 3, -9)
+  runWith[Long]("Long")(-3, 3, -9)
+  runWith[Float]("Float")(-3, 3, -9)
+  runWith[Double]("Double")(-3, 3, -9)
+  runWith[BigInt]("BigInt")(-3, 3, -9)
+  runWith[BigDecimal]("BigDecimal")(-3, 3, -9)
+  runWith[Rational]("Rational")(-3, 3, -9)
   // commented out due to specialization bug
-  runWith[Complex[Double]](-3, 3, -9)
-  runWith[Complex[BigDecimal]](Complex(BigDecimal(-3), BigDecimal(0)),
+  runWith[Complex[Double]]("Complex[Double]")(-3, 3, -9)
+  runWith[Complex[BigDecimal]]("Complex[BigDecimal]")(Complex(BigDecimal(-3), BigDecimal(0)),
                                Complex(BigDecimal(3), BigDecimal(0)),
                                Complex(BigDecimal(-9), BigDecimal(0)))
-  runWith[FPFilter[BigInt]](FPFilter[BigInt](-3), FPFilter[BigInt](3), FPFilter[BigInt](-9))
+  runWith[FPFilter[BigInt]]("FPFilter[BigInt]")(FPFilter[BigInt](-3), FPFilter[BigInt](3), FPFilter[BigInt](-9))
 
 
   {

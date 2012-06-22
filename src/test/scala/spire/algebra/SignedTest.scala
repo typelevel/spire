@@ -1,5 +1,7 @@
 package spire.algebra
 
+import scala.reflect.ClassTag
+
 // scalatest
 import org.scalatest.FunSuite
 
@@ -16,14 +18,17 @@ import spire.math.fpf.FPFilter
 
 
 class SignedTest extends FunSuite {
-  def runWith[@spec(Int, Long, Float, Double) A: Signed: Manifest](neg: A, pos: A, zero: A) {
-    val m = implicitly[Manifest[A]]
+  def runWith[@spec(Int, Long, Float, Double) A: Signed: ClassTag](neg: A, pos: A, zero: A) {
+    val m = implicitly[ClassTag[A]]
+
+    //// the name to use for this A
+    //val cls = m.typeArguments match {
+    //  case Nil => m.erasure.getSimpleName
+    //  case args => "%s[%s]" format (m.erasure.getSimpleName, args.mkString(","))
+    //}
 
     // the name to use for this A
-    val cls = m.typeArguments match {
-      case Nil => m.erasure.getSimpleName
-      case args => "%s[%s]" format (m.erasure.getSimpleName, args.mkString(","))
-    }
+    val cls = m.runtimeClass.getName
 
     // test runner which constructs a unique name for each test we run.
     def runTest(name:String)(f: => Unit) = test("%s:%s" format(cls, name))(f)
