@@ -400,7 +400,7 @@ protected abstract class Rationals[@specialized(Long) A](implicit integral: Inte
 
   def build(n: A, d: A): Rational
 
-  trait RationalLike extends Rational with Fraction[A] {
+  sealed trait RationalLike extends Rational with Fraction[A] {
     
     override def signum: Int = scala.math.signum(integral.compare(num, zero))
 
