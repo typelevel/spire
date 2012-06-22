@@ -48,10 +48,10 @@ class BoundFieldOps[T:Field](lhs:Bound[T]) {
   def /(rhs:Bound[T]) = lhs.binop(rhs)(_ / _)
 }
 
-trait Lower[T] extends Bound[T] { def toLower = this }
-trait Upper[T] extends Bound[T] { def toUpper = this }
+sealed trait Lower[T] extends Bound[T] { def toLower = this }
+sealed trait Upper[T] extends Bound[T] { def toUpper = this }
 
-trait Unbound[T] extends Bound[T] {
+sealed trait Unbound[T] extends Bound[T] {
   def unop(f:T => T):Bound[T] = this
   def binop(rhs:Bound[T])(f:(T, T) => T):Bound[T] = this
 }
@@ -74,12 +74,12 @@ case class UnboundAbove[T]()(implicit val order:Order[T]) extends Upper[T] with 
   def toLower = UnboundBelow[T]
 }
 
-trait Closed[T] {
+sealed trait Closed[T] {
   implicit def order:Order[T]
   def x:T
   def compare(rhs:Bound[T]) = rhs match {
     case UnboundBelow() => 1
-    case UnboundAbove() => -1
+    case UnboundAbove() => -1 // claimed to be unreachable???
     case ClosedBelow(y) => x cmp y
     case ClosedAbove(y) => x cmp y
     case OpenBelow(y) => if (x <= y) -1 else 1
@@ -108,7 +108,7 @@ case class ClosedAbove[T](x:T)(implicit val order:Order[T]) extends Upper[T] wit
   override def binop(rhs:Bound[T])(f:(T, T) => T):Upper[T] = super.binop(rhs)(f).toUpper
 }
 
-trait Open[T] {
+sealed trait Open[T] {
   implicit def order:Order[T]
   def x:T
   def binop(rhs:Bound[T])(f:(T, T) => T):Bound[T] = rhs match {
