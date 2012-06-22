@@ -37,5 +37,5 @@ object Implicits {
   implicit def signedOps[@spec(Float, Double, Int, Long) A: Signed](a: A) = new SignedOps(a)
   implicit def nrootOps[@spec(Int, Long) A: EuclideanRingWithNRoot](a: A) = new NRootOps(a)
 
-  //implicit def literals(s:StringContext) = new Literals(s)
+  implicit def literals(s:StringContext) = new Literals(s)
 }

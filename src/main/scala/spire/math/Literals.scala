@@ -14,30 +14,42 @@ class Literals(s:StringContext) {
 object Literals {
   def byte(c:Context)(): c.Expr[Byte] = {
     import c.mirror._
+    import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    Expr[Byte](Literal(Constant(s.toByte)))
+    c.Expr[Byte](Literal(Constant(s.toByte)))
   }
 
   def short(c:Context)(): c.Expr[Short] = {
     import c.mirror._
+    import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    Expr[Short](Literal(Constant(s.toShort)))
+    c.Expr[Short](Literal(Constant(s.toShort)))
   }
+
 
   def rational(c:Context)(): c.Expr[Rational] = {
     import c.mirror._
+    import c.universe._
+
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    try {
-      val Array(s1, s2) = s.split("/")
-      val n = BigInt(s1)
-      val d = BigInt(s2)
-      if (n.toLong == n && d.toLong == d) {
-        val nn:Long = n.toLong
-        val dd:Long = d.toLong
-        c.reify(Rational(nn, dd))
-      } else {
-        c.reify(Rational(n, d))
-      }
+    val mth = Select(Select(Select(Ident("spire"), "math"), "Rational"), "apply")
+    val bg = Select(Select(Select(Ident("scala"), "math"), "BigInt"), "apply")
+
+    val r = Rational(s)
+
+    // TODO: might be nice to create "fast" constructors for Rational/BigInt
+    // for these kinds of situations (also for serialization/deserialization).
+
+    if (r.numerator <= BigInt(Long.MaxValue) &&
+        r.numerator >= BigInt(Long.MinValue) &&
+        r.denominator <= BigInt(Long.MaxValue)) {
+      val ns = List(r.numerator.toLong, r.denominator.toLong)
+      val ts = ns.map(t => Literal(Constant(t)))
+      c.Expr[Rational](Apply(mth, ts))
+    } else {
+      val ns = List(r.numerator.toString, r.denominator.toString)
+      val ts = ns.map(t => Apply(bg, List(Literal(Constant(t)))))
+      c.Expr[Rational](Apply(mth, ts))
     }
   }
 }
