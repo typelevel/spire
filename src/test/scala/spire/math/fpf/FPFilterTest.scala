@@ -65,9 +65,16 @@ class FPFilterTest extends FunSuite {
   }
  
   test("Non-zero sign doesn't (always) evaluate value") {
-    val zero = FPFilter(BigDecimal(0))
-    val a = FPFilter(BigDecimal(5))
-    val b = FPFilter(BigDecimal(9))
+    def wrap(b:BigDecimal)(f:() => Unit) = new FPFilter(MaybeDouble(b), { f(); b })
+
+    // used to track evaluation of FPFilter's lazy value
+    var zeroEval = false
+    var aEval = false
+    var bEval = false
+
+    val zero = wrap(BigDecimal(0))(() => zeroEval = true)
+    val a = wrap(BigDecimal(5))(() => aEval = true)
+    val b = wrap(BigDecimal(9))(() => bEval = true)
 
     val sum = a + a
     val prod = a * b
@@ -77,9 +84,14 @@ class FPFilterTest extends FunSuite {
     val s2 = prod == zero
     val s3 = quot == zero
 
-    assert(!isEvaluated(sum))
-    assert(!isEvaluated(prod))
-    assert(!isEvaluated(quot))
+    // make sure we haven't evaluated the exact value yet
+    assert(!zeroEval)
+    assert(!aEval)
+    assert(!bEval)
+
+    // make sure a.value actaully evalutes
+    val x = a.value
+    assert(aEval)
   }
 }
 

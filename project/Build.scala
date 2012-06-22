@@ -5,15 +5,23 @@ object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     name := "Spire",
     version := "0.2.0",
-    //scalaVersion := "2.9.2",
     scalaVersion := "2.10.0-M4",
     //scalaHome := Some(file("/home/erik/scala/build/pack")),
-    //scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize"),
-    //libraryDependencies += "org.scalatest" %% "scalatest" % "1.7.2" % "test"
-    libraryDependencies += "org.scala-lang" % "scala-reflect" % "2.10.0-M4",
+
+    libraryDependencies ++= Seq(
+      "org.scalatest" % "scalatest_2.10.0-M4" % "1.9-2.10.0-M4-B2" % "test",
+      "org.scala-lang" % "scala-reflect" % "2.10.0-M4"
+    ),
     
     // turn specialization off until SI-5788 is fixed
-    scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize", "-no-specialization", "-feature")
+    //scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize"),
+    scalacOptions ++= Seq(
+      "-deprecation",
+      "-unchecked",
+      "-optimize",
+      "-no-specialization",
+      "-feature"
+    )
   )
 
   val key = AttributeKey[Boolean]("javaOptionsPatched")
