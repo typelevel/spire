@@ -1,7 +1,9 @@
 package spire.algebra
 
 import spire.math._
+import spire.macros._
 
+import language.experimental.macros
 import scala.{specialized => spec}
 
 trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] {
@@ -17,8 +19,8 @@ trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] {
 }
 
 final class FieldOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Field[A]) {
-  def /(rhs:A) = ev.div(lhs, rhs)
-  def isWhole = ev.isWhole(lhs)
+  def /(rhs:A) = macro Macros.div[A]
+  def isWhole() = macro Macros.isWhole[A]
 }
 
 object Field {

@@ -1,6 +1,8 @@
 package spire.algebra
 
 import spire.math.Eq
+import spire.macros._
+import language.experimental.macros
 
 trait Semigroup[A] {
   def op(x:A, y:A): A
@@ -11,5 +13,5 @@ object Semigroup {
 }
 
 final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
-  def |+|(rhs:A) = ev.op(lhs, rhs)
+  def |+|(rhs:A) = macro Macros.op[A]
 }

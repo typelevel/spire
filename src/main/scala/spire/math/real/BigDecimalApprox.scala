@@ -8,7 +8,8 @@ import Implicits._
 
 
 trait BigDecimalApprox[A <: BigDecimalApprox[A]]
-extends RealLike[A] with SeparationBound[A] { self: A =>
+extends RealLike[A] with SeparationBound[A] {
+  self: A =>
   import BigDecimalApproximations._
 
   def sign: Sign = this match {
@@ -85,12 +86,12 @@ extends RealLike[A] with SeparationBound[A] { self: A =>
   def simulate[B](implicit f: Fractional[B]): B = this match {
     case IntLit(n) => f.fromInt(n)
     case BigIntLit(n) => f.fromBigInt(n)
-    case Add(a, b) => a.simulate[B] + b.simulate[B]
-    case Sub(a, b) => a.simulate[B] - b.simulate[B]
-    case Mul(a, b) => a.simulate[B] * b.simulate[B]
-    case Div(a, b) => a.simulate[B] / b.simulate[B]
-    case KRoot(a, k) => a.simulate[B] nroot k
-    case Neg(a) => -(a.simulate[B])
+    case Add(a, b) => f.plus(a.simulate[B], b.simulate[B])
+    case Sub(a, b) => f.minus(a.simulate[B], b.simulate[B])
+    case Mul(a, b) => f.times(a.simulate[B], b.simulate[B])
+    case Div(a, b) => f.div(a.simulate[B], b.simulate[B])
+    case KRoot(a, k) => f.nroot(a.simulate[B], k)
+    case Neg(a) => f.negate(a.simulate[B])
   }
 
   def toRational(implicit ac: ApproximationContext[Rational] = ApproximationContext(Rational(1L, 10000000000000000L))): Rational = simulate[Rational]

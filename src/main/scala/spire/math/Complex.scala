@@ -39,23 +39,23 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   // ugh, ScalaNumericConversions ghetto
   //
   // maybe complex numbers are too different...
-  def doubleValue = real.toDouble
-  def floatValue = real.toFloat
-  def longValue = real.toLong
-  def intValue = real.toInt
-  def isWhole = (f.fromInt(real.toInt) == real) && (imag == f.zero)
+  def doubleValue = f.toDouble(real)
+  def floatValue = f.toFloat(real)
+  def longValue = f.toLong(real)
+  def intValue = f.toInt(real)
+  def isWhole = (f.eqv(f.fromInt(f.toInt(real)), real)) && (f.eqv(imag, f.zero))
   def signum: Int = f.compare(real, f.zero)
   def underlying = (real, imag)
-  def complexSignum = if (abs == f.zero) {
+  def complexSignum = if (f.eqv(abs, f.zero)) {
     Complex.zero
   } else {
     this / Complex(abs, f.zero)
   }
 
   override def hashCode: Int = {
-    if (isReal && real.isWhole &&
-        real <= f.fromInt(Int.MaxValue) &&
-        real >= f.fromInt(Int.MinValue)) real.toInt.##
+    if (isReal && f.isWhole(real) &&
+        f.lteqv(real, f.fromInt(Int.MaxValue)) &&
+        f.gteqv(real, f.fromInt(Int.MinValue))) f.toInt(real).##
     else 19 * real.## + 41 * imag.##
   }
 
@@ -71,7 +71,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   // ugh, specialized lazy vals don't work very well
   //lazy val abs: T = f.sqrt(real * real + imag * imag)
   //lazy val arg: T = t.atan2(imag, real)
-  def abs: T = f.sqrt(real * real + imag * imag)
+  def abs: T = f.sqrt(f.plus(f.times(real, real), f.times(imag, imag)))
   def arg: T = t.atan2(imag, real)
 
   def conjugate = Complex(real, f.negate(imag))
@@ -95,8 +95,8 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
                                 f.plus(f.times(imag, b.real), f.times(real, b.imag)))
 
   def /(b:Complex[T]) = {
-    val abs_breal = b.real.abs
-    val abs_bimag = b.imag.abs
+    val abs_breal = f.abs(b.real)
+    val abs_bimag = f.abs(b.imag)
 
     if (f.gteqv(abs_breal, abs_bimag)) {
       if (f.eqv(abs_breal, f.zero)) throw new Exception("/ by zero")
@@ -143,12 +143,15 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     // TODO: is adding frac**frac reasonable? if not, we won't be able to do
     // this without something hacky like the below.
     // TODO: we also need log and exp on Field, Fractional, or Trig.
-    val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble) / exp((arg * b.imag).toDouble))
-    val phase = f.fromDouble(arg.toDouble * b.real.toDouble + log(abs.toDouble) * b.imag.toDouble)
+    val len = f.fromDouble(
+      math.pow(f.toDouble(abs), f.toDouble(b.real)) / exp(f.toDouble(f.times(arg, b.imag)))
+    )
+    val phase = f.fromDouble(f.toDouble(arg) * f.toDouble(b.real) +
+                             log(f.toDouble(abs)) * f.toDouble(b.imag))
     Complex.polar(len, phase)
 
   } else {
-    val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble))
+    val len = f.fromDouble(math.pow(f.toDouble(abs), f.toDouble(b.real)))
     val phase = f.times(arg, b.real)
     Complex.polar(len, phase)
   }
@@ -237,7 +240,7 @@ object FastComplex {
   final def conjugate(d:Long):Long = encode(real(d), -imag(d))
 
   // see if the complex number is a whole value
-  final def isWhole(d:Long):Boolean = real(d).isWhole && imag(d).isWhole
+  final def isWhole(d:Long):Boolean = real(d) % 1.0F == 0.0F && imag(d) % 1.0F == 0.0F
 
   // get the sign of the complex number
   final def signum(d:Long):Int = real(d) compare 0.0F

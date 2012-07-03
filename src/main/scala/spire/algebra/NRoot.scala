@@ -1,7 +1,9 @@
 package spire.algebra
 
 import spire.math._
+import spire.macros._
 
+import language.experimental.macros
 import scala.{specialized => spec, math => mth}
 import java.math.MathContext
 
@@ -20,7 +22,6 @@ trait NRoot[@spec(Double,Float,Int,Long) A] {
   def nroot(a: A, n: Int): A
   def sqrt(a: A): A = nroot(a, 2)
 }
-
 
 /**
  * A type class for `EuclideanRing`s with `NRoot`s as well. Since the base
@@ -71,8 +72,10 @@ object FieldWithNRoot {
 
 
 final class NRootOps[@spec(Double, Float, Int, Long) A](lhs: A)(implicit n: NRoot[A]) {
-  def nroot(k: Int): A = n.nroot(lhs, k)
-  def sqrt: A = n.sqrt(lhs)
+  //def nroot(k: Int): A = n.nroot(lhs, k)
+  //def sqrt: A = n.sqrt(lhs)
+  def nroot(rhs: Int): A = macro Macros.nroot[A]
+  def sqrt(): A = macro Macros.sqrt[A]
 }
 
 
@@ -173,6 +176,9 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
 
 
 object NRoot {
+  @inline final def apply[A](implicit ev:NRoot[A]) = ev
+
+  implicit object BigIntIsNRoot extends BigIntIsNRoot
 
   /**
    * This will return the largest integer that meets some criteria. Specifically,
@@ -287,5 +293,3 @@ object NRoot {
     BigDecimal(unscaled, newscale, ctxt)
   }
 }
-
-

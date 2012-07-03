@@ -311,7 +311,7 @@ protected[math] case class DecimalNumber(n:BigDecimal) extends Number {
   def canBeLong = isWhole && withinLong
 
   def underlying = n
-  def isWhole = n.isWhole
+  def isWhole = n % 1 == 0
   def doubleValue = n.toDouble
   def floatValue = n.toFloat
   def longValue = n.toLong

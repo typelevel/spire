@@ -68,7 +68,7 @@ trait FPFilterEq[A] extends Eq[FPFilter[A]] {
 
   def eqv(a: FPFilter[A], b: FPFilter[A]): Boolean = (a.approx - b.approx).sign match {
     case Some(s) => s == Zero
-    case None => a.value === b.value
+    case None => ev.eqv(a.value, b.value)
   }
 }
 
@@ -140,19 +140,19 @@ trait FPFilterIsSigned[A] extends Signed[FPFilter[A]] {
 trait FPFilterIsRing[A] extends Ring[FPFilter[A]] {
   implicit def ev: Ring[A]
 
-  def negate(a: FPFilter[A]): FPFilter[A] = new FPFilter(-a.approx, -(a.value))
+  def negate(a: FPFilter[A]): FPFilter[A] = new FPFilter(-a.approx, ev.negate(a.value))
 
   override def minus(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
-    new FPFilter(a.approx - b.approx, a.value - b.value)
+    new FPFilter(a.approx - b.approx, ev.minus(a.value, b.value))
 
   def plus(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
-    new FPFilter(a.approx + b.approx, a.value + b.value)
+    new FPFilter(a.approx + b.approx, ev.plus(a.value, b.value))
 
   override def pow(a: FPFilter[A], k: Int): FPFilter[A] =
-    new FPFilter(a.approx pow k, a.value pow k)
+    new FPFilter(a.approx pow k, ev.pow(a.value, k))
 
   override def times(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
-    new FPFilter(a.approx * b.approx, a.value * b.value)
+    new FPFilter(a.approx * b.approx, ev.times(a.value, b.value))
 
   def zero: FPFilter[A] = new FPFilter(MaybeDouble(0.0), ev.fromInt(0))
   def one: FPFilter[A] = new FPFilter(MaybeDouble(1.0), ev.fromInt(1))
@@ -164,17 +164,17 @@ trait FPFilterIsEuclideanRing[A] extends FPFilterIsRing[A] with EuclideanRing[FP
   implicit def ev: EuclideanRing[A]
 
   def quot(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
-    new FPFilter(a.approx quot b.approx, a.value /~ b.value)
+    new FPFilter(a.approx quot b.approx, ev.quot(a.value, b.value))
 
   def mod(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
-    new FPFilter(a.approx mod b.approx, a.value % b.value)
+    new FPFilter(a.approx mod b.approx, ev.mod(a.value, b.value))
 }
 
 trait FPFilterIsField[A] extends FPFilterIsEuclideanRing[A] with Field[FPFilter[A]] {
   implicit def ev: Field[A]
 
   def div(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
-    new FPFilter(a.approx / b.approx, a.value / b.value)
+    new FPFilter(a.approx / b.approx, ev.div(a.value, b.value))
 }
 
 trait FPFilterIsEuclideanRingWithNRoot[A]
@@ -182,20 +182,20 @@ extends FPFilterIsEuclideanRing[A] with EuclideanRingWithNRoot[FPFilter[A]] {
   implicit val ev: EuclideanRingWithNRoot[A]
 
   def nroot(a: FPFilter[A], n: Int): FPFilter[A] =
-    new FPFilter(a.approx nroot n, a.value nroot n)
+    new FPFilter(a.approx nroot n, ev.nroot(a.value, n))
   
   override def sqrt(a: FPFilter[A]): FPFilter[A] = 
-    new FPFilter(a.approx.sqrt, a.value.sqrt)
+    new FPFilter(a.approx.sqrt, ev.sqrt(a.value))
 }
 
 trait FPFilterIsFieldWithNRoot[A] extends FPFilterIsField[A] with FieldWithNRoot[FPFilter[A]] {
   implicit val ev: FieldWithNRoot[A]
 
   def nroot(a: FPFilter[A], n: Int): FPFilter[A] =
-    new FPFilter(a.approx nroot n, a.value nroot n)
+    new FPFilter(a.approx nroot n, ev.nroot(a.value, n))
 
   override def sqrt(a: FPFilter[A]): FPFilter[A] = 
-    new FPFilter(a.approx.sqrt, a.value.sqrt)
+    new FPFilter(a.approx.sqrt, ev.sqrt(a.value))
 }
 
 

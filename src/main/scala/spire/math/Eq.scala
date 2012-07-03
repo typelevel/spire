@@ -1,7 +1,10 @@
 package spire.math
 
-import spire.algebra.{ Zero }
+import language.experimental.macros
 import scala.{specialized => spec}
+
+import spire.algebra.Zero
+import spire.macros._
 
 trait Eq[@spec A] {
   def eqv(x:A, y:A): Boolean
@@ -11,8 +14,8 @@ trait Eq[@spec A] {
 }
 
 final class EqOps[@spec(Int,Long,Double) A](lhs:A)(implicit ev:Eq[A]) {
-  def ===(rhs:A) = ev.eqv(lhs, rhs)
-  def =!=(rhs:A) = ev.neqv(lhs, rhs)
+  def ===(rhs:A) = macro Macros.eqv[A]
+  def =!=(rhs:A) = macro Macros.neqv[A]
 }
 
 object Eq extends LowPriority {

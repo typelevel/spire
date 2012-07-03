@@ -1,7 +1,9 @@
 package spire.algebra
 
 import spire.math._
+import spire.macros._
 
+import language.experimental.macros
 import scala.{specialized => spec}
 import scala.math.{abs, ceil, floor}
 
@@ -12,9 +14,9 @@ trait EuclideanRing[@spec(Int,Long,Float,Double) A] extends Ring[A] {
 }
 
 final class EuclideanRingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:EuclideanRing[A]) {
-  def /~(rhs:A) = ev.quot(lhs, rhs)
-  def %(rhs:A) = ev.mod(lhs, rhs)
-  def /%(rhs:A) = (ev.quot(lhs, rhs), ev.mod(lhs, rhs))
+  def /~(rhs:A) = macro Macros.quot[A]
+  def %(rhs:A) = macro Macros.mod[A]
+  def /%(rhs:A) = macro Macros.quotmod[A]
 }
 
 object EuclideanRing {

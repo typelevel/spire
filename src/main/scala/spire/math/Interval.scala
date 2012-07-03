@@ -26,26 +26,26 @@ sealed trait Bound[T] {
   def max(rhs:Bound[T]):Bound[T] = if (this > rhs) this else rhs
 }
 
-class BoundRingOps[T:Ring](lhs:Bound[T]) {
-  // def abs = lhs.unop(_.abs)
-  def unary_- = lhs.unop(-_)
-  def +(rhs:T) = lhs.unop(_ + rhs)
-  def -(rhs:T) = lhs.unop(_ - rhs)
-  def *(rhs:T) = lhs.unop(_ * rhs)
-  def +(rhs:Bound[T]) = lhs.binop(rhs)(_ + _)
-  def -(rhs:Bound[T]) = lhs.binop(rhs)(_ - _)
-  def *(rhs:Bound[T]) = lhs.binop(rhs)(_ * _)
-  def pow(rhs:Int) = lhs.unop(_ pow rhs)
+class BoundRingOps[T](lhs:Bound[T])(implicit ev:Ring[T]) {
+  //def abs = lhs.unop(_.abs)
+  def unary_- = lhs.unop(ev.negate(_))
+  def +(rhs:T) = lhs.unop(ev.plus(_, rhs))
+  def -(rhs:T) = lhs.unop(ev.minus(_, rhs))
+  def *(rhs:T) = lhs.unop(ev.times(_, rhs))
+  def +(rhs:Bound[T]) = lhs.binop(rhs)(ev.plus(_, _))
+  def -(rhs:Bound[T]) = lhs.binop(rhs)(ev.minus(_, _))
+  def *(rhs:Bound[T]) = lhs.binop(rhs)(ev.times(_, _))
+  def pow(rhs:Int) = lhs.unop(ev.pow(_, rhs))
 }
 
-class BoundEuclideanRingOps[T:EuclideanRing](lhs:Bound[T]) {
-  def /~(rhs:T) = lhs.unop(_ /~ rhs)
-  def /~(rhs:Bound[T]) = lhs.binop(rhs)(_ /~ _)
+class BoundEuclideanRingOps[T](lhs:Bound[T])(implicit ev:EuclideanRing[T]) {
+  def /~(rhs:T) = lhs.unop(ev.quot(_, rhs))
+  def /~(rhs:Bound[T]) = lhs.binop(rhs)(ev.quot(_, _))
 }
 
-class BoundFieldOps[T:Field](lhs:Bound[T]) {
-  def /(rhs:T) = lhs.unop(_ / rhs)
-  def /(rhs:Bound[T]) = lhs.binop(rhs)(_ / _)
+class BoundFieldOps[T](lhs:Bound[T])(implicit ev:Field[T]) {
+  def /(rhs:T) = lhs.unop(ev.div(_, rhs))
+  def /(rhs:Bound[T]) = lhs.binop(rhs)(ev.div(_, _))
 }
 
 sealed trait Lower[T] extends Bound[T] { def toLower = this }
@@ -80,12 +80,12 @@ sealed trait Closed[T] {
   def compare(rhs:Bound[T]) = rhs match {
     case UnboundBelow() => 1
     case UnboundAbove() => -1 // claimed to be unreachable???
-    case ClosedBelow(y) => x cmp y
-    case ClosedAbove(y) => x cmp y
-    case OpenBelow(y) => if (x <= y) -1 else 1
-    case OpenAbove(y) => if (x < y) -1 else 1
+    case ClosedBelow(y) => order.compare(x, y)
+    case ClosedAbove(y) => order.compare(x, y)
+    case OpenBelow(y) => if (order.lteqv(x, y)) -1 else 1
+    case OpenAbove(y) => if (order.lt(x, y)) -1 else 1
   }
-  def comparePt(t:T) = x cmp t
+  def comparePt(t:T) = order.compare(x, t)
   def binop(rhs:Bound[T])(f:(T, T) => T):Bound[T] = rhs match {
     case UnboundBelow() => UnboundBelow()
     case UnboundAbove() => UnboundBelow()
@@ -125,12 +125,12 @@ case class OpenBelow[T](x:T)(implicit val order:Order[T]) extends Lower[T] with 
   def compare(rhs:Bound[T]) = rhs match {
     case UnboundBelow() => 1
     case UnboundAbove() => -1
-    case ClosedBelow(y) => if (x < y) -1 else 1
-    case ClosedAbove(y) => if (x < y) -1 else 1
-    case OpenBelow(y) => x cmp y
-    case OpenAbove(y) => if (x < y) -1 else 1
+    case ClosedBelow(y) => if (order.lt(x, y)) -1 else 1
+    case ClosedAbove(y) => if (order.lt(x, y)) -1 else 1
+    case OpenBelow(y) => order.compare(x, y)
+    case OpenAbove(y) => if (order.lt(x, y)) -1 else 1
   }
-  def comparePt(t:T) = if (x < t) -1 else 1
+  def comparePt(t:T) = if (order.lt(x, t)) -1 else 1
   def toUpper = OpenAbove(x)
   def unop(f:T => T) = OpenBelow(f(x))
   override def binop(rhs:Bound[T])(f:(T, T) => T):Lower[T] = super.binop(rhs)(f).toLower
@@ -140,12 +140,12 @@ case class OpenAbove[T](x:T)(implicit val order:Order[T]) extends Upper[T] with 
   def compare(rhs:Bound[T]) = rhs match {
     case UnboundBelow() => 1
     case UnboundAbove() => -1
-    case ClosedBelow(y) => if (x <= y) -1 else 1
-    case ClosedAbove(y) => if (x <= y) -1 else 1
-    case OpenBelow(y) => if (x <= y) -1 else 1
-    case OpenAbove(y) => x cmp y
+    case ClosedBelow(y) => if (order.lteqv(x, y)) -1 else 1
+    case ClosedAbove(y) => if (order.lteqv(x, y)) -1 else 1
+    case OpenBelow(y) => if (order.lteqv(x, y)) -1 else 1
+    case OpenAbove(y) => order.compare(x, y)
   }
-  def comparePt(t:T) = if (x <= t) -1 else 1
+  def comparePt(t:T) = if (order.lteqv(x, t)) -1 else 1
   def toLower = OpenBelow(x)
   def unop(f:T => T) = OpenAbove(f(x))
   override def binop(rhs:Bound[T])(f:(T, T) => T):Upper[T] = super.binop(rhs)(f).toUpper

@@ -1,6 +1,9 @@
 package spire.math
 
 import scala.{specialized => spec}
+import language.experimental.macros
+
+import spire.macros._
 
 trait ConvertableTo[@spec A] {
   def fromByte(a:Byte): A
@@ -338,6 +341,8 @@ trait ConvertableFromReal extends ConvertableFrom[Real] {
 }
 
 object ConvertableFrom {
+  @inline final def apply[A](implicit ev:ConvertableFrom[A]) = ev
+
   implicit object ConvertableFromByte extends ConvertableFromByte
   implicit object ConvertableFromShort extends ConvertableFromShort
   implicit object ConvertableFromInt extends ConvertableFromInt
@@ -353,14 +358,24 @@ object ConvertableFrom {
 }
 
 final class ConvertableFromOps[@spec A](lhs:A)(implicit ev:ConvertableFrom[A]) {
-  def toByte: Byte = ev.toByte(lhs)
-  def toShort: Short = ev.toShort(lhs)
-  def toInt: Int = ev.toInt(lhs)
-  def toLong: Long = ev.toLong(lhs)
-  def toFloat: Float = ev.toFloat(lhs)
-  def toDouble: Double = ev.toDouble(lhs)
-  def toBigInt: BigInt = ev.toBigInt(lhs)
-  def toBigDecimal: BigDecimal = ev.toBigDecimal(lhs)
-  def toRational: Rational = ev.toRational(lhs)
-  override def toString: String = ev.toString(lhs)
+  //def toByte: Byte = ev.toByte(lhs)
+  //def toShort: Short = ev.toShort(lhs)
+  //def toInt: Int = ev.toInt(lhs)
+  //def toLong: Long = ev.toLong(lhs)
+  //def toFloat: Float = ev.toFloat(lhs)
+  //def toDouble: Double = ev.toDouble(lhs)
+  //def toBigInt: BigInt = ev.toBigInt(lhs)
+  //def toBigDecimal: BigDecimal = ev.toBigDecimal(lhs)
+  //def toRational: Rational = ev.toRational(lhs)
+  override def toString(): String = ev.toString(lhs)
+
+  def toByte(): Byte = macro Macros.toByte[A]
+  def toShort(): Short = macro Macros.toShort[A]
+  def toInt(): Int = macro Macros.toInt[A]
+  def toLong(): Long = macro Macros.toLong[A]
+  def toFloat(): Float = macro Macros.toFloat[A]
+  def toDouble(): Double = macro Macros.toDouble[A]
+  def toBigInt(): BigInt = macro Macros.toBigInt[A]
+  def toBigDecimal(): BigDecimal = macro Macros.toBigDecimal[A]
+  def toRational(): Rational = macro Macros.toRational[A]
 }

@@ -2,6 +2,8 @@ package spire.math
 
 import scala.math.abs
 
+import language.implicitConversions
+
 import org.scalatest.FunSuite
 import spire.math._
 import Implicits.{eqOps => _, _}
@@ -10,13 +12,14 @@ class TrigTest extends FunSuite {
 
   val epsilon:Double = 1e-15
 
-  implicit def relativeOps(lhs:Double) = new {
+  final class RelativeOps(lhs:Double) {
     def within(rhs:Double) = {
       val ok = scala.math.abs(lhs - rhs) < epsilon
       if (!ok) println("failed: abs(%s - %s) < %s" format (lhs, rhs, epsilon))
       assert(ok)
     }
   }
+  implicit def relativeOps(lhs:Double) = new RelativeOps(lhs)
 
   test("Trig[Double]") {
     val t = implicitly[Trig[Double]]

@@ -1,7 +1,9 @@
 package spire.math
 
 import spire.algebra._
+import spire.macros._
 
+import language.experimental.macros
 import scala.{specialized => spec}
 
 trait Fractional[@spec(Float,Double) A] extends FieldWithNRoot[A]
@@ -11,8 +13,8 @@ with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A] {
 }
 
 class FractionalOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Fractional[A]) {
-  def ceil = ev.ceil(lhs)
-  def floor = ev.floor(lhs)
+  def ceil() = macro Macros.ceil[A]
+  def floor() = macro Macros.floor[A]
 }
 
 object Fractional {

@@ -1,7 +1,9 @@
 package spire.algebra
 
-import spire.math.{Fractional, Trig, Order, Real, Rational, Complex}
+import spire.math._
+import spire.macros._
 
+import language.experimental.macros
 import java.lang.{Math => mth}
 import scala.{ specialized => spec }
 
@@ -37,9 +39,12 @@ object Signed extends SignedLow {
 }
 
 final class SignedOps[@spec(Double, Float, Int, Long) A](lhs: A)(implicit s: Signed[A]) {
-  def abs: A = s.abs(lhs)
-  def sign: Sign = s.sign(lhs)
-  def signum: Int = s.signum(lhs)
+  //def abs: A = s.abs(lhs)
+  //def sign: Sign = s.sign(lhs)
+  //def signum: Int = s.signum(lhs)
+  def abs(): A = macro Macros.abs[A]
+  def sign(): Sign = macro Macros.sign[A]
+  def signum(): Int = macro Macros.signum[A]
 }
 
 class OrderedRingIsSigned[A](implicit o:Order[A], r:Ring[A]) extends Signed[A] {

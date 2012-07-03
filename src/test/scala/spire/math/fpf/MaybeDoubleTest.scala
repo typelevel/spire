@@ -90,7 +90,7 @@ class MaybeDoubleTest extends FunSuite {
     assertAlmostEqual(a_ / b_, (a / b).toDouble)
 
     val x = Iterator.fill(23)(b_).foldLeft(a_)(_ / _)
-    assertAlmostEqual(x, a / b pow 23 toDouble)
+    assertAlmostEqual(x, (a / b pow 23).toDouble)
   }
 
   test("Square-roots keep correct error bound") {

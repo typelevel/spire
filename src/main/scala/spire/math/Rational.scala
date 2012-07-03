@@ -417,7 +417,7 @@ protected abstract class Rationals[@specialized(Long) A](implicit integral: Inte
 
     def doubleValue: Double = if (num == zero) {
       0.0
-    } else if (num < zero) {
+    } else if (integral.lt(num, zero)) {
       -((-this).toDouble)
     } else {
 
@@ -496,8 +496,8 @@ object LongRationals extends Rationals[Long] {
     def num: Long = n
     def den: Long = d
 
-    def numerator = n.toBigInt
-    def denominator = d.toBigInt
+    def numerator = ConvertableFrom[Long].toBigInt(n)
+    def denominator = ConvertableFrom[Long].toBigInt(d)
 
     override def signum: Int = if (n > 0) 1 else if (n < 0) -1 else 0
 
@@ -627,8 +627,8 @@ object LongRationals extends Rationals[Long] {
 
     // FIXME: SafeLong would ideally support pow
     def pow(exp: Int): Rational = if (exp == 0) Rational.one else {
-      val num = n.toBigInt.pow(exp.abs)
-      val den = d.toBigInt.pow(exp.abs)
+      val num = ConvertableFrom[Long].toBigInt(n).pow(exp.abs)
+      val den = ConvertableFrom[Long].toBigInt(d).pow(exp.abs)
       if (exp > 0) BigRationals.build(num, den) else BigRationals.build(den, num)
     }
 

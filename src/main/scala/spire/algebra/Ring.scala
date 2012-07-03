@@ -1,10 +1,12 @@
 package spire.algebra
 
-import spire.math._
-
 import annotation.tailrec
+import language.experimental.macros
 import scala.{specialized => spec}
 import scala.math.{abs, ceil, floor, pow => mpow}
+
+import spire.math._
+import spire.macros._
 
 /**
  * Ring represents a set (A) that is a group over addition (+) and a monoid
@@ -48,14 +50,14 @@ trait Ring[@spec(Int,Long,Float,Double) A] {
 }
 
 final class RingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Ring[A]) {
-  def unary_- = ev.negate(lhs)
+  def unary_-() = macro Macros.negate[A]
 
-  def -(rhs:A) = ev.minus(lhs, rhs)
-  def +(rhs:A) = ev.plus(lhs, rhs)
-  def *(rhs:A) = ev.times(lhs, rhs)
+  def -(rhs:A) = macro Macros.minus[A]
+  def +(rhs:A) = macro Macros.plus[A]
+  def *(rhs:A) = macro Macros.times[A]
 
-  def pow(rhs:Int) = ev.pow(lhs, rhs)
-  def **(rhs:Int) = ev.pow(lhs, rhs)
+  def pow(rhs:Int) = macro Macros.pow[A]
+  def **(rhs:Int) = macro Macros.pow[A]
 }
 
 object Ring {

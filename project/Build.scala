@@ -27,11 +27,11 @@ object MyBuild extends Build {
 
   lazy val spire = Project("spire", file("."))
 
-  lazy val examples = Project("examples", file("examples"))
+  lazy val examples = Project("examples", file("examples")).
     dependsOn (spire)
 
-  lazy val benchmark: Project = Project("benchmark", file("benchmark"))
-    settings (benchmarkSettings: _*)
+  lazy val benchmark: Project = Project("benchmark", file("benchmark")).
+    settings (benchmarkSettings: _*).
     dependsOn (spire)
 
   def benchmarkSettings = Seq(

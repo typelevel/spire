@@ -23,8 +23,8 @@ trait LowPriorityFPFilterWrappers {
    * approximately by a `Double`, that it'll return an `Infinity` or `NaN`
    * instead. Otherwise, the results are undefined (and most likely incorrect).
    */
-  implicit def genericFPFilter[A: Numeric]: FPFilterWrapper[A] = new FPFilterWrapper[A] {
-    def wrap(a: A): FPFilter[A] = new FPFilter(MaybeDouble.approx(a.toDouble), a)
+  implicit def genericFPFilter[A](implicit ev:Numeric[A]) = new FPFilterWrapper[A] {
+    def wrap(a: A): FPFilter[A] = new FPFilter(MaybeDouble.approx(ev.toDouble(a)), a)
   }
 }
 

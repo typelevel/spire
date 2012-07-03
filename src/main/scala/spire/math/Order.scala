@@ -1,6 +1,9 @@
 package spire.math
 
+import language.experimental.macros
 import scala.{specialized => spec}
+
+import spire.macros._
 
 trait Order[@spec A] extends Eq[A] {
   self =>
@@ -25,14 +28,14 @@ trait Order[@spec A] extends Eq[A] {
 }
 
 final class OrderOps[@spec A](lhs:A)(implicit ev:Order[A]) {
-  def >(rhs:A) = ev.gt(lhs, rhs)
-  def >=(rhs:A) = ev.gteqv(lhs, rhs)
-  def <(rhs:A) = ev.lt(lhs, rhs)
-  def <=(rhs:A) = ev.lteqv(lhs, rhs)
+  def >(rhs:A) = macro Macros.gt[A]
+  def >=(rhs:A) = macro Macros.gteqv[A]
+  def <(rhs:A) = macro Macros.lt[A]
+  def <=(rhs:A) = macro Macros.lteqv[A]
 
-  def cmp(rhs:A) = ev.compare(lhs, rhs)
-  def min(rhs:A) = ev.min(lhs, rhs)
-  def max(rhs:A) = ev.max(lhs, rhs)
+  def cmp(rhs:A) = macro Macros.compare[A]
+  def min(rhs:A) = macro Macros.min[A]
+  def max(rhs:A) = macro Macros.max[A]
 }
 
 object Order {
