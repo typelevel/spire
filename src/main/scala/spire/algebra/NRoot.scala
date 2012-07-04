@@ -99,7 +99,7 @@ trait RationalIsNRoot extends NRoot[Rational] {
   implicit def context: ApproximationContext[Rational]
   def nroot(a: Rational, k: Int): Rational = a nroot k
   def log(a:Rational) = a.log
-  def fpow(a:Rational, b:Rational) = sys.error("fixme")
+  def fpow(a:Rational, b:Rational) = a.pow(b)
 }
 
 case class RationalIsFieldWithNRoot(context: ApproximationContext[Rational])
@@ -120,7 +120,7 @@ trait ComplexIsNRoot[@spec(Float,Double) A] extends NRoot[Complex[A]] {
 
 class ComplexIsNRootCls[@spec(Float,Double) A]
 (implicit val f:Fractional[A], val t:Trig[A]) extends ComplexIsNRoot[A] {
-  def nroot(a:Complex[A], k:Int) = sys.error("fixme")
+  def nroot(a:Complex[A], k:Int) = a.pow(Complex.one[A] / Complex(f.fromInt(k), f.zero))
 }
 
 
