@@ -1,5 +1,6 @@
 package spire.math.real
 
+//import language.implicitConversions
 import java.math.{ MathContext, BigDecimal => BigDec }
 import scala.math.max
 

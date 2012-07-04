@@ -113,8 +113,7 @@ trait BigDecimalIsTrig extends Trig[BigDecimal] {
   def e:BigDecimal = BigDecimalIsTrig.e
   def pi:BigDecimal = BigDecimalIsTrig.pi
 
-  // TODO: ugh... BigDecimal has no useful pow()/exp() function
-  def exp(a:BigDecimal):BigDecimal = BigDecimal(mth.exp(a.toDouble), a.mc)
+  def exp(a:BigDecimal):BigDecimal = spire.math.fun.exp(a)
 
   def toRadians(a:BigDecimal):BigDecimal = (a * twoPi) / BigDecimal(360)
   def toDegrees(a:BigDecimal):BigDecimal = (a * BigDecimal(360)) / twoPi

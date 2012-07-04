@@ -37,6 +37,8 @@ with ConvertableFromInt with ConvertableToInt with IntOrder with IntIsSigned {
   override def fromInt(n: Int): Int = n
   def div(a:Int, b:Int) = a / b
   def isWhole(a:Int) = true
+  //def log(a:Int) = scala.math.log(a.toDouble).toInt
+  //def fpow(a:Int, b:Int) = pow(a, b)
 }
 
 trait LongIsNumeric extends Numeric[Long] with LongIsEuclideanRing with LongIsNRoot
@@ -44,6 +46,8 @@ with ConvertableFromLong with ConvertableToLong with LongOrder with LongIsSigned
   override def fromInt(n: Int): Long = n
   def div(a:Long, b:Long) = a / b
   def isWhole(a:Long) = true
+  //def log(a:Long) = scala.math.log(a.toDouble).toLong
+  //def fpow(a:Long, b:Long) = fun.pow(a, b)
 }
 
 trait BigIntIsNumeric extends Numeric[BigInt] with BigIntIsEuclideanRing
@@ -52,6 +56,8 @@ with BigIntOrder with BigIntIsSigned {
   override def fromInt(n: Int): BigInt = super[ConvertableToBigInt].fromInt(n)
   def div(a:BigInt, b:BigInt) = a / b
   def isWhole(a:BigInt) = true
+  //def log(a:BigInt) = Numeric[BigDecimal].log(BigDecimal(a)).toBigInt
+  //def fpow(a:BigInt, b:BigInt) = fun.pow(BigDecimal(a), BigDecimal(b)).toBigInt
 }
 
 trait FloatIsNumeric extends Numeric[Float] with FloatIsField
@@ -96,4 +102,7 @@ with Order[Complex[A]] with ComplexIsSigned[A] {
   override def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   override def lteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   def compare(x:Complex[A], y:Complex[A]) = if (x == y) 0 else sys.error("undefined")
+
+  def log(a:Complex[A]) = a.log
+  def fpow(a:Complex[A], b:Complex[A]) = a.pow(b)
 }

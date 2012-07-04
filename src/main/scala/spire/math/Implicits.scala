@@ -1,8 +1,9 @@
 package spire.math
 
-import spire.algebra._
-
+//import language.implicitConversions
 import scala.{specialized => spec}
+
+import spire.algebra._
 
 final class IntOpts(lhs:Int) {
 }

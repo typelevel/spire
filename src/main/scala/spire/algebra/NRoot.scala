@@ -19,6 +19,8 @@ import java.math.MathContext
 trait NRoot[@spec(Double,Float,Int,Long) A] {
   def nroot(a: A, n: Int): A
   def sqrt(a: A): A = nroot(a, 2)
+  def log(a:A):A
+  def fpow(a:A, b:A): A
 }
 
 
@@ -73,23 +75,31 @@ object FieldWithNRoot {
 final class NRootOps[@spec(Double, Float, Int, Long) A](lhs: A)(implicit n: NRoot[A]) {
   def nroot(k: Int): A = n.nroot(lhs, k)
   def sqrt: A = n.sqrt(lhs)
+  def log = n.log(lhs)
+  def ***(rhs:A) = n.fpow(lhs, rhs)
 }
 
 
 trait DoubleIsNRoot extends NRoot[Double] {
   def nroot(a: Double, k: Int): Double = mth.pow(a, 1 / k.toDouble)
   override def sqrt(a: Double): Double = mth.sqrt(a)
+  def log(a:Double) = scala.math.log(a)
+  def fpow(a:Double, b:Double) = scala.math.pow(a, b)
 }
 
 trait FloatIsNRoot extends NRoot[Float] {
   def nroot(a: Float, k: Int): Float = mth.pow(a, 1 / k.toDouble).toFloat
   override def sqrt(a: Float): Float = mth.sqrt(a).toFloat
+  def log(a:Float) = scala.math.log(a).toFloat
+  def fpow(a:Float, b:Float) = scala.math.pow(a, b).toFloat
 }
 
 
 trait RationalIsNRoot extends NRoot[Rational] {
   implicit def context: ApproximationContext[Rational]
   def nroot(a: Rational, k: Int): Rational = a nroot k
+  def log(a:Rational) = a.log
+  def fpow(a:Rational, b:Rational) = sys.error("fixme")
 }
 
 case class RationalIsFieldWithNRoot(context: ApproximationContext[Rational])
@@ -98,6 +108,19 @@ extends FieldWithNRoot[Rational] with RationalIsNRoot with RationalIsField
 
 trait RealIsNRoot extends NRoot[Real] {
   def nroot(a: Real, k: Int): Real = a nroot k
+  def log(a:Real) = sys.error("fixme")
+  def fpow(a:Real, b:Real) = sys.error("fixme")
+}
+
+trait ComplexIsNRoot[@spec(Float,Double) A] extends NRoot[Complex[A]] {
+  implicit val f:Fractional[A]
+  def log(a:Complex[A]) = a.log
+  def fpow(a:Complex[A], b:Complex[A]) = a.pow(b)
+}
+
+class ComplexIsNRootCls[@spec(Float,Double) A]
+(implicit val f:Fractional[A], val t:Trig[A]) extends ComplexIsNRoot[A] {
+  def nroot(a:Complex[A], k:Int) = sys.error("fixme")
 }
 
 
@@ -107,6 +130,8 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
   } else {
     NRoot.nroot(a, k, a.mc)
   }
+  def log(a:BigDecimal) = spire.math.fun.log(a)
+  def fpow(a:BigDecimal, b:BigDecimal) = fun.pow(a, b)
 }
 
 
@@ -127,7 +152,8 @@ trait IntIsNRoot extends NRoot[Int] { self: Ring[Int] =>
 
     findnroot(0, 1 << ((33 - n) / n))
   }
-
+  def log(a:Int) = scala.math.log(a.toDouble).toInt
+  def fpow(a:Int, b:Int) = pow(a, b)
 }
 
 trait LongIsNRoot extends NRoot[Long] { self: Ring[Long] =>
@@ -147,6 +173,8 @@ trait LongIsNRoot extends NRoot[Long] { self: Ring[Long] =>
 
     findnroot(0, 1L << ((65 - n) / n))
   }
+  def log(a:Long) = scala.math.log(a.toDouble).toLong
+  def fpow(a:Long, b:Long) = fun.pow(a, b)
 }
 
 trait BigIntIsNRoot extends NRoot[BigInt] {
@@ -168,6 +196,8 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
 
     findNroot(0, a.bitLength - 1)
   }
+  def log(a:BigInt) = Numeric[BigDecimal].log(BigDecimal(a)).toBigInt
+  def fpow(a:BigInt, b:BigInt) = fun.pow(BigDecimal(a), BigDecimal(b)).toBigInt
 }
 
 

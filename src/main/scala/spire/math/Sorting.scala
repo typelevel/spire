@@ -140,14 +140,14 @@ object QuickSort {
         var done = false
         while (!done) {
           while (b <= c && o.lteqv(x(b), v)) {
-            if (o.eq(x(b), v)) {
+            if (o.eqv(x(b), v)) {
               swap(k, a, b)
               a += 1
             }
             b += 1
           }
           while (c >= b && o.gteqv(x(c), v)) {
-            if (o.eq(x(c), v)) {
+            if (o.eqv(x(c), v)) {
               swap(k, c, d)
               d -= 1
             }

@@ -15,11 +15,11 @@ trait Order[@spec A] extends Eq[A] {
   def compare(x:A, y:A): Int
 
   override def on[@spec B](f:B => A): Order[B] = new Order[B] {
-    def eqv(x:B, y:B) = self.eq(f(x), f(y))
+    def eqv(x:B, y:B) = self.eqv(f(x), f(y))
     def compare(x:B, y:B) = self.compare(f(x), f(y))
   }
   def reverse: Order[A] = new Order[A] {
-    def eqv(x:A, y:A) = self.eq(y, x)
+    def eqv(x:A, y:A) = self.eqv(y, x)
     def compare(x:A, y:A) = self.compare(y, x)
   }
 }
