@@ -44,27 +44,31 @@ object fun {
 
   // Since a^b = e^(log(a) * b) we can use exp and log to write pow.
   // TODO: doesn't make precision guarantees, but it's better than nothing.
-  final def pow(base:BigDecimal, exponent:BigDecimal) = exp(log(base) * exponent)
+  private val maxIntEx = BigDecimal(999999999)
+  private val minIntEx = BigDecimal(-999999999)
+  final def pow(base:BigDecimal, ex:BigDecimal) =
+    if (ex.isValidInt && ex <= maxIntEx && ex >= minIntEx) base.pow(ex.toInt)
+    else exp(log(base) * ex)
 
   /**
    * Exponentiation function, e.g. x^y
    *
-   * If base^exponent doesn't fit in a Long, the result will overflow (unlike
+   * If base^ex doesn't fit in a Long, the result will overflow (unlike
    * scala.math.pow which will return +/- Infinity). 
    */
-  final def pow(base:Long, exponent:Long):Long = if (exponent < 0L) {
-    _inv_pow(base, exponent)
+  final def pow(base:Long, ex:Long):Long = if (ex < 0L) {
+    _inv_pow(base, ex)
   } else {
-    _pow(1L, base, exponent)
+    _pow(1L, base, ex)
   }
 
   // inverse powers for integers will return -1L, 0L, 1L, or throw an error.
-  private final def _inv_pow(base:Long, exponent:Long) = if(base == 0L) {
+  private final def _inv_pow(base:Long, ex:Long) = if(base == 0L) {
     throw new Exception("zero can't be raised to negative power")
   } else if (base == 1L) {
     1L
   } else if (base == -1L) {
-    if (exponent % 2L == 0L) -1L else 1L
+    if (ex % 2L == 0L) -1L else 1L
   } else {
     0L
   }
@@ -75,7 +79,7 @@ object fun {
     _pow(if (e % 2L == 1L) t * b else t, b * b, e / 2L)
   }
 
-  final def pow(base:Double, exp:Double):Double = Math.pow(base, exp)
+  final def pow(base:Double, ex:Double):Double = Math.pow(base, ex)
 
   @tailrec def euclidGcd(a: Long, b: Long): Long = if (b == 0L) {
     scala.math.abs(a)

@@ -56,9 +56,6 @@ class RingTest extends FunSuite {
     runTest("3 * 0")(assert(b * z === z))
     runTest("3 * (-3)")(assert(b * a === c))
 
-    // toInt -- Removed from Ring.
-    // runTest("3.toInt")(assert(b.toInt === 3))
-
     runTest("fromInt(3)")(assert(Ring[A].fromInt(3) == b))
 
     runTest("3 pow 2")(assert((b pow 2) === -c))
@@ -80,7 +77,6 @@ class RingTest extends FunSuite {
                                Complex(BigDecimal(3), BigDecimal(0)),
                                Complex(BigDecimal(-9), BigDecimal(0)))
   runWith[FPFilter[BigInt]](FPFilter[BigInt](-3), FPFilter[BigInt](3), FPFilter[BigInt](-9))
-
 
   {
     class XRing extends Ring[String] {

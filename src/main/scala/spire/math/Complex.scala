@@ -70,6 +70,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   //lazy val abs: T = f.sqrt(real * real + imag * imag)
   //lazy val arg: T = t.atan2(imag, real)
   def abs: T = f.sqrt(real * real + imag * imag)
+
   def arg: T = t.atan2(imag, real)
 
   def conjugate = Complex(real, f.negate(imag))
@@ -138,12 +139,28 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     Complex.zero[T]
 
   } else if (f.neqv(b.imag, f.zero)) {
-    val len = f.div(f.fpow(abs, b.real), t.exp(f.times(arg, b.imag)))
-    val phase = f.plus(f.times(arg, b.real), f.times(f.log(abs), b.imag))
+    val a = f.fpow(abs, b.real)
+    val bb = f.times(arg, b.imag)
+    val c = t.exp(bb)
+    val len = f.div(a, c)
+    println("len=%s abs=%s b.real=%s b.imag=%s a=%s bb=%s c=%s" format (len, abs, b.real, b.imag, a, bb, c))
+
+    val d = f.times(arg, b.real)
+    val e = f.log(abs)
+    val ff = f.times(e, b.imag)
+    val phase = f.plus(d, ff)
+    println("phase=%s abs=%s b.real b.imag=%s d=%s e=%s ff=%s" format (phase, abs, b.real, b.imag, d, e, ff))
+
+    //val len = f.div(f.fpow(abs, b.real), t.exp(f.times(arg, b.imag)))
+    //val phase = f.plus(f.times(arg, b.real), f.times(f.log(abs), b.imag))
     Complex.polar(len, phase)
 
   } else {
-    Complex.polar(f.fpow(abs, b.real), f.times(arg, b.real))
+    val len = f.fpow(abs, b.real)
+    println("len=%s abs=%s b.real=%s" format (len, abs, b.real))
+    val phase = f.times(arg, b.real)
+    println("phase=%s arg=%s b.real=%s" format (phase, arg, b.real))
+    Complex.polar(len, phase)
   }
 
   // we are going with the "principal value" definition of Log.
