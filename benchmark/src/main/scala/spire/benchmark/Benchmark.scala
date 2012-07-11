@@ -1,6 +1,9 @@
 package spire.benchmark
 
+import java.lang.Math
+
 import scala.{specialized => spec}
+import scala.annotation.tailrec
 import scala.util.Random
 import Random._
 
@@ -60,104 +63,6 @@ trait BenchmarkData extends MyBenchmark {
   lazy val fcomplexes = init(size)(FastComplex(nextFloat(), nextFloat()))
 }
 
-object AddBenchmarks extends MyRunner { val cls = classOf[AddBenchmarks] }
-class AddBenchmarks extends MyBenchmark with BenchmarkData {
-  def addGeneric[@spec(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
-    var total = Ring[A].zero
-    var i = 0
-    val len = data.length
-    while (i < len) { total = Ring[A].plus(total, data(i)); i += 1 }
-    total
-  }
-
-  def addIntsDirect(data:Array[Int]):Int = {
-    var total = 0
-    var i = 0
-    val len = data.length
-    while (i < len) { total += data(i); i += 1 }
-    total
-  }
-
-  def addLongsDirect(data:Array[Long]):Long = {
-    var total = 0L
-    var i = 0
-    val len = data.length
-    while (i < len) { total += data(i); i += 1 }
-    total
-  }
-
-  def addFloatsDirect(data:Array[Float]):Float = {
-    var total = 0.0F
-    var i = 0
-    val len = data.length
-    while (i < len) { total += data(i); i += 1 }
-    total
-  }
-
-  def addDoublesDirect(data:Array[Double]):Double = {
-    var total = 0.0
-    var i = 0
-    val len = data.length
-    while (i < len) { total += data(i); i += 1 }
-    total
-  }
-
-  def addMaybeDoublesDirect(data: Array[MaybeDouble]): MaybeDouble = {
-    var total = MaybeDouble(0.0)
-    var i = 0
-    val len = data.length
-    while (i < len) { total += data(i); i += 1 }
-    total
-  }
-
-  def addFastMaybeFloatsDirect(data: Array[Long]): Long = {
-    var total = FastMaybeFloat(0f)
-    var i = 0
-    val len = data.length - 1
-
-    // This is slightly different from the others, because it'll overflow the
-    // FastMaybeFloat and apparently adding NaNs and Infinities is quite a bit
-    // slower than regular fp ops.
-    
-    while (i < len) { total += FastMaybeFloat.plus(data(i), data(i + 1)); i += 1 }
-    total
-  }
-
-  def addComplexesDirect(data:Array[Complex[Double]]):Complex[Double] = {
-    var total = Complex.zero[Double]
-    var i = 0
-    val len = data.length
-    while (i < len) { total += data(i); i += 1 }
-    total
-  }
-
-  def addFastComplexes(data:Array[Long]):Long = {
-    var total = FastComplex(0.0F, 0.0F)
-    var i = 0
-    val len = data.length
-    while (i < len) { total = FastComplex.add(total, data(i)); i += 1 }
-    total
-  }
-
-  def timeAddIntsDirect(reps:Int) = run(reps)(addIntsDirect(ints))
-  def timeAddIntsGeneric(reps:Int) = run(reps)(addGeneric(ints))
-  
-  def timeAddLongsDirect(reps:Int) = run(reps)(addLongsDirect(longs))
-  def timeAddLongsGeneric(reps:Int) = run(reps)(addGeneric(longs))
-  
-  def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
-  def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
-  def timeAddFastMaybeFloatsDirect(reps:Int) = run(reps)(addFastMaybeFloatsDirect(maybeFloats))
-  
-  def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
-  def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
-  def timeAddMaybeDoublesDirect(reps:Int) = run(reps)(addMaybeDoublesDirect(maybeDoubles))
-
-  def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
-  def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))
-  def timeAddFastComplexes(reps:Int) = run(reps)(addFastComplexes(fcomplexes))
-}
-
 object SortBenchmarks extends MyRunner { val cls = classOf[SortBenchmarks] }
 class SortBenchmarks extends MyBenchmark with BenchmarkData {
   def quickSortInts(data:Array[Int]) = scala.util.Sorting.quickSort(data)
@@ -183,34 +88,6 @@ class SortBenchmarks extends MyBenchmark with BenchmarkData {
   def timeQuicksortDoubles(reps:Int) = run(reps)(quickSortDoubles(doubles.clone))
   def timeGenMergeSortDoubles(reps:Int) = run(reps)(mergeSortGeneric(doubles.clone))
   def timeGenQuickSortDoubles(reps:Int) = run(reps)(quickSortGeneric(doubles.clone))
-}
-
-object GcdBenchmarks extends MyRunner { val cls = classOf[GcdBenchmarks] }
-class GcdBenchmarks extends MyBenchmark with BenchmarkData {
-  def sumEuclidGcds(data:Array[Long]):Long = {
-    var total = 0L
-    var i = 0
-    val len = data.length - 1
-    while (i < len) {
-      total += spire.math.fun.euclidGcd(data(i), data(i + 1))
-      i += 1
-    }
-    total
-  }
-
-  def sumBinaryGcds(data:Array[Long]):Long = {
-    var total = 0L
-    var i = 0
-    val len = data.length - 1
-    while (i < len) {
-      total += spire.math.fun.euclidGcd(data(i), data(i + 1))
-      i += 1
-    }
-    total
-  }
-
-  def timeSumEuclidGcds(reps:Int) = run(reps)(sumEuclidGcds(longs))
-  def timeSumBinaryGcds(reps:Int) = run(reps)(sumBinaryGcds(longs))
 }
 
 object RationalBenchmarks extends MyRunner { val cls = classOf[RationalBenchmarks] }

@@ -7,15 +7,12 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.math.{Pi, atan2, cos, exp, log, sin, sqrt}
 
 import spire.algebra._
-import Implicits._
-
-// TODO: refactor places where Fractional is converted to Double in order to
-// access functions (e.g. trig, pow, exp, log)
 
 object Complex {
   def i[@spec(Float, Double) T](implicit f:Fractional[T], t:Trig[T]) = Complex(f.zero, f.one)
   def one[@spec(Float, Double) T](implicit f:Fractional[T], t:Trig[T]) = Complex(f.one, f.zero)
   def zero[@spec(Float, Double) T](implicit f:Fractional[T], t:Trig[T]) = Complex(f.zero, f.zero)
+
   implicit def intToComplex(n:Int) = new Complex(n.toDouble, 0.0)
   implicit def longToComplex(n:Long) = new Complex(n.toDouble, 0.0)
   implicit def floatToComplex(n:Float) = new Complex(n, 0.0F)
@@ -34,31 +31,24 @@ object Complex {
 class Complex[@spec(Float, Double) T](val real:T, val imag:T)(implicit f:Fractional[T], t:Trig[T])
 extends ScalaNumber with ScalaNumericConversions with Serializable {
 
-  // ugh, ScalaNumericConversions ghetto
-  //
-  // maybe complex numbers are too different...
-  def doubleValue = real.toDouble
-  def floatValue = real.toFloat
-  def longValue = real.toLong
-  def intValue = real.toInt
-  def isWhole = (f.fromInt(real.toInt) == real) && (imag == f.zero)
+  def doubleValue = f.toDouble(real)
+  def floatValue = f.toFloat(real)
+  def longValue = f.toLong(real)
+  def intValue = f.toInt(real)
+  def isWhole = f.isWhole(real) && f.eqv(imag, f.zero)
   def signum: Int = f.compare(real, f.zero)
   def underlying = (real, imag)
-  def complexSignum = if (abs == f.zero) {
-    Complex.zero
-  } else {
-    this / Complex(abs, f.zero)
-  }
+
+  def complexSignum = if (f.eqv(abs, f.zero)) Complex.zero else this / Complex(abs, f.zero)
 
   override def hashCode: Int = {
-    if (isReal && real.isWhole &&
-        real <= f.fromInt(Int.MaxValue) &&
-        real >= f.fromInt(Int.MinValue)) real.toInt.##
+    if (f.isWhole(real) && f.eqv(imag, f.zero) &&
+        f.lteqv(real, f.fromInt(Int.MaxValue)) &&
+        f.gteqv(real, f.fromInt(Int.MinValue))) f.toInt(real)
     else 19 * real.## + 41 * imag.##
   }
 
-  //override def hashCode: Int = 19 * real.## + 41 * imag.##
-
+  // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
     case that:Complex[_] => real == that.real && imag == that.imag
     case that => unifiedPrimitiveEquals(that)
@@ -69,8 +59,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   // ugh, specialized lazy vals don't work very well
   //lazy val abs: T = f.sqrt(real * real + imag * imag)
   //lazy val arg: T = t.atan2(imag, real)
-  def abs: T = f.sqrt(real * real + imag * imag)
-
+  def abs: T = f.sqrt(f.plus(f.times(real, real), f.times(imag, imag)))
   def arg: T = t.atan2(imag, real)
 
   def conjugate = Complex(real, f.negate(imag))
@@ -94,8 +83,8 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
                                 f.plus(f.times(imag, b.real), f.times(real, b.imag)))
 
   def /(b:Complex[T]) = {
-    val abs_breal = b.real.abs
-    val abs_bimag = b.imag.abs
+    val abs_breal = f.abs(b.real)
+    val abs_bimag = f.abs(b.imag)
 
     if (f.gteqv(abs_breal, abs_bimag)) {
       if (f.eqv(abs_breal, f.zero)) throw new Exception("/ by zero")

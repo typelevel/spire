@@ -1,11 +1,17 @@
-1. Profiling!
-2. Test!
-3. Unify package and Rational versions of integral nroot/pow
-4. Implement nroot/pow for BigInt/BigDecimal
-5. Add sqrt/nroot/pow to Numeric, etc.
-6. Avoid overflowing BigDecimal => Double (e.g. in Complex)
-7. Create our own, better, Decimal class, with more methods
-8. Add implicits to put numerics.math.* functionality onto types
-9. Match up concrete and generic APIs
-10. Get compiler plugin for inlining implicits/ops working
-11. Unify operators (e.g. /~, %, /%, **, ~^, etc).
+      1. Profiling!
+      2. Test!
+      3. Unify package and Rational versions of integral nroot/pow
+done  4. Implement nroot/pow for BigInt/BigDecimal
+done  5. Add sqrt/nroot/pow to Numeric, etc.
+done  6. Avoid overflowing BigDecimal => Double (e.g. in Complex)
+      7. Create our own, better, Decimal class, with more methods
+      8. Add implicits to put numerics.math.* functionality onto types
+      9. Match up concrete and generic APIs
+n/a  10. Get compiler plugin for inlining implicits/ops working
+     11. move BigInt/BigDecimal nroot into spire.math.fun.
+     12. move unused algorithms (i.e. binaryGcd) into benchmarking
+     13. remove all use of implicits from spire classes
+     14. audit erik's pow/log/exp implementations
+     14. flesh out FPFloat and Real pow/log/exp
+     15. add Rational/Real Numbers
+     16. add Real implementations for e, pi

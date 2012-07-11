@@ -2,8 +2,9 @@ package spire.algebra
 
 import spire.math._
 
-import scala.{specialized => spec, math => mth}
+import scala.{specialized => spec}
 import java.math.MathContext
+import java.lang.Math
 
 /**
  * This is a type class for types with n-roots. The value returned by `nroot`
@@ -81,17 +82,17 @@ final class NRootOps[@spec(Double, Float, Int, Long) A](lhs: A)(implicit n: NRoo
 
 
 trait DoubleIsNRoot extends NRoot[Double] {
-  def nroot(a: Double, k: Int): Double = mth.pow(a, 1 / k.toDouble)
-  override def sqrt(a: Double): Double = mth.sqrt(a)
-  def log(a:Double) = scala.math.log(a)
-  def fpow(a:Double, b:Double) = scala.math.pow(a, b)
+  def nroot(a: Double, k: Int): Double = Math.pow(a, 1 / k.toDouble)
+  override def sqrt(a: Double): Double = Math.sqrt(a)
+  def log(a:Double) = Math.log(a)
+  def fpow(a:Double, b:Double) = Math.pow(a, b)
 }
 
 trait FloatIsNRoot extends NRoot[Float] {
-  def nroot(a: Float, k: Int): Float = mth.pow(a, 1 / k.toDouble).toFloat
-  override def sqrt(a: Float): Float = mth.sqrt(a).toFloat
-  def log(a:Float) = scala.math.log(a).toFloat
-  def fpow(a:Float, b:Float) = scala.math.pow(a, b).toFloat
+  def nroot(a: Float, k: Int): Float = Math.pow(a, 1 / k.toDouble).toFloat
+  override def sqrt(a: Float): Float = Math.sqrt(a).toFloat
+  def log(a:Float) = Math.log(a).toFloat
+  def fpow(a:Float, b:Float) = Math.pow(a, b).toFloat
 }
 
 
@@ -152,7 +153,7 @@ trait IntIsNRoot extends NRoot[Int] { self: Ring[Int] =>
 
     findnroot(0, 1 << ((33 - n) / n))
   }
-  def log(a:Int) = scala.math.log(a.toDouble).toInt
+  def log(a:Int) = Math.log(a.toDouble).toInt
   def fpow(a:Int, b:Int) = pow(a, b)
 }
 
@@ -173,7 +174,7 @@ trait LongIsNRoot extends NRoot[Long] { self: Ring[Long] =>
 
     findnroot(0, 1L << ((65 - n) / n))
   }
-  def log(a:Long) = scala.math.log(a.toDouble).toLong
+  def log(a:Long) = Math.log(a.toDouble).toLong
   def fpow(a:Long, b:Long) = fun.pow(a, b)
 }
 
@@ -203,6 +204,8 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
 
 
 object NRoot {
+
+  @inline final def apply[A](implicit ev:NRoot[A]): NRoot[A] = ev
 
   /**
    * This will return the largest integer that meets some criteria. Specifically,
@@ -317,5 +320,3 @@ object NRoot {
     BigDecimal(unscaled, newscale, ctxt)
   }
 }
-
-
