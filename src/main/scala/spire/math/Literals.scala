@@ -7,7 +7,7 @@ import scala.{specialized => spec}
 
 class Literals(s:StringContext) {
   def b():Byte = macro Literals.byte
-  def s():Short = macro Literals.short
+  def h():Short = macro Literals.short
   def r():Rational = macro Literals.rational
 }
 
@@ -16,16 +16,31 @@ object Literals {
     import c.mirror._
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    c.Expr[Byte](Literal(Constant(s.toByte)))
+    val i = s.toInt
+    val n:Byte = if (i < -128 || i > 255) {
+      throw new ArithmeticException("illegal byte constant: %s" format s)
+    } else if (i > 127) {
+      (i - 256).toByte
+    } else {
+      i.toByte
+    }
+    c.Expr[Byte](Literal(Constant(n)))
   }
 
   def short(c:Context)(): c.Expr[Short] = {
     import c.mirror._
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    c.Expr[Short](Literal(Constant(s.toShort)))
+    val i = s.toInt
+    val n:Short = if (i < -32768 || i > 65535) {
+      throw new ArithmeticException("illegal short constant: %s" format s)
+    } else if (i > 32767) {
+      (i - 65536).toShort
+    } else {
+      i.toShort
+    }
+    c.Expr[Short](Literal(Constant(n)))
   }
-
 
   def rational(c:Context)(): c.Expr[Rational] = {
     import c.mirror._
