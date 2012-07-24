@@ -477,6 +477,7 @@ object LongRationals extends Rationals[Long] {
   @inline final def gcd(a: Long, b: Long) = spire.math.fun.euclidGcd(a, b)
 
   def build(n: Long, d: Long): Rational = {
+    if (d == 0) throw new IllegalArgumentException("0 denominator")
     val divisor = gcd(n, d)
     if (divisor == 1L) {
       if (d < 0)
@@ -656,6 +657,7 @@ object BigRationals extends Rationals[BigInt] {
   import LongRationals.{LongRational,gcd}
 
   def build(n: BigInt, d: BigInt): Rational = {
+    if (d == 0) throw new IllegalArgumentException("0 denominator")
     val gcd = n.gcd(d)
     if (gcd == 1) {
       if (d < 0)
