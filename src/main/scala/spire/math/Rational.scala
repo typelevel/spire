@@ -257,10 +257,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
     this.sign match {
       case Zero => this
-      case Positive =>
-        closest(Rational(this.toBigInt), Rational(1, 0))
-      case Negative =>
-        closest(Rational(-1, 0), Rational(this.toBigInt))
+      case Positive => closest(Rational(this.toBigInt), Rational.unsafeBuild(1, 0))
+      case Negative => closest(Rational.unsafeBuild(-1, 0), Rational(this.toBigInt))
     }
   }
 }
@@ -280,8 +278,11 @@ object Rational {
     n.foldWith[Rational,LongRational,BigRational](d)(LongRational(_, _), BigRational(_, _))
   }
 
-  def apply(n: BigInt, d: BigInt): Rational = BigRationals.build(n, d)
   def apply(n: Long, d: Long): Rational = LongRationals.build(n, d)
+  def apply(n: BigInt, d: BigInt): Rational = BigRationals.build(n, d)
+
+  protected[math] def unsafeBuild(n: Long, d: Long) = LongRationals.unsafeBuild(n, d)
+  protected[math] def unsafeBuild(n: BigInt, d: BigInt) = BigRationals.unsafeBuild(n, d)
 
   implicit def apply(x:Long): Rational = LongRationals.build(x, 1L)
   implicit def apply(x:BigInt): Rational = BigRationals.build(x, BigInt(1))
@@ -481,6 +482,10 @@ object LongRationals extends Rationals[Long] {
 
   def build(n: Long, d: Long): Rational = {
     if (d == 0) throw new IllegalArgumentException("0 denominator")
+    unsafeBuild(n, d)
+  }
+
+  def unsafeBuild(n: Long, d: Long): Rational = {
     val divisor = gcd(n, d)
     if (divisor == 1L) {
       if (d < 0)
@@ -661,6 +666,10 @@ object BigRationals extends Rationals[BigInt] {
 
   def build(n: BigInt, d: BigInt): Rational = {
     if (d == 0) throw new IllegalArgumentException("0 denominator")
+    unsafeBuild(n, d)
+  }
+
+  def unsafeBuild(n: BigInt, d:BigInt): Rational = {
     val gcd = n.gcd(d)
     if (gcd == 1) {
       if (d < 0)
