@@ -3,7 +3,7 @@ package spire.math
 import org.scalatest.FunSuite
 
 import scala.util.Random
-
+import scala.math.abs
 
 class RationalTest extends FunSuite {
 
@@ -256,7 +256,7 @@ class RationalTest extends FunSuite {
     assert(Rational(-6, 5) === Rational(-23, 19).limitDenominatorTo(10))
 
     val rng = new Random(9281)
-    val rationals = List.fill(100)(Rational(rng.nextInt, rng.nextInt))
+    val rationals = List.fill(100)(Rational(rng.nextInt, abs(rng.nextInt) + 1))
     rationals foreach { a =>
       assert(a.limitDenominatorTo(255) === bruteForceLimitDen(a, 255), {
           "%s != %s (original: %s)" format (
@@ -275,7 +275,7 @@ class RationalTest extends FunSuite {
 
   test("limitToInt makes rationals fit in Ints") {
     val rng = new Random(2919234)
-    val rationals = List.fill(100)(Rational(BigInt(128, rng), BigInt(128, rng)))
+    val rationals = List.fill(100)(Rational(BigInt(128, rng), BigInt(128, rng).abs + 1))
     rationals foreach { a =>
       val b = a.limitToInt
       assert(b.numerator.isValidInt && b.denominator.isValidInt, 
