@@ -6,7 +6,8 @@ package spire.math
 
 import org.scalatest.FunSuite
 import spire.math._
-import spire.math.Implicits.{eqOps => _, _}
+//import spire.math.Implicits.{eqOps => _, _}
+import spire.math.Literals._
 
 class LiteralsTest extends FunSuite {
   test("byte literals") {
