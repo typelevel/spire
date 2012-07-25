@@ -5,12 +5,13 @@ object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     name := "Spire",
     version := "0.2.0",
-    scalaVersion := "2.10.0-M4",
+    scalaVersion := "2.10.0-M5",
     //scalaHome := Some(file("/home/erik/scala/build/pack")),
 
     libraryDependencies ++= Seq(
-      "org.scalatest" % "scalatest_2.10.0-M4" % "1.9-2.10.0-M4-B2" % "test",
-      "org.scala-lang" % "scala-reflect" % "2.10.0-M4"
+      //"org.scalatest" % "scalatest_2.10.0-M4" % "1.9-2.10.0-M4-B2" % "test",
+      "org.scalatest" % "scalatest_2.10.0-M5" % "1.9-2.10.0-M5-B1" % "test",
+      "org.scala-lang" % "scala-reflect" % "2.10.0-M5"
     ),
     
     scalacOptions ++= Seq(

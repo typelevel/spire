@@ -31,7 +31,7 @@ object Number {
   def apply(n:scala.math.BigDecimal):Number = DecimalNumber(n)
 
   def apply(s:String):Number = {
-    def conv(n: => Number):Option[Number] = try { Some(n) } catch { case _ => None }
+    def conv(n: => Number):Option[Number] = try { Some(n) } catch { case _:Exception => None }
     conv(Number(java.lang.Long.parseLong(s))) orElse
     conv(Number(BigInt(s))) orElse
     conv(Number(java.lang.Double.parseDouble(s))) orElse
