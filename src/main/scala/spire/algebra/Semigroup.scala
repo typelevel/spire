@@ -13,5 +13,5 @@ object Semigroup {
 }
 
 final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
-  def |+|(rhs:A) = macro Macros.op[A]
+  def |+|(rhs:A) = macro Ops.binop[A, A]
 }

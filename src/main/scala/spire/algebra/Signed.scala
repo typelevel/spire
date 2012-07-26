@@ -39,12 +39,9 @@ object Signed extends SignedLow {
 }
 
 final class SignedOps[@spec(Double, Float, Int, Long) A](lhs: A)(implicit s: Signed[A]) {
-  //def abs: A = s.abs(lhs)
-  //def sign: Sign = s.sign(lhs)
-  //def signum: Int = s.signum(lhs)
-  def abs(): A = macro Macros.abs[A]
-  def sign(): Sign = macro Macros.sign[A]
-  def signum(): Int = macro Macros.signum[A]
+  def abs(): A = macro Ops.unop[A]
+  def sign(): Sign = macro Ops.unop[Sign]
+  def signum(): Int = macro Ops.unop[Int]
 }
 
 class OrderedRingIsSigned[A](implicit o:Order[A], r:Ring[A]) extends Signed[A] {

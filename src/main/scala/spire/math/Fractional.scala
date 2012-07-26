@@ -13,8 +13,8 @@ with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A] {
 }
 
 class FractionalOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Fractional[A]) {
-  def ceil() = macro Macros.ceil[A]
-  def floor() = macro Macros.floor[A]
+  def ceil() = macro Ops.unop[A]
+  def floor() = macro Ops.unop[A]
 }
 
 object Fractional {

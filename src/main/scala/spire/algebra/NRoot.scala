@@ -72,10 +72,8 @@ object FieldWithNRoot {
 
 
 final class NRootOps[@spec(Double, Float, Int, Long) A](lhs: A)(implicit n: NRoot[A]) {
-  //def nroot(k: Int): A = n.nroot(lhs, k)
-  //def sqrt: A = n.sqrt(lhs)
-  def nroot(rhs: Int): A = macro Macros.nroot[A]
-  def sqrt(): A = macro Macros.sqrt[A]
+  def nroot(rhs: Int): A = macro Ops.binop[Int, A]
+  def sqrt(): A = macro Ops.unop[A]
 }
 
 

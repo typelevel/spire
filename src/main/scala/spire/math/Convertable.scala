@@ -369,13 +369,13 @@ final class ConvertableFromOps[@spec A](lhs:A)(implicit ev:ConvertableFrom[A]) {
   //def toRational: Rational = ev.toRational(lhs)
   override def toString(): String = ev.toString(lhs)
 
-  def toByte(): Byte = macro Macros.toByte[A]
-  def toShort(): Short = macro Macros.toShort[A]
-  def toInt(): Int = macro Macros.toInt[A]
-  def toLong(): Long = macro Macros.toLong[A]
-  def toFloat(): Float = macro Macros.toFloat[A]
-  def toDouble(): Double = macro Macros.toDouble[A]
-  def toBigInt(): BigInt = macro Macros.toBigInt[A]
-  def toBigDecimal(): BigDecimal = macro Macros.toBigDecimal[A]
-  def toRational(): Rational = macro Macros.toRational[A]
+  def toByte(): Byte = macro Ops.unop[Byte]
+  def toShort(): Short = macro Ops.unop[Short]
+  def toInt(): Int = macro Ops.unop[Int]
+  def toLong(): Long = macro Ops.unop[Long]
+  def toFloat(): Float = macro Ops.unop[Float]
+  def toDouble(): Double = macro Ops.unop[Double]
+  def toBigInt(): BigInt = macro Ops.unop[BigInt]
+  def toBigDecimal(): BigDecimal = macro Ops.unop[BigDecimal]
+  def toRational(): Rational = macro Ops.unop[Rational]
 }

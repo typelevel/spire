@@ -14,9 +14,9 @@ trait EuclideanRing[@spec(Int,Long,Float,Double) A] extends Ring[A] {
 }
 
 final class EuclideanRingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:EuclideanRing[A]) {
-  def /~(rhs:A) = macro Macros.quot[A]
-  def %(rhs:A) = macro Macros.mod[A]
-  def /%(rhs:A) = macro Macros.quotmod[A]
+  def /~(rhs:A) = macro Ops.binop[A, A]
+  def %(rhs:A) = macro Ops.binop[A, A]
+  def /%(rhs:A) = macro Ops.binop[A, A]
 }
 
 object EuclideanRing {

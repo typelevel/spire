@@ -14,8 +14,8 @@ trait Eq[@spec A] {
 }
 
 final class EqOps[@spec(Int,Long,Double) A](lhs:A)(implicit ev:Eq[A]) {
-  def ===(rhs:A) = macro Macros.eqv[A]
-  def =!=(rhs:A) = macro Macros.neqv[A]
+  def ===(rhs:A) = macro Ops.binop[A, Boolean]
+  def =!=(rhs:A) = macro Ops.binop[A, Boolean]
 }
 
 object Eq extends LowPriority {
