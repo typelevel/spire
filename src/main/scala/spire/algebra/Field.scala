@@ -18,7 +18,7 @@ trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] {
   override def multiplicative:Group[A] = new MultiplicativeGroup[A]()(this)
 }
 
-final class FieldOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Field[A]) {
+final class FieldOps[A](lhs:A)(implicit ev:Field[A]) {
   def /(rhs:A) = macro Ops.binop[A, A]
   def isWhole() = macro Ops.unop[Boolean]
 }

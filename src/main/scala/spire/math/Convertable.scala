@@ -357,18 +357,8 @@ object ConvertableFrom {
   implicit def convertableFromComplex[A:Fractional] = new ConvertableFromComplexCls[A]
 }
 
-final class ConvertableFromOps[@spec A](lhs:A)(implicit ev:ConvertableFrom[A]) {
-  //def toByte: Byte = ev.toByte(lhs)
-  //def toShort: Short = ev.toShort(lhs)
-  //def toInt: Int = ev.toInt(lhs)
-  //def toLong: Long = ev.toLong(lhs)
-  //def toFloat: Float = ev.toFloat(lhs)
-  //def toDouble: Double = ev.toDouble(lhs)
-  //def toBigInt: BigInt = ev.toBigInt(lhs)
-  //def toBigDecimal: BigDecimal = ev.toBigDecimal(lhs)
-  //def toRational: Rational = ev.toRational(lhs)
-  override def toString(): String = ev.toString(lhs)
-
+final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {
+  override def toString(): String = macro Ops.unop[String]
   def toByte(): Byte = macro Ops.unop[Byte]
   def toShort(): Short = macro Ops.unop[Short]
   def toInt(): Int = macro Ops.unop[Int]

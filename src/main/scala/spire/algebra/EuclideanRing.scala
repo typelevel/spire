@@ -13,7 +13,7 @@ trait EuclideanRing[@spec(Int,Long,Float,Double) A] extends Ring[A] {
   def quotmod(a:A, b:A) = (quot(a, b), mod(a, b))
 }
 
-final class EuclideanRingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:EuclideanRing[A]) {
+final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def /~(rhs:A) = macro Ops.binop[A, A]
   def %(rhs:A) = macro Ops.binop[A, A]
   def /%(rhs:A) = macro Ops.binop[A, A]

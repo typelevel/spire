@@ -18,7 +18,7 @@ object LongRational {
     }
   }
 
-  @inline final def gcd(a: Long, b: Long) = spire.math.fun.euclidGcd(a, b)
+  @inline final def gcd(a: Long, b: Long) = spire.math.fun.gcd(a, b)
 }
 
 final class LongRational private (val n: Long, val d: Long) {

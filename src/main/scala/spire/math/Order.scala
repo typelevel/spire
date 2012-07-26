@@ -27,12 +27,12 @@ trait Order[@spec A] extends Eq[A] {
   }
 }
 
-final class OrderOps[@spec A](lhs:A)(implicit ev:Order[A]) {
+final class OrderOps[A](lhs:A)(implicit ev:Order[A]) {
   def >(rhs:A) = macro Ops.binop[A, Boolean]
   def >=(rhs:A) = macro Ops.binop[A, Boolean]
   def <(rhs:A) = macro Ops.binop[A, Boolean]
   def <=(rhs:A) = macro Ops.binop[A, Boolean]
-
+  
   def cmp(rhs:A) = macro Ops.binop[A, Int]
   def min(rhs:A) = macro Ops.binop[A, A]
   def max(rhs:A) = macro Ops.binop[A, A]

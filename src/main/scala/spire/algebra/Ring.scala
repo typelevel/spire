@@ -38,24 +38,51 @@ trait Ring[@spec(Int,Long,Float,Double) A] {
     if (n < 0) _fromInt(negate(one), -n, zero)
     else _fromInt(one, n, zero)
 
-  @tailrec protected[this] final def _pow(a:A, n:Int, sofar:A):A =
-    if (n == 0) sofar
-    else if (n % 2 == 1) _pow(times(a, a), n / 2, times(sofar, a))
-    else _pow(times(a, a), n / 2, sofar)
+  // TODO: return to tailrec method when SI-5788 is resolved
+  //@tailrec protected[this] final def _pow(a:A, n:Int, sofar:A):A =
+  //  if (n == 0) sofar
+  //  else if (n % 2 == 1) _pow(times(a, a), n / 2, times(sofar, a))
+  //  else _pow(times(a, a), n / 2, sofar)
+  //
+  //@tailrec private def _fromInt(a:A, n:Int, sofar:A):A =
+  //  if (n == 0) sofar
+  //  else if (n % 2 == 1) _fromInt(plus(a, a), n / 2, plus(sofar, a))
+  //  else _fromInt(plus(a, a), n / 2, sofar)
 
-  @tailrec private def _fromInt(a:A, n:Int, sofar:A):A =
-    if (n == 0) sofar
-    else if (n % 2 == 1) _fromInt(plus(a, a), n / 2, plus(sofar, a))
-    else _fromInt(plus(a, a), n / 2, sofar)
+  protected[this] final def _pow(_a:A, _n:Int, _sofar:A):A = {
+    var a = _a
+    var n = _n
+    var sofar = _sofar
+    while (true) {
+      if (n == 0) return sofar
+      if (n % 2 == 1) sofar = times(sofar, a)
+      n /= 2
+      a = times(a, a)
+    }
+    a // this is just to satisfy scalac
+  }
+  
+  private def _fromInt(_a:A, _n:Int, _sofar:A):A = {
+    var a = _a
+    var n = _n
+    var sofar = _sofar
+    while (true) {
+      if (n == 0) return sofar
+      if (n % 2 == 1) sofar = plus(sofar, a)
+      n /= 2
+      a = plus(a, a)
+    }
+    a // this is just to satisfy scalac
+  }
 }
 
-final class RingOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Ring[A]) {
+final class RingOps[A](lhs:A)(implicit ev:Ring[A]) {
   def unary_-() = macro Ops.unop[A]
-
+  
   def -(rhs:A) = macro Ops.binop[A, A]
   def +(rhs:A) = macro Ops.binop[A, A]
   def *(rhs:A) = macro Ops.binop[A, A]
-
+  
   def pow(rhs:Int) = macro Ops.binop[Int, A]
   def **(rhs:Int) = macro Ops.binop[Int, A]
 }

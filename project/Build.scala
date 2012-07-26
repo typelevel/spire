@@ -18,8 +18,9 @@ object MyBuild extends Build {
       "-deprecation",
       "-unchecked",
       "-optimize",
-      // turn specialization off until SI-5788 is fixed
-      "-no-specialization",
+      // can't use @tailrec and specialiation until SI-5788 is fixed
+      // also, may need to turn off specialization to compile macros
+      //"-no-specialization",
       "-feature"
     )
   )

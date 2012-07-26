@@ -233,23 +233,48 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     //       between (1/2)*2^(k-1) and (1/2)*2^k to find the new lower bound.
     //       This would reduce the number of steps to O(log n).
 
-    @tailrec
-    def closest(l: Rational, u: Rational): Rational = {
-      val mediant = Rational(l.numerator + u.numerator, l.denominator + u.denominator)
+    // TODO: return to tailrec method when SI-5788 is resolved
+    //@tailrec
+    //def closest(l: Rational, u: Rational): Rational = {
+    //  val mediant = Rational(l.numerator + u.numerator, l.denominator + u.denominator)
+    //
+    //  if (mediant.denominator > limit) {
+    //    if ((this - l).abs > (u - this).abs) {
+    //      u
+    //    } else {
+    //      l
+    //    }
+    //  } else if (mediant == this) {
+    //    mediant
+    //  } else if (mediant < this) {
+    //    closest(mediant, u)
+    //  } else {
+    //    closest(l, mediant)
+    //  }
+    //}
 
-      if (mediant.denominator > limit) {
-        if ((this - l).abs > (u - this).abs) {
-          u
+    // TODO: remove this when @tailrec is fixed
+    def closest(_l: Rational, _u: Rational): Rational = {
+      var l = _l
+      var u = _u
+
+      while (true) {
+        val mediant = Rational(l.numerator + u.numerator, l.denominator + u.denominator)
+        if (mediant.denominator > limit) {
+          if ((this - l).abs > (u - this).abs) {
+            return u
+          } else {
+            return l
+          }
+        } else if (mediant == this) {
+          return mediant
+        } else if (mediant < this) {
+          l = mediant
         } else {
-          l
+          u = mediant
         }
-      } else if (mediant == this) {
-        mediant
-      } else if (mediant < this) {
-        closest(mediant, u)
-      } else {
-        closest(l, mediant)
       }
+      l // this is just to satisfy scalac
     }
 
     this.sign match {
@@ -475,7 +500,7 @@ object LongRationals extends Rationals[Long] {
   import BigRationals.BigRational
 
   // inline the implementation we want to use
-  @inline final def gcd(a: Long, b: Long) = spire.math.fun.euclidGcd(a, b)
+  @inline final def gcd(a: Long, b: Long) = spire.math.fun.gcd(a, b)
 
   def build(n: Long, d: Long): Rational = {
     if (d == 0) throw new IllegalArgumentException("0 denominator")

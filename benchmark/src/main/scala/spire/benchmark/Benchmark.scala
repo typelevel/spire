@@ -160,32 +160,32 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
   def timeAddFastComplexes(reps:Int) = run(reps)(addFastComplexes(fcomplexes))
 }
 
-object SortBenchmarks extends MyRunner { val cls = classOf[SortBenchmarks] }
-class SortBenchmarks extends MyBenchmark with BenchmarkData {
-  def quickSortInts(data:Array[Int]) = scala.util.Sorting.quickSort(data)
-  def quickSortLongs(data:Array[Long]) = scala.util.Sorting.quickSort(data)
-  def quickSortFloats(data:Array[Float]) = scala.util.Sorting.quickSort(data)
-  def quickSortDoubles(data:Array[Double]) = scala.util.Sorting.quickSort(data)
-  
-  def mergeSortGeneric[@spec T:Order:ClassTag](data:Array[T]) = Sorting.mergeSort(data)
-  def quickSortGeneric[@spec T:Order:ClassTag](data:Array[T]) = Sorting.quickSort(data)
-
-  def timeQuicksortInts(reps:Int) = run(reps)(quickSortInts(ints.clone))
-  def timeGenMergeSortInts(reps:Int) = run(reps)(mergeSortGeneric(ints.clone))
-  def timeGenQuickSortInts(reps:Int) = run(reps)(quickSortGeneric(ints.clone))
-  
-  def timeQuicksortLongs(reps:Int) = run(reps)(quickSortLongs(longs.clone))
-  def timeGenMergeSortLongs(reps:Int) = run(reps)(mergeSortGeneric(longs.clone))
-  def timeGenQuickSortLongs(reps:Int) = run(reps)(quickSortGeneric(longs.clone))
-  
-  def timeQuicksortFloats(reps:Int) = run(reps)(quickSortFloats(floats.clone))
-  def timeGenMergeSortFloats(reps:Int) = run(reps)(mergeSortGeneric(floats.clone))
-  def timeGenQuickSortFloats(reps:Int) = run(reps)(quickSortGeneric(floats.clone))
-  
-  def timeQuicksortDoubles(reps:Int) = run(reps)(quickSortDoubles(doubles.clone))
-  def timeGenMergeSortDoubles(reps:Int) = run(reps)(mergeSortGeneric(doubles.clone))
-  def timeGenQuickSortDoubles(reps:Int) = run(reps)(quickSortGeneric(doubles.clone))
-}
+//object SortBenchmarks extends MyRunner { val cls = classOf[SortBenchmarks] }
+//class SortBenchmarks extends MyBenchmark with BenchmarkData {
+//  def quickSortInts(data:Array[Int]) = scala.util.Sorting.quickSort(data)
+//  def quickSortLongs(data:Array[Long]) = scala.util.Sorting.quickSort(data)
+//  def quickSortFloats(data:Array[Float]) = scala.util.Sorting.quickSort(data)
+//  def quickSortDoubles(data:Array[Double]) = scala.util.Sorting.quickSort(data)
+//  
+//  def mergeSortGeneric[@spec T:Order:ClassTag](data:Array[T]) = Sorting.mergeSort(data)
+//  def quickSortGeneric[@spec T:Order:ClassTag](data:Array[T]) = Sorting.quickSort(data)
+//
+//  def timeQuicksortInts(reps:Int) = run(reps)(quickSortInts(ints.clone))
+//  def timeGenMergeSortInts(reps:Int) = run(reps)(mergeSortGeneric(ints.clone))
+//  def timeGenQuickSortInts(reps:Int) = run(reps)(quickSortGeneric(ints.clone))
+//  
+//  def timeQuicksortLongs(reps:Int) = run(reps)(quickSortLongs(longs.clone))
+//  def timeGenMergeSortLongs(reps:Int) = run(reps)(mergeSortGeneric(longs.clone))
+//  def timeGenQuickSortLongs(reps:Int) = run(reps)(quickSortGeneric(longs.clone))
+//  
+//  def timeQuicksortFloats(reps:Int) = run(reps)(quickSortFloats(floats.clone))
+//  def timeGenMergeSortFloats(reps:Int) = run(reps)(mergeSortGeneric(floats.clone))
+//  def timeGenQuickSortFloats(reps:Int) = run(reps)(quickSortGeneric(floats.clone))
+//  
+//  def timeQuicksortDoubles(reps:Int) = run(reps)(quickSortDoubles(doubles.clone))
+//  def timeGenMergeSortDoubles(reps:Int) = run(reps)(mergeSortGeneric(doubles.clone))
+//  def timeGenQuickSortDoubles(reps:Int) = run(reps)(quickSortGeneric(doubles.clone))
+//}
 
 object GcdBenchmarks extends MyRunner { val cls = classOf[GcdBenchmarks] }
 class GcdBenchmarks extends MyBenchmark with BenchmarkData {
@@ -194,7 +194,7 @@ class GcdBenchmarks extends MyBenchmark with BenchmarkData {
     var i = 0
     val len = data.length - 1
     while (i < len) {
-      total += spire.math.fun.euclidGcd(data(i), data(i + 1))
+      total += euclidGcd(data(i), data(i + 1))
       i += 1
     }
     total
@@ -205,7 +205,7 @@ class GcdBenchmarks extends MyBenchmark with BenchmarkData {
     var i = 0
     val len = data.length - 1
     while (i < len) {
-      total += spire.math.fun.euclidGcd(data(i), data(i + 1))
+      total += binaryGcd(data(i), data(i + 1))
       i += 1
     }
     total
@@ -213,6 +213,54 @@ class GcdBenchmarks extends MyBenchmark with BenchmarkData {
 
   def timeSumEuclidGcds(reps:Int) = run(reps)(sumEuclidGcds(longs))
   def timeSumBinaryGcds(reps:Int) = run(reps)(sumBinaryGcds(longs))
+
+  // TODO: return to tailrec method when SI-5788 is resolved
+  //@tailrec def euclidGcd(a: Long, b: Long): Long = if (b == 0L) {
+  //  scala.math.abs(a)
+  //} else {
+  //  euclidGcd(b, a % b)
+  //}
+
+  def euclidGcd(_a: Long, _b: Long): Long = {
+    var a = _a
+    var b = _b
+    while (true) {
+      if (b == 0L) return scala.math.abs(a)
+      var tmp = a
+      a = b
+      b = tmp % b
+    }
+    a // unused, required by scalac
+  }
+
+  // iterative version of binary gcd stolen from wikipedia
+  def binaryGcd(_a: Long, _b: Long): Long = {
+    var a = scala.math.abs(_a)
+    var b = scala.math.abs(_b)
+    var shifts = 0
+
+    while (((a | b) & 1) == 0) {
+      a >>= 1
+      b >>= 1
+      shifts += 1
+    }
+
+    while ((a & 1) == 0) a >>= 1
+
+    while (true) {
+      while ((b & 1) == 0) b >>= 1
+      if (a > b) {
+        val t = b
+        b = a
+        a = t
+      }
+      b = b - a
+      if (b == 0) return a << shifts
+    }
+
+    a // unused, required by scalac
+  }
+
 }
 
 object RationalBenchmarks extends MyRunner { val cls = classOf[RationalBenchmarks] }

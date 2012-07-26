@@ -38,7 +38,7 @@ object Signed extends SignedLow {
   def apply[A](implicit s: Signed[A]): Signed[A] = s
 }
 
-final class SignedOps[@spec(Double, Float, Int, Long) A](lhs: A)(implicit s: Signed[A]) {
+final class SignedOps[A](lhs: A)(implicit s: Signed[A]) {
   def abs(): A = macro Ops.unop[A]
   def sign(): Sign = macro Ops.unop[Sign]
   def signum(): Int = macro Ops.unop[Int]

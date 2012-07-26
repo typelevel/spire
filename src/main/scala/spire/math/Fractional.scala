@@ -12,7 +12,7 @@ with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A] {
   def floor(a:A):A
 }
 
-class FractionalOps[@spec(Int,Long,Float,Double) A](lhs:A)(implicit ev:Fractional[A]) {
+class FractionalOps[A](lhs:A)(implicit ev:Fractional[A]) {
   def ceil() = macro Ops.unop[A]
   def floor() = macro Ops.unop[A]
 }

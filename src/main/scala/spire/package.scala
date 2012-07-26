@@ -15,30 +15,59 @@ object fun {
   // e^logMaxDouble as BigDecimal
   private final val expLogMaxDouble = BigDecimal(scala.math.exp(scala.math.log(Double.MaxValue)))
 
-  final def log(n:BigDecimal):BigDecimal = if (n < 0) sys.error("!!!") else log(n, BigDecimal(0))
+  final def log(n:BigDecimal):BigDecimal = {
+    if (n < 0) sys.error("invalid argument: %s" format n) else log(n, BigDecimal(0))
+  }
 
-  // Since log(n * x) = log(n) + log(x), we can use scala.math.log to
-  // approximate log for BigDecimal.
-  @tailrec private final def log(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
-    if (n < 0) {
-      log(-n, -sofar)
-    } else if (n <= maxDouble) {
-      BigDecimal(scala.math.log(n.toDouble)) + sofar
-    } else {
-      log(n / maxDouble, logMaxDouble + sofar)
+  // TODO: return to tailrec method when SI-5788 is resolved
+  //// Since log(n * x) = log(n) + log(x), we can use scala.math.log to
+  //// approximate log for BigDecimal.
+  //@tailrec private final def log(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
+  //  if (n < 0) {
+  //    log(-n, -sofar)
+  //  } else if (n <= maxDouble) {
+  //    BigDecimal(scala.math.log(n.toDouble)) + sofar
+  //  } else {
+  //    log(n / maxDouble, logMaxDouble + sofar)
+  //  }
+  //}
+
+  private final def log(_n:BigDecimal, _sofar:BigDecimal): BigDecimal = {
+    if (_n < 0) return log(-_n, -_sofar)
+    var n = _n
+    var sofar = _sofar
+    while (true) {
+      if (n <= maxDouble) return BigDecimal(scala.math.log(n.toDouble)) + sofar
+      n /= maxDouble
+      sofar += logMaxDouble
     }
+    sofar // unused, required by scalac
   }
 
   final def exp(n:BigDecimal):BigDecimal = exp(n, BigDecimal(1))
 
+  // TODO: return to tailrec method when SI-5788 is resolved
+  //// Since exp(a + b) = exp(a) * exp(b), we can use scala.math.log to
+  //// approximate exp for BigDecimal.
+  //@tailrec private final def exp(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
+  //  if (n <= logMaxDouble) {
+  //    BigDecimal(scala.math.exp(n.toDouble)) * sofar
+  //  } else {
+  //    exp(n - logMaxDouble, maxDouble * sofar)
+  //  }
+  //}
+
   // Since exp(a + b) = exp(a) * exp(b), we can use scala.math.log to
   // approximate exp for BigDecimal.
-  @tailrec private final def exp(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
-    if (n <= expLogMaxDouble) {
-      BigDecimal(scala.math.exp(n.toDouble)) * sofar
-    } else {
-      exp(n - expLogMaxDouble, expLogMaxDouble * sofar)
+  private final def exp(_n:BigDecimal, _sofar:BigDecimal): BigDecimal = {
+    var n = _n
+    var sofar = _sofar
+    while (true) {
+      if (n <= logMaxDouble) return BigDecimal(scala.math.exp(n.toDouble)) * sofar
+      n -= logMaxDouble
+      sofar *= maxDouble
     }
+    n // unused, required by scalac
   }
 
   // Since a^b = e^(log(a) * b) we can use exp and log to write pow.
@@ -63,46 +92,49 @@ object fun {
   } else if (base == 1L) {
     1L
   } else if (base == -1L) {
-    if (exponent % 2 == 0) -1L else 1L
+    if ((exponent & 1) == 0) -1L else 1L
   } else {
     0L
   }
 
-  // tail-recursive helper method for pow(Long, Long)
-  @tailrec private final def _pow(t:Long, b:Long, e:Int): Long = {
-    if (e == 0) return t
-    _pow(if (e % 2 == 1) t * b else t, b * b, e / 2)
-  }
+  // TODO: return to tailrec method when SI-5788 is resolved
+  //// tail-recursive helper method for pow(Long, Long)
+  //@tailrec private final def _pow(t:Long, b:Long, e:Int): Long = {
+  //  if (e == 0) return t
+  //  _pow(if ((e & 1) == 1) t * b else t, b * b, e / 2)
+  //}
 
-  final def pow(base:Double, exponent:Double):Double = {
-    java.lang.Math.pow(base, exponent)
-  }
-
-  @tailrec def euclidGcd(a: Long, b: Long): Long = if (b == 0L) {
-    scala.math.abs(a)
-  } else {
-    euclidGcd(b, a % b)
-  }
-
-  @tailrec def binaryGcd(a: Long, b: Long, shifts: Int = 0): Long = {
-    // these are the terminal cases
-    if (a == b) a << shifts
-    else if (a == 0L) b << shifts
-    else if (b == 0L) a << shifts
-
-    // if a is even
-    else if ((~a & 1L) != 0L) {
-      // factor out 2 from a
-      if ((b & 1L) != 0L) binaryGcd(a >> 1, b, shifts)
-      // remove out 2 from both, remembering to reapply it at the end.
-      else binaryGcd(a >> 1L, b >> 1L, shifts + 1)
+  private final def _pow(_t:Long, _b:Long, _e:Int): Long = {
+    var t = _t
+    var b = _b
+    var e = _e
+    while (true) {
+      if (e == 0) return t
+      if ((e & 1) == 1) t *= b
+      b *= b
+      e /= 2
     }
+    t // unused, required by scalac
+  }
 
-    // if b is even, factor out 2
-    else if ((~b & 1L) != 0L) binaryGcd(a, b >> 1L, shifts)
+  final def pow(base:Double, exponent:Double):Double = java.lang.Math.pow(base, exponent)
 
-    // reduce whichever argument is larger
-    else if (a > b) binaryGcd((a - b) >> 1L, b, shifts)
-    else binaryGcd((b - a) >> 1L, a, shifts)
+  // TODO: return to tailrec method when SI-5788 is resolved
+  //@tailrec def gcd(a: Long, b: Long): Long = if (b == 0L) {
+  //  scala.math.abs(a)
+  //} else {
+  //  gcd(b, a % b)
+  //}
+
+  def gcd(_a: Long, _b: Long): Long = {
+    var a = _a
+    var b = _b
+    while (true) {
+      if (b == 0L) return scala.math.abs(a)
+      var tmp = a
+      a = b
+      b = tmp % b
+    }
+    a // unused, required by scalac
   }
 }

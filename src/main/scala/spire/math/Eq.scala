@@ -13,7 +13,7 @@ trait Eq[@spec A] {
   def on[@spec B](f:B => A) = Eq.by(f)(this)
 }
 
-final class EqOps[@spec(Int,Long,Double) A](lhs:A)(implicit ev:Eq[A]) {
+final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
   def ===(rhs:A) = macro Ops.binop[A, Boolean]
   def =!=(rhs:A) = macro Ops.binop[A, Boolean]
 }
