@@ -15,7 +15,8 @@ import com.google.caliper.Param
 
 object AnyValAddBenchmarks extends MyRunner { val cls = classOf[AnyValAddBenchmarks] }
 class AnyValAddBenchmarks extends MyBenchmark {
-  @Param(Array("1000000", "2000000", "4000000", "8000000", "16000000"))
+  //@Param(Array("1000000", "2000000", "4000000", "8000000", "16000000"))
+  @Param(Array("4000000"))
   var size:Int = 0
 
   var bytes:Array[Byte] = null
