@@ -5,30 +5,36 @@ import spire.math.fun._
 import Implicits.{eqOps => _, _}
 
 class IntervalTest extends FunSuite {
-  def cc(n1:Double, n2:Double) = ContinuousInterval(ClosedBelow(n1), ClosedAbove(n2))
+  def cc(n1:Double, n2:Double) = Interval(ClosedBelow(n1), ClosedAbove(n2))
+  def oc(n1:Double, n2:Double) = Interval(OpenBelow(n1), ClosedAbove(n2))
 
   val a = cc(0.0, 4.0)
-  val b = cc(-8.0, 2.0)
-  val c = ContinuousInterval(OpenBelow(0.0), ClosedAbove(1.0))
+  test("a.contains(0.0) is true") { assert(a.contains(0.0) === true) }
+  test("a.crosses(0.0) is false") { assert(a.crosses(0.0) === false) }
+  test("a.contains(3.334) is true") { assert(a.contains(3.334) === true) }
+  test("a.contains(8.334) is false") { assert(a.contains(8.334) === false) }
 
-  test("a.contains(0.0)") { assert(a.contains(0.0)) }
-  test("a.crosses(0.0)") { assert(!a.crosses(0.0)) }
-  test("a.contains(3.334)") { assert(a.contains(3.334)) }
-  test("a.contains(8.334)") { assert(!a.contains(8.334)) }
-  // test("a.abs") { assert(a.abs === a) }
+  val b = cc(-8.0, 2.0)
+  test("b.contains(0.0) is true") { assert(b.contains(0.0) === true) }
+  test("b.crosses(0.0) is true") { assert(b.crosses(0.0) === true) }
+
+  val c = oc(0.0, 1.0)
+  test("c.contains(0.0) is false") { assert(c.contains(0.0) === false) }
+  test("c.crosses(0.0) is false") { assert(c.crosses(0.0) === false) }
+}
+
+class RingIntervalTest extends FunSuite {
+  def cc(n1:Double, n2:Double) = RingInterval(ClosedBelow(n1), ClosedAbove(n2))
+
+  val a = cc(0.0, 4.0)
   test("a + a") { assert(a + a === cc(0.0, 8.0)) }
   test("a - a") { assert(a - a === cc(-4.0, 4.0)) }
   test("a * a") { assert(a * a === cc(0.0, 16.0)) }
 
-  test("b.contains(0.0)") { assert(b.contains(0.0)) }
-  test("b.crosses(0.0)") { assert(b.crosses(0.0)) }
-  // test("b.abs") { assert(b.abs === cc(0.0, 8.0)) }
+  val b = cc(-8.0, 2.0)
   test("b + b") { assert(b + b === cc(-16.0, 4.0)) }
   test("b - b") { assert(b - b === cc(-10.0, 10.0)) }
   test("b * b") { assert(b * b === cc(-16.0, 64.0)) }
-
-  test("c.contains(0.0)") { assert(!c.contains(0.0)) }
-  test("c.crosses(0.0)") { assert(!c.crosses(0.0)) }
 }
 
 // TODO: this is just the tip of the iceberg... we also need to worry about

@@ -5,6 +5,13 @@ import Implicits._
 
 import language.implicitConversions
 
+/**
+ * A Bound represents one side of an interval; it is parameterized on T, the
+ * ordered type covered by the interval.
+ *
+ * Bound does not imply anything about being an upper and lower bound, or
+ * necessarily having a value (it may represent a limit like +infinity).
+ */
 sealed trait Bound[T] {
   implicit def order:Order[T]
 
@@ -26,6 +33,10 @@ sealed trait Bound[T] {
   def max(rhs:Bound[T]):Bound[T] = if (this > rhs) this else rhs
 }
 
+/**
+ * This class provides operators for Bound[T] instances when T is a member of
+ * the Ring typeclass (i.e. an implicit Ring[T] exists).
+ */
 class BoundRingOps[T](lhs:Bound[T])(implicit ev:Ring[T]) {
   //def abs = lhs.unop(_.abs)
   def unary_- = lhs.unop(ev.negate(_))
@@ -38,24 +49,46 @@ class BoundRingOps[T](lhs:Bound[T])(implicit ev:Ring[T]) {
   def pow(rhs:Int) = lhs.unop(ev.pow(_, rhs))
 }
 
+/**
+ * This class provides operators for Bound[T] instances when T is a member of
+ * the EuclideanRing typeclass (i.e. an implicit EuclideanRing[T] exists).
+ */
 class BoundEuclideanRingOps[T](lhs:Bound[T])(implicit ev:EuclideanRing[T]) {
   def /~(rhs:T) = lhs.unop(ev.quot(_, rhs))
   def /~(rhs:Bound[T]) = lhs.binop(rhs)(ev.quot(_, _))
 }
 
+/**
+ * This class provides operators for Bound[T] instances when T is a member of
+ * the Field typeclass (i.e. an implicit Field[T] exists).
+ */
 class BoundFieldOps[T](lhs:Bound[T])(implicit ev:Field[T]) {
   def /(rhs:T) = lhs.unop(ev.div(_, rhs))
   def /(rhs:Bound[T]) = lhs.binop(rhs)(ev.div(_, _))
 }
 
+/**
+ * Lower represents a Bound which is a lower bound.
+ */
 sealed trait Lower[T] extends Bound[T] { def toLower = this }
+
+/**
+ * Upper represents a Bound which is an upper bound.
+ */
 sealed trait Upper[T] extends Bound[T] { def toUpper = this }
 
+/**
+ * Unbound represents a boundary which does not limit its "side" of the
+ * interval, i.e. +/- infinity.
+ */
 sealed trait Unbound[T] extends Bound[T] {
   def unop(f:T => T):Bound[T] = this
   def binop(rhs:Bound[T])(f:(T, T) => T):Bound[T] = this
 }
 
+/**
+ * UnboundBelow represents an unrestrainted lower bound, i.e. negative infinity.
+ */
 case class UnboundBelow[T]()(implicit val order:Order[T]) extends Lower[T] with Unbound[T] {
   def compare(rhs:Bound[T]) = rhs match {
     case UnboundBelow() => 0
@@ -65,6 +98,9 @@ case class UnboundBelow[T]()(implicit val order:Order[T]) extends Lower[T] with 
   def toUpper = UnboundAbove[T]
 }
 
+/**
+ * UnboundAbove represents an unrestrainted upper bound, i.e. positive infinity.
+ */
 case class UnboundAbove[T]()(implicit val order:Order[T]) extends Upper[T] with Unbound[T] {
   def compare(rhs:Bound[T]) = rhs match {
     case UnboundAbove() => 0
@@ -74,6 +110,9 @@ case class UnboundAbove[T]()(implicit val order:Order[T]) extends Upper[T] with 
   def toLower = UnboundBelow[T]
 }
 
+/**
+ * Closed is a closed bound (the interval contains this boundary limit).
+ */
 sealed trait Closed[T] {
   implicit def order:Order[T]
   def x:T
@@ -96,18 +135,27 @@ sealed trait Closed[T] {
   }
 }
 
+/**
+ * ClosedBelow is a closed lower bound, i.e. a in the interval [a, b].
+ */
 case class ClosedBelow[T](x:T)(implicit val order:Order[T]) extends Lower[T] with Closed[T] {
   def toUpper = ClosedAbove(x)
   def unop(f:T => T) = ClosedBelow(f(x))
   override def binop(rhs:Bound[T])(f:(T, T) => T):Lower[T] = super.binop(rhs)(f).toLower
 }
 
+/**
+ * ClosedAbove is a closed upper bound, i.e. b in the interval [a, b]
+ */
 case class ClosedAbove[T](x:T)(implicit val order:Order[T]) extends Upper[T] with Closed[T] {
   def toLower = ClosedBelow(x)
   def unop(f:T => T) = ClosedAbove(f(x))
   override def binop(rhs:Bound[T])(f:(T, T) => T):Upper[T] = super.binop(rhs)(f).toUpper
 }
 
+/**
+ * Open is a open bound (the interval does not contain this boundary limit).
+ */
 sealed trait Open[T] {
   implicit def order:Order[T]
   def x:T
@@ -121,6 +169,9 @@ sealed trait Open[T] {
   }
 }
 
+/**
+ * OpenBelow is an open lower bound, i.e. a in the interval (a, b).
+ */
 case class OpenBelow[T](x:T)(implicit val order:Order[T]) extends Lower[T] with Open[T] {
   def compare(rhs:Bound[T]) = rhs match {
     case UnboundBelow() => 1
@@ -136,6 +187,9 @@ case class OpenBelow[T](x:T)(implicit val order:Order[T]) extends Lower[T] with 
   override def binop(rhs:Bound[T])(f:(T, T) => T):Lower[T] = super.binop(rhs)(f).toLower
 }
 
+/**
+ * OpenAbove is an open upper bound, i.e. b in the interval (a, b).
+ */
 case class OpenAbove[T](x:T)(implicit val order:Order[T]) extends Upper[T] with Open[T] {
   def compare(rhs:Bound[T]) = rhs match {
     case UnboundBelow() => 1
@@ -151,6 +205,13 @@ case class OpenAbove[T](x:T)(implicit val order:Order[T]) extends Upper[T] with 
   override def binop(rhs:Bound[T])(f:(T, T) => T):Upper[T] = super.binop(rhs)(f).toUpper
 }
 
+/**
+ * GenInterval is a trait representing the most generic kind of interval.
+ * In this case, the only information we have about T is that it can be
+ * ordered... no other mathematical operations are allowed.
+ *
+ * GenInterval's concrete counterpart is Interval.
+ */
 trait GenInterval[T, U <: GenInterval[T, U]] {
   implicit def order:Order[T]
 
@@ -174,6 +235,12 @@ trait GenInterval[T, U <: GenInterval[T, U]] {
   }
 }
 
+/**
+ * GenRingInterval is an interval whose T is a member of Ring.
+ *
+ * This Ring[T] enables us to support the Ring operations over intervals, i.e.
+ * basic interval arithmetic. Obviously things like division are not included.
+ */
 trait GenRingInterval[T, U <: GenRingInterval[T, U]] extends GenInterval[T, U] {
   implicit def num:Ring[T]
 
@@ -238,9 +305,15 @@ trait GenRingInterval[T, U <: GenRingInterval[T, U]] extends GenInterval[T, U] {
   }
 }
 
+/**
+ * GenDiscreteInterval is an interval whose T is a member of EuclideanRing.
+ *
+ * In addition to the operations on ring intervals, this interval also
+ * supports quotient.
+ */
 trait GenDiscreteInterval[T, U <: GenDiscreteInterval[T, U]] extends GenRingInterval[T, U] {
   implicit def num:EuclideanRing[T]
-  implicit def order:Order[T]
+  //implicit def order:Order[T]
 
   implicit def boundEuclideanRingOps(b:Bound[T]) = new BoundEuclideanRingOps(b)
 
@@ -269,9 +342,15 @@ trait GenDiscreteInterval[T, U <: GenDiscreteInterval[T, U]] extends GenRingInte
   }
 }
 
+/**
+ * GenContinuousInterval is an interval whose T is a member of Field.
+ *
+ * In addition to the operations on discrete intervals, this interval also
+ * supports division.
+ */
 trait GenContinuousInterval[T, U <: GenContinuousInterval[T, U]] extends GenRingInterval[T, U] {
   implicit def num:Field[T]
-  implicit def order:Order[T]
+  //implicit def order:Order[T]
 
   implicit def boundFieldOps(b:Bound[T]) = new BoundFieldOps(b)
 
@@ -300,26 +379,47 @@ trait GenContinuousInterval[T, U <: GenContinuousInterval[T, U]] extends GenRing
   }
 }
 
+/**
+ * Interval represents a lower and upper bound of an ordered type T.
+ *
+ * This interval may be unbounded (i.e. (-inf, inf)), half-bounded
+ * (i.e. (-inf, 3)), or bounded (i.e. (-3, 3)).
+ */
 case class Interval[T](lower:Lower[T], upper:Upper[T])(implicit val order:Order[T])
 extends GenInterval[T, Interval[T]] {
   protected[this] def coerce(a:Bound[T], b:Bound[T]) = Interval(a.toLower, b.toUpper)
 }
 
+/**
+ * RingInterval represents a lower and upper bound of an ordered type T, where
+ * T is a member of Ring. RingIntervals can be combined using the interval
+ * arithmetic operations defined in Ring.
+ */
 case class RingInterval[T](lower:Lower[T], upper:Upper[T])(implicit val order:Order[T], val num:Ring[T])
 extends GenRingInterval[T, RingInterval[T]] {
   protected[this] def coerce(a:Bound[T], b:Bound[T]) = RingInterval(a.toLower, b.toUpper)
 }
 
-case class DiscreteInterval[T](lower:Lower[T], upper:Upper[T])(implicit f:Integral[T])
+/**
+ * DiscreteInterval represents a lower and upper bound of an ordered type T,
+ * where T is a member of EuclideanRing. DiscreteIntervals support all ring
+ * operations as well as quotient.
+ */
+case class DiscreteInterval[T](lower:Lower[T], upper:Upper[T])(implicit ev:Integral[T])
 extends GenDiscreteInterval[T, DiscreteInterval[T]] {
-  implicit def num:EuclideanRing[T] = f
-  implicit def order:Order[T] = f
+  implicit def num:EuclideanRing[T] = ev
+  implicit def order:Order[T] = ev
   protected[this] def coerce(a:Bound[T], b:Bound[T]) = DiscreteInterval(a.toLower, b.toUpper)
 }
 
-case class ContinuousInterval[T](lower:Lower[T], upper:Upper[T])(implicit f:Fractional[T])
+/**
+ * ContinuousInterval represents a lower and upper bound of an ordered type T,
+ * where T is a member of EuclideanRing. ContinuousIntervals supports all ring
+ * operations as well as quotient and division.
+ */
+case class ContinuousInterval[T](lower:Lower[T], upper:Upper[T])(implicit ev:Fractional[T])
 extends GenContinuousInterval[T, ContinuousInterval[T]] {
-  implicit def num:Field[T] = f
-  implicit def order:Order[T] = f
+  implicit def num:Field[T] = ev
+  implicit def order:Order[T] = ev
   protected[this] def coerce(a:Bound[T], b:Bound[T]) = ContinuousInterval(a.toLower, b.toUpper)
 }
