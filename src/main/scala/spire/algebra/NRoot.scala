@@ -28,14 +28,14 @@ trait NRoot[@spec(Double,Float,Int,Long) A] {
  * requirement is only a `EuclideanRing`, we can provide instances for `Int`,
  * `Long`, and `BigInt`.
  */
-trait EuclideanRingWithNRoot[@spec(Int,Long) A] extends EuclideanRing[A] with NRoot[A]
+trait EuclideanRingWithNRoot[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] with NRoot[A]
 
 
 /**
  * A type class for `Field`s with `NRoot`s. These will be `Field`s that have an
  * additional `nroot` and `sqrt` function.
  */
-trait FieldWithNRoot[@spec(Double, Float) A] extends EuclideanRingWithNRoot[A] with Field[A]
+trait FieldWithNRoot[@spec(Int,Long,Float,Double) A] extends EuclideanRingWithNRoot[A] with Field[A]
 
 
 object EuclideanRingWithNRoot {
@@ -47,10 +47,10 @@ object EuclideanRingWithNRoot {
                                                  with BigIntIsNRoot
                                                  with BigIntIsEuclideanRing
 
-  implicit def FieldWithNRootIsEuclideanRingWithNRoot[A]
+  implicit def FieldWithNRootIsEuclideanRingWithNRoot[@spec A]
   (implicit e: FieldWithNRoot[A]): EuclideanRingWithNRoot[A] = e
 
-  def apply[A](implicit e: EuclideanRingWithNRoot[A]): EuclideanRingWithNRoot[A] = e
+  def apply[@spec(Int,Long,Float,Double) A](implicit e: EuclideanRingWithNRoot[A]): EuclideanRingWithNRoot[A] = e
 }
 
 
@@ -67,7 +67,7 @@ object FieldWithNRoot {
   implicit def rationalIsFieldWithNRoot(implicit c: ApproximationContext[Rational]): FieldWithNRoot[Rational] =
     RationalIsFieldWithNRoot(c)
 
-  def apply[A](implicit e: FieldWithNRoot[A]): FieldWithNRoot[A] = e
+  def apply[@spec(Int,Long,Float,Double) A](implicit e: FieldWithNRoot[A]): FieldWithNRoot[A] = e
 }
 
 
@@ -174,7 +174,9 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
 
 
 object NRoot {
-  @inline final def apply[A](implicit ev:NRoot[A]) = ev
+  @inline final def apply[@spec(Int,Long,Float,Double) A](implicit ev:NRoot[A]) = ev
+
+  implicit object DoubleIsNRoot extends DoubleIsNRoot
 
   implicit object BigIntIsNRoot extends BigIntIsNRoot
 

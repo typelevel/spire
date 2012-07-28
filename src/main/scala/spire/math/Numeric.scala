@@ -29,7 +29,7 @@ object Numeric {
   implicit object RealIsNumeric extends RealIsNumeric
   implicit def complexIsNumeric[A:Fractional:Trig] = new ComplexIsNumeric
 
-  def apply[A](implicit e:Numeric[A]):Numeric[A] = e
+  def apply[@spec(Int,Long,Float,Double) A](implicit e:Numeric[A]):Numeric[A] = e
 }
 
 trait IntIsNumeric extends Numeric[Int] with IntIsEuclideanRing with IntIsNRoot

@@ -27,7 +27,7 @@ object Fractional {
   }
   implicit object RealIsFractional extends RealIsFractional
 
-  def apply[A](implicit f:Fractional[A]) = f
+  def apply[@spec(Int,Long,Float,Double) A](implicit f:Fractional[A]) = f
 }
 
 trait FloatIsFractional extends Fractional[Float] with FloatIsField

@@ -68,4 +68,3 @@ extends ComplexIsEuclideanRing[A] with Field[Complex[A]] {
 
 class ComplexIsFieldCls[@spec(Float,Double) A]
 (implicit val f:Fractional[A], val t:Trig[A]) extends ComplexIsField[A]
-
