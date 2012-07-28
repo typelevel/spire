@@ -209,3 +209,4 @@ object FiniteFieldExample extends App {
   assert((e * f) === Z[_3](2))
   assert((e / f) === Z[_3](2))
 }
+
