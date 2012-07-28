@@ -1,5 +1,6 @@
 package spire.math.fpf
 
+//import language.implicitConversions
 import scala.math.{ max, abs }
 import java.lang.Double.{ NaN, isNaN, isInfinite }
 
@@ -45,7 +46,7 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
    * This will always evalute the underlying `value` and will lead to serious
    * performance problems if used often.
    */
-  override def hashCode: Int = value ##
+  override def hashCode: Int = value.##
 
   /**
    * Returns true if these values are equal. Note that this will only return
@@ -206,6 +207,9 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
 
   def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
   override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
+  def log(a: FPFilter[A]): FPFilter[A] =
+    new FPFilter(a.approx.log, ev.log(a.value))
+  def fpow(a:FPFilter[A], b:FPFilter[A]) = sys.error("fixme")
 }
 
 trait FPFilterIsFractional[A] extends Fractional[FPFilter[A]]
@@ -216,6 +220,9 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   
   def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
   override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
+  def log(a: FPFilter[A]): FPFilter[A] =
+    new FPFilter(a.approx.log, ev.log(a.value))
+  def fpow(a:FPFilter[A], b:FPFilter[A]) = sys.error("fixme")
 }
 
 

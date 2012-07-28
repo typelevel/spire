@@ -29,7 +29,7 @@ object Numeric {
   implicit object RealIsNumeric extends RealIsNumeric
   implicit def complexIsNumeric[A:Fractional:Trig] = new ComplexIsNumeric
 
-  def apply[A](implicit e:Numeric[A]):Numeric[A] = e
+  @inline final def apply[A](implicit ev:Numeric[A]):Numeric[A] = ev
 }
 
 trait IntIsNumeric extends Numeric[Int] with IntIsEuclideanRing with IntIsNRoot
@@ -96,4 +96,7 @@ with Order[Complex[A]] with ComplexIsSigned[A] {
   override def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   override def lteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   def compare(x:Complex[A], y:Complex[A]) = if (x == y) 0 else sys.error("undefined")
+
+  def log(a:Complex[A]) = a.log
+  def fpow(a:Complex[A], b:Complex[A]) = a.pow(b)
 }

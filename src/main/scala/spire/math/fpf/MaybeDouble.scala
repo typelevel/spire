@@ -60,6 +60,9 @@ final class MaybeDouble(val approx: Double, private val mes: Double, private val
              (math.abs(approx) / math.abs(that.approx) + (mes / that.mes)) /
                 (math.abs(that.approx) / that.mes - (that.ind + 1) * eps),
              1 + max(ind, that.ind + 1))
+
+  def log(): MaybeDouble =
+    new MaybeDouble(math.log(approx), math.log(mes), ind + 1)
     
   def pow(k: Int): MaybeDouble = if (k > 0) {
     new MaybeDouble(math.pow(approx, k), math.pow(mes, k), ind + k)

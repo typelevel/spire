@@ -1,5 +1,7 @@
 package spire.math
 
+//import language.implicitConversions
+
 import spire.algebra._
 import Implicits._
 
@@ -46,10 +48,10 @@ class BoundFieldOps[T:Field](lhs:Bound[T]) {
   def /(rhs:Bound[T]) = lhs.binop(rhs)(_ / _)
 }
 
-trait Lower[T] extends Bound[T] { def toLower = this }
-trait Upper[T] extends Bound[T] { def toUpper = this }
+sealed trait Lower[T] extends Bound[T] { def toLower = this }
+sealed trait Upper[T] extends Bound[T] { def toUpper = this }
 
-trait Unbound[T] extends Bound[T] {
+sealed trait Unbound[T] extends Bound[T] {
   def unop(f:T => T):Bound[T] = this
   def binop(rhs:Bound[T])(f:(T, T) => T):Bound[T] = this
 }

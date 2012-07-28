@@ -1,7 +1,8 @@
 package spire.math.real
 
-import spire.math.fpf.MaybeDouble
+//import language.implicitConversions
 
+import spire.math.fpf.MaybeDouble
 import spire.math._
 
 

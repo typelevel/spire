@@ -1,5 +1,6 @@
 package spire.math
 
+//import language.implicitConversions
 import spire.algebra.{ Sign, Positive, Negative, Zero }
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions, abs, min}
@@ -40,6 +41,10 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def pow(exp: Int): Rational
 
+  def log: Rational = this match {
+    case LongRational(n, d) => Rational(scala.math.log(n) - scala.math.log(d))
+    case BigRational(n, d) => Rational(fun.log(BigDecimal(n)) - fun.log(BigDecimal(d)))
+  }
 
   /**
    * Returns this `Rational` to the exponent `exp`. Both the numerator and
@@ -262,8 +267,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
 
 object Rational {
-  private val RationalString = """^(-?\d+)/(-?\d+)$"""r
-  private val IntegerString = """^(-?\d+)$"""r
+  private val RationalString = """^(-?\d+)/(-?\d+)$""".r
+  private val IntegerString = """^(-?\d+)$""".r
 
   import LongRationals.LongRational
   import BigRationals.BigRational
@@ -398,7 +403,7 @@ protected abstract class Rationals[@specialized(Long) A](implicit integral: Inte
 
   def build(n: A, d: A): Rational
 
-  trait RationalLike extends Rational with Fraction[A] {
+  sealed trait RationalLike extends Rational with Fraction[A] {
     
     override def signum: Int = scala.math.signum(integral.compare(num, zero))
 
@@ -475,6 +480,7 @@ object LongRationals extends Rationals[Long] {
   @inline final def gcd(a: Long, b: Long) = spire.math.fun.euclidGcd(a, b)
 
   def build(n: Long, d: Long): Rational = {
+    if (d == 0) throw new IllegalArgumentException("0 denominator")
     val divisor = gcd(n, d)
     if (divisor == 1L) {
       if (d < 0)
@@ -654,6 +660,7 @@ object BigRationals extends Rationals[BigInt] {
   import LongRationals.{LongRational,gcd}
 
   def build(n: BigInt, d: BigInt): Rational = {
+    if (d == 0) throw new IllegalArgumentException("0 denominator")
     val gcd = n.gcd(d)
     if (gcd == 1) {
       if (d < 0)

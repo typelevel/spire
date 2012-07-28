@@ -1,6 +1,7 @@
 package spire.algebra
 
 import spire.math._
+import spire.math.fpf.MaybeDouble
 
 import annotation.tailrec
 import scala.{specialized => spec}
@@ -70,6 +71,7 @@ object Ring {
   implicit object RationalIsRing extends RationalIsRing
   implicit def complexIsRing[A:Fractional:Trig] = new ComplexIsRingCls
   implicit object RealIsRing extends RealIsRing
+  implicit object MaybeDoubleIsRing extends MaybeDoubleIsRing
 
   def apply[A](implicit r:Ring[A]):Ring[A] = r
 }
@@ -224,3 +226,15 @@ trait RealIsRing extends Ring[Real] {
 
 class ComplexIsRingCls[A](implicit val f:Fractional[A], val t:Trig[A])
 extends ComplexIsRing[A]
+
+trait MaybeDoubleIsRing extends Ring[MaybeDouble] {
+  override def minus(a:MaybeDouble, b:MaybeDouble): MaybeDouble = a - b
+  def negate(a:MaybeDouble): MaybeDouble = -a
+  def one: MaybeDouble = MaybeDouble(1.0)
+  def plus(a:MaybeDouble, b:MaybeDouble): MaybeDouble = a + b
+  override def pow(a:MaybeDouble, b:Int): MaybeDouble = a.pow(b)
+  override def times(a:MaybeDouble, b:MaybeDouble): MaybeDouble = a * b
+  def zero: MaybeDouble = MaybeDouble(0.0)
+
+  override def fromInt(n: Int): MaybeDouble = MaybeDouble(n)
+}

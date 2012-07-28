@@ -1,21 +1,18 @@
 package spire.math
 
-import spire.algebra._
+//import language.implicitConversions
 
 import scala.{specialized => spec}
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.math.{Pi, atan2, cos, exp, log, sin, sqrt}
 
-import spire.math.fun._
-import Implicits._
-
-// TODO: refactor places where Fractional is converted to Double in order to
-// access functions (e.g. trig, pow, exp, log)
+import spire.algebra._
 
 object Complex {
   def i[@spec(Float, Double) T](implicit f:Fractional[T], t:Trig[T]) = Complex(f.zero, f.one)
   def one[@spec(Float, Double) T](implicit f:Fractional[T], t:Trig[T]) = Complex(f.one, f.zero)
   def zero[@spec(Float, Double) T](implicit f:Fractional[T], t:Trig[T]) = Complex(f.zero, f.zero)
+
   implicit def intToComplex(n:Int) = new Complex(n.toDouble, 0.0)
   implicit def longToComplex(n:Long) = new Complex(n.toDouble, 0.0)
   implicit def floatToComplex(n:Float) = new Complex(n, 0.0F)
@@ -34,31 +31,24 @@ object Complex {
 class Complex[@spec(Float, Double) T](val real:T, val imag:T)(implicit f:Fractional[T], t:Trig[T])
 extends ScalaNumber with ScalaNumericConversions with Serializable {
 
-  // ugh, ScalaNumericConversions ghetto
-  //
-  // maybe complex numbers are too different...
-  def doubleValue = real.toDouble
-  def floatValue = real.toFloat
-  def longValue = real.toLong
-  def intValue = real.toInt
-  def isWhole = (f.fromInt(real.toInt) == real) && (imag == f.zero)
+  def doubleValue = f.toDouble(real)
+  def floatValue = f.toFloat(real)
+  def longValue = f.toLong(real)
+  def intValue = f.toInt(real)
+  def isWhole = f.isWhole(real) && f.eqv(imag, f.zero)
   def signum: Int = f.compare(real, f.zero)
   def underlying = (real, imag)
-  def complexSignum = if (abs == f.zero) {
-    Complex.zero
-  } else {
-    this / Complex(abs, f.zero)
-  }
+
+  def complexSignum = if (f.eqv(abs, f.zero)) Complex.zero else this / Complex(abs, f.zero)
 
   override def hashCode: Int = {
-    if (isReal && real.isWhole &&
-        real <= f.fromInt(Int.MaxValue) &&
-        real >= f.fromInt(Int.MinValue)) real.toInt.##
+    if (f.isWhole(real) && f.eqv(imag, f.zero) &&
+        f.lteqv(real, f.fromInt(Int.MaxValue)) &&
+        f.gteqv(real, f.fromInt(Int.MinValue))) f.toInt(real)
     else 19 * real.## + 41 * imag.##
   }
 
-  //override def hashCode: Int = 19 * real.## + 41 * imag.##
-
+  // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
     case that:Complex[_] => real == that.real && imag == that.imag
     case that => unifiedPrimitiveEquals(that)
@@ -69,7 +59,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   // ugh, specialized lazy vals don't work very well
   //lazy val abs: T = f.sqrt(real * real + imag * imag)
   //lazy val arg: T = t.atan2(imag, real)
-  def abs: T = f.sqrt(real * real + imag * imag)
+  def abs: T = f.sqrt(f.plus(f.times(real, real), f.times(imag, imag)))
   def arg: T = t.atan2(imag, real)
 
   def conjugate = Complex(real, f.negate(imag))
@@ -77,7 +67,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def asTuple: (T, T) = (real, imag)
   def asPolarTuple: (T, T) = (abs, arg)
 
-  def isImaginary: Boolean = f.eq(real, f.zero) && f.neqv(imag, f.zero)
+  def isImaginary: Boolean = f.eqv(real, f.zero) && f.neqv(imag, f.zero)
   def isReal: Boolean = f.neqv(real, f.zero) && f.eqv(imag, f.zero)
 
   def eqv(b:Complex[T]) = f.eqv(real, b.real) && f.eqv(imag, b.imag)
@@ -93,18 +83,18 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
                                 f.plus(f.times(imag, b.real), f.times(real, b.imag)))
 
   def /(b:Complex[T]) = {
-    val abs_breal = b.real.abs
-    val abs_bimag = b.imag.abs
+    val abs_breal = f.abs(b.real)
+    val abs_bimag = f.abs(b.imag)
 
     if (f.gteqv(abs_breal, abs_bimag)) {
-      if (f.eq(abs_breal, f.zero)) throw new Exception("/ by zero")
+      if (f.eqv(abs_breal, f.zero)) throw new Exception("/ by zero")
       val ratio = f.div(b.imag, b.real)
       val denom = f.plus(b.real, f.times(b.imag, ratio))
       Complex(f.div(f.plus(real, f.times(imag, ratio)), denom),
               f.div(f.minus(imag, f.times(real, ratio)), denom))
 
     } else {
-      if (f.eq(abs_bimag, f.zero)) throw new Exception("/ by zero")
+      if (f.eqv(abs_bimag, f.zero)) throw new Exception("/ by zero")
       val ratio = f.div(b.real, b.imag)
       val denom = f.plus(f.times(b.real, ratio), b.imag)
       Complex(f.div(f.plus(f.times(real, ratio), imag), denom),
@@ -129,26 +119,43 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   }
 
   def **(b:Complex[T]) = pow(b)
-  def pow(b:Complex[T]) = if (b.eq(Complex.zero[T])) {
+  def pow(b:Complex[T]) = if (b == Complex.zero[T]) {
     Complex.one[T]
 
-  } else if (this.eq(Complex.zero[T])) {
+  } else if (this.eqv(Complex.zero[T])) {
     if (f.neqv(b.imag, f.zero) || f.lt(b.real, f.zero))
       throw new Exception("raising 0 to negative/complex power")
     Complex.zero[T]
 
   } else if (f.neqv(b.imag, f.zero)) {
-    // TODO: is adding frac**frac reasonable? if not, we won't be able to do
-    // this without something hacky like the below.
-    // TODO: we also need log and exp on Field, Fractional, or Trig.
-    val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble) / exp((arg * b.imag).toDouble))
-    val phase = f.fromDouble(arg.toDouble * b.real.toDouble + log(abs.toDouble) * b.imag.toDouble)
+    val a = f.fpow(abs, b.real)
+    val bb = f.times(arg, b.imag)
+    val c = t.exp(bb)
+    val len = f.div(a, c)
+    println("len=%s abs=%s b.real=%s b.imag=%s a=%s bb=%s c=%s" format (len, abs, b.real, b.imag, a, bb, c))
+
+    val d = f.times(arg, b.real)
+    val e = f.log(abs)
+    val ff = f.times(e, b.imag)
+    val phase = f.plus(d, ff)
+    println("phase=%s abs=%s b.real b.imag=%s d=%s e=%s ff=%s" format (phase, abs, b.real, b.imag, d, e, ff))
+
+    //val len = f.div(f.fpow(abs, b.real), t.exp(f.times(arg, b.imag)))
+    //val phase = f.plus(f.times(arg, b.real), f.times(f.log(abs), b.imag))
     Complex.polar(len, phase)
 
   } else {
-    val len = f.fromDouble(math.pow(abs.toDouble, b.real.toDouble))
+    val len = f.fpow(abs, b.real)
+    println("len=%s abs=%s b.real=%s" format (len, abs, b.real))
     val phase = f.times(arg, b.real)
+    println("phase=%s arg=%s b.real=%s" format (phase, arg, b.real))
     Complex.polar(len, phase)
+  }
+
+  // we are going with the "principal value" definition of Log.
+  def log:Complex[T] = {
+    if (this == Complex.zero[T]) sys.error("log undefined at 0")
+    Complex(f.log(abs), arg)
   }
 }
 
@@ -310,7 +317,7 @@ object FastComplex {
 
   } else if (imag(b) != 0.0F) {
     val len = math.pow(abs(a), real(b)) / exp((angle(a) * imag(b)))
-    val phase = angle(a) * real(b) + log(abs(a)) * imag(b)
+    val phase = angle(a) * real(b) + scala.math.log(abs(a)) * imag(b)
     polar(len.toFloat, phase.toFloat)
 
   } else {

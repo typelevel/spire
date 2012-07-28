@@ -1,8 +1,8 @@
 package spire.math
 
-import scala.math.{ScalaNumber, ScalaNumericConversions, abs, floor}
-import spire.math.Implicits._
-import scala.math.BigDecimal
+import scala.math.{floor, BigDecimal}
+
+//import language.implicitConversions
 
 // TODO: implement RationalNumber.
 // TODO: implement toNumber and fromNumber in ConvertableTo/From.
@@ -11,25 +11,25 @@ import scala.math.BigDecimal
 // TODO: pow() is hairy; should support more cases and generate better errors
 // TODO: decide what should be public/private
 
-case class NumberOutOfRange(msg:String) extends Exception(msg)
-case class InvalidNumber(msg:String) extends Exception(msg)
-
 /**
  * Convenient apply and implicits for Numbers
  */
 object Number {
-
   def apply(n:Byte):Number = IntNumber(SafeLong(n))
   def apply(n:Short):Number = IntNumber(SafeLong(n))
   def apply(n:Int):Number = IntNumber(SafeLong(n))
   def apply(n:Long):Number = IntNumber(SafeLong(n))
   def apply(n:BigInt):Number = IntNumber(SafeLong(n))
   def apply(n:SafeLong):Number = IntNumber(n)
-  def apply(n:Double):Number = FloatNumber(n)
-  def apply(n:scala.math.BigDecimal):Number = DecimalNumber(n)
+  def apply(n:Double):Number = {
+    if (n == n.toLong) IntNumber(SafeLong(n.toLong)) else FloatNumber(n)
+  }
+  def apply(n:BigDecimal):Number = {
+    n.toBigIntExact.map(x => IntNumber(SafeLong(x))).getOrElse(DecimalNumber(n))
+  }
 
   def apply(s:String):Number = {
-    def conv(n: => Number):Option[Number] = try { Some(n) } catch { case _ => None }
+    def conv(n: => Number):Option[Number] = try { Some(n) } catch { case _:Exception => None }
     conv(Number(java.lang.Long.parseLong(s))) orElse
     conv(Number(BigInt(s))) orElse
     conv(Number(java.lang.Double.parseDouble(s))) orElse
@@ -46,21 +46,22 @@ object Number {
   implicit def bigDecimalToNumber(n:BigDecimal) = Number(n)
 }
 
-sealed trait Number extends ScalaNumber with ScalaNumericConversions with Ordered[Number] {
+sealed trait Number extends scala.math.ScalaNumber
+with scala.math.ScalaNumericConversions with Ordered[Number] {
   def abs:Number
   def signum:Int
 
-  def withinInt: Boolean
-  def withinLong: Boolean
-  def withinDouble: Boolean
+  protected[math] def withinInt: Boolean
+  protected[math] def withinLong: Boolean
+  protected[math] def withinDouble: Boolean
 
-  def canBeInt:Boolean
-  def canBeLong:Boolean
+  protected[math] def canBeInt:Boolean
+  protected[math] def canBeLong:Boolean
 
   def unary_-():Number
 
-  def toBigInt: BigInt
-  def toBigDecimal: BigDecimal
+  def toBigInt:BigInt
+  def toBigDecimal:BigDecimal
 
   def +(rhs:Number):Number
 
@@ -83,11 +84,28 @@ sealed trait Number extends ScalaNumber with ScalaNumericConversions with Ordere
 
   def pow(rhs:Number): Number
   def **(rhs:Number) = this.pow(rhs)
+
+  def nroot(rhs:Number): Number = rhs match {
+    case IntNumber(m) => {
+      val x = m.fold(_.toInt, _.toInt)
+      if (m != x) sys.error("invalid exponent: %s" format rhs)
+      nroot(x)
+    }
+    case _ => sys.error("invalid exponent: %s" format rhs)
+  }
+
+  def sqrt: Number = nroot(2)
+
+  protected[math] def nroot(rhs:Int): Number
 }
 
 
 /**
- * Number with an underlying Long representation.
+ * Number representing an integer value.
+ *
+ * This is the most basic of the Number classes, so operations mixing this and
+ * another type will handled by that other type. In general operations on two
+ * IntNumber classes will return an IntNumber, except in cases like division.
  */
 protected[math] case class IntNumber(n:SafeLong) extends Number {
   def abs = IntNumber(n.abs)
@@ -186,6 +204,9 @@ protected[math] case class IntNumber(n:SafeLong) extends Number {
     case FloatNumber(m) if (withinDouble) => Number(fun.pow(doubleValue, m))
     case _ => Number(fun.pow(this.toBigDecimal, rhs.toBigDecimal))
   }
+
+  def nroot(rhs:Int):Number = n.fold(x => Number(Numeric[Long].nroot(x, rhs)),
+                                     x => Number(Numeric[BigInt].nroot(x, rhs)))
 }
 
 protected[math] case class FloatNumber(n:Double) extends Number {
@@ -265,13 +286,13 @@ protected[math] case class FloatNumber(n:Double) extends Number {
 
   def /~(rhs:Number) = rhs match {
     case IntNumber(m) => m.fold(x => Number(floor(n / x)),
-                                 x => Number(BigDecimal(n) quot BigDecimal(x)))
+                                x => Number(BigDecimal(n) quot BigDecimal(x)))
     case FloatNumber(m) => Number(floor(n / m))
     case t => t rhs_/~ this
   }
   def rhs_/~(lhs:Number) = lhs match {
     case IntNumber(m) => m.fold(x => Number(floor(x / n)),
-                                 x => Number(BigDecimal(x) quot n))
+                                x => Number(BigDecimal(x) quot n))
     case FloatNumber(m) => Number(floor(m / n))
     case t => t /~ this
   }
@@ -294,6 +315,8 @@ protected[math] case class FloatNumber(n:Double) extends Number {
     case _ if rhs.withinDouble => Number(fun.pow(n, rhs.doubleValue));
     case _ => Number(fun.pow(BigDecimal(n), rhs.toBigDecimal))
   }
+
+  def nroot(rhs:Int) = Number(Numeric[Double].nroot(n, rhs))
 }
 
 
@@ -309,7 +332,7 @@ protected[math] case class DecimalNumber(n:BigDecimal) extends Number {
   def canBeLong = isWhole && withinLong
 
   def underlying = n
-  def isWhole = n.isWhole
+  def isWhole = n % 1 == 0
   def doubleValue = n.toDouble
   def floatValue = n.toFloat
   def longValue = n.toLong
@@ -404,4 +427,6 @@ protected[math] case class DecimalNumber(n:BigDecimal) extends Number {
   } else {
     Number(fun.pow(n, rhs.toBigDecimal))
   }
+
+  def nroot(rhs:Int) = Number(Numeric[BigDecimal].nroot(n, rhs))
 }
