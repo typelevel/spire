@@ -1,5 +1,7 @@
 package spire.example
 
+import language.implicitConversions
+
 import spire.algebra._
 import spire.math._
 import Implicits._
@@ -121,5 +123,3 @@ object EndoRingExample extends App {
   assert(((double + triple) * triple)(Set(1,2,3)) ==
     (double * triple + triple * triple)(Set(1,2,3)))
 }
-
-
