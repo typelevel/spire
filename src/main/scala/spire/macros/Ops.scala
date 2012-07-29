@@ -19,7 +19,20 @@ object Ops {
    * with the lhs parameter. We find the symbol which is applying the macro
    * and use its name to determine what method to call.
    *
-   * This is used for defining unary operators as macros, for instance: !x, -x.
+   * Users write code like:
+   *
+   *   -x
+   *
+   * After typing and implicit resolution, we get trees like:
+   *   
+   *   ringOps[A](x:A)(ev:R[A]).unary_-()
+   *
+   * and we want to get out:
+   *
+   *   ev.negate(x:A)
+   *
+   * So, we need to decompose ringOps[A](x)(ev) to get x and ev, and we need
+   * to map "unary_-" into "negate".
    */
   def unop[R](c:Context)():c.Expr[R] = {
     import c.universe._
@@ -32,7 +45,20 @@ object Ops {
    * "desired" method with the lhs and rhs parameters. We find the symbol which
    * is applying the macro and use its name to determine what method to call.
    *
-   * This is used for defining binary operators as macros, for instance: x * y.
+   * Users write code like:
+   *
+   *   x + y
+   *
+   * After typing and implicit resolution, we get trees like:
+   *   
+   *   ringOps[A](x:A)(ev:R[A]).+(y:A)
+   *
+   * and we want to get out:
+   *
+   *   ev.method(x:A, y:A)
+   *
+   * So, we need to decompose ringOps[A](x)(ev) to get x and ev, and we need
+   * to map "+" into "plus".
    */
   def binop[A, R](c:Context)(rhs:c.Expr[A]):c.Expr[R] = {
     import c.universe._
