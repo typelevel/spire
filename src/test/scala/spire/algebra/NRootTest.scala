@@ -3,10 +3,12 @@ package spire.algebra
 import spire.math._
 import org.scalatest.FunSuite
 
+import scala.reflect.ClassTag
+
 
 class NRootTest extends FunSuite {
-  def testIntegralNRoot[A: Numeric: Manifest] {
-    val cls = implicitly[Manifest[A]].erasure.getSimpleName
+  def testIntegralNRoot[A: Numeric: ClassTag] {
+    val cls = implicitly[ClassTag[A]].runtimeClass.getSimpleName
     test("Integral NRoot (%s)" format cls) {
       val one = Ring[A].one
       assert(NRoot[A].nroot(Ring[A].one, 2) === Ring[A].one)

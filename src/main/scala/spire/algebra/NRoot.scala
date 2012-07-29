@@ -117,7 +117,7 @@ trait IntIsNRoot extends NRoot[Int] { self: Ring[Int] =>
       val next = prev | add
       val e = self.pow(next, n)
 
-      if (e == x) {
+      if (e == x || add == 0) {
         next
       } else if (e <= 0 || e > x) {
         findnroot(prev, add >> 1)
@@ -176,8 +176,6 @@ object NRoot {
   @inline final def apply[A](implicit ev:NRoot[A]) = ev
 
   implicit object BigIntIsNRoot extends BigIntIsNRoot
-
-  def apply[A](implicit nroot: NRoot[A]): NRoot[A] = nroot
 
   /**
    * This will return the largest integer that meets some criteria. Specifically,
