@@ -18,10 +18,14 @@ object Complex {
   def i[@spec(Float, Double) T](implicit f:Fractional[T], t:Trig[T]) = Complex(f.zero, f.one)
   def one[@spec(Float, Double) T](implicit f:Fractional[T], t:Trig[T]) = Complex(f.one, f.zero)
   def zero[@spec(Float, Double) T](implicit f:Fractional[T], t:Trig[T]) = Complex(f.zero, f.zero)
+
   implicit def intToComplex(n:Int) = new Complex(n.toDouble, 0.0)
   implicit def longToComplex(n:Long) = new Complex(n.toDouble, 0.0)
   implicit def floatToComplex(n:Float) = new Complex(n, 0.0F)
   implicit def doubleToComplex(n:Double) = new Complex(n, 0.0)
+
+  implicit def bigIntToComplex(n:BigInt) = new Complex(BigDecimal(n), BigDecimal(0))
+  implicit def bigDecimalToComplex(n:BigDecimal) = new Complex(n, BigDecimal(0))
 
   def polar[@spec(Float, Double) T](magnitude:T, angle:T)(implicit f:Fractional[T], t:Trig[T]) = {
     val real:T = f.times(magnitude, t.cos(angle))
