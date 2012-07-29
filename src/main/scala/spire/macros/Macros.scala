@@ -123,4 +123,20 @@ object Macros {
 
     c.Expr[BigInt](Apply(bigIntApply(c), List(Literal(Constant(str)))))
   }
+
+
+  def radix(c:Context)(): c.Expr[Int] = {
+    import c.mirror._
+    import c.universe._
+    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
+
+    val name = c.macroApplication.symbol.name.toString
+    val base = name.substring(1).toInt
+    if (base < 2 || 36 < base)
+      throw new NumberFormatException("invalid radix: %s" format base)
+
+    val n = java.lang.Integer.parseInt(s, base)
+
+    c.Expr[Int](Literal(Constant(n)))
+  }
 }

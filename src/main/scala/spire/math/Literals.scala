@@ -18,6 +18,17 @@ object Literals {
   implicit def literals(s:StringContext) = new Literals(s)
 }
 
+class Radix(s:StringContext) {
+  def x2():Int = macro Macros.radix
+  def x8():Int = macro Macros.radix
+  def x10():Int = macro Macros.radix
+  def x16():Int = macro Macros.radix
+}
+
+object Radix {
+  implicit def radix(s:StringContext) = new Radix(s)
+}
+
 class SiLiterals(s:StringContext) {
   def i():Int = macro Macros.siInt
   def j():Long = macro Macros.siLong
