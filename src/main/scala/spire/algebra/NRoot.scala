@@ -117,7 +117,7 @@ trait IntIsNRoot extends NRoot[Int] { self: Ring[Int] =>
       val next = prev | add
       val e = self.pow(next, n)
 
-      if (e == x) {
+      if (e == x || add == 0) {
         next
       } else if (e <= 0 || e > x) {
         findnroot(prev, add >> 1)
@@ -137,7 +137,7 @@ trait LongIsNRoot extends NRoot[Long] { self: Ring[Long] =>
       val next = prev | add
       val e = self.pow(next, n)
 
-      if (e == x) {
+      if (e == x || add == 0) {
         next
       } else if (e <= 0 || e > x) {
         findnroot(prev, add >> 1)
@@ -170,7 +170,6 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
     findNroot(0, a.bitLength - 1)
   }
 }
-
 
 
 object NRoot {
@@ -265,7 +264,9 @@ object NRoot {
     val radixPowK = BigInt(radix) pow k
 
     // Total # of digits to compute.
-    val maxSize = (ctxt.getPrecision + 8) / 9 + 1
+    // Note: I originally had `+ 1` here, but some edge cases were missed, so now
+    // it is `+ 2`.
+    val maxSize = (ctxt.getPrecision + 8) / 9 + 2
 
     def findRoot(digits: Stream[Int], y: BigInt, r: BigInt, i: Int): (Int, BigInt) = {
       val y_ = y * radix
