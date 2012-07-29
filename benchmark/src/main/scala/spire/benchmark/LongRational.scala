@@ -82,7 +82,7 @@ final class LongRational private (val n: Long, val d: Long) {
   def pow(exp: Int): LongRational = if (exp == 0) {
     LongRational.One
   } else if (exp < 0) {
-    new LongRational(d pow exp.abs, n pow exp.abs)
+    new LongRational(d pow java.lang.Math.abs(exp), n pow java.lang.Math.abs(exp))
   } else {
     new LongRational(n pow exp, d pow exp)
   }
@@ -90,9 +90,9 @@ final class LongRational private (val n: Long, val d: Long) {
   def compare(r: LongRational): Int = {
     val dgcd = gcd(d, r.d)
     if (dgcd == 1)
-      (n * r.d - r.n * d).signum
+      java.lang.Math.signum(n * r.d - r.n * d).toInt
     else
-      ((r.d / dgcd) * n - (d / dgcd) * r.n).signum
+      java.lang.Math.signum((r.d / dgcd) * n - (d / dgcd) * r.n).toInt
   }
 
   def signum: Int = if (n < 0) -1 else if (n > 0) 1 else 0

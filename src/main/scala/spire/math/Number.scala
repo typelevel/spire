@@ -191,8 +191,8 @@ protected[math] case class IntNumber(n:SafeLong) extends Number {
 }
 
 protected[math] case class FloatNumber(n:Double) extends Number {
-  def abs = FloatNumber(n.abs)
-  def signum = n.signum
+  def abs = FloatNumber(java.lang.Math.abs(n))
+  def signum = java.lang.Math.signum(n).toInt
 
   def withinInt = Int.MinValue.toDouble <= n && n <= Int.MaxValue.toDouble
   def withinLong = Long.MinValue.toDouble <= n && n <= Long.MaxValue.toDouble

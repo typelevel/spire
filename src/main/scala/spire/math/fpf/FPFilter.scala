@@ -95,6 +95,8 @@ trait ConvertableToFPFilter[A] extends ConvertableTo[FPFilter[A]] {
   def fromBigInt(a: BigInt): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromBigInt(a))
   def fromBigDecimal(a: BigDecimal): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromBigDecimal(a))
   def fromRational(a: Rational): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromRational(a))
+
+  def fromType[B:ConvertableFrom](a: B): FPFilter[A] = sys.error("fixme")
 }
 
 trait ConvertableFromFPFilter[A] extends ConvertableFrom[FPFilter[A]] {
@@ -125,6 +127,8 @@ trait ConvertableFromFPFilter[A] extends ConvertableFrom[FPFilter[A]] {
   } else {
     ev.toRational(a.value)
   }
+
+  def toType[B:ConvertableTo](a: FPFilter[A]) = sys.error("fixme")
 
   def toString(a: FPFilter[A]): String = ev.toString(a.value)
 }

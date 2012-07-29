@@ -658,8 +658,8 @@ object LongRationals extends Rationals[Long] {
 
     // FIXME: SafeLong would ideally support pow
     def pow(exp: Int): Rational = if (exp == 0) Rational.one else {
-      val num = ConvertableFrom[Long].toBigInt(n).pow(exp.abs)
-      val den = ConvertableFrom[Long].toBigInt(d).pow(exp.abs)
+      val num = ConvertableFrom[Long].toBigInt(n).pow(java.lang.Math.abs(exp))
+      val den = ConvertableFrom[Long].toBigInt(d).pow(java.lang.Math.abs(exp))
       if (exp > 0) BigRationals.build(num, den) else BigRationals.build(den, num)
     }
 
@@ -778,7 +778,7 @@ object BigRationals extends Rationals[BigInt] {
     def pow(exp: Int): Rational = if (exp == 0) {
       Rational.one
     } else if (exp < 0) {
-      BigRationals.build(d pow exp.abs, n pow exp.abs)
+      BigRationals.build(d pow java.lang.Math.abs(exp), n pow java.lang.Math.abs(exp))
     } else {
       BigRationals.build(n pow exp, d pow exp)
     }
