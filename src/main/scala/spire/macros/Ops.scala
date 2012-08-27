@@ -4,7 +4,7 @@ import language.implicitConversions
 import language.higherKinds
 import language.experimental.macros
 
-import scala.reflect.makro.Context
+import scala.reflect.macros.Context
 
 import spire.math._
 import spire.algebra._

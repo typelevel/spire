@@ -5,16 +5,17 @@ object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     name := "Spire",
     version := "0.2.0",
-    scalaVersion := "2.10.0-M5",
+    scalaVersion := "2.10.0-M7",
     //scalaHome := Some(file("/home/erik/scala/build/pack")),
 
     libraryDependencies ++= Seq(
       //"org.scalatest" % "scalatest_2.10.0-M4" % "1.9-2.10.0-M4-B2" % "test",
-      "org.scalatest" % "scalatest_2.10.0-M5" % "1.9-2.10.0-M5-B1" % "test",
-      "org.scala-lang" % "scala-reflect" % "2.10.0-M5"
+      "org.scalatest" % "scalatest_2.10.0-M7" % "1.9-2.10.0-M7-B1" % "test",
+      "org.scala-lang" % "scala-reflect" % "2.10.0-M7"
     ),
     
     scalacOptions ++= Seq(
+      "-Yinline-warnings",
       "-deprecation",
       "-unchecked",
       "-optimize",
@@ -27,14 +28,15 @@ object MyBuild extends Build {
 
   val key = AttributeKey[Boolean]("javaOptionsPatched")
 
-  lazy val spire = Project("spire", file("."))
+  lazy val spire = Project("spire", file(".")).dependsOn(deps)
 
-  lazy val examples = Project("examples", file("examples")).
-    dependsOn (spire)
+  lazy val deps = Project("deps", file("deps"))
 
-  lazy val benchmark: Project = Project("benchmark", file("benchmark")).
-    settings (benchmarkSettings: _*).
-    dependsOn (spire)
+  lazy val examples = Project("examples", file("examples")).dependsOn(spire)
+
+  lazy val benchmark:Project = Project("benchmark", file("benchmark")).
+    settings(benchmarkSettings: _*).
+    dependsOn(spire)
 
   def benchmarkSettings = Seq(
     // raise memory limits here if necessary

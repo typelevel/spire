@@ -3,7 +3,6 @@ package spire.math
 import language.experimental.macros
 import language.implicitConversions
 
-import scala.reflect.makro.Context
 import scala.{specialized => spec}
 
 import spire.macros.Macros
