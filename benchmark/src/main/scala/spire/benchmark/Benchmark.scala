@@ -15,6 +15,8 @@ import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
+import java.lang.Math
+
 /**
  * Extend this to create an actual benchmarking class.
  */
@@ -215,28 +217,17 @@ class GcdBenchmarks extends MyBenchmark with BenchmarkData {
   def timeSumBinaryGcds(reps:Int) = run(reps)(sumBinaryGcds(longs))
 
   // TODO: return to tailrec method when SI-5788 is resolved
-  //@tailrec def euclidGcd(a: Long, b: Long): Long = if (b == 0L) {
-  //  scala.math.abs(a)
-  //} else {
-  //  euclidGcd(b, a % b)
-  //}
-
-  def euclidGcd(_a: Long, _b: Long): Long = {
-    var a = _a
-    var b = _b
-    while (true) {
-      if (b == 0L) return scala.math.abs(a)
-      var tmp = a
-      a = b
-      b = tmp % b
-    }
-    a // unused, required by scalac
+  import scala.annotation.tailrec
+  @tailrec final def euclidGcd(a: Long, b: Long): Long = if (b == 0L) {
+    Math.abs(a)
+  } else {
+    euclidGcd(b, a % b)
   }
 
   // iterative version of binary gcd stolen from wikipedia
   def binaryGcd(_a: Long, _b: Long): Long = {
-    var a = scala.math.abs(_a)
-    var b = scala.math.abs(_b)
+    var a = Math.abs(_a)
+    var b = Math.abs(_b)
     var shifts = 0
 
     while (((a | b) & 1) == 0) {

@@ -3,10 +3,12 @@ package spire.algebra
 import annotation.tailrec
 import language.experimental.macros
 import scala.{specialized => spec}
-import scala.math.{abs, ceil, floor, pow => mpow}
+
+import java.lang.Math
 
 import spire.math._
 import spire.macros._
+
 
 /**
  * Ring represents a set (A) that is a group over addition (+) and a monoid
@@ -17,8 +19,6 @@ import spire.macros._
  * should be overridden by more efficient implementations.
  */
 trait Ring[@spec(Int,Long,Float,Double) A] {
-  self =>
-
   def zero:A
   def one:A
   def negate(a:A):A
@@ -38,42 +38,15 @@ trait Ring[@spec(Int,Long,Float,Double) A] {
     if (n < 0) _fromInt(negate(one), -n, zero)
     else _fromInt(one, n, zero)
 
-  // TODO: return to tailrec method when SI-5788 is resolved
-  //@tailrec protected[this] final def _pow(a:A, n:Int, sofar:A):A =
-  //  if (n == 0) sofar
-  //  else if (n % 2 == 1) _pow(times(a, a), n / 2, times(sofar, a))
-  //  else _pow(times(a, a), n / 2, sofar)
-  //
-  //@tailrec private def _fromInt(a:A, n:Int, sofar:A):A =
-  //  if (n == 0) sofar
-  //  else if (n % 2 == 1) _fromInt(plus(a, a), n / 2, plus(sofar, a))
-  //  else _fromInt(plus(a, a), n / 2, sofar)
-
-  protected[this] final def _pow(_a:A, _n:Int, _sofar:A):A = {
-    var a = _a
-    var n = _n
-    var sofar = _sofar
-    while (true) {
-      if (n == 0) return sofar
-      if (n % 2 == 1) sofar = times(sofar, a)
-      n /= 2
-      a = times(a, a)
-    }
-    a // this is just to satisfy scalac
-  }
+  @tailrec private final def _pow(a:A, n:Int, sofar:A):A =
+    if (n == 0) sofar
+    else if (n % 2 == 1) _pow(times(a, a), n / 2, times(sofar, a))
+    else _pow(times(a, a), n / 2, sofar)
   
-  private def _fromInt(_a:A, _n:Int, _sofar:A):A = {
-    var a = _a
-    var n = _n
-    var sofar = _sofar
-    while (true) {
-      if (n == 0) return sofar
-      if (n % 2 == 1) sofar = plus(sofar, a)
-      n /= 2
-      a = plus(a, a)
-    }
-    a // this is just to satisfy scalac
-  }
+  @tailrec private def _fromInt(a:A, n:Int, sofar:A):A =
+    if (n == 0) sofar
+    else if (n % 2 == 1) _fromInt(plus(a, a), n / 2, plus(sofar, a))
+    else _fromInt(plus(a, a), n / 2, sofar)
 }
 
 final class RingOps[A](lhs:A)(implicit ev:Ring[A]) {
@@ -108,7 +81,7 @@ trait ByteIsRing extends Ring[Byte] {
   def negate(a:Byte): Byte = (-a).toByte
   def one: Byte = 1.toByte
   def plus(a:Byte, b:Byte): Byte = (a + b).toByte
-  override def pow(a: Byte, b:Int): Byte = mpow(a, b).toByte
+  override def pow(a: Byte, b:Int): Byte = Math.pow(a, b).toByte
   override def times(a:Byte, b:Byte): Byte = (a * b).toByte
   def zero: Byte = 0.toByte
   
@@ -120,7 +93,7 @@ trait ShortIsRing extends Ring[Short] {
   def negate(a:Short): Short = (-a).toShort
   def one: Short = 1.toShort
   def plus(a:Short, b:Short): Short = (a + b).toShort
-  override def pow(a: Short, b:Int): Short = mpow(a, b).toShort
+  override def pow(a: Short, b:Int): Short = Math.pow(a, b).toShort
   override def times(a:Short, b:Short): Short = (a * b).toShort
   def zero: Short = 0.toShort
   
@@ -132,7 +105,7 @@ trait IntIsRing extends Ring[Int] {
   def negate(a:Int): Int = -a
   def one: Int = 1
   def plus(a:Int, b:Int): Int = a + b
-  override def pow(a:Int, b:Int): Int = mpow(a, b).toInt
+  override def pow(a:Int, b:Int): Int = Math.pow(a, b).toInt
   override def times(a:Int, b:Int): Int = a * b
   def zero: Int = 0
 
@@ -169,7 +142,7 @@ trait FloatIsRing extends Ring[Float] {
   def negate(a:Float): Float = -a
   def one: Float = 1.0F
   def plus(a:Float, b:Float): Float = a + b
-  override def pow(a:Float, b:Int): Float = mpow(a, b).toFloat
+  override def pow(a:Float, b:Int): Float = Math.pow(a, b).toFloat
   override def times(a:Float, b:Float): Float = a * b
   def zero: Float = 0.0F
   
@@ -181,7 +154,7 @@ trait DoubleIsRing extends Ring[Double] {
   def negate(a:Double): Double = -a
   def one: Double = 1.0
   def plus(a:Double, b:Double): Double = a + b
-  override def pow(a:Double, b:Int): Double = mpow(a, b)
+  override def pow(a:Double, b:Int): Double = Math.pow(a, b)
   override def times(a:Double, b:Double): Double = a * b
   def zero: Double = 0.0
 

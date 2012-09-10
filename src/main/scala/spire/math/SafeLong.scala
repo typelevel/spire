@@ -42,24 +42,10 @@ sealed trait SafeLong extends Ordered[SafeLong] {
     _pow(SafeLong.one, this, rhs)
   }
 
-  // TODO: return to tailrec method when SI-5788 is resolved
-  //// tail-recursive helper method for pow(Long, Long)
-  //@tailrec private final def _pow(total:SafeLong, base:SafeLong, exp:Int): SafeLong = {
-  //  if (exp == 0) return total
-  //  _pow(if (exp % 2 == 1) total * base else total, base * base, exp / 2)
-  //}
-
-  private final def _pow(_total:SafeLong, _base:SafeLong, _exp:Int): SafeLong = {
-    var total = _total
-    var base = _base
-    var exp = _exp
-    while (true) {
-      if (exp == 0) return total
-      total = if (exp % 2 == 1) total * base else total
-      base *= base
-      exp /= 2
-    }
-    total // unused, required by scalac
+  @tailrec private final def _pow(total:SafeLong, base:SafeLong, exp:Int): SafeLong = {
+    if (exp == 0) return total
+    else if ((exp & 1) == 1) _pow(total * base, base * base, exp >> 1)
+    else _pow(total, base * base, exp >> 1)
   }
 
   def abs = if (this.compare(SafeLong.zero) < 0) -this else this

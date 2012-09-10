@@ -27,29 +27,11 @@ object fun {
     else _log(n, BigDecimal(0))
   }
 
-  // TODO: return to tailrec method when SI-5788 is resolved
-  //// Since log(n * x) = log(n) + log(x), we can use scala.math.log to
-  //// approximate log for BigDecimal.
-  //@tailrec private final def log(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
-  //  if (n < 0) {
-  //    log(-n, -sofar)
-  //  } else if (n <= maxDouble) {
-  //    BigDecimal(scala.math.log(n.toDouble)) + sofar
-  //  } else {
-  //    log(n / maxDouble, logMaxDouble + sofar)
-  //  }
-  //}
-
-  private final def _log(_n:BigDecimal, _sofar:BigDecimal): BigDecimal = {
-    if (_n < 0) return _log(-_n, -_sofar)
-    var n = _n
-    var sofar = _sofar
-    while (true) {
-      if (n <= maxDouble) return BigDecimal(Math.log(n.toDouble)) + sofar
-      n /= maxDouble
-      sofar += logMaxDouble
-    }
-    sofar // unused, required by scalac
+  // Since log(n * x) = log(n) + log(x), we can use scala.math.log to
+  // approximate log for BigDecimal.
+  @tailrec private final def _log(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
+    if (n <= maxDouble) BigDecimal(Math.log(n.toDouble)) + sofar
+    else _log(n / maxDouble, logMaxDouble + sofar)
   }
 
   /**
@@ -59,28 +41,11 @@ object fun {
 
   final def exp(n:BigDecimal):BigDecimal = _exp(n, BigDecimal(1))
 
-  // TODO: return to tailrec method when SI-5788 is resolved
-  //// Since exp(a + b) = exp(a) * exp(b), we can use scala.math.log to
-  //// approximate exp for BigDecimal.
-  //@tailrec private final def exp(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
-  //  if (n <= logMaxDouble) {
-  //    BigDecimal(scala.math.exp(n.toDouble)) * sofar
-  //  } else {
-  //    exp(n - logMaxDouble, maxDouble * sofar)
-  //  }
-  //}
-
   // Since exp(a + b) = exp(a) * exp(b), we can use scala.math.log to
   // approximate exp for BigDecimal.
-  private final def _exp(_n:BigDecimal, _sofar:BigDecimal): BigDecimal = {
-    var n = _n
-    var sofar = _sofar
-    while (true) {
-      if (n <= logMaxDouble) return BigDecimal(Math.exp(n.toDouble)) * sofar
-      n -= logMaxDouble
-      sofar *= maxDouble
-    }
-    n // unused, required by scalac
+  @tailrec private final def _exp(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
+    if (n <= logMaxDouble) BigDecimal(Math.exp(n.toDouble)) * sofar
+    else _exp(n - logMaxDouble, maxDouble * sofar)
   }
 
   /**
@@ -111,13 +76,6 @@ object fun {
     _pow(1L, base, ex)
   }
 
-  // TODO: return to tailrec method when SI-5788 is resolved
-  //// tail-recursive helper method for pow(Long, Long)
-  //@tailrec private final def _pow(t:Long, b:Long, e:Int): Long = {
-  //  if (e == 0) return t
-  //  _pow(if ((e & 1) == 1) t * b else t, b * b, e / 2)
-  //}
-
   private final def _pow(_t:Long, _b:Long, _e:Long): Long = {
     var t = _t
     var b = _b
@@ -133,22 +91,6 @@ object fun {
 
   final def pow(base:Double, exponent:Double) = Math.pow(base, exponent)
 
-  // TODO: return to tailrec method when SI-5788 is resolved
-  //@tailrec def gcd(a: Long, b: Long): Long = if (b == 0L) {
-  //  scala.math.abs(a)
-  //} else {
-  //  gcd(b, a % b)
-  //}
-
-  def gcd(_a: Long, _b: Long): Long = {
-    var a = _a
-    var b = _b
-    while (true) {
-      if (b == 0L) return Math.abs(a)
-      var tmp = a
-      a = b
-      b = tmp % b
-    }
-    a // unused, required by scalac
-  }
+  @tailrec final def gcd(a: Long, b: Long): Long =
+    if (b == 0L) Math.abs(a) else gcd(b, a % b)
 }

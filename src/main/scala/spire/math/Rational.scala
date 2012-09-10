@@ -1,19 +1,18 @@
 package spire.math
 
-import spire.algebra.{ Sign, Positive, Negative, Zero }
 import scala.annotation.tailrec
-import scala.math.{ScalaNumber, ScalaNumericConversions, abs, min}
-import Implicits._
+import scala.math.{ScalaNumber, ScalaNumericConversions}
+import language.implicitConversions
 
 import java.lang.Math
 
-import language.implicitConversions
+import spire.algebra.{Sign, Positive, Negative, Zero}
+import Implicits._
 
 trait Fraction[@specialized(Long) A] {
   def num: A
   def den: A
 }
-
 
 sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] {
   import LongRationals.LongRational
@@ -236,48 +235,19 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     //       between (1/2)*2^(k-1) and (1/2)*2^k to find the new lower bound.
     //       This would reduce the number of steps to O(log n).
 
-    // TODO: return to tailrec method when SI-5788 is resolved
-    //@tailrec
-    //def closest(l: Rational, u: Rational): Rational = {
-    //  val mediant = Rational(l.numerator + u.numerator, l.denominator + u.denominator)
-    //
-    //  if (mediant.denominator > limit) {
-    //    if ((this - l).abs > (u - this).abs) {
-    //      u
-    //    } else {
-    //      l
-    //    }
-    //  } else if (mediant == this) {
-    //    mediant
-    //  } else if (mediant < this) {
-    //    closest(mediant, u)
-    //  } else {
-    //    closest(l, mediant)
-    //  }
-    //}
-
-    // TODO: remove this when @tailrec is fixed
-    def closest(_l: Rational, _u: Rational): Rational = {
-      var l = _l
-      var u = _u
-
-      while (true) {
-        val mediant = Rational(l.numerator + u.numerator, l.denominator + u.denominator)
-        if (mediant.denominator > limit) {
-          if ((this - l).abs > (u - this).abs) {
-            return u
-          } else {
-            return l
-          }
-        } else if (mediant == this) {
-          return mediant
-        } else if (mediant < this) {
-          l = mediant
-        } else {
-          u = mediant
-        }
+    @tailrec
+    def closest(l: Rational, u: Rational): Rational = {
+      val mediant = Rational(l.numerator + u.numerator, l.denominator + u.denominator)
+    
+      if (mediant.denominator > limit) {
+        if ((this - l).abs > (u - this).abs) u else l
+      } else if (mediant == this) {
+        mediant
+      } else if (mediant < this) {
+        closest(mediant, u)
+      } else {
+        closest(l, mediant)
       }
-      l // this is just to satisfy scalac
     }
 
     this.sign match {
@@ -456,7 +426,7 @@ protected abstract class Rationals[@specialized(Long) A](implicit integral: Inte
       val n = integral.toBigInt(num)
       val d = integral.toBigInt(den)
 
-      val sharedLength = scala.math.min(n.bitLength, d.bitLength)
+      val sharedLength = Math.min(n.bitLength, d.bitLength)
       val dLowerLength = d.bitLength - sharedLength
 
       val nShared = n >> (n.bitLength - sharedLength)
