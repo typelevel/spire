@@ -6,7 +6,7 @@ package spire.math
 
 import org.scalatest.FunSuite
 import spire.math._
-//import spire.math.Implicits.{eqOps => _, _}
+import spire.math.Implicits.{eqOps => _, _}
 import spire.math.Literals._
 
 class LiteralsTest extends FunSuite {
@@ -30,7 +30,6 @@ class LiteralsTest extends FunSuite {
       throw new ArithmeticException("illegal short constant: %s" format s)
     } else if (i > 32767) {
       (i - 32768).toShort
-
 */
 
   test("short literals") {
@@ -41,5 +40,27 @@ class LiteralsTest extends FunSuite {
     assert(h"32767" === (32767:Short))
     assert(h"32768" === (-32768:Short))
     assert(h"65535" === (-1:Short))
+  }
+
+  test("int operators") {
+    assert(5 ** 2 === 25)
+    assert(5 /~ 2 === 2)
+    assert(5 /% 2 === (2, 1))
+    assert(25.sqrt === 5)
+  }
+
+  test("inter-type operators") {
+    val c = Complex(2.0, 3.0)
+    val q = Rational(4, 5)
+    val r = Real(3.0)
+
+    assert(c + 1 === Complex(3.0, 3.0))
+    assert(1 + c === Complex(3.0, 3.0))
+
+    assert(q + 1 === Rational(9, 5))
+    assert(1 + q === Rational(9, 5))
+
+    assert(r + 1 === Real(4.0))
+    assert(1 + r === Real(4.0))
   }
 }

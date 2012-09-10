@@ -5,6 +5,8 @@ import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions, abs, min}
 import Implicits._
 
+import java.lang.Math
+
 import language.implicitConversions
 
 trait Fraction[@specialized(Long) A] {
@@ -42,6 +44,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def pow(exp: Int): Rational
 
+  def log(): Rational
 
   /**
    * Returns this `Rational` to the exponent `exp`. Both the numerator and
@@ -522,7 +525,6 @@ object LongRationals extends Rationals[Long] {
     }
   }
 
-
   case class LongRational private[math] (n: Long, d: Long) extends RationalLike {
     def num: Long = n
     def den: Long = d
@@ -658,10 +660,12 @@ object LongRationals extends Rationals[Long] {
 
     // FIXME: SafeLong would ideally support pow
     def pow(exp: Int): Rational = if (exp == 0) Rational.one else {
-      val num = ConvertableFrom[Long].toBigInt(n).pow(java.lang.Math.abs(exp))
-      val den = ConvertableFrom[Long].toBigInt(d).pow(java.lang.Math.abs(exp))
+      val num = ConvertableFrom[Long].toBigInt(n).pow(Math.abs(exp))
+      val den = ConvertableFrom[Long].toBigInt(d).pow(Math.abs(exp))
       if (exp > 0) BigRationals.build(num, den) else BigRationals.build(den, num)
     }
+
+    def log() = Rational(Math.log(n) - Math.log(d))
 
     def compare(r: Rational): Int = r match {
       case r: LongRational => {
@@ -778,10 +782,12 @@ object BigRationals extends Rationals[BigInt] {
     def pow(exp: Int): Rational = if (exp == 0) {
       Rational.one
     } else if (exp < 0) {
-      BigRationals.build(d pow java.lang.Math.abs(exp), n pow java.lang.Math.abs(exp))
+      BigRationals.build(d pow Math.abs(exp), n pow Math.abs(exp))
     } else {
       BigRationals.build(n pow exp, d pow exp)
     }
+
+    def log() = Rational(fun.log(BigDecimal(n)) - fun.log(BigDecimal(d)))
 
     def compare(r: Rational): Int = r match {
       case r: LongRational => {

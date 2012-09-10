@@ -47,24 +47,19 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def floatValue = f.toFloat(real)
   def longValue = f.toLong(real)
   def intValue = f.toInt(real)
-  def isWhole = (f.eqv(f.fromInt(f.toInt(real)), real)) && (f.eqv(imag, f.zero))
+  def isWhole = f.isWhole(real) && f.eqv(imag, f.zero)
   def signum: Int = f.compare(real, f.zero)
   def underlying = (real, imag)
-  def complexSignum = if (f.eqv(abs, f.zero)) {
-    Complex.zero
-  } else {
-    this / Complex(abs, f.zero)
-  }
+  def complexSignum = if (f.eqv(abs, f.zero)) Complex.zero else this / Complex(abs, f.zero)
 
   override def hashCode: Int = {
-    if (isReal && f.isWhole(real) &&
+    if (f.isWhole(real) && f.eqv(imag, f.zero) &&
         f.lteqv(real, f.fromInt(Int.MaxValue)) &&
-        f.gteqv(real, f.fromInt(Int.MinValue))) f.toInt(real).##
+        f.gteqv(real, f.fromInt(Int.MinValue))) f.toInt(real)
     else 19 * real.## + 41 * imag.##
   }
 
-  //override def hashCode: Int = 19 * real.## + 41 * imag.##
-
+  // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
     case that:Complex[_] => real == that.real && imag == that.imag
     case that => unifiedPrimitiveEquals(that)
@@ -134,7 +129,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     (q, this - (b * q))
   }
 
-  def **(b:Complex[T]) = pow(b)
+  final def **(b:Complex[T]) = pow(b)
   def pow(b:Complex[T]) = if (b.eqv(Complex.zero[T])) {
     Complex.one[T]
 
@@ -144,20 +139,26 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     Complex.zero[T]
 
   } else if (f.neqv(b.imag, f.zero)) {
-    // TODO: is adding frac**frac reasonable? if not, we won't be able to do
-    // this without something hacky like the below.
-    // TODO: we also need log and exp on Field, Fractional, or Trig.
-    val len = f.fromDouble(
-      math.pow(f.toDouble(abs), f.toDouble(b.real)) / exp(f.toDouble(f.times(arg, b.imag)))
-    )
-    val phase = f.fromDouble(f.toDouble(arg) * f.toDouble(b.real) +
-                             log(f.toDouble(abs)) * f.toDouble(b.imag))
+    val a = f.fpow(abs, b.real)
+    val bb = f.times(arg, b.imag)
+    val c = t.exp(bb)
+    val len = f.div(a, c)
+
+    val d = f.times(arg, b.real)
+    val e = f.log(abs)
+    val ff = f.times(e, b.imag)
+    val phase = f.plus(d, ff)
+
     Complex.polar(len, phase)
 
   } else {
-    val len = f.fromDouble(math.pow(f.toDouble(abs), f.toDouble(b.real)))
-    val phase = f.times(arg, b.real)
-    Complex.polar(len, phase)
+    Complex.polar(f.fpow(abs, b.real), f.times(arg, b.real))
+  }
+
+  // we are going with the "principal value" definition of Log.
+  def log:Complex[T] = {
+    if (this == Complex.zero[T]) sys.error("log undefined at 0")
+    Complex(f.log(abs), arg)
   }
 }
 

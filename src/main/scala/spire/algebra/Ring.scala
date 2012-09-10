@@ -100,7 +100,7 @@ object Ring {
   implicit def complexIsRing[A:Fractional:Trig] = new ComplexIsRingCls
   implicit object RealIsRing extends RealIsRing
 
-  def apply[A](implicit r:Ring[A]):Ring[A] = r
+  @inline final def apply[A](implicit r:Ring[A]):Ring[A] = r
 }
 
 trait ByteIsRing extends Ring[Byte] {

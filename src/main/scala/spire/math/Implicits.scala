@@ -22,6 +22,39 @@ final class ComplexDoubleOps(lhs:Double) {
 }
 
 final class LiteralIntOps(lhs:Int) {
+  @inline private final def q = Rational(lhs, 1)
+
+  def +(rhs:Rational) = q + rhs
+  def -(rhs:Rational) = q - rhs
+  def *(rhs:Rational) = q * rhs
+  def /(rhs:Rational) = q / rhs
+
+  def /~(rhs:Rational) = q.quot(rhs)
+  def %(rhs:Rational) = q % rhs
+  def /%(rhs:Rational) = (q.quot(rhs), q % rhs)
+
+  def **(rhs:Rational)(implicit ev:ApproximationContext[Rational]) = q.pow(rhs)
+
+  def <(rhs:Rational) = q.compare(rhs) < 0
+  def <=(rhs:Rational) = q.compare(rhs) <= 0
+  def >(rhs:Rational) = q.compare(rhs) > 0
+  def >=(rhs:Rational) = q.compare(rhs) >= 0
+
+  private def c[A](implicit f:Fractional[A], t:Trig[A]) = Complex(f.fromInt(lhs), f.zero)
+
+  def +[A:Fractional:Trig](rhs:Complex[A]) = c[A] + rhs
+  def -[A:Fractional:Trig](rhs:Complex[A]) = c[A] - rhs
+  def *[A:Fractional:Trig](rhs:Complex[A]) = c[A] * rhs
+  def /[A:Fractional:Trig](rhs:Complex[A]) = c[A] / rhs
+
+  def /~[A:Fractional:Trig](rhs:Complex[A]) = c[A] /~ rhs
+  def %[A:Fractional:Trig](rhs:Complex[A]) = c[A] % rhs
+  def /%[A:Fractional:Trig](rhs:Complex[A]) = c[A] /% rhs
+
+  def **[A:Fractional:Trig](rhs:Complex[A]) = c[A] ** rhs
+
+  def +(rhs:Real) = Real(lhs) + rhs
+
   def /~(rhs:Int) = EuclideanRing[Int].quot(lhs, rhs)
   def /%(rhs:Int) = EuclideanRing[Int].quotmod(lhs, rhs)
   def pow(rhs:Int) = Ring[Int].pow(lhs, rhs)

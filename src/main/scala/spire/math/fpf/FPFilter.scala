@@ -210,6 +210,8 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
 
   def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
   override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
+  def fpow(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] = sys.error("fixme")
+  def log(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
 }
 
 trait FPFilterIsFractional[A] extends Fractional[FPFilter[A]]
@@ -220,6 +222,8 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   
   def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
   override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
+  def fpow(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] = sys.error("fixme")
+  def log(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
 }
 
 

@@ -6,6 +6,7 @@ import spire.macros._
 import language.experimental.macros
 import scala.{specialized => spec, math => mth}
 import java.math.MathContext
+import java.lang.Math
 
 /**
  * This is a type class for types with n-roots. The value returned by `nroot`
@@ -21,6 +22,8 @@ import java.math.MathContext
 trait NRoot[@spec(Double,Float,Int,Long) A] {
   def nroot(a: A, n: Int): A
   def sqrt(a: A): A = nroot(a, 2)
+  def log(a:A):A
+  def fpow(a:A, b:A): A
 }
 
 /**
@@ -28,69 +31,81 @@ trait NRoot[@spec(Double,Float,Int,Long) A] {
  * requirement is only a `EuclideanRing`, we can provide instances for `Int`,
  * `Long`, and `BigInt`.
  */
-trait EuclideanRingWithNRoot[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] with NRoot[A]
+trait EuclideanRingWithNRoot[@spec(Int,Long,Float,Double) A]
+extends EuclideanRing[A] with NRoot[A]
 
 
 /**
  * A type class for `Field`s with `NRoot`s. These will be `Field`s that have an
  * additional `nroot` and `sqrt` function.
  */
-trait FieldWithNRoot[@spec(Int,Long,Float,Double) A] extends EuclideanRingWithNRoot[A] with Field[A]
+trait FieldWithNRoot[@spec(Int,Long,Float,Double) A]
+extends EuclideanRingWithNRoot[A] with Field[A]
 
 
 object EuclideanRingWithNRoot {
-  implicit object IntIsEuclideanRingWithNRoot extends EuclideanRingWithNRoot[Int]
-                                              with IntIsNRoot with IntIsEuclideanRing
-  implicit object LongIsEuclideanRingWithNRoot extends EuclideanRingWithNRoot[Long]
-                                               with LongIsNRoot with LongIsEuclideanRing
-  implicit object BigIntIsEuclideanRingWithNRoot extends EuclideanRingWithNRoot[BigInt]
-                                                 with BigIntIsNRoot
-                                                 with BigIntIsEuclideanRing
+  implicit object IntIsEuclideanRingWithNRoot
+  extends EuclideanRingWithNRoot[Int] with IntIsNRoot with IntIsEuclideanRing
 
-  implicit def FieldWithNRootIsEuclideanRingWithNRoot[@spec A]
-  (implicit e: FieldWithNRoot[A]): EuclideanRingWithNRoot[A] = e
+  implicit object LongIsEuclideanRingWithNRoot
+  extends EuclideanRingWithNRoot[Long] with LongIsNRoot with LongIsEuclideanRing
 
-  def apply[@spec(Int,Long,Float,Double) A](implicit e: EuclideanRingWithNRoot[A]): EuclideanRingWithNRoot[A] = e
+  implicit object BigIntIsEuclideanRingWithNRoot
+  extends EuclideanRingWithNRoot[BigInt] with BigIntIsNRoot with BigIntIsEuclideanRing
+
+  implicit def fieldWithNRootIsEuclideanRingWithNRoot[@spec(Int,Long,Float,Double) A]
+  (implicit ev: FieldWithNRoot[A]): EuclideanRingWithNRoot[A] = ev
+
+  def apply[A](implicit ev:EuclideanRingWithNRoot[A]) = ev
 }
 
 
 object FieldWithNRoot {
-  implicit object DoubleIsFieldWithNRoot extends FieldWithNRoot[Double]
-                                         with DoubleIsNRoot with DoubleIsField
-  implicit object FloatIsFieldWithNRoot extends FieldWithNRoot[Float]
-                                        with FloatIsNRoot with FloatIsField
-  implicit object RealIsFieldWithNRoot extends FieldWithNRoot[Real]
-                                       with RealIsNRoot with RealIsField
-  implicit object BigDecimalIsFieldWithNRoot extends FieldWithNRoot[BigDecimal]
-                                  with BigDecimalIsNRoot with BigDecimalIsField
+  implicit object DoubleIsFieldWithNRoot
+  extends FieldWithNRoot[Double] with DoubleIsNRoot with DoubleIsField
+
+  implicit object FloatIsFieldWithNRoot
+  extends FieldWithNRoot[Float] with FloatIsNRoot with FloatIsField
+
+  implicit object RealIsFieldWithNRoot
+  extends FieldWithNRoot[Real] with RealIsNRoot with RealIsField
+
+  implicit object BigDecimalIsFieldWithNRoot
+  extends FieldWithNRoot[BigDecimal] with BigDecimalIsNRoot with BigDecimalIsField
 
   implicit def rationalIsFieldWithNRoot(implicit c: ApproximationContext[Rational]): FieldWithNRoot[Rational] =
     RationalIsFieldWithNRoot(c)
 
-  def apply[@spec(Int,Long,Float,Double) A](implicit e: FieldWithNRoot[A]): FieldWithNRoot[A] = e
+  def apply[A](implicit ev:FieldWithNRoot[A]) = ev
 }
-
 
 final class NRootOps[A](lhs: A)(implicit n: NRoot[A]) {
   def nroot(rhs: Int): A = macro Ops.binop[Int, A]
   def sqrt(): A = macro Ops.unop[A]
+  def log(): A = macro Ops.unop[A]
+  def fpow(rhs: A): A = macro Ops.binop[A, A]
 }
 
-
 trait DoubleIsNRoot extends NRoot[Double] {
-  def nroot(a: Double, k: Int): Double = mth.pow(a, 1 / k.toDouble)
-  override def sqrt(a: Double): Double = mth.sqrt(a)
+  def nroot(a: Double, k: Int): Double = Math.pow(a, 1 / k.toDouble)
+  override def sqrt(a: Double): Double = Math.sqrt(a)
+  def log(a: Double) = Math.log(a)
+  def fpow(a: Double, b: Double) = Math.pow(a, b)
 }
 
 trait FloatIsNRoot extends NRoot[Float] {
-  def nroot(a: Float, k: Int): Float = mth.pow(a, 1 / k.toDouble).toFloat
-  override def sqrt(a: Float): Float = mth.sqrt(a).toFloat
+  def nroot(a: Float, k: Int): Float = Math.pow(a, 1 / k.toDouble).toFloat
+  override def sqrt(a: Float): Float = Math.sqrt(a).toFloat
+  def log(a: Float) = Math.log(a).toFloat
+  def fpow(a: Float, b: Float) = Math.pow(a, b).toFloat
 }
 
 
 trait RationalIsNRoot extends NRoot[Rational] {
   implicit def context: ApproximationContext[Rational]
-  def nroot(a: Rational, k: Int): Rational = a nroot k
+  def nroot(a: Rational, k: Int): Rational = a.nroot(k)
+  def log(a: Rational): Rational = a.log
+  def fpow(a: Rational, b: Rational): Rational = a.pow(b)
 }
 
 case class RationalIsFieldWithNRoot(context: ApproximationContext[Rational])
@@ -99,23 +114,28 @@ extends FieldWithNRoot[Rational] with RationalIsNRoot with RationalIsField
 
 trait RealIsNRoot extends NRoot[Real] {
   def nroot(a: Real, k: Int): Real = a nroot k
+  def log(a:Real) = sys.error("fixme")
+  def fpow(a:Real, b:Real) = sys.error("fixme")
 }
 
 
 trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
-  def nroot(a: BigDecimal, k: Int): BigDecimal = if (a.mc.getPrecision <= 0) {
-    throw new ArithmeticException("Cannot find the nroot of a BigDecimal with unlimited precision.")
-  } else {
+  def nroot(a: BigDecimal, k: Int): BigDecimal = {
+    if (a.mc.getPrecision <= 0)
+      throw new ArithmeticException("Cannot find the nroot of a BigDecimal with unlimited precision.")
     NRoot.nroot(a, k, a.mc)
   }
+  def log(a:BigDecimal) = fun.log(a)
+  def fpow(a:BigDecimal, b:BigDecimal) = fun.pow(a, b)
 }
 
 
-trait IntIsNRoot extends NRoot[Int] { self: Ring[Int] =>
+trait IntIsNRoot extends NRoot[Int] {
+  //self: Ring[Int] =>
   def nroot(x: Int, n: Int): Int = {
     def findnroot(prev: Int, add: Int): Int = {
       val next = prev | add
-      val e = self.pow(next, n)
+      val e = Math.pow(next, n)
 
       if (e == x || add == 0) {
         next
@@ -129,13 +149,16 @@ trait IntIsNRoot extends NRoot[Int] { self: Ring[Int] =>
     findnroot(0, 1 << ((33 - n) / n))
   }
 
+  def log(a:Int) = Math.log(a.toDouble).toInt
+  def fpow(a:Int, b:Int) = Math.pow(a, b).toInt
 }
 
-trait LongIsNRoot extends NRoot[Long] { self: Ring[Long] =>
+trait LongIsNRoot extends NRoot[Long] {
+  //self: Ring[Long] =>
   def nroot(x: Long, n: Int): Long = {
     def findnroot(prev: Long, add: Long): Long = {
       val next = prev | add
-      val e = self.pow(next, n)
+      val e = Math.pow(next, n)
 
       if (e == x || add == 0) {
         next
@@ -148,6 +171,8 @@ trait LongIsNRoot extends NRoot[Long] { self: Ring[Long] =>
 
     findnroot(0, 1L << ((65 - n) / n))
   }
+  def log(a:Long) = Math.log(a.toDouble).toLong
+  def fpow(a:Long, b:Long) = fun.pow(a, b) // xyz
 }
 
 trait BigIntIsNRoot extends NRoot[BigInt] {
@@ -169,6 +194,8 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
 
     findNroot(0, a.bitLength - 1)
   }
+  def log(a:BigInt) = fun.log(BigDecimal(a)).toBigInt
+  def fpow(a:BigInt, b:BigInt) = fun.pow(BigDecimal(a), BigDecimal(b)).toBigInt
 }
 
 
