@@ -3,11 +3,50 @@ import sbt.Keys._
 
 object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
-    name := "Spire",
-    version := "0.2.0",
+    name := "spire",
+    organization := "org.spire-math",
+    version := "0.2.0-M1",
     scalaVersion := "2.9.2",
+
+    licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
+    homepage := Some(url("http://spire-math.org")),
+
+    libraryDependencies += "org.scalatest" %% "scalatest" % "1.7.2" % "test",
+
     scalacOptions ++= Seq("-deprecation", "-unchecked", "-optimize"),
-    libraryDependencies += "org.scalatest" %% "scalatest" % "1.7.2" % "test"
+
+    publishMavenStyle := true,
+    publishArtifact in Test := false,
+    pomIncludeRepository := { _ => false },
+
+    publishTo <<= version {
+      (v: String) =>
+      val nexus = "https://oss.sonatype.org/"
+      if (v.trim.endsWith("SNAPSHOT")) 
+        Some("snapshots" at nexus + "content/repositories/snapshots") 
+      else
+        Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+    },
+
+    pomExtra := (
+<scm>
+  <url>git@github.com:non/spire.git</url>
+  <connection>scm:git:git@github.com:non/spire.git</connection>
+</scm>
+<developers>
+  <developer>
+    <id>d_m</id>
+    <name>Erik Osheim</name>
+    <url>http://github.com/non/</url>
+  </developer>
+  <developer>
+    <id>tixxit</id>
+    <name>Tom Switzer</name>
+    <url>http://github.com/tixxit/</url>
+  </developer>
+</developers>
+
+    )
   )
 
   val key = AttributeKey[Boolean]("javaOptionsPatched")
