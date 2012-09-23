@@ -61,10 +61,6 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
   def timeScaleGeneric(reps:Int) = run(reps)(doScaleGeneric(as, 9, 4, cs))
   def timeScaleSpire(reps:Int) = run(reps)(doScaleSpire(as, 9, 4, cs))
 
-  def timeScaleDirect(reps:Int) = run(reps)(doScaleDirect(as, 9, 4, cs))
-  def timeScaleGeneric(reps:Int) = run(reps)(doScaleGeneric(as, 9, 4, cs))
-  def timeScaleSpire(reps:Int) = run(reps)(doScaleSpire(as, 9, 4, cs))
-
   /**
    * Pairwise addition between arrays
    */
