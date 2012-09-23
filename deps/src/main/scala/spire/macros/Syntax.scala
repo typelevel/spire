@@ -7,18 +7,20 @@ import language.experimental.macros
 import scala.reflect.macros.Context
 
 object Syntax {
-  def cfor[A]
-    (init:A)
+
+  def cfor[A](init:A)
     (test:A => Boolean, next:A => A)
     (body:A => Unit): Unit = macro cforMacro[A]
 
-  def cforMacro[A:c.AbsTypeTag]
-     (c:Context)
-     (init:c.Expr[A])
+  def cforMacro[A:c.AbsTypeTag](c:Context)(init:c.Expr[A])
      (test:c.Expr[A => Boolean], next:c.Expr[A => A])
      (body:c.Expr[A => Unit]): c.Expr[Unit] = {
     import c.universe._
 
+    //val iName = c.fresh("i$")
+    //val cforName = c.fresh("cfor$")
+    // TODO: use a fresh name instead of "elem_priv"
+    // but to do that, we probably have to build the tree by hand
     val t = c.universe.reify {
       var elem_priv:A = init.splice
       while(test.splice(elem_priv)) {
@@ -28,10 +30,7 @@ object Syntax {
     }
 
     new Util[c.type](c).inlineAndReset(t)
-    //c.inlineAndReset(t)
   }
-
-  //implicit def Util(context:Context) = new Util[context.type](context)
 
   class Util[C <: Context with Singleton](val c:C) {
     import c.universe._
@@ -52,20 +51,17 @@ object Syntax {
       }
 
       object InlineApply extends Transformer {
-        override def transform(tree: Tree): Tree = {
-          tree match {
-            case Apply(Select(Function(params, body), ApplyName), args) => {
-              if (params.length != args.length)
-                die("bad arity: %s vs %s" format (params.length, args.length))
+        override def transform(tree: Tree): Tree = tree match {
+          case Apply(Select(Function(params, body), ApplyName), args) =>
+            if (params.length != args.length)
+              die("bad arity: %s vs %s" format (params.length, args.length))
 
-              params.zip(args).foldLeft(body) {
-                case (body, (ValDef(_, name, _, _), arg)) =>
-                  new InlineTerm(name, arg).transform(body)
-              }
+            params.zip(args).foldLeft(body) {
+              case (body, (ValDef(_, name, _, _), arg)) =>
+                new InlineTerm(name, arg).transform(body)
             }
 
-            case _ => super.transform(tree)
-          }
+          case _ => super.transform(tree)
         }
       }
 

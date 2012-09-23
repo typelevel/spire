@@ -2,6 +2,7 @@ import sbt._
 import sbt.Keys._
 
 object MyBuild extends Build {
+
   override lazy val settings = super.settings ++ Seq(
     name := "spire",
     organization := "org.spire-math",
@@ -16,7 +17,7 @@ object MyBuild extends Build {
       "org.scalatest" % "scalatest_2.10.0-M7" % "1.9-2.10.0-M7-B1" % "test",
       "org.scala-lang" % "scala-reflect" % "2.10.0-M7"
     ),
-    
+
     scalacOptions ++= Seq(
       "-Yinline-warnings",
       "-deprecation",
@@ -63,6 +64,8 @@ object MyBuild extends Build {
   lazy val spire = Project("spire", file(".")).dependsOn(deps)
 
   lazy val deps = Project("deps", file("deps"))
+
+  lazy val pkg = Project("pkg", file("pkg")).aggregate(spire, deps)
 
   lazy val examples = Project("examples", file("examples")).dependsOn(spire)
 
