@@ -76,17 +76,10 @@ object fun {
     _pow(1L, base, ex)
   }
 
-  private final def _pow(_t:Long, _b:Long, _e:Long): Long = {
-    var t = _t
-    var b = _b
-    var e = _e
-    while (true) {
-      if (e == 0) return t
-      if ((e & 1) == 1) t *= b
-      b *= b
-      e /= 2
-    }
-    t // unused, required by scalac
+  @tailrec final def _pow(t:Long, b:Long, e:Long): Long = {
+    if (e == 0L) t
+    else if ((e & 1) == 1) _pow(t * b, b * b, e >> 1L)
+    else _pow(t, b * b, e >> 1L)
   }
 
   final def pow(base:Double, exponent:Double) = Math.pow(base, exponent)

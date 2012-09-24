@@ -26,59 +26,6 @@ trait NRoot[@spec(Double,Float,Int,Long) A] {
   def fpow(a:A, b:A): A
 }
 
-/**
- * A type class for `EuclideanRing`s with `NRoot`s as well. Since the base
- * requirement is only a `EuclideanRing`, we can provide instances for `Int`,
- * `Long`, and `BigInt`.
- */
-trait EuclideanRingWithNRoot[@spec(Int,Long,Float,Double) A]
-extends EuclideanRing[A] with NRoot[A]
-
-
-/**
- * A type class for `Field`s with `NRoot`s. These will be `Field`s that have an
- * additional `nroot` and `sqrt` function.
- */
-trait FieldWithNRoot[@spec(Int,Long,Float,Double) A]
-extends EuclideanRingWithNRoot[A] with Field[A]
-
-
-object EuclideanRingWithNRoot {
-  implicit object IntIsEuclideanRingWithNRoot
-  extends EuclideanRingWithNRoot[Int] with IntIsNRoot with IntIsEuclideanRing
-
-  implicit object LongIsEuclideanRingWithNRoot
-  extends EuclideanRingWithNRoot[Long] with LongIsNRoot with LongIsEuclideanRing
-
-  implicit object BigIntIsEuclideanRingWithNRoot
-  extends EuclideanRingWithNRoot[BigInt] with BigIntIsNRoot with BigIntIsEuclideanRing
-
-  implicit def fieldWithNRootIsEuclideanRingWithNRoot[@spec(Int,Long,Float,Double) A]
-  (implicit ev: FieldWithNRoot[A]): EuclideanRingWithNRoot[A] = ev
-
-  def apply[A](implicit ev:EuclideanRingWithNRoot[A]) = ev
-}
-
-
-object FieldWithNRoot {
-  implicit object DoubleIsFieldWithNRoot
-  extends FieldWithNRoot[Double] with DoubleIsNRoot with DoubleIsField
-
-  implicit object FloatIsFieldWithNRoot
-  extends FieldWithNRoot[Float] with FloatIsNRoot with FloatIsField
-
-  implicit object RealIsFieldWithNRoot
-  extends FieldWithNRoot[Real] with RealIsNRoot with RealIsField
-
-  implicit object BigDecimalIsFieldWithNRoot
-  extends FieldWithNRoot[BigDecimal] with BigDecimalIsNRoot with BigDecimalIsField
-
-  implicit def rationalIsFieldWithNRoot(implicit c: ApproximationContext[Rational]): FieldWithNRoot[Rational] =
-    RationalIsFieldWithNRoot(c)
-
-  def apply[A](implicit ev:FieldWithNRoot[A]) = ev
-}
-
 final class NRootOps[A](lhs: A)(implicit n: NRoot[A]) {
   def nroot(rhs: Int): A = macro Ops.binop[Int, A]
   def sqrt(): A = macro Ops.unop[A]
@@ -102,15 +49,11 @@ trait FloatIsNRoot extends NRoot[Float] {
 
 
 trait RationalIsNRoot extends NRoot[Rational] {
-  implicit def context: ApproximationContext[Rational]
+  implicit def context:ApproximationContext[Rational]
   def nroot(a: Rational, k: Int): Rational = a.nroot(k)
   def log(a: Rational): Rational = a.log
   def fpow(a: Rational, b: Rational): Rational = a.pow(b)
 }
-
-case class RationalIsFieldWithNRoot(context: ApproximationContext[Rational])
-extends FieldWithNRoot[Rational] with RationalIsNRoot with RationalIsField
-
 
 trait RealIsNRoot extends NRoot[Real] {
   def nroot(a: Real, k: Int): Real = a nroot k
@@ -131,7 +74,6 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
 
 
 trait IntIsNRoot extends NRoot[Int] {
-  //self: Ring[Int] =>
   def nroot(x: Int, n: Int): Int = {
     def findnroot(prev: Int, add: Int): Int = {
       val next = prev | add
@@ -154,7 +96,6 @@ trait IntIsNRoot extends NRoot[Int] {
 }
 
 trait LongIsNRoot extends NRoot[Long] {
-  //self: Ring[Long] =>
   def nroot(x: Long, n: Int): Long = {
     def findnroot(prev: Long, add: Long): Long = {
       val next = prev | add
@@ -202,9 +143,19 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
 object NRoot {
   @inline final def apply[@spec(Int,Long,Float,Double) A](implicit ev:NRoot[A]) = ev
 
-  implicit object DoubleIsNRoot extends DoubleIsNRoot
-
+  implicit object IntIsNRoot extends IntIsNRoot
+  implicit object LongIsNRoot extends LongIsNRoot
   implicit object BigIntIsNRoot extends BigIntIsNRoot
+
+  implicit object FloatIsNRoot extends FloatIsNRoot
+  implicit object DoubleIsNRoot extends DoubleIsNRoot
+  implicit object BigDecimalIsNRoot extends BigDecimalIsNRoot
+
+  implicit def rationalIsNRoot(implicit c:ApproximationContext[Rational]) = new RationalIsNRoot {
+    implicit def context = c
+  }
+
+  implicit object RealIsNRoot extends RealIsNRoot
 
   /**
    * This will return the largest integer that meets some criteria. Specifically,

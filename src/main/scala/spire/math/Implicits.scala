@@ -80,7 +80,7 @@ object Implicits extends LowPriorityImplicits {
   implicit def fractionalOps[@spec(Float, Double) A:Fractional](a:A) = new FractionalOps(a)
 
   implicit def signedOps[@spec(Float, Double, Int, Long) A: Signed](a: A) = new SignedOps(a)
-  implicit def nrootOps[@spec(Int, Long) A: EuclideanRingWithNRoot](a: A) = new NRootOps(a)
+  implicit def nrootOps[@spec(Int, Long) A: NRoot](a: A) = new NRootOps(a)
 
   implicit def literalIntOps(lhs:Int) = new LiteralIntOps(lhs)
   implicit def literalDoubleOps(lhs:Double) = new LiteralDoubleOps(lhs)

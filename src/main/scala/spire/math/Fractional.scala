@@ -6,7 +6,7 @@ import spire.macros._
 import language.experimental.macros
 import scala.{specialized => spec}
 
-trait Fractional[@spec(Float,Double) A] extends FieldWithNRoot[A]
+trait Fractional[@spec(Float,Double) A] extends Field[A] with NRoot[A]
 with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A] {
   def ceil(a:A):A
   def floor(a:A):A

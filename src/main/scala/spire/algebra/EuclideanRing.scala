@@ -30,7 +30,7 @@ object EuclideanRing {
   implicit object RealIsEuclideanRing extends RealIsEuclideanRing
   implicit def complexIsEuclideanRingCls[A:Fractional:Trig] = new ComplexIsEuclideanRingCls
 
-  def apply[A](implicit e:EuclideanRing[A]):EuclideanRing[A] = e
+  @inline final def apply[A](implicit e:EuclideanRing[A]):EuclideanRing[A] = e
 }
 
 

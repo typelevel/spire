@@ -7,13 +7,14 @@ object MyBuild extends Build {
     name := "spire",
     organization := "org.spire-math",
     version := "0.3.0-SNAPSHOT",
+
     scalaVersion := "2.10.0-M7",
+    scalaBinaryVersion := "2.10.0-M7",
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
-      //"org.scalatest" % "scalatest_2.10.0-M4" % "1.9-2.10.0-M4-B2" % "test",
       "org.scalatest" % "scalatest_2.10.0-M7" % "1.9-2.10.0-M7-B1" % "test",
       "org.scala-lang" % "scala-reflect" % "2.10.0-M7"
     ),
@@ -56,25 +57,24 @@ object MyBuild extends Build {
     <url>http://github.com/tixxit/</url>
   </developer>
 </developers>
+
     )
   )
 
   val key = AttributeKey[Boolean]("javaOptionsPatched")
 
   lazy val spire = Project("spire", file(".")).dependsOn(deps)
-
   lazy val deps = Project("deps", file("deps"))
-
   lazy val pkg = Project("pkg", file("pkg")).aggregate(spire, deps)
-
   lazy val examples = Project("examples", file("examples")).dependsOn(spire)
-
   lazy val benchmark:Project = Project("benchmark", file("benchmark")).
     settings(benchmarkSettings: _*).
     dependsOn(spire)
 
   def benchmarkSettings = Seq(
     // raise memory limits here if necessary
+    // TODO: this doesn't seem to be working with caliper at the moment :(
+  
     javaOptions in run += "-Xmx4G",
 
     libraryDependencies ++= Seq(

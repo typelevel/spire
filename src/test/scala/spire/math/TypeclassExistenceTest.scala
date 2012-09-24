@@ -36,14 +36,6 @@ class TypeclassExistenceTest extends FunSuite {
   def hasFractional[A](implicit f: Fractional[A] = null, m: ClassTag[A]) {
     assert(f != null, "Expected implicit Fractional[%s] instance, but it was not found." format m)
   }
-
-  def hasEuclideanRingWithNRoot[A](implicit e: EuclideanRingWithNRoot[A] = null, m: ClassTag[A]) {
-    assert(e != null, "Expected implicit EuclideanRingWithNRoot[%s] instance, but it was not found." format m)
-  }
- 
-  def hasFieldWithNRoot[A](implicit e: FieldWithNRoot[A] = null, m: ClassTag[A]) {
-    assert(e != null, "Expected implicit FieldWithNRoot[%s] instance, but it was not found." format m)
-  }
  
   def hasOrder[A](implicit ev: Order[A] = null, m: ClassTag[A]) {
     assert(ev != null, "Expected implicit Order[%s] instance, but it was not found." format m)
@@ -97,22 +89,6 @@ class TypeclassExistenceTest extends FunSuite {
     check[Double]
   }
 
-  test("EuclideanRingWithNRoots are EuclideanRings") {
-    def check[A: EuclideanRingWithNRoot: ClassTag] {
-      hasEuclideanRing[A]
-    }
-
-    check[BigInt]
-  }
-
-  test("FieldWithNRoots are Fields") {
-    def check[A: FieldWithNRoot: ClassTag] {
-      hasField[A]
-    }
-
-    check[BigDecimal]
-  }
-
   test("Numerics have Order, NRoot, are EuclideanRings and are Fields") {
     def check[A: Numeric: ClassTag] {
       hasOrder[A]
@@ -135,25 +111,28 @@ class TypeclassExistenceTest extends FunSuite {
     check[Double]
   }
 
-  test("Int is EuclideanRingWithNRoot") {
+  test("Int has Eq:Order:EuclideanRing:NRoot") {
     hasEq[Int]
+    hasOrder[Int]
     hasRing[Int]
     hasEuclideanRing[Int]
-    hasEuclideanRingWithNRoot[Int]
+    hasNRoot[Int]
   }
 
-  test("Long is EuclideanRingWithNRoot") {
+  test("Long has Eq:Order:EuclideanRing:NRoot") {
     hasEq[Long]
+    hasOrder[Long]
     hasRing[Long]
     hasEuclideanRing[Long]
-    hasEuclideanRingWithNRoot[Long]
+    hasNRoot[Long]
   }
 
-  test("BigBigInt is EuclideanRingWithNRoot") {
+  test("BigInt has Eq:EuclideanRing:NRoot") {
     hasEq[BigInt]
+    hasOrder[BigInt]
     hasRing[BigInt]
     hasEuclideanRing[BigInt]
-    hasEuclideanRingWithNRoot[BigInt]
+    hasNRoot[BigInt]
   }
 
   test("Float is FieldWithNRoot") {
@@ -161,7 +140,7 @@ class TypeclassExistenceTest extends FunSuite {
     hasRing[Float]
     hasEuclideanRing[Float]
     hasField[Float]
-    hasFieldWithNRoot[Float]
+    hasNRoot[Float]
   }
 
   test("Double is FieldWithNRoot") {
@@ -169,7 +148,7 @@ class TypeclassExistenceTest extends FunSuite {
     hasRing[Double]
     hasEuclideanRing[Double]
     hasField[Double]
-    hasFieldWithNRoot[Double]
+    hasNRoot[Double]
   }
 
   test("BigDecimal is FieldWithNRoot") {
@@ -177,7 +156,7 @@ class TypeclassExistenceTest extends FunSuite {
     hasRing[BigDecimal]
     hasEuclideanRing[BigDecimal]
     hasField[BigDecimal]
-    hasFieldWithNRoot[BigDecimal]
+    hasNRoot[BigDecimal]
   }
 
   test("Rational is FieldWithNRoot") {
@@ -186,7 +165,7 @@ class TypeclassExistenceTest extends FunSuite {
     hasRing[Rational]
     hasEuclideanRing[Rational]
     hasField[Rational]
-    hasFieldWithNRoot[Rational]
+    hasNRoot[Rational]
   }
 
   test("Real is FieldWithNRoot") {
@@ -194,7 +173,7 @@ class TypeclassExistenceTest extends FunSuite {
     hasRing[Real]
     hasEuclideanRing[Real]
     hasField[Real]
-    hasFieldWithNRoot[Real]
+    hasNRoot[Real]
   }
 
   test("Everybody is Numeric") {
@@ -220,9 +199,9 @@ class TypeclassExistenceTest extends FunSuite {
     hasFractional[Real]
   }
 
-  test("FieldWithNRoot[Rational] requires implicit ApproximationContext") {
-    def check[A](implicit f: FieldWithNRoot[A] = null) {
-      assert(f == null)
+  test("NRoot[Rational] requires implicit ApproximationContext") {
+    def check[A](implicit e: NRoot[A] = null) {
+      assert(e == null)
     }
 
     check[Rational]

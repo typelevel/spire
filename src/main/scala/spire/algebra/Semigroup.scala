@@ -9,7 +9,7 @@ trait Semigroup[A] {
 }
 
 object Semigroup {
-  def apply[A](implicit s: Semigroup[A]) = s
+  @inline final def apply[A](implicit s: Semigroup[A]) = s
 }
 
 final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {

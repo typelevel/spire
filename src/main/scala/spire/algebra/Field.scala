@@ -31,7 +31,7 @@ object Field {
   implicit object RealIsField extends RealIsField
   implicit def complexIsField[A:Fractional:Trig] = new ComplexIsFieldCls
 
-  def apply[A](implicit f:Field[A]):Field[A] = f
+  @inline final def apply[A](implicit f:Field[A]):Field[A] = f
 }
 
 trait FloatIsField extends Field[Float] with FloatIsEuclideanRing {

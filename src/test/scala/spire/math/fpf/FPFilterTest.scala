@@ -49,8 +49,8 @@ class FPFilterTest extends FunSuite {
                 FPFilter(Rational(5, 7)))
   }
 
-  test("FPFilter is FieldWithNRoot") {
-    def powerToTheRoot[A: FieldWithNRoot](a: A, b: A) {
+  test("FPFilter is Field:NRoot") {
+    def powerToTheRoot[A: Field:NRoot](a: A, b: A) {
       assert(a.sqrt == b)
       assert((a pow 2) == (b pow 4))
     }

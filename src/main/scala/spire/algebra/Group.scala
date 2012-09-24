@@ -5,7 +5,7 @@ trait Group[A] extends Monoid[A] {
 }
 
 object Group {
-  def apply[A](implicit ev: Group[A]) = ev
+  @inline final def apply[A](implicit ev: Group[A]) = ev
 }
 
 class AdditiveGroup[A](implicit ring:Ring[A]) extends Group[A] {

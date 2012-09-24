@@ -12,7 +12,7 @@ import scala.{specialized => spec}
  * 6. Start to worry about things like e.g. pow(BigInt, BigInt)
  */
 
-trait Numeric[@spec(Int,Long,Float,Double) A] extends FieldWithNRoot[A]
+trait Numeric[@spec(Int,Long,Float,Double) A] extends Field[A] with NRoot[A]
 with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A]
 
 object Numeric {

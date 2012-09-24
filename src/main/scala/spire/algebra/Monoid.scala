@@ -5,7 +5,7 @@ trait Monoid[A] extends Semigroup[A] {
 }
 
 object Monoid {
-  def apply[A](implicit m: Monoid[A]): Monoid[A] = m
+  @inline final def apply[A](implicit m: Monoid[A]): Monoid[A] = m
 }
 
 class AdditiveMonoid[A](implicit ring:Ring[A]) extends Monoid[A] {
