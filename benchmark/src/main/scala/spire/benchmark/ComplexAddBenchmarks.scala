@@ -15,18 +15,21 @@ import com.google.caliper.Param
 
 object ComplexAddBenchmarks extends MyRunner { val cls = classOf[ComplexAddBenchmarks] }
 class ComplexAddBenchmarks extends MyBenchmark {
-  @Param(Array("500000", "1000000", "2000000", "4000000", "8000000", "16000000"))
+  //@Param(Array("500000", "1000000", "2000000", "4000000", "8000000", "16000000"))
+  @Param(Array("500000"))
   var size:Int = 0
 
-  var complexes:Array[Complex[Double]] = null
-  var fcomplexes:Array[Long] = null
+  var complexes:Array[Complex[Float]] = null
+  var longs:Array[Long] = null
+  var fcs:Array[FloatComplex] = null
 
   override protected def setUp() {
-    complexes = init(size)(Complex(nextDouble(), nextDouble()))
-    fcomplexes = init(size)(FastComplex(nextFloat(), nextFloat()))
+    complexes = init(size)(Complex(nextFloat(), nextFloat()))
+    longs = init(size)(FastComplex(nextFloat(), nextFloat()))
+    fcs = init(size)(FloatComplex(nextFloat(), nextFloat()))
   }
 
-  def addGeneric[@spec(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
+  def addGeneric[@spec(Float) A:Ring](data:Array[A]):A = {
     var total = Ring[A].zero
     var i = 0
     val len = data.length
@@ -34,8 +37,8 @@ class ComplexAddBenchmarks extends MyBenchmark {
     total
   }
 
-  def addComplexesDirect(data:Array[Complex[Double]]):Complex[Double] = {
-    var total = Complex.zero[Double]
+  def addComplexesDirect(data:Array[Complex[Float]]):Complex[Float] = {
+    var total = Complex.zero[Float]
     var i = 0
     val len = data.length
     while (i < len) { total += data(i); i += 1 }
@@ -50,7 +53,25 @@ class ComplexAddBenchmarks extends MyBenchmark {
     total
   }
 
+  def addFloatComplexesBoxed(data:Array[FloatComplex]):FloatComplex = {
+    var total = FloatComplex(0.0F, 0.0F)
+    var i = 0
+    val len = fcs.length
+    while (i < len) { total += fcs(i); i += 1 }
+    total
+  }
+
+  def addFloatComplexesUnboxed(data:Array[Long]):FloatComplex = {
+    var total = FloatComplex(0.0F, 0.0F)
+    var i = 0
+    val len = fcs.length
+    while (i < len) { total += new FloatComplex(longs(i)); i += 1 }
+    total
+  }
+
   def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
   def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))
-  def timeAddFastComplexes(reps:Int) = run(reps)(addFastComplexes(fcomplexes))
+  def timeAddFastComplexes(reps:Int) = run(reps)(addFastComplexes(longs))
+  def timeAddFloatComplexesBoxed(reps:Int) = run(reps)(addFloatComplexesBoxed(fcs))
+  def timeAddFloatComplexesUnboxed(reps:Int) = run(reps)(addFloatComplexesUnboxed(longs))
 }

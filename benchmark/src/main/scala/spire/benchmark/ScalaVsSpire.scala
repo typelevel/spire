@@ -168,6 +168,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
    */
   @tailrec final def gcdDirect(a: Int, b: Int): Int =
     if (a % b == 0) b else gcdDirect(b, a % b)
+
   def doGcdDirect(as: Array[Int], bs: Array[Int], cs: Array[Int]) = {
     var i = 0
     val len = as.length
@@ -179,6 +180,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     import ScalaI.Implicits._
     if (a % b == ev.zero) b else gcdGeneric(b, a % b)
   }
+
   def doGcdGeneric[A:ScalaI](as: Array[A], bs: Array[A], cs: Array[A]) = {
     var i = 0
     val len = as.length
@@ -189,6 +191,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     import spire.math.Implicits._
     if (a % b === ev1.zero) b else gcdSpire(b, a % b)
   }
+
   def doGcdSpire[@spec(Int) A:EuclideanRing:Eq](as: Array[A], bs: Array[A], cs: Array[A]) = {
     var i = 0
     val len = as.length
@@ -218,3 +221,19 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     while (i < len) { cs(i) = as(i) * n /~ d; i += 1}
   }
 }
+
+//
+//object Direct {
+//  @tailrec final def gcd(a: Int, b: Int): Int =
+//    if (a % b == 0) b else gcd(b, a % b)
+//}
+//
+//object Spire {
+//  @tailrec final def gcd[@spec(Int) A: Integral](a: A, b: A): A =
+//    if (a % b === Integral[A].zero) b else gcd(b, a % b)
+//}
+//
+//object Scala {
+//  @tailrec final def gcd[A: Integral](a: A, b: A): A =
+//    if (a % b == implicitly[Integra[A]].zero) b else gcd(b, a % b)
+//}

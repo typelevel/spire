@@ -32,7 +32,7 @@ object Trig {
   implicit object DoubleIsTrig extends DoubleIsTrig
   implicit object BigDecimalIsTrig extends BigDecimalIsTrig
 
-  def apply[A](implicit t:Trig[A]) = t
+  @inline final def apply[A](implicit t:Trig[A]) = t
 }
 
 trait FloatIsTrig extends Trig[Float] {

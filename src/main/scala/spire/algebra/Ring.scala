@@ -197,7 +197,7 @@ trait RationalIsRing extends Ring[Rational] {
   override def fromInt(n: Int): Rational = Rational(n)
 }
 
-trait ComplexIsRing[A] extends Ring[Complex[A]] {
+trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A]] {
   implicit def f:Fractional[A]
   implicit def t:Trig[A]
 
@@ -205,11 +205,11 @@ trait ComplexIsRing[A] extends Ring[Complex[A]] {
   def negate(a:Complex[A]): Complex[A] = -a
   def one: Complex[A] = Complex.one(f, t)
   def plus(a:Complex[A], b:Complex[A]): Complex[A] = a + b
-  override def pow(a:Complex[A], b:Int):Complex[A] = a.pow(Complex(f.fromInt(b), f.zero))
+  override def pow(a:Complex[A], b:Int):Complex[A] = a.pow(b)
   override def times(a:Complex[A], b:Complex[A]): Complex[A] = a * b
   def zero: Complex[A] = Complex.zero(f, t)
 
-  override def fromInt(n: Int): Complex[A] = Complex(f.fromInt(n), f.zero)
+  override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
 }
 
 trait RealIsRing extends Ring[Real] {
@@ -224,5 +224,6 @@ trait RealIsRing extends Ring[Real] {
   override def fromInt(n: Int): Real = Real(n)
 }
 
-class ComplexIsRingCls[A](implicit val f:Fractional[A], val t:Trig[A])
+class ComplexIsRingCls[@spec(Float, Double) A]
+(implicit val f:Fractional[A], val t:Trig[A])
 extends ComplexIsRing[A]
