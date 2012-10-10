@@ -55,7 +55,7 @@ class SortBenchmarks extends MyBenchmark with BenchmarkData {
       val arr = ds.clone; java.util.Arrays.sort(arr); arr.length
     }
   }
-
+  
   def timeScalaQuicksort(reps:Int) = run(reps) {
     if (typ == "int") {
       val arr = is.clone; scala.util.Sorting.quickSort(arr); arr.length
@@ -67,7 +67,7 @@ class SortBenchmarks extends MyBenchmark with BenchmarkData {
       val arr = ds.clone; scala.util.Sorting.quickSort(arr); arr.length
     }
   }
-
+  
   def timeSpireInsertionSort(reps:Int) = run(reps) {
     if (typ == "int") {
       val arr = is.clone; spire.math.Sorting.insertionSort(arr); arr.length
@@ -79,7 +79,7 @@ class SortBenchmarks extends MyBenchmark with BenchmarkData {
       val arr = ds.clone; spire.math.Sorting.insertionSort(arr); arr.length
     }
   }
-
+  
   def timeSpireMergeSort(reps:Int) = run(reps) {
     if (typ == "int") {
       val arr = is.clone; spire.math.Sorting.mergeSort(arr); arr.length

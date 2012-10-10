@@ -5,8 +5,6 @@ import scala.{specialized => spec}
 import scala.annotation.tailrec
 import scala.math.min
 
-//import Implicits._
-
 /**
  *  Interface for a sorting strategy object.
  */
@@ -41,21 +39,25 @@ object InsertionSort extends Sort {
  * This sort is faster than quickSort, but must allocate extra space.
  */
 object MergeSort extends Sort {
-  final def sort[@spec A:Order:ClassTag](data:Array[A]) = {
+  @inline final def startWidth = 32
+  @inline final def startStep = 64
+
+  final def sort[@spec A:Order:ClassTag](data:Array[A]) {
     val len = data.length
 
+    //if (len <= startWidth) return InsertionSort.sort(data)
+    if (len <= startStep) return InsertionSort.sort(data)
+
     var buf1:Array[A] = data
-    var buf2:Array[A] = Array.ofDim[A](len)
+    var buf2:Array[A] = new Array[A](len)
     var tmp:Array[A] = null
 
-    //var width = 1
-    //var step = 2
     var i = 0
-    var limit = len - 16
-    while (i < limit) { InsertionSort.sort(data, i, i + 16); i += 16 }
+    var limit = len - startWidth
+    while (i < limit) { InsertionSort.sort(data, i, i + startWidth); i += startWidth }
     if (i < len) InsertionSort.sort(data, i, len)
-    var width = 16
-    var step = 32
+    var width = startWidth
+    var step = startStep
     while (width < len) {
       i = 0
       limit = len - step
