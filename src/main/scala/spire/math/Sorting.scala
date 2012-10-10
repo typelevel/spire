@@ -3,6 +3,8 @@ package spire.math
 import scala.{specialized => spec}
 import scala.math.min
 
+import scala.annotation.tailrec
+
 //import Implicits._
 
 /**
@@ -20,32 +22,43 @@ trait Sort {
  * This sort is faster than quickSort, but must allocate extra space.
  */
 object MergeSort extends Sort {
-  final def sort[@spec A:Order:Manifest](data:Array[A]) = {
-    val len = data.length
+  final def sort[@spec A](in: Array[A])(implicit o: Order[A], m: Manifest[A]) = {
+    if (in.length < 2) in else {
+      var initLen = 1
 
-    var buf1:Array[A] = data
-    var buf2:Array[A] = Array.ofDim[A](len)
-    var tmp:Array[A] = null
-
-    var i = 0
-
-    var width = 1
-    var step = 2
-    while (width < len) {
-      i = 0
-      while (i < len) {
-        merge(buf1, buf2, i, min(i + width, len), min(i + step, len))
-        i += step
+      val passes = 32 - java.lang.Integer.numberOfLeadingZeros(in.length - 1)
+      if (passes % 2 == 1) {
+        var i = 0
+        val len = in.length & (~1)
+        while (i < len) {
+          if (o.gt(in(i), in(i + 1))) {
+            val tmp = in(i)
+            in(i) = in(i + 1)
+            in(i + 1) = tmp
+          }
+          i += 2
+        }
+        initLen = 2
       }
-      tmp = buf2
-      buf2 = buf1
-      buf1 = tmp
 
-      width *= 2
-      step *= 2
+      val out = new Array[A](in.length)
+      sort2(in, out, initLen)
     }
+  }
 
-    buf1
+
+  @tailrec private final def sort2[@spec A](in: Array[A], out: Array[A], len: Int)(implicit o: Order[A]): Array[A] = {
+    if (len < in.length) {
+      val nextLen = 2 * len
+      var i = 0
+      while ((i + len) <= in.length) {
+        merge2(in, out, i, len)
+        i += nextLen
+      }
+      if (i < in.length)
+        System.arraycopy(in, i, out, i, in.length - i)
+      sort2(out, in, nextLen)
+    } else in
   }
 
   // TODO: making this private breaks specialization, but we'd like to hide it
@@ -59,18 +72,24 @@ object MergeSort extends Sort {
    * This method will be called approximately N times (where N is the length
    * of the array to be sorted), which is why we inline it.
    */
-  @inline final def merge[@spec A](in:Array[A], out:Array[A], start:Int, mid:Int, end:Int)(implicit o:Order[A]) {
-    var ii = start
-    var jj = mid
-    var kk = start
-    while (kk < end) {
-      if (ii < mid && (jj >= end || o.lteqv(in(ii), in(jj)))) {
-        out(kk) = in(ii); ii += 1
+  @inline final def merge2[@spec A](in: Array[A], out: Array[A], left: Int, len: Int)(implicit o: Order[A]) {
+    val right = left + len
+    var end = right + len
+    if (end > in.length) end = in.length
+
+    var i = left
+    var j = right
+    var k = left
+    while (i < right && j < end) {
+      if (o.lteqv(in(i), in(j))) {
+        out(k) = in(i); i += 1
       } else {
-        out(kk) = in(jj); jj += 1
+        out(k) = in(j); j += 1
       }
-      kk += 1
+      k += 1
     }
+    if (i < right) System.arraycopy(in, i, out, k, right - i)
+    if (j < end) System.arraycopy(in, j, out, k, end - j)
   }
 }
 
