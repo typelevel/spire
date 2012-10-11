@@ -13,10 +13,12 @@ trait Sort {
 }
 
 object InsertionSort extends Sort {
-  final def sort[@spec A:Order:ClassTag](data:Array[A]) = sort(data, 0, data.length)
+  final def sort[@spec A:Order:ClassTag](data:Array[A]) =
+    sort(data, 0, data.length)
 
   final def sort[@spec A](data:Array[A], start:Int, end:Int)
-  (implicit o:Order[A], ct:ClassTag[A]) = {
+    (implicit o:Order[A], ct:ClassTag[A]) {
+
     var i = start + 1
     while (i < end) {
       val item = data(i)
@@ -39,13 +41,12 @@ object InsertionSort extends Sort {
  * This sort is faster than quickSort, but must allocate extra space.
  */
 object MergeSort extends Sort {
-  @inline final def startWidth = 32
-  @inline final def startStep = 64
+  @inline final def startWidth = 8
+  @inline final def startStep = 16
 
   final def sort[@spec A:Order:ClassTag](data:Array[A]) {
     val len = data.length
 
-    //if (len <= startWidth) return InsertionSort.sort(data)
     if (len <= startStep) return InsertionSort.sort(data)
 
     var buf1:Array[A] = data
@@ -78,8 +79,6 @@ object MergeSort extends Sort {
     if (buf1 != data) System.arraycopy(buf1, 0, data, 0, len)
   }
 
-  // TODO: making this private breaks specialization, but we'd like to hide it
-  // somehow. 2.11 maybe?
   /**
    * Helper method for mergeSort, used to do a single "merge" between two
    * sections of the input array. The start, mid and end parameters denote the
@@ -110,121 +109,63 @@ object MergeSort extends Sort {
  * not allocate extra space.
  */
 object QuickSort {
-  final def sort[@spec K](x:Array[K])(implicit o:Order[K], ct:ClassTag[K]) {
-    sort2(x:Array[K], x(0), 0, x.length)
+  @inline final def limit = 16
+
+  final def sort[@spec A:Order:ClassTag](data:Array[A]) = qsort(data, 0, data.length - 1)
+
+  final def qsort[@spec A]
+    (data:Array[A], left: Int, right: Int)
+    (implicit o:Order[A], ct:ClassTag[A]) {
+
+    if (right - left < limit) {
+      return InsertionSort.sort(data, left, right + 1)
+    }
+
+    val pivot = left + (right - left) / 2
+    val next = partition(data, left, right, pivot)
+    qsort(data, left, next - 1)
+    qsort(data, next + 1, right)
   }
 
-  def sort2[@spec K](x: Array[K], k:K, off: Int, len: Int)
-    (implicit o:Order[K], ct:ClassTag[K]) {
+  final def partition[@spec A]
+    (data:Array[A], left:Int, right:Int, pivot:Int)
+    (implicit o:Order[A], ct:ClassTag[A]): Int = {
+    
+    val value = data(pivot)
 
-    def swap(k:K, a: Int, b: Int) {
-      val t = x(a)
-      x(a) = x(b)
-      x(b) = t
+    //swap(pivot, right)
+    var tmp = data(pivot); data(pivot) = data(right); data(right) = tmp
+
+    var store = left
+    var i = left
+    while (i < right) {
+      if (o.lt(data(i), value)) {
+        //swap(i, store)
+        tmp = data(i); data(i) = data(store); data(store) = tmp
+        store += 1
+      }
+      i += 1
     }
-  
-    def vecswap(k:K, _a: Int, _b: Int, n: Int) {
-      var a = _a
-      var b = _b
-      var i = 0
-      while (i < n) {
-        swap(k, a, b)
-        i += 1
-        a += 1
-        b += 1
-      }
-    }
-  
-    def med3(k:K, a: Int, b: Int, c: Int) = {
-      if (o.lt(x(a), x(b))) {
-        if (o.lt(x(b), x(c))) b else if (o.lt(x(a), x(c))) c else a
-      } else {
-        if (o.lt(x(b), x(c))) b else if (o.lt(x(a), x(c))) c else a
-      }
-    }
-
-    // Insertion sort on smallest arrays
-    if (len < 7) {
-      var i = off
-      while (i < len + off) {
-        var j = i
-        while (j > off && o.gt(x(j-1), x(j))) {
-          swap(k, j, j-1)
-          j -= 1
-        }
-        i += 1
-      }
-    } else {
-      // Choose a partition element, v
-      var m = off + (len >> 1)        // Small arrays, middle element
-      if (len > 7) {
-        var l = off
-        var n = off + len - 1
-        if (len > 40) {        // Big arrays, pseudomedian of 9
-          val s = len / 8
-          l = med3(k, l, l+s, l+2*s)
-          m = med3(k, m-s, m, m+s)
-          n = med3(k, n-2*s, n-s, n)
-        }
-        m = med3(k, l, m, n) // Mid-size, med of 3
-      }
-      val v = x(m)
-
-      // Establish Invariant: v* (<v)* (>v)* v*
-      var a = off
-      var b = a
-      var c = off + len - 1
-      var d = c
-      var done = false
-      while (!done) {
-        while (b <= c && o.lteqv(x(b), v)) {
-          if (o.eqv(x(b), v)) {
-            swap(k, a, b)
-            a += 1
-          }
-          b += 1
-        }
-        while (c >= b && o.gteqv(x(c), v)) {
-          if (o.eqv(x(c), v)) {
-            swap(k, c, d)
-            d -= 1
-          }
-          c -= 1
-        }
-        if (b > c) {
-          done = true
-        } else {
-          swap(k, b, c)
-          c -= 1
-          b += 1
-        }
-      }
-
-      // Swap partition elements back to middle
-      val n = off + len
-      var s = math.min(a-off, b-a)
-      vecswap(k, off, b-s, s)
-      s = math.min(d-c, n-d-1)
-      vecswap(k, b, n-s, s)
-
-      // Recursively sort non-partition-elements
-      s = b - a
-      if (s > 1)
-        sort2(x, k, off, s)(o, ct)
-      s = d - c
-      if (s > 1)
-        sort2(x, k, n-s, s)(o, ct)
-    }
+    //swap(store, right)
+    tmp = data(store); data(store) = data(right); data(right) = tmp
+    store
   }
 }
 
-// TODO: would be nice to try implementing e.g. Tim Peters' sort algorithm.
+// TODO: it would be nice to try implementing some hybrid sorts, for instance
+// Tim Peters' sort algorithm.
 
 /**
- * Both sorts are roughly the same speed right now. Merge sort is stable but
- * uses extra memory. Quicksort is a bit faster but is O(n^2) in worst case.
+ * Object providing in-place sorting capability for arrays.
+ *
+ * Sorting.sort() uses quickSort() by default (in-place, not stable, generally
+ * fastest but might hit bad cases where it's O(n^2)). Also provides
+ * mergeSort() (in-place, stable, uses extra memory, still pretty fast) and
+ * insertionSort(), which is slow except for small arrays.
  */
 object Sorting {
+  final def sort[@spec A:Order:ClassTag](data:Array[A]) = QuickSort.sort(data)
+
   final def insertionSort[@spec A:Order:ClassTag](data:Array[A]) = InsertionSort.sort(data)
   final def mergeSort[@spec A:Order:ClassTag](data:Array[A]) = MergeSort.sort(data)
   final def quickSort[@spec K:Order:ClassTag](data:Array[K]) = QuickSort.sort(data)

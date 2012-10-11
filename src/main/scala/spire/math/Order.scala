@@ -22,7 +22,7 @@ trait Order[@spec A] extends Eq[A] {
     def compare(x:B, y:B) = self.compare(f(x), f(y))
   }
   def reverse: Order[A] = new Order[A] {
-    def eqv(x:A, y:A) = self.eqv(y, x)
+    def eqv(x:A, y:A) = self.eqv(x, y)
     def compare(x:A, y:A) = self.compare(y, x)
   }
 }
@@ -114,10 +114,6 @@ trait RationalOrder extends Order[Rational] with RationalEq {
 }
 
 trait RealOrder extends Order[Real] with RealEq {
-  override def gt(x:Real, y:Real) = compare(x, y) > 0
-  override def gteqv(x:Real, y:Real) = compare(x, y) >= 0
-  override def lt(x:Real, y:Real) = compare(x, y) < 0
-  override def lteqv(x:Real, y:Real) = compare(x, y) <= 0
   def compare(x:Real, y:Real) = (x - y).signum
 }
 

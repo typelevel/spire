@@ -13,12 +13,12 @@ class SortingTest extends FunSuite {
     val merged = before.clone()
     Sorting.mergeSort(merged)
 
-    // val quicked = before.clone()
-    // Sorting.quickSort(quicked)
+     val quicked = before.clone()
+     Sorting.quickSort(quicked)
 
     // make sure our result is ok
     for (i <- 0 until before.length) assert(merged(i) === goal(i))
-    // for (i <- 0 until before.length) assert(quicked(i) === goal(i))
+     for (i <- 0 until before.length) assert(quicked(i) === goal(i))
   }
 
   test("sort empty array") {
