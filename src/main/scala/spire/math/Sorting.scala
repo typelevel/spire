@@ -12,6 +12,11 @@ trait Sort {
   def sort[@spec A:Order:ClassTag](data:Array[A]): Unit
 }
 
+/**
+ * Simple implementation of insertion sort.
+ *
+ * Works for small arrays but due to O(n^2) complexity is not generally good.
+ */
 object InsertionSort extends Sort {
   final def sort[@spec A:Order:ClassTag](data:Array[A]) =
     sort(data, 0, data.length)
@@ -36,9 +41,8 @@ object InsertionSort extends Sort {
 /**
  * In-place merge sort implementation. This sort is stable but does mutate
  * the given array. It is an in-place sort but it does allocate a temporary
- * array of the same size as the input.
- *
- * This sort is faster than quickSort, but must allocate extra space.
+ * array of the same size as the input. It uses InsertionSort for sorting very
+ * small arrays.
  */
 object MergeSort extends Sort {
   @inline final def startWidth = 8
@@ -104,9 +108,9 @@ object MergeSort extends Sort {
 }
 
 /**
- * This is a specialized version of Scala's built-in quicksort
- * implementation. It is not a stable sort, and mutates its input. It does
- * not allocate extra space.
+ * In-place quicksort implementation. It is not stable, but does not allocate
+ * extra space (other thans stack). Like MergeSort, it uses InsertionSort for
+ * sorting very small arrays.
  */
 object QuickSort {
   @inline final def limit = 16
