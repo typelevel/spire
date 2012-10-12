@@ -31,8 +31,7 @@ import real._
  * them on-demand.
  */
 final class Real private (val expr: Expr[Real])
-extends ScalaNumber
-   with ScalaNumericConversions
+extends ScalaNumber with ScalaNumericConversions
    with RealLike[Real]
    with BMFSSBound[Real]
    with BigDecimalApprox[Real]
@@ -43,6 +42,10 @@ extends ScalaNumber
    with Ordered[Real] {
 
   val coexpr: Coexpr[Real] = Real.RealCoexpr
+
+  // ugh
+  override def byteValue(): Byte = fpf.toLong map (_.toByte) getOrElse super.toByte
+  override def shortValue(): Short = fpf.toLong map (_.toShort) getOrElse super.toShort
 
   override def equals(that: Any) = that match {
     case that: Real => (this - that).sign == Zero

@@ -44,7 +44,7 @@ object Complex {
 
 final class Complex[@spec(Float, Double) T]
 (val real:T, val imag:T)(implicit f:Fractional[T], t:Trig[T])
-extends ScalaNumber with ScalaNumericConversions with Serializable {
+extends ScalaNumericConversions with Serializable {
 
   // ugh, ScalaNumericConversions ghetto
   //

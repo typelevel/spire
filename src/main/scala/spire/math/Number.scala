@@ -48,7 +48,7 @@ object Number {
   implicit def bigDecimalToNumber(n:BigDecimal) = Number(n)
 }
 
-sealed trait Number extends ScalaNumber with ScalaNumericConversions with Ordered[Number] {
+sealed trait Number extends ScalaNumericConversions with Ordered[Number] {
   def abs:Number
   def signum:Int
 

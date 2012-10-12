@@ -29,4 +29,3 @@ trait FPFilter[A <: FPFilter[A]] extends RealLike[A] { self: A =>
   abstract override def intValue: Int = fpf.toLong map (_.toInt) getOrElse super.intValue 
   abstract override def longValue: Long = fpf.toLong getOrElse super.longValue
 }
-

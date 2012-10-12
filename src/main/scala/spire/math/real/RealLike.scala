@@ -69,5 +69,3 @@ trait RealLike[A <: RealLike[A]] extends ScalaNumber { self: A =>
   def toDouble: Double
   def toBigDecimal(implicit mc: MathContext): BigDecimal
 }
-
-

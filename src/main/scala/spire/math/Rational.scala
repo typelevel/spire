@@ -14,7 +14,7 @@ trait Fraction[@specialized(Long) A] {
   def den: A
 }
 
-sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] {
+sealed abstract class Rational extends ScalaNumericConversions with Ordered[Rational] {
   import LongRationals.LongRational
   import BigRationals.BigRational
 
@@ -74,7 +74,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     Rational.one
   } else if (k < 0) {
     this.inverse.nroot(-k)(ctxt)
-  } else if (this == 0) {
+  } else if (numerator == 0) {
     Rational.zero
   } else {
 

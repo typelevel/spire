@@ -6,17 +6,17 @@ object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     name := "spire",
     organization := "org.spire-math",
-    version := "0.3.0-SNAPSHOT",
+    version := "0.3.0-M2",
 
-    scalaVersion := "2.10.0-M7",
-    scalaBinaryVersion := "2.10.0-M7",
+    scalaVersion := "2.10.0-RC1",
+    scalaBinaryVersion := "2.10.0-RC1",
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
-      "org.scalatest" % "scalatest_2.10.0-M7" % "1.9-2.10.0-M7-B1" % "test",
-      "org.scala-lang" % "scala-reflect" % "2.10.0-M7"
+      //"org.scalatest" % "scalatest_2.10.0-M7" % "1.9-2.10.0-M7-B1" % "test",
+      "org.scala-lang" % "scala-reflect" % "2.10.0-RC1"
     ),
 
     scalacOptions ++= Seq(
@@ -63,8 +63,7 @@ object MyBuild extends Build {
 
   val key = AttributeKey[Boolean]("javaOptionsPatched")
 
-  lazy val spire = Project("spire", file(".")).dependsOn(deps)
-  lazy val deps = Project("deps", file("deps"))
+  lazy val spire = Project("spire", file("."))
   lazy val pkg = Project("pkg", file("pkg")).aggregate(spire, deps)
   lazy val examples = Project("examples", file("examples")).dependsOn(spire)
   lazy val benchmark:Project = Project("benchmark", file("benchmark")).

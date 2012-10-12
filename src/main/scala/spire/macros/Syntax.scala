@@ -12,23 +12,20 @@ object Syntax {
     (test:A => Boolean, next:A => A)
     (body:A => Unit): Unit = macro cforMacro[A]
 
-  def cforMacro[A:c.AbsTypeTag](c:Context)(init:c.Expr[A])
+  def cforMacro[A:c.WeakTypeTag](c:Context)(init:c.Expr[A])
      (test:c.Expr[A => Boolean], next:c.Expr[A => A])
      (body:c.Expr[A => Unit]): c.Expr[Unit] = {
     import c.universe._
-
-    //val iName = c.fresh("i$")
-    //val cforName = c.fresh("cfor$")
-    // TODO: use a fresh name instead of "elem_priv"
-    // but to do that, we probably have to build the tree by hand
-    val t = c.universe.reify {
-      var elem_priv:A = init.splice
-      while(test.splice(elem_priv)) {
-        body.splice(elem_priv)
-        elem_priv = next.splice(elem_priv)
+    val t = reify {
+      import scala.annotation.tailrec
+      @tailrec def loop(a: A) {
+        if (test.splice(a)) {
+          body.splice(a)
+          loop(next.splice(a))
+        }
       }
+      loop(init.splice)
     }
-
     new Util[c.type](c).inlineAndReset(t)
   }
 
