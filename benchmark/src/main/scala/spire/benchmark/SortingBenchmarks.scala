@@ -2,6 +2,7 @@ package spire.benchmark
 
 import scala.{specialized => spec}
 import scala.annotation.tailrec
+import scala.reflect.ClassTag
 
 import scala.util.Random
 import Random._
@@ -44,11 +45,17 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
     }
   }
 
+  //@Param(Array("4", "6", "8", "10", "12", "14", "16", "18", "20"))
   @Param(Array("3", "4", "6", "9", "13", "18"))
   var pow: Int = 0
 
+  //@Param(Array("double"))
   @Param(Array("int", "long", "float", "double", "complex"))
   var typ: String = null
+
+  //@Param(Array("random", "sorted", "reversed"))
+  @Param(Array("random"))
+  var layout: String = null
 
   var is: Array[Int] = null
   var js: Array[Long] = null
@@ -57,14 +64,23 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
   var cs: Array[Complex[Double]] = null
   var cs2: Array[FakeComplex[Double]] = null
 
+  def mkarray[A:ClassTag:Order](size:Int)(init: => A): Array[A] = {
+    val data = Array.ofDim[A](size)
+    var i = 0
+    while (i < size) { data(i) = init; i += 1 }
+    if (layout == "random") return data
+    spire.math.Sorting.sort(data)
+    if (layout == "sorted") data else data.reverse
+  }
+
   override protected def setUp() {
     val size = fun.pow(2, pow).toInt
 
-    is = if (typ == "int") init(size)(nextInt) else null
-    js = if (typ == "long") init(size)(nextLong) else null
-    fs = if (typ == "float") init(size)(nextFloat) else null
-    ds = if (typ == "double") init(size)(nextDouble) else null
-    cs = if (typ == "complex") init(size)(Complex(nextDouble, nextDouble)) else null
+    is = if (typ == "int") mkarray(size)(nextInt) else null
+    js = if (typ == "long") mkarray(size)(nextLong) else null
+    fs = if (typ == "float") mkarray(size)(nextFloat) else null
+    ds = if (typ == "double") mkarray(size)(nextDouble) else null
+    cs = if (typ == "complex") mkarray(size)(Complex(nextDouble, nextDouble)) else null
     cs2 = if (typ == "complex") cs.map(c => new FakeComplex(c.real, c.imag)) else null
   }
 
@@ -99,7 +115,7 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
   
   def timeSpireInsertionSort(reps:Int): Unit = run(reps) {
     val n = if (pow > 13) 8000 else fun.pow(2, pow).toInt
-
+  
     if (typ == "int") {
       val arr = is.clone; spire.math.InsertionSort.sort(arr, 0, n); arr.length
     } else if (typ == "long") {

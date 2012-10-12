@@ -75,7 +75,7 @@ object MergeSort extends Sort {
       tmp = buf2
       buf2 = buf1
       buf1 = tmp
-    
+
       width *= 2
       step *= 2
     }
@@ -92,7 +92,7 @@ object MergeSort extends Sort {
   @inline final def merge[@spec A]
     (in:Array[A], out:Array[A], start:Int, mid:Int, end:Int)
     (implicit o:Order[A]) {
-          
+
     var ii = start
     var jj = mid
     var kk = start
@@ -121,9 +121,7 @@ object QuickSort {
     (data:Array[A], left: Int, right: Int)
     (implicit o:Order[A], ct:ClassTag[A]) {
 
-    if (right - left < limit) {
-      return InsertionSort.sort(data, left, right + 1)
-    }
+    if (right - left < limit) return InsertionSort.sort(data, left, right + 1)
 
     val pivot = left + (right - left) / 2
     val next = partition(data, left, right, pivot)
@@ -134,7 +132,7 @@ object QuickSort {
   final def partition[@spec A]
     (data:Array[A], left:Int, right:Int, pivot:Int)
     (implicit o:Order[A], ct:ClassTag[A]): Int = {
-    
+
     val value = data(pivot)
 
     //swap(pivot, right)
