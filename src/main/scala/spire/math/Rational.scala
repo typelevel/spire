@@ -14,12 +14,15 @@ trait Fraction[@specialized(Long) A] {
   def den: A
 }
 
-sealed abstract class Rational extends ScalaNumericConversions with Ordered[Rational] {
+sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] {
   import LongRationals.LongRational
   import BigRationals.BigRational
 
   def numerator: BigInt
   def denominator: BigInt
+
+  // ugh, ScalaNumber and ScalaNumericConversions in 2.10 require this hack
+  override def underlying: List[Any] = sys.error("unimplemented")
 
   def abs: Rational = if (this < Rational.zero) -this else this
   def inverse: Rational = Rational.one / this
@@ -37,6 +40,8 @@ sealed abstract class Rational extends ScalaNumericConversions with Ordered[Rati
 
   def toBigInt: BigInt
   def toBigDecimal: BigDecimal
+  override def shortValue = longValue.toShort
+  override def byteValue = longValue.toByte
 
   def floor: Rational = Rational(toBigInt)
   def ceil: Rational = if (denominator == 1) floor else Rational(toBigInt + 1)
@@ -405,13 +410,14 @@ protected abstract class Rationals[@specialized(Long) A](implicit integral: Inte
 
     def isWhole: Boolean = den == one
 
-    def underlying = List(num, den)
+    override def underlying = List(num, den)
 
     def toBigInt: BigInt = (integral.toBigInt(num) / integral.toBigInt(den))
     def toBigDecimal: BigDecimal = integral.toBigDecimal(num) / integral.toBigDecimal(den)
 
     def longValue = toBigInt.longValue    // Override if possible.
     def intValue = longValue.intValue
+
     def floatValue = doubleValue.toFloat
 
     def doubleValue: Double = if (num == zero) {

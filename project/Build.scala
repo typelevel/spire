@@ -16,6 +16,7 @@ object MyBuild extends Build {
 
     libraryDependencies ++= Seq(
       //"org.scalatest" % "scalatest_2.10.0-M7" % "1.9-2.10.0-M7-B1" % "test",
+      "org.scalatest" %% "scalatest" % "1.8" % "test",
       "org.scala-lang" % "scala-reflect" % "2.10.0-RC1"
     ),
 
@@ -64,7 +65,6 @@ object MyBuild extends Build {
   val key = AttributeKey[Boolean]("javaOptionsPatched")
 
   lazy val spire = Project("spire", file("."))
-  lazy val pkg = Project("pkg", file("pkg")).aggregate(spire, deps)
   lazy val examples = Project("examples", file("examples")).dependsOn(spire)
   lazy val benchmark:Project = Project("benchmark", file("benchmark")).
     settings(benchmarkSettings: _*).

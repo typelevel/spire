@@ -44,7 +44,7 @@ object Complex {
 
 final class Complex[@spec(Float, Double) T]
 (val real:T, val imag:T)(implicit f:Fractional[T], t:Trig[T])
-extends ScalaNumericConversions with Serializable {
+extends ScalaNumber with ScalaNumericConversions with Serializable {
 
   // ugh, ScalaNumericConversions ghetto
   //
@@ -53,6 +53,8 @@ extends ScalaNumericConversions with Serializable {
   def floatValue = f.toFloat(real)
   def longValue = f.toLong(real)
   def intValue = f.toInt(real)
+  override def shortValue = f.toShort(real)
+  override def byteValue = f.toByte(real)
   def isWhole = f.isWhole(real) && f.eqv(imag, f.zero)
   def signum: Int = f.compare(real, f.zero)
   def underlying = (real, imag)
