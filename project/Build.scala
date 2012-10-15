@@ -65,7 +65,19 @@ object MyBuild extends Build {
   val key = AttributeKey[Boolean]("javaOptionsPatched")
 
   lazy val spire = Project("spire", file("."))
-  lazy val examples = Project("examples", file("examples")).dependsOn(spire)
+
+  lazy val examples = Project("examples", file("examples")).
+    settings(examplesSettings: _*).
+    dependsOn(spire)
+
+  def examplesSettings = Seq(
+    resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+
+    libraryDependencies ++= Seq(
+      "com.chuusai" % "shapeless_2.10.0-RC1" % "1.2.3-SNAPSHOT"
+    )
+  )
+
   lazy val benchmark:Project = Project("benchmark", file("benchmark")).
     settings(benchmarkSettings: _*).
     dependsOn(spire)

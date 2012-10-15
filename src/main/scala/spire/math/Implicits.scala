@@ -77,6 +77,7 @@ object Implicits extends LowPriorityImplicits {
   implicit def euclideanRingOps[@spec(Int, Long, Float, Double) A:EuclideanRing](a:A) = new EuclideanRingOps(a)
   implicit def fieldOps[@spec(Float, Double) A:Field](a:A) = new FieldOps(a)
 
+  implicit def integralOps[@spec(Float, Double) A:Integral](a:A) = new IntegralOps(a)
   implicit def fractionalOps[@spec(Float, Double) A:Fractional](a:A) = new FractionalOps(a)
 
   implicit def signedOps[@spec(Float, Double, Int, Long) A: Signed](a: A) = new SignedOps(a)

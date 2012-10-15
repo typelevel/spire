@@ -6,8 +6,7 @@ import spire.macros._
 import language.experimental.macros
 import scala.{specialized => spec}
 
-trait Fractional[@spec(Float,Double) A] extends Field[A] with NRoot[A]
-with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A] {
+trait Fractional[@spec(Float,Double) A] extends Field[A] with NRoot[A] with Integral[A] {
   def ceil(a:A):A
   def floor(a:A):A
 }
@@ -27,7 +26,7 @@ object Fractional {
   }
   implicit object RealIsFractional extends RealIsFractional
 
-  def apply[@spec(Int,Long,Float,Double) A](implicit f:Fractional[A]) = f
+  @inline final def apply[A](implicit ev:Fractional[A]) = ev
 }
 
 trait FloatIsFractional extends Fractional[Float] with FloatIsField

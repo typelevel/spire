@@ -1,18 +1,33 @@
 package spire.math
 
 import spire.algebra._
+import spire.macros._
 
 import scala.{specialized => spec}
 
+import language.experimental.macros
+
 trait Integral[@spec(Int,Long) A] extends EuclideanRing[A]
-with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A]
+with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A] {
+  def isZero(x: A) = eqv(x, zero)
+  def isNonzero(x: A) = neqv(x, zero)
+  def isPositive(x: A) = gt(x, zero)
+  def isNegative(x: A) = lt(x, zero)
+}
+
+class IntegralOps[A](lhs:A)(implicit ev:Integral[A]) {
+  def isZero() = macro Ops.unop[Boolean]
+  def isNonzero() = macro Ops.unop[Boolean]
+  def isPositive() = macro Ops.unop[Boolean]
+  def isNegative() = macro Ops.unop[Boolean]
+}
 
 object Integral {
   implicit object IntIsIntegral extends IntIsIntegral
   implicit object LongIsIntegral extends LongIsIntegral
   implicit object BigIntIsIntegral extends BigIntIsIntegral
 
-  def apply[A](implicit i:Integral[A]) = i
+  @inline final def apply[A](implicit ev:Integral[A]) = ev
 }
 
 trait IntIsIntegral extends Integral[Int] with IntIsEuclideanRing
