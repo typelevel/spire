@@ -1,6 +1,5 @@
 package spire.algebra
 
-import spire.math.Eq
 import spire.macros._
 import language.experimental.macros
 

@@ -70,6 +70,7 @@ object Implicits extends LowPriorityImplicits {
   implicit def eqOps[@spec(Int, Long, Float, Double) A:Eq](a:A) = new EqOps(a)
   implicit def orderOps[@spec(Int, Long, Float, Double) A:Order](a:A) = new OrderOps(a)
   implicit def semigroupOps[A:Semigroup](a:A) = new SemigroupOps(a)
+  implicit def groupOps[A:Group](a:A) = new GroupOps(a)
 
   implicit def convertableOps[@spec(Int, Long, Float, Double) A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
 
