@@ -6,7 +6,7 @@ import Random._
 
 import spire.algebra._
 import spire.math._
-import spire.math.Implicits._
+import spire.implicits._
 import fpf._
 
 import com.google.caliper.Runner 

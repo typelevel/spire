@@ -7,7 +7,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.math.{Pi, atan2, cos, exp, log, sin, sqrt}
 
 import spire.math.fun._
-import Implicits._
+import spire.implicits._
 
 import language.implicitConversions
 

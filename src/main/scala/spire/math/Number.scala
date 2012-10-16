@@ -1,7 +1,7 @@
 package spire.math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions, abs, floor}
-import spire.math.Implicits._
+import spire.implicits._
 import scala.math.BigDecimal
 
 import language.implicitConversions

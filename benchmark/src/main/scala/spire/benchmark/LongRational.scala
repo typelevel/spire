@@ -1,9 +1,8 @@
 package spire.benchmark
 
 import spire.algebra._
+import spire.implicits._
 import spire.math._
-import Implicits._
-
 
 object LongRational {
   val Zero = new LongRational(0, 1)

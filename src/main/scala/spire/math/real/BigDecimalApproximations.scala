@@ -93,7 +93,7 @@ object BigDecimalApproximations {
         }
 
       case e @ KRoot(a, k) =>
-        import Implicits._
+        import spire.implicits._
 
         val x = apply(a, max(bits + 1, 1 - a.decimalLowerBound / 2))
 
@@ -148,7 +148,7 @@ object BigDecimalApproximations {
         -apply(a, mc)
 
       case KRoot(a, k) => {
-        import Implicits._
+        import spire.implicits._
 
         val ctxt = mc + 1
         val sub = apply(a, ctxt)

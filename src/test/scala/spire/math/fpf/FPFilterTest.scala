@@ -2,7 +2,7 @@ package spire.math.fpf
 
 import spire.algebra._
 import spire.math._
-import Implicits._
+import spire.implicits._
 
 import org.scalatest.FunSuite
 

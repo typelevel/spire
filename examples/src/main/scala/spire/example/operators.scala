@@ -4,7 +4,7 @@ import language.implicitConversions
 
 import spire.algebra._
 import spire.math._
-import spire.math.Implicits._
+import spire.implicits._
 
 object Gcd {
   def gcd0[A:Integral](x: A, y: A): A =

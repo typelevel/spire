@@ -1,4 +1,4 @@
-package spire.macros
+package spire.macrosk
 
 import language.implicitConversions
 import language.higherKinds

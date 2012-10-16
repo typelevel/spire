@@ -7,7 +7,7 @@ import scala.{specialized => spec}
 import java.lang.Math
 
 import spire.math._
-import spire.macros._
+import spire.macrosk.Ops
 
 
 /**

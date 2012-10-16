@@ -6,7 +6,7 @@ import language.implicitConversions
 
 import org.scalatest.FunSuite
 import spire.math._
-import Implicits.{eqOps => _, _}
+import spire.implicits.{eqOps => _, _}
 
 class TrigTest extends FunSuite {
 

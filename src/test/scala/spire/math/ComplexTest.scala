@@ -2,7 +2,7 @@ package spire.math
 
 import org.scalatest.FunSuite
 import spire.math.fun._
-import Implicits.{eqOps => _, _}
+import spire.implicits.{eqOps => _, _}
 import java.math.MathContext
 
 class ComplexTest extends FunSuite {

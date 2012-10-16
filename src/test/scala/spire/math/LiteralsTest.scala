@@ -1,16 +1,13 @@
 package spire.math
 
-//import scala.math.abs
-//
-//import language.implicitConversions
-
 import org.scalatest.FunSuite
+
 import spire.math._
-import spire.math.Implicits.{eqOps => _, _}
-import spire.math.Literals._
+import spire.implicits.{eqOps => _, _}
 
 class LiteralsTest extends FunSuite {
   test("byte literals") {
+    import spire.syntax._
     assert(b"-128" === (-128:Byte))
     assert(b"-100" === (-100:Byte))
     assert(b"0" === (0:Byte))
@@ -18,21 +15,18 @@ class LiteralsTest extends FunSuite {
     assert(b"127" === (127:Byte))
     assert(b"128" === (-128:Byte))
     assert(b"255" === (-1:Byte))
-    
-    // TODO: need a way to assert exceptions thrown at compile time
-    //intercept[ArithmeticException]{ b"-129" }
-    //intercept[ArithmeticException]{ b"256" }
-    //intercept[ArithmeticException]{ b"10000" }
   }
 
-/*
-    val n:Short = if (i < -32768 || i > 65535) {
-      throw new ArithmeticException("illegal short constant: %s" format s)
-    } else if (i > 32767) {
-      (i - 32768).toShort
-*/
+  test("illegal byte literals") {
+    import spire.macrosk._
+    assert(Macros.parseByte("-129") === Left("illegal byte constant: -129"))
+    assert(Macros.parseByte("256") === Left("illegal byte constant: 256"))
+    assert(Macros.parseByte("10000") === Left("illegal byte constant: 10000"))
+    assert(Macros.parseByte("abc") === Left("illegal byte constant: abc"))
+  }
 
   test("short literals") {
+    import spire.syntax._
     assert(h"-32768" === (-32768:Short))
     assert(h"-10000" === (-10000:Short))
     assert(h"0" === (0:Short))

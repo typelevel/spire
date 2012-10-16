@@ -4,7 +4,7 @@ import language.experimental.macros
 import scala.{specialized => spec}
 
 import spire.algebra.Zero
-import spire.macros._
+import spire.macrosk.Ops
 
 trait Eq[@spec A] {
   def eqv(x:A, y:A): Boolean

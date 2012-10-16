@@ -3,7 +3,7 @@ package spire.math
 import scala.{specialized => spec}
 import language.experimental.macros
 
-import spire.macros._
+import spire.macrosk.Ops
 
 trait ConvertableTo[@spec A] {
   def fromByte(n:Byte): A

@@ -1,89 +1,102 @@
-package spire.math
+package spire
 
-import scala.annotation.tailrec
-import java.lang.Math
+import scala.{specialized => spec}
+import language.implicitConversions
+import language.experimental.macros
 
-// TODO: in 2.9 there is a bug where package objects break overloading.
-// in 2.10 and beyond this should just be the spire.math package object.
+import spire.algebra._
+import spire.math._
 
-object fun {
-  // largest possible double as BigDecimal
-  private final val maxDouble = BigDecimal(Double.MaxValue)
+final class LiteralIntOps(lhs:Int) {
+  @inline private final def q = Rational(lhs, 1)
 
-  // natural log of largest possible double as BigDecimal
-  private final val logMaxDouble = BigDecimal(Math.log(Double.MaxValue))
+  def +(rhs:Rational) = q + rhs
+  def -(rhs:Rational) = q - rhs
+  def *(rhs:Rational) = q * rhs
+  def /(rhs:Rational) = q / rhs
 
-  // e^logMaxDouble as BigDecimal
-  private final val expLogMaxDouble = BigDecimal(Math.exp(Math.log(Double.MaxValue)))
+  def /~(rhs:Rational) = q.quot(rhs)
+  def %(rhs:Rational) = q % rhs
+  def /%(rhs:Rational) = (q.quot(rhs), q % rhs)
 
-  /**
-   * log() implementations
-   */
+  def **(rhs:Rational)(implicit ev:ApproximationContext[Rational]) = q.pow(rhs)
 
-  final def log(n:Double):Double = Math.log(n)
+  def <(rhs:Rational) = q.compare(rhs) < 0
+  def <=(rhs:Rational) = q.compare(rhs) <= 0
+  def >(rhs:Rational) = q.compare(rhs) > 0
+  def >=(rhs:Rational) = q.compare(rhs) >= 0
 
-  final def log(n:BigDecimal):BigDecimal = {
-    if (n < 0) sys.error("invalid argument: %s" format n)
-    else _log(n, BigDecimal(0))
-  }
+  @inline private def c[A](implicit f:Fractional[A], t:Trig[A]) =
+    Complex(f.fromInt(lhs), f.zero)
 
-  // Since log(n * x) = log(n) + log(x), we can use scala.math.log to
-  // approximate log for BigDecimal.
-  @tailrec private final def _log(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
-    if (n <= maxDouble) BigDecimal(Math.log(n.toDouble)) + sofar
-    else _log(n / maxDouble, logMaxDouble + sofar)
-  }
+  def +[A:Fractional:Trig](rhs:Complex[A]) = c[A] + rhs
+  def -[A:Fractional:Trig](rhs:Complex[A]) = c[A] - rhs
+  def *[A:Fractional:Trig](rhs:Complex[A]) = c[A] * rhs
+  def /[A:Fractional:Trig](rhs:Complex[A]) = c[A] / rhs
 
-  /**
-   * exp() implementations
-   */
-  final def exp(n:Double):Double = Math.exp(n)
+  def /~[A:Fractional:Trig](rhs:Complex[A]) = c[A] /~ rhs
+  def %[A:Fractional:Trig](rhs:Complex[A]) = c[A] % rhs
+  def /%[A:Fractional:Trig](rhs:Complex[A]) = c[A] /% rhs
 
-  final def exp(n:BigDecimal):BigDecimal = _exp(n, BigDecimal(1))
+  def **[A:Fractional:Trig](rhs:Complex[A]) = c[A] ** rhs
 
-  // Since exp(a + b) = exp(a) * exp(b), we can use scala.math.log to
-  // approximate exp for BigDecimal.
-  @tailrec private final def _exp(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
-    if (n <= logMaxDouble) BigDecimal(Math.exp(n.toDouble)) * sofar
-    else _exp(n - logMaxDouble, maxDouble * sofar)
-  }
+  def +(rhs:Real) = Real(lhs) + rhs
 
-  /**
-   * pow() implementations
-   */
+  def /~(rhs:Int) = EuclideanRing[Int].quot(lhs, rhs)
+  def /%(rhs:Int) = EuclideanRing[Int].quotmod(lhs, rhs)
+  def pow(rhs:Int) = Ring[Int].pow(lhs, rhs)
+  def **(rhs:Int) = Ring[Int].pow(lhs, rhs)
+}
 
-  // Since a^b = e^(log(a) * b) we can use exp and log to write pow.
-  // TODO: doesn't make precision guarantees, but it's better than nothing.
-  private val maxIntEx = BigDecimal(999999999)
-  private val minIntEx = BigDecimal(-999999999)
+final class LiteralDoubleOps(lhs:Double) {
+  def pow(rhs:Int) = Ring[Double].pow(lhs, rhs)
+  def **(rhs:Int) = Ring[Double].pow(lhs, rhs)
 
-  final def pow(base:BigDecimal, ex:BigDecimal) =
-    if (ex.isValidInt && ex <= maxIntEx && ex >= minIntEx) base.pow(ex.toInt)
-    else exp(log(base) * ex)
+  @inline private final def c[A:Fractional:ConvertableTo:Trig]:Complex[A] =
+    Complex(ConvertableFrom[Double].toType[A](lhs), Fractional[A].zero)
 
-  /**
-   * Exponentiation function, e.g. x^y
-   *
-   * If base^ex doesn't fit in a Long, the result will overflow (unlike
-   * Math.pow which will return +/- Infinity). 
-   */
-  final def pow(base:Long, ex:Long):Long = if (ex < 0L) {
-    if(base == 0L) sys.error("zero can't be raised to negative power")
-    else if (base == 1L) 1L
-    else if (base == -1L) if ((ex & 1L) == 0L) -1L else 1L
-    else 0L
-  } else {
-    _pow(1L, base, ex)
-  }
+  def +[A:Fractional:Trig](rhs:Complex[A]) = c + rhs
+  def *[A:Fractional:Trig](rhs:Complex[A]) = c * rhs
+  def -[A:Fractional:Trig](rhs:Complex[A]) = c - rhs
+  def /[A:Fractional:Trig](rhs:Complex[A]) = c / rhs
+  def /~[A:Fractional:Trig](rhs:Complex[A]) = c /~ rhs
+  def %[A:Fractional:Trig](rhs:Complex[A]) = c % rhs
+  def /%[A:Fractional:Trig](rhs:Complex[A]) = c /% rhs
+  def pow[A:Fractional:Trig](rhs:Complex[A]) = c pow rhs
+  def **[A:Fractional:Trig](rhs:Complex[A]) = c ** rhs
+}
 
-  @tailrec final def _pow(t:Long, b:Long, e:Long): Long = {
-    if (e == 0L) t
-    else if ((e & 1) == 1) _pow(t * b, b * b, e >> 1L)
-    else _pow(t, b * b, e >> 1L)
-  }
+object implicits {
+  implicit def eqOps[@spec(Int, Long, Float, Double) A:Eq](a:A) = new EqOps(a)
+  implicit def orderOps[@spec(Int, Long, Float, Double) A:Order](a:A) = new OrderOps(a)
+  implicit def semigroupOps[A:Semigroup](a:A) = new SemigroupOps(a)
+  implicit def groupOps[A:Group](a:A) = new GroupOps(a)
 
-  final def pow(base:Double, exponent:Double) = Math.pow(base, exponent)
+  implicit def convertableOps[@spec(Int, Long, Float, Double) A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
 
-  @tailrec final def gcd(a: Long, b: Long): Long =
-    if (b == 0L) Math.abs(a) else gcd(b, a % b)
+  implicit def ringOps[@spec(Int, Long, Float, Double) A:Ring](a:A) = new RingOps(a)
+  implicit def euclideanRingOps[@spec(Int, Long, Float, Double) A:EuclideanRing](a:A) = new EuclideanRingOps(a)
+  implicit def fieldOps[@spec(Float, Double) A:Field](a:A) = new FieldOps(a)
+
+  implicit def integralOps[@spec(Float, Double) A:Integral](a:A) = new IntegralOps(a)
+  implicit def fractionalOps[@spec(Float, Double) A:Fractional](a:A) = new FractionalOps(a)
+
+  implicit def signedOps[@spec(Float, Double, Int, Long) A: Signed](a: A) = new SignedOps(a)
+  implicit def nrootOps[@spec(Int, Long) A: NRoot](a: A) = new NRootOps(a)
+
+  implicit def literalIntOps(lhs:Int) = new LiteralIntOps(lhs)
+  implicit def literalDoubleOps(lhs:Double) = new LiteralDoubleOps(lhs)
+}
+
+object syntax {
+  import spire.macrosk._
+  def cfor[A](init:A)(test:A => Boolean, next:A => A)(body:A => Unit): Unit =
+    macro Syntax.cforMacro[A]
+
+  implicit def literals(s:StringContext) = new Literals(s)
+
+  object radix { implicit def radix(s:StringContext) = new Radix(s) }
+  object si { implicit def siLiterals(s:StringContext) = new SiLiterals(s) }
+  object us { implicit def usLiterals(s:StringContext) = new UsLiterals(s) }
+  object eu { implicit def euLiterals(s:StringContext) = new EuLiterals(s) }
 }

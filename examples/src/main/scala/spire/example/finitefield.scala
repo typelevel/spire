@@ -140,7 +140,7 @@ trait FiniteRing[N <: Nat] extends Ring[Z[N]] {
 }
 
 trait FiniteField[N <: Nat] extends FiniteRing[N] with Field[Z[N]] {
-  import spire.math.Implicits._
+  import spire.implicits._
 
   def quot(a: Z[N], b: Z[N]) = Z[N](a.n / b.n)
   def mod(a: Z[N], b: Z[N]) = Z[N](a.n % b.n)
@@ -163,7 +163,7 @@ trait FiniteField[N <: Nat] extends FiniteRing[N] with Field[Z[N]] {
  * An example of type safe finite fields.
  */
 object FiniteFieldExample extends App {
-  import spire.math.Implicits._
+  import spire.implicits._
   import Nat._
 
   // Some examples of primes. Primality testing is currently rather slow.

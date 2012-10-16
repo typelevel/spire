@@ -7,7 +7,7 @@ import language.implicitConversions
 import java.lang.Math
 
 import spire.algebra.{Sign, Positive, Negative, Zero}
-import Implicits._
+import spire.implicits._
 
 trait Fraction[@specialized(Long) A] {
   def num: A

@@ -3,7 +3,7 @@ package spire.math
 import language.experimental.macros
 import scala.{specialized => spec}
 
-import spire.macros._
+import spire.macrosk.Ops
 
 trait Order[@spec A] extends Eq[A] {
   self =>

@@ -1,6 +1,6 @@
 package spire.algebra
 
-import spire.macros._
+import spire.macrosk.Ops
 import language.experimental.macros
 
 trait Group[A] extends Monoid[A] {

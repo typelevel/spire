@@ -1,4 +1,4 @@
-package spire.macros
+package spire.macrosk
 
 import language.implicitConversions
 import language.higherKinds
@@ -7,11 +7,6 @@ import language.experimental.macros
 import scala.reflect.macros.Context
 
 object Syntax {
-
-  def cfor[A](init:A)
-    (test:A => Boolean, next:A => A)
-    (body:A => Unit): Unit = macro cforMacro[A]
-
   def cforMacro[A:c.WeakTypeTag](c:Context)(init:c.Expr[A])
      (test:c.Expr[A => Boolean], next:c.Expr[A => A])
      (body:c.Expr[A => Unit]): c.Expr[Unit] = {

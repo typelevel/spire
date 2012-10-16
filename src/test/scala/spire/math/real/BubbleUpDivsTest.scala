@@ -1,7 +1,7 @@
 package test.scala.spire.math.real
 
 import spire.math._
-import Implicits._
+import spire.implicits._
 import real._
 
 import org.scalatest.FunSuite

@@ -28,7 +28,7 @@ class NRootTest extends FunSuite {
     x.round(DECIMAL1) * BigDecimal(1, x.mc.getPrecision - 1)
 
   def checkNRoot(x: BigDecimal, n: Int) {
-    import Implicits._
+    import spire.implicits._
 
     val y = x nroot n
     val e = eps(y)

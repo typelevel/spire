@@ -6,7 +6,7 @@ import scala.reflect.ClassTag
 import org.scalatest.FunSuite
 
 // we need to disable our own === to avoid messing up ScalaTest.
-import Implicits.{eqOps => _, _}
+import spire.implicits.{eqOps => _, _}
 
 import java.math.MathContext
 

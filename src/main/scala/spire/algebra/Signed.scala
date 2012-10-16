@@ -1,7 +1,7 @@
 package spire.algebra
 
 import spire.math._
-import spire.macros._
+import spire.macrosk.Ops
 
 import language.experimental.macros
 import java.lang.{Math => mth}

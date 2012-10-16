@@ -19,7 +19,7 @@ class RationalTest extends FunSuite {
   }
 
   test("RationalIsFractional implicit exists") {
-    import Implicits._
+    import spire.implicits._
     def doStuff[NT](a: NT, b: NT)(implicit n: Fractional[NT]) = {
       a / b    // Note: a & b are of unknown type NT, not Rational
     }

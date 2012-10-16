@@ -3,8 +3,8 @@ package spire.example
 import language.implicitConversions
 
 import spire.algebra._
+import spire.implicits._
 import spire.math._
-import Implicits._
 
 object EndoRingExample extends App {
 

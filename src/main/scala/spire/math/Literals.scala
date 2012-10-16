@@ -5,16 +5,12 @@ import language.implicitConversions
 
 import scala.{specialized => spec}
 
-import spire.macros.Macros
+import spire.macrosk.Macros
 
 class Literals(s:StringContext) {
   def b():Byte = macro Macros.byte
   def h():Short = macro Macros.short
   def r():Rational = macro Macros.rational
-}
-
-object Literals {
-  implicit def literals(s:StringContext) = new Literals(s)
 }
 
 class Radix(s:StringContext) {
@@ -24,16 +20,23 @@ class Radix(s:StringContext) {
   def x16():Int = macro Macros.radix
 }
 
-object Radix {
-  implicit def radix(s:StringContext) = new Radix(s)
-}
-
 class SiLiterals(s:StringContext) {
   def i():Int = macro Macros.siInt
   def j():Long = macro Macros.siLong
   def big():BigInt = macro Macros.siBigInt
+  def dec():BigDecimal = macro Macros.siBigDecimal
 }
 
-object SiLiterals {
-  implicit def siLiterals(s:StringContext) = new SiLiterals(s)
+class UsLiterals(s:StringContext) {
+  def i():Int = macro Macros.usInt
+  def j():Long = macro Macros.usLong
+  def big():BigInt = macro Macros.usBigInt
+  def dec():BigDecimal = macro Macros.usBigDecimal
+}
+
+class EuLiterals(s:StringContext) {
+  def i():Int = macro Macros.euInt
+  def j():Long = macro Macros.euLong
+  def big():BigInt = macro Macros.euBigInt
+  def dec():BigDecimal = macro Macros.euBigDecimal
 }

@@ -1,11 +1,10 @@
 package spire.math.real
 
 import spire.algebra._
+import spire.implicits._
 import spire.math._
+
 import java.math.MathContext
-
-import Implicits._
-
 
 trait BigDecimalApprox[A <: BigDecimalApprox[A]]
 extends RealLike[A] with SeparationBound[A] {

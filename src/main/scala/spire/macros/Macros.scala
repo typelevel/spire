@@ -1,4 +1,4 @@
-package spire.macros
+package spire.macrosk
 
 import language.implicitConversions
 import language.higherKinds
@@ -10,21 +10,49 @@ import spire.math._
 import spire.algebra._
 
 object Macros {
+  def parseTree1(c:Context): String = {
+    import c.mirror._
+    import c.universe._
+    c.prefix.tree match {
+      case Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) => s
+    }
+  }
+
+  def parseByte(s: String): Either[String, Byte] = try {
+    val i = s.toInt
+    if (i < -128 || i > 255) {
+      Left("illegal byte constant: %s" format s)
+    } else if (i > 127) {
+      Right((i - 256).toByte)
+    } else {
+      Right(i.toByte)
+    }
+  } catch {
+    case _: Exception => Left("illegal byte constant: %s" format s)
+  }
 
   // byte literals
   def byte(c:Context)(): c.Expr[Byte] = {
     import c.mirror._
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    val i = s.toInt
-    val n:Byte = if (i < -128 || i > 255) {
-      throw new NumberFormatException("illegal byte constant: %s" format s)
-    } else if (i > 127) {
-      (i - 256).toByte
-    } else {
-      i.toByte
+    parseByte(s) match {
+      case Right(n) => c.Expr[Byte](Literal(Constant(n)))
+      case Left(s) => throw new NumberFormatException(s)
     }
-    c.Expr[Byte](Literal(Constant(n)))
+  }
+
+  def parseShort(s: String): Either[String, Short] = try {
+    val i = s.toInt
+    if (i < -32768 || i > 65535) {
+      Left("illegal short constant: %s" format s)
+    } else if (i > 32767) {
+      Right((i - 65536).toShort)
+    } else {
+      Right(i.toShort)
+    }
+  } catch {
+    case _: Exception => Left("illegal short constant: %s" format s)
   }
 
   // short literals
@@ -32,15 +60,10 @@ object Macros {
     import c.mirror._
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    val i = s.toInt
-    val n:Short = if (i < -32768 || i > 65535) {
-      throw new NumberFormatException("illegal short constant: %s" format s)
-    } else if (i > 32767) {
-      (i - 65536).toShort
-    } else {
-      i.toShort
+    parseShort(s) match {
+      case Right(n) => c.Expr[Short](Literal(Constant(n)))
+      case Left(s) => throw new NumberFormatException(s)
     }
-    c.Expr[Short](Literal(Constant(n)))
   }
 
   // rational literals
@@ -49,6 +72,12 @@ object Macros {
     import c.mirror._
     import c.universe._
     Select(Select(Select(Ident("scala"), "math"), "BigInt"), "apply")
+  }
+
+  def bigDecimalApply(c:Context) = {
+    import c.mirror._
+    import c.universe._
+    Select(Select(Select(Ident("scala"), "math"), "BigDecimal"), "apply")
   }
 
   def rationalApply(c:Context) = {
@@ -82,48 +111,86 @@ object Macros {
     }
   }
 
-  // short literals
-  def isValidSiInt(s:String) = s.matches("0|-?[1-9][0-9]{0,2}( [0-9]{3})*")
-
-  def siInt(c:Context)(): c.Expr[Int] = {
+  def formatWhole(c: Context, sep: String): String = {
+    val regex = "0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*" format sep
     import c.mirror._
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-
-    if (!isValidSiInt(s))
-      throw new NumberFormatException("illegal SI Int constant: %s" format s)
-
-    val n = s.replace(" ", "").toInt
-
-    c.Expr[Int](Literal(Constant(n)))
+    if (!s.matches(regex)) sys.error("invalid")
+    s.replace(sep, "")
   }
 
-  def siLong(c:Context)(): c.Expr[Long] = {
+  def formatDecimal(c: Context, sep: String, dec: String): String = {
+    val regex = "0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*(%s[0-9]+)?" format (sep, dec)
     import c.mirror._
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-
-    if (!isValidSiInt(s))
-      throw new NumberFormatException("illegal SI Long constant: %s" format s)
-
-    val n = s.replace(" ", "").toLong
-
-    c.Expr[Long](Literal(Constant(n)))
+    if (!s.matches(regex)) sys.error("invalid")
+    s.replace(sep, "").replace(dec, ".")
   }
 
-  def siBigInt(c:Context)(): c.Expr[BigInt] = {
+  def handleInt(c: Context, name: String, sep: String): c.Expr[Int] = {
     import c.mirror._
     import c.universe._
-    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-
-    if (!isValidSiInt(s))
-      throw new NumberFormatException("illegal SI BigInt constant: %s" format s)
-
-    val str = s.replace(" ", "")
-
-    c.Expr[BigInt](Apply(bigIntApply(c), List(Literal(Constant(str)))))
+    try {
+      c.Expr[Int](Literal(Constant(formatWhole(c, sep).toInt)))
+    } catch {
+      case e: Exception =>
+        throw new NumberFormatException("illegal %s Int constant" format name)
+    }
   }
 
+  def handleLong(c: Context, name: String, sep: String): c.Expr[Long] = {
+    import c.mirror._
+    import c.universe._
+    try {
+      c.Expr[Long](Literal(Constant(formatWhole(c, sep).toLong)))
+    } catch {
+      case e: Exception =>
+        throw new NumberFormatException("illegal %s Long constant" format name)
+    }
+  }
+
+  def handleBigInt(c:Context, name: String, sep: String): c.Expr[BigInt] = {
+    import c.mirror._
+    import c.universe._
+    try {
+      val s = formatWhole(c, sep)
+      val b = BigInt(s) // make sure it's ok
+      c.Expr[BigInt](Apply(bigIntApply(c), List(Literal(Constant(s)))))
+    } catch {
+      case e: Exception =>
+        throw new NumberFormatException("illegal %s BigInt constant" format name)
+    }
+  }
+
+  def handleBigDecimal(c:Context, name: String, sep: String, dec: String): c.Expr[BigDecimal] = {
+    import c.mirror._
+    import c.universe._
+    try {
+      val s = formatDecimal(c, sep, dec)
+      val b = BigDecimal(s) // make sure it's ok
+      c.Expr[BigDecimal](Apply(bigDecimalApply(c), List(Literal(Constant(s)))))
+    } catch {
+      case e: Exception =>
+        throw new NumberFormatException("illegal %s BigInt constant" format name)
+    }
+  }
+
+  def siInt(c:Context)(): c.Expr[Int] = handleInt(c, "SI", " ")
+  def siLong(c:Context)(): c.Expr[Long] = handleLong(c, "SI", " ")
+  def siBigInt(c:Context)(): c.Expr[BigInt] = handleBigInt(c, "SI", " ")
+  def siBigDecimal(c:Context)(): c.Expr[BigDecimal] = handleBigDecimal(c, "SI", " ", ".")
+
+  def usInt(c:Context)(): c.Expr[Int] = handleInt(c, "US", ",")
+  def usLong(c:Context)(): c.Expr[Long] = handleLong(c, "US", ",")
+  def usBigInt(c:Context)(): c.Expr[BigInt] = handleBigInt(c, "US", ",")
+  def usBigDecimal(c:Context)(): c.Expr[BigDecimal] = handleBigDecimal(c, "US", ",", ".")
+
+  def euInt(c:Context)(): c.Expr[Int] = handleInt(c, "EU", ".")
+  def euLong(c:Context)(): c.Expr[Long] = handleLong(c, "EU", ".")
+  def euBigInt(c:Context)(): c.Expr[BigInt] = handleBigInt(c, "EU", ".")
+  def euBigDecimal(c:Context)(): c.Expr[BigDecimal] = handleBigDecimal(c, "EU", ".", ",")
 
   def radix(c:Context)(): c.Expr[Int] = {
     import c.mirror._

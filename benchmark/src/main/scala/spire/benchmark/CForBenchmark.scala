@@ -10,7 +10,7 @@ import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
-import spire.macros.Syntax._
+import spire.syntax._
 import spire.math.fun._
 
 object CForBenchmarks extends MyRunner {

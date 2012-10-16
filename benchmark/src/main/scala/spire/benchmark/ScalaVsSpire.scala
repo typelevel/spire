@@ -78,7 +78,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
   }
 
   def doPairwiseSpire[@spec(Int) A:Ring](as:Array[A], bs: Array[A], cs: Array[A]) {
-    import spire.math.Implicits._
+    import spire.implicits._
     var i = 0
     val len = as.length
     while (i < len) { cs(i) = as(i) + bs(i); i += 1 }
@@ -105,7 +105,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
   }
 
   def doIncrementSpire[@spec(Int) A:Ring:Order](start: A, n: A) = {
-    import spire.math.Implicits._
+    import spire.implicits._
     val ev = Ring[A]
     var t = start
     var i = ev.zero
@@ -148,7 +148,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
   }
 
   def doMinMaxSpire[@spec(Int) A:Ring:Order](ns: Array[A]) = {
-    import spire.math.Implicits._
+    import spire.implicits._
 
     var zmin = ns(0)
     var zmax = ns(0)
@@ -188,7 +188,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
   }
 
   @tailrec final def gcdSpire[@spec(Int) A](a: A, b: A)(implicit ev1:EuclideanRing[A], ev2:Eq[A]): A = {
-    import spire.math.Implicits._
+    import spire.implicits._
     if (a % b === ev1.zero) b else gcdSpire(b, a % b)
   }
 
@@ -215,7 +215,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
   }
 
   def doScaleSpire[@spec(Int) A:EuclideanRing](as: Array[A], n: A, d: A, cs: Array[A]) = {
-    import spire.math.Implicits._
+    import spire.implicits._
     var i = 0
     val len = as.length
     while (i < len) { cs(i) = as(i) * n /~ d; i += 1}

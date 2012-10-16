@@ -2,7 +2,7 @@ package spire.math
 
 import org.scalatest.FunSuite
 import spire.math.fun._
-import Implicits.{eqOps => _, _}
+import spire.implicits.{eqOps => _, _}
 
 class IntervalTest extends FunSuite {
   def cc(n1:Double, n2:Double) = Interval(ClosedBelow(n1), ClosedAbove(n2))
