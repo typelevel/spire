@@ -40,7 +40,7 @@ object Syntax {
     val t = Block(
       List(
         //importTailrec,
-        DefDef(mods, w, List(), List(param), Ident("Unit"),
+        DefDef(mods, w, List(), List(param), Ident(newTypeName("Unit")),
           If(Apply(test.tree, List(Ident(a))),
             Block(
               List(Apply(body.tree, List(Ident(a)))),
@@ -48,7 +48,7 @@ object Syntax {
             Literal(Constant(()))))),
       Apply(Ident(w), List(init.tree)))
 
-    new Util[c.type](c).inlineAndReset(t)
+    new Util[c.type](c).inlineAndReset[Unit](t)
   }
 
   class Util[C <: Context with Singleton](val c:C) {
