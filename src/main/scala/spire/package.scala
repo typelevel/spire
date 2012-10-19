@@ -7,8 +7,26 @@ import language.experimental.macros
 import spire.algebra._
 import spire.math._
 
-final class LiteralIntOps(lhs:Int) {
+final class LiteralIntOps(val lhs:Int) extends AnyVal {
   @inline private final def q = Rational(lhs, 1)
+
+  def +[A](rhs:A)(implicit ev:Ring[A]) = ev.plus(ev.fromInt(lhs), rhs)
+  def -[A](rhs:A)(implicit ev:Ring[A]) = ev.minus(ev.fromInt(lhs), rhs)
+  def *[A](rhs:A)(implicit ev:Ring[A]) = ev.times(ev.fromInt(lhs), rhs)
+  def /[A](rhs:A)(implicit ev:Field[A]) = ev.div(ev.fromInt(lhs), rhs)
+
+  def /~[A](rhs:A)(implicit ev:EuclideanRing[A]) = ev.quot(ev.fromInt(lhs), rhs)
+  def %[A](rhs:A)(implicit ev:EuclideanRing[A]) = ev.mod(ev.fromInt(lhs), rhs)
+  def /%[A](rhs:A)(implicit ev:EuclideanRing[A]) = ev.quotmod(ev.fromInt(lhs), rhs)
+
+  def <[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.lt(c.fromInt(lhs), rhs)
+  def <=[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.lteqv(c.fromInt(lhs), rhs)
+  def >[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.gt(c.fromInt(lhs), rhs)
+  def >=[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.gteqv(c.fromInt(lhs), rhs)
+
+  def cmp[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.compare(c.fromInt(lhs), rhs)
+  def min[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.min(c.fromInt(lhs), rhs)
+  def max[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.max(c.fromInt(lhs), rhs)
 
   def +(rhs:Rational) = q + rhs
   def -(rhs:Rational) = q - rhs
@@ -48,7 +66,7 @@ final class LiteralIntOps(lhs:Int) {
   def **(rhs:Int) = Ring[Int].pow(lhs, rhs)
 }
 
-final class LiteralDoubleOps(lhs:Double) {
+final class LiteralDoubleOps(val lhs:Double) extends AnyVal {
   def pow(rhs:Int) = Ring[Double].pow(lhs, rhs)
   def **(rhs:Int) = Ring[Double].pow(lhs, rhs)
 
@@ -86,6 +104,8 @@ object implicits {
 
   implicit def literalIntOps(lhs:Int) = new LiteralIntOps(lhs)
   implicit def literalDoubleOps(lhs:Double) = new LiteralDoubleOps(lhs)
+
+  implicit def intToA[A](n:Int)(implicit c:ConvertableTo[A]): A = c.fromInt(n)
 }
 
 object syntax {

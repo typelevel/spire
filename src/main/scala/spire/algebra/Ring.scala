@@ -52,9 +52,13 @@ trait Ring[@spec(Int,Long,Float,Double) A] {
 final class RingOps[A](lhs:A)(implicit ev:Ring[A]) {
   def unary_-() = macro Ops.unop[A]
   
-  def -(rhs:A) = macro Ops.binop[A, A]
-  def +(rhs:A) = macro Ops.binop[A, A]
-  def *(rhs:A) = macro Ops.binop[A, A]
+  def -(rhs:A): A = macro Ops.binop[A, A]
+  def +(rhs:A): A = macro Ops.binop[A, A]
+  def *(rhs:A): A = macro Ops.binop[A, A]
+
+  def -(rhs:Int): A = ev.minus(lhs, ev.fromInt(rhs))
+  def +(rhs:Int): A = ev.plus(lhs, ev.fromInt(rhs))
+  def *(rhs:Int): A = ev.times(lhs, ev.fromInt(rhs))
   
   def pow(rhs:Int) = macro Ops.binop[Int, A]
   def **(rhs:Int) = macro Ops.binop[Int, A]

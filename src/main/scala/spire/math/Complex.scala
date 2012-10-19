@@ -38,7 +38,8 @@ object Complex {
     new Complex(real, imag)
   }
 
-  def apply[@spec(Float, Double) T:Fractional:Trig](real:T, imag:T) = new Complex(real, imag)
+  def apply(real: Double, imag: Double): Complex[Double] = new Complex(real, imag)
+  def apply[@spec(Float, Double) T:Fractional:Trig](real:T, imag:T): Complex[T] = new Complex(real, imag)
   def unapply[@spec(Float, Double) T:Fractional:Trig](c:Complex[T]) = Some((c.real, c.imag))
 }
 

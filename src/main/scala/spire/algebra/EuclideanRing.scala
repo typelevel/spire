@@ -17,6 +17,10 @@ final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def /~(rhs:A) = macro Ops.binop[A, A]
   def %(rhs:A) = macro Ops.binop[A, A]
   def /%(rhs:A) = macro Ops.binop[A, A]
+
+  def /~(rhs:Int) = ev.quot(lhs, ev.fromInt(rhs))
+  def %(rhs:Int) = ev.mod(lhs, ev.fromInt(rhs))
+  def /%(rhs:Int) = ev.quotmod(lhs, ev.fromInt(rhs))
 }
 
 object EuclideanRing {

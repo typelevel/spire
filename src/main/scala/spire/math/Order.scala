@@ -36,6 +36,15 @@ final class OrderOps[A](lhs:A)(implicit ev:Order[A]) {
   def cmp(rhs:A) = macro Ops.binop[A, Int]
   def min(rhs:A) = macro Ops.binop[A, A]
   def max(rhs:A) = macro Ops.binop[A, A]
+
+  def >(rhs:Int)(implicit c:ConvertableTo[A]) = ev.gt(lhs, c.fromInt(rhs))
+  def >=(rhs:Int)(implicit c:ConvertableTo[A]) = ev.gteqv(lhs, c.fromInt(rhs))
+  def <(rhs:Int)(implicit c:ConvertableTo[A]) = ev.lt(lhs, c.fromInt(rhs))
+  def <=(rhs:Int)(implicit c:ConvertableTo[A]) = ev.lteqv(lhs, c.fromInt(rhs))
+  
+  def cmp(rhs:Int)(implicit c:ConvertableTo[A]) = ev.compare(lhs, c.fromInt(rhs))
+  def min(rhs:Int)(implicit c:ConvertableTo[A]) = ev.min(lhs, c.fromInt(rhs))
+  def max(rhs:Int)(implicit c:ConvertableTo[A]) = ev.max(lhs, c.fromInt(rhs))
 }
 
 object Order {

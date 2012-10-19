@@ -16,6 +16,8 @@ trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] {
 
 final class FieldOps[A](lhs:A)(implicit ev:Field[A]) {
   def /(rhs:A) = macro Ops.binop[A, A]
+  def /(rhs:Int) = ev.div(lhs, ev.fromInt(rhs))
+
   def isWhole() = macro Ops.unop[Boolean]
 }
 
