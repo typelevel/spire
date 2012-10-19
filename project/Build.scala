@@ -6,7 +6,7 @@ object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     name := "spire",
     organization := "org.spire-math",
-    version := "0.3.0-M2",
+    version := "0.3.0-M3",
 
     scalaVersion := "2.10.0-RC1",
     scalaBinaryVersion := "2.10.0-RC1",
@@ -15,7 +15,6 @@ object MyBuild extends Build {
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
-      //"org.scalatest" % "scalatest_2.10.0-M7" % "1.9-2.10.0-M7-B1" % "test",
       "org.scalatest" %% "scalatest" % "1.8" % "test",
       "org.scala-lang" % "scala-reflect" % "2.10.0-RC1"
     ),
