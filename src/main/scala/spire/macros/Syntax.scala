@@ -7,20 +7,47 @@ import language.experimental.macros
 import scala.reflect.macros.Context
 
 object Syntax {
+  // used to give our labels, vars a somewhat unique identifier
+  var n: Int = 0
+
   def cforMacro[A:c.WeakTypeTag](c:Context)(init:c.Expr[A])
      (test:c.Expr[A => Boolean], next:c.Expr[A => A])
      (body:c.Expr[A => Unit]): c.Expr[Unit] = {
     import c.universe._
-    val t = reify {
-      import scala.annotation.tailrec
-      @tailrec def loop(a: A) {
-        if (test.splice(a)) {
-          body.splice(a)
-          loop(next.splice(a))
-        }
-      }
-      loop(init.splice)
-    }
+
+    val c.WeakTypeTag(tpe) = implicitly[c.WeakTypeTag[A]]
+
+    // it would be good to do something smarter here
+    n = (n + 1) % 100000
+
+    val a = newTermName("a%d" format n)
+    val w = newTermName("w%d" format n)
+
+    val tailrec = newTermName("tailrec")
+
+    val importTailrec = Import(
+      Select(Ident("scala"), newTermName("annotation")),
+      List(ImportSelector(tailrec, 1161, tailrec, 1161)))
+
+    // TODO: why can't i get the freaking tailrec working??? ARGHGGH!!
+
+    //val mods = Modifiers(NoFlags, tpnme.EMPTY,
+    //  List(Apply(Select(New(Ident(tailrec)), nme.CONSTRUCTOR), List())))
+    val mods = Modifiers(NoFlags, tpnme.EMPTY, List())
+
+    val param = List(ValDef(Modifiers(Flag.PARAM), a, TypeTree(tpe), EmptyTree))
+
+    val t = Block(
+      List(
+        //importTailrec,
+        DefDef(mods, w, List(), List(param), Ident("Unit"),
+          If(Apply(test.tree, List(Ident(a))),
+            Block(
+              List(Apply(body.tree, List(Ident(a)))),
+              Apply(Ident(w), List(Apply(next.tree, List(Ident(a)))))),
+            Literal(Constant(()))))),
+      Apply(Ident(w), List(init.tree)))
+
     new Util[c.type](c).inlineAndReset(t)
   }
 
@@ -29,8 +56,8 @@ object Syntax {
 
     def die(msg:String) = c.abort(c.enclosingPosition, msg)
 
-    def inlineAndReset[T](expr: c.Expr[T]): c.Expr[T] =
-      c.Expr[T](c resetAllAttrs inlineApplyRecursive(expr.tree))
+    def inlineAndReset[T](tree: Tree): c.Expr[T] =
+      c.Expr[T](c resetAllAttrs inlineApplyRecursive(tree))
 
     def inlineApplyRecursive(tree: Tree): Tree = {
       val ApplyName = newTermName("apply")
@@ -43,17 +70,26 @@ object Syntax {
       }
 
       object InlineApply extends Transformer {
+        def inlineTerms(params: List[Tree], body: Tree, args: List[Tree]): Tree = {
+          if (params.length != args.length)
+            die("bad arity: %s vs %s" format (params.length, args.length))
+
+          params.zip(args).foldLeft(body) {
+            case (body, (ValDef(_, name, _, _), arg)) => {
+              new InlineTerm(name, arg).transform(body)
+            }
+          }
+        }
+
         override def transform(tree: Tree): Tree = tree match {
           case Apply(Select(Function(params, body), ApplyName), args) =>
-            if (params.length != args.length)
-              die("bad arity: %s vs %s" format (params.length, args.length))
+            inlineTerms(params, body, args)
 
-            params.zip(args).foldLeft(body) {
-              case (body, (ValDef(_, name, _, _), arg)) =>
-                new InlineTerm(name, arg).transform(body)
-            }
+          case Apply(Function(params, body), args) =>
+            inlineTerms(params, body, args)
 
-          case _ => super.transform(tree)
+          case _ =>
+            super.transform(tree)
         }
       }
 

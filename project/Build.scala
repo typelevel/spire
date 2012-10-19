@@ -71,6 +71,7 @@ object MyBuild extends Build {
     dependsOn(spire)
 
   def examplesSettings = Seq(
+    //scalacOptions ++= Seq("-Ymacro-debug-lite"),
     resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
 
     libraryDependencies ++= Seq(
