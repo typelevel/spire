@@ -14,9 +14,7 @@ import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
-object JuliaBenchmarks extends MyRunner {
-  val cls = classOf[JuliaBenchmarks]
-}
+object JuliaBenchmarks extends MyRunner(classOf[JuliaBenchmarks])
 
 class JuliaBenchmarks extends MyBenchmark {
   def mandelComplex(c: Complex[Double]): Int = {

@@ -14,12 +14,9 @@ import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
+object SelectionBenchmarks extends MyRunner(classOf[SelectionBenchmarks])
 
-object SelectionBenchmarks extends MyRunner {
-  val cls = classOf[SelectionBenchmarks]
-}
-
-class SelectionBenchmarks extends MyBenchmark with BenchmarkData {
+class SelectionBenchmarks extends MyBenchmark {
   implicit val lexicographic:Order[Complex[Double]] = new Order[Complex[Double]] {
     def eqv(a: Complex[Double], b: Complex[Double]) = a == b
     def compare(a: Complex[Double], b: Complex[Double]): Int = {
@@ -60,11 +57,11 @@ class SelectionBenchmarks extends MyBenchmark with BenchmarkData {
   override protected def setUp() {
     val size = fun.pow(2, pow).toInt
 
-    is = if (typ == "int") mkarray(size)(nextInt) else null
-    js = if (typ == "long") mkarray(size)(nextLong) else null
-    fs = if (typ == "float") mkarray(size)(nextFloat) else null
-    ds = if (typ == "double") mkarray(size)(nextDouble) else null
-    cs = if (typ == "complex") mkarray(size)(Complex(nextDouble, nextDouble)) else null
+    is = if (typ == "int") mkarray(size, layout)(nextInt) else null
+    js = if (typ == "long") mkarray(size, layout)(nextLong) else null
+    fs = if (typ == "float") mkarray(size, layout)(nextFloat) else null
+    ds = if (typ == "double") mkarray(size, layout)(nextDouble) else null
+    cs = if (typ == "complex") mkarray(size, layout)(nextComplex) else null
     cs2 = if (typ == "complex") cs.map(c => new FakeComplex(c.real, c.imag)) else null
   }
 
@@ -96,44 +93,3 @@ class SelectionBenchmarks extends MyBenchmark with BenchmarkData {
     }
   }
 }
-
-object Mo5Benchmarks extends MyRunner {
-  val cls = classOf[Mo5Benchmarks]
-}
-
-class Mo5Benchmarks extends MyBenchmark with BenchmarkData {
-  val mo5_hb = new HighBranchingMedianOf5 { }
-  val mo5_m = new MutatingMedianOf5 { }
-
-  var as: Array[Int] = null
-
-  val len = 5000000
-
-  override protected def setUp() {
-    as = new Array[Int](len)
-    (0 until len) foreach { i =>
-      as(i) = nextInt
-    }
-  }
-
-  def timeHBMo5(reps:Int) = run(reps) {
-    val a = as.clone()
-    var i = 0
-    while (i <= len - 5) {
-      mo5_hb.mo5(a, i, 1)
-      i += 5
-    }
-    a.length
-  }
-
-  def timeMMo5(reps:Int) = run(reps) {
-    val a = as.clone()
-    var i = 0
-    while (i <= len - 5) {
-      mo5_m.mo5(a, i, 1)
-      i += 5
-    }
-    a.length
-  }
-}
-

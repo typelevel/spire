@@ -13,9 +13,7 @@ import com.google.caliper.Param
 import spire.syntax._
 import spire.math.fun._
 
-object CForBenchmarks extends MyRunner {
-  val cls = classOf[CForBenchmarks]
-}
+object CForBenchmarks extends MyRunner(classOf[CForBenchmarks])
 
 class CForBenchmarks extends MyBenchmark {
   //@Param(Array("10", "15", "20", "25"))

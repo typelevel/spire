@@ -17,9 +17,7 @@ import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
-object ScalaVsSpireBenchmarks extends MyRunner {
-  val cls = classOf[ScalaVsSpireBenchmarks]
-}
+object ScalaVsSpireBenchmarks extends MyRunner(classOf[ScalaVsSpireBenchmarks])
 
 class ScalaVsSpireBenchmarks extends MyBenchmark {
   //@Param(Array("10", "15", "20", "25"))

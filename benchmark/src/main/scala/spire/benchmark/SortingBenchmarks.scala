@@ -18,9 +18,7 @@ import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
-object SortingBenchmarks extends MyRunner {
-  val cls = classOf[SortingBenchmarks]
-}
+object SortingBenchmarks extends MyRunner(classOf[SortingBenchmarks])
 
 final class FakeComplex[@spec(Float, Double) T](val real:T, val imag:T)(implicit f:Fractional[T], t:Trig[T]) extends Ordered[FakeComplex[T]] {
   def compare(b: FakeComplex[T]): Int = {
@@ -64,24 +62,17 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
   var cs: Array[Complex[Double]] = null
   var cs2: Array[FakeComplex[Double]] = null
 
-  def mkarray[A:ClassTag:Order](size:Int)(init: => A): Array[A] = {
-    val data = Array.ofDim[A](size)
-    var i = 0
-    while (i < size) { data(i) = init; i += 1 }
-    if (layout == "random") return data
-    spire.math.Sorting.sort(data)
-    if (layout == "sorted") data else data.reverse
-  }
-
   override protected def setUp() {
     val size = fun.pow(2, pow).toInt
 
-    is = if (typ == "int") mkarray(size)(nextInt) else null
-    js = if (typ == "long") mkarray(size)(nextLong) else null
-    fs = if (typ == "float") mkarray(size)(nextFloat) else null
-    ds = if (typ == "double") mkarray(size)(nextDouble) else null
-    cs = if (typ == "complex") mkarray(size)(Complex(nextDouble, nextDouble)) else null
-    cs2 = if (typ == "complex") cs.map(c => new FakeComplex(c.real, c.imag)) else null
+    def complexToFake(c: Complex[Double]) = new FakeComplex(c.real, c.imag)
+
+    is = if (typ == "int") mkarray(size, layout)(nextInt) else null
+    js = if (typ == "long") mkarray(size, layout)(nextLong) else null
+    fs = if (typ == "float") mkarray(size, layout)(nextFloat) else null
+    ds = if (typ == "double") mkarray(size, layout)(nextDouble) else null
+    cs = if (typ == "complex") mkarray(size, layout)(nextComplex) else null
+    cs2 = if (typ == "complex") cs.map(complexToFake) else null
   }
 
   def timeJavaSort(reps:Int) = run(reps) {

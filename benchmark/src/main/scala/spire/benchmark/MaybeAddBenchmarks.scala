@@ -13,7 +13,8 @@ import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
-object MaybeAddBenchmarks extends MyRunner { val cls = classOf[MaybeAddBenchmarks] }
+object MaybeAddBenchmarks extends MyRunner(classOf[MaybeAddBenchmarks])
+
 class MaybeAddBenchmarks extends MyBenchmark {
   @Param(Array("2000000", "4000000", "8000000"))
   var size:Int = 0
