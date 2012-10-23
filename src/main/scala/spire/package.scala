@@ -1,5 +1,7 @@
 package spire
 
+import scala.reflect.ClassTag
+import scala.annotation.tailrec
 import scala.{specialized => spec}
 import language.implicitConversions
 import language.experimental.macros
@@ -19,14 +21,14 @@ final class LiteralIntOps(val lhs:Int) extends AnyVal {
   def %[A](rhs:A)(implicit ev:EuclideanRing[A]) = ev.mod(ev.fromInt(lhs), rhs)
   def /%[A](rhs:A)(implicit ev:EuclideanRing[A]) = ev.quotmod(ev.fromInt(lhs), rhs)
 
-  def <[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.lt(c.fromInt(lhs), rhs)
-  def <=[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.lteqv(c.fromInt(lhs), rhs)
-  def >[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.gt(c.fromInt(lhs), rhs)
-  def >=[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.gteqv(c.fromInt(lhs), rhs)
+  def <[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.lt(c.fromInt(lhs), rhs)
+  def <=[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.lteqv(c.fromInt(lhs), rhs)
+  def >[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.gt(c.fromInt(lhs), rhs)
+  def >=[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.gteqv(c.fromInt(lhs), rhs)
 
-  def cmp[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.compare(c.fromInt(lhs), rhs)
-  def min[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.min(c.fromInt(lhs), rhs)
-  def max[A](rhs:A)(implicit o:Order[A], c:ConvertableTo[A]) = o.max(c.fromInt(lhs), rhs)
+  def cmp[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.compare(c.fromInt(lhs), rhs)
+  def min[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.min(c.fromInt(lhs), rhs)
+  def max[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.max(c.fromInt(lhs), rhs)
 
   def +(rhs:Rational) = q + rhs
   def -(rhs:Rational) = q - rhs
@@ -84,28 +86,126 @@ final class LiteralDoubleOps(val lhs:Double) extends AnyVal {
   def **[A:Fractional:Trig](rhs:Complex[A]) = c ** rhs
 }
 
+final class ArrayOps[@spec A](arr:Array[A]) {
+  def qsum(implicit ev:Ring[A]) = {
+    @tailrec
+    def f(i:Int, n:Int, t:A):A = if (i < n) f(i + 1, n, ev.plus(t, arr(i))) else t
+    f(0, arr.length, ev.zero)
+  }
+
+  def qproduct(implicit ev:Ring[A]) = {
+    @tailrec
+    def f(i:Int, n:Int, t:A):A = if (i < n) f(i + 1, n, ev.times(t, arr(i))) else t
+    f(0, arr.length, ev.one)
+  }
+
+  def qnorm(p:Int)(implicit ev:Field[A], s: Signed[A], nr:NRoot[A]) = {
+    @tailrec
+    def f(i:Int, n:Int, t:A):A =
+      if (i < n) f(i + 1, n, ev.plus(t, ev.pow(s.abs(arr(i)), p))) else t
+    nr.nroot(f(0, arr.length, ev.one), p)
+  }
+
+  def qmin(implicit ev:Order[A]) = {
+    if (arr.length == 0) sys.error("empty array")
+    @tailrec
+    def f(i:Int, n:Int, t:A):A = if (i < n) f(i + 1, n, ev.min(t, arr(i))) else t
+    f(1, arr.length, arr(0))
+  }
+
+  def qmax(implicit ev:Order[A]) = {
+    if (arr.length == 0) sys.error("empty array")
+    @tailrec
+    def f(i:Int, n:Int, t:A):A = if (i < n) f(i + 1, n, ev.max(t, arr(i))) else t
+    f(1, arr.length, arr(0))
+  }
+
+  def qmean(implicit ev:Field[A]): A = {
+    if (arr.length == 0) sys.error("empty array")
+    var sum = ev.zero
+    @tailrec
+    def f(i:Int, j: Int, n:Int):A = if (i < n) {
+      val t = ev.div(ev.times(sum, ev.fromInt(i)), ev.fromInt(j))
+      val z = ev.div(arr(i), ev.fromInt(j))
+      sum = ev.plus(t, z)
+      f(i + 1, j + 1, n)
+    } else {
+      sum
+    }
+    f(0, 1, arr.length)
+  }
+      
+  import spire.math.{Sorting, Selection}
+
+  def qsort(implicit ev:Order[A], ct:ClassTag[A]) {
+    Sorting.sort(arr)
+  }
+
+  def qsortBy[@spec B](f:A => B)(implicit ev:Order[B], ct:ClassTag[A]) {
+    implicit val ord: Order[A] = ev.on(f)
+    Sorting.sort(arr)
+  }
+
+  def qsortWith(f:(A, A) => Int)(implicit ct:ClassTag[A]) {
+    implicit val ord: Order[A] = Order.from(f)
+    Sorting.sort(arr)
+  }
+
+  def qsorted(implicit ev:Order[A], ct:ClassTag[A]): Array[A] = {
+    val arr2 = arr.clone
+    Sorting.sort(arr2)
+    arr2
+  }
+
+  def qsortedBy[@spec B](f:A => B)(implicit ev:Order[B], ct:ClassTag[A]): Array[A] = {
+    implicit val ord: Order[A] = ev.on(f)
+    val arr2 = arr.clone
+    Sorting.sort(arr2)
+    arr2
+  }
+
+  def qsortedWith(f:(A, A) => Int)(implicit ct:ClassTag[A]): Array[A] = {
+    implicit val ord: Order[A] = Order.from(f)
+    val arr2 = arr.clone
+    Sorting.sort(arr2)
+    arr2
+  }
+
+  def qselect(k: Int)(implicit ev:Order[A], ct:ClassTag[A]) {
+    Selection.select(arr, k)
+  }
+
+  def qselected(k: Int)(implicit ev:Order[A], ct:ClassTag[A]): Array[A] = {
+    val arr2 = arr.clone
+    Selection.select(arr2, k)
+    arr2
+  }
+}
+
 object implicits {
-  implicit def eqOps[@spec(Int, Long, Float, Double) A:Eq](a:A) = new EqOps(a)
-  implicit def orderOps[@spec(Int, Long, Float, Double) A:Order](a:A) = new OrderOps(a)
+  implicit def eqOps[A:Eq](a:A) = new EqOps(a)
+  implicit def orderOps[A:Order](a:A) = new OrderOps(a)
   implicit def semigroupOps[A:Semigroup](a:A) = new SemigroupOps(a)
   implicit def groupOps[A:Group](a:A) = new GroupOps(a)
 
-  implicit def convertableOps[@spec(Int, Long, Float, Double) A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
+  implicit def convertableOps[A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
 
-  implicit def ringOps[@spec(Int, Long, Float, Double) A:Ring](a:A) = new RingOps(a)
-  implicit def euclideanRingOps[@spec(Int, Long, Float, Double) A:EuclideanRing](a:A) = new EuclideanRingOps(a)
-  implicit def fieldOps[@spec(Float, Double) A:Field](a:A) = new FieldOps(a)
+  implicit def ringOps[A:Ring](a:A) = new RingOps(a)
+  implicit def euclideanRingOps[A:EuclideanRing](a:A) = new EuclideanRingOps(a)
+  implicit def fieldOps[A:Field](a:A) = new FieldOps(a)
 
-  implicit def integralOps[@spec(Float, Double) A:Integral](a:A) = new IntegralOps(a)
-  implicit def fractionalOps[@spec(Float, Double) A:Fractional](a:A) = new FractionalOps(a)
+  implicit def integralOps[A:Integral](a:A) = new IntegralOps(a)
+  implicit def fractionalOps[A:Fractional](a:A) = new FractionalOps(a)
 
-  implicit def signedOps[@spec(Float, Double, Int, Long) A: Signed](a: A) = new SignedOps(a)
-  implicit def nrootOps[@spec(Int, Long) A: NRoot](a: A) = new NRootOps(a)
+  implicit def signedOps[A: Signed](a: A) = new SignedOps(a)
+  implicit def nrootOps[A: NRoot](a: A) = new NRootOps(a)
 
   implicit def literalIntOps(lhs:Int) = new LiteralIntOps(lhs)
   implicit def literalDoubleOps(lhs:Double) = new LiteralDoubleOps(lhs)
+  implicit def arrayOps[@spec A](lhs:Array[A]) = new ArrayOps(lhs)
 
   implicit def intToA[A](n:Int)(implicit c:ConvertableTo[A]): A = c.fromInt(n)
+
 }
 
 object syntax {
