@@ -48,6 +48,9 @@ final class OrderOps[A](lhs:A)(implicit ev:Order[A]) {
 }
 
 object Order {
+  implicit object ByteOrder extends ByteOrder
+  implicit object ShortOrder extends ShortOrder
+  implicit object CharOrder extends CharOrder
   implicit object IntOrder extends IntOrder
   implicit object LongOrder extends LongOrder
   implicit object FloatOrder extends FloatOrder
@@ -69,6 +72,30 @@ object Order {
   implicit def ordering[A](implicit o:Order[A]) = new Ordering[A] {
     def compare(x:A, y:A) = o.compare(x, y)
   }
+}
+
+trait ByteOrder extends Order[Byte] with ByteEq {
+  override def gt(x:Byte, y:Byte) = x > y
+  override def gteqv(x:Byte, y:Byte) = x >= y
+  override def lt(x:Byte, y:Byte) = x < y
+  override def lteqv(x:Byte, y:Byte) = x <= y
+  def compare(x:Byte, y:Byte) = if (x < y) -1 else if (x > y) 1 else 0
+}
+
+trait ShortOrder extends Order[Short] with ShortEq {
+  override def gt(x:Short, y:Short) = x > y
+  override def gteqv(x:Short, y:Short) = x >= y
+  override def lt(x:Short, y:Short) = x < y
+  override def lteqv(x:Short, y:Short) = x <= y
+  def compare(x:Short, y:Short) = if (x < y) -1 else if (x > y) 1 else 0
+}
+
+trait CharOrder extends Order[Char] with CharEq {
+  override def gt(x:Char, y:Char) = x > y
+  override def gteqv(x:Char, y:Char) = x >= y
+  override def lt(x:Char, y:Char) = x < y
+  override def lteqv(x:Char, y:Char) = x <= y
+  def compare(x:Char, y:Char) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 trait IntOrder extends Order[Int] with IntEq {

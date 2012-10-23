@@ -21,6 +21,7 @@ final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
 object Eq extends LowPriority {
   implicit object ByteEq extends ByteEq
   implicit object ShortEq extends ShortEq
+  implicit object CharEq extends CharEq
   implicit object IntEq extends IntEq
   implicit object LongEq extends LongEq
   implicit object FloatEq extends FloatEq
@@ -55,6 +56,10 @@ trait ByteEq extends Eq[Byte] {
 trait ShortEq extends Eq[Short] {
   def eqv(x:Short, y:Short) = x == y
   override def neqv(x:Short, y:Short) = x != y
+}
+trait CharEq extends Eq[Char] {
+  def eqv(x:Char, y:Char) = x == y
+  override def neqv(x:Char, y:Char) = x != y
 }
 trait IntEq extends Eq[Int] {
   def eqv(x:Int, y:Int) = x == y
