@@ -8,6 +8,7 @@ import java.lang.Math
 
 import spire.algebra.{Sign, Positive, Negative, Zero}
 import spire.implicits._
+import spire.math.fun.gcd
 
 trait Fraction[@specialized(Long) A] {
   def num: A
@@ -478,9 +479,6 @@ protected abstract class Rationals[@specialized(Long) A](implicit integral: Inte
 object LongRationals extends Rationals[Long] {
   import BigRationals.BigRational
 
-  // inline the implementation we want to use
-  @inline final def gcd(a: Long, b: Long) = spire.math.fun.gcd(a, b)
-
   def build(n: Long, d: Long): Rational = {
     if (d == 0) throw new IllegalArgumentException("0 denominator")
     unsafeBuild(n, d)
@@ -664,7 +662,7 @@ object LongRationals extends Rationals[Long] {
 
 
 object BigRationals extends Rationals[BigInt] {
-  import LongRationals.{LongRational,gcd}
+  import LongRationals.LongRational
 
   def build(n: BigInt, d: BigInt): Rational = {
     if (d == 0) throw new IllegalArgumentException("0 denominator")

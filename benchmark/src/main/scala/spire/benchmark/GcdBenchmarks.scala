@@ -18,6 +18,7 @@ import com.google.caliper.Param
 
 import java.lang.Math
 import java.math.BigInteger
+import java.lang.Long.numberOfTrailingZeros
 
 object GcdBenchmarks extends MyRunner(classOf[GcdBenchmarks])
 
@@ -33,9 +34,7 @@ class GcdBenchmarks extends MyBenchmark {
 
   def timeXorEuclidGcdLong(reps:Int) = run(reps)(xorEuclidGcdLong(longs))
   def timeXorBinaryGcdLong(reps:Int) = run(reps)(xorBinaryGcdLong(longs))
-
-  def timeXorEuclidGcdBigInteger(reps:Int) = run(reps)(xorEuclidGcdBigInteger(bigs))
-  def timeXorBinaryGcdBigInteger(reps:Int) = run(reps)(xorBinaryGcdBigInteger(bigs))
+  //def timeXorBuiltinGcdBigInteger(reps:Int) = run(reps)(xorBuiltinGcdBigInteger(bigs))
 
   def xorEuclidGcdLong(data:Array[Long]):Long = {
     var t = 0L
@@ -59,87 +58,45 @@ class GcdBenchmarks extends MyBenchmark {
     t
   }
 
-  def xorEuclidGcdBigInteger(data:Array[BigInteger]):BigInteger = {
+  def xorBuiltinGcdBigInteger(data:Array[BigInteger]):BigInteger = {
     var t = BigInteger.ZERO
     var i = 0
     val len = data.length - 1
     while (i < len) {
-      t = t.xor(euclidGcdBigInteger(data(i).abs, data(i + 1).abs))
-      i += 1
-    }
-    t
-  }
-
-  def xorBinaryGcdBigInteger(data:Array[BigInteger]):BigInteger = {
-    var t = BigInteger.ZERO
-    var i = 0
-    val len = data.length - 1
-    while (i < len) {
-      t = t.xor(binaryGcdBigInteger(data(i), data(i + 1)))
+      t = t.xor(data(i).gcd(data(i + 1)))
       i += 1
     }
     t
   }
 
   @tailrec
-  final def euclidGcdLong(a: Long, b: Long): Long = {
-    if (b == 0L) Math.abs(a) else euclidGcdLong(b, a % b)
+  final def euclidGcdLong(x: Long, y: Long): Long = {
+    if (y == 0L) Math.abs(x) else euclidGcdLong(y, x % y)
   }
 
-  @tailrec
-  final def euclidGcdBigInteger(a: BigInteger, b: BigInteger): BigInteger = {
-    if (b.signum == 0) a.abs else euclidGcdBigInteger(b, a.mod(b))
-  }
-
-  // iterative version of binary gcd stolen from wikipedia
-  def binaryGcdLong(_a: Long, _b: Long): Long = {
-    var a = Math.abs(_a)
-    var b = Math.abs(_b)
-    var shifts = 0
-
-    while (((a | b) & 1) == 0) {
-      a >>= 1
-      b >>= 1
-      shifts += 1
-    }
-
-    while ((a & 1) == 0) a >>= 1
-
-    do {
-      while ((b & 1) == 0) b >>= 1
-      if (a > b) {
-        val t = b
-        b = a
-        a = t
+  def binaryGcdLong(_x: Long, _y: Long): Long = {
+    if (_x == 0L) return _y
+    if (_y == 0L) return _x
+  
+    var x = Math.abs(_x)
+    var xz = numberOfTrailingZeros(x)
+    x >>= xz
+  
+    var y = Math.abs(_y)
+    var yz = numberOfTrailingZeros(y)
+    y >>= yz
+  
+    while (x != y) {
+      if (x > y) {
+        x -= y
+        x >>= numberOfTrailingZeros(x)
+      } else {
+        y -= x
+        y >>= numberOfTrailingZeros(y)
       }
-      b = b - a
-    } while (b != 0)
-    a << shifts
-  }
-
-  def binaryGcdBigInteger(_a: BigInteger, _b: BigInteger): BigInteger = {
-    var a = _a.abs
-    var b = _b.abs
-    var shifts = 0
-
-    while (!a.testBit(0) && !b.testBit(0)) {
-      a = a.shiftRight(1)
-      b = b.shiftRight(1)
-      shifts += 1
     }
-
-    while (!a.testBit(0)) a = a.shiftRight(1)
-
-    do {
-      while (!b.testBit(0)) b = b.shiftRight(1)
-      if (a.compareTo(b) > 0) {
-        val t = b
-        b = a
-        a = t
-      }
-      b = b.subtract(a)
-    } while (b.signum != 0)
-    a.shiftLeft(shifts)
+  
+    if (xz < yz) x << xz else x << yz
   }
 }
 

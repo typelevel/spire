@@ -1,7 +1,9 @@
 package spire.math
 
 import scala.annotation.tailrec
+import java.lang.Long.numberOfTrailingZeros
 import java.lang.Math
+import java.math.BigInteger
 
 // TODO: in 2.9 there is a bug where package objects break overloading.
 // in 2.10 and beyond this should just be the spire.math package object.
@@ -84,6 +86,33 @@ object fun {
 
   final def pow(base:Double, exponent:Double) = Math.pow(base, exponent)
 
-  @tailrec final def gcd(a: Long, b: Long): Long =
-    if (b == 0L) Math.abs(a) else gcd(b, a % b)
+  def gcd(_x: Long, _y: Long): Long = {
+    if (_x == 0L) return _y
+    if (_y == 0L) return _x
+  
+    var x = Math.abs(_x)
+    var xz = numberOfTrailingZeros(x)
+    x >>= xz
+  
+    var y = Math.abs(_y)
+    var yz = numberOfTrailingZeros(y)
+    y >>= yz
+  
+    while (x != y) {
+      if (x > y) {
+        x -= y
+        x >>= numberOfTrailingZeros(x)
+      } else {
+        y -= x
+        y >>= numberOfTrailingZeros(y)
+      }
+    }
+  
+    if (xz < yz) x << xz else x << yz
+  }
+
+
+  final def gcd(a: BigInt, b: BigInt): BigInt = a.gcd(b)
+
+  final def gcd(a: BigInteger, b: BigInteger): BigInteger = a.gcd(b)
 }
