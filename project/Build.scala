@@ -89,6 +89,11 @@ object MyBuild extends Build {
     javaOptions in run += "-Xmx4G",
 
     libraryDependencies ++= Seq(
+      // comparisons
+      "org.apfloat" % "apfloat" % "1.6.3",
+      "org.jscience" % "jscience" % "4.3.1",
+
+      // caliper stuff
       "com.google.guava" % "guava" % "r09",
       "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.0",
       "com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" from "http://n0d.es/jars/caliper-1.0-SNAPSHOT.jar",
