@@ -177,6 +177,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def sign: Sign = Sign(signum)
 
+  def compareToOne: Int
 
   /**
    * Returns a `Rational` whose numerator and denominator both fit in an `Int`.
@@ -641,6 +642,8 @@ object LongRationals extends Rationals[Long] {
 
     def log() = Rational(Math.log(n) - Math.log(d))
 
+    def compareToOne: Int = n compare d
+
     def compare(r: Rational): Int = r match {
       case r: LongRational => {
         val dgcd = gcd(d, r.d)
@@ -762,6 +765,8 @@ object BigRationals extends Rationals[BigInt] {
     }
 
     def log() = Rational(fun.log(BigDecimal(n)) - fun.log(BigDecimal(d)))
+
+    def compareToOne: Int = n compare d
 
     def compare(r: Rational): Int = r match {
       case r: LongRational => {

@@ -168,11 +168,11 @@ trait DoubleIsRing extends Ring[Double] {
 trait BigIntIsRing extends Ring[BigInt] {
   override def minus(a:BigInt, b:BigInt): BigInt = a - b
   def negate(a:BigInt): BigInt = -a
-  def one: BigInt = BigInt(1)
+  val one: BigInt = BigInt(1)
   def plus(a:BigInt, b:BigInt): BigInt = a + b
   override def pow(a:BigInt, b:Int): BigInt = a pow b
   override def times(a:BigInt, b:BigInt): BigInt = a * b
-  def zero: BigInt = BigInt(0)
+  val zero: BigInt = BigInt(0)
   
   override def fromInt(n: Int): BigInt = BigInt(n)
 }
@@ -180,11 +180,11 @@ trait BigIntIsRing extends Ring[BigInt] {
 trait BigDecimalIsRing extends Ring[BigDecimal] {
   override def minus(a:BigDecimal, b:BigDecimal): BigDecimal = a - b
   def negate(a:BigDecimal): BigDecimal = -a
-  def one: BigDecimal = BigDecimal(1.0)
+  val one: BigDecimal = BigDecimal(1.0)
   def plus(a:BigDecimal, b:BigDecimal): BigDecimal = a + b
   override def pow(a:BigDecimal, b:Int): BigDecimal = a.pow(b)
   override def times(a:BigDecimal, b:BigDecimal): BigDecimal = a * b
-  def zero: BigDecimal = BigDecimal(0.0)
+  val zero: BigDecimal = BigDecimal(0.0)
 
   override def fromInt(n: Int): BigDecimal = BigDecimal(n)
 }

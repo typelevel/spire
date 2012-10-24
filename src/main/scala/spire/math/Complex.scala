@@ -39,11 +39,9 @@ object Complex {
   }
 
   def apply(real: Double, imag: Double): Complex[Double] = new Complex(real, imag)
-  def apply[@spec(Float, Double) T:Fractional:Trig](real:T, imag:T): Complex[T] = new Complex(real, imag)
-  def unapply[@spec(Float, Double) T:Fractional:Trig](c:Complex[T]) = Some((c.real, c.imag))
 }
 
-final class Complex[@spec(Float, Double) T]
+final case class Complex[@spec(Float, Double) T]
 (val real:T, val imag:T)(implicit f:Fractional[T], t:Trig[T])
 extends ScalaNumber with ScalaNumericConversions with Serializable {
 
@@ -139,15 +137,21 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   //
   // alternately, could try piecewise functions for the previous things
   // (e.g. div_real(Complex, Complex) which would return just real part).
-  def quot(b:Complex[T]) = new Complex(f.floor((this / b).real), f.zero)
+  def quot(b:Complex[T]) = this /~ b
 
-  def /~(b:Complex[T]) = quot(b)
+  def /~(b:Complex[T]) = {
+    val Complex(x, y) = this / b
+    Complex(f.round(x), f.round(y))
+  }
 
-  def %(b:Complex[T]):Complex[T] = this - (b * (this /~ b))
+  def %(b:Complex[T]):Complex[T] = {
+    val q = this /~ b
+    this - q * b
+  }
 
   def /%(b:Complex[T]):(Complex[T], Complex[T]) = {
-    val q = quot(b)
-    (q, this - (b * q))
+    val q = this /~ b
+    (q, this - q * b)
   }
 
   def **(b:Int): Complex[T] = pow(b)

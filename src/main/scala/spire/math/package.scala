@@ -115,4 +115,10 @@ object fun {
   final def gcd(a: BigInt, b: BigInt): BigInt = a.gcd(b)
 
   final def gcd(a: BigInteger, b: BigInteger): BigInteger = a.gcd(b)
+
+  def round(a: Float): Float =
+    if (Math.abs(a) >= 16777216.0F) a else Math.round(a).toFloat
+
+  def round(a: Double): Double =
+    if (Math.abs(a) >= 4503599627370496.0) a else Math.round(a).toDouble
 }

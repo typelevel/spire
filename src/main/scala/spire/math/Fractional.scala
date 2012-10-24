@@ -5,15 +5,18 @@ import spire.macrosk.Ops
 
 import language.experimental.macros
 import scala.{specialized => spec}
+import java.lang.Math
 
 trait Fractional[@spec(Float,Double) A] extends Field[A] with NRoot[A] with Integral[A] {
   def ceil(a:A):A
   def floor(a:A):A
+  def round(a:A):A
 }
 
 class FractionalOps[A](lhs:A)(implicit ev:Fractional[A]) {
   def ceil() = macro Ops.unop[A]
   def floor() = macro Ops.unop[A]
+  def round() = macro Ops.unop[A]
 }
 
 object Fractional {
@@ -33,8 +36,9 @@ trait FloatIsFractional extends Fractional[Float] with FloatIsField
 with FloatIsNRoot with ConvertableFromFloat with ConvertableToFloat
 with FloatOrder with FloatIsSigned {
   override def fromInt(n: Int): Float = n
-  def ceil(a:Float) = scala.math.ceil(a).toFloat
-  def floor(a:Float) = scala.math.floor(a).toFloat
+  def ceil(a:Float) = Math.ceil(a).toFloat
+  def floor(a:Float) = Math.floor(a).toFloat
+  def round(a:Float) = fun.round(a)
 }
 
 trait DoubleIsFractional extends Fractional[Double] with DoubleIsField
@@ -43,6 +47,7 @@ with DoubleOrder with DoubleIsSigned {
   override def fromInt(n: Int): Double = n
   def ceil(a:Double) = scala.math.ceil(a)
   def floor(a:Double) = scala.math.floor(a)
+  def round(a:Double) = fun.round(a)
 }
 
 
@@ -50,42 +55,40 @@ with DoubleOrder with DoubleIsSigned {
  * A generic implementation of ceil/floor that can be mixed in.
  */
 trait GenericCeilAndFloor[A] { self: Fractional[A] =>
+  import self._
   def ceil(a: A) = {
-    val i = self.fromBigInt(self.toBigInt(a))
-
-    if (i == a || self.lt(a, self.fromInt(0))) {
-      i
-    } else {
-      self.plus(i, self.fromInt(1))
-    }
+    val q = quot(a, one)
+    if (q == a || lt(a, zero)) q else plus(q, one)
   }
 
   def floor(a: A) = {
-    val i = self.fromBigInt(self.toBigInt(a))
+    val q = quot(a, one)
+    if (q == a || gt(a, zero)) q else plus(q, one)
+  }
 
-    if (i == a || self.gt(a, self.fromInt(0))) {
-      i
+  def round(a: A) = {
+    val r = mod(a, one)
+    val q = minus(a, r)
+    if (lt(a, zero)) {
+      if (q == a || gt(fromInt(-2), one)) q else minus(q, one)
     } else {
-      self.plus(i, self.fromInt(1))
+      if (q == a || lt(fromInt(2), one)) q else plus(q, one)
     }
   }
 }
 
 trait BigDecimalIsFractional extends Fractional[BigDecimal] with BigDecimalIsField
 with BigDecimalIsNRoot with ConvertableFromBigDecimal with ConvertableToBigDecimal
-with BigDecimalOrder with BigDecimalIsSigned {
-  override def fromInt(n: Int): BigDecimal = super[ConvertableToBigDecimal].fromInt(n)
-  def ceil(a:BigDecimal) = {
-    val (q, r) = a /% 1
-    if (r > 0) q + BigDecimal(1) else q
-  }
-  def floor(a:BigDecimal) = a.quot(1)
+with BigDecimalOrder with BigDecimalIsSigned with GenericCeilAndFloor[BigDecimal] {
+  override def fromInt(n: Int): BigDecimal =
+    super[ConvertableToBigDecimal].fromInt(n)
 }
 
 trait RationalIsFractional extends Fractional[Rational] with RationalIsField
 with RationalIsNRoot with ConvertableFromRational with ConvertableToRational
 with RationalOrder with RationalIsSigned with GenericCeilAndFloor[Rational] {
-  override def fromInt(n: Int): Rational = super[ConvertableToRational].fromInt(n)
+  override def fromInt(n: Int): Rational =
+    super[ConvertableToRational].fromInt(n)
 }
 
 
