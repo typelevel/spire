@@ -69,10 +69,10 @@ trait GenericCeilAndFloor[A] { self: Fractional[A] =>
   def round(a: A) = {
     val r = mod(a, one)
     val q = minus(a, r)
-    if (lt(a, zero)) {
-      if (q == a || gt(fromInt(-2), one)) q else minus(q, one)
+    if (lt(r, zero)) {
+      if (q == a || lt(times(r, fromInt(-2)), one)) q else minus(q, one)
     } else {
-      if (q == a || lt(fromInt(2), one)) q else plus(q, one)
+      if (q == a || lt(times(r, fromInt(2)), one)) q else plus(q, one)
     }
   }
 }
