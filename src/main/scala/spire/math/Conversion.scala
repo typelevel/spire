@@ -143,44 +143,17 @@ object WideningConversion extends WideningConversionLow {
 }
 
 
-trait NarrowingConversionLow0 {
-  //implicit def transitiveNarrow1[A, B, C](implicit c1: NarrowingConversion[A, Long, B]
-  implicit def transitiveNarrow1[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
-                                 @spec(Byte, Short, Int, Long, Float, Double, AnyRef) B](implicit
-      c1: NarrowingConversion[A, Double], c2: NarrowingConversion[Double, B]) = {
-    new NarrowingConversion[A, B] {
-      def convert(a: A): B = c2.convert(c1.convert(a))
-    }
-  }
-}
-
-trait NarrowingConversionLow1 extends NarrowingConversionLow0 {
-  implicit def transitiveNarrow2[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
-                                 @spec(Byte, Short, Int, Long, Float, Double, AnyRef) B](implicit
-      c1: NarrowingConversion[A, Int], c2: NarrowingConversion[Int, B]) = {
-    new NarrowingConversion[A, B] {
-      def convert(a: A): B = c2.convert(c1.convert(a))
-    }
-  }
-}
-
-trait Not[A]
-object Not {
-  implicit def not[A]: Not[A] = new Not[A] { }
-  implicit def notAmbig[A](implicit a: A): Not[A] = new Not[A] { }
-}
-
-trait NarrowingConversionLow2 /*extends NarrowingConversionLow1*/ {
+trait NarrowingConversionLow {
   implicit def widen[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
                      @spec(Byte, Short, Int, Long, Float, Double, AnyRef) B](implicit
-      c: WideningConversion[A, B], ev: Not[(A =:= B)]) = {
+      c: WideningConversion[A, B]) = {
     new NarrowingConversion[A, B] {
       def convert(a: A): B = c.convert(a)
     }
   }
 }
 
-object NarrowingConversion extends NarrowingConversionLow2 {
+object NarrowingConversion extends NarrowingConversionLow {
   def apply[@spec(Byte, Short, Int, Long, Float, Double, AnyRef) A,
             @spec(Byte, Short, Int, Long, Float, Double, AnyRef) B](implicit c: NarrowingConversion[A, B]) = c
 
