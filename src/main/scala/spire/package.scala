@@ -8,6 +8,7 @@ import language.experimental.macros
 
 import spire.algebra._
 import spire.math._
+import spire.macrosk._
 
 final class LiteralIntOps(val lhs:Int) extends AnyVal {
   @inline private final def q = Rational(lhs, 1)
@@ -182,6 +183,14 @@ final class ArrayOps[@spec A](arr:Array[A]) {
   }
 }
 
+final class ConversionOps[A](a: A) {
+  def narrow[B](implicit rhs: NarrowingConversion[A, B]): B =
+    macro Ops.flip[NarrowingConversion[A, B], B]
+
+  def widen[B](implicit rhs: WideningConversion[A, B]): B =
+    macro Ops.flip[WideningConversion[A, B], B]
+}
+
 object implicits {
   implicit def eqOps[A:Eq](a:A) = new EqOps(a)
   implicit def orderOps[A:Order](a:A) = new OrderOps(a)
@@ -206,6 +215,7 @@ object implicits {
 
   implicit def intToA[A](n:Int)(implicit c:ConvertableTo[A]): A = c.fromInt(n)
 
+  implicit def conversionOps[A](a: A) = new ConversionOps(a)
 }
 
 object syntax {

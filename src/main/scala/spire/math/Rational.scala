@@ -259,8 +259,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
     this.sign match {
       case Zero => this
-      case Positive => closest(Rational(this.toBigInt), Rational.unsafeBuild(1, 0))
-      case Negative => closest(Rational.unsafeBuild(-1, 0), Rational(this.toBigInt))
+      case Positive => closest(Rational(this.toBigInt), LongRationals.LongRational(1, 0))
+      case Negative => closest(LongRationals.LongRational(-1, 0), Rational(this.toBigInt))
     }
   }
 }

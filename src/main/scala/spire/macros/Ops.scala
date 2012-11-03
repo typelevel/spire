@@ -40,6 +40,15 @@ object Ops {
     c.Expr[R](Apply(Select(ev, findMethodName(c)), List(lhs)))
   }
 
+  def flip[A, R](c: Context)(rhs: c.Expr[A]): c.Expr[R] = {
+    import c.universe._
+    val lhs = c.prefix.tree match {
+      case Apply(TypeApply(_, _), List(x)) => x
+      case t => sys.error("bad tree: %s" format t)
+    }
+    c.Expr[R](Apply(Select(rhs.tree, findMethodName(c)), List(lhs)))
+  }
+
   /**
    * Given context and an expression, this method rewrites the tree to call the
    * "desired" method with the lhs and rhs parameters. We find the symbol which
