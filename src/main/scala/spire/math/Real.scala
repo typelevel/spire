@@ -59,9 +59,12 @@ extends ScalaNumber with ScalaNumericConversions
     case _ => unifiedPrimitiveEquals(that)
   }
 
-  override def hashCode: Int =
-    if (isWhole && toBigInt == toLong) unifiedPrimitiveHashcode
-    else toFloat.##
+  override def hashCode: Int = if (isWhole && toBigInt == toLong) {
+    unifiedPrimitiveHashcode
+  } else {
+    val x = toBigDecimal(java.math.MathContext.DECIMAL64)
+    x.underlying.unscaledValue.hashCode + 23 * x.scale.hashCode + 17
+  }
 }
 
 
