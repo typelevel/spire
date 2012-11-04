@@ -2,7 +2,6 @@ package spire.math
 
 import spire.algebra._
 
-
 trait ScalaEquivWrapper[A] extends scala.math.Equiv[A] {
   def eq: Eq[A]
 
@@ -62,42 +61,3 @@ with scala.math.Integral[A]{
   def quot(x:A, y:A): A = structure.quot(x, y)
   def rem(x:A, y:A): A = structure.mod(x, y)
 }
-
-
-/**
- * Provides methods for creating `scala.math` typeclasses from Spire
- * typeclasses.
- */
-object ScalaMath {
-  def equiv[A: Eq] = new ScalaEquivWrapper[A] {
-    val eq = Eq[A]
-  }
-
-  def ordering[A: Order]: scala.math.Ordering[A] = new ScalaOrderingWrapper[A] {
-    val order = Order[A]
-  }
-
-  def numeric[A: Ring: ConvertableFrom: Signed: Order] = {
-    new ScalaNumericWrapper[A] {
-      val order = Order[A]
-      val structure = Ring[A]
-      val conversions = ConvertableFrom[A]
-      val signed = Signed[A]
-    }
-  }
-
-  def fractional[A: Field: ConvertableFrom: Signed: Order] = new ScalaFractionalWrapper[A] {
-    val order = Order[A]
-    val structure = Field[A]
-    val conversions = ConvertableFrom[A]
-    val signed = Signed[A]
-  }
-
-  def integral[A: EuclideanRing: ConvertableFrom: Signed: Order] = new ScalaIntegralWrapper[A] {
-    val order = Order[A]
-    val structure = EuclideanRing[A]
-    val conversions = ConvertableFrom[A]
-    val signed = Signed[A]
-  }
-}
-
