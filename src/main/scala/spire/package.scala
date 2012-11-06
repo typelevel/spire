@@ -183,6 +183,105 @@ final class ArrayOps[@spec A](arr:Array[A]) {
   }
 }
 
+import scala.collection.generic.CanBuildFrom
+
+final class SeqOps[@spec A](as:Seq[A])(implicit cbf:CanBuildFrom[Seq[A], A, Seq[A]]) {
+  def qsum(implicit ev:Ring[A]) = {
+    var sum = ev.zero
+    as.foreach(a => sum = ev.plus(sum, a))
+    sum
+  }
+
+  def qproduct(implicit ev:Ring[A]) = {
+    var prod = ev.one
+    as.foreach(a => prod = ev.times(prod, a))
+    prod
+  }
+
+  def qnorm(p:Int)(implicit ev:Field[A], s: Signed[A], nr:NRoot[A]) = {
+    var t = ev.one
+    as.foreach(a => t = ev.plus(t, ev.pow(s.abs(a), p)))
+    nr.nroot(t, p)
+  }
+
+  def qmin(implicit ev:Order[A]) = {
+    if (as.isEmpty) sys.error("empty seq")
+    var min = as.head
+    as.foreach(a => min = ev.min(min, a))
+    min
+  }
+
+  def qmax(implicit ev:Order[A]) = {
+    if (as.isEmpty) sys.error("empty seq")
+    var max = as.head
+    as.foreach(a => max = ev.max(max, a))
+    max
+  }
+
+  def qmean(implicit ev:Field[A]): A = {
+    if (as.isEmpty) sys.error("empty seq")
+    var mean = ev.zero
+    var i = 0
+    as.foreach { a =>
+      val t = ev.div(ev.times(mean, ev.fromInt(i)), ev.fromInt(i + 1))
+      val z = ev.div(a, ev.fromInt(i + 1))
+      mean = ev.plus(t, z)
+    }
+    mean
+  }
+
+  import spire.math.{Sorting, Selection}
+
+  protected[this] def toSizeAndArray(implicit ct:ClassTag[A]) = {
+    val len = as.size
+    val arr = new Array[A](len)
+    var i = 0
+    as.foreach { a =>
+      arr(i) = a
+      i += 1
+    }
+    (len, arr)
+  }
+
+  protected[this] def fromSizeAndArray(len: Int, arr: Array[A]) = {
+    val b = cbf(as)
+    b.sizeHint(len)
+    var i = 0
+    while (i < len) {
+      b += arr(i)
+      i += 1
+    }
+    b.result
+  }
+
+  def qsorted(implicit ev:Order[A], ct:ClassTag[A]): Seq[A] = {
+    val (len, arr) = toSizeAndArray
+    Sorting.sort(arr)
+    fromSizeAndArray(len, arr)
+  }
+  
+  def qsortedBy[@spec B](f:A => B)(implicit ev:Order[B], ct:ClassTag[A]): Seq[A] = {
+    val (len, arr) = toSizeAndArray
+    implicit val ord: Order[A] = ev.on(f)
+    Sorting.sort(arr)
+    fromSizeAndArray(len, arr)
+  }
+  
+  def qsortedWith(f:(A, A) => Int)(implicit ct:ClassTag[A]): Seq[A] = {
+    val (len, arr) = toSizeAndArray
+    implicit val ord: Order[A] = Order.from(f)
+    Sorting.sort(arr)
+    fromSizeAndArray(len, arr)
+  }
+  
+  def qselected(k: Int)(implicit ev:Order[A], ct:ClassTag[A]): Seq[A] = {
+    val (len, arr) = toSizeAndArray
+    Selection.select(arr, k)
+    fromSizeAndArray(len, arr)
+  }
+}
+
+
 final class ConversionOps[A](a: A) {
   def narrow[B](implicit rhs: NarrowingConversion[A, B]): B =
     macro Ops.flip[NarrowingConversion[A, B], B]
@@ -211,7 +310,9 @@ object implicits {
 
   implicit def literalIntOps(lhs:Int) = new LiteralIntOps(lhs)
   implicit def literalDoubleOps(lhs:Double) = new LiteralDoubleOps(lhs)
+
   implicit def arrayOps[@spec A](lhs:Array[A]) = new ArrayOps(lhs)
+  implicit def seqOps[@spec A](lhs:Seq[A]) = new SeqOps[A](lhs)
 
   implicit def intToA[A](n:Int)(implicit c:ConvertableTo[A]): A = c.fromInt(n)
 
