@@ -17,8 +17,6 @@
  */
 package spire.math
 
-import language.implicitConversions
-
 import spire.algebra.{ Zero }
 import java.math.{ MathContext, BigInteger, BigDecimal => BigDec }
 import scala.math.{ ScalaNumber, ScalaNumericConversions, max }

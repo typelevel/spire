@@ -6,8 +6,6 @@ import scala.math.max
 import spire.algebra.{ NRoot, Zero }
 import spire.math._
 
-import language.implicitConversions
-
 /**
  * Provides absolute and relative approximations to `RealLike` types that have
  * mixed in a `SeparationBound`. The absolute approximations take 

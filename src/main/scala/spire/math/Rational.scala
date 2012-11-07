@@ -2,7 +2,6 @@ package spire.math
 
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
-import language.implicitConversions
 
 import java.lang.Math
 

@@ -3,8 +3,6 @@ package spire
 import scala.reflect.ClassTag
 import scala.annotation.tailrec
 import scala.{specialized => spec}
-import language.implicitConversions
-import language.experimental.macros
 
 import spire.algebra._
 import spire.math._

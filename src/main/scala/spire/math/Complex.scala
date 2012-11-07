@@ -9,8 +9,6 @@ import scala.math.{Pi, atan2, cos, exp, log, sin, sqrt}
 import spire.math.fun._
 import spire.implicits._
 
-import language.implicitConversions
-
 object Complex {
   def i[@spec(Float, Double) T](implicit f:Fractional[T], t:Trig[T]) =
     new Complex(f.zero, f.one)

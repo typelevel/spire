@@ -3,8 +3,6 @@ package spire.math
 import scala.math.{abs, signum}
 import annotation.tailrec
 
-import language.implicitConversions
-
 /**
  * Provides a type to do safe long arithmetic. This type will never overflow,
  * but rather convert the underlying long to a BigInt as need and back down

@@ -1,7 +1,5 @@
 package spire.math
 
-import language.implicitConversions
-
 import java.lang.Math.pow
 
 object UInt {

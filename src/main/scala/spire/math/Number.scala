@@ -4,8 +4,6 @@ import scala.math.{ScalaNumber, ScalaNumericConversions, abs, floor}
 import spire.implicits._
 import scala.math.BigDecimal
 
-import language.implicitConversions
-
 // TODO: implement RationalNumber.
 // TODO: implement toNumber and fromNumber in ConvertableTo/From.
 // TODO: create implicits to support things like 3 + Number(4) -> Number(7)

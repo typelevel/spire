@@ -4,8 +4,6 @@ import spire.math.fpf.MaybeDouble
 
 import spire.math._
 
-import language.implicitConversions
-
 /**
  * An `Expr` describes a simple structure for algebraic expressions. Generally,
  * a type `Expr[A]` indicates that `A` has some structure that mirrors `Expr`.

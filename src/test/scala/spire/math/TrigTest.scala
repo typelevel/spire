@@ -2,8 +2,6 @@ package spire.math
 
 import scala.math.abs
 
-import language.implicitConversions
-
 import org.scalatest.FunSuite
 import spire.math._
 import spire.implicits.{eqOps => _, _}

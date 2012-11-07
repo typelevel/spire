@@ -1,7 +1,6 @@
 package spire.algebra
 
 import annotation.tailrec
-import language.experimental.macros
 import scala.{specialized => spec}
 
 import java.lang.Math

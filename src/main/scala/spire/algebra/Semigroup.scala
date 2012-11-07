@@ -1,7 +1,6 @@
 package spire.algebra
 
 import spire.macrosk.Ops
-import language.experimental.macros
 
 trait Semigroup[A] {
   def op(x:A, y:A): A

@@ -4,7 +4,6 @@ import spire.math._
 import spire.macrosk.Ops
 
 import scala.annotation.tailrec
-import language.experimental.macros
 import scala.{specialized => spec}
 import scala.math.{abs, ceil, floor}
 

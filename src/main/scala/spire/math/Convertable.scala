@@ -1,7 +1,6 @@
 package spire.math
 
 import scala.{specialized => spec}
-import language.experimental.macros
 
 import spire.macrosk.Ops
 

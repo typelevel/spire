@@ -1,7 +1,5 @@
 package spire.math
 
-import language.implicitConversions
-
 import java.lang.Math.pow
 import scala.annotation.tailrec
 
@@ -12,6 +10,8 @@ object ULong {
   implicit final def fromLong(n: Long): ULong = new ULong(n)
   implicit final def toLong(u: ULong): Long = u.signed
 
+  @inline final def MinValue = ULong(0L)
+  @inline final def MaxValue = ULong(-1L)
 
   @tailrec final private[math] def pow(t:Long, b:Long, e:Long): ULong = {
     if (e == 0L) new ULong(t)
@@ -52,12 +52,12 @@ class ULong(val signed: Long) extends AnyVal {
   final def <= (that: ULong) = if (this.signed >= 0L)
     this.signed <= that.signed || that.signed < 0L
   else
-    that.signed <= this.signed
+    that.signed >= this.signed
 
   final def < (that: ULong) = if (this.signed >= 0L)
     this.signed < that.signed || that.signed < 0L
   else
-    that.signed < this.signed
+    that.signed > this.signed
 
   @inline final def >= (that: ULong) = that <= this
   @inline final def > (that: ULong) = that < this

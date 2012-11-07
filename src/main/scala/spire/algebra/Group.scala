@@ -1,7 +1,6 @@
 package spire.algebra
 
 import spire.macrosk.Ops
-import language.experimental.macros
 
 trait Group[A] extends Monoid[A] {
   def inverse(a: A): A

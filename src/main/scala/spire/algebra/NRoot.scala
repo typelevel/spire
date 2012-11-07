@@ -3,7 +3,6 @@ package spire.algebra
 import spire.math._
 import spire.macrosk.Ops
 
-import language.experimental.macros
 import scala.{specialized => spec, math => mth}
 import java.math.MathContext
 import java.lang.Math

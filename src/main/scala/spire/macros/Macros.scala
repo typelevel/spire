@@ -1,9 +1,5 @@
 package spire.macrosk
 
-import language.implicitConversions
-import language.higherKinds
-import language.experimental.macros
-
 import scala.reflect.macros.Context
 
 import spire.math._

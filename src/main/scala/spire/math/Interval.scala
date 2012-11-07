@@ -3,8 +3,6 @@ package spire.math
 import spire.algebra._
 import spire.implicits._
 
-import language.implicitConversions
-
 /**
  * A Bound represents one side of an interval; it is parameterized on T, the
  * ordered type covered by the interval.

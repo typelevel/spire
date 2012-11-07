@@ -5,8 +5,6 @@ import spire.macrosk.Ops
 
 import scala.{specialized => spec}
 
-import language.experimental.macros
-
 trait Integral[@spec(Int,Long) A] extends EuclideanRing[A]
 with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A] {
   def isZero(x: A) = eqv(x, zero)

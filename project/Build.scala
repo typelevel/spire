@@ -8,15 +8,16 @@ object MyBuild extends Build {
     organization := "org.spire-math",
     version := "0.3.0-M3",
 
-    scalaVersion := "2.10.0-RC1",
-    scalaBinaryVersion := "2.10.0-RC1",
+    scalaVersion := "2.10.0-RC2",
+    scalaBinaryVersion := "2.10.0-RC2",
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "1.8" % "test",
-      "org.scala-lang" % "scala-reflect" % "2.10.0-RC1"
+      "org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
+      "org.scala-lang" % "scala-reflect" % "2.10.0-RC2"
     ),
 
     scalacOptions ++= Seq(
@@ -24,6 +25,9 @@ object MyBuild extends Build {
       "-deprecation",
       "-unchecked",
       "-optimize",
+      "-language:experimental.macros",
+      "-language:higherKinds",
+      "-language:implicitConversions",
       "-feature"
     ),
 

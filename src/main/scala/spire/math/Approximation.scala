@@ -4,8 +4,6 @@ import java.math.{ MathContext, BigDecimal => BigDec }
 import scala.math.max
 import spire.math.real.BigDecimalApproximations
 
-import language.implicitConversions
-
 /** 
  * A typeclass approach for getting an approximation to an `A` using error `B`
  * in type `C`.
