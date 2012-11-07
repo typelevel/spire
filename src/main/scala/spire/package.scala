@@ -86,13 +86,13 @@ final class LiteralDoubleOps(val lhs:Double) extends AnyVal {
 }
 
 final class ArrayOps[@spec A](arr:Array[A]) {
-  def qsum(implicit ev:Ring[A]) = {
+  def qsum(implicit ev:Rig[A]) = {
     @tailrec
     def f(i:Int, n:Int, t:A):A = if (i < n) f(i + 1, n, ev.plus(t, arr(i))) else t
     f(0, arr.length, ev.zero)
   }
 
-  def qproduct(implicit ev:Ring[A]) = {
+  def qproduct(implicit ev:Rig[A]) = {
     @tailrec
     def f(i:Int, n:Int, t:A):A = if (i < n) f(i + 1, n, ev.times(t, arr(i))) else t
     f(0, arr.length, ev.one)
@@ -184,13 +184,13 @@ final class ArrayOps[@spec A](arr:Array[A]) {
 import scala.collection.generic.CanBuildFrom
 
 final class SeqOps[@spec A](as:Seq[A])(implicit cbf:CanBuildFrom[Seq[A], A, Seq[A]]) {
-  def qsum(implicit ev:Ring[A]) = {
+  def qsum(implicit ev:Rig[A]) = {
     var sum = ev.zero
     as.foreach(a => sum = ev.plus(sum, a))
     sum
   }
 
-  def qproduct(implicit ev:Ring[A]) = {
+  def qproduct(implicit ev:Rig[A]) = {
     var prod = ev.one
     as.foreach(a => prod = ev.times(prod, a))
     prod
@@ -296,6 +296,8 @@ object implicits {
 
   implicit def convertableOps[A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
 
+
+  implicit def rigOps[A:Rig](a:A) = new RigOps(a)
   implicit def ringOps[A:Ring](a:A) = new RingOps(a)
   implicit def euclideanRingOps[A:EuclideanRing](a:A) = new EuclideanRingOps(a)
   implicit def fieldOps[A:Field](a:A) = new FieldOps(a)

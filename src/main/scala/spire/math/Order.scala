@@ -52,6 +52,8 @@ object Order {
   implicit object CharOrder extends CharOrder
   implicit object IntOrder extends IntOrder
   implicit object LongOrder extends LongOrder
+  implicit object UIntOrder extends UIntOrder
+  implicit object ULongOrder extends ULongOrder
   implicit object FloatOrder extends FloatOrder
   implicit object DoubleOrder extends DoubleOrder
   implicit object BigIntOrder extends BigIntOrder
@@ -111,6 +113,22 @@ trait LongOrder extends Order[Long] with LongEq {
   override def lt(x:Long, y:Long) = x < y
   override def lteqv(x:Long, y:Long) = x <= y
   def compare(x:Long, y:Long) = if (x < y) -1 else if (x > y) 1 else 0
+}
+
+trait UIntOrder extends Order[UInt] with UIntEq {
+  override def gt(x:UInt, y:UInt) = x > y
+  override def gteqv(x:UInt, y:UInt) = x >= y
+  override def lt(x:UInt, y:UInt) = x < y
+  override def lteqv(x:UInt, y:UInt) = x <= y
+  def compare(x:UInt, y:UInt) = if (x < y) -1 else if (x > y) 1 else 0
+}
+
+trait ULongOrder extends Order[ULong] with ULongEq {
+  override def gt(x:ULong, y:ULong) = x > y
+  override def gteqv(x:ULong, y:ULong) = x >= y
+  override def lt(x:ULong, y:ULong) = x < y
+  override def lteqv(x:ULong, y:ULong) = x <= y
+  def compare(x:ULong, y:ULong) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 trait FloatOrder extends Order[Float] with FloatEq {
