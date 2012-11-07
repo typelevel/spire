@@ -17,30 +17,16 @@ import spire.macrosk.Ops
  * fundamental methods (zero, one and plus). Where possible, these methods
  * should be overridden by more efficient implementations.
  */
-trait Ring[@spec(Int,Long,Float,Double) A] {
-  def zero:A
-  def one:A
+trait Ring[@spec(Int,Long,Float,Double) A] extends Rig[A] {
   def negate(a:A):A
-  def plus(a:A, b:A):A
-  def times(a:A, b:A):A
 
-  def additive:Group[A] = new AdditiveGroup[A]()(this)
-  def multiplicative:Monoid[A] = new MultiplicativeMonoid[A]()(this)
+  override def additive:Group[A] = new AdditiveGroup[A]()(this)
 
   def minus(a:A, b:A):A = plus(a, negate(b))
-
-  def pow(a:A, n:Int):A =
-    if (n < 0) sys.error("illegal exponent: %s" format n)
-    else _pow(a, n, one)
 
   def fromInt(n: Int): A =
     if (n < 0) _fromInt(negate(one), -n, zero)
     else _fromInt(one, n, zero)
-
-  @tailrec private final def _pow(a:A, n:Int, sofar:A):A =
-    if (n == 0) sofar
-    else if (n % 2 == 1) _pow(times(a, a), n / 2, times(sofar, a))
-    else _pow(times(a, a), n / 2, sofar)
   
   @tailrec private def _fromInt(a:A, n:Int, sofar:A):A =
     if (n == 0) sofar
@@ -52,15 +38,10 @@ final class RingOps[A](lhs:A)(implicit ev:Ring[A]) {
   def unary_-() = macro Ops.unop[A]
   
   def -(rhs:A): A = macro Ops.binop[A, A]
-  def +(rhs:A): A = macro Ops.binop[A, A]
-  def *(rhs:A): A = macro Ops.binop[A, A]
 
   def -(rhs:Int): A = ev.minus(lhs, ev.fromInt(rhs))
   def +(rhs:Int): A = ev.plus(lhs, ev.fromInt(rhs))
   def *(rhs:Int): A = ev.times(lhs, ev.fromInt(rhs))
-  
-  def pow(rhs:Int) = macro Ops.binop[Int, A]
-  def **(rhs:Int) = macro Ops.binop[Int, A]
 }
 
 object Ring {

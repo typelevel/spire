@@ -17,6 +17,10 @@ import org.scalatest.FunSuite
  */
 class TypeclassExistenceTest extends FunSuite {
 
+  def hasRig[A](implicit rig: Rig[A] = null, m: ClassTag[A]) {
+    assert(rig != null, "Expected implicit Rig[%s] instance, but it was not found." format m)
+  }
+
   def hasRing[A](implicit ring: Ring[A] = null, m: ClassTag[A]) {
     assert(ring != null, "Expected implicit Ring[%s] instance, but it was not found." format m)
   }
@@ -73,6 +77,14 @@ class TypeclassExistenceTest extends FunSuite {
     check[Int]
   }
 
+  test("Rings are Rigs") {
+    def check[A: Ring: ClassTag] {
+      hasRig[A]
+    }
+
+    check[Int]
+  }
+
   test("EuclideanRings are Rings") {
     def check[A: EuclideanRing: ClassTag] {
       hasRing[A]
@@ -109,6 +121,18 @@ class TypeclassExistenceTest extends FunSuite {
     }
 
     check[Double]
+  }
+
+  test("UInt has Eq:Order:Rig") {
+    hasEq[UInt]
+    hasOrder[UInt]
+    hasRig[UInt]
+  }
+
+  test("ULong has Eq:Order:Rig") {
+    hasEq[ULong]
+    hasOrder[ULong]
+    hasRig[ULong]
   }
 
   test("Int has Eq:Order:EuclideanRing:NRoot") {
