@@ -23,6 +23,8 @@ object Eq extends LowPriority {
   implicit object CharEq extends CharEq
   implicit object IntEq extends IntEq
   implicit object LongEq extends LongEq
+  implicit object UByteEq extends UByteEq
+  implicit object UShortEq extends UShortEq
   implicit object UIntEq extends UIntEq
   implicit object ULongEq extends ULongEq
   implicit object FloatEq extends FloatEq
@@ -69,6 +71,14 @@ trait IntEq extends Eq[Int] {
 trait LongEq extends Eq[Long] {
   def eqv(x:Long, y:Long) = x == y
   override def neqv(x:Long, y:Long) = x != y
+}
+trait UByteEq extends Eq[UByte] {
+  def eqv(x:UByte, y:UByte) = x == y
+  override def neqv(x:UByte, y:UByte) = x != y
+}
+trait UShortEq extends Eq[UShort] {
+  def eqv(x:UShort, y:UShort) = x == y
+  override def neqv(x:UShort, y:UShort) = x != y
 }
 trait UIntEq extends Eq[UInt] {
   def eqv(x:UInt, y:UInt) = x == y

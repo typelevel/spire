@@ -123,6 +123,18 @@ class TypeclassExistenceTest extends FunSuite {
     check[Double]
   }
 
+  test("UByte has Eq:Order:Rig") {
+    hasEq[UByte]
+    hasOrder[UByte]
+    hasRig[UByte]
+  }
+
+  test("UShort has Eq:Order:Rig") {
+    hasEq[UShort]
+    hasOrder[UShort]
+    hasRig[UShort]
+  }
+
   test("UInt has Eq:Order:Rig") {
     hasEq[UInt]
     hasOrder[UInt]

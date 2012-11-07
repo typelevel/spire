@@ -41,11 +41,29 @@ final class RigOps[A](lhs:A)(implicit ev:Rig[A]) {
 }
 
 object Rig {
+  implicit object UByteIsRing extends UByteIsRig
+  implicit object UShortIsRing extends UShortIsRig
   implicit object UIntIsRing extends UIntIsRig
   implicit object ULongIsRing extends ULongIsRig
   implicit def ringIsRig[@spec(Int,Long,Float,Double) A: Ring]: Rig[A] = Ring[A]
 
   @inline final def apply[A](implicit r:Rig[A]):Rig[A] = r
+}
+
+trait UByteIsRig extends Rig[UByte] {
+  def one: UByte = UByte(1)
+  def plus(a:UByte, b:UByte): UByte = a + b
+  override def pow(a:UByte, b:Int): UByte = a ** b
+  override def times(a:UByte, b:UByte): UByte = a * b
+  def zero: UByte = UByte(0)
+}
+
+trait UShortIsRig extends Rig[UShort] {
+  def one: UShort = UShort(1)
+  def plus(a:UShort, b:UShort): UShort = a + b
+  override def pow(a:UShort, b:Int): UShort = a ** b
+  override def times(a:UShort, b:UShort): UShort = a * b
+  def zero: UShort = UShort(0)
 }
 
 trait UIntIsRig extends Rig[UInt] {

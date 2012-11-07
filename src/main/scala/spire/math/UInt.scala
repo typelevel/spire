@@ -5,6 +5,9 @@ import java.lang.Math.pow
 object UInt {
   @inline implicit final def apply(n: Int) = new UInt(n)
   @inline implicit final def apply(n: Long) = new UInt(n.toInt)
+
+  @inline final def MinValue = UInt(0)
+  @inline final def MaxValue = UInt(-1)
 }
 
 class UInt(val signed: Int) extends AnyVal {
