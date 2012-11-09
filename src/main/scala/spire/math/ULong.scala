@@ -62,7 +62,7 @@ class ULong(val signed: Long) extends AnyVal {
   @inline final def >= (that: ULong) = that <= this
   @inline final def > (that: ULong) = that < this
   
-  final def unary_- (that: ULong) = new ULong(this.signed)
+  final def unary_- = new ULong(this.signed)
 
   final def + (that: ULong) = new ULong(this.signed + that.signed)
   final def - (that: ULong) = new ULong(this.signed - that.signed)
@@ -89,7 +89,7 @@ class ULong(val signed: Long) extends AnyVal {
     (q, this - q * that)
   }
 
-  final def unary_~ (that: ULong) = new ULong(this.signed)
+  final def unary_~ = new ULong(~this.signed)
 
   final def << (shift: ULong) = new ULong(this.signed << shift.signed)
   final def >> (shift: ULong) = new ULong(this.signed >> shift.signed)

@@ -38,7 +38,7 @@ class UInt(val signed: Int) extends AnyVal {
   def >= (that: UInt) = this.toLong >= that.toLong
   def > (that: UInt) = this.toLong > that.toLong
   
-  def unary_- (that: UInt) = new UInt(this.signed)
+  def unary_- = new UInt(this.signed)
 
   def + (that: UInt) = new UInt(this.signed + that.signed)
   def - (that: UInt) = new UInt(this.signed - that.signed)
@@ -46,7 +46,7 @@ class UInt(val signed: Int) extends AnyVal {
   def / (that: UInt) = UInt(this.toLong / that.toLong)
   def % (that: UInt) = UInt(this.toLong % that.toLong)
 
-  def unary_~ (that: UInt) = new UInt(this.signed)
+  def unary_~ = new UInt(~this.signed)
 
   def << (shift: UInt) = new UInt(this.signed << shift.signed)
   def >> (shift: UInt) = new UInt(this.signed >> shift.signed)

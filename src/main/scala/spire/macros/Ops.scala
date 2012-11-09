@@ -128,6 +128,13 @@ object Ops {
       // Field (/)
       case "$div" => "div"
 
+      // BooleanAlgebra
+      case "$up" => "xor"
+      case "$bar" => "or"
+      case "$amp" => "and"
+      case "unary_$tilde" => "negate"
+
+
       case s => s
     }
     //println("s=%s -> name=%s" format (s, name))
