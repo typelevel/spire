@@ -317,6 +317,8 @@ object implicits {
   implicit def intToA[A](n:Int)(implicit c:ConvertableTo[A]): A = c.fromInt(n)
 
   implicit def conversionOps[A](a: A) = new ConversionOps(a)
+
+  implicit def booleanAlgebraOps[A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
 }
 
 object syntax {

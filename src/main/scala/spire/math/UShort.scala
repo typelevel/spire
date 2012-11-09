@@ -38,7 +38,7 @@ class UShort(val signed: Char) extends AnyVal {
   def >= (that: UShort) = this.signed >= that.signed
   def > (that: UShort) = this.signed > that.signed
   
-  def unary_- (that: UShort) = UShort(this.signed)
+  def unary_- = UShort(this.signed)
 
   def + (that: UShort) = UShort(this.signed + that.signed)
   def - (that: UShort) = UShort(this.signed - that.signed)
@@ -46,7 +46,7 @@ class UShort(val signed: Char) extends AnyVal {
   def / (that: UShort) = UShort(this.signed / that.signed)
   def % (that: UShort) = UShort(this.signed % that.signed)
 
-  def unary_~ (that: UShort) = UShort(this.signed)
+  def unary_~ = UShort(~this.signed)
 
   def << (shift: UShort) = UShort(this.signed << shift.signed)
   def >> (shift: UShort) = UShort(this.signed >> shift.signed)
