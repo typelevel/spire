@@ -17,8 +17,8 @@ trait BooleanAlgebra[@spec(Boolean, Byte, Short, Int, Long) A] {
   def zero: A
   def and(a: A, b: A): A
   def or(a: A, b: A): A
-  def negate(a: A): A
-  def xor(a: A, b: A): A = or(and(a, negate(b)), and(negate(a), b))
+  def complement(a: A): A
+  def xor(a: A, b: A): A = or(and(a, complement(b)), and(complement(a), b))
 }
 
 final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
@@ -45,7 +45,7 @@ trait BooleanIsBooleanAlgebra extends BooleanAlgebra[Boolean] {
   def zero: Boolean = false
   def and(a: Boolean, b: Boolean): Boolean = a & b
   def or(a: Boolean, b: Boolean): Boolean = a | b
-  def negate(a: Boolean): Boolean = !a
+  def complement(a: Boolean): Boolean = !a
   override def xor(a: Boolean, b: Boolean): Boolean = a ^ b
 }
 
@@ -54,7 +54,7 @@ trait ByteIsBooleanAlgebra extends BooleanAlgebra[Byte] {
   def zero: Byte = (0: Byte)
   def and(a: Byte, b: Byte): Byte = (a & b).toByte
   def or(a: Byte, b: Byte): Byte = (a | b).toByte
-  def negate(a: Byte): Byte = (~a).toByte
+  def complement(a: Byte): Byte = (~a).toByte
   override def xor(a: Byte, b: Byte): Byte = (a ^ b).toByte
 }
 
@@ -63,7 +63,7 @@ trait ShortIsBooleanAlgebra extends BooleanAlgebra[Short] {
   def zero: Short = (0: Short)
   def and(a: Short, b: Short): Short = (a & b).toShort
   def or(a: Short, b: Short): Short = (a | b).toShort
-  def negate(a: Short): Short = (~a).toShort
+  def complement(a: Short): Short = (~a).toShort
   override def xor(a: Short, b: Short): Short = (a ^ b).toShort
 }
 
@@ -72,7 +72,7 @@ trait IntIsBooleanAlgebra extends BooleanAlgebra[Int] {
   def zero: Int = 0
   def and(a: Int, b: Int): Int = a & b
   def or(a: Int, b: Int): Int = a | b
-  def negate(a: Int): Int = ~a
+  def complement(a: Int): Int = ~a
   override def xor(a: Int, b: Int): Int = a ^ b
 }
 
@@ -81,7 +81,7 @@ trait LongIsBooleanAlgebra extends BooleanAlgebra[Long] {
   def zero: Long = 0L
   def and(a: Long, b: Long): Long = a & b
   def or(a: Long, b: Long): Long = a | b
-  def negate(a: Long): Long = ~a
+  def complement(a: Long): Long = ~a
   override def xor(a: Long, b: Long): Long = a ^ b
 }
 
@@ -90,7 +90,7 @@ trait UByteIsBooleanAlgebra extends BooleanAlgebra[UByte] {
   def zero: UByte = UByte(0: Byte)
   def and(a: UByte, b: UByte): UByte = a & b
   def or(a: UByte, b: UByte): UByte = a | b
-  def negate(a: UByte): UByte = ~a
+  def complement(a: UByte): UByte = ~a
   override def xor(a: UByte, b: UByte): UByte = a ^ b
 }
 
@@ -99,7 +99,7 @@ trait UShortIsBooleanAlgebra extends BooleanAlgebra[UShort] {
   def zero: UShort = UShort(0: Short)
   def and(a: UShort, b: UShort): UShort = a & b
   def or(a: UShort, b: UShort): UShort = a | b
-  def negate(a: UShort): UShort = ~a
+  def complement(a: UShort): UShort = ~a
   override def xor(a: UShort, b: UShort): UShort = a ^ b
 }
 
@@ -108,7 +108,7 @@ trait UIntIsBooleanAlgebra extends BooleanAlgebra[UInt] {
   def zero: UInt = 0
   def and(a: UInt, b: UInt): UInt = a & b
   def or(a: UInt, b: UInt): UInt = a | b
-  def negate(a: UInt): UInt = ~a
+  def complement(a: UInt): UInt = ~a
   override def xor(a: UInt, b: UInt): UInt = a ^ b
 }
 
@@ -117,7 +117,7 @@ trait ULongIsBooleanAlgebra extends BooleanAlgebra[ULong] {
   def zero: ULong = 0L
   def and(a: ULong, b: ULong): ULong = a & b
   def or(a: ULong, b: ULong): ULong = a | b
-  def negate(a: ULong): ULong = ~a
+  def complement(a: ULong): ULong = ~a
   override def xor(a: ULong, b: ULong): ULong = a ^ b
 }
 

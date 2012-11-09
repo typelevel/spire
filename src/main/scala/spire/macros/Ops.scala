@@ -132,7 +132,7 @@ object Ops {
       case "$up" => "xor"
       case "$bar" => "or"
       case "$amp" => "and"
-      case "unary_$tilde" => "negate"
+      case "unary_$tilde" => "complement"
 
 
       case s => s
