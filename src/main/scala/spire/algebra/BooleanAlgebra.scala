@@ -5,6 +5,7 @@ import scala.{specialized => spec}
 import spire.math._
 import spire.macrosk.Ops
 
+
 /**
  * A boolean algebra is a structure that defines a few basic operations, namely
  * as conjunction (&), disjunction (|), and negation (~). Both conjunction and
@@ -12,13 +13,22 @@ import spire.macrosk.Ops
  * other. Also, both have an identity. Also, they obey the absortion laws, that
  * is `x & (y | x) == x` and `x | (x & y) == x`.
  */
-trait BooleanAlgebra[@spec(Boolean, Byte, Short, Int, Long) A] {
+trait BooleanAlgebra[@spec(Boolean, Byte, Short, Int, Long) A] { self =>
   def one: A
   def zero: A
   def and(a: A, b: A): A
   def or(a: A, b: A): A
   def complement(a: A): A
   def xor(a: A, b: A): A = or(and(a, complement(b)), and(complement(a), b))
+
+  def dual: BooleanAlgebra[A] = new BooleanAlgebra[A] {
+    def one: A = self.zero
+    def zero: A = self.one
+    def and(a: A, b: A): A = self.or(a, b)
+    def or(a: A, b: A): A = self.and(a, b)
+    def complement(a: A): A = self.complement(a)
+    override def xor(a: A, b: A): A = self.complement(self.xor(a, b))
+  }
 }
 
 final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
@@ -29,6 +39,9 @@ final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
 }
 
 object BooleanAlgebra {
+  @inline final def apply[@specialized(Boolean, Byte, Short, Int, Long) A](
+    implicit ev: BooleanAlgebra[A]): BooleanAlgebra[A] = ev
+
   implicit object BooleanIsBooleanAlgebra extends BooleanIsBooleanAlgebra
   implicit object ByteIsBooleanAlgebra extends ByteIsBooleanAlgebra
   implicit object ShortIsBooleanAlgebra extends ShortIsBooleanAlgebra
