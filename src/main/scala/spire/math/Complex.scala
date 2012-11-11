@@ -27,86 +27,96 @@ object Complex {
   implicit def floatToComplex(n:Float) = new Complex(n, 0.0F)
   implicit def doubleToComplex(n:Double) = new Complex(n, 0.0)
 
-  implicit def bigIntToComplex(n:BigInt) = new Complex(BigDecimal(n), BigDecimal(0))
-  implicit def bigDecimalToComplex(n:BigDecimal) = new Complex(n, BigDecimal(0))
+  implicit def bigIntToComplex(n:BigInt) =
+    new Complex(BigDecimal(n), BigDecimal(0))
 
-  def polar[@spec(Float, Double) T](magnitude:T, angle:T)(implicit f:Fractional[T], t:Trig[T]) = {
+  implicit def bigDecimalToComplex(n:BigDecimal) =
+    new Complex(n, BigDecimal(0))
+
+  def polar[@spec(Float, Double) T]
+    (magnitude:T, angle:T)(implicit f:Fractional[T], t:Trig[T]) = {
     val real:T = f.times(magnitude, t.cos(angle))
     val imag:T = f.times(magnitude, t.sin(angle))
     new Complex(real, imag)
   }
 
-  def apply(real: Double, imag: Double): Complex[Double] = new Complex(real, imag)
+  def apply(real: Double, imag: Double): Complex[Double] =
+    new Complex(real, imag)
 }
 
 final case class Complex[@spec(Float, Double) T]
-(val real:T, val imag:T)(implicit f:Fractional[T], t:Trig[T])
-extends ScalaNumber with ScalaNumericConversions with Serializable {
+  (val real:T, val imag:T)(implicit f:Fractional[T], t:Trig[T])
+    extends ScalaNumber with ScalaNumericConversions with Serializable {
 
-  // ugh, ScalaNumericConversions ghetto
-  //
-  // maybe complex numbers are too different...
-  def doubleValue = f.toDouble(real)
-  def floatValue = f.toFloat(real)
-  def longValue = f.toLong(real)
-  def intValue = f.toInt(real)
-  override def shortValue = f.toShort(real)
-  override def byteValue = f.toByte(real)
-  def isWhole = f.isWhole(real) && f.eqv(imag, f.zero)
+  def doubleValue: Double = f.toDouble(real)
+  def floatValue: Float = f.toFloat(real)
+  def longValue: Long = f.toLong(real)
+  def intValue: Int = f.toInt(real)
+  override def shortValue: Short = f.toShort(real)
+  override def byteValue: Byte = f.toByte(real)
+
+  def isWhole: Boolean = f.eqv(real, f.zero) && f.isWhole(real)
   def signum: Int = f.compare(real, f.zero)
-  def underlying = (real, imag)
-  def complexSignum = if (f.eqv(abs, f.zero)) Complex.zero else this / new Complex(abs, f.zero)
+  def underlying: (T, T) = (real, imag)
+  def complexSignum: Complex[T] = if (f.eqv(abs, f.zero))
+    Complex.zero
+  else
+    this / new Complex(abs, f.zero)
 
-  override def hashCode: Int = {
-    if (f.isWhole(real) && f.eqv(imag, f.zero) &&
-        f.lteqv(real, f.fromInt(Int.MaxValue)) &&
-        f.gteqv(real, f.fromInt(Int.MinValue))) f.toInt(real)
-    else 19 * real.## + 41 * imag.##
-  }
+  override final def isValidInt: Boolean =
+    f.eqv(imag, f.zero) &&
+    f.isWhole(real) &&
+    f.lteqv(real, f.fromInt(Int.MaxValue)) &&
+    f.gteqv(real, f.fromInt(Int.MinValue))
+
+  override def hashCode: Int = if (isValidInt)
+    f.toInt(real)
+  else
+    19 * real.## + 41 * imag.## + 97
 
   // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
-    case that:Complex[_] => real == that.real && imag == that.imag
+    case that: Complex[_] => real == that.real && imag == that.imag
     case that => unifiedPrimitiveEquals(that)
   }
 
   override def toString: String = "Complex(%s, %s)".format(real, imag)
 
-  // ugh, specialized lazy vals don't work very well
-  //lazy val abs: T = f.sqrt(real * real + imag * imag)
-  //lazy val arg: T = t.atan2(imag, real)
+  def toGaussian: Gaussian[T] = Gaussian(f.round(real), f.round(imag))(f)
+
+  def toGaussian[@spec(Int, Long) U: Integral](g: T => U): Gaussian[U] =
+    Gaussian(g(f.round(real)), g(f.round(imag)))
+
   def abs: T = f.sqrt(f.plus(f.times(real, real), f.times(imag, imag)))
   def arg: T = t.atan2(imag, real)
 
+  def norm: T = f.plus(f.times(real, real), f.times(imag, imag))
   def conjugate = new Complex(real, f.negate(imag))
 
   def asTuple: (T, T) = (real, imag)
   def asPolarTuple: (T, T) = (abs, arg)
 
-  def isImaginary: Boolean = f.eqv(real, f.zero) && f.neqv(imag, f.zero)
-  def isReal: Boolean = f.neqv(real, f.zero) && f.eqv(imag, f.zero)
+  def isZero: Boolean = f.eqv(real, f.zero) && f.eqv(imag, f.zero)
+  def isImaginary: Boolean = f.eqv(real, f.zero)
+  def isReal: Boolean = f.eqv(imag, f.zero)
 
-  def eqv(b:Complex[T]) = f.eqv(real, b.real) && f.eqv(imag, b.imag)
-  def neqv(b:Complex[T]) = f.neqv(real, b.real) || f.neqv(imag, b.imag)
+  def eqv(b: Complex[T]) = f.eqv(real, b.real) && f.eqv(imag, b.imag)
+  def neqv(b: Complex[T]) = f.neqv(real, b.real) || f.neqv(imag, b.imag)
 
   def unary_-() = new Complex(f.negate(real), f.negate(imag))
 
-  def +(b:Complex[T]) = new Complex(
-    f.plus(real, b.real),
-    f.plus(imag, b.imag)
-  )
+  def +(b: Complex[T]) =
+    new Complex(f.plus(real, b.real), f.plus(imag, b.imag))
 
-  def -(b:Complex[T]) = new Complex(
-    f.minus(real, b.real),
-    f.minus(imag, b.imag)
-  )
+  def -(b: Complex[T]) =
+    new Complex(f.minus(real, b.real), f.minus(imag, b.imag))
 
-  def *(b:Complex[T]) = new Complex(
+  def *(b: Complex[T]) = new Complex(
     f.minus(f.times(real, b.real), f.times(imag, b.imag)),
     f.plus(f.times(imag, b.real), f.times(real, b.imag))
   )
 
-  def /(b:Complex[T]) = {
+  def /(b: Complex[T]) = {
     val abs_breal = f.abs(b.real)
     val abs_bimag = f.abs(b.imag)
 
@@ -130,22 +140,14 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     }
   }
 
-  // TODO: to avoid creating intermediate objects we should probably implement
-  // all of these directly rather than relying on our previous definitions.
-  //
-  // alternately, could try piecewise functions for the previous things
-  // (e.g. div_real(Complex, Complex) which would return just real part).
   def quot(b:Complex[T]) = this /~ b
 
   def /~(b:Complex[T]) = {
-    val Complex(x, y) = this / b
-    Complex(f.round(x), f.round(y))
+    val d = this / b
+    Complex(f.round(d.real), f.round(d.imag))
   }
 
-  def %(b:Complex[T]):Complex[T] = {
-    val q = this /~ b
-    this - q * b
-  }
+  def %(b:Complex[T]):Complex[T] = this - (this /~ b) * b
 
   def /%(b:Complex[T]):(Complex[T], Complex[T]) = {
     val q = this /~ b
@@ -154,7 +156,8 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
 
   def **(b:Int): Complex[T] = pow(b)
 
-  def pow(b:Int): Complex[T] = pow(Complex.fromInt[T](b))
+  def pow(b:Int): Complex[T] =
+    Complex.polar(f.fpow(abs, f.fromInt(b)), f.times(arg, f.fromInt(b)))
 
   def **(b:Complex[T]): Complex[T] = pow(b)
 
