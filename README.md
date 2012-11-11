@@ -20,14 +20,14 @@ Spire currently relies heavily on macros introduced Scala 2.10.0, as well as
 many improvements to specialization. The 0.3.0 release of Spire is expected
 shortly after the final Scala 2.10.0 release.
 
-Until then, Spire 0.3.0-M3 (which requires Scala-2.10.0-RC1) is available.
+Until then, Spire 0.3.0-M4 (which requires Scala-2.10.0-RC2) is available.
 
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-scalaVersion := "2.10.0-RC1"
+scalaVersion := "2.10.0-RC2"
 
-libraryDependencies += "org.spire-math" % "spire_2.10.0-RC1" % "0.3.0-M3"
+libraryDependencies += "org.spire-math" % "spire_2.10.0-RC2" % "0.3.0-M4"
 ```
 
 ### Number Types
@@ -64,6 +64,7 @@ to concepts from abstract algebra:
  * `Semigroup[A]` types with an associtive binary operator
  * `Monoid[A]` semigroups who have an identity element
  * `Group[A]` monoids that have an inverse operator
+ * `Rig[A]` types that form monoids under `+` and `\*`
  * `Ring[A]` types that form a group under `+` and a monoid under `\*`
  * `EuclideanRing[A]` rings with quotients and remainders (euclidean division)
  * `Field[A]` euclidean rings with multiplicative inverses
