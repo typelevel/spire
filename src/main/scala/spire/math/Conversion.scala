@@ -140,6 +140,14 @@ object WideningConversion extends WideningConversionLow {
   implicit def realish2complex[A, B]
   (implicit c: WideningConversion[A, B], f: Fractional[B], t: Trig[B]) =
     widen[A, Complex[B]](x => Complex(c.convert(x), Fractional[B].zero))
+
+  implicit def gaussian2gaussian[A, B]
+  (implicit c: WideningConversion[A, B], f: Integral[B]) =
+    widen[Gaussian[A], Gaussian[B]](x => Gaussian(c.convert(x.real), c.convert(x.imag)))
+
+  implicit def realish2gaussian[A, B]
+  (implicit c: WideningConversion[A, B], f: Integral[B]) =
+    widen[A, Gaussian[B]](x => Gaussian(c.convert(x), Integral[B].zero))
 }
 
 
@@ -247,5 +255,13 @@ object NarrowingConversion extends NarrowingConversionLow {
   implicit def realish2complex[A, B]
   (implicit c: NarrowingConversion[A, B], f: Fractional[B], t: Trig[B]) =
     narrow[A, Complex[B]](x => Complex(c.convert(x), Fractional[B].zero))
+
+  implicit def gaussian2gaussian[A, B]
+  (implicit c: NarrowingConversion[A, B], f: Integral[B]) =
+    narrow[Gaussian[A], Gaussian[B]](x => Gaussian(c.convert(x.real), c.convert(x.imag)))
+
+  implicit def realish2gaussian[A, B]
+  (implicit c: NarrowingConversion[A, B], f: Integral[B]) =
+    narrow[A, Gaussian[B]](x => Gaussian(c.convert(x), Integral[B].zero))
 }
 

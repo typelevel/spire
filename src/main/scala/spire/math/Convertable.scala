@@ -144,6 +144,20 @@ trait ConvertableToRational extends ConvertableTo[Rational] {
   def fromType[B:ConvertableFrom](b:B): Rational = ConvertableFrom[B].toRational(b)
 }
 
+trait ConvertableToReal extends ConvertableTo[Real] {
+  def fromByte(a:Byte): Real = Real(a)
+  def fromShort(a:Short): Real = Real(a)
+  def fromInt(a:Int): Real = Real(a)
+  def fromLong(a:Long): Real = Real(a)
+  def fromFloat(a:Float): Real = Real(a)
+  def fromDouble(a:Double): Real = Real(a)
+  def fromBigInt(a:BigInt): Real = Real(a)
+  def fromBigDecimal(a:BigDecimal): Real = Real(a)
+  def fromRational(a:Rational) = Real(a)
+
+  def fromType[B:ConvertableFrom](b:B): Real = sys.error("fixme")
+}
+
 trait ConvertableToComplex[A] extends ConvertableTo[Complex[A]] {
   implicit def f:Fractional[A]
   implicit def t:Trig[A]
@@ -160,21 +174,19 @@ trait ConvertableToComplex[A] extends ConvertableTo[Complex[A]] {
   def fromType[B:ConvertableFrom](b:B): Complex[A] = Complex(f.fromType(b), f.zero)
 }
 
-class ConvertableToComplexCls[A](implicit val f:Fractional[A], val t:Trig[A])
-extends ConvertableToComplex[A]
+trait ConvertableToGaussian[A] extends ConvertableTo[Gaussian[A]] {
+  implicit def f:Integral[A]
+  def fromByte(a:Byte): Gaussian[A] = Gaussian(f.fromByte(a), f.zero)
+  def fromShort(a:Short): Gaussian[A] = Gaussian(f.fromShort(a), f.zero)
+  def fromInt(a:Int): Gaussian[A] = Gaussian(f.fromInt(a), f.zero)
+  def fromLong(a:Long): Gaussian[A] = Gaussian(f.fromLong(a), f.zero)
+  def fromFloat(a:Float): Gaussian[A] = Gaussian(f.fromFloat(a), f.zero)
+  def fromDouble(a:Double): Gaussian[A] = Gaussian(f.fromDouble(a), f.zero)
+  def fromBigInt(a:BigInt): Gaussian[A] = Gaussian(f.fromBigInt(a), f.zero)
+  def fromBigDecimal(a:BigDecimal): Gaussian[A] = Gaussian(f.fromBigDecimal(a), f.zero)
+  def fromRational(a:Rational): Gaussian[A] = Gaussian(f.fromRational(a), f.zero)
 
-trait ConvertableToReal extends ConvertableTo[Real] {
-  def fromByte(a:Byte): Real = Real(a)
-  def fromShort(a:Short): Real = Real(a)
-  def fromInt(a:Int): Real = Real(a)
-  def fromLong(a:Long): Real = Real(a)
-  def fromFloat(a:Float): Real = Real(a)
-  def fromDouble(a:Double): Real = Real(a)
-  def fromBigInt(a:BigInt): Real = Real(a)
-  def fromBigDecimal(a:BigDecimal): Real = Real(a)
-  def fromRational(a:Rational) = Real(a)
-
-  def fromType[B:ConvertableFrom](b:B): Real = sys.error("fixme")
+  def fromType[B:ConvertableFrom](b:B): Gaussian[A] = Gaussian(f.fromType(b), f.zero)
 }
 
 object ConvertableTo {
@@ -189,7 +201,16 @@ object ConvertableTo {
   implicit object ConvertableToRational extends ConvertableToRational
   implicit object ConvertableToReal extends ConvertableToReal
 
-  implicit def convertableToComplex[A:Fractional:Trig] = new ConvertableToComplexCls[A]
+  implicit def convertableToComplex[A: Fractional: Trig] =
+    new ConvertableToComplex[A] {
+      val f = Fractional[A]
+      val t = Trig[A]
+    }
+
+  implicit def convertableToGaussian[A: Integral] =
+    new ConvertableToGaussian[A] {
+      val f = Integral[A]
+    }
 }
 
 trait ConvertableFrom[@spec A] {
@@ -342,25 +363,6 @@ trait ConvertableFromRational extends ConvertableFrom[Rational] {
   def toString(a:Rational): String = a.toString
 }
 
-trait ConvertableFromComplex[A] extends ConvertableFrom[Complex[A]] {
-  def f:Fractional[A]
-  def toByte(a:Complex[A]): Byte = f.toByte(a.real)
-  def toShort(a:Complex[A]): Short = f.toShort(a.real)
-  def toInt(a:Complex[A]): Int = f.toInt(a.real)
-  def toLong(a:Complex[A]): Long = f.toLong(a.real)
-  def toFloat(a:Complex[A]): Float = f.toFloat(a.real)
-  def toDouble(a:Complex[A]): Double = f.toDouble(a.real)
-  def toBigInt(a:Complex[A]): BigInt = f.toBigInt(a.real)
-  def toBigDecimal(a:Complex[A]): BigDecimal = f.toBigDecimal(a.real)
-  def toRational(a:Complex[A]): Rational = f.toRational(a.real)
-
-  def toType[B:ConvertableTo](a:Complex[A]): B = sys.error("fixme")
-  def toString(a:Complex[A]): String = a.toString
-}
-
-class ConvertableFromComplexCls[A](implicit val f:Fractional[A])
-extends ConvertableFromComplex[A]
-
 trait ConvertableFromReal extends ConvertableFrom[Real] {
   def toByte(a:Real): Byte = a.toInt.toByte
   def toShort(a:Real): Short = a.toInt.toShort
@@ -377,6 +379,39 @@ trait ConvertableFromReal extends ConvertableFrom[Real] {
   def toString(a:Real): String = a.toString
 }
 
+trait ConvertableFromGaussian[A] extends ConvertableFrom[Gaussian[A]] {
+  def f:Integral[A]
+  def toByte(a:Gaussian[A]): Byte = f.toByte(a.real)
+  def toShort(a:Gaussian[A]): Short = f.toShort(a.real)
+  def toInt(a:Gaussian[A]): Int = f.toInt(a.real)
+  def toLong(a:Gaussian[A]): Long = f.toLong(a.real)
+  def toFloat(a:Gaussian[A]): Float = f.toFloat(a.real)
+  def toDouble(a:Gaussian[A]): Double = f.toDouble(a.real)
+  def toBigInt(a:Gaussian[A]): BigInt = f.toBigInt(a.real)
+  def toBigDecimal(a:Gaussian[A]): BigDecimal = f.toBigDecimal(a.real)
+  def toRational(a:Gaussian[A]): Rational = f.toRational(a.real)
+
+  def toType[B:ConvertableTo](a:Gaussian[A]): B = sys.error("fixme")
+  def toString(a:Gaussian[A]): String = a.toString
+}
+
+trait ConvertableFromComplex[A] extends ConvertableFrom[Complex[A]] {
+  def f:Fractional[A]
+  def t:Trig[A]
+  def toByte(a:Complex[A]): Byte = f.toByte(a.real)
+  def toShort(a:Complex[A]): Short = f.toShort(a.real)
+  def toInt(a:Complex[A]): Int = f.toInt(a.real)
+  def toLong(a:Complex[A]): Long = f.toLong(a.real)
+  def toFloat(a:Complex[A]): Float = f.toFloat(a.real)
+  def toDouble(a:Complex[A]): Double = f.toDouble(a.real)
+  def toBigInt(a:Complex[A]): BigInt = f.toBigInt(a.real)
+  def toBigDecimal(a:Complex[A]): BigDecimal = f.toBigDecimal(a.real)
+  def toRational(a:Complex[A]): Rational = f.toRational(a.real)
+
+  def toType[B:ConvertableTo](a:Complex[A]): B = sys.error("fixme")
+  def toString(a:Complex[A]): String = a.toString
+}
+
 object ConvertableFrom {
   @inline final def apply[A](implicit ev:ConvertableFrom[A]) = ev
 
@@ -391,7 +426,16 @@ object ConvertableFrom {
   implicit object ConvertableFromRational extends ConvertableFromRational
   implicit object ConvertableFromReal extends ConvertableFromReal
 
-  implicit def convertableFromComplex[A:Fractional] = new ConvertableFromComplexCls[A]
+  implicit def convertableFromComplex[A: Fractional: Trig] =
+    new ConvertableFromComplex[A] {
+      val f = Fractional[A]
+      val t = Trig[A]
+    }
+
+  implicit def convertableFromGaussian[A: Integral] =
+    new ConvertableFromGaussian[A] {
+      val f = Integral[A]
+    }
 }
 
 final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {

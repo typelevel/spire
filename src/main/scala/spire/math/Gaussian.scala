@@ -99,9 +99,9 @@ final case class Gaussian[@spec(Int, Long) T]
     val n = b.norm
     val r = f.quot(f.plus(f.times(real, b.real), f.times(imag, b.imag)), n)
     val j = f.quot(f.minus(f.times(imag, b.real), f.times(real, b.imag)), n)
-    val rr = r * b.real - j * b.imag
-    val jj = j * b.real + r * b.imag
-    new Gaussian(real - rr, imag - jj)
+    val rr = f.minus(f.times(r, b.real), f.times(j, b.imag))
+    val jj = f.plus(f.times(j, b.real), f.times(r, b.imag))
+    new Gaussian(f.minus(real, rr), f.minus(imag, jj))
   }
 
   def /%(b: Gaussian[T]): (Gaussian[T], Gaussian[T]) = {

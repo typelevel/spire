@@ -32,7 +32,16 @@ object Signed extends SignedLow {
   implicit object BigDecimalIsSigned extends BigDecimalIsSigned
   implicit object RationalIsSigned extends RationalIsSigned
   implicit object RealIsSigned extends RealIsSigned
-  implicit def complexIsSigned[A:Fractional:Trig] = new ComplexIsSignedCls
+
+  implicit def complexIsSigned[A: Fractional: Trig] = new ComplexIsSigned[A] {
+    val f = Fractional[A]
+    val t = Trig[A]
+  }
+    
+  implicit def gaussianIsSigned[A: Integral: NRoot] = new GaussianIsSigned[A] {
+    val f = Integral[A]
+    val n = NRoot[A]
+  }
 
   def apply[A](implicit s: Signed[A]): Signed[A] = s
 }
@@ -108,5 +117,9 @@ trait ComplexIsSigned[A] extends Signed[Complex[A]] {
   def abs(a: Complex[A]): Complex[A] = Complex[A](a.abs, f.zero)
 }
 
-class ComplexIsSignedCls[A](implicit val f:Fractional[A], val t:Trig[A])
-extends ComplexIsSigned[A]
+trait GaussianIsSigned[A] extends Signed[Gaussian[A]] {
+  implicit def f: Integral[A]
+  implicit def n: NRoot[A]
+  def signum(a: Gaussian[A]): Int = a.signum
+  def abs(a: Gaussian[A]): Gaussian[A] = Gaussian[A](n.sqrt(a.norm), f.zero)
+}

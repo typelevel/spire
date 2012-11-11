@@ -54,8 +54,16 @@ object Ring {
   implicit object BigIntIsRing extends BigIntIsRing
   implicit object BigDecimalIsRing extends BigDecimalIsRing
   implicit object RationalIsRing extends RationalIsRing
-  implicit def complexIsRing[A:Fractional:Trig] = new ComplexIsRingCls
   implicit object RealIsRing extends RealIsRing
+
+  implicit def complexIsRing[A: Fractional: Trig] = new ComplexIsRing[A] {
+    val f = Fractional[A]
+    val t = Trig[A]
+  }
+
+  implicit def gaussianIsRing[A: Integral] = new GaussianIsRing[A] {
+    val f = Integral[A]
+  }
 
   @inline final def apply[A](implicit r:Ring[A]):Ring[A] = r
 }
@@ -181,6 +189,18 @@ trait RationalIsRing extends Ring[Rational] {
   override def fromInt(n: Int): Rational = Rational(n)
 }
 
+trait RealIsRing extends Ring[Real] {
+  override def minus(a: Real, b: Real): Real = a - b
+  def negate(a: Real): Real = -a
+  def one: Real = Real(1)
+  def plus(a: Real, b: Real): Real = a + b
+  override def pow(a: Real, b: Int): Real = a pow b
+  override def times(a: Real, b: Real): Real = a * b
+  def zero: Real = Real(0)
+  
+  override def fromInt(n: Int): Real = Real(n)
+}
+
 trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A]] {
   implicit def f:Fractional[A]
   implicit def t:Trig[A]
@@ -196,18 +216,16 @@ trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A]] {
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
 }
 
-trait RealIsRing extends Ring[Real] {
-  override def minus(a: Real, b: Real): Real = a - b
-  def negate(a: Real): Real = -a
-  def one: Real = Real(1)
-  def plus(a: Real, b: Real): Real = a + b
-  override def pow(a: Real, b: Int): Real = a pow b
-  override def times(a: Real, b: Real): Real = a * b
-  def zero: Real = Real(0)
-  
-  override def fromInt(n: Int): Real = Real(n)
-}
+trait GaussianIsRing[@spec(Int, Long) A] extends Ring[Gaussian[A]] {
+  implicit def f:Integral[A]
 
-class ComplexIsRingCls[@spec(Float, Double) A]
-(implicit val f:Fractional[A], val t:Trig[A])
-extends ComplexIsRing[A]
+  override def minus(a:Gaussian[A], b:Gaussian[A]): Gaussian[A] = a - b
+  def negate(a:Gaussian[A]): Gaussian[A] = -a
+  def one: Gaussian[A] = Gaussian.one[A]
+  def plus(a:Gaussian[A], b:Gaussian[A]): Gaussian[A] = a + b
+  override def pow(a:Gaussian[A], b:Int):Gaussian[A] = a.pow(b)
+  override def times(a:Gaussian[A], b:Gaussian[A]): Gaussian[A] = a * b
+  def zero: Gaussian[A] = Gaussian.zero[A]
+
+  override def fromInt(n: Int): Gaussian[A] = Gaussian.fromInt[A](n)
+}

@@ -32,9 +32,8 @@ object Eq extends LowPriority {
   implicit object BigIntEq extends BigIntEq
   implicit object BigDecimalEq extends BigDecimalEq
   implicit object RationalEq extends RationalEq
-  implicit def complexEq[A:Fractional] = new ComplexEq[A] {
-    val f = Fractional[A]
-  }
+  implicit def complexEq[A:Fractional] = new ComplexEq[A] {}
+  implicit def gaussianEq[A: Integral] = new GaussianEq[A] {}
   implicit object RealEq extends RealEq
 
   def apply[A](implicit e:Eq[A]):Eq[A] = e
@@ -109,9 +108,12 @@ trait RationalEq extends Eq[Rational] {
   override def neqv(x:Rational, y:Rational) = x != y
 }
 trait ComplexEq[A] extends Eq[Complex[A]] {
-  implicit def f: Fractional[A]
-  def eqv(x:Complex[A], y:Complex[A]) = x == y
-  override def neqv(x:Complex[A], y:Complex[A]) = x != y
+  def eqv(x:Complex[A], y:Complex[A]) = x eqv y
+  override def neqv(x:Complex[A], y:Complex[A]) = x neqv y
+}
+trait GaussianEq[A] extends Eq[Gaussian[A]] {
+  def eqv(x:Gaussian[A], y:Gaussian[A]) = x eqv y
+  override def neqv(x:Gaussian[A], y:Gaussian[A]) = x neqv y
 }
 trait RealEq extends Eq[Real] {
   def eqv(x: Real, y: Real) = (x - y).sign == Zero
