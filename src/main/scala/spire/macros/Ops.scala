@@ -100,11 +100,11 @@ object Ops {
   def findMethodName(c:Context) = {
     val s = c.macroApplication.symbol.name.toString
     val name = s match {
-      // Eq (===, =!=)
+      // Eq (=== =!=)
       case "$eq$eq$eq" => "eqv"
       case "$eq$bang$eq" => "neqv"
 
-      // Order (>, >=, <, <=)
+      // Order (> >= < <=)
       case "$greater" => "gt"
       case "$greater$eq" => "gteqv"
       case "$less" => "lt"
@@ -113,14 +113,14 @@ object Ops {
       // Semigroup (|+|)
       case "$bar$plus$bar" => "op"
 
-      // Ring (unary_-,+,-,*,**)
+      // Ring (unary_- + - * **)
       case "unary_$minus" => "negate"
       case "$plus" => "plus"
       case "$minus" => "minus"
       case "$times" => "times"
       case "$times$times" => "pow"
 
-      // EuclideanRing (/~,%,/%)
+      // EuclideanRing (/~ % /%)
       case "$div$tilde" => "quot"
       case "$percent" => "mod"
       case "$div$percent" => "quotmod"
@@ -128,16 +128,15 @@ object Ops {
       // Field (/)
       case "$div" => "div"
 
-      // BooleanAlgebra
+      // BooleanAlgebra (^ | & ~)
       case "$up" => "xor"
       case "$bar" => "or"
       case "$amp" => "and"
       case "unary_$tilde" => "complement"
 
-
+      // everything else
       case s => s
     }
-    //println("s=%s -> name=%s" format (s, name))
     name
   }
 }
