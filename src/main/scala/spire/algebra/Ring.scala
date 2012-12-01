@@ -55,6 +55,7 @@ object Ring {
   implicit object BigDecimalIsRing extends BigDecimalIsRing
   implicit object RationalIsRing extends RationalIsRing
   implicit object RealIsRing extends RealIsRing
+  implicit object SafeLongIsRing extends SafeLongIsRing
 
   implicit def complexIsRing[A: Fractional: Trig] = new ComplexIsRing[A] {
     val f = Fractional[A]
@@ -199,6 +200,18 @@ trait RealIsRing extends Ring[Real] {
   def zero: Real = Real(0)
   
   override def fromInt(n: Int): Real = Real(n)
+}
+
+trait SafeLongIsRing extends Ring[SafeLong] {
+  override def minus(a:SafeLong, b:SafeLong): SafeLong = a - b
+  def negate(a:SafeLong): SafeLong = -a
+  val one: SafeLong = SafeLong(1)
+  def plus(a:SafeLong, b:SafeLong): SafeLong = a + b
+  override def pow(a:SafeLong, b:Int): SafeLong = a pow b
+  override def times(a:SafeLong, b:SafeLong): SafeLong = a * b
+  val zero: SafeLong = SafeLong(0)
+  
+  override def fromInt(n: Int): SafeLong = SafeLong(n)
 }
 
 trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A]] {

@@ -42,3 +42,8 @@ trait BigIntIsIntegral extends Integral[BigInt] with BigIntIsEuclideanRing
 with ConvertableFromBigInt with ConvertableToBigInt with BigIntOrder with BigIntIsSigned {
   override def fromInt(n: Int): BigInt = super[ConvertableToBigInt].fromInt(n)
 }
+
+trait SafeLongIsIntegral extends Integral[SafeLong] with SafeLongIsEuclideanRing
+with ConvertableFromSafeLong with ConvertableToSafeLong with SafeLongOrder with SafeLongIsSigned {
+  override def fromInt(n: Int): SafeLong = super[ConvertableToSafeLong].fromInt(n)
+}

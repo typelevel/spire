@@ -39,6 +39,8 @@ object EuclideanRing {
   implicit object BigDecimalIsEuclideanRing extends BigDecimalIsEuclideanRing
   implicit object RationalIsEuclideanRing extends RationalIsEuclideanRing
   implicit object RealIsEuclideanRing extends RealIsEuclideanRing
+  implicit object SafeLongIsEuclideanRing extends SafeLongIsEuclideanRing
+
   implicit def complexIsEuclideanRing[A: Fractional: Trig] =
     new ComplexIsEuclideanRing[A] {
       val f = Fractional[A]
@@ -139,6 +141,12 @@ trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRin
 trait RealIsEuclideanRing extends EuclideanRing[Real] with RealIsRing {
   def quot(a: Real, b: Real): Real = a /~ b
   def mod(a: Real, b: Real): Real = a % b
+}
+
+trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with SafeLongIsRing {
+  def quot(a:SafeLong, b:SafeLong) = a / b
+  def mod(a:SafeLong, b:SafeLong) = a % b
+  override def gcd(a:SafeLong, b:SafeLong) = a.toBigInt.gcd(b.toBigInt)
 }
 
 trait ComplexIsEuclideanRing[@spec(Float,Double) A]

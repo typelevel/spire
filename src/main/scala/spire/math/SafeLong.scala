@@ -48,11 +48,14 @@ sealed trait SafeLong extends Ordered[SafeLong] {
 
   def abs = if (this.compare(SafeLong.zero) < 0) -this else this
 
+  def gcd(that: SafeLong): SafeLong
+
   def unary_-(): SafeLong
 
   def isLong: Boolean = fold(_ => true, _ => false)
   def isBigInt: Boolean = fold(_ => false, _ => true)
 
+  def toLong: Long
   def toBigInt: BigInt
   def toBigDecimal: BigDecimal
 
@@ -134,6 +137,9 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
   
   def compare(that: SafeLong): Int = that.fold(x compare _, BigInt(x) compare _)
 
+  def gcd(that: SafeLong) = fun.gcd(x, that.fold(identity, n => (n % x).toLong))
+
+  def toLong: Long = x
   def toBigInt: BigInt = BigInt(x)
   def toBigDecimal = BigDecimal(x)
 
@@ -158,6 +164,12 @@ case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
 
   def compare(that: SafeLong): Int = that.fold(x compare BigInt(_), x compare _)
 
+  def gcd(that: SafeLong) = that match {
+    case SafeLongLong(y) => fun.gcd((x % y).toLong, y)
+    case SafeLongBigInt(y) => x.gcd(y)
+  }
+
+  def toLong: Long = x.toLong
   def toBigInt: BigInt = x
   def toBigDecimal = BigDecimal(x)
 

@@ -189,6 +189,20 @@ trait ConvertableToGaussian[A] extends ConvertableTo[Gaussian[A]] {
   def fromType[B:ConvertableFrom](b:B): Gaussian[A] = Gaussian(f.fromType(b), f.zero)
 }
 
+trait ConvertableToSafeLong extends ConvertableTo[SafeLong] {
+  def fromByte(a:Byte): SafeLong = SafeLong(a)
+  def fromShort(a:Short): SafeLong = SafeLong(a)
+  def fromInt(a:Int): SafeLong = SafeLong(a)
+  def fromLong(a:Long): SafeLong = SafeLong(a)
+  def fromFloat(a:Float): SafeLong = SafeLong(a.toLong)
+  def fromDouble(a:Double): SafeLong = SafeLong(a.toLong)
+  def fromBigInt(a:BigInt): SafeLong = SafeLong(a)
+  def fromBigDecimal(a:BigDecimal): SafeLong = SafeLong(a.toBigInt)
+  def fromRational(a:Rational): SafeLong = SafeLong(a.toBigInt)
+
+  def fromType[B:ConvertableFrom](b:B): SafeLong = SafeLong(ConvertableFrom[B].toBigInt(b))
+}
+
 object ConvertableTo {
   @inline final def apply[A](implicit ev:ConvertableTo[A]) = ev
 
@@ -200,6 +214,7 @@ object ConvertableTo {
   implicit object ConvertableToBigDecimal extends ConvertableToBigDecimal
   implicit object ConvertableToRational extends ConvertableToRational
   implicit object ConvertableToReal extends ConvertableToReal
+  implicit object ConvertableToSafeLong extends ConvertableToSafeLong
 
   implicit def convertableToComplex[A: Fractional: Trig] =
     new ConvertableToComplex[A] {
@@ -412,6 +427,21 @@ trait ConvertableFromComplex[A] extends ConvertableFrom[Complex[A]] {
   def toString(a:Complex[A]): String = a.toString
 }
 
+trait ConvertableFromSafeLong extends ConvertableFrom[SafeLong] {
+  def toByte(a:SafeLong): Byte = a.toBigInt.toByte
+  def toShort(a:SafeLong): Short = a.toBigInt.toShort
+  def toInt(a:SafeLong): Int = a.toBigInt.toInt
+  def toLong(a:SafeLong): Long = a.toBigInt.toLong
+  def toFloat(a:SafeLong): Float = a.toBigInt.toFloat
+  def toDouble(a:SafeLong): Double = a.toBigInt.toDouble
+  def toBigInt(a:SafeLong): BigInt = a.toBigInt
+  def toBigDecimal(a:SafeLong): BigDecimal = BigDecimal(a.toBigInt)
+  def toRational(a:SafeLong): Rational = Rational(a.toBigInt)
+
+  def toType[B:ConvertableTo](a:SafeLong): B = ConvertableTo[B].fromBigInt(a.toBigInt)
+  def toString(a:SafeLong): String = a.toString
+}
+
 object ConvertableFrom {
   @inline final def apply[A](implicit ev:ConvertableFrom[A]) = ev
 
@@ -425,6 +455,7 @@ object ConvertableFrom {
   implicit object ConvertableFromBigDecimal extends ConvertableFromBigDecimal
   implicit object ConvertableFromRational extends ConvertableFromRational
   implicit object ConvertableFromReal extends ConvertableFromReal
+  implicit object ConvertableFromSafeLong extends ConvertableFromSafeLong
 
   implicit def convertableFromComplex[A: Fractional: Trig] =
     new ConvertableFromComplex[A] {

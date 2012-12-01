@@ -62,6 +62,7 @@ object Order {
   implicit object BigDecimalOrder extends BigDecimalOrder
   implicit object RationalOrder extends RationalOrder
   implicit object RealOrder extends RealOrder
+  implicit object SafeLongOrder extends SafeLongOrder
 
   def by[@spec A, @spec B](f:A => B)(implicit o:Order[B]): Order[A] = o.on(f)
 
@@ -193,3 +194,10 @@ trait RealOrder extends Order[Real] with RealEq {
   def compare(x:Real, y:Real) = (x - y).signum
 }
 
+trait SafeLongOrder extends Order[SafeLong] with SafeLongEq {
+  override def gt(x:SafeLong, y:SafeLong) = x > y
+  override def gteqv(x:SafeLong, y:SafeLong) = x >= y
+  override def lt(x:SafeLong, y:SafeLong) = x < y
+  override def lteqv(x:SafeLong, y:SafeLong) = x <= y
+  def compare(x:SafeLong, y:SafeLong) = if (x < y) -1 else if (x > y) 1 else 0
+}
