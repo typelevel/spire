@@ -61,6 +61,8 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
   def toBigInt: BigInt
   def toBigDecimal: BigDecimal
 
+  override def toString: String = fold(_.toString, _.toString)
+
   final def isWhole: Boolean = true
 
   def fold[A,B <: A,C <: A](f: Long => B, g: BigInt => C): A
