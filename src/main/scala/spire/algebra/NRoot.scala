@@ -138,6 +138,21 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
   def fpow(a:BigInt, b:BigInt) = fun.pow(BigDecimal(a), BigDecimal(b)).toBigInt
 }
 
+trait SafeLongIsNRoot extends NRoot[SafeLong] {
+  import NRoot.{LongIsNRoot, BigIntIsNRoot}
+
+  def nroot(a: SafeLong, k: Int): SafeLong = a.fold(
+    n => SafeLong(LongIsNRoot.nroot(n, k)),
+    n => SafeLong(BigIntIsNRoot.nroot(n, k))
+  )
+  def log(a:SafeLong) = a.fold(
+    n => SafeLong(LongIsNRoot.log(n)),
+    n => SafeLong(BigIntIsNRoot.log(n))
+  )
+
+  def fpow(a:SafeLong, b:SafeLong) =
+    SafeLong(BigIntIsNRoot.fpow(a.toBigInt, b.toBigInt))
+}
 
 object NRoot {
   @inline final def apply[@spec(Int,Long,Float,Double) A](implicit ev:NRoot[A]) = ev
@@ -145,6 +160,7 @@ object NRoot {
   implicit object IntIsNRoot extends IntIsNRoot
   implicit object LongIsNRoot extends LongIsNRoot
   implicit object BigIntIsNRoot extends BigIntIsNRoot
+  implicit object SafeLongIsNRoot extends SafeLongIsNRoot
 
   implicit object FloatIsNRoot extends FloatIsNRoot
   implicit object DoubleIsNRoot extends DoubleIsNRoot

@@ -1,6 +1,6 @@
 package spire.math
 
-import scala.math.{abs, signum}
+import scala.math.{abs, signum, ScalaNumber, ScalaNumericConversions}
 import annotation.tailrec
 
 /**
@@ -8,7 +8,7 @@ import annotation.tailrec
  * but rather convert the underlying long to a BigInt as need and back down
  * to a Long when possible.
  */
-sealed trait SafeLong extends Ordered[SafeLong] {
+sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] {
   def signum: Int = fold(scala.math.signum(_).toInt, _.signum)
 
   def +(rhs: SafeLong): SafeLong = rhs.fold(this + _, this + _)
@@ -55,9 +55,13 @@ sealed trait SafeLong extends Ordered[SafeLong] {
   def isLong: Boolean = fold(_ => true, _ => false)
   def isBigInt: Boolean = fold(_ => false, _ => true)
 
-  def toLong: Long
+  override def toByte: Byte = toLong.toByte
+  override def toShort: Short = toLong.toShort
+  override def toInt: Int = toLong.toInt
   def toBigInt: BigInt
   def toBigDecimal: BigDecimal
+
+  final def isWhole: Boolean = true
 
   def fold[A,B <: A,C <: A](f: Long => B, g: BigInt => C): A
 
@@ -135,11 +139,27 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
     SafeLongLong(-x)
   }
   
-  def compare(that: SafeLong): Int = that.fold(x compare _, BigInt(x) compare _)
+  def compare(that: SafeLong): Int = that match {
+    case SafeLongLong(y) => x compare y
+    case SafeLongBigInt(y) => if (x < y) -1 else if (x > y) 1 else 0
+  }
+
+  override def equals(that: Any): Boolean = that match {
+    case SafeLongLong(y) => x == y
+    case SafeLongBigInt(y) => x == y
+    case that => unifiedPrimitiveEquals(that)
+  }
 
   def gcd(that: SafeLong) = fun.gcd(x, that.fold(identity, n => (n % x).toLong))
 
-  def toLong: Long = x
+  def doubleValue: Double = x.toDouble
+  def floatValue: Float = x.toFloat
+  def longValue: Long = x.toLong
+  def intValue: Int = x.toInt
+  
+  def underlying: java.lang.Long = new java.lang.Long(x)
+
+  override def toLong: Long = x
   def toBigInt: BigInt = BigInt(x)
   def toBigDecimal = BigDecimal(x)
 
@@ -162,17 +182,32 @@ case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
   
   def unary_-(): SafeLong = SafeLong(-x)  // Covers the case where x == Long.MaxValue + 1
 
-  def compare(that: SafeLong): Int = that.fold(x compare BigInt(_), x compare _)
+  def compare(that: SafeLong): Int = that match {
+    case SafeLongLong(y) => if (x < y) -1 else if (x > y) 1 else 0
+    case SafeLongBigInt(y) => x compare y
+  }
+
+  override def equals(that: Any): Boolean = that match {
+    case SafeLongLong(y) => x == y
+    case SafeLongBigInt(y) => x == y
+    case that => unifiedPrimitiveEquals(that)
+  }
 
   def gcd(that: SafeLong) = that match {
     case SafeLongLong(y) => fun.gcd((x % y).toLong, y)
     case SafeLongBigInt(y) => x.gcd(y)
   }
 
-  def toLong: Long = x.toLong
+  def doubleValue: Double = x.toDouble
+  def floatValue: Float = x.toFloat
+  def longValue: Long = x.toLong
+  def intValue: Int = x.toInt
+  
+  def underlying: BigInt = x
+
+  override def toLong: Long = x.toLong
   def toBigInt: BigInt = x
   def toBigDecimal = BigDecimal(x)
 
   def fold[A,B <: A,C <: A](f: Long => B, g: BigInt => C): A = g(x)
 }
-
