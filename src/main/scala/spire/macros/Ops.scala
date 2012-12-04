@@ -36,12 +36,16 @@ object Ops {
     c.Expr[R](Apply(Select(ev, findMethodName(c)), List(lhs)))
   }
 
+  def unopWithEv[Ev, R](c:Context)(ev: c.Expr[Ev]): c.Expr[R] = {
+    import c.universe._
+    val lhs = unpackWithoutEv(c)
+    c.Expr[R](Apply(Select(ev.tree, findMethodName(c)), List(lhs)))
+  }
+
+
   def flip[A, R](c: Context)(rhs: c.Expr[A]): c.Expr[R] = {
     import c.universe._
-    val lhs = c.prefix.tree match {
-      case Apply(TypeApply(_, _), List(x)) => x
-      case t => sys.error("bad tree: %s" format t)
-    }
+    val lhs = unpackWithoutEv(c)
     c.Expr[R](Apply(Select(rhs.tree, findMethodName(c)), List(lhs)))
   }
 
@@ -72,6 +76,21 @@ object Ops {
   }
 
   /**
+   * Like binop, but for right-associative operators (eg. +:).
+   */
+  def rbinop[A, R](c:Context)(lhs:c.Expr[A]):c.Expr[R] = {
+    import c.universe._
+    val (ev, rhs) = unpack(c)
+    c.Expr[R](Apply(Select(ev, findMethodName(c)), List(lhs.tree, rhs)))
+  }
+
+  def binopWithEv[A, Ev, R](c: Context)(rhs: c.Expr[A])(ev:c.Expr[Ev]): c.Expr[R] = {
+    import c.universe._
+    val lhs = unpackWithoutEv(c)
+    c.Expr[R](Apply(Select(ev.tree, findMethodName(c)), List(lhs, rhs.tree)))
+  }
+
+  /**
    * Given context, this method pulls 'evidence' and 'lhs' values out of
    * instantiations of implicit -Ops classes. For instance,
    *
@@ -81,7 +100,17 @@ object Ops {
     import c.universe._
     c.prefix.tree match {
       case Apply(Apply(TypeApply(_, _), List(x)), List(ev)) => (ev, x)
-      case t => sys.error("bad tree: %s" format t)
+      case t => c.abort(c.enclosingPosition,
+        "Cannot extract subject of operator (tree = %s)" format t)
+    }
+  }
+
+  def unpackWithoutEv(c:Context) = {
+    import c.universe._
+    c.prefix.tree match {
+      case Apply(TypeApply(_, _), List(lhs)) => lhs
+      case t => c.abort(c.enclosingPosition,
+        "Cannot extract subject of operator (tree = %s)" format t)
     }
   }
 
@@ -134,6 +163,10 @@ object Ops {
       case "$amp" => "and"
       case "unary_$tilde" => "complement"
 
+      // VectorSpace
+      case "$times$colon" => "timesl"
+      case "$colon$times" => "timesr"
+      case "$u22C5" => "dot"
 
       case s => s
     }

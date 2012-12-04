@@ -5,16 +5,11 @@ import spire.macrosk.Ops
 
 import scala.{specialized => spec}
 
-trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] {
-  def div(a:A, b:A): A
+trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] with MultiplicativeAbGroup[A] {
   def isWhole(a:A): Boolean
-  def reciprocal(a:A): A = div(one, a)
-
-  override def multiplicative:Group[A] = new MultiplicativeGroup[A]()(this)
 }
 
 final class FieldOps[A](lhs:A)(implicit ev:Field[A]) {
-  def /(rhs:A) = macro Ops.binop[A, A]
   def /(rhs:Int) = ev.div(lhs, ev.fromInt(rhs))
 
   def isWhole() = macro Ops.unop[Boolean]
