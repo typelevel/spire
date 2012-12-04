@@ -62,11 +62,11 @@ class ULong(val signed: Long) extends AnyVal {
   @inline final def >= (that: ULong) = that <= this
   @inline final def > (that: ULong) = that < this
   
-  final def unary_- = new ULong(this.signed)
+  final def unary_- = ULong(this.signed)
 
-  final def + (that: ULong) = new ULong(this.signed + that.signed)
-  final def - (that: ULong) = new ULong(this.signed - that.signed)
-  final def * (that: ULong) = new ULong(this.signed * that.signed)
+  final def + (that: ULong) = ULong(this.signed + that.signed)
+  final def - (that: ULong) = ULong(this.signed - that.signed)
+  final def * (that: ULong) = ULong(this.signed * that.signed)
 
   final def / (that: ULong) = {
     val n: Long = this.signed
@@ -75,10 +75,10 @@ class ULong(val signed: Long) extends AnyVal {
     if (d == 0) {
       throw new java.lang.ArithmeticException("/ by zero")
     } else if (d < 0) {
-      new ULong(if (n >= 0 || n < d) 0 else 1)
+      ULong(if (n >= 0 || n < d) 0 else 1)
     } else {
       val half = n >>> 1
-      new ULong(((half / d) << 1) + (((half % d) << 1) + (n & 1)) / d)
+      ULong(((half / d) << 1) + (((half % d) << 1) + (n & 1)) / d)
     }
   }
 
@@ -89,14 +89,14 @@ class ULong(val signed: Long) extends AnyVal {
     (q, this - q * that)
   }
 
-  final def unary_~ = new ULong(~this.signed)
+  final def unary_~ = ULong(~this.signed)
 
-  final def << (shift: ULong) = new ULong(this.signed << shift.signed)
-  final def >> (shift: ULong) = new ULong(this.signed >> shift.signed)
-  final def >>> (shift: ULong) = new ULong(this.signed >>> shift.signed)
-  final def & (that: ULong) = new ULong(this.signed & that.signed)
-  final def | (that: ULong) = new ULong(this.signed | that.signed)
-  final def ^ (that: ULong) = new ULong(this.signed ^ that.signed)
+  final def << (shift: ULong) = ULong(this.signed << shift.signed)
+  final def >> (shift: ULong) = ULong(this.signed >>> (shift.signed & 63))
+  final def >>> (shift: ULong) = ULong(this.signed >>> (shift.signed & 63))
+  final def & (that: ULong) = ULong(this.signed & that.signed)
+  final def | (that: ULong) = ULong(this.signed | that.signed)
+  final def ^ (that: ULong) = ULong(this.signed ^ that.signed)
 
   final def ** (that: ULong) = ULong.pow(1L, this.signed, that.signed)
 

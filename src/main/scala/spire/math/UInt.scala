@@ -38,22 +38,22 @@ class UInt(val signed: Int) extends AnyVal {
   def >= (that: UInt) = this.toLong >= that.toLong
   def > (that: UInt) = this.toLong > that.toLong
   
-  def unary_- = new UInt(this.signed)
+  def unary_- = UInt(this.signed)
 
-  def + (that: UInt) = new UInt(this.signed + that.signed)
-  def - (that: UInt) = new UInt(this.signed - that.signed)
-  def * (that: UInt) = new UInt(this.signed * that.signed)
+  def + (that: UInt) = UInt(this.signed + that.signed)
+  def - (that: UInt) = UInt(this.signed - that.signed)
+  def * (that: UInt) = UInt(this.signed * that.signed)
   def / (that: UInt) = UInt(this.toLong / that.toLong)
   def % (that: UInt) = UInt(this.toLong % that.toLong)
 
-  def unary_~ = new UInt(~this.signed)
+  def unary_~ = UInt(~this.signed)
 
-  def << (shift: UInt) = new UInt(this.signed << shift.signed)
-  def >> (shift: UInt) = new UInt(this.signed >> shift.signed)
-  def >>> (shift: UInt) = new UInt(this.signed >>> shift.signed)
-  def & (that: UInt) = new UInt(this.signed & that.signed)
-  def | (that: UInt) = new UInt(this.signed | that.signed)
-  def ^ (that: UInt) = new UInt(this.signed ^ that.signed)
+  def << (shift: UInt) = UInt(this.signed << shift.signed)
+  def >> (shift: UInt) = UInt(this.signed >>> (shift.signed & 31))
+  def >>> (shift: UInt) = UInt(this.signed >>> (shift.signed & 31))
+  def & (that: UInt) = UInt(this.signed & that.signed)
+  def | (that: UInt) = UInt(this.signed | that.signed)
+  def ^ (that: UInt) = UInt(this.signed ^ that.signed)
 
-  def ** (that: UInt) = new UInt(pow(this.toDouble, that.toDouble).toInt)
+  def ** (that: UInt) = UInt(fun.pow(this.toLong, that.toLong))
 }

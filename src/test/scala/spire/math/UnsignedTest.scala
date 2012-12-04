@@ -339,4 +339,22 @@ class UByteTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropert
       }
     }
   }
+
+  property("n << x == n << (x + 32 * y)") {
+    forAll { (n: Byte, x: Byte, y: Byte) =>
+      UByte(n) << UByte(x) should be === UByte(n) << UByte(x + 32 * y)
+    }
+  }
+
+  property("n >> x == n >> (x % 32)") {
+    forAll { (n: Byte, x: Byte, y: Byte) =>
+      UByte(n) >> UByte(x) should be === UByte(n) >> UByte(x % 32)
+    }
+  }
+
+  property("n >> x == n >>> x") {
+    forAll { (n: Byte, x: Byte) =>
+      UByte(n) >> UByte(x) should be === UByte(n) >>> UByte(x)
+    }
+  }
 }

@@ -35,7 +35,7 @@ class UByte(val signed: Byte) extends AnyVal {
   def >= (that: UByte) = this.toInt >= that.toInt
   def > (that: UByte) = this.toInt > that.toInt
   
-  def unary_- = UByte(this.signed)
+  def unary_- = UByte(-this.signed)
 
   def + (that: UByte) = UByte(this.signed + that.signed)
   def - (that: UByte) = UByte(this.signed - that.signed)
@@ -46,11 +46,11 @@ class UByte(val signed: Byte) extends AnyVal {
   def unary_~ = UByte(~this.signed)
 
   def << (shift: UByte) = UByte(this.signed << shift.signed)
-  def >> (shift: UByte) = UByte(this.signed >> shift.signed)
-  def >>> (shift: UByte) = UByte(this.signed >>> shift.signed)
+  def >> (shift: UByte) = UByte(this.signed >>> (shift.signed & 7))
+  def >>> (shift: UByte) = UByte(this.signed >>> (shift.signed & 7))
   def & (that: UByte) = UByte(this.signed & that.signed)
   def | (that: UByte) = UByte(this.signed | that.signed)
   def ^ (that: UByte) = UByte(this.signed ^ that.signed)
 
-  def ** (that: UByte) = UByte(pow(this.toDouble, that.toDouble).toByte)
+  def ** (that: UByte) = UByte(fun.pow(this.toLong, that.toLong).toInt)
 }
