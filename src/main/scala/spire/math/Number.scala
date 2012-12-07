@@ -37,8 +37,8 @@ object Number {
     sys.error("could not parse Number: %s" format s)
   }
 
-  implicit def byteToNumber(n:Int) = Number(n)
-  implicit def shortToNumber(n:Int) = Number(n)
+  implicit def byteToNumber(n:Byte) = Number(n)
+  implicit def shortToNumber(n:Short) = Number(n)
   implicit def intToNumber(n:Int) = Number(n)
   implicit def longToNumber(n:Long) = Number(n)
   implicit def bigIntToNumber(n:BigInt) = Number(n)
