@@ -20,14 +20,14 @@ Spire currently relies heavily on macros introduced Scala 2.10.0, as well as
 many improvements to specialization. The 0.3.0 release of Spire is expected
 shortly after the final Scala 2.10.0 release.
 
-Until then, Spire 0.3.0-M4 (which requires Scala-2.10.0-RC2) is available.
+Until then, Spire 0.3.0-M6 (which requires Scala-2.10.0-RC5) is available.
 
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-scalaVersion := "2.10.0-RC2"
+scalaVersion := "2.10.0-RC5"
 
-libraryDependencies += "org.spire-math" % "spire_2.10.0-RC2" % "0.3.0-M4"
+libraryDependencies += "org.spire-math" % "spire_2.10.0-RC5" % "0.3.0-M6"
 ```
 
 ### Number Types
@@ -41,6 +41,7 @@ introduces several new ones, all of which can be found in `spire.math`:
  * `SafeLong` fast, overflow-proof integer type
  * `Interval[A]` arithmetic on open, closed, and unbound intervals
  * `Number` boxed type supporting a traditional numeric tower
+ * `UByte` through `ULong` value classes supporting unsigned operations
 
 ### Type Classes
 
