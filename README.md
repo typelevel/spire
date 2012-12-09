@@ -70,6 +70,10 @@ to concepts from abstract algebra:
  * `Field[A]` euclidean rings with multiplicative inverses
  * `Signed[A]` types that have a sign (negative, zero, positive)
  * `NRoot[A]` types that support k-roots, logs, and fractional powers
+ * `Module[V,R]` types that form a left R-module
+ * `VectorSpace[V,F]` types that form a vector space
+ * `NormedVectorSpace[V,F]` types with an associated norm
+ * `InnerProductSpace[V,F]` types with an inner product
 
 In addition to the type classes themselves, `spire.implicits` defines many
 implicits which provide unary and infix operators for the type classes. The
