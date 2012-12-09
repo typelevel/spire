@@ -288,10 +288,7 @@ final class ConversionOps[A](a: A) {
     macro Ops.flip[WideningConversion[A, B], B]
 }
 
-trait LowPriorityImplicits {
-}
-
-object implicits extends LowPriorityImplicits {
+object implicits {
   implicit def eqOps[A:Eq](a:A) = new EqOps(a)
   implicit def orderOps[A:Order](a:A) = new OrderOps(a)
   implicit def semigroupOps[A:Semigroup](a:A) = new SemigroupOps(a)
@@ -316,6 +313,7 @@ object implicits extends LowPriorityImplicits {
   implicit def nrootOps[A: NRoot](a: A) = new NRootOps(a)
 
   implicit def moduleOps[V, R](v:V)(implicit m:Module[V,R]) = new ModuleOps[V, R](v)
+  implicit def rigtModuleOps[V, R](v:V)(implicit m:RightModule[V,R]) = new RightModuleOps[V, R](v)
   implicit def vectorSpaceOps[V, F](v:V)(implicit m:VectorSpace[V,F]) = new VectorSpaceOps[V, F](v)
   implicit def normedVectorSpaceOps[V](v:V) = new NormedVectorSpaceOps[V](v)
   implicit def innerProductSpaceOps[V](v:V) = new InnerProductSpaceOps[V](v)

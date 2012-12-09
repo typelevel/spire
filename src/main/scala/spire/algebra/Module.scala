@@ -75,7 +75,7 @@ final class ModuleOps[V, F](rhs: V)(implicit ev: Module[V, F]) {
   def *: (lhs:F): V = macro Ops.rbinop[F, V]
 }
 
-final class RightModuleOps[V, F](lhs: V)(implicit ev: Module[V, F]) {
+final class RightModuleOps[V, F](lhs: V)(implicit ev: RightModule[V, F]) {
   def :* (rhs:F): V = macro Ops.binop[F, V]
 }
 
