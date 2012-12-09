@@ -166,6 +166,7 @@ object Ops {
       // VectorSpace
       case "$times$colon" => "timesl"
       case "$colon$times" => "timesr"
+      case "$colon$div" => "divr"
       case "$u22C5" => "dot"
 
       case s => s

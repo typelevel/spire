@@ -2,7 +2,7 @@ package spire.algebra
 
 import scala.{ specialized => spec }
 
-trait RingAlgebra[V, @spec R] extends Module[V, R] with Ring[V]
+trait RingAlgebra[V, @spec R] extends Module[V, R] with MultiplicativeSemigroup[V]
 
 object RingAlgebra {
   implicit def ZAlgebra[A](implicit ring: Ring[A]) = new ZAlgebra[A] {
@@ -10,7 +10,7 @@ object RingAlgebra {
   }
 }
 
-trait ZAlgebra[V] extends RingAlgebra[V, Int] {
+trait ZAlgebra[V] extends RingAlgebra[V, Int] with Ring[V] {
   implicit def vector: Ring[V]
   implicit def scalar: Ring[Int] = Ring.IntIsRing
 
@@ -25,3 +25,5 @@ trait ZAlgebra[V] extends RingAlgebra[V, Int] {
 
   override def fromInt(n: Int): V = vector.fromInt(n)
 }
+
+trait FieldAlgebra[V, @spec(Float, Double) F] extends RingAlgebra[V, F] with VectorSpace[V, F]

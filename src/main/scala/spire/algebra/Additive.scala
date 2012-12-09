@@ -32,6 +32,16 @@ trait AdditiveAbGroup[@spec(Int,Long,Float,Double) A] extends AdditiveGroup[A] {
   }
 }
 
+trait AdditiveMonoid0 {
+  implicit def moduleIsAdditiveMonoid[V, @spec(Int, Long, Float, Double) R](implicit
+    m: Module[V, R]): AdditiveMonoid[V] = m
+}
+
+object AdditiveMonoid extends AdditiveMonoid0 {
+  implicit def ringIsAdditiveMonoid[@spec(Int, Long, Float, Double) A](implicit
+    r: Ring[A]): AdditiveMonoid[A] = r
+}
+
 final class AdditiveMonoidOps[A](lhs:A)(implicit ev:AdditiveMonoid[A]) {
   def +(rhs:A): A = macro Ops.binop[A, A]
 }
