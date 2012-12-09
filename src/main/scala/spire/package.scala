@@ -288,7 +288,10 @@ final class ConversionOps[A](a: A) {
     macro Ops.flip[WideningConversion[A, B], B]
 }
 
-object implicits {
+trait LowPriorityImplicits {
+}
+
+object implicits extends LowPriorityImplicits {
   implicit def eqOps[A:Eq](a:A) = new EqOps(a)
   implicit def orderOps[A:Order](a:A) = new OrderOps(a)
   implicit def semigroupOps[A:Semigroup](a:A) = new SemigroupOps(a)
@@ -296,6 +299,10 @@ object implicits {
 
   implicit def convertableOps[A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
 
+  implicit def additiveMonoidOps[A:AdditiveMonoid](a:A) = new AdditiveMonoidOps(a)
+  implicit def additiveGroupOps[A:AdditiveGroup](a:A) = new AdditiveGroupOps(a)
+  implicit def multiplicativeSemigroupOps[A:MultiplicativeSemigroup](a:A) = new MultiplicativeSemigroupOps(a)
+  implicit def multiplicativeGroupOps[A:MultiplicativeGroup](a:A) = new MultiplicativeGroupOps(a)
 
   implicit def rigOps[A:Rig](a:A) = new RigOps(a)
   implicit def ringOps[A:Ring](a:A) = new RingOps(a)
@@ -307,6 +314,11 @@ object implicits {
 
   implicit def signedOps[A: Signed](a: A) = new SignedOps(a)
   implicit def nrootOps[A: NRoot](a: A) = new NRootOps(a)
+
+  implicit def moduleOps[V, R](v:V)(implicit m:Module[V,R]) = new ModuleOps[V, R](v)
+  implicit def vectorSpaceOps[V, F](v:V)(implicit m:VectorSpace[V,F]) = new VectorSpaceOps[V, F](v)
+  implicit def normedVectorSpaceOps[V](v:V) = new NormedVectorSpaceOps[V](v)
+  implicit def innerProductSpaceOps[V](v:V) = new InnerProductSpaceOps[V](v)
 
   implicit def literalIntOps(lhs:Int) = new LiteralIntOps(lhs)
   implicit def literalDoubleOps(lhs:Double) = new LiteralDoubleOps(lhs)

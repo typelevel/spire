@@ -11,19 +11,14 @@ import spire.macrosk.Ops
 
 /**
  * Ring represents a set (A) that is a group over addition (+) and a monoid
- * over multiplication (*).
+ * over multiplication (*). Aside from this, the multiplication must distribute
+ * over addition.
  *
  * Ring implements some methods (for example fromInt) in terms of other more
  * fundamental methods (zero, one and plus). Where possible, these methods
  * should be overridden by more efficient implementations.
  */
-trait Ring[@spec(Int,Long,Float,Double) A] extends Rig[A] {
-  def negate(a:A):A
-
-  override def additive:Group[A] = new AdditiveGroup[A]()(this)
-
-  def minus(a:A, b:A):A = plus(a, negate(b))
-
+trait Ring[@spec(Int,Long,Float,Double) A] extends Rig[A] with AdditiveAbGroup[A] {
   def fromInt(n: Int): A =
     if (n < 0) _fromInt(negate(one), -n, zero)
     else _fromInt(one, n, zero)
@@ -35,10 +30,6 @@ trait Ring[@spec(Int,Long,Float,Double) A] extends Rig[A] {
 }
 
 final class RingOps[A](lhs:A)(implicit ev:Ring[A]) {
-  def unary_-() = macro Ops.unop[A]
-  
-  def -(rhs:A): A = macro Ops.binop[A, A]
-
   def -(rhs:Int): A = ev.minus(lhs, ev.fromInt(rhs))
   def +(rhs:Int): A = ev.plus(lhs, ev.fromInt(rhs))
   def *(rhs:Int): A = ev.times(lhs, ev.fromInt(rhs))

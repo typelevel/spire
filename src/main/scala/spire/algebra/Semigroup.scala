@@ -2,6 +2,9 @@ package spire.algebra
 
 import spire.macrosk.Ops
 
+/**
+ * A semigroup is any set `A` with an associative operation (`op`).
+ */
 trait Semigroup[A] {
   def op(x:A, y:A): A
 }

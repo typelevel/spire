@@ -13,15 +13,7 @@ import spire.macrosk.Ops
  * Rig is a ring whose additive structure doesn't have an inverse (ie. it is
  * monoid, not a group). Put another way, a Rig is a Ring without a negative.
  */
-trait Rig[@spec(Int,Long,Float,Double) A] {
-  def zero:A
-  def one:A
-  def plus(a:A, b:A):A
-  def times(a:A, b:A):A
-
-  def additive:Monoid[A] = new AdditiveMonoid[A]()(this)
-  def multiplicative:Monoid[A] = new MultiplicativeMonoid[A]()(this)
-
+trait Rig[@spec(Int,Long,Float,Double) A] extends AdditiveMonoid[A] with MultiplicativeMonoid[A] {
   def pow(a:A, n:Int):A =
     if (n < 0) sys.error("illegal exponent: %s" format n)
     else _pow(a, n, one)
@@ -33,9 +25,6 @@ trait Rig[@spec(Int,Long,Float,Double) A] {
 }
 
 final class RigOps[A](lhs:A)(implicit ev:Rig[A]) {
-  def +(rhs:A): A = macro Ops.binop[A, A]
-  def *(rhs:A): A = macro Ops.binop[A, A]
-
   def pow(rhs:Int) = macro Ops.binop[Int, A]
   def **(rhs:Int) = macro Ops.binop[Int, A]
 }
