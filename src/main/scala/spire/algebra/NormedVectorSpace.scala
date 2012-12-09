@@ -6,10 +6,10 @@ import scala.{ specialized => spec }
 
 trait NormedVectorSpace[V, @spec(Int, Long, Float, Double) F]
 extends VectorSpace[V, F] with MetricSpace[V, F] {
-  def distance(v: V, w: V): F = norm(minus(v, w))
   def norm(v: V): F
 
   def normalize(v: V): V = divr(v, norm(v))
+  def distance(v: V, w: V): F = norm(minus(v, w))
 }
 
 trait NormedVectorSpace0 {
