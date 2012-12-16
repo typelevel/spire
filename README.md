@@ -42,6 +42,8 @@ introduces several new ones, all of which can be found in `spire.math`:
  * `Interval[A]` arithmetic on open, closed, and unbound intervals
  * `Number` boxed type supporting a traditional numeric tower
  * `UByte` through `ULong` value classes supporting unsigned operations
+ * `Natural` unsigned, immutable, arbitrary precision intger
+ * `EuclideanRational` fractions of types from any Euclidean domain
 
 ### Type Classes
 
@@ -65,8 +67,8 @@ to concepts from abstract algebra:
  * `Semigroup[A]` types with an associtive binary operator
  * `Monoid[A]` semigroups who have an identity element
  * `Group[A]` monoids that have an inverse operator
- * `Rig[A]` types that form monoids under `+` and `\*`
- * `Ring[A]` types that form a group under `+` and a monoid under `\*`
+ * `Rig[A]` types that form monoids under `+` and `*`
+ * `Ring[A]` types that form a group under `+` and a monoid under `*`
  * `EuclideanRing[A]` rings with quotients and remainders (euclidean division)
  * `Field[A]` euclidean rings with multiplicative inverses
  * `Signed[A]` types that have a sign (negative, zero, positive)
