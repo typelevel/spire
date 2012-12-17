@@ -4,64 +4,61 @@ import spire.algebra._
 import spire.implicits._
 
 /**
- * A Bound represents one side of an interval; it is parameterized on T, the
- * ordered type covered by the interval.
+ * A Bound represents one side of an interval; it is parameterized on
+ * T, the ordered type covered by the interval.
  *
- * Bound does not imply anything about being an upper and lower bound, or
- * necessarily having a value (it may represent a limit like +infinity).
+ * Bound (by itself) does not imply anything about being an upper and
+ * lower bound, or necessarily having a value (it may represent a
+ * limit like +infinity).
  */
 sealed trait Bound[T] {
+  // bounds require T to have an Order[T].
   implicit def order: Order[T]
 
+  // convert this bound to an upper/lower bound
   def toUpper: Upper[T]
   def toLower: Lower[T]
 
+  // compare to other bounds/points
   def compare(rhs: Bound[T]): Int
   def comparePt(t: T): Int
 
-  def unop(f: T => T): Bound[T]
-  def binop(rhs: Bound[T])(f: (T, T) => T): Bound[T]
-
+  // compare bounds
   def <(rhs: Bound[T]) = compare(rhs) < 0
   def <=(rhs: Bound[T]) = compare(rhs) < 1
   def >(rhs: Bound[T]) = compare(rhs) > 0
   def >=(rhs: Bound[T]) = compare(rhs) > -1
 
-  def min(rhs: Bound[T]): Bound[T] = if (this < rhs) this else rhs
-  def max(rhs: Bound[T]): Bound[T] = if (this > rhs) this else rhs
-}
+  def min(rhs: Bound[T]): Bound[T] = if (compare(rhs) < 0) this else rhs
+  def max(rhs: Bound[T]): Bound[T] = if (compare(rhs) > 0) this else rhs
 
-/**
- * This class provides operators for Bound[T] instances when T is a member of
- * the Ring typeclass (i.e. an implicit Ring[T] exists).
- */
-class BoundRingOps[T](lhs: Bound[T])(implicit ev: Ring[T]) {
-  def unary_- = lhs.unop(ev.negate(_))
-  def +(rhs: T) = lhs.unop(ev.plus(_, rhs))
-  def -(rhs: T) = lhs.unop(ev.minus(_, rhs))
-  def *(rhs: T) = lhs.unop(ev.times(_, rhs))
-  def +(rhs: Bound[T]) = lhs.binop(rhs)(ev.plus(_, _))
-  def -(rhs: Bound[T]) = lhs.binop(rhs)(ev.minus(_, _))
-  def *(rhs: Bound[T]) = lhs.binop(rhs)(ev.times(_, _))
-  def pow(rhs: Int) = lhs.unop(ev.pow(_, rhs))
-}
+  // perform unary ops (correctly handling open/closed, upper/lower)
+  def unop(f: T => T): Bound[T]
 
-/**
- * This class provides operators for Bound[T] instances when T is a member of
- * the EuclideanRing typeclass (i.e. an implicit EuclideanRing[T] exists).
- */
-class BoundEuclideanRingOps[T](lhs: Bound[T])(implicit ev: EuclideanRing[T]) {
-  def /~(rhs: T) = lhs.unop(ev.quot(_, rhs))
-  def /~(rhs: Bound[T]) = lhs.binop(rhs)(ev.quot(_, _))
-}
+  // perform binary ops (correctly handling open/closed, upper/lower)
+  def binop(rhs: Bound[T])(f: (T, T) => T): Bound[T]
 
-/**
- * This class provides operators for Bound[T] instances when T is a member of
- * the Field typeclass (i.e. an implicit Field[T] exists).
- */
-class BoundFieldOps[T](lhs: Bound[T])(implicit ev: Field[T]) {
-  def /(rhs: T) = lhs.unop(ev.div(_, rhs))
-  def /(rhs: Bound[T]) = lhs.binop(rhs)(ev.div(_, _))
+  // TODO: it would be nice to avoid the overhead of unop/binop, but
+  // for now the amount of boilerplate required to accomplish that is
+  // simply too high. we could probably solve this with a macro...
+
+  // basic Ring operations involving bounds
+  def unary_-(implicit ev: Ring[T]) = unop(ev.negate(_))
+  def +(rhs: T)(implicit ev: Ring[T]) = unop(ev.plus(_, rhs))
+  def -(rhs: T)(implicit ev: Ring[T]) = unop(ev.minus(_, rhs))
+  def *(rhs: T)(implicit ev: Ring[T]) = unop(ev.times(_, rhs))
+  def +(rhs: Bound[T])(implicit ev: Ring[T]) = binop(rhs)(ev.plus(_, _))
+  def -(rhs: Bound[T])(implicit ev: Ring[T]) = binop(rhs)(ev.minus(_, _))
+  def *(rhs: Bound[T])(implicit ev: Ring[T]) = binop(rhs)(ev.times(_, _))
+  def pow(rhs: Int)(implicit ev: Ring[T]) = unop(ev.pow(_, rhs))
+
+  // basic EuclideanRing operations involving bounds
+  def /~(rhs: T)(implicit ev: EuclideanRing[T]) = unop(ev.quot(_, rhs))
+  def /~(rhs: Bound[T])(implicit ev: EuclideanRing[T]) = binop(rhs)(ev.quot(_, _))
+
+  // basic Field operations involving bounds
+  def /(rhs: T)(implicit ev: Field[T]) = unop(ev.div(_, rhs))
+  def /(rhs: Bound[T])(implicit ev: Field[T]) = binop(rhs)(ev.div(_, _))
 }
 
 /**
@@ -75,8 +72,8 @@ sealed trait Lower[T] extends Bound[T] { def toLower = this }
 sealed trait Upper[T] extends Bound[T] { def toUpper = this }
 
 /**
- * Unbound represents a boundary which does not limit its "side" of the
- * interval, i.e. +/- infinity.
+ * Unbound represents a boundary which does not limit its "side" of
+ * the interval, i.e. +/- infinity.
  */
 sealed trait Unbound[T] extends Bound[T] {
   def unop(f: T => T): Bound[T] = this
@@ -84,31 +81,25 @@ sealed trait Unbound[T] extends Bound[T] {
 }
 
 /**
- * UnboundBelow represents an unrestrainted lower bound, i.e. negative infinity.
+ * UnboundBelow represents an unrestrainted lower bound (i.e. -inf).
  */
 final case class UnboundBelow[T]()(implicit val order: Order[T]) extends Lower[T] with Unbound[T] {
-  def compare(rhs: Bound[T]) = rhs match {
-    case UnboundBelow() => 0
-    case _ => -1
-  }
+  def compare(rhs: Bound[T]) = if (rhs == this) 0 else -1
   def comparePt(t: T) = -1
   def toUpper = UnboundAbove[T]()
 }
 
 /**
- * UnboundAbove represents an unrestrainted upper bound, i.e. positive infinity.
+ * UnboundAbove represents an unrestrainted upper bound (i.e. +inf).
  */
 final case class UnboundAbove[T]()(implicit val order: Order[T]) extends Upper[T] with Unbound[T] {
-  def compare(rhs: Bound[T]) = rhs match {
-    case UnboundAbove() => 0
-    case _ => 1
-  }
+  def compare(rhs: Bound[T]) = if (rhs == this) 0 else 1
   def comparePt(t: T) = 1
   def toLower = UnboundBelow[T]()
 }
 
 /**
- * Closed is a closed bound (the interval contains this boundary limit).
+ * Closed is a closed bound (the interval contains this limit).
  */
 sealed trait Closed[T] {
   implicit def order: Order[T]
@@ -133,25 +124,27 @@ sealed trait Closed[T] {
 }
 
 /**
- * ClosedBelow is a closed lower bound, i.e. a in the interval [a, b].
+ * ClosedBelow is a closed lower bound, e.g. a in the interval [a, b].
  */
 final case class ClosedBelow[T](x: T)(implicit val order: Order[T]) extends Lower[T] with Closed[T] {
   def toUpper = ClosedAbove(x)
   def unop(f: T => T) = ClosedBelow(f(x))
-  override def binop(rhs: Bound[T])(f: (T, T) => T): Lower[T] = super.binop(rhs)(f).toLower
+  override def binop(rhs: Bound[T])(f: (T, T) => T): Lower[T] =
+    super.binop(rhs)(f).toLower
 }
 
 /**
- * ClosedAbove is a closed upper bound, i.e. b in the interval [a, b]
+ * ClosedAbove is a closed upper bound, e.g. b in the interval [a, b]
  */
 final case class ClosedAbove[T](x: T)(implicit val order: Order[T]) extends Upper[T] with Closed[T] {
   def toLower = ClosedBelow(x)
   def unop(f: T => T) = ClosedAbove(f(x))
-  override def binop(rhs: Bound[T])(f: (T, T) => T): Upper[T] = super.binop(rhs)(f).toUpper
+  override def binop(rhs: Bound[T])(f: (T, T) => T): Upper[T] =
+    super.binop(rhs)(f).toUpper
 }
 
 /**
- * Open is a open bound (the interval does not contain this boundary limit).
+ * Open is a open bound (the interval does not contain this limit).
  */
 sealed trait Open[T] {
   implicit def order: Order[T]
@@ -167,45 +160,48 @@ sealed trait Open[T] {
 }
 
 /**
- * OpenBelow is an open lower bound, i.e. a in the interval (a, b).
+ * OpenBelow is an open lower bound, e.g. a in the interval (a, b).
  */
 final case class OpenBelow[T](x: T)(implicit val order: Order[T]) extends Lower[T] with Open[T] {
   def compare(rhs: Bound[T]) = rhs match {
     case UnboundBelow() => 1
     case UnboundAbove() => -1
-    case ClosedBelow(y) => if (order.lt(x, y)) -1 else 1
-    case ClosedAbove(y) => if (order.lt(x, y)) -1 else 1
+    case ClosedBelow(y) => comparePt(y)
+    case ClosedAbove(y) => comparePt(y)
     case OpenBelow(y) => order.compare(x, y)
-    case OpenAbove(y) => if (order.lt(x, y)) -1 else 1
+    case OpenAbove(y) => comparePt(y)
   }
   def comparePt(t: T) = if (order.lt(x, t)) -1 else 1
   def toUpper = OpenAbove(x)
   def unop(f: T => T) = OpenBelow(f(x))
-  override def binop(rhs: Bound[T])(f: (T, T) => T): Lower[T] = super.binop(rhs)(f).toLower
+  override def binop(rhs: Bound[T])(f: (T, T) => T): Lower[T] =
+    super.binop(rhs)(f).toLower
 }
 
 /**
- * OpenAbove is an open upper bound, i.e. b in the interval (a, b).
+ * OpenAbove is an open upper bound, e.g. b in the interval (a, b).
  */
 final case class OpenAbove[T](x: T)(implicit val order: Order[T]) extends Upper[T] with Open[T] {
   def compare(rhs: Bound[T]) = rhs match {
     case UnboundBelow() => 1
     case UnboundAbove() => -1
-    case ClosedBelow(y) => if (order.lteqv(x, y)) -1 else 1
-    case ClosedAbove(y) => if (order.lteqv(x, y)) -1 else 1
-    case OpenBelow(y) => if (order.lteqv(x, y)) -1 else 1
+    case ClosedBelow(y) => comparePt(y)
+    case ClosedAbove(y) => comparePt(y)
+    case OpenBelow(y) => comparePt(y)
     case OpenAbove(y) => order.compare(x, y)
   }
   def comparePt(t: T) = if (order.lteqv(x, t)) -1 else 1
   def toLower = OpenBelow(x)
   def unop(f: T => T) = OpenAbove(f(x))
-  override def binop(rhs: Bound[T])(f: (T, T) => T): Upper[T] = super.binop(rhs)(f).toUpper
+  override def binop(rhs: Bound[T])(f: (T, T) => T): Upper[T] =
+    super.binop(rhs)(f).toUpper
 }
 
 /**
  * Interval represents a set of values, usually numbers.
  * 
- * Intervals have upper and lower bounds. Each bound can be one of three kinds:
+ * Intervals have upper and lower bounds. Each bound can be one of
+ * three kinds:
  * 
  *   * Closed: The boundary value is included in the interval.
  *   * Open: The boundary value is excluded from the interval.
@@ -235,10 +231,11 @@ final case class OpenAbove[T](x: T)(implicit val order: Order[T]) extends Upper[
  */
 case class Interval[T](lower: Lower[T], upper: Upper[T])(implicit order: Order[T]) {
 
-  private[math] final def coerce(a: Bound[T], b: Bound[T]) =
+  // used to build new intervals with correct lower/upper bounds
+  @inline private[math] final def coerce(a: Bound[T], b: Bound[T]) =
     Interval(a.toLower, b.toUpper)
 
-  def isAbove(t: T) = 0 < lower.comparePt(t)
+  def isAbove(t: T) = lower.comparePt(t) > 0
   def isBelow(t: T) = upper.comparePt(t) < 0
   def isAt(t: T) = lower.comparePt(t) == 0 && 0 == upper.comparePt(t)
   def contains(t: T) = lower.comparePt(t) <= 0 && 0 <= upper.comparePt(t)
@@ -248,17 +245,10 @@ case class Interval[T](lower: Lower[T], upper: Upper[T])(implicit order: Order[T
     coerce(lower max rhs.lower, upper min rhs.upper)
 
   def split(t: T): (Interval[T], Interval[T]) = {
-    val below = coerce(UnboundBelow[T], OpenAbove(t))
-    val above = coerce(OpenBelow(t), UnboundAbove[T])
+    val below = Interval(UnboundBelow[T], OpenAbove(t))
+    val above = Interval(OpenBelow(t), UnboundAbove[T])
     (this mask below, this mask above)
   }
-
-  implicit def boundRingOps(b: Bound[T])(implicit ev: Ring[T]) =
-    new BoundRingOps(b)
-  implicit def boundEuclideanRingOps(b: Bound[T])(implicit er: EuclideanRing[T]) =
-    new BoundEuclideanRingOps(b)
-  implicit def boundFieldOps(b: Bound[T])(implicit field: Field[T]) =
-    new BoundFieldOps(b)
 
   def splitAtZero(implicit ev: Ring[T]) = split(ev.zero)
   
@@ -312,9 +302,10 @@ case class Interval[T](lower: Lower[T], upper: Upper[T])(implicit order: Order[T
       coerce(b, a)
   }
 
-  def mapAroundZero[A](f: Interval[T] => A)(implicit ev: Ring[T]): (A, A) = splitAtZero match {
-    case (a, b) => (f(a), f(b))
-  }
+  def mapAroundZero[A](f: Interval[T] => A)(implicit ev: Ring[T]): (A, A) =
+    splitAtZero match {
+      case (a, b) => (f(a), f(b))
+    }
 
   def /~(rhs: Interval[T])(implicit ev: EuclideanRing[T]): Interval[T] = {
     if (rhs.contains(ev.zero))
@@ -366,13 +357,49 @@ case class Interval[T](lower: Lower[T], upper: Upper[T])(implicit order: Order[T
 }
 
 object Interval {
+
+  /**
+   * Interval from a to b. By default is this closed, [a, b].
+   */
   def apply[T: Order](a: T, b: T): Interval[T] = closed(a, b)
+
+  /**
+   * Closed interval [a, b].
+   */
   def closed[T: Order](a: T, b: T) = Interval[T](ClosedBelow[T](a), ClosedAbove[T](b))
+
+  /**
+   * Open interval (a, b).
+   */
   def open[T: Order](a: T, b: T) = Interval[T](OpenBelow[T](a), OpenAbove[T](b))
 
+  /**
+   * An interval containing all T values.
+   */
   def unbound[T: Order] = Interval(UnboundBelow(), UnboundAbove())
+
+  /**
+   * An interval containing exactly one value (a).
+   */
   def point[T: Order](a: T) = Interval(ClosedBelow(a), ClosedAbove(a))
-  def empty[T: Order: Ring] = Interval(OpenBelow(Ring[T].zero), OpenAbove(Ring[T].zero))
+
+  /**
+   * An empty interval.
+   * 
+   * NOTE: Currently we require a Ring[T] to provide a zero
+   * value. This restriction is ugly and non-obvious, and in the
+   * future may be unnecessary.
+   */
+  def empty[T: Order: Ring] =
+    Interval(OpenBelow(Ring[T].zero), OpenAbove(Ring[T].zero))
+
+  /**
+   * Interval containing all values above (greater-than) a.
+   */
   def above[T: Order](a: T) = Interval(OpenBelow(a), UnboundAbove())
+
+  /**
+   * Interval containing all values below (less-than) a.
+   */
   def below[T: Order](a: T) = Interval(UnboundBelow(), OpenAbove(a))
 }
