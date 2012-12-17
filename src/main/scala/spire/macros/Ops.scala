@@ -114,6 +114,48 @@ object Ops {
     }
   }
 
+  private final val operatorNames = Map(
+    // Eq (=== =!=)
+    ("$eq$eq$eq", "eqv"),
+    ("$eq$bang$eq", "neqv"),
+
+    // Order (> >= < <=)
+    ("$greater", "gt"),
+    ("$greater$eq", "gteqv"),
+    ("$less", "lt"),
+    ("$less$eq", "lteqv"),
+
+    // Semigroup (|+|)
+    ("$bar$plus$bar", "op"),
+
+    // Ring (unary_- + - * **)
+    ("unary_$minus", "negate"),
+    ("$plus", "plus"),
+    ("$minus", "minus"),
+    ("$times", "times"),
+    ("$times$times", "pow"),
+
+    // EuclideanRing (/~ % /%)
+    ("$div$tilde", "quot"),
+    ("$percent", "mod"),
+    ("$div$percent", "quotmod"),
+
+    // Field (/)
+    ("$div", "div"),
+
+    // BooleanAlgebra (^ | & ~)
+    ("$up", "xor"),
+    ("$bar", "or"),
+    ("$amp", "and"),
+    ("unary_$tilde", "complement"),
+
+    // VectorSpace
+    ("$times$colon", "timesl"),
+    ("$colon$times", "timesr"),
+    ("$colon$div", "divr"),
+    ("$u22C5", "dot")
+  )
+
   /**
    * Provide a canonical mapping between "operator names" used in Ops classes
    * and the actual method names used for type classes.
@@ -128,50 +170,6 @@ object Ops {
    */
   def findMethodName(c:Context) = {
     val s = c.macroApplication.symbol.name.toString
-    val name = s match {
-      // Eq (=== =!=)
-      case "$eq$eq$eq" => "eqv"
-      case "$eq$bang$eq" => "neqv"
-
-      // Order (> >= < <=)
-      case "$greater" => "gt"
-      case "$greater$eq" => "gteqv"
-      case "$less" => "lt"
-      case "$less$eq" => "lteqv"
-
-      // Semigroup (|+|)
-      case "$bar$plus$bar" => "op"
-
-      // Ring (unary_- + - * **)
-      case "unary_$minus" => "negate"
-      case "$plus" => "plus"
-      case "$minus" => "minus"
-      case "$times" => "times"
-      case "$times$times" => "pow"
-
-      // EuclideanRing (/~ % /%)
-      case "$div$tilde" => "quot"
-      case "$percent" => "mod"
-      case "$div$percent" => "quotmod"
-
-      // Field (/)
-      case "$div" => "div"
-
-      // BooleanAlgebra (^ | & ~)
-      case "$up" => "xor"
-      case "$bar" => "or"
-      case "$amp" => "and"
-      case "unary_$tilde" => "complement"
-
-      // VectorSpace
-      case "$times$colon" => "timesl"
-      case "$colon$times" => "timesr"
-      case "$colon$div" => "divr"
-      case "$u22C5" => "dot"
-
-      // everything else
-      case s => s
-    }
-    name
+    operatorNames.getOrElse(s, s)
   }
 }
