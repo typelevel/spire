@@ -8,8 +8,11 @@ import spire.macrosk.Ops
 trait Eq[@spec A] {
   def eqv(x:A, y:A): Boolean
   def neqv(x:A, y:A): Boolean = !eqv(x, y)
+  def on[@spec B](f:B => A): Eq[B] = new MappedEq(this)(f)
+}
 
-  def on[@spec B](f:B => A) = Eq.by(f)(this)
+class MappedEq[@spec A, @spec B](eq: Eq[B])(f: A => B) extends Eq[A] {
+  def eqv(x: A, y: A): Boolean = eq.eqv(f(x), f(x))
 }
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
@@ -39,9 +42,7 @@ object Eq extends LowPriority {
 
   def apply[A](implicit e:Eq[A]):Eq[A] = e
 
-  def by[@spec A, @spec B](f:A => B)(implicit e:Eq[B]): Eq[A] = new Eq[A] {
-    def eqv(x:A, y:A) = e.eqv(f(x), f(y))
-  }
+  def by[@spec A, @spec B](f:A => B)(implicit e:Eq[B]): Eq[A] = new MappedEq(e)(f)
 }
 
 trait LowPriority {
@@ -49,7 +50,7 @@ trait LowPriority {
 }
 
 private[this] class GenericEq[@spec A] extends Eq[A] {
-  def eqv(x:A, y:A) = x == y
+  def eqv(x:A, y:A): Boolean = x == y
 }
 
 trait ByteEq extends Eq[Byte] {
