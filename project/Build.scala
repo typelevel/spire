@@ -6,18 +6,18 @@ object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     name := "spire",
     organization := "org.spire-math",
-    version := "0.3.0-M6",
+    version := "0.3.0-M7",
 
-    scalaVersion := "2.10.0-RC5",
-    scalaBinaryVersion := "2.10.0-RC5",
+    scalaVersion := "2.10.0",
+    scalaBinaryVersion := "2.10.0",
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
-      "org.scalatest" % "scalatest_2.10.0-RC5" % "1.8-B1" % "test",
+      "org.scalatest" % "scalatest_2.10.0" % "1.8" % "test",
       "org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
-      "org.scala-lang" % "scala-reflect" % "2.10.0-RC5"
+      "org.scala-lang" % "scala-reflect" % "2.10.0"
     ),
 
     scalacOptions ++= Seq(
