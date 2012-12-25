@@ -3,9 +3,6 @@ package spire.macrosk
 import scala.reflect.macros.Context
 
 object Syntax {
-  // used to give our labels, vars a somewhat unique identifier
-  var n: Int = 0
-
   def cforMacro[A:c.WeakTypeTag](c:Context)(init:c.Expr[A])
      (test:c.Expr[A => Boolean], next:c.Expr[A => A])
      (body:c.Expr[A => Unit]): c.Expr[Unit] = {
@@ -13,11 +10,8 @@ object Syntax {
 
     val c.WeakTypeTag(tpe) = implicitly[c.WeakTypeTag[A]]
 
-    // it would be good to do something smarter here
-    n = (n + 1) % 100000
-
-    val a = newTermName("a%d" format n)
-    val w = newTermName("w%d" format n)
+    val a = newTermName(c.fresh)
+    val w = newTermName(c.fresh)
 
     val tailrec = newTermName("tailrec")
 
