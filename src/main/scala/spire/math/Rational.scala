@@ -36,7 +36,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def /(rhs: Rational): Rational
 
   def quot(rhs: Rational): Rational = Rational(SafeLong((this / rhs).toBigInt), SafeLong.one)
-  def %(rhs: Rational): Rational = this - (this quot rhs)
+  def %(rhs: Rational): Rational = this - (this quot rhs) * rhs
 
   def toBigInt: BigInt
   def toBigDecimal: BigDecimal
