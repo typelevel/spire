@@ -121,4 +121,7 @@ object fun {
 
   def round(a: Double): Double =
     if (Math.abs(a) >= 4503599627370496.0) a else Math.round(a).toDouble
+
+  def min[A](x: A, y: A)(implicit ev: Order[A]) = ev.min(x, y)
+  def max[A](x: A, y: A)(implicit ev: Order[A]) = ev.max(x, y)
 }
