@@ -4,9 +4,6 @@ import spire.algebra._
 
 import scala.{specialized => spec}
 import scala.math.{ScalaNumber, ScalaNumericConversions}
-import scala.math.{Pi, atan2, cos, sin, sqrt}
-
-import spire.implicits._
 
 object Complex {
   def i[@spec(Float, Double) T](implicit f: Fractional[T], t: Trig[T]) =
@@ -217,6 +214,8 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
  * Not bad, eh?
  */
 object FastComplex {
+  import java.lang.Math.{atan2, cos, sin, sqrt}
+
   // note the superstitious use of @inline and final everywhere
 
   final def apply(real: Float, imag: Float) = encode(real, imag)

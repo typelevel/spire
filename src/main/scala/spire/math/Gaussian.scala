@@ -5,7 +5,6 @@ import spire.algebra._
 import scala.{specialized => spec}
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
-import scala.math.{Pi, atan2, cos, sin, sqrt}
 
 //import spire.math.fun._
 import spire.implicits._
@@ -26,12 +25,9 @@ object Gaussian {
   implicit def intToGaussian(n:Int) = new Gaussian[Int](n, 0)
   implicit def longToGaussian(n:Long) = new Gaussian[Long](n, 0L)
   implicit def bigIntToGaussian(n:BigInt) = new Gaussian[BigInt](n, BigInt(0))
-
-  //def apply(real: Long, imag: Long) = new Gaussian(real, imag)
 }
 
-final case class Gaussian[@spec(Int, Long) T]
-  (val real: T, val imag: T)(implicit f: Integral[T])
+final case class Gaussian[@spec(Int, Long) T](real: T, imag: T)(implicit f: Integral[T])
     extends ScalaNumber with ScalaNumericConversions with Serializable {
 
   def doubleValue: Double = f.toDouble(real)
