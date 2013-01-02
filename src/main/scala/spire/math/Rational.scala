@@ -319,23 +319,6 @@ object Rational {
     }
   }
 
-
-  /**
-   * Finds x ^ y in log y multiplications. If `y` is `0`, then `1` is returned.
-   * If `y` is negative, then the result is undefined.
-   *
-   * TODO: This is really-out-of-place here :-\
-   */
-  def pow(x: Long, y: Int): Long = if (y == 0) {
-    1
-  } else if (y == 1) {
-    x
-  } else {
-    val z = pow(x, y >>> 1)
-    if ((y & 1) == 1) z * z * x else z * z
-  }
-
-
   /**
    * Returns an interval that bounds the nth-root of the integer x.
    *
@@ -631,32 +614,31 @@ object LongRationals extends Rationals[Long] {
       }
     }
 
-    // FIXME: SafeLong would ideally support pow
-    def pow(exp: Int): Rational = if (exp == 0) Rational.one else {
-      val num = ConvertableFrom[Long].toBigInt(n).pow(Math.abs(exp))
-      val den = ConvertableFrom[Long].toBigInt(d).pow(Math.abs(exp))
-      if (exp > 0) BigRationals.build(num, den) else BigRationals.build(den, num)
-    }
+    def pow(exp: Int): Rational = if (exp == 0)
+      Rational.one
+    else if (exp < 0)
+      BigRationals.build(d pow -exp, n pow -exp)
+    else
+      BigRationals.build(n pow exp, d pow exp)
 
     def log() = Rational(Math.log(n) - Math.log(d))
 
     def compareToOne: Int = n compare d
 
     def compare(r: Rational): Int = r match {
-      case r: LongRational => {
+      case r: LongRational =>
         val dgcd = gcd(d, r.d)
         if (dgcd == 1L)
           (SafeLong(n) * r.d - SafeLong(r.n) * d).signum
         else
           (SafeLong(n) * (r.d / dgcd) - SafeLong(r.n) * (d / dgcd)).signum
-      }
-      case r: BigRational => {
+
+      case r: BigRational =>
         val dgcd = gcd(d, (r.d % d).toLong)
         if (dgcd == 1L)
           (SafeLong(n) * r.d - SafeLong(r.n) * d).signum
         else
           (SafeLong(n) * (r.d / dgcd) - SafeLong(r.n) * (d / dgcd)).signum
-      }
     }
   }
 }
@@ -754,13 +736,12 @@ object BigRationals extends Rationals[BigInt] {
         if (den < SafeLong.zero) Rational(-num, -den) else Rational(num, den)
     }
 
-    def pow(exp: Int): Rational = if (exp == 0) {
+    def pow(exp: Int): Rational = if (exp == 0)
       Rational.one
-    } else if (exp < 0) {
-      BigRationals.build(d pow Math.abs(exp), n pow Math.abs(exp))
-    } else {
+    else if (exp < 0)
+      BigRationals.build(d pow -exp, n pow -exp)
+    else
       BigRationals.build(n pow exp, d pow exp)
-    }
 
     def log() = Rational(spire.math.log(BigDecimal(n)) - spire.math.log(BigDecimal(d)))
 
