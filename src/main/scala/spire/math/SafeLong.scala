@@ -1,7 +1,10 @@
 package spire.math
 
 import scala.math.{abs, signum, ScalaNumber, ScalaNumericConversions}
-import annotation.tailrec
+import scala.annotation.tailrec
+
+// TODO: might be nice to write a macro-version of fold here to
+// avoid using closures for everything.
 
 /**
  * Provides a type to do safe long arithmetic. This type will never overflow,
@@ -31,6 +34,9 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
 
   def min(that: SafeLong): SafeLong = if (this < that) this else that
   def max(that: SafeLong): SafeLong = if (this > that) this else that
+
+  def <<(n: Int): SafeLong
+  def >>(n: Int): SafeLong
 
   /**
    * Exponentiation function, e.g. x^y
@@ -70,7 +76,8 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
 
   def fold[A,B <: A,C <: A](f: Long => B, g: BigInt => C): A
 
-  def map(f: Long => Long, g: BigInt => BigInt): SafeLong = fold(x => SafeLongLong(f(x)), x => SafeLongBigInt(g(x)))
+  def map(f: Long => Long, g: BigInt => BigInt): SafeLong =
+    fold(x => SafeLongLong(f(x)), x => SafeLongBigInt(g(x)))
   
   /**
    * If `this` SafeLong is backed by a Long and `that` SafeLong is backed by
@@ -128,21 +135,25 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
       SafeLongBigInt(BigInt(x) * y)
   }
 
-  def /(y: Long): SafeLong = if (y != -1 || x != Long.MinValue) SafeLongLong(x / y) else SafeLongBigInt(Long.MaxValue) + 1
+  def /(y: Long): SafeLong = if (y != -1 || x != Long.MinValue)
+    SafeLongLong(x / y)
+  else
+    SafeLongBigInt(Long.MaxValue) + 1
 
   def %(y: Long): SafeLong = SafeLongLong(x % y)
 
   def +(y: BigInt): SafeLong = SafeLong(y + x)
   def -(y: BigInt): SafeLong = SafeLong(BigInt(x) - y)
   def *(y: BigInt): SafeLong = SafeLong(y * x)
-  def /(y: BigInt): SafeLong = if (y.bitLength > 63) SafeLongLong(0L) else { SafeLongLong(x / y.toLong) }
-  def %(y: BigInt): SafeLong = if (y.bitLength > 63) x else { SafeLongLong(x % y.toLong) }
+  def /(y: BigInt): SafeLong =
+    if (y.bitLength > 63) SafeLongLong(0L) else SafeLongLong(x / y.toLong)
+  def %(y: BigInt): SafeLong =
+    if (y.bitLength > 63) x else SafeLongLong(x % y.toLong)
 
-  def unary_-(): SafeLong = if (x == Long.MinValue) {
+  def unary_-(): SafeLong = if (x == Long.MinValue)
     SafeLongBigInt(-BigInt(x))
-  } else {
+  else
     SafeLongLong(-x)
-  }
 
   override def <(that: SafeLong): Boolean = that match {
     case SafeLongLong(y) => x < y
@@ -164,6 +175,15 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
     case SafeLongLong(y) => x compare y
     case SafeLongBigInt(y) => if (x < y) -1 else if (x > y) 1 else 0
   }
+
+  def <<(n: Int): SafeLong = if (n < 0)
+    >>(-n)
+  else if (n < 64 && x <= (0x7fffffffffffffffL >> (63 - n)))
+    SafeLongLong(x << n)
+  else
+    SafeLongBigInt(BigInt(x) << n)
+
+  def >>(n: Int): SafeLong = if (n < 0) <<(-n) else SafeLongLong(x >> n)
 
   override def equals(that: Any): Boolean = that match {
     case SafeLongLong(y) => x == y
@@ -207,6 +227,9 @@ case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
     case SafeLongLong(y) => if (x < y) -1 else if (x > y) 1 else 0
     case SafeLongBigInt(y) => x compare y
   }
+
+  def <<(n: Int): SafeLong = SafeLong(x << n)
+  def >>(n: Int): SafeLong = SafeLong(x >> n)
 
   override def equals(that: Any): Boolean = that match {
     case SafeLongLong(y) => x == y
