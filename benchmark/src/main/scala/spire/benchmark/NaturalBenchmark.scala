@@ -22,14 +22,15 @@ object NaturalBenchmarks extends MyRunner(classOf[NaturalBenchmarks])
 
 class NaturalBenchmarks extends MyBenchmark {
   //@Param(Array("8", "16", "32", "64", "96", "128", "192", "256"))
-  @Param(Array("8"))
+  //@Param(Array("8"))
+  @Param(Array("8", "16", "32", "64", "128"))
   var bits: Int = 0
-
-  var size: Int = 0
 
   //@Param(Array("10", "15", "20"))
   @Param(Array("10"))
   var pow: Int = 0
+
+  var size: Int = 0
 
   var nats: Array[Natural] = _
   var bigints: Array[BigInt] = _
@@ -42,42 +43,23 @@ class NaturalBenchmarks extends MyBenchmark {
     safes = bigints.map(SafeLong(_))
   }
 
-  // def timeNaturalSum(reps: Int) = run(reps) {
-  //   var sum = Natural(0)
-  //   nats.foreach(n => sum += n)
-  //   sum
-  // }
+  def timeNaturalSum(reps: Int) = run(reps)(nats.qsum)
+  def timeBigIntSum(reps: Int) = run(reps)(bigints.qsum)
+  def timeSafeLongSums(reps: Int) = run(reps)(safes.qsum)
 
-  // def timeBigIntSum(reps: Int) = run(reps) {
-  //   var sum = BigInt(0)
-  //   bigints.foreach(n => sum += n)
-  //   sum
-  // }
+  def timeNaturalSumDoubles(reps: Int) = run(reps)(nats.map(n => n << 1).qsum)
+  def timeBigIntSumDoubles(reps: Int) = run(reps)(bigints.map(n => n << 1).qsum)
+  def timeSafeLongSumDoubles(reps: Int) = run(reps)(safes.map(n => n * 2).qsum)
 
-  // def timeSafeLongSums(reps: Int) = run(reps) {
-  //   var sum = SafeLong(0)
-  //   safes.foreach(n => sum += n)
-  //   sum
-  // }
+  def timeNaturalSumSquares(reps: Int) = run(reps)(nats.map(n => n * n).qsum)
+  def timeBigIntSumSquares(reps: Int) = run(reps)(bigints.map(n => n * n).qsum)
+  def timeSafeLongSumSquares(reps: Int) = run(reps)(safes.map(n => n * n).qsum)
 
-  def timeNaturalScale(reps: Int) = run(reps) {
-    var sum = Natural(0)
-    //nats.map(n => sum *= 2)
-    nats.map(n => sum + 1)
-    sum
-  }
+  def timeNaturalSumNormalized(reps: Int) = run(reps)(nats.map(n => n / UInt(10)).qsum)
+  def timeBigIntSumNormalized(reps: Int) = run(reps)(bigints.map(n => n / 10).qsum)
+  def timeSafeLongSumNormalized(reps: Int) = run(reps)(safes.map(n => n / 10).qsum)
 
-  def timeBigIntScale(reps: Int) = run(reps) {
-    var sum = BigInt(0)
-    //bigints.foreach(n => sum * 2)
-    bigints.foreach(n => sum << 1)
-    sum
-  }
-
-  def timeSafeLongScales(reps: Int) = run(reps) {
-    var sum = SafeLong(0)
-    //safes.foreach(n => sum * 2)
-    safes.foreach(n => sum * 2)
-    sum
-  }
+  def timeNaturalMin(reps: Int) = run(reps)(nats.qmin)
+  def timeBigIntMin(reps: Int) = run(reps)(bigints.qmin)
+  def timeSafeLongMin(reps: Int) = run(reps)(safes.qmin)
 }

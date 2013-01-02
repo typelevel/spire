@@ -5,9 +5,9 @@ import spire.algebra._
 import scala.{specialized => spec}
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
-import scala.math.{Pi, atan2, cos, exp, log, sin, sqrt}
+import scala.math.{Pi, atan2, cos, sin, sqrt}
 
-import spire.math.fun._
+//import spire.math.fun._
 import spire.implicits._
 
 object Gaussian {

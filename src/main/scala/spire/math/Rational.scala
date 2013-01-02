@@ -7,7 +7,6 @@ import java.lang.Math
 
 import spire.algebra.{Sign, Positive, Negative, Zero}
 import spire.implicits._
-import spire.math.fun.gcd
 
 trait Fraction[@specialized(Long) A] {
   def num: A
@@ -763,7 +762,7 @@ object BigRationals extends Rationals[BigInt] {
       BigRationals.build(n pow exp, d pow exp)
     }
 
-    def log() = Rational(fun.log(BigDecimal(n)) - fun.log(BigDecimal(d)))
+    def log() = Rational(spire.math.log(BigDecimal(n)) - spire.math.log(BigDecimal(d)))
 
     def compareToOne: Int = n compare d
 

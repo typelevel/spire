@@ -183,8 +183,8 @@ protected[math] case class IntNumber(n:SafeLong) extends Number {
 
   def pow(rhs:Number) = rhs match {
     case _ if rhs.canBeInt => Number(n.pow(rhs.intValue))
-    case FloatNumber(m) if (withinDouble) => Number(fun.pow(doubleValue, m))
-    case _ => Number(fun.pow(this.toBigDecimal, rhs.toBigDecimal))
+    case FloatNumber(m) if (withinDouble) => Number(spire.math.pow(doubleValue, m))
+    case _ => Number(spire.math.pow(this.toBigDecimal, rhs.toBigDecimal))
   }
 }
 
@@ -290,9 +290,9 @@ protected[math] case class FloatNumber(n:Double) extends Number {
   }
 
   def pow(rhs:Number) = rhs match {
-    case FloatNumber(m) => Number(fun.pow(n, m))
-    case _ if rhs.withinDouble => Number(fun.pow(n, rhs.doubleValue));
-    case _ => Number(fun.pow(BigDecimal(n), rhs.toBigDecimal))
+    case FloatNumber(m) => Number(spire.math.pow(n, m))
+    case _ if rhs.withinDouble => Number(spire.math.pow(n, rhs.doubleValue));
+    case _ => Number(spire.math.pow(BigDecimal(n), rhs.toBigDecimal))
   }
 }
 
@@ -402,6 +402,6 @@ protected[math] case class DecimalNumber(n:BigDecimal) extends Number {
   def pow(rhs:Number) = if (rhs.canBeInt) {
     Number(n.pow(rhs.intValue))
   } else {
-    Number(fun.pow(n, rhs.toBigDecimal))
+    Number(spire.math.pow(n, rhs.toBigDecimal))
   }
 }

@@ -67,8 +67,8 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
       throw new ArithmeticException("Cannot find the nroot of a BigDecimal with unlimited precision.")
     NRoot.nroot(a, k, a.mc)
   }
-  def log(a:BigDecimal) = fun.log(a)
-  def fpow(a:BigDecimal, b:BigDecimal) = fun.pow(a, b)
+  def log(a:BigDecimal) = spire.math.log(a)
+  def fpow(a:BigDecimal, b:BigDecimal) = spire.math.pow(a, b)
 }
 
 
@@ -112,7 +112,7 @@ trait LongIsNRoot extends NRoot[Long] {
     findnroot(0, 1L << ((65 - n) / n))
   }
   def log(a:Long) = Math.log(a.toDouble).toLong
-  def fpow(a:Long, b:Long) = fun.pow(a, b) // xyz
+  def fpow(a:Long, b:Long) = spire.math.pow(a, b) // xyz
 }
 
 trait BigIntIsNRoot extends NRoot[BigInt] {
@@ -134,8 +134,8 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
 
     findNroot(0, a.bitLength - 1)
   }
-  def log(a:BigInt) = fun.log(BigDecimal(a)).toBigInt
-  def fpow(a:BigInt, b:BigInt) = fun.pow(BigDecimal(a), BigDecimal(b)).toBigInt
+  def log(a:BigInt) = spire.math.log(BigDecimal(a)).toBigInt
+  def fpow(a:BigInt, b:BigInt) = spire.math.pow(BigDecimal(a), BigDecimal(b)).toBigInt
 }
 
 trait SafeLongIsNRoot extends NRoot[SafeLong] {

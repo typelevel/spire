@@ -3,6 +3,7 @@ package spire.math
 import scala.{specialized => spec}
 
 import spire.macrosk.Ops
+import java.lang.Math
 
 trait Order[@spec A] extends Eq[A] {
   self =>
@@ -67,6 +68,7 @@ object Order {
   implicit object RationalOrder extends RationalOrder
   implicit object RealOrder extends RealOrder
   implicit object SafeLongOrder extends SafeLongOrder
+  implicit object NaturalOrder extends NaturalOrder
 
   def by[@spec A, @spec B](f: A => B)(implicit o: Order[B]): Order[A] = o.on(f)
 
@@ -159,7 +161,9 @@ trait FloatOrder extends Order[Float] with FloatEq {
   override def gteqv(x: Float, y: Float) = x >= y
   override def lt(x: Float, y: Float) = x < y
   override def lteqv(x: Float, y: Float) = x <= y
-  def compare(x: Float, y: Float) = if (x < y) -1 else if (x > y) 1 else 0
+  override def min(x: Float, y: Float) = Math.min(x, y)
+  override def max(x: Float, y: Float) = Math.max(x, y)
+  def compare(x: Float, y: Float) = java.lang.Float.compare(x, y)
 }
 
 trait DoubleOrder extends Order[Double] with DoubleEq {
@@ -167,7 +171,9 @@ trait DoubleOrder extends Order[Double] with DoubleEq {
   override def gteqv(x: Double, y: Double) = x >= y
   override def lt(x: Double, y: Double) = x < y
   override def lteqv(x: Double, y: Double) = x <= y
-  def compare(x: Double, y: Double) = if (x < y) -1 else if (x > y) 1 else 0
+  override def min(x: Double, y: Double) = Math.min(x, y)
+  override def max(x: Double, y: Double) = Math.max(x, y)
+  def compare(x: Double, y: Double) = java.lang.Double.compare(x, y)
 }
 
 trait BigIntOrder extends Order[BigInt] with BigIntEq {
@@ -175,7 +181,9 @@ trait BigIntOrder extends Order[BigInt] with BigIntEq {
   override def gteqv(x: BigInt, y: BigInt) = x >= y
   override def lt(x: BigInt, y: BigInt) = x < y
   override def lteqv(x: BigInt, y: BigInt) = x <= y
-  def compare(x: BigInt, y: BigInt) = if (x < y) -1 else if (x > y) 1 else 0
+  override def min(x: BigInt, y: BigInt) = x.min(y)
+  override def max(x: BigInt, y: BigInt) = x.max(y)
+  def compare(x: BigInt, y: BigInt) = x.compare(y)
 }
 
 trait BigDecimalOrder extends Order[BigDecimal] with BigDecimalEq {
@@ -183,7 +191,9 @@ trait BigDecimalOrder extends Order[BigDecimal] with BigDecimalEq {
   override def gteqv(x: BigDecimal, y: BigDecimal) = x >= y
   override def lt(x: BigDecimal, y: BigDecimal) = x < y
   override def lteqv(x: BigDecimal, y: BigDecimal) = x <= y
-  def compare(x: BigDecimal, y: BigDecimal) = if (x < y) -1 else if (x > y) 1 else 0
+  override def min(x: BigDecimal, y: BigDecimal) = x.min(y)
+  override def max(x: BigDecimal, y: BigDecimal) = x.max(y)
+  def compare(x: BigDecimal, y: BigDecimal) = x.compare(y)
 }
 
 trait RationalOrder extends Order[Rational] with RationalEq {
@@ -204,4 +214,12 @@ trait SafeLongOrder extends Order[SafeLong] with SafeLongEq {
   override def lt(x: SafeLong, y: SafeLong) = x < y
   override def lteqv(x: SafeLong, y: SafeLong) = x <= y
   def compare(x: SafeLong, y: SafeLong) = if (x < y) -1 else if (x > y) 1 else 0
+}
+
+trait NaturalOrder extends Order[Natural] with NaturalEq {
+  override def gt(x: Natural, y: Natural) = x > y
+  override def gteqv(x: Natural, y: Natural) = x >= y
+  override def lt(x: Natural, y: Natural) = x < y
+  override def lteqv(x: Natural, y: Natural) = x <= y
+  def compare(x: Natural, y: Natural) = x.compare(y)
 }

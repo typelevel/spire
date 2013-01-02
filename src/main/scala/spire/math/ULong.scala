@@ -1,17 +1,15 @@
 package spire.math
 
-import java.lang.Math.pow
 import scala.annotation.tailrec
 
 object ULong {
   @inline final def apply(n: Long): ULong = new ULong(n)
 
-  implicit final def fromInt(n: Int): ULong = new ULong(n & 0xffffffffL)
-  implicit final def fromLong(n: Long): ULong = new ULong(n)
-  implicit final def toLong(u: ULong): Long = u.signed
+  final def fromInt(n: Int): ULong = new ULong(n & 0xffffffffL)
+  final def fromLong(n: Long): ULong = new ULong(n)
 
-  @inline final def MinValue = ULong(0L)
-  @inline final def MaxValue = ULong(-1L)
+  @inline final val MinValue = ULong(0L)
+  @inline final val MaxValue = ULong(-1L)
 
   @tailrec final private[math] def pow(t:Long, b:Long, e:Long): ULong = {
     if (e == 0L) new ULong(t)

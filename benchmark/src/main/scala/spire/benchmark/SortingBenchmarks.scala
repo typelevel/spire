@@ -63,7 +63,7 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
   var cs2: Array[FakeComplex[Double]] = null
 
   override protected def setUp() {
-    val size = fun.pow(2, pow).toInt
+    val size = spire.math.pow(2, pow).toInt
 
     def complexToFake(c: Complex[Double]) = new FakeComplex(c.real, c.imag)
 
@@ -105,7 +105,7 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
   }
   
   def timeSpireInsertionSort(reps:Int): Unit = run(reps) {
-    val n = if (pow > 13) 8000 else fun.pow(2, pow).toInt
+    val n = if (pow > 13) 8000 else spire.math.pow(2, pow).toInt
   
     if (typ == "int") {
       val arr = is.clone; spire.math.InsertionSort.sort(arr, 0, n); arr.length

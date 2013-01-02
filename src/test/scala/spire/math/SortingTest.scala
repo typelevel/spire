@@ -1,7 +1,5 @@
 package spire.math
 
-import spire.math.fun._
-
 import org.scalatest.FunSuite
 
 class SortingTest extends FunSuite {

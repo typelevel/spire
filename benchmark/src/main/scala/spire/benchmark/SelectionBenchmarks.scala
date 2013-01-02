@@ -55,7 +55,7 @@ class SelectionBenchmarks extends MyBenchmark {
   }
 
   override protected def setUp() {
-    val size = fun.pow(2, pow).toInt
+    val size = spire.math.pow(2, pow).toInt
 
     is = if (typ == "int") mkarray(size, layout)(nextInt) else null
     js = if (typ == "long") mkarray(size, layout)(nextLong) else null

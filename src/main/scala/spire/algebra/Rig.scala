@@ -30,10 +30,12 @@ final class RigOps[A](lhs:A)(implicit ev:Rig[A]) {
 }
 
 object Rig {
-  implicit object UByteIsRing extends UByteIsRig
-  implicit object UShortIsRing extends UShortIsRig
-  implicit object UIntIsRing extends UIntIsRig
-  implicit object ULongIsRing extends ULongIsRig
+  implicit object UByteIsRig extends UByteIsRig
+  implicit object UShortIsRig extends UShortIsRig
+  implicit object UIntIsRig extends UIntIsRig
+  implicit object ULongIsRig extends ULongIsRig
+  implicit object NaturalIsRig extends NaturalIsRig
+
   implicit def ringIsRig[@spec(Int,Long,Float,Double) A: Ring]: Rig[A] = Ring[A]
 
   @inline final def apply[A](implicit r:Rig[A]):Rig[A] = r
@@ -42,7 +44,11 @@ object Rig {
 trait UByteIsRig extends Rig[UByte] {
   def one: UByte = UByte(1)
   def plus(a:UByte, b:UByte): UByte = a + b
-  override def pow(a:UByte, b:Int): UByte = a ** b
+  override def pow(a:UByte, b:Int): UByte = {
+    if (b < 0)
+      throw new IllegalArgumentException("negative exponent: %s" format b)
+    a ** UByte(b)
+  }
   override def times(a:UByte, b:UByte): UByte = a * b
   def zero: UByte = UByte(0)
 }
@@ -50,7 +56,11 @@ trait UByteIsRig extends Rig[UByte] {
 trait UShortIsRig extends Rig[UShort] {
   def one: UShort = UShort(1)
   def plus(a:UShort, b:UShort): UShort = a + b
-  override def pow(a:UShort, b:Int): UShort = a ** b
+  override def pow(a:UShort, b:Int): UShort = {
+    if (b < 0)
+      throw new IllegalArgumentException("negative exponent: %s" format b)
+    a ** UShort(b)
+  }
   override def times(a:UShort, b:UShort): UShort = a * b
   def zero: UShort = UShort(0)
 }
@@ -58,7 +68,11 @@ trait UShortIsRig extends Rig[UShort] {
 trait UIntIsRig extends Rig[UInt] {
   def one: UInt = UInt(1)
   def plus(a:UInt, b:UInt): UInt = a + b
-  override def pow(a:UInt, b:Int): UInt = a ** b
+  override def pow(a:UInt, b:Int): UInt = {
+    if (b < 0)
+      throw new IllegalArgumentException("negative exponent: %s" format b)
+    a ** UInt(b)
+  }
   override def times(a:UInt, b:UInt): UInt = a * b
   def zero: UInt = UInt(0)
 }
@@ -66,8 +80,23 @@ trait UIntIsRig extends Rig[UInt] {
 trait ULongIsRig extends Rig[ULong] {
   def one: ULong = ULong(1)
   def plus(a:ULong, b:ULong): ULong = a + b
-  override def pow(a:ULong, b:Int): ULong = a ** b
+  override def pow(a:ULong, b:Int): ULong = {
+    if (b < 0)
+      throw new IllegalArgumentException("negative exponent: %s" format b)
+    a ** ULong(b)
+  }
   override def times(a:ULong, b:ULong): ULong = a * b
   def zero: ULong = ULong(0)
 }
 
+trait NaturalIsRig extends Rig[Natural] {
+  def one: Natural = Natural(1L)
+  def plus(a:Natural, b:Natural): Natural = a + b
+  override def pow(a:Natural, b:Int): Natural = {
+    if (b < 0)
+      throw new IllegalArgumentException("negative exponent: %s" format b)
+    a pow UInt(b)
+  }
+  override def times(a:Natural, b:Natural): Natural = a * b
+  def zero: Natural = Natural(0L)
+}

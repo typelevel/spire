@@ -1,13 +1,11 @@
 package spire.math
 
-import java.lang.Math.pow
-
 object UInt {
-  @inline implicit final def apply(n: Int) = new UInt(n)
-  @inline implicit final def apply(n: Long) = new UInt(n.toInt)
+  @inline final def apply(n: Int) = new UInt(n)
+  @inline final def apply(n: Long) = new UInt(n.toInt)
 
-  @inline final def MinValue = UInt(0)
-  @inline final def MaxValue = UInt(-1)
+  @inline final val MinValue = UInt(0)
+  @inline final val MaxValue = UInt(-1)
 }
 
 class UInt(val signed: Int) extends AnyVal {
@@ -55,5 +53,5 @@ class UInt(val signed: Int) extends AnyVal {
   def | (that: UInt) = UInt(this.signed | that.signed)
   def ^ (that: UInt) = UInt(this.signed ^ that.signed)
 
-  def ** (that: UInt) = UInt(fun.pow(this.toLong, that.toLong))
+  def ** (that: UInt) = UInt(pow(this.toLong, that.toLong))
 }

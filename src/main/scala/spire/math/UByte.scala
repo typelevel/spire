@@ -1,10 +1,8 @@
 package spire.math
 
-import java.lang.Math.pow
-
 object UByte {
-  @inline implicit final def apply(n: Byte) = new UByte(n)
-  @inline implicit final def apply(n: Int) = new UByte(n.toByte)
+  @inline final def apply(n: Byte) = new UByte(n)
+  @inline final def apply(n: Int) = new UByte(n.toByte)
 }
 
 class UByte(val signed: Byte) extends AnyVal {
@@ -52,5 +50,5 @@ class UByte(val signed: Byte) extends AnyVal {
   def | (that: UByte) = UByte(this.signed | that.signed)
   def ^ (that: UByte) = UByte(this.signed ^ that.signed)
 
-  def ** (that: UByte) = UByte(fun.pow(this.toLong, that.toLong).toInt)
+  def ** (that: UByte) = UByte(pow(this.toLong, that.toLong).toInt)
 }

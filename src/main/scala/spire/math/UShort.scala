@@ -1,10 +1,9 @@
 package spire.math
 
-import java.lang.Math.pow
-
 object UShort {
-  @inline implicit final def apply(n: Char) = new UShort(n)
-  @inline implicit final def apply(n: Int) = new UShort(n.toChar)
+  @inline final def apply(n: Char) = new UShort(n)
+  @inline final def apply(n: Short) = new UShort(n.toChar)
+  @inline final def apply(n: Int) = new UShort(n.toChar)
 
   @inline final def MinValue = UShort(0)
   @inline final def MaxValue = UShort(Char.MaxValue)
@@ -55,5 +54,5 @@ class UShort(val signed: Char) extends AnyVal {
   def | (that: UShort) = UShort(this.signed | that.signed)
   def ^ (that: UShort) = UShort(this.signed ^ that.signed)
 
-  def ** (that: UShort) = UShort(fun.pow(this.toLong, that.toLong).toChar)
+  def ** (that: UShort) = UShort(pow(this.toLong, that.toLong).toChar)
 }

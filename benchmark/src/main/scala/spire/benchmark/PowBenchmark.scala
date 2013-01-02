@@ -35,7 +35,7 @@ class PowBenchmarks extends MyBenchmark {
   def timeLongPowForInt(reps:Int) = run(reps) {
     var t = 0
     ints.foreach { n =>
-      t += fun.pow(n.toLong, 2.toLong).toInt
+      t += spire.math.pow(n.toLong, 2.toLong).toInt
     }
     t
   }
@@ -43,7 +43,7 @@ class PowBenchmarks extends MyBenchmark {
   def timeDoublePowForInt(reps:Int) = run(reps) {
     var t = 0
     ints.foreach { n =>
-      t += fun.pow(n.toDouble, 2.0).toInt
+      t += spire.math.pow(n.toDouble, 2.0).toInt
     }
     t
   }
@@ -59,7 +59,7 @@ class PowBenchmarks extends MyBenchmark {
   def timeLongPowForLong(reps:Int) = run(reps) {
     var t = 0L
     longs.foreach { n =>
-      t += fun.pow(n, 2L)
+      t += spire.math.pow(n, 2L)
     }
     t
   }
@@ -67,7 +67,7 @@ class PowBenchmarks extends MyBenchmark {
   def timeDoublePowForLong(reps:Int) = run(reps) {
     var t = 0L
     longs.foreach { n =>
-      t += fun.pow(n.toDouble, 2.0).toLong
+      t += spire.math.pow(n.toDouble, 2.0).toLong
     }
     t
   }
@@ -83,7 +83,7 @@ class PowBenchmarks extends MyBenchmark {
   def timeDoublePowForDouble(reps:Int) = run(reps) {
     var t = 0.0
     longs.foreach { n =>
-      t += fun.pow(n, 2.0)
+      t += spire.math.pow(n, 2.0)
     }
     t
   }

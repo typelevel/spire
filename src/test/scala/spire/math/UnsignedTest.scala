@@ -167,7 +167,7 @@ class UIntTest extends PropSpec with ShouldMatchers with GeneratorDrivenProperty
   property("n + 1 > n") {
     forAll { (n: Int) =>
       whenever (n != -1) {
-        n + UInt(1) > n should be === true
+        UInt(n) + UInt(1) > UInt(n) should be === true
       }
     }
   }
@@ -251,7 +251,7 @@ class UShortTest extends PropSpec with ShouldMatchers with GeneratorDrivenProper
   property("n + 1 > n") {
     forAll { (n: Char) =>
       whenever (n != -1) {
-        n + UShort(1) > n should be === true
+        UShort(n) + UShort(1) > UShort(n) should be === true
       }
     }
   }
@@ -335,7 +335,7 @@ class UByteTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropert
   property("n + 1 > n") {
     forAll { (n: Byte) =>
       whenever (n != -1) {
-        n + UByte(1) > n should be === true
+        UByte(n) + UByte(1) > UByte(n) should be === true
       }
     }
   }

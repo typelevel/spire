@@ -5,7 +5,6 @@ import scala.{specialized => spec}
 import spire.math._
 import spire.macrosk.Ops
 
-
 /**
  * A boolean algebra is a structure that defines a few basic operations, namely
  * as conjunction (&), disjunction (|), and negation (~). Both conjunction and
@@ -124,8 +123,8 @@ trait UShortIsBooleanAlgebra extends BooleanAlgebra[UShort] {
 }
 
 trait UIntIsBooleanAlgebra extends BooleanAlgebra[UInt] {
-  def one: UInt = -1
-  def zero: UInt = 0
+  def one: UInt = UInt(-1)
+  def zero: UInt = UInt(0)
   def and(a: UInt, b: UInt): UInt = a & b
   def or(a: UInt, b: UInt): UInt = a | b
   def complement(a: UInt): UInt = ~a
@@ -133,8 +132,8 @@ trait UIntIsBooleanAlgebra extends BooleanAlgebra[UInt] {
 }
 
 trait ULongIsBooleanAlgebra extends BooleanAlgebra[ULong] {
-  def one: ULong = -1L
-  def zero: ULong = 0L
+  def one: ULong = ULong(-1L)
+  def zero: ULong = ULong(0L)
   def and(a: ULong, b: ULong): ULong = a & b
   def or(a: ULong, b: ULong): ULong = a | b
   def complement(a: ULong): ULong = ~a

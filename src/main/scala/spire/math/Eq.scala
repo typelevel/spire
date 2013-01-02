@@ -39,6 +39,7 @@ object Eq extends LowPriority {
   implicit def gaussianEq[A: Integral] = new GaussianEq[A] {}
   implicit object RealEq extends RealEq
   implicit object SafeLongEq extends SafeLongEq
+  implicit object NaturalEq extends NaturalEq
 
   def apply[A](implicit e:Eq[A]):Eq[A] = e
 
@@ -124,4 +125,8 @@ trait RealEq extends Eq[Real] {
 trait SafeLongEq extends Eq[SafeLong] {
   def eqv(x: SafeLong, y: SafeLong) = x == y
   override def neqv(x: SafeLong, y: SafeLong) = x != y
+}
+trait NaturalEq extends Eq[Natural] {
+  def eqv(x: Natural, y: Natural) = x == y
+  override def neqv(x: Natural, y: Natural) = x != y
 }

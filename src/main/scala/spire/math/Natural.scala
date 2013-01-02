@@ -29,7 +29,7 @@ sealed trait Natural {
 
   def getNumBits: Int = {
     @tailrec
-    def bit(n: UInt, b: Int): Int = if (n == 0) b else bit(n >>> 1, b + 1)
+    def bit(n: UInt, b: Int): Int = if (n == 0) b else bit(n >>> UInt(1), b + 1)
 
     @tailrec
     def recur(next: Natural, b: Int): Int = next match {
@@ -147,7 +147,7 @@ sealed trait Natural {
       if ((n.signed & -n.signed) != n.signed) return -1
       // TODO: this could be better/faster
       var i = 1
-      while (i < 32 && (n >>> i) != 0) i += 1
+      while (i < 32 && (n >>> UInt(i)) != 0) i += 1
       i - 1
     }
 
@@ -254,7 +254,7 @@ sealed trait Natural {
           val t = ld.toLong - rd.toLong - carry
           val tl = rtail - UInt(-(t >> 32))
           if (tl.isInstanceOf[End] && tl.digit == UInt(0))
-            End(t)
+            End(UInt(t))
           else
             Digit(UInt(t), tl)
       }
@@ -264,7 +264,7 @@ sealed trait Natural {
           val t = ld.toLong - rd.toLong - carry
           val tl = ltail - UInt(-(t >> 32))
           if (tl.isInstanceOf[End] && tl.digit == UInt(0))
-            End(t)
+            End(UInt(t))
           else
             Digit(UInt(t), tl)
           
@@ -307,8 +307,8 @@ sealed trait Natural {
   def pow(rhs: UInt): Natural = {
     @tailrec def _pow(t: Natural, b: Natural, e: UInt): Natural = {
       if (e == UInt(0)) t
-      else if ((e & UInt(1)) == UInt(1)) _pow(t * b, b * b, e >> 1)
-      else _pow(t, b * b, e >> 1)
+      else if ((e & UInt(1)) == UInt(1)) _pow(t * b, b * b, e >> UInt(1))
+      else _pow(t, b * b, e >> UInt(1))
     }
     _pow(Natural(1), lhs, rhs)
   }
@@ -340,7 +340,7 @@ sealed trait Natural {
 
         case Digit(ld, ltail) => rhs.compare(UInt(1)) match {
           case -1 => sys.error("/ by zero")
-          case 0 => End(0)
+          case 0 => End(UInt(0))
           case 1 =>
             val p = rhs.powerOfTwo
             if (p >= 0)
@@ -546,8 +546,8 @@ object Natural {
         val q: Long = t / n.toLong
         val r: Long = t % n.toLong
         next match {
-          case End(d) => (Digit(q, sofar), End(r))
-          case Digit(d, tail) => recur(tail, r, Digit(q, sofar))
+          case End(d) => (Digit(UInt(q), sofar), End(UInt(r)))
+          case Digit(d, tail) => recur(tail, UInt(r), Digit(UInt(q), sofar))
         }
       }
 

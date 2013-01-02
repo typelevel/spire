@@ -37,16 +37,16 @@ with FloatOrder with FloatIsSigned {
   override def fromInt(n: Int): Float = n
   def ceil(a:Float) = Math.ceil(a).toFloat
   def floor(a:Float) = Math.floor(a).toFloat
-  def round(a:Float) = fun.round(a)
+  def round(a:Float) = spire.math.round(a)
 }
 
 trait DoubleIsFractional extends Fractional[Double] with DoubleIsField
 with DoubleIsNRoot with ConvertableFromDouble with ConvertableToDouble
 with DoubleOrder with DoubleIsSigned {
   override def fromInt(n: Int): Double = n
-  def ceil(a:Double) = scala.math.ceil(a)
-  def floor(a:Double) = scala.math.floor(a)
-  def round(a:Double) = fun.round(a)
+  def ceil(a:Double) = Math.ceil(a)
+  def floor(a:Double) = Math.floor(a)
+  def round(a:Double) = spire.math.round(a)
 }
 
 

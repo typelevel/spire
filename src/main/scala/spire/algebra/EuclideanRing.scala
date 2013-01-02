@@ -59,13 +59,13 @@ object EuclideanRing {
 trait IntIsEuclideanRing extends EuclideanRing[Int] with IntIsRing {
   def quot(a:Int, b:Int) = a / b
   def mod(a:Int, b:Int) = a % b
-  override def gcd(a:Int, b:Int): Int = fun.gcd(a, b).toInt
+  override def gcd(a:Int, b:Int): Int = spire.math.gcd(a, b).toInt
 }
 
 trait LongIsEuclideanRing extends EuclideanRing[Long] with LongIsRing {
   def quot(a:Long, b:Long) = a / b
   def mod(a:Long, b:Long) = a % b
-  override def gcd(a:Long, b:Long) = fun.gcd(a, b)
+  override def gcd(a:Long, b:Long) = spire.math.gcd(a, b)
 }
 
 trait FloatIsEuclideanRing extends EuclideanRing[Float] with FloatIsRing {

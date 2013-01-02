@@ -1,7 +1,6 @@
 package spire.math
 
 import org.scalatest.FunSuite
-import spire.math.fun._
 import spire.implicits.{eqOps => _, _}
 import java.math.MathContext
 

@@ -31,7 +31,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
   var cs: Array[Int] = null
 
   override protected def setUp() {
-    size = fun.pow(2, pow).toInt
+    size = spire.math.pow(2, pow).toInt
     //as = init(size)(scala.math.abs(nextInt).toInt % 1000 + 1)
     //bs = init(size)(scala.math.abs(nextInt).toInt % 1000 + 1)
     as = init(size)(scala.math.abs(nextInt).toInt % 100000 + 1)
