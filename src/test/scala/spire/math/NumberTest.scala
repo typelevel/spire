@@ -2,6 +2,47 @@ package spire.math
 
 import org.scalatest.FunSuite
 
+import org.scalatest.matchers.ShouldMatchers
+import org.scalacheck.Arbitrary._
+import org.scalatest._
+import prop._
+
+class NumberPropertiesTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+  property("Number.apply(Long)") {
+    forAll { (n: Long) => Number(n) should be === n }
+    forAll { (n: Long) => Number(n) should be === SafeLong(n) }
+    // we need to do (n - 1).abs to ensure we don't get a negative number
+    forAll { (n: Long) => Number((n - 1).abs) should be === Natural((n - 1).abs) }
+  }
+  property("Number.apply(BigInt)") {
+    forAll { (n: BigInt) => Number(n) should be === n }
+    forAll { (n: BigInt) => Number(n) should be === SafeLong(n) }
+    forAll { (n: BigInt) => Number(n.abs) should be === Natural(n.abs) }
+  }
+  property("Number.apply(Double)") {
+    forAll { (n: Double) => Number(n) should be === n }
+  }
+  property("Number.apply(BigDecimal)") {
+    forAll { (n: BigDecimal) => Number(n) should be === n }
+  }
+
+  property("Long + Long") {
+    forAll { (x: Long, y: Long) =>
+      val lx = Number(x)
+      val ly = Number(y)
+      val lz = lx + ly
+      val bx = Number(BigInt(x))
+      val by = Number(BigInt(y))
+
+      lz should be === BigInt(x) + BigInt(y)
+      bx + by should be === lz
+      lx + by should be === lz
+      bx + ly should be === lz
+    }
+  }
+}
+
+// These tests are mostly about weird interplay between Long/Double/Number.
 class NumberTest extends FunSuite {
   test("create numbers") {
     Number(3.toByte)
@@ -11,18 +52,30 @@ class NumberTest extends FunSuite {
     Number(3.0F)
     Number(3.0)
     Number("333333333333333333333333333333")
+    Number("99.253895895395839583958953895389538958395839583958958953")
   }
 
   test("operations") {
     assert(Number(3) + Number(4) === Number(7))
-    assert(Number(4) ** Number(30.0) === Number(1152921504606846976.0))
 
+    // since 30.0 can be repesented as a SafeLong, we get an IntNumber
+    assert(Number(4) ** Number(30.0) === Number("1152921504606846976"))
+
+    // since 30.5 can't, we get a DoubleNumber
+    assert(Number(4) ** Number(30.5) === FloatNumber(2.305843009213694e18))
+  
     assert(Number(100) ** Number(200.0) === Number(100) ** Number(200))
     assert(Number(100) ** Number(200) === Number("10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"))
 
-    // sigh :(
-    assert((Number("81") ** Number("0.5") - Number("9")).abs < 0.00000000000001)
+    // DecimalNumber is honest that its roots aren't perfect
+    val z1 = Number("81") ** Number("0.5") - Number("9.0")
+    assert(z1 != 0)
+    assert(z1.abs < 0.00000000000001)
 
+    // FloatNumber lies like a fox
+    val z2 = Number(81.0) ** Number(0.5) - Number(9.0)
+    assert(z2 == 0)
+  
     // tests near Long.MaxValue are nice because the floating point coverage is
     // sparser and fewer of the Long values can be exactly represented.
     val m = Long.MaxValue
