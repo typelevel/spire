@@ -23,6 +23,10 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
   def %(rhs: SafeLong): SafeLong = rhs.fold(this % _, this % _)
   def /~(rhs: SafeLong): SafeLong = lhs / rhs
   def /%(rhs: SafeLong): (SafeLong, SafeLong) = rhs.fold(this /% _, this /% _)
+
+  def &(rhs: SafeLong): SafeLong = rhs.fold(this & _, this & _)
+  def |(rhs: SafeLong): SafeLong = rhs.fold(this & _, this & _)
+  def ^(rhs: SafeLong): SafeLong = rhs.fold(this & _, this & _)
   
   def +(rhs: Long): SafeLong
   def -(rhs: Long): SafeLong
@@ -30,6 +34,9 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
   def /(rhs: Long): SafeLong
   def %(rhs: Long): SafeLong
   def /%(rhs: Long): (SafeLong, SafeLong)
+  def &(rhs: Long): SafeLong
+  def |(rhs: Long): SafeLong
+  def ^(rhs: Long): SafeLong
   
   def +(rhs: BigInt): SafeLong
   def -(rhs: BigInt): SafeLong
@@ -37,12 +44,16 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
   def /(rhs: BigInt): SafeLong
   def %(rhs: BigInt): SafeLong
   def /%(rhs: BigInt): (SafeLong, SafeLong)
+  def &(rhs: BigInt): SafeLong
+  def |(rhs: BigInt): SafeLong
+  def ^(rhs: BigInt): SafeLong
 
   def min(that: SafeLong): SafeLong = if (this < that) this else that
   def max(that: SafeLong): SafeLong = if (this > that) this else that
 
   def <<(n: Int): SafeLong
   def >>(n: Int): SafeLong
+
 
   /**
    * Exponentiation function, e.g. x^y
@@ -97,16 +108,23 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
 
 
 object SafeLong {
-  val SignBit = 0x8000000000000000L
+  final val SignBit = 0x8000000000000000L
 
-  val zero: SafeLong = SafeLongLong(0L)
-  val one: SafeLong = SafeLongLong(1L)
+  final val zero: SafeLong = SafeLongLong(0L)
+  final val one: SafeLong = SafeLongLong(1L)
 
   implicit def apply(x: Long): SafeLong = SafeLongLong(x)
+
   implicit def apply(x: BigInt): SafeLong = if (x.bitLength > 63) {
     SafeLongBigInt(x)
   } else {
     SafeLongLong(x.toLong)
+  }
+
+  def apply(s: String): SafeLong = try {
+    SafeLong(java.lang.Long.parseLong(s))
+  } catch {
+    case _: Exception => SafeLong(BigInt(s))
   }
 }
 
@@ -149,6 +167,10 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
   def %(y: Long): SafeLong = SafeLongLong(x % y)
   def /%(y: Long) = (SafeLongLong(x / y), SafeLongLong(x % y))
 
+  def &(y: Long): SafeLong = SafeLongLong(x & y)
+  def |(y: Long): SafeLong = SafeLongLong(x | y)
+  def ^(y: Long): SafeLong = SafeLongLong(x ^ y)
+
   def +(y: BigInt): SafeLong = SafeLong(y + x)
   def -(y: BigInt): SafeLong = SafeLong(BigInt(x) - y)
   def *(y: BigInt): SafeLong = SafeLong(y * x)
@@ -163,6 +185,10 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
       val n = y.toLong
       (SafeLongLong(x / n), SafeLongLong(x % n))
     }
+
+  def &(y: BigInt): SafeLong = SafeLongLong(x & y.toLong)
+  def |(y: BigInt): SafeLong = SafeLongLong(x | y.toLong)
+  def ^(y: BigInt): SafeLong = SafeLongLong(x ^ y.toLong)
 
   def unary_-(): SafeLong = if (x == Long.MinValue)
     SafeLongBigInt(-BigInt(x))
@@ -202,6 +228,7 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
   override def equals(that: Any): Boolean = that match {
     case SafeLongLong(y) => x == y
     case SafeLongBigInt(y) => x == y
+    case t: BigInt => if (t.bitLength > 63) false else t.toLong == x
     case that => unifiedPrimitiveEquals(that)
   }
 
@@ -233,6 +260,10 @@ case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
     (SafeLong(q), SafeLong(r))
   }
 
+  def &(y: Long): SafeLong = SafeLongLong(x.toLong & y)
+  def |(y: Long): SafeLong = SafeLongLong(x.toLong | y)
+  def ^(y: Long): SafeLong = SafeLongLong(x.toLong ^ y)
+
   def +(y: BigInt): SafeLong = if ((x.signum ^ y.signum) < 0) SafeLong(x + y) else SafeLongBigInt(x + y)
   def -(y: BigInt): SafeLong = if ((x.signum ^ y.signum) < 0) SafeLongBigInt(x - y) else SafeLong(x - y)
   def *(y: BigInt): SafeLong = SafeLongBigInt(x * y)
@@ -242,6 +273,10 @@ case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
     val (q, r) = x /% y
     (SafeLong(q), SafeLong(r))
   }
+
+  def &(y: BigInt): SafeLong = SafeLong(x & y)
+  def |(y: BigInt): SafeLong = SafeLong(x | y)
+  def ^(y: BigInt): SafeLong = SafeLong(x ^ y)
   
   def unary_-(): SafeLong = SafeLong(-x)  // Covers the case where x == Long.MaxValue + 1
 
@@ -256,6 +291,7 @@ case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
   override def equals(that: Any): Boolean = that match {
     case SafeLongLong(y) => x == y
     case SafeLongBigInt(y) => x == y
+    case t: BigInt => x == t
     case that => unifiedPrimitiveEquals(that)
   }
 
