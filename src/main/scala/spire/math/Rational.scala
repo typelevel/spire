@@ -44,6 +44,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def floor: Rational = Rational(toBigInt)
   def ceil: Rational = if (denominator == 1) floor else Rational(toBigInt + 1)
+  def round: Rational
 
   def pow(exp: Int): Rational
 
@@ -614,12 +615,17 @@ object LongRationals extends Rationals[Long] {
       }
     }
 
+    def round: Rational = {
+      val m = (n % d).abs
+      if (m >= (d - m).abs) Rational(n / d + 1) else Rational(n / d)
+    }
+
     def pow(exp: Int): Rational = if (exp == 0)
       Rational.one
     else if (exp < 0)
-      BigRationals.build(d pow -exp, n pow -exp)
+      BigRationals.build(spire.math.pow(d, -exp), spire.math.pow(n, -exp))
     else
-      BigRationals.build(n pow exp, d pow exp)
+      BigRationals.build(spire.math.pow(n, exp), spire.math.pow(d, exp))
 
     def log() = Rational(Math.log(n) - Math.log(d))
 
@@ -734,6 +740,11 @@ object BigRationals extends Rationals[BigInt] {
         val num = SafeLong(n / a) * (r.d / b)
         val den = SafeLong(d / b) * (r.n / a)
         if (den < SafeLong.zero) Rational(-num, -den) else Rational(num, den)
+    }
+
+    def round: Rational = {
+      val m = (n % d).abs
+      if (m >= (d - m).abs) Rational(n / d + 1) else Rational(n / d)
     }
 
     def pow(exp: Int): Rational = if (exp == 0)

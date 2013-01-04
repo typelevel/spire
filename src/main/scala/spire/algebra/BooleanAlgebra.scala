@@ -42,6 +42,10 @@ final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
   def &(rhs: A): A = macro Ops.binop[A, A]
   def |(rhs: A): A = macro Ops.binop[A, A]
   def ^(rhs: A): A = macro Ops.binop[A, A]
+
+  def &(rhs: Int)(implicit c: ConvertableTo[A]): A = ev.and(lhs, c.fromInt(rhs))
+  def |(rhs: Int)(implicit c: ConvertableTo[A]): A = ev.or(lhs, c.fromInt(rhs))
+  def ^(rhs: Int)(implicit c: ConvertableTo[A]): A = ev.xor(lhs, c.fromInt(rhs))
 }
 
 object BooleanAlgebra {

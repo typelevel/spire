@@ -28,6 +28,10 @@ final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def /~(rhs:Int) = ev.quot(lhs, ev.fromInt(rhs))
   def %(rhs:Int) = ev.mod(lhs, ev.fromInt(rhs))
   def /%(rhs:Int) = ev.quotmod(lhs, ev.fromInt(rhs))
+
+  def /~(rhs:Double)(implicit c:ConvertableTo[A]) = ev.quot(lhs, c.fromDouble(rhs))
+  def %(rhs:Double)(implicit c:ConvertableTo[A]) = ev.mod(lhs, c.fromDouble(rhs))
+  def /%(rhs:Double)(implicit c:ConvertableTo[A]) = ev.quotmod(lhs, c.fromDouble(rhs))
 }
 
 object EuclideanRing {

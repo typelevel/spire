@@ -29,13 +29,6 @@ trait Ring[@spec(Int,Long,Float,Double) A] extends Rig[A] with AdditiveAbGroup[A
     else _fromInt(plus(a, a), n / 2, sofar)
 }
 
-final class RingOps[A](lhs:A)(implicit ev:Ring[A]) {
-  // TODO: these should really be macro-ized somehow
-  def -(rhs:Int): A = ev.minus(lhs, ev.fromInt(rhs))
-  def +(rhs:Int): A = ev.plus(lhs, ev.fromInt(rhs))
-  def *(rhs:Int): A = ev.times(lhs, ev.fromInt(rhs))
-}
-
 object Ring {
   implicit object ByteIsRing extends ByteIsRing
   implicit object ShortIsRing extends ShortIsRing

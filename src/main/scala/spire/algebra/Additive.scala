@@ -42,11 +42,17 @@ object AdditiveMonoid extends AdditiveMonoid0 {
     r: Ring[A]): AdditiveMonoid[A] = r
 }
 
+import spire.math.ConvertableTo
+
 final class AdditiveMonoidOps[A](lhs:A)(implicit ev:AdditiveMonoid[A]) {
   def +(rhs:A): A = macro Ops.binop[A, A]
+  def +(rhs:Int)(implicit c: Ring[A]): A = ev.plus(lhs, c.fromInt(rhs))
+  def +(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.plus(lhs, c.fromDouble(rhs))
 }
 
 final class AdditiveGroupOps[A](lhs:A)(implicit ev:AdditiveGroup[A]) {
   def unary_-() = macro Ops.unop[A]
   def -(rhs:A): A = macro Ops.binop[A, A]
+  def -(rhs:Int)(implicit c: Ring[A]): A = ev.minus(lhs, c.fromInt(rhs))
+  def -(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.minus(lhs, c.fromDouble(rhs))
 }

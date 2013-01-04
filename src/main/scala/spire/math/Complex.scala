@@ -181,6 +181,10 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
     if (this == Complex.zero[T]) sys.error("log undefined at 0")
     new Complex(f.log(abs), arg)
   }
+
+  def floor: Complex[T] = Complex(f.floor(real), f.floor(imag))
+  def ceil: Complex[T] = Complex(f.ceil(real), f.ceil(imag))
+  def round: Complex[T] = Complex(f.round(real), f.round(imag))
 }
 
 

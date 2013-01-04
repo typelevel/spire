@@ -189,6 +189,9 @@ trait FPFilterIsNRoot[A] extends NRoot[FPFilter[A]] {
   
   override def sqrt(a: FPFilter[A]): FPFilter[A] = 
     new FPFilter(a.approx.sqrt, ev.sqrt(a.value))
+
+  def fpow(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] = sys.error("fixme")
+  def log(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
 }
 
 trait FPFilterIsNumeric[A] extends Numeric[FPFilter[A]]
@@ -198,9 +201,10 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   implicit val ev: Numeric[A]
 
   def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
+  def ceil(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
+  def floor(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
+  def round(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
   override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
-  def fpow(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] = sys.error("fixme")
-  def log(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
 }
 
 trait FPFilterIsFractional[A] extends Fractional[FPFilter[A]]
@@ -209,11 +213,12 @@ with GenericCeilAndFloor[FPFilter[A]] with FPFilterOrder[A]
 with FPFilterIsSigned[A] with ConvertableFromFPFilter[A]
 with ConvertableToFPFilter[A] {
   implicit val ev: Fractional[A]
-  
+
   def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
+  def ceil(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
+  def floor(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
+  def round(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
   override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
-  def fpow(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] = sys.error("fixme")
-  def log(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
 }
 
 

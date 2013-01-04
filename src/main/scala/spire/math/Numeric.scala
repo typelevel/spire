@@ -37,6 +37,9 @@ trait IntIsNumeric extends Numeric[Int] with IntIsEuclideanRing with IntIsNRoot
 with ConvertableFromInt with ConvertableToInt with IntOrder with IntIsSigned {
   override def fromInt(n: Int): Int = n
   def div(a:Int, b:Int) = a / b
+  def ceil(a: Int): Int = a
+  def floor(a: Int): Int = a
+  def round(a: Int): Int = a
   def isWhole(a:Int) = true
 }
 
@@ -44,6 +47,9 @@ trait LongIsNumeric extends Numeric[Long] with LongIsEuclideanRing with LongIsNR
 with ConvertableFromLong with ConvertableToLong with LongOrder with LongIsSigned {
   override def fromInt(n: Int): Long = n
   def div(a:Long, b:Long) = a / b
+  def ceil(a: Long): Long = a
+  def floor(a: Long): Long = a
+  def round(a: Long): Long = a
   def isWhole(a:Long) = true
 }
 
@@ -52,6 +58,9 @@ with BigIntIsNRoot with ConvertableFromBigInt with ConvertableToBigInt
 with BigIntOrder with BigIntIsSigned {
   override def fromInt(n: Int): BigInt = super[ConvertableToBigInt].fromInt(n)
   def div(a:BigInt, b:BigInt) = a / b
+  def ceil(a: BigInt): BigInt = a
+  def floor(a: BigInt): BigInt = a
+  def round(a: BigInt): BigInt = a
   def isWhole(a:BigInt) = true
 }
 
@@ -122,5 +131,8 @@ with ConvertableFromGaussian[A] with ConvertableToGaussian[A] {
   def fpow(a:Gaussian[A], b:Gaussian[A]) = sys.error("undefined")
 
   def div(a:Gaussian[A], b:Gaussian[A]) = a / b
+  def ceil(a: Gaussian[A]): Gaussian[A] = a
+  def floor(a: Gaussian[A]): Gaussian[A] = a
+  def round(a: Gaussian[A]): Gaussian[A] = a
   def isWhole(a:Gaussian[A]) = true
 }

@@ -53,6 +53,9 @@ class RingTest extends FunSuite {
     runTest("3 + (-3)")(assert(b + a === z))
 
     // -
+    //implicit def fooby[B:Ring](b:B) = new AdditiveGroupOps[B](b)
+    //runTest("3 - 0")(assert(additiveGroupOps(b).-(z) === b))
+    val xyz: A = b - z
     runTest("3 - 0")(assert(b - z === b))
     runTest("3 - 3)")(assert(b - b === z))
     runTest("0 - 3)")(assert(z - b === a))
@@ -60,9 +63,6 @@ class RingTest extends FunSuite {
     // *
     runTest("3 * 0")(assert(b * z === z))
     runTest("3 * (-3)")(assert(b * a === c))
-
-    // toInt -- Removed from Ring.
-    // runTest("3.toInt")(assert(b.toInt === 3))
 
     runTest("fromInt(3)")(assert(Ring[A].fromInt(3) == b))
 
