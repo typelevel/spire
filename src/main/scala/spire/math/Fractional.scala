@@ -16,6 +16,15 @@ class FractionalOps[A](lhs:A)(implicit ev:Fractional[A]) {
   def ceil() = macro Ops.unop[A]
   def floor() = macro Ops.unop[A]
   def round() = macro Ops.unop[A]
+
+  // TODO: these should really be macro-ized somehow
+  def +(rhs: Double): A = ev.plus(lhs, ev.fromDouble(rhs))
+  def -(rhs: Double): A = ev.minus(lhs, ev.fromDouble(rhs))
+  def *(rhs: Double): A = ev.times(lhs, ev.fromDouble(rhs))
+  def /(rhs: Double): A = ev.div(lhs, ev.fromDouble(rhs))
+  def /~(rhs: Double): A = ev.quot(lhs, ev.fromDouble(rhs))
+  def %(rhs: Double): A = ev.mod(lhs, ev.fromDouble(rhs))
+  def /%(rhs: Double): (A, A) = ev.quotmod(lhs, ev.fromDouble(rhs))
 }
 
 object Fractional {

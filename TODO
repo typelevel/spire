@@ -1,16 +1,13 @@
 1. Profiling!
-2. Test!
-3. Unify package and Rational versions of integral nroot/pow
-4. Implement nroot/pow for BigInt/BigDecimal
-5. Add sqrt/nroot/pow to Numeric, etc.
-6. Avoid overflowing BigDecimal => Double (e.g. in Complex)
-7. Create our own, better, Decimal class, with more methods
-8. Add implicits to put numerics.math.* functionality onto types
-9. Match up concrete and generic APIs
-10. Get compiler plugin for inlining implicits/ops working
-11. Unify operators (e.g. /~, %, /%, **, ~^, etc).
-
-=======
-
-1. type class standardization plus guidelines
-2. 
+2. Testing!
+3. Make sure Numeric[A] is a superset of other type classes
+4. Make sure Number contains functionality for all types
+5. Add support for Rational and Complex to Number
+6. Improve macro support so we don't need operator -> methodname mapping
+7. Create our own BigFloat/Decimal class(es)
+8. Match up concrete and generic APIs
+9. Unify operators (e.g. /~, %, /%, **, etc).
+10. Make sure situations with implicits is coherent
+11. Make sure Rig/Ring/AdditiveGroup/MultiplicativeMonoid are all sane/OK
+12. Make sure specialization is consistent
+13. More benchmarks

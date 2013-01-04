@@ -72,8 +72,8 @@ final class LiteralIntOps(val lhs:Int) extends AnyVal {
 }
 
 final class LiteralDoubleOps(val lhs:Double) extends AnyVal {
-  def pow(rhs:Int) = Ring[Double].pow(lhs, rhs)
-  def **(rhs:Int) = Ring[Double].pow(lhs, rhs)
+  def pow(rhs:Double) = spire.math.pow(lhs, rhs)
+  def **(rhs:Double) = spire.math.pow(lhs, rhs)
 
   @inline private final def c[A:Fractional:ConvertableTo:Trig]:Complex[A] =
     Complex(ConvertableFrom[Double].toType[A](lhs), Fractional[A].zero)
@@ -87,6 +87,16 @@ final class LiteralDoubleOps(val lhs:Double) extends AnyVal {
   def /%[A:Fractional:Trig](rhs:Complex[A]) = c /% rhs
   def pow[A:Fractional:Trig](rhs:Complex[A]) = c pow rhs
   def **[A:Fractional:Trig](rhs:Complex[A]) = c ** rhs
+
+  def +[A](rhs:A)(implicit ev: Fractional[A]) = ev.plus(ev.fromDouble(lhs), rhs)
+  def *[A](rhs:A)(implicit ev: Fractional[A]) = ev.times(ev.fromDouble(lhs), rhs)
+  def -[A](rhs:A)(implicit ev: Fractional[A]) = ev.minus(ev.fromDouble(lhs), rhs)
+  def /[A](rhs:A)(implicit ev: Fractional[A]) = ev.div(ev.fromDouble(lhs), rhs)
+  def /~[A](rhs:A)(implicit ev: Fractional[A]) = ev.quot(ev.fromDouble(lhs), rhs)
+  def %[A](rhs:A)(implicit ev: Fractional[A]) = ev.mod(ev.fromDouble(lhs), rhs)
+  def /%[A](rhs:A)(implicit ev: Fractional[A]) = ev.quotmod(ev.fromDouble(lhs), rhs)
+  def pow[A](rhs:A)(implicit ev: Fractional[A]) = ev.fpow(ev.fromDouble(lhs), rhs)
+  def **[A](rhs:A)(implicit ev: Fractional[A]) = ev.fpow(ev.fromDouble(lhs), rhs)
 }
 
 final class ArrayOps[@spec A](arr:Array[A]) {
@@ -292,18 +302,22 @@ final class ConversionOps[A](a: A) {
     macro Ops.flip[WideningConversion[A, B], B]
 }
 
-object implicits {
+trait LowViz {
+  // these are lower priority to prevent conflicts around operators overloaded
+  // to deal with literals
+  implicit def additiveMonoidOps[A:AdditiveMonoid](a:A) = new AdditiveMonoidOps(a)
+  implicit def additiveGroupOps[A:AdditiveGroup](a:A) = new AdditiveGroupOps(a)
+  implicit def multiplicativeSemigroupOps[A:MultiplicativeSemigroup](a:A) = new MultiplicativeSemigroupOps(a)
+  implicit def multiplicativeGroupOps[A:MultiplicativeGroup](a:A) = new MultiplicativeGroupOps(a)
+}
+
+object implicits extends LowViz {
   implicit def eqOps[A:Eq](a:A) = new EqOps(a)
   implicit def orderOps[A:Order](a:A) = new OrderOps(a)
   implicit def semigroupOps[A:Semigroup](a:A) = new SemigroupOps(a)
   implicit def groupOps[A:Group](a:A) = new GroupOps(a)
 
   implicit def convertableOps[A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
-
-  implicit def additiveMonoidOps[A:AdditiveMonoid](a:A) = new AdditiveMonoidOps(a)
-  implicit def additiveGroupOps[A:AdditiveGroup](a:A) = new AdditiveGroupOps(a)
-  implicit def multiplicativeSemigroupOps[A:MultiplicativeSemigroup](a:A) = new MultiplicativeSemigroupOps(a)
-  implicit def multiplicativeGroupOps[A:MultiplicativeGroup](a:A) = new MultiplicativeGroupOps(a)
 
   implicit def rigOps[A:Rig](a:A) = new RigOps(a)
   implicit def ringOps[A:Ring](a:A) = new RingOps(a)

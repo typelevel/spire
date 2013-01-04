@@ -7,6 +7,9 @@ import scala.{specialized => spec, math => mth}
 import java.math.MathContext
 import java.lang.Math
 
+// NOTE: fpow vs pow is a bit of a trainwreck :P
+// overloading is evil, but it's definitely what users will expect.
+
 /**
  * This is a type class for types with n-roots. The value returned by `nroot`
  * and `sqrt` are only guaranteed to be approximate answers (except in the case
@@ -25,11 +28,15 @@ trait NRoot[@spec(Double,Float,Int,Long) A] {
   def fpow(a:A, b:A): A
 }
 
-final class NRootOps[A](lhs: A)(implicit n: NRoot[A]) {
+final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
   def nroot(rhs: Int): A = macro Ops.binop[Int, A]
   def sqrt(): A = macro Ops.unop[A]
   def log(): A = macro Ops.unop[A]
   def fpow(rhs: A): A = macro Ops.binop[A, A]
+
+  // TODO: should be macros
+  def pow(rhs: Double)(implicit c: ConvertableTo[A]) = ev.fpow(lhs, c.fromDouble(rhs))
+  def **(rhs: Double)(implicit c: ConvertableTo[A]) = ev.fpow(lhs, c.fromDouble(rhs))
 }
 
 trait DoubleIsNRoot extends NRoot[Double] {
@@ -45,7 +52,6 @@ trait FloatIsNRoot extends NRoot[Float] {
   def log(a: Float) = Math.log(a).toFloat
   def fpow(a: Float, b: Float) = Math.pow(a, b).toFloat
 }
-
 
 trait RationalIsNRoot extends NRoot[Rational] {
   implicit def context:ApproximationContext[Rational]
