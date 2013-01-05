@@ -28,6 +28,8 @@ trait NRoot[@spec(Double,Float,Int,Long) A] {
   def fpow(a:A, b:A): A
 }
 
+import spire.math.{ConvertableTo, ConvertableFrom, Number}
+
 final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
   def nroot(rhs: Int): A = macro Ops.binop[Int, A]
   def sqrt(): A = macro Ops.unop[A]
@@ -37,6 +39,9 @@ final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
   // TODO: should be macros
   def pow(rhs: Double)(implicit c: ConvertableTo[A]) = ev.fpow(lhs, c.fromDouble(rhs))
   def **(rhs: Double)(implicit c: ConvertableTo[A]) = ev.fpow(lhs, c.fromDouble(rhs))
+
+  def pow(rhs:Number)(implicit c:ConvertableFrom[A]): Number = Number(c.toDouble(lhs)) pow rhs
+  def **(rhs:Number)(implicit c:ConvertableFrom[A]): Number = Number(c.toDouble(lhs)) ** rhs
 }
 
 trait DoubleIsNRoot extends NRoot[Double] {
@@ -177,6 +182,7 @@ object NRoot {
   }
 
   implicit object RealIsNRoot extends RealIsNRoot
+  implicit object NumberIsNRoot extends NumberIsNRoot
 
   /**
    * This will return the largest integer that meets some criteria. Specifically,
@@ -292,4 +298,11 @@ object NRoot {
     val newscale = (size - (intPart.size + k - 1) / k) * 9
     BigDecimal(unscaled, newscale, ctxt)
   }
+}
+
+trait NumberIsNRoot extends NRoot[Number] {
+  def nroot(a: Number, k: Int): Number = a.pow(Number(k))
+  override def sqrt(a: Number): Number = a.pow(Number(0.5))
+  def log(a: Number) = Number(Math.log(a.toDouble))
+  def fpow(a: Number, b: Number) = a.pow(b)
 }

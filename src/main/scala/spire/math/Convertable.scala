@@ -203,6 +203,20 @@ trait ConvertableToSafeLong extends ConvertableTo[SafeLong] {
   def fromType[B:ConvertableFrom](b:B): SafeLong = SafeLong(ConvertableFrom[B].toBigInt(b))
 }
 
+trait ConvertableToNumber extends ConvertableTo[Number] {
+  def fromByte(a:Byte): Number = Number(a)
+  def fromShort(a:Short): Number = Number(a)
+  def fromInt(a:Int): Number = Number(a)
+  def fromLong(a:Long): Number = Number(a)
+  def fromFloat(a:Float): Number = Number(a.toLong)
+  def fromDouble(a:Double): Number = Number(a.toLong)
+  def fromBigInt(a:BigInt): Number = Number(a)
+  def fromBigDecimal(a:BigDecimal): Number = Number(a.toBigInt)
+  def fromRational(a:Rational): Number = Number(a.toBigInt)
+
+  def fromType[B:ConvertableFrom](b:B): Number = Number(ConvertableFrom[B].toDouble(b))
+}
+
 object ConvertableTo {
   @inline final def apply[A](implicit ev:ConvertableTo[A]) = ev
 
@@ -215,6 +229,7 @@ object ConvertableTo {
   implicit object ConvertableToRational extends ConvertableToRational
   implicit object ConvertableToReal extends ConvertableToReal
   implicit object ConvertableToSafeLong extends ConvertableToSafeLong
+  implicit object ConvertableToNumber extends ConvertableToNumber
 
   implicit def convertableToComplex[A: Fractional: Trig] =
     new ConvertableToComplex[A] {
@@ -442,6 +457,21 @@ trait ConvertableFromSafeLong extends ConvertableFrom[SafeLong] {
   def toString(a:SafeLong): String = a.toString
 }
 
+trait ConvertableFromNumber extends ConvertableFrom[Number] {
+  def toByte(a:Number): Byte = a.toBigInt.toByte
+  def toShort(a:Number): Short = a.toBigInt.toShort
+  def toInt(a:Number): Int = a.toBigInt.toInt
+  def toLong(a:Number): Long = a.toBigInt.toLong
+  def toFloat(a:Number): Float = a.toBigInt.toFloat
+  def toDouble(a:Number): Double = a.toBigInt.toDouble
+  def toBigInt(a:Number): BigInt = a.toBigInt
+  def toBigDecimal(a:Number): BigDecimal = BigDecimal(a.toBigInt)
+  def toRational(a:Number): Rational = Rational(a.toBigInt)
+
+  def toType[B:ConvertableTo](a:Number): B = ConvertableTo[B].fromBigInt(a.toBigInt)
+  def toString(a:Number): String = a.toString
+}
+
 object ConvertableFrom {
   @inline final def apply[A](implicit ev:ConvertableFrom[A]) = ev
 
@@ -456,6 +486,7 @@ object ConvertableFrom {
   implicit object ConvertableFromRational extends ConvertableFromRational
   implicit object ConvertableFromReal extends ConvertableFromReal
   implicit object ConvertableFromSafeLong extends ConvertableFromSafeLong
+  implicit object ConvertableFromNumber extends ConvertableFromNumber
 
   implicit def convertableFromComplex[A: Fractional: Trig] =
     new ConvertableFromComplex[A] {

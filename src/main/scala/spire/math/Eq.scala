@@ -40,6 +40,7 @@ object Eq extends LowPriority {
   implicit object RealEq extends RealEq
   implicit object SafeLongEq extends SafeLongEq
   implicit object NaturalEq extends NaturalEq
+  implicit object NumberEq extends NumberEq
 
   def apply[A](implicit e:Eq[A]):Eq[A] = e
 
@@ -125,6 +126,10 @@ trait RealEq extends Eq[Real] {
 trait SafeLongEq extends Eq[SafeLong] {
   def eqv(x: SafeLong, y: SafeLong) = x == y
   override def neqv(x: SafeLong, y: SafeLong) = x != y
+}
+trait NumberEq extends Eq[Number] {
+  def eqv(x: Number, y: Number) = x == y
+  override def neqv(x: Number, y: Number) = x != y
 }
 trait NaturalEq extends Eq[Natural] {
   def eqv(x: Natural, y: Natural) = x == y

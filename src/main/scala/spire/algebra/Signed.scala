@@ -33,6 +33,7 @@ object Signed extends SignedLow {
   implicit object RationalIsSigned extends RationalIsSigned
   implicit object RealIsSigned extends RealIsSigned
   implicit object SafeLongIsSigned extends SafeLongIsSigned
+  implicit object NumberIsSigned extends NumberIsSigned
 
   implicit def complexIsSigned[A: Fractional: Trig] = new ComplexIsSigned[A] {
     val f = Fractional[A]
@@ -113,6 +114,11 @@ trait RealIsSigned extends Signed[Real] {
 trait SafeLongIsSigned extends Signed[SafeLong] {
   def signum(a: SafeLong): Int = a.toBigInt.toInt
   def abs(a: SafeLong): SafeLong = a.abs
+}
+
+trait NumberIsSigned extends Signed[Number] {
+  def signum(a: Number): Int = a.signum
+  def abs(a: Number): Number = a.abs
 }
 
 trait ComplexIsSigned[A] extends Signed[Complex[A]] {

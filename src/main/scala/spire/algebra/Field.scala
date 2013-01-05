@@ -31,6 +31,7 @@ object Field {
       val f = Fractional[A]
       val t = Trig[A]
     }
+  implicit object NumberIsField extends NumberIsField
 
   @inline final def apply[A](implicit f:Field[A]):Field[A] = f
 }
@@ -87,4 +88,12 @@ extends ComplexIsEuclideanRing[A] with Field[Complex[A]] {
   def floor(a:Complex[A]): Complex[A] = a.floor
   def round(a:Complex[A]): Complex[A] = a.round
   def isWhole(a:Complex[A]) = a.isWhole
+}
+
+trait NumberIsField extends Field[Number] with NumberIsEuclideanRing {
+  def div(a:Number, b:Number) = a / b
+  def ceil(a:Number): Number = a.ceil
+  def floor(a:Number): Number = a.floor
+  def round(a:Number): Number = a.round
+  def isWhole(a:Number) = a.isWhole
 }

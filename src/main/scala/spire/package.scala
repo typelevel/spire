@@ -336,7 +336,6 @@ object implicits extends LowViz {
   implicit def fieldOps[A:Field](a:A) = new FieldOps(a)
 
   implicit def integralOps[A:Integral](a:A) = new IntegralOps(a)
-  implicit def fractionalOps[A:Fractional](a:A) = new FractionalOps(a)
 
   implicit def signedOps[A: Signed](a: A) = new SignedOps(a)
   implicit def nrootOps[A: NRoot](a: A) = new NRootOps(a)

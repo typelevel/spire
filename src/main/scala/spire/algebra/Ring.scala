@@ -41,6 +41,7 @@ object Ring {
   implicit object RationalIsRing extends RationalIsRing
   implicit object RealIsRing extends RealIsRing
   implicit object SafeLongIsRing extends SafeLongIsRing
+  implicit object NumberIsRing extends NumberIsRing
 
   implicit def complexIsRing[A: Fractional: Trig] = new ComplexIsRing[A] {
     val f = Fractional[A]
@@ -226,4 +227,16 @@ trait GaussianIsRing[@spec(Int, Long) A] extends Ring[Gaussian[A]] {
   def zero: Gaussian[A] = Gaussian.zero[A]
 
   override def fromInt(n: Int): Gaussian[A] = Gaussian.fromInt[A](n)
+}
+
+trait NumberIsRing extends Ring[Number] {
+  override def minus(a:Number, b:Number): Number = a - b
+  def negate(a:Number): Number = -a
+  val one: Number = Number.one
+  def plus(a:Number, b:Number): Number = a + b
+  override def pow(a:Number, b:Int): Number = a.pow(Number(b))
+  override def times(a:Number, b:Number): Number = a * b
+  val zero: Number = Number.zero
+  
+  override def fromInt(n: Int): Number = Number(n)
 }

@@ -1,7 +1,8 @@
 package spire.math
 
-import scala.math.{BigDecimal, ScalaNumber, ScalaNumericConversions, abs, floor}
+import scala.math.{BigDecimal, ScalaNumber, ScalaNumericConversions}
 import spire.implicits._
+import java.lang.Math
 
 // TODO: implement RationalNumber.
 // TODO: implement toNumber and fromNumber in ConvertableTo/From.
@@ -13,10 +14,36 @@ import spire.implicits._
 case class NumberOutOfRange(msg: String) extends Exception(msg)
 case class InvalidNumber(msg: String) extends Exception(msg)
 
+//final class XyzOps[A](lhs:A)(implicit c: ConvertableFrom[A]) {
+//  @inline private final def n: Number = Number(c.toDouble(lhs))
+//
+//  def +(rhs: Number) = n + rhs
+//  def *(rhs: Number) = n * rhs
+//  def -(rhs: Number) = n - rhs
+//  def /(rhs: Number) = n / rhs
+//  def /~(rhs: Number) = n /~ rhs
+//  def %(rhs: Number) = n % rhs
+//  def /%(rhs: Number) = n /% rhs
+//  def pow(rhs: Number) = n pow rhs
+//  def **(rhs: Number) = n ** rhs
+//
+//  def <(rhs: Number) = n < rhs
+//  def <=(rhs: Number) = n <= rhs
+//  def >(rhs: Number) = n > rhs
+//  def >=(rhs: Number) = n >= rhs
+//
+//  def cmp(rhs: Number) = n.compare(rhs)
+//  def min(rhs: Number) = n.min(rhs)
+//  def max(rhs: Number) = n.max(rhs)
+//}
+
 /**
  * Convenient apply and implicits for Numbers
  */
 object Number {
+
+  final val zero = Number(0)
+  final val one = Number(1)
 
   def apply(n: Byte): Number = IntNumber(SafeLong(n))
   def apply(n: Short): Number = IntNumber(SafeLong(n))
@@ -26,6 +53,9 @@ object Number {
   def apply(n: SafeLong): Number = IntNumber(n)
   def apply(n: Double): Number = FloatNumber(n)
   def apply(n: BigDecimal): Number = DecimalNumber(n)
+
+  object implicits {
+  }
 
   def apply(s: String): Number = try {
     Number(SafeLong(s))
@@ -54,7 +84,7 @@ object Number {
   private[math] val maxDouble = BigDecimal(Double.MaxValue)
 }
 
-sealed trait Number extends ScalaNumericConversions with Ordered[Number] {
+sealed trait Number extends ScalaNumericConversions {
   def abs: Number
   def signum: Int
 
@@ -85,13 +115,26 @@ sealed trait Number extends ScalaNumericConversions with Ordered[Number] {
   private[math] def r_/%(lhs: Number): (Number, Number)
 
   def pow(rhs: Number): Number
-  def **(rhs: Number) = pow(rhs)
+  final def **(rhs: Number) = pow(rhs)
+
+  def compare(rhs: Number): Int
+  def min(rhs: Number): Number = if (this < rhs) this else rhs
+  def max(rhs: Number): Number = if (this > rhs) this else rhs
+
+  final def <(rhs: Number): Boolean = compare(rhs) < 0
+  final def <=(rhs: Number): Boolean = compare(rhs) <= 0
+  final def >(rhs: Number): Boolean = compare(rhs) > 0
+  final def >=(rhs: Number): Boolean = compare(rhs) >= 0
 
   def &(rhs: Number): Number = sys.error("%s not an integer" format this)
   def |(rhs: Number): Number = sys.error("%s not an integer" format this)
   def ^(rhs: Number): Number = sys.error("%s not an integer" format this)
   def <<(rhs: Number): Number = sys.error("%s not an integer" format this)
   def >>(rhs: Number): Number = sys.error("%s not an integer" format this)
+
+  def floor: Number
+  def ceil: Number
+  def round: Number
 }
 
 
@@ -228,11 +271,15 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
     case IntNumber(x) => IntNumber(n >> x.toInt)
     case _ => sys.error("%s not an integer" format rhs)
   }
+
+  def floor = this
+  def ceil = this
+  def round = this
 }
 
 private[math] case class FloatNumber(n: Double) extends Number { lhs =>
-  def abs = FloatNumber(java.lang.Math.abs(n))
-  def signum = java.lang.Math.signum(n).toInt
+  def abs = FloatNumber(Math.abs(n))
+  def signum = Math.signum(n).toInt
 
   def withinInt = Int.MinValue.toDouble <= n && n <= Int.MaxValue.toDouble
   def withinLong = Long.MinValue.toDouble <= n && n <= Long.MaxValue.toDouble
@@ -305,15 +352,15 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   }
 
   def /~(rhs: Number) = rhs match {
-    case IntNumber(m) => m.fold(x => Number(floor(n / x)),
+    case IntNumber(m) => m.fold(x => Number(Math.floor(n / x)),
                                  x => Number(BigDecimal(n) quot BigDecimal(x)))
-    case FloatNumber(m) => Number(floor(n / m))
+    case FloatNumber(m) => Number(Math.floor(n / m))
     case t => t r_/~ lhs
   }
   private[math] def r_/~(lhs: Number) = lhs match {
-    case IntNumber(m) => m.fold(x => Number(floor(x / n)),
+    case IntNumber(m) => m.fold(x => Number(Math.floor(x / n)),
                                  x => Number(BigDecimal(x) quot n))
-    case FloatNumber(m) => Number(floor(m / n))
+    case FloatNumber(m) => Number(Math.floor(m / n))
     case t => t /~ lhs
   }
   
@@ -350,6 +397,10 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
     case _ if rhs.withinDouble => Number(spire.math.pow(n, rhs.doubleValue));
     case _ => Number(spire.math.pow(BigDecimal(n), rhs.toBigDecimal))
   }
+
+  def floor = Number(Math.floor(n))
+  def ceil = Number(Math.ceil(n))
+  def round = Number(Math.round(n))
 }
 
 
@@ -418,4 +469,10 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
   } else {
     Number(spire.math.pow(n, rhs.toBigDecimal))
   }
+
+  import spire.algebra.Field
+
+  def floor = DecimalNumber(Field[BigDecimal].floor(n))
+  def ceil = DecimalNumber(Field[BigDecimal].ceil(n))
+  def round = DecimalNumber(Field[BigDecimal].round(n))
 }

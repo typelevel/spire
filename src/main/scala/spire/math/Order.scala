@@ -36,7 +36,6 @@ final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
   def >=(rhs: A) = macro Ops.binop[A, Boolean]
   def <(rhs: A) = macro Ops.binop[A, Boolean]
   def <=(rhs: A) = macro Ops.binop[A, Boolean]
-  
   def compare(rhs: A) = macro Ops.binop[A, Int]
   def min(rhs: A) = macro Ops.binop[A, A]
   def max(rhs: A) = macro Ops.binop[A, A]
@@ -45,10 +44,25 @@ final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
   def >=(rhs: Int)(implicit c: ConvertableTo[A]) = ev.gteqv(lhs, c.fromInt(rhs))
   def <(rhs: Int)(implicit c: ConvertableTo[A]) = ev.lt(lhs, c.fromInt(rhs))
   def <=(rhs: Int)(implicit c: ConvertableTo[A]) = ev.lteqv(lhs, c.fromInt(rhs))
-  
   def compare(rhs: Int)(implicit c: ConvertableTo[A]) = ev.compare(lhs, c.fromInt(rhs))
   def min(rhs: Int)(implicit c: ConvertableTo[A]) = ev.min(lhs, c.fromInt(rhs))
   def max(rhs: Int)(implicit c: ConvertableTo[A]) = ev.max(lhs, c.fromInt(rhs))
+
+  def >(rhs: Double)(implicit c: ConvertableTo[A]) = ev.gt(lhs, c.fromDouble(rhs))
+  def >=(rhs: Double)(implicit c: ConvertableTo[A]) = ev.gteqv(lhs, c.fromDouble(rhs))
+  def <(rhs: Double)(implicit c: ConvertableTo[A]) = ev.lt(lhs, c.fromDouble(rhs))
+  def <=(rhs: Double)(implicit c: ConvertableTo[A]) = ev.lteqv(lhs, c.fromDouble(rhs))
+  def compare(rhs: Double)(implicit c: ConvertableTo[A]) = ev.compare(lhs, c.fromDouble(rhs))
+  def min(rhs: Double)(implicit c: ConvertableTo[A]) = ev.min(lhs, c.fromDouble(rhs))
+  def max(rhs: Double)(implicit c: ConvertableTo[A]) = ev.max(lhs, c.fromDouble(rhs))
+
+  def >(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = Number(c.toDouble(lhs)) > rhs
+  def >=(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = Number(c.toDouble(lhs)) >= rhs
+  def <(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = Number(c.toDouble(lhs)) < rhs
+  def <=(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = Number(c.toDouble(lhs)) <= rhs
+  def compare(rhs:Number)(implicit c:ConvertableFrom[A]): Int = Number(c.toDouble(lhs)) compare rhs
+  def min(rhs:Number)(implicit c:ConvertableFrom[A]): Number = Number(c.toDouble(lhs)) min rhs
+  def max(rhs:Number)(implicit c:ConvertableFrom[A]): Number = Number(c.toDouble(lhs)) max rhs
 }
 
 object Order {
@@ -69,6 +83,7 @@ object Order {
   implicit object RealOrder extends RealOrder
   implicit object SafeLongOrder extends SafeLongOrder
   implicit object NaturalOrder extends NaturalOrder
+  implicit object NumberOrder extends NumberOrder
 
   def by[@spec A, @spec B](f: A => B)(implicit o: Order[B]): Order[A] = o.on(f)
 
@@ -222,4 +237,12 @@ trait NaturalOrder extends Order[Natural] with NaturalEq {
   override def lt(x: Natural, y: Natural) = x < y
   override def lteqv(x: Natural, y: Natural) = x <= y
   def compare(x: Natural, y: Natural) = x.compare(y)
+}
+
+trait NumberOrder extends Order[Number] with NumberEq {
+  override def gt(x: Number, y: Number) = x > y
+  override def gteqv(x: Number, y: Number) = x >= y
+  override def lt(x: Number, y: Number) = x < y
+  override def lteqv(x: Number, y: Number) = x <= y
+  def compare(x: Number, y: Number) = x.compare(y)
 }

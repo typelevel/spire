@@ -7,6 +7,8 @@ import scala.annotation.tailrec
 import scala.{specialized => spec}
 import scala.math.{abs, ceil, floor}
 
+import spire.math.{ConvertableTo, ConvertableFrom, Number}
+
 trait EuclideanRing[@spec(Int,Long,Float,Double) A] extends Ring[A] {
   def quot(a:A, b:A):A
   def mod(a:A, b:A):A
@@ -25,13 +27,17 @@ final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def %(rhs:A) = macro Ops.binop[A, A]
   def /%(rhs:A) = macro Ops.binop[A, A]
 
-  def /~(rhs:Int) = ev.quot(lhs, ev.fromInt(rhs))
-  def %(rhs:Int) = ev.mod(lhs, ev.fromInt(rhs))
-  def /%(rhs:Int) = ev.quotmod(lhs, ev.fromInt(rhs))
+  def /~(rhs:Int): A = ev.quot(lhs, ev.fromInt(rhs))
+  def %(rhs:Int): A = ev.mod(lhs, ev.fromInt(rhs))
+  def /%(rhs:Int): (A, A) = ev.quotmod(lhs, ev.fromInt(rhs))
 
-  def /~(rhs:Double)(implicit c:ConvertableTo[A]) = ev.quot(lhs, c.fromDouble(rhs))
-  def %(rhs:Double)(implicit c:ConvertableTo[A]) = ev.mod(lhs, c.fromDouble(rhs))
-  def /%(rhs:Double)(implicit c:ConvertableTo[A]) = ev.quotmod(lhs, c.fromDouble(rhs))
+  def /~(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.quot(lhs, c.fromDouble(rhs))
+  def %(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.mod(lhs, c.fromDouble(rhs))
+  def /%(rhs:Double)(implicit c:ConvertableTo[A]): (A, A) = ev.quotmod(lhs, c.fromDouble(rhs))
+
+  def /~(rhs:Number)(implicit c:ConvertableFrom[A]): Number = Number(c.toDouble(lhs)) /~ rhs
+  def %(rhs:Number)(implicit c:ConvertableFrom[A]): Number = Number(c.toDouble(lhs)) % rhs
+  def /%(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = Number(c.toDouble(lhs)) /% rhs
 }
 
 object EuclideanRing {
@@ -44,6 +50,7 @@ object EuclideanRing {
   implicit object RationalIsEuclideanRing extends RationalIsEuclideanRing
   implicit object RealIsEuclideanRing extends RealIsEuclideanRing
   implicit object SafeLongIsEuclideanRing extends SafeLongIsEuclideanRing
+  implicit object NumberIsEuclideanRing extends NumberIsEuclideanRing
 
   implicit def complexIsEuclideanRing[A: Fractional: Trig] =
     new ComplexIsEuclideanRing[A] {
@@ -179,4 +186,9 @@ extends GaussianIsRing[A] with EuclideanRing[Gaussian[A]] {
   override def quotmod(a:Gaussian[A], b:Gaussian[A]) = a /% b
   def quot(a:Gaussian[A], b:Gaussian[A]) = a / b
   def mod(a:Gaussian[A], b:Gaussian[A]) = a % b
+}
+
+trait NumberIsEuclideanRing extends EuclideanRing[Number] with NumberIsRing {
+  def quot(a:Number, b:Number) = a / b
+  def mod(a:Number, b:Number) = a % b
 }

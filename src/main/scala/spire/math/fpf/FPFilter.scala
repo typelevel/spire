@@ -209,9 +209,8 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
 
 trait FPFilterIsFractional[A] extends Fractional[FPFilter[A]]
 with FPFilterIsField[A] with FPFilterIsNRoot[A]
-with GenericCeilAndFloor[FPFilter[A]] with FPFilterOrder[A]
-with FPFilterIsSigned[A] with ConvertableFromFPFilter[A]
-with ConvertableToFPFilter[A] {
+with FPFilterOrder[A] with FPFilterIsSigned[A]
+with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   implicit val ev: Fractional[A]
 
   def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
