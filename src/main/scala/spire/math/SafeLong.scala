@@ -61,6 +61,7 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
    * If base^exponent doesn't fit in a Long, the result will overflow (unlike
    * scala.math.pow which will return +/- Infinity). 
    */
+  final def **(rhs:Int):SafeLong = pow(rhs)
   final def pow(rhs:Int):SafeLong = {
     assert (rhs >= 0)
     _pow(SafeLong.one, this, rhs)
@@ -70,6 +71,17 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
     if (exp == 0) return total
     else if ((exp & 1) == 1) _pow(total * base, base * base, exp >> 1)
     else _pow(total, base * base, exp >> 1)
+  }
+
+  final def modPow(exp:Int, mod:SafeLong):SafeLong = {
+    assert (exp >= 0)
+    _modPow(SafeLong.one % mod, this, exp, mod)
+  }
+
+  @tailrec private final def _modPow(total:SafeLong, base:SafeLong, exp:Int, mod:SafeLong): SafeLong = {
+    if (exp == 0) return total
+    else if ((exp & 1) == 1) _modPow((total * base) % mod, (base * base) % mod, exp >> 1, mod)
+    else _modPow(total, (base * base) % mod, exp >> 1, mod)
   }
 
   def abs = if (this.compare(SafeLong.zero) < 0) -this else this
