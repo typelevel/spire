@@ -56,13 +56,13 @@ final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
   def min(rhs: Double)(implicit c: ConvertableTo[A]) = ev.min(lhs, c.fromDouble(rhs))
   def max(rhs: Double)(implicit c: ConvertableTo[A]) = ev.max(lhs, c.fromDouble(rhs))
 
-  def >(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = Number(c.toDouble(lhs)) > rhs
-  def >=(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = Number(c.toDouble(lhs)) >= rhs
-  def <(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = Number(c.toDouble(lhs)) < rhs
-  def <=(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = Number(c.toDouble(lhs)) <= rhs
-  def compare(rhs:Number)(implicit c:ConvertableFrom[A]): Int = Number(c.toDouble(lhs)) compare rhs
-  def min(rhs:Number)(implicit c:ConvertableFrom[A]): Number = Number(c.toDouble(lhs)) min rhs
-  def max(rhs:Number)(implicit c:ConvertableFrom[A]): Number = Number(c.toDouble(lhs)) max rhs
+  def >(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = c.toNumber(lhs) > rhs
+  def >=(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = c.toNumber(lhs) >= rhs
+  def <(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = c.toNumber(lhs) < rhs
+  def <=(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = c.toNumber(lhs) <= rhs
+  def compare(rhs:Number)(implicit c:ConvertableFrom[A]): Int = c.toNumber(lhs) compare rhs
+  def min(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) min rhs
+  def max(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) max rhs
 }
 
 object Order {

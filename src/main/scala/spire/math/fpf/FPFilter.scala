@@ -128,6 +128,12 @@ trait ConvertableFromFPFilter[A] extends ConvertableFrom[FPFilter[A]] {
     ev.toRational(a.value)
   }
 
+  def toNumber(a: FPFilter[A]): Number = if (a.approx.isExact) {
+    Number(a.approx.approx)
+  } else {
+    Number(ev.toBigDecimal(a.value))
+  }
+
   def toType[B:ConvertableTo](a: FPFilter[A]) = sys.error("fixme")
 
   def toString(a: FPFilter[A]): String = ev.toString(a.value)

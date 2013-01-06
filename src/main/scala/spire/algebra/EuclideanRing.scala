@@ -35,9 +35,9 @@ final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def %(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.mod(lhs, c.fromDouble(rhs))
   def /%(rhs:Double)(implicit c:ConvertableTo[A]): (A, A) = ev.quotmod(lhs, c.fromDouble(rhs))
 
-  def /~(rhs:Number)(implicit c:ConvertableFrom[A]): Number = Number(c.toDouble(lhs)) /~ rhs
-  def %(rhs:Number)(implicit c:ConvertableFrom[A]): Number = Number(c.toDouble(lhs)) % rhs
-  def /%(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = Number(c.toDouble(lhs)) /% rhs
+  def /~(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) /~ rhs
+  def %(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) % rhs
+  def /%(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = c.toNumber(lhs) /% rhs
 }
 
 object EuclideanRing {

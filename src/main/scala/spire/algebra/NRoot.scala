@@ -40,8 +40,8 @@ final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
   def pow(rhs: Double)(implicit c: ConvertableTo[A]) = ev.fpow(lhs, c.fromDouble(rhs))
   def **(rhs: Double)(implicit c: ConvertableTo[A]) = ev.fpow(lhs, c.fromDouble(rhs))
 
-  def pow(rhs:Number)(implicit c:ConvertableFrom[A]): Number = Number(c.toDouble(lhs)) pow rhs
-  def **(rhs:Number)(implicit c:ConvertableFrom[A]): Number = Number(c.toDouble(lhs)) ** rhs
+  def pow(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) pow rhs
+  def **(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) ** rhs
 }
 
 trait DoubleIsNRoot extends NRoot[Double] {
