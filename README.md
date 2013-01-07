@@ -17,17 +17,17 @@ Spire is provided to you as free software under the MIT license.
 ### Set up
 
 Spire currently relies heavily on macros introduced Scala 2.10.0, as well as
-many improvements to specialization. The 0.3.0 release of Spire is expected
-shortly after the final Scala 2.10.0 release.
+many improvements to specialization. Now that 2.10.0 has been released, the
+0.3.0 release of Spire is expected to follow.
 
-Until then, Spire 0.3.0-M6 (which requires Scala-2.10.0-RC5) is available.
+Until then, Spire 0.3.0-M7 is available.
 
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-scalaVersion := "2.10.0-RC5"
+scalaVersion := "2.10.0"
 
-libraryDependencies += "org.spire-math" % "spire_2.10.0-RC5" % "0.3.0-M6"
+libraryDependencies += "org.spire-math" % "spire_2.10.0" % "0.3.0-M7"
 ```
 
 ### Number Types
@@ -36,7 +36,7 @@ In addition to supporting all of Scala's built-in number types, Spire
 introduces several new ones, all of which can be found in `spire.math`:
 
  * `Rational` fractions of integers with perfect precision
- * `Complex[A]` point on the complex plane
+ * `Complex[A]` and `Gaussian[A]` points on the complex plane
  * `Real` lazily-computed, arbitrary precision number type
  * `SafeLong` fast, overflow-proof integer type
  * `Interval[A]` arithmetic on open, closed, and unbound intervals
@@ -81,6 +81,21 @@ to concepts from abstract algebra:
 In addition to the type classes themselves, `spire.implicits` defines many
 implicits which provide unary and infix operators for the type classes. The
 easiest way to use these is via a wildcard import of `spire.implicits._`.
+
+### Getting Started
+
+Spire contains a lot of types, as well as other machinery to provide a nice
+user experience. The easiest way to use spire is via wildcard imports:
+
+```scala
+import spire.algebra._   // provides algebraic type classes
+import spire.math._      // provides functions, types, and type classes
+import spire.implicits._ // provides infix operators and conversions
+```
+
+Of course, you can still productively use Spire without wildcard imports, but
+it may require a bit more work to figure out which functionality you want and
+where it's coming from.
 
 ### Syntax
 
