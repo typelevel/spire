@@ -13,13 +13,6 @@ with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A] {
   def isNegative(x: A) = lt(x, zero)
 }
 
-class IntegralOps[A](lhs:A)(implicit ev:Integral[A]) {
-  def isZero() = macro Ops.unop[Boolean]
-  def isNonzero() = macro Ops.unop[Boolean]
-  def isPositive() = macro Ops.unop[Boolean]
-  def isNegative() = macro Ops.unop[Boolean]
-}
-
 object Integral {
   implicit object IntIsIntegral extends IntIsIntegral
   implicit object LongIsIntegral extends LongIsIntegral

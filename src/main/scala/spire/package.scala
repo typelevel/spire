@@ -325,8 +325,6 @@ object implicits {
   implicit def euclideanRingOps[A:EuclideanRing](a:A) = new EuclideanRingOps(a)
   implicit def fieldOps[A:Field](a:A) = new FieldOps(a)
 
-  implicit def integralOps[A:Integral](a:A) = new IntegralOps(a)
-
   implicit def signedOps[A: Signed](a: A) = new SignedOps(a)
   implicit def nrootOps[A: NRoot](a: A) = new NRootOps(a)
 
