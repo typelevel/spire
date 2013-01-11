@@ -8,6 +8,11 @@ import java.lang.Math
 import spire.math._
 import spire.macrosk.Ops
 
+/**
+ * Rig is a ring whose multiplicative structure doesn't have an identity
+ * (i.e. it is semigroup, not a monoid). Put another way, a Rng is a Ring
+ * without an identity.
+ */
 trait Rng[@spec(Int,Long,Float,Double) A] extends Semiring[A] with AdditiveAbGroup[A]
 
 object Rng {

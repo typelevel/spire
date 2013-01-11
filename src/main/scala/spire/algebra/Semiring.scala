@@ -13,8 +13,8 @@ import spire.macrosk.Ops
  * Semiring is a ring with identities or an invese. Thus, it has no
  * negation, zero, or one.
  *
- * A Semiring with an additive inverse (-) is a Rig.
- * A Semiring with additive and multiplicative identities (0 and 1) is a Rng.
+ * A Semiring with an additive inverse (-) is a Rng.
+ * A Semiring with additive and multiplicative identities (0 and 1) is a Rig.
  * A Semiring with all of the above is a Ring.
  */
 trait Semiring[@spec(Int,Long,Float,Double) A] extends AdditiveSemigroup[A] with MultiplicativeSemigroup[A] {
