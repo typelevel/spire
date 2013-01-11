@@ -2,10 +2,12 @@ package spire.algebra
 
 import spire.macrosk.Ops
 
+import scala.{ specialized => spec }
+
 /**
  * A semigroup is any set `A` with an associative operation (`op`).
  */
-trait Semigroup[A] {
+trait Semigroup[@spec(Int,Long,Float,Double) A] {
   def op(x:A, y:A): A
 }
 

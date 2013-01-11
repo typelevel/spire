@@ -1,9 +1,11 @@
 package spire.algebra
 
+import scala.{ specialized => spec }
+
 /**
  * A monoid is a semigroup with a special identity element.
  */
-trait Monoid[A] extends Semigroup[A] {
+trait Monoid[@spec(Int,Long,Float,Double) A] extends Semigroup[A] {
   def id: A
 }
 
