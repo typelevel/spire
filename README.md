@@ -111,10 +111,10 @@ The type classes provide type-safe equivalence and comparison functions. The
 orderings are total, although undefined elements like `NaN` or `null` will
 cause problems in the default implementations [1].
 
- * spire.math.Eq
+ * *Eq*
    + eqv (`===`): equivalence
    + neqv (`=!=`): non-equivalence
- * spire.math.Order
+ * *Order*
    + compare: less-than (-1), equivalent (0), or greater-than (1)
    + gt (`>`): greater-than
    + gteqv (`>=`): greater-than-or-equivalent
@@ -132,12 +132,12 @@ These general type classes constitute very general operations. The operations
 range from addition and multiplication to concatenating strings or lists, and
 beyond!
 
- * spire.algebra.Semigroup
-   + op (`|+|`): associative binary operator, where `(a |+| b) |+| c === a |+| (b |+| c)`
- * spire.algebra.Monoid
-   + id: an identity element, where `a |+| id === a`
- * spire.algebra.Group
-   + inverse: an unary operator, where `a |+| a.inverse === id`
+ * *Semigroup*
+   + op (`|+|`): associative binary operator
+ * *Monoid*
+   + id: an identity element
+ * *Group*
+   + inverse: an unary operator
 
 There are Additive and Multiplicative refinements of these general type
 classes, which are used in the Ring-family of type classes.
@@ -147,35 +147,35 @@ classes, which are used in the Ring-family of type classes.
 The Ring family of type classes provides the typical arithmetic operations
 most users will expect.
 
- * spire.algebra.Semiring
+ * *Semiring*
    + plus (`+`): addition
    + times (`*`): multiplication
-   + pow (`**`): exponentiation (repeated multiplication)
- * spire.algebra.Rng
+   + pow (`**`): exponentiation (integral exponent)
+ * *Rng*
    + negate (`-`): additive inverse
    + minus (`-`): subtraction
    + zero: additive identity
- * spire.algebra.Rig
+ * *Rig*
    + zero: additive identity
    + one: multiplicative identity
- * spire.algebra.Ring (Rng + Rig)
- * spire.algebra.EuclideanRing
+ * *Ring* (Rng + Rig)
+ * *EuclideanRing*
    + quot (`/~`): quotient (floor division)
    + mod (`%`): remainder
    + quotmod (`/%`): quotient and mod
    + gcd: greatest-common-divisor
    + lcm: least-common-multiple
- * spire.algebra.Field
+ * *Field*
    + reciprocal: multiplicative inverse
    + div (`/`): division
    + ceil: round up
    + floor: round down
    + round: round to nearest
- * spire.algebra.NRoot
+ * *NRoot*
    + nroot: k-roots (k: Int)
    + sqrt: square root
    + log: natural logarithm
-   + fpow (`**`): fractional exponentiation
+   + fpow (`**`): exponentiation (fractional exponent)
 
 #### Numeric, Integral, and Fractional
 
@@ -183,9 +183,9 @@ These high-level type classes will pull in all of the relevant algebraic type
 classes. Users who aren't concerned with algebraic properties directly, or who
 wish for more flexibility, should prefer these type classes.
 
- * spire.math.Integral: whole number types (e.g. `Int`)
- * spire.math.Fractional: fractional/decimal types (e.g. `Double`)
- * spire.math.Numeric: any number type, making "best effort" to support ops
+ * *Integral*: whole number types (e.g. `Int`)
+ * *Fractional*: fractional/decimal types (e.g. `Double`)
+ * *Numeric*: any number type, making "best effort" to support ops
 
 The `Numeric` type class is unique in that it provides the same functionality
 as `Fractional` for all number types. Each type will attempt to "do the right
