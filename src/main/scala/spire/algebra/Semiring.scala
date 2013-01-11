@@ -10,7 +10,7 @@ import spire.macrosk.Ops
 
 
 /**
- * Semiring is a ring with identities or an invese. Thus, it has no
+ * Semiring is a ring without identities or an inverse. Thus, it has no
  * negation, zero, or one.
  *
  * A Semiring with an additive inverse (-) is a Rng.

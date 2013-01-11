@@ -9,7 +9,7 @@ import spire.math._
 import spire.macrosk.Ops
 
 /**
- * Rig is a ring whose multiplicative structure doesn't have an identity
+ * Rng is a ring whose multiplicative structure doesn't have an identity
  * (i.e. it is semigroup, not a monoid). Put another way, a Rng is a Ring
  * without an identity.
  */
