@@ -18,7 +18,7 @@ import spire.macrosk.Ops
  * fundamental methods (zero, one and plus). Where possible, these methods
  * should be overridden by more efficient implementations.
  */
-trait Ring[@spec(Int,Long,Float,Double) A] extends Rig[A] with AdditiveAbGroup[A] {
+trait Ring[@spec(Int,Long,Float,Double) A] extends Semiring[A] with Rig[A] with Rng[A] with AdditiveAbGroup[A] {
   def fromInt(n: Int): A =
     if (n < 0) _fromInt(negate(one), -n, zero)
     else _fromInt(one, n, zero)

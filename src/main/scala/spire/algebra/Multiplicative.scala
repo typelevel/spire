@@ -49,6 +49,7 @@ final class MultiplicativeSemigroupOps[A](lhs:A)(implicit ev:MultiplicativeSemig
 }
 
 final class MultiplicativeGroupOps[A](lhs:A)(implicit ev:MultiplicativeGroup[A]) {
+  def reciprocal() = macro Ops.unop[A]
   def /(rhs:A): A = macro Ops.binop[A, A]
   def /(rhs:Int)(implicit c: Ring[A]): A = ev.div(lhs, c.fromInt(rhs))
   def /(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.div(lhs, c.fromDouble(rhs))

@@ -3,14 +3,21 @@ package spire.algebra
 import scala.{ specialized => spec }
 import spire.macrosk.Ops
 
-trait AdditiveMonoid[@spec(Int,Long,Float,Double) A] {
-  def additive: Monoid[A] = new Monoid[A] {
+trait AdditiveSemigroup[@spec(Int,Long,Float,Double) A] {
+  def additive: Semigroup[A] = new Semigroup[A] {
+    def op(x: A, y: A): A = plus(x, y)
+  }
+
+  def plus(x: A, y: A): A
+}
+
+trait AdditiveMonoid[@spec(Int,Long,Float,Double) A] extends AdditiveSemigroup[A] {
+  override def additive: Monoid[A] = new Monoid[A] {
     def id = zero
     def op(x: A, y: A): A = plus(x, y)
   }
 
   def zero: A
-  def plus(x: A, y: A): A
 }
 
 trait AdditiveGroup[@spec(Int,Long,Float,Double) A] extends AdditiveMonoid[A] {
@@ -44,7 +51,7 @@ object AdditiveMonoid extends AdditiveMonoid0 {
 
 import spire.math.{ConvertableTo, ConvertableFrom, Number}
 
-final class AdditiveMonoidOps[A](lhs:A)(implicit ev:AdditiveMonoid[A]) {
+final class AdditiveSemigroupOps[A](lhs:A)(implicit ev:AdditiveSemigroup[A]) {
   def +(rhs:A): A = macro Ops.binop[A, A]
   def +(rhs:Int)(implicit c: Ring[A]): A = ev.plus(lhs, c.fromInt(rhs))
   def +(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.plus(lhs, c.fromDouble(rhs))

@@ -310,7 +310,7 @@ final class ConversionOps[A](a: A) {
 
 object implicits {
 
-  implicit def additiveMonoidOps[A:AdditiveMonoid](a:A) = new AdditiveMonoidOps(a)
+  implicit def additiveMonoidOps[A:AdditiveSemigroup](a:A) = new AdditiveSemigroupOps(a)
   implicit def additiveGroupOps[A:AdditiveGroup](a:A) = new AdditiveGroupOps(a)
   implicit def multiplicativeSemigroupOps[A:MultiplicativeSemigroup](a:A) = new MultiplicativeSemigroupOps(a)
   implicit def multiplicativeGroupOps[A:MultiplicativeGroup](a:A) = new MultiplicativeGroupOps(a)
@@ -321,7 +321,8 @@ object implicits {
   implicit def groupOps[A:Group](a:A) = new GroupOps(a)
 
   implicit def booleanAlgebraOps[A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
-  implicit def rigOps[A:Rig](a:A) = new RigOps(a)
+  //implicit def rigOps[A:Rig](a:A) = new RigOps(a)
+  implicit def semiringOps[A:Semiring](a:A) = new SemiringOps(a)
   implicit def euclideanRingOps[A:EuclideanRing](a:A) = new EuclideanRingOps(a)
   implicit def fieldOps[A:Field](a:A) = new FieldOps(a)
 
@@ -329,7 +330,7 @@ object implicits {
   implicit def nrootOps[A: NRoot](a: A) = new NRootOps(a)
 
   implicit def moduleOps[V, R](v:V)(implicit m:Module[V,R]) = new ModuleOps[V, R](v)
-  implicit def rigtModuleOps[V, R](v:V)(implicit m:RightModule[V,R]) = new RightModuleOps[V, R](v)
+  implicit def rightModuleOps[V, R](v:V)(implicit m:RightModule[V,R]) = new RightModuleOps[V, R](v)
   implicit def vectorSpaceOps[V, F](v:V)(implicit m:VectorSpace[V,F]) = new VectorSpaceOps[V, F](v)
   implicit def normedVectorSpaceOps[V](v:V) = new NormedVectorSpaceOps[V](v)
   implicit def innerProductSpaceOps[V](v:V) = new InnerProductSpaceOps[V](v)

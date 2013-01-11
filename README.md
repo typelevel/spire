@@ -67,10 +67,12 @@ to concepts from abstract algebra:
  * `Semigroup[A]` types with an associtive binary operator
  * `Monoid[A]` semigroups who have an identity element
  * `Group[A]` monoids that have an inverse operator
+ * `Semiring[A]` types that form semigroups under `+` and `*`
+ * `Rng[A]` types that form a group under `+` and a semigroup under `*`
  * `Rig[A]` types that form monoids under `+` and `*`
  * `Ring[A]` types that form a group under `+` and a monoid under `*`
  * `EuclideanRing[A]` rings with quotients and remainders (euclidean division)
- * `Field[A]` euclidean rings with multiplicative inverses
+ * `Field[A]` euclidean rings with multiplicative inverses (reciprocals)
  * `Signed[A]` types that have a sign (negative, zero, positive)
  * `NRoot[A]` types that support k-roots, logs, and fractional powers
  * `Module[V,R]` types that form a left R-module
@@ -96,6 +98,103 @@ import spire.implicits._ // provides infix operators and conversions
 Of course, you can still productively use Spire without wildcard imports, but
 it may require a bit more work to figure out which functionality you want and
 where it's coming from.
+
+### Operators by Type Class
+
+The following is an outline in more detail of the type classes provided by
+Spire, as well as the operators that they use. While Spire avoids introducing
+novel operators when possible, in a few cases it was unavoidable.
+
+#### Eq and Order
+
+The type classes provide type-safe equivalence and comparison functions. The
+orderings are total, although undefined elements like `NaN` or `null` will
+cause problems in the default implementations [1].
+
+ * spire.math.Eq
+   + eqv (`===`): equivalence
+   + neqv (`=!=`): non-equivalence
+ * spire.math.Order
+   + compare: less-than (-1), equivalent (0), or greater-than (1)
+   + gt (`>`): greater-than
+   + gteqv (`>=`): greater-than-or-equivalent
+   + lt (`<`): less-than
+   + lteqv (`<=`): less-than-or-equivalent
+   + min: find least value
+   + max: find greatest value
+
+[1] For floating-point numbers, alternate implementations that take `NaN` into
+account can be imported from `spire.optional.totalfloat._`.
+
+#### Semigroup, Monoid, and Group
+
+These general type classes constitute very general operations. The operations
+range from addition and multiplication to concatenating strings or lists, and
+beyond!
+
+ * spire.algebra.Semigroup
+   + op (`|+|`): associative binary operator, where `(a |+| b) |+| c === a |+| (b |+| c)`
+ * spire.algebra.Monoid
+   + id: an identity element, where `a |+| id === a`
+ * spire.algebra.Group
+   + inverse: an unary operator, where `a |+| a.inverse === id`
+
+There are Additive and Multiplicative refinements of these general type
+classes, which are used in the Ring-family of type classes.
+
+#### Rings &co
+
+The Ring family of type classes provides the typical arithmetic operations
+most users will expect.
+
+ * spire.algebra.Semiring
+   + plus (`+`): addition
+   + times (`*`): multiplication
+   + pow (`**`): exponentiation (repeated multiplication)
+ * spire.algebra.Rng
+   + negate (`-`): additive inverse
+   + minus (`-`): subtraction
+   + zero: additive identity
+ * spire.algebra.Rig
+   + zero: additive identity
+   + one: multiplicative identity
+ * spire.algebra.Ring (Rng + Rig)
+ * spire.algebra.EuclideanRing
+   + quot (`/~`): quotient (floor division)
+   + mod (`%`): remainder
+   + quotmod (`/%`): quotient and mod
+   + gcd: greatest-common-divisor
+   + lcm: least-common-multiple
+ * spire.algebra.Field
+   + reciprocal: multiplicative inverse
+   + div (`/`): division
+   + ceil: round up
+   + floor: round down
+   + round: round to nearest
+ * spire.algebra.NRoot
+   + nroot: k-roots (k: Int)
+   + sqrt: square root
+   + log: natural logarithm
+   + fpow (`**`): fractional exponentiation
+
+#### Numeric, Integral, and Fractional
+
+These high-level type classes will pull in all of the relevant algebraic type
+classes. Users who aren't concerned with algebraic properties directly, or who
+wish for more flexibility, should prefer these type classes.
+
+ * spire.math.Integral: whole number types (e.g. `Int`)
+ * spire.math.Fractional: fractional/decimal types (e.g. `Double`)
+ * spire.math.Numeric: any number type, making "best effort" to support ops
+
+The `Numeric` type class is unique in that it provides the same functionality
+as `Fractional` for all number types. Each type will attempt to "do the right
+thing" as far as possible, and throw errors otherwise. Users who are leery of
+this behavior are encouraged to use more precise type classes.
+
+#### Errata
+
+Additional type classes `BooleanAlgebra` and `Trig` are provided.
 
 ### Syntax
 
