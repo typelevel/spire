@@ -145,6 +145,10 @@ trait FiniteField[N <: Nat] extends FiniteRing[N] with Field[Z[N]] {
   def quot(a: Z[N], b: Z[N]) = Z[N](a.n / b.n)
   def mod(a: Z[N], b: Z[N]) = Z[N](a.n % b.n)
 
+  def ceil(a: Z[N]) = a
+  def floor(a: Z[N]) = a
+  def round(a: Z[N]) = a
+
   override def reciprocal(a: Z[N]): Z[N] = if (a === zero) {
     throw new ArithmeticException("Divide by zero.")
   } else (1 until order) map (Z[N](_)) find { b =>
