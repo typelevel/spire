@@ -2,6 +2,8 @@ package spire.benchmark
 
 import spire.algebra._
 import spire.math._
+import spire.implicits._
+import spire.algebra.map._
 
 import com.google.caliper.{ Runner, SimpleBenchmark, Param }
 
@@ -58,9 +60,12 @@ class MapSemigroupBenchmarks extends MyBenchmark with BenchmarkData {
     if (x.size < y.size) add(y, x, true) else add(x, y, false)
   }
 
+  def spireAdd[K, V](x: Map[K, V], y: Map[K, V])(implicit
+      rng: Rng[Map[K, V]]): Map[K, V] = rng.plus(x, y)
+
   val numMaps = 1000
 
-  @Param(Array("1", "2", "4", "8", "16", "32", "64"))
+  @Param(Array("2", "4", "8", "16", "32", "64"))
   var mapSize: Int = 0
 
   @Param(Array("random", "sparse", "dense"))
@@ -107,6 +112,15 @@ class MapSemigroupBenchmarks extends MyBenchmark with BenchmarkData {
     var total = 0
     while (i < numMaps) {
       total += bulkAdd(maps(i - 1), maps(i)).size
+      i += 1
+    }
+  }
+
+  def timeSpireAdd(reps: Int) = run(reps) {
+    var i = 1
+    var total = 0
+    while (i < numMaps) {
+      total += spireAdd(maps(i - 1), maps(i)).size
       i += 1
     }
   }
