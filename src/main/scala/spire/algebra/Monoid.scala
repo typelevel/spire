@@ -3,6 +3,7 @@ package spire.algebra
 import scala.{ specialized => spec }
 import scala.collection.TraversableLike
 import scala.collection.generic._
+import scala.reflect.ClassTag
 
 /**
  * A monoid is a semigroup with a special identity element.
@@ -18,6 +19,7 @@ object Monoid extends Monoid0 {
   implicit def SetMonoid[A]: Monoid[Set[A]] = new CollMonoid[A, Set[A]]
   implicit def ListMonoid[A]: Monoid[List[A]] = new CollMonoid[A, List[A]]
   implicit def VectorMonoid[A]: Monoid[Vector[A]] = new CollMonoid[A, Vector[A]]
+  implicit def ArrayMonoid[@spec A: ClassTag]: Monoid[Array[A]] = new ArrayMonoid[A]
 }
 
 trait Monoid0 {
@@ -36,3 +38,12 @@ final class CollMonoid[A, SA <: TraversableLike[A, SA]](implicit cbf: CanBuildFr
   def op(x: SA, y: SA): SA = x.++(y)(cbf)
 }
 
+final class ArrayMonoid[@spec A: ClassTag] extends Monoid[Array[A]] {
+  def id = new Array[A](0)
+  def op(x: Array[A], y: Array[A]) = {
+    val z = new Array[A](x.length + y.length)
+    System.arraycopy(x, 0, z, 0, x.length)
+    System.arraycopy(y, 0, z, x.length, y.length)
+    z
+  }
+}
