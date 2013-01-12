@@ -7,6 +7,7 @@ import scala.annotation.tailrec
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable.Builder
+import scala.reflect.ClassTag
 
 /**
  * A module generalizes a vector space by requiring its scalar need only form
@@ -53,7 +54,14 @@ trait Module2 extends Module1 {
   }
 
   implicit def ListModule[A: Ring]: Module[List[A], A] = SeqModule[A, List[A]]
+
   implicit def VectorModule[A: Ring]: Module[Vector[A], A] = SeqModule[A, Vector[A]]
+
+  implicit def ArrayModule[@spec(Int,Long,Float,Double) A](implicit
+      scalar0: Ring[A], classTag0: ClassTag[A]): Module[Array[A], A] = new ArrayModule[A] {
+    val scalar = scalar0
+    val classTag = classTag0
+  }
 
   implicit def RingAlgebraIsModule[V,@spec(Int,Long,Float,Double) R](implicit
     alg: RingAlgebra[V, R]): Module[V, R] = alg
@@ -101,6 +109,58 @@ trait IdentityModule[@spec(Int,Long,Float,Double) V] extends Module[V, V] {
   override def minus(v: V, w: V): V = scalar.minus(v, w)
 
   def timesl(r: V, v: V): V = scalar.times(r, v)
+}
+
+trait ArrayModule[@spec(Int,Long,Float,Double) A] extends Module[Array[A], A] {
+  implicit def classTag: ClassTag[A]
+
+  def zero: Array[A] = new Array[A](0)
+
+  def negate(x: Array[A]): Array[A] = {
+    val y = new Array[A](x.length)
+    var i = 0
+    while (i < x.length) {
+      y(i) = scalar.negate(x(i))
+      i += 1
+    }
+    x
+  }
+
+  def plus(x: Array[A], y: Array[A]): Array[A] = {
+    var prefix = math.min(x.length, y.length)
+    var z = new Array[A](math.max(x.length, y.length))
+    var i = 0
+    while (i < prefix) {
+      z(i) = scalar.plus(x(i), y(i))
+      i += 1
+    }
+    while (i < x.length) { z(i) = x(i); i += 1 }
+    while (i < y.length) { z(i) = y(i); i += 1 }
+    z
+  }
+
+  override def minus(x: Array[A], y: Array[A]): Array[A] = {
+    var prefix = math.min(x.length, y.length)
+    var z = new Array[A](math.max(x.length, y.length))
+    var i = 0
+    while (i < prefix) {
+      z(i) = scalar.minus(x(i), y(i))
+      i += 1
+    }
+    while (i < x.length) { z(i) = x(i); i += 1 }
+    while (i < y.length) { z(i) = scalar.negate(y(i)); i += 1 }
+    z
+  }
+
+  def timesl(r: A, x: Array[A]): Array[A] = {
+    val y = new Array[A](x.length)
+    var i = 0
+    while (i < y.length) {
+      y(i) = scalar.times(r, x(i))
+      i += 1
+    }
+    y
+  }
 }
 
 trait SeqModule[A, SA <: SeqLike[A, SA]] extends Module[SA, A] {

@@ -7,6 +7,7 @@ import scala.{ specialized => spec }
 import scala.annotation.tailrec
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
+import scala.reflect.ClassTag
 
 trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends NormedVectorSpace[V, F] {
   implicit def nroot: NRoot[F]
@@ -35,6 +36,14 @@ trait InnerProductSpace1 extends InnerProductSpace0 {
 
   implicit def VectorInnerProductSpace[A: Field: NRoot]: InnerProductSpace[Vector[A], A] =
     SeqInnerProductSpace[A, Vector[A]]
+
+  implicit def ArrayInnerProductSpace[@spec(Int,Long,Float,Double) A](implicit
+      scalar0: Field[A], nroot0: NRoot[A],
+      classTag0: ClassTag[A]): InnerProductSpace[Array[A], A] = new ArrayInnerProductSpace[A] {
+    val scalar = scalar0
+    val nroot = nroot0
+    val classTag = classTag0
+  }
 
   implicit def Tuple2IsInnerProductSpace[@spec(Int,Long,Float,Double) A](implicit
       scalar0: Field[A], nroot0: NRoot[A]) = new Tuple2IsInnerProductSpace[A] {
@@ -112,6 +121,19 @@ object SeqInnerProductSpace {
       val nroot = nroot0
       val cbf = cbf0
     }
+  }
+}
+
+trait ArrayInnerProductSpace[@spec(Int,Long,Float,Double) A] extends ArrayVectorSpace[A]
+with InnerProductSpace[Array[A], A] {
+  def dot(x: Array[A], y: Array[A]): A = {
+    var z = scalar.zero
+    var i = 0
+    while (i < x.length && i < y.length) {
+      z = scalar.plus(z, scalar.times(x(i), y(i)))
+      i += 1
+    }
+    z
   }
 }
 
