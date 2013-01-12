@@ -11,7 +11,7 @@ trait Group[@spec(Int,Long,Float,Double) A] extends Monoid[A] {
   def inverse(a: A): A
 }
 
-object Group {
+object Group extends Group0 {
   @inline final def apply[A](implicit ev: Group[A]) = ev
 }
 
@@ -20,6 +20,14 @@ object Group {
  */
 trait AbGroup[@spec(Int,Long,Float,Double) A] extends Group[A]
 
+object AbGroup {
+  @inline final def apply[A](implicit ev: AbGroup[A]) = ev
+}
+
 final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
   def inverse() = macro Ops.unop[A]
+}
+
+trait Group0 {
+  implicit def abGroup[A: AbGroup]: Group[A] = AbGroup[A]
 }
