@@ -9,7 +9,7 @@ import scala.{ specialized => spec }
  * a ring, rather than a field. In Spire, a `Module` is a left R-Module.
  */
 trait Module[V, @spec(Int,Long,Float,Double) R] extends AdditiveGroup[V] {
-  implicit def scalar: Ring[R]
+  implicit def scalar: Ring[R] // TODO: Can this be Rng[R] instead?
 
   def timesl(r: R, v: V): V
 }
