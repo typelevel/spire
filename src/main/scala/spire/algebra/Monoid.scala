@@ -2,7 +2,7 @@ package spire.algebra
 
 import scala.{ specialized => spec }
 import scala.collection.TraversableLike
-import scala.collection.generic._
+import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
 
 /**

@@ -4,6 +4,9 @@ import spire.math.{ Complex, Trig, Fractional }
 import spire.macrosk.Ops
 
 import scala.{ specialized => spec }
+import scala.annotation.tailrec
+import scala.collection.SeqLike
+import scala.collection.generic.CanBuildFrom
 
 trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends NormedVectorSpace[V, F] {
   implicit def nroot: NRoot[F]
@@ -12,7 +15,27 @@ trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends NormedVect
   def dot(v: V, w: V): F
 }
 
-object InnerProductSpace {
+object InnerProductSpace extends InnerProductSpace1
+
+final class InnerProductSpaceOps[V](lhs: V) {
+  def dot[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
+    macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
+  def ⋅[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
+    macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
+}
+
+trait InnerProductSpace0 {
+  implicit def seqInnerProductSpace[A: Field: NRoot]: InnerProductSpace[Seq[A], A] =
+    SeqInnerProductSpace[A, Seq[A]]
+}
+
+trait InnerProductSpace1 extends InnerProductSpace0 {
+  implicit def ListInnerProductSpace[A: Field: NRoot]: InnerProductSpace[List[A], A] =
+    SeqInnerProductSpace[A, List[A]]
+
+  implicit def VectorInnerProductSpace[A: Field: NRoot]: InnerProductSpace[Vector[A], A] =
+    SeqInnerProductSpace[A, Vector[A]]
+
   implicit def Tuple2IsInnerProductSpace[@spec(Int,Long,Float,Double) A](implicit
       scalar0: Field[A], nroot0: NRoot[A]) = new Tuple2IsInnerProductSpace[A] {
     val scalar = scalar0
@@ -58,19 +81,38 @@ object InnerProductSpace {
   }
 }
 
-final class InnerProductSpaceOps[V](lhs: V) {
-  def dot[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
-    macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
-  def ⋅[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
-    macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
-}
-
 trait ComplexIsInnerProductSpace[@spec(Float, Double) A] extends ComplexIsField[A]
 with InnerProductSpace[Complex[A], A] with RingAlgebra[Complex[A], A] {
   def timesl(r: A, v: Complex[A]): Complex[A] = Complex(r, scalar.zero) * v
   override def norm(x: Complex[A]): A = x.abs
   def dot(x: Complex[A], y: Complex[A]): A =
     scalar.plus(scalar.times(x.real, y.real), scalar.times(x.imag, y.imag))
+}
+
+trait SeqInnerProductSpace[A, SA <: SeqLike[A, SA]] extends SeqVectorSpace[A, SA]
+with InnerProductSpace[SA, A] {
+  def dot(x: SA, y: SA): A = {
+    @tailrec
+    def loop(xi: Iterator[A], yi: Iterator[A], acc: A): A = {
+      if (xi.hasNext && yi.hasNext) {
+        loop(xi, yi, scalar.plus(acc, scalar.times(xi.next(), yi.next())))
+      } else {
+        acc
+      }
+    }
+
+    loop(x.toIterator, y.toIterator, scalar.zero)
+  }
+}
+
+object SeqInnerProductSpace {
+  def apply[A, SA <: SeqLike[A, SA]](implicit A: Field[A], nroot0: NRoot[A], cbf0: CanBuildFrom[SA, A, SA]) = {
+    new SeqInnerProductSpace[A, SA] {
+      val scalar = A
+      val nroot = nroot0
+      val cbf = cbf0
+    }
+  }
 }
 
 trait Tuple2IsInnerProductSpace[@spec(Int,Long,Float,Double) A]

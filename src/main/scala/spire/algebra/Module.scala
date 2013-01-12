@@ -3,6 +3,10 @@ package spire.algebra
 import spire.macrosk.Ops
 
 import scala.{ specialized => spec }
+import scala.annotation.tailrec
+import scala.collection.SeqLike
+import scala.collection.generic.CanBuildFrom
+import scala.collection.mutable.Builder
 
 /**
  * A module generalizes a vector space by requiring its scalar need only form
@@ -23,12 +27,33 @@ trait RightModule[V, @spec(Int,Long,Float,Double) R] extends AdditiveGroup[V] {
   def timesr(v: V, r: R): V
 }
 
+object Module extends Module3
+
+final class ModuleOps[V, F](rhs: V)(implicit ev: Module[V, F]) {
+  def *: (lhs:F): V = macro Ops.rbinop[F, V]
+}
+
+final class RightModuleOps[V, F](lhs: V)(implicit ev: RightModule[V, F]) {
+  def :* (rhs:F): V = macro Ops.binop[F, V]
+}
+
 trait Module0 {
+  implicit def seqModule[A: Ring]: Module[Seq[A], A] = SeqModule[A, Seq[A]]
+}
+
+trait Module1 extends Module0 {
+  implicit def IndexedSeqModule[A: Ring]: Module[IndexedSeq[A], A] = SeqModule[A, IndexedSeq[A]]
+}
+
+trait Module2 extends Module1 {
   implicit def IdentityModule[@spec(Int,Long,Float,Double) V](implicit ring: Ring[V]) = {
     new IdentityModule[V] {
       val scalar = ring
     }
   }
+
+  implicit def ListModule[A: Ring]: Module[List[A], A] = SeqModule[A, List[A]]
+  implicit def VectorModule[A: Ring]: Module[Vector[A], A] = SeqModule[A, Vector[A]]
 
   implicit def RingAlgebraIsModule[V,@spec(Int,Long,Float,Double) R](implicit
     alg: RingAlgebra[V, R]): Module[V, R] = alg
@@ -64,19 +89,9 @@ trait Module0 {
   }
 }
 
-trait Module1 extends Module0 {
+trait Module3 extends Module2 {
   implicit def VectorSpaceIsModule[V,@spec(Int,Long,Float,Double) R](implicit
     vs: VectorSpace[V, R]): Module[V, R] = vs
-}
-
-object Module extends Module1
-
-final class ModuleOps[V, F](rhs: V)(implicit ev: Module[V, F]) {
-  def *: (lhs:F): V = macro Ops.rbinop[F, V]
-}
-
-final class RightModuleOps[V, F](lhs: V)(implicit ev: RightModule[V, F]) {
-  def :* (rhs:F): V = macro Ops.binop[F, V]
 }
 
 trait IdentityModule[@spec(Int,Long,Float,Double) V] extends Module[V, V] {
@@ -86,6 +101,71 @@ trait IdentityModule[@spec(Int,Long,Float,Double) V] extends Module[V, V] {
   override def minus(v: V, w: V): V = scalar.minus(v, w)
 
   def timesl(r: V, v: V): V = scalar.times(r, v)
+}
+
+trait SeqModule[A, SA <: SeqLike[A, SA]] extends Module[SA, A] {
+  implicit def cbf: CanBuildFrom[SA, A, SA]
+
+  def zero: SA = cbf().result
+
+  def negate(sa: SA): SA = sa map (scalar.negate(_))
+
+  def plus(x: SA, y: SA): SA = {
+    @tailrec
+    def add(xi: Iterator[A], yi: Iterator[A], b: Builder[A, SA]): SA = {
+      val contxi = xi.hasNext
+      val contyi = yi.hasNext
+
+      if (contxi || contyi) {
+        b += (if (contxi && contyi) {
+          (scalar.plus(xi.next(), yi.next()))
+        } else if (contxi) {
+          xi.next()
+        } else {
+          yi.next()
+        })
+        add(xi, yi, b)
+      } else {
+        b.result
+      }
+    }
+
+    add(x.toIterator, y.toIterator, cbf(x))
+  }
+
+  override def minus(x: SA, y: SA): SA = {
+    @tailrec
+    def sub(xi: Iterator[A], yi: Iterator[A], b: Builder[A, SA]): SA = {
+      val contxi = xi.hasNext
+      val contyi = yi.hasNext
+
+      if (contxi || contyi) {
+        b += (if (contxi && contyi) {
+          (scalar.minus(xi.next(), yi.next()))
+        } else if (contxi) {
+          xi.next()
+        } else {
+          scalar.negate(yi.next())
+        })
+        sub(xi, yi, b)
+      } else {
+        b.result
+      }
+    }
+
+    sub(x.toIterator, y.toIterator, cbf(x))
+  }
+
+  def timesl(r: A, sa: SA): SA = sa map (scalar.times(r, _))
+}
+
+object SeqModule {
+  def apply[A, SA <: SeqLike[A, SA]](implicit A: Ring[A], cbf0: CanBuildFrom[SA, A, SA]) = {
+    new SeqModule[A, SA] {
+      val scalar = A
+      val cbf = cbf0
+    }
+  }
 }
 
 trait Tuple2IsModule[@spec(Int,Long,Float,Double) A]
