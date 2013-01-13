@@ -12,20 +12,19 @@ trait Monoid[@spec(Int,Long,Float,Double) A] extends Semigroup[A] {
   def id: A
 }
 
-object Monoid extends Monoid0 {
+object Monoid extends Monoid1 {
   @inline final def apply[A](implicit m: Monoid[A]): Monoid[A] = m
+}
 
+trait Monoid1 extends Monoid0 {
   implicit object StringMonoid extends StringMonoid
-  implicit def SetMonoid[A]: Monoid[Set[A]] = new CollMonoid[A, Set[A]]
-  implicit def ListMonoid[A]: Monoid[List[A]] = new CollMonoid[A, List[A]]
-  implicit def VectorMonoid[A]: Monoid[Vector[A]] = new CollMonoid[A, Vector[A]]
-  implicit def ArrayMonoid[@spec A: ClassTag]: Monoid[Array[A]] = new ArrayMonoid[A]
 }
 
 trait Monoid0 {
   implicit def group[A: Group]: Monoid[A] = Group[A]
 
-  implicit def SeqMonoid[A]: Monoid[Seq[A]] = new CollMonoid[A, Seq[A]]
+  implicit def traversable[A, CC[A] <: TraversableLike[A, CC[A]]](implicit
+    cbf: CanBuildFrom[CC[A], A, CC[A]]): Monoid[CC[A]] = new CollMonoid[A, CC[A]]
 }
 
 trait StringMonoid extends Monoid[String] {

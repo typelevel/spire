@@ -6,14 +6,17 @@ trait MetricSpace[V, @spec(Int, Long, Float, Double) R] {
   def distance(v: V, w: V): R
 }
 
-object MetricSpace
+object MetricSpace extends MetricSpace0 with MetricSpaceFunctions
 
-//final class MetricSpaceOps[V, S](lhs: V)(implicit metric: MetricSpace[V, S]) {
-//  def closeTo(rhs: A, tolerance: Double)(implicit real: IsReal[A], g: Monoid[A]) = {
-//    val lsz = metric.distance(g.id, lhs)
-//    val rsz = metric.distance(g.id, rhs)
-//    val eps = math.max(real.toDouble(lsz), real.toDouble(rsz)) * tolerance
-//    val dist = metric.distance(lhs, rhs)
-//    dist < eps
-//  }
-//}
+trait MetricSpace0 {
+  implicit def NormedVectorSpaceIsMetricSpace[V, @spec(Float,Double) R](implicit
+      V: NormedVectorSpace[V, R]): MetricSpace[V, R] = V
+}
+
+trait MetricSpaceFunctions {
+  def closeTo[V, @spec(Int,Long,Float,Double) R](x: V, y: V, tolerance: Double)(implicit
+      R: IsReal[R], metric: MetricSpace[V, R]): Boolean = {
+    val d = R.toDouble(metric.distance(x, y))
+    d <= tolerance
+  }
+}

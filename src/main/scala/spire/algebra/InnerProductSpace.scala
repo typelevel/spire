@@ -26,17 +26,15 @@ final class InnerProductSpaceOps[V](lhs: V) {
 }
 
 trait InnerProductSpace0 {
-  implicit def seqInnerProductSpace[A: Field: NRoot]: InnerProductSpace[Seq[A], A] =
-    SeqInnerProductSpace[A, Seq[A]]
+  implicit def seq[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
+      nroot0: NRoot[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqInnerProductSpace[A, CC[A]] {
+    val scalar = field0
+    val nroot = nroot0
+    val cbf = cbf0
+  }
 }
 
 trait InnerProductSpace1 extends InnerProductSpace0 {
-  implicit def ListInnerProductSpace[A: Field: NRoot]: InnerProductSpace[List[A], A] =
-    SeqInnerProductSpace[A, List[A]]
-
-  implicit def VectorInnerProductSpace[A: Field: NRoot]: InnerProductSpace[Vector[A], A] =
-    SeqInnerProductSpace[A, Vector[A]]
-
   implicit def ArrayInnerProductSpace[@spec(Int,Long,Float,Double) A](implicit
       scalar0: Field[A], nroot0: NRoot[A],
       classTag0: ClassTag[A]): InnerProductSpace[Array[A], A] = new ArrayInnerProductSpace[A] {
@@ -111,16 +109,6 @@ with InnerProductSpace[SA, A] {
     }
 
     loop(x.toIterator, y.toIterator, scalar.zero)
-  }
-}
-
-object SeqInnerProductSpace {
-  def apply[A, SA <: SeqLike[A, SA]](implicit A: Field[A], nroot0: NRoot[A], cbf0: CanBuildFrom[SA, A, SA]) = {
-    new SeqInnerProductSpace[A, SA] {
-      val scalar = A
-      val nroot = nroot0
-      val cbf = cbf0
-    }
   }
 }
 

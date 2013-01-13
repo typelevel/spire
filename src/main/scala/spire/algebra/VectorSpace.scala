@@ -1,6 +1,7 @@
 package spire.algebra
 
 import spire.macrosk.Ops
+import spire.NoImplicit
 
 import scala.{ specialized => spec }
 import scala.annotation.tailrec
@@ -17,14 +18,15 @@ trait VectorSpace[V, @spec(Int, Long, Float, Double) F] extends Module[V, F] {
 object VectorSpace extends VectorSpace2
 
 trait VectorSpace0 {
-  implicit def seqVectorSpace[A: Field]: VectorSpace[Seq[A], A] = SeqVectorSpace[A, Seq[A]]
+  implicit def seq[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
+      cbf0: CanBuildFrom[CC[A], A, CC[A]],
+      ev: NoImplicit[NormedVectorSpace[CC[A], A]]) = new SeqVectorSpace[A, CC[A]] {
+    val scalar = field0
+    val cbf = cbf0
+  }
 }
 
 trait VectorSpace1 extends VectorSpace0 {
-  implicit def ListVectorSpace[A: Field]: VectorSpace[List[A], A] = SeqVectorSpace[A, List[A]]
-
-  implicit def VectorVectorSpace[A: Field]: VectorSpace[Vector[A], A] = SeqVectorSpace[A, Vector[A]]
-
   implicit def ArrayVectorSpace[@spec(Int,Long,Float,Double) A](implicit
       scalar0: Field[A], classTag0: ClassTag[A]): VectorSpace[Array[A], A] = new ArrayVectorSpace[A] {
     val scalar = scalar0
@@ -42,14 +44,5 @@ final class VectorSpaceOps[V, F](rhs: V)(implicit ev: VectorSpace[V, F]) {
 }
 
 trait SeqVectorSpace[A, SA <: SeqLike[A, SA]] extends SeqModule[A, SA] with VectorSpace[SA, A]
-
-object SeqVectorSpace {
-  def apply[A, SA <: SeqLike[A, SA]](implicit A: Field[A], cbf0: CanBuildFrom[SA, A, SA]) = {
-    new SeqVectorSpace[A, SA] {
-      val scalar = A
-      val cbf = cbf0
-    }
-  }
-}
 
 trait ArrayVectorSpace[@spec(Int,Long,Float,Double) A] extends ArrayModule[A] with VectorSpace[Array[A], A]

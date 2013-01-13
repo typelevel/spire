@@ -308,6 +308,17 @@ final class ConversionOps[A](a: A) {
     macro Ops.flip[WideningConversion[A, B], B]
 }
 
+/**
+ * `NoImplicit` provides a way to ensure that a particular implicit doesn't
+ * exist. It is often useful to work-around annoying ambiguous implicit
+ * problems.
+ */
+final class NoImplicit[A]
+object NoImplicit {
+  implicit def noImplicit0[A] = new NoImplicit[A]
+  implicit def noImplicit1[A](implicit ev: A) = new NoImplicit[A]
+}
+
 object implicits {
 
   implicit def additiveMonoidOps[A:AdditiveSemigroup](a:A) = new AdditiveSemigroupOps(a)
@@ -344,6 +355,7 @@ object implicits {
   implicit def intToA[A](n:Int)(implicit c:ConvertableTo[A]): A = c.fromInt(n)
   implicit def convertableOps[A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
   implicit def conversionOps[A](a: A) = new ConversionOps(a)
+
 }
 
 object syntax {
