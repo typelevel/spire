@@ -96,22 +96,6 @@ with InnerProductSpace[Complex[A], A] with RingAlgebra[Complex[A], A] {
     scalar.plus(scalar.times(x.real, y.real), scalar.times(x.imag, y.imag))
 }
 
-trait SeqInnerProductSpace[A, SA <: SeqLike[A, SA]] extends SeqVectorSpace[A, SA]
-with InnerProductSpace[SA, A] {
-  def dot(x: SA, y: SA): A = {
-    @tailrec
-    def loop(xi: Iterator[A], yi: Iterator[A], acc: A): A = {
-      if (xi.hasNext && yi.hasNext) {
-        loop(xi, yi, scalar.plus(acc, scalar.times(xi.next(), yi.next())))
-      } else {
-        acc
-      }
-    }
-
-    loop(x.toIterator, y.toIterator, scalar.zero)
-  }
-}
-
 trait ArrayInnerProductSpace[@spec(Int,Long,Float,Double) A] extends ArrayVectorSpace[A]
 with InnerProductSpace[Array[A], A] {
   def dot(x: Array[A], y: Array[A]): A = {
