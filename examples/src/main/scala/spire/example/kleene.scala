@@ -124,6 +124,7 @@ object KleeneExample {
   implicit val bhs = Show.BooleanHasShow
   implicit val ehs = Show.EdgeHasShow
   implicit def ohs[A: Show] = Show.optionHasShow[A]
+  implicit def shs[A: Show] = Show.streamHasShow[A]
   implicit def exprhs[A: Show] = Show.exprHasShow[A]
   implicit def ths[A: Show] = Show.tropicalHasShow[A]
 
@@ -174,7 +175,119 @@ object KleeneExample {
       m
     }
     println("weights:\n%s" format weighted.show)
-    println("shortest:\n%s" format kt.kstar(weighted).show)
+    println("least-cost:\n%s" format kt.kstar(weighted).show)
+
+    case class ShortestPath[A, B](a: Tropical[A], b: B) {
+      def map[C](f: B => C) = ShortestPath[A, C](a, f(b))
+    }
+
+    implicit def tropicalHasOrder[A](implicit ord: Order[A]) = new Order[Tropical[A]] {
+      def eqv(x: Tropical[A], y: Tropical[A]) = compare(x, y) == 0
+      def compare(x: Tropical[A], y: Tropical[A]) = (x, y) match {
+        case (Infinity(), Infinity()) => 0
+        case (Infinity(), _) => 1
+        case (_, Infinity()) => -1
+        case (Finite(a1), Finite(a2)) => ord.compare(a1, a2)
+      }
+    }
+
+    implicit def kleeneAlgebraHasRig[A](implicit ev: KleeneAlgebra[A]): Rig[A] = ev
+
+    implicit def shortestPathHasKleeneAlgebra[A, B](implicit rig: Rig[Tropical[A]], ord: Order[Tropical[A]], kb: KleeneAlgebra[B]) =
+      new KleeneAlgebra[ShortestPath[A, B]] {
+        def zero = ShortestPath(rig.zero, kb.zero)
+
+        def one = ShortestPath(rig.one, kb.one)
+
+        def plus(x: ShortestPath[A, B], y: ShortestPath[A, B]) = (x.a compare y.a) match {
+          case -1 => x
+          case 0 => ShortestPath(x.a + y.a, x.b + y.b)
+          case 1 => y
+        }
+
+        def times(x: ShortestPath[A, B], y: ShortestPath[A, B]) =
+          ShortestPath(x.a * y.a, x.b * y.b)
+
+        override def kstar(x: ShortestPath[A, B]) =
+          ShortestPath(rig.one, if (x.a === rig.one) kb.kstar(x.b) else kb.one)
+      }
+
+    implicit def shortestPathHasShow[A: Show, B: Show] =
+      new Show[ShortestPath[A, B]] {
+        def show(sp: ShortestPath[A, B]) = sp match {
+          case ShortestPath(a, b) =>
+            "%s[%s]" format (Show[B].show(b), Show[Tropical[A]].show(a))
+        }
+      }
+
+    val annotated = Matrix[ShortestPath[Int, Expr[Edge]]] { (x, y) =>
+      weighted(x, y) match {
+        case Infinity() =>
+          ShortestPath(Infinity(), KleeneAlgebra[Expr[Edge]].zero)
+        case Finite(n) =>
+          ShortestPath(Finite(n), Var(Edge(y, x)))
+      }
+    }
+
+    val ks = KleeneAlgebra[Matrix[ShortestPath[Int, Expr[Edge]]]]
+    println("annotated-re:\n%s" format annotated.show)
+    println("shortest-path-re:\n%s" format ks.kstar(annotated).show)
+
+    type SS[W] = Stream[Stream[W]]
+    case class Language[W](wss: SS[W])
+
+    implicit def languageHasKleeneAlgebra[W] = new KleeneAlgebra[Language[W]] {
+      def zero: Language[W] = Language(Stream.empty[Stream[W]])
+      def one: Language[W] = Language(Stream(Stream.empty[W]))
+
+      def plus(x: Language[W], y: Language[W]): Language[W] = {
+        def interleave(ws1: SS[W], ws2: SS[W]): SS[W] =
+          if (ws1.isEmpty) ws2 else ws1.head #:: interleave(ws2, ws1)
+        Language(interleave(x.wss, y.wss))
+      }
+
+      def times(x: Language[W], y: Language[W]): Language[W] =
+        Language(x.wss.flatMap(ws1 => y.wss.map(ws2 => ws1 #::: ws2)))
+
+      override def kstar(x: Language[W]): Language[W] = {
+        def plusList(z: Language[W]): Language[W] =
+          if (z.wss.isEmpty) zero else Language(z.wss #::: kstar(z).wss)
+        plus(one, plusList(x))
+      }
+    }
+
+    implicit def languageHasShow[W: Show] = new Show[Language[W]] {
+      def show(l: Language[W]) = Show[SS[W]].show(l.wss)
+    }
+
+    def someWord[W](lang: Language[W]): Option[List[W]] =
+      lang.wss.headOption.map(_.toList)
+
+    val langed = Matrix[ShortestPath[Int, Language[Edge]]] { (x, y) =>
+      weighted(x, y) match {
+        case Infinity() =>
+          ShortestPath(Infinity(), KleeneAlgebra[Language[Edge]].zero)
+        case Finite(n) =>
+          ShortestPath(Finite(n), Language(Stream(Stream(Edge(y, x)))))
+      }
+    }
+
+    val ksl = KleeneAlgebra[Matrix[ShortestPath[Int, Language[Edge]]]]
+    println("l-annotated:\n%s" format langed.show)
+    val sp = ksl.kstar(langed).map {
+      case ShortestPath(_, lang) => someWord(lang)
+    }
+    println("l-shortest-path:\n%s" format sp.show)
+
+    def evalExpr[A, B](expr: Expr[A])(f: A => B)(implicit k: KleeneAlgebra[B]): B =
+      expr match {
+        case Nul() => k.zero
+        case Empty() => k.one
+        case Var(a) => f(a)
+        case Star(x) => k.kstar(evalExpr(x)(f))
+        case Or(x, y) => evalExpr(x)(f) + evalExpr(y)(f)
+        case Then(x, y) => evalExpr(x)(f) * evalExpr(y)(f)
+      }
   }
 
   def main(args: Array[String]) {
@@ -221,7 +334,7 @@ object ExprGraph {
 trait Matrix[A] { lhs =>
   def dim: Dim
   def apply(x: Int, y: Int): A
-  def map[B: Rig: ClassTag](f: A => B): Matrix[B]
+  def map[B: ClassTag](f: A => B): Matrix[B]
   def +(rhs: Matrix[A])(implicit rig: Rig[A]): Matrix[A]
   def *(rhs: Matrix[A])(implicit rig: Rig[A]): Matrix[A]
 
@@ -281,7 +394,7 @@ case class ArrayMatrix[A](arr: Array[A])(implicit val dim: Dim, ct: ClassTag[A])
 
   def update(x: Int, y: Int, a: A): Unit = arr(y * dim.n + x) = a
 
-  def map[B: Rig: ClassTag](f: A => B): Matrix[B] =
+  def map[B: ClassTag](f: A => B): Matrix[B] =
     ArrayMatrix(arr.map(f))
 
   def +(rhs: Matrix[A])(implicit rig: Rig[A]): Matrix[A] =
@@ -320,7 +433,16 @@ object Show {
   }
 
   implicit def optionHasShow[A](implicit ev: Show[A]) = new Show[Option[A]] {
-    def show(a: Option[A]) = a.map(ev.show).toString
+    def show(a: Option[A]) = a.map(ev.show).getOrElse("-")
+  }
+
+  implicit def listHasShow[A](implicit ev: Show[A]) = new Show[List[A]] {
+    def show(a: List[A]) = a.map(ev.show).mkString("[", ",", "]")
+  }
+
+  implicit def streamHasShow[A](implicit ev: Show[A]) = new Show[Stream[A]] {
+    def show(s: Stream[A]) =
+      if (s.isEmpty) "[]" else "[%s,...]" format ev.show(s.head)
   }
 
   implicit def tropicalHasShow[A](implicit ev: Show[A]) = new Show[Tropical[A]] {
