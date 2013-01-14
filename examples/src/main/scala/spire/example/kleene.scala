@@ -297,6 +297,7 @@ object Xyz {
 
   object Tropical {
     def apply[A](a: A): Tropical[A] = Finite(a)
+    def inf[A]: Tropical[A] = Infinity()
   }
 
   implicit def tropicalHasShow[A: Show] = new Show[Tropical[A]] {
@@ -378,6 +379,9 @@ object Xyz {
   case class Language[W](wss: SS[W]) {
     def someWord: Option[List[W]] = wss.headOption.map(_.toList)
   }
+  object Language {
+    def letter[W](w: W): Language[W] = Language(Stream(Stream(w)))
+  }
 
   // handy type alias
   type SS[W] = Stream[Stream[W]]
@@ -413,11 +417,16 @@ object Xyz {
     // our example graph will be 5x5
     implicit val dim = Dim(5)
 
-    // build our example graph from a sequence of directional edges
-    val edges: List[Edge] = List(
-      Edge(0, 1), Edge(1, 2), Edge(2, 3), Edge(2, 4), Edge(3, 1), Edge(4, 3)
+    // edges for this example
+    val edges = List(
+      Edge(0, 1),
+      Edge(1, 2),
+      Edge(2, 3), Edge(2, 4),
+      Edge(3, 1),
+      Edge(4, 3)
     )
 
+    // build the example graph
     val example: Matrix[Boolean] = Graph(edges:_*)
 
     // examine the graph
@@ -429,16 +438,15 @@ object Xyz {
     println("labels:\n%s" format labeled.show)
 
     val expred = labeled.map(_.map(Expr.apply).getOrElse(Nul()))
-
-    println("expr:\n%s" format expred.show)
-    println("re:\n%s" format expred.kstar.show)
+    println("exprs:\n%s" format expred.show)
+    println("path exprs:\n%s" format expred.kstar.show)
   }
 
   def pathExample() {
     // our example graph will be 5x5
     implicit val dim = Dim(6)
 
-    val edges: List[(Edge, Int)] = List(
+    val edges = List(
       (Edge(0, 1), 7), (Edge(0, 2), 9), (Edge(0, 5), 14),
       (Edge(1, 2), 10), (Edge(1, 3), 15),
       (Edge(2, 3), 11), (Edge(2, 5), 2),
@@ -447,24 +455,21 @@ object Xyz {
     )
 
     val weighted: Matrix[Tropical[Int]] = {
-      val m = ArrayMatrix(Array.fill[Tropical[Int]](dim.n * dim.n)(Infinity()))
-      edges.foreach {
-        case (Edge(y, x), n) =>
-          // undirected graph
-          m(x, y) = Tropical(n)
-          m(y, x) = Tropical(n)
+      val m = ArrayMatrix(Array.fill(dim.n * dim.n)(Tropical.inf[Int]))
+      edges.foreach { case (Edge(y, x), n) =>
+        m(x, y) = Tropical(n)
+        m(y, x) = Tropical(n)
       }
       m
     }
+
     println("weights:\n%s" format weighted.show)
     println("least-cost:\n%s" format weighted.kstar.show)
 
     val annotated = Matrix[ShortestPath[Int, Expr[Edge]]] { (x, y) =>
       weighted(x, y) match {
-        case Infinity() =>
-          ShortestPath(Infinity(), Kleene[Expr[Edge]].zero)
-        case Finite(n) =>
-          ShortestPath(Finite(n), Var(Edge(y, x)))
+        case Infinity() => ShortestPath(Infinity(), Kleene[Expr[Edge]].zero)
+        case Finite(n) => ShortestPath(Finite(n), Var(Edge(y, x)))
       }
     }
 
@@ -473,25 +478,31 @@ object Xyz {
 
     val langed = Matrix[ShortestPath[Int, Language[Edge]]] { (x, y) =>
       weighted(x, y) match {
-        case Infinity() =>
-          ShortestPath(Infinity(), Kleene[Language[Edge]].zero)
-        case Finite(n) =>
-          ShortestPath(Finite(n), Language(Stream(Stream(Edge(y, x)))))
+        case Infinity() => ShortestPath(Infinity(), Kleene[Language[Edge]].zero)
+        case Finite(n) => ShortestPath(Finite(n), Language.letter(Edge(y, x)))
       }
     }
 
     println("l-annotated:\n" + langed.show)
     println("l-shortest-path:\n" + langed.kstar.map(_.b.someWord).show)
 
-    def evalExpr[A, B](expr: Expr[A])(f: A => B)(implicit k: Kleene[B]): B =
-      expr match {
-        case Nul() => k.zero
-        case Empty() => k.one
-        case Var(a) => f(a)
-        case Star(x) => evalExpr(x)(f).kstar
-        case Or(x, y) => evalExpr(x)(f) + evalExpr(y)(f)
-        case Then(x, y) => evalExpr(x)(f) * evalExpr(y)(f)
-      }
+    def evalExpr[A, B: Kleene](expr: Expr[A])(f: A => B): B = expr match {
+      case Nul() => Kleene[B].zero
+      case Empty() => Kleene[B].one
+      case Var(a) => f(a)
+      case Star(x) => evalExpr(x)(f).kstar
+      case Or(x, y) => evalExpr(x)(f) + evalExpr(y)(f)
+      case Then(x, y) => evalExpr(x)(f) * evalExpr(y)(f)
+    }
+
+    val costExprs: Matrix[Expr[Int]] = annotated.map {
+      case ShortestPath(Infinity(), _) => Nul()
+      case ShortestPath(Finite(n), _) => Expr(n)
+    }
+    val leastCostExprs: Matrix[Tropical[Int]] =
+      costExprs.kstar.map(a => evalExpr(a)(Tropical.apply))
+
+    println("least-cost via evalExpr:\n" + leastCostExprs.show)
   }
 
   def main(args: Array[String]) {
