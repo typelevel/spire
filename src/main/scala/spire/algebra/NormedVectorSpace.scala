@@ -15,7 +15,9 @@ extends VectorSpace[V, F] with MetricSpace[V, F] {
   def distance(v: V, w: V): F = norm(minus(v, w))
 }
 
-object NormedVectorSpace extends NormedVectorSpace0 with NormedVectorSpaceFunctions
+object NormedVectorSpace extends NormedVectorSpace0 with NormedVectorSpaceFunctions {
+  @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: NormedVectorSpace[V, R]) = V
+}
 
 trait NormedVectorSpace0 {
   implicit def InnerProductSpaceIsNormedVectorSpace[V, @spec(Int, Long, Float, Double) F](implicit

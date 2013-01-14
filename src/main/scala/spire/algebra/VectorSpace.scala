@@ -14,7 +14,9 @@ trait VectorSpace[V, @spec(Int, Long, Float, Double) F] extends Module[V, F] {
   def divr(v: V, f: F): V = timesl(scalar.reciprocal(f), v)
 }
 
-object VectorSpace extends VectorSpace2
+object VectorSpace extends VectorSpace2 {
+  @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: VectorSpace[V, R]) = V
+}
 
 trait VectorSpace0 {
   implicit def seq[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],

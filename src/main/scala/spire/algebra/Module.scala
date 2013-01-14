@@ -26,7 +26,9 @@ trait RightModule[V, @spec(Int,Long,Float,Double) R] extends AdditiveGroup[V] {
   def timesr(v: V, r: R): V
 }
 
-object Module extends Module2
+object Module extends Module2 {
+  @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: Module[V, R]) = V
+}
 
 final class ModuleOps[V, F](rhs: V)(implicit ev: Module[V, F]) {
   def *: (lhs:F): V = macro Ops.rbinop[F, V]

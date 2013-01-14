@@ -16,7 +16,9 @@ trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends NormedVect
   def dot(v: V, w: V): F
 }
 
-object InnerProductSpace extends InnerProductSpace1
+object InnerProductSpace extends InnerProductSpace1 {
+  @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: InnerProductSpace[V, R]) = V
+}
 
 final class InnerProductSpaceOps[V](lhs: V) {
   def dot[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
