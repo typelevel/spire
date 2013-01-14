@@ -11,7 +11,7 @@ import scala.reflect.ClassTag
 import scala.annotation.tailrec
 
 /**
- * This example is taken from http://r6.ca/blog/20110808T035622Z.html.
+ * These examples are taken from http://r6.ca/blog/20110808T035622Z.html.
  *
  * The goal is to try to do as direct a translation as possible from the
  * Haskell, to see how well we can do with Spire.
@@ -19,7 +19,6 @@ import scala.annotation.tailrec
  * The original example is in literate Haskell with good comments, so consult
  * the link for more information.
  */
-
 object Xyz {
 
   /**
@@ -39,6 +38,9 @@ object Xyz {
   implicit object IntHasShow extends Show[Int] {
     def show(a: Int) = a.toString
   }
+  implicit object DoubleHasShow extends Show[Double] {
+    def show(a: Double) = a.toString
+  }
   implicit object BooleanHasShow extends Show[Boolean] {
     def show(a: Boolean) = if (a) "x" else "."
   }
@@ -54,26 +56,58 @@ object Xyz {
   }
 
   /**
-   * A Kleene is a Rig with asteration (kstar).
+   * StarRig[A] is a Rig[A] that also has an asteration operator: kstar.
+   * 
+   * Laws:
+   * 1. a.star = 1 + a * a.star = 1 + a.star * a
+   */
+  trait StarRig[A] extends Rig[A] {
+    // one of these must be overridden in any type class instance
+    def kstar(a: A): A = plus(one, kplus(a))
+    def kplus(a: A): A = times(a, kstar(a))
+  }
+  object StarRig {
+    def apply[A](implicit ev: StarRig[A]) = ev
+  }
+
+  implicit def starRigHasRig[A](implicit ev: StarRig[A]): Rig[A] = ev
+
+  implicit class StarRigOps[A: StarRig](a: A) {
+    def kstar: A = StarRig[A].kstar(a)
+    def kplus: A = StarRig[A].kplus(a)
+  }
+
+  implicit def matrixHasStarRig[A](implicit dim: Dim, sr: StarRig[A], ct: ClassTag[A]) =
+    new StarRig[Matrix[A]] {
+      def zero: Matrix[A] = Matrix.zero
+      def one: Matrix[A] = Matrix.one
+      def plus(x: Matrix[A], y: Matrix[A]) = x + y
+      def times(x: Matrix[A], y: Matrix[A]) = x * y
+
+      override def kplus(m: Matrix[A]) = {
+        def f(k: Int, m: Matrix[A]) = Matrix[A] { (x, y) =>
+          m(x, y) + m(k, y) * m(k, k).kstar * m(x, k)
+        }
+        @tailrec def loop(m: Matrix[A], i: Int): Matrix[A] =
+          if (i >= 0) loop(f(i, m), i - 1) else m
+        loop(m, dim.n - 1)
+      }
+    }
+
+  /**
+   * A Kleene is a StarRig which obeys some additional laws.
    *
    * Laws:
    * 1. a + a = a
    * 2. a * x + x = x  ==> a.kstar * x + x = x
    * 3. x * a + x = x  ==>  x * a.kstar + x = x
    */
-  trait Kleene[A] extends Rig[A] {
-    // one of these must be overridden in any type class instance
-    def kstar(a: A): A = plus(one, kplus(a))
-    def kplus(a: A): A = times(a, kstar(a))
-  }
+  trait Kleene[A] extends StarRig[A]
   object Kleene {
     def apply[A](implicit ev: Kleene[A]) = ev
   }
-  implicit def kleeneHasRig[A: Kleene]: Rig[A] = Kleene[A]
-  implicit class KleeneOps[A: Kleene](a: A) {
-    def kstar: A = Kleene[A].kstar(a)
-    def kplus: A = Kleene[A].kplus(a)
-  }
+
+  implicit def xyz[A](implicit ev: Kleene[A]): StarRig[A] = ev
 
   // Kleene[A] instances for built-in types
   implicit object BooleanHasKleene extends Kleene[Boolean] with BooleanIsRig {
@@ -412,7 +446,53 @@ object Xyz {
     }
   }
 
+  /**
+   * 
+   */
+  trait Compact[A] {
+    def map[B: Field](f: A => B): Compact[B] = this match {
+      case CompactReal(a) => CompactReal(f(a))
+      case _ => CompactInf()
+    }
+  }
+  case class CompactInf[A]() extends Compact[A]
+  case class CompactReal[A: Field](a: A) extends Compact[A]
+  object Compact {
+    def apply[A: Field](a: A): Compact[A] = CompactReal(a)
+  }
 
+  implicit def compactHasShow[A: Show] = new Show[Compact[A]] {
+    def show(c: Compact[A]) = c match {
+      case CompactReal(a) => a.show
+      case _ => "∞"
+    }
+  }
+
+  implicit def compactIsStarRig[A: Field] = new StarRig[Compact[A]] {
+    val zero: Compact[A] = Compact(Field[A].zero)
+    val one: Compact[A] = Compact(Field[A].one)
+    def plus(x: Compact[A], y: Compact[A]): Compact[A] = (x, y) match {
+      case (CompactInf(), _) => CompactInf()
+      case (_, CompactInf()) => CompactInf()
+      case (CompactReal(a), CompactReal(b)) => Compact(a + b)
+    }
+    def times(x: Compact[A], y: Compact[A]): Compact[A] = (x, y) match {
+      case (`zero`, _) => zero
+      case (_, `zero`) => zero
+      case (CompactInf(), _) => CompactInf()
+      case (_, CompactInf()) => CompactInf()
+      case (CompactReal(a), CompactReal(b)) => Compact(a * b)
+    }
+    override def kstar(x: Compact[A]): Compact[A] = x match {
+      case `one` => CompactInf()
+      case CompactInf() => CompactInf()
+      case CompactReal(a) => CompactReal((Field[A].one - a).reciprocal)
+    }
+  }
+
+  /**
+   * 
+   */
   def graphExample() {
     // our example graph will be 5x5
     implicit val dim = Dim(5)
@@ -505,10 +585,23 @@ object Xyz {
     println("least-cost via evalExpr:\n" + leastCostExprs.show)
   }
 
+  def solvingExample() {
+    // our example matrix is 2x2
+    implicit val dim = Dim(2)
+
+    val m: Matrix[Compact[Double]] = ArrayMatrix(Array(2.0, 1.0, 0.0, 2.0)).map(n => Compact(n))
+    println("2x2 matrix:\n" + m.show)
+    println("2x2 asteration:\n" + m.kstar.show)
+
+    def negate(m: Matrix[Compact[Double]]) = m.map(_.map(-_))
+    val one = Matrix.one[Compact[Double]]
+    def inverse(m: Matrix[Compact[Double]]) = (one + negate(m)).kstar
+    println("2x2 inverse:\n" + inverse(m).show)
+  }
+
   def main(args: Array[String]) {
     graphExample()
     pathExample()
+    solvingExample()
   }
-
-
 }
