@@ -1,5 +1,7 @@
 package spire.algebra
 
+import spire.math.Order
+
 import scala.annotation.tailrec
 import scala.collection.SeqLike
 import scala.collection.mutable.Builder
@@ -76,5 +78,56 @@ with InnerProductSpace[SA, A] {
     }
 
     loop(x.toIterator, y.toIterator, scalar.zero)
+  }
+}
+
+/**
+ * The L_p norm is equal to the `p`-th root of the sum of each element to the
+ * power `p`. For instance, if `p = 1` we have the Manhattan distance. If you'd
+ * like the Euclidean norm (`p = 2`), then you'd probably be best to use an
+ * `InnerProductSpace` instead.
+ */
+trait SeqLpNormedVectorSpace[A, SA <: SeqLike[A, SA]] extends SeqVectorSpace[A, SA]
+with NormedVectorSpace[SA, A] {
+  def nroot: NRoot[A]
+  def signed: Signed[A]
+
+  def p: Int
+
+  def norm(v: SA): A = {
+    @tailrec
+    def loop(xi: Iterator[A], acc: A): A = {
+      if (xi.hasNext) {
+        loop(xi, scalar.plus(acc, signed.abs(scalar.pow(xi.next(), p))))
+      } else {
+        nroot.nroot(acc, p)
+      }
+    }
+
+    loop(v.toIterator, scalar.zero)
+  }
+}
+
+/**
+ * The norm here uses the absolute maximum of the coordinates (ie. the L_inf
+ * norm).
+ */
+trait SeqMaxNormedVectorSpace[A, SA <: SeqLike[A, SA]] extends SeqVectorSpace[A, SA]
+with NormedVectorSpace[SA, A] {
+  def order: Order[A]
+  def signed: Signed[A]
+
+  def norm(v: SA): A = {
+    @tailrec
+    def loop(xi: Iterator[A], acc: A): A = {
+      if (xi.hasNext) {
+        val x = signed.abs(xi.next())
+        loop(xi, if (order.gt(x, acc)) x else acc)
+      } else {
+        acc
+      }
+    }
+
+    loop(v.toIterator, scalar.zero)
   }
 }
