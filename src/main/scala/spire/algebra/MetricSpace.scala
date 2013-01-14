@@ -11,6 +11,8 @@ object MetricSpace extends MetricSpace0 with MetricSpaceFunctions {
 }
 
 trait MetricSpace0 {
+  implicit def editDistance: MetricSpace[String, Int] = string.LevenshteinDistance
+
   implicit def NormedVectorSpaceIsMetricSpace[V, @spec(Float,Double) R](implicit
       V: NormedVectorSpace[V, R]): MetricSpace[V, R] = V
 }

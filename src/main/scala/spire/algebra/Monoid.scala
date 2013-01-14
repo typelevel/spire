@@ -27,11 +27,6 @@ trait Monoid0 {
     cbf: CanBuildFrom[CC[A], A, CC[A]]): Monoid[CC[A]] = new CollMonoid[A, CC[A]]
 }
 
-trait StringMonoid extends Monoid[String] {
-  def id = ""
-  def op(x: String, y: String): String = x + y
-}
-
 final class CollMonoid[A, SA <: TraversableLike[A, SA]](implicit cbf: CanBuildFrom[SA, A, SA]) extends Monoid[SA] {
   def id: SA = cbf().result()
   def op(x: SA, y: SA): SA = x.++(y)(cbf)
