@@ -76,11 +76,11 @@ object GenProductTypes {
       "      val %s%d = _%s%d" format (prefix, i, prefix, i)
     } mkString "\n"
 
-    """  implicit def apply[%s](implicit %s): %s[(%s)] = {
+    """  implicit def %s[%s](implicit %s): %s[(%s)] = {
       |    new %s[%s] {
       |%s
       |    }
-      |  }""".stripMargin format (types, implicits, structure, types, name, types, members)
+      |  }""".stripMargin format (name, types, implicits, structure, types, name, types, members)
   }
 
   def productTrait(blocks0: List[Block]): Block = { tpe =>
@@ -94,7 +94,7 @@ object GenProductTypes {
     } mkString "\n"
 
     """trait %sProductImplicits {
-      |  %s
+      |%s
       |}""".stripMargin format (defn.structure, implicits)
   }
 
