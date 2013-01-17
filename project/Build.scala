@@ -2,12 +2,6 @@ import sbt._
 import sbt.Keys._
 
 object MyBuild extends Build {
-
-  //def write(fileName: String, source: String) {
-  //  val file = (sourceDir / "spire" / ... / fileName).asFile
-  //  IO.write(file, source)
-  //}
-
   override lazy val settings = super.settings ++ Seq(
     name := "spire",
     organization := "org.spire-math",
