@@ -20,7 +20,7 @@ final class FieldOps[A](lhs:A)(implicit ev:Field[A]) {
   def round() = macro Ops.unop[A]
 }
 
-object Field {
+object Field extends FieldProductImplicits {
   implicit object FloatIsField extends FloatIsField
   implicit object DoubleIsField extends DoubleIsField
   implicit object BigDecimalIsField extends BigDecimalIsField

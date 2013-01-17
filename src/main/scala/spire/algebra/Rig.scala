@@ -24,7 +24,7 @@ trait Rig[@spec(Int,Long,Float,Double) A] extends Semiring[A] with AdditiveMonoi
     else _pow(times(a, a), n / 2, sofar)
 }
 
-object Rig {
+object Rig extends RigProductImplicits {
   implicit object BooleanIsRig extends BooleanIsRig
   implicit object UByteIsRig extends UByteIsRig
   implicit object UShortIsRig extends UShortIsRig

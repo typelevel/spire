@@ -65,7 +65,7 @@ final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
   def max(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) max rhs
 }
 
-object Order {
+object Order extends OrderProductImplicits {
   implicit object ByteOrder extends ByteOrder
   implicit object ShortOrder extends ShortOrder
   implicit object CharOrder extends CharOrder

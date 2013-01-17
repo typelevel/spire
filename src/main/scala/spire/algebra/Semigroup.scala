@@ -15,7 +15,7 @@ object Semigroup extends Semigroup0 {
   @inline final def apply[A](implicit s: Semigroup[A]) = s
 }
 
-trait Semigroup0 {
+trait Semigroup0 extends SemigroupProductImplicits {
   implicit def monoid[A: Monoid]: Semigroup[A] = Monoid[A]
 }
 

@@ -16,7 +16,7 @@ object Monoid extends Monoid1 {
   @inline final def apply[A](implicit m: Monoid[A]): Monoid[A] = m
 }
 
-trait Monoid1 extends Monoid0 {
+trait Monoid1 extends Monoid0 with MonoidProductImplicits {
   implicit object StringMonoid extends StringMonoid
 }
 

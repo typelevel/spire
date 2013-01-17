@@ -29,7 +29,7 @@ trait Ring[@spec(Int,Long,Float,Double) A] extends Semiring[A] with Rig[A] with 
     else _fromInt(plus(a, a), n / 2, sofar)
 }
 
-object Ring {
+object Ring extends RingProductImplicits {
   implicit object ByteIsRing extends ByteIsRing
   implicit object ShortIsRing extends ShortIsRing
   implicit object IntIsRing extends IntIsRing

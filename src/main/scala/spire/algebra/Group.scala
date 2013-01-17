@@ -20,7 +20,7 @@ object Group extends Group0 {
  */
 trait AbGroup[@spec(Int,Long,Float,Double) A] extends Group[A]
 
-object AbGroup {
+object AbGroup extends AbGroupProductImplicits {
   @inline final def apply[A](implicit ev: AbGroup[A]) = ev
 }
 
@@ -28,6 +28,6 @@ final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
   def inverse() = macro Ops.unop[A]
 }
 
-trait Group0 {
+trait Group0 extends GroupProductImplicits {
   implicit def abGroup[A: AbGroup]: Group[A] = AbGroup[A]
 }
