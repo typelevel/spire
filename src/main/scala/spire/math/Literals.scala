@@ -7,6 +7,12 @@ import spire.macrosk.Macros
 class Literals(s:StringContext) {
   def b():Byte = macro Macros.byte
   def h():Short = macro Macros.short
+
+  def ub():UByte = macro Macros.ubyte
+  def uh():UShort = macro Macros.ushort
+  def ui():UInt = macro Macros.uint
+  def ul():ULong = macro Macros.ulong
+
   def r():Rational = macro Macros.rational
 }
 

@@ -19,10 +19,11 @@ class LiteralsTest extends FunSuite {
 
   test("illegal byte literals") {
     import spire.macrosk._
-    assert(Macros.parseByte("-129") === Left("illegal byte constant: -129"))
-    assert(Macros.parseByte("256") === Left("illegal byte constant: 256"))
-    assert(Macros.parseByte("10000") === Left("illegal byte constant: 10000"))
-    assert(Macros.parseByte("abc") === Left("illegal byte constant: abc"))
+    def tryit(s: String) = Macros.parseNumber(s, BigInt(-128), BigInt(255))
+    assert(tryit("-129") === Left("illegal constant: -129"))
+    assert(tryit("256") === Left("illegal constant: 256"))
+    assert(tryit("10000") === Left("illegal constant: 10000"))
+    assert(tryit("abc") === Left("illegal constant: abc"))
   }
 
   test("short literals") {
