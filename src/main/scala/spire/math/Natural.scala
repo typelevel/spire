@@ -211,14 +211,27 @@ sealed trait Natural {
   def <=(r: UInt): Boolean = (lhs compare r) <= 0
   def >(r: UInt): Boolean = (lhs compare r) > 0
   def >=(r: UInt): Boolean = (lhs compare r) >= 0
+  def <(r: BigInt): Boolean = (lhs.toBigInt compare r) < 0
+  def <=(r: BigInt): Boolean = (lhs.toBigInt compare r) <= 0
+  def >(r: BigInt): Boolean = (lhs.toBigInt compare r) > 0
+  def >=(r: BigInt): Boolean = (lhs.toBigInt compare r) >= 0
 
   // implemented in Digit and End
   def +(rd: UInt): Natural
   def -(rd: UInt): Natural
   def *(rd: UInt): Natural
+  def /~(rd: UInt): Natural = lhs / rd
   def /(rd: UInt): Natural
   def %(rd: UInt): Natural
   def /%(rd: UInt): (Natural, Natural)
+
+  def +(rhs: BigInt): BigInt = lhs.toBigInt + rhs
+  def -(rhs: BigInt): BigInt = lhs.toBigInt - rhs
+  def *(rhs: BigInt): BigInt = lhs.toBigInt * rhs
+  def /~(rhs: BigInt): BigInt = lhs.toBigInt / rhs
+  def /(rhs: BigInt): BigInt = lhs.toBigInt / rhs
+  def %(rhs: BigInt): BigInt = lhs.toBigInt % rhs
+  def /%(rhs: BigInt): (BigInt, BigInt) = lhs.toBigInt /% rhs
 
   def +(rhs: Natural): Natural = {
     def recur(left: Natural, right: Natural, carry: Long): Natural = left match {
@@ -312,6 +325,8 @@ sealed trait Natural {
     }
     _pow(Natural(1), lhs, rhs)
   }
+
+  def /~(rhs: Natural): Natural = lhs / rhs
 
   def /(rhs: Natural): Natural = {
     rhs match {
@@ -491,6 +506,8 @@ sealed trait Natural {
 // this way we can protect end-users from sign problems
 object Natural {
   private[math] final val denom = UInt(1000000000)
+
+  implicit def naturalToBigInt(n: Natural): BigInt = n.toBigInt
 
   // required in big-endian order
   def apply(us: UInt*): Natural = {
