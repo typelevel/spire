@@ -3,6 +3,32 @@ package spire.algebra
 import scala.{ specialized => spec }
 import spire.macrosk.Ops
 
+object Multiplicative {
+  def apply[A](s: Semigroup[A]): MultiplicativeSemigroup[A] =
+    new MultiplicativeSemigroup[A] {
+      def times(x: A, y: A): A = s.op(x, y)
+    }
+  def apply[A](m: Monoid[A]): MultiplicativeMonoid[A] =
+    new MultiplicativeMonoid[A] {
+      def times(x: A, y: A): A = m.op(x, y)
+      def one = m.id
+    }
+  def apply[A](g: Group[A]): MultiplicativeGroup[A] =
+    new MultiplicativeGroup[A] {
+      def times(x: A, y: A): A = g.op(x, y)
+      def div(x: A, y: A): A = g.op(x, g.inverse(y))
+      def one: A = g.id
+      override def reciprocal(x: A): A = g.inverse(x)
+    }
+  def apply[A](g: AbGroup[A]): MultiplicativeAbGroup[A] =
+    new MultiplicativeAbGroup[A] {
+      def times(x: A, y: A): A = g.op(x, y)
+      def div(x: A, y: A): A = g.op(x, g.inverse(y))
+      def one: A = g.id
+      override def reciprocal(x: A): A = g.inverse(x)
+    }
+}
+
 trait MultiplicativeSemigroup[@spec(Int,Long,Float,Double) A] {
   def multiplicative: Semigroup[A] = new Semigroup[A] {
     def op(x: A, y: A): A = times(x, y)

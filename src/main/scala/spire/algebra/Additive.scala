@@ -3,6 +3,32 @@ package spire.algebra
 import scala.{ specialized => spec }
 import spire.macrosk.Ops
 
+object Additive {
+  def apply[A](s: Semigroup[A]): AdditiveSemigroup[A] =
+    new AdditiveSemigroup[A] {
+      def plus(x: A, y: A): A = s.op(x, y)
+    }
+  def apply[A](m: Monoid[A]): AdditiveMonoid[A] =
+    new AdditiveMonoid[A] {
+      def plus(x: A, y: A): A = m.op(x, y)
+      def zero = m.id
+    }
+  def apply[A](g: Group[A]): AdditiveGroup[A] =
+    new AdditiveGroup[A] {
+      def plus(x: A, y: A): A = g.op(x, y)
+      override def minus(x: A, y: A): A = g.op(x, g.inverse(y))
+      def zero: A = g.id
+      def negate(x: A): A = g.inverse(x)
+    }
+  def apply[A](g: AbGroup[A]): AdditiveAbGroup[A] =
+    new AdditiveAbGroup[A] {
+      def plus(x: A, y: A): A = g.op(x, y)
+      override def minus(x: A, y: A): A = g.op(x, g.inverse(y))
+      def zero: A = g.id
+      def negate(x: A): A = g.inverse(x)
+    }
+}
+
 trait AdditiveSemigroup[@spec(Int,Long,Float,Double) A] {
   def additive: Semigroup[A] = new Semigroup[A] {
     def op(x: A, y: A): A = plus(x, y)
