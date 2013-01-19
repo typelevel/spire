@@ -4,6 +4,7 @@ import scala.{specialized => spec}
 
 import spire.macrosk.Ops
 import java.lang.Math
+import scala.collection.SeqLike
 
 trait Order[@spec A] extends Eq[A] {
   self =>
@@ -65,7 +66,7 @@ final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
   def max(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) max rhs
 }
 
-object Order extends OrderProductImplicits {
+object Order extends Order0 with OrderProductImplicits {
   implicit object ByteOrder extends ByteOrder
   implicit object ShortOrder extends ShortOrder
   implicit object CharOrder extends CharOrder
@@ -96,6 +97,14 @@ object Order extends OrderProductImplicits {
 
   implicit def ordering[A](implicit o: Order[A]) = new Ordering[A] {
     def compare(x: A, y: A) = o.compare(x, y)
+  }
+}
+
+trait Order0 {
+  implicit def seq[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Order[A]) = {
+    new SeqOrder[A, CC[A]] {
+      val A = A0
+    }
   }
 }
 

@@ -4,6 +4,7 @@ import scala.{specialized => spec}
 
 import spire.algebra.Zero
 import spire.macrosk.Ops
+import scala.collection.SeqLike
 
 trait Eq[@spec A] {
   def eqv(x:A, y:A): Boolean
@@ -51,7 +52,13 @@ trait Eq0 {
   implicit def generic[@spec A]: Eq[A] = new GenericEq[A]
 }
 
-trait Eq1 extends Eq0
+trait Eq1 extends Eq0 {
+  implicit def seq[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Eq[A]) = {
+    new SeqEq[A, CC[A]] {
+      val A = A0
+    }
+  }
+}
 
 private[this] class GenericEq[@spec A] extends Eq[A] {
   def eqv(x:A, y:A): Boolean = x == y
