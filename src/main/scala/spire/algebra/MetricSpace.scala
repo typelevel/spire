@@ -6,11 +6,18 @@ trait MetricSpace[V, @spec(Int, Long, Float, Double) R] {
   def distance(v: V, w: V): R
 }
 
-object MetricSpace extends MetricSpace0 with MetricSpaceFunctions {
+object MetricSpace extends MetricSpace1 with MetricSpaceFunctions {
   @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: MetricSpace[V, R]) = V
 }
 
 trait MetricSpace0 {
+  implicit def realMetricSpace[V, @spec(Int,Long,Float,Double) R](implicit
+      V: MetricSpace[V, R], R: IsReal[R]) = new MetricSpace[V, Double] {
+    def distance(v: V, w: V): Double = R.toDouble(V.distance(v, w))
+  }
+}
+
+trait MetricSpace1 extends MetricSpace0 {
   implicit def editDistance: MetricSpace[String, Int] = LevenshteinDistance
 
   implicit def NormedVectorSpaceIsMetricSpace[V, @spec(Float,Double) R](implicit
