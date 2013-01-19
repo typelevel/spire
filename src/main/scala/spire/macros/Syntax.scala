@@ -19,17 +19,12 @@ object Syntax {
       Select(Ident("scala"), newTermName("annotation")),
       List(ImportSelector(tailrec, 1161, tailrec, 1161)))
 
-    // TODO: why can't i get the freaking tailrec working??? ARGHGGH!!
-
-    //val mods = Modifiers(NoFlags, tpnme.EMPTY,
-    //  List(Apply(Select(New(Ident(tailrec)), nme.CONSTRUCTOR), List())))
     val mods = Modifiers(NoFlags, tpnme.EMPTY, List())
 
     val param = List(ValDef(Modifiers(Flag.PARAM), a, TypeTree(tpe), EmptyTree))
 
     val t = Block(
       List(
-        //importTailrec,
         DefDef(mods, w, List(), List(param), Ident(newTypeName("Unit")),
           If(Apply(test.tree, List(Ident(a))),
             Block(

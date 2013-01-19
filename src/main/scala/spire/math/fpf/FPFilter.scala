@@ -178,6 +178,9 @@ trait FPFilterIsEuclideanRing[A] extends FPFilterIsRing[A] with EuclideanRing[FP
 
   def mod(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
     new FPFilter(a.approx mod b.approx, ev.mod(a.value, b.value))
+
+  def gcd(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
+    euclid(a, b)(Eq[FPFilter[A]])
 }
 
 trait FPFilterIsField[A] extends FPFilterIsEuclideanRing[A] with Field[FPFilter[A]] {

@@ -14,12 +14,13 @@ trait EuclideanRing[@spec(Int,Long,Float,Double) A] extends Ring[A] {
   def mod(a:A, b:A):A
   def quotmod(a:A, b:A) = (quot(a, b), mod(a, b))
 
-  def gcd(a: A, b: A): A = euclid(a, b)
+  //def gcd(a: A, b: A)(implicit eq: Eq[A]): A = euclid(a, b)
+  def gcd(a: A, b: A): A
 
-  def lcm(a: A, b: A): A = times(quot(a, gcd(a, b)), b)
+  //def lcm(a: A, b: A)(implicit eq: Eq[A]): A = times(quot(a, gcd(a, b)), b)
 
-  @tailrec protected[this] final def euclid(a:A, b:A):A =
-    if (b == zero) a else euclid(b, mod(a, b))
+  @tailrec protected[this] final def euclid(a:A, b:A)(implicit eq: Eq[A]):A =
+    if (eq.eqv(b, zero)) a else euclid(b, mod(a, b))
 }
 
 final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
@@ -70,19 +71,19 @@ object EuclideanRing extends EuclideanRingProductImplicits {
 trait IntIsEuclideanRing extends EuclideanRing[Int] with IntIsRing {
   def quot(a:Int, b:Int) = a / b
   def mod(a:Int, b:Int) = a % b
-  override def gcd(a:Int, b:Int): Int = spire.math.gcd(a, b).toInt
+  def gcd(a:Int, b:Int): Int = spire.math.gcd(a, b).toInt
 }
 
 trait LongIsEuclideanRing extends EuclideanRing[Long] with LongIsRing {
   def quot(a:Long, b:Long) = a / b
   def mod(a:Long, b:Long) = a % b
-  override def gcd(a:Long, b:Long) = spire.math.gcd(a, b)
+  def gcd(a:Long, b:Long) = spire.math.gcd(a, b)
 }
 
 trait FloatIsEuclideanRing extends EuclideanRing[Float] with FloatIsRing {
   def quot(a:Float, b:Float) = (a - (a % b)) / b
   def mod(a:Float, b:Float) = a % b
-  override def gcd(a:Float, b:Float):Float = _gcd(Math.abs(a), Math.abs(b))
+  def gcd(a:Float, b:Float):Float = _gcd(Math.abs(a), Math.abs(b))
   @tailrec private def _gcd(a:Float, b:Float):Float = if (a < 1.0F) {
     1.0F
   } else if (b == 0.0F) {
@@ -112,13 +113,13 @@ trait DoubleIsEuclideanRing extends EuclideanRing[Double] with DoubleIsRing {
 trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] with BigIntIsRing {
   def quot(a:BigInt, b:BigInt) = a / b
   def mod(a:BigInt, b:BigInt) = a % b
-  override def gcd(a:BigInt, b:BigInt) = a.gcd(b)
+  def gcd(a:BigInt, b:BigInt) = a.gcd(b)
 }
 
 trait BigDecimalIsEuclideanRing extends EuclideanRing[BigDecimal] with BigDecimalIsRing {
   def quot(a:BigDecimal, b:BigDecimal) = a.quot(b)
   def mod(a:BigDecimal, b:BigDecimal) = a % b
-  override def gcd(a:BigDecimal, b:BigDecimal):BigDecimal = _gcd(a.abs, b.abs)
+  def gcd(a:BigDecimal, b:BigDecimal):BigDecimal = _gcd(a.abs, b.abs)
   @tailrec private def _gcd(a:BigDecimal, b:BigDecimal):BigDecimal = {
     if (a < one) {
       one
@@ -135,7 +136,7 @@ trait BigDecimalIsEuclideanRing extends EuclideanRing[BigDecimal] with BigDecima
 trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRing {
   def quot(a:Rational, b:Rational) = a.quot(b)
   def mod(a:Rational, b:Rational) = a % b
-  override def gcd(a:Rational, b:Rational):Rational = _gcd(a.abs, b.abs)
+  def gcd(a:Rational, b:Rational):Rational = _gcd(a.abs, b.abs)
   @tailrec private def _gcd(a:Rational, b:Rational):Rational = {
     if (a.compareToOne < 0) {
       Rational.one
@@ -152,12 +153,13 @@ trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRin
 trait RealIsEuclideanRing extends EuclideanRing[Real] with RealIsRing {
   def quot(a: Real, b: Real): Real = a /~ b
   def mod(a: Real, b: Real): Real = a % b
+  def gcd(a: Real, b: Real): Real = euclid(a, b)(Eq[Real])
 }
 
 trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with SafeLongIsRing {
   def quot(a:SafeLong, b:SafeLong) = a / b
   def mod(a:SafeLong, b:SafeLong) = a % b
-  override def gcd(a:SafeLong, b:SafeLong) = a.toBigInt.gcd(b.toBigInt)
+  def gcd(a:SafeLong, b:SafeLong) = a.toBigInt.gcd(b.toBigInt)
 }
 
 trait ComplexIsEuclideanRing[@spec(Float,Double) A]
@@ -165,7 +167,7 @@ extends ComplexIsRing[A] with EuclideanRing[Complex[A]] {
   override def quotmod(a:Complex[A], b:Complex[A]) = a /% b
   def quot(a:Complex[A], b:Complex[A]) = a /~ b
   def mod(a:Complex[A], b:Complex[A]) = a % b
-  override def gcd(a:Complex[A], b:Complex[A]):Complex[A] =
+  def gcd(a:Complex[A], b:Complex[A]):Complex[A] =
     _gcd(a, b, Fractional[A])
   @tailrec
   private def _gcd(a:Complex[A], b:Complex[A], f:Fractional[A]):Complex[A] = {
@@ -186,9 +188,11 @@ extends GaussianIsRing[A] with EuclideanRing[Gaussian[A]] {
   override def quotmod(a:Gaussian[A], b:Gaussian[A]) = a /% b
   def quot(a:Gaussian[A], b:Gaussian[A]) = a / b
   def mod(a:Gaussian[A], b:Gaussian[A]) = a % b
+  def gcd(a: Gaussian[A], b: Gaussian[A]): Gaussian[A] = euclid(a, b)(Eq[Gaussian[A]])
 }
 
 trait NumberIsEuclideanRing extends EuclideanRing[Number] with NumberIsRing {
   def quot(a:Number, b:Number) = a / b
   def mod(a:Number, b:Number) = a % b
+  def gcd(a: Number, b: Number): Number = euclid(a, b)(Eq[Number])
 }

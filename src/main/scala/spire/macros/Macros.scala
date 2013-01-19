@@ -6,63 +6,90 @@ import spire.math._
 import spire.algebra._
 
 object Macros {
-  def parseTree1(c:Context): String = {
+  def parseContext(c: Context, lower: BigInt, upper: BigInt): Either[String, BigInt] = {
     import c.mirror._
     import c.universe._
-    c.prefix.tree match {
-      case Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) => s
+    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
+    parseNumber(s, lower, upper)
+  }
+
+  def parseNumber(s: String, lower: BigInt, upper: BigInt): Either[String, BigInt] = {
+    try {
+      val n = BigInt(s)
+      if (n < lower || n > upper) Left("illegal constant: %s" format s) else Right(n)
+    } catch {
+      case _: Exception => Left("illegal constant: %s" format s)
     }
   }
 
-  def parseByte(s: String): Either[String, Byte] = try {
-    val i = s.toInt
-    if (i < -128 || i > 255) {
-      Left("illegal byte constant: %s" format s)
-    } else if (i > 127) {
-      Right((i - 256).toByte)
-    } else {
-      Right(i.toByte)
-    }
-  } catch {
-    case _: Exception => Left("illegal byte constant: %s" format s)
-  }
-
-  // byte literals
   def byte(c:Context)(): c.Expr[Byte] = {
     import c.mirror._
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    parseByte(s) match {
-      case Right(n) => c.Expr[Byte](Literal(Constant(n)))
+    parseContext(c, BigInt(-128), BigInt(255)) match {
+      case Right(n) => c.Expr[Byte](Literal(Constant(n.toByte)))
       case Left(s) => throw new NumberFormatException(s)
     }
   }
-
-  def parseShort(s: String): Either[String, Short] = try {
-    val i = s.toInt
-    if (i < -32768 || i > 65535) {
-      Left("illegal short constant: %s" format s)
-    } else if (i > 32767) {
-      Right((i - 65536).toShort)
-    } else {
-      Right(i.toShort)
+  def ubyte(c:Context)(): c.Expr[UByte] = {
+    import c.mirror._
+    import c.universe._
+    parseContext(c, BigInt(0), BigInt(255)) match {
+      case Right(n) =>
+        val e = c.Expr[Byte](Literal(Constant(n.toByte)))
+        reify { spire.math.UByte(e.splice) }
+      case Left(s) =>
+        throw new NumberFormatException(s)
     }
-  } catch {
-    case _: Exception => Left("illegal short constant: %s" format s)
   }
 
-  // short literals
   def short(c:Context)(): c.Expr[Short] = {
     import c.mirror._
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    parseShort(s) match {
-      case Right(n) => c.Expr[Short](Literal(Constant(n)))
+    parseContext(c, BigInt(-32768), BigInt(65535)) match {
+      case Right(n) => c.Expr[Short](Literal(Constant(n.toShort)))
       case Left(s) => throw new NumberFormatException(s)
     }
   }
+  def ushort(c:Context)(): c.Expr[UShort] = {
+    import c.mirror._
+    import c.universe._
+    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
+    parseContext(c, BigInt(0), BigInt(65535)) match {
+      case Right(n) =>
+        val e = c.Expr[Short](Literal(Constant(n.toShort)))
+        reify { spire.math.UShort(e.splice) }
+      case Left(s) =>
+        throw new NumberFormatException(s)
+    }
+  }
 
-  // rational literals
+  def uint(c:Context)(): c.Expr[UInt] = {
+    import c.mirror._
+    import c.universe._
+    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
+    parseContext(c, BigInt(0), BigInt(4294967295L)) match {
+      case Right(n) =>
+        val e = c.Expr[Int](Literal(Constant(n.toInt)))
+        reify { spire.math.UInt(e.splice) }
+      case Left(s) =>
+        throw new NumberFormatException(s)
+    }
+  }
+
+  def ulong(c:Context)(): c.Expr[ULong] = {
+    import c.mirror._
+    import c.universe._
+    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
+    parseContext(c, BigInt(0), BigInt("18446744073709551615")) match {
+      case Right(n) =>
+        val e = c.Expr[Long](Literal(Constant(n.toLong)))
+        reify { spire.math.ULong(e.splice) }
+      case Left(s) =>
+        throw new NumberFormatException(s)
+    }
+  }
 
   def bigIntApply(c:Context) = {
     import c.mirror._

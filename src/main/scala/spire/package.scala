@@ -105,6 +105,32 @@ final class LiteralDoubleOps(val lhs:Double) extends AnyVal {
   def max[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.max(c.fromDouble(lhs), rhs)
 }
 
+class LiteralBigIntOps(val lhs:BigInt) extends AnyVal {
+  def +(rhs: SafeLong) = SafeLong(lhs) + rhs
+  def *(rhs: SafeLong) = SafeLong(lhs) * rhs
+  def -(rhs: SafeLong) = SafeLong(lhs) - rhs
+  def /(rhs: SafeLong) = SafeLong(lhs) / rhs
+  def /~(rhs: SafeLong) = SafeLong(lhs) /~ rhs
+  def %(rhs: SafeLong) = SafeLong(lhs) % rhs
+  def /%(rhs: SafeLong) = SafeLong(lhs) /% rhs
+
+  def +(rhs: Natural) = Natural(lhs) + rhs
+  def *(rhs: Natural) = Natural(lhs) * rhs
+  def -(rhs: Natural) = Natural(lhs) - rhs
+  def /(rhs: Natural) = Natural(lhs) / rhs
+  def /~(rhs: Natural) = Natural(lhs) /~ rhs
+  def %(rhs: Natural) = Natural(lhs) % rhs
+  def /%(rhs: Natural) = Natural(lhs) /% rhs
+
+  def +(rhs: ULong) = lhs + rhs.toBigInt
+  def *(rhs: ULong) = lhs * rhs.toBigInt
+  def -(rhs: ULong) = lhs - rhs.toBigInt
+  def /(rhs: ULong) = lhs / rhs.toBigInt
+  def /~(rhs: ULong) = lhs / rhs.toBigInt
+  def %(rhs: ULong) = lhs % rhs.toBigInt
+  def /%(rhs: ULong) = lhs /% rhs.toBigInt
+}
+
 final class ArrayOps[@spec A](arr:Array[A]) {
   def qsum(implicit ev:Rig[A]) = {
     @tailrec
@@ -348,6 +374,7 @@ object implicits {
 
   implicit def literalIntOps(lhs:Int) = new LiteralIntOps(lhs)
   implicit def literalDoubleOps(lhs:Double) = new LiteralDoubleOps(lhs)
+  implicit def literalBigIntOps(b: BigInt) = new LiteralBigIntOps(b)
 
   implicit def arrayOps[@spec A](lhs:Array[A]) = new ArrayOps(lhs)
   implicit def seqOps[@spec A](lhs:Seq[A]) = new SeqOps[A](lhs)
