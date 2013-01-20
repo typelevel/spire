@@ -4,6 +4,7 @@ import spire.algebra._
 
 import scala.{specialized => spec}
 import scala.math.{ScalaNumber, ScalaNumericConversions}
+import java.lang.Math
 
 object Complex {
   def i[@spec(Float, Double) T](implicit f: Fractional[T], t: Trig[T]) =
@@ -23,21 +24,17 @@ object Complex {
   implicit def floatToComplex(n: Float) = new Complex(n, 0.0F)
   implicit def doubleToComplex(n: Double) = new Complex(n, 0.0)
 
-  implicit def bigIntToComplex(n: BigInt) =
-    new Complex(BigDecimal(n), BigDecimal(0))
+  implicit def bigIntToComplex(n: BigInt) = new Complex(BigDecimal(n), BigDecimal(0))
+  implicit def bigDecimalToComplex(n: BigDecimal) = new Complex(n, BigDecimal(0))
 
-  implicit def bigDecimalToComplex(n: BigDecimal) =
-    new Complex(n, BigDecimal(0))
-
-  def polar[@spec(Float, Double) T]
-    (magnitude: T, angle: T)(implicit f: Fractional[T], t: Trig[T]) = {
+  def polar[@spec(Float, Double) T](magnitude: T, angle: T)(implicit f: Fractional[T], t: Trig[T]) = {
     val real: T = f.times(magnitude, t.cos(angle))
     val imag: T = f.times(magnitude, t.sin(angle))
     new Complex(real, imag)
   }
 
-  def apply(real: Double, imag: Double): Complex[Double] =
-    new Complex(real, imag)
+  def apply[@spec(Float, Double) T](real: T)(implicit f: Fractional[T], t: Trig[T]): Complex[T] =
+    new Complex(real, f.zero)
 }
 
 final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: Fractional[T], t: Trig[T])
@@ -53,10 +50,10 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
   def isWhole: Boolean = f.eqv(real, f.zero) && f.isWhole(real)
   def signum: Int = f.compare(real, f.zero)
   def underlying: (T, T) = (real, imag)
-  def complexSignum: Complex[T] = if (f.eqv(abs, f.zero))
-    Complex.zero[T]
-  else
-    this / new Complex(abs, f.zero)
+  def complexSignum: Complex[T] = {
+    val a = abs
+    if (f.eqv(a, f.zero)) Complex.zero[T] else this / new Complex(a, f.zero)
+  }
 
   override final def isValidInt: Boolean =
     f.eqv(imag, f.zero) &&
@@ -75,7 +72,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
     case that => unifiedPrimitiveEquals(that)
   }
 
-  override def toString: String = "Complex(%s, %s)".format(real, imag)
+  override def toString: String = "(%s+%si)" format (real, imag)
 
   def toGaussian: Gaussian[T] = Gaussian(f.round(real), f.round(imag))(f)
 
@@ -135,8 +132,6 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
     }
   }
 
-  def quot(b: Complex[T]) = this /~ b
-
   def /~(b: Complex[T]) = {
     val d = this / b
     new Complex(f.round(d.real), f.round(d.imag))
@@ -188,7 +183,62 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
 }
 
 
-// TODO: if/when scala gets value types this gets even more interesting
+object FloatComplex {
+  import FastComplex.{encode}
+
+  final def apply(real: Float, imag: Float): FloatComplex =
+    new FloatComplex(encode(real, imag))
+
+  final def apply(real: Double, imag: Double) =
+    new FloatComplex(encode(real.toFloat, imag.toFloat))
+
+  def polar(magnitude: Float, angle: Float) =
+    new FloatComplex(FastComplex.polar(magnitude, angle))
+
+  final val i = new FloatComplex(4575657221408423936L)
+  final val one = new FloatComplex(1065353216L)
+  final val zero = new FloatComplex(0L)
+}
+
+/**
+ * Value class which encodes two floating point values in a Long.
+ *
+ * We get (basically) unboxed complex numbers using this hack.
+ * The underlying implementation lives in the FastComplex object.
+ */
+class FloatComplex(val u: Long) extends AnyVal {
+  override final def toString: String = "(%s+%si)" format (real, imag)
+
+  final def real: Float = FastComplex.real(u)
+  final def imag: Float = FastComplex.imag(u)
+  final def repr = "FloatComplex(%s, %s)" format(real, imag)
+  final def abs: Float = FastComplex.abs(u)
+  final def angle: Float = FastComplex.angle(u)
+  final def conjugate = new FloatComplex(FastComplex.conjugate(u))
+  final def isWhole: Boolean = FastComplex.isWhole(u)
+  final def signum: Int = FastComplex.signum(u)
+  final def complexSignum = new FloatComplex(FastComplex.complexSignum(u))
+  final def negate = new FloatComplex(FastComplex.negate(u))
+
+  final def +(b: FloatComplex) = new FloatComplex(FastComplex.add(u, b.u))
+  final def -(b: FloatComplex) = new FloatComplex(FastComplex.subtract(u, b.u))
+  final def *(b: FloatComplex) = new FloatComplex(FastComplex.multiply(u, b.u))
+  final def /(b: FloatComplex) = new FloatComplex(FastComplex.divide(u, b.u))
+  final def /~(b: FloatComplex) = new FloatComplex(FastComplex.quot(u, b.u))
+  final def %(b: FloatComplex) = new FloatComplex(FastComplex.mod(u, b.u))
+
+  final def /%(b: FloatComplex) = FastComplex.quotmod(u, b.u) match {
+    case (q, m) => (new FloatComplex(q), new FloatComplex(m))
+  }
+
+  final def pow(b: FloatComplex) = new FloatComplex(FastComplex.pow(u, b.u))
+  final def **(b: FloatComplex) = pow(b)
+
+  final def pow(b: Int) = new FloatComplex(FastComplex.pow(u, FastComplex(b.toFloat, 0.0F)))
+  final def **(b: Int) = pow(b)
+}
+
+
 /**
  * FastComplex is an ugly, beautiful hack.
  *
@@ -325,13 +375,12 @@ object FastComplex {
     }
   }
 
-  def quot(a: Long, b: Long): Long = {
-    encode(scala.math.floor(real(divide(a, b))).toFloat, 0.0F)
-  }
+  final def quot(a: Long, b: Long): Long =
+    encode(Math.floor(real(divide(a, b))).toFloat, 0.0F)
 
-  def mod(a: Long, b: Long): Long = subtract(a, multiply(b, quot(a, b)))
+  final def mod(a: Long, b: Long): Long = subtract(a, multiply(b, quot(a, b)))
 
-  def quotmod(a: Long, b: Long): (Long, Long) = {
+  final def quotmod(a: Long, b: Long): (Long, Long) = {
     val q = quot(a, b)
     (q, subtract(a, multiply(b, quot(a, b))))
   }
@@ -357,53 +406,4 @@ object FastComplex {
     val phase = (angle(a) * real(b)).toFloat
     polar(len, phase)
   }
-}
-
-object FloatComplex {
-  import FastComplex.{encode}
-
-  final def apply(real: Float, imag: Float): FloatComplex =
-    new FloatComplex(encode(real, imag))
-
-  final def apply(real: Double, imag: Double) =
-    new FloatComplex(encode(real.toFloat, imag.toFloat))
-
-  def polar(magnitude: Float, angle: Float) =
-    new FloatComplex(FastComplex.polar(magnitude, angle))
-
-  final val i = new FloatComplex(4575657221408423936L)
-  final val one = new FloatComplex(1065353216L)
-  final val zero = new FloatComplex(0L)
-}
-
-class FloatComplex(val u: Long) extends AnyVal {
-  override def toString: String = "FloatComplex(%s, %s)" format (real, imag)
-
-  def real: Float = FastComplex.real(u)
-  def imag: Float = FastComplex.imag(u)
-  def repr = "FloatComplex(%s, %s)" format(real, imag)
-  def abs: Float = FastComplex.abs(u)
-  def angle: Float = FastComplex.angle(u)
-  def conjugate = new FloatComplex(FastComplex.conjugate(u))
-  def isWhole: Boolean = FastComplex.isWhole(u)
-  def signum: Int = FastComplex.signum(u)
-  def complexSignum = new FloatComplex(FastComplex.complexSignum(u))
-  def negate = new FloatComplex(FastComplex.negate(u))
-
-  def +(b: FloatComplex) = new FloatComplex(FastComplex.add(u, b.u))
-  def -(b: FloatComplex) = new FloatComplex(FastComplex.subtract(u, b.u))
-  def *(b: FloatComplex) = new FloatComplex(FastComplex.multiply(u, b.u))
-  def /(b: FloatComplex) = new FloatComplex(FastComplex.divide(u, b.u))
-  def /~(b: FloatComplex) = new FloatComplex(FastComplex.quot(u, b.u))
-  def %(b: FloatComplex) = new FloatComplex(FastComplex.mod(u, b.u))
-
-  def /%(b: FloatComplex) = FastComplex.quotmod(u, b.u) match {
-    case (q, m) => (new FloatComplex(q), new FloatComplex(m))
-  }
-
-  def pow(b: FloatComplex) = new FloatComplex(FastComplex.pow(u, b.u))
-  def **(b: FloatComplex) = pow(b)
-
-  def pow(b: Int) = new FloatComplex(FastComplex.pow(u, FastComplex(b.toFloat, 0.0F)))
-  def **(b: Int) = pow(b)
 }
