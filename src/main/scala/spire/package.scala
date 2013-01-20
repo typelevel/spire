@@ -37,9 +37,9 @@ final class LiteralIntOps(val lhs:Int) extends AnyVal {
   def -(rhs:Rational) = q - rhs
   def *(rhs:Rational) = q * rhs
   def /(rhs:Rational) = q / rhs
-  def /~(rhs:Rational) = q.quot(rhs)
+  def /~(rhs:Rational) = q /~ rhs
   def %(rhs:Rational) = q % rhs
-  def /%(rhs:Rational) = (q.quot(rhs), q % rhs)
+  def /%(rhs:Rational) = q /% rhs
 
   def **(rhs:Rational)(implicit ev:ApproximationContext[Rational]) = q.pow(rhs)
 
