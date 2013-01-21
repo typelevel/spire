@@ -12,52 +12,62 @@ trait SeqModule[A, SA <: SeqLike[A, SA]] extends Module[SA, A] {
 
   def zero: SA = cbf().result
 
-  def negate(sa: SA): SA = sa map (scalar.negate(_))
+  def negate(sa: SA): SA = sa map (scalar.negate)
 
   def plus(x: SA, y: SA): SA = {
     @tailrec
-    def add(xi: Iterator[A], yi: Iterator[A], b: Builder[A, SA]): SA = {
-      val contxi = xi.hasNext
-      val contyi = yi.hasNext
+    def add1(it: Iterator[A], b: Builder[A, SA]): SA = if (it.hasNext) {
+      b += it.next()
+      add1(it, b)
+    } else {
+      b.result
+    }
 
-      if (contxi || contyi) {
-        b += (if (contxi && contyi) {
-          (scalar.plus(xi.next(), yi.next()))
-        } else if (contxi) {
-          xi.next()
-        } else {
-          yi.next()
-        })
-        add(xi, yi, b)
+    @tailrec
+    def add2(xi: Iterator[A], yi: Iterator[A], b: Builder[A, SA]): SA = {
+      if (!xi.hasNext) {
+        add1(yi, b)
+      } else if (!yi.hasNext) {
+        add1(xi, b)
       } else {
-        b.result
+        b += scalar.plus(xi.next(), yi.next())
+        add2(xi, yi, b)
       }
     }
 
-    add(x.toIterator, y.toIterator, cbf(x))
+    add2(x.toIterator, y.toIterator, cbf(x))
   }
 
   override def minus(x: SA, y: SA): SA = {
     @tailrec
-    def sub(xi: Iterator[A], yi: Iterator[A], b: Builder[A, SA]): SA = {
-      val contxi = xi.hasNext
-      val contyi = yi.hasNext
+    def subl(it: Iterator[A], b: Builder[A, SA]): SA = if (it.hasNext) {
+      b += it.next()
+      subl(it, b)
+    } else {
+      b.result
+    }
 
-      if (contxi || contyi) {
-        b += (if (contxi && contyi) {
-          (scalar.minus(xi.next(), yi.next()))
-        } else if (contxi) {
-          xi.next()
-        } else {
-          scalar.negate(yi.next())
-        })
-        sub(xi, yi, b)
+    @tailrec
+    def subr(it: Iterator[A], b: Builder[A, SA]): SA = if (it.hasNext) {
+      b += scalar.negate(it.next())
+      subr(it, b)
+    } else {
+      b.result
+    }
+
+    @tailrec
+    def sub2(xi: Iterator[A], yi: Iterator[A], b: Builder[A, SA]): SA = {
+      if (!xi.hasNext) {
+        subr(yi, b)
+      } else if (!yi.hasNext) {
+        subl(xi, b)
       } else {
-        b.result
+        b += scalar.minus(xi.next(), yi.next())
+        sub2(xi, yi, b)
       }
     }
 
-    sub(x.toIterator, y.toIterator, cbf(x))
+    sub2(x.toIterator, y.toIterator, cbf(x))
   }
 
   def timesl(r: A, sa: SA): SA = sa map (scalar.times(r, _))
