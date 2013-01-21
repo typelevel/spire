@@ -8,7 +8,7 @@ object MyBuild extends Build {
     version := "0.3.0-M7",
 
     scalaVersion := "2.10.0",
-    scalaBinaryVersion := "2.10.0",
+    //scalaBinaryVersion := "2.10.0",
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
