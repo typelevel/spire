@@ -309,9 +309,13 @@ object Rational {
   }
 
   implicit def apply(x:BigDecimal): Rational = {
-    val n = (x / x.ulp).toBigInt
-    val d = (BigDecimal(1.0) / x.ulp).toBigInt
-    BigRationals.build(n, d)
+    if (x.ulp >= 1) {
+      BigRationals.build(x.toBigInt, 1)
+    } else {
+      val n = (x / x.ulp).toBigInt
+      val d = (BigDecimal(1.0) / x.ulp).toBigInt
+      BigRationals.build(n, d)
+    }
   }
 
   def apply(r: String): Rational = r match {
@@ -587,15 +591,17 @@ object LongRationals extends Rationals[Long] {
     }
 
 
-    def *(r: Rational): Rational = r match {
-      case r: LongRational =>
-        val a = gcd(n, r.d)
-        val b = gcd(d, r.n)
-        Rational(SafeLong(n / a) * (r.n / b), SafeLong(d / b) * (r.d / a))
-      case r: BigRational =>
-        val a = gcd(n, (r.d % n).toLong)
-        val b = gcd(d, (r.n % d).toLong)
-        Rational(SafeLong(n / a) * (r.n / b), SafeLong(d / b) * (r.d / a))
+    def *(r: Rational): Rational = {
+      if (n == 0L) Rational.zero else (r match {
+        case r: LongRational =>
+          val a = gcd(n, r.d)
+          val b = gcd(d, r.n)
+          Rational(SafeLong(n / a) * (r.n / b), SafeLong(d / b) * (r.d / a))
+        case r: BigRational =>
+          val a = gcd(n, (r.d % n).toLong)
+          val b = gcd(d, (r.n % d).toLong)
+          Rational(SafeLong(n / a) * (r.n / b), SafeLong(d / b) * (r.d / a))
+      })
     }
 
 

@@ -2,7 +2,7 @@ package spire.algebra
 
 import scala.{ specialized => spec }
 
-trait RingAlgebra[V, @spec R] extends Module[V, R] with MultiplicativeSemigroup[V]
+trait RingAlgebra[V, @spec R] extends Module[V, R] with Rng[V]
 
 object RingAlgebra {
   implicit def ZAlgebra[A](implicit ring: Ring[A]) = new ZAlgebra[A] {

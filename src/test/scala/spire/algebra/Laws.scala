@@ -74,6 +74,9 @@ trait Laws[A] {
   def semiring(implicit A: Semiring[A]) = new Properties("semiring") {
     include(additiveSemigroup)
     include(multiplicativeSemigroup)
+    property("distributive") = forAll { (x: A, y: A, z: A) =>
+      (x * (y + z) === (x * y + x * z)) && (((x + y) * z) === (x * z + y * z))
+    }
   }
 
   def rng(implicit A: Rng[A]) = new Properties("rng") {
@@ -94,31 +97,39 @@ trait Laws[A] {
   private def _euclideanRing(name: String, includes: Properties*)(implicit A: EuclideanRing[A]) = new Properties(name) {
     includes foreach include
 
-    property("quot") = forAll((x: A, y: A) =>
-      y =!= A.zero ==> (((x * y) /~ y) === x)
-    )
-    property("mod = zero") = forAll((x: A, y: A) =>
-      y =!= A.zero ==> (((x * y) % y) === A.zero)
-    )
+    // This isn't necessarily true: x = 1/4, y = 3, (x * y) /~ y === 0.
+    // property("quot") = forAll((x: A, y: A) =>
+    //   y =!= A.zero ==> (((x * y) /~ y) === x)
+    // )
+    //
+    // This is not true, in general: 2 * (1 / 4) % 2 == 1 / 2. But, we should
+    // be testing something here.
+    // property("mod = zero") = forAll((x: A, y: A) =>
+    //   y =!= A.zero ==> (((x * y) % y) === A.zero)
+    // )
   }
 
   def euclideanRing(implicit A: EuclideanRing[A]) = _euclideanRing("euclideanRing", ring)
 
-  def field(implicit A: Field[A]) = _euclideanRing("field", additiveAbGroup, multiplicativeAbGroup)
+  def field(implicit A: Field[A]) = new Properties("field") {
+    include(euclideanRing)
+    include(multiplicativeAbGroup)
+    // _euclideanRing("field", additiveAbGroup, multiplicativeAbGroup)
+  }
 
+  def signed(implicit A: Signed[A]) = new Properties("signed") {
+    property("abs non-negative") = forAll((x: A) => x.abs != Negative)
+  }
 }
 
 object Laws {
-
   def apply[A : Eq : Arbitrary] = new Laws[A] {
     def Eq = implicitly[Eq[A]]
     def Arbitrary = implicitly[Arbitrary[A]]
   }
-
 }
 
 trait LawChecker extends FunSuite with Checkers {
-
   def checkAll[A](name: String, props: Properties) {
     for ((id, prop) <- props.properties) {
       test(name + "." + id) {
@@ -126,7 +137,6 @@ trait LawChecker extends FunSuite with Checkers {
       }
     }
   }
-
 }
 
 // vim: expandtab:ts=2:sw=2

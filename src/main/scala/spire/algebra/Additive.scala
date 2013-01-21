@@ -65,14 +65,34 @@ trait AdditiveAbGroup[@spec(Int,Long,Float,Double) A] extends AdditiveGroup[A] {
   }
 }
 
-trait AdditiveMonoid0 {
-  implicit def moduleIsAdditiveMonoid[V, @spec(Int, Long, Float, Double) R](implicit
-    m: Module[V, R]): AdditiveMonoid[V] = m
+object AdditiveSemigroup extends AdditiveSemigroup1
+object AdditiveMonoid extends AdditiveMonoid0
+object AdditiveGroup extends AdditiveGroup0
+object AdditiveAbGroup extends AdditiveAbGroup0
+
+trait AdditiveSemigroup0 {
+  implicit def MonoidIsSemigroup[@spec(Int,Long,Float,Double) A](implicit
+    m: AdditiveMonoid[A]): AdditiveSemigroup[A] = m
 }
 
-object AdditiveMonoid extends AdditiveMonoid0 {
-  implicit def ringIsAdditiveMonoid[@spec(Int, Long, Float, Double) A](implicit
-    r: Ring[A]): AdditiveMonoid[A] = r
+trait AdditiveSemigroup1 extends AdditiveSemigroup0 {
+  implicit def ringIsAdditiveSemigroup[@spec(Int, Long, Float, Double) A](implicit
+    r: Ring[A]): AdditiveSemigroup[A] = r
+}
+
+trait AdditiveMonoid0 {
+  implicit def GroupIsMonoid[@spec(Int,Long,Float,Double) A](implicit
+    g: AdditiveGroup[A]): AdditiveMonoid[A] = g
+}
+
+trait AdditiveGroup0 {
+  implicit def AbGroupIsGroup[@spec(Int,Long,Float,Double) A](implicit
+    g: AdditiveAbGroup[A]): AdditiveGroup[A] = g
+}
+
+trait AdditiveAbGroup0 {
+  implicit def moduleIsAdditiveAbGroup[V, @spec(Int, Long, Float, Double) R](implicit
+    m: Module[V, R]): AdditiveAbGroup[V] = m
 }
 
 import spire.math.{ConvertableTo, ConvertableFrom, Number}

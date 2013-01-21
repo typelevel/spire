@@ -4,6 +4,8 @@ import scala.{specialized => spec}
 
 import spire.algebra.Zero
 import spire.macrosk.Ops
+import scala.collection.SeqLike
+import scala.reflect.ClassTag
 
 trait Eq[@spec A] {
   def eqv(x:A, y:A): Boolean
@@ -20,7 +22,7 @@ final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
   def =!=(rhs:A) = macro Ops.binop[A, Boolean]
 }
 
-object Eq extends LowPriority {
+object Eq extends Eq2 with EqProductImplicits {
   implicit object ByteEq extends ByteEq
   implicit object ShortEq extends ShortEq
   implicit object CharEq extends CharEq
@@ -47,8 +49,32 @@ object Eq extends LowPriority {
   def by[@spec A, @spec B](f:A => B)(implicit e:Eq[B]): Eq[A] = new MappedEq(e)(f)
 }
 
-trait LowPriority {
+trait Eq0 {
   implicit def generic[@spec A]: Eq[A] = new GenericEq[A]
+}
+
+trait Eq1 extends Eq0 {
+  implicit def seq[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Eq[A]) = {
+    new SeqEq[A, CC[A]] {
+      val A = A0
+    }
+  }
+
+  implicit def map[K, V](implicit V0: Eq[V]) = new MapEq[K, V] {
+    val V = V0
+  }
+
+  implicit def option[A: Eq] = new OptionEq[A] {
+    val A = Eq[A]
+  }
+}
+
+trait Eq2 extends Eq1 {
+  implicit def array[@spec(Int,Long,Float,Double) A](implicit
+      A0: Eq[A], ct: ClassTag[A]) = new ArrayEq[A] {
+    val A = A0
+    val classTag = ct
+  }
 }
 
 private[this] class GenericEq[@spec A] extends Eq[A] {
@@ -134,4 +160,12 @@ trait NumberEq extends Eq[Number] {
 trait NaturalEq extends Eq[Natural] {
   def eqv(x: Natural, y: Natural) = x == y
   override def neqv(x: Natural, y: Natural) = x != y
+}
+trait OptionEq[A] extends Eq[Option[A]] {
+  def A: Eq[A]
+  def eqv(x: Option[A], y: Option[A]) = (x, y) match {
+    case (Some(x), Some(y)) => A.eqv(x, y)
+    case (None, None) => true
+    case _ => false
+  }
 }

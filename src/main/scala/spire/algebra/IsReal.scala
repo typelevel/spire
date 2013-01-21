@@ -18,19 +18,19 @@ object IsReal {
     def toDouble(a: A) = f(a)
   }
 
-  val ByteIsReal = IsReal[Byte] { x: Byte => x.toDouble }
-  val ShortIsReal = IsReal[Short] { x: Short => x.toDouble }
-  val IntIsReal = IsReal[Int] { x: Int => x.toDouble }
-  val LongIsReal = IsReal[Long] { x: Long => x.toDouble }
-  val BigIntIsReal = IsReal[BigInt] { x: BigInt => x.toDouble }
-  val UByteIsReal = IsReal[UByte] { x: UByte => x.toDouble }
-  val UShortIsReal = IsReal[UShort] { x: UShort => x.toDouble }
-  val UIntIsReal = IsReal[UInt] { x: UInt => x.toDouble }
-  val ULongIsReal = IsReal[ULong] { x: ULong => x.toDouble }
-  val FloatIsReal = IsReal[Float] { x: Float => x.toDouble }
-  val DoubleIsReal = IsReal[Double] { x: Double => x.toDouble }
-  val RationalIsReal = IsReal[Rational] { x: Rational => x.toDouble }
-  val RealIsReal = IsReal[Real] { x: Real => x.toDouble }
-  val BigDecimalIsReal = IsReal[BigDecimal] { x: BigDecimal => x.toDouble }
+  implicit val ByteIsReal = IsReal[Byte] { x: Byte => x.toDouble }
+  implicit val ShortIsReal = IsReal[Short] { x: Short => x.toDouble }
+  implicit val IntIsReal = IsReal[Int] { x: Int => x.toDouble }
+  implicit val LongIsReal = IsReal[Long] { x: Long => x.toDouble }
+  implicit val BigIntIsReal = IsReal[BigInt] { x: BigInt => x.toDouble }
+  implicit val UByteIsReal = IsReal[UByte] { x: UByte => x.toDouble }
+  implicit val UShortIsReal = IsReal[UShort] { x: UShort => x.toDouble }
+  implicit val UIntIsReal = IsReal[UInt] { x: UInt => x.toDouble }
+  implicit val ULongIsReal = IsReal[ULong] { x: ULong => x.toDouble }
+  implicit val FloatIsReal = IsReal[Float] { x: Float => x.toDouble }
+  implicit val DoubleIsReal = IsReal[Double] { x: Double => x.toDouble }
+  implicit val RationalIsReal = IsReal[Rational] { x: Rational => x.toDouble }
+  implicit val RealIsReal = IsReal[Real] { x: Real => x.toDouble }
+  implicit val BigDecimalIsReal = IsReal[BigDecimal] { x: BigDecimal => x.toDouble }
 }
 

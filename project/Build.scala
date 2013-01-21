@@ -2,7 +2,6 @@ import sbt._
 import sbt.Keys._
 
 object MyBuild extends Build {
-
   override lazy val settings = super.settings ++ Seq(
     name := "spire",
     organization := "org.spire-math",
@@ -67,11 +66,32 @@ object MyBuild extends Build {
 
   val key = AttributeKey[Boolean]("javaOptionsPatched")
 
-  lazy val spire = Project("spire", file("."))
+  lazy val spire = Project("spire", file(".")).settings(spireSettings: _*)
 
   lazy val examples = Project("examples", file("examples")).
     settings(examplesSettings: _*).
     dependsOn(spire)
+
+  lazy val spireSettings = Seq(
+    genProductTypes <<= (scalaSource in Compile, streams) map { (scalaSource, s) =>
+      println("scalaSource: " + scalaSource)
+
+      s.log.info("Generating spire/algebra/tuples.scala")
+      val algebraSource = ProductTypes.algebraProductTypes
+      val algebraFile = (scalaSource / "spire" / "algebra" / "tuples.scala").asFile
+      IO.write(algebraFile, algebraSource)
+
+      s.log.info("Generating spire/math/tuples.scala")
+      val mathSource = ProductTypes.mathProductTypes
+      val mathFile = (scalaSource / "spire" / "math" / "tuples.scala").asFile
+      IO.write(mathFile, mathSource)
+
+      Seq[File](algebraFile, mathFile)
+    }
+  )
+
+  lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types",
+    "Generates several type classes for Tuple2-22.")
 
   def examplesSettings = Seq(
     //scalacOptions ++= Seq("-Ymacro-debug-lite"),

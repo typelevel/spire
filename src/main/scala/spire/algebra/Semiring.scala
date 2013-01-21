@@ -34,11 +34,11 @@ final class SemiringOps[A](lhs:A)(implicit ev:Semiring[A]) {
   def **(rhs:Int) = macro Ops.binop[Int, A]
 }
 
-trait LowViz {
+trait Semiring0 extends SemiringProductImplicits {
   implicit def rngIsSemiring[@spec(Int,Long,Float,Double) A: Rng]: Semiring[A] = Rng[A]
 }
 
-object Semiring extends LowViz {
+object Semiring extends Semiring0 {
   implicit def rigIsSemiring[@spec(Int,Long,Float,Double) A: Rig]: Semiring[A] = Rig[A]
 
   @inline final def apply[A](implicit r:Semiring[A]):Semiring[A] = r
