@@ -32,5 +32,6 @@ object IsReal {
   implicit val RationalIsReal = IsReal[Rational] { x: Rational => x.toDouble }
   implicit val RealIsReal = IsReal[Real] { x: Real => x.toDouble }
   implicit val BigDecimalIsReal = IsReal[BigDecimal] { x: BigDecimal => x.toDouble }
+  implicit val SafeLongIsReal = IsReal[SafeLong] { x: SafeLong => x.toDouble }
+  implicit val NaturalIsReal = IsReal[Natural] { x: Natural => x.toDouble }
 }
-
