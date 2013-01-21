@@ -14,17 +14,37 @@ trait Monoid[@spec(Int,Long,Float,Double) A] extends Semigroup[A] {
 
 object Monoid extends Monoid1 {
   @inline final def apply[A](implicit m: Monoid[A]): Monoid[A] = m
+
+  implicit def group[A: Group]: Monoid[A] = Group[A]
+}
+
+trait Monoid0 {
+  implicit def MapMonoid[K, V: Semigroup] = new MapMonoid[K, V] {
+    val scalar = Semigroup[V]
+  }
+
+  implicit def OptionMonoid[A: Semigroup] = new OptionMonoid[A] {
+    val scalar = Semigroup[A]
+  }
+
+  implicit def traversable[A, CC[A] <: TraversableLike[A, CC[A]]](implicit
+    cbf: CanBuildFrom[CC[A], A, CC[A]]): Monoid[CC[A]] = new CollMonoid[A, CC[A]]
 }
 
 trait Monoid1 extends Monoid0 with MonoidProductImplicits {
   implicit object StringMonoid extends StringMonoid
 }
 
-trait Monoid0 {
-  implicit def group[A: Group]: Monoid[A] = Group[A]
+trait OptionMonoid[A] extends Monoid[Option[A]] {
+  def scalar: Semigroup[A]
 
-  implicit def traversable[A, CC[A] <: TraversableLike[A, CC[A]]](implicit
-    cbf: CanBuildFrom[CC[A], A, CC[A]]): Monoid[CC[A]] = new CollMonoid[A, CC[A]]
+  def id: Option[A] = None
+  def op(x: Option[A], y: Option[A]): Option[A] = (x, y) match {
+    case (Some(x), Some(y)) => Some(scalar.op(x, y))
+    case (None, None) => None
+    case (x, None) => x
+    case (None, y) => y
+  }
 }
 
 final class CollMonoid[A, SA <: TraversableLike[A, SA]](implicit cbf: CanBuildFrom[SA, A, SA]) extends Monoid[SA] {

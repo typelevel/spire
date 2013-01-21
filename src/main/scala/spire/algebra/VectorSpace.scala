@@ -25,11 +25,17 @@ trait VectorSpace0 {
     val scalar = field0
     val cbf = cbf0
   }
+
+  implicit def MapVectorSpace[K, V](implicit V0: Field[V],
+      ev: NoImplicit[NormedVectorSpace[Map[K, V], V]]) = new MapVectorSpace[K, V] {
+    val scalar = Field[V]
+  }
 }
 
 trait VectorSpace1 extends VectorSpace0 {
   implicit def ArrayVectorSpace[@spec(Int,Long,Float,Double) A](implicit
-      scalar0: Field[A], classTag0: ClassTag[A]): VectorSpace[Array[A], A] = new ArrayVectorSpace[A] {
+      ev: NoImplicit[NormedVectorSpace[Array[A], A]], classTag0: ClassTag[A],
+      scalar0: Field[A]): VectorSpace[Array[A], A] = new ArrayVectorSpace[A] {
     val scalar = scalar0
     val classTag = classTag0
   }

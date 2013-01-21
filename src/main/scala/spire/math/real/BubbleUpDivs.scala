@@ -27,4 +27,3 @@ trait BubbleUpDivs[A <: RealLike[A]] extends RealTransform[A] { self: A =>
     case num => num
   }
 }
-

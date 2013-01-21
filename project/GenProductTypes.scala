@@ -141,7 +141,7 @@ object ProductTypes {
   val rng = Definition("Rng", Some("Semiring"))(const("zero") :: unary("negate") :: Nil)
   val rig = Definition("Rig", Some("Semiring"))(const("zero") :: const("one") :: Nil)
   val ring = Definition("Ring", Some("Rng"))(fromInt :: const("one") :: Nil)
-  val euclideanRing = Definition("EuclideanRing", Some("Ring"))(binary("quot") :: binary("mod") :: Nil)
+  val euclideanRing = Definition("EuclideanRing", Some("Ring"))(binary("quot") :: binary("mod") :: binary("gcd") :: Nil)
   val field = Definition("Field", Some("EuclideanRing")) {
     binary("div") :: unary("ceil") :: unary("floor") :: unary("round") :: isWhole :: Nil
   }

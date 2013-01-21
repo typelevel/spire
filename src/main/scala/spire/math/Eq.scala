@@ -5,6 +5,7 @@ import scala.{specialized => spec}
 import spire.algebra.Zero
 import spire.macrosk.Ops
 import scala.collection.SeqLike
+import scala.reflect.ClassTag
 
 trait Eq[@spec A] {
   def eqv(x:A, y:A): Boolean
@@ -21,7 +22,7 @@ final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
   def =!=(rhs:A) = macro Ops.binop[A, Boolean]
 }
 
-object Eq extends Eq1 with EqProductImplicits {
+object Eq extends Eq2 with EqProductImplicits {
   implicit object ByteEq extends ByteEq
   implicit object ShortEq extends ShortEq
   implicit object CharEq extends CharEq
@@ -57,6 +58,18 @@ trait Eq1 extends Eq0 {
     new SeqEq[A, CC[A]] {
       val A = A0
     }
+  }
+
+  implicit def map[K, V](implicit V0: Eq[V]) = new MapEq[K, V] {
+    val V = V0
+  }
+}
+
+trait Eq2 extends Eq1 {
+  implicit def array[@spec(Int,Long,Float,Double) A](implicit
+      A0: Eq[A], ct: ClassTag[A]) = new ArrayEq[A] {
+    val A = A0
+    val classTag = ct
   }
 }
 

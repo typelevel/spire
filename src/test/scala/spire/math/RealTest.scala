@@ -99,5 +99,12 @@ class RealTest extends FunSuite {
     val bpprox = b +/- err
     assert(bctual - err <= bpprox && bpprox <= bctual + err)
   }
+
+  test("Associativity with large and small numbers") {
+    val x = Real(1e308)
+    val y = Real(-1e308)
+    val z = Real(1)
+    assert((x + (y + z)) === (x + y + z))
+  }
 }
 

@@ -67,7 +67,8 @@ trait AdditiveAbGroup[@spec(Int,Long,Float,Double) A] extends AdditiveGroup[A] {
 
 object AdditiveSemigroup extends AdditiveSemigroup1
 object AdditiveMonoid extends AdditiveMonoid0
-object AdditiveGroup extends AdditiveGroup1
+object AdditiveGroup extends AdditiveGroup0
+object AdditiveAbGroup extends AdditiveAbGroup0
 
 trait AdditiveSemigroup0 {
   implicit def MonoidIsSemigroup[@spec(Int,Long,Float,Double) A](implicit
@@ -85,13 +86,13 @@ trait AdditiveMonoid0 {
 }
 
 trait AdditiveGroup0 {
-  implicit def moduleIsAdditiveGroup[V, @spec(Int, Long, Float, Double) R](implicit
-    m: Module[V, R]): AdditiveGroup[V] = m
-}
-
-trait AdditiveGroup1 extends AdditiveGroup0 {
   implicit def AbGroupIsGroup[@spec(Int,Long,Float,Double) A](implicit
     g: AdditiveAbGroup[A]): AdditiveGroup[A] = g
+}
+
+trait AdditiveAbGroup0 {
+  implicit def moduleIsAdditiveAbGroup[V, @spec(Int, Long, Float, Double) R](implicit
+    m: Module[V, R]): AdditiveAbGroup[V] = m
 }
 
 import spire.math.{ConvertableTo, ConvertableFrom, Number}

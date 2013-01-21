@@ -11,7 +11,7 @@ trait Group[@spec(Int,Long,Float,Double) A] extends Monoid[A] {
   def inverse(a: A): A
 }
 
-object Group extends Group0 {
+object Group extends Group1 {
   @inline final def apply[A](implicit ev: Group[A]) = ev
 }
 
@@ -28,6 +28,12 @@ final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
   def inverse() = macro Ops.unop[A]
 }
 
-trait Group0 extends GroupProductImplicits {
+trait Group0 {
+  implicit def MapGroup[K, V: Group] = new MapGroup[K, V] {
+    val scalar = Group[V]
+  }
+}
+
+trait Group1 extends GroupProductImplicits {
   implicit def abGroup[A: AbGroup]: Group[A] = AbGroup[A]
 }

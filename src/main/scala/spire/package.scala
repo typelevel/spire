@@ -12,6 +12,8 @@ import java.lang.Long.numberOfTrailingZeros
 import java.lang.Math
 import java.math.BigInteger
 
+import scala.collection.SeqLike
+
 final class LiteralIntOps(val lhs:Int) extends AnyVal {
   @inline private final def q = Rational(lhs, 1)
 
@@ -477,8 +479,8 @@ package object math {
   final def pow(base:Double, exponent:Double) = Math.pow(base, exponent)
 
   def gcd(_x: Long, _y: Long): Long = {
-    if (_x == 0L) return _y
-    if (_y == 0L) return _x
+    if (_x == 0L) return Math.abs(_y)
+    if (_y == 0L) return Math.abs(_x)
   
     var x = Math.abs(_x)
     var xz = numberOfTrailingZeros(x)
@@ -487,7 +489,7 @@ package object math {
     var y = Math.abs(_y)
     var yz = numberOfTrailingZeros(y)
     y >>= yz
-  
+
     while (x != y) {
       if (x > y) {
         x -= y
@@ -497,7 +499,7 @@ package object math {
         y >>= numberOfTrailingZeros(y)
       }
     }
-  
+
     if (xz < yz) x << xz else x << yz
   }
 
@@ -526,6 +528,52 @@ package object math {
 }
 
 package optional {
+
+  /**
+   * This object provides implicit instances of Eq and Order for Seq-likes
+   * that will behave like infinite vectors. Essentially all this means is that
+   * `Seq(0, 0, 0) === Seq()`.
+   */
+  object vectorOrder {
+    implicit def seqEq[A, CC[A] <: SeqLike[A, CC[A]]](implicit
+        A0: Eq[A], module: Module[CC[A], A]) = new SeqVectorEq[A, CC[A]] {
+      val scalar = module.scalar
+      val A = A0
+    }
+
+    implicit def seqOrder[A, CC[A] <: SeqLike[A, CC[A]]](implicit
+        A0: Order[A], module: Module[CC[A], A]) = new SeqVectorOrder[A, CC[A]] {
+      val scalar = module.scalar
+      val A = A0
+    }
+
+    implicit def arrayEq[@spec(Int,Long,Float,Double) A](implicit
+        A0: Eq[A], module: Module[Array[A], A], ct: ClassTag[A]) = new ArrayVectorEq[A] {
+      val scalar = module.scalar
+      val A = A0
+      val classTag = ct
+    }
+
+    implicit def arrayOrder[@spec(Int,Long,Float,Double) A](implicit
+        A0: Order[A], module: Module[Array[A], A], ct: ClassTag[A]) = new ArrayVectorOrder[A] {
+      val scalar = module.scalar
+      val A = A0
+      val classTag = ct
+    }
+
+    implicit def mapOrder[K, V](implicit
+        V0: Eq[V], module: Module[Map[K, V], V]) = new MapVectorEq[K, V] {
+      val V = V0
+      val scalar = module.scalar
+    }
+  }
+
+  /**
+   * This provides orderings (Order and Eq) for Float and Double that have
+   * a total order. Specifically, this will order NaN's consistently, rather
+   * than having their order be undefined. However, this won't be as fast as
+   * the default ordering.
+   */
   object totalfloat {
     trait TotalFloatEq extends Eq[Float] {
       def eqv(x:Float, y:Float) = java.lang.Float.compare(x, y) == 0

@@ -42,7 +42,13 @@ object Expr {
   } else {
     BigIntLit(n)
   }
-  def apply[A: Coexpr](n: Rational): A = Div(apply[A](n.numerator), apply[A](n.denominator))
+  def apply[A: Coexpr](n: Rational): A = {
+    if (n.denominator == BigInt(1)) {
+      apply(n.numerator)
+    } else {
+      Div(apply[A](n.numerator), apply[A](n.denominator))
+    }
+  }
   def apply[A: Coexpr](n: Double): A = apply[A](Rational(n.toString))
   def apply[A: Coexpr](n: BigDecimal): A = apply[A](Rational(n))
 

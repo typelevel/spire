@@ -29,7 +29,7 @@ trait Ring[@spec(Int,Long,Float,Double) A] extends Semiring[A] with Rig[A] with 
     else _fromInt(plus(a, a), n / 2, sofar)
 }
 
-object Ring extends Ring0 with RingProductImplicits {
+object Ring extends RingProductImplicits {
   implicit object ByteIsRing extends ByteIsRing
   implicit object ShortIsRing extends ShortIsRing
   implicit object IntIsRing extends IntIsRing
@@ -53,11 +53,6 @@ object Ring extends Ring0 with RingProductImplicits {
   }
 
   @inline final def apply[A](implicit r:Ring[A]):Ring[A] = r
-}
-
-trait Ring0 {
-  implicit def moduleScalar[V, @spec(Int,Long,Float,Double) R](implicit
-      module: Module[V, R]): Ring[R] = module.scalar
 }
 
 trait ByteIsRing extends Ring[Byte] {
