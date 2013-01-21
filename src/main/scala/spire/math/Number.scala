@@ -6,36 +6,11 @@ import java.lang.Math
 
 // TODO: implement RationalNumber.
 // TODO: implement toNumber and fromNumber in ConvertableTo/From.
-// TODO: create implicits to support things like 3 + Number(4) -> Number(7)
-// TODO: profile SafeLong
 // TODO: pow() is hairy; should support more cases and generate better errors
 // TODO: decide what should be public/private
 
 case class NumberOutOfRange(msg: String) extends Exception(msg)
 case class InvalidNumber(msg: String) extends Exception(msg)
-
-//final class XyzOps[A](lhs:A)(implicit c: ConvertableFrom[A]) {
-//  @inline private final def n: Number = Number(c.toDouble(lhs))
-//
-//  def +(rhs: Number) = n + rhs
-//  def *(rhs: Number) = n * rhs
-//  def -(rhs: Number) = n - rhs
-//  def /(rhs: Number) = n / rhs
-//  def /~(rhs: Number) = n /~ rhs
-//  def %(rhs: Number) = n % rhs
-//  def /%(rhs: Number) = n /% rhs
-//  def pow(rhs: Number) = n pow rhs
-//  def **(rhs: Number) = n ** rhs
-//
-//  def <(rhs: Number) = n < rhs
-//  def <=(rhs: Number) = n <= rhs
-//  def >(rhs: Number) = n > rhs
-//  def >=(rhs: Number) = n >= rhs
-//
-//  def cmp(rhs: Number) = n.compare(rhs)
-//  def min(rhs: Number) = n.min(rhs)
-//  def max(rhs: Number) = n.max(rhs)
-//}
 
 /**
  * Convenient apply and implicits for Numbers
@@ -142,6 +117,9 @@ sealed trait Number extends ScalaNumericConversions {
  * Number with an underlying Long representation.
  */
 private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
+
+  override def toString(): String = n.toString
+
   def abs = IntNumber(n.abs)
   def signum = n.signum
 
@@ -278,6 +256,9 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
 }
 
 private[math] case class FloatNumber(n: Double) extends Number { lhs =>
+
+  override def toString(): String = n.toString
+
   def abs = FloatNumber(Math.abs(n))
   def signum = Math.signum(n).toInt
 
@@ -405,6 +386,9 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
 
 
 private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
+
+  override def toString(): String = n.toString
+
   def abs = DecimalNumber(n.abs)
   def signum = n.signum
 

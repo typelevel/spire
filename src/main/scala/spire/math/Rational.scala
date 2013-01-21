@@ -34,8 +34,12 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def *(rhs: Rational): Rational
   def /(rhs: Rational): Rational
 
-  def quot(rhs: Rational): Rational = Rational(SafeLong((this / rhs).toBigInt), SafeLong.one)
-  def %(rhs: Rational): Rational = this - (this quot rhs) * rhs
+  def /~(rhs: Rational): Rational = Rational(SafeLong((this / rhs).toBigInt), SafeLong.one)
+  def %(rhs: Rational): Rational = this - (this /~ rhs) * rhs
+  def /%(rhs: Rational): (Rational, Rational) = {
+    val q = this /~ rhs
+    (q, this - q * rhs)
+  }
 
   def toBigInt: BigInt
   def toBigDecimal: BigDecimal
@@ -458,7 +462,7 @@ protected abstract class Rationals[@specialized(Long) A](implicit integral: Inte
       case that => unifiedPrimitiveEquals(that)
     }
 
-    override def toString: String = "%s/%s" format (num.toString, den.toString)
+    override def toString: String = "%s/%s" format (num, den)
   }
 }
 

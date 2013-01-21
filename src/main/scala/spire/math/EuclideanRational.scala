@@ -13,13 +13,16 @@ object EuclideanRational {
     EuclideanRational(f.one, f.one)
   def zero[@spec(Int, Long) A](implicit f: EuclideanRing[A]): EuclideanRational[A] =
     EuclideanRational(f.zero, f.one)
+  def apply[@spec(Int, Long) A](a: A)(implicit f: EuclideanRing[A]): EuclideanRational[A] =
+    EuclideanRational(a, f.one)
 }
 
-case class EuclideanRational[@spec(Int, Long) A]
-(n: A, d: A)(implicit f: EuclideanRing[A]) {
+case class EuclideanRational[@spec(Int, Long) A](n: A, d: A)(implicit f: EuclideanRing[A]) {
   lhs =>
 
-  def inverse() = EuclideanRational(d, n)
+  override def toString(): String = "%s/%s" format (n, d)
+
+  def reciprocal() = EuclideanRational(d, n)
 
   def quantize() = f.quot(n, d)
 
@@ -41,10 +44,7 @@ case class EuclideanRational[@spec(Int, Long) A]
     val rd = f.quot(rhs.d, dgcd)
     val num = f.plus(f.times(lhs.n, rd), f.times(rhs.n, ld))
     val ngcd = f.gcd(num, dgcd)
-    EuclideanRational(
-      f.quot(num, ngcd),
-      f.times(ld, f.quot(rhs.d, ngcd))
-    )
+    EuclideanRational(f.quot(num, ngcd), f.times(ld, f.quot(rhs.d, ngcd)))
   }
 
   def -(rhs: EuclideanRational[A]) = lhs + (-rhs)
@@ -52,21 +52,20 @@ case class EuclideanRational[@spec(Int, Long) A]
   def *(rhs: EuclideanRational[A]) = {
     val a = f.gcd(lhs.n, rhs.d)
     val b = f.gcd(lhs.d, rhs.n)
-    EuclideanRational(
-      f.times(f.quot(lhs.n, a), f.quot(rhs.n, b)),
-      f.times(f.quot(lhs.d, b), f.quot(rhs.d, a))
-    )
+    val nn = f.times(f.quot(lhs.n, a), f.quot(rhs.n, b))
+    val dd = f.times(f.quot(lhs.d, b), f.quot(rhs.d, a))
+    EuclideanRational(nn, dd)
   }
 
-  def /(rhs: EuclideanRational[A]) = lhs * rhs.inverse
+  def /(rhs: EuclideanRational[A]) = lhs * rhs.reciprocal
 
   def /~(rhs: EuclideanRational[A]) =
     EuclideanRational((lhs / rhs).quantize, f.one)
 
-  def %(rhs: EuclideanRational[A]) = lhs - (lhs /~ rhs)
+  def %(rhs: EuclideanRational[A]) = lhs - (lhs /~ rhs) * rhs
 
   def /%(rhs: EuclideanRational[A]) = {
     val q = lhs /~ rhs
-    (q, lhs - q)
+    (q, lhs - q * rhs)
   }
 }

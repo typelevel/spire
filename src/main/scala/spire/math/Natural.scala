@@ -5,6 +5,11 @@ import scala.{specialized => spec}
 
 import Natural._
 
+// NOTE: this class works, but is only optimal for a relatively narrow
+// set of problems. for really big numbers you're probably better off
+// using SafeLong or BigInt. that said, there are cases where Natural
+// is faster (e.g. addition with 32-128 bit numbers).
+
 // TODO: almost none of this recursion is tailrec. the first goal was
 // correctness, but once that's achieved we need to focus on efficiency.
 // using a similar "private mutable" strategy that :: and ListBuffer
