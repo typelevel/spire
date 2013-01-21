@@ -66,16 +66,3 @@ with InnerProductSpace[Complex[A], A] with RingAlgebra[Complex[A], A] {
   def dot(x: Complex[A], y: Complex[A]): A =
     scalar.plus(scalar.times(x.real, y.real), scalar.times(x.imag, y.imag))
 }
-
-trait ArrayInnerProductSpace[@spec(Int,Long,Float,Double) A] extends ArrayVectorSpace[A]
-with InnerProductSpace[Array[A], A] {
-  def dot(x: Array[A], y: Array[A]): A = {
-    var z = scalar.zero
-    var i = 0
-    while (i < x.length && i < y.length) {
-      z = scalar.plus(z, scalar.times(x(i), y(i)))
-      i += 1
-    }
-    z
-  }
-}

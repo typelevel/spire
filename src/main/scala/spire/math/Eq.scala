@@ -63,6 +63,10 @@ trait Eq1 extends Eq0 {
   implicit def map[K, V](implicit V0: Eq[V]) = new MapEq[K, V] {
     val V = V0
   }
+
+  implicit def option[A: Eq] = new OptionEq[A] {
+    val A = Eq[A]
+  }
 }
 
 trait Eq2 extends Eq1 {
@@ -156,4 +160,12 @@ trait NumberEq extends Eq[Number] {
 trait NaturalEq extends Eq[Natural] {
   def eqv(x: Natural, y: Natural) = x == y
   override def neqv(x: Natural, y: Natural) = x != y
+}
+trait OptionEq[A] extends Eq[Option[A]] {
+  def A: Eq[A]
+  def eqv(x: Option[A], y: Option[A]) = (x, y) match {
+    case (Some(x), Some(y)) => A.eqv(x, y)
+    case (None, None) => true
+    case _ => false
+  }
 }

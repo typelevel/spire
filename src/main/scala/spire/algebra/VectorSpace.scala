@@ -49,5 +49,3 @@ trait VectorSpace2 extends VectorSpace1 {
 final class VectorSpaceOps[V, F](rhs: V)(implicit ev: VectorSpace[V, F]) {
   def :/ (rhs:F): V = macro Ops.binop[F, V]
 }
-
-trait ArrayVectorSpace[@spec(Int,Long,Float,Double) A] extends ArrayModule[A] with VectorSpace[Array[A], A]
