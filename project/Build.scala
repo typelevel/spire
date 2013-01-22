@@ -73,9 +73,8 @@ object MyBuild extends Build {
     dependsOn(spire)
 
   lazy val spireSettings = Seq(
-    genProductTypes <<= (scalaSource in Compile, streams) map { (scalaSource, s) =>
-      println("scalaSource: " + scalaSource)
-
+    sourceGenerators in Compile <+= (genProductTypes in Compile).task,
+    genProductTypes <<= (sourceManaged in Compile, streams) map { (scalaSource, s) =>
       s.log.info("Generating spire/algebra/tuples.scala")
       val algebraSource = ProductTypes.algebraProductTypes
       val algebraFile = (scalaSource / "spire" / "algebra" / "tuples.scala").asFile
