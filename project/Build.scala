@@ -2,8 +2,15 @@ import sbt._
 import sbt.Keys._
 
 object MyBuild extends Build {
+
+  // Dependencies
+
+  lazy val scalaTest = "org.scalatest" % "scalatest_2.10.0" % "1.8"
+  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.10.0"
+
+  // Settings
+
   override lazy val settings = super.settings ++ Seq(
-    name := "spire",
     organization := "org.spire-math",
     version := "0.3.0-RC1",
 
@@ -14,8 +21,7 @@ object MyBuild extends Build {
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
-      "org.scalatest" % "scalatest_2.10.0" % "1.8" % "test",
-      "org.scalacheck" %% "scalacheck" % "1.10.0" % "test",
+      scalaTest % "test",
       "org.scala-lang" % "scala-reflect" % "2.10.0"
     ),
 
@@ -64,15 +70,28 @@ object MyBuild extends Build {
     )
   )
 
-  val key = AttributeKey[Boolean]("javaOptionsPatched")
+  // Main
 
-  lazy val spire = Project("spire", file(".")).settings(spireSettings: _*)
-
-  lazy val examples = Project("examples", file("examples")).
-    settings(examplesSettings: _*).
-    dependsOn(spire)
+  lazy val spire = Project("spire", file(".")).
+    aggregate(core, examples, scalacheckBinding).
+    settings(spireSettings: _*)
 
   lazy val spireSettings = Seq(
+    name := "spire-aggregate",
+    publish := false,
+    publishLocal := false
+  )
+
+  // Core project
+
+  lazy val core = Project("core", file("core")).
+    settings(coreSettings: _*)
+
+  lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types",
+    "Generates several type classes for Tuple2-22.")
+
+  lazy val coreSettings = Seq(
+    name := "spire",
     sourceGenerators in Compile <+= (genProductTypes in Compile).task,
     genProductTypes <<= (sourceManaged in Compile, streams) map { (scalaSource, s) =>
       s.log.info("Generating spire/algebra/tuples.scala")
@@ -86,26 +105,44 @@ object MyBuild extends Build {
       IO.write(mathFile, mathSource)
 
       Seq[File](algebraFile, mathFile)
-    }
+    },
+    libraryDependencies += scalaCheck % "test"
   )
 
-  lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types",
-    "Generates several type classes for Tuple2-22.")
+  // Examples
 
-  def examplesSettings = Seq(
+  lazy val examples = Project("examples", file("examples")).
+    settings(examplesSettings: _*).
+    dependsOn(core)
+
+  lazy val examplesSettings = Seq(
     //scalacOptions ++= Seq("-Ymacro-debug-lite"),
-    resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
-
-    libraryDependencies ++= Seq(
-      "com.chuusai" % "shapeless_2.10.0-RC1" % "1.2.3-SNAPSHOT"
-    )
+    publish := false,
+    publishLocal := false,
+    libraryDependencies += "com.chuusai" %% "shapeless" % "1.2.3"
   )
 
-  lazy val benchmark:Project = Project("benchmark", file("benchmark")).
-    settings(benchmarkSettings: _*).
-    dependsOn(spire)
+  // Scalacheck binding
 
-  def benchmarkSettings = Seq(
+  lazy val scalacheckBinding = Project("scalacheck-binding", file("scalacheck-binding")).
+    settings(scalacheckSettings: _*).
+    dependsOn(core)
+
+  lazy val scalacheckSettings = Seq(
+    name := "spire-scalacheck-binding",
+    libraryDependencies ++= Seq(scalaTest, scalaCheck)
+  )
+
+
+  // Benchmark
+
+  lazy val benchmark: Project = Project("benchmark", file("benchmark")).
+    settings(benchmarkSettings: _*).
+    dependsOn(core)
+
+  lazy val key = AttributeKey[Boolean]("javaOptionsPatched")
+
+  lazy val benchmarkSettings = Seq(
     // raise memory limits here if necessary
     // TODO: this doesn't seem to be working with caliper at the moment :(
   
@@ -150,4 +187,5 @@ object MyBuild extends Build {
 
     // caliper stuff stolen shamelessly from scala-benchmarking-template
   )
+
 }
