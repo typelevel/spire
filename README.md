@@ -79,6 +79,7 @@ to concepts from abstract algebra:
  * `VectorSpace[V,F]` types that form a vector space
  * `NormedVectorSpace[V,F]` types with an associated norm
  * `InnerProductSpace[V,F]` types with an inner product
+ * `MetricSpace[V,R]` types with an associated metric
 
 In addition to the type classes themselves, `spire.implicits` defines many
 implicits which provide unary and infix operators for the type classes. The
@@ -177,6 +178,23 @@ most users will expect.
    + log: natural logarithm
    + fpow (`**`): exponentiation (fractional exponent)
 
+#### VectorSpaces &co
+
+The vector space family of type classes provide basic vector operations. They
+are parameterized on 2 types: the vector type and the scalar type.
+
+ * *Module*
+   + plus (`+`): vector addition
+   + minus (`-`): vector subtraction
+   + timesl (`*:`): scalar multiplication
+ * *VectorSpace*
+   + divr (`:/`): scalar division
+ * *NormedVectorSpace* 
+   + norm: vector norm
+   + normalize: normalizes vector (so norm is 1)
+ * *InnerProductSpace*
+   + dot (`⋅`, `dot`): vector inner product
+
 #### Numeric, Integral, and Fractional
 
 These high-level type classes will pull in all of the relevant algebraic type
@@ -191,6 +209,20 @@ The `Numeric` type class is unique in that it provides the same functionality
 as `Fractional` for all number types. Each type will attempt to "do the right
 thing" as far as possible, and throw errors otherwise. Users who are leery of
 this behavior are encouraged to use more precise type classes.
+
+#### BooleanAlgebra
+
+BooleanAlgebras provide an abstraction of the familiar bitwise boolean
+operators.
+
+ * *BooleanAlgebra*
+   + complement (unary `~`): complement
+   + and (`&`): conjunction
+   + or (`|`): disjunction
+   + xor (`^`): exclusive-disjunction
+
+BooleanAlgebras exist not just for `Boolean`, but also for `Byte`, `Short`,
+`Int`, `Long`, `UByte`, `UShort`, `UInt`,  and `ULong`.
 
 #### Errata
 
@@ -260,7 +292,7 @@ def selectionSort(ns: Array[Int]) {
 }
 ```
 
-### Sorting
+### Sorting and Selection
 
 Since Spire provides a specialized ordering type class, it makes sense that it
 also provides its own sorting and selection methods. These methods are defined
