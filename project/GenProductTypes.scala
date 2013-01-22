@@ -1,8 +1,15 @@
 object GenProductTypes {
+  val spec = "@spec(Int,Long,Float,Double) "
+
   case class ProductType(structure: String, parentStructure: Option[String], arity: Int) {
     val prefix = "structure"
     def typeName(i: Int): String = (64 + i).toChar.toString
     val types = (1 to arity) map (typeName(_)) mkString ", "
+    val specTypes = if (arity == 2) {
+      (1 to arity) map { i => spec + typeName(i) } mkString ","
+    } else {
+      types
+    }
     val name = structure + "Product" + arity
   }
 
@@ -19,7 +26,7 @@ object GenProductTypes {
       " with %sProduct%d[%s]" format (p, arity, types)
     } getOrElse "")
 
-    "trait %s[%s] extends %s {" format (name, types, parents)
+    "trait %s[%s] extends %s {" format (name, specTypes, parents)
   }
 
   val members: Block = { tpe =>
@@ -80,7 +87,7 @@ object GenProductTypes {
       |    new %s[%s] {
       |%s
       |    }
-      |  }""".stripMargin format (name, types, implicits, structure, types, name, types, members)
+      |  }""".stripMargin format (name, specTypes, implicits, structure, types, name, types, members)
   }
 
   def productTrait(blocks0: List[Block]): Block = { tpe =>
@@ -117,7 +124,7 @@ object GenProductTypes {
     |""".stripMargin
 
   def renderAll(pkg: String, start: Int = 2, end: Int = 22): Seq[Definition] => String = { defns =>
-    val header = "package " + pkg
+    val header = "package %s\nimport scala.{ specialized => spec }" format pkg
     val body = defns map renderStructure(start, end) mkString "\n"
 
     header + disclaimer + body
