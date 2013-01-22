@@ -20,14 +20,14 @@ Spire currently relies heavily on macros introduced Scala 2.10.0, as well as
 many improvements to specialization. Now that 2.10.0 has been released, the
 0.3.0 release of Spire is expected to follow.
 
-Until then, Spire 0.3.0-M7 is available.
+Until then, Spire 0.3.0-RC1 is available.
 
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
 scalaVersion := "2.10.0"
 
-libraryDependencies += "org.spire-math" % "spire_2.10.0" % "0.3.0-M7"
+libraryDependencies += "org.spire-math" %% "spire" % "0.3.0-RC1"
 ```
 
 ### Number Types
