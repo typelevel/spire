@@ -1,11 +1,12 @@
 package spire.algebra
+import scala.{ specialized => spec }
 
 /**************************************************************************
  * WARNING: This is an auto-generated file. Any changes will most likely  *
  * be overwritten the next time this file is regenerated.                 *
  **************************************************************************/
 
-trait SemigroupProduct2[A, B] extends Semigroup[(A, B)] {
+trait SemigroupProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B] extends Semigroup[(A, B)] {
   implicit def structure1: Semigroup[A]
   implicit def structure2: Semigroup[B]
   def op(x0: (A, B), x1: (A, B)): (A, B) = { (structure1.op(x0._1, x1._1), structure2.op(x0._2, x1._2)) }
@@ -321,7 +322,7 @@ trait SemigroupProduct22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S
   def op(x0: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), x1: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) = { (structure1.op(x0._1, x1._1), structure2.op(x0._2, x1._2), structure3.op(x0._3, x1._3), structure4.op(x0._4, x1._4), structure5.op(x0._5, x1._5), structure6.op(x0._6, x1._6), structure7.op(x0._7, x1._7), structure8.op(x0._8, x1._8), structure9.op(x0._9, x1._9), structure10.op(x0._10, x1._10), structure11.op(x0._11, x1._11), structure12.op(x0._12, x1._12), structure13.op(x0._13, x1._13), structure14.op(x0._14, x1._14), structure15.op(x0._15, x1._15), structure16.op(x0._16, x1._16), structure17.op(x0._17, x1._17), structure18.op(x0._18, x1._18), structure19.op(x0._19, x1._19), structure20.op(x0._20, x1._20), structure21.op(x0._21, x1._21), structure22.op(x0._22, x1._22)) }
 }
 trait SemigroupProductImplicits {
-  implicit def SemigroupProduct2[A, B](implicit _structure1: Semigroup[A], _structure2: Semigroup[B]): Semigroup[(A, B)] = {
+  implicit def SemigroupProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B](implicit _structure1: Semigroup[A], _structure2: Semigroup[B]): Semigroup[(A, B)] = {
     new SemigroupProduct2[A, B] {
       val structure1 = _structure1
       val structure2 = _structure2
@@ -658,7 +659,7 @@ trait SemigroupProductImplicits {
     }
   }
 }
-trait MonoidProduct2[A, B] extends Monoid[(A, B)] with SemigroupProduct2[A, B] {
+trait MonoidProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B] extends Monoid[(A, B)] with SemigroupProduct2[A, B] {
   implicit def structure1: Monoid[A]
   implicit def structure2: Monoid[B]
   def id: (A, B) = (structure1.id, structure2.id)
@@ -974,7 +975,7 @@ trait MonoidProduct22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T
   def id: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) = (structure1.id, structure2.id, structure3.id, structure4.id, structure5.id, structure6.id, structure7.id, structure8.id, structure9.id, structure10.id, structure11.id, structure12.id, structure13.id, structure14.id, structure15.id, structure16.id, structure17.id, structure18.id, structure19.id, structure20.id, structure21.id, structure22.id)
 }
 trait MonoidProductImplicits {
-  implicit def MonoidProduct2[A, B](implicit _structure1: Monoid[A], _structure2: Monoid[B]): Monoid[(A, B)] = {
+  implicit def MonoidProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B](implicit _structure1: Monoid[A], _structure2: Monoid[B]): Monoid[(A, B)] = {
     new MonoidProduct2[A, B] {
       val structure1 = _structure1
       val structure2 = _structure2
@@ -1311,7 +1312,7 @@ trait MonoidProductImplicits {
     }
   }
 }
-trait GroupProduct2[A, B] extends Group[(A, B)] with MonoidProduct2[A, B] {
+trait GroupProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B] extends Group[(A, B)] with MonoidProduct2[A, B] {
   implicit def structure1: Group[A]
   implicit def structure2: Group[B]
   def inverse(x0: (A, B)): (A, B) = { (structure1.inverse(x0._1), structure2.inverse(x0._2)) }
@@ -1627,7 +1628,7 @@ trait GroupProduct22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T,
   def inverse(x0: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) = { (structure1.inverse(x0._1), structure2.inverse(x0._2), structure3.inverse(x0._3), structure4.inverse(x0._4), structure5.inverse(x0._5), structure6.inverse(x0._6), structure7.inverse(x0._7), structure8.inverse(x0._8), structure9.inverse(x0._9), structure10.inverse(x0._10), structure11.inverse(x0._11), structure12.inverse(x0._12), structure13.inverse(x0._13), structure14.inverse(x0._14), structure15.inverse(x0._15), structure16.inverse(x0._16), structure17.inverse(x0._17), structure18.inverse(x0._18), structure19.inverse(x0._19), structure20.inverse(x0._20), structure21.inverse(x0._21), structure22.inverse(x0._22)) }
 }
 trait GroupProductImplicits {
-  implicit def GroupProduct2[A, B](implicit _structure1: Group[A], _structure2: Group[B]): Group[(A, B)] = {
+  implicit def GroupProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B](implicit _structure1: Group[A], _structure2: Group[B]): Group[(A, B)] = {
     new GroupProduct2[A, B] {
       val structure1 = _structure1
       val structure2 = _structure2
@@ -1964,7 +1965,7 @@ trait GroupProductImplicits {
     }
   }
 }
-trait AbGroupProduct2[A, B] extends AbGroup[(A, B)] with GroupProduct2[A, B] {
+trait AbGroupProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B] extends AbGroup[(A, B)] with GroupProduct2[A, B] {
   implicit def structure1: AbGroup[A]
   implicit def structure2: AbGroup[B]
 }
@@ -2259,7 +2260,7 @@ trait AbGroupProduct22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, 
   implicit def structure22: AbGroup[V]
 }
 trait AbGroupProductImplicits {
-  implicit def AbGroupProduct2[A, B](implicit _structure1: AbGroup[A], _structure2: AbGroup[B]): AbGroup[(A, B)] = {
+  implicit def AbGroupProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B](implicit _structure1: AbGroup[A], _structure2: AbGroup[B]): AbGroup[(A, B)] = {
     new AbGroupProduct2[A, B] {
       val structure1 = _structure1
       val structure2 = _structure2
@@ -2596,7 +2597,7 @@ trait AbGroupProductImplicits {
     }
   }
 }
-trait SemiringProduct2[A, B] extends Semiring[(A, B)] {
+trait SemiringProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B] extends Semiring[(A, B)] {
   implicit def structure1: Semiring[A]
   implicit def structure2: Semiring[B]
   def plus(x0: (A, B), x1: (A, B)): (A, B) = { (structure1.plus(x0._1, x1._1), structure2.plus(x0._2, x1._2)) }
@@ -2954,7 +2955,7 @@ trait SemiringProduct22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S,
   override def pow(x0: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), x1: Int): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) = { (structure1.pow(x0._1, x1), structure2.pow(x0._2, x1), structure3.pow(x0._3, x1), structure4.pow(x0._4, x1), structure5.pow(x0._5, x1), structure6.pow(x0._6, x1), structure7.pow(x0._7, x1), structure8.pow(x0._8, x1), structure9.pow(x0._9, x1), structure10.pow(x0._10, x1), structure11.pow(x0._11, x1), structure12.pow(x0._12, x1), structure13.pow(x0._13, x1), structure14.pow(x0._14, x1), structure15.pow(x0._15, x1), structure16.pow(x0._16, x1), structure17.pow(x0._17, x1), structure18.pow(x0._18, x1), structure19.pow(x0._19, x1), structure20.pow(x0._20, x1), structure21.pow(x0._21, x1), structure22.pow(x0._22, x1)) }
 }
 trait SemiringProductImplicits {
-  implicit def SemiringProduct2[A, B](implicit _structure1: Semiring[A], _structure2: Semiring[B]): Semiring[(A, B)] = {
+  implicit def SemiringProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B](implicit _structure1: Semiring[A], _structure2: Semiring[B]): Semiring[(A, B)] = {
     new SemiringProduct2[A, B] {
       val structure1 = _structure1
       val structure2 = _structure2
@@ -3291,7 +3292,7 @@ trait SemiringProductImplicits {
     }
   }
 }
-trait RngProduct2[A, B] extends Rng[(A, B)] with SemiringProduct2[A, B] {
+trait RngProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B] extends Rng[(A, B)] with SemiringProduct2[A, B] {
   implicit def structure1: Rng[A]
   implicit def structure2: Rng[B]
   def zero: (A, B) = (structure1.zero, structure2.zero)
@@ -3628,7 +3629,7 @@ trait RngProduct22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U
   def negate(x0: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) = { (structure1.negate(x0._1), structure2.negate(x0._2), structure3.negate(x0._3), structure4.negate(x0._4), structure5.negate(x0._5), structure6.negate(x0._6), structure7.negate(x0._7), structure8.negate(x0._8), structure9.negate(x0._9), structure10.negate(x0._10), structure11.negate(x0._11), structure12.negate(x0._12), structure13.negate(x0._13), structure14.negate(x0._14), structure15.negate(x0._15), structure16.negate(x0._16), structure17.negate(x0._17), structure18.negate(x0._18), structure19.negate(x0._19), structure20.negate(x0._20), structure21.negate(x0._21), structure22.negate(x0._22)) }
 }
 trait RngProductImplicits {
-  implicit def RngProduct2[A, B](implicit _structure1: Rng[A], _structure2: Rng[B]): Rng[(A, B)] = {
+  implicit def RngProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B](implicit _structure1: Rng[A], _structure2: Rng[B]): Rng[(A, B)] = {
     new RngProduct2[A, B] {
       val structure1 = _structure1
       val structure2 = _structure2
@@ -3965,7 +3966,7 @@ trait RngProductImplicits {
     }
   }
 }
-trait RigProduct2[A, B] extends Rig[(A, B)] with SemiringProduct2[A, B] {
+trait RigProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B] extends Rig[(A, B)] with SemiringProduct2[A, B] {
   implicit def structure1: Rig[A]
   implicit def structure2: Rig[B]
   def zero: (A, B) = (structure1.zero, structure2.zero)
@@ -4302,7 +4303,7 @@ trait RigProduct22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U
   def one: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) = (structure1.one, structure2.one, structure3.one, structure4.one, structure5.one, structure6.one, structure7.one, structure8.one, structure9.one, structure10.one, structure11.one, structure12.one, structure13.one, structure14.one, structure15.one, structure16.one, structure17.one, structure18.one, structure19.one, structure20.one, structure21.one, structure22.one)
 }
 trait RigProductImplicits {
-  implicit def RigProduct2[A, B](implicit _structure1: Rig[A], _structure2: Rig[B]): Rig[(A, B)] = {
+  implicit def RigProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B](implicit _structure1: Rig[A], _structure2: Rig[B]): Rig[(A, B)] = {
     new RigProduct2[A, B] {
       val structure1 = _structure1
       val structure2 = _structure2
@@ -4639,7 +4640,7 @@ trait RigProductImplicits {
     }
   }
 }
-trait RingProduct2[A, B] extends Ring[(A, B)] with RngProduct2[A, B] {
+trait RingProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B] extends Ring[(A, B)] with RngProduct2[A, B] {
   implicit def structure1: Ring[A]
   implicit def structure2: Ring[B]
   override def fromInt(x0: Int): (A, B) = { (structure1.fromInt(x0), structure2.fromInt(x0)) }
@@ -4976,7 +4977,7 @@ trait RingProduct22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, 
   def one: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) = (structure1.one, structure2.one, structure3.one, structure4.one, structure5.one, structure6.one, structure7.one, structure8.one, structure9.one, structure10.one, structure11.one, structure12.one, structure13.one, structure14.one, structure15.one, structure16.one, structure17.one, structure18.one, structure19.one, structure20.one, structure21.one, structure22.one)
 }
 trait RingProductImplicits {
-  implicit def RingProduct2[A, B](implicit _structure1: Ring[A], _structure2: Ring[B]): Ring[(A, B)] = {
+  implicit def RingProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B](implicit _structure1: Ring[A], _structure2: Ring[B]): Ring[(A, B)] = {
     new RingProduct2[A, B] {
       val structure1 = _structure1
       val structure2 = _structure2
@@ -5313,7 +5314,7 @@ trait RingProductImplicits {
     }
   }
 }
-trait EuclideanRingProduct2[A, B] extends EuclideanRing[(A, B)] with RingProduct2[A, B] {
+trait EuclideanRingProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B] extends EuclideanRing[(A, B)] with RingProduct2[A, B] {
   implicit def structure1: EuclideanRing[A]
   implicit def structure2: EuclideanRing[B]
   def quot(x0: (A, B), x1: (A, B)): (A, B) = { (structure1.quot(x0._1, x1._1), structure2.quot(x0._2, x1._2)) }
@@ -5671,7 +5672,7 @@ trait EuclideanRingProduct22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, 
   def gcd(x0: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), x1: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) = { (structure1.gcd(x0._1, x1._1), structure2.gcd(x0._2, x1._2), structure3.gcd(x0._3, x1._3), structure4.gcd(x0._4, x1._4), structure5.gcd(x0._5, x1._5), structure6.gcd(x0._6, x1._6), structure7.gcd(x0._7, x1._7), structure8.gcd(x0._8, x1._8), structure9.gcd(x0._9, x1._9), structure10.gcd(x0._10, x1._10), structure11.gcd(x0._11, x1._11), structure12.gcd(x0._12, x1._12), structure13.gcd(x0._13, x1._13), structure14.gcd(x0._14, x1._14), structure15.gcd(x0._15, x1._15), structure16.gcd(x0._16, x1._16), structure17.gcd(x0._17, x1._17), structure18.gcd(x0._18, x1._18), structure19.gcd(x0._19, x1._19), structure20.gcd(x0._20, x1._20), structure21.gcd(x0._21, x1._21), structure22.gcd(x0._22, x1._22)) }
 }
 trait EuclideanRingProductImplicits {
-  implicit def EuclideanRingProduct2[A, B](implicit _structure1: EuclideanRing[A], _structure2: EuclideanRing[B]): EuclideanRing[(A, B)] = {
+  implicit def EuclideanRingProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B](implicit _structure1: EuclideanRing[A], _structure2: EuclideanRing[B]): EuclideanRing[(A, B)] = {
     new EuclideanRingProduct2[A, B] {
       val structure1 = _structure1
       val structure2 = _structure2
@@ -6008,7 +6009,7 @@ trait EuclideanRingProductImplicits {
     }
   }
 }
-trait FieldProduct2[A, B] extends Field[(A, B)] with EuclideanRingProduct2[A, B] {
+trait FieldProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B] extends Field[(A, B)] with EuclideanRingProduct2[A, B] {
   implicit def structure1: Field[A]
   implicit def structure2: Field[B]
   def div(x0: (A, B), x1: (A, B)): (A, B) = { (structure1.div(x0._1, x1._1), structure2.div(x0._2, x1._2)) }
@@ -6408,7 +6409,7 @@ trait FieldProduct22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T,
   def isWhole(x: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)): Boolean = false
 }
 trait FieldProductImplicits {
-  implicit def FieldProduct2[A, B](implicit _structure1: Field[A], _structure2: Field[B]): Field[(A, B)] = {
+  implicit def FieldProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B](implicit _structure1: Field[A], _structure2: Field[B]): Field[(A, B)] = {
     new FieldProduct2[A, B] {
       val structure1 = _structure1
       val structure2 = _structure2

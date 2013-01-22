@@ -1,11 +1,12 @@
 package spire.math
+import scala.{ specialized => spec }
 
 /**************************************************************************
  * WARNING: This is an auto-generated file. Any changes will most likely  *
  * be overwritten the next time this file is regenerated.                 *
  **************************************************************************/
 
-trait EqProduct2[A, B] extends Eq[(A, B)] {
+trait EqProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B] extends Eq[(A, B)] {
   implicit def structure1: Eq[A]
   implicit def structure2: Eq[B]
   def eqv(x0: (A, B), x1: (A, B)): Boolean = structure1.eqv(x0._1, x1._1) && structure2.eqv(x0._2, x1._2)
@@ -321,7 +322,7 @@ trait EqProduct22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U,
   def eqv(x0: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V), x1: (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)): Boolean = structure1.eqv(x0._1, x1._1) && structure2.eqv(x0._2, x1._2) && structure3.eqv(x0._3, x1._3) && structure4.eqv(x0._4, x1._4) && structure5.eqv(x0._5, x1._5) && structure6.eqv(x0._6, x1._6) && structure7.eqv(x0._7, x1._7) && structure8.eqv(x0._8, x1._8) && structure9.eqv(x0._9, x1._9) && structure10.eqv(x0._10, x1._10) && structure11.eqv(x0._11, x1._11) && structure12.eqv(x0._12, x1._12) && structure13.eqv(x0._13, x1._13) && structure14.eqv(x0._14, x1._14) && structure15.eqv(x0._15, x1._15) && structure16.eqv(x0._16, x1._16) && structure17.eqv(x0._17, x1._17) && structure18.eqv(x0._18, x1._18) && structure19.eqv(x0._19, x1._19) && structure20.eqv(x0._20, x1._20) && structure21.eqv(x0._21, x1._21) && structure22.eqv(x0._22, x1._22)
 }
 trait EqProductImplicits {
-  implicit def EqProduct2[A, B](implicit _structure1: Eq[A], _structure2: Eq[B]): Eq[(A, B)] = {
+  implicit def EqProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B](implicit _structure1: Eq[A], _structure2: Eq[B]): Eq[(A, B)] = {
     new EqProduct2[A, B] {
       val structure1 = _structure1
       val structure2 = _structure2
@@ -658,7 +659,7 @@ trait EqProductImplicits {
     }
   }
 }
-trait OrderProduct2[A, B] extends Order[(A, B)] with EqProduct2[A, B] {
+trait OrderProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B] extends Order[(A, B)] with EqProduct2[A, B] {
   implicit def structure1: Order[A]
   implicit def structure2: Order[B]
   def compare(x0: (A, B), x1: (A, B)): Int = {
@@ -1793,7 +1794,7 @@ trait OrderProduct22[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T,
 }
 }
 trait OrderProductImplicits {
-  implicit def OrderProduct2[A, B](implicit _structure1: Order[A], _structure2: Order[B]): Order[(A, B)] = {
+  implicit def OrderProduct2[@spec(Int,Long,Float,Double) A,@spec(Int,Long,Float,Double) B](implicit _structure1: Order[A], _structure2: Order[B]): Order[(A, B)] = {
     new OrderProduct2[A, B] {
       val structure1 = _structure1
       val structure2 = _structure2
