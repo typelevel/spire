@@ -8,7 +8,7 @@ import spire.implicits._
 
 object Gcd {
   def gcd0[A:Integral](x: A, y: A): A =
-    if ((x % y) === 0) y else gcd0(y, x % y)
+    if ((x % y) === Integral[A].fromInt(0)) y else gcd0(y, x % y)
 
   def gcd1[A:EuclideanRing:Order](x: A, y: A): A =
     if (x % y === EuclideanRing[A].zero) y else gcd1(y, x % y)

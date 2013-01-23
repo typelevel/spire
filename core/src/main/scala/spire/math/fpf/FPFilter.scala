@@ -64,22 +64,22 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
 }
 
 trait FPFilterEq[A] extends Eq[FPFilter[A]] {
-  implicit def ev: Eq[A]
+  implicit def order: Eq[A]
 
   def eqv(a: FPFilter[A], b: FPFilter[A]): Boolean = (a.approx - b.approx).sign match {
     case Some(s) => s == Zero
-    case None => ev.eqv(a.value, b.value)
+    case None => order.eqv(a.value, b.value)
   }
 }
 
 trait FPFilterOrder[A] extends FPFilterEq[A] {
-  implicit def ev: Order[A]
+  implicit def order: Order[A]
 
   def compare(a: FPFilter[A], b: FPFilter[A]): Int = (a.approx - b.approx).sign match {
     case Some(Positive) => 1
     case Some(Negative) => -1
     case Some(Zero) => 0
-    case None => ev.compare(a.value, b.value)
+    case None => order.compare(a.value, b.value)
   }
 }
 
@@ -170,7 +170,7 @@ trait FPFilterIsRing[A] extends Ring[FPFilter[A]] {
   override def fromInt(a: Int): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromInt(a))
 }
 
-trait FPFilterIsEuclideanRing[A] extends FPFilterIsRing[A] with EuclideanRing[FPFilter[A]] {
+trait FPFilterIsEuclideanRing[A] extends FPFilterIsRing[A] with EuclideanRing[FPFilter[A]] with FPFilterEq[A] {
   implicit def ev: EuclideanRing[A]
 
   def quot(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
@@ -180,7 +180,7 @@ trait FPFilterIsEuclideanRing[A] extends FPFilterIsRing[A] with EuclideanRing[FP
     new FPFilter(a.approx mod b.approx, ev.mod(a.value, b.value))
 
   def gcd(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
-    euclid(a, b)(Eq[FPFilter[A]])
+    euclid(a, b)(this)
 }
 
 trait FPFilterIsField[A] extends FPFilterIsEuclideanRing[A] with Field[FPFilter[A]] {
@@ -208,6 +208,7 @@ with FPFilterIsField[A] with FPFilterIsNRoot[A]
 with FPFilterOrder[A] with FPFilterIsSigned[A]
 with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   implicit val ev: Numeric[A]
+  def order = ev
 
   def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
   def ceil(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
@@ -221,6 +222,7 @@ with FPFilterIsField[A] with FPFilterIsNRoot[A]
 with FPFilterOrder[A] with FPFilterIsSigned[A]
 with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   implicit val ev: Fractional[A]
+  def order = ev
 
   def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
   def ceil(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
@@ -236,9 +238,10 @@ trait LowPriorityFPFilterImplicits {
       val ev = num
     }
 
-  implicit def FPFilterIsEuclideanRing[A](implicit erng: EuclideanRing[A]): EuclideanRing[FPFilter[A]] =
+  implicit def FPFilterIsEuclideanRing[A](implicit erng: EuclideanRing[A], eq0: Eq[A]): EuclideanRing[FPFilter[A]] =
     new FPFilterIsEuclideanRing[A] {
       val ev = erng
+      val order = eq0
     }
 }
 
