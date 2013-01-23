@@ -66,7 +66,7 @@ object KMeansExample extends App {
         val counts = new Array[Int](clusters0.length)
         cfor(0)(_ < points.length, _ + 1) { i =>
           val idx = assignments(i)
-          clusters(idx) = clusters(i) + points(i)
+          clusters(idx) = clusters(idx) + points(i)
           counts(idx) += 1
         }
         cfor(0)(_ < clusters.length, _ + 1) { j =>
