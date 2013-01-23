@@ -527,7 +527,19 @@ package object math {
   final def max[A](x: A, y: A)(implicit ev: Order[A]) = ev.max(x, y)
 }
 
+private[this] class GenericEq[@spec A] extends Eq[A] {
+  def eqv(x:A, y:A): Boolean = x == y
+}
+
 package optional {
+
+  /**
+   * This provides an implicit `Eq[A]` for any type `A` using Scala's (Java's)
+   * `==` (`equals`).
+   */
+  object genericEq {
+    implicit def generic[@spec A]: Eq[A] = new GenericEq[A]
+  }
 
   /**
    * This object provides implicit instances of Eq and Order for Seq-likes

@@ -59,7 +59,7 @@ class LawTests extends LawChecker {
 
   checkAll("List is a Monoid", Laws[List[Int]].monoid)
   checkAll("Vector is a Monoid", Laws[Vector[Int]].monoid)
-  checkAll("Set is a Monoid", Laws[Set[Int]].monoid)
+  checkAll("Set is a Monoid", Laws[Set[Int]](spire.optional.genericEq.generic, implicitly).monoid)
   checkAll("String is a Monoid", Laws[String].monoid)
 }
 
