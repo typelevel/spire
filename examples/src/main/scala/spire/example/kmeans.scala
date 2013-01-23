@@ -17,12 +17,20 @@ import scala.annotation.tailrec
  * We implement Lloyd's algorithm, which has problems of its own, but performs
  * well enough.
  */
-object lloyd extends App {
+object KMeansExample extends App {
+
+  /**
+   * Returns a collection of k points which are the centers of k clusters of
+   * `points0`.
+   */
   def kMeans[V, @spec(Double) A, CC[V] <: Iterable[V]](points0: CC[V], k: Int)(implicit
       vs: NormedVectorSpace[V, A], order: Order[A],
       cbf: CanBuildFrom[Nothing, V, CC[V]], ct: ClassTag[V]): CC[V] = {
 
     val points = points0.toArray
+
+    // We want to create an array that maps the index of each point to the
+    // index of the cluster it is closest to (according to the norm).
 
     def assign(clusters: Array[V]): Array[Int] = {
       val assignments = new Array[Int](points.length)
@@ -40,6 +48,13 @@ object lloyd extends App {
       }
       assignments
     }
+
+    // This is the main loop of the k-means algorithm. Given a new clustering
+    // and some previous assignments mapping each point to a cluster, we
+    // determine if the new clustering will cause any points to switch
+    // clusters. If so, we re-assign all points to their closest center in the
+    // clustering, then find new centers using the centroids of the points
+    // assigned to each cluster, rinse, repeat.
 
     @tailrec
     def loop(assignments0: Array[Int], clusters0: Array[V]): Array[V] = {
@@ -61,8 +76,14 @@ object lloyd extends App {
       }
     }
 
+    // Our seed points are chosen rather naively. However, the points below are
+    // generated randomly, so we don't need to worry about being too smart here.
+
     val init: Array[V] = points take k
     val clusters = loop(assign(init), init)
+
+    // We work with arrays above, but turn it into the collection type the user
+    // wants before we return the clusters.
 
     val bldr = cbf()
     cfor(0)(_ < clusters.length, _ + 1) { i =>
@@ -70,6 +91,9 @@ object lloyd extends App {
     }
     bldr.result()
   }
+
+  // This method let's us generate a set of n points which are clustered around
+  // k centers in d-dimensions.
 
   def genPoints[CC[_], V, @spec(Double) A](d: Int, k: Int, n: Int)(f: Array[Double] => V)(implicit
       vs: VectorSpace[V, A], cbf: CanBuildFrom[Nothing, V, CC[V]]): CC[V] = {
@@ -88,6 +112,9 @@ object lloyd extends App {
   }
 
   implicit val mc = java.math.MathContext.DECIMAL128
+
+  // We construct 3 sets of points, each using different VectorSpaces. We'll
+  // cluster each one, using the same k-means algorithm.
 
   val points0 = genPoints[List, Array[Double], Double](15, 5, 10000)(identity)
   val points1 = genPoints[List, Vector[Double], Double](5, 10, 10000)(_.toVector)
