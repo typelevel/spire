@@ -61,6 +61,7 @@ class LawTests extends LawChecker {
   checkAll("Vector is a Monoid", Laws[Vector[Int]].monoid)
   checkAll("Set is a Monoid", Laws[Set[Int]](spire.optional.genericEq.generic, implicitly).monoid)
   checkAll("String is a Monoid", Laws[String].monoid)
+  checkAll("Array is a Monoid", Laws[Array[Int]].monoid)
 }
 
 // vim: expandtab:ts=2:sw=2
