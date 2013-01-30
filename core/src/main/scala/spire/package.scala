@@ -373,6 +373,7 @@ object implicits {
   implicit def vectorSpaceOps[V, F](v:V)(implicit m:VectorSpace[V,F]) = new VectorSpaceOps[V, F](v)
   implicit def normedVectorSpaceOps[V](v:V) = new NormedVectorSpaceOps[V](v)
   implicit def innerProductSpaceOps[V](v:V) = new InnerProductSpaceOps[V](v)
+  implicit def coordianteSpaceOps[V](v:V) = new CoordinateSpaceOps[V](v)
 
   implicit def literalIntOps(lhs:Int) = new LiteralIntOps(lhs)
   implicit def literalDoubleOps(lhs:Double) = new LiteralDoubleOps(lhs)

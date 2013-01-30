@@ -91,6 +91,11 @@ with InnerProductSpace[SA, A] {
   }
 }
 
+trait SeqCoordinateSpace[A, SA <: SeqLike[A, SA]] extends SeqInnerProductSpace[A, SA]
+with CoordinateSpace[SA, A] {
+  def get(v: SA, i: Int): A = v(i)
+}
+
 /**
  * The L_p norm is equal to the `p`-th root of the sum of each element to the
  * power `p`. For instance, if `p = 1` we have the Manhattan distance. If you'd
