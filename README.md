@@ -248,6 +248,9 @@ val mask = b"255" // unsigned constant converted to signed (-1)
 val n1 = r"1/3"
 val n2 = r"1599/115866" // simplified at compile-time to 13/942
 
+// support different radix literals
+import spire.syntax.radix._
+
 // representations of the number 23
 val a = x2"10111" // binary
 val b = x8"27" // octal
