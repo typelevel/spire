@@ -93,7 +93,7 @@ with InnerProductSpace[SA, A] {
 
 trait SeqCoordinateSpace[A, SA <: SeqLike[A, SA]] extends SeqInnerProductSpace[A, SA]
 with CoordinateSpace[SA, A] {
-  def get(v: SA, i: Int): A = v(i)
+  def coord(v: SA, i: Int): A = v(i)
 }
 
 /**

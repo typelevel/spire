@@ -69,3 +69,8 @@ with InnerProductSpace[Array[A], A] {
     z
   }
 }
+
+trait ArrayCoordinateSpace[@spec(Int,Long,Float,Double) A] extends ArrayInnerProductSpace[A]
+with CoordinateSpace[Array[A], A] {
+  def coord(v: Array[A], i: Int): A = v(i)
+}

@@ -5,48 +5,36 @@ import spire.math._
 import spire.implicits._
 import spire.syntax._
 
-import scala.{ specialized => spec }
 import scala.annotation.tailrec
 import scala.util.Random.nextInt
 
 import scala.reflect.ClassTag
 
-import java.io.{ BufferedReader, InputStreamReader }
 
 /**
  * An example of constructing Random Forests for both regression and
  * classification. This example shows off the utility of vector spaces (in this
- * case `CoordinateSpace`), fields, and orders to implement a generic random
- * forest.
+ * case `CoordinateSpace`), fields, and orders to create random forests.
  */
 object RandomForestExample extends App {
-  def withResource[A](path: String)(f: BufferedReader => A): A = {
-    val in = getClass.getResourceAsStream(path)
-    val reader = new BufferedReader(new InputStreamReader(in))
-    val result = f(reader)
-    reader.close()
-    result
-  }
 
-  def readDataSet(path: String): List[String] = withResource(path) { reader =>
-    Stream.continually(reader.readLine()).takeWhile(_ != null).toList
-  }
+  def test[V, F, K](dataset: DataSet[V, F, K], opts: RandomForest.Options)(implicit
+      order: Order[F], classTagV: ClassTag[V], classTagK: ClassTag[K]) {
 
-  val iris: List[(Vector[Double], String)] = {
-    val lines = readDataSet("/datasets/iris.data")
-    lines map { line =>
-      val fields = line.split(',').toVector
-      (fields take 4 map (_.toDouble), fields.last)
+    println(s"\n${dataset.name} Data Set:")
+    println(s"  ${dataset.space.dimensions} variables")
+    println(s"  ${dataset.data.size} data points")
+    println("  Performing 10-fold cross-validation...")
+    val accuracy = DataSets.crossValidate(dataset) { implicit space => data =>
+      RandomForest.classification(data, opts)
     }
+    println("  Accuracy of %.2f%%" format (accuracy * 100))
   }
 
-  implicit val irisSpace = CoordinateSpace.seq[Double, Vector](4)
-  val irisClassifier = RandomForest.classification(iris, RandomForest.Options())
-  val error = iris.map({ case (v, k) =>
-    if (irisClassifier(v) == k) 1 else 0
-  }).qsum / iris.size
-
-  println(error)
+  test(DataSets.Iris, RandomForest.Options())
+  test(DataSets.Yeast, RandomForest.Options(
+    numAxesSample = Some(2), numPointsSample = Some(200),
+    numTrees = Some(500), minSplitSize = Some(3)))
 }
 
 
@@ -54,7 +42,7 @@ sealed trait DecisionTree[V, F, K] {
   def apply(v: V)(implicit V: CoordinateSpace[V, F], F: Order[F]): K = {
     @tailrec def loop(tree: DecisionTree[V, F, K]): K = tree match {
       case Split(i, boundary, left, right) =>
-        if (v.coord(i) < boundary) loop(left) else loop(right)
+        if (v.coord(i) <= boundary) loop(left) else loop(right)
       case Leaf(k) =>
         k
     }
@@ -180,7 +168,7 @@ trait RandomForest[V, F, K] {
       val indices = new Array[Int](opts.numAxesSample)
       cfor(0)(_ < indices.length, _ + 1) { i => indices(i) = i }
       cfor(V.dimensions - 1)(_ >= indices.length, _ - 1) { i =>
-        val j = nextInt(i)
+        val j = nextInt(i + 1)
         if (j < indices.length)
           indices(j) = i
       }
@@ -231,7 +219,8 @@ trait RandomForest[V, F, K] {
           cfor(0)(_ < (members.length - 1), _ + 1) { j =>
             leftRegion += outputs(j)
             rightRegion -= outputs(j)
-            val error = (leftRegion.error + rightRegion.error) / 2
+            val error = (leftRegion.error * (j + 1) + 
+                         rightRegion.error * (members.length - j - 1)) / members.length
             if (error < minError) {
               minError = error
               minVar = axis
@@ -243,15 +232,17 @@ trait RandomForest[V, F, K] {
         // If we can never do better than our initial region, we don't bother
         // to split it.
 
-        if (minIdx <= 0) {
-          Leaf(region0.value)
-        } else {
-          members.qsortBy(data(_).coord(minVar))
-          val value = data(members(minIdx)).coord(minVar)
-          val left = members take minIdx
-          val right = members drop minIdx
-          Split(minVar, value, growTree(left), growTree(right))
+        if (minIdx < 0) {
+          minVar = vars(vars.length - 1)
+          minIdx = members.length / 2
         }
+
+        members.qsortBy(data(_).coord(minVar))
+        val boundary = (data(members(minIdx)).coord(minVar) +
+                        data(members(minIdx + 1)).coord(minVar)) / 2
+        val left = members take (minIdx + 1)
+        val right = members drop (minIdx + 1)
+        Split(minVar, boundary, growTree(left), growTree(right))
       }
     }
 
