@@ -17,96 +17,31 @@ import scala.reflect.ClassTag
  * case `CoordinateSpace`), fields, and orders to create random forests.
  */
 object RandomForestExample extends App {
-
-  def test[V, F, K](dataset: DataSet[V, F, K], opts: RandomForest.Options)(implicit
+  def test[V, F, K](dataset: DataSet[V, F, K], opts: RandomForestOptions)(implicit
       order: Order[F], classTagV: ClassTag[V], classTagK: ClassTag[K]) {
 
     println(s"\n${dataset.name} Data Set:")
     println(s"  ${dataset.space.dimensions} variables")
     println(s"  ${dataset.data.size} data points")
     println("  Performing 10-fold cross-validation...")
-    val accuracy = DataSets.crossValidate(dataset) { implicit space => data =>
+    val accuracy = DataSet.crossValidate(dataset) { implicit space => data =>
       RandomForest.classification(data, opts)
     }
     println("  Accuracy of %.2f%%" format (accuracy * 100))
   }
 
-  test(DataSets.Iris, RandomForest.Options())
-  test(DataSets.Yeast, RandomForest.Options(
+  test(DataSet.Iris, RandomForestOptions())
+  test(DataSet.Yeast, RandomForestOptions(
     numAxesSample = Some(2), numPointsSample = Some(200),
     numTrees = Some(500), minSplitSize = Some(3)))
 }
 
 
-sealed trait DecisionTree[V, F, K] {
-  def apply(v: V)(implicit V: CoordinateSpace[V, F], F: Order[F]): K = {
-    @tailrec def loop(tree: DecisionTree[V, F, K]): K = tree match {
-      case Split(i, boundary, left, right) =>
-        if (v.coord(i) <= boundary) loop(left) else loop(right)
-      case Leaf(k) =>
-        k
-    }
-
-    loop(this)
-  }
-}
-
-case class Split[V, F, K](variable: Int, boundary: F,
-    left: DecisionTree[V, F, K], right: DecisionTree[V, F, K]) extends DecisionTree[V, F, K]
-
-case class Leaf[V, F, K](value: K) extends DecisionTree[V, F, K]
-
-
-object RandomForest {
-
-  case class Options(
-    numAxesSample: Option[Int] = None,
-    numPointsSample: Option[Int] = None,
-    numTrees: Option[Int] = None,
-    minSplitSize: Option[Int] = None)
-
-  object Options {
-    def default = Options()
-  }
-
-  def regression[V, F](data: Array[V], out: Array[F], options: Options)(implicit
-      V: CoordinateSpace[V, F], order: Order[F], ev: ClassTag[V]): V => F = {
-    val rfr = new RandomForestRegression[V, F]
-    rfr(data, out, options)
-  }
-      
-  def regression[V, F](data: Iterable[V], out: Iterable[F],
-      options: Options)(implicit V: CoordinateSpace[V, F], order: Order[F],
-      classTagV: ClassTag[V], classTagF: ClassTag[F]): V => F = {
-    regression(data.toArray, out.toArray, options)
-  }
-
-  def regression[V, F](data: Iterable[(V, F)], options: Options)(implicit
-      V: CoordinateSpace[V, F], order: Order[F],
-      classTagV: ClassTag[V], classTagF: ClassTag[F]): V => F = {
-    val (in, out) = data.unzip
-    regression(in.toArray, out.toArray, options)
-  }
-
-  def classification[V, F, K](data: Array[V], out: Array[K], options: Options)(implicit
-      V: CoordinateSpace[V, F], order: Order[F], ev: ClassTag[V]): V => K = {
-    val rfc = new RandomForestClassification[V, F, K]
-    rfc(data, out, options)
-  }
-
-  def classification[V, F, K](data: Iterable[V], out: Iterable[K],
-      options: Options)(implicit V: CoordinateSpace[V, F],
-      order: Order[F], classTagV: ClassTag[V], classTagK: ClassTag[K]): V => K = {
-    classification(data.toArray, out.toArray, options)
-  }
-
-  def classification[V, F, K](data: Iterable[(V, K)], options: Options)(implicit
-      V: CoordinateSpace[V, F], order: Order[F],
-      classTagV: ClassTag[V], classTagK: ClassTag[K]): V => K = {
-    val (in, out) = data.unzip
-    classification(in.toArray, out.toArray, options)
-  }
-}
+case class RandomForestOptions(
+  numAxesSample: Option[Int] = None,   // # of variables sampled each split.
+  numPointsSample: Option[Int] = None, // # of points sampled per tree.
+  numTrees: Option[Int] = None,        // # of trees created.
+  minSplitSize: Option[Int] = None)    // min. node size required for split.
 
 
 /**
@@ -117,8 +52,6 @@ object RandomForest {
  * these outputs using the `Region`.
  */
 trait RandomForest[V, F, K] {
-  import RandomForest.Options
-
   implicit def V: CoordinateSpace[V, F]
   implicit def F: Field[F] = V.scalar
   implicit def order: Order[F]
@@ -195,8 +128,7 @@ trait RandomForest[V, F, K] {
     }
 
     // Grows a decision tree from a single region. The tree will keep growing
-    // until we either hit the minimum region size, or we cannot find a split
-    // that will decrease the "disparity" of the region.
+    // until we hit the minimum region size.
 
     def growTree(members: Array[Int]): DecisionTree[V, F, K] = {
       if (members.length < opts.minSplitSize) {
@@ -229,13 +161,15 @@ trait RandomForest[V, F, K] {
           }
         }
 
-        // If we can never do better than our initial region, we don't bother
-        // to split it.
+        // If we can never do better than our initial region, then split the
+        // middle of some random axis -- we can probably do better here.
 
         if (minIdx < 0) {
           minVar = vars(vars.length - 1)
           minIdx = members.length / 2
         }
+
+        // We could do this in a single linear scan, but this is an example.
 
         members.qsortBy(data(_).coord(minVar))
         val boundary = (data(members(minIdx)).coord(minVar) +
@@ -255,7 +189,7 @@ trait RandomForest[V, F, K] {
 
   protected def defaultOptions(size: Int): FixedOptions
 
-  private def fixOptions(size: Int, options: Options): FixedOptions = {
+  private def fixOptions(size: Int, options: RandomForestOptions): FixedOptions = {
     val defaults = defaultOptions(size)
     FixedOptions(
       options.numAxesSample getOrElse defaults.numAxesSample,
@@ -264,7 +198,7 @@ trait RandomForest[V, F, K] {
       options.minSplitSize getOrElse defaults.minSplitSize)
   }
 
-  def apply(data: Array[V], out: Array[K], options: Options) = {
+  def apply(data: Array[V], out: Array[K], options: RandomForestOptions) = {
     fromForest(randomForest(data, out, fixOptions(data.length, options)))
   }
 }
@@ -359,3 +293,73 @@ class RandomForestClassification[V, F, K](implicit val V: CoordinateSpace[V, F],
     }.maxBy(_._2)._1
   }
 }
+
+
+object RandomForest {
+
+  def regression[V, F](data: Array[V], out: Array[F], options: RandomForestOptions)(implicit
+      V: CoordinateSpace[V, F], order: Order[F], ev: ClassTag[V]): V => F = {
+    val rfr = new RandomForestRegression[V, F]
+    rfr(data, out, options)
+  }
+      
+  def regression[V, F](data: Iterable[V], out: Iterable[F],
+      options: RandomForestOptions)(implicit V: CoordinateSpace[V, F], order: Order[F],
+      classTagV: ClassTag[V], classTagF: ClassTag[F]): V => F = {
+    regression(data.toArray, out.toArray, options)
+  }
+
+  def regression[V, F](data: Iterable[(V, F)], options: RandomForestOptions)(implicit
+      V: CoordinateSpace[V, F], order: Order[F],
+      classTagV: ClassTag[V], classTagF: ClassTag[F]): V => F = {
+    val (in, out) = data.unzip
+    regression(in.toArray, out.toArray, options)
+  }
+
+  def classification[V, F, K](data: Array[V], out: Array[K], options: RandomForestOptions)(implicit
+      V: CoordinateSpace[V, F], order: Order[F], ev: ClassTag[V]): V => K = {
+    val rfc = new RandomForestClassification[V, F, K]
+    rfc(data, out, options)
+  }
+
+  def classification[V, F, K](data: Iterable[V], out: Iterable[K],
+      options: RandomForestOptions)(implicit V: CoordinateSpace[V, F],
+      order: Order[F], classTagV: ClassTag[V], classTagK: ClassTag[K]): V => K = {
+    classification(data.toArray, out.toArray, options)
+  }
+
+  def classification[V, F, K](data: Iterable[(V, K)], options: RandomForestOptions)(implicit
+      V: CoordinateSpace[V, F], order: Order[F],
+      classTagV: ClassTag[V], classTagK: ClassTag[K]): V => K = {
+    val (in, out) = data.unzip
+    classification(in.toArray, out.toArray, options)
+  }
+}
+
+
+/**
+ * A simple decision tree. Each internal node is assigned an axis aligned
+ * boundary which divides the space in 2 (left and right). To determine the
+ * value of an input point, we simple determine which side of the boundary line
+ * the input lies on, then recurse on that side. When we reach a leaf node, we
+ * output its value.
+ */
+sealed trait DecisionTree[V, F, K] {
+  def apply(v: V)(implicit V: CoordinateSpace[V, F], F: Order[F]): K = {
+    @tailrec def loop(tree: DecisionTree[V, F, K]): K = tree match {
+      case Split(i, boundary, left, right) =>
+        if (v.coord(i) <= boundary) loop(left) else loop(right)
+      case Leaf(k) =>
+        k
+    }
+
+    loop(this)
+  }
+}
+
+case class Split[V, F, K](variable: Int, boundary: F,
+    left: DecisionTree[V, F, K], right: DecisionTree[V, F, K]) extends DecisionTree[V, F, K]
+
+case class Leaf[V, F, K](value: K) extends DecisionTree[V, F, K]
+
+

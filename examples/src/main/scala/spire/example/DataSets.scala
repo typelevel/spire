@@ -12,7 +12,7 @@ import scala.util.Random.shuffle
 
 case class DataSet[V, F, K](name: String, space: CoordinateSpace[V, F], data: List[(V, K)])
 
-object DataSets {
+object DataSet {
   private def withResource[A](path: String)(f: BufferedReader => A): A = {
     val in = getClass.getResourceAsStream(path)
     val reader = new BufferedReader(new InputStreamReader(in))
