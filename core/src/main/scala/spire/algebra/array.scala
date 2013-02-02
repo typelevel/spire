@@ -59,7 +59,7 @@ trait ArrayVectorSpace[@spec(Int,Long,Float,Double) A] extends ArrayModule[A] wi
 
 trait ArrayInnerProductSpace[@spec(Int,Long,Float,Double) A] extends ArrayVectorSpace[A]
 with InnerProductSpace[Array[A], A] {
-  def dot(x: Array[A], y: Array[A]): A = {
+  protected def dotImpl(x: Array[A], y: Array[A]): A = {
     var z = scalar.zero
     var i = 0
     while (i < x.length && i < y.length) {
@@ -68,9 +68,24 @@ with InnerProductSpace[Array[A], A] {
     }
     z
   }
+
+  def dot(v: Array[A], w: Array[A]): A = dotImpl(v, w)
 }
 
 trait ArrayCoordinateSpace[@spec(Int,Long,Float,Double) A] extends ArrayInnerProductSpace[A]
 with CoordinateSpace[Array[A], A] {
   def coord(v: Array[A], i: Int): A = v(i)
+
+  // super[ArrayInnerProductSpace] has some weird conflicts with @spec.
+  override def dot(v: Array[A], w: Array[A]): A = dotImpl(v, w)
+
+  def axis(i: Int): Array[A] = {
+    val v = new Array[A](dimensions)
+    var j = 0
+    while (j < v.length) {
+      v(j) = if (i == j) scalar.one else scalar.zero
+      j += 1
+    }
+    v
+  }
 }

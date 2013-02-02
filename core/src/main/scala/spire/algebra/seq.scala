@@ -94,6 +94,19 @@ with InnerProductSpace[SA, A] {
 trait SeqCoordinateSpace[A, SA <: SeqLike[A, SA]] extends SeqInnerProductSpace[A, SA]
 with CoordinateSpace[SA, A] {
   def coord(v: SA, i: Int): A = v(i)
+
+  override def dot(v: SA, w: SA): A = super[SeqInnerProductSpace].dot(v, w)
+
+  def axis(i: Int): SA = {
+    val b = cbf()
+
+    @tailrec def loop(j: Int): SA = if (i < dimensions) {
+      b += (if (i == j) scalar.one else scalar.zero)
+      loop(j + 1)
+    } else b.result
+
+    loop(0)
+  }
 }
 
 /**
