@@ -10,6 +10,8 @@ import scala.util.Random.nextInt
 
 import scala.reflect.ClassTag
 
+import CrossValidation._
+
 
 /**
  * An example of constructing Random Forests for both regression and
@@ -17,31 +19,53 @@ import scala.reflect.ClassTag
  * case `CoordinateSpace`), fields, and orders to create random forests.
  */
 object RandomForestExample extends App {
-  def test[V, F, K](dataset: DataSet[V, F, K], opts: RandomForestOptions)(implicit
-      order: Order[F], classTagV: ClassTag[V], classTagK: ClassTag[K]) {
 
-    println(s"\n${dataset.name} Data Set:")
-    println(s"  ${dataset.space.dimensions} variables")
-    println(s"  ${dataset.data.size} data points")
-    println("  Performing 10-fold cross-validation...")
-    val accuracy = DataSet.crossValidate(dataset) { implicit space => data =>
-      RandomForest.classification(data, opts)
-    }
-    println("  Accuracy of %.2f%%" format (accuracy * 100))
-  }
+  // The Iris data set uses `Vector[Rational]`.
+  testClassification(DataSet.Iris, RandomForestOptions())
 
-  test(DataSet.Iris, RandomForestOptions())
-  test(DataSet.Yeast, RandomForestOptions(
+  // The Yeast data set uses `Array[Double]`.
+  testClassification(DataSet.Yeast, RandomForestOptions(
     numAxesSample = Some(2), numPointsSample = Some(200),
     numTrees = Some(500), minSplitSize = Some(3)))
+
+  // The MPG data set uses `Array[Double]`.
+  testRegression(DataSet.MPG, RandomForestOptions(numPointsSample = Some(200), numTrees = Some(200)))
+
+
+  def testClassification[V, F, K](dataset: DataSet[V, F, K], opts: RandomForestOptions)(implicit
+      order: Order[F], classTagV: ClassTag[V], classTagK: ClassTag[K], real: IsReal[F]) {
+
+    println(s"\n${dataset.describe}\n")
+    println(s"Cross-validating ${dataset.name} with random forest classification...")
+    val accuracy = crossValidateClassification(dataset) { implicit space => data =>
+      RandomForest.classification(data, opts)
+    }
+    println("... accuracy of %.2f%%\n" format (real.toDouble(accuracy) * 100))
+  }
+
+  def testRegression[V, F](dataset: DataSet[V, F, F], opts: RandomForestOptions)(implicit
+      order: Order[F], classTagV: ClassTag[V], classTagF: ClassTag[F], real: IsReal[F]) {
+
+    println(s"\n${dataset.describe}\n")
+    println(s"Cross-validating ${dataset.name} with random forest regression...")
+    val rSquared = crossValidateRegression(dataset) { implicit space => data =>
+      RandomForest.regression(data, opts)
+    }
+    println("... R^2 of %.3f" format real.toDouble(rSquared))
+  }
 }
 
 
+/**
+ * Random forests have a lot of knobs, so they are all stored in this class
+ * for ease-of-use.
+ */
 case class RandomForestOptions(
   numAxesSample: Option[Int] = None,   // # of variables sampled each split.
   numPointsSample: Option[Int] = None, // # of points sampled per tree.
   numTrees: Option[Int] = None,        // # of trees created.
-  minSplitSize: Option[Int] = None)    // min. node size required for split.
+  minSplitSize: Option[Int] = None,    // Min. node size required for split.
+  parallel: Boolean = true)            // Build trees in parallel.
 
 
 /**
@@ -82,11 +106,14 @@ trait RandomForest[V, F, K] {
 
   protected case class Forest(trees: List[DecisionTree[V, F, K]])
 
+  // A version `RandomForestOptions` that doesn't have any unknown values.
+
   protected case class FixedOptions(
     numAxesSample: Int,
     numPointsSample: Int,
     numTrees: Int,
-    minSplitSize: Int)
+    minSplitSize: Int,
+    parallel: Boolean)
 
   /**
    * Construct a random forest.
@@ -95,7 +122,8 @@ trait RandomForest[V, F, K] {
     require(opts.numAxesSample <= V.dimensions, "Cannot sample more dimension than exist in V.")
     require(data.length == outputs.length, "Number of dependent and independent variables must match.")
 
-    // Selects a set of `m` predictors to use as coordiante indices.
+    // Selects a set of `m` predictors to use as coordiante indices. The
+    // sampling is done using a variant of Knuth's shuffle.
 
     def predictors(): Array[Int] = {
       val indices = new Array[Int](opts.numAxesSample)
@@ -109,7 +137,7 @@ trait RandomForest[V, F, K] {
     }
 
     // Randomly samples `n` points with replacement from `data`. Note that our
-    // sample is actually an array of indices.
+    // sample is actually an array of indices. 
 
     def sample(): Array[Int] = {
       val sample = new Array[Int](opts.numPointsSample)
@@ -118,6 +146,9 @@ trait RandomForest[V, F, K] {
       }
       sample
     }
+
+    // Convenience method to quickly create a full region from a set of
+    // members.
 
     def region(members: Array[Int]): Region = {
       var d = Region.empty
@@ -146,12 +177,21 @@ trait RandomForest[V, F, K] {
           var leftRegion = Region.empty
           var rightRegion = region0
 
+          // To determine the optimal split point along an axis, we first sort
+          // all the members along this axis. This let's us use a sweep-line to
+          // update the left/right regions in O(1) time, so our total time to
+          // check is dominated by sorting in O(n log n).
+
           members.qsortBy(data(_).coord(axis))
 
           cfor(0)(_ < (members.length - 1), _ + 1) { j =>
+
+            // We move point j from the right region to the left and see if our
+            // error is reduced.
+
             leftRegion += outputs(j)
             rightRegion -= outputs(j)
-            val error = (leftRegion.error * (j + 1) + 
+            val error = (leftRegion.error * (j + 1) +
                          rightRegion.error * (members.length - j - 1)) / members.length
             if (error < minError) {
               minError = error
@@ -162,7 +202,9 @@ trait RandomForest[V, F, K] {
         }
 
         // If we can never do better than our initial region, then split the
-        // middle of some random axis -- we can probably do better here.
+        // middle of some random axis -- we can probably do better here. It
+        // would actually be nice try splitting again with a new set of
+        // predictors, but we'd need a way to bound the number of retries.
 
         if (minIdx < 0) {
           minVar = vars(vars.length - 1)
@@ -171,7 +213,13 @@ trait RandomForest[V, F, K] {
 
         // We could do this in a single linear scan, but this is an example.
 
-        members.qsortBy(data(_).coord(minVar))
+        if (minVar != vars(vars.length - 1)) { // Try to avoid a sort if we can.
+          members.qsortBy(data(_).coord(minVar))
+        }
+
+        // We split the region directly between the left's furthest right point
+        // and the right's furthest left point.
+
         val boundary = (data(members(minIdx)).coord(minVar) +
                         data(members(minIdx + 1)).coord(minVar)) / 2
         val left = members take (minIdx + 1)
@@ -180,9 +228,14 @@ trait RandomForest[V, F, K] {
       }
     }
 
-    Forest((1 to opts.numTrees).map({ _ =>
-      growTree(sample())
-    }).toList)
+    // Random forests are embarassingly parallel.
+    if (opts.parallel) {
+      Forest((1 to opts.numTrees).toList.par.map({ _ =>
+        growTree(sample())
+      }).toList)
+    } else {
+      Forest(List.fill(opts.numTrees)(growTree(sample())))
+    }
   }
 
   protected def fromForest(forest: Forest): V => K
@@ -195,7 +248,8 @@ trait RandomForest[V, F, K] {
       options.numAxesSample getOrElse defaults.numAxesSample,
       options.numPointsSample getOrElse defaults.numPointsSample,
       options.numTrees getOrElse defaults.numTrees,
-      options.minSplitSize getOrElse defaults.minSplitSize)
+      options.minSplitSize getOrElse defaults.minSplitSize,
+      options.parallel)
   }
 
   def apply(data: Array[V], out: Array[K], options: RandomForestOptions) = {
@@ -221,11 +275,7 @@ class RandomForestRegression[V, F](implicit val V: CoordinateSpace[V, F],
   protected final class SquaredError(sum: F, sumSq: F, count: Int) extends RegionLike {
     def +(k: F) = new SquaredError(sum + k, sumSq + (k * k), count + 1)
     def -(k: F) = new SquaredError(sum - k, sumSq - (k * k), count - 1)
-    def error: F = {
-      val mean = sum / count
-      val variance = (sumSq - 2 * mean * sum + mean ** 2) / count
-      variance
-    }
+    def error: F = sumSq / count - (sum / count) ** 2  // Error = variance.
     def value: F = sum / count
   }
 
@@ -237,7 +287,7 @@ class RandomForestRegression[V, F](implicit val V: CoordinateSpace[V, F],
   protected def defaultOptions(size: Int): FixedOptions = {
     val axes = math.max(V.dimensions / 3, math.min(V.dimensions, 2))
     val sampleSize = math.max(size * 2 / 3, 1)
-    FixedOptions(axes, sampleSize, size, 5)
+    FixedOptions(axes, sampleSize, size, 5, true)
   }
 
   protected def fromForest(forest: Forest): V => F = { v =>
@@ -283,7 +333,7 @@ class RandomForestClassification[V, F, K](implicit val V: CoordinateSpace[V, F],
   protected def defaultOptions(size: Int): FixedOptions = {
     val axes = math.max(math.sqrt(V.dimensions.toDouble).toInt, math.min(V.dimensions, 2))
     val sampleSize = math.max(size * 2 / 3, 1)
-    FixedOptions(axes, sampleSize, size, 5)
+    FixedOptions(axes, sampleSize, size, 5, true)
   }
 
   protected def fromForest(forest: Forest): V => K = { v =>
@@ -361,5 +411,3 @@ case class Split[V, F, K](variable: Int, boundary: F,
     left: DecisionTree[V, F, K], right: DecisionTree[V, F, K]) extends DecisionTree[V, F, K]
 
 case class Leaf[V, F, K](value: K) extends DecisionTree[V, F, K]
-
-
