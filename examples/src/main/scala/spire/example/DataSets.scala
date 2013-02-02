@@ -1,6 +1,7 @@
 package spire.example
 
 import spire.algebra._
+import spire.math.Rational
 
 import scala.annotation.tailrec
 import scala.collection.IterableLike
@@ -27,18 +28,23 @@ object DataSet {
 
   /**
    * The Iris data set. It has 4 variables and 3 classes (represented as
-   * strings).
+   * strings). We use `Rational` for the underlying field, wrapped in a
+   * `Vector`.
    */
-  lazy val Iris: DataSet[Vector[Double], Double, String] = {
+  lazy val Iris: DataSet[Vector[Rational], Rational, String] = {
     val lines = readDataSet("/datasets/iris.data")
     val data = lines map { line =>
       val fields = line.split(',').toVector
-      (fields take 4 map (_.toDouble), fields.last)
+      (fields take 4 map (Rational(_)), fields.last)
     }
 
-    DataSet("Iris", CoordinateSpace.seq[Double, Vector](4), data)
+    DataSet("Iris", CoordinateSpace.seq[Rational, Vector](4), data)
   }
 
+  /**
+   * The Yeast data set. It has 8 variables and several `String` classes. We
+   * use `Array`s of `Double`s to store the points in.
+   */
   lazy val Yeast: DataSet[Array[Double], Double, String] = {
     val lines = readDataSet("/datasets/yeast.data")
     val data = lines map { line =>
