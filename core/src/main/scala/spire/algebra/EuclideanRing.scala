@@ -28,13 +28,14 @@ final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def %(rhs:A) = macro Ops.binop[A, A]
   def /%(rhs:A) = macro Ops.binop[A, A]
 
-  def /~(rhs:Int): A = ev.quot(lhs, ev.fromInt(rhs))
-  def %(rhs:Int): A = ev.mod(lhs, ev.fromInt(rhs))
-  def /%(rhs:Int): (A, A) = ev.quotmod(lhs, ev.fromInt(rhs))
+  // TODO: This is a bit
+  def /~(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
+  def %(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
+  def /%(rhs:Int): (A, A) = macro Ops.binopWithSelfLift[Int, Ring[A], (A, A)]
 
-  def /~(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.quot(lhs, c.fromDouble(rhs))
-  def %(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.mod(lhs, c.fromDouble(rhs))
-  def /%(rhs:Double)(implicit c:ConvertableTo[A]): (A, A) = ev.quotmod(lhs, c.fromDouble(rhs))
+  def /~(rhs:Double)(implicit ev1:ConvertableTo[A]): A = macro Ops.binopWithLift[Double, ConvertableTo[A], A]
+  def %(rhs:Double)(implicit ev1:ConvertableTo[A]): A = macro Ops.binopWithLift[Double, ConvertableTo[A], A]
+  def /%(rhs:Double)(implicit ev1:ConvertableTo[A]): (A, A) = macro Ops.binopWithLift[Double, ConvertableTo[A], (A, A)]
 
   def /~(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) /~ rhs
   def %(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) % rhs

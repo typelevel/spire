@@ -91,6 +91,28 @@ object Ops {
   }
 
   /**
+   * Given an expression like: xyz(lhs)(ev0).plus(rhs: Abc)(ev1)
+   * This will create a tree like: ev0.plus(lhs, ev1.fromAbc(rhs))
+   * Notably, this let's us use Ring's fromInt method and ConvertableTo's
+   * fromDouble (etc.) before applying an op.
+   */
+  def binopWithLift[A: c.WeakTypeTag, Ev, R](c: Context)(rhs: c.Expr[A])(ev1: c.Expr[Ev]): c.Expr[R] = {
+    import c.universe._
+    val (ev0, lhs) = unpack(c)
+    val typeName = weakTypeOf[A].typeSymbol.name
+    val rhs1 = Apply(Select(ev1.tree, "from" + typeName), List(rhs.tree))
+    c.Expr[R](Apply(Select(ev0, findMethodName(c)), List(lhs, rhs1)))
+  }
+
+  def binopWithSelfLift[A: c.WeakTypeTag, Ev, R](c: Context)(rhs: c.Expr[A]): c.Expr[R] = {
+    import c.universe._
+    val (ev0, lhs) = unpack(c)
+    val typeName = weakTypeOf[A].typeSymbol.name
+    val rhs1 = Apply(Select(ev0, "from" + typeName), List(rhs.tree))
+    c.Expr[R](Apply(Select(ev0, findMethodName(c)), List(lhs, rhs1)))
+  }
+
+  /**
    * Given context, this method pulls 'evidence' and 'lhs' values out of
    * instantiations of implicit -Ops classes. For instance,
    *
