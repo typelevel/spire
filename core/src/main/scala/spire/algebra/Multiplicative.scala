@@ -69,15 +69,15 @@ import spire.math.{ConvertableTo, ConvertableFrom, Number}
 
 final class MultiplicativeSemigroupOps[A](lhs:A)(implicit ev:MultiplicativeSemigroup[A]) {
   def *(rhs:A): A = macro Ops.binop[A, A]
-  def *(rhs:Int)(implicit c: Ring[A]): A = ev.times(lhs, c.fromInt(rhs))
-  def *(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.times(lhs, c.fromDouble(rhs))
+  def *(rhs:Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+  def *(rhs:Double)(implicit ev1:ConvertableTo[A]): A = macro Ops.binopWithLift[Double, ConvertableTo[A], A]
   def *(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) * rhs
 }
 
 final class MultiplicativeGroupOps[A](lhs:A)(implicit ev:MultiplicativeGroup[A]) {
   def reciprocal() = macro Ops.unop[A]
   def /(rhs:A): A = macro Ops.binop[A, A]
-  def /(rhs:Int)(implicit c: Ring[A]): A = ev.div(lhs, c.fromInt(rhs))
-  def /(rhs:Double)(implicit c:ConvertableTo[A]): A = ev.div(lhs, c.fromDouble(rhs))
+  def /(rhs:Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+  def /(rhs:Double)(implicit ev1:ConvertableTo[A]): A = macro Ops.binopWithLift[Double, ConvertableTo[A], A]
   def /(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) / rhs
 }
