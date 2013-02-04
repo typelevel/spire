@@ -9,11 +9,13 @@ import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
 
-trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends NormedVectorSpace[V, F] {
-  implicit def nroot: NRoot[F]
-
-  def norm(v: V): F = nroot.sqrt(dot(v, v))
+trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends VectorSpace[V, F] { self =>
   def dot(v: V, w: V): F
+
+  def normed(implicit ev: NRoot[F]): NormedVectorSpace[V, F] = new NormedInnerProductSpace[V, F] {
+    def space = self
+    def nroot = ev
+  }
 }
 
 object InnerProductSpace extends InnerProductSpace1 {
@@ -62,7 +64,20 @@ trait InnerProductSpace1 extends InnerProductSpace0 {
 trait ComplexIsInnerProductSpace[@spec(Float, Double) A] extends ComplexIsField[A]
 with InnerProductSpace[Complex[A], A] with RingAlgebra[Complex[A], A] {
   def timesl(r: A, v: Complex[A]): Complex[A] = Complex(r, scalar.zero) * v
-  override def norm(x: Complex[A]): A = x.abs
   def dot(x: Complex[A], y: Complex[A]): A =
     scalar.plus(scalar.times(x.real, y.real), scalar.times(x.imag, y.imag))
+}
+
+trait NormedInnerProductSpace[V, @spec(Float, Double) F] extends NormedVectorSpace[V, F] {
+  def space: InnerProductSpace[V, F]
+  def scalar: Field[F] = space.scalar
+  def nroot: NRoot[F]
+
+  def zero: V = space.zero
+  def plus(v: V, w: V): V = space.plus(v, w)
+  def negate(v: V): V = space.negate(v)
+  override def minus(v: V, w: V): V = space.minus(v, w)
+  def timesl(f: F, v: V): V = space.timesl(f, v)
+  override def divr(v: V, f: F): V = space.divr(v, f)
+  def norm(v: V): F = nroot.sqrt(space.dot(v, v))
 }

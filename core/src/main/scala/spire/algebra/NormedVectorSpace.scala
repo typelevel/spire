@@ -21,7 +21,7 @@ object NormedVectorSpace extends NormedVectorSpace0 with NormedVectorSpaceFuncti
 
 trait NormedVectorSpace0 {
   implicit def InnerProductSpaceIsNormedVectorSpace[V, @spec(Int, Long, Float, Double) F](implicit
-    vectorSpace: InnerProductSpace[V, F]): NormedVectorSpace[V, F] = vectorSpace
+    space: InnerProductSpace[V, F], nroot: NRoot[F]): NormedVectorSpace[V, F] = space.normed
 }
 
 trait NormedVectorSpaceFunctions {

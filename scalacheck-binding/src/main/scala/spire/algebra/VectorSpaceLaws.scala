@@ -66,7 +66,7 @@ trait VectorSpaceLaws[V, A] {
   }
 
   def innerProductSpace(implicit V: InnerProductSpace[V, A], A: Order[A], A0: Signed[A]) = new Properties("inner-product space") {
-    include(normedVectorSpace)
+    include(vectorSpace)
 
     property("symmetry") = forAll { (v: V, w: V) =>
       (v ⋅ w).abs === (w ⋅ v).abs
