@@ -14,6 +14,9 @@ identically to corresponding direct implementations.
 
 Spire is provided to you as free software under the MIT license.
 
+The [Spire mailing list](groups.google.com/group/spire-math/) is the place to
+go for announcements and discussion around Spire.
+
 ### Set up
 
 Spire currently relies heavily on macros introduced Scala 2.10.0, as well as
