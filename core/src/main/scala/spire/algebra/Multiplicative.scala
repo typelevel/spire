@@ -65,6 +65,33 @@ trait MultiplicativeAbGroup[@spec(Int,Long,Float,Double) A] extends Multiplicati
   }
 }
 
+object MultiplicativeSemigroup extends MultiplicativeSemigroup1
+object MultiplicativeMonoid extends MultiplicativeMonoid0
+object MultiplicativeGroup extends MultiplicativeGroup0
+object MultiplicativeAbGroup extends MultiplicativeAbGroup0
+
+trait MultiplicativeSemigroup0 {
+  implicit def MonoidIsSemigroup[@spec(Int,Long,Float,Double) A](implicit
+    m: MultiplicativeMonoid[A]): MultiplicativeSemigroup[A] = m
+}
+
+trait MultiplicativeSemigroup1 extends MultiplicativeSemigroup0 {
+  implicit def ringIsMultiplicativeSemigroup[@spec(Int, Long, Float, Double) A](implicit
+    r: Ring[A]): MultiplicativeSemigroup[A] = r
+}
+
+trait MultiplicativeMonoid0 {
+  implicit def GroupIsMonoid[@spec(Int,Long,Float,Double) A](implicit
+    g: MultiplicativeGroup[A]): MultiplicativeMonoid[A] = g
+}
+
+trait MultiplicativeGroup0 {
+  implicit def AbGroupIsGroup[@spec(Int,Long,Float,Double) A](implicit
+    g: MultiplicativeAbGroup[A]): MultiplicativeGroup[A] = g
+}
+
+trait MultiplicativeAbGroup0 {}
+
 import spire.math.{ConvertableTo, ConvertableFrom, Number}
 
 final class MultiplicativeSemigroupOps[A](lhs:A)(implicit ev:MultiplicativeSemigroup[A]) {

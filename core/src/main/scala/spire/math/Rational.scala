@@ -328,6 +328,15 @@ object Rational {
     }
   }
 
+  implicit def apply(x: SafeLong): Rational =
+    x.fold(LongRationals.unsafeBuild(_, 1L), BigRationals.unsafeBuild(_, BigInt(1)))
+
+  implicit def apply(x: Number): Rational = x match {
+    case IntNumber(n) => apply(n)
+    case FloatNumber(n) => apply(n)
+    case DecimalNumber(n) => apply(n)
+  }
+
   /**
    * Returns an interval that bounds the nth-root of the integer x.
    *

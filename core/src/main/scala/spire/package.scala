@@ -108,6 +108,10 @@ final class LiteralDoubleOps(val lhs:Double) extends AnyVal {
 }
 
 class LiteralBigIntOps(val lhs:BigInt) extends AnyVal {
+  def /~(rhs: BigInt) = lhs / rhs
+  def pow(rhs: BigInt) = spire.math.pow(lhs, rhs)
+  def **(rhs: BigInt) = spire.math.pow(lhs, rhs)
+
   def +(rhs: SafeLong) = SafeLong(lhs) + rhs
   def *(rhs: SafeLong) = SafeLong(lhs) * rhs
   def -(rhs: SafeLong) = SafeLong(lhs) - rhs
@@ -131,6 +135,14 @@ class LiteralBigIntOps(val lhs:BigInt) extends AnyVal {
   def /~(rhs: ULong) = lhs / rhs.toBigInt
   def %(rhs: ULong) = lhs % rhs.toBigInt
   def /%(rhs: ULong) = lhs /% rhs.toBigInt
+
+  def +(rhs: Number) = Number(lhs) + rhs
+  def *(rhs: Number) = Number(lhs) * rhs
+  def -(rhs: Number) = Number(lhs) - rhs
+  def /(rhs: Number) = Number(lhs) / rhs
+  def /~(rhs: Number) = Number(lhs) / rhs
+  def %(rhs: Number) = Number(lhs) % rhs
+  def /%(rhs: Number) = Number(lhs) /% rhs
 }
 
 final class ArrayOps[@spec A](arr:Array[A]) {
@@ -456,6 +468,23 @@ package object math {
     if (ex.isValidInt && ex <= maxIntEx && ex >= minIntEx) base.pow(ex.toInt)
     else exp(log(base) * ex)
 
+  final def pow(base: BigInt, ex: BigInt) = if (ex.signum < 0) {
+    if (base == 0) sys.error("zero can't be raised to negative power")
+    else if (base == 1) base
+    else if (base == -1) if (ex.testBit(0)) BigInt(1) else base
+    else BigInt(0)
+  } else if (ex.isValidInt) {
+    base.pow(ex.toInt)
+  } else {
+    bigIntPow(BigInt(1), base, ex)
+  }
+
+  @tailrec private[math] final def bigIntPow(t: BigInt, b: BigInt, e: BigInt): BigInt = {
+    if (e.isValidInt) t * b.pow(e.toInt)
+    else if (e.testBit(0)) bigIntPow(t * b, b * b, e >> 1)
+    else bigIntPow(t, b * b, e >> 1)
+  }
+
   /**
    * Exponentiation function, e.g. x^y
    *
@@ -468,13 +497,13 @@ package object math {
     else if (base == -1L) if ((ex & 1L) == 0L) -1L else 1L
     else 0L
   } else {
-    _pow(1L, base, ex)
+    longPow(1L, base, ex)
   }
 
-  @tailrec final def _pow(t:Long, b:Long, e:Long): Long = {
+  @tailrec private[math] final def longPow(t:Long, b:Long, e:Long): Long = {
     if (e == 0L) t
-    else if ((e & 1) == 1) _pow(t * b, b * b, e >> 1L)
-    else _pow(t, b * b, e >> 1L)
+    else if ((e & 1) == 1) longPow(t * b, b * b, e >> 1L)
+    else longPow(t, b * b, e >> 1L)
   }
 
   final def pow(base:Double, exponent:Double) = Math.pow(base, exponent)
