@@ -13,6 +13,10 @@ trait Semigroup[@spec(Int,Long,Float,Double) A] {
 
 object Semigroup extends Semigroup0 {
   @inline final def apply[A](implicit s: Semigroup[A]) = s
+
+  @inline final def additive[A](implicit A: AdditiveSemigroup[A]) =  A.additive
+
+  @inline final def multiplicative[A](implicit A: MultiplicativeSemigroup[A]) = A.multiplicative
 }
 
 trait Semigroup0 extends SemigroupProductImplicits {
