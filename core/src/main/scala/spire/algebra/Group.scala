@@ -13,6 +13,10 @@ trait Group[@spec(Int,Long,Float,Double) A] extends Monoid[A] {
 
 object Group extends Group1 {
   @inline final def apply[A](implicit ev: Group[A]) = ev
+
+  @inline final def additive[A](implicit A: AdditiveGroup[A]) =  A.additive
+
+  @inline final def multiplicative[A](implicit A: MultiplicativeGroup[A]) = A.multiplicative
 }
 
 /**
@@ -22,6 +26,10 @@ trait AbGroup[@spec(Int,Long,Float,Double) A] extends Group[A]
 
 object AbGroup extends AbGroupProductImplicits {
   @inline final def apply[A](implicit ev: AbGroup[A]) = ev
+
+  @inline final def additive[A](implicit A: AdditiveAbGroup[A]) =  A.additive
+
+  @inline final def multiplicative[A](implicit A: MultiplicativeAbGroup[A]) = A.multiplicative
 }
 
 final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
