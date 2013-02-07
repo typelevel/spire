@@ -19,7 +19,7 @@ import scala.annotation.tailrec
  * The original example is in literate Haskell with good comments, so consult
  * the link for more information.
  */
-object Xyz {
+object KleeneDemo {
 
   /**
    * Show is a type class we'll use to control how types should display.
