@@ -266,7 +266,7 @@ final class ArrayOps[@spec A](arr:Array[A]) {
 
 import scala.collection.generic.CanBuildFrom
 
-final class SeqOps[@spec A](as:Seq[A])(implicit cbf:CanBuildFrom[Seq[A], A, Seq[A]]) {
+final class SeqOps[@spec A, CC[X] <: SeqLike[X, CC[X]]](as:CC[A])(implicit cbf:CanBuildFrom[CC[A], A, CC[A]]) {
   def qsum(implicit ev:Rig[A]) = {
     var sum = ev.zero
     as.foreach(a => sum = ev.plus(sum, a))
@@ -335,27 +335,27 @@ final class SeqOps[@spec A](as:Seq[A])(implicit cbf:CanBuildFrom[Seq[A], A, Seq[
     b.result
   }
 
-  def qsorted(implicit ev:Order[A], ct:ClassTag[A]): Seq[A] = {
+  def qsorted(implicit ev:Order[A], ct:ClassTag[A]): CC[A] = {
     val (len, arr) = toSizeAndArray
     Sorting.sort(arr)
     fromSizeAndArray(len, arr)
   }
   
-  def qsortedBy[@spec B](f:A => B)(implicit ev:Order[B], ct:ClassTag[A]): Seq[A] = {
+  def qsortedBy[@spec B](f:A => B)(implicit ev:Order[B], ct:ClassTag[A]): CC[A] = {
     val (len, arr) = toSizeAndArray
     implicit val ord: Order[A] = ev.on(f)
     Sorting.sort(arr)
     fromSizeAndArray(len, arr)
   }
   
-  def qsortedWith(f:(A, A) => Int)(implicit ct:ClassTag[A]): Seq[A] = {
+  def qsortedWith(f:(A, A) => Int)(implicit ct:ClassTag[A]): CC[A] = {
     val (len, arr) = toSizeAndArray
     implicit val ord: Order[A] = Order.from(f)
     Sorting.sort(arr)
     fromSizeAndArray(len, arr)
   }
   
-  def qselected(k: Int)(implicit ev:Order[A], ct:ClassTag[A]): Seq[A] = {
+  def qselected(k: Int)(implicit ev:Order[A], ct:ClassTag[A]): CC[A] = {
     val (len, arr) = toSizeAndArray
     Selection.select(arr, k)
     fromSizeAndArray(len, arr)
@@ -416,7 +416,8 @@ object implicits {
   implicit def literalBigIntOps(b: BigInt) = new LiteralBigIntOps(b)
 
   implicit def arrayOps[@spec A](lhs:Array[A]) = new ArrayOps(lhs)
-  implicit def seqOps[@spec A](lhs:Seq[A]) = new SeqOps[A](lhs)
+  implicit def seqOps[A, CC[X] <: SeqLike[X, CC[X]]](lhs:CC[A])(implicit
+    cbf: CanBuildFrom[CC[A], A, CC[A]]) = new SeqOps[A, CC](lhs)(cbf)
 
   implicit def intToA[A](n:Int)(implicit c:ConvertableTo[A]): A = c.fromInt(n)
   implicit def convertableOps[A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
