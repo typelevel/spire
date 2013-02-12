@@ -21,10 +21,10 @@ final class LiteralIntOps(val lhs:Int) extends AnyVal {
   def -[A](rhs:A)(implicit ev:Ring[A]) = ev.minus(ev.fromInt(lhs), rhs)
   def *[A](rhs:A)(implicit ev:Ring[A]) = ev.times(ev.fromInt(lhs), rhs)
   def /[A](rhs:A)(implicit ev:Field[A]) = ev.div(ev.fromInt(lhs), rhs)
-
   def /~[A](rhs:A)(implicit ev:EuclideanRing[A]) = ev.quot(ev.fromInt(lhs), rhs)
   def %[A](rhs:A)(implicit ev:EuclideanRing[A]) = ev.mod(ev.fromInt(lhs), rhs)
   def /%[A](rhs:A)(implicit ev:EuclideanRing[A]) = ev.quotmod(ev.fromInt(lhs), rhs)
+  def **[A](rhs:A)(implicit ev:NRoot[A], c:ConvertableTo[A]) = ev.fpow(c.fromLong(lhs), rhs)
 
   def <[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.lt(c.fromInt(lhs), rhs)
   def <=[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.lteqv(c.fromInt(lhs), rhs)
@@ -43,7 +43,7 @@ final class LiteralIntOps(val lhs:Int) extends AnyVal {
   def %(rhs:Rational) = q % rhs
   def /%(rhs:Rational) = q /% rhs
 
-  def **(rhs:Rational)(implicit ev:ApproximationContext[Rational]) = q.pow(rhs)
+  //def **(rhs:Rational)(implicit ev:ApproximationContext[Rational]) = q.pow(rhs)
 
   def <(rhs:Rational) = q.compare(rhs) < 0
   def <=(rhs:Rational) = q.compare(rhs) <= 0
@@ -61,7 +61,7 @@ final class LiteralIntOps(val lhs:Int) extends AnyVal {
   def %[A:Fractional:Trig](rhs:Complex[A]) = c[A] % rhs
   def /%[A:Fractional:Trig](rhs:Complex[A]) = c[A] /% rhs
 
-  def **[A:Fractional:Trig](rhs:Complex[A]) = c[A] ** rhs
+  //def **[A:Fractional:Trig](rhs:Complex[A]) = c[A] ** rhs
 
   def +(rhs:Real) = Real(lhs) + rhs
 
