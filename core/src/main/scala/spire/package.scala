@@ -71,6 +71,29 @@ final class LiteralIntOps(val lhs:Int) extends AnyVal {
   def **(rhs:Int) = Ring[Int].pow(lhs, rhs)
 }
 
+final class LiteralLongOps(val lhs:Long) extends AnyVal {
+  def pow(rhs:Long) = spire.math.pow(lhs, rhs)
+  def **(rhs:Long) = spire.math.pow(lhs, rhs)
+
+  def +[A](rhs:A)(implicit ev:Ring[A], c:ConvertableTo[A]) = ev.plus(c.fromLong(lhs), rhs)
+  def -[A](rhs:A)(implicit ev:Ring[A], c:ConvertableTo[A]) = ev.minus(c.fromLong(lhs), rhs)
+  def *[A](rhs:A)(implicit ev:Ring[A], c:ConvertableTo[A]) = ev.times(c.fromLong(lhs), rhs)
+  def /[A](rhs:A)(implicit ev:EuclideanRing[A], c:ConvertableTo[A]) = ev.quot(c.fromLong(lhs), rhs)
+  def /~[A](rhs:A)(implicit ev:EuclideanRing[A], c:ConvertableTo[A]) = ev.quot(c.fromLong(lhs), rhs)
+  def %[A](rhs:A)(implicit ev:EuclideanRing[A], c:ConvertableTo[A]) = ev.mod(c.fromLong(lhs), rhs)
+  def /%[A](rhs:A)(implicit ev:EuclideanRing[A], c:ConvertableTo[A]) = ev.quotmod(c.fromLong(lhs), rhs)
+  def **[A](rhs:A)(implicit ev:NRoot[A], c:ConvertableTo[A]) = ev.fpow(c.fromLong(lhs), rhs)
+
+  def <[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.lt(c.fromLong(lhs), rhs)
+  def <=[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.lteqv(c.fromLong(lhs), rhs)
+  def >[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.gt(c.fromLong(lhs), rhs)
+  def >=[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.gteqv(c.fromLong(lhs), rhs)
+
+  def cmp[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.compare(c.fromLong(lhs), rhs)
+  def min[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.min(c.fromLong(lhs), rhs)
+  def max[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.max(c.fromLong(lhs), rhs)
+}
+
 final class LiteralDoubleOps(val lhs:Double) extends AnyVal {
   def pow(rhs:Double) = spire.math.pow(lhs, rhs)
   def **(rhs:Double) = spire.math.pow(lhs, rhs)
@@ -388,6 +411,7 @@ object implicits {
   implicit def coordianteSpaceOps[V](v:V) = new CoordinateSpaceOps[V](v)
 
   implicit def literalIntOps(lhs:Int) = new LiteralIntOps(lhs)
+  implicit def literalLongOps(lhs:Long) = new LiteralLongOps(lhs)
   implicit def literalDoubleOps(lhs:Double) = new LiteralDoubleOps(lhs)
   implicit def literalBigIntOps(b: BigInt) = new LiteralBigIntOps(b)
 
