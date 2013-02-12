@@ -65,10 +65,10 @@ final class LiteralIntOps(val lhs:Int) extends AnyVal {
 
   def +(rhs:Real) = Real(lhs) + rhs
 
-  def /~(rhs:Int) = EuclideanRing[Int].quot(lhs, rhs)
-  def /%(rhs:Int) = EuclideanRing[Int].quotmod(lhs, rhs)
-  def pow(rhs:Int) = Ring[Int].pow(lhs, rhs)
-  def **(rhs:Int) = Ring[Int].pow(lhs, rhs)
+  def /~(rhs:Int) = lhs / rhs
+  def /%(rhs:Int) = (lhs / rhs, lhs % rhs)
+  def pow(rhs:Int) = Math.pow(lhs, rhs).toInt
+  def **(rhs:Int) = Math.pow(lhs, rhs).toInt
 }
 
 final class LiteralLongOps(val lhs:Long) extends AnyVal {
