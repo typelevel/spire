@@ -8,7 +8,7 @@ import scala.annotation.tailrec
  * 
  * This class uses WELL512a, which contains 512 bits of state.
  */
-class WellPrng protected[random] (_i: Int, state: Array[Int]) {
+class WellPrng protected[random] (_i: Int, state: Array[Int]) extends Generator {
   var i: Int = _i
 
   @inline final def m1 = 13
@@ -45,117 +45,6 @@ class WellPrng protected[random] (_i: Int, state: Array[Int]) {
     )
     i = (i + 15) & 0x0f
     state(i)
-  }
-
-  /** 
-   * Generates a random integer using n bits of state (0 <= n <= 32).
-   */
-  def nextBits(n: Int): Int = nextInt() >>> (32 - n)
-
-  /**
-   * Generates a random int between 0 (inclusive) and n (exclusive). All values
-   * should be equally likely.
-   */
-  def nextInt(n: Int): Int = {
-    @inline @tailrec def loop(b: Int): Int = {
-      val v = b % n
-      if (b - v + (n - 1) < 0) loop(nextInt() >>> 1) else v
-    }
-
-    if (n < 1)
-      sys.error("integer input must be positive %d" format n)
-    else if ((n & -n) == n)
-      ((n * ((nextInt() >>> 1).toLong)) >>> 31).toInt
-    else
-      loop(nextInt() >>> 1)
-  }
-
-  /**
-   * Generates a random long. All 64-bit long values are equally likely.
-   */
-  def nextLong(): Long =
-    (nextInt().toLong << 32) | (nextInt() & 0xffffffffL)
-
-  /**
-   * Generates a random Boolean.
-   */
-  def nextBoolean(): Boolean =
-    (nextInt() & 1) != 0
-
-  /**
-   * Generates a random float in the interval 0.0 (inclusive) to 1.0 (exclusive).
-   */
-  def nextFloat(): Float =
-    (nextInt() >>> 8) * 5.9604645e-8f
-
-  /**
-   * Generates a random double in the interval 0.0 (inclusive) to 1.0 (exclusive).
-   */
-  def nextDouble(): Double =
-    (((nextInt() >>> 6).toLong << 27) + (nextInt() >>> 5)) * 1.1102230246251565e-16
-
-  def generateInts(n: Int): Array[Int] = {
-    val arr = new Array[Int](n)
-    fillInts(arr)
-    arr
-  }
-
-  def fillInts(arr: Array[Int]) {
-    var i = 0
-    val len = arr.length
-    while (i < len) {
-      arr(i) = nextInt()
-      i += 1
-    }
-  }
-
-  def generateShorts(n: Int): Array[Short] = {
-    val arr = new Array[Short](n)
-    fillShorts(arr)
-    arr
-  }
-
-  def fillShorts(arr: Array[Short]) {
-    var i = 0
-    val len = arr.length
-    val llen = len & 0xfffffffe
-    while (i < llen) {
-      val n = nextInt()
-      arr(i) = (n & 0xffff).toShort
-      arr(i + 1) = ((n >>> 16) & 0xffff).toShort
-      i += 2
-    }
-
-    if (len != llen) arr(i) = (nextInt() & 0xffff).toShort
-  }
-
-  def generateBytes(n: Int): Array[Byte] = {
-    val arr = new Array[Byte](n)
-    fillBytes(arr)
-    arr
-  }
-
-  def fillBytes(arr: Array[Byte]) {
-    var i = 0
-    val len = arr.length
-    val llen = len & 0xfffffffc
-    while (i < llen) {
-      val n = nextInt()
-      arr(i) = (n & 0xff).toByte
-      arr(i + 1) = ((n >>> 8) & 0xff).toByte
-      arr(i + 2) = ((n >>> 16) & 0xff).toByte
-      arr(i + 3) = ((n >>> 24) & 0xff).toByte
-      i += 4
-    }
-
-    if (i < len) {
-      var n = nextInt()
-      while (i < len) {
-        arr(i) = (n & 0xff).toByte
-        n = n >>> 8
-        i += 1
-      }
-    }
   }
 }
 
