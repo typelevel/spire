@@ -8,7 +8,7 @@ import scala.annotation.tailrec
  * 
  * This class uses WELL512a, which contains 512 bits of state.
  */
-class WellPrng protected[random] (_i: Int, state: Array[Int]) extends Generator {
+class WellPrng protected[random] (_i: Int, state: Array[Int]) extends IntGenerator {
   var i: Int = _i
 
   @inline final def m1 = 13

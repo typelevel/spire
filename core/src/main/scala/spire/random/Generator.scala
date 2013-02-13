@@ -73,8 +73,7 @@ trait Generator {
   /**
    * Generates a random long. All 64-bit long values are equally likely.
    */
-  def nextLong(): Long =
-    (nextInt().toLong << 32) | (nextInt() & 0xffffffffL)
+  def nextLong(): Long
 
   /**
    * Generates a random Boolean.
@@ -192,5 +191,19 @@ trait Generator {
         i += 1
       }
     }
+  }
+}
+
+trait IntGenerator extends Generator {
+  def nextLong(): Long =
+    (nextInt().toLong << 32) | (nextInt() & 0xffffffffL)
+}
+
+trait LongGenerator extends Generator {
+  def nextInt(): Int = (nextLong >>> 32).toInt
+
+  override def nextDouble(): Double = {
+    val n = nextLong()
+    ((((n >>> 38) & 0xffffffff) << 27) + ((n & 0xffffffffL) >>> 5)) * 1.1102230246251565e-16
   }
 }
