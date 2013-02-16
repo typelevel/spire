@@ -109,7 +109,7 @@ object MergeSort extends Sort {
 
 /**
  * In-place quicksort implementation. It is not stable, but does not allocate
- * extra space (other thans stack). Like MergeSort, it uses InsertionSort for
+ * extra space (other than stack). Like MergeSort, it uses InsertionSort for
  * sorting very small arrays.
  */
 object QuickSort {
