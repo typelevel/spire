@@ -4,8 +4,6 @@ import scala.{specialized => spec, math => mth}
 import java.lang.Math
 
 trait Trig[@spec(Float,Double) A] {
-  val f:Fractional[A]
-
   def e:A
   def pi:A
 
@@ -38,8 +36,6 @@ object Trig {
 }
 
 trait FloatIsTrig extends Trig[Float] {
-  val f = Fractional.FloatIsFractional
-
   def e:Float = Math.E.toFloat
   def pi:Float = Math.PI.toFloat
 
@@ -63,8 +59,6 @@ trait FloatIsTrig extends Trig[Float] {
 }
 
 trait DoubleIsTrig extends Trig[Double] {
-  val f = Fractional.DoubleIsFractional
-
   def e:Double = Math.E
   def pi:Double = Math.PI
 
@@ -109,8 +103,6 @@ object BigDecimalIsTrig {
 // we should probably be paying a lot more attention to MathContext, etc.
 trait BigDecimalIsTrig extends Trig[BigDecimal] {
   import BigDecimalIsTrig._
-
-  val f = Fractional.BigDecimalIsFractional
 
   def e:BigDecimal = BigDecimalIsTrig.e
   def pi:BigDecimal = BigDecimalIsTrig.pi
@@ -157,8 +149,6 @@ trait BigDecimalIsTrig extends Trig[BigDecimal] {
 }
 
 trait NumberIsTrig extends Trig[Number] {
-  val f = Fractional.NumberIsFractional
-
   def e:Number = Number(Math.E)
   def pi:Number = Number(Math.PI)
 
