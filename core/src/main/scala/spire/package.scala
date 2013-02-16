@@ -266,10 +266,12 @@ final class ArrayOps[@spec A](arr:Array[A]) {
 
 import scala.collection.generic.CanBuildFrom
 
-final class SeqOps[@spec A](as:Seq[A])(implicit cbf:CanBuildFrom[Seq[A], A, Seq[A]]) {
+final class SeqOps[@spec A, CC[A] <: Iterable[A]](as:CC[A]) {
   def qsum(implicit ev:Rig[A]) = {
     var sum = ev.zero
-    as.foreach(a => sum = ev.plus(sum, a))
+    val f: A => Unit = (a: A) => sum = ev.plus(sum, a)
+    as.foreach(f)
+    // as.foreach(a => sum = ev.plus(sum, a))
     sum
   }
 
@@ -324,7 +326,7 @@ final class SeqOps[@spec A](as:Seq[A])(implicit cbf:CanBuildFrom[Seq[A], A, Seq[
     (len, arr)
   }
 
-  protected[this] def fromSizeAndArray(len: Int, arr: Array[A]) = {
+  protected[this] def fromSizeAndArray(len: Int, arr: Array[A])(implicit cbf:CanBuildFrom[CC[A], A, CC[A]]) = {
     val b = cbf(as)
     b.sizeHint(len)
     var i = 0
@@ -335,27 +337,27 @@ final class SeqOps[@spec A](as:Seq[A])(implicit cbf:CanBuildFrom[Seq[A], A, Seq[
     b.result
   }
 
-  def qsorted(implicit ev:Order[A], ct:ClassTag[A]): Seq[A] = {
+  def qsorted(implicit ev:Order[A], ct:ClassTag[A], cbf:CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     val (len, arr) = toSizeAndArray
     Sorting.sort(arr)
     fromSizeAndArray(len, arr)
   }
   
-  def qsortedBy[@spec B](f:A => B)(implicit ev:Order[B], ct:ClassTag[A]): Seq[A] = {
+  def qsortedBy[@spec B](f:A => B)(implicit ev:Order[B], ct:ClassTag[A], cbf:CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     val (len, arr) = toSizeAndArray
     implicit val ord: Order[A] = ev.on(f)
     Sorting.sort(arr)
     fromSizeAndArray(len, arr)
   }
   
-  def qsortedWith(f:(A, A) => Int)(implicit ct:ClassTag[A]): Seq[A] = {
+  def qsortedWith(f:(A, A) => Int)(implicit ct:ClassTag[A], cbf:CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     val (len, arr) = toSizeAndArray
     implicit val ord: Order[A] = Order.from(f)
     Sorting.sort(arr)
     fromSizeAndArray(len, arr)
   }
   
-  def qselected(k: Int)(implicit ev:Order[A], ct:ClassTag[A]): Seq[A] = {
+  def qselected(k: Int)(implicit ev:Order[A], ct:ClassTag[A], cbf:CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     val (len, arr) = toSizeAndArray
     Selection.select(arr, k)
     fromSizeAndArray(len, arr)
@@ -416,7 +418,7 @@ object implicits {
   implicit def literalBigIntOps(b: BigInt) = new LiteralBigIntOps(b)
 
   implicit def arrayOps[@spec A](lhs:Array[A]) = new ArrayOps(lhs)
-  implicit def seqOps[@spec A](lhs:Seq[A]) = new SeqOps[A](lhs)
+  implicit def seqOps[@spec A, CC[A] <: Iterable[A]](lhs:CC[A]) = new SeqOps[A, CC](lhs)
 
   implicit def intToA[A](n:Int)(implicit c:ConvertableTo[A]): A = c.fromInt(n)
   implicit def convertableOps[A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
