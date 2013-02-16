@@ -25,4 +25,15 @@ class SyntaxTest extends FunSuite {
     }
     assert(s.toSeq.sorted === (10 to 99))
   }
+
+  test("symbol collision cfor") {
+    val b = mutable.ArrayBuffer.empty[Int]
+    cfor(0)(_ < 3, _ + 1) { x =>
+      cfor(0)(_ < 2, _ + 1) { y => 
+        val x = y
+        b += x
+      }
+    }
+    assert(b.toList === List(0, 1, 0, 1, 0, 1))
+  }
 }

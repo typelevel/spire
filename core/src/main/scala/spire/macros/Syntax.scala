@@ -47,32 +47,24 @@ object Syntax {
     def inlineApplyRecursive(tree: Tree): Tree = {
       val ApplyName = newTermName("apply")
 
-      class InlineTerm(name:TermName, value:Tree) extends Transformer {
+      class InlineSymbol(symbol: Symbol, value:Tree) extends Transformer {
         override def transform(tree: Tree): Tree = tree match {
-          case Ident(`name`) => value
+          case Ident(_) if tree.symbol == symbol => value
           case _ => super.transform(tree)
         }
       }
 
       object InlineApply extends Transformer {
-        def inlineTerms(params: List[Tree], body: Tree, args: List[Tree]): Tree = {
-          if (params.length != args.length)
-            die("bad arity: %s vs %s" format (params.length, args.length))
-
-          params.zip(args).foldLeft(body) {
-            case (body, (ValDef(_, name, _, _), arg)) => {
-              new InlineTerm(name, arg).transform(body)
-            }
-          }
-        }
+        def inlineSymbol(symbol: Symbol, body: Tree, arg: Tree): Tree =
+          new InlineSymbol(symbol, arg).transform(body)
 
         override def transform(tree: Tree): Tree = tree match {
-          case Apply(Select(Function(params, body), ApplyName), args) =>
-            inlineTerms(params, body, args)
-
-          case Apply(Function(params, body), args) =>
-            inlineTerms(params, body, args)
-
+          case Apply(Select(Function(List(param), body), ApplyName), List(arg)) =>
+            inlineSymbol(param.symbol, body, arg)
+  
+          case Apply(Function(List(param), body), List(arg)) =>
+            inlineSymbol(param.symbol, body, arg)
+  
           case _ =>
             super.transform(tree)
         }
