@@ -120,13 +120,13 @@ sealed trait Natural {
     @tailrec def recur(next: Natural, s: String): String = {
       next match {
         case End(d) =>
-          d.toInt.toString + s
+          d.toLong.toString + s
         case Digit(d, tail) =>
           val (q, r) = next /% Natural.denom
           if (q == UInt(0))
-            r.digit.toInt.toString + s
+            r.digit.toLong.toString + s
           else
-            recur(q, "%09d%s" format (r.digit.toInt, s))
+            recur(q, "%09d%s" format (r.digit.toLong, s))
       }
     }
     recur(this, "")

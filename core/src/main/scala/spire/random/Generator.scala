@@ -1,27 +1,10 @@
 package spire.random
 
+import spire.math._
+
 import scala.annotation.tailrec
 import scala.{specialized => spec}
-
-case class Resolution[A](bits: Int)
-
-object Resolution {
-  final def apply[A](bits: Int)(implicit ev: Resolution[A]): Resolution[A] = ev
-}
-
-trait Next[@spec A] {
-  def next(gen: Generator): A
-}
-object Next {
-  @inline final def apply[A](implicit ev: Next[A]) = ev
-}
-
-trait Sample[@spec A] {
-  def sample(gen: Generator, from: A, until: A, res: Resolution[A]): A
-}
-object Sample {
-  @inline final def apply[A](implicit ev: Sample[A]) = ev
-}
+import scala.reflect.ClassTag
 
 trait Generator {
   def copy: Generator
@@ -32,20 +15,26 @@ trait Generator {
   def nextInt(): Int
 
   /**
+   * Generates a random long. All 64-bit long values are equally likely.
+   */
+  def nextLong(): Long
+
+  /**
+   * Generate a random value using a Next[A] type class instance.
+   *
+   * Implicit Next[A] instances are provided for the AnyVal types as well as
+   * UByte through ULong. More complex Next instances can be created from
+   * these.
+   */
+  def next[A](implicit next: Next[A]): A = next(this)
+
+  /**
    * Generate an equally-distributed random value.
    *
    * Requires a Next[A]. This usually means the type has a fixed resolution.
    */
-  def next[A]()(implicit ev: Next[A]): A =
-    ev.next(this)
-
-  /**
-   * Sample a value from the interval [from, until) at a given resolution.
-   *
-   * Requires a Sample[A].
-   */
-  def sample[A](from: A, until: A, bits: Int)(implicit ev: Sample[A], res: Resolution[A]): A =
-    ev.sample(this, from, until, res)
+  def iterator[A](implicit next: Next[A]): Iterator[A] =
+    new NextIterator(next, this)
 
   /**
    * Generates a random integer using n bits of state (0 <= n <= 32).
@@ -70,10 +59,7 @@ trait Generator {
       loop(nextInt() >>> 1)
   }
 
-  /**
-   * Generates a random long. All 64-bit long values are equally likely.
-   */
-  def nextLong(): Long
+  def roll(n: Int) = (n * nextDouble).toInt
 
   /**
    * Generates a random Boolean.
@@ -109,6 +95,27 @@ trait Generator {
     if (until <= from)
       throw new IllegalArgumentException("%s is not less than %s" format (from, until))
     from + (until - from) * nextDouble()
+  }
+
+  /**
+   * Generate an array of n random Longs.
+   */
+  def generateLongs(n: Int): Array[Long] = {
+    val arr = new Array[Long](n)
+    fillLongs(arr)
+    arr
+  }
+
+  /**
+   * Fill an array with random Longs.
+   */
+  def fillLongs(arr: Array[Long]) {
+    var i = 0
+    val len = arr.length
+    while (i < len) {
+      arr(i) = nextLong()
+      i += 1
+    }
   }
 
   /**
@@ -192,18 +199,31 @@ trait Generator {
       }
     }
   }
+
+  def generateArray[A: Next: ClassTag](n: Int): Array[A] = {
+    val arr = new Array[A](n)
+    fillArray(arr)
+    arr
+  }
+
+  def fillArray[A: Next](arr: Array[A]) {
+    var i = 0
+    val len = arr.length
+    while (i < len) {
+      arr(i) = next[A]
+      i += 1
+    }
+  }
 }
 
 trait IntGenerator extends Generator {
   def nextLong(): Long =
-    (nextInt().toLong << 32) | (nextInt() & 0xffffffffL)
+    ((nextInt & 0xffffffffL) << 32) | (nextInt & 0xffffffffL)
 }
 
 trait LongGenerator extends Generator {
   def nextInt(): Int = (nextLong >>> 32).toInt
 
-  override def nextDouble(): Double = {
-    val n = nextLong()
-    ((((n >>> 38) & 0xffffffff) << 27) + ((n & 0xffffffffL) >>> 5)) * 1.1102230246251565e-16
-  }
+  override def nextDouble(): Double =
+    (nextLong >>> 11) * 1.1102230246251565e-16
 }
