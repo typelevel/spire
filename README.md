@@ -328,6 +328,41 @@ There are two methods defined:
  * `linearSelect` usually slower, but with guaranteed linear complexity
  * `select` alias for `quickSelect`
 
+### Pseudo-Random Number Generators
+
+Spire comes with many different PRNG implementations, which extends
+the `spire.random.Generator` interface. Generators are mutable RNGs
+that support basic operations like `nextInt`. Unlike Java, generators
+are not threadsafe by default; synchronous instances can be attained
+by calling the `.sync` method.
+
+Spire supports generating random instances of arbitrary types using
+the `spire.random.Next[A]` type class. These instances represent a
+strategy for getting random values using a `Generator` instance. For
+instance:
+
+```scala
+import spire.math._
+import spire.random._
+
+val rng = Cmwc5()
+
+// produces a double in [0.0, 1.0)
+val n = rng.next[Double]
+
+// produces a complex number, with real and imaginary parts in [0.0, 1.0)
+val c = rng.next[Complex[Double]]
+
+// produces a map with ~10-20 entries
+implicit val nextmap = Next.map[Int, Complex[Double]](10, 20)
+val m = rng.next[Map[Int, Complex[Double]]]
+```
+
+Unlike generators, `Next[A]` instances are immutable and composable,
+supporting operations like `map`, `flatMap`, and `filter`. Many default
+instances are provided, and it's easy to create custom instances for
+user-defined types.
+
 ### Miscellany
 
 In addition, Spire provides many other methods which are "missing" from
