@@ -6,8 +6,14 @@ import scala.annotation.tailrec
 import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
-trait Generator {
+abstract class Generator {
   def copy: Generator
+
+  def sync: SyncGenerator = new SyncGenerator(copy)
+
+  def getSeedBytes(): Array[Byte]
+
+  def setSeedBytes(bytes: Array[Byte]): Unit
 
   /**
    * Generate an equally-distributed random Int.
@@ -29,9 +35,7 @@ trait Generator {
   def next[A](implicit next: Next[A]): A = next(this)
 
   /**
-   * Generate an equally-distributed random value.
-   *
-   * Requires a Next[A]. This usually means the type has a fixed resolution.
+   * Generate an infinite iterator of random values using Next[A].
    */
   def iterator[A](implicit next: Next[A]): Iterator[A] =
     new NextIterator(next, this)
@@ -42,8 +46,7 @@ trait Generator {
   def nextBits(n: Int): Int = nextInt() >>> (32 - n)
 
   /**
-   * Generates a random int between 0 (inclusive) and n (exclusive). All values
-   * should be equally likely.
+   * Generates a random int between 0 (inclusive) and n (exclusive).
    */
   def nextInt(n: Int): Int = {
     @tailrec def loop(b: Int): Int = {
@@ -52,50 +55,72 @@ trait Generator {
     }
 
     if (n < 1)
-      sys.error("integer input must be positive %d" format n)
+      throw new IllegalArgumentException("argument must be positive %d" format n)
     else if ((n & -n) == n)
       ((n * ((nextInt() >>> 1).toLong)) >>> 31).toInt
     else
       loop(nextInt() >>> 1)
   }
 
-  def roll(n: Int) = (n * nextDouble).toInt
+  /**
+   * Return an Int in [from, to].
+   */
+  def nextInt(from: Int, to: Int): Int = from + nextInt(to - from + 1)
+
+  /**
+   * Generates a random int between 0 (inclusive) and n (exclusive).
+   */
+  def nextLong(n: Long): Long = {
+    @tailrec def loop(b: Long): Long = {
+      val v = b % n
+      if (b - v + (n - 1) < 0) loop(nextLong() >>> 1) else v
+    }
+
+    if (n < 1)
+      throw new IllegalArgumentException("argument must be positive %d" format n)
+    else if ((n & -n) == n)
+      nextLong() & (n - 1)
+    else
+      loop(nextLong() >>> 1)
+  }
 
   /**
    * Generates a random Boolean.
    */
-  def nextBoolean(): Boolean =
-    (nextInt() & 1) != 0
+  def nextBoolean(): Boolean = (nextInt() & 1) != 0
 
   /**
-   * Generates a random float in the interval 0.0 (inclusive) to 1.0 (exclusive).
+   * Generates a random float in [0.0, 1.0).
    */
-  def nextFloat(): Float =
-    (nextInt() >>> 8) * 5.9604645e-8f
+  def nextFloat(): Float = (nextInt() >>> 8) * 5.9604645e-8f
 
   /**
-   * Generates a random double in the interval [from, until).
+   * Generates a random float in [0.0, n).
    */
-  def nextFloat(from: Float, until: Float): Float = {
-    if (until <= from)
-      throw new IllegalArgumentException("%s is not less than %s" format (from, until))
+  def nextDouble(n: Float): Float = nextFloat() * n
+
+  /**
+   * Generates a random float in [from, until).
+   */
+  def nextFloat(from: Float, until: Float): Float =
     from + (until - from) * nextFloat()
-  }
 
   /**
-   * Generates a random double in the interval [0.0, 1.0).
+   * Generates a random double in [0.0, 1.0).
    */
   def nextDouble(): Double =
-    (((nextInt() >>> 6).toLong << 27) + (nextInt() >>> 5)) * 1.1102230246251565e-16
+    (nextLong() >>> 11) * 1.1102230246251565e-16
 
   /**
-   * Generates a random double in the interval [from, until).
+   * Generates a random double in [0.0, n).
    */
-  def nextDouble(from: Double, until: Double): Double = {
-    if (until <= from)
-      throw new IllegalArgumentException("%s is not less than %s" format (from, until))
+  def nextDouble(n: Double): Double = nextDouble() * n
+
+  /**
+   * Generates a random double in [from, until).
+   */
+  def nextDouble(from: Double, until: Double): Double =
     from + (until - from) * nextDouble()
-  }
 
   /**
    * Generate an array of n random Longs.
@@ -200,12 +225,18 @@ trait Generator {
     }
   }
 
+  /**
+   * Generate an Array[A] using the given Next[A] instance.
+   */
   def generateArray[A: Next: ClassTag](n: Int): Array[A] = {
     val arr = new Array[A](n)
     fillArray(arr)
     arr
   }
 
+  /**
+   * Fill an Array[A] using the given Next[A] instance.
+   */
   def fillArray[A: Next](arr: Array[A]) {
     var i = 0
     val len = arr.length
@@ -216,14 +247,37 @@ trait Generator {
   }
 }
 
-trait IntGenerator extends Generator {
+abstract class IntBasedGenerator extends Generator { self =>
   def nextLong(): Long =
-    ((nextInt & 0xffffffffL) << 32) | (nextInt & 0xffffffffL)
+    ((nextInt() & 0xffffffffL) << 32) | (nextInt() & 0xffffffffL)
 }
 
-trait LongGenerator extends Generator {
-  def nextInt(): Int = (nextLong >>> 32).toInt
+abstract class LongBasedGenerator extends Generator { self =>
+  def nextInt(): Int =
+    (nextLong >>> 32).toInt
+}
 
-  override def nextDouble(): Double =
-    (nextLong >>> 11) * 1.1102230246251565e-16
+trait GeneratorCompanion[G, @spec(Int, Long) S] {
+  def randomSeed(): S
+
+  def fromBytes(bytes: Array[Byte]): G
+  def fromSeed(seed: S): G
+  def fromTime(time: Long = System.nanoTime): G
+
+  final def apply(): G = fromTime()
+  final def apply(seed: S): G = fromSeed(seed)
+}
+
+object global extends LongBasedGenerator {
+  private val rng = Cmwc5.fromTime().sync
+
+  override def sync = rng
+
+  def copy: Generator = rng.copy
+
+  def getSeedBytes: Array[Byte] = rng.getSeedBytes
+
+  def setSeedBytes(bytes: Array[Byte]): Unit = rng.setSeedBytes(bytes)
+
+  def nextLong(): Long = rng.nextLong()
 }

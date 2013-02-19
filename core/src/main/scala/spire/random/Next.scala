@@ -10,9 +10,11 @@ import scala.reflect.ClassTag
 trait Next[@spec A] { self =>
   def apply(gen: Generator): A
 
-  final def map[B](f: A => B) = new NextFromGen(gen => f(apply(gen)))
+  final def get(implicit gen: Generator): A = apply(gen)
 
-  final def flatMap[B](f: A => Next[B]) = new NextFromGen(gen => f(apply(gen))(gen))
+  final def map[B](f: A => B) = new NextFromGen(g => f(apply(g)))
+
+  final def flatMap[B](f: A => Next[B]) = new NextFromGen(g => f(apply(g))(g))
 
   final def filter(f: A => Boolean): Next[A] = new Next[A] {
     @tailrec final def apply(gen: Generator): A = {
@@ -21,7 +23,12 @@ trait Next[@spec A] { self =>
     }
   }
 
+  final def zip[B](that: Next[B]): Next[(A, B)] =
+    new NextFromGen(g => (this(g), that(g)))
+
   final def toIterator(gen: Generator) = new NextIterator(this, gen)
+
+  final def toStream(gen: Generator): Stream[A] = this(gen) #:: toStream(gen)
 }
 
 final class NextIterator[A](next: Next[A], gen: Generator) extends Iterator[A] {
@@ -67,29 +74,26 @@ object Next {
   implicit def euclideanRing[A](implicit ev: EuclideanRing[A]) = new NextEuclideanRing[A] { def alg = ev }
   implicit def field[A](implicit ev: Field[A]) = new NextField[A] { def alg = ev }
 
-  def apply[A, B](f: A => B)(implicit na: Next[A]): Next[B] = na.map(f)
+  final def apply[A, B](f: A => B)(implicit na: Next[A]): Next[B] =
+    na.map(f)
 
-  def apply[A, B, C](f: (A, B) => C)(implicit na: Next[A], nb: Next[B]): Next[C] = {
+  final def apply[A, B, C](f: (A, B) => C)(implicit na: Next[A], nb: Next[B]): Next[C] =
     new NextFromGen(g => f(na(g), nb(g)))
-  }
 
-  def reduce[A](ns: Next[A]*)(f: (A, A) => A): Next[A] = {
+  final def gen[A](f: Generator => A): Next[A] =
+    new NextFromGen(g => f(g))
+
+  def reduce[A](ns: Next[A]*)(f: (A, A) => A): Next[A] =
     new NextFromGen(g => ns.map(_(g)).reduceLeft(f))
-  }
 
-  def fromBytes[A](n: Int, f: Array[Byte] => A): Next[A] = {
+  def fromBytes[A](n: Int)(f: Array[Byte] => A): Next[A] =
     new NextFromGen(g => f(g.generateBytes(n)))
-  }
 
-  def fromInts[A](n: Int, f: Array[Int] => A): Next[A] = {
+  def fromInts[A](n: Int)(f: Array[Int] => A): Next[A] =
     new NextFromGen(g => f(g.generateInts(n)))
-  }
 
-  def fromLongs[A](n: Int, f: Array[Long] => A): Next[A] = {
+  def fromLongs[A](n: Int)(f: Array[Long] => A): Next[A] =
     new NextFromGen(g => f(g.generateLongs(n)))
-  }
-
-  def gen[A](f: Generator => A): Next[A] = new NextFromGen(gen => f(gen))
 
   implicit val unit: Next[Unit] = new NextFromGen[Unit](g => ())
   implicit val boolean: Next[Boolean] = new NextFromGen[Boolean](_.nextBoolean)
@@ -106,12 +110,12 @@ object Next {
   implicit val uint: Next[UInt] = new NextFromGen[UInt](g => UInt(g.nextInt))
   implicit val ulong: Next[ULong] = new NextFromGen[ULong](g => ULong(g.nextLong))
 
-  implicit def complex[A: Fractional: Trig](implicit na: Next[A]): Next[Complex[A]] =
-    new NextFromGen[Complex[A]](g => Complex(g.next[A], g.next[A]))
+  implicit def complex[A: Fractional: Trig: Next]: Next[Complex[A]] =
+    Next(Complex(_: A, _: A))
 
-  def intrange(from: Int, to: Int) = new Next[Int] {
-    private val d = to - from + 1
-    def apply(gen: Generator): Int = from + gen.nextInt(d)
+  def intrange(from: Int, to: Int) = {
+    val d = to - from + 1
+    new NextFromGen(_.nextInt(d) + from)
   }
 
   def natural(maxDigits: Int) = new Next[Natural] {
@@ -127,49 +131,61 @@ object Next {
     throw new IllegalArgumentException("need positive maxBytes, got %s" format maxBytes)
   } else if (maxBytes < 8) {
     val n = (8 - maxBytes) * 8
-    new NextFromGen[SafeLong](g => SafeLong(g.nextLong >>> n))
+    new NextFromGen(g => SafeLong(g.nextLong >>> n))
   } else if (maxBytes == 8) {
-    new NextFromGen[SafeLong](g => SafeLong(g.nextLong))
+    new NextFromGen(g => SafeLong(g.nextLong))
   } else  {
     bigint(maxBytes).map(SafeLong(_))
   }
-
-  // def bigint(maxBytes: Int): Next[BigInt] =
-  //   intrange(1, maxBytes).flatMap(i => Next.gen(BigInt(_.generateBytes(i))))
 
   def bigint(maxBytes: Int) = new Next[BigInt] {
     def apply(gen: Generator): BigInt = BigInt(gen.generateBytes(gen.nextInt(maxBytes) + 1))
   }
 
-  // def bigdecimal(maxBytes: Int, minScale: Int, maxScale: Int) =
-  //   Next(BigDecimal(_, _))(bigint(maxBytes), intrange(minScale, maxScale))
-
-  def bigdecimal(maxBytes: Int, minScale: Int, maxScale: Int) = new Next[BigDecimal] {
-    val nb = bigint(maxBytes)
-    val ni = intrange(minScale, maxScale)
-    def apply(gen: Generator): BigDecimal = BigDecimal(nb(gen), ni(gen))
+  def bigdecimal(maxBytes: Int, maxScale: Int) = new Next[BigDecimal] {
+    private val nb = bigint(maxBytes)
+    def apply(gen: Generator): BigDecimal = BigDecimal(nb(gen), gen.nextInt(maxScale) + 1)
   }
 
   implicit def rational(implicit next: Next[BigInt]) =
-    Next(Rational(_: BigInt, _: BigInt))
+    Next(Rational(_: BigInt, _: BigInt))(next, next.filter(_ != 0))
 
   def longrational: Next[Rational] =
     Next(Rational(_: Long, _: Long))(Next[Long], Next[Long].filter(_ != 0))
 
   def bigrational(maxBytes: Int): Next[Rational] =
-    Next(Rational(_: BigInt, _: BigInt))(bigint(maxBytes), bigint(maxBytes).filter(_ != 0))
+    rational(bigint(maxBytes))
 
   def constant[A](a: A) = new Next[A] {
     def apply(gen: Generator): A = a
   }
 
-  implicit def interval[A](implicit order: Order[A], na: Next[A]) = new Next[Interval[A]] {
-    def apply(gen: Generator): Interval[A] = {
-      val x = na(gen)
-      val y = na(gen)
-      if (order.lt(x, y)) Interval(x, y) else Interval(y, x)
+  implicit def interval[A](implicit na: Next[A], order: Order[A]) =
+    Next((x: A, y: A) => if (order.lt(x, y)) Interval(x, y) else Interval(y, x))
+
+  implicit def option[A](implicit no: Next[Boolean], na: Next[A]) =
+    new NextFromGen(g => if (no(g)) Some(na(g)) else None)
+
+  implicit def either[A, B](implicit no: Next[Boolean], na: Next[A], nb: Next[B]) =
+    new NextFromGen[Either[A, B]](g => if (no(g)) Right(nb(g)) else Left(na(g)))
+
+  implicit def tuple2[A: Next, B: Next] = Next((_: A, _: B))
+
+  implicit def list[A: Next](minSize: Int, maxSize: Int): Next[List[A]] =
+    new Next[List[A]] {
+      private val d = maxSize - minSize + 1
+      private def loop(g: Generator, n: Int, sofar: List[A]): List[A] =
+        if (n > 0) loop(g, n - 1, g.next[A] :: sofar) else sofar
+
+      def apply(gen: Generator): List[A] =
+        loop(gen, gen.nextInt(d) + minSize, Nil)
     }
-  }
+
+  implicit def set[A: Next](minInputs: Int, maxInputs: Int): Next[Set[A]] =
+    list[A](minInputs, maxInputs).map(_.toSet)
+
+  implicit def map[A: Next, B: Next](minInputs: Int, maxInputs: Int): Next[Map[A, B]] =
+    list[(A, B)](minInputs, maxInputs).map(_.toMap)
 
   def oneOf[A: ClassTag](as: A*) = new Next[A] {
     private val arr = as.toArray
@@ -177,7 +193,7 @@ object Next {
     def apply(gen: Generator): A = arr(gen.nextInt(len))
   }
 
-  def cycle[A: ClassTag](as: A*) = new Next[A] {
+  def cycleOf[A: ClassTag](as: A*) = new Next[A] {
     private val arr = as.toArray
     private val len = arr.length
     private var i = 0

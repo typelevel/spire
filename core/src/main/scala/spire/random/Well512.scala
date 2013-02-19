@@ -2,13 +2,16 @@ package spire.random
 
 import scala.annotation.tailrec
 
+import java.nio.ByteBuffer
+import java.util.Arrays
+
 /**
  * Implements the WELL PRNG (Well Equidistributed Long-period Linear),
  * developed by F. Panneton, P. L'Ecuyer, and M. Matsumoto.
  * 
  * This class uses WELL512a, which contains 512 bits of state.
  */
-class WellPrng protected[random] (_i: Int, state: Array[Int]) extends IntGenerator {
+class Well512 protected[random] (_i: Int, private var state: Array[Int]) extends IntBasedGenerator {
   var i: Int = _i
 
   @inline final def m1 = 13
@@ -27,7 +30,22 @@ class WellPrng protected[random] (_i: Int, state: Array[Int]) extends IntGenerat
   /**
    * Generates a copy of this PRNG (with independent state).
    */
-  def copy: WellPrng = new WellPrng(i, state.clone)
+  def copy: Well512 = new Well512(i, state.clone)
+
+  /**
+   * Generate a copy of the RNG's internal state.
+   */
+  def copyState: Array[Int] = state.clone
+
+  def getSeed(): Array[Int] = state.clone
+
+  def setSeed(ints: Array[Int]): Unit = state = ints
+
+  def getSeedBytes(): Array[Byte] =
+    Util.intsToBytes(state)
+
+  def setSeedBytes(bytes: Array[Byte]): Unit =
+    state = Util.intsFromBytes(bytes, 16)
 
   /**
    * Generates a random int. All 32-bit int values are equally likely.
@@ -48,29 +66,17 @@ class WellPrng protected[random] (_i: Int, state: Array[Int]) extends IntGenerat
   }
 }
 
-object WellPrng {
-  @inline final def size = 16
+object Well512 extends GeneratorCompanion[Well512, Array[Int]] {
 
-  /**
-   * Produce a random seed array for use constructing WellPrng instances.
-   */
-  def randomSeed(): Array[Int] = {
-    import scala.util.Random.nextInt
-    val data = new Array[Int](size)
-    for (i <- 0 until size) data(i) = nextInt()
-    data
+  def randomSeed(): Array[Int] = global.generateInts(16)
+
+  def fromBytes(bytes: Array[Byte]): Well512 = {
+    val bs = if (bytes.length < 64) Arrays.copyOf(bytes, 64) else bytes
+    new Well512(0, Util.intsFromBytes(bytes, 16))
   }
 
-  def apply(): WellPrng = new WellPrng(0, randomSeed)
-}
+  def fromSeed(seed: Array[Int]) = new Well512(0, seed)
 
-/**
- * Global PRNG object.
- *
- * Due to possible use by several threads, this object synchronizes on all PRNG
- * access. To reduce possible lock contention, individual threads may
- * instantiate their own WellPrng instances, which are no synchronized.
- */
-object global extends WellPrng(0, WellPrng.randomSeed) {
-  override def nextInt(): Int = this.synchronized(super.nextInt())
+  def fromTime(time: Long = System.nanoTime()): Well512 =
+    new Well512(0, Lcg64.fromTime(time).generateInts(16))
 }
