@@ -6,7 +6,7 @@ Spire is a numeric library for Scala which is intended to be generic, fast,
 and precise.
 
 Using features such as specialization, macros, type classes, and implicits,
-Spire works had to defy conventional wisdom around performance and precision
+Spire works hard to defy conventional wisdom around performance and precision
 trade-offs. A major goal is to allow developers to write efficient numeric
 code without having to "bake in" particular numeric representations. In most
 cases, generic implementations using Spire's specialized type classes perform
@@ -20,17 +20,15 @@ go for announcements and discussion around Spire.
 ### Set up
 
 Spire currently relies heavily on macros introduced Scala 2.10.0, as well as
-many improvements to specialization. Now that 2.10.0 has been released, the
-0.3.0 release of Spire is expected to follow.
-
-Until then, Spire 0.3.0-RC1 is available.
+many improvements to specialization. Now that 2.10.0 has been released, Spire
+has been updated to 0.3.0.
 
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
 scalaVersion := "2.10.0"
 
-libraryDependencies += "org.spire-math" %% "spire" % "0.3.0-RC1"
+libraryDependencies += "org.spire-math" %% "spire" % "0.3.0"
 ```
 
 ### Number Types
