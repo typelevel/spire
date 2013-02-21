@@ -2,7 +2,7 @@ package spire.random
 
 import java.nio.ByteBuffer
 
-object Util {
+object Pack {
   def longToBytes(n: Long): Array[Byte] = {
     val arr = new Array[Byte](8)
     arr(0) = ((n >>> 56) & 0xff).toByte

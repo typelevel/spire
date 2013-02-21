@@ -42,10 +42,10 @@ class Well512 protected[random] (_i: Int, private var state: Array[Int]) extends
   def setSeed(ints: Array[Int]): Unit = state = ints
 
   def getSeedBytes(): Array[Byte] =
-    Util.intsToBytes(state)
+    Pack.intsToBytes(state)
 
   def setSeedBytes(bytes: Array[Byte]): Unit =
-    state = Util.intsFromBytes(bytes, 16)
+    state = Pack.intsFromBytes(bytes, 16)
 
   /**
    * Generates a random int. All 32-bit int values are equally likely.
@@ -72,7 +72,7 @@ object Well512 extends GeneratorCompanion[Well512, Array[Int]] {
 
   def fromBytes(bytes: Array[Byte]): Well512 = {
     val bs = if (bytes.length < 64) Arrays.copyOf(bytes, 64) else bytes
-    new Well512(0, Util.intsFromBytes(bytes, 16))
+    new Well512(0, Pack.intsFromBytes(bytes, 16))
   }
 
   def fromSeed(seed: Array[Int]) = new Well512(0, seed)

@@ -8,9 +8,9 @@ class Lcg32(_seed: Int) extends IntBasedGenerator {
 
   def copy: Lcg32 = new Lcg32(seed)
 
-  def getSeedBytes(): Array[Byte] = Util.intToBytes(seed)
+  def getSeedBytes(): Array[Byte] = Pack.intToBytes(seed)
 
-  def setSeedBytes(bytes: Array[Byte]): Unit = seed = Util.intFromBytes(bytes)
+  def setSeedBytes(bytes: Array[Byte]): Unit = seed = Pack.intFromBytes(bytes)
 
   def nextInt(): Int = {
     seed = 1664525 * seed + 1013904223
@@ -21,7 +21,7 @@ class Lcg32(_seed: Int) extends IntBasedGenerator {
 object Lcg32 extends GeneratorCompanion[Lcg32, Int] {
   def randomSeed(): Int = System.nanoTime.toInt
 
-  def fromBytes(bytes: Array[Byte]): Lcg32 = new Lcg32(Util.intFromBytes(bytes))
+  def fromBytes(bytes: Array[Byte]): Lcg32 = new Lcg32(Pack.intFromBytes(bytes))
   def fromSeed(seed: Int): Lcg32 = new Lcg32(seed)
   def fromTime(time: Long = System.nanoTime) = new Lcg32(time.toInt)
 
