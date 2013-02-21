@@ -19,7 +19,7 @@ object Syntax {
       case _ => false
     }
 
-    def name(s: String) = newTermName(s + c.fresh + "cfor")
+    def name(s: String) = newTermName(c.fresh(s + "$cfor"))
 
     val clean = isClean(test.tree) && isClean(next.tree) && isClean(body.tree)
 
