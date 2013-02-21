@@ -19,6 +19,8 @@ object Syntax {
       case _ => false
     }
 
+    def name(s: String) = newTermName(s + c.fresh + "cfor")
+
     val clean = isClean(test.tree) && isClean(next.tree) && isClean(body.tree)
 
     val tree = if (clean) {
@@ -27,8 +29,8 @@ object Syntax {
        * simple identifiers) then we can go ahead and just inline
        * them directly into a while loop.
        */
-      val index = newTermName(c.fresh)
-      val whileLoop = newTermName(c.fresh)
+      val index = name("index")
+      val whileLoop = name("while")
       Block(
         ValDef(Modifiers(MUTABLE), index, TypeTree(tpe), init.tree), 
         LabelDef(
@@ -51,16 +53,16 @@ object Syntax {
        * we will go ahead and bind each argument to a val just to be
        * safe.
        */
-      val testName = newTermName(c.fresh)
-      val nextName = newTermName(c.fresh)
-      val bodyName = newTermName(c.fresh)
+      val testName = name("test")
+      val nextName = name("next")
+      val bodyName = name("body")
 
       val f1 = Select(Select(Ident(nme.ROOTPKG), newTermName("scala")), newTypeName("Function1"))
       val unit = Select(Select(Ident(nme.ROOTPKG), newTermName("scala")), newTypeName("Unit"))
       val bool = Select(Select(Ident(nme.ROOTPKG), newTermName("scala")), newTypeName("Boolean"))
 
-      val index = newTermName(c.fresh)
-      val whileLoop = newTermName(c.fresh)
+      val index = name("index")
+      val whileLoop = name("while")
       Block(
         ValDef(Modifiers(), testName, AppliedTypeTree(f1, List(TypeTree(tpe), bool)), test.tree),
         ValDef(Modifiers(), nextName, AppliedTypeTree(f1, List(TypeTree(tpe), TypeTree(tpe))), next.tree),
@@ -83,22 +85,19 @@ object Syntax {
      * Instead of just returning 'tree', we will go ahead and inline
      * anonymous functions which are immediately applied.
      */
-    //c.Expr[Unit](tree)
     new Util[c.type](c).inlineAndReset[Unit](tree)
   }
 
   class Util[C <: Context with Singleton](val c:C) {
     import c.universe._
 
-    def die(msg:String) = c.abort(c.enclosingPosition, msg)
-
     def inlineAndReset[T](tree: Tree): c.Expr[T] =
-      c.Expr[T](c resetAllAttrs inlineApplyRecursive(tree))
+      c.Expr[T](c.resetAllAttrs(inlineApplyRecursive(tree)))
 
     def inlineApplyRecursive(tree: Tree): Tree = {
       val ApplyName = newTermName("apply")
 
-      class InlineSymbol(symbol: Symbol, value:Tree) extends Transformer {
+      class InlineSymbol(symbol: Symbol, value: Tree) extends Transformer {
         override def transform(tree: Tree): Tree = tree match {
           case Ident(_) if tree.symbol == symbol => value
           case _ => super.transform(tree)
