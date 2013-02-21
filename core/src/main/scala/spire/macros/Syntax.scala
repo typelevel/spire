@@ -11,22 +11,22 @@ object Syntax {
     import definitions._
     import Flag._
 
+    val c.WeakTypeTag(tpe) = implicitly[c.WeakTypeTag[A]]
+
     def isClean(t: Tree): Boolean = t match {
       case Ident(_) => true
       case Function(_, _) => true
       case _ => false
     }
 
-    //println("init = %s" format showRaw(init.tree))
-    //println("test = %s" format showRaw(test.tree))
-    //println("next = %s" format showRaw(next.tree))
-    //println("body = %s" format showRaw(body.tree))
-
-    val c.WeakTypeTag(tpe) = implicitly[c.WeakTypeTag[A]]
-
     val clean = isClean(test.tree) && isClean(next.tree) && isClean(body.tree)
 
     val tree = if (clean) {
+      /**
+       * If our arguments are all "clean" (anonymous functions or
+       * simple identifiers) then we can go ahead and just inline
+       * them directly into a while loop.
+       */
       val index = newTermName(c.fresh)
       val whileLoop = newTermName(c.fresh)
       Block(
@@ -45,6 +45,12 @@ object Syntax {
 
     } else {
 
+      /**
+       * If one or more of our arguments are "dirty" (something more
+       * complex than an anonymous function or simple identifier) then
+       * we will go ahead and bind each argument to a val just to be
+       * safe.
+       */
       val testName = newTermName(c.fresh)
       val nextName = newTermName(c.fresh)
       val bodyName = newTermName(c.fresh)
@@ -73,6 +79,11 @@ object Syntax {
             Literal(Constant(())))))
     }
 
+    /**
+     * Instead of just returning 'tree', we will go ahead and inline
+     * anonymous functions which are immediately applied.
+     */
+    //c.Expr[Unit](tree)
     new Util[c.type](c).inlineAndReset[Unit](tree)
   }
 
