@@ -36,4 +36,17 @@ class SyntaxTest extends FunSuite {
     }
     assert(b.toList === List(0, 1, 0, 1, 0, 1))
   }
+
+  test("functions with side effects in cfor") {
+    val b = mutable.ArrayBuffer.empty[Int]
+    var v = 0
+    cfor(0)({ v += 1; _ < 3 }, { v += 10; _ + 1})({
+      v += 100
+      x => {
+        b += x
+      }
+    })
+    assert(v == 111, s"v == $v")
+    assert(b.toList === List(0, 1, 2), s"b.toList == ${b.toList}")
+  }
 }
