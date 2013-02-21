@@ -50,52 +50,53 @@ class CForBenchmarks extends MyBenchmark {
 
   def timeWhileIntArrayMultiply(reps:Int) = run(reps)(doWhileIntArrayMultiply)
   def timeTailrecIntArrayMultiply(reps:Int) = run(reps)(doTailrecIntArrayMultiply)
+  def timeForeachIntArrayMultiply(reps:Int) = run(reps)(doForeachGcd)
+  def timeForIntArrayMultiply(reps:Int) = run(reps)(doForGcd)
   def timeCForIntArrayMultiply(reps:Int) = run(reps)(doCForIntArrayMultiply)
-  
 
   def doWhileOr {
     var t: Long = 0L
     var i: Int = 0
     val len = size - 1
-    while (i < len) { t ^ or(arr(i), arr(i + 1)); i += 1 }
+    while (i < len) { t = t ^ or(arr(i), arr(i + 1)); i += 1 }
 
     i = 0
     val len2 = size / 2
-    while (i < len2) { t ^ or(arr(i + 3), arr(i + 2)); i += 1 }
+    while (i < len2) { t = t ^ or(arr(i + 3), arr(i + 2)); i += 1 }
 
     i = 0
     val len3 = size / 3
-    while (i < len3) { t ^ or(arr(i + 1), arr(i + 2)); i += 1 }
+    while (i < len3) { t = t ^ or(arr(i + 1), arr(i + 2)); i += 1 }
   }
 
   def doWhileMin {
     var t: Long = 0L
     var i: Int = 0
     val len = size - 1
-    while (i < len) { t ^ min(arr(i), arr(i + 1)); i += 1 }
+    while (i < len) { t = t ^ min(arr(i), arr(i + 1)); i += 1 }
 
     i = 0
     val len2 = size / 2
-    while (i < len2) { t ^ min(arr(i + 3), arr(i + 2)); i += 1 }
+    while (i < len2) { t = t ^ min(arr(i + 3), arr(i + 2)); i += 1 }
 
     i = 0
     val len3 = size / 3
-    while (i < len3) { t ^ min(arr(i + 1), arr(i + 2)); i += 1 }
+    while (i < len3) { t = t ^ min(arr(i + 1), arr(i + 2)); i += 1 }
   }
 
   def doWhileGcd {
     var t: Long = 0L
     var i: Int = 0
     val len = size - 1
-    while (i < len) { t ^ gcd(arr(i), arr(i + 1)); i += 1 }
+    while (i < len) { t = t ^ gcd(arr(i), arr(i + 1)); i += 1 }
 
     i = 0
     val len2 = size / 2
-    while (i < len2) { t ^ gcd(arr(i + 3), arr(i + 2)); i += 1 }
+    while (i < len2) { t = t ^ gcd(arr(i + 3), arr(i + 2)); i += 1 }
 
     i = 0
     val len3 = size / 3
-    while (i < len3) { t ^ gcd(arr(i + 1), arr(i + 2)); i += 1 }
+    while (i < len3) { t = t ^ gcd(arr(i + 1), arr(i + 2)); i += 1 }
   }
 
   def doWhileIntArrayMultiply {
@@ -113,19 +114,19 @@ class CForBenchmarks extends MyBenchmark {
     var t: Long = 0L
     val len = size - 1
     @tailrec def loop1(i: Int) {
-      if (i < len) { t ^ or(arr(i), arr(i + 1)); loop1(i + 1) }
+      if (i < len) { t = t ^ or(arr(i), arr(i + 1)); loop1(i + 1) }
     }
     loop1(0)
 
     val len2 = size / 2
     @tailrec def loop2(i: Int) {
-      if (i < len2) { t ^ or(arr(i + 3), arr(i + 2)); loop2(i + 1) }
+      if (i < len2) { t = t ^ or(arr(i + 3), arr(i + 2)); loop2(i + 1) }
     }
     loop2(0)
 
     val len3 = size / 3
     @tailrec def loop3(i: Int) {
-      if (i < len2) { t ^ or(arr(i + 1), arr(i + 2)); loop3(i + 1) }
+      if (i < len2) { t = t ^ or(arr(i + 1), arr(i + 2)); loop3(i + 1) }
     }
     loop3(0)
   }
@@ -134,19 +135,19 @@ class CForBenchmarks extends MyBenchmark {
     var t: Long = 0L
     val len = size - 1
     @tailrec def loop1(i: Int) {
-      if (i < len) { t ^ min(arr(i), arr(i + 1)); loop1(i + 1) }
+      if (i < len) { t = t ^ min(arr(i), arr(i + 1)); loop1(i + 1) }
     }
     loop1(0)
 
     val len2 = size / 2
     @tailrec def loop2(i: Int) {
-      if (i < len2) { t ^ min(arr(i + 3), arr(i + 2)); loop2(i + 1) }
+      if (i < len2) { t = t ^ min(arr(i + 3), arr(i + 2)); loop2(i + 1) }
     }
     loop2(0)
 
     val len3 = size / 3
     @tailrec def loop3(i: Int) {
-      if (i < len2) { t ^ min(arr(i + 1), arr(i + 2)); loop3(i + 1) }
+      if (i < len2) { t = t ^ min(arr(i + 1), arr(i + 2)); loop3(i + 1) }
     }
     loop3(0)
   }
@@ -155,19 +156,19 @@ class CForBenchmarks extends MyBenchmark {
     var t: Long = 0L
     val len = size - 1
     @tailrec def loop1(i: Int) {
-      if (i < len) { t ^ gcd(arr(i), arr(i + 1)); loop1(i + 1) }
+      if (i < len) { t = t ^ gcd(arr(i), arr(i + 1)); loop1(i + 1) }
     }
     loop1(0)
 
     val len2 = size / 2
     @tailrec def loop2(i: Int) {
-      if (i < len2) { t ^ gcd(arr(i + 3), arr(i + 2)); loop2(i + 1) }
+      if (i < len2) { t = t ^ gcd(arr(i + 3), arr(i + 2)); loop2(i + 1) }
     }
     loop2(0)
 
     val len3 = size / 3
     @tailrec def loop3(i: Int) {
-      if (i < len2) { t ^ gcd(arr(i + 1), arr(i + 2)); loop3(i + 1) }
+      if (i < len2) { t = t ^ gcd(arr(i + 1), arr(i + 2)); loop3(i + 1) }
     }
     loop3(0)
   }
@@ -189,109 +190,127 @@ class CForBenchmarks extends MyBenchmark {
   def doForeachOr {
     var t: Long = 0L
     val len = size - 1
-    (0 until len).foreach { i => t ^ or(arr(i), arr(i + 1)) }
+    (0 until len).foreach { i => t = t ^ or(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    (0 until len2).foreach { i => t ^ or(arr(i + 3), arr(i + 2)) }
+    (0 until len2).foreach { i => t = t ^ or(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    (0 until len3).foreach { i => t ^ or(arr(i + 1), arr(i + 2)) }
+    (0 until len3).foreach { i => t = t ^ or(arr(i + 1), arr(i + 2)) }
   }
 
   def doForeachMin {
     var t: Long = 0L
     val len = size - 1
-    (0 until len).foreach { i => t ^ min(arr(i), arr(i + 1)) }
+    (0 until len).foreach { i => t = t ^ min(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    (0 until len2).foreach { i => t ^ min(arr(i + 3), arr(i + 2)) }
+    (0 until len2).foreach { i => t = t ^ min(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    (0 until len3).foreach { i => t ^ min(arr(i + 1), arr(i + 2)) }
+    (0 until len3).foreach { i => t = t ^ min(arr(i + 1), arr(i + 2)) }
   }
 
   def doForeachGcd {
     var t: Long = 0L
     val len = size - 1
-    (0 until len).foreach { i => t ^ gcd(arr(i), arr(i + 1)) }
+    (0 until len).foreach { i => t = t ^ gcd(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    (0 until len2).foreach { i => t ^ gcd(arr(i + 3), arr(i + 2)) }
+    (0 until len2).foreach { i => t = t ^ gcd(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    (0 until len3).foreach { i => t ^ gcd(arr(i + 1), arr(i + 2)) }
+    (0 until len3).foreach { i => t = t ^ gcd(arr(i + 1), arr(i + 2)) }
+  }
+
+  def doForeachIntArrayMultiply {
+    val arr2 = arr.clone
+    val len = size
+    (0 until len).foreach { i =>
+      val value = arr2(i)
+      arr2(i) = value * 2
+    }
   }
 
   def doForOr {
     var t: Long = 0L
     val len = size - 1
-    for (i <- 0 until len) { t ^ or(arr(i), arr(i + 1)) }
+    for (i <- 0 until len) { t = t ^ or(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    for (i <- 0 until len2) { t ^ or(arr(i + 3), arr(i + 2)) }
+    for (i <- 0 until len2) { t = t ^ or(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    for (i <- 0 until len3) { t ^ or(arr(i + 1), arr(i + 2)) }
+    for (i <- 0 until len3) { t = t ^ or(arr(i + 1), arr(i + 2)) }
   }
 
   def doForMin {
     var t: Long = 0L
     val len = size - 1
-    for (i <- 0 until len) { t ^ min(arr(i), arr(i + 1)) }
+    for (i <- 0 until len) { t = t ^ min(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    for (i <- 0 until len2) { t ^ min(arr(i + 3), arr(i + 2)) }
+    for (i <- 0 until len2) { t = t ^ min(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    for (i <- 0 until len3) { t ^ min(arr(i + 1), arr(i + 2)) }
+    for (i <- 0 until len3) { t = t ^ min(arr(i + 1), arr(i + 2)) }
   }
 
   def doForGcd {
     var t: Long = 0L
     val len = size - 1
-    for (i <- 0 until len) { t ^ gcd(arr(i), arr(i + 1)) }
+    for (i <- 0 until len) { t = t ^ gcd(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    for (i <- 0 until len2) { t ^ gcd(arr(i + 3), arr(i + 2)) }
+    for (i <- 0 until len2) { t = t ^ gcd(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    for (i <- 0 until len3) { t ^ gcd(arr(i + 1), arr(i + 2)) }
+    for (i <- 0 until len3) { t = t ^ gcd(arr(i + 1), arr(i + 2)) }
+  }
+
+  def doForIntArrayMultiply {
+    val arr2 = arr.clone
+    val len = size
+    for (i <- 0 until len) {
+      val value = arr2(i)
+      arr2(i) = value * 2
+    }
   }
 
   def doCForOr {
     var t: Long = 0L
     val len = size - 1
-    cfor(0)(_ < len, _ + 1) { i => t ^ or(arr(i), arr(i + 1)) }
+    cfor(0)(_ < len, _ + 1) { i => t = t ^ or(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    cfor(0)(_ < len2, _ + 1) { i => t ^ or(arr(i + 3), arr(i + 2)) }
+    cfor(0)(_ < len2, _ + 1) { i => t = t ^ or(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    cfor(0)(_ < len3, _ + 1) { i => t ^ or(arr(i + 1), arr(i + 2)) }
+    cfor(0)(_ < len3, _ + 1) { i => t = t ^ or(arr(i + 1), arr(i + 2)) }
   }
 
   def doCForMin {
     var t: Long = 0L
     val len = size - 1
-    cfor(0)(_ < len, _ + 1) { i => t ^ min(arr(i), arr(i + 1)) }
+    cfor(0)(_ < len, _ + 1) { i => t = t ^ min(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    cfor(0)(_ < len2, _ + 1) { i => t ^ min(arr(i + 3), arr(i + 2)) }
+    cfor(0)(_ < len2, _ + 1) { i => t = t ^ min(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    cfor(0)(_ < len3, _ + 1) { i => t ^ min(arr(i + 1), arr(i + 2)) }
+    cfor(0)(_ < len3, _ + 1) { i => t = t ^ min(arr(i + 1), arr(i + 2)) }
   }
 
   def doCForGcd {
     var t: Long = 0L
     val len = size - 1
-    cfor(0)(_ < len, _ + 1) { i => t ^ gcd(arr(i), arr(i + 1)) }
+    cfor(0)(_ < len, _ + 1) { i => t = t ^ gcd(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    cfor(0)(_ < len2, _ + 1) { i => t ^ gcd(arr(i + 3), arr(i + 2)) }
+    cfor(0)(_ < len2, _ + 1) { i => t = t ^ gcd(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    cfor(0)(_ < len3, _ + 1) { i => t ^ gcd(arr(i + 1), arr(i + 2)) }
+    cfor(0)(_ < len3, _ + 1) { i => t = t ^ gcd(arr(i + 1), arr(i + 2)) }
   }
 
   def doCForIntArrayMultiply {

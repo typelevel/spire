@@ -3,37 +3,33 @@ package spire.macrosk
 import scala.reflect.macros.Context
 
 object Syntax {
-  def cforMacro[A:c.WeakTypeTag](c:Context)(init:c.Expr[A])
-     (test:c.Expr[A => Boolean], next:c.Expr[A => A])
-     (body:c.Expr[A => Unit]): c.Expr[Unit] = {
+  def cforMacro[A: c.WeakTypeTag](c: Context)(init: c.Expr[A])
+     (test: c.Expr[A => Boolean], next: c.Expr[A => A])
+     (body: c.Expr[A => Unit]): c.Expr[Unit] = {
     import c.universe._
+    import definitions._
+    import Flag._
 
     val c.WeakTypeTag(tpe) = implicitly[c.WeakTypeTag[A]]
 
-    val a = newTermName(c.fresh)
-    val w = newTermName(c.fresh)
+    val index = newTermName(c.fresh)
+    val whileLoop = newTermName(c.fresh)
 
-    val tailrec = newTermName("tailrec")
+    val tree = Block(
+      ValDef(Modifiers(MUTABLE), index, TypeTree(tpe), init.tree), 
+      LabelDef(
+        whileLoop,
+        List(),
+        If(
+          Apply(test.tree, List(Ident(index))),
+          Block(
+            Apply(body.tree, List(Ident(index))),
+            Assign(Ident(i), Apply(next.tree, List(Ident(index)))),
+            Apply(Ident(whileLoop), List())
+          ),
+          Literal(Constant(())))))
 
-    val importTailrec = Import(
-      Select(Ident("scala"), newTermName("annotation")),
-      List(ImportSelector(tailrec, 1161, tailrec, 1161)))
-
-    val mods = Modifiers(NoFlags, tpnme.EMPTY, List())
-
-    val param = List(ValDef(Modifiers(Flag.PARAM), a, TypeTree(tpe), EmptyTree))
-
-    val t = Block(
-      List(
-        DefDef(mods, w, List(), List(param), Ident(newTypeName("Unit")),
-          If(Apply(test.tree, List(Ident(a))),
-            Block(
-              List(Apply(body.tree, List(Ident(a)))),
-              Apply(Ident(w), List(Apply(next.tree, List(Ident(a)))))),
-            Literal(Constant(()))))),
-      Apply(Ident(w), List(init.tree)))
-
-    new Util[c.type](c).inlineAndReset[Unit](t)
+    new Util[c.type](c).inlineAndReset[Unit](tree)
   }
 
   class Util[C <: Context with Singleton](val c:C) {
