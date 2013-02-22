@@ -14,7 +14,7 @@ object Syntax {
     val c.WeakTypeTag(tpe) = implicitly[c.WeakTypeTag[A]]
 
     def isClean(t: Tree): Boolean = t match {
-      case Ident(_) => true
+      case Ident(_: TermName) if t.symbol.asTerm.isStable => true
       case Function(_, _) => true
       case _ => false
     }
