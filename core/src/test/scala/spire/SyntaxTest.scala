@@ -48,6 +48,45 @@ class SyntaxTest extends FunSuite {
     assert(v == 111, s"v == $v")
     assert(b.toList === List(0, 1, 2), s"b.toList == ${b.toList}")
   }
+
+  test("functions with side effects function values in cfor") {
+    val b = mutable.ArrayBuffer.empty[Int]
+    var v = 0
+    def test: Int => Boolean = { v += 1; _ < 3 }
+    def incr: Int => Int = { v += 10; _ + 1}
+    def body: Int => Unit = {
+      v += 100
+      x => {
+        b += x
+      }
+    }
+    cfor(0)(test, incr)(body)
+    assert(v == 111, s"v == $v")
+    assert(b.toList === List(0, 1, 2), s"b.toList == ${b.toList}")
+  }
+
+  test("functions with side effects function by-value params in cfor") {
+    val b = mutable.ArrayBuffer.empty[Int]
+    var v = 0
+    def run(
+        test: => (Int => Boolean),
+        incr: => (Int => Int),
+        body: => (Int => Unit)) {
+      cfor(0)(test, incr)(body)
+    }
+    run(
+      { v += 1; _ < 3 },
+      { v += 10; _ + 1},
+      {
+        v += 100
+        x => {
+          b += x
+        }
+      }
+    )
+    assert(v == 111, s"v == $v")
+    assert(b.toList === List(0, 1, 2), s"b.toList == ${b.toList}")
+  }
   
   test("capture value in closure") {
     val b1 = collection.mutable.ArrayBuffer[() => Int]()
