@@ -78,7 +78,22 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
       throw new ArithmeticException("Cannot find the nroot of a BigDecimal with unlimited precision.")
     NRoot.nroot(a, k, a.mc)
   }
+
+  private[this] val two = BigDecimal(2)
+
+  // this is newton's method
+  override def sqrt(n: BigDecimal): BigDecimal = {
+    var x: BigDecimal = BigDecimal(0, n.mc)
+    var y: BigDecimal = BigDecimal(Math.sqrt(n.toDouble), n.mc)
+    while (x != y) {
+      x = y;
+      y = ((n / x) + x) / two
+    }
+    y
+  }
+
   def log(a:BigDecimal) = spire.math.log(a)
+
   def fpow(a:BigDecimal, b:BigDecimal) = spire.math.pow(a, b)
 }
 
