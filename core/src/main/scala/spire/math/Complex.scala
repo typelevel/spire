@@ -24,14 +24,16 @@ object Complex {
   implicit def floatToComplex(n: Float) = new Complex(n, 0.0F)
   implicit def doubleToComplex(n: Double) = new Complex(n, 0.0)
 
-  implicit def bigIntToComplex(n: BigInt) = new Complex(BigDecimal(n), BigDecimal(0))
-  implicit def bigDecimalToComplex(n: BigDecimal) = new Complex(n, BigDecimal(0))
+  implicit def bigIntToComplex(n: BigInt) =
+    bigDecimalToComplex(BigDecimal(n))
 
-  def polar[@spec(Float, Double) T](magnitude: T, angle: T)(implicit f: Fractional[T], t: Trig[T]) = {
-    val real: T = f.times(magnitude, t.cos(angle))
-    val imag: T = f.times(magnitude, t.sin(angle))
-    new Complex(real, imag)
+  implicit def bigDecimalToComplex(n: BigDecimal) = {
+    implicit val mc = n.mc
+    new Complex(n, BigDecimal(0))
   }
+
+  def polar[@spec(Float, Double) T](magnitude: T, angle: T)(implicit f: Fractional[T], t: Trig[T]) =
+    new Complex(f.times(magnitude, t.cos(angle)), f.times(magnitude, t.sin(angle)))
 
   def apply[@spec(Float, Double) T](real: T)(implicit f: Fractional[T], t: Trig[T]): Complex[T] =
     new Complex(real, f.zero)
@@ -72,7 +74,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
     case that => unifiedPrimitiveEquals(that)
   }
 
-  override def toString: String = "(%s+%si)" format (real, imag)
+  override def toString: String = "(%s + %si)" format (real, imag)
 
   def toGaussian: Gaussian[T] = Gaussian(f.round(real), f.round(imag))(f)
 
@@ -97,12 +99,15 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
 
   def unary_-() = new Complex(f.negate(real), f.negate(imag))
 
+  // (a+ci) + (b+di) = (a+b) + (c+d)i
   def +(b: Complex[T]) =
     new Complex(f.plus(real, b.real), f.plus(imag, b.imag))
 
+  // (a+ci) - (b+di) = (a-b) + (c-d)i
   def -(b: Complex[T]) =
     new Complex(f.minus(real, b.real), f.minus(imag, b.imag))
 
+  // (a+ci) * (b+di) = (a*b - c*d) + (c*b + a*d)i
   def *(b: Complex[T]) = new Complex(
     f.minus(f.times(real, b.real), f.times(imag, b.imag)),
     f.plus(f.times(imag, b.real), f.times(real, b.imag))
@@ -177,9 +182,88 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
     new Complex(f.log(abs), arg)
   }
 
-  def floor: Complex[T] = Complex(f.floor(real), f.floor(imag))
-  def ceil: Complex[T] = Complex(f.ceil(real), f.ceil(imag))
-  def round: Complex[T] = Complex(f.round(real), f.round(imag))
+  def sqrt: Complex[T] = {
+    val v = f.sqrt(f.div(f.plus(f.abs(real), this.abs), f.fromInt(2)))
+    val v2 = f.plus(v, v)
+    if (f.gt(real, f.zero))
+      new Complex(v, f.div(imag, v2))
+    else
+      new Complex(f.div(f.abs(imag), v2), f.times(v, f.fromInt(f.signum(imag))))
+  }
+
+  def floor: Complex[T] = new Complex(f.floor(real), f.floor(imag))
+  def ceil: Complex[T] = new Complex(f.ceil(real), f.ceil(imag))
+  def round: Complex[T] = new Complex(f.round(real), f.round(imag))
+
+  // acos(z) = -i*(log(z + i*(sqrt(1 - z*z))))
+  def acos: Complex[T] = {
+    val z2 = this * this
+    val s = new Complex(f.minus(f.one, z2.real), f.negate(z2.imag)).sqrt
+    val l = new Complex(f.plus(real, s.imag), f.plus(imag, s.real)).log
+    new Complex(l.imag, f.negate(l.real))
+  }
+
+  // asin(z) = -i*(log(sqrt(1 - z*z) + i*z))
+  def asin: Complex[T] = {
+    val z2 = this * this
+    val s = new Complex(f.minus(f.one, z2.real), f.negate(z2.imag)).sqrt
+    val l = new Complex(f.plus(s.real, f.negate(imag)), f.plus(s.imag, real)).log
+    new Complex(l.imag, f.negate(l.real))
+  }
+
+  // atan(z) = (i/2) log((i + z)/(i - z))
+  def atan: Complex[T] = {
+    val n = new Complex(real, f.plus(imag, f.one))
+    val d = new Complex(f.negate(real), f.minus(f.one, imag))
+    val l = (n / d).log
+    new Complex(f.div(imag, f.fromInt(-2)), f.div(real, f.fromInt(2)))
+  }
+
+  // exp(a+ci) = (exp(a) * cos(c)) + (exp(a) * sin(c))i
+  def exp: Complex[T] = new Complex(
+    f.times(t.exp(real), t.cos(imag)),
+    f.times(t.exp(real), t.sin(imag))
+  )
+
+  // sin(a+ci) = (sin(a) * cosh(c)) + (-cos(a) * sinh(c))i
+  def sin: Complex[T] = new Complex(
+    f.times(t.sin(real), t.cosh(imag)),
+    f.times(f.negate(t.cos(real)), t.sinh(imag))
+  )
+
+  // sinh(a+ci) = (sinh(a) * cos(c)) + (-cosh(a) * sin(c))i
+  def sinh: Complex[T] = new Complex(
+    f.times(t.sinh(real), t.cos(imag)),
+    f.times(f.negate(t.cosh(real)), t.sin(imag))
+  )
+
+  // cos(a+ci) = (cos(a) * cosh(c)) + (-sin(a) * sinh(c))i 
+  def cos: Complex[T] = new Complex(
+    f.times(t.cos(real), t.cosh(imag)),
+    f.times(f.negate(t.sin(real)), t.sinh(imag))
+  )
+
+  // cosh(a+ci) = (cosh(a) * cos(c)) + (-sinh(a) * sin(c))i 
+  def cosh: Complex[T] = new Complex(
+    f.times(t.cosh(real), t.cos(imag)),
+    f.times(f.negate(t.sinh(real)), t.sin(imag))
+  )
+
+  // tan(a+ci) = (sin(a+a) + sinh(c+c)i) / (cos(a+a) + cosh(c+c))
+  def tan: Complex[T] = {
+    val r2 = f.plus(real, real)
+    val i2 = f.plus(imag, imag)
+    val d = f.plus(t.cos(r2), t.cosh(i2))
+    new Complex(f.div(t.sin(r2), d), f.div(t.sinh(i2), d))
+  }
+
+  // tanh(a+ci) = (sinh(a+a) + sin(c+c)i) / (cosh(a+a) + cos(c+c))
+  def tanh: Complex[T] = {
+    val r2 = f.plus(real, real)
+    val i2 = f.plus(imag, imag)
+    val d = f.plus(t.cos(r2), t.cosh(i2))
+    new Complex(f.div(t.sinh(r2), d), f.div(t.sin(i2), d))
+  }
 }
 
 
