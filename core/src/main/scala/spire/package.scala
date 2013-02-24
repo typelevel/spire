@@ -217,7 +217,11 @@ final class ArrayOps[@spec A](arr:Array[A]) {
     f(0, 1, arr.length)
   }
       
-  import spire.math.{Sorting, Selection}
+  import spire.math.{Sorting, Selection, Searching}
+
+  def qsearch(a: A)(implicit ev: Order[A]): Int = {
+    Searching.search(arr, a)
+  }
 
   def qsort(implicit ev:Order[A], ct:ClassTag[A]) {
     Sorting.sort(arr)
@@ -262,6 +266,11 @@ final class ArrayOps[@spec A](arr:Array[A]) {
     Selection.select(arr2, k)
     arr2
   }
+}
+
+final class IndexedSeqOps[@spec A, CC[A] <: IndexedSeq[A]](as: CC[A]) {
+  def qsearch(a: A)(implicit ev: Order[A]): Int =
+    Searching.search(as, a)
 }
 
 import scala.collection.generic.CanBuildFrom
@@ -419,6 +428,7 @@ object implicits {
 
   implicit def arrayOps[@spec A](lhs:Array[A]) = new ArrayOps(lhs)
   implicit def seqOps[@spec A, CC[A] <: Iterable[A]](lhs:CC[A]) = new SeqOps[A, CC](lhs)
+  implicit def indexedSeqOps[@spec A, CC[A] <: IndexedSeq[A]](lhs:CC[A]) = new IndexedSeqOps[A, CC](lhs)
 
   implicit def intToA[A](n:Int)(implicit c:ConvertableTo[A]): A = c.fromInt(n)
   implicit def convertableOps[A:ConvertableFrom](a:A) = new ConvertableFromOps(a)

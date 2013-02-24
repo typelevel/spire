@@ -24,10 +24,10 @@ object Searching {
     -first - 1
   }
 
-  final def search[A: Order](as: IndexedSeq[A], item: A): Int =
+  final def search[@spec A: Order](as: IndexedSeq[A], item: A): Int =
     search(as, item, 0, as.length - 1)
 
-  final def search[A](as: IndexedSeq[A], item: A, lower: Int, upper: Int)(implicit ev: Order[A]): Int = {
+  final def search[@spec A](as: IndexedSeq[A], item: A, lower: Int, upper: Int)(implicit ev: Order[A]): Int = {
     var first = lower
     var last = upper
     while (first <= last) {
