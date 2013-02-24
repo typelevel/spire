@@ -279,7 +279,7 @@ object Rational {
   val zero: Rational = LongRational(0L, 1L)
   val one: Rational = LongRational(1L, 1L)
   
-  private[math] def apply(n: SafeLong, d: SafeLong): Rational = {
+  def apply(n: SafeLong, d: SafeLong): Rational = {
     n.foldWith[Rational,LongRational,BigRational](d)(LongRational(_, _), BigRational(_, _))
   }
 
