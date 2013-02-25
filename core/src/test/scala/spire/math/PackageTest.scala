@@ -23,7 +23,7 @@ class PackageTest extends FunSuite {
     // these are here more as a sanity check than as a commitment to these
     // exact values.
     assert(pow(BigDecimal(2), BigDecimal(5)) === BigDecimal(32))
-    assert(pow(BigDecimal("1.00000001"), BigDecimal("2000000000")) === BigDecimal("485165087.921736"))
-    assert(pow(BigDecimal(Double.MaxValue) * 100, BigDecimal("0.00001")) === BigDecimal("1.0071694572064958"))
+    assert(pow(BigDecimal("1.00000001"), BigDecimal("2000000000")) === BigDecimal("485165087.9217355080322270235162458"))
+    assert(pow(BigDecimal(Double.MaxValue) * 100, BigDecimal("0.00001")) === BigDecimal("1.007169457206495657215397746604571"))
   }
 }

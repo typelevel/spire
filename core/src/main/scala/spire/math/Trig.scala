@@ -30,7 +30,7 @@ trait Trig[@spec(Float, Double) A] {
 object Trig {
   implicit object FloatIsTrig extends FloatIsTrig
   implicit object DoubleIsTrig extends DoubleIsTrig
-  implicit def bigDecimalIsTrig(implicit mc: MathContext) =
+  implicit def bigDecimalIsTrig(implicit mc: MathContext = BigDecimal.defaultMathContext) =
     new BigDecimalIsTrig(mc)
   implicit object NumberIsTrig extends NumberIsTrig
   implicit def complexIsTrig[@spec(Float, Double) A: Fractional: Trig]: Trig[Complex[A]] =
@@ -98,27 +98,38 @@ object BigDecimalIsTrig {
       return eCache.setScale(mc.getPrecision, BigDecimal.RoundingMode.HALF_UP)
     }
 
-    val zero = BigDecimal(0, mc)
-    val one = BigDecimal(1, mc)
-    val two = BigDecimal(2, mc)
+    val scale = BigInt(10).pow(mc.getPrecision)
 
-    var total: BigDecimal = BigDecimal(2, mc)
-    var curr = two
-    var next = one / curr
-    var last = zero
-    val p = mc.getPrecision + 1
-    while (next != last) {
-      last = next
-      total += last
-      curr += one
-      next = (last / curr).setScale(p, BigDecimal.RoundingMode.FLOOR)
+    /**
+     * e = sum(k=0 -> inf)(1/k!) = 1 + 1 + 1/2 + 1/6 + 1/24 + ...
+     *
+     * To avoid doing lots of division, we will just represent e as a
+     * rational approximation (num/denom), multiplying both by each
+     * new k and adding 1 to the numerator.
+     *
+     * We keep track of the current value of k! as n, since once n exceeds
+     * the scale we have small fractions which won't be representable in
+     * the current MathContext.
+     */
+    var num = BigInt(2)
+    var denom = BigInt(1)
+    var n = BigInt(1)
+    var m = 2
+    while (n < scale) {
+      num = num * m + 1
+      denom = denom * m
+      n = n * m
+      m += 1
     }
-    val result = total.setScale(mc.getPrecision, BigDecimal.RoundingMode.HALF_UP)
+
+    val result = BigDecimal(num, mc) / BigDecimal(denom, mc)
     eCache = result
     result
   }
 
-  // TODO: use a faster method like the Chudnovsky algorithm
+  private final val c: Long = 640320L
+  private final val c3_over_24: Long = (c * c * c) / 24L
+
   private var piCache: BigDecimal = null
   private def piFromContext(mc: MathContext): BigDecimal = {
     import spire.algebra.NRoot.BigDecimalIsNRoot.sqrt
@@ -130,18 +141,38 @@ object BigDecimalIsTrig {
       return piCache.setScale(mc.getPrecision, BigDecimal.RoundingMode.HALF_UP)
     }
 
-    var a: BigDecimal = BigDecimal(1, mc)
-    var b: BigDecimal = one / sqrt(BigDecimal(2, mc))
-    var t: BigDecimal = BigDecimal(0.25, mc)
-    var x: BigDecimal = BigDecimal(1, mc)
-    while (a != b) {
-      val tmp = a
-      a = (a + b) / two
-      b = sqrt(b * tmp)
-      t -= x * ((tmp - a) pow 2)
-      x *= two
+    /**
+     * This is an implementation of Chudnovsky's algorithm for calculating
+     * pi, using binary splitting. The implementation is based on the one
+     * found at http://www.craig-wood.com/nick/articles/pi-chudnovsky/.
+     */
+    def bs(a: BigInt, b: BigInt): (BigInt, BigInt, BigInt) = {
+      if (b - a == 1) {
+        val (pab: BigInt, qab: BigInt) = if (a == 0)
+          (BigInt(1), BigInt(1))
+        else
+          ((6 * a - 5) * (2 * a - 1) * (6 * a - 1), a * a * a * c3_over_24)
+
+        val tab = pab * (a * 545140134 + 13591409)
+        if ((a & 1) == 0)
+          (pab, qab, tab)
+        else
+          (pab, qab, -tab)
+      } else {
+        val m = (a + b) >> 1
+        val (pam, qam, tam) = bs(a, m)
+        val (pmb, qmb, tmb) = bs(m, b)
+        val pab = pam * pmb
+        val qab = qam * qmb
+        val tab = qmb * tam + pam * tmb
+        (pab, qab, tab)
+      }
     }
-    val result = ((a + b) * (a + b)) / (t * four)
+
+    val n = java.lang.Math.log10(c3_over_24 / 72).toInt
+    val (p, q, t) = bs(0, n)
+    val sqrtc = sqrt(BigDecimal(10005, mc))
+    val result = (sqrtc * BigDecimal(q * 426880, mc)) / BigDecimal(t, mc)
     piCache = result
     result
   }
@@ -153,17 +184,15 @@ object BigDecimalIsTrig {
   protected[this] final val four = BigDecimal(4)
 }
 
-// ugh. right now this is SUPER hand-wavy.
-// we should probably be paying a lot more attention to MathContext, etc.
-class BigDecimalIsTrig(mc: MathContext) extends Trig[BigDecimal] {
+// ugh. (apart from pi, e, exp) this is very imprecise.
+class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends Trig[BigDecimal] {
   import BigDecimalIsTrig._
 
-  //def e: BigDecimal = BigDecimalIsTrig.e
   lazy val e: BigDecimal = eFromContext(mc)
   lazy val pi: BigDecimal = piFromContext(mc)
-  protected[math] lazy val twoPi = two * pi
+  protected[math] lazy val twoPi = pi * 2
 
-  def exp(a: BigDecimal): BigDecimal = spire.math.exp(a)
+  def exp(k: BigDecimal): BigDecimal = spire.math.exp(k)
 
   protected[math] val threeSixty = BigDecimal(360)
   def toRadians(a: BigDecimal): BigDecimal = (a * twoPi) / threeSixty

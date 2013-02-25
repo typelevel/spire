@@ -11,6 +11,7 @@ import spire.macrosk._
 import java.lang.Long.numberOfTrailingZeros
 import java.lang.Math
 import java.math.BigInteger
+import java.math.MathContext
 
 import scala.collection.SeqLike
 
@@ -465,11 +466,13 @@ package object math {
 
   final def log(n:Double):Double = Math.log(n)
 
+  // FIXME: we should actually try to return values which are correct for the
+  // given precision.
   final def log(n:BigDecimal):BigDecimal = {
     if (n < 0) sys.error("invalid argument: %s" format n)
     else _log(n, BigDecimal(0))
   }
-
+  
   // Since log(n * x) = log(n) + log(x), we can use Math.log to
   // approximate log for BigDecimal.
   @tailrec private final def _log(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
@@ -482,13 +485,34 @@ package object math {
    */
   final def exp(n:Double):Double = Math.exp(n)
 
-  final def exp(n:BigDecimal):BigDecimal = _exp(n, BigDecimal(1))
+  // FIXME: the error bounds are not quite right on this one. it works fine
+  // for exp(1) (essentially the same algorithm as for e) but for some
+  // precisions the last digit of exp(2) will be off.
+  //
+  // if it turns out that we can prove that we'll only ever be a digit or two
+  // off we can just run the algorithm with more precision and round or
+  // truncate at the end.
+  def exp(k: BigDecimal): BigDecimal = {
+    import spire.algebra.NRoot.BigDecimalIsNRoot.sqrt
 
-  // Since exp(a + b) = exp(a) * exp(b), we can use Math.log to
-  // approximate exp for BigDecimal.
-  @tailrec private final def _exp(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
-    if (n <= logMaxDouble) BigDecimal(Math.exp(n.toDouble)) * sofar
-    else _exp(n - logMaxDouble, maxDouble * sofar)
+    val mc = k.mc
+    var scale = BigDecimal(10, mc).pow(mc.getPrecision)
+    
+    var kk = k
+    var num = BigDecimal(1.0, mc)
+    var denom = BigInt(1)
+    var n = BigDecimal(1, mc)
+    var m = 1
+    while (n < scale) {
+      num = num * m + kk
+      denom = denom * m
+      n = n * m
+      m += 1
+      kk *= k
+      scale *= k
+    }
+    
+    num / BigDecimal(denom, mc)
   }
 
   /**
@@ -500,6 +524,8 @@ package object math {
   private val maxIntEx = BigDecimal(999999999)
   private val minIntEx = BigDecimal(-999999999)
 
+  // FIXME: we should actually try to return values which are correct for the
+  // given precision.
   final def pow(base:BigDecimal, ex:BigDecimal) =
     if (ex.isValidInt && ex <= maxIntEx && ex >= minIntEx) base.pow(ex.toInt)
     else exp(log(base) * ex)
