@@ -25,6 +25,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def abs: Rational = if (this < Rational.zero) -this else this
   def inverse: Rational = Rational.one / this
+  def reciprocal: Rational
   def signum: Int = numerator.signum
 
   def unary_-(): Rational = Rational.zero - this
@@ -471,7 +472,10 @@ protected abstract class Rationals[@specialized(Long) A](implicit integral: Inte
       case that => unifiedPrimitiveEquals(that)
     }
 
-    override def toString: String = "%s/%s" format (num, den)
+    override def toString: String = if (den == 1L)
+      num.toString
+    else
+      "%s/%s" format (num, den)
   }
 }
 
@@ -505,6 +509,11 @@ object LongRationals extends Rationals[Long] {
 
     def numerator = ConvertableFrom[Long].toBigInt(n)
     def denominator = ConvertableFrom[Long].toBigInt(d)
+
+    def reciprocal = if (n == 0L)
+      throw new IllegalArgumentException("/ 0")
+    else
+      LongRational(d, n)
 
     override def signum: Int = if (n > 0) 1 else if (n < 0) -1 else 0
 
@@ -699,6 +708,11 @@ object BigRationals extends Rationals[BigInt] {
 
     def numerator = n
     def denominator = d
+
+    def reciprocal = if (n == 0)
+      throw new IllegalArgumentException("/ 0")
+    else
+      BigRational(d, n)
 
     override def signum: Int = n.signum
 
