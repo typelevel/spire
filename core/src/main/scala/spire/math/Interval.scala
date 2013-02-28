@@ -43,22 +43,24 @@ sealed trait Bound[T] {
   // simply too high. we could probably solve this with a macro...
 
   // basic Ring operations involving bounds
-  def unary_-(implicit ev: Ring[T]) = unop(ev.negate(_))
+  def unary_-(implicit ev: Ring[T]) = unop(ev.negate)
   def +(rhs: T)(implicit ev: Ring[T]) = unop(ev.plus(_, rhs))
   def -(rhs: T)(implicit ev: Ring[T]) = unop(ev.minus(_, rhs))
   def *(rhs: T)(implicit ev: Ring[T]) = unop(ev.times(_, rhs))
-  def +(rhs: Bound[T])(implicit ev: Ring[T]) = binop(rhs)(ev.plus(_, _))
-  def -(rhs: Bound[T])(implicit ev: Ring[T]) = binop(rhs)(ev.minus(_, _))
-  def *(rhs: Bound[T])(implicit ev: Ring[T]) = binop(rhs)(ev.times(_, _))
+  def +(rhs: Bound[T])(implicit ev: Ring[T]) = binop(rhs)(ev.plus)
+  def -(rhs: Bound[T])(implicit ev: Ring[T]) = binop(rhs)(ev.minus)
+  def *(rhs: Bound[T])(implicit ev: Ring[T]) = binop(rhs)(ev.times)
   def pow(rhs: Int)(implicit ev: Ring[T]) = unop(ev.pow(_, rhs))
 
   // basic EuclideanRing operations involving bounds
   def /~(rhs: T)(implicit ev: EuclideanRing[T]) = unop(ev.quot(_, rhs))
-  def /~(rhs: Bound[T])(implicit ev: EuclideanRing[T]) = binop(rhs)(ev.quot(_, _))
+  def /~:(lhs: T)(implicit ev: EuclideanRing[T]) = unop(ev.quot(lhs, _))
+  def /~(rhs: Bound[T])(implicit ev: EuclideanRing[T]) = binop(rhs)(ev.quot)
 
   // basic Field operations involving bounds
   def /(rhs: T)(implicit ev: Field[T]) = unop(ev.div(_, rhs))
-  def /(rhs: Bound[T])(implicit ev: Field[T]) = binop(rhs)(ev.div(_, _))
+  def /:(lhs: T)(implicit ev: Field[T]) = unop(ev.div(lhs, _))
+  def /(rhs: Bound[T])(implicit ev: Field[T]) = binop(rhs)(ev.div)
 }
 
 /**
@@ -237,6 +239,8 @@ case class Interval[T](lower: Lower[T], upper: Upper[T])(implicit order: Order[T
 
   def isAbove(t: T) = lower.comparePt(t) > 0
   def isBelow(t: T) = upper.comparePt(t) < 0
+  def isAtOrAbove(t: T) = lower.comparePt(t) >= 0
+  def isAtOrBelow(t: T) = upper.comparePt(t) <= 0
   def isAt(t: T) = lower.comparePt(t) == 0 && 0 == upper.comparePt(t)
   def contains(t: T) = lower.comparePt(t) <= 0 && 0 <= upper.comparePt(t)
   def crosses(t: T) = lower.comparePt(t) < 0 && 0 < upper.comparePt(t)
@@ -279,7 +283,7 @@ case class Interval[T](lower: Lower[T], upper: Upper[T])(implicit order: Order[T
       coerce(ll min lu, ul max uu)
     else if (rcz)
       coerce(ll min ul, lu max uu)
-    else if (isBelow(ev.zero) == rhs.isBelow(ev.zero))
+    else if (isAtOrBelow(ev.zero) == rhs.isAtOrBelow(ev.zero))
       coerce(ll min uu, ll max uu)
     else
       coerce(lu min ul, lu max ul)
@@ -330,6 +334,11 @@ case class Interval[T](lower: Lower[T], upper: Upper[T])(implicit order: Order[T
     val b = upper /~ rhs
     if (a < b) coerce(a, b) else coerce(b, a)
   }
+  def /~:(lhs: T)(implicit ev: EuclideanRing[T]): Interval[T] = {
+    val a = lhs /~: lower
+    val b = lhs /~: upper
+    if (a < b) coerce(a, b) else coerce(b, a)
+  }
 
   def /(rhs: Interval[T])(implicit ev: Field[T]): Interval[T] = {
     if (rhs.contains(ev.zero))
@@ -353,6 +362,25 @@ case class Interval[T](lower: Lower[T], upper: Upper[T])(implicit order: Order[T
     val a = lower / rhs
     val b = upper / rhs
     if (a < b) coerce(a, b) else coerce(b, a)
+  }
+  def /:(lhs: T)(implicit ev: Field[T]): Interval[T] = {
+    val a = lhs /: lower
+    val b = lhs /: upper
+    if (a < b) coerce(a, b) else coerce(b, a)
+  }
+
+  override def toString(): String = {
+    val a = lower match {
+      case ClosedBelow(n) => "[" + n.toString
+      case OpenBelow(n) => "(" + n.toString
+      case UnboundBelow() => "(-inf"
+    }
+    val b = upper match {
+      case ClosedAbove(n) => n.toString + "]"
+      case OpenAbove(n) => n.toString + ")"
+      case UnboundAbove() => "inf)"
+    }
+    a + ", " + b
   }
 }
 
@@ -381,7 +409,7 @@ object Interval {
   /**
    * An interval containing exactly one value (a).
    */
-  def point[T: Order](a: T) = Interval(ClosedBelow(a), ClosedAbove(a))
+  implicit def point[T: Order](a: T) = Interval(ClosedBelow(a), ClosedAbove(a))
 
   /**
    * An empty interval.
