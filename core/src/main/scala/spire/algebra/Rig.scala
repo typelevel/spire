@@ -25,12 +25,12 @@ trait Rig[@spec(Int,Long,Float,Double) A] extends Semiring[A] with AdditiveMonoi
 }
 
 object Rig extends Rig0 with RigProductImplicits {
-  implicit def ringIsRig[@spec(Int,Long,Float,Double) A: Ring]: Rig[A] = Ring[A]
-
   @inline final def apply[A](implicit r:Rig[A]): Rig[A] = r
 }
 
 trait Rig0 {
+  implicit def ringIsRig[@spec(Int,Long,Float,Double) A: Ring]: Rig[A] = Ring[A]
+
   implicit object BooleanIsRig extends BooleanIsRig
   implicit object UByteIsRig extends UByteIsRig
   implicit object UShortIsRig extends UShortIsRig
