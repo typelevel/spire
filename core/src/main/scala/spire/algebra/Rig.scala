@@ -37,6 +37,11 @@ trait Rig0 {
   implicit object UIntIsRig extends UIntIsRig
   implicit object ULongIsRig extends ULongIsRig
   implicit object NaturalIsRig extends NaturalIsRig
+
+  implicit def intervalIsRig[A: Order: Ring] = new IntervalIsRig[A] {
+    val o = Order[A]
+    val r = Ring[A]
+  }
 }
 
 trait BooleanIsRig extends Rig[Boolean] {
@@ -105,4 +110,17 @@ trait NaturalIsRig extends Rig[Natural] {
   }
   override def times(a:Natural, b:Natural): Natural = a * b
   def zero: Natural = Natural(0L)
+}
+
+// we don't support Ring[Interval[A]] due to the lack of reliable inverses
+// (which is due to the dependency problem for interval arithmetic).
+trait IntervalIsRig[A] extends Rig[Interval[A]] {
+  implicit def o: Order[A]
+  implicit def r: Ring[A]
+
+  def one: Interval[A] = Interval.point(r.one)
+  def plus(a:Interval[A], b:Interval[A]): Interval[A] = a + b
+  override def pow(a:Interval[A], b:Int):Interval[A] = a.pow(b)
+  override def times(a:Interval[A], b:Interval[A]): Interval[A] = a * b
+  def zero: Interval[A] = Interval.point(r.zero)
 }
