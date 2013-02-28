@@ -237,6 +237,11 @@ case class Interval[T](lower: Lower[T], upper: Upper[T])(implicit order: Order[T
   @inline private[math] final def coerce(a: Bound[T], b: Bound[T]) =
     Interval(a.toLower, b.toUpper)
 
+  def isEmpty: Boolean = this match {
+    case Interval(OpenBelow(a), OpenAbove(b)) => order.eqv(a, b)
+    case _ => false
+  }
+
   def isAbove(t: T) = lower.comparePt(t) > 0
   def isBelow(t: T) = upper.comparePt(t) < 0
   def isAtOrAbove(t: T) = lower.comparePt(t) >= 0
@@ -269,6 +274,11 @@ case class Interval[T](lower: Lower[T], upper: Upper[T])(implicit order: Order[T
     coerce(lower - rhs, upper - rhs)
   
   def *(rhs: Interval[T])(implicit ev: Ring[T]): Interval[T] = {
+    if (this.isEmpty) return this
+    if (rhs.isEmpty) return rhs
+    if (this.isAt(ev.zero)) return this
+    if (rhs.isAt(ev.zero)) return rhs
+
     val lcz = crosses(ev.zero)
     val rcz = rhs.crosses(ev.zero)
   
@@ -289,6 +299,7 @@ case class Interval[T](lower: Lower[T], upper: Upper[T])(implicit order: Order[T
       coerce(lu min ul, lu max ul)
   }
   def *(rhs: T)(implicit ev: Ring[T]): Interval[T] = {
+    if (order.eqv(rhs, ev.zero)) return Interval.point(ev.zero)
     val a = lower * rhs
     val b = upper * rhs
     if (a < b) coerce(a, b) else coerce(b, a)
