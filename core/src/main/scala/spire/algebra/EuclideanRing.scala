@@ -43,7 +43,6 @@ final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
 }
 
 object EuclideanRing {
-  implicit object RationalIsEuclideanRing extends RationalIsEuclideanRing
   implicit object RealIsEuclideanRing extends RealIsEuclideanRing
   implicit object SafeLongIsEuclideanRing extends SafeLongIsEuclideanRing
   implicit object NumberIsEuclideanRing extends NumberIsEuclideanRing
@@ -60,24 +59,6 @@ object EuclideanRing {
     }
 
   @inline final def apply[A](implicit e:EuclideanRing[A]):EuclideanRing[A] = e
-}
-
-trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRing {
-  def quot(a:Rational, b:Rational) = a /~ b
-  def mod(a:Rational, b:Rational) = a % b
-  override def quotmod(a:Rational, b:Rational) = a /% b
-  def gcd(a:Rational, b:Rational):Rational = _gcd(a.abs, b.abs)
-  @tailrec private def _gcd(a:Rational, b:Rational):Rational = {
-    if (a.compareToOne < 0) {
-      Rational.one
-    } else if (b.signum == 0) {
-      a
-    } else if (b.compareToOne < 0) {
-      Rational.one
-    } else {
-      _gcd(b, a % b)
-    }
-  }
 }
 
 trait RealIsEuclideanRing extends EuclideanRing[Real] with RealIsRing {

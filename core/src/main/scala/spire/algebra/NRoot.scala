@@ -44,13 +44,6 @@ final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
   def **(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) ** rhs
 }
 
-trait RationalIsNRoot extends NRoot[Rational] {
-  implicit def context:ApproximationContext[Rational]
-  def nroot(a: Rational, k: Int): Rational = a.nroot(k)
-  def log(a: Rational): Rational = a.log
-  def fpow(a: Rational, b: Rational): Rational = a.pow(b)
-}
-
 trait RealIsNRoot extends NRoot[Real] {
   def nroot(a: Real, k: Int): Real = a nroot k
   def log(a:Real) = sys.error("fixme")
@@ -78,10 +71,6 @@ object NRoot {
   @inline final def apply[@spec(Int,Long,Float,Double) A](implicit ev:NRoot[A]) = ev
 
   implicit object SafeLongIsNRoot extends SafeLongIsNRoot
-
-  implicit def rationalIsNRoot(implicit c:ApproximationContext[Rational]) = new RationalIsNRoot {
-    implicit def context = c
-  }
 
   implicit object RealIsNRoot extends RealIsNRoot
   implicit object NumberIsNRoot extends NumberIsNRoot

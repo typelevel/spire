@@ -22,7 +22,6 @@ trait SignedLow {
 }
 
 object Signed extends SignedLow {
-  implicit object RationalIsSigned extends RationalIsSigned
   implicit object RealIsSigned extends RealIsSigned
   implicit object SafeLongIsSigned extends SafeLongIsSigned
   implicit object NumberIsSigned extends NumberIsSigned
@@ -49,12 +48,6 @@ final class SignedOps[A:Signed](lhs: A) {
 class OrderedRingIsSigned[A](implicit o:Order[A], r:Ring[A]) extends Signed[A] {
   def signum(a:A) = o.compare(a, r.zero)
   def abs(a:A) = if (signum(a) < 0) r.negate(a) else a
-}
-
-trait RationalIsSigned extends Signed[Rational] {
-  override def sign(a: Rational): Sign = a.sign
-  def signum(a: Rational): Int = a.signum
-  def abs(a: Rational): Rational = a.abs
 }
 
 trait RealIsSigned extends Signed[Real] {

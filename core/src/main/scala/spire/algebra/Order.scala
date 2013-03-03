@@ -76,7 +76,6 @@ object Order {
   implicit object UShortOrder extends UShortOrder
   implicit object UIntOrder extends UIntOrder
   implicit object ULongOrder extends ULongOrder
-  implicit object RationalOrder extends RationalOrder
   implicit object RealOrder extends RealOrder
   implicit object SafeLongOrder extends SafeLongOrder
   implicit object NaturalOrder extends NaturalOrder
@@ -134,14 +133,6 @@ trait ULongOrder extends Order[ULong] with ULongEq {
   override def lt(x: ULong, y: ULong) = x < y
   override def lteqv(x: ULong, y: ULong) = x <= y
   def compare(x: ULong, y: ULong) = if (x < y) -1 else if (x > y) 1 else 0
-}
-
-trait RationalOrder extends Order[Rational] with RationalEq {
-  override def gt(x: Rational, y: Rational) = x > y
-  override def gteqv(x: Rational, y: Rational) = x >= y
-  override def lt(x: Rational, y: Rational) = x < y
-  override def lteqv(x: Rational, y: Rational) = x <= y
-  def compare(x: Rational, y: Rational) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 trait RealOrder extends Order[Real] with RealEq {

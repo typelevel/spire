@@ -30,7 +30,6 @@ trait Ring[@spec(Int,Long,Float,Double) A] extends Semiring[A] with Rig[A] with 
 }
 
 object Ring {
-  implicit object RationalIsRing extends RationalIsRing
   implicit object RealIsRing extends RealIsRing
   implicit object SafeLongIsRing extends SafeLongIsRing
   implicit object NumberIsRing extends NumberIsRing
@@ -45,18 +44,6 @@ object Ring {
   }
 
   @inline final def apply[A](implicit r:Ring[A]):Ring[A] = r
-}
-
-trait RationalIsRing extends Ring[Rational] {
-  override def minus(a:Rational, b:Rational): Rational = a - b
-  def negate(a:Rational): Rational = -a
-  def one: Rational = Rational.one
-  def plus(a:Rational, b:Rational): Rational = a + b
-  override def pow(a:Rational, b:Int): Rational = a.pow(b)
-  override def times(a:Rational, b:Rational): Rational = a * b
-  def zero: Rational = Rational.zero
-  
-  override def fromInt(n: Int): Rational = Rational(n)
 }
 
 trait RealIsRing extends Ring[Real] {

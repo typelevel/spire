@@ -21,7 +21,6 @@ final class FieldOps[A](lhs:A)(implicit ev:Field[A]) {
 }
 
 object Field {
-  implicit object RationalIsField extends RationalIsField
   implicit object RealIsField extends RealIsField
   implicit def complexIsField[@spec(Float, Double) A: Fractional: Trig] =
     new ComplexIsField[A] {
@@ -31,14 +30,6 @@ object Field {
   implicit object NumberIsField extends NumberIsField
 
   @inline final def apply[A](implicit f:Field[A]):Field[A] = f
-}
-
-trait RationalIsField extends Field[Rational] with RationalIsEuclideanRing {
-  def div(a:Rational, b:Rational) = a / b
-  def ceil(a:Rational): Rational = a.ceil
-  def floor(a:Rational): Rational = a.floor
-  def round(a:Rational): Rational = a.round
-  def isWhole(a:Rational) = a.denominator == 1
 }
 
 trait RealIsField extends Field[Real] with RealIsEuclideanRing {

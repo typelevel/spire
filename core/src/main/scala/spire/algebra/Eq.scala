@@ -26,7 +26,6 @@ object Eq {
   implicit object UShortEq extends UShortEq
   implicit object UIntEq extends UIntEq
   implicit object ULongEq extends ULongEq
-  implicit object RationalEq extends RationalEq
   implicit def complexEq[A:Fractional] = new ComplexEq[A] {}
   implicit def gaussianEq[A: Integral] = new GaussianEq[A] {}
   implicit object RealEq extends RealEq
@@ -58,10 +57,6 @@ trait UIntEq extends Eq[UInt] {
 trait ULongEq extends Eq[ULong] {
   def eqv(x:ULong, y:ULong) = x == y
   override def neqv(x:ULong, y:ULong) = x != y
-}
-trait RationalEq extends Eq[Rational] {
-  def eqv(x:Rational, y:Rational) = x == y
-  override def neqv(x:Rational, y:Rational) = x != y
 }
 trait ComplexEq[A] extends Eq[Complex[A]] {
   def eqv(x:Complex[A], y:Complex[A]) = x eqv y
