@@ -71,15 +71,11 @@ final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
 }
 
 object Order {
-  implicit object CharOrder extends CharOrder
   implicit object UByteOrder extends UByteOrder
   implicit object UShortOrder extends UShortOrder
   implicit object UIntOrder extends UIntOrder
   implicit object ULongOrder extends ULongOrder
-  implicit object RealOrder extends RealOrder
-  implicit object SafeLongOrder extends SafeLongOrder
   implicit object NaturalOrder extends NaturalOrder
-  implicit object NumberOrder extends NumberOrder
 
   def by[@spec A, @spec B](f: A => B)(implicit o: Order[B]): Order[A] = o.on(f)
 
@@ -93,14 +89,6 @@ object Order {
   implicit def ordering[A](implicit o: Order[A]) = new Ordering[A] {
     def compare(x: A, y: A) = o.compare(x, y)
   }
-}
-
-trait CharOrder extends Order[Char] with CharEq {
-  override def gt(x: Char, y: Char) = x > y
-  override def gteqv(x: Char, y: Char) = x >= y
-  override def lt(x: Char, y: Char) = x < y
-  override def lteqv(x: Char, y: Char) = x <= y
-  def compare(x: Char, y: Char) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 trait UByteOrder extends Order[UByte] with UByteEq {
@@ -135,30 +123,10 @@ trait ULongOrder extends Order[ULong] with ULongEq {
   def compare(x: ULong, y: ULong) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
-trait RealOrder extends Order[Real] with RealEq {
-  def compare(x: Real, y: Real) = (x - y).signum
-}
-
-trait SafeLongOrder extends Order[SafeLong] with SafeLongEq {
-  override def gt(x: SafeLong, y: SafeLong) = x > y
-  override def gteqv(x: SafeLong, y: SafeLong) = x >= y
-  override def lt(x: SafeLong, y: SafeLong) = x < y
-  override def lteqv(x: SafeLong, y: SafeLong) = x <= y
-  def compare(x: SafeLong, y: SafeLong) = if (x < y) -1 else if (x > y) 1 else 0
-}
-
 trait NaturalOrder extends Order[Natural] with NaturalEq {
   override def gt(x: Natural, y: Natural) = x > y
   override def gteqv(x: Natural, y: Natural) = x >= y
   override def lt(x: Natural, y: Natural) = x < y
   override def lteqv(x: Natural, y: Natural) = x <= y
   def compare(x: Natural, y: Natural) = x.compare(y)
-}
-
-trait NumberOrder extends Order[Number] with NumberEq {
-  override def gt(x: Number, y: Number) = x > y
-  override def gteqv(x: Number, y: Number) = x >= y
-  override def lt(x: Number, y: Number) = x < y
-  override def lteqv(x: Number, y: Number) = x <= y
-  def compare(x: Number, y: Number) = x.compare(y)
 }

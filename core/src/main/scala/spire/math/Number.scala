@@ -3,6 +3,7 @@ package spire.math
 import scala.math.{BigDecimal, ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
+import spire.algebra._
 import spire.algebra.std.bigDecimal._
 
 // TODO: implement RationalNumber.
@@ -16,7 +17,7 @@ case class InvalidNumber(msg: String) extends Exception(msg)
 /**
  * Convenient apply and implicits for Numbers
  */
-object Number {
+object Number extends NumberInstances {
 
   final val zero = Number(0)
   final val one = Number(1)
@@ -460,4 +461,65 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
   def floor = DecimalNumber(Field[BigDecimal].floor(n))
   def ceil = DecimalNumber(Field[BigDecimal].ceil(n))
   def round = DecimalNumber(Field[BigDecimal].round(n))
+}
+
+trait NumberInstances {
+  implicit object NumberAlgebra extends NumberIsField with NumberIsNRoot
+  implicit object NumberIsReal extends NumberIsReal
+}
+
+trait NumberIsRing extends Ring[Number] {
+  override def minus(a:Number, b:Number): Number = a - b
+  def negate(a:Number): Number = -a
+  val one: Number = Number.one
+  def plus(a:Number, b:Number): Number = a + b
+  override def pow(a:Number, b:Int): Number = a.pow(Number(b))
+  override def times(a:Number, b:Number): Number = a * b
+  val zero: Number = Number.zero
+  
+  override def fromInt(n: Int): Number = Number(n)
+}
+
+trait NumberIsEuclideanRing extends EuclideanRing[Number] with NumberIsRing {
+  def quot(a:Number, b:Number) = a / b
+  def mod(a:Number, b:Number) = a % b
+  override def quotmod(a:Number, b:Number) = a /% b
+  def gcd(a: Number, b: Number): Number = euclid(a, b)(Eq[Number])
+}
+
+trait NumberIsField extends Field[Number] with NumberIsEuclideanRing {
+  def div(a:Number, b:Number) = a / b
+  def ceil(a:Number): Number = a.ceil
+  def floor(a:Number): Number = a.floor
+  def round(a:Number): Number = a.round
+  def isWhole(a:Number) = a.isWhole
+}
+
+trait NumberIsNRoot extends NRoot[Number] {
+  def nroot(a: Number, k: Int): Number = a.pow(Number(k))
+  override def sqrt(a: Number): Number = a.pow(Number(0.5))
+  def log(a: Number) = Number(Math.log(a.toDouble))
+  def fpow(a: Number, b: Number) = a.pow(b)
+}
+
+trait NumberEq extends Eq[Number] {
+  def eqv(x: Number, y: Number) = x == y
+  override def neqv(x: Number, y: Number) = x != y
+}
+
+trait NumberOrder extends Order[Number] with NumberEq {
+  override def gt(x: Number, y: Number) = x > y
+  override def gteqv(x: Number, y: Number) = x >= y
+  override def lt(x: Number, y: Number) = x < y
+  override def lteqv(x: Number, y: Number) = x <= y
+  def compare(x: Number, y: Number) = x.compare(y)
+}
+
+trait NumberIsSigned extends Signed[Number] {
+  def signum(a: Number): Int = a.signum
+  def abs(a: Number): Number = a.abs
+}
+
+trait NumberIsReal extends IsReal[Number] with NumberOrder with NumberIsSigned {
+  def toDouble(x: Number): Double = x.toDouble
 }

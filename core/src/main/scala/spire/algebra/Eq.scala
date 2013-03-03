@@ -21,27 +21,17 @@ final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
 }
 
 object Eq {
-  implicit object CharEq extends CharEq
   implicit object UByteEq extends UByteEq
   implicit object UShortEq extends UShortEq
   implicit object UIntEq extends UIntEq
   implicit object ULongEq extends ULongEq
-  implicit def complexEq[A:Fractional] = new ComplexEq[A] {}
-  implicit def gaussianEq[A: Integral] = new GaussianEq[A] {}
-  implicit object RealEq extends RealEq
-  implicit object SafeLongEq extends SafeLongEq
   implicit object NaturalEq extends NaturalEq
-  implicit object NumberEq extends NumberEq
 
   def apply[A](implicit e:Eq[A]):Eq[A] = e
 
   def by[@spec A, @spec B](f:A => B)(implicit e:Eq[B]): Eq[A] = new MappedEq(e)(f)
 }
 
-trait CharEq extends Eq[Char] {
-  def eqv(x:Char, y:Char) = x == y
-  override def neqv(x:Char, y:Char) = x != y
-}
 trait UByteEq extends Eq[UByte] {
   def eqv(x:UByte, y:UByte) = x == y
   override def neqv(x:UByte, y:UByte) = x != y
@@ -57,26 +47,6 @@ trait UIntEq extends Eq[UInt] {
 trait ULongEq extends Eq[ULong] {
   def eqv(x:ULong, y:ULong) = x == y
   override def neqv(x:ULong, y:ULong) = x != y
-}
-trait ComplexEq[A] extends Eq[Complex[A]] {
-  def eqv(x:Complex[A], y:Complex[A]) = x eqv y
-  override def neqv(x:Complex[A], y:Complex[A]) = x neqv y
-}
-trait GaussianEq[A] extends Eq[Gaussian[A]] {
-  def eqv(x:Gaussian[A], y:Gaussian[A]) = x eqv y
-  override def neqv(x:Gaussian[A], y:Gaussian[A]) = x neqv y
-}
-trait RealEq extends Eq[Real] {
-  def eqv(x: Real, y: Real) = (x - y).sign == Zero
-  override def neqv(x: Real, y: Real) = (x - y).sign != Zero
-}
-trait SafeLongEq extends Eq[SafeLong] {
-  def eqv(x: SafeLong, y: SafeLong) = x == y
-  override def neqv(x: SafeLong, y: SafeLong) = x != y
-}
-trait NumberEq extends Eq[Number] {
-  def eqv(x: Number, y: Number) = x == y
-  override def neqv(x: Number, y: Number) = x != y
 }
 trait NaturalEq extends Eq[Natural] {
   def eqv(x: Natural, y: Natural) = x == y

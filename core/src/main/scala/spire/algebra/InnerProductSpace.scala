@@ -1,13 +1,9 @@
 package spire.algebra
 
-import spire.math.{ Complex, Trig, Fractional }
 import spire.macrosk.Ops
 
 import scala.{ specialized => spec }
 import scala.annotation.tailrec
-import scala.collection.SeqLike
-import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 
 trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends VectorSpace[V, F] { self =>
   def dot(v: V, w: V): F
@@ -18,7 +14,7 @@ trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends VectorSpac
   }
 }
 
-object InnerProductSpace extends InnerProductSpace0 {
+object InnerProductSpace {
   @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: InnerProductSpace[V, R]) = V
 }
 
@@ -27,23 +23,6 @@ final class InnerProductSpaceOps[V](lhs: V) {
     macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
   def ⋅[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
     macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
-}
-
-trait InnerProductSpace0 {
-  implicit def ComplexIsInnerProductSpace[@spec(Float, Double) A](implicit
-      f0: Fractional[A], t0: Trig[A]) = new ComplexIsInnerProductSpace[A] {
-    def scalar = f0
-    def nroot = f0
-    def f = f0
-    def t = t0
-  }
-}
-
-trait ComplexIsInnerProductSpace[@spec(Float, Double) A] extends ComplexIsField[A]
-with InnerProductSpace[Complex[A], A] with RingAlgebra[Complex[A], A] {
-  def timesl(r: A, v: Complex[A]): Complex[A] = Complex(r, scalar.zero) * v
-  def dot(x: Complex[A], y: Complex[A]): A =
-    scalar.plus(scalar.times(x.real, y.real), scalar.times(x.imag, y.imag))
 }
 
 trait NormedInnerProductSpace[V, @spec(Float, Double) F] extends NormedVectorSpace[V, F] {

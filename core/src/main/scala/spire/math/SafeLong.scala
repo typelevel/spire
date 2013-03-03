@@ -3,6 +3,8 @@ package spire.math
 import scala.math.{abs, signum, ScalaNumber, ScalaNumericConversions}
 import scala.annotation.tailrec
 
+import spire.algebra._
+
 // TODO: might be nice to write a macro-version of fold here to
 // avoid using closures for everything.
 
@@ -119,7 +121,7 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
 }
 
 
-object SafeLong {
+object SafeLong extends SafeLongInstances {
   final val SignBit = 0x8000000000000000L
 
   final val zero: SafeLong = SafeLongLong(0L)
@@ -324,4 +326,67 @@ case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
   def toBigDecimal = BigDecimal(x)
 
   def fold[A,B <: A,C <: A](f: Long => B, g: BigInt => C): A = g(x)
+}
+
+trait SafeLongInstances {
+  implicit object SafeLongAlgebra extends SafeLongIsEuclideanRing with SafeLongIsNRoot
+  implicit object SafeLongIsReal extends SafeLongIsReal
+}
+
+trait SafeLongIsRing extends Ring[SafeLong] {
+  override def minus(a:SafeLong, b:SafeLong): SafeLong = a - b
+  def negate(a:SafeLong): SafeLong = -a
+  val one: SafeLong = SafeLong(1)
+  def plus(a:SafeLong, b:SafeLong): SafeLong = a + b
+  override def pow(a:SafeLong, b:Int): SafeLong = a pow b
+  override def times(a:SafeLong, b:SafeLong): SafeLong = a * b
+  val zero: SafeLong = SafeLong(0)
+  
+  override def fromInt(n: Int): SafeLong = SafeLong(n)
+}
+
+trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with SafeLongIsRing {
+  def quot(a:SafeLong, b:SafeLong) = a / b
+  def mod(a:SafeLong, b:SafeLong) = a % b
+  override def quotmod(a:SafeLong, b:SafeLong) = a /% b
+  def gcd(a:SafeLong, b:SafeLong) = a.toBigInt.gcd(b.toBigInt)
+}
+
+trait SafeLongIsNRoot extends NRoot[SafeLong] {
+  import spire.algebra.std.long.LongIsNRoot
+  import spire.algebra.std.bigInt.BigIntIsNRoot
+
+  def nroot(a: SafeLong, k: Int): SafeLong = a.fold(
+    n => SafeLong(LongIsNRoot.nroot(n, k)),
+    n => SafeLong(BigIntIsNRoot.nroot(n, k))
+  )
+  def log(a:SafeLong) = a.fold(
+    n => SafeLong(LongIsNRoot.log(n)),
+    n => SafeLong(BigIntIsNRoot.log(n))
+  )
+
+  def fpow(a:SafeLong, b:SafeLong) =
+    SafeLong(BigIntIsNRoot.fpow(a.toBigInt, b.toBigInt))
+}
+
+trait SafeLongEq extends Eq[SafeLong] {
+  def eqv(x: SafeLong, y: SafeLong) = x == y
+  override def neqv(x: SafeLong, y: SafeLong) = x != y
+}
+
+trait SafeLongOrder extends Order[SafeLong] with SafeLongEq {
+  override def gt(x: SafeLong, y: SafeLong) = x > y
+  override def gteqv(x: SafeLong, y: SafeLong) = x >= y
+  override def lt(x: SafeLong, y: SafeLong) = x < y
+  override def lteqv(x: SafeLong, y: SafeLong) = x <= y
+  def compare(x: SafeLong, y: SafeLong) = if (x < y) -1 else if (x > y) 1 else 0
+}
+
+trait SafeLongIsSigned extends Signed[SafeLong] {
+  def signum(a: SafeLong): Int = a.toBigInt.toInt
+  def abs(a: SafeLong): SafeLong = a.abs
+}
+
+trait SafeLongIsReal extends IsReal[SafeLong] with SafeLongOrder with SafeLongIsSigned {
+  def toDouble(n: SafeLong): Double = n.toDouble
 }

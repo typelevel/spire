@@ -2,6 +2,7 @@ package spire.algebra
 package std
 
 trait AnyInstances extends BooleanInstances
+                      with CharInstances
                       with ByteInstances
                       with ShortInstances
                       with IntInstances

@@ -3,10 +3,11 @@ package spire.math
 import spire.algebra._
 
 import scala.{specialized => spec}
+import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
-object Complex {
+object Complex extends ComplexInstances {
   def i[@spec(Float, Double) T](implicit f: Fractional[T], t: Trig[T]) =
     new Complex(f.zero, f.one)
 
@@ -490,4 +491,88 @@ object FastComplex {
     val phase = (angle(a) * real(b)).toFloat
     polar(len, phase)
   }
+}
+
+trait ComplexInstances {
+  implicit def ComplexAlgebra[@spec(Float, Double) A: Fractional: Trig] =
+    new ComplexAlgebra[A] {
+      val f = Fractional[A]
+      val t = Trig[A]
+      def scalar = f
+      def nroot = f
+    }
+
+  implicit def ComplexEq[A:Fractional] =
+    new ComplexEq[A] {}
+
+  implicit def ComplexIsSigned[A:Fractional:Trig] =
+    new ComplexIsSigned[A] {
+      val f = Fractional[A]
+      val t = Trig[A]
+    }
+}
+
+trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A]] {
+  implicit def f:Fractional[A]
+  implicit def t:Trig[A]
+
+  override def minus(a:Complex[A], b:Complex[A]): Complex[A] = a - b
+  def negate(a:Complex[A]): Complex[A] = -a
+  def one: Complex[A] = Complex.one(f, t)
+  def plus(a:Complex[A], b:Complex[A]): Complex[A] = a + b
+  override def pow(a:Complex[A], b:Int):Complex[A] = a.pow(b)
+  override def times(a:Complex[A], b:Complex[A]): Complex[A] = a * b
+  def zero: Complex[A] = Complex.zero(f, t)
+
+  override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
+}
+
+trait ComplexIsEuclideanRing[@spec(Float,Double) A]
+extends ComplexIsRing[A] with EuclideanRing[Complex[A]] {
+  def quot(a:Complex[A], b:Complex[A]) = a /~ b
+  def mod(a:Complex[A], b:Complex[A]) = a % b
+  override def quotmod(a:Complex[A], b:Complex[A]) = a /% b
+  def gcd(a:Complex[A], b:Complex[A]):Complex[A] =
+    _gcd(a, b, Fractional[A])
+  @tailrec
+  private def _gcd(a:Complex[A], b:Complex[A], f:Fractional[A]):Complex[A] = {
+    if (f.lt(a.abs, f.one)) {
+      one
+    } else if (b == zero) {
+      a
+    } else if (f.lt(b.abs, f.one)) {
+      one
+    } else {
+      _gcd(b, a % b, f)
+    }
+  }
+}
+
+trait ComplexIsField[@spec(Float,Double) A]
+extends ComplexIsEuclideanRing[A] with Field[Complex[A]] {
+  def div(a:Complex[A], b:Complex[A]) = a / b
+  def ceil(a:Complex[A]): Complex[A] = a.ceil
+  def floor(a:Complex[A]): Complex[A] = a.floor
+  def round(a:Complex[A]): Complex[A] = a.round
+  def isWhole(a:Complex[A]) = a.isWhole
+}
+
+trait ComplexEq[A] extends Eq[Complex[A]] {
+  def eqv(x:Complex[A], y:Complex[A]) = x eqv y
+  override def neqv(x:Complex[A], y:Complex[A]) = x neqv y
+}
+
+trait ComplexIsSigned[A] extends Signed[Complex[A]] {
+  implicit def f:Fractional[A]
+  implicit def t:Trig[A]
+
+  def signum(a: Complex[A]): Int = a.signum
+  def abs(a: Complex[A]): Complex[A] = Complex[A](a.abs, f.zero)
+}
+
+trait ComplexAlgebra[@spec(Float, Double) A] extends ComplexIsField[A]
+with InnerProductSpace[Complex[A], A] with FieldAlgebra[Complex[A], A] {
+  def timesl(r: A, v: Complex[A]): Complex[A] = Complex(r, scalar.zero) * v
+  def dot(x: Complex[A], y: Complex[A]): A =
+    scalar.plus(scalar.times(x.real, y.real), scalar.times(x.imag, y.imag))
 }

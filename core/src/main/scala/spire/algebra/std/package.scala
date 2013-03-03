@@ -4,6 +4,7 @@ package object std {
   object any extends AnyInstances
 
   object boolean extends BooleanInstances
+  object char extends CharInstances
   object byte extends ByteInstances
   object short extends ShortInstances
   object int extends IntInstances

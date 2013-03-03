@@ -44,36 +44,8 @@ final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
   def **(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) ** rhs
 }
 
-trait RealIsNRoot extends NRoot[Real] {
-  def nroot(a: Real, k: Int): Real = a nroot k
-  def log(a:Real) = sys.error("fixme")
-  def fpow(a:Real, b:Real) = sys.error("fixme")
-}
-
-trait SafeLongIsNRoot extends NRoot[SafeLong] {
-  import spire.algebra.std.long.LongIsNRoot
-  import spire.algebra.std.bigInt.BigIntIsNRoot
-
-  def nroot(a: SafeLong, k: Int): SafeLong = a.fold(
-    n => SafeLong(LongIsNRoot.nroot(n, k)),
-    n => SafeLong(BigIntIsNRoot.nroot(n, k))
-  )
-  def log(a:SafeLong) = a.fold(
-    n => SafeLong(LongIsNRoot.log(n)),
-    n => SafeLong(BigIntIsNRoot.log(n))
-  )
-
-  def fpow(a:SafeLong, b:SafeLong) =
-    SafeLong(BigIntIsNRoot.fpow(a.toBigInt, b.toBigInt))
-}
-
 object NRoot {
   @inline final def apply[@spec(Int,Long,Float,Double) A](implicit ev:NRoot[A]) = ev
-
-  implicit object SafeLongIsNRoot extends SafeLongIsNRoot
-
-  implicit object RealIsNRoot extends RealIsNRoot
-  implicit object NumberIsNRoot extends NumberIsNRoot
 
   /**
    * This will return the largest integer that meets some criteria. Specifically,
@@ -189,11 +161,4 @@ object NRoot {
     val newscale = (size - (intPart.size + k - 1) / k) * 9
     BigDecimal(unscaled, newscale, ctxt)
   }
-}
-
-trait NumberIsNRoot extends NRoot[Number] {
-  def nroot(a: Number, k: Int): Number = a.pow(Number(k))
-  override def sqrt(a: Number): Number = a.pow(Number(0.5))
-  def log(a: Number) = Number(Math.log(a.toDouble))
-  def fpow(a: Number, b: Number) = a.pow(b)
 }
