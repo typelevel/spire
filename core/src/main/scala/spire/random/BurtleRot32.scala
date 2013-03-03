@@ -45,7 +45,7 @@ abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, A
 
   protected def create(_a: Int, _b: Int, _c: Int, _d: Int): G
 
-  def randomSeed: Array[Int] = global.generateInts(4)
+  def randomSeed: Array[Int] = GlobalRng.generateInts(4)
 
   def fromBytes(bytes: Array[Byte]): G = {
     val bs = if (bytes.length < 16) Arrays.copyOf(bytes, 16) else bytes

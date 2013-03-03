@@ -68,7 +68,7 @@ class Well512 protected[random] (_i: Int, private var state: Array[Int]) extends
 
 object Well512 extends GeneratorCompanion[Well512, Array[Int]] {
 
-  def randomSeed(): Array[Int] = global.generateInts(16)
+  def randomSeed(): Array[Int] = GlobalRng.generateInts(16)
 
   def fromBytes(bytes: Array[Byte]): Well512 = {
     val bs = if (bytes.length < 64) Arrays.copyOf(bytes, 64) else bytes

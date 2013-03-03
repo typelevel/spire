@@ -105,5 +105,5 @@ object Marsaglia32a6 extends GeneratorCompanion[Marsaglia32a6, Array[Int]] {
     new Marsaglia32a6(x, y, z, w, v, d)
   }
 
-  def randomSeed: Array[Int] = global.generateInts(6)
+  def randomSeed: Array[Int] = GlobalRng.generateInts(6)
 }
