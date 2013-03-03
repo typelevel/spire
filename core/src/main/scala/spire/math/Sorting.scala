@@ -3,7 +3,6 @@ package spire.math
 import scala.reflect.ClassTag
 import scala.{specialized => spec}
 import scala.annotation.tailrec
-//import scala.math.min
 
 /**
  *  Interface for a sorting strategy object.

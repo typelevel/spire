@@ -1,7 +1,6 @@
 package spire.math.fpf
 
 import spire.math._
-import spire.implicits._
 
 /**
  * A typeclass approach to wrapping numeric types in an `FPFilter`. This way

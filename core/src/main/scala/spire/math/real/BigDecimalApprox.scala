@@ -1,7 +1,6 @@
 package spire.math.real
 
 import spire.algebra._
-import spire.implicits._
 import spire.math._
 
 import java.math.MathContext

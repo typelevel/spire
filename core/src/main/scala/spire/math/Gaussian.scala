@@ -6,8 +6,6 @@ import scala.{specialized => spec}
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import spire.implicits._
-
 object Gaussian {
   def i[@spec(Int, Long) T](implicit f: Integral[T]) =
     new Gaussian(f.zero, f.one)

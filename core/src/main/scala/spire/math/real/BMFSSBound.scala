@@ -2,7 +2,6 @@ package spire.math.real
 
 import spire.math._
 import spire.algebra._
-import spire.implicits._
 
 /**
  * A mixin for the SeparationBound that implements the BMFSS bound.

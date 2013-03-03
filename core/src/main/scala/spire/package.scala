@@ -485,35 +485,37 @@ package object math {
    */
   final def exp(n:Double):Double = Math.exp(n)
 
-  // FIXME: the error bounds are not quite right on this one. it works fine
-  // for exp(1) (essentially the same algorithm as for e) but for some
-  // precisions the last digit of exp(2) will be off.
-  //
-  // if it turns out that we can prove that we'll only ever be a digit or two
-  // off we can just run the algorithm with more precision and round or
-  // truncate at the end.
-  def exp(k: BigDecimal): BigDecimal = {
-    import spire.algebra.NRoot.BigDecimalIsNRoot.sqrt
+  final def exp(n:BigDecimal):BigDecimal = _exp(n, BigDecimal(1))
 
-    val mc = k.mc
-    var scale = BigDecimal(10, mc).pow(mc.getPrecision)
-    
-    var kk = k
-    var num = BigDecimal(1.0, mc)
-    var denom = BigInt(1)
-    var n = BigDecimal(1, mc)
-    var m = 1
-    while (n < scale) {
-      num = num * m + kk
-      denom = denom * m
-      n = n * m
-      m += 1
-      kk *= k
-      scale *= k
-    }
-    
-    num / BigDecimal(denom, mc)
-  }
+  // Since exp(a + b) = exp(a) * exp(b), we can use Math.log to
+  // approximate exp for BigDecimal.
+  @tailrec private final def _exp(n:BigDecimal, sofar:BigDecimal): BigDecimal =
+    if (n <= logMaxDouble) BigDecimal(Math.exp(n.toDouble)) * sofar
+    else _exp(n - logMaxDouble, maxDouble * sofar)
+
+  // FIXME: this is not working yet.
+  // def exp(k: BigDecimal): BigDecimal = {
+  //   import spire.algebra.NRoot.BigDecimalIsNRoot.sqrt
+  //
+  //   val mc = k.mc
+  //   var scale = BigDecimal(10, mc).pow(mc.getPrecision)
+  //
+  //   var kk = k
+  //   var num = BigDecimal(1.0, mc)
+  //   var denom = BigInt(1)
+  //   var n = BigDecimal(1, mc)
+  //   var m = 1
+  //   while (n < scale) {
+  //     num = num * m + kk
+  //     denom = denom * m
+  //     n = n * m
+  //     m += 1
+  //     kk *= k
+  //     scale *= k
+  //   }
+  //
+  //   num / BigDecimal(denom, mc)
+  // }
 
   /**
    * pow() implementations

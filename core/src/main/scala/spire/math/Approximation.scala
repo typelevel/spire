@@ -1,7 +1,6 @@
 package spire.math
 
 import java.math.{ MathContext, BigDecimal => BigDec }
-//import scala.math.max
 import spire.math.real.BigDecimalApproximations
 
 /** 

@@ -52,13 +52,12 @@ trait DoubleIsField extends Field[Double] with DoubleIsEuclideanRing {
   def isWhole(a:Double) = a % 1.0 == 0.0
 }
 
-import java.math.MathContext
-import java.math.RoundingMode.{CEILING, FLOOR, HALF_UP}
+import BigDecimal.RoundingMode.{CEILING, FLOOR, HALF_UP}
 trait BigDecimalIsField extends Field[BigDecimal] with BigDecimalIsEuclideanRing {
   def div(a:BigDecimal, b:BigDecimal) = a / b
-  def ceil(a:BigDecimal): BigDecimal = a.round(new MathContext(0, CEILING))
-  def floor(a:BigDecimal): BigDecimal = a.round(new MathContext(0, FLOOR))
-  def round(a:BigDecimal): BigDecimal = a.round(new MathContext(0, HALF_UP))
+  def ceil(a:BigDecimal): BigDecimal = a.setScale(0, CEILING)
+  def floor(a:BigDecimal): BigDecimal = a.setScale(0, FLOOR)
+  def round(a:BigDecimal): BigDecimal = a.setScale(0, HALF_UP)
   def isWhole(a:BigDecimal) = a % 1.0 == 0.0
 }
 

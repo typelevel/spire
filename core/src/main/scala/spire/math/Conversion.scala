@@ -264,4 +264,3 @@ object NarrowingConversion extends NarrowingConversionLow {
   (implicit c: NarrowingConversion[A, B], f: Integral[B]) =
     narrow[A, Gaussian[B]](x => Gaussian(c.convert(x), Integral[B].zero))
 }
-

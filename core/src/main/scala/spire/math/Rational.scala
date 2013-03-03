@@ -6,7 +6,6 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
 import spire.algebra.{Sign, Positive, Negative, Zero}
-import spire.implicits._
 
 trait Fraction[@specialized(Long) A] {
   def num: A

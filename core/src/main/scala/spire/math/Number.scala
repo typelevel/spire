@@ -1,7 +1,6 @@
 package spire.math
 
 import scala.math.{BigDecimal, ScalaNumber, ScalaNumericConversions}
-import spire.implicits._
 import java.lang.Math
 
 // TODO: implement RationalNumber.

@@ -1,7 +1,6 @@
 package spire.math
 
 import spire.algebra._
-import spire.implicits._
 
 /**
  * A Bound represents one side of an interval; it is parameterized on
