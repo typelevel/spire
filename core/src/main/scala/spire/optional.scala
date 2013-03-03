@@ -5,6 +5,9 @@ import scala.annotation.tailrec
 import scala.{specialized => spec}
 
 import spire.algebra._
+import spire.algebra.std.{ SeqVectorEq, SeqVectorOrder }
+import spire.algebra.std.{ ArrayVectorEq, ArrayVectorOrder }
+import spire.algebra.std.MapVectorEq
 import spire.math._
 import spire.macrosk._
 

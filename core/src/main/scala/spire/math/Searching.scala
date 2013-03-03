@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.algebra.Order
+
 import scala.{specialized => spec}
 import scala.annotation.tailrec
 

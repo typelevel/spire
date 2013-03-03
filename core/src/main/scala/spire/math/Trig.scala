@@ -1,6 +1,9 @@
 package spire.math
 
 import scala.{specialized => spec, math => mth}
+
+import spire.algebra._
+
 import java.lang.Math
 import java.math.MathContext
 
@@ -89,7 +92,7 @@ object BigDecimalIsTrig {
   // TODO: optimize. also consider improving exp() and just using exp(1)
   private var eCache: BigDecimal = null
   private def eFromContext(mc: MathContext): BigDecimal = {
-    import spire.algebra.NRoot.BigDecimalIsNRoot.sqrt
+    import spire.algebra.std.bigDecimal.BigDecimalAlgebra.sqrt
 
     if (eCache == null) {
     } else if (mc == eCache.mc) {
@@ -132,7 +135,7 @@ object BigDecimalIsTrig {
 
   private var piCache: BigDecimal = null
   private def piFromContext(mc: MathContext): BigDecimal = {
-    import spire.algebra.NRoot.BigDecimalIsNRoot.sqrt
+    import spire.algebra.std.bigDecimal.BigDecimalAlgebra.sqrt
 
     if (piCache == null) {
     } else if (mc == piCache.mc) {

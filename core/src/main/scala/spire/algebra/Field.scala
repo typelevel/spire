@@ -20,10 +20,7 @@ final class FieldOps[A](lhs:A)(implicit ev:Field[A]) {
   def round() = macro Ops.unop[A]
 }
 
-object Field extends FieldProductImplicits {
-  implicit object FloatIsField extends FloatIsField
-  implicit object DoubleIsField extends DoubleIsField
-  implicit object BigDecimalIsField extends BigDecimalIsField
+object Field {
   implicit object RationalIsField extends RationalIsField
   implicit object RealIsField extends RealIsField
   implicit def complexIsField[@spec(Float, Double) A: Fractional: Trig] =
@@ -34,31 +31,6 @@ object Field extends FieldProductImplicits {
   implicit object NumberIsField extends NumberIsField
 
   @inline final def apply[A](implicit f:Field[A]):Field[A] = f
-}
-
-trait FloatIsField extends Field[Float] with FloatIsEuclideanRing {
-  def div(a:Float, b:Float) = a / b
-  def ceil(a:Float): Float = Math.floor(a).toFloat
-  def floor(a:Float): Float = Math.floor(a).toFloat
-  def round(a:Float): Float = spire.math.round(a)
-  def isWhole(a:Float) = a % 1.0 == 0.0
-}
-
-trait DoubleIsField extends Field[Double] with DoubleIsEuclideanRing {
-  def div(a:Double, b:Double) = a / b
-  def ceil(a:Double): Double = Math.floor(a)
-  def floor(a:Double): Double = Math.floor(a)
-  def round(a:Double): Double = spire.math.round(a)
-  def isWhole(a:Double) = a % 1.0 == 0.0
-}
-
-import BigDecimal.RoundingMode.{CEILING, FLOOR, HALF_UP}
-trait BigDecimalIsField extends Field[BigDecimal] with BigDecimalIsEuclideanRing {
-  def div(a:BigDecimal, b:BigDecimal) = a / b
-  def ceil(a:BigDecimal): BigDecimal = a.setScale(0, CEILING)
-  def floor(a:BigDecimal): BigDecimal = a.setScale(0, FLOOR)
-  def round(a:BigDecimal): BigDecimal = a.setScale(0, HALF_UP)
-  def isWhole(a:BigDecimal) = a % 1.0 == 0.0
 }
 
 trait RationalIsField extends Field[Rational] with RationalIsEuclideanRing {

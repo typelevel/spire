@@ -56,60 +56,10 @@ object BooleanAlgebra {
   @inline final def apply[@specialized(Boolean, Byte, Short, Int, Long) A](
     implicit ev: BooleanAlgebra[A]): BooleanAlgebra[A] = ev
 
-  implicit object BooleanIsBooleanAlgebra extends BooleanIsBooleanAlgebra
-  implicit object ByteIsBooleanAlgebra extends ByteIsBooleanAlgebra
-  implicit object ShortIsBooleanAlgebra extends ShortIsBooleanAlgebra
-  implicit object IntIsBooleanAlgebra extends IntIsBooleanAlgebra
-  implicit object LongIsBooleanAlgebra extends LongIsBooleanAlgebra
   implicit object UByteIsBooleanAlgebra extends UByteIsBooleanAlgebra
   implicit object UShortIsBooleanAlgebra extends UShortIsBooleanAlgebra
   implicit object UIntIsBooleanAlgebra extends UIntIsBooleanAlgebra
   implicit object ULongIsBooleanAlgebra extends ULongIsBooleanAlgebra
-}
-
-trait BooleanIsBooleanAlgebra extends BooleanAlgebra[Boolean] {
-  def one: Boolean = true
-  def zero: Boolean = false
-  def and(a: Boolean, b: Boolean): Boolean = a & b
-  def or(a: Boolean, b: Boolean): Boolean = a | b
-  def complement(a: Boolean): Boolean = !a
-  override def xor(a: Boolean, b: Boolean): Boolean = a ^ b
-}
-
-trait ByteIsBooleanAlgebra extends BooleanAlgebra[Byte] {
-  def one: Byte = (-1: Byte)
-  def zero: Byte = (0: Byte)
-  def and(a: Byte, b: Byte): Byte = (a & b).toByte
-  def or(a: Byte, b: Byte): Byte = (a | b).toByte
-  def complement(a: Byte): Byte = (~a).toByte
-  override def xor(a: Byte, b: Byte): Byte = (a ^ b).toByte
-}
-
-trait ShortIsBooleanAlgebra extends BooleanAlgebra[Short] {
-  def one: Short = (-1: Short)
-  def zero: Short = (0: Short)
-  def and(a: Short, b: Short): Short = (a & b).toShort
-  def or(a: Short, b: Short): Short = (a | b).toShort
-  def complement(a: Short): Short = (~a).toShort
-  override def xor(a: Short, b: Short): Short = (a ^ b).toShort
-}
-
-trait IntIsBooleanAlgebra extends BooleanAlgebra[Int] {
-  def one: Int = -1
-  def zero: Int = 0
-  def and(a: Int, b: Int): Int = a & b
-  def or(a: Int, b: Int): Int = a | b
-  def complement(a: Int): Int = ~a
-  override def xor(a: Int, b: Int): Int = a ^ b
-}
-
-trait LongIsBooleanAlgebra extends BooleanAlgebra[Long] {
-  def one: Long = -1L
-  def zero: Long = 0L
-  def and(a: Long, b: Long): Long = a & b
-  def or(a: Long, b: Long): Long = a | b
-  def complement(a: Long): Long = ~a
-  override def xor(a: Long, b: Long): Long = a ^ b
 }
 
 trait UByteIsBooleanAlgebra extends BooleanAlgebra[UByte] {

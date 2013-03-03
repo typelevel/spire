@@ -29,15 +29,7 @@ trait Ring[@spec(Int,Long,Float,Double) A] extends Semiring[A] with Rig[A] with 
     else _fromInt(plus(a, a), n / 2, sofar)
 }
 
-object Ring extends RingProductImplicits {
-  implicit object ByteIsRing extends ByteIsRing
-  implicit object ShortIsRing extends ShortIsRing
-  implicit object IntIsRing extends IntIsRing
-  implicit object LongIsRing extends LongIsRing
-  implicit object FloatIsRing extends FloatIsRing
-  implicit object DoubleIsRing extends DoubleIsRing
-  implicit object BigIntIsRing extends BigIntIsRing
-  implicit object BigDecimalIsRing extends BigDecimalIsRing
+object Ring {
   implicit object RationalIsRing extends RationalIsRing
   implicit object RealIsRing extends RealIsRing
   implicit object SafeLongIsRing extends SafeLongIsRing
@@ -53,115 +45,6 @@ object Ring extends RingProductImplicits {
   }
 
   @inline final def apply[A](implicit r:Ring[A]):Ring[A] = r
-}
-
-trait ByteIsRing extends Ring[Byte] {
-  override def minus(a:Byte, b:Byte): Byte = (a - b).toByte
-  def negate(a:Byte): Byte = (-a).toByte
-  def one: Byte = 1.toByte
-  def plus(a:Byte, b:Byte): Byte = (a + b).toByte
-  override def pow(a: Byte, b:Int): Byte = Math.pow(a, b).toByte
-  override def times(a:Byte, b:Byte): Byte = (a * b).toByte
-  def zero: Byte = 0.toByte
-  
-  override def fromInt(n: Int): Byte = n.toByte
-}
-
-trait ShortIsRing extends Ring[Short] {
-  override def minus(a:Short, b:Short): Short = (a - b).toShort
-  def negate(a:Short): Short = (-a).toShort
-  def one: Short = 1.toShort
-  def plus(a:Short, b:Short): Short = (a + b).toShort
-  override def pow(a: Short, b:Int): Short = Math.pow(a, b).toShort
-  override def times(a:Short, b:Short): Short = (a * b).toShort
-  def zero: Short = 0.toShort
-  
-  override def fromInt(n: Int): Short = n.toShort
-}
-
-trait IntIsRing extends Ring[Int] {
-  override def minus(a:Int, b:Int): Int = a - b
-  def negate(a:Int): Int = -a
-  def one: Int = 1
-  def plus(a:Int, b:Int): Int = a + b
-  override def pow(a:Int, b:Int): Int = Math.pow(a, b).toInt
-  override def times(a:Int, b:Int): Int = a * b
-  def zero: Int = 0
-
-  override def fromInt(n: Int): Int = n
-}
-
-trait LongIsRing extends Ring[Long] {
-  override def minus(a:Long, b:Long): Long = a - b
-  def negate(a:Long): Long = -a
-  def one: Long = 1L
-  def plus(a:Long, b:Long): Long = a + b
-  override def pow(a: Long, b:Int): Long = b match {
-    case 0 => 1
-    case 1 => a
-    case 2 => a * a
-    case 3 => a * a * a
-    case _ =>
-      if (b > 0) {
-        val e = b >> 1
-        val c = if ((b & 1) == 1) a else 1
-        c * pow(a, e) * pow(a, e)
-      } else {
-        0
-      }
-  }
-  override def times(a:Long, b:Long): Long = a * b
-  def zero: Long = 0L
-  
-  override def fromInt(n: Int): Long = n
-}
-
-trait FloatIsRing extends Ring[Float] {
-  override def minus(a:Float, b:Float): Float = a - b
-  def negate(a:Float): Float = -a
-  def one: Float = 1.0F
-  def plus(a:Float, b:Float): Float = a + b
-  override def pow(a:Float, b:Int): Float = Math.pow(a, b).toFloat
-  override def times(a:Float, b:Float): Float = a * b
-  def zero: Float = 0.0F
-  
-  override def fromInt(n: Int): Float = n
-}
-
-trait DoubleIsRing extends Ring[Double] {
-  override def minus(a:Double, b:Double): Double = a - b
-  def negate(a:Double): Double = -a
-  def one: Double = 1.0
-  def plus(a:Double, b:Double): Double = a + b
-  override def pow(a:Double, b:Int): Double = Math.pow(a, b)
-  override def times(a:Double, b:Double): Double = a * b
-  def zero: Double = 0.0
-
-  override def fromInt(n: Int): Double = n
-}
-
-trait BigIntIsRing extends Ring[BigInt] {
-  override def minus(a:BigInt, b:BigInt): BigInt = a - b
-  def negate(a:BigInt): BigInt = -a
-  val one: BigInt = BigInt(1)
-  def plus(a:BigInt, b:BigInt): BigInt = a + b
-  override def pow(a:BigInt, b:Int): BigInt = a pow b
-  override def times(a:BigInt, b:BigInt): BigInt = a * b
-  val zero: BigInt = BigInt(0)
-  
-  override def fromInt(n: Int): BigInt = BigInt(n)
-}
-
-trait BigDecimalIsRing extends Ring[BigDecimal] {
-  override def minus(a:BigDecimal, b:BigDecimal): BigDecimal = a - b
-  def negate(a:BigDecimal): BigDecimal = -a
-  val one: BigDecimal = BigDecimal(1.0)
-  def plus(a:BigDecimal, b:BigDecimal): BigDecimal = a + b
-  override def pow(a:BigDecimal, b:Int): BigDecimal = a.pow(b)
-  override def times(a:BigDecimal, b:BigDecimal): BigDecimal = a * b
-  val zero: BigDecimal = BigDecimal(0.0)
-
-  override def fromInt(n: Int): BigDecimal = BigDecimal(n)
 }
 
 trait RationalIsRing extends Ring[Rational] {

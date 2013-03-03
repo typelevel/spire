@@ -100,7 +100,7 @@ object GenProductTypes {
       constructor(defn ofArity arity)
     } mkString "\n"
 
-    """trait %sProductImplicits {
+    """trait %sProductInstances {
       |%s
       |}""".stripMargin format (defn.structure, implicits)
   }
@@ -123,11 +123,19 @@ object GenProductTypes {
     |
     |""".stripMargin
 
-  def renderAll(pkg: String, start: Int = 2, end: Int = 22): Seq[Definition] => String = { defns =>
-    val header = "package %s\nimport scala.{ specialized => spec }" format pkg
-    val body = defns map renderStructure(start, end) mkString "\n"
+  def unifiedTrait(defns: Seq[Definition], start: Int, end: Int): String = {
+    "trait ProductInstances extends " + (defns map { defn =>
+      defn.structure + "ProductInstances"
+    } mkString " with ")
+  }
 
-    header + disclaimer + body
+  def renderAll(pkg: String, imports: List[String], start: Int = 2, end: Int = 22): Seq[Definition] => String = { defns =>
+    val imps = imports map ("import " + _) mkString "\n"
+    val header = "package %s\n%s\nimport scala.{ specialized => spec }" format (pkg, imps)
+    val body = defns map renderStructure(start, end) mkString "\n"
+    val unified = "\n%s\n" format unifiedTrait(defns, start, end)
+
+    header + disclaimer + body + unified
   }
 }
 
@@ -186,9 +194,7 @@ object ProductTypes {
   val eq = Definition("Eq")(eqv :: Nil)
   val order = Definition("Order", Some("Eq"))(compare :: Nil)
 
-  val algebra = List(semigroup, monoid, group, abGroup, semiring, rng, rig, ring, euclideanRing, field)
-  val math = List(eq, order)
+  val algebra = List(semigroup, monoid, group, abGroup, semiring, rng, rig, ring, euclideanRing, field, eq, order)
 
-  def algebraProductTypes: String = renderAll("spire.algebra", 2, 22)(algebra)
-  def mathProductTypes: String = renderAll("spire.math", 2, 22)(math)
+  def algebraProductTypes: String = renderAll("spire.algebra.std", "spire.algebra._" :: Nil, 2, 22)(algebra)
 }

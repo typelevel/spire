@@ -3,7 +3,6 @@ package spire.benchmark
 import spire.algebra._
 import spire.math._
 import spire.implicits._
-import spire.algebra.map._
 
 import com.google.caliper.{ Runner, SimpleBenchmark, Param }
 

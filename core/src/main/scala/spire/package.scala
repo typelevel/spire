@@ -5,6 +5,7 @@ import scala.annotation.tailrec
 import scala.{specialized => spec}
 
 import spire.algebra._
+import spire.algebra.std._
 import spire.math._
 import spire.macrosk._
 
@@ -394,7 +395,7 @@ object NoImplicit {
   implicit def noImplicit1[A](implicit ev: A) = new NoImplicit[A]
 }
 
-object implicits {
+object implicits extends AnyInstances {
 
   implicit def additiveMonoidOps[A:AdditiveSemigroup](a:A) = new AdditiveSemigroupOps(a)
   implicit def additiveGroupOps[A:AdditiveGroup](a:A) = new AdditiveGroupOps(a)

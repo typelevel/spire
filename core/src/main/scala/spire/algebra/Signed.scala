@@ -22,14 +22,6 @@ trait SignedLow {
 }
 
 object Signed extends SignedLow {
-  implicit object ByteIsSigned extends ByteIsSigned
-  implicit object ShortIsSigned extends ShortIsSigned
-  implicit object IntIsSigned extends IntIsSigned
-  implicit object LongIsSigned extends LongIsSigned
-  implicit object BigIntIsSigned extends BigIntIsSigned
-  implicit object FloatIsSigned extends FloatIsSigned
-  implicit object DoubleIsSigned extends DoubleIsSigned
-  implicit object BigDecimalIsSigned extends BigDecimalIsSigned
   implicit object RationalIsSigned extends RationalIsSigned
   implicit object RealIsSigned extends RealIsSigned
   implicit object SafeLongIsSigned extends SafeLongIsSigned
@@ -57,46 +49,6 @@ final class SignedOps[A:Signed](lhs: A) {
 class OrderedRingIsSigned[A](implicit o:Order[A], r:Ring[A]) extends Signed[A] {
   def signum(a:A) = o.compare(a, r.zero)
   def abs(a:A) = if (signum(a) < 0) r.negate(a) else a
-}
-
-trait ByteIsSigned extends Signed[Byte] {
-  def signum(a: Byte): Int = a
-  def abs(a: Byte): Byte = (if (a < 0) -a else a).toByte
-}
-
-trait ShortIsSigned extends Signed[Short] {
-  def signum(a: Short): Int = a
-  def abs(a: Short): Short = (if (a < 0) -a else a).toShort
-}
-
-trait IntIsSigned extends Signed[Int] {
-  def signum(a: Int): Int = a
-  def abs(a: Int): Int = if (a < 0) -a else a
-}
-
-trait LongIsSigned extends Signed[Long] {
-  def signum(a: Long): Int = a.toInt
-  def abs(a: Long): Long = if (a < 0L) -a else a
-}
-
-trait BigIntIsSigned extends Signed[BigInt] {
-  def signum(a: BigInt): Int = a.toInt
-  def abs(a: BigInt): BigInt = a.abs
-}
-
-trait FloatIsSigned extends Signed[Float] {
-  def signum(a: Float): Int = mth.signum(a).toInt
-  def abs(a: Float): Float = if (a < 0.0f) -a else a
-}
-
-trait DoubleIsSigned extends Signed[Double] {
-  def signum(a: Double): Int = mth.signum(a).toInt
-  def abs(a: Double): Double = if (a < 0.0) -a else a
-}
-
-trait BigDecimalIsSigned extends Signed[BigDecimal] {
-  def signum(a: BigDecimal): Int = a.signum
-  def abs(a: BigDecimal): BigDecimal = a.abs
 }
 
 trait RationalIsSigned extends Signed[Rational] {

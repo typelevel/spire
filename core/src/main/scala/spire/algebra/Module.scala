@@ -37,8 +37,14 @@ trait RightModule[V, @spec(Int,Long,Float,Double) R] extends AdditiveAbGroup[V] 
   def timesr(v: V, r: R): V
 }
 
-object Module extends Module2 {
+object Module {
   @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: Module[V, R]) = V
+
+  implicit def IdentityModule[@spec(Int,Long,Float,Double) V](implicit ring: Ring[V]) = {
+    new IdentityModule[V] {
+      val scalar = ring
+    }
+  }
 }
 
 object LeftModule {
@@ -57,45 +63,6 @@ final class LeftModuleOps[V, F](rhs: V)(implicit ev: LeftModule[V, F]) {
 
 final class RightModuleOps[V, F](lhs: V)(implicit ev: RightModule[V, F]) {
   def :* (rhs:F): V = macro Ops.binop[F, V]
-}
-
-trait Module0 {
-
-  // Note that, unfortunately, I must put a NoImplicit implicit here. I think
-  // this is because Module[CC[A], A] is more specific than Module[V, A], so
-  // this takes precendence over the VectorSpaceIsModule implicit.
-
-  implicit def seq[A, CC[A] <: SeqLike[A, CC[A]]](implicit
-      ring0: Ring[A], cbf0: CanBuildFrom[CC[A], A, CC[A]],
-      ev: NoImplicit[VectorSpace[CC[A], A]]) = new SeqModule[A, CC[A]] {
-    val scalar = ring0
-    val cbf = cbf0
-  }
-
-  implicit def MapModule[K, V](implicit V0: Ring[V],
-      ev: NoImplicit[VectorSpace[Map[K, V], V]]) = new MapRng[K, V] {
-    val scalar = Ring[V]
-  }
-}
-
-trait Module1 extends Module0 {
-  implicit def IdentityModule[@spec(Int,Long,Float,Double) V](implicit ring: Ring[V]) = {
-    new IdentityModule[V] {
-      val scalar = ring
-    }
-  }
-
-  implicit def ArrayModule[@spec(Int,Long,Float,Double) A](implicit
-      ev: NoImplicit[VectorSpace[Array[A], A]], classTag0: ClassTag[A],
-      scalar0: Ring[A]): Module[Array[A], A] = new ArrayModule[A] {
-    val scalar = scalar0
-    val classTag = classTag0
-  }
-}
-
-trait Module2 extends Module1 {
-  implicit def VectorSpaceIsModule[V,@spec(Int,Long,Float,Double) R](implicit
-    vs: VectorSpace[V, R]): Module[V, R] = vs
 }
 
 trait IdentityModule[@spec(Int,Long,Float,Double) V] extends Module[V, V] {

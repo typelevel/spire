@@ -5,14 +5,15 @@ import scala.{ specialized => spec }
 trait RingAlgebra[V, @spec R] extends Module[V, R] with Rng[V]
 
 object RingAlgebra {
-  implicit def ZAlgebra[A](implicit ring: Ring[A]) = new ZAlgebra[A] {
-    val vector = ring
+  implicit def ZAlgebra[A](implicit vector0: Ring[A], scalar0: Ring[Int]) = new ZAlgebra[A] {
+    val vector = vector0
+    val scalar = scalar0
   }
 }
 
 trait ZAlgebra[V] extends RingAlgebra[V, Int] with Ring[V] {
   implicit def vector: Ring[V]
-  implicit def scalar: Ring[Int] = Ring.IntIsRing
+  implicit def scalar: Ring[Int]
 
   def zero: V = vector.zero
   def one: V = vector.one

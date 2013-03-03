@@ -65,45 +65,45 @@ trait MultiplicativeAbGroup[@spec(Int,Long,Float,Double) A] extends Multiplicati
   }
 }
 
-object MultiplicativeSemigroup extends MultiplicativeSemigroup1
-object MultiplicativeMonoid extends MultiplicativeMonoid1
-object MultiplicativeGroup extends MultiplicativeGroup1
-object MultiplicativeAbGroup extends MultiplicativeAbGroup0
+object MultiplicativeSemigroup
+object MultiplicativeMonoid
+object MultiplicativeGroup
+object MultiplicativeAbGroup
 
-trait MultiplicativeSemigroup0 {
-  implicit def MonoidIsSemigroup[@spec(Int,Long,Float,Double) A](implicit
-    m: MultiplicativeMonoid[A]): MultiplicativeSemigroup[A] = m
-}
-
-trait MultiplicativeSemigroup1 extends MultiplicativeSemigroup0 {
-  implicit def rigIsMultiplicativeSemigroup[@spec(Int, Long, Float, Double) A](implicit
-    r: Rig[A]): MultiplicativeSemigroup[A] = r
-}
-
-trait MultiplicativeMonoid0 {
-  implicit def GroupIsMonoid[@spec(Int,Long,Float,Double) A](implicit
-    g: MultiplicativeGroup[A]): MultiplicativeMonoid[A] = g
-}
-
-trait MultiplicativeMonoid1 {
-  implicit def rigIsMultiplicativeMonoid[@spec(Int, Long, Float, Double) A](implicit
-    r: Rig[A]): MultiplicativeMonoid[A] = r
-}
-
-trait MultiplicativeGroup0 {
-  implicit def AbGroupIsGroup[@spec(Int,Long,Float,Double) A](implicit
-    g: MultiplicativeAbGroup[A]): MultiplicativeGroup[A] = g
-}
-
-trait MultiplicativeGroup1 {
-  implicit def fieldIsMultiplicativeGroup[@spec(Int, Long, Float, Double) A](implicit
-    r: Field[A]): MultiplicativeGroup[A] = r
-}
-
-trait MultiplicativeAbGroup0 {
-  implicit def fieldIsMultiplicativeAbGroup[@spec(Int, Long, Float, Double) A](implicit
-    r: Field[A]): MultiplicativeAbGroup[A] = r
-}
+//trait MultiplicativeSemigroup0 {
+//  implicit def MonoidIsSemigroup[@spec(Int,Long,Float,Double) A](implicit
+//    m: MultiplicativeMonoid[A]): MultiplicativeSemigroup[A] = m
+//}
+//
+//trait MultiplicativeSemigroup1 extends MultiplicativeSemigroup0 {
+//  implicit def rigIsMultiplicativeSemigroup[@spec(Int, Long, Float, Double) A](implicit
+//    r: Rig[A]): MultiplicativeSemigroup[A] = r
+//}
+//
+//trait MultiplicativeMonoid0 {
+//  implicit def GroupIsMonoid[@spec(Int,Long,Float,Double) A](implicit
+//    g: MultiplicativeGroup[A]): MultiplicativeMonoid[A] = g
+//}
+//
+//trait MultiplicativeMonoid1 {
+//  implicit def rigIsMultiplicativeMonoid[@spec(Int, Long, Float, Double) A](implicit
+//    r: Rig[A]): MultiplicativeMonoid[A] = r
+//}
+//
+//trait MultiplicativeGroup0 {
+//  implicit def AbGroupIsGroup[@spec(Int,Long,Float,Double) A](implicit
+//    g: MultiplicativeAbGroup[A]): MultiplicativeGroup[A] = g
+//}
+//
+//trait MultiplicativeGroup1 {
+//  implicit def fieldIsMultiplicativeGroup[@spec(Int, Long, Float, Double) A](implicit
+//    r: Field[A]): MultiplicativeGroup[A] = r
+//}
+//
+//trait MultiplicativeAbGroup0 {
+//  implicit def fieldIsMultiplicativeAbGroup[@spec(Int, Long, Float, Double) A](implicit
+//    r: Field[A]): MultiplicativeAbGroup[A] = r
+//}
 
 import spire.math.{ConvertableTo, ConvertableFrom, Number}
 

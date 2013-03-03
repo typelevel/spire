@@ -1,7 +1,8 @@
 package spire.algebra
 
+import spire.algebra.std._
 import spire.macrosk.Ops
-import spire.math.{ UInt, Order }
+import spire.math.UInt
 
 import scala.{ specialized => spec }
 import scala.collection.SeqLike

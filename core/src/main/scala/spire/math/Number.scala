@@ -3,6 +3,8 @@ package spire.math
 import scala.math.{BigDecimal, ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
+import spire.algebra.std.bigDecimal._
+
 // TODO: implement RationalNumber.
 // TODO: implement toNumber and fromNumber in ConvertableTo/From.
 // TODO: pow() is hairy; should support more cases and generate better errors

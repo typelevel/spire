@@ -1,6 +1,8 @@
 package spire.algebra
+package std
 
 import scala.{ specialized => spec }
+import scala.annotation.tailrec
 
 trait MapMonoid[K, V] extends Monoid[Map[K, V]] {
   implicit def scalar: Semigroup[V]
@@ -69,7 +71,48 @@ with InnerProductSpace[Map[K, V], V] {
     times(x, y).foldLeft(scalar.zero) { (a, b) => scalar.plus(a, b._2) }
 }
 
-trait MapAlgebra0 {
+trait MapEq[K, V] extends Eq[Map[K, V]] {
+  def V: Eq[V]
+
+  def eqv(x: Map[K, V], y: Map[K, V]): Boolean = {
+    if (x.size != y.size) false else {
+      x forall { case (k, v) =>
+        (y get k) match {
+          case Some(e) if V.eqv(e, v) => true
+          case _ => false
+        }
+      }
+    }
+  }
+}
+
+trait MapVectorEq[K, V] extends Eq[Map[K, V]] {
+  def scalar: AdditiveMonoid[V]
+  def V: Eq[V]
+
+  def eqv(x: Map[K, V], y: Map[K, V]): Boolean = {
+    @tailrec
+    def loop(acc: Map[K, V], it: Iterator[(K, V)]): Boolean = {
+      if (it.hasNext) {
+        val (k, v0) = it.next()
+        (acc get k) match {
+          case Some(v1) if V.eqv(v0, v1) =>
+            loop(acc - k, it)
+          case None if V.eqv(v0, scalar.zero) =>
+            loop(acc - k, it)
+          case _ =>
+            false
+        }
+      } else {
+        acc forall { case (_, v) => V.eqv(v, scalar.zero) }
+      }
+    }
+
+    loop(x, y.toIterator)
+  }
+}
+
+trait MapInstances0 {
   implicit def MapMonoid[K, V: Semigroup] = new MapMonoid[K, V] {
     val scalar = Semigroup[V]
   }
@@ -79,7 +122,7 @@ trait MapAlgebra0 {
   }
 }
 
-trait MapAlgebra1 extends MapAlgebra0 {
+trait MapInstances1 extends MapInstances0 {
   implicit def MapGroup[K, V: Group] = new MapGroup[K, V] {
     val scalar = Group[V]
   }
@@ -89,13 +132,15 @@ trait MapAlgebra1 extends MapAlgebra0 {
   }
 }
 
-trait MapAlgebra2 extends MapAlgebra1 {
+trait MapInstances2 extends MapInstances1 {
   implicit def MapInnerProductSpace[K, V: Field: NRoot] = new MapInnerProductSpace[K, V] {
     val scalar = Field[V]
     val nroot = NRoot[V]
   }
+
+  implicit def MapEq[K, V](implicit V0: Eq[V]) = new MapEq[K, V] {
+    val V = V0
+  }
 }
 
-trait MapAlgebra extends MapAlgebra2
-
-object map extends MapAlgebra
+trait MapInstances extends MapInstances2

@@ -18,7 +18,7 @@ trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends VectorSpac
   }
 }
 
-object InnerProductSpace extends InnerProductSpace1 {
+object InnerProductSpace extends InnerProductSpace0 {
   @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: InnerProductSpace[V, R]) = V
 }
 
@@ -30,28 +30,6 @@ final class InnerProductSpaceOps[V](lhs: V) {
 }
 
 trait InnerProductSpace0 {
-  implicit def seq[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
-      nroot0: NRoot[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqInnerProductSpace[A, CC[A]] {
-    val scalar = field0
-    val nroot = nroot0
-    val cbf = cbf0
-  }
-
-  implicit def MapInnerProductSpace[K, V: Field: NRoot] = new MapInnerProductSpace[K, V] {
-    val scalar = Field[V]
-    val nroot = NRoot[V]
-  }
-}
-
-trait InnerProductSpace1 extends InnerProductSpace0 {
-  implicit def ArrayInnerProductSpace[@spec(Int,Long,Float,Double) A](implicit
-      scalar0: Field[A], nroot0: NRoot[A],
-      classTag0: ClassTag[A]): InnerProductSpace[Array[A], A] = new ArrayInnerProductSpace[A] {
-    val scalar = scalar0
-    val nroot = nroot0
-    val classTag = classTag0
-  }
-
   implicit def ComplexIsInnerProductSpace[@spec(Float, Double) A](implicit
       f0: Fractional[A], t0: Trig[A]) = new ComplexIsInnerProductSpace[A] {
     def scalar = f0

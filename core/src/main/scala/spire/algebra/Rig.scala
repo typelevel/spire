@@ -24,14 +24,9 @@ trait Rig[@spec(Int,Long,Float,Double) A] extends Semiring[A] with AdditiveMonoi
     else _pow(times(a, a), n / 2, sofar)
 }
 
-object Rig extends Rig0 with RigProductImplicits {
+object Rig {
   @inline final def apply[A](implicit r:Rig[A]): Rig[A] = r
-}
 
-trait Rig0 {
-  implicit def ringIsRig[@spec(Int,Long,Float,Double) A: Ring]: Rig[A] = Ring[A]
-
-  implicit object BooleanIsRig extends BooleanIsRig
   implicit object UByteIsRig extends UByteIsRig
   implicit object UShortIsRig extends UShortIsRig
   implicit object UIntIsRig extends UIntIsRig
@@ -42,14 +37,6 @@ trait Rig0 {
     val o = Order[A]
     val r = Ring[A]
   }
-}
-
-trait BooleanIsRig extends Rig[Boolean] {
-  def one: Boolean = true
-  def plus(a:Boolean, b:Boolean): Boolean = a || b
-  override def pow(a:Boolean, b:Int): Boolean = a
-  override def times(a:Boolean, b:Boolean): Boolean = a && b
-  def zero: Boolean = false
 }
 
 trait UByteIsRig extends Rig[UByte] {

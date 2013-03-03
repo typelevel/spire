@@ -2,6 +2,7 @@ package spire.math.real
 
 import spire.math._
 import spire.algebra._
+import spire.algebra.std.bigInt.BigIntIsNRoot
 
 /**
  * A mixin for the SeparationBound that implements the BMFSS bound.
@@ -10,7 +11,7 @@ trait BMFSSBound[A <: BMFSSBound[A]] extends SeparationBound[A] { self: A =>
   
   private lazy val l: BigInt = this match {
     case IntLit(_) | BigIntLit(_) => BigInt(1)
-    case KRoot(a, k) => if (a.u < a.l) NRoot[BigInt].nroot(((a.u pow (k - 1)) * a.l), k) + 1 else a.l
+    case KRoot(a, k) => if (a.u < a.l) BigIntIsNRoot.nroot(((a.u pow (k - 1)) * a.l), k) + 1 else a.l
     case Add(a, b) => a.l * b.l
     case Sub(a, b) => a.l * b.l
     case Mul(a, b) => a.l * b.l
@@ -21,7 +22,7 @@ trait BMFSSBound[A <: BMFSSBound[A]] extends SeparationBound[A] { self: A =>
   private lazy val u: BigInt = this match {
     case IntLit(n) => BigInt(n).abs
     case BigIntLit(n) => n.abs
-    case KRoot(a, k) => if (a.u >= a.l) NRoot[BigInt].nroot((a.u * (a.l pow (k - 1))), k) + 1 else a.u
+    case KRoot(a, k) => if (a.u >= a.l) BigIntIsNRoot.nroot((a.u * (a.l pow (k - 1))), k) + 1 else a.u
     case Add(a, b) => a.u * b.l + a.l * b.u
     case Sub(a, b) => a.u * b.l + a.l * b.u
     case Mul(a, b) => a.u * b.u

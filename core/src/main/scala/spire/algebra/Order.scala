@@ -1,9 +1,12 @@
-package spire.math
+package spire.algebra
 
 import scala.{specialized => spec}
 
+import spire.math._
 import spire.macrosk.Ops
+
 import java.lang.Math
+
 import scala.collection.SeqLike
 import scala.reflect.ClassTag
 
@@ -67,20 +70,12 @@ final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
   def max(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) max rhs
 }
 
-object Order extends Order1 with OrderProductImplicits {
-  implicit object ByteOrder extends ByteOrder
-  implicit object ShortOrder extends ShortOrder
+object Order {
   implicit object CharOrder extends CharOrder
-  implicit object IntOrder extends IntOrder
-  implicit object LongOrder extends LongOrder
   implicit object UByteOrder extends UByteOrder
   implicit object UShortOrder extends UShortOrder
   implicit object UIntOrder extends UIntOrder
   implicit object ULongOrder extends ULongOrder
-  implicit object FloatOrder extends FloatOrder
-  implicit object DoubleOrder extends DoubleOrder
-  implicit object BigIntOrder extends BigIntOrder
-  implicit object BigDecimalOrder extends BigDecimalOrder
   implicit object RationalOrder extends RationalOrder
   implicit object RealOrder extends RealOrder
   implicit object SafeLongOrder extends SafeLongOrder
@@ -101,60 +96,12 @@ object Order extends Order1 with OrderProductImplicits {
   }
 }
 
-trait Order0 {
-  implicit def seq[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Order[A]) = {
-    new SeqOrder[A, CC[A]] {
-      val A = A0
-    }
-  }
-}
-
-trait Order1 extends Order0 {
-  implicit def array[@spec(Int,Long,Float,Double) A](implicit
-      A0: Order[A], ct: ClassTag[A]) = new ArrayOrder[A] {
-    val A = A0
-    val classTag = ct
-  }
-}
-
-trait ByteOrder extends Order[Byte] with ByteEq {
-  override def gt(x: Byte, y: Byte) = x > y
-  override def gteqv(x: Byte, y: Byte) = x >= y
-  override def lt(x: Byte, y: Byte) = x < y
-  override def lteqv(x: Byte, y: Byte) = x <= y
-  def compare(x: Byte, y: Byte) = if (x < y) -1 else if (x > y) 1 else 0
-}
-
-trait ShortOrder extends Order[Short] with ShortEq {
-  override def gt(x: Short, y: Short) = x > y
-  override def gteqv(x: Short, y: Short) = x >= y
-  override def lt(x: Short, y: Short) = x < y
-  override def lteqv(x: Short, y: Short) = x <= y
-  def compare(x: Short, y: Short) = if (x < y) -1 else if (x > y) 1 else 0
-}
-
 trait CharOrder extends Order[Char] with CharEq {
   override def gt(x: Char, y: Char) = x > y
   override def gteqv(x: Char, y: Char) = x >= y
   override def lt(x: Char, y: Char) = x < y
   override def lteqv(x: Char, y: Char) = x <= y
   def compare(x: Char, y: Char) = if (x < y) -1 else if (x > y) 1 else 0
-}
-
-trait IntOrder extends Order[Int] with IntEq {
-  override def gt(x: Int, y: Int) = x > y
-  override def gteqv(x: Int, y: Int) = x >= y
-  override def lt(x: Int, y: Int) = x < y
-  override def lteqv(x: Int, y: Int) = x <= y
-  def compare(x: Int, y: Int) = if (x < y) -1 else if (x > y) 1 else 0
-}
-
-trait LongOrder extends Order[Long] with LongEq {
-  override def gt(x: Long, y: Long) = x > y
-  override def gteqv(x: Long, y: Long) = x >= y
-  override def lt(x: Long, y: Long) = x < y
-  override def lteqv(x: Long, y: Long) = x <= y
-  def compare(x: Long, y: Long) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 trait UByteOrder extends Order[UByte] with UByteEq {
@@ -187,46 +134,6 @@ trait ULongOrder extends Order[ULong] with ULongEq {
   override def lt(x: ULong, y: ULong) = x < y
   override def lteqv(x: ULong, y: ULong) = x <= y
   def compare(x: ULong, y: ULong) = if (x < y) -1 else if (x > y) 1 else 0
-}
-
-trait FloatOrder extends Order[Float] with FloatEq {
-  override def gt(x: Float, y: Float) = x > y
-  override def gteqv(x: Float, y: Float) = x >= y
-  override def lt(x: Float, y: Float) = x < y
-  override def lteqv(x: Float, y: Float) = x <= y
-  override def min(x: Float, y: Float) = Math.min(x, y)
-  override def max(x: Float, y: Float) = Math.max(x, y)
-  def compare(x: Float, y: Float) = java.lang.Float.compare(x, y)
-}
-
-trait DoubleOrder extends Order[Double] with DoubleEq {
-  override def gt(x: Double, y: Double) = x > y
-  override def gteqv(x: Double, y: Double) = x >= y
-  override def lt(x: Double, y: Double) = x < y
-  override def lteqv(x: Double, y: Double) = x <= y
-  override def min(x: Double, y: Double) = Math.min(x, y)
-  override def max(x: Double, y: Double) = Math.max(x, y)
-  def compare(x: Double, y: Double) = java.lang.Double.compare(x, y)
-}
-
-trait BigIntOrder extends Order[BigInt] with BigIntEq {
-  override def gt(x: BigInt, y: BigInt) = x > y
-  override def gteqv(x: BigInt, y: BigInt) = x >= y
-  override def lt(x: BigInt, y: BigInt) = x < y
-  override def lteqv(x: BigInt, y: BigInt) = x <= y
-  override def min(x: BigInt, y: BigInt) = x.min(y)
-  override def max(x: BigInt, y: BigInt) = x.max(y)
-  def compare(x: BigInt, y: BigInt) = x.compare(y)
-}
-
-trait BigDecimalOrder extends Order[BigDecimal] with BigDecimalEq {
-  override def gt(x: BigDecimal, y: BigDecimal) = x > y
-  override def gteqv(x: BigDecimal, y: BigDecimal) = x >= y
-  override def lt(x: BigDecimal, y: BigDecimal) = x < y
-  override def lteqv(x: BigDecimal, y: BigDecimal) = x <= y
-  override def min(x: BigDecimal, y: BigDecimal) = x.min(y)
-  override def max(x: BigDecimal, y: BigDecimal) = x.max(y)
-  def compare(x: BigDecimal, y: BigDecimal) = x.compare(y)
 }
 
 trait RationalOrder extends Order[Rational] with RationalEq {
