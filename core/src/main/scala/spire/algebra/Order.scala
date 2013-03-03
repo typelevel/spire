@@ -2,13 +2,8 @@ package spire.algebra
 
 import scala.{specialized => spec}
 
-import spire.math._
+import spire.math.{ ConvertableFrom, ConvertableTo, Number }
 import spire.macrosk.Ops
-
-import java.lang.Math
-
-import scala.collection.SeqLike
-import scala.reflect.ClassTag
 
 trait Order[@spec A] extends Eq[A] {
   self =>

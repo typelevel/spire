@@ -2,7 +2,6 @@ package spire.algebra
 
 import scala.{specialized => spec}
 
-import spire.math._
 import spire.macrosk.Ops
 
 trait Eq[@spec A] {

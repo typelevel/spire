@@ -1,6 +1,5 @@
 package spire.algebra
 
-import spire.math._
 import spire.macrosk.Ops
 
 import scala.annotation.tailrec

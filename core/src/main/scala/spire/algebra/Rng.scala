@@ -3,9 +3,6 @@ package spire.algebra
 import annotation.tailrec
 import scala.{specialized => spec}
 
-import java.lang.Math
-
-import spire.math._
 import spire.macrosk.Ops
 
 /**

@@ -3,9 +3,8 @@ package spire.algebra
 import spire.math._
 import spire.macrosk.Ops
 
-import scala.{specialized => spec, math => mth}
+import scala.{specialized => spec}
 import java.math.MathContext
-import java.lang.Math
 
 // NOTE: fpow vs pow is a bit of a trainwreck :P
 // overloading is evil, but it's definitely what users will expect.

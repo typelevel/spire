@@ -2,8 +2,8 @@ package spire.algebra
 
 import scala.{specialized => spec}
 
-import spire.math._
 import spire.macrosk.Ops
+import spire.math.{ ConvertableFrom, ConvertableTo, Number }
 
 /**
  * A boolean algebra is a structure that defines a few basic operations, namely

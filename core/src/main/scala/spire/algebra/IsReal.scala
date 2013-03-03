@@ -1,7 +1,5 @@
 package spire.algebra
 
-import spire.math._
-
 import scala.{ specialized => spec }
 
 /**

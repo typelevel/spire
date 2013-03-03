@@ -1,12 +1,8 @@
 package spire.algebra
 
 import spire.macrosk.Ops
-import spire.NoImplicit
 
 import scala.{ specialized => spec }
-import scala.collection.SeqLike
-import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 
 trait VectorSpace[V, @spec(Int, Long, Float, Double) F] extends Module[V, F] {
   implicit def scalar: Field[F]

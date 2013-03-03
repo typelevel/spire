@@ -2,7 +2,6 @@ package spire.algebra
 
 import spire.algebra.std._
 import spire.macrosk.Ops
-import spire.math.UInt
 
 import scala.{ specialized => spec }
 import scala.collection.SeqLike
@@ -36,9 +35,9 @@ trait NormedVectorSpaceFunctions {
     }
   }
 
-  def Lp[A, CC[A] <: SeqLike[A, CC[A]]](p0: UInt)(implicit field0: Field[A], nroot0: NRoot[A],
+  def Lp[A, CC[A] <: SeqLike[A, CC[A]]](p0: Int)(implicit field0: Field[A], nroot0: NRoot[A],
       signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] = {
-    require(p0 > UInt(0), "p must be > 0")
+    require(p0 > 0, "p must be > 0")
 
     new SeqLpNormedVectorSpace[A, CC[A]] {
       val scalar = field0

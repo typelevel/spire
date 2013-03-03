@@ -1,12 +1,8 @@
 package spire.algebra
 
 import spire.macrosk.Ops
-import spire.NoImplicit
 
 import scala.{ specialized => spec }
-import scala.collection.SeqLike
-import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 
 /**
  * A module generalizes a vector space by requiring its scalar need only form
