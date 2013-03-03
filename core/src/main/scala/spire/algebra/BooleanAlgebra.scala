@@ -55,45 +55,4 @@ final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
 object BooleanAlgebra {
   @inline final def apply[@specialized(Boolean, Byte, Short, Int, Long) A](
     implicit ev: BooleanAlgebra[A]): BooleanAlgebra[A] = ev
-
-  implicit object UByteIsBooleanAlgebra extends UByteIsBooleanAlgebra
-  implicit object UShortIsBooleanAlgebra extends UShortIsBooleanAlgebra
-  implicit object UIntIsBooleanAlgebra extends UIntIsBooleanAlgebra
-  implicit object ULongIsBooleanAlgebra extends ULongIsBooleanAlgebra
-}
-
-trait UByteIsBooleanAlgebra extends BooleanAlgebra[UByte] {
-  def one: UByte = UByte(-1: Byte)
-  def zero: UByte = UByte(0: Byte)
-  def and(a: UByte, b: UByte): UByte = a & b
-  def or(a: UByte, b: UByte): UByte = a | b
-  def complement(a: UByte): UByte = ~a
-  override def xor(a: UByte, b: UByte): UByte = a ^ b
-}
-
-trait UShortIsBooleanAlgebra extends BooleanAlgebra[UShort] {
-  def one: UShort = UShort(-1: Short)
-  def zero: UShort = UShort(0: Short)
-  def and(a: UShort, b: UShort): UShort = a & b
-  def or(a: UShort, b: UShort): UShort = a | b
-  def complement(a: UShort): UShort = ~a
-  override def xor(a: UShort, b: UShort): UShort = a ^ b
-}
-
-trait UIntIsBooleanAlgebra extends BooleanAlgebra[UInt] {
-  def one: UInt = UInt(-1)
-  def zero: UInt = UInt(0)
-  def and(a: UInt, b: UInt): UInt = a & b
-  def or(a: UInt, b: UInt): UInt = a | b
-  def complement(a: UInt): UInt = ~a
-  override def xor(a: UInt, b: UInt): UInt = a ^ b
-}
-
-trait ULongIsBooleanAlgebra extends BooleanAlgebra[ULong] {
-  def one: ULong = ULong(-1L)
-  def zero: ULong = ULong(0L)
-  def and(a: ULong, b: ULong): ULong = a & b
-  def or(a: ULong, b: ULong): ULong = a | b
-  def complement(a: ULong): ULong = ~a
-  override def xor(a: ULong, b: ULong): ULong = a ^ b
 }

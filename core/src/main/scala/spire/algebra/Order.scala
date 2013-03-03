@@ -71,12 +71,6 @@ final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
 }
 
 object Order {
-  implicit object UByteOrder extends UByteOrder
-  implicit object UShortOrder extends UShortOrder
-  implicit object UIntOrder extends UIntOrder
-  implicit object ULongOrder extends ULongOrder
-  implicit object NaturalOrder extends NaturalOrder
-
   def by[@spec A, @spec B](f: A => B)(implicit o: Order[B]): Order[A] = o.on(f)
 
   def from[@spec A](f: (A, A) => Int): Order[A] = new Order[A] {
@@ -89,44 +83,4 @@ object Order {
   implicit def ordering[A](implicit o: Order[A]) = new Ordering[A] {
     def compare(x: A, y: A) = o.compare(x, y)
   }
-}
-
-trait UByteOrder extends Order[UByte] with UByteEq {
-  override def gt(x: UByte, y: UByte) = x > y
-  override def gteqv(x: UByte, y: UByte) = x >= y
-  override def lt(x: UByte, y: UByte) = x < y
-  override def lteqv(x: UByte, y: UByte) = x <= y
-  def compare(x: UByte, y: UByte) = if (x < y) -1 else if (x > y) 1 else 0
-}
-
-trait UShortOrder extends Order[UShort] with UShortEq {
-  override def gt(x: UShort, y: UShort) = x > y
-  override def gteqv(x: UShort, y: UShort) = x >= y
-  override def lt(x: UShort, y: UShort) = x < y
-  override def lteqv(x: UShort, y: UShort) = x <= y
-  def compare(x: UShort, y: UShort) = if (x < y) -1 else if (x > y) 1 else 0
-}
-
-trait UIntOrder extends Order[UInt] with UIntEq {
-  override def gt(x: UInt, y: UInt) = x > y
-  override def gteqv(x: UInt, y: UInt) = x >= y
-  override def lt(x: UInt, y: UInt) = x < y
-  override def lteqv(x: UInt, y: UInt) = x <= y
-  def compare(x: UInt, y: UInt) = if (x < y) -1 else if (x > y) 1 else 0
-}
-
-trait ULongOrder extends Order[ULong] with ULongEq {
-  override def gt(x: ULong, y: ULong) = x > y
-  override def gteqv(x: ULong, y: ULong) = x >= y
-  override def lt(x: ULong, y: ULong) = x < y
-  override def lteqv(x: ULong, y: ULong) = x <= y
-  def compare(x: ULong, y: ULong) = if (x < y) -1 else if (x > y) 1 else 0
-}
-
-trait NaturalOrder extends Order[Natural] with NaturalEq {
-  override def gt(x: Natural, y: Natural) = x > y
-  override def gteqv(x: Natural, y: Natural) = x >= y
-  override def lt(x: Natural, y: Natural) = x < y
-  override def lteqv(x: Natural, y: Natural) = x <= y
-  def compare(x: Natural, y: Natural) = x.compare(y)
 }

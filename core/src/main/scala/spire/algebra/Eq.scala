@@ -21,34 +21,7 @@ final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
 }
 
 object Eq {
-  implicit object UByteEq extends UByteEq
-  implicit object UShortEq extends UShortEq
-  implicit object UIntEq extends UIntEq
-  implicit object ULongEq extends ULongEq
-  implicit object NaturalEq extends NaturalEq
-
   def apply[A](implicit e:Eq[A]):Eq[A] = e
 
   def by[@spec A, @spec B](f:A => B)(implicit e:Eq[B]): Eq[A] = new MappedEq(e)(f)
-}
-
-trait UByteEq extends Eq[UByte] {
-  def eqv(x:UByte, y:UByte) = x == y
-  override def neqv(x:UByte, y:UByte) = x != y
-}
-trait UShortEq extends Eq[UShort] {
-  def eqv(x:UShort, y:UShort) = x == y
-  override def neqv(x:UShort, y:UShort) = x != y
-}
-trait UIntEq extends Eq[UInt] {
-  def eqv(x:UInt, y:UInt) = x == y
-  override def neqv(x:UInt, y:UInt) = x != y
-}
-trait ULongEq extends Eq[ULong] {
-  def eqv(x:ULong, y:ULong) = x == y
-  override def neqv(x:ULong, y:ULong) = x != y
-}
-trait NaturalEq extends Eq[Natural] {
-  def eqv(x: Natural, y: Natural) = x == y
-  override def neqv(x: Natural, y: Natural) = x != y
 }
