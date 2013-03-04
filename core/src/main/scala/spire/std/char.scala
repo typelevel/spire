@@ -1,5 +1,6 @@
-package spire.algebra
-package std
+package spire.std
+
+import spire.algebra._
 
 trait CharEq extends Eq[Char] {
   def eqv(x:Char, y:Char) = x == y

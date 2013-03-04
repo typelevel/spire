@@ -8,7 +8,7 @@ import scala.{ specialized => spec }
 
 import spire.macrosk._
 import spire.algebra._
-import spire.algebra.std.any._
+import spire.std.any._
 
 /**
  * A type class for numeric conversions. All conversions must extend either

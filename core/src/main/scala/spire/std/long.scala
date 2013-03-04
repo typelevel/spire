@@ -1,5 +1,6 @@
-package spire.algebra
-package std
+package spire.std
+
+import spire.algebra._
 
 trait LongIsRing extends Ring[Long] {
   override def minus(a:Long, b:Long): Long = a - b

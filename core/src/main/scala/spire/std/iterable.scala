@@ -1,5 +1,6 @@
-package spire.algebra
-package std
+package spire.std
+
+import spire.algebra._
 
 import scala.collection.TraversableLike
 import scala.collection.generic.CanBuildFrom

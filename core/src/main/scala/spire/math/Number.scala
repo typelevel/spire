@@ -4,7 +4,7 @@ import scala.math.{BigDecimal, ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
 import spire.algebra._
-import spire.algebra.std.bigDecimal._
+import spire.std.bigDecimal._
 
 // TODO: implement RationalNumber.
 // TODO: implement toNumber and fromNumber in ConvertableTo/From.

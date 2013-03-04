@@ -1,5 +1,6 @@
-package spire.algebra
-package std
+package spire.std
+
+import spire.algebra._
 
 trait IntIsRing extends Ring[Int] {
   override def minus(a:Int, b:Int): Int = a - b

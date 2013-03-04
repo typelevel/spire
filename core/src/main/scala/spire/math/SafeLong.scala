@@ -353,8 +353,8 @@ trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with SafeLongIsRin
 }
 
 trait SafeLongIsNRoot extends NRoot[SafeLong] {
-  import spire.algebra.std.long.LongIsNRoot
-  import spire.algebra.std.bigInt.BigIntIsNRoot
+  import spire.std.long.LongIsNRoot
+  import spire.std.bigInt.BigIntIsNRoot
 
   def nroot(a: SafeLong, k: Int): SafeLong = a.fold(
     n => SafeLong(LongIsNRoot.nroot(n, k)),

@@ -1,5 +1,6 @@
-package spire.algebra
-package std
+package spire.std
+
+import spire.algebra._
 
 trait OptionMonoid[A] extends Monoid[Option[A]] {
   def scalar: Semigroup[A]

@@ -92,7 +92,7 @@ object BigDecimalIsTrig {
   // TODO: optimize. also consider improving exp() and just using exp(1)
   private var eCache: BigDecimal = null
   private def eFromContext(mc: MathContext): BigDecimal = {
-    import spire.algebra.std.bigDecimal.BigDecimalAlgebra.sqrt
+    import spire.std.bigDecimal.BigDecimalAlgebra.sqrt
 
     if (eCache == null) {
     } else if (mc == eCache.mc) {
@@ -135,7 +135,7 @@ object BigDecimalIsTrig {
 
   private var piCache: BigDecimal = null
   private def piFromContext(mc: MathContext): BigDecimal = {
-    import spire.algebra.std.bigDecimal.BigDecimalAlgebra.sqrt
+    import spire.std.bigDecimal.BigDecimalAlgebra.sqrt
 
     if (piCache == null) {
     } else if (mc == piCache.mc) {

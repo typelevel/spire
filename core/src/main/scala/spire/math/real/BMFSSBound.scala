@@ -2,7 +2,7 @@ package spire.math.real
 
 import spire.math._
 import spire.algebra._
-import spire.algebra.std.bigInt.BigIntIsNRoot
+import spire.std.bigInt.BigIntIsNRoot
 
 /**
  * A mixin for the SeparationBound that implements the BMFSS bound.

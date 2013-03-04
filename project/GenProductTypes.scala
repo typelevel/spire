@@ -196,5 +196,5 @@ object ProductTypes {
 
   val algebra = List(semigroup, monoid, group, abGroup, semiring, rng, rig, ring, euclideanRing, field, eq, order)
 
-  def algebraProductTypes: String = renderAll("spire.algebra.std", "spire.algebra._" :: Nil, 2, 22)(algebra)
+  def algebraProductTypes: String = renderAll("spire.std", "spire.algebra._" :: Nil, 2, 22)(algebra)
 }

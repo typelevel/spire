@@ -1,5 +1,6 @@
-package spire.algebra
-package std
+package spire.std
+
+import spire.algebra._
 
 trait ByteIsRing extends Ring[Byte] {
   override def minus(a:Byte, b:Byte): Byte = (a - b).toByte

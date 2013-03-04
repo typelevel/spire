@@ -1,5 +1,6 @@
-package spire.algebra
-package std
+package spire.std
+
+import spire.algebra._
 
 import spire.NoImplicit
 
@@ -193,7 +194,7 @@ trait ArrayInstances1 extends ArrayInstances0 {
     val classTag = classTag0
   }
 
-  implicit def array[@spec(Int,Long,Float,Double) A](implicit
+  implicit def ArrayEq[@spec(Int,Long,Float,Double) A](implicit
       A0: Eq[A], ct: ClassTag[A]) = new ArrayEq[A] {
     val A = A0
     val classTag = ct
@@ -209,7 +210,7 @@ trait ArrayInstances2 extends ArrayInstances1 {
     val classTag = classTag0
   }
 
-  implicit def array[@spec(Int,Long,Float,Double) A](implicit
+  implicit def ArrayOrder[@spec(Int,Long,Float,Double) A](implicit
       A0: Order[A], ct: ClassTag[A]) = new ArrayOrder[A] {
     val A = A0
     val classTag = ct

@@ -9,7 +9,7 @@ import Random._
 import spire.algebra._
 import spire.math._
 import spire.math.fpf._
-import spire.algebra.std.any._
+import spire.std.any._
 
 import spire.math.{Numeric => SpireN}
 import scala.math.{Numeric => ScalaN}

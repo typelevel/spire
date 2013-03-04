@@ -1,6 +1,6 @@
 package spire.algebra
 
-import spire.algebra.std._
+import spire.std._
 
 import scala.{ specialized => spec }
 import scala.collection.SeqLike

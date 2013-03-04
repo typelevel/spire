@@ -1,5 +1,6 @@
-package spire.algebra
-package std
+package spire.std
+
+import spire.algebra._
 
 trait AnyInstances extends BooleanInstances
                       with CharInstances

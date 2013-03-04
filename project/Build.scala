@@ -93,9 +93,9 @@ object MyBuild extends Build {
     name := "spire",
     sourceGenerators in Compile <+= (genProductTypes in Compile).task,
     genProductTypes <<= (sourceManaged in Compile, streams) map { (scalaSource, s) =>
-      s.log.info("Generating spire/algebra/std/tuples.scala")
+      s.log.info("Generating spire/std/tuples.scala")
       val algebraSource = ProductTypes.algebraProductTypes
-      val algebraFile = (scalaSource / "spire" / "algebra" / "std" / "tuples.scala").asFile
+      val algebraFile = (scalaSource / "spire" / "std" / "tuples.scala").asFile
       IO.write(algebraFile, algebraSource)
 
       Seq[File](algebraFile)

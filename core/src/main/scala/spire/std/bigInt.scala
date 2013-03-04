@@ -1,5 +1,6 @@
-package spire.algebra
-package std
+package spire.std
+
+import spire.algebra._
 
 trait BigIntIsRing extends Ring[BigInt] {
   override def minus(a:BigInt, b:BigInt): BigInt = a - b
