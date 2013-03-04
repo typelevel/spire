@@ -89,13 +89,13 @@ trait Laws {
     }
   }
 
-  trait WithOneParent { self: SpireProperties =>
+  trait HasOneParent { self: SpireProperties =>
     def parent: Option[SpireProperties]
 
     final def parents = parent.toList
   }
 
-  class DefaultProperties(val name: String, val parent: Option[DefaultProperties], val props: (String, Prop)*) extends SpireProperties with WithOneParent {
+  class DefaultProperties(val name: String, val parent: Option[DefaultProperties], val props: (String, Prop)*) extends SpireProperties with HasOneParent {
     val bases = Seq.empty
   }
 

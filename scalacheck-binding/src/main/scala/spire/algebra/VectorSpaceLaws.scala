@@ -3,12 +3,12 @@ package spire.algebra
 import spire.implicits._
 
 import org.scalacheck.{Arbitrary, Prop}
-import org.scalacheck.Prop.forAll
+import org.scalacheck.Prop._
 
 object VectorSpaceLaws {
-  def apply[V: Eq: Arbitrary, A: Eq: Arbitrary] = new VectorSpaceLaws[V, A] {
-    val vectorLaws = AlgebraLaws[V]
-    val scalarLaws = AlgebraLaws[A]
+  def apply[V: Eq: Arbitrary, A: Eq: Arbitrary: Predicate] = new VectorSpaceLaws[V, A] {
+    val scalarLaws = RingLaws[A]
+    val vectorLaws = GroupLaws[V]
   }
 }
 
@@ -16,11 +16,11 @@ trait VectorSpaceLaws[V, A] extends Laws {
 
   implicit def scalar(implicit V: Module[V, A]): Ring[A] = V.scalar
 
-  val scalarLaws: AlgebraLaws[A]
-  val vectorLaws: AlgebraLaws[V]
+  val scalarLaws: RingLaws[A]
+  val vectorLaws: GroupLaws[V]
 
-  import scalarLaws.{ Eq => EqA, Arbitrary => ArbA }
-  import vectorLaws.{ Eq => EqV, Arbitrary => ArbV }
+  import scalarLaws.{ Equ => EqA, Arb => ArA }
+  import vectorLaws.{ Equ => EqV, Arb => ArV }
 
 
   def module(implicit V: Module[V, A]) = new SpaceProperties(
