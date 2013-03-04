@@ -1,6 +1,9 @@
 package spire.math
 
 import spire.algebra._
+import spire.std.float._
+import spire.std.double._
+import spire.std.bigDecimal._
 
 import scala.{specialized => spec}
 import scala.annotation.tailrec
@@ -558,6 +561,33 @@ extends ComplexIsEuclideanRing[A] with Field[Complex[A]] {
   def isWhole(a:Complex[A]) = a.isWhole
 }
 
+trait ComplexIsTrig[@spec(Float, Double) A] extends Trig[Complex[A]] {
+  implicit def f: Fractional[A]
+  implicit def t: Trig[A]
+
+  def e: Complex[A] = new Complex[A](t.e, f.zero)
+  def pi: Complex[A] = new Complex[A](t.pi, f.zero)
+
+  def exp(a: Complex[A]): Complex[A] = a.exp
+
+  def sin(a: Complex[A]): Complex[A] = a.sin
+  def cos(a: Complex[A]): Complex[A] = a.cos
+  def tan(a: Complex[A]): Complex[A] = a.tan
+
+  def asin(a: Complex[A]): Complex[A] = a.sin
+  def acos(a: Complex[A]): Complex[A] = a.cos
+  def atan(a: Complex[A]): Complex[A] = a.tan
+  def atan2(y: Complex[A], x: Complex[A]): Complex[A] =
+    new Complex(x.real, y.imag).atan
+
+  def sinh(x: Complex[A]): Complex[A] = x.sinh
+  def cosh(x: Complex[A]): Complex[A] = x.cosh
+  def tanh(x: Complex[A]): Complex[A] = x.tanh
+
+  def toRadians(a: Complex[A]): Complex[A] = a
+  def toDegrees(a: Complex[A]): Complex[A] = a
+}
+
 trait ComplexEq[A] extends Eq[Complex[A]] {
   def eqv(x:Complex[A], y:Complex[A]) = x eqv y
   override def neqv(x:Complex[A], y:Complex[A]) = x neqv y
@@ -572,7 +602,8 @@ trait ComplexIsSigned[A] extends Signed[Complex[A]] {
 }
 
 trait ComplexAlgebra[@spec(Float, Double) A] extends ComplexIsField[A]
-with InnerProductSpace[Complex[A], A] with FieldAlgebra[Complex[A], A] {
+with ComplexIsTrig[A] with InnerProductSpace[Complex[A], A]
+with FieldAlgebra[Complex[A], A] {
   def timesl(r: A, v: Complex[A]): Complex[A] = Complex(r, scalar.zero) * v
   def dot(x: Complex[A], y: Complex[A]): A =
     scalar.plus(scalar.times(x.real, y.real), scalar.times(x.imag, y.imag))

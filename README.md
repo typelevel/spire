@@ -57,14 +57,13 @@ The general-purpose type classes can be found in `spire.math` and consist of:
  * `Numeric[A]` all number types, makes "best effort" to support operators
  * `Fractional[A]` fractional number types, where `/` is true division
  * `Integral[A]` integral number types, where `/` is floor division
- * `Eq[A]` types that can be compared for equality
- * `Order[A]` types that can be compared and ordered
- * `Trig[A]` types that support trigonometric functions
 
 Some of the general-purpose type classes are built in terms of a set of more
 fundamental type classes defined in `spire.algebra`. Many of these correspond
 to concepts from abstract algebra:
 
+ * `Eq[A]` types that can be compared for equality
+ * `Order[A]` types that can be compared and ordered
  * `Semigroup[A]` types with an associtive binary operator
  * `Monoid[A]` semigroups who have an identity element
  * `Group[A]` monoids that have an inverse operator
@@ -81,6 +80,7 @@ to concepts from abstract algebra:
  * `NormedVectorSpace[V,F]` types with an associated norm
  * `InnerProductSpace[V,F]` types with an inner product
  * `MetricSpace[V,R]` types with an associated metric
+ * `Trig[A]` types that support trigonometric functions
 
 In addition to the type classes themselves, `spire.implicits` defines many
 implicits which provide unary and infix operators for the type classes. The
@@ -94,7 +94,7 @@ user experience. The easiest way to use spire is via wildcard imports:
 ```scala
 import spire.algebra._   // provides algebraic type classes
 import spire.math._      // provides functions, types, and type classes
-import spire.implicits._ // provides infix operators and conversions
+import spire.implicits._ // provides infix operators, instances and conversions
 ```
 
 Of course, you can still productively use Spire without wildcard imports, but
