@@ -1,0 +1,75 @@
+package spire.std
+
+import spire.algebra._
+
+trait BigIntIsRing extends Ring[BigInt] {
+  override def minus(a:BigInt, b:BigInt): BigInt = a - b
+  def negate(a:BigInt): BigInt = -a
+  val one: BigInt = BigInt(1)
+  def plus(a:BigInt, b:BigInt): BigInt = a + b
+  override def pow(a:BigInt, b:Int): BigInt = a pow b
+  override def times(a:BigInt, b:BigInt): BigInt = a * b
+  val zero: BigInt = BigInt(0)
+  
+  override def fromInt(n: Int): BigInt = BigInt(n)
+}
+
+trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] with BigIntIsRing {
+  def quot(a:BigInt, b:BigInt) = a / b
+  def mod(a:BigInt, b:BigInt) = a % b
+  override def quotmod(a:BigInt, b:BigInt) = a /% b
+  def gcd(a:BigInt, b:BigInt) = a.gcd(b)
+}
+
+// This is not included in the *Instances trait!
+trait BigIntIsNRoot extends NRoot[BigInt] {
+  def nroot(a: BigInt, k: Int): BigInt = if (a < 0 && k % 2 == 1) {
+    -nroot(-a, k)
+  } else if (a < 0) {
+    throw new ArithmeticException("Cannot find %d-root of negative number." format k)
+  } else {
+    def findNroot(b: BigInt, i: Int): BigInt = if (i < 0) {
+      b
+    } else {
+      val c = b setBit i
+
+      if ((c pow k) <= a)
+        findNroot(c, i - 1)
+      else
+        findNroot(b, i - 1)
+    }
+
+    findNroot(0, a.bitLength - 1)
+  }
+  def log(a:BigInt) = spire.math.log(BigDecimal(a)).toBigInt
+  def fpow(a:BigInt, b:BigInt) = spire.math.pow(BigDecimal(a), BigDecimal(b)).toBigInt
+}
+
+trait BigIntEq extends Eq[BigInt] {
+  def eqv(x:BigInt, y:BigInt) = x == y
+  override def neqv(x:BigInt, y:BigInt) = x != y
+}
+
+trait BigIntOrder extends Order[BigInt] with BigIntEq {
+  override def gt(x: BigInt, y: BigInt) = x > y
+  override def gteqv(x: BigInt, y: BigInt) = x >= y
+  override def lt(x: BigInt, y: BigInt) = x < y
+  override def lteqv(x: BigInt, y: BigInt) = x <= y
+  override def min(x: BigInt, y: BigInt) = x.min(y)
+  override def max(x: BigInt, y: BigInt) = x.max(y)
+  def compare(x: BigInt, y: BigInt) = x.compare(y)
+}
+
+trait BigIntIsSigned extends Signed[BigInt] {
+  def signum(a: BigInt): Int = a.toInt
+  def abs(a: BigInt): BigInt = a.abs
+}
+
+trait BigIntIsReal extends IsReal[BigInt] with BigIntOrder with BigIntIsSigned {
+  def toDouble(n: BigInt): Double = n.toDouble
+}
+
+trait BigIntInstances {
+  implicit object BigIntAlgebra extends BigIntIsEuclideanRing with BigIntIsNRoot
+  implicit object BigIntIsReal extends BigIntIsReal
+}

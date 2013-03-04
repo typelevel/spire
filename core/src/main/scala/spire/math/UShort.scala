@@ -1,6 +1,8 @@
 package spire.math
 
-object UShort {
+import spire.algebra._
+
+object UShort extends UShortInstances {
   @inline final def apply(n: Char) = new UShort(n)
   @inline final def apply(n: Short) = new UShort(n.toChar)
   @inline final def apply(n: Int) = new UShort(n.toChar)
@@ -55,4 +57,53 @@ class UShort(val signed: Char) extends AnyVal {
   def ^ (that: UShort) = UShort(this.signed ^ that.signed)
 
   def ** (that: UShort) = UShort(pow(this.toLong, that.toLong).toChar)
+}
+
+trait UShortInstances {
+  implicit object UShortAlgebra extends UShortIsRig
+  implicit object UShortBooleanAlgebra extends UShortBooleanAlgebra
+  implicit object UShortIsReal extends UShortIsReal
+}
+
+trait UShortIsRig extends Rig[UShort] {
+  def one: UShort = UShort(1)
+  def plus(a:UShort, b:UShort): UShort = a + b
+  override def pow(a:UShort, b:Int): UShort = {
+    if (b < 0)
+      throw new IllegalArgumentException("negative exponent: %s" format b)
+    a ** UShort(b)
+  }
+  override def times(a:UShort, b:UShort): UShort = a * b
+  def zero: UShort = UShort(0)
+}
+
+trait UShortEq extends Eq[UShort] {
+  def eqv(x:UShort, y:UShort) = x == y
+  override def neqv(x:UShort, y:UShort) = x != y
+}
+
+trait UShortOrder extends Order[UShort] with UShortEq {
+  override def gt(x: UShort, y: UShort) = x > y
+  override def gteqv(x: UShort, y: UShort) = x >= y
+  override def lt(x: UShort, y: UShort) = x < y
+  override def lteqv(x: UShort, y: UShort) = x <= y
+  def compare(x: UShort, y: UShort) = if (x < y) -1 else if (x > y) 1 else 0
+}
+
+trait UShortBooleanAlgebra extends BooleanAlgebra[UShort] {
+  def one: UShort = UShort(-1: Short)
+  def zero: UShort = UShort(0: Short)
+  def and(a: UShort, b: UShort): UShort = a & b
+  def or(a: UShort, b: UShort): UShort = a | b
+  def complement(a: UShort): UShort = ~a
+  override def xor(a: UShort, b: UShort): UShort = a ^ b
+}
+
+trait UShortIsSigned extends Signed[UShort] {
+  def signum(a: UShort): Int = if (a == UShort(0)) 0 else 1
+  def abs(a: UShort): UShort = a
+}
+
+trait UShortIsReal extends IsReal[UShort] with UShortOrder with UShortIsSigned {
+  def toDouble(n: UShort): Double = n.toDouble
 }

@@ -6,7 +6,7 @@ import scala.{specialized => spec}
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-object Gaussian {
+object Gaussian extends GaussianInstances {
   def i[@spec(Int, Long) T](implicit f: Integral[T]) =
     new Gaussian(f.zero, f.one)
 
@@ -109,4 +109,59 @@ final case class Gaussian[@spec(Int, Long) T](real: T, imag: T)(implicit f: Inte
 
     recur(this, n, Gaussian.one[T])
   }
+}
+
+trait GaussianInstances {
+  implicit def GaussianAlgebra[A: Integral] = new GaussianAlgebra[A] {
+    val f = Integral[A]
+    def scalar = f
+  }
+
+  implicit def GaussianEq[A] = new GaussianEq[A] {}
+
+  implicit def GaussianIsSigned[A: Integral: NRoot] =
+    new GaussianIsSigned[A] {
+      val f = Integral[A]
+      val n = NRoot[A]
+    }
+}
+
+trait GaussianIsRing[@spec(Int, Long) A] extends Ring[Gaussian[A]] {
+  implicit def f:Integral[A]
+
+  override def minus(a:Gaussian[A], b:Gaussian[A]): Gaussian[A] = a - b
+  def negate(a:Gaussian[A]): Gaussian[A] = -a
+  def one: Gaussian[A] = Gaussian.one[A]
+  def plus(a:Gaussian[A], b:Gaussian[A]): Gaussian[A] = a + b
+  override def pow(a:Gaussian[A], b:Int):Gaussian[A] = a.pow(b)
+  override def times(a:Gaussian[A], b:Gaussian[A]): Gaussian[A] = a * b
+  def zero: Gaussian[A] = Gaussian.zero[A]
+
+  override def fromInt(n: Int): Gaussian[A] = Gaussian.fromInt[A](n)
+}
+
+trait GaussianIsEuclideanRing[@spec(Int, Long) A]
+extends GaussianIsRing[A] with EuclideanRing[Gaussian[A]] {
+  def quot(a:Gaussian[A], b:Gaussian[A]) = a / b
+  def mod(a:Gaussian[A], b:Gaussian[A]) = a % b
+  override def quotmod(a:Gaussian[A], b:Gaussian[A]) = a /% b
+  def gcd(a: Gaussian[A], b: Gaussian[A]): Gaussian[A] = euclid(a, b)(Eq[Gaussian[A]])
+}
+
+trait GaussianEq[A] extends Eq[Gaussian[A]] {
+  def eqv(x:Gaussian[A], y:Gaussian[A]) = x eqv y
+  override def neqv(x:Gaussian[A], y:Gaussian[A]) = x neqv y
+}
+
+trait GaussianIsSigned[A] extends Signed[Gaussian[A]] {
+  implicit def f: Integral[A]
+  implicit def n: NRoot[A]
+  def signum(a: Gaussian[A]): Int = a.signum
+  def abs(a: Gaussian[A]): Gaussian[A] = Gaussian[A](n.sqrt(a.norm), f.zero)
+}
+
+trait GaussianAlgebra[@spec(Int, Long) A] extends GaussianIsEuclideanRing[A]
+with Module[Gaussian[A], A] with RingAlgebra[Gaussian[A], A] {
+  def timesl(r: A, v: Gaussian[A]): Gaussian[A] =
+    Gaussian(r, scalar.zero) * v
 }

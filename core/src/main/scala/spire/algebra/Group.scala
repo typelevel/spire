@@ -1,7 +1,5 @@
 package spire.algebra
 
-import spire.macrosk.Ops
-
 import scala.{ specialized => spec }
 
 /**
@@ -11,7 +9,7 @@ trait Group[@spec(Int,Long,Float,Double) A] extends Monoid[A] {
   def inverse(a: A): A
 }
 
-object Group extends Group1 {
+object Group {
   @inline final def apply[A](implicit ev: Group[A]) = ev
 
   @inline final def additive[A](implicit A: AdditiveGroup[A]) =  A.additive
@@ -24,24 +22,10 @@ object Group extends Group1 {
  */
 trait AbGroup[@spec(Int,Long,Float,Double) A] extends Group[A]
 
-object AbGroup extends AbGroupProductImplicits {
+object AbGroup {
   @inline final def apply[A](implicit ev: AbGroup[A]) = ev
 
   @inline final def additive[A](implicit A: AdditiveAbGroup[A]) =  A.additive
 
   @inline final def multiplicative[A](implicit A: MultiplicativeAbGroup[A]) = A.multiplicative
-}
-
-final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
-  def inverse() = macro Ops.unop[A]
-}
-
-trait Group0 {
-  implicit def MapGroup[K, V: Group] = new MapGroup[K, V] {
-    val scalar = Group[V]
-  }
-}
-
-trait Group1 extends GroupProductImplicits {
-  implicit def abGroup[A: AbGroup]: Group[A] = AbGroup[A]
 }

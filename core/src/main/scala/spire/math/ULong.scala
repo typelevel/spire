@@ -2,7 +2,9 @@ package spire.math
 
 import scala.annotation.tailrec
 
-object ULong {
+import spire.algebra._
+
+object ULong extends ULongInstances {
   @inline final def apply(n: Long): ULong = new ULong(n)
 
   final def fromInt(n: Int): ULong = new ULong(n & 0xffffffffL)
@@ -106,4 +108,53 @@ class ULong(val signed: Long) extends AnyVal {
   final def ** (that: ULong) = ULong.pow(1L, this.signed, that.signed)
 
   final def gcd (that: ULong) = ULong.gcd(this, that)
+}
+
+trait ULongInstances {
+  implicit object ULongAlgebra extends ULongIsRig
+  implicit object ULongBooleanAlgebra extends ULongBooleanAlgebra
+  implicit object ULongIsReal extends ULongIsReal
+}
+
+trait ULongIsRig extends Rig[ULong] {
+  def one: ULong = ULong(1)
+  def plus(a:ULong, b:ULong): ULong = a + b
+  override def pow(a:ULong, b:Int): ULong = {
+    if (b < 0)
+      throw new IllegalArgumentException("negative exponent: %s" format b)
+    a ** ULong(b)
+  }
+  override def times(a:ULong, b:ULong): ULong = a * b
+  def zero: ULong = ULong(0)
+}
+
+trait ULongEq extends Eq[ULong] {
+  def eqv(x:ULong, y:ULong) = x == y
+  override def neqv(x:ULong, y:ULong) = x != y
+}
+
+trait ULongOrder extends Order[ULong] with ULongEq {
+  override def gt(x: ULong, y: ULong) = x > y
+  override def gteqv(x: ULong, y: ULong) = x >= y
+  override def lt(x: ULong, y: ULong) = x < y
+  override def lteqv(x: ULong, y: ULong) = x <= y
+  def compare(x: ULong, y: ULong) = if (x < y) -1 else if (x > y) 1 else 0
+}
+
+trait ULongBooleanAlgebra extends BooleanAlgebra[ULong] {
+  def one: ULong = ULong(-1L)
+  def zero: ULong = ULong(0L)
+  def and(a: ULong, b: ULong): ULong = a & b
+  def or(a: ULong, b: ULong): ULong = a | b
+  def complement(a: ULong): ULong = ~a
+  override def xor(a: ULong, b: ULong): ULong = a ^ b
+}
+
+trait ULongIsSigned extends Signed[ULong] {
+  def signum(a: ULong): Int = if (a == ULong(0)) 0 else 1
+  def abs(a: ULong): ULong = a
+}
+
+trait ULongIsReal extends IsReal[ULong] with ULongOrder with ULongIsSigned {
+  def toDouble(n: ULong): Double = n.toDouble
 }

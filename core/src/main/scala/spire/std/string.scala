@@ -1,8 +1,18 @@
-package spire.algebra
+package spire.std
+
+import spire.algebra._
 
 trait StringMonoid extends Monoid[String] {
   def id = ""
   def op(x: String, y: String): String = x + y
+}
+
+trait StringEq extends Eq[String] {
+  def eqv(x: String, y: String): Boolean = x == y
+}
+
+trait StringOrder extends StringEq with Order[String] {
+  def compare(x: String, y: String): Int = x.compareTo(y)
 }
 
 object LevenshteinDistance extends MetricSpace[String, Int] {
@@ -39,4 +49,13 @@ object LevenshteinDistance extends MetricSpace[String, Int] {
 
     row0(b.length)
   }
+}
+
+trait StringInstances0 {
+  implicit def levenshteinDistance: MetricSpace[String, Int] = LevenshteinDistance
+}
+
+trait StringInstances extends StringInstances0 {
+  implicit object StringAlgebra extends StringMonoid
+  implicit object StringOrder extends StringOrder
 }

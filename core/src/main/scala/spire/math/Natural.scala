@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.algebra._
+
 import scala.annotation.tailrec
 import scala.{specialized => spec}
 
@@ -509,7 +511,7 @@ sealed trait Natural {
 
 // TODO: maybe split apply into apply() and fromX()
 // this way we can protect end-users from sign problems
-object Natural {
+object Natural extends NaturalInstances {
   private[math] final val denom = UInt(1000000000)
 
   implicit def naturalToBigInt(n: Natural): BigInt = n.toBigInt
@@ -531,6 +533,9 @@ object Natural {
     End(UInt(n.toLong))
   else
     Digit(UInt((n & 0xffffffffL).toLong), apply(n >> 32))
+
+  val zero: Natural = apply(0L)
+  val one: Natural = apply(1L)
 
   case class Digit(d: UInt, tl: Natural) extends Natural {
     def digit: UInt = d
@@ -632,4 +637,44 @@ object Natural {
 
     def /%(n: UInt): (Natural, Natural) = (this / n, this % n)
   }
+}
+
+trait NaturalInstances {
+  implicit object NaturalAlgebra extends NaturalIsRig
+  implicit object NaturalIsReal extends NaturalIsReal
+}
+
+trait NaturalIsRig extends Rig[Natural] {
+  def one: Natural = Natural(1L)
+  def plus(a:Natural, b:Natural): Natural = a + b
+  override def pow(a:Natural, b:Int): Natural = {
+    if (b < 0)
+      throw new IllegalArgumentException("negative exponent: %s" format b)
+    a pow UInt(b)
+  }
+  override def times(a:Natural, b:Natural): Natural = a * b
+  def zero: Natural = Natural(0L)
+}
+
+trait NaturalEq extends Eq[Natural] {
+  def eqv(x: Natural, y: Natural) = x == y
+  override def neqv(x: Natural, y: Natural) = x != y
+}
+
+trait NaturalOrder extends Order[Natural] with NaturalEq {
+  override def gt(x: Natural, y: Natural) = x > y
+  override def gteqv(x: Natural, y: Natural) = x >= y
+  override def lt(x: Natural, y: Natural) = x < y
+  override def lteqv(x: Natural, y: Natural) = x <= y
+  def compare(x: Natural, y: Natural) = x.compare(y)
+}
+
+trait NaturalIsSigned extends Signed[Natural] {
+  def signum(a: Natural): Int = if (a == Natural.zero) 0 else 1
+  def abs(a: Natural): Natural = a
+}
+
+trait NaturalIsReal extends IsReal[Natural]
+with NaturalOrder with NaturalIsSigned {
+  def toDouble(n: Natural): Double = n.toDouble
 }

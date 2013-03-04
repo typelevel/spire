@@ -5,6 +5,7 @@ import scala.annotation.tailrec
 import scala.{specialized => spec}
 
 import spire.algebra._
+import spire.std._
 import spire.math._
 import spire.macrosk._
 
@@ -394,8 +395,11 @@ object NoImplicit {
   implicit def noImplicit1[A](implicit ev: A) = new NoImplicit[A]
 }
 
-object implicits {
+object implicits extends AnyInstances with OpsImplicits
 
+object ops extends OpsImplicits
+
+trait OpsImplicits {
   implicit def additiveMonoidOps[A:AdditiveSemigroup](a:A) = new AdditiveSemigroupOps(a)
   implicit def additiveGroupOps[A:AdditiveGroup](a:A) = new AdditiveGroupOps(a)
   implicit def multiplicativeSemigroupOps[A:MultiplicativeSemigroup](a:A) = new MultiplicativeSemigroupOps(a)
@@ -434,7 +438,6 @@ object implicits {
   implicit def intToA[A](n:Int)(implicit c:ConvertableTo[A]): A = c.fromInt(n)
   implicit def convertableOps[A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
   implicit def conversionOps[A](a: A) = new ConversionOps(a)
-
 }
 
 object syntax {
