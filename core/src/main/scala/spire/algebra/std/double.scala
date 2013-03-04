@@ -33,6 +33,7 @@ trait DoubleIsEuclideanRing extends EuclideanRing[Double] with DoubleIsRing {
 }
 
 trait DoubleIsField extends Field[Double] with DoubleIsEuclideanRing {
+  override def fromDouble(n: Double): Double = n
   def div(a:Double, b:Double) = a / b
   def ceil(a:Double): Double = Math.floor(a)
   def floor(a:Double): Double = Math.floor(a)

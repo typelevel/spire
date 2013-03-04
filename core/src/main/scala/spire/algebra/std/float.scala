@@ -33,6 +33,7 @@ trait FloatIsEuclideanRing extends EuclideanRing[Float] with FloatIsRing {
 }
 
 trait FloatIsField extends Field[Float] with FloatIsEuclideanRing {
+  override def fromDouble(n: Double): Float = n.toFloat
   def div(a:Float, b:Float) = a / b
   def ceil(a:Float): Float = Math.floor(a).toFloat
   def floor(a:Float): Float = Math.floor(a).toFloat

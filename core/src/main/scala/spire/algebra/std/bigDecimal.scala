@@ -36,6 +36,7 @@ trait BigDecimalIsEuclideanRing extends EuclideanRing[BigDecimal] with BigDecima
 }
 
 trait BigDecimalIsField extends Field[BigDecimal] with BigDecimalIsEuclideanRing {
+  override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
   def div(a:BigDecimal, b:BigDecimal) = a / b
   def ceil(a:BigDecimal): BigDecimal = a.setScale(0, CEILING)
   def floor(a:BigDecimal): BigDecimal = a.setScale(0, FLOOR)

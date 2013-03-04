@@ -848,6 +848,7 @@ trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRin
 }
 
 trait RationalIsField extends Field[Rational] with RationalIsEuclideanRing {
+  override def fromDouble(n: Double): Rational = Rational(n)
   def div(a:Rational, b:Rational) = a / b
   def ceil(a:Rational): Rational = a.ceil
   def floor(a:Rational): Rational = a.floor

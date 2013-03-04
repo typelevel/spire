@@ -106,6 +106,7 @@ trait RealIsEuclideanRing extends EuclideanRing[Real] with RealIsRing {
 }
 
 trait RealIsField extends Field[Real] with RealIsEuclideanRing {
+  override def fromDouble(n: Double): Real = Real(n)
   def div(a:Real, b:Real) = a / b
   def ceil(a:Real) = if (a % 1 == 0) a else a + 1 - (a % 1)
   def floor(a:Real) = a - (a % 1)

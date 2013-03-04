@@ -550,6 +550,7 @@ extends ComplexIsRing[A] with EuclideanRing[Complex[A]] {
 
 trait ComplexIsField[@spec(Float,Double) A]
 extends ComplexIsEuclideanRing[A] with Field[Complex[A]] {
+  override def fromDouble(n: Double): Complex[A] = Complex(f.fromDouble(n))
   def div(a:Complex[A], b:Complex[A]) = a / b
   def ceil(a:Complex[A]): Complex[A] = a.ceil
   def floor(a:Complex[A]): Complex[A] = a.floor
