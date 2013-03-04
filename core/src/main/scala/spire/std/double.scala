@@ -49,6 +49,29 @@ trait DoubleIsNRoot extends NRoot[Double] {
   def fpow(a: Double, b: Double) = Math.pow(a, b)
 }
 
+trait DoubleIsTrig extends Trig[Double] {
+  def e: Double = JavaMath.E
+  def pi: Double = JavaMath.PI
+
+  def exp(a: Double): Double = JavaMath.exp(a)
+
+  def sin(a: Double): Double = JavaMath.sin(a)
+  def cos(a: Double): Double = JavaMath.cos(a)
+  def tan(a: Double): Double = JavaMath.tan(a)
+
+  def asin(a: Double): Double = JavaMath.asin(a)
+  def acos(a: Double): Double = JavaMath.acos(a)
+  def atan(a: Double): Double = JavaMath.atan(a)
+  def atan2(y: Double, x: Double): Double = JavaMath.atan2(y, x)
+
+  def sinh(x: Double): Double = JavaMath.sinh(x)
+  def cosh(x: Double): Double = JavaMath.cosh(x)
+  def tanh(x: Double): Double = JavaMath.tanh(x)
+
+  def toRadians(a: Double): Double = (a * 2 * pi) / 360
+  def toDegrees(a: Double): Double = (a * 360) / (2 * pi)
+}
+
 trait DoubleEq extends Eq[Double] {
   def eqv(x:Double, y:Double) = x == y
   override def neqv(x:Double, y:Double) = x != y
@@ -74,6 +97,6 @@ trait DoubleIsReal extends IsReal[Double] with DoubleOrder with DoubleIsSigned {
 }
 
 trait DoubleInstances {
-  implicit object DoubleAlgebra extends DoubleIsField with DoubleIsNRoot
+  implicit object DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig
   implicit object DoubleIsReal extends DoubleIsReal
 }
