@@ -170,6 +170,11 @@ object ProductTypes {
     "  def eqv(x0: (%s), x1: (%s)): Boolean = %s" format (types, types, bool)
   }
 
+  private val overrideEqv: Block = { tpe =>
+    import tpe._
+    "  override def eqv(x0: (%s), x1: (%s)): Boolean = super.eqv(x0, x1)" format (types, types)
+  }
+
   private val compare: Block = { tpe =>
     import tpe._
 
@@ -192,7 +197,7 @@ object ProductTypes {
   }
 
   val eq = Definition("Eq")(eqv :: Nil)
-  val order = Definition("Order", Some("Eq"))(compare :: Nil)
+  val order = Definition("Order", Some("Eq"))(compare :: overrideEqv :: Nil)
 
   val algebra = List(semigroup, monoid, group, abGroup, semiring, rng, rig, ring, euclideanRing, field, eq, order)
 

@@ -368,12 +368,9 @@ trait SafeLongIsNRoot extends NRoot[SafeLong] {
     SafeLong(NRoot[BigInt].fpow(a.toBigInt, b.toBigInt))
 }
 
-trait SafeLongEq extends Eq[SafeLong] {
-  def eqv(x: SafeLong, y: SafeLong) = x == y
+trait SafeLongOrder extends Order[SafeLong] {
+  override def eqv(x: SafeLong, y: SafeLong) = x == y
   override def neqv(x: SafeLong, y: SafeLong) = x != y
-}
-
-trait SafeLongOrder extends Order[SafeLong] with SafeLongEq {
   override def gt(x: SafeLong, y: SafeLong) = x > y
   override def gteqv(x: SafeLong, y: SafeLong) = x >= y
   override def lt(x: SafeLong, y: SafeLong) = x < y

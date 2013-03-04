@@ -2,7 +2,7 @@ package spire.std
 
 import spire.algebra._
 
-trait LongIsRing extends Ring[Long] {
+trait LongIsEuclideanRing extends EuclideanRing[Long] {
   override def minus(a:Long, b:Long): Long = a - b
   def negate(a:Long): Long = -a
   def one: Long = 1L
@@ -25,17 +25,10 @@ trait LongIsRing extends Ring[Long] {
   def zero: Long = 0L
   
   override def fromInt(n: Int): Long = n
-}
 
-trait LongIsEuclideanRing extends EuclideanRing[Long] with LongIsRing {
   def quot(a:Long, b:Long) = a / b
   def mod(a:Long, b:Long) = a % b
   def gcd(a:Long, b:Long) = spire.math.gcd(a, b)
-}
-
-trait LongEq extends Eq[Long] {
-  def eqv(x:Long, y:Long) = x == y
-  override def neqv(x:Long, y:Long) = x != y
 }
 
 // Not included in Instances trait!
@@ -60,7 +53,9 @@ trait LongIsNRoot extends NRoot[Long] {
   def fpow(a:Long, b:Long) = spire.math.pow(a, b) // xyz
 }
 
-trait LongOrder extends Order[Long] with LongEq {
+trait LongOrder extends Order[Long] {
+  override def eqv(x:Long, y:Long) = x == y
+  override def neqv(x:Long, y:Long) = x != y
   override def gt(x: Long, y: Long) = x > y
   override def gteqv(x: Long, y: Long) = x >= y
   override def lt(x: Long, y: Long) = x < y

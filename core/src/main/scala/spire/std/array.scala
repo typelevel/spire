@@ -138,8 +138,10 @@ trait ArrayVectorEq[@spec(Int,Long,Float,Double) A] extends Eq[Array[A]] {
   }
 }
 
-trait ArrayOrder[@spec(Int,Long,Float,Double) A] extends ArrayEq[A] with Order[Array[A]] {
+trait ArrayOrder[@spec(Int,Long,Float,Double) A] extends Order[Array[A]] with ArrayEq[A] {
   implicit def A: Order[A]
+
+  override def eqv(x: Array[A], y: Array[A]): Boolean = super.eqv(x, y)
 
   def compare(x: Array[A], y: Array[A]): Int = {
     var i = 0
@@ -152,8 +154,10 @@ trait ArrayOrder[@spec(Int,Long,Float,Double) A] extends ArrayEq[A] with Order[A
   }
 }
 
-trait ArrayVectorOrder[@spec(Int,Long,Float,Double) A] extends ArrayVectorEq[A] with Order[Array[A]] {
+trait ArrayVectorOrder[@spec(Int,Long,Float,Double) A] extends Order[Array[A]] with ArrayVectorEq[A] {
   implicit def A: Order[A]
+
+  override def eqv(x: Array[A], y: Array[A]): Boolean = super.eqv(x, y)
 
   def compare(x: Array[A], y: Array[A]): Int = {
     var i = 0

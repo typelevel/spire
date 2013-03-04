@@ -6,7 +6,7 @@ import java.lang.{ Math => JavaMath }
 
 import scala.annotation.tailrec
 
-trait FloatIsRing extends Ring[Float] {
+trait FloatIsField extends Field[Float] {
   override def minus(a:Float, b:Float): Float = a - b
   def negate(a:Float): Float = -a
   def one: Float = 1.0F
@@ -16,9 +16,7 @@ trait FloatIsRing extends Ring[Float] {
   def zero: Float = 0.0F
   
   override def fromInt(n: Int): Float = n
-}
 
-trait FloatIsEuclideanRing extends EuclideanRing[Float] with FloatIsRing {
   def quot(a:Float, b:Float) = (a - (a % b)) / b
   def mod(a:Float, b:Float) = a % b
   def gcd(a:Float, b:Float):Float = _gcd(Math.abs(a), Math.abs(b))
@@ -31,10 +29,9 @@ trait FloatIsEuclideanRing extends EuclideanRing[Float] with FloatIsRing {
   } else {
     _gcd(b, a % b)
   }
-}
 
-trait FloatIsField extends Field[Float] with FloatIsEuclideanRing {
   override def fromDouble(n: Double): Float = n.toFloat
+
   def div(a:Float, b:Float) = a / b
   def ceil(a:Float): Float = Math.floor(a).toFloat
   def floor(a:Float): Float = Math.floor(a).toFloat
@@ -77,12 +74,9 @@ trait FloatIsSigned extends Signed[Float] {
   def abs(a: Float): Float = if (a < 0.0f) -a else a
 }
 
-trait FloatEq extends Eq[Float] {
-  def eqv(x:Float, y:Float) = x == y
+trait FloatOrder extends Order[Float] {
+  override def eqv(x:Float, y:Float) = x == y
   override def neqv(x:Float, y:Float) = x != y
-}
-
-trait FloatOrder extends Order[Float] with FloatEq {
   override def gt(x: Float, y: Float) = x > y
   override def gteqv(x: Float, y: Float) = x >= y
   override def lt(x: Float, y: Float) = x < y

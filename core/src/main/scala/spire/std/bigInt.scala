@@ -45,12 +45,9 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
   def fpow(a:BigInt, b:BigInt) = spire.math.pow(BigDecimal(a), BigDecimal(b)).toBigInt
 }
 
-trait BigIntEq extends Eq[BigInt] {
-  def eqv(x:BigInt, y:BigInt) = x == y
+trait BigIntOrder extends Order[BigInt] {
+  override def eqv(x:BigInt, y:BigInt) = x == y
   override def neqv(x:BigInt, y:BigInt) = x != y
-}
-
-trait BigIntOrder extends Order[BigInt] with BigIntEq {
   override def gt(x: BigInt, y: BigInt) = x > y
   override def gteqv(x: BigInt, y: BigInt) = x >= y
   override def lt(x: BigInt, y: BigInt) = x < y

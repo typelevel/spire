@@ -73,12 +73,9 @@ trait UByteIsRig extends Rig[UByte] {
   def zero: UByte = UByte(0)
 }
 
-trait UByteEq extends Eq[UByte] {
-  def eqv(x:UByte, y:UByte) = x == y
+trait UByteOrder extends Order[UByte] {
+  override def eqv(x:UByte, y:UByte) = x == y
   override def neqv(x:UByte, y:UByte) = x != y
-}
-
-trait UByteOrder extends Order[UByte] with UByteEq {
   override def gt(x: UByte, y: UByte) = x > y
   override def gteqv(x: UByte, y: UByte) = x >= y
   override def lt(x: UByte, y: UByte) = x < y

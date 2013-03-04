@@ -23,8 +23,13 @@ trait OptionEq[A] extends Eq[Option[A]] {
   }
 }
 
-trait OptionOrder[A] extends OptionEq[A] with Order[Option[A]] {
+trait OptionOrder[A] extends Order[Option[A]] with OptionEq[A] {
   def A: Order[A]
+  override def eqv(x: Option[A], y: Option[A]) = (x, y) match {
+    case (Some(x), Some(y)) => A.eqv(x, y)
+    case (None, None) => true
+    case _ => false
+  }
   def compare(x: Option[A], y: Option[A]): Int = {
     (x, y) match {
       case (None, None) => 0

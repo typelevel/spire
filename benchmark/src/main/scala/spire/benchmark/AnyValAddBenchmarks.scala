@@ -17,7 +17,7 @@ object AnyValAddBenchmarks extends MyRunner(classOf[AnyValAddBenchmarks])
 
 class AnyValAddBenchmarks extends MyBenchmark {
   //@Param(Array("1000000", "2000000", "4000000", "8000000", "16000000"))
-  @Param(Array("4000000"))
+  @Param(Array("1000000", "2000000", "4000000"))
   var size:Int = 0
 
   var bytes:Array[Byte] = null
@@ -92,16 +92,16 @@ class AnyValAddBenchmarks extends MyBenchmark {
     total
   }
 
-  //def timeAddBytesDirect(reps:Int) = run(reps)(addBytesDirect(bytes))
-  //def timeAddBytesGeneric(reps:Int) = run(reps)(addGeneric(bytes))
-  //def timeAddShortsDirect(reps:Int) = run(reps)(addShortsDirect(shorts))
-  //def timeAddShortsGeneric(reps:Int) = run(reps)(addGeneric(shorts))
+  def timeAddBytesDirect(reps:Int) = run(reps)(addBytesDirect(bytes))
+  def timeAddBytesGeneric(reps:Int) = run(reps)(addGeneric(bytes))
+  def timeAddShortsDirect(reps:Int) = run(reps)(addShortsDirect(shorts))
+  def timeAddShortsGeneric(reps:Int) = run(reps)(addGeneric(shorts))
   def timeAddIntsDirect(reps:Int) = run(reps)(addIntsDirect(ints))
   def timeAddIntsGeneric(reps:Int) = run(reps)(addGeneric(ints))
-  //def timeAddLongsDirect(reps:Int) = run(reps)(addLongsDirect(longs))
-  //def timeAddLongsGeneric(reps:Int) = run(reps)(addGeneric(longs))
-  //def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
-  //def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
-  //def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
-  //def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
+  def timeAddLongsDirect(reps:Int) = run(reps)(addLongsDirect(longs))
+  def timeAddLongsGeneric(reps:Int) = run(reps)(addGeneric(longs))
+  def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
+  def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
+  def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
+  def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
 }

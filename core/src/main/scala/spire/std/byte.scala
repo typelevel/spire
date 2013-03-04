@@ -2,7 +2,7 @@ package spire.std
 
 import spire.algebra._
 
-trait ByteIsRing extends Ring[Byte] {
+trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
   override def minus(a:Byte, b:Byte): Byte = (a - b).toByte
   def negate(a:Byte): Byte = (-a).toByte
   def one: Byte = 1.toByte
@@ -12,6 +12,10 @@ trait ByteIsRing extends Ring[Byte] {
   def zero: Byte = 0.toByte
   
   override def fromInt(n: Int): Byte = n.toByte
+
+  def quot(a: Byte, b: Byte) = (a / b).toByte
+  def mod(a: Byte, b: Byte) = (a % b).toByte
+  def gcd(a: Byte, b: Byte): Byte = spire.math.gcd(a, b).toByte
 }
 
 trait ByteIsSigned extends Signed[Byte] {
@@ -19,12 +23,9 @@ trait ByteIsSigned extends Signed[Byte] {
   def abs(a: Byte): Byte = (if (a < 0) -a else a).toByte
 }
 
-trait ByteEq extends Eq[Byte] {
-  def eqv(x:Byte, y:Byte) = x == y
+trait ByteOrder extends Order[Byte] {
+  override def eqv(x:Byte, y:Byte) = x == y
   override def neqv(x:Byte, y:Byte) = x != y
-}
-
-trait ByteOrder extends Order[Byte] with ByteEq {
   override def gt(x: Byte, y: Byte) = x > y
   override def gteqv(x: Byte, y: Byte) = x >= y
   override def lt(x: Byte, y: Byte) = x < y
@@ -47,6 +48,6 @@ trait ByteIsBooleanAlgebra extends BooleanAlgebra[Byte] {
 
 trait ByteInstances {
   implicit object ByteBooleanAlgebra extends ByteIsBooleanAlgebra
-  implicit object ByteAlgebra extends ByteIsRing
+  implicit object ByteAlgebra extends ByteIsEuclideanRing
   implicit object ByteIsReal extends ByteIsReal
 }

@@ -863,12 +863,9 @@ trait RationalIsNRoot extends NRoot[Rational] {
   def fpow(a: Rational, b: Rational): Rational = a.pow(b)
 }
 
-trait RationalEq extends Eq[Rational] {
-  def eqv(x:Rational, y:Rational) = x == y
+trait RationalOrder extends Order[Rational] {
+  override def eqv(x:Rational, y:Rational) = x == y
   override def neqv(x:Rational, y:Rational) = x != y
-}
-
-trait RationalOrder extends Order[Rational] with RationalEq {
   override def gt(x: Rational, y: Rational) = x > y
   override def gteqv(x: Rational, y: Rational) = x >= y
   override def lt(x: Rational, y: Rational) = x < y

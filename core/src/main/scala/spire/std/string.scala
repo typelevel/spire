@@ -7,11 +7,9 @@ trait StringMonoid extends Monoid[String] {
   def op(x: String, y: String): String = x + y
 }
 
-trait StringEq extends Eq[String] {
-  def eqv(x: String, y: String): Boolean = x == y
-}
-
-trait StringOrder extends StringEq with Order[String] {
+trait StringOrder extends Order[String] {
+  override def eqv(x: String, y: String): Boolean = x == y
+  override def neqv(x: String, y: String): Boolean = x != y
   def compare(x: String, y: String): Int = x.compareTo(y)
 }
 

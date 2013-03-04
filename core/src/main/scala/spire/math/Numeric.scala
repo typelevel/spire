@@ -110,12 +110,13 @@ with Order[Complex[A]] with ComplexIsSigned[A] {
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
   override def fromDouble(n: Double): Complex[A] = Complex[A](f.fromDouble(n))
 
+  override def eqv(x: Complex[A], y: Complex[A]): Boolean = x == y
   override def nroot(a: Complex[A], n: Int) = a.pow(reciprocal(fromInt(n)))
   override def gt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   override def gteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   override def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   override def lteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  def compare(x:Complex[A], y:Complex[A]) = if (x eqv y) 0 else sys.error("undefined")
+  def compare(x:Complex[A], y:Complex[A]): Int = if (x eqv y) 0 else sys.error("undefined")
 
   def log(a:Complex[A]) = a.log
   def fpow(a:Complex[A], b:Complex[A]) = a.pow(b)
@@ -132,6 +133,7 @@ with ConvertableFromGaussian[A] with ConvertableToGaussian[A] {
 
   override def nroot(a: Gaussian[A], n: Int) = sys.error("undefined")
 
+  override def eqv(x: Gaussian[A], y: Gaussian[A]): Boolean = x == y
   override def gt(x:Gaussian[A], y:Gaussian[A]) = sys.error("undefined")
   override def gteqv(x:Gaussian[A], y:Gaussian[A]) = sys.error("undefined")
   override def lt(x:Gaussian[A], y:Gaussian[A]) = sys.error("undefined")

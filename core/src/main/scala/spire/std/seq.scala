@@ -192,8 +192,10 @@ trait SeqEq[A, SA <: SeqLike[A, SA]] extends Eq[SA] {
   def eqv(x: SA, y: SA): Boolean = forall[A, SA](x, y)(A.eqv(_, _))
 }
 
-trait SeqOrder[A, SA <: SeqLike[A, SA]] extends SeqEq[A, SA] with Order[SA] {
+trait SeqOrder[A, SA <: SeqLike[A, SA]] extends Order[SA] with SeqEq[A, SA] {
   def A: Order[A]
+
+  override def eqv(x: SA, y: SA): Boolean = super.eqv(x, y)
 
   def compare(x: SA, y: SA): Int = {
     @tailrec
@@ -226,8 +228,10 @@ trait SeqVectorEq[A, SA <: SeqLike[A, SA]] extends Eq[SA] {
   def eqv(x: SA, y: SA): Boolean = forall[A, SA](x, y)(A.eqv(_, _), A.eqv(_, scalar.zero))
 }
 
-trait SeqVectorOrder[A, SA <: SeqLike[A, SA]] extends SeqVectorEq[A, SA] with Order[SA] {
+trait SeqVectorOrder[A, SA <: SeqLike[A, SA]] extends Order[SA] with SeqVectorEq[A, SA] {
   def A: Order[A]
+
+  override def eqv(x: SA, y: SA): Boolean = super.eqv(x, y)
 
   def compare(x: SA, y: SA): Int = {
     @tailrec

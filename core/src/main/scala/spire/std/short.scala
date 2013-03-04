@@ -2,7 +2,7 @@ package spire.std
 
 import spire.algebra._
 
-trait ShortIsRing extends Ring[Short] {
+trait ShortIsEuclideanRing extends EuclideanRing[Short] {
   override def minus(a:Short, b:Short): Short = (a - b).toShort
   def negate(a:Short): Short = (-a).toShort
   def one: Short = 1.toShort
@@ -12,14 +12,15 @@ trait ShortIsRing extends Ring[Short] {
   def zero: Short = 0.toShort
   
   override def fromInt(n: Int): Short = n.toShort
+
+  def quot(a: Short, b: Short) = (a / b).toShort
+  def mod(a: Short, b: Short) = (a % b).toShort
+  def gcd(a: Short, b: Short): Short = spire.math.gcd(a, b).toShort
 }
 
-trait ShortEq extends Eq[Short] {
-  def eqv(x:Short, y:Short) = x == y
+trait ShortOrder extends Order[Short] {
+  override def eqv(x:Short, y:Short) = x == y
   override def neqv(x:Short, y:Short) = x != y
-}
-
-trait ShortOrder extends Order[Short] with ShortEq {
   override def gt(x: Short, y: Short) = x > y
   override def gteqv(x: Short, y: Short) = x >= y
   override def lt(x: Short, y: Short) = x < y
@@ -47,6 +48,6 @@ trait ShortIsBooleanAlgebra extends BooleanAlgebra[Short] {
 
 trait ShortInstances {
   implicit object ShortBooleanAlgebra extends ShortIsBooleanAlgebra
-  implicit object ShortAlgebra extends ShortIsRing
+  implicit object ShortAlgebra extends ShortIsEuclideanRing
   implicit object ShortIsReal extends ShortIsReal
 }

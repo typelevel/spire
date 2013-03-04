@@ -76,12 +76,9 @@ trait UIntIsRig extends Rig[UInt] {
   def zero: UInt = UInt(0)
 }
 
-trait UIntEq extends Eq[UInt] {
-  def eqv(x:UInt, y:UInt) = x == y
+trait UIntOrder extends Order[UInt] {
+  override def eqv(x:UInt, y:UInt) = x == y
   override def neqv(x:UInt, y:UInt) = x != y
-}
-
-trait UIntOrder extends Order[UInt] with UIntEq {
   override def gt(x: UInt, y: UInt) = x > y
   override def gteqv(x: UInt, y: UInt) = x >= y
   override def lt(x: UInt, y: UInt) = x < y

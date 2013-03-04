@@ -223,12 +223,9 @@ class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends 
   }
 }
 
-trait BigDecimalEq extends Eq[BigDecimal] {
-  def eqv(x:BigDecimal, y:BigDecimal) = x == y
+trait BigDecimalOrder extends Order[BigDecimal] {
+  override def eqv(x:BigDecimal, y:BigDecimal) = x == y
   override def neqv(x:BigDecimal, y:BigDecimal) = x != y
-}
-
-trait BigDecimalOrder extends Order[BigDecimal] with BigDecimalEq {
   override def gt(x: BigDecimal, y: BigDecimal) = x > y
   override def gteqv(x: BigDecimal, y: BigDecimal) = x >= y
   override def lt(x: BigDecimal, y: BigDecimal) = x < y

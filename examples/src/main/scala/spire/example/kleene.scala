@@ -343,7 +343,6 @@ object KleeneDemo {
   }
 
   implicit def tropicalHasOrder[A](implicit ord: Order[A]) = new Order[Tropical[A]] {
-    def eqv(x: Tropical[A], y: Tropical[A]) = compare(x, y) == 0
     def compare(x: Tropical[A], y: Tropical[A]) = (x, y) match {
       case (Infinity(), Infinity()) => 0
       case (Infinity(), _) => 1

@@ -123,12 +123,9 @@ trait RealIsNRoot extends NRoot[Real] {
   def fpow(a:Real, b:Real) = sys.error("fixme")
 }
 
-trait RealEq extends Eq[Real] {
-  def eqv(x: Real, y: Real) = (x - y).sign == Zero
+trait RealOrder extends Order[Real] {
+  override def eqv(x: Real, y: Real) = (x - y).sign == Zero
   override def neqv(x: Real, y: Real) = (x - y).sign != Zero
-}
-
-trait RealOrder extends Order[Real] with RealEq {
   def compare(x: Real, y: Real) = (x - y).signum
 }
 

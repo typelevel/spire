@@ -128,12 +128,9 @@ trait ULongIsRig extends Rig[ULong] {
   def zero: ULong = ULong(0)
 }
 
-trait ULongEq extends Eq[ULong] {
-  def eqv(x:ULong, y:ULong) = x == y
+trait ULongOrder extends Order[ULong] {
+  override def eqv(x:ULong, y:ULong) = x == y
   override def neqv(x:ULong, y:ULong) = x != y
-}
-
-trait ULongOrder extends Order[ULong] with ULongEq {
   override def gt(x: ULong, y: ULong) = x > y
   override def gteqv(x: ULong, y: ULong) = x >= y
   override def lt(x: ULong, y: ULong) = x < y

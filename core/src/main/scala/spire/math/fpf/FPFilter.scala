@@ -209,6 +209,7 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   implicit val ev: Numeric[A]
   def order = ev
 
+  override def eqv(x: FPFilter[A], y: FPFilter[A]): Boolean = super.eqv(x, y)
   def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
   def ceil(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
   def floor(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
@@ -224,6 +225,7 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   implicit val ev: Fractional[A]
   def order = ev
 
+  override def eqv(x: FPFilter[A], y: FPFilter[A]): Boolean = super.eqv(x, y)
   def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
   def ceil(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
   def floor(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")

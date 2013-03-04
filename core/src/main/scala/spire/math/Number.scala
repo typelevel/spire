@@ -525,12 +525,9 @@ trait NumberIsTrig extends Trig[Number] {
   def toDegrees(a: Number): Number = (a * 360) / (2 * pi)
 }
 
-trait NumberEq extends Eq[Number] {
-  def eqv(x: Number, y: Number) = x == y
+trait NumberOrder extends Order[Number] {
+  override def eqv(x: Number, y: Number) = x == y
   override def neqv(x: Number, y: Number) = x != y
-}
-
-trait NumberOrder extends Order[Number] with NumberEq {
   override def gt(x: Number, y: Number) = x > y
   override def gteqv(x: Number, y: Number) = x >= y
   override def lt(x: Number, y: Number) = x < y

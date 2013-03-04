@@ -6,7 +6,7 @@ import java.lang.{ Math => JavaMath }
 
 import scala.annotation.tailrec
 
-trait DoubleIsRing extends Ring[Double] {
+trait DoubleIsField extends Field[Double] {
   override def minus(a:Double, b:Double): Double = a - b
   def negate(a:Double): Double = -a
   def one: Double = 1.0
@@ -16,9 +16,7 @@ trait DoubleIsRing extends Ring[Double] {
   def zero: Double = 0.0
 
   override def fromInt(n: Int): Double = n
-}
 
-trait DoubleIsEuclideanRing extends EuclideanRing[Double] with DoubleIsRing {
   def quot(a:Double, b:Double) = (a - (a % b)) / b
   def mod(a:Double, b:Double) = a % b
   override final def gcd(a:Double, b:Double):Double = _gcd(Math.abs(a), Math.abs(b))
@@ -31,9 +29,7 @@ trait DoubleIsEuclideanRing extends EuclideanRing[Double] with DoubleIsRing {
   } else {
     _gcd(b, a % b)
   }
-}
 
-trait DoubleIsField extends Field[Double] with DoubleIsEuclideanRing {
   override def fromDouble(n: Double): Double = n
   def div(a:Double, b:Double) = a / b
   def ceil(a:Double): Double = Math.floor(a)
@@ -72,12 +68,9 @@ trait DoubleIsTrig extends Trig[Double] {
   def toDegrees(a: Double): Double = (a * 360) / (2 * pi)
 }
 
-trait DoubleEq extends Eq[Double] {
-  def eqv(x:Double, y:Double) = x == y
+trait DoubleOrder extends Order[Double] {
+  override def eqv(x:Double, y:Double) = x == y
   override def neqv(x:Double, y:Double) = x != y
-}
-
-trait DoubleOrder extends Order[Double] with DoubleEq {
   override def gt(x: Double, y: Double) = x > y
   override def gteqv(x: Double, y: Double) = x >= y
   override def lt(x: Double, y: Double) = x < y

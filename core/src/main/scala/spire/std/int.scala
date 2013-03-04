@@ -2,7 +2,7 @@ package spire.std
 
 import spire.algebra._
 
-trait IntIsRing extends Ring[Int] {
+trait IntIsEuclideanRing extends EuclideanRing[Int] {
   override def minus(a:Int, b:Int): Int = a - b
   def negate(a:Int): Int = -a
   def one: Int = 1
@@ -12,17 +12,10 @@ trait IntIsRing extends Ring[Int] {
   def zero: Int = 0
 
   override def fromInt(n: Int): Int = n
-}
 
-trait IntIsEuclideanRing extends EuclideanRing[Int] with IntIsRing {
   def quot(a:Int, b:Int) = a / b
   def mod(a:Int, b:Int) = a % b
   def gcd(a:Int, b:Int): Int = spire.math.gcd(a, b).toInt
-}
-
-trait IntEq extends Eq[Int] {
-  def eqv(x:Int, y:Int) = x == y
-  override def neqv(x:Int, y:Int) = x != y
 }
 
 // Not included in Instances trait.
@@ -48,7 +41,9 @@ trait IntIsNRoot extends NRoot[Int] {
   def fpow(a:Int, b:Int) = Math.pow(a, b).toInt
 }
 
-trait IntOrder extends Order[Int] with IntEq {
+trait IntOrder extends Order[Int] {
+  override def eqv(x: Int, y: Int) = x == y
+  override def neqv(x: Int, y: Int) = x != y
   override def gt(x: Int, y: Int) = x > y
   override def gteqv(x: Int, y: Int) = x >= y
   override def lt(x: Int, y: Int) = x < y

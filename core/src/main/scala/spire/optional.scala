@@ -75,11 +75,9 @@ object vectorOrder {
  * the default ordering.
  */
 object totalfloat {
-  trait TotalFloatEq extends Eq[Float] {
-    def eqv(x:Float, y:Float) = java.lang.Float.compare(x, y) == 0
+  trait TotalFloatOrder extends Order[Float] {
+    override def eqv(x:Float, y:Float) = java.lang.Float.compare(x, y) == 0
     override def neqv(x:Float, y:Float) = java.lang.Float.compare(x, y) != 0
-  }
-  trait TotalFloatOrder extends Order[Float] with TotalFloatEq {
     override def gt(x: Float, y: Float) = java.lang.Float.compare(x, y) > 0
     override def gteqv(x: Float, y: Float) = java.lang.Float.compare(x, y) >= 0
     override def lt(x: Float, y: Float) = java.lang.Float.compare(x, y) > 0
@@ -90,11 +88,9 @@ object totalfloat {
   }
   implicit object TotalFloatOrder extends TotalFloatOrder
 
-  trait TotalDoubleEq extends Eq[Double] {
-    def eqv(x:Double, y:Double) = java.lang.Double.compare(x, y) == 0
+  trait TotalDoubleOrder extends Order[Double] {
+    override def eqv(x:Double, y:Double) = java.lang.Double.compare(x, y) == 0
     override def neqv(x:Double, y:Double) = java.lang.Double.compare(x, y) != 0
-  }
-  trait TotalDoubleOrder extends Order[Double] with TotalDoubleEq {
     override def gt(x: Double, y: Double) = java.lang.Double.compare(x, y) > 0
     override def gteqv(x: Double, y: Double) = java.lang.Double.compare(x, y) >= 0
     override def lt(x: Double, y: Double) = java.lang.Double.compare(x, y) > 0

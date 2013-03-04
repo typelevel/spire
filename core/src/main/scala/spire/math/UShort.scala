@@ -77,12 +77,9 @@ trait UShortIsRig extends Rig[UShort] {
   def zero: UShort = UShort(0)
 }
 
-trait UShortEq extends Eq[UShort] {
-  def eqv(x:UShort, y:UShort) = x == y
+trait UShortOrder extends Order[UShort] {
+  override def eqv(x:UShort, y:UShort) = x == y
   override def neqv(x:UShort, y:UShort) = x != y
-}
-
-trait UShortOrder extends Order[UShort] with UShortEq {
   override def gt(x: UShort, y: UShort) = x > y
   override def gteqv(x: UShort, y: UShort) = x >= y
   override def lt(x: UShort, y: UShort) = x < y

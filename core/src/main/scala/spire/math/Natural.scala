@@ -656,12 +656,9 @@ trait NaturalIsRig extends Rig[Natural] {
   def zero: Natural = Natural(0L)
 }
 
-trait NaturalEq extends Eq[Natural] {
-  def eqv(x: Natural, y: Natural) = x == y
+trait NaturalOrder extends Order[Natural] {
+  override def eqv(x: Natural, y: Natural) = x == y
   override def neqv(x: Natural, y: Natural) = x != y
-}
-
-trait NaturalOrder extends Order[Natural] with NaturalEq {
   override def gt(x: Natural, y: Natural) = x > y
   override def gteqv(x: Natural, y: Natural) = x >= y
   override def lt(x: Natural, y: Natural) = x < y

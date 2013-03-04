@@ -19,12 +19,9 @@ trait BooleanIsRig extends Rig[Boolean] {
   def zero: Boolean = false
 }
 
-trait BooleanEq extends Eq[Boolean] {
-  def eqv(x:Boolean, y:Boolean): Boolean = x == y
+trait BooleanOrder extends Order[Boolean] {
+  override def eqv(x:Boolean, y:Boolean): Boolean = x == y
   override def neqv(x:Boolean, y:Boolean): Boolean = x != y
-}
-
-trait BooleanOrder extends BooleanEq with Order[Boolean] {
   override def gt(x: Boolean, y: Boolean): Boolean = x && !y
   override def lt(x: Boolean, y: Boolean): Boolean = !x && y
   override def gteqv(x: Boolean, y: Boolean): Boolean = x == y || x

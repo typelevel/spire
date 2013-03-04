@@ -19,7 +19,7 @@ object SelectionBenchmarks extends MyRunner(classOf[SelectionBenchmarks])
 
 class SelectionBenchmarks extends MyBenchmark {
   implicit val lexicographic:Order[Complex[Double]] = new Order[Complex[Double]] {
-    def eqv(a: Complex[Double], b: Complex[Double]) = a == b
+    override def eqv(a: Complex[Double], b: Complex[Double]) = a == b
     def compare(a: Complex[Double], b: Complex[Double]): Int = {
       if (a.real < b.real) -1
       else if (a.real > b.real) 1

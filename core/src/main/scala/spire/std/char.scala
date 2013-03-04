@@ -2,12 +2,9 @@ package spire.std
 
 import spire.algebra._
 
-trait CharEq extends Eq[Char] {
-  def eqv(x:Char, y:Char) = x == y
+trait CharOrder extends Order[Char] {
+  override def eqv(x:Char, y:Char) = x == y
   override def neqv(x:Char, y:Char) = x != y
-}
-
-trait CharOrder extends Order[Char] with CharEq {
   override def gt(x: Char, y: Char) = x > y
   override def gteqv(x: Char, y: Char) = x >= y
   override def lt(x: Char, y: Char) = x < y
