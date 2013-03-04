@@ -464,7 +464,7 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
 }
 
 trait NumberInstances {
-  implicit object NumberAlgebra extends NumberIsField with NumberIsNRoot
+  implicit object NumberAlgebra extends NumberIsField with NumberIsNRoot with NumberIsTrig
   implicit object NumberIsReal extends NumberIsReal
 }
 
@@ -500,6 +500,29 @@ trait NumberIsNRoot extends NRoot[Number] {
   override def sqrt(a: Number): Number = a.pow(Number(0.5))
   def log(a: Number) = Number(Math.log(a.toDouble))
   def fpow(a: Number, b: Number) = a.pow(b)
+}
+
+trait NumberIsTrig extends Trig[Number] {
+  def e: Number = Number(Math.E)
+  def pi: Number = Number(Math.PI)
+
+  def exp(a: Number): Number = Math.exp(a.toDouble)
+
+  def sin(a: Number): Number = Math.sin(a.toDouble)
+  def cos(a: Number): Number = Math.cos(a.toDouble)
+  def tan(a: Number): Number = Math.tan(a.toDouble)
+
+  def asin(a: Number): Number = Math.asin(a.toDouble)
+  def acos(a: Number): Number = Math.acos(a.toDouble)
+  def atan(a: Number): Number = Math.atan(a.toDouble)
+  def atan2(y: Number, x: Number): Number = Math.atan2(y.toDouble, x.toDouble)
+
+  def sinh(x: Number): Number = Math.sinh(x.toDouble)
+  def cosh(x: Number): Number = Math.cosh(x.toDouble)
+  def tanh(x: Number): Number = Math.tanh(x.toDouble)
+
+  def toRadians(a: Number): Number = (a * 2 * pi) / 360
+  def toDegrees(a: Number): Number = (a * 360) / (2 * pi)
 }
 
 trait NumberEq extends Eq[Number] {

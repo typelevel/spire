@@ -49,6 +49,29 @@ trait FloatIsNRoot extends NRoot[Float] {
   def fpow(a: Float, b: Float) = Math.pow(a, b).toFloat
 }
 
+trait FloatIsTrig extends Trig[Float] {
+  def e: Float = JavaMath.E.toFloat
+  def pi: Float = JavaMath.PI.toFloat
+
+  def exp(a: Float): Float = JavaMath.exp(a.toDouble).toFloat
+
+  def sin(a: Float): Float = JavaMath.sin(a.toDouble).toFloat
+  def cos(a: Float): Float = JavaMath.cos(a.toDouble).toFloat
+  def tan(a: Float): Float = JavaMath.tan(a.toDouble).toFloat
+
+  def asin(a: Float): Float = JavaMath.asin(a.toDouble).toFloat
+  def acos(a: Float): Float = JavaMath.acos(a.toDouble).toFloat
+  def atan(a: Float): Float = JavaMath.atan(a.toDouble).toFloat
+  def atan2(y: Float, x: Float): Float = JavaMath.atan2(y.toDouble, x.toDouble).toFloat
+
+  def sinh(x: Float): Float = JavaMath.sinh(x.toDouble).toFloat
+  def cosh(x: Float): Float = JavaMath.cosh(x.toDouble).toFloat
+  def tanh(x: Float): Float = JavaMath.tanh(x.toDouble).toFloat
+
+  def toRadians(a: Float): Float = (a * 2 * pi) / 360
+  def toDegrees(a: Float): Float = (a * 360) / (2 * pi)
+}
+
 trait FloatIsSigned extends Signed[Float] {
   def signum(a: Float): Int = JavaMath.signum(a).toInt
   def abs(a: Float): Float = if (a < 0.0f) -a else a
@@ -74,6 +97,6 @@ trait FloatIsReal extends IsReal[Float] with FloatOrder with FloatIsSigned {
 }
 
 trait FloatInstances {
-  implicit object FloatAlgebra extends  FloatIsField with FloatIsNRoot
+  implicit object FloatAlgebra extends  FloatIsField with FloatIsNRoot with FloatIsTrig
   implicit object FloatIsReal extends FloatIsReal
 }
