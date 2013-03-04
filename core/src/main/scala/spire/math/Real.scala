@@ -17,7 +17,7 @@
  */
 package spire.math
 
-import spire.algebra.{ Zero }
+import spire.algebra._
 import java.math.{ MathContext, BigInteger, BigDecimal => BigDec }
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
 
@@ -66,7 +66,7 @@ extends ScalaNumber with ScalaNumericConversions
 }
 
 
-object Real {
+object Real extends RealInstances {
 
   implicit def apply(n: Int): Real = Expr(n)
   implicit def apply(n: Long): Real = Expr(n)
@@ -82,3 +82,62 @@ object Real {
   }
 }
 
+trait RealInstances {
+  implicit object RealAlgebra extends RealIsField with RealIsNRoot
+  implicit object RealIsReal extends RealIsReal
+}
+
+trait RealIsRing extends Ring[Real] {
+  override def minus(a: Real, b: Real): Real = a - b
+  def negate(a: Real): Real = -a
+  def one: Real = Real(1)
+  def plus(a: Real, b: Real): Real = a + b
+  override def pow(a: Real, b: Int): Real = a pow b
+  override def times(a: Real, b: Real): Real = a * b
+  def zero: Real = Real(0)
+  
+  override def fromInt(n: Int): Real = Real(n)
+}
+
+trait RealIsEuclideanRing extends EuclideanRing[Real] with RealIsRing {
+  def quot(a: Real, b: Real): Real = a /~ b
+  def mod(a: Real, b: Real): Real = a % b
+  def gcd(a: Real, b: Real): Real = euclid(a, b)(Eq[Real])
+}
+
+trait RealIsField extends Field[Real] with RealIsEuclideanRing {
+  override def fromDouble(n: Double): Real = Real(n)
+  def div(a:Real, b:Real) = a / b
+  def ceil(a:Real) = if (a % 1 == 0) a else a + 1 - (a % 1)
+  def floor(a:Real) = a - (a % 1)
+  def round(a:Real) = {
+    val m = a % 1
+    if (m < 0.5) a - m else a + 1 - m
+  }
+  def isWhole(a:Real) = a % 1 == 0
+}
+
+trait RealIsNRoot extends NRoot[Real] {
+  def nroot(a: Real, k: Int): Real = a nroot k
+  def log(a:Real) = sys.error("fixme")
+  def fpow(a:Real, b:Real) = sys.error("fixme")
+}
+
+trait RealEq extends Eq[Real] {
+  def eqv(x: Real, y: Real) = (x - y).sign == Zero
+  override def neqv(x: Real, y: Real) = (x - y).sign != Zero
+}
+
+trait RealOrder extends Order[Real] with RealEq {
+  def compare(x: Real, y: Real) = (x - y).signum
+}
+
+trait RealIsSigned extends Signed[Real] {
+  override def sign(a: Real): Sign = a.sign
+  def signum(a: Real): Int = a.signum
+  def abs(a: Real): Real = a.abs
+}
+
+trait RealIsReal extends IsReal[Real] with RealOrder with RealIsSigned {
+  def toDouble(x: Real): Double = x.toDouble
+}

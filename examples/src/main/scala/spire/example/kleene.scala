@@ -3,6 +3,7 @@ package spire.example
 import Predef.{any2stringadd => _, intWrapper => _, _}
 
 import spire.algebra._
+import spire.std.BooleanIsRig
 import spire.implicits._
 import spire.math._
 import spire.syntax._

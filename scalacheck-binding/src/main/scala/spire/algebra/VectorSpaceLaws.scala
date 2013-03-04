@@ -1,7 +1,6 @@
 package spire.algebra
 
 import spire.implicits._
-import spire.math.{ Eq, Order }
 
 import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 import org.scalacheck.Prop._

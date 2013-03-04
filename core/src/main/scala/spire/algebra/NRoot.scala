@@ -1,11 +1,9 @@
 package spire.algebra
 
 import spire.math._
-import spire.macrosk.Ops
 
-import scala.{specialized => spec, math => mth}
+import scala.{specialized => spec}
 import java.math.MathContext
-import java.lang.Math
 
 // NOTE: fpow vs pow is a bit of a trainwreck :P
 // overloading is evil, but it's definitely what users will expect.
@@ -30,174 +28,8 @@ trait NRoot[@spec(Double,Float,Int,Long) A] {
 
 import spire.math.{ConvertableTo, ConvertableFrom, Number}
 
-final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
-  def nroot(rhs: Int): A = macro Ops.binop[Int, A]
-  def sqrt(): A = macro Ops.unop[A]
-  def log(): A = macro Ops.unop[A]
-  def fpow(rhs: A): A = macro Ops.binop[A, A]
-
-  // TODO: should be macros
-  def pow(rhs: Double)(implicit c: Fractional[A]) = ev.fpow(lhs, c.fromDouble(rhs))
-  def **(rhs: Double)(implicit c: Fractional[A]) = ev.fpow(lhs, c.fromDouble(rhs))
-
-  def pow(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) pow rhs
-  def **(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) ** rhs
-}
-
-trait DoubleIsNRoot extends NRoot[Double] {
-  def nroot(a: Double, k: Int): Double = Math.pow(a, 1 / k.toDouble)
-  override def sqrt(a: Double): Double = Math.sqrt(a)
-  def log(a: Double) = Math.log(a)
-  def fpow(a: Double, b: Double) = Math.pow(a, b)
-}
-
-trait FloatIsNRoot extends NRoot[Float] {
-  def nroot(a: Float, k: Int): Float = Math.pow(a, 1 / k.toDouble).toFloat
-  override def sqrt(a: Float): Float = Math.sqrt(a).toFloat
-  def log(a: Float) = Math.log(a).toFloat
-  def fpow(a: Float, b: Float) = Math.pow(a, b).toFloat
-}
-
-trait RationalIsNRoot extends NRoot[Rational] {
-  implicit def context:ApproximationContext[Rational]
-  def nroot(a: Rational, k: Int): Rational = a.nroot(k)
-  def log(a: Rational): Rational = a.log
-  def fpow(a: Rational, b: Rational): Rational = a.pow(b)
-}
-
-trait RealIsNRoot extends NRoot[Real] {
-  def nroot(a: Real, k: Int): Real = a nroot k
-  def log(a:Real) = sys.error("fixme")
-  def fpow(a:Real, b:Real) = sys.error("fixme")
-}
-
-
-trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
-  def nroot(a: BigDecimal, k: Int): BigDecimal = {
-    if (a.mc.getPrecision <= 0)
-      throw new ArithmeticException("Cannot find the nroot of a BigDecimal with unlimited precision.")
-    NRoot.nroot(a, k, a.mc)
-  }
-
-  private[this] val two = BigDecimal(2)
-
-  // this is newton's method
-  override def sqrt(n: BigDecimal): BigDecimal = {
-    var x: BigDecimal = BigDecimal(0, n.mc)
-    var y: BigDecimal = BigDecimal(Math.sqrt(n.toDouble), n.mc)
-    while (x != y) {
-      x = y;
-      y = ((n / x) + x) / two
-    }
-    y
-  }
-
-  def log(a:BigDecimal) = spire.math.log(a)
-
-  def fpow(a:BigDecimal, b:BigDecimal) = spire.math.pow(a, b)
-}
-
-
-trait IntIsNRoot extends NRoot[Int] {
-  def nroot(x: Int, n: Int): Int = {
-    def findnroot(prev: Int, add: Int): Int = {
-      val next = prev | add
-      val e = Math.pow(next, n)
-
-      if (e == x || add == 0) {
-        next
-      } else if (e <= 0 || e > x) {
-        findnroot(prev, add >> 1)
-      } else {
-        findnroot(next, add >> 1)
-      }
-    }
-
-    findnroot(0, 1 << ((33 - n) / n))
-  }
-
-  def log(a:Int) = Math.log(a.toDouble).toInt
-  def fpow(a:Int, b:Int) = Math.pow(a, b).toInt
-}
-
-trait LongIsNRoot extends NRoot[Long] {
-  def nroot(x: Long, n: Int): Long = {
-    def findnroot(prev: Long, add: Long): Long = {
-      val next = prev | add
-      val e = Math.pow(next, n)
-
-      if (e == x || add == 0) {
-        next
-      } else if (e <= 0 || e > x) {
-        findnroot(prev, add >> 1)
-      } else {
-        findnroot(next, add >> 1)
-      }
-    }
-
-    findnroot(0, 1L << ((65 - n) / n))
-  }
-  def log(a:Long) = Math.log(a.toDouble).toLong
-  def fpow(a:Long, b:Long) = spire.math.pow(a, b) // xyz
-}
-
-trait BigIntIsNRoot extends NRoot[BigInt] {
-  def nroot(a: BigInt, k: Int): BigInt = if (a < 0 && k % 2 == 1) {
-    -nroot(-a, k)
-  } else if (a < 0) {
-    throw new ArithmeticException("Cannot find %d-root of negative number." format k)
-  } else {
-    def findNroot(b: BigInt, i: Int): BigInt = if (i < 0) {
-      b
-    } else {
-      val c = b setBit i
-
-      if ((c pow k) <= a)
-        findNroot(c, i - 1)
-      else
-        findNroot(b, i - 1)
-    }
-
-    findNroot(0, a.bitLength - 1)
-  }
-  def log(a:BigInt) = spire.math.log(BigDecimal(a)).toBigInt
-  def fpow(a:BigInt, b:BigInt) = spire.math.pow(BigDecimal(a), BigDecimal(b)).toBigInt
-}
-
-trait SafeLongIsNRoot extends NRoot[SafeLong] {
-  import NRoot.{LongIsNRoot, BigIntIsNRoot}
-
-  def nroot(a: SafeLong, k: Int): SafeLong = a.fold(
-    n => SafeLong(LongIsNRoot.nroot(n, k)),
-    n => SafeLong(BigIntIsNRoot.nroot(n, k))
-  )
-  def log(a:SafeLong) = a.fold(
-    n => SafeLong(LongIsNRoot.log(n)),
-    n => SafeLong(BigIntIsNRoot.log(n))
-  )
-
-  def fpow(a:SafeLong, b:SafeLong) =
-    SafeLong(BigIntIsNRoot.fpow(a.toBigInt, b.toBigInt))
-}
-
 object NRoot {
   @inline final def apply[@spec(Int,Long,Float,Double) A](implicit ev:NRoot[A]) = ev
-
-  implicit object IntIsNRoot extends IntIsNRoot
-  implicit object LongIsNRoot extends LongIsNRoot
-  implicit object BigIntIsNRoot extends BigIntIsNRoot
-  implicit object SafeLongIsNRoot extends SafeLongIsNRoot
-
-  implicit object FloatIsNRoot extends FloatIsNRoot
-  implicit object DoubleIsNRoot extends DoubleIsNRoot
-  implicit object BigDecimalIsNRoot extends BigDecimalIsNRoot
-
-  implicit def rationalIsNRoot(implicit c:ApproximationContext[Rational]) = new RationalIsNRoot {
-    implicit def context = c
-  }
-
-  implicit object RealIsNRoot extends RealIsNRoot
-  implicit object NumberIsNRoot extends NumberIsNRoot
 
   /**
    * This will return the largest integer that meets some criteria. Specifically,
@@ -313,11 +145,4 @@ object NRoot {
     val newscale = (size - (intPart.size + k - 1) / k) * 9
     BigDecimal(unscaled, newscale, ctxt)
   }
-}
-
-trait NumberIsNRoot extends NRoot[Number] {
-  def nroot(a: Number, k: Int): Number = a.pow(Number(k))
-  override def sqrt(a: Number): Number = a.pow(Number(0.5))
-  def log(a: Number) = Number(Math.log(a.toDouble))
-  def fpow(a: Number, b: Number) = a.pow(b)
 }

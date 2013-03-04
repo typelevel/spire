@@ -6,7 +6,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import java.lang.Math
 
-import spire.algebra.EuclideanRing
+import spire.algebra.{ Order, EuclideanRing }
 
 object EuclideanRational {
   def one[@spec(Int, Long) A](implicit f: EuclideanRing[A]): EuclideanRational[A] =

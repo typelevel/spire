@@ -394,7 +394,7 @@ case class Interval[T](lower: Lower[T], upper: Upper[T])(implicit order: Order[T
   }
 }
 
-object Interval {
+object Interval extends IntervalInstances {
 
   /**
    * Interval from a to b. By default is this closed, [a, b].
@@ -440,4 +440,24 @@ object Interval {
    * Interval containing all values below (less-than) a.
    */
   def below[T: Order](a: T) = Interval(UnboundBelow(), OpenAbove(a))
+}
+
+trait IntervalInstances {
+  implicit def IntervalIsRig[A: Order: Ring] = new IntervalIsRig[A] {
+    val o = Order[A]
+    val r = Ring[A]
+  }
+}
+
+// we don't support Ring[Interval[A]] due to the lack of reliable inverses
+// (which is due to the dependency problem for interval arithmetic).
+trait IntervalIsRig[A] extends Rig[Interval[A]] {
+  implicit def o: Order[A]
+  implicit def r: Ring[A]
+
+  def one: Interval[A] = Interval.point(r.one)
+  def plus(a:Interval[A], b:Interval[A]): Interval[A] = a + b
+  override def pow(a:Interval[A], b:Int):Interval[A] = a.pow(b)
+  override def times(a:Interval[A], b:Interval[A]): Interval[A] = a * b
+  def zero: Interval[A] = Interval.point(r.zero)
 }

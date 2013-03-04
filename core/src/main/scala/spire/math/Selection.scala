@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.algebra._
+
 import scala.reflect.ClassTag
 
 import scala.{specialized => spec}

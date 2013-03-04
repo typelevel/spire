@@ -5,7 +5,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import java.lang.Math
 
-import spire.algebra.{Sign, Positive, Negative, Zero}
+import spire.algebra._
 
 trait Fraction[@specialized(Long) A] {
   def num: A
@@ -269,7 +269,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 }
 
 
-object Rational {
+object Rational extends RationalInstances {
   private val RationalString = """^(-?\d+)/(-?\d+)$""".r
   private val IntegerString = """^(-?\d+)$""".r
 
@@ -807,4 +807,82 @@ object BigRationals extends Rationals[BigInt] {
       }
     }
   }
+}
+
+trait RationalInstances {
+  implicit object RationalIsField extends RationalIsField
+  implicit def RationalIsNRoot(implicit c:ApproximationContext[Rational]) = new RationalIsNRoot {
+    implicit def context = c
+  }
+  implicit object RationalIsReal extends RationalIsReal
+}
+
+trait RationalIsRing extends Ring[Rational] {
+  override def minus(a:Rational, b:Rational): Rational = a - b
+  def negate(a:Rational): Rational = -a
+  def one: Rational = Rational.one
+  def plus(a:Rational, b:Rational): Rational = a + b
+  override def pow(a:Rational, b:Int): Rational = a.pow(b)
+  override def times(a:Rational, b:Rational): Rational = a * b
+  def zero: Rational = Rational.zero
+  
+  override def fromInt(n: Int): Rational = Rational(n)
+}
+
+trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRing {
+  def quot(a:Rational, b:Rational) = a /~ b
+  def mod(a:Rational, b:Rational) = a % b
+  override def quotmod(a:Rational, b:Rational) = a /% b
+  def gcd(a:Rational, b:Rational):Rational = _gcd(a.abs, b.abs)
+  @tailrec private def _gcd(a:Rational, b:Rational):Rational = {
+    if (a.compareToOne < 0) {
+      Rational.one
+    } else if (b.signum == 0) {
+      a
+    } else if (b.compareToOne < 0) {
+      Rational.one
+    } else {
+      _gcd(b, a % b)
+    }
+  }
+}
+
+trait RationalIsField extends Field[Rational] with RationalIsEuclideanRing {
+  override def fromDouble(n: Double): Rational = Rational(n)
+  def div(a:Rational, b:Rational) = a / b
+  def ceil(a:Rational): Rational = a.ceil
+  def floor(a:Rational): Rational = a.floor
+  def round(a:Rational): Rational = a.round
+  def isWhole(a:Rational) = a.denominator == 1
+}
+
+trait RationalIsNRoot extends NRoot[Rational] {
+  implicit def context:ApproximationContext[Rational]
+  def nroot(a: Rational, k: Int): Rational = a.nroot(k)
+  def log(a: Rational): Rational = a.log
+  def fpow(a: Rational, b: Rational): Rational = a.pow(b)
+}
+
+trait RationalEq extends Eq[Rational] {
+  def eqv(x:Rational, y:Rational) = x == y
+  override def neqv(x:Rational, y:Rational) = x != y
+}
+
+trait RationalOrder extends Order[Rational] with RationalEq {
+  override def gt(x: Rational, y: Rational) = x > y
+  override def gteqv(x: Rational, y: Rational) = x >= y
+  override def lt(x: Rational, y: Rational) = x < y
+  override def lteqv(x: Rational, y: Rational) = x <= y
+  def compare(x: Rational, y: Rational) = if (x < y) -1 else if (x > y) 1 else 0
+}
+
+trait RationalIsSigned extends Signed[Rational] {
+  override def sign(a: Rational): Sign = a.sign
+  def signum(a: Rational): Int = a.signum
+  def abs(a: Rational): Rational = a.abs
+}
+
+trait RationalIsReal extends IsReal[Rational]
+with RationalOrder with RationalIsSigned {
+  def toDouble(r: Rational): Double = r.toDouble
 }
