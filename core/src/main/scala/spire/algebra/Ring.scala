@@ -3,8 +3,6 @@ package spire.algebra
 import annotation.tailrec
 import scala.{specialized => spec}
 
-import spire.macrosk.Ops
-
 
 /**
  * Ring represents a set (A) that is a group over addition (+) and a monoid

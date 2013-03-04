@@ -1,7 +1,6 @@
 package spire.algebra
 
 import spire.math._
-import spire.macrosk.Ops
 
 import scala.{specialized => spec}
 import java.math.MathContext
@@ -28,20 +27,6 @@ trait NRoot[@spec(Double,Float,Int,Long) A] {
 }
 
 import spire.math.{ConvertableTo, ConvertableFrom, Number}
-
-final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
-  def nroot(rhs: Int): A = macro Ops.binop[Int, A]
-  def sqrt(): A = macro Ops.unop[A]
-  def log(): A = macro Ops.unop[A]
-  def fpow(rhs: A): A = macro Ops.binop[A, A]
-
-  // TODO: should be macros
-  def pow(rhs: Double)(implicit c: Fractional[A]) = ev.fpow(lhs, c.fromDouble(rhs))
-  def **(rhs: Double)(implicit c: Fractional[A]) = ev.fpow(lhs, c.fromDouble(rhs))
-
-  def pow(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) pow rhs
-  def **(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) ** rhs
-}
 
 object NRoot {
   @inline final def apply[@spec(Int,Long,Float,Double) A](implicit ev:NRoot[A]) = ev

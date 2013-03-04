@@ -3,8 +3,6 @@ package spire.algebra
 import annotation.tailrec
 import scala.{specialized => spec}
 
-import spire.macrosk.Ops
-
 
 /**
  * Semiring is a ring without identities or an inverse. Thus, it has no
@@ -24,11 +22,6 @@ trait Semiring[@spec(Int,Long,Float,Double) A] extends AdditiveSemigroup[A] with
     if (n == 0) sofar
     else if (n % 2 == 1) _pow(times(a, a), n / 2, times(sofar, a))
     else _pow(times(a, a), n / 2, sofar)
-}
-
-final class SemiringOps[A](lhs:A)(implicit ev:Semiring[A]) {
-  def pow(rhs:Int) = macro Ops.binop[Int, A]
-  def **(rhs:Int) = macro Ops.binop[Int, A]
 }
 
 object Semiring {

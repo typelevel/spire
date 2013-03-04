@@ -2,8 +2,6 @@ package spire.algebra
 
 import scala.{specialized => spec}
 
-import spire.macrosk.Ops
-
 trait Eq[@spec A] {
   def eqv(x:A, y:A): Boolean
   def neqv(x:A, y:A): Boolean = !eqv(x, y)
@@ -12,11 +10,6 @@ trait Eq[@spec A] {
 
 class MappedEq[@spec A, @spec B](eq: Eq[B])(f: A => B) extends Eq[A] {
   def eqv(x: A, y: A): Boolean = eq.eqv(f(x), f(x))
-}
-
-final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
-  def ===(rhs:A) = macro Ops.binop[A, Boolean]
-  def =!=(rhs:A) = macro Ops.binop[A, Boolean]
 }
 
 object Eq {

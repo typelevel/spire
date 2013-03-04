@@ -37,6 +37,7 @@ object Numeric {
 trait IntIsNumeric extends Numeric[Int] with IntIsEuclideanRing with IntIsNRoot
 with ConvertableFromInt with ConvertableToInt with IntOrder with IntIsSigned {
   override def fromInt(n: Int): Int = n
+  override def fromDouble(n: Double): Int = n.toInt
   def div(a:Int, b:Int) = a / b
   def ceil(a: Int): Int = a
   def floor(a: Int): Int = a
@@ -47,6 +48,7 @@ with ConvertableFromInt with ConvertableToInt with IntOrder with IntIsSigned {
 trait LongIsNumeric extends Numeric[Long] with LongIsEuclideanRing with LongIsNRoot
 with ConvertableFromLong with ConvertableToLong with LongOrder with LongIsSigned {
   override def fromInt(n: Int): Long = n
+  override def fromDouble(n: Double): Long = n.toLong
   def div(a:Long, b:Long) = a / b
   def ceil(a: Long): Long = a
   def floor(a: Long): Long = a
@@ -58,6 +60,7 @@ trait BigIntIsNumeric extends Numeric[BigInt] with BigIntIsEuclideanRing
 with BigIntIsNRoot with ConvertableFromBigInt with ConvertableToBigInt
 with BigIntOrder with BigIntIsSigned {
   override def fromInt(n: Int): BigInt = super[ConvertableToBigInt].fromInt(n)
+  override def fromDouble(n: Double): BigInt = BigDecimal(n).toBigInt
   def div(a:BigInt, b:BigInt) = a / b
   def ceil(a: BigInt): BigInt = a
   def floor(a: BigInt): BigInt = a
@@ -69,29 +72,34 @@ trait FloatIsNumeric extends Numeric[Float] with FloatIsField
 with FloatIsNRoot with ConvertableFromFloat with ConvertableToFloat
 with FloatOrder with FloatIsSigned {
   override def fromInt(n: Int): Float = n
+  override def fromDouble(n: Double): Float = n.toFloat
 }
 
 trait DoubleIsNumeric extends Numeric[Double] with DoubleIsField
 with DoubleIsNRoot with ConvertableFromDouble with ConvertableToDouble
 with DoubleOrder with DoubleIsSigned {
   override def fromInt(n: Int): Double = n
+  override def fromDouble(n: Double): Double = n
 }
 
 trait BigDecimalIsNumeric extends Numeric[BigDecimal] with BigDecimalIsField
 with BigDecimalIsNRoot with ConvertableFromBigDecimal with ConvertableToBigDecimal
 with BigDecimalOrder with BigDecimalIsSigned {
   override def fromInt(n: Int): BigDecimal = super[ConvertableToBigDecimal].fromInt(n)
+  override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
 }
 
 trait RationalIsNumeric extends Numeric[Rational] with RationalIsField
 with RationalIsNRoot with ConvertableFromRational with ConvertableToRational
 with RationalOrder with RationalIsSigned {
   override def fromInt(n: Int): Rational = super[ConvertableToRational].fromInt(n)
+  override def fromDouble(n: Double): Rational = Rational(n)
 }
 
 trait RealIsNumeric extends Numeric[Real] with RealIsField with RealIsNRoot
 with ConvertableFromReal with ConvertableToReal with RealOrder with RealIsSigned {
   override def fromInt(n: Int): Real = super[ConvertableToReal].fromInt(n)
+  override def fromDouble(n: Double): Real = Real(n)
 }
 
 
@@ -100,6 +108,7 @@ extends ComplexIsField[A] with Numeric[Complex[A]] with ComplexEq[A]
 with NRoot[Complex[A]] with ConvertableFromComplex[A] with ConvertableToComplex[A]
 with Order[Complex[A]] with ComplexIsSigned[A] {
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
+  override def fromDouble(n: Double): Complex[A] = Complex[A](f.fromDouble(n))
 
   override def nroot(a: Complex[A], n: Int) = a.pow(reciprocal(fromInt(n)))
   override def gt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
@@ -118,6 +127,8 @@ with Order[Gaussian[A]] with GaussianIsSigned[A]
 with GaussianIsEuclideanRing[A] with GaussianEq[A]
 with ConvertableFromGaussian[A] with ConvertableToGaussian[A] {
   override def fromInt(n: Int): Gaussian[A] = Gaussian.fromInt[A](n)
+  override def fromDouble(n: Double): Gaussian[A] =
+    super[ConvertableToGaussian].fromDouble(n)
 
   override def nroot(a: Gaussian[A], n: Int) = sys.error("undefined")
 

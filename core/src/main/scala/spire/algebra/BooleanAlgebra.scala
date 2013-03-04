@@ -2,7 +2,6 @@ package spire.algebra
 
 import scala.{specialized => spec}
 
-import spire.macrosk.Ops
 import spire.math.{ ConvertableFrom, ConvertableTo, Number }
 
 /**
@@ -35,21 +34,6 @@ trait BooleanAlgebra[@spec(Boolean, Byte, Short, Int, Long) A] { self =>
 
     override def dual: BooleanAlgebra[A] = self
   }
-}
-
-final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
-  def unary_~() = macro Ops.unop[A]
-  def &(rhs: A): A = macro Ops.binop[A, A]
-  def |(rhs: A): A = macro Ops.binop[A, A]
-  def ^(rhs: A): A = macro Ops.binop[A, A]
-
-  def &(rhs: Int)(implicit c: ConvertableTo[A]): A = ev.and(lhs, c.fromInt(rhs))
-  def |(rhs: Int)(implicit c: ConvertableTo[A]): A = ev.or(lhs, c.fromInt(rhs))
-  def ^(rhs: Int)(implicit c: ConvertableTo[A]): A = ev.xor(lhs, c.fromInt(rhs))
-
-  def &(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) & rhs
-  def |(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) | rhs
-  def ^(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) ^ rhs
 }
 
 object BooleanAlgebra {

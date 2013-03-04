@@ -214,6 +214,7 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   def floor(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
   def round(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
   override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
+  override def fromDouble(n: Double): FPFilter[A] = super[ConvertableToFPFilter].fromDouble(n)
 }
 
 trait FPFilterIsFractional[A] extends Fractional[FPFilter[A]]
@@ -228,6 +229,7 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   def floor(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
   def round(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
   override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
+  override def fromDouble(n: Double): FPFilter[A] = super[ConvertableToFPFilter].fromDouble(n)
 }
 
 

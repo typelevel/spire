@@ -1,7 +1,5 @@
 package spire.algebra
 
-import spire.macrosk.Ops
-
 import scala.{ specialized => spec }
 
 /**
@@ -17,8 +15,4 @@ object Semigroup {
   @inline final def additive[A](implicit A: AdditiveSemigroup[A]) =  A.additive
 
   @inline final def multiplicative[A](implicit A: MultiplicativeSemigroup[A]) = A.multiplicative
-}
-
-final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
-  def |+|(rhs:A) = macro Ops.binop[A, A]
 }

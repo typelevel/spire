@@ -3,9 +3,6 @@ package spire.algebra
 import annotation.tailrec
 import scala.{specialized => spec}
 
-import spire.macrosk.Ops
-
-
 /**
  * Rig is a ring whose additive structure doesn't have an inverse (ie. it is
  * monoid, not a group). Put another way, a Rig is a Ring without a negative.

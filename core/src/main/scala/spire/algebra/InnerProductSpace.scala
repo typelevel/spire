@@ -1,7 +1,5 @@
 package spire.algebra
 
-import spire.macrosk.Ops
-
 import scala.{ specialized => spec }
 import scala.annotation.tailrec
 
@@ -16,13 +14,6 @@ trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends VectorSpac
 
 object InnerProductSpace {
   @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: InnerProductSpace[V, R]) = V
-}
-
-final class InnerProductSpaceOps[V](lhs: V) {
-  def dot[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
-    macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
-  def ⋅[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
-    macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
 }
 
 trait NormedInnerProductSpace[V, @spec(Float, Double) F] extends NormedVectorSpace[V, F] {

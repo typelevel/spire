@@ -3,8 +3,6 @@ package spire.algebra
 import annotation.tailrec
 import scala.{specialized => spec}
 
-import spire.macrosk.Ops
-
 /**
  * Rng is a ring whose multiplicative structure doesn't have an identity
  * (i.e. it is semigroup, not a monoid). Put another way, a Rng is a Ring

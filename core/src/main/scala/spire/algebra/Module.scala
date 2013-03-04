@@ -1,7 +1,5 @@
 package spire.algebra
 
-import spire.macrosk.Ops
-
 import scala.{ specialized => spec }
 
 /**
@@ -51,14 +49,6 @@ object LeftModule {
 object RightModule {
   implicit def module[V, @spec(Int,Long,Float,Double) R](implicit
       module: Module[V, R]): RightModule[V, R] = module
-}
-
-final class LeftModuleOps[V, F](rhs: V)(implicit ev: LeftModule[V, F]) {
-  def *: (lhs:F): V = macro Ops.rbinop[F, V]
-}
-
-final class RightModuleOps[V, F](lhs: V)(implicit ev: RightModule[V, F]) {
-  def :* (rhs:F): V = macro Ops.binop[F, V]
 }
 
 trait IdentityModule[@spec(Int,Long,Float,Double) V] extends Module[V, V] {

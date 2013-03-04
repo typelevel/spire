@@ -1,7 +1,6 @@
 package spire.algebra
 
 import spire.algebra.std._
-import spire.macrosk.Ops
 
 import scala.{ specialized => spec }
 import scala.collection.SeqLike
@@ -48,12 +47,4 @@ trait NormedVectorSpaceFunctions {
       val p = p0.toInt
     }
   }
-}
-
-final class NormedVectorSpaceOps[V](lhs: V) {
-  def norm[F](implicit ev: NormedVectorSpace[V, F]): F =
-    macro Ops.unopWithEv[NormedVectorSpace[V, F], F]
-
-  def normalize[F](implicit ev: NormedVectorSpace[V, F]): V =
-    macro Ops.unopWithEv[NormedVectorSpace[V, F], V]
 }

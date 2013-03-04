@@ -1,7 +1,6 @@
 package spire.algebra
 
 import scala.{ specialized => spec }
-import spire.macrosk.Ops
 
 object Additive {
   def apply[A](s: Semigroup[A]): AdditiveSemigroup[A] =
@@ -63,66 +62,4 @@ trait AdditiveAbGroup[@spec(Int,Long,Float,Double) A] extends AdditiveGroup[A] {
     def op(x: A, y: A): A = plus(x, y)
     def inverse(x: A): A = negate(x)
   }
-}
-
-object AdditiveSemigroup
-object AdditiveMonoid
-object AdditiveGroup
-object AdditiveAbGroup
-
-//trait AdditiveSemigroup0 {
-//  implicit def MonoidIsSemigroup[@spec(Int,Long,Float,Double) A](implicit
-//    m: AdditiveMonoid[A]): AdditiveSemigroup[A] = m
-//}
-//
-//trait AdditiveSemigroup1 extends AdditiveSemigroup0 {
-//  implicit def rigIsAdditiveSemigroup[@spec(Int, Long, Float, Double) A](implicit
-//    r: Rig[A]): AdditiveSemigroup[A] = r
-//}
-//
-//trait AdditiveMonoid0 {
-//  implicit def GroupIsMonoid[@spec(Int,Long,Float,Double) A](implicit
-//    g: AdditiveGroup[A]): AdditiveMonoid[A] = g
-//}
-//
-//trait AdditiveMonoid1 extends AdditiveMonoid0 {
-//  implicit def rigIsAdditiveMonoid[@spec(Int,Long,Float,Double) A](implicit
-//    r: Rig[A]): AdditiveMonoid[A] = r
-//}
-//
-//trait AdditiveGroup0 {
-//  implicit def AbGroupIsGroup[@spec(Int,Long,Float,Double) A](implicit
-//    g: AdditiveAbGroup[A]): AdditiveGroup[A] = g
-//}
-//
-//trait AdditiveGroup1 extends AdditiveGroup0 {
-//  implicit def ringIsAdditiveGroup[@spec(Int,Long,Float,Double) A](implicit
-//    r: Ring[A]): AdditiveGroup[A] = r
-//}
-//
-//trait AdditiveAbGroup0 {
-//  implicit def moduleIsAdditiveAbGroup[V, @spec(Int, Long, Float, Double) R](implicit
-//    m: Module[V, R]): AdditiveAbGroup[V] = m
-//}
-//
-//trait AdditiveAbGroup1 extends AdditiveAbGroup0 {
-//  implicit def ringIsAdditiveAbGroup[@spec(Int,Long,Float,Double) A](implicit
-//    r: Ring[A]): AdditiveAbGroup[A] = r
-//}
-
-import spire.math.{ConvertableTo, ConvertableFrom, Number}
-
-final class AdditiveSemigroupOps[A](lhs:A)(implicit ev:AdditiveSemigroup[A]) {
-  def +(rhs:A): A = macro Ops.binop[A, A]
-  def +(rhs:Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
-  def +(rhs:Double)(implicit ev1:ConvertableTo[A]): A = macro Ops.binopWithLift[Double, ConvertableTo[A], A]
-  def +(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) + rhs
-}
-
-final class AdditiveGroupOps[A](lhs:A)(implicit ev:AdditiveGroup[A]) {
-  def unary_-() = macro Ops.unop[A]
-  def -(rhs:A): A = macro Ops.binop[A, A]
-  def -(rhs:Int)(implicit ev1: Ring[A]): A =  macro Ops.binopWithLift[Int, Ring[A], A]
-  def -(rhs:Double)(implicit ev1:ConvertableTo[A]): A =  macro Ops.binopWithLift[Double, ConvertableTo[A], A]
-  def -(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) - rhs
 }

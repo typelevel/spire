@@ -1,7 +1,6 @@
 package spire.algebra
 
 import scala.{ specialized => spec }
-import spire.macrosk.Ops
 
 object Multiplicative {
   def apply[A](s: Semigroup[A]): MultiplicativeSemigroup[A] =
@@ -63,61 +62,4 @@ trait MultiplicativeAbGroup[@spec(Int,Long,Float,Double) A] extends Multiplicati
     def op(x: A, y: A): A = times(x, y)
     def inverse(x: A): A = reciprocal(x)
   }
-}
-
-object MultiplicativeSemigroup
-object MultiplicativeMonoid
-object MultiplicativeGroup
-object MultiplicativeAbGroup
-
-//trait MultiplicativeSemigroup0 {
-//  implicit def MonoidIsSemigroup[@spec(Int,Long,Float,Double) A](implicit
-//    m: MultiplicativeMonoid[A]): MultiplicativeSemigroup[A] = m
-//}
-//
-//trait MultiplicativeSemigroup1 extends MultiplicativeSemigroup0 {
-//  implicit def rigIsMultiplicativeSemigroup[@spec(Int, Long, Float, Double) A](implicit
-//    r: Rig[A]): MultiplicativeSemigroup[A] = r
-//}
-//
-//trait MultiplicativeMonoid0 {
-//  implicit def GroupIsMonoid[@spec(Int,Long,Float,Double) A](implicit
-//    g: MultiplicativeGroup[A]): MultiplicativeMonoid[A] = g
-//}
-//
-//trait MultiplicativeMonoid1 {
-//  implicit def rigIsMultiplicativeMonoid[@spec(Int, Long, Float, Double) A](implicit
-//    r: Rig[A]): MultiplicativeMonoid[A] = r
-//}
-//
-//trait MultiplicativeGroup0 {
-//  implicit def AbGroupIsGroup[@spec(Int,Long,Float,Double) A](implicit
-//    g: MultiplicativeAbGroup[A]): MultiplicativeGroup[A] = g
-//}
-//
-//trait MultiplicativeGroup1 {
-//  implicit def fieldIsMultiplicativeGroup[@spec(Int, Long, Float, Double) A](implicit
-//    r: Field[A]): MultiplicativeGroup[A] = r
-//}
-//
-//trait MultiplicativeAbGroup0 {
-//  implicit def fieldIsMultiplicativeAbGroup[@spec(Int, Long, Float, Double) A](implicit
-//    r: Field[A]): MultiplicativeAbGroup[A] = r
-//}
-
-import spire.math.{ConvertableTo, ConvertableFrom, Number}
-
-final class MultiplicativeSemigroupOps[A](lhs:A)(implicit ev:MultiplicativeSemigroup[A]) {
-  def *(rhs:A): A = macro Ops.binop[A, A]
-  def *(rhs:Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
-  def *(rhs:Double)(implicit ev1:ConvertableTo[A]): A = macro Ops.binopWithLift[Double, ConvertableTo[A], A]
-  def *(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) * rhs
-}
-
-final class MultiplicativeGroupOps[A](lhs:A)(implicit ev:MultiplicativeGroup[A]) {
-  def reciprocal() = macro Ops.unop[A]
-  def /(rhs:A): A = macro Ops.binop[A, A]
-  def /(rhs:Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
-  def /(rhs:Double)(implicit ev1:ConvertableTo[A]): A = macro Ops.binopWithLift[Double, ConvertableTo[A], A]
-  def /(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) / rhs
 }
