@@ -2,13 +2,10 @@ package spire.algebra
 
 import spire.implicits._
 
-import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
+import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
-import org.scalatest.FunSuite
-import org.scalatest.prop.Checkers
-
-trait Laws[A] {
+trait AlgebraLaws[A] {
 
   implicit def Eq: Eq[A]
   implicit def Arbitrary: Arbitrary[A]
@@ -121,20 +118,10 @@ trait Laws[A] {
   }
 }
 
-object Laws {
-  def apply[A : Eq : Arbitrary] = new Laws[A] {
+object AlgebraLaws {
+  def apply[A : Eq : Arbitrary] = new AlgebraLaws[A] {
     def Eq = implicitly[Eq[A]]
     def Arbitrary = implicitly[Arbitrary[A]]
-  }
-}
-
-trait LawChecker extends FunSuite with Checkers {
-  def checkAll[A](name: String, props: Properties) {
-    for ((id, prop) <- props.properties) {
-      test(name + "." + id) {
-        check(prop)
-      }
-    }
   }
 }
 

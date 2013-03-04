@@ -5,18 +5,16 @@ import spire.implicits._
 import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
 import org.scalacheck.Prop._
 
-import org.scalatest.FunSuite
-import org.scalatest.prop.Checkers
-
 trait VectorSpaceLaws[V, A] {
 
   implicit def scalar(implicit V: Module[V, A]): Ring[A] = V.scalar
 
-  val vectorLaws: Laws[V]
-  val scalarLaws: Laws[A]
+  val vectorLaws: AlgebraLaws[V]
+  val scalarLaws: AlgebraLaws[A]
 
   import vectorLaws.{ Eq => EqV, Arbitrary => ArbV }
   import scalarLaws.{ Eq => EqA, Arbitrary => ArbA }
+
 
   def module(implicit V: Module[V, A]) = new Properties("module") {
     include(vectorLaws.abGroup(V.additive))
@@ -78,7 +76,9 @@ trait VectorSpaceLaws[V, A] {
 
 object VectorSpaceLaws {
   def apply[V: Eq: Arbitrary, A: Eq: Arbitrary] = new VectorSpaceLaws[V, A] {
-    val vectorLaws = Laws[V]
-    val scalarLaws = Laws[A]
+    val vectorLaws = AlgebraLaws[V]
+    val scalarLaws = AlgebraLaws[A]
   }
 }
+
+// vim: expandtab:ts=2:sw=2
