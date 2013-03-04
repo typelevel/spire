@@ -21,7 +21,7 @@ import java.lang.Math
 object NaturalBenchmarks extends MyRunner(classOf[NaturalBenchmarks])
 
 class NaturalBenchmarks extends MyBenchmark {
-  import spire.algebra.EuclideanRing.SafeLongIsEuclideanRing
+  import spire.math.SafeLong.SafeLongAlgebra
 
   //@Param(Array("8", "16", "32", "64", "96", "128", "192", "256"))
   //@Param(Array("8"))

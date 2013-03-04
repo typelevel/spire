@@ -2,6 +2,9 @@ package spire.math
 
 import org.scalatest.FunSuite
 
+import spire.algebra._
+import spire.std.int._
+
 class SortingTest extends FunSuite {
   def testSort(before: Array[Int]) = {
 

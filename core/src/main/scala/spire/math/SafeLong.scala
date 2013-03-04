@@ -4,6 +4,8 @@ import scala.math.{abs, signum, ScalaNumber, ScalaNumericConversions}
 import scala.annotation.tailrec
 
 import spire.algebra._
+import spire.std.long._
+import spire.std.bigInt._
 
 // TODO: might be nice to write a macro-version of fold here to
 // avoid using closures for everything.
@@ -353,20 +355,17 @@ trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with SafeLongIsRin
 }
 
 trait SafeLongIsNRoot extends NRoot[SafeLong] {
-  import spire.std.long.LongIsNRoot
-  import spire.std.bigInt.BigIntIsNRoot
-
   def nroot(a: SafeLong, k: Int): SafeLong = a.fold(
-    n => SafeLong(LongIsNRoot.nroot(n, k)),
-    n => SafeLong(BigIntIsNRoot.nroot(n, k))
+    n => SafeLong(NRoot[Long].nroot(n, k)),
+    n => SafeLong(NRoot[BigInt].nroot(n, k))
   )
   def log(a:SafeLong) = a.fold(
-    n => SafeLong(LongIsNRoot.log(n)),
-    n => SafeLong(BigIntIsNRoot.log(n))
+    n => SafeLong(NRoot[Long].log(n)),
+    n => SafeLong(NRoot[BigInt].log(n))
   )
 
   def fpow(a:SafeLong, b:SafeLong) =
-    SafeLong(BigIntIsNRoot.fpow(a.toBigInt, b.toBigInt))
+    SafeLong(NRoot[BigInt].fpow(a.toBigInt, b.toBigInt))
 }
 
 trait SafeLongEq extends Eq[SafeLong] {

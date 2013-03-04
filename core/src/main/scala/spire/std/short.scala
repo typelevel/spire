@@ -32,7 +32,7 @@ trait ShortIsSigned extends Signed[Short] {
   def abs(a: Short): Short = (if (a < 0) -a else a).toShort
 }
 
-trait ShortIsReal extends ShortOrder with ShortIsSigned {
+trait ShortIsReal extends IsReal[Short] with ShortOrder with ShortIsSigned {
   def toDouble(n: Short): Double = n.toDouble
 }
 

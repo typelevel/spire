@@ -69,7 +69,7 @@ trait FloatOrder extends Order[Float] with FloatEq {
   def compare(x: Float, y: Float) = java.lang.Float.compare(x, y)
 }
 
-trait FloatIsReal extends FloatOrder with FloatIsSigned {
+trait FloatIsReal extends IsReal[Float] with FloatOrder with FloatIsSigned {
   def toDouble(x: Float): Double = x.toDouble
 }
 

@@ -73,7 +73,7 @@ trait LongIsSigned extends Signed[Long] {
   def abs(a: Long): Long = if (a < 0L) -a else a
 }
 
-trait LongIsReal extends LongOrder with LongIsSigned {
+trait LongIsReal extends IsReal[Long] with LongOrder with LongIsSigned {
   def toDouble(n: Long): Double = n.toDouble
 }
 
@@ -87,8 +87,7 @@ trait LongIsBooleanAlgebra extends BooleanAlgebra[Long] {
 }
 
 trait LongInstances {
-  object LongIsNRoot extends LongIsNRoot
   implicit object LongBooleanAlgebra extends LongIsBooleanAlgebra
-  implicit object LongAlgebra extends LongIsEuclideanRing
+  implicit object LongAlgebra extends LongIsEuclideanRing with LongIsNRoot
   implicit object LongIsReal extends LongIsReal
 }

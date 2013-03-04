@@ -90,7 +90,8 @@ trait BigDecimalIsSigned extends Signed[BigDecimal] {
   def abs(a: BigDecimal): BigDecimal = a.abs
 }
 
-trait BigDecimalIsReal extends BigDecimalOrder with BigDecimalIsSigned {
+trait BigDecimalIsReal extends IsReal[BigDecimal]
+with BigDecimalOrder with BigDecimalIsSigned {
   def toDouble(x: BigDecimal): Double = x.toDouble
 }
 

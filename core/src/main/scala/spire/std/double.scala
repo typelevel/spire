@@ -69,7 +69,7 @@ trait DoubleIsSigned extends Signed[Double] {
   def abs(a: Double): Double = if (a < 0.0) -a else a
 }
 
-trait DoubleIsReal extends DoubleOrder with DoubleIsSigned {
+trait DoubleIsReal extends IsReal[Double] with DoubleOrder with DoubleIsSigned {
   def toDouble(x: Double): Double = x
 }
 
