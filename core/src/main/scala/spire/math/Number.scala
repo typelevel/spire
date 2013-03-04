@@ -498,7 +498,6 @@ trait NumberIsField extends Field[Number] with NumberIsEuclideanRing {
 trait NumberIsNRoot extends NRoot[Number] {
   def nroot(a: Number, k: Int): Number = a.pow(Number(k))
   override def sqrt(a: Number): Number = a.pow(Number(0.5))
-  def log(a: Number) = Number(Math.log(a.toDouble))
   def fpow(a: Number, b: Number) = a.pow(b)
 }
 
@@ -507,6 +506,7 @@ trait NumberIsTrig extends Trig[Number] {
   def pi: Number = Number(Math.PI)
 
   def exp(a: Number): Number = Math.exp(a.toDouble)
+  def log(a: Number) = Number(Math.log(a.toDouble))
 
   def sin(a: Number): Number = Math.sin(a.toDouble)
   def cos(a: Number): Number = Math.cos(a.toDouble)

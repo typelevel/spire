@@ -119,7 +119,6 @@ trait RealIsField extends Field[Real] with RealIsEuclideanRing {
 
 trait RealIsNRoot extends NRoot[Real] {
   def nroot(a: Real, k: Int): Real = a nroot k
-  def log(a:Real) = sys.error("fixme")
   def fpow(a:Real, b:Real) = sys.error("fixme")
 }
 

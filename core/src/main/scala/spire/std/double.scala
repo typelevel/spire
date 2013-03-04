@@ -2,7 +2,7 @@ package spire.std
 
 import spire.algebra._
 
-import java.lang.{ Math => JavaMath }
+import java.lang.Math
 
 import scala.annotation.tailrec
 
@@ -41,28 +41,28 @@ trait DoubleIsField extends Field[Double] {
 trait DoubleIsNRoot extends NRoot[Double] {
   def nroot(a: Double, k: Int): Double = Math.pow(a, 1 / k.toDouble)
   override def sqrt(a: Double): Double = Math.sqrt(a)
-  def log(a: Double) = Math.log(a)
   def fpow(a: Double, b: Double) = Math.pow(a, b)
 }
 
 trait DoubleIsTrig extends Trig[Double] {
-  def e: Double = JavaMath.E
-  def pi: Double = JavaMath.PI
+  def e: Double = Math.E
+  def pi: Double = Math.PI
 
-  def exp(a: Double): Double = JavaMath.exp(a)
+  def exp(a: Double): Double = Math.exp(a)
+  def log(a: Double) = Math.log(a)
 
-  def sin(a: Double): Double = JavaMath.sin(a)
-  def cos(a: Double): Double = JavaMath.cos(a)
-  def tan(a: Double): Double = JavaMath.tan(a)
+  def sin(a: Double): Double = Math.sin(a)
+  def cos(a: Double): Double = Math.cos(a)
+  def tan(a: Double): Double = Math.tan(a)
 
-  def asin(a: Double): Double = JavaMath.asin(a)
-  def acos(a: Double): Double = JavaMath.acos(a)
-  def atan(a: Double): Double = JavaMath.atan(a)
-  def atan2(y: Double, x: Double): Double = JavaMath.atan2(y, x)
+  def asin(a: Double): Double = Math.asin(a)
+  def acos(a: Double): Double = Math.acos(a)
+  def atan(a: Double): Double = Math.atan(a)
+  def atan2(y: Double, x: Double): Double = Math.atan2(y, x)
 
-  def sinh(x: Double): Double = JavaMath.sinh(x)
-  def cosh(x: Double): Double = JavaMath.cosh(x)
-  def tanh(x: Double): Double = JavaMath.tanh(x)
+  def sinh(x: Double): Double = Math.sinh(x)
+  def cosh(x: Double): Double = Math.cosh(x)
+  def tanh(x: Double): Double = Math.tanh(x)
 
   def toRadians(a: Double): Double = (a * 2 * pi) / 360
   def toDegrees(a: Double): Double = (a * 360) / (2 * pi)
@@ -81,7 +81,7 @@ trait DoubleOrder extends Order[Double] {
 }
 
 trait DoubleIsSigned extends Signed[Double] {
-  def signum(a: Double): Int = JavaMath.signum(a).toInt
+  def signum(a: Double): Int = Math.signum(a).toInt
   def abs(a: Double): Double = if (a < 0.0) -a else a
 }
 

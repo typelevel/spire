@@ -68,8 +68,6 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
     y
   }
 
-  def log(a:BigDecimal) = spire.math.log(a)
-
   def fpow(a:BigDecimal, b:BigDecimal) = spire.math.pow(a, b)
 }
 
@@ -181,6 +179,7 @@ class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends 
   protected[std] lazy val twoPi = pi * 2
 
   def exp(k: BigDecimal): BigDecimal = spire.math.exp(k)
+  def log(a: BigDecimal) = spire.math.log(a)
 
   protected[std] val threeSixty = BigDecimal(360)
   def toRadians(a: BigDecimal): BigDecimal = (a * twoPi) / threeSixty

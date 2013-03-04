@@ -41,7 +41,6 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
 
     findNroot(0, a.bitLength - 1)
   }
-  def log(a:BigInt) = spire.math.log(BigDecimal(a)).toBigInt
   def fpow(a:BigInt, b:BigInt) = spire.math.pow(BigDecimal(a), BigDecimal(b)).toBigInt
 }
 

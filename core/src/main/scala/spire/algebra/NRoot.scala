@@ -22,7 +22,6 @@ import java.math.MathContext
 trait NRoot[@spec(Double,Float,Int,Long) A] {
   def nroot(a: A, n: Int): A
   def sqrt(a: A): A = nroot(a, 2)
-  def log(a:A):A
   def fpow(a:A, b:A): A
 }
 

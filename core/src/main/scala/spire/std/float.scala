@@ -2,7 +2,7 @@ package spire.std
 
 import spire.algebra._
 
-import java.lang.{ Math => JavaMath }
+import java.lang.Math
 
 import scala.annotation.tailrec
 
@@ -47,30 +47,30 @@ trait FloatIsNRoot extends NRoot[Float] {
 }
 
 trait FloatIsTrig extends Trig[Float] {
-  def e: Float = JavaMath.E.toFloat
-  def pi: Float = JavaMath.PI.toFloat
+  def e: Float = Math.E.toFloat
+  def pi: Float = Math.PI.toFloat
 
-  def exp(a: Float): Float = JavaMath.exp(a.toDouble).toFloat
+  def exp(a: Float): Float = Math.exp(a.toDouble).toFloat
 
-  def sin(a: Float): Float = JavaMath.sin(a.toDouble).toFloat
-  def cos(a: Float): Float = JavaMath.cos(a.toDouble).toFloat
-  def tan(a: Float): Float = JavaMath.tan(a.toDouble).toFloat
+  def sin(a: Float): Float = Math.sin(a.toDouble).toFloat
+  def cos(a: Float): Float = Math.cos(a.toDouble).toFloat
+  def tan(a: Float): Float = Math.tan(a.toDouble).toFloat
 
-  def asin(a: Float): Float = JavaMath.asin(a.toDouble).toFloat
-  def acos(a: Float): Float = JavaMath.acos(a.toDouble).toFloat
-  def atan(a: Float): Float = JavaMath.atan(a.toDouble).toFloat
-  def atan2(y: Float, x: Float): Float = JavaMath.atan2(y.toDouble, x.toDouble).toFloat
+  def asin(a: Float): Float = Math.asin(a.toDouble).toFloat
+  def acos(a: Float): Float = Math.acos(a.toDouble).toFloat
+  def atan(a: Float): Float = Math.atan(a.toDouble).toFloat
+  def atan2(y: Float, x: Float): Float = Math.atan2(y.toDouble, x.toDouble).toFloat
 
-  def sinh(x: Float): Float = JavaMath.sinh(x.toDouble).toFloat
-  def cosh(x: Float): Float = JavaMath.cosh(x.toDouble).toFloat
-  def tanh(x: Float): Float = JavaMath.tanh(x.toDouble).toFloat
+  def sinh(x: Float): Float = Math.sinh(x.toDouble).toFloat
+  def cosh(x: Float): Float = Math.cosh(x.toDouble).toFloat
+  def tanh(x: Float): Float = Math.tanh(x.toDouble).toFloat
 
   def toRadians(a: Float): Float = (a * 2 * pi) / 360
   def toDegrees(a: Float): Float = (a * 360) / (2 * pi)
 }
 
 trait FloatIsSigned extends Signed[Float] {
-  def signum(a: Float): Int = JavaMath.signum(a).toInt
+  def signum(a: Float): Int = Math.signum(a).toInt
   def abs(a: Float): Float = if (a < 0.0f) -a else a
 }
 

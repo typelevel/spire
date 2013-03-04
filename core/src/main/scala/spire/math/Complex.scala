@@ -155,6 +155,8 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
 
   def **(b: Int): Complex[T] = pow(b)
 
+  def nroot(k: Int): Complex[T] = pow(Complex(f.reciprocal(f.fromInt(k)), f.zero))
+
   def pow(b: Int): Complex[T] =
     Complex.polar(f.fpow(abs, f.fromInt(b)), f.times(arg, f.fromInt(b)))
 
@@ -172,7 +174,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
     val c = t.exp(bb)
     val len = f.div(a, c)
     val d = f.times(arg, b.real)
-    val e = f.log(abs)
+    val e = t.log(abs)
     val ff = f.times(e, b.imag)
     val phase = f.plus(d, ff)
     Complex.polar(len, phase)
@@ -183,7 +185,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
   // we are going with the "principal value" definition of Log.
   def log: Complex[T] = {
     if (this == Complex.zero[T]) sys.error("log undefined at 0")
-    new Complex(f.log(abs), arg)
+    new Complex(t.log(abs), arg)
   }
 
   def sqrt: Complex[T] = {
@@ -569,6 +571,7 @@ trait ComplexIsTrig[@spec(Float, Double) A] extends Trig[Complex[A]] {
   def pi: Complex[A] = new Complex[A](t.pi, f.zero)
 
   def exp(a: Complex[A]): Complex[A] = a.exp
+  def log(a: Complex[A]): Complex[A] = a.log
 
   def sin(a: Complex[A]): Complex[A] = a.sin
   def cos(a: Complex[A]): Complex[A] = a.cos
@@ -588,6 +591,12 @@ trait ComplexIsTrig[@spec(Float, Double) A] extends Trig[Complex[A]] {
   def toDegrees(a: Complex[A]): Complex[A] = a
 }
 
+trait ComplexIsNRoot[A] extends NRoot[Complex[A]] {
+  def nroot(a: Complex[A], k: Int): Complex[A] = a.nroot(k)
+  override def sqrt(a: Complex[A]): Complex[A] = a.sqrt
+  def fpow(a: Complex[A], b: Complex[A]): Complex[A] = a.pow(b)
+}
+
 trait ComplexEq[A] extends Eq[Complex[A]] {
   def eqv(x:Complex[A], y:Complex[A]) = x eqv y
   override def neqv(x:Complex[A], y:Complex[A]) = x neqv y
@@ -602,7 +611,8 @@ trait ComplexIsSigned[A] extends Signed[Complex[A]] {
 }
 
 trait ComplexAlgebra[@spec(Float, Double) A] extends ComplexIsField[A]
-with ComplexIsTrig[A] with InnerProductSpace[Complex[A], A]
+with ComplexIsTrig[A] with ComplexIsNRoot[A]
+with InnerProductSpace[Complex[A], A]
 with FieldAlgebra[Complex[A], A] {
   def timesl(r: A, v: Complex[A]): Complex[A] = Complex(r, scalar.zero) * v
   def dot(x: Complex[A], y: Complex[A]): A =

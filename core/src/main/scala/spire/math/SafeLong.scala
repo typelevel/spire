@@ -359,10 +359,6 @@ trait SafeLongIsNRoot extends NRoot[SafeLong] {
     n => SafeLong(NRoot[Long].nroot(n, k)),
     n => SafeLong(NRoot[BigInt].nroot(n, k))
   )
-  def log(a:SafeLong) = a.fold(
-    n => SafeLong(NRoot[Long].log(n)),
-    n => SafeLong(NRoot[BigInt].log(n))
-  )
 
   def fpow(a:SafeLong, b:SafeLong) =
     SafeLong(NRoot[BigInt].fpow(a.toBigInt, b.toBigInt))

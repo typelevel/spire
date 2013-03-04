@@ -52,8 +52,6 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def pow(exp: Int): Rational
 
-  def log(): Rational
-
   /**
    * Returns this `Rational` to the exponent `exp`. Both the numerator and
    * denominator of `exp` must be valid integers. Anything larger will cause
@@ -654,8 +652,6 @@ object LongRationals extends Rationals[Long] {
     else
       BigRationals.build(spire.math.pow(n, exp), spire.math.pow(d, exp))
 
-    def log() = Rational(Math.log(n) - Math.log(d))
-
     def compareToOne: Int = n compare d
 
     def compare(r: Rational): Int = r match {
@@ -786,8 +782,6 @@ object BigRationals extends Rationals[BigInt] {
     else
       BigRationals.build(n pow exp, d pow exp)
 
-    def log() = Rational(spire.math.log(BigDecimal(n)) - spire.math.log(BigDecimal(d)))
-
     def compareToOne: Int = n compare d
 
     def compare(r: Rational): Int = r match {
@@ -859,7 +853,6 @@ trait RationalIsField extends Field[Rational] with RationalIsEuclideanRing {
 trait RationalIsNRoot extends NRoot[Rational] {
   implicit def context:ApproximationContext[Rational]
   def nroot(a: Rational, k: Int): Rational = a.nroot(k)
-  def log(a: Rational): Rational = a.log
   def fpow(a: Rational, b: Rational): Rational = a.pow(b)
 }
 

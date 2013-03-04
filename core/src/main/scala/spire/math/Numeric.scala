@@ -105,7 +105,8 @@ with ConvertableFromReal with ConvertableToReal with RealOrder with RealIsSigned
 
 class ComplexIsNumeric[A](implicit val f:Fractional[A], val t:Trig[A])
 extends ComplexIsField[A] with Numeric[Complex[A]] with ComplexEq[A]
-with NRoot[Complex[A]] with ConvertableFromComplex[A] with ConvertableToComplex[A]
+with ComplexIsTrig[A] with ComplexIsNRoot[A]
+with ConvertableFromComplex[A] with ConvertableToComplex[A]
 with Order[Complex[A]] with ComplexIsSigned[A] {
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
   override def fromDouble(n: Double): Complex[A] = Complex[A](f.fromDouble(n))
@@ -117,9 +118,6 @@ with Order[Complex[A]] with ComplexIsSigned[A] {
   override def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   override def lteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   def compare(x:Complex[A], y:Complex[A]): Int = if (x eqv y) 0 else sys.error("undefined")
-
-  def log(a:Complex[A]) = a.log
-  def fpow(a:Complex[A], b:Complex[A]) = a.pow(b)
 }
 
 class GaussianIsNumeric[A](implicit val f:Integral[A], val n: NRoot[A])

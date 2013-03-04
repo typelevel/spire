@@ -199,7 +199,6 @@ trait FPFilterIsNRoot[A] extends NRoot[FPFilter[A]] {
     new FPFilter(a.approx.sqrt, ev.sqrt(a.value))
 
   def fpow(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] = sys.error("fixme")
-  def log(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
 }
 
 trait FPFilterIsNumeric[A] extends Numeric[FPFilter[A]]

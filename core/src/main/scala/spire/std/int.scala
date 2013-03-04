@@ -2,6 +2,8 @@ package spire.std
 
 import spire.algebra._
 
+import java.lang.Math
+
 trait IntIsEuclideanRing extends EuclideanRing[Int] {
   override def minus(a:Int, b:Int): Int = a - b
   def negate(a:Int): Int = -a

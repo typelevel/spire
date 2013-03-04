@@ -120,7 +120,6 @@ final class FieldOps[A](lhs:A)(implicit ev:Field[A]) {
 final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
   def nroot(rhs: Int): A = macro Ops.binop[Int, A]
   def sqrt(): A = macro Ops.unop[A]
-  def log(): A = macro Ops.unop[A]
   def fpow(rhs: A): A = macro Ops.binop[A, A]
 
   // TODO: should be macros
@@ -129,6 +128,11 @@ final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
 
   def pow(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) pow rhs
   def **(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) ** rhs
+}
+
+final class TrigOps[A](lhs: A)(implicit ev: Trig[A]) {
+  def exp(): A = macro Ops.unop[A]
+  def log(): A = macro Ops.unop[A]
 }
 
 final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
