@@ -175,21 +175,6 @@ trait ConvertableToComplex[A] extends ConvertableTo[Complex[A]] {
   def fromType[B:ConvertableFrom](b:B): Complex[A] = Complex(f.fromType(b), f.zero)
 }
 
-trait ConvertableToGaussian[A] extends ConvertableTo[Gaussian[A]] {
-  implicit def f:Integral[A]
-  def fromByte(a:Byte): Gaussian[A] = Gaussian(f.fromByte(a), f.zero)
-  def fromShort(a:Short): Gaussian[A] = Gaussian(f.fromShort(a), f.zero)
-  def fromInt(a:Int): Gaussian[A] = Gaussian(f.fromInt(a), f.zero)
-  def fromLong(a:Long): Gaussian[A] = Gaussian(f.fromLong(a), f.zero)
-  def fromFloat(a:Float): Gaussian[A] = Gaussian(f.fromFloat(a), f.zero)
-  def fromDouble(a:Double): Gaussian[A] = Gaussian(f.fromDouble(a), f.zero)
-  def fromBigInt(a:BigInt): Gaussian[A] = Gaussian(f.fromBigInt(a), f.zero)
-  def fromBigDecimal(a:BigDecimal): Gaussian[A] = Gaussian(f.fromBigDecimal(a), f.zero)
-  def fromRational(a:Rational): Gaussian[A] = Gaussian(f.fromRational(a), f.zero)
-
-  def fromType[B:ConvertableFrom](b:B): Gaussian[A] = Gaussian(f.fromType(b), f.zero)
-}
-
 trait ConvertableToSafeLong extends ConvertableTo[SafeLong] {
   def fromByte(a:Byte): SafeLong = SafeLong(a)
   def fromShort(a:Short): SafeLong = SafeLong(a)
@@ -236,11 +221,6 @@ object ConvertableTo {
     new ConvertableToComplex[A] {
       val f = Fractional[A]
       val t = Trig[A]
-    }
-
-  implicit def convertableToGaussian[A: Integral] =
-    new ConvertableToGaussian[A] {
-      val f = Integral[A]
     }
 }
 
@@ -421,23 +401,6 @@ trait ConvertableFromReal extends ConvertableFrom[Real] {
   def toString(a:Real): String = a.toString
 }
 
-trait ConvertableFromGaussian[A] extends ConvertableFrom[Gaussian[A]] {
-  def f:Integral[A]
-  def toByte(a:Gaussian[A]): Byte = f.toByte(a.real)
-  def toShort(a:Gaussian[A]): Short = f.toShort(a.real)
-  def toInt(a:Gaussian[A]): Int = f.toInt(a.real)
-  def toLong(a:Gaussian[A]): Long = f.toLong(a.real)
-  def toFloat(a:Gaussian[A]): Float = f.toFloat(a.real)
-  def toDouble(a:Gaussian[A]): Double = f.toDouble(a.real)
-  def toBigInt(a:Gaussian[A]): BigInt = f.toBigInt(a.real)
-  def toBigDecimal(a:Gaussian[A]): BigDecimal = f.toBigDecimal(a.real)
-  def toRational(a:Gaussian[A]): Rational = f.toRational(a.real)
-  def toNumber(a:Gaussian[A]): Number = f.toNumber(a.real)
-
-  def toType[B:ConvertableTo](a:Gaussian[A]): B = sys.error("fixme")
-  def toString(a:Gaussian[A]): String = a.toString
-}
-
 trait ConvertableFromComplex[A] extends ConvertableFrom[Complex[A]] {
   def f:Fractional[A]
   def t:Trig[A]
@@ -508,11 +471,6 @@ object ConvertableFrom {
     new ConvertableFromComplex[A] {
       val f = Fractional[A]
       val t = Trig[A]
-    }
-
-  implicit def convertableFromGaussian[A: Integral] =
-    new ConvertableFromGaussian[A] {
-      val f = Integral[A]
     }
 }
 

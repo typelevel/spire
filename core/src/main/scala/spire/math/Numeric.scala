@@ -29,7 +29,6 @@ object Numeric {
   }
   implicit object RealIsNumeric extends RealIsNumeric
   implicit def complexIsNumeric[A: Fractional: Trig] = new ComplexIsNumeric
-  implicit def gaussianIsNumeric[A: Integral: NRoot] = new GaussianIsNumeric
 
   @inline final def apply[A](implicit ev:Numeric[A]):Numeric[A] = ev
 }
@@ -118,33 +117,4 @@ with Order[Complex[A]] with ComplexIsSigned[A] {
   override def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   override def lteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
   def compare(x:Complex[A], y:Complex[A]): Int = if (x eqv y) 0 else sys.error("undefined")
-}
-
-class GaussianIsNumeric[A](implicit val f:Integral[A], val n: NRoot[A])
-extends Numeric[Gaussian[A]] with NRoot[Gaussian[A]] 
-with Order[Gaussian[A]] with GaussianIsSigned[A]
-with GaussianIsEuclideanRing[A] with GaussianEq[A]
-with ConvertableFromGaussian[A] with ConvertableToGaussian[A] {
-  override def fromInt(n: Int): Gaussian[A] = Gaussian.fromInt[A](n)
-  override def fromDouble(n: Double): Gaussian[A] =
-    super[ConvertableToGaussian].fromDouble(n)
-
-  override def nroot(a: Gaussian[A], n: Int) = sys.error("undefined")
-
-  override def eqv(x: Gaussian[A], y: Gaussian[A]): Boolean = x == y
-  override def gt(x:Gaussian[A], y:Gaussian[A]) = sys.error("undefined")
-  override def gteqv(x:Gaussian[A], y:Gaussian[A]) = sys.error("undefined")
-  override def lt(x:Gaussian[A], y:Gaussian[A]) = sys.error("undefined")
-  override def lteqv(x:Gaussian[A], y:Gaussian[A]) = sys.error("undefined")
-
-  def compare(x:Gaussian[A], y:Gaussian[A]) = if (x eqv y) 0 else sys.error("undefined")
-
-  def log(a:Gaussian[A]) = sys.error("undefined")
-  def fpow(a:Gaussian[A], b:Gaussian[A]) = sys.error("undefined")
-
-  def div(a:Gaussian[A], b:Gaussian[A]) = a / b
-  def ceil(a: Gaussian[A]): Gaussian[A] = a
-  def floor(a: Gaussian[A]): Gaussian[A] = a
-  def round(a: Gaussian[A]): Gaussian[A] = a
-  def isWhole(a:Gaussian[A]) = true
 }

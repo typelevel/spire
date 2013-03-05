@@ -80,11 +80,6 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
 
   override def toString: String = "(%s + %si)" format (real, imag)
 
-  def toGaussian: Gaussian[T] = Gaussian(f.round(real), f.round(imag))(f)
-
-  def toGaussian[@spec(Int, Long) U: Integral](g: T => U): Gaussian[U] =
-    Gaussian(g(f.round(real)), g(f.round(imag)))
-
   def abs: T = f.sqrt(f.plus(f.times(real, real), f.times(imag, imag)))
   def arg: T = t.atan2(imag, real)
 
