@@ -71,8 +71,11 @@ trait FPFilterEq[A] extends Eq[FPFilter[A]] {
   }
 }
 
-trait FPFilterOrder[A] extends FPFilterEq[A] {
+trait FPFilterOrder[A] extends Order[FPFilter[A]] with FPFilterEq[A] {
   implicit def order: Order[A]
+
+  override def eqv(a: FPFilter[A], b: FPFilter[A]): Boolean =
+    super[FPFilterEq].eqv(a, b)
 
   def compare(a: FPFilter[A], b: FPFilter[A]): Int = (a.approx - b.approx).sign match {
     case Some(Positive) => 1
@@ -208,7 +211,6 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   implicit val ev: Numeric[A]
   def order = ev
 
-  override def eqv(x: FPFilter[A], y: FPFilter[A]): Boolean = super.eqv(x, y)
   def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
   def ceil(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
   def floor(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
@@ -224,7 +226,6 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   implicit val ev: Fractional[A]
   def order = ev
 
-  override def eqv(x: FPFilter[A], y: FPFilter[A]): Boolean = super.eqv(x, y)
   def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
   def ceil(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
   def floor(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")

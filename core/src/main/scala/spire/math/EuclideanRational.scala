@@ -22,23 +22,23 @@ case class EuclideanRational[@spec(Int, Long) A](n: A, d: A)(implicit f: Euclide
 
   override def toString(): String = "%s/%s" format (n, d)
 
-  def reciprocal() = EuclideanRational(d, n)
+  def reciprocal(): EuclideanRational[A] = EuclideanRational(d, n)
 
-  def quantize() = f.quot(n, d)
+  def quantize(): A = f.quot(n, d)
 
-  def ceil()(implicit o:Order[A]) = if (o.compare(f.mod(n, d), f.zero) > 0)
+  def ceil()(implicit o: Order[A]): A = if (o.compare(f.mod(n, d), f.zero) > 0)
     f.plus(f.quot(n, d), f.one)
   else
     f.quot(n, d)
 
-  def floor()(implicit o:Order[A]) = if (o.compare(f.mod(n, d), f.zero) < 0)
+  def floor()(implicit o:Order[A]): A = if (o.compare(f.mod(n, d), f.zero) < 0)
     f.minus(f.quot(n, d), f.one)
   else
     f.quot(n, d)
 
-  def unary_-() = EuclideanRational(f.negate(n), d)
+  def unary_-(): EuclideanRational[A] = EuclideanRational(f.negate(n), d)
 
-  def +(rhs: EuclideanRational[A]) = {
+  def +(rhs: EuclideanRational[A]): EuclideanRational[A] = {
     val dgcd = f.gcd(lhs.d, rhs.d)
     val ld = f.quot(lhs.d, dgcd)
     val rd = f.quot(rhs.d, dgcd)
@@ -47,9 +47,9 @@ case class EuclideanRational[@spec(Int, Long) A](n: A, d: A)(implicit f: Euclide
     EuclideanRational(f.quot(num, ngcd), f.times(ld, f.quot(rhs.d, ngcd)))
   }
 
-  def -(rhs: EuclideanRational[A]) = lhs + (-rhs)
+  def -(rhs: EuclideanRational[A]): EuclideanRational[A] = lhs + (-rhs)
 
-  def *(rhs: EuclideanRational[A]) = {
+  def *(rhs: EuclideanRational[A]): EuclideanRational[A] = {
     val a = f.gcd(lhs.n, rhs.d)
     val b = f.gcd(lhs.d, rhs.n)
     val nn = f.times(f.quot(lhs.n, a), f.quot(rhs.n, b))
@@ -57,15 +57,20 @@ case class EuclideanRational[@spec(Int, Long) A](n: A, d: A)(implicit f: Euclide
     EuclideanRational(nn, dd)
   }
 
-  def /(rhs: EuclideanRational[A]) = lhs * rhs.reciprocal
+  def /(rhs: EuclideanRational[A]): EuclideanRational[A] =
+    lhs * rhs.reciprocal
 
-  def /~(rhs: EuclideanRational[A]) =
+  def /~(rhs: EuclideanRational[A]): EuclideanRational[A] =
     EuclideanRational((lhs / rhs).quantize, f.one)
 
-  def %(rhs: EuclideanRational[A]) = lhs - (lhs /~ rhs) * rhs
+  def %(rhs: EuclideanRational[A]): EuclideanRational[A] =
+    lhs - (lhs /~ rhs) * rhs
 
-  def /%(rhs: EuclideanRational[A]) = {
+  def /%(rhs: EuclideanRational[A]): (EuclideanRational[A], EuclideanRational[A]) = {
     val q = lhs /~ rhs
     (q, lhs - q * rhs)
   }
+
+  def **(rhs: Int): EuclideanRational[A] =
+    EuclideanRational(f.pow(n, rhs), f.pow(d, rhs))
 }

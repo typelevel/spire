@@ -31,7 +31,6 @@ object Approximation {
     }
   }
 
-
   implicit def int2error(k: Int): ApproximationContextBuilder = new ApproximationContextBuilder(k)
   final class ApproximationContextBuilder(k: Int) {
     // def bits: AbsolutePrecision = AbsolutePrecision(k)

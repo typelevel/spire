@@ -12,7 +12,7 @@ import scala.{specialized => spec}
  * A Semiring with additive and multiplicative identities (0 and 1) is a Rig.
  * A Semiring with all of the above is a Ring.
  */
-trait Semiring[@spec(Int,Long,Float,Double) A] extends AdditiveSemigroup[A] with MultiplicativeSemigroup[A] {
+trait Semiring[@spec(Byte, Short, Int, Long, Float, Double) A] extends AdditiveSemigroup[A] with MultiplicativeSemigroup[A] {
   // NOTE: that for a Semiring, the exponent must be > 0.
   def pow(a:A, n:Int):A =
     if (n < 1) sys.error("illegal exponent: %s" format n)

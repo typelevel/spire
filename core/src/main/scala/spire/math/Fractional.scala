@@ -7,16 +7,17 @@ import spire.macrosk.Ops
 import scala.{specialized => spec}
 import java.lang.Math
 
-trait Fractional[@spec(Float,Double) A] extends Field[A] with NRoot[A] with Integral[A]
+trait Fractional[@spec(Float, Double) A] extends Field[A] with NRoot[A] with Integral[A]
 
 object Fractional {
+  private val ratCtx = ApproximationContext(Rational(1, 1000000000))
+
   implicit object FloatIsFractional extends FloatIsFractional
   implicit object DoubleIsFractional extends DoubleIsFractional
   implicit object BigDecimalIsFractional extends BigDecimalIsFractional
-  implicit def RationalIsFractional(implicit ctx: ApproximationContext[Rational] =
-      ApproximationContext(Rational(1, 1000000000))) = new RationalIsFractional {
-    val context = ctx
-  }
+  implicit def RationalIsFractional(implicit ctx: ApproximationContext[Rational] = ratCtx) =
+    new RationalIsFractional { val context = ctx }
+
   implicit object RealIsFractional extends RealIsFractional
   implicit object NumberIsFractional extends NumberIsFractional
 

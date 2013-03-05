@@ -28,13 +28,13 @@ class ReversedOrder[@spec A](order: Order[A]) extends Order[A] {
 }
 
 object Order {
+  @inline final def apply[A](implicit o: Order[A]) = o
+
   def by[@spec A, @spec B](f: A => B)(implicit o: Order[B]): Order[A] = o.on(f)
 
   def from[@spec A](f: (A, A) => Int): Order[A] = new Order[A] {
     def compare(x: A, y: A) = f(x, y)
   }
-
-  def apply[A](implicit o: Order[A]) = o
 
   implicit def ordering[A](implicit o: Order[A]) = new Ordering[A] {
     def compare(x: A, y: A) = o.compare(x, y)

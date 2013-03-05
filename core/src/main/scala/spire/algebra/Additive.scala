@@ -3,32 +3,31 @@ package spire.algebra
 import scala.{ specialized => spec }
 
 object Additive {
-  def apply[A](s: Semigroup[A]): AdditiveSemigroup[A] =
-    new AdditiveSemigroup[A] {
-      def plus(x: A, y: A): A = s.op(x, y)
-    }
-  def apply[A](m: Monoid[A]): AdditiveMonoid[A] =
-    new AdditiveMonoid[A] {
-      def plus(x: A, y: A): A = m.op(x, y)
-      def zero = m.id
-    }
-  def apply[A](g: Group[A]): AdditiveGroup[A] =
-    new AdditiveGroup[A] {
-      def plus(x: A, y: A): A = g.op(x, y)
-      override def minus(x: A, y: A): A = g.op(x, g.inverse(y))
-      def zero: A = g.id
-      def negate(x: A): A = g.inverse(x)
-    }
-  def apply[A](g: AbGroup[A]): AdditiveAbGroup[A] =
-    new AdditiveAbGroup[A] {
-      def plus(x: A, y: A): A = g.op(x, y)
-      override def minus(x: A, y: A): A = g.op(x, g.inverse(y))
-      def zero: A = g.id
-      def negate(x: A): A = g.inverse(x)
-    }
+  def apply[A](s: Semigroup[A]): AdditiveSemigroup[A] = new AdditiveSemigroup[A] {
+    def plus(x: A, y: A): A = s.op(x, y)
+  }
+
+  def apply[A](m: Monoid[A]): AdditiveMonoid[A] = new AdditiveMonoid[A] {
+    def plus(x: A, y: A): A = m.op(x, y)
+    def zero = m.id
+  }
+
+  def apply[A](g: Group[A]): AdditiveGroup[A] = new AdditiveGroup[A] {
+    def plus(x: A, y: A): A = g.op(x, y)
+    override def minus(x: A, y: A): A = g.op(x, g.inverse(y))
+    def zero: A = g.id
+    def negate(x: A): A = g.inverse(x)
+  }
+
+  def apply[A](g: AbGroup[A]): AdditiveAbGroup[A] = new AdditiveAbGroup[A] {
+    def plus(x: A, y: A): A = g.op(x, y)
+    override def minus(x: A, y: A): A = g.op(x, g.inverse(y))
+    def zero: A = g.id
+    def negate(x: A): A = g.inverse(x)
+  }
 }
 
-trait AdditiveSemigroup[@spec(Int,Long,Float,Double) A] {
+trait AdditiveSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] {
   def additive: Semigroup[A] = new Semigroup[A] {
     def op(x: A, y: A): A = plus(x, y)
   }
@@ -36,7 +35,7 @@ trait AdditiveSemigroup[@spec(Int,Long,Float,Double) A] {
   def plus(x: A, y: A): A
 }
 
-trait AdditiveMonoid[@spec(Int,Long,Float,Double) A] extends AdditiveSemigroup[A] {
+trait AdditiveMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends AdditiveSemigroup[A] {
   override def additive: Monoid[A] = new Monoid[A] {
     def id = zero
     def op(x: A, y: A): A = plus(x, y)
@@ -45,7 +44,7 @@ trait AdditiveMonoid[@spec(Int,Long,Float,Double) A] extends AdditiveSemigroup[A
   def zero: A
 }
 
-trait AdditiveGroup[@spec(Int,Long,Float,Double) A] extends AdditiveMonoid[A] {
+trait AdditiveGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends AdditiveMonoid[A] {
   override def additive: Group[A] = new Group[A] {
     def id = zero
     def op(x: A, y: A): A = plus(x, y)
@@ -56,7 +55,7 @@ trait AdditiveGroup[@spec(Int,Long,Float,Double) A] extends AdditiveMonoid[A] {
   def minus(x: A, y: A): A = plus(x, negate(y))
 }
 
-trait AdditiveAbGroup[@spec(Int,Long,Float,Double) A] extends AdditiveGroup[A] {
+trait AdditiveAbGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends AdditiveGroup[A] {
   override def additive: AbGroup[A] = new AbGroup[A] {
     def id = zero
     def op(x: A, y: A): A = plus(x, y)

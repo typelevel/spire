@@ -5,11 +5,11 @@ import scala.{specialized => spec}
 import java.lang.Double.{ isInfinite, isNaN, doubleToLongBits }
 import java.lang.Long.{ numberOfTrailingZeros }
 
-trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] with MultiplicativeAbGroup[A] {
-  def ceil(a:A): A
-  def floor(a:A): A
-  def round(a:A): A
-  def isWhole(a:A): Boolean
+trait Field[@spec(Byte, Short, Int, Long, Float, Double) A] extends EuclideanRing[A] with MultiplicativeAbGroup[A] {
+  def ceil(a: A): A
+  def floor(a: A): A
+  def round(a: A): A
+  def isWhole(a: A): Boolean
 
   /**
    * This is implemented in terms of basic Field ops. However, this is
@@ -18,7 +18,7 @@ trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] with Multip
    *
    * This is possible because a Double is a rational number.
    */
-  def fromDouble(a: Double): A = if (a == 0D) {
+  def fromDouble(a: Double): A = if (a == 0.0) {
     fromInt(0)
   } else {
     require(!isInfinite(a) && !isNaN(a),
@@ -46,5 +46,5 @@ trait Field[@spec(Int,Long,Float,Double) A] extends EuclideanRing[A] with Multip
 }
 
 object Field {
-  @inline final def apply[A](implicit f:Field[A]):Field[A] = f
+  @inline final def apply[A](implicit f: Field[A]): Field[A] = f
 }

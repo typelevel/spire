@@ -7,7 +7,7 @@ import scala.{specialized => spec}
  * Rig is a ring whose additive structure doesn't have an inverse (ie. it is
  * monoid, not a group). Put another way, a Rig is a Ring without a negative.
  */
-trait Rig[@spec(Int,Long,Float,Double) A] extends Semiring[A] with AdditiveMonoid[A] with MultiplicativeMonoid[A] {
+trait Rig[@spec(Byte, Short, Int, Long, Float, Double) A] extends Semiring[A] with AdditiveMonoid[A] with MultiplicativeMonoid[A] {
   override def pow(a:A, n:Int):A =
     if (n < 0) sys.error("illegal exponent: %s" format n)
     else _pow(a, n, one)

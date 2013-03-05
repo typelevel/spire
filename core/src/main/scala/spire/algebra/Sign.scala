@@ -33,8 +33,6 @@ case object Negative extends Sign {
 
 object Sign {
   implicit def sign2int(s: Sign): Int = s.toInt
-  implicit def apply(i: Int): Sign =
+  implicit def apply(i: Int): Sign = 
     if (i == 0) Zero else if (i > 0) Positive else Negative
 }
-
-
