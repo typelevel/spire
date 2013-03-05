@@ -1,7 +1,7 @@
 package spire.algebra
 
 import spire.macrosk.Ops
-import spire.math.{ConvertableTo, ConvertableFrom, Number}
+import spire.math.{ConvertableFrom, Number}
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
   def ===(rhs:A) = macro Ops.binop[A, Boolean]
@@ -17,21 +17,21 @@ final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
   def min(rhs: A) = macro Ops.binop[A, A]
   def max(rhs: A) = macro Ops.binop[A, A]
 
-  def >(rhs: Int)(implicit c: ConvertableTo[A]) = ev.gt(lhs, c.fromInt(rhs))
-  def >=(rhs: Int)(implicit c: ConvertableTo[A]) = ev.gteqv(lhs, c.fromInt(rhs))
-  def <(rhs: Int)(implicit c: ConvertableTo[A]) = ev.lt(lhs, c.fromInt(rhs))
-  def <=(rhs: Int)(implicit c: ConvertableTo[A]) = ev.lteqv(lhs, c.fromInt(rhs))
-  def compare(rhs: Int)(implicit c: ConvertableTo[A]) = ev.compare(lhs, c.fromInt(rhs))
-  def min(rhs: Int)(implicit c: ConvertableTo[A]) = ev.min(lhs, c.fromInt(rhs))
-  def max(rhs: Int)(implicit c: ConvertableTo[A]) = ev.max(lhs, c.fromInt(rhs))
+  def >(rhs: Int)(implicit ev1: Ring[A]) = macro Ops.binopWithLift[Int, Ring[A], A]
+  def >=(rhs: Int)(implicit ev1: Ring[A]) = macro Ops.binopWithLift[Int, Ring[A], A]
+  def <(rhs: Int)(implicit ev1: Ring[A]) = macro Ops.binopWithLift[Int, Ring[A], A]
+  def <=(rhs: Int)(implicit ev1: Ring[A]) = macro Ops.binopWithLift[Int, Ring[A], A]
+  def compare(rhs: Int)(implicit ev1: Ring[A]) = macro Ops.binopWithLift[Int, Ring[A], A]
+  def min(rhs: Int)(implicit ev1: Ring[A]) = macro Ops.binopWithLift[Int, Ring[A], A]
+  def max(rhs: Int)(implicit ev1: Ring[A]) = macro Ops.binopWithLift[Int, Ring[A], A]
 
-  def >(rhs: Double)(implicit c: ConvertableTo[A]) = ev.gt(lhs, c.fromDouble(rhs))
-  def >=(rhs: Double)(implicit c: ConvertableTo[A]) = ev.gteqv(lhs, c.fromDouble(rhs))
-  def <(rhs: Double)(implicit c: ConvertableTo[A]) = ev.lt(lhs, c.fromDouble(rhs))
-  def <=(rhs: Double)(implicit c: ConvertableTo[A]) = ev.lteqv(lhs, c.fromDouble(rhs))
-  def compare(rhs: Double)(implicit c: ConvertableTo[A]) = ev.compare(lhs, c.fromDouble(rhs))
-  def min(rhs: Double)(implicit c: ConvertableTo[A]) = ev.min(lhs, c.fromDouble(rhs))
-  def max(rhs: Double)(implicit c: ConvertableTo[A]) = ev.max(lhs, c.fromDouble(rhs))
+  def >(rhs: Double)(implicit ev1: Field[A]) = macro Ops.binopWithLift[Int, Field[A], A]
+  def >=(rhs: Double)(implicit ev1: Field[A]) = macro Ops.binopWithLift[Int, Field[A], A]
+  def <(rhs: Double)(implicit ev1: Field[A]) = macro Ops.binopWithLift[Int, Field[A], A]
+  def <=(rhs: Double)(implicit ev1: Field[A]) = macro Ops.binopWithLift[Int, Field[A], A]
+  def compare(rhs: Double)(implicit ev1: Field[A]) = macro Ops.binopWithLift[Int, Field[A], A]
+  def min(rhs: Double)(implicit ev1: Field[A]) = macro Ops.binopWithLift[Int, Field[A], A]
+  def max(rhs: Double)(implicit ev1: Field[A]) = macro Ops.binopWithLift[Int, Field[A], A]
 
   def >(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = c.toNumber(lhs) > rhs
   def >=(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = c.toNumber(lhs) >= rhs
@@ -59,7 +59,7 @@ final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
 final class AdditiveSemigroupOps[A](lhs:A)(implicit ev:AdditiveSemigroup[A]) {
   def +(rhs:A): A = macro Ops.binop[A, A]
   def +(rhs:Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
-  def +(rhs:Double)(implicit ev1:ConvertableTo[A]): A = macro Ops.binopWithLift[Double, ConvertableTo[A], A]
+  def +(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
   def +(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) + rhs
 }
 
@@ -67,14 +67,14 @@ final class AdditiveGroupOps[A](lhs:A)(implicit ev:AdditiveGroup[A]) {
   def unary_-() = macro Ops.unop[A]
   def -(rhs:A): A = macro Ops.binop[A, A]
   def -(rhs:Int)(implicit ev1: Ring[A]): A =  macro Ops.binopWithLift[Int, Ring[A], A]
-  def -(rhs:Double)(implicit ev1:ConvertableTo[A]): A =  macro Ops.binopWithLift[Double, ConvertableTo[A], A]
+  def -(rhs:Double)(implicit ev1:Field[A]): A =  macro Ops.binopWithLift[Double, Field[A], A]
   def -(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) - rhs
 }
 
 final class MultiplicativeSemigroupOps[A](lhs:A)(implicit ev:MultiplicativeSemigroup[A]) {
   def *(rhs:A): A = macro Ops.binop[A, A]
   def *(rhs:Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
-  def *(rhs:Double)(implicit ev1:ConvertableTo[A]): A = macro Ops.binopWithLift[Double, ConvertableTo[A], A]
+  def *(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
   def *(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) * rhs
 }
 
@@ -82,7 +82,7 @@ final class MultiplicativeGroupOps[A](lhs:A)(implicit ev:MultiplicativeGroup[A])
   def reciprocal() = macro Ops.unop[A]
   def /(rhs:A): A = macro Ops.binop[A, A]
   def /(rhs:Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
-  def /(rhs:Double)(implicit ev1:ConvertableTo[A]): A = macro Ops.binopWithLift[Double, ConvertableTo[A], A]
+  def /(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
   def /(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) / rhs
 }
 
@@ -101,9 +101,9 @@ final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def %(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
   def /%(rhs:Int): (A, A) = macro Ops.binopWithSelfLift[Int, Ring[A], (A, A)]
 
-  def /~(rhs:Double)(implicit ev1:ConvertableTo[A]): A = macro Ops.binopWithLift[Double, ConvertableTo[A], A]
-  def %(rhs:Double)(implicit ev1:ConvertableTo[A]): A = macro Ops.binopWithLift[Double, ConvertableTo[A], A]
-  def /%(rhs:Double)(implicit ev1:ConvertableTo[A]): (A, A) = macro Ops.binopWithLift[Double, ConvertableTo[A], (A, A)]
+  def /~(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
+  def %(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
+  def /%(rhs:Double)(implicit ev1:Field[A]): (A, A) = macro Ops.binopWithLift[Double, Field[A], (A, A)]
 
   def /~(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) /~ rhs
   def %(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) % rhs
@@ -141,9 +141,9 @@ final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
   def |(rhs: A): A = macro Ops.binop[A, A]
   def ^(rhs: A): A = macro Ops.binop[A, A]
 
-  def &(rhs: Int)(implicit c: ConvertableTo[A]): A = ev.and(lhs, c.fromInt(rhs))
-  def |(rhs: Int)(implicit c: ConvertableTo[A]): A = ev.or(lhs, c.fromInt(rhs))
-  def ^(rhs: Int)(implicit c: ConvertableTo[A]): A = ev.xor(lhs, c.fromInt(rhs))
+  def &(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+  def |(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+  def ^(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
 
   def &(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) & rhs
   def |(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) | rhs
