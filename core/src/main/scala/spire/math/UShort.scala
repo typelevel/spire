@@ -49,9 +49,9 @@ class UShort(val signed: Char) extends AnyVal {
 
   def unary_~ = UShort(~this.signed)
 
-  def << (shift: UShort) = UShort(this.signed << shift.signed)
-  def >> (shift: UShort) = UShort(this.signed >>> (shift.signed & 15))
-  def >>> (shift: UShort) = UShort(this.signed >>> (shift.signed & 15))
+  def << (shift: Int) = UShort((signed & 0xffff) << (shift & 15))
+  def >> (shift: Int) = UShort((signed & 0xffff) >>> (shift & 15))
+  def >>> (shift: Int) = UShort((signed & 0xffff) >>> (shift & 15))
   def & (that: UShort) = UShort(this.signed & that.signed)
   def | (that: UShort) = UShort(this.signed | that.signed)
   def ^ (that: UShort) = UShort(this.signed ^ that.signed)

@@ -262,6 +262,10 @@ class UByteTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropert
   val zero = UByte(0)
   val one = UByte(1)
 
+  property("UByte(-128) >> 1 == UByte(64)") {
+    (UByte(-128) >> 1) should be === UByte(64)
+  }
+
   property("n >= 0") {
     forAll { (n: Byte) =>
       UByte(n) >= zero should be === true
@@ -341,20 +345,20 @@ class UByteTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropert
   }
 
   property("n << x == n << (x + 32 * y)") {
-    forAll { (n: Byte, x: Byte, y: Byte) =>
-      UByte(n) << UByte(x) should be === UByte(n) << UByte(x + 32 * y)
+    forAll { (n: Byte, x: Int, y: Int) =>
+      UByte(n) << x should be === UByte(n) << (x + 32 * y)
     }
   }
 
   property("n >> x == n >> (x % 32)") {
-    forAll { (n: Byte, x: Byte, y: Byte) =>
-      UByte(n) >> UByte(x) should be === UByte(n) >> UByte(x % 32)
+    forAll { (n: Byte, x: Int, y: Int) =>
+      UByte(n) >> x should be === UByte(n) >> (x % 32)
     }
   }
 
   property("n >> x == n >>> x") {
     forAll { (n: Byte, x: Byte) =>
-      UByte(n) >> UByte(x) should be === UByte(n) >>> UByte(x)
+      UByte(n) >> x should be === UByte(n) >>> x
     }
   }
 }

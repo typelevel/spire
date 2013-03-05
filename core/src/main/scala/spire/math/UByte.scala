@@ -45,12 +45,12 @@ class UByte(val signed: Byte) extends AnyVal {
 
   def unary_~ = UByte(~this.signed)
 
-  def << (shift: UByte) = UByte(this.signed << shift.signed)
-  def >> (shift: UByte) = UByte(this.signed >>> (shift.signed & 7))
-  def >>> (shift: UByte) = UByte(this.signed >>> (shift.signed & 7))
-  def & (that: UByte) = UByte(this.signed & that.signed)
-  def | (that: UByte) = UByte(this.signed | that.signed)
-  def ^ (that: UByte) = UByte(this.signed ^ that.signed)
+  def << (shift: Int) = UByte((signed & 0xff) << (shift & 7))
+  def >> (shift: Int) = UByte((signed & 0xff) >>> (shift & 7))
+  def >>> (shift: Int) = UByte((signed & 0xff) >>> (shift & 7))
+  def & (that: UByte) = UByte((this.signed & 0xff) & (that.signed & 0xff))
+  def | (that: UByte) = UByte((this.signed & 0xff) | (that.signed & 0xff))
+  def ^ (that: UByte) = UByte((this.signed & 0xff) ^ (that.signed & 0xff))
 
   def ** (that: UByte) = UByte(pow(this.toLong, that.toLong).toInt)
 }

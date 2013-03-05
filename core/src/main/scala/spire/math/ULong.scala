@@ -98,9 +98,9 @@ class ULong(val signed: Long) extends AnyVal {
 
   final def unary_~ = ULong(~this.signed)
 
-  final def << (shift: ULong) = ULong(this.signed << shift.signed)
-  final def >> (shift: ULong) = ULong(this.signed >>> (shift.signed & 63))
-  final def >>> (shift: ULong) = ULong(this.signed >>> (shift.signed & 63))
+  final def << (shift: Int) = ULong(signed << shift)
+  final def >> (shift: Int) = ULong(signed >>> shift)
+  final def >>> (shift: Int) = ULong(signed >>> shift)
   final def & (that: ULong) = ULong(this.signed & that.signed)
   final def | (that: ULong) = ULong(this.signed | that.signed)
   final def ^ (that: ULong) = ULong(this.signed ^ that.signed)

@@ -48,9 +48,9 @@ class UInt(val signed: Int) extends AnyVal {
 
   def unary_~ = UInt(~this.signed)
 
-  def << (shift: UInt) = UInt(this.signed << shift.signed)
-  def >> (shift: UInt) = UInt(this.signed >>> (shift.signed & 31))
-  def >>> (shift: UInt) = UInt(this.signed >>> (shift.signed & 31))
+  def << (shift: Int) = UInt(signed << shift)
+  def >> (shift: Int) = UInt(signed >>> shift)
+  def >>> (shift: Int) = UInt(signed >>> shift)
   def & (that: UInt) = UInt(this.signed & that.signed)
   def | (that: UInt) = UInt(this.signed | that.signed)
   def ^ (that: UInt) = UInt(this.signed ^ that.signed)
