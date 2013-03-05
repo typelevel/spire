@@ -96,6 +96,9 @@ final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def %(rhs:A) = macro Ops.binop[A, A]
   def /%(rhs:A) = macro Ops.binop[A, A]
 
+  def gcd(rhs:A) = macro Ops.binop[A, A]
+  def lcm(rhs:A) = macro Ops.binop[A, A]
+
   // TODO: This is a bit
   def /~(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
   def %(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]

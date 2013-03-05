@@ -467,7 +467,22 @@ package object math {
    * log() implementations
    */
 
-  final def log(n:Double):Double = Math.log(n)
+  final def abs(n: Byte): Byte = Math.abs(n).toByte
+  final def abs(n: Short): Short = Math.abs(n).toShort
+  final def abs(n: Int): Int = Math.abs(n)
+  final def abs(n: Long): Long = Math.abs(n)
+  final def abs(n: Float): Float = Math.abs(n)
+  final def abs(n: Double): Double = Math.abs(n)
+
+  final def ceil(n: Float): Float = Math.ceil(n).toFloat
+  final def ceil(n: Double): Double = Math.ceil(n)
+  final def ceil(n: BigDecimal): BigDecimal = n.setScale(0, BigDecimal.RoundingMode.CEILING)
+
+  final def floor(n: Float): Float = Math.floor(n).toFloat
+  final def floor(n: Double): Double = Math.floor(n)
+  final def floor(n: BigDecimal): BigDecimal = n.setScale(0, BigDecimal.RoundingMode.FLOOR)
+
+  final def log(n: Double): Double = Math.log(n)
 
   // FIXME: we should actually try to return values which are correct for the
   // given precision.
@@ -483,16 +498,18 @@ package object math {
     else _log(n / maxDouble, logMaxDouble + sofar)
   }
 
+  final def log[A](a: A)(implicit t: Trig[A]): A = t.log(a)
+
   /**
    * exp() implementations
    */
   final def exp(n:Double):Double = Math.exp(n)
 
-  final def exp(n:BigDecimal):BigDecimal = _exp(n, BigDecimal(1))
+  final def exp(n: BigDecimal): BigDecimal = _exp(n, BigDecimal(1))
 
   // Since exp(a + b) = exp(a) * exp(b), we can use Math.log to
   // approximate exp for BigDecimal.
-  @tailrec private final def _exp(n:BigDecimal, sofar:BigDecimal): BigDecimal =
+  @tailrec private final def _exp(n: BigDecimal, sofar:BigDecimal): BigDecimal =
     if (n <= logMaxDouble) BigDecimal(Math.exp(n.toDouble)) * sofar
     else _exp(n - logMaxDouble, maxDouble * sofar)
 
@@ -520,6 +537,8 @@ package object math {
   //   num / BigDecimal(denom, mc)
   // }
 
+  final def exp[A](a: A)(implicit t: Trig[A]): A = t.exp(a)
+
   /**
    * pow() implementations
    */
@@ -531,7 +550,7 @@ package object math {
 
   // FIXME: we should actually try to return values which are correct for the
   // given precision.
-  final def pow(base:BigDecimal, ex:BigDecimal) =
+  final def pow(base: BigDecimal, ex: BigDecimal) =
     if (ex.isValidInt && ex <= maxIntEx && ex >= minIntEx) base.pow(ex.toInt)
     else exp(log(base) * ex)
 
@@ -573,9 +592,9 @@ package object math {
     else longPow(t, b * b, e >> 1L)
   }
 
-  final def pow(base:Double, exponent:Double) = Math.pow(base, exponent)
+  final def pow(base: Double, exponent: Double) = Math.pow(base, exponent)
 
-  def gcd(_x: Long, _y: Long): Long = {
+  final def gcd(_x: Long, _y: Long): Long = {
     if (_x == 0L) return Math.abs(_y)
     if (_y == 0L) return Math.abs(_x)
   
@@ -600,26 +619,38 @@ package object math {
     if (xz < yz) x << xz else x << yz
   }
 
-
   final def gcd(a: BigInt, b: BigInt): BigInt = a.gcd(b)
 
-  final def gcd(a: BigInteger, b: BigInteger): BigInteger = a.gcd(b)
+  final def gcd[A](x: A, y: A)(implicit ev: EuclideanRing[A]): A = ev.gcd(x, y)
 
-  def round(a: Float): Float =
+  final def lcm(x: Long, y: Long): Long = (x / gcd(x, y)) * y
+
+  final def lcm(a: BigInt, b: BigInt): BigInt = (a / a.gcd(b)) * b
+
+  final def lcm[A](x: A, y: A)(implicit ev: EuclideanRing[A]): A = ev.lcm(x, y)
+
+  final def round(a: Float): Float =
     if (Math.abs(a) >= 16777216.0F) a else Math.round(a).toFloat
 
-  def round(a: Double): Double =
+  final def round(a: Double): Double =
     if (Math.abs(a) >= 4503599627370496.0) a else Math.round(a).toDouble
 
-  @inline final def min(x: Int, y: Int): Int = Math.min(x, y)
-  @inline final def min(x: Long, y: Long): Long = Math.min(x, y)
-  @inline final def min(x: Float, y: Float): Float = Math.min(x, y)
-  @inline final def min(x: Double, y: Double): Double = Math.min(x, y)
+  final def round(a: BigDecimal): BigDecimal =
+    a.setScale(0, BigDecimal.RoundingMode.HALF_UP)
+
+  final def min(x: Byte, y: Byte): Byte = Math.min(x, y).toByte
+  final def min(x: Short, y: Short): Short = Math.min(x, y).toShort
+  final def min(x: Int, y: Int): Int = Math.min(x, y)
+  final def min(x: Long, y: Long): Long = Math.min(x, y)
+  final def min(x: Float, y: Float): Float = Math.min(x, y)
+  final def min(x: Double, y: Double): Double = Math.min(x, y)
   final def min[A](x: A, y: A)(implicit ev: Order[A]) = ev.min(x, y)
 
-  @inline final def max(x: Int, y: Int): Int = Math.max(x, y)
-  @inline final def max(x: Long, y: Long): Long = Math.max(x, y)
-  @inline final def max(x: Float, y: Float): Float = Math.max(x, y)
-  @inline final def max(x: Double, y: Double): Double = Math.max(x, y)
+  final def max(x: Byte, y: Byte): Byte = Math.max(x, y).toByte
+  final def max(x: Short, y: Short): Short = Math.max(x, y).toShort
+  final def max(x: Int, y: Int): Int = Math.max(x, y)
+  final def max(x: Long, y: Long): Long = Math.max(x, y)
+  final def max(x: Float, y: Float): Float = Math.max(x, y)
+  final def max(x: Double, y: Double): Double = Math.max(x, y)
   final def max[A](x: A, y: A)(implicit ev: Order[A]) = ev.max(x, y)
 }

@@ -1,6 +1,6 @@
 package spire.math
 
-import scala.math.{abs, signum, ScalaNumber, ScalaNumericConversions}
+import scala.math.{signum, ScalaNumber, ScalaNumericConversions}
 import scala.annotation.tailrec
 
 import spire.algebra._

@@ -99,7 +99,8 @@ class ComplexTest extends FunSuite {
     val ipi = fc.multiply(fc.i, pi)
     val e_ipi = fc.pow(e, ipi)
     val z = fc.add(e_ipi, fc.one)
-    
+
+    println((fc.real(z), fc.imag(z)))
     assert(fc.real(z) == 0.0F)
     assert(fc.imag(z) < 0.000000001F)
   }
