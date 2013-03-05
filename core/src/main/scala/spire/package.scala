@@ -376,13 +376,13 @@ final class SeqOps[@spec A, CC[A] <: Iterable[A]](as:CC[A]) {
 }
 
 
-final class ConversionOps[A](a: A) {
-  def narrow[B](implicit rhs: NarrowingConversion[A, B]): B =
-    macro Ops.flip[NarrowingConversion[A, B], B]
-
-  def widen[B](implicit rhs: WideningConversion[A, B]): B =
-    macro Ops.flip[WideningConversion[A, B], B]
-}
+//final class ConversionOps[A](a: A) {
+//  def narrow[B](implicit rhs: NarrowingConversion[A, B]): B =
+//    macro Ops.flip[NarrowingConversion[A, B], B]
+//
+//  def widen[B](implicit rhs: WideningConversion[A, B]): B =
+//    macro Ops.flip[WideningConversion[A, B], B]
+//}
 
 /**
  * `NoImplicit` provides a way to ensure that a particular implicit doesn't
@@ -437,7 +437,7 @@ trait OpsImplicits {
 
   implicit def intToA[A](n:Int)(implicit c:ConvertableTo[A]): A = c.fromInt(n)
   implicit def convertableOps[A:ConvertableFrom](a:A) = new ConvertableFromOps(a)
-  implicit def conversionOps[A](a: A) = new ConversionOps(a)
+  //implicit def conversionOps[A](a: A) = new ConversionOps(a)
 }
 
 object syntax {
