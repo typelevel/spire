@@ -268,6 +268,10 @@ trait GeneratorCompanion[G, @spec(Int, Long) S] {
   final def apply(seed: S): G = fromSeed(seed)
 }
 
+object Generator {
+  implicit val rng = GlobalRng
+}
+
 object GlobalRng extends LongBasedGenerator {
   private val rng = Cmwc5.fromTime().sync
 
