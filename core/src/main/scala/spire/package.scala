@@ -268,6 +268,19 @@ final class ArrayOps[@spec A](arr:Array[A]) {
     Selection.select(arr2, k)
     arr2
   }
+
+  import spire.random.{Generator, Shuffling, Sampling}
+
+  def qshuffle()(implicit gen: Generator): Unit = Shuffling.shuffle(arr)
+
+  def qshuffled(implicit gen: Generator): Array[A] = {
+    val arr2 = arr.clone
+    Shuffling.shuffle(arr2)
+    arr2
+  }
+
+  def qsampled(n: Int)(implicit gen: Generator, ct: ClassTag[A]): Array[A] =
+    Sampling.sampleFromArray(arr, n)
 }
 
 final class IndexedSeqOps[@spec A, CC[A] <: IndexedSeq[A]](as: CC[A]) {
@@ -373,6 +386,21 @@ final class SeqOps[@spec A, CC[A] <: Iterable[A]](as:CC[A]) {
     Selection.select(arr, k)
     fromSizeAndArray(len, arr)
   }
+
+  import spire.random.{Generator, Shuffling, Sampling}
+
+  def qshuffled(implicit gen: Generator, ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+    val (len, arr) = toSizeAndArray
+    Shuffling.shuffle(arr)
+    fromSizeAndArray(len, arr)
+  }
+
+  def qsampled(n: Int)(implicit gen: Generator, ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+    val sampled = Sampling.sampleFromTraversable(as, n)
+    fromSizeAndArray(n, sampled)
+  }
+
+  def qchoose(implicit gen: Generator): A = Sampling.chooseFromIterable(as)
 }
 
 
