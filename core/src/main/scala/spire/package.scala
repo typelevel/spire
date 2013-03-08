@@ -447,8 +447,7 @@ trait OpsImplicits {
   implicit def signedOps[A: Signed](a: A) = new SignedOps(a)
   implicit def nrootOps[A: NRoot](a: A) = new NRootOps(a)
 
-  implicit def leftModuleOps[V, R](v:V)(implicit m:LeftModule[V,R]) = new LeftModuleOps[V, R](v)
-  implicit def rightModuleOps[V, R](v:V)(implicit m:RightModule[V,R]) = new RightModuleOps[V, R](v)
+  implicit def moduleOps[V, R](v:V)(implicit m:Module[V,R]) = new ModuleOps[V, R](v)
   implicit def vectorSpaceOps[V, F](v:V)(implicit m:VectorSpace[V,F]) = new VectorSpaceOps[V, F](v)
   implicit def normedVectorSpaceOps[V](v:V) = new NormedVectorSpaceOps[V](v)
   implicit def innerProductSpaceOps[V](v:V) = new InnerProductSpaceOps[V](v)
