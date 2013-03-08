@@ -153,11 +153,8 @@ final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
   def ^(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) ^ rhs
 }
 
-final class LeftModuleOps[V, F](rhs: V)(implicit ev: LeftModule[V, F]) {
+final class ModuleOps[V, F](rhs: V)(implicit ev: Module[V, F]) {
   def *: (lhs:F): V = macro Ops.rbinop[F, V]
-}
-
-final class RightModuleOps[V, F](lhs: V)(implicit ev: RightModule[V, F]) {
   def :* (rhs:F): V = macro Ops.binop[F, V]
 }
 
