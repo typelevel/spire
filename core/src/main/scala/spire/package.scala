@@ -19,14 +19,14 @@ import scala.collection.SeqLike
 final class LiteralIntOps(val lhs:Int) extends AnyVal {
   @inline private final def q = Rational(lhs, 1)
 
-  def +[A](rhs:A)(implicit ev:Ring[A]) = ev.plus(ev.fromInt(lhs), rhs)
-  def -[A](rhs:A)(implicit ev:Ring[A]) = ev.minus(ev.fromInt(lhs), rhs)
-  def *[A](rhs:A)(implicit ev:Ring[A]) = ev.times(ev.fromInt(lhs), rhs)
-  def /[A](rhs:A)(implicit ev:Field[A]) = ev.div(ev.fromInt(lhs), rhs)
-  def /~[A](rhs:A)(implicit ev:EuclideanRing[A]) = ev.quot(ev.fromInt(lhs), rhs)
-  def %[A](rhs:A)(implicit ev:EuclideanRing[A]) = ev.mod(ev.fromInt(lhs), rhs)
-  def /%[A](rhs:A)(implicit ev:EuclideanRing[A]) = ev.quotmod(ev.fromInt(lhs), rhs)
-  def **[A](rhs:A)(implicit ev:NRoot[A], c:ConvertableTo[A]) = ev.fpow(c.fromLong(lhs), rhs)
+  def +[A](rhs:A)(implicit ev: Ring[A]) = ev.plus(ev.fromInt(lhs), rhs)
+  def -[A](rhs:A)(implicit ev: Ring[A]) = ev.minus(ev.fromInt(lhs), rhs)
+  def *[A](rhs:A)(implicit ev: Ring[A]) = ev.times(ev.fromInt(lhs), rhs)
+  def /[A](rhs:A)(implicit ev: Field[A]) = ev.div(ev.fromInt(lhs), rhs)
+  def /~[A](rhs:A)(implicit ev: EuclideanRing[A]) = ev.quot(ev.fromInt(lhs), rhs)
+  def %[A](rhs:A)(implicit ev: EuclideanRing[A]) = ev.mod(ev.fromInt(lhs), rhs)
+  def /%[A](rhs:A)(implicit ev: EuclideanRing[A]) = ev.quotmod(ev.fromInt(lhs), rhs)
+  def **[A](rhs:A)(implicit ev: NRoot[A], c:ConvertableTo[A]) = ev.fpow(c.fromLong(lhs), rhs)
 
   def <[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.lt(c.fromInt(lhs), rhs)
   def <=[A](rhs:A)(implicit ev:Order[A], c:ConvertableTo[A]) = ev.lteqv(c.fromInt(lhs), rhs)
@@ -269,18 +269,18 @@ final class ArrayOps[@spec A](arr:Array[A]) {
     arr2
   }
 
-  import spire.random.{Generator, Shuffling, Sampling}
+  import spire.random.Generator
 
-  def qshuffle()(implicit gen: Generator): Unit = Shuffling.shuffle(arr)
+  def qshuffle()(implicit gen: Generator): Unit = gen.shuffle(arr)
 
   def qshuffled(implicit gen: Generator): Array[A] = {
     val arr2 = arr.clone
-    Shuffling.shuffle(arr2)
+    gen.shuffle(arr2)
     arr2
   }
 
   def qsampled(n: Int)(implicit gen: Generator, ct: ClassTag[A]): Array[A] =
-    Sampling.sampleFromArray(arr, n)
+    gen.sampleFromArray(arr, n)
 }
 
 final class IndexedSeqOps[@spec A, CC[A] <: IndexedSeq[A]](as: CC[A]) {
@@ -387,20 +387,20 @@ final class SeqOps[@spec A, CC[A] <: Iterable[A]](as:CC[A]) {
     fromSizeAndArray(len, arr)
   }
 
-  import spire.random.{Generator, Shuffling, Sampling}
+  import spire.random.Generator
 
   def qshuffled(implicit gen: Generator, ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     val (len, arr) = toSizeAndArray
-    Shuffling.shuffle(arr)
+    gen.shuffle(arr)
     fromSizeAndArray(len, arr)
   }
 
   def qsampled(n: Int)(implicit gen: Generator, ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
-    val sampled = Sampling.sampleFromTraversable(as, n)
+    val sampled = gen.sampleFromTraversable(as, n)
     fromSizeAndArray(n, sampled)
   }
 
-  def qchoose(implicit gen: Generator): A = Sampling.chooseFromIterable(as)
+  def qchoose(implicit gen: Generator): A = gen.chooseFromIterable(as)
 }
 
 

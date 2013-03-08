@@ -7,10 +7,8 @@ import prop._
 import org.scalacheck.Arbitrary._
 import org.scalacheck._
 
-import spire.random.Sampling._
-
 class SamplingTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
-  implicit val rng = spire.random.Lcg64.fromTime()
+  val rng = spire.random.Lcg64.fromTime()
 
   val Size = 100
   val range = (1 to Size)
@@ -23,10 +21,10 @@ class SamplingTest extends PropSpec with ShouldMatchers with GeneratorDrivenProp
   }
 
   property("sampleArray(ns, [1, n])") {
-    forAll(gen)((n: Int) => verify(sampleFromArray(ns, n), n))
+    forAll(gen)((n: Int) => verify(rng.sampleFromArray(ns, n), n))
   }
 
   property("sampleTraversable(ns, [1, n])") {
-    forAll(gen)((n: Int) => verify(sampleFromTraversable(ns, n), n))
+    forAll(gen)((n: Int) => verify(rng.sampleFromTraversable(ns, n), n))
   }
 }
