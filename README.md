@@ -335,7 +335,7 @@ are not threadsafe by default; synchronous instances can be attained
 by calling the `.sync` method.
 
 Spire supports generating random instances of arbitrary types using
-the `spire.random.Next[A]` type class. These instances represent a
+the `spire.random.Dist[A]` type class. These instances represent a
 strategy for getting random values using a `Generator` instance. For
 instance:
 
@@ -352,11 +352,11 @@ val n = rng.next[Double]
 val c = rng.next[Complex[Double]]
 
 // produces a map with ~10-20 entries
-implicit val nextmap = Next.map[Int, Complex[Double]](10, 20)
+implicit val nextmap = Dist.map[Int, Complex[Double]](10, 20)
 val m = rng.next[Map[Int, Complex[Double]]]
 ```
 
-Unlike generators, `Next[A]` instances are immutable and composable,
+Unlike generators, `Dist[A]` instances are immutable and composable,
 supporting operations like `map`, `flatMap`, and `filter`. Many default
 instances are provided, and it's easy to create custom instances for
 user-defined types.

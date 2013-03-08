@@ -26,19 +26,19 @@ abstract class Generator {
   def nextLong(): Long
 
   /**
-   * Generate a random value using a Next[A] type class instance.
+   * Generate a random value using a Dist[A] type class instance.
    *
-   * Implicit Next[A] instances are provided for the AnyVal types as well as
-   * UByte through ULong. More complex Next instances can be created from
+   * Implicit Dist[A] instances are provided for the AnyVal types as well as
+   * UByte through ULong. More complex Dist instances can be created from
    * these.
    */
-  def next[A](implicit next: Next[A]): A = next(this)
+  def next[A](implicit next: Dist[A]): A = next(this)
 
   /**
-   * Generate an infinite iterator of random values using Next[A].
+   * Generate an infinite iterator of random values using Dist[A].
    */
-  def iterator[A](implicit next: Next[A]): Iterator[A] =
-    new NextIterator(next, this)
+  def iterator[A](implicit next: Dist[A]): Iterator[A] =
+    new DistIterator(next, this)
 
   /**
    * Generates a random integer using n bits of state (0 <= n <= 32).
@@ -226,18 +226,18 @@ abstract class Generator {
   }
 
   /**
-   * Generate an Array[A] using the given Next[A] instance.
+   * Generate an Array[A] using the given Dist[A] instance.
    */
-  def generateArray[A: Next: ClassTag](n: Int): Array[A] = {
+  def generateArray[A: Dist: ClassTag](n: Int): Array[A] = {
     val arr = new Array[A](n)
     fillArray(arr)
     arr
   }
 
   /**
-   * Fill an Array[A] using the given Next[A] instance.
+   * Fill an Array[A] using the given Dist[A] instance.
    */
-  def fillArray[A: Next](arr: Array[A]) {
+  def fillArray[A: Dist](arr: Array[A]) {
     var i = 0
     val len = arr.length
     while (i < len) {
