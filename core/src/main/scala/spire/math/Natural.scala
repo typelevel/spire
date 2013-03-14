@@ -534,6 +534,19 @@ object Natural extends NaturalInstances {
   else
     Digit(UInt((n & 0xffffffffL).toLong), apply(n >> 32))
 
+  private val ten18 = Natural(1000000000000000000L)
+  def apply(s: String): Natural = {
+    def parse(sofar: Natural, s: String, m: Natural): Natural = if (s.length <= 18) {
+      Natural(s.toLong) * m + sofar
+    } else {
+      val p = s.substring(s.length - 18, s.length)
+      val r = s.substring(0, s.length - 18)
+      parse(Natural(p.toLong) * m + sofar, r, m * ten18)
+    }
+
+    parse(Natural(0L), s, Natural(1L))
+  }
+
   val zero: Natural = apply(0L)
   val one: Natural = apply(1L)
 
