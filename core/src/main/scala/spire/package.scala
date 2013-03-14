@@ -329,10 +329,13 @@ final class SeqOps[@spec A, CC[A] <: Iterable[A]](as:CC[A]) {
     if (as.isEmpty) sys.error("empty seq")
     var mean = ev.zero
     var i = 0
+    var j = 1
     as.foreach { a =>
-      val t = ev.div(ev.times(mean, ev.fromInt(i)), ev.fromInt(i + 1))
-      val z = ev.div(a, ev.fromInt(i + 1))
+      val t = ev.div(ev.times(mean, ev.fromInt(i)), ev.fromInt(j))
+      val z = ev.div(a, ev.fromInt(j))
       mean = ev.plus(t, z)
+      i += 1
+      j += 1
     }
     mean
   }
