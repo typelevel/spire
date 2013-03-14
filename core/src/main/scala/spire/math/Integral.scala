@@ -18,26 +18,27 @@ object Integral {
   implicit object IntIsIntegral extends IntIsIntegral
   implicit object LongIsIntegral extends LongIsIntegral
   implicit object BigIntIsIntegral extends BigIntIsIntegral
+  implicit object SafeLongIsIntegral extends SafeLongIsIntegral
 
   @inline final def apply[A](implicit ev:Integral[A]) = ev
 }
 
 trait IntIsIntegral extends Integral[Int] with IntIsEuclideanRing
 with ConvertableFromInt with ConvertableToInt with IntOrder with IntIsSigned {
-  override def fromInt(n: Int): Int = n
+  override def fromInt(n: Int): Int = super.fromInt(n)
 }
 
 trait LongIsIntegral extends Integral[Long] with LongIsEuclideanRing
 with ConvertableFromLong with ConvertableToLong with LongOrder with LongIsSigned {
-  override def fromInt(n: Int): Long = n
+  override def fromInt(n: Int): Long = super.fromInt(n)
 }
 
 trait BigIntIsIntegral extends Integral[BigInt] with BigIntIsEuclideanRing
 with ConvertableFromBigInt with ConvertableToBigInt with BigIntOrder with BigIntIsSigned {
-  override def fromInt(n: Int): BigInt = super[ConvertableToBigInt].fromInt(n)
+  override def fromInt(n: Int): BigInt = super.fromInt(n)
 }
 
 trait SafeLongIsIntegral extends Integral[SafeLong] with SafeLongIsEuclideanRing
 with ConvertableFromSafeLong with ConvertableToSafeLong with SafeLongOrder with SafeLongIsSigned {
-  override def fromInt(n: Int): SafeLong = super[ConvertableToSafeLong].fromInt(n)
+  override def fromInt(n: Int): SafeLong = super.fromInt(n)
 }
