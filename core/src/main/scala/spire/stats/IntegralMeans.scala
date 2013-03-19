@@ -24,12 +24,12 @@ object IntegralMeans extends IntegralMeans0 {
 trait ArrayIntegralMeans extends IntegralMeans[Array] {
   def arithmeticMean[A](xs: Array[A])(implicit num: Integral[A]): A = {
     val sum = xs.foldLeft(num.zero)(num.plus)
-    num.quot(sum, num.fromInt(xs.size))
+    num.quot(sum, num.fromInt(xs.length))
   }
 
   def arithmeticMeanBy[A,B](xs: Array[A])(f: A ⇒ B)(implicit num: Integral[B]): B = {
     val sum = xs.foldLeft(num.zero)((b,a) ⇒ num.plus(b, f(a)))
-    num.quot(sum, num.fromInt(xs.size))
+    num.quot(sum, num.fromInt(xs.length))
   }
 }
 

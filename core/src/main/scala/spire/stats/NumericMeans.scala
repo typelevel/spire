@@ -31,42 +31,42 @@ object NumericMeans extends NumericMeans0 {
 trait ArrayNumericMeans extends NumericMeans[Array] {
   def arithmeticMean[A](xs: Array[A])(implicit num: Numeric[A]): A = {
     val sum = xs.foldLeft(num.zero)(num.plus)
-    num.div(sum, num.fromInt(xs.size))
+    num.div(sum, num.fromInt(xs.length))
   }
 
   def arithmeticMeanBy[A,B](xs: Array[A])(f: A ⇒ B)(implicit num: Numeric[B]): B = {
     val sum = xs.foldLeft(num.zero)((b,a) ⇒ num.plus(b, f(a)))
-    num.div(sum, num.fromInt(xs.size))
+    num.div(sum, num.fromInt(xs.length))
   }
 
   def geometricMean[A](xs: Array[A])(implicit num: Numeric[A]): A = {
     val prod = xs.foldLeft(num.one)(num.times)
-    num.fpow(prod, num.reciprocal(num.fromInt(xs.size)))
+    num.fpow(prod, num.reciprocal(num.fromInt(xs.length)))
   }
 
   def geometricMeanBy[A,B](xs: Array[A])(f: A ⇒ B)(implicit num: Numeric[B]): B = {
     val prod = xs.foldLeft(num.one)((b,a) ⇒ num.times(b, f(a)))
-    num.fpow(prod, num.reciprocal(num.fromInt(xs.size)))
+    num.fpow(prod, num.reciprocal(num.fromInt(xs.length)))
   }
 
   def harmonicMean[A](xs: Array[A])(implicit num: Numeric[A]): A = {
     val sum = xs.foldLeft(num.zero)((agg,a) ⇒ num.plus(agg, num.reciprocal(a)))
-    num.div(num.fromInt(xs.size), sum)
+    num.div(num.fromInt(xs.length), sum)
   }
 
   def harmonicMeanBy[A,B](xs: Array[A])(f: A ⇒ B)(implicit num: Numeric[B]): B = {
     val sum = xs.foldLeft(num.zero)((b,a) ⇒ num.plus(b, num.reciprocal(f(a))))
-    num.div(num.fromInt(xs.size), sum)
+    num.div(num.fromInt(xs.length), sum)
   }
 
   def quadraticMean[A](xs: Array[A])(implicit num: Numeric[A]): A = {
     val sum = xs.foldLeft(num.zero)((agg,a) ⇒ num.plus(agg, num.times(a,a)))
-    num.sqrt(num.div(sum, num.fromInt(xs.size)))
+    num.sqrt(num.div(sum, num.fromInt(xs.length)))
   }
 
   def quadraticMeanBy[A,B](xs: Array[A])(f: A ⇒ B)(implicit num: Numeric[B]): B = {
     val sum = xs.foldLeft(num.zero)((b,a) ⇒ num.plus(b, num.pow(f(a),2)))
-    num.sqrt(num.div(sum, num.fromInt(xs.size)))
+    num.sqrt(num.div(sum, num.fromInt(xs.length)))
   }
 }
 
