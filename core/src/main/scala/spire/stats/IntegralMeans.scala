@@ -7,6 +7,13 @@ import scala.collection.GenTraversableOnce
 
 import spire.math.Integral
 
+object integral {
+  implicit class IntegralMeansMA[M[_],A](val xs: M[A]) extends AnyVal {
+    def arithmeticMean(implicit imeans: IntegralMeans[M], int: Integral[A]): A = imeans.arithmeticMean(xs)
+    def arithmeticMeanBy[B](f: A ⇒ B)(implicit imeans: IntegralMeans[M], int: Integral[B]): B = imeans.arithmeticMeanBy(xs)(f)
+  }
+}
+
 trait IntegralMeans[M[_]] {
   def arithmeticMean[A:Integral](xs: M[A]): A
   def arithmeticMeanBy[A,B:Integral](xs: M[A])(f: A ⇒ B): B

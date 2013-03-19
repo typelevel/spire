@@ -6,6 +6,22 @@ import scala.collection.GenTraversable
 
 import spire.math.Fractional
 
+object fractional {
+  implicit class FractionalMeansMA[M[_],A](val xs: M[A]) extends AnyVal {
+    def arithmeticMean(implicit fmeans: FractionalMeans[M], frac: Fractional[A]): A = fmeans.arithmeticMean(xs)
+    def arithmeticMeanBy[B](f: A ⇒ B)(implicit fmeans: FractionalMeans[M], frac: Fractional[B]): B = fmeans.arithmeticMeanBy(xs)(f)
+
+    def geometricMean(implicit fmeans: FractionalMeans[M], frac: Fractional[A]): A = fmeans.geometricMean(xs)
+    def geometricMeanBy[B](f: A ⇒ B)(implicit fmeans: FractionalMeans[M], frac: Fractional[B]): B = fmeans.geometricMeanBy(xs)(f)
+
+    def harmonicMean(implicit fmeans: FractionalMeans[M], frac: Fractional[A]): A = fmeans.harmonicMean(xs)
+    def harmonicMeanBy[B](f: A ⇒ B)(implicit fmeans: FractionalMeans[M], frac: Fractional[B]): B = fmeans.harmonicMeanBy(xs)(f)
+
+    def quadraticMean(implicit fmeans: FractionalMeans[M], frac: Fractional[A]): A = fmeans.quadraticMean(xs)
+    def quadraticMeanBy[B](f: A ⇒ B)(implicit fmeans: FractionalMeans[M], frac: Fractional[B]): B = fmeans.quadraticMeanBy(xs)(f)
+  }
+}
+
 trait FractionalMeans[M[_]] {
   def arithmeticMean[A:Fractional](xs: M[A]): A
   def arithmeticMeanBy[A,B:Fractional](xs: M[A])(f: A ⇒ B): B

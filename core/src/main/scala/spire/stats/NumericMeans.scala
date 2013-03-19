@@ -6,6 +6,22 @@ import scala.collection.GenTraversable
 
 import spire.math.Numeric
 
+object numeric {
+  implicit class NumericMeansMA[M[_],A](val xs: M[A]) extends AnyVal {
+    def arithmeticMean(implicit nmeans: NumericMeans[M], num: Numeric[A]): A = nmeans.arithmeticMean(xs)
+    def arithmeticMeanBy[B](f: A ⇒ B)(implicit nmeans: NumericMeans[M], num: Numeric[B]): B = nmeans.arithmeticMeanBy(xs)(f)
+
+    def geometricMean(implicit nmeans: NumericMeans[M], num: Numeric[A]): A = nmeans.geometricMean(xs)
+    def geometricMeanBy[B](f: A ⇒ B)(implicit nmeans: NumericMeans[M], num: Numeric[B]): B = nmeans.geometricMeanBy(xs)(f)
+
+    def harmonicMean(implicit nmeans: NumericMeans[M], num: Numeric[A]): A = nmeans.harmonicMean(xs)
+    def harmonicMeanBy[B](f: A ⇒ B)(implicit nmeans: NumericMeans[M], num: Numeric[B]): B = nmeans.harmonicMeanBy(xs)(f)
+
+    def quadraticMean(implicit nmeans: NumericMeans[M], num: Numeric[A]): A = nmeans.quadraticMean(xs)
+    def quadraticMeanBy[B](f: A ⇒ B)(implicit nmeans: NumericMeans[M], num: Numeric[B]): B = nmeans.quadraticMeanBy(xs)(f)
+  }
+}
+
 trait NumericMeans[M[_]] {
   def arithmeticMean[A:Numeric](xs: M[A]): A
   def arithmeticMeanBy[A,B:Numeric](xs: M[A])(f: A ⇒ B): B
