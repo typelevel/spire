@@ -25,20 +25,20 @@ object Integral {
 
 trait IntIsIntegral extends Integral[Int] with IntIsEuclideanRing
 with ConvertableFromInt with ConvertableToInt with IntOrder with IntIsSigned {
-  override def fromInt(n: Int): Int = super.fromInt(n)
+  override def fromInt(n: Int): Int = n
 }
 
 trait LongIsIntegral extends Integral[Long] with LongIsEuclideanRing
 with ConvertableFromLong with ConvertableToLong with LongOrder with LongIsSigned {
-  override def fromInt(n: Int): Long = super.fromInt(n)
+  override def fromInt(n: Int): Long = n.toLong
 }
 
 trait BigIntIsIntegral extends Integral[BigInt] with BigIntIsEuclideanRing
 with ConvertableFromBigInt with ConvertableToBigInt with BigIntOrder with BigIntIsSigned {
-  override def fromInt(n: Int): BigInt = super.fromInt(n)
+  override def fromInt(n: Int): BigInt = BigInt(n)
 }
 
 trait SafeLongIsIntegral extends Integral[SafeLong] with SafeLongIsEuclideanRing
 with ConvertableFromSafeLong with ConvertableToSafeLong with SafeLongOrder with SafeLongIsSigned {
-  override def fromInt(n: Int): SafeLong = super.fromInt(n)
+  override def fromInt(n: Int): SafeLong = SafeLong(n)
 }
