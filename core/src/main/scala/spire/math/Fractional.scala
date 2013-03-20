@@ -42,16 +42,14 @@ with DoubleOrder with DoubleIsSigned {
 trait BigDecimalIsFractional extends Fractional[BigDecimal] with BigDecimalIsField
 with BigDecimalIsNRoot with ConvertableFromBigDecimal with ConvertableToBigDecimal
 with BigDecimalOrder with BigDecimalIsSigned {
-  override def fromInt(n: Int): BigDecimal =
-    super[ConvertableToBigDecimal].fromInt(n)
+  override def fromInt(n: Int): BigDecimal = BigDecimal(n)
   override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
 }
 
 trait RationalIsFractional extends Fractional[Rational] with RationalIsField
 with RationalIsNRoot with ConvertableFromRational with ConvertableToRational
 with RationalOrder with RationalIsSigned {
-  override def fromInt(n: Int): Rational =
-    super[ConvertableToRational].fromInt(n)
+  override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
 }
 
@@ -59,13 +57,13 @@ with RationalOrder with RationalIsSigned {
 trait RealIsFractional extends Fractional[Real] with RealIsField
 with RealIsNRoot with ConvertableFromReal with ConvertableToReal
 with RealOrder with RealIsSigned {
-  override def fromInt(n: Int): Real = super[ConvertableToReal].fromInt(n)
+  override def fromInt(n: Int): Real = Real(n)
   override def fromDouble(n: Double): Real = Real(n)
 }
 
 trait NumberIsFractional extends Fractional[Number] with NumberIsField
 with NumberIsNRoot with ConvertableFromNumber with ConvertableToNumber
 with NumberOrder with NumberIsSigned {
-  override def fromInt(n: Int): Number = super[ConvertableToNumber].fromInt(n)
+  override def fromInt(n: Int): Number = Number(n)
   override def fromDouble(n: Double): Number = Number(n)
 }

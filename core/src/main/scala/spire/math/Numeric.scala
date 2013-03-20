@@ -58,7 +58,7 @@ with ConvertableFromLong with ConvertableToLong with LongOrder with LongIsSigned
 trait BigIntIsNumeric extends Numeric[BigInt] with BigIntIsEuclideanRing
 with BigIntIsNRoot with ConvertableFromBigInt with ConvertableToBigInt
 with BigIntOrder with BigIntIsSigned {
-  override def fromInt(n: Int): BigInt = super[ConvertableToBigInt].fromInt(n)
+  override def fromInt(n: Int): BigInt = BigInt(n)
   override def fromDouble(n: Double): BigInt = BigDecimal(n).toBigInt
   def div(a:BigInt, b:BigInt) = a / b
   def ceil(a: BigInt): BigInt = a
@@ -70,34 +70,34 @@ with BigIntOrder with BigIntIsSigned {
 trait FloatIsNumeric extends Numeric[Float] with FloatIsField
 with FloatIsNRoot with ConvertableFromFloat with ConvertableToFloat
 with FloatOrder with FloatIsSigned {
-  override def fromInt(n: Int): Float = n
+  override def fromInt(n: Int): Float = n.toFloat
   override def fromDouble(n: Double): Float = n.toFloat
 }
 
 trait DoubleIsNumeric extends Numeric[Double] with DoubleIsField
 with DoubleIsNRoot with ConvertableFromDouble with ConvertableToDouble
 with DoubleOrder with DoubleIsSigned {
-  override def fromInt(n: Int): Double = n
+  override def fromInt(n: Int): Double = n.toDouble
   override def fromDouble(n: Double): Double = n
 }
 
 trait BigDecimalIsNumeric extends Numeric[BigDecimal] with BigDecimalIsField
 with BigDecimalIsNRoot with ConvertableFromBigDecimal with ConvertableToBigDecimal
 with BigDecimalOrder with BigDecimalIsSigned {
-  override def fromInt(n: Int): BigDecimal = super[ConvertableToBigDecimal].fromInt(n)
+  override def fromInt(n: Int): BigDecimal = BigDecimal(n)
   override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
 }
 
 trait RationalIsNumeric extends Numeric[Rational] with RationalIsField
 with RationalIsNRoot with ConvertableFromRational with ConvertableToRational
 with RationalOrder with RationalIsSigned {
-  override def fromInt(n: Int): Rational = super[ConvertableToRational].fromInt(n)
+  override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
 }
 
 trait RealIsNumeric extends Numeric[Real] with RealIsField with RealIsNRoot
 with ConvertableFromReal with ConvertableToReal with RealOrder with RealIsSigned {
-  override def fromInt(n: Int): Real = super[ConvertableToReal].fromInt(n)
+  override def fromInt(n: Int): Real = Real(n)
   override def fromDouble(n: Double): Real = Real(n)
 }
 
