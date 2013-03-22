@@ -1,141 +1,138 @@
 package spire.algebra
 
-import spire.implicits._
+import scala.collection.SortedMap
 
-import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
-import org.scalacheck.Prop._
-
-import org.scalatest.FunSuite
-import org.scalatest.prop.Checkers
-
-trait Laws[A] {
-
-  implicit def Eq: Eq[A]
-  implicit def Arbitrary: Arbitrary[A]
-
-  def semigroup(implicit A: Semigroup[A]) = new Properties("semigroup") {
-    property("associative") = forAll((x: A, y: A, z: A) =>
-      ((x |+| y) |+| z) === (x |+| (y |+| z))
-    )
-  }
-
-  def monoid(implicit A: Monoid[A]) = new Properties("monoid") {
-    include(semigroup)
-    property("left identity")  = forAll((x: A) => (A.id |+| x) === x)
-    property("right identity") = forAll((x: A) => (x |+| A.id) === x)
-  }
-
-  def group(implicit A: Group[A]) = new Properties("group") {
-    include(monoid)
-    property("left inverse")  = forAll((x: A) => A.id === (x.inverse |+| x))
-    property("right inverse") = forAll((x: A) => A.id === (x |+| x.inverse))
-  }
-
-  def abGroup(implicit A: AbGroup[A]) = new Properties("abGroup") {
-    include(group)
-    property("commutative") = forAll((x: A, y: A) =>
-      (x |+| y) === (y |+| x)
-    )
-  }
-
-  def additiveSemigroup(implicit A: AdditiveSemigroup[A]) = new Properties("additive") {
-    include(semigroup(A.additive))
-  }
-
-  def additiveMonoid(implicit A: AdditiveMonoid[A]) = new Properties("additive") {
-    include(monoid(A.additive))
-  }
-
-  def additiveGroup(implicit A: AdditiveGroup[A]) = new Properties("additive") {
-    include(group(A.additive))
-  }
-
-  def additiveAbGroup(implicit A: AdditiveAbGroup[A]) = new Properties("additive") {
-    include(abGroup(A.additive))
-  }
-
-  def multiplicativeSemigroup(implicit A: MultiplicativeSemigroup[A]) = new Properties("multiplicative") {
-    include(semigroup(A.multiplicative))
-  }
-
-  def multiplicativeMonoid(implicit A: MultiplicativeMonoid[A]) = new Properties("multiplicative") {
-    include(monoid(A.multiplicative))
-  }
-
-  def multiplicativeGroup(implicit A: MultiplicativeGroup[A]) = new Properties("multiplicative") {
-    include(group(A.multiplicative))
-  }
-
-  def multiplicativeAbGroup(implicit A: MultiplicativeAbGroup[A]) = new Properties("multiplicative") {
-    include(abGroup(A.multiplicative))
-  }
-
-  def semiring(implicit A: Semiring[A]) = new Properties("semiring") {
-    include(additiveSemigroup)
-    include(multiplicativeSemigroup)
-    property("distributive") = forAll { (x: A, y: A, z: A) =>
-      (x * (y + z) === (x * y + x * z)) && (((x + y) * z) === (x * z + y * z))
-    }
-  }
-
-  def rng(implicit A: Rng[A]) = new Properties("rng") {
-    include(additiveAbGroup)
-    include(multiplicativeSemigroup)
-  }
-
-  def rig(implicit A: Rig[A]) = new Properties("rig") {
-    include(additiveMonoid)
-    include(multiplicativeMonoid)
-  }
-
-  def ring(implicit A: Ring[A]) = new Properties("ring") {
-    include(additiveAbGroup)
-    include(multiplicativeMonoid)
-  }
-
-  private def _euclideanRing(name: String, includes: Properties*)(implicit A: EuclideanRing[A]) = new Properties(name) {
-    includes foreach include
-
-    // This isn't necessarily true: x = 1/4, y = 3, (x * y) /~ y === 0.
-    // property("quot") = forAll((x: A, y: A) =>
-    //   y =!= A.zero ==> (((x * y) /~ y) === x)
-    // )
-    //
-    // This is not true, in general: 2 * (1 / 4) % 2 == 1 / 2. But, we should
-    // be testing something here.
-    // property("mod = zero") = forAll((x: A, y: A) =>
-    //   y =!= A.zero ==> (((x * y) % y) === A.zero)
-    // )
-  }
-
-  def euclideanRing(implicit A: EuclideanRing[A]) = _euclideanRing("euclideanRing", ring)
-
-  def field(implicit A: Field[A]) = new Properties("field") {
-    include(euclideanRing)
-    include(multiplicativeAbGroup)
-    // _euclideanRing("field", additiveAbGroup, multiplicativeAbGroup)
-  }
-
-  def signed(implicit A: Signed[A]) = new Properties("signed") {
-    property("abs non-negative") = forAll((x: A) => x.abs != Negative)
-  }
-}
+import org.scalacheck.{Prop, Properties}
 
 object Laws {
-  def apply[A : Eq : Arbitrary] = new Laws[A] {
-    def Eq = implicitly[Eq[A]]
-    def Arbitrary = implicitly[Arbitrary[A]]
-  }
+
+  // implicit scope ftw
+
+  implicit def spireProps2Props(sp: Laws#SpireProperties): Properties = sp.all
+
 }
 
-trait LawChecker extends FunSuite with Checkers {
-  def checkAll[A](name: String, props: Properties) {
-    for ((id, prop) <- props.properties) {
-      test(name + "." + id) {
-        check(prop)
-      }
+/**
+ * Root trait of the law cake.
+ *
+ * Defines a wrapper around scalacheck's `Properties` ([[SpireProperties]]),
+ * and some default implementations.
+ *
+ * Extend this trait if you want to define a set of laws.
+ */
+trait Laws {
+
+  /**
+   * This trait abstracts over the various ways how the laws of a type class
+   * can depend on the laws of other type classes. An instance of this trait is
+   * called a ''property set''.
+   *
+   * For that matter, we divide type classes into ''kinds'', where the classes
+   * of one kind share the number of operations and meaning. For example,
+   * `Semigroup`, `Monoid` and `Group` all belong to the same kind. On the
+   * other hand, their additive variants also belong to a common kind, but to
+   * a different one.
+   *
+   * Users of this trait should extend the outer trait [[Laws]] and create
+   * specialized subtypes for each kind of type class. (See
+   * [[DefaultProperties]] for an example.)
+   *
+   * Consider this example hierarchy:
+   * <pre>
+   * Semigroup
+   *     |   \
+   *  Monoid   AdditiveSemigroup
+   *     |   \        |
+   *  Group     AdditiveMonoid
+   *         \        |
+   *            AdditiveGroup
+   * </pre>
+   * They all define their own laws, as well as a couple of parent classes.
+   * If we want to check the laws of `AdditiveGroup`, we want to avoid checking
+   * properties twice, i.e. do not want to check `Monoid` laws via `Group` and
+   * also via `AdditiveMonoid`.
+   *
+   * To address this problem, we define the parent in the same kind as
+   * ''parent'', and other parents as ''bases''. In this example, the parent of
+   * `AdditiveGroup` is `Group`, and its only basis is `Group`. On the other
+   * hand, the parent of `Group` is `Monoid`, and it does not have any bases.
+   *
+   * The set of all properties of a certain class is now defined as union of
+   * these sets:
+   *  - the properties of the class itself
+   *  - recursively, the properties of all its parents (ignoring their bases)
+   *  - recursively, the set of ''all'' properties of its bases
+   *
+   * Looking at our example, that means that `AdditiveGroup` includes the
+   * `Monoid` law only once, because it is the parent of its basis. The
+   * same laws are ignored by its parent `AdditiveMonoid`, hence no redundant
+   * checks occur.
+   *
+   * Of course, classes can have multiple parents and multiple (named) bases.
+   * The only requirement here is that ''inside one kind'', the identifier of
+   * a property is unique, since duplicates are eliminated. To avoid name
+   * clashes ''between different kinds'', the names of properties pulled in
+   * via a basis are prefixed with the name of the basis.
+   *
+   * For better type-safety, ''parents'' are only allowed to come from the
+   * same outer instance of [[Laws]], whereas ''bases'' are allowed to come
+   * from anywhere.
+   */
+  trait SpireProperties {
+    def name: String
+    def bases: Seq[(String, Laws#SpireProperties)]
+    def parents: Seq[SpireProperties]
+    def props: Seq[(String, Prop)]
+
+    private def collectParentProps: SortedMap[String, Prop] =
+      SortedMap(props: _*) ++ parents.flatMap(_.collectParentProps)
+
+    /** Assembles all properties. For the rules, see [[SpireProperties]]. */
+    final def all: Properties = new Properties(name) {
+      for {
+        (baseName, baseProps) ← bases.sortBy(_._1)
+        (name, prop) ← baseProps.all.properties
+      } property(baseName + ":" + name) = prop
+
+      for ((name, prop) ← collectParentProps)
+        property(name) = prop
     }
   }
+
+  /**
+   * Convenience trait to mix into subclasses of [[SpireProperties]] for
+   * property sets which only have one parent.
+   */
+  trait HasOneParent { self: SpireProperties =>
+    def parent: Option[SpireProperties]
+
+    final def parents = parent.toList
+  }
+
+  /**
+   * Convenience class for property sets which may have a parent, but no bases.
+   */
+  class DefaultProperties(
+    val name: String,
+    val parent: Option[SpireProperties],
+    val props: (String, Prop)*
+  ) extends SpireProperties with HasOneParent {
+    val bases = Seq.empty
+  }
+
+  /**
+   * Convencience class for property sets without parents and bases.
+   */
+  class SimpleProperties(
+    name: String,
+    props: (String, Prop)*
+  ) extends DefaultProperties(name, None, props: _*)
+
+  /** Empty property set. */
+  def emptyProperties: SpireProperties = new SimpleProperties(
+    name = "<empty>"
+  )
+
 }
 
 // vim: expandtab:ts=2:sw=2
