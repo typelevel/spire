@@ -87,9 +87,17 @@ trait GroupLaws[A] extends Laws {
 
   // property classes
 
-  class GroupProperties(name: String, parent: Option[GroupProperties], props: (String, Prop)*) extends DefaultProperties(name, parent, props: _*)
+  class GroupProperties(
+    name: String,
+    parent: Option[GroupProperties],
+    props: (String, Prop)*
+  ) extends DefaultProperties(name, parent, props: _*)
 
-  class AdditiveProperties(val base: GroupProperties, val parent: Option[AdditiveProperties], val props: (String, Prop)*) extends SpireProperties with HasOneParent {
+  class AdditiveProperties(
+    val base: GroupProperties,
+    val parent: Option[AdditiveProperties],
+    val props: (String, Prop)*
+  ) extends SpireProperties with HasOneParent {
     val name = base.name
     val bases = Seq("base" → base)
   }

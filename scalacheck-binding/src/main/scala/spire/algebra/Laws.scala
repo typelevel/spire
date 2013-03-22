@@ -12,11 +12,20 @@ object Laws {
 
 }
 
+/**
+ * Root trait of the law cake.
+ *
+ * Defines a wrapper around scalacheck's `Properties` ([[SpireProperties]]),
+ * and some default implementations.
+ *
+ * Extend this trait if you want to define a set of laws.
+ */
 trait Laws {
 
   /**
    * This trait abstracts over the various ways how the laws of a type class
-   * can depend on the laws of other type classes.
+   * can depend on the laws of other type classes. An instance of this trait is
+   * called a ''property set''.
    *
    * For that matter, we divide type classes into ''kinds'', where the classes
    * of one kind share the number of operations and meaning. For example,
@@ -78,6 +87,7 @@ trait Laws {
     private def collectParentProps: SortedMap[String, Prop] =
       SortedMap(props: _*) ++ parents.flatMap(_.collectParentProps)
 
+    /** Assembles all properties. For the rules, see [[SpireProperties]]. */
     final def all: Properties = new Properties(name) {
       for {
         (baseName, baseProps) ← bases.sortBy(_._1)
@@ -89,21 +99,36 @@ trait Laws {
     }
   }
 
+  /**
+   * Convenience trait to mix into subclasses of [[SpireProperties]] for
+   * property sets which only have one parent.
+   */
   trait HasOneParent { self: SpireProperties =>
     def parent: Option[SpireProperties]
 
     final def parents = parent.toList
   }
 
-  class DefaultProperties(val name: String, val parent: Option[DefaultProperties], val props: (String, Prop)*) extends SpireProperties with HasOneParent {
+  /**
+   * Convenience class for property sets which may have a parent, but no bases.
+   */
+  class DefaultProperties(
+    val name: String,
+    val parent: Option[SpireProperties],
+    val props: (String, Prop)*
+  ) extends SpireProperties with HasOneParent {
     val bases = Seq.empty
   }
 
-  class SimpleProperties(val name: String, val props: (String, Prop)*) extends SpireProperties {
-    val bases = Seq.empty
-    val parents = Seq.empty
-  }
+  /**
+   * Convencience class for property sets without parents and bases.
+   */
+  class SimpleProperties(
+    name: String,
+    props: (String, Prop)*
+  ) extends DefaultProperties(name, None, props: _*)
 
+  /** Empty property set. */
   def emptyProperties: SpireProperties = new SimpleProperties(
     name = "<empty>"
   )

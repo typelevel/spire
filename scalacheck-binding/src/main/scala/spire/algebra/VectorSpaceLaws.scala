@@ -108,7 +108,13 @@ trait VectorSpaceLaws[V, A] extends Laws {
       new SpaceProperties(name, parent.sl, parent.vl, Seq(parent), props: _*)
   }
 
-  class SpaceProperties(val name: String, val sl: scalarLaws.type => scalarLaws.SpireProperties, val vl: vectorLaws.type => vectorLaws.SpireProperties, val parents: Seq[SpaceProperties], val props: (String, Prop)*) extends SpireProperties {
+  class SpaceProperties(
+    val name: String,
+    val sl: scalarLaws.type => scalarLaws.SpireProperties,
+    val vl: vectorLaws.type => vectorLaws.SpireProperties,
+    val parents: Seq[SpaceProperties],
+    val props: (String, Prop)*
+  ) extends SpireProperties {
     val bases = Seq("scalar" → sl(scalarLaws), "vector" → vl(vectorLaws))
   }
 
