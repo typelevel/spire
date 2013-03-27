@@ -2,83 +2,122 @@ package spire.algebra
 
 import spire.implicits._
 
-import org.scalacheck.{Arbitrary, Gen, Prop, Properties}
+import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
-import org.scalatest.FunSuite
-import org.scalatest.prop.Checkers
+object VectorSpaceLaws {
+  def apply[V: Eq: Arbitrary, A: Eq: Arbitrary: Predicate] = new VectorSpaceLaws[V, A] {
+    val scalarLaws = RingLaws[A]
+    val vectorLaws = GroupLaws[V]
+  }
+}
 
-trait VectorSpaceLaws[V, A] {
+trait VectorSpaceLaws[V, A] extends Laws {
 
   implicit def scalar(implicit V: Module[V, A]): Ring[A] = V.scalar
 
-  val vectorLaws: Laws[V]
-  val scalarLaws: Laws[A]
+  val scalarLaws: RingLaws[A]
+  val vectorLaws: GroupLaws[V]
 
-  import vectorLaws.{ Eq => EqV, Arbitrary => ArbV }
-  import scalarLaws.{ Eq => EqA, Arbitrary => ArbA }
+  import scalarLaws.{ Equ => EqA, Arb => ArA }
+  import vectorLaws.{ Equ => EqV, Arb => ArV }
 
-  def module(implicit V: Module[V, A]) = new Properties("module") {
-    include(vectorLaws.abGroup(V.additive))
-    include(scalarLaws.ring(V.scalar))
 
-    property("associative scalar") = forAll { (r: A, s: A, v: V) =>
+  def module(implicit V: Module[V, A]) = new SpaceProperties(
+    name = "module",
+    sl = _.ring(V.scalar),
+    vl = _.abGroup(V.additive),
+    parents = Seq.empty,
+
+    "associative scalar" → forAll { (r: A, s: A, v: V) =>
+      // TODO compiler crash if variable 'w' is replaced by its value
       val w = r *: s *: v
       w === ((r * s) *: v)
-    }
-    property("scalar is distributes over vector") = forAll { (r: A, v: V, w: V) =>
+    },
+    "scalar distributes over vector" → forAll((r: A, v: V, w: V) =>
       (r *: (v + w)) === ((r *: v) + (r *: w))
-    }
-    property("vector distributes over scalar") = forAll { (r: A, s: A, v: V) =>
+    ),
+    "vector distributes over scalar" → forAll((r: A, s: A, v: V) =>
       ((r + s) *: v) === ((r *: v) + (s *: v))
-    }
-    property("scalar identity is identity") = forAll { (v: V) =>
+    ),
+    "scalar identity is identity" → forAll((v: V) =>
       (V.scalar.one *: v) === v
-    }
-  }
+    )
+  )
 
-  def vectorSpace(implicit V: VectorSpace[V, A]) = new Properties("vector space") {
-    include(module)
-    include(scalarLaws.field(V.scalar))
-  }
+  def vectorSpace(implicit V: VectorSpace[V, A]) = new SpaceProperties(
+    name = "vector space",
+    sl = _.field(V.scalar),
+    vl = _.abGroup(V.additive),
+    parents = Seq(module)
+  )
 
-  def normedVectorSpace(implicit V: NormedVectorSpace[V, A], ev0: Order[A], ev1: Signed[A]) = new Properties("normed vector space") {
-    include(vectorSpace)
-    property("scalable") = forAll { (a: A, v: V) =>
+  // TODO metric space dummy
+  def metricSpace(implicit V: MetricSpace[V, A]) = new SpaceProperties(
+    name = "metric space",
+    sl = _.emptyProperties,
+    vl = _.emptyProperties,
+    parents = Seq.empty
+  )
+
+  def normedVectorSpace(implicit V: NormedVectorSpace[V, A], ev0: Order[A], ev1: Signed[A]) = new SpaceProperties(
+    name = "normed vector space",
+    sl = _.field(V.scalar),
+    vl = _.abGroup(V.additive),
+    parents = Seq(vectorSpace, metricSpace),
+
+    "scalable" → forAll((a: A, v: V) =>
       a.abs * v.norm === (a.abs *: v).norm
-    }
-    property("triangle inequality") = forAll { (v: V, w: V) =>
+    ),
+    "triangle inequality" → forAll((v: V, w: V) =>
       (v + w).norm <= (v.norm + w.norm)
-    }
-    property("only 1 zero") = forAll { (v: V) =>
-      if (v === V.zero) {
+    ),
+    "only 1 zero" → forAll((v: V) =>
+      if (v === V.zero)
         v.norm === Ring[A].zero
-      } else {
+      else
         v.norm > Ring[A].zero
-      }
-    }
-  }
+    )
+  )
 
-  def linearity(f: V => A)(implicit V: Module[V, A]) = new Properties("linearity") {
-    property("homogeneity") = forAll((r: A, v: V) => f(r *: v) === r * f(v))
-    property("additivity") = forAll((v: V, w: V) => f(v + w) === f(v) + f(w))
-  }
+  def linearity(f: V => A)(implicit V: Module[V, A]) = new SimpleProperties(
+    name = "linearity",
 
-  def innerProductSpace(implicit V: InnerProductSpace[V, A], A: Order[A], A0: Signed[A]) = new Properties("inner-product space") {
-    include(vectorSpace)
+    "homogeneity" → forAll((r: A, v: V) =>
+      f(r *: v) === r * f(v)
+    ),
+    "additivity" → forAll((v: V, w: V) =>
+      f(v + w) === f(v) + f(w)
+    )
+  )
 
-    property("symmetry") = forAll { (v: V, w: V) =>
+  def innerProductSpace(implicit V: InnerProductSpace[V, A], A: Order[A], A0: Signed[A]) = SpaceProperties.fromParent(
+    name = "inner-product space",
+    parent = vectorSpace,
+
+    "symmetry" → forAll((v: V, w: V) =>
       (v ⋅ w).abs === (w ⋅ v).abs
-    }
-    property("linearity of partial inner product") = forAll { (w: V) =>
+    ),
+    "linearity of partial inner product" → forAll((w: V) =>
       linearity(_ ⋅ w)
-    }
+    )
+  )
+
+  object SpaceProperties {
+    def fromParent(name: String, parent: SpaceProperties, props: (String, Prop)*) =
+      new SpaceProperties(name, parent.sl, parent.vl, Seq(parent), props: _*)
   }
+
+  class SpaceProperties(
+    val name: String,
+    val sl: scalarLaws.type => scalarLaws.SpireProperties,
+    val vl: vectorLaws.type => vectorLaws.SpireProperties,
+    val parents: Seq[SpaceProperties],
+    val props: (String, Prop)*
+  ) extends SpireProperties {
+    val bases = Seq("scalar" → sl(scalarLaws), "vector" → vl(vectorLaws))
+  }
+
 }
 
-object VectorSpaceLaws {
-  def apply[V: Eq: Arbitrary, A: Eq: Arbitrary] = new VectorSpaceLaws[V, A] {
-    val vectorLaws = Laws[V]
-    val scalarLaws = Laws[A]
-  }
-}
+// vim: expandtab:ts=2:sw=2
