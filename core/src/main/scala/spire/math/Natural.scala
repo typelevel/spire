@@ -109,7 +109,7 @@ sealed trait Natural {
 
   def toLong: Long = this match {
     case End(d) => d.toLong
-    case Digit(d, tail) => (tail.toInt << 32L) + d.toLong
+    case Digit(d, tail) => (tail.toLong << 32L) + d.toLong
   }
 
   def toBigInt: BigInt = this match {
@@ -162,7 +162,7 @@ sealed trait Natural {
     def recur(next: Natural, shift: Int, bit: Int): Int = next match {
       case End(n) =>
         val t = test(n)
-        if (t < 0) bit else if (bit < 0) shift + t else -1
+        if (t < 0) -1 else if (bit < 0) shift + t else -1
       case Digit(n, tail) =>
         val t = test(n)
         if (t < 0)
@@ -179,9 +179,10 @@ sealed trait Natural {
     case End(d) =>
       if (d < rhs) -1 else if (d > rhs) 1 else 0
     case Digit(d, tail) =>
-      // TODO: we must be sure there can't be leading zeros
-      //if (d > rhs || !tail.isZero) 1 else if (d < rhs) -1 else 0
-      if (d > rhs) 1 else if (d < rhs) -1 else 0
+      if (tail.isZero)
+        if (d > rhs) 1 else if (d < rhs) -1 else 0
+      else
+        1
   }
 
   def compare(rhs: Natural): Int = {
@@ -192,7 +193,7 @@ sealed trait Natural {
     def recur(lhs: Natural, rhs: Natural, d: Int): Int = lhs match {
       case End(ld) => rhs match {
         case End(rd) => cmp(ld, rd, d)
-        case _:Digit => -rhs.compare(ld)
+        case _: Digit => -rhs.compare(ld)
       }
       case Digit(ld, ltail) => rhs match {
         case End(rd) => lhs.compare(rd)
@@ -305,9 +306,6 @@ sealed trait Natural {
     case Digit(ld, ltail) => rhs match {
       case End(rd) => lhs * rd
       case Digit(rd, rtail) =>
-        // TODO: karatsuba might do better, but didn't when i last tried.
-        // in our case, the fact that Natural*UInt is so much faster might
-        // distort the results a bit.
         Digit(UInt(0), Digit(UInt(0), ltail * rtail)) +
         Digit(UInt(0), ltail * rd) +
         Digit(UInt(0), rtail * ld) +
@@ -337,17 +335,24 @@ sealed trait Natural {
 
   def /(rhs: Natural): Natural = {
     rhs match {
-      case End(rd) => lhs / rd
+      case End(rd) =>
+        lhs / rd
   
       case Digit(rd, rtail) => lhs match {
-        case End(ld) => End(UInt(0))
+        case End(ld) =>
+          End(UInt(0))
 
         case Digit(ld, ltail) => rhs.compare(UInt(1)) match {
           case -1 => sys.error("/ by zero")
-          case 0 => lhs
+          case 0 =>
+            lhs
           case 1 =>
             val p = rhs.powerOfTwo
-            if (p >= 0) lhs >> p else longdiv(lhs, rhs)._1
+            if (p >= 0) {
+              lhs >> p
+            } else {
+              longdiv(lhs, rhs)._1
+            }
         }
       }
     }
@@ -408,8 +413,8 @@ sealed trait Natural {
     while (shift >= 0) {
       val shifted = denom << shift
       if (shifted <= rem) {
-        quo = quo + Natural(1) << shift
-        rem = rem - shifted
+        quo += Natural(1) << shift
+        rem -= shifted
         remBits = rem.getNumBits
         shift = remBits - denomBits
       } else {
@@ -582,9 +587,9 @@ object Natural extends NaturalInstances {
     def /%(n: UInt): (Natural, Natural) = {
       @tailrec
       def recur(next: Natural, rem: UInt, sofar: Natural): (Natural, Natural) = {
-        val t: Long = (rem.toLong << 32) + next.digit.toLong
-        val q: Long = t / n.toLong
-        val r: Long = t % n.toLong
+        val t: ULong = ULong(rem.toLong << 32) + ULong(next.digit.toLong)
+        val q: Long = (t / ULong(n.toLong)).toLong
+        val r: Long = (t % ULong(n.toLong)).toLong
         next match {
           case End(d) => (Digit(UInt(q), sofar), End(UInt(r)))
           case Digit(d, tail) => recur(tail, UInt(r), Digit(UInt(q), sofar))
