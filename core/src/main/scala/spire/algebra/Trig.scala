@@ -1,16 +1,13 @@
 package spire.algebra
 
-import scala.{specialized => spec, math => mth}
-
-import java.lang.Math
-import java.math.MathContext
+import scala.{specialized => spec}
 
 trait Trig[@spec(Float, Double) A] {
   def e: A
   def pi: A
 
   def exp(a: A): A
-  def log(a:A):A
+  def log(a:A): A
 
   def sin(a: A): A
   def cos(a: A): A
