@@ -24,16 +24,24 @@ object Simplification {
 
   def main(args: Array[String]) {
     if (args.isEmpty) {
-      println("usage: %s [nth | all | snap] [number]")
+      println("usage: %s [nrat | rats | nprime | primes | snap] [number]")
     } else {
       args(0) match {
-        case "nth" =>
+        case "nrat" =>
           val n = if (args.length == 1) 10 else args(1).toInt
           val r: Rational = rationals.drop(n - 1).head
           println("rational %d is %s" format (n, r.toString))
-        case "all" =>
+        case "rats" =>
           val n = if (args.length == 1) 10 else args(1).toInt
           rationals.take(n).foreach(r => print(r.toString + ", "))
+          println("...")
+        case "nprime" =>
+          val n = if (args.length == 1) 10 else args(1).toInt
+          val p: Int = primes.drop(n - 1).head
+          println("rational %d is %s" format (n, p.toString))
+        case "primes" =>
+          val n = if (args.length == 1) 10 else args(1).toInt
+          primes.take(n).foreach(p => print(p.toString + ", "))
           println("...")
         case "snap" =>
           val n = if (args.length == 1) 1.4142135623730951 else args(1).toDouble
@@ -70,6 +78,28 @@ object Simplification {
     def loop(i: Long, n: Long, d: Long): BigStream[Rational] = next(i, n, d)
 
     Rational.zero #:: loop(2L, 1L, 1L)
+  }
+
+  /**
+   * Naive prime stream. For each odd number, this method tries
+   * dividing by all previous primes <= sqrt(n).
+   * 
+   * There are a lot of ways to improve this. For now it's a toy.
+   * It can generate the millionth prime in ~9s on my computer.
+   */
+  val primes: Stream[Int] = {
+    @tailrec
+    def next(n: Int, stream: Stream[Int]): Stream[Int] =
+      if (stream.isEmpty || (stream.head ** 2) > n)
+        n #:: loop(n + 2, primes)
+      else if (n % stream.head == 0)
+        next(n + 2, primes)
+      else
+        next(n, stream.tail)
+
+    def loop(n: Int, stream: Stream[Int]): Stream[Int] = next(n, stream)
+
+    2 #:: loop(3, primes)
   }
 
   /**
