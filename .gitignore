@@ -4,6 +4,7 @@ project7/plugins/src_managed
 project7/plugins/project
 project/boot
 project/build/target
+project/plugins.sbt
 project/plugins/lib_managed
 project/plugins/project
 project/plugins/src_managed
