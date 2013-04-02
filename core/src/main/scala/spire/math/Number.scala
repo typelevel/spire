@@ -31,9 +31,6 @@ object Number extends NumberInstances {
   def apply(n: Double): Number = FloatNumber(n)
   def apply(n: BigDecimal): Number = DecimalNumber(n)
 
-  object implicits {
-  }
-
   def apply(s: String): Number = try {
     Number(SafeLong(s))
   } catch {
