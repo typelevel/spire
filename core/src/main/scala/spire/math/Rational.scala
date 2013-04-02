@@ -19,6 +19,9 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def numerator: BigInt
   def denominator: BigInt
 
+  def numeratorAsLong: Long
+  def denominatorAsLong: Long
+
   // ugh, ScalaNumber and ScalaNumericConversions in 2.10 require this hack
   override def underlying: List[Any] = sys.error("unimplemented")
 
@@ -507,6 +510,9 @@ object LongRationals extends Rationals[Long] {
     def numerator = ConvertableFrom[Long].toBigInt(n)
     def denominator = ConvertableFrom[Long].toBigInt(d)
 
+    def numeratorAsLong: Long = n
+    def denominatorAsLong: Long = d
+
     def reciprocal = if (n == 0L)
       throw new IllegalArgumentException("/ 0")
     else
@@ -703,6 +709,9 @@ object BigRationals extends Rationals[BigInt] {
 
     def numerator = n
     def denominator = d
+
+    def numeratorAsLong: Long = n.toLong
+    def denominatorAsLong: Long = d.toLong
 
     def reciprocal = if (n == 0)
       throw new IllegalArgumentException("/ 0")
