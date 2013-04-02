@@ -427,7 +427,7 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
   def unary_- = Number(-n)
 
   def +(rhs: Number) = Number(n + rhs.toBigDecimal)
-  def *(rhs: Number) = Number(n + rhs.toBigDecimal)
+  def *(rhs: Number) = Number(n * rhs.toBigDecimal)
   def -(rhs: Number) = Number(n - rhs.toBigDecimal)
   def /(rhs: Number) = Number(n / rhs.toBigDecimal)
   def /~(rhs: Number) = Number(n quot rhs.toBigDecimal)
