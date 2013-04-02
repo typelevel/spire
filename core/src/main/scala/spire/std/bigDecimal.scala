@@ -73,15 +73,16 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
 
 object BigDecimalIsTrig {
   // TODO: optimize. also consider improving exp() and just using exp(1)
-  private var eCache: BigDecimal = null
+  @volatile private var eCache: BigDecimal = null
   private def eFromContext(mc: MathContext): BigDecimal = {
     import spire.std.bigDecimal.BigDecimalAlgebra.sqrt
+    val eCache0 = eCache
 
-    if (eCache == null) {
-    } else if (mc == eCache.mc) {
-      return eCache
-    } else if (mc.getPrecision < eCache.mc.getPrecision) {
-      return eCache.setScale(mc.getPrecision, BigDecimal.RoundingMode.HALF_UP)
+    if (eCache0 == null) {
+    } else if (mc == eCache0.mc) {
+      return eCache0
+    } else if (mc.getPrecision < eCache0.mc.getPrecision) {
+      return eCache0.setScale(mc.getPrecision, BigDecimal.RoundingMode.HALF_UP)
     }
 
     val scale = BigInt(10).pow(mc.getPrecision)
@@ -116,15 +117,16 @@ object BigDecimalIsTrig {
   private final val c: Long = 640320L
   private final val c3_over_24: Long = (c * c * c) / 24L
 
-  private var piCache: BigDecimal = null
+  @volatile private var piCache: BigDecimal = null
   private def piFromContext(mc: MathContext): BigDecimal = {
+    val piCache0 = piCache
     import spire.std.bigDecimal.BigDecimalAlgebra.sqrt
 
-    if (piCache == null) {
-    } else if (mc == piCache.mc) {
-      return piCache
-    } else if (mc.getPrecision < piCache.mc.getPrecision) {
-      return piCache.setScale(mc.getPrecision, BigDecimal.RoundingMode.HALF_UP)
+    if (piCache0 == null) {
+    } else if (mc == piCache0.mc) {
+      return piCache0
+    } else if (mc.getPrecision < piCache0.mc.getPrecision) {
+      return piCache0.setScale(mc.getPrecision, BigDecimal.RoundingMode.HALF_UP)
     }
 
     /**
