@@ -32,10 +32,6 @@ trait DoubleIsField extends Field[Double] {
 
   override def fromDouble(n: Double): Double = n
   def div(a:Double, b:Double) = a / b
-  def ceil(a:Double): Double = Math.floor(a)
-  def floor(a:Double): Double = Math.floor(a)
-  def round(a:Double): Double = spire.math.round(a)
-  def isWhole(a:Double) = a % 1.0 == 0.0
 }
 
 trait DoubleIsNRoot extends NRoot[Double] {
@@ -87,6 +83,10 @@ trait DoubleIsSigned extends Signed[Double] {
 
 trait DoubleIsReal extends IsReal[Double] with DoubleOrder with DoubleIsSigned {
   def toDouble(x: Double): Double = x
+  def ceil(a:Double): Double = Math.floor(a)
+  def floor(a:Double): Double = Math.floor(a)
+  def round(a:Double): Double = spire.math.round(a)
+  def isWhole(a:Double) = a % 1.0 == 0.0
 }
 
 trait DoubleInstances {

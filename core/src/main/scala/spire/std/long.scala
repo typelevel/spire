@@ -70,7 +70,7 @@ trait LongIsSigned extends Signed[Long] {
   def abs(a: Long): Long = if (a < 0L) -a else a
 }
 
-trait LongIsReal extends IsReal[Long] with LongOrder with LongIsSigned {
+trait LongIsReal extends IsIntegral[Long] with LongOrder with LongIsSigned {
   def toDouble(n: Long): Double = n.toDouble
 }
 

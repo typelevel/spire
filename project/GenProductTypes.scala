@@ -157,9 +157,7 @@ object ProductTypes {
   val rig = Definition("Rig", Some("Semiring"))(const("zero") :: const("one") :: Nil)
   val ring = Definition("Ring", Some("Rng"))(fromInt :: const("one") :: Nil)
   val euclideanRing = Definition("EuclideanRing", Some("Ring"))(binary("quot") :: binary("mod") :: binary("gcd") :: Nil)
-  val field = Definition("Field", Some("EuclideanRing")) {
-    binary("div") :: unary("ceil") :: unary("floor") :: unary("round") :: isWhole :: Nil
-  }
+  val field = Definition("Field", Some("EuclideanRing"))(binary("div") :: Nil)
 
   private val eqv: Block = { tpe =>
     import tpe._

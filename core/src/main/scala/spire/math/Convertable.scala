@@ -3,7 +3,7 @@ package spire.math
 import scala.{specialized => spec}
 
 import spire.macrosk.Ops
-import spire.algebra.Trig
+import spire.algebra.{ Trig, IsReal }
 
 trait ConvertableTo[@spec A] {
   def fromByte(n:Byte): A
@@ -162,6 +162,7 @@ trait ConvertableToReal extends ConvertableTo[Real] {
 trait ConvertableToComplex[A] extends ConvertableTo[Complex[A]] {
   implicit def f:Fractional[A]
   implicit def t:Trig[A]
+  implicit def r:IsReal[A]
   def fromByte(a:Byte): Complex[A] = Complex(f.fromByte(a), f.zero)
   def fromShort(a:Short): Complex[A] = Complex(f.fromShort(a), f.zero)
   def fromInt(a:Int): Complex[A] = Complex(f.fromInt(a), f.zero)
@@ -217,10 +218,11 @@ object ConvertableTo {
   implicit object ConvertableToSafeLong extends ConvertableToSafeLong
   implicit object ConvertableToNumber extends ConvertableToNumber
 
-  implicit def convertableToComplex[A: Fractional: Trig] =
+  implicit def convertableToComplex[A: Fractional: Trig: IsReal] =
     new ConvertableToComplex[A] {
       val f = Fractional[A]
       val t = Trig[A]
+      val r = IsReal[A]
     }
 }
 

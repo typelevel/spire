@@ -108,13 +108,6 @@ trait RealIsEuclideanRing extends EuclideanRing[Real] with RealIsRing {
 trait RealIsField extends Field[Real] with RealIsEuclideanRing {
   override def fromDouble(n: Double): Real = Real(n)
   def div(a:Real, b:Real) = a / b
-  def ceil(a:Real) = if (a % 1 == 0) a else a + 1 - (a % 1)
-  def floor(a:Real) = a - (a % 1)
-  def round(a:Real) = {
-    val m = a % 1
-    if (m < 0.5) a - m else a + 1 - m
-  }
-  def isWhole(a:Real) = a % 1 == 0
 }
 
 trait RealIsNRoot extends NRoot[Real] {
@@ -136,4 +129,11 @@ trait RealIsSigned extends Signed[Real] {
 
 trait RealIsReal extends IsReal[Real] with RealOrder with RealIsSigned {
   def toDouble(x: Real): Double = x.toDouble
+  def ceil(a:Real) = if (a % 1 == 0) a else a + 1 - (a % 1)
+  def floor(a:Real) = a - (a % 1)
+  def round(a:Real) = {
+    val m = a % 1
+    if (m < 0.5) a - m else a + 1 - m
+  }
+  def isWhole(a:Real) = a % 1 == 0
 }

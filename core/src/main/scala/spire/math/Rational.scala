@@ -853,10 +853,6 @@ trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRin
 trait RationalIsField extends Field[Rational] with RationalIsEuclideanRing {
   override def fromDouble(n: Double): Rational = Rational(n)
   def div(a:Rational, b:Rational) = a / b
-  def ceil(a:Rational): Rational = a.ceil
-  def floor(a:Rational): Rational = a.floor
-  def round(a:Rational): Rational = a.round
-  def isWhole(a:Rational) = a.denominator == 1
 }
 
 trait RationalIsNRoot extends NRoot[Rational] {
@@ -884,4 +880,8 @@ trait RationalIsSigned extends Signed[Rational] {
 trait RationalIsReal extends IsReal[Rational]
 with RationalOrder with RationalIsSigned {
   def toDouble(r: Rational): Double = r.toDouble
+  def ceil(a:Rational): Rational = a.ceil
+  def floor(a:Rational): Rational = a.floor
+  def round(a:Rational): Rational = a.round
+  def isWhole(a:Rational) = a.denominator == 1
 }

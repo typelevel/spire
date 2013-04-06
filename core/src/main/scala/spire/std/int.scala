@@ -58,7 +58,7 @@ trait IntIsSigned extends Signed[Int] {
   def abs(a: Int): Int = if (a < 0) -a else a
 }
 
-trait IntIsReal extends IsReal[Int] with IntOrder with IntIsSigned {
+trait IntIsReal extends IsIntegral[Int] with IntOrder with IntIsSigned {
   def toDouble(n: Int): Double = n.toDouble
 }
 
