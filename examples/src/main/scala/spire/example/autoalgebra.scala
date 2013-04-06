@@ -1,6 +1,7 @@
 package spire.example
 
 import org.apfloat._
+import org.jscience.mathematics.number.{ Rational => JRational }
 
 import scala.collection.JavaConverters._
 
@@ -55,6 +56,13 @@ object AutoAlgebraExample extends App {
 
   // That's a total of 8 lines to create an Apfloat -> Spire bridge!
 
+  // Creating a JScience bridge isn't any harder:
+
+  implicit val jrationalOrder = Auto.java.order[JRational]
+  implicit val jrationalField = Auto.java.field[JRational](JRational.ZERO, JRational.ONE)
+
+  assert(-JRational.valueOf(2L, 1L) === JRational.valueOf(-2L, 1L))
+
   // On top of that, Auto also has some basic support for Java collections.
   // Do you really love `java.util._`? Probably not, but let's say you still
   // need to work with Java Lists, so you want to create a monoid for it.
@@ -90,4 +98,6 @@ object AutoAlgebraExample extends App {
 
   implicit val doubleOrder = Auto.scala.order[Double]
   implicit val doubleField = Auto.scala.field[Double](0d, 1d)
+
+  implicit def listMonoid[A] = Auto.scala.collection.monoid[List[A]](Nil)
 }
