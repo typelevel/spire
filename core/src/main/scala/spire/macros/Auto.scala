@@ -63,6 +63,10 @@ abstract class AutoOps {
       })
     }
   }
+
+  def failedSearch(name: String, op: String): c.Expr[Nothing] =
+    c.abort(c.enclosingPosition,
+      "Couldn't find matching method for op %s (%s)." format (name, op))
 }
 
 abstract class AutoAlgebra extends AutoOps { ops =>
@@ -73,7 +77,7 @@ abstract class AutoAlgebra extends AutoOps { ops =>
   def times[A: c.WeakTypeTag]: c.Expr[A]
   def negate[A: c.WeakTypeTag]: c.Expr[A]
   def div[A: c.WeakTypeTag]: c.Expr[A]
-  def mod[A: c.WeakTypeTag]: c.Expr[A]
+  def mod[A: c.WeakTypeTag](stub: => c.Expr[A] = failedSearch("mod", "%")): c.Expr[A]
   def equals: c.Expr[Boolean]
   def compare: c.Expr[Int]
 
@@ -133,7 +137,7 @@ abstract class AutoAlgebra extends AutoOps { ops =>
         override def minus(x: A, y: A): A = ops.minus[A].splice
         def negate(x: A): A = ops.negate[A].splice
         def quot(x: A, y: A): A = ops.div[A].splice
-        def mod(x: A, y: A): A = ops.mod[A].splice
+        def mod(x: A, y: A): A = ops.mod[A]().splice
         def gcd(x: A, y: A): A = euclid(x, y)(ev.splice)
       }
     }
@@ -150,7 +154,7 @@ abstract class AutoAlgebra extends AutoOps { ops =>
         override def minus(x: A, y: A): A = ops.minus[A].splice
         def negate(x: A): A = ops.negate[A].splice
         def quot(x: A, y: A): A = ops.div[A].splice
-        def mod(x: A, y: A): A = ops.mod[A].splice
+        def mod(x: A, y: A): A = ops.mod[A](z).splice
         def gcd(x: A, y: A): A = euclid(x, y)(ev.splice)
         def div(x: A, y: A): A = ops.div[A].splice
       }
@@ -181,7 +185,7 @@ case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
   def times[A: c.WeakTypeTag] = binop[A]("$times")
   def negate[A: c.WeakTypeTag] = unop[A]("unary_$minus")
   def div[A: c.WeakTypeTag] = binop[A]("$div")
-  def mod[A: c.WeakTypeTag] = binop[A]("$percent")
+  def mod[A: c.WeakTypeTag](stub: => c.Expr[A]) = binop[A]("$percent")
   def equals = binop[Boolean]("$eq$eq")
   def compare = binop[Int]("compare")
 }
@@ -192,15 +196,11 @@ case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
   def times[A: c.WeakTypeTag] = binop[A]("multiply")
   def div[A: c.WeakTypeTag] = binop[A]("divide")
   def negate[A: c.WeakTypeTag] = unop[A]("negate")
-  def mod[A: c.WeakTypeTag] =
-    if (hasMethod1[A, A, A]("mod")) {
-      binop[A]("mod")
-    } else if (hasMethod1[A, A, A]("remainder")) {
-      binop[A]("remainder")
-    } else {
-      c.abort(c.enclosingPosition,
-        "Cannot find suitable mod (%) method (checked: mod, remainder).")
-    }
+  def mod[A: c.WeakTypeTag](stub: => c.Expr[A]) =
+    if (hasMethod1[A, A, A]("mod")) binop[A]("mod")
+    else if (hasMethod1[A, A, A]("remainder")) binop[A]("remainder")
+    else stub
+
   def equals = binop[Boolean]("equals")
   def compare = binop[Int]("compareTo")
 }

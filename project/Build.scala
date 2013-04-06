@@ -114,7 +114,11 @@ object MyBuild extends Build {
     //scalacOptions ++= Seq("-Ymacro-debug-lite"),
     publish := false,
     publishLocal := false,
-    libraryDependencies += "com.chuusai" %% "shapeless" % "1.2.3"
+    libraryDependencies ++= Seq(
+      "com.chuusai" %% "shapeless" % "1.2.3",
+      "org.apfloat" % "apfloat" % "1.6.3",
+      "org.jscience" % "jscience" % "4.3.1"
+    )
   )
 
   // Scalacheck binding
