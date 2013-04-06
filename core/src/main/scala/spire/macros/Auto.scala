@@ -50,6 +50,23 @@ abstract class AutoOps {
       Select(Ident(newTermName(x)), newTermName(name)),
       List(Ident(newTermName(y)))))
 
+  def binopSearch[A: c.WeakTypeTag](names: List[String], x: String = "x", y: String = "y"): Option[c.Expr[A]] =
+    names find { name => hasMethod1[A, A, A](name) } map (binop[A](_, x, y))
+
+  def unopSearch[A: c.WeakTypeTag](names: List[String], x: String = "x"): Option[c.Expr[A]] =
+    names find { name => hasMethod0[A, A](name) } map (unop[A](_, x))
+
+  def hasMethod0[A: c.WeakTypeTag, B: c.WeakTypeTag](name: String): Boolean = {
+    val tpeA = c.weakTypeTag[A].tpe
+    val tpeB = c.weakTypeTag[B].tpe
+    tpeA.members exists { m =>
+      m.isMethod && m.isPublic && m.name.encoded == name && (m.typeSignature match {
+        case MethodType(Nil, ret) => ret =:= tpeB
+        case _ => false
+      })
+    }
+  }
+
   def hasMethod1[A: c.WeakTypeTag, B: c.WeakTypeTag, C: c.WeakTypeTag](name: String): Boolean = {
     val tpeA = c.weakTypeTag[A].tpe
     val tpeB = c.weakTypeTag[B].tpe
@@ -57,7 +74,7 @@ abstract class AutoOps {
     tpeA.members exists { m =>
       m.isMethod && m.isPublic && m.name.encoded == name && (m.typeSignature match {
         case MethodType(List(param), ret) =>
-          param.typeSignature == tpeB && ret == tpeC
+          param.typeSignature =:= tpeB && ret =:= tpeC
         case _ =>
           false
       })
@@ -77,6 +94,7 @@ abstract class AutoAlgebra extends AutoOps { ops =>
   def times[A: c.WeakTypeTag]: c.Expr[A]
   def negate[A: c.WeakTypeTag]: c.Expr[A]
   def div[A: c.WeakTypeTag]: c.Expr[A]
+  def quot[A: c.WeakTypeTag]: c.Expr[A]
   def mod[A: c.WeakTypeTag](stub: => c.Expr[A] = failedSearch("mod", "%")): c.Expr[A]
   def equals: c.Expr[Boolean]
   def compare: c.Expr[Int]
@@ -136,7 +154,7 @@ abstract class AutoAlgebra extends AutoOps { ops =>
         def times(x: A, y: A): A = ops.times[A].splice
         override def minus(x: A, y: A): A = ops.minus[A].splice
         def negate(x: A): A = ops.negate[A].splice
-        def quot(x: A, y: A): A = ops.div[A].splice
+        def quot(x: A, y: A): A = ops.quot[A].splice
         def mod(x: A, y: A): A = ops.mod[A]().splice
         def gcd(x: A, y: A): A = euclid(x, y)(ev.splice)
       }
@@ -184,6 +202,7 @@ case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
   def minus[A: c.WeakTypeTag] = binop[A]("$minus")
   def times[A: c.WeakTypeTag] = binop[A]("$times")
   def negate[A: c.WeakTypeTag] = unop[A]("unary_$minus")
+  def quot[A: c.WeakTypeTag] = binopSearch[A]("quot" :: "$div" :: Nil) getOrElse failedSearch("quot", "/~")
   def div[A: c.WeakTypeTag] = binop[A]("$div")
   def mod[A: c.WeakTypeTag](stub: => c.Expr[A]) = binop[A]("$percent")
   def equals = binop[Boolean]("$eq$eq")
@@ -191,15 +210,27 @@ case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
 }
 
 case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
-  def plus[A: c.WeakTypeTag] = binop[A]("add")
-  def minus[A: c.WeakTypeTag] = binop[A]("subtract")
-  def times[A: c.WeakTypeTag] = binop[A]("multiply")
-  def div[A: c.WeakTypeTag] = binop[A]("divide")
-  def negate[A: c.WeakTypeTag] = unop[A]("negate")
+  def plus[A: c.WeakTypeTag] = 
+    binopSearch[A]("add" :: "plus" :: Nil) getOrElse failedSearch("plus", "+")
+  def minus[A: c.WeakTypeTag] = 
+    binopSearch[A]("subtract" :: "minus" :: Nil) getOrElse failedSearch("minus", "-")
+  def times[A: c.WeakTypeTag] = 
+    binopSearch[A]("multiply" :: "times" :: Nil) getOrElse failedSearch("times", "*")
+  def div[A: c.WeakTypeTag] = 
+    binopSearch[A]("divide" :: "div" :: Nil) getOrElse failedSearch("div", "/")
+  def negate[A: c.WeakTypeTag] = 
+    unopSearch[A]("negate" :: "negative" :: Nil) getOrElse {
+      // We can implement negate interms of minus. This is actually required
+      // for JScience's Rational :(
+      import c.universe._
+      c.Expr[A](Apply(
+        Select(Ident(newTermName("zero")), newTermName("minus")),
+        List(Ident(newTermName("x")))))
+    }
+  def quot[A: c.WeakTypeTag] =
+    binopSearch[A]("quot" :: "divide" :: "div" :: Nil) getOrElse failedSearch("quot", "/~")
   def mod[A: c.WeakTypeTag](stub: => c.Expr[A]) =
-    if (hasMethod1[A, A, A]("mod")) binop[A]("mod")
-    else if (hasMethod1[A, A, A]("remainder")) binop[A]("remainder")
-    else stub
+    binopSearch("mod" :: "remainder" :: Nil) getOrElse stub
 
   def equals = binop[Boolean]("equals")
   def compare = binop[Int]("compareTo")
