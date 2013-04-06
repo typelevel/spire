@@ -41,7 +41,7 @@ class ULongTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropert
         false
       } catch {
         case _: ArithmeticException => true
-        case _ => false
+        case _: Exception => false
       }
       error should be === true
     }
@@ -125,7 +125,7 @@ class UIntTest extends PropSpec with ShouldMatchers with GeneratorDrivenProperty
         false
       } catch {
         case _: ArithmeticException => true
-        case _ => false
+        case _: Exception => false
       }
       error should be === true
     }
@@ -209,7 +209,7 @@ class UShortTest extends PropSpec with ShouldMatchers with GeneratorDrivenProper
         false
       } catch {
         case _: ArithmeticException => true
-        case _ => false
+        case _: Exception => false
       }
       error should be === true
     }
@@ -297,7 +297,7 @@ class UByteTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropert
         false
       } catch {
         case _: ArithmeticException => true
-        case _ => false
+        case _: Exception => false
       }
       error should be === true
     }
