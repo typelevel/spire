@@ -88,7 +88,7 @@ trait UByteIsSigned extends Signed[UByte] {
   def abs(a: UByte): UByte = a
 }
 
-trait UByteIsReal extends IsReal[UByte] with UByteOrder with UByteIsSigned {
+trait UByteIsReal extends IsIntegral[UByte] with UByteOrder with UByteIsSigned {
   def toDouble(n: UByte): Double = n.toDouble
 }
 

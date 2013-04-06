@@ -379,6 +379,6 @@ trait SafeLongIsSigned extends Signed[SafeLong] {
   def abs(a: SafeLong): SafeLong = a.abs
 }
 
-trait SafeLongIsReal extends IsReal[SafeLong] with SafeLongOrder with SafeLongIsSigned {
+trait SafeLongIsReal extends IsIntegral[SafeLong] with SafeLongOrder with SafeLongIsSigned {
   def toDouble(n: SafeLong): Double = n.toDouble
 }

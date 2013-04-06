@@ -152,6 +152,6 @@ trait ULongIsSigned extends Signed[ULong] {
   def abs(a: ULong): ULong = a
 }
 
-trait ULongIsReal extends IsReal[ULong] with ULongOrder with ULongIsSigned {
+trait ULongIsReal extends IsIntegral[ULong] with ULongOrder with ULongIsSigned {
   def toDouble(n: ULong): Double = n.toDouble
 }

@@ -33,7 +33,7 @@ trait ByteOrder extends Order[Byte] {
   def compare(x: Byte, y: Byte) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
-trait ByteIsReal extends IsReal[Byte] with ByteOrder with ByteIsSigned {
+trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned {
   def toDouble(n: Byte): Double = n.toDouble
 }
 

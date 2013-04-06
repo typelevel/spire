@@ -52,16 +52,16 @@ final class LiteralIntOps(val lhs:Int) extends AnyVal {
   def >(rhs:Rational) = q.compare(rhs) > 0
   def >=(rhs:Rational) = q.compare(rhs) >= 0
 
-  @inline private def c[A](implicit f:Fractional[A], t:Trig[A]) =
+  @inline private def c[A](implicit f:Fractional[A], t:Trig[A], r: IsReal[A]) =
     Complex(f.fromInt(lhs), f.zero)
 
-  def +[A:Fractional:Trig](rhs:Complex[A]) = c[A] + rhs
-  def -[A:Fractional:Trig](rhs:Complex[A]) = c[A] - rhs
-  def *[A:Fractional:Trig](rhs:Complex[A]) = c[A] * rhs
-  def /[A:Fractional:Trig](rhs:Complex[A]) = c[A] / rhs
-  def /~[A:Fractional:Trig](rhs:Complex[A]) = c[A] /~ rhs
-  def %[A:Fractional:Trig](rhs:Complex[A]) = c[A] % rhs
-  def /%[A:Fractional:Trig](rhs:Complex[A]) = c[A] /% rhs
+  def +[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c[A] + rhs
+  def -[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c[A] - rhs
+  def *[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c[A] * rhs
+  def /[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c[A] / rhs
+  def /~[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c[A] /~ rhs
+  def %[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c[A] % rhs
+  def /%[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c[A] /% rhs
 
   //def **[A:Fractional:Trig](rhs:Complex[A]) = c[A] ** rhs
 
@@ -100,18 +100,18 @@ final class LiteralDoubleOps(val lhs:Double) extends AnyVal {
   def pow(rhs:Double) = spire.math.pow(lhs, rhs)
   def **(rhs:Double) = spire.math.pow(lhs, rhs)
 
-  @inline private final def c[A:Fractional:ConvertableTo:Trig]:Complex[A] =
+  @inline private final def c[A:Fractional:ConvertableTo:Trig:IsReal]:Complex[A] =
     Complex(ConvertableFrom[Double].toType[A](lhs), Fractional[A].zero)
 
-  def +[A:Fractional:Trig](rhs:Complex[A]) = c + rhs
-  def *[A:Fractional:Trig](rhs:Complex[A]) = c * rhs
-  def -[A:Fractional:Trig](rhs:Complex[A]) = c - rhs
-  def /[A:Fractional:Trig](rhs:Complex[A]) = c / rhs
-  def /~[A:Fractional:Trig](rhs:Complex[A]) = c /~ rhs
-  def %[A:Fractional:Trig](rhs:Complex[A]) = c % rhs
-  def /%[A:Fractional:Trig](rhs:Complex[A]) = c /% rhs
-  def pow[A:Fractional:Trig](rhs:Complex[A]) = c pow rhs
-  def **[A:Fractional:Trig](rhs:Complex[A]) = c ** rhs
+  def +[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c + rhs
+  def *[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c * rhs
+  def -[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c - rhs
+  def /[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c / rhs
+  def /~[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c /~ rhs
+  def %[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c % rhs
+  def /%[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c /% rhs
+  def pow[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c pow rhs
+  def **[A:Fractional:Trig:IsReal](rhs:Complex[A]) = c ** rhs
 
   def +[A](rhs:A)(implicit ev:Ring[A], c:ConvertableTo[A]) = ev.plus(c.fromDouble(lhs), rhs)
   def -[A](rhs:A)(implicit ev:Ring[A], c:ConvertableTo[A]) = ev.minus(c.fromDouble(lhs), rhs)

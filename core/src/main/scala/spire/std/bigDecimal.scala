@@ -42,10 +42,6 @@ trait BigDecimalIsEuclideanRing extends EuclideanRing[BigDecimal] with BigDecima
 trait BigDecimalIsField extends Field[BigDecimal] with BigDecimalIsEuclideanRing {
   override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
   def div(a:BigDecimal, b:BigDecimal) = a / b
-  def ceil(a:BigDecimal): BigDecimal = a.setScale(0, CEILING)
-  def floor(a:BigDecimal): BigDecimal = a.setScale(0, FLOOR)
-  def round(a:BigDecimal): BigDecimal = a.setScale(0, HALF_UP)
-  def isWhole(a:BigDecimal) = a % 1.0 == 0.0
 }
 
 trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
@@ -244,6 +240,10 @@ trait BigDecimalIsSigned extends Signed[BigDecimal] {
 trait BigDecimalIsReal extends IsReal[BigDecimal]
 with BigDecimalOrder with BigDecimalIsSigned {
   def toDouble(x: BigDecimal): Double = x.toDouble
+  def ceil(a:BigDecimal): BigDecimal = a.setScale(0, CEILING)
+  def floor(a:BigDecimal): BigDecimal = a.setScale(0, FLOOR)
+  def round(a:BigDecimal): BigDecimal = a.setScale(0, HALF_UP)
+  def isWhole(a:BigDecimal) = a % 1.0 == 0.0
 }
 
 trait BigDecimalInstances {

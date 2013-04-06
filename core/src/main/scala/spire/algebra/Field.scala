@@ -6,10 +6,6 @@ import java.lang.Double.{ isInfinite, isNaN, doubleToLongBits }
 import java.lang.Long.{ numberOfTrailingZeros }
 
 trait Field[@spec(Byte, Short, Int, Long, Float, Double) A] extends EuclideanRing[A] with MultiplicativeAbGroup[A] {
-  def ceil(a: A): A
-  def floor(a: A): A
-  def round(a: A): A
-  def isWhole(a: A): Boolean
 
   /**
    * This is implemented in terms of basic Field ops. However, this is

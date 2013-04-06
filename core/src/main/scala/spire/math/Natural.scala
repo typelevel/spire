@@ -684,7 +684,7 @@ trait NaturalIsSigned extends Signed[Natural] {
   def abs(a: Natural): Natural = a
 }
 
-trait NaturalIsReal extends IsReal[Natural]
+trait NaturalIsReal extends IsIntegral[Natural]
 with NaturalOrder with NaturalIsSigned {
   def toDouble(n: Natural): Double = n.toDouble
 }

@@ -455,9 +455,9 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
 
   import spire.algebra.Field
 
-  def floor = DecimalNumber(Field[BigDecimal].floor(n))
-  def ceil = DecimalNumber(Field[BigDecimal].ceil(n))
-  def round = DecimalNumber(Field[BigDecimal].round(n))
+  def floor = DecimalNumber(IsReal[BigDecimal].floor(n))
+  def ceil = DecimalNumber(IsReal[BigDecimal].ceil(n))
+  def round = DecimalNumber(IsReal[BigDecimal].round(n))
 }
 
 trait NumberInstances {
@@ -486,10 +486,7 @@ trait NumberIsEuclideanRing extends EuclideanRing[Number] with NumberIsRing {
 
 trait NumberIsField extends Field[Number] with NumberIsEuclideanRing {
   def div(a:Number, b:Number) = a / b
-  def ceil(a:Number): Number = a.ceil
-  def floor(a:Number): Number = a.floor
-  def round(a:Number): Number = a.round
-  def isWhole(a:Number) = a.isWhole
+  override def fromDouble(a: Double): Number = Number(a)
 }
 
 trait NumberIsNRoot extends NRoot[Number] {
@@ -539,4 +536,8 @@ trait NumberIsSigned extends Signed[Number] {
 
 trait NumberIsReal extends IsReal[Number] with NumberOrder with NumberIsSigned {
   def toDouble(x: Number): Double = x.toDouble
+  def ceil(a:Number): Number = a.ceil
+  def floor(a:Number): Number = a.floor
+  def round(a:Number): Number = a.round
+  def isWhole(a:Number) = a.isWhole
 }

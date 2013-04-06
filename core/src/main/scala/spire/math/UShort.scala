@@ -101,6 +101,6 @@ trait UShortIsSigned extends Signed[UShort] {
   def abs(a: UShort): UShort = a
 }
 
-trait UShortIsReal extends IsReal[UShort] with UShortOrder with UShortIsSigned {
+trait UShortIsReal extends IsIntegral[UShort] with UShortOrder with UShortIsSigned {
   def toDouble(n: UShort): Double = n.toDouble
 }

@@ -100,6 +100,6 @@ trait UIntIsSigned extends Signed[UInt] {
   def abs(a: UInt): UInt = a
 }
 
-trait UIntIsReal extends IsReal[UInt] with UIntOrder with UIntIsSigned {
+trait UIntIsReal extends IsIntegral[UInt] with UIntOrder with UIntIsSigned {
   def toDouble(n: UInt): Double = n.toDouble
 }

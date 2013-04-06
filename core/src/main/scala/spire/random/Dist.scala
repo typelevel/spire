@@ -143,10 +143,6 @@ trait DistField[A] extends Field[Dist[A]] with DistEuclideanRing[A] {
   def alg: Field[A]
   def div(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.div(x(g), y(g)))
   override def reciprocal(x: Dist[A]): Dist[A] = new DistFromGen(g => alg.reciprocal(x(g)))
-  def ceil(x: Dist[A]): Dist[A] = new DistFromGen(g => alg.ceil(x(g)))
-  def floor(x: Dist[A]): Dist[A] = new DistFromGen(g => alg.floor(x(g)))
-  def round(x: Dist[A]): Dist[A] = new DistFromGen(g => alg.round(x(g)))
-  def isWhole(x: Dist[A]): Boolean = false
 }
 
 object Dist {
@@ -199,7 +195,7 @@ object Dist {
   implicit val uint: Dist[UInt] = new DistFromGen[UInt](g => UInt(g.nextInt))
   implicit val ulong: Dist[ULong] = new DistFromGen[ULong](g => ULong(g.nextLong))
 
-  implicit def complex[A: Fractional: Trig: Dist]: Dist[Complex[A]] =
+  implicit def complex[A: Fractional: Trig: IsReal: Dist]: Dist[Complex[A]] =
     Dist(Complex(_: A, _: A))
 
   implicit def interval[A](implicit na: Dist[A], order: Order[A]): Dist[Interval[A]] =

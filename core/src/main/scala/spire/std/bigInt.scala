@@ -61,7 +61,7 @@ trait BigIntIsSigned extends Signed[BigInt] {
   def abs(a: BigInt): BigInt = a.abs
 }
 
-trait BigIntIsReal extends IsReal[BigInt] with BigIntOrder with BigIntIsSigned {
+trait BigIntIsReal extends IsIntegral[BigInt] with BigIntOrder with BigIntIsSigned {
   def toDouble(n: BigInt): Double = n.toDouble
 }
 
