@@ -683,4 +683,20 @@ package object math {
   final def max(x: Float, y: Float): Float = Math.max(x, y)
   final def max(x: Double, y: Double): Double = Math.max(x, y)
   final def max[A](x: A, y: A)(implicit ev: Order[A]) = ev.max(x, y)
+
+  final def e[A: Trig]: A = Trig[A].e
+  final def pi[A: Trig]: A = Trig[A].pi
+
+  final def sin[A: Trig](a: A): A = Trig[A].sin(a)
+  final def cos[A: Trig](a: A): A = Trig[A].cos(a)
+  final def tan[A: Trig](a: A): A = Trig[A].tan(a)
+
+  final def asin[A: Trig](a: A): A = Trig[A].asin(a)
+  final def acos[A: Trig](a: A): A = Trig[A].acos(a)
+  final def atan[A: Trig](a: A): A = Trig[A].atan(a)
+  final def atan2[A: Trig](y: A, x: A): A = Trig[A].atan2(y, x)
+
+  final def sinh[A: Trig](x: A): A = Trig[A].sinh(x)
+  final def cosh[A: Trig](x: A): A = Trig[A].cosh(x)
+  final def tanh[A: Trig](x: A): A = Trig[A].tanh(x)
 }
