@@ -22,14 +22,12 @@ object Number extends NumberInstances {
   final val zero = Number(0)
   final val one = Number(1)
 
-  def apply(n: Byte): Number = IntNumber(SafeLong(n))
-  def apply(n: Short): Number = IntNumber(SafeLong(n))
-  def apply(n: Int): Number = IntNumber(SafeLong(n))
-  def apply(n: Long): Number = IntNumber(SafeLong(n))
-  def apply(n: BigInt): Number = IntNumber(SafeLong(n))
-  def apply(n: SafeLong): Number = IntNumber(n)
-  def apply(n: Double): Number = FloatNumber(n)
-  def apply(n: BigDecimal): Number = DecimalNumber(n)
+  implicit def apply(n: Long): Number = IntNumber(SafeLong(n))
+  implicit def apply(n: BigInt): Number = IntNumber(SafeLong(n))
+  implicit def apply(n: SafeLong): Number = IntNumber(n)
+  implicit def apply(n: Double): Number = FloatNumber(n)
+  implicit def apply(n: BigDecimal): Number = DecimalNumber(n)
+  implicit def apply(n: Natural) = IntNumber(n.toBigInt)
 
   def apply(s: String): Number = try {
     Number(SafeLong(s))
@@ -37,15 +35,15 @@ object Number extends NumberInstances {
     case _: Exception => Number(BigDecimal(s))
   }
 
-  implicit def byteToNumber(n: Byte) = Number(n)
-  implicit def shortToNumber(n: Short) = Number(n)
-  implicit def intToNumber(n: Int) = Number(n)
-  implicit def longToNumber(n: Long) = Number(n)
-  implicit def bigIntToNumber(n: BigInt) = Number(n)
-  implicit def doubleToNumber(n: Double) = Number(n)
-  implicit def bigDecimalToNumber(n: BigDecimal) = Number(n)
-  implicit def safeLongToNumber(n: SafeLong) = Number(n)
-  implicit def naturalToNumber(n: Natural) = Number(n.toBigInt)
+  //implicit def byteToNumber(n: Byte) = IntNumber(n)
+  //implicit def shortToNumber(n: Short) = IntNumber(n)
+  //implicit def intToNumber(n: Int) = Number(n)
+  //implicit def longToNumber(n: Long) = Number(n)
+  //implicit def bigIntToNumber(n: BigInt) = Number(n)
+  //implicit def doubleToNumber(n: Double) = FloatNumber(n)
+  //implicit def bigDecimalToNumber(n: BigDecimal) = Number(n)
+  //implicit def safeLongToNumber(n: SafeLong) = Number(n)
+  //implicit def naturalToNumber(n: Natural) = Number(n.toBigInt)
   // TODO: Rational? Real? Complex?
 
   private[math] val minInt = SafeLong(Int.MinValue)

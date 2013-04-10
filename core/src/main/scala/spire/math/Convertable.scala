@@ -195,11 +195,11 @@ trait ConvertableToNumber extends ConvertableTo[Number] {
   def fromShort(a:Short): Number = Number(a)
   def fromInt(a:Int): Number = Number(a)
   def fromLong(a:Long): Number = Number(a)
-  def fromFloat(a:Float): Number = Number(a.toLong)
-  def fromDouble(a:Double): Number = Number(a.toLong)
+  def fromFloat(a:Float): Number = Number(a)
+  def fromDouble(a:Double): Number = Number(a)
   def fromBigInt(a:BigInt): Number = Number(a)
-  def fromBigDecimal(a:BigDecimal): Number = Number(a.toBigInt)
-  def fromRational(a:Rational): Number = Number(a.toBigInt)
+  def fromBigDecimal(a:BigDecimal): Number = Number(a)
+  def fromRational(a:Rational): Number = Number(a.toBigDecimal)
 
   def fromType[B:ConvertableFrom](b:B): Number = Number(ConvertableFrom[B].toDouble(b))
 }
