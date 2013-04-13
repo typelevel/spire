@@ -190,6 +190,7 @@ abstract class AutoAlgebra extends AutoOps { ops =>
   def Order[A: c.WeakTypeTag](): c.Expr[Order[A]] = {
     c.universe.reify {
       new Order[A] {
+        override def eqv(x: A, y: A): Boolean = ops.equals.splice
         def compare(x: A, y: A): Int = ops.compare.splice
       }
     }
