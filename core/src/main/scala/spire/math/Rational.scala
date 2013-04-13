@@ -7,11 +7,6 @@ import java.lang.Math
 
 import spire.algebra._
 
-trait Fraction[@specialized(Long) A] {
-  def num: A
-  def den: A
-}
-
 sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] {
   import LongRationals.LongRational
   import BigRationals.BigRational
@@ -406,7 +401,10 @@ protected abstract class Rationals[@specialized(Long) A](implicit integral: Inte
 
   def build(n: A, d: A): Rational
 
-  sealed trait RationalLike extends Rational with Fraction[A] {
+  //sealed trait RationalLike extends Rational with Fraction[A] {
+  sealed trait RationalLike extends Rational {
+    def num: A
+    def den: A
     
     override def signum: Int = scala.math.signum(integral.compare(num, zero))
 
@@ -461,7 +459,8 @@ protected abstract class Rationals[@specialized(Long) A](implicit integral: Inte
       else 29 * (37 * num.## + den.##)
 
     override def equals(that: Any): Boolean = that match {
-      case that: Rational with Fraction[_] => num == that.num && den == that.den
+      //case that: Rational with Fraction[_] => num == that.num && den == that.den
+      case that: RationalLike => num == that.num && den == that.den
       case that: BigInt => isWhole && toBigInt == that
       case that: BigDecimal =>
         try {
