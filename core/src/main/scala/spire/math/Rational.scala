@@ -513,7 +513,7 @@ object LongRationals extends Rationals[Long] {
     def denominatorAsLong: Long = d
 
     def reciprocal = if (n == 0L)
-      throw new IllegalArgumentException("/ 0")
+      throw new ArithmeticException("reciprocal called on 0/1")
     else
       LongRational(d, n)
 
@@ -626,7 +626,7 @@ object LongRationals extends Rationals[Long] {
 
 
     def /(r: Rational): Rational = {
-      if (r == Rational.zero) throw new IllegalArgumentException("/ by 0")
+      if (r == Rational.zero) throw new ArithmeticException("divide (/) by 0")
       r match {
         case r: LongRational => {
           val a = gcd(n, r.n)
@@ -713,7 +713,7 @@ object BigRationals extends Rationals[BigInt] {
     def denominatorAsLong: Long = d.toLong
 
     def reciprocal = if (n == 0)
-      throw new IllegalArgumentException("/ 0")
+      throw new ArithmeticException("reciprocal called on 0/1")
     else
       BigRational(d, n)
 
@@ -766,7 +766,7 @@ object BigRationals extends Rationals[BigInt] {
         val b = d.gcd(r.n)
         Rational(SafeLong((n / a) * (r.n / b)), SafeLong((d / b) * (r.d / a)))
     }
-    
+
 
     def /(r: Rational): Rational = r match {
       case r: LongRational => r.inverse * this
