@@ -159,8 +159,7 @@ class RationalTest extends FunSuite {
   }
   
   test("division by 0") {
-    // Should this be an ArithmeticException?
-    intercept[IllegalArgumentException] {
+    intercept[ArithmeticException] {
       Rational.one / 0
     }
   }
