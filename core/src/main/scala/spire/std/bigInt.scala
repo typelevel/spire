@@ -57,7 +57,7 @@ trait BigIntOrder extends Order[BigInt] {
 }
 
 trait BigIntIsSigned extends Signed[BigInt] {
-  def signum(a: BigInt): Int = a.toInt
+  def signum(a: BigInt): Int = a.signum
   def abs(a: BigInt): BigInt = a.abs
 }
 
@@ -65,7 +65,11 @@ trait BigIntIsReal extends IsIntegral[BigInt] with BigIntOrder with BigIntIsSign
   def toDouble(n: BigInt): Double = n.toDouble
 }
 
+trait BigIntIsMetricSpace extends MetricSpace[BigInt, BigInt] {
+  def distance(v: BigInt, w: BigInt) = (w - v).abs
+}
+
 trait BigIntInstances {
-  implicit object BigIntAlgebra extends BigIntIsEuclideanRing with BigIntIsNRoot
+  implicit object BigIntAlgebra extends BigIntIsEuclideanRing with BigIntIsNRoot with BigIntIsMetricSpace
   implicit object BigIntIsReal extends BigIntIsReal
 }
