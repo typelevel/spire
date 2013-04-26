@@ -28,6 +28,9 @@ class LawTests extends LawChecker {
   checkAll("Rational", RingLaws[Rational].field)
   checkAll("Real",     RingLaws[Real].field)
 
+  checkAll("Levenshtein distance", BaseLaws[String].metricSpace)
+  checkAll("BigInt",               BaseLaws[BigInt].metricSpace)
+
   // We skip checking all tuple types, as they are all generated from the same
   // template.
   checkAll("(Int,Int)",           RingLaws[(Int, Int)].ring)
