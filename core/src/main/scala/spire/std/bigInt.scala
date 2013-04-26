@@ -57,7 +57,7 @@ trait BigIntOrder extends Order[BigInt] {
 }
 
 trait BigIntIsSigned extends Signed[BigInt] {
-  def signum(a: BigInt): Int = a.toInt
+  def signum(a: BigInt): Int = a.signum
   def abs(a: BigInt): BigInt = a.abs
 }
 
