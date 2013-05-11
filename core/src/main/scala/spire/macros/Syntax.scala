@@ -32,18 +32,22 @@ object Syntax {
       val index = name("index")
       val whileLoop = name("while")
       Block(
-        ValDef(Modifiers(MUTABLE), index, TypeTree(tpe), init.tree), 
-        LabelDef(
-          whileLoop,
-          List(),
-          If(
-            Apply(test.tree, List(Ident(index))),
-            Block(
-              Apply(body.tree, List(Ident(index))),
-              Assign(Ident(index), Apply(next.tree, List(Ident(index)))),
-              Apply(Ident(whileLoop), List())
-            ),
-            Literal(Constant(())))))
+        List(
+          ValDef(Modifiers(MUTABLE), index, TypeTree(tpe), init.tree),
+          LabelDef(
+            whileLoop,
+            List(),
+            If(
+              Apply(test.tree, List(Ident(index))),
+              Block(
+                List(
+                  Apply(body.tree, List(Ident(index))),
+                  Assign(Ident(index), Apply(next.tree, List(Ident(index)))),
+                  Apply(Ident(whileLoop), List())),
+                Literal(Constant(()))
+              ),
+              Literal(Constant(()))))),
+        Literal(Constant(())))
 
     } else {
 
@@ -64,21 +68,25 @@ object Syntax {
       val index = name("index")
       val whileLoop = name("while")
       Block(
-        ValDef(Modifiers(), testName, AppliedTypeTree(f1, List(TypeTree(tpe), bool)), test.tree),
-        ValDef(Modifiers(), nextName, AppliedTypeTree(f1, List(TypeTree(tpe), TypeTree(tpe))), next.tree),
-        ValDef(Modifiers(), bodyName, AppliedTypeTree(f1, List(TypeTree(tpe), unit)), body.tree),
-        ValDef(Modifiers(MUTABLE), index, TypeTree(tpe), init.tree), 
-        LabelDef(
-          whileLoop,
-          List(),
-          If(
-            Apply(Ident(testName), List(Ident(index))),
-            Block(
-              Apply(Ident(bodyName), List(Ident(index))),
-              Assign(Ident(index), Apply(Ident(nextName), List(Ident(index)))),
-              Apply(Ident(whileLoop), List())
-            ),
-            Literal(Constant(())))))
+        List(
+          ValDef(Modifiers(), testName, AppliedTypeTree(f1, List(TypeTree(tpe), bool)), test.tree),
+          ValDef(Modifiers(), nextName, AppliedTypeTree(f1, List(TypeTree(tpe), TypeTree(tpe))), next.tree),
+          ValDef(Modifiers(), bodyName, AppliedTypeTree(f1, List(TypeTree(tpe), unit)), body.tree),
+          ValDef(Modifiers(MUTABLE), index, TypeTree(tpe), init.tree),
+          LabelDef(
+            whileLoop,
+            List(),
+            If(
+              Apply(Ident(testName), List(Ident(index))),
+              Block(
+                List(
+                  Apply(Ident(bodyName), List(Ident(index))),
+                  Assign(Ident(index), Apply(Ident(nextName), List(Ident(index)))),
+                  Apply(Ident(whileLoop), List())),
+                Literal(Constant(()))
+              ),
+              Literal(Constant(()))))),
+        Literal(Constant(())))
     }
 
     /**

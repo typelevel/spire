@@ -13,6 +13,7 @@ object Macros {
     parseNumber(s, lower, upper)
   }
 
+
   def parseNumber(s: String, lower: BigInt, upper: BigInt): Either[String, BigInt] = {
     try {
       val n = BigInt(s)
@@ -94,19 +95,19 @@ object Macros {
   def bigIntApply(c:Context) = {
     import c.mirror._
     import c.universe._
-    Select(Select(Select(Ident("scala"), "math"), "BigInt"), "apply")
+    Select(Select(Select(Ident(newTermName("scala")), newTermName("math")), newTermName("BigInt")), newTermName("apply"))
   }
 
   def bigDecimalApply(c:Context) = {
     import c.mirror._
     import c.universe._
-    Select(Select(Select(Ident("scala"), "math"), "BigDecimal"), "apply")
+    Select(Select(Select(Ident(newTermName("scala")), newTermName("math")), newTermName("BigDecimal")), newTermName("apply"))
   }
 
   def rationalApply(c:Context) = {
     import c.mirror._
     import c.universe._
-    Select(Select(Select(Ident("spire"), "math"), "Rational"), "apply")
+    Select(Select(Select(Ident(newTermName("spire")), newTermName("math")), newTermName("Rational")), newTermName("apply"))
   }
 
   def rational(c:Context)(): c.Expr[Rational] = {

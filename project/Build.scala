@@ -14,14 +14,14 @@ object MyBuild extends Build {
     organization := "org.spire-math",
     version := "0.4.0-M4",
 
-    scalaVersion := "2.10.0",
+    scalaVersion := "2.10.1",
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
       scalaTest % "test",
-      "org.scala-lang" % "scala-reflect" % "2.10.0"
+      "org.scala-lang" % "scala-reflect" % "2.10.1"
     ),
 
     scalacOptions ++= Seq(

@@ -526,7 +526,7 @@ object LongRationals extends Rationals[Long] {
     }
 
     def +(r: Rational): Rational = r match {
-      case r: LongRational =>
+      case r: LongRationals.LongRational =>
         val dgcd: Long = gcd(d, r.d)
         if (dgcd == 1L) {
 
@@ -569,7 +569,7 @@ object LongRationals extends Rationals[Long] {
 
 
     def -(r: Rational): Rational = r match {
-      case r: LongRational =>
+      case r: LongRationals.LongRational =>
         val dgcd: Long = gcd(d, r.d)
         if (dgcd == 1L) {
 
@@ -613,7 +613,7 @@ object LongRationals extends Rationals[Long] {
 
     def *(r: Rational): Rational = {
       if (n == 0L) Rational.zero else (r match {
-        case r: LongRational =>
+        case r: LongRationals.LongRational =>
           val a = gcd(n, r.d)
           val b = gcd(d, r.n)
           Rational(SafeLong(n / a) * (r.n / b), SafeLong(d / b) * (r.d / a))
@@ -628,7 +628,7 @@ object LongRationals extends Rationals[Long] {
     def /(r: Rational): Rational = {
       if (r == Rational.zero) throw new ArithmeticException("divide (/) by 0")
       r match {
-        case r: LongRational => {
+        case r: LongRationals.LongRational => {
           val a = gcd(n, r.n)
           val b = gcd(d, r.d)
           val num = SafeLong(n / a) * (r.d / b)
@@ -660,7 +660,7 @@ object LongRationals extends Rationals[Long] {
     def compareToOne: Int = n compare d
 
     def compare(r: Rational): Int = r match {
-      case r: LongRational =>
+      case r: LongRationals.LongRational =>
         val dgcd = gcd(d, r.d)
         if (dgcd == 1L)
           (SafeLong(n) * r.d - SafeLong(r.n) * d).signum
@@ -723,7 +723,7 @@ object BigRationals extends Rationals[BigInt] {
 
     def +(r: Rational): Rational = r match {
       case r: LongRational => r + this
-      case r: BigRational =>
+      case r: BigRationals.BigRational =>
         val dgcd: BigInt = d.gcd(r.d)
         if (dgcd == 1) {
           Rational(SafeLong(r.d * n + r.n * d), SafeLong(r.d * d))
@@ -742,7 +742,7 @@ object BigRationals extends Rationals[BigInt] {
 
     def -(r: Rational): Rational = r match {
       case r: LongRational => (-r) + this
-      case r: BigRational =>
+      case r: BigRationals.BigRational =>
         val dgcd: BigInt = d.gcd(r.d)
         if (dgcd == 1) {
           Rational(SafeLong(r.d * n - r.n * d), SafeLong(r.d * d))
@@ -761,7 +761,7 @@ object BigRationals extends Rationals[BigInt] {
 
     def *(r: Rational): Rational = r match {
       case r: LongRational => r * this
-      case r: BigRational =>
+      case r: BigRationals.BigRational =>
         val a = n.gcd(r.d)
         val b = d.gcd(r.n)
         Rational(SafeLong((n / a) * (r.n / b)), SafeLong((d / b) * (r.d / a)))
@@ -770,7 +770,7 @@ object BigRationals extends Rationals[BigInt] {
 
     def /(r: Rational): Rational = r match {
       case r: LongRational => r.inverse * this
-      case r: BigRational =>
+      case r: BigRationals.BigRational =>
         val a = n.gcd(r.n)
         val b = d.gcd(r.d)
         val num = SafeLong(n / a) * (r.d / b)
@@ -800,7 +800,7 @@ object BigRationals extends Rationals[BigInt] {
         else
           (SafeLong(n) * (r.d / dgcd) - SafeLong(r.n) * (d / dgcd)).signum
       }
-      case r: BigRational => {
+      case r: BigRationals.BigRational => {
         val dgcd = d.gcd(r.d)
         if (dgcd == 1)
           (SafeLong(n * r.d) - r.n * d).signum

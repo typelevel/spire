@@ -33,6 +33,7 @@ object Ops {
   def unop[R](c:Context)():c.Expr[R] = {
     import c.universe._
     val (ev, lhs) = unpack(c)
+
     c.Expr[R](Apply(Select(ev, findMethodName(c)), List(lhs)))
   }
 
@@ -100,7 +101,7 @@ object Ops {
     import c.universe._
     val (ev0, lhs) = unpack(c)
     val typeName = weakTypeOf[A].typeSymbol.name
-    val rhs1 = Apply(Select(ev1.tree, "from" + typeName), List(rhs.tree))
+    val rhs1 = Apply(Select(ev1.tree, newTermName("from" + typeName)), List(rhs.tree))
     c.Expr[R](Apply(Select(ev0, findMethodName(c)), List(lhs, rhs1)))
   }
 
@@ -108,7 +109,7 @@ object Ops {
     import c.universe._
     val (ev0, lhs) = unpack(c)
     val typeName = weakTypeOf[A].typeSymbol.name
-    val rhs1 = Apply(Select(ev0, "from" + typeName), List(rhs.tree))
+    val rhs1 = Apply(Select(ev0, newTermName("from" + typeName)), List(rhs.tree))
     c.Expr[R](Apply(Select(ev0, findMethodName(c)), List(lhs, rhs1)))
   }
 
@@ -191,7 +192,8 @@ object Ops {
    * typeclass... it is probably not wise to provide mappings for them here.
    */
   def findMethodName(c:Context) = {
+    import c.universe._
     val s = c.macroApplication.symbol.name.toString
-    operatorNames.getOrElse(s, s)
+    newTermName(operatorNames.getOrElse(s, s))
   }
 }

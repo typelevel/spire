@@ -31,6 +31,7 @@ sealed trait Natural {
     recur(this, a)
   }
 
+
   def foldDigitsRight[@spec A](a: A)(f: (A, UInt) => A): A =
     reversed.foldDigitsLeft(a)(f)
 
@@ -590,9 +591,10 @@ object Natural extends NaturalInstances {
         val t: ULong = ULong(rem.toLong << 32) + ULong(next.digit.toLong)
         val q: Long = (t / ULong(n.toLong)).toLong
         val r: Long = (t % ULong(n.toLong)).toLong
+
         next match {
-          case End(d) => (Digit(UInt(q), sofar), End(UInt(r)))
-          case Digit(d, tail) => recur(tail, UInt(r), Digit(UInt(q), sofar))
+          case Natural.End(d) => (Digit(UInt(q), sofar), End(UInt(r)))
+          case Natural.Digit(d, tail) => recur(tail, UInt(r), Digit(UInt(q), sofar))
         }
       }
 
