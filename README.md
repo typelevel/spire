@@ -14,8 +14,8 @@ identically to corresponding direct implementations.
 
 Spire is provided to you as free software under the MIT license.
 
-The [Spire mailing list](http://groups.google.com/group/spire-math/) is the place to
-go for announcements and discussion around Spire.
+The [Spire mailing list](http://groups.google.com/group/spire-math/) is the
+place to go for announcements and discussion around Spire.
 
 ### Set up
 
@@ -26,10 +26,13 @@ has been updated to 0.3.0.
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-scalaVersion := "2.10.0"
+scalaVersion := "2.10.1"
 
-libraryDependencies += "org.spire-math" %% "spire" % "0.3.0"
+libraryDependencies += "org.spire-math" %% "spire" % "0.4.0"
 ```
+
+(For maven instructions, and to download the jars directly, visit the
+[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.4.0%7Cjar)).
 
 ### Number Types
 
@@ -287,8 +290,8 @@ def selectionSort(ns: Array[Int]) {
   cfor(0)(_ < limit, _ + 1) { i =>
     var k = i
     val n = ns(i)
-    cfor(i + 1)(_ <= limit, _ + 1) {
-      j => if (ns(j) < ns(k)) k = j
+    cfor(i + 1)(_ <= limit, _ + 1) { j =>
+      if (ns(j) < ns(k)) k = j
     }
     ns(i) = ns(k)
     ns(k) = n
