@@ -12,9 +12,12 @@ object MyBuild extends Build {
 
   override lazy val settings = super.settings ++ Seq(
     organization := "org.spire-math",
-    version := "0.4.0-M4",
+    version := "0.4.0",
 
     scalaVersion := "2.10.1",
+
+    // disable annoying warnings about 2.10.0 and 2.10.1
+    conflictWarning in ThisBuild := ConflictWarning.disable,
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
