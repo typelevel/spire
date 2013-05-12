@@ -628,13 +628,13 @@ package object math {
     if (_x == 0L) return Math.abs(_y)
     if (_y == 0L) return Math.abs(_x)
   
-    var x = Math.abs(_x)
+    var x = _x
     var xz = numberOfTrailingZeros(x)
-    x >>= xz
+    x = Math.abs(x >> xz)
   
-    var y = Math.abs(_y)
+    var y = _y
     var yz = numberOfTrailingZeros(y)
-    y >>= yz
+    y = Math.abs(y >> yz)
 
     while (x != y) {
       if (x > y) {

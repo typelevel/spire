@@ -514,6 +514,8 @@ object LongRationals extends Rationals[Long] {
 
     def reciprocal = if (n == 0L)
       throw new ArithmeticException("reciprocal called on 0/1")
+    else if (n < 0L)
+      LongRational(-d, -n)
     else
       LongRational(d, n)
 
@@ -653,9 +655,9 @@ object LongRationals extends Rationals[Long] {
     def pow(exp: Int): Rational = if (exp == 0)
       Rational.one
     else if (exp < 0)
-      BigRationals.build(spire.math.pow(d, -exp), spire.math.pow(n, -exp))
+      reciprocal.pow(-exp)
     else
-      BigRationals.build(spire.math.pow(n, exp), spire.math.pow(d, exp))
+      Rational(SafeLong(n).pow(exp), SafeLong(d).pow(exp))
 
     def compareToOne: Int = n compare d
 
@@ -714,6 +716,8 @@ object BigRationals extends Rationals[BigInt] {
 
     def reciprocal = if (n == 0)
       throw new ArithmeticException("reciprocal called on 0/1")
+    else if (n < 0)
+      BigRational(-d, -n)
     else
       BigRational(d, n)
 
