@@ -12,7 +12,7 @@ object MyBuild extends Build {
 
   override lazy val settings = super.settings ++ Seq(
     organization := "org.spire-math",
-    version := "0.5.0-SNAPSHOT",
+    version := "0.4.0",
 
     scalaVersion := "2.10.1",
 
