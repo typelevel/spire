@@ -27,10 +27,10 @@ object RandomForestExample extends App {
   // The Yeast data set uses `Array[Double]`.
   testClassification(DataSet.Yeast, RandomForestOptions(
     numAxesSample = Some(2), numPointsSample = Some(200),
-    numTrees = Some(500), minSplitSize = Some(3)))
+    numTrees = Some(200), minSplitSize = Some(3)))
 
   // The MPG data set uses `Array[Double]`.
-  testRegression[Array[Double], Double](DataSet.MPG, RandomForestOptions(numPointsSample = Some(200), numTrees = Some(200)))
+  testRegression[Array[Double], Double](DataSet.MPG, RandomForestOptions(numPointsSample = Some(200), numTrees = Some(50)))
 
 
   def testClassification[V, @spec(Double) F, K](dataset: DataSet[V, F, K], opts: RandomForestOptions)(implicit
@@ -190,8 +190,8 @@ trait RandomForest[V, @spec(Double) F, @spec(Double) K] {
             // We move point j from the right region to the left and see if our
             // error is reduced.
 
-            leftRegion += outputs(j)
-            rightRegion -= outputs(j)
+            leftRegion += outputs(members(j))
+            rightRegion -= outputs(members(j))
             val error = (leftRegion.error * (j + 1) +
                          rightRegion.error * (members.length - j - 1)) / members.length
             if (error < minError) {
