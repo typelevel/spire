@@ -7,30 +7,30 @@ import spire.algebra._
 
 object Auto {
   object scala {
-    def semiring[A]() = macro ScalaAutoMacros.semiringImpl[A]
+    def semiring[A] = macro ScalaAutoMacros.semiringImpl[A]
     def rig[A](z: A, o: A) = macro ScalaAutoMacros.rigImpl[A]
     def rng[A](z: A) = macro ScalaAutoMacros.rngImpl[A]
     def ring[A](z: A, o: A) = macro ScalaAutoMacros.ringImpl[A]
     def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]) = macro ScalaAutoMacros.euclideanRingImpl[A]
     def field[A](z: A, o: A)(implicit ev: Eq[A]) = macro ScalaAutoMacros.fieldImpl[A]
-    def eq[A]() = macro ScalaAutoMacros.eqImpl[A]
-    def order[A]() = macro ScalaAutoMacros.orderImpl[A]
+    def eq[A] = macro ScalaAutoMacros.eqImpl[A]
+    def order[A] = macro ScalaAutoMacros.orderImpl[A]
 
     object collection {
-      def semigroup[A]() = macro ScalaAutoMacros.collectionSemigroupImpl[A]
+      def semigroup[A] = macro ScalaAutoMacros.collectionSemigroupImpl[A]
       def monoid[A](z: A) = macro ScalaAutoMacros.collectionMonoidImpl[A]
     }
   }
 
   object java {
-    def semiring[A]() = macro JavaAutoMacros.semiringImpl[A]
+    def semiring[A] = macro JavaAutoMacros.semiringImpl[A]
     def rig[A](z: A, o: A) = macro JavaAutoMacros.rigImpl[A]
     def rng[A](z: A) = macro JavaAutoMacros.rngImpl[A]
     def ring[A](z: A, o: A) = macro JavaAutoMacros.ringImpl[A]
     def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]) = macro JavaAutoMacros.euclideanRingImpl[A]
     def field[A](z: A, o: A)(implicit ev: Eq[A]) = macro JavaAutoMacros.fieldImpl[A]
-    def eq[A]() = macro JavaAutoMacros.eqImpl[A]
-    def order[A]() = macro JavaAutoMacros.orderImpl[A]
+    def eq[A] = macro JavaAutoMacros.eqImpl[A]
+    def order[A] = macro JavaAutoMacros.orderImpl[A]
 
     object collection {
       def monoid[A](empty: A) = macro JavaAutoMacros.collectionMonoidImpl[A]
@@ -238,7 +238,7 @@ case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
 }
 
 object ScalaAutoMacros {
-  def semiringImpl[A: c.WeakTypeTag](c: Context)(): c.Expr[Semiring[A]] =
+  def semiringImpl[A: c.WeakTypeTag](c: Context): c.Expr[Semiring[A]] =
     ScalaAlgebra[c.type](c).Semiring[A]()
 
   def rigImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A], o: c.Expr[A]): c.Expr[Rig[A]] =
@@ -258,13 +258,13 @@ object ScalaAutoMacros {
       (z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[Field[A]] =
     ScalaAlgebra[c.type](c).Field[A](z, o)(ev)
 
-  def eqImpl[A: c.WeakTypeTag](c: Context)(): c.Expr[Eq[A]] =
+  def eqImpl[A: c.WeakTypeTag](c: Context): c.Expr[Eq[A]] =
     ScalaAlgebra[c.type](c).Eq[A]()
 
-  def orderImpl[A: c.WeakTypeTag](c: Context)(): c.Expr[Order[A]] =
+  def orderImpl[A: c.WeakTypeTag](c: Context): c.Expr[Order[A]] =
     ScalaAlgebra[c.type](c).Order[A]()
 
-  def collectionSemigroupImpl[A: c.WeakTypeTag](c: Context)(): c.Expr[Semigroup[A]] = {
+  def collectionSemigroupImpl[A: c.WeakTypeTag](c: Context): c.Expr[Semigroup[A]] = {
     val ops = ScalaAlgebra[c.type](c)
     c.universe.reify {
       new Semigroup[A] {
@@ -285,7 +285,7 @@ object ScalaAutoMacros {
 }
 
 object JavaAutoMacros {
-  def semiringImpl[A: c.WeakTypeTag](c: Context)(): c.Expr[Semiring[A]] =
+  def semiringImpl[A: c.WeakTypeTag](c: Context): c.Expr[Semiring[A]] =
     JavaAlgebra[c.type](c).Semiring[A]()
 
   def rigImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A], o: c.Expr[A]): c.Expr[Rig[A]] =
@@ -305,10 +305,10 @@ object JavaAutoMacros {
       (z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[Field[A]] =
     JavaAlgebra[c.type](c).Field[A](z, o)(ev)
 
-  def eqImpl[A: c.WeakTypeTag](c: Context)(): c.Expr[Eq[A]] =
+  def eqImpl[A: c.WeakTypeTag](c: Context): c.Expr[Eq[A]] =
     JavaAlgebra[c.type](c).Eq[A]()
 
-  def orderImpl[A: c.WeakTypeTag](c: Context)(): c.Expr[Order[A]] =
+  def orderImpl[A: c.WeakTypeTag](c: Context): c.Expr[Order[A]] =
     JavaAlgebra[c.type](c).Order[A]()
 
   def collectionMonoidImpl[A: c.WeakTypeTag](c: Context)(empty: c.Expr[A]): c.Expr[Monoid[A]] = {
