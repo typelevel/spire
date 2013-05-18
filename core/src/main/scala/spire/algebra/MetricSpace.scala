@@ -4,22 +4,28 @@ import scala.{ specialized => spec }
 
 trait MetricSpace[V, @spec(Int, Long, Float, Double) R] {
   def distance(v: V, w: V): R
+
+  def close(v: V, w: V)(implicit o: Order[R], e: MetricSpace.Epsilon[V, R]): Boolean =
+    o.lteqv(distance(v, w), e.value)
 }
 
-object MetricSpace extends MetricSpace1 with MetricSpaceFunctions {
+object MetricSpace extends MetricSpace0 with MetricSpaceFunctions {
   @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: MetricSpace[V, R]) = V
-}
 
-trait MetricSpace0 {
-  implicit def realMetricSpace[V, @spec(Int,Long,Float,Double) R](implicit
-      V: MetricSpace[V, R], R: IsReal[R]) = new MetricSpace[V, Double] {
-    def distance(v: V, w: V): Double = R.toDouble(V.distance(v, w))
+  trait Epsilon[V, R] {
+    def value: R
+  }
+
+  def Epsilon[V, R](e: R)(implicit ms: MetricSpace[V, R]): Epsilon[V, R] = new Epsilon[V, R] {
+    val value = e
   }
 }
 
-trait MetricSpace1 extends MetricSpace0 {
-  implicit def NormedVectorSpaceIsMetricSpace[V, @spec(Float,Double) R](implicit
-      V: NormedVectorSpace[V, R]): MetricSpace[V, R] = V
+trait MetricSpace0 {
+  implicit def simpleMetricSpace[@spec(Int,Long,Float,Double) R](implicit
+      s: IsReal[R], rng: Rng[R]): MetricSpace[R, R] = new MetricSpace[R, R] {
+    def distance(v: R, w: R): R = s.abs(rng.minus(v, w))
+  }
 }
 
 trait MetricSpaceFunctions {

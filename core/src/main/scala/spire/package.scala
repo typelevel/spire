@@ -456,6 +456,8 @@ trait OpsImplicits {
   implicit def innerProductSpaceOps[V](v:V) = new InnerProductSpaceOps[V](v)
   implicit def coordianteSpaceOps[V](v:V) = new CoordinateSpaceOps[V](v)
 
+  implicit def metricSpaceOps[V](v:V) = new MetricSpaceOps[V](v)
+
   implicit def literalIntOps(lhs:Int) = new LiteralIntOps(lhs)
   implicit def literalLongOps(lhs:Long) = new LiteralLongOps(lhs)
   implicit def literalDoubleOps(lhs:Double) = new LiteralDoubleOps(lhs)
