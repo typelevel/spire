@@ -202,13 +202,16 @@ trait ArrayInstances1 extends ArrayInstances0 {
 }
 
 trait ArrayInstances2 extends ArrayInstances1 {
-  implicit def ArrayInnerProductSpace[@spec(Int,Long,Float,Double) A](implicit
+  implicit def ArrayNormedVectorSpace[@spec(Int,Long,Float,Double) A](implicit
       scalar0: Field[A], nroot0: NRoot[A],
-      classTag0: ClassTag[A]): InnerProductSpace[Array[A], A] = new ArrayInnerProductSpace[A] {
-    val scalar = scalar0
-    val nroot = nroot0
-    val classTag = classTag0
-  }
+      classTag0: ClassTag[A]): NormedVectorSpace[Array[A], A] = ArrayInnerProductSpace[A].normed
+
+  implicit def ArrayInnerProductSpace[@spec(Int,Long,Float,Double) A](implicit
+      scalar0: Field[A], classTag0: ClassTag[A]): InnerProductSpace[Array[A], A] =
+    new ArrayInnerProductSpace[A] {
+      val scalar = scalar0
+      val classTag = classTag0
+    }
 
   implicit def ArrayOrder[@spec(Int,Long,Float,Double) A](implicit
       A0: Order[A], ct: ClassTag[A]) = new ArrayOrder[A] {

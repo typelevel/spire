@@ -193,3 +193,8 @@ final class NormedVectorSpaceOps[V](lhs: V) {
   def normalize[F](implicit ev: NormedVectorSpace[V, F]): V =
     macro Ops.unopWithEv[NormedVectorSpace[V, F], V]
 }
+
+final class MetricSpaceOps[V](lhs: V) {
+  def =~=[R](rhs: V)(implicit ms: MetricSpace[V, R], o: Order[R],
+      e: MetricSpace.Epsilon[V, R]): Boolean = ms.close(lhs, rhs)
+}

@@ -65,6 +65,8 @@ class LawTests extends LawChecker {
   checkAll("Set[Int]",    GroupLaws[Set[Int]](spire.optional.genericEq.generic, implicitly).monoid)
   checkAll("String[Int]", GroupLaws[String].monoid)
   checkAll("Array[Int]",  GroupLaws[Array[Int]].monoid)
+
+  checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
 }
 
 // vim: expandtab:ts=2:sw=2

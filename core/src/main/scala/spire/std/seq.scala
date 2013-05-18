@@ -282,10 +282,12 @@ trait SeqInstances1 extends SeqInstances0 {
 }
 
 trait SeqInstances2 extends SeqInstances1 {
+  implicit def SeqNormedVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
+      nroot0: NRoot[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]) = SeqInnerProductSpace[A, CC].normed
+
   implicit def SeqInnerProductSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
-      nroot0: NRoot[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqInnerProductSpace[A, CC[A]] {
+      cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqInnerProductSpace[A, CC[A]] {
     val scalar = field0
-    val nroot = nroot0
     val cbf = cbf0
   }
 
