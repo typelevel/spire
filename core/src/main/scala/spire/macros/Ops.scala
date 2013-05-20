@@ -91,6 +91,12 @@ object Ops {
     c.Expr[R](Apply(Select(ev.tree, findMethodName(c)), List(lhs, rhs.tree)))
   }
 
+  def rbinopWithEv[A, Ev, R](c: Context)(lhs: c.Expr[A])(ev:c.Expr[Ev]): c.Expr[R] = {
+    import c.universe._
+    val rhs = unpackWithoutEv(c)
+    c.Expr[R](Apply(Select(ev.tree, findMethodName(c)), List(lhs.tree, rhs)))
+  }
+
   /**
    * Given an expression like: xyz(lhs)(ev0).plus(rhs: Abc)(ev1)
    * This will create a tree like: ev0.plus(lhs, ev1.fromAbc(rhs))
@@ -150,6 +156,7 @@ object Ops {
 
     // Semigroup (|+|)
     ("$bar$plus$bar", "op"),
+    ("$bar$minus$bar", "opInverse"),
 
     // Ring (unary_- + - * **)
     ("unary_$minus", "negate"),

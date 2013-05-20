@@ -2,7 +2,6 @@ package spire.example
 
 import spire.implicits._
 import spire.math._
-import spire.syntax._
 
 import scala.annotation.tailrec
 

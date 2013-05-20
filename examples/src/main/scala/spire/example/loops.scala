@@ -1,4 +1,6 @@
-import spire.syntax._
+package spire.example
+
+import spire.implicits._
 import scala.annotation.tailrec
 
 class Loops {
