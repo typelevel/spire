@@ -7,6 +7,7 @@ import scala.{ specialized => spec }
  */
 trait Group[@spec(Byte, Short, Int, Long, Float, Double) A] extends Monoid[A] {
   def inverse(a: A): A
+  def opInverse(a: A, b: A): A = op(a, inverse(b))
 }
 
 object Group {

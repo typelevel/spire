@@ -475,16 +475,3 @@ object ConvertableFrom {
       val t = Trig[A]
     }
 }
-
-final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {
-  override def toString(): String = macro Ops.unop[String]
-  def toByte(): Byte = macro Ops.unop[Byte]
-  def toShort(): Short = macro Ops.unop[Short]
-  def toInt(): Int = macro Ops.unop[Int]
-  def toLong(): Long = macro Ops.unop[Long]
-  def toFloat(): Float = macro Ops.unop[Float]
-  def toDouble(): Double = macro Ops.unop[Double]
-  def toBigInt(): BigInt = macro Ops.unop[BigInt]
-  def toBigDecimal(): BigDecimal = macro Ops.unop[BigDecimal]
-  def toRational(): Rational = macro Ops.unop[Rational]
-}

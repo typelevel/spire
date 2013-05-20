@@ -3,7 +3,6 @@ package spire.example
 import spire.algebra._
 import spire.math._
 import spire.implicits._
-import spire.syntax._
 
 import scala.{ specialized => spec }
 import scala.annotation.tailrec

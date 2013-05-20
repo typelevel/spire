@@ -6,7 +6,6 @@ import spire.algebra._
 import spire.std.BooleanIsRig
 import spire.implicits._
 import spire.math._
-import spire.syntax._
 
 import scala.reflect.ClassTag
 import scala.annotation.tailrec

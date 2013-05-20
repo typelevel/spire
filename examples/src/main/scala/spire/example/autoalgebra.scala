@@ -8,7 +8,7 @@ import scala.collection.JavaConverters._
 import spire.macros.Auto
 import spire.algebra._
 import spire.math._
-import spire.ops._
+import spire.implicits._
 
 /**
  * An example showing how to use the Auto macros.

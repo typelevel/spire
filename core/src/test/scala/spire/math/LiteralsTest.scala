@@ -3,11 +3,11 @@ package spire.math
 import org.scalatest.FunSuite
 
 import spire.math._
-import spire.implicits.{eqOps => _, _}
+import spire.std.int._
 
 class LiteralsTest extends FunSuite {
   test("byte literals") {
-    import spire.syntax._
+    import spire.syntax.literals._
     assert(b"-128" === (-128:Byte))
     assert(b"-100" === (-100:Byte))
     assert(b"0" === (0:Byte))
@@ -27,7 +27,7 @@ class LiteralsTest extends FunSuite {
   }
 
   test("short literals") {
-    import spire.syntax._
+    import spire.syntax.literals._
     assert(h"-32768" === (-32768:Short))
     assert(h"-10000" === (-10000:Short))
     assert(h"0" === (0:Short))
@@ -38,6 +38,8 @@ class LiteralsTest extends FunSuite {
   }
 
   test("int operators") {
+    import spire.syntax.std.int._
+    import spire.syntax.nroot._
     assert(5 ** 2 === 25)
     assert(5 /~ 2 === 2)
     assert(5 /% 2 === (2, 1))
@@ -45,6 +47,7 @@ class LiteralsTest extends FunSuite {
   }
 
   test("inter-type operators") {
+    import spire.std.double._
     val c = Complex(2.0, 3.0)
     val q = Rational(4, 5)
     val r = Real(3.0)
