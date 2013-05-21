@@ -23,7 +23,7 @@ object Module {
   }
 }
 
-trait IdentityModule[@spec(Int,Long,Float,Double) V] extends Module[V, V] {
+private[algebra] trait IdentityModule[@spec(Int,Long,Float,Double) V] extends Module[V, V] {
   def zero = scalar.zero
   def negate(v: V) = scalar.negate(v)
   def plus(v: V, w: V): V = scalar.plus(v, w)

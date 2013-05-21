@@ -16,7 +16,7 @@ object InnerProductSpace {
   @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: InnerProductSpace[V, R]) = V
 }
 
-trait NormedInnerProductSpace[V, @spec(Float, Double) F] extends NormedVectorSpace[V, F] {
+private[algebra] trait NormedInnerProductSpace[V, @spec(Float, Double) F] extends NormedVectorSpace[V, F] {
   def space: InnerProductSpace[V, F]
   def scalar: Field[F] = space.scalar
   def nroot: NRoot[F]

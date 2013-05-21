@@ -8,7 +8,7 @@ trait Eq[@spec A] {
   def on[@spec B](f:B => A): Eq[B] = new MappedEq(this)(f)
 }
 
-class MappedEq[@spec A, @spec B](eq: Eq[B])(f: A => B) extends Eq[A] {
+private[algebra] class MappedEq[@spec A, @spec B](eq: Eq[B])(f: A => B) extends Eq[A] {
   def eqv(x: A, y: A): Boolean = eq.eqv(f(x), f(x))
 }
 
