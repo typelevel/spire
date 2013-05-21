@@ -5,7 +5,7 @@ import scala.reflect.ClassTag
 
 import spire.implicits._
 import spire.math._
-import spire.syntax._
+//import spire.syntax._
 
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark

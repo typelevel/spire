@@ -10,7 +10,7 @@ import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
-import spire.syntax._
+import spire.syntax.cfor._
 
 object CForBenchmarks extends MyRunner(classOf[CForBenchmarks])
 
