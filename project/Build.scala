@@ -76,7 +76,7 @@ object MyBuild extends Build {
   // Main
 
   lazy val spire = Project("spire", file(".")).
-    aggregate(core, examples, scalacheckBinding).
+    aggregate(core, examples, scalacheckBinding, benchmark).
     settings(spireSettings: _*)
 
   lazy val spireSettings = Seq(

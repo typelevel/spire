@@ -1,4 +1,4 @@
-package spire.algebra
+package spire.syntax
 
 import spire.algebra._
 import spire.macrosk.Ops

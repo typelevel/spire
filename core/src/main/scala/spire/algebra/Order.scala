@@ -19,11 +19,11 @@ trait Order[@spec A] extends Eq[A] {
   def reverse: Order[A] = new ReversedOrder(this)
 }
 
-class MappedOrder[@spec A, @spec B](order: Order[B])(f: A => B) extends Order[A] {
+private[algebra] class MappedOrder[@spec A, @spec B](order: Order[B])(f: A => B) extends Order[A] {
   def compare(x: A, y: A) = order.compare(f(x), f(y))
 }
 
-class ReversedOrder[@spec A](order: Order[A]) extends Order[A] {
+private[algebra] class ReversedOrder[@spec A](order: Order[A]) extends Order[A] {
   def compare(x: A, y: A) = order.compare(y, x)
 }
 
