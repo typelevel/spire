@@ -18,6 +18,7 @@
 package spire.math
 
 import spire.algebra._
+import spire.algebra.Sign.{ Positive, Negative, Zero }
 import java.math.{ MathContext, BigInteger, BigDecimal => BigDec }
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
 
@@ -87,7 +88,7 @@ trait RealInstances {
   implicit object RealIsReal extends RealIsReal
 }
 
-trait RealIsRing extends Ring[Real] {
+private[math] trait RealIsRing extends Ring[Real] {
   override def minus(a: Real, b: Real): Real = a - b
   def negate(a: Real): Real = -a
   def one: Real = Real(1)
@@ -99,35 +100,35 @@ trait RealIsRing extends Ring[Real] {
   override def fromInt(n: Int): Real = Real(n)
 }
 
-trait RealIsEuclideanRing extends EuclideanRing[Real] with RealIsRing {
+private[math] trait RealIsEuclideanRing extends EuclideanRing[Real] with RealIsRing {
   def quot(a: Real, b: Real): Real = a /~ b
   def mod(a: Real, b: Real): Real = a % b
   def gcd(a: Real, b: Real): Real = euclid(a, b)(Eq[Real])
 }
 
-trait RealIsField extends Field[Real] with RealIsEuclideanRing {
+private[math] trait RealIsField extends Field[Real] with RealIsEuclideanRing {
   override def fromDouble(n: Double): Real = Real(n)
   def div(a:Real, b:Real) = a / b
 }
 
-trait RealIsNRoot extends NRoot[Real] {
+private[math] trait RealIsNRoot extends NRoot[Real] {
   def nroot(a: Real, k: Int): Real = a nroot k
   def fpow(a:Real, b:Real) = sys.error("fixme")
 }
 
-trait RealOrder extends Order[Real] {
+private[math] trait RealOrder extends Order[Real] {
   override def eqv(x: Real, y: Real) = (x - y).sign == Zero
   override def neqv(x: Real, y: Real) = (x - y).sign != Zero
   def compare(x: Real, y: Real) = (x - y).signum
 }
 
-trait RealIsSigned extends Signed[Real] {
+private[math] trait RealIsSigned extends Signed[Real] {
   override def sign(a: Real): Sign = a.sign
   def signum(a: Real): Int = a.signum
   def abs(a: Real): Real = a.abs
 }
 
-trait RealIsReal extends IsReal[Real] with RealOrder with RealIsSigned {
+private[math] trait RealIsReal extends IsReal[Real] with RealOrder with RealIsSigned {
   def toDouble(x: Real): Double = x.toDouble
   def ceil(a:Real) = if (a % 1 == 0) a else a + 1 - (a % 1)
   def floor(a:Real) = a - (a % 1)

@@ -664,7 +664,7 @@ trait NaturalInstances {
   implicit object NaturalIsReal extends NaturalIsReal
 }
 
-trait NaturalIsRig extends Rig[Natural] {
+private[math] trait NaturalIsRig extends Rig[Natural] {
   def one: Natural = Natural(1L)
   def plus(a:Natural, b:Natural): Natural = a + b
   override def pow(a:Natural, b:Int): Natural = {
@@ -676,7 +676,7 @@ trait NaturalIsRig extends Rig[Natural] {
   def zero: Natural = Natural(0L)
 }
 
-trait NaturalOrder extends Order[Natural] {
+private[math] trait NaturalOrder extends Order[Natural] {
   override def eqv(x: Natural, y: Natural) = x == y
   override def neqv(x: Natural, y: Natural) = x != y
   override def gt(x: Natural, y: Natural) = x > y
@@ -686,12 +686,12 @@ trait NaturalOrder extends Order[Natural] {
   def compare(x: Natural, y: Natural) = x.compare(y)
 }
 
-trait NaturalIsSigned extends Signed[Natural] {
+private[math] trait NaturalIsSigned extends Signed[Natural] {
   def signum(a: Natural): Int = if (a == Natural.zero) 0 else 1
   def abs(a: Natural): Natural = a
 }
 
-trait NaturalIsReal extends IsIntegral[Natural]
+private[math] trait NaturalIsReal extends IsIntegral[Natural]
 with NaturalOrder with NaturalIsSigned {
   def toDouble(n: Natural): Double = n.toDouble
 }

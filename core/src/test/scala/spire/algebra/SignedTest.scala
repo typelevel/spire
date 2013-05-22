@@ -35,9 +35,9 @@ class SignedTest extends FunSuite {
 
     runTest("-neg.abs === pos")(assert(neg.abs === pos))
     runTest("pos.abs === pos")(assert(pos.abs === pos))
-    runTest("neg.sign == Negative")(assert(neg.sign === Negative))
-    runTest("pos.sign == Positive")(assert(pos.sign === Positive))
-    runTest("zero.sign == Zero")(assert(zero.sign === Zero))
+    runTest("neg.sign == Negative")(assert(neg.sign === Sign.Negative))
+    runTest("pos.sign == Positive")(assert(pos.sign === Sign.Positive))
+    runTest("zero.sign == Zero")(assert(zero.sign === Sign.Zero))
     runTest("neg.signum < 0")(assert(neg.signum < 0))
     runTest("pos.signum > 0")(assert(pos.signum > 0))
     runTest("zero.signum == 0")(assert(zero.signum === 0))
@@ -53,6 +53,3 @@ class SignedTest extends FunSuite {
   runWith[Real](-3, 3, 0)
   runWith[Complex[Double]](-3, 3, 0)
 }
-
-
-

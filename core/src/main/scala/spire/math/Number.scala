@@ -11,9 +11,6 @@ import spire.std.bigDecimal._
 // TODO: pow() is hairy; should support more cases and generate better errors
 // TODO: decide what should be public/private
 
-case class NumberOutOfRange(msg: String) extends Exception(msg)
-case class InvalidNumber(msg: String) extends Exception(msg)
-
 /**
  * Convenient apply and implicits for Numbers
  */
@@ -463,7 +460,7 @@ trait NumberInstances {
   implicit object NumberIsReal extends NumberIsReal
 }
 
-trait NumberIsRing extends Ring[Number] {
+private[math] trait NumberIsRing extends Ring[Number] {
   override def minus(a:Number, b:Number): Number = a - b
   def negate(a:Number): Number = -a
   val one: Number = Number.one
@@ -475,25 +472,25 @@ trait NumberIsRing extends Ring[Number] {
   override def fromInt(n: Int): Number = Number(n)
 }
 
-trait NumberIsEuclideanRing extends EuclideanRing[Number] with NumberIsRing {
+private[math] trait NumberIsEuclideanRing extends EuclideanRing[Number] with NumberIsRing {
   def quot(a:Number, b:Number) = a / b
   def mod(a:Number, b:Number) = a % b
   override def quotmod(a:Number, b:Number) = a /% b
   def gcd(a: Number, b: Number): Number = euclid(a, b)(Eq[Number])
 }
 
-trait NumberIsField extends Field[Number] with NumberIsEuclideanRing {
+private[math] trait NumberIsField extends Field[Number] with NumberIsEuclideanRing {
   def div(a:Number, b:Number) = a / b
   override def fromDouble(a: Double): Number = Number(a)
 }
 
-trait NumberIsNRoot extends NRoot[Number] {
+private[math] trait NumberIsNRoot extends NRoot[Number] {
   def nroot(a: Number, k: Int): Number = a.pow(Number(k))
   override def sqrt(a: Number): Number = a.pow(Number(0.5))
   def fpow(a: Number, b: Number) = a.pow(b)
 }
 
-trait NumberIsTrig extends Trig[Number] {
+private[math] trait NumberIsTrig extends Trig[Number] {
   def e: Number = Number(Math.E)
   def pi: Number = Number(Math.PI)
 
@@ -517,7 +514,7 @@ trait NumberIsTrig extends Trig[Number] {
   def toDegrees(a: Number): Number = (a * 360) / (2 * pi)
 }
 
-trait NumberOrder extends Order[Number] {
+private[math] trait NumberOrder extends Order[Number] {
   override def eqv(x: Number, y: Number) = x == y
   override def neqv(x: Number, y: Number) = x != y
   override def gt(x: Number, y: Number) = x > y
@@ -527,12 +524,12 @@ trait NumberOrder extends Order[Number] {
   def compare(x: Number, y: Number) = x.compare(y)
 }
 
-trait NumberIsSigned extends Signed[Number] {
+private[math] trait NumberIsSigned extends Signed[Number] {
   def signum(a: Number): Int = a.signum
   def abs(a: Number): Number = a.abs
 }
 
-trait NumberIsReal extends IsReal[Number] with NumberOrder with NumberIsSigned {
+private[math] trait NumberIsReal extends IsReal[Number] with NumberOrder with NumberIsSigned {
   def toDouble(x: Number): Double = x.toDouble
   def ceil(a:Number): Number = a.ceil
   def floor(a:Number): Number = a.floor

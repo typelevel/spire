@@ -21,22 +21,22 @@ trait BaseLaws[A] extends Laws {
   def signed(implicit A: Signed[A]) = new SimpleProperties(
     name = "signed",
     "abs non-negative" → forAll((x: A) =>
-      x.abs.sign != Negative
+      x.abs.sign != Sign.Negative
     )
   )
 
   def metricSpace[R](implicit MSA: MetricSpace[A, R], SR: Signed[R], OR: Order[R], ASR: AdditiveSemigroup[R]) = new SimpleProperties(
     name = "metricSpace",
     "non-negative" → forAll((a1: A, a2: A) =>
-      MSA.distance(a1, a2).sign != Negative
+      MSA.distance(a1, a2).sign != Sign.Negative
     ),
     "identity" → forAll((a: A) =>
-      MSA.distance(a, a).sign == Zero
+      MSA.distance(a, a).sign == Sign.Zero
     ),
     "equality" → forAll((a1: A, a2: A) =>
       // generating equal values is hard, and Scalacheck will give up if it can't
       // hence, not using `==>` here
-      a1 =!= a2 || MSA.distance(a1, a2).sign == Zero
+      a1 =!= a2 || MSA.distance(a1, a2).sign == Sign.Zero
     ),
     "symmetry" → forAll((a1: A, a2: A) =>
       MSA.distance(a1, a2) === MSA.distance(a2, a1)

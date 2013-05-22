@@ -26,7 +26,7 @@ object GenProductTypes {
       " with %sProduct%d[%s]" format (p, arity, types)
     } getOrElse "")
 
-    "trait %s[%s] extends %s {" format (name, specTypes, parents)
+    "private[spire] trait %s[%s] extends %s {" format (name, specTypes, parents)
   }
 
   val members: Block = { tpe =>

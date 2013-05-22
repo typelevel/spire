@@ -30,7 +30,7 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
 
   implicit def ArbPositive[A: Ring: Signed: Arbitrary]: Arbitrary[Positive[A]] = {
     import spire.syntax.signed._
-    Arbitrary(arbitrary[A] filter (_.sign != Negative) map (Positive[A](_)))
+    Arbitrary(arbitrary[A] filter (_.sign != Sign.Negative) map (Positive[A](_)))
   }
 
   implicit def ArbVector[A: Arbitrary]: Arbitrary[Vector[A]] = Arbitrary(for {

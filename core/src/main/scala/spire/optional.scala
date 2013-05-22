@@ -19,7 +19,9 @@ import scala.collection.SeqLike
 
 /**
  * This provides an implicit `Eq[A]` for any type `A` using Scala's (Java's)
- * `==` (`equals`).
+ * `==` (`equals`). This is generally considered a bad idea, since it means you
+ * lose all type safety -- for instance, any 2 types can always be compared as
+ * `Eq[Any]`.
  */
 object genericEq {
   private class GenericEq[@spec A] extends Eq[A] {
@@ -32,7 +34,8 @@ object genericEq {
 /**
  * This object provides implicit instances of Eq and Order for Seq-likes
  * that will behave like infinite vectors. Essentially all this means is that
- * `Seq(0, 0, 0) === Seq()`.
+ * `Seq(0, 0, 0) === Seq()`, since both are infinite vectors of zeros. Any
+ * element not explicitly set is implied to be 0.
  */
 object vectorOrder {
   implicit def seqEq[A, CC[A] <: SeqLike[A, CC[A]]](implicit

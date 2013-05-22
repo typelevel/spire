@@ -13,7 +13,7 @@ trait FPFilterWrapper[A] {
 }
 
 
-trait LowPriorityFPFilterWrappers {
+private[fpf] trait LowPriorityFPFilterWrappers {
 
   /**
    * In the general case, we assume the conversion to `Double` is lossy. This
@@ -62,4 +62,3 @@ object FPFilterWrapper extends LowPriorityFPFilterWrappers {
     def wrap(a: Rational): FPFilter[Rational] = Numeric[FPFilter[Rational]].fromRational(a)
   }
 }
-

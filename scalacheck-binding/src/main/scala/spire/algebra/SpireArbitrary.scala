@@ -18,7 +18,7 @@ object SpireArbitrary {
     Arbitrary(arbitrary[List[A]] map (Vector(_: _*)))
 
   implicit def SignArbitrary[A: Arbitrary]: Arbitrary[Sign] =
-    Arbitrary(Gen.oneOf(Positive, Zero, Negative))
+    Arbitrary(Gen.oneOf(Sign.Positive, Sign.Zero, Sign.Negative))
 }
 
 // vim: expandtab:ts=2:sw=2

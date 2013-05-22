@@ -61,7 +61,7 @@ trait UByteInstances {
   implicit object UByteIsReal extends UByteIsReal
 }
 
-trait UByteIsRig extends Rig[UByte] {
+private[math] trait UByteIsRig extends Rig[UByte] {
   def one: UByte = UByte(1)
   def plus(a:UByte, b:UByte): UByte = a + b
   override def pow(a:UByte, b:Int): UByte = {
@@ -73,7 +73,7 @@ trait UByteIsRig extends Rig[UByte] {
   def zero: UByte = UByte(0)
 }
 
-trait UByteOrder extends Order[UByte] {
+private[math] trait UByteOrder extends Order[UByte] {
   override def eqv(x:UByte, y:UByte) = x == y
   override def neqv(x:UByte, y:UByte) = x != y
   override def gt(x: UByte, y: UByte) = x > y
@@ -83,16 +83,16 @@ trait UByteOrder extends Order[UByte] {
   def compare(x: UByte, y: UByte) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
-trait UByteIsSigned extends Signed[UByte] {
+private[math] trait UByteIsSigned extends Signed[UByte] {
   def signum(a: UByte): Int = if (a == UByte(0)) 0 else 1
   def abs(a: UByte): UByte = a
 }
 
-trait UByteIsReal extends IsIntegral[UByte] with UByteOrder with UByteIsSigned {
+private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteOrder with UByteIsSigned {
   def toDouble(n: UByte): Double = n.toDouble
 }
 
-trait UByteBooleanAlgebra extends BooleanAlgebra[UByte] {
+private[math] trait UByteBooleanAlgebra extends BooleanAlgebra[UByte] {
   def one: UByte = UByte(-1: Byte)
   def zero: UByte = UByte(0: Byte)
   def and(a: UByte, b: UByte): UByte = a & b

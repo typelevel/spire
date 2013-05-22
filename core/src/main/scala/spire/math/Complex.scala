@@ -514,7 +514,7 @@ trait ComplexInstances {
     }
 }
 
-trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A]] {
+private[math] trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A]] {
   implicit def f:Fractional[A]
   implicit def t:Trig[A]
   implicit def r:IsReal[A]
@@ -530,7 +530,7 @@ trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A]] {
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
 }
 
-trait ComplexIsEuclideanRing[@spec(Float,Double) A]
+private[math] trait ComplexIsEuclideanRing[@spec(Float,Double) A]
 extends ComplexIsRing[A] with EuclideanRing[Complex[A]] {
   def quot(a:Complex[A], b:Complex[A]) = a /~ b
   def mod(a:Complex[A], b:Complex[A]) = a % b
@@ -551,7 +551,7 @@ extends ComplexIsRing[A] with EuclideanRing[Complex[A]] {
   }
 }
 
-trait ComplexIsField[@spec(Float,Double) A]
+private[math] trait ComplexIsField[@spec(Float,Double) A]
 extends ComplexIsEuclideanRing[A] with Field[Complex[A]] {
   override def fromDouble(n: Double): Complex[A] = Complex(f.fromDouble(n))
   def div(a:Complex[A], b:Complex[A]) = a / b
@@ -561,7 +561,7 @@ extends ComplexIsEuclideanRing[A] with Field[Complex[A]] {
   def isWhole(a:Complex[A]) = a.isWhole
 }
 
-trait ComplexIsTrig[@spec(Float, Double) A] extends Trig[Complex[A]] {
+private[math] trait ComplexIsTrig[@spec(Float, Double) A] extends Trig[Complex[A]] {
   implicit def f: Fractional[A]
   implicit def t: Trig[A]
   implicit def r: IsReal[A]
@@ -590,18 +590,18 @@ trait ComplexIsTrig[@spec(Float, Double) A] extends Trig[Complex[A]] {
   def toDegrees(a: Complex[A]): Complex[A] = a
 }
 
-trait ComplexIsNRoot[A] extends NRoot[Complex[A]] {
+private[math] trait ComplexIsNRoot[A] extends NRoot[Complex[A]] {
   def nroot(a: Complex[A], k: Int): Complex[A] = a.nroot(k)
   override def sqrt(a: Complex[A]): Complex[A] = a.sqrt
   def fpow(a: Complex[A], b: Complex[A]): Complex[A] = a.pow(b)
 }
 
-trait ComplexEq[A] extends Eq[Complex[A]] {
+private[math] trait ComplexEq[A] extends Eq[Complex[A]] {
   def eqv(x:Complex[A], y:Complex[A]) = x eqv y
   override def neqv(x:Complex[A], y:Complex[A]) = x neqv y
 }
 
-trait ComplexIsSigned[A] extends Signed[Complex[A]] {
+private[math] trait ComplexIsSigned[A] extends Signed[Complex[A]] {
   implicit def f:Fractional[A]
   implicit def t:Trig[A]
   implicit def r:IsReal[A]
@@ -610,10 +610,10 @@ trait ComplexIsSigned[A] extends Signed[Complex[A]] {
   def abs(a: Complex[A]): Complex[A] = Complex[A](a.abs, f.zero)
 }
 
-trait ComplexAlgebra[@spec(Float, Double) A] extends ComplexIsField[A]
-with ComplexIsTrig[A] with ComplexIsNRoot[A]
-with InnerProductSpace[Complex[A], A]
-with FieldAlgebra[Complex[A], A] {
+private[math] trait ComplexAlgebra[@spec(Float, Double) A] extends ComplexIsField[A]
+    with ComplexIsTrig[A] with ComplexIsNRoot[A]
+    with InnerProductSpace[Complex[A], A]
+    with FieldAlgebra[Complex[A], A] {
   def timesl(a: A, v: Complex[A]): Complex[A] = Complex(a, scalar.zero) * v
   def dot(x: Complex[A], y: Complex[A]): A =
     scalar.plus(scalar.times(x.real, y.real), scalar.times(x.imag, y.imag))

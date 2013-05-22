@@ -2,14 +2,18 @@ package spire.algebra
 
 import scala.{ specialized => spec }
 
-
 /**
  * A trait for things that have some notion of sign and the ability to ensure
  * something has a positive sign.
  */
 trait Signed[@spec(Double, Float, Int, Long) A] {
+  /** Returns Zero if `a` is 0, Positive if `a` is positive, and Negative is `a` is negative. */
   def sign(a: A): Sign = Sign(signum(a))
+
+  /** Returns 0 if `a` is 0, > 0 if `a` is positive, and < 0 is `a` is negative. */
   def signum(a: A): Int
+
+  /** An idempotent function that ensures an object has a non-negative sign. */
   def abs(a: A): A
 }
 
