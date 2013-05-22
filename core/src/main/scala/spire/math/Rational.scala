@@ -6,6 +6,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
 import spire.algebra._
+import spire.algebra.Sign.{ Positive, Zero, Negative }
 
 sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] {
   import LongRationals.LongRational

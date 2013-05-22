@@ -1,6 +1,6 @@
 package spire.math
 
-import spire.algebra.Zero
+import spire.algebra.Sign
 
 import org.scalatest.FunSuite
 import java.math.MathContext
@@ -10,7 +10,7 @@ class RealTest extends FunSuite {
   def trickyZero: Real = Real(18).sqrt - Real(8).sqrt - Real(2).sqrt
 
   test("Sign of tricky zero is Zero") {
-    assert(trickyZero.sign === Zero)
+    assert(trickyZero.sign === Sign.Zero)
   }
 
   test("Relative approximation of zero is zero") {

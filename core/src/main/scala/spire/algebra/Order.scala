@@ -2,6 +2,9 @@ package spire.algebra
 
 import scala.{specialized => spec}
 
+/**
+ * The `Order` type class is used to define a total ordering on some type `A`.
+ */
 trait Order[@spec A] extends Eq[A] {
   self =>
 
@@ -15,7 +18,15 @@ trait Order[@spec A] extends Eq[A] {
   def max(x: A, y: A): A = if (gt(x, y)) x else y
   def compare(x: A, y: A): Int
 
+  /**
+   * Defines an order on `B` by mapping `B` to `A` using `f` and using `A`s
+   * order to order `B`.
+   */
   override def on[@spec B](f: B => A): Order[B] = new MappedOrder(this)(f)
+
+  /**
+   * Defines an ordering on `A` where all arrows switch direction.
+   */
   def reverse: Order[A] = new ReversedOrder(this)
 }
 

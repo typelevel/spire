@@ -8,7 +8,7 @@ import spire.math.{ ConvertableFrom, ConvertableTo, Number }
  * A boolean algebra is a structure that defines a few basic operations, namely
  * as conjunction (&), disjunction (|), and negation (~). Both conjunction and
  * disjunction must be associative, commutative and should distribute over each
- * other. Also, both have an identity. Also, they obey the absorption law, that
+ * other. Also, both have an identity and they obey the absorption law; that
  * is `x & (y | x) == x` and `x | (x & y) == x`.
  */
 trait BooleanAlgebra[@spec(Boolean, Byte, Short, Int, Long) A] { self =>

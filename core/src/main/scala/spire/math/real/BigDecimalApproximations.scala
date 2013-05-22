@@ -3,7 +3,8 @@ package spire.math.real
 import java.math.{ MathContext, BigDecimal => BigDec }
 import scala.math.max
 
-import spire.algebra.{ NRoot, Zero }
+import spire.algebra.{ NRoot }
+import spire.algebra.Sign.{ Positive, Zero, Negative }
 import spire.math._
 
 /**

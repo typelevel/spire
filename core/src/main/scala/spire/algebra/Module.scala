@@ -4,7 +4,7 @@ import scala.{ specialized => spec }
 
 /**
  * A module generalizes a vector space by requiring its scalar need only form
- * a ring, rather than a field. In Spire, a `Module` is a left R-Module.
+ * a ring, rather than a field.
  */
 trait Module[V, @spec(Int,Long,Float,Double) R] extends AdditiveAbGroup[V] {
   implicit def scalar: Ring[R] // TODO: Can this be Rng[R] instead?

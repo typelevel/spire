@@ -2,6 +2,10 @@ package spire.algebra
 
 import scala.{ specialized => spec }
 
+/**
+ * A `RingAlgebra` is a module that is also a `Rng`. An example is the Gaussian
+ * numbers.
+ */
 trait RingAlgebra[V, @spec R] extends Module[V, R] with Rng[V]
 
 object RingAlgebra {
@@ -11,6 +15,10 @@ object RingAlgebra {
   }
 }
 
+/**
+ * Given any `Ring[A]` we can construct a `RingAlgebra[A, Int]`. This is
+ * possible since we can define `fromInt` on `Ring` generally.
+ */
 trait ZAlgebra[V] extends RingAlgebra[V, Int] with Ring[V] {
   implicit def vector: Ring[V]
   implicit def scalar: Ring[Int]
@@ -27,4 +35,8 @@ trait ZAlgebra[V] extends RingAlgebra[V, Int] with Ring[V] {
   override def fromInt(n: Int): V = vector.fromInt(n)
 }
 
+/**
+ * A `FieldAlgebra` is a vector space that is also a `Ring`. An example is the
+ * complex numbers.
+ */
 trait FieldAlgebra[V, @spec(Float, Double) F] extends RingAlgebra[V, F] with VectorSpace[V, F]

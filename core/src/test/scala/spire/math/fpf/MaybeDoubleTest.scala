@@ -1,6 +1,6 @@
 package spire.math.fpf
 
-import spire.algebra.Positive
+import spire.algebra.Sign
 import spire.math._
 import org.scalatest.FunSuite
 
@@ -130,7 +130,7 @@ class MaybeDoubleTest extends FunSuite {
   test("Sign returns Some(sign) when it can") {
     val x = MaybeDouble(3.08)
     val r = MaybeDouble(19).sqrt
-    assert((r - (x*x + x*x).sqrt).sign == Some(Positive))
+    assert((r - (x*x + x*x).sqrt).sign == Some(Sign.Positive))
   }
 
   test("Conversion functions can be exact") {

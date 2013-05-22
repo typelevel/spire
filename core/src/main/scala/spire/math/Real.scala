@@ -18,6 +18,7 @@
 package spire.math
 
 import spire.algebra._
+import spire.algebra.Sign.{ Positive, Negative, Zero }
 import java.math.{ MathContext, BigInteger, BigDecimal => BigDec }
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
 
