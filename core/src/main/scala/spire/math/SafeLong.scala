@@ -335,7 +335,7 @@ trait SafeLongInstances {
   implicit object SafeLongIsReal extends SafeLongIsReal
 }
 
-trait SafeLongIsRing extends Ring[SafeLong] {
+private[math] trait SafeLongIsRing extends Ring[SafeLong] {
   override def minus(a:SafeLong, b:SafeLong): SafeLong = a - b
   def negate(a:SafeLong): SafeLong = -a
   val one: SafeLong = SafeLong(1)
@@ -347,14 +347,14 @@ trait SafeLongIsRing extends Ring[SafeLong] {
   override def fromInt(n: Int): SafeLong = SafeLong(n)
 }
 
-trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with SafeLongIsRing {
+private[math] trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with SafeLongIsRing {
   def quot(a:SafeLong, b:SafeLong) = a / b
   def mod(a:SafeLong, b:SafeLong) = a % b
   override def quotmod(a:SafeLong, b:SafeLong) = a /% b
   def gcd(a:SafeLong, b:SafeLong) = a.toBigInt.gcd(b.toBigInt)
 }
 
-trait SafeLongIsNRoot extends NRoot[SafeLong] {
+private[math] trait SafeLongIsNRoot extends NRoot[SafeLong] {
   def nroot(a: SafeLong, k: Int): SafeLong = a.fold(
     n => SafeLong(NRoot[Long].nroot(n, k)),
     n => SafeLong(NRoot[BigInt].nroot(n, k))
@@ -364,7 +364,7 @@ trait SafeLongIsNRoot extends NRoot[SafeLong] {
     SafeLong(NRoot[BigInt].fpow(a.toBigInt, b.toBigInt))
 }
 
-trait SafeLongOrder extends Order[SafeLong] {
+private[math] trait SafeLongOrder extends Order[SafeLong] {
   override def eqv(x: SafeLong, y: SafeLong) = x == y
   override def neqv(x: SafeLong, y: SafeLong) = x != y
   override def gt(x: SafeLong, y: SafeLong) = x > y
@@ -374,11 +374,11 @@ trait SafeLongOrder extends Order[SafeLong] {
   def compare(x: SafeLong, y: SafeLong) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
-trait SafeLongIsSigned extends Signed[SafeLong] {
+private[math] trait SafeLongIsSigned extends Signed[SafeLong] {
   def signum(a: SafeLong): Int = a.toBigInt.toInt
   def abs(a: SafeLong): SafeLong = a.abs
 }
 
-trait SafeLongIsReal extends IsIntegral[SafeLong] with SafeLongOrder with SafeLongIsSigned {
+private[math] trait SafeLongIsReal extends IsIntegral[SafeLong] with SafeLongOrder with SafeLongIsSigned {
   def toDouble(n: SafeLong): Double = n.toDouble
 }

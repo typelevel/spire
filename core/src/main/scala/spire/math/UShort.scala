@@ -65,7 +65,7 @@ trait UShortInstances {
   implicit object UShortIsReal extends UShortIsReal
 }
 
-trait UShortIsRig extends Rig[UShort] {
+private[math] trait UShortIsRig extends Rig[UShort] {
   def one: UShort = UShort(1)
   def plus(a:UShort, b:UShort): UShort = a + b
   override def pow(a:UShort, b:Int): UShort = {
@@ -77,7 +77,7 @@ trait UShortIsRig extends Rig[UShort] {
   def zero: UShort = UShort(0)
 }
 
-trait UShortOrder extends Order[UShort] {
+private[math] trait UShortOrder extends Order[UShort] {
   override def eqv(x:UShort, y:UShort) = x == y
   override def neqv(x:UShort, y:UShort) = x != y
   override def gt(x: UShort, y: UShort) = x > y
@@ -87,7 +87,7 @@ trait UShortOrder extends Order[UShort] {
   def compare(x: UShort, y: UShort) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
-trait UShortBooleanAlgebra extends BooleanAlgebra[UShort] {
+private[math] trait UShortBooleanAlgebra extends BooleanAlgebra[UShort] {
   def one: UShort = UShort(-1: Short)
   def zero: UShort = UShort(0: Short)
   def and(a: UShort, b: UShort): UShort = a & b
@@ -96,11 +96,11 @@ trait UShortBooleanAlgebra extends BooleanAlgebra[UShort] {
   override def xor(a: UShort, b: UShort): UShort = a ^ b
 }
 
-trait UShortIsSigned extends Signed[UShort] {
+private[math] trait UShortIsSigned extends Signed[UShort] {
   def signum(a: UShort): Int = if (a == UShort(0)) 0 else 1
   def abs(a: UShort): UShort = a
 }
 
-trait UShortIsReal extends IsIntegral[UShort] with UShortOrder with UShortIsSigned {
+private[math] trait UShortIsReal extends IsIntegral[UShort] with UShortOrder with UShortIsSigned {
   def toDouble(n: UShort): Double = n.toDouble
 }

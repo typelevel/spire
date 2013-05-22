@@ -116,7 +116,7 @@ trait ULongInstances {
   implicit object ULongIsReal extends ULongIsReal
 }
 
-trait ULongIsRig extends Rig[ULong] {
+private[math] trait ULongIsRig extends Rig[ULong] {
   def one: ULong = ULong(1)
   def plus(a:ULong, b:ULong): ULong = a + b
   override def pow(a:ULong, b:Int): ULong = {
@@ -128,7 +128,7 @@ trait ULongIsRig extends Rig[ULong] {
   def zero: ULong = ULong(0)
 }
 
-trait ULongOrder extends Order[ULong] {
+private[math] trait ULongOrder extends Order[ULong] {
   override def eqv(x:ULong, y:ULong) = x == y
   override def neqv(x:ULong, y:ULong) = x != y
   override def gt(x: ULong, y: ULong) = x > y
@@ -138,7 +138,7 @@ trait ULongOrder extends Order[ULong] {
   def compare(x: ULong, y: ULong) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
-trait ULongBooleanAlgebra extends BooleanAlgebra[ULong] {
+private[math] trait ULongBooleanAlgebra extends BooleanAlgebra[ULong] {
   def one: ULong = ULong(-1L)
   def zero: ULong = ULong(0L)
   def and(a: ULong, b: ULong): ULong = a & b
@@ -147,11 +147,11 @@ trait ULongBooleanAlgebra extends BooleanAlgebra[ULong] {
   override def xor(a: ULong, b: ULong): ULong = a ^ b
 }
 
-trait ULongIsSigned extends Signed[ULong] {
+private[math] trait ULongIsSigned extends Signed[ULong] {
   def signum(a: ULong): Int = if (a == ULong(0)) 0 else 1
   def abs(a: ULong): ULong = a
 }
 
-trait ULongIsReal extends IsIntegral[ULong] with ULongOrder with ULongIsSigned {
+private[math] trait ULongIsReal extends IsIntegral[ULong] with ULongOrder with ULongIsSigned {
   def toDouble(n: ULong): Double = n.toDouble
 }

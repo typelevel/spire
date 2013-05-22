@@ -451,7 +451,7 @@ trait IntervalInstances {
 
 // we don't support Ring[Interval[A]] due to the lack of reliable inverses
 // (which is due to the dependency problem for interval arithmetic).
-trait IntervalIsRig[A] extends Rig[Interval[A]] {
+private[math] trait IntervalIsRig[A] extends Rig[Interval[A]] {
   implicit def o: Order[A]
   implicit def r: Ring[A]
 

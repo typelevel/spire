@@ -816,14 +816,14 @@ object BigRationals extends Rationals[BigInt] {
 }
 
 trait RationalInstances {
-  implicit object RationalIsField extends RationalIsField
+  implicit object RationalAlgebra extends RationalIsField
   implicit def RationalIsNRoot(implicit c:ApproximationContext[Rational]) = new RationalIsNRoot {
     implicit def context = c
   }
   implicit object RationalIsReal extends RationalIsReal
 }
 
-trait RationalIsRing extends Ring[Rational] {
+private[math] trait RationalIsField extends Field[Rational] {
   override def minus(a:Rational, b:Rational): Rational = a - b
   def negate(a:Rational): Rational = -a
   def one: Rational = Rational.one
@@ -831,11 +831,6 @@ trait RationalIsRing extends Ring[Rational] {
   override def pow(a:Rational, b:Int): Rational = a.pow(b)
   override def times(a:Rational, b:Rational): Rational = a * b
   def zero: Rational = Rational.zero
-  
-  override def fromInt(n: Int): Rational = Rational(n)
-}
-
-trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRing {
   def quot(a:Rational, b:Rational) = a /~ b
   def mod(a:Rational, b:Rational) = a % b
   override def quotmod(a:Rational, b:Rational) = a /% b
@@ -851,20 +846,18 @@ trait RationalIsEuclideanRing extends EuclideanRing[Rational] with RationalIsRin
       _gcd(b, a % b)
     }
   }
-}
-
-trait RationalIsField extends Field[Rational] with RationalIsEuclideanRing {
+  override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
   def div(a:Rational, b:Rational) = a / b
 }
 
-trait RationalIsNRoot extends NRoot[Rational] {
+private[math] trait RationalIsNRoot extends NRoot[Rational] {
   implicit def context:ApproximationContext[Rational]
   def nroot(a: Rational, k: Int): Rational = a.nroot(k)
   def fpow(a: Rational, b: Rational): Rational = a.pow(b)
 }
 
-trait RationalOrder extends Order[Rational] {
+private[math] trait RationalIsReal extends IsReal[Rational] {
   override def eqv(x:Rational, y:Rational) = x == y
   override def neqv(x:Rational, y:Rational) = x != y
   override def gt(x: Rational, y: Rational) = x > y
@@ -872,16 +865,11 @@ trait RationalOrder extends Order[Rational] {
   override def lt(x: Rational, y: Rational) = x < y
   override def lteqv(x: Rational, y: Rational) = x <= y
   def compare(x: Rational, y: Rational) = if (x < y) -1 else if (x > y) 1 else 0
-}
 
-trait RationalIsSigned extends Signed[Rational] {
   override def sign(a: Rational): Sign = a.sign
   def signum(a: Rational): Int = a.signum
   def abs(a: Rational): Rational = a.abs
-}
 
-trait RationalIsReal extends IsReal[Rational]
-with RationalOrder with RationalIsSigned {
   def toDouble(r: Rational): Double = r.toDouble
   def ceil(a:Rational): Rational = a.ceil
   def floor(a:Rational): Rational = a.floor

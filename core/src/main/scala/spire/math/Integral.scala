@@ -23,22 +23,22 @@ object Integral {
   @inline final def apply[A](implicit ev:Integral[A]) = ev
 }
 
-trait IntIsIntegral extends Integral[Int] with IntIsEuclideanRing
+private[math] trait IntIsIntegral extends Integral[Int] with IntIsEuclideanRing
 with ConvertableFromInt with ConvertableToInt with IntOrder with IntIsSigned {
   override def fromInt(n: Int): Int = n
 }
 
-trait LongIsIntegral extends Integral[Long] with LongIsEuclideanRing
+private[math] trait LongIsIntegral extends Integral[Long] with LongIsEuclideanRing
 with ConvertableFromLong with ConvertableToLong with LongOrder with LongIsSigned {
   override def fromInt(n: Int): Long = n.toLong
 }
 
-trait BigIntIsIntegral extends Integral[BigInt] with BigIntIsEuclideanRing
+private[math] trait BigIntIsIntegral extends Integral[BigInt] with BigIntIsEuclideanRing
 with ConvertableFromBigInt with ConvertableToBigInt with BigIntOrder with BigIntIsSigned {
   override def fromInt(n: Int): BigInt = BigInt(n)
 }
 
-trait SafeLongIsIntegral extends Integral[SafeLong] with SafeLongIsEuclideanRing
+private[math] trait SafeLongIsIntegral extends Integral[SafeLong] with SafeLongIsEuclideanRing
 with ConvertableFromSafeLong with ConvertableToSafeLong with SafeLongOrder with SafeLongIsSigned {
   override def fromInt(n: Int): SafeLong = SafeLong(n)
 }
