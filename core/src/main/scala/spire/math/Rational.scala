@@ -394,7 +394,7 @@ object Rational extends RationalInstances {
 
 
 
-protected abstract class Rationals[@specialized(Long) A](implicit integral: Integral[A]) {
+private[math] abstract class Rationals[@specialized(Long) A](implicit integral: Integral[A]) {
   import LongRationals._
   import BigRationals._
   import integral._
@@ -479,7 +479,7 @@ protected abstract class Rationals[@specialized(Long) A](implicit integral: Inte
 }
 
 
-object LongRationals extends Rationals[Long] {
+private[math] object LongRationals extends Rationals[Long] {
   import BigRationals.BigRational
 
   def build(n: Long, d: Long): Rational = {
@@ -680,7 +680,7 @@ object LongRationals extends Rationals[Long] {
 }
 
 
-object BigRationals extends Rationals[BigInt] {
+private[math] object BigRationals extends Rationals[BigInt] {
   import LongRationals.LongRational
 
   def build(n: BigInt, d: BigInt): Rational = {

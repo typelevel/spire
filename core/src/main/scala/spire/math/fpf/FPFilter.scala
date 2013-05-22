@@ -62,7 +62,7 @@ final class FPFilter[A](val approx: MaybeDouble, x: => A) {
   }
 }
 
-trait FPFilterEq[A] extends Eq[FPFilter[A]] {
+private[fpf] trait FPFilterEq[A] extends Eq[FPFilter[A]] {
   implicit def order: Eq[A]
 
   def eqv(a: FPFilter[A], b: FPFilter[A]): Boolean = (a.approx - b.approx).sign match {
@@ -71,7 +71,7 @@ trait FPFilterEq[A] extends Eq[FPFilter[A]] {
   }
 }
 
-trait FPFilterOrder[A] extends Order[FPFilter[A]] with FPFilterEq[A] {
+private[fpf] trait FPFilterOrder[A] extends Order[FPFilter[A]] with FPFilterEq[A] {
   implicit def order: Order[A]
 
   override def eqv(a: FPFilter[A], b: FPFilter[A]): Boolean =
@@ -85,7 +85,7 @@ trait FPFilterOrder[A] extends Order[FPFilter[A]] with FPFilterEq[A] {
   }
 }
 
-trait ConvertableToFPFilter[A] extends ConvertableTo[FPFilter[A]] {
+private[fpf] trait ConvertableToFPFilter[A] extends ConvertableTo[FPFilter[A]] {
   implicit def ev: ConvertableTo[A]
 
   def fromByte(a: Byte): FPFilter[A] = fromInt(a)
@@ -101,7 +101,7 @@ trait ConvertableToFPFilter[A] extends ConvertableTo[FPFilter[A]] {
   def fromType[B:ConvertableFrom](a: B): FPFilter[A] = sys.error("fixme")
 }
 
-trait ConvertableFromFPFilter[A] extends ConvertableFrom[FPFilter[A]] {
+private[fpf] trait ConvertableFromFPFilter[A] extends ConvertableFrom[FPFilter[A]] {
   implicit def ev: ConvertableFrom[A]
 
   def toByte(a: FPFilter[A]): Byte = toInt(a).toByte
@@ -141,7 +141,7 @@ trait ConvertableFromFPFilter[A] extends ConvertableFrom[FPFilter[A]] {
   def toString(a: FPFilter[A]): String = ev.toString(a.value)
 }
 
-trait FPFilterIsSigned[A] extends Signed[FPFilter[A]] {
+private[fpf] trait FPFilterIsSigned[A] extends Signed[FPFilter[A]] {
   implicit def ev: Signed[A]
 
   def abs(a: FPFilter[A]): FPFilter[A] = new FPFilter(a.approx.abs, ev.abs(a.value))
@@ -149,7 +149,7 @@ trait FPFilterIsSigned[A] extends Signed[FPFilter[A]] {
   def signum(a: FPFilter[A]): Int = a.approx.sign.getOrElse(ev.sign(a.value)).toInt
 }
 
-trait FPFilterIsRing[A] extends Ring[FPFilter[A]] {
+private[fpf] trait FPFilterIsRing[A] extends Ring[FPFilter[A]] {
   implicit def ev: Ring[A]
 
   def negate(a: FPFilter[A]): FPFilter[A] = new FPFilter(-a.approx, ev.negate(a.value))
@@ -172,7 +172,7 @@ trait FPFilterIsRing[A] extends Ring[FPFilter[A]] {
   override def fromInt(a: Int): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromInt(a))
 }
 
-trait FPFilterIsEuclideanRing[A] extends FPFilterIsRing[A] with EuclideanRing[FPFilter[A]] with FPFilterEq[A] {
+private[fpf] trait FPFilterIsEuclideanRing[A] extends FPFilterIsRing[A] with EuclideanRing[FPFilter[A]] with FPFilterEq[A] {
   implicit def ev: EuclideanRing[A]
 
   def quot(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
@@ -185,14 +185,14 @@ trait FPFilterIsEuclideanRing[A] extends FPFilterIsRing[A] with EuclideanRing[FP
     euclid(a, b)(this)
 }
 
-trait FPFilterIsField[A] extends FPFilterIsEuclideanRing[A] with Field[FPFilter[A]] {
+private[fpf] trait FPFilterIsField[A] extends FPFilterIsEuclideanRing[A] with Field[FPFilter[A]] {
   implicit def ev: Field[A]
 
   def div(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
     new FPFilter(a.approx / b.approx, ev.div(a.value, b.value))
 }
 
-trait FPFilterIsNRoot[A] extends NRoot[FPFilter[A]] {
+private[fpf] trait FPFilterIsNRoot[A] extends NRoot[FPFilter[A]] {
   implicit def ev: NRoot[A]
 
   def nroot(a: FPFilter[A], n: Int): FPFilter[A] =
@@ -204,7 +204,7 @@ trait FPFilterIsNRoot[A] extends NRoot[FPFilter[A]] {
   def fpow(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] = sys.error("fixme")
 }
 
-trait FPFilterIsNumeric[A] extends Numeric[FPFilter[A]]
+private[fpf] trait FPFilterIsNumeric[A] extends Numeric[FPFilter[A]]
 with FPFilterIsField[A] with FPFilterIsNRoot[A]
 with FPFilterOrder[A] with FPFilterIsSigned[A]
 with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
@@ -219,7 +219,7 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   override def fromDouble(n: Double): FPFilter[A] = super[ConvertableToFPFilter].fromDouble(n)
 }
 
-trait FPFilterIsFractional[A] extends Fractional[FPFilter[A]]
+private[fpf] trait FPFilterIsFractional[A] extends Fractional[FPFilter[A]]
 with FPFilterIsField[A] with FPFilterIsNRoot[A]
 with FPFilterOrder[A] with FPFilterIsSigned[A]
 with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
@@ -235,7 +235,7 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
 }
 
 
-trait LowPriorityFPFilterImplicits {
+private[fpf] trait LowPriorityFPFilterImplicits {
   implicit def FPFilterIsNumeric[A](implicit num: Numeric[A]): Numeric[FPFilter[A]] =
     new FPFilterIsNumeric[A] {
       val ev = num

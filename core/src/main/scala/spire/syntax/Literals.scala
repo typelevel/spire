@@ -1,7 +1,8 @@
-package spire.math
+package spire.syntax
 
 import scala.{specialized => spec}
 
+import spire.math._
 import spire.macrosk.Macros
 
 class Literals(s:StringContext) {

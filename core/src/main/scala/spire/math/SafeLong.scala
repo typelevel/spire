@@ -145,7 +145,7 @@ object SafeLong extends SafeLongInstances {
 }
 
 
-case class SafeLongLong private[math] (x: Long) extends SafeLong {
+private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong {
   def +(y: Long): SafeLong = {
     val a = x + y
 
@@ -265,7 +265,7 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
 }
 
 
-case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
+private[math] case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
   def +(y: Long): SafeLong = if ((x.signum ^ y) < 0) SafeLong(x + y) else SafeLongBigInt(x + y)
   def -(y: Long): SafeLong = if ((x.signum ^ y) < 0) SafeLongBigInt(x - y) else SafeLong(x - y)
   def *(y: Long): SafeLong = if (y == 0) SafeLongBigInt(0) else SafeLongBigInt(x * y)
