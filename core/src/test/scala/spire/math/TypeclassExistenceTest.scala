@@ -101,11 +101,10 @@ class TypeclassExistenceTest extends FunSuite {
     check[Double]
   }
 
-  test("Numerics have Order, NRoot, are EuclideanRings and are Fields") {
+  test("Numerics have Order, NRoot, and are Rigs") {
     def check[A: Numeric: ClassTag] {
+      hasRig[A]
       hasOrder[A]
-      hasEuclideanRing[A]
-      hasField[A]
       hasNRoot[A]
     }
 
