@@ -186,6 +186,15 @@ final class MaybeDouble(val approx: Double, private val mes: Double, private val
     toLong map { _.toDouble == approx }
   } else None
 
+  private def consensus(f: Double => Double) = if (isValid) {
+    val x = f(approx - error)
+    if (x == f(approx + error)) MaybeDouble(x) else MaybeDouble.Invalid
+  } else MaybeDouble.Invalid
+
+  def ceil: MaybeDouble = consensus(spire.math.ceil)
+  def floor: MaybeDouble = consensus(spire.math.floor)
+  def round: MaybeDouble = consensus(spire.math.round)
+
   override def hashCode: Int = (approx.## + mes.## * 19 + ind * 23)
   override def equals(that: Any): Boolean = that match {
     case that: MaybeDouble =>

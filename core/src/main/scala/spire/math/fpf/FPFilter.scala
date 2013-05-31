@@ -150,13 +150,8 @@ private[fpf] trait FPFilterIsSigned[A] extends Signed[FPFilter[A]] {
   def signum(a: FPFilter[A]): Int = a.approx.sign.getOrElse(ev.sign(a.value)).toInt
 }
 
-private[fpf] trait FPFilterIsRing[A] extends Ring[FPFilter[A]] {
-  implicit def ev: Ring[A]
-
-  def negate(a: FPFilter[A]): FPFilter[A] = new FPFilter(-a.approx, ev.negate(a.value))
-
-  override def minus(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
-    new FPFilter(a.approx - b.approx, ev.minus(a.value, b.value))
+private[fpf] trait FPFilterIsRig[A] extends Rig[FPFilter[A]] {
+  implicit def ev: Rig[A]
 
   def plus(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
     new FPFilter(a.approx + b.approx, ev.plus(a.value, b.value))
@@ -167,8 +162,17 @@ private[fpf] trait FPFilterIsRing[A] extends Ring[FPFilter[A]] {
   override def times(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
     new FPFilter(a.approx * b.approx, ev.times(a.value, b.value))
 
-  def zero: FPFilter[A] = new FPFilter(MaybeDouble(0.0), ev.fromInt(0))
-  def one: FPFilter[A] = new FPFilter(MaybeDouble(1.0), ev.fromInt(1))
+  def zero: FPFilter[A] = new FPFilter(MaybeDouble(0.0), ev.zero)
+  def one: FPFilter[A] = new FPFilter(MaybeDouble(1.0), ev.one)
+}
+
+private[fpf] trait FPFilterIsRing[A] extends FPFilterIsRig[A] with Ring[FPFilter[A]] {
+  implicit def ev: Ring[A]
+
+  def negate(a: FPFilter[A]): FPFilter[A] = new FPFilter(-a.approx, ev.negate(a.value))
+
+  override def minus(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
+    new FPFilter(a.approx - b.approx, ev.minus(a.value, b.value))
 
   override def fromInt(a: Int): FPFilter[A] = new FPFilter(MaybeDouble(a), ev.fromInt(a))
 }
@@ -206,16 +210,24 @@ private[fpf] trait FPFilterIsNRoot[A] extends NRoot[FPFilter[A]] {
 }
 
 private[fpf] trait FPFilterIsNumeric[A] extends Numeric[FPFilter[A]]
-with FPFilterIsField[A] with FPFilterIsNRoot[A]
+with FPFilterIsRig[A] with FPFilterIsNRoot[A]
 with FPFilterOrder[A] with FPFilterIsSigned[A]
 with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   implicit val ev: Numeric[A]
   def order = ev
 
-  def isWhole(a: FPFilter[A]): Boolean = eqv(quot(a, one), zero)
-  def ceil(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
-  def floor(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
-  def round(a: FPFilter[A]): FPFilter[A] = sys.error("fixme")
+  def negate(a: FPFilter[A]): FPFilter[A] = new FPFilter(-a.approx, ev.negate(a.value))
+
+  override def minus(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
+    new FPFilter(a.approx - b.approx, ev.minus(a.value, b.value))
+
+  def div(a: FPFilter[A], b: FPFilter[A]): FPFilter[A] =
+    new FPFilter(a.approx / b.approx, ev.div(a.value, b.value))
+
+  def isWhole(a: FPFilter[A]): Boolean = a.approx.isWhole getOrElse ev.isWhole(a.value)
+  def ceil(a: FPFilter[A]): FPFilter[A] = new FPFilter(a.approx.ceil, ev.ceil(a.value))
+  def floor(a: FPFilter[A]): FPFilter[A] = new FPFilter(a.approx.floor, ev.floor(a.value))
+  def round(a: FPFilter[A]): FPFilter[A] = new FPFilter(a.approx.round, ev.round(a.value))
   override def fromInt(n: Int): FPFilter[A] = super[ConvertableToFPFilter].fromInt(n)
   override def fromDouble(n: Double): FPFilter[A] = super[ConvertableToFPFilter].fromDouble(n)
 }

@@ -13,8 +13,9 @@ import scala.{specialized => spec}
  * 6. Start to worry about things like e.g. pow(BigInt, BigInt)
  */
 
-trait Numeric[@spec(Int,Long,Float,Double) A] extends Field[A] with NRoot[A]
-with ConvertableFrom[A] with ConvertableTo[A] with Order[A] with Signed[A]
+trait Numeric[@spec(Int,Long,Float,Double) A] extends Rig[A]
+with AdditiveAbGroup[A] with MultiplicativeGroup[A] with NRoot[A]
+with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A]
 
 object Numeric {
   implicit object IntIsNumeric extends IntIsNumeric
@@ -34,58 +35,52 @@ object Numeric {
 }
 
 private[math] trait IntIsNumeric extends Numeric[Int] with IntIsEuclideanRing with IntIsNRoot
-with ConvertableFromInt with ConvertableToInt with IntOrder with IntIsSigned {
+with ConvertableFromInt with ConvertableToInt with IntIsReal {
   override def fromInt(n: Int): Int = n
   override def fromDouble(n: Double): Int = n.toInt
+  override def toDouble(n: Int): Double = n.toDouble
   def div(a:Int, b:Int) = a / b
-  def ceil(a: Int): Int = a
-  def floor(a: Int): Int = a
-  def round(a: Int): Int = a
-  def isWhole(a:Int) = true
 }
 
 private[math] trait LongIsNumeric extends Numeric[Long] with LongIsEuclideanRing with LongIsNRoot
-with ConvertableFromLong with ConvertableToLong with LongOrder with LongIsSigned {
+with ConvertableFromLong with ConvertableToLong with LongIsReal {
   override def fromInt(n: Int): Long = n
   override def fromDouble(n: Double): Long = n.toLong
+  override def toDouble(n: Long): Double = n.toDouble
   def div(a:Long, b:Long) = a / b
-  def ceil(a: Long): Long = a
-  def floor(a: Long): Long = a
-  def round(a: Long): Long = a
-  def isWhole(a:Long) = true
 }
 
 private[math] trait BigIntIsNumeric extends Numeric[BigInt] with BigIntIsEuclideanRing
 with BigIntIsNRoot with ConvertableFromBigInt with ConvertableToBigInt
-with BigIntOrder with BigIntIsSigned {
+with BigIntIsReal {
   override def fromInt(n: Int): BigInt = BigInt(n)
   override def fromDouble(n: Double): BigInt = BigDecimal(n).toBigInt
+  override def toDouble(n: BigInt): Double = n.toDouble
   def div(a:BigInt, b:BigInt) = a / b
-  def ceil(a: BigInt): BigInt = a
-  def floor(a: BigInt): BigInt = a
-  def round(a: BigInt): BigInt = a
-  def isWhole(a:BigInt) = true
 }
 
 private[math] trait FloatIsNumeric extends Numeric[Float] with FloatIsField
 with FloatIsNRoot with ConvertableFromFloat with ConvertableToFloat
-with FloatOrder with FloatIsSigned {
+with FloatIsReal {
   override def fromInt(n: Int): Float = n.toFloat
   override def fromDouble(n: Double): Float = n.toFloat
+  override def toDouble(n: Float): Double = n.toDouble
 }
 
 private[math] trait DoubleIsNumeric extends Numeric[Double] with DoubleIsField
 with DoubleIsNRoot with ConvertableFromDouble with ConvertableToDouble
-with DoubleOrder with DoubleIsSigned {
+with DoubleIsReal {
   override def fromInt(n: Int): Double = n.toDouble
   override def fromDouble(n: Double): Double = n
+  override def toDouble(n: Double): Double = n.toDouble
 }
 
 private[math] trait BigDecimalIsNumeric extends Numeric[BigDecimal] with BigDecimalIsField
 with BigDecimalIsNRoot with ConvertableFromBigDecimal with ConvertableToBigDecimal
-with BigDecimalOrder with BigDecimalIsSigned {
+with BigDecimalIsReal {
   override def fromInt(n: Int): BigDecimal = BigDecimal(n)
   override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
+  override def toDouble(n: BigDecimal): Double = n.toDouble
 }
 
 private[math] trait RationalIsNumeric extends Numeric[Rational] with RationalIsField
@@ -97,9 +92,10 @@ with RationalIsReal {
 }
 
 private[math] trait RealIsNumeric extends Numeric[Real] with RealIsField with RealIsNRoot
-with ConvertableFromReal with ConvertableToReal with RealOrder with RealIsSigned {
+with ConvertableFromReal with ConvertableToReal with RealIsReal {
   override def fromInt(n: Int): Real = Real(n)
   override def fromDouble(n: Double): Real = Real(n)
+  override def toDouble(n: Real): Double = n.toDouble
 }
 
 
