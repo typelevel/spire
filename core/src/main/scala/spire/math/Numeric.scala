@@ -13,7 +13,7 @@ import scala.{specialized => spec}
  * 6. Start to worry about things like e.g. pow(BigInt, BigInt)
  */
 
-trait Numeric[@spec(Int,Long,Float,Double) A] extends Rig[A]
+trait Numeric[@spec(Int,Long,Float,Double) A] extends Ring[A]
 with AdditiveAbGroup[A] with MultiplicativeGroup[A] with NRoot[A]
 with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A]
 
