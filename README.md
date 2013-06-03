@@ -51,7 +51,7 @@ introduces several new ones, all of which can be found in `spire.math`:
 
 ### Type Classes
 
-Spire provides type classes to support the a wide range of unary and binary
+Spire provides type classes to support a wide range of unary and binary
 operations on numbers. The type classes are specialized, do no boxing, and use
 implicits to provide convenient infix syntax.
 
