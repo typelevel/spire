@@ -2,9 +2,6 @@ package spire.macrosk
 
 import scala.reflect.macros.Context
 
-import spire.math._
-import spire.algebra._
-
 /**
  * This trait has some nice methods for working with implicit Ops classes.
  */

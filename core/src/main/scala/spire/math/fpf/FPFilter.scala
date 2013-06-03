@@ -247,13 +247,14 @@ with ConvertableFromFPFilter[A] with ConvertableToFPFilter[A] {
   override def fromDouble(n: Double): FPFilter[A] = super[ConvertableToFPFilter].fromDouble(n)
 }
 
-
-private[fpf] trait LowPriorityFPFilterImplicits {
+private[fpf] trait LowerPriorityFPFilterImplicits {
   implicit def FPFilterIsNumeric[A](implicit num: Numeric[A]): Numeric[FPFilter[A]] =
     new FPFilterIsNumeric[A] {
       val ev = num
     }
+}
 
+private[fpf] trait LowPriorityFPFilterImplicits extends LowerPriorityFPFilterImplicits {
   implicit def FPFilterIsEuclideanRing[A](implicit erng: EuclideanRing[A], eq0: Eq[A]): EuclideanRing[FPFilter[A]] =
     new FPFilterIsEuclideanRing[A] {
       val ev = erng

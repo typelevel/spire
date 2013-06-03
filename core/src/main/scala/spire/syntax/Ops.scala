@@ -219,7 +219,7 @@ final class IsRealOps[A](lhs:A)(implicit ev:IsReal[A]) {
   def ceil() = macro Ops.unop[A]
   def floor() = macro Ops.unop[A]
   def round() = macro Ops.unop[A]
-  def toDouble() = macro Ops.unop[Double]
+  //def toDouble() = macro Ops.unop[Double]
 }
 
 final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {

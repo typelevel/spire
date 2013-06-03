@@ -85,10 +85,12 @@ object MyBuild extends Build {
     publishLocal := false
   )
 
-  // Core project
+  lazy val macros = Project("macros", file("macros"))
 
+  // Core project
   lazy val core = Project("core", file("core")).
-    settings(coreSettings: _*)
+    settings(coreSettings: _*).
+    dependsOn(macros)
 
   lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types",
     "Generates several type classes for Tuple2-22.")

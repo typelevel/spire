@@ -456,8 +456,8 @@ private[math] trait IntervalIsRig[A] extends Rig[Interval[A]] {
   implicit def r: Ring[A]
 
   def one: Interval[A] = Interval.point(r.one)
-  def plus(a:Interval[A], b:Interval[A]): Interval[A] = a + b
-  override def pow(a:Interval[A], b:Int):Interval[A] = a.pow(b)
-  override def times(a:Interval[A], b:Interval[A]): Interval[A] = a * b
+  def plus(a: Interval[A], b: Interval[A]): Interval[A] = a + b
+  override def pow(a: Interval[A], b: Int): Interval[A] = a.pow(b)
+  override def times(a: Interval[A], b: Interval[A]): Interval[A] = a * b
   def zero: Interval[A] = Interval.point(r.zero)
 }
