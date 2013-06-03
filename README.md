@@ -19,7 +19,7 @@ place to go for announcements and discussion around Spire.
 
 ### Set up
 
-Spire currently relies heavily on macros introduced Scala 2.10.0, as well as
+Spire currently relies heavily on macros introduced in Scala 2.10, as well as
 many improvements to specialization. Now that 2.10.0 has been released, Spire
 has been updated to 0.3.0.
 
