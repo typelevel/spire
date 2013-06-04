@@ -114,8 +114,7 @@ trait BaseSyntaxTest {
     (a.ceil == IsReal[A].ceil(a)) &&
       (a.floor == IsReal[A].floor(a)) &&
       (a.round == IsReal[A].round(a)) &&
-      (a.isWhole == IsReal[A].isWhole(a)) &&
-      (a.toDouble == IsReal[A].toDouble(a))
+      (a.isWhole == IsReal[A].isWhole(a))
   }
 
   def testSemigroupSyntax[A: Semigroup](a: A, b: A) = {
