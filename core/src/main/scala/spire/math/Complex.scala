@@ -119,7 +119,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
     val abs_breal = b.real.abs
     val abs_bimag = b.imag.abs
 
-    if (abs_breal <= abs_bimag) {
+    if (abs_breal >= abs_bimag) {
       if (abs_breal === f.zero) throw new Exception("/ by zero")
       val ratio = b.imag / b.real
       val denom = b.real + b.imag * ratio
