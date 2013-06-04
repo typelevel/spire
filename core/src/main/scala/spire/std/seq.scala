@@ -295,4 +295,9 @@ trait SeqInstances2 extends SeqInstances1 {
   }
 }
 
-trait SeqInstances extends SeqInstances2
+trait SeqInstances3 extends SeqInstances2 {
+  implicit def SeqNormedVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
+      nroot0: NRoot[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]) = SeqInnerProductSpace[A, CC].normed
+}
+
+trait SeqInstances extends SeqInstances3
