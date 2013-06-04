@@ -52,12 +52,21 @@ trait VectorSpaceLaws[V, A] extends Laws {
     parents = Seq(module)
   )
 
-  // TODO metric space dummy
-  def metricSpace(implicit V: MetricSpace[V, A]) = new SpaceProperties(
+  def metricSpace(implicit V: MetricSpace[V, A], o: Order[A], A: Ring[A]) = new SpaceProperties(
     name = "metric space",
     sl = _.emptyProperties,
     vl = _.emptyProperties,
-    parents = Seq.empty
+    parents = Seq.empty,
+    "identity" → forAll((x: V, y: V) =>
+      if (x === y) V.distance(x, y) === Ring[A].zero
+      else V.distance(x, y) =!= Ring[A].zero
+    ),
+    "symmetric" → forAll((x: V, y: V) =>
+      V.distance(x, y) === V.distance(y, x)
+    ),
+    "triangle inequality" → forAll((x: V, y: V, z: V) =>
+      V.distance(x, z) <= (V.distance(x, y) + V.distance(y, z))
+    )
   )
 
   def normedVectorSpace(implicit V: NormedVectorSpace[V, A], ev0: Order[A], ev1: Signed[A]) = new SpaceProperties(
@@ -69,10 +78,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     "scalable" → forAll((a: A, v: V) =>
       a.abs * v.norm === (a.abs *: v).norm
     ),
-    "triangle inequality" → forAll((v: V, w: V) =>
-      (v + w).norm <= (v.norm + w.norm)
-    ),
-    "only 1 zero" → forAll((v: V) =>
+    "only 1 zero" → forAll((v: V) => // This is covered by metricSpace...
       if (v === V.zero)
         v.norm === Ring[A].zero
       else
