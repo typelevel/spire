@@ -39,16 +39,20 @@ trait FloatIsField extends Field[Float] {
       if (exp < 0) 0F else intBitsToFloat((exp << 23) | mantissa)
     }
 
-    val aBits = floatToIntBits(a)
-    val aVal = value(aBits)
-    val aExp = exp(aBits)
+    if (a == 0F) b
+    else if (b == 0F) a
+    else {
+      val aBits = floatToIntBits(a)
+      val aVal = value(aBits)
+      val aExp = exp(aBits)
 
-    val bBits = floatToIntBits(b)
-    val bVal = value(bBits)
-    val bExp = exp(bBits)
+      val bBits = floatToIntBits(b)
+      val bVal = value(bBits)
+      val bExp = exp(bBits)
 
-    if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp)
-    else gcd0(bVal, bExp, aVal, aExp)
+      if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp)
+      else gcd0(bVal, bExp, aVal, aExp)
+    }
   }
 
   override def fromDouble(n: Double): Float = n.toFloat

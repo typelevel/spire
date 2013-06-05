@@ -39,16 +39,20 @@ trait DoubleIsField extends Field[Double] {
       if (exp < 0) 0.0 else longBitsToDouble((exp << 52) | mantissa)
     }
 
-    val aBits = doubleToLongBits(a)
-    val aVal = value(aBits)
-    val aExp = exp(aBits)
+    if (a == 0D) b
+    else if (b == 0D) a
+    else {
+      val aBits = doubleToLongBits(a)
+      val aVal = value(aBits)
+      val aExp = exp(aBits)
 
-    val bBits = doubleToLongBits(b)
-    val bVal = value(bBits)
-    val bExp = exp(bBits)
+      val bBits = doubleToLongBits(b)
+      val bVal = value(bBits)
+      val bExp = exp(bBits)
 
-    if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp)
-    else gcd0(bVal, bExp, aVal, aExp)
+      if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp)
+      else gcd0(bVal, bExp, aVal, aExp)
+    }
   }
 
   override def fromDouble(n: Double): Double = n
