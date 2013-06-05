@@ -3,6 +3,8 @@ package spire.std
 import spire.algebra._
 
 import java.lang.Math
+import java.lang.Integer.{ numberOfTrailingZeros, numberOfLeadingZeros }
+import java.lang.Float.{ intBitsToFloat, floatToIntBits }
 
 import scala.annotation.tailrec
 
@@ -19,15 +21,34 @@ trait FloatIsField extends Field[Float] {
 
   def quot(a:Float, b:Float) = (a - (a % b)) / b
   def mod(a:Float, b:Float) = a % b
-  def gcd(a:Float, b:Float):Float = _gcd(Math.abs(a), Math.abs(b))
-  @tailrec private def _gcd(a:Float, b:Float):Float = if (a < 1.0F) {
-    1.0F
-  } else if (b == 0.0F) {
-    a
-  } else if (b < 1.0F) {
-    1.0F
-  } else {
-    _gcd(b, a % b)
+
+  final def gcd(a:Float, b:Float):Float = {
+    def value(bits: Int): Int = bits & 0x007FFFFF | 0x00800000
+
+    def exp(bits: Int): Int = ((bits >> 23) & 0xFF).toInt
+
+    def gcd0(val0: Int, exp0: Int, val1: Int, exp1: Int): Float = {
+      val tz0 = numberOfTrailingZeros(val0)
+      val tz1 = numberOfTrailingZeros(val1)
+      val tzShared = spire.math.min(tz0, tz1 + exp1 - exp0)
+      val n = spire.math.gcd(val0 >>> tz0, val1 >>> tz1).toInt << tzShared
+
+      val shift = numberOfLeadingZeros(n) - 8 // Number of bits to move 1 to bit 23
+      val mantissa = (n << shift) & 0x007FFFFF
+      val exp = (exp0 - shift)
+      if (exp < 0) 0F else intBitsToFloat((exp << 23) | mantissa)
+    }
+
+    val aBits = floatToIntBits(a)
+    val aVal = value(aBits)
+    val aExp = exp(aBits)
+
+    val bBits = floatToIntBits(b)
+    val bVal = value(bBits)
+    val bExp = exp(bBits)
+
+    if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp)
+    else gcd0(bVal, bExp, aVal, aExp)
   }
 
   override def fromDouble(n: Double): Float = n.toFloat
