@@ -30,21 +30,23 @@ trait BigDecimalIsEuclideanRing extends EuclideanRing[BigDecimal] with BigDecima
 
     val Two = BigInteger.valueOf(2)
     val Five = BigInteger.valueOf(5)
+    val Ten = BigInteger.TEN
 
     @tailrec
     def reduce0(n: BigInteger, prime: BigInteger, shift: Int = 0): (Int, BigInteger) = {
       val Array(div, rem) = n.divideAndRemainder(prime)
-      if (rem == BigInteger.ZERO) {
-        reduce0(div, prime, shift + 1)
-      } else {
+      if (n == BigInteger.ZERO || rem != BigInteger.ZERO) {
         (shift, n)
+      } else {
+        reduce0(div, prime, shift + 1)
       }
     }
 
     def reduce(n: BigInteger): (Int, Int, BigInteger) = {
-      val (shift5, n0) = reduce0(n, Five)
-      val (shift2, n1) = reduce0(n0, Two)
-      (shift2, shift5, n1)
+      val (shift10, n0) = reduce0(n, Ten)
+      val (shift5, n1) = reduce0(n0, Five)
+      val (shift2, n2) = reduce0(n1, Two)
+      (shift2 + shift10, shift5 + shift10, n2)
     }
 
     def gcd0(val0: BigInteger, exp0: Int, val1: BigInteger, exp1: Int): BigDecimal = {
