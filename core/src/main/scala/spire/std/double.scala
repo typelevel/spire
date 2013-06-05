@@ -3,6 +3,8 @@ package spire.std
 import spire.algebra._
 
 import java.lang.Math
+import java.lang.Long.{ numberOfTrailingZeros, numberOfLeadingZeros }
+import java.lang.Double.{ longBitsToDouble, doubleToLongBits }
 
 import scala.annotation.tailrec
 
@@ -19,15 +21,38 @@ trait DoubleIsField extends Field[Double] {
 
   def quot(a:Double, b:Double) = (a - (a % b)) / b
   def mod(a:Double, b:Double) = a % b
-  override final def gcd(a:Double, b:Double):Double = _gcd(Math.abs(a), Math.abs(b))
-  @tailrec private def _gcd(a:Double, b:Double):Double = if (a < 1.0) {
-    1.0
-  } else if (b == 0.0) {
-    a
-  } else if (b < 1.0) {
-    1.0
-  } else {
-    _gcd(b, a % b)
+
+  final def gcd(a:Double, b:Double):Double = {
+    def value(bits: Long): Long = bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L
+
+    def exp(bits: Long): Int = ((bits >> 52) & 0x7FF).toInt
+
+    def gcd0(val0: Long, exp0: Int, val1: Long, exp1: Int): Double = {
+      val tz0 = numberOfTrailingZeros(val0)
+      val tz1 = numberOfTrailingZeros(val1)
+      val tzShared = spire.math.min(tz0, tz1 + exp1 - exp0)
+      val n = spire.math.gcd(val0 >>> tz0, val1 >>> tz1) << tzShared
+
+      val shift = numberOfLeadingZeros(n) - 11 // Number of bits to move 1 to bit 52
+      val mantissa = (n << shift) & 0x000FFFFFFFFFFFFFL
+      val exp = (exp0 - shift).toLong
+      if (exp < 0) 0.0 else longBitsToDouble((exp << 52) | mantissa)
+    }
+
+    if (a == 0D) b
+    else if (b == 0D) a
+    else {
+      val aBits = doubleToLongBits(a)
+      val aVal = value(aBits)
+      val aExp = exp(aBits)
+
+      val bBits = doubleToLongBits(b)
+      val bVal = value(bBits)
+      val bExp = exp(bBits)
+
+      if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp)
+      else gcd0(bVal, bExp, aVal, aExp)
+    }
   }
 
   override def fromDouble(n: Double): Double = n
