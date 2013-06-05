@@ -25,17 +25,50 @@ trait BigDecimalIsEuclideanRing extends EuclideanRing[BigDecimal] with BigDecima
   def quot(a:BigDecimal, b:BigDecimal) = a.quot(b)
   def mod(a:BigDecimal, b:BigDecimal) = a % b
   override def quotmod(a:BigDecimal, b:BigDecimal) = a /% b
-  def gcd(a:BigDecimal, b:BigDecimal):BigDecimal = _gcd(a.abs, b.abs)
-  @tailrec private def _gcd(a:BigDecimal, b:BigDecimal):BigDecimal = {
-    if (a < one) {
-      one
-    } else if (b.signum == 0) {
-      a
-    } else if (b < one) {
-      one
-    } else {
-      _gcd(b, a % b)
+  def gcd(a:BigDecimal, b:BigDecimal):BigDecimal = {
+    import java.math.BigInteger
+
+    val Two = BigInteger.valueOf(2)
+    val Five = BigInteger.valueOf(5)
+    val Ten = BigInteger.TEN
+
+    @tailrec
+    def reduce0(n: BigInteger, prime: BigInteger, shift: Int = 0): (Int, BigInteger) = {
+      val Array(div, rem) = n.divideAndRemainder(prime)
+      if (n == BigInteger.ZERO || rem != BigInteger.ZERO) {
+        (shift, n)
+      } else {
+        reduce0(div, prime, shift + 1)
+      }
     }
+
+    def reduce(n: BigInteger): (Int, Int, BigInteger) = {
+      val (shift10, n0) = reduce0(n, Ten)
+      val (shift5, n1) = reduce0(n0, Five)
+      val (shift2, n2) = reduce0(n1, Two)
+      (shift2 + shift10, shift5 + shift10, n2)
+    }
+
+    def gcd0(val0: BigInteger, exp0: Int, val1: BigInteger, exp1: Int): BigDecimal = {
+      val (shiftTwo0, shiftFive0, shifted0) = reduce(val0)
+      val (shiftTwo1, shiftFive1, shifted1) = reduce(val1)
+      val sharedTwo = spire.math.min(shiftTwo0, shiftTwo1 + exp1 - exp0)
+      val sharedFive = spire.math.min(shiftFive0, shiftFive1 + exp1 - exp0)
+      val reshift = Two.pow(sharedTwo).multiply(Five.pow(sharedFive))
+      val n = (shifted0 gcd shifted1).multiply(reshift)
+      BigDecimal(new java.math.BigDecimal(n, -exp0))
+    }
+
+    val aJbd = a.bigDecimal
+    val aVal = aJbd.unscaledValue.abs
+    val aExp = -aJbd.scale
+
+    val bJbd = b.bigDecimal
+    val bVal = bJbd.unscaledValue.abs
+    val bExp = -bJbd.scale
+
+    if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp)
+    else gcd0(bVal, bExp, aVal, aExp)
   }
 }
 
