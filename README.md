@@ -21,10 +21,6 @@ place to go for announcements and discussion around Spire.
 
 ### Set up
 
-Spire currently relies heavily on macros introduced in Scala 2.10, as well as
-many improvements to specialization. Now that 2.10.0 has been released, Spire
-has been updated to 0.3.0.
-
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
@@ -33,8 +29,35 @@ scalaVersion := "2.10.1"
 libraryDependencies += "org.spire-math" %% "spire" % "0.4.0"
 ```
 
+Moving forward Spire is tareting Scala 2.10.x and higher. If you want to use
+Spire with 2.9.x, there is an 0.3.0 release available.
+
 (For maven instructions, and to download the jars directly, visit the
 [Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.4.0%7Cjar)).
+
+### Playing Around
+
+If you clone the Spire repo, you can get a taste of what Spire can do using
+SBT's console. Launch `sbt` and at the prompt, type `core/console`:
+
+```
+> core/console
+[info] Generating spire/std/tuples.scala
+[info] Starting scala interpreter...
+[info]
+Welcome to Scala version 2.10.1 (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_29).
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala> import spire.implicits._
+import spire.implicits._
+
+scala> import spire.math._
+import spire.math._
+
+scala> Complex(3.0, 5.0).sin
+res0: spire.math.Complex[Double] = (10.472508533940392 + 73.46062169567367i)
+```
 
 ### Number Types
 
@@ -243,7 +266,7 @@ encounter will occur at compile-time.
 For example:
 
 ```scala
-import spire.syntax._
+import spire.syntax.literals._
 
 // bytes and shorts
 val x = b"100" // without type annotation!
@@ -255,7 +278,7 @@ val n1 = r"1/3"
 val n2 = r"1599/115866" // simplified at compile-time to 13/942
 
 // support different radix literals
-import spire.syntax.radix._
+import spire.syntax.literals.radix._
 
 // representations of the number 23
 val a = x2"10111" // binary
@@ -263,7 +286,7 @@ val b = x8"27" // octal
 val c = x16"17" // hex
 
 // SI notation for large numbers
-import spire.syntax.si._ // .us and .eu also available
+import spire.syntax.literals.si._ // .us and .eu also available
 
 val w = i"1 944 234 123" // Int
 val x = j"89 234 614 123 234 772" // Long
@@ -279,7 +302,7 @@ The macro can be nested in itself and compares favorably with other looping
 constructs in Scala such as `for` and `while`:
 
 ```scala
-import spire.syntax._
+import spire.syntax.cfor._
 
 // print numbers 1 through 10
 cfor(0)(_ < 10, _ + 1) { i =>
@@ -406,6 +429,12 @@ Multiple main classes detected, select one to run:
  [11] spire.benchmark.SortingBenchmarks
  [12] spire.benchmark.ScalaVsSpireBenchmarks
  [13] spire.benchmark.MaybeAddBenchmarks
+```
+
+You can also run a particular benchmark with `run-main`, for instance:
+
+```
+> run-main spire.benchmark.JuliaBenchmarks
 ```
 
 If you plan to contribute to Spire, please make sure to run the relevant
