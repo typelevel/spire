@@ -299,7 +299,10 @@ sealed trait Natural {
             Digit(UInt(t), tl)
       }
     }
-    recur(lhs, rhs, 0L)
+    if (lhs < rhs)
+      throw new ArithmeticException("negative subtraction: %s - %s" format (lhs, rhs))
+    else
+      recur(lhs, rhs, 0L)
   }
 
   def *(rhs: Natural): Natural = lhs match {
