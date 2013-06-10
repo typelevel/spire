@@ -56,7 +56,7 @@ trait SelectLike extends Select {
 
     } else {
       val c = partition(data, left, right, stride)(approxMedian(data, left, right, stride))
-      val span = equalSpan(data, left, stride)
+      val span = equalSpan(data, c, stride)
 
       if (c <= k && k < (c + span)) {
         // Spin.
