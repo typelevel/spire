@@ -97,7 +97,7 @@ abstract class Generator {
   /**
    * Generates a random float in [0.0, n).
    */
-  def nextDouble(n: Float): Float = nextFloat() * n
+  def nextFloat(n: Float): Float = nextFloat() * n
 
   /**
    * Generates a random float in [from, until).
