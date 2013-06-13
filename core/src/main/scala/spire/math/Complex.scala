@@ -89,7 +89,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
   def arg: T = t.atan2(imag, real)
 
   def norm: T = real * real + imag * imag
-  def conjugate = new Complex(real, -imag)
+  def conjugate: Complex[T] = new Complex(real, -imag)
 
   def asTuple: (T, T) = (real, imag)
   def asPolarTuple: (T, T) = (abs, arg)
@@ -98,24 +98,44 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
   def isImaginary: Boolean = real === f.zero
   def isReal: Boolean = imag === f.zero
 
-  def eqv(b: Complex[T]) = real === b.real && imag === b.imag
-  def neqv(b: Complex[T]) = real =!= b.real || imag =!= b.imag
+  def eqv(b: Complex[T]): Boolean = real === b.real && imag === b.imag
+  def neqv(b: Complex[T]): Boolean = real =!= b.real || imag =!= b.imag
 
-  def unary_-() = new Complex(-real, -imag)
+  def unary_-(): Complex[T] = new Complex(-real, -imag)
 
-  // (a+ci) + (b+di) = (a+b) + (c+d)i
-  def +(b: Complex[T]) =
+  def +(b: T): Complex[T] = new Complex(real + b, imag)
+  def -(b: T): Complex[T] = new Complex(real - b, imag)
+  def *(b: T): Complex[T] = new Complex(real * b, imag * b)
+  def /(b: T): Complex[T] = new Complex(real / b, imag / b)
+
+  def /~(b: T): Complex[T] = (this / b).floor
+  def %(b: T): Complex[T] = this - (this /~ b) * b
+  def /%(b: T): (Complex[T], Complex[T]) = {
+    val q = this /~ b
+    (q, this - q * b)
+  }
+
+  def **(b: T): Complex[T] = pow(b)
+  def pow(b: T): Complex[T] = if (b === f.zero) {
+    Complex.one[T]
+  } else if (this.isZero) {
+    if (b < f.zero)
+      throw new Exception("raising 0 to negative/complex power")
+    Complex.zero[T]
+  } else {
+    Complex.polar(abs fpow b, arg * b)
+  }
+
+  def +(b: Complex[T]): Complex[T] =
     new Complex(real + b.real, imag + b.imag)
 
-  // (a+ci) - (b+di) = (a-b) + (c-d)i
-  def -(b: Complex[T]) =
+  def -(b: Complex[T]): Complex[T] =
     new Complex(real - b.real, imag - b.imag)
 
-  // (a+ci) * (b+di) = (a*b - c*d) + (c*b + a*d)i
-  def *(b: Complex[T]) =
+  def *(b: Complex[T]): Complex[T] =
     new Complex(real * b.real - imag * b.imag, imag * b.real + real * b.imag)
 
-  def /(b: Complex[T]) = {
+  def /(b: Complex[T]): Complex[T] = {
     val abs_breal = b.real.abs
     val abs_bimag = b.imag.abs
 
@@ -133,9 +153,9 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
     }
   }
 
-  def /~(b: Complex[T]) = {
+  def /~(b: Complex[T]): Complex[T] = {
     val d = this / b
-    new Complex(d.real.round, d.imag.round)
+    new Complex(d.real.floor, d.imag.floor)
   }
 
   def %(b: Complex[T]): Complex[T] = this - (this /~ b) * b

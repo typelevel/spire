@@ -14,10 +14,19 @@ class NaturalTest extends PropSpec with ShouldMatchers with GeneratorDrivenPrope
   }
 
   property("x - y") {
-    forAll { (__x: BigInt, __y: BigInt) =>
-      val (_x, _y) = (__x.abs, __y.abs)
-      val (x, y) = if (_x > _y) (_x, _y) else (_y, _x)
-      Natural(x) - Natural(y) should be === Natural(x - y)
+    forAll { (_x: BigInt, _y: BigInt) =>
+      val (x, y) = (_x.abs, _y.abs)
+      if (x >= y) {
+        Natural(x) - Natural(y) should be === Natural(x - y)
+      } else {
+        val error = try {
+          Natural(x) - Natural(y); false
+        } catch {
+          case _: ArithmeticException => true
+          case _: Exception => false
+        }
+        error should be === true
+      }
     }
   }
   
