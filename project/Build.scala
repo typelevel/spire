@@ -14,9 +14,9 @@ object MyBuild extends Build {
     organization := "org.spire-math",
     version := "0.5.0-M1",
 
-    scalaVersion := "2.10.1",
+    scalaVersion := "2.10.2",
 
-    // disable annoying warnings about 2.10.0 and 2.10.1
+    // disable annoying warnings about 2.10.x
     conflictWarning in ThisBuild := ConflictWarning.disable,
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
@@ -24,7 +24,7 @@ object MyBuild extends Build {
 
     libraryDependencies ++= Seq(
       scalaTest % "test",
-      "org.scala-lang" % "scala-reflect" % "2.10.1"
+      "org.scala-lang" % "scala-reflect" % "2.10.2"
     ),
 
     scalacOptions ++= Seq(
