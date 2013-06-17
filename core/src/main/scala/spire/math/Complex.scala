@@ -63,11 +63,28 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
   override def byteValue: Byte = real.toByte
 
   def isWhole: Boolean = imag === f.zero && real.isWhole
-  def signum: Int = real compare f.zero
+
+  /**
+   * This implements csgn(z), which (except for z=0) observes:
+   * 
+   * csgn(z) = z / sqrt(z*z) = sqrt(z*z) / z
+   */
+  def signum: Int = if (real === f.zero) {
+    imag compare f.zero
+  } else {
+    if (real < f.zero) -1 else 1
+  }
+
   def underlying: (T, T) = (real, imag)
+
+  /**
+   * This implements sgn(z), which (except for z=0) observes:
+   * 
+   * sgn(z) = z / abs(z) = abs(z) / z
+   */
   def complexSignum: Complex[T] = {
     val a = abs
-    if (a === f.zero) Complex.zero[T] else this / new Complex(a, f.zero)
+    if (a === f.zero) this else this / a
   }
 
   override final def isValidInt: Boolean =
@@ -189,7 +206,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
 
   // we are going with the "principal value" definition of Log.
   def log: Complex[T] = {
-    if (this.isZero) sys.error("log undefined at 0")
+    if (this.isZero) throw new IllegalArgumentException("log(0) undefined")
     new Complex(t.log(abs), arg)
   }
 
@@ -446,13 +463,13 @@ object FastComplex {
     val abs_im_b = Math.abs(im_b)
 
     if (abs_re_b >= abs_im_b) {
-      if (abs_re_b == 0.0F) sys.error("/0")
+      if (abs_re_b == 0.0F) throw new ArithmeticException("/0")
       val ratio = im_b / re_b
       val denom = re_b + im_b * ratio
       encode((re_a + im_a * ratio) / denom, (im_a - re_a * ratio) / denom)
 
     } else {
-      if (abs_im_b == 0.0F) sys.error("/0")
+      if (abs_im_b == 0.0F) throw new ArithmeticException("/0")
       val ratio = re_b / im_b
       val denom = re_b * ratio + im_b
       encode((re_a * ratio + im_a) / denom, (im_a * ratio - re_a) / denom)
