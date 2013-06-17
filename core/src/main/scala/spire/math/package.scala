@@ -45,19 +45,6 @@ package object math {
 
   final def log(n: Double): Double = Math.log(n)
 
-  //// FIXME: we should actually try to return values which are correct for the
-  //// given precision.
-  //final def log(n: BigDecimal): BigDecimal = {
-  //  if (n < 0) sys.error("invalid argument: %s" format n)
-  //  else _log(n, BigDecimal(0))
-  //}
-  //
-  //// Since log(n * x) = log(n) + log(x), we can use Math.log to
-  //// approximate log for BigDecimal.
-  //@tailrec private final def _log(n: BigDecimal, sofar: BigDecimal): BigDecimal = {
-  //  if (n <= maxDouble) BigDecimal(Math.log(n.toDouble)) + sofar
-  //  else _log(n / maxDouble, logMaxDouble + sofar)
-  //}
   final def log(n: BigDecimal): BigDecimal = {
     val scale = n.mc.getPrecision
 
