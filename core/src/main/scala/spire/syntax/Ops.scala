@@ -2,7 +2,7 @@ package spire.syntax
 
 import spire.algebra._
 import spire.macrosk.Ops
-import spire.math.{ConvertableTo, ConvertableFrom, Rational, Number}
+import spire.math.{BitString, ConvertableTo, ConvertableFrom, Rational, Number}
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
   def ===(rhs:A) = macro Ops.binop[A, Boolean]
@@ -329,4 +329,16 @@ final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {
   def toBigInt(): BigInt = macro Ops.unop[BigInt]
   def toBigDecimal(): BigDecimal = macro Ops.unop[BigDecimal]
   def toRational(): Rational = macro Ops.unop[Rational]
+}
+
+final class BitStringOps[A](lhs: A)(implicit ev: BitString[A]) {
+  def <<(rhs: Int): A = macro Ops.binop[Int, A]
+  def >>(rhs: Int): A = macro Ops.binop[Int, A]
+  def >>>(rhs: Int): A = macro Ops.binop[Int, A]
+
+  def bitCount(): Int = macro Ops.unop[Int]
+  def highestOneBit(): A = macro Ops.unop[A]
+  def lowestOneBit(): A = macro Ops.unop[A]
+  def numberOfLeadingZeros(): Int = macro Ops.unop[Int]
+  def numberOfTrailingZeros(): Int = macro Ops.unop[Int]
 }

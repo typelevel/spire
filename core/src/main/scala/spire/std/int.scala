@@ -1,8 +1,10 @@
 package spire.std
 
 import spire.algebra._
+import spire.math.BitString
 
 import java.lang.Math
+import java.lang.Integer
 
 trait IntIsEuclideanRing extends EuclideanRing[Int] {
   override def minus(a:Int, b:Int): Int = a - b
@@ -62,17 +64,33 @@ trait IntIsReal extends IsIntegral[Int] with IntOrder with IntIsSigned {
   def toDouble(n: Int): Double = n.toDouble
 }
 
-trait IntIsBooleanAlgebra extends BooleanAlgebra[Int] {
+trait IntIsBitString extends BitString[Int] {
   def one: Int = -1
   def zero: Int = 0
   def and(a: Int, b: Int): Int = a & b
   def or(a: Int, b: Int): Int = a | b
   def complement(a: Int): Int = ~a
   override def xor(a: Int, b: Int): Int = a ^ b
+
+  def signed: Boolean = true
+  def width: Int = 32
+  def toHexString(n: Int): String = Integer.toHexString(n)
+
+  def bitCount(n: Int): Int = Integer.bitCount(n)
+  def highestOneBit(n: Int): Int = Integer.highestOneBit(n)
+  def lowestOneBit(n: Int): Int = Integer.lowestOneBit(n)
+  def numberOfLeadingZeros(n: Int): Int = Integer.numberOfLeadingZeros(n)
+  def numberOfTrailingZeros(n: Int): Int = Integer.numberOfTrailingZeros(n)
+
+  def leftShift(n: Int, i: Int): Int = n << i
+  def rightShift(n: Int, i: Int): Int = n >>> i
+  def signedRightShift(n: Int, i: Int): Int = n >> i
+  def rotateLeft(n: Int, i: Int): Int = Integer.rotateLeft(n, i)
+  def rotateRight(n: Int, i: Int): Int = Integer.rotateRight(n, i)
 }
 
 trait IntInstances {
-  implicit object IntBooleanAlgebra extends IntIsBooleanAlgebra
+  implicit object IntBitString extends IntIsBitString
   implicit object IntAlgebra extends IntIsEuclideanRing with IntIsNRoot
   implicit object IntIsReal extends IntIsReal
 }

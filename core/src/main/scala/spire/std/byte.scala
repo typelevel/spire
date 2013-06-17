@@ -1,6 +1,7 @@
 package spire.std
 
 import spire.algebra._
+import spire.math.BitString
 
 trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
   override def minus(a:Byte, b:Byte): Byte = (a - b).toByte
@@ -37,17 +38,39 @@ trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned {
   def toDouble(n: Byte): Double = n.toDouble
 }
 
-trait ByteIsBooleanAlgebra extends BooleanAlgebra[Byte] {
+trait ByteIsBitString extends BitString[Byte] {
   def one: Byte = (-1: Byte)
   def zero: Byte = (0: Byte)
   def and(a: Byte, b: Byte): Byte = (a & b).toByte
   def or(a: Byte, b: Byte): Byte = (a | b).toByte
   def complement(a: Byte): Byte = (~a).toByte
   override def xor(a: Byte, b: Byte): Byte = (a ^ b).toByte
+
+  def signed: Boolean = true
+  def width: Int = 8
+  def toHexString(n: Byte): String = Integer.toHexString(n)
+
+  def bitCount(n: Byte): Int = Integer.bitCount(n)
+  def highestOneBit(n: Byte): Byte = (Integer.highestOneBit(n) & 0xff).toByte
+  def lowestOneBit(n: Byte): Byte = (Integer.lowestOneBit(n) & 0xff).toByte
+  def numberOfLeadingZeros(n: Byte): Int = Integer.numberOfLeadingZeros(n)
+  def numberOfTrailingZeros(n: Byte): Int = Integer.numberOfTrailingZeros(n)
+
+  def leftShift(n: Byte, i: Int): Byte = ((n << i) & 0xff).toByte
+  def rightShift(n: Byte, i: Int): Byte = ((n >>> i) & 0xff).toByte
+  def signedRightShift(n: Byte, i: Int): Byte = ((n >> i) & 0xff).toByte
+  def rotateLeft(n: Byte, i: Int): Byte = {
+    val j = i & 7
+    (((n << j) | (n >>> (8 - j))) & 0xff).toByte
+  }
+  def rotateRight(n: Byte, i: Int): Byte = {
+    val j = i & 7
+    (((n >>> j) | (n << (8 - j))) & 0xff).toByte
+  }
 }
 
 trait ByteInstances {
-  implicit object ByteBooleanAlgebra extends ByteIsBooleanAlgebra
+  implicit object ByteBitString extends ByteIsBitString
   implicit object ByteAlgebra extends ByteIsEuclideanRing
   implicit object ByteIsReal extends ByteIsReal
 }

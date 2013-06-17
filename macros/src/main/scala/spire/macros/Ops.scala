@@ -176,6 +176,11 @@ object Ops {
     ("$amp", "and"),
     ("unary_$tilde", "complement"),
 
+    // BitString (<< >> >>>)
+    ("$less$less", "leftShift"),
+    ("$greater$greater", "rightShift"),
+    ("$greater$greater$greater", "signedRightShift"),
+
     // VectorSpace
     ("$times$colon", "timesl"),
     ("$colon$times", "timesr"),

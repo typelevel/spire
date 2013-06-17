@@ -99,4 +99,26 @@ private[math] trait UByteBooleanAlgebra extends BooleanAlgebra[UByte] {
   def or(a: UByte, b: UByte): UByte = a | b
   def complement(a: UByte): UByte = ~a
   override def xor(a: UByte, b: UByte): UByte = a ^ b
+
+  def signed: Boolean = false
+  def width: Int = 8
+  def toHexString(n: UByte): String = Integer.toHexString(n.toInt)
+
+  def bitCount(n: UByte): Int = Integer.bitCount(n.toInt)
+  def highestOneBit(n: UByte): UByte = UByte(Integer.highestOneBit(n.toInt))
+  def lowestOneBit(n: UByte): UByte = UByte(Integer.lowestOneBit(n.toInt))
+  def numberOfLeadingZeros(n: UByte): Int = Integer.numberOfLeadingZeros(n.toInt)
+  def numberOfTrailingZeros(n: UByte): Int = Integer.numberOfTrailingZeros(n.toInt)
+
+  def leftShift(n: UByte, i: Int): UByte = n << i
+  def rightShift(n: UByte, i: Int): UByte = n >> i
+  def signedRightShift(n: UByte, i: Int): UByte = n >>> i
+  def rotateLeft(n: UByte, i: Int): UByte = {
+    val j = i & 7
+    (n << j) | (n >>> (8 - j))
+  }
+  def rotateRight(n: UByte, i: Int): UByte = {
+    val j = i & 7
+    (n >>> j) | (n << (8 - j))
+  }
 }
