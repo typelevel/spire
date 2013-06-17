@@ -148,6 +148,17 @@ sealed trait Natural {
     recur(this)
   }
 
+  def isOne: Boolean = this match {
+    case End(n) =>
+      n == UInt(1)
+    case Digit(n, tail) =>
+      n == UInt(1) && tail.isZero
+  }
+
+  def isOdd: Boolean = (digit & UInt(1)) == UInt(1)
+
+  def isEven: Boolean = (digit & UInt(1)) == UInt(0)
+
   def powerOfTwo: Int = {
     import java.lang.Integer.highestOneBit
 
@@ -319,8 +330,8 @@ sealed trait Natural {
 
   def pow(rhs: Natural): Natural = {
     @tailrec def _pow(t: Natural, b: Natural, e: Natural): Natural = {
-      if (e == UInt(0)) t
-      else if ((e & UInt(1)) == UInt(1)) _pow(t * b, b * b, e >> 1)
+      if (e.isZero) t
+      else if (e.isOdd) _pow(t * b, b * b, e >> 1)
       else _pow(t, b * b, e >> 1)
     }
     _pow(Natural(1), lhs, rhs)
