@@ -5,9 +5,14 @@ import spire.math._
 
 import scala.annotation.tailrec
 
+import spire.std.bigDecimal._
+import spire.syntax.nroot._
+
 import java.lang.Long.numberOfTrailingZeros
 import java.lang.Math
 import java.math.BigInteger
+
+import BigDecimal.RoundingMode.HALF_UP
 
 package object math {
   // largest possible double as BigDecimal
@@ -40,18 +45,44 @@ package object math {
 
   final def log(n: Double): Double = Math.log(n)
 
-  // FIXME: we should actually try to return values which are correct for the
-  // given precision.
-  final def log(n:BigDecimal):BigDecimal = {
-    if (n < 0) sys.error("invalid argument: %s" format n)
-    else _log(n, BigDecimal(0))
-  }
-  
-  // Since log(n * x) = log(n) + log(x), we can use Math.log to
-  // approximate log for BigDecimal.
-  @tailrec private final def _log(n:BigDecimal, sofar:BigDecimal): BigDecimal = {
-    if (n <= maxDouble) BigDecimal(Math.log(n.toDouble)) + sofar
-    else _log(n / maxDouble, logMaxDouble + sofar)
+  //// FIXME: we should actually try to return values which are correct for the
+  //// given precision.
+  //final def log(n: BigDecimal): BigDecimal = {
+  //  if (n < 0) sys.error("invalid argument: %s" format n)
+  //  else _log(n, BigDecimal(0))
+  //}
+  //
+  //// Since log(n * x) = log(n) + log(x), we can use Math.log to
+  //// approximate log for BigDecimal.
+  //@tailrec private final def _log(n: BigDecimal, sofar: BigDecimal): BigDecimal = {
+  //  if (n <= maxDouble) BigDecimal(Math.log(n.toDouble)) + sofar
+  //  else _log(n / maxDouble, logMaxDouble + sofar)
+  //}
+  final def log(n: BigDecimal): BigDecimal = {
+    val scale = n.mc.getPrecision
+
+    def ln(n: BigDecimal): BigDecimal = {
+      val scale2 = scale + 1
+      val limit = BigDecimal(5) * BigDecimal(10).pow(-scale2)
+
+      @tailrec def loop(x: BigDecimal): BigDecimal = {
+        val xp = exp(x)
+        val term = (xp - n) / xp
+        if (term > limit) loop(x - term) else x - term
+      }
+
+      loop(n.setScale(scale2, HALF_UP)).setScale(scale, HALF_UP)
+    }
+
+    if (n.signum < 1)
+      throw new IllegalArgumentException("argument <= 0")
+
+    @tailrec def rescale(x: BigDecimal, n: Int): (BigDecimal, Int) =
+      if (x < 64) (x, n) else rescale(x.sqrt, n + 1)
+
+    val (x, i) = rescale(n, 0)
+
+    (ln(x) * BigDecimal(2).pow(i)).setScale(scale, HALF_UP)
   }
 
   final def log[A](a: A)(implicit t: Trig[A]): A = t.log(a)
@@ -59,39 +90,52 @@ package object math {
   /**
    * exp() implementations
    */
-  final def exp(n:Double):Double = Math.exp(n)
+  final def exp(n: Double): Double = Math.exp(n)
 
-  final def exp(n: BigDecimal): BigDecimal = _exp(n, BigDecimal(1))
 
-  // Since exp(a + b) = exp(a) * exp(b), we can use Math.log to
-  // approximate exp for BigDecimal.
-  @tailrec private final def _exp(n: BigDecimal, sofar:BigDecimal): BigDecimal =
-    if (n <= logMaxDouble) BigDecimal(Math.exp(n.toDouble)) * sofar
-    else _exp(n - logMaxDouble, maxDouble * sofar)
+  final def exp(k: BigDecimal): BigDecimal = {
+    // TODO: often the last digit or two may be wrong. but this is the
+    // best approximation we have so far. to do better will require
+    // restarting the algorithm with more precision based on a
+    // pessimistic idea of how much rounding error may have accumulated.
 
-  // FIXME: this is not working yet.
-  // def exp(k: BigDecimal): BigDecimal = {
-  //   import spire.algebra.NRoot.BigDecimalIsNRoot.sqrt
-  //
-  //   val mc = k.mc
-  //   var scale = BigDecimal(10, mc).pow(mc.getPrecision)
-  //
-  //   var kk = k
-  //   var num = BigDecimal(1.0, mc)
-  //   var denom = BigInt(1)
-  //   var n = BigDecimal(1, mc)
-  //   var m = 1
-  //   while (n < scale) {
-  //     num = num * m + kk
-  //     denom = denom * m
-  //     n = n * m
-  //     m += 1
-  //     kk *= k
-  //     scale *= k
-  //   }
-  //
-  //   num / BigDecimal(denom, mc)
-  // }
+    if (k.signum == 0) return BigDecimal(1)
+
+    if (k.signum == -1) return BigDecimal(1) / exp(-k)
+
+    // take a BigDecimal to a BigInt power
+    @tailrec
+    def power(result: BigDecimal, base: BigDecimal, exponent: BigInt): BigDecimal =
+      if (exponent.signum == 0) result
+      else if (exponent.testBit(0)) power(result * base, base * base, exponent >> 1)
+      else power(result, base * base, exponent >> 1)
+
+    val whole = k.setScale(0, HALF_UP)
+
+    if (whole.signum > 1) {
+      val part = exp(BigDecimal(1) + (k - whole) / whole)
+      return power(BigDecimal(1), part, whole.toBigInt)
+    }
+  
+    val mc = k.mc
+    var scale = BigDecimal(10, mc).pow(mc.getPrecision + 1)
+  
+    var kk = k
+    var num = BigDecimal(1.0, mc)
+    var denom = BigInt(1)
+    var n = BigDecimal(1, mc)
+    var m = 1
+    while (n < scale) {
+      num = num * m + kk
+      denom = denom * m
+      n = n * m
+      m += 1
+      kk *= k
+      scale *= k
+    }
+  
+    num / BigDecimal(denom, mc)
+  }
 
   final def exp[A](a: A)(implicit t: Trig[A]): A = t.exp(a)
 
@@ -99,19 +143,14 @@ package object math {
    * pow() implementations
    */
 
-  // Since a^b = e^(log(a) * b) we can use exp and log to write pow.
-  // TODO: doesn't make precision guarantees, but it's better than nothing.
-  private val maxIntEx = BigDecimal(999999999)
-  private val minIntEx = BigDecimal(-999999999)
-
-  // FIXME: we should actually try to return values which are correct for the
-  // given precision.
-  final def pow(base: BigDecimal, ex: BigDecimal) =
-    if (ex.isValidInt && ex <= maxIntEx && ex >= minIntEx) base.pow(ex.toInt)
-    else exp(log(base) * ex)
+  final def pow(base: BigDecimal, exponent: BigDecimal) =
+    if (exponent.scale == 0 && 0 <= exponent && exponent <= 999999999)
+      base.pow(exponent.toInt)
+    else
+      exp(log(base) * exponent)
 
   final def pow(base: BigInt, ex: BigInt) = if (ex.signum < 0) {
-    if (base == 0) sys.error("zero can't be raised to negative power")
+    if (base.signum == 0) sys.error("zero can't be raised to negative power")
     else if (base == 1) base
     else if (base == -1) if (ex.testBit(0)) BigInt(1) else base
     else BigInt(0)
@@ -122,7 +161,7 @@ package object math {
   }
 
   @tailrec private[math] final def bigIntPow(t: BigInt, b: BigInt, e: BigInt): BigInt = {
-    if (e.isValidInt) t * b.pow(e.toInt)
+    if (e.signum == 0) t * b.pow(e.toInt)
     else if (e.testBit(0)) bigIntPow(t * b, b * b, e >> 1)
     else bigIntPow(t, b * b, e >> 1)
   }
@@ -133,19 +172,20 @@ package object math {
    * If base^ex doesn't fit in a Long, the result will overflow (unlike
    * Math.pow which will return +/- Infinity). 
    */
-  final def pow(base:Long, ex:Long):Long = if (ex < 0L) {
-    if(base == 0L) sys.error("zero can't be raised to negative power")
-    else if (base == 1L) 1L
-    else if (base == -1L) if ((ex & 1L) == 0L) -1L else 1L
-    else 0L
-  } else {
-    longPow(1L, base, ex)
-  }
+  final def pow(base: Long, exponent: Long): Long = {
+    @tailrec def longPow(t: Long, b: Long, e: Long): Long =
+      if (e == 0L) t
+      else if ((e & 1) == 1) longPow(t * b, b * b, e >> 1L)
+      else longPow(t, b * b, e >> 1L)
 
-  @tailrec private[math] final def longPow(t:Long, b:Long, e:Long): Long = {
-    if (e == 0L) t
-    else if ((e & 1) == 1) longPow(t * b, b * b, e >> 1L)
-    else longPow(t, b * b, e >> 1L)
+    if (exponent < 0L) {
+      if(base == 0L) sys.error("zero can't be raised to negative power")
+      else if (base == 1L) 1L
+      else if (base == -1L) if ((exponent & 1L) == 0L) -1L else 1L
+      else 0L
+    } else {
+      longPow(1L, base, exponent)
+    }
   }
 
   final def pow(base: Double, exponent: Double) = Math.pow(base, exponent)
@@ -192,7 +232,7 @@ package object math {
     if (Math.abs(a) >= 4503599627370496.0) a else Math.round(a).toDouble
 
   final def round(a: BigDecimal): BigDecimal =
-    a.setScale(0, BigDecimal.RoundingMode.HALF_UP)
+    a.setScale(0, HALF_UP)
 
   final def min(x: Byte, y: Byte): Byte = Math.min(x, y).toByte
   final def min(x: Short, y: Short): Short = Math.min(x, y).toShort

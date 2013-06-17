@@ -88,10 +88,19 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
 
   // this is newton's method
   override def sqrt(n: BigDecimal): BigDecimal = {
+    def approxSqrt(x: BigDecimal): BigDecimal =
+      if (x < Double.MaxValue) {
+        BigDecimal(Math.sqrt(x.toDouble), x.mc)
+      } else {
+        val s = approxSqrt(x / Double.MaxValue)
+        s * BigDecimal(Math.sqrt(Double.MaxValue), x.mc)
+      }
+
     var x: BigDecimal = BigDecimal(0, n.mc)
-    var y: BigDecimal = BigDecimal(Math.sqrt(n.toDouble), n.mc)
+    var y: BigDecimal = approxSqrt(n)
+
     while (x != y) {
-      x = y;
+      x = y
       y = ((n / x) + x) / two
     }
     y
