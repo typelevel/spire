@@ -6,6 +6,9 @@ import java.lang.Math
 import spire.algebra._
 import spire.std.bigDecimal._
 
+import spire.syntax.isReal._
+import spire.syntax.nroot._
+
 // TODO: implement RationalNumber.
 // TODO: implement toNumber and fromNumber in ConvertableTo/From.
 // TODO: pow() is hairy; should support more cases and generate better errors
@@ -16,32 +19,26 @@ import spire.std.bigDecimal._
  */
 object Number extends NumberInstances {
 
-  final val zero = Number(0)
-  final val one = Number(1)
+  final val zero: Number = Number(0)
+  final val one: Number = Number(1)
 
   implicit def apply(n: Long): Number = IntNumber(SafeLong(n))
   implicit def apply(n: BigInt): Number = IntNumber(SafeLong(n))
   implicit def apply(n: SafeLong): Number = IntNumber(n)
-  implicit def apply(n: Double): Number = FloatNumber(n)
   implicit def apply(n: BigDecimal): Number = DecimalNumber(n)
-  implicit def apply(n: Natural) = IntNumber(n.toBigInt)
+  implicit def apply(n: Natural): Number = IntNumber(n.toBigInt)
+
+  implicit def apply(n: Double): Number =
+    if (java.lang.Double.isNaN(n) || java.lang.Double.isInfinite(n))
+      throw new IllegalArgumentException(n.toString)
+    else
+      FloatNumber(n)
 
   def apply(s: String): Number = try {
     Number(SafeLong(s))
   } catch {
     case _: Exception => Number(BigDecimal(s))
   }
-
-  //implicit def byteToNumber(n: Byte) = IntNumber(n)
-  //implicit def shortToNumber(n: Short) = IntNumber(n)
-  //implicit def intToNumber(n: Int) = Number(n)
-  //implicit def longToNumber(n: Long) = Number(n)
-  //implicit def bigIntToNumber(n: BigInt) = Number(n)
-  //implicit def doubleToNumber(n: Double) = FloatNumber(n)
-  //implicit def bigDecimalToNumber(n: BigDecimal) = Number(n)
-  //implicit def safeLongToNumber(n: SafeLong) = Number(n)
-  //implicit def naturalToNumber(n: Natural) = Number(n.toBigInt)
-  // TODO: Rational? Real? Complex?
 
   private[math] val minInt = SafeLong(Int.MinValue)
   private[math] val maxInt = SafeLong(Int.MaxValue)
@@ -170,7 +167,7 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
   def /(rhs: Number) = rhs match {
     case IntNumber(m) => n.fold(
       x => m.fold(
-        y => FloatNumber(x.toDouble / y.toDouble),
+        y => Number(x.toDouble / y.toDouble),
         y => DecimalNumber(BigDecimal(x) / BigDecimal(y))
       ),
       x => Number(BigDecimal(x) / m.toBigDecimal)
@@ -197,7 +194,7 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
   private[math] def r_/(lhs: Number) = lhs match {
     case IntNumber(m) => n.fold(
       x => m.fold(
-        y => FloatNumber(y.toDouble / x.toDouble),
+        y => Number(y.toDouble / x.toDouble),
         y => DecimalNumber(BigDecimal(y) / BigDecimal(x))
       ),
       x => Number(m.toBigDecimal / BigDecimal(x))
@@ -244,9 +241,21 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
     case _ => sys.error("%s not an integer" format rhs)
   }
 
-  def floor = this
-  def ceil = this
-  def round = this
+  def sqrt: Number =
+    if (withinDouble)
+      Number(Math.sqrt(n.toDouble))
+    else
+      Number(n.toBigDecimal.sqrt)
+
+  def nroot(k: Int): Number =
+    if (withinDouble)
+      Number(Math.pow(n.toDouble, 1.0 / k))
+    else
+      Number(n.toBigDecimal.nroot(k))
+
+  def floor: Number = this
+  def ceil: Number = this
+  def round: Number = this
 }
 
 private[math] case class FloatNumber(n: Double) extends Number { lhs =>
@@ -357,13 +366,13 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   }
 
   def /%(rhs: Number) = rhs match {
-    case IntNumber(m) => (FloatNumber(n / m.toDouble), FloatNumber(n % m.toDouble))
-    case FloatNumber(m) => (FloatNumber(n / m), FloatNumber(n % m))
+    case IntNumber(m) => (Number(n / m.toDouble), Number(n % m.toDouble))
+    case FloatNumber(m) => (Number(n / m), Number(n % m))
     case t => t r_/% lhs
   }
   private[math] def r_/%(lhs: Number) = lhs match {
-    case IntNumber(m) => (FloatNumber(m.toDouble / n), FloatNumber(m.toDouble % n))
-    case FloatNumber(m) => (FloatNumber(m / n), FloatNumber(m % n))
+    case IntNumber(m) => (Number(m.toDouble / n), Number(m.toDouble % n))
+    case FloatNumber(m) => (Number(m / n), Number(m % n))
     case t => t /% lhs
   }
 
@@ -372,6 +381,9 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
     case _ if rhs.withinDouble => Number(spire.math.pow(n, rhs.doubleValue));
     case _ => Number(spire.math.pow(BigDecimal(n), rhs.toBigDecimal))
   }
+
+  def sqrt: Number = Number(Math.sqrt(n))
+  def nroot(k: Int): Number = Number(Math.pow(n, 1.0 / k))
 
   def floor = Number(Math.floor(n))
   def ceil = Number(Math.ceil(n))
@@ -448,11 +460,12 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
     Number(spire.math.pow(n, rhs.toBigDecimal))
   }
 
-  import spire.algebra.Field
+  def sqrt: Number = Number(n.sqrt)
+  def nroot(k: Int): Number = Number(n.nroot(k))
 
-  def floor = DecimalNumber(IsReal[BigDecimal].floor(n))
-  def ceil = DecimalNumber(IsReal[BigDecimal].ceil(n))
-  def round = DecimalNumber(IsReal[BigDecimal].round(n))
+  def floor = Number(n.floor)
+  def ceil = Number(n.ceil)
+  def round = Number(n.round())
 }
 
 trait NumberInstances {

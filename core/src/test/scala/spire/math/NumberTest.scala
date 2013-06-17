@@ -19,9 +19,7 @@ class NumberPropertiesTest extends PropSpec with ShouldMatchers with GeneratorDr
     forAll { (n: BigInt) => Number(n) should be === SafeLong(n) }
     forAll { (n: BigInt) => Number(n.abs) should be === Natural(n.abs) }
   }
-  property("Number.apply(Double)") {
-    forAll { (n: Double) => Number(n) should be === n }
-  }
+
   property("Number.apply(BigDecimal)") {
     forAll { (n: BigDecimal) => Number(n) should be === n }
   }
@@ -55,6 +53,12 @@ class NumberTest extends FunSuite {
     Number("99.253895895395839583958953895389538958395839583958958953")
   }
 
+  test("doesn't allow sentinel values") {
+    intercept[IllegalArgumentException] { Number(Double.NaN) }
+    intercept[IllegalArgumentException] { Number(Double.PositiveInfinity) }
+    intercept[IllegalArgumentException] { Number(Double.NegativeInfinity) }
+  }
+
   test("operations") {
     assert(Number(3) + Number(4) === Number(7))
 
@@ -67,10 +71,11 @@ class NumberTest extends FunSuite {
     assert(Number(100) ** Number(200.0) === Number(100) ** Number(200))
     assert(Number(100) ** Number(200) === Number("10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"))
 
-    // DecimalNumber is honest that its roots aren't perfect
+    // DecimalNumber is honest when its roots aren't perfect
     val z1 = Number("81") ** Number("0.5") - Number("9.0")
     assert(z1 != 0)
     assert(z1.abs < 0.00000000000001)
+    //assert(Number("81").sqrt - Number("9") == Number(0))
 
     // FloatNumber lies like a fox
     val z2 = Number(81.0) ** Number(0.5) - Number(9.0)
