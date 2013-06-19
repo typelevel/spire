@@ -156,8 +156,6 @@ object ProductTypes {
   val rng = Definition("Rng", Some("Semiring"))(const("zero") :: unary("negate") :: Nil)
   val rig = Definition("Rig", Some("Semiring"))(const("zero") :: const("one") :: Nil)
   val ring = Definition("Ring", Some("Rng"))(fromInt :: const("one") :: Nil)
-  val euclideanRing = Definition("EuclideanRing", Some("Ring"))(binary("quot") :: binary("mod") :: binary("gcd") :: Nil)
-  val field = Definition("Field", Some("EuclideanRing"))(binary("div") :: Nil)
 
   private val eqv: Block = { tpe =>
     import tpe._
@@ -197,7 +195,7 @@ object ProductTypes {
   val eq = Definition("Eq")(eqv :: Nil)
   val order = Definition("Order", Some("Eq"))(compare :: overrideEqv :: Nil)
 
-  val algebra = List(semigroup, monoid, group, abGroup, semiring, rng, rig, ring, euclideanRing, field, eq, order)
+  val algebra = List(semigroup, monoid, group, abGroup, semiring, rng, rig, ring, eq, order)
 
   def algebraProductTypes: String = renderAll("spire.std", "spire.algebra._" :: Nil, 2, 22)(algebra)
 }

@@ -34,10 +34,7 @@ class LawTests extends LawChecker {
   // We skip checking all tuple types, as they are all generated from the same
   // template.
   checkAll("(Int,Int)",           RingLaws[(Int, Int)].ring)
-  checkAll("(Rational,Rational)", RingLaws[(Rational, Rational)].withPred(Predicate { case (r1, r2) =>
-    val P = implicitly[Predicate[Rational]]
-    P(r1) && P(r2)
-  }).field)
+  checkAll("(Rational,Rational)", RingLaws[(Rational, Rational)].ring)
 
   import spire.optional.vectorOrder._
 
