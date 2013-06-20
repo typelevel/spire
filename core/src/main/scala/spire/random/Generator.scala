@@ -228,7 +228,7 @@ abstract class Generator {
   /**
    * Generate an Array[A] using the given Dist[A] instance.
    */
-  def generateArray[A: Dist: ClassTag](n: Int): Array[A] = {
+  def generateArray[@spec A: Dist: ClassTag](n: Int): Array[A] = {
     val arr = new Array[A](n)
     fillArray(arr)
     arr
@@ -237,7 +237,7 @@ abstract class Generator {
   /**
    * Fill an Array[A] using the given Dist[A] instance.
    */
-  def fillArray[A: Dist](arr: Array[A]) {
+  def fillArray[@spec A: Dist](arr: Array[A]) {
     var i = 0
     val len = arr.length
     while (i < len) {

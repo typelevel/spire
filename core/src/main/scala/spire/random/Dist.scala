@@ -4,6 +4,9 @@ import spire.algebra._
 import spire.implicits._
 import spire.math._
 
+import scala.collection.mutable.ArrayBuffer
+import scala.collection.SeqLike
+import scala.collection.generic.CanBuildFrom
 import scala.annotation.tailrec
 import scala.{specialized => spec}
 import scala.reflect.ClassTag
@@ -11,8 +14,16 @@ import scala.reflect.ClassTag
 trait Dist[@spec A] { self =>
   def apply(gen: Generator): A
 
-  final def get(implicit gen: Generator): A =
+  final def get()(implicit gen: Generator): A =
     apply(gen)
+
+  def fill(gen: Generator, arr: Array[A]): Unit = {
+    var i = 0
+    while (i < arr.length) {
+      arr(i) = apply(gen)
+      i += 1
+    }
+  }
 
   final def map[B](f: A => B): Dist[B] =
     new DistFromGen(g => f(apply(g)))
@@ -31,10 +42,12 @@ trait Dist[@spec A] { self =>
   final def given(pred: A => Boolean): Dist[A] =
     filter(pred)
 
-  def until(pred: A => Boolean): Dist[List[A]] = {
-    @tailrec def loop(gen: Generator, a: A, sofar: List[A]): List[A] =
-      if (pred(a))  a :: sofar else loop(gen, self(gen), a :: sofar)
-    new DistFromGen(g => loop(g, self(g), Nil))
+  def until(pred: A => Boolean): Dist[Seq[A]] = {
+    @tailrec def loop(gen: Generator, a: A, buf: ArrayBuffer[A]): Seq[A] = {
+      buf.append(a)
+      if (pred(a)) buf else loop(gen, self(gen), buf)
+    }
+    new DistFromGen(g => loop(g, self(g), ArrayBuffer.empty[A]))
   }
 
   def foldn[B](init: B, n: Int)(f: (B, A) => B): Dist[B] = {
@@ -49,8 +62,34 @@ trait Dist[@spec A] { self =>
     new DistFromGen(g => loop(g, init))
   }
 
-  def repeat(n: Int): Dist[List[A]] =
-    foldn[List[A]](Nil, n)((lst, a) => a :: lst)
+  def pack(n: Int)(implicit ct: ClassTag[A]): Dist[Array[A]] = new Dist[Array[A]] {
+    def apply(gen: Generator): Array[A] = {
+      var i = 0
+      val arr = new Array[A](n)
+      while (i < arr.length) {
+        arr(i) = self(gen)
+        i += 1
+      }
+      arr
+    }
+  }
+
+  def repeat[CC[A] <: Seq[A]](n: Int)(implicit cbf: CanBuildFrom[Nothing, A, CC[A]]): Dist[CC[A]] =
+    new Dist[CC[A]] {
+      def apply(gen: Generator): CC[A] = {
+        val builder = cbf()
+        builder.sizeHint(n)
+        var i = 0
+        while (i < n) {
+          builder += self(gen)
+          i += 1
+        }
+        builder.result()
+      }
+    }
+
+  // def repeat(n: Int): Dist[List[A]] =
+  //   foldn[List[A]](Nil, n)((lst, a) => a :: lst)
 
   def iterate(n: Int, f: A => Dist[A]): Dist[A] =
     if (n == 0) this else flatMap(f).iterate(n - 1 ,f)
@@ -180,6 +219,30 @@ object Dist {
   def fromLongs[A](n: Int)(f: Array[Long] => A): Dist[A] =
     new DistFromGen(g => f(g.generateLongs(n)))
 
+  def mix[A](ds: Dist[A]*): Dist[A] =
+    Dist.oneOf(ds:_*).flatMap(identity)
+
+  def weightedMix[A](tpls: (Double, Dist[A])*): Dist[A] = {
+    val ds = new Array[Dist[A]](tpls.length)
+    val ws = new Array[Double](tpls.length)
+    var i = 0
+    var total = 0.0
+    tpls.foreach { case (w, d) =>
+      total += w
+      ws(i) = total
+      ds(i) = d
+      i += 1
+    }
+
+    new DistFromGen({ g =>
+      val w = g.nextDouble(total)
+      var i = 0
+      while (ws(i) < w) i += 1
+      ds(i).apply(g)
+    })
+  }
+        
+
   implicit val unit: Dist[Unit] = new DistFromGen[Unit](g => ())
   implicit val boolean: Dist[Boolean] = new DistFromGen[Boolean](_.nextBoolean)
   implicit val byte: Dist[Byte] = new DistFromGen[Byte](_.nextInt.toByte)
@@ -280,17 +343,15 @@ object Dist {
 
   def oneOf[A: ClassTag](as: A*): Dist[A] = new Dist[A] {
     private val arr = as.toArray
-    private val len = arr.length
-    def apply(gen: Generator): A = arr(gen.nextInt(len))
+    def apply(gen: Generator): A = arr(gen.nextInt(arr.length))
   }
 
   def cycleOf[A: ClassTag](as: A*): Dist[A] = new Dist[A] {
     private val arr = as.toArray
-    private val len = arr.length
     private var i = 0
     def apply(gen: Generator): A = {
       val a = arr(i)
-      i = (i + 1) % len
+      i = (i + 1) % arr.length
       a
     }
   }
