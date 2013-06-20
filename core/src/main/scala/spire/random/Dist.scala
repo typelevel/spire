@@ -88,9 +88,6 @@ trait Dist[@spec A] { self =>
       }
     }
 
-  // def repeat(n: Int): Dist[List[A]] =
-  //   foldn[List[A]](Nil, n)((lst, a) => a :: lst)
-
   def iterate(n: Int, f: A => Dist[A]): Dist[A] =
     if (n == 0) this else flatMap(f).iterate(n - 1 ,f)
 
