@@ -60,7 +60,7 @@ class UInt(val signed: Int) extends AnyVal {
 
 trait UIntInstances {
   implicit object UIntAlgebra extends UIntIsRig
-  implicit object UIntBooleanAlgebra extends UIntBooleanAlgebra
+  implicit object UIntBitString extends UIntBitString
   implicit object UIntIsReal extends UIntIsReal
 }
 
@@ -86,13 +86,29 @@ private[math] trait UIntOrder extends Order[UInt] {
   def compare(x: UInt, y: UInt) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
-private[math] trait UIntBooleanAlgebra extends BooleanAlgebra[UInt] {
+private[math] trait UIntBitString extends BitString[UInt] {
   def one: UInt = UInt(-1)
   def zero: UInt = UInt(0)
   def and(a: UInt, b: UInt): UInt = a & b
   def or(a: UInt, b: UInt): UInt = a | b
   def complement(a: UInt): UInt = ~a
   override def xor(a: UInt, b: UInt): UInt = a ^ b
+
+  def signed: Boolean = false
+  def width: Int = 32
+  def toHexString(n: UInt): String = Integer.toHexString(n.signed)
+
+  def bitCount(n: UInt): Int = Integer.bitCount(n.signed)
+  def highestOneBit(n: UInt): UInt = UInt(Integer.highestOneBit(n.signed))
+  def lowestOneBit(n: UInt): UInt = UInt(Integer.lowestOneBit(n.signed))
+  def numberOfLeadingZeros(n: UInt): Int = Integer.numberOfLeadingZeros(n.signed)
+  def numberOfTrailingZeros(n: UInt): Int = Integer.numberOfTrailingZeros(n.signed)
+
+  def leftShift(n: UInt, i: Int): UInt = n << i
+  def rightShift(n: UInt, i: Int): UInt = n >> i
+  def signedRightShift(n: UInt, i: Int): UInt = n >>> i
+  def rotateLeft(n: UInt, i: Int): UInt = UInt(Integer.rotateLeft(n.signed, i))
+  def rotateRight(n: UInt, i: Int): UInt = UInt(Integer.rotateRight(n.signed, i))
 }
 
 private[math] trait UIntIsSigned extends Signed[UInt] {

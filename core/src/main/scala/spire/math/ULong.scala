@@ -112,7 +112,7 @@ class ULong(val signed: Long) extends AnyVal {
 
 trait ULongInstances {
   implicit object ULongAlgebra extends ULongIsRig
-  implicit object ULongBooleanAlgebra extends ULongBooleanAlgebra
+  implicit object ULongBitString extends ULongBitString
   implicit object ULongIsReal extends ULongIsReal
 }
 
@@ -138,13 +138,29 @@ private[math] trait ULongOrder extends Order[ULong] {
   def compare(x: ULong, y: ULong) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
-private[math] trait ULongBooleanAlgebra extends BooleanAlgebra[ULong] {
+private[math] trait ULongBitString extends BitString[ULong] {
   def one: ULong = ULong(-1L)
   def zero: ULong = ULong(0L)
   def and(a: ULong, b: ULong): ULong = a & b
   def or(a: ULong, b: ULong): ULong = a | b
   def complement(a: ULong): ULong = ~a
   override def xor(a: ULong, b: ULong): ULong = a ^ b
+
+  def signed: Boolean = false
+  def width: Int = 64
+  def toHexString(n: ULong): String = java.lang.Long.toHexString(n.signed)
+
+  def bitCount(n: ULong): Int = java.lang.Long.bitCount(n.signed)
+  def highestOneBit(n: ULong): ULong = ULong(java.lang.Long.highestOneBit(n.signed))
+  def lowestOneBit(n: ULong): ULong = ULong(java.lang.Long.lowestOneBit(n.signed))
+  def numberOfLeadingZeros(n: ULong): Int = java.lang.Long.numberOfLeadingZeros(n.signed)
+  def numberOfTrailingZeros(n: ULong): Int = java.lang.Long.numberOfTrailingZeros(n.signed)
+
+  def leftShift(n: ULong, i: Int): ULong = n << i
+  def rightShift(n: ULong, i: Int): ULong = n >> i
+  def signedRightShift(n: ULong, i: Int): ULong = n >>> i
+  def rotateLeft(n: ULong, i: Int): ULong = ULong(java.lang.Long.rotateLeft(n.signed, i))
+  def rotateRight(n: ULong, i: Int): ULong = ULong(java.lang.Long.rotateRight(n.signed, i))
 }
 
 private[math] trait ULongIsSigned extends Signed[ULong] {

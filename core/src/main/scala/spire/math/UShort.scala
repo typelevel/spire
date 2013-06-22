@@ -61,7 +61,7 @@ class UShort(val signed: Char) extends AnyVal {
 
 trait UShortInstances {
   implicit object UShortAlgebra extends UShortIsRig
-  implicit object UShortBooleanAlgebra extends UShortBooleanAlgebra
+  implicit object UShortBitString extends UShortBitString
   implicit object UShortIsReal extends UShortIsReal
 }
 
@@ -87,13 +87,35 @@ private[math] trait UShortOrder extends Order[UShort] {
   def compare(x: UShort, y: UShort) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
-private[math] trait UShortBooleanAlgebra extends BooleanAlgebra[UShort] {
+private[math] trait UShortBitString extends BitString[UShort] {
   def one: UShort = UShort(-1: Short)
   def zero: UShort = UShort(0: Short)
   def and(a: UShort, b: UShort): UShort = a & b
   def or(a: UShort, b: UShort): UShort = a | b
   def complement(a: UShort): UShort = ~a
   override def xor(a: UShort, b: UShort): UShort = a ^ b
+
+  def signed: Boolean = false
+  def width: Int = 16
+  def toHexString(n: UShort): String = Integer.toHexString(n.toInt)
+
+  def bitCount(n: UShort): Int = Integer.bitCount(n.toInt)
+  def highestOneBit(n: UShort): UShort = UShort(Integer.highestOneBit(n.toInt))
+  def lowestOneBit(n: UShort): UShort = UShort(Integer.lowestOneBit(n.toInt))
+  def numberOfLeadingZeros(n: UShort): Int = Integer.numberOfLeadingZeros(n.toInt)
+  def numberOfTrailingZeros(n: UShort): Int = Integer.numberOfTrailingZeros(n.toInt)
+
+  def leftShift(n: UShort, i: Int): UShort = n << i
+  def rightShift(n: UShort, i: Int): UShort = n >> i
+  def signedRightShift(n: UShort, i: Int): UShort = n >>> i
+  def rotateLeft(n: UShort, i: Int): UShort = {
+    val j = i & 15
+    (n << j) | (n >>> (16 - j))
+  }
+  def rotateRight(n: UShort, i: Int): UShort = {
+    val j = i & 15
+    (n >>> j) | (n << (16 - j))
+  }
 }
 
 private[math] trait UShortIsSigned extends Signed[UShort] {

@@ -40,6 +40,8 @@ package object syntax {
 
   object booleanAlgebra extends BooleanAlgebraSyntax
 
+  object bitString extends BitStringSyntax
+
   object integral extends IntegralSyntax
   object fractional extends FractionalSyntax
   object numeric extends NumericSyntax
