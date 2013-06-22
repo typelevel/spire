@@ -106,7 +106,7 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
     y
   }
 
-  def fpow(a:BigDecimal, b:BigDecimal) = spire.math.pow(a, b)
+  def fpow(a: BigDecimal, b: BigDecimal) = spire.math.pow(a, b)
 }
 
 object BigDecimalIsTrig {
@@ -120,7 +120,7 @@ object BigDecimalIsTrig {
     } else if (mc == eCache0.mc) {
       return eCache0
     } else if (mc.getPrecision < eCache0.mc.getPrecision) {
-      return eCache0.setScale(mc.getPrecision, BigDecimal.RoundingMode.HALF_UP)
+      return eCache0.setScale(mc.getPrecision, HALF_UP)
     }
 
     val scale = BigInt(10).pow(mc.getPrecision)
@@ -164,7 +164,7 @@ object BigDecimalIsTrig {
     } else if (mc == piCache0.mc) {
       return piCache0
     } else if (mc.getPrecision < piCache0.mc.getPrecision) {
-      return piCache0.setScale(mc.getPrecision, BigDecimal.RoundingMode.HALF_UP)
+      return piCache0.setScale(mc.getPrecision, HALF_UP)
     }
 
     /**
@@ -218,8 +218,8 @@ class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends 
   lazy val pi: BigDecimal = piFromContext(mc)
   protected[std] lazy val twoPi = pi * 2
 
-  def exp(k: BigDecimal): BigDecimal = spire.math.exp(k)
-  def log(a: BigDecimal) = spire.math.log(a)
+  def exp(k: BigDecimal): BigDecimal = spire.math.exp(BigDecimal(k.bigDecimal, mc))
+  def log(a: BigDecimal) = spire.math.log(BigDecimal(a.bigDecimal, mc))
 
   protected[std] val threeSixty = BigDecimal(360)
   def toRadians(a: BigDecimal): BigDecimal = (a * twoPi) / threeSixty
@@ -229,9 +229,62 @@ class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends 
 
   // we can avoid overflow and minimize fp-error via %2pi
   // TODO: use a more precise formulation of sin/cos/tan?
-  def sin(a: BigDecimal): BigDecimal = BigDecimal(Math.sin(modTwoPi(a)), a.mc)
+  //def sin(a: BigDecimal): BigDecimal = BigDecimal(Math.sin(modTwoPi(a)), a.mc)
   def cos(a: BigDecimal): BigDecimal = BigDecimal(Math.cos(modTwoPi(a)), a.mc)
   def tan(a: BigDecimal): BigDecimal = BigDecimal(Math.tan(modTwoPi(a)), a.mc)
+
+  private def macLaurinExpansion[A](x: BigDecimal, scale: Int)(init: A)(f: (BigDecimal, A) => (BigDecimal, A)): BigDecimal = {
+    @tailrec def loop(total: BigDecimal, state: A): BigDecimal = {
+      val (delta, next) = f(x, state)
+      if (delta.signum != 0) loop(total + delta, next) else total
+    }
+    loop(BigDecimal(0, mc), init).setScale(scale, HALF_UP)
+  }
+
+  // def sinReducer(a: BigDecimal): BigDecimal = {
+  //   def worker(a: BigDecimal): BigDecimal =
+  //     a.pow(5) * BigDecimal(16, mc) - a.pow(3) * BigDecimal(20, mc) + a * BigDecimal(5, mc)
+
+  //   val x = sinOld(a / BigDecimal(125, mc))
+  //   //worker(worker(worker(x)))
+  //   println("x=%s x.mc=%s" format (x, x.mc))
+  //   x
+  // }
+
+  def sinOld(a: BigDecimal): BigDecimal = {
+    val x = a % twoPi
+    x + macLaurinExpansion(x, mc.getPrecision)((1, x, BigDecimal(1))) {
+      (x, state) =>
+      val (i, m0, fib0) = state
+      val m1 = m0 * x * x
+      val m2 = m1 * x * x
+      val fib1 = fib0 * (i + 1) * (i + 2)
+      val fib2 = fib1 * (i + 3) * (i + 4)
+      ((m2 / fib2 - m1 / fib1).setScale(mc.getPrecision + 2, HALF_UP), (i + 4, m2, fib2))
+    }
+  }
+
+  def sin(a: BigDecimal): BigDecimal = {
+    val x = a % twoPi
+
+    var result = x
+    var i = 5
+    var m = BigDecimal(120, mc)
+    var delta = x.pow(5) / 120 - x.pow(3) / 6
+
+    while (delta.signum != 0) {
+      result += delta
+
+      val m1 = m * (i + 1) * (i + 2)
+      val m2 = m1 * (i + 3) * (i + 4)
+      delta = (x.pow(i + 4) / m2 - x.pow(i + 2) / m1).setScale(mc.getPrecision + 2, HALF_UP)
+      m = m2
+      i += 4
+    }
+    result.setScale(mc.getPrecision, HALF_UP)
+
+    //x - x.pow(3) / 6 + x.pow(5) / 120 - x.pow(7) / 5040 + x.pow(9) / 362880 - x.pow(11) / 39916800
+  }
 
   // 'a' will range from -1.0 to 1.0
   // TODO: use a more precise formulation of asin/acos/atan?
