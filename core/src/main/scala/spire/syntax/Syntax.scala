@@ -113,6 +113,10 @@ trait BooleanAlgebraSyntax {
   implicit def booleanAlgebraOps[A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
 }
 
+trait BitStringSyntax {
+  implicit def bitStringOps[A: BitString](a: A) = new BitStringOps(a)
+}
+
 trait IntegralSyntax extends
     EuclideanRingSyntax with
     ConvertableFromSyntax with
@@ -181,6 +185,7 @@ trait AllSyntax extends
     InnerProductSpaceSyntax with
     CoordinateSpaceSyntax with
     BooleanAlgebraSyntax with
+    BitStringSyntax with
     IntegralSyntax with
     FractionalSyntax with
     NumericSyntax with
