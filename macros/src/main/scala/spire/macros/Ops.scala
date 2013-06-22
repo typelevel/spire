@@ -178,8 +178,8 @@ object Ops {
 
     // BitString (<< >> >>>)
     ("$less$less", "leftShift"),
-    ("$greater$greater", "rightShift"),
-    ("$greater$greater$greater", "signedRightShift"),
+    ("$greater$greater$greater", "rightShift"),
+    ("$greater$greater", "signedRightShift"),
 
     // VectorSpace
     ("$times$colon", "timesl"),
