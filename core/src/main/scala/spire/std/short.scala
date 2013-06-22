@@ -48,24 +48,24 @@ trait ShortIsBitString extends BitString[Short] {
 
   def signed: Boolean = true
   def width: Int = 16
-  def toHexString(n: Short): String = Integer.toHexString(n)
+  def toHexString(n: Short): String = Integer.toHexString(n & 0xffff)
 
-  def bitCount(n: Short): Int = Integer.bitCount(n)
-  def highestOneBit(n: Short): Short = (Integer.highestOneBit(n) & 0xffff).toShort
-  def lowestOneBit(n: Short): Short = (Integer.lowestOneBit(n) & 0xffff).toShort
-  def numberOfLeadingZeros(n: Short): Int = Integer.numberOfLeadingZeros(n)
-  def numberOfTrailingZeros(n: Short): Int = Integer.numberOfTrailingZeros(n)
+  def bitCount(n: Short): Int = Integer.bitCount(n & 0xffff)
+  def highestOneBit(n: Short): Short = (Integer.highestOneBit(n & 0xffff) & 0xffff).toShort
+  def lowestOneBit(n: Short): Short = (Integer.lowestOneBit(n & 0xffff) & 0xffff).toShort
+  def numberOfLeadingZeros(n: Short): Int = Integer.numberOfLeadingZeros(n & 0xffff) - 16
+  def numberOfTrailingZeros(n: Short): Int = if (n == 0) 16 else Integer.numberOfTrailingZeros(n & 0xffff)
 
-  def leftShift(n: Short, i: Int): Short = ((n << i) & 0xffff).toShort
-  def rightShift(n: Short, i: Int): Short = ((n >>> i) & 0xffff).toShort
-  def signedRightShift(n: Short, i: Int): Short = ((n >> i) & 0xffff).toShort
+  def leftShift(n: Short, i: Int): Short = (((n & 0xffff) << (i & 15)) & 0xffff).toShort
+  def rightShift(n: Short, i: Int): Short = (((n & 0xffff) >>> (i & 15)) & 0xffff).toShort
+  def signedRightShift(n: Short, i: Int): Short = ((n >> (i & 15)) & 0xffff).toShort
   def rotateLeft(n: Short, i: Int): Short = {
     val j = i & 15
-    (((n << j) | (n >>> (8 - j))) & 0xffff).toShort
+    ((((n & 0xffff) << j) | ((n & 0xffff) >>> (16 - j))) & 0xffff).toShort
   }
   def rotateRight(n: Short, i: Int): Short = {
     val j = i & 15
-    (((n >>> j) | (n << (8 - j))) & 0xffff).toShort
+    ((((n & 0xffff) >>> j) | ((n & 0xffff) << (16 - j))) & 0xffff).toShort
   }
 }
 

@@ -114,7 +114,7 @@ trait BooleanAlgebraSyntax {
 }
 
 trait BitStringSyntax {
-  implicit def bitlikeOps[A: BitString](a: A) = new BitStringOps(a)
+  implicit def bitStringOps[A: BitString](a: A) = new BitStringOps(a)
 }
 
 trait IntegralSyntax extends

@@ -57,7 +57,7 @@ class UByte(val signed: Byte) extends AnyVal {
 
 trait UByteInstances {
   implicit object UByteAlgebra extends UByteIsRig
-  implicit object UByteBooleanAlgebra extends UByteBooleanAlgebra
+  implicit object UByteBitString extends UByteBitString
   implicit object UByteIsReal extends UByteIsReal
 }
 
@@ -92,7 +92,7 @@ private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteOrder with U
   def toDouble(n: UByte): Double = n.toDouble
 }
 
-private[math] trait UByteBooleanAlgebra extends BooleanAlgebra[UByte] {
+private[math] trait UByteBitString extends BitString[UByte] {
   def one: UByte = UByte(-1: Byte)
   def zero: UByte = UByte(0: Byte)
   def and(a: UByte, b: UByte): UByte = a & b
