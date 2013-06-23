@@ -81,6 +81,23 @@ package object math {
    */
   final def exp(n: Double): Double = Math.exp(n)
 
+  final def exp(k: Int, precision: Int): BigDecimal = {
+    val mc = new MathContext(precision + 1, RoundingMode.HALF_UP)
+    var i = 2
+    var num = BigInt(2)
+    var denom = BigInt(1)
+    var factorial = BigInt(2)
+
+    val limit = BigInt(10).pow(precision)
+    while (denom < limit) {
+      denom *= i
+      num = num * i + BigInt(1)
+      i += 1
+    }
+    val sum = BigDecimal (num, mc) / BigDecimal(denom, mc)
+    sum.setScale(precision - sum.precision + sum.scale, FLOOR).pow(k)
+  }
+
   final def exp(k: BigDecimal): BigDecimal = {
     // take a BigDecimal to a BigInt power
     @tailrec
@@ -103,7 +120,8 @@ package object math {
     var precision = k.mc.getPrecision + 3
     var leeway = 1000
 
-    while (true) {
+    @tailrec
+    def doit(precision: Int, leeway: Int): BigDecimal = {
       val mc = new MathContext(precision, RoundingMode.HALF_UP)
       var i = 2
       var sum = BigDecimal(1, mc) + k
@@ -119,13 +137,14 @@ package object math {
       }
 
       if (i <= leeway) {
-        return sum.setScale(k.mc.getPrecision - sum.precision + sum.scale, FLOOR)
+        sum.setScale(k.mc.getPrecision - sum.precision + sum.scale, FLOOR)
       } else {
-        precision += 3
-        leeway *= 1000
+        println("  restarted %s" format i)
+        doit(precision + 3, leeway * 1000)
       }
     }
-    null
+
+    doit(k.mc.getPrecision + 3, 1000)
   }
 
   final def exp[A](a: A)(implicit t: Trig[A]): A = t.exp(a)
