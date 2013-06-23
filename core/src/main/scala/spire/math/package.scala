@@ -11,8 +11,10 @@ import spire.syntax.nroot._
 import java.lang.Long.numberOfTrailingZeros
 import java.lang.Math
 import java.math.BigInteger
+import java.math.MathContext
+import java.math.RoundingMode
 
-import BigDecimal.RoundingMode.HALF_UP
+import BigDecimal.RoundingMode.{FLOOR, HALF_UP, CEILING}
 
 package object math {
   // largest possible double as BigDecimal
@@ -37,11 +39,11 @@ package object math {
 
   final def ceil(n: Float): Float = Math.ceil(n).toFloat
   final def ceil(n: Double): Double = Math.ceil(n)
-  final def ceil(n: BigDecimal): BigDecimal = n.setScale(0, BigDecimal.RoundingMode.CEILING)
+  final def ceil(n: BigDecimal): BigDecimal = n.setScale(0, CEILING)
 
   final def floor(n: Float): Float = Math.floor(n).toFloat
   final def floor(n: Double): Double = Math.floor(n)
-  final def floor(n: BigDecimal): BigDecimal = n.setScale(0, BigDecimal.RoundingMode.FLOOR)
+  final def floor(n: BigDecimal): BigDecimal = n.setScale(0, FLOOR)
 
   final def log(n: Double): Double = Math.log(n)
 
@@ -79,17 +81,7 @@ package object math {
    */
   final def exp(n: Double): Double = Math.exp(n)
 
-
   final def exp(k: BigDecimal): BigDecimal = {
-    // TODO: often the last digit or two may be wrong. but this is the
-    // best approximation we have so far. to do better will require
-    // restarting the algorithm with more precision based on a
-    // pessimistic idea of how much rounding error may have accumulated.
-
-    if (k.signum == 0) return BigDecimal(1)
-
-    if (k.signum == -1) return BigDecimal(1) / exp(-k)
-
     // take a BigDecimal to a BigInt power
     @tailrec
     def power(result: BigDecimal, base: BigDecimal, exponent: BigInt): BigDecimal =
@@ -97,31 +89,43 @@ package object math {
       else if (exponent.testBit(0)) power(result * base, base * base, exponent >> 1)
       else power(result, base * base, exponent >> 1)
 
-    val whole = k.setScale(0, HALF_UP)
+    if (k.signum == 0) return BigDecimal(1)
+
+    if (k.signum == -1) return BigDecimal(1) / exp(-k)
+
+    val whole = k.setScale(0, FLOOR)
 
     if (whole.signum > 1) {
       val part = exp(BigDecimal(1) + (k - whole) / whole)
       return power(BigDecimal(1), part, whole.toBigInt)
     }
-  
-    val mc = k.mc
-    var scale = BigDecimal(10, mc).pow(mc.getPrecision + 1)
-  
-    var kk = k
-    var num = BigDecimal(1.0, mc)
-    var denom = BigInt(1)
-    var n = BigDecimal(1, mc)
-    var m = 1
-    while (n < scale) {
-      num = num * m + kk
-      denom = denom * m
-      n = n * m
-      m += 1
-      kk *= k
-      scale *= k
+
+    var precision = k.mc.getPrecision + 3
+    var leeway = 1000
+
+    while (true) {
+      val mc = new MathContext(precision, RoundingMode.HALF_UP)
+      var i = 2
+      var sum = BigDecimal(1, mc) + k
+      var factorial = BigDecimal(2, mc)
+      var kpow = k * k
+      var term = (kpow / factorial).setScale(precision, HALF_UP)
+      while (term.signum != 0 && i < leeway) {
+        i += 1
+        sum += term
+        factorial *= i
+        kpow *= k
+        term = (kpow / factorial).setScale(precision, HALF_UP)
+      }
+
+      if (i <= leeway) {
+        return sum.setScale(k.mc.getPrecision - sum.precision + sum.scale, FLOOR)
+      } else {
+        precision += 3
+        leeway *= 1000
+      }
     }
-  
-    num / BigDecimal(denom, mc)
+    null
   }
 
   final def exp[A](a: A)(implicit t: Trig[A]): A = t.exp(a)
