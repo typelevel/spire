@@ -24,6 +24,7 @@ object Number extends NumberInstances {
   implicit def apply(n: SafeLong): Number = IntNumber(n)
   implicit def apply(n: Double): Number = FloatNumber(n)
   implicit def apply(n: BigDecimal): Number = DecimalNumber(n)
+  implicit def apply(n: Rational): Number = RationalNumber(n)
   implicit def apply(n: Natural) = IntNumber(n.toBigInt)
 
   def apply(s: String): Number = try {
@@ -41,6 +42,7 @@ object Number extends NumberInstances {
   //implicit def bigDecimalToNumber(n: BigDecimal) = Number(n)
   //implicit def safeLongToNumber(n: SafeLong) = Number(n)
   //implicit def naturalToNumber(n: Natural) = Number(n.toBigInt)
+  //implicit def rationalToNumber(n: Rational) = Number(n)
   // TODO: Rational? Real? Complex?
 
   private[math] val minInt = SafeLong(Int.MinValue)
@@ -63,11 +65,13 @@ sealed trait Number extends ScalaNumericConversions {
 
   def canBeInt: Boolean
   def canBeLong: Boolean
+  def isExact: Boolean
 
   def unary_-(): Number
 
   def toBigInt: BigInt
   def toBigDecimal: BigDecimal
+  def toRational: Rational
 
   def +(rhs: Number): Number
   def *(rhs: Number): Number
@@ -126,9 +130,11 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
 
   def canBeInt = isWhole && withinInt
   def canBeLong = isWhole && withinLong
+  def isExact = true
 
   def toBigInt: BigInt = n.toBigInt
   def toBigDecimal: BigDecimal = n.toBigDecimal
+  def toRational: Rational = Rational(n)
 
   def underlying = n.fold(x => new java.lang.Long(x), b => b)
 
@@ -147,6 +153,7 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
     case IntNumber(m) => n == m
     case t: Number => t == this
     case t: BigDecimal => n.toBigDecimal == t
+    case t: Rational => Rational(n) == t
     case t: BigInt => n == t
     case t: Natural => n == t.toBigInt
     case t: SafeLong => n == t
@@ -262,6 +269,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
 
   def canBeInt = isWhole && withinInt
   def canBeLong = isWhole && withinLong
+  def isExact = false
 
   def underlying = new java.lang.Double(n)
   def isWhole = (n % 1) == 0.0
@@ -272,6 +280,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
 
   def toBigInt: BigInt = BigDecimal(n).toBigInt
   def toBigDecimal: BigDecimal = BigDecimal(n)
+  def toRational: Rational = Rational(n)
 
   def compare(rhs: Number) = rhs match {
     case IntNumber(m) => BigDecimal(n) compare m.toBigDecimal
@@ -284,6 +293,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
     case FloatNumber(m) => n == m
     case t: Number => t == this
     case t: BigDecimal => BigDecimal(n) == t
+    case t: Rational => Rational(n) == t
     case t: BigInt => n == t
     case t: Natural => BigDecimal(t.toBigInt) == BigDecimal(n)
     case t: SafeLong => t == n
@@ -392,6 +402,7 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
 
   def canBeInt = isWhole && withinInt
   def canBeLong = isWhole && withinLong
+  def isExact = false
 
   def underlying = n
   def isWhole = n % 1 == 0
@@ -402,6 +413,7 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
 
   def toBigInt: BigInt = n.toBigInt
   def toBigDecimal: BigDecimal = n
+  def toRational: Rational = Rational(n)
 
   def compare(rhs: Number) = n compare rhs.toBigDecimal
 
@@ -409,7 +421,9 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
     case IntNumber(m) => n == m.toBigDecimal
     case FloatNumber(m) => n == m
     case DecimalNumber(m) => n == m
+    case RationalNumber(m) => Rational(n) == m
     case t: BigDecimal => n == t
+    case t: Rational => Rational(n) == t
     case t: BigInt => n == t
     case t: Natural => n == t.toBigInt
     case t: SafeLong => n == t.toBigInt
@@ -453,6 +467,87 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
   def floor = DecimalNumber(IsReal[BigDecimal].floor(n))
   def ceil = DecimalNumber(IsReal[BigDecimal].ceil(n))
   def round = DecimalNumber(IsReal[BigDecimal].round(n))
+}
+
+private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
+
+  override def toString(): String = n.toString
+
+  def abs = RationalNumber(n.abs)
+  def signum = n.signum
+
+  def withinInt = Rational(Int.MinValue) <= n && n <= Rational(Int.MaxValue)
+  def withinLong = Rational(Long.MinValue) <= n && n <= Rational(Long.MaxValue)
+  def withinDouble = Rational(Double.MinValue) <= n && n <= Rational(Double.MaxValue)
+
+  def canBeInt = isWhole && withinInt
+  def canBeLong = isWhole && withinLong
+  def isExact = true
+
+  def underlying = n
+  def isWhole = n % 1 == 0
+  def doubleValue = n.toDouble
+  def floatValue = n.toFloat
+  def longValue = n.toLong
+  def intValue = n.toInt
+
+  def toBigInt: BigInt = n.toBigInt
+  def toBigDecimal: BigDecimal = n.toBigDecimal
+  def toRational: Rational = n
+
+  def compare(rhs: Number) = n compare rhs.toRational
+
+  override def equals(that: Any): Boolean = that match {
+    case IntNumber(m) => n == m.toBigDecimal
+    case FloatNumber(m) => n == m
+    case DecimalNumber(m) => n == m
+    case RationalNumber(m) => n == m
+    case t: BigDecimal => n == t
+    case t: Rational => n == t
+    case t: BigInt => n == t
+    case t: Natural => n == t.toBigInt
+    case t: SafeLong => n == t.toBigInt
+    case t => unifiedPrimitiveEquals(t)
+  }
+
+  def unary_- = Number(-n)
+
+  def +(rhs: Number) = Number(n + rhs.toRational)
+  def *(rhs: Number) = Number(n * rhs.toRational)
+  def -(rhs: Number) = Number(n - rhs.toRational)
+  def /(rhs: Number) = Number(n / rhs.toRational)
+  def /~(rhs: Number) = Number(n /~ rhs.toRational)
+  def %(rhs: Number) = Number(n % rhs.toRational)
+
+  def r_-(lhs: Number) = Number(lhs.toRational - n)
+  def r_/(lhs: Number) = Number(lhs.toRational / n)
+  def r_/~(lhs: Number) = Number(lhs.toRational /~ n)
+  def r_%(lhs: Number) = Number(lhs.toRational % n)
+
+  private def tuplize(t: (Rational, Rational)) = (RationalNumber(t._1), RationalNumber(t._2))
+
+  def /%(rhs: Number) = {
+    val t = n /% rhs.toRational
+    (Number(t._1), Number(t._2))
+  }
+
+  def r_/%(lhs: Number) = {
+    val t = lhs.toRational /% n
+    (Number(t._1), Number(t._2))
+  }
+
+  def pow(rhs: Number) = if (rhs.canBeInt) {
+    Number(n.pow(rhs.intValue))
+  } else {
+    // FIXME: we should actually try to return values with a meaningful approximation context
+    Number(spire.math.pow(n.toDouble, rhs.toDouble)) 
+  }
+
+  import spire.algebra.Field
+
+  def floor = RationalNumber(IsReal[Rational].floor(n))
+  def ceil = RationalNumber(IsReal[Rational].ceil(n))
+  def round = RationalNumber(IsReal[Rational].round(n))
 }
 
 trait NumberInstances {

@@ -25,6 +25,46 @@ class NumberPropertiesTest extends PropSpec with ShouldMatchers with GeneratorDr
   property("Number.apply(BigDecimal)") {
     forAll { (n: BigDecimal) => Number(n) should be === n }
   }
+  property("Number.apply(Rational)") {
+    forAll { (n: Long, _d: Long) => {
+      val d = if (_d == 0) 1 else _d
+      val r = Rational(n, d)
+      Number(r) should be === r
+    }
+    }
+  }
+
+  property("Rational == Int") {
+    forAll { (n: Int) => Number(Rational(n)) should be === n }
+  }
+  property("Int == Rational") {
+    forAll { (n: Int) => n should be === Number(Rational(n)) }
+  }
+  property("Rational == Long") {
+    forAll { (n: Long) => Number(Rational(n)) should be === n }
+  }
+  property("Long == Rational") {
+    forAll { (n: Long) => n should be === Number(Rational(n)) }
+  }
+  property("Rational == BigDecimal") {
+    forAll { (n: BigDecimal) => Number(Rational(n)) should be === n }
+  }
+  property("BigDecimal == Rational") {
+    forAll { (n: BigDecimal) => n should be === Number(Rational(n)) }
+  }
+  property("Rational == BigInt") {
+    forAll { (n: BigInt) => Number(Rational(n)) should be === n }
+  }
+  property("BigInt == Rational") {
+    forAll { (n: BigInt) => n should be === Number(Rational(n)) }
+  }
+  property("Rational == Double") {
+    forAll { (n: Double) => Number(Rational(n)) should be === n }
+  }
+  property("Double == Rational") {
+    forAll { (n: Double) => n should be === Number(Rational(n)) }
+  }
+
 
   property("Long + Long") {
     forAll { (x: Long, y: Long) =>
