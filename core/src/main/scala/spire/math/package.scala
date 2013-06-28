@@ -86,15 +86,14 @@ package object math {
     var i = 2
     var num = BigInt(2)
     var denom = BigInt(1)
-    var factorial = BigInt(2)
 
     val limit = BigInt(10).pow(precision)
     while (denom < limit) {
-      denom *= i
+      denom = denom * i
       num = num * i + BigInt(1)
       i += 1
     }
-    val sum = BigDecimal (num, mc) / BigDecimal(denom, mc)
+    val sum = BigDecimal(num, mc) / BigDecimal(denom, mc)
     sum.setScale(precision - sum.precision + sum.scale, FLOOR).pow(k)
   }
 

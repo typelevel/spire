@@ -89,31 +89,24 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
   // this is newton's method
   override def sqrt(n: BigDecimal): BigDecimal = {
     def approxSqrt(x: BigDecimal): BigDecimal =
-      if (x < Double.MaxValue) {
+      if (x < Double.MaxValue)
         BigDecimal(Math.sqrt(x.toDouble), x.mc)
-      } else {
-        val s = approxSqrt(x / Double.MaxValue)
-        s * BigDecimal(Math.sqrt(Double.MaxValue), x.mc)
-      }
+      else
+        approxSqrt(x / Double.MaxValue) * BigDecimal(Math.sqrt(Double.MaxValue), x.mc)
 
-    var x: BigDecimal = BigDecimal(0, n.mc)
-    var y: BigDecimal = approxSqrt(n)
+    @tailrec def loop(x: BigDecimal, y: BigDecimal): BigDecimal =
+      if (x == y) y else loop(y, ((n / y) + y) / two)
 
-    while (x != y) {
-      x = y
-      y = ((n / x) + x) / two
-    }
-    y
+    loop(BigDecimal(0, n.mc), approxSqrt(n))
   }
 
   def fpow(a: BigDecimal, b: BigDecimal) = spire.math.pow(a, b)
 }
 
 object BigDecimalIsTrig {
-  // TODO: optimize. also consider improving exp() and just using exp(1)
+
   @volatile private var eCache: BigDecimal = null
-  private def eFromContext(mc: MathContext): BigDecimal = {
-    import spire.std.bigDecimal.BigDecimalAlgebra.sqrt
+  private[spire] def eFromContext(mc: MathContext): BigDecimal = {
     val eCache0 = eCache
 
     if (eCache0 == null) {
@@ -123,31 +116,7 @@ object BigDecimalIsTrig {
       return eCache0.setScale(mc.getPrecision, HALF_UP)
     }
 
-    val scale = BigInt(10).pow(mc.getPrecision)
-
-    /**
-     * e = sum(k=0 -> inf)(1/k!) = 1 + 1 + 1/2 + 1/6 + 1/24 + ...
-     *
-     * To avoid doing lots of division, we will just represent e as a
-     * rational approximation (num/denom), multiplying both by each
-     * new k and adding 1 to the numerator.
-     *
-     * We keep track of the current value of k! as n, since once n exceeds
-     * the scale we have small fractions which won't be representable in
-     * the current MathContext.
-     */
-    var num = BigInt(2)
-    var denom = BigInt(1)
-    var n = BigInt(1)
-    var m = 2
-    while (n < scale) {
-      num = num * m + 1
-      denom = denom * m
-      n = n * m
-      m += 1
-    }
-
-    val result = BigDecimal(num, mc) / BigDecimal(denom, mc)
+    val result = spire.math.exp(BigDecimal(1, mc))
     eCache = result
     result
   }
@@ -156,7 +125,7 @@ object BigDecimalIsTrig {
   private final val c3_over_24: Long = (c * c * c) / 24L
 
   @volatile private var piCache: BigDecimal = null
-  private def piFromContext(mc: MathContext): BigDecimal = {
+  private[spire] def piFromContext(mc: MathContext): BigDecimal = {
     val piCache0 = piCache
     import spire.std.bigDecimal.BigDecimalAlgebra.sqrt
 
@@ -164,7 +133,7 @@ object BigDecimalIsTrig {
     } else if (mc == piCache0.mc) {
       return piCache0
     } else if (mc.getPrecision < piCache0.mc.getPrecision) {
-      return piCache0.setScale(mc.getPrecision, HALF_UP)
+      return piCache0.setScale(mc.getPrecision - piCache0.precision + piCache0.scale, HALF_UP)
     }
 
     /**
@@ -195,12 +164,15 @@ object BigDecimalIsTrig {
       }
     }
 
-    val n = java.lang.Math.log10(c3_over_24 / 72).toInt
+    val mc0 = new MathContext(mc.getPrecision + 2, java.math.RoundingMode.FLOOR)
+
+    val n = (mc.getPrecision / java.lang.Math.log10(c3_over_24 / 72)).toInt + 1
     val (p, q, t) = bs(0, n)
-    val sqrtc = sqrt(BigDecimal(10005, mc))
-    val result = (sqrtc * BigDecimal(q * 426880, mc)) / BigDecimal(t, mc)
-    piCache = result
-    result
+    val sqrtc = sqrt(BigDecimal(10005, mc0))
+    val quot = (sqrtc * BigDecimal(q * 426880, mc0)) / BigDecimal(t, mc0)
+    val r = BigDecimal(quot.bigDecimal, mc).setScale(mc.getPrecision - 1, FLOOR)
+    piCache = r
+    r
   }
 
   // TODO: delete or move these into the BigDecimalIsTrig class
@@ -230,61 +202,75 @@ class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends 
   // we can avoid overflow and minimize fp-error via %2pi
   // TODO: use a more precise formulation of sin/cos/tan?
   //def sin(a: BigDecimal): BigDecimal = BigDecimal(Math.sin(modTwoPi(a)), a.mc)
-  def cos(a: BigDecimal): BigDecimal = BigDecimal(Math.cos(modTwoPi(a)), a.mc)
-  def tan(a: BigDecimal): BigDecimal = BigDecimal(Math.tan(modTwoPi(a)), a.mc)
-
-  private def macLaurinExpansion[A](x: BigDecimal, scale: Int)(init: A)(f: (BigDecimal, A) => (BigDecimal, A)): BigDecimal = {
-    @tailrec def loop(total: BigDecimal, state: A): BigDecimal = {
-      val (delta, next) = f(x, state)
-      if (delta.signum != 0) loop(total + delta, next) else total
-    }
-    loop(BigDecimal(0, mc), init).setScale(scale, HALF_UP)
-  }
-
-  // def sinReducer(a: BigDecimal): BigDecimal = {
-  //   def worker(a: BigDecimal): BigDecimal =
-  //     a.pow(5) * BigDecimal(16, mc) - a.pow(3) * BigDecimal(20, mc) + a * BigDecimal(5, mc)
-
-  //   val x = sinOld(a / BigDecimal(125, mc))
-  //   //worker(worker(worker(x)))
-  //   println("x=%s x.mc=%s" format (x, x.mc))
-  //   x
-  // }
-
-  def sinOld(a: BigDecimal): BigDecimal = {
-    val x = a % twoPi
-    x + macLaurinExpansion(x, mc.getPrecision)((1, x, BigDecimal(1))) {
-      (x, state) =>
-      val (i, m0, fib0) = state
-      val m1 = m0 * x * x
-      val m2 = m1 * x * x
-      val fib1 = fib0 * (i + 1) * (i + 2)
-      val fib2 = fib1 * (i + 3) * (i + 4)
-      ((m2 / fib2 - m1 / fib1).setScale(mc.getPrecision + 2, HALF_UP), (i + 4, m2, fib2))
-    }
-  }
+  //def cos(a: BigDecimal): BigDecimal = BigDecimal(Math.cos(modTwoPi(a)), a.mc)
 
   def sin(a: BigDecimal): BigDecimal = {
     val x = a % twoPi
 
-    var result = x
-    var i = 5
-    var m = BigDecimal(120, mc)
-    var delta = x.pow(5) / 120 - x.pow(3) / 6
+    var precision = a.mc.getPrecision + 3
+    var leeway = 1000
 
-    while (delta.signum != 0) {
-      result += delta
+    @tailrec
+    def loop(precision: Int, leeway: Int): BigDecimal = {
+      val mc = new MathContext(precision, java.math.RoundingMode.HALF_UP)
+      var result = x
+      var i = 5
+      var m = BigDecimal(120, mc)
+      var delta = x.pow(5) / 120 - x.pow(3) / 6
+      while (delta.signum != 0) {
+        result += delta
 
-      val m1 = m * (i + 1) * (i + 2)
-      val m2 = m1 * (i + 3) * (i + 4)
-      delta = (x.pow(i + 4) / m2 - x.pow(i + 2) / m1).setScale(mc.getPrecision + 2, HALF_UP)
-      m = m2
-      i += 4
+        val m1 = m * (i + 1) * (i + 2)
+        val m2 = m1 * (i + 3) * (i + 4)
+        delta = (x.pow(i + 4) / m2 - x.pow(i + 2) / m1).setScale(precision, HALF_UP)
+        m = m2
+        i += 4
+      }
+
+      if (i <= leeway)
+        result.setScale(a.mc.getPrecision - result.precision + result.scale, FLOOR)
+      else
+        loop(precision + 3, leeway * 1000)
     }
-    result.setScale(mc.getPrecision, HALF_UP)
 
-    //x - x.pow(3) / 6 + x.pow(5) / 120 - x.pow(7) / 5040 + x.pow(9) / 362880 - x.pow(11) / 39916800
+    loop(a.mc.getPrecision + 3, 1000)
   }
+
+  def cos(a: BigDecimal): BigDecimal = {
+    val x = a % twoPi
+
+    var precision = a.mc.getPrecision + 3
+    var leeway = 1000
+
+    @tailrec
+    def loop(precision: Int, leeway: Int): BigDecimal = {
+      val mc = new MathContext(precision, java.math.RoundingMode.HALF_UP)
+      var result = BigDecimal(1, mc)
+      var i = 4
+      var m = BigDecimal(24, mc)
+      var delta = x.pow(4) / 24 - x.pow(2) / 2
+      while (delta.signum != 0) {
+        result += delta
+
+        val m1 = m * (i + 1) * (i + 2)
+        val m2 = m1 * (i + 3) * (i + 4)
+        delta = (x.pow(i + 4) / m2 - x.pow(i + 2) / m1).setScale(precision, HALF_UP)
+        m = m2
+        i += 4
+      }
+
+      if (i <= leeway)
+        result.setScale(a.mc.getPrecision - result.precision + result.scale, FLOOR)
+      else
+        loop(precision + 3, leeway * 1000)
+    }
+
+    loop(a.mc.getPrecision + 3, 1000)
+  }
+
+  // TODO: we could use a taylor series here as well. but we'd have to
+  // compute bernoulli numbers which i don't feel like doing right now.
+  def tan(a: BigDecimal): BigDecimal = sin(a) / cos(a)
 
   // 'a' will range from -1.0 to 1.0
   // TODO: use a more precise formulation of asin/acos/atan?
