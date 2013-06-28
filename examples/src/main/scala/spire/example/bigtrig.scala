@@ -47,7 +47,9 @@ object TrigTest {
     //testPi()
     //apfloatPi()
 
-    testExp1()
+    testE()
+
+    //testExp1()
     //apfloatExp1()
 
     //testSin1()
@@ -78,6 +80,8 @@ object TrigTest {
     test("sqrt(2)", mc => BigDecimal(2, mc).sqrt, sqrt2String)
   def testPi(): Unit =
     test("pi", mc => new spire.std.BigDecimalIsTrig(mc).pi, piString)
+  def testE(): Unit =
+    test("e", mc => new spire.std.BigDecimalIsTrig(mc).e, eString)
   def testExp1(): Unit =
     test("exp(1)", mc => spire.math.exp(BigDecimal(1, mc)), eString)
   def testSin1(): Unit =

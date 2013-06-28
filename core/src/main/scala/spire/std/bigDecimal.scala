@@ -113,7 +113,7 @@ object BigDecimalIsTrig {
     } else if (mc == eCache0.mc) {
       return eCache0
     } else if (mc.getPrecision < eCache0.mc.getPrecision) {
-      return eCache0.setScale(mc.getPrecision, HALF_UP)
+      return eCache0.setScale(mc.getPrecision - 1, HALF_UP)
     }
 
     val result = spire.math.exp(BigDecimal(1, mc))
@@ -133,7 +133,7 @@ object BigDecimalIsTrig {
     } else if (mc == piCache0.mc) {
       return piCache0
     } else if (mc.getPrecision < piCache0.mc.getPrecision) {
-      return piCache0.setScale(mc.getPrecision - piCache0.precision + piCache0.scale, HALF_UP)
+      return piCache0.setScale(mc.getPrecision - 1, HALF_UP)
     }
 
     /**
