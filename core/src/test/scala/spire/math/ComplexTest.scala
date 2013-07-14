@@ -81,6 +81,19 @@ class ComplexTest extends FunSuite {
     assert (z.imag > -0.000000000000001)
   }
 
+  test("test roots of unity") {
+    val one = Complex.one[Double]
+    val i = Complex.i[Double]
+
+    assert(Complex.rootsOfUnity[Double](2) === Array(one, -one))
+    assert(Complex.rootsOfUnity[Double](4) === Array(one, i, -one, -i))
+
+    val theta = 2.0 * math.Pi / 3.0
+    val c1 = math.cos(theta) + math.sin(theta) * i
+    val c2 = -one - c1
+    assert(Complex.rootsOfUnity[Double](3) === Array(one, c1, c2))
+  }
+
   // TODO: get a way to get Real values for e and pi, and try this for Real
 
   test("try using FastComplex") {

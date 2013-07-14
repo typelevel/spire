@@ -43,11 +43,52 @@ object Complex extends ComplexInstances {
     new Complex(n, BigDecimal(0))
   }
 
-  def polar[@spec(Float, Double) T](magnitude: T, angle: T)(implicit f: Fractional[T], t: Trig[T], r: IsReal[T]) =
+  def polar[@spec(Float, Double) T](magnitude: T, angle: T)(implicit f: Fractional[T], t: Trig[T], r: IsReal[T]): Complex[T] =
     new Complex(magnitude * t.cos(angle), magnitude * t.sin(angle))
 
   def apply[@spec(Float, Double) T](real: T)(implicit f: Fractional[T], t: Trig[T], r: IsReal[T]): Complex[T] =
     new Complex(real, f.zero)
+
+  def rootOfUnity[@spec(Float, Double) T](n: Int, x: Int)(implicit f: Fractional[T], t: Trig[T], r: IsReal[T]): Complex[T] = {
+    if (x == 0) return one[T]
+
+    if (n % 2 == 0) {
+      if (x == n / 2) return -one[T]
+      if (n % 4 == 0) {
+        if (x == n / 4) return i[T]
+        if (x == n * 3 / 4) return -i[T]
+      }
+    }
+
+    polar(f.one, (t.pi * 2 * x) / n)
+  }
+
+  def rootsOfUnity[@spec(Float, Double) T](n: Int)(implicit f: Fractional[T], t: Trig[T], r: IsReal[T]): Array[Complex[T]] = {
+    val roots = new Array[Complex[T]](n)
+    var sum = one[T]
+    roots(0) = sum
+
+    val west = if (n % 2 == 0) n / 2 else -1
+    val north = if (n % 4 == 0) n / 4 else -1
+    val south = if (n % 4 == 0) 3 * n / 4 else -1
+
+    var x = 1
+    val last = n - 1
+    while (x < last) {
+      val c = x match {
+        case `north` => i[T]
+        case `west` => -one[T]
+        case `south` => -i[T]
+        case _ => polar(f.one, (t.pi * 2 * x) / n)
+      }
+      roots(x) = c
+      sum += c
+      x += 1
+    }
+
+    roots(last) = zero[T] - sum
+    roots
+  }
 }
 
 final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: Fractional[T], t: Trig[T], r: IsReal[T])
