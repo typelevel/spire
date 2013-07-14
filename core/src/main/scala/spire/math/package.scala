@@ -153,6 +153,8 @@ package object math {
    * pow() implementations
    */
 
+  // TODO: figure out how much precision we need from log(base) to
+  // make the exp() have the right precision
   final def pow(base: BigDecimal, exponent: BigDecimal) =
     if (exponent.scale == 0 && 0 <= exponent && exponent <= 999999999)
       base.pow(exponent.toInt)
