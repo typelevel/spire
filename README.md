@@ -71,7 +71,7 @@ introduces several new ones, all of which can be found in `spire.math`:
  * `Interval[A]` arithmetic on open, closed, and unbound intervals
  * `Number` boxed type supporting a traditional numeric tower
  * `UByte` through `ULong` value classes supporting unsigned operations
- * `Natural` unsigned, immutable, arbitrary precision intger
+ * `Natural` unsigned, immutable, arbitrary precision integer
  * `EuclideanRational` fractions of types from any Euclidean domain
 
 ### Type Classes
