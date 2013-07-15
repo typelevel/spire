@@ -173,7 +173,7 @@ package object math {
   }
 
   @tailrec private[math] final def bigIntPow(t: BigInt, b: BigInt, e: BigInt): BigInt = {
-    if (e.signum == 0) t * b.pow(e.toInt)
+    if (e.signum == 0) t
     else if (e.testBit(0)) bigIntPow(t * b, b * b, e >> 1)
     else bigIntPow(t, b * b, e >> 1)
   }
