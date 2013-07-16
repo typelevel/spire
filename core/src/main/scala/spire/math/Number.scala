@@ -485,7 +485,7 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
   def isExact = true
 
   def underlying = n
-  def isWhole = n % 1 == 0
+  def isWhole = n.isWhole
   def doubleValue = n.toDouble
   def floatValue = n.toFloat
   def longValue = n.toLong
