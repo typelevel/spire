@@ -14,6 +14,7 @@ class NumberPropertiesTest extends PropSpec with ShouldMatchers with GeneratorDr
     // we need to do (n - 1).abs to ensure we don't get a negative number
     forAll { (n: Long) => Number((n - 1).abs) should be === Natural((n - 1).abs) }
   }
+
   property("Number.apply(BigInt)") {
     forAll { (n: BigInt) => Number(n) should be === n }
     forAll { (n: BigInt) => Number(n) should be === SafeLong(n) }
@@ -23,46 +24,35 @@ class NumberPropertiesTest extends PropSpec with ShouldMatchers with GeneratorDr
   property("Number.apply(BigDecimal)") {
     forAll { (n: BigDecimal) => Number(n) should be === n }
   }
+
   property("Number.apply(Rational)") {
-    forAll { (n: Long, _d: Long) => {
-      val d = if (_d == 0) 1 else _d
+    forAll { (n: BigInt, d0: BigInt) =>
+      val d = if (d0 == 0) BigInt(1) else d0
       val r = Rational(n, d)
       Number(r) should be === r
     }
-    }
   }
 
-  property("Rational == Int") {
-    forAll { (n: Int) => Number(Rational(n)) should be === n }
-  }
-  property("Int == Rational") {
-    forAll { (n: Int) => n should be === Number(Rational(n)) }
-  }
-  property("Rational == Long") {
-    forAll { (n: Long) => Number(Rational(n)) should be === n }
-  }
-  property("Long == Rational") {
-    forAll { (n: Long) => n should be === Number(Rational(n)) }
-  }
-  property("Rational == BigDecimal") {
-    forAll { (n: BigDecimal) => Number(Rational(n)) should be === n }
-  }
-  property("BigDecimal == Rational") {
-    forAll { (n: BigDecimal) => n should be === Number(Rational(n)) }
-  }
-  property("Rational == BigInt") {
-    forAll { (n: BigInt) => Number(Rational(n)) should be === n }
-  }
-  property("BigInt == Rational") {
-    forAll { (n: BigInt) => n should be === Number(Rational(n)) }
-  }
-  property("Rational == Double") {
-    forAll { (n: Double) => Number(Rational(n)) should be === n }
-  }
-  property("Double == Rational") {
-    forAll { (n: Double) => n should be === Number(Rational(n)) }
+  def bothEq[A, B](a: A, b: B) = {
+    a should be === b
+    b should be === a
   }
 
+  property("RationalNumber == Int") {
+    forAll { (n: Int) => bothEq(Number(Rational(n)), n) }
+  }
+
+  property("RationalNumber == Long") {
+    forAll { (n: Long) => bothEq(Number(Rational(n)), n) }
+  }
+
+  property("RationalNumber == Double") {
+    forAll { (n: Double) => bothEq(Number(Rational(n)), n) }
+  }
+
+  property("RationalNumber == BigInt") {
+    forAll { (n: BigInt) => bothEq(Number(Rational(n)), n) }
+  }
 
   property("Long + Long") {
     forAll { (x: Long, y: Long) =>

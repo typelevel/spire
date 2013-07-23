@@ -18,6 +18,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def numeratorAsLong: Long
   def denominatorAsLong: Long
 
+  def isWhole: Boolean
+
   // ugh, ScalaNumber and ScalaNumericConversions in 2.10 require this hack
   override def underlying: List[Any] = sys.error("unimplemented")
 
