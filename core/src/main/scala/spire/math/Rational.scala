@@ -331,6 +331,7 @@ object Rational extends RationalInstances {
     x.fold(LongRationals.unsafeBuild(_, 1L), BigRationals.unsafeBuild(_, BigInt(1)))
 
   implicit def apply(x: Number): Rational = x match {
+    case RationalNumber(n) => apply(n)
     case IntNumber(n) => apply(n)
     case FloatNumber(n) => apply(n)
     case DecimalNumber(n) => apply(n)
