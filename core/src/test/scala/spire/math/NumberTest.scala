@@ -51,7 +51,7 @@ class NumberPropertiesTest extends PropSpec with ShouldMatchers with GeneratorDr
   }
 
   property("RationalNumber == BigInt") {
-    forAll { (n: BigInt) => Number(Rational(n)) === n }
+    forAll { (n: BigInt) => Number(Rational(n)) should be === n }
   }
 
   property("Long + Long") {
