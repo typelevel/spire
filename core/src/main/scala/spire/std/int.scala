@@ -90,7 +90,7 @@ trait IntIsBitString extends BitString[Int] {
 }
 
 trait IntInstances {
-  implicit object IntBitString extends IntIsBitString
-  implicit object IntAlgebra extends IntIsEuclideanRing with IntIsNRoot
-  implicit object IntIsReal extends IntIsReal
+  implicit final val IntBitString = new IntIsBitString {}
+  implicit final val IntAlgebra = new IntIsEuclideanRing with IntIsNRoot {}
+  implicit final val IntIsReal = new IntIsReal {}
 }

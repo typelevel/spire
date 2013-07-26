@@ -70,7 +70,7 @@ trait ByteIsBitString extends BitString[Byte] {
 }
 
 trait ByteInstances {
-  implicit object ByteBitString extends ByteIsBitString
-  implicit object ByteAlgebra extends ByteIsEuclideanRing
-  implicit object ByteIsReal extends ByteIsReal
+  implicit final val ByteBitString = new ByteIsBitString {}
+  implicit final val ByteAlgebra = new ByteIsEuclideanRing {}
+  implicit final val ByteIsReal = new ByteIsReal {}
 }

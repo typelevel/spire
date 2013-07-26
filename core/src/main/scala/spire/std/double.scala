@@ -115,6 +115,6 @@ trait DoubleIsReal extends IsReal[Double] with DoubleOrder with DoubleIsSigned {
 }
 
 trait DoubleInstances {
-  implicit object DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig
-  implicit object DoubleIsReal extends DoubleIsReal
+  implicit final val DoubleAlgebra = new DoubleIsField with DoubleIsNRoot with DoubleIsTrig {}
+  implicit final val DoubleIsReal = new DoubleIsReal {}
 }

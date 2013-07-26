@@ -13,5 +13,5 @@ trait CharOrder extends Order[Char] {
 }
 
 trait CharInstances {
-  implicit object CharOrder extends CharOrder
+  implicit final val CharOrder = new CharOrder {}
 }
