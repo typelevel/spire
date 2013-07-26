@@ -116,6 +116,6 @@ trait FloatIsReal extends IsReal[Float] with FloatOrder with FloatIsSigned {
 }
 
 trait FloatInstances {
-  implicit object FloatAlgebra extends  FloatIsField with FloatIsNRoot with FloatIsTrig
-  implicit object FloatIsReal extends FloatIsReal
+  implicit final val FloatAlgebra = new FloatIsField with FloatIsNRoot with FloatIsTrig {}
+  implicit final val FloatIsReal = new FloatIsReal {}
 }

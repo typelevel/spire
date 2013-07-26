@@ -70,7 +70,7 @@ trait ShortIsBitString extends BitString[Short] {
 }
 
 trait ShortInstances {
-  implicit object ShortBitString extends ShortIsBitString
-  implicit object ShortAlgebra extends ShortIsEuclideanRing
-  implicit object ShortIsReal extends ShortIsReal
+  implicit final val ShortBitString = new ShortIsBitString {}
+  implicit final val ShortAlgebra = new ShortIsEuclideanRing {}
+  implicit final val ShortIsReal = new ShortIsReal {}
 }
