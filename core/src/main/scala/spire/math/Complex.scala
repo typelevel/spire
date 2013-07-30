@@ -35,10 +35,10 @@ object Complex extends ComplexInstances {
   implicit def floatToComplex(n: Float) = new Complex(n, 0.0F)
   implicit def doubleToComplex(n: Double) = new Complex(n, 0.0)
 
-  implicit def bigIntToComplex(n: BigInt) =
+  implicit def bigIntToComplex(n: BigInt): Complex[BigDecimal] =
     bigDecimalToComplex(BigDecimal(n))
 
-  implicit def bigDecimalToComplex(n: BigDecimal) = {
+  implicit def bigDecimalToComplex(n: BigDecimal): Complex[BigDecimal] = {
     implicit val mc = n.mc
     new Complex(n, BigDecimal(0))
   }

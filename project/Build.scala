@@ -1,6 +1,9 @@
 import sbt._
 import sbt.Keys._
 
+import sbtunidoc.Plugin._
+import sbtunidoc.Plugin.UnidocKeys._
+
 object MyBuild extends Build {
 
   // Dependencies
@@ -82,6 +85,8 @@ object MyBuild extends Build {
     name := "spire-aggregate",
     publish := (),
     publishLocal := ()
+  ) ++ unidocSettings ++ Seq(
+    excludedProjects in unidoc in ScalaUnidoc ++= Seq("examples", "benchmark")
   )
 
   // Macros
