@@ -1,4 +1,4 @@
-package spire.algebra
+package spire.laws
 
 import scala.collection.SortedMap
 

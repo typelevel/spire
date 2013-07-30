@@ -1,5 +1,6 @@
-package spire.algebra
+package spire.laws
 
+import spire.algebra.Sign
 import spire.math._
 
 import org.scalacheck.{Arbitrary, Gen}
