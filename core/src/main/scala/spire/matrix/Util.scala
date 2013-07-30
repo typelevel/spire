@@ -1,4 +1,4 @@
-package spire.linearAlgebra
+package spire.matrix
 
 /**
  * Constants used throughout this package

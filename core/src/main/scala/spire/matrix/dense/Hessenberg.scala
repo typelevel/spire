@@ -1,4 +1,4 @@
-package spire.linearAlgebra.dense
+package spire.matrix.dense
 
 /**
  * Hessenberg decomposition.

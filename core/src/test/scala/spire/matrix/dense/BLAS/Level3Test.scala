@@ -1,9 +1,9 @@
-package spire.linearAlgebra.BLAS.level3.FunSuite
+package spire.matrix.BLAS.level3.FunSuite
 
-import spire.linearAlgebra.BLAS
+import spire.matrix.BLAS
 import BLAS.Transposition._
-import spire.linearAlgebra.dense.Matrix
-import spire.linearAlgebra.Constants._
+import spire.matrix.dense.Matrix
+import spire.matrix.Constants._
 
 import org.scalatest.FunSuite
 

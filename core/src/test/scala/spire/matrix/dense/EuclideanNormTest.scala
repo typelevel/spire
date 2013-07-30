@@ -1,6 +1,6 @@
-package spire.linearAlgebra.dense.FunSuite
+package spire.matrix.dense.FunSuite
 
-import spire.linearAlgebra.dense._
+import spire.matrix.dense._
 
 import org.scalatest.FunSuite
 import scala.math.sqrt

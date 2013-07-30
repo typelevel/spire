@@ -20,10 +20,10 @@
  *     enumerations instead
  *
  */
-package spire.linearAlgebra.BLAS.level3
+package spire.matrix.BLAS.level3
 
-import spire.linearAlgebra.dense.MatrixLike
-import spire.linearAlgebra.BLAS._
+import spire.matrix.dense.MatrixLike
+import spire.matrix.BLAS._
 import Transposition._
 
 trait interface {

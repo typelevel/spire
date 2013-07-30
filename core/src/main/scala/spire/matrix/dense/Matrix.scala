@@ -4,11 +4,11 @@
  * Unless specified otherwise, or not obviously so (e.g. `update`),
  * all methods are pure functions.
  */
-package spire.linearAlgebra.dense
+package spire.matrix.dense
 
 import scala.math.sqrt
 import spire.implicits._
-import spire.linearAlgebra.Constants._
+import spire.matrix.Constants._
 
 /**
  * Common features to all dense matrices

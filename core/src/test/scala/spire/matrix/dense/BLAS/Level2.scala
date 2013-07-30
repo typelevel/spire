@@ -1,8 +1,8 @@
-package spire.linearAlgebra.BLAS.level2.FunSuite
+package spire.matrix.BLAS.level2.FunSuite
 
-import spire.linearAlgebra.BLAS
+import spire.matrix.BLAS
 import BLAS.Transposition._
-import spire.linearAlgebra.dense.{Matrix,Vector}
+import spire.matrix.dense.{Matrix,Vector}
 
 import org.scalatest.FunSuite
 

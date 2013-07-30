@@ -19,9 +19,9 @@
  *     in the arguments of type VectorLike.
  *
  */
-package spire.linearAlgebra.BLAS.level1
+package spire.matrix.BLAS.level1
 
-import spire.linearAlgebra.dense.VectorLike
+import spire.matrix.dense.VectorLike
 
 trait interface {
   /**

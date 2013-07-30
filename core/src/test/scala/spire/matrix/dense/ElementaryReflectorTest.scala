@@ -1,8 +1,8 @@
-package spire.linearAlgebra.dense.FunSuite
+package spire.matrix.dense.FunSuite
 
-import spire.linearAlgebra.BLAS
-import spire.linearAlgebra.Constants._
-import spire.linearAlgebra.dense._
+import spire.matrix.BLAS
+import spire.matrix.Constants._
+import spire.matrix.dense._
 
 import scala.math.sqrt
 import org.scalatest.FunSuite

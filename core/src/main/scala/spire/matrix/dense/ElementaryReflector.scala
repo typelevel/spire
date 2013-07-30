@@ -1,10 +1,10 @@
-package spire.linearAlgebra.dense
+package spire.matrix.dense
 
-import spire.linearAlgebra.BLAS
+import spire.matrix.BLAS
 import BLAS.Transposition._
 
 import java.lang.Math.copySign
-import spire.linearAlgebra.NumericPropertiesOfDouble
+import spire.matrix.NumericPropertiesOfDouble
 
 /**
  * Elementary Reflector

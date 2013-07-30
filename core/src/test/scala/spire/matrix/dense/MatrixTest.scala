@@ -1,7 +1,7 @@
-package spire.linearAlgebra.dense.FunSuite
+package spire.matrix.dense.FunSuite
 
-import spire.linearAlgebra.dense.Matrix
-import spire.linearAlgebra.Constants._
+import spire.matrix.dense.Matrix
+import spire.matrix.Constants._
 
 import org.scalatest.FunSuite
 

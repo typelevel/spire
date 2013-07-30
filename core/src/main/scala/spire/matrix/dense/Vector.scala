@@ -1,5 +1,5 @@
-package spire.linearAlgebra.dense
-import spire.linearAlgebra.Constants._
+package spire.matrix.dense
+import spire.matrix.Constants._
 
 /**
  * Simple vector abstraction

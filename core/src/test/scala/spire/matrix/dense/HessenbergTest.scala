@@ -1,9 +1,9 @@
-package spire.linearAlgebra.FunSuite
+package spire.matrix.FunSuite
 
-import spire.linearAlgebra.dense._
-import spire.linearAlgebra.BLAS
-import spire.linearAlgebra.BLAS.Transposition._
-import spire.linearAlgebra.NumericPropertiesOfDouble
+import spire.matrix.dense._
+import spire.matrix.BLAS
+import spire.matrix.BLAS.Transposition._
+import spire.matrix.NumericPropertiesOfDouble
 
 import org.scalatest.FunSuite
 
