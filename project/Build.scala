@@ -69,7 +69,6 @@ object MyBuild extends Build {
     <url>http://github.com/tixxit/</url>
   </developer>
 </developers>
-
     )
   )
 
@@ -81,13 +80,21 @@ object MyBuild extends Build {
 
   lazy val spireSettings = Seq(
     name := "spire-aggregate",
-    publish := false,
-    publishLocal := false
+    publish := (),
+    publishLocal := ()
   )
 
-  lazy val macros = Project("macros", file("macros"))
+  // Macros
 
-  // Core project
+  lazy val macros = Project("macros", file("macros")).
+    settings(macroSettings: _*)
+
+  lazy val macroSettings = Seq(
+    name := "spire-macros"
+  )
+
+  // Core
+
   lazy val core = Project("core", file("core")).
     settings(coreSettings: _*).
     dependsOn(macros)
@@ -116,9 +123,9 @@ object MyBuild extends Build {
     dependsOn(core)
 
   lazy val examplesSettings = Seq(
-    //scalacOptions ++= Seq("-Ymacro-debug-lite"),
-    publish := false,
-    publishLocal := false,
+    name := "spire-examples",
+    publish := (),
+    publishLocal := (),
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "1.2.3",
       "org.apfloat" % "apfloat" % "1.6.3",
@@ -147,6 +154,10 @@ object MyBuild extends Build {
   lazy val key = AttributeKey[Boolean]("javaOptionsPatched")
 
   lazy val benchmarkSettings = Seq(
+    name := "spire-benchmark",
+    publish := (),
+    publishLocal := (),
+
     // raise memory limits here if necessary
     // TODO: this doesn't seem to be working with caliper at the moment :(
   
