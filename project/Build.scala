@@ -4,6 +4,16 @@ import sbt.Keys._
 import sbtunidoc.Plugin._
 import sbtunidoc.Plugin.UnidocKeys._
 
+import com.typesafe.sbt.pgp.PgpKeys._
+
+import sbtrelease._
+import sbtrelease.ReleasePlugin._
+import sbtrelease.ReleasePlugin.ReleaseKeys._
+import sbtrelease.ReleaseStateTransformations._
+import sbtrelease.Utilities._
+
+import sbtbuildinfo.Plugin._
+
 object MyBuild extends Build {
 
   // Dependencies
@@ -11,11 +21,34 @@ object MyBuild extends Build {
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "1.9.1"
   lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.10.0"
 
+  // Release step
+
+  lazy val publishSignedArtifacts = ReleaseStep(
+    action = st => {
+      val extracted = st.extract
+      val ref = extracted.get(thisProjectRef)
+      extracted.runAggregated(publishSigned in Global in ref, st)
+    },
+    check = st => {
+      // getPublishTo fails if no publish repository is set up.
+      val ex = st.extract
+      val ref = ex.get(thisProjectRef)
+      Classpaths.getPublishTo(ex.get(publishTo in Global in ref))
+      st
+    },
+    enableCrossBuild = true
+  )
+
+  lazy val noPublish = Seq(
+    publish := (),
+    publishLocal := (),
+    publishArtifact := false
+  )
+
   // Settings
 
   override lazy val settings = super.settings ++ Seq(
     organization := "org.spire-math",
-    version := "0.6.0-M1",
 
     scalaVersion := "2.10.2",
 
@@ -82,11 +115,22 @@ object MyBuild extends Build {
     settings(spireSettings: _*)
 
   lazy val spireSettings = Seq(
-    name := "spire-aggregate",
-    publish := (),
-    publishLocal := ()
-  ) ++ unidocSettings ++ Seq(
+    name := "spire-aggregate"
+  ) ++ noPublish ++ unidocSettings ++ Seq(
     excludedProjects in unidoc in ScalaUnidoc ++= Seq("examples", "benchmark")
+  ) ++ releaseSettings ++ Seq(
+    releaseProcess := Seq[ReleaseStep](
+      checkSnapshotDependencies,
+      inquireVersions,
+      runTest,
+      setReleaseVersion,
+      commitReleaseVersion,
+      tagRelease,
+      publishSignedArtifacts,
+      setNextVersion,
+      commitNextVersion,
+      pushChanges
+    )
   )
 
   // Macros
@@ -119,6 +163,10 @@ object MyBuild extends Build {
       Seq[File](algebraFile)
     },
     libraryDependencies += scalaCheck % "test"
+  ) ++ buildInfoSettings ++ Seq(
+    sourceGenerators in Compile <+= buildInfo,
+    buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
+    buildInfoPackage := "spire"
   )
 
   // Examples
@@ -129,14 +177,12 @@ object MyBuild extends Build {
 
   lazy val examplesSettings = Seq(
     name := "spire-examples",
-    publish := (),
-    publishLocal := (),
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "1.2.3",
       "org.apfloat" % "apfloat" % "1.6.3",
       "org.jscience" % "jscience" % "4.3.1"
     )
-  )
+  ) ++ noPublish
 
   // Scalacheck binding
 
@@ -160,8 +206,6 @@ object MyBuild extends Build {
 
   lazy val benchmarkSettings = Seq(
     name := "spire-benchmark",
-    publish := (),
-    publishLocal := (),
 
     // raise memory limits here if necessary
     // TODO: this doesn't seem to be working with caliper at the moment :(
@@ -206,6 +250,6 @@ object MyBuild extends Build {
     }
 
     // caliper stuff stolen shamelessly from scala-benchmarking-template
-  )
+  ) ++ noPublish
 
 }
