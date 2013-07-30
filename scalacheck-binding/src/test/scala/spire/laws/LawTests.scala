@@ -1,11 +1,12 @@
-package spire.algebra
+package spire.laws
 
+import spire.algebra._
+import spire.math._
 import spire.implicits.{
   SeqOrder => _, SeqEq => _,
   ArrayOrder => _, ArrayEq => _,
   MapEq => _,
   _ }
-import spire.math._
 
 import scala.{ specialized => spec }
 
