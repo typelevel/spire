@@ -22,12 +22,14 @@
  */
 package spire.matrix.BLAS.level2
 
+import spire.syntax.cfor._
+
 import spire.matrix.dense.MatrixLike
 import spire.matrix.dense.VectorLike
 import spire.matrix.BLAS._
 import Transposition._
 
-trait interface {
+trait Interface {
 
   /**
    * This performs the following operation involving the matrix A,
@@ -38,9 +40,9 @@ trait interface {
    * where $op(A)=A$ or $op(A)=A^T$ depending on the value
    * of the argument `trans`.
    */
-   def GEMV(trans:Transposition.Value,
-            alpha:Double, a:MatrixLike,
-            x:VectorLike, beta:Double, y:VectorLike): Unit
+   def gemv(trans: Transposition.Value,
+            alpha: Double, a: MatrixLike,
+            x: VectorLike, beta: Double, y: VectorLike): Unit
 
    /**
     * This perform the rank-1 update
@@ -49,54 +51,52 @@ trait interface {
     * \]
     * where A is a matrix, x and y are vectors and $\alpha$ is a scalar.
     */
-   def GER(alpha:Double, x:VectorLike, y:VectorLike, a:MatrixLike):Unit
+   def ger(alpha: Double, x: VectorLike, y: VectorLike, a: MatrixLike): Unit
 }
 
-trait naive {
+trait Naive extends Interface {
 
-   def GEMV(trans:Transposition.Value,
-            alpha:Double, a:MatrixLike,
-            x:VectorLike, beta:Double, y:VectorLike): Unit = {
-    require(if(trans == NoTranspose) y.length == a.dimensions._1 &&
-                                     a.dimensions._2 == x.length
-            else                     y.length == a.dimensions._2 &&
-                                     a.dimensions._1 == x.length)
+   def gemv(trans: Transposition.Value,
+            alpha: Double, a: MatrixLike,
+            x: VectorLike, beta: Double, y: VectorLike): Unit = {
+    if (trans == NoTranspose)
+      require(y.length == a.dimensions._1 && a.dimensions._2 == x.length)
+    else
+      require(y.length == a.dimensions._2 && a.dimensions._1 == x.length)
 
     // y := beta y
-    if(beta == 0) {
-      for(i <- 0 until y.length) y(i) = 0
-    }
-    else if(beta != 1) {
-      for(i <- 0 until y.length) y(i) *= beta
-    }
+    if(beta == 0)
+      cfor(0)(_ < y.length, _ + 1) { i => y(i) = 0 }
+    else if(beta != 1)
+      cfor(0)(_ < y.length, _ + 1) { i => y(i) *= beta }
 
     // y += alpha op(A) x
     if(alpha != 0) {
-      val (m,n) = a.dimensions
+      val (m, n) = a.dimensions
       if(trans == NoTranspose) {
-        for(j <- 0 until n) {
-          if(x(j) != 0) {
-            val t = alpha*x(j)
-            for(i <- 0 until m) y(i) += t*a(i,j)
+        cfor(0)(_ < n, _ + 1) { j =>
+          if (x(j) != 0) {
+            val t = alpha * x(j)
+            cfor(0)(_ < m, _ + 1) { i => y(i) += t * a(i,j) }
           }
         }
-      }
-      else {
-        for(j <- 0 until n) {
-          val t = (for(i <- 0 until m) yield a(i,j)*x(i)).sum
-          y(j) += alpha*t
+      } else {
+        cfor(0)(_ < n, _ + 1) { j =>
+          var t = 0.0
+          cfor(0)(_ < m, _ + 1) { i => t += a(i, j) * x(i) }
+          y(j) += alpha * t
         }
       }
     }
-  }
+   }
 
-  def GER(alpha:Double, x:VectorLike, y:VectorLike, a:MatrixLike):Unit = {
+  def ger(alpha: Double, x: VectorLike, y: VectorLike, a: MatrixLike): Unit = {
     require((x.length, y.length) == a.dimensions)
 
-    for(j <- 0 until y.length) {
-      if(y(j) != 0) {
-        val t = alpha*y(j)
-        for(i <- 0 until x.length) a(i,j) += x(i)*t
+    cfor(0)(_ < y.length, _ + 1) { j =>
+      if (y(j) != 0) {
+        val t = alpha * y(j)
+        cfor(0)(_ < x.length, _ + 1) { i => a(i, j) += x(i) * t }
       }
     }
   }

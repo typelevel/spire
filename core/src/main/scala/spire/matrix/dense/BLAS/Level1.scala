@@ -21,9 +21,10 @@
  */
 package spire.matrix.BLAS.level1
 
+import spire.syntax.cfor._
 import spire.matrix.dense.VectorLike
 
-trait interface {
+trait Interface {
   /**
    * Perform the vector operation
    *\[
@@ -31,10 +32,10 @@ trait interface {
    *\]
    *
    */
-  def SCALE(alpha:Double, x:VectorLike): Unit
+  def scale(alpha: Double, x: VectorLike): Unit
 
   /** For a given vector x of length n, perform y(0:n) = x(0:n) */
-  def COPY(x:VectorLike, y:VectorLike): Unit
+  def copy(x: VectorLike, y: VectorLike): Unit
 
   /**
    * Perform the vector operation
@@ -42,19 +43,16 @@ trait interface {
    *     y := \alpha x + y
    * \]
    */
-  def AXPY(alpha:Double, x:VectorLike, y:VectorLike): Unit
+  def axpy(alpha: Double, x: VectorLike, y: VectorLike): Unit
 }
 
-trait naive extends interface {
-  def SCALE(alpha:Double, x:VectorLike): Unit = {
-    for(k <- 0 until x.length) x(k) *= alpha
-  }
+trait Naive extends Interface {
+  def scale(alpha: Double, x: VectorLike): Unit =
+    cfor(0)(_ < x.length, _ + 1) { k => x(k) *= alpha }
 
-  def COPY(x:VectorLike, y:VectorLike): Unit = {
-    for(k <- 0 until x.length) y(k) = x(k)
-  }
+  def copy(x: VectorLike, y: VectorLike): Unit =
+    cfor(0)(_ < x.length, _ + 1) { k => y(k) = x(k) }
 
-  def AXPY(alpha:Double, x:VectorLike, y:VectorLike): Unit = {
-    for(k <- 0 until x.length) y(k) += alpha*x(k)
-  }
+  def axpy(alpha: Double, x: VectorLike, y: VectorLike): Unit =
+    cfor(0)(_ < x.length, _ + 1) { k => y(k) += alpha * x(k) }
 }
