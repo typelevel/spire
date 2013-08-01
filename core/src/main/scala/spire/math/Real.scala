@@ -76,7 +76,6 @@ object Real extends RealInstances {
   implicit def apply(n: Double): Real = Expr(n)
   implicit def apply(n: BigDecimal): Real = Expr(n)
 
-
   implicit object RealCoexpr extends Coexpr[Real] {
     def expr(r: Real): Expr[Real] = r.expr
     def coexpr(e: Expr[Real]): Real = new Real(e)
@@ -84,8 +83,8 @@ object Real extends RealInstances {
 }
 
 trait RealInstances {
-  implicit object RealAlgebra extends RealIsField with RealIsNRoot
-  implicit object RealIsReal extends RealIsReal
+  implicit final val RealAlgebra = new RealIsField with RealIsNRoot {}
+  implicit final val RealIsReal = new RealIsReal {}
 }
 
 private[math] trait RealIsRing extends Ring[Real] {

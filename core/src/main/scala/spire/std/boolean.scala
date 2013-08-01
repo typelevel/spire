@@ -37,7 +37,7 @@ trait BooleanOrder extends Order[Boolean] {
 }
 
 trait BooleanInstances {
-  object BooleanIsBooleanAlgebra extends BooleanIsBooleanAlgebra
-  object BooleanIsRig extends BooleanIsRig
-  object BoolOrder extends BooleanOrder
+  implicit final val BooleanIsBooleanAlgebra = new BooleanIsBooleanAlgebra {}
+  implicit final val BooleanIsRig = new BooleanIsRig {}
+  implicit final val BoolOrder = new BooleanOrder {}
 }

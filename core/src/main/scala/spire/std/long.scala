@@ -101,7 +101,7 @@ trait LongIsBitString extends BitString[Long] {
 }
 
 trait LongInstances {
-  implicit object LongBitString extends LongIsBitString
-  implicit object LongAlgebra extends LongIsEuclideanRing with LongIsNRoot
-  implicit object LongIsReal extends LongIsReal
+  implicit final val LongBitString = new LongIsBitString {}
+  implicit final val LongAlgebra = new LongIsEuclideanRing with LongIsNRoot {}
+  implicit final val LongIsReal = new LongIsReal {}
 }

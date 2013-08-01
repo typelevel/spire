@@ -674,8 +674,8 @@ object Natural extends NaturalInstances {
 }
 
 trait NaturalInstances {
-  implicit object NaturalAlgebra extends NaturalIsRig
-  implicit object NaturalIsReal extends NaturalIsReal
+  implicit final val NaturalAlgebra = new NaturalIsRig {}
+  implicit final val NaturalIsReal = new NaturalIsReal {}
 }
 
 private[math] trait NaturalIsRig extends Rig[Natural] {

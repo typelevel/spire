@@ -41,11 +41,4 @@ object CoordinateSpace {
     val cbf = cbf0
     val dimensions = dimensions0
   }
-
-  def array[@spec(Float, Double) A](dimensions0: Int)(implicit field0: Field[A],
-      classTag0: ClassTag[A]) = new ArrayCoordinateSpace[A] {
-    val scalar = field0
-    val dimensions = dimensions0
-    val classTag = classTag0
-  }
 }

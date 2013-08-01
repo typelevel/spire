@@ -11,7 +11,7 @@ object ArraySupport {
   import spire.syntax.order._
   import spire.syntax.ring._
 
-  def eqv[@spec A](x: Array[A], y: Array[A])(implicit ev: Eq[A]): Boolean = {
+  def eqv[@spec A: Eq](x: Array[A], y: Array[A]): Boolean = {
     var i = 0
     if (x.length != y.length) return false
     while (i < x.length && i < y.length && x(i) === y(i)) i += 1
@@ -26,7 +26,7 @@ object ArraySupport {
     i >= x.length && i >= y.length
   }
 
-  def compare[@spec A](x: Array[A], y: Array[A])(implicit ev: Order[A]): Int = {
+  def compare[@spec A: Order](x: Array[A], y: Array[A]): Int = {
     var i = 0
     while (i < x.length && i < y.length) {
       val cmp = x(i) compare y(i)
@@ -61,7 +61,7 @@ object ArraySupport {
     z
   }
 
-  def negate[@spec A: ClassTag: Ring](x: Array[A]): Array[A] = {
+  def negate[@spec(Int, Long, Float, Double) A: ClassTag: Ring](x: Array[A]): Array[A] = {
     val y = new Array[A](x.length)
     var i = 0
     while (i < x.length) {
@@ -71,7 +71,7 @@ object ArraySupport {
     y
   }
 
-  def plus[@spec A: ClassTag: AdditiveMonoid](x: Array[A], y: Array[A]): Array[A] = {
+  def plus[@spec(Int, Long, Float, Double) A: ClassTag: AdditiveMonoid](x: Array[A], y: Array[A]): Array[A] = {
     val z = new Array[A](spire.math.max(x.length, y.length))
     var i = 0
     while (i < x.length && i < y.length) { z(i) = x(i) + y(i); i += 1 }
@@ -80,7 +80,7 @@ object ArraySupport {
     z
   }
 
-  def minus[@spec A: ClassTag: AdditiveGroup](x: Array[A], y: Array[A]): Array[A] = {
+  def minus[@spec(Int, Long, Float, Double) A: ClassTag: AdditiveGroup](x: Array[A], y: Array[A]): Array[A] = {
     val z = new Array[A](spire.math.max(x.length, y.length))
     var i = 0
     while (i < x.length && i < y.length) { z(i) = x(i) - y(i); i += 1 }
@@ -89,82 +89,75 @@ object ArraySupport {
     z
   }
 
-  def timesl[@spec A: ClassTag: MultiplicativeSemigroup](r: A, x: Array[A]): Array[A] = {
+  def timesl[@spec(Int, Long, Float, Double) A: ClassTag: MultiplicativeSemigroup](r: A, x: Array[A]): Array[A] = {
     val y = new Array[A](x.length)
     var i = 0
     while (i < y.length) { y(i) = r * x(i); i += 1 }
     y
   }
 
-  def dot[@spec A](x: Array[A], y: Array[A])(implicit sc: Rig[A]): A = {
+  def dot[@spec(Int, Long, Float, Double) A](x: Array[A], y: Array[A])(implicit sc: Rig[A]): A = {
     var z = sc.zero
     var i = 0
     while (i < x.length && i < y.length) { z += x(i) * y(i); i += 1 }
     z
   }
 
-  def axis[@spec A](dimensions: Int, i: Int)(implicit ct: ClassTag[A], sc: Rig[A]): Array[A] = {
+  def axis[@spec(Float, Double) A](dimensions: Int, i: Int)(implicit ct: ClassTag[A], sc: Rig[A]): Array[A] = {
     val v = new Array[A](dimensions)
     var j = 0
     while (j < v.length) { v(j) = sc.zero; j += 1 }
     if (i < dimensions) v(i) = sc.one
     v
   }
-
-}
-
-trait ArrayModule[@spec(Int,Long,Float,Double) A] extends Module[Array[A], A] {
-  implicit def classTag: ClassTag[A]
-  def zero: Array[A] = new Array[A](0)
-  def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
-  def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
-  override def minus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.minus(x, y)
-  def timesl(r: A, x: Array[A]): Array[A] = ArraySupport.timesl(r, x)
-}
-
-trait ArrayVectorSpace[@spec(Int,Long,Float,Double) A] extends ArrayModule[A] with VectorSpace[Array[A], A]
-
-trait ArrayInnerProductSpace[@spec(Int,Long,Float,Double) A] extends ArrayVectorSpace[A]
-with InnerProductSpace[Array[A], A] {
-  def dot(v: Array[A], w: Array[A]): A = ArraySupport.dot(v, w)
-}
-
-trait ArrayCoordinateSpace[@spec(Int,Long,Float,Double) A] extends CoordinateSpace[Array[A], A] with ArrayInnerProductSpace[A] {
-  def coord(v: Array[A], i: Int): A = v(i)
-  override def dot(v: Array[A], w: Array[A]): A = ArraySupport.dot(v, w)
-  def axis(i: Int): Array[A] = ArraySupport.axis(dimensions, i)
 }
 
 trait ArrayInstances0 {
-  implicit def ArrayModule[@spec(Int,Long,Float,Double) A](implicit ev: NoImplicit[VectorSpace[Array[A], A]],classTag0: ClassTag[A], scalar0: Ring[A]): Module[Array[A], A] = new ArrayModule[A] {
-    val scalar = scalar0
-    val classTag = classTag0
-  }
+  type NI0[A] = NoImplicit[VectorSpace[Array[A], A]]
+
+  implicit def ArrayModule[@spec(Int,Long,Float,Double) A: NI0: ClassTag: Ring]: Module[Array[A], A] =
+    new Module[Array[A], A] {
+      def scalar = Ring[A]
+      def zero: Array[A] = new Array[A](0)
+      def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
+      def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
+      override def minus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.minus(x, y)
+      def timesl(r: A, x: Array[A]): Array[A] = ArraySupport.timesl(r, x)
+    }
 }
 
 trait ArrayInstances1 extends ArrayInstances0 {
-  implicit def ArrayVectorSpace[@spec(Int,Long,Float,Double) A](implicit
-      ev: NoImplicit[NormedVectorSpace[Array[A], A]], classTag0: ClassTag[A],
-      scalar0: Field[A]): VectorSpace[Array[A], A] = new ArrayVectorSpace[A] {
-    val scalar = scalar0
-    val classTag = classTag0
-  }
+  type NI1[A] = NoImplicit[NormedVectorSpace[Array[A], A]]
 
-  implicit def ArrayEq[@spec(Int,Long,Float,Double) A: Eq]: Eq[Array[A]] =
+  implicit def ArrayVectorSpace[@spec(Int,Long,Float,Double) A: NI1: ClassTag: Field]: VectorSpace[Array[A], A] =
+    new VectorSpace[Array[A], A] {
+      def scalar = Field[A]
+      def zero: Array[A] = new Array[A](0)
+      def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
+      def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
+      override def minus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.minus(x, y)
+      def timesl(r: A, x: Array[A]): Array[A] = ArraySupport.timesl(r, x)
+    }
+
+  implicit def ArrayEq[@spec A: Eq]: Eq[Array[A]] =
     new Eq[Array[A]] {
       def eqv(x: Array[A], y: Array[A]): Boolean = ArraySupport.eqv(x, y)
     }
 }
 
 trait ArrayInstances2 extends ArrayInstances1 {
-  implicit def ArrayInnerProductSpace[@spec(Int,Long,Float,Double) A](implicit
-      scalar0: Field[A], classTag0: ClassTag[A]): InnerProductSpace[Array[A], A] =
-    new ArrayInnerProductSpace[A] {
-      val scalar = scalar0
-      val classTag = classTag0
+  implicit def ArrayInnerProductSpace[@spec(Float, Double) A: Field: ClassTag]: InnerProductSpace[Array[A], A] =
+    new InnerProductSpace[Array[A], A] {
+      def scalar = Field[A]
+      def zero: Array[A] = new Array[A](0)
+      def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
+      def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
+      override def minus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.minus(x, y)
+      def timesl(r: A, x: Array[A]): Array[A] = ArraySupport.timesl(r, x)
+      def dot(x: Array[A], y: Array[A]): A = ArraySupport.dot(x, y)
     }
 
-  implicit def ArrayOrder[@spec(Int,Long,Float,Double) A](implicit A0: Order[A]) =
+  implicit def ArrayOrder[@spec A: Order]: Order[Array[A]] =
     new Order[Array[A]] {
       override def eqv(x: Array[A], y: Array[A]): Boolean = ArraySupport.eqv(x, y)
       def compare(x: Array[A], y: Array[A]): Int = ArraySupport.compare(x, y)
@@ -172,15 +165,28 @@ trait ArrayInstances2 extends ArrayInstances1 {
 }
 
 trait ArrayInstances3 extends ArrayInstances2 {
-  implicit def ArrayNormedVectorSpace[@spec(Int,Long,Float,Double) A](implicit
-      scalar0: Field[A], nroot0: NRoot[A],
-      classTag0: ClassTag[A]): NormedVectorSpace[Array[A], A] = ArrayInnerProductSpace[A].normed
+  implicit def ArrayNormedVectorSpace[@spec(Float, Double) A: Field: NRoot: ClassTag]: NormedVectorSpace[Array[A], A] =
+    ArrayInnerProductSpace[A].normed
 }
 
 trait ArrayInstances extends ArrayInstances3 {
-  implicit def ArrayMonoid[@spec A: ClassTag] =
+  implicit def ArrayMonoid[@spec A: ClassTag]: Monoid[Array[A]] =
     new Monoid[Array[A]] {
       def id = new Array[A](0)
       def op(x: Array[A], y: Array[A]) = ArraySupport.concat(x, y)
+    }
+
+  def ArrayCoordinateSpace[@spec(Float, Double) A: Field: ClassTag](dimensions0: Int): CoordinateSpace[Array[A], A] =
+    new CoordinateSpace[Array[A], A] {
+      final val dimensions = dimensions0
+      def scalar = Field[A]
+      def zero: Array[A] = new Array[A](0)
+      def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
+      def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
+      override def minus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.minus(x, y)
+      def timesl(r: A, x: Array[A]): Array[A] = ArraySupport.timesl(r, x)
+      override def dot(x: Array[A], y: Array[A]): A = ArraySupport.dot(x, y)
+      def coord(v: Array[A], i: Int): A = v(i)
+      def axis(i: Int): Array[A] = ArraySupport.axis(dimensions, i)
     }
 }

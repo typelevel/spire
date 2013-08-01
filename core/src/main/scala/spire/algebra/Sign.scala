@@ -24,7 +24,7 @@ object Sign {
   implicit def apply(i: Int): Sign = 
     if (i == 0) Zero else if (i > 0) Positive else Negative
 
-  implicit object SignAlgebra extends SignAlgebra
+  implicit final val SignAlgebra = new SignAlgebra {}
 
   trait SignAlgebra extends Group[Sign] with Signed[Sign] with Order[Sign] {
     def id: Sign = Zero

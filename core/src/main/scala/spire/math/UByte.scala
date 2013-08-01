@@ -56,9 +56,9 @@ class UByte(val signed: Byte) extends AnyVal {
 }
 
 trait UByteInstances {
-  implicit object UByteAlgebra extends UByteIsRig
-  implicit object UByteBitString extends UByteBitString
-  implicit object UByteIsReal extends UByteIsReal
+  implicit final val UByteAlgebra = new UByteIsRig {}
+  implicit final val UByteBitString = new UByteBitString {}
+  implicit final val UByteIsReal = new UByteIsReal {}
 }
 
 private[math] trait UByteIsRig extends Rig[UByte] {

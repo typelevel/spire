@@ -861,11 +861,11 @@ private[math] object BigRationals extends Rationals[BigInt] {
 }
 
 trait RationalInstances {
-  implicit object RationalAlgebra extends RationalIsField
+  implicit final val RationalAlgebra = new RationalIsField {}
   implicit def RationalIsNRoot(implicit c:ApproximationContext[Rational]) = new RationalIsNRoot {
     implicit def context = c
   }
-  implicit object RationalIsReal extends RationalIsReal
+  implicit final val RationalIsReal = new RationalIsReal {}
 }
 
 private[math] trait RationalIsField extends Field[Rational] {

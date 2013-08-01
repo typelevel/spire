@@ -18,17 +18,18 @@ with AdditiveAbGroup[A] with MultiplicativeGroup[A] with NRoot[A]
 with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A]
 
 object Numeric {
-  implicit object IntIsNumeric extends IntIsNumeric
-  implicit object LongIsNumeric extends LongIsNumeric
-  implicit object FloatIsNumeric extends FloatIsNumeric
-  implicit object DoubleIsNumeric extends DoubleIsNumeric
-  implicit object BigIntIsNumeric extends BigIntIsNumeric
-  implicit object BigDecimalIsNumeric extends BigDecimalIsNumeric
+  implicit final val IntIsNumeric = new IntIsNumeric {}
+  implicit final val LongIsNumeric = new LongIsNumeric {}
+  implicit final val FloatIsNumeric = new FloatIsNumeric {}
+  implicit final val DoubleIsNumeric = new DoubleIsNumeric {}
+  implicit final val BigIntIsNumeric = new BigIntIsNumeric {}
+  implicit final val BigDecimalIsNumeric = new BigDecimalIsNumeric {}
+  implicit final val RealIsNumeric = new RealIsNumeric {}
+
   implicit def RationalIsNumeric(implicit ctx: ApproximationContext[Rational] =
       ApproximationContext(Rational(1, 1000000000))) = new RationalIsNumeric {
     val context = ctx
   }
-  implicit object RealIsNumeric extends RealIsNumeric
   implicit def complexIsNumeric[A: Fractional: Trig: IsReal] = new ComplexIsNumeric
 
   @inline final def apply[A](implicit ev:Numeric[A]):Numeric[A] = ev

@@ -563,8 +563,8 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
 }
 
 trait NumberInstances {
-  implicit object NumberAlgebra extends NumberIsField with NumberIsNRoot with NumberIsTrig
-  implicit object NumberIsReal extends NumberIsReal
+  implicit final val NumberAlgebra = new NumberIsField with NumberIsNRoot with NumberIsTrig {}
+  implicit final val NumberIsReal = new NumberIsReal {}
 }
 
 private[math] trait NumberIsRing extends Ring[Number] {

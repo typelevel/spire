@@ -111,9 +111,9 @@ class ULong(val signed: Long) extends AnyVal {
 }
 
 trait ULongInstances {
-  implicit object ULongAlgebra extends ULongIsRig
-  implicit object ULongBitString extends ULongBitString
-  implicit object ULongIsReal extends ULongIsReal
+  implicit final val ULongAlgebra = new ULongIsRig {}
+  implicit final val ULongBitString = new ULongBitString {}
+  implicit final val ULongIsReal = new ULongIsReal {}
 }
 
 private[math] trait ULongIsRig extends Rig[ULong] {

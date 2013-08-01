@@ -328,8 +328,10 @@ with BigDecimalOrder with BigDecimalIsSigned {
 }
 
 trait BigDecimalInstances {
-  implicit object BigDecimalAlgebra extends BigDecimalIsField with BigDecimalIsNRoot
-  implicit object BigDecimalIsReal extends BigDecimalIsReal
-  implicit def BigDecimalIsTrig(implicit mc: MathContext = BigDecimal.defaultMathContext) =
+  import BigDecimal.defaultMathContext
+
+  implicit final val BigDecimalAlgebra = new BigDecimalIsField with BigDecimalIsNRoot {}
+  implicit final val BigDecimalIsReal = new BigDecimalIsReal {}
+  implicit def BigDecimalIsTrig(implicit mc: MathContext = defaultMathContext) =
     new BigDecimalIsTrig(mc)
 }

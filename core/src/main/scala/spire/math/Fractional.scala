@@ -12,14 +12,14 @@ trait Fractional[@spec(Float, Double) A] extends Field[A] with NRoot[A] with Int
 object Fractional {
   private val ratCtx = ApproximationContext(Rational(1, 1000000000))
 
-  implicit object FloatIsFractional extends FloatIsFractional
-  implicit object DoubleIsFractional extends DoubleIsFractional
-  implicit object BigDecimalIsFractional extends BigDecimalIsFractional
+  implicit final val FloatIsFractional = new FloatIsFractional {}
+  implicit final val DoubleIsFractional = new DoubleIsFractional {}
+  implicit final val BigDecimalIsFractional = new BigDecimalIsFractional {}
+  implicit final val RealIsFractional = new RealIsFractional {}
+  implicit final val NumberIsFractional = new NumberIsFractional {}
+
   implicit def RationalIsFractional(implicit ctx: ApproximationContext[Rational] = ratCtx) =
     new RationalIsFractional { val context = ctx }
-
-  implicit object RealIsFractional extends RealIsFractional
-  implicit object NumberIsFractional extends NumberIsFractional
 
   @inline final def apply[A](implicit ev:Fractional[A]) = ev
 }

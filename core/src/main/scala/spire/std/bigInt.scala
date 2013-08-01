@@ -70,6 +70,6 @@ trait BigIntIsMetricSpace extends MetricSpace[BigInt, BigInt] {
 }
 
 trait BigIntInstances {
-  implicit object BigIntAlgebra extends BigIntIsEuclideanRing with BigIntIsNRoot with BigIntIsMetricSpace
-  implicit object BigIntIsReal extends BigIntIsReal
+  implicit final val BigIntAlgebra = new BigIntIsEuclideanRing with BigIntIsNRoot with BigIntIsMetricSpace {}
+  implicit final val BigIntIsReal = new BigIntIsReal {}
 }
