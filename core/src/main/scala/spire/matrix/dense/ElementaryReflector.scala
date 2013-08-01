@@ -43,7 +43,7 @@ import spire.matrix.NumericPropertiesOfDouble
  * prefer to avoid this ugly hack altogether.
  */
 trait ElementaryReflectorLike
-extends BLAS.level2.interface with BLAS.level1.interface {
+extends BLAS.level2.Interface with BLAS.level1.Interface {
 
   val tau:Double
 
@@ -116,10 +116,10 @@ extends BLAS.level2.interface with BLAS.level1.interface {
       val cb = c.block(1,p)(0,q)
       val cr = c.row(0).block(0,q)
       val vb = essentialPart.block(0,p-1)
-      COPY(cr, w)
-      GEMV(Transpose, alpha=1.0, cb, vb, beta=1.0, w)
-      AXPY(-tau, w, cr)
-      GER(-tau, vb, w, cb)
+      copy(cr, w)
+      gemv(Transpose, alpha=1.0, cb, vb, beta=1.0, w)
+      axpy(-tau, w, cr)
+      ger(-tau, vb, w, cb)
     }
   }
 
@@ -168,10 +168,10 @@ extends BLAS.level2.interface with BLAS.level1.interface {
       val cb = c.block(0,p)(1,q)
       val cc = c.column(0).block(0,p)
       val vb = essentialPart.block(0,q-1)
-      COPY(cc, w)
-      GEMV(NoTranspose, alpha=1.0, cb, vb, beta=1.0, w)
-      AXPY(-tau, w, cc)
-      GER(-tau, w, vb, cb)
+      copy(cc, w)
+      gemv(NoTranspose, alpha=1.0, cb, vb, beta=1.0, w)
+      axpy(-tau, w, cc)
+      ger(-tau, w, vb, cb)
     }
   }
 }
@@ -180,7 +180,7 @@ extends BLAS.level2.interface with BLAS.level1.interface {
  * Elementary reflector companion object to be.
  */
 trait ElementaryReflectorLikeCompanion
-  extends BLAS.level1.interface
+  extends BLAS.level1.Interface
   with EuclideanNorm with NumericPropertiesOfDouble
 {
   val safeMin = safeMinimum/epsilonMachine
@@ -240,7 +240,7 @@ trait ElementaryReflectorLikeCompanion
           // .. rescale x, beta and alpha until beta is accurate enough...
           do {
             count += 1
-            SCALE(safeMinInv, x)
+            scale(safeMinInv, x)
             beta *= safeMinInv
             alpha *= safeMinInv
           } while(beta.abs < safeMin)
@@ -252,7 +252,7 @@ trait ElementaryReflectorLikeCompanion
 
         // Compute tau and v now that we have an accurate beta
         val tau = (beta - alpha)/beta
-        SCALE(1.0/(alpha - beta), x)
+        scale(1.0/(alpha - beta), x)
 
         // Comment verbatim from LAPACK code:
         // if alpha is subnormal, it may lose relative accuracy
@@ -269,11 +269,11 @@ trait ElementaryReflectorLikeCompanion
 
 class ElementaryReflectorWithNaiveBLAS(val tau:Double,
                                        val essentialPart:VectorLike)
-extends ElementaryReflectorLike with BLAS.level1.naive with BLAS.level2.naive
+extends ElementaryReflectorLike with BLAS.level1.Naive with BLAS.level2.Naive
 
 object ElementaryReflectorWithNaiveBLAS
 extends ElementaryReflectorLikeCompanion
-with BLAS.level1.naive with BLAS.level2.naive {
+with BLAS.level1.Naive with BLAS.level2.Naive {
   def apply(tau:Double, v:VectorLike) =
     new ElementaryReflectorWithNaiveBLAS(tau, v)
 }
