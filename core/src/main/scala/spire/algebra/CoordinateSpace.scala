@@ -41,4 +41,18 @@ object CoordinateSpace {
     val cbf = cbf0
     val dimensions = dimensions0
   }
+
+  def array[@spec(Float, Double) A: Field: ClassTag](dimensions0: Int): CoordinateSpace[Array[A], A] =
+    new CoordinateSpace[Array[A], A] {
+      final val dimensions = dimensions0
+      def scalar = Field[A]
+      def zero: Array[A] = new Array[A](0)
+      def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
+      def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
+      override def minus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.minus(x, y)
+      def timesl(r: A, x: Array[A]): Array[A] = ArraySupport.timesl(r, x)
+      override def dot(x: Array[A], y: Array[A]): A = ArraySupport.dot(x, y)
+      def coord(v: Array[A], i: Int): A = v(i)
+      def axis(i: Int): Array[A] = ArraySupport.axis(dimensions, i)
+    }
 }
