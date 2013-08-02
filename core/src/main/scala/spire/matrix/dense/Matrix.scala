@@ -62,7 +62,7 @@ trait MatrixLike extends Iterable[Double] {
     * then fill the k-th diagonal with 1's.
     */
   def copyToUpperDiagonal(k:Int, unitDiagonal:Boolean = false): Matrix = {
-    val result = new Matrix(m, n)
+    val result = Matrix.empty(m, n)
     for(j <- 0 until n) {
       for(i <- 0 to math.min(j-k, m-1)) {
         if(unitDiagonal && i == j) result(j,j) = 1
@@ -78,7 +78,7 @@ trait MatrixLike extends Iterable[Double] {
     * then fill the k-th diagonal with 1's.
     */
   def copyToLowerDiagonal(k:Int, unitDiagonal:Boolean = false): Matrix = {
-    val result = new Matrix(m, n)
+    val result = Matrix.empty(m, n)
     for(j <- 0 until n) {
       for(i <- math.max(j-k,0) until m) {
         if(unitDiagonal && i == j) result(j,j) = 1
@@ -131,26 +131,28 @@ trait MatrixLike extends Iterable[Double] {
   def apply(k:Int): Double
 
   /** Swap the k-th and the l-th element */
-  def swap(k1:Int, k2:Int): Unit = {
+  @inline final def swap(k1: Int, k2: Int): Unit = {
     val tmp = this(k1)
     this(k1) = this(k2)
     this(k2) = tmp
   }
 
   /** Swap the (i,j) and the (k,l) elements */
-  def swap(i1:Int, j1:Int, i2:Int, j2:Int): Unit = {
-    val k1 = j1*m + i1
-    val k2 = j2*m + i2
-    swap(k1,k2)
+  @inline final def swap(i1:Int, j1:Int, i2:Int, j2:Int): Unit = {
+    val k1 = j1 * m + i1
+    val k2 = j2 * m + i2
+    val tmp = this(k1)
+    this(k1) = this(k2)
+    this(k2) = tmp
   }
 
   /**
    * Same matrix as this but with elements rounded to the nearest
    * at the given decimal digit.
    */
-  def round(d:Int) = {
+  def round(d: Int) = {
     val s = 10 pow d
-    new Matrix(m, n, map((x:Double) => (x*s).round.toDouble/s))
+    Matrix(m, n, map((x:Double) => (x*s).round.toDouble/s).toArray)
   }
 
   /** Total number of elements */
@@ -272,7 +274,7 @@ trait MatrixLike extends Iterable[Double] {
 
   /** The transpose of this matrix */
   def transposed: Matrix = {
-    val result = new Matrix(n, m)
+    val result = Matrix.empty(n, m)
     for(i <- 0 until m; j <- 0 until n) result(j,i) = this(i,j)
     result
   }
@@ -293,6 +295,15 @@ trait MatrixLike extends Iterable[Double] {
       result ++= " ]\n"
     }
     result.toString
+  }
+
+  def formatted(fmt: String = "%10.3g"): String = {
+    val sb = new StringBuilder
+    sb.append("\n")
+    for (i <- 0 until m) {
+      sb.append(row(i).map(fmt format _).mkString("[", "  ", "]\n"))
+    }
+    sb.toString
   }
 }
 
@@ -385,6 +396,7 @@ class MatrixBlock(private val a:MatrixLike,
   }
 }
 
+
 /**
  * Matrix whose dimensions are set at runtime.
  *
@@ -407,18 +419,10 @@ class MatrixBlock(private val a:MatrixLike,
  * val a = new Matrix(m, n, elements, given_in_row_major=true)
  * }}}
  */
-class Matrix(rows:Int, columns:Int, itsElements:Traversable[Double] = null,
-             given_in_row_major: Boolean = false)
-  extends MatrixLike {
-
-  require(rows > 0)
-  require(columns > 0)
-  require(itsElements == null || itsElements.size == rows*columns)
-  protected val m = rows
-  protected val n = columns
-  protected var elems = if(itsElements != null) itsElements.toArray
-                        else new Array[Double](m*n)
-  if(itsElements != null && given_in_row_major) permuteFromRowMajorToColumnMajor
+final case class Matrix(m: Int, n: Int, elems: Array[Double]) extends MatrixLike {
+  require(m > 0)
+  require(n > 0)
+  require(elems.length == m * n)
 
   /**
    * Overriden for efficiency
@@ -428,7 +432,7 @@ class Matrix(rows:Int, columns:Int, itsElements:Traversable[Double] = null,
   /**
    * Overloaded for efficiency.
    */
-  def sameElements(other:Matrix) = this.elems === other.elems
+  def sameElements(other: Matrix) = elems === other.elems
 
   /**
    * Permute the elements to change the ordering from row- to column-major.
@@ -441,33 +445,34 @@ class Matrix(rows:Int, columns:Int, itsElements:Traversable[Double] = null,
    *     A. J. W. Duijvestijn.
    *     BIT, 1972 vol. 12 pp. 318-324.
   */
-  def permuteFromRowMajorToColumnMajor = {
+  def permuteFromRowMajorToColumnMajor() = {
     /* In term of transposition, the target is a matrix of dimension (n,m),
        hence the fact that m and n are swapped compared to [1] */
-    def f(k:Int) = (k % m)*n + k/m
-    for(k <- 1 until length-2) {
-      var kn = f(k)
-      while(kn < k) kn = f(kn)
-      if(kn != k) this.swap(kn, k)
+    cfor(1)(_ < length - 2, _ + 1) { k =>
+      var kn = (k % m)*n + k/m
+      while(kn < k) kn = (kn % m)*n + kn/m
+
+      if(kn != k) {
+        val t = elems(kn)
+        elems(kn) = elems(k)
+        elems(k) = t
+      }
     }
   }
-
-  /** Construct a square matrix, zero or with the given elements */
-  def this(m:Int, elements:Traversable[Double] = null) = this(m, m, elements)
 
   /**
    * Set element at row i and column j (indices are 0-based)
    *
    * This implements MatrixLike abstract method
    */
-  def update(i:Int, j:Int, value:Double) = { elems(j*m + i) = value }
+  def update(i: Int, j: Int, value: Double) = { elems(j*m + i) = value }
 
   /**
    * Element at row i and column j (indices are 0-based)
    *
    * This implements MatrixLike abstract method
    */
-  def apply(i:Int, j:Int): Double = elems(j*m + i)
+  def apply(i: Int, j: Int): Double = elems(j*m + i)
 
   /** Set k-th element, assuming column-major layout
     *
@@ -484,31 +489,44 @@ class Matrix(rows:Int, columns:Int, itsElements:Traversable[Double] = null,
 
 /** Matrix companion object */
 object Matrix {
-  /**
-   * Convenience method to create a matrix with given elements in one place
-   * The layout of the elements passed here is row-major so that the rows
-   * may be formatted to read naturally:
-   * {{{
-   * val a = Matrix(2,3)(1, 2, 3,
-   *                     4, 5, 6)
-   * }}}
-   */
 
-  def apply(m:Int, n:Int)(elements:Double*): Matrix =
-    new Matrix(m, n, elements, given_in_row_major=true)
-
-  /**
-   * The identity matrix of dimension m x m
-   */
-  def identity(m:Int): Matrix = {
-    val result = new Matrix(m)
-    for(i <- 0 until m) result(i, i) = 1
-    result
+  def apply(m: Int, n: Int)(elems: Double*): Matrix = {
+    val matrix = Matrix(m, n, elems.toArray)
+    matrix.permuteFromRowMajorToColumnMajor()
+    matrix
   }
 
-  /**
-   * The zero matrix of dimension m x n
-   */
-  def zero(m:Int, n:Int): Matrix = new Matrix(m,n)
-}
+  def identity(m: Int): Matrix = {
+    val arr = new Array[Double](m * m)
+    cfor(0)(_ < arr.length, _ + m + 1) { i => arr(i) = 1.0 }
+    Matrix(m, m, arr)
+  }
 
+  def empty(m:Int, n:Int): Matrix = zero(m, n)
+
+  def zero(m:Int, n:Int): Matrix =
+    Matrix(m, n, new Array[Double](m * n))
+
+  def fromString(s: String): Matrix = {
+    val lines = s.trim.split("\n")
+    val rows = lines.map { line =>
+      if (!line.startsWith("[") || !line.endsWith("]"))
+        throw new IllegalArgumentException()
+      val data = line.substring(1, line.length - 1)
+      data.split(" +").map(_.toDouble).toArray
+    }
+    val n = rows.length
+    if (n < 1) throw new IllegalArgumentException()
+    val m = rows(0).length
+    rows.foreach { row =>
+      if (row.length != m) throw new IllegalArgumentException()
+    }
+    val arr = new Array[Double](m * n)
+    cfor(0)(_ < n, _ + 1) { j =>
+      cfor(0)(_ < m, _ + 1) { i =>
+        arr(j * m + i) = rows(j)(i)
+      }
+    }
+    Matrix(m, n, arr)
+  }
+}

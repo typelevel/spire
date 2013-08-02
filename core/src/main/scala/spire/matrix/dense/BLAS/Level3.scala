@@ -26,7 +26,7 @@ import spire.matrix.dense.MatrixLike
 import spire.matrix.BLAS._
 import Transposition._
 
-trait interface {
+trait Interface {
   /**
    * Performs the matrix-matrix operations
    *
@@ -42,7 +42,7 @@ trait interface {
    *
    * TODO: we could check whether there are such overlaps
    */
-  def GEMM(transA:Transposition.Value, transB:Transposition.Value,
+  def gemm(transA:Transposition.Value, transB:Transposition.Value,
            alpha:Double, a:MatrixLike, b:MatrixLike,
            beta:Double, c:MatrixLike): Unit
 }
@@ -52,9 +52,9 @@ trait interface {
   *
   * No blocking, no parallelism, no vectorisation(?).
   */
-trait naive extends interface {
+trait Naive extends Interface {
 
-  def GEMM(transA:Transposition.Value, transB:Transposition.Value,
+  def gemm(transA:Transposition.Value, transB:Transposition.Value,
            alpha:Double, a:MatrixLike, b:MatrixLike,
            beta:Double, c:MatrixLike): Unit = {
     require(if(transA == NoTranspose) c.dimensions._1 == a.dimensions._1

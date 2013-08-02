@@ -4,6 +4,38 @@ import scala.reflect.macros.Context
 
 object Syntax {
 
+  // def rangeMacro(c: Context)(start: c.Expr[Int], limit: c.Expr[Int])(body: c.Expr[Int => Unit]): c.Expr[Unit] = {
+  //   import c.universe._
+  //   import definitions._
+  //   import Flag._
+
+  //   val u = new Util[c.type](c)
+
+  //   val expr = if (u.isClean(body.tree))
+  //     reify {
+  //       {
+  //         var __i = start.splice
+  //         val __limit = limit.splice
+  //         while (__i < __limit) { body.splice.apply(__i); __i += 1 }
+  //       }
+  //     }
+  //   else
+  //     reify {
+  //       {
+  //         var __i = start.splice
+  //         val __limit = limit.splice
+  //         val __f = body.splice
+  //         while (__i < __limit) { __f.apply(__i); __i += 1 }
+  //       }
+  //     }
+
+  //   /**
+  //    * Instead of just returning 'tree', we will go ahead and inline
+  //    * anonymous functions which are immediately applied.
+  //    */
+  //   u.inlineAndReset[Unit](expr.tree)
+  // }
+
   def cforMacro[A: c.WeakTypeTag](c: Context)(init: c.Expr[A])
      (test: c.Expr[A => Boolean], next: c.Expr[A => A])
      (body: c.Expr[A => Unit]): c.Expr[Unit] = {
@@ -11,17 +43,13 @@ object Syntax {
     import definitions._
     import Flag._
 
-    val c.WeakTypeTag(tpe) = implicitly[c.WeakTypeTag[A]]
+    val u = new Util[c.type](c)
 
-    def isClean(t: Tree): Boolean = t match {
-      case Ident(_: TermName) if t.symbol.asTerm.isStable => true
-      case Function(_, _) => true
-      case _ => false
-    }
+    val c.WeakTypeTag(tpe) = implicitly[c.WeakTypeTag[A]]
 
     def name(s: String) = newTermName(c.fresh(s + "$cfor"))
 
-    val clean = isClean(test.tree) && isClean(next.tree) && isClean(body.tree)
+    val clean = u.isClean(test.tree) && u.isClean(next.tree) && u.isClean(body.tree)
 
     val tree = if (clean) {
       /**
@@ -93,11 +121,17 @@ object Syntax {
      * Instead of just returning 'tree', we will go ahead and inline
      * anonymous functions which are immediately applied.
      */
-    new Util[c.type](c).inlineAndReset[Unit](tree)
+    u.inlineAndReset[Unit](tree)
   }
 
   class Util[C <: Context with Singleton](val c:C) {
     import c.universe._
+
+    def isClean(t: Tree): Boolean = t match {
+      case Ident(_: TermName) if t.symbol.asTerm.isStable => true
+      case Function(_, _) => true
+      case _ => false
+    }
 
     def inlineAndReset[T](tree: Tree): c.Expr[T] =
       c.Expr[T](c.resetAllAttrs(inlineApplyRecursive(tree)))

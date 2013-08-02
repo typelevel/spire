@@ -9,7 +9,7 @@ import org.scalatest.FunSuite
 
 trait HessenbergTestLike extends FunSuite
 with NumericPropertiesOfDouble
-with BLAS.level3.naive
+with BLAS.level3.Naive
 {
   val HessenbergDecomposition: HessenbergDecompositionLikeCompanion
 
@@ -19,16 +19,16 @@ with BLAS.level3.naive
     // TODO: use SYRK instead when we have code to model symmetric matrices
     val (m,n) = q.dimensions
     val d = Matrix.identity(n)
-    GEMM(Transpose, NoTranspose, -1.0, q, q, 1.0, d)
+    gemm(Transpose, NoTranspose, -1.0, q, q, 1.0, d)
     d.norm1/(n*eps)
   }
 
   def decompositionGoodness(a:MatrixLike, q:MatrixLike, h:MatrixLike) = {
     val (m,n) = q.dimensions
-    val qh = new Matrix(m, n)
-    GEMM(NoTranspose, NoTranspose, 1.0, q, h, 0.0, qh)
+    val qh = Matrix.empty(m, n)
+    gemm(NoTranspose, NoTranspose, 1.0, q, h, 0.0, qh)
     val d = a.copyToMatrix
-    GEMM(NoTranspose, Transpose, -1.0, qh, q, 1.0, d)
+    gemm(NoTranspose, Transpose, -1.0, qh, q, 1.0, d)
     // TODO: check LAPACK code as I think it's a wee more complicated than that
     d.norm1/(a.norm1*m*eps)
   }
@@ -48,7 +48,7 @@ with BLAS.level3.naive
       h.transformationWithUnblockedAlgorithm.round(9)
     }
 
-    val m1 = new Matrix(8,8)
+    val m1 = Matrix.empty(8,8)
     m1.block(0,2)(0,2) := Matrix(2,2)(1, 2,
                                       0, 3)
     val a = Matrix(2,3)((10 to 60 by 10).map(-_.toDouble): _*)
@@ -73,7 +73,7 @@ with BLAS.level3.naive
   }
 
   test("Random 5x5 matrix") {
-    val m = new Matrix(5,5)
+    val m = Matrix.empty(5,5)
     val generator = spire.random.Well512.fromTime(0)
     for(k <- 0 until m.length) m(k) = generator.nextDouble(-1.0, 1.0)
     val m0 = m.copyToMatrix

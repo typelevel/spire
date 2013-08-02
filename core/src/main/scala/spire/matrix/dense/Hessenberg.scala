@@ -71,7 +71,7 @@ trait HessenbergDecompositionLike {
    */
   def transformationWithUnblockedAlgorithm:Matrix = {
     val n = a.dimensions._1
-    val result = new Matrix(n, n)
+    val result = Matrix.empty(n, n)
 
     // Initialise result to the identity matrix
     // Note: we assume that q has been created as a zero matrix
