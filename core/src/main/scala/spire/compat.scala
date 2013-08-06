@@ -1,8 +1,9 @@
-package spire.math
+package spire
 
 import spire.algebra._
+import spire.math._
 
-private[math] trait LowViz1 {
+private[spire] trait CompatPriority1 {
   implicit def numeric[A: Ring: ConvertableFrom: Signed: Order]: scala.math.Numeric[A] =
     new ScalaNumericWrapper[A] {
       val order = Order[A]
@@ -22,7 +23,7 @@ private[math] trait LowViz1 {
     }
 }
 
-private[math] trait LowViz2 extends LowViz1 {
+private[spire] trait CompatPriority2 extends CompatPriority1 {
   implicit def fractional [A: Field: ConvertableFrom: Signed: Order]: scala.math.Fractional[A] =
     new ScalaFractionalWrapper[A] {
       val order = Order[A]
@@ -32,7 +33,7 @@ private[math] trait LowViz2 extends LowViz1 {
     }
 }
 
-private[math] trait LowViz3 extends LowViz2 {
+private[spire] trait CompatPriority3 extends CompatPriority2 {
   implicit def integral[A: EuclideanRing: ConvertableFrom: Signed: Order]: scala.math.Integral[A] =
     new ScalaIntegralWrapper[A] {
       val order = Order[A]
@@ -42,4 +43,4 @@ private[math] trait LowViz3 extends LowViz2 {
     }
 }
 
-object compat extends LowViz3
+object compat extends CompatPriority3
