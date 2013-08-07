@@ -23,31 +23,22 @@ object Syntax {
 
     val clean = isClean(test.tree) && isClean(next.tree) && isClean(body.tree)
 
+    val index = name("index")
+    val whileLoop = name("while")
+
     val tree = if (clean) {
       /**
        * If our arguments are all "clean" (anonymous functions or
        * simple identifiers) then we can go ahead and just inline
        * them directly into a while loop.
        */
-      val index = name("index")
-      val whileLoop = name("while")
-      Block(
-        List(
-          ValDef(Modifiers(MUTABLE), index, TypeTree(tpe), init.tree),
-          LabelDef(
-            whileLoop,
-            List(),
-            If(
-              Apply(test.tree, List(Ident(index))),
-              Block(
-                List(
-                  Apply(body.tree, List(Ident(index))),
-                  Assign(Ident(index), Apply(next.tree, List(Ident(index)))),
-                  Apply(Ident(whileLoop), List())),
-                Literal(Constant(()))
-              ),
-              Literal(Constant(()))))),
-        Literal(Constant(())))
+      q"""
+      var $index = $init
+      while ($test($index)) {
+        $body($index)
+        $index = $next($index)
+      }
+      """
 
     } else {
 
@@ -61,32 +52,16 @@ object Syntax {
       val nextName = name("next")
       val bodyName = name("body")
 
-      val f1 = Select(Select(Ident(nme.ROOTPKG), newTermName("scala")), newTypeName("Function1"))
-      val unit = Select(Select(Ident(nme.ROOTPKG), newTermName("scala")), newTypeName("Unit"))
-      val bool = Select(Select(Ident(nme.ROOTPKG), newTermName("scala")), newTypeName("Boolean"))
-
-      val index = name("index")
-      val whileLoop = name("while")
-      Block(
-        List(
-          ValDef(Modifiers(), testName, AppliedTypeTree(f1, List(TypeTree(tpe), bool)), test.tree),
-          ValDef(Modifiers(), nextName, AppliedTypeTree(f1, List(TypeTree(tpe), TypeTree(tpe))), next.tree),
-          ValDef(Modifiers(), bodyName, AppliedTypeTree(f1, List(TypeTree(tpe), unit)), body.tree),
-          ValDef(Modifiers(MUTABLE), index, TypeTree(tpe), init.tree),
-          LabelDef(
-            whileLoop,
-            List(),
-            If(
-              Apply(Ident(testName), List(Ident(index))),
-              Block(
-                List(
-                  Apply(Ident(bodyName), List(Ident(index))),
-                  Assign(Ident(index), Apply(Ident(nextName), List(Ident(index)))),
-                  Apply(Ident(whileLoop), List())),
-                Literal(Constant(()))
-              ),
-              Literal(Constant(()))))),
-        Literal(Constant(())))
+      q"""
+      val $testName: Int => Boolean = $test
+      val $nextName: Int => Int = $next
+      val $bodyName: Int => Unit = $body
+      var $index: Int = $init
+      while ($testName($index)) {
+        $bodyName($index)
+        $index = $nextName($index)
+      }
+      """
     }
 
     /**

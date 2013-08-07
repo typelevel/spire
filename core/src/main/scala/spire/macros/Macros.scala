@@ -6,108 +6,79 @@ import spire.math._
 import spire.algebra._
 
 object Macros {
-  def parseContext(c: Context, lower: BigInt, upper: BigInt): Either[String, BigInt] = {
-    import c.mirror._
+
+  case class LiteralUtil(c: Context) {
     import c.universe._
-    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    parseNumber(s, lower, upper)
+
+    def getString: String = {
+      val Apply(_, List(Apply(_, List(Literal(Constant(s: String)))))) = c.prefix.tree
+      s
+    }
   }
 
+  def parseContext(c: Context, lower: BigInt, upper: BigInt): Either[String, BigInt] =
+    parseNumber(LiteralUtil(c).getString, lower, upper)
 
-  def parseNumber(s: String, lower: BigInt, upper: BigInt): Either[String, BigInt] = {
+  def parseNumber(s: String, lower: BigInt, upper: BigInt): Either[String, BigInt] =
     try {
       val n = BigInt(s)
       if (n < lower || n > upper) Left("illegal constant: %s" format s) else Right(n)
     } catch {
       case _: Exception => Left("illegal constant: %s" format s)
     }
-  }
 
   def byte(c:Context)(): c.Expr[Byte] = {
     import c.mirror._
     import c.universe._
-    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
     parseContext(c, BigInt(-128), BigInt(255)) match {
-      case Right(n) => c.Expr[Byte](Literal(Constant(n.toByte)))
+      case Right(n) => c.Expr(q"${n.toByte}")
       case Left(s) => throw new NumberFormatException(s)
     }
   }
+
   def ubyte(c:Context)(): c.Expr[UByte] = {
     import c.mirror._
     import c.universe._
     parseContext(c, BigInt(0), BigInt(255)) match {
-      case Right(n) =>
-        val e = c.Expr[Byte](Literal(Constant(n.toByte)))
-        reify { spire.math.UByte(e.splice) }
-      case Left(s) =>
-        throw new NumberFormatException(s)
+      case Right(n) => c.Expr(q"spire.math.UByte(${n.toByte})")
+      case Left(s) => throw new NumberFormatException(s)
     }
   }
 
   def short(c:Context)(): c.Expr[Short] = {
     import c.mirror._
     import c.universe._
-    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
     parseContext(c, BigInt(-32768), BigInt(65535)) match {
-      case Right(n) => c.Expr[Short](Literal(Constant(n.toShort)))
+      case Right(n) => c.Expr(q"${n.toShort}")
       case Left(s) => throw new NumberFormatException(s)
     }
   }
+
   def ushort(c:Context)(): c.Expr[UShort] = {
     import c.mirror._
     import c.universe._
-    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
     parseContext(c, BigInt(0), BigInt(65535)) match {
-      case Right(n) =>
-        val e = c.Expr[Short](Literal(Constant(n.toShort)))
-        reify { spire.math.UShort(e.splice) }
-      case Left(s) =>
-        throw new NumberFormatException(s)
+      case Right(n) => c.Expr(q"spire.math.UShort(${n.toShort})")
+      case Left(s) => throw new NumberFormatException(s)
     }
   }
 
   def uint(c:Context)(): c.Expr[UInt] = {
     import c.mirror._
     import c.universe._
-    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
     parseContext(c, BigInt(0), BigInt(4294967295L)) match {
-      case Right(n) =>
-        val e = c.Expr[Int](Literal(Constant(n.toInt)))
-        reify { spire.math.UInt(e.splice) }
-      case Left(s) =>
-        throw new NumberFormatException(s)
+      case Right(n) => c.Expr(q"spire.math.UInt(${n.toInt})")
+      case Left(s) => throw new NumberFormatException(s)
     }
   }
 
   def ulong(c:Context)(): c.Expr[ULong] = {
     import c.mirror._
     import c.universe._
-    val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
     parseContext(c, BigInt(0), BigInt("18446744073709551615")) match {
-      case Right(n) =>
-        val e = c.Expr[Long](Literal(Constant(n.toLong)))
-        reify { spire.math.ULong(e.splice) }
-      case Left(s) =>
-        throw new NumberFormatException(s)
+      case Right(n) => c.Expr(q"spire.math.ULong(${n.toLong})")
+      case Left(s) => throw new NumberFormatException(s)
     }
-  }
-
-  def bigIntApply(c:Context) = {
-    import c.mirror._
-    import c.universe._
-    Select(Select(Select(Ident(newTermName("scala")), newTermName("math")), newTermName("BigInt")), newTermName("apply"))
-  }
-
-  def bigDecimalApply(c:Context) = {
-    import c.mirror._
-    import c.universe._
-    Select(Select(Select(Ident(newTermName("scala")), newTermName("math")), newTermName("BigDecimal")), newTermName("apply"))
-  }
-
-  def rationalApply(c:Context) = {
-    import c.mirror._
-    import c.universe._
-    Select(Select(Select(Ident(newTermName("spire")), newTermName("math")), newTermName("Rational")), newTermName("apply"))
   }
 
   def rational(c:Context)(): c.Expr[Rational] = {
@@ -115,24 +86,13 @@ object Macros {
     import c.universe._
 
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    val mth = rationalApply(c)
-    val bg = bigIntApply(c)
-    
     val r = Rational(s)
 
-    // TODO: might be nice to create "fast" constructors for Rational/BigInt
-    // for these kinds of situations (also for serialization/deserialization).
-    if (r.numerator <= BigInt(Long.MaxValue) &&
-        r.numerator >= BigInt(Long.MinValue) &&
-        r.denominator <= BigInt(Long.MaxValue)) {
-      val ns = List(r.numerator.toLong, r.denominator.toLong)
-      val ts = ns.map(t => Literal(Constant(t)))
-      c.Expr[Rational](Apply(mth, ts))
-    } else {
-      val ns = List(r.numerator.toString, r.denominator.toString)
-      val ts = ns.map(t => Apply(bigIntApply(c), List(Literal(Constant(t)))))
-      c.Expr[Rational](Apply(mth, ts))
-    }
+    val (n, d) = (r.numerator, r.denominator)
+    if (n.isValidLong && d.isValidLong)
+      c.Expr(q"spire.math.Rational(${n.toLong}, ${d.toLong})")
+    else
+      c.Expr(q"spire.math.Rational(BigInt(${n.toString}), BigInt(${d.toString}))")
   }
 
   def formatWhole(c: Context, sep: String): String = {
@@ -181,7 +141,7 @@ object Macros {
     try {
       val s = formatWhole(c, sep)
       val b = BigInt(s) // make sure it's ok
-      c.Expr[BigInt](Apply(bigIntApply(c), List(Literal(Constant(s)))))
+      c.Expr[BigInt](Apply(q"scala.math.BigInt.apply", List(Literal(Constant(s)))))
     } catch {
       case e: Exception =>
         throw new NumberFormatException("illegal %s BigInt constant" format name)
@@ -194,7 +154,7 @@ object Macros {
     try {
       val s = formatDecimal(c, sep, dec)
       val b = BigDecimal(s) // make sure it's ok
-      c.Expr[BigDecimal](Apply(bigDecimalApply(c), List(Literal(Constant(s)))))
+      c.Expr[BigDecimal](Apply(q"scala.math.BigDecimal.apply", List(Literal(Constant(s)))))
     } catch {
       case e: Exception =>
         throw new NumberFormatException("illegal %s BigInt constant" format name)

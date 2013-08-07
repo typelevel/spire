@@ -52,6 +52,8 @@ object MyBuild extends Build {
 
     scalaVersion := "2.10.2",
 
+
+
     // disable annoying warnings about 2.10.x
     conflictWarning in ThisBuild := ConflictWarning.disable,
 
@@ -74,6 +76,9 @@ object MyBuild extends Build {
       "-language:implicitConversions",
       "-feature"
     ),
+
+    resolvers += Resolver.sonatypeRepo("snapshots"),
+    addCompilerPlugin("org.scala-lang.plugins" % "macro-paradise_2.10.2" % "2.0.0-SNAPSHOT"),
 
     publishMavenStyle := true,
     publishArtifact in Test := false,
