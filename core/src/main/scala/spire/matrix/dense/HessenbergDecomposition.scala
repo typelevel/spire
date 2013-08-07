@@ -1,4 +1,6 @@
-package spire.matrix.dense
+package spire.matrix.dense.Hessenberg
+
+import spire.matrix.dense._
 
 /**
  * Hessenberg decomposition.
@@ -42,7 +44,7 @@ package spire.matrix.dense
  *     Society for Industrial and Applied Mathematics,
  *     Philadelphia, PA, Third.
  */
-trait HessenbergDecompositionLike {
+trait DecompositionLike {
 
   protected val a:Matrix
   require(a.isSquare)
@@ -101,11 +103,11 @@ trait HessenbergDecompositionLike {
  *     Philadelphia, PA, Third.
  *
  */
-trait HessenbergDecompositionLikeCompanion {
+trait DecompositionLikeCompanion {
 
   val ElementaryReflector: ElementaryReflectorLikeCompanion
 
-  def apply(a:Matrix, iLo:Int, iHi:Int, tau:Vector): HessenbergDecompositionLike
+  def apply(a:Matrix, iLo:Int, iHi:Int, tau:Vector): DecompositionLike
 
   def optimalWorkingAreaForDecomposeUnblocked(a:MatrixLike) =
     a.dimensions._1
@@ -119,8 +121,7 @@ trait HessenbergDecompositionLikeCompanion {
    *
    * Reference: subroutine DGEHD2 in LAPACK [1]
    */
-  def withUnblockedAlgorithm(a:Matrix,
-                             iLo:Int, iHi:Int): HessenbergDecompositionLike =
+  def withUnblockedAlgorithm(a:Matrix, iLo:Int, iHi:Int): DecompositionLike =
   {
     require(0 <= iLo && iLo < a.dimensions._1)
     require(iLo <= iHi && iHi <= a.dimensions._1)
@@ -138,21 +139,21 @@ trait HessenbergDecompositionLikeCompanion {
     this(a, iLo, iHi, taus)
   }
 
-  def withUnblockedAlgorithm(a:Matrix): HessenbergDecompositionLike =
+  def withUnblockedAlgorithm(a:Matrix): DecompositionLike =
     withUnblockedAlgorithm(a, 0, a.dimensions._1)
 }
 
-class HessenbergDecompositionWithNaiveBLAS(val a:Matrix,
+class DecompositionWithNaiveBLAS(val a:Matrix,
                                            val iLo:Int, val iHi:Int,
                                            val taus:Vector)
-extends HessenbergDecompositionLike {
+extends DecompositionLike {
   val ElementaryReflector = ElementaryReflectorWithNaiveBLAS
 }
 
-object HessenbergDecompositionWithNaiveBLAS
-extends HessenbergDecompositionLikeCompanion {
+object DecompositionWithNaiveBLAS
+extends DecompositionLikeCompanion {
   val ElementaryReflector = ElementaryReflectorWithNaiveBLAS
   def apply(a:Matrix, iLo:Int, iHi:Int,
-            taus:Vector): HessenbergDecompositionLike =
-    new HessenbergDecompositionWithNaiveBLAS(a, iLo, iHi, taus)
+            taus:Vector): DecompositionLike =
+    new DecompositionWithNaiveBLAS(a, iLo, iHi, taus)
 }

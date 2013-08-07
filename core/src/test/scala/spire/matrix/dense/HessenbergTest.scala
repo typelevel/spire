@@ -11,7 +11,7 @@ trait HessenbergTestLike extends FunSuite
 with NumericPropertiesOfDouble
 with BLAS.level3.Naive
 {
-  val HessenbergDecomposition: HessenbergDecompositionLikeCompanion
+  val HessenbergDecomposition: Hessenberg.DecompositionLikeCompanion
 
   val eps = precision
 
@@ -87,5 +87,5 @@ with BLAS.level3.Naive
 }
 
 class HessenbergWithNaiveBLASTest extends HessenbergTestLike {
-  val HessenbergDecomposition = HessenbergDecompositionWithNaiveBLAS
+  val HessenbergDecomposition = Hessenberg.DecompositionWithNaiveBLAS
 }
