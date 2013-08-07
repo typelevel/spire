@@ -79,25 +79,43 @@ class PolynomialTest extends FunSuite {
 		}
 	}
 
-	// test("polynomial arithmetic") {
-	// 	val p1 = Polynomial(Array(Term(Rational(1,2), 0L), Term(Rational(1,4), 2L), Term(Rational(2/1), 1L)))
-	// 	val p2 = Polynomial(Array(Term(Rational(1,2), 0L), Term(Rational(1,4), 2L), Term(Rational(3/1), 1L)))
+	test("polynomial arithmetic") {
+		val pr = implicitly[PolynomialRing[Rational]]
 
-	// 	expectResult(Polynomial(Array(Term(Rational(1,1), 0L), Term(Rational(1,2), 2L), Term(Rational(5/1), 1L)))) {
-	// 		p1 + p2
-	// 	}
+		val p1 = Polynomial(Array(Term(Rational(1,2), 0L), Term(Rational(1,4), 2L), Term(Rational(2/1), 1L)))
+		val p2 = Polynomial(Array(Term(Rational(1,2), 0L), Term(Rational(1,4), 2L), Term(Rational(3/1), 1L)))
 
-	// 	expectResult(Array(Rational(1,16), Rational(0,1), Rational(1,4), Rational(1,4), Rational(1,2), Rational(1,4))) {
-	// 		(p1 * p2).coeffs
-	// 	}
+		def legendres(i: Int)(implicit r: Numeric[Rational]) : List[Polynomial[Rational]] = {
+		  val one = Polynomial(Map(0L -> r.one))
+		  val x = Polynomial(Map(1L -> r.one))
+		  lazy val leg : Stream[Polynomial[Rational]] = {
+		    def loop(pnm1: Polynomial[Rational], pn: Polynomial[Rational], n: Int = 1) : Stream[Polynomial[Rational]] = {
+		      pn #:: loop(pn, pr.times(Polynomial(Map(0L -> r.fromInt(n + 1).reciprocal)), pr.plus(
+		                 (pr.times(Polynomial(Map(1L -> r.fromInt(2 * n + 1))), pn)), 
+		                 (pr.times(Polynomial(Map(0L -> r.fromInt(n).unary_-)), pnm1)))), n + 1)
+		    }
+		    one #:: loop(one, x)
+		  }
+		  leg.take(i).toList
+		}
 
-	// 	expectResult(Polynomial(Array(Term(Rational(-1,1), 1L)))) {
-	// 		p1 % p2
-	// 	}
+		val leg = legendres(4)
 
-	// 	expectResult(Polynomial(Array(Term(Rational(1,1), 0L)))) {
-	// 		p2 /~ p2
-	// 	}
-	// }
+		expectResult(Polynomial(Array(Term(Rational(1,1), 0L), Term(Rational(1,2), 2L), Term(Rational(5/1), 1L)))) {
+			pr.plus(p1, p2)
+		}
+
+		expectResult(Polynomial(Array(Term(Rational(15,4), 5L), Term(Rational(-5,4), 3L), Term(Rational(3,4), 1L)))) {
+			pr.times(leg(2), leg(3))
+		}
+
+		expectResult(Polynomial(Array(Term(Rational(-1,1), 1L)))) {
+			pr.mod(p1, p2)
+		}
+
+		expectResult(Polynomial(Array(Term(Rational(1,1), 0L)))) {
+			pr.quot(p1, p2)
+		}
+	}
 
 }

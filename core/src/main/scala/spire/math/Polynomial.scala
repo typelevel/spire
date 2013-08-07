@@ -1,10 +1,10 @@
 package spire.math
 
+import compat._
 import scala.annotation.tailrec
 import scala.reflect._
 import spire.algebra._
 import spire.implicits._
-import compat._
 import spire.syntax._
 
 /*	Polynomial
@@ -108,12 +108,12 @@ case class Polynomial[C: ClassTag](data: Map[Long, C]) {
     Polynomial(data.map { case (e, c) => (e, c / m) })
   }
 	
-  def derivative(implicit r: Ring[C]): Polynomial[C] =
+  def derivative(implicit r: Ring[C], eq: Eq[C]): Polynomial[C] =
     Polynomial(data.flatMap { case (e, c) =>
       if (e > 0) Some(Term(c, e).der) else None
     })
 	
-  def integral(implicit f: Field[C]): Polynomial[C] =
+  def integral(implicit f: Field[C], eq: Eq[C]): Polynomial[C] =
     Polynomial(data.map(t => Term.fromTuple(t).int))
 	
   def show(implicit o: Order[C], r: Ring[C]) : String =
@@ -130,8 +130,13 @@ case class Polynomial[C: ClassTag](data: Map[Long, C]) {
 
 object Polynomial {
 
-  def apply[C: ClassTag](terms: Iterable[Term[C]]): Polynomial[C] =
-    Polynomial(terms.map(_.toTuple).toMap)
+	/* We have to get rid of coeff=zero terms here for long division
+		 operations.
+	 	I think we should have an Eq[C] and Ring[C] requirement for Polys.
+	*/
+  def apply[C: ClassTag](terms: Iterable[Term[C]])
+  											(implicit eq: Eq[C], r: Ring[C]): Polynomial[C] =
+    Polynomial(terms.filterNot(_.isZero).map(_.toTuple).toMap)
 
   implicit def pRD: PolynomialRing[Double] = new PolynomialRing[Double] {
     val ct = classTag[Double]
