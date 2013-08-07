@@ -41,14 +41,63 @@ class PolynomialTest extends FunSuite {
 
 	test("polynomial construction") {
 		val p = Polynomial(Array(Term(Rational(1,2), 0L), Term(Rational(1,4), 2L), Term(Rational(2/1), 1L)))
-		assert(p.terms === Array(Term(Rational(1,2), 0L), Term(Rational(1,4), 2L), Term(Rational(2/1), 1L))
+		assert(p.terms === Array(Term(Rational(1,2), 0L), Term(Rational(1,4), 2L), Term(Rational(2/1), 1L)))
 	}
 
 	test("polynomial non-arithmetic functions") {
 		val p = Polynomial(Array(Term(Rational(1,2), 0L), Term(Rational(1,4), 2L), Term(Rational(2/1), 1L)))
 		
-		expectResult(Array(Rational(1,4), Rational(2/1), Rational(1,2)))
+		expectResult(Rational(1,4)) {
+			val a = p.coeffs
+			a(0)
+		}
 
+		expectResult(Term(Rational(1,4), 2L)) {
+			p.maxTerm
+		}
+
+		assert(p.maxOrder === 2L)
+		assert(p.maxOrderTermCoeff === Rational(1,4))
+		assert(p.degree === 2L)
+
+		expectResult(Rational(11,2)) {
+			p(Rational(2,1))
+		}
+
+		assert(p.isZero === false)
+
+		expectResult(Polynomial(Array(Term(Rational(2,1), 0L), Term(Rational(1,1), 2L), Term(Rational(8/1), 1L)))) {
+			p.monic
+		}
+
+		expectResult(Polynomial(Array(Term(Rational(1,2), 1L), Term(Rational(2,1), 0L)))) {
+			p.derivative
+		}
+
+		expectResult(Polynomial(Array(Term(Rational(1,2), 1L), Term(Rational(1,12), 3L), Term(Rational(1/1), 2L)))) {
+			p.integral
+		}
 	}
+
+	// test("polynomial arithmetic") {
+	// 	val p1 = Polynomial(Array(Term(Rational(1,2), 0L), Term(Rational(1,4), 2L), Term(Rational(2/1), 1L)))
+	// 	val p2 = Polynomial(Array(Term(Rational(1,2), 0L), Term(Rational(1,4), 2L), Term(Rational(3/1), 1L)))
+
+	// 	expectResult(Polynomial(Array(Term(Rational(1,1), 0L), Term(Rational(1,2), 2L), Term(Rational(5/1), 1L)))) {
+	// 		p1 + p2
+	// 	}
+
+	// 	expectResult(Array(Rational(1,16), Rational(0,1), Rational(1,4), Rational(1,4), Rational(1,2), Rational(1,4))) {
+	// 		(p1 * p2).coeffs
+	// 	}
+
+	// 	expectResult(Polynomial(Array(Term(Rational(-1,1), 1L)))) {
+	// 		p1 % p2
+	// 	}
+
+	// 	expectResult(Polynomial(Array(Term(Rational(1,1), 0L)))) {
+	// 		p2 /~ p2
+	// 	}
+	// }
 
 }
