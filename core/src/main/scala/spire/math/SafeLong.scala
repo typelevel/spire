@@ -1,6 +1,6 @@
 package spire.math
 
-import scala.math.{signum, ScalaNumber, ScalaNumericConversions}
+import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.annotation.tailrec
 
 import spire.algebra._
@@ -18,7 +18,7 @@ import spire.std.bigInt._
 sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] {
   lhs =>
 
-  def signum: Int = fold(scala.math.signum(_).toInt, _.signum)
+  def signum: Int = fold(spire.math.signum(_).toInt, _.signum)
 
   def +(rhs: SafeLong): SafeLong = rhs.fold(this + _, this + _)
   def -(rhs: SafeLong): SafeLong = rhs.fold(this - _, this - _)
@@ -63,7 +63,7 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
    * Exponentiation function, e.g. x^y
    *
    * If base^exponent doesn't fit in a Long, the result will overflow (unlike
-   * scala.math.pow which will return +/- Infinity). 
+   * scala.math.pow which will return +/- Infinity).
    */
   final def **(rhs:Int):SafeLong = pow(rhs)
   final def pow(rhs:Int):SafeLong = {

@@ -1,6 +1,5 @@
 package spire.math.fpf
 
-import scala.math.{ max, abs }
 import java.lang.Double.{ NaN, isNaN, isInfinite }
 
 import spire.algebra._

@@ -1,6 +1,6 @@
 package spire.math
 
-import scala.math.{BigDecimal, ScalaNumber, ScalaNumericConversions}
+import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
 import spire.algebra._

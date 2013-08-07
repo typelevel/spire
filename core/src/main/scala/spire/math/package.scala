@@ -4,6 +4,7 @@ import spire.algebra._
 import spire.math._
 
 import scala.annotation.tailrec
+import scala.{specialized => spec}
 
 import spire.std.bigDecimal._
 import spire.syntax.nroot._
@@ -17,67 +18,47 @@ import java.math.RoundingMode
 import BigDecimal.RoundingMode.{FLOOR, HALF_UP, CEILING}
 
 package object math {
-  // largest possible double as BigDecimal
-  private final val maxDouble = BigDecimal(Double.MaxValue)
-
-  // natural log of largest possible double as BigDecimal
-  private final val logMaxDouble = BigDecimal(Math.log(Double.MaxValue))
-
-  // e^logMaxDouble as BigDecimal
-  private final val expLogMaxDouble = BigDecimal(Math.exp(Math.log(Double.MaxValue)))
 
   /**
-   * log() implementations
+   * abs
    */
-
   final def abs(n: Byte): Byte = Math.abs(n).toByte
   final def abs(n: Short): Short = Math.abs(n).toShort
   final def abs(n: Int): Int = Math.abs(n)
   final def abs(n: Long): Long = Math.abs(n)
   final def abs(n: Float): Float = Math.abs(n)
   final def abs(n: Double): Double = Math.abs(n)
+  final def abs[A](a: A)(implicit ev: Signed[A]): A = ev.abs(a)
 
+  /**
+   * ceil
+   */
   final def ceil(n: Float): Float = Math.ceil(n).toFloat
   final def ceil(n: Double): Double = Math.ceil(n)
   final def ceil(n: BigDecimal): BigDecimal = n.setScale(0, CEILING)
+  final def ceil[A](a: A)(implicit ev: IsReal[A]): A = ev.ceil(a)
 
+  /**
+   * floor
+   */
   final def floor(n: Float): Float = Math.floor(n).toFloat
   final def floor(n: Double): Double = Math.floor(n)
   final def floor(n: BigDecimal): BigDecimal = n.setScale(0, FLOOR)
-
-  final def log(n: Double): Double = Math.log(n)
-
-  final def log(n: BigDecimal): BigDecimal = {
-    val scale = n.mc.getPrecision
-
-    def ln(n: BigDecimal): BigDecimal = {
-      val scale2 = scale + 1
-      val limit = BigDecimal(5) * BigDecimal(10).pow(-scale2)
-
-      @tailrec def loop(x: BigDecimal): BigDecimal = {
-        val xp = exp(x)
-        val term = (xp - n) / xp
-        if (term > limit) loop(x - term) else x - term
-      }
-
-      loop(n.setScale(scale2, HALF_UP)).setScale(scale, HALF_UP)
-    }
-
-    if (n.signum < 1)
-      throw new IllegalArgumentException("argument <= 0")
-
-    @tailrec def rescale(x: BigDecimal, n: Int): (BigDecimal, Int) =
-      if (x < 64) (x, n) else rescale(x.sqrt, n + 1)
-
-    val (x, i) = rescale(n, 0)
-
-    (ln(x) * BigDecimal(2).pow(i)).setScale(scale, HALF_UP)
-  }
-
-  final def log[A](a: A)(implicit t: Trig[A]): A = t.log(a)
+  final def floor[A](a: A)(implicit ev: IsReal[A]): A = ev.ceil(a)
 
   /**
-   * exp() implementations
+   * round
+   */
+  final def round(a: Float): Float =
+    if (Math.abs(a) >= 16777216.0F) a else Math.round(a).toFloat
+  final def round(a: Double): Double =
+    if (Math.abs(a) >= 4503599627370496.0) a else Math.round(a).toDouble
+  final def round(a: BigDecimal): BigDecimal =
+    a.setScale(0, HALF_UP)
+  final def round[A](a: A)(implicit ev: IsReal[A]): A = ev.round(a)
+
+  /**
+   * exp
    */
   final def exp(n: Double): Double = Math.exp(n)
 
@@ -150,7 +131,41 @@ package object math {
   final def exp[A](a: A)(implicit t: Trig[A]): A = t.exp(a)
 
   /**
-   * pow() implementations
+   * log
+   */
+  final def log(n: Double): Double = Math.log(n)
+
+  final def log(n: BigDecimal): BigDecimal = {
+    val scale = n.mc.getPrecision
+
+    def ln(n: BigDecimal): BigDecimal = {
+      val scale2 = scale + 1
+      val limit = BigDecimal(5) * BigDecimal(10).pow(-scale2)
+
+      @tailrec def loop(x: BigDecimal): BigDecimal = {
+        val xp = exp(x)
+        val term = (xp - n) / xp
+        if (term > limit) loop(x - term) else x - term
+      }
+
+      loop(n.setScale(scale2, HALF_UP)).setScale(scale, HALF_UP)
+    }
+
+    if (n.signum < 1)
+      throw new IllegalArgumentException("argument <= 0")
+
+    @tailrec def rescale(x: BigDecimal, n: Int): (BigDecimal, Int) =
+      if (x < 64) (x, n) else rescale(x.sqrt, n + 1)
+
+    val (x, i) = rescale(n, 0)
+
+    (ln(x) * BigDecimal(2).pow(i)).setScale(scale, HALF_UP)
+  }
+
+  final def log[A](a: A)(implicit t: Trig[A]): A = t.log(a)
+
+  /**
+   * pow
    */
 
   // TODO: figure out how much precision we need from log(base) to
@@ -161,21 +176,22 @@ package object math {
     else
       exp(log(base) * exponent)
 
-  final def pow(base: BigInt, ex: BigInt) = if (ex.signum < 0) {
-    if (base.signum == 0) sys.error("zero can't be raised to negative power")
-    else if (base == 1) base
-    else if (base == -1) if (ex.testBit(0)) BigInt(1) else base
-    else BigInt(0)
-  } else if (ex.isValidInt) {
-    base.pow(ex.toInt)
-  } else {
-    bigIntPow(BigInt(1), base, ex)
-  }
+  final def pow(base: BigInt, ex: BigInt) = {
+    @tailrec def bigIntPow(t: BigInt, b: BigInt, e: BigInt): BigInt =
+      if (e.signum == 0) t
+      else if (e.testBit(0)) bigIntPow(t * b, b * b, e >> 1)
+      else bigIntPow(t, b * b, e >> 1)
 
-  @tailrec private[math] final def bigIntPow(t: BigInt, b: BigInt, e: BigInt): BigInt = {
-    if (e.signum == 0) t
-    else if (e.testBit(0)) bigIntPow(t * b, b * b, e >> 1)
-    else bigIntPow(t, b * b, e >> 1)
+    if (ex.signum < 0) {
+      if (base.signum == 0) sys.error("zero can't be raised to negative power")
+      else if (base == 1) base
+      else if (base == -1) if (ex.testBit(0)) BigInt(1) else base
+      else BigInt(0)
+    } else if (ex.isValidInt) {
+      base.pow(ex.toInt)
+    } else {
+      bigIntPow(BigInt(1), base, ex)
+    }
   }
 
   /**
@@ -202,6 +218,9 @@ package object math {
 
   final def pow(base: Double, exponent: Double) = Math.pow(base, exponent)
 
+  /**
+   * gcd
+   */
   final def gcd(_x: Long, _y: Long): Long = {
     if (_x == 0L) return Math.abs(_y)
     if (_y == 0L) return Math.abs(_x)
@@ -228,24 +247,18 @@ package object math {
   }
 
   final def gcd(a: BigInt, b: BigInt): BigInt = a.gcd(b)
-
   final def gcd[A](x: A, y: A)(implicit ev: EuclideanRing[A]): A = ev.gcd(x, y)
 
+  /**
+   * lcm
+   */
   final def lcm(x: Long, y: Long): Long = (x / gcd(x, y)) * y
-
   final def lcm(a: BigInt, b: BigInt): BigInt = (a / a.gcd(b)) * b
-
   final def lcm[A](x: A, y: A)(implicit ev: EuclideanRing[A]): A = ev.lcm(x, y)
 
-  final def round(a: Float): Float =
-    if (Math.abs(a) >= 16777216.0F) a else Math.round(a).toFloat
-
-  final def round(a: Double): Double =
-    if (Math.abs(a) >= 4503599627370496.0) a else Math.round(a).toDouble
-
-  final def round(a: BigDecimal): BigDecimal =
-    a.setScale(0, HALF_UP)
-
+  /**
+   * min
+   */
   final def min(x: Byte, y: Byte): Byte = Math.min(x, y).toByte
   final def min(x: Short, y: Short): Short = Math.min(x, y).toShort
   final def min(x: Int, y: Int): Int = Math.min(x, y)
@@ -254,6 +267,9 @@ package object math {
   final def min(x: Double, y: Double): Double = Math.min(x, y)
   final def min[A](x: A, y: A)(implicit ev: Order[A]) = ev.min(x, y)
 
+  /**
+   * max
+   */
   final def max(x: Byte, y: Byte): Byte = Math.max(x, y).toByte
   final def max(x: Short, y: Short): Short = Math.max(x, y).toShort
   final def max(x: Int, y: Int): Int = Math.max(x, y)
@@ -262,20 +278,66 @@ package object math {
   final def max(x: Double, y: Double): Double = Math.max(x, y)
   final def max[A](x: A, y: A)(implicit ev: Order[A]) = ev.max(x, y)
 
-  final def e[A](implicit t: Trig[A]): A = t.e
-  final def pi[A](implicit t: Trig[A]): A = t.pi
+  /**
+   * signum
+   */
+  final def signum(x: Double): Double = Math.signum(x)
+  final def signum(x: Float): Float = Math.signum(x)
+  final def signum[A](a: A)(implicit ev: Signed[A]): Int = ev.signum(a)
 
-  final def sin[A](a: A)(implicit t: Trig[A]): A = t.sin(a)
-  final def cos[A](a: A)(implicit t: Trig[A]): A = t.cos(a)
-  final def tan[A](a: A)(implicit t: Trig[A]): A = t.tan(a)
+  /**
+   * sqrt
+   */
+  final def sqrt(x: Double): Double = Math.sqrt(x)
+  final def sqrt[A](a: A)(implicit ev: NRoot[A]): A = ev.sqrt(a)
 
-  final def asin[A](a: A)(implicit t: Trig[A]): A = t.asin(a)
-  final def acos[A](a: A)(implicit t: Trig[A]): A = t.acos(a)
-  final def atan[A](a: A)(implicit t: Trig[A]): A = t.atan(a)
-  final def atan2[A](y: A, x: A)(implicit t: Trig[A]): A = t.atan2(y, x)
+  /**
+   * e
+   */
+  final def e: Double = Math.E
+  final def e[@spec(Float, Double) A](implicit ev: Trig[A]): A = ev.e
 
-  final def sinh[A](x: A)(implicit t: Trig[A]): A = t.sinh(x)
-  final def cosh[A](x: A)(implicit t: Trig[A]): A = t.cosh(x)
-  final def tanh[A](x: A)(implicit t: Trig[A]): A = t.tanh(x)
+  /**
+   * pi
+   */
+  final def pi: Double = Math.PI
+  final def pi[@spec(Float, Double) A](implicit ev: Trig[A]): A = ev.pi
+
+  final def sin[@spec(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.sin(a)
+  final def cos[@spec(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.cos(a)
+  final def tan[@spec(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.tan(a)
+
+  final def asin[@spec(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.asin(a)
+  final def acos[@spec(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.acos(a)
+  final def atan[@spec(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.atan(a)
+  final def atan2[@spec(Float, Double) A](y: A, x: A)(implicit ev: Trig[A]): A = ev.atan2(y, x)
+
+  final def sinh[@spec(Float, Double) A](x: A)(implicit ev: Trig[A]): A = ev.sinh(x)
+  final def cosh[@spec(Float, Double) A](x: A)(implicit ev: Trig[A]): A = ev.cosh(x)
+  final def tanh[@spec(Float, Double) A](x: A)(implicit ev: Trig[A]): A = ev.tanh(x)
+
+  // java.lang.Math/scala.math.compatibility
+  final def cbrt(x: Double): Double = Math.cbrt(x)
+  final def copySign(m: Double, s: Double): Double = Math.copySign(m, s)
+  final def copySign(m: Float, s: Float): Float = Math.copySign(m, s)
+  final def cosh(x: Double): Double = Math.cosh(x)
+  final def expm1(x: Double): Double = Math.expm1(x)
+  final def getExponent(x: Double): Int = Math.getExponent(x)
+  final def getExponent(x: Float): Int = Math.getExponent(x)
+  final def hypot(x: Double, y: Double): Double = Math.hypot(x, y)
+  final def IEEEremainder(x: Double, d: Double): Double = Math.IEEEremainder(x, d)
+  final def log10(x: Double): Double = Math.log10(x)
+  final def log1p(x: Double): Double = Math.log1p(x)
+  final def nextAfter(x: Double, y: Double): Double = Math.nextAfter(x, y)
+  final def nextAfter(x: Float, y: Float): Float = Math.nextAfter(x, y)
+  final def nextUp(x: Double): Double = Math.nextUp(x)
+  final def nextUp(x: Float): Float = Math.nextUp(x)
+  final def random(): Double = Math.random()
+  final def rint(x: Double): Double = Math.rint(x)
+  final def scalb(d: Double, s: Int): Double = Math.scalb(d, s)
+  final def scalb(d: Float, s: Int): Float = Math.scalb(d, s)
+  final def toDegrees(a: Double): Double = Math.toDegrees(a)
+  final def toRadians(a: Double): Double = Math.toRadians(a)
+  final def ulp(x: Double): Double = Math.ulp(x)
+  final def ulp(x: Float): Double = Math.ulp(x)
 }
-

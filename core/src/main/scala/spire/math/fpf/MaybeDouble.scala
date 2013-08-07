@@ -4,7 +4,6 @@ import spire.algebra.Sign
 import spire.algebra.Sign.{ Positive, Negative, Zero }
 import spire.math._
 
-import scala.math.{ max, abs }
 import java.lang.Double.{ NaN, isNaN, isInfinite }
 
 
