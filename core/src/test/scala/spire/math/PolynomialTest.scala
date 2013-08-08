@@ -31,7 +31,7 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
   implicit val arbitraryRationalPolynomial = Arbitrary(for {
     ts <- arbitrary[List[Term[Rational]]]
   } yield {
-    Polynomial(ts.foldLeft(Map.empty[Long, Rational]) { (m, t) =>
+    Polynomial(ts.foldLeft(Map.empty[Int, Rational]) { (m, t) =>
       m.updated(t.exp, m.getOrElse(t.exp, r"0") + t.coeff)
     }.filter { case (e, c) => c != 0 })
   })
@@ -44,7 +44,7 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
         t.eval(x) should be === t.coeff * x.pow(t.exp.toInt)
       }
       t.isZero should be === (t.coeff == 0)
-      if (t.exp > 0L) t.der.int should be === t
+      if (t.exp > 0) t.der.int should be === t
       t.int.der should be === t
     }
   }
@@ -67,7 +67,7 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     }
   }
 
-  property("p / 1 = p") {
+  property("p /~ 1 = p") {
     forAll { (p: Polynomial[Rational]) =>
       p /~ Polynomial("1") should be === p
     }
@@ -85,7 +85,7 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     }
   }
 
-  property("(x / y) * y + (x % y) = x") {
+  property("(x /~ y) * y + (x % y) = x") {
     forAll { (x: Polynomial[Rational], y: Polynomial[Rational]) =>
       if (!y.isZero) {
         (x /~ y) * y + (x % y) should be === x
@@ -109,17 +109,16 @@ class PolynomialTest extends FunSuite {
     val p = Polynomial(Array(Term(r"1/2", 0), Term(r"1/4", 2), Term(r"2", 1)))
     assert(p.terms.toSet === Set(Term(r"1/2", 0), Term(r"1/4", 2), Term(r"2", 1)))
     assert(p === Polynomial("1/4x^2 + 2x + 1/2"))
-    assert(p === Polynomial(Map(2L -> r"1/4", 1L -> r"2", 0L -> r"1/2")))
+    assert(p === Polynomial(Map(2 -> r"1/4", 1 -> r"2", 0 -> r"1/2")))
   }
 
   test("polynomial non-arithmetic functions") {
     val p = Polynomial("1/4x^2 + 2x + 1/2")
 
-    assert(p.coeffs === Array(r"1/4", r"2", r"1/2"))
+    assert(p.coeffs === List(r"1/4", r"2", r"1/2"))
     assert(p.maxTerm === Term(r"1/4", 2))
-    assert(p.maxOrder === 2L)
+    assert(p.degree === 2)
     assert(p.maxOrderTermCoeff === Rational(1,4))
-    assert(p.degree === 2L)
     assert(p(r"2") === r"11/2")
     assert(p.isZero === false)
 
@@ -135,7 +134,7 @@ class PolynomialTest extends FunSuite {
 
     def legendres(i: Int): List[Polynomial[Rational]] = {
       val one = Polynomial(r"1", 0)
-      val x = Polynomial(r"1", 1L)
+      val x = Polynomial(r"1", 1)
       lazy val leg : Stream[Polynomial[Rational]] = {
         def loop(pnm1: Polynomial[Rational], pn: Polynomial[Rational], n: Int = 1): Stream[Polynomial[Rational]] = {
           val a = Polynomial(Rational(1, n + 1), 0)
@@ -151,7 +150,7 @@ class PolynomialTest extends FunSuite {
     val leg = legendres(4)
 
     assert(p1 + p2 === Polynomial("1/2x^2 + 5x + 1"))
-    assert(leg(2) * leg(3) === Polynomial("15/4x^5 - 5/4x^3 + 3/4x"))
+    assert(leg(2) * leg(3) === Polynomial("15/4x^5 - 7/2x^3 + 3/4x"))
     assert(p1 % p2 === Polynomial("-x"))
     assert(p1 /~ p2 === Polynomial("1"))
   }
