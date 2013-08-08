@@ -61,7 +61,15 @@ object Term {
 
 
 // Univariate polynomial class
-case class Polynomial[C: ClassTag](data: Map[Long, C]) {
+class Polynomial[C: ClassTag] private[spire] (val data: Map[Long, C]) {
+
+  override def toString: String =
+    "Polynomial(%s)" format data
+
+  override def equals(that: Any): Boolean = that match {
+    case p: Polynomial[_] => data == p.data
+    case _ => false
+  }
 
   def terms: Array[Term[C]] =
     data.map(Term.fromTuple).toArray
@@ -84,7 +92,7 @@ case class Polynomial[C: ClassTag](data: Map[Long, C]) {
 
   def maxTerm(implicit r: Ring[C]): Term[C] =
     data.foldLeft(Term.zero[C]) { case (term, (e, c)) =>
-      if (term.exp < e) Term(c, e) else term
+      if (term.exp <= e) Term(c, e) else term
     }
 
   def maxOrder(implicit r: Ring[C]): Long =
@@ -106,7 +114,7 @@ case class Polynomial[C: ClassTag](data: Map[Long, C]) {
 
   def monic(implicit f: Field[C]): Polynomial[C] = {
     val m = maxOrderTermCoeff
-    Polynomial(data.map { case (e, c) => (e, c / m) })
+    new Polynomial(data.map { case (e, c) => (e, c / m) })
   }
 
   def derivative(implicit r: Ring[C], eq: Eq[C]): Polynomial[C] =
@@ -131,12 +139,20 @@ case class Polynomial[C: ClassTag](data: Map[Long, C]) {
 
 object Polynomial {
 
+  def apply[C: ClassTag](data: Map[Long, C])(implicit eq: Eq[C], r: Ring[C]): Polynomial[C] =
+    new Polynomial(data.filter { case (e, c) => c =!= r.zero })
+
   /* We have to get rid of coeff=zero terms here for long division
    * operations.
    * I think we should have an Eq[C] and Ring[C] requirement for Polys.
    */
   def apply[C: ClassTag](terms: Iterable[Term[C]])(implicit eq: Eq[C], r: Ring[C]): Polynomial[C] =
-    Polynomial(terms.filterNot(_.isZero).map(_.toTuple).toMap)
+    new Polynomial(terms.foldLeft(Map.empty[Long, C]) { case (m, Term(c, e)) =>
+      if (c === r.zero) m else m.updated(e, m.get(e).map(_ + c).getOrElse(c))
+    })
+
+  def apply[C: ClassTag](c: C, e: Long): Polynomial[C] =
+    new Polynomial(Map(e -> c))
 
   private val termRe = "([0-9]+\\.[0-9]+|[0-9]+/[0-9]+|[0-9]+)?(?:([a-z])(?:\\^([0-9]+))?)?".r
   private val operRe = " *([+-]) *".r
@@ -168,7 +184,7 @@ object Polynomial {
         } catch {
           case _: Exception => sys.error(s"parse error: $c $e")
         }
-        parse(s2.substring(m2.end), t :: ts)
+        parse(s2.substring(m2.end), if (t.c == 0) ts else t :: ts)
       }
 
     // do some pre-processing to remove whitespace/outer parens
@@ -232,8 +248,12 @@ trait PolynomialRing[C] extends EuclideanRing[Polynomial[C]] {
     Polynomial(x.data + y.data)
 
   def times(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] =
-    Polynomial(x.data.flatMap { case (ex, cx) =>
-      y.data.map { case (ey, cy) => (ex + ey, cx * cy) }
+    Polynomial(x.data.foldLeft(Map.empty[Long, C]) { case (m, (ex, cx)) =>
+      y.data.foldLeft(m) { case (m, (ey, cy)) =>
+        val e = ex + ey
+        val c = cx * cy
+        m.updated(e, m.get(e).map(_ + c).getOrElse(c))
+      }
     })
 
   def quotMod(x: Polynomial[C], y: Polynomial[C]): (Polynomial[C], Polynomial[C]) = {
@@ -255,8 +275,15 @@ trait PolynomialRing[C] extends EuclideanRing[Polynomial[C]] {
       lazy val uprime = zipSum(u.coeffs, y.coeffs.map(_ * -q0))
       if (u.isZero || n < 0) (polyFromCoeffsLE(q), u) else eval(q0 :: q, uprime, n - 1)
     }
-      
-    eval(Nil, x, x.degree - y.degree)
+
+    val ym = y.maxTerm
+    if (ym.exp == 0L) {
+      val q = Polynomial(x.data.map { case (e, c) => (e, c / ym.coeff) })
+      val r = Polynomial(Map.empty[Long, C])
+      (q, r)
+    } else {
+      eval(Nil, x, x.degree - y.degree)
+    }
   }
 
   def quot(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = quotMod(x, y)._1
