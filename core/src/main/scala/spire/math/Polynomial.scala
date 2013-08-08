@@ -120,9 +120,6 @@ class Polynomial[C] private[spire] (val data: Map[Int, C])(implicit r: Ring[C], 
   def integral(implicit f: Field[C]): Polynomial[C] =
     Polynomial(data.map(t => Term.fromTuple(t).int))
 
-   // temporary while checking the backed in type classes
-  def show = this.toString
-
   override def toString =
     if (isZero) {
       "(0)"
