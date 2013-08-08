@@ -138,6 +138,54 @@ object Polynomial {
   def apply[C: ClassTag](terms: Iterable[Term[C]])(implicit eq: Eq[C], r: Ring[C]): Polynomial[C] =
     Polynomial(terms.filterNot(_.isZero).map(_.toTuple).toMap)
 
+  private val termRe = "([0-9]+\\.[0-9]+|[0-9]+/[0-9]+|[0-9]+)?(?:([a-z])(?:\\^([0-9]+))?)?".r
+  private val operRe = " *([+-]) *".r
+
+  def apply(s: String): Polynomial[Rational] = {
+
+    // represents a term, plus a named variable v
+    case class T(c: Rational, v: String, e: Long)
+
+    // parse all the terms and operators out of the string
+    @tailrec def parse(s: String, ts: List[T]): List[T] =
+      if (s.isEmpty) {
+        ts
+      } else {
+        val (op, s2) = operRe.findPrefixMatchOf(s) match {
+          case Some(m) => (m.group(1), s.substring(m.end))
+          case None => if (ts.isEmpty) ("+", s) else sys.error(s"parse error: $s")
+        }
+
+        val m2 = termRe.findPrefixMatchOf(s2).getOrElse(sys.error("parse error: $s2"))
+        val c0 = Option(m2.group(1)).getOrElse("1")
+        val c = if (op == "-") "-" + c0 else c0
+        val v = Option(m2.group(2)).getOrElse("")
+        val e0 = Option(m2.group(3)).getOrElse("")
+        val e = if (e0 != "") e0 else if (v == "") "0" else "1"
+
+        val t = try {
+          T(Rational(c), v, e.toLong)
+        } catch {
+          case _: Exception => sys.error(s"parse error: $c $e")
+        }
+        parse(s2.substring(m2.end), t :: ts)
+      }
+
+    // do some pre-processing to remove whitespace/outer parens
+    val t = s.trim
+    val u = if (t.startsWith("(") && t.endsWith(")")) t.substring(1, t.length - 1) else t
+
+    // parse out the terms
+    val ts = parse(u, Nil)
+
+    // make sure we have at most one variable
+    val vs = ts.map(_.v).toSet.filter(_ != "")
+    if (vs.size > 1) sys.error("only univariate polynomials supported")
+
+    // we're done!
+    Polynomial(ts.map(t => (t.e, t.c)).toMap)
+  }
+
   implicit def pRD: PolynomialRing[Double] = new PolynomialRing[Double] {
     val ct = classTag[Double]
     val r = Ring[Double]
