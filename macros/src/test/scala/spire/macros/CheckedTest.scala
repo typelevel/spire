@@ -1,7 +1,5 @@
 package spire.macros
 
-import scala.language.existentials
-
 import org.scalatest.FunSuite
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
@@ -117,17 +115,17 @@ class CheckedTest extends FunSuite with GeneratorDrivenPropertyChecks with Shoul
   }
 
   test("Int upgrades to Long for overflow checks when mixed in binary op") {
-    checked {
+    Checked.option {
       val x = 2L
       val y = Int.MaxValue
       x + y
-    } should equal(Int.MaxValue.toLong + 2)
+    } should equal(Some(Int.MaxValue.toLong + 2))
 
-    checked {
+    Checked.option {
       val x = 2L
       val y = Int.MaxValue
       y + x
-    } should equal(Int.MaxValue.toLong + 2)
+    } should equal(Some(Int.MaxValue.toLong + 2))
 
     evaluating(checked {
       val x = Long.MaxValue
@@ -138,6 +136,32 @@ class CheckedTest extends FunSuite with GeneratorDrivenPropertyChecks with Shoul
     evaluating(checked {
       val x = Long.MaxValue
       val y = 2
+      y * x
+    }) should produce[ArithmeticException]
+  }
+
+  test("Byte and Short upgrade to Int when mixed") {
+    evaluating(checked {
+      val x = Int.MaxValue
+      val y = (2: Byte)
+      x * y
+    }) should produce[ArithmeticException]
+
+    evaluating(checked {
+      val x = Int.MaxValue
+      val y = (2: Byte)
+      y * x
+    }) should produce[ArithmeticException]
+
+    evaluating(checked {
+      val x = Int.MaxValue
+      val y = (2: Short)
+      x * y
+    }) should produce[ArithmeticException]
+
+    evaluating(checked {
+      val x = Int.MaxValue
+      val y = (2: Short)
       y * x
     }) should produce[ArithmeticException]
   }

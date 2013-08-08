@@ -1,11 +1,18 @@
 package spire.macros
 
+import scala.language.existentials
+
 import language.experimental.macros
 import scala.reflect.macros.Context
 
-object Checked {
-  def apply[A](n: A): A = macro checkedImpl[A]
+case class ArithmeticOverflowException(message: String) extends ArithmeticException(message)
 
+object Checked {
+  /**
+   * Rewrites the expression provided to check many Int/Long arithmetic
+   * operations for overflow (specifically +, -, *, / and unary_-). If an
+   * overflow is detected, an `ArithmeticOverflowException` is thrown.
+   */
   def checked[A](n: A): A = macro checkedImpl[A]
 
   def checkedImpl[A](c: Context)(n: c.Expr[A]): c.Expr[A] = {
@@ -14,8 +21,29 @@ object Checked {
     c.Expr[A](resetTree)
   }
 
-  private final def overflowLong: Nothing = throw new ArithmeticException("Long arithmetic overflow")
-  private final def overflowInt: Nothing = throw new ArithmeticException("Int arithmetic overflow")
+  /**
+   * This is equivalent to wrapping `checked` in a `Some` in a try/catch block
+   * and if an `ArithmeticOverflowException` is caught, then `None` is returned
+   * instead.
+   */
+  def option[A](n: A): Option[A] = macro optionImpl[A]
+
+  def optionImpl[A](c: Context)(n: c.Expr[A]): c.Expr[Option[A]] = {
+    val checkedExpr = checkedImpl[A](c)(n)
+    c.universe.reify {
+      try {
+        Some(checkedExpr.splice)
+      } catch { case (ex: ArithmeticOverflowException) =>
+        None
+      }
+    }
+  }
+
+  @inline
+  private final def overflowLong: Nothing = throw new ArithmeticOverflowException("Long arithmetic overflow")
+
+  @inline
+  private final def overflowInt: Nothing = throw new ArithmeticOverflowException("Int arithmetic overflow")
 
   final def negate(x: Long): Long = if (x != Long.MinValue) -x else overflowLong
 
