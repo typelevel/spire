@@ -3,11 +3,58 @@ package spire.macros
 import language.experimental.macros
 import scala.reflect.macros.Context
 
-object Safe {
-  def checked[A](n: A): A = macro checkedImpl[A]
+object Checked {
+  def apply[A](n: A): A = macro checkedImpl[A]
 
   def checkedImpl[A](c: Context)(n: c.Expr[A]): c.Expr[A] =
     c.Expr[A](CheckedRewriter[c.type](c)(n.tree))
+
+  private final def overflowLong: Nothing = throw new ArithmeticException("Long arithmetic overflow")
+  private final def overflowInt: Nothing = throw new ArithmeticException("Int arithmetic overflow")
+
+  final def negate(x: Long): Long = if (x != Long.MinValue) -x else overflowLong
+
+  final def plus(x: Long, y: Long): Long = {
+    val z = x + y
+    if ((~(x ^ y) & (x ^ z)) >= 0L) z else overflowLong
+  }
+
+  final def minus(x: Long, y: Long): Long = {
+    val z = x - y
+    if (((x ^ y) & (x ^ z)) >= 0L) z else overflowLong
+  }
+
+  final def times(x: Long, y: Long): Long = {
+    val z = x * y
+    if (x == 0L || (y == z / x && !(x == -1L && y == Long.MinValue))) z else overflowLong
+  }
+
+  final def div(x: Long, y: Long): Long = {
+    val z = x / y
+    if (y != -1L || x != Long.MinValue) z else overflowLong
+  }
+
+  final def negate(x: Int): Int = if (x != Int.MinValue) -x else overflowInt
+
+  final def plus(x: Int, y: Int): Int = {
+    val z = x + y
+    if ((~(x ^ y) & (x ^ z)) >= 0L) z else overflowInt
+  }
+
+  final def minus(x: Int, y: Int): Int = {
+    val z = x - y
+    if (((x ^ y) & (x ^ z)) >= 0L) z else overflowInt
+  }
+
+  final def times(x: Int, y: Int): Int = {
+    val z = x * y
+    if (x == 0L || (y == z / x && !(x == -1L && y == Int.MinValue))) z else overflowInt
+  }
+
+  final def div(x: Int, y: Int): Int = {
+    val z = x / y
+    if (y != -1L || x != Int.MinValue) z else overflowInt
+  }
 }
 
 private[macros] case class CheckedRewriter[C <: Context](c: C) {
