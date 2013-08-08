@@ -49,9 +49,9 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     }
   }
 
-  property("apply(p.show) = p") {
+  property("apply(p.toString) = p") {
     forAll { (p: Polynomial[Rational]) =>
-      Polynomial(p.show) should be === p
+      Polynomial(p.toString) should be === p
     }
   }
 
@@ -81,7 +81,7 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
   property("x * y = y * x") {
     forAll { (x: Polynomial[Rational], y: Polynomial[Rational]) =>
-      (x * y).show should be === (y * x).show
+      (x * y).toString should be === (y * x).toString
     }
   }
 
