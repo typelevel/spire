@@ -10,9 +10,9 @@ import spire.syntax._
  * Polynomial
  * A univariate polynomial class and EuclideanRing extension trait 
  * for arithmetic operations.Polynomials can be instantiated using 
- * any type C, with exponents given by Int values. Arithmetic and 
- * many other basic operations require either implicit Ring[C] 
- * and/or Field[C]'s in scope.
+ * any type C for which a Ring[C] and Signed[C] are in scope, with 
+ * exponents given by Int values. Some operations require a Field[C]
+ * to be in scope.
 */
 
 
