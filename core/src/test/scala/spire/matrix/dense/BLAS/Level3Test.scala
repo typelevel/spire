@@ -2,6 +2,7 @@ package spire.matrix.BLAS.level3.FunSuite
 
 import spire.matrix.BLAS
 import BLAS.Transposition._
+import BLAS.UpperOrLower._
 import spire.matrix.dense.Matrix
 import spire.matrix.Constants._
 
@@ -102,6 +103,68 @@ trait BLASLevel3Test extends FunSuite with BLAS.level3.Interface {
                                  -2,  -4, -1,  -2,   2,  0, -4,
                                   5,   3, -2,  -4,  -3,  0,  3)
     expectResult(expectedB) { b }
+  }
+
+  test("Symmetric Rank-k Update (SYRK)") {
+    val c = Matrix(5,5)(-2, -3, 2, -1, 0,
+                        3, 0, 1, -2, -3,
+                        0, 3, 3, 2, -2,
+                        1, 1, -1, 0, 3,
+                        2, -2, -3, 3, 0)
+    val a1 = Matrix(5,9)(2, 2, -4, -1, 0, 2, 0, -2, -3,
+                         -2, 0, -1, -4, -4, -1, -1, -4, 4,
+                         2, -1, -4, 1, -1, 1, 4, -4, -2,
+                         -2, 3, -1, 3, 2, -1, -2, -4, 3,
+                         1, -2, 3, 3, -3, 0, 3, 1, -3)
+    val a2 = Matrix(9,5)(-2, 4, 2, 2, 3,
+                         2, 1, 1, -3, 4,
+                         0, -1, 1, 1, -1,
+                         2, 1, -3, -3, 0,
+                         1, 2, -3, 4, 0,
+                         -2, -1, -4, 3, -4,
+                         -1, -2, -1, 2, -4,
+                         3, 1, -4, -3, -1,
+                         2, 4, -2, 4, 2)
+
+    val euc1 = Matrix(5,5)(-46, -4, -29, -2, 10,
+                          3, -71, -1, -20, 18,
+                          0, 3, -54, 5, -16,
+                          1, 1, -1, -57, 33,
+                          2, -2, -3, 3, -51)
+    val euc2 = Matrix(5,5)(-35, -19, 22, 19, -15,
+                          3, -45, 9, -19, -42,
+                          0, 3, -55, 15, -33,
+                          1, 1, -1, -77, 22,
+                          2, -2, -3, 3, -63)
+    val uc1 = c.copyToMatrix
+    syrk(uplo = Upper, trans = NoTranspose,
+         alpha = -1, a = a1, beta = 2, c = uc1)
+    expectResult(euc1) { uc1 }
+    val uc2 = c.copyToMatrix
+    syrk(uplo = Upper, trans = Transpose,
+         alpha = -1, a = a2, beta = 2, c = uc2)
+    expectResult(euc2) { uc2 }
+
+    val elc1 = Matrix(5,5)(-46, -3, 2, -1, 0,
+                           8, -71, 1, -2, -3,
+                           -33, 3, -54, 2, -2,
+                           2, -14, -1, -57, 3,
+                           14, 20, -18, 33, -51)
+    val lc1 = c.copyToMatrix
+    syrk(uplo = Lower, trans = NoTranspose,
+         alpha = -1, a = a1, beta = 2, c = lc1)
+    expectResult(elc1) { lc1 }
+
+    val elc2 = Matrix(5,5)(-35, -3, 2, -1, 0,
+                           -7, -45, 1, -2, -3,
+                           18, 13, -55, 2, -2,
+                           23, -13, 9, -77, 3,
+                           -11, -40, -35, 22, -63)
+    val lc2 = c.copyToMatrix
+    syrk(uplo = Lower, trans = Transpose,
+         alpha = -1, a = a2, beta = 2, c = lc2)
+    expectResult(elc2) { lc2 }
+
   }
 }
 

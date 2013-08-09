@@ -27,6 +27,7 @@ import spire.syntax.cfor._
 import spire.matrix.dense.MatrixLike
 import spire.matrix.BLAS._
 import Transposition._
+import UpperOrLower._
 
 trait Interface {
   /**
@@ -47,6 +48,25 @@ trait Interface {
   def gemm(transA:Transposition.Value, transB:Transposition.Value,
            alpha:Double, a:MatrixLike, b:MatrixLike,
            beta:Double, c:MatrixLike): Unit
+
+  /**
+   * Performs either of the following symmetric rank-k updates
+   * \[
+   *     C := \alpha A A^T + \beta C (1)
+   * \]
+   * or
+   * \[
+   *     C := \alpha A^T A + \beta C (2)
+   * \]
+   * where $\alpha$ and $\beta$ are scalars and $C$ is a symmetric matrix
+   * of dimension n x n. If the argument `trans` is Transpose, then (1) is
+   * performed, whereas if `trans` is NoTranspose, (2) is performed.
+   *
+   * If `uplo` is Upper (resp. Lower), then only the upper (resp. lower)
+   * triangle of C is updated.
+   */
+  def syrk(uplo:UpperOrLower.Value, trans:Transposition.Value,
+           alpha:Double, a:MatrixLike, beta:Double, c:MatrixLike): Unit
 }
 
 
@@ -147,5 +167,76 @@ trait Naive extends Interface {
 
   }
 
+  def syrk(uplo:UpperOrLower.Value, trans:Transposition.Value,
+           alpha:Double, a:MatrixLike, beta:Double, c:MatrixLike): Unit = {
+    require(c.isSquare)
+    if(trans == NoTranspose)
+      require(c.dimensions._1 ==  a.dimensions._1)
+    else
+      require(c.dimensions._1 ==  a.dimensions._2)
+
+    val n = c.dimensions._1
+    val k = if(trans == NoTranspose) a.dimensions._2 else a.dimensions._1
+    if(n==0 || ((alpha==0 || k==0) && beta==1)) return
+
+    if(alpha == 0) {
+      if(uplo == Upper)
+        cforRange(0 until n) { j =>
+          cforRange(0 to j) { i =>
+            c(i,j) *= beta
+          }
+        }
+      else
+        cforRange(0 until n) { j =>
+          cforRange(j until n) { i =>
+            c(i,j) *= beta
+          }
+        }
+      return
+    }
+
+    if(trans == NoTranspose) {
+      // C = alpha A A^T + beta C
+      if(uplo == Upper) {
+        cforRange(0 until n) { j =>
+          cforRange(0 to j) { i => c(i,j) *= beta }
+          cforRange(0 until k) { l =>
+            if(a(j,l) != 0) {
+              val t = alpha*a(j,l)
+              for(i <- 0 to j) c(i,j) += t*a(i,l)
+            }
+          }
+        }
+      }
+      else {
+        cforRange(0 until n) { j =>
+          cforRange(j until n) { i => c(i,j) *= beta }
+          cforRange(0 until k) { l =>
+            if(a(j,l) != 0) {
+              val t = alpha*a(j,l)
+              cforRange(j until n) { i => c(i,j) += t*a(i,l) }
+            }
+          }
+        }
+      }
+    }
+    else {
+      // C = alpha A^T A + beta C
+      if(uplo == Upper) {
+        cforRange(0 until n) { j => cforRange(0 to j) { i =>
+          var t = 0.0
+          cforRange(0 until k) { l => t += a(l,i)*a(l,j) }
+          c(i,j) = alpha*t + beta*c(i,j)
+        }}
+      }
+      else {
+        cforRange(0 until n) { j => cforRange(j until n) { i =>
+          var t = 0.0
+          cforRange(0 until k) { l => t += a(l,i)*a(l,j) }
+          c(i,j) = alpha*t + beta*c(i,j)
+        }}
+      }
+    }
+  }
 }
 
