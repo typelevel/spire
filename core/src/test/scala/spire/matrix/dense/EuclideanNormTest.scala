@@ -1,4 +1,4 @@
-package spire.matrix.dense.FunSuite
+package spire.matrix.dense.tests
 
 import spire.matrix.dense._
 

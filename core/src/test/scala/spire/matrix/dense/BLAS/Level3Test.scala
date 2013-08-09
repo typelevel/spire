@@ -1,4 +1,4 @@
-package spire.matrix.BLAS.level3.FunSuite
+package spire.matrix.BLAS.level3.tests
 
 import spire.matrix.BLAS
 import BLAS.Transposition._

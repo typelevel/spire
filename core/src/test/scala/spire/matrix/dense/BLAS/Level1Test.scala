@@ -1,4 +1,4 @@
-package spire.matrix.BLAS.level1.FunSuite
+package spire.matrix.BLAS.level1.tests
 
 import spire.matrix.BLAS
 import spire.matrix.dense._
