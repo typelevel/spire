@@ -49,6 +49,12 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     }
   }
 
+  property("p = p") {
+    forAll { (p: Polynomial[Rational]) =>
+      p should be === p
+    }
+  }
+
   property("apply(p.toString) = p") {
     forAll { (p: Polynomial[Rational]) =>
       Polynomial(p.toString) should be === p
@@ -61,6 +67,18 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     }
   }
 
+  property("p + (-p) = 0") {
+    forAll { (p: Polynomial[Rational]) =>
+      p + (-p) should be === Polynomial("0")
+    }
+  }
+
+  property("p * 0 = 0") {
+    forAll { (p: Polynomial[Rational]) =>
+      p * Polynomial("0") should be === Polynomial("0")
+    }
+  }
+
   property("p * 1 = p") {
     forAll { (p: Polynomial[Rational]) =>
       p * Polynomial("1") should be === p
@@ -70,6 +88,22 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
   property("p /~ 1 = p") {
     forAll { (p: Polynomial[Rational]) =>
       p /~ Polynomial("1") should be === p
+    }
+  }
+
+  property("p /~ p = 1") {
+    forAll { (p: Polynomial[Rational]) =>
+      if (!p.isZero) {
+        p /~ p should be === Polynomial("1")
+      }
+    }
+  }
+
+  property("p % p = 0") {
+    forAll { (p: Polynomial[Rational]) =>
+      if (!p.isZero) {
+        p % p should be === Polynomial("0")
+      }
     }
   }
 
