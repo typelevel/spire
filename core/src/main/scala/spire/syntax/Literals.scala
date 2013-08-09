@@ -5,7 +5,7 @@ import scala.{specialized => spec}
 import spire.math._
 import spire.macrosk.Macros
 
-class Literals(s:StringContext) {
+class Literals(val s:StringContext) extends AnyVal {
   def b():Byte = macro Macros.byte
   def h():Short = macro Macros.short
 
@@ -15,6 +15,22 @@ class Literals(s:StringContext) {
   def ul():ULong = macro Macros.ulong
 
   def r():Rational = macro Macros.rational
+
+  def poly(args: Any*): Polynomial[Rational] = {
+    val sb = new StringBuilder
+    val lits = s.parts.iterator
+    val vars = args.map(_.toString).iterator
+
+    // if there are n interpolated values there will always be n+1
+    // literal parts. we want to intersperse them in the order they
+    // were seen.
+    sb.append(lits.next)
+    while(vars.hasNext) {
+      sb.append(vars.next)
+      sb.append(lits.next)
+    }
+    Polynomial(sb.toString)
+  }
 }
 
 class Radix(s:StringContext) {

@@ -17,7 +17,7 @@ import spire.syntax._
 
 
 // Univariate polynomial term
-case class Term[C](coeff: C, exp: Int)(implicit r: Ring[C], s: Signed[C]) { lhs =>
+case class Term[C: Signed](coeff: C, exp: Int)(implicit r: Ring[C]) { lhs =>
 
   def unary_-(): Term[C] = Term(-coeff, exp)
 
@@ -71,7 +71,7 @@ object Term {
 
 
 // Univariate polynomial class
-class Polynomial[C] private[spire] (val data: Map[Int, C])(implicit r: Ring[C], s: Signed[C]) { lhs =>
+class Polynomial[C: Signed] private[spire] (val data: Map[Int, C])(implicit r: Ring[C]) extends Function1[C, C] { lhs =>
 
   override def equals(that: Any): Boolean = that match {
     case p: Polynomial[_] => data == p.data
@@ -213,11 +213,17 @@ object Polynomial {
 
   def apply(s: String): Polynomial[Rational] = parse(s)
 
-  def zero[C: Signed: Ring] =
-    new Polynomial(Map.empty[Int, C])
+  def zero[C: Signed: Ring] = new Polynomial(Map.empty[Int, C])
+  def one[C: Signed](implicit r: Ring[C]) = new Polynomial(Map(0 -> r.one))
 
-  def one[C: Signed](implicit r: Ring[C]) =
-    new Polynomial(Map(0 -> r.one))
+  def constant[C: Signed: Ring](c: C) =
+    if (c.signum == 0) zero[C] else Polynomial(Map(0 -> c))
+  def linear[C: Signed: Ring](c: C) =
+    if (c.signum == 0) zero[C] else Polynomial(Map(1 -> c))
+  def quadratic[C: Signed: Ring](c: C) =
+    if (c.signum == 0) zero[C] else Polynomial(Map(2 -> c))
+  def cubic[C: Signed: Ring](c: C) =
+    if (c.signum == 0) zero[C] else Polynomial(Map(3 -> c))
 
   implicit def ring[C](implicit a: Ring[C], s: Signed[C]) =
     new PolynomialRing[C] {
