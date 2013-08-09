@@ -121,7 +121,7 @@ class Polynomial[C: Signed] private[spire] (val data: Map[Int, C])(implicit r: R
   def unary_-(): Polynomial[C] =
     Polynomial(data.map { case (e, c) => (e, -c) })
 
-  def +(rhs: Polynomial[C]): Polynomial[C] =
+  def +(rhs: Polynomial[C]): Polynomial[C] = 
     Polynomial(lhs.data + rhs.data)
 
   def *(rhs: Polynomial[C]): Polynomial[C] =
@@ -138,7 +138,7 @@ class Polynomial[C: Signed] private[spire] (val data: Map[Int, C])(implicit r: R
 
     def zipSum(x: List[C], y: List[C]): List[C] = {
       val (s, l) = if(x.length > y.length) (y, x) else (x, y)
-     (s.zip(l).map(z => z._1 + z._2) ++ l.drop(s.length)).tail
+      (s.zip(l).map(z => z._1 + z._2) ++ l.drop(s.length)).tail
     }
 
     def polyFromCoeffsLE(cs: List[C]): Polynomial[C] =

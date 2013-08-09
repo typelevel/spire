@@ -13,6 +13,7 @@ import Gen._
 import Arbitrary.arbitrary
 
 class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+  
   implicit val arbitraryRational = Arbitrary(for {
     n0 <- arbitrary[Long]
     d0 <- arbitrary[Long]
