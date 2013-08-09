@@ -419,7 +419,8 @@ class MatrixBlock(private val a:MatrixLike,
  * val a = new Matrix(m, n, elements, given_in_row_major=true)
  * }}}
  */
-final case class Matrix(m: Int, n: Int, elems: Array[Double]) extends MatrixLike {
+final case class Matrix(m: Int, n: Int, elems: Array[Double])
+extends MatrixLike {
   require(m > 0)
   require(n > 0)
   require(elems.length == m * n)

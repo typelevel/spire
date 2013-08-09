@@ -81,7 +81,7 @@ trait HessenbergDecompositionLike {
     for(j <- iHi-3 to iLo by -1) {
       val h = ElementaryReflector(taus(j-iLo), a.column(j).block(j+2, iHi))
       h.applyOnLeft(result.block(j+1, iHi)(j+1, n))
-  }
+    }
     result
   }
 }
