@@ -491,23 +491,45 @@ extends MatrixLike {
 /** Matrix companion object */
 object Matrix {
 
+  /** Create a m x n matrix with the given elements listed in row-major order */
   def apply(m: Int, n: Int)(elems: Double*): Matrix = {
     val matrix = Matrix(m, n, elems.toArray)
     matrix.permuteFromRowMajorToColumnMajor()
     matrix
   }
 
+  /** Create the identity matrix of dimension m */
   def identity(m: Int): Matrix = {
     val arr = new Array[Double](m * m)
     cforRange(0 until arr.length by m+1) { i => arr(i) = 1.0 }
     Matrix(m, m, arr)
   }
 
+  /**
+   * Create an m x n matrix with uninitialised elements
+   *
+   * Actually, the elements are currently initialised to zero
+   * but it would be nice to find a way to work that around (TODO).
+   */
   def empty(m:Int, n:Int): Matrix = zero(m, n)
 
+  /** Create the zero matrix of dimension m x n */
   def zero(m:Int, n:Int): Matrix =
     Matrix(m, n, new Array[Double](m * n))
 
+  /**
+   * Create a matrix from the given string.
+   * The format is:
+   *
+   * {{{
+   * [ x x x x ]
+   * [ x x x x ]
+   * ........
+   * [ x x x x ]
+   * }}}
+   *
+   * where each `x` is a number.
+   */
   def fromString(s: String): Matrix = {
     val lines = s.trim.split("\n")
     val rows = lines.map { line =>
