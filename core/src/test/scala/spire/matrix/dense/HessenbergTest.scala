@@ -3,6 +3,7 @@ package spire.matrix.tests
 import spire.matrix.dense._
 import spire.matrix.BLAS
 import spire.matrix.BLAS.Transposition._
+import spire.matrix.BLAS.UpperOrLower._
 import spire.matrix.NumericPropertiesOfDouble
 
 import org.scalatest.FunSuite
@@ -16,10 +17,9 @@ with BLAS.level3.Naive
   val eps = precision
 
   def normalityGoodness(q:MatrixLike) = {
-    // TODO: use SYRK instead when we have code to model symmetric matrices
     val (m,n) = q.dimensions
     val d = Matrix.identity(n)
-    gemm(Transpose, NoTranspose, -1.0, q, q, 1.0, d)
+    syrk(Lower, Transpose, -1.0, q, 1.0, d)
     d.norm1/(n*eps)
   }
 
