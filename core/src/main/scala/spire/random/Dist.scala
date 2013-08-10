@@ -12,15 +12,15 @@ import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
 trait Dist[@spec A] { self =>
-  def apply(gen: Generator): A
+  def apply(g: Generator): A
 
-  final def get()(implicit gen: Generator): A =
-    apply(gen)
+  final def get()(implicit g: Generator): A =
+    apply(g)
 
-  def fill(gen: Generator, arr: Array[A]): Unit = {
+  def fill(g: Generator, arr: Array[A]): Unit = {
     var i = 0
     while (i < arr.length) {
-      arr(i) = apply(gen)
+      arr(i) = apply(g)
       i += 1
     }
   }
@@ -33,9 +33,9 @@ trait Dist[@spec A] { self =>
 
   final def filter(pred: A => Boolean): Dist[A] =
     new Dist[A] {
-      @tailrec final def apply(gen: Generator): A = {
-        val a = self(gen)
-        if (pred(a)) a else apply(gen)
+      @tailrec final def apply(g: Generator): A = {
+        val a = self(g)
+        if (pred(a)) a else apply(g)
       }
     }
 
@@ -181,6 +181,13 @@ trait DistField[A] extends Field[Dist[A]] with DistEuclideanRing[A] {
   override def reciprocal(x: Dist[A]): Dist[A] = new DistFromGen(g => alg.reciprocal(x(g)))
 }
 
+class Size(val int: Int) extends AnyVal
+
+object Size {
+  def apply(n: Int) = new Size(n)
+  implicit def sizeToInt(s: Size): Int = s.int
+}
+
 object Dist {
   @inline final def apply[A](implicit na: Dist[A]): Dist[A] = na
 
@@ -238,9 +245,8 @@ object Dist {
       ds(i).apply(g)
     })
   }
-        
 
-  implicit val unit: Dist[Unit] = new DistFromGen[Unit](g => ())
+  implicit val unit: Dist[Unit] = Dist.always(())
   implicit val boolean: Dist[Boolean] = new DistFromGen[Boolean](_.nextBoolean)
   implicit val byte: Dist[Byte] = new DistFromGen[Byte](_.nextInt.toByte)
   implicit val short: Dist[Short] = new DistFromGen[Short](_.nextInt.toShort)
@@ -258,85 +264,24 @@ object Dist {
   implicit def complex[A: Fractional: Trig: IsReal: Dist]: Dist[Complex[A]] =
     Dist(Complex(_: A, _: A))
 
-  implicit def interval[A](implicit na: Dist[A], order: Order[A]): Dist[Interval[A]] =
-    Dist((x: A, y: A) => if (order.lt(x, y)) Interval(x, y) else Interval(y, x))
+  implicit def interval[A: Order: Dist]: Dist[Interval[A]] =
+    Dist((x: A, y: A) => if (x < y) Interval(x, y) else Interval(y, x))
 
-  implicit def option[A](implicit no: Dist[Boolean], na: Dist[A]): Dist[Option[A]] =
-    new DistFromGen(g => if (no(g)) Some(na(g)) else None)
+  implicit def option[A](implicit bool: Dist[Boolean], a: Dist[A]): Dist[Option[A]] =
+    new DistFromGen(g => if (bool(g)) Some(a(g)) else None)
 
-  implicit def either[A, B](implicit no: Dist[Boolean], na: Dist[A], nb: Dist[B]): Dist[Either[A, B]] =
-    new DistFromGen[Either[A, B]](g => if (no(g)) Right(nb(g)) else Left(na(g)))
+  implicit def either[A, B](implicit bool: Dist[Boolean], a: Dist[A], b: Dist[B]): Dist[Either[A, B]] =
+    new DistFromGen(g => if (bool(g)) Right(b(g)) else Left(a(g)))
 
   implicit def tuple2[A: Dist, B: Dist]: Dist[(A, B)] =
     Dist((_: A, _: B))
 
-  def intrange(from: Int, to: Int): Dist[Int] = {
-    val d = to - from + 1
-    new DistFromGen(_.nextInt(d) + from)
-  }
-
-  def natural(maxDigits: Int): Dist[Natural] = new Dist[Natural] {
-    @tailrec
-    private def loop(g: Generator, i: Int, size: Int, n: Natural): Natural =
-      if (i < size) loop(g, i + 1, size, Natural.Digit(g.next[UInt], n)) else n
-
-    def apply(gen: Generator): Natural =
-      loop(gen, 1, gen.nextInt(maxDigits) + 1, Natural.End(gen.next[UInt]))
-  }
-
-  def safelong(maxBytes: Int): Dist[SafeLong] = if (maxBytes <= 0) {
-    throw new IllegalArgumentException("need positive maxBytes, got %s" format maxBytes)
-  } else if (maxBytes < 8) {
-    val n = (8 - maxBytes) * 8
-    new DistFromGen(g => SafeLong(g.nextLong >>> n))
-  } else if (maxBytes == 8) {
-    new DistFromGen(g => SafeLong(g.nextLong))
-  } else  {
-    bigint(maxBytes).map(SafeLong(_))
-  }
-
-  def bigint(maxBytes: Int): Dist[BigInt] = new Dist[BigInt] {
-    def apply(gen: Generator): BigInt = BigInt(gen.generateBytes(gen.nextInt(maxBytes) + 1))
-  }
-
-  def bigdecimal(maxBytes: Int, maxScale: Int): Dist[BigDecimal] = new Dist[BigDecimal] {
-    private val nb = bigint(maxBytes)
-    def apply(gen: Generator): BigDecimal = BigDecimal(nb(gen), gen.nextInt(maxScale) + 1)
-  }
-
-  implicit def rational(implicit next: Dist[BigInt]): Dist[Rational] =
-    Dist(Rational(_: BigInt, _: BigInt))(next, next.filter(_ != 0))
-
-  def longrational: Dist[Rational] =
-    Dist(Rational(_: Long, _: Long))(Dist[Long], Dist[Long].filter(_ != 0))
-
-  def bigrational(maxBytes: Int): Dist[Rational] =
-    rational(bigint(maxBytes))
+  implicit def rational(implicit bigint: Dist[BigInt]): Dist[Rational] =
+    Dist(Rational(_: BigInt, _: BigInt))(bigint, bigint.filter(_ != 0))
 
   def constant[A](a: A): Dist[A] = new DistFromGen[A](g => a)
+
   def always[A](a: A): Dist[A] = new DistFromGen[A](g => a)
-
-  implicit def array[A: Dist: ClassTag](minSize: Int, maxSize: Int): Dist[Array[A]] =
-    new Dist[Array[A]] {
-      private val d = maxSize - minSize + 1
-      def apply(gen: Generator): Array[A] = gen.generateArray[A](gen.nextInt(d) + minSize)
-    }
-
-  implicit def list[A: Dist](minSize: Int, maxSize: Int): Dist[List[A]] =
-    new Dist[List[A]] {
-      private val d = maxSize - minSize + 1
-      private def loop(g: Generator, n: Int, sofar: List[A]): List[A] =
-        if (n > 0) loop(g, n - 1, g.next[A] :: sofar) else sofar
-
-      def apply(gen: Generator): List[A] =
-        loop(gen, gen.nextInt(d) + minSize, Nil)
-    }
-
-  implicit def set[A: Dist](minInputs: Int, maxInputs: Int): Dist[Set[A]] =
-    list[A](minInputs, maxInputs).map(_.toSet)
-
-  implicit def map[A: Dist, B: Dist](minInputs: Int, maxInputs: Int): Dist[Map[A, B]] =
-    list[(A, B)](minInputs, maxInputs).map(_.toMap)
 
   def oneOf[A: ClassTag](as: A*): Dist[A] = new Dist[A] {
     private val arr = as.toArray
@@ -351,5 +296,55 @@ object Dist {
       i = (i + 1) % arr.length
       a
     }
+  }
+
+  import java.lang.Long.numberOfLeadingZeros
+
+  def binsize(g: Generator): Int = {
+    val a = numberOfLeadingZeros(g.nextLong)
+    val b = numberOfLeadingZeros(g.nextLong)
+    val c = numberOfLeadingZeros(g.nextLong)
+    a * b + c
+  }
+
+  implicit def size: Dist[Size] =
+    new DistFromGen(g => new Size(binsize(g)))
+
+  implicit def defaultNatural(implicit size: Dist[Size]): Dist[Natural] =
+    new DistFromGen[Natural]({ g =>
+      val init = Natural(g.next[UInt])
+      (0 until size(g)).foldLeft(init)((n, _) => Natural.Digit(g.next[UInt], n))
+    })
+
+  implicit def defaultBigInt(implicit size: Dist[Size]): Dist[BigInt] =
+    new DistFromGen[BigInt](g => BigInt(g.generateBytes(4 * size(g) + 4)))
+
+  implicit def defaultSafeLong(implicit bigint: Dist[BigInt]): Dist[SafeLong] =
+    Dist(SafeLong(_: BigInt))
+
+  implicit def defaultBigDecimal(implicit rat: Dist[Rational]): Dist[BigDecimal] =
+    Dist((_: Rational).toBigDecimal)
+
+  implicit def array[A](implicit a: Dist[A], size: Dist[Size], ct: ClassTag[A]): Dist[Array[A]] =
+    new DistFromGen(g => g.generateArray[A](size(g)))
+
+  implicit def traversableOnce[A, CC[A] <: TraversableOnce[A]]
+    (implicit a: Dist[A], size: Dist[Size], cbf: CanBuildFrom[Nothing, A, CC[A]]): Dist[CC[A]] =
+    new DistFromGen(g => buildHelper(g, cbf, a, size))
+
+  implicit def map[A, B, MM[A, B] <: scala.collection.Map[A, B]]
+    (implicit ab: Dist[(A, B)], size: Dist[Size], cbf: CanBuildFrom[Nothing, (A, B), MM[A, B]]): Dist[MM[A, B]] =
+    new DistFromGen(g => buildHelper(g, cbf, ab, size))
+
+  def buildHelper[A, R](g: Generator, cbf: CanBuildFrom[Nothing, A, R], a: Dist[A], size: Dist[Size]): R = {
+    val builder = cbf()
+    val n = size(g)
+    builder.sizeHint(n)
+    var i = 0
+    while (i < n) {
+      builder += a(g)
+      i += 1
+    }
+    builder.result()
   }
 }
