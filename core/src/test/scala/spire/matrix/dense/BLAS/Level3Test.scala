@@ -1,10 +1,13 @@
 package spire.matrix.BLAS.level3.tests
 
 import spire.matrix.BLAS
+import BLAS.Transposition
 import BLAS.Transposition._
 import BLAS.UpperOrLower._
 import spire.matrix.dense.Matrix
 import spire.matrix.Constants._
+import spire.matrix.dense.tests.TestGeneralMatrices
+import spire.matrix.dense.random._
 
 import org.scalatest.FunSuite
 
@@ -164,7 +167,85 @@ trait BLASLevel3Test extends FunSuite with BLAS.level3.Interface {
     syrk(uplo = Lower, trans = Transpose,
          alpha = -1, a = a2, beta = 2, c = lc2)
     expectResult(elc2) { lc2 }
+  }
 
+  implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
+
+  def syrkSample(trans:Transposition.Value) = {
+    val uniformIm1p1 = new ScalarUniformDistributionFromMinusOneToOne
+    val g = new TestGeneralMatrices(
+      nonSpecialDimensions = 4,
+      nonSpecialScalars = 1,
+      scalars = uniformIm1p1,
+      elements = uniformIm1p1)
+    for {
+      (m,k) <- g.twoDimensionSample
+      a <- if(trans == NoTranspose) g.generalMatrixSample(m,k).take(3)
+           else g.generalMatrixSample(k,m)
+      c <- g.generalMatrixSample(m,m).take(2)
+      alpha <- g.scalarSample
+      beta <- g.scalarSample
+    } yield (alpha, a, beta, c)
+  }
+
+  def gemmVsSyrkSample(trans:Transposition.Value) =
+    for {
+      (alpha, a, beta, c) <- syrkSample(trans)
+      cGemm = c.copyToMatrix
+      cSyrk = c.copyToMatrix
+      } yield (alpha, a, beta, cGemm, cSyrk)
+
+  test("SYRK only touches upper or lower triangle") {
+    for((alpha, a, beta, c) <- syrkSample(Transpose)) {
+      val cSyrk = c.copyToMatrix
+      syrk(Lower, Transpose, alpha, a, beta, cSyrk)
+      assert(cSyrk.copyToUpperDiagonal(1) === c.copyToUpperDiagonal(1))
+    }
+    for((alpha, a, beta, c) <- syrkSample(NoTranspose)) {
+      val cSyrk = c.copyToMatrix
+      syrk(Lower, NoTranspose, alpha, a, beta, cSyrk)
+      assert(cSyrk.copyToUpperDiagonal(1) === c.copyToUpperDiagonal(1))
+    }
+    for((alpha, a, beta, c) <- syrkSample(Transpose)) {
+      val cSyrk = c.copyToMatrix
+      syrk(Upper, Transpose, alpha, a, beta, cSyrk)
+      assert(cSyrk.copyToLowerDiagonal(-1) === c.copyToLowerDiagonal(-1))
+    }
+    for((alpha, a, beta, c) <- syrkSample(NoTranspose)) {
+      val cSyrk = c.copyToMatrix
+      syrk(Upper, NoTranspose, alpha, a, beta, cSyrk)
+      assert(cSyrk.copyToLowerDiagonal(-1) === c.copyToLowerDiagonal(-1))
+    }
+  }
+
+  test("GEMM compatibility with SYRK") {
+    // C := alpha A^T A + beta C (lower triangle)
+    for((alpha, a, beta, cGemm, cSyrk) <- gemmVsSyrkSample(Transpose)) {
+      gemm(Transpose, NoTranspose, alpha, a, a, beta, cGemm)
+      syrk(Lower, Transpose, alpha, a, beta, cSyrk)
+      assert(cSyrk.copyToLowerDiagonal() === cGemm.copyToLowerDiagonal())
+    }
+
+    // C := alpha A^T A + beta C (upper triangle)
+    for((alpha, a, beta, cGemm, cSyrk) <- gemmVsSyrkSample(Transpose)) {
+      gemm(Transpose, NoTranspose, alpha, a, a, beta, cGemm)
+      syrk(Upper, Transpose, alpha, a, beta, cSyrk)
+      assert(cSyrk.copyToUpperDiagonal() === cGemm.copyToUpperDiagonal())
+    }
+
+    // C := alpha A A^T + beta C (lower triangle)
+    for((alpha, a, beta, cGemm, cSyrk) <- gemmVsSyrkSample(NoTranspose)) {
+      gemm(NoTranspose, Transpose, alpha, a, a, beta, cGemm)
+      syrk(Lower, NoTranspose, alpha, a, beta, cSyrk)
+      assert(cSyrk.copyToLowerDiagonal() === cGemm.copyToLowerDiagonal())
+    }
+
+    // C := alpha A A^T + beta C (upper triangle)
+    for((alpha, a, beta, cGemm, cSyrk) <- gemmVsSyrkSample(NoTranspose)) {
+      gemm(NoTranspose, Transpose, alpha, a, a, beta, cGemm)
+      syrk(Upper, NoTranspose, alpha, a, beta, cSyrk)
+      assert(cSyrk.copyToUpperDiagonal() === cGemm.copyToUpperDiagonal())
+    }
   }
 }
 
