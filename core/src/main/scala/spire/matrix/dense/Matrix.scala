@@ -57,11 +57,11 @@ trait MatrixLike extends Iterable[Double] {
   def copyToMatrix = new Matrix(m, n, toArray)
 
   /**
-    * Copy the upper diagonal part of this matrix
+    * Copy the upper diagonal part of this matrix (k-th diagonal)
     * and set the remaining elements to 0. If `unitDiagonal` is True,
     * then fill the k-th diagonal with 1's.
     */
-  def copyToUpperDiagonal(k:Int, unitDiagonal:Boolean = false): Matrix = {
+  def copyToUpperDiagonal(k:Int = 0, unitDiagonal:Boolean = false): Matrix = {
     val result = Matrix.empty(m, n)
     for(j <- 0 until n) {
       for(i <- 0 to math.min(j-k, m-1)) {
@@ -73,11 +73,11 @@ trait MatrixLike extends Iterable[Double] {
   }
 
   /**
-    * Copy the lower diagonal part of this matrix
+    * Copy the lower diagonal part of this matrix (k-th diagonal)
     * and set the remaining elements to 0. If `unitDiagonal` is True,
     * then fill the k-th diagonal with 1's.
     */
-  def copyToLowerDiagonal(k:Int, unitDiagonal:Boolean = false): Matrix = {
+  def copyToLowerDiagonal(k:Int = 0, unitDiagonal:Boolean = false): Matrix = {
     val result = Matrix.empty(m, n)
     for(j <- 0 until n) {
       for(i <- math.max(j-k,0) until m) {
@@ -87,24 +87,6 @@ trait MatrixLike extends Iterable[Double] {
     }
     result
   }
-
-  /**
-    * Copy the upper triangle of this matrix
-    * and set the remaining elements to 0.
-    * If `unitDiagonal` is True, then fill diagonal with 1's instead of copying
-    * the diagonal elements of this matrix.
-    */
-  def copyToUpperTriangular(unitDiagonal:Boolean = false) =
-    copyToUpperDiagonal(0, unitDiagonal)
-
-  /**
-    * Copy the lower triangle of this matrix
-    * and set the remaining elements to 0.
-    * If `unitDiagonal` is True, then fill diagonal with 1's instead of copying
-    * the diagonal elements of this matrix.
-    */
-  def copyToLowerTriangular(unitDiagonal:Boolean = false) =
-    copyToLowerDiagonal(0, unitDiagonal)
 
   /**
     * Copy the upper Hessenberg part of this matrix
@@ -224,11 +206,11 @@ trait MatrixLike extends Iterable[Double] {
     return true
   }
 
-  /** Is the matrix upper triangular? */
-  def isUpperTriangular = isUpperDiagonal(0)
+  /** Are all elements zero below the main diagonal? */
+  def isUpperDiagonal: Boolean = isUpperDiagonal(0)
 
-  /** Is the matrix lower triangular? */
-  def isLowerTriangular = isLowerDiagonal(0)
+  /** Are all elements zero above the main diagonal? */
+  def isLowerDiagonal: Boolean = isLowerDiagonal(0)
 
   /** Is the matrix upper Hessenberg? */
   def isUpperHessenberg = isUpperDiagonal(-1)
