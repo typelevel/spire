@@ -382,6 +382,10 @@ class MatrixBlock(private val a:MatrixLike,
 /**
  * Matrix whose dimensions are set at runtime.
  *
+ * We accept null dimensions although it makes little sense so as to have
+ * the same behaviour as MatrixBlock for which zero dimensions make sense
+ * (empty block).
+ *
  * TODO: parametrize the class by the type of elements
  *
  * @constructor Create a m x n matrix.
@@ -403,8 +407,8 @@ class MatrixBlock(private val a:MatrixLike,
  */
 final case class Matrix(m: Int, n: Int, elems: Array[Double])
 extends MatrixLike {
-  require(m > 0)
-  require(n > 0)
+  require(m >= 0)
+  require(n >= 0)
   require(elems.length == m * n)
 
   /**
