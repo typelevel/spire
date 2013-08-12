@@ -15,7 +15,7 @@ object PolynomialBenchmarks extends MyRunner(classOf[PolynomialBenchmarks])
 
 class PolynomialBenchmarks extends MyBenchmark {
 
-  @Param(Array("100"))
+  @Param(Array("1000"))
   var size: Int = 0
 
   def arbitraryRational = {

@@ -121,7 +121,7 @@ class Polynomial[C: Signed] private[spire] (val data: Map[Int, C])(implicit r: R
   def unary_-(): Polynomial[C] =
     Polynomial(data.map { case (e, c) => (e, -c) })
 
-  def +(rhs: Polynomial[C]): Polynomial[C] = 
+  def +(rhs: Polynomial[C]): Polynomial[C] =
     Polynomial(lhs.data + rhs.data)
 
   def *(rhs: Polynomial[C]): Polynomial[C] =
