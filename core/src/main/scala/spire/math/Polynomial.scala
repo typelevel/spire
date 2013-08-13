@@ -19,7 +19,7 @@ import spire.syntax._
 
 
 // Univariate polynomial term
-case class Term[C: Signed](coeff: C, exp: Int)(implicit r: Ring[C]) { lhs =>
+case class Term[C: ClassTag](coeff: C, exp: Int)(implicit r: Ring[C], s: Signed[C]) { lhs =>
 
   def unary_-(): Term[C] = Term(-coeff, exp)
 
@@ -66,140 +66,127 @@ case class Term[C: Signed](coeff: C, exp: Int)(implicit r: Ring[C]) { lhs =>
 }
 
 object Term {
-  def fromTuple[C: Ring : Signed](tpl: (Int, C)): Term[C] = Term(tpl._2, tpl._1)
-  def zero[C: Signed](implicit r: Ring[C]): Term[C] = Term(r.zero, 0)
-  def one[C: Signed](implicit r: Ring[C]): Term[C] = Term(r.one, 0)
+
+  def fromTuple[C: ClassTag](tpl: (Int, C))(implicit r: Ring[C], s: Signed[C]): Term[C] = 
+    Term(tpl._2, tpl._1)
+  def zero[C: ClassTag](implicit r: Ring[C], s: Signed[C]): Term[C] = 
+    Term(r.zero, 0)
+  def one[C: ClassTag](implicit r: Ring[C], s: Signed[C]): Term[C] = 
+    Term(r.one, 0)
+
 }
 
 
-// Univariate polynomial class
-// class Polynomial[C: Signed: ClassTag] private[spire] (val data: Map[Int, C])
-//   (implicit r: Ring[C]) extends Function1[C, C] with Polynomial { lhs =>
+// Sparse polynomials
+class PolySparse[C: ClassTag] private[spire] (val data: Map[Int, C])
+  (implicit r: Ring[C], s: Signed[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
-//   override def equals(that: Any): Boolean = that match {
-//     case p: Polynomial[_] => data == p.data
-//     case n => terms match {
-//       case Nil => n == 0
-//       case Term(c, 0) :: Nil => n == c
-//       case _ => false
-//     }
-//   }
+  def terms: List[Term[C]] =
+    data.map(Term.fromTuple(_)).toList
 
-//   def terms: List[Term[C]] =
-//     data.map(Term.fromTuple(_)).toList
+  def allTerms: List[Term[C]] = {
+    val m = degree
+    val cs = new Array[Term[C]](m + 1)
+    terms.foreach(t => cs(t.exp) = t)
+    for(i <- 0 to m)
+      if (cs(i) == null) cs(i) = Term(r.zero, i)
+    cs.toList.reverse
+  }
 
-//   implicit object BigEndianPolynomialOrdering extends Order[Term[C]] {
-//     def compare(x:Term[C], y:Term[C]): Int = y.exp compare x.exp
-//   }
+  def coeffs: Array[C] = {
+    allTerms.map(_.coeff)
+  }
 
-//   def allTerms: List[Term[C]] = {
-//     val m = degree
-//     val cs = new Array[Term[C]](m + 1)
-//     terms.foreach(t => cs(t.exp) = t)
-//     for(i <- 0 to m)
-//       if (cs(i) == null) cs(i) = Term(r.zero, i)
-//     cs.toList.reverse
-//   }
+  def maxTerm: Term[C] =
+    data.foldLeft(Term.zero[C]) { case (term, (e, c)) =>
+      if (term.exp <= e) Term(c, e) else term
+    }
 
-//   def coeffs: List[C] =
-//     allTerms.map(_.coeff)
+  def degree: Int =
+    if (isZero) 0 else data.keys.qmax
 
-//   def maxTerm: Term[C] =
-//     data.foldLeft(Term.zero[C]) { case (term, (e, c)) =>
-//       if (term.exp <= e) Term(c, e) else term
-//     }
+  def maxOrderTermCoeff: C =
+    maxTerm.coeff
 
-//   def degree: Int =
-//     if (isZero) 0 else data.keys.qmax
+  def apply(x: C): C =
+    data.view.foldLeft(r.zero)((sum, t) => sum + Term.fromTuple(t).eval(x))
 
-//   def maxOrderTermCoeff: C =
-//     maxTerm.coeff
+  def isZero: Boolean =
+    data.isEmpty
 
-//   def apply(x: C): C =
-//     data.view.foldLeft(r.zero)((sum, t) => sum + Term.fromTuple(t).eval(x))
+  def unary_-(): Polynomial[C] =
+    Polynomial(data.map { case (e, c) => (e, -c) })
 
-//   def isZero: Boolean =
-//     data.isEmpty
+  def +(rhs: Polynomial[C]): Polynomial[C] =
+    Polynomial(lhs.data + rhs.data)
 
-//   def unary_-(): Polynomial[C] =
-//     Polynomial(data.map { case (e, c) => (e, -c) })
+  def *(rhs: Polynomial[C]): Polynomial[C] =
+    Polynomial(lhs.data.view.foldLeft(Map.empty[Int, C]) { case (m, (ex, cx)) =>
+      rhs.data.foldLeft(m) { case (m, (ey, cy)) =>
+        val e = ex + ey
+        val c = cx * cy
+        m.updated(e, m.get(e).map(_ + c).getOrElse(c))
+      }
+    })
 
-//   def +(rhs: Polynomial[C]): Polynomial[C] =
-//     Polynomial(lhs.data + rhs.data)
+  def /%(rhs: Polynomial[C])(implicit f: Field[C]): (Polynomial[C], Polynomial[C]) = {
+    require(!rhs.isZero, "Can't divide by polynomial of zero!")
 
-//   def *(rhs: Polynomial[C]): Polynomial[C] =
-//     Polynomial(lhs.data.view.foldLeft(Map.empty[Int, C]) { case (m, (ex, cx)) =>
-//       rhs.data.foldLeft(m) { case (m, (ey, cy)) =>
-//         val e = ex + ey
-//         val c = cx * cy
-//         m.updated(e, m.get(e).map(_ + c).getOrElse(c))
-//       }
-//     })
+    def zipSum(x: List[C], y: List[C]): List[C] = {
+      val (s, l) = if(x.length > y.length) (y, x) else (x, y)
+      (s.zip(l).map(z => z._1 + z._2) ++ l.drop(s.length)).tail
+    }
 
-//   def /%(rhs: Polynomial[C])(implicit f: Field[C]): (Polynomial[C], Polynomial[C]) = {
-//     require(!rhs.isZero, "Can't divide by polynomial of zero!")
+    def polyFromCoeffsLE(cs: List[C]): Polynomial[C] =
+      Polynomial(cs.zipWithIndex.map({ case (c, e) => Term(c, e) }))
 
-//     def zipSum(x: List[C], y: List[C]): List[C] = {
-//       val (s, l) = if(x.length > y.length) (y, x) else (x, y)
-//       (s.zip(l).map(z => z._1 + z._2) ++ l.drop(s.length)).tail
-//     }
-
-//     def polyFromCoeffsLE(cs: List[C]): Polynomial[C] =
-//       Polynomial(cs.zipWithIndex.map({ case (c, e) => Term(c, e) }))
-
-//     def polyFromCoeffsBE(cs: List[C]): Polynomial[C] = {
-//       val ncs = cs.dropWhile(_.signum == 0)
-//       Polynomial(((ncs.length - 1) to 0 by -1).zip(ncs).map(Term.fromTuple(_)))
-//     }
+    def polyFromCoeffsBE(cs: List[C]): Polynomial[C] = {
+      val ncs = cs.dropWhile(_.signum == 0)
+      Polynomial(((ncs.length - 1) to 0 by -1).zip(ncs).map(Term.fromTuple(_)))
+    }
             
-//     @tailrec def eval(q: List[C], u: List[C], n: Int): (Polynomial[C], Polynomial[C]) = {
-//       lazy val v0 = if (rhs.isZero) r.zero else rhs.maxOrderTermCoeff
-//       lazy val q0 = u.head / v0
-//       lazy val uprime = zipSum(u, rhs.coeffs.map(_ * -q0))
-//       if (u.isEmpty || n < 0) (polyFromCoeffsLE(q), polyFromCoeffsBE(u)) 
-//         else eval(q0 :: q, uprime, n - 1)
-//     }
+    @tailrec def eval(q: List[C], u: List[C], n: Int): (Polynomial[C], Polynomial[C]) = {
+      lazy val v0 = if (rhs.isZero) r.zero else rhs.maxOrderTermCoeff
+      lazy val q0 = u.head / v0
+      lazy val uprime = zipSum(u, rhs.coeffs.map(_ * -q0))
+      if (u.isEmpty || n < 0) (polyFromCoeffsLE(q), polyFromCoeffsBE(u)) 
+        else eval(q0 :: q, uprime, n - 1)
+    }
 
-//     val ym = rhs.maxTerm
-//     if (ym.exp == 0) {
-//       val q = Polynomial(lhs.data.map { case (e, c) => (e, c / ym.coeff) })
-//       val r = Polynomial(Map.empty[Int, C])
-//       (q, r)
-//     } else eval(Nil, lhs.coeffs, lhs.degree - rhs.degree)
-//   }
+    val ym = rhs.maxTerm
+    if (ym.exp == 0) {
+      val q = Polynomial(lhs.data.map { case (e, c) => (e, c / ym.coeff) })
+      val r = Polynomial(Map.empty[Int, C])
+      (q, r)
+    } else eval(Nil, lhs.coeffs, lhs.degree - rhs.degree)
+  }
 
-//   def /~(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C] = (lhs /% rhs)._1
+  def /~(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C] = (lhs /% rhs)._1
     
-//   def %(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C] = (lhs /% rhs)._2
+  def %(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C] = (lhs /% rhs)._2
 
-//   def monic(implicit f: Field[C]): Polynomial[C] = {
-//     val m = maxOrderTermCoeff
-//     new Polynomial(data.map { case (e, c) => (e, c / m) })
-//   }
+  def monic(implicit f: Field[C]): Polynomial[C] = {
+    val m = maxOrderTermCoeff
+    new Polynomial(data.map { case (e, c) => (e, c / m) })
+  }
 
-//   def derivative: Polynomial[C] =
-//     Polynomial(data.flatMap { case (e, c) =>
-//       if (e > 0) Some(Term(c, e).der) else None
-//     })
+  def derivative: Polynomial[C] =
+    Polynomial(data.flatMap { case (e, c) =>
+      if (e > 0) Some(Term(c, e).der) else None
+    })
 
-//   def integral(implicit f: Field[C]): Polynomial[C] =
-//     Polynomial(data.map(t => Term.fromTuple(t).int))
+  def integral(implicit f: Field[C]): Polynomial[C] =
+    Polynomial(data.map(t => Term.fromTuple(t).int))
 
-//   override def toString =
-//     if (isZero) {
-//       "(0)"
-//     } else {
-//       val ts = terms.toArray
-//       QuickSort.sort(ts)
-//       val s = ts.mkString
-//       "(" + (if (s.take(3) == " - ") "-" + s.drop(3) else s.drop(3)) + ")"
-//     }
-
-// }
-
-
-class Polynomial[C: Signed: ClassTag] private[spire] (val data: Map[Int, C])
-  (implicit r: Ring[C]) extends Function1[C, C] { lhs =>
+  override def toString =
+    if (isZero) {
+      "(0)"
+    } else {
+      val ts = terms.toArray
+      QuickSort.sort(ts)
+      val s = ts.mkString
+      "(" + (if (s.take(3) == " - ") "-" + s.drop(3) else s.drop(3)) + ")"
+    }
 
   override def equals(that: Any): Boolean = that match {
     case p: Polynomial[_] => data == p.data
@@ -210,23 +197,33 @@ class Polynomial[C: Signed: ClassTag] private[spire] (val data: Map[Int, C])
     }
   }
 
-  lazy val coeffs: Array[C] = {
-    val cs = new Array[C](degree + 1)
-    data.foreach{ case (e, c) => cs(e) = c }
-    cs
+}
+
+// Dense polynomials - Little Endian Storage
+class PolyDense[C: ClassTag] private[spire] (val coeffs: Array[C])
+  (implicit r: Ring[C], s: Signed[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
+
+  lazy val data: Map[Int, C] = {
+    terms.view.map(_ => (_.exp, _.coeff)).toMap
   }
 
   lazy val terms: List[Term[C]] =
-    data.map(Term.fromTuple(_)).toList
+    coeffs.view.zipWithIndex.map({ case (c, e) => 
+      Term(c, e)).filterNot(_.isZero)}).toList
 
-  implicit object BigEndianPolynomialOrdering extends Order[Term[C]] {
-    def compare(x:Term[C], y:Term[C]): Int = y.exp compare x.exp
-  }
-
-  def maxTerm: Term[C] =
-    data.foldLeft(Term.zero[C]) { case (term, (e, c)) =>
+  lazy val maxTerm: Term[C] =
+    terms.view.foldLeft(Term.zero[C]) { case (term, (e, c)) =>
       if (term.exp <= e) Term(c, e) else term
     }
+
+  lazy val degree: Int =
+    if (isZero) 0 else coeffs.length - 1
+
+  lazy val maxOrderTermCoeff: C =
+    coeffs(degree)
+    
+  def isZero: Boolean =
+    coeffs.isEmpty
 
   def apply(x: C): C = {
     var sum = r.zero
@@ -237,15 +234,6 @@ class Polynomial[C: Signed: ClassTag] private[spire] (val data: Map[Int, C])
     }
     sum
   }
-
-  lazy val degree: Int =
-    if (isZero) 0 else maxTerm.exp
-
-  lazy val maxOrderTermCoeff: C =
-    maxTerm.coeff
-    
-  def isZero: Boolean =
-    coeffs.isEmpty
 
   def unary_-(): Polynomial[C] = {
     val negArray = new Array[C](coeffs.length)
@@ -380,6 +368,15 @@ class Polynomial[C: Signed: ClassTag] private[spire] (val data: Map[Int, C])
       "(" + (if (s.take(3) == " - ") "-" + s.drop(3) else s.drop(3)) + ")"
     }
 
+  override def equals(that: Any): Boolean = that match {
+    case p: Polynomial[_] => data == p.data
+    case n => terms match {
+      case Nil => n == 0
+      case Term(c, 0) :: Nil => n == c
+      case _ => false
+    }
+  }
+
 }
 
 
@@ -484,6 +481,34 @@ object Polynomial {
 }
 
 
+trait Polynomial[C] {
+
+  def terms: List[Terms[C]]
+  def coeffs: Array[C]
+  def data: Map[Int, C]
+
+  def maxTerm: Term[C]
+  def degree: Int
+  def maxOrderTermCoeff: C
+  def isZero: Boolean
+
+  def apply(x: C): C
+  def unary_-: Polynomial[C]
+  def monic: Polynomial[C]
+  def derivative: Polynomial[C]
+  def integral: Polynomial[C]
+  def +(rhs: Polynomial[C]): Polynomial[C]
+  def *(rhs: Polynomial[C]): Polynomial[C]
+  def /~(rhs: Polynomial[C]): Polynomial[C]
+  def /%(rhs: Polynomial[C]): Polynomial[C]
+  def %(rhs: Polynomial[C]): Polynomial[C]
+
+  implicit object BigEndianPolynomialOrdering extends Order[Term[C]] {
+    def compare(x:Term[C], y:Term[C]): Int = y.exp compare x.exp
+  }
+
+}
+
 trait PolynomialRing[C] extends Ring[Polynomial[C]] {
   implicit def algebra: Ring[C]
   implicit def signed: Signed[C]
@@ -499,7 +524,6 @@ trait PolynomialRing[C] extends Ring[Polynomial[C]] {
 
 trait PolynomialEuclideanRing[C] extends EuclideanRing[Polynomial[C]] with PolynomialRing[C] {
   implicit def algebra: Field[C]
-  implicit def ct: ClassTag[C]
 
   def quot(x: Polynomial[C], y: Polynomial[C]) = x /~ y
   def mod(x: Polynomial[C], y: Polynomial[C]) = x % y
