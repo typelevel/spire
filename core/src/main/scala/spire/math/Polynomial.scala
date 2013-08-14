@@ -78,11 +78,8 @@ object Term {
 
 
 // Sparse polynomials
-class PolySparse[C: ClassTag] private[spire] (val data: Map[Int, C])
+class PolySparse[C] private[spire] (val data: Map[Int, C])
   (implicit r: Ring[C], s: Signed[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
-
-  def terms: List[Term[C]] =
-    data.map(Term.fromTuple(_)).toList
 
   def allTerms: List[Term[C]] = {
     val m = degree
@@ -93,7 +90,10 @@ class PolySparse[C: ClassTag] private[spire] (val data: Map[Int, C])
     cs.toList.reverse
   }
 
-  def coeffs: Array[C] = {
+  def terms: List[Term[C]] =
+    data.map(Term.fromTuple(_)).toList
+
+  def coeffs: List[C] = {
     allTerms.map(_.coeff)
   }
 
@@ -148,7 +148,7 @@ class PolySparse[C: ClassTag] private[spire] (val data: Map[Int, C])
     @tailrec def eval(q: List[C], u: List[C], n: Int): (Polynomial[C], Polynomial[C]) = {
       lazy val v0 = if (rhs.isZero) r.zero else rhs.maxOrderTermCoeff
       lazy val q0 = u.head / v0
-      lazy val uprime = zipSum(u, rhs.coeffs.map(_ * -q0))
+      lazy val uprime = zipSum(u, rhs.coeffs.toList.map(_ * -q0))
       if (u.isEmpty || n < 0) (polyFromCoeffsLE(q), polyFromCoeffsBE(u)) 
         else eval(q0 :: q, uprime, n - 1)
     }
@@ -167,7 +167,7 @@ class PolySparse[C: ClassTag] private[spire] (val data: Map[Int, C])
 
   def monic(implicit f: Field[C]): Polynomial[C] = {
     val m = maxOrderTermCoeff
-    new Polynomial(data.map { case (e, c) => (e, c / m) })
+    Polynomial(data.map { case (e, c) => (e, c / m) })
   }
 
   def derivative: Polynomial[C] =
@@ -177,6 +177,10 @@ class PolySparse[C: ClassTag] private[spire] (val data: Map[Int, C])
 
   def integral(implicit f: Field[C]): Polynomial[C] =
     Polynomial(data.map(t => Term.fromTuple(t).int))
+
+  implicit object BigEndianPolynomialOrdering extends Order[Term[C]] {
+    def compare(x:Term[C], y:Term[C]): Int = y.exp compare x.exp
+  }
 
   override def toString =
     if (isZero) {
@@ -200,19 +204,19 @@ class PolySparse[C: ClassTag] private[spire] (val data: Map[Int, C])
 }
 
 // Dense polynomials - Little Endian Storage
-class PolyDense[C: ClassTag] private[spire] (val coeffs: Array[C])
+class PolyDense[C] private[spire] (val coeffs: Array[C])
   (implicit r: Ring[C], s: Signed[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
   lazy val data: Map[Int, C] = {
-    terms.view.map(_ => (_.exp, _.coeff)).toMap
+    terms.view.map(_.toTuple).toMap
   }
 
   lazy val terms: List[Term[C]] =
     coeffs.view.zipWithIndex.map({ case (c, e) => 
-      Term(c, e)).filterNot(_.isZero)}).toList
+      Term(c, e)}).filterNot(_.isZero).toList
 
   lazy val maxTerm: Term[C] =
-    terms.view.foldLeft(Term.zero[C]) { case (term, (e, c)) =>
+    data.view.foldLeft(Term.zero[C]) { case (term, (e, c)) =>
       if (term.exp <= e) Term(c, e) else term
     }
 
@@ -242,7 +246,7 @@ class PolyDense[C: ClassTag] private[spire] (val coeffs: Array[C])
       negArray(i) = -coeffs(i)
       i += 1
     }
-    Polynomial.LE(negArray)
+    Polynomial.dense(negArray)
   }
 
   def monic(implicit f: Field[C]): Polynomial[C] = {
@@ -253,18 +257,18 @@ class PolyDense[C: ClassTag] private[spire] (val coeffs: Array[C])
       cs(i) = coeffs(i) / m
       i += 1
     }
-    Polynomial.LE(cs)
+    Polynomial.dense(cs)
   }
 
   def derivative: Polynomial[C] =
-    if(isZero) this else if(coeffs.length == 1) Polynomial.LE(Array(r.zero)) else {
+    if(isZero) this else if(coeffs.length == 1) Polynomial.dense(Array(r.zero)) else {
       val cs = new Array[C](degree)
       var i = degree
       while(i > 0) {
         cs(i - 1) = r.fromInt(i) * coeffs(i)
         i -= 1
       }
-      Polynomial.LE(cs) 
+      Polynomial.dense(cs) 
     }
 
   def integral(implicit f: Field[C]): Polynomial[C] = {
@@ -274,7 +278,7 @@ class PolyDense[C: ClassTag] private[spire] (val coeffs: Array[C])
       cs(i + 1) = coeffs(i) / f.fromInt(i + 1)
       i += 1
     }
-    Polynomial.LE(cs) 
+    Polynomial.dense(cs) 
   }
 
   def +(rhs: Polynomial[C]): Polynomial[C] = {
@@ -291,7 +295,7 @@ class PolyDense[C: ClassTag] private[spire] (val coeffs: Array[C])
     }
     val cs = if(lhs.degree < rhs.degree) rhs.coeffs else lhs.coeffs
     System.arraycopy(cs, minDeg, sumArr, minDeg, maxDeg - minDeg)
-    Polynomial.LE(sumArr)
+    Polynomial.dense(sumArr)
   }
 
   def *(rhs: Polynomial[C]): Polynomial[C] = {
@@ -305,7 +309,7 @@ class PolyDense[C: ClassTag] private[spire] (val coeffs: Array[C])
       }
       i += 1
     }
-    Polynomial.LE(cs)
+    Polynomial.dense(cs)
   }
 
   def /%(rhs: Polynomial[C])(implicit f: Field[C]): (Polynomial[C], Polynomial[C]) = {
@@ -342,13 +346,13 @@ class PolyDense[C: ClassTag] private[spire] (val coeffs: Array[C])
         qtemp
       }
       // POSSIBLE ISSUE HERE WITH PRECURSOR ZEROES -> MUST CHECK THOROUGHLY
-      if (u.isEmpty || n < 0) (Polynomial.LE(q.reverse.dropWhile(_.signum == 0)), Polynomial.LE(u.reverse.dropWhile(_.signum == 0))) 
+      if (u.isEmpty || n < 0) (Polynomial.dense(q.reverse.dropWhile(_.signum == 0)), Polynomial.dense(u.reverse.dropWhile(_.signum == 0))) 
         else eval(newQ, uprime, n - 1)
     }
 
     if (rhs.coeffs.length == 1) {
-      val q = Polynomial.LE(lhs.coeffs.map { c => c / rhs.coeffs(0) })
-      val r = Polynomial.LE(Array[C]())
+      val q = Polynomial.dense(lhs.coeffs.map { c => c / rhs.coeffs(0) })
+      val r = Polynomial.dense(Array[C]())
       (q, r)
     } else 
     eval(new Array[C](rhs.coeffs.length), lhs.coeffs.reverse, lhs.degree - rhs.degree)
@@ -357,6 +361,10 @@ class PolyDense[C: ClassTag] private[spire] (val coeffs: Array[C])
   def /~(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C] = (lhs /% rhs)._1
     
   def %(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C] = (lhs /% rhs)._2
+
+  implicit object BigEndianPolynomialOrdering extends Order[Term[C]] {
+    def compare(x:Term[C], y:Term[C]): Int = y.exp compare x.exp
+  }
 
   override def toString =
     if (isZero) {
@@ -382,30 +390,30 @@ class PolyDense[C: ClassTag] private[spire] (val coeffs: Array[C])
 
 object Polynomial {
 
-  def LE[C: Ring: ClassTag](coeffs: Array[C])(implicit s: Signed[C]): Polynomial[C] = {
-    val cs = for {i <- 0 until coeffs.length;
-         if(coeffs(i).signum =!= 0)} yield (i, coeffs(i))
-    new Polynomial(cs.toMap)
-  }
+  def dense[C](coeffs: Array[C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): Polynomial[C] =
+    new PolyDense(coeffs)
 
-  def apply[C: Ring: ClassTag](data: Map[Int, C])(implicit s: Signed[C]): Polynomial[C] =
-    new Polynomial(data.filterNot { case (e, c) => s.sign(c) == Sign.Zero })
+  def sparse[C](data: Map[Int, C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): Polynomial[C] =
+    new PolySparse(data)
 
-  def apply[C: Ring : Signed: ClassTag](terms: Iterable[Term[C]]): Polynomial[C] =
-    new Polynomial(terms.view.filterNot(_.isZero).map(_.toTuple).toMap)
+  def apply[C](data: Map[Int, C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): Polynomial[C] =
+    new PolySparse(data.filterNot { case (e, c) => s.sign(c) == Sign.Zero })
 
-  def apply[C: Ring : Signed: ClassTag](terms: Traversable[Term[C]]): Polynomial[C] =
-    new Polynomial(terms.view.filterNot(_.isZero).map(_.toTuple).toMap)
+  def apply[C](terms: Iterable[Term[C]])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): Polynomial[C] =
+    new PolySparse(terms.view.filterNot(_.isZero).map(_.toTuple).toMap)
 
-  def apply[C: Ring: ClassTag](c: C, e: Int)(implicit s: Signed[C]): Polynomial[C] =
-    new Polynomial(Map(e -> c).filterNot { case (e, c) => s.sign(c) == Sign.Zero})
+  def apply[C](terms: Traversable[Term[C]])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): Polynomial[C] =
+    new PolySparse(terms.view.filterNot(_.isZero).map(_.toTuple).toMap)
+
+  def apply[C](c: C, e: Int)(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): Polynomial[C] =
+    new PolySparse(Map(e -> c).filterNot { case (e, c) => s.sign(c) == Sign.Zero})
 
   import scala.util.{Try, Success, Failure}
 
   def apply(s: String): Polynomial[Rational] = parse(s)
 
-  def zero[C: Signed: Ring: ClassTag] = new Polynomial(Map.empty[Int, C])
-  def one[C: Signed: ClassTag](implicit r: Ring[C]) = new Polynomial(Map(0 -> r.one))
+  def zero[C: Signed: Ring: ClassTag] = new PolySparse(Map.empty[Int, C])
+  def one[C: Signed: ClassTag](implicit r: Ring[C]) = new PolySparse(Map(0 -> r.one))
 
   def constant[C: Signed: Ring: ClassTag](c: C) =
     if (c.signum == 0) zero[C] else Polynomial(Map(0 -> c))
@@ -483,7 +491,7 @@ object Polynomial {
 
 trait Polynomial[C] {
 
-  def terms: List[Terms[C]]
+  def terms: List[Term[C]]
   def coeffs: Array[C]
   def data: Map[Int, C]
 
@@ -493,19 +501,17 @@ trait Polynomial[C] {
   def isZero: Boolean
 
   def apply(x: C): C
-  def unary_-: Polynomial[C]
-  def monic: Polynomial[C]
+  def unary_-(): Polynomial[C]
+  def monic(implicit f: Field[C]): Polynomial[C]
   def derivative: Polynomial[C]
-  def integral: Polynomial[C]
+  def integral(implicit f: Field[C]): Polynomial[C]
   def +(rhs: Polynomial[C]): Polynomial[C]
   def *(rhs: Polynomial[C]): Polynomial[C]
-  def /~(rhs: Polynomial[C]): Polynomial[C]
-  def /%(rhs: Polynomial[C]): Polynomial[C]
-  def %(rhs: Polynomial[C]): Polynomial[C]
+  def /~(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C]
+  def /%(rhs: Polynomial[C])(implicit f: Field[C]): (Polynomial[C], Polynomial[C])
+  def %(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C]
 
-  implicit object BigEndianPolynomialOrdering extends Order[Term[C]] {
-    def compare(x:Term[C], y:Term[C]): Int = y.exp compare x.exp
-  }
+  implicit val ct: ClassTag[C] = classTag[C]
 
 }
 
