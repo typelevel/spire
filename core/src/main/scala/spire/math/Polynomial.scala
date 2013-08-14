@@ -79,7 +79,7 @@ object Term {
 }
 
 
-// Sparse polynomials
+// Sparse polynomials - Big Endian Coeffs e.g. x^n, x^n-1, ... x^0
 class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
   (implicit r: Ring[C], s: Signed[C], val ct: ClassTag[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
@@ -131,29 +131,30 @@ class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
       }
     })
 
-  // SPARSE QUOTMOD
   def /%(rhs: Polynomial[C])(implicit f: Field[C]): (Polynomial[C], Polynomial[C]) = {
     require(!rhs.isZero, "Can't divide by polynomial of zero!")
 
-    def zipSum(x: List[C], y: List[C]): List[C] =
+    def zipSum(x: Array[C], y: Array[C]): Array[C] =
       (x + y).tail
 
-    def polyFromCoeffsLE(cs: List[C]): Polynomial[C] =
-      Polynomial(cs.zipWithIndex.map({ case (c, e) => Term(c, e) }))
+    def polyFromCoeffsLE(cs: Array[C]): Polynomial[C] = {
+      val ncs: Array[Term[C]] = cs.zipWithIndex.map({ case (c, e) => Term(c, e) })
+      Polynomial(ncs)
+    }
 
-    def polyFromCoeffsBE(cs: List[C]): Polynomial[C] = {
+    def polyFromCoeffsBE(cs: Array[C]): Polynomial[C] = {
       val ncs = cs.dropWhile(_.signum == 0)
       Polynomial(((ncs.length - 1) to 0 by -1).zip(ncs).map(Term.fromTuple(_)))
     }
             
-    @tailrec def eval(q: List[C], u: List[C], n: Int): (Polynomial[C], Polynomial[C]) = {
+    @tailrec def eval(q: Array[C], u: Array[C], n: Int): (Polynomial[C], Polynomial[C]) = {
       if (u.isEmpty || n < 0) {
         (polyFromCoeffsLE(q), polyFromCoeffsBE(u))
       } else {
         val v0 = if (rhs.isZero) r.zero else rhs.maxOrderTermCoeff
-        val q0 = u.head / v0
-        val uprime = zipSum(u, rhs.coeffs.toList.map(_ * -q0))
-        eval(q0 :: q, uprime, n - 1)
+        val q0 = u(0) / v0
+        val uprime = zipSum(u, rhs.coeffs.map(_ * -q0))
+        eval(Array(q0) ++ q, uprime, n - 1)
       }
     }
 
@@ -162,7 +163,7 @@ class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
       val q = Polynomial(lhs.data.map { case (e, c) => (e, c / ym.coeff) })
       val r = Polynomial(Map.empty[Int, C])
       (q, r)
-    } else eval(Nil, lhs.coeffs.toList, lhs.degree - rhs.degree)
+    } else eval(Array[C](), lhs.coeffs, lhs.degree - rhs.degree)
   }
 
   def /~(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C] = (lhs /% rhs)._1
@@ -207,7 +208,7 @@ class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
 
 }
 
-// Dense polynomials - Little Endian Storage
+// Dense polynomials - Little Endian Coeffs e.g. x^0, x^1, ... x^n
 class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   (implicit r: Ring[C], s: Signed[C], val ct: ClassTag[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
@@ -320,7 +321,6 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
     Polynomial.dense(cs)
   }
 
-  // DENSE QUOTMOD
   def /%(rhs: Polynomial[C])(implicit f: Field[C]): (Polynomial[C], Polynomial[C]) = {
     require(!rhs.isZero, "Can't divide by polynomial of zero!")
 
@@ -328,11 +328,11 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
       (lcs + rcs).tail
 
     def polyFromCoeffsLE(cs: Array[C]): Polynomial[C] =
-      Polynomial.denseFromTerms(cs.zipWithIndex.map({ case (c, e) => Term(c, e) }))
+      Polynomial.dense(cs)
 
     def polyFromCoeffsBE(cs: Array[C]): Polynomial[C] = {
       val ncs = cs.dropWhile(_.signum == 0)
-      Polynomial.denseFromTerms(((ncs.length - 1) to 0 by -1).zip(ncs).map(Term.fromTuple(_)))
+      Polynomial.dense(ncs.reverse)
     }
             
     @tailrec def eval(q: Array[C], u: Array[C], n: Int): (Polynomial[C], Polynomial[C]) = {
@@ -340,17 +340,17 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
         (polyFromCoeffsLE(q), polyFromCoeffsBE(u))
       } else {
         val v0 = if (rhs.isZero) r.zero else rhs.maxOrderTermCoeff
-        val q0 = u.head / v0
+        val q0 = u(0) / v0
         val uprime = zipSum(u, rhs.coeffs.reverse.map(_ * -q0))
         eval(Array(q0) ++ q, uprime, n - 1)
       }
     }
 
-    // if (rhs.coeffs.length == 1) {
-    //   val q = Polynomial.dense(lhs.coeffs.map { c => c / rhs.coeffs(0) })
-    //   val r = Polynomial.dense(Array[C]())
-    //   (q, r)
-    // } else 
+    if (rhs.coeffs.length == 1) {
+      val q = Polynomial.dense(lhs.coeffs.map { c => c / rhs.coeffs(0) })
+      val r = Polynomial.dense(Array[C]())
+      (q, r)
+    } else 
     eval(Array[C](), lhs.coeffs.reverse, lhs.degree - rhs.degree)
   }
 
@@ -398,12 +398,8 @@ object Polynomial {
     }
   }
 
-  def denseFromTerms[@spec(Double) C](terms: Iterable[Term[C]])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolyDense[C] = {
-    new PolyDense(Polynomial(terms).coeffs.reverse)
-  }
-
   def sparse[@spec(Double) C](data: Map[Int, C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
-    new PolySparse(data)
+    new PolySparse(data.filterNot { case (e, c) => s.sign(c) == Sign.Zero })
 
   def apply[@spec(Double) C](data: Map[Int, C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
     new PolySparse(data.filterNot { case (e, c) => s.sign(c) == Sign.Zero })

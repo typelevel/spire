@@ -15,7 +15,7 @@ object PolynomialBenchmarks extends MyRunner(classOf[PolynomialBenchmarks])
 
 class PolynomialBenchmarks extends MyBenchmark {
 
-  @Param(Array("1", "2", "4", "8", "16"))
+  @Param(Array("1"))//, "2", "4", "8", "16"))
   var size: Int = 0
 
   def arbitraryRational = {
@@ -25,6 +25,7 @@ class PolynomialBenchmarks extends MyBenchmark {
 
   var spireRationalPolys: Array[Polynomial[Rational]] = null
   var spireDoublePolys: Array[Polynomial[Double]] = null
+  var spireSparseDoublePolys: Array[Polynomial[Double]] = null
   var commonsDoublePolys: Array[PolynomialFunction] = null
 
   override protected def setUp() {
@@ -34,6 +35,7 @@ class PolynomialBenchmarks extends MyBenchmark {
 
     spireRationalPolys = coeffs.map(cs => Polynomial.dense(cs))
     spireDoublePolys = coeffs.map(cs => Polynomial.dense(cs.map(_.toDouble)))
+    spireSparseDoublePolys = spireDoublePolys.map(p => Polynomial(p.data))
     commonsDoublePolys = coeffs.map(cs => new PolynomialFunction(cs.map(_.toDouble)))
   }
 
@@ -152,22 +154,28 @@ class PolynomialBenchmarks extends MyBenchmark {
     total
   }
 
-  def timeAddSpireRationalPolys(reps: Int) = run(reps)(addSpireRationalPolynomials(spireRationalPolys))
-  def timeAddSpireDoublePolys(reps: Int) = run(reps)(addSpireDoublePolynomials(spireDoublePolys))
+  // def timeAddSpireRationalPolys(reps: Int) = run(reps)(addSpireRationalPolynomials(spireRationalPolys))
+  def timeAddSpireDoublePolysDense(reps: Int) = run(reps)(addSpireDoublePolynomials(spireDoublePolys))
+  def timeAddSpireDoublePolysSparse(reps: Int) = run(reps)(addSpireDoublePolynomials(spireSparseDoublePolys))
   def timeAddCommonsDoublePolynomials(reps: Int) = run(reps)(addCommonsDoublePolynomials(commonsDoublePolys))
 
-  def timeMultiplySpireRationalPolys(reps: Int) = run(reps)(multiplySpireRationalPolynomials(spireRationalPolys))
-  def timeMultiplySpireDoublePolys(reps: Int) = run(reps)(multiplySpireDoublePolynomials(spireDoublePolys))
+  // def timeMultiplySpireRationalPolys(reps: Int) = run(reps)(multiplySpireRationalPolynomials(spireRationalPolys))
+  def timeMultiplySpireDoublePolysDense(reps: Int) = run(reps)(multiplySpireDoublePolynomials(spireDoublePolys))
+  def timeMultiplySpireDoublePolysSparse(reps: Int) = run(reps)(multiplySpireDoublePolynomials(spireSparseDoublePolys))
   def timeMultiplyCommonsDoublePolynomials(reps: Int) = run(reps)(multiplyCommonsDoublePolynomials(commonsDoublePolys))
   
   // def timeDerivativeSpireRationalPolys(reps: Int) = run(reps)(derivativeSpireRationalPolynomials(spireRationalPolys))
-  def timeDerivativeSpireDoublePolys(reps: Int) = run(reps)(derivativeSpireDoublePolynomials(spireDoublePolys))
+  def timeDerivativeSpireDoublePolysDense(reps: Int) = run(reps)(derivativeSpireDoublePolynomials(spireDoublePolys))
+  def timeDerivativeSpireDoublePolysSparse(reps: Int) = run(reps)(derivativeSpireDoublePolynomials(spireSparseDoublePolys))
   def timeDerivativeCommonsDoublePolynomials(reps: Int) = run(reps)(derivativeCommonsDoublePolynomials(commonsDoublePolys))
   
   // def timeEvaluateSpireRationalPolys(reps: Int) = run(reps)(evaluateSpireRationalPolynomials(spireRationalPolys))
-  def timeEvaluateSpireDoublePolys(reps: Int) = run(reps)(evaluateSpireDoublePolynomials(spireDoublePolys))
+  def timeEvaluateSpireDoublePolysDense(reps: Int) = run(reps)(evaluateSpireDoublePolynomials(spireDoublePolys))
+  def timeEvaluateSpireDoublePolysSparse(reps: Int) = run(reps)(evaluateSpireDoublePolynomials(spireSparseDoublePolys))
   def timeEvaluateCommonsDoublePolynomials(reps: Int) = run(reps)(evaluateCommonsDoublePolynomials(commonsDoublePolys))
 
   // def timeQuotModSpireRationalPolys(reps: Int) = run(reps)(quotModSpireRationalPolynomials(spireRationalPolys))
-  def timeQuotModSpireDoublePolys(reps: Int) = run(reps)(quotModSpireDoublePolynomials(spireDoublePolys))
+  def timeQuotModSpireDoublePolysDense(reps: Int) = run(reps)(quotModSpireDoublePolynomials(spireDoublePolys))
+  def timeQuotModSpireDoublePolysSparse(reps: Int) = run(reps)(quotModSpireDoublePolynomials(spireSparseDoublePolys))
+
 }
