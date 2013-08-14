@@ -131,13 +131,12 @@ class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
       }
     })
 
+  // SPARSE QUOTMOD
   def /%(rhs: Polynomial[C])(implicit f: Field[C]): (Polynomial[C], Polynomial[C]) = {
     require(!rhs.isZero, "Can't divide by polynomial of zero!")
 
-    def zipSum(x: List[C], y: List[C]): List[C] = {
-      val (s, l) = if(x.length > y.length) (y, x) else (x, y)
-      (s.zip(l).map(z => z._1 + z._2) ++ l.drop(s.length)).tail
-    }
+    def zipSum(x: List[C], y: List[C]): List[C] =
+      (x + y).tail
 
     def polyFromCoeffsLE(cs: List[C]): Polynomial[C] =
       Polynomial(cs.zipWithIndex.map({ case (c, e) => Term(c, e) }))
@@ -321,50 +320,38 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
     Polynomial.dense(cs)
   }
 
+  // DENSE QUOTMOD
   def /%(rhs: Polynomial[C])(implicit f: Field[C]): (Polynomial[C], Polynomial[C]) = {
     require(!rhs.isZero, "Can't divide by polynomial of zero!")
 
-    // this is correct.
-    def zipSum(lcs: Array[C], rcs: Array[C], q0: C)(implicit r: Ring[C]): Array[C] = {
-      val (maxl, minl) = lcs.length compare rcs.length match {
-        case 0 => (lcs.length, rcs.length)
-        case 1 => (lcs.length, rcs.length)
-        case -1 => (rcs.length, lcs.length)
-      } 
-      val sumArr = new Array[C](maxl)
-      var i = 0
-      while(i < minl) {
-        sumArr(i) = lcs(i) + (rcs(i) * -q0)
-        i += 1
-      }
-      val cs = if(lcs.length < rcs.length) rcs else lcs
-      System.arraycopy(cs, minl, sumArr, minl, maxl - minl)
-      val out = new Array[C](maxl - 1)
-      System.arraycopy(sumArr, 1, out, 0, maxl - 1)
-      out
+    def zipSum(lcs: Array[C], rcs: Array[C])(implicit r: Ring[C]): Array[C] = 
+      (lcs + rcs).tail
+
+    def polyFromCoeffsLE(cs: Array[C]): Polynomial[C] =
+      Polynomial.denseFromTerms(cs.zipWithIndex.map({ case (c, e) => Term(c, e) }))
+
+    def polyFromCoeffsBE(cs: Array[C]): Polynomial[C] = {
+      val ncs = cs.dropWhile(_.signum == 0)
+      Polynomial.denseFromTerms(((ncs.length - 1) to 0 by -1).zip(ncs).map(Term.fromTuple(_)))
     }
             
-    def eval(q: Array[C], u: Array[C], n: Int): (Polynomial[C], Polynomial[C]) = {
-      val v0 = if (rhs.isZero) f.zero else rhs.maxOrderTermCoeff
-      val q0 = if(!u.isEmpty) u(0) / v0 else f.zero
-      val uprime = zipSum(u, rhs.coeffs.reverse, q0)
-      val newQ = {
-        val qtemp = new Array[C](q.length + 1)
-        qtemp(0) = q0
-        if(q.length > 0) System.arraycopy(q, 0, qtemp, 1, q.length - 1)
-        qtemp
+    @tailrec def eval(q: Array[C], u: Array[C], n: Int): (Polynomial[C], Polynomial[C]) = {
+      if (u.isEmpty || n < 0) {
+        (polyFromCoeffsLE(q), polyFromCoeffsBE(u))
+      } else {
+        val v0 = if (rhs.isZero) r.zero else rhs.maxOrderTermCoeff
+        val q0 = u.head / v0
+        val uprime = zipSum(u, rhs.coeffs.reverse.map(_ * -q0))
+        eval(Array(q0) ++ q, uprime, n - 1)
       }
-      // POSSIBLE ISSUE HERE WITH PRECURSOR ZEROES -> MUST CHECK THOROUGHLY
-      if (u.isEmpty || n < 0) (Polynomial.dense(q.reverse.dropWhile(_.signum == 0)), Polynomial.dense(u.reverse.dropWhile(_.signum == 0))) 
-        else eval(newQ, uprime, n - 1)
     }
 
-    if (rhs.coeffs.length == 1) {
-      val q = Polynomial.dense(lhs.coeffs.map { c => c / rhs.coeffs(0) })
-      val r = Polynomial.dense(Array[C]())
-      (q, r)
-    } else 
-    eval(new Array[C](rhs.coeffs.length), lhs.coeffs.reverse, lhs.degree - rhs.degree)
+    // if (rhs.coeffs.length == 1) {
+    //   val q = Polynomial.dense(lhs.coeffs.map { c => c / rhs.coeffs(0) })
+    //   val r = Polynomial.dense(Array[C]())
+    //   (q, r)
+    // } else 
+    eval(Array[C](), lhs.coeffs.reverse, lhs.degree - rhs.degree)
   }
 
   def /~(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C] = (lhs /% rhs)._1
@@ -409,6 +396,10 @@ object Polynomial {
       System.arraycopy(coeffs, 0, cs, 0, i + 1)
       new PolyDense(cs)
     }
+  }
+
+  def denseFromTerms[@spec(Double) C](terms: Iterable[Term[C]])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolyDense[C] = {
+    new PolyDense(Polynomial(terms).coeffs.reverse)
   }
 
   def sparse[@spec(Double) C](data: Map[Int, C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
