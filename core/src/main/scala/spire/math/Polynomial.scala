@@ -120,7 +120,7 @@ class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
     Polynomial(data.map { case (e, c) => (e, -c) })
 
   def +(rhs: Polynomial[C]): Polynomial[C] =
-    Polynomial(lhs.data + rhs.data)
+    Polynomial(lhs.data + rhs.data) // .data -> .coeffs array from Map check...
 
   def *(rhs: Polynomial[C]): Polynomial[C] =
     Polynomial(lhs.data.view.foldLeft(Map.empty[Int, C]) { case (m, (ex, cx)) =>
@@ -399,7 +399,7 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
 
 object Polynomial {
 
-  def dense[@spec(Double) C](coeffs: Array[C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): Polynomial[C] = {
+  def dense[@spec(Double) C](coeffs: Array[C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolyDense[C] = {
     var i = coeffs.length - 1
     while (i >= 0 && coeffs(i).signum == 0) i -= 1
     if (i == coeffs.length) {
@@ -411,19 +411,19 @@ object Polynomial {
     }
   }
 
-  def sparse[@spec(Double) C](data: Map[Int, C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): Polynomial[C] =
+  def sparse[@spec(Double) C](data: Map[Int, C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
     new PolySparse(data)
 
-  def apply[@spec(Double) C](data: Map[Int, C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): Polynomial[C] =
+  def apply[@spec(Double) C](data: Map[Int, C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
     new PolySparse(data.filterNot { case (e, c) => s.sign(c) == Sign.Zero })
 
-  def apply[@spec(Double) C](terms: Iterable[Term[C]])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): Polynomial[C] =
+  def apply[@spec(Double) C](terms: Iterable[Term[C]])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
     new PolySparse(terms.view.filterNot(_.isZero).map(_.toTuple).toMap)
 
-  def apply[@spec(Double) C](terms: Traversable[Term[C]])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): Polynomial[C] =
+  def apply[@spec(Double) C](terms: Traversable[Term[C]])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
     new PolySparse(terms.view.filterNot(_.isZero).map(_.toTuple).toMap)
 
-  def apply[@spec(Double) C](c: C, e: Int)(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): Polynomial[C] =
+  def apply[@spec(Double) C](c: C, e: Int)(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
     new PolySparse(Map(e -> c).filterNot { case (e, c) => s.sign(c) == Sign.Zero})
 
   import scala.util.{Try, Success, Failure}

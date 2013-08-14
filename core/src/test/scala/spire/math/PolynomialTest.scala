@@ -29,13 +29,19 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     Term(c, (e0 % 100).abs)
   })
 
-  implicit val arbitraryRationalPolynomial: Arbitrary[Polynomial[Rational]] = Arbitrary(for {
+  implicit val arbitraryDenseRationalPolynomial: Arbitrary[PolyDense[Rational]] = Arbitrary(for {
     ts <- arbitrary[List[Term[Rational]]]
   } yield {
     val p = Polynomial(ts.foldLeft(Map.empty[Int, Rational]) { (m, t) =>
       m.updated(t.exp, m.getOrElse(t.exp, r"0") + t.coeff)
     }.filter { case (e, c) => c != 0 })
     Polynomial.dense(p.coeffs)
+  })
+
+  implicit val arbitrarySparseRationalPolynomial: Arbitrary[PolySparse[Rational]] = Arbitrary(for {
+    ts <- arbitrary[List[Term[Rational]]]
+  } yield {
+    Polynomial(ts)
   })
 
   property("terms") {
@@ -51,78 +57,156 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     }
   }
 
-  property("p = p") {
-    forAll { (p: Polynomial[Rational]) =>
+  property("sparse p = p") {
+    forAll { (p: PolySparse[Rational]) =>
       p should be === p
     }
   }
 
-  property("apply(p.toString) = p") {
-    forAll { (p: Polynomial[Rational]) =>
+  property("dense p = p") {
+    forAll { (p: PolyDense[Rational]) =>
+      p should be === p
+    }
+  }
+
+  property("sparse apply(p.toString) = p") {
+    forAll { (p: PolySparse[Rational]) =>
       Polynomial(p.toString) should be === p
     }
   }
 
-  property("p + 0 = p") {
-    forAll { (p: Polynomial[Rational]) =>
+  property("dense apply(p.toString) = p") {
+    forAll { (p: PolyDense[Rational]) =>
+      Polynomial(p.toString) should be === p
+    }
+  }
+
+  property("sparse p + 0 = p") {
+    forAll { (p: PolySparse[Rational]) =>
       p + Polynomial("0") should be === p
     }
   }
 
-  property("p + (-p) = 0") {
-    forAll { (p: Polynomial[Rational]) =>
+  property("dense p + 0 = p") {
+    forAll { (p: PolyDense[Rational]) =>
+      p + Polynomial("0") should be === p
+    }
+  }
+
+  property("sparse p + (-p) = 0") {
+    forAll { (p: PolySparse[Rational]) =>
       p + (-p) should be === Polynomial("0")
     }
   }
 
-  property("p * 0 = 0") {
-    forAll { (p: Polynomial[Rational]) =>
+  property("dense p + (-p) = 0") {
+    forAll { (p: PolyDense[Rational]) =>
+      p + (-p) should be === Polynomial("0")
+    }
+  }
+
+  property("sparse p * 0 = 0") {
+    forAll { (p: PolySparse[Rational]) =>
       p * Polynomial("0") should be === Polynomial("0")
     }
   }
 
-  property("p * 1 = p") {
-    forAll { (p: Polynomial[Rational]) =>
+  property("dense p * 0 = 0") {
+    forAll { (p: PolyDense[Rational]) =>
+      p * Polynomial("0") should be === Polynomial("0")
+    }
+  }
+
+  property("sparse p * 1 = p") {
+    forAll { (p: PolySparse[Rational]) =>
       p * Polynomial("1") should be === p
     }
   }
 
-  property("p /~ 1 = p") {
-    forAll { (p: Polynomial[Rational]) =>
+  property("dense p * 1 = p") {
+    forAll { (p: PolyDense[Rational]) =>
+      p * Polynomial("1") should be === p
+    }
+  }
+
+  property("sparse p /~ 1 = p") {
+    forAll { (p: PolySparse[Rational]) =>
       p /~ Polynomial("1") should be === p
     }
   }
 
-  property("p /~ p = 1") {
-    forAll { (p: Polynomial[Rational]) =>
+  property("dense p /~ 1 = p") {
+    forAll { (p: PolyDense[Rational]) =>
+      p /~ Polynomial("1") should be === p
+    }
+  }
+
+  property("sparse p /~ p = 1") {
+    forAll { (p: PolySparse[Rational]) =>
       if (!p.isZero) {
         p /~ p should be === Polynomial("1")
       }
     }
   }
 
-  property("p % p = 0") {
-    forAll { (p: Polynomial[Rational]) =>
+  property("dense p /~ p = 1") {
+    forAll { (p: PolyDense[Rational]) =>
+      if (!p.isZero) {
+        p /~ p should be === Polynomial("1")
+      }
+    }
+  }
+
+  property("sparse p % p = 0") {
+    forAll { (p: PolySparse[Rational]) =>
       if (!p.isZero) {
         p % p should be === Polynomial("0")
       }
     }
   }
 
-  property("x + y = y + x") {
-    forAll { (x: Polynomial[Rational], y: Polynomial[Rational]) =>
+  property("dense p % p = 0") {
+    forAll { (p: PolyDense[Rational]) =>
+      if (!p.isZero) {
+        p % p should be === Polynomial("0")
+      }
+    }
+  }
+
+  property("sparse x + y = y + x") {
+    forAll { (x: PolySparse[Rational], y: PolySparse[Rational]) =>
       x + y should be === y + x
     }
   }
 
-  property("x * y = y * x") {
-    forAll { (x: Polynomial[Rational], y: Polynomial[Rational]) =>
+  property("dense x + y = y + x") {
+    forAll { (x: PolyDense[Rational], y: PolyDense[Rational]) =>
+      x + y should be === y + x
+    }
+  }
+
+  property("sparse x * y = y * x") {
+    forAll { (x: PolySparse[Rational], y: PolySparse[Rational]) =>
       (x * y).toString should be === (y * x).toString
     }
   }
 
-  property("(x /~ y) * y + (x % y) = x") {
-    forAll { (x: Polynomial[Rational], y: Polynomial[Rational]) =>
+  property("dense x * y = y * x") {
+    forAll { (x: PolyDense[Rational], y: PolyDense[Rational]) =>
+      (x * y).toString should be === (y * x).toString
+    }
+  }
+
+  property("sparse (x /~ y) * y + (x % y) = x") {
+    forAll { (x: PolySparse[Rational], y: PolySparse[Rational]) =>
+      if (!y.isZero) {
+        (x /~ y) * y + (x % y) should be === x
+      }
+    }
+  }
+
+  property("dense (x /~ y) * y + (x % y) = x") {
+    forAll { (x: PolyDense[Rational], y: PolyDense[Rational]) =>
       if (!y.isZero) {
         (x /~ y) * y + (x % y) should be === x
       }
