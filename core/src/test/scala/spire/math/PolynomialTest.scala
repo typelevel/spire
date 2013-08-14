@@ -29,12 +29,13 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     Term(c, (e0 % 100).abs)
   })
 
-  implicit val arbitraryRationalPolynomial = Arbitrary(for {
+  implicit val arbitraryRationalPolynomial: Arbitrary[Polynomial[Rational]] = Arbitrary(for {
     ts <- arbitrary[List[Term[Rational]]]
   } yield {
-    Polynomial(ts.foldLeft(Map.empty[Int, Rational]) { (m, t) =>
+    val p = Polynomial(ts.foldLeft(Map.empty[Int, Rational]) { (m, t) =>
       m.updated(t.exp, m.getOrElse(t.exp, r"0") + t.coeff)
     }.filter { case (e, c) => c != 0 })
+    Polynomial.dense(p.coeffs)
   })
 
   property("terms") {
