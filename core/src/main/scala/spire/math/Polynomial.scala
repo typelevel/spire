@@ -83,6 +83,9 @@ object Term {
 class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
   (implicit r: Ring[C], s: Signed[C], val ct: ClassTag[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
+  def toDense: PolyDense[C] = new PolyDense(coeffs.reverse)
+  def toSparse: PolySparse[C] = lhs
+
   def allTerms: List[Term[C]] = {
     val m = degree
     val cs = new Array[Term[C]](m + 1)
@@ -120,7 +123,7 @@ class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
     Polynomial(data.map { case (e, c) => (e, -c) })
 
   def +(rhs: Polynomial[C]): Polynomial[C] =
-    Polynomial(lhs.data + rhs.data) // .data -> .coeffs array from Map check...
+    Polynomial(lhs.data + rhs.data)
 
   def *(rhs: Polynomial[C]): Polynomial[C] =
     Polynomial(lhs.data.view.foldLeft(Map.empty[Int, C]) { case (m, (ex, cx)) =>
@@ -212,6 +215,9 @@ class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
 class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   (implicit r: Ring[C], s: Signed[C], val ct: ClassTag[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
+  def toSparse: PolySparse[C] = new PolySparse(data)
+  def toDense: PolyDense[C] = lhs
+
   def data: Map[Int, C] = {
     terms.view.map(_.toTuple).toMap
   }
@@ -283,11 +289,12 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   def integral(implicit f: Field[C]): Polynomial[C] = {
     val cs = new Array[C](coeffs.length + 1)
     var i = 0
-    while(i < degree) {
+    while(i < coeffs.length) {
       cs(i + 1) = coeffs(i) / f.fromInt(i + 1)
       i += 1
     }
-    Polynomial.dense(cs) 
+    cs(0) = f.zero // n.b. must initialize first term 0x^0 otherwise it's null
+    Polynomial.dense(cs)
   }
 
   def +(rhs: Polynomial[C]): Polynomial[C] =
@@ -495,6 +502,9 @@ object Polynomial {
 
 
 trait Polynomial[@spec(Double) C] {
+
+  def toDense: Polynomial[C]
+  def toSparse: Polynomial[C]
 
   def terms: List[Term[C]]
   def coeffs: Array[C]

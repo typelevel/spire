@@ -69,9 +69,21 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     }
   }
 
+  property("conversion dense to sparse to dense p = p") {
+    forAll { (p: PolyDense[Rational]) =>
+      p.toSparse.toDense should be === p
+    }
+  }
+
+  property("conversion sparse to dense to sparse p = p") {
+    forAll { (p: PolySparse[Rational]) =>
+      p.toDense.toSparse should be === p
+    }
+  }
+
   property("sparse apply(p.toString) = p") {
     forAll { (p: PolySparse[Rational]) =>
-      Polynomial(p.toString) should be === p
+      Polynomial(p.toString).toDense should be === p
     }
   }
 
@@ -241,10 +253,20 @@ class PolynomialTest extends FunSuite {
     assert(p.maxOrderTermCoeff === Rational(1,4))
     assert(p(r"2") === r"11/2")
     assert(p.isZero === false)
-
     assert(p.monic === Polynomial("x^2 + 8x + 2"))
     assert(p.derivative === Polynomial("1/2x + 2"))
     assert(p.integral === Polynomial("1/12x^3 + x^2 + 1/2x"))
+
+    assert(p.toDense.coeffs === Array(r"1/2", r"2/1", r"1/4"))
+    assert(p.toDense.maxTerm === Term(r"1/4", 2))
+    assert(p.toDense.degree === 2)
+    assert(p.toDense.maxOrderTermCoeff === Rational(1,4))
+    assert(p.toDense(r"2") === r"11/2")
+    assert(p.toDense.isZero === false)
+    assert(p.toDense.monic === Polynomial.dense(Array(r"2/1", r"8/1", r"1/1")))
+    assert(p.toDense.derivative === Polynomial.dense(Array(r"2/1", r"1/2")))
+    assert(p.toDense.integral === Polynomial.dense(Array(r"0", r"1/2", r"1/1", r"1/12")))
+
   }
 
   test("polynomial arithmetic") {
@@ -252,7 +274,7 @@ class PolynomialTest extends FunSuite {
     val p1 = Polynomial("1/4x^2 + 2x + 1/2")
     val p2 = Polynomial("1/4x^2 + 3x + 1/2")
 
-    def legendres(i: Int): List[Polynomial[Rational]] = {
+    def legendresSparse(i: Int): List[Polynomial[Rational]] = {
       val one = Polynomial(r"1", 0)
       val x = Polynomial(r"1", 1)
       lazy val leg : Stream[Polynomial[Rational]] = {
@@ -267,12 +289,35 @@ class PolynomialTest extends FunSuite {
       leg.take(i).toList
     }
 
-    val leg = legendres(4)
+    val legSparse = legendresSparse(4)
 
     assert(p1 + p2 === Polynomial("1/2x^2 + 5x + 1"))
-    assert(leg(2) * leg(3) === Polynomial("15/4x^5 - 7/2x^3 + 3/4x"))
+    assert(legSparse(2) * legSparse(3) === Polynomial("15/4x^5 - 7/2x^3 + 3/4x"))
     assert(p1 % p2 === Polynomial("-x"))
     assert(p1 /~ p2 === Polynomial("1"))
+
+    def legendresDense(i: Int): List[Polynomial[Rational]] = {
+      val one = Polynomial(r"1", 0).toDense
+      val x = Polynomial(r"1", 1).toDense
+      lazy val leg : Stream[Polynomial[Rational]] = {
+        def loop(pnm1: Polynomial[Rational], pn: Polynomial[Rational], n: Int = 1): Stream[Polynomial[Rational]] = {
+          val a = Polynomial(Rational(1, n + 1), 0).toDense
+          val b = Polynomial(Rational(2 * n + 1), 1).toDense
+          val c = Polynomial(-Rational(n), 0).toDense
+          pn #:: loop(pn, a * (b * pn + c * pnm1), n + 1)
+        }
+        one #:: loop(one, x)
+      }
+      leg.take(i).toList
+    }
+
+    val legDense = legendresDense(4)
+
+    assert(p1 + p2 === Polynomial.dense(Array(r"1/1", r"5/1", r"1/2")))
+    assert((legDense(2) * legDense(3)).coeffs === Array(r"0", r"3/4", r"0", r"-7/2", r"0", r"15/4"))
+    assert(p1 % p2 === Polynomial("-x"))
+    assert(p1 /~ p2 === Polynomial("1"))
+
   }
 
 }
