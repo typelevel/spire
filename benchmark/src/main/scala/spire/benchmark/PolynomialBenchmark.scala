@@ -29,6 +29,7 @@ class PolynomialBenchmarks extends MyBenchmark {
   var commonsArraysDoubleArrays: Array[Array[Double]] = null
   var spireRationalPolys: Array[Polynomial[Rational]] = null
   var spireDoublePolys: Array[Polynomial[Double]] = null
+  var spireDenseDoublePolys: Array[Polynomial[Double]] = null
   var commonsDoublePolys: Array[PolynomialFunction] = null
 
   override protected def setUp() {
@@ -40,6 +41,7 @@ class PolynomialBenchmarks extends MyBenchmark {
     commonsArraysDoubleArrays = spireTermArraysRational.map(_.map(t => t.coeff.toDouble))
     spireRationalPolys = spireTermArraysRational.map(Polynomial(_))
     spireDoublePolys = spireTermArraysDouble.map(Polynomial(_))
+    spireDenseDoublePolys = commonsArraysDoubleArrays.map(Polynomial.dense(_))
     commonsDoublePolys = commonsArraysDoubleArrays.map(darr => new PolynomialFunction(darr))
 
   }
@@ -162,10 +164,12 @@ class PolynomialBenchmarks extends MyBenchmark {
 
   def timeAddSpireRationalPolys(reps: Int) = run(reps)(addSpireRationalPolynomials(spireRationalPolys))
   def timeAddSpireDoublePolys(reps: Int) = run(reps)(addSpireDoublePolynomials(spireDoublePolys))
+  def timeAddSpireDoublePolysDense(reps: Int) = run(reps)(addSpireDoublePolynomials(spireDenseDoublePolys))
   def timeAddCommonsDoublePolynomials(reps: Int) = run(reps)(addCommonsDoublePolynomials(commonsDoublePolys))
 
   def timeMultiplySpireRationalPolys(reps: Int) = run(reps)(multiplySpireRationalPolynomials(spireRationalPolys))
   def timeMultiplySpireDoublePolys(reps: Int) = run(reps)(multiplySpireDoublePolynomials(spireDoublePolys))
+  def timeMultiplySpireDoublePolysDense(reps: Int) = run(reps)(multiplySpireDoublePolynomials(spireDenseDoublePolys))
   def timeMultiplyCommonsDoublePolynomials(reps: Int) = run(reps)(multiplyCommonsDoublePolynomials(commonsDoublePolys))
   
   // def timeDerivativeSpireRationalPolys(reps: Int) = run(reps)(derivativeSpireRationalPolynomials(spireRationalPolys))
