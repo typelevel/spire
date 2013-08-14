@@ -13,6 +13,7 @@ import Gen._
 import Arbitrary.arbitrary
 
 class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+  
   implicit val arbitraryRational = Arbitrary(for {
     n0 <- arbitrary[Long]
     d0 <- arbitrary[Long]
@@ -149,7 +150,7 @@ class PolynomialTest extends FunSuite {
   test("polynomial non-arithmetic functions") {
     val p = Polynomial("1/4x^2 + 2x + 1/2")
 
-    assert(p.coeffs === List(r"1/4", r"2", r"1/2"))
+    assert(p.coeffs === Array(r"1/4", r"2", r"1/2"))
     assert(p.maxTerm === Term(r"1/4", 2))
     assert(p.degree === 2)
     assert(p.maxOrderTermCoeff === Rational(1,4))

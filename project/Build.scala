@@ -221,6 +221,7 @@ object MyBuild extends Build {
       // comparisons
       "org.apfloat" % "apfloat" % "1.6.3",
       "org.jscience" % "jscience" % "4.3.1",
+      "org.apache.commons" % "commons-math3" % "3.2",
 
       // caliper stuff
       "com.google.guava" % "guava" % "r09",
