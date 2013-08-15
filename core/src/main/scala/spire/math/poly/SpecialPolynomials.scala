@@ -22,7 +22,7 @@ object SpecialPolynomials {
   }
 
   // Legendre generator function - sparse and accurate Rational type
-  def legendreFnRational: (Polynomial[Rational], Polynomial[Rational], Int) => Polynomial[Rational] = 
+  private[this] def legendreFnRational: (Polynomial[Rational], Polynomial[Rational], Int) => Polynomial[Rational] = 
     (pn: Polynomial[Rational], pnm1: Polynomial[Rational], n: Int) => {
       val a = Polynomial(Rational(1, n + 1), 0)
       val b = Polynomial(Rational(2 * n + 1), 1)
@@ -31,7 +31,7 @@ object SpecialPolynomials {
     }
 
   // Legendre generator function - dense Double type for fast arithmetic
-  def legendreFnDouble: (Polynomial[Double], Polynomial[Double], Int) => Polynomial[Double] = 
+  private[this] def legendreFnDouble: (Polynomial[Double], Polynomial[Double], Int) => Polynomial[Double] = 
     (pn: Polynomial[Double], pnm1: Polynomial[Double], n: Int) => {
       val a = Polynomial(1.0 / (n + 1.0), 0).toDense
       val b = Polynomial(2.0 * n + 1, 1).toDense
