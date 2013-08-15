@@ -23,8 +23,10 @@ class PolynomialBenchmarks extends MyBenchmark {
     Rational(nextLong(), if (d == 0L) 1L else d)
   }
 
-  var spireRationalPolys: Array[Polynomial[Rational]] = null
-  var spireDoublePolys: Array[Polynomial[Double]] = null
+  var spireDenseRationalPolys: Array[Polynomial[Rational]] = null
+  var spireSparseRationalPolys: Array[Polynomial[Rational]] = null
+  var spireDenseDoublePolys: Array[Polynomial[Double]] = null
+  var spireSparseDoublePolys: Array[Polynomial[Double]] = null
   var commonsDoublePolys: Array[PolynomialFunction] = null
 
   override protected def setUp() {
@@ -32,8 +34,10 @@ class PolynomialBenchmarks extends MyBenchmark {
     val coeffs: Array[Array[Rational]] =
       init(100)(init(size)(arbitraryRational))
 
-    spireRationalPolys = coeffs.map(cs => Polynomial.dense(cs))
-    spireDoublePolys = coeffs.map(cs => Polynomial.dense(cs.map(_.toDouble)))
+    spireDenseRationalPolys = coeffs.map(cs => Polynomial.dense(cs))
+    spireSparseRationalPolys = spireDenseRationalPolys.map(_.toSparse)
+    spireDenseDoublePolys = coeffs.map(cs => Polynomial.dense(cs.map(_.toDouble)))
+    spireSparseDoublePolys = spireDenseDoublePolys.map(_.toSparse)
     commonsDoublePolys = coeffs.map(cs => new PolynomialFunction(cs.map(_.toDouble)))
   }
 
@@ -152,22 +156,33 @@ class PolynomialBenchmarks extends MyBenchmark {
     total
   }
 
-  def timeAddSpireRationalPolys(reps: Int) = run(reps)(addSpireRationalPolynomials(spireRationalPolys))
-  def timeAddSpireDoublePolys(reps: Int) = run(reps)(addSpireDoublePolynomials(spireDoublePolys))
+  def timeAddSpireRationalPolysSparse(reps: Int) = run(reps)(addSpireRationalPolynomials(spireSparseRationalPolys))
+  def timeAddSpireRationalPolysDense(reps: Int) = run(reps)(addSpireRationalPolynomials(spireDenseRationalPolys))
+  def timeAddSpireDoublePolysSparse(reps: Int) = run(reps)(addSpireDoublePolynomials(spireSparseDoublePolys))
+  def timeAddSpireDoublePolysDense(reps: Int) = run(reps)(addSpireDoublePolynomials(spireDenseDoublePolys))
   def timeAddCommonsDoublePolynomials(reps: Int) = run(reps)(addCommonsDoublePolynomials(commonsDoublePolys))
 
-  def timeMultiplySpireRationalPolys(reps: Int) = run(reps)(multiplySpireRationalPolynomials(spireRationalPolys))
-  def timeMultiplySpireDoublePolys(reps: Int) = run(reps)(multiplySpireDoublePolynomials(spireDoublePolys))
+  def timeMultiplySpireRationalPolysSparse(reps: Int) = run(reps)(multiplySpireRationalPolynomials(spireSparseRationalPolys))
+  def timeMultiplySpireRationalPolysDense(reps: Int) = run(reps)(multiplySpireRationalPolynomials(spireDenseRationalPolys))
+  def timeMultiplySpireDoublePolysSparse(reps: Int) = run(reps)(multiplySpireDoublePolynomials(spireSparseDoublePolys))
+  def timeMultiplySpireDoublePolysDense(reps: Int) = run(reps)(multiplySpireDoublePolynomials(spireDenseDoublePolys))
   def timeMultiplyCommonsDoublePolynomials(reps: Int) = run(reps)(multiplyCommonsDoublePolynomials(commonsDoublePolys))
   
-  // def timeDerivativeSpireRationalPolys(reps: Int) = run(reps)(derivativeSpireRationalPolynomials(spireRationalPolys))
-  def timeDerivativeSpireDoublePolys(reps: Int) = run(reps)(derivativeSpireDoublePolynomials(spireDoublePolys))
+  def timeDerivativeSpireRationalPolysSparse(reps: Int) = run(reps)(derivativeSpireRationalPolynomials(spireSparseRationalPolys))
+  def timeDerivativeSpireRationalPolysDense(reps: Int) = run(reps)(derivativeSpireRationalPolynomials(spireDenseRationalPolys))
+  def timeDerivativeSpireDoublePolysSparse(reps: Int) = run(reps)(derivativeSpireDoublePolynomials(spireSparseDoublePolys))
+  def timeDerivativeSpireDoublePolysDense(reps: Int) = run(reps)(derivativeSpireDoublePolynomials(spireDenseDoublePolys))
   def timeDerivativeCommonsDoublePolynomials(reps: Int) = run(reps)(derivativeCommonsDoublePolynomials(commonsDoublePolys))
   
-  // def timeEvaluateSpireRationalPolys(reps: Int) = run(reps)(evaluateSpireRationalPolynomials(spireRationalPolys))
-  def timeEvaluateSpireDoublePolys(reps: Int) = run(reps)(evaluateSpireDoublePolynomials(spireDoublePolys))
+  def timeEvaluateSpireRationalPolysSparse(reps: Int) = run(reps)(evaluateSpireRationalPolynomials(spireSparseRationalPolys))
+  def timeEvaluateSpireRationalPolysDense(reps: Int) = run(reps)(evaluateSpireRationalPolynomials(spireDenseRationalPolys))
+  def timeEvaluateSpireDoublePolysSparse(reps: Int) = run(reps)(evaluateSpireDoublePolynomials(spireSparseDoublePolys))
+  def timeEvaluateSpireDoublePolysDense(reps: Int) = run(reps)(evaluateSpireDoublePolynomials(spireDenseDoublePolys))
   def timeEvaluateCommonsDoublePolynomials(reps: Int) = run(reps)(evaluateCommonsDoublePolynomials(commonsDoublePolys))
 
-  // def timeQuotModSpireRationalPolys(reps: Int) = run(reps)(quotModSpireRationalPolynomials(spireRationalPolys))
-  def timeQuotModSpireDoublePolys(reps: Int) = run(reps)(quotModSpireDoublePolynomials(spireDoublePolys))
+  def timeQuotModSpireRationalPolysSparse(reps: Int) = run(reps)(quotModSpireRationalPolynomials(spireSparseRationalPolys))
+  def timeQuotModSpireRationalPolysDense(reps: Int) = run(reps)(quotModSpireRationalPolynomials(spireDenseRationalPolys))
+  def timeQuotModSpireDoublePolysSparse(reps: Int) = run(reps)(quotModSpireDoublePolynomials(spireSparseDoublePolys))
+  def timeQuotModSpireDoublePolysDense(reps: Int) = run(reps)(quotModSpireDoublePolynomials(spireDenseDoublePolys))
+
 }
