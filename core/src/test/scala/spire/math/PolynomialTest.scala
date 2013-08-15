@@ -1,5 +1,6 @@
 package spire.math
 
+import spire.math.poly._
 import spire.syntax.literals._
 import spire.syntax.euclideanRing._
 
