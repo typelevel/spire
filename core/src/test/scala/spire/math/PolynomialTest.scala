@@ -1,5 +1,6 @@
 package spire.math
 
+import spire.math.poly._
 import spire.syntax.literals._
 import spire.syntax.euclideanRing._
 
@@ -274,49 +275,37 @@ class PolynomialTest extends FunSuite {
     val p1 = Polynomial("1/4x^2 + 2x + 1/2")
     val p2 = Polynomial("1/4x^2 + 3x + 1/2")
 
-    def legendresSparse(i: Int): List[Polynomial[Rational]] = {
-      val one = Polynomial(r"1", 0)
-      val x = Polynomial(r"1", 1)
-      lazy val leg : Stream[Polynomial[Rational]] = {
-        def loop(pnm1: Polynomial[Rational], pn: Polynomial[Rational], n: Int = 1): Stream[Polynomial[Rational]] = {
-          val a = Polynomial(Rational(1, n + 1), 0)
-          val b = Polynomial(Rational(2 * n + 1), 1)
-          val c = Polynomial(-Rational(n), 0)
-          pn #:: loop(pn, a * (b * pn + c * pnm1), n + 1)
-        }
-        one #:: loop(one, x)
-      }
-      leg.take(i).toList
-    }
-
-    val legSparse = legendresSparse(4)
+    val legSparse = SpecialPolynomials.legendres[Rational](4).toList
 
     assert(p1 + p2 === Polynomial("1/2x^2 + 5x + 1"))
     assert(legSparse(2) * legSparse(3) === Polynomial("15/4x^5 - 7/2x^3 + 3/4x"))
     assert(p1 % p2 === Polynomial("-x"))
     assert(p1 /~ p2 === Polynomial("1"))
 
-    def legendresDense(i: Int): List[Polynomial[Rational]] = {
-      val one = Polynomial(r"1", 0).toDense
-      val x = Polynomial(r"1", 1).toDense
-      lazy val leg : Stream[Polynomial[Rational]] = {
-        def loop(pnm1: Polynomial[Rational], pn: Polynomial[Rational], n: Int = 1): Stream[Polynomial[Rational]] = {
-          val a = Polynomial(Rational(1, n + 1), 0).toDense
-          val b = Polynomial(Rational(2 * n + 1), 1).toDense
-          val c = Polynomial(-Rational(n), 0).toDense
-          pn #:: loop(pn, a * (b * pn + c * pnm1), n + 1)
-        }
-        one #:: loop(one, x)
-      }
-      leg.take(i).toList
-    }
-
-    val legDense = legendresDense(4)
+    val legDense = legSparse.map(_.toDense)
 
     assert(p1 + p2 === Polynomial.dense(Array(r"1/1", r"5/1", r"1/2")))
     assert((legDense(2) * legDense(3)).coeffs === Array(r"0", r"3/4", r"0", r"-7/2", r"0", r"15/4"))
     assert(p1 % p2 === Polynomial("-x"))
     assert(p1 /~ p2 === Polynomial("1"))
+
+  }
+
+  test("special polynomials") {
+
+   val leg = SpecialPolynomials.legendres[Rational](5).toList
+   val lag = SpecialPolynomials.laguerres[Rational](5).toList
+   val chebFirstKind = SpecialPolynomials.chebyshevsFirstKind[Rational](5).toList
+   val chebSecondKind = SpecialPolynomials.chebyshevsSecondKind[Rational](5).toList
+   val hermProb = SpecialPolynomials.probHermites[Rational](5).toList
+   val hermPhys = SpecialPolynomials.physHermites[Rational](5).toList
+
+   assert(leg(4) === Polynomial("35/8x^4 - 30/8x^2 + 3/8"))
+   assert(lag(4) === Polynomial("1/24x^4 - 16/24x^3 + 72/24x^2 - 96/24x + 1"))
+   assert(chebFirstKind(4) === Polynomial("8x^4 - 8x^2 + 1"))
+   assert(chebSecondKind(4) === Polynomial("16x^4 - 12x^2 + 1"))
+   assert(hermProb(4) === Polynomial("x^4 - 6x^2 + 3"))
+   assert(hermPhys(4) === Polynomial("16x^4 - 48x^2 + 12"))
 
   }
 
