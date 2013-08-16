@@ -30,6 +30,7 @@ object SpecialPolynomials {
       a * (b * pn + c * pnm1)
     }
 
+  // Laguerre recurrence function
   private[this] def laguerreFn[C: Signed: ClassTag](implicit f: Field[C]): (Polynomial[C], Polynomial[C], Int) => Polynomial[C] = 
     (pn: Polynomial[C], pnm1: Polynomial[C], n: Int) => {
       Polynomial(Map(0 -> f.one / f.fromInt(n + 1))) * (Polynomial(Map(0 -> f.fromInt(2 * n + 1), 1 -> -f.one)) * pn - pnm1 * Polynomial(Map(0 -> f.fromInt(n))))
@@ -37,21 +38,15 @@ object SpecialPolynomials {
 
   // Chebyshev recurrence function
   private[this] def chebyshevFn[C: Signed: ClassTag](implicit r: Ring[C]): (Polynomial[C], Polynomial[C], Int) => Polynomial[C] =
-    (pn: Polynomial[C], pnm1: Polynomial[C], n: Int) => {
-      Polynomial.twox[C] * pn - pnm1
-    }
+    (pn: Polynomial[C], pnm1: Polynomial[C], n: Int) => Polynomial.twox[C] * pn - pnm1
 
   // Hermite recurrence function for probability
   private[this] def hermiteFnProb[C: Signed: ClassTag](implicit r: Ring[C]): (Polynomial[C], Polynomial[C], Int) => Polynomial[C] =
-    (pn: Polynomial[C], pnm1: Polynomial[C], n: Int) => {
-      Polynomial.x[C] * pn - pn.derivative
-    }
+    (pn: Polynomial[C], pnm1: Polynomial[C], n: Int) => Polynomial.x[C] * pn - pn.derivative
 
   // Hermite recurrence function for physics
   private[this] def hermiteFnPhys[C: Signed: ClassTag](implicit r: Ring[C]): (Polynomial[C], Polynomial[C], Int) => Polynomial[C] =
-    (pn: Polynomial[C], pnm1: Polynomial[C], n: Int) => {
-      Polynomial.twox[C] * pn - pn.derivative
-    }
+    (pn: Polynomial[C], pnm1: Polynomial[C], n: Int) => Polynomial.twox[C] * pn - pn.derivative
 
   // Legendre polynomials of the first kind
   def legendres[C: Field: Signed: ClassTag](num: Int): Stream[Polynomial[C]] = 
