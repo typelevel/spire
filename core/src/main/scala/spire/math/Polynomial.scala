@@ -54,6 +54,8 @@ object Polynomial {
 
   def zero[@spec(Double) C: Signed: Ring: ClassTag] = new PolySparse(Map.empty[Int, C])
   def one[@spec(Double) C: Signed: ClassTag](implicit r: Ring[C]) = new PolySparse(Map(0 -> r.one))
+  def x[@spec(Double) C: Signed: ClassTag](implicit r: Ring[C]) = new PolySparse(Map(1 -> r.one))
+  def twox[@spec(Double) C: Signed: ClassTag](implicit r: Ring[C]) = new PolySparse(Map(1 -> r.fromInt(2)))  
 
   def constant[@spec(Double) C: Signed: Ring: ClassTag](c: C) =
     if (c.signum == 0) zero[C] else Polynomial(Map(0 -> c))
