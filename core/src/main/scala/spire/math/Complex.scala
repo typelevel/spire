@@ -138,8 +138,12 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
 
   // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
-    case that: Complex[_] => real == that.real && imag == that.imag
-    case that => unifiedPrimitiveEquals(that)
+    case that: Complex[_] =>
+      real == that.real && imag == that.imag
+    case that: Quaternion =>
+      real == that.r && imag == that.i && that.j == 0.0 && that.k == 0.0
+    case that =>
+      unifiedPrimitiveEquals(that)
   }
 
   override def toString: String = "(%s + %si)" format (real, imag)
