@@ -15,7 +15,7 @@ import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
-object Quaternion {
+object Quaternion extends QuaternionInstances {
   def i[@spec(Float, Double) A](implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
     Quaternion(f.zero, f.one, f.zero, f.zero)
   def j[@spec(Float, Double) A](implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
@@ -32,6 +32,57 @@ object Quaternion {
     Quaternion(n, f.zero, f.zero, f.zero)
   def apply[@spec(Float, Double) A](c: Complex[A])(implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
     Quaternion(c.real, c.imag, f.zero, f.zero)
+}
+
+// really a skew field
+private[math] trait QuaternionAlgebra[A]
+    extends Field[Quaternion[A]]
+    with Eq[Quaternion[A]]
+    with NRoot[Quaternion[A]]
+    with Signed[Quaternion[A]]
+    with InnerProductSpace[Quaternion[A], A]
+    with FieldAlgebra[Quaternion[A], A] {
+
+  implicit def f: Fractional[A]
+  implicit def t: Trig[A]
+  implicit def r: IsReal[A]
+
+  def signum(q: Quaternion[A]): Int = q.signum
+  def abs(q: Quaternion[A]): Quaternion[A] = Quaternion(q.norm)
+
+  def eqv(x: Quaternion[A], y: Quaternion[A]): Boolean = x == y
+  override def neqv(x: Quaternion[A], y: Quaternion[A]): Boolean = x != y
+
+  override def minus(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a - b
+  def negate(a: Quaternion[A]): Quaternion[A] = -a
+  def one: Quaternion[A] = Quaternion.one[A]
+  def plus(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a + b
+  override def pow(a: Quaternion[A], b: Int): Quaternion[A] = a.pow(b)
+  override def times(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a * b
+  def zero: Quaternion[A] = Quaternion.zero[A]
+
+  def div(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a / b
+  def quot(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a /~ b
+  def mod(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a % b
+  def gcd(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = sys.error("FIXME")
+
+  def nroot(a: Quaternion[A], k: Int): Quaternion[A] = a.nroot(k)
+  override def sqrt(a: Quaternion[A]): Quaternion[A] = a.sqrt
+  def fpow(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a.fpow(b.r) //FIXME
+
+  def timesl(a: A, q: Quaternion[A]): Quaternion[A] = q * a
+  def dot(x: Quaternion[A], y: Quaternion[A]): A = x.dot(y)
+}
+
+trait QuaternionInstances {
+  implicit def QuaternionAlgebra[A](implicit fr: Fractional[A], tr: Trig[A], isr: IsReal[A]) =
+    new QuaternionAlgebra[A] {
+      val f = fr
+      val t = tr
+      val r = isr
+      def scalar = f
+      def nroot = f
+    }
 }
 
 final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
@@ -74,6 +125,17 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
 
   override def toString: String = s"($r + ${i}i + ${j}j + ${k}k)"
 
+  def signum(): Int = r.signum match {
+    case 0 => i.signum match {
+      case 0 => j.signum match {
+        case 0 => k.signum
+        case n => n
+      }
+      case n => n
+    }
+    case n => n
+  }
+
   def unary_-(): Quaternion[A] =
     Quaternion(-r, -i, -j, -k)
 
@@ -107,8 +169,10 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
       val n = norm
       val t = acos(r / n)
       (Quaternion(cos(t / k0)) + v * sin(t / k0)) * n.nroot(k0)
-    } else if (((k0 & 1) == 1) ^ (r >= 0)) {
-      Quaternion(r.abs.nroot(k0))
+    } else if (r >= 0) {
+      Quaternion(r.nroot(k0))
+    } else if ((k0 & 1) == 1) {
+      Quaternion(-r.abs.nroot(k0))
     } else {
       Quaternion(zero, r.abs.nroot(k0), zero, zero)
     }
