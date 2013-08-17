@@ -9,7 +9,6 @@ import spire.syntax.convertableFrom._
 import spire.syntax.field._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
-import spire.syntax.order._
 
 import scala.{specialized => spec}
 import scala.annotation.tailrec
@@ -17,45 +16,45 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
 object Quaternion {
-  def i[A](implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
+  def i[@spec(Float, Double) A](implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
     Quaternion(f.zero, f.one, f.zero, f.zero)
-  def j[A](implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
+  def j[@spec(Float, Double) A](implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
     Quaternion(f.zero, f.zero, f.one, f.zero)
-  def k[A](implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
+  def k[@spec(Float, Double) A](implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
     Quaternion(f.zero, f.zero, f.zero, f.one)
 
-  def zero[A](implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
+  def zero[@spec(Float, Double) A](implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
     Quaternion(f.zero, f.zero, f.zero, f.zero)
-  def one[A](implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
+  def one[@spec(Float, Double) A](implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
     Quaternion(f.one, f.zero, f.zero, f.zero)
 
-  def apply[A](n: A)(implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
+  def apply[@spec(Float, Double) A](n: A)(implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
     Quaternion(n, f.zero, f.zero, f.zero)
-  def apply[A](c: Complex[A])(implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
+  def apply[@spec(Float, Double) A](c: Complex[A])(implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A]): Quaternion[A] =
     Quaternion(c.real, c.imag, f.zero, f.zero)
 }
 
-final case class Quaternion[A](r: A, i: A, j: A, k: A)
+final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
   (implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A])
     extends ScalaNumber with ScalaNumericConversions with Serializable { lhs =>
+
+  import f.{zero, one, fromInt => int, fromDouble => double}
   
   def doubleValue: Double = if (isReal) r.toDouble else Double.NaN
   def floatValue: Float = if (isReal) r.toFloat else Float.NaN
   def longValue: Long = r.toLong
   def intValue: Int = r.toInt
 
-  def isReal: Boolean = i == f.zero && j == f.zero && k == f.zero
-  def isPure: Boolean = r == f.zero
+  def isReal: Boolean = i === zero && j === zero && k === zero
+  def isPure: Boolean = r === zero
   def isWhole: Boolean = isReal && r.isWhole
 
-  def real: Quaternion[A] = Quaternion(r, f.zero, f.zero, f.zero)
-  def unreal: Quaternion[A] = Quaternion(f.zero, i, j, k)
+  def real: Quaternion[A] = Quaternion(r, zero, zero, zero)
+  def unreal: Quaternion[A] = Quaternion(zero, i, j, k)
 
   override def isValidInt: Boolean =
-    i == f.zero && j == f.zero && k == f.zero && r.isWhole &&
-    //r <= f.fromInt(Int.MaxValue) && r >= f.fromInt(Int.MinValue)
-    isr.compare(r, f.fromInt(Int.MaxValue)) <= 0 &&
-    isr.compare(r, f.fromInt(Int.MinValue)) >= 0
+    i === zero && j === zero && k === zero && r.isWhole &&
+    r <= int(Int.MaxValue) && r >= int(Int.MinValue)
 
   def underlying = (r, i, j, k)
 
@@ -68,7 +67,7 @@ final case class Quaternion[A](r: A, i: A, j: A, k: A)
     case that: Quaternion[_] =>
       r == that.r && i == that.i && j == that.j && k == that.k
     case that: Complex[_] =>
-      r == that.real && i == that.imag && j == f.zero && k == f.zero
+      r == that.real && i == that.imag && j == zero && k == zero
     case that =>
       unifiedPrimitiveEquals(that)
   }
@@ -90,12 +89,11 @@ final case class Quaternion[A](r: A, i: A, j: A, k: A)
   def sqrt(): Quaternion[A] =
     if (!isReal) {
       val n = (r + norm).sqrt
-      Quaternion(n, i / n, j / n, k / n) / f.fromDouble(2.0).sqrt
-    //} else if (r >= f.zero) {
-    } else if (r.signum >= 0) {
+      Quaternion(n, i / n, j / n, k / n) / double(2.0).sqrt
+    } else if (r >= zero) {
       Quaternion(r.sqrt)
     } else {
-      Quaternion(f.zero, r.abs.sqrt, f.zero, f.zero)
+      Quaternion(zero, r.abs.sqrt, zero, zero)
     }
 
   def nroot(k0: Int): Quaternion[A] =
@@ -105,22 +103,18 @@ final case class Quaternion[A](r: A, i: A, j: A, k: A)
       this
     } else if (!isReal) {
       val s = (i ** 2 + j ** 2 + k ** 2).sqrt
-      val v = Quaternion(f.zero, i / s, j / s, k / s)
+      val v = Quaternion(zero, i / s, j / s, k / s)
       val n = norm
-      //val t = acos(r / n)
-      val t = trig.acos(r / n)
+      val t = acos(r / n)
       (Quaternion(cos(t / k0)) + v * sin(t / k0)) * n.nroot(k0)
-    //} else if (((k0 & 1) == 1) ^ (r >= 0)) {
-    } else if (((k0 & 1) == 1) ^ (r.signum >= 0)) {
+    } else if (((k0 & 1) == 1) ^ (r >= 0)) {
       Quaternion(r.abs.nroot(k0))
     } else {
-      Quaternion(f.zero, r.abs.nroot(k0), f.zero, f.zero)
+      Quaternion(zero, r.abs.nroot(k0), zero, zero)
     }
 
-  def unit(): Quaternion[A] = {
-    val n = norm
-    Quaternion((r ** 2) / n, (i ** 2) / n, (j ** 2) / n, (k ** 2) / n)
-  }
+  def unit(): Quaternion[A] =
+    Quaternion(r ** 2, i ** 2, j ** 2, k ** 2) / norm
 
   def +(rhs: A): Quaternion[A] =
     Quaternion(r + rhs, i, j, k)
@@ -170,22 +164,18 @@ final case class Quaternion[A](r: A, i: A, j: A, k: A)
   def **(k: Int): Quaternion[A] = pow(k)
 
   def fpow(k0: A): Quaternion[A] =
-    //if (k0 < 0.0) {
     if (k0.signum < 0) {
       Quaternion.zero
-    //} else if (k0 == 0.0) {
-    } else if (k0 == f.zero) {
+    } else if (k0 == zero) {
       Quaternion.one
-    } else if (k0 == f.one) {
+    } else if (k0 == one) {
       this
     } else if (!isReal) {
       val s = (i ** 2 + j ** 2 + k ** 2).sqrt
-      val v = Quaternion(f.zero, i / s, j / s, k / s)
-      val n: A = norm
-      //val t = acos(r / n)
-      val t = trig.acos(r / n)
+      val v = Quaternion(zero, i / s, j / s, k / s)
+      val n = norm
+      val t = acos(r / n)
       (Quaternion(cos(t * k0)) + v * sin(t * k0)) * n.fpow(k0)
-    //} else if (r >= 0) {
     } else if (r.signum >= 0) {
       Quaternion(r.fpow(k0))
     } else {
@@ -224,5 +214,5 @@ final case class Quaternion[A](r: A, i: A, j: A, k: A)
   }
 
   def dot(rhs: Quaternion[A]): A =
-    (lhs.conjugate * rhs + rhs.conjugate * lhs).r * f.fromDouble(0.5)
+    (lhs.conjugate * rhs + rhs.conjugate * lhs).r * double(0.5)
 }
