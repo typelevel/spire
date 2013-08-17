@@ -17,14 +17,17 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
 object Quaternion {
-  val i = Quaternion(0.0, 1.0, 0.0, 0.0)
-  val j = Quaternion(0.0, 0.0, 1.0, 0.0)
-  val k = Quaternion(0.0, 0.0, 0.0, 1.0)
+  def i = Quaternion(0.0, 1.0, 0.0, 0.0)
+  def j = Quaternion(0.0, 0.0, 1.0, 0.0)
+  def k = Quaternion(0.0, 0.0, 0.0, 1.0)
 
-  val zero = Quaternion(0.0, 0.0, 0.0, 0.0)
-  val one = Quaternion(1.0, 0.0, 0.0, 0.0)
+  def zero = Quaternion(0.0, 0.0, 0.0, 0.0)
+  def one = Quaternion(1.0, 0.0, 0.0, 0.0)
 
-  def apply(n: Double): Quaternion = Quaternion(n, 0.0, 0.0, 0.0)
+  def apply(n: Double): Quaternion =
+    Quaternion(n, 0.0, 0.0, 0.0)
+  def apply(c: Complex[Double]): Quaternion =
+    Quaternion(c.real, c.imag, 0.0, 0.0)
 }
 
 final case class Quaternion(r: Double, i: Double, j: Double, k: Double)
@@ -83,7 +86,11 @@ final case class Quaternion(r: Double, i: Double, j: Double, k: Double)
     }
 
   def nroot(k0: Int): Quaternion =
-    if (!isReal) {
+    if (k0 <= 0) {
+      sys.error(s"illegal root: $k0")
+    } else if (k0 == 1) {
+      this
+    } else if (!isReal) {
       val s = (i ** 2 + j ** 2 + k ** 2).sqrt
       val v = Quaternion(0.0, i / s, j / s, k / s)
       val n = norm
@@ -102,19 +109,27 @@ final case class Quaternion(r: Double, i: Double, j: Double, k: Double)
 
   def +(rhs: Double): Quaternion =
     Quaternion(r + rhs, i, j, k)
-
+  def +(rhs: Complex[Double]): Quaternion =
+    Quaternion(r + rhs.real, i + rhs.imag, j, k)
   def +(rhs: Quaternion): Quaternion =
     Quaternion(lhs.r + rhs.r, lhs.i + rhs.i, lhs.j + rhs.j, lhs.k + rhs.k)
 
   def -(rhs: Double): Quaternion =
     Quaternion(r - rhs, i, j, k)
-
+  def -(rhs: Complex[Double]): Quaternion =
+    Quaternion(r - rhs.real, i - rhs.imag, j, k)
   def -(rhs: Quaternion): Quaternion =
     Quaternion(lhs.r - rhs.r, lhs.i - rhs.i, lhs.j - rhs.j, lhs.k - rhs.k)
 
   def *(rhs: Double): Quaternion =
     Quaternion(r * rhs, i * rhs, j * rhs, k * rhs)
-
+  def *(rhs: Complex[Double]): Quaternion =
+    Quaternion(
+      (r * rhs.real) + (i * rhs.imag),
+      (r * rhs.imag) + (i * rhs.real),
+      (j * rhs.real) + (k * rhs.imag),
+      (j * rhs.imag) + (k * rhs.real)
+    )
   def *(rhs: Quaternion): Quaternion = Quaternion(
     (lhs.r * rhs.r) - (lhs.i * rhs.i) - (lhs.j * rhs.j) - (lhs.k * rhs.k),
     (lhs.r * rhs.i) + (lhs.i * rhs.r) + (lhs.j * rhs.k) - (lhs.k * rhs.j),
@@ -124,11 +139,12 @@ final case class Quaternion(r: Double, i: Double, j: Double, k: Double)
 
   def /(rhs: Double): Quaternion =
     Quaternion(r / rhs, i / rhs, j / rhs, k / rhs)
-
+  def /(rhs: Complex[Double]): Quaternion =
+    lhs * Quaternion(rhs).reciprocal
   def /(rhs: Quaternion): Quaternion =
     lhs * rhs.reciprocal
 
-  def pow(k: Int) = {
+  def pow(k: Int): Quaternion = {
     @tailrec def loop(p: Quaternion, b: Quaternion, e: Int): Quaternion =
       if (e == 0) p
       else if ((e & 1) == 1) loop(p * b, b * b, e >>> 1)
@@ -136,5 +152,55 @@ final case class Quaternion(r: Double, i: Double, j: Double, k: Double)
 
     if (k >= 0) loop(Quaternion.one, this, k) else sys.error(s"illegal exponent: $k")
   }
-  def **(k: Int) = pow(k)
+  def **(k: Int): Quaternion = pow(k)
+
+  def fpow(k0: Double): Quaternion =
+    if (k0 < 0.0) {
+      Quaternion.zero
+    } else if (k0 == 0.0) {
+      Quaternion.one
+    } else if (k0 == 1.0) {
+      this
+    } else if (!isReal) {
+      val s = (i ** 2 + j ** 2 + k ** 2).sqrt
+      val v = Quaternion(0.0, i / s, j / s, k / s)
+      val n = norm
+      val t = acos(r / n)
+      (Quaternion(cos(t * k0)) + v * sin(t * k0)) * n.fpow(k0)
+    } else if (r >= 0) {
+      Quaternion(r.fpow(k0))
+    } else {
+      Quaternion(Complex(r).pow(Complex(k0)))
+    }
+
+  def floor: Quaternion = Quaternion(r.floor, i.floor, j.floor, k.floor)
+  def ceil: Quaternion = Quaternion(r.ceil, i.ceil, j.ceil, k.ceil)
+  def round: Quaternion = Quaternion(r.round, i.round, j.round, k.round)
+
+  def /~(rhs: Double): Quaternion =
+    (lhs / rhs).floor
+  def /~(rhs: Complex[Double]): Quaternion =
+    (lhs / rhs).floor
+  def /~(rhs: Quaternion): Quaternion =
+    (lhs / rhs).floor
+
+  def %(rhs: Double): Quaternion =
+    lhs - (lhs /~ rhs)
+  def %(rhs: Complex[Double]): Quaternion =
+    lhs - (lhs /~ rhs)
+  def %(rhs: Quaternion): Quaternion =
+    lhs - (lhs /~ rhs)
+
+  def /%(rhs: Double): (Quaternion, Quaternion) = {
+    val q = lhs /~ rhs
+    (q, lhs - q)
+  }
+  def /%(rhs: Complex[Double]): (Quaternion, Quaternion) = {
+    val q = lhs /~ rhs
+    (q, lhs - q)
+  }
+  def /%(rhs: Quaternion): (Quaternion, Quaternion) = {
+    val q = lhs /~ rhs
+    (q, lhs - q)
+  }
 }
