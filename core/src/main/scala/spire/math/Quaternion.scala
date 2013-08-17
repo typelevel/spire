@@ -39,7 +39,11 @@ final case class Quaternion(r: Double, i: Double, j: Double, k: Double)
   def intValue: Int = r.toInt
 
   def isReal: Boolean = i == 0.0 && j == 0.0 && k == 0.0
+  def isPure: Boolean = r == 0.0
   def isWhole: Boolean = isReal && r.isWhole
+
+  def real: Quaternion = Quaternion(r, 0.0, 0.0, 0.0)
+  def unreal: Quaternion = Quaternion(0.0, i, j, k)
 
   override def isValidInt: Boolean =
     i == 0.0 && j == 0.0 && k == 0.0 && r.isWhole &&
@@ -203,4 +207,7 @@ final case class Quaternion(r: Double, i: Double, j: Double, k: Double)
     val q = lhs /~ rhs
     (q, lhs - q)
   }
+
+  def dot(rhs: Quaternion): Double =
+    (lhs.conjugate * rhs + rhs.conjugate * lhs) * 0.5
 }
