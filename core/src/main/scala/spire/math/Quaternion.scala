@@ -84,7 +84,11 @@ final case class Quaternion(r: Double, i: Double, j: Double, k: Double)
 
   def nroot(k0: Int): Quaternion =
     if (!isReal) {
-      sys.error("fixme")
+      val s = (i ** 2 + j ** 2 + k ** 2).sqrt
+      val v = Quaternion(0.0, i / s, j / s, k / s)
+      val n = norm
+      val t = spire.math.acos(r / n)
+      (Quaternion(cos(t / k0)) + v * sin(t / k0)) * n.nroot(k0)
     } else if (((k0 & 1) == 1) ^ (r >= 0)) {
       Quaternion(r.abs.nroot(k0))
     } else {
@@ -94,19 +98,6 @@ final case class Quaternion(r: Double, i: Double, j: Double, k: Double)
   def unit(): Quaternion = {
     val n = norm
     Quaternion((r ** 2) / n, (i ** 2) / n, (j ** 2) / n, (k ** 2) / n)
-  }
-
-  def star(): Quaternion =
-    (this +
-      Quaternion.i * this * Quaternion.i +
-      Quaternion.j * this * Quaternion.j +
-      Quaternion.k * this * Quaternion.k) * -0.5
-
-  def abv(): (Double, Double, (Double, Double, Double)) = {
-    val a = r
-    val b = (i ** 2 + j ** 2 + k ** 2).sqrt
-    Complex(a, b).sqrt
-    (a, b, (i / b, j / b, k / b))
   }
 
   def +(rhs: Double): Quaternion =
@@ -143,7 +134,7 @@ final case class Quaternion(r: Double, i: Double, j: Double, k: Double)
       else if ((e & 1) == 1) loop(p * b, b * b, e >>> 1)
       else loop(p, b * b, e >>> 1)
 
-    if (k >= 0) loop(Quaternion.one, this, k) else sys.error("illegal exponent")
+    if (k >= 0) loop(Quaternion.one, this, k) else sys.error(s"illegal exponent: $k")
   }
   def **(k: Int) = pow(k)
 }

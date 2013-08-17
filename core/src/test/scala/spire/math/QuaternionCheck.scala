@@ -112,6 +112,20 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     }
   }
 
+
+  property("q.sqrt = q.nroot(2)") {
+    forAll { (q: Quaternion) =>
+      (q.sqrt - q.nroot(2)).norm should be < 1e-6
+    }
+  }
+
+  property("q.nroot(k) ** k = q") {
+    forAll { (q: Quaternion, k0: Int) =>
+      val k = (k0 % 10).abs + 1
+      (q - q.nroot(k).pow(k)).norm should be < 1e-6
+    }
+  }
+
   property("q = q.r iff q.isReal") {
     forAll { (q: Quaternion) =>
       q == q.r should be === q.isReal
