@@ -44,13 +44,18 @@ final case class Quaternion(r: Double, i: Double, j: Double, k: Double)
 
   def underlying = (r, i, j, k)
 
+  // important to keep in sync with Complex[_]
   override def hashCode: Int =
     if (isValidInt) r.toInt
     else 19 * r.## + 41 * i.## + 13 * j.## + 77 * k.## + 97
 
   override def equals(that: Any): Boolean = that match {
-    case that: Quaternion => r == that.r && i == that.i && j == that.j && k == that.k
-    case that => unifiedPrimitiveEquals(that)
+    case that: Quaternion =>
+      r == that.r && i == that.i && j == that.j && k == that.k
+    case that: Complex[_] =>
+      r == that.real && i == that.imag && j == 0.0 && k == 0.0
+    case that =>
+      unifiedPrimitiveEquals(that)
   }
 
   override def toString: String = s"($r + ${i}i + ${j}j + ${k}k)"
@@ -61,27 +66,29 @@ final case class Quaternion(r: Double, i: Double, j: Double, k: Double)
   def conjugate(): Quaternion =
     Quaternion(r, -i, -j, -k)
 
-  def norm(): Double = {
-    //(r ** 2 + i ** 2 + j ** 2 + k ** 2).sqrt
-    (BigDecimal(r).pow(2) + BigDecimal(i).pow(2) + BigDecimal(j).pow(2) + BigDecimal(k).pow(2)).sqrt.toDouble
-  }
+  def norm(): Double =
+    (r ** 2 + i ** 2 + j ** 2 + k ** 2).sqrt
 
   def reciprocal(): Quaternion =
     conjugate / (r ** 2 + i ** 2 + j ** 2 + k ** 2)
 
   def sqrt(): Quaternion =
-    if (isReal) {
-      Quaternion(r.sqrt)
-    } else {
+    if (!isReal) {
       val n = (r + norm).sqrt
       Quaternion(n, i / n, j / n, k / n) / 2.0.sqrt
+    } else if (r >= 0) {
+      Quaternion(r.sqrt)
+    } else {
+      Quaternion(0.0, r.abs.sqrt, 0.0, 0.0)
     }
 
   def nroot(k0: Int): Quaternion =
-    if (isReal) {
-      Quaternion(r.nroot(k0))
-    } else {
+    if (!isReal) {
       sys.error("fixme")
+    } else if (((k0 & 1) == 1) ^ (r >= 0)) {
+      Quaternion(r.abs.nroot(k0))
+    } else {
+      Quaternion(0.0, r.abs.nroot(k0), 0.0, 0.0)
     }
 
   def unit(): Quaternion = {
@@ -101,15 +108,6 @@ final case class Quaternion(r: Double, i: Double, j: Double, k: Double)
     Complex(a, b).sqrt
     (a, b, (i / b, j / b, k / b))
   }
-
-  // def xyz = {
-  //   val (a, b, c, d) = (r, i, j, k)
-  //   val s = (b ** 2 + c ** 2 + d ** 2).sqrt
-  //   val r = (a ** 2 + s ** 2).sqrt
-  //   val n = Quaternion(0, b / s, c / s, d / s)
-  //   val t = acos(a / r)
-  //   //val t = asin(s / r)
-  // }
 
   def +(rhs: Double): Quaternion =
     Quaternion(r + rhs, i, j, k)

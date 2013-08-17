@@ -12,7 +12,8 @@ import Arbitrary.arbitrary
 class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
 
   // to fudge some of the properties, we limit our quaternion terms to
-  // [-1000, 1000]. this is cheating, and we should do better.
+  // integers in [-1000, 1000]. this is cheating, and we should do
+  // better in the future.
   def df(n: Int): Double = (n % 1000).toDouble
 
   implicit val arbq = Arbitrary(for {
@@ -111,9 +112,33 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     }
   }
 
-  property("q == q.r iff q.isReal") {
+  property("q = q.r iff q.isReal") {
     forAll { (q: Quaternion) =>
       q == q.r should be === q.isReal
+    }
+  }
+
+  property("q.hashCode = c.hashCode") {
+    import spire.std.double._
+
+    forAll { (r: Double, i: Double) =>
+      val q = Quaternion(r, i, 0.0, 0.0)
+      val c = Complex(r, i)
+      q.hashCode should be === c.hashCode
+    }
+  }
+
+  property("q = c") {
+    import spire.std.double._
+
+    forAll { (r: Double, i: Double) =>
+      Quaternion(r, i, 0.0, 0.0) should be === Complex(r, i)
+    }
+
+    forAll { (r: Double, i: Double, j: Double, k: Double) =>
+      if (j != 0.0 || k != 0.0) {
+        Quaternion(r, i, j, k) != Complex(r, i) should be === true
+      }
     }
   }
 }
