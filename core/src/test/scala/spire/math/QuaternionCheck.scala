@@ -96,7 +96,8 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
   property("1 / q = 1.reciprocal") {
     forAll { (q: Quaternion) =>
-      (Quaternion.one / q - q.reciprocal).norm should be < 1e-6
+      if (q != Quaternion.zero)
+        (Quaternion.one / q - q.reciprocal).norm should be < 1e-6
     }
   }
 
@@ -123,6 +124,24 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     forAll { (q: Quaternion, k0: Int) =>
       val k = (k0 % 10).abs + 1
       (q - q.nroot(k).pow(k)).norm should be < 1e-6
+    }
+  }
+
+  property("q.fpow(1/k) = q.nroot(k)") {
+    forAll { (q: Quaternion, k0: Int) =>
+      val k = (k0 % 10).abs + 1
+      (q.nroot(k) - q.fpow(1.0/k)).norm should be < 1e-6
+    }
+  }
+
+  property("q.fpow(1/k).fpow(k) = q") {
+    forAll { (q: Quaternion, k0: Double) =>
+      val k = (k0 % 10).abs
+      if (k == 0.0) {
+        q.fpow(k) should be === Quaternion.one
+      } else {
+        (q - q.fpow(1.0/k).fpow(k)).norm should be < 1e-6
+      }
     }
   }
 
