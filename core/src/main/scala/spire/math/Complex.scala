@@ -139,8 +139,8 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
   override def equals(that: Any): Boolean = that match {
     case that: Complex[_] =>
       real == that.real && imag == that.imag
-    case that: Quaternion =>
-      real == that.r && imag == that.i && that.j == 0.0 && that.k == 0.0
+    case that: Quaternion[_] =>
+      real == that.r && imag == that.i && that.j == f.zero && that.k == f.zero
     case that =>
       unifiedPrimitiveEquals(that)
   }

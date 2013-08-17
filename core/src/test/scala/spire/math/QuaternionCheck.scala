@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.implicits._
+
 import org.scalatest.matchers.ShouldMatchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
@@ -25,120 +27,124 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     Quaternion(df(r), df(i), df(j), df(k))
   })
 
+  type H = Quaternion[Double]
+  val zero = Quaternion.zero[Double]
+  val one = Quaternion.one[Double]
+
   property("q + 0 = q") {
-    forAll { (q: Quaternion) =>
+    forAll { (q: H) =>
       q + 0.0 should be === q
-      q + Quaternion.zero should be === q
+      q + zero should be === q
     }
   }
 
   property("q + -q = 0") {
-    forAll { (q: Quaternion) =>
-      q + (-q) should be === Quaternion.zero
+    forAll { (q: H) =>
+      q + (-q) should be === zero
     }
   }
 
   property("q1 + -q2 = q1 - q2") {
-    forAll { (q1: Quaternion, q2: Quaternion) =>
+    forAll { (q1: H, q2: H) =>
       q1 + (-q2) should be === q1 - q2
     }
   }
 
   property("q1 + q2 = q2 + q1") {
-    forAll { (q1: Quaternion, q2: Quaternion) =>
+    forAll { (q1: H, q2: H) =>
       q1 + q2 should be === q2 + q1
     }
   }
 
   property("(q1 + q2) + a3 = q1 + (q2 + q3)") {
-    forAll { (q1: Quaternion, q2: Quaternion, q3: Quaternion) =>
+    forAll { (q1: H, q2: H, q3: H) =>
       (q1 + q2) + q3 should be === q1 + (q2 + q3)
     }
   }
 
   property("q * 0 = q") {
-    forAll { (q: Quaternion) =>
-      q * 0.0 should be === Quaternion.zero
-      q * Quaternion.zero should be === Quaternion.zero
+    forAll { (q: H) =>
+      q * 0.0 should be === zero
+      q * zero should be === zero
     }
   }
 
   property("q * 1 = q") {
-    forAll { (q: Quaternion) =>
+    forAll { (q: H) =>
       q * 1.0 should be === q
-      q * Quaternion.one should be === q
+      q * one should be === q
     }
   }
 
   property("q * 2 = q + q") {
-    forAll { (q: Quaternion) =>
+    forAll { (q: H) =>
       q * 2.0 should be === q + q
     }
   }
 
   property("q1 * (q2 + q3) = q1 * q2 + q1 * q3") {
-    forAll { (q1: Quaternion, q2: Quaternion, q3: Quaternion) =>
+    forAll { (q1: H, q2: H, q3: H) =>
       q1 * (q2 + q3) should be === q1 * q2 + q1 * q3
     }
   }
 
   property("(q1 * q2) * a3 = q1 * (q2 * q3)") {
-    forAll { (q1: Quaternion, q2: Quaternion, q3: Quaternion) =>
+    forAll { (q1: H, q2: H, q3: H) =>
       (q1 * q2) * q3 should be === q1 * (q2 * q3)
     }
   }
 
   property("q * q.reciprocal = 1") {
-    forAll { (q: Quaternion) =>
-      (q * q.reciprocal - Quaternion.one).norm should be < 1e-6
+    forAll { (q: H) =>
+      (q * q.reciprocal - one).norm should be < 1e-6
     }
   }
 
   property("1 / q = 1.reciprocal") {
-    forAll { (q: Quaternion) =>
-      if (q != Quaternion.zero)
-        (Quaternion.one / q - q.reciprocal).norm should be < 1e-6
+    forAll { (q: H) =>
+      if (q != zero)
+        (one / q - q.reciprocal).norm should be < 1e-6
     }
   }
 
   property("q ** 2 = q * q") {
-    forAll { (q: Quaternion) =>
+    forAll { (q: H) =>
       q ** 2 should be === q * q
     }
   }
 
   property("q.sqrt ** 2 = q") {
-    forAll { (q: Quaternion) =>
+    forAll { (q: H) =>
       (q.sqrt ** 2 - q).norm should be < 1e-6
     }
   }
 
 
   property("q.sqrt = q.nroot(2)") {
-    forAll { (q: Quaternion) =>
+    forAll { (q: H) =>
       (q.sqrt - q.nroot(2)).norm should be < 1e-6
     }
   }
 
   property("q.nroot(k) ** k = q") {
-    forAll { (q: Quaternion, k0: Int) =>
+    forAll { (q: H, k0: Int) =>
       val k = (k0 % 10).abs + 1
       (q - q.nroot(k).pow(k)).norm should be < 1e-6
     }
   }
 
   property("q.fpow(1/k) = q.nroot(k)") {
-    forAll { (q: Quaternion, k0: Int) =>
+    forAll { (q: H, k0: Int) =>
       val k = (k0 % 10).abs + 1
       (q.nroot(k) - q.fpow(1.0/k)).norm should be < 1e-6
     }
   }
 
   property("q.fpow(1/k).fpow(k) = q") {
-    forAll { (q: Quaternion, k0: Double) =>
+    forAll { (q: H, k0: Double) =>
       val k = (k0 % 10).abs
       if (k == 0.0) {
-        q.fpow(k) should be === Quaternion.one
+        q.fpow(k) should be === one
       } else {
         (q - q.fpow(1.0/k).fpow(k)).norm should be < 1e-6
       }
@@ -146,7 +152,7 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
   }
 
   property("q = q.r iff q.isReal") {
-    forAll { (q: Quaternion) =>
+    forAll { (q: H) =>
       q == q.r should be === q.isReal
     }
   }
