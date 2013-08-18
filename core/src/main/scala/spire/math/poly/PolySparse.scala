@@ -14,7 +14,18 @@ import scala.{specialized => spec}
 class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
   (implicit r: Ring[C], s: Signed[C], val ct: ClassTag[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
-  def toDense: PolyDense[C] = new PolyDense(coeffs.reverse)
+  def toDense: PolyDense[C] = {
+    val cs = coeffs.reverse
+    var i = cs.length
+    while (i > 0 && cs(i - 1).signum == 0) i -= 1
+    if (i != cs.length) {
+      val cs2 = new Array[C](i)
+      System.arraycopy(cs, 0, cs2, 0, i)
+      new PolyDense(cs2)
+    } else {
+      new PolyDense(cs)
+    }
+  }
   def toSparse: PolySparse[C] = lhs
 
   def allTerms: List[Term[C]] = {

@@ -128,8 +128,6 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   }
 
   def /%(rhs: Polynomial[C])(implicit f: Field[C]): (Polynomial[C], Polynomial[C]) = {
-    require(!rhs.isZero, "Can't divide by polynomial of zero!")
-
     def zipSum(lcs: Array[C], rcs: Array[C])(implicit r: Ring[C]): Array[C] = 
       (lcs + rcs).tail
 
@@ -152,12 +150,17 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
       }
     }
 
-    if (rhs.coeffs.length == 1) {
-      val q = Polynomial.dense(lhs.coeffs.map { c => c / rhs.coeffs(0) })
-      val r = Polynomial.dense(Array[C]())
+    val cs = rhs.coeffs
+    if (cs.length == 0) {
+      throw new ArithmeticException("/ by zero polynomial")
+    } else if (cs.length == 1) {
+      val c = cs(0)
+      val q = Polynomial.dense(lhs.coeffs.map(_ / c))
+      val r = Polynomial.dense(new Array[C](0))
       (q, r)
-    } else 
-    eval(Array[C](), lhs.coeffs.reverse, lhs.degree - rhs.degree)
+    } else {
+      eval(new Array[C](0), lhs.coeffs.reverse, lhs.degree - rhs.degree)
+    }
   }
 
   def /~(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C] = (lhs /% rhs)._1
@@ -186,5 +189,4 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
       case _ => false
     }
   }
-
 }
