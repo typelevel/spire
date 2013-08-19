@@ -6,7 +6,6 @@ import scala.annotation.tailrec
 import scala.reflect._
 import spire.algebra._
 import spire.implicits._
-import spire.syntax._
 
 import scala.{specialized => spec}
 
@@ -23,11 +22,7 @@ class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
     } else {
       val m = degree + 1
       val cs = new Array[C](m)
-      var i = 0
-      while (i < m) {
-        cs(i) = data.getOrElse(i, r.zero)
-        i += 1
-      }
+      cfor(0)(_ < m, _ + 1) { i => cs(i) = data.getOrElse(i, r.zero) }
       new PolyDense(cs)
     }
 

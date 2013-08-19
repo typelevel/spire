@@ -6,7 +6,6 @@ import scala.annotation.tailrec
 import scala.reflect._
 import spire.algebra._
 import spire.implicits._
-import spire.syntax._
 
 import scala.{specialized => spec}
 
@@ -49,44 +48,29 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   def apply(x: C): C = {
     val cs = coeffs
     var c = cs(cs.length - 1)
-    var i = cs.length - 2
-    while(i >= 0) {
-      c = cs(i) + c * x
-      i -= 1
-    }
+    cfor(cs.length - 2)(_ >= 0, _ - 1) { i => c = cs(i) + c * x }
     c
   }
 
   def unary_-(): Polynomial[C] = {
     val negArray = new Array[C](coeffs.length)
-    var i = 0
-    while(i < coeffs.length) {
-      negArray(i) = -coeffs(i)
-      i += 1
-    }
+    cfor(0)(_ < coeffs.length, _ + 1) { i => negArray(i) = -coeffs(i) }
     Polynomial.dense(negArray)
   }
 
   def monic(implicit f: Field[C]): Polynomial[C] = {
     val m = maxOrderTermCoeff
     val cs = new Array[C](coeffs.length)
-    var i = 0
-    while(i < coeffs.length) {
-      cs(i) = coeffs(i) / m
-      i += 1
-    }
+    cfor(0)(_ < coeffs.length, _ + 1) { i => cs(i) = coeffs(i) / m }
     Polynomial.dense(cs)
   }
 
   def derivative: Polynomial[C] = {
     if (isZero) return this
-    val d = degree
-    val cs = new Array[C](d)
-    var i = cs.length - 1
+    val cs = new Array[C](degree)
     var j = coeffs.length - 1
-    while(i >= 0) {
+    cfor(cs.length - 1)(_ >= 0, _ - 1) { i =>
       cs(i) = r.fromInt(j) * coeffs(j)
-      i -= 1
       j -= 1
     }
     Polynomial.dense(cs)
@@ -94,12 +78,8 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
 
   def integral(implicit f: Field[C]): Polynomial[C] = {
     val cs = new Array[C](coeffs.length + 1)
-    var i = 0
-    while(i < coeffs.length) {
-      cs(i + 1) = coeffs(i) / f.fromInt(i + 1)
-      i += 1
-    }
     cs(0) = f.zero
+    cfor(0)(_ < coeffs.length, _ + 1) { i => cs(i + 1) = coeffs(i) / f.fromInt(i + 1) }
     Polynomial.dense(cs)
   }
 
@@ -109,28 +89,17 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   def *(rhs: Polynomial[C]): Polynomial[C] = {
     if (rhs.isZero) return rhs
     if (lhs.isZero) return lhs
-
     val lcs = lhs.coeffs
     val rcs = rhs.coeffs
-    val cs = new Array[C](lcs.length + rcs.length - 1)
-    var i = 0
-    while (i < cs.length) {
-      cs(i) = r.zero
-      i += 1
-    }
-    i = 0
-    while (i < lcs.length) {
+    val cs = Array.fill(lcs.length + rcs.length - 1)(r.zero)
+    cfor(0)(_ < lcs.length, _ + 1) { i =>
       val c = lcs(i)
-      var j = 0
       var k = i
-      while (j < rcs.length) {
+      cfor(0)(_ < rcs.length, _ + 1) { j =>
         cs(k) += c * rcs(j)
-        j += 1
         k += 1
       }
-      i += 1
     }
-    if (cs.exists(_ == null)) sys.error("argh! %s" format cs.toList)
     Polynomial.dense(cs)
   }
 

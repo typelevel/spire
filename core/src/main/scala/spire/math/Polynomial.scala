@@ -6,7 +6,6 @@ import scala.annotation.tailrec
 import scala.reflect._
 import spire.algebra._
 import spire.implicits._
-import spire.syntax._
 
 import scala.{specialized => spec}
 
@@ -162,11 +161,9 @@ trait Polynomial[@spec(Double) C] {
   override def equals(that: Any): Boolean = that match {
     case p: Polynomial[_] =>
       if (degree != p.degree) return false
-      var i = 0
       val last = degree
-      while (i <= last) {
+      cfor(0)(_ < last, _ + 1) { i =>
         if (nth(i) != p.nth(i)) return false
-        i += 1
       }
       true
     case n => terms match {
