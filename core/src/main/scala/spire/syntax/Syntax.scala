@@ -2,6 +2,7 @@ package spire.syntax
 
 import spire.algebra._
 import spire.math._
+import spire.macros.Syntax
 import spire.macrosk._
 import spire.syntax.std._
 
