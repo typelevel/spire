@@ -14,30 +14,37 @@ import scala.{specialized => spec}
 class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   (implicit r: Ring[C], s: Signed[C], val ct: ClassTag[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
+  private val _degree = if (isZero) 0 else coeffs.length - 1
+  def degree = _degree
+
   def toSparse: PolySparse[C] = new PolySparse(data)
   def toDense: PolyDense[C] = lhs
 
-  def data: Map[Int, C] = {
-    terms.view.map(_.toTuple).toMap
-  }
-
-  def terms: List[Term[C]] =
-    coeffs.view.zipWithIndex.map({ case (c, e) => 
-      Term(c, e)}).filterNot(_.isZero).toList
-
-  def maxTerm: Term[C] =
-    data.view.foldLeft(Term.zero[C]) { case (term, (e, c)) =>
-      if (term.exp <= e) Term(c, e) else term
+  def data: Map[Int, C] =
+    (0 to coeffs.length - 1).foldLeft(Map.empty[Int, C]) { (m, e) =>
+      if (coeffs(e).signum == 0) m else m.updated(e, coeffs(e))
     }
 
-  def degree: Int =
-    if (isZero) 0 else coeffs.length - 1
+  def nth(n: Int): C =
+    if (n < coeffs.length) coeffs(n) else r.zero
+
+  def terms: List[Term[C]] =
+    if (isZero)
+      Term(r.zero, 0) :: Nil
+    else
+      (degree to 0 by -1).foldLeft(List.empty[Term[C]]) { (ts, e) =>
+        if (coeffs(e).signum == 0) ts else Term(coeffs(e), e) :: ts
+      }
+
+  def maxTerm: Term[C] =
+    if (isZero) Term(r.zero, 0) else Term(nth(degree), degree)
+    
 
   def maxOrderTermCoeff: C =
-    coeffs(degree)
+    if (isZero) r.zero else coeffs(degree)
     
   def isZero: Boolean =
-    coeffs.isEmpty
+    coeffs.length == 0
 
   def apply(x: C): C = {
     val cs = coeffs
@@ -166,27 +173,4 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   def /~(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C] = (lhs /% rhs)._1
     
   def %(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C] = (lhs /% rhs)._2
-
-  implicit object BigEndianPolynomialOrdering extends Order[Term[C]] {
-    def compare(x:Term[C], y:Term[C]): Int = y.exp compare x.exp
-  }
-
-  override def toString =
-    if (isZero) {
-      "(0)"
-    } else {
-      val ts = terms.toArray
-      QuickSort.sort(ts)
-      val s = ts.mkString
-      "(" + (if (s.take(3) == " - ") "-" + s.drop(3) else s.drop(3)) + ")"
-    }
-
-  override def equals(that: Any): Boolean = that match {
-    case p: Polynomial[_] => data == p.data
-    case n => terms match {
-      case Nil => n == 0
-      case Term(c, 0) :: Nil => n == c
-      case _ => false
-    }
-  }
 }

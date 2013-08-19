@@ -57,6 +57,9 @@ case class Term[@spec(Float, Double) C: ClassTag](coeff: C, exp: Int)(implicit r
 }
 
 object Term {
+  implicit def ordering[C] = new Order[Term[C]] {
+    def compare(x: Term[C], y: Term[C]): Int = x.exp compare y.exp
+  }
 
   def fromTuple[@spec(Float, Double) C: ClassTag](tpl: (Int, C))(implicit r: Ring[C], s: Signed[C]): Term[C] = 
     Term(tpl._2, tpl._1)
