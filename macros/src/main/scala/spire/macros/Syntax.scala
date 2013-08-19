@@ -1,4 +1,4 @@
-package spire.macrosk
+package spire.macros
 
 import scala.reflect.macros.Context
 
