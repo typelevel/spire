@@ -39,16 +39,12 @@ private[math] trait QuaternionAlgebra[A]
     extends Field[Quaternion[A]]
     with Eq[Quaternion[A]]
     with NRoot[Quaternion[A]]
-    with Signed[Quaternion[A]]
     with InnerProductSpace[Quaternion[A], A]
     with FieldAlgebra[Quaternion[A], A] {
 
   implicit def f: Fractional[A]
   implicit def t: Trig[A]
   implicit def r: IsReal[A]
-
-  def signum(q: Quaternion[A]): Int = q.signum
-  def abs(q: Quaternion[A]): Quaternion[A] = Quaternion(q.norm)
 
   def eqv(x: Quaternion[A], y: Quaternion[A]): Boolean = x == y
   override def neqv(x: Quaternion[A], y: Quaternion[A]): Boolean = x != y
