@@ -6,7 +6,6 @@ import scala.annotation.tailrec
 import scala.reflect._
 import spire.algebra._
 import spire.implicits._
-import spire.syntax._
 
 import scala.{specialized => spec}
 
@@ -22,13 +21,13 @@ import scala.{specialized => spec}
 object Polynomial {
 
   def dense[@spec(Double) C](coeffs: Array[C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolyDense[C] = {
-    var i = coeffs.length - 1
-    while (i >= 0 && coeffs(i).signum == 0) i -= 1
+    var i = coeffs.length
+    while (i > 0 && coeffs(i - 1).signum == 0) i -= 1
     if (i == coeffs.length) {
       new PolyDense(coeffs)
     } else {
-      val cs = new Array[C](i + 1)
-      System.arraycopy(coeffs, 0, cs, 0, i + 1)
+      val cs = new Array[C](i)
+      System.arraycopy(coeffs, 0, cs, 0, i)
       new PolyDense(cs)
     }
   }
@@ -55,7 +54,7 @@ object Polynomial {
   def zero[@spec(Double) C: Signed: Ring: ClassTag] = new PolySparse(Map.empty[Int, C])
   def one[@spec(Double) C: Signed: ClassTag](implicit r: Ring[C]) = new PolySparse(Map(0 -> r.one))
   def x[@spec(Double) C: Signed: ClassTag](implicit r: Ring[C]) = new PolySparse(Map(1 -> r.one))
-  def twox[@spec(Double) C: Signed: ClassTag](implicit r: Ring[C]) = new PolySparse(Map(1 -> r.fromInt(2)))  
+  def twox[@spec(Double) C: Signed: ClassTag](implicit r: Ring[C]) = new PolySparse(Map(1 -> r.fromInt(2)))
 
   def constant[@spec(Double) C: Signed: Ring: ClassTag](c: C) =
     if (c.signum == 0) zero[C] else Polynomial(Map(0 -> c))
@@ -139,6 +138,7 @@ trait Polynomial[@spec(Double) C] {
   def terms: List[Term[C]]
   def coeffs: Array[C]
   def data: Map[Int, C]
+  def nth(n: Int): C
 
   def maxTerm: Term[C]
   def degree: Int
@@ -157,6 +157,31 @@ trait Polynomial[@spec(Double) C] {
   def %(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C]
 
   implicit def ct: ClassTag[C]
+
+  override def equals(that: Any): Boolean = that match {
+    case p: Polynomial[_] =>
+      if (degree != p.degree) return false
+      val last = degree
+      cfor(0)(_ < last, _ + 1) { i =>
+        if (nth(i) != p.nth(i)) return false
+      }
+      true
+    case n => terms match {
+      case Nil => n == 0
+      case Term(c, 0) :: Nil => n == c
+      case _ => false
+    }
+  }
+
+  override def toString =
+    if (isZero) {
+      "(0)"
+    } else {
+      val ts = terms.toArray
+      QuickSort.sort(ts)(Order[Term[C]].reverse, implicitly[ClassTag[Term[C]]])
+      val s = ts.mkString
+      "(" + (if (s.take(3) == " - ") "-" + s.drop(3) else s.drop(3)) + ")"
+    }
 }
 
 trait PolynomialRing[@spec(Double) C] extends Ring[Polynomial[C]] {

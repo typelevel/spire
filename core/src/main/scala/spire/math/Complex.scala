@@ -141,7 +141,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
     case that => unifiedPrimitiveEquals(that)
   }
 
-  override def toString: String = "(%s + %si)" format (real, imag)
+  override def toString: String = "(%s + %si)" format (real.toString, imag.toString)
 
   def abs: T = (real * real + imag * imag).sqrt
   def arg: T = t.atan2(imag, real)

@@ -6,7 +6,6 @@ import scala.annotation.tailrec
 import scala.reflect._
 import spire.algebra._
 import spire.implicits._
-import spire.syntax._
 
 import scala.{specialized => spec}
 
@@ -14,38 +13,41 @@ import scala.{specialized => spec}
 class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
   (implicit r: Ring[C], s: Signed[C], val ct: ClassTag[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
-  def toDense: PolyDense[C] = new PolyDense(coeffs.reverse)
+  val _degree = if (isZero) 0 else data.keys.qmax
+  def degree = _degree
+
+  def toDense: PolyDense[C] =
+    if (isZero) {
+      new PolyDense(new Array[C](0))
+    } else {
+      val m = degree + 1
+      val cs = new Array[C](m)
+      cfor(0)(_ < m, _ + 1) { i => cs(i) = data.getOrElse(i, r.zero) }
+      new PolyDense(cs)
+    }
+
   def toSparse: PolySparse[C] = lhs
 
-  def allTerms: List[Term[C]] = {
-    val m = degree
-    val cs = new Array[Term[C]](m + 1)
-    terms.foreach(t => cs(t.exp) = t)
-    for(i <- 0 to m)
-      if (cs(i) == null) cs(i) = Term(r.zero, i)
-    cs.toList.reverse
-  }
+  def allTerms: List[Term[C]] =
+    (degree to 0 by -1).map(e => Term(nth(e), e)).toList
 
   def terms: List[Term[C]] =
     data.map(Term.fromTuple(_)).toList
 
-  def coeffs: Array[C] = {
-    allTerms.map(_.coeff).toArray
-  }
+  def coeffs: Array[C] =
+    (degree to 0 by -1).map(nth).toArray
+
+  def nth(n: Int): C =
+    data.getOrElse(n, r.zero)
 
   def maxTerm: Term[C] =
-    data.foldLeft(Term.zero[C]) { case (term, (e, c)) =>
-      if (term.exp <= e) Term(c, e) else term
-    }
-
-  def degree: Int =
-    if (isZero) 0 else data.keys.qmax
+    Term(nth(degree), degree)
 
   def maxOrderTermCoeff: C =
-    maxTerm.coeff
+    nth(degree)
 
   def apply(x: C): C =
-    data.view.foldLeft(r.zero)((sum, t) => sum + Term.fromTuple(t).eval(x))
+    data.foldLeft(r.zero) { case (sum, (e, c)) => sum + x.pow(e) * c }
 
   def isZero: Boolean =
     data.isEmpty
@@ -115,29 +117,5 @@ class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
     })
 
   def integral(implicit f: Field[C]): Polynomial[C] =
-    Polynomial(data.map(t => Term.fromTuple(t).int))
-
-  implicit object BigEndianPolynomialOrdering extends Order[Term[C]] {
-    def compare(x:Term[C], y:Term[C]): Int = y.exp compare x.exp
-  }
-
-  override def toString =
-    if (isZero) {
-      "(0)"
-    } else {
-      val ts = terms.toArray
-      QuickSort.sort(ts)
-      val s = ts.mkString
-      "(" + (if (s.take(3) == " - ") "-" + s.drop(3) else s.drop(3)) + ")"
-    }
-
-  override def equals(that: Any): Boolean = that match {
-    case p: Polynomial[_] => data == p.data
-    case n => terms match {
-      case Nil => n == 0
-      case Term(c, 0) :: Nil => n == c
-      case _ => false
-    }
-  }
-
+    Polynomial(data.map(Term.fromTuple(_).int))
 }

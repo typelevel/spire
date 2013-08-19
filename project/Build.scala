@@ -144,7 +144,8 @@ object MyBuild extends Build {
     settings(macroSettings: _*)
 
   lazy val macroSettings = Seq(
-    name := "spire-macros"
+    name := "spire-macros",
+    libraryDependencies ++= Seq(scalaTest, scalaCheck)
   )
 
   // Core
