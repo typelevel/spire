@@ -103,6 +103,7 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
 
   def real: Quaternion[A] = Quaternion(r, zero, zero, zero)
   def unreal: Quaternion[A] = Quaternion(zero, i, j, k)
+  def abs: A = (r * r + i * i + j * j + k * k).sqrt
 
   override def isValidInt: Boolean =
     i === zero && j === zero && k === zero && r.isWhole &&
@@ -126,7 +127,7 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
 
   override def toString: String = s"($r + ${i}i + ${j}j + ${k}k)"
 
-  def signum(): Int = r.signum match {
+  def signum: Int = r.signum match {
     case 0 => i.signum match {
       case 0 => j.signum match {
         case 0 => k.signum
@@ -137,19 +138,19 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
     case n => n
   }
 
-  def unary_-(): Quaternion[A] =
+  def unary_- : Quaternion[A] =
     Quaternion(-r, -i, -j, -k)
 
-  def conjugate(): Quaternion[A] =
+  def norm: A =
+    (r * r + i * i + j * j + k * k).sqrt
+
+  def conjugate: Quaternion[A] =
     Quaternion(r, -i, -j, -k)
 
-  def norm(): A =
-    (r ** 2 + i ** 2 + j ** 2 + k ** 2).sqrt
+  def reciprocal: Quaternion[A] =
+    conjugate / (r * r + i * i + j * j + k * k)
 
-  def reciprocal(): Quaternion[A] =
-    conjugate / (r ** 2 + i ** 2 + j ** 2 + k ** 2)
-
-  def sqrt(): Quaternion[A] =
+  def sqrt: Quaternion[A] =
     if (!isReal) {
       val n = (r + norm).sqrt
       Quaternion(n, i / n, j / n, k / n) / double(2.0).sqrt
@@ -178,8 +179,8 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
       Quaternion(zero, r.abs.nroot(k0), zero, zero)
     }
 
-  def unit(): Quaternion[A] =
-    Quaternion(r ** 2, i ** 2, j ** 2, k ** 2) / norm
+  def unit: Quaternion[A] =
+    Quaternion(r * r, i * i, j * j, k * k) / norm
 
   def +(rhs: A): Quaternion[A] =
     Quaternion(r + rhs, i, j, k)
