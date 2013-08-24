@@ -91,6 +91,7 @@ object Complex extends ComplexInstances {
   }
 }
 
+@SerialVersionUID(0L)
 final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: Fractional[T], t: Trig[T], r: IsReal[T])
     extends ScalaNumber with ScalaNumericConversions with Serializable {
 
@@ -552,23 +553,9 @@ object FastComplex {
 
 trait ComplexInstances {
   implicit def ComplexAlgebra[@spec(Float, Double) A: Fractional: Trig: IsReal] =
-    new ComplexAlgebra[A] {
-      val f = Fractional[A]
-      val t = Trig[A]
-      val r = IsReal[A]
-      def scalar = f
-      def nroot = f
-    }
+    new ComplexAlgebra[A]
 
-  implicit def ComplexEq[A: Fractional] =
-    new ComplexEq[A] {}
-
-  implicit def ComplexIsSigned[A: Fractional: Trig: IsReal] =
-    new ComplexIsSigned[A] {
-      val f = Fractional[A]
-      val t = Trig[A]
-      val r = IsReal[A]
-    }
+  implicit def ComplexEq[A] = new ComplexEq[A]
 }
 
 private[math] trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A]] {
@@ -652,7 +639,8 @@ private[math] trait ComplexIsNRoot[A] extends NRoot[Complex[A]] {
   def fpow(a: Complex[A], b: Complex[A]): Complex[A] = a.pow(b)
 }
 
-private[math] trait ComplexEq[A] extends Eq[Complex[A]] {
+@SerialVersionUID(0L)
+private[math] class ComplexEq[A] extends Eq[Complex[A]] with Serializable {
   def eqv(x: Complex[A], y: Complex[A]) = x eqv y
   override def neqv(x: Complex[A], y: Complex[A]) = x neqv y
 }
@@ -666,10 +654,18 @@ private[math] trait ComplexIsSigned[A] extends Signed[Complex[A]] {
   def abs(a: Complex[A]): Complex[A] = Complex[A](a.abs, f.zero)
 }
 
-private[math] trait ComplexAlgebra[@spec(Float, Double) A] extends ComplexIsField[A]
-    with ComplexIsTrig[A] with ComplexIsNRoot[A]
+@SerialVersionUID(0L)
+private[math] class ComplexAlgebra[@spec(Float, Double) A](implicit
+      val f: Fractional[A], val t: Trig[A], val r: IsReal[A])
+    extends ComplexIsField[A]
+    with ComplexIsTrig[A]
+    with ComplexIsNRoot[A]
+    with ComplexIsSigned[A]
     with InnerProductSpace[Complex[A], A]
-    with FieldAlgebra[Complex[A], A] {
+    with FieldAlgebra[Complex[A], A]
+    with Serializable {
+  def scalar = f
+  def nroot = f
   def timesl(a: A, v: Complex[A]): Complex[A] = Complex(a, scalar.zero) * v
   def dot(x: Complex[A], y: Complex[A]): A =
     scalar.plus(scalar.times(x.real, y.real), scalar.times(x.imag, y.imag))

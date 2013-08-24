@@ -183,7 +183,9 @@ object BigDecimalIsTrig {
 }
 
 // ugh. (apart from pi, e, exp) this is very imprecise.
-class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends Trig[BigDecimal] {
+@SerialVersionUID(0L)
+class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext)
+extends Trig[BigDecimal] with Serializable {
   import BigDecimalIsTrig._
 
   lazy val e: BigDecimal = eFromContext(mc)
@@ -329,11 +331,13 @@ with BigDecimalOrder with BigDecimalIsSigned {
   def isWhole(a:BigDecimal) = a % 1.0 == 0.0
 }
 
+@SerialVersionUID(0L)
+class BigDecimalAlgebra extends BigDecimalIsField with BigDecimalIsNRoot with BigDecimalIsReal with Serializable
+
 trait BigDecimalInstances {
   import BigDecimal.defaultMathContext
 
-  implicit final val BigDecimalAlgebra = new BigDecimalIsField with BigDecimalIsNRoot {}
-  implicit final val BigDecimalIsReal = new BigDecimalIsReal {}
+  implicit final val BigDecimalAlgebra = new BigDecimalAlgebra
   implicit def BigDecimalIsTrig(implicit mc: MathContext = defaultMathContext) =
     new BigDecimalIsTrig(mc)
 }

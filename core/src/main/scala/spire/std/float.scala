@@ -117,7 +117,9 @@ trait FloatIsReal extends IsReal[Float] with FloatOrder with FloatIsSigned {
   def isWhole(a:Float) = a % 1.0 == 0.0
 }
 
+@SerialVersionUID(0L)
+class FloatAlgebra extends FloatIsField with FloatIsNRoot with FloatIsTrig with FloatIsReal with Serializable
+
 trait FloatInstances {
-  implicit final val FloatAlgebra = new FloatIsField with FloatIsNRoot with FloatIsTrig {}
-  implicit final val FloatIsReal = new FloatIsReal {}
+  implicit final val FloatAlgebra = new FloatAlgebra
 }

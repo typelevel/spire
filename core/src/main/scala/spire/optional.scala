@@ -6,6 +6,7 @@ import scala.{specialized => spec}
 
 import spire.algebra._
 import spire.std.{ SeqVectorEq, SeqVectorOrder }
+import spire.std.{ ArrayVectorEq, ArrayVectorOrder }
 import spire.std.MapVectorEq
 import spire.math._
 import spire.macrosk._
@@ -23,11 +24,23 @@ import scala.collection.SeqLike
  * `Eq[Any]`.
  */
 object genericEq {
-  private class GenericEq[@spec A] extends Eq[A] {
+  @SerialVersionUID(0L)
+  private class GenericEq[@spec A] extends Eq[A] with Serializable {
     def eqv(x:A, y:A): Boolean = x == y
   }
 
   implicit def generic[@spec A]: Eq[A] = new GenericEq[A]
+}
+
+trait VectorOrderLow {
+  implicit def seqEq[A, CC[A] <: SeqLike[A, CC[A]]](implicit
+      A0: Eq[A], module: Module[CC[A], A]) = new SeqVectorEq[A, CC[A]]()(A0, module.scalar)
+
+  implicit def arrayEq[@spec(Int,Long,Float,Double) A](implicit ev: Eq[A], module: Module[Array[A], A]) =
+    new ArrayVectorEq[A]()(ev, module.scalar)
+
+  implicit def mapEq[K, V](implicit V0: Eq[V], module: Module[Map[K, V], V]) =
+    new MapVectorEq[K, V]()(V0, module.scalar)
 }
 
 /**
@@ -36,46 +49,15 @@ object genericEq {
  * `Seq(0, 0, 0) === Seq()`, since both are infinite vectors of zeros. Any
  * element not explicitly set is implied to be 0.
  */
-object vectorOrder {
+object vectorOrder extends VectorOrderLow {
   implicit def seqOrder[A, CC[A] <: SeqLike[A, CC[A]]](implicit
-      A0: Order[A], module: Module[CC[A], A]) = new SeqVectorOrder[A, CC[A]] {
-    val scalar = module.scalar
-    val A = A0
-  }
+      A0: Order[A], module: Module[CC[A], A]) = new SeqVectorOrder[A, CC[A]]()(A0, module.scalar)
 
   import spire.std.ArraySupport
 
   implicit def arrayOrder[@spec(Int,Long,Float,Double) A](implicit ev: Order[A], module: Module[Array[A], A]) =
-    new Order[Array[A]] {
-      override def eqv(x: Array[A], y: Array[A]): Boolean =
-        ArraySupport.vectorEqv(x, y)(ev, module.scalar)
-      def compare(x: Array[A], y: Array[A]): Int =
-        ArraySupport.vectorCompare(x, y)(ev, module.scalar)
-    }
-
-  implicit def mapOrder[K, V](implicit
-      V0: Eq[V], module: Module[Map[K, V], V]) = new MapVectorEq[K, V] {
-    val V = V0
-    val scalar = module.scalar
-  }
+    new ArrayVectorOrder[A]()(ev, module.scalar)
 }
-
-object LowPriorityVectorOrder {
-  import spire.std.ArraySupport
-
-  implicit def seqEq[A, CC[A] <: SeqLike[A, CC[A]]](implicit
-      A0: Eq[A], module: Module[CC[A], A]) = new SeqVectorEq[A, CC[A]] {
-    val scalar = module.scalar
-    val A = A0
-  }
-
-  implicit def arrayEq[@spec(Int,Long,Float,Double) A](implicit ev: Eq[A], module: Module[Array[A], A]) =
-    new Eq[Array[A]] {
-      def eqv(x: Array[A], y: Array[A]): Boolean =
-        ArraySupport.vectorEqv(x, y)(ev, module.scalar)
-    }
-}
-
 
 /**
  * This provides orderings (Order and Eq) for Float and Double that have

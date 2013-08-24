@@ -116,7 +116,9 @@ trait DoubleIsReal extends IsReal[Double] with DoubleOrder with DoubleIsSigned {
   def isWhole(a:Double) = a % 1.0 == 0.0
 }
 
+@SerialVersionUID(0L)
+class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable
+
 trait DoubleInstances {
-  implicit final val DoubleAlgebra = new DoubleIsField with DoubleIsNRoot with DoubleIsTrig {}
-  implicit final val DoubleIsReal = new DoubleIsReal {}
+  implicit final val DoubleAlgebra = new DoubleAlgebra
 }

@@ -35,24 +35,9 @@ trait CoordinateSpace[V, @spec(Float, Double) F] extends InnerProductSpace[V, F]
 object CoordinateSpace {
   @inline final def apply[V, @spec(Float,Double) F](implicit V: CoordinateSpace[V, F]) = V
 
-  def seq[A, CC[A] <: SeqLike[A, CC[A]]](dimensions0: Int)(implicit field0: Field[A],
-      cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqCoordinateSpace[A, CC[A]] {
-    val scalar = field0
-    val cbf = cbf0
-    val dimensions = dimensions0
-  }
+  def seq[A: Field, CC[A] <: SeqLike[A, CC[A]]](dimensions: Int)(implicit
+      cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqCoordinateSpace[A, CC[A]](dimensions)
 
-  def array[@spec(Float, Double) A: Field: ClassTag](dimensions0: Int): CoordinateSpace[Array[A], A] =
-    new CoordinateSpace[Array[A], A] {
-      final val dimensions = dimensions0
-      def scalar = Field[A]
-      def zero: Array[A] = new Array[A](0)
-      def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
-      def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
-      override def minus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.minus(x, y)
-      def timesl(r: A, x: Array[A]): Array[A] = ArraySupport.timesl(r, x)
-      override def dot(x: Array[A], y: Array[A]): A = ArraySupport.dot(x, y)
-      def coord(v: Array[A], i: Int): A = v(i)
-      def axis(i: Int): Array[A] = ArraySupport.axis(dimensions, i)
-    }
+  def array[@spec(Float, Double) A: Field: ClassTag](dimensions: Int): CoordinateSpace[Array[A], A] =
+    new ArrayCoordinateSpace[A](dimensions)
 }

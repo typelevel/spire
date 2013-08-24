@@ -64,7 +64,8 @@ trait IntIsReal extends IsIntegral[Int] with IntOrder with IntIsSigned {
   def toDouble(n: Int): Double = n.toDouble
 }
 
-trait IntIsBitString extends BitString[Int] {
+@SerialVersionUID(0L)
+class IntIsBitString extends BitString[Int] with Serializable {
   def one: Int = -1
   def zero: Int = 0
   def and(a: Int, b: Int): Int = a & b
@@ -89,8 +90,10 @@ trait IntIsBitString extends BitString[Int] {
   def rotateRight(n: Int, i: Int): Int = Integer.rotateRight(n, i)
 }
 
+@SerialVersionUID(0L)
+class IntAlgebra extends IntIsEuclideanRing with IntIsNRoot with IntIsReal with Serializable
+
 trait IntInstances {
-  implicit final val IntBitString = new IntIsBitString {}
-  implicit final val IntAlgebra = new IntIsEuclideanRing with IntIsNRoot {}
-  implicit final val IntIsReal = new IntIsReal {}
+  implicit final val IntBitString = new IntIsBitString
+  implicit final val IntAlgebra = new IntAlgebra
 }

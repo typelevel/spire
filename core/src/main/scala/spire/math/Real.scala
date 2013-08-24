@@ -29,6 +29,7 @@ import real._
  * An general Real type. Can be used represent real numbers and approximate
  * them on-demand.
  */
+@SerialVersionUID(0L)
 final class Real private (val expr: Expr[Real])
 extends ScalaNumber with ScalaNumericConversions
    with RealLike[Real]
@@ -38,7 +39,8 @@ extends ScalaNumber with ScalaNumericConversions
    with ConstantFolder[Real]
    with BubbleUpDivs[Real]
    with PrettyToString[Real]
-   with Ordered[Real] {
+   with Ordered[Real]
+   with Serializable {
 
   val coexpr: Coexpr[Real] = Real.RealCoexpr
 
@@ -83,8 +85,7 @@ object Real extends RealInstances {
 }
 
 trait RealInstances {
-  implicit final val RealAlgebra = new RealIsField with RealIsNRoot {}
-  implicit final val RealIsReal = new RealIsReal {}
+  implicit final val RealAlgebra = new RealAlgebra
 }
 
 private[math] trait RealIsRing extends Ring[Real] {
@@ -137,3 +138,6 @@ private[math] trait RealIsReal extends IsReal[Real] with RealOrder with RealIsSi
   }
   def isWhole(a:Real) = a % 1 == 0
 }
+
+@SerialVersionUID(0L)
+class RealAlgebra extends RealIsField with RealIsNRoot with RealIsReal with Serializable

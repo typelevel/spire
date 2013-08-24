@@ -56,9 +56,8 @@ class UByte(val signed: Byte) extends AnyVal {
 }
 
 trait UByteInstances {
-  implicit final val UByteAlgebra = new UByteIsRig {}
-  implicit final val UByteBitString = new UByteBitString {}
-  implicit final val UByteIsReal = new UByteIsReal {}
+  implicit final val UByteAlgebra = new UByteAlgebra
+  implicit final val UByteBitString = new UByteBitString
 }
 
 private[math] trait UByteIsRig extends Rig[UByte] {
@@ -92,7 +91,8 @@ private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteOrder with U
   def toDouble(n: UByte): Double = n.toDouble
 }
 
-private[math] trait UByteBitString extends BitString[UByte] {
+@SerialVersionUID(0L)
+private[math] class UByteBitString extends BitString[UByte] with Serializable {
   def one: UByte = UByte(-1: Byte)
   def zero: UByte = UByte(0: Byte)
   def and(a: UByte, b: UByte): UByte = a & b
@@ -122,3 +122,6 @@ private[math] trait UByteBitString extends BitString[UByte] {
     (n >>> j) | (n << (8 - j))
   }
 }
+
+@SerialVersionUID(0L)
+private[math] class UByteAlgebra extends UByteIsRig with UByteIsReal with Serializable

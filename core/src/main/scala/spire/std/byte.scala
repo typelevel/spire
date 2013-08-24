@@ -38,7 +38,8 @@ trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned {
   def toDouble(n: Byte): Double = n.toDouble
 }
 
-trait ByteIsBitString extends BitString[Byte] {
+@SerialVersionUID(0L)
+class ByteIsBitString extends BitString[Byte] with Serializable {
   def one: Byte = (-1: Byte)
   def zero: Byte = (0: Byte)
   def and(a: Byte, b: Byte): Byte = (a & b).toByte
@@ -69,8 +70,10 @@ trait ByteIsBitString extends BitString[Byte] {
   }
 }
 
+@SerialVersionUID(0L)
+class ByteAlgebra extends ByteIsEuclideanRing with ByteIsReal with Serializable
+
 trait ByteInstances {
-  implicit final val ByteBitString = new ByteIsBitString {}
-  implicit final val ByteAlgebra = new ByteIsEuclideanRing {}
-  implicit final val ByteIsReal = new ByteIsReal {}
+  implicit final val ByteBitString = new ByteIsBitString
+  implicit final val ByteAlgebra = new ByteAlgebra
 }

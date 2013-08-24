@@ -5,7 +5,9 @@ import spire.algebra._
 import scala.collection.TraversableLike
 import scala.collection.generic.CanBuildFrom
 
-final class IterableMonoid[A, SA <: TraversableLike[A, SA]](implicit cbf: CanBuildFrom[SA, A, SA]) extends Monoid[SA] {
+@SerialVersionUID(0L)
+final class IterableMonoid[A, SA <: TraversableLike[A, SA]](implicit cbf: CanBuildFrom[SA, A, SA])
+extends Monoid[SA] with Serializable {
   def id: SA = cbf().result()
   def op(x: SA, y: SA): SA = x.++(y)(cbf)
 }
