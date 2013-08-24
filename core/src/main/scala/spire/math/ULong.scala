@@ -59,12 +59,12 @@ class ULong(val signed: Long) extends AnyVal {
   final def <= (that: ULong) = if (this.signed >= 0L)
     this.signed <= that.signed || that.signed < 0L
   else
-    that.signed >= this.signed
+    that.signed >= this.signed && that.signed < 0L
 
   final def < (that: ULong) = if (this.signed >= 0L)
     this.signed < that.signed || that.signed < 0L
   else
-    that.signed > this.signed
+    that.signed > this.signed && that.signed < 0L
 
   @inline final def >= (that: ULong) = that <= this
   @inline final def > (that: ULong) = that < this
