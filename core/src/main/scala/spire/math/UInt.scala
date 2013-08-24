@@ -59,9 +59,8 @@ class UInt(val signed: Int) extends AnyVal {
 }
 
 trait UIntInstances {
-  implicit object UIntAlgebra extends UIntIsRig
-  implicit object UIntBitString extends UIntBitString
-  implicit object UIntIsReal extends UIntIsReal
+  implicit final val UIntAlgebra = new UIntAlgebra
+  implicit final val UIntBitString = new UIntBitString
 }
 
 private[math] trait UIntIsRig extends Rig[UInt] {
@@ -86,7 +85,8 @@ private[math] trait UIntOrder extends Order[UInt] {
   def compare(x: UInt, y: UInt) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
-private[math] trait UIntBitString extends BitString[UInt] {
+@SerialVersionUID(0L)
+private[math] class UIntBitString extends BitString[UInt] with Serializable {
   def one: UInt = UInt(-1)
   def zero: UInt = UInt(0)
   def and(a: UInt, b: UInt): UInt = a & b
@@ -119,3 +119,6 @@ private[math] trait UIntIsSigned extends Signed[UInt] {
 private[math] trait UIntIsReal extends IsIntegral[UInt] with UIntOrder with UIntIsSigned {
   def toDouble(n: UInt): Double = n.toDouble
 }
+
+@SerialVersionUID(0L)
+private[math] class UIntAlgebra extends UIntIsRig with UIntIsReal with Serializable

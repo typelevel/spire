@@ -6,6 +6,7 @@ import scala.{specialized => spec}
 
 import spire.algebra._
 import spire.std.{ SeqVectorEq, SeqVectorOrder }
+import spire.std.{ ArrayVectorEq, ArrayVectorOrder }
 import spire.std.MapVectorEq
 import spire.math._
 import spire.macrosk._
@@ -23,7 +24,8 @@ import scala.collection.SeqLike
  * `Eq[Any]`.
  */
 object genericEq {
-  private class GenericEq[@spec A] extends Eq[A] {
+  @SerialVersionUID(0L)
+  private class GenericEq[@spec A] extends Eq[A] with Serializable {
     def eqv(x:A, y:A): Boolean = x == y
   }
 
@@ -38,38 +40,21 @@ object genericEq {
  */
 object vectorOrder {
   implicit def seqEq[A, CC[A] <: SeqLike[A, CC[A]]](implicit
-      A0: Eq[A], module: Module[CC[A], A]) = new SeqVectorEq[A, CC[A]] {
-    val scalar = module.scalar
-    val A = A0
-  }
+      A0: Eq[A], module: Module[CC[A], A]) = new SeqVectorEq[A, CC[A]]()(A0, module.scalar)
 
   implicit def seqOrder[A, CC[A] <: SeqLike[A, CC[A]]](implicit
-      A0: Order[A], module: Module[CC[A], A]) = new SeqVectorOrder[A, CC[A]] {
-    val scalar = module.scalar
-    val A = A0
-  }
+      A0: Order[A], module: Module[CC[A], A]) = new SeqVectorOrder[A, CC[A]]()(A0, module.scalar)
 
   import spire.std.ArraySupport
 
   implicit def arrayEq[@spec(Int,Long,Float,Double) A](implicit ev: Eq[A], module: Module[Array[A], A]) =
-    new Eq[Array[A]] {
-      def eqv(x: Array[A], y: Array[A]): Boolean =
-        ArraySupport.vectorEqv(x, y)(ev, module.scalar)
-    }
+    new ArrayVectorEq[A]()(ev, module.scalar)
 
   implicit def arrayOrder[@spec(Int,Long,Float,Double) A](implicit ev: Order[A], module: Module[Array[A], A]) =
-    new Order[Array[A]] {
-      override def eqv(x: Array[A], y: Array[A]): Boolean =
-        ArraySupport.vectorEqv(x, y)(ev, module.scalar)
-      def compare(x: Array[A], y: Array[A]): Int =
-        ArraySupport.vectorCompare(x, y)(ev, module.scalar)
-    }
+    new ArrayVectorOrder[A]()(ev, module.scalar)
 
-  implicit def mapOrder[K, V](implicit
-      V0: Eq[V], module: Module[Map[K, V], V]) = new MapVectorEq[K, V] {
-    val V = V0
-    val scalar = module.scalar
-  }
+  implicit def mapOrder[K, V](implicit V0: Eq[V], module: Module[Map[K, V], V]) =
+    new MapVectorEq[K, V]()(V0, module.scalar)
 }
 
 /**

@@ -75,7 +75,8 @@ trait LongIsReal extends IsIntegral[Long] with LongOrder with LongIsSigned {
   def toDouble(n: Long): Double = n.toDouble
 }
 
-trait LongIsBitString extends BitString[Long] {
+@SerialVersionUID(0L)
+class LongIsBitString extends BitString[Long] with Serializable {
   def one: Long = -1L
   def zero: Long = 0L
   def and(a: Long, b: Long): Long = a & b
@@ -100,8 +101,10 @@ trait LongIsBitString extends BitString[Long] {
   def rotateRight(n: Long, i: Int): Long = java.lang.Long.rotateRight(n, i)
 }
 
+@SerialVersionUID(0L)
+class LongAlgebra extends LongIsEuclideanRing with LongIsNRoot with LongIsReal with Serializable
+
 trait LongInstances {
-  implicit final val LongBitString = new LongIsBitString {}
-  implicit final val LongAlgebra = new LongIsEuclideanRing with LongIsNRoot {}
-  implicit final val LongIsReal = new LongIsReal {}
+  implicit final val LongBitString = new LongIsBitString
+  implicit final val LongAlgebra = new LongAlgebra
 }
