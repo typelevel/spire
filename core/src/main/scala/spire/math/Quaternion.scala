@@ -60,7 +60,11 @@ private[math] trait QuaternionAlgebra[A]
   def div(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a / b
   def quot(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a /~ b
   def mod(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a % b
-  def gcd(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = sys.error("FIXME")
+  def gcd(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = {
+    @tailrec def _gcd(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] =
+      if (b.isZero) a else _gcd(b, a - (a / b).round * b)
+    _gcd(a, b)
+  }
 
   def nroot(a: Quaternion[A], k: Int): Quaternion[A] = a.nroot(k)
   override def sqrt(a: Quaternion[A]): Quaternion[A] = a.sqrt
@@ -92,6 +96,7 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
   def longValue: Long = r.toLong
   def intValue: Int = r.toInt
 
+  def isZero: Boolean = r == zero && i === zero && j === zero && k === zero
   def isReal: Boolean = i === zero && j === zero && k === zero
   def isPure: Boolean = r === zero
   def isWhole: Boolean = isReal && r.isWhole

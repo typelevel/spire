@@ -586,12 +586,8 @@ extends ComplexIsRing[A] with EuclideanRing[Complex[A]] {
   def mod(a: Complex[A], b: Complex[A]) = a % b
   override def quotmod(a: Complex[A], b: Complex[A]) = a /% b
   def gcd(a: Complex[A], b: Complex[A]): Complex[A] = {
-    @tailrec def _gcd(a: Complex[A], b: Complex[A]): Complex[A] = {
-      if (a.abs < f.one) one
-      else if (b.isZero) a
-      else if (b.abs < f.one) one
-      else _gcd(b, a % b)
-    }
+    @tailrec def _gcd(a: Complex[A], b: Complex[A]): Complex[A] =
+      if (b.isZero) a else _gcd(b, a - (a / b).round * b)
     _gcd(a, b)
   }
 }
