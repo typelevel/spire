@@ -19,6 +19,7 @@ class UShort(val signed: Char) extends AnyVal {
   def toLong: Long = signed.toLong
   def toFloat: Float = signed.toFloat
   def toDouble: Double = signed.toDouble
+  def toBigInt: BigInt = BigInt(toInt)
 
   def isValidByte = signed == toByte
   def isValidShort = signed == toShort

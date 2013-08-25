@@ -5,6 +5,9 @@ import spire.algebra._
 object UByte extends UByteInstances {
   @inline final def apply(n: Byte) = new UByte(n)
   @inline final def apply(n: Int) = new UByte(n.toByte)
+
+  @inline final def MinValue = UByte(0)
+  @inline final def MaxValue = UByte(-1)
 }
 
 class UByte(val signed: Byte) extends AnyVal {
@@ -15,6 +18,7 @@ class UByte(val signed: Byte) extends AnyVal {
   def toLong: Long = signed & 0xffL
   def toFloat: Float = toInt.toFloat
   def toDouble: Double = toInt.toDouble
+  def toBigInt: BigInt = BigInt(toInt)
 
   def isValidByte = signed >= 0
   def isValidShort = true
