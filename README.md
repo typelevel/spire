@@ -26,7 +26,7 @@ To get started with SBT, simply add the following to your `build.sbt` file:
 ```
 scalaVersion := "2.10.2"
 
-libraryDependencies += "org.spire-math" %% "spire" % "0.5.0"
+libraryDependencies += "org.spire-math" %% "spire" % "0.6.0"
 ```
 
 Moving forward Spire is tareting Scala 2.10.x and higher. If you want to use
@@ -64,15 +64,15 @@ res0: spire.math.Complex[Double] = (10.472508533940392 + 73.46062169567367i)
 In addition to supporting all of Scala's built-in number types, Spire
 introduces several new ones, all of which can be found in `spire.math`:
 
- * `Rational` fractions of integers with perfect precision
- * `Complex[A]` and `Gaussian[A]` points on the complex plane
- * `Real` lazily-computed, arbitrary precision number type
- * `SafeLong` fast, overflow-proof integer type
- * `Interval[A]` arithmetic on open, closed, and unbound intervals
- * `Number` boxed type supporting a traditional numeric tower
- * `UByte` through `ULong` value classes supporting unsigned operations
  * `Natural` unsigned, immutable, arbitrary precision integer
- * `EuclideanRational` fractions of types from any Euclidean domain
+ * `Rational` fractions of integers with perfect precision
+ * `Real` lazily-computed, arbitrary precision number type
+ * `Complex[A]` complex numbers, points on the complex plane
+ * `Quaternion[A]` extension of complex numbers into 4D space
+ * `UByte` through `ULong` value classes supporting unsigned operations
+ * `SafeLong` fast, overflow-proof integer type
+ * `Number` boxed type supporting a traditional numeric tower
+ * `Interval[A]` arithmetic on open, closed, and unbound intervals
 
 ### Type Classes
 
@@ -92,8 +92,8 @@ to concepts from abstract algebra:
 
  * `Eq[A]` types that can be compared for equality
  * `Order[A]` types that can be compared and ordered
- * `Semigroup[A]` types with an associtive binary operator
- * `Monoid[A]` semigroups who have an identity element
+ * `Semigroup[A]` types with an associtive binary operator `|+|`
+ * `Monoid[A]` semigroups that have an identity element
  * `Group[A]` monoids that have an inverse operator
  * `Semiring[A]` types that form semigroups under `+` and `*`
  * `Rng[A]` types that form a group under `+` and a semigroup under `*`
@@ -230,8 +230,8 @@ These high-level type classes will pull in all of the relevant algebraic type
 classes. Users who aren't concerned with algebraic properties directly, or who
 wish for more flexibility, should prefer these type classes.
 
- * *Integral*: whole number types (e.g. `Int`)
- * *Fractional*: fractional/decimal types (e.g. `Double`)
+ * *Integral*: whole number types (e.g. `Int`, `BigInt`)
+ * *Fractional*: fractional/decimal types (e.g. `Double`, `Rational`)
  * *Numeric*: any number type, making "best effort" to support ops
 
 The `Numeric` type class is unique in that it provides the same functionality
@@ -249,13 +249,31 @@ operators.
    + and (`&`): conjunction
    + or (`|`): disjunction
    + xor (`^`): exclusive-disjunction
+   + imp: `~a | b`
+   + nand: `~(a & b)`
+   + nor: `~(a | b)`
+   + nxor: `~(a ^ b)`
 
 BooleanAlgebras exist not just for `Boolean`, but also for `Byte`, `Short`,
 `Int`, `Long`, `UByte`, `UShort`, `UInt`,  and `ULong`.
 
-#### Errata
+#### Trig
 
-Additional type classes `BooleanAlgebra` and `Trig` are provided.
+Trig provides an abstraction for any type which defines trigonometric
+functions. To do this, types should be able to reasonably approximate real
+values.
+
+ * *Trig*
+   + e: Euler's number, `2.71828...`
+   + pi: Ratio of circle's circumference to diameter, `3.14159...`
+   + exp: exponential function, `e^x`
+   + expm1: `e^x - 1`
+   + log: natural logarithm
+   + log1p: `log(x + 1)`
+   + sin, cos, tan: sine, cosine, and tangent, the standard functions of angles
+   + asin, acos, atan, atan2: inverse functions
+   + sinh, cosh, tanh: hyperbolic functions
+   + toRatians, toDegrees: convert between angle units
 
 ### Syntax
 
@@ -399,6 +417,7 @@ In addition, Spire provides many other methods which are "missing" from
  * pow(BigDecimal): BigDecimal
  * pow(Long): Long
  * gcd(Long, Long): Long
+ * and so on...
 
 ### Benchmarks
 
@@ -447,6 +466,6 @@ measure relative as well as absolute performance.
 Code is offered as-is, with no implied warranty of any kind. Comments,
 criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
-Copyright 2011-2012 Erik Osheim, Tom Switzer
+Copyright 2011-2013 Erik Osheim, Tom Switzer
 
 The MIT software license is attached in the COPYING file.
