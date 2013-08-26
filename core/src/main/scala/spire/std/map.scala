@@ -28,7 +28,7 @@ with Group[Map[K, V]] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class MapRng[K, V](implicit val scalar: Ring[V]) extends RingAlgebra[Map[K, V], V]
+class MapRng[K, V](implicit val scalar: Rng[V]) extends RingAlgebra[Map[K, V], V]
 with Serializable { self =>
   def zero: Map[K, V] = Map.empty
 
@@ -118,7 +118,7 @@ class MapVectorEq[K, V](implicit V: Eq[V], scalar: AdditiveMonoid[V]) extends Eq
 trait MapInstances0 {
   implicit def MapMonoid[K, V: Semigroup] = new MapMonoid[K, V]
 
-  implicit def MapRng[K, V: Ring] = new MapRng[K, V]
+  implicit def MapRng[K, V: Rng] = new MapRng[K, V]
 }
 
 trait MapInstances1 extends MapInstances0 {
