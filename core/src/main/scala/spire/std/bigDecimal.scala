@@ -183,7 +183,9 @@ object BigDecimalIsTrig {
 }
 
 // ugh. (apart from pi, e, exp) this is very imprecise.
-class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends Trig[BigDecimal] {
+@SerialVersionUID(0L)
+class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext)
+extends Trig[BigDecimal] with Serializable {
   import BigDecimalIsTrig._
 
   lazy val e: BigDecimal = eFromContext(mc)
@@ -191,7 +193,9 @@ class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends 
   protected[std] lazy val twoPi = pi * 2
 
   def exp(k: BigDecimal): BigDecimal = spire.math.exp(BigDecimal(k.bigDecimal, mc))
+  def expm1(k: BigDecimal): BigDecimal = spire.math.exp(BigDecimal(k.bigDecimal, mc)) - BigDecimal(1)
   def log(a: BigDecimal) = spire.math.log(BigDecimal(a.bigDecimal, mc))
+  def log1p(a: BigDecimal) = spire.math.log(BigDecimal(a.bigDecimal, mc) + BigDecimal(1))
 
   protected[std] val threeSixty = BigDecimal(360)
   def toRadians(a: BigDecimal): BigDecimal = (a * twoPi) / threeSixty
@@ -327,11 +331,13 @@ with BigDecimalOrder with BigDecimalIsSigned {
   def isWhole(a:BigDecimal) = a % 1.0 == 0.0
 }
 
+@SerialVersionUID(0L)
+class BigDecimalAlgebra extends BigDecimalIsField with BigDecimalIsNRoot with BigDecimalIsReal with Serializable
+
 trait BigDecimalInstances {
   import BigDecimal.defaultMathContext
 
-  implicit final val BigDecimalAlgebra = new BigDecimalIsField with BigDecimalIsNRoot {}
-  implicit final val BigDecimalIsReal = new BigDecimalIsReal {}
+  implicit final val BigDecimalAlgebra = new BigDecimalAlgebra
   implicit def BigDecimalIsTrig(implicit mc: MathContext = defaultMathContext) =
     new BigDecimalIsTrig(mc)
 }

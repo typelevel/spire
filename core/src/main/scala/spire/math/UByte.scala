@@ -5,6 +5,9 @@ import spire.algebra._
 object UByte extends UByteInstances {
   @inline final def apply(n: Byte) = new UByte(n)
   @inline final def apply(n: Int) = new UByte(n.toByte)
+
+  @inline final def MinValue = UByte(0)
+  @inline final def MaxValue = UByte(-1)
 }
 
 class UByte(val signed: Byte) extends AnyVal {
@@ -15,6 +18,7 @@ class UByte(val signed: Byte) extends AnyVal {
   def toLong: Long = signed & 0xffL
   def toFloat: Float = toInt.toFloat
   def toDouble: Double = toInt.toDouble
+  def toBigInt: BigInt = BigInt(toInt)
 
   def isValidByte = signed >= 0
   def isValidShort = true
@@ -56,9 +60,8 @@ class UByte(val signed: Byte) extends AnyVal {
 }
 
 trait UByteInstances {
-  implicit final val UByteAlgebra = new UByteIsRig {}
-  implicit final val UByteBitString = new UByteBitString {}
-  implicit final val UByteIsReal = new UByteIsReal {}
+  implicit final val UByteAlgebra = new UByteAlgebra
+  implicit final val UByteBitString = new UByteBitString
 }
 
 private[math] trait UByteIsRig extends Rig[UByte] {
@@ -92,7 +95,8 @@ private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteOrder with U
   def toDouble(n: UByte): Double = n.toDouble
 }
 
-private[math] trait UByteBitString extends BitString[UByte] {
+@SerialVersionUID(0L)
+private[math] class UByteBitString extends BitString[UByte] with Serializable {
   def one: UByte = UByte(-1: Byte)
   def zero: UByte = UByte(0: Byte)
   def and(a: UByte, b: UByte): UByte = a & b
@@ -122,3 +126,6 @@ private[math] trait UByteBitString extends BitString[UByte] {
     (n >>> j) | (n << (8 - j))
   }
 }
+
+@SerialVersionUID(0L)
+private[math] class UByteAlgebra extends UByteIsRig with UByteIsReal with Serializable
