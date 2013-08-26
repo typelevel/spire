@@ -7,7 +7,7 @@ import scala.{ specialized => spec }
  * a ring, rather than a field.
  */
 trait Module[V, @spec(Int,Long,Float,Double) R] extends AdditiveAbGroup[V] {
-  implicit def scalar: Ring[R] // TODO: Can this be Rng[R] instead?
+  implicit def scalar: Rng[R]
 
   def timesl(r: R, v: V): V
   def timesr(v: V, r: R): V = timesl(r, v)
