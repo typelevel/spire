@@ -71,13 +71,13 @@ class LiteralBigIntOps(val lhs: BigInt) extends AnyVal {
 }
 
 final class ArrayOps[@spec A](arr: Array[A]) {
-  def qsum(implicit ev: Rig[A]) = {
+  def qsum(implicit ev: AdditiveMonoid[A]) = {
     @tailrec
     def f(i: Int, n: Int, t: A): A = if (i < n) f(i + 1, n, ev.plus(t, arr(i))) else t
     f(0, arr.length, ev.zero)
   }
 
-  def qproduct(implicit ev: Rig[A]) = {
+  def qproduct(implicit ev: MultiplicativeMonoid[A]) = {
     @tailrec
     def f(i: Int, n: Int, t: A): A = if (i < n) f(i + 1, n, ev.times(t, arr(i))) else t
     f(0, arr.length, ev.one)
@@ -118,7 +118,7 @@ final class ArrayOps[@spec A](arr: Array[A]) {
     }
     f(0, 1, arr.length)
   }
-      
+
   import spire.math.{Sorting, Selection, Searching}
 
   def qsearch(a: A)(implicit ev: Order[A]): Int = {
@@ -189,15 +189,14 @@ final class IndexedSeqOps[@spec A, CC[A] <: IndexedSeq[A]](as: CC[A]) {
 }
 
 final class SeqOps[@spec A, CC[A] <: Iterable[A]](as: CC[A]) {
-  def qsum(implicit ev: Rig[A]) = {
+  def qsum(implicit ev: AdditiveMonoid[A]) = {
     var sum = ev.zero
     val f: A => Unit = (a: A) => sum = ev.plus(sum, a)
     as.foreach(f)
-    // as.foreach(a => sum = ev.plus(sum, a))
     sum
   }
 
-  def qproduct(implicit ev: Rig[A]) = {
+  def qproduct(implicit ev: MultiplicativeMonoid[A]) = {
     var prod = ev.one
     as.foreach(a => prod = ev.times(prod, a))
     prod
