@@ -52,10 +52,6 @@ object Polynomial {
   def apply(s: String): Polynomial[Rational] = parse(s)
 
   def zero[@spec(Double) C: Signed: Ring: ClassTag] = new PolySparse(Map.empty[Int, C])
-  def one[@spec(Double) C: Signed: ClassTag](implicit r: Ring[C]) = new PolySparse(Map(0 -> r.one))
-  def x[@spec(Double) C: Signed: ClassTag](implicit r: Ring[C]) = new PolySparse(Map(1 -> r.one))
-  def twox[@spec(Double) C: Signed: ClassTag](implicit r: Ring[C]) = new PolySparse(Map(1 -> r.fromInt(2)))
-
   def constant[@spec(Double) C: Signed: Ring: ClassTag](c: C) =
     if (c.signum == 0) zero[C] else Polynomial(Map(0 -> c))
   def linear[@spec(Double) C: Signed: Ring: ClassTag](c: C) =
@@ -64,6 +60,12 @@ object Polynomial {
     if (c.signum == 0) zero[C] else Polynomial(Map(2 -> c))
   def cubic[@spec(Double) C: Signed: Ring: ClassTag](c: C) =
     if (c.signum == 0) zero[C] else Polynomial(Map(3 -> c))
+  def one[@spec(Double) C: Signed: ClassTag](implicit r: Ring[C]) = 
+    constant(r.fromInt(1))
+  def x[@spec(Double) C: Signed: ClassTag](implicit r: Ring[C]) = 
+    linear(r.fromInt(1))
+  def twox[@spec(Double) C: Signed: ClassTag](implicit r: Ring[C]) = 
+    linear(r.fromInt(2))
 
   implicit def ring[@spec(Double) C: ClassTag](implicit a: Ring[C], s: Signed[C]) =
     new PolynomialRing[C] {
