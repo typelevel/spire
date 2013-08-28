@@ -13,10 +13,10 @@ import scala.{specialized => spec}
 class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   (implicit r: Ring[C], s: Signed[C], val ct: ClassTag[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
-  private val _degree = if (isZero) 0 else coeffs.length - 1
-  def degree = _degree
+  // val _degree: Int = if(isZero) 0 else coeffs.length - 1
+  def degree: Int = if(isZero) 0 else coeffs.length - 1//_degree
 
-  def toSparse: PolySparse[C] = new PolySparse(data)
+  def toSparse: PolySparse[C] = Polynomial.sparse(data)
   def toDense: PolyDense[C] = lhs
 
   def data: Map[Int, C] =
