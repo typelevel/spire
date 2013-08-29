@@ -15,34 +15,38 @@ with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A] {
 }
 
 object Integral {
-  implicit object IntIsIntegral extends IntIsIntegral
-  implicit object LongIsIntegral extends LongIsIntegral
-  implicit object BigIntIsIntegral extends BigIntIsIntegral
-  implicit object SafeLongIsIntegral extends SafeLongIsIntegral
+  implicit final val IntIsIntegral = new IntIsIntegral
+  implicit final val LongIsIntegral = new LongIsIntegral
+  implicit final val BigIntIsIntegral = new BigIntIsIntegral
+  implicit final val SafeLongIsIntegral = new SafeLongIsIntegral
 
   @inline final def apply[A](implicit ev:Integral[A]) = ev
 }
 
-private[math] trait IntIsIntegral extends Integral[Int] with IntIsEuclideanRing
-with ConvertableFromInt with ConvertableToInt with IntIsReal {
+@SerialVersionUID(0L)
+private[math] class IntIsIntegral extends Integral[Int] with IntIsEuclideanRing
+with ConvertableFromInt with ConvertableToInt with IntIsReal with Serializable {
   override def fromInt(n: Int): Int = n
   override def toDouble(n: Int): Double = n.toDouble
 }
 
-private[math] trait LongIsIntegral extends Integral[Long] with LongIsEuclideanRing
-with ConvertableFromLong with ConvertableToLong with LongIsReal {
+@SerialVersionUID(0L)
+private[math] class LongIsIntegral extends Integral[Long] with LongIsEuclideanRing
+with ConvertableFromLong with ConvertableToLong with LongIsReal with Serializable {
   override def fromInt(n: Int): Long = n.toLong
   override def toDouble(n: Long): Double = n.toDouble
 }
 
-private[math] trait BigIntIsIntegral extends Integral[BigInt] with BigIntIsEuclideanRing
-with ConvertableFromBigInt with ConvertableToBigInt with BigIntIsReal {
+@SerialVersionUID(0L)
+private[math] class BigIntIsIntegral extends Integral[BigInt] with BigIntIsEuclideanRing
+with ConvertableFromBigInt with ConvertableToBigInt with BigIntIsReal with Serializable {
   override def fromInt(n: Int): BigInt = BigInt(n)
   override def toDouble(n: BigInt): Double = n.toDouble
 }
 
-private[math] trait SafeLongIsIntegral extends Integral[SafeLong] with SafeLongIsEuclideanRing
-with ConvertableFromSafeLong with ConvertableToSafeLong with SafeLongIsReal {
+@SerialVersionUID(0L)
+private[math] class SafeLongIsIntegral extends Integral[SafeLong] with SafeLongIsEuclideanRing
+with ConvertableFromSafeLong with ConvertableToSafeLong with SafeLongIsReal with Serializable {
   override def fromInt(n: Int): SafeLong = SafeLong(n)
   override def toDouble(n: SafeLong): Double = n.toDouble
 }

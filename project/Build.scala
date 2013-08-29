@@ -222,6 +222,10 @@ object MyBuild extends Build {
       // comparisons
       "org.apfloat" % "apfloat" % "1.6.3",
       "org.jscience" % "jscience" % "4.3.1",
+      "org.apache.commons" % "commons-math3" % "3.2",
+
+      // thyme
+      "ichi.bench" % "thyme" % "0.1.0" from "http://plastic-idolatry.com/jars/thyme-0.1.0.jar",
 
       // caliper stuff
       "com.google.guava" % "guava" % "r09",
