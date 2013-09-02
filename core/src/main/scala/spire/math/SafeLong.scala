@@ -119,6 +119,11 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
 
   final def isWhole: Boolean = true
 
+  def isProbablePrime(c: Int): Boolean = toBigInt.isProbablePrime(c)
+
+  def bitLength: Int =
+    fold(64 - java.lang.Long.numberOfLeadingZeros(_), _.bitLength)
+
   def fold[A,B <: A,C <: A](f: Long => B, g: BigInt => C): A
 
   def map(f: Long => Long, g: BigInt => BigInt): SafeLong =
