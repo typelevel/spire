@@ -1,4 +1,4 @@
-package spire.math.primes
+package spire.math.prime
 
 import spire.algebra.Sign
 import spire.algebra.Sign.{Negative, Zero, Positive}
@@ -103,6 +103,8 @@ object Factors {
     SafeLong(x)
   }
 
+  // TODO: 1-in-1M chance of being wrong. too risky?
+  // maybe we should use 30, i.e. 1-in-1B?
   def isPrime(n: SafeLong): Boolean =
     n.toBigInt.isProbablePrime(20)
 
@@ -174,7 +176,7 @@ object Factors {
 
 case class Factors(factors: Map[SafeLong, Int], sign: Sign) extends Iterable[(SafeLong, Int)] with Ordered[Factors] { lhs =>
 
-  private[primes] def prod(m: Map[SafeLong, Int]): SafeLong =
+  private[prime] def prod(m: Map[SafeLong, Int]): SafeLong =
     m.foldLeft(SafeLong.one) { case (t, (p, e)) => t * (p ** e) }
 
   lazy val value: SafeLong = sign match {
@@ -253,7 +255,7 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign) extends Iterable[(Sa
   def *(rhs: SafeLong): Factors =
     Factors(factors.updated(rhs, factors.getOrElse(rhs, 0) + 1), sign)
 
-  private[primes] def qm(rhs: Factors) = {
+  private[prime] def qm(rhs: Factors) = {
     val sign = (lhs.sign * rhs.sign).toInt
     val (nn, dd) = (lhs.factors - rhs.factors).filter(_._2 != 0).partition(_._2 > 0)
     val cc = lhs.factors.flatMap { case (p, le) =>
