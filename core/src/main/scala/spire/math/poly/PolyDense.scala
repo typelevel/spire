@@ -99,7 +99,8 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
     if (lhs.isZero) return lhs
     val lcs = lhs.coeffs
     val rcs = rhs.coeffs
-    val cs = Array.fill(lcs.length + rcs.length - 1)(r.zero)
+    val cs = new Array[C](lcs.length + rcs.length - 1)
+    cfor(0)(_ < cs.length, _ + 1) { i => cs(i) = r.zero }
     cfor(0)(_ < lcs.length, _ + 1) { i =>
       val c = lcs(i)
       var k = i
