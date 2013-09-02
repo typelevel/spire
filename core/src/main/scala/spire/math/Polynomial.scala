@@ -131,24 +131,53 @@ object Polynomial {
 
 trait Polynomial[@spec(Double) C] { lhs =>
 
+  /** Returns a polynmial that has a dense representation. */
   def toDense: Polynomial[C]
+
+  /** Returns a polynomial that has a sparse representation. */
   def toSparse: Polynomial[C]
 
+  /**
+   * Returns a list of non-zero terms.
+   */
   def terms: List[Term[C]]
+
+  /**
+   * Returns the coefficients in little-endian order. So, the i-th element is
+   * coeffs(i) * (x ** i).
+   */
   def coeffs: Array[C]
+
+  /** Returns a map from exponent to coefficient of this polynomial. */
   def data: Map[Int, C]
+
+  /** Returns the coefficient of the n-th degree term. */
   def nth(n: Int): C
 
+  /** Returns the term of the highest degree in this polynomial. */
   def maxTerm: Term[C]
+
+  /** Returns the degree of this polynomial. */
   def degree: Int
+
+  /** Returns the coefficient of max term of this polynomial. */
   def maxOrderTermCoeff: C
+
+  /** Returns `true` iff this polynomial is zero. */
   def isZero: Boolean
 
+  /** Evaluate the polynomial at `x`. */
   def apply(x: C): C
-  def unary_-(): Polynomial[C]
+
+  /** Returns this polynomial as a monic polynomial, where the leading
+   * coefficient (ie. `maxOrderTermCoeff`) is 1.
+   */
   def monic(implicit f: Field[C]): Polynomial[C]
+
   def derivative: Polynomial[C]
   def integral(implicit f: Field[C]): Polynomial[C]
+
+  def unary_-(): Polynomial[C]
   def +(rhs: Polynomial[C]): Polynomial[C]
   def -(rhs: Polynomial[C]): Polynomial[C] = lhs + (-rhs)
   def *(rhs: Polynomial[C]): Polynomial[C]
