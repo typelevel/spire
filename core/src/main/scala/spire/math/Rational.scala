@@ -18,6 +18,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def numeratorAsLong: Long
   def denominatorAsLong: Long
 
+  def isWhole: Boolean
+
   // ugh, ScalaNumber and ScalaNumericConversions in 2.10 require this hack
   override def underlying: List[Any] = sys.error("unimplemented")
 
@@ -331,6 +333,7 @@ object Rational extends RationalInstances {
     x.fold(LongRationals.unsafeBuild(_, 1L), BigRationals.unsafeBuild(_, BigInt(1)))
 
   implicit def apply(x: Number): Rational = x match {
+    case RationalNumber(n) => apply(n)
     case IntNumber(n) => apply(n)
     case FloatNumber(n) => apply(n)
     case DecimalNumber(n) => apply(n)
@@ -505,7 +508,8 @@ private[math] object LongRationals extends Rationals[Long] {
     }
   }
 
-  case class LongRational private[math] (n: Long, d: Long) extends RationalLike {
+  @SerialVersionUID(0L)
+  case class LongRational private[math] (n: Long, d: Long) extends RationalLike with Serializable {
     def num: Long = n
     def den: Long = d
 
@@ -733,7 +737,8 @@ private[math] object BigRationals extends Rationals[BigInt] {
   }
 
 
-  case class BigRational private[math] (n: BigInt, d: BigInt) extends RationalLike {
+  @SerialVersionUID(0L)
+  case class BigRational private[math] (n: BigInt, d: BigInt) extends RationalLike with Serializable {
     def num: BigInt = n
     def den: BigInt = d
 
@@ -858,11 +863,8 @@ private[math] object BigRationals extends Rationals[BigInt] {
 }
 
 trait RationalInstances {
-  implicit object RationalAlgebra extends RationalIsField
-  implicit def RationalIsNRoot(implicit c:ApproximationContext[Rational]) = new RationalIsNRoot {
-    implicit def context = c
-  }
-  implicit object RationalIsReal extends RationalIsReal
+  implicit final val RationalAlgebra = new RationalAlgebra
+  implicit def RationalIsNRoot(implicit c:ApproximationContext[Rational]) = new RationalIsNRoot0
 }
 
 private[math] trait RationalIsField extends Field[Rational] {
@@ -882,7 +884,7 @@ private[math] trait RationalIsField extends Field[Rational] {
   def div(a:Rational, b:Rational) = a / b
 }
 
-private[math] trait RationalIsNRoot extends NRoot[Rational] {
+private[math] trait RationalIsNRoot extends NRoot[Rational] with Serializable {
   implicit def context:ApproximationContext[Rational]
   def nroot(a: Rational, k: Int): Rational = a.nroot(k)
   def fpow(a: Rational, b: Rational): Rational = a.pow(b)
@@ -907,3 +909,10 @@ private[math] trait RationalIsReal extends IsReal[Rational] {
   def round(a:Rational): Rational = a.round
   def isWhole(a:Rational) = a.denominator == 1
 }
+
+@SerialVersionUID(0L)
+class RationalAlgebra extends RationalIsField with RationalIsReal with Serializable
+
+@SerialVersionUID(0L)
+class RationalIsNRoot0(implicit val context: ApproximationContext[Rational])
+extends RationalIsNRoot with Serializable

@@ -1,6 +1,7 @@
 package spire.std
 
 import spire.algebra._
+import spire.math.BitString
 
 import java.lang.Math
 
@@ -74,17 +75,36 @@ trait LongIsReal extends IsIntegral[Long] with LongOrder with LongIsSigned {
   def toDouble(n: Long): Double = n.toDouble
 }
 
-trait LongIsBooleanAlgebra extends BooleanAlgebra[Long] {
+@SerialVersionUID(0L)
+class LongIsBitString extends BitString[Long] with Serializable {
   def one: Long = -1L
   def zero: Long = 0L
   def and(a: Long, b: Long): Long = a & b
   def or(a: Long, b: Long): Long = a | b
   def complement(a: Long): Long = ~a
   override def xor(a: Long, b: Long): Long = a ^ b
+
+  def signed: Boolean = true
+  def width: Int = 64
+  def toHexString(n: Long): String = java.lang.Long.toHexString(n)
+
+  def bitCount(n: Long): Int = java.lang.Long.bitCount(n)
+  def highestOneBit(n: Long): Long = java.lang.Long.highestOneBit(n)
+  def lowestOneBit(n: Long): Long = java.lang.Long.lowestOneBit(n)
+  def numberOfLeadingZeros(n: Long): Int = java.lang.Long.numberOfLeadingZeros(n)
+  def numberOfTrailingZeros(n: Long): Int = java.lang.Long.numberOfTrailingZeros(n)
+
+  def leftShift(n: Long, i: Int): Long = n << i
+  def rightShift(n: Long, i: Int): Long = n >> i
+  def signedRightShift(n: Long, i: Int): Long = n >>> i
+  def rotateLeft(n: Long, i: Int): Long = java.lang.Long.rotateLeft(n, i)
+  def rotateRight(n: Long, i: Int): Long = java.lang.Long.rotateRight(n, i)
 }
 
+@SerialVersionUID(0L)
+class LongAlgebra extends LongIsEuclideanRing with LongIsNRoot with LongIsReal with Serializable
+
 trait LongInstances {
-  implicit object LongBooleanAlgebra extends LongIsBooleanAlgebra
-  implicit object LongAlgebra extends LongIsEuclideanRing with LongIsNRoot
-  implicit object LongIsReal extends LongIsReal
+  implicit final val LongBitString = new LongIsBitString
+  implicit final val LongAlgebra = new LongAlgebra
 }

@@ -35,17 +35,9 @@ trait CoordinateSpace[V, @spec(Float, Double) F] extends InnerProductSpace[V, F]
 object CoordinateSpace {
   @inline final def apply[V, @spec(Float,Double) F](implicit V: CoordinateSpace[V, F]) = V
 
-  def seq[A, CC[A] <: SeqLike[A, CC[A]]](dimensions0: Int)(implicit field0: Field[A],
-      cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqCoordinateSpace[A, CC[A]] {
-    val scalar = field0
-    val cbf = cbf0
-    val dimensions = dimensions0
-  }
+  def seq[A: Field, CC[A] <: SeqLike[A, CC[A]]](dimensions: Int)(implicit
+      cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqCoordinateSpace[A, CC[A]](dimensions)
 
-  def array[@spec(Float, Double) A](dimensions0: Int)(implicit field0: Field[A],
-      classTag0: ClassTag[A]) = new ArrayCoordinateSpace[A] {
-    val scalar = field0
-    val dimensions = dimensions0
-    val classTag = classTag0
-  }
+  def array[@spec(Float, Double) A: Field: ClassTag](dimensions: Int): CoordinateSpace[Array[A], A] =
+    new ArrayCoordinateSpace[A](dimensions)
 }

@@ -1,6 +1,7 @@
 package spire.std
 
 import spire.algebra._
+import spire.math.BitString
 
 trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
   override def minus(a:Byte, b:Byte): Byte = (a - b).toByte
@@ -37,17 +38,42 @@ trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned {
   def toDouble(n: Byte): Double = n.toDouble
 }
 
-trait ByteIsBooleanAlgebra extends BooleanAlgebra[Byte] {
+@SerialVersionUID(0L)
+class ByteIsBitString extends BitString[Byte] with Serializable {
   def one: Byte = (-1: Byte)
   def zero: Byte = (0: Byte)
   def and(a: Byte, b: Byte): Byte = (a & b).toByte
   def or(a: Byte, b: Byte): Byte = (a | b).toByte
   def complement(a: Byte): Byte = (~a).toByte
   override def xor(a: Byte, b: Byte): Byte = (a ^ b).toByte
+
+  def signed: Boolean = true
+  def width: Int = 8
+  def toHexString(n: Byte): String = Integer.toHexString(n & 0xff)
+
+  def bitCount(n: Byte): Int = Integer.bitCount(n & 0xff)
+  def highestOneBit(n: Byte): Byte = (Integer.highestOneBit(n & 0xff) & 0xff).toByte
+  def lowestOneBit(n: Byte): Byte = (Integer.lowestOneBit(n & 0xff) & 0xff).toByte
+  def numberOfLeadingZeros(n: Byte): Int = Integer.numberOfLeadingZeros(n & 0xff) - 24
+  def numberOfTrailingZeros(n: Byte): Int = if (n == 0) 8 else Integer.numberOfTrailingZeros(n & 0xff)
+
+  def leftShift(n: Byte, i: Int): Byte = (((n & 0xff) << (i & 7)) & 0xff).toByte
+  def rightShift(n: Byte, i: Int): Byte = (((n & 0xff) >>> (i & 7)) & 0xff).toByte
+  def signedRightShift(n: Byte, i: Int): Byte = ((n >> (i & 7)) & 0xff).toByte
+  def rotateLeft(n: Byte, i: Int): Byte = {
+    val j = i & 7
+    ((((n & 0xff) << j) | ((n & 0xff) >>> (8 - j))) & 0xff).toByte
+  }
+  def rotateRight(n: Byte, i: Int): Byte = {
+    val j = i & 7
+    ((((n & 0xff) >>> j) | ((n & 0xff) << (8 - j))) & 0xff).toByte
+  }
 }
 
+@SerialVersionUID(0L)
+class ByteAlgebra extends ByteIsEuclideanRing with ByteIsReal with Serializable
+
 trait ByteInstances {
-  implicit object ByteBooleanAlgebra extends ByteIsBooleanAlgebra
-  implicit object ByteAlgebra extends ByteIsEuclideanRing
-  implicit object ByteIsReal extends ByteIsReal
+  implicit final val ByteBitString = new ByteIsBitString
+  implicit final val ByteAlgebra = new ByteAlgebra
 }

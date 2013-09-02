@@ -1,5 +1,6 @@
-package spire.algebra
+package spire.laws
 
+import spire.algebra._
 import spire.implicits._
 
 import org.scalacheck.{Arbitrary, Prop}

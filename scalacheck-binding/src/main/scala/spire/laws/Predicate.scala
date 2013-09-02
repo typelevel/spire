@@ -1,6 +1,7 @@
-package spire.algebra
+package spire.laws
 
-import spire.implicits._
+import spire.algebra.{AdditiveMonoid, Eq}
+import spire.syntax.eq._
 
 trait Predicate[A] extends (A => Boolean) {
   def apply(a: A): Boolean

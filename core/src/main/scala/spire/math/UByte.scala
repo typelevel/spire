@@ -5,6 +5,9 @@ import spire.algebra._
 object UByte extends UByteInstances {
   @inline final def apply(n: Byte) = new UByte(n)
   @inline final def apply(n: Int) = new UByte(n.toByte)
+
+  @inline final def MinValue = UByte(0)
+  @inline final def MaxValue = UByte(-1)
 }
 
 class UByte(val signed: Byte) extends AnyVal {
@@ -15,6 +18,7 @@ class UByte(val signed: Byte) extends AnyVal {
   def toLong: Long = signed & 0xffL
   def toFloat: Float = toInt.toFloat
   def toDouble: Double = toInt.toDouble
+  def toBigInt: BigInt = BigInt(toInt)
 
   def isValidByte = signed >= 0
   def isValidShort = true
@@ -56,9 +60,8 @@ class UByte(val signed: Byte) extends AnyVal {
 }
 
 trait UByteInstances {
-  implicit object UByteAlgebra extends UByteIsRig
-  implicit object UByteBooleanAlgebra extends UByteBooleanAlgebra
-  implicit object UByteIsReal extends UByteIsReal
+  implicit final val UByteAlgebra = new UByteAlgebra
+  implicit final val UByteBitString = new UByteBitString
 }
 
 private[math] trait UByteIsRig extends Rig[UByte] {
@@ -92,11 +95,37 @@ private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteOrder with U
   def toDouble(n: UByte): Double = n.toDouble
 }
 
-private[math] trait UByteBooleanAlgebra extends BooleanAlgebra[UByte] {
+@SerialVersionUID(0L)
+private[math] class UByteBitString extends BitString[UByte] with Serializable {
   def one: UByte = UByte(-1: Byte)
   def zero: UByte = UByte(0: Byte)
   def and(a: UByte, b: UByte): UByte = a & b
   def or(a: UByte, b: UByte): UByte = a | b
   def complement(a: UByte): UByte = ~a
   override def xor(a: UByte, b: UByte): UByte = a ^ b
+
+  def signed: Boolean = false
+  def width: Int = 8
+  def toHexString(n: UByte): String = Integer.toHexString(n.toInt)
+
+  def bitCount(n: UByte): Int = Integer.bitCount(n.toInt)
+  def highestOneBit(n: UByte): UByte = UByte(Integer.highestOneBit(n.toInt))
+  def lowestOneBit(n: UByte): UByte = UByte(Integer.lowestOneBit(n.toInt))
+  def numberOfLeadingZeros(n: UByte): Int = Integer.numberOfLeadingZeros(n.toInt)
+  def numberOfTrailingZeros(n: UByte): Int = Integer.numberOfTrailingZeros(n.toInt)
+
+  def leftShift(n: UByte, i: Int): UByte = n << i
+  def rightShift(n: UByte, i: Int): UByte = n >> i
+  def signedRightShift(n: UByte, i: Int): UByte = n >>> i
+  def rotateLeft(n: UByte, i: Int): UByte = {
+    val j = i & 7
+    (n << j) | (n >>> (8 - j))
+  }
+  def rotateRight(n: UByte, i: Int): UByte = {
+    val j = i & 7
+    (n >>> j) | (n << (8 - j))
+  }
 }
+
+@SerialVersionUID(0L)
+private[math] class UByteAlgebra extends UByteIsRig with UByteIsReal with Serializable

@@ -2,7 +2,7 @@ package spire.syntax
 
 import spire.algebra._
 import spire.macrosk.Ops
-import spire.math.{ConvertableTo, ConvertableFrom, Rational, Number}
+import spire.math.{BitString, ConvertableTo, ConvertableFrom, Rational, Number}
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
   def ===(rhs:A) = macro Ops.binop[A, Boolean]
@@ -272,8 +272,8 @@ final class ModuleOps[V](x: V) {
   def :*[F](rhs:F)(implicit ev: Module[V, F]): V = macro Ops.binopWithEv[F, Module[V, F], V]
 
   // TODO: Are macros worth it here?
-  def *:[F](lhs:Int)(implicit ev: Module[V, F]): V = ev.timesl(ev.scalar.fromInt(lhs), x)
-  def :*[F](rhs:Int)(implicit ev: Module[V, F]): V = ev.timesr(x, ev.scalar.fromInt(rhs))
+  def *:[F](lhs:Int)(implicit ev: Module[V, F], F: Ring[F]): V = ev.timesl(F.fromInt(lhs), x)
+  def :*[F](rhs:Int)(implicit ev: Module[V, F], F: Ring[F]): V = ev.timesr(x, F.fromInt(rhs))
 }
 
 final class VectorSpaceOps[V](x: V) {
@@ -329,4 +329,16 @@ final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {
   def toBigInt(): BigInt = macro Ops.unop[BigInt]
   def toBigDecimal(): BigDecimal = macro Ops.unop[BigDecimal]
   def toRational(): Rational = macro Ops.unop[Rational]
+}
+
+final class BitStringOps[A](lhs: A)(implicit ev: BitString[A]) {
+  def <<(rhs: Int): A = macro Ops.binop[Int, A]
+  def >>(rhs: Int): A = macro Ops.binop[Int, A]
+  def >>>(rhs: Int): A = macro Ops.binop[Int, A]
+
+  def bitCount(): Int = macro Ops.unop[Int]
+  def highestOneBit(): A = macro Ops.unop[A]
+  def lowestOneBit(): A = macro Ops.unop[A]
+  def numberOfLeadingZeros(): Int = macro Ops.unop[Int]
+  def numberOfTrailingZeros(): Int = macro Ops.unop[Int]
 }

@@ -207,16 +207,16 @@ private[math] trait ConvertableToNumber extends ConvertableTo[Number] {
 object ConvertableTo {
   @inline final def apply[A](implicit ev:ConvertableTo[A]) = ev
 
-  implicit object ConvertableToInt extends ConvertableToInt
-  implicit object ConvertableToLong extends ConvertableToLong
-  implicit object ConvertableToBigInt extends ConvertableToBigInt
-  implicit object ConvertableToFloat extends ConvertableToFloat
-  implicit object ConvertableToDouble extends ConvertableToDouble
-  implicit object ConvertableToBigDecimal extends ConvertableToBigDecimal
-  implicit object ConvertableToRational extends ConvertableToRational
-  implicit object ConvertableToReal extends ConvertableToReal
-  implicit object ConvertableToSafeLong extends ConvertableToSafeLong
-  implicit object ConvertableToNumber extends ConvertableToNumber
+  implicit final val ConvertableToInt = new ConvertableToInt {}
+  implicit final val ConvertableToLong = new ConvertableToLong {}
+  implicit final val ConvertableToBigInt = new ConvertableToBigInt {}
+  implicit final val ConvertableToFloat = new ConvertableToFloat {}
+  implicit final val ConvertableToDouble = new ConvertableToDouble {}
+  implicit final val ConvertableToBigDecimal = new ConvertableToBigDecimal {}
+  implicit final val ConvertableToRational = new ConvertableToRational {}
+  implicit final val ConvertableToReal = new ConvertableToReal {}
+  implicit final val ConvertableToSafeLong = new ConvertableToSafeLong {}
+  implicit final val ConvertableToNumber = new ConvertableToNumber {}
 
   implicit def convertableToComplex[A: Fractional: Trig: IsReal] =
     new ConvertableToComplex[A] {
@@ -456,18 +456,18 @@ private[math] trait ConvertableFromNumber extends ConvertableFrom[Number] {
 object ConvertableFrom {
   @inline final def apply[A](implicit ev:ConvertableFrom[A]) = ev
 
-  implicit object ConvertableFromByte extends ConvertableFromByte
-  implicit object ConvertableFromShort extends ConvertableFromShort
-  implicit object ConvertableFromInt extends ConvertableFromInt
-  implicit object ConvertableFromLong extends ConvertableFromLong
-  implicit object ConvertableFromFloat extends ConvertableFromFloat
-  implicit object ConvertableFromDouble extends ConvertableFromDouble
-  implicit object ConvertableFromBigInt extends ConvertableFromBigInt
-  implicit object ConvertableFromBigDecimal extends ConvertableFromBigDecimal
-  implicit object ConvertableFromRational extends ConvertableFromRational
-  implicit object ConvertableFromReal extends ConvertableFromReal
-  implicit object ConvertableFromSafeLong extends ConvertableFromSafeLong
-  implicit object ConvertableFromNumber extends ConvertableFromNumber
+  implicit final val ConvertableFromByte = new ConvertableFromByte {}
+  implicit final val ConvertableFromShort = new ConvertableFromShort {}
+  implicit final val ConvertableFromInt = new ConvertableFromInt {}
+  implicit final val ConvertableFromLong = new ConvertableFromLong {}
+  implicit final val ConvertableFromFloat = new ConvertableFromFloat {}
+  implicit final val ConvertableFromDouble = new ConvertableFromDouble {}
+  implicit final val ConvertableFromBigInt = new ConvertableFromBigInt {}
+  implicit final val ConvertableFromBigDecimal = new ConvertableFromBigDecimal {}
+  implicit final val ConvertableFromRational = new ConvertableFromRational {}
+  implicit final val ConvertableFromReal = new ConvertableFromReal {}
+  implicit final val ConvertableFromSafeLong = new ConvertableFromSafeLong {}
+  implicit final val ConvertableFromNumber = new ConvertableFromNumber {}
 
   implicit def convertableFromComplex[A: Fractional: Trig] =
     new ConvertableFromComplex[A] {

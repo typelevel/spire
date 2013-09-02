@@ -2,6 +2,7 @@ package spire.syntax
 
 import spire.algebra._
 import spire.math._
+import spire.macros.Syntax
 import spire.macrosk._
 import spire.syntax.std._
 
@@ -89,11 +90,11 @@ trait NRootSyntax {
   implicit def nrootOps[A: NRoot](a: A) = new NRootOps(a)
 }
 
-trait ModuleSyntax extends AdditiveGroupSyntax {
+trait ModuleSyntax extends RingSyntax {
   implicit def moduleOps[V](v:V) = new ModuleOps[V](v)
 }
 
-trait VectorSpaceSyntax extends ModuleSyntax {
+trait VectorSpaceSyntax extends ModuleSyntax with FieldSyntax {
   implicit def vectorSpaceOps[V](v:V) = new VectorSpaceOps[V](v)
 }
 
@@ -111,6 +112,10 @@ trait CoordinateSpaceSyntax extends InnerProductSpaceSyntax {
 
 trait BooleanAlgebraSyntax {
   implicit def booleanAlgebraOps[A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
+}
+
+trait BitStringSyntax {
+  implicit def bitStringOps[A: BitString](a: A) = new BitStringOps(a)
 }
 
 trait IntegralSyntax extends
@@ -183,6 +188,7 @@ trait AllSyntax extends
     InnerProductSpaceSyntax with
     CoordinateSpaceSyntax with
     BooleanAlgebraSyntax with
+    BitStringSyntax with
     IntegralSyntax with
     FractionalSyntax with
     NumericSyntax with

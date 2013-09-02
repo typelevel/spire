@@ -1,7 +1,6 @@
 package spire.math.real
 
 import java.math.{ MathContext, BigDecimal => BigDec }
-import scala.math.max
 
 import spire.algebra.{ NRoot }
 import spire.algebra.Sign.{ Positive, Zero, Negative }
@@ -34,8 +33,8 @@ object BigDecimalApproximations {
     def -(x: Int): MathContext = new MathContext(precision - x, roundingMode)
     def *(x: Int): MathContext = new MathContext(precision * x, roundingMode)
     def /(x: Int): MathContext = new MathContext(precision / x, roundingMode)
-    def min(x: Int): MathContext = new MathContext(math.min(precision, x), roundingMode)
-    def max(x: Int): MathContext = new MathContext(math.max(precision, x), roundingMode)
+    def min(x: Int): MathContext = new MathContext(spire.math.min(precision, x), roundingMode)
+    def max(x: Int): MathContext = new MathContext(spire.math.max(precision, x), roundingMode)
 
     def min(omc: MathContext): MathContext = this min omc.getPrecision
     def max(omc: MathContext): MathContext = this max omc.getPrecision

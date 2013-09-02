@@ -36,26 +36,10 @@ trait NormedVectorSpace0 {
 
 trait NormedVectorSpaceFunctions {
   def max[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A], order0: Order[A],
-      signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] = {
-    new SeqMaxNormedVectorSpace[A, CC[A]] {
-      val scalar = field0
-      val order = order0
-      val signed = signed0
-      val cbf = cbf0
-    }
-  }
+      signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] =
+    new SeqMaxNormedVectorSpace[A, CC[A]]
 
-  def Lp[A, CC[A] <: SeqLike[A, CC[A]]](p0: Int)(implicit field0: Field[A], nroot0: NRoot[A],
-      signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] = {
-    require(p0 > 0, "p must be > 0")
-
-    new SeqLpNormedVectorSpace[A, CC[A]] {
-      val scalar = field0
-      val nroot = nroot0
-      val signed = signed0
-      val cbf = cbf0
-
-      val p = p0.toInt
-    }
-  }
+  def Lp[A, CC[A] <: SeqLike[A, CC[A]]](p: Int)(implicit field0: Field[A], nroot0: NRoot[A],
+      signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] =
+    new SeqLpNormedVectorSpace[A, CC[A]](p)
 }

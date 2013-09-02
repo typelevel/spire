@@ -2,18 +2,21 @@ package spire.std
 
 import spire.algebra._
 
-trait StringMonoid extends Monoid[String] {
+@SerialVersionUID(0L)
+class StringMonoid extends Monoid[String] with Serializable {
   def id = ""
   def op(x: String, y: String): String = x + y
 }
 
-trait StringOrder extends Order[String] {
+@SerialVersionUID(0L)
+class StringOrder extends Order[String] with Serializable {
   override def eqv(x: String, y: String): Boolean = x == y
   override def neqv(x: String, y: String): Boolean = x != y
   def compare(x: String, y: String): Int = x.compareTo(y)
 }
 
-object LevenshteinDistance extends MetricSpace[String, Int] {
+@SerialVersionUID(0L)
+object LevenshteinDistance extends MetricSpace[String, Int] with Serializable {
   def distance(a: String, b: String): Int = {
     var row0 = new Array[Int](b.length + 1)
     var row1 = new Array[Int](b.length + 1)
@@ -54,6 +57,6 @@ trait StringInstances0 {
 }
 
 trait StringInstances extends StringInstances0 {
-  implicit object StringAlgebra extends StringMonoid
-  implicit object StringOrder extends StringOrder
+  implicit final val StringAlgebra = new StringMonoid
+  implicit final val StringOrder = new StringOrder
 }

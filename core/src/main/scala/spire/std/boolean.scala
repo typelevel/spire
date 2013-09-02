@@ -19,7 +19,7 @@ trait BooleanIsRig extends Rig[Boolean] {
   def zero: Boolean = false
 }
 
-trait BooleanOrder extends Order[Boolean] {
+trait BooleanOrder extends Order[Boolean] with Serializable {
   override def eqv(x:Boolean, y:Boolean): Boolean = x == y
   override def neqv(x:Boolean, y:Boolean): Boolean = x != y
   override def gt(x: Boolean, y: Boolean): Boolean = x && !y
@@ -36,8 +36,13 @@ trait BooleanOrder extends Order[Boolean] {
   }
 }
 
+@SerialVersionUID(0L)
+class BooleanStructure extends BooleanIsBooleanAlgebra with BooleanIsRig
+with BooleanOrder with Serializable {
+  override def one: Boolean = true
+  override def zero: Boolean = false
+}
+
 trait BooleanInstances {
-  object BooleanIsBooleanAlgebra extends BooleanIsBooleanAlgebra
-  object BooleanIsRig extends BooleanIsRig
-  object BoolOrder extends BooleanOrder
+  implicit final val BooleanStructure = new BooleanStructure
 }

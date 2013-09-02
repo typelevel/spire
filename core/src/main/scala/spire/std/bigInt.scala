@@ -61,7 +61,7 @@ trait BigIntIsSigned extends Signed[BigInt] {
   def abs(a: BigInt): BigInt = a.abs
 }
 
-trait BigIntIsReal extends IsIntegral[BigInt] with BigIntOrder with BigIntIsSigned {
+trait BigIntIsReal extends IsIntegral[BigInt] with BigIntOrder with BigIntIsSigned with Serializable {
   def toDouble(n: BigInt): Double = n.toDouble
 }
 
@@ -69,7 +69,9 @@ trait BigIntIsMetricSpace extends MetricSpace[BigInt, BigInt] {
   def distance(v: BigInt, w: BigInt) = (w - v).abs
 }
 
+@SerialVersionUID(0L)
+class BigIntAlgebra extends BigIntIsEuclideanRing with BigIntIsNRoot with BigIntIsMetricSpace with BigIntIsReal with Serializable
+
 trait BigIntInstances {
-  implicit object BigIntAlgebra extends BigIntIsEuclideanRing with BigIntIsNRoot with BigIntIsMetricSpace
-  implicit object BigIntIsReal extends BigIntIsReal
+  implicit final val BigIntAlgebra = new BigIntAlgebra
 }

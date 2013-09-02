@@ -1,5 +1,6 @@
-package spire.algebra
+package spire.laws
 
+import spire.algebra._
 import spire.implicits._
 
 import org.scalacheck.{Arbitrary, Prop}
@@ -14,7 +15,7 @@ object VectorSpaceLaws {
 
 trait VectorSpaceLaws[V, A] extends Laws {
 
-  implicit def scalar(implicit V: Module[V, A]): Ring[A] = V.scalar
+  implicit def scalar(implicit V: Module[V, A]): Rng[A] = V.scalar
 
   val scalarLaws: RingLaws[A]
   val vectorLaws: GroupLaws[V]
@@ -25,7 +26,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
 
   def module(implicit V: Module[V, A]) = new SpaceProperties(
     name = "module",
-    sl = _.ring(V.scalar),
+    sl = _.rng(V.scalar),
     vl = _.abGroup(V.additive),
     parents = Seq.empty,
 
@@ -39,10 +40,10 @@ trait VectorSpaceLaws[V, A] extends Laws {
     ),
     "vector distributes over scalar" → forAll((r: A, s: A, v: V) =>
       ((r + s) *: v) === ((r *: v) + (s *: v))
-    ),
+    )/*,
     "scalar identity is identity" → forAll((v: V) =>
       (V.scalar.one *: v) === v
-    )
+    )*/
   )
 
   def vectorSpace(implicit V: VectorSpace[V, A]) = new SpaceProperties(
@@ -52,14 +53,14 @@ trait VectorSpaceLaws[V, A] extends Laws {
     parents = Seq(module)
   )
 
-  def metricSpace(implicit V: MetricSpace[V, A], o: Order[A], A: Ring[A]) = new SpaceProperties(
+  def metricSpace(implicit V: MetricSpace[V, A], o: Order[A], A: Rng[A]) = new SpaceProperties(
     name = "metric space",
     sl = _.emptyProperties,
     vl = _.emptyProperties,
     parents = Seq.empty,
     "identity" → forAll((x: V, y: V) =>
-      if (x === y) V.distance(x, y) === Ring[A].zero
-      else V.distance(x, y) =!= Ring[A].zero
+      if (x === y) V.distance(x, y) === Rng[A].zero
+      else V.distance(x, y) =!= Rng[A].zero
     ),
     "symmetric" → forAll((x: V, y: V) =>
       V.distance(x, y) === V.distance(y, x)
@@ -80,9 +81,9 @@ trait VectorSpaceLaws[V, A] extends Laws {
     ),
     "only 1 zero" → forAll((v: V) => // This is covered by metricSpace...
       if (v === V.zero)
-        v.norm === Ring[A].zero
+        v.norm === Rng[A].zero
       else
-        v.norm > Ring[A].zero
+        v.norm > Rng[A].zero
     )
   )
 

@@ -1,6 +1,6 @@
 package spire.math
 
-import scala.math.{signum, ScalaNumber, ScalaNumericConversions}
+import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.annotation.tailrec
 
 import spire.algebra._
@@ -18,7 +18,7 @@ import spire.std.bigInt._
 sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] {
   lhs =>
 
-  def signum: Int = fold(scala.math.signum(_).toInt, _.signum)
+  def signum: Int = fold(spire.math.signum(_).toInt, _.signum)
 
   def +(rhs: SafeLong): SafeLong = rhs.fold(this + _, this + _)
   def -(rhs: SafeLong): SafeLong = rhs.fold(this - _, this - _)
@@ -63,7 +63,7 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
    * Exponentiation function, e.g. x^y
    *
    * If base^exponent doesn't fit in a Long, the result will overflow (unlike
-   * scala.math.pow which will return +/- Infinity). 
+   * scala.math.pow which will return +/- Infinity).
    */
   final def **(rhs:Int):SafeLong = pow(rhs)
   final def pow(rhs:Int):SafeLong = {
@@ -145,7 +145,8 @@ object SafeLong extends SafeLongInstances {
 }
 
 
-private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong {
+@SerialVersionUID(0L)
+private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong with Serializable {
   def +(y: Long): SafeLong = {
     val a = x + y
 
@@ -264,8 +265,8 @@ private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong {
   def fold[A,B <: A,C <: A](f: Long => B, g: BigInt => C): A = f(x)
 }
 
-
-private[math] case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
+@SerialVersionUID(0L)
+private[math] case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong with Serializable {
   def +(y: Long): SafeLong = if ((x.signum ^ y) < 0) SafeLong(x + y) else SafeLongBigInt(x + y)
   def -(y: Long): SafeLong = if ((x.signum ^ y) < 0) SafeLongBigInt(x - y) else SafeLong(x - y)
   def *(y: Long): SafeLong = if (y == 0) SafeLongBigInt(0) else SafeLongBigInt(x * y)
@@ -331,8 +332,11 @@ private[math] case class SafeLongBigInt private[math] (x: BigInt) extends SafeLo
 }
 
 trait SafeLongInstances {
-  implicit object SafeLongAlgebra extends SafeLongIsEuclideanRing with SafeLongIsNRoot
-  implicit object SafeLongIsReal extends SafeLongIsReal
+  @SerialVersionUID(0L)
+  implicit object SafeLongAlgebra extends SafeLongIsEuclideanRing with SafeLongIsNRoot with Serializable
+
+  @SerialVersionUID(0L)
+  implicit object SafeLongIsReal extends SafeLongIsReal with Serializable
 }
 
 private[math] trait SafeLongIsRing extends Ring[SafeLong] {

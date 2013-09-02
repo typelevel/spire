@@ -570,7 +570,8 @@ object Natural extends NaturalInstances {
   val zero: Natural = apply(0L)
   val one: Natural = apply(1L)
 
-  case class Digit(d: UInt, tl: Natural) extends Natural {
+  @SerialVersionUID(0L)
+  case class Digit(d: UInt, tl: Natural) extends Natural with Serializable {
     def digit: UInt = d
     def tail: Natural = tl
 
@@ -629,7 +630,8 @@ object Natural extends NaturalInstances {
     }
   }
 
-  case class End(d: UInt) extends Natural {
+  @SerialVersionUID(0L)
+  case class End(d: UInt) extends Natural with Serializable {
     def digit: UInt = d
 
     def +(n: UInt): Natural = if (n == UInt(0)) {
@@ -674,8 +676,7 @@ object Natural extends NaturalInstances {
 }
 
 trait NaturalInstances {
-  implicit object NaturalAlgebra extends NaturalIsRig
-  implicit object NaturalIsReal extends NaturalIsReal
+  implicit final val NaturalAlgebra = new NaturalAlgebra
 }
 
 private[math] trait NaturalIsRig extends Rig[Natural] {
@@ -709,3 +710,6 @@ private[math] trait NaturalIsReal extends IsIntegral[Natural]
 with NaturalOrder with NaturalIsSigned {
   def toDouble(n: Natural): Double = n.toDouble
 }
+
+@SerialVersionUID(0L)
+class NaturalAlgebra extends NaturalIsRig with NaturalIsReal with Serializable

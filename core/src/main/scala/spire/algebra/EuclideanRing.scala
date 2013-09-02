@@ -2,7 +2,6 @@ package spire.algebra
 
 import scala.annotation.tailrec
 import scala.{specialized => spec}
-import scala.math.{abs, ceil, floor}
 
 trait EuclideanRing[@spec(Byte, Short, Int, Long, Float, Double) A] extends Ring[A] {
   def quot(a: A, b: A): A
