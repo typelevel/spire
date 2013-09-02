@@ -94,6 +94,18 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
 
   def unary_-(): SafeLong
 
+  override def isValidInt: Boolean = {
+    if (!isLong) return false
+    val n = toLong
+    Int.MinValue <= n && n <= Int.MaxValue
+  }
+
+  def isValidLong: Boolean = {
+    if (!isLong) return false
+    val n = toLong
+    Long.MinValue <= n && n <= Long.MaxValue
+  }
+
   def isLong: Boolean = fold(_ => true, _ => false)
   def isBigInt: Boolean = fold(_ => false, _ => true)
 
