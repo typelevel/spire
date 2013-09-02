@@ -74,6 +74,7 @@ object Syntax {
      (test: c.Expr[A => Boolean], next: c.Expr[A => A])
      (body: c.Expr[A => Unit]): c.Expr[Unit] = {
 
+
     import c.universe._
     val util = SyntaxUtil[c.type](c)
     val index = util.name("index")
