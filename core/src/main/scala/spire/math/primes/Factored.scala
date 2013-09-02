@@ -10,6 +10,7 @@ import spire.syntax.std.seq._
 import spire.syntax.nroot._
 import spire.syntax.rng._
 
+import scala.annotation.tailrec
 import scala.collection.mutable
 
 object Factored {
@@ -95,31 +96,73 @@ object Factored {
 
   private val srand = new java.security.SecureRandom
 
-  def rand(n: SafeLong): SafeLong =
-    SafeLong(new java.math.BigInteger(n.fold(_ => 64, _.bitLength), srand))
+  def rand(n: SafeLong): SafeLong = {
+    val bits = n.fold(_ => 64, _.bitLength)
+    var x = new java.math.BigInteger(bits, srand)
+    while (x == 0) x = new java.math.BigInteger(bits, srand)
+    SafeLong(x)
+  }
 
   def isPrime(n: SafeLong): Boolean =
     n.toBigInt.isProbablePrime(20)
 
   def pollardRho(n0: SafeLong): Factored = {
 
-    def rho(n: SafeLong): SafeLong = {
-      val c = rand(n)
-      def f(x: SafeLong): SafeLong = ((x * x) % n + c) % n
-      def rhoLoop(x: SafeLong, y: SafeLong): SafeLong = {
-        val x2 = f(x)
-        val y2 = f(f(y))
-        val d = (x2 - y2) gcd n
-        if (d == 1) rhoLoop(x2, y2) else d
+    // def rho(n: SafeLong): SafeLong = {
+    //   val c = rand(n)
+    //   def f(x: SafeLong): SafeLong = ((x * x) % n + c) % n
+    //   @tailrec def rhoLoop(x: SafeLong, y: SafeLong): SafeLong = {
+    //     val x2 = f(x)
+    //     val y2 = f(f(y))
+    //     val d = (x2 - y2) gcd n
+    //     if (d == 1) rhoLoop(x2, y2) else d
+    //   }
+    //   val x = SafeLong(2)
+    //   rhoLoop(x, x)
+    // }
+
+    def fasterRho(n: SafeLong, c: SafeLong): SafeLong = {
+      var y = rand(n)
+      val m = rand(n)
+      var g = SafeLong.one
+      var r = SafeLong.one
+      var q = SafeLong.one
+      var x = y
+      var ys = y
+      while (g == 1) {
+        x = y
+        cfor(0)(r > _, _ + 1) { _ =>
+          y = ((y * y) % n + c) % n
+        }
+        var k = SafeLong.zero
+        while (r > k && g == 1) {
+          ys = y
+          val limit = m min (r - k)
+          cfor(0)(limit > _, _ + 1) { _ =>
+            y = ((y * y) % n + c) % n
+            q = (q * (x - y).abs) % n
+          }
+          if (q == 0) {
+            g = n
+          } else {
+            g = n gcd q
+            k = k + m
+          }
+        }
+        r = r * 2
       }
-      val x = rand(n)
-      rhoLoop(x, x)
+      if (g == n) {
+        do {
+          ys = ((ys * ys) % n + c) % n
+          g = (x - ys).abs gcd n
+        } while (g == 1)
+      }
+      g
     }
 
-    def fastRho(n: SafeLong): SafeLong = {
-      val c = rand(n)
+    def fastRho(n: SafeLong, c: SafeLong): SafeLong = {
       def f(x: SafeLong): SafeLong = ((x * x) % n + c) % n
-      def fastRhoLoop(x: SafeLong, y: SafeLong): SafeLong = {
+      @tailrec def fastRhoLoop(x: SafeLong, y: SafeLong): SafeLong = {
         var i = 0
         var x2 = f(x)
         var y2 = f(f(y))
@@ -135,13 +178,13 @@ object Factored {
         else if (d == n) rhoLoop(x, y)
         else d
       }
-      def rhoLoop(x: SafeLong, y: SafeLong): SafeLong = {
+      @tailrec def rhoLoop(x: SafeLong, y: SafeLong): SafeLong = {
         val x2 = f(x)
         val y2 = f(f(y))
         val d = (x2 - y2) gcd n
         if (d == 1) rhoLoop(x2, y2) else d
       }
-      val x = rand(n)
+      val x = SafeLong(2)
       fastRhoLoop(x, x)
     }
 
@@ -156,10 +199,14 @@ object Factored {
         while (x % 2 == 0) { x /= 2; e += 1 }
         Factored(Map(SafeLong(2) -> e), Positive) * factor(x)
       } else {
-        // TODO: alternately, use the simpler pollard-rho algorithm
+        // NOTE: alternately, use the simpler pollard-rho algorithm
         // by calling rho(n) instead
-        var divisor = fastRho(n)
-        while (divisor == n) divisor = fastRho(n)
+        // var divisor = fastRho(n, SafeLong.one)
+        // while (divisor == n) divisor = fastRho(n, rand(n))
+
+        //var divisor = fasterRho(n, SafeLong.one)
+        var divisor = fasterRho(n, rand(n))
+        while (divisor == n) divisor = fasterRho(n, rand(n))
         factor(divisor) * factor(n / divisor)
       }
     }
