@@ -168,18 +168,24 @@ object Factors {
   }
 
   def apply(n: SafeLong): Factors = pollardRho(n)
+
+  def apply(s: String): Factors = pollardRho(SafeLong(s))
 }
 
-case class Factors(factors: Map[SafeLong, Int], sign: Sign) extends Ordered[Factors] { lhs =>
+case class Factors(factors: Map[SafeLong, Int], sign: Sign) extends Iterable[(SafeLong, Int)] with Ordered[Factors] { lhs =>
+
+  private[primes] def prod(m: Map[SafeLong, Int]): SafeLong =
+    m.foldLeft(SafeLong.one) { case (t, (p, e)) => t * (p ** e) }
+
   lazy val value: SafeLong = sign match {
-    case Positive => factors.map { case (p, e) => p ** e }.qproduct
+    case Positive => prod(factors)
     case Zero => SafeLong.zero
-    case Negative => -factors.map { case (p, e) => p ** e }.qproduct
+    case Negative => -prod(factors)
   }
 
   override def toString(): String = {
     def terms =
-      if (factors.isEmpty) "(1)"
+      if (factors.isEmpty) "1"
       else factors.toSeq.sorted.map { case (p, e) => s"$p^$e" }.mkString(" * ")
     sign match {
       case Positive => s"($terms)"
@@ -188,65 +194,116 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign) extends Ordered[Fact
     }
   }
 
+  def iterator: Iterator[(SafeLong, Int)] =
+    factors.iterator
+
+  def uniqueFactors: Set[SafeLong] =
+    factors.keySet
+
+  def contains(p: SafeLong): Boolean =
+    factors.contains(p)
+
+  def get(p: SafeLong): Int =
+    factors.getOrElse(p, 0)
+
   def compare(rhs: Factors): Int =
     lhs.value compare rhs.value
+
+  def compare(rhs: Int): Int =
+    sign match {
+      case Positive =>
+        var t = SafeLong.one
+        val it = iterator
+        while (it.hasNext && t <= rhs) { val (p, e) = it.next(); t *= (p ** e) }
+        t compare rhs
+      case Zero =>
+        rhs.signum
+      case Negative =>
+        var t = -SafeLong.one
+        val it = iterator
+        while (it.hasNext && t >= rhs) { val (p, e) = it.next(); t *= (p ** e) }
+        t compare rhs
+    }
+
+  def gcd(rhs: Factors): Factors =
+    Factors(lhs.factors.flatMap { case (p, le) =>
+      rhs.factors.get(p).map(re => (p, le min re))
+    }, Positive)
+
+  def lcm(rhs: Factors): Factors =
+    Factors(lhs.factors.foldLeft(rhs.factors) { case (fs, (p, e)) =>
+      fs.updated(p, fs.getOrElse(p, 0) max e)
+    }, Positive)
 
   def unary_-(): Factors =
     Factors(factors, -sign)
 
   def +(rhs: Factors): Factors =
     Factors(lhs.value + rhs.value)
+  def +(rhs: SafeLong): Factors =
+    Factors(lhs.value + rhs)
 
   def -(rhs: Factors): Factors =
     Factors(lhs.value - rhs.value)
+  def -(rhs: SafeLong): Factors =
+    Factors(lhs.value - rhs)
 
   def *(rhs: Factors): Factors =
     Factors(lhs.factors + rhs.factors, lhs.sign * rhs.sign)
+  def *(rhs: SafeLong): Factors =
+    Factors(factors.updated(rhs, factors.getOrElse(rhs, 0) + 1), sign)
 
-  private[primes] def qm(rhs: Factors): (SafeLong, SafeLong) = {
-    var common = SafeLong.zero
-    var num = SafeLong.zero
-    var denom = SafeLong.zero
-
+  private[primes] def qm(rhs: Factors) = {
     val sign = (lhs.sign * rhs.sign).toInt
-    val nn = mutable.Map.empty[SafeLong, Int] ++ lhs.factors
-    val dd = mutable.Map.empty[SafeLong, Int] ++ rhs.factors
-    val facts = if (lhs.factors.size < rhs.factors.size) lhs.factors else rhs.factors
-
-    facts.keys.foreach { p =>
-      val ne = nn.getOrElse(p, 0)
-      val de = dd.getOrElse(p, 0)
-      if (ne > 0) {
-        val e = ne min de
-        nn(p) -= e
-        dd(p) -= e
-        common += p ** e
-      }
+    val (nn, dd) = (lhs.factors - rhs.factors).filter(_._2 != 0).partition(_._2 > 0)
+    val cc = lhs.factors.flatMap { case (p, le) =>
+      rhs.factors.get(p).map(re => (p, le min re))
     }
-
-    if (dd.isEmpty) {
-      val q = nn.map { case (p, e) => p ** e }.qproduct
-      (q, SafeLong.zero)
-    } else {
-      (nn.toMap - dd.toMap).foreach { case (p, e) =>
-        if (e > 0) num += p ** e
-        else if (e < 0) denom += p ** e
-      }
-      val (q, m) = (num * sign) /% denom
-      (q, m * common)
-    }
+    (sign, nn, dd.map { case (p, e) => (p, -e) }, cc)
   }
 
-  def /(rhs: Factors): Factors =
-    Factors(this.qm(rhs)._1)
+  def /(rhs: Factors): Factors = {
+    val (sign, nn, dd, cc) = qm(rhs)
+    if (dd.isEmpty) Factors(nn, sign)
+    else Factors((prod(nn) * sign) / prod(dd))
+  }
 
-  def %(rhs: Factors): Factors =
-    Factors(this.qm(rhs)._2)
+  def /(rhs: SafeLong): Factors =
+    factors.get(rhs) match {
+      case Some(1) => Factors(factors - rhs, sign)
+      case Some(n) => Factors(factors.updated(rhs, n - 1), sign)
+      case None => Factors(lhs.value / rhs)
+    }
+
+  def %(rhs: Factors): Factors = {
+    val (sign, nn, dd, cc) = qm(rhs)
+    if (dd.isEmpty) Factors.zero
+    else Factors(((prod(nn) * sign) % prod(dd)) * prod(cc))
+  }
+
+  def %(rhs: SafeLong): Factors =
+    if (factors.contains(rhs)) Factors.zero else Factors(lhs.value % rhs)
 
   def /%(rhs: Factors): (Factors, Factors) = {
-    val (q, r) = this.qm(rhs)
-    (Factors(q), Factors(r))
+    val (sign, nn, dd, cc) = qm(rhs)
+    if (dd.isEmpty) {
+      (Factors(nn, sign), Factors.zero)
+    } else {
+      val (q, m) = (prod(nn) * sign) /% prod(dd)
+      (Factors(q), Factors(m * prod(cc)))
+    }
   }
+
+  def /%(rhs: SafeLong): (Factors, Factors) =
+    factors.get(rhs) match {
+      case Some(1) =>
+        (Factors(factors - rhs, sign), Factors.zero)
+      case Some(n) =>
+        (Factors(factors.updated(rhs, n - 1), sign), Factors.zero)
+      case None =>
+        val (q, m) = lhs.value /% rhs
+        (Factors(q), Factors(m))
+    }
 
   def pow(rhs: Int): Factors =
     Factors(lhs.factors.map { case (p, e) => (p, e ** rhs) }, lhs.sign ** rhs)
