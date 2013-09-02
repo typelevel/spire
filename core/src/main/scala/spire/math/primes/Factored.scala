@@ -13,9 +13,9 @@ import spire.syntax.rng._
 import scala.annotation.tailrec
 import scala.collection.mutable
 
-object Factored {
-  val zero = Factored(Map.empty, Zero)
-  val one = Factored(Map.empty, Positive)
+object Factors {
+  val zero = Factors(Map.empty, Zero)
+  val one = Factors(Map.empty, Positive)
 
   def findPowers(x0: SafeLong, b: SafeLong): (SafeLong, Int) = {
     var x = x0
@@ -24,12 +24,12 @@ object Factored {
     (x, e)
   }
 
-  def trialDivision(n0: SafeLong): Factored = {
+  def trialDivision(n0: SafeLong): Factors = {
     if (n0 == 0) return zero
 
     val n = n0.abs
     val sign = Sign(n0.signum)
-    if (n == SafeLong.one) return Factored(Map.empty, sign)
+    if (n == SafeLong.one) return Factors(Map.empty, sign)
 
     val facts = mutable.Map.empty[SafeLong, Int]
     var x = n
@@ -49,15 +49,15 @@ object Factored {
       }
     }
     if (x > 1) facts(x) = 1
-    Factored(facts.toMap, sign)
+    Factors(facts.toMap, sign)
   }
 
-  def wheelDivision(n0: SafeLong): Factored = {
+  def wheelDivision(n0: SafeLong): Factors = {
     if (n0 == 0) return zero
 
     val n = n0.abs
     val sign = Sign(n0.signum)
-    if (n == 1) return Factored(Map.empty, sign)
+    if (n == 1) return Factors(Map.empty, sign)
 
     val facts = mutable.Map.empty[SafeLong, Int]
     var x = n
@@ -91,7 +91,7 @@ object Factored {
     }
 
     if (x > 1) facts(x) = 1
-    Factored(facts.toMap, sign)
+    Factors(facts.toMap, sign)
   }
 
   private val srand = new java.security.SecureRandom
@@ -106,107 +106,56 @@ object Factored {
   def isPrime(n: SafeLong): Boolean =
     n.toBigInt.isProbablePrime(20)
 
-  def pollardRho(n0: SafeLong): Factored = {
+  def pollardRho(n0: SafeLong): Factors = {
 
-    // def rho(n: SafeLong): SafeLong = {
-    //   val c = rand(n)
-    //   def f(x: SafeLong): SafeLong = ((x * x) % n + c) % n
-    //   @tailrec def rhoLoop(x: SafeLong, y: SafeLong): SafeLong = {
-    //     val x2 = f(x)
-    //     val y2 = f(f(y))
-    //     val d = (x2 - y2) gcd n
-    //     if (d == 1) rhoLoop(x2, y2) else d
-    //   }
-    //   val x = SafeLong(2)
-    //   rhoLoop(x, x)
-    // }
+    def rho(n: SafeLong, c: SafeLong): SafeLong = {
 
-    def fasterRho(n: SafeLong, c: SafeLong): SafeLong = {
-      var y = rand(n)
-      val m = rand(n)
-      var g = SafeLong.one
-      var r = SafeLong.one
-      var q = SafeLong.one
-      var x = y
-      var ys = y
-      while (g == 1) {
-        x = y
-        cfor(0)(r > _, _ + 1) { _ =>
-          y = ((y * y) % n + c) % n
-        }
+      @inline def f(x: SafeLong): SafeLong = ((x * x) % n + c) % n
+
+      @tailrec def fastRho(x: SafeLong, q0: SafeLong, r: SafeLong, m :SafeLong): SafeLong = {
+        var y = x
+        var q = q0
+        cfor(0)(r > _, _ + 1)(_ => y = f(y))
+
+        var g = SafeLong.one
         var k = SafeLong.zero
+        var ys = y
         while (r > k && g == 1) {
           ys = y
           val limit = m min (r - k)
           cfor(0)(limit > _, _ + 1) { _ =>
-            y = ((y * y) % n + c) % n
+            y = f(y)
             q = (q * (x - y).abs) % n
           }
-          if (q == 0) {
-            g = n
-          } else {
-            g = n gcd q
-            k = k + m
-          }
+          if (q == 0) g = n else g = n gcd q
+          k = k + m
         }
-        r = r * 2
+
+        if (g == 1) fastRho(y, q, r * 2, m) else if (g == n) slowRho(x, ys) else g
       }
-      if (g == n) {
-        do {
-          ys = ((ys * ys) % n + c) % n
-          g = (x - ys).abs gcd n
-        } while (g == 1)
+
+      @tailrec def slowRho(x: SafeLong, ys: SafeLong): SafeLong = {
+        val yys = f(ys)
+        val g = n gcd (x - yys).abs
+        if (g == 1) slowRho(x, yys) else g
       }
-      g
+
+      fastRho(rand(n), SafeLong.one, SafeLong.one, rand(n))
     }
 
-    def fastRho(n: SafeLong, c: SafeLong): SafeLong = {
-      def f(x: SafeLong): SafeLong = ((x * x) % n + c) % n
-      @tailrec def fastRhoLoop(x: SafeLong, y: SafeLong): SafeLong = {
-        var i = 0
-        var x2 = f(x)
-        var y2 = f(f(y))
-        var z = (x2 - y2)
-        while (i < 100) {
-          i += 1
-          x2 = f(x2)
-          y2 = f(f(y2))
-          z = (z * (x2 - y2)) % n
-        }
-        val d = z gcd n
-        if (d == 1) fastRhoLoop(x2, y2)
-        else if (d == n) rhoLoop(x, y)
-        else d
-      }
-      @tailrec def rhoLoop(x: SafeLong, y: SafeLong): SafeLong = {
-        val x2 = f(x)
-        val y2 = f(f(y))
-        val d = (x2 - y2) gcd n
-        if (d == 1) rhoLoop(x2, y2) else d
-      }
-      val x = SafeLong(2)
-      fastRhoLoop(x, x)
-    }
-
-    def factor(n: SafeLong): Factored = {
+    def factor(n: SafeLong): Factors = {
       if (n == 1) {
-        Factored.one
+        Factors.one
       } else if (isPrime(n)) {
-        Factored(Map(n -> 1), Positive)
+        Factors(Map(n -> 1), Positive)
       } else if (n % 2 == 0) {
         var x = n / 2
         var e = 1
         while (x % 2 == 0) { x /= 2; e += 1 }
-        Factored(Map(SafeLong(2) -> e), Positive) * factor(x)
+        Factors(Map(SafeLong(2) -> e), Positive) * factor(x)
       } else {
-        // NOTE: alternately, use the simpler pollard-rho algorithm
-        // by calling rho(n) instead
-        // var divisor = fastRho(n, SafeLong.one)
-        // while (divisor == n) divisor = fastRho(n, rand(n))
-
-        //var divisor = fasterRho(n, SafeLong.one)
-        var divisor = fasterRho(n, rand(n))
-        while (divisor == n) divisor = fasterRho(n, rand(n))
+        var divisor = rho(n, rand(n))
+        while (divisor == n) divisor = rho(n, rand(n))
         factor(divisor) * factor(n / divisor)
       }
     }
@@ -214,14 +163,14 @@ object Factored {
     if (n0 == 0) return zero
 
     val n = n0.abs
-    if (n == 1) return Factored(Map.empty, Sign(n0.signum))
+    if (n == 1) return Factors(Map.empty, Sign(n0.signum))
     if (n0 < 0) -factor(n) else factor(n)
   }
 
-  def apply(n: SafeLong): Factored = pollardRho(n)
+  def apply(n: SafeLong): Factors = pollardRho(n)
 }
 
-case class Factored(factors: Map[SafeLong, Int], sign: Sign) extends Ordered[Factored] { lhs =>
+case class Factors(factors: Map[SafeLong, Int], sign: Sign) extends Ordered[Factors] { lhs =>
   lazy val value: SafeLong = sign match {
     case Positive => factors.map { case (p, e) => p ** e }.qproduct
     case Zero => SafeLong.zero
@@ -239,22 +188,22 @@ case class Factored(factors: Map[SafeLong, Int], sign: Sign) extends Ordered[Fac
     }
   }
 
-  def compare(rhs: Factored): Int =
+  def compare(rhs: Factors): Int =
     lhs.value compare rhs.value
 
-  def unary_-(): Factored =
-    Factored(factors, -sign)
+  def unary_-(): Factors =
+    Factors(factors, -sign)
 
-  def +(rhs: Factored): Factored =
-    Factored(lhs.value + rhs.value)
+  def +(rhs: Factors): Factors =
+    Factors(lhs.value + rhs.value)
 
-  def -(rhs: Factored): Factored =
-    Factored(lhs.value - rhs.value)
+  def -(rhs: Factors): Factors =
+    Factors(lhs.value - rhs.value)
 
-  def *(rhs: Factored): Factored =
-    Factored(lhs.factors + rhs.factors, lhs.sign * rhs.sign)
+  def *(rhs: Factors): Factors =
+    Factors(lhs.factors + rhs.factors, lhs.sign * rhs.sign)
 
-  private[primes] def qm(rhs: Factored): (SafeLong, SafeLong) = {
+  private[primes] def qm(rhs: Factors): (SafeLong, SafeLong) = {
     var common = SafeLong.zero
     var num = SafeLong.zero
     var denom = SafeLong.zero
@@ -288,17 +237,17 @@ case class Factored(factors: Map[SafeLong, Int], sign: Sign) extends Ordered[Fac
     }
   }
 
-  def /(rhs: Factored): Factored =
-    Factored(this.qm(rhs)._1)
+  def /(rhs: Factors): Factors =
+    Factors(this.qm(rhs)._1)
 
-  def %(rhs: Factored): Factored =
-    Factored(this.qm(rhs)._2)
+  def %(rhs: Factors): Factors =
+    Factors(this.qm(rhs)._2)
 
-  def /%(rhs: Factored): (Factored, Factored) = {
+  def /%(rhs: Factors): (Factors, Factors) = {
     val (q, r) = this.qm(rhs)
-    (Factored(q), Factored(r))
+    (Factors(q), Factors(r))
   }
 
-  def pow(rhs: Int): Factored =
-    Factored(lhs.factors.map { case (p, e) => (p, e ** rhs) }, lhs.sign ** rhs)
+  def pow(rhs: Int): Factors =
+    Factors(lhs.factors.map { case (p, e) => (p, e ** rhs) }, lhs.sign ** rhs)
 }
