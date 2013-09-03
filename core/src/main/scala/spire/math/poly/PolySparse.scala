@@ -3,7 +3,6 @@ package spire.math.poly
 import compat._
 import spire.math._
 import scala.annotation.tailrec
-import scala.collection.parallel.immutable.ParMap
 import scala.reflect._
 import spire.algebra._
 import spire.implicits._
@@ -11,7 +10,7 @@ import spire.implicits._
 import scala.{specialized => spec}
 
 // Sparse polynomials - Big Endian Coeffs e.g. x^n, x^n-1, ... x^0
-class PolySparse[@spec(Double) C] private[spire] (val data: ParMap[Int, C])
+class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
   (implicit r: Ring[C], s: Signed[C], val ct: ClassTag[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
   private lazy val _degree: Int = if(isZero) 0 else data.keys.qmax

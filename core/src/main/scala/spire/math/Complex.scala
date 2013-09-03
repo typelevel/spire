@@ -247,7 +247,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
 
   // we are going with the "principal value" definition of Log.
   def log: Complex[T] = {
-    if (isZero) throw new IllegalArgumentException("log(0) undefined")
+    if (this.isZero) throw new IllegalArgumentException("log(0) undefined")
     new Complex(t.log(abs), arg)
   }
 
@@ -624,9 +624,7 @@ private[math] trait ComplexIsTrig[@spec(Float, Double) A] extends Trig[Complex[A
   def pi: Complex[A] = new Complex[A](t.pi, f.zero)
 
   def exp(a: Complex[A]): Complex[A] = a.exp
-  def expm1(a: Complex[A]): Complex[A] = a.exp - f.one
   def log(a: Complex[A]): Complex[A] = a.log
-  def log1p(a: Complex[A]): Complex[A] = (a + f.one).log
 
   def sin(a: Complex[A]): Complex[A] = a.sin
   def cos(a: Complex[A]): Complex[A] = a.cos

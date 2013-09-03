@@ -39,53 +39,6 @@ package object math {
   final def ceil[A](a: A)(implicit ev: IsReal[A]): A = ev.ceil(a)
 
   /**
-   * choose (binomial coefficient)
-   */
-  def choose(n: Long, k: Long): BigInt = {
-    if (n < 0 || k < 0) throw new IllegalArgumentException(s"n=$n, k=$k")
-    if (k == 0L || k == n) return BigInt(1)
-    if (k > n) return BigInt(0)
-    if (n - k > k) return choose(n, n - k)
-
-    @tailrec def loop(lo: Long, hi: Long, prod: BigInt): BigInt =
-      if (lo > hi) prod
-      else loop(lo + 1L, hi - 1L, BigInt(lo) * BigInt(hi) * prod)
-
-    if (((n - k) & 1) == 1)
-      loop(k + 1, n - 1L, BigInt(n)) / fact(n - k)
-    else
-      loop(k + 1, n, BigInt(1)) / fact(n - k)
-  }
-
-  /**
-   * factorial
-   */
-  def fact(n: Long): BigInt = {
-    if (n < 0) throw new IllegalArgumentException(n.toString)
-    @tailrec def loop(lo: Long, hi: Long, prod: BigInt): BigInt =
-      if (lo > hi) prod
-      else loop(lo + 1L, hi - 1L, BigInt(lo) * BigInt(hi) * prod)
-    if ((n & 1) == 1) loop(1L, n - 1L, BigInt(n))
-    else loop(2L, n - 1L, BigInt(n))
-  }
-
-  /**
-   * fibonacci
-   */
-  def fib(n: Long): BigInt = {
-    if (n < 0) throw new IllegalArgumentException(n.toString)
-    var i = 63
-    while (((n >>> i) & 1) == 0 && i >= 0) i -= 1
-    @tailrec def loop(a: BigInt, b: BigInt, i: Int): BigInt = {
-      val c = a + b
-      if (i < 0) b
-      else if (((n >>> i) & 1) == 1) loop((a + c) * b, b * b + c * c, i - 1)
-      else loop(a * a + b * b, (a + c) * b, i - 1)
-    }
-    loop(BigInt(1), BigInt(0), i)
-  }
-
-  /**
    * floor
    */
   final def floor(n: Float): Float = Math.floor(n).toFloat

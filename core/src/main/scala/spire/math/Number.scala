@@ -602,9 +602,7 @@ private[math] trait NumberIsTrig extends Trig[Number] {
   def pi: Number = Number(Math.PI)
 
   def exp(a: Number): Number = Math.exp(a.toDouble)
-  def expm1(a: Number): Number = Math.expm1(a.toDouble)
   def log(a: Number) = Number(Math.log(a.toDouble))
-  def log1p(a: Number) = Number(Math.log1p(a.toDouble))
 
   def sin(a: Number): Number = Math.sin(a.toDouble)
   def cos(a: Number): Number = Math.cos(a.toDouble)

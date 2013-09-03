@@ -63,6 +63,7 @@ trait FloatIsField extends Field[Float] {
 trait FloatIsNRoot extends NRoot[Float] {
   def nroot(a: Float, k: Int): Float = Math.pow(a, 1 / k.toDouble).toFloat
   override def sqrt(a: Float): Float = Math.sqrt(a).toFloat
+  def log(a: Float) = Math.log(a).toFloat
   def fpow(a: Float, b: Float) = Math.pow(a, b).toFloat
 }
 
@@ -70,10 +71,7 @@ trait FloatIsTrig extends Trig[Float] {
   def e: Float = Math.E.toFloat
   def pi: Float = Math.PI.toFloat
 
-  def exp(a: Float): Float = Math.exp(a).toFloat
-  def expm1(a: Float): Float = Math.expm1(a).toFloat
-  def log(a: Float) = Math.log(a).toFloat
-  def log1p(a: Float) = Math.log1p(a).toFloat
+  def exp(a: Float): Float = Math.exp(a.toDouble).toFloat
 
   def sin(a: Float): Float = Math.sin(a.toDouble).toFloat
   def cos(a: Float): Float = Math.cos(a.toDouble).toFloat

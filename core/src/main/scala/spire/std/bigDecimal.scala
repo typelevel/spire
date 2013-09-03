@@ -191,9 +191,7 @@ class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends 
   protected[std] lazy val twoPi = pi * 2
 
   def exp(k: BigDecimal): BigDecimal = spire.math.exp(BigDecimal(k.bigDecimal, mc))
-  def expm1(k: BigDecimal): BigDecimal = spire.math.exp(BigDecimal(k.bigDecimal, mc)) - BigDecimal(1)
   def log(a: BigDecimal) = spire.math.log(BigDecimal(a.bigDecimal, mc))
-  def log1p(a: BigDecimal) = spire.math.log(BigDecimal(a.bigDecimal, mc) + BigDecimal(1))
 
   protected[std] val threeSixty = BigDecimal(360)
   def toRadians(a: BigDecimal): BigDecimal = (a * twoPi) / threeSixty
