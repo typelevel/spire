@@ -45,7 +45,7 @@ class CforTest extends FunSuite {
         b += x
       }
     })
-    assert(v == 111, s"v == $v")
+    assert(v === 111, s"v == $v")
     assert(b.toList === List(0, 1, 2), s"b.toList == ${b.toList}")
   }
 
@@ -61,7 +61,7 @@ class CforTest extends FunSuite {
       }
     }
     cfor(0)(test, incr)(body)
-    assert(v == 111, s"v == $v")
+    assert(v === 111, s"v == $v")
     assert(b.toList === List(0, 1, 2), s"b.toList == ${b.toList}")
   }
 
@@ -84,7 +84,7 @@ class CforTest extends FunSuite {
         }
       }
     )
-    assert(v == 111, s"v == $v")
+    assert(v === 111, s"v == $v")
     assert(b.toList === List(0, 1, 2), s"b.toList == ${b.toList}")
   }
   
@@ -110,7 +110,22 @@ class CforTest extends FunSuite {
     }}
     assert(b.toList === List(0, 1, 2))
   }
+
+  test("type tree bug fixed") {
+    val arr = Array((1,2), (2,3), (4,5))
+    var t = 0
+    cfor(0)(_ < arr.length, _ + 1) { i =>
+      val (a, b) = arr(i)
+      t += a + 2 * b
+    }
+    assert(t === 27)
+  }
+
+  test("destructure tuples") {
+    var t = 0
+    cfor((0, 0))(_._1 < 3, t => (t._1 + 1, t._2 + 2)) { case (a, b) =>
+      t += 3 * a + b
+    }
+    assert(t === 15)
+  }
 }
-
-
-

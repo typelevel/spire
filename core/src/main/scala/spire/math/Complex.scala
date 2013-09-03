@@ -91,6 +91,7 @@ object Complex extends ComplexInstances {
   }
 }
 
+@SerialVersionUID(0L)
 final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: Fractional[T], t: Trig[T], r: IsReal[T])
     extends ScalaNumber with ScalaNumericConversions with Serializable {
 
@@ -137,8 +138,12 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
 
   // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
-    case that: Complex[_] => real == that.real && imag == that.imag
-    case that => unifiedPrimitiveEquals(that)
+    case that: Complex[_] =>
+      real == that.real && imag == that.imag
+    case that: Quaternion[_] =>
+      real == that.r && imag == that.i && that.j == f.zero && that.k == f.zero
+    case that =>
+      unifiedPrimitiveEquals(that)
   }
 
   override def toString: String = "(%s + %si)" format (real.toString, imag.toString)
@@ -247,7 +252,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
 
   // we are going with the "principal value" definition of Log.
   def log: Complex[T] = {
-    if (this.isZero) throw new IllegalArgumentException("log(0) undefined")
+    if (isZero) throw new IllegalArgumentException("log(0) undefined")
     new Complex(t.log(abs), arg)
   }
 
@@ -552,23 +557,9 @@ object FastComplex {
 
 trait ComplexInstances {
   implicit def ComplexAlgebra[@spec(Float, Double) A: Fractional: Trig: IsReal] =
-    new ComplexAlgebra[A] {
-      val f = Fractional[A]
-      val t = Trig[A]
-      val r = IsReal[A]
-      def scalar = f
-      def nroot = f
-    }
+    new ComplexAlgebra[A]
 
-  implicit def ComplexEq[A: Fractional] =
-    new ComplexEq[A] {}
-
-  implicit def ComplexIsSigned[A: Fractional: Trig: IsReal] =
-    new ComplexIsSigned[A] {
-      val f = Fractional[A]
-      val t = Trig[A]
-      val r = IsReal[A]
-    }
+  implicit def ComplexEq[A] = new ComplexEq[A]
 }
 
 private[math] trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A]] {
@@ -595,12 +586,8 @@ extends ComplexIsRing[A] with EuclideanRing[Complex[A]] {
   def mod(a: Complex[A], b: Complex[A]) = a % b
   override def quotmod(a: Complex[A], b: Complex[A]) = a /% b
   def gcd(a: Complex[A], b: Complex[A]): Complex[A] = {
-    @tailrec def _gcd(a: Complex[A], b: Complex[A]): Complex[A] = {
-      if (a.abs < f.one) one
-      else if (b.isZero) a
-      else if (b.abs < f.one) one
-      else _gcd(b, a % b)
-    }
+    @tailrec def _gcd(a: Complex[A], b: Complex[A]): Complex[A] =
+      if (b.isZero) a else _gcd(b, a - (a / b).round * b)
     _gcd(a, b)
   }
 }
@@ -624,7 +611,9 @@ private[math] trait ComplexIsTrig[@spec(Float, Double) A] extends Trig[Complex[A
   def pi: Complex[A] = new Complex[A](t.pi, f.zero)
 
   def exp(a: Complex[A]): Complex[A] = a.exp
+  def expm1(a: Complex[A]): Complex[A] = a.exp - f.one
   def log(a: Complex[A]): Complex[A] = a.log
+  def log1p(a: Complex[A]): Complex[A] = (a + f.one).log
 
   def sin(a: Complex[A]): Complex[A] = a.sin
   def cos(a: Complex[A]): Complex[A] = a.cos
@@ -650,7 +639,8 @@ private[math] trait ComplexIsNRoot[A] extends NRoot[Complex[A]] {
   def fpow(a: Complex[A], b: Complex[A]): Complex[A] = a.pow(b)
 }
 
-private[math] trait ComplexEq[A] extends Eq[Complex[A]] {
+@SerialVersionUID(0L)
+private[math] class ComplexEq[A] extends Eq[Complex[A]] with Serializable {
   def eqv(x: Complex[A], y: Complex[A]) = x eqv y
   override def neqv(x: Complex[A], y: Complex[A]) = x neqv y
 }
@@ -664,10 +654,18 @@ private[math] trait ComplexIsSigned[A] extends Signed[Complex[A]] {
   def abs(a: Complex[A]): Complex[A] = Complex[A](a.abs, f.zero)
 }
 
-private[math] trait ComplexAlgebra[@spec(Float, Double) A] extends ComplexIsField[A]
-    with ComplexIsTrig[A] with ComplexIsNRoot[A]
+@SerialVersionUID(0L)
+private[math] class ComplexAlgebra[@spec(Float, Double) A](implicit
+      val f: Fractional[A], val t: Trig[A], val r: IsReal[A])
+    extends ComplexIsField[A]
+    with ComplexIsTrig[A]
+    with ComplexIsNRoot[A]
+    with ComplexIsSigned[A]
     with InnerProductSpace[Complex[A], A]
-    with FieldAlgebra[Complex[A], A] {
+    with FieldAlgebra[Complex[A], A]
+    with Serializable {
+  def scalar = f
+  def nroot = f
   def timesl(a: A, v: Complex[A]): Complex[A] = Complex(a, scalar.zero) * v
   def dot(x: Complex[A], y: Complex[A]): A =
     scalar.plus(scalar.times(x.real, y.real), scalar.times(x.imag, y.imag))

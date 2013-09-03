@@ -70,7 +70,9 @@ trait DoubleIsTrig extends Trig[Double] {
   def pi: Double = Math.PI
 
   def exp(a: Double): Double = Math.exp(a)
+  def expm1(a: Double): Double = Math.expm1(a)
   def log(a: Double) = Math.log(a)
+  def log1p(a: Double) = Math.log1p(a)
 
   def sin(a: Double): Double = Math.sin(a)
   def cos(a: Double): Double = Math.cos(a)
@@ -114,7 +116,9 @@ trait DoubleIsReal extends IsReal[Double] with DoubleOrder with DoubleIsSigned {
   def isWhole(a:Double) = a % 1.0 == 0.0
 }
 
+@SerialVersionUID(0L)
+class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable
+
 trait DoubleInstances {
-  implicit final val DoubleAlgebra = new DoubleIsField with DoubleIsNRoot with DoubleIsTrig {}
-  implicit final val DoubleIsReal = new DoubleIsReal {}
+  implicit final val DoubleAlgebra = new DoubleAlgebra
 }

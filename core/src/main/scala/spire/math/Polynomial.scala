@@ -33,25 +33,26 @@ object Polynomial {
   }
 
   def sparse[@spec(Double) C](data: Map[Int, C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
-    new PolySparse(data.filterNot { case (e, c) => s.sign(c) == Sign.Zero })
+    PolySparse(data)
 
   def apply[@spec(Double) C](data: Map[Int, C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
-    new PolySparse(data.filterNot { case (e, c) => s.sign(c) == Sign.Zero })
+    sparse(data)
 
   def apply[@spec(Double) C](terms: Iterable[Term[C]])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
-    new PolySparse(terms.view.filterNot(_.isZero).map(_.toTuple).toMap)
-
-  def apply[@spec(Double) C](terms: Traversable[Term[C]])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
-    new PolySparse(terms.view.filterNot(_.isZero).map(_.toTuple).toMap)
+    sparse(terms.map(_.toTuple)(collection.breakOut))
 
   def apply[@spec(Double) C](c: C, e: Int)(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
-    new PolySparse(Map(e -> c).filterNot { case (e, c) => s.sign(c) == Sign.Zero})
+    PolySparse.safe(Array(e), Array(c))
 
   import scala.util.{Try, Success, Failure}
 
   def apply(s: String): Polynomial[Rational] = parse(s)
 
+<<<<<<< HEAD
   def zero[@spec(Double) C: Signed: Ring: ClassTag] = new PolySparse(Map.empty[Int, C])
+=======
+  def zero[@spec(Double) C: Signed: Ring: ClassTag] = PolySparse.zero[C]
+>>>>>>> a73928a425a8d96b96092ca21fb86e59c504ca94
   def constant[@spec(Double) C: Signed: Ring: ClassTag](c: C) =
     if (c.signum == 0) zero[C] else Polynomial(Map(0 -> c))
   def linear[@spec(Double) C: Signed: Ring: ClassTag](c: C) =
@@ -132,31 +133,63 @@ object Polynomial {
 }
 
 
-trait Polynomial[@spec(Double) C] {
+trait Polynomial[@spec(Double) C] { lhs =>
 
+  /** Returns a polynmial that has a dense representation. */
   def toDense: Polynomial[C]
+
+  /** Returns a polynomial that has a sparse representation. */
   def toSparse: Polynomial[C]
 
+  /**
+   * Returns a list of non-zero terms.
+   */
   def terms: List[Term[C]]
+
+  /**
+   * Returns the coefficients in little-endian order. So, the i-th element is
+   * coeffs(i) * (x ** i).
+   */
   def coeffs: Array[C]
+
+  /** Returns a map from exponent to coefficient of this polynomial. */
   def data: Map[Int, C]
+
+  /** Returns the coefficient of the n-th degree term. */
   def nth(n: Int): C
 
+  /** Returns the term of the highest degree in this polynomial. */
   def maxTerm: Term[C]
+
+  /** Returns the degree of this polynomial. */
   def degree: Int
+
+  /** Returns the coefficient of max term of this polynomial. */
   def maxOrderTermCoeff: C
+
+  /** Returns `true` iff this polynomial is zero. */
   def isZero: Boolean
 
+  /** Evaluate the polynomial at `x`. */
   def apply(x: C): C
-  def unary_-(): Polynomial[C]
+
+  /** Returns this polynomial as a monic polynomial, where the leading
+   * coefficient (ie. `maxOrderTermCoeff`) is 1.
+   */
   def monic(implicit f: Field[C]): Polynomial[C]
+
   def derivative: Polynomial[C]
   def integral(implicit f: Field[C]): Polynomial[C]
+
+  def unary_-(): Polynomial[C]
   def +(rhs: Polynomial[C]): Polynomial[C]
+  def -(rhs: Polynomial[C]): Polynomial[C] = lhs + (-rhs)
   def *(rhs: Polynomial[C]): Polynomial[C]
   def /~(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C]
   def /%(rhs: Polynomial[C])(implicit f: Field[C]): (Polynomial[C], Polynomial[C])
   def %(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C]
+
+  def foreachNonZero[U](f: (Int, C) => U): Unit
 
   implicit def ct: ClassTag[C]
 
