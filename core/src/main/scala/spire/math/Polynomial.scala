@@ -130,6 +130,7 @@ object Polynomial {
 
 
 trait Polynomial[@spec(Double) C] { lhs =>
+  implicit def ct: ClassTag[C]
 
   /** Returns a polynmial that has a dense representation. */
   def toDense: Polynomial[C]
@@ -137,10 +138,18 @@ trait Polynomial[@spec(Double) C] { lhs =>
   /** Returns a polynomial that has a sparse representation. */
   def toSparse: Polynomial[C]
 
+  def foreachNonZero[U](f: (Int, C) => U): Unit
+
   /**
    * Returns a list of non-zero terms.
    */
-  def terms: List[Term[C]]
+  def terms: List[Term[C]] = {
+    val lb = new scala.collection.mutable.ListBuffer[Term[C]]
+    foreachNonZero { (e, c) =>
+      lb += Term(c, e)
+    }
+    lb.result()
+  }
 
   /**
    * Returns the coefficients in little-endian order. So, the i-th element is
@@ -149,13 +158,19 @@ trait Polynomial[@spec(Double) C] { lhs =>
   def coeffs: Array[C]
 
   /** Returns a map from exponent to coefficient of this polynomial. */
-  def data: Map[Int, C]
+  def data: Map[Int, C] = {
+    val bldr = new scala.collection.mutable.MapBuilder[Int, C, Map[Int, C]](Map.empty[Int, C])
+    foreachNonZero { (e, c) =>
+      bldr += ((e, c))
+    }
+    bldr.result()
+  }
 
   /** Returns the coefficient of the n-th degree term. */
   def nth(n: Int): C
 
   /** Returns the term of the highest degree in this polynomial. */
-  def maxTerm: Term[C]
+  def maxTerm: Term[C] = Term(maxOrderTermCoeff, degree)
 
   /** Returns the degree of this polynomial. */
   def degree: Int
@@ -172,10 +187,12 @@ trait Polynomial[@spec(Double) C] { lhs =>
   /** Returns this polynomial as a monic polynomial, where the leading
    * coefficient (ie. `maxOrderTermCoeff`) is 1.
    */
-  def monic(implicit f: Field[C]): Polynomial[C]
+  def monic(implicit f: Field[C]): Polynomial[C] = this :/ maxOrderTermCoeff
 
   def derivative: Polynomial[C]
   def integral(implicit f: Field[C]): Polynomial[C]
+
+  // EuclideanRing ops.
 
   def unary_-(): Polynomial[C]
   def +(rhs: Polynomial[C]): Polynomial[C]
@@ -185,9 +202,11 @@ trait Polynomial[@spec(Double) C] { lhs =>
   def /%(rhs: Polynomial[C])(implicit f: Field[C]): (Polynomial[C], Polynomial[C])
   def %(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C]
 
-  def foreachNonZero[U](f: (Int, C) => U): Unit
+  // VectorSpace ops.
 
-  implicit def ct: ClassTag[C]
+  def *: (k: C): Polynomial[C]
+  def :* (k: C): Polynomial[C] = k *: lhs
+  def :/ (k: C)(implicit field: Field[C]): Polynomial[C] = this :* k.reciprocal
 
   override def equals(that: Any): Boolean = that match {
     case p: Polynomial[_] =>

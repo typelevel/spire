@@ -8,7 +8,6 @@ import scala.{specialized => spec}
 
 trait Integral[@spec(Int,Long) A] extends EuclideanRing[A]
 with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A] {
-  def isZero(x: A) = eqv(x, zero)
   def isNonzero(x: A) = neqv(x, zero)
   def isPositive(x: A) = gt(x, zero)
   def isNegative(x: A) = lt(x, zero)

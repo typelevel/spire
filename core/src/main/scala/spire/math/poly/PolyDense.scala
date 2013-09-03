@@ -27,25 +27,8 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
     }
   }
 
-  def data: Map[Int, C] =
-    (0 to coeffs.length - 1).foldLeft(Map.empty[Int, C]) { (m, e) =>
-      if (coeffs(e).signum == 0) m else m.updated(e, coeffs(e))
-    }
-
   def nth(n: Int): C =
     if (n < coeffs.length) coeffs(n) else r.zero
-
-  def terms: List[Term[C]] =
-    if (isZero)
-      Term(r.zero, 0) :: Nil
-    else
-      (degree to 0 by -1).foldLeft(List.empty[Term[C]]) { (ts, e) =>
-        if (coeffs(e).signum == 0) ts else Term(coeffs(e), e) :: ts
-      }
-
-  def maxTerm: Term[C] =
-    if (isZero) Term(r.zero, 0) else Term(nth(degree), degree)
-    
 
   def maxOrderTermCoeff: C =
     if (isZero) r.zero else coeffs(degree)
@@ -64,13 +47,6 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
     val negArray = new Array[C](coeffs.length)
     cfor(0)(_ < coeffs.length, _ + 1) { i => negArray(i) = -coeffs(i) }
     Polynomial.dense(negArray)
-  }
-
-  def monic(implicit f: Field[C]): Polynomial[C] = {
-    val m = maxOrderTermCoeff
-    val cs = new Array[C](coeffs.length)
-    cfor(0)(_ < coeffs.length, _ + 1) { i => cs(i) = coeffs(i) / m }
-    Polynomial.dense(cs)
   }
 
   def derivative: Polynomial[C] = {
@@ -111,6 +87,17 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
     }
     Polynomial.dense(cs)
   }
+
+  def *: (k: C): Polynomial[C] =
+    if (k.signum == 0) {
+      Polynomial.dense(new Array[C](0))
+    } else {
+      val cs = new Array[C](coeffs.length)
+      cfor(0)(_ < cs.length, _ + 1) { i =>
+        cs(i) = k * coeffs(i)
+      }
+      Polynomial.dense(cs)
+    }
 
   def /%(rhs: Polynomial[C])(implicit f: Field[C]): (Polynomial[C], Polynomial[C]) = {
     def zipSum(lcs: Array[C], rcs: Array[C])(implicit r: Ring[C]): Array[C] = 

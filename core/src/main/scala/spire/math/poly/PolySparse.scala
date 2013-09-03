@@ -13,8 +13,6 @@ import scala.{specialized => spec}
 case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val coeff: Array[C])
   (implicit r: Ring[C], s: Signed[C], val ct: ClassTag[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
-  def data: Map[Int, C] = (exp zip coeff)(collection.breakOut)
-
   def degree: Int = if (isZero) 0 else exp(exp.length - 1)
 
   def toDense: PolyDense[C] = Polynomial.dense(coeffs)
@@ -23,25 +21,6 @@ case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val
 
   def foreachNonZero[U](f: (Int, C) => U): Unit =
     cfor(0)(_ < exp.length, _ + 1) { i => f(exp(i), coeff(i)) }
-
-  def allTerms: List[Term[C]] = {
-    @tailrec
-    def loop(e: Int, i: Int, xs: List[Term[C]]): List[Term[C]] =
-      if (i > exp.length)  xs
-      else if (e == exp(i)) loop(e + 1, i + 1, Term(coeff(i), e) :: xs)
-      else loop(e + 1, i, Term(r.zero, e) :: xs)
-
-    loop(0, 0, Nil)
-  }
-
-  def terms: List[Term[C]] = {
-    @tailrec
-    def loop(i: Int, xs: List[Term[C]]): List[Term[C]] =
-      if (i >= exp.length) xs
-      else loop(i + 1, Term(coeff(i), exp(i)) :: xs)
-
-    loop(0, Nil)
-  }
 
   def coeffs: Array[C] = if (isZero) {
     new Array[C](0)
@@ -58,9 +37,6 @@ case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val
     val i = java.util.Arrays.binarySearch(exp, n)
     if (i >= 0) coeff(i) else r.zero
   }
-
-  def maxTerm: Term[C] =
-    Term(maxOrderTermCoeff, degree)
 
   def maxOrderTermCoeff: C =
     if (isZero) r.zero else coeff(coeff.length - 1)
@@ -138,11 +114,6 @@ case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val
   def /~(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C] = (lhs /% rhs)._1
     
   def %(rhs: Polynomial[C])(implicit f: Field[C]): Polynomial[C] = (lhs /% rhs)._2
-
-  def monic(implicit f: Field[C]): Polynomial[C] = {
-    val m = maxOrderTermCoeff
-    Polynomial(data.map { case (e, c) => (e, c / m) })
-  }
 
   def derivative: Polynomial[C] =
     Polynomial(data.flatMap { case (e, c) =>
