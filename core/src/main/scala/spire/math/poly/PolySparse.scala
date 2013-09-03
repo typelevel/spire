@@ -21,14 +21,8 @@ case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val
 
   def toSparse: PolySparse[C] = lhs
 
-  def foreachNonZero[U](f: (Int, C) => U): Unit = {
-    cfor(0)(_ < exp.length, _ + 1) { i =>
-      val e = exp(i)
-      val c = coeff(e)
-      if (c.signum != 0)
-        f(e, c)
-    }
-  }
+  def foreachNonZero[U](f: (Int, C) => U): Unit =
+    cfor(0)(_ < exp.length, _ + 1) { i => f(exp(i), coeff(i)) }
 
   def allTerms: List[Term[C]] = {
     @tailrec
