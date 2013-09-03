@@ -19,6 +19,14 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   def toSparse: PolySparse[C] = Polynomial.sparse(data)
   def toDense: PolyDense[C] = lhs
 
+  def foreachNonZero[U](f: (Int, C) => U): Unit = {
+    cfor(0)(_ < coeffs.length, _ + 1) { e =>
+      val c = coeffs(e)
+      if (c.signum != 0)
+        f(e, c)
+    }
+  }
+
   def data: Map[Int, C] =
     (0 to coeffs.length - 1).foldLeft(Map.empty[Int, C]) { (m, e) =>
       if (coeffs(e).signum == 0) m else m.updated(e, coeffs(e))
