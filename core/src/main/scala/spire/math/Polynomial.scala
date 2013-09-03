@@ -48,11 +48,9 @@ object Polynomial {
 
   def apply(s: String): Polynomial[Rational] = parse(s)
 
-<<<<<<< HEAD
-  def zero[@spec(Double) C: Signed: Ring: ClassTag] = new PolySparse(Map.empty[Int, C])
-=======
+
   def zero[@spec(Double) C: Signed: Ring: ClassTag] = PolySparse.zero[C]
->>>>>>> a73928a425a8d96b96092ca21fb86e59c504ca94
+
   def constant[@spec(Double) C: Signed: Ring: ClassTag](c: C) =
     if (c.signum == 0) zero[C] else Polynomial(Map(0 -> c))
   def linear[@spec(Double) C: Signed: Ring: ClassTag](c: C) =

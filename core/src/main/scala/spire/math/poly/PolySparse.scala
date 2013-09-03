@@ -13,26 +13,11 @@ import scala.{specialized => spec}
 case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val coeff: Array[C])
   (implicit r: Ring[C], s: Signed[C], val ct: ClassTag[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
-<<<<<<< HEAD
-  private lazy val _degree: Int = if(isZero) 0 else data.keys.qmax
-  def degree: Int = _degree
-
-  def toDense: PolyDense[C] =
-    if (isZero) {
-      Polynomial.dense(new Array[C](0))
-    } else {
-      val m = degree + 1
-      val cs = new Array[C](m)
-      cfor(0)(_ < m, _ + 1) { i => cs(i) = data.getOrElse(i, r.zero) }
-      Polynomial.dense(cs)
-    }
-=======
   def data: Map[Int, C] = (exp zip coeff)(collection.breakOut)
 
   def degree: Int = if (isZero) 0 else exp(exp.length - 1)
 
   def toDense: PolyDense[C] = Polynomial.dense(coeffs)
->>>>>>> a73928a425a8d96b96092ca21fb86e59c504ca94
 
   def toSparse: PolySparse[C] = lhs
 
