@@ -70,7 +70,9 @@ trait DoubleIsTrig extends Trig[Double] {
   def pi: Double = Math.PI
 
   def exp(a: Double): Double = Math.exp(a)
+  def expm1(a: Double): Double = Math.expm1(a)
   def log(a: Double) = Math.log(a)
+  def log1p(a: Double) = Math.log1p(a)
 
   def sin(a: Double): Double = Math.sin(a)
   def cos(a: Double): Double = Math.cos(a)

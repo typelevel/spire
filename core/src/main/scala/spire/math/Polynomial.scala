@@ -3,6 +3,7 @@ package spire.math
 import compat._
 import spire.math.poly._
 import scala.annotation.tailrec
+import scala.collection.parallel.immutable.ParMap
 import scala.reflect._
 import spire.algebra._
 import spire.implicits._
@@ -33,19 +34,19 @@ object Polynomial {
   }
 
   def sparse[@spec(Double) C](data: Map[Int, C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
-    new PolySparse(data.filterNot { case (e, c) => s.sign(c) == Sign.Zero })
+    new PolySparse(data.filterNot { case (e, c) => s.sign(c) == Sign.Zero } par)
 
   def apply[@spec(Double) C](data: Map[Int, C])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
-    new PolySparse(data.filterNot { case (e, c) => s.sign(c) == Sign.Zero })
+    new PolySparse(data.filterNot { case (e, c) => s.sign(c) == Sign.Zero } par)
 
   def apply[@spec(Double) C](terms: Iterable[Term[C]])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
-    new PolySparse(terms.view.filterNot(_.isZero).map(_.toTuple).toMap)
+    new PolySparse(terms.view.filterNot(_.isZero).map(_.toTuple).toMap.par)
 
   def apply[@spec(Double) C](terms: Traversable[Term[C]])(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
-    new PolySparse(terms.view.filterNot(_.isZero).map(_.toTuple).toMap)
+    new PolySparse(terms.view.filterNot(_.isZero).map(_.toTuple).toMap.par)
 
   def apply[@spec(Double) C](c: C, e: Int)(implicit r: Ring[C], s: Signed[C], ct: ClassTag[C]): PolySparse[C] =
-    new PolySparse(Map(e -> c).filterNot { case (e, c) => s.sign(c) == Sign.Zero})
+    new PolySparse(Map(e -> c).filterNot { case (e, c) => s.sign(c) == Sign.Zero} par)
 
   import scala.util.{Try, Success, Failure}
 
@@ -139,7 +140,7 @@ trait Polynomial[@spec(Double) C] {
 
   def terms: List[Term[C]]
   def coeffs: Array[C]
-  def data: Map[Int, C]
+  def data: ParMap[Int, C]
   def nth(n: Int): C
 
   def maxTerm: Term[C]

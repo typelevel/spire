@@ -2,36 +2,84 @@ package spire.macros
 
 import scala.reflect.macros.Context
 
-object Syntax {
+case class SyntaxUtil[C <: Context with Singleton](val c: C) {
+  import c.universe._
+  import definitions._
+  import Flag._
 
-  def cforMacro[A: c.WeakTypeTag](c: Context)(init: c.Expr[A])
-     (test: c.Expr[A => Boolean], next: c.Expr[A => A])
-     (body: c.Expr[A => Unit]): c.Expr[Unit] = {
-    import c.universe._
-    import definitions._
-    import Flag._
+  def name(s: String) = newTermName(c.fresh(s + "$"))
 
-    val c.WeakTypeTag(tpe) = implicitly[c.WeakTypeTag[A]]
+  def isClean(es: c.Expr[_]*): Boolean =
+    es.forall {
+      _.tree match {
+        case t @ Ident(_: TermName) if t.symbol.asTerm.isStable => true
+        case Function(_, _) => true
+        case _ => false
+      }
+    }
+}
 
-    def isClean(t: Tree): Boolean = t match {
-      case Ident(_: TermName) if t.symbol.asTerm.isStable => true
-      case Function(_, _) => true
-      case _ => false
+class InlineUtil[C <: Context with Singleton](val c: C) {
+  import c.universe._
+
+  def inlineAndReset[T](tree: Tree): c.Expr[T] =
+    c.Expr[T](c.resetAllAttrs(inlineApplyRecursive(tree)))
+
+  def inlineApplyRecursive(tree: Tree): Tree = {
+    val ApplyName = newTermName("apply")
+
+    class InlineSymbol(symbol: Symbol, value: Tree) extends Transformer {
+      override def transform(tree: Tree): Tree = tree match {
+        case Ident(_) if tree.symbol == symbol =>
+          value
+        case tt: TypeTree if tt.original != null =>
+          super.transform(TypeTree().setOriginal(transform(tt.original)))
+        case _ =>
+          super.transform(tree)
+      }
     }
 
-    def name(s: String) = newTermName(c.fresh(s + "$cfor"))
+    object InlineApply extends Transformer {
+      def inlineSymbol(symbol: Symbol, body: Tree, arg: Tree): Tree =
+        new InlineSymbol(symbol, arg).transform(body)
 
-    val clean = isClean(test.tree) && isClean(next.tree) && isClean(body.tree)
+      override def transform(tree: Tree): Tree = tree match {
+        case Apply(Select(Function(List(param), body), ApplyName), List(arg)) =>
+          inlineSymbol(param.symbol, body, arg)
+          
+        case Apply(Function(List(param), body), List(arg)) =>
+          inlineSymbol(param.symbol, body, arg)
+          
+        case _ =>
+          super.transform(tree)
+      }
+    }
 
-    val index = name("index")
-    val whileLoop = name("while")
+    InlineApply.transform(tree)
+  }
+}
 
-    val tree = if (clean) {
-      /**
-       * If our arguments are all "clean" (anonymous functions or
-       * simple identifiers) then we can go ahead and just inline
-       * them directly into a while loop.
-       */
+object Syntax {
+
+  def cforMacro[A](c: Context)(init: c.Expr[A])
+     (test: c.Expr[A => Boolean], next: c.Expr[A => A])
+     (body: c.Expr[A => Unit]): c.Expr[Unit] = {
+
+    import c.universe._
+    val util = SyntaxUtil[c.type](c)
+    val index = util.name("index")
+
+    /**
+     * If our arguments are all "clean" (anonymous functions or simple
+     * identifiers) then we can go ahead and just inline them directly
+     * into a while loop.
+     * 
+     * If one or more of our arguments are "dirty" (something more
+     * complex than an anonymous function or simple identifier) then
+     * we will go ahead and bind each argument to a val just to be
+     * safe.
+     */
+    val tree = if (util.isClean(test, next, body)) {
       q"""
       var $index = $init
       while ($test($index)) {
@@ -41,16 +89,9 @@ object Syntax {
       """
 
     } else {
-
-      /**
-       * If one or more of our arguments are "dirty" (something more
-       * complex than an anonymous function or simple identifier) then
-       * we will go ahead and bind each argument to a val just to be
-       * safe.
-       */
-      val testName = name("test")
-      val nextName = name("next")
-      val bodyName = name("body")
+      val testName = util.name("test")
+      val nextName = util.name("next")
+      val bodyName = util.name("body")
 
       q"""
       val $testName: Int => Boolean = $test
@@ -68,42 +109,6 @@ object Syntax {
      * Instead of just returning 'tree', we will go ahead and inline
      * anonymous functions which are immediately applied.
      */
-    new Util[c.type](c).inlineAndReset[Unit](tree)
-  }
-
-  class Util[C <: Context with Singleton](val c:C) {
-    import c.universe._
-
-    def inlineAndReset[T](tree: Tree): c.Expr[T] =
-      c.Expr[T](c.resetAllAttrs(inlineApplyRecursive(tree)))
-
-    def inlineApplyRecursive(tree: Tree): Tree = {
-      val ApplyName = newTermName("apply")
-
-      class InlineSymbol(symbol: Symbol, value: Tree) extends Transformer {
-        override def transform(tree: Tree): Tree = tree match {
-          case Ident(_) if tree.symbol == symbol => value
-          case _ => super.transform(tree)
-        }
-      }
-
-      object InlineApply extends Transformer {
-        def inlineSymbol(symbol: Symbol, body: Tree, arg: Tree): Tree =
-          new InlineSymbol(symbol, arg).transform(body)
-
-        override def transform(tree: Tree): Tree = tree match {
-          case Apply(Select(Function(List(param), body), ApplyName), List(arg)) =>
-            inlineSymbol(param.symbol, body, arg)
-  
-          case Apply(Function(List(param), body), List(arg)) =>
-            inlineSymbol(param.symbol, body, arg)
-  
-          case _ =>
-            super.transform(tree)
-        }
-      }
-
-      InlineApply.transform(tree)
-    }
+    new InlineUtil[c.type](c).inlineAndReset[Unit](tree)
   }
 }
