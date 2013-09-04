@@ -20,7 +20,7 @@ import scala.{specialized => spec}
  * to be in scope.
 */
 
-object Polynomial {
+object Polynomial extends PolynomialInstances {
 
   def dense[@spec(Double) C: Semiring: Eq: ClassTag](coeffs: Array[C]): PolyDense[C] = {
     var i = coeffs.length
@@ -59,26 +59,12 @@ object Polynomial {
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map(2 -> c))
   def cubic[@spec(Double) C: Eq: Semiring: ClassTag](c: C) =
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map(3 -> c))
-  def one[@spec(Double) C: Eq: Ring: ClassTag] =
-    constant(Ring[C].fromInt(1))
-  def x[@spec(Double) C: Eq: Ring: ClassTag] =
-    linear(Ring[C].fromInt(1))
-  def twox[@spec(Double) C: Eq: Ring: ClassTag] =
-    linear(Ring[C].fromInt(2))
-
-  implicit def ring[@spec(Double) C: ClassTag: Ring: Eq] =
-    new PolynomialRing[C] {
-      val ct = classTag[C]
-      val algebra = Ring[C]
-      val eq = Eq[C]
-    }
-
-  implicit def euclideanRing[@spec(Double) C: ClassTag: Field: Eq] =
-    new PolynomialEuclideanRing[C] {
-      val ct = classTag[C]
-      val algebra = Field[C]
-      val eq = Eq[C]
-    }
+  def one[@spec(Double) C: Eq: Rig: ClassTag] =
+    constant(Rig[C].one)
+  def x[@spec(Double) C: Eq: Rig: ClassTag] =
+    linear(Rig[C].one)
+  def twox[@spec(Double) C: Eq: Rig: ClassTag] =
+    linear(Rig[C].one + Rig[C].one)
 
   private[this] val termRe = "([0-9]+\\.[0-9]+|[0-9]+/[0-9]+|[0-9]+)?(?:([a-z])(?:\\^([0-9]+))?)?".r
 
@@ -274,28 +260,95 @@ trait Polynomial[@spec(Double) C] { lhs =>
     }
 }
 
-trait PolynomialRing[@spec(Double) C] extends Ring[Polynomial[C]] {
-  implicit def algebra: Ring[C]
+trait PolynomialSemiring[@spec(Double) C]
+extends Semiring[Polynomial[C]] {
+  implicit def scalar: Semiring[C]
   implicit def eq: Eq[C]
   implicit def ct: ClassTag[C]
 
   def zero: Polynomial[C] = Polynomial.zero[C]
-  def one: Polynomial[C] = Polynomial.one[C]
-
-  def negate(x: Polynomial[C]): Polynomial[C] = -x
   def plus(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = x + y
   def times(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = x * y
 }
 
-trait PolynomialEuclideanRing[@spec(Double) C] extends EuclideanRing[Polynomial[C]] with PolynomialRing[C] {
-  implicit def algebra: Field[C]
+trait PolynomialRig[@spec(Double) C] extends PolynomialSemiring[C]
+with Rig[Polynomial[C]] {
+  implicit override val scalar: Rig[C]
 
+  def one: Polynomial[C] = Polynomial.one[C]
+}
+
+trait PolynomialRng[@spec(Double) C] extends PolynomialSemiring[C]
+with RingAlgebra[Polynomial[C], C] {
+  implicit override val scalar: Rng[C]
+
+  def timesl(r: C, v: Polynomial[C]): Polynomial[C] = r *: v
+  def negate(x: Polynomial[C]): Polynomial[C] = -x
+}
+
+trait PolynomialRing[@spec(Double) C] extends PolynomialRng[C]
+with Ring[Polynomial[C]] {
+  implicit override val scalar: Ring[C]
+
+  def one: Polynomial[C] = Polynomial.one[C]
+}
+
+trait PolynomialEuclideanRing[@spec(Double) C] extends PolynomialRing[C]
+with EuclideanRing[Polynomial[C]] with VectorSpace[Polynomial[C], C] {
+  implicit override val scalar: Field[C]
+
+  override def divr(x: Polynomial[C], k: C): Polynomial[C] = x :/ k
   def quot(x: Polynomial[C], y: Polynomial[C]) = x /~ y
   def mod(x: Polynomial[C], y: Polynomial[C]) = x % y
   override def quotmod(x: Polynomial[C], y: Polynomial[C]) = x /% y
 
   @tailrec final def gcd(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] =
-    if (y.isZero && x.isZero) Polynomial(algebra.zero, 0)
+    if (y.isZero && x.isZero) Polynomial(scalar.zero, 0)
     else if (y.maxTerm.isZero) x
     else gcd(y, x % y)
 }
+
+trait PolynomialInstances0 {
+  implicit def semiring[@spec(Double) C: ClassTag: Semiring: Eq] =
+    new PolynomialSemiring[C] {
+      val scalar = Semiring[C]
+      val eq = Eq[C]
+      val ct = implicitly[ClassTag[C]]
+    }
+}
+
+trait PolynomialInstances1 extends PolynomialInstances0 {
+  implicit def rig[@spec(Double) C: ClassTag: Rig: Eq] =
+    new PolynomialRig[C] {
+      val scalar = Rig[C]
+      val eq = Eq[C]
+      val ct = implicitly[ClassTag[C]]
+    }
+
+  implicit def rng[@spec(Double) C: ClassTag: Rng: Eq] =
+    new PolynomialRng[C] {
+      val scalar = Rng[C]
+      val eq = Eq[C]
+      val ct = implicitly[ClassTag[C]]
+    }
+}
+
+trait PolynomialInstances2 extends PolynomialInstances1 {
+  implicit def ring[@spec(Double) C: ClassTag: Ring: Eq] =
+    new PolynomialRing[C] {
+      val scalar = Ring[C]
+      val eq = Eq[C]
+      val ct = implicitly[ClassTag[C]]
+    }
+}
+
+trait PolynomialInstances3 extends PolynomialInstances2 {
+  implicit def euclideanRing[@spec(Double) C: ClassTag: Field: Eq] =
+    new PolynomialEuclideanRing[C] {
+      val scalar = Field[C]
+      val eq = Eq[C]
+      val ct = implicitly[ClassTag[C]]
+    }
+}
+
+trait PolynomialInstances extends PolynomialInstances3
