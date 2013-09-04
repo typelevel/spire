@@ -194,6 +194,27 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
       Polynomial(p.toString) should be === p
     }
   }
+
+  property("x % gcd(x, y) == 0 && y % gcd(x, y) == 0") {
+    implicit val arbPolynomial: Arbitrary[Polynomial[Rational]] = Arbitrary(for {
+      ts <- Gen.listOf(for {
+          c <- arbitrary[Rational]
+          e <- arbitrary[Int] map { n => (n % 10).abs }
+        } yield (e, c))
+    } yield {
+      Polynomial(ts.toMap).toDense
+    })
+
+    forAll { (x: Polynomial[Rational], y: Polynomial[Rational]) =>
+      if (!x.isZero || !y.isZero) {
+        val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
+        if (!gcd.isZero) {
+          (x % gcd) should be === 0
+          (y % gcd) should be === 0
+        }
+      }
+    }
+  }
 }
 
 class PolynomialTest extends FunSuite {
@@ -262,20 +283,27 @@ class PolynomialTest extends FunSuite {
 
   test("special polynomials") {
 
-   val leg = SpecialPolynomials.legendres[Rational](5).toList
-   val lag = SpecialPolynomials.laguerres[Rational](5).toList
-   val chebFirstKind = SpecialPolynomials.chebyshevsFirstKind[Rational](5).toList
-   val chebSecondKind = SpecialPolynomials.chebyshevsSecondKind[Rational](5).toList
-   val hermProb = SpecialPolynomials.probHermites[Rational](5).toList
-   val hermPhys = SpecialPolynomials.physHermites[Rational](5).toList
+    val leg = SpecialPolynomials.legendres[Rational](5).toList
+    val lag = SpecialPolynomials.laguerres[Rational](5).toList
+    val chebFirstKind = SpecialPolynomials.chebyshevsFirstKind[Rational](5).toList
+    val chebSecondKind = SpecialPolynomials.chebyshevsSecondKind[Rational](5).toList
+    val hermProb = SpecialPolynomials.probHermites[Rational](5).toList
+    val hermPhys = SpecialPolynomials.physHermites[Rational](5).toList
 
-   assert(leg(4) === Polynomial("35/8x^4 - 30/8x^2 + 3/8"))
-   assert(lag(4) === Polynomial("1/24x^4 - 16/24x^3 + 72/24x^2 - 96/24x + 1"))
-   assert(chebFirstKind(4) === Polynomial("8x^4 - 8x^2 + 1"))
-   assert(chebSecondKind(4) === Polynomial("16x^4 - 12x^2 + 1"))
-   assert(hermProb(4) === Polynomial("x^4 - 6x^2 + 3"))
-   assert(hermPhys(4) === Polynomial("16x^4 - 48x^2 + 12"))
+    assert(leg(4) === Polynomial("35/8x^4 - 30/8x^2 + 3/8"))
+    assert(lag(4) === Polynomial("1/24x^4 - 16/24x^3 + 72/24x^2 - 96/24x + 1"))
+    assert(chebFirstKind(4) === Polynomial("8x^4 - 8x^2 + 1"))
+    assert(chebSecondKind(4) === Polynomial("16x^4 - 12x^2 + 1"))
+    assert(hermProb(4) === Polynomial("x^4 - 6x^2 + 3"))
+    assert(hermPhys(4) === Polynomial("16x^4 - 48x^2 + 12"))
 
   }
 
+  test("GCD returns nice results") {
+    val a = Polynomial("x^2 + 2x + 1")
+    val b = Polynomial("x - 1")
+    assert(spire.math.gcd(a, b) == 1)
+    assert(spire.math.gcd(2 *: a, Polynomial("2")) == 2)
+    assert(spire.math.gcd(2 *: a, 2 *: b) == 2)
+  }
 }
