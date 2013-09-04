@@ -13,8 +13,7 @@ import scala.{specialized => spec}
 class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
     (implicit val ct: ClassTag[C]) extends Polynomial[C] { lhs =>
 
-  // val _degree: Int = if(isZero) 0 else coeff.length - 1
-  def degree: Int = if(isZero) 0 else coeffs.length - 1//_degree
+  def degree: Int = if (isZero) 0 else coeffs.length - 1
 
   def toSparse(implicit ring: Semiring[C], eq: Eq[C]): PolySparse[C] =
     Polynomial.sparse(data)
