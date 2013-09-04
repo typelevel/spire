@@ -13,10 +13,10 @@ import scala.{specialized => spec}
 case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val coeff: Array[C])
     (implicit val ct: ClassTag[C]) extends Polynomial[C] { lhs =>
 
-  def toDense(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] =
+  def toDense(implicit ring: Semiring[C], eq: Eq[C]): PolyDense[C] =
     Polynomial.dense(coeffsArray)
 
-  def toSparse(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] = lhs
+  def toSparse(implicit ring: Semiring[C], eq: Eq[C]): PolySparse[C] = lhs
 
   def foreach[U](f: (Int, C) => U): Unit =
     cfor(0)(_ < exp.length, _ + 1) { i => f(exp(i), coeff(i)) }

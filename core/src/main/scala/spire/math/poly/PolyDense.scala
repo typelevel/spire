@@ -16,10 +16,10 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   // val _degree: Int = if(isZero) 0 else coeff.length - 1
   def degree: Int = if(isZero) 0 else coeffs.length - 1//_degree
 
-  def toSparse(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] =
+  def toSparse(implicit ring: Semiring[C], eq: Eq[C]): PolySparse[C] =
     Polynomial.sparse(data)
 
-  def toDense(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] = lhs
+  def toDense(implicit ring: Semiring[C], eq: Eq[C]): PolyDense[C] = lhs
 
   def foreach[U](f: (Int, C) => U): Unit = {
     cfor(0)(_ < coeffs.length, _ + 1) { e =>

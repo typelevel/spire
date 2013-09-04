@@ -41,7 +41,7 @@ object PolynomialSetup {
     Complex(re, im)
   })
 
-  implicit def arbitraryTerm[A: Arbitrary: Ring: Signed: ClassTag] = Arbitrary(for {
+  implicit def arbitraryTerm[A: Arbitrary: Ring: Eq: ClassTag] = Arbitrary(for {
     c <- arbitrary[A]
     e0 <- arbitrary[Int]
   } yield {
@@ -54,7 +54,7 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
   import PolynomialSetup._
 
-  val sbd = Signed[BigDecimal]
+  val ebd = Eq[BigDecimal]
   val fbd = Field[BigDecimal]
   val cbd = implicitly[ClassTag[BigDecimal]]
  
@@ -65,7 +65,7 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
   // runDense[BigDecimal]("decimal")(arbitraryBigDecimal, sbd, fbd, cbd)
   // runSparse[BigDecimal]("decimal")(arbitraryBigDecimal, sbd, fbd, cbd)
 
-  def runDense[A: Arbitrary: Signed: Field: ClassTag](typ: String) {
+  def runDense[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
     implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
@@ -74,7 +74,7 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     runTest[A](s"$typ/dense")
   }
 
-  def runSparse[A: Arbitrary: Signed: Field: ClassTag](typ: String) {
+  def runSparse[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
     implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
@@ -83,7 +83,7 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     runTest[A](s"$typ/sparse")
   }
 
-  def runTest[A: Signed: Field: ClassTag](name: String)(implicit arb: Arbitrary[Polynomial[A]]) {
+  def runTest[A: Eq: Field: ClassTag](name: String)(implicit arb: Arbitrary[Polynomial[A]]) {
     type P = Polynomial[A]
 
     val zero = Polynomial.zero[A]
@@ -217,7 +217,7 @@ class PolynomialTest extends FunSuite {
   test("polynomial non-arithmetic functions") {
     val p = Polynomial("1/4x^2 + 2x + 1/2")
 
-    assert(p.coeffs === Array(r"1/4", r"2", r"1/2"))
+    assert(p.coeffsArray === Array(r"1/2", r"2", r"1/4"))
     assert(p.maxTerm === Term(r"1/4", 2))
     assert(p.degree === 2)
     assert(p.maxOrderTermCoeff === Rational(1,4))
@@ -231,7 +231,7 @@ class PolynomialTest extends FunSuite {
     assert(p.toDense.maxTerm === Term(r"1/4", 2))
     assert(p.toDense.degree === 2)
     assert(p.toDense.maxOrderTermCoeff === Rational(1,4))
-    assert(p.toDense(r"2") === r"11/2")
+    assert(p.toDense.apply(r"2") === r"11/2")
     assert(p.toDense.isZero === false)
     assert(p.toDense.monic === Polynomial.dense(Array(r"2/1", r"8/1", r"1/1")))
     assert(p.toDense.derivative === Polynomial.dense(Array(r"2/1", r"1/2")))
@@ -254,7 +254,7 @@ class PolynomialTest extends FunSuite {
     val legDense = legSparse.map(_.toDense)
 
     assert(p1 + p2 === Polynomial.dense(Array(r"1/1", r"5/1", r"1/2")))
-    assert((legDense(2) * legDense(3)).coeffs === Array(r"0", r"3/4", r"0", r"-7/2", r"0", r"15/4"))
+    assert((legDense(2) * legDense(3)).coeffsArray === Array(r"0", r"3/4", r"0", r"-7/2", r"0", r"15/4"))
     assert(p1 % p2 === Polynomial("-x"))
     assert(p1 /~ p2 === Polynomial("1"))
 

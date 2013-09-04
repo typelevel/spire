@@ -131,10 +131,10 @@ trait Polynomial[@spec(Double) C] { lhs =>
   implicit def ct: ClassTag[C]
 
   /** Returns a polynmial that has a dense representation. */
-  def toDense(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C]
+  def toDense(implicit ring: Semiring[C], eq: Eq[C]): PolyDense[C]
 
   /** Returns a polynomial that has a sparse representation. */
-  def toSparse(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C]
+  def toSparse(implicit ring: Semiring[C], eq: Eq[C]): PolySparse[C]
 
   def foreach[U](f: (Int, C) => U): Unit
 
@@ -222,7 +222,7 @@ trait Polynomial[@spec(Double) C] { lhs =>
         } else if (j >= res.length || les(i) < res(j)) {
           if (lcs(i) == 0) loop(i + 1, j) else false
         } else if (i >= les.length || les(i) > res(j)) {
-          if (rcs(i) == 0) loop(i, j + 1) else false
+          if (rcs(j) == 0) loop(i, j + 1) else false
         } else if (lcs(i) == rcs(j)) {
           loop(i + 1, j + 1)
         } else {
