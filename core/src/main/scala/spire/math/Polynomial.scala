@@ -302,15 +302,31 @@ with EuclideanRing[Polynomial[C]] with VectorSpace[Polynomial[C], C] {
   def mod(x: Polynomial[C], y: Polynomial[C]) = x % y
   override def quotmod(x: Polynomial[C], y: Polynomial[C]) = x /% y
 
-  @tailrec final def gcd(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] =
-    if (y.isZero && x.isZero) Polynomial(scalar.zero, 0)
-    else if (y.maxTerm.isZero) x
-    else gcd(y, x % y)
+  final def gcd(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = {
+    val k = spire.math.gcd(x.coeffsArray ++ y.coeffsArray)
+    k *: euclid(x :/ k, y :/ k)(Polynomial.eq).monic
+  }
+}
+
+trait PolynomialEq[@spec(Double) C] extends Eq[Polynomial[C]] {
+  implicit def scalar: Semiring[C]
+  implicit def eq: Eq[C]
+  implicit def ct: ClassTag[C]
+
+  def eqv(x: Polynomial[C], y: Polynomial[C]): Boolean =
+    x.coeffsArray === y.coeffsArray // TODO: This is bad for sparse arrays. Do better.
 }
 
 trait PolynomialInstances0 {
   implicit def semiring[@spec(Double) C: ClassTag: Semiring: Eq] =
     new PolynomialSemiring[C] {
+      val scalar = Semiring[C]
+      val eq = Eq[C]
+      val ct = implicitly[ClassTag[C]]
+    }
+
+  implicit def eq[@spec(Double) C: ClassTag: Semiring: Eq] =
+    new PolynomialEq[C] {
       val scalar = Semiring[C]
       val eq = Eq[C]
       val ct = implicitly[ClassTag[C]]
