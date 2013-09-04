@@ -2,7 +2,6 @@ package spire.math.poly
 
 import compat._
 import spire.math._
-import scala.reflect._
 import spire.algebra._
 import spire.implicits._
 import spire.syntax._
@@ -31,8 +30,8 @@ case class Term[@spec(Float, Double) C](coeff: C, exp: Int) { lhs =>
   def isIndexZero: Boolean = 
     exp == 0
 
-  def isZero(implicit s: Signed[C]): Boolean =
-    coeff.isZero
+  def isZero(implicit ring: Semiring[C], eq: Eq[C]): Boolean =
+    coeff === ring.zero
 
   def divideBy(x: C)(implicit f: Field[C]): Term[C] =
     Term(coeff / x, exp)
@@ -76,11 +75,11 @@ object Term {
     def compare(x: Term[C], y: Term[C]): Int = x.exp compare y.exp
   }
 
-  def fromTuple[@spec(Float, Double) C: ClassTag](tpl: (Int, C)): Term[C] = 
+  def fromTuple[@spec(Float, Double) C](tpl: (Int, C)): Term[C] = 
     Term(tpl._2, tpl._1)
-  def zero[@spec(Float, Double) C: ClassTag](implicit r: Rng[C]): Term[C] =
+  def zero[@spec(Float, Double) C](implicit r: Semiring[C]): Term[C] =
     Term(r.zero, 0)
-  def one[@spec(Float, Double) C: ClassTag](implicit r: Rig[C]): Term[C] = 
+  def one[@spec(Float, Double) C](implicit r: Rig[C]): Term[C] = 
     Term(r.one, 0)
 
   private val IsZero = "0".r
