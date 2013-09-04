@@ -152,9 +152,9 @@ object ProductTypes {
   val monoid = Definition("Monoid", Some("Semigroup"))(const("id") :: Nil)
   val group = Definition("Group", Some("Monoid"))(unary("inverse") :: Nil)
   val abGroup = Definition("AbGroup", Some("Group"))(Nil)
-  val semiring = Definition("Semiring")(binary("plus") :: binary("times") :: pow :: Nil)
-  val rng = Definition("Rng", Some("Semiring"))(const("zero") :: unary("negate") :: Nil)
-  val rig = Definition("Rig", Some("Semiring"))(const("zero") :: const("one") :: Nil)
+  val semiring = Definition("Semiring")(const("zero") :: binary("plus") :: binary("times") :: pow :: Nil)
+  val rng = Definition("Rng", Some("Semiring"))(unary("negate") :: Nil)
+  val rig = Definition("Rig", Some("Semiring"))(const("one") :: Nil)
   val ring = Definition("Ring", Some("Rng"))(fromInt :: const("one") :: Nil)
 
   private val eqv: Block = { tpe =>
