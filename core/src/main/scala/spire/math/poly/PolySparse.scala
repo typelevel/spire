@@ -13,7 +13,7 @@ import scala.{specialized => spec}
 class PolySparse[@spec(Double) C] private[spire] (val data: Map[Int, C])
   (implicit r: Ring[C], s: Signed[C], val ct: ClassTag[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
-  val _degree = if (isZero) 0 else data.keys.qmax
+  private val _degree = if (isZero) 0 else data.keys.qmax
   def degree = _degree
 
   def toDense: PolyDense[C] =
