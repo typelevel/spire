@@ -59,12 +59,12 @@ class ULong(val signed: Long) extends AnyVal {
   final def <= (that: ULong) = if (this.signed >= 0L)
     this.signed <= that.signed || that.signed < 0L
   else
-    that.signed >= this.signed
+    that.signed >= this.signed && that.signed < 0L
 
   final def < (that: ULong) = if (this.signed >= 0L)
     this.signed < that.signed || that.signed < 0L
   else
-    that.signed > this.signed
+    that.signed > this.signed && that.signed < 0L
 
   @inline final def >= (that: ULong) = that <= this
   @inline final def > (that: ULong) = that < this
@@ -111,9 +111,8 @@ class ULong(val signed: Long) extends AnyVal {
 }
 
 trait ULongInstances {
-  implicit final val ULongAlgebra = new ULongIsRig {}
-  implicit final val ULongBitString = new ULongBitString {}
-  implicit final val ULongIsReal = new ULongIsReal {}
+  implicit final val ULongAlgebra = new ULongAlgebra
+  implicit final val ULongBitString = new ULongBitString
 }
 
 private[math] trait ULongIsRig extends Rig[ULong] {
@@ -138,7 +137,8 @@ private[math] trait ULongOrder extends Order[ULong] {
   def compare(x: ULong, y: ULong) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
-private[math] trait ULongBitString extends BitString[ULong] {
+@SerialVersionUID(0L)
+private[math] class ULongBitString extends BitString[ULong] with Serializable {
   def one: ULong = ULong(-1L)
   def zero: ULong = ULong(0L)
   def and(a: ULong, b: ULong): ULong = a & b
@@ -171,3 +171,6 @@ private[math] trait ULongIsSigned extends Signed[ULong] {
 private[math] trait ULongIsReal extends IsIntegral[ULong] with ULongOrder with ULongIsSigned {
   def toDouble(n: ULong): Double = n.toDouble
 }
+
+@SerialVersionUID(0L)
+private[math] class ULongAlgebra extends ULongIsRig with ULongIsReal with Serializable

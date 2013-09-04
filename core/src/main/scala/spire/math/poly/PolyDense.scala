@@ -13,11 +13,18 @@ import scala.{specialized => spec}
 class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   (implicit r: Ring[C], s: Signed[C], val ct: ClassTag[C]) extends Function1[C, C] with Polynomial[C] { lhs =>
 
-  private val _degree = if (isZero) 0 else coeffs.length - 1
-  def degree = _degree
+  def degree: Int = if(isZero) 0 else coeffs.length - 1
 
-  def toSparse: PolySparse[C] = new PolySparse(data)
+  def toSparse: PolySparse[C] = Polynomial.sparse(data)
   def toDense: PolyDense[C] = lhs
+
+  def foreachNonZero[U](f: (Int, C) => U): Unit = {
+    cfor(0)(_ < coeffs.length, _ + 1) { e =>
+      val c = coeffs(e)
+      if (c.signum != 0)
+        f(e, c)
+    }
+  }
 
   def data: Map[Int, C] =
     (0 to coeffs.length - 1).foldLeft(Map.empty[Int, C]) { (m, e) =>
@@ -91,7 +98,8 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
     if (lhs.isZero) return lhs
     val lcs = lhs.coeffs
     val rcs = rhs.coeffs
-    val cs = Array.fill(lcs.length + rcs.length - 1)(r.zero)
+    val cs = new Array[C](lcs.length + rcs.length - 1)
+    cfor(0)(_ < cs.length, _ + 1) { i => cs(i) = r.zero }
     cfor(0)(_ < lcs.length, _ + 1) { i =>
       val c = lcs(i)
       var k = i

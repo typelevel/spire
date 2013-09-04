@@ -51,7 +51,7 @@ object Number extends NumberInstances {
   private[math] val maxDouble = BigDecimal(Double.MaxValue)
 }
 
-sealed trait Number extends ScalaNumericConversions {
+sealed trait Number extends ScalaNumericConversions with Serializable {
   def abs: Number
   def signum: Int
 
@@ -563,8 +563,7 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
 }
 
 trait NumberInstances {
-  implicit final val NumberAlgebra = new NumberIsField with NumberIsNRoot with NumberIsTrig {}
-  implicit final val NumberIsReal = new NumberIsReal {}
+  implicit final val NumberAlgebra = new NumberAlgebra
 }
 
 private[math] trait NumberIsRing extends Ring[Number] {
@@ -602,7 +601,9 @@ private[math] trait NumberIsTrig extends Trig[Number] {
   def pi: Number = Number(Math.PI)
 
   def exp(a: Number): Number = Math.exp(a.toDouble)
+  def expm1(a: Number): Number = Math.expm1(a.toDouble)
   def log(a: Number) = Number(Math.log(a.toDouble))
+  def log1p(a: Number) = Number(Math.log1p(a.toDouble))
 
   def sin(a: Number): Number = Math.sin(a.toDouble)
   def cos(a: Number): Number = Math.cos(a.toDouble)
@@ -643,3 +644,6 @@ private[math] trait NumberIsReal extends IsReal[Number] with NumberOrder with Nu
   def round(a:Number): Number = a.round
   def isWhole(a:Number) = a.isWhole
 }
+
+@SerialVersionUID(0L)
+class NumberAlgebra extends NumberIsField with NumberIsNRoot with NumberIsTrig with NumberIsReal with Serializable

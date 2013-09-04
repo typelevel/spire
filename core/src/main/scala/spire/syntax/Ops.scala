@@ -272,8 +272,8 @@ final class ModuleOps[V](x: V) {
   def :*[F](rhs:F)(implicit ev: Module[V, F]): V = macro Ops.binopWithEv[F, Module[V, F], V]
 
   // TODO: Are macros worth it here?
-  def *:[F](lhs:Int)(implicit ev: Module[V, F]): V = ev.timesl(ev.scalar.fromInt(lhs), x)
-  def :*[F](rhs:Int)(implicit ev: Module[V, F]): V = ev.timesr(x, ev.scalar.fromInt(rhs))
+  def *:[F](lhs:Int)(implicit ev: Module[V, F], F: Ring[F]): V = ev.timesl(F.fromInt(lhs), x)
+  def :*[F](rhs:Int)(implicit ev: Module[V, F], F: Ring[F]): V = ev.timesr(x, F.fromInt(rhs))
 }
 
 final class VectorSpaceOps[V](x: V) {

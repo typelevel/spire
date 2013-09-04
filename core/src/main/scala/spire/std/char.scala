@@ -12,6 +12,9 @@ trait CharOrder extends Order[Char] {
   def compare(x: Char, y: Char) = if (x < y) -1 else if (x > y) 1 else 0
 }
 
+@SerialVersionUID(0L)
+class CharAlgebra extends CharOrder with Serializable
+
 trait CharInstances {
-  implicit final val CharOrder = new CharOrder {}
+  implicit final val CharAlgebra = new CharAlgebra
 }
