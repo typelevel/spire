@@ -88,13 +88,35 @@ case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val
     sum
   }
 
-  def derivative(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] =
-    Polynomial(data.flatMap { case (e, c) =>
-      if (e > 0) Some(Term(c, e).der) else None
-    })
+  def derivative(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] = {
+    val i0 = if (exp(0) == 0) 1 else 0
+    val es = new Array[Int](exp.length - i0)
+    val cs = new Array[C](es.length)
 
-  def integral(implicit field: Field[C], eq: Eq[C]): Polynomial[C] =
-    Polynomial(data.map(Term.fromTuple(_).int))
+    @tailrec
+    def loop(i: Int, j: Int): Unit = if (j < es.length) {
+      val e = exp(i)
+      es(j) = e - 1
+      cs(j) = e * coeff(i)
+      loop(i + 1, j + 1)
+    }
+
+    loop(i0, 0)
+    PolySparse.safe(es, cs)
+  }
+
+  def integral(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = {
+    val es = new Array[Int](exp.length)
+    val cs = new Array[C](es.length)
+
+    cfor(0)(_ < es.length, _ + 1) { i =>
+      val e = exp(i) + 1
+      es(i) = e
+      cs(i) = coeff(i) / field.fromInt(e)
+    }
+    
+    PolySparse.safe(es, cs)
+  }
 
   def unary_-()(implicit ring: Rng[C]): Polynomial[C] = {
     val cs = new Array[C](coeff.length)
