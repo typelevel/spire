@@ -388,6 +388,8 @@ object Dist extends DistInstances8 {
       a
     }
   }
+
+  def gaussian[A: Field] = new DistFromGen[A](g => Field[A].fromDouble(g.nextGaussian))
 }
 
 trait DistInstances0 {
