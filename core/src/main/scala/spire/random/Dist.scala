@@ -159,13 +159,26 @@ class DistFromGen[@spec A](f: Generator => A) extends Dist[A] {
   def apply(gen: Generator): A = f(gen)
 }
 
-trait DistRing[A] extends Ring[Dist[A]] {
-  def alg: Ring[A]
+trait DistSemiring[A] extends Semiring[Dist[A]] {
+  implicit def alg: Semiring[A]
   def zero: Dist[A] = Dist.constant(alg.zero)
-  def one: Dist[A] = Dist.constant(alg.one)
-  def plus(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.plus(x(g), y(g)))
+  def plus(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => x(g) + y(g))
+  def times(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => x(g) * y(g))
+}
+
+trait DistRng[A] extends DistSemiring[A] with Rng[Dist[A]] {
+  implicit def alg: Rng[A]
   def negate(x: Dist[A]): Dist[A] = new DistFromGen(g => alg.negate(x(g)))
-  def times(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.times(x(g), y(g)))
+}
+
+trait DistRig[A] extends DistSemiring[A] with Rig[Dist[A]] {
+  implicit def alg: Rig[A]
+  def one: Dist[A] = Dist.constant(alg.one)
+}
+
+trait DistRing[A] extends DistRng[A] with Ring[Dist[A]] {
+  def alg: Ring[A]
+  def one: Dist[A] = Dist.constant(alg.one)
 }
 
 trait DistEuclideanRing[A] extends EuclideanRing[Dist[A]] with DistRing[A] {
@@ -181,19 +194,42 @@ trait DistField[A] extends Field[Dist[A]] with DistEuclideanRing[A] {
   override def reciprocal(x: Dist[A]): Dist[A] = new DistFromGen(g => alg.reciprocal(x(g)))
 }
 
-object Dist {
+trait DistModule[V, K] extends Module[Dist[V], Dist[K]] {
+  implicit def alg: Module[V, K]
+
+  def scalar: Rng[Dist[K]] = Dist.rng(alg.scalar)
+  def zero: Dist[V] = Dist.constant(alg.zero)
+  def plus(x: Dist[V], y: Dist[V]): Dist[V] = new DistFromGen(g => x(g) + y(g))
+  def negate(x: Dist[V]): Dist[V] = new DistFromGen(g => -x(g))
+  override def minus(x: Dist[V], y: Dist[V]): Dist[V] = new DistFromGen(g => x(g) - y(g))
+  def timesl(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => k(g) *: v(g))
+  def timesr(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => v(g) :* k(g))
+}
+
+trait DistVectorSpace[V, K] extends DistModule[V, K] with VectorSpace[Dist[V], Dist[K]] {
+  implicit def alg: VectorSpace[V, K]
+
+  override def scalar: Field[Dist[K]] = Dist.field(alg.scalar)
+
+  override def divr(v: Dist[V], k: Dist[K]): Dist[V] = new DistFromGen(g => v(g) :/ k(g))
+}
+
+trait DistNormedVectorSpace[V, K] extends DistVectorSpace[V, K]
+with NormedVectorSpace[Dist[V], Dist[K]] {
+  implicit def alg: NormedVectorSpace[V, K]
+
+  def norm(v: Dist[V]): Dist[K] = v map alg.norm
+}
+
+trait DistInnerProductSpace[V, K] extends DistVectorSpace[V, K]
+with InnerProductSpace[Dist[V], Dist[K]] {
+  implicit def alg: InnerProductSpace[V, K]
+
+  def dot(v: Dist[V], w: Dist[V]): Dist[K] = new DistFromGen(g => v(g) dot w(g))
+}
+
+object Dist extends DistInstances8 {
   @inline final def apply[A](implicit na: Dist[A]): Dist[A] = na
-
-  import spire.algebra.Ring
-
-  implicit def ring[A](implicit ev: Ring[A]): Ring[Dist[A]] =
-    new DistRing[A] { def alg = ev }
-
-  implicit def euclideanRing[A](implicit ev: EuclideanRing[A]): EuclideanRing[Dist[A]] =
-    new DistEuclideanRing[A] { def alg = ev }
-
-  implicit def field[A](implicit ev: Field[A]): Field[Dist[A]] =
-    new DistField[A] { def alg = ev }
 
   final def apply[A, B](f: A => B)(implicit na: Dist[A]): Dist[B] =
     na.map(f)
@@ -352,4 +388,54 @@ object Dist {
       a
     }
   }
+
+  def gaussian[A: Field] = new DistFromGen[A](g => Field[A].fromDouble(g.nextGaussian))
+}
+
+trait DistInstances0 {
+  implicit def semiring[A](implicit ev: Semiring[A]): Semiring[Dist[A]] =
+    new DistSemiring[A] { def alg = ev }
+}
+
+trait DistInstances1 extends DistInstances0 {
+  implicit def rig[A](implicit ev: Rig[A]): Rig[Dist[A]] =
+    new DistRig[A] { def alg = ev }
+
+  implicit def rng[A](implicit ev: Rng[A]): Rng[Dist[A]] =
+    new DistRng[A] { def alg = ev }
+}
+
+trait DistInstances2 extends DistInstances1 {
+  implicit def ring[A](implicit ev: Ring[A]): Ring[Dist[A]] =
+    new DistRing[A] { def alg = ev }
+}
+
+trait DistInstances3 extends DistInstances2 {
+  implicit def euclideanRing[A](implicit ev: EuclideanRing[A]): EuclideanRing[Dist[A]] =
+    new DistEuclideanRing[A] { def alg = ev }
+}
+
+trait DistInstances4 extends DistInstances3 {
+  implicit def field[A](implicit ev: Field[A]): Field[Dist[A]] =
+    new DistField[A] { def alg = ev }
+}
+
+trait DistInstances5 extends DistInstances4 {
+  implicit def module[V,K](implicit ev: Module[V,K]): Module[Dist[V],Dist[K]] =
+    new DistModule[V,K] { def alg = ev }
+}
+
+trait DistInstances6 extends DistInstances5 {
+  implicit def vectorSpace[V,K](implicit ev: VectorSpace[V,K]): VectorSpace[Dist[V],Dist[K]] =
+    new DistVectorSpace[V,K] { def alg = ev }
+}
+
+trait DistInstances7 extends DistInstances6 {
+  implicit def NormedVectorSpace[V,K](implicit ev: NormedVectorSpace[V,K]): NormedVectorSpace[Dist[V],Dist[K]] =
+    new DistNormedVectorSpace[V,K] { def alg = ev }
+}
+
+trait DistInstances8 extends DistInstances7 {
+  implicit def InnerProductSpace[V,K](implicit ev: InnerProductSpace[V,K]): InnerProductSpace[Dist[V],Dist[K]] =
+    new DistInnerProductSpace[V,K] { def alg = ev }
 }
