@@ -66,10 +66,35 @@ abstract class Generator {
       loop(nextInt() >>> 1)
   }
 
+  private final def retryCap(width: UInt): UInt = {
+    // Simulate 1 << 32 long division.
+    val q = UInt(Int.MinValue) / width
+    val r = UInt(Int.MinValue) % width
+    val n = (q << 1) + (r << 1) / width
+    n * width
+  }
+
   /**
    * Return an Int in [from, to].
    */
-  def nextInt(from: Int, to: Int): Int = from + nextInt(to - from + 1)
+  def nextInt(from: Int, to: Int): Int = {
+    val width = UInt(to - from + 1)
+    if (width == UInt(0)) {
+      nextInt()
+    } else {
+      val cap = if (width > UInt(Int.MinValue)) width else retryCap(width)
+      if (cap == UInt(0)) {
+        val x = UInt(nextInt())
+        from + (x % width).signed
+      } else {
+        @tailrec def loop(): Int = {
+          val x = UInt(nextInt())
+          if (x <= cap) (x % width).signed + from else loop()
+        }
+        loop()
+      }
+    }
+  }
 
   /**
    * Generates a random int between 0 (inclusive) and n (exclusive).
@@ -86,6 +111,36 @@ abstract class Generator {
       nextLong() & (n - 1)
     else
       loop(nextLong() >>> 1)
+  }
+
+  private final def retryCap(width: ULong): ULong = {
+    // Simulate 1 << 32 long division.
+    val q = ULong(Long.MinValue) / width
+    val r = ULong(Long.MinValue) % width
+    val n = (q << 1) + (r << 1) / width
+    n * width
+  }
+
+  /**
+   * Return an Long in [from, to].
+   */
+  def nextLong(from: Long, to: Long): Long = {
+    val width = ULong(to - from + 1)
+    if (width == ULong(0)) {
+      nextLong()
+    } else {
+      val cap = if (width > ULong(Long.MinValue)) width else retryCap(width)
+      if (cap == ULong(0)) {
+        val x = ULong(nextLong())
+        from + (x % width).signed
+      } else {
+        @tailrec def loop(): Long = {
+          val x = ULong(nextLong())
+          if (x <= cap) (x % width).signed + from else loop()
+        }
+        loop()
+      }
+    }
   }
 
   /**
