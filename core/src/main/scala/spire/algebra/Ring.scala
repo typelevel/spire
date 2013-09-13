@@ -25,3 +25,12 @@ trait Ring[@spec(Byte, Short, Int, Long, Float, Double) A] extends Rig[A] with R
 object Ring {
   @inline final def apply[A](implicit r: Ring[A]): Ring[A] = r
 }
+
+/**
+ * CRing is a Ring that is commutative under multiplication.
+ */
+trait CRing[@spec(Byte, Short, Int, Long, Float, Double) A] extends Ring[A] with MultiplicativeCMonoid[A]
+
+object CRing {
+  @inline final def apply[A](implicit r: CRing[A]): CRing[A] = r
+}

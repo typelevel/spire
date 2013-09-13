@@ -34,6 +34,7 @@ package object syntax {
 
   object module extends ModuleSyntax
   object vectorSpace extends VectorSpaceSyntax
+  object metricSpace extends MetricSpaceSyntax
   object normedVectorSpace extends NormedVectorSpaceSyntax
   object innerProductSpace extends InnerProductSpaceSyntax
   object coordinateSpace extends CoordinateSpaceSyntax

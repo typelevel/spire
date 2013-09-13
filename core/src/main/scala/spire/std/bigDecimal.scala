@@ -9,7 +9,7 @@ import BigDecimal.RoundingMode.{CEILING, FLOOR, HALF_UP}
 import java.lang.Math
 import java.math.MathContext
 
-trait BigDecimalIsRing extends Ring[BigDecimal] {
+trait BigDecimalIsField extends Field[BigDecimal] {
   override def minus(a:BigDecimal, b:BigDecimal): BigDecimal = a - b
   def negate(a:BigDecimal): BigDecimal = -a
   val one: BigDecimal = BigDecimal(1.0)
@@ -19,9 +19,7 @@ trait BigDecimalIsRing extends Ring[BigDecimal] {
   val zero: BigDecimal = BigDecimal(0.0)
 
   override def fromInt(n: Int): BigDecimal = BigDecimal(n)
-}
 
-trait BigDecimalIsEuclideanRing extends EuclideanRing[BigDecimal] with BigDecimalIsRing {
   def quot(a:BigDecimal, b:BigDecimal) = a.quot(b)
   def mod(a:BigDecimal, b:BigDecimal) = a % b
   override def quotmod(a:BigDecimal, b:BigDecimal) = a /% b
@@ -70,9 +68,7 @@ trait BigDecimalIsEuclideanRing extends EuclideanRing[BigDecimal] with BigDecima
     if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp)
     else gcd0(bVal, bExp, aVal, aExp)
   }
-}
 
-trait BigDecimalIsField extends Field[BigDecimal] with BigDecimalIsEuclideanRing {
   override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
   def div(a:BigDecimal, b:BigDecimal) = a / b
 }
