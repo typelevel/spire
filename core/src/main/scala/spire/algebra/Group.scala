@@ -19,7 +19,7 @@ object Group {
 /**
  * An abelian group is a group whose operation is commutative.
  */
-trait AbGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Group[A]
+trait AbGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Group[A] with CMonoid[A]
 
 object AbGroup {
   @inline final def apply[A](implicit ev: AbGroup[A]): AbGroup[A] = ev

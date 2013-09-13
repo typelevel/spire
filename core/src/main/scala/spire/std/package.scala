@@ -22,4 +22,5 @@ package object std {
   object seq extends SeqInstances
   object map extends MapInstances
   object tuples extends ProductInstances
+  object option extends OptionInstances
 }

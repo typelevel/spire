@@ -2,7 +2,7 @@ package spire.std
 
 import spire.algebra._
 
-trait BigIntIsRing extends Ring[BigInt] {
+trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   override def minus(a:BigInt, b:BigInt): BigInt = a - b
   def negate(a:BigInt): BigInt = -a
   val one: BigInt = BigInt(1)
@@ -12,9 +12,7 @@ trait BigIntIsRing extends Ring[BigInt] {
   val zero: BigInt = BigInt(0)
   
   override def fromInt(n: Int): BigInt = BigInt(n)
-}
 
-trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] with BigIntIsRing {
   def quot(a:BigInt, b:BigInt) = a / b
   def mod(a:BigInt, b:BigInt) = a % b
   override def quotmod(a:BigInt, b:BigInt) = a /% b

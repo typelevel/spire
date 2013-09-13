@@ -311,6 +311,11 @@ final class CoordinateSpaceOps[V](v: V) {
     macro Ops.unopWithEv[CoordinateSpace[V, F], Int]
 }
 
+final class MetricSpaceOps[V](lhs: V) {
+  def distance[F](rhs: V)(implicit ev: MetricSpace[V, F]): F =
+    macro Ops.binopWithEv[V, MetricSpace[V, F], F]
+}
+
 final class NormedVectorSpaceOps[V](lhs: V) {
   def norm[F](implicit ev: NormedVectorSpace[V, F]): F =
     macro Ops.unopWithEv[NormedVectorSpace[V, F], F]

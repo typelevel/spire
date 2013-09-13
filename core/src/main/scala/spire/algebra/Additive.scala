@@ -44,6 +44,13 @@ trait AdditiveMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Add
   def zero: A
 }
 
+trait AdditiveCMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends AdditiveMonoid[A] {
+  override def additive: CMonoid[A] = new CMonoid[A] {
+    def id = zero
+    def op(x: A, y: A): A = plus(x, y)
+  }
+}
+
 trait AdditiveGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends AdditiveMonoid[A] {
   override def additive: Group[A] = new Group[A] {
     def id = zero
@@ -55,7 +62,7 @@ trait AdditiveGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Addi
   def minus(x: A, y: A): A = plus(x, negate(y))
 }
 
-trait AdditiveAbGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends AdditiveGroup[A] {
+trait AdditiveAbGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends AdditiveGroup[A] with AdditiveCMonoid[A] {
   override def additive: AbGroup[A] = new AbGroup[A] {
     def id = zero
     def op(x: A, y: A): A = plus(x, y)
