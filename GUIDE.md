@@ -21,8 +21,8 @@ try to distinguish the following:
 #### Package Layout
 
 In the case of `Ring[A]`, the type class itself is located in `spire.algebra`.
-Except for certain special-purpose type classes in `spire.math`, all of
-Spire's type classes can be found in `spire.algebra`.
+Except for certain special-purpose type classes, all of Spire's type classes
+can be found in `spire.algebra`.
 
 Type class members (also called instances) can be found in two different
 places. For types defined in Spire, or code that is aware of Spire, type class
@@ -30,20 +30,21 @@ instances should be placed in the type's companion object. For instance,
 `UByte` (an unsigned byte type) has an instance of `Rig[UByte]` contained in
 its companion object.
 
-For types defined elsewhere (including the built-in number types) Spire
-defines objects in `spire.std` which contain their instances. So to get all
-the instances for `Int` you'd import them from `spire.std.int._`. To get all
-these "standard instances" at one go, import `spire.std.any._`.
+For types defined elsewhere that Spire supports directly (for instance the
+built-in number types) Spire defines objects in `spire.std` which contain
+their instances. So to get all the instances for `Int` you'd import them from
+`spire.std.int._`. To get all these "standard instances" at one go, import
+`spire.std.any._`.
 
 Finally, syntax implicits are imported from objecs in `spire.syntax`. To get
 the syntax for `Ring[A]` you'd import `spire.syntax.ring._`. Again, there is a
-shortcut import `spire.syntax.all._` which imports all syntax.
+shortcut package: you can import `spire.syntax.all._` to get all syntax.
 
 These imports might seem a bit confusing, but they are very useful if you find
-a situation where Spire's types or operators conflict with another libraries.
-We provide an even more basic import `spire.implicits._` for when you want all
-instances and operators. This is useful for working in the console, or for
-when you're sure there won't be a conflict.
+a situation where Spire's types or operators conflict with another library's.
+We provide an even more basic import (`spire.implicits._`) for when you want
+all instances and all operators. This is nice when working in the console, or
+for when you're sure there won't be a conflict.
 
 #### Usage
 
@@ -73,10 +74,10 @@ object Demo {
 ```
 
 The `IntAlgebra` type extends `Ring[Int]` and has been imported via
-`spire.std.any._`. The implicits providing the `+` and `*` binary operators
+`spire.std.any._`. The implicits providing the binary operators `+` and `*`
 (and also the implicit to convert the integer literal into an `A`) were all
 imported form `spire.syntax.ring._`. And the `Ring` context bound is really
-just sugar for an implicit object (the type class instance).
+just sugar for an implicit parameter (the type class instance).
 
 Hopefully this small example gives you an idea of the basic mechanics behind
 Spire's generic math capabilities.
@@ -125,9 +126,10 @@ capabilities and problems.
 
 #### Byte, Short, Int, and Long
 
-These built-in integral types are all signed and have a fixed-width. Division
-with these types is truncated, and overflow can silently occur when numbers to
-get too big (or too small). Division by zero will trigger an exception.
+These built-in integral types are all signed and have a fixed-width (8, 16,
+32, and 64 bits respectively). Division with these types is truncated, and
+overflow can silently occur when numbers to get too big (or too small).
+Division by zero will trigger an exception.
 
 #### Float and Double
 
