@@ -98,7 +98,11 @@ trait VectorSpaceSyntax extends ModuleSyntax with FieldSyntax {
   implicit def vectorSpaceOps[V](v:V) = new VectorSpaceOps[V](v)
 }
 
-trait NormedVectorSpaceSyntax extends VectorSpaceSyntax {
+trait MetricSpaceSyntax extends VectorSpaceSyntax {
+  implicit def metricSpaceOps[V](v:V) = new MetricSpaceOps[V](v)
+}
+
+trait NormedVectorSpaceSyntax extends MetricSpaceSyntax {
   implicit def normedVectorSpaceOps[V](v:V) = new NormedVectorSpaceOps[V](v)
 }
 
