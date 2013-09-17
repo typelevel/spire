@@ -1,9 +1,8 @@
 package spire.matrix.dense.tests
 
 import spire.matrix.dense._
-import spire.matrix.BLAS
-import BLAS.Transposition._
-import BLAS.UpperOrLower._
+import spire.matrix.Transposition._
+import spire.matrix.UpperOrLower._
 import spire.matrix.NumericPropertiesOfDouble
 
 /**

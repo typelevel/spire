@@ -2,8 +2,8 @@ package spire.matrix.tests
 
 import spire.matrix.dense._
 import spire.matrix.BLAS
-import spire.matrix.BLAS.Transposition._
-import spire.matrix.BLAS.UpperOrLower._
+import spire.matrix.Transposition._
+import spire.matrix.UpperOrLower._
 import spire.matrix.NumericPropertiesOfDouble
 
 import org.scalatest.FunSuite

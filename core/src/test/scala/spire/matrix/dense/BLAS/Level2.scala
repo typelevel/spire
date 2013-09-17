@@ -1,7 +1,7 @@
 package spire.matrix.BLAS.level2.tests
 
 import spire.matrix.BLAS
-import BLAS.Transposition._
+import spire.matrix.Transposition._
 import spire.matrix.dense.{Matrix,Vector}
 
 import org.scalatest.FunSuite

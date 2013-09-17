@@ -26,7 +26,7 @@ import spire.syntax.cfor._
 
 import spire.matrix.dense.MatrixLike
 import spire.matrix.dense.VectorLike
-import spire.matrix.BLAS._
+import spire.matrix.Transposition
 import Transposition._
 
 trait Interface {

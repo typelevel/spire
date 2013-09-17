@@ -25,7 +25,7 @@ package spire.matrix.BLAS.level3
 import spire.syntax.cfor._
 
 import spire.matrix.dense.MatrixLike
-import spire.matrix.BLAS._
+import spire.matrix.{Transposition, UpperOrLower}
 import Transposition._
 import UpperOrLower._
 

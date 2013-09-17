@@ -1,7 +1,7 @@
 package spire.matrix.dense
 
 import spire.matrix.BLAS
-import BLAS.Transposition._
+import spire.matrix.Transposition._
 
 import java.lang.Math.copySign
 import spire.matrix.NumericPropertiesOfDouble

@@ -1,9 +1,9 @@
 package spire.matrix.BLAS.level3.tests
 
 import spire.matrix.BLAS
-import BLAS.Transposition
-import BLAS.Transposition._
-import BLAS.UpperOrLower._
+import spire.matrix.Transposition
+import Transposition._
+import spire.matrix.UpperOrLower._
 import spire.matrix.dense.Matrix
 import spire.matrix.Constants._
 import spire.matrix.dense.tests.TestGeneralMatrices
