@@ -38,12 +38,12 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
 
   val javaRng = new java.util.Random(long)
   val scalaRng = new scala.util.Random(long)
-  val lcg32Rng = spire.random.Lcg32.fromSeed(int)
-  val lcg64Rng = spire.random.Lcg64.fromSeed(long)
-  val burtle2Rng = spire.random.BurtleRot2.fromSeed(ints4)
-  val burtle3Rng = spire.random.BurtleRot3.fromSeed(ints4)
-  val cmwc5Rng = spire.random.Cmwc5.fromSeed(longs5)
-  val well512Rng = spire.random.Well512.fromSeed(ints16)
+  val lcg32Rng = spire.random.mutable.Lcg32.fromSeed(int)
+  val lcg64Rng = spire.random.mutable.Lcg64.fromSeed(long)
+  val burtle2Rng = spire.random.mutable.BurtleRot2.fromSeed(ints4)
+  val burtle3Rng = spire.random.mutable.BurtleRot3.fromSeed(ints4)
+  val cmwc5Rng = spire.random.mutable.Cmwc5.fromSeed(longs5)
+  val well512Rng = spire.random.mutable.Well512.fromSeed(ints16)
 
   @inline final def nextLen = 1000000
 

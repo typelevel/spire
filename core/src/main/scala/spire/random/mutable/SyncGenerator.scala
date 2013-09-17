@@ -1,4 +1,5 @@
 package spire.random
+package mutable
 
 final class SyncGenerator(gen: Generator) extends Generator {
   def copy: SyncGenerator = new SyncGenerator(gen.copy)

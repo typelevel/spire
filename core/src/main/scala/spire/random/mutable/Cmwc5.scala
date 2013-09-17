@@ -1,4 +1,5 @@
 package spire.random
+package mutable
 
 import java.nio.ByteBuffer
 import java.util.Arrays

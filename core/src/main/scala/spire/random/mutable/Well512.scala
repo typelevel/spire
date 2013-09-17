@@ -1,4 +1,7 @@
 package spire.random
+package mutable
+
+import spire.util.Pack
 
 import scala.annotation.tailrec
 
