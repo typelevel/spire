@@ -34,9 +34,7 @@ import spire.matrix.dense._
  *        Q(iLo:iHi, iLo:iHi) = h_{iHi-2} h_{iHi-3} \cdots h_{iLo}.
  *    \]
  *  - the $tau_i$ are stored in `tau`.
- *
- * Reference: subroutine DGEHD2 in LAPACK [1]
- *
+ * *
  * [1] LAPACK Users' Guide.
  *     E Anderson, Z Bai, Christian H. Bischof, S Blackford, J Demmel,
  *     J Dongarra, J Du Croz, A Greenbaum, S Hammarling, A McKenney,
@@ -70,6 +68,10 @@ trait DecompositionLike {
    * This uses an unblocked algorithm and it does not work in-place.
    * Thus this should only be used as a reference implementation for
    * debugging purposes.
+   *
+   * Reference: subroutine DORG2R in LAPACK [1] (this routines is for
+   * QR decomposition but we trivially adapted it to the layout of the
+   * elementary reflectors for the Hessenberg decomposition)
    */
   def transformationWithUnblockedAlgorithm:Matrix = {
     val n = a.dimensions._1
@@ -94,6 +96,8 @@ trait DecompositionLike {
  * Upon completion of each of the featured algorithms, A is overwritten by
  * the Hessenberg matrix H and the essential part of each elementary reflector
  * as specified by trait HessenbergDecompositionLike.
+ *
+ * Reference: subroutine DGEHD2 in LAPACK [1]
  *
  * [1] LAPACK Users' Guide.
  *     E Anderson, Z Bai, Christian H. Bischof, S Blackford, J Demmel,
