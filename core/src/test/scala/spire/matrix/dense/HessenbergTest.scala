@@ -1,27 +1,17 @@
 package spire.matrix.dense.tests
 
 import spire.matrix.dense._
-import spire.matrix.BLAS
 import spire.matrix.Transposition._
 import spire.matrix.UpperOrLower._
-import spire.matrix.NumericPropertiesOfDouble
+import spire.matrix.BLAS
 
 import org.scalatest.FunSuite
 
 trait HessenbergTestLike extends FunSuite
-with NumericPropertiesOfDouble
+with CommonMatrixPropertyTests
 with BLAS.level3.Naive
 {
   val HessenbergDecomposition: Hessenberg.DecompositionLikeCompanion
-
-  val eps = precision
-
-  def normalityGoodness(q:MatrixLike) = {
-    val (m,n) = q.dimensions
-    val d = Matrix.identity(n)
-    syrk(Lower, Transpose, -1.0, q, 1.0, d)
-    d.norm1/(n*eps)
-  }
 
   def decompositionGoodness(a:MatrixLike, q:MatrixLike, h:MatrixLike) = {
     val (m,n) = q.dimensions
@@ -81,7 +71,7 @@ with BLAS.level3.Naive
     val q = hd.transformationWithUnblockedAlgorithm
     val h = hd.reducedMatrix
     // TODO: check that value 20 is what LAPACK nep.in sets by default
-    assert(normalityGoodness(q) < 20)
+    assert(orthogonalityMeasure(q) < 20)
     assert(decompositionGoodness(m0, q, h) < 20)
   }
 }

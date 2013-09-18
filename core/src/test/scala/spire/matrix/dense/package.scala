@@ -46,3 +46,16 @@ extends TestDimensions(nonSpecialDimensions)(gen) {
       a <- generalMatrixSample(m,n).take(matricesPerDimensions)
     } yield a
 }
+
+trait CommonMatrixPropertyTests
+extends BLAS.level3.Interface with NumericPropertiesOfDouble {
+
+  val eps = precision
+
+  def orthogonalityMeasure(q:MatrixLike) = {
+    val (m,n) = q.dimensions
+    val d = Matrix.identity(n)
+    syrk(Lower, Transpose, -1.0, q, 1.0, d)
+    d.norm1/(n*eps)
+  }
+}
