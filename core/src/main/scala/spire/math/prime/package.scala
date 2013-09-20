@@ -126,9 +126,8 @@ package object prime {
     def factor(n: SafeLong): Factors = {
       if (n == 1) {
         Factors.one
-      } else if (n.isProbablePrime(20)) {
-        // TODO: 1-in-1M chance of being wrong. too risky?
-        // maybe we should use 30, i.e. 1-in-1B?
+      } else if (n.isProbablePrime(30)) {
+        // TODO: ~1-in-1B chance of being wrong. too risky?
         Factors(Map(n -> 1), Positive)
       } else if (n % 2 == 0) {
         var x = n / 2
@@ -152,7 +151,6 @@ package object prime {
   private val srand = new java.util.Random
 
   private def rand(n: SafeLong): SafeLong = {
-    //val bits = n.fold(_ => 64, _.bitLength)
     val bits = n.bitLength
     var x = new java.math.BigInteger(bits, srand)
     while (x == 0) x = new java.math.BigInteger(bits, srand)
