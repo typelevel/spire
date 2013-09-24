@@ -53,7 +53,7 @@ with EuclideanNorm
                          0, -1, -3, 1, 2, 1, 0,
                          1, -2, -2, -2, 0, -2, -1,
                          -2, 0, -3, -3, 2, 3, 0)
-    WorkingArea.reserve(7)
+    implicit val work = Scratchpad(vectorLength=7)
     val expected = Matrix(4,7)( 9.5, -8.0, -1.5, 4.5, -1.5, -12.5, -3.0,
                                -10.5, 8.0, -1.5, -3.5, 0.5, 11.5, 3.0,
                                -20.0, 16.0, 1.0, -11.0, -3.0, 19.0, 5.0,
@@ -70,7 +70,7 @@ with EuclideanNorm
                          -3, -3, -2, -1, -3, 0, 3,
                          -3, 0, 0, -2, -3, 2, -2,
                           3, 1, 3, 1, 1, 0, 0)
-    WorkingArea.reserve(4)
+    implicit val work = Scratchpad(vectorLength=4)
     val expected = Matrix(4,7)(21.75, 45.5, -68.25, -44.5, -1.0, -45.5, -73.25,
                                9.5, 22.0, -39.5, -26.0, -3.0, -25.0, -34.5,
                                -6.75, -7.5, 11.25, 5.5, -3.0, 9.5, 9.25,
@@ -89,7 +89,7 @@ with EuclideanNorm
     val tau = 1.5
     val h = ElementaryReflector(tau, v)
 
-    WorkingArea.reserve(math.max(m0.dimensions._1, m0.dimensions._2))
+    implicit val work = Scratchpad(vectorLength = m0.dimensions._1)
 
     val m1 = m0.copyToMatrix
     val v1 = Vector(3, 0, 0, 0, 0)

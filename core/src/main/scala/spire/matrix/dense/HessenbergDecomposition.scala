@@ -73,7 +73,8 @@ trait DecompositionLike {
    * QR decomposition but we trivially adapted it to the layout of the
    * elementary reflectors for the Hessenberg decomposition)
    */
-  def transformationWithUnblockedAlgorithm:Matrix = {
+  def transformationWithUnblockedAlgorithm(implicit work:Scratchpad):Matrix =
+  {
     val n = a.dimensions._1
     val result = Matrix.empty(n, n)
 
@@ -113,9 +114,6 @@ trait DecompositionLikeCompanion {
 
   def apply(a:Matrix, iLo:Int, iHi:Int, tau:Vector): DecompositionLike
 
-  def optimalWorkingAreaForDecomposeUnblocked(a:MatrixLike) =
-    a.dimensions._1
-
   /**
    * Decompose the n x n matrix A using an unblocked algorithm.
    *
@@ -125,14 +123,13 @@ trait DecompositionLikeCompanion {
    *
    * Reference: subroutine DGEHD2 in LAPACK [1]
    */
-  def withUnblockedAlgorithm(a:Matrix, iLo:Int, iHi:Int): DecompositionLike =
-  {
+  def withUnblockedAlgorithm(a:Matrix)(iLo:Int = 0, iHi:Int = a.dimensions._1)
+                            (implicit work: Scratchpad): DecompositionLike = {
     require(0 <= iLo && iLo < a.dimensions._1)
     require(iLo <= iHi && iHi <= a.dimensions._1)
 
     val n = a.dimensions._1
-    WorkingArea.reserve(optimalWorkingAreaForDecomposeUnblocked(a))
-    val taus = new Vector(iHi-2 - iLo)
+    val taus = Vector.empty(iHi-2 - iLo)
     for(j <- iLo until iHi - 2) {
       val col = a.column(j).block(j+1, iHi)
       val h = ElementaryReflector.annihilateAndConstruct(col)
@@ -143,8 +140,10 @@ trait DecompositionLikeCompanion {
     this(a, iLo, iHi, taus)
   }
 
-  def withUnblockedAlgorithm(a:Matrix): DecompositionLike =
-    withUnblockedAlgorithm(a, 0, a.dimensions._1)
+  /**
+   * The minimum amound of working space needed by the unblocked algorithms
+   */
+  def unblockedMinimumScratchpad(n:Int) = ScratchpadSpecs(vectorLength=n)
 }
 
 class DecompositionWithNaiveBLAS(val a:Matrix,

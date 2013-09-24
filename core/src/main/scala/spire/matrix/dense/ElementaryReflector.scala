@@ -80,7 +80,7 @@ extends BLAS.level2.Interface with BLAS.level1.Interface {
    * Reference: subroutine DLARF in LAPACK [1] (our implementation
    * differs because we do not have the whole vector of the reflector)
    */
-  def applyOnLeft(c:MatrixLike) {
+  def applyOnLeft(c:MatrixLike)(implicit work:Scratchpad) {
     /**
      * Decompose our vector v as
      *
@@ -112,7 +112,7 @@ extends BLAS.level2.Interface with BLAS.level1.Interface {
       val (m,n) = c.dimensions
       val p = vectorNonZeroEndIndex
       val q = c.block(1,p)(0,n).nonZeroColumnsEndIndex
-      val w = WorkingArea.vector(q)
+      val w = work.vector.block(0,q)
       val cb = c.block(1,p)(0,q)
       val cr = c.row(0).block(0,q)
       val vb = essentialPart.block(0,p-1)
@@ -134,7 +134,7 @@ extends BLAS.level2.Interface with BLAS.level1.Interface {
    * Reference: subroutine DLARF in LAPACK [1] (our implementation
    * differs because we do not have the whole vector of the reflector)
    */
-  def applyOnRight(c:MatrixLike) {
+  def applyOnRight(c:MatrixLike)(implicit work:Scratchpad) {
     /**
      * Decompose our vector v as
      *
@@ -164,7 +164,7 @@ extends BLAS.level2.Interface with BLAS.level1.Interface {
       val (m,n) = c.dimensions
       val q = vectorNonZeroEndIndex
       val p = c.block(0,m)(1,q).nonZeroRowsEndIndex
-      val w = WorkingArea.vector(p)
+      val w = work.vector.block(0,p)
       val cb = c.block(0,p)(1,q)
       val cc = c.column(0).block(0,p)
       val vb = essentialPart.block(0,q-1)

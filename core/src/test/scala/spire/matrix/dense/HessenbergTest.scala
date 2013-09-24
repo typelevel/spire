@@ -24,11 +24,15 @@ with BLAS.level3.Naive
   }
 
   test("Generic 3x3 matrix, with or without triangular padding") {
+    implicit val work = new Scratchpad(
+      HessenbergDecomposition.unblockedMinimumScratchpad((3,3))
+      + HessenbergDecomposition.unblockedMinimumScratchpad((8,8)))
+
     // This is not a precision test, just a corner case test
     val m0 = Matrix(3,3)(100, 500, 700,
                          300,   0, 600,
                          400, 300, 100)
-    val h = HessenbergDecomposition.withUnblockedAlgorithm(m0.copyToMatrix)
+    val h = HessenbergDecomposition.withUnblockedAlgorithm(m0.copyToMatrix)()
     expectResult(Matrix(3,3)( 100, -860,   20,
                              -500,  496,  -72,
                                 0,  228, -396))(h.reducedMatrix)
@@ -49,7 +53,7 @@ with BLAS.level3.Naive
     m1.block(5,8)(5,8) := Matrix(3,3)(1, 2, 3,
                                       0, 4, 5,
                                       0, 0, 6)
-    val h1 = HessenbergDecomposition.withUnblockedAlgorithm(m1)
+    val h1 = HessenbergDecomposition.withUnblockedAlgorithm(m1)()
     val expected = Matrix(8,8)(
       1.0, 2.0, -10, 36, -2, -10, -20, -30,
       0.0, 3.0, -40, 78,  4, -40, -50, -60,
@@ -64,10 +68,12 @@ with BLAS.level3.Naive
 
   test("Random 5x5 matrix") {
     val m = Matrix.empty(5,5)
+    implicit val work = new Scratchpad(
+      HessenbergDecomposition.unblockedMinimumScratchpad(m.dimensions))
     val generator = spire.random.Well512.fromTime(0)
     for(k <- 0 until m.length) m(k) = generator.nextDouble(-1.0, 1.0)
     val m0 = m.copyToMatrix
-    val hd = HessenbergDecomposition.withUnblockedAlgorithm(m)
+    val hd = HessenbergDecomposition.withUnblockedAlgorithm(m)()
     val q = hd.transformationWithUnblockedAlgorithm
     val h = hd.reducedMatrix
     // TODO: check that value 20 is what LAPACK nep.in sets by default
