@@ -190,7 +190,7 @@ trait ElementaryReflectorLikeCompanion
   def apply(tau:Double, v:VectorLike): ElementaryReflectorLike
 
   /** The case $tau = 0$. */
-  def identity: ElementaryReflectorLike = this(0, Vector.empty)
+  def identity: ElementaryReflectorLike = this(0, Vector.empty(0))
 
   /**
    * We follow the conventions and notations of LAPACK [1].

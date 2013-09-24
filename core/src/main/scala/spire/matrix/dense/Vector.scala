@@ -1,13 +1,11 @@
 package spire.matrix.dense
 import spire.matrix.Constants._
+import scala.collection.mutable
 
 /**
  * Simple vector abstraction
  */
-trait VectorLike extends IndexedSeq[Double] {
-  def apply(i:Int): Double
-  def update(i:Int, value:Double)
-  val length: Int
+trait VectorLike extends mutable.IndexedSeq[Double] {
 
   /**
    * The block V(first:end)
@@ -20,7 +18,7 @@ trait VectorLike extends IndexedSeq[Double] {
 
   def isZero = find(_ != 0) == None
 
-  def copyToVector = new Vector(length, this.toArray)
+  def copyToVector = new Vector(this.toArray)
 
   override def toString =
     this.map("%10.3g" format _).mkString("[", ", ", "]")
@@ -29,12 +27,10 @@ trait VectorLike extends IndexedSeq[Double] {
 /**
  * A vector actually allocating elements
  */
-class Vector(val length:Int, itsElements:Traversable[Double] = null)
+class Vector(elems:Array[Double])
 extends VectorLike {
-  require(itsElements == null || itsElements.size == length)
 
-  protected var elems = if(itsElements != null) itsElements.toArray
-                        else new Array[Double](length)
+  def length = elems.size
 
   def apply(i:Int): Double = elems(i)
 
@@ -47,11 +43,11 @@ extends VectorLike {
 
 /** Vector companion object */
 object Vector {
-  def apply(elements:Double*) = new Vector(elements.size, elements)
+  def apply(elements:Double*) = new Vector(elements.toArray)
 
-  def zero(length:Int) = new Vector(length)
+  def zero(length:Int) = new Vector(new Array[Double](length))
 
-  lazy val empty = new Vector(0)
+  def empty(length:Int) = zero(length)
 }
 
 /**
