@@ -63,7 +63,17 @@ extends BLAS.level2.Interface with BLAS.level1.Interface {
   /**
    * The position after which the vector v has only zero elements.
    *
-   * i.e. if $v = (1 v_1 \cdots v_{p-1} 0 \cdots 0)^T$,
+   * i.e. if
+   * <pre>
+   *   v = [ 1      ]
+   *       [ v(1)   ]
+   *       [ ...    ]
+   *       [ v(p-1) ]
+   *       [ 0      ]
+   *       [ ...    ]
+   *       [ 0      ]
+   * </pre>
+   *
    * then this is p
    */
   val vectorNonZeroEndIndex: Int =
@@ -195,25 +205,30 @@ trait ElementaryReflectorLikeCompanion
   /**
    * We follow the conventions and notations of LAPACK [1].
    *
-   * Given a vector $y=\C{\alpha}{x}$ of size n, where $\alpha$ is a scalar,
-   * and therefore $x$ is a vector of size n-1, we seek the elementary
-   * reflector H such that
-   * \[
-   *      H \C{\alpha}{x} = \C{\beta}{0}
-   * \]
+   * Given a vector
+   * <pre>
+   *   y = [ α ]
+   *       [ x ]
+   * </pre>
+   * of size n, where α is a scalar, and therefore x is a vector of size n-1,
+   * we seek the elementary reflector H such that
+   * <pre>
+   *      H [ α ] = [ β ]
+   *        [ x ]   [ 0 ]
+   * </pre>
    *
-   * where $\beta$ is a scalar. The solution is represented as
-   * \[
-   *     H = I - \tau \C{1}{v} \R{1}{v^T}
-   * \]
+   * where β is a scalar. The solution is represented as
+   * <pre>
+   *     H = I - τ [ 1 ] [ 1 v^T^]
+   *               [ v ]
+   * </pre>
    *
-   * where $\tau$ is a scalar and $v$ is a vector of size n-1 called
+   * where τ is a scalar and v is a vector of size n-1 called
    * the essential part of the elementary reflector.
    *
-   * If $x=0$, then $\tau=0$ and therefore $H=I$, otherwise $1 <= \tau <= 2$.
+   * If x=0, then τ=0 and therefore H=I, otherwise 1 ≤ τ ≤ 2.
    *
-   * The construction is done in-place, as vector $y$ get overwritten
-   * by $\C{\beta}{v}$
+   * The construction is done in-place, leaving y(0) = β and y(1:n) = v
    *
    * Reference: subroutine DLARFG in LAPACK [1]
    *
