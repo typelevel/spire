@@ -220,7 +220,11 @@ trigonometry functions are used).
 
 #### Number
 
-TODO
+This is a boxed number type that approximates the semantics of numbers in a
+dynamically-typed numeric tower (like Scheme or Python). There are four
+subtypes of `Number`, based on `SafeLong`, `Double`, `BigDecimal`, and
+`Rational`. Combining two numbers will always return a number of the highest
+precision.
 
 #### Interval
 
