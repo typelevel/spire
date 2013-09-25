@@ -181,6 +181,42 @@ class MatrixTest extends FunSuite {
     expectResult(5) { m.normFrobenius }
   }
 
+  test("diagonal") {
+    val m = Matrix(3,5)(11, 12, 13, 14, 15,
+                        21, 22, 23, 24, 25,
+                        31, 32, 33, 34, 35)
+    expectResult(31 :: Nil) { m.diagonalOfOrder(-2).toList }
+    expectResult(21 :: 32 :: Nil) { m.diagonalOfOrder(-1).toList }
+    expectResult(11 :: 22 :: 33 :: Nil) { m.diagonal.toList }
+    expectResult(12 :: 23 :: 34 :: Nil) { m.diagonalOfOrder(1).toList }
+    expectResult(13 :: 24 :: 35 :: Nil) { m.diagonalOfOrder(2).toList }
+    expectResult(14 :: 25 :: Nil) { m.diagonalOfOrder(3).toList }
+    expectResult(15 :: Nil) { m.diagonalOfOrder(4).toList }
+
+    val m1 = Matrix(5,4)(11, 12, 13, 14,
+                         21, 22, 23, 24,
+                         31, 32, 33, 34,
+                         41, 42, 43, 44,
+                         51, 52, 53, 54)
+    expectResult(51 :: Nil) { m1.diagonalOfOrder(-4).toList }
+    expectResult(41 :: 52 :: Nil) { m1.diagonalOfOrder(-3).toList }
+    expectResult(31 :: 42 :: 53 :: Nil) { m1.diagonalOfOrder(-2).toList }
+    expectResult(21 :: 32 :: 43 :: 54 :: Nil) { m1.diagonalOfOrder(-1).toList }
+    expectResult(11 :: 22 :: 33 :: 44 :: Nil) { m1.diagonalOfOrder(0).toList }
+    expectResult(12 :: 23 :: 34 :: Nil) { m1.diagonalOfOrder(1).toList }
+    expectResult(13 :: 24 :: Nil) { m1.diagonalOfOrder(2).toList }
+    expectResult(14 :: Nil) { m1.diagonalOfOrder(3).toList }
+
+    val m2 = Matrix(3,3)(11, 12, 13,
+                         21, 22, 23,
+                         31, 32, 33)
+    expectResult(31 :: Nil) { m2.diagonalOfOrder(-2).toList }
+    expectResult(21 :: 32 :: Nil) { m2.diagonalOfOrder(-1).toList }
+    expectResult(11 :: 22 :: 33 :: Nil) { m2.diagonalOfOrder(0).toList }
+    expectResult(12 :: 23 :: Nil) { m2.diagonalOfOrder(1).toList }
+    expectResult(13 :: Nil) { m2.diagonalOfOrder(2).toList }
+  }
+
   test("string conversion") {
     val a = Matrix(2,3)(1, 2, 3,
       4, 5, 6)

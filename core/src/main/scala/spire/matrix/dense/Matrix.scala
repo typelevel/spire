@@ -6,9 +6,9 @@
  */
 package spire.matrix.dense
 
-import scala.math.sqrt
 import spire.implicits._
 import spire.matrix.Constants._
+import scala.math
 
 /**
  * Common features to all dense matrices
@@ -145,6 +145,17 @@ trait MatrixLike extends Iterable[Double] {
     new  MatrixStrides(this, i, m, n)
   }
 
+  /** k-th diagonal */
+  def diagonalOfOrder(k:Int = 0) =
+    new MatrixStrides(this,
+                      first  = if(k >= 0) (0, k) else (-k, 0),
+                      step   = m+1,
+                      length = if(k >= 0) math.min(m, n-k)
+                               else       math.min(n, m+k))
+
+  /** main diagonal */
+  def diagonal = diagonalOfOrder(0)
+
   /**
    * The open-ended upper end of the sequence of non-zero columns
    *
@@ -245,7 +256,7 @@ trait MatrixLike extends Iterable[Double] {
 
   /** The Frobenius norm, $\left( \sum_i \sum_j a_{ij}^2 \right)^\frac{1}{2}$
     */
-  def normFrobenius: Double = sqrt(this.map((e) => e*e).sum)
+  def normFrobenius: Double = math.sqrt(this.map((e) => e*e).sum)
 
   /** The transpose of this matrix */
   def transposed: Matrix = {
@@ -253,6 +264,9 @@ trait MatrixLike extends Iterable[Double] {
     for(i <- 0 until m; j <- 0 until n) result(j,i) = this(i,j)
     result
   }
+
+  /** Sum of the diagonal elements */
+  def trace = diagonal.sum
 
   /** A tabulated display of the matrix
    *
