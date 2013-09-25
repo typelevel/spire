@@ -112,15 +112,8 @@ trait MatrixLike extends Iterable[Double] {
   /** k-th element, assuming column-major layout */
   def apply(k:Int): Double
 
-  /** Swap the k-th and the l-th element */
-  @inline final def swap(k1: Int, k2: Int): Unit = {
-    val tmp = this(k1)
-    this(k1) = this(k2)
-    this(k2) = tmp
-  }
-
   /** Swap the (i,j) and the (k,l) elements */
-  @inline final def swap(i1:Int, j1:Int, i2:Int, j2:Int): Unit = {
+  @inline final def swap(i1:Int, j1:Int)(i2:Int, j2:Int): Unit = {
     val k1 = j1 * m + i1
     val k2 = j2 * m + i2
     val tmp = this(k1)

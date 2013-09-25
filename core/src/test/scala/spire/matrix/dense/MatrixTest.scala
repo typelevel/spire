@@ -16,7 +16,7 @@ class MatrixTest extends FunSuite {
     expectResult(11){ m(0,0) }
     expectResult(23){ m(1,2) }
 
-    m.swap(0,1, 1,2)
+    m.swap(0,1)(1,2)
     expectResult(Matrix(2,3)(11, 23, 13,
       21, 22, 12)) { m }
   }
