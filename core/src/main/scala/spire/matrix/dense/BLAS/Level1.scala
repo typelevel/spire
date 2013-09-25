@@ -48,11 +48,11 @@ trait Interface {
 
 trait Naive extends Interface {
   def scale(alpha: Double, x: VectorLike): Unit =
-    cfor(0)(_ < x.length, _ + 1) { k => x(k) *= alpha }
+    cforRange(0 until x.length) { k => x(k) *= alpha }
 
   def copy(x: VectorLike, y: VectorLike): Unit =
-    cfor(0)(_ < x.length, _ + 1) { k => y(k) = x(k) }
+    cforRange(0 until x.length) { k => y(k) = x(k) }
 
   def axpy(alpha: Double, x: VectorLike, y: VectorLike): Unit =
-    cfor(0)(_ < x.length, _ + 1) { k => y(k) += alpha * x(k) }
+    cforRange(0 until x.length) { k => y(k) += alpha * x(k) }
 }

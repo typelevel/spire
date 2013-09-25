@@ -448,7 +448,7 @@ final case class Matrix(m: Int, n: Int, elems: Array[Double]) extends MatrixLike
   def permuteFromRowMajorToColumnMajor() = {
     /* In term of transposition, the target is a matrix of dimension (n,m),
        hence the fact that m and n are swapped compared to [1] */
-    cfor(1)(_ < length - 2, _ + 1) { k =>
+    cforRange(1 until length - 2) { k =>
       var kn = (k % m)*n + k/m
       while(kn < k) kn = (kn % m)*n + kn/m
 
@@ -498,7 +498,7 @@ object Matrix {
 
   def identity(m: Int): Matrix = {
     val arr = new Array[Double](m * m)
-    cfor(0)(_ < arr.length, _ + m + 1) { i => arr(i) = 1.0 }
+    cforRange(0 until arr.length by m+1) { i => arr(i) = 1.0 }
     Matrix(m, m, arr)
   }
 
@@ -522,10 +522,8 @@ object Matrix {
       if (row.length != m) throw new IllegalArgumentException()
     }
     val arr = new Array[Double](m * n)
-    cfor(0)(_ < n, _ + 1) { j =>
-      cfor(0)(_ < m, _ + 1) { i =>
-        arr(j * m + i) = rows(j)(i)
-      }
+    cforRange2(0 until n, 0 until m) { (j, i) =>
+      arr(j * m + i) = rows(j)(i)
     }
     Matrix(m, n, arr)
   }

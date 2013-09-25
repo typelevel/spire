@@ -66,24 +66,24 @@ trait Naive extends Interface {
 
     // y := beta y
     if(beta == 0)
-      cfor(0)(_ < y.length, _ + 1) { i => y(i) = 0 }
+      cforRange(0 until y.length) { i => y(i) = 0 }
     else if(beta != 1)
-      cfor(0)(_ < y.length, _ + 1) { i => y(i) *= beta }
+      cforRange(0 until y.length) { i => y(i) *= beta }
 
     // y += alpha op(A) x
     if(alpha != 0) {
       val (m, n) = a.dimensions
       if(trans == NoTranspose) {
-        cfor(0)(_ < n, _ + 1) { j =>
+        cforRange(0 until n) { j =>
           if (x(j) != 0) {
             val t = alpha * x(j)
-            cfor(0)(_ < m, _ + 1) { i => y(i) += t * a(i,j) }
+            cforRange(0 until m) { i => y(i) += t * a(i,j) }
           }
         }
       } else {
-        cfor(0)(_ < n, _ + 1) { j =>
+        cforRange(0 until n) { j =>
           var t = 0.0
-          cfor(0)(_ < m, _ + 1) { i => t += a(i, j) * x(i) }
+          cforRange(0 until m) { i => t += a(i, j) * x(i) }
           y(j) += alpha * t
         }
       }
@@ -93,10 +93,10 @@ trait Naive extends Interface {
   def ger(alpha: Double, x: VectorLike, y: VectorLike, a: MatrixLike): Unit = {
     require((x.length, y.length) == a.dimensions)
 
-    cfor(0)(_ < y.length, _ + 1) { j =>
+    cforRange(0 until y.length) { j =>
       if (y(j) != 0) {
         val t = alpha * y(j)
-        cfor(0)(_ < x.length, _ + 1) { i => a(i, j) += x(i) * t }
+        cforRange(0 until x.length) { i => a(i, j) += x(i) * t }
       }
     }
   }

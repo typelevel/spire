@@ -256,7 +256,7 @@ trait ElementaryReflectorLikeCompanion
 
         // Comment verbatim from LAPACK code:
         // if alpha is subnormal, it may lose relative accuracy
-        for(i <- 1 to count) beta *= safeMin
+        cforRange(1 to count) { k => beta *= safeMin }
 
         // get results out
         y(0) = beta

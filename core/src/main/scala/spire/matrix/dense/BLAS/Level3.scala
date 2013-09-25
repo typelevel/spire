@@ -22,6 +22,8 @@
  */
 package spire.matrix.BLAS.level3
 
+import spire.syntax.cfor._
+
 import spire.matrix.dense.MatrixLike
 import spire.matrix.BLAS._
 import Transposition._
@@ -81,9 +83,9 @@ trait Naive extends Interface {
     // trivial cases
     if(alpha == 0) {
       if(beta == 0)
-        for(j <- 0 until n; i <-0 until m) c(i,j) = 0
+        cforRange2(0 until n, 0 until m) { (j,i) => c(i,j) = 0 }
       else if(beta != 1)
-        for(j <- 0 until n; i <- 0 until m) c(i,j) *= beta
+        cforRange2(0 until n, 0 until m) { (j,i) => c(i,j) *= beta }
       return
     }
 
@@ -91,24 +93,24 @@ trait Naive extends Interface {
     if (transB == NoTranspose) {
       if(transA == NoTranspose) {
         // (I) C := alpha A B + beta C
-        for(j <- 0 until n) {
+        cforRange(0 until n) { j =>
           if(beta == 0)
-            for(i <- 0 until m) c(i,j) = 0
+            cforRange(0 until m) { i => c(i,j) = 0 }
           else if(beta != 1)
-            for(i <- 0 until m) c(i,j) *= beta
-          for(l <- 0 until k) {
+            cforRange(0 until m) { i => c(i,j) *= beta }
+          cforRange(0 until k) { l =>
             if(b(l,j) != 0) {
               val t = alpha*b(l,j)
-              for(i <- 0 until m) c(i,j) += t*a(i,l)
+              cforRange(0 until m) { i => c(i,j) += t*a(i,l) }
             }
           }
         }
       }
       else {
         // (II) C := alpha A^T B + beta C
-        for(j <- 0 until n; i <- 0 until m) {
+        cforRange2(0 until n, 0 until m) { (j, i) =>
           var t = 0.0
-          for(l <- 0 until k) t += a(l,i)*b(l,j)
+          cforRange(0 until k) { l => t += a(l,i)*b(l,j) }
           if(beta == 0) c(i,j) = alpha*t
           else          c(i,j) = alpha*t + beta*c(i,j)
         }
@@ -118,15 +120,15 @@ trait Naive extends Interface {
       if(transA == NoTranspose) {
         // (III) alpha A B^T + beta C,
         // same as (I) except that b(l,j) becomes b(j,l)
-        for(j <- 0 until n) {
+        cforRange(0 until n) { j =>
           if(beta == 0)
-            for(i <- 0 until m) c(i,j) = 0
+            cforRange(0 until m) { i => c(i,j) = 0 }
           else if(beta != 1)
-            for(i <- 0 until m) c(i,j) *= beta
-          for(l <- 0 until k) {
+            cforRange(0 until m) { i => c(i,j) *= beta }
+          cforRange(0 until k) { l =>
             if(b(j,l) != 0) {
               val t = alpha*b(j,l)
-              for(i <- 0 until m) c(i,j) += t*a(i,l)
+              cforRange(0 until m) { i => c(i,j) += t*a(i,l) }
             }
           }
         }
@@ -134,9 +136,9 @@ trait Naive extends Interface {
       else {
         // (IV) alpha A^T B^T + beta C,
         // same as (II) except that b(l,j) becomes b(j,l)
-        for(j <- 0 until n; i <- 0 until m) {
+        cforRange2(0 until n, 0 until m) { (j, i) =>
           var t = 0.0
-          for(l <- 0 until k) t += a(l,i)*b(j,l)
+          cforRange(0 until k) { l => t += a(l,i)*b(j,l) }
           if(beta == 0) c(i,j) = alpha*t
           else          c(i,j) = alpha*t + beta*c(i,j)
         }
