@@ -7,3 +7,7 @@ object Transposition extends Enumeration {
 object UpperOrLower extends Enumeration {
   val Upper, Lower = Value
 }
+
+object Sides extends Enumeration {
+  val fromLeft, fromRight, Congruent = Value
+}
