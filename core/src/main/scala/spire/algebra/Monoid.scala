@@ -27,3 +27,16 @@ object Monoid {
    */
   @inline final def multiplicative[A](implicit A: MultiplicativeMonoid[A]) = A.multiplicative
 }
+
+/**
+ * CMonoid represents a commutative monoid.
+ * 
+ * A monoid is commutative if for all x and y, x |+| y === y |+| x.
+ */
+trait CMonoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Monoid[A]
+
+object CMonoid {
+  @inline final def apply[A](implicit ev: CMonoid[A]): CMonoid[A] = ev
+  @inline final def additive[A](implicit A: AdditiveCMonoid[A]): CMonoid[A] =  A.additive
+  @inline final def multiplicative[A](implicit A: MultiplicativeCMonoid[A]): CMonoid[A] = A.multiplicative
+}

@@ -21,10 +21,8 @@ object MetricSpace extends MetricSpace0 {
    * to `tolerance`.
    */
   def closeTo[V, @spec(Int,Long,Float,Double) R](x: V, y: V, tolerance: Double)(implicit
-      R: IsReal[R], metric: MetricSpace[V, R]): Boolean = {
-    val d = R.toDouble(metric.distance(x, y))
-    d <= tolerance
-  }
+      R: IsReal[R], metric: MetricSpace[V, R]): Boolean =
+    R.toDouble(metric.distance(x, y)) <= tolerance
 }
 
 private[algebra] trait MetricSpace0 {

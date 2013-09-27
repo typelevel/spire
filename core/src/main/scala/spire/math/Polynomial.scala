@@ -50,20 +50,21 @@ object Polynomial extends PolynomialInstances {
 
   def apply(s: String): Polynomial[Rational] = parse(s)
 
-  def zero[@spec(Double) C: Eq: Semiring: ClassTag] = PolySparse.zero[C]
-  def constant[@spec(Double) C: Eq: Semiring: ClassTag](c: C) =
+  def zero[@spec(Double) C: Eq: Semiring: ClassTag]: Polynomial[C] =
+    PolySparse.zero[C]
+  def constant[@spec(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map(0 -> c))
-  def linear[@spec(Double) C: Eq: Semiring: ClassTag](c: C) =
+  def linear[@spec(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map(1 -> c))
-  def quadratic[@spec(Double) C: Eq: Semiring: ClassTag](c: C) =
+  def quadratic[@spec(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map(2 -> c))
-  def cubic[@spec(Double) C: Eq: Semiring: ClassTag](c: C) =
+  def cubic[@spec(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map(3 -> c))
-  def one[@spec(Double) C: Eq: Rig: ClassTag] =
+  def one[@spec(Double) C: Eq: Rig: ClassTag]: Polynomial[C] =
     constant(Rig[C].one)
-  def x[@spec(Double) C: Eq: Rig: ClassTag] =
+  def x[@spec(Double) C: Eq: Rig: ClassTag]: Polynomial[C] =
     linear(Rig[C].one)
-  def twox[@spec(Double) C: Eq: Rig: ClassTag] =
+  def twox[@spec(Double) C: Eq: Rig: ClassTag]: Polynomial[C] =
     linear(Rig[C].one + Rig[C].one)
 
   private[this] val termRe = "([0-9]+\\.[0-9]+|[0-9]+/[0-9]+|[0-9]+)?(?:([a-z])(?:\\^([0-9]+))?)?".r
@@ -124,8 +125,22 @@ object Polynomial extends PolynomialInstances {
     }
     (es.result(), cs.result())
   }
-}
 
+  def interpolate[C: Field: Eq: ClassTag](points: (C, C)*): Polynomial[C] = {
+    def loop(p: Polynomial[C], xs: List[C], pts: List[(C, C)]): Polynomial[C] =
+      pts match {
+        case Nil =>
+          p
+        case (x, y) :: tail =>
+          val c = Polynomial.constant((y - p(x)) / xs.map(x - _).qproduct)
+          val prod = xs.foldLeft(Polynomial.one[C]) { (prod, xn) =>
+            prod * (Polynomial.x[C] - constant(xn))
+          }
+          loop(p + c * prod, x :: xs, tail)
+      }
+    loop(Polynomial.zero[C], Nil, points.toList)
+  }
+}
 
 trait Polynomial[@spec(Double) C] { lhs =>
   implicit def ct: ClassTag[C]

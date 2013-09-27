@@ -14,7 +14,7 @@ import scala.{specialized => spec}
  */
 
 trait Numeric[@spec(Int,Long,Float,Double) A] extends Ring[A]
-with AdditiveAbGroup[A] with MultiplicativeGroup[A] with NRoot[A]
+with AdditiveAbGroup[A] with MultiplicativeAbGroup[A] with NRoot[A]
 with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A]
 
 object Numeric {
