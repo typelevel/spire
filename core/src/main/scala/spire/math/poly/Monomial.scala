@@ -44,19 +44,13 @@ case class Monomial[@spec(Float, Double) C](variables: List[Term[C]]) { lhs =>
   override def toString = {
     import Monomial._
 
-    def expString(variableLetter: String, exp: Int) = exp match {
-      case 0 => ""
-      case 1 => s"$variableLetter"
-      case _ => s"$variableLetter^$exp"
-    }
+    // def expString(variableLetter: String, exp: Int) = exp match {
+    //   case 0 => ""
+    //   case 1 => s"$variableLetter"
+    //   case _ => s"$variableLetter^$exp"
+    // }
 
-    
-
-
-
-
-
-
+    ("^" :: variables.foldLeft(",^")(_.toString + _.toString).toList).toString
   }
 
 }
@@ -67,10 +61,10 @@ object Monomial {
   }
 
   def apply[@spec(Float, Double) C](coeff: C, exps: List[Int])
-                                   (implicit r: Semiring[C]): Monomial[C] =
+                                   (implicit r: Rig[C]): Monomial[C] =
     Monomial(Term(coeff, exps.head) :: exps.tail.map(e => Term(r.one, e)))
 
-  def zero[@spec(Float, Double) C](implicit r: Semiring[C]): Monomial[C] =
+  def zero[@spec(Float, Double) C](implicit r: Rig[C]): Monomial[C] =
     Monomial(r.zero, List(0))
   
   def one[@spec(Float, Double) C](implicit r: Rig[C]): Monomial[C] = 
