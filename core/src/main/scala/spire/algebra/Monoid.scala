@@ -1,7 +1,6 @@
 package spire.algebra
 
 import scala.{ specialized => spec }
-import scala.annotation.{ switch, tailrec }
 
 /**
  * A monoid is a semigroup with an identity. A monoid is a specialization of a
@@ -32,16 +31,9 @@ object Monoid {
    * Return `a` appended to itself `n` times.
    */
   final def sumn[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A](a: A, n: Int)(implicit A: Monoid[A]): A = {
-    @tailrec def loop(b: A, k: Int, extra: A): A = {
-      (k: @annotation.switch) match {
-        case 0 => b
-        case 1 => A.op(b, extra)
-        case n =>
-          loop(A.op(b, b), k >>> 1, if (k % 2 == 1) A.op(b, extra) else extra)
-      }
-    }
-
-    loop(a, n, A.id)
+    if (n > 0) Semigroup.sumn(a, n)
+    else if (n == 0) A.id
+    else throw new IllegalArgumentException("Repeated summation for monoids must have reptitions >= 0")
   }
 }
 
