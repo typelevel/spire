@@ -31,3 +31,12 @@ private[algebra] trait IdentityModule[@spec(Int,Long,Float,Double) V] extends Mo
 
   def timesl(r: V, v: V): V = scalar.times(r, v)
 }
+
+final case class ZModule[V](vector: Group[V]) extends Module[V, Int] {
+  def scalar = spire.std.int.IntAlgebra
+
+  def zero: V = vector.id
+  def negate(v: V): V = vector.inverse(v)
+  def plus(v: V, w: V): V = vector.op(v, w)
+  def timesl(k: Int, v: V): V = Group.sumn(v, k)(vector)
+}
