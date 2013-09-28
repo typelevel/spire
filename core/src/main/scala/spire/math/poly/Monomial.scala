@@ -50,7 +50,8 @@ case class Monomial[@spec(Float, Double) C](variables: List[Term[C]]) { lhs =>
     //   case _ => s"$variableLetter^$exp"
     // }
 
-    ("^" :: variables.foldLeft(",^")(_.toString + _.toString).toList).toString
+    variables.mkString("") // outputting the Terms (but each one is basically just a different variable..)
+    // e.g. x y z...
   }
 
 }
