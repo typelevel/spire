@@ -6,11 +6,11 @@ import scala.{specialized => spec}
 import spire.algebra._
 import spire.implicits._
 import spire.math._
-import spire.syntax._
 
 
 // A monomial is the product of a coefficient and a list of variables each to a non-negative integer power.
-case class Monomial[@spec(Float, Double) C: ClassTag](coeff: C, exps: Array[Int]) { lhs =>
+case class Monomial[@spec(Float, Double) C](coeff: C, exps: Array[Int])
+                                           (implicit val ct: ClassTag[C]) { lhs =>
 
   def eval(vars: Array[C])(implicit r: Semiring[C]): C = {
     var prod = coeff
@@ -18,7 +18,8 @@ case class Monomial[@spec(Float, Double) C: ClassTag](coeff: C, exps: Array[Int]
     prod
   }
 
-  def unary_-(implicit r: Rng[C]): Monomial[C] = Monomial(-coeff, exps)
+  def unary_-(implicit r: Rng[C]): Monomial[C] = 
+    Monomial(-coeff, exps)
 
   def +(rhs: Monomial[C])(implicit r: Semiring[C], eq: Eq[C]): Monomial[C] = {
     if (lhs.exps === rhs.exps)
@@ -36,29 +37,21 @@ case class Monomial[@spec(Float, Double) C: ClassTag](coeff: C, exps: Array[Int]
     coeff === r.zero
 
   def divideBy(x: C)(implicit f: Field[C]): Monomial[C] =
-    Monomial(coeff / c, lhs.exps)
+    Monomial(coeff / x, lhs.exps)
 
-}
-
-  override def toString = {
-    import Monomial._
-
-    // TODO: Figure out how to print these monomials!
-
-  }
+  // override def toString = {
+  //   import Monomial._
+  //   // TODO: Figure out how to print these monomials!
+  // }
 
 }
 
 object Monomial {
 
-  def apply[@spec(Float, Double) C](coeff: C, exps: Array[Int])
-                                   (implicit r: Rig[C]): Monomial[C] =
-    Monomial(coeff, exps)
-
-  def zero[@spec(Float, Double) C](implicit r: Rig[C]): Monomial[C] =
+  def zero[@spec(Float, Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] =
     Monomial(r.zero, Array(0))
   
-  def one[@spec(Float, Double) C](implicit r: Rig[C]): Monomial[C] = 
+  def one[@spec(Float, Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] = 
     Monomial(r.one, Array(1))
 
   private val IsZero = "0".r
