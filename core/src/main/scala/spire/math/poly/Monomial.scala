@@ -1,76 +1,78 @@
 package spire.math.poly
 
 import compat._
-import spire.math._
+import scala.reflect._
+import scala.{specialized => spec}
 import spire.algebra._
 import spire.implicits._
+import spire.math._
 import spire.syntax._
 
-import scala.{specialized => spec}
 
-// A monomial is a list of terms (the head containing the coefficient, the tail containing the variables - all with coefficients == one)
-case class Monomial[@spec(Float, Double) C](variables: List[Term[C]]) { lhs =>
+// A monomial is the product of a coefficient and a list of variables each to a non-negative integer power.
+case class Monomial[@spec(Float, Double) C: ClassTag](coeff: C, exps: Array[Int]) { lhs =>
 
-  // should have a check of length match here...
-  def eval(vars: List[C])(implicit r: Ring[C]): C = 
-    (variables.head.eval(vars.head) :: variables.tail.zip(vars.tail).map({ 
-      case (t, v) => t.eval(v) })).qproduct
+  def eval(vars: Array[C])(implicit r: Semiring[C]): C = {
+    var prod = coeff
+    cfor(0)(_ < exps.length , _ + 1) { i => prod *= (vars(i) ** exps(i)) }
+    prod
+  }
 
-  def unary_-(implicit r: Rng[C]): Monomial[C] = Monomial(-variables.head :: variables.tail)
+  def unary_-(implicit r: Rng[C]): Monomial[C] = Monomial(-coeff, exps)
 
-  def +(rhs: Monomial[C])(implicit r: Semiring[C]): Monomial[C] = {
-    if (lhs.variables.length != rhs.variables.length && lhs.variables.zip(rhs.variables).forall(z => z._1.exp == z._2.exp))
+  def +(rhs: Monomial[C])(implicit r: Semiring[C], eq: Eq[C]): Monomial[C] = {
+    if (lhs.exps === rhs.exps)
       throw new IllegalArgumentException(s"can't add monomials with different number of variables or different exponents!")
-    Monomial(lhs.variables.head + rhs.variables.head :: lhs.variables.tail)
+    Monomial(lhs.coeff + rhs.coeff, lhs.exps)
   }
 
   def *(rhs: Monomial[C])(implicit r: Semiring[C]): Monomial[C] = {
-    if (lhs.variables.length != rhs.variables.length)
+    if (lhs.exps.length != rhs.exps.length)
       throw new IllegalArgumentException(s"can't add monomials with different number of variables")
-    Monomial(lhs.variables.zip(rhs.variables).map(z => z._1 * z._2))
+    Monomial(lhs.coeff * rhs.coeff, lhs.exps + rhs.exps)
   }
 
-  def isIndexZero: Boolean = 
-    variables.forall(_.isIndexZero)
-
-  def isZero(implicit ring: Semiring[C], eq: Eq[C]): Boolean =
-    variables.head.isZero
+  def isZero(implicit r: Semiring[C], eq: Eq[C]): Boolean =
+    coeff === r.zero
 
   def divideBy(x: C)(implicit f: Field[C]): Monomial[C] =
-    Monomial(variables.head.divideBy(x) :: variables.tail)
+    Monomial(coeff / c, lhs.exps)
 
-  // TODO: Derivatives with respect to different variables... e.g. d/dx, d/dy or d/dz (is this really necessary though for mvpolys?)
+}
 
   override def toString = {
     import Monomial._
 
-    // def expString(variableLetter: String, exp: Int) = exp match {
-    //   case 0 => ""
-    //   case 1 => s"$variableLetter"
-    //   case _ => s"$variableLetter^$exp"
-    // }
+    // TODO: Figure out how to print these monomials!
 
-    variables.mkString("") // outputting the Terms (but each one is basically just a different variable..)
-    // e.g. x y z...
   }
 
 }
 
 object Monomial {
-  implicit def ordering[C] = new Order[Monomial[C]] {
-    def compare(x: Monomial[C], y: Monomial[C]): Int = x.variables.head.exp compare y.variables.head.exp
-  }
 
-  def apply[@spec(Float, Double) C](coeff: C, exps: List[Int])
+  def apply[@spec(Float, Double) C](coeff: C, exps: Array[Int])
                                    (implicit r: Rig[C]): Monomial[C] =
-    Monomial(Term(coeff, exps.head) :: exps.tail.map(e => Term(r.one, e)))
+    Monomial(coeff, exps)
 
   def zero[@spec(Float, Double) C](implicit r: Rig[C]): Monomial[C] =
-    Monomial(r.zero, List(0))
+    Monomial(r.zero, Array(0))
   
   def one[@spec(Float, Double) C](implicit r: Rig[C]): Monomial[C] = 
-    Monomial(r.one, List(0))
+    Monomial(r.one, Array(1))
 
   private val IsZero = "0".r
   private val IsNegative = "-(.*)".r
 }
+
+
+trait MonomialEq[@spec(Float, Double) C] extends Eq[Monomial[C]] {
+  implicit def scalar: Semiring[C]
+  implicit def eq: Eq[C]
+  implicit def ct: ClassTag[C]
+
+  def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
+    x.exps === y.exps
+}
+
+
