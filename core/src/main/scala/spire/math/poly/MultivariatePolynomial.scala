@@ -1,12 +1,11 @@
 package spire.math.poly
 
 import compat._
+import scala.reflect._
+import scala.{specialized => spec}
 import spire.math._
 import spire.algebra._
-import spire.implicits._
 import spire.syntax._
-
-import scala.{specialized => spec}
 
 
 // Lexicographic ordering
