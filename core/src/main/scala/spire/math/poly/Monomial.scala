@@ -33,16 +33,53 @@ case class Monomial[@spec(Float, Double) C](coeff: C, exps: Array[Int])
     Monomial(lhs.coeff * rhs.coeff, lhs.exps + rhs.exps)
   }
 
+  lazy val degree: Int = {
+    var sum = 0
+    cfor(0)(_ < exps.length , _ + 1) { i => sum += exps(i) }
+    sum
+  }
+
   def isZero(implicit r: Semiring[C], eq: Eq[C]): Boolean =
     coeff === r.zero
 
   def divideBy(x: C)(implicit f: Field[C]): Monomial[C] =
     Monomial(coeff / x, lhs.exps)
 
-  // override def toString = {
-  //   import Monomial._
-  //   // TODO: Figure out how to print these monomials!
-  // }
+  override def toString = {
+    import Monomial._
+
+    def expString(e: Int, strRec: String = "") : String = 
+      if (e < exps.length) {
+        lazy val varStr = e match {
+          case 0 => "x"
+          case 1 => "y"
+          case _ => "z"
+        }
+        exps(e) match {
+          case 0 => expString(e + 1, strRec)
+          case 1 => expString(e + 1, s"$strRec$varStr")
+          case exp => expString(e + 1, s"$strRec$varStr^$exp")
+        }
+      } else strRec
+
+    def simpleCoeff: Option[String] = coeff match {
+      case 0 => Some("")
+      case 1 if exps(0) == 0 => Some(s" + $coeff${expString(0)}")
+      case 1 => Some(s" + ${expString(0)}")
+      case -1 if exps(0) != 0 => Some(s" - ${expString(0)}")
+      case _ => None
+    }
+
+    def stringCoeff: Option[String] = coeff.toString match {
+      case IsZero() => Some("")
+      case IsNegative(posPart) if exps(0) == 0 => Some(s" - $posPart")
+      case IsNegative(posPart) => Some(s" - $posPart${expString(0)}")
+      case _ => None
+    }
+
+    simpleCoeff orElse stringCoeff getOrElse s" + $coeff${expString(0)}"
+
+  }
 
 }
 
