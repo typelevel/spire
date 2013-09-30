@@ -49,9 +49,20 @@ case class Monomial[@spec(Float, Double) C](coeff: C, exps: Array[Int])
   // & if x^0y^0z^2 = 2 (basically the index of the first term with a non-zero exponent) 
   def firstNonZeroVarIndex(a: Array[Int] = lhs.exps): Int = {
     var i = 0
-    while((a(i) <= 0) && (i < a.length)) { i += 1 } 
+    while((i < a.length) && (a(i) <= 0)) { i += 1 } 
     i
   }
+
+  // The leading variable, i.e. if x^0yz^2 = 1
+  // & if x^0y^0z^2 = 2 (basically the exponent of the first non-zero order variable) 
+  def firstNonZeroVarExp(a: Array[Int] = lhs.exps): Int =
+    a(firstNonZeroVarIndex(a))
+
+  def monomialTail: Monomial[C] = {
+    val newExps = new Array[Int](lhs.exps.length - 1)
+    cfor(1)(_ < lhs.exps.length, _ + 1) { i => newExps(i - 1) = exps(i) }
+    Monomial(lhs.coeff, newExps)
+  } 
 
   def divides(rhs: Monomial[C])(implicit f: Field[C], o: Order[C]): Boolean = {
     @tailrec def divides_(l: Array[Int], r: Array[Int]): Boolean = {
@@ -193,7 +204,7 @@ trait MonomialEq[@spec(Float, Double) C] extends Eq[Monomial[C]] {
   implicit def ct: ClassTag[C]
 
   def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
-    x.exps === y.exps
+    x.coeff === y.coeff && x.exps === y.exps
 }
 
 
