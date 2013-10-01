@@ -20,7 +20,7 @@ trait MonomialOrderingLex[@spec(Float, Double) C] extends Order[Monomial[C]] {
       case (false, false) => x.firstNonZeroVarIndex() compare y.firstNonZeroVarIndex() match {
         case -1 => -1
         case 1 => 1
-        case 0 => x.firstNonZeroVarExp() compare y.firstNonZeroVarExp() match {
+        case 0 => x.firstNonZeroVarExp(x.exps) compare y.firstNonZeroVarExp(y.exps) match {
           case -1 => 1
           case 1 => -1
           case 0 => compare(x.monomialTail, y.monomialTail)
