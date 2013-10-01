@@ -29,6 +29,7 @@ trait VectorLike extends mutable.IndexedSeq[Double] {
  */
 class Vector(elems:Array[Double])
 extends VectorLike {
+  def this(n:Int) = this(new Array[Double](n))
 
   def length = elems.size
 
