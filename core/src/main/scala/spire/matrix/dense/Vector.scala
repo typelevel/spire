@@ -25,6 +25,17 @@ trait VectorLike extends mutable.IndexedSeq[Double] {
   }
 
   /**
+   * Reverse elements in-place and return this
+   */
+  def reverseInPlace:VectorLike = {
+    cforRange(0 until length/2) { i =>
+      val j = length - 1 - i
+      val t = this(i); this(i) = this(j); this(j) = t
+    }
+    this
+  }
+
+  /**
    * The block V(first:end)
    *
    * If end is End, then it takes the value length.
