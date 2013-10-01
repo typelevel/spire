@@ -55,7 +55,7 @@ case class Monomial[@spec(Float, Double) C](coeff: C, exps: Array[Int])
 
   // The leading variable, i.e. if x^0yz^2 = 1
   // & if x^0y^0z^2 = 2 (basically the exponent of the first non-zero order variable) 
-  def firstNonZeroVarExp(a: Array[Int] = lhs.exps): Int =
+  def firstNonZeroVarExp(a: Array[Int] = lhs.exps): Int = 
     a(firstNonZeroVarIndex(a))
 
   def monomialTail: Monomial[C] = {
@@ -64,41 +64,48 @@ case class Monomial[@spec(Float, Double) C](coeff: C, exps: Array[Int])
     Monomial(lhs.coeff, newExps)
   } 
 
-  def divides(rhs: Monomial[C])(implicit f: Field[C], o: Order[C]): Boolean = {
-    @tailrec def divides_(l: Array[Int], r: Array[Int]): Boolean = {
-      if(l.isEmpty) true else if(r.isEmpty) false else
-        firstNonZeroVarIndex(l) compare firstNonZeroVarIndex(r) match {
-          case -1 => false
-          case 1 => divides_(l, if(r.tail.isEmpty || r.head == 0) Array() else if(r.tail.isEmpty) Array(r.head) else r.tail)
-          case 0 => if(l(firstNonZeroVarIndex(l)) <= r(firstNonZeroVarIndex(r))) divides_(
-            if(l.tail.isEmpty || l.head == 0) Array() else if(l.tail.isEmpty) Array(l.head) else l.tail,
-            if(r.tail.isEmpty || r.head == 0) Array() else if(r.tail.isEmpty) Array(r.head) else r.tail) else false
+  def divides(rhs: Monomial[C])(implicit o: Order[C]): Boolean =
+    lhs.coeff <= rhs.coeff && lhs.exps.zip(rhs.exps).forall({ case(a,b) => a <= b })
+
+  def gcd(rhs: Monomial[C])(implicit f: Field[C], er: EuclideanRing[C]): Monomial[C] = {
+    val coeffGCD = er.gcd(lhs.coeff, rhs.coeff)
+    def gcd_(l: Array[Int], r: Array[Int]): Monomial[C] = {
+      if (l.length < r.length) {
+        gcd_(r, l)
+      } else {
+        val newExps = new Array[Int](l.length)
+        cfor(0)(_ < r.length, _ + 1) { i =>
+          newExps(i) = min(l(i), r(i))
         }
+        cfor(r.length)(_ < l.length, _ + 1) { i =>
+          newExps(i) = 0
+        }
+        Monomial(coeffGCD, newExps)
+      }
     }
-    lhs.coeff <= rhs.coeff && divides_(lhs.exps, rhs.exps)
+    gcd_(lhs.exps, rhs.exps)
   }
 
-  def gcd(rhs: Monomial[C])(implicit f: Field[C]): Monomial[C] = ???
-  // This Haskell algorithm is outputting the wrong value... hmm 
-  //   @tailrec def gcd_(s: C, zks: List[Int], l: List[Int], r: List[Int]): Monomial[C] = {
-  //     if(l.isEmpty && r.isEmpty) Monomial(s, zks.reverse.toArray) else {
-  //       val i = firstNonZeroVarIndex(l.toArray)
-  //       val j = firstNonZeroVarIndex(r.toArray)
-  //        i compare j match {
-  //         case -1 => gcd_(s, zks, l.tail, r)
-  //         case 1 => gcd_(s, zks, l, r.tail)
-  //         case 0 => {
-  //           val k = min(l(i), r(j))
-  //           gcd_(s + f.fromInt(k), k :: zks, l.tail, r.tail)
-  //         }
-  //       }
-  //     }
-  //   }
-  //   gcd_(f.zero, Nil, lhs.exps.toList, rhs.exps.toList)
-  // }
+  def lcm(rhs: Monomial[C])(implicit f: Field[C], er: EuclideanRing[C]): Monomial[C] = {
+    val coeffLCM = er.lcm(lhs.coeff, rhs.coeff)
+    def lcm_(l: Array[Int], r: Array[Int]): Monomial[C] = {
+      if (l.length < r.length) {
+        lcm_(r, l)
+      } else {
+        val newExps = new Array[Int](l.length)
+        cfor(0)(_ < r.length, _ + 1) { i =>
+          newExps(i) = max(l(i), r(i))
+        }
+        cfor(r.length)(_ < l.length, _ + 1) { i =>
+          newExps(i) = 0
+        }
+        Monomial(coeffLCM, newExps)
+      }
+    }
+    lcm_(lhs.exps, rhs.exps)
+  }
 
-  def lcm(rhs: Monomial[C])(implicit f: Field[C]): Monomial[C] = ???
-
+  // Ugly hack so far, not necessarily that important...
   def coprime(rhs: Monomial[C])(implicit f: Field[C]): Boolean = {
     @tailrec def coprime_(l: Array[Int], r: Array[Int]): Boolean = {
       if(l.isEmpty && r.isEmpty) true else {
@@ -194,6 +201,7 @@ object Monomial {
 
   private val IsZero = "0".r
   private val IsNegative = "-(.*)".r
+
 
 }
 
