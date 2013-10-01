@@ -1,11 +1,28 @@
 package spire.matrix.dense
 import spire.matrix.Constants._
+import spire.syntax.cfor._
+
 import scala.collection.mutable
 
 /**
  * Simple vector abstraction
  */
 trait VectorLike extends mutable.IndexedSeq[Double] {
+
+  /** Assign the elements of other to this */
+  def := (other:VectorLike): Unit = {
+    cforRange(0 until length) { i => this(i) = other(i) }
+  }
+
+  /** Assign the given value to every elements of this */
+  def := (e:Double): Unit = {
+    cforRange(0 until length) { i => this(i) = e }
+  }
+
+  /** Assign the elements produced by the given iterator to this */
+  def :=(other:Iterator[Double]):Unit = {
+    cforRange(0 until length) { i => other.next }
+  }
 
   /**
    * The block V(first:end)
