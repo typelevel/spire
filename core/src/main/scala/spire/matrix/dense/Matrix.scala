@@ -54,7 +54,7 @@ trait MatrixLike extends Iterable[Double] {
   lazy val dimensions = (m,n)
 
   /** Copies dimensions and elements of this matrix to a new matrix */
-  def copyToMatrix = new Matrix(m, n, toArray)
+  def copyToMatrix = new Matrix(m, n)(toArray)
 
   /**
     * Copy the upper diagonal part of this matrix (k-th diagonal)
@@ -127,7 +127,7 @@ trait MatrixLike extends Iterable[Double] {
    */
   def round(d: Int) = {
     val s = 10 pow d
-    Matrix(m, n, map((x:Double) => (x*s).round.toDouble/s).toArray)
+    new Matrix(m, n)(map((x:Double) => (x*s).round.toDouble/s).toArray)
   }
 
   /** Total number of elements */
@@ -412,7 +412,8 @@ class MatrixBlock(private val a:MatrixLike,
  * val a = new Matrix(m, n, elements, given_in_row_major=true)
  * }}}
  */
-final case class Matrix(m: Int, n: Int, elems: Array[Double])
+class Matrix(val m: Int, val n: Int)
+            (val elems: Array[Double] = new Array[Double](m*n))
 extends MatrixLike {
   require(m >= 0)
   require(n >= 0)
@@ -486,7 +487,7 @@ object Matrix {
 
   /** Create a m x n matrix with the given elements listed in row-major order */
   def apply(m: Int, n: Int)(elems: Double*): Matrix = {
-    val matrix = Matrix(m, n, elems.toArray)
+    val matrix = new Matrix(m, n)(elems.toArray)
     matrix.permuteFromRowMajorToColumnMajor()
     matrix
   }
@@ -495,7 +496,7 @@ object Matrix {
   def identity(m: Int): Matrix = {
     val arr = new Array[Double](m * m)
     cforRange(0 until arr.length by m+1) { i => arr(i) = 1.0 }
-    Matrix(m, m, arr)
+    new Matrix(m, m)(arr)
   }
 
   /**
@@ -507,8 +508,10 @@ object Matrix {
   def empty(m:Int, n:Int): Matrix = zero(m, n)
 
   /** Create the zero matrix of dimension m x n */
-  def zero(m:Int, n:Int): Matrix =
-    Matrix(m, n, new Array[Double](m * n))
+  def zero(m:Int, n:Int): Matrix = new Matrix(m, n)()
+
+  /** Create the zero matrix of dimension n x n */
+  def zero(n:Int) = new Matrix(n, n)()
 
   /**
    * Create a matrix from the given string.
@@ -541,6 +544,6 @@ object Matrix {
     cforRange2(0 until n, 0 until m) { (j, i) =>
       arr(j * m + i) = rows(j)(i)
     }
-    Matrix(m, n, arr)
+    new Matrix(m, n)(arr)
   }
 }
