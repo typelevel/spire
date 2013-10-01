@@ -10,7 +10,7 @@ import spire.math._
 
 
 // A monomial is the product of a coefficient and a list of variables each to a non-negative integer power.
-case class Monomial[@spec(Float, Double) C](coeff: C, exps: Array[Int])
+case class Monomial[@spec(Double) C](coeff: C, exps: Array[Int])
                                            (implicit val ct: ClassTag[C]) { lhs =>
   require(exps.forall(_ >= 0), "Monomial variable exponents must be non-negative!")
 
@@ -173,7 +173,6 @@ case class Monomial[@spec(Float, Double) C](coeff: C, exps: Array[Int])
 
     def simpleCoeff: Option[String] = coeff match {
       case 0 => Some("")
-      case 1 if exps(0) == 0 => Some(s" + $coeff${expString(0)}")
       case 1 => Some(s" + ${expString(0)}")
       case -1 if exps(0) != 0 => Some(s" - ${expString(0)}")
       case _ => None
@@ -193,20 +192,19 @@ case class Monomial[@spec(Float, Double) C](coeff: C, exps: Array[Int])
 
 object Monomial {
 
-  def zero[@spec(Float, Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] =
+  def zero[@spec(Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] =
     Monomial(r.zero, Array())
   
-  def one[@spec(Float, Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] = 
+  def one[@spec(Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] = 
     Monomial(r.one, Array(1))
 
   private val IsZero = "0".r
   private val IsNegative = "-(.*)".r
 
-
 }
 
 
-trait MonomialEq[@spec(Float, Double) C] extends Eq[Monomial[C]] {
+trait MonomialEq[@spec(Double) C] extends Eq[Monomial[C]] {
   implicit def scalar: Semiring[C]
   implicit def eq: Eq[C]
   implicit def ct: ClassTag[C]
