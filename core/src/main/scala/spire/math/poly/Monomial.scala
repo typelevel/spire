@@ -78,21 +78,22 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
   override def toString = {
     import Monomial._
 
-    val varStr = variables.map(v => v._2 match {
-      case 0 => ""
-      case 1 => s"${v._1}"
-      case e => s"${v._1}^$e"
-    }).mkString
+    val varStr = vars.map(v => v._2 match {
+        case 0 => ""
+        case 1 => s"${v._1}"
+        case e => s"${v._1}^$e"
+      }).mkString
 
     def simpleCoeff: Option[String] = coeff match {
       case 0 => Some("")
-      case 1 => Some(s" + $varStr")
-      case -1 if variables(0)._2 != 0 => Some(s" - $varStr")
+      case 1 => if(vars.head._2 == 0) Some(s" + $coeff") else Some(s" + $varStr")
+      case -1 => if(vars.head._2 != 0) Some(s" - $coeff") else Some(s" - $varStr")
       case _ => None
     }
 
     def stringCoeff: Option[String] = coeff.toString match {
       case IsZero() => Some("")
+      case IsNegative(posPart) if vars.head._2 == 0 => Some(s" - $posPart")
       case IsNegative(posPart) => Some(s" - $posPart$varStr")
       case _ => None
     }
@@ -102,11 +103,12 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
 
 }
 
+
 object Monomial {
 
-  // Must get rid of zero order variables at instantiation and sort the variables in the Map!
   def apply[@spec(Double) C: ClassTag](c: C, v: (Char, Int)*): Monomial[C] = {
-    val arr = v.filterNot(_._2 == 0).toArray
+    val arr = if(v.length == 1 && v.head._2 == 0) v.toArray 
+      else if(v.forall(_._2 == 0)) v.toArray else v.filterNot(_._2 == 0).toArray
     QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
     Monomial(c, arr.toMap) 
   }
@@ -128,6 +130,7 @@ object Monomial {
   // implicit def grevlexOrdering[C] = new MonomialOrderingGrevlex[C] {}
 
 }
+
 
 // Lexicographic ordering
 // e.g. x^2 < xy < xz < x < y^2 < yz < y < z^2 < z < 1
