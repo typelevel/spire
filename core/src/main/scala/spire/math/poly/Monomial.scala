@@ -9,8 +9,10 @@ import spire.implicits._
 import spire.math._
 
 
-// A monomial is the product of a coefficient and a list of variables (Char as symbol) 
-// each to a non-negative integer power.
+/*  A monomial is the product of a coefficient and a list of variables (Char as symbol) 
+    each to a non-negative integer power.
+*/
+
 case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
                                     (implicit val ct: ClassTag[(Char, Int)]) { lhs =>
 
@@ -113,17 +115,22 @@ object Monomial {
     Monomial(r.zero, Map[Char, Int]())
   
   def one[@spec(Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] = 
+    Monomial(r.one, Map[Char, Int]())
+
+  def x[@spec(Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] = 
     Monomial(r.one, Map('x' -> 1))
 
   private val IsZero = "0".r
   private val IsNegative = "-(.*)".r
 
   // implicit def lexOrdering[C] = new MonomialOrderingLex[C] {}
-  implicit def glexOrdering[C] = new MonomialOrderingGlex[C] {}
+  // implicit def glexOrdering[C] = new MonomialOrderingGlex[C] {}
+  // implicit def grevlexOrdering[C] = new MonomialOrderingGrevlex[C] {}
 
 }
 
-
+// Lexicographic ordering
+// e.g. x^2 < xy < xz < x < y^2 < yz < y < z^2 < z < 1
 trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]] {
   def compare(x: Monomial[C], y: Monomial[C]): Int = {
     @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
@@ -143,6 +150,8 @@ trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]] {
   }
 }
 
+// Graded lexicographic ordering
+// e.g. x^2 < xy < xz < y^2 < yz < z^2 < x < y < z < 1
 trait MonomialOrderingGlex[@spec(Double) C] extends Order[Monomial[C]] {
   def compare(x: Monomial[C], y: Monomial[C]): Int = {
     @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
@@ -166,17 +175,23 @@ trait MonomialOrderingGlex[@spec(Double) C] extends Order[Monomial[C]] {
   }
 }
 
+//Graded reverse lexicographic ordering
+// e.g. x^2 < xy < y^2 < xz < yz < z^2 < x < y < z
 trait MonomialOrderingGrevlex[@spec(Double) C] extends Order[Monomial[C]] {
-  // TODO: implement graded reverse lexographic ordering. Should be easy.
+  def compare(x: Monomial[C], y: Monomial[C]): Int = {
+    @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
+      if(x.isEmpty && y.isEmpty) 0 else if(y.isEmpty) -1 else if(x.isEmpty) 1 else {
+        x.values.sum compare y.values.sum match {
+          case -1 => 1
+          case 1 => -1
+          case 0 => x.head._1 compare y.head._1 match {
+              case -1 => -1
+              case 1 => 1
+              case 0 => compare_(x.tail, y.tail)
+            }
+          }
+        }
+      }
+    compare_(x.variables.reverse.toMap, y.variables.reverse.toMap)
+  }
 }
-
-/* Array(Monomial(1.0, 'x' -> 2),
-Monomial(1.0, 'x' -> 1, 'y' -> 1),
-Monomial(1.0, 'x' -> 1, 'z' -> 1),
-Monomial(1.0, 'x' -> 1),
-Monomial(1.0, 'y' -> 2),
-Monomial(1.0, 'y' -> 1, 'z' -> 1),
-Monomial(1.0, 'y' -> 1),
-Monomial(1.0, 'z' -> 2),
-Monomial(1.0, 'z' -> 1))
-*/
