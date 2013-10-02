@@ -34,14 +34,44 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
   def multiplyBy(x: C)(implicit r: Ring[C]): Monomial[C] =
     Monomial(coeff * x, lhs.vars)
 
-  def divides(rhs: Monomial[C])(implicit o: Order[C]): Boolean =
-    lhs.coeff <= rhs.coeff && lhs.variables.zip(rhs.variables).forall({ case(a,b) => a <= b })
+  def divides(rhs: Monomial[C])(implicit o: Order[C]): Boolean = {
+    @tailrec def divides_(x: Map[Char, Int], y: Map[Char, Int]): Boolean = {
+      if(x.isEmpty) true else if(y.isEmpty) false else x.head._1 compare y.head._1 match {
+        case -1 => false
+        case 1 => divides_(x, y.tail)
+        case 0 => if(x.head._2 <= y.head._2) divides_(x.tail, y.tail) else false
+      }
+    }
+    divides_(lhs.variables.toMap, rhs.variables.toMap)
+  }
 
-  def gcd(rhs: Monomial[C])(implicit f: Field[C], er: EuclideanRing[C]): Monomial[C] = 
-    Monomial(er.gcd(lhs.coeff, rhs.coeff), lhs.vars.zip(rhs.vars).map({case (a,b) => min(a,b)}))
+  def gcd(rhs: Monomial[C])(implicit f: Field[C], er: EuclideanRing[C]): Monomial[C] = {
+    @tailrec def gcd_(z: Map[Char, Int], x: Map[Char, Int], y: Map[Char, Int]) : Monomial[C] = {
+      if(x.isEmpty || y.isEmpty) Monomial(er.gcd(lhs.coeff, rhs.coeff), z) else x.head._1 compare y.head._1 match {
+        case -1 => gcd_(z, x.tail, y)
+        case 1 => gcd_(z, x, y.tail)
+        case 0 => {
+          val k: Int = min(x.head._2, y.head._2)
+          gcd_(Map(x.head._1 -> k) ++ z, x.tail, y.tail)
+        }
+      } 
+    }
+    gcd_(Map[Char, Int](), lhs.variables.toMap, rhs.variables.toMap)
+  }
 
-  def lcm(rhs: Monomial[C])(implicit f: Field[C], er: EuclideanRing[C]): Monomial[C] = 
-    Monomial(er.lcm(lhs.coeff, rhs.coeff), lhs.vars.zip(rhs.vars).map({case (a,b) => max(a,b)}))
+  def lcm(rhs: Monomial[C])(implicit f: Field[C], er: EuclideanRing[C]): Monomial[C] = {
+    @tailrec def lcm_(z: Map[Char, Int], x: Map[Char, Int], y: Map[Char, Int]) : Monomial[C] = {
+      if(x.isEmpty || y.isEmpty) Monomial(er.lcm(lhs.coeff, rhs.coeff), z) else x.head._1 compare y.head._1 match {
+        case -1 => lcm_(z, x.tail, y)
+        case 1 => lcm_(z, x, y.tail)
+        case 0 => {
+          val k: Int = max(x.head._2, y.head._2)
+          lcm_(Map(x.head._1 -> k) ++ z, x.tail, y.tail)
+        }
+      } 
+    }
+    lcm_(Map[Char, Int](), lhs.variables.toMap, rhs.variables.toMap)
+  }
 
   override def toString = {
     import Monomial._
