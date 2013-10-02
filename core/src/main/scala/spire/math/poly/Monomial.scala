@@ -34,7 +34,7 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
   def multiplyBy(x: C)(implicit r: Ring[C]): Monomial[C] =
     Monomial(coeff * x, lhs.vars)
 
-  def divides(rhs: Monomial[C])(implicit o: Order[C]): Boolean = {
+  def divides(rhs: Monomial[C]): Boolean = {
     @tailrec def divides_(x: Map[Char, Int], y: Map[Char, Int]): Boolean = {
       if(x.isEmpty) true else if(y.isEmpty) false else x.head._1 compare y.head._1 match {
         case -1 => false
@@ -42,10 +42,10 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
         case 0 => if(x.head._2 <= y.head._2) divides_(x.tail, y.tail) else false
       }
     }
-    divides_(lhs.variables.toMap, rhs.variables.toMap)
+    divides_(lhs.vars, rhs.vars)
   }
 
-  def gcd(rhs: Monomial[C])(implicit f: Field[C], er: EuclideanRing[C]): Monomial[C] = {
+  def gcd(rhs: Monomial[C])(implicit er: EuclideanRing[C]): Monomial[C] = {
     @tailrec def gcd_(z: Map[Char, Int], x: Map[Char, Int], y: Map[Char, Int]) : Monomial[C] = {
       if(x.isEmpty || y.isEmpty) Monomial(er.gcd(lhs.coeff, rhs.coeff), z) else x.head._1 compare y.head._1 match {
         case -1 => gcd_(z, x.tail, y)
@@ -56,10 +56,10 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
         }
       } 
     }
-    gcd_(Map[Char, Int](), lhs.variables.toMap, rhs.variables.toMap)
+    gcd_(Map[Char, Int](), lhs.vars, rhs.vars)
   }
 
-  def lcm(rhs: Monomial[C])(implicit f: Field[C], er: EuclideanRing[C]): Monomial[C] = {
+  def lcm(rhs: Monomial[C])(implicit er: EuclideanRing[C]): Monomial[C] = {
     @tailrec def lcm_(z: Map[Char, Int], x: Map[Char, Int], y: Map[Char, Int]) : Monomial[C] = {
       if(x.isEmpty || y.isEmpty) Monomial(er.lcm(lhs.coeff, rhs.coeff), z) else x.head._1 compare y.head._1 match {
         case -1 => lcm_(z, x.tail, y)
@@ -70,7 +70,7 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
         }
       } 
     }
-    lcm_(Map[Char, Int](), lhs.variables.toMap, rhs.variables.toMap)
+    lcm_(Map[Char, Int](), lhs.vars, rhs.vars)
   }
 
   override def toString = {
@@ -96,14 +96,18 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
     }
 
     simpleCoeff orElse stringCoeff getOrElse s" + $coeff$varStr"
-
   }
+
 }
 
 object Monomial {
 
-  def apply[@spec(Double) C: ClassTag](c: C, v: (Char, Int)*): Monomial[C] =
-    Monomial(c, v.filterNot(_._2 == 0).toMap)
+  // Must get rid of zero order variables at instantiation and sort the variables in the Map!
+  def apply[@spec(Double) C: ClassTag](c: C, v: (Char, Int)*): Monomial[C] = {
+    val arr = v.filterNot(_._2 == 0).toArray
+    QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
+    Monomial(c, arr.toMap) 
+  }
 
   def zero[@spec(Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] =
     Monomial(r.zero, Map[Char, Int]())
@@ -114,5 +118,65 @@ object Monomial {
   private val IsZero = "0".r
   private val IsNegative = "-(.*)".r
 
+  // implicit def lexOrdering[C] = new MonomialOrderingLex[C] {}
+  implicit def glexOrdering[C] = new MonomialOrderingGlex[C] {}
+
 }
 
+
+trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]] {
+  def compare(x: Monomial[C], y: Monomial[C]): Int = {
+    @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
+      if(x.isEmpty && y.isEmpty) 0 else if(y.isEmpty) -1 else if(x.isEmpty) 1 else {
+        x.head._1 compare y.head._1 match {
+          case -1 => -1
+          case 1 => 1
+          case 0 => x.head._2 compare y.head._2 match {
+            case -1 => 1
+            case 1 => -1
+            case 0 => compare_(x.tail, y.tail)
+          }
+        }
+      }
+    }
+    compare_(x.vars, y.vars)
+  }
+}
+
+trait MonomialOrderingGlex[@spec(Double) C] extends Order[Monomial[C]] {
+  def compare(x: Monomial[C], y: Monomial[C]): Int = {
+    @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
+      if(x.isEmpty && y.isEmpty) 0 else if(y.isEmpty) -1 else if(x.isEmpty) 1 else {
+        x.values.sum compare y.values.sum match {
+          case -1 => 1
+          case 1 => -1
+          case 0 => x.head._1 compare y.head._1 match {
+              case -1 => -1
+              case 1 => 1
+              case 0 => x.head._2 compare y.head._2 match {
+                case -1 => 1
+                case 1 => -1
+                case 0 => compare_(x.tail, y.tail)
+              }
+            }
+        }  
+      }
+    }
+    compare_(x.vars, y.vars)
+  }
+}
+
+trait MonomialOrderingGrevlex[@spec(Double) C] extends Order[Monomial[C]] {
+  // TODO: implement graded reverse lexographic ordering. Should be easy.
+}
+
+/* Array(Monomial(1.0, 'x' -> 2),
+Monomial(1.0, 'x' -> 1, 'y' -> 1),
+Monomial(1.0, 'x' -> 1, 'z' -> 1),
+Monomial(1.0, 'x' -> 1),
+Monomial(1.0, 'y' -> 2),
+Monomial(1.0, 'y' -> 1, 'z' -> 1),
+Monomial(1.0, 'y' -> 1),
+Monomial(1.0, 'z' -> 2),
+Monomial(1.0, 'z' -> 1))
+*/
