@@ -30,11 +30,21 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
   def unary_-(implicit r: Rng[C]): Monomial[C] = 
     Monomial(-coeff, vars)
 
-  def divideBy(x: C)(implicit f: Field[C]): Monomial[C] =
+  def :/(x: C)(implicit f: Field[C]): Monomial[C] =
     Monomial(coeff / x, lhs.vars)
 
-  def multiplyBy(x: C)(implicit r: Ring[C]): Monomial[C] =
+  def :*(x: C)(implicit r: Semiring[C]): Monomial[C] =
     Monomial(coeff * x, lhs.vars)
+
+  def +(rhs: Monomial[C])(implicit r: Semiring[C], eq: Eq[Monomial[C]]): Option[Monomial[C]] = {
+    val c = lhs.coeff + rhs.coeff
+    if(lhs === rhs && c != r.zero) Some(Monomial(c, lhs.vars)) else None
+  }
+
+  def -(rhs: Monomial[C])(implicit r: Rng[C], eq: Eq[Monomial[C]]): Option[Monomial[C]] = {
+    val c = lhs.coeff + -rhs.coeff
+    if(lhs === rhs && c != r.zero) Some(Monomial(c, lhs.vars)) else None
+  }
 
   def divides(rhs: Monomial[C]): Boolean = {
     @tailrec def divides_(x: Map[Char, Int], y: Map[Char, Int]): Boolean = {
@@ -87,7 +97,7 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
     def simpleCoeff: Option[String] = coeff match {
       case 0 => Some("")
       case 1 => if(vars.head._2 == 0) Some(s" + $coeff") else Some(s" + $varStr")
-      case -1 => if(vars.head._2 != 0) Some(s" - $coeff") else Some(s" - $varStr")
+      case -1 => if(vars.head._2 == 0) Some(s" - ${coeff.toString.tail.mkString}") else Some(s" - $varStr")
       case _ => None
     }
 
@@ -125,16 +135,25 @@ object Monomial {
   private val IsZero = "0".r
   private val IsNegative = "-(.*)".r
 
-  // implicit def lexOrdering[C] = new MonomialOrderingLex[C] {}
-  // implicit def glexOrdering[C] = new MonomialOrderingGlex[C] {}
-  // implicit def grevlexOrdering[C] = new MonomialOrderingGrevlex[C] {}
+  implicit def monomialEq[@spec(Double) C: ClassTag: Semiring] = new MonomialEq[C] {
+    val scalar = Semiring[C]
+    val ct = implicitly[ClassTag[C]]
+  }
 
+}
+
+trait MonomialEq[@spec(Double) C] extends Eq[Monomial[C]] {
+  implicit def scalar: Semiring[C]
+  implicit def ct: ClassTag[C]
+  def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
+    x.variables === y.variables 
 }
 
 
 // Lexicographic ordering
 // e.g. x^2 < xy < xz < x < y^2 < yz < y < z^2 < z < 1
-trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]] {
+trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]]
+with Eq[Monomial[C]] {
   def compare(x: Monomial[C], y: Monomial[C]): Int = {
     @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
       if(x.isEmpty && y.isEmpty) 0 else if(y.isEmpty) -1 else if(x.isEmpty) 1 else {
@@ -155,7 +174,8 @@ trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]] {
 
 // Graded lexicographic ordering
 // e.g. x^2 < xy < xz < y^2 < yz < z^2 < x < y < z < 1
-trait MonomialOrderingGlex[@spec(Double) C] extends Order[Monomial[C]] {
+trait MonomialOrderingGlex[@spec(Double) C] extends Order[Monomial[C]]
+with Eq[Monomial[C]] {
   def compare(x: Monomial[C], y: Monomial[C]): Int = {
     @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
       if(x.isEmpty && y.isEmpty) 0 else if(y.isEmpty) -1 else if(x.isEmpty) 1 else {
@@ -180,7 +200,8 @@ trait MonomialOrderingGlex[@spec(Double) C] extends Order[Monomial[C]] {
 
 //Graded reverse lexicographic ordering
 // e.g. x^2 < xy < y^2 < xz < yz < z^2 < x < y < z
-trait MonomialOrderingGrevlex[@spec(Double) C] extends Order[Monomial[C]] {
+trait MonomialOrderingGrevlex[@spec(Double) C] extends Order[Monomial[C]]
+with Eq[Monomial[C]] {
   def compare(x: Monomial[C], y: Monomial[C]): Int = {
     @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
       if(x.isEmpty && y.isEmpty) 0 else if(y.isEmpty) -1 else if(x.isEmpty) 1 else {
