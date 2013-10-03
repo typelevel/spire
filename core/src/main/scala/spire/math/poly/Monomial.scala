@@ -16,12 +16,19 @@ import spire.math._
 case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
                                     (implicit val ct: ClassTag[(Char, Int)]) { lhs =>
 
-  lazy val degree: Int = vars.values.sum
+  lazy val degree: Int = 
+    vars.values.sum
 
   lazy val variables: Array[(Char, Int)] = {
     val arr = vars.toArray
     QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
     arr
+  }
+
+  private def sortMap(m: Map[Char, Int]) = {
+    val arr = m.toArray
+    QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
+    arr.toMap
   }
 
   def isZero(implicit r: Semiring[C], eq: Eq[C]): Boolean =
@@ -36,15 +43,15 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
   def :*(x: C)(implicit r: Semiring[C]): Monomial[C] =
     Monomial(coeff * x, lhs.vars)
 
-  def +(rhs: Monomial[C])(implicit r: Semiring[C], eq: Eq[Monomial[C]]): Option[Monomial[C]] = {
-    val c = lhs.coeff + rhs.coeff
-    if(lhs === rhs && c != r.zero) Some(Monomial(c, lhs.vars)) else None
-  }
+  def *(rhs: Monomial[C])(implicit r: Semiring[C], i: Semiring[Int]): Monomial[C] =
+    Monomial(lhs.coeff * rhs.coeff, sortMap(lhs.vars + rhs.vars))
 
-  def -(rhs: Monomial[C])(implicit r: Rng[C], eq: Eq[Monomial[C]]): Option[Monomial[C]] = {
-    val c = lhs.coeff + -rhs.coeff
-    if(lhs === rhs && c != r.zero) Some(Monomial(c, lhs.vars)) else None
-  }
+  // n.b. only monomials with the same variables form a ring...
+  def +(rhs: Monomial[C])(implicit r: Semiring[C], eq: Eq[Monomial[C]]): Monomial[C] = 
+    Monomial(lhs.coeff + rhs.coeff, lhs.vars)
+
+  def -(rhs: Monomial[C])(implicit r: Rng[C], eq: Eq[Monomial[C]]): Monomial[C] =
+    Monomial(lhs.coeff + -rhs.coeff, lhs.vars)
 
   def divides(rhs: Monomial[C]): Boolean = {
     @tailrec def divides_(x: Map[Char, Int], y: Map[Char, Int]): Boolean = {
@@ -127,7 +134,7 @@ object Monomial {
     Monomial(r.zero, Map[Char, Int]())
   
   def one[@spec(Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] = 
-    Monomial(r.one, Map[Char, Int]())
+    Monomial(r.one, Map('x' -> 0))
 
   def x[@spec(Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] = 
     Monomial(r.one, Map('x' -> 1))
@@ -142,11 +149,13 @@ object Monomial {
 
 }
 
+// An equivalent monomial has the same variables (that's all)
+// not checking that the terms are equal using this typeclass
 trait MonomialEq[@spec(Double) C] extends Eq[Monomial[C]] {
   implicit def scalar: Semiring[C]
   implicit def ct: ClassTag[C]
   def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
-    x.variables === y.variables 
+    x.variables.map(_._1) === y.variables.map(_._1) 
 }
 
 

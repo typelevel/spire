@@ -22,11 +22,37 @@ trait GrevlexOrdering {
 case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]])
   (implicit val ct: ClassTag[C], ord: Order[Monomial[C]]) { lhs =>
 
-  def +(rhs: MultivariatePolynomial[C])(implicit r: Semiring[C], eq: Eq[Monomial[C]]): MultivariatePolynomial[C] = ???
+  def isZero: Boolean = 
+    terms.isEmpty
 
-  def -(rhs: MultivariatePolynomial[C])(implicit ring: Rng[C], eq: Eq[Monomial[C]]): MultivariatePolynomial[C] = ???
+  def degree: Int = 
+    terms.map(_.degree).max
 
-  def isZero: Boolean = terms.isEmpty
+  def unary_-(implicit r: Rng[C]): MultivariatePolynomial[C] = 
+    new MultivariatePolynomial(terms.map(_.unary_-))
+
+  def simplify(ts: Array[Monomial[C]])(implicit r: Semiring[C], eq: Eq[Monomial[C]]): Array[Monomial[C]] = 
+   (for(t <- ts) yield ts.view.filter(_ === t).reduce(_ + _)).distinct.filterNot(_.coeff == r.zero)
+
+  // EuclideanRing ops
+  def +(rhs: MultivariatePolynomial[C])(implicit r: Semiring[C], eq: Eq[Monomial[C]]): MultivariatePolynomial[C] =
+    new MultivariatePolynomial(simplify(lhs.terms ++ rhs.terms))
+
+  def -(rhs: MultivariatePolynomial[C])(implicit r: Rng[C], eq: Eq[Monomial[C]]): MultivariatePolynomial[C] =
+    new MultivariatePolynomial(simplify(lhs.terms ++ rhs.terms))
+
+  def *(rhs: MultivariatePolynomial[C])(implicit ring: Semiring[C], eq: Eq[C]): MultivariatePolynomial[C] =
+    new MultivariatePolynomial(simplify(lhs.terms.flatMap(l => rhs.terms.map(r => l * r))))
+
+  def /~(rhs: MultivariatePolynomial[C])(implicit field: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = ???
+  def /%(rhs: MultivariatePolynomial[C])(implicit field: Field[C], eq: Eq[C]): (MultivariatePolynomial[C], MultivariatePolynomial[C]) = ???
+  def %(rhs: MultivariatePolynomial[C])(implicit field: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = ???
+
+
+  // VectorSpace ops
+  def *: (k: C)(implicit ring: Semiring[C], eq: Eq[C]): MultivariatePolynomial[C] = ???
+  def :* (k: C)(implicit ring: Semiring[C], eq: Eq[C]): MultivariatePolynomial[C] = ???
+  def :/ (k: C)(implicit field: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = ???
 
   override def toString =
     if (isZero) {
@@ -40,25 +66,16 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
 }
 
 object MultivariatePolynomialLex extends LexOrdering {
-
-  def apply[@spec(Double) C: ClassTag](terms: Monomial[C]*): MultivariatePolynomial[C] = {
+  def apply[@spec(Double) C: ClassTag](terms: Monomial[C]*): MultivariatePolynomial[C] =
     new MultivariatePolynomial(terms.toArray)
-  }
-
 }
 
 object MultivariatePolynomialGlex extends GlexOrdering {
-
-  def apply[@spec(Double) C: ClassTag](terms: Monomial[C]*): MultivariatePolynomial[C] = {
+  def apply[@spec(Double) C: ClassTag](terms: Monomial[C]*): MultivariatePolynomial[C] =
     new MultivariatePolynomial(terms.toArray)
-  }
-
 }
 
 object MultivariatePolynomialGrevlex extends GrevlexOrdering {
-
-  def apply[@spec(Double) C: ClassTag](terms: Monomial[C]*): MultivariatePolynomial[C] = {
+  def apply[@spec(Double) C: ClassTag](terms: Monomial[C]*): MultivariatePolynomial[C] =
     new MultivariatePolynomial(terms.toArray)
-  }
-
 }
