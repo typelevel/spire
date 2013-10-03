@@ -207,6 +207,8 @@ private[math] trait ConvertableToNumber extends ConvertableTo[Number] {
 object ConvertableTo {
   @inline final def apply[A](implicit ev:ConvertableTo[A]) = ev
 
+  implicit final val ConvertableToByte = new ConvertableToByte {}
+  implicit final val ConvertableToShort = new ConvertableToShort {}
   implicit final val ConvertableToInt = new ConvertableToInt {}
   implicit final val ConvertableToLong = new ConvertableToLong {}
   implicit final val ConvertableToBigInt = new ConvertableToBigInt {}
