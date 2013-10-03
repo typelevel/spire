@@ -28,7 +28,7 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
   private def sortMap(m: Map[Char, Int]) = {
     val arr = m.toArray
     QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
-    arr.toMap
+    arr.toMap.filterNot({ case (a,b) => b == 0})
   }
 
   def isZero(implicit r: Semiring[C], eq: Eq[C]): Boolean =
@@ -49,13 +49,16 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
   def *(rhs: Monomial[C])(implicit r: Semiring[C], i: Semiring[Int]): Monomial[C] =
     Monomial(lhs.coeff * rhs.coeff, sortMap(lhs.vars + rhs.vars))
 
-  // n.b. only monomials with the same variables form a ring...
+  // n.b. only monomials with the same variables form a ring or field
   // but it is like this as we do the arithmetic in MultivariatePolynomial.
-  def +(rhs: Monomial[C])(implicit r: Semiring[C], eq: Eq[Monomial[C]]): Monomial[C] = 
+  def +(rhs: Monomial[C])(implicit r: Semiring[C]): Monomial[C] = 
     Monomial(lhs.coeff + rhs.coeff, lhs.vars)
 
-  def -(rhs: Monomial[C])(implicit r: Rng[C], eq: Eq[Monomial[C]]): Monomial[C] =
+  def -(rhs: Monomial[C])(implicit r: Rng[C]): Monomial[C] =
     Monomial(lhs.coeff + -rhs.coeff, lhs.vars)
+
+  def /(rhs: Monomial[C])(implicit f: Field[C]): Monomial[C] =
+    Monomial(lhs.coeff / rhs.coeff, sortMap(lhs.vars - rhs.vars))
 
   def divides(rhs: Monomial[C]): Boolean = {
     @tailrec def divides_(x: Map[Char, Int], y: Map[Char, Int]): Boolean = {
