@@ -37,16 +37,20 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
   def unary_-(implicit r: Rng[C]): Monomial[C] = 
     Monomial(-coeff, vars)
 
-  def :/(x: C)(implicit f: Field[C]): Monomial[C] =
-    Monomial(coeff / x, lhs.vars)
-
-  def :*(x: C)(implicit r: Semiring[C]): Monomial[C] =
+  def *:(x: C)(implicit r: Semiring[C]): Monomial[C] =
     Monomial(coeff * x, lhs.vars)
+
+  def :*(k: C)(implicit r: Semiring[C], eq: Eq[C]): Monomial[C] = 
+    k *: lhs
+
+  def :/(x: C)(implicit f: Field[C]): Monomial[C] =
+    lhs.*:(x.reciprocal)
 
   def *(rhs: Monomial[C])(implicit r: Semiring[C], i: Semiring[Int]): Monomial[C] =
     Monomial(lhs.coeff * rhs.coeff, sortMap(lhs.vars + rhs.vars))
 
   // n.b. only monomials with the same variables form a ring...
+  // but it is like this as we do the arithmetic in MultivariatePolynomial.
   def +(rhs: Monomial[C])(implicit r: Semiring[C], eq: Eq[Monomial[C]]): Monomial[C] = 
     Monomial(lhs.coeff + rhs.coeff, lhs.vars)
 
