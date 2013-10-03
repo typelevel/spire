@@ -44,15 +44,18 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
   def *(rhs: MultivariatePolynomial[C])(implicit ring: Semiring[C], eq: Eq[C]): MultivariatePolynomial[C] =
     new MultivariatePolynomial(simplify(lhs.terms.flatMap(l => rhs.terms.map(r => l * r))))
 
-  def /~(rhs: MultivariatePolynomial[C])(implicit field: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = ???
-  def /%(rhs: MultivariatePolynomial[C])(implicit field: Field[C], eq: Eq[C]): (MultivariatePolynomial[C], MultivariatePolynomial[C]) = ???
-  def %(rhs: MultivariatePolynomial[C])(implicit field: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = ???
+  def /~(rhs: MultivariatePolynomial[C])(implicit f: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = ???
+  def /%(rhs: MultivariatePolynomial[C])(implicit f: Field[C], eq: Eq[C]): (MultivariatePolynomial[C], MultivariatePolynomial[C]) = ???
+  def %(rhs: MultivariatePolynomial[C])(implicit f: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = ???
 
 
   // VectorSpace ops
-  def *: (k: C)(implicit ring: Semiring[C], eq: Eq[C]): MultivariatePolynomial[C] = ???
-  def :* (k: C)(implicit ring: Semiring[C], eq: Eq[C]): MultivariatePolynomial[C] = ???
-  def :/ (k: C)(implicit field: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = ???
+  def *:(k: C)(implicit r: Semiring[C], eq: Eq[C]): MultivariatePolynomial[C] = 
+    if(k === r.zero) new MultivariatePolynomial(new Array[Monomial[C]](0)) else new MultivariatePolynomial(terms.map(_.*:(k)))
+
+  def :*(k: C)(implicit r: Semiring[C], eq: Eq[C]): MultivariatePolynomial[C] = k *: lhs
+
+  def :/ (k: C)(implicit f: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = lhs.*:(k.reciprocal)
 
   override def toString =
     if (isZero) {
@@ -65,17 +68,26 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
 
 }
 
+
 object MultivariatePolynomialLex extends LexOrdering {
+  
   def apply[@spec(Double) C: ClassTag](terms: Monomial[C]*): MultivariatePolynomial[C] =
     new MultivariatePolynomial(terms.toArray)
+
 }
 
 object MultivariatePolynomialGlex extends GlexOrdering {
+
   def apply[@spec(Double) C: ClassTag](terms: Monomial[C]*): MultivariatePolynomial[C] =
     new MultivariatePolynomial(terms.toArray)
+
 }
 
 object MultivariatePolynomialGrevlex extends GrevlexOrdering {
+
   def apply[@spec(Double) C: ClassTag](terms: Monomial[C]*): MultivariatePolynomial[C] =
     new MultivariatePolynomial(terms.toArray)
+     
 }
+
+
