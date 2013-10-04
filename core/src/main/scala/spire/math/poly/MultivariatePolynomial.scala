@@ -10,13 +10,24 @@ import spire.math._
 
 
 trait LexOrdering {
-  implicit def lexOrdering[C] = new MonomialOrderingLex[C] {}
+  implicit def lexOrdering[C] = new MonomialOrderingLex[C] {
+    val ordInt = Order[Int]
+    val ordChar = Order[Char]
+  }
 }
+
 trait GlexOrdering {
-  implicit def glexOrdering[C] = new MonomialOrderingGlex[C] {}
+  implicit def glexOrdering[C] = new MonomialOrderingGlex[C] {    
+    val ordInt = Order[Int]
+    val ordChar = Order[Char]
+  }
 }
+
 trait GrevlexOrdering {
-  implicit def grevlexOrdering[C] = new MonomialOrderingGrevlex[C] {}
+  implicit def grevlexOrdering[C] = new MonomialOrderingGrevlex[C] {
+    val ordInt = Order[Int]
+    val ordChar = Order[Char]
+  }
 }
 
 case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]])
@@ -36,6 +47,9 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
     sts.qsort
     sts.toList
   }
+
+  def allVariables: Array[Char] =
+    terms.flatMap(t => t.vars.keys).distinct
 
   def unary_-(implicit r: Rng[C]): MultivariatePolynomial[C] = 
     new MultivariatePolynomial[C](terms.map(_.unary_-))
@@ -104,7 +118,8 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
     if (isEmpty) {
       "(0)"
     } else {
-      terms.qsort
+      QuickSort.sort(terms)(ord, implicitly[ClassTag[Monomial[C]]])
+      // terms.qsort
       val s = terms.mkString
       "(" + (if (s.take(3) == " - ") "-" + s.drop(3) else s.drop(3)) + ")"
     }
