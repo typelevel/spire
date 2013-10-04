@@ -55,7 +55,7 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
   val fbd = Field[Rational]
   val cbd = implicitly[ClassTag[Rational]]
 
-  runLex[Rational]("double")
+  runLex[Rational]("rational")
   // runGlex[Rational]("rational")
   // runGrevlex[Rational]("rational")
 
