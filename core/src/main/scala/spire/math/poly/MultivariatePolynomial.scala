@@ -40,7 +40,10 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
     terms.isEmpty
 
   def degree: Int = 
-    terms.map(_.degree).max
+    if(isEmpty) 0 else terms.map(_.degree).max
+
+  def numTerms: Int =
+    terms.length
 
   def ts(implicit r: Semiring[C]): List[Monomial[C]] = {
     val sts = simplify(terms)
@@ -50,6 +53,11 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
 
   def allVariables: Array[Char] =
     terms.flatMap(t => t.vars.keys).distinct
+
+  def allTerms: Array[Monomial[C]] = {
+    terms.qsort
+    terms
+  }
 
   def eval(values: Map[Char, C])(implicit r: Ring[C]): C = {
     require(allVariables.forall(values.contains), "Can't evaluate polynomial without all the variable (symbol) values!")
@@ -119,6 +127,16 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
 
   def :/ (k: C)(implicit f: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = lhs.*:(k.reciprocal)
 
+  override def equals(that: Any): Boolean = that match {
+    case rhs: MultivariatePolynomial[_] if lhs.degree == rhs.degree && lhs.numTerms == rhs.numTerms =>
+      lhs.allTerms.view.zip(rhs.allTerms.asInstanceOf[Array[Monomial[C]]]).map(z => z._1 compare z._2).forall(_ == 0)
+
+    case rhs: MultivariatePolynomial[_] => if(lhs.isEmpty && rhs.isEmpty) true else false
+
+    case _ => false
+  }
+
+
   override def toString =
     if (isEmpty) {
       "(0)"
@@ -133,31 +151,49 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
 
 object MultivariatePolynomialLex extends LexOrdering {
   
-  def apply[@spec(Double) C: ClassTag](terms: Monomial[C]*): MultivariatePolynomial[C] =
-    new MultivariatePolynomial[C](terms.toArray)
+  def apply[@spec(Double) C: ClassTag: Semiring: Eq](terms: Monomial[C]*): MultivariatePolynomial[C] = 
+    new MultivariatePolynomial[C](terms.filterNot(t => t.isZero).toArray)
 
-  def apply[@spec(Double) C: ClassTag](terms: List[Monomial[C]]): MultivariatePolynomial[C] =
-    new MultivariatePolynomial[C](terms.toArray)
+  def apply[@spec(Double) C: ClassTag: Semiring: Eq](terms: List[Monomial[C]]): MultivariatePolynomial[C] =
+    new MultivariatePolynomial[C](terms.filterNot(t => t.isZero).toArray)
+
+  def zero[@spec(Double) C: ClassTag](implicit r: Semiring[C]) = 
+    new MultivariatePolynomial[C](new Array[Monomial[C]](0))
+
+  def one[@spec(Double) C: ClassTag](implicit r: Ring[C]) = new 
+    MultivariatePolynomial[C](Array(Monomial(r.one, 'x' -> 0)))
 
 }
 
 object MultivariatePolynomialGlex extends GlexOrdering {
 
-  def apply[@spec(Double) C: ClassTag](terms: Monomial[C]*): MultivariatePolynomial[C] =
-    new MultivariatePolynomial[C](terms.toArray)
+  def apply[@spec(Double) C: ClassTag: Semiring: Eq](terms: Monomial[C]*): MultivariatePolynomial[C] = 
+    new MultivariatePolynomial[C](terms.filterNot(t => t.isZero).toArray)
 
-  def apply[@spec(Double) C: ClassTag](terms: List[Monomial[C]]): MultivariatePolynomial[C] =
-    new MultivariatePolynomial[C](terms.toArray)
+  def apply[@spec(Double) C: ClassTag: Semiring: Eq](terms: List[Monomial[C]]): MultivariatePolynomial[C] =
+    new MultivariatePolynomial[C](terms.filterNot(t => t.isZero).toArray)
+
+  def zero[@spec(Double) C: ClassTag](implicit r: Semiring[C]) = 
+    new MultivariatePolynomial[C](new Array[Monomial[C]](0))
+
+  def one[@spec(Double) C: ClassTag](implicit r: Ring[C]) = new 
+    MultivariatePolynomial[C](Array(Monomial(r.one, 'x' -> 0)))
 
 }
 
 object MultivariatePolynomialGrevlex extends GrevlexOrdering {
 
-  def apply[@spec(Double) C: ClassTag](terms: Monomial[C]*): MultivariatePolynomial[C] =
-    new MultivariatePolynomial[C](terms.toArray)
+  def apply[@spec(Double) C: ClassTag: Semiring: Eq](terms: Monomial[C]*): MultivariatePolynomial[C] = 
+    new MultivariatePolynomial[C](terms.filterNot(t => t.isZero).toArray)
 
-  def apply[@spec(Double) C: ClassTag](terms: List[Monomial[C]]): MultivariatePolynomial[C] =
-    new MultivariatePolynomial[C](terms.toArray)
+  def apply[@spec(Double) C: ClassTag: Semiring: Eq](terms: List[Monomial[C]]): MultivariatePolynomial[C] =
+    new MultivariatePolynomial[C](terms.filterNot(t => t.isZero).toArray)
+
+  def zero[@spec(Double) C: ClassTag](implicit r: Semiring[C]) = 
+    new MultivariatePolynomial[C](new Array[Monomial[C]](0))
+
+  def one[@spec(Double) C: ClassTag](implicit r: Ring[C]) = new 
+    MultivariatePolynomial[C](Array(Monomial(r.one, 'x' -> 0)))
      
 }
 
