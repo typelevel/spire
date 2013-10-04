@@ -29,6 +29,9 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
   def isZero(implicit r: Semiring[C], eq: Eq[C]): Boolean =
     coeff === r.zero
 
+  def isEmpty: Boolean =
+    vars.size == 0
+
   def eval(values: Map[Char, C])(implicit r: Ring[C]): C =
     coeff * vars.map({ case (k,v) => values.get(k).get ** v }).reduce(_ * _)
 
@@ -120,7 +123,7 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
       case _ => None
     }
 
-    simpleCoeff orElse stringCoeff getOrElse s" + $coeff$varStr"
+    if(vars.size == 0) "(0)" else simpleCoeff orElse stringCoeff getOrElse s" + $coeff$varStr"
   }
 
 }
@@ -129,6 +132,13 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
 object Monomial {
 
   def apply[@spec(Double) C: ClassTag](c: C, v: (Char, Int)*): Monomial[C] = {
+    val arr = if(v.length == 1 && v.head._2 == 0) v.toArray 
+      else if(v.forall(_._2 == 0)) v.toArray else v.filterNot(_._2 == 0).toArray
+    QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
+    Monomial(c, arr.toMap) 
+  }
+
+  def apply[@spec(Double) C: ClassTag](c: C, v: List[(Char, Int)]): Monomial[C] = {
     val arr = if(v.length == 1 && v.head._2 == 0) v.toArray 
       else if(v.forall(_._2 == 0)) v.toArray else v.filterNot(_._2 == 0).toArray
     QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
