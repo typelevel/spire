@@ -19,12 +19,6 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
   lazy val degree: Int = 
     vars.values.sum
 
-  // lazy val variables: Array[(Char, Int)] = {
-  //   val arr = vars.toArray
-  //   QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
-  //   arr
-  // }
-
   def sortMap(m: Map[Char, Int] = vars): Map[Char, Int] = {
     val arr = m.toArray
     QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
@@ -34,6 +28,9 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
 
   def isZero(implicit r: Semiring[C], eq: Eq[C]): Boolean =
     coeff === r.zero
+
+  def eval(values: Map[Char, C])(implicit r: Ring[C]): C =
+    coeff * vars.map({ case (k,v) => values.get(k).get ** v }).reduce(_ * _)
 
   def unary_-(implicit r: Rng[C]): Monomial[C] = 
     Monomial(-coeff, vars)
@@ -157,8 +154,8 @@ object Monomial {
 
 }
 
-// An equivalent monomial has the same variables (that's all)
-// not checking that the terms are equal using this typeclass
+// An equivalent monomial has the same variables (that's all!)
+// not checking that the variable exponents are equal using this instance
 trait MonomialEq[@spec(Double) C] extends Eq[Monomial[C]] {
   implicit def scalar: Semiring[C]
   implicit def ct: ClassTag[C]
