@@ -106,17 +106,18 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
     @tailrec def quotMod_(quot: MultivariatePolynomial[C],
                           dividend: MultivariatePolynomial[C],
                           divisor: MultivariatePolynomial[C]): (MultivariatePolynomial[C], MultivariatePolynomial[C]) = {
-      if(divisor.isEmpty) (quot, dividend) else { // if we can't divide anything in, give it back the quot and dividend
-        if(divisor.head.divides(dividend.head)) {
-          val divTerm = new MultivariatePolynomial[C](Array(dividend.head / divisor.head)) // the first division
-          val prod = divisor.tail * divTerm // then multiply the rhs.tail by the MVP containing only this product.
-          val quotSum = quot + divTerm // expand the quotient with the divided term
-          val rem = dividend.tail - prod // then subtract from the original dividend tail
-          if(rem.isZero) (quotSum, rem) else quotMod_(quotSum, rem, divisor) // repeat
-        } else quotMod_(quot, dividend, divisor.tail)
+      if(lhs == rhs) (MultivariatePolynomial[C](Array(Monomial(f.one, 'x' -> 0))), new MultivariatePolynomial[C](new Array[Monomial[C]](0)))
+        else if(divisor.isZero || dividend.isZero) (quot, dividend) else { // if we can't divide anything in, give it back the quot and dividend
+          if(divisor.head.divides(dividend.head)) {
+            val divTerm = new MultivariatePolynomial[C](Array(dividend.head / divisor.head)) // the first division
+            val prod = divisor.tail * divTerm // then multiply the rhs.tail by the MVP containing only this product.
+            val quotSum = quot + divTerm // expand the quotient with the divided term
+            val rem = dividend.tail - prod // then subtract from the original dividend tail
+            if(rem.isZero) (quotSum, rem) else quotMod_(quotSum, rem, divisor) // repeat
+          } else quotMod_(quot, dividend, divisor.tail)
       }
     }
-    quotMod_(new MultivariatePolynomial[C](Array(Monomial(f.zero, 'x' -> 0))), lhs, rhs)
+    quotMod_(new MultivariatePolynomial[C](new Array[Monomial[C]](0)), lhs, rhs)
   }
 
   // VectorSpace ops

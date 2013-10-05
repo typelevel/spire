@@ -123,7 +123,7 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
       case _ => None
     }
 
-    if(vars.size == 0) "(0)" else simpleCoeff orElse stringCoeff getOrElse s" + $coeff$varStr"
+    if(vars.size == 0) "+ (0)" else simpleCoeff orElse stringCoeff getOrElse s" + $coeff$varStr"
   }
 
 }

@@ -67,7 +67,8 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
 
   def runLex[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
     implicit val arb: Arbitrary[MultivariatePolynomial[A]] = Arbitrary(for {
-      ts <- arbitrary[List[Monomial[A]]]
+      ts <- arbitrary[List[Monomial[A]]];
+      if(ts.length <= 5)
     } yield {
       MultivariatePolynomialLex(ts)
     })
