@@ -38,12 +38,12 @@ class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val 
     lhs.*:(x.reciprocal)
 
   def *(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] = // there was an implicit semiring[int] here for the map but I think it's not needed.
-    if(rhs.isZero) Monomial.zero[C] else Monomial[C](lhs.coeff * rhs.coeff, lhs.vars + rhs.vars)
+    if(lhs.isZero || rhs.isZero) Monomial.zero[C] else Monomial[C](lhs.coeff * rhs.coeff, lhs.vars + rhs.vars)
 
   // n.b. only monomials with the same variables form a ring or field
   // but it is like this as we do the arithmetic in MultivariatePolynomial.
-  def +(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] =
-    if(rhs.isZero) lhs else Monomial[C](lhs.coeff + rhs.coeff, lhs.vars)
+  def +(rhs: Monomial[C]): Monomial[C] =
+    Monomial[C](lhs.coeff + rhs.coeff, lhs.vars)
 
   def -(rhs: Monomial[C]): Monomial[C] =
     Monomial[C](lhs.coeff + -rhs.coeff, lhs.vars)
@@ -90,8 +90,9 @@ class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val 
     lcm_(Map[Char, Int](), lhs.vars, rhs.vars)
   }
 
-  override def equals(that: Any): Boolean = {
-    
+  override def equals(that: Any): Boolean = that match {
+    case rhs: Monomial[C] if lhs.coeff === rhs.coeff && lhs.vars == rhs.vars => true
+    case _ => false
   }
 
   override def toString = {
