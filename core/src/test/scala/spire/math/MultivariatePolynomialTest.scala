@@ -68,43 +68,43 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
   // })
 
   def runMonomial[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
-    implicit val arb: Arbitrary[MultivariatePolynomial[A]] = Arbitrary(for {
-      m <- arbitrary[Monomial[A]]
-    } yield { 
-      m
-    })
+    // implicit val ab: Arbitrary[Monomial[A]] = Arbitrary(for {
+    //   m <- arbitrary[Monomial[A]]
+    // } yield { 
+    //   m
+    // })
     runMonomialTest[A](s"$typ/monomial")
   }
 
-  def runLex[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
-    implicit val arb: Arbitrary[MultivariatePolynomial[A]] = Arbitrary(for {
-      ts <- arbitrary[List[Monomial[A]]];
-      if(ts.length <= 5)
-    } yield {
-      MultivariatePolynomialLex(ts)
-    })
-    runTest[A](s"$typ/lexicographic")
-  }
+  // def runLex[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
+  //   implicit val arb: Arbitrary[MultivariatePolynomial[A]] = Arbitrary(for {
+  //     ts <- arbitrary[List[Monomial[A]]];
+  //     if(ts.length <= 5)
+  //   } yield {
+  //     MultivariatePolynomialLex(ts)
+  //   })
+  //   runTest[A](s"$typ/lexicographic")
+  // }
 
-  def runGlex[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
-    implicit val arb: Arbitrary[MultivariatePolynomial[A]] = Arbitrary(for {
-      ts <- arbitrary[List[Monomial[A]]]
-    } yield {
-      MultivariatePolynomialGlex(ts)
-    })
-    runTest[A](s"$typ/graded lexicographic")
-  }
+  // def runGlex[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
+  //   implicit val arb: Arbitrary[MultivariatePolynomial[A]] = Arbitrary(for {
+  //     ts <- arbitrary[List[Monomial[A]]]
+  //   } yield {
+  //     MultivariatePolynomialGlex(ts)
+  //   })
+  //   runTest[A](s"$typ/graded lexicographic")
+  // }
 
-  def runGrevlex[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
-    implicit val arb: Arbitrary[MultivariatePolynomial[A]] = Arbitrary(for {
-      ts <- arbitrary[List[Monomial[A]]]
-    } yield {
-      MultivariatePolynomialGrevlex(ts)
-    })
-    runTest[A](s"$typ/graded reverse lexicographic")
-  }
+  // def runGrevlex[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
+  //   implicit val arb: Arbitrary[MultivariatePolynomial[A]] = Arbitrary(for {
+  //     ts <- arbitrary[List[Monomial[A]]]
+  //   } yield {
+  //     MultivariatePolynomialGrevlex(ts)
+  //   })
+  //   runTest[A](s"$typ/graded reverse lexicographic")
+  // }
 
-  def runMonomialTest[A: Eq: ClassTag](name: String)(implicit arb: Arbitrary[MultivariatePolynomial[A]], f: Field[A]) {
+  def runMonomialTest[A: Eq: ClassTag](name: String)(implicit arb: Arbitrary[Monomial[A]], f: Field[A]) {
     type M = Monomial[A]
 
     val zero = Monomial.zero[A]
@@ -119,7 +119,7 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
     }
 
     property(s"$name p + (-p) = 0") {
-      forAll { (m: m) => m + (-m) should be === zero }
+      forAll { (m: M) => m + (-m) should be === zero }
     }
 
     property(s"$name p * 0 = 0") {
@@ -130,66 +130,62 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
       forAll { (m: M) => m * one should be === m }
     }
 
-    property(s"$name x + y = y + x") {
-      forAll { (x: m, y: m) => x + y should be === y + x }
-    }
-
     property(s"$name x * y = y * x") {
-      forAll { (x: m, y: m) => x * y should be === y * x }
+      forAll { (x: M, y: M) => x * y should be === y * x }
     }
 
   }
 
-  def runTest[A: Eq: ClassTag](name: String)(implicit arb: Arbitrary[Monomial[A]], f: Field[A]) {
-    type P = MultivariatePolynomial[A]
+  // def runTest[A: Eq: ClassTag](name: String)(implicit arb: Arbitrary[Monomial[A]], f: Field[A]) {
+  //   type P = MultivariatePolynomial[A]
 
-    val zero = MultivariatePolynomialLex.zero[A]
-    val one = MultivariatePolynomialLex.one[A]
+  //   val zero = MultivariatePolynomialLex.zero[A]
+  //   val one = MultivariatePolynomialLex.one[A]
 
-    property(s"$name p = p") {
-      forAll { (p: P) => p should be === p }
-    }
+  //   property(s"$name p = p") {
+  //     forAll { (p: P) => p should be === p }
+  //   }
 
-    property(s"$name p + 0 = p") {
-      forAll { (p: P) => p + zero should be === p }
-    }
+  //   property(s"$name p + 0 = p") {
+  //     forAll { (p: P) => p + zero should be === p }
+  //   }
 
-    property(s"$name p + (-p) = 0") {
-      forAll { (p: P) => p + (-p) should be === zero }
-    }
+  //   property(s"$name p + (-p) = 0") {
+  //     forAll { (p: P) => p + (-p) should be === zero }
+  //   }
 
-    property(s"$name p * 0 = 0") {
-      forAll { (p: P) => p * zero should be === zero }
-    }
+  //   property(s"$name p * 0 = 0") {
+  //     forAll { (p: P) => p * zero should be === zero }
+  //   }
 
-    property(s"$name p * 1 = p") {
-      forAll { (p: P) => p * one should be === p }
-    }
+  //   property(s"$name p * 1 = p") {
+  //     forAll { (p: P) => p * one should be === p }
+  //   }
 
-    property(s"$name p /~ 1 = p") {
-      forAll { (p: P) => p /~ one should be === p }
-    }
+  //   property(s"$name p /~ 1 = p") {
+  //     forAll { (p: P) => p /~ one should be === p }
+  //   }
 
-    property(s"$name p /~ p = 1") {
-      forAll { (p: P) => if (!p.isZero) p /~ p should be === one }
-    }
+  //   property(s"$name p /~ p = 1") {
+  //     forAll { (p: P) => if (!p.isZero) p /~ p should be === one }
+  //   }
 
-    property(s"$name p % p = 0") {
-      forAll { (p: P) => if (!p.isZero) p % p should be === zero }
-    }
+  //   property(s"$name p % p = 0") {
+  //     forAll { (p: P) => if (!p.isZero) p % p should be === zero }
+  //   }
 
-    property(s"$name x + y = y + x") {
-      forAll { (x: P, y: P) => x + y should be === y + x }
-    }
+  //   property(s"$name x + y = y + x") {
+  //     forAll { (x: P, y: P) => x + y should be === y + x }
+  //   }
 
-    property(s"$name x * y = y * x") {
-      forAll { (x: P, y: P) => x * y should be === y * x }
-    }
+  //   property(s"$name x * y = y * x") {
+  //     forAll { (x: P, y: P) => x * y should be === y * x }
+  //   }
 
-    property(s"$name (x /~ y) * y + (x % y) = x") {
-      forAll { (x: P, y: P) => if (!y.isZero) (x /~ y) * y + (x % y) should be === x }
-    }
-  }
+  //   property(s"$name (x /~ y) * y + (x % y) = x") {
+  //     forAll { (x: P, y: P) => if (!y.isZero) (x /~ y) * y + (x % y) should be === x }
+  //   }
+  // }
 
 }
 
