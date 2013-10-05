@@ -13,53 +13,43 @@ import spire.math._
     each to a non-negative integer power.
 */
 
-case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
-                                    (implicit val ct: ClassTag[(Char, Int)]) { lhs =>
+class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val vars: Map[Char, Int])
+  (implicit r: Ring[C]) { lhs =>
 
   lazy val degree: Int = 
     vars.values.sum
 
-  def sortMap(m: Map[Char, Int] = vars): Map[Char, Int] = {
-    val arr = m.toArray
-    QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
-    if(arr.length == 1 && arr.head._2 == 0) arr.toMap 
-      else if(arr.forall(_._2 == 0)) arr.toMap else arr.filterNot(_._2 == 0).toMap
-  }
+  def isZero(implicit eqm: Eq[Monomial[C]]): Boolean =
+    lhs === Monomial.zero[C]
 
-  def isZero(implicit r: Semiring[C], eq: Eq[C]): Boolean =
-    coeff === r.zero
-
-  def isEmpty: Boolean =
-    vars.size == 0
-
-  def eval(values: Map[Char, C])(implicit r: Ring[C]): C =
+  def eval(values: Map[Char, C]): C =
     coeff * vars.map({ case (k,v) => values.get(k).get ** v }).reduce(_ * _)
 
-  def unary_-(implicit r: Rng[C]): Monomial[C] = 
-    Monomial(-coeff, vars)
+  def unary_- = 
+    Monomial[C](-coeff, vars)
 
-  def *:(x: C)(implicit r: Semiring[C]): Monomial[C] =
-    Monomial(coeff * x, lhs.vars)
+  def *:(x: C): Monomial[C] =
+    Monomial[C](coeff * x, lhs.vars)
 
-  def :*(k: C)(implicit r: Semiring[C], eq: Eq[C]): Monomial[C] = 
+  def :*(k: C): Monomial[C] = 
     k *: lhs
 
   def :/(x: C)(implicit f: Field[C]): Monomial[C] =
     lhs.*:(x.reciprocal)
 
-  def *(rhs: Monomial[C])(implicit r: Semiring[C], i: Semiring[Int]): Monomial[C] =
-    Monomial(lhs.coeff * rhs.coeff, sortMap(lhs.vars + rhs.vars))
+  def *(rhs: Monomial[C])(implicit i: Semiring[Int]): Monomial[C] =
+    Monomial[C](lhs.coeff * rhs.coeff, lhs.vars + rhs.vars)
 
   // n.b. only monomials with the same variables form a ring or field
   // but it is like this as we do the arithmetic in MultivariatePolynomial.
-  def +(rhs: Monomial[C])(implicit r: Semiring[C]): Monomial[C] = 
-    Monomial(lhs.coeff + rhs.coeff, lhs.vars)
+  def +(rhs: Monomial[C]): Monomial[C] = 
+    Monomial[C](lhs.coeff + rhs.coeff, lhs.vars)
 
-  def -(rhs: Monomial[C])(implicit r: Rng[C]): Monomial[C] =
-    Monomial(lhs.coeff + -rhs.coeff, lhs.vars)
+  def -(rhs: Monomial[C]): Monomial[C] =
+    Monomial[C](lhs.coeff + -rhs.coeff, lhs.vars)
 
   def /(rhs: Monomial[C])(implicit f: Field[C]): Monomial[C] =
-    Monomial(lhs.coeff / rhs.coeff, sortMap(lhs.vars - rhs.vars))
+    Monomial[C](lhs.coeff / rhs.coeff, lhs.vars - rhs.vars)
 
   def divides(rhs: Monomial[C]): Boolean = {
     @tailrec def divides_(x: Map[Char, Int], y: Map[Char, Int]): Boolean = {
@@ -74,7 +64,7 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
 
   def gcd(rhs: Monomial[C])(implicit er: EuclideanRing[C]): Monomial[C] = {
     @tailrec def gcd_(z: Map[Char, Int], x: Map[Char, Int], y: Map[Char, Int]) : Monomial[C] = {
-      if(x.isEmpty || y.isEmpty) Monomial(er.gcd(lhs.coeff, rhs.coeff), z) else x.head._1 compare y.head._1 match {
+      if(x.isEmpty || y.isEmpty) Monomial[C](er.gcd(lhs.coeff, rhs.coeff), z) else x.head._1 compare y.head._1 match {
         case -1 => gcd_(z, x.tail, y)
         case 1 => gcd_(z, x, y.tail)
         case 0 => {
@@ -88,7 +78,7 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
 
   def lcm(rhs: Monomial[C])(implicit er: EuclideanRing[C]): Monomial[C] = {
     @tailrec def lcm_(z: Map[Char, Int], x: Map[Char, Int], y: Map[Char, Int]) : Monomial[C] = {
-      if(x.isEmpty || y.isEmpty) Monomial(er.lcm(lhs.coeff, rhs.coeff), z) else x.head._1 compare y.head._1 match {
+      if(x.isEmpty || y.isEmpty) Monomial[C](er.lcm(lhs.coeff, rhs.coeff), z) else x.head._1 compare y.head._1 match {
         case -1 => lcm_(z, x.tail, y)
         case 1 => lcm_(z, x, y.tail)
         case 0 => {
@@ -101,9 +91,10 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
   }
 
   override def toString = {
+
     import Monomial._
 
-    val varStr = sortMap().map(v => v._2 match {
+    val varStr = vars.map(v => v._2 match {
         case 0 => ""
         case 1 => s"${v._1}"
         case e => s"${v._1}^$e"
@@ -123,7 +114,7 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
       case _ => None
     }
 
-    if(vars.size == 0) "+ (0)" else simpleCoeff orElse stringCoeff getOrElse s" + $coeff$varStr"
+    if(vars.isEmpty) " + (0)" else simpleCoeff orElse stringCoeff getOrElse s" + $coeff$varStr"
   }
 
 }
@@ -131,33 +122,50 @@ case class Monomial[@spec(Double) C](coeff: C, vars: Map[Char, Int])
 
 object Monomial {
 
-  def apply[@spec(Double) C: ClassTag](c: C, v: (Char, Int)*): Monomial[C] = {
-    val arr = if(v.length == 1 && v.head._2 == 0) v.toArray 
-      else if(v.forall(_._2 == 0)) v.toArray else v.filterNot(_._2 == 0).toArray
-    QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
-    Monomial(c, arr.toMap) 
-  }
+  def apply[@spec(Double) C: ClassTag: Eq: Ring](c: C, v: (Char, Int)*): Monomial[C] = 
+    checkCreateMonomial(c, v.toArray)
 
-  def apply[@spec(Double) C: ClassTag](c: C, v: List[(Char, Int)]): Monomial[C] = {
-    val arr = if(v.length == 1 && v.head._2 == 0) v.toArray 
-      else if(v.forall(_._2 == 0)) v.toArray else v.filterNot(_._2 == 0).toArray
-    QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
-    Monomial(c, arr.toMap) 
-  }
+  def apply[@spec(Double) C: ClassTag: Eq: Ring](c: C, v: List[(Char, Int)]): Monomial[C] =
+    checkCreateMonomial(c, v.toArray)
 
-  def zero[@spec(Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] =
-    Monomial(r.zero, Map[Char, Int]())
+  def apply[@spec(Double) C: ClassTag: Eq: Ring](c: C, v: Map[Char, Int]): Monomial[C] =
+    checkCreateMonomial(c, v.toArray)
+
+  def checkCreateMonomial[@spec(Double) C: ClassTag: Eq](c: C, arr: Array[(Char, Int)])
+    (implicit r: Ring[C]): Monomial[C] = c match {
+      case n if n === r.zero => zero[C]
+      case _ => {
+        arr.length match {
+          case 0 => zero[C]
+          case 1 => {
+            if(c === r.zero && arr(0)._2 == 0) zero[C] else if(arr(0)._2 ==0) xzero(c) else {
+              new Monomial[C](c, arr.toMap)
+            }
+          }
+          case _ => {
+            QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
+            if(arr.forall(_._2 == 0)) xzero(c) else new Monomial[C](c, arr.filterNot(_._2 == 0).toMap) 
+          }
+        }
+      }
+    }
+
+  def zero[@spec(Double) C: ClassTag: Eq](implicit r: Ring[C]): Monomial[C] =
+    new Monomial[C](r.zero, Map[Char, Int]())
   
-  def one[@spec(Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] = 
-    Monomial(r.one, Map('x' -> 0))
+  def one[@spec(Double) C: ClassTag: Eq](implicit r: Ring[C]): Monomial[C] = 
+    new Monomial[C](r.one, Map('x' -> 0))
 
-  def x[@spec(Double) C: ClassTag](implicit r: Rig[C]): Monomial[C] = 
-    Monomial(r.one, Map('x' -> 1))
+  def xzero[@spec(Double) C: ClassTag: Eq](c: C)(implicit r: Ring[C]): Monomial[C] =
+    new Monomial[C](c, Map('x' -> 0))
+
+  def x[@spec(Double) C: ClassTag: Eq](implicit r: Ring[C]): Monomial[C] = 
+    new Monomial[C](r.one, Map('x' -> 1))
 
   private val IsZero = "0".r
   private val IsNegative = "-(.*)".r
 
-  implicit def monomialEq[@spec(Double) C: ClassTag: Semiring] = new MonomialEq[C] {
+  implicit def monomialEq[@spec(Double) C: ClassTag: Eq: Semiring] = new MonomialEq[C] {
     val scalar = Semiring[C]
     val ct = implicitly[ClassTag[C]]
   }
@@ -170,7 +178,7 @@ trait MonomialEq[@spec(Double) C] extends Eq[Monomial[C]] {
   implicit def scalar: Semiring[C]
   implicit def ct: ClassTag[C]
   def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
-    x.sortMap().toArray.map(_._1) === y.sortMap().toArray.map(_._1) 
+    x.vars.keys.toArray === y.vars.keys.toArray 
 }
 
 
@@ -196,7 +204,7 @@ with Eq[Monomial[C]] {
         }
       }
     }
-    compare_(x.sortMap(), y.sortMap())
+    compare_(x.vars, y.vars)
   }
 }
 
@@ -226,7 +234,7 @@ with Eq[Monomial[C]] {
         }  
       }
     }
-    compare_(x.sortMap(), y.sortMap())
+    compare_(x.vars, y.vars)
   }
 }
 
@@ -252,6 +260,6 @@ with Eq[Monomial[C]] {
           }
         }
       }
-    compare_(x.sortMap().toArray.reverse.toMap, y.sortMap().toArray.reverse.toMap)
+    compare_(x.vars.toArray.reverse.toMap, y.vars.toArray.reverse.toMap)
   }
 }

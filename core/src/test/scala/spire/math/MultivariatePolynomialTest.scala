@@ -41,7 +41,8 @@ object MVPolynomialSetup {
   implicit def arbitraryMonomial[A: Arbitrary: Ring: Eq: ClassTag] = Arbitrary(for {
     coeff <- arbitrary[A]
     count <- arbitrary[Int]
-    vs <- arbitrary[List[Variable]]
+    vs <- arbitrary[List[Variable]];
+    if(vs.length < 5) // we only need short variables - this is about algebraic tests after all - can expand later on.
   } yield {
     Monomial[A](coeff, vs.map(_.v))
   })
@@ -55,7 +56,8 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
   val fbd = Field[Rational]
   val cbd = implicitly[ClassTag[Rational]]
 
-  runLex[Rational]("rational")
+  runMonomial[Rational]("rational")
+  // runLex[Rational]("rational")
   // runGlex[Rational]("rational")
   // runGrevlex[Rational]("rational")
 
@@ -64,6 +66,15 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
   // } yield {
   //   MultivariatePolynomialLex(ts)
   // })
+
+  def runMonomial[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
+    implicit val arb: Arbitrary[MultivariatePolynomial[A]] = Arbitrary(for {
+      m <- arbitrary[Monomial[A]]
+    } yield { 
+      m
+    })
+    runMonomialTest[A](s"$typ/monomial")
+  }
 
   def runLex[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
     implicit val arb: Arbitrary[MultivariatePolynomial[A]] = Arbitrary(for {
@@ -93,7 +104,43 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
     runTest[A](s"$typ/graded reverse lexicographic")
   }
 
-  def runTest[A: Eq: ClassTag](name: String)(implicit arb: Arbitrary[MultivariatePolynomial[A]], f: Field[A]) {
+  def runMonomialTest[A: Eq: ClassTag](name: String)(implicit arb: Arbitrary[MultivariatePolynomial[A]], f: Field[A]) {
+    type M = Monomial[A]
+
+    val zero = Monomial.zero[A]
+    val one = Monomial.one[A]
+
+    property(s"$name p = p") {
+      forAll { (m: M) => m should be === m }
+    }
+
+    property(s"$name p + 0 = p") {
+      forAll { (m: M) => m + zero should be === m }
+    }
+
+    property(s"$name p + (-p) = 0") {
+      forAll { (m: m) => m + (-m) should be === zero }
+    }
+
+    property(s"$name p * 0 = 0") {
+      forAll { (m: M) => m * zero should be === zero }
+    }
+
+    property(s"$name p * 1 = p") {
+      forAll { (m: M) => m * one should be === m }
+    }
+
+    property(s"$name x + y = y + x") {
+      forAll { (x: m, y: m) => x + y should be === y + x }
+    }
+
+    property(s"$name x * y = y * x") {
+      forAll { (x: m, y: m) => x * y should be === y * x }
+    }
+
+  }
+
+  def runTest[A: Eq: ClassTag](name: String)(implicit arb: Arbitrary[Monomial[A]], f: Field[A]) {
     type P = MultivariatePolynomial[A]
 
     val zero = MultivariatePolynomialLex.zero[A]
