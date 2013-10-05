@@ -67,10 +67,10 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
   def unary_-(implicit r: Rng[C]): MultivariatePolynomial[C] = 
     new MultivariatePolynomial[C](terms.map(_.unary_-))
 
-  def head(implicit r: Semiring[C], eq: Eq[C]): Monomial[C] =
-    if(isZero) Monomial(r.zero, Map[Char, Int]()) else ts.head
+  def head(implicit r: Ring[C], eq: Eq[C]): Monomial[C] =
+    if(isZero) Monomial.zero[C] else ts.head
 
-  def headCoefficient(implicit r: Semiring[C], eq: Eq[C]): C =
+  def headCoefficient(implicit r: Ring[C], eq: Eq[C]): C =
     head.coeff
 
   def tail(implicit r: Semiring[C]): MultivariatePolynomial[C] = 
@@ -106,7 +106,7 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
     @tailrec def quotMod_(quot: MultivariatePolynomial[C],
                           dividend: MultivariatePolynomial[C],
                           divisor: MultivariatePolynomial[C]): (MultivariatePolynomial[C], MultivariatePolynomial[C]) = {
-      if(lhs == rhs) (MultivariatePolynomial[C](Array(Monomial(f.one, 'x' -> 0))), new MultivariatePolynomial[C](new Array[Monomial[C]](0)))
+      if(lhs == rhs) (new MultivariatePolynomial[C](Array(Monomial(f.one, 'x' -> 0))), new MultivariatePolynomial[C](new Array[Monomial[C]](0)))
         else if(divisor.isZero || dividend.isZero) (quot, dividend) else { // if we can't divide anything in, give it back the quot and dividend
           if(divisor.head.divides(dividend.head)) {
             val divTerm = new MultivariatePolynomial[C](Array(dividend.head / divisor.head)) // the first division
@@ -161,8 +161,8 @@ object MultivariatePolynomialLex extends LexOrdering {
   def zero[@spec(Double) C: ClassTag](implicit r: Semiring[C]) = 
     new MultivariatePolynomial[C](new Array[Monomial[C]](0))
 
-  def one[@spec(Double) C: ClassTag](implicit r: Ring[C]) = new 
-    MultivariatePolynomial[C](Array(Monomial(r.one, 'x' -> 0)))
+  def one[@spec(Double) C: ClassTag: Eq](implicit r: Ring[C]) = 
+    new MultivariatePolynomial[C](Array(Monomial.one[C]))
 
 }
 
@@ -177,8 +177,8 @@ object MultivariatePolynomialGlex extends GlexOrdering {
   def zero[@spec(Double) C: ClassTag](implicit r: Semiring[C]) = 
     new MultivariatePolynomial[C](new Array[Monomial[C]](0))
 
-  def one[@spec(Double) C: ClassTag](implicit r: Ring[C]) = new 
-    MultivariatePolynomial[C](Array(Monomial(r.one, 'x' -> 0)))
+  def one[@spec(Double) C: ClassTag: Eq](implicit r: Ring[C]) = 
+    new MultivariatePolynomial[C](Array(Monomial.one[C]))
 
 }
 
@@ -193,8 +193,8 @@ object MultivariatePolynomialGrevlex extends GrevlexOrdering {
   def zero[@spec(Double) C: ClassTag](implicit r: Semiring[C]) = 
     new MultivariatePolynomial[C](new Array[Monomial[C]](0))
 
-  def one[@spec(Double) C: ClassTag](implicit r: Ring[C]) = new 
-    MultivariatePolynomial[C](Array(Monomial(r.one, 'x' -> 0)))
+  def one[@spec(Double) C: ClassTag: Eq](implicit r: Ring[C]) = 
+    new MultivariatePolynomial[C](Array(Monomial.one[C]))
      
 }
 
