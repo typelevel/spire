@@ -37,19 +37,19 @@ class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val 
   def :/(x: C)(implicit f: Field[C]): Monomial[C] =
     lhs.*:(x.reciprocal)
 
-  def *(rhs: Monomial[C])(implicit i: Semiring[Int]): Monomial[C] =
-    Monomial[C](lhs.coeff * rhs.coeff, lhs.vars + rhs.vars)
+  def *(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] = // there was an implicit semiring[int] here for the map but I think it's not needed.
+    if(rhs.isZero) Monomial.zero[C] else Monomial[C](lhs.coeff * rhs.coeff, lhs.vars + rhs.vars)
 
   // n.b. only monomials with the same variables form a ring or field
   // but it is like this as we do the arithmetic in MultivariatePolynomial.
-  def +(rhs: Monomial[C]): Monomial[C] = 
-    Monomial[C](lhs.coeff + rhs.coeff, lhs.vars)
+  def +(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] =
+    if(rhs.isZero) lhs else Monomial[C](lhs.coeff + rhs.coeff, lhs.vars)
 
   def -(rhs: Monomial[C]): Monomial[C] =
     Monomial[C](lhs.coeff + -rhs.coeff, lhs.vars)
 
-  def /(rhs: Monomial[C])(implicit f: Field[C]): Monomial[C] =
-    Monomial[C](lhs.coeff / rhs.coeff, lhs.vars - rhs.vars)
+  def /(rhs: Monomial[C])(implicit f: Field[C], eqm: Eq[Monomial[C]]): Monomial[C] =
+    if(lhs === rhs) Monomial.one[C] else Monomial[C](lhs.coeff / rhs.coeff, lhs.vars - rhs.vars)
 
   def divides(rhs: Monomial[C]): Boolean = {
     @tailrec def divides_(x: Map[Char, Int], y: Map[Char, Int]): Boolean = {
@@ -88,6 +88,10 @@ class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val 
       } 
     }
     lcm_(Map[Char, Int](), lhs.vars, rhs.vars)
+  }
+
+  override def equals(that: Any): Boolean = {
+    
   }
 
   override def toString = {
