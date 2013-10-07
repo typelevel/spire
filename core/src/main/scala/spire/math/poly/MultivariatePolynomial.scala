@@ -81,10 +81,10 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
       new MultivariatePolynomial[C](terms.map(_.:/(headCoefficient)))
 
   def simplify(xs: Array[Monomial[C]])(implicit r: Semiring[C], eq: Eq[Monomial[C]]): Array[Monomial[C]] = 
-   (for(x <- xs) yield xs.view.filter(_ === x).reduce(_ + _)).distinct.filterNot(_.coeff == r.zero)
+   (for(x <- xs) yield xs.view.filter(_ === x).reduce(_ + _)).toSet.filterNot(_.coeff == r.zero).toArray
 
   def simplifySub(xs: Array[Monomial[C]])(implicit r: Rng[C], eq: Eq[Monomial[C]]): Array[Monomial[C]] = 
-   (for(x <- xs) yield xs.view.filter(_ === x).reduce(_ - _)).distinct.filterNot(_.coeff == r.zero)
+   (for(x <- xs) yield xs.view.filter(_ === x).reduce(_ - _)).toSet.filterNot(_.coeff == r.zero).toArray
 
   // EuclideanRing ops
   def +(rhs: MultivariatePolynomial[C])(implicit r: Semiring[C], eq: Eq[Monomial[C]]): MultivariatePolynomial[C] =
@@ -133,7 +133,6 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
       lhs.allTerms.view.zip(rhs.allTerms.asInstanceOf[Array[Monomial[C]]]).map(z => z._1 compare z._2).forall(_ == 0)
 
     case rhs: MultivariatePolynomial[_] => if(lhs.isEmpty && rhs.isEmpty) true else false
-
     case _ => false
   }
 

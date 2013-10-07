@@ -186,7 +186,6 @@ trait MonomialEq[@spec(Double) C] extends Eq[Monomial[C]] {
     x.vars.keys.toArray === y.vars.keys.toArray 
 }
 
-
 // Lexicographic ordering
 // e.g. x^2 < xy < xz < x < y^2 < yz < y < z^2 < z < 1
 trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]]
