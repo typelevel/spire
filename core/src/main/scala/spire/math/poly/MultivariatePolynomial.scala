@@ -2,6 +2,8 @@ package spire.math.poly
 
 import compat._
 import scala.annotation.tailrec
+import scala.collection.mutable.ArrayBuilder
+import scala.collection.mutable.Set
 import scala.reflect._
 import scala.{specialized => spec}
 import spire.algebra._
@@ -80,20 +82,47 @@ case class MultivariatePolynomial[@spec(Double) C](val terms: Array[Monomial[C]]
     if(isZero) new MultivariatePolynomial[C](new Array[Monomial[C]](0)) else 
       new MultivariatePolynomial[C](terms.map(_.:/(headCoefficient)))
 
-  def simplify(xs: Array[Monomial[C]])(implicit r: Semiring[C], eq: Eq[Monomial[C]]): Array[Monomial[C]] = 
-   (for(x <- xs) yield xs.view.filter(_ === x).reduce(_ + _)).toSet.filterNot(_.coeff == r.zero).toArray
+  def sum(l: Array[Monomial[C]], r: Array[Monomial[C]])(implicit ring: Semiring[C], eq: Eq[Monomial[C]]) = {
+    val a = ArrayBuilder.make[Monomial[C]]()
+    val ar = new Array[Boolean](r.length)
+    cfor(0)(_ < ar.length, _ + 1) { x => ar(x) = false }
+    cfor(0)(_ < l.length, _ + 1) { i =>
+      var added = false
+      cfor(0)(_ < r.length, _ + 1) { j =>
+        if(l(i) === r(j)) {
+          val sumTerm = l(i) + r(j) 
+          a += sumTerm 
+          added = true
+          ar(j) = true
+        }
+      }
+      if(!added) a += l(i)
+    }
+    cfor(0)(_ < ar.length, _ + 1) { x => 
+      if(!ar(x)) a += r(x) 
+    }
+    a.result()
+  }
 
-  def simplifySub(xs: Array[Monomial[C]])(implicit r: Rng[C], eq: Eq[Monomial[C]]): Array[Monomial[C]] = 
-   (for(x <- xs) yield xs.view.filter(_ === x).reduce(_ - _)).toSet.filterNot(_.coeff == r.zero).toArray
+  @tailrec private final def simplify(ts: Array[Monomial[C]], a: ArrayBuilder[Monomial[C]] = ArrayBuilder.make[Monomial[C]])
+              (implicit r: Semiring[C], eq: Eq[Monomial[C]]): Array[Monomial[C]] = ts.length match {
+    case 0 => a.result()
+    case 1 => a += ts(0); a.result()
+    case _ => {
+      val reduction = ts.filter(_ === ts(0)).reduce(_ + _)
+      a += reduction
+      simplify(ts.filterNot(_ === ts(0)), a)
+    }
+  }   
 
   // EuclideanRing ops
   def +(rhs: MultivariatePolynomial[C])(implicit r: Semiring[C], eq: Eq[Monomial[C]]): MultivariatePolynomial[C] =
-    new MultivariatePolynomial[C](simplify(lhs.terms ++ rhs.terms))
+    new MultivariatePolynomial[C](sum(lhs.terms, rhs.terms))
 
   def -(rhs: MultivariatePolynomial[C])(implicit r: Rng[C], eq: Eq[Monomial[C]]): MultivariatePolynomial[C] =
-    new MultivariatePolynomial[C](simplifySub(lhs.terms ++ rhs.terms))
+    new MultivariatePolynomial[C](sum(lhs.terms, (rhs.unary_-).terms))
 
-  def *(rhs: MultivariatePolynomial[C])(implicit r: Semiring[C], eq: Eq[C]): MultivariatePolynomial[C] =
+  def *(rhs: MultivariatePolynomial[C])(implicit r: Semiring[C], eq: Eq[Monomial[C]]): MultivariatePolynomial[C] =
     new MultivariatePolynomial[C](simplify(lhs.terms.flatMap(lt => rhs.terms.map(rt => lt * rt))))
 
   def /~(rhs: MultivariatePolynomial[C])(implicit f: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = 

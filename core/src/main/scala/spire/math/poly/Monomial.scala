@@ -42,10 +42,12 @@ class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val 
 
   // n.b. only monomials with the same variables form a ring or field
   // but it is like this as we do the arithmetic in MultivariatePolynomial.
-  def +(rhs: Monomial[C]): Monomial[C] =
-    Monomial[C](lhs.coeff + rhs.coeff, lhs.vars)
+  def +(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] =
+    if(rhs === Monomial.zero[C]) lhs else if(lhs === Monomial.zero[C]) rhs else 
+      Monomial[C](lhs.coeff + rhs.coeff, lhs.vars)
 
-  def -(rhs: Monomial[C]): Monomial[C] =
+  def -(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] =
+  if(rhs === Monomial.zero[C]) lhs else if(lhs === Monomial.zero[C]) -rhs else
     Monomial[C](lhs.coeff + -rhs.coeff, lhs.vars)
 
   def /(rhs: Monomial[C])(implicit f: Field[C], eqm: Eq[Monomial[C]]): Monomial[C] =
@@ -175,6 +177,8 @@ object Monomial {
     val ct = implicitly[ClassTag[C]]
   }
 
+
+
 }
 
 // An equivalent monomial has the same variables (that's all!)
@@ -183,7 +187,7 @@ trait MonomialEq[@spec(Double) C] extends Eq[Monomial[C]] {
   implicit def scalar: Semiring[C]
   implicit def ct: ClassTag[C]
   def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
-    x.vars.keys.toArray === y.vars.keys.toArray 
+    x.vars.toArray === y.vars.toArray 
 }
 
 // Lexicographic ordering
@@ -210,6 +214,7 @@ with Eq[Monomial[C]] {
     }
     compare_(x.vars, y.vars)
   }
+
 }
 
 // Graded lexicographic ordering
