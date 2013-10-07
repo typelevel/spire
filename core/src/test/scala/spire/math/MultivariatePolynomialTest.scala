@@ -66,16 +66,16 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
   //   MultivariatePolynomialLex(ts)
   // })
 
-  // def runMonomial[A: Arbitrary: ClassTag](typ: String)(implicit r: Ring[A], eqa: Eq[A]) {
-  //   implicit val arb: Arbitrary[Monomial[A]] = Arbitrary(for {
-  //     coeff <- arbitrary[A]
-  //     vs <- arbitrary[List[Variable]];
-  //     if(vs.isEmpty && vs.length < 5)  // we only need short variables - this is about algebraic tests after all - can expand later on.
-  //   } yield {
-  //     Monomial[A](coeff, vs.map(_.v))
-  //   })
-  //   runMonomialTest[A](s"$typ/monomial")
-  // }
+  def runMonomial[A: Arbitrary: ClassTag](typ: String)(implicit r: Ring[A], eqa: Eq[A]) {
+    implicit val arb: Arbitrary[Monomial[A]] = Arbitrary(for {
+      coeff <- arbitrary[A]
+      vs <- arbitrary[List[Variable]];
+      if(vs.isEmpty && vs.length < 5)  // we only need short variables - this is about algebraic tests after all - can expand later on.
+    } yield {
+      Monomial[A](coeff, vs.map(_.v))
+    })
+    runMonomialTest[A](s"$typ/monomial")
+  }
 
   def runLex[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
     implicit val arb: Arbitrary[MultivariatePolynomial[A]] = Arbitrary(for {
@@ -112,10 +112,7 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
     val one = Monomial.one[A]
 
     property(s"$name m = m") {
-      forAll { (m: M) => {
-        println(s"\nMonomial for testing = $m");
-        m should be === m }
-      }
+      forAll { (m: M) => m should be === m }
     }
 
     property(s"$name m + 0 = m") {
