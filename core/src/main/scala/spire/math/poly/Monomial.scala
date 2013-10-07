@@ -55,7 +55,7 @@ class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val 
 
   def divides(rhs: Monomial[C])(implicit ordi: Order[Int], ordc: Order[Char]): Boolean = {
     @tailrec def divides_(x: Map[Char, Int], y: Map[Char, Int]): Boolean = {
-      if(x.isEmpty) true else if(y.isEmpty) false else x.head._1 compare y.head._1 match {
+      if(x.isEmpty) true else if(y.isEmpty) false else ordc.compare(x.head._1, y.head._1) match {
         case -1 => false
         case 1 => divides_(x, y.tail)
         case 0 => if(x.head._2 <= y.head._2) divides_(x.tail, y.tail) else false
