@@ -82,7 +82,7 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
       ts <- arbitrary[List[Monomial[A]]];
       if(ts.length <= 5)
     } yield {
-      MultivariatePolynomialLex(ts)
+      MultivariatePolynomial(ts)
     })
     runTest[A](s"$typ/lexicographic")
   }
@@ -140,8 +140,8 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
   def runTest[A: Eq: ClassTag](name: String)(implicit arb: Arbitrary[MultivariatePolynomial[A]], f: Field[A]) {
     type P = MultivariatePolynomial[A]
 
-    val zero = MultivariatePolynomialLex.zero[A]
-    val one = MultivariatePolynomialLex.one[A]
+    val zero = MultivariatePolynomial.zero[A]
+    val one = MultivariatePolynomial.one[A]
 
     property(s"$name p = p") {
       forAll { (p: P) => p should be === p }
