@@ -41,7 +41,7 @@ object MVPolynomialSetup {
   implicit def arbitraryMonomial[A: Arbitrary: Ring: Eq: ClassTag] = Arbitrary(for {
       coeff <- arbitrary[A]
       vs <- arbitrary[List[Variable]];
-      if(vs.isEmpty && vs.length < 5)  // we only need short variables - this is about algebraic tests after all - can expand later on.
+      if(!vs.isEmpty && vs.length < 5)  // we only need short variables - this is about algebraic tests after all - can expand later on.
     } yield {
       Monomial[A](coeff, vs.map(_.v))
     })
@@ -55,22 +55,17 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
   val fbd = Field[Rational]
   val cbd = implicitly[ClassTag[Rational]]
 
-  // runMonomial[Rational]("rational")
+  runMonomial[Rational]("rational")
   runLex[Rational]("rational")
   // runGlex[Rational]("rational")
   // runGrevlex[Rational]("rational")
 
-  // implicit val arbLex: Arbitrary[MultivariatePolynomial[Rational]] = Arbitrary(for {
-  //   ts <- arbitrary[List[Monomial[Rational]]]
-  // } yield {
-  //   MultivariatePolynomialLex(ts)
-  // })
 
   def runMonomial[A: Arbitrary: ClassTag](typ: String)(implicit r: Ring[A], eqa: Eq[A]) {
     implicit val arb: Arbitrary[Monomial[A]] = Arbitrary(for {
       coeff <- arbitrary[A]
       vs <- arbitrary[List[Variable]];
-      if(vs.isEmpty && vs.length < 5)  // we only need short variables - this is about algebraic tests after all - can expand later on.
+      if(!vs.isEmpty && vs.length < 5)  // we only need short variables - this is about algebraic tests after all - can expand later on.
     } yield {
       Monomial[A](coeff, vs.map(_.v))
     })
@@ -80,11 +75,11 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
   def runLex[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
     implicit val arb: Arbitrary[MultivariatePolynomial[A]] = Arbitrary(for {
       ts <- arbitrary[List[Monomial[A]]];
-      if(ts.length <= 5)
+      if(!ts.isEmpty && ts.length <= 5)
     } yield {
-      MultivariatePolynomial(ts)
+      MultivariatePolynomial[A](ts)
     })
-    runTest[A](s"$typ/lexicographic")
+    runTest[A](s"$typ/lexicographic multivariate polynomial")
   }
 
   // def runGlex[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
@@ -112,7 +107,7 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
     val one = Monomial.one[A]
 
     property(s"$name m = m") {
-      forAll { (m: M) => m should be === m }
+      forAll { (m: M) => println(s"monomial test case = $m"); m should be === m }
     }
 
     property(s"$name m + 0 = m") {
@@ -144,7 +139,7 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
     val one = MultivariatePolynomial.one[A]
 
     property(s"$name p = p") {
-      forAll { (p: P) => p should be === p }
+      forAll { (p: P) => println(s"MVP test case = $p"); p should be === p }
     }
 
     property(s"$name p + 0 = p") {

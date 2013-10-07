@@ -105,7 +105,7 @@ class MultivariatePolynomial[@spec(Double) C] private[spire] (val terms: Array[M
   }
 
   @tailrec private final def simplify(ts: Array[Monomial[C]], a: ArrayBuilder[Monomial[C]] = ArrayBuilder.make[Monomial[C]])
-              (implicit r: Semiring[C], eq: Eq[Monomial[C]]): Array[Monomial[C]] = ts.length match {
+    (implicit r: Semiring[C], eq: Eq[Monomial[C]]): Array[Monomial[C]] = ts.length match {
     case 0 => a.result()
     case 1 => a += ts(0); a.result()
     case _ => {
@@ -126,17 +126,17 @@ class MultivariatePolynomial[@spec(Double) C] private[spire] (val terms: Array[M
     MultivariatePolynomial[C](simplify(lhs.terms.flatMap(lt => rhs.terms.map(rt => lt * rt))))
 
   def /~(rhs: MultivariatePolynomial[C])(implicit f: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = 
-    lhs./%(rhs)._2
+    lhs./%(rhs)._1
 
   def %(rhs: MultivariatePolynomial[C])(implicit f: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = 
-    lhs./%(rhs)._1
+    lhs./%(rhs)._2
 
   def /%(rhs: MultivariatePolynomial[C])(implicit f: Field[C], eq: Eq[C], ct: ClassTag[C]) = {
     @tailrec def quotMod_(quot: MultivariatePolynomial[C],
                           dividend: MultivariatePolynomial[C],
                           divisor: MultivariatePolynomial[C]): (MultivariatePolynomial[C], MultivariatePolynomial[C]) = {
       if(lhs == rhs) (MultivariatePolynomial.one[C], MultivariatePolynomial.zero[C])
-        else if(divisor.isZero || dividend.isZero) (quot, dividend) else { // if we can't divide anything in, give it back the quot and dividend
+        else if(divisor.isEmpty || dividend.isEmpty) (quot, dividend) else { // if we can't divide anything in, give it back the quot and dividend
           if(divisor.head.divides(dividend.head)) {
             val divTerm = MultivariatePolynomial[C](dividend.head / divisor.head) // the first division
             val prod = divisor.tail * divTerm // then multiply the rhs.tail by the MVP containing only this product.
