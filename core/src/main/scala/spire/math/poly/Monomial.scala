@@ -53,7 +53,7 @@ class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val 
   def /(rhs: Monomial[C])(implicit f: Field[C], eqm: Eq[Monomial[C]]): Monomial[C] =
     if(lhs === rhs) Monomial.one[C] else Monomial[C](lhs.coeff / rhs.coeff, lhs.vars - rhs.vars)
 
-  def divides(rhs: Monomial[C]): Boolean = {
+  def divides(rhs: Monomial[C])(implicit ordi: Order[Int], ordc: Order[Char]): Boolean = {
     @tailrec def divides_(x: Map[Char, Int], y: Map[Char, Int]): Boolean = {
       if(x.isEmpty) true else if(y.isEmpty) false else x.head._1 compare y.head._1 match {
         case -1 => false
