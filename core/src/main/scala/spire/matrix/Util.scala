@@ -40,4 +40,7 @@ trait NumericPropertiesOfDouble {
 
     /** Precision */
     val precision = base*epsilonMachine
+
+    /** The next number greater than this is +Infinity */
+    val overflow = java.lang.Double.MAX_VALUE
 }
