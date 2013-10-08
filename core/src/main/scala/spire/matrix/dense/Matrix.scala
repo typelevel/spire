@@ -8,6 +8,7 @@ package spire.matrix.dense
 
 import spire.implicits._
 import spire.matrix.Constants._
+import scala.collection.mutable
 import scala.math
 
 /**
@@ -43,12 +44,9 @@ import scala.math
  *
  * TODO: parametrize the trait by the type of elements
  */
-trait MatrixLike extends Iterable[Double] {
+trait MatrixLike extends mutable.IndexedSeq[Double] {
   protected val m: Int
   protected val n: Int
-
-  def iterator: Iterator[Double] =
-    (for(j <- 0 until n; i <- 0 until m) yield this(i,j)).toIterator
 
   /** (number of rows, number of columns) */
   lazy val dimensions = (m,n)

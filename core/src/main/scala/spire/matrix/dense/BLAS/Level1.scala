@@ -16,13 +16,13 @@
  *     of elements, therefore keeping the next 2 characters indicating the type
  *     of matrices (GE for general, SY for symmetric, TR for triangular, ...)
  *   - we do not pass either the vector size or stride as they are encapsulated
- *     in the arguments of type VectorLike.
+ *     in the arguments of type IndexedSeq.
  *
  */
 package spire.matrix.BLAS.level1
 
 import spire.syntax.cfor._
-import spire.matrix.dense.VectorLike
+import scala.collection.mutable
 
 trait Interface {
   /**
@@ -32,10 +32,10 @@ trait Interface {
    *\]
    *
    */
-  def scale(alpha: Double, x: VectorLike): Unit
+  def scale(alpha: Double, x: mutable.IndexedSeq[Double]): Unit
 
   /** For a given vector x of length n, perform y(0:n) = x(0:n) */
-  def copy(x: VectorLike, y: VectorLike): Unit
+  def copy(x: mutable.IndexedSeq[Double], y: mutable.IndexedSeq[Double]): Unit
 
   /**
    * Perform the vector operation
@@ -43,16 +43,18 @@ trait Interface {
    *     y := \alpha x + y
    * \]
    */
-  def axpy(alpha: Double, x: VectorLike, y: VectorLike): Unit
+  def axpy(alpha: Double,
+           x: mutable.IndexedSeq[Double], y: mutable.IndexedSeq[Double]): Unit
 }
 
 trait Naive extends Interface {
-  def scale(alpha: Double, x: VectorLike): Unit =
+  def scale(alpha: Double, x: mutable.IndexedSeq[Double]): Unit =
     cforRange(0 until x.length) { k => x(k) *= alpha }
 
-  def copy(x: VectorLike, y: VectorLike): Unit =
+  def copy(x: mutable.IndexedSeq[Double], y: mutable.IndexedSeq[Double]): Unit =
     cforRange(0 until x.length) { k => y(k) = x(k) }
 
-  def axpy(alpha: Double, x: VectorLike, y: VectorLike): Unit =
+  def axpy(alpha: Double,
+           x: mutable.IndexedSeq[Double], y: mutable.IndexedSeq[Double]): Unit =
     cforRange(0 until x.length) { k => y(k) += alpha * x(k) }
 }
