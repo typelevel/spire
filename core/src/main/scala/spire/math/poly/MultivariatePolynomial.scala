@@ -110,15 +110,14 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
     @tailrec def quotMod_(quot: MultivariatePolynomial[C],
                           dividend: MultivariatePolynomial[C],
                           divisor: MultivariatePolynomial[C]): (MultivariatePolynomial[C], MultivariatePolynomial[C]) = {
-      if(divisor.isEmpty || dividend.isEmpty) (quot, dividend) else { // if we can't divide anything in, give it back the quot and dividend
+      if(divisor.isEmpty || dividend.isEmpty) (quot, dividend) else { 
         if(divisor.head.divides(dividend.head)) {
-          val divTerm = MultivariatePolynomial[C](dividend.head / divisor.head) // the first division
-          val prod = divisor * divTerm // then multiply the rhs.tail by the MVP containing only this product.
-          val quotSum = quot + divTerm // expand the quotient with the divided term
-          val rem = dividend - prod // then subtract from the dividend - should cancel out the head term
-          // println(s"\nquot = $quot\ndividend = $dividend\ndivisor = $divisor\ndivTerm = $divTerm\nprod = $prod\nquotSum (new quotient) = $quotSum\nrem (new dividend)= $rem")
-          if(rem.isZero) (quotSum, rem) else quotMod_(quotSum, rem, divisor) // repeat
-        } else if(!rhs.allTerms.forall(t => t.divides(dividend.head))) (quot, dividend) else quotMod_(quot, dividend, divisor.tail) // if divisor head passed down wont divide, check the others.. if fail (output) else, try the tail.
+          val divTerm = MultivariatePolynomial[C](dividend.head / divisor.head) 
+          val prod = divisor * divTerm 
+          val quotSum = quot + divTerm 
+          val rem = dividend - prod 
+          if(rem.isZero) (quotSum, rem) else quotMod_(quotSum, rem, divisor)
+        } else if(!rhs.allTerms.forall(t => t.divides(dividend.head))) (quot, dividend) else quotMod_(quot, dividend, divisor.tail)
       }
     }
 
