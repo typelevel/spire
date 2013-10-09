@@ -13,7 +13,7 @@ import spire.math._
     each to a non-negative integer power.
 */
 
-class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val vars: Map[Char, Int])
+class Monomial[@spec(Double) C: ClassTag: Order] private[spire] (val coeff: C, val vars: Map[Char, Int])
   (implicit r: Ring[C]) { lhs =>
 
   lazy val degree: Int = 
@@ -42,25 +42,18 @@ class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val 
 
   // n.b. only monomials with the same variables form a ring or field
   // but it is like this as we do the arithmetic in MultivariatePolynomial.
-  def +(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] =
+  def +(rhs: Monomial[C]): Monomial[C] =
     Monomial[C](lhs.coeff + rhs.coeff, lhs.vars)
 
-  def -(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] =
+  def -(rhs: Monomial[C]): Monomial[C] =
     Monomial[C](lhs.coeff + -(rhs.coeff), lhs.vars)
 
-  def /(rhs: Monomial[C])(implicit f: Field[C], eqm: Eq[Monomial[C]]): Monomial[C] =
+  def /(rhs: Monomial[C])(implicit f: Field[C]): Monomial[C] =
     if(lhs == rhs) Monomial.one[C] else Monomial[C](lhs.coeff / rhs.coeff, lhs.vars - rhs.vars)
 
-  def divides(rhs: Monomial[C])(implicit ordi: Order[Int], ordc: Order[Char], ordC: Order[C]): Boolean = {
-    @tailrec def divides_(x: Map[Char, Int], y: Map[Char, Int]): Boolean = {
-      if(x.isEmpty) true else if(y.isEmpty) false else if(x.values.sum == 0) true else ordc.compare(x.head._1, y.head._1) match {
-        case -1 => false
-        case 1 => divides_(x, y.tail)
-        case 0 => if(x.head._2 <= y.head._2) divides_(x.tail, y.tail) else false
-      }
-    }
+  def divides(rhs: Monomial[C])(implicit ordChar: Order[Char], ordInt: Order[Int]): Boolean = {
     if(lhs.degree == 0 && rhs.degree == 0 && lhs.coeff.abs < rhs.coeff.abs) true else if(lhs.degree == 0 && rhs.degree == 0) false else
-      divides_(lhs.vars, rhs.vars)
+      lhs.vars.view.zip(rhs.vars).forall(z => (z._1._2 <= z._2._2))
   }
 
   def gcd(rhs: Monomial[C])(implicit er: EuclideanRing[C]): Monomial[C] = {
@@ -128,16 +121,16 @@ class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val 
 
 object Monomial {
 
-  def apply[@spec(Double) C: ClassTag: Eq: Ring](c: C, v: (Char, Int)*): Monomial[C] = 
+  def apply[@spec(Double) C: ClassTag: Order: Ring](c: C, v: (Char, Int)*): Monomial[C] = 
     checkCreateMonomial(c, v.toArray)
 
-  def apply[@spec(Double) C: ClassTag: Eq: Ring](c: C, v: List[(Char, Int)]): Monomial[C] =
+  def apply[@spec(Double) C: ClassTag: Order: Ring](c: C, v: List[(Char, Int)]): Monomial[C] =
     checkCreateMonomial(c, v.toArray)
 
-  def apply[@spec(Double) C: ClassTag: Eq: Ring](c: C, v: Map[Char, Int]): Monomial[C] =
+  def apply[@spec(Double) C: ClassTag: Order: Ring](c: C, v: Map[Char, Int]): Monomial[C] =
     checkCreateMonomial(c, v.toArray)
 
-  def checkCreateMonomial[@spec(Double) C: ClassTag: Eq](c: C, arr: Array[(Char, Int)])
+  def checkCreateMonomial[@spec(Double) C: ClassTag: Order](c: C, arr: Array[(Char, Int)])
     (implicit r: Ring[C]): Monomial[C] = c match {
       case n if n === r.zero => zero[C]
       case _ => {
@@ -156,27 +149,25 @@ object Monomial {
       }
     }
 
-  def zero[@spec(Double) C: ClassTag: Eq](implicit r: Ring[C]): Monomial[C] =
+  def zero[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] =
     new Monomial[C](r.zero, Map[Char, Int]())
   
-  def one[@spec(Double) C: ClassTag: Eq](implicit r: Ring[C]): Monomial[C] = 
+  def one[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] = 
     new Monomial[C](r.one, Map('x' -> 0))
 
-  def xzero[@spec(Double) C: ClassTag: Eq](c: C)(implicit r: Ring[C]): Monomial[C] =
+  def xzero[@spec(Double) C: ClassTag: Order](c: C)(implicit r: Ring[C]): Monomial[C] =
     new Monomial[C](c, Map('x' -> 0))
 
-  def x[@spec(Double) C: ClassTag: Eq](implicit r: Ring[C]): Monomial[C] = 
+  def x[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] = 
     new Monomial[C](r.one, Map('x' -> 1))
 
   private val IsZero = "0".r
   private val IsNegative = "-(.*)".r
 
-  implicit def monomialEq[@spec(Double) C: ClassTag: Eq: Semiring] = new MonomialEq[C] {
+  implicit def monomialEq[@spec(Double) C: ClassTag: Order: Semiring] = new MonomialEq[C] {
     val scalar = Semiring[C]
     val ct = implicitly[ClassTag[C]]
   }
-
-
 
 }
 
@@ -190,17 +181,24 @@ trait MonomialEq[@spec(Double) C] extends Eq[Monomial[C]] {
 }
 
 // Lexicographic ordering
-// e.g. x^2 < xy < xz < x < y^2 < yz < y < z^2 < z < 1
-trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]]
-with Eq[Monomial[C]] {
+// e.g. x^2 > xy > xz > x > y^2 > yz > y > z^2 > z > 1
+trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]] 
+with MonomialEq[C] {
 
-  implicit def ordInt: Order[Int]
-  implicit def ordChar: Order[Char]
+  implicit def ordCoeff: Order[C]
+  implicit val ordChar = Order[Char]
+  implicit val ordInt = Order[Int]
 
-  def compare(x: Monomial[C], y: Monomial[C]): Int = {
+  override def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
+    x.vars.toArray === y.vars.toArray 
+
+  def compare(l: Monomial[C], r: Monomial[C]): Int = {
     @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
-      if(x.isEmpty && y.isEmpty) 0 else if(y.isEmpty) -1 else if(x.isEmpty) 1 else {
-        ordChar.compare(x.head._1, y.head._1) match {
+      (x.isEmpty, y.isEmpty) match {
+        case (true, true) => l.coeff compare r.coeff
+        case (false, true) => -1
+        case (true, false) => 1
+        case _ => ordChar.compare(x.head._1, y.head._1) match {
           case -1 => -1
           case 1 => 1
           case 0 => ordInt.compare(x.head._2, y.head._2) match {
@@ -211,63 +209,77 @@ with Eq[Monomial[C]] {
         }
       }
     }
-    compare_(x.vars, y.vars)
+    compare_(l.vars, r.vars)
   }
-
+  
 }
 
 // Graded lexicographic ordering
-// e.g. x^2 < xy < xz < y^2 < yz < z^2 < x < y < z < 1
-trait MonomialOrderingGlex[@spec(Double) C] extends Order[Monomial[C]]
-with Eq[Monomial[C]] {
+// e.g. x^2 > xy > xz > y^2 > yz > z^2 > x > y > z > 1
+trait MonomialOrderingGlex[@spec(Double) C] extends Order[Monomial[C]] 
+with MonomialEq[C] {
 
-  implicit def ordInt: Order[Int]
-  implicit def ordChar: Order[Char]
+  implicit def ordCoeff: Order[C]
+  implicit val ordChar = Order[Char]
+  implicit val ordInt = Order[Int]
 
-  def compare(x: Monomial[C], y: Monomial[C]): Int = {
+  override def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
+    x.vars.toArray === y.vars.toArray
+
+  def compare(l: Monomial[C], r: Monomial[C]): Int = {
     @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
-      if(x.isEmpty && y.isEmpty) 0 else if(y.isEmpty) -1 else if(x.isEmpty) 1 else {
-        ordInt.compare(x.values.sum, y.values.sum) match {
+     (x.isEmpty, y.isEmpty) match {
+        case (true, true) => l.coeff compare r.coeff
+        case (false, true) => -1
+        case (true, false) => 1
+        case _ => ordInt.compare(x.values.sum, y.values.sum) match {
           case -1 => 1
           case 1 => -1
           case 0 => ordChar.compare(x.head._1, y.head._1) match {
-              case -1 => -1
-              case 1 => 1
-              case 0 => ordInt.compare(x.head._2, y.head._2) match {
-                case -1 => 1
-                case 1 => -1
-                case 0 => compare_(x.tail, y.tail)
-              }
+            case -1 => -1
+            case 1 => 1
+            case 0 => ordInt.compare(x.head._2, y.head._2) match {
+              case -1 => 1
+              case 1 => -1
+              case 0 => compare_(x.tail, y.tail)
             }
+          }
         }  
       }
     }
-    compare_(x.vars, y.vars)
+    compare_(l.vars, r.vars)
   }
 }
 
 //Graded reverse lexicographic ordering
-// e.g. x^2 < xy < y^2 < xz < yz < z^2 < x < y < z
-trait MonomialOrderingGrevlex[@spec(Double) C] extends Order[Monomial[C]]
-with Eq[Monomial[C]] {
+// e.g. x^2 > xy > y^2 > xz > yz > z^2 > x > y > z
+trait MonomialOrderingGrevlex[@spec(Double) C] extends Order[Monomial[C]] 
+with MonomialEq[C] {
 
-  implicit def ordInt: Order[Int]
-  implicit def ordChar: Order[Char]
+  implicit def ordCoeff: Order[C]
+  implicit val ordChar = Order[Char]
+  implicit val ordInt = Order[Int]
 
-  def compare(x: Monomial[C], y: Monomial[C]): Int = {
+  override def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
+    x.vars.toArray === y.vars.toArray
+
+  def compare(l: Monomial[C], r: Monomial[C]): Int = {
     @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
-      if(x.isEmpty && y.isEmpty) 0 else if(y.isEmpty) -1 else if(x.isEmpty) 1 else {
-        ordInt.compare(x.values.sum, y.values.sum) match {
+      (x.isEmpty, y.isEmpty) match {
+        case (true, true) => l.coeff compare r.coeff
+        case (false, true) => -1
+        case (true, false) => 1
+        case _ => ordInt.compare(x.values.sum, y.values.sum) match {
           case -1 => 1
           case 1 => -1
           case 0 => ordChar.compare(x.head._1, y.head._1) match {
-              case -1 => -1
-              case 1 => 1
-              case 0 => compare_(x.tail, y.tail)
-            }
+            case -1 => -1
+            case 1 => 1
+            case 0 => compare_(x.tail, y.tail)
           }
         }
       }
-    compare_(x.vars.toArray.reverse.toMap, y.vars.toArray.reverse.toMap)
+    }
+    compare_(l.vars.toArray.reverse.toMap, r.vars.toArray.reverse.toMap)
   }
 }
