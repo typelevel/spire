@@ -19,8 +19,8 @@ class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val 
   lazy val degree: Int = 
     vars.values.sum
 
-  def isZero(implicit eqm: Eq[Monomial[C]]): Boolean =
-    lhs === Monomial.zero[C]
+  def isZero: Boolean =
+    lhs == Monomial.zero[C]
 
   def eval(values: Map[Char, C]): C =
     coeff * vars.map({ case (k,v) => values.get(k).get ** v }).reduce(_ * _)
@@ -43,17 +43,15 @@ class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val 
   // n.b. only monomials with the same variables form a ring or field
   // but it is like this as we do the arithmetic in MultivariatePolynomial.
   def +(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] =
-    if(rhs === Monomial.zero[C]) lhs else if(lhs === Monomial.zero[C]) rhs else 
-      Monomial[C](lhs.coeff + rhs.coeff, lhs.vars)
+    Monomial[C](lhs.coeff + rhs.coeff, lhs.vars)
 
   def -(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] =
-  if(rhs === Monomial.zero[C]) lhs else if(lhs === Monomial.zero[C]) -rhs else
-    Monomial[C](lhs.coeff + -rhs.coeff, lhs.vars)
+    Monomial[C](lhs.coeff + -(rhs.coeff), lhs.vars)
 
   def /(rhs: Monomial[C])(implicit f: Field[C], eqm: Eq[Monomial[C]]): Monomial[C] =
-    if(lhs === rhs) Monomial.one[C] else Monomial[C](lhs.coeff / rhs.coeff, lhs.vars - rhs.vars)
+    if(lhs == rhs) Monomial.one[C] else Monomial[C](lhs.coeff / rhs.coeff, lhs.vars - rhs.vars)
 
-  def divides(rhs: Monomial[C])(implicit ordi: Order[Int], ordc: Order[Char]): Boolean = {
+  def divides(rhs: Monomial[C])(implicit ordi: Order[Int], ordc: Order[Char], ordC: Order[C]): Boolean = {
     @tailrec def divides_(x: Map[Char, Int], y: Map[Char, Int]): Boolean = {
       if(x.isEmpty) true else if(y.isEmpty) false else if(x.values.sum == 0) true else ordc.compare(x.head._1, y.head._1) match {
         case -1 => false
@@ -61,7 +59,8 @@ class Monomial[@spec(Double) C: ClassTag: Eq] private[spire] (val coeff: C, val 
         case 0 => if(x.head._2 <= y.head._2) divides_(x.tail, y.tail) else false
       }
     }
-    divides_(lhs.vars, rhs.vars)
+    if(lhs.degree == 0 && rhs.degree == 0 && lhs.coeff.abs < rhs.coeff.abs) true else if(lhs.degree == 0 && rhs.degree == 0) false else
+      divides_(lhs.vars, rhs.vars)
   }
 
   def gcd(rhs: Monomial[C])(implicit er: EuclideanRing[C]): Monomial[C] = {
@@ -145,7 +144,7 @@ object Monomial {
         arr.length match {
           case 0 => zero[C]
           case 1 => {
-            if(c === r.zero && arr(0)._2 == 0) zero[C] else if(arr(0)._2 ==0) xzero(c) else {
+            if(c === r.zero && arr(0)._2 == 0) zero[C] else if(arr(0)._2 == 0) xzero(c) else {
               new Monomial[C](c, arr.toMap)
             }
           }
