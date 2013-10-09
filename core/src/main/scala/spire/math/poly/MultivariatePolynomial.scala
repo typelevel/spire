@@ -33,7 +33,7 @@ trait GrevlexOrdering {
 }
 
 class MultivariatePolynomial[@spec(Double) C] private[spire] (val terms: Array[Monomial[C]])
-  (implicit val ct: ClassTag[C], ord: Order[Monomial[C]]) { lhs =>
+  (implicit val ct: ClassTag[C], ordm: Order[Monomial[C]]) { lhs =>
 
   def isZero(implicit r: Semiring[C], eq: Eq[C]): Boolean = 
     terms.forall(_.isZero)
@@ -46,12 +46,6 @@ class MultivariatePolynomial[@spec(Double) C] private[spire] (val terms: Array[M
 
   def numTerms: Int =
     terms.length
-
-  def ts(implicit r: Semiring[C]): List[Monomial[C]] = {
-    val sts = simplify(terms)
-    sts.qsort
-    sts.toList
-  }
 
   def allVariables: Array[Char] =
     terms.flatMap(t => t.vars.keys).distinct
@@ -70,13 +64,13 @@ class MultivariatePolynomial[@spec(Double) C] private[spire] (val terms: Array[M
     MultivariatePolynomial[C](terms.map(_.unary_-))
 
   def head(implicit r: Ring[C], eq: Eq[C]): Monomial[C] =
-    if(isZero) Monomial.zero[C] else ts.head
+    if(isZero) Monomial.zero[C] else allTerms.head
 
   def headCoefficient(implicit r: Ring[C], eq: Eq[C]): C =
     head.coeff
 
   def tail(implicit r: Semiring[C], eq: Eq[C]): MultivariatePolynomial[C] = 
-    MultivariatePolynomial[C](ts.tail)
+    MultivariatePolynomial[C](allTerms.tail)
 
   def monic(implicit f: Field[C], eq: Eq[C]): MultivariatePolynomial[C] =
     if(isZero) MultivariatePolynomial.zero[C] else 
@@ -117,32 +111,34 @@ class MultivariatePolynomial[@spec(Double) C] private[spire] (val terms: Array[M
 
   // EuclideanRing ops
   def +(rhs: MultivariatePolynomial[C])(implicit r: Semiring[C], eq: Eq[Monomial[C]], eqc: Eq[C]): MultivariatePolynomial[C] =
-    if(rhs == MultivariatePolynomial.zero[C]) lhs else MultivariatePolynomial[C](simplify(sum(lhs.terms, rhs.terms)))
+    if(rhs.isZero) lhs else if(lhs.isZero) rhs else MultivariatePolynomial[C](sum(lhs.terms, rhs.terms))
 
   def -(rhs: MultivariatePolynomial[C])(implicit r: Rng[C], eq: Eq[Monomial[C]], eqc: Eq[C]): MultivariatePolynomial[C] =
-    if(lhs == rhs) MultivariatePolynomial.zero[C] else MultivariatePolynomial[C](simplify(sum(lhs.terms, (-rhs).terms)))
+    lhs + (-rhs)
 
   def *(rhs: MultivariatePolynomial[C])(implicit r: Ring[C], eq: Eq[Monomial[C]], eqc: Eq[C]): MultivariatePolynomial[C] =
     if(rhs == MultivariatePolynomial.one[C]) lhs else if(rhs == MultivariatePolynomial.zero[C]) MultivariatePolynomial.zero[C]
       else MultivariatePolynomial[C](simplify(lhs.terms.flatMap(lt => rhs.terms.map(rt => lt * rt))))
 
-  def /~(rhs: MultivariatePolynomial[C])(implicit f: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = 
+  def /~(rhs: MultivariatePolynomial[C])(implicit f: Field[C], eq: Eq[C], ordC: Order[C]): MultivariatePolynomial[C] = 
     lhs./%(rhs)._1
 
-  def %(rhs: MultivariatePolynomial[C])(implicit f: Field[C], eq: Eq[C]): MultivariatePolynomial[C] = 
+  def %(rhs: MultivariatePolynomial[C])(implicit f: Field[C], eq: Eq[C], ordC: Order[C]): MultivariatePolynomial[C] = 
     lhs./%(rhs)._2
 
-  def /%(rhs: MultivariatePolynomial[C])(implicit f: Field[C], eq: Eq[C], ct: ClassTag[C]) = {
+  def /%(rhs: MultivariatePolynomial[C])(implicit f: Field[C], eq: Eq[C], ct: ClassTag[C], ordC: Order[C]) = {
   
     @tailrec def quotMod_(quot: MultivariatePolynomial[C],
                           dividend: MultivariatePolynomial[C],
                           divisor: MultivariatePolynomial[C]): (MultivariatePolynomial[C], MultivariatePolynomial[C]) = {
       if(divisor.isEmpty || dividend.isEmpty) (quot, dividend) else { // if we can't divide anything in, give it back the quot and dividend
         if(divisor.head.divides(dividend.head)) {
-          val divTerm = MultivariatePolynomial[C](dividend.head / divisor.head) // the first division
-          val prod = divisor.tail * divTerm // then multiply the rhs.tail by the MVP containing only this product.
+          val divMonomial = dividend.head / divisor.head
+          val divTerm = MultivariatePolynomial[C](divMonomial) // the first division
+          val prod = divisor * divTerm // then multiply the rhs.tail by the MVP containing only this product.
           val quotSum = quot + divTerm // expand the quotient with the divided term
-          val rem = dividend.tail - prod // then subtract from the original dividend tail
+          val rem = dividend - prod // then subtract from the original dividend tail
+          // println(s"\nquot = $quot\ndividend = $dividend\ndivisor = $divisor\ndividend head / divisor head = ${dividend.head} / ${divisor.head}\ndivMonomial = $divMonomial\ndivTerm = $divTerm\nprod = $prod\nquotSum = $quotSum\ndividend tail = ${dividend.tail}\nrem = $rem")
           if(rem.isZero) (quotSum, rem) else quotMod_(quotSum, rem, divisor) // repeat
         } else quotMod_(quot, dividend, divisor.tail)
       }
@@ -174,7 +170,7 @@ class MultivariatePolynomial[@spec(Double) C] private[spire] (val terms: Array[M
     if (isEmpty) {
       "(0)"
     } else {
-      QuickSort.sort(terms)(ord, implicitly[ClassTag[Monomial[C]]])
+      QuickSort.sort(terms)(ordm, implicitly[ClassTag[Monomial[C]]])
       val s = terms.mkString
       "(" + (if (s.take(3) == " - ") "-" + s.drop(3) else s.drop(3)) + ")"
     }
