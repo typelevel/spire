@@ -13,13 +13,11 @@ import scala.{specialized => spec}
  * should be overridden by more efficient implementations.
  */
 trait Ring[@spec(Byte, Short, Int, Long, Float, Double) A] extends Rig[A] with Rng[A] {
-  def fromInt(n: Int): A =
-    if (n < 0) _fromInt(negate(one), -n, zero) else _fromInt(one, n, zero)
-  
-  @tailrec private def _fromInt(a: A, n: Int, sofar: A): A =
-    if (n == 0) sofar
-    else if ((n & 1) == 1) _fromInt(plus(a, a), n / 2, plus(sofar, a))
-    else _fromInt(plus(a, a), n / 2, sofar)
+  /**
+   * Defined to be equivalent to `Group.sumn(one, n)(ring.additive)`. That is,
+   * `n` repeated summations of this ring's `one`, or `-one` if `n` is negative.
+   */
+  def fromInt(n: Int): A = Group.sumn(one, n)(additive)
 }
 
 object Ring {
