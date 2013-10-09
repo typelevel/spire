@@ -111,7 +111,7 @@ class MultivariatePolynomial[@spec(Double) C] private[spire] (val terms: Array[M
 
   // EuclideanRing ops
   def +(rhs: MultivariatePolynomial[C])(implicit r: Semiring[C], eq: Eq[Monomial[C]], eqc: Eq[C]): MultivariatePolynomial[C] =
-    if(rhs.isZero) lhs else if(lhs.isZero) rhs else MultivariatePolynomial[C](sum(lhs.terms, rhs.terms))
+    if(rhs.isZero) lhs else if(lhs.isZero) rhs else MultivariatePolynomial[C](simplify(sum(lhs.terms, rhs.terms)))
 
   def -(rhs: MultivariatePolynomial[C])(implicit r: Rng[C], eq: Eq[Monomial[C]], eqc: Eq[C]): MultivariatePolynomial[C] =
     lhs + (-rhs)
@@ -138,7 +138,7 @@ class MultivariatePolynomial[@spec(Double) C] private[spire] (val terms: Array[M
           val prod = divisor * divTerm // then multiply the rhs.tail by the MVP containing only this product.
           val quotSum = quot + divTerm // expand the quotient with the divided term
           val rem = dividend - prod // then subtract from the original dividend tail
-          // println(s"\nquot = $quot\ndividend = $dividend\ndivisor = $divisor\ndividend head / divisor head = ${dividend.head} / ${divisor.head}\ndivMonomial = $divMonomial\ndivTerm = $divTerm\nprod = $prod\nquotSum = $quotSum\ndividend tail = ${dividend.tail}\nrem = $rem")
+          println(s"\nquot = $quot\ndividend = $dividend\ndivisor = $divisor\ndividend head / divisor head = ${dividend.head} / ${divisor.head}\ndivMonomial = $divMonomial\ndivTerm = $divTerm\nprod = $prod\nquotSum = $quotSum\ndividend tail = ${dividend.tail}\nrem = $rem")
           if(rem.isZero) (quotSum, rem) else quotMod_(quotSum, rem, divisor) // repeat
         } else quotMod_(quot, dividend, divisor.tail)
       }
