@@ -37,7 +37,7 @@ class Monomial[@spec(Double) C: ClassTag: Order] private[spire] (val coeff: C, v
   def :/(x: C)(implicit f: Field[C]): Monomial[C] =
     lhs.*:(x.reciprocal)
 
-  def *(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] = // there was an implicit semiring[int] here for the map but I think it's not needed.
+  def *(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] = 
     if(lhs.isZero || rhs.isZero) Monomial.zero[C] else Monomial[C](lhs.coeff * rhs.coeff, lhs.vars + rhs.vars)
 
   // n.b. only monomials with the same variables form a ring or field
