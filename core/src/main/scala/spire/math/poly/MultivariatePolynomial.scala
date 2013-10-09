@@ -138,7 +138,7 @@ class MultivariatePolynomial[@spec(Double) C] private[spire] (val terms: Array[M
           val prod = divisor * divTerm // then multiply the rhs.tail by the MVP containing only this product.
           val quotSum = quot + divTerm // expand the quotient with the divided term
           val rem = dividend - prod // then subtract from the original dividend tail
-          println(s"\nquot = $quot\ndividend = $dividend\ndivisor = $divisor\ndividend head / divisor head = ${dividend.head} / ${divisor.head}\ndivMonomial = $divMonomial\ndivTerm = $divTerm\nprod = $prod\nquotSum = $quotSum\ndividend tail = ${dividend.tail}\nrem = $rem")
+          // println(s"\nquot = $quot\ndividend = $dividend\ndivisor = $divisor\ndividend head / divisor head = ${dividend.head} / ${divisor.head}\ndivMonomial = $divMonomial\ndivTerm = $divTerm\nprod = $prod\nquotSum = $quotSum\ndividend tail = ${dividend.tail}\nrem = $rem")
           if(rem.isZero) (quotSum, rem) else quotMod_(quotSum, rem, divisor) // repeat
         } else quotMod_(quot, dividend, divisor.tail)
       }
@@ -146,7 +146,7 @@ class MultivariatePolynomial[@spec(Double) C] private[spire] (val terms: Array[M
 
     if(lhs == rhs) (MultivariatePolynomial.one[C], MultivariatePolynomial.zero[C]) else if(rhs == MultivariatePolynomial.one[C]) {
       (lhs, MultivariatePolynomial.zero[C]) } else if(rhs == MultivariatePolynomial.zero[C]) { (lhs, MultivariatePolynomial.zero[C]) } 
-        else quotMod_(MultivariatePolynomial.zero[C], lhs, rhs)
+        else if(!rhs.head.divides(lhs.head)) (MultivariatePolynomial.zero[C], lhs) else quotMod_(MultivariatePolynomial.zero[C], lhs, rhs)
   }
 
   // VectorSpace ops
