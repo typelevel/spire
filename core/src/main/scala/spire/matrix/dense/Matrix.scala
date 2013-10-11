@@ -257,6 +257,27 @@ trait MatrixLike extends mutable.IndexedSeq[Double] {
   /** Is the matrix lower Hessenberg? */
   def isLowerHessenberg = isLowerDiagonal(+1)
 
+  /** Is the matrix diagonal? */
+  def isDiagonal: Boolean = {
+    if (m != n) return false
+    cforRange2(0 until m, 0 until n) { (j,i) =>
+      if(i != j && this(i,j) != 0) return false
+    }
+    return true
+  }
+
+  /** Is the matrix zero? */
+  def isZero = forall(_ == 0)
+
+  /** Is the matrix the identity matrix */
+  def isIdentity: Boolean = {
+    if (m != n) return false
+    cforRange2(0 until m, 0 until n) { (j,i) =>
+      if(this(i,j) != (if(i == j) 1 else 0)) return false
+    }
+    return true
+  }
+
   /**
    * A rectangular block of this matrix.
    *
