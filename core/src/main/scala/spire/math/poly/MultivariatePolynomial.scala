@@ -4,6 +4,7 @@ import compat._
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuilder
 import scala.collection.mutable.Set
+import scala.util.matching.Regex
 import scala.reflect._
 import scala.{specialized => spec}
 import spire.algebra._
@@ -29,11 +30,6 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
   def allVariables: Array[Char] =
     terms.flatMap(t => t.vars.keys).distinct
 
-  def allTerms: Array[Monomial[C]] = {
-    terms.qsort
-    terms
-  }
-
   def eval(values: Map[Char, C])(implicit r: Ring[C]): C = {
     require(allVariables.forall(values.contains), "Can't evaluate polynomial without all the variable (symbol) values!")
     terms.map(_.eval(values)).reduce(_ + _)
@@ -43,13 +39,13 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
     MultivariatePolynomial[C](terms.map(_.unary_-))
 
   def head(implicit r: Ring[C]): Monomial[C] =
-    if(isZero) Monomial.zero[C] else allTerms.head
+    if(isZero) Monomial.zero[C] else terms.head
 
   def headCoefficient(implicit r: Ring[C]): C =
     head.coeff
 
   def tail(implicit r: Semiring[C]): MultivariatePolynomial[C] = 
-    MultivariatePolynomial[C](allTerms.tail)
+    MultivariatePolynomial[C](terms.tail)
 
   def monic(implicit f: Field[C]): MultivariatePolynomial[C] =
     if(isZero) MultivariatePolynomial.zero[C] else 
@@ -117,7 +113,7 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
           val quotSum = quot + divTerm 
           val rem = dividend - prod 
           if(rem.isZero) (quotSum, rem) else quotMod_(quotSum, rem, divisor)
-        } else if(!rhs.allTerms.forall(t => t.divides(dividend.head))) (quot, dividend) else quotMod_(quot, dividend, divisor.tail)
+        } else if(!rhs.terms.forall(t => t.divides(dividend.head))) (quot, dividend) else quotMod_(quot, dividend, divisor.tail)
       }
     }
 
@@ -136,18 +132,16 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
 
   override def equals(that: Any): Boolean = that match {
     case rhs: MultivariatePolynomial[_] if lhs.degree == rhs.degree && lhs.numTerms == rhs.numTerms =>
-      lhs.allTerms.view.zip(rhs.allTerms.asInstanceOf[Array[Monomial[C]]]).map(z => z._1 compare z._2).forall(_ == 0)
+      lhs.terms.view.zip(rhs.terms.asInstanceOf[Array[Monomial[C]]]).map(z => z._1 compare z._2).forall(_ == 0)
 
     case rhs: MultivariatePolynomial[_] => if(lhs.isEmpty && rhs.isEmpty) true else false
     case _ => false
   }
 
-
   override def toString =
     if (isEmpty) {
       "(0)"
     } else {
-      QuickSort.sort(terms)(ordm, implicitly[ClassTag[Monomial[C]]])
       val s = terms.mkString
       "(" + (if (s.take(3) == " - ") "-" + s.drop(3) else s.drop(3)) + ")"
     }
@@ -163,17 +157,59 @@ object MultivariatePolynomial {
     val ct = implicitly[ClassTag[C]]
   }
   
-  def apply[@spec(Double) C: ClassTag: Semiring: Order](terms: Monomial[C]*): MultivariatePolynomial[C] = 
-    new MultivariatePolynomial[C](terms.filterNot(t => t.isZero).toArray)
+  def apply[@spec(Double) C: ClassTag: Semiring: Order](terms: Monomial[C]*): MultivariatePolynomial[C] = {
+    val ts = terms.filterNot(t => t.isZero).toArray
+    ts.qsort
+    new MultivariatePolynomial[C](ts)
+  }
 
-  def apply[@spec(Double) C: ClassTag: Semiring: Order](terms: Traversable[Monomial[C]]): MultivariatePolynomial[C] = 
-    new MultivariatePolynomial[C](terms.filterNot(t => t.isZero).toArray)
+  def apply[@spec(Double) C: ClassTag: Semiring: Order](terms: Traversable[Monomial[C]]): MultivariatePolynomial[C] = {
+    val ts = terms.filterNot(t => t.isZero).toArray
+    ts.qsort
+    new MultivariatePolynomial[C](ts)
+  }
+
+  def apply(s: String)(implicit r: Ring[Rational], o: Order[Rational], ct: ClassTag[Rational]): MultivariatePolynomial[Rational] = 
+    parse(s)
 
   def zero[@spec(Double) C: ClassTag: Order](implicit r: Semiring[C]) = 
     new MultivariatePolynomial[C](new Array[Monomial[C]](0))
 
   def one[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]) = 
     new MultivariatePolynomial[C](Array(Monomial.one[C]))
+
+  val operRe = " *([+-]) *".r
+  val termRe = "(\\d+\\.\\d+|\\d+/\\d+|\\d+)?((?:\\w\\^\\d+|\\w)+)?".r
+  val varRe = "(\\w)\\^(\\d+)|(\\w)".r
+
+  def parse(s: String)(implicit r: Ring[Rational], o: Order[Rational], ct: ClassTag[Rational]): MultivariatePolynomial[Rational] = {
+    def parse(s: String, ts: List[Monomial[Rational]]): List[Monomial[Rational]] =
+      if (s.isEmpty) {
+        ts
+      } else {
+        val (op, s2) = operRe.findPrefixMatchOf(s) match {
+          case Some(m) => (m.group(1), s.substring(m.end))
+          case None => if (ts.isEmpty) ("+", s) else sys.error(s"parse error: $s")
+        }
+        val termMatch = termRe.findPrefixMatchOf(s2).getOrElse(sys.error("parse error: $s2"))
+        val termsSubgroup = termMatch.subgroups
+        val c0 = Option(termsSubgroup.head).getOrElse("1")
+        val c = if (op == "-") s"-$c0" else c0
+        val vstr = Option(termsSubgroup(1)).getOrElse("")
+        var t = if(vstr != "") {
+          val vlist = varRe.findAllMatchIn(vstr).toList.map(v => {
+            val vsub = v.subgroups
+            if(vsub.head != null) (vsub.head.charAt(0), vsub(1).toInt) else (vsub.last.charAt(0), 1)
+          })
+          Monomial(Rational(c), vlist)
+        } else Monomial(Rational(c), ('x', 0))
+        parse(s2.substring(termMatch.end), if (c == 0) ts else t :: ts)
+    }
+    val t = s.trim
+    val u = if (t.startsWith("(") && t.endsWith(")")) t.substring(1, t.length - 1) else t
+    val ts = parse(u, Nil)
+    MultivariatePolynomial(ts)
+  }
 
 }
 

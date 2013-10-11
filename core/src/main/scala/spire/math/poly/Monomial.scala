@@ -164,7 +164,8 @@ object Monomial {
   private val IsZero = "0".r
   private val IsNegative = "-(.*)".r
 
-  implicit def monomialEq[@spec(Double) C: ClassTag: Order: Semiring] = new MonomialEq[C] {
+  implicit def monomialOrd[@spec(Double) C: ClassTag: Order: Semiring] = new MonomialOrderingLex[C] {
+    val ordCoeff = Order[C]
     val scalar = Semiring[C]
     val ct = implicitly[ClassTag[C]]
   }
@@ -173,17 +174,9 @@ object Monomial {
 
 // An equivalent monomial has the same variables (that's all!)
 // not checking that the variable exponents are equal using this instance
-trait MonomialEq[@spec(Double) C] extends Eq[Monomial[C]] {
-  implicit def scalar: Semiring[C]
-  implicit def ct: ClassTag[C]
-  def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
-    x.vars.toArray === y.vars.toArray 
-}
-
 // Lexicographic ordering
 // e.g. x^2 > xy > xz > x > y^2 > yz > y > z^2 > z > 1
-trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]] 
-with MonomialEq[C] {
+trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]] {
 
   implicit def ordCoeff: Order[C]
   implicit val ordChar = Order[Char]
@@ -216,8 +209,7 @@ with MonomialEq[C] {
 
 // Graded lexicographic ordering
 // e.g. x^2 > xy > xz > y^2 > yz > z^2 > x > y > z > 1
-trait MonomialOrderingGlex[@spec(Double) C] extends Order[Monomial[C]] 
-with MonomialEq[C] {
+trait MonomialOrderingGlex[@spec(Double) C] extends Order[Monomial[C]] {
 
   implicit def ordCoeff: Order[C]
   implicit val ordChar = Order[Char]
@@ -253,8 +245,7 @@ with MonomialEq[C] {
 
 //Graded reverse lexicographic ordering
 // e.g. x^2 > xy > y^2 > xz > yz > z^2 > x > y > z
-trait MonomialOrderingGrevlex[@spec(Double) C] extends Order[Monomial[C]] 
-with MonomialEq[C] {
+trait MonomialOrderingGrevlex[@spec(Double) C] extends Order[Monomial[C]] {
 
   implicit def ordCoeff: Order[C]
   implicit val ordChar = Order[Char]

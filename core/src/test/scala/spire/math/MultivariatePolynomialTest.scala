@@ -29,7 +29,7 @@ object MonomialSetup {
   })
 
   implicit def arbitraryVariable = Arbitrary(for {
-    c <- Gen.choose('x', 'z')
+    c <- Gen.choose('a', 'e')
     v <- Gen.choose(1, 10)
   } yield (c, v))
 
@@ -156,11 +156,6 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
     vs <- arbitrary[List[(Char,Int)]]
   } yield Monomial(coeff, vs) )
 
-  implicit def rationalMonomialEq = new MonomialEq[Rational] {
-    val scalar = Semiring[Rational]
-    val ct = implicitly[ClassTag[Rational]]
-  }
-
   @tailrec private final def uniqueTerms[A](ts: Array[Monomial[A]], a: ArrayBuilder[Monomial[A]] = ArrayBuilder.make[Monomial[A]])
     (implicit eq: Eq[Monomial[A]]): Array[Monomial[A]] = ts.length match {
       case 0 => a.result()
@@ -243,8 +238,9 @@ class MultivariatePolynomialTest extends FunSuite {
     val m2 = Monomial(r"1/2",('d', 2), ('b', 1), ('c', 1), ('a', 1))
     val m3 = Monomial(r"18/9",('d', 5), ('b', 0), ('c', 2), ('a', 3))
     val p = MultivariatePolynomial(m1, m2, m3)
-    assert(p.terms === Array(m1, m2, m3))
+    assert(p.terms === Array(m3, m1, m2))
     assert(p.toString === "(2a^3c^2d^5 + 3/2a^2b^2d^3 + 1/2abcd^2)")
+    assert(p.toString === MultivariatePolynomial("3/2a^2b^2d^3 + 2a^3c^2d^5 + 1/2abcd^2").toString)
     assert((-p).toString === "(-2a^3c^2d^5 - 3/2a^2b^2d^3 - 1/2abcd^2)")
     assert(p === MultivariatePolynomial(m2, m3, m1))
     assert(MultivariatePolynomial.zero[Rational].toString === "(0)")
@@ -272,39 +268,12 @@ class MultivariatePolynomialTest extends FunSuite {
     val m5 = Monomial(r"1/2",('d', 1), ('a', 1))
     val m6 = Monomial(r"2",('c', 2), ('a', 3))
     val p2 = MultivariatePolynomial(m4, m5, m6)
-    assert(p1 + p2 === MultivariatePolynomial(Monomial(r"2", ('a', 3), ('c', 2)), 
-                                              Monomial(r"2", ('a', 3)), 
-                                              Monomial(r"1/2", ('a', 1), ('c', 1)), 
-                                              Monomial(r"1/2", ('a', 1), ('d', 1)), 
-                                              Monomial(r"1/4", ('b', 3)), 
-                                              Monomial(r"3/2", ('b', 2), ('d', 3))))
-    assert(p2 + p1 === MultivariatePolynomial(Monomial(r"2", ('a', 3), ('c', 2)), 
-                                              Monomial(r"2", ('a', 3)), 
-                                              Monomial(r"1/2", ('a', 1), ('c', 1)), 
-                                              Monomial(r"1/2", ('a', 1), ('d', 1)), 
-                                              Monomial(r"1/4", ('b', 3)), 
-                                              Monomial(r"3/2", ('b', 2), ('d', 3))))
-    assert(p1 - p2 === MultivariatePolynomial(Monomial(r"-2", ('a', 3), ('c', 2)), 
-                                              Monomial(r"2", ('a', 3)), 
-                                              Monomial(r"1/2", ('a', 1), ('c', 1)), 
-                                              Monomial(r"-1/2", ('a', 1), ('d', 1)), 
-                                              Monomial(r"-1/4", ('b', 3)), 
-                                              Monomial(r"3/2", ('b', 2), ('d', 3))))
-    assert(p1 * p2 === MultivariatePolynomial(Monomial(r"4", ('a', 6), ('c', 2)), 
-                                              Monomial(r"1",('a', 4), ('c', 3)), 
-                                              Monomial(r"1", ('a', 4), ('d', 1)), 
-                                              Monomial(r"1/2", ('a', 3), ('b', 3)), 
-                                              Monomial(r"3", ('a', 3), ('b', 2), ('c', 2), ('d', 3)), 
-                                              Monomial(r"1/4", ('a', 2), ('c', 1), ('d', 1)), 
-                                              Monomial(r"1/8", ('a', 1), ('b', 3), ('c', 1)), 
-                                              Monomial(r"3/4", ('a', 1), ('b', 2), ('d', 4)), 
-                                              Monomial(r"3/8",('b', 5), ('d', 3))))
-    assert(p2 :* r"1/2" === MultivariatePolynomial(Monomial(r"1/8",('b', 3)),
-                                                   Monomial(r"1/4",('d', 1), ('a', 1)),
-                                                   Monomial(r"1",('c', 2), ('a', 3))))
-    assert(p1 :/ r"1/4" === MultivariatePolynomial(Monomial(r"6",('d', 3), ('b', 2)),
-                                                   Monomial(r"2",('c', 1), ('a', 1)),
-                                                   Monomial(r"8",('a', 3))))
+    assert(p1 + p2 === MultivariatePolynomial("2a^3c^2 + 2a^3 + 1/2ac + 1/2ad + 1/4b^3 + 3/2b^2d^3"))
+    assert(p2 + p1 === MultivariatePolynomial("2a^3c^2 + 2a^3 + 1/2ac + 1/2ad + 1/4b^3 + 3/2b^2d^3"))
+    assert(p1 - p2 === MultivariatePolynomial("-2a^3c^2 + 2a^3 + 1/2ac - 1/2ad - 1/4b^3 + 3/2b^2d^3"))
+    assert(p1 * p2 === MultivariatePolynomial("4a^6c^2 + a^4c^3 + a^4d + 1/2a^3b^3 + 3a^3b^2c^2d^3 + 1/4a^2cd + 1/8ab^3c + 3/4ab^2d^4 + 3/8b^5d^3"))
+    assert(p2 :* r"1/2" === MultivariatePolynomial("a^3c^2 + 1/4ad + 1/8b^3"))
+    assert(p1 :/ r"1/4" === MultivariatePolynomial("8a^3 + 2ac + 6b^2d^3"))
     assert(-p1 + p1 === MultivariatePolynomial.zero[Rational])
     assert(p2 + (-p2) === MultivariatePolynomial.zero[Rational])
     assert(p1 - p1 === MultivariatePolynomial.zero[Rational])
@@ -316,21 +285,9 @@ class MultivariatePolynomialTest extends FunSuite {
   }
 
   test("Multivariate polynomial euclidean ring operations") {
-    val m1 = Monomial(r"1",('x', 1))
-    val m2 = Monomial(r"1",('y', 1))
-    val m3 = Monomial(r"1",('z', 1))
-    val p1 = MultivariatePolynomial(m1, m2, m3)
-    val m4 = Monomial(r"1",('x', 3))
-    val m5 = Monomial(r"1",('y', 3))
-    val m6 = Monomial(r"1",('z', 3))
-    val m7 = Monomial(r"-3",('x', 1), ('y', 1), ('z', 1))
-    val p2 = MultivariatePolynomial(m4, m5, m6, m7)
-    assert(p2 /% p1 === (MultivariatePolynomial(Monomial(r"1", ('x', 2)),
-                                                Monomial(r"-1", ('x', 1), ('y', 1)),
-                                                Monomial(r"-1", ('x', 1), ('z', 1)),
-                                                Monomial(r"1", ('y', 2)),
-                                                Monomial(r"-1", ('y', 1), ('z', 1)),
-                                                Monomial(r"1", ('z', 2))), MultivariatePolynomial.zero[Rational]))
+    val p1 = MultivariatePolynomial("x + y + z")
+    val p2 = MultivariatePolynomial("x^3 - 3xyz + y^3 + z^3")
+    assert(p2 /% p1 === (MultivariatePolynomial("x^2 - xy - xz + y^2 - yz + z^2"), MultivariatePolynomial.zero[Rational]))
     assert(p1 /~ p2 === MultivariatePolynomial.zero[Rational])
     assert((p2 /~ p1) * p1 + (p2 % p1) === p2)
     assert((p1 /~ p2) * p1 + (p1 % p2) === p1)

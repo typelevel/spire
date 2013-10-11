@@ -206,7 +206,7 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     })
 
     forAll { (x: Polynomial[Rational], y: Polynomial[Rational]) =>
-      if (!x.isZero || !y.isZero) {
+      if (!x.isZero && !y.isZero) {
         val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
         if (!gcd.isZero) {
           (x % gcd) should be === 0
