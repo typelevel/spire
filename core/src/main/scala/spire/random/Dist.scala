@@ -241,10 +241,14 @@ object Dist extends DistInstances8 {
     na.map(f)
 
   final def apply[A, B, C](f: (A, B) => C)(implicit na: Dist[A], nb: Dist[B]): Dist[C] =
-    new DistFromGen(g => f(na(g), nb(g)))
+    na.zipWith(nb)(f)
 
   final def gen[A](f: mutable.Generator => A): Dist[A] =
     new DistFromGen(g => f(g))
+
+  def uniform[A: Uniform](low: A, high: A): Dist[A] = Uniform[A].apply(low, high)
+
+  def gaussian[A: Gaussian](mean: A, stdDev: A): Dist[A] = Gaussian[A].apply(mean, stdDev)
 
   def reduce[A](ns: Dist[A]*)(f: (A, A) => A): Dist[A] =
     new DistFromGen(g => ns.map(_(g)).reduceLeft(f))
