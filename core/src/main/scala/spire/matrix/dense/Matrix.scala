@@ -166,7 +166,7 @@ trait MatrixLike extends mutable.IndexedSeq[Double] {
   }
 
   /** Total number of elements */
-  lazy val length = m*n
+  def length = m*n
 
   /** j-th column */
   def column(j:Int) = {
