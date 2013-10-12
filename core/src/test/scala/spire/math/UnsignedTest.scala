@@ -101,6 +101,12 @@ class ULongTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropert
   property("a >= b") {
     forAll { (a: ULong, b: ULong) => a >= b should be === a.toBigInt >= b.toBigInt }
   }
+
+  property("a.toString = a.toBigInt.toString") {
+    forAll { (n: ULong) =>
+      n.toString should be === n.toBigInt.toString
+    }
+  }
 }
 
 class UIntTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
