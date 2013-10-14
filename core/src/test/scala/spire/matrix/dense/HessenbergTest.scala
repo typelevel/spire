@@ -4,7 +4,9 @@ import spire.matrix.dense._
 import spire.matrix.Transposition._
 import spire.matrix.UpperOrLower._
 import spire.matrix.BLAS
+import spire.matrix.dense.random._
 
+import scala.math._
 import org.scalatest.FunSuite
 
 trait HessenbergTestLike extends FunSuite
@@ -19,14 +21,16 @@ with BLAS.level3.Naive
     gemm(NoTranspose, NoTranspose, 1.0, q, h, 0.0, qh)
     val d = a.copyToMatrix
     gemm(NoTranspose, Transpose, -1.0, qh, q, 1.0, d)
-    // TODO: check LAPACK code as I think it's a wee more complicated than that
-    d.norm1/(a.norm1*m*eps)
+    // Reference: subroutine DHST01 in LAPACK
+    val underflow = safeMinimum
+    val aNorm = max(a.norm1, underflow)
+    min(d.norm1, aNorm)/max(underflow*n/eps, a.norm1*eps)/n
   }
 
   test("Generic 3x3 matrix, with or without triangular padding") {
     implicit val work = new Scratchpad(
-      HessenbergDecomposition.unblockedMinimumScratchpad((3,3))
-      + HessenbergDecomposition.unblockedMinimumScratchpad((8,8)))
+      HessenbergDecomposition.unblockedMinimumScratchpad(3)
+      + HessenbergDecomposition.unblockedMinimumScratchpad(8))
 
     // This is not a precision test, just a corner case test
     val m0 = Matrix(3,3)(100, 500, 700,
@@ -66,19 +70,24 @@ with BLAS.level3.Naive
     expectResult(expected) { h1.reducedMatrix }
   }
 
-  test("Random 5x5 matrix") {
-    val m = Matrix.empty(5,5)
+  implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
+
+  test("Sample of test matrices ") {
+    val eigenTests = new EigenTestMatrices
     implicit val work = new Scratchpad(
-      HessenbergDecomposition.unblockedMinimumScratchpad(m.dimensions))
-    val generator = spire.random.Well512.fromTime(0)
-    for(k <- 0 until m.length) m(k) = generator.nextDouble(-1.0, 1.0)
-    val m0 = m.copyToMatrix
-    val hd = HessenbergDecomposition.withUnblockedAlgorithm(m)()
-    val q = hd.transformationWithUnblockedAlgorithm
-    val h = hd.reducedMatrix
-    // TODO: check that value 20 is what LAPACK nep.in sets by default
-    assert(orthogonalityMeasure(q) < 20)
-    assert(decompositionGoodness(m0, q, h) < 20)
+      HessenbergDecomposition.unblockedMinimumScratchpad(
+        eigenTests.oneDimensionSample.max))
+    for(n <- eigenTests.oneDimensionSample) {
+      for((itype, a) <- eigenTests.sample(n)) {
+        val a0 = a.copyToMatrix
+        val hd = HessenbergDecomposition.withUnblockedAlgorithm(a)()
+        val q = hd.transformationWithUnblockedAlgorithm
+        val h = hd.reducedMatrix
+        // That value 20 is what LAPACK nep.in sets by default
+        assert(orthogonalityMeasure(q) < 20)
+        assert(decompositionGoodness(a0, q, h) < 20, (itype, (a0, q, h)))
+      }
+    }
   }
 }
 

@@ -1,6 +1,7 @@
 package spire.matrix.dense.Hessenberg
 
 import spire.matrix.dense._
+import scala.math._
 
 /**
  * Hessenberg decomposition.
@@ -129,7 +130,7 @@ trait DecompositionLikeCompanion {
     require(iLo <= iHi && iHi <= a.dimensions._1)
 
     val n = a.dimensions._1
-    val taus = Vector.empty(iHi-2 - iLo)
+    val taus = Vector.empty(max(iHi-2 - iLo, 0))
     for(j <- iLo until iHi - 2) {
       val col = a.column(j).block(j+1, iHi)
       val h = ElementaryReflector.annihilateAndConstruct(col)
