@@ -1,4 +1,4 @@
-package spire.random
+package spire.util
 
 import java.nio.ByteBuffer
 

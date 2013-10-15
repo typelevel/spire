@@ -1,4 +1,5 @@
 package spire.random
+package mutable
 
 import spire.math._
 import java.io._

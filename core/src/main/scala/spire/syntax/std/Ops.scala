@@ -169,7 +169,7 @@ final class ArrayOps[@spec A](arr: Array[A]) {
     arr2
   }
 
-  import spire.random.Generator
+  import spire.random.mutable.Generator
 
   def qshuffle()(implicit gen: Generator): Unit = gen.shuffle(arr)
 
@@ -287,7 +287,7 @@ final class SeqOps[@spec A, CC[A] <: Iterable[A]](as: CC[A]) {
     fromSizeAndArray(len, arr)
   }
 
-  import spire.random.Generator
+  import spire.random.mutable.Generator
 
   def qshuffled(implicit gen: Generator, ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     val (len, arr) = toSizeAndArray
