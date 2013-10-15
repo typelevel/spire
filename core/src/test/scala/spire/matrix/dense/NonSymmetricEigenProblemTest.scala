@@ -9,7 +9,7 @@ import spire.matrix.dense.random._
 import scala.math._
 import org.scalatest.FunSuite
 
-trait HessenbergTestLike extends FunSuite
+trait NonSymmetricEigenProblemTestLike extends FunSuite
 with CommonMatrixPropertyTests
 with BLAS.level3.Naive
 {
@@ -27,12 +27,13 @@ with BLAS.level3.Naive
     min(d.norm1, aNorm)/max(underflow*n/eps, a.norm1*eps)/n
   }
 
-  test("Generic 3x3 matrix, with or without triangular padding") {
+  test("Hessenberg decomposition of decoupled diagonal blocks") {
     implicit val work = new Scratchpad(
       HessenbergDecomposition.unblockedMinimumScratchpad(3)
       + HessenbergDecomposition.unblockedMinimumScratchpad(8))
 
     // This is not a precision test, just a corner case test
+    info("Simple 3x3 block")
     val m0 = Matrix(3,3)(100, 500, 700,
                          300,   0, 600,
                          400, 300, 100)
@@ -46,6 +47,7 @@ with BLAS.level3.Naive
       h.transformationWithUnblockedAlgorithm.round(9)
     }
 
+    info("Previous 3x3 block embedded in 8x8 matrix")
     val m1 = Matrix.empty(8,8)
     m1.block(0,2)(0,2) := Matrix(2,2)(1, 2,
                                       0, 3)
@@ -72,7 +74,7 @@ with BLAS.level3.Naive
 
   implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
 
-  test("Sample of test matrices ") {
+  test("All steps of unblocked eigen-decomposition") {
     val eigenTests = new EigenTestMatrices
     implicit val work = new Scratchpad(
       HessenbergDecomposition.unblockedMinimumScratchpad(
@@ -83,6 +85,7 @@ with BLAS.level3.Naive
         val hd = HessenbergDecomposition.withUnblockedAlgorithm(a)()
         val q = hd.transformationWithUnblockedAlgorithm
         val h = hd.reducedMatrix
+        info(s"Hessenberg decomposition: $n x $n matrix of type #$itype")
         // That value 20 is what LAPACK nep.in sets by default
         assert(orthogonalityMeasure(q) < 20)
         assert(decompositionGoodness(a0, q, h) < 20, (itype, (a0, q, h)))
@@ -91,6 +94,8 @@ with BLAS.level3.Naive
   }
 }
 
-class HessenbergWithNaiveBLASTest extends HessenbergTestLike {
+class NonSymmetricEigenProblemWithNaiveBLASTest
+extends NonSymmetricEigenProblemTestLike
+{
   val HessenbergDecomposition = Hessenberg.DecompositionWithNaiveBLAS
 }
