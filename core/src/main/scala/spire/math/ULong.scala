@@ -24,6 +24,8 @@ object ULong extends ULongInstances {
   @tailrec final private[math] def gcd(a:ULong, b:ULong): ULong = {
     if (b == new ULong(0L)) a else gcd(b, a % b)
   }
+
+  private[spire] final val bigIntOffset: BigInt = BigInt(Long.MaxValue) + 1
 }
 
 class ULong(val signed: Long) extends AnyVal {
@@ -46,7 +48,7 @@ class ULong(val signed: Long) extends AnyVal {
   final def toBigInt: BigInt = if (signed >= 0)
     BigInt(signed)
   else
-    BigInt(Long.MaxValue) + (signed & Long.MaxValue)
+    ULong.bigIntOffset + (signed & Long.MaxValue)
 
   override final def toString: String = if (this.signed >= 0L)
     this.signed.toString
