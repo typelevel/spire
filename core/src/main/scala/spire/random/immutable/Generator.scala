@@ -37,7 +37,6 @@ trait Generator {
   }
 
   def nextGaussian: (Generator, Double) = {
-    // TODO: This actually generates 2 gaussians, but we throw 1 away.
     @tailrec def loop(gen0: Generator): (Generator, Double) = {
       val (gen1, x0) = gen0.nextDouble
       val (gen2, y0) = gen1.nextDouble
@@ -48,7 +47,7 @@ trait Generator {
         loop(gen2)
       } else {
         val scale = Math.sqrt(-2.0 * Math.log(s) / s)
-        (gen2, x * scale)
+        (new FixedGaussianGenerator(y * scale, gen2), x * scale)
       }
     }
     loop(this)
@@ -75,6 +74,30 @@ abstract class LongBasedGenerator extends Generator { self =>
     val (gen, x) = nextLong
     (gen, (x >>> 32).toInt)
   }
+}
+
+private final class FixedGaussianGenerator(gaussian: Double, gen: Generator) extends Generator {
+  def getSeedBytes: Array[Byte] = gen.getSeedBytes
+
+  def withSeedBytes(bytes: Array[Byte]): Generator = gen.withSeedBytes(bytes)
+
+  /**
+   * Generate an equally-distributed random Int.
+   */
+  def nextInt: (Generator, Int) = {
+    val (gen0, x) = gen.nextInt
+    (new FixedGaussianGenerator(gaussian, gen0), x)
+  }
+
+  /**
+   * Generates a random long. All 64-bit long values are equally likely.
+   */
+  def nextLong: (Generator, Long) = {
+    val (gen0, x) = gen.nextLong
+    (new FixedGaussianGenerator(gaussian, gen0), x)
+  }
+
+  override def nextGaussian: (Generator, Double) = (gen, gaussian)
 }
 
 private final class MutableWrapper(var gen: Generator) extends mutable.Generator {

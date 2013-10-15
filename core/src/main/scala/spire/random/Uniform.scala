@@ -5,6 +5,9 @@ import scala.{specialized => spec}
 import spire.math._
 
 trait Uniform[@spec A] { self =>
+  /**
+   * Return an `A` that is uniformly distributed between `min` and `max` inclusive.
+   */
   def apply(min: A, max: A): Dist[A]
 }
 

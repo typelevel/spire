@@ -284,7 +284,6 @@ object Dist extends DistInstances8 {
       ds(i).apply(g)
     })
   }
-        
 
   implicit val unit: Dist[Unit] = new DistFromGen[Unit](g => ())
   implicit val boolean: Dist[Boolean] = new DistFromGen[Boolean](_.nextBoolean)
@@ -399,7 +398,7 @@ object Dist extends DistInstances8 {
     }
   }
 
-  def gaussian[A: Field] = new DistFromGen[A](g => Field[A].fromDouble(g.nextGaussian))
+  def gaussianFromDouble[A: Field] = new DistFromGen[A](g => Field[A].fromDouble(g.nextGaussian))
 }
 
 trait DistInstances0 {

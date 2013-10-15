@@ -10,6 +10,10 @@ import spire.algebra._
 import spire.random.mutable.Generator
 
 trait Gaussian[@spec(Float,Double) A] {
+  /**
+   * Return an `A` that is normally distributed about `mean` with a standard
+   * deviation of `stdDev`.
+   */
   def apply(mean: A, stdDev: A): Dist[A]
 }
 
@@ -29,6 +33,9 @@ trait GaussianInstances {
     new MarsagliaGaussian[BigDecimal]
 }
 
+/**
+ * An implementation of `Gaussian` that uses the Marsaglia algorithm.
+ */
 final class MarsagliaGaussian[@spec(Float,Double) A: Field: NRoot: Trig: Order: Uniform]
 extends Gaussian[A] {
   import spire.syntax.field._
@@ -53,5 +60,6 @@ extends Gaussian[A] {
       }
       loop()
     })
+
   }
 }
