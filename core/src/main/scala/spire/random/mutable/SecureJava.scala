@@ -6,7 +6,7 @@ import java.util.Arrays
 import java.security.SecureRandom
 
 class SecureJava(rand: SecureRandom) extends IntBasedGenerator {
-  def copy: SecureJava = new SecureJava(rand)
+  def copyInit: SecureJava = new SecureJava(rand)
 
   def getSeedBytes: Array[Byte] =
     throw new UnsupportedOperationException("getSeedBytes")

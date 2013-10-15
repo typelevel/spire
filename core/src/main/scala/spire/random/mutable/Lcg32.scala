@@ -9,7 +9,7 @@ import spire.util.Pack
 class Lcg32(_seed: Int) extends IntBasedGenerator {
   private var seed: Int = _seed
 
-  def copy: Lcg32 = new Lcg32(seed)
+  def copyInit: Lcg32 = new Lcg32(seed)
 
   def getSeedBytes(): Array[Byte] = Pack.intToBytes(seed)
 

@@ -33,7 +33,7 @@ class Well512 protected[random] (_i: Int, private var state: Array[Int]) extends
   /**
    * Generates a copy of this PRNG (with independent state).
    */
-  def copy: Well512 = new Well512(i, state.clone)
+  def copyInit: Well512 = new Well512(i, state.clone)
 
   /**
    * Generate a copy of the RNG's internal state.

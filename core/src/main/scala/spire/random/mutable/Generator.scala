@@ -11,8 +11,14 @@ abstract class Generator {
   protected var extra: Boolean = false
   protected var value: Double = 0.0
 
-  // TODO: copy may not generate the same gaussians as the original.
-  def copy: Generator
+  def copy: Generator = {
+    val gen = copyInit
+    gen.extra = extra
+    gen.value = value
+    gen
+  }
+
+  protected[this] def copyInit: Generator
 
   def sync: SyncGenerator = new SyncGenerator(copy)
 
@@ -485,7 +491,7 @@ object GlobalRng extends LongBasedGenerator {
 
   override def sync = rng
 
-  def copy: Generator = rng.copy
+  def copyInit: Generator = rng.copyInit
 
   def getSeedBytes: Array[Byte] = rng.getSeedBytes
 

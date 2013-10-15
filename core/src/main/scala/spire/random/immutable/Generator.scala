@@ -101,7 +101,7 @@ private final class FixedGaussianGenerator(gaussian: Double, gen: Generator) ext
 }
 
 private final class MutableWrapper(var gen: Generator) extends mutable.Generator {
-  def copy: mutable.Generator = new MutableWrapper(gen)
+  def copyInit: mutable.Generator = new MutableWrapper(gen)
 
   def getSeedBytes(): Array[Byte] = gen.getSeedBytes
 

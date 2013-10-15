@@ -11,7 +11,7 @@ final class Cmwc5(_x: Long, _y: Long, _z: Long, _w: Long, _v: Long) extends Long
   private var w: Long = _w
   private var v: Long = _v
 
-  def copy: Cmwc5 = new Cmwc5(x, y, z, w, v)
+  def copyInit: Cmwc5 = new Cmwc5(x, y, z, w, v)
 
   def getSeed: Array[Long] = {
     val longs = new Array[Long](5)
