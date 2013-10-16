@@ -442,6 +442,15 @@ extends TestDimensions with NumericPropertiesOfDouble
       }
     }
   }
+
+  /** A sample of matrix of various sizes */
+  def sample: Traversable[(Int, Matrix)] = new Traversable[(Int, Matrix)] {
+    def foreach[U](f: ((Int, Matrix)) => U): Unit = {
+      for(n <- oneDimensionSample) {
+        for((itype, a) <- sample(n)) f(itype, a)
+      }
+    }
+  }
 }
 
 

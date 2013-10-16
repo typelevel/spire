@@ -79,17 +79,16 @@ with BLAS.level3.Naive
     implicit val work = new Scratchpad(
       HessenbergDecomposition.unblockedMinimumScratchpad(
         eigenTests.oneDimensionSample.max))
-    for(n <- eigenTests.oneDimensionSample) {
-      for((itype, a) <- eigenTests.sample(n)) {
-        val a0 = a.copyToMatrix
-        val hd = HessenbergDecomposition.withUnblockedAlgorithm(a)()
-        val q = hd.transformationWithUnblockedAlgorithm
-        val h = hd.reducedMatrix
-        info(s"Hessenberg decomposition: $n x $n matrix of type #$itype")
-        // That value 20 is what LAPACK nep.in sets by default
-        assert(orthogonalityMeasure(q) < 20)
-        assert(decompositionGoodness(a0, q, h) < 20, (itype, (a0, q, h)))
-      }
+    for((itype, a) <- eigenTests.sample) {
+      val n = a.dimensions._1
+      val a0 = a.copyToMatrix
+      val hd = HessenbergDecomposition.withUnblockedAlgorithm(a)()
+      val q = hd.transformationWithUnblockedAlgorithm
+      val h = hd.reducedMatrix
+      info(s"Hessenberg decomposition: $n x $n matrix of type #$itype")
+      // That value 20 is what LAPACK nep.in sets by default
+      assert(orthogonalityMeasure(q) < 20)
+      assert(decompositionGoodness(a0, q, h) < 20, (itype, (a0, q, h)))
     }
   }
 }
