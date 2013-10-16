@@ -564,11 +564,14 @@ object Matrix {
    */
   def empty(m:Int, n:Int): Matrix = zero(m, n)
 
+  /** Create an n x n matrix with uninitialised elements */
+  def empty(n:Int): Matrix = empty(n, n)
+
   /** Create the zero matrix of dimension m x n */
   def zero(m:Int, n:Int): Matrix = new Matrix(m, n)()
 
   /** Create the zero matrix of dimension n x n */
-  def zero(n:Int) = new Matrix(n, n)()
+  def zero(n:Int): Matrix = zero(n, n)
 
   /**
    * Create a matrix from the given string.
