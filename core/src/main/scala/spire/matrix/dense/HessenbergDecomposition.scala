@@ -77,11 +77,7 @@ trait DecompositionLike {
   def transformationWithUnblockedAlgorithm(implicit work:Scratchpad):Matrix =
   {
     val n = a.dimensions._1
-    val result = Matrix.empty(n, n)
-
-    // Initialise result to the identity matrix
-    // Note: we assume that q has been created as a zero matrix
-    for(j <- 0 until n) result(j,j) = 1.0
+    val result = Matrix.identity(n)
 
     // Accumulate reflectors backward
     for(j <- iHi-3 to iLo by -1) {
