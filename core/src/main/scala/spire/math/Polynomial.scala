@@ -86,7 +86,7 @@ object Polynomial extends PolynomialInstances {
           case None => if (ts.isEmpty) ("+", s) else sys.error(s"parse error: $s")
         }
 
-        val m2 = termRe.findPrefixMatchOf(s2).getOrElse(sys.error("parse error: $s2"))
+        val m2 = termRe.findPrefixMatchOf(s2).getOrElse(sys.error(s"parse error: $s2"))
         val c0 = Option(m2.group(1)).getOrElse("1")
         val c = if (op == "-") "-" + c0 else c0
         val v = Option(m2.group(2)).getOrElse("")
