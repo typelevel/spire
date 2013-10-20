@@ -6,6 +6,8 @@ import spire.matrix.Transposition._
 import java.lang.Math.copySign
 import spire.matrix.NumericPropertiesOfDouble
 
+import spire.syntax.cfor._
+
 /**
  * Elementary Reflector
  *
@@ -21,12 +23,6 @@ import spire.matrix.NumericPropertiesOfDouble
  * ways to use them). We will always assume that v(0) = 1 and therefore we will
  * only require the knowledge of v(1:n), the so-called essential part of the
  * reflector [2].
- *
- *
- * The latter variant nicely factor out the pattern used throughout LAPACK
- * that consists in setting to 1 the matrix element corresponding to v(0),
- * then applying the reflector, and finally restoring the original value of
- * that matrix element.
  *
  * [1] LAPACK Users' Guide.
  *     E Anderson, Z Bai, Christian H. Bischof, S Blackford, J Demmel,
@@ -291,4 +287,74 @@ extends ElementaryReflectorLikeCompanion
 with BLAS.level1.Naive with BLAS.level2.Naive {
   def apply(tau:Double, v:VectorLike) =
     new ElementaryReflectorWithNaiveBLAS(tau, v)
+}
+
+/**
+ * Elementary reflector of dimension n = 2 or 3
+ *
+ * The essential part is (v1, v2) or just (v1) if v2 is None.
+ * This is a hand-optimised version of ElementaryReflector, that is primary
+ * useful for the bulge chasing of the real Schur decomposition.
+ */
+final class TinyElementaryReflector private[this](tau:Double,
+                                                  val n:Int,
+                                                  val v1:Double, val v2:Double)
+{
+  val t0 = tau
+  val t1 = tau*v1
+  val t2 = if(n == 3) tau*v2 else 0
+
+  /** Construct an elementary reflector of dimension 2 */
+  def this(tau:Double, v1:Double) = this(tau, 2, v1, 0)
+
+  /** Construct an elementary reflector of dimension 3 */
+  def this(tau:Double, v1:Double, v2:Double) = this(tau, 3, v1, v2)
+
+  /**
+   * Denoting by H this reflector, perform C(i:i+n, j1:j2) := H C(i:i+n, j1:j2)
+   * where i = startingRow and (j1, j2) = columns
+   */
+  def applyOnLeft(c:MatrixLike)(startingRow:Int,
+                                columns:(Int, Int)=(0, c.dimensions._2)) {
+    val i = startingRow
+    val (j1, j2) = columns
+    cforRange(j1 until j2) { j =>
+      var s = c(i, j) + v1*c(i+1, j)
+      if(n == 3) s += v2*c(i+2, j)
+      c(i, j) -= t0*s
+      c(i+1, j) -= t1*s
+      if(n == 3) c(i+2, j) -= t2*s
+    }
+  }
+
+  /**
+   * Denoting by H this reflector, perform C(i1:i2, j:j+n) := C(i1:i2, j:j+n) H
+   * where j = startingColumn and (i1, i2) = rows
+   */
+  def applyOnRight(c:MatrixLike)(startingColumn:Int,
+                                 rows:(Int, Int)=(0, c.dimensions._1)) {
+    val (i1, i2) = rows
+    val j = startingColumn
+    cforRange(i1 until i2) { i =>
+      var s = c(i, j) + c(i, j+1)*v1
+      if(n == 3) s += c(i, j+2)*v2
+      c(i, j) -= t0*s
+      c(i, j+1) -= t1*s
+      if(n == 3) c(i, j+2) -= t2*s
+    }
+  }
+}
+
+object TinyElementaryReflector {
+
+    def annihilateAndConstruct(y:VectorLike) = {
+      require(y.length == 2 || y.length == 3)
+      val h = ElementaryReflectorWithNaiveBLAS.annihilateAndConstruct(y)
+      if(y.length == 2)
+        new TinyElementaryReflector(h.tau,
+                                    h.essentialPart(0))
+      else
+        new TinyElementaryReflector(h.tau,
+                                    h.essentialPart(0), h.essentialPart(1))
+    }
 }

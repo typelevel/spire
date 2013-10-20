@@ -112,3 +112,50 @@ class ElementaryReflectorWithNaiveBLASTest extends ElementaryReflectorTestLike
 {
   val ElementaryReflector = ElementaryReflectorWithNaiveBLAS
 }
+
+class TinyElementaryReflectorTest extends FunSuite {
+
+  test("Elementary Reflector 2 x 2: construction") {
+    val a = Matrix(2, 1)(2,
+                         5)
+    val a0 = a.copyToMatrix
+    val h = TinyElementaryReflector.annihilateAndConstruct(a.column(0))
+    h.applyOnLeft(a0)(startingRow=0)
+    expectResult { a0(0,0) } { a(0,0) }
+  }
+
+  test("Elementary Reflector 2 x 2: apply") {
+    val h = new TinyElementaryReflector(tau=1.5, v1=0.5)
+    val a = Matrix(2,3)( 1, 2,  3,
+                        -1, 5, -2)
+    h.applyOnLeft(a)(startingRow=0)
+    expectResult { Matrix(2,3)(   1.0/4, -19.0/4,  0,
+                                -11.0/8,  13.0/8, -7.0/2) } { a }
+    val b = Matrix(3,2)( 1, -1,
+                         2,  3,
+                        -1,  4)
+    h.applyOnRight(b)(startingColumn=0)
+    expectResult { Matrix(3,2)(  1.0/4, -11.0/8,
+                               -13.0/4,   3.0/8,
+                                -5.0/2,  13.0/4 ) } { b }
+  }
+
+  test("Elementary Reflector 3 x 3: apply") {
+    val h = new TinyElementaryReflector(tau = 1.5, v1 = -0.5, v2 = 0.5)
+    val a = Matrix(3,3)( 1,  2, 3,
+                        -2, -1, 4,
+                         3, -3, 1)
+    val aL = a.copyToMatrix
+    h.applyOnLeft(aL)(startingRow=0)
+    expectResult { Matrix(3,3)(-17.0/4,   1.0/2,  3.0/4,
+                                 5.0/8,  -1.0/4, 41.0/8,
+                                 3.0/8, -15.0/4, -1.0/8 )  } { aL }
+    val aR = a.copyToMatrix
+    h.applyOnRight(aR)(startingColumn=0)
+    expectResult { Matrix(3,3)( -5.0/4, 25.0/8,  15.0/8,
+                               -11.0/4, -5.0/8,  29.0/8,
+                                -9.0/2,  3.0/4, -11.0/4  )  } { aR }
+
+  }
+
+}
