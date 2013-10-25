@@ -354,8 +354,15 @@ class  MatrixStrides(a:MatrixLike,
   def this(a:MatrixLike, first:(Int, Int), step:Int, length:Int) =
     this(a, first._2*a.dimensions._1 + first._1, step, length)
 
-  override def iterator: Iterator[Double] =
-    (for(k <- firstIndex until endIndex by step) yield a(k)).toIterator
+  override def iterator = new Iterator[Double] {
+    var k = firstIndex
+    def hasNext = k < endIndex
+    def next = {
+      val result = a(k)
+      k += step
+      result
+    }
+  }
 
   def apply(k:Int):Double = a(firstIndex + k*step)
 
