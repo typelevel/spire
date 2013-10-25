@@ -21,6 +21,8 @@
  */
 package spire.matrix.BLAS.level1
 
+import spire.matrix.dense.{VectorLike, PlaneRotation}
+
 import spire.syntax.cfor._
 import scala.collection.mutable
 
@@ -45,6 +47,25 @@ trait Interface {
    */
   def axpy(alpha: Double,
            x: mutable.IndexedSeq[Double], y: mutable.IndexedSeq[Double]): Unit
+
+  /**
+   * Transform each (x(i), y(i)) into its image by the given plane rotation
+   *
+   * This may be interpreted as one of the following matrix product, performed
+   * in place:
+   * <pre>
+   *         [ x(0) y(0) ] G^T
+   *         [ x(1) y(1) ]
+   *         [ ......... ]
+   * </pre>
+   * or
+   * <pre>
+   *         G [ x(0) y(0) .... ]
+   *           [ x(1) y(1) .... ]
+   * </pre>
+   * where G is this rotation and G^T its transpose (which is also its inverse).
+   */
+  def rot(x:VectorLike, y:VectorLike, g:PlaneRotation): Unit
 }
 
 trait Naive extends Interface {
@@ -57,4 +78,12 @@ trait Naive extends Interface {
   def axpy(alpha: Double,
            x: mutable.IndexedSeq[Double], y: mutable.IndexedSeq[Double]): Unit =
     cforRange(0 until x.length) { k => y(k) += alpha * x(k) }
+
+  def rot(x:VectorLike, y:VectorLike, g:PlaneRotation) {
+    cforRange(0 until x.length) { i =>
+      val xi = g.cs*x(i) + g.sn*y(i)
+      y(i) = g.cs*y(i) - g.sn*x(i)
+      x(i) = xi
+    }
+  }
 }
