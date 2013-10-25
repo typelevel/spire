@@ -121,6 +121,43 @@ trait MatrixLike extends Iterable[Double] {
     this(k2) = tmp
   }
 
+  /** Assign the elements of other to this */
+  def := (other:MatrixLike): Unit = {
+    cforRange2(0 until dimensions._1, 0 until dimensions._2) { (i,j) =>
+      this(i,j) = other(i,j)
+    }
+  }
+
+  /**
+   * Assign the elements of other to this.
+   *
+   * Precisely, denoting this as A
+   * <pre>
+   *         [ A(0,0) A(0,1) ] = [ a b ]
+   *         [ A(1,0) A(1,1) ]   [ c d ]
+   * </pre>
+   */
+  def := (other:(Double, Double, Double, Double)) {
+    this(0, 0) = other._1
+    this(0, 1) = other._2
+    this(1, 0) = other._3
+    this(1, 1) = other._4
+  }
+
+  /** Assign the given value to every elements of this */
+  def := (e:Double): Unit = {
+    cforRange(0 until length) { i => this(i) = e }
+  }
+
+  /**
+   * Assign the elements produced by the given iterator to this
+   *
+   * The elements shall be produced by other with a column-major ordering
+   */
+  def :=(other:Iterator[Double]):Unit = {
+    cforRange(0 until length) { i => other.next }
+  }
+
   /**
    * Same matrix as this but with elements rounded to the nearest
    * at the given decimal digit.
@@ -377,12 +414,6 @@ class MatrixBlock(private val a:MatrixLike,
    * This implements MatrixLike abstract method.
    */
   def apply(k:Int) = this(k%m, k/m)
-
-  /** Set the elements of this block to those of the given matrix */
-  def :=(b:MatrixLike): Unit = {
-    require(dimensions == b.dimensions)
-    for(j <- 0 until n; i <- 0 until m) this(i,j) = b(i,j)
-  }
 }
 
 
