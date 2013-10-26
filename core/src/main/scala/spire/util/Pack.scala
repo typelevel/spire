@@ -1,10 +1,12 @@
 package spire.util
 
 import java.nio.ByteBuffer
+import scala.language.experimental.macros
+import scala.reflect.macros._
 
 /**
  * These methods are all big-endian.
- * 
+ *
  * That is, bytes[0] is the most-significant byte.
  */
 object Pack {
@@ -20,6 +22,24 @@ object Pack {
     arr(3) = ism(n, 0)
     arr
   }
+
+  /** index must be 0 <= index < 4 */
+  def intToByte(n: Int)(index: Byte): Byte = macro impIntToByte
+
+  def impIntToByte(c: Context)(n: c.Expr[Int])(index: c.Expr[Byte]): c.Expr[Byte] = {
+    import c.universe._
+    index.tree match {
+      case Literal(Constant(i: Int)) if i < 0 || i >= 4 =>
+        c.abort(c.enclosingPosition,
+          "Index must be in bounds (0 <= index < 4)")
+      case _ =>
+    }
+
+    reify {
+      ((n.splice >>> (32 - index.splice * 8)) & 0xFF).toByte
+    }
+  }
+
 
   def intsToBytes(ints: Array[Int]): Array[Byte] = {
     val arr = new Array[Byte](ints.length * 4)
@@ -58,7 +78,10 @@ object Pack {
   def intsFromByteBuffer(bb: ByteBuffer, n: Int): Array[Int] = {
     val out = new Array[Int](n)
     var i = 0
-    while (i < n && bb.remaining >= 4) { out(i) = bb.getInt(); i += 1 }
+    while (i < n && bb.remaining >= 4) {
+      out(i) = bb.getInt();
+      i += 1
+    }
     if (i < n && bb.remaining > 0) out(i) = intFromByteBuffer(bb)
     out
   }
@@ -77,6 +100,23 @@ object Pack {
     arr(6) = lsm(n, 8)
     arr(7) = lsm(n, 0)
     arr
+  }
+
+  /** index must be 0 <= index < 8 */
+  def longToByte(n: Long)(index: Byte): Byte = macro impLongToByte
+
+  def impLongToByte(c: Context)(n: c.Expr[Long])(index: c.Expr[Byte]): c.Expr[Byte] = {
+    import c.universe._
+    index.tree match {
+      case Literal(Constant(i: Int)) if i < 0 || i >= 4 =>
+        c.abort(c.enclosingPosition,
+          "Index must be in bounds (0 <= index < 8)")
+      case _ =>
+    }
+
+    reify {
+      ((n.splice >>> (64 - index.splice * 8)) & 0xFF).toByte
+    }
   }
 
   def longsToBytes(longs: Array[Long]): Array[Byte] = {
@@ -122,7 +162,10 @@ object Pack {
   def longsFromByteBuffer(bb: ByteBuffer, n: Int): Array[Long] = {
     val out = new Array[Long](n)
     var i = 0
-    while (i < n && bb.remaining >= 8) { out(i) = bb.getLong(); i += 1 }
+    while (i < n && bb.remaining >= 8) {
+      out(i) = bb.getLong();
+      i += 1
+    }
     if (i < n && bb.remaining > 0) out(i) = longFromByteBuffer(bb)
     out
   }
@@ -133,7 +176,10 @@ object Pack {
       bb.get(out)
     } else {
       var i = 0
-      while (bb.remaining > 0) {out(i) = bb.get; i += 1}
+      while (bb.remaining > 0) {
+        out(i) = bb.get;
+        i += 1
+      }
     }
     out
   }
