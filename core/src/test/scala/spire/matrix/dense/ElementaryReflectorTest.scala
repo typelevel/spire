@@ -45,6 +45,12 @@ with EuclideanNorm
     assert(m(0,0) === m(0,1)*eta)
   }
 
+  test("Construction: zero vector") {
+    val x = Vector.zero(3)
+    val h = ElementaryReflector.annihilateAndConstruct(x)
+    expectResult { 2 } { h.essentialPart.length }
+  }
+
   test("Product with a general matrix from the left") {
     val v = Vector(-1, -2, 2)
     val tau = 1.5

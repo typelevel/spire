@@ -195,9 +195,6 @@ trait ElementaryReflectorLikeCompanion
   /** Factory method */
   def apply(tau:Double, v:VectorLike): ElementaryReflectorLike
 
-  /** The case $tau = 0$. */
-  def identity: ElementaryReflectorLike = this(0, Vector.empty(0))
-
   /**
    * We follow the conventions and notations of LAPACK [1].
    *
@@ -236,11 +233,11 @@ trait ElementaryReflectorLikeCompanion
    *     Philadelphia, PA, Third.
    */
   def annihilateAndConstruct(y:VectorLike): ElementaryReflectorLike = {
-    if(y.length <= 1) identity
+    if(y.length <= 1) this(0, Vector.empty(0))
     else {
       var x = y.block(1, y.length)
       var xNorm = euclideanNorm(x)
-      if(xNorm == 0) identity
+      if(xNorm == 0) this(0, x)
       else { // Non-trivial case
         var count = 0
         var alpha = y(0)
