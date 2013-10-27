@@ -329,26 +329,19 @@ trait MatrixLike extends mutable.IndexedSeq[Double] {
    *  Mostly for debugging purposes.
    */
   override def toString: String = {
-    val result = new StringBuilder
-    result ++= "\n"
-    for(i <- 0 until m) {
-      result ++= "[ "
-      for(j <- 0 until n) {
-        result ++= "%10.3g" format this(i,j)
-        if(j != n-1) result ++= "  "
-      }
-      result ++= " ]\n"
-    }
-    result.toString
+    formatted(StringFormatting.elementFormat,
+              StringFormatting.useMathematicaFormat)
   }
 
-  def formatted(fmt: String = "%10.3g"): String = {
-    val sb = new StringBuilder
-    sb.append("\n")
-    for (i <- 0 until m) {
-      sb.append(row(i).map(fmt format _).mkString("[", "  ", "]\n"))
-    }
-    sb.toString
+  def formatted(fmt: String, useMathematicaFormat: Boolean=false): String = {
+  val (rowStart, colStep, rowEnd) =
+    StringFormatting.ofRows(useMathematicaFormat)
+  val (start, rowStep, end) =
+    StringFormatting.ofColumns(useMathematicaFormat)
+  val disp = (for (i <- 0 until m)
+       yield row(i).map(fmt format _).mkString(rowStart, colStep, rowEnd)
+    ).mkString(start, rowStep, end)
+    StringFormatting.postprocess(disp, useMathematicaFormat)
   }
 }
 

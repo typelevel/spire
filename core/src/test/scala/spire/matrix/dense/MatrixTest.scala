@@ -221,14 +221,22 @@ class MatrixTest extends FunSuite {
     val a = Matrix(2,3)(1, 2, 3,
                         4, 5, 6)
     expectResult("""|
-                    |[       1.00        2.00        3.00 ]
-                    |[       4.00        5.00        6.00 ]
+                    |[       1.00       2.00       3.00 ]
+                    |[       4.00       5.00       6.00 ]
                     |"""
       .stripMargin)
     {
-      a.toString
+      a.formatted("%10.3g")
     }
 
+    expectResult("""|
+                    |{{      1.00,      2.00,      3.00},
+                    |{      4.00,      5.00,      6.00}}
+                    |"""
+      .stripMargin)
+    {
+      a.formatted("%10.3g", useMathematicaFormat=true)
+    }
   }
 
   test("iteration over matrix block") {

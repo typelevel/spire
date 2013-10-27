@@ -49,7 +49,14 @@ trait VectorLike extends mutable.IndexedSeq[Double] {
   def copyToVector = new Vector(this.toArray)
 
   override def toString =
-    this.map("%10.3g" format _).mkString("[", ", ", "]")
+    formatted(StringFormatting.elementFormat,
+              StringFormatting.useMathematicaFormat)
+
+  def formatted(fmt: String, useMathematicaFormat: Boolean=false): String = {
+    val (start, step, end) = StringFormatting.ofRows(useMathematicaFormat)
+    val disp = this.map(fmt format _).mkString(start, step, end)
+    StringFormatting.postprocess(disp, useMathematicaFormat)
+  }
 }
 
 /**
