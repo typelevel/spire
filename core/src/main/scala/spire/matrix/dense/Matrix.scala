@@ -7,6 +7,7 @@
 package spire.matrix.dense
 
 import spire.implicits._
+import spire.math.Complex
 import spire.matrix.Constants._
 import scala.collection.mutable
 import scala.math
@@ -530,6 +531,25 @@ extends MatrixLike {
     * This implements MatrixLike abstract method.
     */
   def apply(k:Int) = elems(k)
+
+  /**
+   * The eigenvalues of this matrix
+   *
+   * If inplace is true, then this matrix elements are overwritten by
+   * essentially garbage from the point of view of the client code.
+   * This option is provided to deal more efficiently with huge matrices.
+   */
+  def eigenvalues(inplace:Boolean=false):Array[Complex[Double]] = {
+    val HessenbergDecomposition = Hessenberg.DecompositionWithNaiveBLAS
+    val SchurDecomposition = Schur.RealDecompositionWithDoubleShiftQRAlgorithm
+    implicit val work = new Scratchpad(
+      HessenbergDecomposition.unblockedMinimumScratchpad(dimensions._1))
+    val a = if(inplace) this else copyToMatrix
+    val hd = HessenbergDecomposition.withUnblockedAlgorithm(a)()
+    val sd = SchurDecomposition(a, None, fullSchurFormWanted=false)()()
+    for((a, b) <- sd.eigenvalues) yield Complex(a, b)
+  }
+
 }
 
 /** Matrix companion object */
