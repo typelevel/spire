@@ -9,8 +9,8 @@ import spire.random
 import java.lang.Math.{signum, copySign}
 
 object Defaults {
-  type IntegerGenerator = spire.random.Well512
-  val IntegerGenerator = spire.random.Well512
+  type IntegerGenerator = spire.random.mutable.Well512
+  val IntegerGenerator = spire.random.mutable.Well512
 }
 
 /**
@@ -77,10 +77,9 @@ extends ScalarDistribution {
 class ScalarNormalDistribution(
   implicit gen: Defaults.IntegerGenerator)
 extends ScalarDistribution {
-  private val normal = spire.random.GaussianGenerator(gen)
   val min = java.lang.Double.MIN_VALUE
   val max = java.lang.Double.MAX_VALUE
-  def next = normal.nextGaussian
+  def next = gen.nextGaussian
 }
 
 /**

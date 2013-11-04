@@ -5,7 +5,6 @@ import spire.matrix.Transposition._
 import spire.matrix.UpperOrLower._
 import spire.matrix.BLAS
 import BLAS.level3
-import spire.random.{Well512,GaussianGenerator}
 import spire.matrix.Sides._
 import spire.matrix.dense.random._
 
