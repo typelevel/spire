@@ -1,4 +1,5 @@
 package spire.random
+package mutable
 
 import spire.math._
 import java.io._
@@ -9,7 +10,7 @@ class Device(f: File) extends Generator { self =>
 
   private var dis = new DataInputStream(new FileInputStream(f))
 
-  def copy: Generator = new Device(f)
+  def copyInit: Generator = new Device(f)
 
   def getSeedBytes(): Array[Byte] =
     throw new UnsupportedOperationException("getSeedBytes")
@@ -48,7 +49,7 @@ class CycledFile(f: File) extends Generator { self =>
     dis = new DataInputStream(new FileInputStream(f))
   }
 
-  def copy: Generator = new CycledFile(f)
+  def copyInit: Generator = new CycledFile(f)
 
   def getSeedBytes(): Array[Byte] =
     throw new UnsupportedOperationException("getSeedBytes")

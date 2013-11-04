@@ -8,14 +8,13 @@ import scala.{specialized => spec}
  * monoid, not a group). Put another way, a Rig is a Ring without a negative.
  */
 trait Rig[@spec(Byte, Short, Int, Long, Float, Double) A] extends Semiring[A] with AdditiveMonoid[A] with MultiplicativeMonoid[A] {
+  /**
+   * This is similar to `Semigroup#pow`, except that `a pow 0` is defined to be
+   * the multiplicative identity.
+   */
   override def pow(a:A, n:Int):A =
-    if (n < 0) sys.error("illegal exponent: %s" format n)
-    else _pow(a, n, one)
-
-  @tailrec private final def _pow(a:A, n:Int, sofar:A):A =
-    if (n == 0) sofar
-    else if (n % 2 == 1) _pow(times(a, a), n / 2, times(sofar, a))
-    else _pow(times(a, a), n / 2, sofar)
+    if (n >= 0) Monoid.sumn(a, n)(multiplicative)
+    else throw new IllegalArgumentException(s"Illegal negative exponent $n to Monoid#pow")
 }
 
 object Rig {

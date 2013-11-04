@@ -26,4 +26,26 @@ object Monoid {
    * plain `Monoid[A]`.
    */
   @inline final def multiplicative[A](implicit A: MultiplicativeMonoid[A]) = A.multiplicative
+
+  /**
+   * Return `a` appended to itself `n` times.
+   */
+  final def sumn[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A](a: A, n: Int)(implicit A: Monoid[A]): A = {
+    if (n > 0) Semigroup.sumn(a, n)
+    else if (n == 0) A.id
+    else throw new IllegalArgumentException("Repeated summation for monoids must have reptitions >= 0")
+  }
+}
+
+/**
+ * CMonoid represents a commutative monoid.
+ * 
+ * A monoid is commutative if for all x and y, x |+| y === y |+| x.
+ */
+trait CMonoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Monoid[A]
+
+object CMonoid {
+  @inline final def apply[A](implicit ev: CMonoid[A]): CMonoid[A] = ev
+  @inline final def additive[A](implicit A: AdditiveCMonoid[A]): CMonoid[A] =  A.additive
+  @inline final def multiplicative[A](implicit A: MultiplicativeCMonoid[A]): CMonoid[A] = A.multiplicative
 }

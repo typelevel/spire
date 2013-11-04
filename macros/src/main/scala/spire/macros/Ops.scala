@@ -5,7 +5,7 @@ import scala.reflect.macros.Context
 /**
  * This trait has some nice methods for working with implicit Ops classes.
  */
-object Ops {
+trait Ops {
 
   /**
    * Given context, this method rewrites the tree to call the desired method
@@ -140,7 +140,29 @@ object Ops {
     }
   }
 
-  private final val operatorNames = Map(
+  /**
+   * Provide a canonical mapping between "operator names" used in Ops classes
+   * and the actual method names used for type classes.
+   *
+   * This is an interesting directory of the operators Spire supports. It's
+   * also worth noting that we don't (currently) have the capacity to dispatch
+   * to two different typeclass-method names for the same operator--typeclasses
+   * have to agree to use the same name for the same operator.
+   *
+   * In general "textual" method names should just pass through to the
+   * typeclass... it is probably not wise to provide mappings for them here.
+   */
+  def findMethodName(c:Context) = {
+    import c.universe._
+    val s = c.macroApplication.symbol.name.toString
+    newTermName(operatorNames.getOrElse(s, s))
+  }
+
+  def operatorNames: Map[String, String]
+}
+
+object Ops extends Ops {
+  final val operatorNames = Map(
     // Eq (=== =!=)
     ("$eq$eq$eq", "eqv"),
     ("$eq$bang$eq", "neqv"),
@@ -187,22 +209,4 @@ object Ops {
     ("$colon$div", "divr"),
     ("$u22C5", "dot")
   )
-
-  /**
-   * Provide a canonical mapping between "operator names" used in Ops classes
-   * and the actual method names used for type classes.
-   *
-   * This is an interesting directory of the operators Spire supports. It's
-   * also worth noting that we don't (currently) have the capacity to dispatch
-   * to two different typeclass-method names for the same operator--typeclasses
-   * have to agree to use the same name for the same operator.
-   *
-   * In general "textual" method names should just pass through to the
-   * typeclass... it is probably not wise to provide mappings for them here.
-   */
-  def findMethodName(c:Context) = {
-    import c.universe._
-    val s = c.macroApplication.symbol.name.toString
-    newTermName(operatorNames.getOrElse(s, s))
-  }
 }

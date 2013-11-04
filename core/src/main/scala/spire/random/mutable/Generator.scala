@@ -1,4 +1,5 @@
 package spire.random
+package mutable
 
 import spire.math._
 
@@ -7,7 +8,17 @@ import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
 abstract class Generator {
-  def copy: Generator
+  protected var extra: Boolean = false
+  protected var value: Double = 0.0
+
+  def copy: Generator = {
+    val gen = copyInit
+    gen.extra = extra
+    gen.value = value
+    gen
+  }
+
+  protected[this] def copyInit: Generator
 
   def sync: SyncGenerator = new SyncGenerator(copy)
 
@@ -62,10 +73,35 @@ abstract class Generator {
       loop(nextInt() >>> 1)
   }
 
+  private final def retryCap(width: UInt): UInt = {
+    // Simulate 1 << 32 long division.
+    val q = UInt(Int.MinValue) / width
+    val r = UInt(Int.MinValue) % width
+    val n = (q << 1) + (r << 1) / width
+    n * width
+  }
+
   /**
    * Return an Int in [from, to].
    */
-  def nextInt(from: Int, to: Int): Int = from + nextInt(to - from + 1)
+  def nextInt(from: Int, to: Int): Int = {
+    val width = UInt(to - from + 1)
+    if (width == UInt(0)) {
+      nextInt()
+    } else {
+      val cap = if (width > UInt(Int.MinValue)) width else retryCap(width)
+      if (cap == UInt(0)) {
+        val x = UInt(nextInt())
+        from + (x % width).signed
+      } else {
+        @tailrec def loop(): Int = {
+          val x = UInt(nextInt())
+          if (x <= cap) (x % width).signed + from else loop()
+        }
+        loop()
+      }
+    }
+  }
 
   /**
    * Generates a random int between 0 (inclusive) and n (exclusive).
@@ -82,6 +118,36 @@ abstract class Generator {
       nextLong() & (n - 1)
     else
       loop(nextLong() >>> 1)
+  }
+
+  private final def retryCap(width: ULong): ULong = {
+    // Simulate 1 << 32 long division.
+    val q = ULong(Long.MinValue) / width
+    val r = ULong(Long.MinValue) % width
+    val n = (q << 1) + (r << 1) / width
+    n * width
+  }
+
+  /**
+   * Return an Long in [from, to].
+   */
+  def nextLong(from: Long, to: Long): Long = {
+    val width = ULong(to - from + 1)
+    if (width == ULong(0)) {
+      nextLong()
+    } else {
+      val cap = if (width > ULong(Long.MinValue)) width else retryCap(width)
+      if (cap == ULong(0)) {
+        val x = ULong(nextLong())
+        from + (x % width).signed
+      } else {
+        @tailrec def loop(): Long = {
+          val x = ULong(nextLong())
+          if (x <= cap) (x % width).signed + from else loop()
+        }
+        loop()
+      }
+    }
   }
 
   /**
@@ -311,6 +377,66 @@ abstract class Generator {
     }
   }
 
+  def nextGaussian(): Double = if (extra) {
+    extra = false
+    value
+  } else {
+    @tailrec def loop(x: Double, y: Double): Double = {
+      val s = x * x + y * y
+      if (s >= 1.0 || s == 0.0) {
+        loop(nextDouble() * 2 - 1, nextDouble() * 2 - 1)
+      } else {
+        val scale = Math.sqrt(-2.0 * Math.log(s) / s)
+        extra = true
+        value = y * scale
+        x * scale
+      }
+    }
+    loop(nextDouble() * 2 - 1, nextDouble() * 2 - 1)
+  }
+
+  def nextGaussian(mean: Double, stddev: Double): Double =
+    nextGaussian() * stddev + mean
+
+  def fillGaussians(arr: Array[Double]): Unit =
+    fillGaussians(arr, 0.0, 1.0)
+
+  def fillGaussians(arr: Array[Double], mean: Double, stddev: Double) {
+    var i = 0
+    val len = arr.length & 0xfffffffe
+
+    @tailrec def loop(i: Int, x: Double, y: Double) {
+      val s = x * x + y * y
+      if (s >= 1.0 || s == 0.0) {
+        loop(i, nextDouble() * 2 - 1, nextDouble() * 2 - 1)
+      } else {
+        val scale = Math.sqrt(-2.0 * Math.log(s) / s)
+        arr(i) = x * scale * stddev + mean
+        arr(i + 1) = y * scale * stddev + mean
+      }
+    }
+
+    while (i < len) {
+      loop(i, nextDouble() * 2 - 1, nextDouble() * 2 - 1)
+      i += 2
+    }
+
+    if (len < arr.length) arr(len) = nextGaussian() * stddev + mean
+  }
+
+  def generateGaussians(n: Int): Array[Double] = {
+    val arr = new Array[Double](n)
+    fillGaussians(arr)
+    arr
+  }
+
+  def generateGaussians(n: Int, mean: Double, stddev: Double): Array[Double] = {
+    val arr = new Array[Double](n)
+    fillGaussians(arr, mean, stddev)
+    arr
+  }
+
+  def toImmutable: immutable.Generator = new ImmutableWrapper(copy)
 }
 
 abstract class IntBasedGenerator extends Generator { self =>
@@ -321,6 +447,28 @@ abstract class IntBasedGenerator extends Generator { self =>
 abstract class LongBasedGenerator extends Generator { self =>
   def nextInt(): Int =
     (nextLong >>> 32).toInt
+}
+
+private final class ImmutableWrapper(var gen: Generator) extends immutable.Generator {
+  def getSeedBytes: Array[Byte] = gen.getSeedBytes()
+
+  def withSeedBytes(bytes: Array[Byte]): immutable.Generator = {
+    val gen0 = gen.copy
+    gen0.setSeedBytes(bytes)
+    new ImmutableWrapper(gen0)
+  }
+
+  def nextInt: (immutable.Generator, Int) = {
+    val gen0 = gen.copy
+    val x = gen0.nextInt
+    (new ImmutableWrapper(gen0), x)
+  }
+
+  def nextLong: (immutable.Generator, Long) = {
+    val gen0 = gen.copy
+    val x = gen0.nextLong
+    (new ImmutableWrapper(gen0), x)
+  }
 }
 
 trait GeneratorCompanion[G, @spec(Int, Long) S] {
@@ -343,7 +491,7 @@ object GlobalRng extends LongBasedGenerator {
 
   override def sync = rng
 
-  def copy: Generator = rng.copy
+  def copyInit: Generator = rng.copyInit
 
   def getSeedBytes: Array[Byte] = rng.getSeedBytes
 

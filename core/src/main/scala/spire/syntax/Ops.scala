@@ -80,6 +80,7 @@ final class SignedOps[A:Signed](lhs: A) {
   def abs(): A = macro Ops.unop[A]
   def sign(): Sign = macro Ops.unop[Sign]
   def signum(): Int = macro Ops.unop[Int]
+  def isZero(): Boolean = macro Ops.unop[Boolean]
 }
 
 final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
@@ -308,6 +309,11 @@ final class CoordinateSpaceOps[V](v: V) {
 
   def dimensions[F](implicit ev: CoordinateSpace[V, F]): Int =
     macro Ops.unopWithEv[CoordinateSpace[V, F], Int]
+}
+
+final class MetricSpaceOps[V](lhs: V) {
+  def distance[F](rhs: V)(implicit ev: MetricSpace[V, F]): F =
+    macro Ops.binopWithEv[V, MetricSpace[V, F], F]
 }
 
 final class NormedVectorSpaceOps[V](lhs: V) {

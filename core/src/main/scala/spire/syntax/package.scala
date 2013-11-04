@@ -31,9 +31,11 @@ package object syntax {
   object euclideanRing extends EuclideanRingSyntax
   object field extends FieldSyntax
   object nroot extends NRootSyntax
+  object trig extends TrigSyntax
 
   object module extends ModuleSyntax
   object vectorSpace extends VectorSpaceSyntax
+  object metricSpace extends MetricSpaceSyntax
   object normedVectorSpace extends NormedVectorSpaceSyntax
   object innerProductSpace extends InnerProductSpaceSyntax
   object coordinateSpace extends CoordinateSpaceSyntax

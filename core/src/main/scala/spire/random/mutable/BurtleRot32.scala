@@ -1,4 +1,5 @@
 package spire.random
+package mutable
 
 import java.nio.ByteBuffer
 import java.util.Arrays
@@ -79,7 +80,7 @@ final class BurtleRot2(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_
     d = e + a
   }
 
-  def copy: BurtleRot2 = new BurtleRot2(a, b, c, d)
+  def copyInit: BurtleRot2 = new BurtleRot2(a, b, c, d)
 }
 
 object BurtleRot2 extends BurtleCompanion[BurtleRot2] {
@@ -101,7 +102,7 @@ final class BurtleRot3(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_
     d = e + a
   }
 
-  def copy: BurtleRot3 = new BurtleRot3(a, b, c, d)
+  def copyInit: BurtleRot3 = new BurtleRot3(a, b, c, d)
 }
 
 object BurtleRot3 extends BurtleCompanion[BurtleRot3] {
