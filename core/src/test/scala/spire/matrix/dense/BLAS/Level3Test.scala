@@ -179,8 +179,8 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
       elements = uniformIm1p1)
     for {
       (m,k) <- g.twoDimensionSample
-      a <- if(trans == NoTranspose) g.generalMatrixSample(m,k).take(3)
-           else g.generalMatrixSample(k,m)
+      a <- (if(trans == NoTranspose) g.generalMatrixSample(m,k)
+            else g.generalMatrixSample(k,m)).take(3)
       c <- g.generalMatrixSample(m,m).take(2)
       alpha <- g.scalarSample
       beta <- g.scalarSample
