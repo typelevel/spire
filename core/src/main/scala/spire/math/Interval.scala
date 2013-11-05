@@ -2,6 +2,7 @@ package spire.math
 
 import spire.algebra._
 import spire.implicits._
+import spire.math.poly.Term
 
 import Predef.{any2stringadd => _, _}
 
@@ -68,7 +69,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def crosses(t: A): Boolean =
     isBelow(t) && isAbove(t)
 
-  def crossesZero(implicit ev: Ring[A]): Boolean =
+  def crossesZero(implicit ev: AdditiveMonoid[A]): Boolean =
     isBelow(ev.zero) && isAbove(ev.zero)
 
   def lowerBound: Option[(A, Int)] = this match {
@@ -216,10 +217,10 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def split(t: A): (Interval[A], Interval[A]) =
     (this mask Interval.below(t), this mask Interval.above(t))
 
-  def splitAtZero(implicit ev: Ring[A]): (Interval[A], Interval[A]) =
+  def splitAtZero(implicit ev: AdditiveMonoid[A]): (Interval[A], Interval[A]) =
     split(ev.zero)
 
-  def mapAroundZero[B](f: Interval[A] => B)(implicit ev: Ring[A]): (B, B) =
+  def mapAroundZero[B](f: Interval[A] => B)(implicit ev: AdditiveMonoid[A]): (B, B) =
     splitAtZero match {
       case (a, b) => (f(a), f(b))
     }
@@ -232,9 +233,13 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     case Below(upper, flags) =>
       if (isClosedAbove(flags)) s"(-∞, $upper]" else s"(-∞, $upper)"
     case Ranged(lower, upper, flags) =>
-      val s1 = if (isClosedBelow(flags)) s"[$lower" else s"($lower"
-      val s2 = if (isClosedAbove(flags)) s"$upper]" else s"$upper)"
-      s"$s1, $s2"
+      if (lower === upper) {
+        if (isClosed(flags)) s"[$lower]" else "(Ø)"
+      } else {
+        val s1 = if (isClosedBelow(flags)) s"[$lower" else s"($lower"
+        val s2 = if (isClosedAbove(flags)) s"$upper]" else s"$upper)"
+        s"$s1, $s2"
+      }
   }
 
   def combine(rhs: Interval[A])(f: (A, A) => A): Interval[A] = {
@@ -288,7 +293,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   private[this] def fromTpl(t1: (A, Int), t2: (A, Int)): Interval[A] =
     Interval.withFlags(t1._1, t2._1, lowerFlag(t1._2) | lowerFlagToUpper(t2._2))
 
-  def *(rhs: Interval[A])(implicit ev: Ring[A]): Interval[A] = {
+  def *(rhs: Interval[A])(implicit ev: Semiring[A]): Interval[A] = {
     if (lhs.isEmpty || rhs.isEmpty) return Interval.empty[A]
     val z = ev.zero
     if (lhs.isAt(z) || rhs.isAt(z)) return Interval.point(z)
@@ -481,7 +486,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       case All() => this
     }
 
-  def *(rhs: A)(implicit ev: Ring[A]): Interval[A] =
+  def *(rhs: A)(implicit ev: Semiring[A]): Interval[A] =
     if (rhs < ev.zero) {
       this match {
         case Ranged(l, u, f) => Ranged(u * rhs, l * rhs, swapFlags(f))
@@ -522,6 +527,12 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   def dist(min: A, max: A, epsilon: A)(implicit u: Uniform[A], r: AdditiveGroup[A]): Dist[A] =
     u(bottom(min, epsilon).getOrElse(min), top(epsilon).getOrElse(max))
+
+  def translate(p: Polynomial[A])(implicit ev: Field[A]): Interval[A] = {
+    val terms2 = p.terms.map { case Term(c, e) => Term(Interval.point(c), e) }
+    val p2 = Polynomial(terms2)
+    p2(this)
+  }
 }
 
 case class All[A: Order] private[spire] () extends Interval[A]
@@ -539,7 +550,7 @@ object Interval {
   def point[A: Order](a: A): Interval[A] =
     Ranged(a, a, 0)
 
-  def zero[A](implicit o: Order[A], r: Ring[A]): Interval[A] =
+  def zero[A](implicit o: Order[A], r: Semiring[A]): Interval[A] =
     Ranged(r.zero, r.zero, 0)
 
   def all[A: Order]: Interval[A] = All[A]()
@@ -559,4 +570,17 @@ object Interval {
   def below[A: Order](a: A): Interval[A] = Below(a, 2)
   def atOrAbove[A: Order](a: A): Interval[A] = Above(a, 0)
   def atOrBelow[A: Order](a: A): Interval[A] = Below(a, 0)
+
+  implicit def eq[A: Eq]: Eq[Interval[A]] =
+    new Eq[Interval[A]] {
+      def eqv(x: Interval[A], y: Interval[A]): Boolean =
+        (x.lowerBound === y.lowerBound) && (x.upperBound === y.upperBound)
+    }
+
+  implicit def semiring[A](implicit ev: Semiring[A], o: Order[A]): Semiring[Interval[A]] =
+    new Semiring[Interval[A]] {
+      def zero: Interval[A] = Interval.point(ev.zero)
+      def plus(x: Interval[A], y: Interval[A]): Interval[A] = x + y
+      def times(x: Interval[A], y: Interval[A]): Interval[A] = x * y
+    }
 }
