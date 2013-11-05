@@ -4,7 +4,7 @@ import spire.matrix.dense._
 import spire.matrix.NumericPropertiesOfDouble
 import spire.matrix.Transposition._
 import spire.matrix.UpperOrLower._
-import spire.matrix.BLAS
+import spire.matrix.dense.BLAS
 import spire.matrix.dense.random._
 
 import scala.math._
@@ -13,7 +13,7 @@ import org.scalatest.matchers.ShouldMatchers
 
 trait NonSymmetricEigenProblemTestLike extends FunSuite
 with CommonMatrixPropertyTests
-with BLAS.level3.Naive
+with BLAS.NaiveLevel3
 {
   val HessenbergDecomposition: Hessenberg.DecompositionLikeCompanion
   val SchurDecomposition: Schur.RealDecompositionCompanion

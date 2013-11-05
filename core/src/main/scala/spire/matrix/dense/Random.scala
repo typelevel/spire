@@ -3,8 +3,7 @@ package spire.matrix.dense.random
 import spire.matrix.dense._
 import spire.matrix.Sides
 import Sides._
-import spire.matrix.BLAS
-import BLAS.level1
+import spire.matrix.dense.BLAS
 import spire.random
 import java.lang.Math.{signum, copySign}
 
@@ -85,22 +84,22 @@ extends ScalarDistribution {
 /**
  * The Haar distribution for orthogonal matrices of dimension n.
  *
- * In the following, $U$ will always refer to a matrix drawn from this
+ * In the following, U will always refer to a matrix drawn from this
  * distribution. Every method of this class has a base runtime cost of
- * O(n^2) random numbers generated from a normal distribution,
+ * O(n^2^) random numbers generated from a normal distribution,
  * and a base storage cost of O(n).
  *
- * An economical method [1, theorem 3.3] to generate such a matrix $U$ is used:
- * a sequence of n-1 elementrary reflections $H_0, H_1, H_{n-2}$
- * is generated such that $U = D H_0 H_1 \cdots H_{n-2}$, for a well chosen
+ * An economical method [1, theorem 3.3] to generate such a matrix U is used:
+ * a sequence of n-1 elementrary reflections H,,0,,, H,,1,,, ..., H,,n-2,,
+ * is generated such that U = D H,,0,, H,,1,, ... H,,n-2,,, for a well chosen
  * diagonal matrix D, but this product is only computed
- * if the matrix $U$ is requested, and only one elementary reflection
+ * if the matrix U is requested, and only one elementary reflection
  * is stored at a time.
  *
  * Refrence: subroutine DLAROR from LAPACK [2]
  *
  * Note: subroutine DLARGE does also deal with random orthogonal matrices
- * using the same method but it leaves out the multiplication by the matrix $D$
+ * using the same method but it leaves out the multiplication by the matrix D
  * and therefore the distribution is not the Haar measure. As a result, the
  * eigenvalues are not neatly distributed on the circle of radius 1 centered
  * on 0 in the complex plane.
@@ -109,17 +108,12 @@ extends ScalarDistribution {
  *     with an application to condition estimators,
  *     SIAM Journal on Numerical Analysis 17 (1980), no. 3, 403–409.
  *
- * [2] LAPACK Users' Guide.
- *     E Anderson, Z Bai, Christian H. Bischof, S Blackford, J Demmel,
- *     J Dongarra, J Du Croz, A Greenbaum, S Hammarling, A McKenney,
- *     and D Sorensen.
- *     Society for Industrial and Applied Mathematics,
- *     Philadelphia, PA, Third.
+ * [2]
  */
 class OrthogonalMatricesHaarDistribution(val n:Int)
                                         (implicit gen: Defaults.IntegerGenerator,
                                          implicit val work: Scratchpad)
-extends Iterator[Matrix] with BLAS.level1.Naive {
+extends Iterator[Matrix] with BLAS.NaiveLevel1 {
 
   val ElementaryReflector = ElementaryReflectorWithNaiveBLAS
 
@@ -128,9 +122,9 @@ extends Iterator[Matrix] with BLAS.level1.Naive {
   private val r = Vector.zero(n)
 
   /**
-   * Overwrite $A$ with either $U A$, $A U$ or $U A U^T$
+   * Overwrite A with either U A, A U or U A U^T^
    *
-   * The runtime cost is O(n^3) on the top of the base runtime cost
+   * The runtime cost is O(n^3^) on the top of the base runtime cost
    * whereas there is no extra storage cost.
    */
   def overwriteWithProductByNext(sides:Sides.Value, a:MatrixLike):Unit = {

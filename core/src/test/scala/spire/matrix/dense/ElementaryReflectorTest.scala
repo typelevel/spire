@@ -1,6 +1,5 @@
 package spire.matrix.dense.tests
 
-import spire.matrix.BLAS
 import spire.matrix.Constants._
 import spire.matrix.dense._
 

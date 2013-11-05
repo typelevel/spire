@@ -1,26 +1,4 @@
-/**
- * An implementation of the infamous Basic Linear Algebra System, level 3
- *
- * BLAS level 3 is concerned with those basic operations
- * that references O(n^2) elements and that performs O(n^3) flops,
- * where n is the size of the problem. Those operations are:
- *
- *   - multiplication of a pair of matrices, supporting different type for
- *     each of them (general, symmetric, triangular, etc)
- *   - solution of triangularised system of equations for many right-hand sides
- *
- * The BLAS function declarations are altered as follow:
- *
- *   - we remove only the leading character (S, D, Z) indicating the type
- *     of elements, therefore keeping the next 2 characters indicating the type
- *     of matrices (GE for general, SY for symmetric, TR for triangular, ...)
- *   - we do not pass the matrix sizes and leading dimension as arguments
- *     as they are encapsulated in the matrix arguments
- *   - the dummy CHARACTER*1 parameters such as TRANx are coded with
- *     enumerations instead
- *
- */
-package spire.matrix.BLAS.level3
+package spire.matrix.dense.BLAS
 
 import spire.syntax.cfor._
 
@@ -29,52 +7,12 @@ import spire.matrix.{Transposition, UpperOrLower}
 import Transposition._
 import UpperOrLower._
 
-trait Interface {
-  /**
-   * Performs the matrix-matrix operations
-   *
-   * \[
-   *     C := \alpha op(A) op(B) + \beta C
-   * \]
-   *
-   * where $op(X) = X$ if transX is NoTranspose
-   * or $op(X) = X^T$ if transX is Transpose or ConjugateTranspose.
-   *
-   * The matrix C is thus modified in-place whereas matrices a and b are
-   * not modified. Result is unpredictable if C overlaps with any of A or B.
-   *
-   * TODO: we could check whether there are such overlaps
-   */
-  def gemm(transA:Transposition.Value, transB:Transposition.Value,
-           alpha:Double, a:MatrixLike, b:MatrixLike,
-           beta:Double, c:MatrixLike): Unit
-
-  /**
-   * Performs either of the following symmetric rank-k updates
-   * \[
-   *     C := \alpha A A^T + \beta C (1)
-   * \]
-   * or
-   * \[
-   *     C := \alpha A^T A + \beta C (2)
-   * \]
-   * where $\alpha$ and $\beta$ are scalars and $C$ is a symmetric matrix
-   * of dimension n x n. If the argument `trans` is Transpose, then (1) is
-   * performed, whereas if `trans` is NoTranspose, (2) is performed.
-   *
-   * If `uplo` is Upper (resp. Lower), then only the upper (resp. lower)
-   * triangle of C is updated.
-   */
-  def syrk(uplo:UpperOrLower.Value, trans:Transposition.Value,
-           alpha:Double, a:MatrixLike, beta:Double, c:MatrixLike): Unit
-}
-
-
-/** Straightforward but inefficient implementations
-  *
-  * No blocking, no parallelism, no vectorisation(?).
-  */
-trait Naive extends Interface {
+/**
+ * Straightforward but inefficient implementations
+ *
+ * No blocking, no parallelism, no vectorisation(?).
+ */
+trait NaiveLevel3 extends Level3 {
 
   def gemm(transA:Transposition.Value, transB:Transposition.Value,
            alpha:Double, a:MatrixLike, b:MatrixLike,

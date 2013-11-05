@@ -7,20 +7,20 @@ import scala.math._
  * Hessenberg decomposition.
  *
  * A Hessenberg decomposition reads
- * \[
- *     A = Q H Q^T
- * \]
+ *
+ *     A = Q H Q^T^
+ *
  * where Q is an orthogonal matrix and H is a Hessenberg matrix.
  * Q is represented as a product of n elementary reflectors
- * \[
- *     Q = H_{n-1} H_{n-2} \cdots H_0
- * \]
- * Each elementary reflector has the form $H_i = I - \tau_i v_i v_i^T$
- * (@see trait ElementaryReflectorLike).
+ *
+ *     Q = H,,n-1,, H,,n-2,, ... H,,0,,
+ *
+ * Each elementary reflector has the form H,,i,, = I - τ,,i,, v,,i,, v,,i,,^T^
+ * (see trait [[spire.matrix.dense.ElementaryReflectorLike]]).
  *
  * This class handles the storage of and the operation on the decomposion
- * $Q H Q^T$ but not the computation of Q and H given an input matrix A
- * (this is the role of the trait HessenbergDecompositionConstruction).
+ * Q H Q^T^ but not the computation of Q and H given an input matrix A
+ * (this is the role of the trait DecompositionLikeCompanion).
  * The decomposition is stored in the matrix A, and in an extra vector tau
  * of length n:
  *
@@ -30,11 +30,11 @@ import scala.math._
  *    contains the elements of the Hessenberg matrix H
  *  - each column j below the first subdiagonal of A(iLo:iHi, iLo:iHi)
  *    contains the j-2 elements of the essential part of an elementary
- *    reflector $h_j$ such that
- *    \[
- *        Q(iLo:iHi, iLo:iHi) = h_{iHi-2} h_{iHi-3} \cdots h_{iLo}.
- *    \]
- *  - the $tau_i$ are stored in `tau`.
+ *    reflector H,,j,, such that
+ *
+ *        Q(iLo:iHi, iLo:iHi) = H,,iHi-2,, H,,iHi-3,, ... H,,iLo,,.
+ *
+ *  - the τ,,i,,'s are stored in attribute ''taus''.
  * *
  * [1] LAPACK Users' Guide.
  *     E Anderson, Z Bai, Christian H. Bischof, S Blackford, J Demmel,
@@ -64,7 +64,7 @@ trait DecompositionLike {
   def reducedMatrix = a.copyToUpperHessenberg
 
   /**
-   * The matrix $Q$ formed by computing the product of the $H_i$.
+   * The matrix Q formed by computing the product of the H,,i,,.
    *
    * This uses an unblocked algorithm and it does not work in-place.
    * Thus this should only be used as a reference implementation for

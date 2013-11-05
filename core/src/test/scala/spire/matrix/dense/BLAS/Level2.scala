@@ -1,12 +1,12 @@
-package spire.matrix.BLAS.level2.tests
+package spire.matrix.dense.BLAS.level2.tests
 
-import spire.matrix.BLAS
+import spire.matrix.dense.BLAS
 import spire.matrix.Transposition._
 import spire.matrix.dense.{Matrix,Vector}
 
 import org.scalatest.FunSuite
 
-trait BLASLevel2Test extends FunSuite with BLAS.level2.Interface {
+trait BLASLevel2Test extends FunSuite with BLAS.Level2 {
 
   test("General Matrix Vector product (GEMV): no transpose") {
     val a = Matrix(3,5)( 2, -2, 1, -1,  2,
@@ -53,4 +53,4 @@ trait BLASLevel2Test extends FunSuite with BLAS.level2.Interface {
   }
 }
 
-class NaiveBLASLevel2Test extends BLASLevel2Test with BLAS.level2.Naive
+class NaiveBLASLevel2Test extends BLASLevel2Test with BLAS.NaiveLevel2

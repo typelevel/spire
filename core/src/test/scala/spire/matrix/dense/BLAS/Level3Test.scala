@@ -1,6 +1,6 @@
-package spire.matrix.BLAS.level3.tests
+package spire.matrix.dense.BLAS.level3.tests
 
-import spire.matrix.BLAS
+import spire.matrix.dense.BLAS
 import spire.matrix.Transposition
 import Transposition._
 import spire.matrix.UpperOrLower._
@@ -11,7 +11,7 @@ import spire.matrix.dense.random._
 
 import org.scalatest.FunSuite
 
-trait BLASLevel3Test extends FunSuite with BLAS.level3.Interface {
+trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
 
   test("General Matrix Multiplication (GEMM)") {
     val a = Matrix(5,3)(-2, -1, -3,
@@ -249,4 +249,4 @@ trait BLASLevel3Test extends FunSuite with BLAS.level3.Interface {
   }
 }
 
-class NaiveBLASLevel3Test extends BLASLevel3Test with BLAS.level3.Naive
+class NaiveBLASLevel3Test extends BLASLevel3Test with BLAS.NaiveLevel3

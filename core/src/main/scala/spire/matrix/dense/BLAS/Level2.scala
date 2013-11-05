@@ -1,26 +1,4 @@
-/**
- * An implementation of the infamous Basic Linear Algebra System, level 2
- *
- * BLAS level 2 is concerned with those basic operations
- * that references O(n^2) elements and that performs O(n^2) flops,
- * where n is the size of the problem. Those operations are:
- *
- *   - product of a matrix and a vector
- *   - rank-1 updates
- *
- * The BLAS function declarations are altered as follow:
- *
- *   - we remove only the leading character (S, D, Z) indicating the type
- *     of elements, therefore keeping the next 2 characters indicating the type
- *     of matrices (GE for general, SY for symmetric, TR for triangular, ...)
- *   - we do not pass either the matrix and vector sizes, or vector stride,
- *     or matrix leading dimension as arguments as they are encapsulated
- *     in the matrix and vector arguments
- *   - the dummy CHARACTER*1 parameters such as TRANx are coded with
- *     enumerations instead
- *
- */
-package spire.matrix.BLAS.level2
+package spire.matrix.dense.BLAS
 
 import spire.syntax.cfor._
 
@@ -29,32 +7,12 @@ import spire.matrix.dense.VectorLike
 import spire.matrix.Transposition
 import Transposition._
 
-trait Interface {
-
-  /**
-   * This performs the following operation involving the matrix A,
-   * the vectors x and y and the scalars $\alpha$ and $\beta$
-   * \[
-   *     y := \alpha op(A) x + beta y
-   * \]
-   * where $op(A)=A$ or $op(A)=A^T$ depending on the value
-   * of the argument `trans`.
-   */
-   def gemv(trans: Transposition.Value,
-            alpha: Double, a: MatrixLike,
-            x: VectorLike, beta: Double, y: VectorLike): Unit
-
-   /**
-    * This perform the rank-1 update
-    * \[
-    *     A := alpha x y^T + A
-    * \]
-    * where A is a matrix, x and y are vectors and $\alpha$ is a scalar.
-    */
-   def ger(alpha: Double, x: VectorLike, y: VectorLike, a: MatrixLike): Unit
-}
-
-trait Naive extends Interface {
+/**
+ * Straightforward but inefficient implementations
+ *
+ * They are to be considered as a reference implementations.
+ */
+trait NaiveLevel2 extends Level2 {
 
    def gemv(trans: Transposition.Value,
             alpha: Double, a: MatrixLike,

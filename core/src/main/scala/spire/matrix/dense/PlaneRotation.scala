@@ -4,6 +4,7 @@ import scala.math._
 
 /**
  * A plane rotation
+ *
  * <pre>
  *      [ cs  -sn ]
  *      [ sn   cs ]
@@ -33,7 +34,7 @@ final case class PlaneRotation(val cs:Double, val sn:Double) {
   }
 
   /**
-   * The product $R M$ where R is this rotation
+   * The product R M where R is this rotation
    */
   def applyOnLeft(m: Matrix2x2): Matrix2x2 = {
     val (a, b,
@@ -45,7 +46,7 @@ final case class PlaneRotation(val cs:Double, val sn:Double) {
   }
 
   /**
-   * The product $M R^T$ where R is this rotation
+   * The product M R^T^ where R is this rotation
    */
   def applyTransposeOnRight(m: Matrix2x2): Matrix2x2 = {
     val (a, b,
@@ -57,7 +58,7 @@ final case class PlaneRotation(val cs:Double, val sn:Double) {
   }
 
   /**
-   * Similarity transform $R M R^T$ where R is this rotation
+   * Similarity transform R M R^T^ where R is this rotation
    */
   def applySimilarity(m: Matrix2x2): Matrix2x2 =
     applyOnLeft(applyTransposeOnRight(m))

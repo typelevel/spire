@@ -1,7 +1,7 @@
 package spire.matrix.dense.Schur
 
 import spire.matrix.dense._
-import spire.matrix.BLAS
+import spire.matrix.dense.BLAS
 import spire.matrix.NumericPropertiesOfDouble
 import scala.math._
 import java.lang.Math.copySign
@@ -14,9 +14,9 @@ import scala.annotation.tailrec
  *
  * Mathematically, given a Hessenberg matrix H, the real Schur decomposition
  * reads
- * \[
- *   H = Z T Z^T
- * \]
+ *
+ *   H = Z T Z^T^
+ *
  * where Z is an upper quasi-triangular matrix, i.e. its diagonal is made of
  * either 1 x 1 or 2 x 2 blocks having a pair of complex conjugate eigenvalues,
  * below which all elements are zero.
@@ -40,11 +40,11 @@ import scala.annotation.tailrec
  *     after completion of the algorithm.
  *
  * The algorithm may take as input an orthogonal matrix Q, usually such
- * that $A = Q H Q^T$, where A is the general square matrix whose Schur
+ * that A = Q H Q^T^, where A is the general square matrix whose Schur
  * decomposition is ultimately sought. If provided (i.e. if different from
- * null), Q is transformed in-place into the matrix of Schur vectors $ZQ$.
+ * null), Q is transformed in-place into the matrix of Schur vectors ZQ.
  * The arguments iLoZ and iHiZ may be used to restrict the computation to the
- * rows of $ZQ$ in the range iLoZ until iHiZ.
+ * rows of ZQ in the range iLoZ until iHiZ.
  *
  * The argument fullSchurFormWanted specifies whether the full Schur form
  * shall be computed or whether only eigenvalues shall be computed.
@@ -138,7 +138,7 @@ class RealDecompositionWithDoubleShiftQRAlgorithm(
   (iLoZ:Int, iHiZ:Int)
 extends RealDecomposition(h, q, fullSchurFormWanted)(iLo, iHi)(iLoZ, iHiZ)
 with NumericPropertiesOfDouble
-with BLAS.level1.Naive
+with BLAS.NaiveLevel1
 {
   /**
    * Maximum number of iterations to reveal one eigenvalue
@@ -206,12 +206,10 @@ with BLAS.level1.Naive
     }
   }
 
-  /**
-   * Find k in [l+1, i) such that H(k, k-1) is small enough
-   *
-   * It uses the conservative deflation criterion introduced in [5]
-   */
-  final def findDeflationPoint(l:Int, i:Int): Int = {
+  // Find k in [l+1, i) such that H(k, k-1) is small enough
+  // It uses the conservative deflation criterion introduced in [5]
+  private
+  def findDeflationPoint(l:Int, i:Int): Int = {
     // TODO: use cforRange when https://github.com/non/spire/issues/164
     // has been addressed
     for(k <- i-1 until l by -1) {
@@ -239,7 +237,8 @@ with BLAS.level1.Naive
   // The 2nd shift is complex conjugate of the 1st,
   // which degenerate to their being equal if both are real.
   // This returns the 1st shift as a pair (real part, imaginary part)
-  final def findShifts(l:Int, i:Int, iterations:Int): (Double, Double) = {
+  private
+  def findShifts(l:Int, i:Int, iterations:Int): (Double, Double) = {
     // Compute the matrix whose eigenvalues are the shifts
     var (h11, h12,
          h21, h22) = iterations match {
@@ -283,10 +282,10 @@ with BLAS.level1.Naive
   }
 
   // Find best index m in [l,i) to perform implicit double-shift QR step
-  // on H(m:i, m:i), denoted $A_0$. Returns (m, v) where v is the vector
+  // on H(m:i, m:i), denoted A,,0,,. Returns (m, v) where v is the vector
   // containing the 3 non-zero elements of the first column of the matrix
-  // $A_0^2 -2\Re\sigma A_0 +|\sigma|^2 I$ as explained in [3, page 171].
-  final
+  // A,,0,,^2^ -2 A,,0,, + Re(σ)^2^ I as explained in [3, page 171].
+  private
   def initialBulge(l:Int, i:Int, firstShift:(Double, Double)): (Int, Vector) = {
     val v = Vector.empty(3)
     val (sigR, sigI) = firstShift
@@ -314,7 +313,7 @@ with BLAS.level1.Naive
     (l, v)
   }
 
-  final
+  private
   def performDoubleShiftQRStep(l:Int, m:Int, i:Int, v:Vector) {
     // If the Schur form is wanted, the whole matrix H needs to be transformed.
     // Otherwise only the active block l:i.
@@ -345,7 +344,7 @@ with BLAS.level1.Naive
     }
   }
 
-  final def perform2x2SchurDecomposition(i:Int) {
+  private def perform2x2SchurDecomposition(i:Int) {
     val d2x2 = Decomposition2x2(h(i-2 ,i-2), h(i-2, i-1),
                                 h(i-1 ,i-2), h(i-1, i-1))
     eigenvalues(i-2) = d2x2.eigenvalues._1

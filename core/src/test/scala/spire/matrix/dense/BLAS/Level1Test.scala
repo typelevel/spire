@@ -1,11 +1,11 @@
-package spire.matrix.BLAS.level1.tests
+package spire.matrix.dense.BLAS.level1.tests
 
-import spire.matrix.BLAS
+import spire.matrix.dense.BLAS
 import spire.matrix.dense._
 
 import org.scalatest.FunSuite
 
-trait BLASLevel1Test extends FunSuite with BLAS.level1.Interface {
+trait BLASLevel1Test extends FunSuite with BLAS.Level1 {
 
   test("Vector scaling") {
     val m = Matrix(2,4)(1, 2, 3, 4,
@@ -18,4 +18,4 @@ trait BLASLevel1Test extends FunSuite with BLAS.level1.Interface {
 
 }
 
-class NaiveBLASLevel1Test extends BLASLevel1Test with BLAS.level1.Naive
+class NaiveBLASLevel1Test extends BLASLevel1Test with BLAS.NaiveLevel1

@@ -1,6 +1,5 @@
 package spire.matrix.dense
 
-import spire.matrix.BLAS
 import spire.matrix.Transposition._
 
 import java.lang.Math.copySign
@@ -13,11 +12,11 @@ import spire.syntax.cfor._
  *
  * We use LAPACK conventions [1].
  *
- * An elementary reflector of order n is a n x n matrix of the form
- * \[
- *     H = I - \tau v v^T
- * \]
- * where $\tau$ is a scalar and $v$ is a vector of size n. This is also named
+ * An elementary reflector of order n is a n x n orthogonal matrix of the form
+ *
+ *     H = I - τ v v^T^
+ *
+ * where τ is a scalar and v is a vector of size n. This is also named
  * a Householder matrix (not because Householder invented the concept, which
  * had been known for about a century, but because he found new and interesting
  * ways to use them). We will always assume that v(0) = 1 and therefore we will
@@ -38,8 +37,7 @@ import spire.syntax.cfor._
  * for which v(0) aliases an element that is part of the desired output. We
  * prefer to avoid this ugly hack altogether.
  */
-trait ElementaryReflectorLike
-extends BLAS.level2.Interface with BLAS.level1.Interface {
+trait ElementaryReflectorLike extends BLAS.Level2 with BLAS.Level1 {
 
   val tau:Double
 
@@ -80,8 +78,7 @@ extends BLAS.level2.Interface with BLAS.level1.Interface {
    *
    * i.e. C := H C
    *
-   * This needs WorkingArea to be able to provide a vector of size at least
-   * as large as the number of columns of C
+   * @param work needs to be at least as large as the number of columns of C
    *
    * Reference: subroutine DLARF in LAPACK [1] (our implementation
    * differs because we do not have the whole vector of the reflector)
@@ -134,8 +131,7 @@ extends BLAS.level2.Interface with BLAS.level1.Interface {
    *
    * i.e. C := C H
    *
-   * This needs WorkingArea to be able to provide a vector of size at least
-   * as large as the number of rows of C
+   * @param work needs to be at least as large as the number of rows of C
    *
    * Reference: subroutine DLARF in LAPACK [1] (our implementation
    * differs because we do not have the whole vector of the reflector)
@@ -186,7 +182,7 @@ extends BLAS.level2.Interface with BLAS.level1.Interface {
  * Elementary reflector companion object to be.
  */
 trait ElementaryReflectorLikeCompanion
-  extends BLAS.level1.Interface
+  extends BLAS.Level1
   with EuclideanNorm with NumericPropertiesOfDouble
 {
   val safeMin = safeMinimum/epsilonMachine
@@ -196,6 +192,8 @@ trait ElementaryReflectorLikeCompanion
   def apply(tau:Double, v:VectorLike): ElementaryReflectorLike
 
   /**
+   * Construct a reflector whose application to y zeroes all but y(0)
+   *
    * We follow the conventions and notations of LAPACK [1].
    *
    * Given a vector
@@ -212,7 +210,7 @@ trait ElementaryReflectorLikeCompanion
    *
    * where β is a scalar. The solution is represented as
    * <pre>
-   *     H = I - τ [ 1 ] [ 1 v^T^]
+   *     H = I - τ [ 1 ] [ 1 v^T^ ]
    *               [ v ]
    * </pre>
    *
@@ -277,11 +275,11 @@ trait ElementaryReflectorLikeCompanion
 
 class ElementaryReflectorWithNaiveBLAS(val tau:Double,
                                        val essentialPart:VectorLike)
-extends ElementaryReflectorLike with BLAS.level1.Naive with BLAS.level2.Naive
+extends ElementaryReflectorLike with BLAS.NaiveLevel1 with BLAS.NaiveLevel2
 
 object ElementaryReflectorWithNaiveBLAS
 extends ElementaryReflectorLikeCompanion
-with BLAS.level1.Naive with BLAS.level2.Naive {
+with BLAS.NaiveLevel1 with BLAS.NaiveLevel2 {
   def apply(tau:Double, v:VectorLike) =
     new ElementaryReflectorWithNaiveBLAS(tau, v)
 }

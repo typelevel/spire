@@ -3,8 +3,7 @@ package spire.matrix.dense.tests
 import spire.matrix.dense._
 import spire.matrix.Transposition._
 import spire.matrix.UpperOrLower._
-import spire.matrix.BLAS
-import BLAS.level3
+import spire.matrix.dense.BLAS
 import spire.matrix.Sides._
 import spire.matrix.dense.random._
 
@@ -18,7 +17,7 @@ import org.scalatest.FunSuite
 
 class RandomOrthogonalMatrixTest extends FunSuite
 with CommonMatrixPropertyTests
-with BLAS.level3.Naive
+with BLAS.NaiveLevel3
 {
   implicit val gen = Defaults.IntegerGenerator.fromTime(3)
 

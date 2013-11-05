@@ -5,7 +5,7 @@ import spire.matrix.Transposition._
 import spire.matrix.UpperOrLower._
 import spire.matrix.Sides._
 import spire.matrix.NumericPropertiesOfDouble
-import spire.matrix.BLAS
+import spire.matrix.dense.BLAS
 import spire.matrix.dense.random._
 import spire.implicits._
 import scala.math.sqrt
@@ -100,7 +100,7 @@ extends Vector(n) with MagnitudeLimitation
  */
 class GeneralSquareMatrix(n:Int)(a:Array[Double])
 extends Matrix(n, n)(a)
-with NumericPropertiesOfDouble with MagnitudeLimitation with BLAS.level1.Naive {
+with NumericPropertiesOfDouble with MagnitudeLimitation with BLAS.NaiveLevel1 {
 
   /**
    * Jordan block
@@ -493,7 +493,7 @@ extends TestDimensions(nonSpecialDimensions)(gen) {
 }
 
 trait CommonMatrixPropertyTests
-extends BLAS.level3.Interface with NumericPropertiesOfDouble {
+extends BLAS.Level3 with NumericPropertiesOfDouble {
 
   val eps = precision
 

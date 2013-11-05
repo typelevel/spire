@@ -23,7 +23,7 @@ import scala.math
  * - A matrix may be viewed as a 2D object but also as a linear sequence,
  *   with its elements ordered by increasing row and column indices,
  *   following the internal column-major layout. Hence this traits extending
- *   Iterable.
+ *   IndexedSeq.
  *
  * - This traits is primarily focused on providing flexible and efficient means
  *   of accessing the matrix elements but it also provide a few linear algebra
@@ -300,18 +300,18 @@ trait MatrixLike extends mutable.IndexedSeq[Double] {
       case _ => false
     }
 
-  /** The 1-norm of the matrix, $\max_j \sum_i |a_{ij}|$ */
+  /** The 1-norm of the matrix, max,,j,, sum,,i,, |a,,ij,,| */
   def norm1: Double = {
     (for(j <- 0 until n) yield column(j).map(_.abs).sum).max
   }
 
-  /** The infinity-norm of the matrix, $\max_i \sum_j |a_{ij}|$ */
+  /** The infinity-norm of the matrix, max,,i,, sum,,j,, |a,,ij,,| */
 
   def normInf: Double = {
     (for(i <- 0 until m) yield row(i).map(_.abs).sum).max
   }
 
-  /** The Frobenius norm, $\left( \sum_i \sum_j a_{ij}^2 \right)^\frac{1}{2}$
+  /** The Frobenius norm, (∑,,j,, a,,ij,,^2^)^1/2^
     */
   def normFrobenius: Double = math.sqrt(this.map((e) => e*e).sum)
 
