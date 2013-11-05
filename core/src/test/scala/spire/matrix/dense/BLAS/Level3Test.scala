@@ -1,4 +1,4 @@
-package spire.matrix.dense.BLAS.level3.tests
+package spire.matrix.dense.tests
 
 import spire.matrix.dense.BLAS
 import spire.matrix.Transposition
@@ -6,7 +6,6 @@ import Transposition._
 import spire.matrix.UpperOrLower._
 import spire.matrix.dense.Matrix
 import spire.matrix.Constants._
-import spire.matrix.dense.tests.TestGeneralMatrices
 import spire.matrix.dense.random._
 
 import org.scalatest.FunSuite

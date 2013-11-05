@@ -1,4 +1,4 @@
-package spire.matrix.dense.BLAS.level1.tests
+package spire.matrix.dense.tests
 
 import spire.matrix.dense.BLAS
 import spire.matrix.dense._
