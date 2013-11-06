@@ -189,7 +189,6 @@ v     */
             c.error(c.enclosingPosition, "zero stride")
             q"()"
           case None =>
-            c.info(c.enclosingPosition, "non-literal stride", true)
             q"$r.foreach($body)"
         }
 
@@ -201,12 +200,10 @@ v     */
             c.error(c.enclosingPosition, "zero stride")
             q"()"
           case None =>
-            c.info(c.enclosingPosition, "non-literal stride", true)
             q"$r.foreach($body)"
         }
 
       case r =>
-        c.info(c.enclosingPosition, "non-literal range", true)
         q"$r.foreach($body)"
     }
 
