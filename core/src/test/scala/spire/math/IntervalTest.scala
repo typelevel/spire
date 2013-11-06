@@ -4,8 +4,8 @@ import org.scalatest.FunSuite
 import spire.implicits.{eqOps => _, _}
 
 class IntervalTest extends FunSuite {
-  def cc(n1:Double, n2:Double) = Interval(ClosedBelow(n1), ClosedAbove(n2))
-  def oc(n1:Double, n2:Double) = Interval(OpenBelow(n1), ClosedAbove(n2))
+  def cc(n1:Double, n2:Double) = Interval.closed(n1, n2)
+  def oc(n1:Double, n2:Double) = Interval.openBelow(n1, n2)
 
   val a = cc(0.0, 4.0)
   test("a.contains(0.0) is true") { assert(a.contains(0.0) === true) }
@@ -23,7 +23,7 @@ class IntervalTest extends FunSuite {
 }
 
 class RingIntervalTest extends FunSuite {
-  def cc(n1:Double, n2:Double) = Interval(ClosedBelow(n1), ClosedAbove(n2))
+  def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)
 
   val a = cc(0.0, 4.0)
   test("a + a") { assert(a + a === cc(0.0, 8.0)) }
@@ -39,7 +39,7 @@ class RingIntervalTest extends FunSuite {
 // TODO: this is just the tip of the iceberg... we also need to worry about
 // unbounded intervals, closed vs open bounds, etc.
 class ContinuousIntervalTest extends FunSuite {
-  def cc(n1:Double, n2:Double) = Interval(ClosedBelow(n1), ClosedAbove(n2))
+  def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)
 
   val a = 2.0
   val b = 5.0
