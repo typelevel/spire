@@ -52,8 +52,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   @inline private[this] final def lowerFlag(flags: Int): Int = flags & 1
   @inline private[this] final def upperFlag(flags: Int): Int = flags & 2
 
-  @inline private[this] final def lowerFlagToUpper(flags: Int): Int = (flags & 1) << 1
-  @inline private[this] final def upperFlagToLower(flags: Int): Int = (flags & 2) >>> 1
+  private[this] final def lowerFlagToUpper(flags: Int): Int = (flags & 1) << 1
+  private[this] final def upperFlagToLower(flags: Int): Int = (flags & 2) >>> 1
 
   @inline private[this] final def swapFlags(flags: Int): Int =
     ((flags & 1) << 1) | ((flags & 2) >>> 1)
@@ -72,46 +72,46 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def crossesZero(implicit ev: AdditiveMonoid[A]): Boolean =
     isBelow(ev.zero) && isAbove(ev.zero)
 
-  def lowerBound: Option[(A, Int)] = this match {
+  private[spire] def lowerPair: Option[(A, Int)] = this match {
     case Ranged(lower, upper, flags) => Some((lower, lowerFlag(flags)))
     case Above(lower, flags) => Some((lower, flags))
     case _ => None
   }
 
-  def upperBound: Option[(A, Int)] = this match {
+  private[spire] def upperPair: Option[(A, Int)] = this match {
     case Ranged(lower, upper, flags) => Some((upper, upperFlag(flags)))
     case Above(upper, flags) => Some((upper, flags))
     case _ => None
   }
 
-  def upperBoundAsLower: Option[(A, Int)] = this match {
+  private[spire] def upperPairAsLower: Option[(A, Int)] = this match {
     case Ranged(lower, upper, flags) => Some((upper, upperFlagToLower(flags)))
     case Above(upper, flags) => Some((upper, upperFlagToLower(flags)))
     case _ => None
   }
 
-  private[this] def lowerBoundBelow(lower1: A, flags1: Int, lower2: A, flags2: Int): Boolean =
+  private[this] def lowerPairBelow(lower1: A, flags1: Int, lower2: A, flags2: Int): Boolean =
     lower1 < lower2 || lower1 === lower2 && (isClosedBelow(flags1) || isOpenBelow(flags2))
 
-  private[this] def upperBoundAbove(upper1: A, flags1: Int, upper2: A, flags2: Int): Boolean =
+  private[this] def upperPairAbove(upper1: A, flags1: Int, upper2: A, flags2: Int): Boolean =
     upper1 > upper2 || upper1 === upper2 && (isClosedAbove(flags1) || isOpenAbove(flags2))
 
   def isSupersetOf(rhs: Interval[A]): Boolean = lhs match {
     case All() =>
       true
     case Above(lower1, flags1) =>
-      rhs.lowerBound.map { case (lower2, flags2) =>
-        lowerBoundBelow(lower1, flags1, lower2, flags2)
+      rhs.lowerPair.map { case (lower2, flags2) =>
+        lowerPairBelow(lower1, flags1, lower2, flags2)
       }.getOrElse(false)
     case Below(upper1, flags1) =>
-      rhs.upperBound.map { case (upper2, flags2) =>
-        upperBoundAbove(upper1, flags1, upper2, flags2)
+      rhs.upperPair.map { case (upper2, flags2) =>
+        upperPairAbove(upper1, flags1, upper2, flags2)
       }.getOrElse(false)
     case Ranged(lower1, upper1, flags1) =>
       rhs match {
         case Ranged(lower2, upper2, flags2) =>
-          lowerBoundBelow(lower1, flags1, lower2, flags2) &&
-          upperBoundAbove(upper1, flags1, upper2, flags2)
+          lowerPairBelow(lower1, flags1, lower2, flags2) &&
+          upperPairAbove(upper1, flags1, upper2, flags2)
         case _ =>
           false
       }
@@ -244,13 +244,13 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   def combine(rhs: Interval[A])(f: (A, A) => A): Interval[A] = {
     val ll: Option[(A, Int)] = for {
-      (x1, f1) <- lhs.lowerBound
-      (x2, f2) <- rhs.lowerBound
+      (x1, f1) <- lhs.lowerPair
+      (x2, f2) <- rhs.lowerPair
     } yield (f(x1, x2), f1 | f2)
 
     val uu: Option[(A, Int)] = for {
-      (x1, f1) <- lhs.upperBound
-      (x2, f2) <- rhs.upperBound
+      (x1, f1) <- lhs.upperPair
+      (x2, f2) <- rhs.upperPair
     } yield (f(x1, x2), f1 | f2)
 
     (ll, uu) match {
@@ -266,13 +266,13 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   def -(rhs: Interval[A])(implicit ev: AdditiveGroup[A]): Interval[A] = {
     val ll: Option[(A, Int)] = for {
-      (x1, f1) <- lhs.lowerBound
-      (x2, f2) <- rhs.upperBound
+      (x1, f1) <- lhs.lowerPair
+      (x2, f2) <- rhs.upperPair
     } yield (x1 - x2, f1 | upperFlagToLower(f2))
 
     val uu: Option[(A, Int)] = for {
-      (x1, f1) <- lhs.upperBound
-      (x2, f2) <- rhs.lowerBound
+      (x1, f1) <- lhs.upperPair
+      (x2, f2) <- rhs.lowerPair
     } yield (x1 - x2, f1 | lowerFlagToUpper(f2))
 
     (ll, uu) match {
@@ -533,6 +533,24 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     val p2 = Polynomial(terms2)
     p2(this)
   }
+
+  import Interval.{Bound, Open, Closed, Unbound}
+
+  def lowerBound: Bound[A] = lowerPair match {
+    case Some((a, n)) => if (isOpenBelow(n)) Open(a) else Closed(a)
+    case None => Unbound()
+  }
+
+  def upperBound: Bound[A] = upperPair match {
+    case Some((a, n)) => if (isOpenAbove(n)) Open(a) else Closed(a)
+    case None => Unbound()
+  }
+
+  def mapBounds[B: Order](f: A => B): Interval[B] =
+    Interval.fromBounds(lowerBound.map(f), upperBound.map(f))
+
+  def fold[B](f: (Bound[A], Bound[A]) => B): B =
+    f(lowerBound, upperBound)
 }
 
 case class All[A: Order] private[spire] () extends Interval[A]
@@ -541,6 +559,45 @@ case class Below[A: Order] private[spire] (upper: A, flags: Int) extends Interva
 case class Ranged[A: Order] private[spire] (lower: A, upper: A, flags: Int) extends Interval[A]
 
 object Interval {
+
+  sealed trait Bound[A] { lhs =>
+    def map[B](f: A => B): Bound[B] = this match {
+      case Open(a) => Open(f(a))
+      case Closed(a) => Closed(f(a))
+      case Unbound() => Unbound()
+    }
+    def combine[B](rhs: Bound[A])(f: (A, A) => A): Bound[A] = (lhs, rhs) match {
+      case (Unbound(), _) => lhs
+      case (_, Unbound()) => rhs
+      case (Closed(a), y) => y.map(b => f(a, b))
+      case (x, Closed(b)) => x.map(a => f(a, b))
+      case (Open(a), Open(b)) => Open(f(a, b))
+    }
+
+    def unary_-()(implicit ev: AdditiveGroup[A]): Bound[A] =
+      lhs.map(-_)
+    def reciprocal()(implicit ev: MultiplicativeGroup[A]): Bound[A] =
+      lhs.map(_.reciprocal)
+
+    def +(a: A)(implicit ev: AdditiveSemigroup[A]): Bound[A] = map(_ + a)
+    def -(a: A)(implicit ev: AdditiveGroup[A]): Bound[A] = map(_ - a)
+    def *(a: A)(implicit ev: MultiplicativeSemigroup[A]): Bound[A] = map(_ * a)
+    def /(a: A)(implicit ev: MultiplicativeGroup[A]): Bound[A] = map(_ / a)
+
+    def +(rhs: Bound[A])(implicit ev: AdditiveSemigroup[A]): Bound[A] =
+      lhs.combine(rhs)(_ + _)
+    def -(rhs: Bound[A])(implicit ev: AdditiveGroup[A]): Bound[A] =
+      lhs.combine(rhs)(_ - _)
+    def *(rhs: Bound[A])(implicit ev: MultiplicativeSemigroup[A]): Bound[A] =
+      lhs.combine(rhs)(_ * _)
+    def /(rhs: Bound[A])(implicit ev: MultiplicativeGroup[A]): Bound[A] =
+      lhs.combine(rhs)(_ / _)
+  }
+
+  case class Unbound[A]() extends Bound[A]
+  case class Open[A](a: A) extends Bound[A]
+  case class Closed[A](a: A) extends Bound[A]
+
   private[spire] def withFlags[A: Order](lower: A, upper: A, flags: Int): Interval[A] =
     if (lower <= upper) Ranged(lower, upper, flags) else Interval.empty[A]
 
@@ -556,6 +613,19 @@ object Interval {
   def all[A: Order]: Interval[A] = All[A]()
 
   def apply[A: Order](lower: A, upper: A): Interval[A] = closed(lower, upper)
+
+  def fromBounds[A: Order](lower: Bound[A], upper: Bound[A]): Interval[A] =
+    (lower, upper) match {
+      case (Closed(x), Closed(y)) => closed(x, y)
+      case (Open(x), Open(y)) => open(x, y)
+      case (Unbound(), Open(y)) => below(y)
+      case (Open(x), Unbound()) => above(x)
+      case (Unbound(), Closed(y)) => atOrBelow(y)
+      case (Closed(x), Unbound()) => atOrAbove(x)
+      case (Closed(x), Open(y)) => openAbove(x, y)
+      case (Open(x), Closed(y)) => openBelow(x, y)
+      case (Unbound(), Unbound()) => all
+    }
 
   def closed[A: Order](lower: A, upper: A): Interval[A] =
     if (lower <= upper) Ranged(lower, upper, 0) else Interval.empty[A]
@@ -574,7 +644,7 @@ object Interval {
   implicit def eq[A: Eq]: Eq[Interval[A]] =
     new Eq[Interval[A]] {
       def eqv(x: Interval[A], y: Interval[A]): Boolean =
-        (x.lowerBound === y.lowerBound) && (x.upperBound === y.upperBound)
+        (x.lowerPair === y.lowerPair) && (x.upperPair === y.upperPair)
     }
 
   implicit def semiring[A](implicit ev: Semiring[A], o: Order[A]): Semiring[Interval[A]] =
