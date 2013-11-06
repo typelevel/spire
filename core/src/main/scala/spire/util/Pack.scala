@@ -24,22 +24,7 @@ object Pack {
   }
 
   /** index must be 0 <= index < 4 */
-  def intToByte(n: Int)(index: Byte): Byte = macro impIntToByte
-
-  def impIntToByte(c: Context)(n: c.Expr[Int])(index: c.Expr[Byte]): c.Expr[Byte] = {
-    import c.universe._
-    index.tree match {
-      case Literal(Constant(i: Int)) if i < 0 || i >= 4 =>
-        c.abort(c.enclosingPosition,
-          "Index must be in bounds (0 <= index < 4)")
-      case _ =>
-    }
-
-    reify {
-      ((n.splice >>> (32 - index.splice * 8)) & 0xFF).toByte
-    }
-  }
-
+  def intToByte(n: Int)(index: Int): Byte = macro intToByteMacro
 
   def intsToBytes(ints: Array[Int]): Array[Byte] = {
     val arr = new Array[Byte](ints.length * 4)
@@ -103,21 +88,7 @@ object Pack {
   }
 
   /** index must be 0 <= index < 8 */
-  def longToByte(n: Long)(index: Byte): Byte = macro impLongToByte
-
-  def impLongToByte(c: Context)(n: c.Expr[Long])(index: c.Expr[Byte]): c.Expr[Byte] = {
-    import c.universe._
-    index.tree match {
-      case Literal(Constant(i: Int)) if i < 0 || i >= 4 =>
-        c.abort(c.enclosingPosition,
-          "Index must be in bounds (0 <= index < 8)")
-      case _ =>
-    }
-
-    reify {
-      ((n.splice >>> (64 - index.splice * 8)) & 0xFF).toByte
-    }
-  }
+  def longToByte(n: Long)(index: Int): Byte = macro longToByteMacro
 
   def longsToBytes(longs: Array[Long]): Array[Byte] = {
     val arr = new Array[Byte](longs.length * 8)
@@ -182,5 +153,51 @@ object Pack {
       }
     }
     out
+  }
+
+  // macro stuff beyond this point
+
+  def intToByteRuntime(n: Int)(index: Int): Byte =
+    if (0 <= index && index < 4) {
+      ((n >>> (24 - index * 8)) & 0xff).toByte
+    } else {
+      throw new IllegalArgumentException(s"$index outside of 0-3")
+    }
+
+  def intToByteMacro(c: Context)(n: c.Expr[Int])(index: c.Expr[Int]): c.Expr[Byte] = {
+    import c.universe._
+    index.tree match {
+      case Literal(Constant(i: Int)) =>
+        if (0 <= i && i < 4) {
+          val offset = c.Expr[Int](Literal(Constant(24 - i * 8)))
+          reify { ((n.splice >>> offset.splice) & 0xff).toByte }
+        } else {
+          c.abort(c.enclosingPosition, "index outside of 0-3")
+        }
+      case _ =>
+        reify { Pack.intToByteRuntime(n.splice)(index.splice) }
+    }
+  }
+
+  def longToByteRuntime(n: Long)(index: Int): Byte =
+    if (0 <= index && index < 8) {
+      ((n >>> (56 - index * 8)) & 0xff).toByte
+    } else {
+      throw new IllegalArgumentException(s"$index outside of 0-7")
+    }
+
+  def longToByteMacro(c: Context)(n: c.Expr[Long])(index: c.Expr[Int]): c.Expr[Byte] = {
+    import c.universe._
+    index.tree match {
+      case Literal(Constant(i: Int)) =>
+        if (0 <= i && i < 8) {
+          val offset = c.Expr[Int](Literal(Constant(56 - i * 8)))
+          reify { ((n.splice >>> offset.splice) & 0xff).toByte }
+        } else {
+          c.abort(c.enclosingPosition, "index outside of 0-7")
+        }
+      case _ =>
+        reify { Pack.longToByteRuntime(n.splice)(index.splice) }
+    }
   }
 }
