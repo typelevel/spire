@@ -62,6 +62,9 @@ object MyBuild extends Build {
 
     libraryDependencies ++= Seq(
       scalaTest % "test",
+      "net.sf" % "jdistlib" % "0.0.7" % "test" from "http://plastic-idolatry.com/jars/jdistlib-0.0.7.jar",
+      "com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" from "http://plastic-idolatry.com/jars/caliper-1.0-SNAPSHOT.jar",
+
       "org.scala-lang" % "scala-reflect" % "2.10.2"
     ),
 
