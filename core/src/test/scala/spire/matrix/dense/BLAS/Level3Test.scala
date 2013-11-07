@@ -1,12 +1,15 @@
 package spire.matrix.dense.tests
 
 import spire.matrix.dense.BLAS
-import spire.matrix.Transposition
+import spire.matrix.{Transposition, UpperOrLower, Sides, DiagonalProperty}
 import Transposition._
-import spire.matrix.UpperOrLower._
+import UpperOrLower._
+import Sides._
+import DiagonalProperty._
 import spire.matrix.dense.Matrix
 import spire.matrix.Constants._
 import spire.matrix.dense.random._
+
 
 import org.scalatest.FunSuite
 
@@ -245,6 +248,46 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
       gemm(NoTranspose, Transpose, alpha, a, a, beta, cGemm)
       syrk(Upper, NoTranspose, alpha, a, beta, cSyrk)
       assert(cSyrk.copyToUpperDiagonal() === cGemm.copyToUpperDiagonal())
+    }
+  }
+
+  def trsmSample: Iterator[(Sides.Value, UpperOrLower.Value, Transposition.Value,
+                            DiagonalProperty.Value, Double, Matrix, Matrix,
+                            Matrix)] = {
+    val p2d = new ScalarUniformPowerOfTwoDistribution(minPower=0, maxPower=6)
+    val testMatrices = new TestGeneralMatrices(scalars = p2d,
+                                               elements = p2d)
+    for {
+      (m,n) <- testMatrices.twoDimensionSample
+      x <- testMatrices.generalMatrixSample(m,n).take(1)
+      b = Matrix.empty(m,n)
+      uplo <- Iterator(Upper, Lower)
+      diag <- Iterator(UnitDiagonal, NonUnitDiagonal)
+      side <- Iterator(fromLeft, fromRight)
+      a <- testMatrices.triangularMatrixSample(if(side == fromLeft) m else n,
+                                               uplo, diag).take(1)
+      trans <- Iterator(NoTranspose, Transpose)
+      alpha <- testMatrices.scalarSample
+    } yield {
+      if(side == fromLeft)
+        gemm(trans, NoTranspose, 1/alpha, a, x, 0.0, b)
+      else
+        gemm(NoTranspose, trans, 1/alpha, x, a, 0.0, b)
+      (side, uplo, trans, diag, alpha, a, b, x)
+    }
+  }
+
+  test("Triangular Solver (TRSM)") {
+    for ((side, uplo, trans, diag, alpha, a, b, x0) <- trsmSample) {
+      trsm(side, uplo, trans, diag, alpha, a, b)
+      val x = b
+      val msg = s"""|Expected x=$x but got x=$b
+                    |for side=$side, uplo=$uplo, trans=$trans,
+                    |    diag=$diag, alpha=$alpha, and
+                    | a=$a
+                    | b=$b""".stripMargin
+      if(alpha == 0) assert(x.isZero, msg)
+      else assert(b == x, msg)
     }
   }
 }

@@ -21,7 +21,7 @@ package spire.matrix.dense
 package object BLAS {
 
   import scala.collection.mutable.IndexedSeq
-  import spire.matrix.{Transposition, UpperOrLower}
+  import spire.matrix.{Transposition, UpperOrLower, Sides, DiagonalProperty}
   import spire.matrix.dense.{VectorLike, MatrixLike, PlaneRotation}
 
   /**
@@ -149,6 +149,33 @@ package object BLAS {
      */
     def syrk(uplo:UpperOrLower.Value, trans:Transposition.Value,
              alpha:Double, a:MatrixLike, beta:Double, c:MatrixLike): Unit
+
+    /**
+     * Solve triangular system of equations with multiple right-hand sides
+     *
+     * It finds the matrix X such that either
+     *
+     *  1. op(A) X = α B, or
+     *
+     *  2. X op(A) = α B,
+     *
+     * where op(A) = A or A^T^, and X and B are m x n matrices whereas A is a
+     * unit, or non-unit, upper or lower triangular matrix.
+     *
+     * The matrix X is overwritten on B.
+     *
+     * @param side specifies from which side X is operated upon (thus selecting
+     * case 1 or 2)
+     *
+     * @param uplo specifies whether A is upper or lower diagonal
+     *
+     * @param trans specifies which alternative op(A) to use
+     *
+     * @param diag specifies whether A shall be assumed to have a unit diagonal
+     */
+    def trsm(side:Sides.Value, uplo:UpperOrLower.Value,
+             trans:Transposition.Value, unit:DiagonalProperty.Value,
+             alpha:Double, a:MatrixLike, B:MatrixLike): Unit
   }
 
 }

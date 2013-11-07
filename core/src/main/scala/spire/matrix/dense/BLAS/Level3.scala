@@ -3,9 +3,11 @@ package spire.matrix.dense.BLAS
 import spire.syntax.cfor._
 
 import spire.matrix.dense.MatrixLike
-import spire.matrix.{Transposition, UpperOrLower}
+import spire.matrix.{Transposition, UpperOrLower, Sides, DiagonalProperty}
+import Sides._
 import Transposition._
 import UpperOrLower._
+import DiagonalProperty._
 
 /**
  * Straightforward but inefficient implementations
@@ -176,5 +178,134 @@ trait NaiveLevel3 extends Level3 {
       }
     }
   }
+
+  def trsm(side:Sides.Value, uplo:UpperOrLower.Value,
+           trans:Transposition.Value, diag:DiagonalProperty.Value,
+           alpha:Double, a:MatrixLike, b:MatrixLike) {
+    require(a.isSquare)
+    if(side == fromLeft) require(a.dimensions._2 == b.dimensions._1)
+    else                 require(b.dimensions._2 == a.dimensions._1)
+
+    val (m, n) = b.dimensions
+
+    // Trivial cases: quick return
+    if(m == 0 || n == 0) return
+    if(alpha == 0) {
+      b := 0
+      return
+    }
+
+    if (side == fromLeft && trans == NoTranspose) {
+      // B := alpha A^(-1) B
+      if(uplo == Upper) {
+        cforRange(0 until n) { j =>
+          if(alpha != 1.0) cforRange(0 until m) { i => b(i,j) *= alpha }
+          cforRange(m-1 to 0 by -1) { k =>
+            if(b(k,j) != 0) {
+              if(diag == NonUnitDiagonal) b(k,j) /= a(k,k)
+              cforRange(0 to k-1) { i => b(i,j) -= b(k,j)*a(i,k) }
+            }
+          }
+        }
+      }
+      else {
+        cforRange(0 until n) { j =>
+          if(alpha != 1.0) cforRange(0 until m) { i => b(i,j) *= alpha }
+          cforRange(0 until m) { k =>
+            if(b(k,j) != 0) {
+              if(diag == NonUnitDiagonal) b(k,j) /= a(k,k)
+              cforRange(k+1 until m) { i => b(i,j) -= b(k,j)*a(i,k) }
+            }
+          }
+        }
+      }
+    }
+    else if (side == fromLeft && trans == Transpose) {
+      // B := alpha A^(-T) B
+      if(uplo == Upper) {
+        cforRange(0 until n) { j =>
+          cforRange(0 until m) { i =>
+            var t = alpha*b(i,j)
+            cforRange(0 to i-1) { k => t -= a(k,i)*b(k,j) }
+            if(diag == NonUnitDiagonal) t /= a(i,i)
+            b(i,j) = t
+          }
+        }
+      }
+      else {
+        cforRange(0 until n) { j =>
+          cforRange(m-1 to 0 by -1) { i =>
+            var t = alpha*b(i,j)
+            cforRange(i+1 until m) { k => t -= a(k,i)*b(k,j) }
+            if(diag == NonUnitDiagonal) t /= a(i,i)
+            b(i,j) = t
+          }
+        }
+      }
+    }
+    else if (side == fromRight && trans ==  NoTranspose) {
+      // B: = alpha B A^(-1)
+      if(uplo == Upper) {
+        cforRange(0 until n) { j =>
+          if(alpha != 1.0) cforRange(0 until m) { i => b(i,j) *= alpha }
+          cforRange(0 to j-1) { k =>
+            if(a(k,j) != 0)
+              cforRange(0 until m) { i => b(i,j) -= a(k,j)*b(i,k) }
+          }
+          if(diag == NonUnitDiagonal) {
+            val t = 1/a(j,j)
+            cforRange(0 until m) { i => b(i,j) *= t }
+          }
+        }
+      }
+      else {
+        cforRange(n-1 to 0 by -1) { j =>
+          if(alpha != 1.0) cforRange(0 until m) { i => b(i,j) *= alpha }
+          cforRange(j+1 until n) { k =>
+            if(a(k,j) != 0)
+              cforRange(0 until m) { i => b(i,j) -= a(k,j)*b(i,k) }
+          }
+          if(diag == NonUnitDiagonal) {
+            val t = 1/a(j,j)
+            cforRange(0 until m) { i => b(i,j) *= t }
+          }
+        }
+      }
+    }
+    else if (side == fromRight && trans ==  Transpose) {
+      // B: = alpha B A^(-T)
+      if(uplo == Upper) {
+        cforRange(n-1 to 0 by -1) { k =>
+          if(diag == NonUnitDiagonal) {
+            val t = 1.0/a(k,k)
+            cforRange(0 until m) { i => b(i,k) *= t }
+          }
+          cforRange(0 to k-1) { j =>
+            if(a(j,k) != 0) {
+              val t = a(j,k)
+              cforRange(0 until m) { i => b(i,j) -= t*b(i,k) }
+            }
+          }
+          if(alpha != 0) cforRange(0 until m) { i => b(i,k) *= alpha }
+        }
+      }
+      else {
+        cforRange(0 until n) { k =>
+          if(diag == NonUnitDiagonal) {
+            val t = 1.0/a(k,k)
+            cforRange(0 until m) { i => b(i,k) *= t }
+          }
+          cforRange(k+1 until n) { j =>
+            if(a(j,k) != 0) {
+              val t = a(j,k)
+              cforRange(0 until m) { i => b(i,j) -= t*b(i,k) }
+            }
+          }
+          if(alpha != 0) cforRange(0 until m) { i => b(i,k) *= alpha }
+        }
+      }
+    }
+  }
+
 }
 
