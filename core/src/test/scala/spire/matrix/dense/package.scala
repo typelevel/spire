@@ -189,10 +189,10 @@ with NumericPropertiesOfDouble with MagnitudeLimitation with BLAS.NaiveLevel1 {
   /**
    * Apply random similarity transformation
    *
-   * The transform reads $X A X^{-1}$ where $X = U S V$,
-   * where $U$ and $V$ are random orthogonal matrices.
+   * The transform reads X A X^-1^ where X = U S V,
+   * where U and V are random orthogonal matrices.
    * The arguments `mode`, `c`, `reverse`, and  `uniform01`
-   * are used to construct $S$, c.f. class SpecialDiagonal.
+   * are used to construct S, c.f. class SpecialDiagonal.
    */
   def applyRandomSimilarityTransform(
     mode:SpecialDiagonalMode.Value,
@@ -469,7 +469,7 @@ class TestDimensions(nonSpecialDimensions:Int=0)
 }
 
 /**
- * Test general matrices, mostly to test the like of BLAS
+ * Test general matrices, mostly to exercise the like of BLAS
  */
 class TestGeneralMatrices(nonSpecialDimensions:Int=0,
                           nonSpecialScalars:Int=1,
