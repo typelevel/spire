@@ -11,3 +11,7 @@ object UpperOrLower extends Enumeration {
 object Sides extends Enumeration {
   val fromLeft, fromRight, Congruent = Value
 }
+
+object DiagonalProperty extends Enumeration {
+  val UnitDiagonal, NonUnitDiagonal = Value
+}
