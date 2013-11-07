@@ -66,11 +66,11 @@ class Vector(elems:Array[Double])
 extends VectorLike {
   def this(n:Int) = this(new Array[Double](n))
 
-  def length = elems.size
+  final def length = elems.size
 
-  def apply(i:Int): Double = elems(i)
+  final def apply(i:Int): Double = elems(i)
 
-  def update(i:Int, value:Double) = { elems(i) = value }
+  final def update(i:Int, value:Double) = { elems(i) = value }
 
   override def iterator = elems.toIterator
 
@@ -91,6 +91,7 @@ object Vector {
  *
  * @constructor Construct x(first:end)
  */
+final
 class VectorBlock(private val x:VectorLike, val first:Int, end:Int)
   extends VectorLike
 {

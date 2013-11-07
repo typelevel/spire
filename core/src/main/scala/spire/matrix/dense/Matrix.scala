@@ -167,7 +167,7 @@ trait MatrixLike extends mutable.IndexedSeq[Double] {
   }
 
   /** Total number of elements */
-  def length = m*n
+  final def length = m*n
 
   /** j-th column */
   def column(j:Int) = {
@@ -346,7 +346,6 @@ trait MatrixLike extends mutable.IndexedSeq[Double] {
   }
 }
 
-
 /**
  *  Strides over matrix elements.
  *
@@ -358,6 +357,7 @@ trait MatrixLike extends mutable.IndexedSeq[Double] {
  * a sequence that has `length` elements. `step` may be negative.
  *
  */
+final
 class  MatrixStrides(a:MatrixLike,
                      val firstIndex:Int, val step:Int, val length:Int)
   extends VectorLike
@@ -385,6 +385,7 @@ class  MatrixStrides(a:MatrixLike,
 /**
  * Rectangular block of a matrix that may be considered a matrix itself.
  */
+final
 class MatrixBlock(private val a:MatrixLike,
                   firstRow:Int, endRow:Int, firstColumn:Int, endColumn:Int)
   extends MatrixLike {
@@ -511,26 +512,26 @@ extends MatrixLike {
    *
    * This implements MatrixLike abstract method
    */
-  def update(i: Int, j: Int, value: Double) = { elems(j*m + i) = value }
+  final def update(i: Int, j: Int, value: Double) = { elems(j*m + i) = value }
 
   /**
    * Element at row i and column j (indices are 0-based)
    *
    * This implements MatrixLike abstract method
    */
-  def apply(i: Int, j: Int): Double = elems(j*m + i)
+  final def apply(i: Int, j: Int): Double = elems(j*m + i)
 
   /** Set k-th element, assuming column-major layout
     *
     * This implements MatrixLike abstract method.
     */
-  def update(k:Int, value:Double) { elems(k) = value }
+  final def update(k:Int, value:Double) { elems(k) = value }
 
   /** k-th element, assuming column-major layout
     *
     * This implements MatrixLike abstract method.
     */
-  def apply(k:Int) = elems(k)
+  final def apply(k:Int) = elems(k)
 
   /**
    * The eigenvalues of this matrix
