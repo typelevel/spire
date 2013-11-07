@@ -5,6 +5,7 @@ import spire.matrix.Sides
 import Sides._
 import spire.matrix.dense.BLAS
 import spire.random
+import spire.implicits._
 import java.lang.Math.{signum, copySign}
 
 object Defaults {
@@ -79,6 +80,17 @@ extends ScalarDistribution {
   val min = java.lang.Double.MIN_VALUE
   val max = java.lang.Double.MAX_VALUE
   def next = gen.nextGaussian
+}
+
+/**
+ * Random variable 2^X^ where X is a uniform integer random variable
+ */
+class ScalarUniformPowerOfTwoDistribution(minPower:Int, maxPower:Int)(
+  implicit gen: Defaults.IntegerGenerator)
+extends ScalarDistribution {
+  val min = 2.0**minPower
+  val max = 2.0**maxPower
+  def next = 2.0**gen.nextInt(minPower, maxPower)
 }
 
 /**
