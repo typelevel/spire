@@ -170,7 +170,8 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
 
   implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
 
-  def syrkSample(trans:Transposition.Value) = {
+  def syrkSample(trans:Transposition.Value)
+  : Iterator[(Double, Matrix, Double, Matrix)] = {
     val uniformIm1p1 = new ScalarUniformDistributionFromMinusOneToOne
     val g = new TestGeneralMatrices(
       nonSpecialDimensions = 4,

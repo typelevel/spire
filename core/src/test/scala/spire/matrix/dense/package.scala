@@ -461,8 +461,8 @@ class TestDimensions(nonSpecialDimensions:Int=0)
                     (implicit gen:Defaults.IntegerGenerator) {
 
   def oneDimensionSample =
-    List(1, 2, 3, 5, 10, 16) ++
-    List.fill(nonSpecialDimensions)(gen.nextInt(32, 64))
+    Iterator(1, 2, 3, 5, 10, 16) ++
+    Iterator.fill(nonSpecialDimensions)(gen.nextInt(32, 64))
 
   def twoDimensionSample =
     for(m <- oneDimensionSample; n <- oneDimensionSample) yield (m,n)
@@ -479,15 +479,15 @@ class TestGeneralMatrices(nonSpecialDimensions:Int=0,
                          (implicit gen:Defaults.IntegerGenerator)
 extends TestDimensions(nonSpecialDimensions)(gen) {
 
-  def scalarSample = List(0.0, 1.0) ++ (
-    if(scalars != null) scalars.take(nonSpecialScalars).toList else Nil)
+  def scalarSample = Iterator(0.0, 1.0) ++ (
+    if(scalars != null) scalars.take(nonSpecialScalars) else Iterator.empty)
 
   def generalMatrixSample(m:Int, n:Int): Iterator[Matrix] =
     Iterator.continually(new Matrix(m, n)(elements.take(m*n).toArray))
 
   def generalMatrixSample: Iterator[Matrix] =
     for {
-      (m,n) <- twoDimensionSample.iterator
+      (m,n) <- twoDimensionSample
       a <- generalMatrixSample(m,n).take(matricesPerDimensions)
     } yield a
 }
