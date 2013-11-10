@@ -68,9 +68,8 @@ object KleeneDemo {
   }
   object StarRig {
     def apply[A](implicit ev: StarRig[A]) = ev
+    implicit def starRigHasRig[A](implicit ev: StarRig[A]): Rig[A] = ev
   }
-
-  implicit def starRigHasRig[A](implicit ev: StarRig[A]): Rig[A] = ev
 
   implicit class StarRigOps[A: StarRig](a: A) {
     def kstar: A = StarRig[A].kstar(a)
@@ -105,9 +104,8 @@ object KleeneDemo {
   trait Kleene[A] extends StarRig[A]
   object Kleene {
     def apply[A](implicit ev: Kleene[A]) = ev
+    implicit def kleenIsStarRig[A](implicit ev: Kleene[A]): StarRig[A] = ev
   }
-
-  implicit def xyz[A](implicit ev: Kleene[A]): StarRig[A] = ev
 
   // Kleene[A] instances for built-in types
   implicit object BooleanHasKleene extends Kleene[Boolean] with BooleanIsRig {
@@ -431,18 +429,15 @@ object KleeneDemo {
 
     def plus(x: Language[W], y: Language[W]): Language[W] = {
       def interleave(ws1: SS[W], ws2: SS[W]): SS[W] =
-        if (ws1.isEmpty) ws2 else ws1.head #:: interleave(ws2, ws1)
+        if (ws1.isEmpty) ws2 else ws1.head #:: interleave(ws2, ws1.tail)
       Language(interleave(x.wss, y.wss))
     }
 
     def times(x: Language[W], y: Language[W]): Language[W] =
       Language(x.wss.flatMap(ws1 => y.wss.map(ws2 => ws1 #::: ws2)))
 
-    override def kstar(x: Language[W]): Language[W] = {
-      def plusList(z: Language[W]): Language[W] =
-        if (z.wss.isEmpty) zero else Language(z.wss #::: kstar(z).wss)
-      plus(one, plusList(x))
-    }
+    override def kstar(x: Language[W]): Language[W] =
+      Language(Stream.empty #:: x.wss.flatMap(s => kstar(x).wss.map(s #::: _)))
   }
 
   /**
@@ -598,9 +593,18 @@ object KleeneDemo {
     println("2x2 inverse:\n" + inverse(m).show)
   }
 
+  def languageExample() {
+    val bit = Language(Stream(Stream('0'), Stream('1')))
+    val lang1 = bit.pow(4)
+    val lang2 = bit.kstar
+    println(lang1.wss.take(10).map(_.take(10).mkString + "...").toList)
+    println(lang2.wss.take(10).map(_.take(10).mkString + "...").toList)
+  }
+
   def main(args: Array[String]) {
     graphExample()
     pathExample()
     solvingExample()
+    languageExample()
   }
 }

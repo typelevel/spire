@@ -98,7 +98,11 @@ trait VectorSpaceSyntax extends ModuleSyntax with FieldSyntax {
   implicit def vectorSpaceOps[V](v:V) = new VectorSpaceOps[V](v)
 }
 
-trait NormedVectorSpaceSyntax extends VectorSpaceSyntax {
+trait MetricSpaceSyntax extends VectorSpaceSyntax {
+  implicit def metricSpaceOps[V](v:V) = new MetricSpaceOps[V](v)
+}
+
+trait NormedVectorSpaceSyntax extends MetricSpaceSyntax {
   implicit def normedVectorSpaceOps[V](v:V) = new NormedVectorSpaceOps[V](v)
 }
 
@@ -108,6 +112,10 @@ trait InnerProductSpaceSyntax extends VectorSpaceSyntax {
 
 trait CoordinateSpaceSyntax extends InnerProductSpaceSyntax {
   implicit def coordianteSpaceOps[V](v:V) = new CoordinateSpaceOps[V](v)
+}
+
+trait TrigSyntax {
+  implicit def trigOps[A:Trig](a: A) = new TrigOps(a)
 }
 
 trait BooleanAlgebraSyntax {
@@ -145,6 +153,10 @@ trait ConvertableFromSyntax {
 trait CforSyntax {
   def cfor[A](init:A)(test:A => Boolean, next:A => A)(body:A => Unit): Unit =
     macro Syntax.cforMacro[A]
+  def cforRange(r: Range)(body: Int => Unit): Unit =
+    macro Syntax.cforRangeMacro
+  def cforRange2(r1: Range, r2: Range)(body: (Int, Int) => Unit): Unit =
+    macro Syntax.cforRange2Macro
 }
 
 trait LiteralsSyntax {
@@ -180,6 +192,7 @@ trait AllSyntax extends
     EuclideanRingSyntax with
     FieldSyntax with
     NRootSyntax with
+    TrigSyntax with
     ModuleSyntax with
     VectorSpaceSyntax with
     NormedVectorSpaceSyntax with

@@ -1,4 +1,5 @@
 package spire.random
+package mutable
 
 import java.nio.ByteBuffer
 import java.util.Arrays
@@ -18,7 +19,7 @@ class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extend
   private[this] var v: Int = _v
   private[this] var d: Int = _d
 
-  def copy: Marsaglia32a6 = new Marsaglia32a6(x, y, z, w, v, d)
+  def copyInit: Marsaglia32a6 = new Marsaglia32a6(x, y, z, w, v, d)
 
   def getSeed: Array[Int] = {
     val ints = new Array[Int](6)

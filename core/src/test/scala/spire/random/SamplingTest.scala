@@ -8,7 +8,7 @@ import org.scalacheck.Arbitrary._
 import org.scalacheck._
 
 class SamplingTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
-  val rng = spire.random.Lcg64.fromTime()
+  val rng = spire.random.mutable.Lcg64.fromTime()
 
   val Size = 100
   val range = (1 to Size)

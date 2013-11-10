@@ -96,7 +96,8 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
   property("q * q.reciprocal = 1") {
     forAll { (q: H) =>
-      (q * q.reciprocal - one).norm should be < 1e-6
+      if (q != zero)
+        (q * q.reciprocal - one).norm should be < 1e-6
     }
   }
 

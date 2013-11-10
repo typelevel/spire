@@ -17,35 +17,30 @@ class StringOrder extends Order[String] with Serializable {
 
 @SerialVersionUID(0L)
 object LevenshteinDistance extends MetricSpace[String, Int] with Serializable {
+  import spire.syntax.cfor._
+
   def distance(a: String, b: String): Int = {
     var row0 = new Array[Int](b.length + 1)
     var row1 = new Array[Int](b.length + 1)
 
-    var j = 0
-    while (j < row0.length) {
-      row0(j) = j
-      j += 1
-    }
+    cfor(0)(_ < row0.length, _ + 1)(j => row0(j) = j)
 
-    var i = 0
-    while (i < a.length) {
+    cfor(0)(_ < a.length, _ + 1) { i =>
       row1(0) = i + 1
-
-      var j = 1
-      while (j < row1.length) {
-        val d = row0(j - 1) + (if (a.charAt(i) == b.charAt(j - 1)) 0 else 1)
+      val c = a.charAt(i)
+      cfor(1)(_ < row1.length, _ + 1) { j =>
+        val d = row0(j - 1) + (if (c == b.charAt(j - 1)) 0 else 1)
         val h = row1(j - 1) + 1
         val v = row0(j) + 1
 
         row1(j) = if (d < h) {
           if (v < d) v else d
-        } else if (v < h) v else h
-
-        j += 1
+        } else {
+          if (v < h) v else h
+        }
       }
 
       var tmp = row0; row0 = row1; row1 = tmp
-      i += 1
     }
 
     row0(b.length)

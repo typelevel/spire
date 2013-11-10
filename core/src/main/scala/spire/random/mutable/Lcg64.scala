@@ -1,12 +1,14 @@
 package spire.random
+package mutable
 
+import spire.util.Pack
 import spire.math._
 import java.nio.ByteBuffer
 
 final class Lcg64(_seed: Long) extends LongBasedGenerator {
   private var seed: Long = _seed
 
-  def copy: Lcg64 = new Lcg64(seed)
+  def copyInit: Lcg64 = new Lcg64(seed)
 
   def getSeed: Long = seed
 
