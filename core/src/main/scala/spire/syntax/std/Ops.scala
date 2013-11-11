@@ -287,6 +287,19 @@ final class SeqOps[@spec A, CC[A] <: Iterable[A]](as: CC[A]) {
     fromSizeAndArray(len, arr)
   }
 
+  def qselectk(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+    val (len, arr) = toSizeAndArray
+    Selection.select(arr, k)
+    fromSizeAndArray(k, arr)
+  }
+
+  def qtopk(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+    val (len, arr) = toSizeAndArray
+    Selection.select(arr, k)
+    QuickSort.qsort(arr, 0, k)
+    fromSizeAndArray(k, arr)
+  }
+
   import spire.random.mutable.Generator
 
   def qshuffled(implicit gen: Generator, ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
