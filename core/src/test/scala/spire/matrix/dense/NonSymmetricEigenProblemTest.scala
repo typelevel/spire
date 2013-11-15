@@ -76,7 +76,7 @@ with BLAS.NaiveLevel3
     expectResult(expected) { h1.reducedMatrix }
   }
 
-  implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
+  implicit val gen = Defaults.IntegerGenerator.fromTime(1)
 
   test("All steps of unblocked eigen-decomposition") {
     val eigenTests = new EigenTestMatrices
