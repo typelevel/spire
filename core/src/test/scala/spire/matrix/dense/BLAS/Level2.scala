@@ -1,8 +1,12 @@
 package spire.matrix.dense.tests
 
 import spire.matrix.dense.BLAS
-import spire.matrix.Transposition._
+import spire.matrix.{Transposition, UpperOrLower, DiagonalProperty}
+import Transposition._
+import UpperOrLower._
+import DiagonalProperty._
 import spire.matrix.dense.{Matrix,Vector}
+import spire.matrix.dense.random._
 
 import org.scalatest.FunSuite
 
@@ -50,6 +54,33 @@ trait BLASLevel2Test extends FunSuite with BLAS.Level2 {
     val y4 = y.copyToVector
     gemv(Transpose, alpha, a, x, beta=1, y4)
     expectResult(Vector(-1, 1, 4, 27, -21)) { y4 }
+  }
+
+  implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
+
+  def trmvSample: Iterator[(UpperOrLower.Value, Transposition.Value,
+                            DiagonalProperty.Value, Matrix, Vector, Vector)] = {
+    val p2d = new ScalarUniformPowerOfTwoDistribution(minPower=0, maxPower=6)
+    val testMatrices = new RandomUncorrelatedElements(
+        scalars = p2d,
+        elements = p2d)
+    for {
+      uplo <- Iterator(Upper, Lower)
+      diag <- Iterator(UnitDiagonal, NonUnitDiagonal)
+      trans <- Iterator(NoTranspose, Transpose)
+      n <- testMatrices.oneDimensionSample
+      a <- testMatrices.triangularMatrixSample(n, uplo, diag).take(1)
+      x <- testMatrices.vectorSample(n).take(2)
+      y = Vector.empty(x.length)
+    } yield (uplo, trans, diag, a, x, y)
+  }
+
+  test("Triangular Matrix Vector product (TRMV)") {
+    for((uplo, trans, diag, a, x, y) <- trmvSample) {
+        gemv(trans, 1.0, a, x, 0.0, y)
+        trmv(uplo, trans, diag, a, x)
+        assert(x == y, (uplo, trans, diag, a, x))
+    }
   }
 }
 

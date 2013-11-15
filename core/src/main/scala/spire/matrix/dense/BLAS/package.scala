@@ -98,6 +98,20 @@ package object BLAS {
       * A := α x y^T^ + A
       */
      def ger(alpha: Double, x: VectorLike, y: VectorLike, a: MatrixLike): Unit
+
+     /**
+      * Product of a lower or upper triangular square matrix and a vector
+      *
+      *   1. x := A x or
+      *   2. x := A^T^ x
+      *
+      * @param trans decides whether to perform 1 or 2
+      * @param uplo decides whether A is upper or lower diagonal
+      * @param diag decides whether A is unit-diagonal or not
+      *
+      */
+     def trmv(uplo:UpperOrLower.Value, trans:Transposition.Value,
+              diag:DiagonalProperty.Value, a:MatrixLike, x:VectorLike): Unit
   }
 
   /**
