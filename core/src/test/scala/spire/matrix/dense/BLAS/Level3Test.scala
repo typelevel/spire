@@ -176,7 +176,7 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
   def syrkSample(trans:Transposition.Value)
   : Iterator[(Double, Matrix, Double, Matrix)] = {
     val uniformIm1p1 = new ScalarUniformDistributionFromMinusOneToOne
-    val g = new TestGeneralMatrices(
+    val g = new RandomUncorrelatedElements(
       nonSpecialDimensions = 4,
       nonSpecialScalars = 1,
       scalars = uniformIm1p1,
@@ -255,7 +255,7 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
                             DiagonalProperty.Value, Double, Matrix, Matrix,
                             Matrix)] = {
     val p2d = new ScalarUniformPowerOfTwoDistribution(minPower=0, maxPower=6)
-    val testMatrices = new TestGeneralMatrices(scalars = p2d,
+    val testMatrices = new RandomUncorrelatedElements(scalars = p2d,
                                                elements = p2d)
     for {
       (m,n) <- testMatrices.twoDimensionSample

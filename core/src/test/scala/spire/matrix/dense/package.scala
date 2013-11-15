@@ -471,18 +471,23 @@ class TestDimensions(nonSpecialDimensions:Int=0)
 }
 
 /**
- * Test general matrices, mostly to exercise the like of BLAS
+ * Uncorrelated elements drawn from the same distribution to build scalar,
+ * vector, and matrix samples.
  */
-class TestGeneralMatrices(nonSpecialDimensions:Int=0,
-                          nonSpecialScalars:Int=1,
-                          matricesPerDimensions:Int=1,
-                          elements:ScalarDistribution,
-                          scalars:ScalarDistribution=null)
-                         (implicit gen:Defaults.IntegerGenerator)
+class RandomUncorrelatedElements(
+  nonSpecialDimensions:Int=0,
+  nonSpecialScalars:Int=1,
+  matricesPerDimensions:Int=1,
+  elements:ScalarDistribution,
+  scalars:ScalarDistribution=null)
+  (implicit gen:Defaults.IntegerGenerator)
 extends TestDimensions(nonSpecialDimensions)(gen) {
 
   def scalarSample = Iterator(0.0, 1.0) ++ (
     if(scalars != null) scalars.take(nonSpecialScalars) else Iterator.empty)
+
+  def vectorSample(n:Int) =
+    Iterator.continually(new Vector(elements.take(n).toArray))
 
   def generalMatrixSample(m:Int, n:Int): Iterator[Matrix] =
     Iterator.continually(new Matrix(m, n)(elements.take(m*n).toArray))

@@ -15,7 +15,7 @@ class MatrixSamplingTest extends FunSuite with ShouldMatchers {
 
   test("General Matrix Samples") {
     val uniformIm1p1 = new ScalarUniformDistributionFromMinusOneToOne
-    val matrices = new TestGeneralMatrices(elements=uniformIm1p1)
+    val matrices = new RandomUncorrelatedElements(elements=uniformIm1p1)
     expectResult((1,1) :: (1,2) :: (1,3) :: (1,5) :: (1,10) :: (1,16) ::
                  (2,1) :: (2,2) :: (2,3) :: (2,5) :: (2,10) :: (2,16) ::
                  (3,1) :: (3,2) :: (3,3) :: (3,5) :: (3,10) :: (3,16) ::
