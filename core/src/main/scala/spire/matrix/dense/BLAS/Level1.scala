@@ -3,18 +3,18 @@ package spire.matrix.dense.BLAS
 import spire.matrix.dense.{VectorLike, PlaneRotation}
 
 import spire.syntax.cfor._
-import scala.collection.mutable
+  import scala.collection.mutable.IndexedSeq
 
 /** Reference implementation using textbook loops */
 trait NaiveLevel1 extends Level1 {
-  def scale(alpha: Double, x: mutable.IndexedSeq[Double]): Unit =
+  def scale(alpha: Double, x: IndexedSeq[Double]): Unit =
     cforRange(0 until x.length) { k => x(k) *= alpha }
 
-  def copy(x: mutable.IndexedSeq[Double], y: mutable.IndexedSeq[Double]): Unit =
+  def copy(x: IndexedSeq[Double], y: IndexedSeq[Double]): Unit =
     cforRange(0 until x.length) { k => y(k) = x(k) }
 
   def axpy(alpha: Double,
-           x: mutable.IndexedSeq[Double], y: mutable.IndexedSeq[Double]): Unit =
+           x: IndexedSeq[Double], y: IndexedSeq[Double]): Unit =
     cforRange(0 until x.length) { k => y(k) += alpha * x(k) }
 
   def rot(x:VectorLike, y:VectorLike, g:PlaneRotation) {
