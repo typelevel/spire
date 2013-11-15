@@ -72,6 +72,11 @@ package object BLAS {
      * inverse).
      */
     def rot(x:VectorLike, y:VectorLike, g:PlaneRotation): Unit
+
+    /**
+     * Scalar product of x and y
+     */
+    def dot(x:IndexedSeq[Double], y:IndexedSeq[Double]): Double
   }
 
   /**

@@ -24,4 +24,10 @@ trait NaiveLevel1 extends Level1 {
       x(i) = xi
     }
   }
+
+  def dot(x:IndexedSeq[Double], y:IndexedSeq[Double]): Double = {
+    var s = 0.0
+    cforRange(0 until x.length) { i => s += x(i)*y(i) }
+    s
+  }
 }
