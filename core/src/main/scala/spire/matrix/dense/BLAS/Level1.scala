@@ -3,7 +3,9 @@ package spire.matrix.dense.BLAS
 import spire.matrix.dense.{VectorLike, PlaneRotation}
 
 import spire.syntax.cfor._
-  import scala.collection.mutable.IndexedSeq
+import scala.collection.mutable.IndexedSeq
+
+import scala.math.abs
 
 /** Reference implementation using textbook loops */
 trait NaiveLevel1 extends Level1 {
@@ -30,4 +32,22 @@ trait NaiveLevel1 extends Level1 {
     cforRange(0 until x.length) { i => s += x(i)*y(i) }
     s
   }
+
+  def idamax(x:IndexedSeq[Double]): Int = {
+    val n = x.length
+    if(n == 0 || n == 1) 0
+    else {
+      var amax = abs(x(0))
+      var idx = 0
+      cforRange(1 until n) { i =>
+        val amaxNew = abs(x(i))
+        if(amaxNew > amax) {
+          amax = amaxNew
+          idx = i
+        }
+      }
+      idx
+    }
+  }
+
 }

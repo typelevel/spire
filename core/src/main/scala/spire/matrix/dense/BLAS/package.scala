@@ -77,6 +77,11 @@ package object BLAS {
      * Scalar product of x and y
      */
     def dot(x:IndexedSeq[Double], y:IndexedSeq[Double]): Double
+
+    /**
+     * The index of the element that has the greatest absolute value
+     */
+    def idamax(x:IndexedSeq[Double]): Int
   }
 
   /**
