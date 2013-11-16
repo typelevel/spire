@@ -563,6 +563,13 @@ object Matrix {
     matrix
   }
 
+  /** Create a m x n matrix whose (i,j) elements is f(i,j) */
+  def tabulate(m:Int, n:Int)(f: (Int,Int) => Double) = {
+    val matrix = empty(m, n)
+    cforRange2(0 until m, 0 until n) { (i,j) => matrix(i,j) = f(i,j) }
+    matrix
+  }
+
   /** Create the identity matrix of dimension m */
   def identity(m: Int): Matrix = {
     val arr = new Array[Double](m * m)
