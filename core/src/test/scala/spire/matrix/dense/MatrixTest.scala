@@ -1,7 +1,8 @@
 package spire.matrix.dense.tests
 
-import spire.matrix.dense.Matrix
+import spire.matrix.dense.{Matrix, Permutation}
 import spire.matrix.Constants._
+import spire.syntax.cfor._
 
 import org.scalatest.FunSuite
 
@@ -254,8 +255,8 @@ class MatrixTest extends FunSuite {
 
   test("element access for matrix block") {
     val a = Matrix(3,4)(11, 12, 13, 14,
-      21, 22, 23, 24,
-      31, 32, 33, 34)
+                        21, 22, 23, 24,
+                        31, 32, 33, 34)
     val b = a.block(1,3)(1,4)
     expectResult(22) { b(0,0) }
     expectResult(23) { b(0,1) }
@@ -269,5 +270,77 @@ class MatrixTest extends FunSuite {
     expectResult(23) { b(2)}
     expectResult(33) { b(3)}
     expectResult(24) { b(4)}
+  }
+
+  test("Permutation of matrix rows") {
+    val a0 = Matrix(6,3)(11, 12, 13,
+                         21, 22, 23,
+                         31, 32, 33,
+                         41, 42, 43,
+                         51, 52, 53,
+                         61, 62, 63)
+    val p = Permutation(1, 1, 4, 0, 4, 5)
+
+    val a1 = a0.copyToMatrix
+    p.permute_rows(a1)
+    expectResult {
+      Matrix(6,3)(
+        41, 42, 43,
+        11, 12, 13,
+        51, 52, 53,
+        21, 22, 23,
+        31, 32, 33,
+        61, 62, 63
+      )
+    } { a1 }
+
+    val a2 = a0.copyToMatrix
+    p.inverse.permute_rows(a2)
+    expectResult {
+      Matrix(6,3)(
+        21, 22, 23,
+        41, 42, 43,
+        51, 52, 53,
+        11, 12, 13,
+        31, 32, 33,
+        61, 62, 63
+      )
+    } { a2 }
+
+    val b0 = Matrix.tabulate(3,8)((i,j) => 10*(i+1) + (j+1))
+    val q = Permutation(2, 1, 2)
+    val b = b0.copyToMatrix
+    q.permute_rows(b, blockSize=3)
+    cforRange(0 until 8) { j => b0.swap(0,j)(2,j) }
+    expectResult(b0)(b)
+
+    val c0 = Matrix(3,3)(1.0, 0.0, 0.0,
+                         0.0, 0.7, 0.0,
+                         0.0, 0.0, 0.5)
+    val c = c0.copyToMatrix
+    val r = Permutation(0, 2, 1)
+    r.permute_rows(c)
+    expectResult { c0 } { c }
+  }
+
+  test("Permutation of a subset of matrix rows") {
+    val a0 = Matrix.tabulate(5,2)((i,j) => 10*(i+1) + (j+1))
+    val p = Permutation.identity(5)
+    val q = p.subset(1,4)
+    q(0) = 1
+    q(1) = 2
+    q(2) = 2
+    expectResult { 1 } { q(0) }
+    expectResult { 2 } { q(1) }
+    expectResult { 2 } { q(2) }
+    expectResult { 0 :: 2 :: 3 :: 3 :: 4 :: Nil } { p.toList }
+
+    val a = a0.copyToMatrix
+    q.permute_rows(a.block(1,4)(0,2))
+    expectResult { a0.row(0) } { a.row(0) }
+    expectResult { Matrix(3,2)(31, 32,
+                               41, 42,
+                               21, 22) } { a.block(1,4)(0,2) }
+    expectResult { a0.row(4) } { a.row(4) }
   }
 }
