@@ -7,7 +7,16 @@ object Multiplicative {
     def times(x: A, y: A): A = s.op(x, y)
   }
 
+  def apply[A](s: CSemigroup[A]): MultiplicativeCSemigroup[A] = new MultiplicativeCSemigroup[A] {
+    def times(x: A, y: A): A = s.op(x, y)
+  }
+
   def apply[A](m: Monoid[A]): MultiplicativeMonoid[A] = new MultiplicativeMonoid[A] {
+    def times(x: A, y: A): A = m.op(x, y)
+    def one = m.id
+  }
+
+  def apply[A](m: CMonoid[A]): MultiplicativeCMonoid[A] = new MultiplicativeCMonoid[A] {
     def times(x: A, y: A): A = m.op(x, y)
     def one = m.id
   }
@@ -35,6 +44,12 @@ trait MultiplicativeSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] {
   def times(x: A, y: A): A
 }
 
+trait MultiplicativeCSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends MultiplicativeSemigroup[A] {
+  override def multiplicative: CSemigroup[A] = new CSemigroup[A] {
+    def op(x: A, y: A): A = times(x, y)
+  }
+}
+
 trait MultiplicativeMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends MultiplicativeSemigroup[A] {
   override def multiplicative: Monoid[A] = new Monoid[A] {
     def id = one
@@ -44,7 +59,7 @@ trait MultiplicativeMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] exten
   def one: A
 }
 
-trait MultiplicativeCMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends MultiplicativeMonoid[A] {
+trait MultiplicativeCMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends MultiplicativeMonoid[A] with MultiplicativeCSemigroup[A] {
   override def multiplicative: CMonoid[A] = new CMonoid[A] {
     def id = one
     def op(x: A, y: A): A = times(x, y)
