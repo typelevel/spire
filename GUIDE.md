@@ -226,13 +226,74 @@ subtypes of `Number`, based on `SafeLong`, `Double`, `BigDecimal`, and
 `Rational`. Combining two numbers will always return a number of the highest
 precision.
 
-#### Interval
+#### Interval[A]
 
-TODO
+Interval supports arithmetic across a range of possible `A`
+values. This can be thought of as representing uncertainty about a
+single, actual value, or as operating on the entire set of values
+simultaneously. Any type that has an `Order[A]` can be used in an
+interval, although most arithmetic operations will require additional
+type classes (ranging from `AdditiveSemigroup[A]` for `+` to
+`Field[A]` for `/`).
 
-#### Polynomial
+Intervals may be unbounded on either side, and bounds can be open or
+closed.  (An interval includes closed boundaries, but not open
+boundaries). Here are some string representations of various
+intervals:
 
-TODO
+ * `[3, 6]` the set of values between 3 and 6 (including both).
+ * `(2, 4)` the set of values between 2 and 4 (excluding both).
+ * `(1, 2]` half-open set, including 1 but not 2.
+ * `(-∞, 5)` the set of values less than 5.
+
+Intervals model continuous spaces, even if the type A is discrete. So
+for instance when `(3, 4)` is an `Interval[Int]` it is not considered
+"empty" , even though there are no `Int` values between 3 and 4. This
+is because we can multiply the interval by 2 to get `(6, 8)` which is
+clearly not empty. The underlying continuous interval contains values
+which when multiplied by a scalar become valid `Int` values.
+
+#### Polynomial[C]
+
+Currently Spire supports univariate polynomials. These are polynomials
+with a single variable (e.g. *x*) with the following structure:
+
+```
+c0 + (c1 * x^1) + (c2 * x^2) + ... + (cn * x^n)
+```
+  
+The coefficents (`c0` through `cn`) are values of the type `C`, and
+the exponents (`1` through `n`) are `Int` values (this does mean that
+Spire's implementation only supports polynomials whose exponents are
+less than 2147483648).
+
+Like interval, arithmetic on polynomials is accomplished using type
+classes for `C`, such as `Semiring[C]`. With the right type classes,
+polynomials can support all the arithmetic operations covered by
+euclidean rings, but not fields. Division and reciprocal operations
+are impossible because polynomials do not support fractional or
+negative exponents. Polynomials also support `interval`, `derivative`,
+and other operations.
+
+Spire does support a convenient syntax for literal polynomials. By
+importing `spire.syntax.literals._` (or just `spire.implicits._`) you
+can use the `poly` string interpolator to create
+`Polynomial[Rational]` instances:
+
+```scala
+import spire.syntax.literals._
+poly"3x^2 - 5x + 1"
+poly"5/4x^6 - 7x - 2"
+poly"1.2x^3 - 6.1x^2 + 9x - 3.33"
+```
+
+Spire actually supports two types of polynomials: dense and
+sparse. For most simple polynomials used in these examples, you'll
+probably want dense polynomials. However, in cases where your
+polynomials have a few terms with very large exponents the sparse
+implementation will be more efficient. In any case, the underlying
+representation is an implementation detail and both types support the
+same operations (and can interoperate).
 
 #### Real
 
