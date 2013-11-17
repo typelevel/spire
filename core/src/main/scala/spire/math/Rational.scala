@@ -21,7 +21,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def isWhole: Boolean
 
   // ugh, ScalaNumber and ScalaNumericConversions in 2.10 require this hack
-  override def underlying: List[Any] = sys.error("unimplemented")
+  override def underlying: List[Any] = 
+    throw new UnsupportedOperationException("unimplemented")
 
   def abs: Rational = if (this < Rational.zero) -this else this
   def inverse: Rational = Rational.one / this

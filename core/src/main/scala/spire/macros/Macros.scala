@@ -100,7 +100,7 @@ object Macros {
     import c.mirror._
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    if (!s.matches(regex)) sys.error("invalid")
+    if (!s.matches(regex)) c.error(c.enclosingPosition, "invalid whole number")
     s.replace(sep, "")
   }
 
@@ -109,7 +109,7 @@ object Macros {
     import c.mirror._
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
-    if (!s.matches(regex)) sys.error("invalid")
+    if (!s.matches(regex)) c.error(c.enclosingPosition, "invalid decimal number")
     s.replace(sep, "").replace(dec, ".")
   }
 
