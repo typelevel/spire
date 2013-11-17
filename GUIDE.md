@@ -17,34 +17,59 @@ try to distinguish the following:
  1. The type class itself (`Ring[A]`). This is often a trait.
  2. Concrete instances of the type class, such as `Ring[Int]`.
  3. Syntax implicits that use the type class to define operators.
+ 
+The methods in these type classes are always given text names (like
+`plus`). In some cases these names correspond to symbolic operators:
+in the case of `plus`, it corresponds with `+`. When using these type
+classes, users have the option of using the symbolic syntax on the
+values directly or calling the method on the type clas instance:
+
+```scala
+import spire.algebra.Ring
+import spire.syntax.ring._
+
+def usingSymbols[A: Ring](x: A, y: A): A = x + y
+def usingNames[A](x: A, y: A)(implicit r: Ring[A]): A = r.plus(x, y)
+```
+
+Some methods (e.g. `sqrt`) do not have corresponding symbols. In those
+cases, the method name itself can be used with the values:
+
+```scala
+def sqrt[A: NRoot](x: A): A = x.sqrt
+```
 
 #### Package Layout
 
-In the case of `Ring[A]`, the type class itself is located in `spire.algebra`.
-Except for certain special-purpose type classes, all of Spire's type classes
-can be found in `spire.algebra`.
+In the case of `Ring[A]`, the type class itself is located in
+`spire.algebra`. Except for a few special cases, all of Spire's type
+classes can be found in `spire.algebra`.
 
-Type class members (also called instances) can be found in two different
-places. For types defined in Spire, or code that is aware of Spire, type class
-instances should be placed in the type's companion object. For instance,
-`UByte` (an unsigned byte type) has an instance of `Rig[UByte]` contained in
-its companion object.
+Type class members (also called instances) can be found in two
+different places. For types defined in Spire, or code that is aware of
+Spire, type class instances should be placed in the type's companion
+object. For instance, `UByte` (an unsigned byte type) has an instance
+of `Rig[UByte]` contained in its companion object.
 
-For types defined elsewhere that Spire supports directly (for instance the
-built-in number types) Spire defines objects in `spire.std` which contain
-their instances. So to get all the instances for `Int` you'd import them from
-`spire.std.int._`. To get all these "standard instances" at one go, import
-`spire.std.any._`.
+For types defined elsewhere that Spire supports directly (for instance
+the built-in number types) Spire defines objects in `spire.std` which
+contain their instances. So to get all the instances for `Int` you'd
+import them from `spire.std.int._`. To get all these "standard
+instances" at one go, import `spire.std.any._`. This pattern should
+also be used when supporting other number types that are not
+Spire-aware.
 
-Finally, syntax implicits are imported from objecs in `spire.syntax`. To get
-the syntax for `Ring[A]` you'd import `spire.syntax.ring._`. Again, there is a
-shortcut package: you can import `spire.syntax.all._` to get all syntax.
+Finally, syntax implicits are imported from objecs in
+`spire.syntax`. To get the syntax for `Ring[A]` you'd import
+`spire.syntax.ring._`. Again, there is a shortcut package: you can
+import `spire.syntax.all._` to get all syntax.
 
-These imports might seem a bit confusing, but they are very useful if you find
-a situation where Spire's types or operators conflict with another library's.
-We provide an even more basic import (`spire.implicits._`) for when you want
-all instances and all operators. This is nice when working in the console, or
-for when you're sure there won't be a conflict.
+These imports might seem a bit confusing, but they are very useful
+when you find a situation where Spire's types or operators conflict
+with another library's.  We provide an even more basic import
+(`spire.implicits._`) for when you want all instances and all
+operators. This is nice when working in the console or experimenting,
+and for when you're sure there won't be a conflict.
 
 #### Usage
 
@@ -74,20 +99,21 @@ object Demo {
 ```
 
 The `IntAlgebra` type extends `Ring[Int]` and has been imported via
-`spire.std.any._`. The implicits providing the binary operators `+` and `*`
-(and also the implicit to convert the integer literal into an `A`) were all
-imported form `spire.syntax.ring._`. And the `Ring` context bound is really
-just sugar for an implicit parameter (the type class instance).
+`spire.std.any._`. The implicits providing the binary operators `+`
+and `*` (and also the implicit to convert the integer literal into an
+`A`) were all imported form `spire.syntax.ring._`. And the `Ring`
+context bound is really just sugar for an implicit parameter (the type
+class instance).
 
-Hopefully this small example gives you an idea of the basic mechanics behind
-Spire's generic math capabilities.
+Hopefully this small example gives you an idea of the basic mechanics
+behind Spire's generic math capabilities.
 
 #### Specialization
 
-To achieve speed on-par with direct (non-generic) code, you will need to use
-specialization. The good news is that most of Spire's code is already
-specialized (and tested for proper performance). The bad news is that you'll
-have to annotate all your generic code like so:
+To achieve speed on-par with direct (non-generic) code, you will need
+to use specialization. The good news is that most of Spire's code is
+already specialized (and tested for proper performance). The bad news
+is that you'll have to annotate all your generic code like so:
 
 ```scala
 import spire.algebra._
@@ -115,9 +141,183 @@ If you have questions about specialization feel free to ask on the mailing
 list. You may notice that some code in Spire is structured in an unusual way,
 and often this is to make sure specialization works properly.
 
+You may find that it's easy to develop generic code without using
+specialization first (to keep things simple) and then going back and adding
+annotations later if necessary. This helps keep things simple while you get
+your code working correctly, and it's a (relatively) minor change to enable
+specialization later (as long as you are consistent).
+
 Of course, if your code is not generic, you can call into Spire's specialized
 code without worrying about any of this (and the result will be unboxed and
 fast).
+
+### Type Classes
+
+#### Properties
+
+Spire's type classes are often described in terms of properties (or "laws").
+These properties must be true no matter what values are used.
+
+Here's a brief description of some of the most common properties:
+
+ * *associativity*: `|+|` is associative if `(a |+| b) |+| c` = `a |+| (b |+| c)`.
+ * *identity*: `id` is an identity value for `|+|` if `a |+| id` = `id` = `id |+| a`.
+ * *inverse*: `|+|` has an inverse if `a |+| a.inverse` = `id` = `a.inverse |+| a`.
+ * *commutativity*: `|+|` is commutative if `a |+| b` equals `b |+| a`.
+
+In some cases the operator names are different (e.g. `+`, `*`) but the
+properties themselves remain the same.
+
+### Eq
+
+Spire provides an `Eq[A]` type class to represent type-safe equality. This
+allows us to talk about types for which there isn't a computationally useful
+notion of equality, and also to avoid programming errors caused by universal
+equality.
+
+`Eq[A]` provides two operators
+
+ * `eqv` (`a === b`) equality operator.
+ * `neqv` (`a =!= `) inequality operator (defaults to `!(a === b)`).
+
+Spire requires that `eqv` obey the laws of an equivalence relation, namely:
+
+ * `a === a` (*reflexivity*)
+ * if `a === b` then `b === a` (*symmetry*)
+ * if `a === b` then `a` is `b` (*anti-symmetry*)
+ * if `a === b` and `b === c` then `a === c` (*transitivity*)
+
+The anti-symmetry property may seem confusing. The idea is that if `a === b`
+then `a` and `b` must be substitutable for each other, such that for any
+expression `f(x)`, `f(a) === f(b)`.
+
+### Order
+
+Total orderings in Spire are supported by the `Order[A]` type class. Unlike
+other ordering type classes, this one is specialized to avoid boxing.
+`Order[A]` extends `Eq[A]` can be implemented via a single `compare` method,
+although it provides all of the following:
+
+ * `eqv` (`a === b`)
+ * `neqv` (`a =!= b`)
+ * `lt` (`a < b`)
+ * `gt` (`a > b`)
+ * `lteqv` (`a <= b`)
+ * `gteqv` (`a >= b`)
+ * `compare` (`a compare b`)
+ * `min` (`a min b`)
+ * `max` (`a max b`)
+
+Total orderings are required to observe the following properties:
+
+ * if `a <= b` and `b <= a` then `a === b` (*anti-symmetry*)
+ * if `a <= b` and `b <= c` then `a <= b` (*transitivity*)
+ * either `a <= b` or `b <= a` (*totality*)
+
+Additionally, total orderings across fields should obey the following
+additional laws:
+
+ * if `a <= b` then `(a + c) <= (b + c)` (*O1*)
+ * if `zero <= a` and `zero <= b` then `zero <= (a * b)` (*O2*)
+
+In some cases users may need to use (or define) total orderings that do not
+follow all these laws, or may break laws required by other structures. An
+example would be lexicographic ordering of complex numbers, which breaks *O2*.
+In these cases, users will need to be aware of the risks and limit their use
+to situations where the particular law is not needed.
+
+#### Groups
+
+The most basic algebraic type classes Spire supports involve a single
+associative binary operator (called `op` and represented as `|+|`):
+
+ * `Semigroup[A]` just the associative operator `|+|`, nothing more.
+ * `Monoid[A]` a semigroup that also has an identity element `id`.
+ * `Group[A]` a monoid that also has an inverse operation (`inverse` or `-`).
+ * `CSemigroup[A]` a semigroup that is commutative.
+ * `CMonoid[A]` a monoid that is commutative.
+ * `AbGroup[A]` an "abelian group", a group that is commutative.
+
+Most types have many possible implementations of these types classes. In these
+cases Spire requires users to explicitly choose which implementation they
+want.
+
+Spire also defines two parallel group heirarchies for *additive* and
+*multiplicative* groups. These have the same properties but different names
+and symbols. The following list provides the generic, additive, and
+multiplicative variants:
+
+ * operator method: `op`, `plus`, `times`
+ * operator symbol: `|+|`, `+`, `*`
+ * identity name: `id`, `zero`, `one`
+ * inverse method: `inverse`, `negate`, `reciprocal`
+ * inverse symbol: `inverse`, `-` (unary), `reciprocal`
+ * inverse binary operator: `|-|`, `-` (binary), `/`
+
+#### Rings and Fields
+
+Rings are a set together with two binary operation (additive and
+multiplicative). Spire defines these by extending the appropriate additive and
+multiplicative group traits. The following list roughly describes the
+Ring-like type classes Spire provides:
+
+ * `Semiring[A]` provides `+`, `zero`, and `*`.
+ * `Rig[A]` provides `+`, `zero`, `*`, and `one`.
+ * `Rng[A]` provides commutative `+`, `zero`, `-`, and `*`.
+ * `Ring[A]` provides commutative `+`, `zero`, `-`, `*`, and `one`.
+ * `CRing[A]` provides commutative `+`, `zero`, `-`, commutative `*`, and `one`.
+
+The following list makes clear how these type classes are defined
+via inheritance:
+
+ * `Semiring[A]` extends `AdditiveMonoid[A]` with `MultiplicativeSemigroup[A]`
+ * `Rig[A]` extends `Semiring[A]` with `MultiplicativeMonoid[A]`
+ * `Rng[A]` extends `Semiring[A]` with `AdditiveAbGroup[A]`
+ * `Ring[A]` extends `Rig[A]` with `Rng[A]`
+ * `CRing[A]` extends `Ring[A]` with `MultiplicativeCMonoid[A]`
+
+Rings also provide a `pow` method (`**`) for doing repeated multiplication.
+
+#### EuclideanRings
+
+Spire supports euclidean domains (called `EuclideanRing[A]`). A euclidean
+domain is a commutative ring (`CRing[A]`) that also supports euclidean
+division (e.g. floor division or integer division). This structure generalizes
+many useful properties of the integers (for instance, quotients and
+remainders, and greatest common divisors).
+
+Formally, euclidean domains have a *euclidean function* f such that for any
+`x` and `y` in `A`, if `y` is nonzero, then there are `q` and `r` (quotient
+and remainder) such that `a = b*q + r` and `r = 0` or `f(r) < f(b)`.
+
+Spire's `EuclideanRing[A]` supports the following operations:
+
+ * `quot` (`a /~ b`) finding the quotient (often integer division).
+ * `mod` (`a % b`) the remainder from the quotient operation.
+ * `quotmod` (`a /% b`) combines `quot` and `mod` into one operation.
+ * `gcd` (`a gcd b`) find the greatest common divisor of `a` and `b`.
+ * `lcm` (`a lcm b`) find the lowest common multiple of `a` and `b`.
+
+Spire requires that `b * (a /~ b) + (a % b)` is equivalent to `a`.
+
+#### Fields
+
+Fields are commutative rings with commutative multiplication and
+multiplicative inverses for all non-zero elements. Fields generalize how most
+people think about real numbers.
+
+Spire's `Field[A]` supports the following operations:
+
+ * `div` (`a / b`) divide `a` by `b`.
+ * `reciprocal` (`a.reciprocal`) the multiplicative inverse of `a`, i.e. `one/a`.
+
+#### Modules, VectorSpaces, &co
+
+TODO
+
+#### Everything else
+
+TODO
 
 ### Types
 
@@ -130,6 +330,12 @@ These built-in integral types are all signed and have a fixed-width (8, 16,
 32, and 64 bits respectively). Division with these types is truncated, and
 overflow can silently occur when numbers to get too big (or too small).
 Division by zero will trigger an exception.
+
+It's worth noting that the JVM does not support operating on `Byte` and
+`Short` directly: these operations will usually return `Int`. This can cause
+confusion when using type inference, and can also lead to differences between
+direct code (where adding bytes produces an int) and generic code (where
+adding bytes produces a byte).
 
 #### Float and Double
 
@@ -146,7 +352,9 @@ total, see `spire.optional.totalfloat`.
 
 Since floating-point values are approximations of real values, loss of
 precision can occur when adding values of different magnitudes. Thus, many
-operations are not always associative.
+operations are not always associative. Spire assumes that users who work with
+`Float` and `Double` are aware of these problems, and provides instances like
+`Ring[Double]` even though it will fail to be associative in some cases.
 
 #### BigInt
 
@@ -163,17 +371,42 @@ precision, which also makes this type not associative in some cases (although
 with user-specified precision it is easier to avoid cases where this matters).
 
 The math context also defines how values should be rounded. Since this type is
-decimal, it can exactly represent any decimal number exactly (unlike a
-floating point value) although its math context will need enough digits to do
-so.
+decimal, it can exactly represent any decimal number (unlike a floating point
+value) although its math context will need enough digits to do so.
+
+As with floating point, Spire makes a best effort to support this type even
+though there may be problems related to precision and rounding. Spire also
+provides capabilities which the underlying type lacks, including roots,
+fractional powers, and trigonometric methods.
 
 #### Rational
 
 This fractional type represents a rational number, a fraction of two integers
-(`n/d`). It is an exact type, although it can't represent irrational numbers
-without approximating them as rationals. It is unbounded, although as the
-fraction becomes larger or more complex, operations will become slower.
-Rationals are always stored in simplest form to speed up future calculations.
+(`n/d`). It is an exact type, although as you might expect it can't represent
+irrational numbers without approximating them as rationals. It is unbounded,
+although as the fraction becomes larger or more complex, operations will
+become slower. Rationals are always stored in simplest form to speed up future
+calculations.
+
+This is probably the easiest fractional type to use correctly.
+
+#### SafeLong
+
+This integral type is also unbounded, like `BigInt`. However, it is more
+efficient for small values, where it will use a `Long` instead. There is
+usually no reason to prefer using a `BigInt` over a `SafeLong` except to
+comply with an external API, or in cases where all the values are known to
+exceed a long's storage capacity.
+
+#### Natural
+
+This is a simple unbounded, unsigned integral type. It models natural numbers
+a as a cons list of digits (each "digit" being a 32-bit unsigned integer). For
+relatively small values 32-128 bits) it is faster than `SafeLong` or `BigInt`
+in most cases. For larger values it becomes a bit slower.
+
+The `Natural` type a bit of an odd-ball type at present. However the fact that
+it is guaranteed to be non-negative is nice.
 
 #### UByte, UShort, UInt, and ULong
 
@@ -187,36 +420,41 @@ arrays. `Array[UInt]` will be boxed whereas `Array[Int]` is not. Since
 conversions between `UInt` and `Int` only exit at compile-time, it's easy to
 work around this issue by storing `UInt` instances in an `Array[Int]`.
 
+Writing literal unsigned values is slightly more cumbersome than their signed
+counterparts (consider `UInt(7)` versus `7`). Spire provides syntax imports
+which make these slightly easier to write:
+
+```scala
+import spire.syntax.literals._
+
+ui"7" // equivalent to UInt(7)
+```
+
 #### FixedPoint
 
 This value class uses a `Long` with an implicit denominator. The type itself
 doesn't contain information about the denominator. Instead, an implicit
-`FixedScale` instance is required to provide that context. This type is
-relatively specialized and should only be used in situations where a large
-number of rational numbers with the same denominator are needed.
+`FixedScale` instance is required to provide that context when necessary (for
+instance, during multiplication). Like the previous unsigned values, fixed
+point values will not be boxed in most cases.
 
-#### SafeLong
-
-This integral type is also unbounded, like `BigInt`. However, it is more
-efficient for small values, where it will use a `Long` instead. There is
-usually no reason to prefer using a `BigInt` over a `SafeLong` except to
-comply with an external API, or in cases where all numbers are known to exceed
-a long's storage capacity.
-
-#### Natural
-
-This is a simple unbounded, unsigned integral type. For relatively small
-values 32-128 bits) it is faster than `SafeLong` or `BigInt` in many cases,
-although for larger values it becomes a bit slower. It's a bit of an odd-ball
-at present, however the fact that it is guaranteed to be non-negative is nice.
+This type is designed to solve a specific type of problem and should only be
+used in situations where a large number of rational numbers with the same
+denominator are needed, and efficiency is very important.
 
 #### Complex[A] and Quanternion[A]
 
 These generic types represent complex numbers (`x + yi`) and quaternions (`w +
-xi + xj + zk`) respectively. They can be parameterized with fractional types.
-In general they are as exact as their underlying types are, although in some
-cases approximate results are necessarily returned (in cases where roots or
+xi + xj + zk`) respectively. They can be parameterized with any fractional
+type `A` which has a `Field[A]`, `NRoot[A]`, and `Trig[A]`. In general these
+values are as exact as their underlying `A` values are, although in some cases
+approximate results are necessarily returned (in cases where roots or
 trigonometry functions are used).
+
+These types are specialized, so most operations should be quite fast and not
+cause unnecessary boxing. However, these types use more memory than a
+non-generic complex number based on `Double` values would, and are a bit
+slower.
 
 #### Number
 
@@ -225,6 +463,10 @@ dynamically-typed numeric tower (like Scheme or Python). There are four
 subtypes of `Number`, based on `SafeLong`, `Double`, `BigDecimal`, and
 `Rational`. Combining two numbers will always return a number of the highest
 precision.
+
+`Number` is a good choice for users who want simple and correct numbers. The
+type keeps operations as safe as possible, while providing access to all
+operators and methods.
 
 #### Interval[A]
 
@@ -309,23 +551,54 @@ interface to creating uniform distributions of values.
 
 #### Pseudo-Random Number Generators
 
-The `Generator` trait represents a PRNG strategy. Using uniformly-generated
-`Int` or `Long` values it can generate random values, arrays of values, and so
-on. Defining a generator is relatively easy (for a very simple example see
-`Lcg64`).
+Spire supports two types of PRNGs: mutable and immutable.
+
+The `mutable.Generator` trait represents a PRNG strategy. Using
+uniformly-generated `Int` or `Long` values it can generate random values,
+arrays of values, and so on. Defining a generator is relatively easy (for a
+very simple example see `Lcg64`).
 
 By default, generators are not threadsafe. A synchronized generator can be
 created from an unsynchronized one via the `sync` method. Generators can be
 copied, and their seeds can be saved and restored. This allows users to create
-deterministic streams of values by using the same seed.
+deterministic streams of values by using the same seed. In general, it is
+preferred for users to create and use their own generators as opposed to
+relying on a single generator across threads.
 
-Although the `Generator` class itself only provides low-level methods like
-`nextInt`, it can produce values of any type using the `Dist[A]` type class,
-which will be discussed in the next seciton.
+Although the `mutable.Generator` trait itself only provides low-level methods
+like `nextInt`, it can produce values of any type using the `Dist[A]` type
+class, which will be discussed in the next seciton.
+
+The `immutable.Generator` trait is similar to `mutable.Generator`, although
+the state it stores is immutable. Each time a number is generated a new
+generator is returned as well, which allows these generators to be used in a
+pure-functional context. The same `Dist[A]` instances that would be used with
+a mutable generator are also applicable here.
+
+#### Creation random values with Dist[A]
+
+The `Dist[A]` type class represents a strategy for generating a distribution
+of `A` values given a `Generator` instance. `Dist[A]` makes no guarantee as to
+how the `A` values are distributed (for instance, it may always return the
+same value). Users who are interested in particular distributions should use
+the `Uniform[A]` and `Gaussian[A]` traits to generate `Dist[A]` instances that
+correspond to their needs.
+
+The `Dist[A]` objects themselves are immutable and are powered by generators
+(both mutable and immutable). They can be transformed via `map`, `flatMap`,
+and other combinators. Given the appropriate structure on `A`, `Dist[A]`
+instances can also be operated on as if they were value.
 
 #### Distributions
 
-The `Dist[A]` type class represents a strategy for generating a (uniform)
-distribution of `A` values given a `Generator` instance. Distributions
-themselves are immutable, and can be transformed into other distributions via
-`map`, `flatMap`, and so on.
+Currently, `spire.random` provides `Uniform[A]` and `Gaussian[A]` type classes
+which given appropriate parameters can produce `Dist[A]` instances. Since most
+types have a (approximately) infinite number of possible values, bounds and
+other constraints need to be put on these types before we can usefully talk
+about (or implement) probability distributions in Spire.
+
+Given `min` and `max`, a `Uniform[A]` instance can produce a
+uniformly-distributed `Dist[A]` instance.
+
+Given a `mean` and `stdDev`, a `Gaussian[A]` instance can produce a `Dist[A]`
+whose values are distributed according to the desired gaussian distribution.
