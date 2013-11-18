@@ -48,10 +48,10 @@ classes can be found in `spire.algebra`.
 Type class members (also called instances) can be found in two
 different places. For types defined in Spire, or code that is aware of
 Spire, type class instances should be placed in the type's companion
-object. For instance, `UByte` (an unsigned byte type) has an instance
+object. For example, `UByte` (an unsigned byte type) has an instance
 of `Rig[UByte]` contained in its companion object.
 
-For types defined elsewhere that Spire supports directly (for instance
+For types defined elsewhere that Spire supports directly (for example
 the built-in number types) Spire defines objects in `spire.std` which
 contain their instances. So to get all the instances for `Int` you'd
 import them from `spire.std.int._`. To get all these "standard
@@ -161,8 +161,8 @@ These properties must be true no matter what values are used.
 Here's a brief description of some of the most common properties:
 
  * *associativity*: `|+|` is associative if `(a |+| b) |+| c` = `a |+| (b |+| c)`.
- * *identity*: `id` is an identity value for `|+|` if `a |+| id` = `id` = `id |+| a`.
- * *inverse*: `|+|` has an inverse if `a |+| a.inverse` = `id` = `a.inverse |+| a`.
+ * *identity*: `id` is an identity value for `|+|` if `a |+| id` = `a` = `id |+| a`.
+ * *inverse*: `|+|` has an `inverse` operation if `a |+| a.inverse` = `id` = `a.inverse |+| a`.
  * *commutativity*: `|+|` is commutative if `a |+| b` equals `b |+| a`.
 
 In some cases the operator names are different (e.g. `+`, `*`) but the
