@@ -637,6 +637,7 @@ private[math] object LongRationals extends Rationals[Long] {
 
     def /(r: Rational): Rational = {
       if (r == Rational.zero) throw new ArithmeticException("divide (/) by 0")
+      if (this == Rational.zero) return this
       r match {
         case r: LongRationals.LongRational => {
           val a = spire.math.gcd(n, r.n)
