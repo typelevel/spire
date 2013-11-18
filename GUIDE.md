@@ -22,7 +22,7 @@ The methods in these type classes are always given text names (like
 `plus`). In some cases these names correspond to symbolic operators:
 in the case of `plus`, it corresponds with `+`. When using these type
 classes, users have the option of using the symbolic syntax on the
-values directly or calling the method on the type clas instance:
+values directly or calling the method on the type class instance:
 
 ```scala
 import spire.algebra.Ring
@@ -45,11 +45,11 @@ In the case of `Ring[A]`, the type class itself is located in
 `spire.algebra`. Except for a few special cases, all of Spire's type
 classes can be found in `spire.algebra`.
 
-Type class members (also called instances) can be found in two
-different places. For types defined in Spire, or code that is aware of
-Spire, type class instances should be placed in the type's companion
-object. For example, `UByte` (an unsigned byte type) has an instance
-of `Rig[UByte]` contained in its companion object.
+Type class instances can be found in two different places. For types
+defined in Spire, or code that is aware of Spire, type class instances
+should be placed in the type's companion object. For example, `UByte`
+(an unsigned byte type) has an instance of `Rig[UByte]` contained in
+its companion object.
 
 For types defined elsewhere that Spire supports directly (for example
 the built-in number types) Spire defines objects in `spire.std` which
@@ -129,51 +129,54 @@ object Demo {
 }
 ```
 
-There are too many gotchas with specialization to list here. But the (very)
-short guide to specialization is:
+There are too many gotchas with specialization to list here. But the
+(very) short guide to specialization is:
 
  1. It's much easier to specialize methods.
  2. Calls from generic code into specialized code are not specialized.
  3. Limit specialization to types you'll use via `@sp(Int, Double)`.
  4. Specialization will increase bytecode size by a factor of x2-10.
 
-If you have questions about specialization feel free to ask on the mailing
-list. You may notice that some code in Spire is structured in an unusual way,
-and often this is to make sure specialization works properly.
+If you have questions about specialization feel free to ask on the
+mailing list. You may notice that some code in Spire is structured in
+an unusual way, and often this is to make sure specialization works
+properly.
 
 You may find that it's easy to develop generic code without using
-specialization first (to keep things simple) and then going back and adding
-annotations later if necessary. This helps keep things simple while you get
-your code working correctly, and it's a (relatively) minor change to enable
-specialization later (as long as you are consistent).
+specialization first (to keep things simple) and then going back and
+adding annotations later if necessary. This helps keep things simple
+while you get your code working correctly, and it's a (relatively)
+minor change to enable specialization later (as long as you are
+consistent).
 
-Of course, if your code is not generic, you can call into Spire's specialized
-code without worrying about any of this (and the result will be unboxed and
-fast).
+Of course, if your code is not generic, you can call into Spire's
+specialized code without worrying about any of this (and the result
+will be unboxed and fast).
 
 ### Type Classes
 
 #### Properties
 
-Spire's type classes are often described in terms of properties (or "laws").
-These properties must be true no matter what values are used.
+Spire's type classes are often described in terms of properties (or
+"laws").  These properties must be true no matter what values are
+used.
 
 Here's a brief description of some of the most common properties:
 
  * *associativity*: `|+|` is associative if `(a |+| b) |+| c` = `a |+| (b |+| c)`.
  * *identity*: `id` is an identity value for `|+|` if `a |+| id` = `a` = `id |+| a`.
  * *inverse*: `|+|` has an `inverse` operation if `a |+| a.inverse` = `id` = `a.inverse |+| a`.
- * *commutativity*: `|+|` is commutative if `a |+| b` equals `b |+| a`.
+ * *commutativity*: `|+|` is commutative if `a |+| b` = `b |+| a`.
 
 In some cases the operator names are different (e.g. `+`, `*`) but the
 properties themselves remain the same.
 
 ### Eq
 
-Spire provides an `Eq[A]` type class to represent type-safe equality. This
-allows us to talk about types for which there isn't a computationally useful
-notion of equality, and also to avoid programming errors caused by universal
-equality.
+Spire provides an `Eq[A]` type class to represent type-safe
+equality. This allows us to talk about types for which there isn't a
+computationally useful notion of equality, and also to avoid
+programming errors caused by universal equality.
 
 `Eq[A]` provides two operators
 
@@ -193,10 +196,11 @@ expression `f(x)`, `f(a) === f(b)`.
 
 ### Order
 
-Total orderings in Spire are supported by the `Order[A]` type class. Unlike
-other ordering type classes, this one is specialized to avoid boxing.
-`Order[A]` extends `Eq[A]` can be implemented via a single `compare` method,
-although it provides all of the following:
+Total orderings in Spire are supported by the `Order[A]` type
+class. Unlike other ordering type classes
+(e.g. `scala.math.Ordering`), this one is specialized to avoid boxing.
+`Order[A]` extends `Eq[A]` can be implemented via a single `compare`
+method, although it provides all of the following:
 
  * `eqv` (`a === b`)
  * `neqv` (`a =!= b`)
@@ -208,7 +212,8 @@ although it provides all of the following:
  * `min` (`a min b`)
  * `max` (`a max b`)
 
-Total orderings are required to observe the following properties:
+Instances of `Order[A]` are required to observe the following
+properties:
 
  * if `a <= b` and `b <= a` then `a === b` (*anti-symmetry*)
  * if `a <= b` and `b <= c` then `a <= b` (*transitivity*)
@@ -219,12 +224,15 @@ additional laws:
 
  * if `a <= b` then `(a + c) <= (b + c)` (*O1*)
  * if `zero <= a` and `zero <= b` then `zero <= (a * b)` (*O2*)
+ 
+(These are laws are required by ordered fields.)
 
-In some cases users may need to use (or define) total orderings that do not
-follow all these laws, or may break laws required by other structures. An
-example would be lexicographic ordering of complex numbers, which breaks *O2*.
-In these cases, users will need to be aware of the risks and limit their use
-to situations where the particular law is not needed.
+In some cases users may need to use (or define) total orderings that
+do not follow all these laws, or may break laws required by other
+structures. An example would be the lexicographic ordering of complex
+numbers, which breaks *O2*.  In these cases, users will need to be
+aware of the risks and limit their use to situations where the
+particular law is not needed.
 
 #### Groups
 
@@ -238,14 +246,14 @@ associative binary operator (called `op` and represented as `|+|`):
  * `CMonoid[A]` a monoid that is commutative.
  * `AbGroup[A]` an "abelian group", a group that is commutative.
 
-Most types have many possible implementations of these types classes. In these
-cases Spire requires users to explicitly choose which implementation they
-want.
+Most types have many possible implementations of these types
+classes. In these cases Spire requires users to explicitly choose
+which implementation they want.
 
 Spire also defines two parallel group heirarchies for *additive* and
-*multiplicative* groups. These have the same properties but different names
-and symbols. The following list provides the generic, additive, and
-multiplicative variants:
+*multiplicative* groups. These have the same properties but different
+names and symbols. The following list provides the generic, additive,
+and multiplicative variants:
 
  * operator method: `op`, `plus`, `times`
  * operator symbol: `|+|`, `+`, `*`
@@ -257,9 +265,9 @@ multiplicative variants:
 #### Rings and Fields
 
 Rings are a set together with two binary operation (additive and
-multiplicative). Spire defines these by extending the appropriate additive and
-multiplicative group traits. The following list roughly describes the
-Ring-like type classes Spire provides:
+multiplicative). Spire defines these by extending the appropriate
+additive and multiplicative group traits. The following list roughly
+describes the Ring-like type classes Spire provides:
 
  * `Semiring[A]` provides `+`, `zero`, and `*`.
  * `Rig[A]` provides `+`, `zero`, `*`, and `one`.
@@ -267,8 +275,8 @@ Ring-like type classes Spire provides:
  * `Ring[A]` provides commutative `+`, `zero`, `-`, `*`, and `one`.
  * `CRing[A]` provides commutative `+`, `zero`, `-`, commutative `*`, and `one`.
 
-The following list makes clear how these type classes are defined
-via inheritance:
+The following list makes clear how these type classes are defined via
+inheritance:
 
  * `Semiring[A]` extends `AdditiveMonoid[A]` with `MultiplicativeSemigroup[A]`
  * `Rig[A]` extends `Semiring[A]` with `MultiplicativeMonoid[A]`
@@ -280,15 +288,17 @@ Rings also provide a `pow` method (`**`) for doing repeated multiplication.
 
 #### EuclideanRings
 
-Spire supports euclidean domains (called `EuclideanRing[A]`). A euclidean
-domain is a commutative ring (`CRing[A]`) that also supports euclidean
-division (e.g. floor division or integer division). This structure generalizes
-many useful properties of the integers (for instance, quotients and
-remainders, and greatest common divisors).
+Spire supports euclidean domains (called `EuclideanRing[A]`). A
+euclidean domain is a commutative ring (`CRing[A]`) that also supports
+euclidean division (e.g. floor division or integer division). This
+structure generalizes many useful properties of the integers (for
+instance, quotients and remainders, and greatest common divisors).
 
-Formally, euclidean domains have a *euclidean function* f such that for any
-`x` and `y` in `A`, if `y` is nonzero, then there are `q` and `r` (quotient
-and remainder) such that `a = b*q + r` and `r = 0` or `f(r) < f(b)`.
+Formally, euclidean domains have a *euclidean function* f such that
+for any `x` and `y` in `A`, if `y` is nonzero, then there are `q` and
+`r` (quotient and remainder) such that `a = b*q + r` and `r = 0` or
+`f(r) < f(b)`. For integers, `f` is usually the absolute value
+function.
 
 Spire's `EuclideanRing[A]` supports the following operations:
 
@@ -303,19 +313,79 @@ Spire requires that `b * (a /~ b) + (a % b)` is equivalent to `a`.
 #### Fields
 
 Fields are commutative rings with commutative multiplication and
-multiplicative inverses for all non-zero elements. Fields generalize how most
-people think about real numbers.
+multiplicative inverses for all non-zero elements. Fields generalize
+how most people think about rational numbers.
 
 Spire's `Field[A]` supports the following operations:
 
  * `div` (`a / b`) divide `a` by `b`.
  * `reciprocal` (`a.reciprocal`) the multiplicative inverse of `a`, i.e. `one/a`.
 
+Even though fields sit at the top of the ring hierarchy, there are
+many operations which are not provided by fields:
+
+ * equality and ordering (provided by `Eq[A]` and `Order[A]`).
+ * square root, and other roots (provided by `NRoot[A]`).
+ * sine, cosine, and trigonometric functions (provided by `Trig[A]`).
+
+#### Irrational and Transcendental type classes
+
+Spire supports square roots and fractional powers via
+`NRoot[A]`. There are three basic methods available:
+
+ * `sqrt` (`a.sqrt`) finds the square root of `a`
+ * `nroot` (`(a nroot k)`) finds the kth root of `a`
+ * `fpow` (`(a fpow b)`) takes `a` to the fractional power `b`
+
+Spire does not have any fractional types that can represent irrational
+roots exactly. This means that many laws we might like to write about
+roots will be weaker than we would like:
+
+ * `a.sqrt` = `(a nroot 2)` = `(a fpow 2)`
+ * if `A` can represent `1/k` exactly, then `(a nroot k)` = `(a fpow k.reciprocal)`
+ * if `(a nroot k)` is rational, then `(a nroot k).pow(k)` = `a`
+ 
+Approximate types like `Double` and `BigDecimal` have a built-in
+precision to which Spire can find roots. Exact types like `Rational`
+do not have `NRoot` instances defined by default, but instances can
+instantiated with user-provided precision.
+
+Similarly, Spire supports the Trigonometric functions via
+`Trig[A]`. The preceeding caveats about precision apply to these
+functions and values as well. The following methods are supported:
+
+  * `e` Euler's number
+  * `pi` Ratio of a circle's diameter to its circumfernce.
+
+  * `exp(a)` Raise `e` to `a`-th power.
+  * `expm1(a)` Equivalent to `exp(a) - 1` with less error.
+  * `log(a)` Find the natural logarithm of `a` (`r` such that `expr(r)` = `a`)
+  * `log1p(a)` Equivalent to `log(1 + a)` but with less error.
+
+  * `sin(a)` Sine: the y-coordinate of the unit circle.
+  * `cos(a)` Cosine: the x-coordinate of the unit circle.
+  * `tan(a)` Tangent: equivalent to `sin(a) / cos(a)`.
+
+  * `asin(a)` inverse sine function, `asin(sin(a))` = `a`.
+  * `acos(a)` inverse cosine function, `acos(cos(a))` = `a`.
+  * `atan(a)` inverse tangent function, `atan(tan(a))` = `a`.
+  * `atan2(y, x)` like `atan` but returns results in `(0, 2pi)`.
+
+  * `sinh(x)` hyperbolic sine, y-coordinate of the unit hyperbola.
+  * `cosh(x)` hyperbolic cosine, x-coordinate of the unit hyperbola.
+  * `tanh(x)` hyperbolic tangent, `sinh(a) / cosh(a)`.
+
+  * `toRadians(a)` convert degrees (e.g. `180`) to pi-radians (e.g. `pi`)
+  * `toDegrees(a)` convert pi-radians (e.g. `pi/2`) to degrees (e.g. `90`).
+
+Spire is able to calculate trigonometric values (like pi) and
+functions (like sine) to arbitrary precision when using
+`BigDecimal`. Unlike with `NRoot`, there is no support for creating
+`Trig[Rational]` instances with arbitrary precision (although an
+instance with `Double` precision can be found in
+`spire.optional.rationalTrig`).
+
 #### Modules, VectorSpaces, &co
-
-TODO
-
-#### Everything else
 
 TODO
 
