@@ -347,4 +347,9 @@ final class BitStringOps[A](lhs: A)(implicit ev: BitString[A]) {
   def lowestOneBit(): A = macro Ops.unop[A]
   def numberOfLeadingZeros(): Int = macro Ops.unop[Int]
   def numberOfTrailingZeros(): Int = macro Ops.unop[Int]
+
+  def toHexString(): String = macro Ops.unop[String]
+
+  def rotateLeft(rhs: Int): A = macro Ops.binop[Int, A]
+  def rotateRight(rhs: Int): A = macro Ops.binop[Int, A]
 }

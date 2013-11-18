@@ -195,6 +195,22 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     }
   }
 
+  def gcdTest(x: Polynomial[Rational], y: Polynomial[Rational]) {
+    if (!x.isZero || !y.isZero) {
+      val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
+      if (!gcd.isZero) {
+        (x % gcd) should be === 0
+        (y % gcd) should be === 0
+      }
+    }
+  }
+
+  property("test gcd regression") {
+    val x = poly"(3/37x^9 - 85x^7 - 71/4x^6 + 27/25x)"
+    val y = poly"(17/9x^8 - 1/78x^6)"
+    gcdTest(x.toDense, y.toDense)
+  }
+
   property("x % gcd(x, y) == 0 && y % gcd(x, y) == 0") {
     implicit val arbPolynomial: Arbitrary[Polynomial[Rational]] = Arbitrary(for {
       ts <- Gen.listOf(for {
@@ -206,13 +222,7 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     })
 
     forAll { (x: Polynomial[Rational], y: Polynomial[Rational]) =>
-      if (!x.isZero || !y.isZero) {
-        val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
-        if (!gcd.isZero) {
-          (x % gcd) should be === 0
-          (y % gcd) should be === 0
-        }
-      }
+      gcdTest(x, y)
     }
   }
 }

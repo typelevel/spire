@@ -91,21 +91,21 @@ final class ArrayOps[@spec A](arr: Array[A]) {
   }
 
   def qmin(implicit ev: Order[A]) = {
-    if (arr.length == 0) sys.error("empty array")
+    if (arr.length == 0) throw new UnsupportedOperationException("empty array")
     @tailrec
     def f(i: Int, n: Int, t: A): A = if (i < n) f(i + 1, n, ev.min(t, arr(i))) else t
     f(1, arr.length, arr(0))
   }
 
   def qmax(implicit ev: Order[A]) = {
-    if (arr.length == 0) sys.error("empty array")
+    if (arr.length == 0) throw new UnsupportedOperationException("empty array")
     @tailrec
     def f(i: Int, n: Int, t: A): A = if (i < n) f(i + 1, n, ev.max(t, arr(i))) else t
     f(1, arr.length, arr(0))
   }
 
   def qmean(implicit ev: Field[A]): A = {
-    if (arr.length == 0) sys.error("empty array")
+    if (arr.length == 0) throw new UnsupportedOperationException("empty array")
     var sum = ev.zero
     @tailrec
     def f(i: Int, j: Int, n: Int): A = if (i < n) {
@@ -209,21 +209,21 @@ final class SeqOps[@spec A, CC[A] <: Iterable[A]](as: CC[A]) {
   }
 
   def qmin(implicit ev: Order[A]) = {
-    if (as.isEmpty) sys.error("empty seq")
+    if (as.isEmpty) throw new UnsupportedOperationException("empty seq")
     var min = as.head
     as.foreach(a => min = ev.min(min, a))
     min
   }
 
   def qmax(implicit ev: Order[A]) = {
-    if (as.isEmpty) sys.error("empty seq")
+    if (as.isEmpty) throw new UnsupportedOperationException("empty seq")
     var max = as.head
     as.foreach(a => max = ev.max(max, a))
     max
   }
 
   def qmean(implicit ev: Field[A]): A = {
-    if (as.isEmpty) sys.error("empty seq")
+    if (as.isEmpty) throw new UnsupportedOperationException("empty seq")
     var mean = ev.zero
     var i = 0
     var j = 1
@@ -285,6 +285,19 @@ final class SeqOps[@spec A, CC[A] <: Iterable[A]](as: CC[A]) {
     val (len, arr) = toSizeAndArray
     Selection.select(arr, k)
     fromSizeAndArray(len, arr)
+  }
+
+  def qselectk(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+    val (len, arr) = toSizeAndArray
+    Selection.select(arr, k)
+    fromSizeAndArray(k, arr)
+  }
+
+  def qtopk(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+    val (len, arr) = toSizeAndArray
+    Selection.select(arr, k)
+    QuickSort.qsort(arr, 0, k)
+    fromSizeAndArray(k, arr)
   }
 
   import spire.random.mutable.Generator

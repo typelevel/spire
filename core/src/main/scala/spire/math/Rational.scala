@@ -21,7 +21,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def isWhole: Boolean
 
   // ugh, ScalaNumber and ScalaNumericConversions in 2.10 require this hack
-  override def underlying: List[Any] = sys.error("unimplemented")
+  override def underlying: List[Any] = 
+    throw new UnsupportedOperationException("unimplemented")
 
   def abs: Rational = if (this < Rational.zero) -this else this
   def inverse: Rational = Rational.one / this
@@ -636,6 +637,7 @@ private[math] object LongRationals extends Rationals[Long] {
 
     def /(r: Rational): Rational = {
       if (r == Rational.zero) throw new ArithmeticException("divide (/) by 0")
+      if (this == Rational.zero) return this
       r match {
         case r: LongRationals.LongRational => {
           val a = spire.math.gcd(n, r.n)
