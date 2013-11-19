@@ -160,6 +160,7 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
       Quaternion(zero, r.abs.sqrt, zero, zero)
     }
 
+
   def nroot(k0: Int): Quaternion[A] =
     if (k0 <= 0) {
       sys.error(s"illegal root: $k0")
@@ -171,12 +172,10 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
       val n = norm
       val t = acos(r / n)
       (Quaternion(cos(t / k0)) + v * sin(t / k0)) * n.nroot(k0)
-    } else if (r >= 0) {
+    } else if (r.signum >= 0) {
       Quaternion(r.nroot(k0))
-    } else if ((k0 & 1) == 1) {
-      Quaternion(-r.abs.nroot(k0))
     } else {
-      Quaternion(zero, r.abs.nroot(k0), zero, zero)
+      Quaternion(Complex(r).nroot(k0))
     }
 
   def unit: Quaternion[A] =

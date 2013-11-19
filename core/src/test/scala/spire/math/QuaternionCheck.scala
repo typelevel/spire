@@ -134,15 +134,12 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     }
   }
 
-  // unfortunately nroot(k) and fpow(1/k) produce different
-  // roots often enough that we can't rely on this test passing.
-
-  // property("q.fpow(1/k) = q.nroot(k)") {
-  //   forAll { (q: H, k0: Int) =>
-  //     val k = (k0 % 10).abs + 1
-  //     (q.nroot(k) - q.fpow(1.0/k)).norm should be < 1e-6
-  //   }
-  // }
+  property("q.fpow(1/k) = q.nroot(k)") {
+    forAll { (q: H, k0: Int) =>
+      val k = (k0 % 10).abs + 1
+      (q.nroot(k) - q.fpow(1.0/k)).norm should be < 1e-6
+    }
+  }
 
   property("q.fpow(1/k).fpow(k) = q") {
     forAll { (q: H, k0: Double) =>
