@@ -200,6 +200,16 @@ trait Polynomial[@spec(Double) C] { lhs =>
   /** Evaluate the polynomial at `x`. */
   def apply(x: C)(implicit r: Semiring[C]): C
 
+  /** Compose this polynomial with another. */
+  def compose(y: Polynomial[C])(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = {
+    var polynomial: Polynomial[C] = Polynomial.zero[C]
+    foreachNonZero { (e, c) =>
+      val z: Polynomial[C] = y.pow(e) :* c
+      polynomial = polynomial + z
+    }
+    polynomial
+  }
+
   /**
    * Returns this polynomial as a monic polynomial, where the leading
    * coefficient (ie. `maxOrderTermCoeff`) is 1.
@@ -218,6 +228,24 @@ trait Polynomial[@spec(Double) C] { lhs =>
   def /~(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = (lhs /% rhs)._1
   def /%(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): (Polynomial[C], Polynomial[C])
   def %(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = (lhs /% rhs)._2
+
+  def pow(k: Int)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = {
+    def loop(b: Polynomial[C], k: Int, extra: Polynomial[C]): Polynomial[C] =
+      if (k == 1)
+        b * extra
+      else
+        loop(b * b, k >>> 1, if ((k & 1) == 1) b * extra else extra)
+
+    if (k < 0) {
+      throw new IllegalArgumentException("negative exponent")
+    } else if (k == 0) {
+      Polynomial.one[C]
+    } else if (k == 1) {
+      this
+    } else {
+      loop(this, k - 1, this)
+    }
+  }
 
   // VectorSpace ops.
 
