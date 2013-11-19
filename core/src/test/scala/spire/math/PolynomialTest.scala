@@ -83,7 +83,7 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     runTest[A](s"$typ/sparse")
   }
 
-  def runTest[A: Eq: Field: ClassTag](name: String)(implicit arb: Arbitrary[Polynomial[A]]) {
+  def runTest[A: Eq: Field: ClassTag](name: String)(implicit arb: Arbitrary[Polynomial[A]], arb2: Arbitrary[A]) {
     type P = Polynomial[A]
 
     val zero = Polynomial.zero[A]
@@ -131,6 +131,17 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
     property(s"$name (x /~ y) * y + (x % y) = x") {
       forAll { (x: P, y: P) => if (!y.isZero) (x /~ y) * y + (x % y) should be === x }
+    }
+  }
+
+  property("(x compose y)(z) == x(y(z))") {
+    forAll { (rs1: List[Rational], rs2: List[Rational], r: Rational) =>
+      def xyz(rs: List[Rational]): Polynomial[Rational] =
+        Polynomial(rs.take(4).zipWithIndex.map { case (c, e) => Term(c, e) })
+
+      val (p1, p2) = (xyz(rs1), xyz(rs2))
+      val p3 = p1 compose p2
+      p3(r) should be === p1(p2(r))
     }
   }
 
