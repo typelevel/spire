@@ -435,6 +435,13 @@ class MatrixBlock(private val a:MatrixLike,
    * This implements MatrixLike abstract method.
    */
   def apply(k:Int) = this(k%m, k/m)
+
+  override
+  def block(firstRow:Int = 0, endRow:Int = End)
+           (firstColumn:Int = 0, endColumn:Int = End) =
+    new MatrixBlock(a,
+                    i0 + firstRow, i0 + endRow,
+                    j0 + firstColumn, j0 + endColumn)
 }
 
 
