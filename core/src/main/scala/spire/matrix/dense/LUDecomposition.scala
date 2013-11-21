@@ -80,6 +80,37 @@ extends BLAS.Level1 with BLAS.Level2 with BLAS.Level3 {
     plu
   }
 
+  /**
+   * Solve a system of linear equation
+   *
+   * The system of equations read in matrix form
+   *
+   *  1. A X = B  or
+   *  2. A^T^ X = B
+   *
+   * The matrix A shall be square and B is overwritten by X.
+   *
+   * Reference: DGETRS from [1]
+   */
+  def solve(trans:Transposition.Value, b:Matrix) {
+    require(lu.isSquare)
+    if(trans == NoTranspose)
+      require(lu.dimensions._1 == b.dimensions._1)
+    else
+      require(lu.dimensions._2 == b.dimensions._1)
+
+    if(trans == NoTranspose) {
+      p.permute_rows(b)
+      trsm(fromLeft, Lower, NoTranspose, UnitDiagonal, 1.0, lu, b)
+      trsm(fromLeft, Upper, NoTranspose, NonUnitDiagonal, 1.0, lu, b)
+    }
+    else {
+      trsm(fromLeft, Upper, Transpose, NonUnitDiagonal, 1.0, lu, b)
+      trsm(fromLeft, Lower, Transpose, NonUnitDiagonal, 1.0, lu, b)
+      p.inverse.permute_rows(b)
+    }
+  }
+
   override def toString =
     s"""|L\\U=$lu
         |
