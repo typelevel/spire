@@ -487,7 +487,7 @@ class LinearSystemTestMatrices(
   excludedTypes:Set[Int] = Set(),
   includedTypes:Set[Int] = (1 to 11).toSet)
   (implicit gen:Defaults.IntegerGenerator)
-extends TestDimensions with NumericPropertiesOfDouble
+extends TestDimensions(nonSpecialDimensions) with NumericPropertiesOfDouble
 {
   val types = includedTypes -- excludedTypes
 
