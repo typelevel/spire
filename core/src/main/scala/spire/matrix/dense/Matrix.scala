@@ -9,6 +9,7 @@ package spire.matrix.dense
 import spire.implicits._
 import spire.math.Complex
 import spire.matrix.Constants._
+import spire.matrix.Transposition
 import scala.collection.mutable
 import scala.math
 
@@ -556,6 +557,27 @@ extends MatrixLike {
     val hd = HessenbergDecomposition.withUnblockedAlgorithm(a)()
     val sd = SchurDecomposition(a, None, fullSchurFormWanted=false)()()
     for((a, b) <- sd.eigenvalues) yield Complex(a, b)
+  }
+
+  /**
+   * Solve a system of equations
+   *
+   * It solves the equations A x,,j,, = b,,j,, for 0 <= j < p where A is this
+   * matrix and b,,j,, is the j-th column of the matrix B, i.e. this actually
+   * solves the equation A X = B for the matrix X.
+   *
+   * @overwriteB specifies whether B is overwritten by X, in which case
+   *             the returned value is the same object as B
+   * @overwriteA specifies whether A shall be overwritten in the process of
+   *             solving the equations
+   */
+  def solve(b:Matrix,
+            overwriteA:Boolean = false, overwriteB:Boolean = false) = {
+    val a = if(overwriteA) this else copyToMatrix
+    val lu = LU.RecursiveDecompositionConstructionWithNaiveBLAS(a)
+    val x = if(overwriteB) b else b.copyToMatrix
+    lu.solve(Transposition.NoTranspose, x)
+    x
   }
 
 }
