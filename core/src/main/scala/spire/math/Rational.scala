@@ -282,7 +282,8 @@ object Rational extends RationalInstances {
   val one: Rational = LongRational(1L, 1L)
   
   def apply(n: SafeLong, d: SafeLong): Rational = {
-    n.foldWith[Rational,LongRational,BigRational](d)(LongRational(_, _), BigRational(_, _))
+    val g = n gcd d
+    (n / g).foldWith[Rational,LongRational,BigRational](d / g)(LongRational(_, _), BigRational(_, _))
   }
 
   def apply(n: Long, d: Long): Rational = LongRationals.build(n, d)
@@ -495,6 +496,8 @@ private[math] object LongRationals extends Rationals[Long] {
   }
 
   def unsafeBuild(n: Long, d: Long): Rational = {
+    if (n == 0L) return Rational.zero
+
     val divisor = spire.math.gcd(n, d)
     if (divisor == 1L) {
       if (d < 0)
@@ -724,6 +727,8 @@ private[math] object BigRationals extends Rationals[BigInt] {
   }
 
   def unsafeBuild(n: BigInt, d:BigInt): Rational = {
+    if (n == 0) return Rational.zero
+
     val gcd = n.gcd(d)
     if (gcd == 1) {
       if (d < 0)
