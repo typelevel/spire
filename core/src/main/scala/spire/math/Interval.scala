@@ -350,9 +350,17 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
           if (lcz && rcz) {
             fromTpl(minTpl(lu, ul), maxTpl(ll, uu))
           } else if (lcz) {
-            fromTpl(minTpl(ll, lu), maxTpl(ul, uu))
+            if (rhs.isAtOrAbove(z)) {
+              fromTpl(lu, uu)
+            } else {
+              fromTpl(ul, ll)
+            }
           } else if (rcz) {
-            fromTpl(minTpl(ll, ul), maxTpl(lu, uu))
+            if (lhs.isAtOrAbove(z)) {
+              fromTpl(ul, uu)
+            } else {
+              fromTpl(lu, ll)
+            }
           } else if (lhs.isAtOrBelow(z) == rhs.isAtOrBelow(z)) {
             fromTpl(minTpl(ll, uu), maxTpl(ll, uu))
           } else {
@@ -362,113 +370,137 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     }
   }
 
-  def reciprocal(implicit ev: Field[A]): Interval[A] =
-    Interval.point(ev.one) / this
-
-  def /(rhs: Interval[A])(implicit ev: Field[A]): Interval[A] = {
+  def reciprocal(implicit ev: Field[A]): Interval[A] = {
     val z = ev.zero
-    def err = throw new java.lang.ArithmeticException("/ by zero")
-    rhs match {
-      case All() => err
-      case Above(lower2, lf2) if (lower2 <= z) => err
-      case Below(upper2, uf2) if (z <= upper2) => err
-      case Ranged(lower2, upper2, flags2) if (lower2 <= z && z <= upper2) => err
+    def error = throw new java.lang.ArithmeticException("/ by zero")
+    if (contains(z)) return error
 
-      case Above(lower2, lf2) => lhs match {
-        case All() =>
-          lhs
-        case Above(lower1, lf1) =>
-          Interval.above(z)
-        case Below(upper1, uf1) =>
-          Interval.below(z)
-        case Ranged(lower1, upper1, flags1) =>
-          if (lower1 < z) {
-            Ranged(lower1 / lower2, upper1 / lower2, flags1 | lf2 | lowerFlagToUpper(lf2))
-          } else {
-            Ranged(z, upper1 / lower2, 1 | upperFlag(flags1) | lowerFlagToUpper(lf2))
-          }
-      }
+    this match {
+      case All() =>
+        error
 
-      case Below(upper2, uf2) => lhs match {
-        case All() =>
-          lhs
-        case Above(lower1, lf1) =>
-          Interval.below(z)
-        case Below(upper1, uf1) =>
-          Interval.above(z)
-        case Ranged(lower1, upper1, flags1) =>
-          if (lower1 < z) {
-            Ranged(upper1 / upper2, lower1 / upper2, swapFlags(flags1) | uf2 | upperFlagToLower(uf2))
-          } else {
-            Ranged(z, lower1 / upper2, 2 | lowerFlagToUpper(flags1) | uf2)
-          }
-      }
+      case Above(lower, lf) =>
+        if (lower === z) this
+        else Ranged(z, lower.reciprocal, 1 | lowerFlagToUpper(lf))
 
-      case Ranged(lower2, upper2, flags2) =>
-        if (lower2 > z) {
-          // positive denominator
-          lhs match {
-            case All() =>
-              lhs
-            case Above(lower1, lf1) =>
-              if (lower1 >= z) {
-                Above(lower1 / upper2, lf1 | upperFlagToLower(flags2))
-              } else {
-                Above(lower1 / lower2, lf1 | lowerFlag(flags2))
-              }
-            case Below(upper1, uf1) =>
-              if (upper1 > z) {
-                Below(upper1 / lower2, uf1 | lowerFlagToUpper(flags2))
-              } else {
-                Below(upper1 / upper2, uf1 | upperFlag(flags2))
-              }
-            case Ranged(lower1, upper1, flags1) =>
-              if (lower1 >= z) {
-                // positive / positive
-                Ranged(lower1 / upper2, upper1 / lower2, flags1 | swapFlags(flags2))
-              } else if (upper1 > z) {
-                // both / positive
-                Ranged(lower1 / lower2, upper1 / lower2, flags1 | lowerFlag(flags2) | lowerFlagToUpper(flags2))
-              } else {
-                // negative / positive
-                Ranged(lower1 / lower2, upper1 / upper2, flags1 | flags2)
-              }
-          }
-        } else {
-          // negative denominator, since denominator interval can't cross zero
-          lhs match {
-            case All() =>
-              lhs
+      case Below(upper, uf) =>
+        if (upper === z) this
+        else Ranged(upper.reciprocal, z, 2 | upperFlagToLower(uf))
 
-            case Above(lower1, lf1) =>
-              val uf1x = lowerFlagToUpper(lf1)
-              if (lower1 > z)
-                Below(lower1 / upper2, uf1x | upperFlag(flags2))
-              else
-                Below(lower1 / lower2, uf1x | lowerFlagToUpper(flags2))
-
-            case Below(upper1, uf1) =>
-              val lf1x = upperFlagToLower(uf1)
-              if (upper1 > z)
-                Above(upper1 / upper2, lf1x | upperFlagToLower(flags2))
-              else
-                Above(upper1 / lower2, lf1x | lowerFlag(flags2))
-
-            case Ranged(lower1, upper1, flags1) =>
-              if (lower1 >= z) {
-                // positive / negative [0,a,b] / [c,d,0] = [b/d,a/c,0]
-                Ranged(upper1 / upper2, lower1 / lower2, swapFlags(flags1 | flags2))
-              } else if (upper1 > z) {
-                // both / negative [a,0,b] / [c,d,0] = [b/d,0,a/d]
-                Ranged(upper1 / upper2, lower1 / upper2, swapFlags(flags1) | lowerFlag(flags2) | lowerFlagToUpper(flags2))
-              } else {
-                // negative / negative [a,b,0] / [c,d,0] = [0,b/c,a/d]
-                Ranged(upper1 / lower2, lower1 / upper2, swapFlags(flags1) | flags2)
-              }
-          }
-        }
+      case Ranged(lower, upper, flags) =>
+        if (lower === z) Above(upper.reciprocal, upperFlagToLower(flags))
+        else if (upper === z) Below(lower.reciprocal, lowerFlagToUpper(flags))
+        else Ranged(upper.reciprocal, lower.reciprocal, swapFlags(flags))
     }
   }
+
+  def /(rhs: Interval[A])(implicit ev: Field[A]): Interval[A] =
+    lhs * rhs.reciprocal
+
+  // def /(rhs: Interval[A])(implicit ev: Field[A]): Interval[A] = {
+  //   val z = ev.zero
+  //   def err = throw new java.lang.ArithmeticException("/ by zero")
+  //   rhs match {
+  //     case All() => err
+  //     case Above(lower2, lf2) if (lower2 <= z) => err
+  //     case Below(upper2, uf2) if (z <= upper2) => err
+  //     case Ranged(lower2, upper2, flags2) if (lower2 <= z && z <= upper2) => err
+  // 
+  //     case Above(lower2, lf2) => lhs match {
+  //       case All() =>
+  //         lhs
+  //       case Above(lower1, lf1) =>
+  //         Interval.above(z)
+  //       case Below(upper1, uf1) =>
+  //         Interval.below(z)
+  //       case Ranged(lower1, upper1, flags1) =>
+  //         if (lower1 < z) {
+  //           Ranged(lower1 / lower2, upper1 / lower2, flags1 | lf2 | lowerFlagToUpper(lf2))
+  //         } else {
+  //           Ranged(z, upper1 / lower2, 1 | upperFlag(flags1) | lowerFlagToUpper(lf2))
+  //         }
+  //     }
+  // 
+  //     case Below(upper2, uf2) => lhs match {
+  //       case All() =>
+  //         lhs
+  //       case Above(lower1, lf1) =>
+  //         Interval.below(z)
+  //       case Below(upper1, uf1) =>
+  //         Interval.above(z)
+  //       case Ranged(lower1, upper1, flags1) =>
+  //         if (lower1 < z) {
+  //           Ranged(upper1 / upper2, lower1 / upper2, swapFlags(flags1) | uf2 | upperFlagToLower(uf2))
+  //         } else {
+  //           Ranged(z, lower1 / upper2, 2 | lowerFlagToUpper(flags1) | uf2)
+  //         }
+  //     }
+  // 
+  //     case Ranged(lower2, upper2, flags2) =>
+  //       if (lower2 > z) {
+  //         // positive denominator
+  //         lhs match {
+  //           case All() =>
+  //             lhs
+  //           case Above(lower1, lf1) =>
+  //             if (lower1 >= z) {
+  //               Above(lower1 / upper2, lf1 | upperFlagToLower(flags2))
+  //             } else {
+  //               Above(lower1 / lower2, lf1 | lowerFlag(flags2))
+  //             }
+  //           case Below(upper1, uf1) =>
+  //             if (upper1 > z) {
+  //               Below(upper1 / lower2, uf1 | lowerFlagToUpper(flags2))
+  //             } else {
+  //               Below(upper1 / upper2, uf1 | upperFlag(flags2))
+  //             }
+  //           case Ranged(lower1, upper1, flags1) =>
+  //             if (lower1 >= z) {
+  //               // positive / positive
+  //               Ranged(lower1 / upper2, upper1 / lower2, flags1 | swapFlags(flags2))
+  //             } else if (upper1 > z) {
+  //               // both / positive
+  //               Ranged(lower1 / lower2, upper1 / lower2, flags1 | lowerFlag(flags2) | lowerFlagToUpper(flags2))
+  //             } else {
+  //               // negative / positive
+  //               Ranged(lower1 / lower2, upper1 / upper2, flags1 | flags2)
+  //             }
+  //         }
+  //       } else {
+  //         // negative denominator, since denominator interval can't cross zero
+  //         lhs match {
+  //           case All() =>
+  //             lhs
+  // 
+  //           case Above(lower1, lf1) =>
+  //             val uf1x = lowerFlagToUpper(lf1)
+  //             if (lower1 > z)
+  //               Below(lower1 / upper2, uf1x | upperFlag(flags2))
+  //             else
+  //               Below(lower1 / lower2, uf1x | lowerFlagToUpper(flags2))
+  // 
+  //           case Below(upper1, uf1) =>
+  //             val lf1x = upperFlagToLower(uf1)
+  //             if (upper1 > z)
+  //               Above(upper1 / upper2, lf1x | upperFlagToLower(flags2))
+  //             else
+  //               Above(upper1 / lower2, lf1x | lowerFlag(flags2))
+  // 
+  //           case Ranged(lower1, upper1, flags1) =>
+  //             if (lower1 >= z) {
+  //               // positive / negative [0,a,b] / [c,d,0] = [b/d,a/c,0]
+  //               Ranged(upper1 / upper2, lower1 / lower2, swapFlags(flags1 | flags2))
+  //             } else if (upper1 > z) {
+  //               // both / negative [a,0,b] / [c,d,0] = [b/d,0,a/d]
+  //               Ranged(upper1 / upper2, lower1 / upper2, swapFlags(flags1) | lowerFlag(flags2) | lowerFlagToUpper(flags2))
+  //             } else {
+  //               // negative / negative [a,b,0] / [c,d,0] = [0,b/c,a/d]
+  //               Ranged(upper1 / lower2, lower1 / upper2, swapFlags(flags1) | flags2)
+  //             }
+  //         }
+  //       }
+  //   }
+  // }
 
   def +(rhs: A)(implicit ev: AdditiveSemigroup[A]): Interval[A] =
     this match {
