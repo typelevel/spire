@@ -362,6 +362,9 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     }
   }
 
+  def reciprocal(implicit ev: Field[A]): Interval[A] =
+    Interval.point(ev.one) / this
+
   def /(rhs: Interval[A])(implicit ev: Field[A]): Interval[A] = {
     val z = ev.zero
     def err = throw new java.lang.ArithmeticException("/ by zero")
@@ -504,6 +507,24 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
         case All() => this
       }
     }
+
+  def pow(k: Int)(implicit r: Ring[A]): Interval[A] = {
+    def loop(b: Interval[A], k: Int, extra: Interval[A]): Interval[A] =
+      if (k == 1)
+        b * extra
+      else
+        loop(b * b, k >>> 1, if ((k & 1) == 1) b * extra else extra)
+
+    if (k < 0) {
+      throw new IllegalArgumentException(s"negative exponent: $k")
+    } else if (k == 0) {
+      Interval.point(r.one)
+    } else if (k == 1) {
+      this
+    } else {
+      loop(this, k - 1, this)
+    }
+  }
 
   def top(epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] = this match {
     case Below(upper, uf) =>
