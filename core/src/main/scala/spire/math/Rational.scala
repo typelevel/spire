@@ -8,7 +8,7 @@ import java.lang.Math
 import spire.algebra._
 import spire.algebra.Sign.{ Positive, Zero, Negative }
 
-sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] {
+sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] { lhs =>
   import LongRationals.LongRational
   import BigRationals.BigRational
 
@@ -183,6 +183,12 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def sign: Sign = Sign(signum)
 
   def compareToOne: Int
+
+  def min(rhs: Rational): Rational =
+    if ((lhs compare rhs) < 0) lhs else rhs
+
+  def max(rhs: Rational): Rational =
+    if ((lhs compare rhs) > 0) lhs else rhs
 
   /**
    * Returns a `Rational` whose numerator and denominator both fit in an `Int`.
