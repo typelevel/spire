@@ -77,7 +77,8 @@ class RealDecomposition(val h:Matrix, val q:Option[Matrix],
    *   - if the i-th and (i+1)-th eigenvalues are a complex conjugate pair, then
    *     they are the eigenvalues of the block T(i:i+2, i:i+2).
    */
-  val eigenvalues = new Array[(Double, Double)](n)
+  val eigenRe = Vector.empty(n)
+  val eigenIm = Vector.empty(n)
 }
 
 trait RealDecompositionCompanion {
@@ -159,7 +160,8 @@ with BLAS.NaiveLevel1
   // ========== Construction ==========
 
   if(iLo == iHi-1) {
-    eigenvalues(iLo) = (h(iLo, iLo), 0)
+    eigenRe(iLo) = h(iLo, iLo)
+    eigenIm(iLo) = 0.0
   }
   else {
     // Zero the 2nd and 3rd subdiagonal so that further computations, that
@@ -198,7 +200,10 @@ with BLAS.NaiveLevel1
       }
 
       // Extract eigenvalues of split-off block, 1x1 or 2x2
-      if(l == i-1) eigenvalues(i-1) = (h(i-1, i-1), 0)
+      if(l == i-1) {
+        eigenRe(i-1) = h(i-1, i-1)
+        eigenIm(i-1) = 0.0
+      }
       else if(l == i-2) perform2x2SchurDecomposition(i)
 
       // Iterate with new value of i
@@ -345,11 +350,8 @@ with BLAS.NaiveLevel1
   }
 
   private def perform2x2SchurDecomposition(i:Int) {
-    val d2x2 = Decomposition2x2(h(i-2 ,i-2), h(i-2, i-1),
-                                h(i-1 ,i-2), h(i-1, i-1))
-    eigenvalues(i-2) = d2x2.eigenvalues._1
-    eigenvalues(i-1) = d2x2.eigenvalues._2
-    h.block(i-2, i)(i-2, i) := d2x2.schurForm
+    val d2x2 = Decomposition2x2(i-2, h)
+    d2x2.storeEigenvalues(eigenRe, eigenIm)
     if(fullSchurFormWanted) {
       if(i < n) rot(h.row(i-2).block(i, n),
                     h.row(i-1).block(i, n),
@@ -399,6 +401,8 @@ extends RealDecompositionCompanion {
  *             [ sn  cn ]
  * </pre>
  *
+ * T is actually the block H(i:i+2, i:i+2) of some matrix H
+ *
  * References:
  *
  * [1] LAPACK Users' Guide.
@@ -409,22 +413,30 @@ extends RealDecompositionCompanion {
  *     Philadelphia, PA, Third.
  *
  */
-final class Decomposition2x2(val r: PlaneRotation)
-                            (val a:Double, val b:Double,
-                             val c:Double, val d:Double)
+final class Decomposition2x2(val i:Int, h:MatrixLike,
+                             val r:PlaneRotation)
 {
-  /**
-   * Eigenvalues (eigen1Im >= 0)
-   */
-  val eigenvalues: ((Double, Double), (Double, Double)) =
+  // Compute eigenvalues
+  val eigenvalues: ((Double, Double), (Double, Double)) = {
+    val (a, b,
+         c, d) = (h(i  ,i), h(i  ,i+1),
+                  h(i+1,i), h(i+1,i+1))
     if(c == 0) ((a, 0), (d, 0))
     else {
       val im = sqrt(abs(b))*sqrt(abs(c))
       ((a, im), (d, -im))
     }
+  }
 
-  def schurForm = (a, b,
-                   c, d)
+  def schurForm = (h(i  ,i), h(i  ,i+1),
+                   h(i+1,i), h(i+1,i+1))
+
+  def storeEigenvalues(eigenRe:VectorLike, eigenIm:VectorLike) {
+    eigenRe(i) = eigenvalues._1._1
+    eigenIm(i) = eigenvalues._1._2
+    eigenRe(i+1) = eigenvalues._2._1
+    eigenIm(i+1) = eigenvalues._2._2
+  }
 }
 
 object Decomposition2x2
@@ -433,6 +445,13 @@ extends NumericPropertiesOfDouble with EuclideanNorm
   val eps = precision
 
   val tinyThreshold = 4*eps
+
+  def set(i:Int, h:MatrixLike)(a:Double, b:Double,
+                               c:Double, d:Double) {
+      h(i  ,i) = a ; h(i  ,i+1) = b
+      h(i+1,i) = c ; h(i+1,i+1) = d
+
+  }
 
   /**
    * Schur decomposition of the matrix
@@ -450,18 +469,23 @@ extends NumericPropertiesOfDouble with EuclideanNorm
    *     Society for Industrial and Applied Mathematics,
    *     Philadelphia, PA, Third.
    */
-  def apply(a:Double, b:Double,
-            c:Double, d:Double): Decomposition2x2 = {
+  def apply(i:Int, h:MatrixLike): Decomposition2x2 = {
+    val (a, b,
+         c, d) = (h(i  ,i), h(i  ,i+1),
+                  h(i+1,i), h(i+1,i+1))
     if(c == 0)
-      new Decomposition2x2(PlaneRotation.identity)(a, b,
-                                                   0, d)
+      new Decomposition2x2(i, h, PlaneRotation.identity)
 
-    else if(b == 0) // swap rows and columns
-      new Decomposition2x2(PlaneRotation.positiveQuarterRotation)(d, -c,
-                                                                  0,  a)
-    else if(a - d == 0 && signum(b) != signum(c)) // standard Schur form already
-        new Decomposition2x2(PlaneRotation.identity)(a, b,
-                                                     c, d)
+    else if(b == 0) {
+      // swap rows and columns
+      set(i, h)(d, -c,
+                0,  a)
+      new Decomposition2x2(i, h, PlaneRotation.positiveQuarterRotation)
+    }
+    else if(a - d == 0 && signum(b) != signum(c)) {
+      // standard Schur form already
+      new Decomposition2x2(i, h, PlaneRotation.identity)
+    }
     else {
       val t = a - d
       val p = 0.5*t
@@ -475,8 +499,9 @@ extends NumericPropertiesOfDouble with EuclideanNorm
         z = p + copySign(sqrt(s)*sqrt(z), p)
         val tau = euclideanNorm2D(c, z)
         val r = PlaneRotation(z/tau, c/tau)
-        new Decomposition2x2(r)(d + z, b - c,
-                                    0, d - (bcMax/z)*bcMis)
+        set(i, h)(d + z, b - c,
+                  0    , d - (bcMax/z)*bcMis)
+        new Decomposition2x2(i, h, r)
       }
       else {
         // Complex eigenvalues, or real almost equal eigenvalues
@@ -489,23 +514,32 @@ extends NumericPropertiesOfDouble with EuclideanNorm
              cc, dd) = r.inverse.applySimilarity((a, b,
                                                   c, d))
         val aORd = 0.5*(aa + dd)
-        if(cc == 0)
-          new Decomposition2x2(r)(aORd, bb,
-                                     0, aORd)
-        else if(bb == 0) // compose r with swapping of rows and columns
-          new Decomposition2x2(r.timesPositiveQuarterRotation)(aORd, -cc,
-                                                                  0,  aORd)
-        else if(signum(b) != signum(c)) // standard Schur form
-          new Decomposition2x2(r)(aORd, bb,
-                                    cc, aORd)
+        if(cc == 0) {
+          set(i, h)(aORd, bb,
+                    0   , aORd)
+          new Decomposition2x2(i, h, r)
+        }
+        else if(bb == 0) {
+          // compose r with swapping of rows and columns
+          set(i, h)(aORd, -cc,
+                    0   ,  aORd)
+          new Decomposition2x2(i, h, r.timesPositiveQuarterRotation)
+        }
+        else if(signum(b) != signum(c)) {
+          // standard Schur form
+          set(i, h)(aORd, bb,
+                    cc  , aORd)
+          new Decomposition2x2(i, h, r)
+        }
         else { // real eigenvalues: reduce to upper triangular form
           val sab = sqrt(abs(bb))
           val sac = sqrt(abs(cc))
           val p = copySign(sab*sac, cc)
           val tau = 1/sqrt(abs(bb+cc))
           val rr = PlaneRotation(sab*tau, sac*tau)
-          new Decomposition2x2(r*rr)(aORd + p, bb - cc,
-                                            0, aORd - p)
+          set(i, h)(aORd + p, bb - cc,
+                    0       , aORd - p)
+          new Decomposition2x2(i, h, r*rr)
         }
       }
     }

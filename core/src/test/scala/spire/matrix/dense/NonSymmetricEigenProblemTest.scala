@@ -143,9 +143,16 @@ extends FunSuite with ShouldMatchers with NumericPropertiesOfDouble
 {
   val eps = 2*precision
 
+  def decompose(a:Double, b:Double,
+                c:Double, d:Double): Schur.Decomposition2x2 = {
+    val h = Matrix(2,2)(a, b,
+                        c, d)
+    Schur.Decomposition2x2(0, h)
+  }
+
   test("Upper Triangular") {
-    val d = Schur.Decomposition2x2(1.0, -1.0,
-                                   0.0,  2.0)
+    val d = decompose(1.0, -1.0,
+                      0.0,  2.0)
     d.r  should be === PlaneRotation.identity
     d.schurForm  should be === (1.0, -1.0,
                                 0.0,  2.0)
@@ -153,8 +160,8 @@ extends FunSuite with ShouldMatchers with NumericPropertiesOfDouble
   }
 
   test("Lower Triangular") {
-    val d = Schur.Decomposition2x2(-1.0, 0.0,
-                                    4.0, 1.0)
+    val d = decompose(-1.0, 0.0,
+                      4.0, 1.0)
     d.r  should be === PlaneRotation.positiveQuarterRotation
     d.schurForm  should be === (1.0, -4.0,
                                 0.0, -1.0)
@@ -162,8 +169,8 @@ extends FunSuite with ShouldMatchers with NumericPropertiesOfDouble
   }
 
   test("Schur Form Already") {
-    val d = Schur.Decomposition2x2(1.0, -3.0,
-                                   3.0,  1.0)
+    val d = decompose(1.0, -3.0,
+                      3.0,  1.0)
     d.r  should be === PlaneRotation.identity
     d.schurForm  should be === (1.0, -3.0,
                                 3.0,  1.0)
@@ -175,8 +182,8 @@ extends FunSuite with ShouldMatchers with NumericPropertiesOfDouble
   }
 
   test("Complex conjugate eigenvalues") {
-    val sd = Schur.Decomposition2x2(1 + 3*sqrt(3)/4, 7.0/4,
-                                            -13.0/4, 1 - 3*sqrt(3)/4)
+    val sd = decompose(1 + 3*sqrt(3)/4, 7.0/4,
+                               -13.0/4, 1 - 3*sqrt(3)/4)
 
     toDegrees(sd.r.angle) should be (30.0 plusOrMinus toDegrees(eps))
 
@@ -196,8 +203,8 @@ extends FunSuite with ShouldMatchers with NumericPropertiesOfDouble
 
   test("Clearly distinct real eigenvalues") {
     val s3 = sqrt(3)
-    val sd = Schur.Decomposition2x2(( 3 - s3)/2, (1 + s3)/2,
-                                    (-3 + s3)/2, (5 + s3)/2)
+    val sd = decompose(( 3 - s3)/2, (1 + s3)/2,
+                       (-3 + s3)/2, (5 + s3)/2)
     toDegrees(sd.r.angle) should be (-165.0 plusOrMinus toDegrees(eps))
     val (a, b,
          c, d) = sd.schurForm
@@ -213,8 +220,8 @@ extends FunSuite with ShouldMatchers with NumericPropertiesOfDouble
     // conjugate case. This example therefore chooses carefully the coefficient
     // to avoid round-offs in the last representative digit.
     val s3 = sqrt(3)
-    val sd = Schur.Decomposition2x2(1.0 - s3/8,      1.0/8,
-                                        -3.0/8, 1.0 + s3/8)
+    val sd = decompose(1.0 - s3/8,      1.0/8,
+                           -3.0/8, 1.0 + s3/8)
     toDegrees(sd.r.angle) should be (60.0 plusOrMinus toDegrees(eps))
     val (a, b,
          c, d) = sd.schurForm
@@ -226,8 +233,8 @@ extends FunSuite with ShouldMatchers with NumericPropertiesOfDouble
 
   test("Nearly-degenerate real eigenvalues") {
     // This tests the very last "if" branch of Schur.Decomposition2x2.apply
-    val sd = Schur.Decomposition2x2(1     , 0.5,
-                                    1e-16 , 1   )
+    val sd = decompose(1     , 0.5,
+                       1e-16 , 1   )
     toDegrees(sd.r.angle) should be (
       8.1028468454139541e-7 plusOrMinus toDegrees(eps))
     val (a, b,

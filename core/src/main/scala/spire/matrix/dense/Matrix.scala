@@ -549,14 +549,17 @@ extends MatrixLike {
    * This option is provided to deal more efficiently with huge matrices.
    */
   def eigenvalues(inplace:Boolean=false):Array[Complex[Double]] = {
+    val n = dimensions._1
     val HessenbergDecomposition = Hessenberg.DecompositionWithNaiveBLAS
     val SchurDecomposition = Schur.RealDecompositionWithDoubleShiftQRAlgorithm
     implicit val work = new Scratchpad(
-      HessenbergDecomposition.unblockedMinimumScratchpad(dimensions._1))
+      HessenbergDecomposition.unblockedMinimumScratchpad(n))
     val a = if(inplace) this else copyToMatrix
     val hd = HessenbergDecomposition.withUnblockedAlgorithm(a)()
     val sd = SchurDecomposition(a, None, fullSchurFormWanted=false)()()
-    for((a, b) <- sd.eigenvalues) yield Complex(a, b)
+    val buf = new scala.collection.mutable.ArrayBuffer[Complex[Double]](n)
+    cforRange(0 until n) { i => buf += Complex(sd.eigenRe(i), sd.eigenIm(i))}
+    buf.toArray
   }
 
   /**
