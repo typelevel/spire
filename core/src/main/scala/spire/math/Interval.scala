@@ -171,7 +171,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       case 1 => (upper2, flags2)
     }
 
-  def mask(rhs: Interval[A]): Interval[A] = lhs match {
+  def mask(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] = lhs match {
     case All() => rhs
     case Below(upper1, flags1) => rhs match {
       case All() =>
@@ -214,7 +214,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       }
   }
 
-  def split(t: A): (Interval[A], Interval[A]) =
+  def split(t: A)(implicit r: AdditiveMonoid[A]): (Interval[A], Interval[A]) =
     (this mask Interval.below(t), this mask Interval.above(t))
 
   def splitAtZero(implicit ev: AdditiveMonoid[A]): (Interval[A], Interval[A]) =
@@ -290,7 +290,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   private[this] def maxTpl(t1: (A, Int), t2: (A, Int)): (A, Int) =
     if (t1._1 > t2._1) t1 else t2
 
-  private[this] def fromTpl(t1: (A, Int), t2: (A, Int)): Interval[A] =
+  private[this] def fromTpl(t1: (A, Int), t2: (A, Int))(implicit r: AdditiveMonoid[A]): Interval[A] =
     Interval.withFlags(t1._1, t2._1, lowerFlag(t1._2) | lowerFlagToUpper(t2._2))
 
   def *(rhs: Interval[A])(implicit ev: Semiring[A]): Interval[A] = {
@@ -361,7 +361,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
             } else {
               fromTpl(lu, ll)
             }
-          } else if (lhs.isAtOrBelow(z) == rhs.isAtOrBelow(z)) {
+          } else if (lhs.isBelow(z) == rhs.isBelow(z)) {
             fromTpl(minTpl(ll, uu), maxTpl(ll, uu))
           } else {
             fromTpl(minTpl(lu, ul), maxTpl(lu, ul))
@@ -397,7 +397,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def /(rhs: Interval[A])(implicit ev: Field[A]): Interval[A] =
     lhs * rhs.reciprocal
 
-  // def /(rhs: Interval[A])(implicit ev: Field[A]): Interval[A] = {
+  // def baddiv(rhs: Interval[A])(implicit ev: Field[A]): Interval[A] = {
   //   val z = ev.zero
   //   def err = throw new java.lang.ArithmeticException("/ by zero")
   //   rhs match {
@@ -599,7 +599,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     case None => Unbound()
   }
 
-  def mapBounds[B: Order](f: A => B): Interval[B] =
+  def mapBounds[B: Order: AdditiveMonoid](f: A => B): Interval[B] =
     Interval.fromBounds(lowerBound.map(f), upperBound.map(f))
 
   def fold[B](f: (Bound[A], Bound[A]) => B): B =
@@ -651,11 +651,11 @@ object Interval {
   case class Open[A](a: A) extends Bound[A]
   case class Closed[A](a: A) extends Bound[A]
 
-  private[spire] def withFlags[A: Order](lower: A, upper: A, flags: Int): Interval[A] =
+  private[spire] def withFlags[A: Order: AdditiveMonoid](lower: A, upper: A, flags: Int): Interval[A] =
     if (lower <= upper) Ranged(lower, upper, flags) else Interval.empty[A]
 
-  def empty[A: Order]: Interval[A] =
-    Ranged(null.asInstanceOf[A], null.asInstanceOf[A], 3) //fixme
+  def empty[A](implicit o: Order[A], r: AdditiveMonoid[A]): Interval[A] =
+    Ranged(r.zero, r.zero, 3)
 
   def point[A: Order](a: A): Interval[A] =
     Ranged(a, a, 0)
@@ -665,9 +665,9 @@ object Interval {
 
   def all[A: Order]: Interval[A] = All[A]()
 
-  def apply[A: Order](lower: A, upper: A): Interval[A] = closed(lower, upper)
+  def apply[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] = closed(lower, upper)
 
-  def fromBounds[A: Order](lower: Bound[A], upper: Bound[A]): Interval[A] =
+  def fromBounds[A: Order: AdditiveMonoid](lower: Bound[A], upper: Bound[A]): Interval[A] =
     (lower, upper) match {
       case (Closed(x), Closed(y)) => closed(x, y)
       case (Open(x), Open(y)) => open(x, y)
@@ -680,13 +680,13 @@ object Interval {
       case (Unbound(), Unbound()) => all
     }
 
-  def closed[A: Order](lower: A, upper: A): Interval[A] =
+  def closed[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
     if (lower <= upper) Ranged(lower, upper, 0) else Interval.empty[A]
-  def open[A: Order](lower: A, upper: A): Interval[A] =
+  def open[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
     if (lower <= upper) Ranged(lower, upper, 3) else Interval.empty[A]
-  def openBelow[A: Order](lower: A, upper: A): Interval[A] =
+  def openBelow[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
     if (lower < upper) Ranged(lower, upper, 1) else Interval.empty[A]
-  def openAbove[A: Order](lower: A, upper: A): Interval[A] =
+  def openAbove[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
     if (lower < upper) Ranged(lower, upper, 2) else Interval.empty[A]
 
   def above[A: Order](a: A): Interval[A] = Above(a, 1)

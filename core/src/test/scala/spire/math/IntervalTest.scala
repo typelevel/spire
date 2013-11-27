@@ -8,6 +8,10 @@ import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
+import org.scalacheck._
+import Gen._
+import Arbitrary.arbitrary
+
 class IntervalTest extends FunSuite {
   def cc(n1:Double, n2:Double) = Interval.closed(n1, n2)
   def oc(n1:Double, n2:Double) = Interval.openBelow(n1, n2)
@@ -54,8 +58,6 @@ class ContinuousIntervalTest extends FunSuite {
   // numerator interval crosses zero
   test("[-a,b] / [c,d]") { assert(cc(-a, b) / cc(c, d) === cc(-a / c, b / c)) }
   test("[-a,b] / [-d,-c]") { assert(cc(-a, b) / cc(-d, -c) === cc(b / -c, -a / -c)) }
-
-  test("xyz") { assert(Interval(r"-2", r"5") * Interval(r"-1", r"-1/4") === Interval(r"-5", r"2")) }
 
   // numerator interval is positive
   test("[a,b] / [-d,-c]") { assert(cc(a, b) / cc(-d, -c) === cc(b / -c, a / -d)) }
@@ -128,4 +130,85 @@ class IntervalReciprocalTest extends FunSuite {
   error(Interval.atOrBelow(r"1/9"))
   error(Interval.atOrBelow(r"0"))
   t(Interval.atOrBelow(r"-2"), Interval.openAbove(r"-1/2", r"0")) //fixme
+}
+
+class IntervalCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+
+  implicit val arbr = Arbitrary(for {
+    n <- arbitrary[Long]
+    d <- arbitrary[Long].filter(_ != 0L)
+  } yield {
+    Rational(n, d)
+  })
+
+  implicit val arbi = Arbitrary(for {
+    n <- arbitrary[Double]
+    lower <- arbitrary[Rational]
+    upper <- arbitrary[Rational]
+  } yield {
+    if (n < 0.05) Interval.all[Rational]
+    else if (n < 0.10) Interval.above(lower)
+    else if (n < 0.15) Interval.atOrAbove(lower)
+    else if (n < 0.20) Interval.below(upper)
+    else if (n < 0.25) Interval.atOrBelow(upper)
+    else if (n < 0.50) Interval.open(lower, upper)
+    else if (n < 0.60) Interval.openBelow(lower, upper)
+    else if (n < 0.70) Interval.openAbove(lower, upper)
+    else Interval.closed(lower, upper)
+  })
+
+  val rng = spire.random.mutable.GlobalRng
+  def sample(int: Interval[Rational], n: Int): Array[Rational] =
+    if (int.isEmpty) {
+      Array.empty[Rational]
+    } else {
+      val underlyingf: () => Rational = (int.lowerPair, int.upperPair) match {
+        case (None, None) => () => Rational(rng.nextGaussian)
+        case (Some((x, _)), None) => () => x + Rational(rng.nextGaussian).abs
+        case (None, Some((y, _))) => () => y - Rational(rng.nextGaussian).abs
+        case (Some((x, _)) ,Some((y, _))) => () => x + Rational(rng.nextDouble) * (y - x)
+      }
+
+      def nextf(): Rational = {
+        val r = underlyingf()
+        if (int.contains(r)) r else nextf()
+      }
+
+      Array.fill(n)(nextf())
+    }
+
+  val tries = 100
+
+  def testUnop(f: Interval[Rational] => Interval[Rational])(g: Rational => Rational) {
+    forAll { (a: Interval[Rational]) =>
+      val c: Interval[Rational] = f(a)
+      sample(a, tries).foreach { x =>
+        val ok = c.contains(g(x))
+        if (!ok) println("%s failed on %s" format (a, x.toString))
+        ok should be === true
+      }
+    }
+  }
+
+  def testBinop(f: (Interval[Rational], Interval[Rational]) => Interval[Rational])(g: (Rational, Rational) => Rational) {
+    forAll { (a: Interval[Rational], b: Interval[Rational]) =>
+      val c: Interval[Rational] = f(a, b)
+      sample(a, tries).zip(sample(b, tries)).foreach { case (x, y) =>
+        val ok = c.contains(g(x, y))
+        if (!ok) println("(%s, %s) failed on (%s, %s)" format (a, b, x.toString, y.toString))
+        ok should be === true
+      }
+    }
+  }
+
+  //property("sampled unop abs") { testUnop(_.abs)(_.abs) }
+  property("sampled unop -") { testUnop(-_)(-_) }
+  property("sampled unop pow(2)") { testUnop(_.pow(2))(_.pow(2)) }
+  property("sampled unop pow(3)") { testUnop(_.pow(3))(_.pow(3)) }
+
+  property("sampled binop +") { testBinop(_ + _)(_ + _) }
+  property("sampled binop -") { testBinop(_ - _)(_ - _) }
+  property("sampled binop *") { testBinop(_ * _)(_ * _) }
+  // property("sampled binop min") { testBinop(_ min _)(_ min _) }
+  // property("sampled binop max") { testBinop(_ max _)(_ max _) }
 }
