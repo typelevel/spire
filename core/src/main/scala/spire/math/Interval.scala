@@ -350,17 +350,9 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
           if (lcz && rcz) {
             fromTpl(minTpl(lu, ul), maxTpl(ll, uu))
           } else if (lcz) {
-            if (rhs.isAtOrAbove(z)) {
-              fromTpl(lu, uu)
-            } else {
-              fromTpl(ul, ll)
-            }
+            if (rhs.isAbove(z)) fromTpl(lu, uu) else fromTpl(ul, ll)
           } else if (rcz) {
-            if (lhs.isAtOrAbove(z)) {
-              fromTpl(ul, uu)
-            } else {
-              fromTpl(lu, ll)
-            }
+            if (lhs.isAbove(z)) fromTpl(ul, uu) else fromTpl(lu, ll)
           } else if (lhs.isBelow(z) == rhs.isBelow(z)) {
             fromTpl(minTpl(ll, uu), maxTpl(ll, uu))
           } else {
