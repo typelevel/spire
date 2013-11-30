@@ -2,6 +2,7 @@ package spire.math
 
 import org.scalatest.FunSuite
 import spire.implicits.{eqOps => _, _}
+import spire.random.{Uniform, Dist}
 
 import org.scalatest.matchers.ShouldMatchers
 import org.scalacheck.Arbitrary._
@@ -158,14 +159,15 @@ class IntervalCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPro
   })
 
   val rng = spire.random.mutable.GlobalRng
+
   def sample(int: Interval[Rational], n: Int): Array[Rational] =
     if (int.isEmpty) {
-      Array.empty[Rational]
+       Array.empty[Rational]
     } else {
       val underlyingf: () => Rational = (int.lowerPair, int.upperPair) match {
-        case (None, None) => () => Rational(rng.nextGaussian)
-        case (Some((x, _)), None) => () => x + Rational(rng.nextGaussian).abs
-        case (None, Some((y, _))) => () => y - Rational(rng.nextGaussian).abs
+        case (None, None) => () => Rational(rng.nextGaussian) * Long.MaxValue
+        case (Some((x, _)), None) => () => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
+        case (None, Some((y, _))) => () => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
         case (Some((x, _)) ,Some((y, _))) => () => x + Rational(rng.nextDouble) * (y - x)
       }
 
@@ -176,6 +178,7 @@ class IntervalCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPro
 
       Array.fill(n)(nextf())
     }
+
 
   val tries = 100
 

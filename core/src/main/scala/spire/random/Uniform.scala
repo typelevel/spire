@@ -85,4 +85,12 @@ object Uniform {
       })
     }
   }
+
+  def uniformRational(eps: Rational) = new Uniform[Rational] {
+    def apply(min: Rational, max: Rational): Dist[Rational] = {
+      val num = ((max - min) / eps).toBigInt
+      Uniform[BigInt].apply(0, num).map(n => min + Rational(n) * eps)
+    }
+  }
+
 }
