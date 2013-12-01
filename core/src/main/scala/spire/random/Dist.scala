@@ -303,7 +303,7 @@ object Dist extends DistInstances8 {
   implicit def complex[A: Fractional: Trig: IsReal: Dist]: Dist[Complex[A]] =
     Dist(Complex(_: A, _: A))
 
-  implicit def interval[A](implicit na: Dist[A], order: Order[A]): Dist[Interval[A]] =
+  implicit def interval[A](implicit na: Dist[A], order: Order[A], r: AdditiveMonoid[A]): Dist[Interval[A]] =
     Dist((x: A, y: A) => if (order.lt(x, y)) Interval(x, y) else Interval(y, x))
 
   implicit def option[A](implicit no: Dist[Boolean], na: Dist[A]): Dist[Option[A]] =

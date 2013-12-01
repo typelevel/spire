@@ -212,11 +212,6 @@ class SeqOrder[A: Order, SA <: SeqLike[A, SA]] extends SeqEq[A, SA] with Order[S
 
     loop(x.toIterator, y.toIterator)
   }
-
-  override def gt(x: SA, y: SA): Boolean = forall[A, SA](x, y)(Order[A].gt(_, _))
-  override def lt(x: SA, y: SA): Boolean = forall[A, SA](x, y)(Order[A].lt(_, _))
-  override def gteqv(x: SA, y: SA): Boolean = forall[A, SA](x, y)(Order[A].gteqv(_, _))
-  override def lteqv(x: SA, y: SA): Boolean = forall[A, SA](x, y)(Order[A].lteqv(_, _))
 }
 
 @SerialVersionUID(0L)
@@ -248,11 +243,6 @@ extends SeqVectorEq[A, SA] with Order[SA] with Serializable {
 
     loop(x.toIterator, y.toIterator)
   }
-
-  override def gt(x: SA, y: SA): Boolean = forall[A, SA](x, y)(Order[A].gt(_, _))
-  override def lt(x: SA, y: SA): Boolean = forall[A, SA](x, y)(Order[A].lt(_, _))
-  override def gteqv(x: SA, y: SA): Boolean = forall[A, SA](x, y)(Order[A].gteqv(_, _), Order[A].eqv(_, scalar.zero))
-  override def lteqv(x: SA, y: SA): Boolean = forall[A, SA](x, y)(Order[A].lteqv(_, _), Order[A].eqv(_, scalar.zero))
 }
 
 trait SeqInstances0 {
