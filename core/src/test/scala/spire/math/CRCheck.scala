@@ -110,7 +110,9 @@ class CRCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyC
       x.nroot(k).pow(k) should be === x
     }
   }
-  
+
+  // // TODO: this doesn't really work due to the kind of rounding that
+  // // even computable reals introduce when computing 1/3.
   // property("x.pow(j).nroot(k) = x.fpow(j/k)") {
   //   forAll { (x0: Int, j0: Byte, k0: Byte) =>
   //     if (x0 > 0) {

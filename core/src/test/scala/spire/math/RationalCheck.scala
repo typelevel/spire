@@ -41,6 +41,11 @@ class RationalCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPro
   rat1("x * 1 == x") { x: Q => x * Rational(1) should be === x }
   rat1("x * 0 == 0") { x: Q => x * Rational(0) should be === Rational(0) }
 
+  rat1("x.floor <= x.round <= x.ceil") { x: Q =>
+    x.floor should be <= x.round
+    x.round should be <= x.ceil
+  }
+
   rat1("x + x == 2x") { x: Q => (x + x) should be === 2 * x }
   rat1("x - x == 0") { x: Q => x - x should be === Rational(0) }
   rat1("x * x == x^2") { x: Q => (x * x) should be === x.pow(2) }

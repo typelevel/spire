@@ -3,80 +3,66 @@ package spire.math
 import spire.syntax.nroot._
 
 sealed trait CR { x =>
-  def f: Int => SafeLong
 
-  import CR.{roundUp}
+  def apply(p: Int): SafeLong
+
+  import CR.roundUp
 
   def toRational(p: Int): Rational = this match {
     case Exact(n) => n
-    case _ => Rational(x.f(p), SafeLong.two.pow(p))
+    case _ => Rational(x(p), SafeLong.two.pow(p))
   }
 
   def toRational: Rational = toRational(CR.bits)
 
   override def equals(y: Any): Boolean = y match {
-    case y: CR =>
-      x eqv y
-      // val a = x eqv y
-      // val b = x.toString == y.toString
-      // (a, b) match {
-      //   case (true, true) =>
-      //     true
-      //   case (true, false) =>
-      //     println(s"warning, eqv is true, but strings differ: ${x.toString} and ${y.toString}")
-      //     true
-      //   case (false, false) =>
-      //     false
-      //   case (false, true) =>
-      //     println(s"warning, eqv is false, but strings are same: ${x.toString} and ${y.toString}")
-      //     false
-      // }
+    case y: CR => x eqv y
     case y => toRational.equals(y)
   }
 
   def eqv(y: CR): Boolean = (x, y) match {
     case (Exact(nx), Exact(ny)) => nx == ny
-    case _ => (x - y).f(CR.bits) == SafeLong.zero
+    case _ => (x - y)(CR.bits) == SafeLong.zero
   }
 
   def compare(y: CR): Int = (x, y) match {
     case (Exact(nx), Exact(ny)) => nx compare ny
-    case _ => (x - y).f(CR.bits).signum
+    case _ => (x - y)(CR.bits).signum
   }
 
   def min(y: CR): CR = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx min ny)
-    case _ => CR(p => x.f(p) min y.f(p))
+    case _ => CR(p => x(p) min y(p))
   }
 
   def max(y: CR): CR = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx max ny)
-    case _ => CR(p => x.f(p) max y.f(p))
+    case _ => CR(p => x(p) max y(p))
   }
 
   def abs(): CR = this match {
     case Exact(n) => Exact(n.abs)
-    case _ => CR(p => x.f(p).abs)
+    case _ => CR(p => x(p).abs)
   }
 
   def signum(): Int = this match {
     case Exact(n) => n.signum
-    case _ => x.f(CR.bits).signum
+    case _ => x(CR.bits).signum
   }
 
   def unary_-(): CR = this match {
     case Exact(n) => Exact(-n)
-    case _ => CR(p => -x.f(p))
+    case _ => CR(p => -x(p))
   }
 
   def reciprocal(): CR = {
-    def xyz(i: Int): Int = if (SafeLong.three <= x.f(i).abs) i else xyz(i + 1)
+    def xyz(i: Int): Int = if (SafeLong.three <= x(i).abs) i else xyz(i + 1)
 
     this match {
       case Exact(n) => Exact(n.reciprocal)
       case _ => CR({p =>
         val s = xyz(0)
-        roundUp(Rational(SafeLong.two.pow(2 * p + 2 * s + 2), x.f(p + 2 * s + 2)))
+        roundUp(Rational(SafeLong.two.pow(2 * p + 2 * s + 2), x(p + 2 * s + 2)))
       })
     }
   }
@@ -85,7 +71,7 @@ sealed trait CR { x =>
     case (Exact(nx), Exact(ny)) => Exact(nx + ny)
     case (Exact(Rational.zero), _) => y
     case (_, Exact(Rational.zero)) => x
-    case _ => CR(p => roundUp(Rational(x.f(p + 2) + y.f(p + 2), 4)))
+    case _ => CR(p => roundUp(Rational(x(p + 2) + y(p + 2), 4)))
   }
 
   def -(y: CR): CR = x + (-y)
@@ -97,11 +83,11 @@ sealed trait CR { x =>
     case (Exact(Rational.one), _) => y
     case (_, Exact(Rational.one)) => x
     case _ => CR({p =>
-      val x0 = x.f(0).abs + 2
-      val y0 = y.f(0).abs + 2
+      val x0 = x(0).abs + 2
+      val y0 = y(0).abs + 2
       val sx = CR.sizeInBase(x0, 2) + 3
       val sy = CR.sizeInBase(y0, 2) + 3
-      roundUp(Rational(x.f(p + sy) * y.f(p + sx), SafeLong.two.pow(p + sx + sy)))
+      roundUp(Rational(x(p + sy) * y(p + sx), SafeLong.two.pow(p + sx + sy)))
     })
   }
 
@@ -134,9 +120,9 @@ sealed trait CR { x =>
     case (Exact(nx), Exact(ny)) => Exact(nx % ny)
     case _ => CR({ p => 
       val d = x / y
-      val s = d.f(2)
+      val s = d(2)
       val d2 = if (s >= 0) d.floor else d.ceil
-        (x - d2 * y).f(p)
+        (x - d2 * y)(p)
     })
   }
 
@@ -144,16 +130,16 @@ sealed trait CR { x =>
     case (Exact(nx), Exact(ny)) => Exact(nx /~ ny)
     case _ => CR({ p =>
       val d = x / y
-      val s = d.f(2)
+      val s = d(2)
       val d2 = if (s >= 0) d.floor else d.ceil
-      d2.f(p)
+      d2(p)
     })
   }
 
   def ceil(): CR = x match {
     case Exact(n) => Exact(n.ceil)
     case _ => CR({ p =>
-      val n = x.f(p)
+      val n = x(p)
       val t = SafeLong.two.pow(p)
       val m = n % t
       if (m == 0) n else n + t - m
@@ -163,7 +149,7 @@ sealed trait CR { x =>
   def floor(): CR = x match {
     case Exact(n) => Exact(n.floor)
     case _ => CR({ p =>
-      val n = x.f(p)
+      val n = x(p)
       val t = SafeLong.two.pow(p)
       val m = n % t
       n - m
@@ -173,7 +159,7 @@ sealed trait CR { x =>
   def round: CR = x match {
     case Exact(n) => Exact(n.round)
     case _ => CR({ p =>
-      val n = x.f(p)
+      val n = x(p)
       val t = SafeLong.two.pow(p)
       val h = t / 2
       val m = n % t
@@ -185,27 +171,27 @@ sealed trait CR { x =>
     case Exact(n) =>
       n.isWhole
     case _ =>
-      val n = x.f(CR.bits)
+      val n = x(CR.bits)
       val t = SafeLong.two.pow(CR.bits)
         (n % t) == 0
   }
 
-  def sqrt(): CR = CR(p => x.f(p * 2).sqrt)
-  def nroot(k: Int): CR = CR(p => x.f(p * k).nroot(k))
+  def sqrt(): CR = CR(p => x(p * 2).sqrt)
+  def nroot(k: Int): CR = CR(p => x(p * k).nroot(k))
 
   def fpow(r: Rational): CR =
     CR({ p =>
       val r2 = r.limitToInt
       val n = r2.numerator
       val d = r2.denominator
-      x.pow(n.toInt).nroot(d.toInt).f(p)
+      x.pow(n.toInt).nroot(d.toInt)(p)
     })
 
   // a bit hand-wavy
   def fpow(y: CR): CR = y match {
     case Exact(n) => x.fpow(n)
     case _ => CR({ p =>
-      x.fpow(Rational(y.f(p), SafeLong.two.pow(p))).f(p)
+      x.fpow(Rational(y(p), SafeLong.two.pow(p)))(p)
     })
   }
 
@@ -216,7 +202,7 @@ sealed trait CR { x =>
 
   def getString(d: Int): String = {
     val b = CR.digitsToBits(d)
-    val r = Rational(x.f(b) * SafeLong.ten.pow(d), SafeLong.two.pow(b))
+    val r = Rational(x(b) * SafeLong.ten.pow(d), SafeLong.two.pow(b))
     val m = roundUp(r)
     val (sign, str) = m.signum match {
       case -1 => ("-", m.abs.toString)
@@ -236,24 +222,15 @@ sealed trait CR { x =>
 object CR {
   import spire.algebra._
 
-  // val zero = CR(p => SafeLong.zero)
-  // val one = CR(p => SafeLong.two.pow(p))
-  // val two = CR(p => SafeLong.two.pow(p + 1))
-  // val four = CR(p => SafeLong.two.pow(p + 2))
-
   val zero = Exact(Rational.zero)
   val one = Exact(Rational.one)
   val two = Exact(Rational(2))
   val four = Exact(Rational(1, 2))
 
   def apply(f: Int => SafeLong): CR = Inexact(f)
-  //def apply(n: Long): CR = CR(p => SafeLong.two.pow(p) * n)
   def apply(n: Long): CR = Exact(Rational(n))
-  //def apply(n: BigInt): CR = CR(p => SafeLong.two.pow(p) * n)
   def apply(n: BigInt): CR = Exact(Rational(n))
-  //def apply(n: SafeLong): CR = CR(p => SafeLong.two.pow(p) * n)
   def apply(n: SafeLong): CR = Exact(Rational(n))
-  //def apply(n: Rational): CR = CR(p => roundUp(Rational(2).pow(p) * n))
   def apply(n: Rational): CR = Exact(n)
   def apply(n: Double): CR = Exact(Rational(n))
   def apply(n: BigDecimal): CR = Exact(Rational(n))
@@ -264,7 +241,7 @@ object CR {
   lazy val e = exp(CR.one)
 
   def log(x: CR): CR = {
-    val t = x.f(2)
+    val t = x(2)
     val n = sizeInBase(t, 2) - 3
     if (t < 0) sys.error("log of negative number")
     else if (t < 4) -log(x.reciprocal)
@@ -274,7 +251,7 @@ object CR {
 
   def exp(x: CR): CR = {
     val u = x / log2
-    val n = u.f(0)
+    val n = u(0)
     val s = x - CR(n) * log2
     if (!n.isValidInt) sys.error("sorry")
     else if (n < 0) div2n(expDr(s), -n.toInt)
@@ -284,7 +261,7 @@ object CR {
 
   def sin(x: CR): CR = {
     val z = x / piBy4
-    val s = roundUp(Rational(z.f(2), 4))
+    val s = roundUp(Rational(z(2), 4))
     val y = x - piBy4 * CR(s)
     val m = (s % 8).toInt
     val n = if (m < 0) m + 8 else m
@@ -302,7 +279,7 @@ object CR {
 
   def cos(x: CR): CR = {
     val z = x / piBy4
-    val s = roundUp(Rational(z.f(2), 4))
+    val s = roundUp(Rational(z(2), 4))
     val y = x - piBy4 * CR(s)
     val m = (s % 8).toInt
     val n = if (m < 0) m + 8 else m
@@ -321,7 +298,7 @@ object CR {
   def tan(x: CR): CR = sin(x) / cos(x)
 
   def atan(x: CR): CR = {
-    val t = x.f(2)
+    val t = x(2)
     val xp1 = x + CR.one
     val xm1 = x - CR.one
     if (t < -5) atanDr(-x.reciprocal - piBy2)
@@ -332,25 +309,25 @@ object CR {
   }
 
   def atan2(y: CR, x: CR): CR = CR({ p =>
-    val sx = x.f(p).signum
-    val sy = y.f(p).signum
+    val sx = x(p).signum
+    val sy = y(p).signum
     if (sx > 0) {
-      atan(y / x).f(p)
+      atan(y / x)(p)
     } else if (sy >= 0 && sx < 0) {
-      (atan(y / x) + CR.pi).f(p)
+      (atan(y / x) + CR.pi)(p)
     } else if (sy < 0 && sx < 0) {
-      (atan(y / x) - CR.pi).f(p)
+      (atan(y / x) - CR.pi)(p)
     } else if (sy > 0) {
-      (CR.pi / CR.two).f(p)
+      (CR.pi / CR.two)(p)
     } else if (sy < 0) {
-      (-CR.pi / CR.two).f(p)
+      (-CR.pi / CR.two)(p)
     } else {
       sys.error("undefined")
     }
   })
 
   def asin(x: CR): CR = {
-    val x0 = x.f(0)
+    val x0 = x(0)
     val s = (CR.one - x * x).sqrt
     if (x0 > 0) pi / CR.two - atan(s / x)
     else if (x0 == 0) atan(x / s)
@@ -390,13 +367,13 @@ object CR {
     loop(n.abs, 0)
   }
 
-  def roundUp(r: Rational): SafeLong = SafeLong((r + Rational(1, 2)).floor.toBigInt)
+  def roundUp(r: Rational): SafeLong = SafeLong(r.round.toBigInt)
 
   def div2n(x: CR, n: Int): CR =
-    CR(p => if (p >= n) x.f(p - n) else roundUp(Rational(x.f(p), SafeLong.two.pow(n))))
+    CR(p => if (p >= n) x(p - n) else roundUp(Rational(x(p), SafeLong.two.pow(n))))
 
   def mul2n(x: CR, n: Int): CR =
-    CR(p => x.f(p + n))
+    CR(p => x(p + n))
 
   lazy val piBy2 = div2n(pi, 1)
 
@@ -421,7 +398,7 @@ object CR {
       val t = terms(p)
       val l2t = 2 * sizeInBase(SafeLong(t) + 1, 2) + 6
       val p2 = p + l2t
-      val xr = x.f(p2)
+      val xr = x(p2)
       val xn = SafeLong.two.pow(p2)
       if (xn == 0) sys.error("oh no")
       def g(yn: SafeLong): SafeLong = roundUp(Rational(yn * xr, xn))
@@ -541,8 +518,18 @@ object CR {
 }
 
 case class Exact(n: Rational) extends CR { x =>
-  val f: Int => SafeLong =
-    p => CR.roundUp(Rational(2).pow(p) * n)
+  def apply(p: Int): SafeLong = CR.roundUp(Rational(2).pow(p) * n)
 }
 
-case class Inexact(f: Int => SafeLong) extends CR
+case class Inexact(f: Int => SafeLong) extends CR {
+  @volatile private[this] var memo: Option[(Int, SafeLong)] = None
+
+  def apply(p: Int): SafeLong = memo match {
+    case Some((bits, value)) if bits >= p =>
+      value >> (bits - p)
+    case _ =>
+      val result = f(p)
+      memo = Some((p, result))
+      result
+  }
+}
