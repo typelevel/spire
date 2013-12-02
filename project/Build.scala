@@ -198,7 +198,11 @@ object MyBuild extends Build {
 
   lazy val scalacheckSettings = Seq(
     name := "spire-scalacheck-binding",
-    libraryDependencies ++= Seq(scalaTest, scalaCheck)
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "discipline" % "0.1",
+      scalaTest % "test",
+      scalaCheck
+    )
   )
 
 
