@@ -2,40 +2,40 @@ package spire.math
 
 import org.scalatest.FunSuite
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
-class NumberPropertiesTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class NumberPropertiesTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   property("Number.apply(Long)") {
-    forAll { (n: Long) => Number(n) should be === n }
-    forAll { (n: Long) => Number(n) should be === SafeLong(n) }
+    forAll { (n: Long) => Number(n) shouldBe n }
+    forAll { (n: Long) => Number(n) shouldBe SafeLong(n) }
     // we need to do (n - 1).abs to ensure we don't get a negative number
-    forAll { (n: Long) => Number((n - 1).abs) should be === Natural((n - 1).abs) }
+    forAll { (n: Long) => Number((n - 1).abs) shouldBe Natural((n - 1).abs) }
   }
 
   property("Number.apply(BigInt)") {
-    forAll { (n: BigInt) => Number(n) should be === n }
-    forAll { (n: BigInt) => Number(n) should be === SafeLong(n) }
-    forAll { (n: BigInt) => Number(n.abs) should be === Natural(n.abs) }
+    forAll { (n: BigInt) => Number(n) shouldBe n }
+    forAll { (n: BigInt) => Number(n) shouldBe SafeLong(n) }
+    forAll { (n: BigInt) => Number(n.abs) shouldBe Natural(n.abs) }
   }
 
   property("Number.apply(BigDecimal)") {
-    forAll { (n: BigDecimal) => Number(n) should be === n }
+    forAll { (n: BigDecimal) => Number(n) shouldBe n }
   }
 
   property("Number.apply(Rational)") {
     forAll { (n: BigInt, d0: BigInt) =>
       val d = if (d0 == 0) BigInt(1) else d0
       val r = Rational(n, d)
-      Number(r) should be === r
+      Number(r) shouldBe r
     }
   }
 
   def bothEq[A, B](a: A, b: B) = {
-    a should be === b
-    b should be === a
+    a shouldBe b
+    b shouldBe a
   }
 
   property("RationalNumber == Int") {
@@ -51,7 +51,7 @@ class NumberPropertiesTest extends PropSpec with ShouldMatchers with GeneratorDr
   }
 
   property("RationalNumber == BigInt") {
-    forAll { (n: BigInt) => Number(Rational(n)) should be === n }
+    forAll { (n: BigInt) => Number(Rational(n)) shouldBe n }
   }
 
   property("Long + Long") {
@@ -62,10 +62,10 @@ class NumberPropertiesTest extends PropSpec with ShouldMatchers with GeneratorDr
       val bx = Number(BigInt(x))
       val by = Number(BigInt(y))
 
-      lz should be === BigInt(x) + BigInt(y)
-      bx + by should be === lz
-      lx + by should be === lz
-      bx + ly should be === lz
+      lz shouldBe BigInt(x) + BigInt(y)
+      bx + by shouldBe lz
+      lx + by shouldBe lz
+      bx + ly shouldBe lz
     }
   }
 }

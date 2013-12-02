@@ -2,7 +2,7 @@ package spire.math
 
 import spire.implicits._
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
@@ -11,7 +11,7 @@ import org.scalacheck._
 import Gen._
 import Arbitrary.arbitrary
 
-class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   // to fudge some of the properties, we limit our quaternion terms to
   // integers in [-1000, 1000]. this is cheating, and we should do
@@ -33,64 +33,64 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
   property("q + 0 = q") {
     forAll { (q: H) =>
-      q + 0.0 should be === q
-      q + zero should be === q
+      q + 0.0 shouldBe q
+      q + zero shouldBe q
     }
   }
 
   property("q + -q = 0") {
     forAll { (q: H) =>
-      q + (-q) should be === zero
+      q + (-q) shouldBe zero
     }
   }
 
   property("q1 + -q2 = q1 - q2") {
     forAll { (q1: H, q2: H) =>
-      q1 + (-q2) should be === q1 - q2
+      q1 + (-q2) shouldBe q1 - q2
     }
   }
 
   property("q1 + q2 = q2 + q1") {
     forAll { (q1: H, q2: H) =>
-      q1 + q2 should be === q2 + q1
+      q1 + q2 shouldBe q2 + q1
     }
   }
 
   property("(q1 + q2) + a3 = q1 + (q2 + q3)") {
     forAll { (q1: H, q2: H, q3: H) =>
-      (q1 + q2) + q3 should be === q1 + (q2 + q3)
+      (q1 + q2) + q3 shouldBe q1 + (q2 + q3)
     }
   }
 
   property("q * 0 = q") {
     forAll { (q: H) =>
-      q * 0.0 should be === zero
-      q * zero should be === zero
+      q * 0.0 shouldBe zero
+      q * zero shouldBe zero
     }
   }
 
   property("q * 1 = q") {
     forAll { (q: H) =>
-      q * 1.0 should be === q
-      q * one should be === q
+      q * 1.0 shouldBe q
+      q * one shouldBe q
     }
   }
 
   property("q * 2 = q + q") {
     forAll { (q: H) =>
-      q * 2.0 should be === q + q
+      q * 2.0 shouldBe q + q
     }
   }
 
   property("q1 * (q2 + q3) = q1 * q2 + q1 * q3") {
     forAll { (q1: H, q2: H, q3: H) =>
-      q1 * (q2 + q3) should be === q1 * q2 + q1 * q3
+      q1 * (q2 + q3) shouldBe q1 * q2 + q1 * q3
     }
   }
 
   property("(q1 * q2) * a3 = q1 * (q2 * q3)") {
     forAll { (q1: H, q2: H, q3: H) =>
-      (q1 * q2) * q3 should be === q1 * (q2 * q3)
+      (q1 * q2) * q3 shouldBe q1 * (q2 * q3)
     }
   }
 
@@ -110,7 +110,7 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
   property("q ** 2 = q * q") {
     forAll { (q: H) =>
-      q ** 2 should be === q * q
+      q ** 2 shouldBe q * q
     }
   }
 
@@ -145,7 +145,7 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     forAll { (q: H, k0: Double) =>
       val k = (k0 % 10).abs
       if (k == 0.0) {
-        q.fpow(k) should be === one
+        q.fpow(k) shouldBe one
       } else {
         (q - q.fpow(1.0/k).fpow(k)).norm should be < 1e-6
       }
@@ -154,7 +154,7 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
   property("q = q.r iff q.isReal") {
     forAll { (q: H) =>
-      q == q.r should be === q.isReal
+      q == q.r shouldBe q.isReal
     }
   }
 
@@ -164,7 +164,7 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     forAll { (r: Double, i: Double) =>
       val q = Quaternion(r, i, 0.0, 0.0)
       val c = Complex(r, i)
-      q.hashCode should be === c.hashCode
+      q.hashCode shouldBe c.hashCode
     }
   }
 
@@ -172,12 +172,12 @@ class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     import spire.std.double._
 
     forAll { (r: Double, i: Double) =>
-      Quaternion(r, i, 0.0, 0.0) should be === Complex(r, i)
+      Quaternion(r, i, 0.0, 0.0) shouldBe Complex(r, i)
     }
 
     forAll { (r: Double, i: Double, j: Double, k: Double) =>
       if (j != 0.0 || k != 0.0) {
-        Quaternion(r, i, j, k) != Complex(r, i) should be === true
+        Quaternion(r, i, j, k) != Complex(r, i) shouldBe true
       }
     }
   }
