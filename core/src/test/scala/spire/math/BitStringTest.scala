@@ -1,6 +1,6 @@
 package spire.math
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
@@ -119,7 +119,7 @@ class BitStringTest extends FunSuite {
   }
 }
 
-class BitStringCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class BitStringCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   property("operator mappings") {
     def byOp[A: BitString](n: A, i: Int): List[A] =
       List(n << i, n >>> i, n >> i)
@@ -128,7 +128,7 @@ class BitStringCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPr
       List(bs.leftShift(n, i), bs.rightShift(n, i), bs.signedRightShift(n, i))
 
     forAll { (n: Byte, i: Int) =>
-      byOp(n, i) should be === byName(n, i)
+      byOp(n, i) shouldBe byName(n, i)
     }
   }
 }

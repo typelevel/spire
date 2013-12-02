@@ -2,12 +2,12 @@ package spire.math
 
 import spire.implicits._
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
-class FixedPointCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   import BigDecimal.RoundingMode.FLOOR
 
@@ -38,9 +38,9 @@ class FixedPointCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
         ofz match {
           case Some(fz) =>
-            BigInt(fz.long) should be === (az * denom).toBigInt
+            BigInt(fz.long) shouldBe (az * denom).toBigInt
           case None =>
-            (az * denom < Long.MinValue || Long.MaxValue < az * denom) should be === true
+            (az * denom < Long.MinValue || Long.MaxValue < az * denom) shouldBe true
         }
       }
     }
@@ -82,9 +82,9 @@ class FixedPointCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
         ofz match {
           case Some(fz) =>
-            BigInt(fz.long) should be === (az * denom).toBigInt
+            BigInt(fz.long) shouldBe (az * denom).toBigInt
           case None =>
-            (az * denom < Long.MinValue || Long.MaxValue < az * denom) should be === true
+            (az * denom < Long.MinValue || Long.MaxValue < az * denom) shouldBe true
         }
       }
     }
@@ -115,9 +115,9 @@ class FixedPointCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
       ofz match {
         case Some(fz) =>
-          BigInt(fz.long) should be === (az * denom).toBigInt
+          BigInt(fz.long) shouldBe (az * denom).toBigInt
         case None =>
-          (az * denom < Long.MinValue || Long.MaxValue < az * denom) should be === true
+          (az * denom < Long.MinValue || Long.MaxValue < az * denom) shouldBe true
       }
     }
   }
