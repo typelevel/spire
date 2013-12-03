@@ -22,7 +22,7 @@ sealed trait CR { x =>
 
   def eqv(y: CR): Boolean = (x, y) match {
     case (Exact(nx), Exact(ny)) => nx == ny
-    case _ => (x - y)(CR.bits) == SafeLong.zero
+    case _ => (x - y)(CR.bits).signum == 0
   }
 
   def compare(y: CR): Int = (x, y) match {
@@ -56,12 +56,13 @@ sealed trait CR { x =>
   }
 
   def reciprocal(): CR = {
-    def xyz(i: Int): Int = if (SafeLong.three <= x(i).abs) i else xyz(i + 1)
+    def findNonzero(i: Int): Int =
+      if (SafeLong.three <= x(i).abs) i else findNonzero(i + 1)
 
     this match {
       case Exact(n) => Exact(n.reciprocal)
       case _ => CR({p =>
-        val s = xyz(0)
+        val s = findNonzero(0)
         roundUp(Rational(SafeLong.two.pow(2 * p + 2 * s + 2), x(p + 2 * s + 2)))
       })
     }
@@ -133,6 +134,14 @@ sealed trait CR { x =>
       val s = d(2)
       val d2 = if (s >= 0) d.floor else d.ceil
       d2(p)
+    })
+  }
+
+  def gcd(y: CR): CR = (x, y) match {
+    case (Exact(nx), Exact(ny)) => Exact(nx gcd ny)
+    case _ => CR({ p =>
+      val g = x.toRational(p) gcd y.toRational(p)
+      roundUp(g * SafeLong.two.pow(p))
     })
   }
 
@@ -454,9 +463,9 @@ object CR {
     override def minus(x: CR, y: CR): CR = x - y
     def times(x: CR, y: CR): CR = x * y
 
-    def gcd(x: CR, y: CR): CR = x min y //fixme
-    def quot(x: CR, y: CR): CR = x / y //fixme
-    def mod(x: CR, y: CR): CR = CR.zero //fixme
+    def gcd(x: CR, y: CR): CR = x gcd y
+    def quot(x: CR, y: CR): CR = x /~ y
+    def mod(x: CR, y: CR): CR = x % y
 
     override def reciprocal(x: CR): CR = x.reciprocal
     def div(x: CR, y: CR): CR = x / y
