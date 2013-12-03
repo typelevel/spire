@@ -231,10 +231,10 @@ sealed trait CR { x =>
 object CR {
   import spire.algebra._
 
-  val zero = Exact(Rational.zero)
-  val one = Exact(Rational.one)
-  val two = Exact(Rational(2))
-  val four = Exact(Rational(1, 2))
+  val zero: CR = Exact(Rational.zero)
+  val one: CR = Exact(Rational.one)
+  val two: CR = Exact(Rational(2))
+  val four: CR = Exact(Rational(1, 2))
 
   def apply(f: Int => SafeLong): CR = Inexact(f)
   def apply(n: Long): CR = Exact(Rational(n))
@@ -245,9 +245,9 @@ object CR {
   def apply(n: BigDecimal): CR = Exact(Rational(n))
   def apply(s: String): CR = Exact(Rational(s))
 
-  lazy val pi = CR(16) * atan(CR(Rational(1, 5))) - CR.four * atan(CR(Rational(1, 239)))
+  lazy val pi: CR = CR(16) * atan(CR(Rational(1, 5))) - CR.four * atan(CR(Rational(1, 239)))
 
-  lazy val e = exp(CR.one)
+  lazy val e: CR = exp(CR.one)
 
   def log(x: CR): CR = {
     val t = x(2)
