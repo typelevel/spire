@@ -179,7 +179,6 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
       Array.fill(n)(nextf())
     }
 
-
   val tries = 100
 
   def testUnop(f: Interval[Rational] => Interval[Rational])(g: Rational => Rational) {
@@ -204,14 +203,14 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
-  //property("sampled unop abs") { testUnop(_.abs)(_.abs) }
-  property("sampled unop -") { testUnop(-_)(-_) }
-  property("sampled unop pow(2)") { testUnop(_.pow(2))(_.pow(2)) }
-  property("sampled unop pow(3)") { testUnop(_.pow(3))(_.pow(3)) }
-
-  property("sampled binop +") { testBinop(_ + _)(_ + _) }
-  property("sampled binop -") { testBinop(_ - _)(_ - _) }
-  property("sampled binop *") { testBinop(_ * _)(_ * _) }
-  // property("sampled binop min") { testBinop(_ min _)(_ min _) }
-  // property("sampled binop max") { testBinop(_ max _)(_ max _) }
+  // //property("sampled unop abs") { testUnop(_.abs)(_.abs) }
+  // property("sampled unop -") { testUnop(-_)(-_) }
+  // property("sampled unop pow(2)") { testUnop(_.pow(2))(_.pow(2)) }
+  // property("sampled unop pow(3)") { testUnop(_.pow(3))(_.pow(3)) }
+  // 
+  // property("sampled binop +") { testBinop(_ + _)(_ + _) }
+  // property("sampled binop -") { testBinop(_ - _)(_ - _) }
+  // property("sampled binop *") { testBinop(_ * _)(_ * _) }
+  // // property("sampled binop min") { testBinop(_ min _)(_ min _) }
+  // // property("sampled binop max") { testBinop(_ max _)(_ max _) }
 }

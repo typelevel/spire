@@ -7,9 +7,16 @@ import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
+import org.scalacheck._
+import Gen._
+import Arbitrary.arbitrary
+
 class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   import BigDecimal.RoundingMode.FLOOR
+
+  implicit val arbScale: Arbitrary[FixedScale] =
+    Arbitrary(arbitrary[Int].map(_ & 0x7fffffff).filter(_ != 0).map(FixedScale))
 
   def build(x: Long, y0: Long, z: Byte, noZero: Boolean): (Int, Int, FixedPoint, FixedPoint, Rational, Rational) = {
     val y = if (y0 == 0L && noZero) 1L else y0
@@ -23,10 +30,29 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   type S2[A] = (A, A, FixedScale) => A
   type F2[A] = (A, A) => A
 
+  import scala.util.{Try, Success}
+  def testBinop2(name: String, noZero: Boolean, f: S2[FixedPoint], g: F2[Rational]) =
+    property(name) {
+      forAll { (x: Long, y: Long, s: FixedScale) =>
+        implicit val scale = s
+        if (!noZero || y != 0L) {
+          val (fx, fy) = (new FixedPoint(x), new FixedPoint(y))
+          val (ax, ay) = (Rational(x, s.denom), Rational(y, s.denom))
+          val az = g(ax, ay)
+          val fz = Try(f(fx, fy, scale)) match {
+            case Success(fz) =>
+              BigInt(fz.long) shouldBe (az * s.denom).toBigInt
+            case _ =>
+              (az * s.denom < Long.MinValue || Long.MaxValue < az * s.denom) shouldBe true
+          }
+        }
+      }
+    }
+
   def testBinop(name: String, noZero: Boolean, f: S2[FixedPoint], g: F2[Rational]) =
     property(name) {
       forAll { (x: Long, y: Long, z: Byte) =>
-        val (d, denom, fx, fy, ax, ay) = build(x, y, z, noZero)
+        val (_, denom, fx, fy, ax, ay) = build(x, y, z, noZero)
         val az = g(ax, ay)
 
         val ofz = try {
@@ -45,15 +71,15 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
       }
     }
 
-  testBinop("addition", false, (x, y, s) => x + y, _ + _)
+  testBinop2("addition", false, (x, y, s) => x + y, _ + _)
 
-  testBinop("subtraction", false, (x, y, s) => x - y, _ - _)
+  testBinop2("subtraction", false, (x, y, s) => x - y, _ - _)
 
-  testBinop("multiplication", false, (x, y, s) => (x).*(y)(s), _ * _)
+  testBinop2("multiplication", false, (x, y, s) => (x).*(y)(s), _ * _)
 
-  testBinop("division", true, (x, y, s) => (x)./(y)(s), _ / _)
+  testBinop2("division", true, (x, y, s) => (x)./(y)(s), _ / _)
 
-  testBinop("modulus", true, (x, y, s) => x % y, _ % _)
+  testBinop2("modulus", true, (x, y, s) => x % y, _ % _)
 
   def buildHalf(x: Long, z: Byte): (Int, Int, FixedPoint, Rational) = {
     val d = z.toInt.abs % 11

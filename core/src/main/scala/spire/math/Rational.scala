@@ -282,6 +282,7 @@ object Rational extends RationalInstances {
   val one: Rational = LongRational(1L, 1L)
   
   def apply(n: SafeLong, d: SafeLong): Rational = {
+    if (d < 0) return apply(-n, -d)
     val g = n gcd d
     (n / g).foldWith[Rational,LongRational,BigRational](d / g)(LongRational(_, _), BigRational(_, _))
   }
@@ -492,7 +493,9 @@ private[math] object LongRationals extends Rationals[Long] {
 
   def build(n: Long, d: Long): Rational = {
     if (d == 0) throw new IllegalArgumentException("0 denominator")
-    unsafeBuild(n, d)
+    else if (d > 0) unsafeBuild(n, d)
+    else if (n == Long.MinValue || d == Long.MinValue) Rational(-BigInt(n), -BigInt(d))
+    else unsafeBuild(-n, -d)
   }
 
   def unsafeBuild(n: Long, d: Long): Rational = {
@@ -523,20 +526,17 @@ private[math] object LongRationals extends Rationals[Long] {
     def numeratorAsLong: Long = n
     def denominatorAsLong: Long = d
 
-    def reciprocal = if (n == 0L)
-      throw new ArithmeticException("reciprocal called on 0/1")
-    else if (n < 0L)
-      LongRational(-d, -n)
-    else
-      LongRational(d, n)
+    def reciprocal =
+      if (n == 0L) throw new ArithmeticException("reciprocal called on 0/1")
+      else if (n > 0L) LongRational(d, n)
+      else if (n == Long.MinValue || d == Long.MinValue) BigRational(-BigInt(d), -BigInt(n))
+      else LongRational(-d, -n)
 
     override def signum: Int = if (n > 0) 1 else if (n < 0) -1 else 0
 
-    override def unary_-(): Rational = if (n == Long.MinValue) {
-      BigRational(-BigInt(Long.MinValue), BigInt(d))
-    } else {
-      LongRational(-n, d)
-    }
+    override def unary_-(): Rational =
+      if (n == Long.MinValue) BigRational(-BigInt(Long.MinValue), BigInt(d))
+      else LongRational(-n, d)
 
     def +(r: Rational): Rational = r match {
       case r: LongRationals.LongRational =>
@@ -723,7 +723,8 @@ private[math] object BigRationals extends Rationals[BigInt] {
 
   def build(n: BigInt, d: BigInt): Rational = {
     if (d == 0) throw new IllegalArgumentException("0 denominator")
-    unsafeBuild(n, d)
+    else if (d > 0) unsafeBuild(n, d)
+    else unsafeBuild(-n, -d)
   }
 
   def unsafeBuild(n: BigInt, d:BigInt): Rational = {
