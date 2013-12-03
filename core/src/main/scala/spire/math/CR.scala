@@ -234,7 +234,7 @@ object CR {
   val zero: CR = Exact(Rational.zero)
   val one: CR = Exact(Rational.one)
   val two: CR = Exact(Rational(2))
-  val four: CR = Exact(Rational(1, 2))
+  val four: CR = Exact(Rational(4))
 
   def apply(f: Int => SafeLong): CR = Inexact(f)
   def apply(n: Long): CR = Exact(Rational(n))
