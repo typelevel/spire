@@ -38,6 +38,22 @@ class CRCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks 
     CR.e.getString(200) shouldBe "2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741359662904357290033429526059563073813232862794349076323382988075319525101901"
   }
 
+  property("sqrt(2)") {
+    CR(2).sqrt.getString(200) shouldBe "1.41421356237309504880168872420969807856967187537694807317667973799073247846210703885038753432764157273501384623091229702492483605585073721264412149709993583141322266592750559275579995050115278206057147"
+  }
+
+  property("Rational(n) = CR(n).toRational") {
+    forAll { (n: BigInt) =>
+      Rational(n) shouldBe CR(n).toRational
+    }
+  }
+
+  property("CR(n)/CR(d) = CR(n/d)") {
+    forAll { (r: Rational) =>
+      CR(r.numerator) / CR(r.denominator) shouldBe CR(r)
+    }
+  }
+
   property("x + 0 = x") {
     forAll { (x0: Rational) =>
       val x = CR(x0)
