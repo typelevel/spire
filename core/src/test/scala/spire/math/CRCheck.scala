@@ -2,7 +2,7 @@ package spire.math
 
 import spire.implicits._
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
@@ -11,7 +11,7 @@ import org.scalacheck._
 import Gen._
 import Arbitrary.arbitrary
 
-class CRCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class CRCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   implicit val smallRational = Arbitrary(for {
     n <- arbitrary[Long]
@@ -30,38 +30,46 @@ class CRCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyC
   implicit val arbitraryCR =
     Arbitrary(for { r <- arbitrary[Rational] } yield CR(r))
 
+  property("pi") {
+    CR.pi.getString(200) shouldBe "3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196"
+  }
+
+  property("e") {
+    CR.e.getString(200) shouldBe "2.71828182845904523536028747135266249775724709369995957496696762772407663035354759457138217852516642742746639193200305992181741359662904357290033429526059563073813232862794349076323382988075319525101901"
+  }
+
   property("x + 0 = x") {
     forAll { (x0: Rational) =>
       val x = CR(x0)
-      x + CR.zero should be === x
+      x + CR.zero shouldBe x
     }
   }
   
   property("x * 0 = 0") {
     forAll { (x0: Rational) =>
       val x = CR(x0)
-      x * CR.zero should be === CR.zero
+      x * CR.zero shouldBe CR.zero
     }
   }
   
   property("x * 1 = x") {
     forAll { (x0: Rational) =>
       val x = CR(x0)
-      x + CR.zero should be === x
+      x + CR.zero shouldBe x
     }
   }
   
   property("x + y = y + x") {
     forAll { (x0: Rational, y0: Rational) =>
       val (x, y) = (CR(x0), CR(y0))
-      x + y should be === y + x
+      x + y shouldBe y + x
     }
   }
   
   property("x + (-x) = 0") {
     forAll { (x0: Rational) =>
       val x = CR(x0)
-      x + (-x) should be === CR.zero
+      x + (-x) shouldBe CR.zero
     }
   }
   
@@ -69,7 +77,7 @@ class CRCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyC
     forAll { (x0: Rational) =>
       if (x0 != 0) {
         val x = CR(x0)
-        x / x should be === CR.one
+        x / x shouldBe CR.one
       }
     }
   }
@@ -77,21 +85,21 @@ class CRCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyC
   property("x * y = y * x") {
     forAll { (x0: Rational, y0: Rational) =>
       val (x, y) = (CR(x0), CR(y0))
-      x * y should be === y * x
+      x * y shouldBe y * x
     }
   }
   
   property("x + x = 2x") {
     forAll { (x0: Rational) =>
       val x = CR(x0)
-      x + x should be === x * CR(2)
+      x + x shouldBe x * CR(2)
     }
   }
   
   property("x * (y + z) = xy + xz") {
     forAll { (x0: Rational, y0: Rational, z0: Rational) =>
       val (x, y, z) = (CR(x0), CR(y0), CR(z0))
-      x * (y + z) should be === x * y + x * z
+      x * (y + z) shouldBe x * y + x * z
     }
   }
   
@@ -99,7 +107,7 @@ class CRCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyC
     forAll { (x0: Rational, k0: Byte) =>
       val x = CR(x0.abs)
       val k = (k0 & 0xff) % 10 + 1
-      x.pow(k).nroot(k) should be === x
+      x.pow(k).nroot(k) shouldBe x
     }
   }
   
@@ -107,7 +115,7 @@ class CRCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyC
     forAll { (x0: Rational, k0: Byte) =>
       val x = CR(x0.abs)
       val k = (k0 & 0xff) % 10 + 1
-      x.nroot(k).pow(k) should be === x
+      x.nroot(k).pow(k) shouldBe x
     }
   }
 
@@ -119,7 +127,7 @@ class CRCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyC
   //       val x = CR(x0)
   //       val j = (j0 & 0xff) % 10 + 1
   //       val k = (k0 & 0xff) % 10 + 1
-  //       x.pow(j).nroot(k) should be === x.fpow(Rational(j, k))
+  //       x.pow(j).nroot(k) shouldBe x.fpow(Rational(j, k))
   //     }
   //   }
   // }
