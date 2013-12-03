@@ -80,7 +80,18 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     val d = scale.denom
     val q = lhs.long / d
     val r = lhs.long % d
-    rhs * q + (rhs * r) / d
+    val qq = rhs * q
+    val rr = try {
+      (rhs * r) / d
+    } catch {
+      case _: FixedPointOverflow =>
+        val n = (SafeLong(rhs.long) * r) / d
+        if (n.isLong)
+          new FixedPoint(n.toLong)
+        else
+          throw new FixedPointOverflow(n.toLong)
+    }
+    qq + rr
   }
 
   def *(rhs: Long): FixedPoint = {
@@ -91,26 +102,26 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
       throw new FixedPointOverflow(n)
   }
 
-  def /(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint = {
-    val d = scale.denom
-    val c = lhs.long * d
+  def /(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint =
+    try {
+      (lhs * scale.denom) / rhs.long
+    } catch {
+      case _: FixedPointOverflow =>
+        // TODO: it might be nice to use something a little more
+        // lightweight, but this is the least error-prone thing to
+        // do right now.
+        val n = SafeLong(lhs.long) * scale.denom / rhs.long
+        if (n < Long.MinValue || Long.MaxValue < n)
+          throw new FixedPointOverflow(n.toLong)
 
-    // if lhs.lone * d is small enough, just use longs.
-    if (lhs.long == 0 || d == 0 || (d == c / lhs.long && (((lhs.long ^ d ^ c) & Long.MinValue) == 0)))
-      return new FixedPoint(c / rhs.long)
-
-    // TODO: it might be nice to use something a little more
-    // lightweight, but this is the least error-prone thing to
-    // do right now.
-    val n = SafeLong(lhs.long) * d / rhs.long
-    if (n < Long.MinValue || Long.MaxValue < n)
-      throw new FixedPointOverflow(n.toLong)
-
-    new FixedPoint(n.toLong)
-  }
+        new FixedPoint(n.toLong)
+    }
 
   def /(rhs: Long): FixedPoint =
-    new FixedPoint(lhs.long / rhs)
+    if (lhs.long == Long.MinValue && rhs == -1L)
+      throw new FixedPointOverflow(lhs.long)
+    else
+      new FixedPoint(lhs.long / rhs)
 
   def %(rhs: FixedPoint): FixedPoint =
     new FixedPoint(lhs.long % rhs.long)

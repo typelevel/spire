@@ -9,7 +9,7 @@ import spire.optional.rationalTrig._
 
 import scala.reflect.ClassTag
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
@@ -50,7 +50,7 @@ object PolynomialSetup {
 }
 
 
-class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   import PolynomialSetup._
 
@@ -90,47 +90,47 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     val one = Polynomial.one[A]
 
     property(s"$name p = p") {
-      forAll { (p: P) => p should be === p }
+      forAll { (p: P) => p shouldBe p }
     }
 
     property(s"$name p + 0 = p") {
-      forAll { (p: P) => p + zero should be === p }
+      forAll { (p: P) => p + zero shouldBe p }
     }
 
     property(s"$name p + (-p) = 0") {
-      forAll { (p: P) => p + (-p) should be === zero }
+      forAll { (p: P) => p + (-p) shouldBe zero }
     }
 
     property(s"$name p * 0 = 0") {
-      forAll { (p: P) => p * zero should be === zero }
+      forAll { (p: P) => p * zero shouldBe zero }
     }
 
     property(s"$name p * 1 = p") {
-      forAll { (p: P) => p * one should be === p }
+      forAll { (p: P) => p * one shouldBe p }
     }
 
     property(s"$name p /~ 1 = p") {
-      forAll { (p: P) => p /~ one should be === p }
+      forAll { (p: P) => p /~ one shouldBe p }
     }
 
     property(s"$name p /~ p = 1") {
-      forAll { (p: P) => if (!p.isZero) p /~ p should be === one }
+      forAll { (p: P) => if (!p.isZero) p /~ p shouldBe one }
     }
 
     property(s"$name p % p = 0") {
-      forAll { (p: P) => if (!p.isZero) p % p should be === zero }
+      forAll { (p: P) => if (!p.isZero) p % p shouldBe zero }
     }
 
     property(s"$name x + y = y + x") {
-      forAll { (x: P, y: P) => x + y should be === y + x }
+      forAll { (x: P, y: P) => x + y shouldBe y + x }
     }
 
     property(s"$name x * y = y * x") {
-      forAll { (x: P, y: P) => x * y should be === y * x }
+      forAll { (x: P, y: P) => x * y shouldBe y * x }
     }
 
     property(s"$name (x /~ y) * y + (x % y) = x") {
-      forAll { (x: P, y: P) => if (!y.isZero) (x /~ y) * y + (x % y) should be === x }
+      forAll { (x: P, y: P) => if (!y.isZero) (x /~ y) * y + (x % y) shouldBe x }
     }
   }
 
@@ -141,7 +141,7 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
       val (p1, p2) = (xyz(rs1), xyz(rs2))
       val p3 = p1 compose p2
-      p3(r) should be === p1(p2(r))
+      p3(r) shouldBe p1(p2(r))
     }
   }
 
@@ -159,50 +159,50 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
   property("terms") {
     forAll { (t: Term[Rational]) =>
-      t.toTuple should be === (t.exp, t.coeff)
-      t.isIndexZero should be === (t.exp == 0)
+      t.toTuple shouldBe (t.exp, t.coeff)
+      t.isIndexZero shouldBe (t.exp == 0)
       forAll { (x: Rational) =>
-        t.eval(x) should be === t.coeff * x.pow(t.exp.toInt)
+        t.eval(x) shouldBe t.coeff * x.pow(t.exp.toInt)
       }
-      t.isZero should be === (t.coeff == 0)
-      if (t.exp > 0) t.der.int should be === t
-      t.int.der should be === t
+      t.isZero shouldBe (t.coeff == 0)
+      if (t.exp > 0) t.der.int shouldBe t
+      t.int.der shouldBe t
     }
   }
 
   property("sparse p = p") {
     forAll { (p: PolySparse[Rational]) =>
-      p should be === p
+      p shouldBe p
     }
   }
 
   property("dense p = p") {
     forAll { (p: PolyDense[Rational]) =>
-      p should be === p
+      p shouldBe p
     }
   }
 
   property("p.toSparse.toDense = p") {
     forAll { (p: PolyDense[Rational]) =>
-      p.toSparse.toDense should be === p
+      p.toSparse.toDense shouldBe p
     }
   }
 
   property("p.toDense.toSparse = p") {
     forAll { (p: PolySparse[Rational]) =>
-      p.toDense.toSparse should be === p
+      p.toDense.toSparse shouldBe p
     }
   }
 
   property("apply(p.toString).toDense = p") {
     forAll { (p: PolySparse[Rational]) =>
-      Polynomial(p.toString).toDense should be === p
+      Polynomial(p.toString).toDense shouldBe p
     }
   }
 
   property("apply(p.toString) = p") {
     forAll { (p: PolyDense[Rational]) =>
-      Polynomial(p.toString) should be === p
+      Polynomial(p.toString) shouldBe p
     }
   }
 
@@ -210,8 +210,8 @@ class PolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
     if (!x.isZero || !y.isZero) {
       val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
       if (!gcd.isZero) {
-        (x % gcd) should be === 0
-        (y % gcd) should be === 0
+        (x % gcd) shouldBe 0
+        (y % gcd) shouldBe 0
       }
     }
   }

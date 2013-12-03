@@ -1,13 +1,13 @@
 package spire.util
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
 import java.nio.ByteBuffer
 
-class PackCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class PackCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   import Pack.{intToByte, longToByte}
 
   property("int <=> bytes") {
@@ -25,11 +25,11 @@ class PackCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropert
       val n3 = Pack.intFromBytes(b0, b1, b2, b3)
       val n4 = Pack.intFromByteBuffer(ByteBuffer.wrap(bs0))
       val n5 = Pack.intFromBytes(bs2)
-      n should be === n1
-      n should be === n2
-      n should be === n3
-      n should be === n4
-      n should be === n5
+      n shouldBe n1
+      n shouldBe n2
+      n shouldBe n3
+      n shouldBe n4
+      n shouldBe n5
     }
   }
 
@@ -39,8 +39,8 @@ class PackCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropert
         val bs = Pack.intsToBytes(ns)
         val ns1 = Pack.intsFromBytes(bs, ns.length)
         val ns2 = Pack.intsFromByteBuffer(ByteBuffer.wrap(bs), ns.length)
-        ns should be === ns1
-        ns should be === ns2
+        ns shouldBe ns1
+        ns shouldBe ns2
     }
   }
 
@@ -64,11 +64,11 @@ class PackCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropert
       val n3 = Pack.longFromBytes(b0, b1, b2, b3, b4, b5, b6, b7)
       val n4 = Pack.longFromByteBuffer(ByteBuffer.wrap(bs0))
       val n5 = Pack.longFromBytes(bs2)
-      n should be === n1
-      n should be === n2
-      n should be === n3
-      n should be === n4
-      n should be === n5
+      n shouldBe n1
+      n shouldBe n2
+      n shouldBe n3
+      n shouldBe n4
+      n shouldBe n5
     }
   }
 
@@ -78,8 +78,8 @@ class PackCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropert
         val bs = Pack.longsToBytes(ns)
         val ns1 = Pack.longsFromBytes(bs, ns.length)
         val ns2 = Pack.longsFromByteBuffer(ByteBuffer.wrap(bs), ns.length)
-        ns should be === ns1
-        ns should be === ns2
+        ns shouldBe ns1
+        ns shouldBe ns2
     }
   }
 }

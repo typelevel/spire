@@ -9,7 +9,7 @@ import spire.optional.rationalTrig._
 
 import scala.reflect.ClassTag
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
@@ -18,7 +18,7 @@ import org.scalacheck._
 import Gen._
 import Arbitrary.arbitrary
 
-class PolynomialSamplingCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   import PolynomialSetup._
 
@@ -56,14 +56,14 @@ class PolynomialSamplingCheck extends PropSpec with ShouldMatchers with Generato
     def testUnop(f: P => P)(g: A => A) {
       forAll { (x: P, a: A) =>
         val z = f(x)
-        g(x(a)) should be === z(a)
+        g(x(a)) shouldBe z(a)
       }
     }
 
     def testBinop(f: (P, P) => P)(g: (A, A) => A) {
       forAll { (x: P, y: P, a: A) =>
         val z = f(x, y)
-        g(x(a), y(a)) should be === z(a)
+        g(x(a), y(a)) shouldBe z(a)
       }
     }
 
@@ -71,7 +71,7 @@ class PolynomialSamplingCheck extends PropSpec with ShouldMatchers with Generato
       forAll { (x: P, y: P, a: A) =>
         if (!y.isZero && a != Field[A].zero) {
           val z = f(x, y)
-          g(x(a), y(a)) should be === z(a)
+          g(x(a), y(a)) shouldBe z(a)
         }
       }
     }
