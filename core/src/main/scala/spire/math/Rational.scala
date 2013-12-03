@@ -8,7 +8,7 @@ import java.lang.Math
 import spire.algebra._
 import spire.algebra.Sign.{ Positive, Zero, Negative }
 
-sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] {
+sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] { lhs =>
   import LongRationals.LongRational
   import BigRationals.BigRational
 
@@ -50,8 +50,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   override def shortValue = longValue.toShort
   override def byteValue = longValue.toByte
 
-  def floor: Rational = Rational(toBigInt)
-  def ceil: Rational = if (denominator == 1) floor else Rational(toBigInt + 1)
+  def floor: Rational
+  def ceil: Rational
   def round: Rational
 
   def pow(exp: Int): Rational
@@ -183,6 +183,12 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def sign: Sign = Sign(signum)
 
   def compareToOne: Int
+
+  def min(rhs: Rational): Rational =
+    if ((lhs compare rhs) < 0) lhs else rhs
+
+  def max(rhs: Rational): Rational =
+    if ((lhs compare rhs) > 0) lhs else rhs
 
   /**
    * Returns a `Rational` whose numerator and denominator both fit in an `Int`.
@@ -685,10 +691,24 @@ private[math] object LongRationals extends Rationals[Long] {
         }
     }
 
-    def round: Rational = {
-      val m = (n % d).abs
-      if (m >= (d - m).abs) Rational(n / d + 1) else Rational(n / d)
-    }
+    def floor: Rational =
+      if (d == 1L) this
+      else if (n >= 0) Rational(n / d, 1L)
+      else Rational(n / d - 1L, 1L)
+
+    def ceil: Rational =
+      if (d == 1L) this
+      else if (n >= 0) Rational(n / d + 1L, 1L)
+      else Rational(n / d, 1L)
+
+    def round: Rational =
+      if (n >= 0) {
+        val m = (n % d)
+        if (m >= (d - m)) Rational(n / d + 1) else Rational(n / d)
+      } else {
+        val m = -(n % d)
+        if (m >= (d - m)) Rational(n / d - 1) else Rational(n / d)
+      }
 
     def pow(exp: Int): Rational = if (exp == 0)
       Rational.one
@@ -837,10 +857,24 @@ private[math] object BigRationals extends Rationals[BigInt] {
         }
     }
 
-    def round: Rational = {
-      val m = (n % d).abs
-      if (m >= (d - m).abs) Rational(n / d + 1) else Rational(n / d)
-    }
+    def floor: Rational =
+      if (d == 1) this
+      else if (n >= 0) Rational(n / d, BigInt(1))
+      else Rational(n / d - 1, BigInt(1))
+
+    def ceil: Rational =
+      if (d == 1) this
+      else if (n >= 0) Rational(n / d + 1, BigInt(1))
+      else Rational(n / d, BigInt(1))
+
+    def round: Rational =
+      if (n >= 0) {
+        val m = (n % d)
+        if (m >= (d - m)) Rational(n / d + 1) else Rational(n / d)
+      } else {
+        val m = -(n % d)
+        if (m >= (d - m)) Rational(n / d - 1) else Rational(n / d)
+      }
 
     def pow(exp: Int): Rational = if (exp == 0)
       Rational.one
