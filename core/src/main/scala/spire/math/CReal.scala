@@ -165,7 +165,7 @@ sealed trait CReal { x =>
     })
   }
 
-  def round: CReal = x match {
+  def round(): CReal = x match {
     case Exact(n) => Exact(n.round)
     case _ => CReal({ p =>
       val n = x(p)
