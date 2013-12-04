@@ -66,13 +66,16 @@ introduces several new ones, all of which can be found in `spire.math`:
 
  * `Natural` unsigned, immutable, arbitrary precision integer
  * `Rational` fractions of integers with perfect precision
+ * `CReal` computable real number implementation
  * `Real` lazily-computed, arbitrary precision number type
  * `Complex[A]` complex numbers, points on the complex plane
  * `Quaternion[A]` extension of complex numbers into 4D space
  * `UByte` through `ULong` value classes supporting unsigned operations
  * `SafeLong` fast, overflow-proof integer type
  * `Number` boxed type supporting a traditional numeric tower
+ * `FixedPoint` fractions with unboxed `Long` numerator and implicit denominator
  * `Interval[A]` arithmetic on open, closed, and unbound intervals
+ * `Polynomial[A]` univariate (single-variable) polynomial expressions
 
 ### Type Classes
 
