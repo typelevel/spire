@@ -5,16 +5,12 @@ import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
-import org.scalacheck._
-import Gen._
-import Arbitrary.arbitrary
+import ArbitrarySupport.{ubyte, ushort, uint, ulong}
 
 class ULongTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   val zero = ULong(0L)
   val one = ULong(1L)
-
-  implicit val arbu: Arbitrary[ULong] = Arbitrary(arbitrary[Long].map(ULong(_)))
 
   property("n >= 0") {
     forAll { (n: ULong) => n >= zero shouldBe true }
@@ -114,8 +110,6 @@ class UIntTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks
   val zero = UInt(0)
   val one = UInt(1)
 
-  implicit val arbu: Arbitrary[UInt] = Arbitrary(arbitrary[Int].map(UInt(_)))
-
   property("n >= 0") {
     forAll { (n: UInt) =>
       n >= zero shouldBe true
@@ -204,8 +198,6 @@ class UShortTest extends PropSpec with Matchers with GeneratorDrivenPropertyChec
   val zero = UShort(0)
   val one = UShort(1)
 
-  implicit val arbu: Arbitrary[UShort] = Arbitrary(arbitrary[Short].map(UShort(_)))
-
   property("n >= 0") {
     forAll { (n: UShort) =>
       n >= zero shouldBe true
@@ -293,8 +285,6 @@ class UByteTest extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
 
   val zero = UByte(0)
   val one = UByte(1)
-
-  implicit val arbu: Arbitrary[UByte] = Arbitrary(arbitrary[Byte].map(UByte(_)))
 
   property("n >= 0") {
     forAll { (n: UByte) =>

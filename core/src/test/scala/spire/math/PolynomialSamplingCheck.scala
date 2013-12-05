@@ -69,7 +69,7 @@ class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrive
 
     def testBinopNonzero(f: (P, P) => P)(g: (A, A) => A) {
       forAll { (x: P, y: P, a: A) =>
-        if (!y.isZero && a != Field[A].zero) {
+        if (!y.isZero && y(a) != Field[A].zero) {
           val z = f(x, y)
           g(x(a), y(a)) shouldBe z(a)
         }

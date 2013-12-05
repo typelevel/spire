@@ -39,10 +39,7 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
     z <- arbitrary[A]
   } yield Vector(x, y, z))
 
-  implicit def ArbRational: Arbitrary[Rational] = Arbitrary(for {
-    n <- arbitrary[Long]
-    d <- arbitrary[Long] if d != 0
-  } yield Rational(n, d))
+  import spire.math.ArbitrarySupport.rational
 
   test("Eq syntax")(check(forAll { (a: Int, b: Int) => testEqSyntax(a, b) }))
   test("Order syntax")(check(forAll { (a: Int, b: Int) => testOrderSyntax(a, b) }))

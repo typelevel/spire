@@ -135,28 +135,10 @@ class IntervalReciprocalTest extends FunSuite {
 
 class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
-  implicit val arbr = Arbitrary(for {
-    n <- arbitrary[Long]
-    d <- arbitrary[Long].filter(_ != 0L)
-  } yield {
-    Rational(n, d)
-  })
-
-  implicit val arbi = Arbitrary(for {
-    n <- arbitrary[Double]
-    lower <- arbitrary[Rational]
-    upper <- arbitrary[Rational]
-  } yield {
-    if (n < 0.05) Interval.all[Rational]
-    else if (n < 0.10) Interval.above(lower)
-    else if (n < 0.15) Interval.atOrAbove(lower)
-    else if (n < 0.20) Interval.below(upper)
-    else if (n < 0.25) Interval.atOrBelow(upper)
-    else if (n < 0.50) Interval.open(lower, upper)
-    else if (n < 0.60) Interval.openBelow(lower, upper)
-    else if (n < 0.70) Interval.openAbove(lower, upper)
-    else Interval.closed(lower, upper)
-  })
+  // import ArbitrarySupport.longRational
+  // import ArbitrarySupport.longRationalInterval
+  import ArbitrarySupport.rational
+  import ArbitrarySupport.interval
 
   val rng = spire.random.mutable.GlobalRng
 
