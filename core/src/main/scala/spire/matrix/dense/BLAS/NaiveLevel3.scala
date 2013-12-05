@@ -2,7 +2,7 @@ package spire.matrix.dense.BLAS
 
 import spire.syntax.cfor._
 
-import spire.matrix.dense.MatrixLike
+import spire.matrix.dense.Matrix
 import spire.matrix.{Transposition, UpperOrLower, Sides, DiagonalProperty}
 import Sides._
 import Transposition._
@@ -17,8 +17,8 @@ import DiagonalProperty._
 trait NaiveLevel3 extends Level3 {
 
   def gemm(transA:Transposition.Value, transB:Transposition.Value,
-           alpha:Double, a:MatrixLike, b:MatrixLike,
-           beta:Double, c:MatrixLike): Unit = {
+           alpha:Double, a:Matrix, b:Matrix,
+           beta:Double, c:Matrix): Unit = {
     checkGemmPreconditions(transA, transB, alpha, a, b, beta, c)
 
     // trivial cases
@@ -91,7 +91,7 @@ trait NaiveLevel3 extends Level3 {
   }
 
   def syrk(uplo:UpperOrLower.Value, trans:Transposition.Value,
-           alpha:Double, a:MatrixLike, beta:Double, c:MatrixLike): Unit = {
+           alpha:Double, a:Matrix, beta:Double, c:Matrix): Unit = {
     require(c.isSquare)
     if(trans == NoTranspose)
       require(c.dimensions._1 ==  a.dimensions._1)
@@ -164,7 +164,7 @@ trait NaiveLevel3 extends Level3 {
 
   def trsm(side:Sides.Value, uplo:UpperOrLower.Value,
            trans:Transposition.Value, diag:DiagonalProperty.Value,
-           alpha:Double, a:MatrixLike, b:MatrixLike) {
+           alpha:Double, a:Matrix, b:Matrix) {
     require(a.isSquare)
     if(side == fromLeft) require(a.dimensions._2 == b.dimensions._1)
     else                 require(b.dimensions._2 == a.dimensions._1)

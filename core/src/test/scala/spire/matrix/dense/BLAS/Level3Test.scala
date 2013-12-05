@@ -7,7 +7,6 @@ import UpperOrLower._
 import Sides._
 import DiagonalProperty._
 import spire.matrix.dense.Matrix
-import spire.matrix.Constants._
 import spire.matrix.dense.random._
 
 
@@ -81,7 +80,8 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
   }
 
   test("GEMM: matrix x block") {
-    val b = Matrix(10,7)( 4, -4,  1,  1, -4,  2, -1,
+    val (m,n) = (10,7)
+    val b = Matrix(m,n)( 4, -4,  1,  1, -4,  2, -1,
                           5,  2,  0, -2,  0,  3, -5,
                          -2,  5,  5, -4, -5, -4,  2,
                          -5,  1,  5,  2,  2,  2, -5,
@@ -95,9 +95,9 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
                         -1, -3,  0,
                          2, -2, -2)
     gemm(transA = NoTranspose, transB = NoTranspose,
-         alpha = -2, a = a, b = b.block(7, End)(2, End),
+         alpha = -2, a = a, b = b.block(7, m)(2, n),
          beta = 1, c = b.block(0,3)(0,5))
-    val expectedB = Matrix(10,7)(-2,  36,  3, -11, -22,  2, -1,
+    val expectedB = Matrix(m,n)(-2,  36,  3, -11, -22,  2, -1,
                                  -9,   0,  2,  -8, -20,  3, -5,
                                   2, -39, 21,   8, -17, -4,  2,
                                  -5,   1,  5,   2,   2,  2, -5,

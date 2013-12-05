@@ -413,7 +413,7 @@ extends RealDecompositionCompanion {
  *     Philadelphia, PA, Third.
  *
  */
-final class Decomposition2x2(val i:Int, h:MatrixLike,
+final class Decomposition2x2(val i:Int, h:Matrix,
                              val r:PlaneRotation)
 {
   // Compute eigenvalues
@@ -431,7 +431,7 @@ final class Decomposition2x2(val i:Int, h:MatrixLike,
   def schurForm = (h(i  ,i), h(i  ,i+1),
                    h(i+1,i), h(i+1,i+1))
 
-  def storeEigenvalues(eigenRe:VectorLike, eigenIm:VectorLike) {
+  def storeEigenvalues(eigenRe:Vector, eigenIm:Vector) {
     eigenRe(i) = eigenvalues._1._1
     eigenIm(i) = eigenvalues._1._2
     eigenRe(i+1) = eigenvalues._2._1
@@ -446,7 +446,7 @@ extends NumericPropertiesOfDouble with EuclideanNorm
 
   val tinyThreshold = 4*eps
 
-  def set(i:Int, h:MatrixLike)(a:Double, b:Double,
+  def set(i:Int, h:Matrix)(a:Double, b:Double,
                                c:Double, d:Double) {
       h(i  ,i) = a ; h(i  ,i+1) = b
       h(i+1,i) = c ; h(i+1,i+1) = d
@@ -469,7 +469,7 @@ extends NumericPropertiesOfDouble with EuclideanNorm
    *     Society for Industrial and Applied Mathematics,
    *     Philadelphia, PA, Third.
    */
-  def apply(i:Int, h:MatrixLike): Decomposition2x2 = {
+  def apply(i:Int, h:Matrix): Decomposition2x2 = {
     val (a, b,
          c, d) = (h(i  ,i), h(i  ,i+1),
                   h(i+1,i), h(i+1,i+1))

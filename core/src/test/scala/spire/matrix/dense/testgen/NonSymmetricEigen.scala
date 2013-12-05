@@ -52,7 +52,7 @@ class SpecialDiagonal(n:Int, mode:SpecialDiagonalMode.Value, c:Double,
                       reverse:Boolean=false,
                       signs:BernoulliDistribution=null,
                       uniform01:ScalarUniformDistributionFromZeroToOne=null)
-extends Vector(n) with MagnitudeLimitation
+extends Vector(n)
 {
   import SpecialDiagonalMode._
   require(mode != Random || uniform01 != null)
@@ -100,8 +100,8 @@ extends Vector(n) with MagnitudeLimitation
  *     Society for Industrial and Applied Mathematics,
  *     Philadelphia, PA, Third.
  */
-class GeneralSquareMatrix(n:Int)(a:Array[Double])
-extends Matrix(n, n)(a)
+class GeneralSquareMatrix(n:Int, a:Array[Double])
+extends Matrix(n, n, n, 0, a)
 with NumericPropertiesOfDouble with MagnitudeLimitation with BLAS.NaiveLevel1 {
 
   /**
@@ -233,9 +233,15 @@ with NumericPropertiesOfDouble with MagnitudeLimitation with BLAS.NaiveLevel1 {
 /**
  * Companion object of class spire.matrix.dense.test.SquareMatrix
  */
-object GeneralSquareMatrix extends NumericPropertiesOfDouble {
+object GeneralSquareMatrix
+extends MatrixConstruction[GeneralSquareMatrix] with NumericPropertiesOfDouble {
 
-  def zero(n:Int) = new GeneralSquareMatrix(n)(new Array[Double](n*n))
+  def empty(m:Int, n:Int): GeneralSquareMatrix = zero(m, n)
+
+  def apply(m:Int, n:Int, elements:Array[Double]) = {
+    require(m == n)
+    new GeneralSquareMatrix(n, elements)
+  }
 
 }
 
@@ -429,7 +435,7 @@ extends TestDimensions with NumericPropertiesOfDouble
 
         // Matrices with random elements in the range (-1, 1)
         for(itype <- 19 to 21 if types.contains(itype)) {
-          val a = new GeneralSquareMatrix(n)(uniformIm1p1.take(n*n).toArray)
+          val a = GeneralSquareMatrix.fill(n,n)(uniformIm1p1.next)
 
           // Rescale element magnitudes if requested
           if(typesWithSmallMagnitude.contains(itype))

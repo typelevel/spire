@@ -14,12 +14,12 @@ import scala.math.{sqrt, min, max}
 
 
 /** General rectrangular matrix */
-class GeneralMatrix(m:Int, n:Int)(a:Array[Double])
-extends Matrix(m, n)(a)
+class GeneralMatrix(m:Int, n:Int, a:Array[Double])
+extends Matrix(m, n, m, 0, a)
 with NumericPropertiesOfDouble with MagnitudeLimitation {}
 
 object GeneralMatrix extends NumericPropertiesOfDouble {
-  def zero(m:Int, n:Int) = new GeneralMatrix(m,n)(new Array[Double](m*n))
+  def zero(m:Int, n:Int) = new GeneralMatrix(m, n, new Array[Double](m*n))
 }
 
 

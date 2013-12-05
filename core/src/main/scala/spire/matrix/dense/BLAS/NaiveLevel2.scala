@@ -2,8 +2,8 @@ package spire.matrix.dense.BLAS
 
 import spire.syntax.cfor._
 
-import spire.matrix.dense.MatrixLike
-import spire.matrix.dense.VectorLike
+import spire.matrix.dense.Matrix
+import spire.matrix.dense.Vector
 import spire.matrix.{Transposition,UpperOrLower,DiagonalProperty}
 import Transposition._
 import UpperOrLower._
@@ -17,18 +17,18 @@ import DiagonalProperty._
 trait NaiveLevel2 extends Level2 {
 
    def gemv(trans: Transposition.Value,
-            alpha: Double, a: MatrixLike,
-            x: VectorLike, beta: Double, y: VectorLike): Unit = {
+            alpha: Double, a: Matrix,
+            x: Vector, beta: Double, y: Vector): Unit = {
     if (trans == NoTranspose)
-      require(y.length == a.dimensions._1 && a.dimensions._2 == x.length)
+      require(y.dimension == a.dimensions._1 && a.dimensions._2 == x.dimension)
     else
-      require(y.length == a.dimensions._2 && a.dimensions._1 == x.length)
+      require(y.dimension == a.dimensions._2 && a.dimensions._1 == x.dimension)
 
     // y := beta y
     if(beta == 0)
-      cforRange(0 until y.length) { i => y(i) = 0 }
+      cforRange(0 until y.dimension) { i => y(i) = 0 }
     else if(beta != 1)
-      cforRange(0 until y.length) { i => y(i) *= beta }
+      cforRange(0 until y.dimension) { i => y(i) *= beta }
 
     // y += alpha op(A) x
     if(alpha != 0) {
@@ -50,23 +50,23 @@ trait NaiveLevel2 extends Level2 {
     }
    }
 
-  def ger(alpha: Double, x: VectorLike, y: VectorLike, a: MatrixLike): Unit = {
-    require((x.length, y.length) == a.dimensions)
+  def ger(alpha: Double, x: Vector, y: Vector, a: Matrix): Unit = {
+    require((x.dimension, y.dimension) == a.dimensions)
 
-    cforRange(0 until y.length) { j =>
+    cforRange(0 until y.dimension) { j =>
       if (y(j) != 0) {
         val t = alpha * y(j)
-        cforRange(0 until x.length) { i => a(i, j) += x(i) * t }
+        cforRange(0 until x.dimension) { i => a(i, j) += x(i) * t }
       }
     }
   }
 
   def trmv(uplo:UpperOrLower.Value, trans:Transposition.Value,
-           diag:DiagonalProperty.Value, a:MatrixLike, x:VectorLike) {
-    if(trans == NoTranspose) require(a.dimensions._2 == x.length)
-    else                     require(a.dimensions._1 == x.length)
+           diag:DiagonalProperty.Value, a:Matrix, x:Vector) {
+    if(trans == NoTranspose) require(a.dimensions._2 == x.dimension)
+    else                     require(a.dimensions._1 == x.dimension)
 
-    val n = x.length
+    val n = x.dimension
     if(n == 0) return
 
     if(trans == NoTranspose) {

@@ -1,6 +1,5 @@
 package spire.matrix.dense.tests
 
-import spire.matrix.Constants._
 import spire.matrix.dense._
 
 import scala.math.sqrt
@@ -12,20 +11,22 @@ with EuclideanNorm
   val ElementaryReflector: ElementaryReflectorLikeCompanion
 
   test("Construction: exact") {
-    val m = Matrix(2,4)(3,   1,  5,  1,
+    val (m,n) = (2,4)
+    val a = Matrix(m,n)(3,   1,  5,  1,
                         21, 22, 23, 24)
-    val h = ElementaryReflector.annihilateAndConstruct(m.row(0))
+    val h = ElementaryReflector.annihilateAndConstruct(a.row(0))
     expectResult(1.5) { h.tau }
     expectResult(1.0/9 :: 5.0/9 :: 1.0/9 :: Nil) { h.essentialPart.toList }
-    expectResult(-6) { m.row(0)(0) }
-    expectResult(h.essentialPart) { m.row(0).block(1,End) }
-    expectResult(21 :: 22 :: 23 :: 24 :: Nil) { m.row(1).toList }
+    expectResult(-6) { a.row(0)(0) }
+    expectResult(h.essentialPart) { a.row(0).block(1,n) }
+    expectResult(21 :: 22 :: 23 :: 24 :: Nil) { a.row(1).toList }
   }
 
   test("Construction: tiny vector") {
     import ElementaryReflector.safeMin
     val eta = safeMin/8
-    val m = Matrix(5,2)(-2*eta, -2,
+    val (m,n) = (5,2)
+    val a = Matrix(m,n)(-2*eta, -2,
                            eta,  1,
                           -eta, -1,
                          2*eta,  2,
@@ -33,21 +34,21 @@ with EuclideanNorm
     // let's make sure we got our test case right,
     // i.e. such that the branch `if(beta.abs < safeMin)` is taken
     // in `trait HouseholderReflectionLike` constructor.
-    val norm = euclideanNorm(m.column(0))
+    val norm = euclideanNorm(a.column(0))
     assert(0 < norm && norm < safeMin)
 
     // the test itself
-    val h0 = ElementaryReflector.annihilateAndConstruct(m.column(0))
-    val h1 = ElementaryReflector.annihilateAndConstruct(m.column(1))
+    val h0 = ElementaryReflector.annihilateAndConstruct(a.column(0))
+    val h1 = ElementaryReflector.annihilateAndConstruct(a.column(1))
     assert(h0.tau === h1.tau)
-    assert(m.column(0).block(1,End).toList === m.column(1).block(1,End).toList)
-    assert(m(0,0) === m(0,1)*eta)
+    assert(a.column(0).block(1,m).toList === a.column(1).block(1,m).toList)
+    assert(a(0,0) === a(0,1)*eta)
   }
 
   test("Construction: zero vector") {
     val x = Vector.zero(3)
     val h = ElementaryReflector.annihilateAndConstruct(x)
-    expectResult { 2 } { h.essentialPart.length }
+    expectResult { 2 } { h.essentialPart.dimension }
   }
 
   test("Product with a general matrix from the left") {

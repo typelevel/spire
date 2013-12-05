@@ -54,7 +54,7 @@ class Permutation(private val p:Array[Int],
    * @blockSize the algorithm proceeds by block of r columns where r is given
    *            by this argument
    */
-  def permute_rows(a:MatrixLike, blockSize:Int = 32) {
+  def permute_rows(a:Matrix, blockSize:Int = 32) {
     require(a.dimensions._1 == dimension)
     val (m,n) = a.dimensions
     val (startRow, stepRow, endRow) = range

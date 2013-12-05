@@ -139,7 +139,7 @@ extends Iterator[Matrix] with BLAS.NaiveLevel1 {
    * The runtime cost is O(n^3^) on the top of the base runtime cost
    * whereas there is no extra storage cost.
    */
-  def overwriteWithProductByNext(sides:Sides.Value, a:MatrixLike):Unit = {
+  def overwriteWithProductByNext(sides:Sides.Value, a:Matrix):Unit = {
     if (sides == fromLeft || sides == Congruent)
       require(a.dimensions._1 == n)
     else if (sides == fromRight || sides == Congruent)
@@ -147,7 +147,7 @@ extends Iterator[Matrix] with BLAS.NaiveLevel1 {
 
     for(i <- n-2 to 0 by -1) {
       val u = v.block(0, n - i)
-      u.transform(_ => elements.next)
+      u := elements
       val h = ElementaryReflector.annihilateAndConstruct(u)
       r(i) = signum(u(0))
       if(sides == fromLeft || sides == Congruent)

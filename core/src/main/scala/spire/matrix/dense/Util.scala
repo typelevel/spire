@@ -3,7 +3,7 @@ package spire.matrix.dense
 import scala.collection.mutable
 
 trait MagnitudeLimitation
-extends mutable.IndexedSeq[Double] with BLAS.NaiveLevel1 {
+extends Matrix with BLAS.NaiveLevel1 {
 
   /** Rescale this so that the maximum absolute value of any element is amax */
   def rescaleElementMagnitudeTo(amax:Double): Unit = {

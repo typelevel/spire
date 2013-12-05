@@ -23,6 +23,14 @@ class TestDimensions(nonSpecialDimensions:Int=0)
     Iterator(1, 2, 3, 5, 10, 16) ++
     Iterator.fill(nonSpecialDimensions)(gen.nextInt(32, 64))
 
+  def oneDimensionWithThresholdSample(threshold:Int,
+                                      howManyBelow:Int = 1,
+                                      howManyAbove:Int = 1) =
+    Iterator(1, 2, 3, 5, 10, 16) ++
+    Iterator.fill(howManyBelow)(gen.nextInt(32, threshold-1)) ++
+    Iterator.single(threshold) ++
+    Iterator.fill(howManyAbove)(gen.nextInt(32, threshold+1))
+
   def twoDimensionSample =
     for(m <- oneDimensionSample; n <- oneDimensionSample) yield (m,n)
 }
@@ -44,10 +52,10 @@ extends TestDimensions(nonSpecialDimensions)(gen) {
     if(scalars != null) scalars.take(nonSpecialScalars) else Iterator.empty)
 
   def vectorSample(n:Int) =
-    Iterator.continually(new Vector(elements.take(n).toArray))
+    Iterator.continually(Vector.fill(n)(elements.next))
 
   def generalMatrixSample(m:Int, n:Int): Iterator[Matrix] =
-    Iterator.continually(new Matrix(m, n)(elements.take(m*n).toArray))
+    Iterator.continually(Matrix.fill(m, n)(elements.next))
 
   def generalMatrixSample: Iterator[Matrix] =
     for {
@@ -83,6 +91,27 @@ extends TestDimensions(nonSpecialDimensions)(gen) {
       a <- triangularMatrixSample(n, uplo, diag).take(matricesPerDimensions)
     } yield a
   }
+
+  /**
+   * mT, kT and nT are thresholds: dimensions will be generated that are
+   * below, equal to, and above each of them.
+   */
+  def matrixProductSample(mT:Int, kT:Int, nT:Int,
+                          belowMT:Int = 1, aboveMT:Int = 1,
+                          belowKT:Int = 1, aboveKT:Int = 1,
+                          belowNT:Int = 1, aboveNT:Int = 1) = {
+    for {
+      m <- oneDimensionWithThresholdSample(mT, belowMT, aboveMT)
+      k <- oneDimensionWithThresholdSample(kT, belowKT, aboveKT)
+      n <- oneDimensionWithThresholdSample(nT, belowNT, aboveNT)
+      a <- generalMatrixSample(m,k).take(1)
+      b <- generalMatrixSample(k,n).take(1)
+      transA <- Iterator(NoTranspose, Transpose)
+      transB <- Iterator(NoTranspose, Transpose)
+      alpha <- scalarSample
+      beta <- scalarSample
+    } yield (transA, transB, alpha, a, b, beta, m, n)
+  }
 }
 
 trait CommonMatrixPropertyTests
@@ -90,7 +119,7 @@ extends BLAS.Level3 with NumericPropertiesOfDouble {
 
   val eps = precision
 
-  def orthogonalityMeasure(q:MatrixLike) = {
+  def orthogonalityMeasure(q:Matrix) = {
     val (m,n) = q.dimensions
     val d = Matrix.identity(n)
     syrk(Lower, Transpose, -1.0, q, 1.0, d)

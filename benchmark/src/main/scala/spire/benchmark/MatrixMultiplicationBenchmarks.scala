@@ -31,7 +31,7 @@ object MatrixMultiplicationBenchmarks {
     jblas.NativeBlas.dgemm('N', 'N',
                            m, n, k, 2.0, a, 0, m, b, 0, k,
                            0.0, c, 0, m)
-    new Matrix(m, n)(c)
+    Matrix(m, n, c)
   }
 
   def sizes = {

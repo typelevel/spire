@@ -12,7 +12,7 @@ package spire.matrix.dense
  *     of elements, therefore keeping the next 2 characters indicating the type
  *     of matrices (GE for general, SY for symmetric, TR for triangular, ...);
  *   - we pass [[scala.collection.mutable.IndexedSeq]],
- *     [[spire.matrix.dense.VectorLike]] and [[spire.matrix.dense.MatrixLike]]
+ *     [[spire.matrix.dense.Vector]] and [[spire.matrix.dense.Matrix]]
  *     objects as arguments instead of raw pointers along with sizes, strides
  *     or leading dimensions as those are encapsulated in the arguments in our
  *     design;
@@ -22,7 +22,7 @@ package object BLAS {
 
   import scala.collection.mutable.IndexedSeq
   import spire.matrix.{Transposition, UpperOrLower, Sides, DiagonalProperty}
-  import spire.matrix.dense.{VectorLike, MatrixLike, PlaneRotation}
+  import spire.matrix.dense.{Vector, Matrix, PlaneRotation}
   import Sides._
   import Transposition._
   import UpperOrLower._
@@ -37,25 +37,39 @@ package object BLAS {
    */
   trait Level1 {
     /**
-     * Scale a vector or a matrix
+     * Scale a vector
      *
      * i.e. x := α x
      */
-    def scale(alpha: Double, x: IndexedSeq[Double]): Unit
+    def scale(alpha: Double, x: Vector): Unit
+
+    /**
+     * Scale a matrix
+     *
+     * i.e. x := α x
+     */
+    def scale(alpha: Double, x: Matrix): Unit
 
     /**
      * Copy x into y
      *
-     * i.e. y(0:n) := x(0:n) where n is the length of x
+     * i.e. y(0:n) := x(0:n) where n is the dimension of x
      */
-    def copy(x: IndexedSeq[Double], y: IndexedSeq[Double]): Unit
+    def copy(x: Vector, y: Vector): Unit
 
     /**
      * Linear combination
      *
      * y := α x + y
      */
-    def axpy(alpha: Double, x: IndexedSeq[Double], y: IndexedSeq[Double]): Unit
+    def axpy(alpha: Double, x: Vector, y: Vector): Unit
+
+    /**
+     * Linear combination of matrices
+     *
+     * y := α x + y
+     */
+    def axpy(alpha: Double, x: Matrix, y: Matrix): Unit
 
     /**
      * Transform each (x(i), y(i)) into its image by the given plane rotation
@@ -75,17 +89,17 @@ package object BLAS {
      * where G is this rotation and G^T^ its transpose (which is also its
      * inverse).
      */
-    def rot(x:VectorLike, y:VectorLike, g:PlaneRotation): Unit
+    def rot(x:Vector, y:Vector, g:PlaneRotation): Unit
 
     /**
      * Scalar product of x and y
      */
-    def dot(x:IndexedSeq[Double], y:IndexedSeq[Double]): Double
+    def dot(x:Vector, y:Vector): Double
 
     /**
      * The index of the element that has the greatest absolute value
      */
-    def idamax(x:IndexedSeq[Double]): Int
+    def idamax(x:Vector): Int
   }
 
   /**
@@ -103,15 +117,15 @@ package object BLAS {
      * @param trans decides which alternative for op(A) shall be used.
      */
      def gemv(trans: Transposition.Value,
-              alpha: Double, a: MatrixLike,
-              x: VectorLike, beta: Double, y: VectorLike): Unit
+              alpha: Double, a: Matrix,
+              x: Vector, beta: Double, y: Vector): Unit
 
      /**
       * Rank-1 update for a general matrix
       *
       * A := α x y^T^ + A
       */
-     def ger(alpha: Double, x: VectorLike, y: VectorLike, a: MatrixLike): Unit
+     def ger(alpha: Double, x: Vector, y: Vector, a: Matrix): Unit
 
      /**
       * Product of a lower or upper triangular square matrix and a vector
@@ -125,7 +139,7 @@ package object BLAS {
       *
       */
      def trmv(uplo:UpperOrLower.Value, trans:Transposition.Value,
-              diag:DiagonalProperty.Value, a:MatrixLike, x:VectorLike): Unit
+              diag:DiagonalProperty.Value, a:Matrix, x:Vector): Unit
   }
 
   /**
@@ -152,14 +166,14 @@ package object BLAS {
      * @todo We could check whether there are such overlaps.
      */
     def gemm(transA:Transposition.Value, transB:Transposition.Value,
-             alpha:Double, a:MatrixLike, b:MatrixLike,
-             beta:Double, c:MatrixLike): Unit
+             alpha:Double, a:Matrix, b:Matrix,
+             beta:Double, c:Matrix): Unit
 
     protected
     def checkGemmPreconditions(transA:Transposition.Value,
                                transB:Transposition.Value,
-                               alpha:Double, a:MatrixLike, b:MatrixLike,
-                               beta:Double, c:MatrixLike) {
+                               alpha:Double, a:Matrix, b:Matrix,
+                               beta:Double, c:Matrix) {
       require(if(transA == NoTranspose) c.dimensions._1 == a.dimensions._1
               else                      c.dimensions._1 == a.dimensions._2)
       require(if(transB == NoTranspose) c.dimensions._2 == b.dimensions._2
@@ -200,7 +214,7 @@ package object BLAS {
      * (resp. lower) triangle of C is updated.
      */
     def syrk(uplo:UpperOrLower.Value, trans:Transposition.Value,
-             alpha:Double, a:MatrixLike, beta:Double, c:MatrixLike): Unit
+             alpha:Double, a:Matrix, beta:Double, c:Matrix): Unit
 
     /**
      * Solve triangular system of equations with multiple right-hand sides
@@ -227,7 +241,7 @@ package object BLAS {
      */
     def trsm(side:Sides.Value, uplo:UpperOrLower.Value,
              trans:Transposition.Value, unit:DiagonalProperty.Value,
-             alpha:Double, a:MatrixLike, B:MatrixLike): Unit
+             alpha:Double, a:Matrix, B:Matrix): Unit
   }
 
 }

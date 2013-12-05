@@ -71,7 +71,7 @@ trait BLASLevel2Test extends FunSuite with BLAS.Level2 {
       n <- testMatrices.oneDimensionSample
       a <- testMatrices.triangularMatrixSample(n, uplo, diag).take(1)
       x <- testMatrices.vectorSample(n).take(2)
-      y = Vector.empty(x.length)
+      y = Vector.empty(x.dimension)
     } yield (uplo, trans, diag, a, x, y)
   }
 

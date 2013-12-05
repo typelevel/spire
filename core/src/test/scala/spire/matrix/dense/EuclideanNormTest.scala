@@ -15,9 +15,9 @@ class EuclideanNormTest extends FunSuite with EuclideanNorm {
                       )
 
   test("Trivial cases") {
-    val x1 = new  MatrixStrides(m, first=(4,0), step=1, length=1)
+    val x1 = m.column(0).block(4,5)
     expectResult(5.0) { euclideanNorm(x1) }
-    val x2 = new  MatrixStrides(m, first=(0,0), step=1, length=0)
+    val x2 = m.column(0).block(0,0)
     expectResult(0.0) { euclideanNorm(x2) }
   }
 

@@ -18,7 +18,7 @@ with BLAS.NaiveLevel3
   val HessenbergDecomposition: Hessenberg.DecompositionLikeCompanion
   val SchurDecomposition: Schur.RealDecompositionCompanion
 
-  def decompositionGoodness(a:MatrixLike, q:MatrixLike, h:MatrixLike) = {
+  def decompositionGoodness(a:Matrix, q:Matrix, h:Matrix) = {
     val (m,n) = q.dimensions
     val qh = Matrix.empty(m, n)
     gemm(NoTranspose, NoTranspose, 1.0, q, h, 0.0, qh)

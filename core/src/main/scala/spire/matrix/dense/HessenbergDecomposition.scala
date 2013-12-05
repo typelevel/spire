@@ -22,7 +22,7 @@ import scala.math._
  * Q H Q^T^ but not the computation of Q and H given an input matrix A
  * (this is the role of the trait DecompositionLikeCompanion).
  * The decomposition is stored in the matrix A, and in an extra vector tau
- * of length n:
+ * of dimension n:
  *
  *  - it is assumed that the blocks A(0:iLo, 0:iLo) and A(iHi:n, iHi:n) are
       upper triangular whereas A(iLo:n, 0:iLo) and A(iHi:n, 0:iHi) are zero.

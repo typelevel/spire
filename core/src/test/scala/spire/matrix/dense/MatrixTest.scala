@@ -1,18 +1,18 @@
 package spire.matrix.dense.tests
 
-import spire.matrix.dense.{Matrix, Permutation}
-import spire.matrix.Constants._
+import spire.matrix.dense.{Vector, Matrix, Permutation}
 import spire.syntax.cfor._
 
 import org.scalatest.FunSuite
 
 class MatrixTest extends FunSuite {
 
+  val V = Vector
+
   test("Matrix elements") {
     val m = Matrix(2,3)(11, 12, 13,
-      21, 22, 23)
+                        21, 22, 23)
     expectResult((2,3)) { m.dimensions }
-    expectResult(6) { m.length }
     expectResult(11 :: 21 :: 12 :: 22 :: 13 :: 23 :: Nil) { m.toList }
     expectResult(11){ m(0,0) }
     expectResult(23){ m(1,2) }
@@ -35,17 +35,28 @@ class MatrixTest extends FunSuite {
   }
 
   test("Matrix columns") {
-    val m = Matrix(5,3)( 1,  2,  3,
+    val (m,n) = (5,3)
+    val a = Matrix(5,3)( 1,  2,  3,
                          4,  5,  6,
                          7,  8,  9,
                          10, 11, 12,
                          13, 14, 15)
-    expectResult(2 :: 5 :: 8 :: 11 :: 14 :: Nil) { m.column(1).toList }
-    expectResult(5 :: 8 :: 11 :: 14 :: Nil) { m.column(1).block(1,End).toList }
-    expectResult(2 :: 5 :: 8 :: Nil) { m.column(1).block(0,3).toList }
-    expectResult(8 :: 11 :: Nil) { m.column(1).block(2,4).toList }
-    expectResult(15 :: Nil) { m.column(2).block(4,End).toList }
-    expectResult(Nil) { m.column(1).block(1,1).toList }
+    expectResult(Vector(2 , 5 , 8 , 11 , 14)) { a.column(1) }
+    expectResult(Vector(5 , 8 , 11 , 14)) { a.column(1).block(1,m) }
+    expectResult(Vector(2 , 5 , 8)) { a.column(1).block(0,3) }
+    expectResult(Vector(8 , 11)) { a.column(1).block(2,4) }
+    expectResult(Vector(15)) { a.column(2).block(4,m) }
+    expectResult(Vector()) { a.column(1).block(1,1) }
+  }
+
+  test("Block of a matrix column") {
+    val (m,n) = (5,3)
+    val a = Matrix(5,3)( 1,  2,  3,
+                         4,  5,  6,
+                         7,  8,  9,
+                         10, 11, 12,
+                         13, 14, 15)
+    expectResult { Vector(7 , 10 , 13) } { a.column(0).block(2,5) }
   }
 
   test("Search for trailing zero columns") {
@@ -110,30 +121,30 @@ class MatrixTest extends FunSuite {
   }
 
   test("Matrix rows") {
-    val m = Matrix(5,3)(1,   2,  3,
+    val a = Matrix(5,3)(1,   2,  3,
                         4,   5,  6,
                         7,   8,  9,
                         10, 11, 12,
                         13, 14, 15)
-    expectResult(4 :: 5 :: 6 :: Nil) { m.row(1).toList }
-    expectResult(13 :: 14 :: 15 :: Nil) { m.row(4).toList }
-    val m1 = m.copyToMatrix
-    m.row(3)(2) = -1
-    m1(3,2) = -1
-    expectResult(m1){ m }
-    val r = m.row(0).block(1,3)
-    expectResult(2) { r.length }
+    expectResult(Vector(4 , 5 , 6)) { a.row(1) }
+    expectResult(Vector(13 , 14 , 15)) { a.row(4) }
+    val a1 = a.copyToMatrix
+    a.row(3)(2) = -1
+    a1(3,2) = -1
+    expectResult(a1){ a }
+    val r = a.row(0).block(1,3)
+    expectResult(2) { r.dimension }
     r(1) = -2
-    m1(0,2) = -2
-    expectResult(m1){ m }
-    val m2 = Matrix(6,4)(11, 12, 13, 14,
+    a1(0,2) = -2
+    expectResult(a1){ a }
+    val a2 = Matrix(6,4)(11, 12, 13, 14,
                          21, 22, 23, 24,
                          31, 32, 33, 34,
                          41, 42, 43, 44,
                          51, 52, 53, 54,
                          61, 62, 63, 64)
-    expectResult(51::52::53::54::Nil) { m2.row(4).block(0,End) }
-    expectResult(31 :: 32 :: Nil) { m2.row(2).block(0,2) }
+    expectResult(Vector(51,52,53,54)) { a2.row(4).block(0,4) }
+    expectResult(Vector(31 , 32)) { a2.row(2).block(0,2) }
   }
 
   test("1-norm of 2 x 3 matrix") {
@@ -186,36 +197,36 @@ class MatrixTest extends FunSuite {
     val m = Matrix(3,5)(11, 12, 13, 14, 15,
                         21, 22, 23, 24, 25,
                         31, 32, 33, 34, 35)
-    expectResult(31 :: Nil) { m.diagonalOfOrder(-2).toList }
-    expectResult(21 :: 32 :: Nil) { m.diagonalOfOrder(-1).toList }
-    expectResult(11 :: 22 :: 33 :: Nil) { m.diagonal.toList }
-    expectResult(12 :: 23 :: 34 :: Nil) { m.diagonalOfOrder(1).toList }
-    expectResult(13 :: 24 :: 35 :: Nil) { m.diagonalOfOrder(2).toList }
-    expectResult(14 :: 25 :: Nil) { m.diagonalOfOrder(3).toList }
-    expectResult(15 :: Nil) { m.diagonalOfOrder(4).toList }
+    expectResult(Vector(31)) { m.diagonalOfOrder(-2) }
+    expectResult(Vector(21 , 32)) { m.diagonalOfOrder(-1) }
+    expectResult(Vector(11 , 22 , 33)) { m.diagonal }
+    expectResult(Vector(12 , 23 , 34)) { m.diagonalOfOrder(1) }
+    expectResult(Vector(13 , 24 , 35)) { m.diagonalOfOrder(2) }
+    expectResult(Vector(14 , 25)) { m.diagonalOfOrder(3) }
+    expectResult(Vector(15)) { m.diagonalOfOrder(4) }
 
     val m1 = Matrix(5,4)(11, 12, 13, 14,
                          21, 22, 23, 24,
                          31, 32, 33, 34,
                          41, 42, 43, 44,
                          51, 52, 53, 54)
-    expectResult(51 :: Nil) { m1.diagonalOfOrder(-4).toList }
-    expectResult(41 :: 52 :: Nil) { m1.diagonalOfOrder(-3).toList }
-    expectResult(31 :: 42 :: 53 :: Nil) { m1.diagonalOfOrder(-2).toList }
-    expectResult(21 :: 32 :: 43 :: 54 :: Nil) { m1.diagonalOfOrder(-1).toList }
-    expectResult(11 :: 22 :: 33 :: 44 :: Nil) { m1.diagonalOfOrder(0).toList }
-    expectResult(12 :: 23 :: 34 :: Nil) { m1.diagonalOfOrder(1).toList }
-    expectResult(13 :: 24 :: Nil) { m1.diagonalOfOrder(2).toList }
-    expectResult(14 :: Nil) { m1.diagonalOfOrder(3).toList }
+    expectResult(Vector(51)) { m1.diagonalOfOrder(-4) }
+    expectResult(Vector(41 , 52)) { m1.diagonalOfOrder(-3) }
+    expectResult(Vector(31 , 42 , 53)) { m1.diagonalOfOrder(-2) }
+    expectResult(Vector(21 , 32 , 43 , 54)) { m1.diagonalOfOrder(-1) }
+    expectResult(Vector(11 , 22 , 33 , 44)) { m1.diagonalOfOrder(0) }
+    expectResult(Vector(12 , 23 , 34)) { m1.diagonalOfOrder(1) }
+    expectResult(Vector(13 , 24)) { m1.diagonalOfOrder(2) }
+    expectResult(Vector(14)) { m1.diagonalOfOrder(3) }
 
     val m2 = Matrix(3,3)(11, 12, 13,
                          21, 22, 23,
                          31, 32, 33)
-    expectResult(31 :: Nil) { m2.diagonalOfOrder(-2).toList }
-    expectResult(21 :: 32 :: Nil) { m2.diagonalOfOrder(-1).toList }
-    expectResult(11 :: 22 :: 33 :: Nil) { m2.diagonalOfOrder(0).toList }
-    expectResult(12 :: 23 :: Nil) { m2.diagonalOfOrder(1).toList }
-    expectResult(13 :: Nil) { m2.diagonalOfOrder(2).toList }
+    expectResult(Vector(31)) { m2.diagonalOfOrder(-2) }
+    expectResult(Vector(21 , 32)) { m2.diagonalOfOrder(-1) }
+    expectResult(Vector(11 , 22 , 33)) { m2.diagonalOfOrder(0) }
+    expectResult(Vector(12 , 23)) { m2.diagonalOfOrder(1) }
+    expectResult(Vector(13)) { m2.diagonalOfOrder(2) }
   }
 
   test("string conversion") {
@@ -264,12 +275,27 @@ class MatrixTest extends FunSuite {
     expectResult(32) { b(1,0) }
     expectResult(33) { b(1,1) }
     expectResult(34) { b(1,2) }
+  }
 
-    expectResult(22) { b(0)}
-    expectResult(32) { b(1)}
-    expectResult(23) { b(2)}
-    expectResult(33) { b(3)}
-    expectResult(24) { b(4)}
+  test("columns of matrix block") {
+    val a = Matrix(4,3)(11, 12, 13,
+                        21, 22, 23,
+                        31, 32, 33,
+                        41, 42, 43)
+    val b = a.block(1,4)(1,3)
+    expectResult(Vector(22 , 32 , 42)) { b.column(0) }
+    expectResult(Vector(23 , 33 , 43)) { b.column(1) }
+  }
+
+  test("block of matrix block") {
+    val a = Matrix(5,5)(11, 12, 13, 14, 15,
+                        21, 22, 23, 24, 25,
+                        31, 32, 33, 34, 35,
+                        41, 42, 43, 44, 45,
+                        51, 52, 53, 54, 55)
+    val b = a.block(1,5)(2,5).block(1,4)(1,3)
+    expectResult { b(0,1) } { 35 }
+    expectResult { 34 :: 44 :: 54 :: 35 :: 45 :: 55 :: Nil } { b.toList }
   }
 
   test("Permutation of matrix rows") {

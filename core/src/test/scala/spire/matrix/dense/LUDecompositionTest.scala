@@ -26,7 +26,7 @@ with BLAS.NaiveLevel3
   val threshold = 30.0
   val rightHandSides = Seq(1, 2, 15)
 
-  def decompositionGoodness(a:MatrixLike, lu:LU.Decomposition) = {
+  def decompositionGoodness(a:Matrix, lu:LU.Decomposition) = {
     val (m, n) = a.dimensions
     // residual starts as PLU
     val residual = lu.reconstructedOriginal

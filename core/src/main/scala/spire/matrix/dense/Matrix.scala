@@ -8,28 +8,21 @@ package spire.matrix.dense
 
 import spire.implicits._
 import spire.math.Complex
-import spire.matrix.Constants._
 import spire.matrix.Transposition
-import scala.collection.mutable
 import scala.math
 
 /**
- * Common features to all dense matrices
+ * Dense matrix whose dimensions are set at runtime.
  *
  * - The elements of a matrix are mutable but its dimensions are immutable.
  *
  * - Elements are stored in column-major order and each and every algorithm
  *   in this package assumes so.
  *
- * - A matrix may be viewed as a 2D object but also as a linear sequence,
- *   with its elements ordered by increasing row and column indices,
- *   following the internal column-major layout. Hence this traits extending
- *   IndexedSeq.
- *
  * - This traits is primarily focused on providing flexible and efficient means
  *   of accessing the matrix elements but it also provide a few linear algebra
  *   operations: those for which convenience is more important than performance.
- *   Any performance critical linear algebra should be implemented as a BLAS
+ *   Any performance critical linear algebra should be implemented in the BLAS
  *   package. This includes matrix multiplication, matrix-vector multiplication,
  *   etc.
  *
@@ -44,17 +37,195 @@ import scala.math
  * whereas a positive k gives a diagonal above it (superdiagonal),
  * and a negative k gives a diagonal below it (subdiagonal).
  *
- * TODO: parametrize the trait by the type of elements
+ * TODO: parametrize by the type of elements
  */
-trait MatrixLike extends mutable.IndexedSeq[Double] {
-  protected val m: Int
-  protected val n: Int
+class Matrix(val m:Int, val n:Int, val ld:Int,
+             val start:Int, val elements:Array[Double])
+extends Iterable[Double] {
+  require(m >= 0)
+  require(n >= 0)
+  require(m <= ld)
+  require(start >= 0)
+  require(start + m + (n-1)*ld <= elements.length)
+
+  def this(m:Int, n:Int, elements:Array[Double]) = this(m, n, m, 0, elements)
 
   /** (number of rows, number of columns) */
   lazy val dimensions = (m,n)
 
+  /**
+   * Set element at row i and column j (indices are 0-based)
+   *
+   * This implements Matrix abstract method
+   */
+  final def update(i: Int, j: Int, x: Double) = {
+    elements(start + i + j*ld) = x
+  }
+
+  /**
+   * Element at row i and column j (indices are 0-based)
+   *
+   * This implements Matrix abstract method
+   */
+  final def apply(i: Int, j: Int): Double = elements(start + i + j*ld)
+
+  final def block(firstRow:Int, endRow:Int)(firstColumn:Int, endColumn:Int) =
+    new Matrix(endRow - firstRow, endColumn - firstColumn, ld,
+               start + firstRow + firstColumn*ld, elements)
+
+  final
+  def column(j:Int) = new Vector(m, 1, start + j*ld, elements)
+
+  final
+  def row(i:Int) = new Vector(n, ld, start + i, elements)
+
+  /** Swap the (i,j) and the (k,l) elements */
+  final
+  def swap(i1:Int, j1:Int)(i2:Int, j2:Int): Unit = {
+    val k1 = start + j1 * ld + i1
+    val k2 = start + j2 * ld + i2
+    val tmp = elements(k1)
+    elements(k1) = elements(k2)
+    elements(k2) = tmp
+  }
+
+  override def equals(other: Any): Boolean =
+    other match {
+      case that: Matrix =>
+        m == that.m &&
+        n == that.n &&
+        (this sameElements that)
+      case _ => false
+    }
+
+  /** Whether this has the same elements as other */
+  def sameElements(that:Matrix): Boolean = {
+    cforRange2(0 until n, 0 until m) { (j,i) =>
+      if(this(i,j) != that(i,j)) return false
+    }
+    return true
+  }
+
+  /** Traversal in column-major order */
+  def iterator =
+    if(m == ld)
+      new Iterator[Double] {
+        var l = start
+        def hasNext = l < start + m*n
+        def next = {
+          val elt = elements(l)
+          l += 1
+          elt
+        }
+      }
+    else
+      new Iterator[Double] {
+        var l = start
+        var i = 0
+        def hasNext = l < start + m + ld*(n-1)
+        def next = {
+          if(i == m) {
+            i = 0
+            l += ld - m
+          }
+          val elt = elements(l)
+          i += 1
+          l += 1
+          elt
+        }
+      }
+
+  /** Assign the elements of other to this */
+  def := (other:Matrix): Unit = {
+    cforRange2(0 until dimensions._1, 0 until dimensions._2) { (i,j) =>
+      this(i,j) = other(i,j)
+    }
+  }
+
+  /**
+   * Assign the elements of other to this.
+   *
+   * Precisely, denoting this as A
+   * <pre>
+   *         [ A(0,0) A(0,1) ] = [ a b ]
+   *         [ A(1,0) A(1,1) ]   [ c d ]
+   * </pre>
+   */
+  def := (other:(Double, Double, Double, Double)) {
+    this(0, 0) = other._1
+    this(0, 1) = other._2
+    this(1, 0) = other._3
+    this(1, 1) = other._4
+  }
+
+  /** Assign the given value to every elements of this */
+  def := (e:Double): Unit = {
+    cforRange2(0 until n, 0 until m) { (j,i) => this(i,j) = e }
+  }
+
+  /**
+   * Assign the elements produced by the given iterator to this
+   *
+   * The elements shall be produced by other with a column-major ordering
+   */
+  def :=(other:Iterator[Double]):Unit = {
+    cforRange2(0 until n, 0 until m) { (j,i) => this(i,j) = other.next }
+  }
+
+  /** Is the matrix zero? */
+  def isZero = forall(_ == 0)
+
+  /** Is the matrix the identity matrix */
+  def isIdentity: Boolean = {
+    if (m != n) return false
+    cforRange2(0 until m, 0 until n) { (j,i) =>
+      if(this(i,j) != (if(i == j) 1 else 0)) return false
+    }
+    return true
+  }
+
+  /** Is the matrix square? */
+  def isSquare = m == n
+
+  /** Are all elements zero below the k-th diagonal? */
+  def isUpperDiagonal(k:Int): Boolean = {
+    for(j <- 0 until n) {
+      for(i <- math.max(j-k+1, 0) until m) if(this(i,j) != 0) return false
+    }
+    return true
+  }
+
+  /** Are all elements zero above the k-th diagonal? */
+  def isLowerDiagonal(k:Int): Boolean = {
+    for(j <- 0 until n) {
+      for(i <- 0 until math.min(j-k, m)) if(this(i,j) != 0) return false
+    }
+    return true
+  }
+
+  /** Are all elements zero below the main diagonal? */
+  def isUpperDiagonal: Boolean = isUpperDiagonal(0)
+
+  /** Are all elements zero above the main diagonal? */
+  def isLowerDiagonal: Boolean = isLowerDiagonal(0)
+
+  /** Is the matrix upper Hessenberg? */
+  def isUpperHessenberg = isUpperDiagonal(-1)
+
+  /** Is the matrix lower Hessenberg? */
+  def isLowerHessenberg = isLowerDiagonal(+1)
+
+  /** Is the matrix diagonal? */
+  def isDiagonal: Boolean = {
+    if (m != n) return false
+    cforRange2(0 until m, 0 until n) { (j,i) =>
+      if(i != j && this(i,j) != 0) return false
+    }
+    return true
+  }
+
   /** Copies dimensions and elements of this matrix to a new matrix */
-  def copyToMatrix = new Matrix(m, n)(toArray)
+  def copyToMatrix = new Matrix(m, n, m, 0, toArray)
 
   /**
     * Copy the upper diagonal part of this matrix (k-th diagonal)
@@ -100,95 +271,20 @@ trait MatrixLike extends mutable.IndexedSeq[Double] {
     */
   def copyToLowerHessenberg: Matrix = copyToLowerDiagonal(1)
 
-  /** Set element at row i and column j (indices are 0-based) */
-  def update(i:Int, j:Int, value:Double)
-
-  /** Element at row i and column j (indices are 0-based) */
-  def apply(i:Int, j:Int): Double
-
-  /** Set k-th element, assuming column-major layout */
-  def update(k:Int, value:Double)
-
-  /** k-th element, assuming column-major layout */
-  def apply(k:Int): Double
-
-  /** Swap the (i,j) and the (k,l) elements */
-  @inline final def swap(i1:Int, j1:Int)(i2:Int, j2:Int): Unit = {
-    val k1 = j1 * m + i1
-    val k2 = j2 * m + i2
-    val tmp = this(k1)
-    this(k1) = this(k2)
-    this(k2) = tmp
-  }
-
-  /** Assign the elements of other to this */
-  def := (other:MatrixLike): Unit = {
-    cforRange2(0 until dimensions._1, 0 until dimensions._2) { (i,j) =>
-      this(i,j) = other(i,j)
-    }
-  }
-
-  /**
-   * Assign the elements of other to this.
-   *
-   * Precisely, denoting this as A
-   * <pre>
-   *         [ A(0,0) A(0,1) ] = [ a b ]
-   *         [ A(1,0) A(1,1) ]   [ c d ]
-   * </pre>
-   */
-  def := (other:(Double, Double, Double, Double)) {
-    this(0, 0) = other._1
-    this(0, 1) = other._2
-    this(1, 0) = other._3
-    this(1, 1) = other._4
-  }
-
-  /** Assign the given value to every elements of this */
-  def := (e:Double): Unit = {
-    cforRange(0 until length) { i => this(i) = e }
-  }
-
-  /**
-   * Assign the elements produced by the given iterator to this
-   *
-   * The elements shall be produced by other with a column-major ordering
-   */
-  def :=(other:Iterator[Double]):Unit = {
-    cforRange(0 until length) { i => other.next }
-  }
-
   /**
    * Same matrix as this but with elements rounded to the nearest
    * at the given decimal digit.
    */
   def round(d: Int) = {
     val s = 10 pow d
-    new Matrix(m, n)(map((x:Double) => (x*s).round.toDouble/s).toArray)
-  }
-
-  /** Total number of elements */
-  final def length = m*n
-
-  /** j-th column */
-  def column(j:Int) = {
-    require(0 <= j && j < n)
-    new  MatrixStrides(this, j*m, 1, m)
-  }
-
-  /** i-th row */
-  def row(i:Int) = {
-    require(0 <= i && i < m)
-    new  MatrixStrides(this, i, m, n)
+    new Matrix(m, n, ld, 0, map((x:Double) => (x*s).round.toDouble/s).toArray)
   }
 
   /** k-th diagonal */
-  def diagonalOfOrder(k:Int = 0) =
-    new MatrixStrides(this,
-                      first  = if(k >= 0) (0, k) else (-k, 0),
-                      step   = m+1,
-                      length = if(k >= 0) math.min(m, n-k)
-                               else       math.min(n, m+k))
+  def diagonalOfOrder(k:Int = 0) = {
+    if(k >= 0) new Vector(math.min(m, n-k), ld+1, k*ld, elements)
+    else       new Vector(math.min(n, m+k), ld+1, -k  , elements)
+  }
 
   /** main diagonal */
   def diagonal = diagonalOfOrder(0)
@@ -203,8 +299,8 @@ trait MatrixLike extends mutable.IndexedSeq[Double] {
     // non-zero block
     if(this(0, n-1) != 0 || this(m-1, n-1) != 0) n
     else {
-      for(j <- n-1 to 0 by -1) {
-        for(i <- 0 until m) if(this(i,j) != 0) return j+1
+      cforRange(n-1 to 0 by -1) { j =>
+        cforRange(0 until m) { i => if(this(i,j) != 0) return j+1 }
       }
       return 0
     }
@@ -219,7 +315,7 @@ trait MatrixLike extends mutable.IndexedSeq[Double] {
     if(this(m-1, 0) != 0 || this(m-1, n-1) != 0) m
     else {
       var result = -1
-      for(j <- 0 until n) {
+      cforRange(0 until n) { j =>
         var i = m-1
         while(i >= 0 && this(i,j) == 0) i -= 1
         result = math.max(result, i)
@@ -227,79 +323,6 @@ trait MatrixLike extends mutable.IndexedSeq[Double] {
       result + 1
     }
   }
-
-  /** Is the matrix square? */
-  val isSquare = m == n
-
-  /** Are all elements zero below the k-th diagonal? */
-  def isUpperDiagonal(k:Int): Boolean = {
-    for(j <- 0 until n) {
-      for(i <- math.max(j-k+1, 0) until m) if(this(i,j) != 0) return false
-    }
-    return true
-  }
-
-  /** Are all elements zero above the k-th diagonal? */
-  def isLowerDiagonal(k:Int): Boolean = {
-    for(j <- 0 until n) {
-      for(i <- 0 until math.min(j-k, m)) if(this(i,j) != 0) return false
-    }
-    return true
-  }
-
-  /** Are all elements zero below the main diagonal? */
-  def isUpperDiagonal: Boolean = isUpperDiagonal(0)
-
-  /** Are all elements zero above the main diagonal? */
-  def isLowerDiagonal: Boolean = isLowerDiagonal(0)
-
-  /** Is the matrix upper Hessenberg? */
-  def isUpperHessenberg = isUpperDiagonal(-1)
-
-  /** Is the matrix lower Hessenberg? */
-  def isLowerHessenberg = isLowerDiagonal(+1)
-
-  /** Is the matrix diagonal? */
-  def isDiagonal: Boolean = {
-    if (m != n) return false
-    cforRange2(0 until m, 0 until n) { (j,i) =>
-      if(i != j && this(i,j) != 0) return false
-    }
-    return true
-  }
-
-  /** Is the matrix zero? */
-  def isZero = forall(_ == 0)
-
-  /** Is the matrix the identity matrix */
-  def isIdentity: Boolean = {
-    if (m != n) return false
-    cforRange2(0 until m, 0 until n) { (j,i) =>
-      if(this(i,j) != (if(i == j) 1 else 0)) return false
-    }
-    return true
-  }
-
-  /**
-   * A rectangular block of this matrix.
-   *
-   * This returns A(firstRow:endRow, firstColumn:endColumn). If endRow (resp.
-   * endColumn) is End, then it takes the value m (resp. n).
-   */
-  def block(firstRow:Int = 0, endRow:Int = End)
-           (firstColumn:Int = 0, endColumn:Int = End) =
-    new MatrixBlock(this,
-                    firstRow, if(endRow == End) m else endRow,
-                    firstColumn, if(endColumn == End) n else endColumn)
-
-  override def equals(other: Any): Boolean =
-    other match {
-      case that: MatrixLike =>
-        m == that.m &&
-        n == that.n &&
-        (this sameElements that)
-      case _ => false
-    }
 
   /** The 1-norm of the matrix, max,,j,, sum,,i,, |a,,ij,,| */
   def norm1: Double = {
@@ -345,201 +368,6 @@ trait MatrixLike extends mutable.IndexedSeq[Double] {
     ).mkString(start, rowStep, end)
     StringFormatting.postprocess(disp, useMathematicaFormat)
   }
-}
-
-/**
- *  Strides over matrix elements.
- *
- * Note: this is quite inefficient if the underlying matrix is an instance
- * of MatrixBlock but this is not a common use case.
- *
- * @constructor Construct strides starting at the element of index `firstIndex`,
- * advancing by the given `step` at each stride, eventually producing
- * a sequence that has `length` elements. `step` may be negative.
- *
- */
-final
-class  MatrixStrides(a:MatrixLike,
-                     val firstIndex:Int, val step:Int, val length:Int)
-  extends VectorLike
-{
-  val endIndex = firstIndex + length*step
-
-  def this(a:MatrixLike, first:(Int, Int), step:Int, length:Int) =
-    this(a, first._2*a.dimensions._1 + first._1, step, length)
-
-  override def iterator = new Iterator[Double] {
-    var k = firstIndex
-    def hasNext = k < endIndex
-    def next = {
-      val result = a(k)
-      k += step
-      result
-    }
-  }
-
-  def apply(k:Int):Double = a(firstIndex + k*step)
-
-  def update(k:Int, value:Double) = { a(firstIndex + k*step) = value }
-}
-
-/**
- * Rectangular block of a matrix that may be considered a matrix itself.
- */
-final
-class MatrixBlock(private val a:MatrixLike,
-                  firstRow:Int, endRow:Int, firstColumn:Int, endColumn:Int)
-  extends MatrixLike {
-
-  require(0 <= firstRow  && firstRow <= endRow && endRow <= a.dimensions._1)
-  require(0 <= firstColumn  && firstColumn <= endColumn
-                                                && endColumn <= a.dimensions._2)
-
-  private val i0 = firstRow
-  private val j0 = firstColumn
-  private val k0 = j0*a.dimensions._1 + i0
-  protected val m = endRow - firstRow
-  protected val n = endColumn - firstColumn
-
-  /** Top-left corner of this block */
-  def topLeftCorner = (i0, j0)
-
-  /**
-   * Set element at row i and column j (indices are 0-based)
-   *
-   * This implements MatrixLike abstract function
-   */
-  def update(i:Int, j:Int, value:Double) = {
-    a(k0 + j*a.dimensions._1 + i) = value
-  }
-
-  /**
-   * Element at row i and column j (indices are 0-based)
-   *
-   * This implements MatrixLike abstract method.
-   */
-  def apply(i:Int, j:Int): Double = a(k0 + j*a.dimensions._1 + i)
-
-  /**
-   * Set k-th element, assuming column-major layout
-   *
-   * This method is inefficient.
-   *
-   * This implements MatrixLike abstract method.
-   */
-  def update(k:Int, value:Double) { this(k%m, k/m) = value }
-
-  /** k-th element, assuming column-major layout
-   *
-   * This method is inefficient.
-   *
-   * This implements MatrixLike abstract method.
-   */
-  def apply(k:Int) = this(k%m, k/m)
-
-  override
-  def block(firstRow:Int = 0, endRow:Int = End)
-           (firstColumn:Int = 0, endColumn:Int = End) =
-    new MatrixBlock(a,
-                    i0 + firstRow, i0 + endRow,
-                    j0 + firstColumn, j0 + endColumn)
-}
-
-
-/**
- * Matrix whose dimensions are set at runtime.
- *
- * We accept null dimensions although it makes little sense so as to have
- * the same behaviour as MatrixBlock for which zero dimensions make sense
- * (empty block).
- *
- * TODO: parametrize the class by the type of elements
- *
- * @constructor Create a m x n matrix.
- * Synopsis:
- * {{{
- * // Create a zero m x n matrix
- * val a = new Matrix(m, n)
- * // or more clearly
- * val b = Matrix.zero(m,n)
- *
- * // Create a m x n matrix with the given elements
- * // that come stored in column-major order
- * val a = new Matrix(m, n, elements)
- *
- * // Create a m x n matrix with the given elements
- * // that come stored in row-major order
- * val a = new Matrix(m, n, elements, given_in_row_major=true)
- * }}}
- */
-class Matrix(val m: Int, val n: Int)
-            (val elems: Array[Double] = new Array[Double](m*n))
-extends MatrixLike {
-  require(m >= 0)
-  require(n >= 0)
-  require(elems.length == m * n)
-
-  /**
-   * Overriden for efficiency
-   */
-  override def iterator = elems.iterator
-
-  /**
-   * Overloaded for efficiency.
-   */
-  def sameElements(other: Matrix) = elems === other.elems
-
-  /**
-   * Permute the elements to change the ordering from row- to column-major.
-   * This is equivalent to transposing the matrix in-place.
-   *
-   * This is the algorithm described in [1], taking advantage of Remark 1.
-   * Note that the author credits P.F. Windley for this algorithm (ref 1.)
-   *
-   * [1] Correctness proof of an in-place permutation.
-   *     A. J. W. Duijvestijn.
-   *     BIT, 1972 vol. 12 pp. 318-324.
-  */
-  def permuteFromRowMajorToColumnMajor() = {
-    /* In term of transposition, the target is a matrix of dimension (n,m),
-       hence the fact that m and n are swapped compared to [1] */
-    cforRange(1 until length - 2) { k =>
-      var kn = (k % m)*n + k/m
-      while(kn < k) kn = (kn % m)*n + kn/m
-
-      if(kn != k) {
-        val t = elems(kn)
-        elems(kn) = elems(k)
-        elems(k) = t
-      }
-    }
-  }
-
-  /**
-   * Set element at row i and column j (indices are 0-based)
-   *
-   * This implements MatrixLike abstract method
-   */
-  final def update(i: Int, j: Int, value: Double) = { elems(j*m + i) = value }
-
-  /**
-   * Element at row i and column j (indices are 0-based)
-   *
-   * This implements MatrixLike abstract method
-   */
-  final def apply(i: Int, j: Int): Double = elems(j*m + i)
-
-  /** Set k-th element, assuming column-major layout
-    *
-    * This implements MatrixLike abstract method.
-    */
-  final def update(k:Int, value:Double) { elems(k) = value }
-
-  /** k-th element, assuming column-major layout
-    *
-    * This implements MatrixLike abstract method.
-    */
-  final def apply(k:Int) = elems(k)
 
   /**
    * The eigenvalues of this matrix
@@ -582,49 +410,90 @@ extends MatrixLike {
     lu.solve(Transposition.NoTranspose, x)
     x
   }
-
 }
 
-/** Matrix companion object */
-object Matrix {
+/** Construction of matrices and other utilities */
+trait MatrixConstruction[M <: Matrix] {
 
-  /** Create a m x n matrix with the given elements listed in row-major order */
-  def apply(m: Int, n: Int)(elems: Double*): Matrix = {
-    val matrix = new Matrix(m, n)(elems.toArray)
-    matrix.permuteFromRowMajorToColumnMajor()
+  /**
+   * Create an m x n matrix with uninitialised elements
+   */
+  def empty(m:Int, n:Int): M
+
+  /**
+   * Create a m x n matrix with the given elements listed in column-major order
+   */
+  def apply(m:Int, n:Int, elements:Array[Double]): M
+
+  /**
+   * Create a m x n matrix with the given elements listed in row-major order
+   */
+  def apply(m: Int, n: Int)(elements: Double*): M = {
+    require(m*n == elements.size)
+    val elems = elements.toArray
+    permuteFromRowMajorToColumnMajor(m, n, elems)
+    this(m, n, elems)
+  }
+
+  /**
+   * On input, elements shall be viewed as a m x n matrix stored in row-major
+   * order. On output, elements has been permuted in-place so as to store
+   * the same m x n matrix stored in column-major order.
+   *
+   * This is the algorithm described in [1], taking advantage of Remark 1.
+   * Note that the author credits P.F. Windley for this algorithm (ref 1.)
+   *
+   * [1] Correctness proof of an in-place permutation.
+   *     A. J. W. Duijvestijn.
+   *     BIT, 1972 vol. 12 pp. 318-324.
+  */
+  def permuteFromRowMajorToColumnMajor(m:Int, n:Int, elements:Array[Double]) = {
+    /* In term of transposition, the target is a matrix of dimension (n,m),
+       hence the fact that m and n are swapped compared to [1] */
+    cforRange(1 until m*n - 2) { k =>
+      var kn = (k % m)*n + k/m
+      while(kn < k) kn = (kn % m)*n + kn/m
+
+      if(kn != k) {
+        val t = elements(kn)
+        elements(kn) = elements(k)
+        elements(k) = t
+      }
+    }
+  }
+
+  /** Create the zero matrix of dimension m x n */
+  def zero(m:Int, n:Int) = this(m, n, new Array[Double](m*n))
+
+  /** Create an n x n matrix with uninitialised elements */
+  def empty(n:Int): M = empty(n, n)
+
+  /** Create the zero matrix of dimension n x n */
+  def zero(n:Int): M = zero(n, n)
+
+  /** Create the identity matrix of dimension m */
+  def identity(m: Int): M = {
+    val matrix = zero(m,m)
+    matrix.diagonal := 1.0
     matrix
   }
 
   /** Create a m x n matrix whose (i,j) elements is f(i,j) */
   def tabulate(m:Int, n:Int)(f: (Int,Int) => Double) = {
     val matrix = empty(m, n)
-    cforRange2(0 until m, 0 until n) { (i,j) => matrix(i,j) = f(i,j) }
+    cforRange2(0 until n, 0 until m) { (j,i) => matrix(i,j) = f(i,j) }
     matrix
   }
 
-  /** Create the identity matrix of dimension m */
-  def identity(m: Int): Matrix = {
-    val arr = new Array[Double](m * m)
-    cforRange(0 until arr.length by m+1) { i => arr(i) = 1.0 }
-    new Matrix(m, m)(arr)
-  }
-
   /**
-   * Create an m x n matrix with uninitialised elements
-   *
-   * Actually, the elements are currently initialised to zero
-   * but it would be nice to find a way to work that around (TODO).
+   * Create a m x n matrix whose elements are obtained in column-major order
+   * by repeateadly evaluating the given expression.
    */
-  def empty(m:Int, n:Int): Matrix = zero(m, n)
-
-  /** Create an n x n matrix with uninitialised elements */
-  def empty(n:Int): Matrix = empty(n, n)
-
-  /** Create the zero matrix of dimension m x n */
-  def zero(m:Int, n:Int): Matrix = new Matrix(m, n)()
-
-  /** Create the zero matrix of dimension n x n */
-  def zero(n:Int): Matrix = zero(n, n)
+  def fill(m:Int, n:Int)(element: => Double) = {
+    val matrix = empty(m,n)
+    cforRange2(0 until n, 0 until m) { (j,i) => matrix(i,j) = element }
+    matrix
+  }
 
   /**
    * Create a matrix from the given string.
@@ -639,7 +508,7 @@ object Matrix {
    *
    * where each `x` is a number.
    */
-  def fromString(s: String): Matrix = {
+  def fromString(s: String): M = {
     val lines = s.trim.split("\n")
     val rows = lines.map { line =>
       if (!line.startsWith("[") || !line.endsWith("]"))
@@ -657,6 +526,20 @@ object Matrix {
     cforRange2(0 until n, 0 until m) { (j, i) =>
       arr(j * m + i) = rows(j)(i)
     }
-    new Matrix(m, n)(arr)
+    this(m, n, arr)
   }
 }
+
+object Matrix extends MatrixConstruction[Matrix] {
+
+  /**
+   * Actually, the elements are currently initialised to zero
+   * but it would be nice to find a way to work that around (TODO).
+   */
+  def empty(m:Int, n:Int): Matrix = zero(m, n)
+
+  def apply(m:Int, n:Int, elements:Array[Double]) =
+    new Matrix(m, n, m, 0, elements)
+}
+
+
