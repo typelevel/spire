@@ -135,6 +135,55 @@ class CRealCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChec
     }
   }
 
+  // // useful for visually debugging atan/asin
+  // property("atan view") {
+  //   println((-8 to 8).map { i =>
+  //     val x = CReal(Rational(i, 2))
+  //     if ((scala.math.atan(x.toDouble) - CReal.atan(x).toDouble).abs < 0.00001) "." else "!"
+  //   }.mkString)
+  // }
+  // 
+  // property("asin view") {
+  //   println((-8 to 8).map { i =>
+  //     val x = CReal(Rational(i, 8))
+  //     if ((scala.math.asin(x.toDouble) - CReal.asin(x).toDouble).abs < 0.00001) "." else "!"
+  //   }.mkString)
+  // }
+
+  property("CReal.acos") {
+    forAll { (n: Rational) =>
+      // (-1) to (1)
+      val x = CReal(if (n.abs > 1) n.reciprocal else n)
+      if (x.toDouble.abs != 0.5) { // work around Rational#toDouble bug for now
+        val a1 = scala.math.acos(x.toDouble)
+        val a2 = CReal.acos(x)
+        (a1 - a2.toDouble).abs should be < 0.00001
+      }
+    }
+  }
+  
+  property("CReal.asin") {
+    forAll { (n: Rational) =>
+      // (-1) to (1)
+      val x = CReal(if (n.abs > 1) n.reciprocal else n)
+      if (x.toDouble.abs != 0.5) { // work around Rational#toDouble bug for now
+        val a1 = scala.math.asin(x.toDouble)
+        val a2 = CReal.asin(x)
+        (a1 - a2.toDouble).abs should be < 0.00001
+      }
+    }
+  }
+
+  property("CReal.atan") {
+    forAll { (n: Int) =>
+      // (-inf) to (inf)
+      val x = CReal(Rational(n, 1024 * 1024))
+      val a1 = scala.math.atan(x.toDouble)
+      val a2 = CReal.atan(x)
+      (a1 - a2.toDouble).abs should be < 0.00001
+    }
+  }
+
   // // TODO: this doesn't really work due to the kind of rounding that
   // // even computable reals introduce when computing 1/3.
   // property("x.pow(j).nroot(k) = x.fpow(j/k)") {

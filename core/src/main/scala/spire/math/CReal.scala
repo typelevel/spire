@@ -1,8 +1,9 @@
 package spire.math
 
+import scala.math.{ScalaNumber, ScalaNumericConversions}
 import spire.syntax.nroot._
 
-sealed trait CReal { x =>
+sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
 
   import CReal.{roundUp, Exact, Inexact}
 
@@ -14,6 +15,15 @@ sealed trait CReal { x =>
   }
 
   def toRational: Rational = toRational(CReal.bits)
+
+  // ugh scala.math
+  def doubleValue(): Double = toRational.toDouble
+  def floatValue(): Float = toRational.toFloat
+  def intValue(): Int = toRational.toInt
+  def longValue(): Long = toRational.toLong
+  def underlying(): Object = this
+
+  override def hashCode(): Int = toRational.hashCode
 
   override def equals(y: Any): Boolean = y match {
     case y: CReal => x eqv y
@@ -310,7 +320,7 @@ object CReal {
     val t = x(2)
     val xp1 = x + CReal.one
     val xm1 = x - CReal.one
-    if (t < -5) atanDr(-x.reciprocal - piBy2)
+    if (t < -5) atanDr(-x.reciprocal) - piBy2
     else if (t == -4) -piBy4 - atanDr(xp1 / xm1)
     else if (t < 4) atanDr(x)
     else if (t == 4) piBy4 + atanDr(xm1 / xp1)
@@ -338,12 +348,14 @@ object CReal {
   def asin(x: CReal): CReal = {
     val x0 = x(0)
     val s = (CReal.one - x * x).sqrt
-    if (x0 > 0) pi / CReal.two - atan(s / x)
-    else if (x0 == 0) atan(x / s)
-    else atan(s / x) - pi / CReal.two
+    x0.signum match {
+      case n if n > 0 => (CReal.pi / CReal.two) - atan(s / x)
+      case 0 => atan(x / s)
+      case _ => (-CReal.pi / CReal.two) - atan(s / x)
+    }
   }
 
-  def acos(x: CReal): CReal  = pi / CReal.two - asin(x)
+  def acos(x: CReal): CReal  = (CReal.pi / CReal.two) - asin(x)
 
   def sinh(x: CReal): CReal = {
     val y = exp(x)
