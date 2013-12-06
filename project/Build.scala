@@ -90,8 +90,8 @@ object MyBuild extends Build {
     publishTo <<= version {
       (v: String) =>
       val nexus = "https://oss.sonatype.org/"
-      if (v.trim.endsWith("SNAPSHOT")) 
-        Some("snapshots" at nexus + "content/repositories/snapshots") 
+      if (v.trim.endsWith("SNAPSHOT"))
+        Some("snapshots" at nexus + "content/repositories/snapshots")
       else
         Some("releases"  at nexus + "service/local/staging/deploy/maven2")
     },
@@ -204,12 +204,18 @@ object MyBuild extends Build {
     libraryDependencies ++= Seq(scalaTest, scalaCheck)
   )
 
+  // Bit of the tests needed for benchmarks
+  lazy val testSamples = Project(
+    "matrixTestGen",
+    file("core/src/test/scala/spire/matrix/dense/testgen")).
+    dependsOn(core)
 
   // Benchmark
 
   lazy val benchmark: Project = Project("benchmark", file("benchmark")).
     settings(benchmarkSettings: _*).
-    dependsOn(core)
+    dependsOn(core).
+    dependsOn(testSamples)
 
   lazy val key = AttributeKey[Boolean]("javaOptionsPatched")
 
@@ -218,7 +224,7 @@ object MyBuild extends Build {
 
     // raise memory limits here if necessary
     // TODO: this doesn't seem to be working with caliper at the moment :(
-  
+
     javaOptions in run += "-Xmx4G",
 
     libraryDependencies ++= Seq(
@@ -226,6 +232,7 @@ object MyBuild extends Build {
       "org.apfloat" % "apfloat" % "1.6.3",
       "org.jscience" % "jscience" % "4.3.1",
       "org.apache.commons" % "commons-math3" % "3.2",
+      "org.jblas" % "jblas" % "1.2.3",
 
       // thyme
       "ichi.bench" % "thyme" % "0.1.0" from "http://plastic-idolatry.com/jars/thyme-0.1.0.jar",
