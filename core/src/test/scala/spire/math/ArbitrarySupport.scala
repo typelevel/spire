@@ -33,11 +33,16 @@ object ArbitrarySupport {
 
   implicit val rational: Arbitrary[Rational] =
     Arbitrary(for {
-      n <- arbitrary[BigInt]
-      d <- arbitrary[BigInt].filter(_ != 0)
+      // n <- arbitrary[BigInt]
+      // d <- arbitrary[BigInt].filter(_ != 0)
+      n <- arbitrary[Long]
+      d <- arbitrary[Long].filter(_ != 0)
     } yield {
       Rational(n, d)
     })
+
+  implicit val creal: Arbitrary[CReal] =
+    Arbitrary(arbitrary[Rational].map(n => CReal(n)))
 
   implicit def complex[A: Arbitrary: Fractional: Signed: Trig]: Arbitrary[Complex[A]] =
     Arbitrary(for {
