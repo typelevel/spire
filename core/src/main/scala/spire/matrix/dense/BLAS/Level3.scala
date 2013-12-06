@@ -19,28 +19,10 @@ trait NaiveLevel3 extends Level3 {
   def gemm(transA:Transposition.Value, transB:Transposition.Value,
            alpha:Double, a:MatrixLike, b:MatrixLike,
            beta:Double, c:MatrixLike): Unit = {
-    require(if(transA == NoTranspose) c.dimensions._1 == a.dimensions._1
-            else                      c.dimensions._1 == a.dimensions._2)
-    require(if(transB == NoTranspose) c.dimensions._2 == b.dimensions._2
-            else                      c.dimensions._2 == b.dimensions._1)
-    require(if(transA == NoTranspose && transB == NoTranspose) {
-              a.dimensions._2 == b.dimensions._1
-            }
-            else if(transA == NoTranspose && transB != NoTranspose) {
-              a.dimensions._2 == b.dimensions._2
-            }
-            else if(transA != NoTranspose && transB == NoTranspose) {
-              a.dimensions._1 == b.dimensions._1
-            }
-            else if(transA != NoTranspose && transB != NoTranspose) {
-              a.dimensions._1 == b.dimensions._2
-            }
-            else false)
-
-    val (m, n) = c.dimensions
-    val k = if(transB == NoTranspose) b.dimensions._1 else b.dimensions._2
+    checkGemmPreconditions(transA, transB, alpha, a, b, beta, c)
 
     // trivial cases
+    val (m, n) = c.dimensions
     if(alpha == 0) {
       if(beta == 0)
         cforRange2(0 until n, 0 until m) { (j,i) => c(i,j) = 0 }
@@ -50,6 +32,7 @@ trait NaiveLevel3 extends Level3 {
     }
 
     // charge!
+    val k = if(transB == NoTranspose) b.dimensions._1 else b.dimensions._2
     if (transB == NoTranspose) {
       if(transA == NoTranspose) {
         // (I) C := alpha A B + beta C

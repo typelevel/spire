@@ -23,6 +23,10 @@ package object BLAS {
   import scala.collection.mutable.IndexedSeq
   import spire.matrix.{Transposition, UpperOrLower, Sides, DiagonalProperty}
   import spire.matrix.dense.{VectorLike, MatrixLike, PlaneRotation}
+  import Sides._
+  import Transposition._
+  import UpperOrLower._
+  import DiagonalProperty._
 
   /**
    * Operations referencing O(n) elements and performing O(n) flops
@@ -150,6 +154,30 @@ package object BLAS {
     def gemm(transA:Transposition.Value, transB:Transposition.Value,
              alpha:Double, a:MatrixLike, b:MatrixLike,
              beta:Double, c:MatrixLike): Unit
+
+    protected
+    def checkGemmPreconditions(transA:Transposition.Value,
+                               transB:Transposition.Value,
+                               alpha:Double, a:MatrixLike, b:MatrixLike,
+                               beta:Double, c:MatrixLike) {
+      require(if(transA == NoTranspose) c.dimensions._1 == a.dimensions._1
+              else                      c.dimensions._1 == a.dimensions._2)
+      require(if(transB == NoTranspose) c.dimensions._2 == b.dimensions._2
+              else                      c.dimensions._2 == b.dimensions._1)
+      require(if(transA == NoTranspose && transB == NoTranspose) {
+                a.dimensions._2 == b.dimensions._1
+              }
+              else if(transA == NoTranspose && transB != NoTranspose) {
+                a.dimensions._2 == b.dimensions._2
+              }
+              else if(transA != NoTranspose && transB == NoTranspose) {
+                a.dimensions._1 == b.dimensions._1
+              }
+              else if(transA != NoTranspose && transB != NoTranspose) {
+                a.dimensions._1 == b.dimensions._2
+              }
+              else false)
+    }
 
     /**
      * Symmetric rank-k updates
