@@ -21,8 +21,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def isWhole: Boolean
 
   // ugh, ScalaNumber and ScalaNumericConversions in 2.10 require this hack
-  override def underlying: List[Any] = 
-    throw new UnsupportedOperationException("unimplemented")
+  override def underlying: Object = this
 
   def abs: Rational = if (this < Rational.zero) -this else this
   def inverse: Rational = Rational.one / this
@@ -424,8 +423,6 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
     override def signum: Int = scala.math.signum(integral.compare(num, zero))
 
     def isWhole: Boolean = den == one
-
-    override def underlying = List(num, den)
 
     def toBigInt: BigInt = (integral.toBigInt(num) / integral.toBigInt(den))
     def toBigDecimal: BigDecimal = integral.toBigDecimal(num) / integral.toBigDecimal(den)
