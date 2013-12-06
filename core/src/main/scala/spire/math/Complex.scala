@@ -134,7 +134,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
       real <= f.fromInt(Int.MaxValue) && real >= f.fromInt(Int.MinValue)
 
   override def hashCode: Int =
-    if (isValidInt) real.toInt else 19 * real.## + 41 * imag.## + 97
+    if (isValidInt) real.## else 19 * real.## + 41 * imag.## + 97
 
   // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
@@ -143,7 +143,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
     case that: Quaternion[_] =>
       real == that.r && imag == that.i && that.j == f.zero && that.k == f.zero
     case that =>
-      unifiedPrimitiveEquals(that)
+      imag == f.zero && real == that
   }
 
   override def toString: String = "(%s + %si)" format (real.toString, imag.toString)
