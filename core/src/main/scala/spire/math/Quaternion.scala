@@ -120,7 +120,7 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
 
   // important to keep in sync with Complex[_]
   override def hashCode: Int =
-    if (isValidInt) r.## else 19 * r.## + 41 * i.## + 13 * j.## + 77 * k.## + 97
+    if (isReal) r.## else 19 * r.## + 41 * i.## + 13 * j.## + 77 * k.## + 97
 
   override def equals(that: Any): Boolean = that match {
     case that: Quaternion[_] =>

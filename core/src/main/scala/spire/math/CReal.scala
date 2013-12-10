@@ -32,7 +32,7 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
 
   def eqv(y: CReal): Boolean = (x, y) match {
     case (Exact(nx), Exact(ny)) => nx == ny
-    case _ => (x - y)(CReal.bits).signum == 0
+    case _ => (x - y).signum == 0 || x.toString == y.toString
   }
 
   def compare(y: CReal): Int = (x, y) match {
@@ -217,6 +217,11 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
   override def toString: String = x match {
     case Exact(n) => n.toString
     case _ => getString(CReal.digits)
+  }
+
+  def repr: String = x match {
+    case Exact(n) => s"Exact(${n.toString})"
+    case _ => s"Inexact(${toRational})"
   }
 
   def getString(d: Int): String = {
