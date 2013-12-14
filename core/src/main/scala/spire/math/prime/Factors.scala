@@ -17,6 +17,8 @@ object Factors {
   val zero = Factors(Map.empty, Zero)
   val one = Factors(Map.empty, Positive)
 
+  def apply(n: Long): Factors = factor(SafeLong(n))
+  def apply(n: BigInt): Factors = factor(SafeLong(n))
   def apply(n: SafeLong): Factors = factor(n)
   def apply(s: String): Factors = factor(SafeLong(s))
 }
@@ -25,7 +27,7 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
     extends Iterable[(SafeLong, Int)] with Ordered[Factors] { lhs =>
 
   private[prime] def prod(m: Map[SafeLong, Int]): SafeLong =
-    m.foldLeft(SafeLong.one) { case (t, (p, e)) => t * (p ** e) }
+    m.foldLeft(SafeLong.one) { case (t, (p, e)) => t * p.pow(e) }
 
   lazy val value: SafeLong = sign match {
     case Positive => prod(factors)
@@ -97,7 +99,7 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
   def *(rhs: SafeLong): Factors =
     Factors(factors.updated(rhs, factors.getOrElse(rhs, 0) + 1), sign)
 
-  private[prime] def qm(rhs: Factors) = {
+  private[prime] def qm(rhs: Factors): (Int, Map[SafeLong, Int], Map[SafeLong, Int], Map[SafeLong, Int]) = {
     val sign = (lhs.sign * rhs.sign).toInt
     val (nn, dd) = (lhs.factors - rhs.factors).filter(_._2 != 0).partition(_._2 > 0)
     val cc = lhs.factors.flatMap { case (p, le) =>
@@ -150,5 +152,15 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
     }
 
   def pow(rhs: Int): Factors =
-    Factors(lhs.factors.map { case (p, e) => (p, e ** rhs) }, lhs.sign ** rhs)
+    if (rhs < 0) {
+      throw new IllegalArgumentException("negative exponent")
+    } else if (rhs == 0) {
+      Factors.one
+    } else {
+      val sign = lhs.sign match {
+        case Negative if (rhs & 1) == 0 => Positive
+        case sign => sign
+      }
+      Factors(lhs.factors.map { case (p, e) => (p, e * rhs) }, sign)
+    }
 }

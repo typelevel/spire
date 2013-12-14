@@ -92,7 +92,7 @@ package object prime {
 
       @inline def f(x: SafeLong): SafeLong = ((x * x) % n + c) % n
 
-      @tailrec def fastRho(x: SafeLong, q0: SafeLong, r: SafeLong, m :SafeLong): SafeLong = {
+      @tailrec def fastRho(x: SafeLong, q0: SafeLong, r: SafeLong, m: SafeLong): SafeLong = {
         var y = x
         var q = q0
         cfor(0)(r > _, _ + 1)(_ => y = f(y))
@@ -127,7 +127,7 @@ package object prime {
       if (n == 1) {
         Factors.one
       } else if (n.isProbablePrime(30)) {
-        // TODO: ~1-in-1B chance of being wrong. too risky?
+        // TODO: ~1-in-1T chance of being wrong. too risky?
         Factors(Map(n -> 1), Positive)
       } else if (n % 2 == 0) {
         var x = n / 2
@@ -153,7 +153,7 @@ package object prime {
   private def rand(n: SafeLong): SafeLong = {
     val bits = n.bitLength
     var x = new java.math.BigInteger(bits, srand)
-    while (x == 0) x = new java.math.BigInteger(bits, srand)
+    while (x.signum == 0) x = new java.math.BigInteger(bits, srand)
     SafeLong(x)
   }
 
