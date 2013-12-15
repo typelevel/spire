@@ -17,9 +17,9 @@ import scala.annotation.tailrec
  *
  *   H = Z T Z^T^
  *
- * where Z is an upper quasi-triangular matrix, i.e. its diagonal is made of
+ * where T is an upper quasi-triangular matrix, i.e. its diagonal is made of
  * either 1 x 1 or 2 x 2 blocks having a pair of complex conjugate eigenvalues,
- * below which all elements are zero.
+ * below which all elements are zero, and Z is an orthogonal matrix.
  *
  * It is assumed that the block H(iLo:iHi, iLo:iHi) is decoupled from the rest
  * of the matrix, i.e. that

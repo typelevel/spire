@@ -6,16 +6,19 @@ import spire.syntax.cfor._
  *
  * The elements of a Vector are mutable but its dimension is immutable
  *
- * Vector elements are stored at regular intervals in the attribute elements.
+ * Vector elements are stored at regular intervals in the attribute `elements`.
  * As a result, this class can model not only a vector per se (for which there
- * is a one-to-one mapping between the vector elements and that array elements)
- * but also matrix rows, columns, diagonals and vector blocks as well.
+ * is a one-to-one mapping between the vector elements and the elements of that
+ * array) but also matrix rows, columns, and diagonals as well as vector blocks.
+ *
+ * @todo parametrise by the type of elements
  *
  * @param dimension is the number of elements
- * @param step is the distance between two succesive elements of this
- *        in attribute elements
- * @param start is the position of the first element of this in attribute
- *        elements
+ * @param step is the distance between two successive elements of this vector
+ *        in `elements`
+ * @param start is the position of the first element of this vector
+ *        in `elements`
+ * @param elements stores the vector elements as explained above
  */
 class Vector(val dimension:Int, val step:Int,
              val start:Int, val elements:Array[Double])

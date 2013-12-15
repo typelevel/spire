@@ -34,8 +34,8 @@ import scala.math._
  *
  *        Q(iLo:iHi, iLo:iHi) = H,,iHi-2,, H,,iHi-3,, ... H,,iLo,,.
  *
- *  - the τ,,i,,'s are stored in attribute ''taus''.
- * *
+ *  - the τ,,i,,'s are stored in attribute `taus`.
+ *
  * [1] LAPACK Users' Guide.
  *     E Anderson, Z Bai, Christian H. Bischof, S Blackford, J Demmel,
  *     J Dongarra, J Du Croz, A Greenbaum, S Hammarling, A McKenney,

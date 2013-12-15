@@ -14,42 +14,45 @@ import scala.math
 /**
  * Dense matrix whose dimensions are set at runtime.
  *
- * - The elements of a matrix are mutable but its dimensions are immutable.
+ *   - The elements of a matrix are mutable but its dimensions are immutable.
  *
- * - Elements are stored in column-major order and each and every algorithm
- *   in this package assumes so.
+ *   - Elements are stored in column-major order and each and every algorithm
+ *     in this package assumes so.
  *
- * - This traits is primarily focused on providing flexible and efficient means
- *   of accessing the matrix elements but it also provide a few linear algebra
- *   operations: those for which convenience is more important than performance.
- *   Any performance critical linear algebra should be implemented in the BLAS
- *   package. This includes matrix multiplication, matrix-vector multiplication,
- *   etc.
+ *   - This traits is primarily focused on providing flexible and efficient
+ *     means of accessing the matrix elements but it also provide a few linear
+ *     algebra operations: those for which convenience is more important than
+ *     performance. Any performance critical linear algebra should be
+ *     implemented in the BLAS package. This includes matrix multiplication,
+ *     matrix-vector multiplication, etc.
  *
- * In the following, we will denote by m the number of rows and by n the
- * number of columns, and use the notation A(i:i', j:j') to denote parts
- * of the matrix, with A(:, ...) standing for A(0:m, j) and A(..., :) standing
- * for A(..., 0:n). All intervals k:k' are close at the lower end and open at
- * the upper end.
+ * Elements are stored in the attribute `elements` with the mapping from
+ * matrix indices (i,j) to the position in `elements` being based on the
+ * concept of leading dimension: if A(i,j) is stored at position l in `elements`
+ * then A(i,j+1) is stored at position l+ld whereas A(i+1,j) is stored at
+ * position l+1 (this is what it means that the storage is in column-major
+ * order). As a result, this class can model not only a matrix per se (for which
+ * the mapping is one-to-one) but also matrix blocks, including blocks of
+ * blocks of ... of blocks.
+ *
+ * In the following, we will denote this matrix by A, the number of rows by m,
+ * and the number of columns by n. We will use the notation A(i:i', j:j') to
+ * denote rectangular submatrices of A, with A(:, ...) standing for A(0:m, ...)
+ * and A(..., :) standing for A(..., 0:n). All intervals k:k' are close at the
+ * lower end and open at the upper end.
  *
  * Several methods deal with the k-th diagonal. It is defined as those
  * indices (i,j) such that j-i == k. Thus k = 0 gives the main diagonal,
  * whereas a positive k gives a diagonal above it (superdiagonal),
  * and a negative k gives a diagonal below it (subdiagonal).
  *
- * Elements are stored in the attribute elements with the mapping from
- * matrix indices (i,j) to the position in elements being based on the
- * concept of leading dimension. As a result, this class can model not only
- * a matrix per se (for which the mapping is one-to-one) but also matrix blocks,
- * including blocks of blocks of ... of blocks.
+ * @todo parametrize by the type of elements
  *
  * @param m is the number of rows
  * @param n is the number of columns
- * @param ld is the leading dimension, i.e. the distance to move forward in
- *        attribute elements in order to move from (i, j) to (i, j+1)
- * @param start is the position in attribute elements of the element (0,0)
- *
- * TODO: parametrize by the type of elements
+ * @param ld is the leading dimension,
+ * @param start is the position in `elements` of the element (0,0)
+ * @param elements stores the matrix elements as explained above
  */
 class Matrix(val m:Int, val n:Int, val ld:Int,
              val start:Int, val elements:Array[Double])
@@ -364,15 +367,26 @@ extends Iterable[Double] {
   /** Sum of the diagonal elements */
   def trace = diagonal.sum
 
-  /** A tabulated display of the matrix
+  /**
+   * A tabulated display of the matrix
    *
-   *  Mostly for debugging purposes.
+   * The floating-point format used for each elements is
+   * `StringFormatting.elementFormat`, which client code is free to change
+   * (the change is global and affects all displays afterwards).
    */
   override def toString: String = {
     formatted(StringFormatting.elementFormat,
               StringFormatting.useMathematicaFormat)
   }
 
+  /**
+   * Customisable display of the matrix
+   *
+   * @param fmt is the format used to display each element
+   * @useMathematicaFormat specifies whether to display the matrix using
+   *                       Mathematica™ input format or whether to use a
+   *                       tabulated display
+   */
   def formatted(fmt: String, useMathematicaFormat: Boolean=false): String = {
   val (rowStart, colStep, rowEnd) =
     StringFormatting.ofRows(useMathematicaFormat)
