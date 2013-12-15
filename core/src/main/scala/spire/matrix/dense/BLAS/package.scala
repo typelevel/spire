@@ -20,7 +20,6 @@ package spire.matrix.dense
  */
 package object BLAS {
 
-  import scala.collection.mutable.IndexedSeq
   import spire.matrix.{Transposition, UpperOrLower, Sides, DiagonalProperty}
   import spire.matrix.dense.{Vector, Matrix, PlaneRotation}
   import Sides._

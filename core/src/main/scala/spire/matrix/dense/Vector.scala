@@ -3,11 +3,25 @@ import spire.syntax.cfor._
 
 /**
  * Simple vector abstraction
+ *
+ * The elements of a Vector are mutable but its dimension is immutable
+ *
+ * Vector elements are stored at regular intervals in the attribute elements.
+ * As a result, this class can model not only a vector per se (for which there
+ * is a one-to-one mapping between the vector elements and that array elements)
+ * but also matrix rows, columns, diagonals and vector blocks as well.
+ *
+ * @param dimension is the number of elements
+ * @param step is the distance between two succesive elements of this
+ *        in attribute elements
+ * @param start is the position of the first element of this in attribute
+ *        elements
  */
 class Vector(val dimension:Int, val step:Int,
              val start:Int, val elements:Array[Double])
 extends Iterable[Double] {
 
+  /** Convenience constructor to quickly get a vector of a given dimension */
   def this(dimension:Int) = this(dimension, 1, 0, new Array[Double](dimension))
 
   /** i-th element (0-based) */
@@ -129,6 +143,7 @@ trait VectorConstruction[V <: Vector] {
   }
 }
 
+/** Utilities to construct instances of class Vector */
 object Vector extends VectorConstruction[Vector] {
   def apply(elements:Array[Double]) = new Vector(elements.size, 1, 0, elements)
 

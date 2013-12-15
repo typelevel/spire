@@ -37,6 +37,18 @@ import scala.math
  * whereas a positive k gives a diagonal above it (superdiagonal),
  * and a negative k gives a diagonal below it (subdiagonal).
  *
+ * Elements are stored in the attribute elements with the mapping from
+ * matrix indices (i,j) to the position in elements being based on the
+ * concept of leading dimension. As a result, this class can model not only
+ * a matrix per se (for which the mapping is one-to-one) but also matrix blocks,
+ * including blocks of blocks of ... of blocks.
+ *
+ * @param m is the number of rows
+ * @param n is the number of columns
+ * @param ld is the leading dimension, i.e. the distance to move forward in
+ *        attribute elements in order to move from (i, j) to (i, j+1)
+ * @param start is the position in attribute elements of the element (0,0)
+ *
  * TODO: parametrize by the type of elements
  */
 class Matrix(val m:Int, val n:Int, val ld:Int,
@@ -48,40 +60,43 @@ extends Iterable[Double] {
   require(start >= 0)
   require(start + m + (n-1)*ld <= elements.length)
 
+  /**
+   * Convenience constructor to create a whole matrix
+   *
+   * @param m is the number of rows
+   * @param n is the number of columns
+   * @param elements shall contain the matrix elements in column-major order
+   */
   def this(m:Int, n:Int, elements:Array[Double]) = this(m, n, m, 0, elements)
 
   /** (number of rows, number of columns) */
   lazy val dimensions = (m,n)
 
-  /**
-   * Set element at row i and column j (indices are 0-based)
-   *
-   * This implements Matrix abstract method
-   */
+  /** Set element at row i and column j (indices are 0-based) */
   final def update(i: Int, j: Int, x: Double) = {
     elements(start + i + j*ld) = x
   }
 
-  /**
-   * Element at row i and column j (indices are 0-based)
-   *
-   * This implements Matrix abstract method
-   */
+  /** Element at row i and column j (indices are 0-based) */
   final def apply(i: Int, j: Int): Double = elements(start + i + j*ld)
 
+  /**
+   * A rectangular block of this matrix
+   *
+   * The block reads A(firstRow:endRow, firstColumn:endColumn)
+   */
   final def block(firstRow:Int, endRow:Int)(firstColumn:Int, endColumn:Int) =
     new Matrix(endRow - firstRow, endColumn - firstColumn, ld,
                start + firstRow + firstColumn*ld, elements)
 
-  final
-  def column(j:Int) = new Vector(m, 1, start + j*ld, elements)
+  /** j-th column */
+  final def column(j:Int) = new Vector(m, 1, start + j*ld, elements)
 
-  final
-  def row(i:Int) = new Vector(n, ld, start + i, elements)
+  /** i-th row */
+  final def row(i:Int) = new Vector(n, ld, start + i, elements)
 
   /** Swap the (i,j) and the (k,l) elements */
-  final
-  def swap(i1:Int, j1:Int)(i2:Int, j2:Int): Unit = {
+  final def swap(i1:Int, j1:Int)(i2:Int, j2:Int): Unit = {
     val k1 = start + j1 * ld + i1
     val k2 = start + j2 * ld + i2
     val tmp = elements(k1)
@@ -530,6 +545,7 @@ trait MatrixConstruction[M <: Matrix] {
   }
 }
 
+/** Utilities to construct instances of class Matrix */
 object Matrix extends MatrixConstruction[Matrix] {
 
   /**
