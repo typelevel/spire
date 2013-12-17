@@ -3,9 +3,9 @@ package spire.math
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import spire.syntax.nroot._
 
-sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
+sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
-  import CReal.{roundUp, Exact, Inexact}
+  import Real.{roundUp, Exact, Inexact}
 
   def apply(p: Int): SafeLong
 
@@ -14,7 +14,7 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
     case _ => Rational(x(p), SafeLong.two.pow(p))
   }
 
-  def toRational: Rational = toRational(CReal.bits)
+  def toRational: Rational = toRational(Real.bits)
 
   // ugh scala.math
   def doubleValue(): Double = toRational.toDouble
@@ -26,84 +26,84 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
   override def hashCode(): Int = toRational.hashCode
 
   override def equals(y: Any): Boolean = y match {
-    case y: CReal => x eqv y
+    case y: Real => x eqv y
     case y => toRational.equals(y)
   }
 
-  def eqv(y: CReal): Boolean = (x, y) match {
+  def eqv(y: Real): Boolean = (x, y) match {
     case (Exact(nx), Exact(ny)) => nx == ny
     case _ => (x - y).signum == 0 || x.toString == y.toString
   }
 
-  def compare(y: CReal): Int = (x, y) match {
+  def compare(y: Real): Int = (x, y) match {
     case (Exact(nx), Exact(ny)) => nx compare ny
-    case _ => (x - y)(CReal.bits).signum
+    case _ => (x - y)(Real.bits).signum
   }
 
-  def min(y: CReal): CReal = (x, y) match {
+  def min(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx min ny)
-    case _ => CReal(p => x(p) min y(p))
+    case _ => Real(p => x(p) min y(p))
   }
 
-  def max(y: CReal): CReal = (x, y) match {
+  def max(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx max ny)
-    case _ => CReal(p => x(p) max y(p))
+    case _ => Real(p => x(p) max y(p))
   }
 
-  def abs(): CReal = this match {
+  def abs(): Real = this match {
     case Exact(n) => Exact(n.abs)
-    case _ => CReal(p => x(p).abs)
+    case _ => Real(p => x(p).abs)
   }
 
   def signum(): Int = this match {
     case Exact(n) => n.signum
-    case _ => x(CReal.bits).signum
+    case _ => x(Real.bits).signum
   }
 
-  def unary_-(): CReal = this match {
+  def unary_-(): Real = this match {
     case Exact(n) => Exact(-n)
-    case _ => CReal(p => -x(p))
+    case _ => Real(p => -x(p))
   }
 
-  def reciprocal(): CReal = {
+  def reciprocal(): Real = {
     def findNonzero(i: Int): Int =
       if (SafeLong.three <= x(i).abs) i else findNonzero(i + 1)
 
     this match {
       case Exact(n) => Exact(n.reciprocal)
-      case _ => CReal({p =>
+      case _ => Real({p =>
         val s = findNonzero(0)
         roundUp(Rational(SafeLong.two.pow(2 * p + 2 * s + 2), x(p + 2 * s + 2)))
       })
     }
   }
 
-  def +(y: CReal): CReal = (x, y) match {
+  def +(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx + ny)
     case (Exact(Rational.zero), _) => y
     case (_, Exact(Rational.zero)) => x
-    case _ => CReal(p => roundUp(Rational(x(p + 2) + y(p + 2), 4)))
+    case _ => Real(p => roundUp(Rational(x(p + 2) + y(p + 2), 4)))
   }
 
-  def -(y: CReal): CReal = x + (-y)
+  def -(y: Real): Real = x + (-y)
 
-  def *(y: CReal): CReal = (x, y) match {
+  def *(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx * ny)
-    case (Exact(Rational.zero), _) => CReal.zero
-    case (_, Exact(Rational.zero)) => CReal.zero
+    case (Exact(Rational.zero), _) => Real.zero
+    case (_, Exact(Rational.zero)) => Real.zero
     case (Exact(Rational.one), _) => y
     case (_, Exact(Rational.one)) => x
-    case _ => CReal({p =>
+    case _ => Real({p =>
       val x0 = x(0).abs + 2
       val y0 = y(0).abs + 2
-      val sx = CReal.sizeInBase(x0, 2) + 3
-      val sy = CReal.sizeInBase(y0, 2) + 3
+      val sx = Real.sizeInBase(x0, 2) + 3
+      val sy = Real.sizeInBase(y0, 2) + 3
       roundUp(Rational(x(p + sy) * y(p + sx), SafeLong.two.pow(p + sx + sy)))
     })
   }
 
-  def pow(k: Int): CReal = {
-    def loop(b: CReal, k: Int, extra: CReal): CReal =
+  def pow(k: Int): Real = {
+    def loop(b: Real, k: Int, extra: Real): Real =
       if (k == 1)
         b * extra
       else
@@ -116,7 +116,7 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
         if (k < 0) {
           reciprocal.pow(-k)
         } else if (k == 0) {
-          CReal.one
+          Real.one
         } else if (k == 1) {
           this
         } else {
@@ -125,11 +125,11 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
     }
   }
 
-  def /(y: CReal): CReal = x * y.reciprocal
+  def /(y: Real): Real = x * y.reciprocal
 
-  def %(y: CReal): CReal = (x, y) match {
+  def %(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx % ny)
-    case _ => CReal({ p => 
+    case _ => Real({ p => 
       val d = x / y
       val s = d(2)
       val d2 = if (s >= 0) d.floor else d.ceil
@@ -137,9 +137,9 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
     })
   }
 
-  def /~(y: CReal): CReal = (x, y) match {
+  def /~(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx /~ ny)
-    case _ => CReal({ p =>
+    case _ => Real({ p =>
       val d = x / y
       val s = d(2)
       val d2 = if (s >= 0) d.floor else d.ceil
@@ -147,17 +147,17 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
     })
   }
 
-  def gcd(y: CReal): CReal = (x, y) match {
+  def gcd(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx gcd ny)
-    case _ => CReal({ p =>
+    case _ => Real({ p =>
       val g = x.toRational(p) gcd y.toRational(p)
       roundUp(g * SafeLong.two.pow(p))
     })
   }
 
-  def ceil(): CReal = x match {
+  def ceil(): Real = x match {
     case Exact(n) => Exact(n.ceil)
-    case _ => CReal({ p =>
+    case _ => Real({ p =>
       val n = x(p)
       val t = SafeLong.two.pow(p)
       val m = n % t
@@ -165,9 +165,9 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
     })
   }
 
-  def floor(): CReal = x match {
+  def floor(): Real = x match {
     case Exact(n) => Exact(n.floor)
-    case _ => CReal({ p =>
+    case _ => Real({ p =>
       val n = x(p)
       val t = SafeLong.two.pow(p)
       val m = n % t
@@ -175,9 +175,9 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
     })
   }
 
-  def round(): CReal = x match {
+  def round(): Real = x match {
     case Exact(n) => Exact(n.round)
-    case _ => CReal({ p =>
+    case _ => Real({ p =>
       val n = x(p)
       val t = SafeLong.two.pow(p)
       val h = t / 2
@@ -190,16 +190,16 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
     case Exact(n) =>
       n.isWhole
     case _ =>
-      val n = x(CReal.bits)
-      val t = SafeLong.two.pow(CReal.bits)
+      val n = x(Real.bits)
+      val t = SafeLong.two.pow(Real.bits)
         (n % t) == 0
   }
 
-  def sqrt(): CReal = CReal(p => x(p * 2).sqrt)
-  def nroot(k: Int): CReal = CReal(p => x(p * k).nroot(k))
+  def sqrt(): Real = Real(p => x(p * 2).sqrt)
+  def nroot(k: Int): Real = Real(p => x(p * k).nroot(k))
 
-  def fpow(r: Rational): CReal =
-    CReal({ p =>
+  def fpow(r: Rational): Real =
+    Real({ p =>
       val r2 = r.limitToInt
       val n = r2.numerator
       val d = r2.denominator
@@ -207,16 +207,16 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
     })
 
   // a bit hand-wavy
-  def fpow(y: CReal): CReal = y match {
+  def fpow(y: Real): Real = y match {
     case Exact(n) => x.fpow(n)
-    case _ => CReal({ p =>
+    case _ => Real({ p =>
       x.fpow(Rational(y(p), SafeLong.two.pow(p)))(p)
     })
   }
 
   override def toString: String = x match {
     case Exact(n) => n.toString
-    case _ => getString(CReal.digits)
+    case _ => getString(Real.digits)
   }
 
   def repr: String = x match {
@@ -225,7 +225,7 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
   }
 
   def getString(d: Int): String = {
-    val b = CReal.digitsToBits(d)
+    val b = Real.digitsToBits(d)
     val r = Rational(x(b) * SafeLong.ten.pow(d), SafeLong.two.pow(b))
     val m = roundUp(r)
     val (sign, str) = m.signum match {
@@ -243,50 +243,50 @@ sealed trait CReal extends ScalaNumber with ScalaNumericConversions { x =>
   }
 }
 
-object CReal {
+object Real {
   import spire.algebra._
 
-  val zero: CReal = Exact(Rational.zero)
-  val one: CReal = Exact(Rational.one)
-  val two: CReal = Exact(Rational(2))
-  val four: CReal = Exact(Rational(4))
+  val zero: Real = Exact(Rational.zero)
+  val one: Real = Exact(Rational.one)
+  val two: Real = Exact(Rational(2))
+  val four: Real = Exact(Rational(4))
 
-  def apply(f: Int => SafeLong): CReal = Inexact(f)
-  def apply(n: Long): CReal = Exact(Rational(n))
-  def apply(n: BigInt): CReal = Exact(Rational(n))
-  def apply(n: SafeLong): CReal = Exact(Rational(n))
-  def apply(n: Rational): CReal = Exact(n)
-  def apply(n: Double): CReal = Exact(Rational(n))
-  def apply(n: BigDecimal): CReal = Exact(Rational(n))
-  def apply(s: String): CReal = Exact(Rational(s))
+  def apply(f: Int => SafeLong): Real = Inexact(f)
+  def apply(n: Long): Real = Exact(Rational(n))
+  def apply(n: BigInt): Real = Exact(Rational(n))
+  def apply(n: SafeLong): Real = Exact(Rational(n))
+  def apply(n: Rational): Real = Exact(n)
+  def apply(n: Double): Real = Exact(Rational(n))
+  def apply(n: BigDecimal): Real = Exact(Rational(n))
+  def apply(s: String): Real = Exact(Rational(s))
 
-  lazy val pi: CReal = CReal(16) * atan(CReal(Rational(1, 5))) - CReal.four * atan(CReal(Rational(1, 239)))
+  lazy val pi: Real = Real(16) * atan(Real(Rational(1, 5))) - Real.four * atan(Real(Rational(1, 239)))
 
-  lazy val e: CReal = exp(CReal.one)
+  lazy val e: Real = exp(Real.one)
 
-  def log(x: CReal): CReal = {
+  def log(x: Real): Real = {
     val t = x(2)
     val n = sizeInBase(t, 2) - 3
     if (t < 0) sys.error("log of negative number")
     else if (t < 4) -log(x.reciprocal)
     else if (t < 8) logDr(x)
-    else logDr(div2n(x, n)) + CReal(n) * log2
+    else logDr(div2n(x, n)) + Real(n) * log2
   }
 
-  def exp(x: CReal): CReal = {
+  def exp(x: Real): Real = {
     val u = x / log2
     val n = u(0)
-    val s = x - CReal(n) * log2
+    val s = x - Real(n) * log2
     if (!n.isValidInt) sys.error("sorry")
     else if (n < 0) div2n(expDr(s), -n.toInt)
     else if (n > 0) mul2n(expDr(s), n.toInt)
     else expDr(s)
   }
 
-  def sin(x: CReal): CReal = {
+  def sin(x: Real): Real = {
     val z = x / piBy4
     val s = roundUp(Rational(z(2), 4))
-    val y = x - piBy4 * CReal(s)
+    val y = x - piBy4 * Real(s)
     val m = (s % 8).toInt
     val n = if (m < 0) m + 8 else m
     n match {
@@ -301,10 +301,10 @@ object CReal {
     }
   }
 
-  def cos(x: CReal): CReal = {
+  def cos(x: Real): Real = {
     val z = x / piBy4
     val s = roundUp(Rational(z(2), 4))
-    val y = x - piBy4 * CReal(s)
+    val y = x - piBy4 * Real(s)
     val m = (s % 8).toInt
     val n = if (m < 0) m + 8 else m
     n match {
@@ -319,12 +319,12 @@ object CReal {
     }
   }
 
-  def tan(x: CReal): CReal = sin(x) / cos(x)
+  def tan(x: Real): Real = sin(x) / cos(x)
 
-  def atan(x: CReal): CReal = {
+  def atan(x: Real): Real = {
     val t = x(2)
-    val xp1 = x + CReal.one
-    val xm1 = x - CReal.one
+    val xp1 = x + Real.one
+    val xm1 = x - Real.one
     if (t < -5) atanDr(-x.reciprocal) - piBy2
     else if (t == -4) -piBy4 - atanDr(xp1 / xm1)
     else if (t < 4) atanDr(x)
@@ -332,55 +332,55 @@ object CReal {
     else piBy2 - atanDr(x.reciprocal)
   }
 
-  def atan2(y: CReal, x: CReal): CReal = CReal({ p =>
+  def atan2(y: Real, x: Real): Real = Real({ p =>
     val sx = x(p).signum
     val sy = y(p).signum
     if (sx > 0) {
       atan(y / x)(p)
     } else if (sy >= 0 && sx < 0) {
-      (atan(y / x) + CReal.pi)(p)
+      (atan(y / x) + Real.pi)(p)
     } else if (sy < 0 && sx < 0) {
-      (atan(y / x) - CReal.pi)(p)
+      (atan(y / x) - Real.pi)(p)
     } else if (sy > 0) {
-      (CReal.pi / CReal.two)(p)
+      (Real.pi / Real.two)(p)
     } else if (sy < 0) {
-      (-CReal.pi / CReal.two)(p)
+      (-Real.pi / Real.two)(p)
     } else {
       sys.error("undefined")
     }
   })
 
-  def asin(x: CReal): CReal = {
+  def asin(x: Real): Real = {
     val x0 = x(0)
-    val s = (CReal.one - x * x).sqrt
+    val s = (Real.one - x * x).sqrt
     x0.signum match {
-      case n if n > 0 => (CReal.pi / CReal.two) - atan(s / x)
+      case n if n > 0 => (Real.pi / Real.two) - atan(s / x)
       case 0 => atan(x / s)
-      case _ => (-CReal.pi / CReal.two) - atan(s / x)
+      case _ => (-Real.pi / Real.two) - atan(s / x)
     }
   }
 
-  def acos(x: CReal): CReal  = (CReal.pi / CReal.two) - asin(x)
+  def acos(x: Real): Real  = (Real.pi / Real.two) - asin(x)
 
-  def sinh(x: CReal): CReal = {
+  def sinh(x: Real): Real = {
     val y = exp(x)
-    (y - y.reciprocal) / CReal.two
+    (y - y.reciprocal) / Real.two
   }
 
-  def cosh(x: CReal): CReal = {
+  def cosh(x: Real): Real = {
     val y = exp(x)
-    (y + y.reciprocal) / CReal.two
+    (y + y.reciprocal) / Real.two
   }
 
-  def tanh(x: CReal): CReal = {
+  def tanh(x: Real): Real = {
     val y = exp(x);
     val y2 = y.reciprocal
     (y - y2) / (y + y2)
   }
 
-  def asinh(x: CReal): CReal = log(x + (x * x + CReal.one).sqrt)
-  def acosh(x: CReal): CReal = log(x + (x * x - CReal.one).sqrt)
-  def atanh(x: CReal): CReal = log((CReal.one + x) / (CReal.one - x)) / CReal.two
+  def asinh(x: Real): Real = log(x + (x * x + Real.one).sqrt)
+  def acosh(x: Real): Real = log(x + (x * x - Real.one).sqrt)
+  def atanh(x: Real): Real = log((Real.one + x) / (Real.one - x)) / Real.two
 
   def digits: Int = 40
   def bits: Int = digitsToBits(digits)
@@ -395,19 +395,19 @@ object CReal {
 
   def roundUp(r: Rational): SafeLong = SafeLong(r.round.toBigInt)
 
-  def div2n(x: CReal, n: Int): CReal =
-    CReal(p => if (p >= n) x(p - n) else roundUp(Rational(x(p), SafeLong.two.pow(n))))
+  def div2n(x: Real, n: Int): Real =
+    Real(p => if (p >= n) x(p - n) else roundUp(Rational(x(p), SafeLong.two.pow(n))))
 
-  def mul2n(x: CReal, n: Int): CReal =
-    CReal(p => x(p + n))
+  def mul2n(x: Real, n: Int): Real =
+    Real(p => x(p + n))
 
   lazy val piBy2 = div2n(pi, 1)
 
   lazy val piBy4 = div2n(pi, 2)
 
-  lazy val log2 = div2n(logDrx(CReal.two.reciprocal), 1)
+  lazy val log2 = div2n(logDrx(Real.two.reciprocal), 1)
 
-  lazy val sqrt1By2 = CReal.two.reciprocal.sqrt
+  lazy val sqrt1By2 = Real.two.reciprocal.sqrt
 
   def accumulate(total: SafeLong, xs: Stream[SafeLong], cs: Stream[Rational]): SafeLong = {
     (xs, cs) match {
@@ -419,8 +419,8 @@ object CReal {
     }
   }
 
-  private[spire] def powerSeries(ps: Stream[Rational], terms: Int => Int, x: CReal): CReal = {
-    CReal({p =>
+  private[spire] def powerSeries(ps: Stream[Rational], terms: Int => Int, x: Real): Real = {
+    Real({p =>
       val t = terms(p)
       val l2t = 2 * sizeInBase(SafeLong(t) + 1, 2) + 6
       val p2 = p + l2t
@@ -440,113 +440,113 @@ object CReal {
     loop(Rational.one, SafeLong.one)
   }
 
-  def expDr(x: CReal): CReal =
+  def expDr(x: Real): Real =
     powerSeries(accSeq((r, n) => r / n), n => n, x)
 
-  def logDr(x: CReal): CReal = {
-    val y = (x - CReal.one) / x
+  def logDr(x: Real): Real = {
+    val y = (x - Real.one) / x
     y * logDrx(y)
   }
 
-  def logDrx(x: CReal): CReal = {
+  def logDrx(x: Real): Real = {
     powerSeries(Stream.from(1).map(n => Rational(1, n)), _ + 1, x)
   }
 
-  def sinDr(x: CReal): CReal =
+  def sinDr(x: Real): Real =
     x * powerSeries(accSeq((r, n) => -r * Rational(1, 2*n*(2*n+1))), n => n, x * x)
 
-  def cosDr(x: CReal): CReal =
+  def cosDr(x: Real): Real =
     powerSeries(accSeq((r, n) => -r * Rational(1, 2*n*(2*n-1))), n => n, x * x)
 
-  def atanDr(x: CReal): CReal = {
-    val y = x * x + CReal(1)
+  def atanDr(x: Real): Real = {
+    val y = x * x + Real(1)
     (x / y) * atanDrx((x * x) / y)
   }
 
-  def atanDrx(x: CReal): CReal =
+  def atanDrx(x: Real): Real =
     powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ + 1, x)
 
-  implicit val algebra = new Fractional[CReal] with Order[CReal] with Signed[CReal] with Trig[CReal] {
-    def abs(x: CReal): CReal = x.abs
-    def signum(x: CReal): Int = x.signum
+  implicit val algebra = new Fractional[Real] with Order[Real] with Signed[Real] with Trig[Real] {
+    def abs(x: Real): Real = x.abs
+    def signum(x: Real): Int = x.signum
 
-    override def eqv(x: CReal, y: CReal): Boolean = x eqv y
-    def compare(x: CReal, y: CReal): Int = x compare y
+    override def eqv(x: Real, y: Real): Boolean = x eqv y
+    def compare(x: Real, y: Real): Int = x compare y
 
-    def zero: CReal = CReal.zero
-    def one: CReal = CReal.one
-    def negate(x: CReal): CReal = -x
-    def plus(x: CReal, y: CReal): CReal = x + y
-    override def minus(x: CReal, y: CReal): CReal = x - y
-    def times(x: CReal, y: CReal): CReal = x * y
+    def zero: Real = Real.zero
+    def one: Real = Real.one
+    def negate(x: Real): Real = -x
+    def plus(x: Real, y: Real): Real = x + y
+    override def minus(x: Real, y: Real): Real = x - y
+    def times(x: Real, y: Real): Real = x * y
 
-    def gcd(x: CReal, y: CReal): CReal = x gcd y
-    def quot(x: CReal, y: CReal): CReal = x /~ y
-    def mod(x: CReal, y: CReal): CReal = x % y
+    def gcd(x: Real, y: Real): Real = x gcd y
+    def quot(x: Real, y: Real): Real = x /~ y
+    def mod(x: Real, y: Real): Real = x % y
 
-    override def reciprocal(x: CReal): CReal = x.reciprocal
-    def div(x: CReal, y: CReal): CReal = x / y
+    override def reciprocal(x: Real): Real = x.reciprocal
+    def div(x: Real, y: Real): Real = x / y
 
-    override def sqrt(x: CReal): CReal = x.sqrt
-    def nroot(x: CReal, k: Int): CReal = x.nroot(k)
-    def fpow(x: CReal, y: CReal): CReal = x fpow y
+    override def sqrt(x: Real): Real = x.sqrt
+    def nroot(x: Real, k: Int): Real = x.nroot(k)
+    def fpow(x: Real, y: Real): Real = x fpow y
 
-    def acos(a: CReal): CReal = CReal.acos(a)
-    def asin(a: CReal): CReal = CReal.asin(a)
-    def atan(a: CReal): CReal = CReal.atan(a)
-    def atan2(y: CReal, x: CReal): CReal = CReal.atan2(y, x)
-    def cos(a: CReal): CReal = CReal.cos(a)
-    def cosh(x: CReal): CReal = CReal.cosh(x)
-    def e: CReal = CReal.e
-    def exp(x: CReal): CReal = CReal.exp(x)
-    def expm1(x: CReal): CReal = CReal.exp(CReal.one) - CReal.one
-    def log(x: CReal): CReal = CReal.log(x)
-    def log1p(x: CReal): CReal = CReal.log(CReal.one + x)
-    def pi: CReal = CReal.pi
-    def sin(x: CReal): CReal = CReal.sin(x)
-    def sinh(x: CReal): CReal = CReal.sinh(x)
-    def tan(x: CReal): CReal = CReal.tan(x)
-    def tanh(x: CReal): CReal = CReal.tanh(x)
-    def toDegrees(a: CReal): CReal = a / (CReal.two * CReal.pi) * CReal(360)
-    def toRadians(a: CReal): CReal = a / CReal(360) * (CReal.two * CReal.pi)
+    def acos(a: Real): Real = Real.acos(a)
+    def asin(a: Real): Real = Real.asin(a)
+    def atan(a: Real): Real = Real.atan(a)
+    def atan2(y: Real, x: Real): Real = Real.atan2(y, x)
+    def cos(a: Real): Real = Real.cos(a)
+    def cosh(x: Real): Real = Real.cosh(x)
+    def e: Real = Real.e
+    def exp(x: Real): Real = Real.exp(x)
+    def expm1(x: Real): Real = Real.exp(Real.one) - Real.one
+    def log(x: Real): Real = Real.log(x)
+    def log1p(x: Real): Real = Real.log(Real.one + x)
+    def pi: Real = Real.pi
+    def sin(x: Real): Real = Real.sin(x)
+    def sinh(x: Real): Real = Real.sinh(x)
+    def tan(x: Real): Real = Real.tan(x)
+    def tanh(x: Real): Real = Real.tanh(x)
+    def toDegrees(a: Real): Real = a / (Real.two * Real.pi) * Real(360)
+    def toRadians(a: Real): Real = a / Real(360) * (Real.two * Real.pi)
 
-    def ceil(x: CReal): CReal = x.ceil
-    def floor(x: CReal): CReal = x.floor
-    def isWhole(x: CReal): Boolean = x.isWhole
-    def round(x: CReal): CReal = x.round
+    def ceil(x: Real): Real = x.ceil
+    def floor(x: Real): Real = x.floor
+    def isWhole(x: Real): Boolean = x.isWhole
+    def round(x: Real): Real = x.round
 
-    def toRational(x: CReal): Rational = x.toRational
-    def toDouble(x: CReal): Double = x.toRational.toDouble
-    def toBigDecimal(x: CReal): BigDecimal = x.toRational.toBigDecimal
-    def toBigInt(x: CReal): BigInt = x.toRational.toBigInt
-    def toByte(x: CReal): Byte = x.toRational.toByte
-    def toFloat(x: CReal): Float = x.toRational.toFloat
-    def toInt(x: CReal): Int = x.toRational.toInt
-    def toLong(x: CReal): Long = x.toRational.toLong
-    def toNumber(x: CReal): Number = Number(x.toRational)
-    def toShort(x: CReal): Short = x.toRational.toShort
-    def toString(x: CReal): String = x.toString
+    def toRational(x: Real): Rational = x.toRational
+    def toDouble(x: Real): Double = x.toRational.toDouble
+    def toBigDecimal(x: Real): BigDecimal = x.toRational.toBigDecimal
+    def toBigInt(x: Real): BigInt = x.toRational.toBigInt
+    def toByte(x: Real): Byte = x.toRational.toByte
+    def toFloat(x: Real): Float = x.toRational.toFloat
+    def toInt(x: Real): Int = x.toRational.toInt
+    def toLong(x: Real): Long = x.toRational.toLong
+    def toNumber(x: Real): Number = Number(x.toRational)
+    def toShort(x: Real): Short = x.toRational.toShort
+    def toString(x: Real): String = x.toString
 
-    def toType[B](x: CReal)(implicit ev: ConvertableTo[B]): B =
+    def toType[B](x: Real)(implicit ev: ConvertableTo[B]): B =
       ev.fromRational(x.toRational)
 
-    def fromBigDecimal(n: BigDecimal): CReal = CReal(n)
-    def fromBigInt(n: BigInt): CReal = CReal(n)
-    def fromByte(n: Byte): CReal = CReal(n)
-    def fromFloat(n: Float): CReal = CReal(n)
-    def fromLong(n: Long): CReal = CReal(n)
-    def fromRational(n: Rational): CReal = CReal(n)
-    def fromShort(n: Short): CReal = CReal(n)
+    def fromBigDecimal(n: BigDecimal): Real = Real(n)
+    def fromBigInt(n: BigInt): Real = Real(n)
+    def fromByte(n: Byte): Real = Real(n)
+    def fromFloat(n: Float): Real = Real(n)
+    def fromLong(n: Long): Real = Real(n)
+    def fromRational(n: Rational): Real = Real(n)
+    def fromShort(n: Short): Real = Real(n)
 
-    def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): CReal =
-      CReal(ev.toRational(b))
+    def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): Real =
+      Real(ev.toRational(b))
   }
 
-  case class Exact(n: Rational) extends CReal { x =>
-    def apply(p: Int): SafeLong = CReal.roundUp(Rational(2).pow(p) * n)
+  case class Exact(n: Rational) extends Real { x =>
+    def apply(p: Int): SafeLong = Real.roundUp(Rational(2).pow(p) * n)
   }
 
-  case class Inexact(f: Int => SafeLong) extends CReal {
+  case class Inexact(f: Int => SafeLong) extends Real {
     @volatile private[this] var memo: Option[(Int, SafeLong)] = None
 
     def apply(p: Int): SafeLong = memo match {
