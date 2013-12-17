@@ -23,10 +23,10 @@ import spire.math._
  * `Int` will overflow before a `Double`!
  *
  * Good candidates to wrap in `FPFilter` are `BigInt`s, `Rational`s, and
- * `BigDecimal`s. Note that `Real` uses an `FPFilter` internally and thus
+ * `BigDecimal`s. Note that `Algebraic` uses an `FPFilter` internally and thus
  * nothing is gained by wrapping it. The reasoning behind this is that
  * `FPFilter`s add quite a bit of space requirements, as they may hold onto the
- * entire expression tree (as call-by-name paramters), and, since `Real` also
+ * entire expression tree (as call-by-name paramters), and, since `Algebraic` also
  * does this by design, the asymptotic space requirements remain the same.
  *
  * Currently, the only way to operate on an `FPFilter` is by using its various

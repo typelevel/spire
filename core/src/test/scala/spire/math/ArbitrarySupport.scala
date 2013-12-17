@@ -41,8 +41,8 @@ object ArbitrarySupport {
       Rational(n, d)
     })
 
-  implicit val creal: Arbitrary[CReal] =
-    Arbitrary(arbitrary[Rational].map(n => CReal(n)))
+  implicit val creal: Arbitrary[Real] =
+    Arbitrary(arbitrary[Rational].map(n => Real(n)))
 
   implicit def complex[A: Arbitrary: Fractional: Signed: Trig]: Arbitrary[Complex[A]] =
     Arbitrary(for {

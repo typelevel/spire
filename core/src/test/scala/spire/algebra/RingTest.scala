@@ -6,7 +6,7 @@ import scala.reflect.ClassTag
 import org.scalatest.FunSuite
 
 // we need to disable our own === to avoid messing up ScalaTest.
-import spire.math.{Real, Rational, Complex}
+import spire.math.{Rational, Complex}
 import spire.implicits.{eqOps => _, _}
 
 // nice alias

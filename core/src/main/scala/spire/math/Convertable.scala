@@ -145,18 +145,18 @@ private[math] trait ConvertableToRational extends ConvertableTo[Rational] {
   def fromType[B: ConvertableFrom](b: B): Rational = ConvertableFrom[B].toRational(b)
 }
 
-private[math] trait ConvertableToReal extends ConvertableTo[Real] {
-  def fromByte(a: Byte): Real = Real(a)
-  def fromShort(a: Short): Real = Real(a)
-  def fromInt(a: Int): Real = Real(a)
-  def fromLong(a: Long): Real = Real(a)
-  def fromFloat(a: Float): Real = Real(a)
-  def fromDouble(a: Double): Real = Real(a)
-  def fromBigInt(a: BigInt): Real = Real(a)
-  def fromBigDecimal(a: BigDecimal): Real = Real(a)
-  def fromRational(a: Rational) = Real(a)
+private[math] trait ConvertableToAlgebraic extends ConvertableTo[Algebraic] {
+  def fromByte(a: Byte): Algebraic = Algebraic(a)
+  def fromShort(a: Short): Algebraic = Algebraic(a)
+  def fromInt(a: Int): Algebraic = Algebraic(a)
+  def fromLong(a: Long): Algebraic = Algebraic(a)
+  def fromFloat(a: Float): Algebraic = Algebraic(a)
+  def fromDouble(a: Double): Algebraic = Algebraic(a)
+  def fromBigInt(a: BigInt): Algebraic = Algebraic(a)
+  def fromBigDecimal(a: BigDecimal): Algebraic = Algebraic(a)
+  def fromRational(a: Rational) = Algebraic(a)
 
-  def fromType[B: ConvertableFrom](b: B): Real = sys.error("fixme")
+  def fromType[B: ConvertableFrom](b: B): Algebraic = sys.error("fixme")
 }
 
 private[math] trait ConvertableToComplex[A] extends ConvertableTo[Complex[A]] {
@@ -216,7 +216,7 @@ object ConvertableTo {
   implicit final val ConvertableToDouble = new ConvertableToDouble {}
   implicit final val ConvertableToBigDecimal = new ConvertableToBigDecimal {}
   implicit final val ConvertableToRational = new ConvertableToRational {}
-  implicit final val ConvertableToReal = new ConvertableToReal {}
+  implicit final val ConvertableToAlgebraic = new ConvertableToAlgebraic {}
   implicit final val ConvertableToSafeLong = new ConvertableToSafeLong {}
   implicit final val ConvertableToNumber = new ConvertableToNumber {}
 
@@ -388,21 +388,21 @@ private[math] trait ConvertableFromRational extends ConvertableFrom[Rational] {
   def toString(a: Rational): String = a.toString
 }
 
-private[math] trait ConvertableFromReal extends ConvertableFrom[Real] {
-  def toByte(a: Real): Byte = a.toInt.toByte
-  def toShort(a: Real): Short = a.toInt.toShort
-  def toInt(a: Real): Int = a.toInt
-  def toLong(a: Real): Long = a.toLong
-  def toFloat(a: Real): Float = a.toDouble.toFloat
-  def toDouble(a: Real): Double = a.toDouble
-  def toBigInt(a: Real): BigInt = a.toBigInt
+private[math] trait ConvertableFromAlgebraic extends ConvertableFrom[Algebraic] {
+  def toByte(a: Algebraic): Byte = a.toInt.toByte
+  def toShort(a: Algebraic): Short = a.toInt.toShort
+  def toInt(a: Algebraic): Int = a.toInt
+  def toLong(a: Algebraic): Long = a.toLong
+  def toFloat(a: Algebraic): Float = a.toDouble.toFloat
+  def toDouble(a: Algebraic): Double = a.toDouble
+  def toBigInt(a: Algebraic): BigInt = a.toBigInt
   // TODO: Figure out how to deal with variable approximability.
-  def toBigDecimal(a: Real): BigDecimal = a.toBigDecimal(java.math.MathContext.DECIMAL128)
-  def toRational(a: Real): Rational = a.toRational(ApproximationContext(Rational(1L, 100000000000000000L)))
-  def toNumber(a: Real): Number = Number(toBigDecimal(a))
+  def toBigDecimal(a: Algebraic): BigDecimal = a.toBigDecimal(java.math.MathContext.DECIMAL128)
+  def toRational(a: Algebraic): Rational = a.toRational(ApproximationContext(Rational(1L, 100000000000000000L)))
+  def toNumber(a: Algebraic): Number = Number(toBigDecimal(a))
 
-  def toType[B: ConvertableTo](a: Real): B = sys.error("fixme")
-  def toString(a: Real): String = a.toString
+  def toType[B: ConvertableTo](a: Algebraic): B = sys.error("fixme")
+  def toString(a: Algebraic): String = a.toString
 }
 
 private[math] trait ConvertableFromComplex[A] extends ConvertableFrom[Complex[A]] {
@@ -467,7 +467,7 @@ object ConvertableFrom {
   implicit final val ConvertableFromBigInt = new ConvertableFromBigInt {}
   implicit final val ConvertableFromBigDecimal = new ConvertableFromBigDecimal {}
   implicit final val ConvertableFromRational = new ConvertableFromRational {}
-  implicit final val ConvertableFromReal = new ConvertableFromReal {}
+  implicit final val ConvertableFromAlgebraic = new ConvertableFromAlgebraic {}
   implicit final val ConvertableFromSafeLong = new ConvertableFromSafeLong {}
   implicit final val ConvertableFromNumber = new ConvertableFromNumber {}
 

@@ -94,11 +94,11 @@ class MaybeDoubleTest extends FunSuite {
   }
 
   test("Square-roots keep correct error bound") {
-    val a = Real(2)
+    val a = Algebraic(2)
     val a_ = MaybeDouble(2)
 
-    assertAlmostEqual(MaybeDouble(2).sqrt, Real(2).sqrt.toDouble)
-    assertAlmostEqual(MaybeDouble(4).sqrt, Real(4).sqrt.toDouble)
+    assertAlmostEqual(MaybeDouble(2).sqrt, Algebraic(2).sqrt.toDouble)
+    assertAlmostEqual(MaybeDouble(4).sqrt, Algebraic(4).sqrt.toDouble)
   }
 
   test("abs doesn't affect error") {

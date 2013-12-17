@@ -55,8 +55,8 @@ class FPFilterTest extends FunSuite {
       assert((a pow 2) == (b pow 4))
     }
 
-    powerToTheRoot(FPFilter(Real(2)),
-                   FPFilter(Real(2).sqrt))
+    powerToTheRoot(FPFilter(Algebraic(2)),
+                   FPFilter(Algebraic(2).sqrt))
   }
 
   // TODO: Really sketchy.
