@@ -4,16 +4,26 @@ import spire.syntax.ring._
 import spire.syntax.order._
 import spire.syntax.convertableFrom._
 
+import spire.algebra.{Order, Signed}
+
 import scala.{specialized => spec}
 
 case class FixedScale(denom: Int) {
   if (denom < 1)
     throw new IllegalArgumentException("illegal denominator: %s" format denom)
+
+  implicit val ctxt: ApproximationContext[Rational] =
+    ApproximationContext(Rational(1L, denom) * 2)
 }
 
 class FixedPointOverflow(n: Long) extends Exception(n.toString)
 
 object FixedPoint {
+
+  val zero: FixedPoint = new FixedPoint(0L)
+
+  def one(implicit scale: FixedScale): FixedPoint = new FixedPoint(scale.denom)
+
   def apply(n: Long)(implicit scale: FixedScale): FixedPoint =
     new FixedPoint(n) * scale.denom
 
@@ -23,12 +33,86 @@ object FixedPoint {
       throw new FixedPointOverflow(x.toLong)
     new FixedPoint(x.toLong)
   }
+
+  implicit def algebra(implicit scale: FixedScale) =
+    new Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint] {
+      implicit val ctxt: ApproximationContext[Rational] =
+        ApproximationContext(Rational(1L, scale.denom) * 2)
+
+      def abs(x: FixedPoint): FixedPoint = x.abs
+      def signum(x: FixedPoint): Int = x.signum
+
+      override def eqv(x: FixedPoint, y: FixedPoint): Boolean = x == y
+      def compare(x: FixedPoint, y: FixedPoint): Int = x compare y
+
+      def zero: FixedPoint = FixedPoint.zero
+      def one: FixedPoint = FixedPoint.one
+      def negate(x: FixedPoint): FixedPoint = -x
+      def plus(x: FixedPoint, y: FixedPoint): FixedPoint = x + y
+      override def minus(x: FixedPoint, y: FixedPoint): FixedPoint = x - y
+      def times(x: FixedPoint, y: FixedPoint): FixedPoint = x * y
+
+      def gcd(x: FixedPoint, y: FixedPoint): FixedPoint = x gcd y
+      def quot(x: FixedPoint, y: FixedPoint): FixedPoint = x /~ y
+      def mod(x: FixedPoint, y: FixedPoint): FixedPoint = x % y
+
+      override def reciprocal(x: FixedPoint): FixedPoint = one / x
+      def div(x: FixedPoint, y: FixedPoint): FixedPoint = x / y
+
+      override def sqrt(x: FixedPoint): FixedPoint = x.sqrt
+      def nroot(x: FixedPoint, k: Int): FixedPoint = x.nroot(k)
+      def fpow(x: FixedPoint, y: FixedPoint): FixedPoint = x.fpow(y)
+
+      def ceil(x: FixedPoint): FixedPoint = x.ceil
+      def floor(x: FixedPoint): FixedPoint = x.floor
+      def isWhole(x: FixedPoint): Boolean = x.isWhole
+      def round(x: FixedPoint): FixedPoint = x.round
+
+      import spire.std.any._
+
+      def toRational(x: FixedPoint): Rational = x.toRational
+      def toDouble(x: FixedPoint): Double = x.toRational.toDouble
+      def toBigDecimal(x: FixedPoint): BigDecimal = x.toRational.toBigDecimal
+      def toBigInt(x: FixedPoint): BigInt = x.toRational.toBigInt
+      def toByte(x: FixedPoint): Byte = x.toRational.toByte
+      def toFloat(x: FixedPoint): Float = x.toRational.toFloat
+      def toInt(x: FixedPoint): Int = x.toRational.toInt
+      def toLong(x: FixedPoint): Long = x.toRational.toLong
+      def toNumber(x: FixedPoint): Number = Number(x.toRational)
+      def toShort(x: FixedPoint): Short = x.toRational.toShort
+      def toString(x: FixedPoint): String = x.toString
+
+      def toType[B](x: FixedPoint)(implicit ev: ConvertableTo[B]): B =
+        ev.fromRational(x.toRational)
+
+      def fromBigDecimal(n: BigDecimal): FixedPoint = FixedPoint(n)
+      def fromBigInt(n: BigInt): FixedPoint = FixedPoint(BigDecimal(n))
+      def fromByte(n: Byte): FixedPoint = FixedPoint(n)
+      def fromFloat(n: Float): FixedPoint = FixedPoint(n)
+      def fromLong(n: Long): FixedPoint = FixedPoint(n)
+      def fromRational(n: Rational): FixedPoint = FixedPoint(n)
+      def fromShort(n: Short): FixedPoint = FixedPoint(n)
+
+      def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): FixedPoint =
+        FixedPoint(ev.toRational(b))
+    }
 }
 
 class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def unary_-(): FixedPoint =
     if (long != Long.MinValue) new FixedPoint(-long)
     else throw new FixedPointOverflow(long)
+
+  def abs: FixedPoint =
+    if (long >= 0L) this
+    else if (long != Long.MinValue) new FixedPoint(-long)
+    else throw new FixedPointOverflow(long)
+
+  def signum: Int =
+    java.lang.Long.signum(long)
+
+  def compare(rhs: FixedPoint): Int =
+    java.lang.Long.compare(lhs.long, rhs.long)
 
   def <(rhs: FixedPoint): Boolean = lhs.long < rhs.long
   def <=(rhs: FixedPoint): Boolean = lhs.long <= rhs.long
@@ -135,16 +219,52 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
       lhs
   }
 
-  def toLong()(implicit scale: FixedScale): Long =
+  def /~(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint = (lhs - lhs % rhs) / rhs
+
+  def /%(rhs: FixedPoint)(implicit scale: FixedScale): (FixedPoint, FixedPoint) = {
+    val rem = lhs % rhs
+    ((lhs - rem) / rhs, rem)
+  }
+
+  def isWhole(implicit scale: FixedScale): Boolean =
+    long % scale.denom == 0L
+
+  def floor(implicit scale: FixedScale): FixedPoint =
+    if (long % scale.denom == 0L) this
+    else if (long > 0L) FixedPoint(long / scale.denom)
+    else FixedPoint(long / scale.denom - 1L)
+
+  def ceil(implicit scale: FixedScale): FixedPoint =
+    if (long % scale.denom == 0L) this
+    else if (long > 0L) FixedPoint(long / scale.denom + 1L)
+    else FixedPoint(long / scale.denom)
+
+  def round(implicit scale: FixedScale): FixedPoint = {
+    val d = scale.denom
+    if (long % d == 0L) {
+      this
+    } else if (long > 0) {
+      val m = (long % d)
+      if (m >= (d - m)) FixedPoint(long / d + 1L) else FixedPoint(long / d)
+    } else {
+      val m = -(long % d)
+      if (m >= (d - m)) FixedPoint(long / d - 1L) else FixedPoint(long / d)
+    }
+  }
+
+  def gcd(rhs: FixedPoint): FixedPoint =
+    new FixedPoint(spire.math.gcd(lhs.long, rhs.long))
+
+  def toLong(implicit scale: FixedScale): Long =
     long / scale.denom
 
-  def toDouble()(implicit scale: FixedScale): Double =
+  def toDouble(implicit scale: FixedScale): Double =
     long.toDouble / scale.denom
 
-  def toBigDecimal()(implicit scale: FixedScale): BigDecimal =
+  def toBigDecimal(implicit scale: FixedScale): BigDecimal =
     BigDecimal(long) / scale.denom
 
-  def toRational()(implicit scale: FixedScale): Rational =
+  def toRational(implicit scale: FixedScale): Rational =
     Rational(long, scale.denom)
 
   def pow(k: Int)(implicit scale: FixedScale): FixedPoint = {
@@ -156,7 +276,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
       case 1 =>
         this
       case _ =>
-        val g = gcd(long, scale.denom)
+        val g = spire.math.gcd(long, scale.denom)
         val n = spire.math.pow((long / g).toDouble, k) * g
         val d = spire.math.pow((scale.denom / g).toDouble, k - 1)
         val x = n / d
@@ -168,5 +288,22 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     }
   }
 
-  def toString()(implicit scale: FixedScale): String = toDouble.toString
+  import spire.syntax.nroot._
+
+  def sqrt(implicit scale: FixedScale): FixedPoint = {
+    import scale.ctxt
+    FixedPoint(toRational.sqrt)
+  }
+
+  def nroot(k: Int)(implicit scale: FixedScale): FixedPoint = {
+    import scale.ctxt
+    FixedPoint(toRational.nroot(k))
+  }
+
+  def fpow(y: FixedPoint)(implicit scale: FixedScale): FixedPoint = {
+    import scale.ctxt
+    FixedPoint(toRational.fpow(y.toRational))
+  }
+
+  def getString(implicit scale: FixedScale): String = toDouble.toString
 }
