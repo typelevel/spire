@@ -66,8 +66,8 @@ introduces several new ones, all of which can be found in `spire.math`:
 
  * `Natural` unsigned, immutable, arbitrary precision integer
  * `Rational` fractions of integers with perfect precision
- * `CReal` computable real number implementation
- * `Real` lazily-computed, arbitrary precision number type
+ * `Algebraic` lazily-computed, arbitrary precision algebraic numbers
+ * `Real` computable real number implementation
  * `Complex[A]` complex numbers, points on the complex plane
  * `Quaternion[A]` extension of complex numbers into 4D space
  * `UByte` through `ULong` value classes supporting unsigned operations
@@ -276,7 +276,7 @@ values.
    + sin, cos, tan: sine, cosine, and tangent, the standard functions of angles
    + asin, acos, atan, atan2: inverse functions
    + sinh, cosh, tanh: hyperbolic functions
-   + toRatians, toDegrees: convert between angle units
+   + toRadians, toDegrees: convert between angle units
 
 ### Syntax
 
