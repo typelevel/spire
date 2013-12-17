@@ -15,7 +15,7 @@ object Fractional {
   implicit final val FloatIsFractional = new FloatIsFractional
   implicit final val DoubleIsFractional = new DoubleIsFractional
   implicit final val BigDecimalIsFractional = new BigDecimalIsFractional
-  implicit final val RealIsFractional = new RealIsFractional
+  implicit final val AlgebraicIsFractional = new AlgebraicIsFractional
   implicit final val NumberIsFractional = new NumberIsFractional
 
   implicit def RationalIsFractional(implicit ctx: ApproximationContext[Rational] = ratCtx) =
@@ -62,12 +62,12 @@ with RationalIsReal with Serializable {
 }
 
 @SerialVersionUID(0L)
-private[math] class RealIsFractional extends Fractional[Real] with RealIsField
-with RealIsNRoot with ConvertableFromReal with ConvertableToReal
-with RealIsReal with Serializable {
-  override def fromInt(n: Int): Real = Real(n)
-  override def fromDouble(n: Double): Real = Real(n)
-  override def toDouble(n: Real): Double = n.toDouble
+private[math] class AlgebraicIsFractional extends Fractional[Algebraic] with AlgebraicIsField
+with AlgebraicIsNRoot with ConvertableFromAlgebraic with ConvertableToAlgebraic
+with AlgebraicIsReal with Serializable {
+  override def fromInt(n: Int): Algebraic = Algebraic(n)
+  override def fromDouble(n: Double): Algebraic = Algebraic(n)
+  override def toDouble(n: Algebraic): Double = n.toDouble
 }
 
 @SerialVersionUID(0L)

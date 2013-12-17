@@ -6,7 +6,7 @@ import scala.reflect.ClassTag
 import org.scalatest.FunSuite
 
 // we need to disable our own === to avoid messing up ScalaTest.
-import spire.math.{Rational, Real, Complex}
+import spire.math.{Rational, Algebraic, Complex}
 import spire.implicits.{eqOps => _, _}
 
 // nice alias
@@ -50,6 +50,6 @@ class SignedTest extends FunSuite {
   runWith[BigInt](-3, 3, 0)
   runWith[BigDecimal](-3, 3, 0)
   runWith[Rational](-3, 3, 0)
-  runWith[Real](-3, 3, 0)
+  runWith[Algebraic](-3, 3, 0)
   runWith[Complex[Double]](-3, 3, 0)
 }

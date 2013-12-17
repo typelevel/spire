@@ -1,4 +1,4 @@
-package spire.math.real
+package spire.math.algebraic
 
 
 trait PrettyToString[A <: PrettyToString[A]] extends RealLike[A] { self: A =>
