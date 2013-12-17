@@ -63,11 +63,11 @@ trait LongOrder extends Order[Long] {
   override def gteqv(x: Long, y: Long) = x >= y
   override def lt(x: Long, y: Long) = x < y
   override def lteqv(x: Long, y: Long) = x <= y
-  def compare(x: Long, y: Long) = if (x < y) -1 else if (x > y) 1 else 0
+  def compare(x: Long, y: Long) = java.lang.Long.compare(x, y)
 }
 
 trait LongIsSigned extends Signed[Long] {
-  def signum(a: Long): Int = a.toInt
+  def signum(a: Long): Int = java.lang.Long.signum(a)
   def abs(a: Long): Long = if (a < 0L) -a else a
 }
 

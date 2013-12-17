@@ -87,7 +87,7 @@ private[math] trait UByteOrder extends Order[UByte] {
 }
 
 private[math] trait UByteIsSigned extends Signed[UByte] {
-  def signum(a: UByte): Int = if (a == UByte(0)) 0 else 1
+  def signum(a: UByte): Int = if (a.signed == 0) 0 else 1
   def abs(a: UByte): UByte = a
 }
 

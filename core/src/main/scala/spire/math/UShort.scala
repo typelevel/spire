@@ -120,7 +120,7 @@ private[math] class UShortBitString extends BitString[UShort] with Serializable 
 }
 
 private[math] trait UShortIsSigned extends Signed[UShort] {
-  def signum(a: UShort): Int = if (a == UShort(0)) 0 else 1
+  def signum(a: UShort): Int = if (a.signed == 0) 0 else 1
   def abs(a: UShort): UShort = a
 }
 

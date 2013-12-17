@@ -178,7 +178,7 @@ private[math] class ULongBitString extends BitString[ULong] with Serializable {
 }
 
 private[math] trait ULongIsSigned extends Signed[ULong] {
-  def signum(a: ULong): Int = if (a == ULong(0)) 0 else 1
+  def signum(a: ULong): Int = if (a.signed == 0L) 0 else 1
   def abs(a: ULong): ULong = a
 }
 
