@@ -609,7 +609,26 @@ same operations (and can interoperate).
 
 #### Algebraic
 
-TODO
+The `Algebraic` type is an implementation of a number for
+"Exact Geometric Computation". It represents algebraic numbers using an AST
+of the operations performed on it. `Algebraic` numbers can be compared
+accurately and exactly. This means that is we have 2 numbers `a` and `b`, then
+`a compare b` is always correct, regardless of whether they are irrational or
+incredibly close to each other. They are suitable for use in algorithms that
+use square or n- roots and rely on sign tests and numeric comparison to work
+correctly.
+
+On top of exact comparisons/sign tests, `Algebraic` is able to approximate
+itself to any desired precision, after the fact. This works for both absolute
+approximations, such as `x +/- 0.00001`, or relative approximations, such as
+`x.toBigDecimal(new MathContext(10000))`.
+
+Because `Algebraic` can represent algebraic numbers (note: we are adding
+support for polynomial roots, not just n-roots), they have a wider range
+than `Rational`. However, whereas `Rational` represents numbers exactly,
+`Algebraic` can only compare exactly. They also sacrifice performance to
+achieve this, and so are not suitable for use where you need performance
+and can tolerate a certain amount of error.
 
 #### Real
 
