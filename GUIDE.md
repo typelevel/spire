@@ -663,14 +663,14 @@ compromise.
 
 ### Which number types should I use?
 
-Since Spire provides a lot of number types, it can be confusing to understand
-the distinctions between them. This section should clarify their difference,
-and guide your decision over which numeric representation(s) to use.
+Spire provides many number types, and it is not always obvious what their
+relative merits are. This section explains the distinctions between them, and
+may help you decide which numeric representation(s) to use.
 
 There is usually a tension between numbers that have correctness caveats (like
 possible overflow or precision issues) and numbers that have performance
 caveats (like extra allocations and/or slower code). Spire provides a wide
-range of numeric types that should cover most cases.
+range of numeric types that should address most needs.
 
 #### Natural numbers (unsigned, whole-value numbers)
 
@@ -724,19 +724,22 @@ trigonometry. However, irrational values (like `Real(2).sqrt` or `Real.pi`)
 are represented via functions from precision to approximations. This means
 that in some situations this type might be too slow, or use too much memory.
 Additionally, operations requiring comparison or equality tests can only be
-approximately computed.
+approximately computed. However, this type should never accumulate error, so
+your results will always be correctly approximated to whatever precision you
+need.
 
 The next precise type is `Algebraic`. This type supports all rational values
 as well as roots. However, it cannot reprsent transcendental values like "pi",
 making its values a subset of `Real`'s. Unlike `Real`, this type is able to do
-exact sign tests (and thus, equality tests and comparisons). Like `Real` it
-can be slow, due to the ASTs it uses to represent algebraic expressions.
+exact sign tests (and thus, equality tests and comparisons). Due to the ASTs
+`Algebraic` uses to represent expressions, execution may be slow and involve
+lots of allocations.
 
 Finally there is `Rational`. This type represents values as irreducible
-fractions (e.g. `n/d`). `Rational` cannot represent irrational values (like
-square-roots), but efficiently implements all operators on rational values.
-This type has the fewest performance "gotchas", although obviously fractions
-with large numerators or denominators will take longer to operate on.
+fractions (e.g. `n/d`). `Rational` cannot represent irrational values (such as
+roots), but efficiently implements all operations on rational values. This
+type has the fewest performance "gotchas", although obviously fractions with
+large numerators or denominators will take longer to operate on.
 
 ##### Imprecise types
 
