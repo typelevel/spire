@@ -8,8 +8,27 @@ import scala.{ specialized => spec }
  * `op(x, id) == op(id, x) == x`. For example, if we have `Monoid[String]`,
  * with `op` as string concatenation, then `id = ""`.
  */
-trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Semigroup[A] {
+trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
+    extends Semigroup[A] {
+
+  /**
+   * Return the identity element for this monoid.
+   */
   def id: A
+
+  /**
+   * Return `a` combined with itself `n` times.
+   */
+  override def sumn(a: A, n: Int): A =
+    if (n < 0) throw new IllegalArgumentException("Repeated summation for monoids must have reptitions >= 0")
+    else if (n == 0) id
+    else if (n == 1) a
+    else sumnAboveOne(a, n)
+
+  /**
+   *  Given a sequence of `as`, sum them using the monoid and return the total.
+   */
+  def sum(as: TraversableOnce[A]): A = as.reduce(op)
 }
 
 object Monoid {
@@ -27,14 +46,6 @@ object Monoid {
    */
   @inline final def multiplicative[A](implicit A: MultiplicativeMonoid[A]) = A.multiplicative
 
-  /**
-   * Return `a` appended to itself `n` times.
-   */
-  final def sumn[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A](a: A, n: Int)(implicit A: Monoid[A]): A = {
-    if (n > 0) Semigroup.sumn(a, n)
-    else if (n == 0) A.id
-    else throw new IllegalArgumentException("Repeated summation for monoids must have reptitions >= 0")
-  }
 }
 
 /**
@@ -42,7 +53,8 @@ object Monoid {
  * 
  * A monoid is commutative if for all x and y, x |+| y === y |+| x.
  */
-trait CMonoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Monoid[A]
+trait CMonoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
+    extends Monoid[A] with CSemigroup[A]
 
 object CMonoid {
   @inline final def apply[A](implicit ev: CMonoid[A]): CMonoid[A] = ev

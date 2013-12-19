@@ -18,8 +18,8 @@ object MyBuild extends Build {
 
   // Dependencies
 
-  lazy val scalaTest = "org.scalatest" %% "scalatest" % "1.9.1"
-  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.10.0"
+  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.0"
+  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.10.1"
 
   // Release step
 
@@ -52,8 +52,6 @@ object MyBuild extends Build {
 
     scalaVersion := "2.10.2",
 
-
-
     // disable annoying warnings about 2.10.x
     conflictWarning in ThisBuild := ConflictWarning.disable,
 
@@ -61,7 +59,6 @@ object MyBuild extends Build {
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
-      scalaTest % "test",
       "org.scala-lang" % "scala-reflect" % "2.10.2"
     ),
 
@@ -168,7 +165,10 @@ object MyBuild extends Build {
 
       Seq[File](algebraFile)
     },
-    libraryDependencies += scalaCheck % "test"
+    libraryDependencies ++= Seq(
+      scalaCheck % "test",
+      scalaTest % "test"
+    )
   ) ++ buildInfoSettings ++ Seq(
     sourceGenerators in Compile <+= buildInfo,
     buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
@@ -198,7 +198,11 @@ object MyBuild extends Build {
 
   lazy val scalacheckSettings = Seq(
     name := "spire-scalacheck-binding",
-    libraryDependencies ++= Seq(scalaTest, scalaCheck)
+    libraryDependencies ++= Seq(
+      "org.typelevel" %% "discipline" % "0.1",
+      scalaTest % "test",
+      scalaCheck
+    )
   )
 
 

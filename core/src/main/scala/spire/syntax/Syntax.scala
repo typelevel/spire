@@ -114,6 +114,10 @@ trait CoordinateSpaceSyntax extends InnerProductSpaceSyntax {
   implicit def coordianteSpaceOps[V](v:V) = new CoordinateSpaceOps[V](v)
 }
 
+trait TrigSyntax {
+  implicit def trigOps[A:Trig](a: A) = new TrigOps(a)
+}
+
 trait BooleanAlgebraSyntax {
   implicit def booleanAlgebraOps[A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
 }
@@ -188,6 +192,7 @@ trait AllSyntax extends
     EuclideanRingSyntax with
     FieldSyntax with
     NRootSyntax with
+    TrigSyntax with
     ModuleSyntax with
     VectorSpaceSyntax with
     NormedVectorSpaceSyntax with

@@ -1,6 +1,6 @@
 package spire.math
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
@@ -9,7 +9,7 @@ import spire.implicits._
 
 import BigDecimal.RoundingMode._
 
-class ComplexCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   type C = Complex[BigDecimal]
 
   val zero = Complex.zero[BigDecimal]
@@ -33,10 +33,10 @@ class ComplexCheck extends PropSpec with ShouldMatchers with GeneratorDrivenProp
   def near(x: Complex[BigDecimal], y: Complex[BigDecimal]) =
     (x - y).abs should be <= threshold
 
-  complex1("x + 0 == x") { x: C => x + zero should be === x }
-  complex1("x * 1 == x") { x: C => x * one should be === x }
-  complex1("x * 0 == 0") { x: C => x * zero should be === zero }
-  complex1("x - x == 0") { x: C => x - x should be === zero }
+  complex1("x + 0 == x") { x: C => x + zero shouldBe x }
+  complex1("x * 1 == x") { x: C => x * one shouldBe x }
+  complex1("x * 0 == 0") { x: C => x * zero shouldBe zero }
+  complex1("x - x == 0") { x: C => x - x shouldBe zero }
   complex1("x / x == 1") { x: C => if (x != zero) near(x / x, one) }
   complex1("x + x == 2x") { x: C => near(x + x, x * 2) }
 

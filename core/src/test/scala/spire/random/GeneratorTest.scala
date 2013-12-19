@@ -1,6 +1,7 @@
 package spire.random
 
 import spire.syntax._
+import spire.random.mutable._
 
 import org.scalatest.FunSuite
 

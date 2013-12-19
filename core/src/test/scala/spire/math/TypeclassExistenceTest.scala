@@ -203,12 +203,12 @@ class TypeclassExistenceTest extends FunSuite {
     hasNRoot[Rational]
   }
 
-  test("Real is FieldWithNRoot") {
-    hasEq[Real]
-    hasRing[Real]
-    hasEuclideanRing[Real]
-    hasField[Real]
-    hasNRoot[Real]
+  test("Algebraic is FieldWithNRoot") {
+    hasEq[Algebraic]
+    hasRing[Algebraic]
+    hasEuclideanRing[Algebraic]
+    hasField[Algebraic]
+    hasNRoot[Algebraic]
   }
 
   test("Everybody is Numeric") {
@@ -221,17 +221,17 @@ class TypeclassExistenceTest extends FunSuite {
     hasNumeric[Double]
     hasNumeric[BigDecimal]
     hasNumeric[Rational]
-    hasNumeric[Real]
+    hasNumeric[Algebraic]
   }
 
-  test("Float, Double, Rational, BigDecimal, and Real are Fractional") {
+  test("Float, Double, Rational, BigDecimal, and Algebraic are Fractional") {
     implicit val ac = ApproximationContext(Rational(1, 100))
 
     hasFractional[Float]
     hasFractional[Double]
     hasFractional[BigDecimal]
     hasFractional[Rational]
-    hasFractional[Real]
+    hasFractional[Algebraic]
   }
 
   test("NRoot[Rational] requires implicit ApproximationContext") {

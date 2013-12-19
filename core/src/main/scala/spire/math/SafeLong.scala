@@ -18,7 +18,7 @@ import spire.std.bigInt._
 sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] {
   lhs =>
 
-  def signum: Int = fold(spire.math.signum(_).toInt, _.signum)
+  def signum: Int = fold(java.lang.Long.signum, _.signum)
 
   def +(rhs: SafeLong): SafeLong = rhs.fold(this + _, this + _)
   def -(rhs: SafeLong): SafeLong = rhs.fold(this - _, this - _)
@@ -128,6 +128,9 @@ object SafeLong extends SafeLongInstances {
 
   final val zero: SafeLong = SafeLongLong(0L)
   final val one: SafeLong = SafeLongLong(1L)
+  final val two: SafeLong = SafeLongLong(2L)
+  final val three: SafeLong = SafeLongLong(3L)
+  final val ten: SafeLong = SafeLongLong(10L)
 
   implicit def apply(x: Long): SafeLong = SafeLongLong(x)
 
@@ -249,7 +252,11 @@ private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong w
     case that => unifiedPrimitiveEquals(that)
   }
 
-  def gcd(that: SafeLong) = spire.math.gcd(x, that.fold(identity, n => (n % x).toLong))
+  def gcd(that: SafeLong): SafeLong = if (x == 0) {
+    if (that == 0) SafeLong.one else that
+  } else {
+    spire.math.gcd(x, that.fold(identity, n => (n % x).toLong))
+  }
 
   def doubleValue: Double = x.toDouble
   def floatValue: Float = x.toFloat
@@ -309,7 +316,7 @@ private[math] case class SafeLongBigInt private[math] (x: BigInt) extends SafeLo
     case SafeLongLong(y) => x == y
     case SafeLongBigInt(y) => x == y
     case t: BigInt => x == t
-    case that => unifiedPrimitiveEquals(that)
+    case that => false
   }
 
   def gcd(that: SafeLong) = that match {
@@ -379,7 +386,7 @@ private[math] trait SafeLongOrder extends Order[SafeLong] {
 }
 
 private[math] trait SafeLongIsSigned extends Signed[SafeLong] {
-  def signum(a: SafeLong): Int = a.toBigInt.toInt
+  def signum(a: SafeLong): Int = a.signum
   def abs(a: SafeLong): SafeLong = a.abs
 }
 

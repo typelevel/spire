@@ -14,10 +14,11 @@ import scala.{specialized => spec}
  */
 trait Ring[@spec(Byte, Short, Int, Long, Float, Double) A] extends Rig[A] with Rng[A] {
   /**
-   * Defined to be equivalent to `Group.sumn(one, n)(ring.additive)`. That is,
-   * `n` repeated summations of this ring's `one`, or `-one` if `n` is negative.
+   * Defined to be equivalent to `additive.sumn(one, n)`. That is, `n`
+   * repeated summations of this ring's `one`, or `-one` if `n` is
+   * negative.
    */
-  def fromInt(n: Int): A = Group.sumn(one, n)(additive)
+  def fromInt(n: Int): A = additive.sumn(one, n)
 }
 
 object Ring {

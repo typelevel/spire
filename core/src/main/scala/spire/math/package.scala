@@ -91,7 +91,7 @@ package object math {
   final def floor(n: Float): Float = Math.floor(n).toFloat
   final def floor(n: Double): Double = Math.floor(n)
   final def floor(n: BigDecimal): BigDecimal = n.setScale(0, FLOOR)
-  final def floor[A](a: A)(implicit ev: IsReal[A]): A = ev.ceil(a)
+  final def floor[A](a: A)(implicit ev: IsReal[A]): A = ev.floor(a)
 
   /**
    * round

@@ -1,13 +1,13 @@
 package spire.math
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
 import BigDecimal.RoundingMode._
 
-class RationalCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   type Q = Rational
 
   def rat1(name: String)(f: Q => Unit) =
@@ -37,20 +37,25 @@ class RationalCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPro
       }
     }
 
-  rat1("x + 0 == x") { x: Q => x + Rational(0) should be === x }
-  rat1("x * 1 == x") { x: Q => x * Rational(1) should be === x }
-  rat1("x * 0 == 0") { x: Q => x * Rational(0) should be === Rational(0) }
+  rat1("x + 0 == x") { x: Q => x + Rational(0) shouldBe x }
+  rat1("x * 1 == x") { x: Q => x * Rational(1) shouldBe x }
+  rat1("x * 0 == 0") { x: Q => x * Rational(0) shouldBe Rational(0) }
 
-  rat1("x + x == 2x") { x: Q => (x + x) should be === 2 * x }
-  rat1("x - x == 0") { x: Q => x - x should be === Rational(0) }
-  rat1("x * x == x^2") { x: Q => (x * x) should be === x.pow(2) }
-  rat1("(x^-1)^3 == x^-3") { x: Q => if (x != 0) x.reciprocal.pow(3) should be === x.pow(-3) }
-  rat1("x / x == 1") { x: Q => if (x != 0) x / x should be === Rational(1) }
+  rat1("x.floor <= x.round <= x.ceil") { x: Q =>
+    x.floor should be <= x.round
+    x.round should be <= x.ceil
+  }
 
-  rat2("x + y == y + x") { (x: Q, y: Q) => x + y should be === y + x }
-  rat2("x - y == -y + x") { (x: Q, y: Q) => x - y should be === -y + x }
-  rat2("x + y - x == y") { (x: Q, y: Q) => (x + y) - x should be === y }
-  rat2("x / y == x * (y^-1)") { (x: Q, y: Q) => if (y != 0) x / y should be === x * y.reciprocal }
+  rat1("x + x == 2x") { x: Q => (x + x) shouldBe 2 * x }
+  rat1("x - x == 0") { x: Q => x - x shouldBe Rational(0) }
+  rat1("x * x == x^2") { x: Q => (x * x) shouldBe x.pow(2) }
+  rat1("(x^-1)^3 == x^-3") { x: Q => if (x != 0) x.reciprocal.pow(3) shouldBe x.pow(-3) }
+  rat1("x / x == 1") { x: Q => if (x != 0) x / x shouldBe Rational(1) }
 
-  rat3("(x + y) * z == x * z + y * z") { (x: Q, y: Q, z: Q) => (x + y) * z should be === x * z + y * z }
+  rat2("x + y == y + x") { (x: Q, y: Q) => x + y shouldBe y + x }
+  rat2("x - y == -y + x") { (x: Q, y: Q) => x - y shouldBe -y + x }
+  rat2("x + y - x == y") { (x: Q, y: Q) => (x + y) - x shouldBe y }
+  rat2("x / y == x * (y^-1)") { (x: Q, y: Q) => if (y != 0) x / y shouldBe x * y.reciprocal }
+
+  rat3("(x + y) * z == x * z + y * z") { (x: Q, y: Q, z: Q) => (x + y) * z shouldBe x * z + y * z }
 }

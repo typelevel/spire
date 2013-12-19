@@ -1,15 +1,15 @@
 package spire.math
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
-class NaturalTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class NaturalTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   property("x + y") {
     forAll { (_x: BigInt, _y: BigInt) =>
       val (x, y) = (_x.abs, _y.abs)
-      Natural(x) + Natural(y) should be === Natural(x + y)
+      Natural(x) + Natural(y) shouldBe Natural(x + y)
     }
   }
 
@@ -17,7 +17,7 @@ class NaturalTest extends PropSpec with ShouldMatchers with GeneratorDrivenPrope
     forAll { (_x: BigInt, _y: BigInt) =>
       val (x, y) = (_x.abs, _y.abs)
       if (x >= y) {
-        Natural(x) - Natural(y) should be === Natural(x - y)
+        Natural(x) - Natural(y) shouldBe Natural(x - y)
       } else {
         val error = try {
           Natural(x) - Natural(y); false
@@ -25,7 +25,7 @@ class NaturalTest extends PropSpec with ShouldMatchers with GeneratorDrivenPrope
           case _: ArithmeticException => true
           case _: Exception => false
         }
-        error should be === true
+        error shouldBe true
       }
     }
   }
@@ -33,7 +33,7 @@ class NaturalTest extends PropSpec with ShouldMatchers with GeneratorDrivenPrope
   property("x * y") {
     forAll { (_x: BigInt, _y: BigInt) =>
       val (x, y) = (_x.abs, _y.abs)
-      Natural(x) * Natural(y) should be === Natural(x * y)
+      Natural(x) * Natural(y) shouldBe Natural(x * y)
     }
   }
   
@@ -43,7 +43,7 @@ class NaturalTest extends PropSpec with ShouldMatchers with GeneratorDrivenPrope
       if (y != 0) {
         val result = Natural(x) / Natural(y)
         val expected = Natural(x / y)
-        result should be === expected
+        result shouldBe expected
       }
     }
   }
@@ -54,7 +54,7 @@ class NaturalTest extends PropSpec with ShouldMatchers with GeneratorDrivenPrope
       if (y != 0) {
         val result = Natural(x) % Natural(y)
         val expected = Natural(x % y)
-        result should be === expected
+        result shouldBe expected
       }
     }
   }
@@ -65,7 +65,7 @@ class NaturalTest extends PropSpec with ShouldMatchers with GeneratorDrivenPrope
       if (y != 0) {
         val result = Natural(x) /% Natural(y)
         val expected = (Natural(x / y), Natural(x % y))
-        result should be === expected
+        result shouldBe expected
       }
     }
   }
@@ -75,28 +75,28 @@ class NaturalTest extends PropSpec with ShouldMatchers with GeneratorDrivenPrope
       val (x, y) = (_x.abs, _y.abs)
       val result = Natural(x) compare Natural(y)
       val expected = x compare y
-      result should be === expected
+      result shouldBe expected
     }
   }
 
   property("x.toString") {
     forAll { _x: BigInt =>
       val x = _x.abs
-      Natural(x).toString should be === x.toString
+      Natural(x).toString shouldBe x.toString
     }
   }
 
   property("x.toBigInt") {
     forAll { _x: BigInt =>
       val x = _x.abs
-      Natural(x).toBigInt should be === x
+      Natural(x).toBigInt shouldBe x
     }
   }
 
   property("x.toLong") {
     forAll { _x: BigInt =>
       val x = _x.abs
-      Natural(x).toLong should be === x.toLong
+      Natural(x).toLong shouldBe x.toLong
     }
   }
 }

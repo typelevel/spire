@@ -10,7 +10,11 @@ import spire.implicits.{
 
 import scala.{ specialized => spec }
 
-class LawTests extends LawChecker {
+import org.typelevel.discipline.scalatest.Discipline
+
+import org.scalatest.FunSuite
+
+class LawTests extends FunSuite with Discipline {
 
   import SpireArbitrary._
 

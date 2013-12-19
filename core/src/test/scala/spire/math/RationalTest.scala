@@ -21,7 +21,7 @@ class RationalTest extends FunSuite {
     import spire.implicits._
     def doStuff[NT:Fractional](a: NT, b: NT):NT = a / b
   
-    expectResult(Rational(1, 2)) {
+    assertResult(Rational(1, 2)) {
       doStuff(Rational(1), Rational(2))
     }
   }
@@ -37,8 +37,8 @@ class RationalTest extends FunSuite {
     val b = Rational(1, 3)
     val c = Rational(2, 1)
     
-    expectResult(false)(a == b)
-    expectResult(false)(a == c)
+    assertResult(false)(a == b)
+    assertResult(false)(a == c)
   }
 
   test("comparisons") {
@@ -74,7 +74,7 @@ class RationalTest extends FunSuite {
   
     // This will go through the coprime denominator path.
     // Since, 97 and 190 are coprime, 97/190 is canonical too.
-    expectResult(Rational(97, 190)) {
+    assertResult(Rational(97, 190)) {
       a + b
     }
   
@@ -84,7 +84,7 @@ class RationalTest extends FunSuite {
     // This will go through the non-coprime denominator path. Since the
     // GCD of 2 and 6 is 2, the numerator 1 * 3 + 1 * 1 = 4 is tried first.
     // The GCD of 4 and 2 is 2, so the numerator will need to be reduced.
-    expectResult(Rational(1 * 6 + 1 * 2, 2 * 6)) {
+    assertResult(Rational(1 * 6 + 1 * 2, 2 * 6)) {
       c + d
     }
   
@@ -94,7 +94,7 @@ class RationalTest extends FunSuite {
     // This will go through the non-coprime denominator path. Since the
     // GCD of 2 and 4 is 2, the numerator 5 is tried first, which is
     // coprime with 2, so the numerator need not be reduced.
-    expectResult(Rational(1 * 4 + 3 * 2, 2 * 4)) {
+    assertResult(Rational(1 * 4 + 3 * 2, 2 * 4)) {
       e + f
     }
   }
@@ -103,19 +103,19 @@ class RationalTest extends FunSuite {
     // Just ripped from addition
     val a = Rational(3, 10)
     val b = Rational(4, 19)
-    expectResult(Rational(3 * 19 - 4 * 10, 10 * 19)) {
+    assertResult(Rational(3 * 19 - 4 * 10, 10 * 19)) {
       a - b
     }
   
     val c = Rational(1, 2)
     val d = Rational(1, 6)
-    expectResult(Rational(1 * 6 - 1 * 2, 2 * 6)) {
+    assertResult(Rational(1 * 6 - 1 * 2, 2 * 6)) {
       c - d
     }
   
     val e = Rational(1, 2)
     val f = Rational(3, 4)
-    expectResult(Rational(1 * 4 - 3 * 2, 2 * 4)) {
+    assertResult(Rational(1 * 4 - 3 * 2, 2 * 4)) {
       e - f
     }
   }
@@ -123,18 +123,18 @@ class RationalTest extends FunSuite {
   test("multiplication") {
     val a = Rational(2, 3)
     val b = Rational(1, 2)
-    expectResult(Rational(1, 3)) {
+    assertResult(Rational(1, 3)) {
       a * b
     }
   
     val c = Rational(-321, 23)
     val d = Rational(23, 13)
-    expectResult(Rational(-321 * 23, 23 * 13)) {
+    assertResult(Rational(-321 * 23, 23 * 13)) {
       c * d
     }
   
     val e = Rational(-1, 2)
-    expectResult(Rational(1, 4)) {
+    assertResult(Rational(1, 4)) {
       e * e
     }
   }
@@ -142,18 +142,18 @@ class RationalTest extends FunSuite {
   test("division") {
     val a = Rational(2, 3)
     val b = Rational(1, 2)
-    expectResult(Rational(4, 3)) {
+    assertResult(Rational(4, 3)) {
       a / b
     }
   
     val c = Rational(-21, 5)
     val d = Rational(7, 18)
-    expectResult(Rational(-54, 5)) {
+    assertResult(Rational(-54, 5)) {
       c / d
     }
   
     val e = Rational(-23, 19)
-    expectResult(Rational.one) {
+    assertResult(Rational.one) {
       e / e
     }
   }
@@ -166,15 +166,15 @@ class RationalTest extends FunSuite {
   
   test("pow") {
     val a = Rational(1, 2)
-    expectResult(Rational(1, BigInt("4294967296"))) {
+    assertResult(Rational(1, BigInt("4294967296"))) {
       a pow 32
     }
     
     val b = Rational(-3, 1)
-    expectResult(Rational(9, 1)) {
+    assertResult(Rational(9, 1)) {
       b pow 2
     }
-    expectResult(Rational(-27, 1)) {
+    assertResult(Rational(-27, 1)) {
       b pow 3
     }
   }
