@@ -53,6 +53,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def ceil: Rational
   def round: Rational
 
+  def roundTo(denom: SafeLong): Rational = (this * denom).round / denom
+
   def pow(exp: Int): Rational
 
   /**
