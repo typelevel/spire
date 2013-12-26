@@ -50,7 +50,9 @@ trait LongIsNRoot extends NRoot[Long] {
       }
     }
 
-    findnroot(0, 1L << ((65 - n) / n))
+    if (n < 1) throw new IllegalArgumentException(s"nroot($n)")
+    else if (n == 1) x
+    else findnroot(0, 1L << ((65 - n) / n))
   }
   def log(a:Long) = Math.log(a.toDouble).toLong
   def fpow(a:Long, b:Long) = spire.math.pow(a, b) // xyz
