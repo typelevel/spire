@@ -243,7 +243,8 @@ private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong w
   else
     SafeLongBigInt(BigInt(x) << n)
 
-  def >>(n: Int): SafeLong = if (n < 0) <<(-n) else SafeLongLong(x >> n)
+  def >>(n: Int): SafeLong =
+    if (n < 0) <<(-n) else if (n >= 64) SafeLongLong(0L) else SafeLongLong(x >> n)
 
   override def equals(that: Any): Boolean = that match {
     case SafeLongLong(y) => x == y
