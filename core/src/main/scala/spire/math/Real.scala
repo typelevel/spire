@@ -30,14 +30,11 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     case y => toRational.equals(y)
   }
 
-  def eqv(y: Real): Boolean = (x, y) match {
-    case (Exact(nx), Exact(ny)) => nx == ny
-    case _ => (x - y).signum == 0 || x.toString == y.toString
-  }
+  def eqv(y: Real): Boolean = (x compare y) == 0
 
   def compare(y: Real): Int = (x, y) match {
     case (Exact(nx), Exact(ny)) => nx compare ny
-    case _ => (x - y)(Real.bits).signum
+    case _ => (x - y).signum
   }
 
   def min(y: Real): Real = (x, y) match {
@@ -333,8 +330,16 @@ object Real {
   }
 
   def atan2(y: Real, x: Real): Real = Real({ p =>
-    val sx = x(p).signum
-    val sy = y(p).signum
+    var pp = p
+    var sx = x(pp).signum
+    var sy = y(pp).signum
+    // val maxp = p * p
+    // while (sx == 0 && sy == 0 && pp < maxp) {
+    while (sx == 0 && sy == 0) {
+      sx = x(pp).signum
+      sy = y(pp).signum
+      pp += 1
+    }
     if (sx > 0) {
       atan(y / x)(p)
     } else if (sy >= 0 && sx < 0) {
@@ -346,7 +351,10 @@ object Real {
     } else if (sy < 0) {
       (-Real.pi / Real.two)(p)
     } else {
-      sys.error("undefined")
+      throw new IllegalArgumentException("atan2(0, 0) is undefined")
+      // // ugh
+      // Real.zero
+      // //sys.error("undefined sx=%s sy=%s" format (sx, sy))
     }
   })
 
@@ -464,7 +472,8 @@ object Real {
   }
 
   def atanDrx(x: Real): Real =
-    powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ + 1, x)
+    //powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ + 1, x)
+    powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ * 2, x)
 
   implicit val algebra = new Fractional[Real] with Order[Real] with Signed[Real] with Trig[Real] {
     def abs(x: Real): Real = x.abs
@@ -542,16 +551,16 @@ object Real {
       Real(ev.toRational(b))
   }
 
-  case class Exact(n: Rational) extends Real { x =>
+  case class Exact(n: Rational) extends Real {
     def apply(p: Int): SafeLong = Real.roundUp(Rational(2).pow(p) * n)
   }
 
   case class Inexact(f: Int => SafeLong) extends Real {
-    @volatile private[this] var memo: Option[(Int, SafeLong)] = None
+    @volatile private[spire] var memo: Option[(Int, SafeLong)] = None
 
     def apply(p: Int): SafeLong = memo match {
       case Some((bits, value)) if bits >= p =>
-        value >> (bits - p)
+        Real.roundUp(Rational(value, SafeLong(2).pow(bits - p)))
       case _ =>
         val result = f(p)
         memo = Some((p, result))
