@@ -167,7 +167,8 @@ object MyBuild extends Build {
     },
     libraryDependencies ++= Seq(
       scalaCheck % "test",
-      scalaTest % "test"
+      scalaTest % "test",
+      "com.chuusai" % "shapeless_2.10.2" % "2.0.0-M1"
     )
   ) ++ buildInfoSettings ++ Seq(
     sourceGenerators in Compile <+= buildInfo,

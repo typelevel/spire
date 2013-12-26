@@ -14,8 +14,8 @@ import Gen._
 import Arbitrary.arbitrary
 
 class IntervalTest extends FunSuite {
-  def cc(n1:Double, n2:Double) = Interval.closed(n1, n2)
-  def oc(n1:Double, n2:Double) = Interval.openBelow(n1, n2)
+  def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)
+  def oc(n1: Double, n2: Double) = Interval.openBelow(n1, n2)
 
   val a = cc(0.0, 4.0)
   test("a.contains(0.0) is true") { assert(a.contains(0.0) === true) }
@@ -135,10 +135,7 @@ class IntervalReciprocalTest extends FunSuite {
 
 class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
-  // import ArbitrarySupport.longRational
-  // import ArbitrarySupport.longRationalInterval
-  import ArbitrarySupport.rational
-  import ArbitrarySupport.interval
+  import ArbitrarySupport.{interval, rational}
 
   val rng = spire.random.mutable.GlobalRng
 

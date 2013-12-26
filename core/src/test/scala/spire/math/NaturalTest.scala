@@ -5,98 +5,76 @@ import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
+import scala.util.Try
+
 class NaturalTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+
+  import spire.std.bigInt._
+  import ArbitrarySupport._
+  type N = NonNegative[BigInt]
+
   property("x + y") {
-    forAll { (_x: BigInt, _y: BigInt) =>
-      val (x, y) = (_x.abs, _y.abs)
-      Natural(x) + Natural(y) shouldBe Natural(x + y)
+    forAll { (x: N, y: N) =>
+      Natural(x.num) + Natural(y.num) shouldBe Natural(x.num + y.num)
     }
   }
 
   property("x - y") {
-    forAll { (_x: BigInt, _y: BigInt) =>
-      val (x, y) = (_x.abs, _y.abs)
-      if (x >= y) {
-        Natural(x) - Natural(y) shouldBe Natural(x - y)
+    forAll { (x: N, y: N) =>
+      val z = Try(Natural(x.num) - Natural(y.num))
+      if (x.num >= y.num) {
+        z shouldBe Try(Natural(x.num - y.num))
       } else {
-        val error = try {
-          Natural(x) - Natural(y); false
-        } catch {
-          case _: ArithmeticException => true
-          case _: Exception => false
-        }
-        error shouldBe true
+        z.isFailure shouldBe true
       }
     }
   }
   
   property("x * y") {
-    forAll { (_x: BigInt, _y: BigInt) =>
-      val (x, y) = (_x.abs, _y.abs)
-      Natural(x) * Natural(y) shouldBe Natural(x * y)
+    forAll { (x: N, y: N) =>
+      Natural(x.num) * Natural(y.num) shouldBe Natural(x.num * y.num)
     }
   }
   
   property("x / y") {
-    forAll { (_x: BigInt, _y: BigInt) =>
-      val (x, y) = (_x.abs, _y.abs)
-      if (y != 0) {
-        val result = Natural(x) / Natural(y)
-        val expected = Natural(x / y)
-        result shouldBe expected
-      }
+    forAll { (x: N, y: Positive[BigInt]) =>
+      Natural(x.num) / Natural(y.num) shouldBe Natural(x.num / y.num)
     }
   }
 
   property("x % y") {
-    forAll { (_x: BigInt, _y: BigInt) =>
-      val (x, y) = (_x.abs, _y.abs)
-      if (y != 0) {
-        val result = Natural(x) % Natural(y)
-        val expected = Natural(x % y)
-        result shouldBe expected
-      }
+    forAll { (x: N, y: Positive[BigInt]) =>
+      Natural(x.num) % Natural(y.num) shouldBe Natural(x.num % y.num)
     }
   }
 
   property("x /% y") {
-    forAll { (_x: BigInt, _y: BigInt) =>
-      val (x, y) = (_x.abs, _y.abs)
-      if (y != 0) {
-        val result = Natural(x) /% Natural(y)
-        val expected = (Natural(x / y), Natural(x % y))
-        result shouldBe expected
-      }
+    forAll { (x: N, y: Positive[BigInt]) =>
+      Natural(x.num) /% Natural(y.num) shouldBe (Natural(x.num / y.num), Natural(x.num % y.num))
     }
   }
 
   property("x compare y") {
-    forAll { (_x: BigInt, _y: BigInt) =>
-      val (x, y) = (_x.abs, _y.abs)
-      val result = Natural(x) compare Natural(y)
-      val expected = x compare y
-      result shouldBe expected
+    forAll { (x: N, y: N) =>
+      (Natural(x.num) compare Natural(y.num)) shouldBe (x.num compare y.num)
     }
   }
 
   property("x.toString") {
-    forAll { _x: BigInt =>
-      val x = _x.abs
-      Natural(x).toString shouldBe x.toString
+    forAll { x: N =>
+      Natural(x.num).toString shouldBe x.num.toString
     }
   }
 
   property("x.toBigInt") {
-    forAll { _x: BigInt =>
-      val x = _x.abs
-      Natural(x).toBigInt shouldBe x
+    forAll { x: N =>
+      Natural(x.num).toBigInt shouldBe x.num
     }
   }
 
   property("x.toLong") {
-    forAll { _x: BigInt =>
-      val x = _x.abs
-      Natural(x).toLong shouldBe x.toLong
+    forAll { x: N =>
+      Natural(x.num).toLong shouldBe x.num.toLong
     }
   }
 }

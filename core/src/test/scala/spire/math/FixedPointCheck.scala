@@ -1,6 +1,7 @@
 package spire.math
 
 import spire.implicits._
+import scala.util.Try
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
@@ -13,10 +14,35 @@ import Arbitrary.arbitrary
 
 class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
-  import BigDecimal.RoundingMode.FLOOR
+  import ArbitrarySupport._
 
-  implicit val arbScale: Arbitrary[FixedScale] =
-    Arbitrary(arbitrary[Int].map(_ & 0x7fffffff).filter(_ != 0).map(FixedScale))
+  implicit val arbFixedScale: Arbitrary[FixedScale] =
+    Arbitrary(arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale))
+
+  implicit val arbFixedPoint: Arbitrary[FixedPoint] =
+    Arbitrary(arbitrary[Long].map(new FixedPoint(_)))
+
+  property("FixedScale(r).toRational ~= r") {
+    forAll { (s: FixedScale, r: Rational) =>
+      implicit val scale = s
+      val minV = FixedPoint.MinValue.toRational
+      val maxV = FixedPoint.MaxValue.toRational
+      if (r < minV || maxV < r) {
+        Try(FixedPoint(r)).isSuccess shouldBe false
+      } else {
+        FixedPoint(r).toRational shouldBe r.roundTo(s.denom)
+      }
+    }
+  }
+
+  property("new FixedScale(n).toRational = n/d") {
+    forAll { (s: FixedScale, n: Long) =>
+      implicit val scale = s
+      new FixedPoint(n).toRational shouldBe Rational(n, s.denom)
+    }
+  }
+
+  import BigDecimal.RoundingMode.FLOOR
 
   def build(x: Long, y0: Long, z: Byte, noZero: Boolean): (Int, Int, FixedPoint, FixedPoint, Rational, Rational) = {
     val y = if (y0 == 0L && noZero) 1L else y0
