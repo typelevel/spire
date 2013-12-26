@@ -252,6 +252,9 @@ object FixedPoint {
 
   val zero: FixedPoint = new FixedPoint(0L)
 
+  val MaxValue: FixedPoint = new FixedPoint(Long.MaxValue)
+  val MinValue: FixedPoint = new FixedPoint(Long.MinValue)
+
   def one(implicit scale: FixedScale): FixedPoint = new FixedPoint(scale.denom)
 
   def apply(n: Long)(implicit scale: FixedScale): FixedPoint =
