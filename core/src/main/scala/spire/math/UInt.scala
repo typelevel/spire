@@ -113,7 +113,7 @@ private[math] class UIntBitString extends BitString[UInt] with Serializable {
 }
 
 private[math] trait UIntIsSigned extends Signed[UInt] {
-  def signum(a: UInt): Int = if (a == UInt(0)) 0 else 1
+  def signum(a: UInt): Int = java.lang.Integer.signum(a.signed) & 1
   def abs(a: UInt): UInt = a
 }
 

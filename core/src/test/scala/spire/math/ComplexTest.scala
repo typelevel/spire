@@ -94,8 +94,6 @@ class ComplexTest extends FunSuite {
     assert(Complex.rootsOfUnity[Double](3) === Array(one, c1, c2))
   }
 
-  // TODO: get a way to get Real values for e and pi, and try this for Real
-
   test("try using FastComplex") {
     val fc = FastComplex
 

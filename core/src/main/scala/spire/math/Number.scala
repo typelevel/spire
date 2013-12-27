@@ -569,11 +569,11 @@ trait NumberInstances {
 private[math] trait NumberIsRing extends Ring[Number] {
   override def minus(a:Number, b:Number): Number = a - b
   def negate(a:Number): Number = -a
-  val one: Number = Number.one
+  def one: Number = Number.one
   def plus(a:Number, b:Number): Number = a + b
   override def pow(a:Number, b:Int): Number = a.pow(Number(b))
   override def times(a:Number, b:Number): Number = a * b
-  val zero: Number = Number.zero
+  def zero: Number = Number.zero
   
   override def fromInt(n: Int): Number = Number(n)
 }

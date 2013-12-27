@@ -1,4 +1,4 @@
-package spire.math.real
+package spire.math.algebraic
 
 import spire.math.fpf.MaybeDouble
 import spire.math._

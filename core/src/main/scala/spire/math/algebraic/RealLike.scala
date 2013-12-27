@@ -1,4 +1,4 @@
-package spire.math.real
+package spire.math.algebraic
 
 import spire.algebra.Sign
 import spire.algebra.Sign.{ Positive, Zero, Negative }
@@ -27,7 +27,7 @@ trait RealLike[A <: RealLike[A]] extends ScalaNumber { self: A =>
   def sqrt: A = this nroot 2
   def nroot(k: Int): A = {
     if (this.sign == Negative && k % 2 == 0) {
-      throw new ArithmeticException("Cannot find an even root of a negative Real.")
+      throw new ArithmeticException("Cannot find an even root of a negative number.")
     }
 
     KRoot[A](this, k)

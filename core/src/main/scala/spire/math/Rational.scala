@@ -53,6 +53,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def ceil: Rational
   def round: Rational
 
+  def roundTo(denom: SafeLong): Rational = (this * denom).round / denom
+
   def pow(exp: Int): Rational
 
   /**
@@ -535,7 +537,7 @@ private[math] object LongRationals extends Rationals[Long] {
       else if (n == Long.MinValue || d == Long.MinValue) BigRational(-BigInt(d), -BigInt(n))
       else LongRational(-d, -n)
 
-    override def signum: Int = if (n > 0) 1 else if (n < 0) -1 else 0
+    override def signum: Int = java.lang.Long.signum(n)
 
     override def unary_-(): Rational =
       if (n == Long.MinValue) BigRational(-BigInt(Long.MinValue), BigInt(d))

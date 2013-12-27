@@ -15,13 +15,13 @@ import ArbitrarySupport._
 
 class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
-  type H = Quaternion[CReal]
-  val zero = Quaternion.zero[CReal]
-  val one = Quaternion.one[CReal]
+  type H = Quaternion[Real]
+  val zero = Quaternion.zero[Real]
+  val one = Quaternion.one[Real]
 
   property("q + 0 = q") {
     forAll { (q: H) =>
-      q + CReal.zero shouldBe q
+      q + Real.zero shouldBe q
       q + zero shouldBe q
     }
   }
@@ -52,21 +52,21 @@ class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
   property("q * 0 = q") {
     forAll { (q: H) =>
-      q * CReal.zero shouldBe zero
+      q * Real.zero shouldBe zero
       q * zero shouldBe zero
     }
   }
 
   property("q * 1 = q") {
     forAll { (q: H) =>
-      q * CReal.one shouldBe q
+      q * Real.one shouldBe q
       q * one shouldBe q
     }
   }
 
   property("q * 2 = q + q") {
     forAll { (q: H) =>
-      q * CReal(2) shouldBe q + q
+      q * Real(2) shouldBe q + q
     }
   }
 
@@ -101,7 +101,7 @@ class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   }
 
   // exact checking isn't quite working in all cases, ugh
-  val tolerance = CReal(Rational(1, 1000000000))
+  val tolerance = Real(Rational(1, 1000000000))
 
   import spire.compat.ordering
 
@@ -132,7 +132,7 @@ class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
   property("q.nroot(3).pow(3) = q") {
     forAll { (a: Short, b: Short, c: Short, d: Short) =>
-      val q = Quaternion(CReal(a), CReal(b), CReal(c), CReal(d))
+      val q = Quaternion(Real(a), Real(b), Real(c), Real(d))
       val r = q.nroot(3).pow(3)
       inexactEq(q, r)
     }
@@ -140,7 +140,7 @@ class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
   property("q.nroot(k).pow(k) = q") {
     forAll { (a: Short, b: Short, c: Short, d: Short, k0: Int) =>
-      val q = Quaternion(CReal(a), CReal(b), CReal(c), CReal(d))
+      val q = Quaternion(Real(a), Real(b), Real(c), Real(d))
       val k = (k0 % 5).abs + 1
       val r = q.nroot(k).pow(k)
       inexactEq(q, r)
@@ -150,15 +150,15 @@ class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   // property("q.fpow(1/k) = q.nroot(k)") {
   //   forAll { (q: H, k0: Int) =>
   //     val k = (k0 % 10).abs + 1
-  //     q.nroot(k) shouldBe q.fpow(CReal(Rational(1, k)))
+  //     q.nroot(k) shouldBe q.fpow(Real(Rational(1, k)))
   //   }
   // }
   // 
   // property("q.fpow(1/k).fpow(k) = q") {
   //   forAll { (q: H, k0: Byte) =>
-  //     val k = CReal(Rational((k0 % 10).abs))
+  //     val k = Real(Rational((k0 % 10).abs))
   //     val ik = k.reciprocal
-  //     if (k == CReal.zero) {
+  //     if (k == Real.zero) {
   //       q.fpow(k) shouldBe one
   //     } else {
   //       q.fpow(ik).fpow(k) shouldBe q
@@ -173,8 +173,8 @@ class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   }
 
   property("q.hashCode = c.hashCode") {
-    forAll { (r: CReal, i: CReal) =>
-      val q1 = Quaternion(r, i, CReal.zero, CReal.zero)
+    forAll { (r: Real, i: Real) =>
+      val q1 = Quaternion(r, i, Real.zero, Real.zero)
       val c1 = Complex(r, i)
       q1.hashCode shouldBe c1.hashCode
 
@@ -186,15 +186,15 @@ class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   }
 
   property("q = c") {
-    val z = CReal.zero
-    forAll { (r: CReal, i: CReal) =>
+    val z = Real.zero
+    forAll { (r: Real, i: Real) =>
       Quaternion(r, i, z, z) shouldBe Complex(r, i)
       Quaternion(r, z, z, z) shouldBe Complex(r, z)
       Quaternion(z, i, z, z) shouldBe Complex(z, i)
     }
 
-    forAll { (r: CReal, i: CReal, j: CReal, k: CReal) =>
-      Quaternion(r, i, j, k) == Complex(r, i) shouldBe (j == CReal.zero && k == CReal.zero)
+    forAll { (r: Real, i: Real, j: Real, k: Real) =>
+      Quaternion(r, i, j, k) == Complex(r, i) shouldBe (j == Real.zero && k == Real.zero)
     }
   }
 }

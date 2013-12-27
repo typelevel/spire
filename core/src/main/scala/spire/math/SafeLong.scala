@@ -18,7 +18,7 @@ import spire.std.bigInt._
 sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] {
   lhs =>
 
-  def signum: Int = fold(spire.math.signum(_).toInt, _.signum)
+  def signum: Int = fold(java.lang.Long.signum, _.signum)
 
   def +(rhs: SafeLong): SafeLong = rhs.fold(this + _, this + _)
   def -(rhs: SafeLong): SafeLong = rhs.fold(this - _, this - _)
@@ -260,7 +260,8 @@ private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong w
   else
     SafeLongBigInt(BigInt(x) << n)
 
-  def >>(n: Int): SafeLong = if (n < 0) <<(-n) else SafeLongLong(x >> n)
+  def >>(n: Int): SafeLong =
+    if (n < 0) <<(-n) else if (n >= 64) SafeLongLong(0L) else SafeLongLong(x >> n)
 
   override def equals(that: Any): Boolean = that match {
     case SafeLongLong(y) => x == y
@@ -403,7 +404,7 @@ private[math] trait SafeLongOrder extends Order[SafeLong] {
 }
 
 private[math] trait SafeLongIsSigned extends Signed[SafeLong] {
-  def signum(a: SafeLong): Int = a.toBigInt.toInt
+  def signum(a: SafeLong): Int = a.signum
   def abs(a: SafeLong): SafeLong = a.abs
 }
 

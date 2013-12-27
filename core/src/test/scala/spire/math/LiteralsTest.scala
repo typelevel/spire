@@ -50,7 +50,7 @@ class LiteralsTest extends FunSuite {
     import spire.std.double._
     val c = Complex(2.0, 3.0)
     val q = Rational(4, 5)
-    val r = Real(3.0)
+    val r = Algebraic(3.0)
 
     assert(c + 1 === Complex(3.0, 3.0))
     assert(1 + c === Complex(3.0, 3.0))
@@ -58,7 +58,7 @@ class LiteralsTest extends FunSuite {
     assert(q + 1 === Rational(9, 5))
     assert(1 + q === Rational(9, 5))
 
-    assert(r + 1 === Real(4.0))
-    assert(1 + r === Real(4.0))
+    assert(r + 1 === Algebraic(4.0))
+    assert(1 + r === Algebraic(4.0))
   }
 }

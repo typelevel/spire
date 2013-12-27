@@ -607,37 +607,60 @@ implementation will be more efficient. In any case, the underlying
 representation is an implementation detail and both types support the
 same operations (and can interoperate).
 
-#### CReal
+#### Algebraic
 
-`CReal` stands for "computable real". Spire's `CReal` implementation
+The `Algebraic` type is an implementation of a number for
+"Exact Geometric Computation". It represents algebraic numbers using an AST
+of the operations performed on it. `Algebraic` numbers can be compared
+accurately and exactly. This means that is we have 2 numbers `a` and `b`, then
+`a compare b` is always correct, regardless of whether they are irrational or
+incredibly close to each other. They are suitable for use in algorithms that
+use square or n- roots and rely on sign tests and numeric comparison to work
+correctly.
+
+On top of exact comparisons/sign tests, `Algebraic` is able to approximate
+itself to any desired precision, after the fact. This works for both absolute
+approximations, such as `x +/- 0.00001`, or relative approximations, such as
+`x.toBigDecimal(new MathContext(10000))`.
+
+Because `Algebraic` can represent algebraic numbers (note: we are adding
+support for polynomial roots, not just n-roots), they have a wider range
+than `Rational`. However, whereas `Rational` represents numbers exactly,
+`Algebraic` can only compare exactly. They also sacrifice performance to
+achieve this, and so are not suitable for use where you need performance
+and can tolerate a certain amount of error.
+
+#### Real
+
+`Real` stands for "computable real". Spire's `Real` implementation
 is based on ERA, written in Haskell by David Lester. Computable real
 numbers are those which can be computed (i.e. approximated) to any
-desired precision. Unlike `Double` and `BigDecimal`, `CReal` values are not
+desired precision. Unlike `Double` and `BigDecimal`, `Real` values are not
 stored as approximations, but rather as a function from desired
 precision to closest approximate value.
 
-If we have an instance `x` of `CReal` which approximates a real number
+If we have an instance `x` of `Real` which approximates a real number
 *r*, this means that for any precision *p* (in bits), our instance
 will produce an *x* such that *x/2^p* is the closest rational value to
 *r*. Translated into Scala, this means that `x.apply(p)` returns a
 `SafeLong` value `x`, such that `Rational(x, SafeLong(2).pow(p))` is
 the best approximation for *r*.
 
-Spire represents two types of `CReal` values: `Exact` and
+Spire represents two types of `Real` values: `Exact` and
 `Inexact`. The former are rational values for which we have an
 existing instance of `Rational`, and are inexpensive to work with. The
 latter are functions for approximating (potentially) irrational
 values, are lazily evaluated and memoized, and can be potentially very
 expensive to compute.
 
-As with `Rational` values, operations on `CReal` values are able to
-obey the relevant algebraic identities. But unlike `Rational`, `CReal`
+As with `Rational` values, operations on `Real` values are able to
+obey the relevant algebraic identities. But unlike `Rational`, `Real`
 supports roots and trigonometric functions. Furthermore, important
 trig identities are also preserved:
 
 ```scala
-import CReal.{sin, cos}
-def circle(a: CReal): CReal = (cos(a).pow(2) + sin(a).pow(2)).sqrt
+import Real.{sin, cos}
+def circle(a: Real): Real = (cos(a).pow(2) + sin(a).pow(2)).sqrt
 // will return CR(1) no matter what value is provided
 ```
 
@@ -653,13 +676,121 @@ precision.
 Spire currently bakes in a "default" precision to use with these kinds
 of methods. Furthermore, these methods will always work with `Exact`
 values: the issues only arise when using `Inexact` values. Given that
-the alternative to using `CReal` is to use another approximate type,
+the alternative to using `Real` is to use another approximate type,
 providing approximate comparisons and equality seems like a reasonable
 compromise.
 
-#### Real
+### Which number types should I use?
 
-TODO
+Spire provides many number types, and it is not always obvious what their
+relative merits are. This section explains the distinctions between them, and
+may help you decide which numeric representation(s) to use.
+
+There is usually a tension between numbers that have correctness caveats (like
+possible overflow or precision issues) and numbers that have performance
+caveats (like extra allocations and/or slower code). Spire provides a wide
+range of numeric types that should address most needs.
+
+#### Natural numbers (unsigned, whole-value numbers)
+
+For non-negative numbers, the safe type to use is `Natural`. It is quite fast
+when representing small-ish numbers (128-bits or less), but has no upper bound
+on the values it can reprsent. However, its unique cons-structure means that
+for very large values `BigInt` and `SafeLong` may be faster. Since it only
+supports non-negative values, subtraction is non-total (and may throw an
+exception).
+
+If your values are guaranteed to be small (or you are prepared to detect
+truncation), you can use `UByte` (8-bit), `UShort` (16-bit), `UInt` (32-bit),
+or `ULong` (64-bit), depending on how much space you need. These types have
+the same unsigned semantics as unsigned types in languages like C. These types
+are not boxed, although care must be used with arrays (like any value class).
+
+#### Integer numbers (signed, whole-value numbers)
+
+There are two safe types that can be used with integer values: `SafeLong` and
+`BigInt`. Both support arbitrarily large values, as well as the usual
+semantics for things like integer division (`quot`). The former (`SafeLong`)
+performs much better for values that can be represented with a `Long` (e.g.
+64-bit or less), and is a good default choice. When dealing with values that
+are mostly or entirely very large, `BigInt` may be a bit faster.
+
+Like the unsigned case, you can use `Byte` (8-bit), `Short` (16-bit), `Int`
+(32-bit), or `Long` (64-bit) to handle cases where your values are small, or
+where you want to avoid allocations and will handle truncation issues
+yourself. These types are provided by Scala (and ultimately the JVM) and will
+not cause allocations.
+
+#### Fractional numbers (numbers that can be divided)
+
+There are many different fractional flavors, which support various trade-offs
+between expressive power, precision, and performance.
+
+Fractional types come in two basic flavors: precise or imprecise. Imprecise
+types (like `Double`) will accumulate error and are not associative in some
+cases (meaning that `(x + y) + z` may produce different results than `x + (y +
+z)`). These types are often faster than precise types but can be risky to use.
+
+Precise numbers make stronger precision guarantees, but at the cost of
+performance or expressiveness. They are often a bit slower, and may restrict
+the operations they support (to preserve guarantees about precision).
+
+##### Precise types
+
+The most powerful precise type is `Real`. It represents computable real
+numbers, and supports all the operations you would expect, including roots and
+trigonometry. However, irrational values (like `Real(2).sqrt` or `Real.pi`)
+are represented via functions from precision to approximations. This means
+that in some situations this type might be too slow, or use too much memory.
+Additionally, operations requiring comparison or equality tests can only be
+approximately computed. However, this type should never accumulate error, so
+your results will always be correctly approximated to whatever precision you
+need.
+
+The next precise type is `Algebraic`. This type supports all rational values
+as well as roots. However, it cannot reprsent transcendental values like "pi",
+making its values a subset of `Real`'s. Unlike `Real`, this type is able to do
+exact sign tests (and thus, equality tests and comparisons). Due to the ASTs
+`Algebraic` uses to represent expressions, execution may be slow and involve
+lots of allocations.
+
+Finally there is `Rational`. This type represents values as irreducible
+fractions (e.g. `n/d`). `Rational` cannot represent irrational values (such as
+roots), but efficiently implements all operations on rational values. This
+type has the fewest performance "gotchas", although obviously fractions with
+large numerators or denominators will take longer to operate on.
+
+##### Imprecise types
+
+These types are more efficient than the precise types, but require care and
+analysis to ensure that results are correct and sufficiently accurate.
+
+The imprecise type with the most potential precision is `BigDecimal` which is
+provided by Scala. This number approximates real values to a number of decimal
+(base-10) digits (by default 34). Unlike floating point values, this type has
+an exact representation of values like `0.111110`, and the user can use
+`java.math.MathContext` to configure how much precision is used. Even so, the
+type is still subject to accumulated rounding error, and thus is not truly
+associative.
+
+Next comes `Float` and `Double`, the built-in 32- and 64-bit floating-point
+implementations on the JVM. The pitfalls of using floating-point values are
+well-known (and documented elsewhere) but these types are very fast.
+
+Finally, Spire supports the experimental `FixedPoint` class. This value class
+uses unboxed `Long` values to represent fractions in terms of user-specified
+denominator (supplied via an implicit `FixedScale` instance). This is a very
+special-purpose type to be used in cases where floating-point approximations
+have problems and unboxed values are required. You should avoid this type
+unless your applications has a known, specific need for fixed-point
+arithmetic.
+
+#### Other types
+
+The other numeric and pseudo-numeric types (like `Polynomial`, `Interval`,
+`Complex`, and `Quaternion`) each implement specific functionality, so there
+should be less confusion about which type to use. The sections describing
+these types explain their properties and trade-offs.
 
 ### Pseudo-Random Number Generators, Distributions, etc
 

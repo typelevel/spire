@@ -15,11 +15,11 @@ object Searching {
     var last = upper
     while (first <= last) {
       val middle = (first + last) >>> 1
-      as(middle).compare(item) match {
-        case -1 => first = middle + 1
-        case 1 => last = middle - 1
-        case 0 => return middle
-      }
+
+      val compare = as(middle).compare(item)
+      if (compare < 0) first = middle + 1
+      else if (compare > 0) last = middle - 1
+      else return middle
     }
     -first - 1
   }
@@ -32,11 +32,11 @@ object Searching {
     var last = upper
     while (first <= last) {
       val middle = (first + last) >>> 1
-      as(middle).compare(item) match {
-        case -1 => first = middle + 1
-        case 1 => last = middle - 1
-        case 0 => return middle
-      }
+
+      val compare = as(middle).compare(item)
+      if (compare < 0) first = middle + 1
+      else if (compare > 0) last = middle - 1
+      else return middle
     }
     -first - 1
   }

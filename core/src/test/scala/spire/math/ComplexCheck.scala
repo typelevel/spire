@@ -31,7 +31,7 @@ class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
 
   val threshold = BigDecimal(1e-20)
   def near(x: Complex[BigDecimal], y: Complex[BigDecimal]) =
-    (x - y).abs should be <= threshold
+    if (x == y) x shouldBe y else (x - y).abs should be <= threshold
 
   complex1("x + 0 == x") { x: C => x + zero shouldBe x }
   complex1("x * 1 == x") { x: C => x * one shouldBe x }
@@ -43,4 +43,116 @@ class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
   complex2("x + y == y + x") { (x: C, y: C) => near(x + y, y + x) }
   complex2("x + y - x == y") { (x: C, y: C) => near(x + y - x, y) }
   complex2("(x / y) * y == x") { (x: C, y: C) => if (y != zero) near((x / y) * y, x) }
+}
+
+class ComplexCheck2 extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+  type C = Complex[Real]
+
+  import ArbitrarySupport._
+
+  val zero = Complex.zero[Real]
+  val one = Complex.one[Real]
+
+  property("x + 0 = 0 + x = x") {
+    forAll { (x: C) =>
+      x + zero shouldBe x
+      zero + x shouldBe x
+    }
+  }
+
+  property("x + y = y + x") {
+    forAll { (x: C, y: C) =>
+      x + y shouldBe y + x
+    }
+  }
+
+  property("x + (y + z) = (x + y) + z") {
+    forAll { (x: C, y: C, z: C) =>
+      x + (y + z) shouldBe (x + y) + z
+    }
+  }
+
+  property("x + (-x) = x - x = 0") {
+    forAll { (x: C) =>
+      x + (-x) shouldBe zero
+      x - x shouldBe zero
+    }
+  }
+
+  property("x * (y + z) = (x * y) + (x * z)") {
+    forAll { (x: C, y: C, z: C) =>
+      x * (y + z) shouldBe (x * y) + (x * z)
+    }
+  }
+
+  property("x * 0 = 0 * x = 0") {
+    forAll { (x: C) =>
+      x * zero shouldBe zero
+      zero * x shouldBe zero
+    }
+  }
+
+  property("x * 1 = 1 * x = x") {
+    forAll { (x: C) =>
+      x * one shouldBe x
+      one * x shouldBe x
+    }
+  }
+
+  property("x * (y * z) = (x * y) * z") {
+    forAll { (x: C, y: C, z: C) =>
+      x * (y * z) shouldBe (x * y) * z
+    }
+  }
+
+  property("x * y = y * x") {
+    forAll { (x: C, y: C) =>
+      x * y shouldBe y * x
+    }
+  }
+
+  property("x / x = 1") {
+    forAll { (x: C) =>
+      if (x != zero) x / x shouldBe one
+    }
+  }
+
+  property("x^-1 = 1 / x") {
+    forAll { (x: C) =>
+      if (x != zero) x.reciprocal shouldBe one / x
+    }
+  }
+
+  property("x.pow(2) = x * x") {
+    forAll { (x: C) =>
+      x.pow(2) shouldBe x * x
+    }
+  }
+
+  import Ordinal._
+
+  // import spire.compat._
+  // val threshold = Real("1/1000")
+  // def near(x: C, y: C) = (x - y).abs should be <= threshold
+  
+  // property("x.sqrt.pow(2) = x.pow(2).sqrt = x") {
+  //   forAll { (x: C) =>
+  //     near(x.sqrt.pow(2), x)
+  //     near(x.pow(2).sqrt, x)
+  //   }
+  // }
+
+  // property("x.nroot(k).pow(k) = x.pow(k).nroot(k) = x") {
+  //   forAll { (x: C, k: Sized[Int, _1, _10]) =>
+  //     near(x.nroot(k.num).pow(k.num), x)
+  //     near(x.pow(k.num).nroot(k.num), x)
+  //   }
+  // }
+
+  // property("xyz") {
+  //   forAll { sz: Sized[Int, _0, _10] =>
+  //     sz.num should be >= 0
+  //     sz.num should be <= 10
+  //   }
+  // }
 }
