@@ -167,7 +167,7 @@ object MyBuild extends Build {
     },
     libraryDependencies ++= Seq(
       scalaCheck % "test",
-      scalaTest % "test",
+      scalaTest % "test"
     )
   ) ++ buildInfoSettings ++ Seq(
     sourceGenerators in Compile <+= buildInfo,
