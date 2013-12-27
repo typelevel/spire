@@ -89,7 +89,7 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
   (implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A])
     extends ScalaNumber with ScalaNumericConversions with Serializable { lhs =>
 
-  import f.{zero, one, fromInt => int, fromDouble => double}
+  import f.{zero, one, fromInt => int}
   
   def doubleValue: Double = if (isReal) r.toDouble else Double.NaN
   def floatValue: Float = if (isReal) r.toFloat else Float.NaN
@@ -102,19 +102,25 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
   def isWhole: Boolean = isReal && r.isWhole
 
   def real: Quaternion[A] = Quaternion(r, zero, zero, zero)
-  def unreal: Quaternion[A] = Quaternion(zero, i, j, k)
-  def abs: A = (r * r + i * i + j * j + k * k).sqrt
+  def pure: Quaternion[A] = Quaternion(zero, i, j, k)
+
+  def abs: A =
+    (r.pow(2) + i.pow(2) + j.pow(2) + k.pow(2)).sqrt
+
+  def pureAbs: A =
+    (i.pow(2) + j.pow(2) + k.pow(2)).sqrt
+
+  def norm: A =
+    (r.pow(2) + i.pow(2) + j.pow(2) + k.pow(2)).sqrt
 
   override def isValidInt: Boolean =
-    i === zero && j === zero && k === zero && r.isWhole &&
-    r <= int(Int.MaxValue) && r >= int(Int.MinValue)
+    isReal && r.isWhole && r <= int(Int.MaxValue) && r >= int(Int.MinValue)
 
-  def underlying = (r, i, j, k)
+  def underlying: Object = this
 
   // important to keep in sync with Complex[_]
   override def hashCode: Int =
-    if (isValidInt) r.toInt
-    else 19 * r.## + 41 * i.## + 13 * j.## + 77 * k.## + 97
+    if (isReal) r.## else 19 * r.## + 41 * i.## + 13 * j.## + 77 * k.## + 97
 
   override def equals(that: Any): Boolean = that match {
     case that: Quaternion[_] =>
@@ -122,7 +128,7 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
     case that: Complex[_] =>
       r == that.real && i == that.imag && j == zero && k == zero
     case that =>
-      unifiedPrimitiveEquals(that)
+      isReal && r == that
   }
 
   override def toString: String = s"($r + ${i}i + ${j}j + ${k}k)"
@@ -138,49 +144,52 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
     case n => n
   }
 
+  def quaternionSignum: Quaternion[A] =
+    if (isZero) this else this / abs
+
+  def pureSignum: Quaternion[A] =
+    if (isReal) Quaternion.zero[A] else (pure / pureAbs)
+
   def unary_- : Quaternion[A] =
     Quaternion(-r, -i, -j, -k)
-
-  def norm: A =
-    (r * r + i * i + j * j + k * k).sqrt
 
   def conjugate: Quaternion[A] =
     Quaternion(r, -i, -j, -k)
 
   def reciprocal: Quaternion[A] =
-    conjugate / (r * r + i * i + j * j + k * k)
+    conjugate / (r.pow(2) + i.pow(2) + j.pow(2) + k.pow(2))
 
   def sqrt: Quaternion[A] =
     if (!isReal) {
-      val n = (r + norm).sqrt
-      Quaternion(n, i / n, j / n, k / n) / double(2.0).sqrt
+      val n = (r + abs).sqrt
+      Quaternion(n, i / n, j / n, k / n) / int(2).sqrt
     } else if (r >= zero) {
       Quaternion(r.sqrt)
     } else {
       Quaternion(zero, r.abs.sqrt, zero, zero)
     }
 
-  def nroot(k0: Int): Quaternion[A] =
-    if (k0 <= 0) {
-      sys.error(s"illegal root: $k0")
-    } else if (k0 == 1) {
+  def nroot(m: Int): Quaternion[A] =
+    if (m <= 0) {
+      throw new IllegalArgumentException(s"illegal root: $m")
+    } else if (m == 1) {
       this
     } else if (!isReal) {
-      val s = (i ** 2 + j ** 2 + k ** 2).sqrt
-      val v = Quaternion(zero, i / s, j / s, k / s)
-      val n = norm
+      val s = pureAbs
+      val n = abs
       val t = acos(r / n)
-      (Quaternion(cos(t / k0)) + v * sin(t / k0)) * n.nroot(k0)
-    } else if (r >= 0) {
-      Quaternion(r.nroot(k0))
-    } else if ((k0 & 1) == 1) {
-      Quaternion(-r.abs.nroot(k0))
+      val v = Quaternion(zero, i / s, j / s, k / s)
+      val e = if (sin(t).signum >= 0) v else -v
+      val tm = t / m
+      (e * sin(tm) + cos(tm)) * n.nroot(m)
+    } else if (r.signum >= 0) {
+      Quaternion(r.nroot(m))
     } else {
-      Quaternion(zero, r.abs.nroot(k0), zero, zero)
+      Quaternion(Complex(r).nroot(m))
     }
 
   def unit: Quaternion[A] =
-    Quaternion(r * r, i * i, j * j, k * k) / norm
+    Quaternion(r.pow(2), i.pow(2), j.pow(2), k.pow(2)) / abs
 
   def +(rhs: A): Quaternion[A] =
     Quaternion(r + rhs, i, j, k)
@@ -225,7 +234,8 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
       else if ((e & 1) == 1) loop(p * b, b * b, e >>> 1)
       else loop(p, b * b, e >>> 1)
 
-    if (k >= 0) loop(Quaternion.one, this, k) else sys.error(s"illegal exponent: $k")
+    if (k >= 0) loop(Quaternion.one, this, k)
+    else throw new IllegalArgumentException(s"illegal exponent: $k")
   }
   def **(k: Int): Quaternion[A] = pow(k)
 
@@ -280,5 +290,5 @@ final case class Quaternion[@spec(Float, Double) A](r: A, i: A, j: A, k: A)
   }
 
   def dot(rhs: Quaternion[A]): A =
-    (lhs.conjugate * rhs + rhs.conjugate * lhs).r * double(0.5)
+    (lhs.conjugate * rhs + rhs.conjugate * lhs).r / int(2)
 }

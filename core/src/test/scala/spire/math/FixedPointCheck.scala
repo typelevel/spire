@@ -1,13 +1,46 @@
 package spire.math
 
 import spire.implicits._
+import scala.util.Try
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
-class FixedPointCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+import org.scalacheck._
+import Gen._
+import Arbitrary.arbitrary
+
+class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+
+  import ArbitrarySupport._
+
+  implicit val arbFixedScale: Arbitrary[FixedScale] =
+    Arbitrary(arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale))
+
+  implicit val arbFixedPoint: Arbitrary[FixedPoint] =
+    Arbitrary(arbitrary[Long].map(new FixedPoint(_)))
+
+  property("FixedScale(r).toRational ~= r") {
+    forAll { (s: FixedScale, r: Rational) =>
+      implicit val scale = s
+      val minV = FixedPoint.MinValue.toRational
+      val maxV = FixedPoint.MaxValue.toRational
+      if (r < minV || maxV < r) {
+        Try(FixedPoint(r)).isSuccess shouldBe false
+      } else {
+        FixedPoint(r).toRational shouldBe r.roundTo(s.denom)
+      }
+    }
+  }
+
+  property("new FixedScale(n).toRational = n/d") {
+    forAll { (s: FixedScale, n: Long) =>
+      implicit val scale = s
+      new FixedPoint(n).toRational shouldBe Rational(n, s.denom)
+    }
+  }
 
   import BigDecimal.RoundingMode.FLOOR
 
@@ -23,10 +56,29 @@ class FixedPointCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
   type S2[A] = (A, A, FixedScale) => A
   type F2[A] = (A, A) => A
 
+  import scala.util.{Try, Success}
+  def testBinop2(name: String, noZero: Boolean, f: S2[FixedPoint], g: F2[Rational]) =
+    property(name) {
+      forAll { (x: Long, y: Long, s: FixedScale) =>
+        implicit val scale = s
+        if (!noZero || y != 0L) {
+          val (fx, fy) = (new FixedPoint(x), new FixedPoint(y))
+          val (ax, ay) = (Rational(x, s.denom), Rational(y, s.denom))
+          val az = g(ax, ay)
+          val fz = Try(f(fx, fy, scale)) match {
+            case Success(fz) =>
+              BigInt(fz.long) shouldBe (az * s.denom).toBigInt
+            case _ =>
+              (az * s.denom < Long.MinValue || Long.MaxValue < az * s.denom) shouldBe true
+          }
+        }
+      }
+    }
+
   def testBinop(name: String, noZero: Boolean, f: S2[FixedPoint], g: F2[Rational]) =
     property(name) {
       forAll { (x: Long, y: Long, z: Byte) =>
-        val (d, denom, fx, fy, ax, ay) = build(x, y, z, noZero)
+        val (_, denom, fx, fy, ax, ay) = build(x, y, z, noZero)
         val az = g(ax, ay)
 
         val ofz = try {
@@ -38,22 +90,22 @@ class FixedPointCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
         ofz match {
           case Some(fz) =>
-            BigInt(fz.long) should be === (az * denom).toBigInt
+            BigInt(fz.long) shouldBe (az * denom).toBigInt
           case None =>
-            (az * denom < Long.MinValue || Long.MaxValue < az * denom) should be === true
+            (az * denom < Long.MinValue || Long.MaxValue < az * denom) shouldBe true
         }
       }
     }
 
-  testBinop("addition", false, (x, y, s) => x + y, _ + _)
+  testBinop2("addition", false, (x, y, s) => x + y, _ + _)
 
-  testBinop("subtraction", false, (x, y, s) => x - y, _ - _)
+  testBinop2("subtraction", false, (x, y, s) => x - y, _ - _)
 
-  testBinop("multiplication", false, (x, y, s) => (x).*(y)(s), _ * _)
+  testBinop2("multiplication", false, (x, y, s) => (x).*(y)(s), _ * _)
 
-  testBinop("division", true, (x, y, s) => (x)./(y)(s), _ / _)
+  testBinop2("division", true, (x, y, s) => (x)./(y)(s), _ / _)
 
-  testBinop("modulus", true, (x, y, s) => x % y, _ % _)
+  testBinop2("modulus", true, (x, y, s) => x % y, _ % _)
 
   def buildHalf(x: Long, z: Byte): (Int, Int, FixedPoint, Rational) = {
     val d = z.toInt.abs % 11
@@ -82,9 +134,9 @@ class FixedPointCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
         ofz match {
           case Some(fz) =>
-            BigInt(fz.long) should be === (az * denom).toBigInt
+            BigInt(fz.long) shouldBe (az * denom).toBigInt
           case None =>
-            (az * denom < Long.MinValue || Long.MaxValue < az * denom) should be === true
+            (az * denom < Long.MinValue || Long.MaxValue < az * denom) shouldBe true
         }
       }
     }
@@ -115,9 +167,9 @@ class FixedPointCheck extends PropSpec with ShouldMatchers with GeneratorDrivenP
 
       ofz match {
         case Some(fz) =>
-          BigInt(fz.long) should be === (az * denom).toBigInt
+          BigInt(fz.long) shouldBe (az * denom).toBigInt
         case None =>
-          (az * denom < Long.MinValue || Long.MaxValue < az * denom) should be === true
+          (az * denom < Long.MinValue || Long.MaxValue < az * denom) shouldBe true
       }
     }
   }

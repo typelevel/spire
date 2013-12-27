@@ -9,6 +9,8 @@ case class SyntaxUtil[C <: Context with Singleton](val c: C) {
 
   def name(s: String) = newTermName(c.fresh(s + "$"))
 
+  def names(bs: String*) = bs.toList.map(name)
+
   def isClean(es: c.Expr[_]*): Boolean =
     es.forall {
       _.tree match {
@@ -24,7 +26,8 @@ class InlineUtil[C <: Context with Singleton](val c: C) {
 
   def inlineAndReset[T](tree: Tree): c.Expr[T] = {
     val inlined = inlineApplyRecursive(tree)
-    c.Expr[T](c.resetAllAttrs(inlined))
+    //c.Expr[T](c.resetAllAttrs(inlined))
+    c.Expr[T](c.resetLocalAttrs(inlined))
   }
 
   def inlineApplyRecursive(tree: Tree): Tree = {
@@ -122,79 +125,89 @@ v     */
 
     import c.universe._
     val util = SyntaxUtil[c.type](c)
-    val index = util.name("index")
 
-    val IntWrapperName = newTermName("intWrapper")
-    val ToName = newTermName("to")
-    val UntilName = newTermName("until")
-    val ByName = newTermName("by")
+    val List(range, index, end, limit, step) =
+      util.names("range", "index", "end", "limit", "step")
 
-    val tree = r.tree match {
-      case Apply(Select(Apply(Select(_, IntWrapperName), List(start)), UntilName), List(limit)) =>
-        val limitName = util.name("limit")
-q"""
-var $index: Int = $start
-val $limitName: Int = $limit
-while ($index < $limitName) {
-  $body($index)
-  $index += 1
-}
-"""
+    def isLiteral(t: Tree): Option[Int] = t match {
+      case Literal(Constant(a)) => a match {
+        case n: Int => Some(n)
+        case _ => None
+      }
+      case _ => None
+    }
 
-      case Apply(Select(Apply(Select(Apply(Select(_, IntWrapperName), List(start)), UntilName), List(limit)), ByName), List(step)) =>
-        val limitName = util.name("limit")
-        val stepName = util.name("step")
-q"""
-var $index: Int = $start
-val $limitName: Int = $limit
-val $stepName: Int = $step
-while ($index < $limitName) {
-  $body($index)
-  $index += $stepName
-}
-"""
+    def strideUpTo(fromExpr: Tree, toExpr: Tree, stride: Int): Tree =
+      q"""
+      var $index: Int = $fromExpr
+      val $end: Int = $toExpr
+      while ($index <= $end) {
+        $body($index)
+        $index += $stride
+      }"""
 
-      case Apply(Select(Apply(Select(_, IntWrapperName), List(start)), ToName), List(end)) =>
-        val endName = util.name("end")
-        q"""
-var $index: Int = $start
-val $endName: Int = $end
-while ($index <= $endName) {
-  $body($index)
-  $index += 1
-}
-"""
+    def strideUpUntil(fromExpr: Tree, untilExpr: Tree, stride: Int): Tree =
+      q"""
+      var $index: Int = $fromExpr
+      val $limit: Int = $untilExpr
+      while ($index < $limit) {
+        $body($index)
+        $index += $stride
+      }"""
 
-      case Apply(Select(Apply(Select(Apply(Select(_, IntWrapperName), List(start)), ToName), List(end)), ByName), List(step)) =>
-        val endName = util.name("end")
-        val stepName = util.name("step")
-        q"""
-var $index: Int = $start
-val $endName: Int = $end
-val $stepName: Int = $step
-while ($index <= $endName) {
-  $body($index)
-  $index += $stepName
-}
-"""
+    def strideDownTo(fromExpr: Tree, toExpr: Tree, stride: Int): Tree =
+      q"""
+      var $index: Int = $fromExpr
+      val $end: Int = $toExpr
+      while ($index >= $end) {
+        $body($index)
+        $index -= $stride
+      }"""
+
+    def strideDownUntil(fromExpr: Tree, untilExpr: Tree, stride: Int): Tree =
+      q"""
+      var $index: Int = $fromExpr
+      val $limit: Int = $untilExpr
+      while ($index > $limit) {
+        $body($index)
+        $index -= $stride
+      }"""
+
+    val tree: Tree = r.tree match {
+
+      case q"scala.this.Predef.intWrapper($i).until($j)" =>
+        strideUpUntil(i, j, 1)
+
+      case q"scala.this.Predef.intWrapper($i).to($j)" =>
+        strideUpTo(i, j, 1)
+
+      case r @ q"scala.this.Predef.intWrapper($i).until($j).by($step)" =>
+        isLiteral(step) match {
+          case Some(k) if k > 0 => strideUpUntil(i, j, k)
+          case Some(k) if k < 0 => strideDownUntil(i, j, -k)
+          case Some(k) if k == 0 =>
+            c.error(c.enclosingPosition, "zero stride")
+            q"()"
+          case None =>
+            c.info(c.enclosingPosition, "non-literal stride", true)
+            q"$r.foreach($body)"
+        }
+
+      case r @ q"scala.this.Predef.intWrapper($i).to($j).by($step)" =>
+        isLiteral(step) match {
+          case Some(k) if k > 0 => strideUpTo(i, j, k)
+          case Some(k) if k < 0 => strideDownTo(i, j, -k)
+          case Some(k) if k == 0 =>
+            c.error(c.enclosingPosition, "zero stride")
+            q"()"
+          case None =>
+            c.info(c.enclosingPosition, "non-literal stride", true)
+            q"$r.foreach($body)"
+        }
 
       case r =>
-        c.info(c.enclosingPosition, "non-literal range found", true)
-        println(showRaw(r))
-        val range = util.name("range")
-        val limit = util.name("limit")
-        val step = util.name("step")
-
-        q"""
-val $range = $r
-var $index: Int = $range.start
-val $step: Int = $range.step
-val $limit: Int = if ($range.isInclusive) $range.end + 1 else $range.end
-while ($index < $limit) {
-  $body($index)
-  $index += $step
-}
-"""
+        c.info(c.enclosingPosition, "non-literal range", true)
+        q"$r.foreach($body)"
     }
 
     new InlineUtil[c.type](c).inlineAndReset[Unit](tree)

@@ -1,14 +1,14 @@
 package spire.random
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest._
 import prop._
 
 import org.scalacheck.Arbitrary._
 import org.scalacheck._
 
-class ShufflingTest extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
-  val rng = spire.random.Lcg64.fromTime()
+class ShufflingTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+  val rng = spire.random.mutable.Lcg64.fromTime()
 
   val range = Gen.chooseNum(1, 1000)
 
@@ -17,7 +17,7 @@ class ShufflingTest extends PropSpec with ShouldMatchers with GeneratorDrivenPro
       val ns1 = rng.generateInts(n)
       val ns2 = ns1.clone
       rng.shuffle(ns1)
-      ns1.sorted should be === ns2.sorted
+      ns1.sorted shouldBe ns2.sorted
     }
   }
 }

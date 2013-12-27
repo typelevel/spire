@@ -1,7 +1,7 @@
 package spire.math
 
 import java.math.{ MathContext, BigDecimal => BigDec }
-import spire.math.real.BigDecimalApproximations
+import spire.math.algebraic.BigDecimalApproximations
 
 /** 
  * A typeclass approach for getting an approximation to an `A` using error `B`
@@ -21,11 +21,11 @@ object Approximation {
   // `RealLike[A] with SeparationBound[A]` would have to compete for implicit
   // priority if they wanted to define their own `Approximation`s.
 
-  implicit val absBigDecimalApproximation = BigDecimalApproximations.Absolute[Real]
-  implicit val relBigDecimalApproximation = BigDecimalApproximations.Relative[Real]
+  implicit val absBigDecimalApproximation = BigDecimalApproximations.Absolute[Algebraic]
+  implicit val relBigDecimalApproximation = BigDecimalApproximations.Relative[Algebraic]
 
-  implicit object DoubleApproximation extends Approximation[Real,Double.type,Double] {
-    def apply(n: Real, err: Double.type): Double = {
+  implicit object DoubleApproximation extends Approximation[Algebraic, Double.type,Double] {
+    def apply(n: Algebraic, err: Double.type): Double = {
       val bd: BigDecimal = approximate(n, new MathContext(17))
       bd.toDouble
     }

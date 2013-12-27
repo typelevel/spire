@@ -84,6 +84,9 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
 
   // this is newton's method
   override def sqrt(n: BigDecimal): BigDecimal = {
+    if (n.mc.getPrecision <= 0)
+      throw new ArithmeticException("Cannot find the sqrt of a BigDecimal with unlimited precision.")
+
     def approxSqrt(x: BigDecimal): BigDecimal =
       if (x < Double.MaxValue)
         BigDecimal(Math.sqrt(x.toDouble), x.mc)

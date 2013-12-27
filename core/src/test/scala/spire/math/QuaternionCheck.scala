@@ -2,7 +2,7 @@ package spire.math
 
 import spire.implicits._
 
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
@@ -11,173 +11,190 @@ import org.scalacheck._
 import Gen._
 import Arbitrary.arbitrary
 
-class QuaternionCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+import ArbitrarySupport._
 
-  // to fudge some of the properties, we limit our quaternion terms to
-  // integers in [-1000, 1000]. this is cheating, and we should do
-  // better in the future.
-  def df(n: Int): Double = (n % 1000).toDouble
+class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
-  implicit val arbq = Arbitrary(for {
-    r <- arbitrary[Int]
-    i <- arbitrary[Int]
-    j <- arbitrary[Int]
-    k <- arbitrary[Int]
-  } yield {
-    Quaternion(df(r), df(i), df(j), df(k))
-  })
-
-  type H = Quaternion[Double]
-  val zero = Quaternion.zero[Double]
-  val one = Quaternion.one[Double]
+  type H = Quaternion[Real]
+  val zero = Quaternion.zero[Real]
+  val one = Quaternion.one[Real]
 
   property("q + 0 = q") {
     forAll { (q: H) =>
-      q + 0.0 should be === q
-      q + zero should be === q
+      q + Real.zero shouldBe q
+      q + zero shouldBe q
     }
   }
 
   property("q + -q = 0") {
     forAll { (q: H) =>
-      q + (-q) should be === zero
+      q + (-q) shouldBe zero
     }
   }
 
   property("q1 + -q2 = q1 - q2") {
     forAll { (q1: H, q2: H) =>
-      q1 + (-q2) should be === q1 - q2
+      q1 + (-q2) shouldBe q1 - q2
     }
   }
 
   property("q1 + q2 = q2 + q1") {
     forAll { (q1: H, q2: H) =>
-      q1 + q2 should be === q2 + q1
+      q1 + q2 shouldBe q2 + q1
     }
   }
 
   property("(q1 + q2) + a3 = q1 + (q2 + q3)") {
     forAll { (q1: H, q2: H, q3: H) =>
-      (q1 + q2) + q3 should be === q1 + (q2 + q3)
+      (q1 + q2) + q3 shouldBe q1 + (q2 + q3)
     }
   }
 
   property("q * 0 = q") {
     forAll { (q: H) =>
-      q * 0.0 should be === zero
-      q * zero should be === zero
+      q * Real.zero shouldBe zero
+      q * zero shouldBe zero
     }
   }
 
   property("q * 1 = q") {
     forAll { (q: H) =>
-      q * 1.0 should be === q
-      q * one should be === q
+      q * Real.one shouldBe q
+      q * one shouldBe q
     }
   }
 
   property("q * 2 = q + q") {
     forAll { (q: H) =>
-      q * 2.0 should be === q + q
+      q * Real(2) shouldBe q + q
     }
   }
 
   property("q1 * (q2 + q3) = q1 * q2 + q1 * q3") {
     forAll { (q1: H, q2: H, q3: H) =>
-      q1 * (q2 + q3) should be === q1 * q2 + q1 * q3
+      q1 * (q2 + q3) shouldBe q1 * q2 + q1 * q3
     }
   }
 
   property("(q1 * q2) * a3 = q1 * (q2 * q3)") {
     forAll { (q1: H, q2: H, q3: H) =>
-      (q1 * q2) * q3 should be === q1 * (q2 * q3)
+      (q1 * q2) * q3 shouldBe q1 * (q2 * q3)
     }
   }
 
   property("q * q.reciprocal = 1") {
     forAll { (q: H) =>
-      (q * q.reciprocal - one).norm should be < 1e-6
+      if (q != zero) (q * q.reciprocal) shouldBe one
     }
   }
 
   property("1 / q = 1.reciprocal") {
     forAll { (q: H) =>
-      if (q != zero)
-        (one / q - q.reciprocal).norm should be < 1e-6
+      if (q != zero) (one / q) shouldBe q.reciprocal
     }
   }
 
-  property("q ** 2 = q * q") {
+  property("q.pow(2) = q * q") {
     forAll { (q: H) =>
-      q ** 2 should be === q * q
+      q.pow(2) shouldBe q * q
     }
   }
 
-  property("q.sqrt ** 2 = q") {
+  // exact checking isn't quite working in all cases, ugh
+  val tolerance = Real(Rational(1, 1000000000))
+
+  import spire.compat.ordering
+
+  def dumpDiff(label: String, base: H, gen: H) {
+    println(s"$label $base $gen")
+    val (gr, gi, gj, gk) = (gen.r, gen.i, gen.j, gen.k)
+    val (br, bi, bj, bk) = (base.r, base.i, base.j, base.k)
+    if (br != gr) println(s"  r: ${br.repr} != ${gr.repr} (${br.toRational} and ${gr.toRational}) [${(br-gr).signum}] <${br-gr}>")
+    if (bi != gi) println(s"  i: ${bi.repr} != ${gi.repr} (${bi.toRational} and ${gi.toRational}) [${(bi-gi).signum}] <${bi-gi}>")
+    if (bj != gj) println(s"  j: ${bj.repr} != ${gj.repr} (${bj.toRational} and ${gj.toRational}) [${(bj-gj).signum}] <${bj-gj}>")
+    if (bk != gk) println(s"  k: ${bk.repr} != ${gk.repr} (${bk.toRational} and ${gk.toRational}) [${(bk-gk).signum}] <${bk-gk}>")
+  }
+
+  def inexactEq(x: H, y: H): Unit =
+    if (x != y) {
+      //dumpDiff("ouch", x, y)
+      (x - y).abs should be < tolerance // sadface
+    } else {
+      x shouldBe y
+    }
+
+  property("q.sqrt.pow(2) = q") {
     forAll { (q: H) =>
-      (q.sqrt ** 2 - q).norm should be < 1e-6
+      val r = q.sqrt.pow(2)
+      inexactEq(q, r)
     }
   }
 
-
-  property("q.sqrt = q.nroot(2)") {
-    forAll { (q: H) =>
-      (q.sqrt - q.nroot(2)).norm should be < 1e-6
+  property("q.nroot(3).pow(3) = q") {
+    forAll { (a: Short, b: Short, c: Short, d: Short) =>
+      val q = Quaternion(Real(a), Real(b), Real(c), Real(d))
+      val r = q.nroot(3).pow(3)
+      inexactEq(q, r)
     }
   }
 
-  property("q.nroot(k) ** k = q") {
-    forAll { (q: H, k0: Int) =>
-      val k = (k0 % 10).abs + 1
-      (q - q.nroot(k).pow(k)).norm should be < 1e-6
+  property("q.nroot(k).pow(k) = q") {
+    forAll { (a: Short, b: Short, c: Short, d: Short, k0: Int) =>
+      val q = Quaternion(Real(a), Real(b), Real(c), Real(d))
+      val k = (k0 % 5).abs + 1
+      val r = q.nroot(k).pow(k)
+      inexactEq(q, r)
     }
   }
 
-  property("q.fpow(1/k) = q.nroot(k)") {
-    forAll { (q: H, k0: Int) =>
-      val k = (k0 % 10).abs + 1
-      (q.nroot(k) - q.fpow(1.0/k)).norm should be < 1e-6
-    }
-  }
-
-  property("q.fpow(1/k).fpow(k) = q") {
-    forAll { (q: H, k0: Double) =>
-      val k = (k0 % 10).abs
-      if (k == 0.0) {
-        q.fpow(k) should be === one
-      } else {
-        (q - q.fpow(1.0/k).fpow(k)).norm should be < 1e-6
-      }
-    }
-  }
+  // property("q.fpow(1/k) = q.nroot(k)") {
+  //   forAll { (q: H, k0: Int) =>
+  //     val k = (k0 % 10).abs + 1
+  //     q.nroot(k) shouldBe q.fpow(Real(Rational(1, k)))
+  //   }
+  // }
+  // 
+  // property("q.fpow(1/k).fpow(k) = q") {
+  //   forAll { (q: H, k0: Byte) =>
+  //     val k = Real(Rational((k0 % 10).abs))
+  //     val ik = k.reciprocal
+  //     if (k == Real.zero) {
+  //       q.fpow(k) shouldBe one
+  //     } else {
+  //       q.fpow(ik).fpow(k) shouldBe q
+  //     }
+  //   }
+  // }
 
   property("q = q.r iff q.isReal") {
     forAll { (q: H) =>
-      q == q.r should be === q.isReal
+      q == q.r shouldBe q.isReal
     }
   }
 
   property("q.hashCode = c.hashCode") {
-    import spire.std.double._
+    forAll { (r: Real, i: Real) =>
+      val q1 = Quaternion(r, i, Real.zero, Real.zero)
+      val c1 = Complex(r, i)
+      q1.hashCode shouldBe c1.hashCode
 
-    forAll { (r: Double, i: Double) =>
-      val q = Quaternion(r, i, 0.0, 0.0)
-      val c = Complex(r, i)
-      q.hashCode should be === c.hashCode
+      val q2 = Quaternion(r)
+      val c2 = Complex(r)
+      q2.hashCode shouldBe c2.hashCode
+      q2.hashCode shouldBe r.hashCode
     }
   }
 
   property("q = c") {
-    import spire.std.double._
-
-    forAll { (r: Double, i: Double) =>
-      Quaternion(r, i, 0.0, 0.0) should be === Complex(r, i)
+    val z = Real.zero
+    forAll { (r: Real, i: Real) =>
+      Quaternion(r, i, z, z) shouldBe Complex(r, i)
+      Quaternion(r, z, z, z) shouldBe Complex(r, z)
+      Quaternion(z, i, z, z) shouldBe Complex(z, i)
     }
 
-    forAll { (r: Double, i: Double, j: Double, k: Double) =>
-      if (j != 0.0 || k != 0.0) {
-        Quaternion(r, i, j, k) != Complex(r, i) should be === true
-      }
+    forAll { (r: Real, i: Real, j: Real, k: Real) =>
+      Quaternion(r, i, j, k) == Complex(r, i) shouldBe (j == Real.zero && k == Real.zero)
     }
   }
 }

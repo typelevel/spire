@@ -24,7 +24,7 @@ object Numeric {
   implicit final val DoubleIsNumeric = new DoubleIsNumeric
   implicit final val BigIntIsNumeric = new BigIntIsNumeric
   implicit final val BigDecimalIsNumeric = new BigDecimalIsNumeric
-  implicit final val RealIsNumeric = new RealIsNumeric
+  implicit final val AlgebraicIsNumeric = new AlgebraicIsNumeric
 
   implicit def RationalIsNumeric(implicit ctx: ApproximationContext[Rational] =
       ApproximationContext(Rational(1, 1000000000))) = new RationalIsNumeric
@@ -100,11 +100,11 @@ with RationalIsReal with Serializable {
 }
 
 @SerialVersionUID(0L)
-private[math] class RealIsNumeric extends Numeric[Real] with RealIsField with RealIsNRoot
-with ConvertableFromReal with ConvertableToReal with RealIsReal with Serializable {
-  override def fromInt(n: Int): Real = Real(n)
-  override def fromDouble(n: Double): Real = Real(n)
-  override def toDouble(n: Real): Double = n.toDouble
+private[math] class AlgebraicIsNumeric extends Numeric[Algebraic] with AlgebraicIsField with AlgebraicIsNRoot
+with ConvertableFromAlgebraic with ConvertableToAlgebraic with AlgebraicIsReal with Serializable {
+  override def fromInt(n: Int): Algebraic = Algebraic(n)
+  override def fromDouble(n: Double): Algebraic = Algebraic(n)
+  override def toDouble(n: Algebraic): Double = n.toDouble
 }
 
 @SerialVersionUID(0L)
@@ -118,9 +118,11 @@ with Order[Complex[A]] with ComplexIsSigned[A] with Serializable {
 
   override def eqv(x: Complex[A], y: Complex[A]): Boolean = x == y
   override def nroot(a: Complex[A], n: Int) = a.pow(reciprocal(fromInt(n)))
-  override def gt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  override def gteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  override def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  override def lteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  def compare(x:Complex[A], y:Complex[A]): Int = if (x eqv y) 0 else sys.error("undefined")
+
+  // override def gt(x:Complex[A], y:Complex[A]) = throw new UnsupportedOperationException("undefined")
+  // override def gteqv(x:Complex[A], y:Complex[A]) = throw new UnsupportedOperationException("undefined")
+  // override def lt(x:Complex[A], y:Complex[A]) = throw new UnsupportedOperationException("undefined")
+  // override def lteqv(x:Complex[A], y:Complex[A]) = throw new UnsupportedOperationException("undefined")
+  def compare(x:Complex[A], y:Complex[A]): Int =
+    if (x eqv y) 0 else throw new UnsupportedOperationException("undefined")
 }

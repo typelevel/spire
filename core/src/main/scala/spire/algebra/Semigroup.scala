@@ -8,6 +8,32 @@ import scala.annotation.{ switch, tailrec }
  */
 trait Semigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] {
   def op(x: A, y: A): A
+
+  /**
+   * Return `a` combined with itself `n` times.
+   */
+  def sumn(a: A, n: Int): A =
+    if (n <= 0) throw new IllegalArgumentException("Repeated summation for semigroups must have reptitions > 0")
+    else if (n == 1) a
+    else sumnAboveOne(a, n)
+
+  protected def sumnAboveOne(a: A, n: Int): A = {
+    @tailrec def loop(b: A, k: Int, extra: A): A =
+      if (k == 1) {
+        op(b, extra)
+      } else {
+        val x = if ((k & 1) == 1) op(b, extra) else extra
+        loop(op(b, b), k >>> 1, x)
+      }
+    loop(a, n - 1, a)
+  }
+
+  /**
+   *  Given a sequence of `as`, sum them using the semigroup and return the total.
+   * 
+   *  If the sequence is empty, returns None. Otherwise, returns Some(total).
+   */
+  def sumOption(as: TraversableOnce[A]): Option[A] = as.reduceOption(op)
 }
 
 object Semigroup {
@@ -24,21 +50,18 @@ object Semigroup {
    * `Semigroup[A]` using `times` for `op`.
    */
   @inline final def multiplicative[A](implicit A: MultiplicativeSemigroup[A]) = A.multiplicative
+}
 
-  /**
-   * Return `a` appended to itself `n` times.
-   */
-  final def sumn[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A](a: A, n: Int)(implicit A: Semigroup[A]): A = {
-    @tailrec def loop(b: A, k: Int, extra: A): A = {
-      (k: @annotation.switch) match {
-        case 0 => b
-        case 1 => A.op(b, extra)
-        case n =>
-          loop(A.op(b, b), k >>> 1, if (k % 2 == 1) A.op(b, extra) else extra)
-      }
-    }
+/**
+ * CSemigroup represents a commutative semigroup.
+ * 
+ * A semigroup is commutative if for all x and y, x |+| y === y |+| x.
+ */
+trait CSemigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
+    extends Semigroup[A]
 
-    if (n > 0) loop(a, n - 1, a)
-    else throw new IllegalArgumentException("Repeated summation for semigroups must have reptitions > 0")
-  }
+object CSemigroup {
+  @inline final def apply[A](implicit ev: CSemigroup[A]): CSemigroup[A] = ev
+  @inline final def additive[A](implicit A: AdditiveCSemigroup[A]): CSemigroup[A] =  A.additive
+  @inline final def multiplicative[A](implicit A: MultiplicativeCSemigroup[A]): CSemigroup[A] = A.multiplicative
 }

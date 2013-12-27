@@ -26,14 +26,14 @@ To get started with SBT, simply add the following to your `build.sbt` file:
 ```
 scalaVersion := "2.10.2"
 
-libraryDependencies += "org.spire-math" %% "spire" % "0.6.0"
+libraryDependencies += "org.spire-math" %% "spire" % "0.7.1"
 ```
 
 Moving forward Spire is tareting Scala 2.10.x and higher. If you want to use
-Spire with 2.9.x, there is an 0.3.0 release available.
+Spire with 2.9.x, there is an older 0.3.0 release available.
 
 (For maven instructions, and to download the jars directly, visit the
-[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.5.0%7Cjar)).
+[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.7.1%7Cjar).)
 
 ### Playing Around
 
@@ -66,13 +66,16 @@ introduces several new ones, all of which can be found in `spire.math`:
 
  * `Natural` unsigned, immutable, arbitrary precision integer
  * `Rational` fractions of integers with perfect precision
- * `Real` lazily-computed, arbitrary precision number type
+ * `Algebraic` lazily-computed, arbitrary precision algebraic numbers
+ * `Real` computable real number implementation
  * `Complex[A]` complex numbers, points on the complex plane
  * `Quaternion[A]` extension of complex numbers into 4D space
  * `UByte` through `ULong` value classes supporting unsigned operations
  * `SafeLong` fast, overflow-proof integer type
  * `Number` boxed type supporting a traditional numeric tower
+ * `FixedPoint` fractions with unboxed `Long` numerator and implicit denominator
  * `Interval[A]` arithmetic on open, closed, and unbound intervals
+ * `Polynomial[A]` univariate (single-variable) polynomial expressions
 
 ### Type Classes
 
@@ -273,7 +276,7 @@ values.
    + sin, cos, tan: sine, cosine, and tangent, the standard functions of angles
    + asin, acos, atan, atan2: inverse functions
    + sinh, cosh, tanh: hyperbolic functions
-   + toRatians, toDegrees: convert between angle units
+   + toRadians, toDegrees: convert between angle units
 
 ### Syntax
 

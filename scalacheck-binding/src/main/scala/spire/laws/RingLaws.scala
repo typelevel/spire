@@ -3,6 +3,8 @@ package spire.laws
 import spire.algebra._
 import spire.implicits._
 
+import org.typelevel.discipline.{Laws, Predicate}
+
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
@@ -126,7 +128,7 @@ trait RingLaws[A] extends GroupLaws[A] {
     val base: GroupLaws[A] => GroupLaws[A]#GroupProperties,
     val parent: Option[MultiplicativeProperties],
     val props: (String, Prop)*
-  ) extends SpireProperties with HasOneParent {
+  ) extends RuleSet with HasOneParent {
     private val _base = base(RingLaws.this)
 
     val name = _base.name
@@ -144,12 +146,12 @@ trait RingLaws[A] extends GroupLaws[A] {
     val ml: MultiplicativeProperties,
     val parents: Seq[RingProperties],
     val props: (String, Prop)*
-  ) extends SpireProperties {
+  ) extends RuleSet {
     def nonZero: Boolean = false
 
     def _ml =
       if (nonZero)
-        new SpireProperties with HasOneParent {
+        new RuleSet with HasOneParent {
           val name = ml.name
           val bases = Seq("base-nonzero" → ml.base(nonZeroLaws))
           val parent = ml.parent

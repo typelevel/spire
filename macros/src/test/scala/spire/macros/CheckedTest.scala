@@ -1,12 +1,12 @@
 package spire.macros
 
 import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.Matchers
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 import org.scalacheck.{Arbitrary, Gen}
 
-class CheckedTest extends FunSuite with GeneratorDrivenPropertyChecks with ShouldMatchers {
+class CheckedTest extends FunSuite with GeneratorDrivenPropertyChecks with Matchers {
   import Checked.checked
   import Arbitrary.arbitrary
 

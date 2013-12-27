@@ -358,7 +358,7 @@ sealed trait Natural {
           End(UInt(0))
 
         case Digit(ld, ltail) => rhs.compare(UInt(1)) match {
-          case -1 => sys.error("/ by zero")
+          case -1 => throw new IllegalArgumentException("/ by zero")
           case 0 =>
             lhs
           case 1 =>
@@ -381,7 +381,7 @@ sealed trait Natural {
         case End(ld) => End(ld)
 
         case Digit(ld, ltail) => rhs.compare(UInt(1)) match {
-          case -1 => sys.error("/ by zero")
+          case -1 => throw new IllegalArgumentException("/ by zero")
           case 0 => End(UInt(0))
           case 1 =>
             val p = rhs.powerOfTwo
@@ -402,7 +402,7 @@ sealed trait Natural {
         case End(ld) => (End(UInt(0)), lhs)
 
         case Digit(ld, ltail) => rhs.compare(UInt(1)) match {
-          case -1 => sys.error("/ by zero")
+          case -1 => throw new IllegalArgumentException("/ by zero")
           case 0 => (lhs, Natural(0))
           case 1 =>
             val p = rhs.powerOfTwo
@@ -538,7 +538,7 @@ object Natural extends NaturalInstances {
 
   // required in big-endian order
   def apply(us: UInt*): Natural = {
-    if (us.isEmpty) sys.error("invalid arguments")
+    if (us.isEmpty) throw new IllegalArgumentException("invalid arguments")
     us.tail.foldLeft(End(us.head): Natural)((n, u) => Digit(u, n))
   }
 
@@ -548,7 +548,7 @@ object Natural extends NaturalInstances {
     Digit(UInt(n.toInt), End(UInt((n >> 32).toInt)))
 
   def apply(n: BigInt): Natural = if (n < 0)
-    sys.error("negative numbers not allowd: %s" format n)
+    throw new IllegalArgumentException("negative numbers not allowed: %s" format n)
   else if (n < 0xffffffffL)
     End(UInt(n.toLong))
   else
@@ -614,7 +614,7 @@ object Natural extends NaturalInstances {
       }
 
       if (n == UInt(0)) {
-        sys.error("/ by zero")
+        throw new IllegalArgumentException("/ by zero")
       } else if (n == UInt(1)) {
         (this, Natural(UInt(0)))
       } else {
@@ -624,7 +624,7 @@ object Natural extends NaturalInstances {
             val r = d % n
             recur(tail, r, End(q))
           case _ =>
-            sys.error("bug in reversed")
+            throw new IllegalArgumentException("bug in reversed")
         }
       }
     }
@@ -651,7 +651,7 @@ object Natural extends NaturalInstances {
       if (t >= 0L)
         End(UInt(t.toInt))
       else
-        sys.error("illegal subtraction: %s %s" format (this, n))
+        throw new IllegalArgumentException("illegal subtraction: %s %s" format (this, n))
     }
 
     def *(n: UInt): Natural = if (n == UInt(0))
@@ -662,12 +662,12 @@ object Natural extends NaturalInstances {
       Natural(d.toLong * n.toLong)
 
     def /(n: UInt): Natural = if (n == UInt(0))
-      sys.error("/ by zero")
+      throw new IllegalArgumentException("/ by zero")
     else
       End(d / n)
 
     def %(n: UInt): Natural = if (n == UInt(0))
-      sys.error("/ by zero")
+      throw new IllegalArgumentException("/ by zero")
     else
       End(d % n)
 

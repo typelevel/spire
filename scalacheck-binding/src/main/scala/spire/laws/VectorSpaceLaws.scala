@@ -3,6 +3,8 @@ package spire.laws
 import spire.algebra._
 import spire.implicits._
 
+import org.typelevel.discipline.{Laws, Predicate}
+
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
@@ -55,8 +57,8 @@ trait VectorSpaceLaws[V, A] extends Laws {
 
   def metricSpace(implicit V: MetricSpace[V, A], o: Order[A], A: Rng[A]) = new SpaceProperties(
     name = "metric space",
-    sl = _.emptyProperties,
-    vl = _.emptyProperties,
+    sl = _.emptyRuleSet,
+    vl = _.emptyRuleSet,
     parents = Seq.empty,
     "identity" → forAll((x: V, y: V) =>
       if (x === y) V.distance(x, y) === Rng[A].zero
@@ -87,7 +89,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     )
   )
 
-  def linearity(f: V => A)(implicit V: Module[V, A]) = new SimpleProperties(
+  def linearity(f: V => A)(implicit V: Module[V, A]) = new SimpleRuleSet(
     name = "linearity",
 
     "homogeneity" → forAll((r: A, v: V) =>
@@ -106,7 +108,8 @@ trait VectorSpaceLaws[V, A] extends Laws {
       (v ⋅ w).abs === (w ⋅ v).abs
     ),
     "linearity of partial inner product" → forAll((w: V) =>
-      linearity(_ ⋅ w)
+      // TODO this probably requires some thought -- should `linearity` be a full `RuleSet`?
+      linearity(_ ⋅ w).all
     )
   )
 
@@ -117,11 +120,11 @@ trait VectorSpaceLaws[V, A] extends Laws {
 
   class SpaceProperties(
     val name: String,
-    val sl: scalarLaws.type => scalarLaws.SpireProperties,
-    val vl: vectorLaws.type => vectorLaws.SpireProperties,
+    val sl: scalarLaws.type => scalarLaws.RuleSet,
+    val vl: vectorLaws.type => vectorLaws.RuleSet,
     val parents: Seq[SpaceProperties],
     val props: (String, Prop)*
-  ) extends SpireProperties {
+  ) extends RuleSet {
     val bases = Seq("scalar" → sl(scalarLaws), "vector" → vl(vectorLaws))
   }
 

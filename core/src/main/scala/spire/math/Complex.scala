@@ -134,7 +134,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
       real <= f.fromInt(Int.MaxValue) && real >= f.fromInt(Int.MinValue)
 
   override def hashCode: Int =
-    if (isValidInt) real.toInt else 19 * real.## + 41 * imag.## + 97
+    if (isReal) real.## else 19 * real.## + 41 * imag.## + 97
 
   // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
@@ -143,13 +143,13 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
     case that: Quaternion[_] =>
       real == that.r && imag == that.i && that.j == f.zero && that.k == f.zero
     case that =>
-      unifiedPrimitiveEquals(that)
+      imag == f.zero && real == that
   }
 
   override def toString: String = "(%s + %si)" format (real.toString, imag.toString)
 
   def abs: T = (real * real + imag * imag).sqrt
-  def arg: T = t.atan2(imag, real)
+  def arg: T = if (isZero) f.zero else t.atan2(imag, real)
 
   def norm: T = real * real + imag * imag
   def conjugate: Complex[T] = new Complex(real, -imag)
@@ -230,9 +230,11 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
 
   def **(b: Int): Complex[T] = pow(b)
 
-  def nroot(k: Int): Complex[T] = pow(Complex(f.fromInt(k).reciprocal, f.zero))
+  def nroot(k: Int): Complex[T] =
+    if (isZero) Complex.zero else pow(Complex(f.fromInt(k).reciprocal, f.zero))
 
-  def pow(b: Int): Complex[T] = Complex.polar(abs.pow(b), arg * b)
+  def pow(b: Int): Complex[T] =
+    if (isZero) Complex.zero else Complex.polar(abs.pow(b), arg * b)
 
   def **(b: Complex[T]): Complex[T] = pow(b)
 
@@ -257,11 +259,19 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)(implicit f: F
   }
 
   def sqrt: Complex[T] = {
-    val v = ((real.abs + this.abs) / f.fromInt(2)).sqrt
-    if (real > f.zero)
-      new Complex(v, imag / (v + v))
-    else
-      new Complex(imag.abs / (v + v), v * f.fromInt(imag.signum))
+    if (isZero) {
+      Complex.zero[T]
+    } else {
+      val two = f.fromInt(2)
+      val a = ((abs + real.abs) / two).sqrt
+      imag.signum match {
+        case 0 =>
+          if (real < 0) Complex(f.zero, a) else Complex(a, f.zero)
+        case n =>
+          val b = ((abs - real.abs) / two).sqrt
+          if (n < 0) Complex(a, -b) else Complex(a, b)
+      }
+    }
   }
 
   def floor: Complex[T] = new Complex(real.floor, imag.floor)
