@@ -23,14 +23,6 @@ class TestDimensions(nonSpecialDimensions:Int=0)
     Iterator(1, 2, 3, 5, 10, 16) ++
     Iterator.fill(nonSpecialDimensions)(gen.nextInt(32, 64))
 
-  def oneDimensionWithThresholdSample(threshold:Int,
-                                      howManyBelow:Int = 1,
-                                      howManyAbove:Int = 1) =
-    Iterator(1, 2, 3, 5, 10, 16) ++
-    Iterator.fill(howManyBelow)(gen.nextInt(32, threshold-1)) ++
-    Iterator.single(threshold) ++
-    Iterator.fill(howManyAbove)(gen.nextInt(32, threshold+1))
-
   def twoDimensionSample =
     for(m <- oneDimensionSample; n <- oneDimensionSample) yield (m,n)
 }
@@ -92,25 +84,24 @@ extends TestDimensions(nonSpecialDimensions)(gen) {
     } yield a
   }
 
-  /**
-   * mT, kT and nT are thresholds: dimensions will be generated that are
-   * below, equal to, and above each of them.
-   */
-  def matrixProductSample(mT:Int, kT:Int, nT:Int,
-                          belowMT:Int = 1, aboveMT:Int = 1,
-                          belowKT:Int = 1, aboveKT:Int = 1,
-                          belowNT:Int = 1, aboveNT:Int = 1) = {
+  def matrixProductSample = {
     for {
-      m <- oneDimensionWithThresholdSample(mT, belowMT, aboveMT)
-      k <- oneDimensionWithThresholdSample(kT, belowKT, aboveKT)
-      n <- oneDimensionWithThresholdSample(nT, belowNT, aboveNT)
-      a <- generalMatrixSample(m,k).take(1)
-      b <- generalMatrixSample(k,n).take(1)
       transA <- Iterator(NoTranspose, Transpose)
       transB <- Iterator(NoTranspose, Transpose)
+      m <- oneDimensionSample
+      k <- oneDimensionSample
+      n <- oneDimensionSample
+      a <- (if(transA == NoTranspose)
+              generalMatrixSample(m,k)
+            else
+              generalMatrixSample(k,m)).take(1)
+      b <- (if(transB == NoTranspose)
+              generalMatrixSample(k,n)
+            else
+              generalMatrixSample(n,k)).take(1)
       alpha <- scalarSample
       beta <- scalarSample
-    } yield (transA, transB, alpha, a, b, beta, m, n)
+    } yield (transA, transB, alpha, a, b, beta, m, n, k)
   }
 }
 
