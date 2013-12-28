@@ -11,6 +11,7 @@ object MatrixMultiplicationBenchmarks {
   }
   import spire.matrix.dense.BLAS
   object NaiveBlas3 extends BLAS.NaiveLevel3
+  object FastBlas3 extends BLAS.FastLevel3
 
   import spire.matrix.dense.tests.RandomUncorrelatedElements
 
@@ -45,7 +46,9 @@ object MatrixMultiplicationBenchmarks {
   def main(args:Array[String]) {
     println("Gflop/s for product of two n x n matrices")
     println("-----------------------------------------")
-    println("%4s  %16s  %16s".format("n", "JBlas", "Spire (Naive)"))
+    println("%4s  %16s  %16s %16s".format(
+            "n", "JBlas", "Spire (Naive)", "Spire (Fast)"))
+    var diffs = ""
     for(n <- sizes) {
       val gen = elts.generalMatrixSample(n,n)
       val a = gen.next
@@ -57,20 +60,25 @@ object MatrixMultiplicationBenchmarks {
       val bb = b.toArray
       val cc = new Array[Double](n*n)
       val (c2, jblasReport) = timer.benchPair(jblasGemm(n, n, n, aa, bb, cc))
-      val (u,v) = (c1(n/2, n/2), c2(n/2, n/2))
-      assert((u-v).abs/(u.abs + v.abs) < 1e-6,
-             s"""|*Error*  Spire = ${c1.formatted("%.3f", true)}
-                 | whereas JBlas = ${c2.formatted("%.3f", true)}""".stripMargin)
+      val (c3, fastReport) = timer.benchPair(spireGemm(FastBlas3, a, b, c))
+      val (u,v,w) = (c1(n/2, n/2), c2(n/2, n/2),c3(n/2, n/2))
+      val deltaNaive = (u-v).abs/(u.abs + v.abs)
+      val deltaFast = (u-w).abs/(u.abs + w.abs)
+      diffs += s"$n ~ $deltaNaive ~ $deltaFast\n"
       val flops = (2*n-1)*n*n
       val tm = naiveReport.runtime
       val (tl, th) = naiveReport.runtimeCI95
       val jtm = jblasReport.runtime
       val (jtl, jth) = jblasReport.runtimeCI95
-      Seq(tm, tl, th, jtm, jtl, jth).map(flops/1e9/_) match {
-        case Seq(gm, gh, gl, jgm, jgh, jgl)
-          => println("%4d  %4.2f +%4.2f -%4.2f  %4.2f +%4.2f -%4.2f".
-                     format(n, jgm, jgh-jgm, jgm-jgl, gm, gh-gm, gm-gl))
+      val ftm = fastReport.runtime
+      val (ftl, fth) = fastReport.runtimeCI95
+      Seq(tm, tl, th, jtm, jtl, jth, ftm, ftl, fth).map(flops/1e9/_) match {
+        case Seq(gm, gh, gl, jgm, jgh, jgl, fgm, fgh, fgl)
+          => println("%4d  %4.2f +%4.2f -%4.2f  %4.2f +%4.2f -%4.2f  %4.2f +%4.2f -%4.2f".
+                     format(n, jgm, jgh-jgm, jgm-jgl, gm, gh-gm, gm-gl,
+                            fgm, fgh-fgm, fgm-fgl))
       }
     }
+    println(s"\n  n ~ naive - jblas ~ fast - jblas \n $diffs\n")
   }
 }
