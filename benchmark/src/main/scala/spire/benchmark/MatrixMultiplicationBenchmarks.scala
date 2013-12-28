@@ -35,37 +35,36 @@ object MatrixMultiplicationBenchmarks {
     Matrix(m, n, c)
   }
 
-  def sizes = {
-    val powers = for {
+  def dimensions = for {
       Seq(k,l) <- (3 to 10).map(2**_).sliding(2)
       n <- Seq(k, (k+l)/2)
-    } yield n
-    powers ++ Seq(2**10)
-  }
+      dims <- Seq((n, n, n), (n, 2*n, n))
+    } yield dims
 
   def main(args:Array[String]) {
     println("Gflop/s for product of two n x n matrices")
     println("-----------------------------------------")
-    println("%4s  %16s  %16s %16s".format(
-            "n", "JBlas", "Spire (Naive)", "Spire (Fast)"))
-    var diffs = ""
-    for(n <- sizes) {
-      val gen = elts.generalMatrixSample(n,n)
-      val a = gen.next
-      val b = gen.next
-      val c = Matrix.empty(n, n)
+    println("%4s  %4s  %4s  %16s  %16s %16s".format(
+            "m", "k", "n", "JBlas", "Spire (Naive)", "Spire (Fast)"))
+    var delta = 0.0
+    for((m,k,n) <- dimensions) {
+      val genA = elts.generalMatrixSample(m,k)
+      val genB = elts.generalMatrixSample(k,n)
+      val a = genA.next
+      val b = genB.next
+      val c = Matrix.empty(m, n)
       val timer = new Thyme
       val (c1, naiveReport) = timer.benchPair(spireGemm(NaiveBlas3, a, b, c))
       val aa = a.toArray
       val bb = b.toArray
-      val cc = new Array[Double](n*n)
-      val (c2, jblasReport) = timer.benchPair(jblasGemm(n, n, n, aa, bb, cc))
+      val cc = new Array[Double](m*n)
+      val (c2, jblasReport) = timer.benchPair(jblasGemm(m, n, k, aa, bb, cc))
       val (c3, fastReport) = timer.benchPair(spireGemm(FastBlas3, a, b, c))
-      val (u,v,w) = (c1(n/2, n/2), c2(n/2, n/2),c3(n/2, n/2))
+      val (u,v,w) = (c1(m/2, n/2), c2(m/2, n/2),c3(m/2, n/2))
       val deltaNaive = (u-v).abs/(u.abs + v.abs)
       val deltaFast = (u-w).abs/(u.abs + w.abs)
-      diffs += s"$n ~ $deltaNaive ~ $deltaFast\n"
-      val flops = (2*n-1)*n*n
+      delta += (deltaNaive + deltaFast)/2
+      val flops = (2*k-1)*m*n
       val tm = naiveReport.runtime
       val (tl, th) = naiveReport.runtimeCI95
       val jtm = jblasReport.runtime
@@ -74,11 +73,13 @@ object MatrixMultiplicationBenchmarks {
       val (ftl, fth) = fastReport.runtimeCI95
       Seq(tm, tl, th, jtm, jtl, jth, ftm, ftl, fth).map(flops/1e9/_) match {
         case Seq(gm, gh, gl, jgm, jgh, jgl, fgm, fgh, fgl)
-          => println("%4d  %4.2f +%4.2f -%4.2f  %4.2f +%4.2f -%4.2f  %4.2f +%4.2f -%4.2f".
-                     format(n, jgm, jgh-jgm, jgm-jgl, gm, gh-gm, gm-gl,
-                            fgm, fgh-fgm, fgm-fgl))
+          => println(("%4d  %4d  %4d  " ++ "%4.2f +%4.2f -%4.2f  "*3).
+                      format(m, k, n,
+                             jgm, jgh-jgm, jgm-jgl,
+                             gm, gh-gm, gm-gl,
+                             fgm, fgh-fgm, fgm-fgl))
       }
     }
-    println(s"\n  n ~ naive - jblas ~ fast - jblas \n $diffs\n")
+    println("Error: %.2f %%".format(delta/100))
   }
 }
