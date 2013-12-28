@@ -71,25 +71,28 @@ trait FastLevel3 extends Level3 {
       val (m,n) = a.dimensions
       val nn = (n/nr)*nr
       var s = 0
+      val ld = a.ld
+      val o = a.start
+      val e = a.elements
       //cforRange(0 until nn by nr) { j =>
       cfor(0)(_ < nn, _ + nr) { j =>
         // start of column j, j+1, j+2 and j+4
-        val r0 = a.start + (j+0)*a.ld
-        val r1 = a.start + (j+1)*a.ld
-        val r2 = a.start + (j+2)*a.ld
-        val r3 = a.start + (j+3)*a.ld
+        val r0 = o + (j+0)*ld
+        val r1 = o + (j+1)*ld
+        val r2 = o + (j+2)*ld
+        val r3 = o + (j+3)*ld
         cforRange(0 until m) { i =>
-                      aa(s+0) = a.elements(r0+i)
-                      aa(s+1) = a.elements(r1+i)
-          if(nr == 4) aa(s+2) = a.elements(r2+i)
-          if(nr == 4) aa(s+3) = a.elements(r3+i)
+                      aa(s+0) = e(r0+i)
+                      aa(s+1) = e(r1+i)
+          if(nr == 4) aa(s+2) = e(r2+i)
+          if(nr == 4) aa(s+3) = e(r3+i)
           s += nr
         }
       }
       cforRange(nn until n) { j =>
-        val r0 = a.start + (j+0)*a.ld
+        val r0 = o + (j+0)*ld
         cforRange(0 until m) { i =>
-          aa(s) = a.elements(r0+i)
+          aa(s) = e(r0+i)
           s += 1
         }
       }
@@ -116,21 +119,23 @@ trait FastLevel3 extends Level3 {
       val (m,n) = a.dimensions
       val mm = (m/mr)*mr
       var s = 0
+      val ld = a.ld
+      val e = a.elements
       //cforRange(0 until mm by mr) { i =>
       cfor(0)(_ < mm, _ + mr) { i =>
         cforRange(0 until n) { j =>
-          val r = i + j*a.ld
-                      aa(s+0) = a.elements(r+0)
-                      aa(s+1) = a.elements(r+1)
-          if(mr == 4) aa(s+2) = a.elements(r+2)
-          if(mr == 4) aa(s+3) = a.elements(r+3)
+          val r = i + j*ld
+                      aa(s+0) = e(r+0)
+                      aa(s+1) = e(r+1)
+          if(mr == 4) aa(s+2) = e(r+2)
+          if(mr == 4) aa(s+3) = e(r+3)
           s += mr
         }
       }
       cforRange(mm until m) { i =>
         cforRange(0 until n) { j =>
-          val r = i + j*a.ld
-          aa(s+0) = a.elements(r+0)
+          val r = i + j*ld
+          aa(s+0) = e(r+0)
           s += 1
         }
       }
@@ -165,6 +170,8 @@ trait FastLevel3 extends Level3 {
       val n4 = (n/4)*4
 
       val cc = c.elements
+      val ldC = c.ld
+      val startC = c.start
 
       // Compute C(:, 0:n4) = A(:, :) B(:, 0:n4)
       cforRange(0 until n4 by 4) { j =>
@@ -178,10 +185,10 @@ trait FastLevel3 extends Level3 {
           var c0, c1, c2, c3, c4, c5, c6, c7 = 0.0
 
           // Indexing into cc
-          val r0 = c.start + i + j*c.ld
-          val r1 = r0 + c.ld
-          val r2 = r1 + c.ld
-          val r3 = r2 + c.ld
+          val r0 = startC + i + j*ldC
+          val r1 = r0 + ldC
+          val r2 = r1 + ldC
+          val r3 = r2 + ldC
 
           // Compute C(i:i+2, j:j+4) += A(i:i+2, 0:k4) B(0:k4, j:j+4)
           // as a sum of [2 x 4] [4 x 4] matrix products
@@ -307,10 +314,10 @@ trait FastLevel3 extends Level3 {
           var c0, c1, c2, c3 = 0.0
 
           // Indexing into cc
-          val r0 = c.start + m2 + j*c.ld
-          val r1 = r0 + c.ld
-          val r2 = r1 + c.ld
-          val r3 = r2 + c.ld
+          val r0 = startC + m2 + j*ldC
+          val r1 = r0 + ldC
+          val r2 = r1 + ldC
+          val r3 = r2 + ldC
 
           // Compute C(m2, j:j+4) += A(m2, 0:k4) B(0:k4, j:j+4)
           var paa = m2*kc
@@ -401,7 +408,7 @@ trait FastLevel3 extends Level3 {
           // using a straightforward summation
 
           // Indexing into cc
-          val r0 = c.start + i + j*c.ld
+          val r0 = startC + i + j*ldC
 
           // Store in registers (hopefully!):
           //   C(i:i+2, j) = [ c0 ]
@@ -434,7 +441,7 @@ trait FastLevel3 extends Level3 {
         // Compute C(m2, j) += A(m2, :) B(:, j) if need be
         if(m2 != mc) {
           var c0 = 0.0
-          var r0 = c.start + m2 + j*c.ld
+          var r0 = startC + m2 + j*ldC
           var paa = m2*kc
           var pbb = j*kc
           cforRange(0 until kc) { p =>
