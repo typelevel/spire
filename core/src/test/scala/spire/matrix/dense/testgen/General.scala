@@ -85,20 +85,24 @@ extends TestDimensions(nonSpecialDimensions)(gen) {
   }
 
   def matrixProductSample = {
-    for {
+    val shapes = for {
       transA <- Iterator(NoTranspose, Transpose)
       transB <- Iterator(NoTranspose, Transpose)
-      m <- oneDimensionSample
-      k <- oneDimensionSample
-      n <- oneDimensionSample
-      a <- (if(transA == NoTranspose)
-              generalMatrixSample(m,k)
-            else
-              generalMatrixSample(k,m)).take(1)
-      b <- (if(transB == NoTranspose)
-              generalMatrixSample(k,n)
-            else
-              generalMatrixSample(n,k)).take(1)
+      m0 <- oneDimensionSample
+      k0 <- oneDimensionSample
+      n0 <- oneDimensionSample
+      (m,k,n) <- Seq((m0,k0,n0),
+                     (m0+m0/3,k0,n0), (m0,k0+k0/3,n0), (m0,k0,n0+n0/3)).distinct
+      flops = m*k*n
+    } yield (flops, transA, transB, m, k, n)
+    def generateOneMatrix(mn:(Int,Int)) =
+      generalMatrixSample(mn._1, mn._2).take(1)
+    for {
+      (flops, transA, transB, m, k, n) <- shapes.toSeq.sortWith(_._1 < _._1)
+      dimA = if(transA == NoTranspose) (m,k) else (k,m)
+      dimB = if(transB == NoTranspose) (k,n) else (n,k)
+      a <- generateOneMatrix(dimA)
+      b <- generateOneMatrix(dimB)
       alpha <- scalarSample
       beta <- scalarSample
     } yield (transA, transB, alpha, a, b, beta, m, n, k)
