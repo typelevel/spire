@@ -14,7 +14,7 @@ import org.scalatest.FunSuite
 class FastGemmTest extends FunSuite {
   import BLAS.NaiveLevel3.{gemm => referenceGemm}
   import BLAS.FastLevel3.{gemm => fastGemm}
-  implicit val gen = Defaults.IntegerGenerator.fromTime(1)
+  implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
 
   test("Fast GEMM shall give the same results as reference GEMM") {
     val p2d = new ScalarUniformPowerOfTwoDistribution(minPower=0, maxPower=6)
