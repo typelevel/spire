@@ -26,7 +26,7 @@ trait ShortOrder extends Order[Short] {
   override def gteqv(x: Short, y: Short) = x >= y
   override def lt(x: Short, y: Short) = x < y
   override def lteqv(x: Short, y: Short) = x <= y
-  def compare(x: Short, y: Short) = java.lang.Short.compare(x, y)
+  def compare(x: Short, y: Short) = x - y
 }
 
 trait ShortIsSigned extends Signed[Short] {

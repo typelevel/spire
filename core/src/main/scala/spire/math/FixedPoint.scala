@@ -50,7 +50,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     java.lang.Long.signum(long)
 
   def compare(rhs: FixedPoint): Int =
-    java.lang.Long.compare(lhs.long, rhs.long)
+    if (lhs.long < rhs.long) -1 else if (lhs.long == rhs.long) 0 else 1
 
   def <(rhs: FixedPoint): Boolean = lhs.long < rhs.long
   def <=(rhs: FixedPoint): Boolean = lhs.long <= rhs.long
