@@ -32,22 +32,24 @@ object MatrixMultiplicationBenchmarks {
     jblas.NativeBlas.dgemm('N', 'N',
                            m, n, k, 2.0, a, 0, m, b, 0, k,
                            0.0, c, 0, m)
-    Matrix(m, n, c)
+    Matrix(m, n,  c)
   }
 
-  def dimensions = for {
-      Seq(k,l) <- (3 to 10).map(2**_).sliding(2)
+  def dimensions(minPowerOf2:Int, maxPowerOf2:Int) = for {
+      Seq(k,l) <- (minPowerOf2 to maxPowerOf2).map(2**_).sliding(2)
       n <- Seq(k, (k+l)/2)
       dims <- Seq((n, n, n), (n, 2*n, n))
     } yield dims
 
   def main(args:Array[String]) {
+    val (lo, hi) = if(args.size == 0) (3, 8)
+                   else (args(0).toInt, args(1).toInt)
     println("Gflop/s for product of two n x n matrices")
     println("-----------------------------------------")
     println("%4s  %4s  %4s  %16s  %16s %16s".format(
             "m", "k", "n", "JBlas", "Spire (Naive)", "Spire (Fast)"))
     var delta = 0.0
-    for((m,k,n) <- dimensions) {
+    for((m,k,n) <- dimensions(lo, hi)) {
       val genA = elts.generalMatrixSample(m,k)
       val genB = elts.generalMatrixSample(k,n)
       val a = genA.next
