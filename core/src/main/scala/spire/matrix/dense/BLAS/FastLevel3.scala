@@ -163,7 +163,8 @@ trait FastLevel3 extends Level3 {
      * core/products/GeneralBlockPanelKernel.h
      */
     def apply(kc:Int, mr:Int, nr:Int,
-              alpha:Double, aa:Buffer, bb:Buffer, beta:Double, c:Matrix) {
+              alpha:Double, aa:Buffer, bb:Buffer, beta:Double, c:Matrix)
+    {
       val (mc, n) = c.dimensions
       val m2 = (mc/2)*2
       val k4 = (kc/4)*4
@@ -179,22 +180,35 @@ trait FastLevel3 extends Level3 {
         cforRange(0 until m2 by 2) { i =>
           // Compute C(i:i+2, j:j+4) += A(i:i+2, :) B(:, j:j+4)
 
-          // Store in registers (hopefully!):
-          //   C(i:i+2, j:j+4) = [ c0 c1 c2 c3 ]
-          //                     [ c4 c5 c6 c7 ]
-          var c0, c1, c2, c3, c4, c5, c6, c7 = 0.0
-
           // Indexing into cc
           val r0 = startC + i + j*ldC
           val r1 = r0 + ldC
           val r2 = r1 + ldC
           val r3 = r2 + ldC
 
+          // Store in registers (hopefully!):
+          //   C(i:i+2, j:j+4) = [ c0 c1 c2 c3 ]
+          //                     [ c4 c5 c6 c7 ]
+          var c0, c1, c2, c3, c4, c5, c6, c7 = 0.0
+
           // Compute C(i:i+2, j:j+4) += A(i:i+2, 0:k4) B(0:k4, j:j+4)
           // as a sum of [2 x 4] [4 x 4] matrix products
           var paa = i*kc
           var pbb = j*kc
           cforRange(0 until k4 by 4) { p =>
+            // Compute C(i:i+2, j:j+4) += A(i:i+2, p:p+4) B(p:p+4, j:j+4)
+            // --------\/-------------    -----\/-------  -------\/-----
+            //         cw                      aw                bw
+            //
+            // this is the unrolled version of:
+            // for k = 1..4
+            //   load aw(:,k)
+            //   for j = 1..4
+            //     cw(:,j) += aw(:,k) b(k,j)
+            //
+            // Thus aw and bw are expected to be packed column- and row-major
+            // respectively (the packing of aa and bb prior to calling this
+            // function should have laid out elements in that manner).
             var a0 = aa(paa+0)
             var a1 = aa(paa+1)
             var b0 = bb(pbb+0)
