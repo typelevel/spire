@@ -511,7 +511,7 @@ object Real {
     def cosh(x: Real): Real = Real.cosh(x)
     def e: Real = Real.e
     def exp(x: Real): Real = Real.exp(x)
-    def expm1(x: Real): Real = Real.exp(Real.one) - Real.one
+    def expm1(x: Real): Real = Real.exp(x) - Real.one
     def log(x: Real): Real = Real.log(x)
     def log1p(x: Real): Real = Real.log(Real.one + x)
     def pi: Real = Real.pi
