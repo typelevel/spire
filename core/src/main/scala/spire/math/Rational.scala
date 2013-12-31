@@ -300,10 +300,13 @@ object Rational extends RationalInstances {
   protected[math] def unsafeBuild(n: Long, d: Long) = LongRationals.unsafeBuild(n, d)
   protected[math] def unsafeBuild(n: BigInt, d: BigInt) = BigRationals.unsafeBuild(n, d)
 
-  implicit def apply(x:Long): Rational = LongRationals.build(x, 1L)
-  implicit def apply(x:BigInt): Rational = BigRationals.build(x, BigInt(1))
+  implicit def apply(x: Int): Rational = LongRationals.build(x, 1L)
+  implicit def apply(x: Long): Rational = LongRationals.build(x, 1L)
+  implicit def apply(x: BigInt): Rational = BigRationals.build(x, BigInt(1))
 
-  implicit def apply(x:Double): Rational = {
+  implicit def apply(x: Float): Rational = apply(x.toDouble)
+
+  implicit def apply(x: Double): Rational = {
     val bits = java.lang.Double.doubleToLongBits(x)
     val value = if ((bits >> 63) < 0) -(bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L)
                 else (bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L)

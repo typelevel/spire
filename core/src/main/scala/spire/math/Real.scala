@@ -249,12 +249,15 @@ object Real {
   val four: Real = Exact(Rational(4))
 
   def apply(f: Int => SafeLong): Real = Inexact(f)
-  def apply(n: Long): Real = Exact(Rational(n))
-  def apply(n: BigInt): Real = Exact(Rational(n))
-  def apply(n: SafeLong): Real = Exact(Rational(n))
-  def apply(n: Rational): Real = Exact(n)
-  def apply(n: Double): Real = Exact(Rational(n))
-  def apply(n: BigDecimal): Real = Exact(Rational(n))
+
+  implicit def apply(n: Int): Real = Exact(Rational(n))
+  implicit def apply(n: Long): Real = Exact(Rational(n))
+  implicit def apply(n: BigInt): Real = Exact(Rational(n))
+  implicit def apply(n: SafeLong): Real = Exact(Rational(n))
+  implicit def apply(n: Rational): Real = Exact(n)
+  implicit def apply(n: Double): Real = Exact(Rational(n))
+  implicit def apply(n: BigDecimal): Real = Exact(Rational(n))
+
   def apply(s: String): Real = Exact(Rational(s))
 
   lazy val pi: Real = Real(16) * atan(Real(Rational(1, 5))) - Real.four * atan(Real(Rational(1, 239)))
