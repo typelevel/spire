@@ -160,20 +160,19 @@ private[math] trait ConvertableToAlgebraic extends ConvertableTo[Algebraic] {
 }
 
 private[math] trait ConvertableToComplex[A] extends ConvertableTo[Complex[A]] {
-  implicit def f: Fractional[A]
-  implicit def t: Trig[A]
-  implicit def r: IsReal[A]
-  def fromByte(a: Byte): Complex[A] = Complex(f.fromByte(a), f.zero)
-  def fromShort(a: Short): Complex[A] = Complex(f.fromShort(a), f.zero)
-  def fromInt(a: Int): Complex[A] = Complex(f.fromInt(a), f.zero)
-  def fromLong(a: Long): Complex[A] = Complex(f.fromLong(a), f.zero)
-  def fromFloat(a: Float): Complex[A] = Complex(f.fromFloat(a), f.zero)
-  def fromDouble(a: Double): Complex[A] = Complex(f.fromDouble(a), f.zero)
-  def fromBigInt(a: BigInt): Complex[A] = Complex(f.fromBigInt(a), f.zero)
-  def fromBigDecimal(a: BigDecimal): Complex[A] = Complex(f.fromBigDecimal(a), f.zero)
-  def fromRational(a: Rational): Complex[A] = Complex(f.fromRational(a), f.zero)
+  implicit def algebra: Integral[A]
 
-  def fromType[B: ConvertableFrom](b: B): Complex[A] = Complex(f.fromType(b), f.zero)
+  def fromByte(a: Byte): Complex[A] = Complex(algebra.fromByte(a), algebra.zero)
+  def fromShort(a: Short): Complex[A] = Complex(algebra.fromShort(a), algebra.zero)
+  def fromInt(a: Int): Complex[A] = Complex(algebra.fromInt(a), algebra.zero)
+  def fromLong(a: Long): Complex[A] = Complex(algebra.fromLong(a), algebra.zero)
+  def fromFloat(a: Float): Complex[A] = Complex(algebra.fromFloat(a), algebra.zero)
+  def fromDouble(a: Double): Complex[A] = Complex(algebra.fromDouble(a), algebra.zero)
+  def fromBigInt(a: BigInt): Complex[A] = Complex(algebra.fromBigInt(a), algebra.zero)
+  def fromBigDecimal(a: BigDecimal): Complex[A] = Complex(algebra.fromBigDecimal(a), algebra.zero)
+  def fromRational(a: Rational): Complex[A] = Complex(algebra.fromRational(a), algebra.zero)
+
+  def fromType[B: ConvertableFrom](b: B): Complex[A] = Complex(algebra.fromType(b), algebra.zero)
 }
 
 private[math] trait ConvertableToSafeLong extends ConvertableTo[SafeLong] {
@@ -220,12 +219,8 @@ object ConvertableTo {
   implicit final val ConvertableToSafeLong = new ConvertableToSafeLong {}
   implicit final val ConvertableToNumber = new ConvertableToNumber {}
 
-  implicit def convertableToComplex[A: Fractional: Trig: IsReal] =
-    new ConvertableToComplex[A] {
-      val f = Fractional[A]
-      val t = Trig[A]
-      val r = IsReal[A]
-    }
+  implicit def convertableToComplex[A: Integral] =
+    new ConvertableToComplex[A] { val algebra = Integral[A] }
 }
 
 trait ConvertableFrom[@spec A] {
@@ -406,18 +401,18 @@ private[math] trait ConvertableFromAlgebraic extends ConvertableFrom[Algebraic] 
 }
 
 private[math] trait ConvertableFromComplex[A] extends ConvertableFrom[Complex[A]] {
-  def f: Fractional[A]
-  def t: Trig[A]
-  def toByte(a: Complex[A]): Byte = f.toByte(a.real)
-  def toShort(a: Complex[A]): Short = f.toShort(a.real)
-  def toInt(a: Complex[A]): Int = f.toInt(a.real)
-  def toLong(a: Complex[A]): Long = f.toLong(a.real)
-  def toFloat(a: Complex[A]): Float = f.toFloat(a.real)
-  def toDouble(a: Complex[A]): Double = f.toDouble(a.real)
-  def toBigInt(a: Complex[A]): BigInt = f.toBigInt(a.real)
-  def toBigDecimal(a: Complex[A]): BigDecimal = f.toBigDecimal(a.real)
-  def toRational(a: Complex[A]): Rational = f.toRational(a.real)
-  def toNumber(a: Complex[A]): Number = f.toNumber(a.real)
+  def algebra: Integral[A]
+
+  def toByte(a: Complex[A]): Byte = algebra.toByte(a.real)
+  def toShort(a: Complex[A]): Short = algebra.toShort(a.real)
+  def toInt(a: Complex[A]): Int = algebra.toInt(a.real)
+  def toLong(a: Complex[A]): Long = algebra.toLong(a.real)
+  def toFloat(a: Complex[A]): Float = algebra.toFloat(a.real)
+  def toDouble(a: Complex[A]): Double = algebra.toDouble(a.real)
+  def toBigInt(a: Complex[A]): BigInt = algebra.toBigInt(a.real)
+  def toBigDecimal(a: Complex[A]): BigDecimal = algebra.toBigDecimal(a.real)
+  def toRational(a: Complex[A]): Rational = algebra.toRational(a.real)
+  def toNumber(a: Complex[A]): Number = algebra.toNumber(a.real)
 
   def toType[B: ConvertableTo](a: Complex[A]): B = sys.error("fixme")
   def toString(a: Complex[A]): String = a.toString
@@ -471,9 +466,6 @@ object ConvertableFrom {
   implicit final val ConvertableFromSafeLong = new ConvertableFromSafeLong {}
   implicit final val ConvertableFromNumber = new ConvertableFromNumber {}
 
-  implicit def convertableFromComplex[A: Fractional: Trig] =
-    new ConvertableFromComplex[A] {
-      val f = Fractional[A]
-      val t = Trig[A]
-    }
+  implicit def convertableFromComplex[A: Integral] =
+    new ConvertableFromComplex[A] { val algebra = Integral[A] }
 }

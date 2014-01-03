@@ -586,33 +586,43 @@ object FastComplex {
   }
 }
 
-trait ComplexInstances {
+trait ComplexInstances0 {
+  implicit def ComplexRing[A: Ring: IsReal]: Ring[Complex[A]] = new ComplexIsRingImpl[A]
+}
+
+trait ComplexInstances1 extends ComplexInstances0 {
+  implicit def ComplexField[A: Field: IsReal]: Field[Complex[A]] = new ComplexIsFieldImpl[A]
+}
+
+trait ComplexInstances extends ComplexInstances1 {
   implicit def ComplexAlgebra[@spec(Float, Double) A: Fractional: Trig: IsReal] =
     new ComplexAlgebra[A]
 
-  implicit def ComplexEq[A: Eq] = new ComplexEq[A]
+  implicit def ComplexEq[A: Eq]: Eq[Complex[A]] = new ComplexEq[A]
 }
 
 private[math] trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A]] {
-  implicit def f: Fractional[A]
-  implicit def t: Trig[A]
-  implicit def r: IsReal[A]
+  implicit def algebra: Ring[A]
+  implicit def order: IsReal[A]
 
   override def minus(a: Complex[A], b: Complex[A]): Complex[A] = a - b
   def negate(a: Complex[A]): Complex[A] = -a
   def one: Complex[A] = Complex.one
   def plus(a: Complex[A], b: Complex[A]): Complex[A] = a + b
-  override def pow(a: Complex[A], b: Int): Complex[A] = a.pow(b)
   override def times(a: Complex[A], b: Complex[A]): Complex[A] = a * b
   def zero: Complex[A] = Complex.zero
 
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
 }
 
-private[math] trait ComplexIsEuclideanRing[@spec(Float,Double) A]
-extends ComplexIsRing[A] with EuclideanRing[Complex[A]] {
+private[math] trait ComplexIsField[@spec(Float,Double) A]
+extends ComplexIsRing[A] with Field[Complex[A]] {
   import spire.syntax.order._
 
+  implicit def algebra: Field[A]
+
+  override def fromDouble(n: Double): Complex[A] = Complex(algebra.fromDouble(n))
+  def div(a: Complex[A], b: Complex[A]) = a / b
   def quot(a: Complex[A], b: Complex[A]) = a /~ b
   def mod(a: Complex[A], b: Complex[A]) = a % b
   override def quotmod(a: Complex[A], b: Complex[A]) = a /% b
@@ -623,28 +633,19 @@ extends ComplexIsRing[A] with EuclideanRing[Complex[A]] {
   }
 }
 
-private[math] trait ComplexIsField[@spec(Float,Double) A]
-extends ComplexIsEuclideanRing[A] with Field[Complex[A]] {
-  override def fromDouble(n: Double): Complex[A] = Complex(f.fromDouble(n))
-  def div(a: Complex[A], b: Complex[A]) = a / b
-  def ceil(a: Complex[A]): Complex[A] = a.ceil
-  def floor(a: Complex[A]): Complex[A] = a.floor
-  def round(a: Complex[A]): Complex[A] = a.round
-  def isWhole(a: Complex[A]) = a.isWhole
-}
-
 private[math] trait ComplexIsTrig[@spec(Float, Double) A] extends Trig[Complex[A]] {
-  implicit def f: Fractional[A]
-  implicit def t: Trig[A]
-  implicit def r: IsReal[A]
+  implicit def algebra: Field[A]
+  implicit def nroot: NRoot[A]
+  implicit def trig: Trig[A]
+  implicit def order: IsReal[A]
 
-  def e: Complex[A] = new Complex[A](t.e, f.zero)
-  def pi: Complex[A] = new Complex[A](t.pi, f.zero)
+  def e: Complex[A] = new Complex[A](trig.e, algebra.zero)
+  def pi: Complex[A] = new Complex[A](trig.pi, algebra.zero)
 
   def exp(a: Complex[A]): Complex[A] = a.exp
-  def expm1(a: Complex[A]): Complex[A] = a.exp - f.one
+  def expm1(a: Complex[A]): Complex[A] = a.exp - algebra.one
   def log(a: Complex[A]): Complex[A] = a.log
-  def log1p(a: Complex[A]): Complex[A] = (a + f.one).log
+  def log1p(a: Complex[A]): Complex[A] = (a + algebra.one).log
 
   def sin(a: Complex[A]): Complex[A] = a.sin
   def cos(a: Complex[A]): Complex[A] = a.cos
@@ -665,32 +666,42 @@ private[math] trait ComplexIsTrig[@spec(Float, Double) A] extends Trig[Complex[A
 }
 
 private[math] trait ComplexIsNRoot[A] extends NRoot[Complex[A]] {
-  implicit def f: Fractional[A]
-  implicit def t: Trig[A]
-  implicit def r: IsReal[A]
+  implicit def algebra: Field[A]
+  implicit def nroot: NRoot[A]
+  implicit def trig: Trig[A]
+  implicit def order: IsReal[A]
+
   def nroot(a: Complex[A], k: Int): Complex[A] = a.nroot(k)
   override def sqrt(a: Complex[A]): Complex[A] = a.sqrt
   def fpow(a: Complex[A], b: Complex[A]): Complex[A] = a.pow(b)
 }
 
-@SerialVersionUID(0L)
+private[math] trait ComplexIsSigned[A] extends Signed[Complex[A]] {
+  implicit def algebra: Field[A]
+  implicit def nroot: NRoot[A]
+  implicit def order: IsReal[A]
+
+  def signum(a: Complex[A]): Int = a.signum
+  def abs(a: Complex[A]): Complex[A] = Complex[A](a.abs, algebra.zero)
+}
+
+@SerialVersionUID(1L)
 private[math] class ComplexEq[A: Eq] extends Eq[Complex[A]] with Serializable {
   def eqv(x: Complex[A], y: Complex[A]) = x eqv y
   override def neqv(x: Complex[A], y: Complex[A]) = x neqv y
 }
 
-private[math] trait ComplexIsSigned[A] extends Signed[Complex[A]] {
-  implicit def f: Fractional[A]
-  implicit def t: Trig[A]
-  implicit def r: IsReal[A]
+@SerialVersionUID(1L)
+private[math] final class ComplexIsRingImpl[@spec(Float,Double) A](implicit
+    val algebra: Ring[A], val order: IsReal[A]) extends ComplexIsRing[A] with Serializable
 
-  def signum(a: Complex[A]): Int = a.signum
-  def abs(a: Complex[A]): Complex[A] = Complex[A](a.abs, f.zero)
-}
+@SerialVersionUID(1L)
+private[math] final class ComplexIsFieldImpl[@spec(Float,Double) A](implicit
+    val algebra: Field[A], val order: IsReal[A]) extends ComplexIsField[A] with Serializable
 
-@SerialVersionUID(0L)
+@SerialVersionUID(1L)
 private[math] class ComplexAlgebra[@spec(Float, Double) A](implicit
-      val f: Fractional[A], val t: Trig[A], val r: IsReal[A])
+      val algebra: Field[A], val nroot: NRoot[A], val trig: Trig[A], val order: IsReal[A])
     extends ComplexIsField[A]
     with ComplexIsTrig[A]
     with ComplexIsNRoot[A]
@@ -698,9 +709,9 @@ private[math] class ComplexAlgebra[@spec(Float, Double) A](implicit
     with InnerProductSpace[Complex[A], A]
     with FieldAlgebra[Complex[A], A]
     with Serializable {
-  def scalar = f
-  def nroot = f
+  def scalar = algebra
   def timesl(a: A, v: Complex[A]): Complex[A] = Complex(a, scalar.zero) * v
   def dot(x: Complex[A], y: Complex[A]): A =
     scalar.plus(scalar.times(x.real, y.real), scalar.times(x.imag, y.imag))
+  override def pow(a: Complex[A], b: Int): Complex[A] = a.pow(b)
 }

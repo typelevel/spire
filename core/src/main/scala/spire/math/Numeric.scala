@@ -108,21 +108,25 @@ with ConvertableFromAlgebraic with ConvertableToAlgebraic with AlgebraicIsReal w
 }
 
 @SerialVersionUID(0L)
-class ComplexIsNumeric[A](implicit val f:Fractional[A], val t:Trig[A], val r:IsReal[A])
+class ComplexIsNumeric[A](implicit
+    val algebra: Fractional[A], val trig: Trig[A], val order: IsReal[A])
 extends ComplexEq[A] with ComplexIsField[A] with Numeric[Complex[A]]
 with ComplexIsTrig[A] with ComplexIsNRoot[A]
 with ConvertableFromComplex[A] with ConvertableToComplex[A]
 with Order[Complex[A]] with ComplexIsSigned[A] with Serializable {
+  def nroot: NRoot[A] = algebra
+
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
-  override def fromDouble(n: Double): Complex[A] = Complex[A](f.fromDouble(n))
+  override def fromDouble(n: Double): Complex[A] = Complex[A](algebra.fromDouble(n))
 
   override def eqv(x: Complex[A], y: Complex[A]): Boolean = x == y
   override def nroot(a: Complex[A], n: Int) = a.pow(reciprocal(fromInt(n)))
 
-  // override def gt(x:Complex[A], y:Complex[A]) = throw new UnsupportedOperationException("undefined")
-  // override def gteqv(x:Complex[A], y:Complex[A]) = throw new UnsupportedOperationException("undefined")
-  // override def lt(x:Complex[A], y:Complex[A]) = throw new UnsupportedOperationException("undefined")
-  // override def lteqv(x:Complex[A], y:Complex[A]) = throw new UnsupportedOperationException("undefined")
   def compare(x:Complex[A], y:Complex[A]): Int =
     if (x eqv y) 0 else throw new UnsupportedOperationException("undefined")
+
+  def ceil(a: Complex[A]): Complex[A] = a.ceil
+  def floor(a: Complex[A]): Complex[A] = a.floor
+  def isWhole(a: Complex[A]): Boolean = a.isWhole
+  def round(a: Complex[A]): Complex[A] = a.round
 }
