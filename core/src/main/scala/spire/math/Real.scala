@@ -99,6 +99,8 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     })
   }
 
+  def **(k: Int): Real = pow(k)
+
   def pow(k: Int): Real = {
     def loop(b: Real, k: Int, extra: Real): Real =
       if (k == 1)
@@ -249,12 +251,15 @@ object Real {
   val four: Real = Exact(Rational(4))
 
   def apply(f: Int => SafeLong): Real = Inexact(f)
-  def apply(n: Long): Real = Exact(Rational(n))
-  def apply(n: BigInt): Real = Exact(Rational(n))
-  def apply(n: SafeLong): Real = Exact(Rational(n))
-  def apply(n: Rational): Real = Exact(n)
-  def apply(n: Double): Real = Exact(Rational(n))
-  def apply(n: BigDecimal): Real = Exact(Rational(n))
+
+  implicit def apply(n: Int): Real = Exact(Rational(n))
+  implicit def apply(n: Long): Real = Exact(Rational(n))
+  implicit def apply(n: BigInt): Real = Exact(Rational(n))
+  implicit def apply(n: SafeLong): Real = Exact(Rational(n))
+  implicit def apply(n: Rational): Real = Exact(n)
+  implicit def apply(n: Double): Real = Exact(Rational(n))
+  implicit def apply(n: BigDecimal): Real = Exact(Rational(n))
+
   def apply(s: String): Real = Exact(Rational(s))
 
   lazy val pi: Real = Real(16) * atan(Real(Rational(1, 5))) - Real.four * atan(Real(Rational(1, 239)))
@@ -508,7 +513,7 @@ object Real {
     def cosh(x: Real): Real = Real.cosh(x)
     def e: Real = Real.e
     def exp(x: Real): Real = Real.exp(x)
-    def expm1(x: Real): Real = Real.exp(Real.one) - Real.one
+    def expm1(x: Real): Real = Real.exp(x) - Real.one
     def log(x: Real): Real = Real.log(x)
     def log1p(x: Real): Real = Real.log(Real.one + x)
     def pi: Real = Real.pi

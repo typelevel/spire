@@ -31,7 +31,7 @@ trait ByteOrder extends Order[Byte] {
   override def gteqv(x: Byte, y: Byte) = x >= y
   override def lt(x: Byte, y: Byte) = x < y
   override def lteqv(x: Byte, y: Byte) = x <= y
-  def compare(x: Byte, y: Byte) = java.lang.Byte.compare(x, y)
+  def compare(x: Byte, y: Byte) = x - y
 }
 
 trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned {
