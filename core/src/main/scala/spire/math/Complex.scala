@@ -101,9 +101,9 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
    * This returns the sign of `real` if it is not 0, otherwise it returns the
    * sign of `imag`.
    */
-  def signum(implicit o: IsReal[T]): Int = {
-    val realSgn = real.signum
-    if (realSgn == 0) imag.signum else realSgn
+  def signum(implicit o: IsReal[T]): Int = real.signum match {
+    case 0 => imag.signum
+    case n => n
   }
 
   /**
@@ -111,10 +111,8 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
    * 
    * `sgn(z) = z / abs(z) = abs(z) / z`
    */
-  def complexSignum(implicit f: Field[T], o: IsReal[T], n: NRoot[T]): Complex[T] = {
-    val a = abs
-    if (a.isZero) this else this / a
-  }
+  def complexSignum(implicit f: Field[T], o: IsReal[T], n: NRoot[T]): Complex[T] =
+    if (isZero) this else this / abs
 
   def abs(implicit f: Field[T], o: IsReal[T], n: NRoot[T]): T =
     (real * real + imag * imag).sqrt
@@ -143,6 +141,8 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
   def -(rhs: T)(implicit r: Rng[T]): Complex[T] = new Complex(real - rhs, imag)
   def *(rhs: T)(implicit r: Semiring[T]): Complex[T] = new Complex(real * rhs, imag * rhs)
   def /(rhs: T)(implicit r: Field[T]): Complex[T] = new Complex(real / rhs, imag / rhs)
+
+  // TODO: instead of floor should be round-toward-zero
 
   def /~(rhs: T)(implicit f: Field[T], o: IsReal[T]): Complex[T] = (this / rhs).floor
   def %(rhs: T)(implicit f: Field[T], o: IsReal[T]): Complex[T] = this - (this /~ rhs) * rhs
@@ -339,7 +339,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
 
   def isWhole: Boolean = sillyIsZero(imag) && realScalaNum.isWhole
 
-  def underlying: (T, T) = (real, imag)
+  def underlying: Object = this
 
   override final def isValidInt: Boolean =
     sillyIsZero(imag) && realScalaNum.isValidInt
