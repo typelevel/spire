@@ -229,6 +229,8 @@ trait Polynomial[@spec(Double) C] { lhs =>
   def /%(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): (Polynomial[C], Polynomial[C])
   def %(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = (lhs /% rhs)._2
 
+  def **(k: Int)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = pow(k)
+
   def pow(k: Int)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = {
     def loop(b: Polynomial[C], k: Int, extra: Polynomial[C]): Polynomial[C] =
       if (k == 1)

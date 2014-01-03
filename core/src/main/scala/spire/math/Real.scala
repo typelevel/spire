@@ -99,6 +99,8 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     })
   }
 
+  def **(k: Int): Real = pow(k)
+
   def pow(k: Int): Real = {
     def loop(b: Real, k: Int, extra: Real): Real =
       if (k == 1)

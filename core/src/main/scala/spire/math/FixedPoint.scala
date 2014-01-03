@@ -205,6 +205,8 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def toRational(implicit scale: FixedScale): Rational =
     Rational(long, scale.denom)
 
+  def **(k: Int)(implicit scale: FixedScale): FixedPoint = pow(k)
+
   def pow(k: Int)(implicit scale: FixedScale): FixedPoint = {
     if (k < 0)
       throw new IllegalArgumentException("exponent %s not allowed" format k)
