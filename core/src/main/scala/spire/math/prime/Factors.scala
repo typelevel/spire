@@ -5,7 +5,6 @@ import spire.algebra.Sign.{Negative, Zero, Positive}
 import spire.math.SafeLong
 import spire.std.int._
 import spire.std.map._
-import spire.syntax.cfor._
 import spire.syntax.std.seq._
 import spire.syntax.nroot._
 import spire.syntax.rng._
@@ -58,7 +57,10 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
 
   def get(p: SafeLong): Int = factors.getOrElse(p, 0)
 
-  def compare(rhs: Factors): Int = lhs.value compare rhs.value
+  def compare(rhs: Factors): Int = {
+    val n = lhs.signum - rhs.signum
+    if (n == 0) lhs.value compare rhs.value else n
+  }
 
   def compare(rhs: Int): Int =
     sign match {
@@ -97,7 +99,7 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
   def *(rhs: Factors): Factors =
     Factors(lhs.factors + rhs.factors, lhs.sign * rhs.sign)
   def *(rhs: SafeLong): Factors =
-    Factors(factors.updated(rhs, factors.getOrElse(rhs, 0) + 1), sign)
+    lhs * Factors(rhs)
 
   private[prime] def qm(rhs: Factors): (Int, Map[SafeLong, Int], Map[SafeLong, Int], Map[SafeLong, Int]) = {
     val sign = (lhs.sign * rhs.sign).toInt
@@ -110,33 +112,36 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
 
   def /(rhs: Factors): Factors = {
     val (sign, nn, dd, cc) = qm(rhs)
-    if (dd.isEmpty) Factors(nn, sign)
-    else Factors((prod(nn) * sign) / prod(dd))
+    if (dd.isEmpty) Factors(nn, sign) else Factors((prod(nn) * sign) / prod(dd))
   }
 
   def /(rhs: SafeLong): Factors =
     factors.get(rhs) match {
-      case Some(1) => Factors(factors - rhs, sign)
-      case Some(n) => Factors(factors.updated(rhs, n - 1), sign)
-      case None => Factors(lhs.value / rhs)
+      case Some(1) =>
+        Factors(factors - rhs, sign)
+      case Some(n) =>
+        Factors(factors.updated(rhs, n - 1), sign)
+      case None =>
+        val n = lhs.value / rhs
+        if (n < rhs) Factors(n) else lhs / Factors(rhs)
     }
 
   def %(rhs: Factors): Factors = {
-    val (sign, nn, dd, cc) = qm(rhs)
+    val (_, nn, dd, cc) = qm(rhs)
     if (dd.isEmpty) Factors.zero
-    else Factors(((prod(nn) * sign) % prod(dd)) * prod(cc))
+    else Factors(((prod(nn) * lhs.signum) % prod(dd)) * prod(cc))
   }
 
   def %(rhs: SafeLong): Factors =
-    if (factors.contains(rhs)) Factors.zero else Factors(lhs.value % rhs)
+    lhs % Factors(rhs)
 
   def /%(rhs: Factors): (Factors, Factors) = {
     val (sign, nn, dd, cc) = qm(rhs)
     if (dd.isEmpty) {
       (Factors(nn, sign), Factors.zero)
     } else {
-      val (q, m) = (prod(nn) * sign) /% prod(dd)
-      (Factors(q), Factors(m * prod(cc)))
+      val (q, m) = prod(nn) /% prod(dd)
+      (Factors(q) * sign, Factors(m * prod(cc)) * lhs.signum)
     }
   }
 
