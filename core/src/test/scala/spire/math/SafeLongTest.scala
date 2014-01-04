@@ -38,6 +38,14 @@ class SafeLongTest extends PropSpec with Matchers with GeneratorDrivenPropertyCh
     }
   }
 
+  property("x /% y") {
+    forAll { (x: Long, y: Long) =>
+      if (y != 0) {
+        SafeLong(x) /% SafeLong(y) shouldBe BigInt(x) /% BigInt(y)
+      }
+    }
+  }
+
   property("x ** y") {
     forAll { (x: Long, y: Int) =>
       val exp: Int = y.abs % 64

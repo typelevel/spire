@@ -201,8 +201,15 @@ private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong w
   else
     SafeLongBigInt(Long.MaxValue) + 1
 
-  def %(y: Long): SafeLong = SafeLongLong(x % y)
-  def /%(y: Long) = (SafeLongLong(x / y), SafeLongLong(x % y))
+  def %(y: Long): SafeLong = if (x == Long.MinValue && y == -1L)
+    SafeLongLong(0L)
+  else
+    SafeLongLong(x % y)
+
+  def /%(y: Long) = if (x == Long.MinValue && y == -1L)
+    (-SafeLongLong(x), SafeLongLong(0L))
+  else
+    (SafeLongLong(x / y), SafeLongLong(x % y))
 
   def &(y: Long): SafeLong = SafeLongLong(x & y)
   def |(y: Long): SafeLong = SafeLongLong(x | y)
