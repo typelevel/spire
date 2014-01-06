@@ -51,7 +51,26 @@ trait FastLevel3 extends Level3 {
    */
   object GEBP {
 
-    type Buffer = FastLevel3Blocking#Buffer
+    import sun.misc.Unsafe
+    // Using Unsafe.getUnsafe restrics users to trusted code,
+    // hence this hack!
+    private val unsafe = {
+      val fld = classOf[Unsafe].getDeclaredField("theUnsafe")
+      fld.setAccessible(true)
+      fld.get(classOf[Unsafe]).asInstanceOf[Unsafe]
+    }
+
+    private def get(p:Long, i:Int) = unsafe.getDouble(p + i*8)
+
+    private def put(p:Long, i:Int, v:Double) { unsafe.putDouble(p + i*8, v) }
+
+    object Buffer {
+      def create(size:Int) = unsafe.allocateMemory(size*8)
+
+      def resize(start:Long, size:Int) = unsafe.reallocateMemory(start, size*8)
+
+      def free(start:Long) { unsafe.freeMemory(start) }
+    }
 
     /**
      * Cut the matrix a in slices of nr columns, with a row-major arrangement
@@ -65,12 +84,14 @@ trait FastLevel3 extends Level3 {
      *    16 17 18 19   36 37 38 39   44 49
      * </pre>
      *
+     * This packed layout is stored in the buffer starting at address aa
+     *
      * Requirement: nr == 2 or 4
      */
-    def packColumnSlices(a:Matrix, nr:Int, aa:Buffer) {
+    def packColumnSlices(a:Matrix, nr:Int, aa:Long) {
       val (m,n) = a.dimensions
       val nn = (n/nr)*nr
-      var s = 0
+      var paa = aa
       val ld = a.ld
       val o = a.start
       val e = a.elements
@@ -82,18 +103,18 @@ trait FastLevel3 extends Level3 {
         val r2 = o + (j+2)*ld
         val r3 = o + (j+3)*ld
         cforRange(0 until m) { i =>
-                      aa(s+0) = e(r0+i)
-                      aa(s+1) = e(r1+i)
-          if(nr == 4) aa(s+2) = e(r2+i)
-          if(nr == 4) aa(s+3) = e(r3+i)
-          s += nr
+                      put(paa, 0, e(r0+i))
+                      put(paa, 1, e(r1+i))
+          if(nr == 4) put(paa, 2, e(r2+i))
+          if(nr == 4) put(paa, 3, e(r3+i))
+          paa += nr * 8
         }
       }
       cforRange(nn until n) { j =>
         val r0 = o + (j+0)*ld
         cforRange(0 until m) { i =>
-          aa(s) = e(r0+i)
-          s += 1
+          put(paa, 0, e(r0+i))
+          paa += 1 * 8
         }
       }
     }
@@ -111,32 +132,34 @@ trait FastLevel3 extends Level3 {
      *      20 21 22 23 24
      *      25 26 27 28 29
      *      30 31 32 33 34
+     * </pre>
+     *
+     * This packed layout is stored in the buffer starting at address bb
      *
      * Requirement: mr == 2 or 4
-     * </pre>
      */
-    def packRowSlices(a:Matrix, mr:Int, aa:Buffer) {
+    def packRowSlices(a:Matrix, mr:Int, aa:Long) {
+      val unsafe = this.unsafe
       val (m,n) = a.dimensions
       val mm = (m/mr)*mr
-      var s = 0
+      var paa = aa
       val ld = a.ld
       val e = a.elements
       //cforRange(0 until mm by mr) { i =>
       cfor(0)(_ < mm, _ + mr) { i =>
         cforRange(0 until n) { j =>
           val r = i + j*ld
-                      aa(s+0) = e(r+0)
-                      aa(s+1) = e(r+1)
-          if(mr == 4) aa(s+2) = e(r+2)
-          if(mr == 4) aa(s+3) = e(r+3)
-          s += mr
+                      put(paa, 0, e(r+0))
+                      put(paa, 1, e(r+1))
+          if(mr == 4) put(paa, 2, e(r+2))
+          if(mr == 4) put(paa, 3, e(r+3))
+          paa += mr * 8
         }
       }
       cforRange(mm until m) { i =>
         cforRange(0 until n) { j =>
-          val r = i + j*ld
-          aa(s+0) = e(r+0)
-          s += 1
+          put(paa, 0, a(i,j))
+          paa += 1 * 8
         }
       }
     }
@@ -145,8 +168,9 @@ trait FastLevel3 extends Level3 {
      * Perform the actual block-panel product
      *
      * This computes C(0:mc, 0:n) = A(0:mc, 0:kc) B(0:kc, 0:n)
-     * A(0:mc, 0:kc) shall have been stored in aa by packA
-     * and B(0:kc, 0:n) shall have been stored in bb by packB.
+     * A(0:mc, 0:kc) shall have been stored in a buffer starting at
+     * address aa by packA and B(0:kc, 0:n) shall have been stored in a
+     * buffer starting at address bb by packB.
      * The result is accumulated in C'(i1:i1+mc, 0:n):
      *   C'(i1:i1+mc, 0:n) = α C'(i1:i1+mc, 0:n) + β C(0:mc, 0:n)
      *
@@ -163,8 +187,9 @@ trait FastLevel3 extends Level3 {
      * core/products/GeneralBlockPanelKernel.h
      */
     def apply(kc:Int, mr:Int, nr:Int,
-              alpha:Double, aa:Buffer, bb:Buffer, beta:Double, c:Matrix)
+              alpha:Double, aa:Long, bb:Long, beta:Double, c:Matrix)
     {
+      val unsafe = this.unsafe
       val (mc, n) = c.dimensions
       val m2 = (mc/2)*2
       val k4 = (kc/4)*4
@@ -191,107 +216,27 @@ trait FastLevel3 extends Level3 {
           //                     [ c4 c5 c6 c7 ]
           var c0, c1, c2, c3, c4, c5, c6, c7 = 0.0
 
-          // Compute C(i:i+2, j:j+4) += A(i:i+2, 0:k4) B(0:k4, j:j+4)
-          // as a sum of [2 x 4] [4 x 4] matrix products
-          var paa = i*kc
-          var pbb = j*kc
-          cforRange(0 until k4 by 4) { p =>
-            // Compute C(i:i+2, j:j+4) += A(i:i+2, p:p+4) B(p:p+4, j:j+4)
-            // --------\/-------------    -----\/-------  -------\/-----
-            //         cw                      aw                bw
-            //
-            // this is the unrolled version of:
-            // for k = 1..4
-            //   load aw(:,k)
-            //   for j = 1..4
-            //     cw(:,j) += aw(:,k) b(k,j)
-            //
-            // Thus aw and bw are expected to be packed column- and row-major
-            // respectively (the packing of aa and bb prior to calling this
-            // function should have laid out elements in that manner).
-            var a0 = aa(paa+0)
-            var a1 = aa(paa+1)
-            var b0 = bb(pbb+0)
-            var b1 = bb(pbb+1)
+          var paa = aa + i*kc * 8
+          var pbb = bb + j*kc * 8
+          cforRange(0 until kc) { p =>
+            val a0 = get(paa, 0)
+            val a1 = get(paa, 1)
+            val b0 = get(pbb, 0)
+            val b1 = get(pbb, 1)
+            val b2 = get(pbb, 2)
+            val b3 = get(pbb, 3)
             c0 += a0*b0
-            var b2 = bb(pbb+2)
-            c4 += a1*b0
-            var b3 = bb(pbb+3)
-            b0 = bb(pbb+4)
             c1 += a0*b1
-            c5 += a1*b1
-            b1 = bb(pbb+5)
             c2 += a0*b2
-            c6 += a1*b2
-            b2 = bb(pbb+6)
             c3 += a0*b3
-            a0 = aa(paa+2)
-            c7 += a1*b3
-            a1 = aa(paa+3)
-            b3 = bb(pbb+7)
-            c0 += a0*b0
             c4 += a1*b0
-            b0 = bb(pbb+8)
-            c1 += a0*b1
             c5 += a1*b1
-            b1 = bb(pbb+9)
-            c2 += a0*b2
             c6 += a1*b2
-            b2 = bb(pbb+10)
-            c3 += a0*b3
-            a0 = aa(paa+4)
-            c7 += a1*b3
-            a1 = aa(paa+5)
-            b3 = bb(pbb+11)
-            c0 += a0*b0
-            c4 += a1*b0
-            b0 = bb(pbb+12)
-            c1 += a0*b1
-            c5 += a1*b1
-            b1 = bb(pbb+13)
-            c2 += a0*b2
-            c6 += a1*b2
-            b2 = bb(pbb+14)
-            c3 += a0*b3
-            a0 = aa(paa+6)
-            c7 += a1*b3
-            a1 = aa(paa+7)
-            b3 = bb(pbb+15)
-            c0 += a0*b0
-            c4 += a1*b0
-            c1 += a0*b1
-            c5 += a1*b1
-            c2 += a0*b2
-            c6 += a1*b2
-            c3 += a0*b3
-            c7 += a1*b3
-
-            // next pair of blocks
-            paa += 8
-            pbb += 16
-          }
-
-          // Compute C(i:i+2, j:j+4) += A(i:i+2, k4:kc) B(k4:kc, j:j+4)
-          // one index p at a time
-          cforRange(k4 until kc) { p =>
-            val a0 = aa(paa)
-            val a1 = aa(paa+1)
-            val b0 = bb(pbb)
-            val b1 = bb(pbb+1)
-            c0 += a0*b0
-            val b2 = bb(pbb+2)
-            c4 += a1*b0
-            val b3 = bb(pbb+3)
-            c1 += a0*b1
-            c5 += a1*b1
-            c2 += a0*b2
-            c6 += a1*b2
-            c3 += a0*b3
             c7 += a1*b3
 
             // next line
-            paa += 2
-            pbb += 4
+            paa += 2 * 8
+            pbb += 4 * 8
           }
 
           // Store result:
@@ -333,67 +278,22 @@ trait FastLevel3 extends Level3 {
           val r2 = r1 + ldC
           val r3 = r2 + ldC
 
-          // Compute C(m2, j:j+4) += A(m2, 0:k4) B(0:k4, j:j+4)
-          var paa = m2*kc
-          var pbb = j*kc
-          cforRange(0 until k4 by 4) { p =>
-            var a0 = aa(paa+0)
-            var b0 = bb(pbb+0)
-            var b1 = bb(pbb+1)
-            c0 += a0*b0
-            var b2 = bb(pbb+2)
-            var b3 = bb(pbb+3)
-            b0 = bb(pbb+4)
-            c1 += a0*b1
-            b1 = bb(pbb+5)
-            c2 += a0*b2
-            b2 = bb(pbb+6)
-            c3 += a0*b3
-            a0 = aa(paa+1)
-            b3 = bb(pbb+7)
-            c0 += a0*b0
-            b0 = bb(pbb+8)
-            c1 += a0*b1
-            b1 = bb(pbb+9)
-            c2 += a0*b2
-            b2 = bb(pbb+10)
-            c3 += a0*b3
-            a0 = aa(paa+2)
-            b3 = bb(pbb+11)
-            c0 += a0*b0
-            b0 = bb(pbb+12)
-            c1 += a0*b1
-            b1 = bb(pbb+13)
-            c2 += a0*b2
-            b2 = bb(pbb+14)
-            c3 += a0*b3
-            a0 = aa(paa+3)
-            b3 = bb(pbb+15)
-            c0 += a0*b0
-            c1 += a0*b1
-            c2 += a0*b2
-            c3 += a0*b3
-
-            // next pair of blocks
-            paa += 4
-            pbb += 16
-          }
-
-          // Compute C(m2, j:j+4) += A(m2, k4:k) B(k4:k, j:j+4)
-          cforRange(k4 until kc) { p =>
-            val a0 = aa(paa)
-            val b0 = bb(pbb+0)
-            val b1 = bb(pbb+1)
-            val b2 = bb(pbb+2)
-            val b3 = bb(pbb+3)
+          var paa = aa + m2*kc * 8
+          var pbb = bb + j*kc  * 8
+          cforRange(0 until kc) { p =>
+            val a0 = get(paa, 0)
+            val b0 = get(pbb, 0)
+            val b1 = get(pbb, 1)
+            val b2 = get(pbb, 2)
+            val b3 = get(pbb, 3)
             c0 += a0*b0
             c1 += a0*b1
             c2 += a0*b2
             c3 += a0*b3
 
             // next line
-            paa += 1
-            pbb += 4
+            paa += 1 * 8
+            pbb += 4 * 8
           }
 
           // Store result:
@@ -428,16 +328,16 @@ trait FastLevel3 extends Level3 {
           //   C(i:i+2, j) = [ c0 ]
           //                 [ c4 ]
           var c0, c4 = 0.0
-          var paa = i*kc
-          var pbb = j*kc
+          var paa = aa + i*kc * 8
+          var pbb = bb + j*kc * 8
           cforRange(0 until kc) { p =>
-            val a0 = aa(paa)
-            val a1 = aa(paa+1)
-            val b0 = bb(pbb)
+            val a0 = get(paa, 0)
+            val a1 = get(paa, 1)
+            val b0 = get(pbb, 0)
             c0 += a0*b0
             c4 += a1*b0
-            pbb += 1
-            paa += 2
+            pbb += 1 * 8
+            paa += 2 * 8
           }
 
           // Store results in C
@@ -456,14 +356,14 @@ trait FastLevel3 extends Level3 {
         if(m2 != mc) {
           var c0 = 0.0
           var r0 = startC + m2 + j*ldC
-          var paa = m2*kc
-          var pbb = j*kc
+          var paa = aa + m2*kc * 8
+          var pbb = bb + j*kc  * 8
           cforRange(0 until kc) { p =>
-            val a0 = aa(paa)
-            val b0 = bb(pbb)
+            val a0 = get(paa, 0)
+            val b0 = get(pbb, 0)
             c0 += a0*b0
-            pbb += 1
-            paa += 1
+            pbb += 1 * 8
+            paa += 1 * 8
           }
           c0 *= alpha
           if(beta == 1) cc(r0) += c0 else cc(r0) = beta*cc(r0) + c0
@@ -560,18 +460,19 @@ object FastLevel3 extends FastLevel3
 class FastLevel3Blocking(val mc:Int, val kc:Int,
                          val mr:Int, val nr:Int,
                          val np:Int) {
-  type Buffer = Array[Double]
+
+  val Buffer = FastLevel3.GEBP.Buffer
 
   /** Buffer to store a block of A of size mc x kc */
-  val bufferA = new Buffer(mc*kc)
+  val bufferA = Buffer.create(mc*kc)
 
-  private var actualBufferB = new Buffer(kc*np)
+  private var actualBufferB = Buffer.create(kc*np)
   private var actualBufferBCols = np
 
   /** Buffer to store a panel of B of size kc x n */
   def bufferB(n:Int) = {
     if(n >= actualBufferBCols) {
-      actualBufferB = new Buffer(kc*n)
+      actualBufferB = Buffer.resize(actualBufferB, kc*n)
       actualBufferBCols = n
     }
     actualBufferB
