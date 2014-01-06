@@ -42,7 +42,7 @@ object MatrixMultiplicationBenchmarks {
     } yield dims
 
   def main(args:Array[String]) {
-    val (lo, hi) = if(args.size == 0) (3, 8)
+    val (lo, hi) = if(args.size == 0) (1, 8)
                    else (args(0).toInt, args(1).toInt)
     println("Gflop/s for product of two n x n matrices")
     println("-----------------------------------------")
