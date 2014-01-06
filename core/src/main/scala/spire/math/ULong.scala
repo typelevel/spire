@@ -51,6 +51,13 @@ class ULong(val signed: Long) extends AnyVal {
   else
     signed.toDouble
 
+  final def toNatural: Natural = Natural(signed)
+
+  final def toSafeLong: SafeLong = if (signed >= 0)
+    SafeLong(signed)
+  else
+    SafeLong(ULong.bigIntOffset + (signed & Long.MaxValue))
+
   final def toBigInt: BigInt = if (signed >= 0)
     BigInt(signed)
   else
