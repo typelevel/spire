@@ -117,7 +117,8 @@ trait FastLevel3 extends Level3 {
      *
      * This packed layout is stored in the buffer starting at address aa
      *
-     * Requirement: nr == 2 or 4
+     * Requirement: nr == 2 or 4. Not enforced for performance reason,
+     * i.e. using any other value will lead to disaster.
      */
     def packColumnSlices(a:Matrix, nr:Int, aa:Long) {
       val (m,n) = a.dimensions
@@ -167,7 +168,8 @@ trait FastLevel3 extends Level3 {
      *
      * This packed layout is stored in the buffer starting at address bb
      *
-     * Requirement: mr == 2 or 4
+     * Requirement: mr == 2 or 4. Not enforced for performance reason,
+     * i.e. using any other value will lead to disaster.
      */
     def packRowSlices(a:Matrix, mr:Int, aa:Long) {
       val unsafe = this.unsafe
@@ -215,6 +217,9 @@ trait FastLevel3 extends Level3 {
      *
      * This code is adapted from Eigen gebp_kernel in
      * core/products/GeneralBlockPanelKernel.h
+     *
+     * Requirement: mr == 2 and nr == 4. Not enforced for performance reason,
+     * i.e. using any other value will lead to disaster.
      */
     def apply(kc:Int, mr:Int, nr:Int,
               alpha:Double, aa:Long, bb:Long, beta:Double, c:Matrix)
@@ -246,6 +251,17 @@ trait FastLevel3 extends Level3 {
           //                     [ c4 c5 c6 c7 ]
           var c0, c1, c2, c3, c4, c5, c6, c7 = 0.0
 
+          // Implementation from [1] and [3] unroll the loops by hand
+          // and carefully interspred the get's with the arithmetic operations
+          // so as to reduce dependencies, which makes the code more efficient
+          // on the superscalar pipelined processors of this era. But the JIT
+          // does not respect this ordering and tries to figure it out on its
+          // own, with little success because the unrolled code ends up being
+          // too complex. For example, c0, c1, ..., c7 end up being stored on
+          // the stack instead of being held in registers, with disastrous
+          // consequences for performance.
+          //
+          // Hence keep it simple to help the JIT makes the right decisions.
           var paa = aa + i*kc * 8
           var pbb = bb + j*kc * 8
           cforRange(0 until kc) { p =>
