@@ -374,11 +374,26 @@ trait FastLevel3 extends Level3 {
 
   def gemm(transA:Transposition.Value, transB:Transposition.Value,
            alpha:Double, a:Matrix, b:Matrix,
-           beta:Double, c:Matrix) {
+           beta:Double, c:Matrix)
+  {
     checkGemmPreconditions(transA, transB, alpha, a, b, beta, c)
 
-    // trivial cases
     val (m, n) = c.dimensions
+    val k = if(transB == NoTranspose) b.dimensions._1 else b.dimensions._2
+
+    val blocking = FastLevel3Blocking()
+    val mc = blocking.mc
+    val kc = blocking.kc
+    val mr = blocking.mr
+    val nr = blocking.nr
+
+    // if matrices are too small, use the naive implementation
+    if(m*k*n < mr*kc + kc*nr) {
+      NaiveLevel3.gemm(transA, transB, alpha, a, b, beta, c)
+      return
+    }
+
+    // trivial cases
     if(alpha == 0) {
       if(beta == 0)
         cforRange2(0 until n, 0 until m) { (j,i) => c(i,j) = 0 }
@@ -388,13 +403,6 @@ trait FastLevel3 extends Level3 {
     }
 
     // Charge!
-    val k = if(transB == NoTranspose) b.dimensions._1 else b.dimensions._2
-    val blocking = FastLevel3Blocking()
-    val mc = blocking.mc
-    val kc = blocking.kc
-    val mr = blocking.mr
-    val nr = blocking.nr
-
     val aa = blocking.bufferA
     val bb = blocking.bufferB(n)
 
