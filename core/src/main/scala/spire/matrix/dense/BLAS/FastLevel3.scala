@@ -64,12 +64,43 @@ trait FastLevel3 extends Level3 {
 
     private def put(p:Long, i:Int, v:Double) { unsafe.putDouble(p + i*8, v) }
 
-    object Buffer {
-      def create(size:Int) = unsafe.allocateMemory(size*8)
+    def newBuffer(size:Int) = unsafe.allocateMemory(size*8)
 
-      def resize(start:Long, size:Int) = unsafe.reallocateMemory(start, size*8)
+    def resizeBuffer(start:Long,
+                     size:Int) = unsafe.reallocateMemory(start, size*8)
 
-      def free(start:Long) { unsafe.freeMemory(start) }
+    def freeBuffer(start:Long) { unsafe.freeMemory(start) }
+
+    /** The blocking policy and buffers used by GEBP */
+    class Blocking(val mc:Int, val kc:Int,
+                   val mr:Int, val nr:Int,
+                   val np:Int) {
+
+      /** Buffer to store a block of A of size mc x kc */
+      val bufferA = newBuffer(mc*kc)
+
+      private var actualBufferB = newBuffer(kc*np)
+      private var actualBufferBCols = np
+
+      /** Buffer to store a panel of B of size kc x n */
+      def bufferB(n:Int) = {
+        if(n >= actualBufferBCols) {
+          actualBufferB = resizeBuffer(actualBufferB, kc*n)
+          actualBufferBCols = n
+        }
+        actualBufferB
+      }
+
+      override def finalize() {
+        freeBuffer(bufferA)
+        freeBuffer(actualBufferB)
+      }
+    }
+
+    /** Provides per-thread instance of blocking */
+    val threadLocalBlocking = new ThreadLocal[Blocking] {
+        override def initialValue =
+          new Blocking(mc=512, kc=256, mr=2, nr=4, np=512)
     }
 
     /**
@@ -168,9 +199,8 @@ trait FastLevel3 extends Level3 {
      * Perform the actual block-panel product
      *
      * This computes C(0:mc, 0:n) = A(0:mc, 0:kc) B(0:kc, 0:n)
-     * A(0:mc, 0:kc) shall have been stored in a buffer starting at
-     * address aa by packA and B(0:kc, 0:n) shall have been stored in a
-     * buffer starting at address bb by packB.
+     * A(0:mc, 0:kc) (resp. B(0:kc, 0:n)) shall have been stored in a buffer
+     * starting at address aa (resp. bb) by packA (resp. packB).
      * The result is accumulated in C'(i1:i1+mc, 0:n):
      *   C'(i1:i1+mc, 0:n) = α C'(i1:i1+mc, 0:n) + β C(0:mc, 0:n)
      *
@@ -381,7 +411,7 @@ trait FastLevel3 extends Level3 {
     val (m, n) = c.dimensions
     val k = if(transB == NoTranspose) b.dimensions._1 else b.dimensions._2
 
-    val blocking = FastLevel3Blocking()
+    val blocking = GEBP.threadLocalBlocking.get()
     val mc = blocking.mc
     val kc = blocking.kc
     val mr = blocking.mr
@@ -463,38 +493,6 @@ trait FastLevel3 extends Level3 {
 
 /** Convenience object to enable `import` instead of `extends` */
 object FastLevel3 extends FastLevel3
-
-
-class FastLevel3Blocking(val mc:Int, val kc:Int,
-                         val mr:Int, val nr:Int,
-                         val np:Int) {
-
-  val Buffer = FastLevel3.GEBP.Buffer
-
-  /** Buffer to store a block of A of size mc x kc */
-  val bufferA = Buffer.create(mc*kc)
-
-  private var actualBufferB = Buffer.create(kc*np)
-  private var actualBufferBCols = np
-
-  /** Buffer to store a panel of B of size kc x n */
-  def bufferB(n:Int) = {
-    if(n >= actualBufferBCols) {
-      actualBufferB = Buffer.resize(actualBufferB, kc*n)
-      actualBufferBCols = n
-    }
-    actualBufferB
-  }
-}
-
-object FastLevel3Blocking {
-  private val tl = new ThreadLocal[FastLevel3Blocking] {
-    override def initialValue =
-      new FastLevel3Blocking(mc=512, kc=256, mr=2, nr=4, np=512)
-  }
-
-  def apply() = tl.get()
-}
 
 
 
