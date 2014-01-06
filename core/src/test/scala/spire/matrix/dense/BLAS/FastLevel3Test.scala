@@ -15,14 +15,13 @@ class FastGemmTest extends FunSuite {
   import BLAS.NaiveLevel3.{gemm => referenceGemm}
   import BLAS.FastLevel3.{gemm => fastGemm}
   implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
+  //implicit val gen = Defaults.IntegerGenerator.fromTime(1)
 
   test("Fast GEMM shall give the same results as reference GEMM") {
     val p2d = new ScalarUniformPowerOfTwoDistribution(minPower=0, maxPower=6)
     val elts = new RandomUncorrelatedElements(nonSpecialScalars = 1,
                                               scalars = p2d,
                                               elements = p2d)
-
-    val blocking = BLAS.FastLevel3Blocking()
 
     def pretty(trans:Transposition.Value, r:Int, s:Int) =
       s"[$r x $s]${if(trans == Transpose) "^T" else ""}"
