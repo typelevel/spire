@@ -200,23 +200,44 @@ trait FastLevel3 extends Level3 {
     /**
      * Perform the actual block-panel product
      *
-     * This computes C(0:mc, 0:n) = A(0:mc, 0:kc) B(0:kc, 0:n)
-     * A(0:mc, 0:kc) (resp. B(0:kc, 0:n)) shall have been stored in a buffer
+     * This computes C(0:mc, 0:n) = A(0:mc, 0:kc) B(0:kc, :)
+     * A(0:mc, 0:kc) (resp. B(0:kc, :)) shall have been stored in a buffer
      * starting at address aa (resp. bb) by packA (resp. packB).
-     * The result is accumulated in C'(i1:i1+mc, 0:n):
-     *   C'(i1:i1+mc, 0:n) = α C'(i1:i1+mc, 0:n) + β C(0:mc, 0:n)
+     * The result is accumulated in C'(i1:i1+mc, :):
+     *   C'(i1:i1+mc, :) = α C'(i1:i1+mc, :) + β C(0:mc, :)
      *
      * Implementation notes:
-     * the optimal value of mr on most modern processors according to [1]
-     * is mr = 4 (for double precision) but the kernel explicitly uses vector
-     * register holding 2 doubles, in effect applying the algorithm
-     * implemented here for mr = 2. We can't do that in Java, so we settle
-     * for mr = 2 with scalars for the time being. Furthermore, hardcoded
-     * for nr = 4 as well at the moment (because this is the optimal value on
-     * most modern processors).
+     *   1. the optimal value of mr on most modern processors according to [1]
+     *   is mr = 4 (for double precision) but the kernel explicitly uses vector
+     *   register holding 2 doubles, in effect applying the algorithm
+     *   implemented here for mr = 2. We can't do that in Java, so we settle
+     *   for mr = 2 with scalars for the time being. Furthermore, hardcoded
+     *   for nr = 4 as well at the moment (because this is the optimal value on
+     *   most modern processors).
      *
-     * This code is adapted from Eigen gebp_kernel in
-     * core/products/GeneralBlockPanelKernel.h
+     *   2. This code is adapted from Eigen gebp_kernel in
+     *   core/products/GeneralBlockPanelKernel.h
+     *
+     *   3. Using sun.misc.Unsafe for the buffers that store the
+     *   block A(0:mc, 0:kc) and the panel B(0:kc, :), as opposed to
+     *   using Array[Double], turns out to be essential here. A careful
+     *   comparison of the Intel assembly emitted by Hotspot 64-bit 23.7-b01
+     *   (shipped with JRE 1.7.0_17-b02) for the hottest loop when using
+     *   Array[Double] shows that many daload's result in a pair of instructions
+     *   like:
+     *         mov    r11,QWORD PTR [rsp+0xa0]
+     *         movsd  xmm13,QWORD PTR [r11+r8*8+0x10]
+     *   Thus an address is repeatedly fetched from the stack (mov), which is
+     *   then used to load the double precision float (movsd).
+     *   On the contrary, with Unsafe, there is only a movsd.
+     *
+     *   This has 2 adverse effects:
+     *     a. since the efficiency of GEBP hinges on those buffers filling as
+     *     much of the machine caches (TLB, L2 and L1) and staying there for
+     *     the whole execution of this method `apply`. The repeated fetching
+     *     from the stack dramatically kills performance;
+     *     b. increase the instruction count by about 1/3 and more importantly
+     *     clog up the pipeline with those useless mov's
      *
      * Requirement: mr == 2 and nr == 4. Not enforced for performance reason,
      * i.e. using any other value will lead to disaster.
@@ -251,15 +272,17 @@ trait FastLevel3 extends Level3 {
           //                     [ c4 c5 c6 c7 ]
           var c0, c1, c2, c3, c4, c5, c6, c7 = 0.0
 
+          // This is the hottest loop.
+          //
           // Implementation from [1] and [3] unroll the loops by hand
           // and carefully interspred the get's with the arithmetic operations
-          // so as to reduce dependencies, which makes the code more efficient
-          // on the superscalar pipelined processors of this era. But the JIT
-          // does not respect this ordering and tries to figure it out on its
-          // own, with little success because the unrolled code ends up being
-          // too complex. For example, c0, c1, ..., c7 end up being stored on
-          // the stack instead of being held in registers, with disastrous
-          // consequences for performance.
+          // so as to reduce dependencies between instructions,which makes the
+          // code more efficient on the superscalar pipelined processors of
+          // this era. But the JIT does not respect this ordering and tries
+          // to figure it out on its own, with little success because the
+          // unrolled code ends up being too complex. For example,
+          // c0, c1, ..., c7 end up being stored on the stack instead of being
+          // held in registers, with disastrous consequences for performance.
           //
           // Hence keep it simple to help the JIT makes the right decisions.
           var paa = aa + i*kc * 8
