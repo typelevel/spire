@@ -21,17 +21,14 @@ trait NaiveLevel3 extends Level3 {
            beta:Double, c:Matrix): Unit = {
     checkGemmPreconditions(transA, transB, alpha, a, b, beta, c)
 
-    // trivial cases
-    val (m, n) = c.dimensions
+    // trivial case
     if(alpha == 0) {
-      if(beta == 0)
-        cforRange2(0 until n, 0 until m) { (j,i) => c(i,j) = 0 }
-      else if(beta != 1)
-        cforRange2(0 until n, 0 until m) { (j,i) => c(i,j) *= beta }
+      trivialGemm(transA, transB, a, b, beta, c)
       return
     }
 
     // charge!
+    val (m, n) = c.dimensions
     val k = if(transB == NoTranspose) b.dimensions._1 else b.dimensions._2
     if (transB == NoTranspose) {
       if(transA == NoTranspose) {

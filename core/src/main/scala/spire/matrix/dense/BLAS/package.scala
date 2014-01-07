@@ -192,6 +192,20 @@ package object BLAS {
               else false)
     }
 
+    protected
+    def trivialGemm(transA:Transposition.Value, transB:Transposition.Value,
+                    a:Matrix, b:Matrix,
+                    beta:Double, c:Matrix) {
+      import spire.syntax.cfor._
+      val (m, n) = c.dimensions
+      if(beta == 0)
+        cforRange2(0 until n, 0 until m) { (j,i) => c(i,j) = 0 }
+      else if(beta != 1)
+        cforRange2(0 until n, 0 until m) { (j,i) => c(i,j) *= beta }
+      return
+
+    }
+
     /**
      * Symmetric rank-k updates
      *
