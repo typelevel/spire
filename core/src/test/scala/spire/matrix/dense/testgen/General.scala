@@ -110,6 +110,26 @@ extends TestDimensions(nonSpecialDimensions)(gen) {
       beta <- scalarSample
     } yield (transA, transB, alpha, a, b, beta, c, m, n, k)
   }
+
+  def triangularSystemSample = {
+    val shapes = for {
+      side <- Iterator(FromLeft, FromRight)
+      uplo <- Iterator(Lower, Upper)
+      trans <- Iterator(NoTranspose, Transpose)
+      diag <- Iterator(NonUnitDiagonal, UnitDiagonal)
+      m0 <- oneDimensionSample
+      n0 <- oneDimensionSample
+      (m,n) <- Seq((m0,n0), (m0+m0/3,n0), (m0, n0+n0/3)).distinct
+      flops = m*(m-1)/2*n
+    } yield (flops, side, uplo, trans, diag, m, n)
+    for {
+      (flops, side, uplo, trans, diag, m, n)
+        <- shapes.toSeq.sortWith(_._1 < _._1).iterator
+      a <- triangularMatrixSample(m, uplo, diag).take(1)
+      b <- generalMatrixSample(m, n).take(1)
+      alpha <- scalarSample
+    } yield (side, uplo, trans, diag, alpha, a, b, m, n)
+  }
 }
 
 trait CommonMatrixPropertyTests
