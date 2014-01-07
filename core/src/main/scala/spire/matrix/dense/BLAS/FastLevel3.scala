@@ -215,10 +215,7 @@ trait FastLevel3 extends Level3 {
      *   for nr = 4 as well at the moment (because this is the optimal value on
      *   most modern processors).
      *
-     *   2. This code is adapted from Eigen gebp_kernel in
-     *   core/products/GeneralBlockPanelKernel.h
-     *
-     *   3. Using sun.misc.Unsafe for the buffers that store the
+     *   2. Using sun.misc.Unsafe for the buffers that store the
      *   block A(0:mc, 0:kc) and the panel B(0:kc, :), as opposed to
      *   using Array[Double], turns out to be essential here. A careful
      *   comparison of the Intel assembly emitted by Hotspot 64-bit 23.7-b01
