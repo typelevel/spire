@@ -254,7 +254,17 @@ package object BLAS {
      */
     def trsm(side:Sides.Value, uplo:UpperOrLower.Value,
              trans:Transposition.Value, unit:DiagonalProperty.Value,
-             alpha:Double, a:Matrix, B:Matrix): Unit
+             alpha:Double, a:Matrix, b:Matrix): Unit
+
+    protected
+    def checkTrsmPreconditions(side:Sides.Value, uplo:UpperOrLower.Value,
+                               trans:Transposition.Value,
+                               unit:DiagonalProperty.Value,
+                               alpha:Double, a:Matrix, b:Matrix) {
+      require(a.isSquare)
+      if(side == fromLeft) require(a.dimensions._2 == b.dimensions._1)
+      else                 require(b.dimensions._2 == a.dimensions._1)
+    }
   }
 
 }

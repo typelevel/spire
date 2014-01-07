@@ -162,9 +162,7 @@ trait NaiveLevel3 extends Level3 {
   def trsm(side:Sides.Value, uplo:UpperOrLower.Value,
            trans:Transposition.Value, diag:DiagonalProperty.Value,
            alpha:Double, a:Matrix, b:Matrix) {
-    require(a.isSquare)
-    if(side == fromLeft) require(a.dimensions._2 == b.dimensions._1)
-    else                 require(b.dimensions._2 == a.dimensions._1)
+    checkTrsmPreconditions(side, uplo, trans, diag, alpha, a, b)
 
     val (m, n) = b.dimensions
 
