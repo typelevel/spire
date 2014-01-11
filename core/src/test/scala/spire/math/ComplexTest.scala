@@ -111,7 +111,6 @@ class ComplexTest extends FunSuite {
     val e_ipi = fc.pow(e, ipi)
     val z = fc.add(e_ipi, fc.one)
 
-    println((fc.real(z), fc.imag(z)))
     assert(fc.real(z) == 0.0F)
     assert(fc.imag(z) < 0.000000001F)
   }
@@ -135,5 +134,19 @@ class ComplexTest extends FunSuite {
     
     assert(z.real == 0.0F)
     assert(z.imag < 0.000000001F)
+  }
+
+  test("complex trigonometry") {
+    // these are just a spot check to avoid sign errors
+
+    assert(Complex(3.0, 5.0).sin == Complex(10.472508533940392, -73.46062169567367))
+    assert(Complex(3.0, -5.0).sin == Complex(10.472508533940392, 73.46062169567367))
+    assert(Complex(-3.0, 5.0).sin == Complex(-10.472508533940392, -73.46062169567367))
+    assert(Complex(-3.0, -5.0).sin == Complex(-10.472508533940392, 73.46062169567367))
+
+    assert(Complex(3.0, 5.0).cos == Complex(-73.46729221264526, -10.471557674805572))
+    assert(Complex(3.0, -5.0).cos == Complex(-73.46729221264526, 10.471557674805572))
+    assert(Complex(-3.0, 5.0).cos == Complex(-73.46729221264526, 10.471557674805572))
+    assert(Complex(-3.0, -5.0).cos == Complex(-73.46729221264526, -10.471557674805572))
   }
 }

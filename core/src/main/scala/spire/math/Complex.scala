@@ -281,21 +281,21 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
   def exp(implicit f: Field[T], t: Trig[T]): Complex[T] =
     new Complex(t.exp(real) * t.cos(imag), t.exp(real) * t.sin(imag))
 
-  // sin(a+ci) = (sin(a) * cosh(c)) + (-cos(a) * sinh(c))i
+  // sin(a+ci) = (sin(a) * cosh(c)) + (cos(a) * sinh(c))i
   def sin(implicit f: Field[T], t: Trig[T]): Complex[T] =
-    new Complex(t.sin(real) * t.cosh(imag), -t.cos(real) * t.sinh(imag))
+    new Complex(t.sin(real) * t.cosh(imag), t.cos(real) * t.sinh(imag))
 
-  // sinh(a+ci) = (sinh(a) * cos(c)) + (-cosh(a) * sin(c))i
+  // sinh(a+ci) = (sinh(a) * cos(c)) + (cosh(a) * sin(c))i
   def sinh(implicit f: Field[T], t: Trig[T]): Complex[T] =
-    new Complex(t.sinh(real) * t.cos(imag), -t.cosh(real) * t.sin(imag))
+    new Complex(t.sinh(real) * t.cos(imag), t.cosh(real) * t.sin(imag))
 
-  // cos(a+ci) = (cos(a) * cosh(c)) + (-sin(a) * sinh(c))i 
+  // cos(a+ci) = (cos(a) * cosh(c)) - (sin(a) * sinh(c))i 
   def cos(implicit f: Field[T], t: Trig[T]): Complex[T] =
     new Complex(t.cos(real) * t.cosh(imag), -t.sin(real) * t.sinh(imag))
 
-  // cosh(a+ci) = (cosh(a) * cos(c)) + (-sinh(a) * sin(c))i 
+  // cosh(a+ci) = (cosh(a) * cos(c)) + (sinh(a) * sin(c))i 
   def cosh(implicit f: Field[T], t: Trig[T]): Complex[T] =
-    new Complex(t.cosh(real) * t.cos(imag), -t.sinh(real) * t.sin(imag))
+    new Complex(t.cosh(real) * t.cos(imag), t.sinh(real) * t.sin(imag))
 
   // tan(a+ci) = (sin(a+a) + sinh(c+c)i) / (cos(a+a) + cosh(c+c))
   def tan(implicit f: Field[T], t: Trig[T]): Complex[T] = {
