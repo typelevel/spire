@@ -99,7 +99,8 @@ extends TestDimensions(nonSpecialDimensions)(gen) {
       flops = m*k*n
     } yield (flops, transA, transB, m, k, n)
     for {
-      (flops, transA, transB, m, k, n) <- shapes.toSeq.sortWith(_._1 < _._1)
+      (flops, transA, transB, m, k, n)
+        <- shapes.toSeq.sortWith(_._1 < _._1).iterator
       dimA = if(transA == NoTranspose) (m,k) else (k,m)
       dimB = if(transB == NoTranspose) (k,n) else (n,k)
       a <- generalMatrixSample(dimA).take(1)
