@@ -105,9 +105,10 @@ extends TestDimensions(nonSpecialDimensions)(gen) {
       dimB = if(transB == NoTranspose) (k,n) else (n,k)
       a <- generalMatrixSample(dimA).take(1)
       b <- generalMatrixSample(dimB).take(1)
+      c <- generalMatrixSample(m,n).take(1)
       alpha <- scalarSample
       beta <- scalarSample
-    } yield (transA, transB, alpha, a, b, beta, m, n, k)
+    } yield (transA, transB, alpha, a, b, beta, c, m, n, k)
   }
 }
 
