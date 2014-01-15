@@ -64,6 +64,12 @@ trait FastLevel3 extends Level3 {
 
     def put(p:Long, i:Int, v:Double) { unsafe.putDouble(p + i*8, v) }
 
+    def display(title:String, p:Long, size:Int) {
+      print(s"$title = {")
+      cforRange(0 until size) { i => print(GEBP.get(p, i)); print(", ") }
+      println("}")
+    }
+
     def newBuffer(size:Int) = unsafe.allocateMemory(size*8)
 
     def resizeBuffer(start:Long,
