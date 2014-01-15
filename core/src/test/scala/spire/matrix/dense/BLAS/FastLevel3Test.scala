@@ -36,11 +36,13 @@ class FastGemmTest extends FunSuite {
   val title = "Fast GEMM shall give the same results as reference GEMM"
 
   test(s"$title (small matrices") {
-    for((transA, transB, alpha, a, b, beta, c, m, n, k)
-          <- elts.matrixProductSample) {
-      val cRef = c.copyToMatrix
+    for {
+      (transA, transB, alpha, a, b, beta, c, m, n, k)
+          <- elts.matrixProductSample
+      cRef = c.copyToMatrix
+      cFast = c.copyToMatrix
+    } {
       referenceGemm(transA, transB, alpha, a, b, beta, cRef)
-      val cFast = c.copyToMatrix
       fastGemm(transA, transB, alpha, a, b, beta, cFast)
       assert(cFast == cRef,
              s"""|Expected $cRef but got $cFast with
@@ -57,10 +59,10 @@ class FastGemmTest extends FunSuite {
       (m,k,n) <- Iterator((mc+1, kc+1, 5), (mc+mc/2, kc+kc/2, 5))
       a <- elts.generalMatrixSample(m,k).take(1)
       b <- elts.generalMatrixSample(k,n).take(1)
+      cRef = Matrix.empty(m,n)
+      cFast = Matrix.empty(m,n)
     } {
-      val cRef = Matrix.empty(m,n)
       referenceGemm(NoTranspose, NoTranspose, 1.0, a, b, 0.0, cRef)
-      val cFast = Matrix.empty(m,n)
       fastGemm(NoTranspose, NoTranspose, 1.0, a, b, 0.0, cFast)
       assert(cFast == cRef,
              s"[$m x $k] [$k x $n]: fast GEMM disagrees with reference GEMM")
