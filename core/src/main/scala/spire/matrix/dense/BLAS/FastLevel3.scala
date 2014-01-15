@@ -212,11 +212,9 @@ trait FastLevel3 extends Level3 {
     /**
      * Perform the actual block-panel product
      *
-     * This computes C(0:mc, 0:n) = A(0:mc, 0:kc) B(0:kc, :)
-     * A(0:mc, 0:kc) (resp. B(0:kc, :)) shall have been stored in a buffer
-     * starting at address aa (resp. bb) by packA (resp. packB).
-     * The result is accumulated in C'(i1:i1+mc, :):
-     *   C'(i1:i1+mc, :) = α C'(i1:i1+mc, :) + β C(0:mc, :)
+     * This computes C += A B where C is mc x n, A is mc x kc and B is kc x n.
+     * A (resp. B) shall have been stored in a buffer starting at address aa (
+     * resp. bb) by packA (resp. packB).
      *
      * Implementation notes:
      *   1. the optimal value of mr on most modern processors according to [1]
@@ -227,13 +225,12 @@ trait FastLevel3 extends Level3 {
      *   for nr = 4 as well at the moment (because this is the optimal value on
      *   most modern processors).
      *
-     *   2. Using sun.misc.Unsafe for the buffers that store the
-     *   block A(0:mc, 0:kc) and the panel B(0:kc, :), as opposed to
-     *   using Array[Double], turns out to be essential here. A careful
-     *   comparison of the Intel assembly emitted by Hotspot 64-bit 23.7-b01
-     *   (shipped with JRE 1.7.0_17-b02) for the hottest loop when using
-     *   Array[Double] shows that many daload's result in a pair of instructions
-     *   like:
+     *   2. Using sun.misc.Unsafe for the buffers that store the block A and
+     *   the panel B, as opposed to using Array[Double], turns out to be
+     *   essential here. A careful comparison of the Intel assembly emitted
+     *   by Hotspot 64-bit 23.7-b01 (shipped with JRE 1.7.0_17-b02) for the
+     *   hottest loop when using Array[Double] shows that many daload's result
+     *   in a pair of instructions like:
      *         mov    r11,QWORD PTR [rsp+0xa0]
      *         movsd  xmm13,QWORD PTR [r11+r8*8+0x10]
      *   Thus an address is repeatedly fetched from the stack (mov), which is
@@ -251,8 +248,7 @@ trait FastLevel3 extends Level3 {
      * Requirement: mr == 2 and nr == 4. Not enforced for performance reason,
      * i.e. using any other value will lead to disaster.
      */
-    def apply(kc:Int, mr:Int, nr:Int,
-              alpha:Double, aa:Long, bb:Long, beta:Double, c:Matrix)
+    def apply(kc:Int, mr:Int, nr:Int, alpha:Double, aa:Long, bb:Long, c:Matrix)
     {
       val (mc, n) = c.dimensions
       val m2 = (mc/2)*2
@@ -262,9 +258,9 @@ trait FastLevel3 extends Level3 {
       val ldC = c.ld
       val startC = c.start
 
-      // Compute C(:, 0:n4) = A(:, :) B(:, 0:n4)
+      // Compute C(:, 0:n4) += A(:, :) B(:, 0:n4)
       cforRange(0 until n4 by 4) { j =>
-        // Compute C(0:m2, j:j+4) = A(0:m2, :) B(:, j:j+4)
+        // Compute C(0:m2, j:j+4) += A(0:m2, :) B(:, j:j+4)
         cforRange(0 until m2 by 2) { i =>
           // Compute C(i:i+2, j:j+4) += A(i:i+2, :) B(:, j:j+4)
 
@@ -316,29 +312,17 @@ trait FastLevel3 extends Level3 {
           }
 
           // Store result:
-          //   C(i:i+2, j:j+4) = α P'(i:i+2, j:j+4) + 𝜷 C(i:i+2, j:j+4)
+          //   C(i:i+2, j:j+4) += α P'(i:i+2, j:j+4)
           c0 *= alpha; c1 *= alpha; c2 *= alpha; c3 *= alpha
           c4 *= alpha; c5 *= alpha; c6 *= alpha; c7 *= alpha
-          if(beta == 1) {
-            cc(r0)   += c0
-            cc(r1)   += c1
-            cc(r2)   += c2
-            cc(r3)   += c3
-            cc(r0+1) += c4
-            cc(r1+1) += c5
-            cc(r2+1) += c6
-            cc(r3+1) += c7
-          }
-          else {
-            cc(r0)   = beta*cc(r0)   + c0
-            cc(r1)   = beta*cc(r1)   + c1
-            cc(r2)   = beta*cc(r2)   + c2
-            cc(r3)   = beta*cc(r3)   + c3
-            cc(r0+1) = beta*cc(r0+1) + c4
-            cc(r1+1) = beta*cc(r1+1) + c5
-            cc(r2+1) = beta*cc(r2+1) + c6
-            cc(r3+1) = beta*cc(r3+1) + c7
-          }
+          cc(r0)   += c0
+          cc(r1)   += c1
+          cc(r2)   += c2
+          cc(r3)   += c3
+          cc(r0+1) += c4
+          cc(r1+1) += c5
+          cc(r2+1) += c6
+          cc(r3+1) += c7
         }
 
         // Compute C(m2, j:j+4) += A(m2, :) B(:, j:j+4) if need be
@@ -375,24 +359,16 @@ trait FastLevel3 extends Level3 {
           // Store result:
           //   C(m2, j:j+4) = α C(m2, j:j+4) + 𝜷 C(m2, j:j+4)
           c0 *= alpha; c1 *= alpha; c2 *= alpha; c3 *= alpha
-          if(beta == 1) {
-            cc(r0)   += c0
-            cc(r1)   += c1
-            cc(r2)   += c2
-            cc(r3)   += c3
-          }
-          else {
-            cc(r0)   = beta*cc(r0)   + c0
-            cc(r1)   = beta*cc(r1)   + c1
-            cc(r2)   = beta*cc(r2)   + c2
-            cc(r3)   = beta*cc(r3)   + c3
-          }
+          cc(r0)   += c0
+          cc(r1)   += c1
+          cc(r2)   += c2
+          cc(r3)   += c3
         }
       }
 
-      // Compute A(0:m2, :) B(:, n4:n)
+      // Compute C(:, n4:n) += A(:, :) B(:, n4:n)
       cforRange(n4 until n) { j =>
-        // compute A(0:m2, :) B(:, j)
+        // compute C(0:m2, j) += A(0:m2, :) B(:, j)
         cforRange(0 until m2 by 2) { i =>
           // Compute C(i:i+2, j) += A(i:i+2, :) B(:, j)
           // using a straightforward summation
@@ -418,14 +394,8 @@ trait FastLevel3 extends Level3 {
 
           // Store results in C
           c0 *= alpha; c4 *= alpha
-          if(beta == 1) {
-            cc(r0)   += c0
-            cc(r0+1) += c4
-          }
-          else {
-            cc(r0)   = beta*cc(r0)   + c0
-            cc(r0+1) = beta*cc(r0+1) + c4
-          }
+          cc(r0)   += c0
+          cc(r0+1) += c4
         }
 
         // Compute C(m2, j) += A(m2, :) B(:, j) if need be
@@ -442,7 +412,7 @@ trait FastLevel3 extends Level3 {
             paa += 1 * 8
           }
           c0 *= alpha
-          if(beta == 1) cc(r0) += c0 else cc(r0) = beta*cc(r0) + c0
+          cc(r0) += c0
         }
       }
     }
@@ -493,6 +463,11 @@ trait FastLevel3 extends Level3 {
     val packA = if(transA == NoTranspose) GEBP.packRowSlices _
                 else                      GEBP.packColumnSlices _
 
+    if(beta == 0)
+      c := 0
+    else if(beta != 1)
+      cforRange2(0 until n, 0 until m) { (j,i) => c(i,j) *= beta }
+
     cfor(0)(_ < k, _ + kc) { p =>
       // the last panel is likely smaller
       val kc1 = math.min(p + kc, k) - p
@@ -517,7 +492,7 @@ trait FastLevel3 extends Level3 {
         packA(blockA(i,i+mc1, p,p+kc1), mr, aa)
 
         // block x panel
-        GEBP(kc1, mr, nr, alpha, aa, bb, beta, c.block(i,i+mc1)(0,n))
+        GEBP(kc1, mr, nr, alpha, aa, bb, c.block(i,i+mc1)(0,n))
       }
     }
   }

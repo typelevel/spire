@@ -21,7 +21,7 @@ object MatrixMultiplicationBenchmarks {
 
   def spireGemm(lvl3:BLAS.Level3, a:Matrix, b:Matrix, c:Matrix) = {
     import spire.matrix.Transposition._
-    lvl3.gemm(NoTranspose, NoTranspose, 2.0, a, b, 0.0, c)
+    lvl3.gemm(NoTranspose, NoTranspose, 2.0, a, b, 1.0, c)
     val (m,n) = c.dimensions
     c
   }
@@ -31,7 +31,7 @@ object MatrixMultiplicationBenchmarks {
     import org.jblas
     jblas.NativeBlas.dgemm('N', 'N',
                            m, n, k, 2.0, a, 0, m, b, 0, k,
-                           0.0, c, 0, m)
+                           1.0, c, 0, m)
     Matrix(m, n,  c)
   }
 
@@ -62,7 +62,7 @@ object MatrixMultiplicationBenchmarks {
       val cc = new Array[Double](m*n)
       val (c2, jblasReport) = timer.benchPair(jblasGemm(m, n, k, aa, bb, cc))
       val (c3, fastReport) = timer.benchPair(spireGemm(FastBlas3, a, b, c))
-      val (u,v,w) = (c1(m/2, n/2), c2(m/2, n/2),c3(m/2, n/2))
+      val (u,v,w) = (c1.trace, c2.trace, c3.trace)
       val deltaNaive = (u-v).abs/(u.abs + v.abs)
       val deltaFast = (u-w).abs/(u.abs + w.abs)
       delta += (deltaNaive + deltaFast)/2
