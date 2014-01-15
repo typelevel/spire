@@ -60,9 +60,9 @@ trait FastLevel3 extends Level3 {
       fld.get(classOf[Unsafe]).asInstanceOf[Unsafe]
     }
 
-    private def get(p:Long, i:Int) = unsafe.getDouble(p + i*8)
+    def get(p:Long, i:Int) = unsafe.getDouble(p + i*8)
 
-    private def put(p:Long, i:Int, v:Double) { unsafe.putDouble(p + i*8, v) }
+    def put(p:Long, i:Int, v:Double) { unsafe.putDouble(p + i*8, v) }
 
     def newBuffer(size:Int) = unsafe.allocateMemory(size*8)
 
