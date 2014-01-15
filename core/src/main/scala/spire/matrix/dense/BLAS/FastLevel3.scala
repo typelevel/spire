@@ -184,7 +184,6 @@ trait FastLevel3 extends Level3 {
      * i.e. using any other value will lead to disaster.
      */
     def packRowSlices(a:Matrix, mr:Int, aa:Long) {
-      val unsafe = this.unsafe
       val (m,n) = a.dimensions
       val mm = (m/mr)*mr
       var paa = aa
@@ -254,10 +253,8 @@ trait FastLevel3 extends Level3 {
     def apply(kc:Int, mr:Int, nr:Int,
               alpha:Double, aa:Long, bb:Long, beta:Double, c:Matrix)
     {
-      val unsafe = this.unsafe
       val (mc, n) = c.dimensions
       val m2 = (mc/2)*2
-      val k4 = (kc/4)*4
       val n4 = (n/4)*4
 
       val cc = c.elements
