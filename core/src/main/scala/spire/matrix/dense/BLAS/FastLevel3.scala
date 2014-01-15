@@ -188,11 +188,12 @@ trait FastLevel3 extends Level3 {
       val mm = (m/mr)*mr
       var paa = aa
       val ld = a.ld
+      val o = a.start
       val e = a.elements
       //cforRange(0 until mm by mr) { i =>
       cfor(0)(_ < mm, _ + mr) { i =>
         cforRange(0 until n) { j =>
-          val r = i + j*ld
+          val r = o + i + j*ld
                       put(paa, 0, e(r+0))
                       put(paa, 1, e(r+1))
           if(mr == 4) put(paa, 2, e(r+2))
