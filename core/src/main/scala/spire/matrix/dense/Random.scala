@@ -144,9 +144,9 @@ extends Iterator[Matrix] with BLAS.NaiveLevel1 {
    * whereas there is no extra storage cost.
    */
   def overwriteWithProductByNext(sides:Sides.Value, a:Matrix):Unit = {
-    if (sides == fromLeft || sides == Congruent)
+    if (sides == FromLeft || sides == Congruent)
       require(a.dimensions._1 == n)
-    else if (sides == fromRight || sides == Congruent)
+    else if (sides == FromRight || sides == Congruent)
       require(a.dimensions._2 == n)
 
     for(i <- n-2 to 0 by -1) {
@@ -154,15 +154,15 @@ extends Iterator[Matrix] with BLAS.NaiveLevel1 {
       u := elements
       val h = ElementaryReflector.annihilateAndConstruct(u)
       r(i) = signum(u(0))
-      if(sides == fromLeft || sides == Congruent)
+      if(sides == FromLeft || sides == Congruent)
         h.applyOnLeft(a.block(i,n)(0,n))
-      else if (sides == fromRight || sides == Congruent)
+      else if (sides == FromRight || sides == Congruent)
         h.applyOnRight(a.block(0,n)(i,n))
     }
     r(n-1) = signum(elements.next)
-    if(sides == fromLeft || sides == Congruent)
+    if(sides == FromLeft || sides == Congruent)
       for(i <- 0 until n) scale(r(i), a.row(i))
-    else if (sides == fromRight || sides == Congruent)
+    else if (sides == FromRight || sides == Congruent)
       for(j <- 0 until n) scale(r(j), a.column(j))
   }
 
@@ -170,7 +170,7 @@ extends Iterator[Matrix] with BLAS.NaiveLevel1 {
 
   def next: Matrix = {
     val result = Matrix.identity(n)
-    overwriteWithProductByNext(fromLeft, result)
+    overwriteWithProductByNext(FromLeft, result)
     result
   }
 }

@@ -30,8 +30,8 @@ with BLAS.NaiveLevel3
         haar = new OrthogonalMatricesHaarDistribution(n))
     {
       val q = Matrix.identity(n)
-      haar.overwriteWithProductByNext(fromLeft, q)
-      haar.overwriteWithProductByNext(fromRight, q)
+      haar.overwriteWithProductByNext(FromLeft, q)
+      haar.overwriteWithProductByNext(FromRight, q)
       haar.overwriteWithProductByNext(Congruent, q)
       val orth = orthogonalityMeasure(q)
       assert(orth < 20)

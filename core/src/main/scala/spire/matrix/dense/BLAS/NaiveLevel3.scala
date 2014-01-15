@@ -173,7 +173,7 @@ trait NaiveLevel3 extends Level3 {
       return
     }
 
-    if (side == fromLeft && trans == NoTranspose) {
+    if (side == FromLeft && trans == NoTranspose) {
       // B := alpha A^(-1) B
       if(uplo == Upper) {
         cforRange(0 until n) { j =>
@@ -198,7 +198,7 @@ trait NaiveLevel3 extends Level3 {
         }
       }
     }
-    else if (side == fromLeft && trans == Transpose) {
+    else if (side == FromLeft && trans == Transpose) {
       // B := alpha A^(-T) B
       if(uplo == Upper) {
         cforRange(0 until n) { j =>
@@ -221,7 +221,7 @@ trait NaiveLevel3 extends Level3 {
         }
       }
     }
-    else if (side == fromRight && trans ==  NoTranspose) {
+    else if (side == FromRight && trans ==  NoTranspose) {
       // B: = alpha B A^(-1)
       if(uplo == Upper) {
         cforRange(0 until n) { j =>
@@ -250,7 +250,7 @@ trait NaiveLevel3 extends Level3 {
         }
       }
     }
-    else if (side == fromRight && trans ==  Transpose) {
+    else if (side == FromRight && trans ==  Transpose) {
       // B: = alpha B A^(-T)
       if(uplo == Upper) {
         cforRange(n-1 to 0 by -1) { k =>

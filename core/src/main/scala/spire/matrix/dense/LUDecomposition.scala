@@ -101,12 +101,12 @@ extends BLAS.Level1 with BLAS.Level2 with BLAS.Level3 {
 
     if(trans == NoTranspose) {
       p.permute_rows(b)
-      trsm(fromLeft, Lower, NoTranspose, UnitDiagonal, 1.0, lu, b)
-      trsm(fromLeft, Upper, NoTranspose, NonUnitDiagonal, 1.0, lu, b)
+      trsm(FromLeft, Lower, NoTranspose, UnitDiagonal, 1.0, lu, b)
+      trsm(FromLeft, Upper, NoTranspose, NonUnitDiagonal, 1.0, lu, b)
     }
     else {
-      trsm(fromLeft, Upper, Transpose, NonUnitDiagonal, 1.0, lu, b)
-      trsm(fromLeft, Lower, Transpose, NonUnitDiagonal, 1.0, lu, b)
+      trsm(FromLeft, Upper, Transpose, NonUnitDiagonal, 1.0, lu, b)
+      trsm(FromLeft, Lower, Transpose, NonUnitDiagonal, 1.0, lu, b)
       p.inverse.permute_rows(b)
     }
   }
@@ -200,7 +200,7 @@ extends DecompositionConstruction {
       val a22p = a.block(nLeft, m)(nLeft, n) // was A22
 
       /* Solve for U12: L11 U12 = A12' in place */
-      trsm(fromLeft, Lower, NoTranspose, UnitDiagonal, 1.0, l11, a12p)
+      trsm(FromLeft, Lower, NoTranspose, UnitDiagonal, 1.0, l11, a12p)
       val u12 = a12p
       /* A22'' = A22' - L21 U12 in place */
       gemm(NoTranspose, NoTranspose, -1.0, l21, u12, 1.0, a22p)

@@ -262,7 +262,7 @@ package object BLAS {
                                unit:DiagonalProperty.Value,
                                alpha:Double, a:Matrix, b:Matrix) {
       require(a.isSquare)
-      if(side == fromLeft) require(a.dimensions._2 == b.dimensions._1)
+      if(side == FromLeft) require(a.dimensions._2 == b.dimensions._1)
       else                 require(b.dimensions._2 == a.dimensions._1)
     }
   }

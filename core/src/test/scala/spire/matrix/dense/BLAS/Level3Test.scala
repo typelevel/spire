@@ -263,13 +263,13 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
       b = Matrix.empty(m,n)
       uplo <- Iterator(Upper, Lower)
       diag <- Iterator(UnitDiagonal, NonUnitDiagonal)
-      side <- Iterator(fromLeft, fromRight)
-      a <- testMatrices.triangularMatrixSample(if(side == fromLeft) m else n,
+      side <- Iterator(FromLeft, FromRight)
+      a <- testMatrices.triangularMatrixSample(if(side == FromLeft) m else n,
                                                uplo, diag).take(1)
       trans <- Iterator(NoTranspose, Transpose)
       alpha <- testMatrices.scalarSample
     } yield {
-      if(side == fromLeft)
+      if(side == FromLeft)
         gemm(trans, NoTranspose, 1/alpha, a, x, 0.0, b)
       else
         gemm(NoTranspose, trans, 1/alpha, x, a, 0.0, b)
