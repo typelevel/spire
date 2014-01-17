@@ -20,6 +20,7 @@ class FastGemmTest extends FunSuite {
 
   val p2d = new ScalarUniformPowerOfTwoDistribution(minPower=0, maxPower=6)
   val elts = new RandomUncorrelatedElements(nonSpecialScalars = 1,
+                                            nonSpecialDimensions=1,
                                             scalars = p2d,
                                             elements = p2d)
 
