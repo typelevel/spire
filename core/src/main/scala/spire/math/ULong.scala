@@ -61,10 +61,7 @@ class ULong(val signed: Long) extends AnyVal {
   else
     (-BigInt(Long.MinValue) * 2 + BigInt(this.signed)).toString // ugh, fixme
 
-  //final def == (that: Int): Boolean = that >= 0 && this.signed == that
   final def == (that: ULong): Boolean = this.signed == that.signed
-
-  //final def != (that: Int): Boolean = that < 0 || this.signed == that
   final def != (that: ULong): Boolean = this.signed != that.signed
 
   final def <= (that: ULong) = if (this.signed >= 0L)

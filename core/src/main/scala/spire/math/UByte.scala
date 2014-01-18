@@ -38,10 +38,7 @@ class UByte(val signed: Byte) extends AnyVal with scala.math.ScalaNumericAnyConv
 
   override def toString: String = toInt.toString
   
-  //def == (that: Long): Boolean = that >= 0 && this.signed == that.toByte
   def == (that: UByte): Boolean = this.signed == that.signed
-
-  //def != (that: Long): Boolean = that < 0 || this.signed != that.toByte
   def != (that: UByte): Boolean = this.signed != that.signed
 
   def <= (that: UByte) = this.toInt <= that.toInt

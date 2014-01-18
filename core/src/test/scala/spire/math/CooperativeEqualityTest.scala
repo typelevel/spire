@@ -49,6 +49,20 @@ class CooperativeEqualityTest extends FunSuite {
   // testEquals(BigDecimal(3), "BigDecimal", Rational(3), "Rational")
   testEquals(Rational(3), "Rational", Rational(3), "Rational")
 
+  // test Number
+  testEquals(3.toByte, "Byte", Number(3), "Number")
+  testEquals(3.toShort, "Short", Number(3), "Number")
+  testEquals(3, "Int", Number(3), "Number")
+  testEquals(3L, "Long", Number(3), "Number")
+  testEquals(3F, "Float", Number(3), "Number")
+  testEquals(3D, "Double", Number(3), "Number")
+  testEquals(Natural(3), "Natural", Number(3), "Number")
+  // testEquals(BigInt(3), "BigInt", Number(3), "Number")
+  testEquals(SafeLong(3), "SafeLong", Number(3), "Number")
+  // testEquals(BigDecimal(3), "BigDecimal", Number(3), "Number")
+  testEquals(Rational(3), "Rational", Number(3), "Number")
+  testEquals(Number(3), "Number", Number(3), "Number")
+
   // test Algebraic
   testEquals(3.toByte, "Byte", Algebraic(3), "Algebraic")
   testEquals(3.toShort, "Short", Algebraic(3), "Algebraic")
@@ -61,6 +75,7 @@ class CooperativeEqualityTest extends FunSuite {
   testEquals(SafeLong(3), "SafeLong", Algebraic(3), "Algebraic")
   // testEquals(BigDecimal(3), "BigDecimal", Algebraic(3), "Algebraic")
   testEquals(Rational(3), "Rational", Algebraic(3), "Algebraic")
+  testEquals(Number(3), "Number", Algebraic(3), "Algebraic")
   testEquals(Algebraic(3), "Algebraic", Algebraic(3), "Algebraic")
 
   // test Real
@@ -75,6 +90,7 @@ class CooperativeEqualityTest extends FunSuite {
   testEquals(SafeLong(3), "SafeLong", Real(3), "Real")
   // testEquals(BigDecimal(3), "BigDecimal", Real(3), "Real")
   testEquals(Rational(3), "Rational", Real(3), "Real")
+  testEquals(Number(3), "Number", Real(3), "Real")
   testEquals(Algebraic(3), "Algebraic", Real(3), "Real")
   testEquals(Real(3), "Real", Real(3), "Real")
 
@@ -94,6 +110,8 @@ class CooperativeEqualityTest extends FunSuite {
   testComplex(Natural(3), "Natural")
   testComplex(SafeLong(3), "SafeLong")
   testComplex(Rational(3), "Rational")
+  testComplex(Number(3), "Number")
+  testComplex(Algebraic(3), "Algebraic")
   testComplex(Real(3), "Real")
 
   def testQuaternion[A: ConvertableFrom](a: A, name: String) {
@@ -112,5 +130,7 @@ class CooperativeEqualityTest extends FunSuite {
   testQuaternion(Natural(3), "Natural")
   testQuaternion(SafeLong(3), "SafeLong")
   testQuaternion(Rational(3), "Rational")
+  testQuaternion(Number(3), "Number")
+  testQuaternion(Algebraic(3), "Algebraic")
   testQuaternion(Real(3), "Real")
 }

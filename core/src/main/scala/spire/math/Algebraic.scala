@@ -51,10 +51,13 @@ extends ScalaNumber with ScalaNumericConversions
   override def equals(that: Any) = that match {
     case that: Algebraic => (this - that).isZero
     case that: Real => (this - Algebraic(that.toRational)).isZero
+    case that: Number => (this - Algebraic(that.toRational)).isZero
     case that: Rational => (this - Algebraic(that)).isZero
     case that: BigInt => isWhole && toBigInt == that
     case that: Natural => isWhole && signum >= 0 && that == toBigInt
     case that: SafeLong => isWhole && that == this
+    case that: Complex[_] => that == this
+    case that: Quaternion[_] => that == this
     case that: BigDecimal => try {
       toBigDecimal(that.mc) == that
     } catch {

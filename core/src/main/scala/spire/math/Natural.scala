@@ -20,7 +20,7 @@ import Natural._
 // in a tail-recursive way.
 
 @SerialVersionUID(0L)
-sealed trait Natural extends ScalaNumber with ScalaNumericConversions with Serializable {
+sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions with Serializable {
   lhs =>
 
   def digit: UInt
@@ -235,8 +235,6 @@ sealed trait Natural extends ScalaNumber with ScalaNumericConversions with Seria
     case rhs: Algebraic => rhs == lhs
     case rhs: Real => lhs == rhs.toRational
     case rhs: Number => Number(lhs.toBigInt) == rhs
-    // case rhs: Complex[_] => anyIsZero(rhs.imag) && lhs == rhs.real
-    // case rhs: Quaternion[_] => anyIsZero(rhs.i) && anyIsZero(rhs.j) && anyIsZero(rhs.k) && lhs == rhs.r
     case rhs: Complex[_] => rhs == lhs
     case rhs: Quaternion[_] => rhs == lhs
     case that => unifiedPrimitiveEquals(that)
