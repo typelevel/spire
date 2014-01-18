@@ -203,6 +203,20 @@ private[math] trait ConvertableToNumber extends ConvertableTo[Number] {
   def fromType[B: ConvertableFrom](b: B): Number = Number(ConvertableFrom[B].toDouble(b))
 }
 
+private[math] trait ConvertableToNatural extends ConvertableTo[Natural] {
+  def fromByte(a: Byte): Natural = Natural(a)
+  def fromShort(a: Short): Natural = Natural(a)
+  def fromInt(a: Int): Natural = Natural(a)
+  def fromLong(a: Long): Natural = Natural(a)
+  def fromFloat(a: Float): Natural = Natural(BigDecimal(a).toBigInt)
+  def fromDouble(a: Double): Natural = Natural(BigDecimal(a).toBigInt)
+  def fromBigInt(a: BigInt): Natural = Natural(a)
+  def fromBigDecimal(a: BigDecimal): Natural = Natural(a.toBigInt)
+  def fromRational(a: Rational): Natural = Natural(a.toBigInt)
+
+  def fromType[B: ConvertableFrom](b: B): Natural = Natural(ConvertableFrom[B].toBigInt(b))
+}
+
 object ConvertableTo {
   @inline final def apply[A](implicit ev: ConvertableTo[A]) = ev
 
@@ -218,6 +232,7 @@ object ConvertableTo {
   implicit final val ConvertableToAlgebraic = new ConvertableToAlgebraic {}
   implicit final val ConvertableToSafeLong = new ConvertableToSafeLong {}
   implicit final val ConvertableToNumber = new ConvertableToNumber {}
+  implicit final val ConvertableToNatural = new ConvertableToNatural {}
 
   implicit def convertableToComplex[A: Integral] =
     new ConvertableToComplex[A] { val algebra = Integral[A] }
@@ -450,6 +465,23 @@ private[math] trait ConvertableFromNumber extends ConvertableFrom[Number] {
   def toString(a: Number): String = a.toString
 }
 
+private[math] trait ConvertableFromNatural extends ConvertableFrom[Natural] {
+  def toByte(a: Natural): Byte = a.toBigInt.toByte
+  def toShort(a: Natural): Short = a.toBigInt.toShort
+  def toInt(a: Natural): Int = a.toBigInt.toInt
+  def toLong(a: Natural): Long = a.toBigInt.toLong
+  def toFloat(a: Natural): Float = a.toBigInt.toFloat
+  def toDouble(a: Natural): Double = a.toBigInt.toDouble
+  def toBigInt(a: Natural): BigInt = a.toBigInt
+  def toBigDecimal(a: Natural): BigDecimal = BigDecimal(a.toBigInt)
+  def toRational(a: Natural): Rational = Rational(a.toBigInt)
+  def toNumber(a: Natural): Number = Number(a.toBigInt)
+
+  def toType[B: ConvertableTo](a: Natural): B = ConvertableTo[B].fromBigInt(a.toBigInt)
+  def toString(a: Natural): String = a.toString
+}
+
+
 object ConvertableFrom {
   @inline final def apply[A](implicit ev: ConvertableFrom[A]) = ev
 
@@ -465,6 +497,7 @@ object ConvertableFrom {
   implicit final val ConvertableFromAlgebraic = new ConvertableFromAlgebraic {}
   implicit final val ConvertableFromSafeLong = new ConvertableFromSafeLong {}
   implicit final val ConvertableFromNumber = new ConvertableFromNumber {}
+  implicit final val ConvertableFromNatural = new ConvertableFromNatural {}
 
   implicit def convertableFromComplex[A: Integral] =
     new ConvertableFromComplex[A] { val algebra = Integral[A] }

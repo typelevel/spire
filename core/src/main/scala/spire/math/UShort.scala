@@ -29,10 +29,10 @@ class UShort(val signed: Char) extends AnyVal {
 
   override def toString: String = toInt.toString
   
-  def == (that: Long): Boolean = this.signed == that.toShort
+  //def == (that: Long): Boolean = that >= 0 && this.signed == that.toShort
   def == (that: UShort): Boolean = this.signed == that.signed
 
-  def != (that: Long): Boolean = this.signed != that.toShort
+  //def != (that: Long): Boolean = that < 0 || this.signed != that.toShort
   def != (that: UShort): Boolean = this.signed != that.signed
 
   def <= (that: UShort) = this.signed <= that.signed

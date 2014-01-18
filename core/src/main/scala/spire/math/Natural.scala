@@ -3,6 +3,7 @@ package spire.math
 import spire.algebra._
 
 import scala.annotation.tailrec
+import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.{specialized => spec}
 
 import Natural._
@@ -18,7 +19,8 @@ import Natural._
 // use in Scala, we should be able to efficiently build Digit chains
 // in a tail-recursive way.
 
-sealed trait Natural {
+@SerialVersionUID(0L)
+sealed trait Natural extends ScalaNumber with ScalaNumericConversions with Serializable {
   lhs =>
 
   def digit: UInt
@@ -37,7 +39,7 @@ sealed trait Natural {
 
   def getNumBits: Int = {
     @tailrec
-    def bit(n: UInt, b: Int): Int = if (n == 0) b else bit(n >>> 1, b + 1)
+    def bit(n: UInt, b: Int): Int = if (n == UInt(0)) b else bit(n >>> 1, b + 1)
 
     @tailrec
     def recur(next: Natural, b: Int): Int = next match {
@@ -106,9 +108,16 @@ sealed trait Natural {
     recur(reversed).reversed
   }
 
-  def toInt: Int = digit.toInt & 0x7fffffff
+  def isWhole: Boolean = true
+  def underlying: Object = this
+  def intValue: Int = toInt
+  def longValue: Long = toLong
+  def floatValue: Float = toBigInt.toFloat
+  def doubleValue: Double = toBigInt.toDouble
 
-  def toLong: Long = this match {
+  override def toInt: Int = digit.toInt & 0x7fffffff
+
+  override def toLong: Long = this match {
     case End(d) => d.toLong
     case Digit(d, tail) => (tail.toLong << 32L) + d.toLong
   }
@@ -166,7 +175,7 @@ sealed trait Natural {
       if ((n.signed & -n.signed) != n.signed) return -1
       // TODO: this could be better/faster
       var i = 1
-      while (i < 32 && (n >>> i) != 0) i += 1
+      while (i < 32 && (n >>> i) != UInt(0)) i += 1
       i - 1
     }
 
@@ -219,7 +228,18 @@ sealed trait Natural {
   final override def equals(rhs: Any): Boolean = rhs match {
     case rhs: Natural => (lhs compare rhs) == 0
     case rhs: UInt => (lhs compare rhs) == 0
-    case _ => false
+    case rhs: BigInt => lhs.toBigInt == rhs
+    case rhs: SafeLong => SafeLong(lhs.toBigInt) == rhs
+    case rhs: BigDecimal => rhs.isWhole && lhs.toBigInt == rhs
+    case rhs: Rational => rhs.isWhole && Rational(lhs.toBigInt) == rhs
+    case rhs: Algebraic => rhs == lhs
+    case rhs: Real => lhs == rhs.toRational
+    case rhs: Number => Number(lhs.toBigInt) == rhs
+    // case rhs: Complex[_] => anyIsZero(rhs.imag) && lhs == rhs.real
+    // case rhs: Quaternion[_] => anyIsZero(rhs.i) && anyIsZero(rhs.j) && anyIsZero(rhs.k) && lhs == rhs.r
+    case rhs: Complex[_] => rhs == lhs
+    case rhs: Quaternion[_] => rhs == lhs
+    case that => unifiedPrimitiveEquals(that)
   }
 
   def <(rhs: Natural): Boolean = (lhs compare rhs) < 0

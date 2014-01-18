@@ -14,6 +14,14 @@ trait RealLike[A <: RealLike[A]] extends ScalaNumber { self: A =>
 
   def sign: Sign
   def signum: Int = sign.toInt
+
+  def isPositive: Boolean = sign == Positive
+  def isZero: Boolean = sign == Zero
+  def isNegative: Boolean = sign == Negative
+
+  def isNonNegative: Boolean = sign != Negative
+  def isNonZero: Boolean = sign != Zero
+  def isNonPositive: Boolean = sign != Positive
   
   def compare(that: A): Int = (this - that).signum
   

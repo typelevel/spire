@@ -49,9 +49,12 @@ extends ScalaNumber with ScalaNumericConversions
   override def shortValue(): Short = fpf.toLong map (_.toShort) getOrElse super.toShort
 
   override def equals(that: Any) = that match {
-    case that: Algebraic => (this - that).sign == Zero
-    case that: Rational => (this - Algebraic(that)).sign == Zero
+    case that: Algebraic => (this - that).isZero
+    case that: Real => (this - Algebraic(that.toRational)).isZero
+    case that: Rational => (this - Algebraic(that)).isZero
     case that: BigInt => isWhole && toBigInt == that
+    case that: Natural => isWhole && signum >= 0 && that == toBigInt
+    case that: SafeLong => isWhole && that == this
     case that: BigDecimal => try {
       toBigDecimal(that.mc) == that
     } catch {
@@ -117,8 +120,8 @@ private[math] trait AlgebraicIsNRoot extends NRoot[Algebraic] {
 }
 
 private[math] trait AlgebraicOrder extends Order[Algebraic] {
-  override def eqv(x: Algebraic, y: Algebraic) = (x - y).sign == Zero
-  override def neqv(x: Algebraic, y: Algebraic) = (x - y).sign != Zero
+  override def eqv(x: Algebraic, y: Algebraic) = (x - y).isZero
+  override def neqv(x: Algebraic, y: Algebraic) = (x - y).isNonZero
   def compare(x: Algebraic, y: Algebraic) = (x - y).signum
 }
 

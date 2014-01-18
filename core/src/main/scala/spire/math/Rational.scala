@@ -476,15 +476,16 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
       else 29 * (37 * num.## + den.##)
 
     override def equals(that: Any): Boolean = that match {
-      //case that: Rational with Fraction[_] => num == that.num && den == that.den
+      case that: Real => this == that.toRational
+      case that: Algebraic => that == this
       case that: RationalLike => num == that.num && den == that.den
       case that: BigInt => isWhole && toBigInt == that
-      case that: BigDecimal =>
-        try {
-          toBigDecimal == that
-        } catch {
-          case ae: ArithmeticException => false
-        }
+      case that: BigDecimal => try { toBigDecimal == that } catch { case ae: ArithmeticException => false }
+      case that: SafeLong => SafeLong(toBigInt) == that
+      case that: Number => Number(this) == that
+      case that: Natural => isWhole && this == Rational(that.toBigInt)
+      case that: Complex[_] => that == this
+      case that: Quaternion[_] => that == this
       case that => unifiedPrimitiveEquals(that)
     }
 
