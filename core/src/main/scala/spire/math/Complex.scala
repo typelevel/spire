@@ -325,11 +325,6 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
     case _ => throw new UnsupportedOperationException(s"$imag is not a ScalaNumber")
   }
 
-  private def sillyIsZero(n: Any): Boolean = n == 0 || (n match {
-    case (n: ScalaNumericConversions) => n.isValidInt && n.toInt == 0
-    case _ => false
-  })
-
   def doubleValue: Double = realScalaNum.toDouble
   def floatValue: Float = realScalaNum.toFloat
   def longValue: Long = realScalaNum.toLong
@@ -337,24 +332,24 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
   override def shortValue: Short = realScalaNum.toShort
   override def byteValue: Byte = realScalaNum.toByte
 
-  def isWhole: Boolean = sillyIsZero(imag) && realScalaNum.isWhole
+  def isWhole: Boolean = anyIsZero(imag) && realScalaNum.isWhole
 
   def underlying: Object = this
 
   override final def isValidInt: Boolean =
-    sillyIsZero(imag) && realScalaNum.isValidInt
+    anyIsZero(imag) && realScalaNum.isValidInt
 
   override def hashCode: Int =
-    if (sillyIsZero(imag)) real.## else 19 * real.## + 41 * imag.## + 97
+    if (anyIsZero(imag)) real.## else 19 * real.## + 41 * imag.## + 97
 
   // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
     case that: Complex[_] =>
       real == that.real && imag == that.imag
     case that: Quaternion[_] =>
-      real == that.r && imag == that.i && sillyIsZero(that.j) && sillyIsZero(that.k)
+      real == that.r && imag == that.i && anyIsZero(that.j) && anyIsZero(that.k)
     case that =>
-      sillyIsZero(imag) && real == that
+      anyIsZero(imag) && real == that
   }
 
   override def toString: String = "(%s + %si)" format (real.toString, imag.toString)

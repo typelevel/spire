@@ -273,8 +273,9 @@ private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong w
   override def equals(that: Any): Boolean = that match {
     case SafeLongLong(y) => x == y
     case SafeLongBigInt(y) => x == y
-    case t: BigInt => if (t.bitLength > 63) false else t.toLong == x
-    case that => unifiedPrimitiveEquals(that)
+    case that: BigInt => if (that.bitLength > 63) false else that.toLong == x
+    case that => that == x
+    //case that => unifiedPrimitiveEquals(that)
   }
 
   def gcd(that: SafeLong): SafeLong = if (x == 0) {
@@ -340,8 +341,9 @@ private[math] case class SafeLongBigInt private[math] (x: BigInt) extends SafeLo
   override def equals(that: Any): Boolean = that match {
     case SafeLongLong(y) => x == y
     case SafeLongBigInt(y) => x == y
-    case t: BigInt => x == t
-    case that => false
+    case that: BigInt => x == that
+    case that => that == x
+    //case that => false
   }
 
   def gcd(that: SafeLong) = that match {

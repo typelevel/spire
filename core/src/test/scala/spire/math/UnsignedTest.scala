@@ -150,7 +150,7 @@ class UIntTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks
 
   property("(n / d) * d + (n % d) == n") {
     forAll { (n: UInt, d: UInt) =>
-      whenever (d != 0) {
+      whenever (d != zero) {
         val q = n / d
         val r = n % d
         q * d + r shouldBe n
@@ -160,13 +160,13 @@ class UIntTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks
 
   property("n / d <= n") {
     forAll { (n: UInt, d: UInt) =>
-      whenever (d != 0) { n / d <= n shouldBe true }
+      whenever (d != zero) { n / d <= n shouldBe true }
     }
   }
 
   property("n % d < d") {
     forAll { (n: UInt, d: UInt) =>
-      whenever (d != 0) { n % d < d shouldBe true }
+      whenever (d != zero) { n % d < d shouldBe true }
     }
   }
 
@@ -238,7 +238,7 @@ class UShortTest extends PropSpec with Matchers with GeneratorDrivenPropertyChec
 
   property("(n / d) * d + (n % d) == n") {
     forAll { (n: UShort, d: UShort) =>
-      whenever (d != 0) {
+      whenever (d != zero) {
         val q = n / d
         val r = n % d
         q * d + r shouldBe n
@@ -248,13 +248,13 @@ class UShortTest extends PropSpec with Matchers with GeneratorDrivenPropertyChec
 
   property("n / d <= n") {
     forAll { (n: UShort, d: UShort) =>
-      whenever (d != 0) { n / d <= n shouldBe true }
+      whenever (d != zero) { n / d <= n shouldBe true }
     }
   }
 
   property("n % d < d") {
     forAll { (n: UShort, d: UShort) =>
-      whenever (d != 0) { n % d < d shouldBe true }
+      whenever (d != zero) { n % d < d shouldBe true }
     }
   }
 
@@ -326,7 +326,7 @@ class UByteTest extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
 
   property("(n / d) * d + (n % d) == n") {
     forAll { (n: UByte, d: UByte) =>
-      whenever (d != 0) {
+      whenever (d != zero) {
         val q = n / d
         val r = n % d
         q * d + r shouldBe n
@@ -336,13 +336,13 @@ class UByteTest extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
 
   property("n / d <= n") {
     forAll { (n: UByte, d: UByte) =>
-      whenever (d != 0) { n / d <= n shouldBe true }
+      whenever (d != zero) { n / d <= n shouldBe true }
     }
   }
 
   property("n % d < d") {
     forAll { (n: UByte, d: UByte) =>
-      whenever (d != 0) { n % d < d shouldBe true }
+      whenever (d != zero) { n % d < d shouldBe true }
     }
   }
 
@@ -368,193 +368,3 @@ class UByteTest extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
     forAll { (a: UByte, b: UByte) => a >= b shouldBe a.toLong >= b.toLong }
   }
 }
-
-// class UShortTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
-
-//   val zero = UShort(0)
-//   val one = UShort(1)
-
-//   property("n >= 0") {
-//     forAll { (n: Char) =>
-//       UShort(n) >= zero shouldBe true
-//     }
-//   }
-
-//   property("a + b == b + a") {
-//     forAll { (a: Char, b: Char) =>
-//       UShort(a) + UShort(b) shouldBe UShort(b) + UShort(a)
-//     }
-//   }
-
-//   property("a * b == b * a") {
-//     forAll { (a: Char, b: Char) =>
-//       UShort(a) * UShort(b) shouldBe UShort(b) * UShort(a)
-//     }
-//   }
-
-//   property("(a + b) - b == a") {
-//     forAll { (a: Char, b: Char) =>
-//       (UShort(a) + UShort(b)) - UShort(b) shouldBe UShort(a)
-//     }
-//   }
-
-//   property("n / 0 -> ArithmeticException") {
-//     forAll { (n: Char) =>
-//       val error = try {
-//         UShort(n) / zero
-//         false
-//       } catch {
-//         case _: ArithmeticException => true
-//         case _: Exception => false
-//       }
-//       error shouldBe true
-//     }
-//   }
-
-//   property("n / 1 == n") {
-//     forAll { (n: Char) =>
-//       UShort(n) / one shouldBe UShort(n)
-//       UShort(n) % one shouldBe zero
-//     }
-//   }
-
-//   property("(n / d) * d + (n % d) == n") {
-//     forAll { (n: Char, d: Char) =>
-//       whenever (d != 0) {
-//         val q = UShort(n) / UShort(d)
-//         val r = UShort(n) % UShort(d)
-//         q * UShort(d) + r shouldBe UShort(n)
-//       }
-//     }
-//   }
-
-//   property("n / d <= n") {
-//     forAll { (n: Char, d: Char) =>
-//       whenever (d != 0) {
-//         UShort(n) / UShort(d) <= UShort(n) shouldBe true
-//       }
-//     }
-//   }
-
-//   property("n % d < d") {
-//     forAll { (n: Char, d: Char) =>
-//       whenever (d != 0) {
-//         UShort(n) % UShort(d) < UShort(d) shouldBe true
-//       }
-//     }
-//   }
-
-//   property("n + 1 > n") {
-//     forAll { (n: Char) =>
-//       whenever (n != -1) {
-//         UShort(n) + UShort(1) > UShort(n) shouldBe true
-//       }
-//     }
-//   }
-// }
-
-// class UByteTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
-
-//   val zero = UByte(0)
-//   val one = UByte(1)
-
-//   property("UByte(-128) >> 1 == UByte(64)") {
-//     (UByte(-128) >> 1) shouldBe UByte(64)
-//   }
-
-//   property("n >= 0") {
-//     forAll { (n: Byte) =>
-//       UByte(n) >= zero shouldBe true
-//     }
-//   }
-
-//   property("a + b == b + a") {
-//     forAll { (a: Byte, b: Byte) =>
-//       UByte(a) + UByte(b) shouldBe UByte(b) + UByte(a)
-//     }
-//   }
-
-//   property("a * b == b * a") {
-//     forAll { (a: Byte, b: Byte) =>
-//       UByte(a) * UByte(b) shouldBe UByte(b) * UByte(a)
-//     }
-//   }
-
-//   property("(a + b) - b == a") {
-//     forAll { (a: Byte, b: Byte) =>
-//       (UByte(a) + UByte(b)) - UByte(b) shouldBe UByte(a)
-//     }
-//   }
-
-//   property("n / 0 -> ArithmeticException") {
-//     forAll { (n: Byte) =>
-//       val error = try {
-//         UByte(n) / zero
-//         false
-//       } catch {
-//         case _: ArithmeticException => true
-//         case _: Exception => false
-//       }
-//       error shouldBe true
-//     }
-//   }
-
-//   property("n / 1 == n") {
-//     forAll { (n: Byte) =>
-//       UByte(n) / one shouldBe UByte(n)
-//       UByte(n) % one shouldBe zero
-//     }
-//   }
-
-//   property("(n / d) * d + (n % d) == n") {
-//     forAll { (n: Byte, d: Byte) =>
-//       whenever (d != 0) {
-//         val q = UByte(n) / UByte(d)
-//         val r = UByte(n) % UByte(d)
-//         q * UByte(d) + r shouldBe UByte(n)
-//       }
-//     }
-//   }
-
-//   property("n / d <= n") {
-//     forAll { (n: Byte, d: Byte) =>
-//       whenever (d != 0) {
-//         UByte(n) / UByte(d) <= UByte(n) shouldBe true
-//       }
-//     }
-//   }
-
-//   property("n % d < d") {
-//     forAll { (n: Byte, d: Byte) =>
-//       whenever (d != 0) {
-//         UByte(n) % UByte(d) < UByte(d) shouldBe true
-//       }
-//     }
-//   }
-
-//   property("n + 1 > n") {
-//     forAll { (n: Byte) =>
-//       whenever (n != -1) {
-//         UByte(n) + UByte(1) > UByte(n) shouldBe true
-//       }
-//     }
-//   }
-
-//   property("n << x == n << (x + 32 * y)") {
-//     forAll { (n: Byte, x: Int, y: Int) =>
-//       UByte(n) << x shouldBe UByte(n) << (x + 32 * y)
-//     }
-//   }
-
-//   property("n >> x == n >> (x % 32)") {
-//     forAll { (n: Byte, x: Int, y: Int) =>
-//       UByte(n) >> x shouldBe UByte(n) >> (x % 32)
-//     }
-//   }
-
-//   property("n >> x == n >>> x") {
-//     forAll { (n: Byte, x: Byte) =>
-//       UByte(n) >> x shouldBe UByte(n) >>> x
-//     }
-//   }
-// }

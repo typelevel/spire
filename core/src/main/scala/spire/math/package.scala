@@ -391,4 +391,9 @@ package object math {
   final def toRadians(a: Double): Double = Math.toRadians(a)
   final def ulp(x: Double): Double = Math.ulp(x)
   final def ulp(x: Float): Double = Math.ulp(x)
+
+  def anyIsZero(n: Any): Boolean = n == 0 || (n match {
+    case (n: scala.math.ScalaNumericConversions) => n.isValidInt && n.toInt == 0
+    case _ => false
+  })
 }

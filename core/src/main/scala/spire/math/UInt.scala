@@ -28,10 +28,7 @@ class UInt(val signed: Int) extends AnyVal {
 
   override def toString: String = toLong.toString
   
-  def == (that: Long): Boolean = this.signed == that.toInt
   def == (that: UInt): Boolean = this.signed == that.signed
-
-  def != (that: Long): Boolean = this.signed != that.toInt
   def != (that: UInt): Boolean = this.signed != that.signed
 
   def <= (that: UInt) = this.toLong <= that.toLong

@@ -147,13 +147,8 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
 
   override def equals(that: Any): Boolean = that match {
     case IntNumber(m) => n == m
-    case t: Number => t == this
-    case t: BigDecimal => n.toBigDecimal == t
-    case t: Rational => Rational(n) == t
-    case t: BigInt => n == t
-    case t: Natural => n == t.toBigInt
-    case t: SafeLong => n == t
-    case t => unifiedPrimitiveEquals(t)
+    case that: Number => that == this
+    case that => n == that
   }
 
   def unary_- = Number(-n)
@@ -299,13 +294,8 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   override def equals(that: Any): Boolean = that match {
     case IntNumber(m) => m == m.toDouble.toLong && m == n
     case FloatNumber(m) => n == m
-    case t: Number => t == this
-    case t: BigDecimal => BigDecimal(n) == t
-    case t: Rational => Rational(n) == t
-    case t: BigInt => n == t
-    case t: Natural => BigDecimal(t.toBigInt) == BigDecimal(n)
-    case t: SafeLong => t == n
-    case t => unifiedPrimitiveEquals(t)
+    case that: Number => that == this
+    case that => n == that
   }
 
   def unary_- = Number(-n)
@@ -432,13 +422,8 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
     case IntNumber(m) => n == m.toBigDecimal
     case FloatNumber(m) => n == m
     case DecimalNumber(m) => n == m
-    case RationalNumber(m) => Rational(n) == m
-    case t: BigDecimal => n == t
-    case t: Rational => Rational(n) == t
-    case t: BigInt => n == t
-    case t: Natural => n == t.toBigInt
-    case t: SafeLong => n == t.toBigInt
-    case t => unifiedPrimitiveEquals(t)
+    case RationalNumber(m) => m == n
+    case that => that == n
   }
 
   def unary_- = Number(-n)
@@ -514,12 +499,7 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
     case FloatNumber(m) => n == m
     case DecimalNumber(m) => n == m
     case RationalNumber(m) => n == m
-    case t: BigDecimal => n == t
-    case t: Rational => n == t
-    case t: BigInt => n == t
-    case t: Natural => n == t.toBigInt
-    case t: SafeLong => n == t.toBigInt
-    case t => unifiedPrimitiveEquals(t)
+    case that => n == that
   }
 
   def unary_- = Number(-n)
