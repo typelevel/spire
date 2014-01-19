@@ -7,6 +7,9 @@ package spire.math
  * "approximate" result. This is not yet precisely-defined, but at a
  * minimum if the given value exceed's B's range the approximation is
  * expected to fail.
+ * 
+ * Successful results provide a B as well as a Rational error
+ * estimate.
  */
 trait Approx[A, B] { self =>
 
@@ -304,7 +307,7 @@ object Approx {
   implicit val UByteToDouble = new Conversion[UByte, Double] { def convert(n: UByte): Double = n.toDouble }
   implicit val UByteToBigDecimal = new Conversion[UByte, BigDecimal] { def convert(n: UByte): BigDecimal = BigDecimal(n.toInt) }
   implicit val UByteToRational = Conversion((n: UByte) => Rational(n.toInt))
-  implicit val UByteToAlgebraic = Conversion((n: UByte) => Algebraic(n.toInt))a
+  implicit val UByteToAlgebraic = Conversion((n: UByte) => Algebraic(n.toInt))
   implicit val UByteToReal = Conversion((n: UByte) => Real(n.toInt))
   
   // UShort conversions
