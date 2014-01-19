@@ -23,10 +23,10 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   // ugh, ScalaNumber and ScalaNumericConversions in 2.10 require this hack
   override def underlying: Object = this
 
-  def abs: Rational = if (this < Rational.zero) -this else this
+  def abs: Rational = if (signum < 0) -this else this
   def inverse: Rational = Rational.one / this
   def reciprocal: Rational
-  def signum: Int = numerator.signum
+  def signum: Int
 
   def unary_-(): Rational = Rational.zero - this
 
@@ -425,8 +425,6 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
     def num: A
     def den: A
     
-    override def signum: Int = scala.math.signum(integral.compare(num, zero))
-
     def isWhole: Boolean = den == one
 
     def toBigInt: BigInt = (integral.toBigInt(num) / integral.toBigInt(den))
@@ -540,7 +538,7 @@ private[math] object LongRationals extends Rationals[Long] {
       else if (n == Long.MinValue || d == Long.MinValue) BigRational(-BigInt(d), -BigInt(n))
       else LongRational(-d, -n)
 
-    override def signum: Int = java.lang.Long.signum(n)
+    def signum: Int = java.lang.Long.signum(n)
 
     override def unary_-(): Rational =
       if (n == Long.MinValue) BigRational(-BigInt(Long.MinValue), BigInt(d))
@@ -785,7 +783,7 @@ private[math] object BigRationals extends Rationals[BigInt] {
     else
       BigRational(d, n)
 
-    override def signum: Int = n.signum
+    def signum: Int = n.signum
 
     override def unary_-(): Rational = Rational(-SafeLong(n), SafeLong(d))
 

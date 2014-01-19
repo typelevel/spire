@@ -605,6 +605,24 @@ case class Ranged[A: Order] private[spire] (lower: A, upper: A, flags: Int) exte
 
 object Interval {
 
+  object Bound {
+    def lift[A](b: Interval.Bound[Option[A]]): Option[Interval.Bound[A]] =
+      b match {
+        case Interval.Unbound() => Some(Interval.Unbound())
+        case Interval.Open(Some(a)) => Some(Interval.Open(a))
+        case Interval.Closed(Some(a)) => Some(Interval.Closed(a))
+        case _ => None
+      }
+
+    def break[A](b: Interval.Bound[Option[(A, Rational)]]): Option[(Interval.Bound[A], Rational)] =
+      b match {
+        case Interval.Unbound() => Some(Interval.Unbound(), Rational.zero)
+        case Interval.Open(Some((a, r))) => Some((Interval.Open(a), r))
+        case Interval.Closed(Some((a, r))) => Some((Interval.Closed(a), r))
+        case _ => None
+      }
+  }
+
   sealed trait Bound[A] { lhs =>
     def map[B](f: A => B): Bound[B] = this match {
       case Open(a) => Open(f(a))

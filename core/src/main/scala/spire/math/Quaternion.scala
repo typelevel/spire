@@ -30,6 +30,8 @@ object Quaternion extends QuaternionInstances {
 
   def apply[@sp(Float, Double) A](a: A)(implicit f: Semiring[A]): Quaternion[A] =
     Quaternion(a, f.zero, f.zero, f.zero)
+  def apply[@sp(Float, Double) A](r: A, i: A)(implicit f: Semiring[A]): Quaternion[A] =
+    Quaternion(r, i, f.zero, f.zero)
   def apply[@sp(Float, Double) A](c: Complex[A])(implicit f: Semiring[A]): Quaternion[A] =
     Quaternion(c.real, c.imag, f.zero, f.zero)
 }
