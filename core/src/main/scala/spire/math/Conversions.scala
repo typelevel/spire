@@ -7,9 +7,6 @@ package spire.math
  * "approximate" result. This is not yet precisely-defined, but at a
  * minimum if the given value exceed's B's range the approximation is
  * expected to fail.
- * 
- * Error is expected to return the absolute error of the approximation
- * or None, if an approximation is not possible.
  */
 trait Approx[A, B] { self =>
 
@@ -101,7 +98,8 @@ trait Coersion[A, B] extends Approx[A, B] { self =>
  * 
  * Calls to convert() must always succeed, and are expected to exactly
  * represent the given value in B. This also means that an instance of
- * Conversion[A, B] provides an exact Approx[A, B].
+ * Conversion[A, B] provides a Coersion[A, B] that always succeeds, as
+ * well as an (exact) Approx[A, B] that also always succeeds.
  * 
  * if convert(a1) = convert(a2) then a1 = a2.
  * 
@@ -138,8 +136,6 @@ trait Conversion[A, B] extends Coersion[A, B] with Approx[A, B] { self =>
   override def map[C](f: B => C): Conversion[A, C] = new Conversion[A, C] {
     def convert(a: A): C = f(self.convert(a))
   }
-
-  //def approximate(a: A): Some[(B, Rational)] = Some((convert(a), Approx.NoError))
 }
 
 class ConversionOps[A](a: A) {
