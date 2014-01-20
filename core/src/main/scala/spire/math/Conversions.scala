@@ -13,7 +13,7 @@ package spire.math
  */
 trait Approx[A, B] { self =>
 
-  def approximate(a: A): Option[(B, Rational)]
+  def approximate(a: A): Option[B]
 
   def canApproximate(a: A): Boolean =
     approximate(a).isDefined
@@ -22,29 +22,23 @@ trait Approx[A, B] { self =>
     that andThen this
 
   def mapFrom[D](f: D => A): Approx[D, B] = new Approx[D, B] {
-    def approximate(d: D): Option[(B, Rational)] = self.approximate(f(d))
+    def approximate(d: D): Option[B] = self.approximate(f(d))
   }
 
   def flatMapFrom[D](f: D => Option[A]): Approx[D, B] = new Approx[D, B] {
-    def approximate(d: D): Option[(B, Rational)] = f(d).flatMap(self.approximate)
+    def approximate(d: D): Option[B] = f(d).flatMap(self.approximate)
   }
 
   def andThen[C](that: Approx[B, C]): Approx[A, C] = new Approx[A, C] {
-    def approximate(a: A): Option[(C, Rational)] =
-      for {
-        (b, e1) <- self.approximate(a)
-        (c, e2) <- that.approximate(b)
-      } yield (c, e1.abs + e2.abs)
+    def approximate(a: A): Option[C] = self.approximate(a).flatMap(that.approximate)
   }
 
   def map[C](f: B => C): Approx[A, C] = new Approx[A, C] {
-    def approximate(a: A): Option[(C, Rational)] =
-      self.approximate(a).map { case (b, error) => (f(b), error) }
+    def approximate(a: A): Option[C] = self.approximate(a).map(f)
   }
 
   def flatMap[C](f: B => Option[C]): Approx[A, C] = new Approx[A, C] {
-    def approximate(a: A): Option[(C, Rational)] =
-      self.approximate(a).flatMap { case (b, error) => f(b).map(c => (c, error)) }
+    def approximate(a: A): Option[C] = self.approximate(a).flatMap(b => f(b))
   }
 }
 
@@ -63,8 +57,7 @@ trait Coercion[A, B] extends Approx[A, B] { self =>
   def canConvert(a: A): Boolean =
     coerce(a).isDefined
 
-  def approximate(a: A): Option[(B, Rational)] =
-    coerce(a).map(b => (b, Rational.zero))
+  def approximate(a: A): Option[B] = coerce(a)
 
   def convertOrSkip(as: Iterable[A]): Iterable[B] =
     as.flatMap(coerce)
@@ -161,8 +154,8 @@ object Coercion {
 object Approx {
   implicit def noop[A] = new Conversion[A, A] { def convert(a: A): A = a }
 
-  def apply[A, B](f: A => Option[(B, Rational)]): Approx[A, B] = new Approx[A, B] {
-    def approximate(a: A): Option[(B, Rational)] = f(a)
+  def apply[A, B](f: A => Option[B]): Approx[A, B] = new Approx[A, B] {
+    def approximate(a: A): Option[B] = f(a)
   }
 
   import scala.reflect.ClassTag
@@ -189,10 +182,7 @@ object Approx {
   implicit def ComplexToComplex2[A, B](implicit ev: Coercion[A, B], f: Semiring[B]) =
     Coercion((a: Complex[A]) => ev.coerce(a.real).flatMap(r => ev.coerce(a.imag).map(i => Complex(r, i))))
   implicit def ComplexToComplex3[A, B](implicit ev: Approx[A, B], f: Semiring[B]) =
-    Approx((a: Complex[A]) => for {
-      (r, e1) <- ev.approximate(a.real)
-      (i, e2) <- ev.approximate(a.imag)
-    } yield (Complex(r, i), e1.abs + e2.abs))
+    Approx((a: Complex[A]) => ev.approximate(a.real).flatMap(r => ev.approximate(a.imag).map(i => Complex(r, i))))
 
   implicit def QuaternionToComplex2[A, B](implicit ev: Coercion[A, B], f: Semiring[B], s: Signed[A]) =
     new Coercion[Quaternion[A], Complex[B]] {
@@ -206,12 +196,12 @@ object Approx {
 
   implicit def QuaternionToComplex3[A, B](implicit ev: Approx[A, B], f: Semiring[B], s: Signed[A]) =
     new Approx[Quaternion[A], Complex[B]] {
-      def approximate(a: Quaternion[A]): Option[(Complex[B], Rational)] =
+      def approximate(a: Quaternion[A]): Option[Complex[B]] =
         if (s.signum(a.j) != 0 || s.signum(a.k) != 0) None
         else for {
-          (r, e1) <- ev.approximate(a.r)
-          (i, e2) <- ev.approximate(a.i)
-        } yield (Complex(r, i), e1.abs + e2.abs)
+          r <- ev.approximate(a.r)
+          i <- ev.approximate(a.i)
+        } yield Complex(r, i)
     }
   
   // convert to Quaternion[_]
@@ -227,10 +217,7 @@ object Approx {
   implicit def ComplexToQuaternion2[A, B](implicit ev: Coercion[A, B], f: Semiring[B]) =
     Coercion((a: Complex[A]) => ev.coerce(a.real).flatMap(r => ev.coerce(a.imag).map(i => Quaternion(r, i))))
   implicit def ComplexToQuaternion3[A, B](implicit ev: Approx[A, B], f: Semiring[B]) =
-    Approx((a: Complex[A]) => for {
-      (r, e1) <- ev.approximate(a.real)
-      (i, e2) <- ev.approximate(a.imag)
-    } yield (Quaternion(r, i), e1.abs + e2.abs))
+    Approx((a: Complex[A]) => ev.approximate(a.real).flatMap(r => ev.approximate(a.imag).map(i => Quaternion(r, i))))
 
   implicit def QuaternionToQuaternion1[A, B](implicit ev: Conversion[A, B], f: Semiring[B]) =
     Conversion((a: Quaternion[A]) => Quaternion(ev.convert(a.r), ev.convert(a.i), ev.convert(a.j), ev.convert(a.k)))
@@ -243,11 +230,11 @@ object Approx {
     } yield Quaternion(r, i, j, k))
   implicit def QuaternionToQuaternion3[A, B](implicit ev: Approx[A, B], f: Semiring[B]) =
     Approx((a: Quaternion[A]) => for {
-      (r, e1) <- ev.approximate(a.r)
-      (i, e2) <- ev.approximate(a.i)
-      (j, e3) <- ev.approximate(a.j)
-      (k, e4) <- ev.approximate(a.k)
-    } yield (Quaternion(r, i, j, k), e1.abs + e2.abs + e3.abs + e4.abs))
+      r <- ev.approximate(a.r)
+      i <- ev.approximate(a.i)
+      j <- ev.approximate(a.j)
+      k <- ev.approximate(a.k)
+    } yield Quaternion(r, i, j, k))
   
   // convert to Interval[_]
   implicit def RealToInterval1[A, B](implicit ev: Conversion[A, B], o: Order[B]) = ev.map(b => Interval.point(b))
@@ -263,9 +250,9 @@ object Approx {
     } yield Interval.fromBounds(b1, b2))
   implicit def IntervalToInterval3[A, B](implicit ev: Approx[A, B], f: AdditiveMonoid[B], o: Order[B]) =
     Conversion((a: Interval[A]) => for {
-      (b1, e1) <- Interval.Bound.break(a.lowerBound.map(ev.approximate))
-      (b2, e2) <- Interval.Bound.break(a.upperBound.map(ev.approximate))
-    } yield (Interval.fromBounds(b1, b2), e1.abs + e2.abs))
+      b1 <- Interval.Bound.lift(a.lowerBound.map(ev.approximate))
+      b2 <- Interval.Bound.lift(a.upperBound.map(ev.approximate))
+    } yield Interval.fromBounds(b1, b2))
   
   // convert to Polynomial[_]
   implicit def RealToPolynomial1[A, B](implicit ev: Conversion[A, B], e: Eq[B], f: Semiring[B], ct: ClassTag[B]) =
@@ -287,10 +274,10 @@ object Approx {
 
   implicit def PolynomialToPolynomial3[A, B](implicit ev: Approx[A, B], ea: Eq[A], eb: Eq[B], fa: Semiring[A], fb: Semiring[B], ct: ClassTag[B]) =
     Approx((a: Polynomial[A]) => for {
-      (ts, errors) <- maybeList(a.terms.map { case Term(c, e) =>
-        ev.approximate(c).map { case (b, error) => (Term(b, e), error) }
-      }).map(_.unzip)
-    } yield (Polynomial(ts), errors.map(_.abs).qsum))
+      ts <- maybeList(a.terms.map { case Term(c, e) =>
+        ev.approximate(c).map(b => Term(b, e))
+      })
+    } yield Polynomial(ts))
   
   // UByte conversions
   implicit val UByteToByte = Coercion((n: UByte) => if (n.signed >= 0) Some(n.toByte) else None)
@@ -336,6 +323,7 @@ object Approx {
   implicit val UIntToByte = Coercion((n: UInt) => if (n <= UInt(Byte.MaxValue)) Some(n.toByte) else None)
   implicit val UIntToShort = Coercion((n: UInt) => if (n <= UInt(Short.MaxValue)) Some(n.toShort) else None)
   implicit val UIntToInt = Coercion((n: UInt) => if (n.signed >= 0) Some(n.toInt) else None)
+  implicit val UIntToFloat = Approx((n: UInt) => Some(n.toFloat))
 
   implicit val UIntToULong = Conversion((n: UInt) => ULong(n.toLong))
   implicit val UIntToNatural = Conversion((n: UInt) => Natural(n.toLong))
@@ -356,6 +344,8 @@ object Approx {
   implicit val ULongToShort = Coercion((n: ULong) => if (n <= ULong(Short.MaxValue)) Some(n.toShort) else None)
   implicit val ULongToInt = Coercion((n: ULong) => if (n <= ULong(Int.MaxValue)) Some(n.toInt) else None)
   implicit val ULongToLong = Coercion((n: ULong) => if (n.signed >= 0) Some(n.toLong) else None)
+  implicit val ULongToFloat = Approx((n: ULong) => Some(n.toFloat))
+  implicit val ULongToDouble = Approx((n: ULong) => Some(n.toDouble))
 
   implicit val ULongToNatural = Conversion((n: ULong) => n.toNatural)
   implicit val ULongToBigInt = Conversion((n: ULong) => n.toBigInt)
@@ -374,6 +364,8 @@ object Approx {
   implicit val NaturalToShort = Coercion((n: Natural) => if (n <= UInt(Short.MaxValue)) Some(n.toShort) else None)
   implicit val NaturalToInt = Coercion((n: Natural) => if (n <= UInt(Int.MaxValue)) Some(n.toInt) else None)
   implicit val NaturalToLong = Coercion((n: Natural) => if (n <= Natural(Long.MaxValue)) Some(n.toLong) else None)
+  implicit val NaturalToFloat = Approx((n: Natural) => Some(n.toFloat)) //fixme
+  implicit val NaturalToDouble = Approx((n: Natural) => Some(n.toDouble)) //fixme
 
   implicit val NaturalToBigInt = Conversion((n: Natural) => n.toBigInt)
   implicit val NaturalToSafeLong = Conversion((n: Natural) => SafeLong(n.toBigInt))
@@ -383,6 +375,12 @@ object Approx {
   implicit val NaturalToReal = Conversion((n: Natural) => Real(n.toBigInt))
   
   // Byte conversions
+  implicit val ByteToUByte = Coercion((n: Byte) => if (n >= 0) Some(UByte(n)) else None)
+  implicit val ByteToUShort = Coercion((n: Byte) => if (n >= 0) Some(UShort(n)) else None)
+  implicit val ByteToUInt = Coercion((n: Byte) => if (n >= 0) Some(UInt(n)) else None)
+  implicit val ByteToULong = Coercion((n: Byte) => if (n >= 0) Some(ULong(n)) else None)
+  implicit val ByteToNatural = Coercion((n: Byte) => if (n >= 0) Some(Natural(n)) else None)
+
   implicit val ByteToShort = Conversion((n: Byte) => n.toShort)
   implicit val ByteToInt = Conversion((n: Byte) => n.toInt)
   implicit val ByteToLong = Conversion((n: Byte) => n.toLong)
@@ -396,6 +394,13 @@ object Approx {
   implicit val ByteToReal = Conversion((n: Byte) => Real(n))
   
   // Short conversions
+  implicit val ShortToUByte = Coercion((n: Short) => if (n >= 0 && n < Byte.MaxValue) Some(UByte(n)) else None)
+  implicit val ShortToUShort = Coercion((n: Short) => if (n >= 0) Some(UShort(n)) else None)
+  implicit val ShortToUInt = Coercion((n: Short) => if (n >= 0) Some(UInt(n)) else None)
+  implicit val ShortToULong = Coercion((n: Short) => if (n >= 0) Some(ULong(n)) else None)
+  implicit val ShortToNatural = Coercion((n: Short) => if (n >= 0) Some(Natural(n)) else None)
+  implicit val ShortToByte = Coercion((n: Short) => if (n.isValidByte) Some(n.toByte) else None)
+
   implicit val ShortToInt = Conversion((n: Short) => n.toInt)
   implicit val ShortToLong = Conversion((n: Short) => n.toLong)
   implicit val ShortToBigInt = Conversion((n: Short) => BigInt(n))
@@ -408,6 +413,15 @@ object Approx {
   implicit val ShortToReal = Conversion((n: Short) => Real(n))
   
   // Int conversions
+  implicit val IntToUByte = Coercion((n: Int) => if (n >= 0 && n < Byte.MaxValue) Some(UByte(n)) else None)
+  implicit val IntToUShort = Coercion((n: Int) => if (n >= 0 && n < Short.MaxValue) Some(UShort(n)) else None)
+  implicit val IntToUInt = Coercion((n: Int) => if (n >= 0) Some(UInt(n)) else None)
+  implicit val IntToULong = Coercion((n: Int) => if (n >= 0) Some(ULong(n)) else None)
+  implicit val IntToNatural = Coercion((n: Int) => if (n >= 0) Some(Natural(n)) else None)
+  implicit val IntToByte = Coercion((n: Int) => if (n.isValidByte) Some(n.toByte) else None)
+  implicit val IntToShort = Coercion((n: Int) => if (n.isValidShort) Some(n.toShort) else None)
+  implicit val IntToFloat = Approx((n: Int) => Some(n.toFloat))
+
   implicit val IntToLong = Conversion((n: Int) => n.toLong)
   implicit val IntToBigInt = Conversion((n: Int) => BigInt(n))
   implicit val IntToSafeLong = Conversion((n: Int) => SafeLong(n))
@@ -418,6 +432,17 @@ object Approx {
   implicit val IntToReal = Conversion((n: Int) => Real(n))
   
   // Long conversions
+  implicit val LongToUByte = Coercion((n: Long) => if (n >= 0 && n < Byte.MaxValue) Some(UByte(n.toInt)) else None)
+  implicit val LongToUShort = Coercion((n: Long) => if (n >= 0 && n < Short.MaxValue) Some(UShort(n.toInt)) else None)
+  implicit val LongToUInt = Coercion((n: Long) => if (n >= 0 && n < Int.MaxValue) Some(UInt(n.toInt)) else None)
+  implicit val LongToULong = Coercion((n: Long) => if (n >= 0) Some(ULong(n)) else None)
+  implicit val LongToNatural = Coercion((n: Long) => if (n >= 0) Some(Natural(n)) else None)
+  implicit val LongToByte = Coercion((n: Long) => if (n.isValidByte) Some(n.toByte) else None)
+  implicit val LongToShort = Coercion((n: Long) => if (n.isValidShort) Some(n.toByte) else None)
+  implicit val LongToInt = Coercion((n: Long) => if (n.isValidInt) Some(n.toInt) else None)
+  implicit val LongToFloat = Approx((n: Long) => Some(n.toFloat))
+  implicit val LongToDouble = Approx((n: Long) => Some(n.toDouble))
+
   implicit val LongToBigInt = Conversion((n: Long) => BigInt(n))
   implicit val LongToSafeLong = Conversion((n: Long) => SafeLong(n))
   implicit val LongToBigDecimal = Conversion((n: Long) => BigDecimal(n))
@@ -426,6 +451,18 @@ object Approx {
   implicit val LongToReal = Conversion((n: Long) => Real(n))
   
   // BigInt conversions
+  implicit val BigIntToUByte = Coercion((n: BigInt) => if (n >= 0 && n < Byte.MaxValue) Some(UByte(n.toInt)) else None)
+  implicit val BigIntToUShort = Coercion((n: BigInt) => if (n >= 0 && n < Short.MaxValue) Some(UShort(n.toInt)) else None)
+  implicit val BigIntToUInt = Coercion((n: BigInt) => if (n >= 0 && n < Int.MaxValue) Some(UInt(n.toInt)) else None)
+  implicit val BigIntToULong = Coercion((n: BigInt) => if (n >= 0 && n < Long.MaxValue) Some(ULong(n.toLong)) else None)
+  implicit val BigIntToNatural = Coercion((n: BigInt) => if (n >= 0) Some(Natural(n)) else None)
+  implicit val BigIntToByte = Coercion((n: BigInt) => if (n.isValidByte) Some(n.toByte) else None)
+  implicit val BigIntToShort = Coercion((n: BigInt) => if (n.isValidShort) Some(n.toByte) else None)
+  implicit val BigIntToInt = Coercion((n: BigInt) => if (n.isValidInt) Some(n.toInt) else None)
+  implicit val BigIntToLong = Coercion((n: BigInt) => if (n.isValidLong) Some(n.toLong) else None)
+  implicit val BigIntToFloat = Approx((n: BigInt) => Some(n.toFloat)) //fixme
+  implicit val BigIntToDouble = Approx((n: BigInt) => Some(n.toDouble)) //fixme
+
   implicit val BigIntToSafeLong = Conversion((n: BigInt) => SafeLong(n))
   implicit val BigIntToBigDecimal = Conversion((n: BigInt) => BigDecimal(n))
   implicit val BigIntToRational = Conversion((n: BigInt) => Rational(n))
@@ -433,6 +470,18 @@ object Approx {
   implicit val BigIntToReal = Conversion((n: BigInt) => Real(n))
   
   // SafeLong conversions
+  implicit val SafeLongToUByte = Coercion((n: SafeLong) => if (n >= 0 && n < Byte.MaxValue) Some(UByte(n.toInt)) else None)
+  implicit val SafeLongToUShort = Coercion((n: SafeLong) => if (n >= 0 && n < Short.MaxValue) Some(UShort(n.toInt)) else None)
+  implicit val SafeLongToUInt = Coercion((n: SafeLong) => if (n >= 0 && n < Int.MaxValue) Some(UInt(n.toInt)) else None)
+  implicit val SafeLongToULong = Coercion((n: SafeLong) => if (n >= 0 && n < Long.MaxValue) Some(ULong(n.toLong)) else None)
+  implicit val SafeLongToNatural = Coercion((n: SafeLong) => if (n >= 0) Some(n.fold(Natural(_), Natural(_))) else None)
+  implicit val SafeLongToByte = Coercion((n: SafeLong) => if (n.isValidByte) Some(n.toByte) else None)
+  implicit val SafeLongToShort = Coercion((n: SafeLong) => if (n.isValidShort) Some(n.toByte) else None)
+  implicit val SafeLongToInt = Coercion((n: SafeLong) => if (n.isValidInt) Some(n.toInt) else None)
+  implicit val SafeLongToLong = Coercion((n: SafeLong) => if (n.isValidLong) Some(n.toLong) else None)
+  implicit val SafeLongToFloat = Approx((n: SafeLong) => Some(n.toFloat)) //fixme
+  implicit val SafeLongToDouble = Approx((n: SafeLong) => Some(n.toDouble)) //fixme
+
   implicit val SafeLongToBigInt = Conversion((n: SafeLong) => n.toBigInt)
   implicit val SafeLongToBigDecimal = Conversion((n: SafeLong) => BigDecimal(n.toBigInt))
   implicit val SafeLongToRational = Conversion((n: SafeLong) => Rational(n))
@@ -440,6 +489,18 @@ object Approx {
   implicit val SafeLongToReal = Conversion((n: SafeLong) => Real(n))
   
   // Float conversions
+  implicit val FloatToUByte = Coercion((n: Float) => if (n >= 0 && n.isValidByte) Some(UByte(n.toInt)) else None)
+  implicit val FloatToUShort = Coercion((n: Float) => if (n >= 0 && n.isValidShort) Some(UShort(n.toInt)) else None)
+  implicit val FloatToUInt = Coercion((n: Float) => if (n >= 0 && n.isValidInt) Some(UInt(n.toInt)) else None)
+  implicit val FloatToULong = Coercion((n: Float) => if (n >= 0 && n <= Long.MaxValue && n.isWhole) Some(ULong(n.toLong)) else None)
+  implicit val FloatToNatural = Coercion((n: Float) => if (n >= 0 && n.isWhole) Some(Natural(Rational(n).toBigInt)) else None)
+  implicit val FloatToByte = Coercion((n: Float) => if (n.isValidByte) Some(n.toByte) else None)
+  implicit val FloatToShort = Coercion((n: Float) => if (n.isValidShort) Some(n.toByte) else None)
+  implicit val FloatToInt = Coercion((n: Float) => if (n.isValidInt) Some(n.toInt) else None)
+  implicit val FloatToLong = Coercion((n: Float) => if (n >= Long.MinValue && n <= Long.MaxValue && n.isWhole) Some(n.toLong) else None)
+  implicit val FloatToBigInt = Coercion((n: Float) => if (n.isWhole) Some(Rational(n).toBigInt) else None)
+  implicit val FloatToSafeLong = Coercion((n: Float) => if (n.isWhole) Some(SafeLong(Rational(n).toBigInt)) else None)
+
   implicit val FloatToDouble = Conversion((n: Float) => n.toDouble)
   implicit val FloatToBigDecimal = Conversion((n: Float) => BigDecimal(n))
   implicit val FloatToRational = Conversion((n: Float) => Rational(n))
@@ -447,17 +508,60 @@ object Approx {
   implicit val FloatToReal = Conversion((n: Float) => Real(n))
   
   // Double conversions
+  implicit val DoubleToUByte = Coercion((n: Double) => if (n >= 0 && n.isValidByte) Some(UByte(n.toInt)) else None)
+  implicit val DoubleToUShort = Coercion((n: Double) => if (n >= 0 && n.isValidShort) Some(UShort(n.toInt)) else None)
+  implicit val DoubleToUInt = Coercion((n: Double) => if (n >= 0 && n.isValidInt) Some(UInt(n.toInt)) else None)
+  implicit val DoubleToULong = Coercion((n: Double) => if (n >= 0 && n <= Long.MaxValue && n.isWhole) Some(ULong(n.toLong)) else None)
+  implicit val DoubleToNatural = Coercion((n: Double) => if (n >= 0 && n.isWhole) Some(Natural(Rational(n).toBigInt)) else None)
+  implicit val DoubleToByte = Coercion((n: Double) => if (n.isValidByte) Some(n.toByte) else None)
+  implicit val DoubleToShort = Coercion((n: Double) => if (n.isValidShort) Some(n.toByte) else None)
+  implicit val DoubleToInt = Coercion((n: Double) => if (n.isValidInt) Some(n.toInt) else None)
+  implicit val DoubleToLong = Coercion((n: Double) => if (n >= Long.MinValue && n <= Long.MaxValue && n.isWhole) Some(n.toLong) else None)
+  implicit val DoubleToBigInt = Coercion((n: Double) => if (n.isWhole) Some(Rational(n).toBigInt) else None)
+  implicit val DoubleToSafeLong = Coercion((n: Double) => if (n.isWhole) Some(SafeLong(Rational(n).toBigInt)) else None)
+  implicit val DoubleToFloat = Approx((n: Double) => Some(n.toFloat))
+
   implicit val DoubleToBigDecimal = Conversion((n: Double) => BigDecimal(n))
   implicit val DoubleToRational = Conversion((n: Double) => Rational(n))
   implicit val DoubleToAlgebraic = Conversion((n: Double) => Algebraic(n))
   implicit val DoubleToReal = Conversion((n: Double) => Real(n))
   
   // BigDecimal conversions
+  implicit val BigDecimalToUByte = Coercion((n: BigDecimal) => if (n >= 0 && n.isValidByte) Some(UByte(n.toInt)) else None)
+  implicit val BigDecimalToUShort = Coercion((n: BigDecimal) => if (n >= 0 && n.isValidShort) Some(UShort(n.toInt)) else None)
+  implicit val BigDecimalToUInt = Coercion((n: BigDecimal) => if (n >= 0 && n.isValidInt) Some(UInt(n.toInt)) else None)
+  implicit val BigDecimalToULong = Coercion((n: BigDecimal) => if (n >= 0 && n <= Long.MaxValue && n.isWhole) Some(ULong(n.toLong)) else None)
+  implicit val BigDecimalToNatural = Coercion((n: BigDecimal) => if (n >= 0 && n.isWhole) Some(Natural(Rational(n).toBigInt)) else None)
+  implicit val BigDecimalToByte = Coercion((n: BigDecimal) => if (n.isValidByte) Some(n.toByte) else None)
+  implicit val BigDecimalToShort = Coercion((n: BigDecimal) => if (n.isValidShort) Some(n.toByte) else None)
+  implicit val BigDecimalToInt = Coercion((n: BigDecimal) => if (n.isValidInt) Some(n.toInt) else None)
+  implicit val BigDecimalToLong = Coercion((n: BigDecimal) => if (n >= Long.MinValue && n <= Long.MaxValue && n.isWhole) Some(n.toLong) else None)
+  implicit val BigDecimalToBigInt = Coercion((n: BigDecimal) => if (n.isWhole) Some(n.toBigInt) else None)
+  implicit val BigDecimalToSafeLong = Coercion((n: BigDecimal) => if (n.isWhole) Some(SafeLong(n.toBigInt)) else None)
+  implicit val BigDecimalToFloat = Approx((n: BigDecimal) => Some(n.toFloat))
+  implicit val BigDecimalToDouble = Approx((n: BigDecimal) => Some(n.toDouble))
+
   implicit val BigDecimalToRational = Conversion((n: BigDecimal) => Rational(n))
   implicit val BigDecimalToAlgebraic = Conversion((n: BigDecimal) => Algebraic(n))
   implicit val BigDecimalToReal = Conversion((n: BigDecimal) => Real(n))
   
   // Rational conversions
+  implicit val RationalToUByte = Coercion((n: Rational) => if (n >= 0 && n.isValidByte) Some(UByte(n.toInt)) else None)
+  implicit val RationalToUShort = Coercion((n: Rational) => if (n >= 0 && n.isValidShort) Some(UShort(n.toInt)) else None)
+  implicit val RationalToUInt = Coercion((n: Rational) => if (n >= 0 && n.isValidInt) Some(UInt(n.toInt)) else None)
+  implicit val RationalToULong = Coercion((n: Rational) => if (n >= 0 && n <= Long.MaxValue && n.isWhole) Some(ULong(n.toLong)) else None)
+  implicit val RationalToNatural = Coercion((n: Rational) => if (n >= 0 && n.isWhole) Some(Natural(Rational(n).toBigInt)) else None)
+  implicit val RationalToByte = Coercion((n: Rational) => if (n.isValidByte) Some(n.toByte) else None)
+  implicit val RationalToShort = Coercion((n: Rational) => if (n.isValidShort) Some(n.toByte) else None)
+  implicit val RationalToInt = Coercion((n: Rational) => if (n.isValidInt) Some(n.toInt) else None)
+  implicit val RationalToLong = Coercion((n: Rational) => if (n >= Long.MinValue && n <= Long.MaxValue && n.isWhole) Some(n.toLong) else None)
+  implicit val RationalToBigInt = Coercion((n: Rational) => if (n.isWhole) Some(n.toBigInt) else None)
+  implicit val RationalToSafeLong = Coercion((n: Rational) => if (n.isWhole) Some(SafeLong(n.toBigInt)) else None)
+  implicit val RationalToFloat = Approx((n: Rational) => Some(n.toFloat))
+  implicit val RationalToDouble = Approx((n: Rational) => Some(n.toDouble))
+
   implicit val RationalToAlgebraic = Conversion((n: Rational) => Algebraic(n))
   implicit val RationalToReal = Conversion((n: Rational) => Real(n))
+
+  // TODO: Real and Algebraic?
 }

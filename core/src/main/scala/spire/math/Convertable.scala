@@ -108,8 +108,8 @@ private[math] trait ConvertableToBigInt extends ConvertableTo[BigInt] {
   def fromShort(a: Short): BigInt = BigInt(a)
   def fromInt(a: Int): BigInt = BigInt(a)
   def fromLong(a: Long): BigInt = BigInt(a)
-  def fromFloat(a: Float): BigInt = BigInt(a.toLong)
-  def fromDouble(a: Double): BigInt = BigInt(a.toLong)
+  def fromFloat(a: Float): BigInt = Rational(a).toBigInt
+  def fromDouble(a: Double): BigInt = Rational(a).toBigInt
   def fromBigInt(a: BigInt): BigInt = a
   def fromBigDecimal(a: BigDecimal): BigInt = a.toBigInt
   def fromRational(a: Rational): BigInt = a.toBigInt
@@ -310,7 +310,7 @@ private[math] trait ConvertableFromFloat extends ConvertableFrom[Float] {
   def toLong(a: Float): Long = a.toLong
   def toFloat(a: Float): Float = a
   def toDouble(a: Float): Double = a.toDouble
-  def toBigInt(a: Float): BigInt = BigInt(a.toLong)
+  def toBigInt(a: Float): BigInt = Rational(a).toBigInt
   def toBigDecimal(a: Float): BigDecimal = BigDecimal(a)
   def toRational(a: Float): Rational = Rational(a)
   def toNumber(a: Float): Number = Number(a)
@@ -326,7 +326,7 @@ private[math] trait ConvertableFromDouble extends ConvertableFrom[Double] {
   def toLong(a: Double): Long = a.toLong
   def toFloat(a: Double): Float = a.toFloat
   def toDouble(a: Double): Double = a
-  def toBigInt(a: Double): BigInt = BigInt(a.toLong)
+  def toBigInt(a: Double): BigInt = Rational(a).toBigInt
   def toBigDecimal(a: Double): BigDecimal = BigDecimal(a)
   def toRational(a: Double): Rational = Rational(a)
   def toNumber(a: Double): Number = Number(a)

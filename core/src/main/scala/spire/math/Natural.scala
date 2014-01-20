@@ -112,7 +112,6 @@ sealed trait Natural {
 
   def toLong: Long = this match {
     case End(d) => d.toLong
-    //case Digit(d, tail) => (tail.toLong << 32L) + d.toLong
     case Digit(d, tail) => (tail.digit.toLong << 32L) + d.toLong
   }
 
