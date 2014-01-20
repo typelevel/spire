@@ -108,9 +108,17 @@ sealed trait Natural {
 
   def toInt: Int = digit.toInt & 0x7fffffff
 
+  def toUInt: UInt = UInt(digit.toInt)
+
   def toLong: Long = this match {
     case End(d) => d.toLong
-    case Digit(d, tail) => (tail.toLong << 32L) + d.toLong
+    //case Digit(d, tail) => (tail.toLong << 32L) + d.toLong
+    case Digit(d, tail) => (tail.digit.toLong << 32L) + d.toLong
+  }
+
+  def toULong: ULong = this match {
+    case End(d) => ULong(d.toLong)
+    case Digit(d, tail) => ULong(tail.digit.toLong << 32L) + ULong(d.toLong)
   }
 
   def toBigInt: BigInt = this match {
