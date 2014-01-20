@@ -173,16 +173,25 @@ object Approx {
   }
 
   // convert to Complex[_]
-  implicit def RealToComplex1[A, B](implicit ev: Conversion[A, B], f: Semiring[B]) = ev.map(b => Complex(b))
-  implicit def RealToComplex2[A, B](implicit ev: Coercion[A, B], f: Semiring[B]) = ev.map(b => Complex(b))
-  implicit def RealToComplex3[A, B](implicit ev: Approx[A, B], f: Semiring[B]) = ev.map(b => Complex(b))
+  implicit def RealToComplex1[A, B](implicit ev: Conversion[A, B], f: Semiring[B]) =
+    ev.map(b => Complex(b))
+  implicit def RealToComplex2[A, B](implicit ev: Coercion[A, B], f: Semiring[B]) =
+    ev.map(b => Complex(b))
+  implicit def RealToComplex3[A, B](implicit ev: Approx[A, B], f: Semiring[B]) =
+    ev.map(b => Complex(b))
 
   implicit def ComplexToComplex1[A, B](implicit ev: Conversion[A, B], f: Semiring[B]) =
     Conversion((a: Complex[A]) => Complex(ev.convert(a.real), ev.convert(a.imag)))
   implicit def ComplexToComplex2[A, B](implicit ev: Coercion[A, B], f: Semiring[B]) =
-    Coercion((a: Complex[A]) => ev.coerce(a.real).flatMap(r => ev.coerce(a.imag).map(i => Complex(r, i))))
+    Coercion((a: Complex[A]) => for {
+      r <- ev.coerce(a.real)
+      i <- ev.coerce(a.imag)
+    } yield Complex(r, i))
   implicit def ComplexToComplex3[A, B](implicit ev: Approx[A, B], f: Semiring[B]) =
-    Approx((a: Complex[A]) => ev.approximate(a.real).flatMap(r => ev.approximate(a.imag).map(i => Complex(r, i))))
+    Approx((a: Complex[A]) => for {
+      r <- ev.approximate(a.real)
+      i <- ev.approximate(a.imag)
+    } yield Complex(r, i))
 
   implicit def QuaternionToComplex2[A, B](implicit ev: Coercion[A, B], f: Semiring[B], s: Signed[A]) =
     new Coercion[Quaternion[A], Complex[B]] {
@@ -215,9 +224,15 @@ object Approx {
   implicit def ComplexToQuaternion1[A, B](implicit ev: Conversion[A, B], f: Semiring[B]) =
     Conversion((a: Complex[A]) => Quaternion(ev.convert(a.real), ev.convert(a.imag)))
   implicit def ComplexToQuaternion2[A, B](implicit ev: Coercion[A, B], f: Semiring[B]) =
-    Coercion((a: Complex[A]) => ev.coerce(a.real).flatMap(r => ev.coerce(a.imag).map(i => Quaternion(r, i))))
+    Coercion((a: Complex[A]) => for {
+      r <- ev.coerce(a.real)
+      i <- ev.coerce(a.imag)
+    } yield Quaternion(r, i))
   implicit def ComplexToQuaternion3[A, B](implicit ev: Approx[A, B], f: Semiring[B]) =
-    Approx((a: Complex[A]) => ev.approximate(a.real).flatMap(r => ev.approximate(a.imag).map(i => Quaternion(r, i))))
+    Approx((a: Complex[A]) => for {
+      r <- ev.approximate(a.real)
+      i <- ev.approximate(a.imag)
+    } yield Quaternion(r, i))
 
   implicit def QuaternionToQuaternion1[A, B](implicit ev: Conversion[A, B], f: Semiring[B]) =
     Conversion((a: Quaternion[A]) => Quaternion(ev.convert(a.r), ev.convert(a.i), ev.convert(a.j), ev.convert(a.k)))
@@ -559,9 +574,22 @@ object Approx {
   implicit val RationalToSafeLong = Coercion((n: Rational) => if (n.isWhole) Some(SafeLong(n.toBigInt)) else None)
   implicit val RationalToFloat = Approx((n: Rational) => Some(n.toFloat))
   implicit val RationalToDouble = Approx((n: Rational) => Some(n.toDouble))
+  implicit val RationalToBigDecimal = Approx((n: Rational) => Some(n.toBigDecimal))
 
   implicit val RationalToAlgebraic = Conversion((n: Rational) => Algebraic(n))
   implicit val RationalToReal = Conversion((n: Rational) => Real(n))
 
-  // TODO: Real and Algebraic?
+  // Algebraic conversions
+  implicit def algebraicApprox[A](implicit ev: Approx[Rational, A]): Approx[Algebraic, A] =
+    ev.mapFrom((n: Algebraic) => n.toRational)
+  implicit val AlgebraicToRational = Approx((n: Algebraic) => Some(n.toRational))
+  implicit val AlgebraicToReal = Conversion((n: Algebraic) => Some(n.simulate[Real]))
+
+  // Real conversions
+  implicit def realApprox[A](implicit ev: Approx[Rational, A]): Approx[Real, A] =
+    ev.mapFrom((n: Real) => n.toRational)
+
+  // FixedPoint conversions
+  implicit def fixedPointApprox[A](implicit scale: FixedScale, ev: Approx[Rational, A]): Approx[FixedPoint, A] =
+    ev.mapFrom((n: FixedPoint) => n.toRational)
 }
