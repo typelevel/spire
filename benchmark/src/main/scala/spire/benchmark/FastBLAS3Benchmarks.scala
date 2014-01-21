@@ -1,20 +1,41 @@
 package spire.benchmark
 
+import spire.matrix.dense.Matrix
+import spire.matrix.dense.random.{
+  Defaults,
+  ScalarUniformDistributionFromMinusOneToOne
+}
+import spire.matrix.dense.BLAS
+object NaiveBlas3 extends BLAS.NaiveLevel3
+object FastBlas3 extends BLAS.FastLevel3
+
+import spire.matrix.dense.tests.RandomUncorrelatedElements
+
 import ichi.bench.Thyme
 import spire.implicits._
 
-object MatrixMultiplicationBenchmarks {
-  import spire.matrix.dense.Matrix
-  import spire.matrix.dense.random.{
-    Defaults,
-    ScalarUniformDistributionFromMinusOneToOne
+object BLAS3Bench {
+
+  def discrepancy(ref:Matrix, others:Matrix*): Double = {
+    val tRef = ref.trace
+    others.map((a:Matrix) => {
+      val t = a.trace
+      (t - tRef).abs/(t.abs + tRef.abs)
+    }).sum/others.size
   }
-  import spire.matrix.dense.BLAS
-  object NaiveBlas3 extends BLAS.NaiveLevel3
-  object FastBlas3 extends BLAS.FastLevel3
 
-  import spire.matrix.dense.tests.RandomUncorrelatedElements
+  def display(flops:Double, reports:Thyme.Benched*): String = {
+    val gflops = flops/1e9
+    reports.map((r:Thyme.Benched) => {
+      val tm = r.runtime
+      val (tl, th) = r.runtimeCI95
+      val (gm, gl, gh) = (gflops/tm, gflops/th, gflops/tl)
+      "%4.2f +%4.2f -%4.2f".format(gm, gh-gm, gm-gl)
+    }).mkString("  ")
+  }
+}
 
+object MatrixMultiplicationBenchmarks {
   implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
   val uniformIm1p1 = new ScalarUniformDistributionFromMinusOneToOne
   val elts = new RandomUncorrelatedElements(elements=uniformIm1p1)
@@ -46,7 +67,7 @@ object MatrixMultiplicationBenchmarks {
                    else (args(0).toInt, args(1).toInt)
     println("Gflop/s for product of two n x n matrices")
     println("-----------------------------------------")
-    println("%4s  %4s  %4s  %16s  %16s %16s".format(
+    println("%4s  %4s  %4s  %16s  %16s  %16s".format(
             "m", "k", "n", "JBlas", "Spire (Naive)", "Spire (Fast)"))
     var delta = 0.0
     for((m,k,n) <- dimensions(lo, hi)) {
@@ -62,25 +83,10 @@ object MatrixMultiplicationBenchmarks {
       val cc = new Array[Double](m*n)
       val (c2, jblasReport) = timer.benchPair(jblasGemm(m, n, k, aa, bb, cc))
       val (c3, fastReport) = timer.benchPair(spireGemm(FastBlas3, a, b, c))
-      val (u,v,w) = (c1.trace, c2.trace, c3.trace)
-      val deltaNaive = (u-v).abs/(u.abs + v.abs)
-      val deltaFast = (u-w).abs/(u.abs + w.abs)
-      delta += (deltaNaive + deltaFast)/2
+      delta += BLAS3Bench.discrepancy(c2, c1, c3)
       val flops = (2*k-1)*m*n
-      val tm = naiveReport.runtime
-      val (tl, th) = naiveReport.runtimeCI95
-      val jtm = jblasReport.runtime
-      val (jtl, jth) = jblasReport.runtimeCI95
-      val ftm = fastReport.runtime
-      val (ftl, fth) = fastReport.runtimeCI95
-      Seq(tm, tl, th, jtm, jtl, jth, ftm, ftl, fth).map(flops/1e9/_) match {
-        case Seq(gm, gh, gl, jgm, jgh, jgl, fgm, fgh, fgl)
-          => println(("%4d  %4d  %4d  " ++ "%4.2f +%4.2f -%4.2f  "*3).
-                      format(m, k, n,
-                             jgm, jgh-jgm, jgm-jgl,
-                             gm, gh-gm, gm-gl,
-                             fgm, fgh-fgm, fgm-fgl))
-      }
+      println("%4d  %4d  %4d  ".format(m, k, n) ++
+              BLAS3Bench.display(flops, jblasReport, naiveReport, fastReport))
     }
     println("Error: %.2f %%".format(delta/100))
   }
