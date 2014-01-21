@@ -116,7 +116,7 @@ trait FastLevel3 extends Level3 {
     }
 
     /**
-     * Cut the matrix a in slices of nr columns, with a row-major arrangement
+     * Cut the matrix b in slices of nr columns, with a row-major arrangement
      *
      * As an illustration, for `nr = 4`, and a 10 x 5 matrix, the layout is:
      * <pre>
@@ -127,18 +127,18 @@ trait FastLevel3 extends Level3 {
      *    16 17 18 19   36 37 38 39   44 49
      * </pre>
      *
-     * This packed layout is stored in the buffer starting at address aa
+     * This packed layout is stored in the buffer starting at address bb
      *
      * Requirement: nr == 2 or 4. Not enforced for performance reason,
      * i.e. using any other value will lead to disaster.
      */
-    def packColumnSlices(a:Matrix, nr:Int, aa:Long) {
-      val (m,n) = a.dimensions
+    def packColumnSlices(b:Matrix, nr:Int, bb:Long) {
+      val (kc,n) = b.dimensions
       val nn = (n/nr)*nr
-      var paa = aa
-      val ld = a.ld
-      val o = a.start
-      val e = a.elements
+      var pbb = bb
+      val ld = b.ld
+      val o = b.start
+      val e = b.elements
       //cforRange(0 until nn by nr) { j =>
       cfor(0)(_ < nn, _ + nr) { j =>
         // start of column j, j+1, j+2 and j+4
@@ -146,19 +146,19 @@ trait FastLevel3 extends Level3 {
         val r1 = o + (j+1)*ld
         val r2 = o + (j+2)*ld
         val r3 = o + (j+3)*ld
-        cforRange(0 until m) { i =>
-                      put(paa, 0, e(r0+i))
-                      put(paa, 1, e(r1+i))
-          if(nr == 4) put(paa, 2, e(r2+i))
-          if(nr == 4) put(paa, 3, e(r3+i))
-          paa += nr * 8
+        cforRange(0 until kc) { p =>
+                      put(pbb, 0, e(r0+p))
+                      put(pbb, 1, e(r1+p))
+          if(nr == 4) put(pbb, 2, e(r2+p))
+          if(nr == 4) put(pbb, 3, e(r3+p))
+          pbb += nr * 8
         }
       }
       cforRange(nn until n) { j =>
         val r0 = o + (j+0)*ld
-        cforRange(0 until m) { i =>
-          put(paa, 0, e(r0+i))
-          paa += 1 * 8
+        cforRange(0 until kc) { p =>
+          put(pbb, 0, e(r0+p))
+          pbb += 1 * 8
         }
       }
     }
@@ -184,15 +184,15 @@ trait FastLevel3 extends Level3 {
      * i.e. using any other value will lead to disaster.
      */
     def packRowSlices(a:Matrix, mr:Int, aa:Long) {
-      val (m,n) = a.dimensions
-      val mm = (m/mr)*mr
+      val (mc,nc) = a.dimensions
+      val mmc = (mc/mr)*mr
       var paa = aa
       val ld = a.ld
       val o = a.start
       val e = a.elements
-      //cforRange(0 until mm by mr) { i =>
-      cfor(0)(_ < mm, _ + mr) { i =>
-        cforRange(0 until n) { j =>
+      //cforRange(0 until mmc by mr) { i =>
+      cfor(0)(_ < mmc, _ + mr) { i =>
+        cforRange(0 until nc) { j =>
           val r = o + i + j*ld
                       put(paa, 0, e(r+0))
                       put(paa, 1, e(r+1))
@@ -201,8 +201,8 @@ trait FastLevel3 extends Level3 {
           paa += mr * 8
         }
       }
-      cforRange(mm until m) { i =>
-        cforRange(0 until n) { j =>
+      cforRange(mmc until mc) { i =>
+        cforRange(0 until nc) { j =>
           put(paa, 0, a(i,j))
           paa += 1 * 8
         }
