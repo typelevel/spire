@@ -91,3 +91,52 @@ object MatrixMultiplicationBenchmarks {
     println("Error: %.2f %%".format(delta/100))
   }
 }
+
+object TriangularSolverBenchmarks {
+  import spire.matrix.{Sides, UpperOrLower, Transposition, DiagonalProperty}
+  import Sides._
+  import UpperOrLower._
+  import Transposition._
+  import DiagonalProperty._
+
+  implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
+  val uniformIm1p1 = new ScalarUniformDistributionFromMinusOneToOne
+  val elts = new RandomUncorrelatedElements(elements=uniformIm1p1)
+
+  def spireTrsm(lvl3:BLAS.Level3, a:Matrix, b:Matrix) = {
+    lvl3.trsm(FromLeft, Lower, NoTranspose, UnitDiagonal, 1.0, a, b)
+    val (m,n) = b.dimensions
+    b
+  }
+
+  def dimensions(minPowerOf2:Int, maxPowerOf2:Int) = for {
+      Seq(k,l) <- (minPowerOf2 to maxPowerOf2).map(2**_).sliding(2)
+      m <- Seq(k, (k+l)/2)
+    } yield m
+
+  def main(args:Array[String]) {
+    val (lo, hi) = if(args.size == 0) (1, 8)
+                   else (args(0).toInt, args(1).toInt)
+    println("Gflop/s for triangular solver A X = B with all matrices m x m")
+    println("-------------------------------------------------------------")
+    println("%4s  %16s  %16s".format(
+            "m", "Spire (Naive)", "Spire (Fast)"))
+    var delta = 0.0
+    for(m <- dimensions(lo, hi)) {
+      val genA = elts.triangularMatrixSample(m, Lower, UnitDiagonal)
+      val genB = elts.generalMatrixSample(m,m)
+      val a = genA.next
+      val b = genB.next
+      val timer = new Thyme
+      val b1 = b.copyToMatrix
+      val (x1, naiveReport) = timer.benchPair(spireTrsm(NaiveBlas3, a, b1))
+      val b2 = b.copyToMatrix
+      val (x2, fastReport) = timer.benchPair(spireTrsm(FastBlas3, a, b2))
+      delta += BLAS3Bench.discrepancy(x1, x2)
+      val flops = m*(m+1)/2 * m
+      println("%4d  ".format(m) ++
+              BLAS3Bench.display(flops, naiveReport, fastReport))
+    }
+    println("Error: %.2f %%".format(delta/100))
+  }
+}
