@@ -70,6 +70,12 @@ trait FastLevel3 extends Level3 {
       println("}")
     }
 
+    def getArray(p:Long, size:Int) = {
+      val result = new Array[Double](size)
+      cforRange(0 until size) { i => result(i) = get(p, i) }
+      result
+    }
+
     def newBuffer(size:Int) = unsafe.allocateMemory(size*8)
 
     def resizeBuffer(start:Long,
