@@ -90,7 +90,11 @@ class ScalarUniformPowerOfTwoDistribution(minPower:Int, maxPower:Int)(
 extends ScalarDistribution {
   val min = 2.0**minPower
   val max = 2.0**maxPower
-  def next = 2.0**gen.nextInt(minPower, maxPower)
+  val sign = new BernoulliDistribution(0.5)
+  def next = {
+    val a = 2.0**gen.nextInt(minPower, maxPower)
+    if(sign.next) a else -a
+  }
 }
 
 /**
