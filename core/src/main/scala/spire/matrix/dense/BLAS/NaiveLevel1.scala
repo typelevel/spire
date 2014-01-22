@@ -59,3 +59,6 @@ trait NaiveLevel1 extends Level1 {
   }
 
 }
+
+/** Convenience object to enable `import` instead of `extends` */
+object NaiveLevel1 extends NaiveLevel1
