@@ -171,6 +171,9 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       case 1 => (upper2, flags2)
     }
 
+  def intersects(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Boolean =
+    !(lhs mask rhs).isEmpty
+
   def mask(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] = lhs match {
     case All() => rhs
     case Below(upper1, flags1) => rhs match {
