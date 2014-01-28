@@ -250,6 +250,38 @@ trait LayeredLevel3 extends Level3 {
     }
 
     /**
+     * The inverse operation of packRowSlices
+     *
+     * @parameter alpha: elements from the buffer aa are multiplied by it
+     *                   before being copied back to a
+     */
+    def unpackRowSlices(alpha:Double, aa:Long, mr:Int, a:Matrix) {
+      val (mc,nc) = a.dimensions
+      val mmc = (mc/mr)*mr
+      var paa = aa
+      val ld = a.ld
+      val o = a.start
+      val e = a.elements
+      //cforRange(0 until mmc by mr) { i =>
+      cfor(0)(_ < mmc, _ + mr) { i =>
+        cforRange(0 until nc) { j =>
+          val r = o + i + j*ld
+                      e(r+0) = alpha*get(paa, 0)
+                      e(r+1) = alpha*get(paa, 1)
+          if(mr == 4) e(r+2) = alpha*get(paa, 2)
+          if(mr == 4) e(r+3) = alpha*get(paa, 3)
+          paa += mr * 8
+        }
+      }
+      cforRange(mmc until mc) { i =>
+        cforRange(0 until nc) { j =>
+          a(i,j) = alpha*get(paa, 0)
+          paa += 1 * 8
+        }
+      }
+    }
+
+    /**
      * Perform the actual block-panel product
      *
      * This computes C += A B where C is mc x n, A is mc x kc and B is kc x n.
