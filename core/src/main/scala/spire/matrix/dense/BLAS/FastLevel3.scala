@@ -37,20 +37,8 @@ import scala.math
  *     Eigen v3, http://eigen.tuxfamily.org, 2010
  */
 trait FastLevel3 extends Level3 {
-  /**
-   * Multiplication of a general block and a general panel
-   *
-   * Given two matrices A' and B' of respective dimensions m x k and k x n,
-   * we are interested in the product C = A B where A is a block of A',
-   * A = A'(i1:i1+mc, p1:p1+kc), and B is a horizontal panel of B',
-   * B = B'(p1:p1+kc, :). Thus C is the block C'(i1:i1+mc, :) of the product
-   * C' = A' B'.
-   *
-   * This turns out to be the workhorse of high-performance
-   * BLAS level3 as explained in details in [1].
-   */
-  object GEBP {
 
+  trait Buffer {
     import sun.misc.Unsafe
     // Using Unsafe.getUnsafe restrics users to trusted code,
     // hence this hack!
@@ -60,9 +48,9 @@ trait FastLevel3 extends Level3 {
       fld.get(classOf[Unsafe]).asInstanceOf[Unsafe]
     }
 
-    def get(p:Long, i:Int) = unsafe.getDouble(p + i*8)
+    final def get(p:Long, i:Int) = unsafe.getDouble(p + i*8)
 
-    def put(p:Long, i:Int, v:Double) { unsafe.putDouble(p + i*8, v) }
+    final def put(p:Long, i:Int, v:Double) { unsafe.putDouble(p + i*8, v) }
 
     def display(title:String, p:Long, size:Int) {
       print(s"$title = {")
@@ -82,6 +70,21 @@ trait FastLevel3 extends Level3 {
                      size:Int) = unsafe.reallocateMemory(start, size*8)
 
     def freeBuffer(start:Long) { unsafe.freeMemory(start) }
+  }
+
+  /**
+   * Multiplication of a general block and a general panel
+   *
+   * Given two matrices A' and B' of respective dimensions m x k and k x n,
+   * we are interested in the product C = A B where A is a block of A',
+   * A = A'(i1:i1+mc, p1:p1+kc), and B is a horizontal panel of B',
+   * B = B'(p1:p1+kc, :). Thus C is the block C'(i1:i1+mc, :) of the product
+   * C' = A' B'.
+   *
+   * This turns out to be the workhorse of high-performance
+   * BLAS level3 as explained in details in [1].
+   */
+  object GEBP extends Buffer {
 
     /** The blocking policy and buffers used by GEBP */
     class Blocking(val mc:Int, val kc:Int,
