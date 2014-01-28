@@ -1,4 +1,4 @@
-package spire.matrix.dense.tests
+package spire.matrix.dense.tests.LayeredBLAS3
 
 import spire.matrix.dense.BLAS
 import spire.matrix.{Transposition, UpperOrLower, Sides, DiagonalProperty}
@@ -9,6 +9,7 @@ import DiagonalProperty._
 import spire.matrix.dense.Matrix
 import spire.matrix.dense.random._
 
+import spire.matrix.dense.tests.RandomUncorrelatedElements
 import org.scalatest.FunSuite
 
 class LayeredGemmTest extends FunSuite {
