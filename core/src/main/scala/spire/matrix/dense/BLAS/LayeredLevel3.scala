@@ -36,7 +36,7 @@ import scala.math
  * [3] Gaël Guennebaud, Benoît Jacob, et al.,
  *     Eigen v3, http://eigen.tuxfamily.org, 2010
  */
-trait FastLevel3 extends Level3 {
+trait LayeredLevel3 extends Level3 {
 
   trait Buffer {
     import sun.misc.Unsafe
@@ -473,12 +473,6 @@ trait FastLevel3 extends Level3 {
     val mr = blocking.mr
     val nr = blocking.nr
 
-    // if matrices are too small, use the naive implementation
-    if(m*k*n < mr*kc + kc*nr) {
-      NaiveLevel3.gemm(transA, transB, alpha, a, b, beta, c)
-      return
-    }
-
     // trivial case
     if(alpha == 0) {
       trivialGemm(transA, transB, a, b, beta, c)
@@ -550,7 +544,7 @@ trait FastLevel3 extends Level3 {
 }
 
 /** Convenience object to enable `import` instead of `extends` */
-object FastLevel3 extends FastLevel3
+object LayeredLevel3 extends LayeredLevel3
 
 
 

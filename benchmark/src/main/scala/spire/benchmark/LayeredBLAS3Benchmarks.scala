@@ -6,8 +6,7 @@ import spire.matrix.dense.random.{
   ScalarUniformDistributionFromMinusOneToOne
 }
 import spire.matrix.dense.BLAS
-object NaiveBlas3 extends BLAS.NaiveLevel3
-object FastBlas3 extends BLAS.FastLevel3
+import BLAS._
 
 import spire.matrix.dense.tests.RandomUncorrelatedElements
 
@@ -68,7 +67,7 @@ object MatrixMultiplicationBenchmarks {
     println("Gflop/s for product of two n x n matrices")
     println("-----------------------------------------")
     println("%4s  %4s  %4s  %16s  %16s  %16s".format(
-            "m", "k", "n", "JBlas", "Spire (Naive)", "Spire (Fast)"))
+            "m", "k", "n", "JBlas", "Spire (Naive)", "Spire (Layered)"))
     var delta = 0.0
     for((m,k,n) <- dimensions(lo, hi)) {
       val genA = elts.generalMatrixSample(m,k)
@@ -77,12 +76,12 @@ object MatrixMultiplicationBenchmarks {
       val b = genB.next
       val c = Matrix.empty(m, n)
       val timer = new Thyme
-      val (c1, naiveReport) = timer.benchPair(spireGemm(NaiveBlas3, a, b, c))
+      val (c1, naiveReport) = timer.benchPair(spireGemm(NaiveLevel3, a, b, c))
       val aa = a.toArray
       val bb = b.toArray
       val cc = new Array[Double](m*n)
       val (c2, jblasReport) = timer.benchPair(jblasGemm(m, n, k, aa, bb, cc))
-      val (c3, fastReport) = timer.benchPair(spireGemm(FastBlas3, a, b, c))
+      val (c3, fastReport) = timer.benchPair(spireGemm(LayeredLevel3, a, b, c))
       delta += BLAS3Bench.discrepancy(c2, c1, c3)
       val flops = (2*k-1)*m*n
       println("%4d  %4d  %4d  ".format(m, k, n) ++
@@ -123,7 +122,7 @@ object TriangularSolverBenchmarks {
     println("Gflop/s for triangular solver A X = B with all matrices m x m")
     println("-------------------------------------------------------------")
     println("%4s  %16s  %16s".format(
-            "m", "Spire (Naive)", "Spire (Fast)"))
+            "m", "Spire (Naive)", "Spire (Layered)"))
     var delta = 0.0
     for(m <- dimensions(lo, hi, reverse)) {
       val genA = elts.triangularMatrixSample(m, Lower, UnitDiagonal)
@@ -132,9 +131,9 @@ object TriangularSolverBenchmarks {
       val b = genB.next
       val timer = new Thyme
       val b1 = b.copyToMatrix
-      val (x1, naiveReport) = timer.benchPair(spireTrsm(NaiveBlas3, a, b1))
+      val (x1, naiveReport) = timer.benchPair(spireTrsm(NaiveLevel3, a, b1))
       val b2 = b.copyToMatrix
-      val (x2, fastReport) = timer.benchPair(spireTrsm(FastBlas3, a, b2))
+      val (x2, fastReport) = timer.benchPair(spireTrsm(LayeredLevel3, a, b2))
       delta += BLAS3Bench.discrepancy(x1, x2)
       val flops = m*(m-1) * m
       println("%4d  ".format(m) ++

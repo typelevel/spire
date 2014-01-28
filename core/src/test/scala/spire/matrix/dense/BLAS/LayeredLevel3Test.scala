@@ -11,9 +11,9 @@ import spire.matrix.dense.random._
 
 import org.scalatest.FunSuite
 
-class FastGemmTest extends FunSuite {
+class LayeredGemmTest extends FunSuite {
   import BLAS.NaiveLevel3.{gemm => referenceGemm}
-  import BLAS.FastLevel3.{gemm => fastGemm, GEBP}
+  import BLAS.LayeredLevel3.{gemm => layeredGemm, GEBP}
 
   //implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
   implicit val gen = Defaults.IntegerGenerator.fromTime(1)
@@ -33,19 +33,19 @@ class FastGemmTest extends FunSuite {
         |alpha=$alpha
         |beta=$beta""".stripMargin
 
-  val title = "Fast GEMM shall give the same results as reference GEMM"
+  val title = "Layered GEMM shall give the same results as reference GEMM"
 
   test(s"$title (small matrices") {
     for {
       (transA, transB, alpha, a, b, beta, c, m, n, k)
           <- elts.matrixProductSample
       cRef = c.copyToMatrix
-      cFast = c.copyToMatrix
+      cLayered = c.copyToMatrix
     } {
       referenceGemm(transA, transB, alpha, a, b, beta, cRef)
-      fastGemm(transA, transB, alpha, a, b, beta, cFast)
-      assert(cFast == cRef,
-             s"""|Expected $cRef but got $cFast with
+      layeredGemm(transA, transB, alpha, a, b, beta, cLayered)
+      assert(cLayered == cRef,
+             s"""|Expected $cRef but got $cLayered with
                  |${msg(transA, transB, alpha, beta, m, n, k)}
                  |""".stripMargin)
     }
@@ -60,23 +60,23 @@ class FastGemmTest extends FunSuite {
       a <- elts.generalMatrixSample(m,k).take(1)
       b <- elts.generalMatrixSample(k,n).take(1)
       cRef = Matrix.empty(m,n)
-      cFast = Matrix.empty(m,n)
+      cLayered = Matrix.empty(m,n)
     } {
       referenceGemm(NoTranspose, NoTranspose, 1.0, a, b, 0.0, cRef)
-      fastGemm(NoTranspose, NoTranspose, 1.0, a, b, 0.0, cFast)
-      assert(cFast == cRef,
-             s"[$m x $k] [$k x $n]: fast GEMM disagrees with reference GEMM")
+      layeredGemm(NoTranspose, NoTranspose, 1.0, a, b, 0.0, cLayered)
+      assert(cLayered == cRef,
+             s"[$m x $k] [$k x $n]: layered GEMM disagrees with reference GEMM")
     }
   }
 }
 
-class FastTrsmTest extends FunSuite {
+class LayeredTrsmTest extends FunSuite {
   import BLAS.NaiveLevel3.{trsm => referenceTrsm}
-  import BLAS.FastLevel3.{trsm => fastTrsm}
+  import BLAS.LayeredLevel3.{trsm => layeredTrsm}
   //implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
   implicit val gen = Defaults.IntegerGenerator.fromTime(1)
 
-  val title = "Fast TRSM shall give the same results as reference TRSM"
+  val title = "Layered TRSM shall give the same results as reference TRSM"
 
   def diff(a:Matrix, b:Matrix) = {
     a.zip(b).map((xy:(Double, Double)) => {
@@ -130,14 +130,14 @@ class FastTrsmTest extends FunSuite {
       (side, uplo, trans, diag, alpha, a, b, m, n)
         <- elts.triangularSystemSample
       xRef = b.copyToMatrix
-      xFast = b.copyToMatrix
+      xLayered = b.copyToMatrix
       if side == FromLeft && uplo == Lower && trans == NoTranspose
     } {
       referenceTrsm(side, uplo, trans, diag, alpha, a, xRef)
-      fastTrsm(side, uplo, trans, diag, alpha, a, xFast)
-      assert(diff(xFast, xRef) < 0.001,
+      layeredTrsm(side, uplo, trans, diag, alpha, a, xLayered)
+      assert(diff(xLayered, xRef) < 0.001,
              s"""|Expected ${xRef.formatted("%.18f")}
-                 |but got ${xFast.formatted("%.18f")} with
+                 |but got ${xLayered.formatted("%.18f")} with
                  |${msg(side, uplo, trans, diag, alpha, m, n)}
                  |a=${a.formatted("%.8f", true)}
                  |b=${b.formatted("%.8f", true)}
@@ -147,7 +147,7 @@ class FastTrsmTest extends FunSuite {
   }
 
   test(s"$title (large matrices)") {
-    import BLAS.FastLevel3._
+    import BLAS.LayeredLevel3._
     val blockingForGEBP = GEBP.threadLocalBlocking.get()
     val mc = blockingForGEBP.mc
     val blockingForTRSLowerBP = TRSLowerBP.threadLocalBlocking.get()
@@ -161,7 +161,7 @@ class FastTrsmTest extends FunSuite {
       a <- elts.triangularMatrixSample(m, Lower, diag).take(1)
       b <- elts.generalMatrixSample(m,n).take(1)
       xRef = b.copyToMatrix
-      xFast = b.copyToMatrix
+      xLayered = b.copyToMatrix
       side = FromLeft
       uplo = Lower
       trans = NoTranspose
@@ -169,9 +169,9 @@ class FastTrsmTest extends FunSuite {
     } {
       val (m,n) = b.dimensions
       referenceTrsm(side, uplo, trans, diag, alpha, a, xRef)
-      fastTrsm(side, uplo, trans, diag, alpha, a, xFast)
-      assert(diff(xFast, xRef) < 0.01,
-             s"""|Fast TRSM disagrees with reference TRSM for
+      layeredTrsm(side, uplo, trans, diag, alpha, a, xLayered)
+      assert(diff(xLayered, xRef) < 0.01,
+             s"""|Layered TRSM disagrees with reference TRSM for
                  |${msg(side, uplo, trans, diag, alpha, m, n)}""".stripMargin)
     }
   }
