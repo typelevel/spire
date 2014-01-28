@@ -133,7 +133,7 @@ object TriangularSolverBenchmarks {
       val b2 = b.copyToMatrix
       val (x2, fastReport) = timer.benchPair(spireTrsm(FastBlas3, a, b2))
       delta += BLAS3Bench.discrepancy(x1, x2)
-      val flops = m*(m+1)/2 * m
+      val flops = m*(m-1) * m
       println("%4d  ".format(m) ++
               BLAS3Bench.display(flops, naiveReport, fastReport))
     }
