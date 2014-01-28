@@ -88,7 +88,7 @@ object MatrixMultiplicationBenchmarks {
       println("%4d  %4d  %4d  ".format(m, k, n) ++
               BLAS3Bench.display(flops, jblasReport, naiveReport, fastReport))
     }
-    println("Error: %.2f %%".format(delta/100))
+    println("Error: %.2f %%".format(delta*100))
   }
 }
 
