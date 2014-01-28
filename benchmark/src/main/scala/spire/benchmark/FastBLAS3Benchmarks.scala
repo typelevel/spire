@@ -109,20 +109,23 @@ object TriangularSolverBenchmarks {
     b
   }
 
-  def dimensions(minPowerOf2:Int, maxPowerOf2:Int) = for {
-      Seq(k,l) <- (minPowerOf2 to maxPowerOf2).map(2**_).sliding(2)
+  def dimensions(minPowerOf2:Int, maxPowerOf2:Int, reverse:Boolean) = for {
+      Seq(k,l) <- (if(reverse) maxPowerOf2 to minPowerOf2 by -1
+                   else minPowerOf2 to maxPowerOf2).map(2**_).sliding(2)
       m <- Seq(k, (k+l)/2)
     } yield m
 
   def main(args:Array[String]) {
     val (lo, hi) = if(args.size == 0) (1, 8)
                    else (args(0).toInt, args(1).toInt)
+    val reverse = args.size == 3 && args(2) == "R"
+    println(s">${reverse}<")
     println("Gflop/s for triangular solver A X = B with all matrices m x m")
     println("-------------------------------------------------------------")
     println("%4s  %16s  %16s".format(
             "m", "Spire (Naive)", "Spire (Fast)"))
     var delta = 0.0
-    for(m <- dimensions(lo, hi)) {
+    for(m <- dimensions(lo, hi, reverse)) {
       val genA = elts.triangularMatrixSample(m, Lower, UnitDiagonal)
       val genB = elts.generalMatrixSample(m,m)
       val a = genA.next
