@@ -125,7 +125,8 @@ extends TestDimensions(nonSpecialDimensions)(gen) {
     for {
       (flops, side, uplo, trans, diag, m, n)
         <- shapes.toSeq.sortWith(_._1 < _._1).iterator
-      a <- triangularMatrixSample(m, uplo, diag).take(1)
+      dimA = if(side == FromLeft) m else n
+      a <- triangularMatrixSample(dimA, uplo, diag).take(1)
       b <- generalMatrixSample(m, n).take(1)
       alpha <- scalarSample
     } yield (side, uplo, trans, diag, alpha, a, b, m, n)
