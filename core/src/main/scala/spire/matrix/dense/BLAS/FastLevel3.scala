@@ -167,6 +167,43 @@ trait FastLevel3 extends Level3 {
     }
 
     /**
+     * The inverse operation of packColumnSlices
+     *
+     * @parameter alpha: elements from the buffer bb are multiplied by it
+     *                   before being copied back to b
+     */
+    def unpackColumnSlices(alpha:Double, bb:Long, nr:Int, b:Matrix) {
+      val (kc,n) = b.dimensions
+      val nn = (n/nr)*nr
+      var pbb = bb
+      val ld = b.ld
+      val o = b.start
+      val e = b.elements
+      //cforRange(0 until nn by nr) { j =>
+      cfor(0)(_ < nn, _ + nr) { j =>
+        // start of column j, j+1, j+2 and j+3
+        val r0 = o + (j+0)*ld
+        val r1 = o + (j+1)*ld
+        val r2 = o + (j+2)*ld
+        val r3 = o + (j+3)*ld
+        cforRange(0 until kc) { p =>
+                      e(r0+p) = alpha*get(pbb, 0)
+                      e(r1+p) = alpha*get(pbb, 1)
+          if(nr == 4) e(r2+p) = alpha*get(pbb, 2)
+          if(nr == 4) e(r3+p) = alpha*get(pbb, 3)
+          pbb += nr * 8
+        }
+      }
+      cforRange(nn until n) { j =>
+        val r0 = o + (j+0)*ld
+        cforRange(0 until kc) { p =>
+          e(r0+p) = alpha*get(pbb, 0)
+          pbb += 1 * 8
+        }
+      }
+    }
+
+    /**
      * Cut the matrix a in slices of mr rows with a column-major arrangement
      *
      * As an illustration, for `mr = 4` and a a 7 x 5 matrix, the layout is:
