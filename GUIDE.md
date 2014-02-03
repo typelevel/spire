@@ -181,7 +181,7 @@ programming errors caused by universal equality.
 `Eq[A]` provides two operators
 
  * `eqv` (`a === b`) equality operator.
- * `neqv` (`a =!= `) inequality operator (defaults to `!(a === b)`).
+ * `neqv` (`a =!= b`) inequality operator (defaults to `!(a === b)`).
 
 Spire requires that `eqv` obey the laws of an equivalence relation, namely:
 
@@ -462,37 +462,39 @@ This is probably the easiest fractional type to use correctly.
 
 #### SafeLong
 
-This integral type is also unbounded, like `BigInt`. However, it is more
-efficient for small values, where it will use a `Long` instead. There is
-usually no reason to prefer using a `BigInt` over a `SafeLong` except to
-comply with an external API, or in cases where all the values are known to
-exceed a long's storage capacity.
+This integral type is also unbounded, like `BigInt`. However, it is
+more efficient for small values, where it will use a `Long`
+instead. There is usually no reason to prefer using a `BigInt` over a
+`SafeLong` except to comply with an external API, or in cases where
+most values are expected to exceed a long's storage capacity.
 
 #### Natural
 
-This is a simple unbounded, unsigned integral type. It models natural numbers
-a as a cons list of digits (each "digit" being a 32-bit unsigned integer). For
-relatively small values 32-128 bits) it is faster than `SafeLong` or `BigInt`
-in most cases. For larger values it becomes a bit slower.
+This is a simple unbounded, unsigned integral type. It models natural
+numbers a as a cons list of digits (each "digit" being a 32-bit
+unsigned integer). For relatively small values (32-128 bits) it is
+often faster than `SafeLong` or `BigInt`. For larger values it becomes
+slower.
 
-The `Natural` type a bit of an odd-ball type at present. However the fact that
-it is guaranteed to be non-negative is nice.
+The `Natural` type a bit of an odd-ball type at present. However the
+fact that it is guaranteed to be non-negative is useful.
 
 #### UByte, UShort, UInt, and ULong
 
-These unsigned integral types are provided by Spire. They have most of the same
-operations as their signed counterparts, although they use unsigned division
-which is a bit more involved.
+These unsigned integral types are provided by Spire. They have most of
+the same operations as their signed counterparts, although they use
+unsigned division which is a bit more involved.
 
-They are value classes, so in most cases there should be no extra overhead
-when compared with their primitive counterparts. The one exception is with
-arrays. `Array[UInt]` will be boxed whereas `Array[Int]` is not. Since
-conversions between `UInt` and `Int` only exit at compile-time, it's easy to
-work around this issue by storing `UInt` instances in an `Array[Int]`.
+They are value classes, so in most cases there should be no extra
+overhead when compared with their primitive counterparts. The one
+exception is with arrays. `Array[UInt]` will be boxed whereas
+`Array[Int]` is not. Since conversions between `UInt` and `Int` only
+exit at compile-time, it's easy to work around this issue by storing
+`UInt` instances in an `Array[Int]`.
 
-Writing literal unsigned values is slightly more cumbersome than their signed
-counterparts (consider `UInt(7)` versus `7`). Spire provides syntax imports
-which make these slightly easier to write:
+Writing literal unsigned values is slightly more cumbersome than their
+signed counterparts (consider `UInt(7)` versus `7`). Spire provides
+syntax imports which make these slightly easier to write:
 
 ```scala
 import spire.syntax.literals._
@@ -502,41 +504,44 @@ ui"7" // equivalent to UInt(7)
 
 #### FixedPoint
 
-This value class uses a `Long` with an implicit denominator. The type itself
-doesn't contain information about the denominator. Instead, an implicit
-`FixedScale` instance is required to provide that context when necessary (for
-instance, during multiplication). Like the previous unsigned values, fixed
-point values will not be boxed in most cases.
+This value class uses a `Long` with an implicit denominator. The type
+itself doesn't contain information about the denominator. Instead, an
+implicit `FixedScale` instance is required to provide that context
+when necessary (for instance, during multiplication). Like the
+previous unsigned values, fixed point values will not be boxed in most
+cases.
 
-This type is designed to solve a specific type of problem and should only be
-used in situations where a large number of rational numbers with the same
-denominator are needed, and efficiency is very important.
+This type is designed to solve a specific type of problem and should
+only be used in situations where a large number of rational numbers
+with the same denominator are needed, and efficiency is very
+important.
 
 #### Complex[A] and Quanternion[A]
 
-These generic types represent complex numbers (`x + yi`) and quaternions (`w +
-xi + xj + zk`) respectively. They can be parameterized with any fractional
-type `A` which has a `Field[A]`, `NRoot[A]`, and `Trig[A]`. In general these
-values are as exact as their underlying `A` values are, although in some cases
-approximate results are necessarily returned (in cases where roots or
-trigonometry functions are used).
+These generic types represent complex numbers (`x + yi`) and
+quaternions (`w + xi + xj + zk`) respectively. They can be
+parameterized with any fractional type `A` which has a `Field[A]`,
+`NRoot[A]`, and `Trig[A]`. In general these values are as exact as
+their underlying `A` values are, although in some cases approximate
+results are necessarily returned (in cases where roots or trigonometry
+functions are used).
 
-These types are specialized, so most operations should be quite fast and not
-cause unnecessary boxing. However, these types use more memory than a
-non-generic complex number based on `Double` values would, and are a bit
-slower.
+These types are specialized, so most operations should be quite fast
+and not cause unnecessary boxing. However, these types use more memory
+than a non-generic complex number based on `Double` values would, and
+are a bit slower.
 
 #### Number
 
-This is a boxed number type that approximates the semantics of numbers in a
-dynamically-typed numeric tower (like Scheme or Python). There are four
-subtypes of `Number`, based on `SafeLong`, `Double`, `BigDecimal`, and
-`Rational`. Combining two numbers will always return a number of the highest
-precision.
+This is a boxed number type that approximates the semantics of numbers
+in a dynamically-typed numeric tower (like Scheme or Python). There
+are four subtypes of `Number`, based on `SafeLong`, `Double`,
+`BigDecimal`, and `Rational`. Combining two numbers will always return
+a number of the highest precision.
 
-`Number` is a good choice for users who want simple and correct numbers. The
-type keeps operations as safe as possible, while providing access to all
-operators and methods.
+`Number` is a good choice for users who want simple and correct
+numbers. The type keeps operations as safe as possible, while
+providing access to all operators and methods.
 
 #### Interval[A]
 
@@ -609,19 +614,19 @@ same operations (and can interoperate).
 
 #### Algebraic
 
-The `Algebraic` type is an implementation of a number for
-"Exact Geometric Computation". It represents algebraic numbers using an AST
+The `Algebraic` type is an implementation of a number for "Exact
+Geometric Computation". It represents algebraic numbers using an AST
 of the operations performed on it. `Algebraic` numbers can be compared
-accurately and exactly. This means that is we have 2 numbers `a` and `b`, then
-`a compare b` is always correct, regardless of whether they are irrational or
-incredibly close to each other. They are suitable for use in algorithms that
-use square or n- roots and rely on sign tests and numeric comparison to work
-correctly.
+accurately and exactly. This means that if we have two numbers `a` and
+`b`, then `a compare b` is always correct, regardless of whether they
+are irrational or incredibly close to each other. They are suitable
+for use in algorithms that use square- or n-roots and rely on sign
+tests and numeric comparison to work correctly.
 
-On top of exact comparisons/sign tests, `Algebraic` is able to approximate
-itself to any desired precision, after the fact. This works for both absolute
-approximations, such as `x +/- 0.00001`, or relative approximations, such as
-`x.toBigDecimal(new MathContext(10000))`.
+On top of exact comparisons/sign tests, `Algebraic` is able to
+approximate itself to any desired precision, after the fact. This
+works for both absolute approximations, such as `x +/- 0.00001`, or
+relative approximations, such as `x.toBigDecimal(new MathContext(10000))`.
 
 Because `Algebraic` can represent algebraic numbers (note: we are adding
 support for polynomial roots, not just n-roots), they have a wider range
@@ -632,25 +637,25 @@ and can tolerate a certain amount of error.
 
 #### Real
 
-`Real` stands for "computable real". Spire's `Real` implementation
-is based on ERA, written in Haskell by David Lester. Computable real
+`Real` stands for "computable real". Spire's `Real` implementation is
+based on ERA, written in Haskell by David Lester. Computable real
 numbers are those which can be computed (i.e. approximated) to any
-desired precision. Unlike `Double` and `BigDecimal`, `Real` values are not
-stored as approximations, but rather as a function from desired
-precision to closest approximate value.
+desired precision. Unlike `Double` and `BigDecimal`, `Real` values are
+not stored as approximations, but rather as a function from a desired
+precision to the closest approximate value.
 
 If we have an instance `x` of `Real` which approximates a real number
 *r*, this means that for any precision *p* (in bits), our instance
 will produce an *x* such that *x/2^p* is the closest rational value to
 *r*. Translated into Scala, this means that `x.apply(p)` returns a
-`SafeLong` value `x`, such that `Rational(x, SafeLong(2).pow(p))` is
-the best approximation for *r*.
+`SafeLong` value `x`, such that `Rational(x, SafeLong(2).pow(p))` is a
+best approximation for *r*.
 
 Spire represents two types of `Real` values: `Exact` and
 `Inexact`. The former are rational values for which we have an
 existing instance of `Rational`, and are inexpensive to work with. The
 latter are functions for approximating (potentially) irrational
-values, are lazily evaluated and memoized, and can be potentially very
+values, are lazily evaluated and memoized, and can potentially be very
 expensive to compute.
 
 As with `Rational` values, operations on `Real` values are able to
@@ -719,7 +724,7 @@ Like the unsigned case, you can use `Byte` (8-bit), `Short` (16-bit), `Int`
 (32-bit), or `Long` (64-bit) to handle cases where your values are small, or
 where you want to avoid allocations and will handle truncation issues
 yourself. These types are provided by Scala (and ultimately the JVM) and will
-not cause allocations.
+not cause object allocations.
 
 #### Fractional numbers (numbers that can be divided)
 
@@ -748,7 +753,7 @@ your results will always be correctly approximated to whatever precision you
 need.
 
 The next precise type is `Algebraic`. This type supports all rational values
-as well as roots. However, it cannot reprsent transcendental values like "pi",
+as well as roots. However, it cannot represent transcendental values like "pi",
 making its values a subset of `Real`'s. Unlike `Real`, this type is able to do
 exact sign tests (and thus, equality tests and comparisons). Due to the ASTs
 `Algebraic` uses to represent expressions, execution may be slow and involve
@@ -773,7 +778,7 @@ an exact representation of values like `0.111110`, and the user can use
 type is still subject to accumulated rounding error, and thus is not truly
 associative.
 
-Next comes `Float` and `Double`, the built-in 32- and 64-bit floating-point
+Next come `Float` and `Double`, the built-in 32- and 64-bit floating-point
 implementations on the JVM. The pitfalls of using floating-point values are
 well-known (and documented elsewhere) but these types are very fast.
 
