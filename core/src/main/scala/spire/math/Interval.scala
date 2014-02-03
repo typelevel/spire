@@ -245,6 +245,59 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       }
   }
 
+  def abs(implicit m: AdditiveGroup[A]): Interval[A] =
+    if (crossesZero) {
+      this match {
+        case Ranged(lower, upper, fs) =>
+          val x = -lower
+          if (x > upper) Ranged(m.zero, x, lowerFlagToUpper(fs))
+          else if (upper > x) Ranged(m.zero, upper, upperFlag(fs))
+          else Ranged(m.zero, x, lowerFlagToUpper(fs) & upperFlag(fs))
+        case _ =>
+          Interval.atOrAbove(m.zero)
+      }
+    } else if (isBelow(m.zero)) {
+      -this
+    } else {
+      this
+    }
+
+  def min(rhs: Interval[A])(implicit m: AdditiveMonoid[A]): Interval[A] = {
+    def zzz(x1: A, f1: Int, x2: A, f2: Int, f3: Int): (A, Int) =
+      if (x1 < x2) (x1, f1) else if (x2 < x1) (x2, f2) else (x1, f3)
+
+    val lower = for {
+      (x1, f1) <- lhs.lowerPair
+      (x2, f2) <- rhs.lowerPair
+    } yield zzz(x1, f1, x2, f2, f1 & f2)
+
+    val upper = (lhs.upperPair, rhs.upperPair) match {
+      case (None, p2) => p2
+      case (p1, None) => p1
+      case (Some((x1, f1)), Some((x2, f2))) => Some(zzz(x1, f1, x2, f2, f1 | f2))
+    }
+
+    fromOptionalTpls(lower, upper)
+  }
+
+  def max(rhs: Interval[A])(implicit m: AdditiveMonoid[A]): Interval[A] = {
+    def zzz(x1: A, f1: Int, x2: A, f2: Int, f3: Int): (A, Int) =
+      if (x1 > x2) (x1, f1) else if (x2 > x1) (x2, f2) else (x1, f3)
+
+    val lower = (lhs.lowerPair, rhs.lowerPair) match {
+      case (None, p2) => p2
+      case (p1, None) => p1
+      case (Some((x1, f1)), Some((x2, f2))) => Some(zzz(x1, f1, x2, f2, f1 | f2))
+    }
+
+    val upper = for {
+      (x1, f1) <- lhs.upperPair
+      (x2, f2) <- rhs.upperPair
+    } yield zzz(x1, f1, x2, f2, f1 & f2)
+
+    fromOptionalTpls(lower, upper)
+  }
+
   def combine(rhs: Interval[A])(f: (A, A) => A): Interval[A] = {
     val ll: Option[(A, Int)] = for {
       (x1, f1) <- lhs.lowerPair
@@ -293,7 +346,15 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   private[this] def maxTpl(t1: (A, Int), t2: (A, Int)): (A, Int) =
     if (t1._1 > t2._1) t1 else t2
 
-  private[this] def fromTpl(t1: (A, Int), t2: (A, Int))(implicit r: AdditiveMonoid[A]): Interval[A] =
+  private[this] def fromOptionalTpls(t1: Option[(A, Int)], t2: Option[(A, Int)])(implicit r: AdditiveMonoid[A]): Interval[A] =
+    (t1, t2) match {
+      case (None, None) => Interval.all
+      case (Some((x1, f1)), None) => Above(x1, f1)
+      case (None, Some((x2, f2))) => Below(x2, f2)
+      case (Some(t1), Some(t2)) => fromTpls(t1, t2)
+    }
+
+  private[this] def fromTpls(t1: (A, Int), t2: (A, Int))(implicit r: AdditiveMonoid[A]): Interval[A] =
     Interval.withFlags(t1._1, t2._1, lowerFlag(t1._2) | lowerFlagToUpper(t2._2))
 
   def *(rhs: Interval[A])(implicit ev: Semiring[A]): Interval[A] = {
@@ -351,15 +412,15 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
           val lcz = lhs.crossesZero
           val rcz = rhs.crossesZero
           if (lcz && rcz) {
-            fromTpl(minTpl(lu, ul), maxTpl(ll, uu))
+            fromTpls(minTpl(lu, ul), maxTpl(ll, uu))
           } else if (lcz) {
-            if (rhs.isAbove(z)) fromTpl(lu, uu) else fromTpl(ul, ll)
+            if (rhs.isAbove(z)) fromTpls(lu, uu) else fromTpls(ul, ll)
           } else if (rcz) {
-            if (lhs.isAbove(z)) fromTpl(ul, uu) else fromTpl(lu, ll)
+            if (lhs.isAbove(z)) fromTpls(ul, uu) else fromTpls(lu, ll)
           } else if (lhs.isBelow(z) == rhs.isBelow(z)) {
-            fromTpl(minTpl(ll, uu), maxTpl(ll, uu))
+            fromTpls(minTpl(ll, uu), maxTpl(ll, uu))
           } else {
-            fromTpl(minTpl(lu, ul), maxTpl(lu, ul))
+            fromTpls(minTpl(lu, ul), maxTpl(lu, ul))
           }
       }
     }
@@ -552,6 +613,23 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       loop(this, k - 1, this)
     }
   }
+
+  def nroot(k: Int)(implicit r: Ring[A], n: NRoot[A]): Interval[A] = {
+    if (k == 1) {
+      this
+    } else if ((k & 1) == 0 && isBelow(r.zero)) {
+      sys.error("can't take even root of negative number")
+    } else {
+      this match {
+        case All() => this
+        case Above(l, lf) => Above(l.nroot(k), lf)
+        case Below(u, uf) => Below(u.nroot(k), uf)
+        case Ranged(l, u, flags) => Ranged(l.nroot(k), u.nroot(k), flags)
+      }
+    }
+  }
+
+  def sqrt(implicit r: Ring[A], n: NRoot[A]): Interval[A] = nroot(2)
 
   def top(epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] = this match {
     case Below(upper, uf) =>
