@@ -144,7 +144,7 @@ trait FastLevel3 extends Level3 {
       val e = b.elements
       //cforRange(0 until nn by nr) { j =>
       cfor(0)(_ < nn, _ + nr) { j =>
-        // start of column j, j+1, j+2 and j+4
+        // start of column j, j+1, j+2 and j+3
         val r0 = o + (j+0)*ld
         val r1 = o + (j+1)*ld
         val r2 = o + (j+2)*ld
