@@ -67,6 +67,7 @@ object Polynomial extends PolynomialInstances {
   def twox[@spec(Double) C: Eq: Rig: ClassTag]: Polynomial[C] =
     linear(Rig[C].one + Rig[C].one)
 
+
   private[this] val termRe = "([0-9]+\\.[0-9]+|[0-9]+/[0-9]+|[0-9]+)?(?:([a-z])(?:\\^([0-9]+))?)?".r
 
   private[this] val operRe = " *([+-]) *".r
@@ -110,7 +111,11 @@ object Polynomial extends PolynomialInstances {
 
     // make sure we have at most one variable
     val vs = ts.view.map(_.v).toSet.filter(_ != "")
+<<<<<<< HEAD
+    if (vs.size > 1) sys.error("only univariate polynomials please, you might require MultivariatePolynomial.")
+=======
     if (vs.size > 1) throw new IllegalArgumentException("only univariate polynomials supported")
+>>>>>>> FETCH_HEAD
 
     // we're done!
     Polynomial(ts.map(t => (t.e, t.c)).toMap)
