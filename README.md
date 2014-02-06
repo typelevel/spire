@@ -95,7 +95,7 @@ to concepts from abstract algebra:
 
  * `Eq[A]` types that can be compared for equality
  * `Order[A]` types that can be compared and ordered
- * `Semigroup[A]` types with an associtive binary operator `|+|`
+ * `Semigroup[A]` types with an associative binary operator `|+|`
  * `Monoid[A]` semigroups that have an identity element
  * `Group[A]` monoids that have an inverse operator
  * `Semiring[A]` types that form semigroups under `+` and `*`
