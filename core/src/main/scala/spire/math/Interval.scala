@@ -124,8 +124,14 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       }
   }
 
+  def isProperSupersetOf(rhs: Interval[A]): Boolean =
+    lhs != rhs && (lhs isSupersetOf rhs)
+
   def isSubsetOf(rhs: Interval[A]): Boolean =
-    rhs.isSupersetOf(lhs)
+    rhs isSupersetOf lhs
+
+  def isProperSubsetOf(rhs: Interval[A]): Boolean =
+    rhs isProperSupersetOf lhs
 
   def isAbove(t: A): Boolean = this match {
     case Below(upper, flags) => upper > t
@@ -846,4 +852,29 @@ object Interval {
       def plus(x: Interval[A], y: Interval[A]): Interval[A] = x + y
       def times(x: Interval[A], y: Interval[A]): Interval[A] = x * y
     }
+
+  // TODO: maybe put this somewhere more global once we have other types that need these?
+  implicit class SymbolicSetOps[A](lhs: Interval[A]) {
+
+    def ∋(rhs: A): Boolean =
+      lhs contains rhs
+
+    def ∩(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
+      lhs intersect rhs
+
+    def ∪(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
+      lhs union rhs
+
+    def ⊂(rhs: Interval[A]): Boolean =
+      lhs isProperSubsetOf rhs
+
+    def ⊃(rhs: Interval[A]): Boolean =
+      lhs isProperSupersetOf rhs
+
+    def ⊆(rhs: Interval[A]): Boolean =
+      lhs isSubsetOf rhs
+
+    def ⊇(rhs: Interval[A]): Boolean =
+      lhs isSupersetOf rhs
+  }
 }
