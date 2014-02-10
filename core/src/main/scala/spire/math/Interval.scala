@@ -157,6 +157,13 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       false
   }
 
+  private[this] def minLower(lower1: A, lower2: A, flags1: Int, flags2: Int): (A, Int) =
+    (lower1 compare lower2) match {
+      case -1 => (lower1, flags1)
+      case 0 => (lower1, flags1 & flags2)
+      case 1 => (lower2, flags2)
+    }
+
   private[this] def maxLower(lower1: A, lower2: A, flags1: Int, flags2: Int): (A, Int) =
     (lower1 compare lower2) match {
       case -1 => (lower2, flags2)
@@ -171,10 +178,20 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       case 1 => (upper2, flags2)
     }
 
-  def intersects(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Boolean =
-    !(lhs mask rhs).isEmpty
+  private[this] def maxUpper(upper1: A, upper2: A, flags1: Int, flags2: Int): (A, Int) =
+    (upper1 compare upper2) match {
+      case -1 => (upper2, flags2)
+      case 0 => (upper1, flags1 & flags2)
+      case 1 => (upper1, flags1)
+    }
 
-  def mask(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] = lhs match {
+  def intersects(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Boolean =
+    !(lhs intersect rhs).isEmpty
+
+  def &(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
+    lhs intersect rhs
+
+  def intersect(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] = lhs match {
     case All() => rhs
     case Below(upper1, flags1) => rhs match {
       case All() =>
@@ -218,7 +235,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   }
 
   def split(t: A)(implicit r: AdditiveMonoid[A]): (Interval[A], Interval[A]) =
-    (this mask Interval.below(t), this mask Interval.above(t))
+    (this intersect Interval.below(t), this intersect Interval.above(t))
 
   def splitAtZero(implicit ev: AdditiveMonoid[A]): (Interval[A], Interval[A]) =
     split(ev.zero)
@@ -226,6 +243,42 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def mapAroundZero[B](f: Interval[A] => B)(implicit ev: AdditiveMonoid[A]): (B, B) =
     splitAtZero match {
       case (a, b) => (f(a), f(b))
+    }
+
+  def |(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
+    lhs union rhs
+
+  def union(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
+    (lhs, rhs) match {
+      case (All(), _) => lhs
+      case (_, All()) => rhs
+      case (Above(_, _), Below(_, _)) => All()
+      case (Below(_, _), Above(_, _)) => All()
+
+      case (Below(upper1, flags1), Below(upper2, flags2)) =>
+        val (u, uf) = maxUpper(upper1, upper2, flags1, flags2)
+        Below(u, uf)
+      case (Below(upper1, flags1), Ranged(_, upper2, flags2)) =>
+        val (u, uf) = maxUpper(upper1, upper2, flags1, flags2)
+        Below(u, uf)
+      case (Ranged(_, upper1, flags1), Below(upper2, flags2)) =>
+        val (u, uf) = maxUpper(upper1, upper2, flags1, flags2)
+        Below(u, uf)
+
+      case (Above(lower1, flags1), Above(lower2, flags2)) =>
+        val (l, lf) = minLower(lower1, lower2, flags1, flags2)
+        Above(l, lf)
+      case (Above(lower1, flags1), Ranged(lower2, _, flags2)) =>
+        val (l, lf) = minLower(lower1, lower2, flags1, flags2)
+        Above(l, lf)
+      case (Ranged(lower1, _, flags1), Above(lower2, flags2)) =>
+        val (l, lf) = minLower(lower1, lower2, flags1, flags2)
+        Above(l, lf)
+
+      case (Ranged(lower1, upper1, flags1), Ranged(lower2, upper2, flags2)) =>
+        val (l, lf) = minLower(lower1, lower2, flags1, flags2)
+        val (u, uf) = maxUpper(upper1, upper2, flags1, flags2)
+        Interval.withFlags(l, u, lf | uf)
     }
 
   override def toString(): String = this match {
