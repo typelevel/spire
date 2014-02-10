@@ -137,6 +137,26 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
 
   import ArbitrarySupport.{interval, rational}
 
+  property("x ⊆ x") {
+    forAll { (x: Interval[Rational]) => (x isSupersetOf x) shouldBe true }
+  }
+
+  property("x ⊆ (x | y) && y ⊆ (x | y)") {
+    forAll { (x: Interval[Rational], y: Interval[Rational]) =>
+      val z = x | y
+      (z isSupersetOf x) shouldBe true
+      (z isSupersetOf y) shouldBe true
+    }
+  }
+
+  property("(x & y) ⊆ x && (x & y) ⊆ y") {
+    forAll { (x: Interval[Rational], y: Interval[Rational]) =>
+      val z = x & y
+      (x isSupersetOf z) shouldBe true
+      (y isSupersetOf z) shouldBe true
+    }
+  }
+
   val rng = spire.random.mutable.GlobalRng
 
   def sample(int: Interval[Rational], n: Int): Array[Rational] =

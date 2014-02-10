@@ -47,7 +47,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   @inline private[this] final def isOpen(flags: Int): Boolean = flags == 3
   @inline private[this] final def isOpenBelow(flags: Int): Boolean = (flags & 1) == 1
-  @inline private[this] final def isOpenAbove(flags: Int): Boolean = (flags & 2) == 1
+  @inline private[this] final def isOpenAbove(flags: Int): Boolean = (flags & 2) == 2
 
   @inline private[this] final def lowerFlag(flags: Int): Int = flags & 1
   @inline private[this] final def upperFlag(flags: Int): Int = flags & 2
@@ -60,6 +60,11 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   def isEmpty: Boolean = this match {
     case Ranged(lower, upper, flags) => isOpen(flags) && lower === upper
+    case _ => false
+  }
+
+  def isPoint: Boolean = this match {
+    case Ranged(lower, upper, flags) => isClosed(flags) && lower === upper
     case _ => false
   }
 
@@ -80,7 +85,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   private[spire] def upperPair: Option[(A, Int)] = this match {
     case Ranged(lower, upper, flags) => Some((upper, upperFlag(flags)))
-    case Above(upper, flags) => Some((upper, flags))
+    case Below(upper, flags) => Some((upper, flags))
     case _ => None
   }
 
@@ -109,6 +114,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       }.getOrElse(false)
     case Ranged(lower1, upper1, flags1) =>
       rhs match {
+        case r if r.isEmpty =>
+          true
         case Ranged(lower2, upper2, flags2) =>
           lowerPairBelow(lower1, flags1, lower2, flags2) &&
           upperPairAbove(upper1, flags1, upper2, flags2)
@@ -217,6 +224,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
         val (l, lf) = maxLower(lower1, lower2, flags1, flags2)
         Interval.withFlags(l, upper2, lf | upperFlag(flags2))
     }
+    case r1 if r1.isEmpty =>
+      Interval.empty[A]
     case Ranged(lower1, upper1, flags1) =>
       rhs match {
         case All() =>
@@ -227,6 +236,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
         case Below(upper2, flags2) =>
           val (u, uf) = minUpper(upper1, upper2, flags1, flags2)
           Interval.withFlags(lower1, u, lowerFlag(flags1) | uf)
+        case r2 if r2.isEmpty =>
+          Interval.empty[A]
         case Ranged(lower2, upper2, flags2) =>
           val (l, lf) = maxLower(lower1, lower2, flags1, flags2)
           val (u, uf) = minUpper(upper1, upper2, flags1, flags2)
@@ -274,6 +285,9 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       case (Ranged(lower1, _, flags1), Above(lower2, flags2)) =>
         val (l, lf) = minLower(lower1, lower2, flags1, flags2)
         Above(l, lf)
+
+      case (r1, r2) if r1.isEmpty => r2
+      case (r1, r2) if r2.isEmpty => r1
 
       case (Ranged(lower1, upper1, flags1), Ranged(lower2, upper2, flags2)) =>
         val (l, lf) = minLower(lower1, lower2, flags1, flags2)
