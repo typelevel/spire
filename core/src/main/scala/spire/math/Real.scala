@@ -2,6 +2,7 @@ package spire.math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import spire.syntax.nroot._
+import spire.algebra._
 
 sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
@@ -243,7 +244,6 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 }
 
 object Real {
-  import spire.algebra._
 
   val zero: Real = Exact(Rational.zero)
   val one: Real = Exact(Rational.one)
@@ -480,81 +480,7 @@ object Real {
     //powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ + 1, x)
     powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ * 2, x)
 
-  implicit val algebra = new Fractional[Real] with Order[Real] with Signed[Real] with Trig[Real] {
-    def abs(x: Real): Real = x.abs
-    def signum(x: Real): Int = x.signum
-
-    override def eqv(x: Real, y: Real): Boolean = x eqv y
-    def compare(x: Real, y: Real): Int = x compare y
-
-    def zero: Real = Real.zero
-    def one: Real = Real.one
-    def negate(x: Real): Real = -x
-    def plus(x: Real, y: Real): Real = x + y
-    override def minus(x: Real, y: Real): Real = x - y
-    def times(x: Real, y: Real): Real = x * y
-
-    def gcd(x: Real, y: Real): Real = x gcd y
-    def quot(x: Real, y: Real): Real = x /~ y
-    def mod(x: Real, y: Real): Real = x % y
-
-    override def reciprocal(x: Real): Real = x.reciprocal
-    def div(x: Real, y: Real): Real = x / y
-
-    override def sqrt(x: Real): Real = x.sqrt
-    def nroot(x: Real, k: Int): Real = x.nroot(k)
-    def fpow(x: Real, y: Real): Real = x fpow y
-
-    def acos(a: Real): Real = Real.acos(a)
-    def asin(a: Real): Real = Real.asin(a)
-    def atan(a: Real): Real = Real.atan(a)
-    def atan2(y: Real, x: Real): Real = Real.atan2(y, x)
-    def cos(a: Real): Real = Real.cos(a)
-    def cosh(x: Real): Real = Real.cosh(x)
-    def e: Real = Real.e
-    def exp(x: Real): Real = Real.exp(x)
-    def expm1(x: Real): Real = Real.exp(x) - Real.one
-    def log(x: Real): Real = Real.log(x)
-    def log1p(x: Real): Real = Real.log(Real.one + x)
-    def pi: Real = Real.pi
-    def sin(x: Real): Real = Real.sin(x)
-    def sinh(x: Real): Real = Real.sinh(x)
-    def tan(x: Real): Real = Real.tan(x)
-    def tanh(x: Real): Real = Real.tanh(x)
-    def toDegrees(a: Real): Real = a / (Real.two * Real.pi) * Real(360)
-    def toRadians(a: Real): Real = a / Real(360) * (Real.two * Real.pi)
-
-    def ceil(x: Real): Real = x.ceil
-    def floor(x: Real): Real = x.floor
-    def isWhole(x: Real): Boolean = x.isWhole
-    def round(x: Real): Real = x.round
-
-    def toRational(x: Real): Rational = x.toRational
-    def toDouble(x: Real): Double = x.toRational.toDouble
-    def toBigDecimal(x: Real): BigDecimal = x.toRational.toBigDecimal
-    def toBigInt(x: Real): BigInt = x.toRational.toBigInt
-    def toByte(x: Real): Byte = x.toRational.toByte
-    def toFloat(x: Real): Float = x.toRational.toFloat
-    def toInt(x: Real): Int = x.toRational.toInt
-    def toLong(x: Real): Long = x.toRational.toLong
-    def toNumber(x: Real): Number = Number(x.toRational)
-    def toShort(x: Real): Short = x.toRational.toShort
-    def toString(x: Real): String = x.toString
-
-    def toType[B](x: Real)(implicit ev: ConvertableTo[B]): B =
-      ev.fromRational(x.toRational)
-
-    def fromBigDecimal(n: BigDecimal): Real = Real(n)
-    def fromBigInt(n: BigInt): Real = Real(n)
-    def fromByte(n: Byte): Real = Real(n)
-    def fromFloat(n: Float): Real = Real(n)
-    def fromLong(n: Long): Real = Real(n)
-    def fromRational(n: Rational): Real = Real(n)
-    def fromShort(n: Short): Real = Real(n)
-
-    def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): Real =
-      Real(ev.toRational(b))
-  }
+  implicit val algebra = new RealIsFractional {}
 
   case class Exact(n: Rational) extends Real {
     def apply(p: Int): SafeLong = Real.roundUp(Rational(2).pow(p) * n)
@@ -573,3 +499,80 @@ object Real {
     }
   }
 }
+
+trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Real] with Trig[Real] {
+  def abs(x: Real): Real = x.abs
+  def signum(x: Real): Int = x.signum
+
+  override def eqv(x: Real, y: Real): Boolean = x eqv y
+  def compare(x: Real, y: Real): Int = x compare y
+
+  def zero: Real = Real.zero
+  def one: Real = Real.one
+  def negate(x: Real): Real = -x
+  def plus(x: Real, y: Real): Real = x + y
+  override def minus(x: Real, y: Real): Real = x - y
+  def times(x: Real, y: Real): Real = x * y
+
+  def gcd(x: Real, y: Real): Real = x gcd y
+  def quot(x: Real, y: Real): Real = x /~ y
+  def mod(x: Real, y: Real): Real = x % y
+
+  override def reciprocal(x: Real): Real = x.reciprocal
+  def div(x: Real, y: Real): Real = x / y
+
+  override def sqrt(x: Real): Real = x.sqrt
+  def nroot(x: Real, k: Int): Real = x.nroot(k)
+  def fpow(x: Real, y: Real): Real = x fpow y
+
+  def acos(a: Real): Real = Real.acos(a)
+  def asin(a: Real): Real = Real.asin(a)
+  def atan(a: Real): Real = Real.atan(a)
+  def atan2(y: Real, x: Real): Real = Real.atan2(y, x)
+  def cos(a: Real): Real = Real.cos(a)
+  def cosh(x: Real): Real = Real.cosh(x)
+  def e: Real = Real.e
+  def exp(x: Real): Real = Real.exp(x)
+  def expm1(x: Real): Real = Real.exp(x) - Real.one
+  def log(x: Real): Real = Real.log(x)
+  def log1p(x: Real): Real = Real.log(Real.one + x)
+  def pi: Real = Real.pi
+  def sin(x: Real): Real = Real.sin(x)
+  def sinh(x: Real): Real = Real.sinh(x)
+  def tan(x: Real): Real = Real.tan(x)
+  def tanh(x: Real): Real = Real.tanh(x)
+  def toDegrees(a: Real): Real = a / (Real.two * Real.pi) * Real(360)
+  def toRadians(a: Real): Real = a / Real(360) * (Real.two * Real.pi)
+
+  def ceil(x: Real): Real = x.ceil
+  def floor(x: Real): Real = x.floor
+  def isWhole(x: Real): Boolean = x.isWhole
+  def round(x: Real): Real = x.round
+
+  def toRational(x: Real): Rational = x.toRational
+  def toDouble(x: Real): Double = x.toRational.toDouble
+  def toBigDecimal(x: Real): BigDecimal = x.toRational.toBigDecimal
+  def toBigInt(x: Real): BigInt = x.toRational.toBigInt
+  def toByte(x: Real): Byte = x.toRational.toByte
+  def toFloat(x: Real): Float = x.toRational.toFloat
+  def toInt(x: Real): Int = x.toRational.toInt
+  def toLong(x: Real): Long = x.toRational.toLong
+  def toNumber(x: Real): Number = Number(x.toRational)
+  def toShort(x: Real): Short = x.toRational.toShort
+  def toString(x: Real): String = x.toString
+
+  def toType[B](x: Real)(implicit ev: ConvertableTo[B]): B =
+    ev.fromRational(x.toRational)
+
+  def fromBigDecimal(n: BigDecimal): Real = Real(n)
+  def fromBigInt(n: BigInt): Real = Real(n)
+  def fromByte(n: Byte): Real = Real(n)
+  def fromFloat(n: Float): Real = Real(n)
+  def fromLong(n: Long): Real = Real(n)
+  def fromRational(n: Rational): Real = Real(n)
+  def fromShort(n: Short): Real = Real(n)
+
+  def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): Real =
+    Real(ev.toRational(b))
+}
+

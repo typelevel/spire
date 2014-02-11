@@ -156,7 +156,7 @@ private[math] trait ConvertableToAlgebraic extends ConvertableTo[Algebraic] {
   def fromBigDecimal(a: BigDecimal): Algebraic = Algebraic(a)
   def fromRational(a: Rational) = Algebraic(a)
 
-  def fromType[B: ConvertableFrom](b: B): Algebraic = sys.error("fixme")
+  def fromType[B: ConvertableFrom](b: B): Algebraic = Algebraic(ConvertableFrom[B].toRational(b))
 }
 
 private[math] trait ConvertableToComplex[A] extends ConvertableTo[Complex[A]] {
@@ -411,7 +411,7 @@ private[math] trait ConvertableFromAlgebraic extends ConvertableFrom[Algebraic] 
   def toRational(a: Algebraic): Rational = a.toRational(ApproximationContext(Rational(1L, 100000000000000000L)))
   def toNumber(a: Algebraic): Number = Number(toBigDecimal(a))
 
-  def toType[B: ConvertableTo](a: Algebraic): B = sys.error("fixme")
+  def toType[B: ConvertableTo](a: Algebraic): B = ConvertableTo[B].fromRational(a.toRational)
   def toString(a: Algebraic): String = a.toString
 }
 
