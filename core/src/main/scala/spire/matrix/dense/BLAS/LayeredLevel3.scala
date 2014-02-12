@@ -135,21 +135,23 @@ trait LayeredLevel3 extends Level3 {
      * Requirement: nr == 2 or 4. Not enforced for performance reason,
      * i.e. using any other value will lead to disaster.
      */
-    def packColumnSlices(b:Matrix, nr:Int, bb:Long) {
+    def packColumnSlices(reverseRows:Boolean)(b:Matrix, nr:Int, bb:Long) {
       val (kc,n) = b.dimensions
       val nn = (n/nr)*nr
       var pbb = bb
       val ld = b.ld
       val o = b.start
       val e = b.elements
-      //cforRange(0 until nn by nr) { j =>
+      val (rowStart, rowInc, rowEnd) =
+        if(reverseRows) (kc-1, -1, -1)
+        else            (0   , +1, kc)
       cfor(0)(_ < nn, _ + nr) { j =>
         // start of column j, j+1, j+2 and j+3
         val r0 = o + (j+0)*ld
         val r1 = o + (j+1)*ld
         val r2 = o + (j+2)*ld
         val r3 = o + (j+3)*ld
-        cforRange(0 until kc) { p =>
+        cfor(rowStart)(_ != rowEnd, _ + rowInc) { p =>
                       put(pbb, 0, e(r0+p))
                       put(pbb, 1, e(r1+p))
           if(nr == 4) put(pbb, 2, e(r2+p))
@@ -159,7 +161,7 @@ trait LayeredLevel3 extends Level3 {
       }
       cforRange(nn until n) { j =>
         val r0 = o + (j+0)*ld
-        cforRange(0 until kc) { p =>
+        cfor(rowStart)(_ != rowEnd, _ + rowInc) { p =>
           put(pbb, 0, e(r0+p))
           pbb += 1 * 8
         }
@@ -172,21 +174,24 @@ trait LayeredLevel3 extends Level3 {
      * @parameter alpha: elements from the buffer bb are multiplied by it
      *                   before being copied back to b
      */
-    def unpackColumnSlices(alpha:Double, bb:Long, nr:Int, b:Matrix) {
+    def unpackColumnSlices(reverseRows:Boolean)
+                          (alpha:Double, bb:Long, nr:Int, b:Matrix) {
       val (kc,n) = b.dimensions
       val nn = (n/nr)*nr
       var pbb = bb
       val ld = b.ld
       val o = b.start
       val e = b.elements
-      //cforRange(0 until nn by nr) { j =>
+      val (rowStart, rowInc, rowEnd) =
+        if(reverseRows) (kc-1, -1, -1)
+        else            (0   , +1, kc)
       cfor(0)(_ < nn, _ + nr) { j =>
         // start of column j, j+1, j+2 and j+3
         val r0 = o + (j+0)*ld
         val r1 = o + (j+1)*ld
         val r2 = o + (j+2)*ld
         val r3 = o + (j+3)*ld
-        cforRange(0 until kc) { p =>
+        cfor(rowStart)(_ != rowEnd, _ + rowInc) { p =>
                       e(r0+p) = alpha*get(pbb, 0)
                       e(r1+p) = alpha*get(pbb, 1)
           if(nr == 4) e(r2+p) = alpha*get(pbb, 2)
@@ -196,7 +201,7 @@ trait LayeredLevel3 extends Level3 {
       }
       cforRange(nn until n) { j =>
         val r0 = o + (j+0)*ld
-        cforRange(0 until kc) { p =>
+        cfor(rowStart)(_ != rowEnd, _ + rowInc) { p =>
           e(r0+p) = alpha*get(pbb, 0)
           pbb += 1 * 8
         }
@@ -223,16 +228,18 @@ trait LayeredLevel3 extends Level3 {
      * Requirement: mr == 2 or 4. Not enforced for performance reason,
      * i.e. using any other value will lead to disaster.
      */
-    def packRowSlices(a:Matrix, mr:Int, aa:Long) {
+    def packRowSlices(reverseColumns:Boolean)(a:Matrix, mr:Int, aa:Long) {
       val (mc,nc) = a.dimensions
       val mmc = (mc/mr)*mr
       var paa = aa
       val ld = a.ld
       val o = a.start
       val e = a.elements
-      //cforRange(0 until mmc by mr) { i =>
+      val (colStart, colInc, colEnd) =
+        if(reverseColumns) (nc-1, -1, -1)
+        else               (   0, +1, nc)
       cfor(0)(_ < mmc, _ + mr) { i =>
-        cforRange(0 until nc) { j =>
+        cfor(colStart)(_ != colEnd, _ + colInc) { j =>
           val r = o + i + j*ld
                       put(paa, 0, e(r+0))
                       put(paa, 1, e(r+1))
@@ -242,7 +249,7 @@ trait LayeredLevel3 extends Level3 {
         }
       }
       cforRange(mmc until mc) { i =>
-        cforRange(0 until nc) { j =>
+        cfor(colStart)(_ != colEnd, _ + colInc) { j =>
           put(paa, 0, a(i,j))
           paa += 1 * 8
         }
@@ -255,16 +262,19 @@ trait LayeredLevel3 extends Level3 {
      * @parameter alpha: elements from the buffer aa are multiplied by it
      *                   before being copied back to a
      */
-    def unpackRowSlices(alpha:Double, aa:Long, mr:Int, a:Matrix) {
+    def unpackRowSlices(reverseColumns:Boolean)
+                       (alpha:Double, aa:Long, mr:Int, a:Matrix) {
       val (mc,nc) = a.dimensions
       val mmc = (mc/mr)*mr
       var paa = aa
       val ld = a.ld
       val o = a.start
       val e = a.elements
-      //cforRange(0 until mmc by mr) { i =>
+      val (colStart, colInc, colEnd) =
+        if(reverseColumns) (nc-1, -1, -1)
+        else               (   0, +1, nc)
       cfor(0)(_ < mmc, _ + mr) { i =>
-        cforRange(0 until nc) { j =>
+        cfor(colStart)(_ != colEnd, _ + colInc) { j =>
           val r = o + i + j*ld
                       e(r+0) = alpha*get(paa, 0)
                       e(r+1) = alpha*get(paa, 1)
@@ -274,7 +284,7 @@ trait LayeredLevel3 extends Level3 {
         }
       }
       cforRange(mmc until mc) { i =>
-        cforRange(0 until nc) { j =>
+        cfor(colStart)(_ != colEnd, _ + colInc) { j =>
           a(i,j) = alpha*get(paa, 0)
           paa += 1 * 8
         }
@@ -524,10 +534,10 @@ trait LayeredLevel3 extends Level3 {
                  else                      (iLo:Int,iHi:Int, pLo:Int,pHi:Int) =>
                    a.block(pLo,pHi)(iLo,iHi)
 
-    val packB = if(transB == NoTranspose) GEBP.packColumnSlices _
-                else                      GEBP.packRowSlices _
-    val packA = if(transA == NoTranspose) GEBP.packRowSlices _
-                else                      GEBP.packColumnSlices _
+    val packB = if(transB == NoTranspose) GEBP.packColumnSlices(false) _
+                else                      GEBP.packRowSlices(false) _
+    val packA = if(transA == NoTranspose) GEBP.packRowSlices(false) _
+                else                      GEBP.packColumnSlices(false) _
 
     if(beta == 0)
       c := 0
