@@ -233,6 +233,7 @@ object MyBuild extends Build {
       "org.jscience" % "jscience" % "4.3.1",
       "org.apache.commons" % "commons-math3" % "3.2",
       "org.jblas" % "jblas" % "1.2.3",
+      "com.github.fommil.netlib" % "all" % "1.1.1" pomOnly(),
 
       // thyme
       "ichi.bench" % "thyme" % "0.1.0" from "http://plastic-idolatry.com/jars/thyme-0.1.0.jar",
