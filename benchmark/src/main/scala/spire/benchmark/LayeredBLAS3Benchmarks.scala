@@ -7,53 +7,88 @@ import spire.matrix.dense.random.{
 }
 import spire.matrix.dense.BLAS
 import BLAS._
+import spire.matrix.{Sides, UpperOrLower, Transposition, DiagonalProperty}
+import Sides._
+import UpperOrLower._
+import Transposition._
+import DiagonalProperty._
 
 import spire.matrix.dense.tests.RandomUncorrelatedElements
 
 import ichi.bench.Thyme
 import spire.implicits._
 
-object BLAS3Bench {
+import org.jblas
 
-  def discrepancy(ref:Matrix, others:Matrix*): Double = {
-    val tRef = ref.trace
-    others.map((a:Matrix) => {
-      val t = a.trace
-      (t - tRef).abs/(t.abs + tRef.abs)
-    }).sum/others.size
-  }
+trait MatrixBenchmark {
+  def header:String
+  type Arguments
+  def benched(args:Arguments): Matrix
+  def gflops(args:Arguments): Double
 
-  def display(flops:Double, reports:Thyme.Benched*): String = {
-    val gflops = flops/1e9
-    reports.map((r:Thyme.Benched) => {
-      val tm = r.runtime
-      val (tl, th) = r.runtimeCI95
-      val (gm, gl, gh) = (gflops/tm, gflops/th, gflops/tl)
-      "%4.2f +%4.2f -%4.2f".format(gm, gh-gm, gm-gl)
-    }).mkString("  ")
+  def formatTitle(h:String) = "%17s".format(h)
+  def formatedHeader = formatTitle(header)
+
+  def formatedTiming(args:Arguments)(implicit timer:Thyme) = {
+    val (result, report) = timer.benchPair(benched(args))
+    val tm = report.runtime
+    val (tl, th) = report.runtimeCI95
+    val g = gflops(args)/1e9
+    val (gm, gl, gh) = (g/tm, g/th, g/tl)
+    val (mean, plusSigma, minusSigma) = (gm, gh-gm, gm-gl)
+    "%5.2f +%4.2f -%4.2f".format(mean, plusSigma, minusSigma)
   }
 }
 
-object MatrixMultiplicationBenchmarks {
-  implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
-  val uniformIm1p1 = new ScalarUniformDistributionFromMinusOneToOne
-  val elts = new RandomUncorrelatedElements(elements=uniformIm1p1)
-
-  def spireGemm(lvl3:BLAS.Level3, a:Matrix, b:Matrix, c:Matrix) = {
-    import spire.matrix.Transposition._
-    lvl3.gemm(NoTranspose, NoTranspose, 2.0, a, b, 1.0, c)
+trait GemmBenchmark extends MatrixBenchmark {
+  type Arguments = (Matrix, Matrix, Matrix)
+  def gflops(args:Arguments) = {
+    val (a, b, c) = args
     val (m,n) = c.dimensions
+    val k = a.dimensions._2
+    (2*k-1)*m*n
+  }
+}
+
+trait SpireGemmBenchmark extends GemmBenchmark {
+  val lvl3:BLAS.Level3
+  def benched(args:Arguments) = {
+    val (a, b, c) = args
+    lvl3.gemm(NoTranspose, NoTranspose, 2.0, a, b, 1.0, c)
     c
   }
+}
 
-  def jblasGemm(m:Int, n:Int, k:Int,
-                a:Array[Double], b:Array[Double], c:Array[Double]) = {
-    import org.jblas
+trait SpireNaiveBenchmark extends MatrixBenchmark {
+  def header = "spire (naive)"
+  val lvl3 = BLAS.NaiveLevel3
+}
+
+trait SpireLayeredBenchmark extends MatrixBenchmark {
+  def header = "spire (layered)"
+  val lvl3 = BLAS.LayeredLevel3
+}
+
+class JBlasGemmBenchmark extends GemmBenchmark {
+  val header = "jblas"
+  def benched(args:Arguments) = {
+    val (a, b, c) = args
+    val (m,n) = c.dimensions
+    val k = a.dimensions._2
     jblas.NativeBlas.dgemm('N', 'N',
-                           m, n, k, 2.0, a, 0, m, b, 0, k,
-                           1.0, c, 0, m)
-    Matrix(m, n,  c)
+                           m, n, k, 2.0, a.elements, 0, m, b.elements, 0, k,
+                           1.0, c.elements, 0, m)
+    c
   }
+}
+
+trait BenchmarkGenerator {
+  implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
+  val uniform = new ScalarUniformDistributionFromMinusOneToOne
+  val elts = new RandomUncorrelatedElements(elements=uniform)
+}
+
+object MatrixMultiplicationBenchmarks extends BenchmarkGenerator {
 
   def dimensions(minPowerOf2:Int, maxPowerOf2:Int) = for {
       Seq(k,l) <- (minPowerOf2 to maxPowerOf2).map(2**_).sliding(2)
@@ -64,49 +99,73 @@ object MatrixMultiplicationBenchmarks {
   def main(args:Array[String]) {
     val (lo, hi) = if(args.size == 0) (1, 8)
                    else (args(0).toInt, args(1).toInt)
-    println("Gflop/s for product of two n x n matrices")
-    println("-----------------------------------------")
-    println("%4s  %4s  %4s  %16s  %16s  %16s".format(
-            "m", "k", "n", "JBlas", "Spire (Naive)", "Spire (Layered)"))
-    var delta = 0.0
-    for((m,k,n) <- dimensions(lo, hi)) {
-      val genA = elts.generalMatrixSample(m,k)
-      val genB = elts.generalMatrixSample(k,n)
-      val a = genA.next
-      val b = genB.next
-      val c = Matrix.empty(m, n)
-      val timer = new Thyme
-      val (c1, naiveReport) = timer.benchPair(spireGemm(NaiveLevel3, a, b, c))
-      val aa = a.toArray
-      val bb = b.toArray
-      val cc = new Array[Double](m*n)
-      val (c2, jblasReport) = timer.benchPair(jblasGemm(m, n, k, aa, bb, cc))
-      val (c3, fastReport) = timer.benchPair(spireGemm(LayeredLevel3, a, b, c))
-      delta += BLAS3Bench.discrepancy(c2, c1, c3)
-      val flops = (2*k-1)*m*n
-      println("%4d  %4d  %4d  ".format(m, k, n) ++
-              BLAS3Bench.display(flops, jblasReport, naiveReport, fastReport))
+    println("Gflops/s for product of two general matrices")
+    println("--------------------------------------------")
+    val dimsHeader = "%4s  %4s  %4s".format("m", "k", "n")
+    val benchmarks = new JBlasGemmBenchmark ::
+                     new SpireGemmBenchmark with SpireNaiveBenchmark ::
+                     new SpireGemmBenchmark with SpireLayeredBenchmark ::
+                     Nil
+    val benchmarksHeader = benchmarks.map(_.formatedHeader).mkString("  ")
+    println(dimsHeader ++ "  " ++ benchmarksHeader)
+
+    implicit val timer = new Thyme
+
+    for {
+      (m,k,n) <- dimensions(lo, hi)
+      a <- elts.generalMatrixSample(m,k).take(1)
+      b <- elts.generalMatrixSample(k,n).take(1)
+      c = Matrix.empty(m, n)
+    } {
+      println("%4d  %4d  %4d".format(m,k,n) ++ "  " ++
+              benchmarks.map(_.formatedTiming((a, b, c))).mkString("  "))
     }
-    println("Error: %.2f %%".format(delta*100))
   }
 }
 
-object TriangularSolverBenchmarks {
-  import spire.matrix.{Sides, UpperOrLower, Transposition, DiagonalProperty}
-  import Sides._
-  import UpperOrLower._
-  import Transposition._
-  import DiagonalProperty._
+trait TrsmBenchmark extends MatrixBenchmark {
+  type Arguments = (Matrix, Matrix)
+  def topHeader:String
+  def formattedTopHeader = formatTitle(topHeader)
+  val side: Sides.Value
+  val uplo: UpperOrLower.Value
+  val trans: Transposition.Value
+  val diag: DiagonalProperty.Value
 
-  implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
-  val uniformIm1p1 = new ScalarUniformDistributionFromMinusOneToOne
-  val elts = new RandomUncorrelatedElements(elements=uniformIm1p1)
-
-  def spireTrsm(lvl3:BLAS.Level3, a:Matrix, b:Matrix) = {
-    lvl3.trsm(FromLeft, Lower, NoTranspose, UnitDiagonal, 1.0, a, b)
+  def gflops(args:Arguments) = {
+    val (a, b) = args
     val (m,n) = b.dimensions
+    val (p,q) = if(side == FromLeft) (m,n) else (n,m)
+    p*(p+1)*q
+  }
+}
+
+trait Benchmark_L_X_eq_B extends TrsmBenchmark {
+  def topHeader = "L X = B"
+  val side  = FromLeft
+  val uplo  = Lower
+  val trans = NoTranspose
+  val diag  = NonUnitDiagonal
+}
+
+trait Benchmark_X_U_eq_B extends TrsmBenchmark {
+  def topHeader = "X U = B"
+  val side  = FromRight
+  val uplo  = Upper
+  val trans = NoTranspose
+  val diag  = NonUnitDiagonal
+}
+
+trait SpireTrsmBenchmark extends TrsmBenchmark {
+  val lvl3: BLAS.Level3
+  def benched(args:Arguments) = {
+    val (a, b) = args
+    lvl3.trsm(side, uplo, trans, diag, 2.0, a, b)
     b
   }
+}
+
+object TriangularSolverBenchmarks extends BenchmarkGenerator {
 
   def dimensions(minPowerOf2:Int, maxPowerOf2:Int, reverse:Boolean) = for {
       Seq(k,l) <- (if(reverse) maxPowerOf2 to minPowerOf2 by -1
@@ -118,27 +177,31 @@ object TriangularSolverBenchmarks {
     val (lo, hi) = if(args.size == 0) (1, 8)
                    else (args(0).toInt, args(1).toInt)
     val reverse = args.size == 3 && args(2) == "R"
-    println(s">${reverse}<")
     println("Gflop/s for triangular solver A X = B with all matrices m x m")
     println("-------------------------------------------------------------")
-    println("%4s  %16s  %16s".format(
-            "m", "Spire (Naive)", "Spire (Layered)"))
-    var delta = 0.0
-    for(m <- dimensions(lo, hi, reverse)) {
-      val genA = elts.triangularMatrixSample(m, Lower, UnitDiagonal)
-      val genB = elts.generalMatrixSample(m,m)
-      val a = genA.next
-      val b = genB.next
-      val timer = new Thyme
-      val b1 = b.copyToMatrix
-      val (x1, naiveReport) = timer.benchPair(spireTrsm(NaiveLevel3, a, b1))
-      val b2 = b.copyToMatrix
-      val (x2, fastReport) = timer.benchPair(spireTrsm(LayeredLevel3, a, b2))
-      delta += BLAS3Bench.discrepancy(x1, x2)
-      val flops = m*(m-1) * m
-      println("%4d  ".format(m) ++
-              BLAS3Bench.display(flops, naiveReport, fastReport))
+    val dimsHeader = "%4s".format("m")
+    val benchmarks =
+      new Benchmark_L_X_eq_B with SpireTrsmBenchmark with SpireNaiveBenchmark ::
+      new Benchmark_L_X_eq_B with SpireTrsmBenchmark with SpireLayeredBenchmark ::
+      new Benchmark_X_U_eq_B with SpireTrsmBenchmark with SpireNaiveBenchmark ::
+      new Benchmark_X_U_eq_B with SpireTrsmBenchmark with SpireLayeredBenchmark ::
+      Nil
+
+    val benchmarksTopHeader = benchmarks.map(_.formattedTopHeader).mkString("  ")
+    val benchmarksHeader = benchmarks.map(_.formatedHeader).mkString("  ")
+    println("    "     ++ "  " ++ benchmarksTopHeader)
+    println(dimsHeader ++ "  " ++ benchmarksHeader)
+
+    implicit val timer = new Thyme
+
+    for {
+      m <- dimensions(lo, hi, reverse)
+      a <- elts.triangularMatrixSample(m, Lower, UnitDiagonal).take(1)
+      b <- elts.generalMatrixSample(m,m).take(1)
+    } {
+      println("%4d  ".format(m) ++ "  " ++
+              benchmarks.map(_.formatedTiming((a, b))).mkString("  "))
     }
-    println("Error: %.2f %%".format(delta/100))
   }
 }
+
