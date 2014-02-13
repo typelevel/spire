@@ -15,38 +15,68 @@ import DiagonalProperty._
 
 import spire.matrix.dense.tests.RandomUncorrelatedElements
 
-import ichi.bench.Thyme
 import spire.implicits._
+import scala.math
+import scala.collection.mutable.ArrayBuffer
 
 import org.jblas
+
+class MatrixTimer {
+  def bench(flops:Long,
+            trashCaches: => Unit,
+            benched: => Matrix): (Matrix, Array[Double]) = {
+    var totalFlops = 0L
+    var runs = 0
+    var durations = new ArrayBuffer[Long]
+    var result: Matrix = null
+    while(totalFlops < 1e9) {
+      trashCaches
+      val start = System.nanoTime
+      result = benched
+      durations += System.nanoTime - start
+      totalFlops += flops
+      runs += 1
+    }
+    (result, durations.map(flops.toDouble/_).toArray.sorted)
+  }
+}
 
 trait MatrixBenchmark {
   def header:String
   type Arguments
+  def trashCaches(args:Arguments): Unit
   def benched(args:Arguments): Matrix
-  def gflops(args:Arguments): Double
+  def flops(args:Arguments): Long
 
-  def formatTitle(h:String) = "%17s".format(h)
+  def formatTitle(h:String) = "%14s".format(h)
   def formatedHeader = formatTitle(header)
 
-  def formatedTiming(args:Arguments)(implicit timer:Thyme) = {
-    val (result, report) = timer.benchPair(benched(args))
-    val tm = report.runtime
-    val (tl, th) = report.runtimeCI95
-    val g = gflops(args)/1e9
-    val (gm, gl, gh) = (g/tm, g/th, g/tl)
-    val (mean, plusSigma, minusSigma) = (gm, gh-gm, gm-gl)
-    "%5.2f +%4.2f -%4.2f".format(mean, plusSigma, minusSigma)
+  def formatedTiming(args:Arguments)(implicit timer:MatrixTimer) = {
+    val (result, gflops) =
+      timer.bench(flops(args), trashCaches(args), benched(args))
+    val n = gflops.size
+    val (q1, q2, q3) = (gflops(n/4), gflops(n/2), gflops(3*n/4))
+    "%5.2f +/- %4.2f".format(q2, (q3-q1)/1.349)
   }
 }
 
 trait GemmBenchmark extends MatrixBenchmark {
   type Arguments = (Matrix, Matrix, Matrix)
-  def gflops(args:Arguments) = {
+
+  def trashCaches(args:Arguments) {
     val (a, b, c) = args
     val (m,n) = c.dimensions
     val k = a.dimensions._2
-    (2*k-1)*m*n
+    a(m/2,k/2) = (b(0,0) + a(m-1,k-1))/2
+    b(k/2,n/2) = (a(0,0) + b(k-1,n-1))/2
+    c(m/2,n/2) = (c(0,0) + c(m-1,n-1))/2
+  }
+
+  def flops(args:Arguments) = {
+    val (a, b, c) = args
+    val (m,n) = c.dimensions
+    val k = a.dimensions._2
+    (2L*k-1)*m*n
   }
 }
 
@@ -109,7 +139,7 @@ object MatrixMultiplicationBenchmarks extends BenchmarkGenerator {
     val benchmarksHeader = benchmarks.map(_.formatedHeader).mkString("  ")
     println(dimsHeader ++ "  " ++ benchmarksHeader)
 
-    implicit val timer = new Thyme
+    implicit val timer = new MatrixTimer
 
     for {
       (m,k,n) <- dimensions(lo, hi)
@@ -132,11 +162,19 @@ trait TrsmBenchmark extends MatrixBenchmark {
   val trans: Transposition.Value
   val diag: DiagonalProperty.Value
 
-  def gflops(args:Arguments) = {
+  def trashCaches(args:Arguments) {
+    val (a, b) = args
+    val (m,n) = b.dimensions
+    val p = a.dimensions._1
+    a(p/2,p/2) = (b(0,0) + a(p-1,p-1))/2
+    b(m/2,n/2) = (a(0,0) + b(m-1,n-1))/2
+  }
+
+  def flops(args:Arguments) = {
     val (a, b) = args
     val (m,n) = b.dimensions
     val (p,q) = if(side == FromLeft) (m,n) else (n,m)
-    p*(p+1)*q
+    p*(p+1L)*q
   }
 }
 
@@ -192,7 +230,7 @@ object TriangularSolverBenchmarks extends BenchmarkGenerator {
     println("    "     ++ "  " ++ benchmarksTopHeader)
     println(dimsHeader ++ "  " ++ benchmarksHeader)
 
-    implicit val timer = new Thyme
+    implicit val timer = new MatrixTimer
 
     for {
       m <- dimensions(lo, hi, reverse)
