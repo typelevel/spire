@@ -20,6 +20,7 @@ import scala.math
 import scala.collection.mutable.ArrayBuffer
 
 import org.jblas
+import com.github.fommil.netlib
 
 class MatrixTimer {
   def bench(flops:Long,
@@ -112,6 +113,20 @@ class JBlasGemmBenchmark extends GemmBenchmark {
   }
 }
 
+class NetlibJavaGemmBenchmark extends GemmBenchmark {
+  val header = "netlib-java"
+  val blas = netlib.BLAS.getInstance()
+  def benched(args:Arguments) = {
+    val (a, b, c) = args
+    val (m,n) = c.dimensions
+    val k = a.dimensions._2
+    blas.dgemm("N", "N",
+               m, n, k, 2.0, a.elements, 0, m, b.elements, 0, k,
+               1.0, c.elements, 0, m)
+    c
+  }
+}
+
 trait BenchmarkGenerator {
   implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
   val uniform = new ScalarUniformDistributionFromMinusOneToOne
@@ -133,6 +148,7 @@ object MatrixMultiplicationBenchmarks extends BenchmarkGenerator {
     println("--------------------------------------------")
     val dimsHeader = "%4s  %4s  %4s".format("m", "k", "n")
     val benchmarks = new JBlasGemmBenchmark ::
+                     new NetlibJavaGemmBenchmark ::
                      new SpireGemmBenchmark with SpireNaiveBenchmark ::
                      new SpireGemmBenchmark with SpireLayeredBenchmark ::
                      Nil
