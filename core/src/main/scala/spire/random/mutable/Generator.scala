@@ -435,8 +435,6 @@ abstract class Generator {
     fillGaussians(arr, mean, stddev)
     arr
   }
-
-  def toImmutable: immutable.Generator = new ImmutableWrapper(copy)
 }
 
 abstract class IntBasedGenerator extends Generator { self =>
@@ -447,28 +445,6 @@ abstract class IntBasedGenerator extends Generator { self =>
 abstract class LongBasedGenerator extends Generator { self =>
   def nextInt(): Int =
     (nextLong >>> 32).toInt
-}
-
-private final class ImmutableWrapper(var gen: Generator) extends immutable.Generator {
-  def getSeedBytes: Array[Byte] = gen.getSeedBytes()
-
-  def withSeedBytes(bytes: Array[Byte]): immutable.Generator = {
-    val gen0 = gen.copy
-    gen0.setSeedBytes(bytes)
-    new ImmutableWrapper(gen0)
-  }
-
-  def nextInt: (immutable.Generator, Int) = {
-    val gen0 = gen.copy
-    val x = gen0.nextInt
-    (new ImmutableWrapper(gen0), x)
-  }
-
-  def nextLong: (immutable.Generator, Long) = {
-    val gen0 = gen.copy
-    val x = gen0.nextLong
-    (new ImmutableWrapper(gen0), x)
-  }
 }
 
 trait GeneratorCompanion[G, @spec(Int, Long) S] {

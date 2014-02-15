@@ -14,12 +14,6 @@ import scala.reflect.ClassTag
 trait Dist[@spec A] { self =>
   def apply(gen: mutable.Generator): A
 
-  def apply(gen: immutable.Generator): (immutable.Generator, A) = {
-    val gen0 = gen.toMutable
-    val a = apply(gen0)
-    (gen0.toImmutable, a)
-  }
-
   final def get()(implicit gen: mutable.Generator): A =
     apply(gen)
 
