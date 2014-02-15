@@ -108,7 +108,7 @@ class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends 
   val bits = Real.digitsToBits(mc.getPrecision + 1)
 
   def fromReal(r: Real): BigDecimal =
-    BigDecimal(r(bits).toBigInt) / BigDecimal(2).pow(bits)
+    BigDecimal(r(bits).toBigInt) / BigDecimal(BigInt(2).pow(bits))
 
   lazy val e: BigDecimal = fromReal(Real.e)
   lazy val pi: BigDecimal = fromReal(Real.pi)
