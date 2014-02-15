@@ -7,7 +7,6 @@ import scala.annotation.tailrec
 
 import spire.math._
 import spire.algebra._
-import spire.random.mutable.Generator
 
 trait Gaussian[@spec(Float,Double) A] {
   /**

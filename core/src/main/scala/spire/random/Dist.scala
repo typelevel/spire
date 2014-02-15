@@ -12,12 +12,12 @@ import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
 trait Dist[@spec A] { self =>
-  def apply(gen: mutable.Generator): A
+  def apply(gen: Generator): A
 
-  final def get()(implicit gen: mutable.Generator): A =
+  final def get()(implicit gen: Generator): A =
     apply(gen)
 
-  def fill(gen: mutable.Generator, arr: Array[A]): Unit = {
+  def fill(gen: Generator, arr: Array[A]): Unit = {
     var i = 0
     while (i < arr.length) {
       arr(i) = apply(gen)
@@ -33,7 +33,7 @@ trait Dist[@spec A] { self =>
 
   final def filter(pred: A => Boolean): Dist[A] =
     new Dist[A] {
-      @tailrec final def apply(gen: mutable.Generator): A = {
+      @tailrec final def apply(gen: Generator): A = {
         val a = self(gen)
         if (pred(a)) a else apply(gen)
       }
@@ -43,7 +43,7 @@ trait Dist[@spec A] { self =>
     filter(pred)
 
   def until(pred: A => Boolean): Dist[Seq[A]] = {
-    @tailrec def loop(gen: mutable.Generator, a: A, buf: ArrayBuffer[A]): Seq[A] = {
+    @tailrec def loop(gen: Generator, a: A, buf: ArrayBuffer[A]): Seq[A] = {
       buf.append(a)
       if (pred(a)) buf else loop(gen, self(gen), buf)
     }
@@ -51,19 +51,19 @@ trait Dist[@spec A] { self =>
   }
 
   def foldn[B](init: B, n: Int)(f: (B, A) => B): Dist[B] = {
-    @tailrec def loop(gen: mutable.Generator, i: Int, b: B): B =
+    @tailrec def loop(gen: Generator, i: Int, b: B): B =
       if (i == 0) b else loop(gen, i - 1, f(b, self(gen)))
     new DistFromGen(g => loop(g, n, init))
   }
 
   def unfold[B](init: B)(f: (B, A) => B)(pred: B => Boolean): Dist[B] = {
-    @tailrec def loop(gen: mutable.Generator, b: B): B =
+    @tailrec def loop(gen: Generator, b: B): B =
       if (pred(b)) b else loop(gen, f(b, self(gen)))
     new DistFromGen(g => loop(g, init))
   }
 
   def pack(n: Int)(implicit ct: ClassTag[A]): Dist[Array[A]] = new Dist[Array[A]] {
-    def apply(gen: mutable.Generator): Array[A] = {
+    def apply(gen: Generator): Array[A] = {
       var i = 0
       val arr = new Array[A](n)
       while (i < arr.length) {
@@ -76,7 +76,7 @@ trait Dist[@spec A] { self =>
 
   def repeat[CC[A] <: Seq[A]](n: Int)(implicit cbf: CanBuildFrom[Nothing, A, CC[A]]): Dist[CC[A]] =
     new Dist[CC[A]] {
-      def apply(gen: mutable.Generator): CC[A] = {
+      def apply(gen: Generator): CC[A] = {
         val builder = cbf()
         builder.sizeHint(n)
         var i = 0
@@ -92,10 +92,10 @@ trait Dist[@spec A] { self =>
     if (n == 0) this else flatMap(f).iterate(n - 1 ,f)
 
   def iterateUntil(pred: A => Boolean, f: A => Dist[A]): Dist[A] = new Dist[A] {
-    @tailrec def loop(gen: mutable.Generator, a: A): A =
+    @tailrec def loop(gen: Generator, a: A): A =
       if (pred(a)) a else loop(gen, f(a)(gen))
 
-    def apply(gen: mutable.Generator): A = loop(gen, self(gen))
+    def apply(gen: Generator): A = loop(gen, self(gen))
   }
 
   final def zip[B](that: Dist[B]): Dist[(A, B)] =
@@ -104,15 +104,15 @@ trait Dist[@spec A] { self =>
   def zipWith[B, C](that: Dist[B])(f: (A, B) => C): Dist[C] =
     new DistFromGen(g => f(this(g), that(g)))
 
-  final def toIterator(gen: mutable.Generator): Iterator[A] =
+  final def toIterator(gen: Generator): Iterator[A] =
     new DistIterator(this, gen)
 
-  final def toStream(gen: mutable.Generator): Stream[A] =
+  final def toStream(gen: Generator): Stream[A] =
     this(gen) #:: toStream(gen)
 
   import scala.collection.generic.CanBuildFrom
 
-  def sample[CC[A] <: Iterable[A]](n: Int)(implicit gen: mutable.Generator, cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+  def sample[CC[A] <: Iterable[A]](n: Int)(implicit gen: Generator, cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     val b = cbf()
     b.sizeHint(n)
     var i = 0
@@ -123,40 +123,40 @@ trait Dist[@spec A] { self =>
     b.result
   }
 
-  final def count(pred: A => Boolean, n: Int)(implicit gen: mutable.Generator): Int = {
+  final def count(pred: A => Boolean, n: Int)(implicit gen: Generator): Int = {
     @tailrec def loop(num: Int, i: Int): Int =
       if (i == 0) num else loop(num + (if (pred(self(gen))) 1 else 0), i - 1)
     loop(0, n)
   }
 
-  def pr(pred: A => Boolean, n: Int)(implicit gen: mutable.Generator): Double =
+  def pr(pred: A => Boolean, n: Int)(implicit gen: Generator): Double =
     1.0 * count(pred, n) / n
 
-  def sum(n: Int)(implicit gen: mutable.Generator, alg: Rig[A]): A = {
+  def sum(n: Int)(implicit gen: Generator, alg: Rig[A]): A = {
     @tailrec def loop(total: A, i: Int): A =
       if (i == 0) total else loop(alg.plus(total, self(gen)), i - 1)
     loop(alg.zero, n)
   }
 
-  def ev(n: Int)(implicit gen: mutable.Generator, alg: Field[A]): A =
+  def ev(n: Int)(implicit gen: Generator, alg: Field[A]): A =
     alg.div(sum(n), alg.fromInt(n))
 
-  def histogram(n: Int)(implicit gen: mutable.Generator): Map[A, Double] =
+  def histogram(n: Int)(implicit gen: Generator): Map[A, Double] =
     rawHistogram(n).map { case (k, v) => (k, 1.0 * v / n) }
 
-  def rawHistogram(n: Int)(implicit gen: mutable.Generator): Map[A, Int] =
+  def rawHistogram(n: Int)(implicit gen: Generator): Map[A, Int] =
     toStream(gen).take(n).foldLeft(Map.empty[A, Int]) { case (h, a) =>
       h.updated(a, h.getOrElse(a, 0) + 1)
     }
 }
 
-final class DistIterator[A](next: Dist[A], gen: mutable.Generator) extends Iterator[A] {
+final class DistIterator[A](next: Dist[A], gen: Generator) extends Iterator[A] {
   final def hasNext(): Boolean = true
   final def next(): A = next(gen)
 }
 
-class DistFromGen[@spec A](f: mutable.Generator => A) extends Dist[A] {
-  def apply(gen: mutable.Generator): A = f(gen)
+class DistFromGen[@spec A](f: Generator => A) extends Dist[A] {
+  def apply(gen: Generator): A = f(gen)
 }
 
 trait DistSemiring[A] extends Semiring[Dist[A]] {
@@ -237,7 +237,7 @@ object Dist extends DistInstances8 {
   final def apply[A, B, C](f: (A, B) => C)(implicit na: Dist[A], nb: Dist[B]): Dist[C] =
     na.zipWith(nb)(f)
 
-  final def gen[A](f: mutable.Generator => A): Dist[A] =
+  final def gen[A](f: Generator => A): Dist[A] =
     new DistFromGen(g => f(g))
 
   def uniform[A: Uniform](low: A, high: A): Dist[A] = Uniform[A].apply(low, high)
@@ -316,10 +316,10 @@ object Dist extends DistInstances8 {
 
   def natural(maxDigits: Int): Dist[Natural] = new Dist[Natural] {
     @tailrec
-    private def loop(g: mutable.Generator, i: Int, size: Int, n: Natural): Natural =
+    private def loop(g: Generator, i: Int, size: Int, n: Natural): Natural =
       if (i < size) loop(g, i + 1, size, Natural.Digit(g.next[UInt], n)) else n
 
-    def apply(gen: mutable.Generator): Natural =
+    def apply(gen: Generator): Natural =
       loop(gen, 1, gen.nextInt(maxDigits) + 1, Natural.End(gen.next[UInt]))
   }
 
@@ -335,12 +335,12 @@ object Dist extends DistInstances8 {
   }
 
   def bigint(maxBytes: Int): Dist[BigInt] = new Dist[BigInt] {
-    def apply(gen: mutable.Generator): BigInt = BigInt(gen.generateBytes(gen.nextInt(maxBytes) + 1))
+    def apply(gen: Generator): BigInt = BigInt(gen.generateBytes(gen.nextInt(maxBytes) + 1))
   }
 
   def bigdecimal(maxBytes: Int, maxScale: Int): Dist[BigDecimal] = new Dist[BigDecimal] {
     private val nb = bigint(maxBytes)
-    def apply(gen: mutable.Generator): BigDecimal = BigDecimal(nb(gen), gen.nextInt(maxScale) + 1)
+    def apply(gen: Generator): BigDecimal = BigDecimal(nb(gen), gen.nextInt(maxScale) + 1)
   }
 
   implicit def rational(implicit next: Dist[BigInt]): Dist[Rational] =
@@ -358,16 +358,16 @@ object Dist extends DistInstances8 {
   implicit def array[A: Dist: ClassTag](minSize: Int, maxSize: Int): Dist[Array[A]] =
     new Dist[Array[A]] {
       private val d = maxSize - minSize + 1
-      def apply(gen: mutable.Generator): Array[A] = gen.generateArray[A](gen.nextInt(d) + minSize)
+      def apply(gen: Generator): Array[A] = gen.generateArray[A](gen.nextInt(d) + minSize)
     }
 
   implicit def list[A: Dist](minSize: Int, maxSize: Int): Dist[List[A]] =
     new Dist[List[A]] {
       private val d = maxSize - minSize + 1
-      private def loop(g: mutable.Generator, n: Int, sofar: List[A]): List[A] =
+      private def loop(g: Generator, n: Int, sofar: List[A]): List[A] =
         if (n > 0) loop(g, n - 1, g.next[A] :: sofar) else sofar
 
-      def apply(gen: mutable.Generator): List[A] =
+      def apply(gen: Generator): List[A] =
         loop(gen, gen.nextInt(d) + minSize, Nil)
     }
 
@@ -379,13 +379,13 @@ object Dist extends DistInstances8 {
 
   def oneOf[A: ClassTag](as: A*): Dist[A] = new Dist[A] {
     private val arr = as.toArray
-    def apply(gen: mutable.Generator): A = arr(gen.nextInt(arr.length))
+    def apply(gen: Generator): A = arr(gen.nextInt(arr.length))
   }
 
   def cycleOf[A: ClassTag](as: A*): Dist[A] = new Dist[A] {
     private val arr = as.toArray
     private var i = 0
-    def apply(gen: mutable.Generator): A = {
+    def apply(gen: Generator): A = {
       val a = arr(i)
       i = (i + 1) % arr.length
       a

@@ -1,5 +1,5 @@
 package spire.random
-package mutable
+package gen
 
 import spire.util.Pack
 
