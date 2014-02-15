@@ -1,5 +1,4 @@
 package spire.random
-package mutable
 
 import spire.math._
 
@@ -20,7 +19,7 @@ abstract class Generator {
 
   protected[this] def copyInit: Generator
 
-  def sync: SyncGenerator = new SyncGenerator(copy)
+  def sync: gen.SyncGenerator = new gen.SyncGenerator(copy)
 
   def getSeedBytes(): Array[Byte]
 
@@ -463,7 +462,7 @@ object Generator {
 }
 
 object GlobalRng extends LongBasedGenerator {
-  private val rng = Cmwc5.fromTime().sync
+  private val rng = gen.Cmwc5.fromTime().sync
 
   override def sync = rng
 
