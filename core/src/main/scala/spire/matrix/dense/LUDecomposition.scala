@@ -1,6 +1,7 @@
 package spire.matrix.dense.LU
 import spire.matrix.dense._
 import spire.matrix.{Sides, UpperOrLower, Transposition, DiagonalProperty}
+import spire.matrix.NumericPropertiesOfDouble
 import Sides._
 import UpperOrLower._
 import Transposition._
@@ -154,6 +155,38 @@ extends BLAS.Level3 with BLAS.Level2 with BLAS.Level1 {
   protected def raw(lu:Matrix, p:Permutation): Decomposition
 }
 
+
+/**
+ * LU decomposition with straightforward unblocked algorithm
+ *
+ * Reference: DGETF2 from LAPACK
+ */
+trait UnblockedDecompositionConstruction
+extends DecompositionConstruction with NumericPropertiesOfDouble {
+
+  protected def decompose(a:Matrix, p:Permutation) {
+    val (m,n) = a.dimensions
+    val mn = min(m,n)
+    cforRange(0 until mn) { j =>
+      val jp = j + idamax(a.column(j).block(j,m))
+      p(j) = jp
+      if(a(jp, j) == 0) throw new Singularity(j)
+      cforRange(0 until n) { k =>
+        val t = a(jp,k); a(jp,k) = a(j,k); a(j,k) = t
+      }
+      val pivot = a(j,j)
+      if(j < m-1) {
+        if (pivot.abs >= safeMinimum)
+          scale(1/pivot, a.column(j).block(j+1,m))
+        else
+          cforRange(j+1 until m) { i => a(i,j) /= pivot }
+      }
+      if(j < mn - 1)
+        ger(-1.0, a.column(j).block(j+1,m), a.row(j).block(j+1,n),
+            a.block(j+1,m)(j+1,n))
+    }
+  }
+}
 /**
  * LU decomposition implemented with Sivan Toledo's recursive algorithm
  *
@@ -175,14 +208,15 @@ extends BLAS.Level3 with BLAS.Level2 with BLAS.Level1 {
  *     O’Reilly, 2007.
  */
 trait RecursiveDecompositionConstruction
-extends DecompositionConstruction {
+extends DecompositionConstruction with UnblockedDecompositionConstruction {
 
+  val unblockedThreshold: Int
 
   /** The recursive function that actually performs the decomposition */
   protected override def decompose(a:Matrix, p:Permutation) {
     val (m,n) = a.dimensions
     val mn = min(m,n)
-    if(mn > 1) {
+    if(mn > unblockedThreshold) {
       /* A = [ A11 A12 ]
              [ A21 A22 ]
         where A11 is n/2 x n/2
@@ -224,13 +258,6 @@ extends DecompositionConstruction {
       /* Permute L21' = P2 L21 */
       p2.permute_rows(l21)
     }
-    else {
-      val i = idamax(a.column(0))
-      p(0) = i
-      val t = a(i, 0)
-      if(t == 0) throw new Singularity(0)
-      scale(1/t, a.column(0))
-      a(i,0) = a(0,0); a(0,0) = t
-    }
+    else super[UnblockedDecompositionConstruction].decompose(a, p)
   }
 }

@@ -114,6 +114,10 @@ class RecursiveLUDecompositionWithNaiveBLASTest extends LUDecompositionTest {
   object TestedLUDecompositionConstruction
   extends LU.RecursiveDecompositionConstruction
   with BLAS.NaiveLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
+    // we chose this value because it fits at the right spot in the
+    // range of tested sizes: 1 to 16. I.e. not trivial but small enough that
+    // it would test the recursive mechanism.
+    val unblockedThreshold = 4
     def raw(lu1:Matrix, p1:Permutation) =
       new LU.Decomposition
       with BLAS.NaiveLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
