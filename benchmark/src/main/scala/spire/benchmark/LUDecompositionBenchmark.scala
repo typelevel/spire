@@ -66,11 +66,11 @@ trait SpireRecursiveLUDecompositionBenchmark extends LUDecompositionBenchmark {
     with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
       val unblockedThreshold = blockingSize
       def raw(lu1:Matrix, p1:Permutation) =
-      new LU.Decomposition
-      with BLAS.LayeredLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
-        val lu = lu1
-        val p = p1
-      }
+        new LU.Decomposition
+        with BLAS.LayeredLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
+          val lu = lu1
+          val p = p1
+        }
    }
 
   def benched(a:Arguments) = {

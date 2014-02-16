@@ -431,14 +431,26 @@ extends Iterable[Double] {
    * @overwriteA specifies whether A shall be overwritten in the process of
    *             solving the equations
    */
-  /*def solve(b:Matrix,
+  def solve(b:Matrix,
             overwriteA:Boolean = false, overwriteB:Boolean = false) = {
+    object LUDecomposition
+      extends LU.RecursiveDecompositionConstruction
+      with BLAS.LayeredLevel3
+      with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
+        val unblockedThreshold = 32
+        def raw(lu1:Matrix, p1:Permutation) =
+          new LU.Decomposition
+          with BLAS.LayeredLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
+            val lu = lu1
+            val p = p1
+          }
+     }
     val a = if(overwriteA) this else copyToMatrix
-    val lu = LU.RecursiveDecompositionConstructionWithNaiveBLAS(a)
+    val lu = LUDecomposition(a)
     val x = if(overwriteB) b else b.copyToMatrix
     lu.solve(Transposition.NoTranspose, x)
     x
-  }*/
+  }
 }
 
 /** Construction of matrices and other utilities */
