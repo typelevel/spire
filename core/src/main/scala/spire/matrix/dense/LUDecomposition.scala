@@ -179,7 +179,7 @@ extends DecompositionConstruction {
 
 
   /** The recursive function that actually performs the decomposition */
-  private def decompose(a:Matrix, p:Permutation) {
+  protected override def decompose(a:Matrix, p:Permutation) {
     val (m,n) = a.dimensions
     val mn = min(m,n)
     if(mn > 1) {

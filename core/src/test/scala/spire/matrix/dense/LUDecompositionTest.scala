@@ -61,17 +61,16 @@ with BLAS.NaiveLevel3
   implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
 
   test("LU decomposition") {
-    val linTests = new LinearSystemTestMatrices(nonSpecialDimensions = 1)
+    val linTests = new LinearSystemTestMatrices(nonSpecialDimensions = 2)
     val uniformIm1p1 = new ScalarUniformDistributionFromMinusOneToOne
     val elts = new RandomUncorrelatedElements(elements = uniformIm1p1)
-    info(elts.oneDimensionSample.toList.toString)
     for((imat, zeroIdx, a) <- linTests.sample) {
       val a0 = a.copyToMatrix
       val (m,n) = a.dimensions
 
-      info(s"Type $imat, dimension $m x $n")
+      //info(s"Type $imat, dimension $m x $n")
       try {
-        info("\t+ Decomposition P A = L U")
+        //info("\t+ Decomposition P A = L U")
         val lu = TestedLUDecompositionConstruction(a)
         val goodnessLU = decompositionGoodness(a0, lu)
         assert(goodnessLU < threshold,
@@ -81,7 +80,7 @@ with BLAS.NaiveLevel3
                    |""".stripMargin)
 
         if(m == n && m > 1) {
-          info("\t+ Solution of A X = B")
+          //info("\t+ Solution of A X = B")
           for(nRhs <- rightHandSides;
               x <- elts.generalMatrixSample(m, nRhs).take(1)) {
             // Construct rhs B = A X
