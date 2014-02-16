@@ -12,10 +12,8 @@ import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
 trait Dist[@spec A] { self =>
-  def apply(gen: Generator): A
 
-  final def get()(implicit gen: Generator): A =
-    apply(gen)
+  def apply(gen: Generator): A
 
   def fill(gen: Generator, arr: Array[A]): Unit = {
     var i = 0
