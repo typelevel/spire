@@ -39,8 +39,11 @@ import scala.math.min
  *     Society for Industrial and Applied Mathematics,
  *     Philadelphia, PA, Third.
  */
-abstract class Decomposition(val lu:Matrix, val p:Permutation)
-extends BLAS.Level1 with BLAS.Level2 with BLAS.Level3 {
+trait Decomposition extends BLAS.Level1 with BLAS.Level2 with BLAS.Level3
+{
+  val lu:Matrix
+
+  val p:Permutation
 
   /**
    * Reconstruct the original matrix A by performing the product PLU.
@@ -132,15 +135,23 @@ extends spire.matrix.dense.Exception
 
 /** Construction of the LU decomposition of a rectangular matrix A */
 trait DecompositionConstruction
-extends BLAS.Level3 with BLAS.Level1 {
+extends BLAS.Level3 with BLAS.Level2 with BLAS.Level1 {
+
+  /** Computes and returns the LU decomposition of A */
+  def apply(a:Matrix) = {
+    val (m,n) = a.dimensions
+    val p = Permutation.identity(m)
+    decompose(a, p)
+    raw(a, p)
+  }
+
+  /** Shall perform the actual decomposition */
+  protected def decompose(a:Matrix, p:Permutation)
 
   /**
    * Factory method to act as a polymorphic constructor for Decomposition heirs
    */
   protected def raw(lu:Matrix, p:Permutation): Decomposition
-
-  /** The decomposition of the given matrix */
-  def apply(a:Matrix): Decomposition
 }
 
 /**
@@ -166,12 +177,6 @@ extends BLAS.Level3 with BLAS.Level1 {
 trait RecursiveDecompositionConstruction
 extends DecompositionConstruction {
 
-  def apply(a:Matrix) = {
-    val (m,n) = a.dimensions
-    val p = Permutation.identity(m)
-    decompose(a.block(0,m)(0,n), p)
-    raw(a, p)
-  }
 
   /** The recursive function that actually performs the decomposition */
   private def decompose(a:Matrix, p:Permutation) {
@@ -228,14 +233,4 @@ extends DecompositionConstruction {
       a(i,0) = a(0,0); a(0,0) = t
     }
   }
-}
-
-class DecompositionWithNaiveBLAS(lu:Matrix, p:Permutation)
-extends Decomposition(lu, p)
-with BLAS.NaiveLevel1 with BLAS.NaiveLevel2 with BLAS.NaiveLevel3
-
-object RecursiveDecompositionConstructionWithNaiveBLAS
-extends RecursiveDecompositionConstruction
-with BLAS.NaiveLevel3 with BLAS.NaiveLevel1 {
-  def raw(lu:Matrix, p:Permutation) = new DecompositionWithNaiveBLAS(lu, p)
 }

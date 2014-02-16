@@ -112,7 +112,15 @@ with BLAS.NaiveLevel3
 }
 
 class RecursiveLUDecompositionWithNaiveBLASTest extends LUDecompositionTest {
-  val TestedLUDecompositionConstruction =
-    LU.RecursiveDecompositionConstructionWithNaiveBLAS
+  object TestedLUDecompositionConstruction
+  extends LU.RecursiveDecompositionConstruction
+  with BLAS.NaiveLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
+    def raw(lu1:Matrix, p1:Permutation) =
+      new LU.Decomposition
+      with BLAS.NaiveLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
+        val lu = lu1
+        val p = p1
+      }
+  }
 }
 

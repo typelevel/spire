@@ -431,14 +431,14 @@ extends Iterable[Double] {
    * @overwriteA specifies whether A shall be overwritten in the process of
    *             solving the equations
    */
-  def solve(b:Matrix,
+  /*def solve(b:Matrix,
             overwriteA:Boolean = false, overwriteB:Boolean = false) = {
     val a = if(overwriteA) this else copyToMatrix
     val lu = LU.RecursiveDecompositionConstructionWithNaiveBLAS(a)
     val x = if(overwriteB) b else b.copyToMatrix
     lu.solve(Transposition.NoTranspose, x)
     x
-  }
+  }*/
 }
 
 /** Construction of matrices and other utilities */
