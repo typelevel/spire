@@ -249,7 +249,7 @@ extends DecompositionConstruction with UnblockedDecompositionConstruction {
          We need to catch failure on the way out so as to update the
          index the zero pivot.
       */
-      val p2 = p.subset(nLeft,m)
+      val p2 = p.restrictTo(nLeft,m)
       try decompose(a22pp, p2)
       catch {
         case ex: Singularity => throw new Singularity(ex.pivotIndex + nLeft)

@@ -352,7 +352,7 @@ class MatrixTest extends FunSuite {
   test("Permutation of a subset of matrix rows") {
     val a0 = Matrix.tabulate(5,2)((i,j) => 10*(i+1) + (j+1))
     val p = Permutation.identity(5)
-    val q = p.subset(1,4)
+    val q = p.restrictTo(1,4)
     q(0) = 1
     q(1) = 2
     q(2) = 2
