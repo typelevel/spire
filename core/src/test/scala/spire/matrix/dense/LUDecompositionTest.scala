@@ -12,6 +12,61 @@ import spire.syntax.cfor._
 import scala.math._
 import org.scalatest.FunSuite
 
+class LUReconstructionTest extends FunSuite {
+
+  class LUDecomposition(val lu:Matrix, val p:Permutation)
+  extends LU.Decomposition
+  with BLAS.NaiveLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1
+
+  test("2 x 2") {
+    val lu = Matrix(2,2)(2, 3,
+                         4, 5)
+    val lud = new LUDecomposition(lu, Permutation(1,1))
+    expectResult { Matrix(2,2)(8, 17,
+                               2,  3) } { lud.reconstructedOriginal }
+  }
+
+  test("3 x 3") {
+    val lu = Matrix(3,3)( 2,  3, -1,
+                         -1,  5, -2,
+                          2, -3,  4)
+    val lud = new LUDecomposition(lu, Permutation.identity(3))
+    expectResult { Matrix(3,3)( 2,  3, -1,
+                               -2,  2, -1,
+                                4, -9,  8) } { lud.reconstructedOriginal }
+    val lud1 = new LUDecomposition(lu, Permutation(1,2,2))
+    expectResult { Matrix(3,3)( 4, -9,  8,
+                                2,  3, -1,
+                               -2,  2, -1) } { lud1.reconstructedOriginal }
+  }
+
+  test("4 x 3") {
+    val lu = Matrix(4,3)(2, 4, 3,
+                         4, 2, 3,
+                         1, 3, 1,
+                         3, 2, 4)
+    val lud = new LUDecomposition(lu, Permutation(3,1,2,3))
+    expectResult { Matrix(4,3)(6, 16, 19,
+                               8, 18, 15,
+                               2, 10, 13,
+                               2,  4,  3) } { lud.reconstructedOriginal }
+  }
+
+  test("3 x 5") {
+    val lu = Matrix(3,5)(2, 4, 2,
+                         3, 4, 1,
+                         2, 4, 1,
+                         4, 4, 2,
+                         4, 4, 2)
+    val lud = new LUDecomposition(lu, Permutation.identity(3))
+    expectResult { Matrix(3,5)( 2,  4,  2,
+                                3,  4,  2,
+                                6,  6,  4,
+                                8,  8, 20,
+                               20, 18, 26) } { lud.reconstructedOriginal }
+  }
+}
+
 trait LUDecompositionTest extends FunSuite
 with CommonMatrixPropertyTests
 with BLAS.NaiveLevel1
