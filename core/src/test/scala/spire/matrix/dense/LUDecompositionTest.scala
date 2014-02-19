@@ -140,7 +140,7 @@ with BLAS.NaiveLevel3
               x <- elts.generalMatrixSample(m, nRhs).take(1)) {
             // Construct rhs B = A X
             val b = Matrix.empty(m, nRhs)
-            gemm(NoTranspose, NoTranspose, 1.0, a, x, 0.0, b)
+            gemm(NoTranspose, NoTranspose, 1.0, a0, x, 0.0, b)
 
             // Solve A X = B and test residual
             val b0 = b.copyToMatrix
