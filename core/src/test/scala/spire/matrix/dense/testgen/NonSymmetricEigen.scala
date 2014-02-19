@@ -102,7 +102,7 @@ extends Vector(n)
  */
 class GeneralSquareMatrix(n:Int, a:Array[Double])
 extends Matrix(n, n, n, 0, a)
-with NumericPropertiesOfDouble with MagnitudeLimitation with BLAS.NaiveLevel1 {
+with NumericPropertiesOfDouble with MatrixMagnitudeLimitation {
 
   /**
    * Jordan block

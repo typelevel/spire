@@ -2,14 +2,27 @@ package spire.matrix.dense
 
 import scala.collection.mutable
 
-trait MagnitudeLimitation
-extends Matrix with BLAS.NaiveLevel1 {
+trait MagnitudeLimitation extends Iterable[Double] {
 
-  /** Rescale this so that the maximum absolute value of any element is amax */
-  def rescaleElementMagnitudeTo(amax:Double): Unit = {
+  /** Scale to use to bring the maximum absolute value of any element to amax */
+  def magnitudeLimitingScale(amax:Double) = {
     val maxAbs = this.iterator.map(_.abs).max
     assert(!maxAbs.isNaN)
-    val alpha = if(maxAbs > 0) amax/maxAbs else 0
-    scale(alpha, this)
+    if(maxAbs > 0) amax/maxAbs else 0
   }
 }
+
+trait MatrixMagnitudeLimitation
+extends Matrix with MagnitudeLimitation with BLAS.NaiveLevel1 {
+  def rescaleElementMagnitudeTo(amax:Double) {
+    scale(magnitudeLimitingScale(amax), this)
+  }
+}
+
+trait VectorMagnitudeLimitation
+extends Vector with MagnitudeLimitation with BLAS.NaiveLevel1 {
+  def rescaleElementMagnitudeTo(amax:Double) {
+    scale(magnitudeLimitingScale(amax), this)
+  }
+}
+
