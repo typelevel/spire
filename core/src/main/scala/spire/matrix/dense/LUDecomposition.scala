@@ -262,3 +262,82 @@ with BLAS.Level3 {
     else super[UnblockedDecompositionConstruction].decompose(a, p)
   }
 }
+
+/**
+ * LU decomposition using the classic blocked algorithm
+ *
+ * The basic algorithm is described e.g. in [1, algorithm 2.10, p. 74]. However
+ * we offer as an option to use the trick suggested by Goto in [2, section 8].
+ * And we use the notations of xGETRF in [3].
+ *
+ * Reference:
+ * [1] James W. Demmel, Applied numerical linear algebra, siam, 1997
+ * [2] Kazushige Goto and Robert van de Geijn,
+ *     High-performance implementation of the level-3 BLAS,
+ *     2006, The University of Texas at Austin,
+ *     Department of Computer Sciences,
+ *     FLAME Working Note #20, Technical Report TR-2006-23
+ * [3] LAPACK Users' Guide.
+ *     E Anderson, Z Bai, Christian H. Bischof, S Blackford, J Demmel,
+ *     J Dongarra, J Du Croz, A Greenbaum, S Hammarling, A McKenney,
+ *     and D Sorensen.
+ *     Society for Industrial and Applied Mathematics,
+ *     Philadelphia, PA, Third.
+ */
+trait LeftToRightBlockedDecompositionConstruction
+extends DecompositionConstruction with UnblockedDecompositionConstruction
+with BLAS.Level3 {
+
+  /*
+   * Width of the panel decomposed with the unblocked algorithm
+   * at each iteration of the main loop
+   */
+  val nb:Int
+
+  /**
+   * Performs step (2) and (3) of [1, algorithm 2.10, p. 74]
+   */
+  protected def solveAndUpdateForRightPanel(a:Matrix, j:Int, jb:Int): Unit
+
+  protected override def decompose(a:Matrix, p:Permutation) {
+    val (m,n) = a.dimensions
+    val mn = min(m,n)
+    if(mn <= nb) {
+      super[UnblockedDecompositionConstruction].decompose(a, p)
+    }
+    else {
+      cfor(0)(_ < mn, _ + nb) { j =>
+        val jb = min(mn-j, nb) // actual width of the left panel
+        val p1 = p.restrictTo(j,m)
+        try super[UnblockedDecompositionConstruction]
+            .decompose(a.block(j,m)(j,j+jb), p1)
+        catch {
+          case ex: Singularity => throw new Singularity(j + ex.pivotIndex)
+        }
+        p1.permute_rows(a.block(j,m)(0,j))
+        if(j+jb <= n) {
+          p1.permute_rows(a.block(j,m)(j+jb,n))
+          solveAndUpdateForRightPanel(a, j, jb)
+        }
+      }
+    }
+  }
+}
+
+trait ClassicLeftToRightBlockedDecompositionConstruction
+extends LeftToRightBlockedDecompositionConstruction {
+
+  /**
+   * Perform step (2) with TRSM followed by step (3) with GEMM,
+   * independtly of each others
+   */
+  protected def solveAndUpdateForRightPanel(a:Matrix, j:Int, jb:Int) {
+    val (m,n) = a.dimensions
+    trsm(FromLeft, Lower, NoTranspose, UnitDiagonal,
+         1.0, a.block(j,j+jb)(j,j+jb), a.block(j,j+jb)(j+jb,n))
+    gemm(NoTranspose, NoTranspose,
+         -1.0, a.block(j+jb,m)(j,j+jb), a.block(j,j+jb)(j+jb,n),
+          1.0, a.block(j+jb,m)(j+jb,n))
+  }
+}
+

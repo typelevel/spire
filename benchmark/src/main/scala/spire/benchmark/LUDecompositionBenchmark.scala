@@ -79,6 +79,30 @@ trait SpireRecursiveLUDecompositionBenchmark extends LUDecompositionBenchmark {
   }
 }
 
+trait SpireClassicBlockedLUDecompositionBenchmark
+extends LUDecompositionBenchmark {
+  val blockSize:Int
+  def header = "l2r blocked (%d)".format(blockSize)
+
+  object LUDecomposition
+    extends LU.ClassicLeftToRightBlockedDecompositionConstruction
+    with BLAS.LayeredLevel3
+    with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
+      val nb = blockSize
+      def raw(lu1:Matrix, p1:Permutation) =
+        new LU.Decomposition
+        with BLAS.LayeredLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
+          val lu = lu1
+          val p = p1
+        }
+    }
+
+  def benched(a:Arguments) = {
+    LUDecomposition(a)
+    a
+  }
+}
+
 object LUDecompositionBenchmarks {
   implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
   val matrices = new LinearSystemTestMatrices(includedTypes = Set(4))
@@ -95,7 +119,7 @@ object LUDecompositionBenchmarks {
     println("---------------------------------------------")
     val dimsHeader = "%4s".format("m")
     val benchmarks = new JBlasLUDecompositionBenchmark ::
-                     new NetlibJavaLUDecompositionBenchmark ::
+                     //new NetlibJavaLUDecompositionBenchmark ::
                      new SpireRecursiveLUDecompositionBenchmark {
                        val blockingSize = 4
                      } ::
@@ -104,6 +128,18 @@ object LUDecompositionBenchmarks {
                      } ::
                      new SpireRecursiveLUDecompositionBenchmark {
                        val blockingSize = 32
+                     } ::
+                     new SpireRecursiveLUDecompositionBenchmark {
+                       val blockingSize = 64
+                     } ::
+                     new SpireClassicBlockedLUDecompositionBenchmark {
+                       val blockSize = 16
+                     } ::
+                     new SpireClassicBlockedLUDecompositionBenchmark {
+                       val blockSize = 32
+                     } ::
+                     new SpireClassicBlockedLUDecompositionBenchmark {
+                       val blockSize = 64
                      } ::
                      Nil
     val benchmarksHeader = benchmarks.map(_.formatedHeader).mkString("  ")

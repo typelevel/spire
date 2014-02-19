@@ -197,3 +197,15 @@ class RecursiveLUDecompositionTest extends LUDecompositionTest {
   }
 }
 
+class ClassicLeftToRightBlockedLUDecompositionTest extends LUDecompositionTest {
+  object TestedLUDecompositionConstruction
+  extends LUDecompositionConstructionForTests
+  with LU.ClassicLeftToRightBlockedDecompositionConstruction {
+    // we chose this value because it fits at the right spot in the
+    // range of tested sizes: 1 to 16. I.e. not trivial but small enough that
+    // it would test the iterations over the panels.
+    val nb = 4
+  }
+}
+
+
