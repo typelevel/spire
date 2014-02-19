@@ -52,7 +52,7 @@ class SpecialDiagonal(n:Int, mode:SpecialDiagonalMode.Value, c:Double,
                       reverse:Boolean=false,
                       signs:BernoulliDistribution=null,
                       uniform01:ScalarUniformDistributionFromZeroToOne=null)
-extends Vector(n)
+extends Vector(n) with VectorMagnitudeLimitation
 {
   import SpecialDiagonalMode._
   require(mode != Random || uniform01 != null)

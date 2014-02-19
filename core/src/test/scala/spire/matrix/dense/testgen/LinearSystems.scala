@@ -10,7 +10,7 @@ import spire.matrix.NumericPropertiesOfDouble
 import spire.matrix.dense.BLAS
 import spire.matrix.dense.random._
 import spire.implicits._
-import scala.math.{sqrt, min, max}
+import scala.math
 
 
 /** General rectrangular matrix */
@@ -48,13 +48,11 @@ class LinearSystemTestMatrices(
   (implicit gen:Defaults.IntegerGenerator)
 extends TestDimensions(nonSpecialDimensions) with NumericPropertiesOfDouble
 {
-  val types = includedTypes -- excludedTypes
+  val types = includedTypes -- excludedTypes -- Set(2,3)
 
   val eps = precision
-  val badConditionNumber = {
-    val c2 = 0.1/eps
-    (sqrt(c2), c2)
-  }
+  val veryBadConditionNumber = 0.1/eps
+  val badConditionNumber = math.sqrt(veryBadConditionNumber)
   val small = safeMinimum
   val large = 1/small
 
@@ -67,17 +65,26 @@ extends TestDimensions(nonSpecialDimensions) with NumericPropertiesOfDouble
    * is the m x n matrix to test whereas imat is an integer code specifying the
    * properties of mat, as follow:
    *
-   * 1. Diagonal matrix
-   * 2. Upper diagonal matrix
-   * 3. Lower diagonal matrix
-   * 4. General matrix, well-conditioned, with a norm of the order of 1
-   * 5. Same as 4 but the first column is zero
-   * 6. Same as 4 but the last column is zero
-   * 7. Same as 4 but all columns right of, and including, min(m, n)/2 are zero
-   * 8. Mildly ill-conditioned general matrix
-   * 9. More ill-conditioned general matrix
-   * 10. General matrix with small elements overhaul
-   * 11. General matrix with large elements overhaul
+   * - shape:
+   *   + imat=1: diagonal
+   *   + imat=2: upper triangular (not implemented)
+   *   + imat=3: lower triangular (not implemented)
+   *   + otherwise: general matrix
+   *
+   * - condition number:
+   *   + imat=8: very bad condition number
+   *   + imat=9: bad condition number
+   *   + otherwise: the condition number is 2
+   *
+   * - matrix norm:
+   *   + imag=10: small
+   *   + imag=11: large
+   *   + otherwise: 1
+   *
+   * - zeroed columns:
+   *   + imat=5: first one
+   *   + imat=6: last one
+   *   + imat=7: all columns right of, and including, min(m,n)/2
    *
    * ZeroIndex is the index of the first zero column or None if the matrix
    * is not singular.
@@ -86,7 +93,7 @@ extends TestDimensions(nonSpecialDimensions) with NumericPropertiesOfDouble
    */
   def sample(m:Int, n:Int)(
     implicit work:Scratchpad = new Scratchpad(
-      OrthogonalMatricesHaarDistribution.minimumScratchpad(max(m,n))))
+      OrthogonalMatricesHaarDistribution.minimumScratchpad(math.max(m,n))))
   : SampleType = new SampleType {
 
     val orthogonalLeft = new OrthogonalMatricesHaarDistribution(m)
@@ -98,11 +105,10 @@ extends TestDimensions(nonSpecialDimensions) with NumericPropertiesOfDouble
       5 <= imat && imat <= 7 && n < imat - 4
 
     def foreach[U](f: ((Int, Option[Int], Matrix)) => U) {
-      // TODO: code types 1 (diagonal), 2 (lower diagonal), and 3 (upper diagonal)
-      for(imat <- 4 to 11 if types.contains(imat) && !shallSkip(imat, m, n)) {
+      for(imat <- 1 to 11 if types.contains(imat) && !shallSkip(imat, m, n)) {
         val conditionNumber = imat match {
-          case 8 => badConditionNumber._1
-          case 9 => badConditionNumber._2
+          case 8 => veryBadConditionNumber
+          case 9 => badConditionNumber
           case _ => 2.0
         }
         val norm = imat match {
@@ -111,13 +117,19 @@ extends TestDimensions(nonSpecialDimensions) with NumericPropertiesOfDouble
           case _  => 1.0
         }
         // Set diagonal
+        val diag = new SpecialDiagonal(math.min(m, n),
+                                       SpecialDiagonalMode.Geometric,
+                                       conditionNumber)
+        // Rescale to get the desired norm of the final matrix
+        diag.rescaleElementMagnitudeTo(norm)
         val a = GeneralMatrix.zero(m,n)
-        a.diagonal := new SpecialDiagonal(math.min(m, n),
-                                          SpecialDiagonalMode.Geometric,
-                                          conditionNumber)
+        a.diagonal := diag
 
-        // Rescale to get the desired norm
-        a.rescaleElementMagnitudeTo(norm)
+        if(imat != 1) {
+          // A := U A V where U and V are random orthogonal matrices
+          orthogonalLeft.overwriteWithProductByNext(FromLeft, a)
+          orthogonalRight.overwriteWithProductByNext(FromRight, a)
+        }
 
         // Perhaps zero some columns
         val zeroIdx = imat match {
