@@ -341,3 +341,35 @@ extends LeftToRightBlockedDecompositionConstruction {
   }
 }
 
+trait FusedLeftToRightBlockedDecompositionConstruction
+extends LeftToRightBlockedDecompositionConstruction
+with BLAS.LayeredLevel3 {
+
+  val blocking: GEBP.Blocking
+
+  /**
+   * Fuse step (2) and (3) to reuse the packing of the top-right
+   * horizontal panel of U
+   */
+  protected def solveAndUpdateForRightPanel(a:Matrix, j:Int, jb:Int) {
+    val (m,n) = a.dimensions
+    val mc = blocking.mc
+    val kc = blocking.kc
+    val mr = blocking.mr
+    val nr = blocking.nr
+    val aa = blocking.bufferA
+    val kr = 2
+    val bb = blocking.bufferB(n)
+    TRSBP.packLowerTriangleAsColumnSlices(a.block(j,j+jb)(j,j+jb),
+                                          true, kr, aa)
+    GEBP.packColumnSlices(false)(a.block(j,j+jb)(j+jb,n), nr, bb)
+    TRSBP.solveLowerFromLeft(jb, n-j-jb, nr, true, aa, bb)
+    cfor(j+jb)(_ < m, _ + mc) { i =>
+      val mc1 = math.min(i + mc, m) -i
+      GEBP.packRowSlices(false)(a.block(i,i+mc1)(j,j+jb), mr, aa)
+      GEBP(jb, mr, nr, -1.0, aa, bb, a.block(i,i+mc1)(j+jb,n))
+    }
+    GEBP.unpackColumnSlices(false)(1.0, bb, nr, a.block(j,j+jb)(j+jb,n))
+  }
+}
+

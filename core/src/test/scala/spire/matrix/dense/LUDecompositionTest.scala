@@ -208,4 +208,15 @@ class ClassicLeftToRightBlockedLUDecompositionTest extends LUDecompositionTest {
   }
 }
 
+class FusedLeftToRightBlockedLUDecompositionTest extends LUDecompositionTest {
+  object TestedLUDecompositionConstruction
+  extends LUDecompositionConstructionForTests
+  with LU.FusedLeftToRightBlockedDecompositionConstruction {
+    // we chose this value because it fits at the right spot in the
+    // range of tested sizes: 1 to 16. I.e. not trivial but small enough that
+    // it would test the iterations over the panels.
+    val nb = 4
+    lazy val blocking = new GEBP.Blocking(mc=8, kc=4, mr=2, nr=4, np=256)
+  }
+}
 

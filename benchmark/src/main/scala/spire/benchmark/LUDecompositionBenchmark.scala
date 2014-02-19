@@ -56,52 +56,63 @@ class NetlibJavaLUDecompositionBenchmark extends LUDecompositionBenchmark {
   }
 }
 
-trait SpireRecursiveLUDecompositionBenchmark extends LUDecompositionBenchmark {
+trait SpireLUDecompositionConstructionForBenchmark
+extends LU.DecompositionConstruction
+with BLAS.LayeredLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
+  def raw(lu1:Matrix, p1:Permutation) =
+    new LU.Decomposition
+    with BLAS.LayeredLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
+      val lu = lu1
+      val p = p1
+    }
+}
+
+trait SpireLUDecompositionBenchmark extends LUDecompositionBenchmark {
+  val LUDecomposition: SpireLUDecompositionConstructionForBenchmark
+  def benched(a:Arguments) = {
+    LUDecomposition(a)
+    a
+  }
+}
+
+trait SpireRecursiveLUDecompositionBenchmark
+extends SpireLUDecompositionBenchmark {
   def blockingSize: Int
   def header = "recursive (%d)".format(blockingSize)
 
   object LUDecomposition
-    extends LU.RecursiveDecompositionConstruction
-    with BLAS.LayeredLevel3
-    with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
-      val unblockedThreshold = blockingSize
-      def raw(lu1:Matrix, p1:Permutation) =
-        new LU.Decomposition
-        with BLAS.LayeredLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
-          val lu = lu1
-          val p = p1
-        }
-   }
-
-  def benched(a:Arguments) = {
-    LUDecomposition(a)
-    a
+  extends SpireLUDecompositionConstructionForBenchmark
+  with LU.RecursiveDecompositionConstruction {
+    val unblockedThreshold = blockingSize
   }
+
 }
 
 trait SpireClassicBlockedLUDecompositionBenchmark
-extends LUDecompositionBenchmark {
+extends SpireLUDecompositionBenchmark {
   val blockSize:Int
-  def header = "l2r blocked (%d)".format(blockSize)
+  def header = "classic (%d)".format(blockSize)
 
   object LUDecomposition
-    extends LU.ClassicLeftToRightBlockedDecompositionConstruction
-    with BLAS.LayeredLevel3
-    with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
-      val nb = blockSize
-      def raw(lu1:Matrix, p1:Permutation) =
-        new LU.Decomposition
-        with BLAS.LayeredLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
-          val lu = lu1
-          val p = p1
-        }
-    }
-
-  def benched(a:Arguments) = {
-    LUDecomposition(a)
-    a
+  extends SpireLUDecompositionConstructionForBenchmark
+  with LU.ClassicLeftToRightBlockedDecompositionConstruction {
+    val nb = blockSize
   }
 }
+
+trait SpireFusedBlockedLUDecompositionBenchmark
+extends SpireLUDecompositionBenchmark {
+  val blockSize:Int
+  def header = "fused (%d)".format(blockSize)
+
+  object LUDecomposition
+  extends SpireLUDecompositionConstructionForBenchmark
+  with LU.FusedLeftToRightBlockedDecompositionConstruction {
+    val nb = blockSize
+    lazy val blocking = GEBP.threadLocalBlocking.get()
+  }
+}
+
 
 object LUDecompositionBenchmarks {
   implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
@@ -139,6 +150,15 @@ object LUDecompositionBenchmarks {
                        val blockSize = 32
                      } ::
                      new SpireClassicBlockedLUDecompositionBenchmark {
+                       val blockSize = 64
+                     } ::
+                     new SpireFusedBlockedLUDecompositionBenchmark {
+                       val blockSize = 16
+                     } ::
+                     new SpireFusedBlockedLUDecompositionBenchmark {
+                       val blockSize = 32
+                     } ::
+                     new SpireFusedBlockedLUDecompositionBenchmark {
                        val blockSize = 64
                      } ::
                      Nil
