@@ -135,8 +135,7 @@ class Singularity(val pivotIndex:Int)
 extends spire.matrix.dense.Exception
 
 /** Construction of the LU decomposition of a rectangular matrix A */
-trait DecompositionConstruction
-extends BLAS.Level3 with BLAS.Level2 with BLAS.Level1 {
+trait DecompositionConstruction {
 
   /** Computes and returns the LU decomposition of A */
   def apply(a:Matrix) = {
@@ -162,7 +161,8 @@ extends BLAS.Level3 with BLAS.Level2 with BLAS.Level1 {
  * Reference: DGETF2 from LAPACK
  */
 trait UnblockedDecompositionConstruction
-extends DecompositionConstruction with NumericPropertiesOfDouble {
+extends DecompositionConstruction with NumericPropertiesOfDouble
+with BLAS.Level2 with BLAS.Level1 {
 
   protected def decompose(a:Matrix, p:Permutation) {
     val (m,n) = a.dimensions
@@ -208,7 +208,8 @@ extends DecompositionConstruction with NumericPropertiesOfDouble {
  *     O’Reilly, 2007.
  */
 trait RecursiveDecompositionConstruction
-extends DecompositionConstruction with UnblockedDecompositionConstruction {
+extends DecompositionConstruction with UnblockedDecompositionConstruction
+with BLAS.Level3 {
 
   val unblockedThreshold: Int
 

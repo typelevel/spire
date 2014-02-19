@@ -98,7 +98,7 @@ with BLAS.NaiveLevel3
 
   def residualForSolution(a:Matrix, b:Matrix, x:Matrix) = {
     val normA = a.norm1
-    if(normA == 0) 1.0/eps
+    if(normA <= 0) 1.0/eps
     else {
       // b := b - A X
       gemm(NoTranspose, NoTranspose, -1.0, a, x, 1.0, b)
@@ -107,15 +107,18 @@ with BLAS.NaiveLevel3
       (for(j <- 0 until nRhs) yield {
         val normB = b.column(j).map(_.abs).sum
         val normX = x.column(j).map(_.abs).sum
-        if(normX == 0) 1.0/eps
+        if(normX <= 0) 1.0/eps
         else ((normB/normA)/normX)/eps
         }).max
     }
   }
 
-  implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
+  //implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
+  implicit val gen = Defaults.IntegerGenerator.fromTime(1)
 
-  test("LU decomposition") {
+  test("LU decomposition and solving of system of linear equations") {
+    //StringFormatting.useMathematicaFormat = true
+    //StringFormatting.elementFormat = "%13.6g"
     val linTests = new LinearSystemTestMatrices(nonSpecialDimensions = 2)
     val uniformIm1p1 = new ScalarUniformDistributionFromMinusOneToOne
     val elts = new RandomUncorrelatedElements(elements = uniformIm1p1)
@@ -125,17 +128,17 @@ with BLAS.NaiveLevel3
 
       //info(s"Type $imat, dimension $m x $n")
       try {
-        //info("\t+ Decomposition P A = L U")
         val lu = TestedLUDecompositionConstruction(a)
         val goodnessLU = decompositionGoodness(a0, lu)
         assert(goodnessLU < threshold,
                s"""|Failure: $goodnessLU >= $threshold
+                   |imat=$imat
                    |A=$a0
                    |$lu
                    |""".stripMargin)
+        //info("\t+ Decomposition P A = L U")
 
         if(m == n && m > 1) {
-          //info("\t+ Solution of A X = B")
           for(nRhs <- rightHandSides;
               x <- elts.generalMatrixSample(m, nRhs).take(1)) {
             // Construct rhs B = A X
@@ -148,9 +151,11 @@ with BLAS.NaiveLevel3
             val residual = residualForSolution(a0, b0, b)
             assert(residual < threshold,
                    s"""|Failure $residual >= $threshold in solving A X = B
-                       |A=$a0
+                       |imat=$imat
+                       |LU=${lu.lu}
                        |B=$b0""".stripMargin)
           }
+          //info("\t+ Solution of A X = B")
         }
       }
       catch {
@@ -165,20 +170,30 @@ with BLAS.NaiveLevel3
   }
 }
 
-class RecursiveLUDecompositionWithNaiveBLASTest extends LUDecompositionTest {
+trait LUDecompositionConstructionForTests extends LU.DecompositionConstruction
+with BLAS.LayeredLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
+  def raw(lu1:Matrix, p1:Permutation) =
+    new LU.Decomposition
+    with BLAS.LayeredLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
+      val lu = lu1
+      val p = p1
+    }
+}
+
+class UnblockedLUDecomposition extends LUDecompositionTest {
   object TestedLUDecompositionConstruction
-  extends LU.RecursiveDecompositionConstruction
-  with BLAS.NaiveLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
+  extends LUDecompositionConstructionForTests
+  with LU.UnblockedDecompositionConstruction
+}
+
+class RecursiveLUDecompositionTest extends LUDecompositionTest {
+  object TestedLUDecompositionConstruction
+  extends LUDecompositionConstructionForTests
+  with LU.RecursiveDecompositionConstruction {
     // we chose this value because it fits at the right spot in the
     // range of tested sizes: 1 to 16. I.e. not trivial but small enough that
     // it would test the recursive mechanism.
     val unblockedThreshold = 4
-    def raw(lu1:Matrix, p1:Permutation) =
-      new LU.Decomposition
-      with BLAS.NaiveLevel3 with BLAS.NaiveLevel2 with BLAS.NaiveLevel1 {
-        val lu = lu1
-        val p = p1
-      }
   }
 }
 
