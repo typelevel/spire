@@ -126,7 +126,7 @@ extends ScalarDistribution {
  *
  * [2]
  */
-class OrthogonalMatricesHaarDistribution(val n:Int)
+class OrthogonalMatricesHaarDistribution(val l:Int)
                                         (implicit gen: Defaults.IntegerGenerator,
                                          implicit val work: Scratchpad)
 extends Iterator[Matrix] with BLAS.NaiveLevel1 {
@@ -134,42 +134,63 @@ extends Iterator[Matrix] with BLAS.NaiveLevel1 {
   val ElementaryReflector = ElementaryReflectorWithNaiveBLAS
 
   private val elements = new ScalarNormalDistribution
-  private val v = Vector.zero(n)
-  private val r = Vector.zero(n)
+  private val v = Vector.zero(l)
+  private val r = Vector.zero(l)
 
   /**
-   * Overwrite A with either U A, A U or U A U^T^
+   * Overwrite A with U A, A U or U A U^T^
    *
    * The runtime cost is O(n^3^) on the top of the base runtime cost
    * whereas there is no extra storage cost.
    */
   def overwriteWithProductByNext(sides:Sides.Value, a:Matrix):Unit = {
-    if (sides == FromLeft || sides == Congruent)
-      require(a.dimensions._1 == n)
-    else if (sides == FromRight || sides == Congruent)
-      require(a.dimensions._2 == n)
-
-    for(i <- n-2 to 0 by -1) {
-      val u = v.block(0, n - i)
-      u := elements
-      val h = ElementaryReflector.annihilateAndConstruct(u)
-      r(i) = signum(u(0))
-      if(sides == FromLeft || sides == Congruent)
-        h.applyOnLeft(a.block(i,n)(0,n))
-      else if (sides == FromRight || sides == Congruent)
-        h.applyOnRight(a.block(0,n)(i,n))
+    val (m,n) = a.dimensions
+    sides match {
+      case FromLeft => {
+        require(m == l)
+        cforRange(m-2 to 0 by -1) { i =>
+          val u = v.block(0,m-i)
+          u := elements
+          val h = ElementaryReflector.annihilateAndConstruct(u)
+          r(i) = signum(u(0))
+          h.applyOnLeft(a.block(i,m)(0,n))
+        }
+        r(m-1) = signum(elements.next)
+        cforRange(0 until m) { i => scale(r(i), a.row(i)) }
+      }
+      case FromRight => {
+        require(n == l)
+        cforRange(n-2 to 0 by -1) { j =>
+          val u = v.block(0,n-j)
+          u := elements
+          val h = ElementaryReflector.annihilateAndConstruct(u)
+          r(j) = signum(u(0))
+          h.applyOnRight(a.block(0,m)(j,n))
+        }
+        r(n-1) = signum(elements.next)
+        cforRange(0 until n) { j => scale(r(j), a.column(j)) }
+      }
+      case Congruent => {
+        require(m == l && n == l)
+        cforRange(l-2 to 0 by -1) { k =>
+          val u = v.block(0,l-k)
+          u := elements
+          val h = ElementaryReflector.annihilateAndConstruct(u)
+          r(k) = signum(u(0))
+          h.applyOnLeft(a.block(k,l)(0,l))
+          h.applyOnRight(a.block(0,l)(k,l))
+        }
+        r(l-1) = signum(elements.next)
+        cforRange(0 until l) { i => scale(r(i), a.row(i)) }
+        cforRange(0 until l) { j => scale(r(j), a.column(j)) }
+      }
     }
-    r(n-1) = signum(elements.next)
-    if(sides == FromLeft || sides == Congruent)
-      for(i <- 0 until n) scale(r(i), a.row(i))
-    else if (sides == FromRight || sides == Congruent)
-      for(j <- 0 until n) scale(r(j), a.column(j))
   }
 
   def hasNext = true
 
   def next: Matrix = {
-    val result = Matrix.identity(n)
+    val result = Matrix.identity(l)
     overwriteWithProductByNext(FromLeft, result)
     result
   }
