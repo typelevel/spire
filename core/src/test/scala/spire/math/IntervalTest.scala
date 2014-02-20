@@ -168,7 +168,7 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
-  val rng = spire.random.mutable.GlobalRng
+  val rng = spire.random.GlobalRng
 
   def sample(int: Interval[Rational], n: Int): Array[Rational] =
     if (int.isEmpty) {

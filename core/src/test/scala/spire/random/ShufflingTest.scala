@@ -8,7 +8,7 @@ import org.scalacheck.Arbitrary._
 import org.scalacheck._
 
 class ShufflingTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
-  val rng = spire.random.mutable.Lcg64.fromTime()
+  val rng = spire.random.rng.Lcg64.fromTime()
 
   val range = Gen.chooseNum(1, 1000)
 

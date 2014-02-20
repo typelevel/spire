@@ -54,8 +54,8 @@ case class More[+A](k: () => Op[A]) extends Op[A]
 case class Next[+A](f: Generator => A) extends Op[A]
 case class FlatMap[A, +B](sub: Op[A], k: A => Op[B]) extends Op[B]
 
-object Random extends RandomCompanion[gen.Cmwc5] {
-  def initGenerator() = gen.Cmwc5.fromTime()
+object Random extends RandomCompanion[rng.Cmwc5] {
+  def initGenerator() = rng.Cmwc5.fromTime()
 
   def spawn[B](op: Op[B]) = new RandomCmwc5(op)
 }
@@ -166,7 +166,7 @@ abstract class Random[+A, G <: Generator](val op: Op[A]) { self =>
     size.assemble(listOfSize)(companion.int(_, _))
 }
 
-class RandomCmwc5[+A](op: Op[A]) extends Random[A, gen.Cmwc5](op) {
+class RandomCmwc5[+A](op: Op[A]) extends Random[A, rng.Cmwc5](op) {
   def companion = Random
 }
 
