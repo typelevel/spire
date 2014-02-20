@@ -1,5 +1,5 @@
 package spire.random
-package gen
+package rng
 
 import spire.math._
 import java.io._

@@ -19,7 +19,7 @@ abstract class Generator {
 
   protected[this] def copyInit: Generator
 
-  def sync: gen.SyncGenerator = new gen.SyncGenerator(copy)
+  def sync: rng.SyncGenerator = new rng.SyncGenerator(copy)
 
   def getSeedBytes(): Array[Byte]
 
@@ -462,7 +462,7 @@ object Generator {
 }
 
 object GlobalRng extends LongBasedGenerator {
-  private val rng = gen.Cmwc5.fromTime().sync
+  private val rng = spire.random.rng.Cmwc5.fromTime().sync
 
   override def sync = rng
 
