@@ -52,6 +52,10 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   @inline private[this] final def lowerFlag(flags: Int): Int = flags & 1
   @inline private[this] final def upperFlag(flags: Int): Int = flags & 2
 
+  @inline private[this] final def reverseLowerFlag(flags: Int): Int = flags ^ 1
+  @inline private[this] final def reverseUpperFlag(flags: Int): Int = flags ^ 2
+  @inline private[this] final def reverseFlags(flags: Int): Int = flags ^ 3
+
   private[this] final def lowerFlagToUpper(flags: Int): Int = (flags & 1) << 1
   private[this] final def upperFlagToLower(flags: Int): Int = (flags & 2) >>> 1
 
@@ -62,6 +66,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     case Ranged(lower, upper, flags) => isOpen(flags) && lower === upper
     case _ => false
   }
+
+  def nonEmpty: Boolean = !isEmpty
 
   def isPoint: Boolean = this match {
     case Ranged(lower, upper, flags) => isClosed(flags) && lower === upper
@@ -216,7 +222,11 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
         Interval.withFlags(lower2, upper1, flags1 | flags2)
       case Ranged(lower2, upper2, flags2) =>
         val (u, uf) = minUpper(upper1, upper2, flags1, flags2)
-        Interval.withFlags(lower2, u, lowerFlag(flags2) | uf)
+        val xf = lowerFlag(flags2) | uf
+        if (lower2 === u && !isClosed(xf))
+          Interval.empty[A]
+        else
+          Interval.withFlags(lower2, u, xf)
     }
     case Above(lower1, flags1) => rhs match {
       case All() =>
@@ -228,7 +238,11 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
         Interval.withFlags(lower1, upper2, flags1 | flags2)
       case Ranged(lower2, upper2, flags2) =>
         val (l, lf) = maxLower(lower1, lower2, flags1, flags2)
-        Interval.withFlags(l, upper2, lf | upperFlag(flags2))
+        val xf = lf | upperFlag(flags2)
+        if (l === upper2 && !isClosed(xf))
+          Interval.empty[A]
+        else
+          Interval.withFlags(l, upper2, xf)
     }
     case r1 if r1.isEmpty =>
       Interval.empty[A]
@@ -238,10 +252,18 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
           lhs
         case Above(lower2, flags2) =>
           val (l, lf) = maxLower(lower1, lower2, flags1, flags2)
-          Interval.withFlags(l, upper1, lf | upperFlag(flags1))
+          val xf = lf | upperFlag(flags1)
+          if (l === upper1 && !isClosed(xf))
+            Interval.empty[A]
+          else
+            Interval.withFlags(l, upper1, xf)
         case Below(upper2, flags2) =>
           val (u, uf) = minUpper(upper1, upper2, flags1, flags2)
-          Interval.withFlags(lower1, u, lowerFlag(flags1) | uf)
+          val xf = lowerFlag(flags1) | uf
+          if (lower1 === u && !isClosed(xf))
+            Interval.empty[A]
+          else
+            Interval.withFlags(lower1, u, xf)
         case r2 if r2.isEmpty =>
           Interval.empty[A]
         case Ranged(lower2, upper2, flags2) =>
@@ -250,6 +272,29 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
           Interval.withFlags(l, u, lf | uf)
       }
   }
+
+  def unary_~(implicit r: AdditiveMonoid[A]): List[Interval[A]] =
+    this match {
+      case All() =>
+        Nil
+      case Above(lower, lf) =>
+        List(Below(lower, lowerFlagToUpper(reverseLowerFlag(lf))))
+      case Below(upper, uf) =>
+        List(Above(upper, upperFlagToLower(reverseUpperFlag(uf))))
+      case _ if isEmpty =>
+        List(All())
+      case Ranged(lower, upper, flags) =>
+        val lx = lowerFlagToUpper(reverseLowerFlag(lowerFlag(flags)))
+        val ux = upperFlagToLower(reverseUpperFlag(upperFlag(flags)))
+        List(Below(lower, lx), Above(upper, ux))
+    }
+
+  def --(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): List[Interval[A]] =
+    if (lhs intersects rhs) {
+      (~rhs).map(lhs & _).filter(_.nonEmpty)
+    } else {
+      lhs :: Nil
+    }
 
   def split(t: A)(implicit r: AdditiveMonoid[A]): (Interval[A], Interval[A]) =
     (this intersect Interval.below(t), this intersect Interval.above(t))
@@ -310,7 +355,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       if (isClosedAbove(flags)) s"(-∞, $upper]" else s"(-∞, $upper)"
     case Ranged(lower, upper, flags) =>
       if (lower === upper) {
-        if (isClosed(flags)) s"[$lower]" else "(Ø)"
+        if (isOpen(flags)) "(Ø)" else s"[$lower]"
       } else {
         val s1 = if (isClosedBelow(flags)) s"[$lower" else s"($lower"
         val s2 = if (isClosedAbove(flags)) s"$upper]" else s"$upper)"
@@ -855,25 +900,28 @@ object Interval {
 
   // TODO: maybe put this somewhere more global once we have other types that need these?
   implicit class SymbolicSetOps[A](lhs: Interval[A]) {
-
+  
     def ∋(rhs: A): Boolean =
       lhs contains rhs
-
+  
     def ∩(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
       lhs intersect rhs
-
+  
     def ∪(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
       lhs union rhs
-
+  
+    def \(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): List[Interval[A]] =
+      lhs -- rhs
+  
     def ⊂(rhs: Interval[A]): Boolean =
       lhs isProperSubsetOf rhs
-
+  
     def ⊃(rhs: Interval[A]): Boolean =
       lhs isProperSupersetOf rhs
-
+  
     def ⊆(rhs: Interval[A]): Boolean =
       lhs isSubsetOf rhs
-
+  
     def ⊇(rhs: Interval[A]): Boolean =
       lhs isSupersetOf rhs
   }

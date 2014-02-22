@@ -15,7 +15,12 @@ import Arbitrary.arbitrary
 
 class IntervalTest extends FunSuite {
   def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)
+  def co(n1: Double, n2: Double) = Interval.openAbove(n1, n2)
   def oc(n1: Double, n2: Double) = Interval.openBelow(n1, n2)
+  def oo(n1: Double, n2: Double) = Interval.open(n1, n2)
+
+  val e = Interval.empty[Double]
+  val all = Interval.all[Double]
 
   val a = cc(0.0, 4.0)
   test("a.contains(0.0) is true") { assert(a.contains(0.0) === true) }
@@ -30,6 +35,12 @@ class IntervalTest extends FunSuite {
   val c = oc(0.0, 1.0)
   test("c.contains(0.0) is false") { assert(c.contains(0.0) === false) }
   test("c.crosses(0.0) is false") { assert(c.crosses(0.0) === false) }
+
+  test("[3, 6] -- [3, 6] = nil") { assert(cc(3D, 6D) -- cc(3D, 6D) === Nil) }
+  test("[3, 6] -- empty = [3, 6]") { assert(cc(3D, 6D) -- e === List(cc(3D, 6D))) }
+  test("[3, 6] -- all = nil") { assert(cc(3D, 6D) -- all === Nil) }
+  test("[3, 6] -- [4, 6] = [3, 4)") { assert(cc(3D, 6D) -- cc(4D, 6D) === List(co(3D, 4D))) }
+  test("[3, 6] -- [4, 5] = [3, 4), (5, 6]") { assert(cc(3D, 6D) -- cc(4D, 5D) === List(co(3D, 4D), oc(5D, 6D))) }
 }
 
 class RingIntervalTest extends FunSuite {
