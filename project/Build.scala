@@ -113,13 +113,13 @@ object MyBuild extends Build {
   // Main
 
   lazy val spire = Project("spire", file(".")).
-    aggregate(macros, core, examples, scalacheckBinding, benchmark).
+    aggregate(macros, core, examples, scalacheckBinding, tests, benchmark).
     settings(spireSettings: _*)
 
   lazy val spireSettings = Seq(
     name := "spire-aggregate"
   ) ++ noPublish ++ unidocSettings ++ Seq(
-    excludedProjects in unidoc in ScalaUnidoc ++= Seq("examples", "benchmark")
+    excludedProjects in unidoc in ScalaUnidoc ++= Seq("examples", "benchmark", "tests")
   ) ++ releaseSettings ++ Seq(
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
@@ -200,10 +200,22 @@ object MyBuild extends Build {
     name := "spire-scalacheck-binding",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "discipline" % "0.1",
-      scalaTest % "test",
       scalaCheck
     )
   )
+
+  // Tests
+
+  lazy val tests = Project("tests", file("tests")).
+    settings(testsSettings: _*).
+    dependsOn(core, scalacheckBinding)
+
+  lazy val testsSettings = Seq(
+    name := "spire-tests",
+    libraryDependencies ++= Seq(
+      scalaTest % "test"
+    )
+  ) ++ noPublish
 
 
   // Benchmark
