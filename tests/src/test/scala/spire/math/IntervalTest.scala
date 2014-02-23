@@ -168,6 +168,35 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
+  property("(x -- y) ⊆ x && (x -- y) & y = Ø") {
+    forAll { (x: Interval[Rational], y: Interval[Rational]) =>
+      (x -- y).foreach { zi =>
+        (zi isSubsetOf x) shouldBe true
+        (zi intersects y) shouldBe false
+      }
+    }
+  }
+
+  property("(x -- Ø) = x") {
+    forAll { (x: Interval[Rational]) =>
+      if (x.nonEmpty) {
+        (x -- Interval.empty[Rational]) shouldBe List(x)
+      }
+    }
+  }
+
+  property("(x -- x = Ø") {
+    forAll { (x: Interval[Rational]) =>
+      (x -- x) shouldBe Nil
+    }
+  }
+
+  property("(x -- (-∞, ∞) = Ø") {
+    forAll { (x: Interval[Rational]) =>
+      (x -- Interval.all[Rational]) shouldBe Nil
+    }
+  }
+
   val rng = spire.random.mutable.GlobalRng
 
   def sample(int: Interval[Rational], n: Int): Array[Rational] =
@@ -223,4 +252,10 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
   property("sampled binop *") { testBinop(_ * _)(_ * _) }
   property("sampled binop min") { testBinop(_ min _)(_ min _) }
   property("sampled binop max") { testBinop(_ max _)(_ max _) }
+
+  property("toString/apply") {
+    forAll { (x: Interval[Rational]) =>
+      Interval(x.toString) shouldBe x
+    }
+  }
 }
