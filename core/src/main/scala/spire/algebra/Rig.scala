@@ -20,3 +20,12 @@ trait Rig[@spec(Byte, Short, Int, Long, Float, Double) A] extends Semiring[A] wi
 object Rig {
   @inline final def apply[A](implicit r:Rig[A]): Rig[A] = r
 }
+
+/**
+ * CRig is a Rig that is commutative under multiplication.
+ */
+trait CRig[@spec(Byte, Short, Int, Long, Float, Double) A] extends Rig[A] with MultiplicativeCMonoid[A]
+
+object CRig {
+  @inline final def apply[A](implicit r: CRig[A]): CRig[A] = r
+}
