@@ -34,7 +34,7 @@ class GeneratorTest extends FunSuite {
   val size: Int = 10000000
   val threshold: Double = 0.003
 
-  List(Lcg32, Lcg64, BurtleRot2, BurtleRot3, Marsaglia32a6, Cmwc5, Well512).foreach { gen => 
+  List(Lcg32, Lcg64, BurtleRot2, BurtleRot3, Marsaglia32a6, MersenneTwister32, MersenneTwister64, Cmwc5, Well512).foreach { gen => 
     val name = getName(gen)
 
     List(3, 5, 7, 11, 13, 17).foreach { mod =>
