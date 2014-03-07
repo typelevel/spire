@@ -109,7 +109,6 @@ final class MersenneTwister64(private var seed: Long = 5489) extends LongBasedGe
   }
 
   def setSeedBytes(bytes: Array[Byte]) {
-    N * 8 + 4
     val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
     for (i <- 0 until N) {

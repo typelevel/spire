@@ -108,7 +108,6 @@ final class MersenneTwister32(private var seed: Int = 5489) extends IntBasedGene
   }
 
   def setSeedBytes(bytes: Array[Byte]) {
-    N * 8 + 4
     val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
     for (i <- 0 until N) {
