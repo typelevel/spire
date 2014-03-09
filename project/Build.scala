@@ -18,8 +18,8 @@ object MyBuild extends Build {
 
   // Dependencies
 
-  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.0"
-  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.10.1"
+  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.1.0"
+  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.11.3"
 
   // Release step
 
@@ -52,9 +52,6 @@ object MyBuild extends Build {
 
     scalaVersion := "2.10.2",
 
-    // disable annoying warnings about 2.10.x
-    conflictWarning in ThisBuild := ConflictWarning.disable,
-
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
@@ -75,6 +72,7 @@ object MyBuild extends Build {
     ),
 
     resolvers += Resolver.sonatypeRepo("snapshots"),
+    resolvers += Resolver.sonatypeRepo("releases"),
     addCompilerPlugin("org.scala-lang.plugins" % "macro-paradise_2.10.2" % "2.0.0-SNAPSHOT"),
 
     publishMavenStyle := true,
@@ -199,7 +197,7 @@ object MyBuild extends Build {
   lazy val scalacheckSettings = Seq(
     name := "spire-scalacheck-binding",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "discipline" % "0.1",
+      "org.typelevel" %% "discipline" % "0.2",
       scalaCheck
     )
   )
