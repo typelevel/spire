@@ -1,4 +1,4 @@
-package spire.macrosk
+package spire.macros
 
 import spire.macros.Compat.OldContext
 import spire.math.{Rational, UByte, UShort, UInt, ULong}

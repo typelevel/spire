@@ -2,7 +2,6 @@ package spire.math
 
 import scala.{specialized => spec}
 
-import spire.macrosk.Ops
 import spire.algebra.{ Trig, IsReal }
 
 trait ConvertableTo[@spec A] {

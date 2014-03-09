@@ -5,8 +5,6 @@ import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
-import BigDecimal.RoundingMode._
-
 class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   type Q = Rational
 

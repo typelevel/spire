@@ -1,7 +1,8 @@
 package spire.syntax
 
 import spire.algebra._
-import spire.macrosk.Ops
+
+import machinist.{DefaultOps => Ops}
 import spire.math.{BitString, ConvertableTo, ConvertableFrom, Rational, Number}
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {

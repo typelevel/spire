@@ -58,7 +58,8 @@ object MyBuild extends Build {
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "org.typelevel" %% "machinist" % "0.3.0"
     ),
 
     scalacOptions ++= Seq(
