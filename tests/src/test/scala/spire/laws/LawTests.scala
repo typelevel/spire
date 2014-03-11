@@ -70,5 +70,3 @@ class LawTests extends FunSuite with Discipline {
 
   checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
 }
-
-// vim: expandtab:ts=2:sw=2

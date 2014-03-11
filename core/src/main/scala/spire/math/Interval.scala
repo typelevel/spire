@@ -38,7 +38,6 @@ import Predef.{any2stringadd => _, _}
  * wider intervals). The result is not wrong per se, but less
  * acccurate than it could be.
  */
-
 sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   @inline private[this] final def isClosed(flags: Int): Boolean = flags == 0
@@ -293,7 +292,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     if (lhs intersects rhs) {
       (~rhs).map(lhs & _).filter(_.nonEmpty)
     } else {
-      lhs :: Nil
+      (lhs :: Nil).filter(_.nonEmpty)
     }
 
   def split(t: A)(implicit r: AdditiveMonoid[A]): (Interval[A], Interval[A]) =
@@ -843,7 +842,11 @@ object Interval {
   case class Closed[A](a: A) extends Bound[A]
 
   private[spire] def withFlags[A: Order: AdditiveMonoid](lower: A, upper: A, flags: Int): Interval[A] =
-    if (lower <= upper) Ranged(lower, upper, flags) else Interval.empty[A]
+    if (lower < upper || lower === upper && flags == 0) {
+      Ranged(lower, upper, flags)
+    } else {
+      Interval.empty[A]
+    }
 
   def empty[A](implicit o: Order[A], r: AdditiveMonoid[A]): Interval[A] =
     Ranged(r.zero, r.zero, 3)
@@ -884,6 +887,42 @@ object Interval {
   def below[A: Order](a: A): Interval[A] = Below(a, 2)
   def atOrAbove[A: Order](a: A): Interval[A] = Above(a, 0)
   def atOrBelow[A: Order](a: A): Interval[A] = Below(a, 0)
+
+  private val NullRe = "^ *\\( *Ø *\\) *$".r
+  private val SingleRe = "^ *\\[ *([^,]+) *\\] *$".r
+  private val PairRe = "^ *(\\[|\\() *(.+?) *, *(.+?) *(\\]|\\)) *$".r
+
+  def apply(s: String): Interval[Rational] = s match {
+    case NullRe() =>
+      Interval.empty[Rational]
+    case SingleRe(x) =>
+      Interval.point(Rational(x))
+    case PairRe(left, x, y, right) =>
+      (left, x, y, right) match {
+        case ("(", "-∞", "∞", ")") =>
+          Interval.all[Rational]
+        case ("(", "-∞", y, ")") =>
+          Interval.below(Rational(y))
+        case ("(", "∞", y, "]") =>
+          Interval.atOrBelow(Rational(y))
+        case ("(", x, "∞", ")") =>
+          Interval.above(Rational(x))
+        case ("[", x, "∞", ")") =>
+          Interval.atOrAbove(Rational(x))
+        case ("[", x, y, "]") =>
+          Interval.closed(Rational(x), Rational(y))
+        case ("(", x, y, ")") =>
+          Interval.open(Rational(x), Rational(y))
+        case ("[", x, y, ")") =>
+          Interval.openAbove(Rational(x), Rational(y))
+        case ("(", x, y, "]") =>
+          Interval.openBelow(Rational(x), Rational(y))
+        case _ =>
+          throw new NumberFormatException("Impossible: " + s)
+      }
+    case _ =>
+      throw new NumberFormatException("For input string: " + s)
+  }
 
   implicit def eq[A: Eq]: Eq[Interval[A]] =
     new Eq[Interval[A]] {

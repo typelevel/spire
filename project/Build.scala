@@ -18,8 +18,8 @@ object MyBuild extends Build {
 
   // Dependencies
 
-  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.0"
-  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.10.1"
+  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.1.0"
+  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.11.3"
 
   // Release step
 
@@ -52,14 +52,11 @@ object MyBuild extends Build {
 
     scalaVersion := "2.10.2",
 
-    // disable annoying warnings about 2.10.x
-    conflictWarning in ThisBuild := ConflictWarning.disable,
-
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % "2.10.2"
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value
     ),
 
     scalacOptions ++= Seq(
@@ -75,7 +72,19 @@ object MyBuild extends Build {
     ),
 
     resolvers += Resolver.sonatypeRepo("snapshots"),
-    addCompilerPlugin("org.scala-lang.plugins" % "macro-paradise_2.10.2" % "2.0.0-SNAPSHOT"),
+    resolvers += Resolver.sonatypeRepo("releases"),
+    libraryDependencies := {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        // if scala 2.11+ is used, quasiquotes are merged into scala-reflect
+        case Some((2, scalaMajor)) if scalaMajor >= 11 =>
+          libraryDependencies.value
+        // in Scala 2.10, quasiquotes are provided by macro-paradise
+        case Some((2, 10)) =>
+          libraryDependencies.value ++ Seq(
+            compilerPlugin("org.scalamacros" % "paradise" % "2.0.0-M3" cross CrossVersion.full),
+            "org.scalamacros" %% "quasiquotes" % "2.0.0-M3" cross CrossVersion.full)
+      }
+    },
 
     publishMavenStyle := true,
     publishArtifact in Test := false,
@@ -113,13 +122,13 @@ object MyBuild extends Build {
   // Main
 
   lazy val spire = Project("spire", file(".")).
-    aggregate(macros, core, examples, scalacheckBinding, benchmark).
+    aggregate(macros, core, examples, scalacheckBinding, tests, benchmark).
     settings(spireSettings: _*)
 
   lazy val spireSettings = Seq(
     name := "spire-aggregate"
   ) ++ noPublish ++ unidocSettings ++ Seq(
-    excludedProjects in unidoc in ScalaUnidoc ++= Seq("examples", "benchmark")
+    excludedProjects in unidoc in ScalaUnidoc ++= Seq("examples", "benchmark", "tests")
   ) ++ releaseSettings ++ Seq(
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
@@ -199,11 +208,23 @@ object MyBuild extends Build {
   lazy val scalacheckSettings = Seq(
     name := "spire-scalacheck-binding",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "discipline" % "0.1",
-      scalaTest % "test",
+      "org.typelevel" %% "discipline" % "0.2",
       scalaCheck
     )
   )
+
+  // Tests
+
+  lazy val tests = Project("tests", file("tests")).
+    settings(testsSettings: _*).
+    dependsOn(core, scalacheckBinding)
+
+  lazy val testsSettings = Seq(
+    name := "spire-tests",
+    libraryDependencies ++= Seq(
+      scalaTest % "test"
+    )
+  ) ++ noPublish
 
 
   // Benchmark
