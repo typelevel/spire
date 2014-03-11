@@ -485,7 +485,7 @@ object FastComplex {
   final def abs(d: Long): Float = {
     val re = real(d)
     val im = imag(d)
-    sqrt(re * re + im * im).toFloat
+    java.lang.Math.sqrt(re * re + im * im).toFloat
   }
 
   // get the angle/argument
