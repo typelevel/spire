@@ -15,7 +15,8 @@
  * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
  */
 
-package spire.random.mutable
+package spire.random
+package rng
 
 import spire.util.Pack
 import scala.math.max

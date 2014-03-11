@@ -14,8 +14,10 @@ import java.util.Arrays
  * 
  * This class uses WELL512a, which contains 512 bits of state.
  */
-class Well512 protected[random] (_i: Int, private var state: Array[Int]) extends IntBasedGenerator {
-  var i: Int = _i
+class Well512 protected[random] (i0: Int, state0: Array[Int]) extends IntBasedGenerator {
+  assert(state0.length == 16)
+  private var i: Int = i0
+  private var state: Array[Int] = state0
 
   @inline final def m1 = 13
   @inline final def m2 = 9
