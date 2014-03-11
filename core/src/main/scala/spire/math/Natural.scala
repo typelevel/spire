@@ -135,7 +135,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
           d.toLong.toString + s
         case Digit(d, tail) =>
           val (q, r) = next /% Natural.denom
-          if (q == UInt(0))
+          if (q.isZero)
             r.digit.toLong.toString + s
           else
             recur(q, "%09d%s" format (r.digit.toLong, s))
