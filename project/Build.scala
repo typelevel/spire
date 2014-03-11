@@ -80,8 +80,9 @@ object MyBuild extends Build {
           libraryDependencies.value
         // in Scala 2.10, quasiquotes are provided by macro-paradise
         case Some((2, 10)) =>
-          libraryDependencies.value :+
-            compilerPlugin("org.scala-lang.plugins" % "macro-paradise_2.10.2" % "2.0.0-SNAPSHOT")
+          libraryDependencies.value ++ Seq(
+            compilerPlugin("org.scalamacros" % "paradise" % "2.0.0-M3" cross CrossVersion.full),
+            "org.scalamacros" %% "quasiquotes" % "2.0.0-M3" cross CrossVersion.full)
       }
     },
 
