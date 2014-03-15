@@ -44,6 +44,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def gcd(rhs: Rational): Rational
 
+  def toSafeLong: SafeLong = SafeLong(floor.toBigInt)
   def toBigInt: BigInt
   def toBigDecimal: BigDecimal
   override def shortValue = longValue.toShort

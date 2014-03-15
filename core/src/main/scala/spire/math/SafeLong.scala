@@ -94,6 +94,9 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
 
   def unary_-(): SafeLong
 
+  def isZero: Boolean
+  def nonZero: Boolean
+
   override def isValidInt: Boolean = {
     if (!isLong) return false
     val n = toLong
@@ -270,6 +273,9 @@ private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong w
   def >>(n: Int): SafeLong =
     if (n < 0) <<(-n) else if (n >= 64) SafeLongLong(0L) else SafeLongLong(x >> n)
 
+  def isZero: Boolean = x == 0
+  def nonZero: Boolean = x != 0
+
   override def equals(that: Any): Boolean = that match {
     case SafeLongLong(y) => x == y
     case SafeLongBigInt(y) => x == y
@@ -337,6 +343,9 @@ private[math] case class SafeLongBigInt private[math] (x: BigInt) extends SafeLo
 
   def <<(n: Int): SafeLong = SafeLong(x << n)
   def >>(n: Int): SafeLong = SafeLong(x >> n)
+
+  def isZero: Boolean = x == 0
+  def nonZero: Boolean = x != 0
 
   override def equals(that: Any): Boolean = that match {
     case SafeLongLong(y) => x == y
