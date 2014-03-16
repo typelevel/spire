@@ -1,5 +1,6 @@
 package spire.math
 
+import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import spire.syntax.nroot._
 import spire.algebra._
@@ -147,12 +148,24 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     })
   }
 
-  def gcd(y: Real): Real = (x, y) match {
-    case (Exact(nx), Exact(ny)) => Exact(nx gcd ny)
-    case _ => Real({ p =>
-      val g = x.toRational(p) gcd y.toRational(p)
-      roundUp(g * SafeLong.two.pow(p))
-    })
+  def gcd(y: Real): Real = {
+    @tailrec def loop(i: Int, x: Real, y: Real): Real = {
+      val g = x % y
+      if (g.signum == 0) y
+      else if (i < 10) loop(i + 1, y, g)
+      else Real.zero
+    }
+    (x, y) match {
+      case (Exact(nx), Exact(ny)) => Exact(nx gcd ny)
+      case _ => loop(0, x, y)
+    }
+  }
+
+  def lcm(y: Real): Real = (x, y) match {
+    case (Exact(nx), Exact(ny)) =>
+      Exact(nx lcm ny)
+    case _ =>
+      (x * y) / (x gcd y)
   }
 
   def ceil(): Real = x match {
@@ -515,6 +528,7 @@ trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Rea
   def times(x: Real, y: Real): Real = x * y
 
   def gcd(x: Real, y: Real): Real = x gcd y
+  override def lcm(x: Real, y: Real): Real = x lcm y
   def quot(x: Real, y: Real): Real = x /~ y
   def mod(x: Real, y: Real): Real = x % y
 

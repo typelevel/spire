@@ -44,6 +44,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def gcd(rhs: Rational): Rational
 
+  def lcm(rhs: Rational): Rational = (lhs * rhs) / (lhs gcd rhs)
+
   def toSafeLong: SafeLong = SafeLong(floor.toBigInt)
   def toBigInt: BigInt
   def toBigDecimal: BigDecimal
@@ -925,6 +927,7 @@ private[math] trait RationalIsField extends Field[Rational] {
   def mod(a:Rational, b:Rational) = a % b
   override def quotmod(a:Rational, b:Rational) = a /% b
   def gcd(a:Rational, b:Rational):Rational = a gcd b
+  override def lcm(a:Rational, b:Rational):Rational = a lcm b
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
   def div(a:Rational, b:Rational) = a / b
