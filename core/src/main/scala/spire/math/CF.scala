@@ -4,36 +4,8 @@ import scala.annotation.tailrec
 
 case class InvalidCFError(msg: String) extends Exception(msg)
 
-object Xyz {
-  type Z = SafeLong
-}
+object Xyz { type Z = SafeLong }
 import Xyz.Z
-
-case class State8(a: Z, b: Z, c: Z, d: Z, e: Z, f: Z, g: Z, h: Z) {
-
-  def canProduce: Option[(Option[Z], State8)] = {
-    if (e == 0 && f == 0 && g == 0 && h == 0) return Some((None, this))
-
-    val ae = Extended(a) /~ Extended(e)
-    val bf = Extended(b) /~ Extended(f)
-    val cg = Extended(c) /~ Extended(g)
-    val dh = Extended(d) /~ Extended(h)
-
-    if (ae == bf && bf == cg && cg == dh) {
-      val q = ae.getOrError()
-      Some((Some(q), State8(e, f, g, h, a - e*q, b - f*q, c - g*q, d - h*q)))
-    } else {
-      None
-    }
-  }
-
-  def consumeLeft(n: Z): State8 =
-    State8(a*n + c, b*n + d, a, b, e*n + g, f*n + h, e, f)
-
-  def consumeRight(n: Z): State8 =
-    State8(a*n + b, a, c*n + d, c, e*n + f, e, g*n + h, g)
-}
-
 
 object Eval {
 
@@ -43,8 +15,7 @@ object Eval {
 
       if (c != 0 && d != 0) {
         val q = a / c
-        if (q == b / d)
-          return CF.xyz(q, () => eval4(c, d, a - c*q, b - d*q, cf))
+        if (q == b / d) return CF.xyz(q, () => eval4(c, d, a - c*q, b - d*q, cf))
       }
 
       cf match {
@@ -55,36 +26,13 @@ object Eval {
     loop4(a, b, c, d, cf)
   }
 
-  // def disp8(a: Z, b: Z, c: Z, d: Z, e: Z, f: Z, g: Z, h: Z, lhs: CF, rhs: CF) {
-  //   val as = a.toString
-  //   val bs = b.toString
-  //   val cs = c.toString
-  //   val ds = d.toString
-  //   val es = e.toString
-  //   val fs = f.toString
-  //   val gs = g.toString
-  //   val hs = h.toString
-  //   val lf1 = "%" + (as.length max es.length) + "s"
-  //   val lf2 = "%" + (bs.length max fs.length) + "s"
-  //   val lf3 = "%" + (cs.length max gs.length) + "s"
-  //   val lf4 = "%" + (ds.length max hs.length) + "s"
-  //   println(lf1.format(as) + " " + lf2.format(bs) + " " + lf3.format(cs) + " " + lf4.format(ds))
-  //   println(lf1.format(es) + " " + lf2.format(fs) + " " + lf3.format(gs) + " " + lf4.format(hs))
-  //   println("x=%s y=%s" format (lhs, rhs))
-  // }
-
   def eval8(
     breakout: Int, doneLeft: Boolean, doneRight: Boolean, lhs: CF, rhs: CF,
     a: Z, b: Z, c: Z, d: Z, e: Z, f: Z, g: Z, h: Z): CF = {
 
-    // var doneLeft = false
-    // var doneRight = false
-
     @tailrec def loop8(
       i: Int, doneLeft: Boolean, doneRight: Boolean, lhs: CF, rhs: CF,
       a: Z, b: Z, c: Z, d: Z, e: Z, f: Z, g: Z, h: Z): CF = {
-
-      //disp8(a, b, c, d, e, f, g, h, lhs, rhs)
 
       if (i >= breakout || (e == 0 && f == 0 && g == 0 && h == 0)) return Infinity
 
@@ -95,7 +43,6 @@ object Eval {
 
       if (ae == bf && bf == cg && cg == dh) {
         val q = ae.getOrError()
-        //println("  returning %s" format q)
         return CF.xyz(q, () => eval8(
           breakout, doneLeft, doneRight, lhs, rhs,
           e, f, g, h,
@@ -202,6 +149,27 @@ sealed trait CF { lhs =>
     Eval.eval8(100, false, false, lhs, rhs,
       zero, one, zero, zero,
       zero, zero, one, zero)
+
+  def /~(rhs: CF): CF =
+    (lhs / rhs) match {
+      case LongTerm(n, _) => CF(n)
+      case BigTerm(n, _) => CF(n)
+      case inf => inf
+    }
+
+  def %(rhs: CF): CF =
+    (lhs / rhs) match {
+      case LongTerm(_, f) => LongTerm(0, f) * rhs
+      case BigTerm(_, f) => LongTerm(0, f) * rhs
+      case inf => inf
+    }
+
+  def /%(rhs: CF): (CF, CF) =
+    (lhs / rhs) match {
+      case LongTerm(n, f) => (CF(n), LongTerm(0, f) * rhs)
+      case BigTerm(n, f) => (CF(n), LongTerm(0, f) * rhs)
+      case inf => (inf, inf)
+    }
 
   def reciprocal: CF =
     this match {

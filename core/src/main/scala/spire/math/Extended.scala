@@ -5,7 +5,7 @@ import scala.{specialized => sp}
 import spire.algebra._
 import spire.syntax.all._
 
-sealed trait Extended[A] { lhs =>
+sealed trait Extended[A] extends Any { lhs =>
 
   import Extended.{PosInf, Fin, NegInf}
 
@@ -59,6 +59,16 @@ sealed trait Extended[A] { lhs =>
       case Fin(n) => Fin(-n)
       case NegInf() => PosInf()
     }
+
+  def signum(implicit s: Signed[A]): Int =
+    lhs match {
+      case PosInf() => 1
+      case Fin(n) => n.signum
+      case NegInf() => -1
+    }
+
+  def takeSign(a: A)(implicit ev: AdditiveGroup[A], s: Signed[A]): Extended[A] =
+    if (this.signum == -a.signum) -this else this
 
   def +(rhs: Extended[A])(implicit ev: AdditiveMonoid[A]): Extended[A] =
     lhs match {
@@ -158,11 +168,11 @@ object Extended {
   def zero[A](implicit ev: AdditiveMonoid[A]): Extended[A] = Fin(ev.zero)
   def one[A](implicit ev: MultiplicativeMonoid[A]): Extended[A] = Fin(ev.one)
 
-  def positiveInfinity[A]: Extended[A] = PosInf()
-  def apply[A](a: A): Extended[A] = Fin(a)
-  def negativeInfinity[A]: Extended[A] = PosInf()
+  def posInf[A]: PosInf[A] = PosInf()
+  def apply[A](a: A): Fin[A] = Fin(a)
+  def negInf[A]: NegInf[A] = NegInf()
 
   case class PosInf[A]() extends Extended[A]
-  case class Fin[A](a: A) extends Extended[A]
+  case class Fin[A](a: A) extends AnyVal with Extended[A]
   case class NegInf[A]() extends Extended[A]
 }
