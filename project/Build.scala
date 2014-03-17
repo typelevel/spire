@@ -128,7 +128,7 @@ object MyBuild extends Build {
   lazy val spireSettings = Seq(
     name := "spire-aggregate"
   ) ++ noPublish ++ unidocSettings ++ Seq(
-    excludedProjects in unidoc in ScalaUnidoc ++= Seq("examples", "benchmark", "tests")
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, tests)
   ) ++ releaseSettings ++ Seq(
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
