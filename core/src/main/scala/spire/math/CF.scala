@@ -15,7 +15,7 @@ object Eval {
 
       if (c != 0 && d != 0) {
         val q = a / c
-        if (q == b / d) return CF.xyz(q, () => eval4(c, d, a - c*q, b - d*q, cf))
+        if (q == b / d) return CF.construct(q, () => eval4(c, d, a - c*q, b - d*q, cf))
       }
 
       cf match {
@@ -34,6 +34,8 @@ object Eval {
       i: Int, doneLeft: Boolean, doneRight: Boolean, lhs: CF, rhs: CF,
       a: Z, b: Z, c: Z, d: Z, e: Z, f: Z, g: Z, h: Z): CF = {
 
+      // FIXME: breakout is a hack to support approximately results
+      // that are exactly zero.
       if (i >= breakout || (e == 0 && f == 0 && g == 0 && h == 0)) return Infinity
 
       val ae = Extended(a) /~ Extended(e)
@@ -43,7 +45,7 @@ object Eval {
 
       if (ae == bf && bf == cg && cg == dh) {
         val q = ae.getOrError()
-        return CF.xyz(q, () => eval8(
+        return CF.construct(q, () => eval8(
           breakout, doneLeft, doneRight, lhs, rhs,
           e, f, g, h,
           a - e*q, b - f*q, c - g*q, d - h*q))
@@ -85,10 +87,44 @@ sealed trait CF { lhs =>
 
   import SafeLong.{zero, one}
 
+  // TODO: use implicit parameter to specify approximation
+  def signum: Int = {
+    // FIXME: i is a similar hack to above, to support breaking out if
+    // we somehow have a stream of zeros.
+    @tailrec def loop(i: Int, cf: CF): Int =
+      if (i > 10) 0 else cf match {
+        case LongTerm(n, f) => if (n != 0) n.signum else loop(i + 1, f())
+        case BigTerm(n, f) => if (n != 0) n.signum else loop(i + 1, f())
+        case _ => 0
+      }
+    loop(0, this)
+  }
+
+  // TODO: use implicit parameter to specify approximation
+  def compare(rhs: CF): Int = (lhs - rhs).signum
+
+  // TODO: use implicit parameter to specify approximation
+  override def equals(rhs: Any): Boolean =
+    rhs match {
+      case rhs: CF => (lhs compare rhs) == 0
+      case _ => false
+    }
+
   def unary_- : CF =
     this match {
       case LongTerm(n, f) => LongTerm(-n, () => -f())
       case BigTerm(n, f) => BigTerm(-n, () => -f())
+      case inf => inf
+    }
+
+  def abs: CF =
+    this match {
+      case LongTerm(Long.MinValue, f) =>
+        BigTerm(-BigInt(Long.MinValue), () => f().abs)
+      case LongTerm(n, f) =>
+        LongTerm(spire.math.abs(n), () => f().abs)
+      case BigTerm(n, f) =>
+        BigTerm(n.abs, () => f().abs)
       case inf => inf
     }
 
@@ -191,6 +227,10 @@ sealed trait CF { lhs =>
     else loop(this, k - 1, this)
   }
 
+  def sqrt: CF = ???
+
+  def nroot(k: Int): CF = ???
+
   def toList: List[SafeLong] = {
     def unroll(cf: CF, acc: List[SafeLong]): List[SafeLong] =
       cf match {
@@ -258,7 +298,7 @@ object CF {
   def apply(n: BigInt): CF = BigTerm(n, done)
   def apply(n: SafeLong): CF = n.fold(apply(_), apply(_))
 
-  def xyz(n: SafeLong, f: () => CF): CF =
+  def construct(n: SafeLong, f: () => CF): CF =
     n.fold(LongTerm(_, f), BigTerm(_, f))
 
   val zero = 0 ~: Infinity

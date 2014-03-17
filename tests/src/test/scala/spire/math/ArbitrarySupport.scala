@@ -106,6 +106,9 @@ object ArbitrarySupport {
   implicit val real: Arbitrary[Real] =
     Arbitrary(arbitrary[Rational].map(n => Real(n)))
 
+  implicit val cf: Arbitrary[CF] =
+    Arbitrary(arbitrary[Rational].map(n => CF(n)))
+
   implicit def complex[A: Arbitrary: Fractional: Signed: Trig]: Arbitrary[Complex[A]] =
     Arbitrary(for {
       re <- arbitrary[A]
