@@ -726,6 +726,9 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       Interval.point(r.one)
     } else if (k == 1) {
       this
+    } else if ((k & 1) == 0) {
+      val t = abs
+      loop(t, k - 1, t)
     } else {
       loop(this, k - 1, this)
     }
@@ -930,11 +933,12 @@ object Interval {
         (x.lowerPair === y.lowerPair) && (x.upperPair === y.upperPair)
     }
 
-  implicit def semiring[A](implicit ev: Semiring[A], o: Order[A]): Semiring[Interval[A]] =
+  implicit def semiring[A](implicit ev: Ring[A], o: Order[A]): Semiring[Interval[A]] =
     new Semiring[Interval[A]] {
       def zero: Interval[A] = Interval.point(ev.zero)
       def plus(x: Interval[A], y: Interval[A]): Interval[A] = x + y
       def times(x: Interval[A], y: Interval[A]): Interval[A] = x * y
+      override def pow(x: Interval[A], k: Int): Interval[A] = x.pow(k)
     }
 
   // TODO: maybe put this somewhere more global once we have other types that need these?

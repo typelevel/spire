@@ -128,7 +128,7 @@ object MyBuild extends Build {
   lazy val spireSettings = Seq(
     name := "spire-aggregate"
   ) ++ noPublish ++ unidocSettings ++ Seq(
-    excludedProjects in unidoc in ScalaUnidoc ++= Seq("examples", "benchmark", "tests")
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, tests)
   ) ++ releaseSettings ++ Seq(
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
@@ -260,31 +260,7 @@ object MyBuild extends Build {
     ),
 
     // enable forking in run
-    fork in run := true,
-
-    // custom kludge to get caliper to see the right classpath
-
-    // we need to add the runtime classpath as a "-cp" argument to the
-    // `javaOptions in run`, otherwise caliper will not see the right classpath
-    // and die with a ConfigurationException unfortunately `javaOptions` is a
-    // SettingsKey and `fullClasspath in Runtime` is a TaskKey, so we need to
-    // jump through these hoops here in order to feed the result of the latter
-    // into the former
-    onLoad in Global ~= { previous => state =>
-      previous {
-        state.get(key) match {
-          case None =>
-            // get the runtime classpath, turn into a colon-delimited string
-            val classPath = Project.runTask(fullClasspath in Runtime in benchmark, state).get._2.toEither.right.get.files.mkString(":")
-            // return a state with javaOptionsPatched = true and javaOptions set correctly
-            Project.extract(state).append(Seq(javaOptions in (benchmark, run) ++= Seq("-cp", classPath)), state.put(key, true))
-          case Some(_) =>
-            state // the javaOptions are already patched
-        }
-      }
-    }
-
-    // caliper stuff stolen shamelessly from scala-benchmarking-template
+    fork in run := true
   ) ++ noPublish
 
 }
