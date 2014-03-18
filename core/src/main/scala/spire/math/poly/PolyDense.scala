@@ -45,16 +45,29 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   def isZero: Boolean =
     coeffs.length == 0
 
-  def apply(x: C)(implicit ring: Semiring[C]): C =
-    if (isZero) {
-      ring.zero
-    } else {
-      var c = coeffs(coeffs.length - 1)
-      cfor(coeffs.length - 2)(_ >= 0, _ - 1) { i =>
-        c = coeffs(i) + c * x
-      }
-      c
+  def apply(x: C)(implicit ring: Semiring[C]): C = {
+    if (isZero) return ring.zero
+
+    var even = coeffs.length - 1
+    var odd = coeffs.length - 2
+    if ((even & 1) == 1) { even = odd; odd = coeffs.length - 1 }
+
+    var c0 = coeffs(even)
+    val x2 = x.pow(2)
+    cfor(even - 2)(_ >= 0, _ - 2) { i =>
+      c0 = coeffs(i) + c0 * x2
     }
+
+    if (odd > 0) {
+      var c1 = coeffs(odd) * x
+      cfor(odd - 2)(_ >= 1, _ - 2) { i =>
+        c1 = coeffs(i) + c1 * x2
+      }
+      c0 + c1
+    } else {
+      c0
+    }
+  }
 
   def derivative(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] = {
     if (isZero) return this
