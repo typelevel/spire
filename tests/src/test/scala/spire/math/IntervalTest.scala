@@ -185,13 +185,13 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
-  property("(x -- x = Ø") {
+  property("(x -- x) = Ø") {
     forAll { (x: Interval[Rational]) =>
       (x -- x) shouldBe Nil
     }
   }
 
-  property("(x -- (-∞, ∞) = Ø") {
+  property("(x -- (-∞, ∞)) = Ø") {
     forAll { (x: Interval[Rational]) =>
       (x -- Interval.all[Rational]) shouldBe Nil
     }
