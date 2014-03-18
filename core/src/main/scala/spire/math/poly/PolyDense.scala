@@ -58,12 +58,12 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
       c0 = coeffs(i) + c0 * x2
     }
 
-    if (odd > 0) {
-      var c1 = coeffs(odd) * x
+    if (odd >= 1) {
+      var c1 = coeffs(odd)
       cfor(odd - 2)(_ >= 1, _ - 2) { i =>
         c1 = coeffs(i) + c1 * x2
       }
-      c0 + c1
+      c0 + c1 * x
     } else {
       c0
     }
