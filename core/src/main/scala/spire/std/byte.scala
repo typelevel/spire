@@ -19,6 +19,29 @@ trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
   def gcd(a: Byte, b: Byte): Byte = spire.math.gcd(a, b).toByte
 }
 
+// Not included in Instances trait.
+trait ByteIsNRoot extends NRoot[Byte] {
+  def nroot(x: Byte, n: Int): Byte = {
+    def findnroot(prev: Int, add: Int): Byte = {
+      val next = prev | add
+      val e = Math.pow(next, n)
+
+      if (e == x || add == 0) {
+        next.toByte
+      } else if (e <= 0 || e > x) {
+        findnroot(prev, add >> 1)
+      } else {
+        findnroot(next, add >> 1)
+      }
+    }
+
+    findnroot(0, 1 << ((33 - n) / n))
+  }
+
+  def log(a: Byte) = Math.log(a.toDouble).toByte
+  def fpow(a: Byte, b: Byte) = Math.pow(a, b).toByte
+}
+
 trait ByteIsSigned extends Signed[Byte] {
   def signum(a: Byte): Int = a
   def abs(a: Byte): Byte = (if (a < 0) -a else a).toByte
@@ -31,7 +54,7 @@ trait ByteOrder extends Order[Byte] {
   override def gteqv(x: Byte, y: Byte) = x >= y
   override def lt(x: Byte, y: Byte) = x < y
   override def lteqv(x: Byte, y: Byte) = x <= y
-  def compare(x: Byte, y: Byte) = if (x < y) -1 else if (x > y) 1 else 0
+  def compare(x: Byte, y: Byte) = x - y
 }
 
 trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned {

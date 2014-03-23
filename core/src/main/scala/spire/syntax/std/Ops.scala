@@ -1,122 +1,126 @@
 package spire.syntax.std
 
+import Predef.{any2stringadd => _, _}
+
 import spire.algebra._
 import spire.math._
 import spire.macrosk._
 
+import spire.syntax.cfor._
+import spire.syntax.field._
+import spire.syntax.nroot._
+import spire.syntax.order._
+import spire.syntax.signed._
+
 import scala.reflect.ClassTag
-import scala.annotation.tailrec
-import scala.{specialized => spec}
+import scala.{specialized => sp}
 
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 
 final class LiteralIntOps(val lhs: Int) extends AnyVal {
-  def /~(rhs: Int) = lhs / rhs
-  def /%(rhs: Int) = (lhs / rhs, lhs % rhs)
-  def pow(rhs: Int) = Math.pow(lhs, rhs).toInt
-  def **(rhs: Int) = Math.pow(lhs, rhs).toInt
+  def /~(rhs: Int): Int = lhs / rhs
+  def /%(rhs: Int): (Int, Int) = (lhs / rhs, lhs % rhs)
+  def pow(rhs: Int): Int = Math.pow(lhs, rhs).toInt
+  def **(rhs: Int): Int = Math.pow(lhs, rhs).toInt
   def !(): BigInt = spire.math.fact(lhs)
 }
 
 final class LiteralLongOps(val lhs: Long) extends AnyVal {
-  def /~(rhs: Long) = lhs / rhs
-  def /%(rhs: Long) = (lhs / rhs, lhs % rhs)
-  def pow(rhs: Long) = spire.math.pow(lhs, rhs)
-  def **(rhs: Long) = spire.math.pow(lhs, rhs)
+  def /~(rhs: Long): Long = lhs / rhs
+  def /%(rhs: Long): (Long, Long) = (lhs / rhs, lhs % rhs)
+  def pow(rhs: Long): Long = spire.math.pow(lhs, rhs)
+  def **(rhs: Long): Long = spire.math.pow(lhs, rhs)
   def !(): BigInt = spire.math.fact(lhs)
 }
 
 final class LiteralDoubleOps(val lhs: Double) extends AnyVal {
-  def pow(rhs: Double) = spire.math.pow(lhs, rhs)
-  def **(rhs: Double) = spire.math.pow(lhs, rhs)
+  def pow(rhs: Double): Double = spire.math.pow(lhs, rhs)
+  def **(rhs: Double): Double = spire.math.pow(lhs, rhs)
 }
 
 class LiteralBigIntOps(val lhs: BigInt) extends AnyVal {
-  def /~(rhs: BigInt) = lhs / rhs
-  def pow(rhs: BigInt) = spire.math.pow(lhs, rhs)
-  def **(rhs: BigInt) = spire.math.pow(lhs, rhs)
+  def /~(rhs: BigInt): BigInt = lhs / rhs
+  def pow(rhs: BigInt): BigInt = spire.math.pow(lhs, rhs)
+  def **(rhs: BigInt): BigInt = spire.math.pow(lhs, rhs)
 
-  def +(rhs: SafeLong) = SafeLong(lhs) + rhs
-  def *(rhs: SafeLong) = SafeLong(lhs) * rhs
-  def -(rhs: SafeLong) = SafeLong(lhs) - rhs
-  def /(rhs: SafeLong) = SafeLong(lhs) / rhs
-  def /~(rhs: SafeLong) = SafeLong(lhs) /~ rhs
-  def %(rhs: SafeLong) = SafeLong(lhs) % rhs
-  def /%(rhs: SafeLong) = SafeLong(lhs) /% rhs
+  def +(rhs: SafeLong): SafeLong = SafeLong(lhs) + rhs
+  def *(rhs: SafeLong): SafeLong = SafeLong(lhs) * rhs
+  def -(rhs: SafeLong): SafeLong = SafeLong(lhs) - rhs
+  def /(rhs: SafeLong): SafeLong = SafeLong(lhs) / rhs
+  def /~(rhs: SafeLong): SafeLong = SafeLong(lhs) /~ rhs
+  def %(rhs: SafeLong): SafeLong = SafeLong(lhs) % rhs
+  def /%(rhs: SafeLong): (SafeLong, SafeLong) = SafeLong(lhs) /% rhs
 
-  def +(rhs: Natural) = Natural(lhs) + rhs
-  def *(rhs: Natural) = Natural(lhs) * rhs
-  def -(rhs: Natural) = Natural(lhs) - rhs
-  def /(rhs: Natural) = Natural(lhs) / rhs
-  def /~(rhs: Natural) = Natural(lhs) /~ rhs
-  def %(rhs: Natural) = Natural(lhs) % rhs
-  def /%(rhs: Natural) = Natural(lhs) /% rhs
+  def +(rhs: Natural): BigInt = lhs + rhs.toBigInt
+  def *(rhs: Natural): BigInt = lhs * rhs.toBigInt
+  def -(rhs: Natural): BigInt = lhs - rhs.toBigInt
+  def /(rhs: Natural): BigInt = lhs / rhs.toBigInt
+  def /~(rhs: Natural): BigInt = lhs / rhs.toBigInt
+  def %(rhs: Natural): BigInt = lhs % rhs.toBigInt
+  def /%(rhs: Natural): (BigInt, BigInt) = lhs /% rhs.toBigInt
 
-  def +(rhs: ULong) = lhs + rhs.toBigInt
-  def *(rhs: ULong) = lhs * rhs.toBigInt
-  def -(rhs: ULong) = lhs - rhs.toBigInt
-  def /(rhs: ULong) = lhs / rhs.toBigInt
-  def /~(rhs: ULong) = lhs / rhs.toBigInt
-  def %(rhs: ULong) = lhs % rhs.toBigInt
-  def /%(rhs: ULong) = lhs /% rhs.toBigInt
+  def +(rhs: ULong): BigInt = lhs + rhs.toBigInt
+  def *(rhs: ULong): BigInt = lhs * rhs.toBigInt
+  def -(rhs: ULong): BigInt = lhs - rhs.toBigInt
+  def /(rhs: ULong): BigInt = lhs / rhs.toBigInt
+  def /~(rhs: ULong): BigInt = lhs / rhs.toBigInt
+  def %(rhs: ULong): BigInt = lhs % rhs.toBigInt
+  def /%(rhs: ULong): (BigInt, BigInt) = lhs /% rhs.toBigInt
 
-  def +(rhs: Number) = Number(lhs) + rhs
-  def *(rhs: Number) = Number(lhs) * rhs
-  def -(rhs: Number) = Number(lhs) - rhs
-  def /(rhs: Number) = Number(lhs) / rhs
-  def /~(rhs: Number) = Number(lhs) / rhs
-  def %(rhs: Number) = Number(lhs) % rhs
-  def /%(rhs: Number) = Number(lhs) /% rhs
+  def +(rhs: Number): Number = Number(lhs) + rhs
+  def *(rhs: Number): Number = Number(lhs) * rhs
+  def -(rhs: Number): Number = Number(lhs) - rhs
+  def /(rhs: Number): Number = Number(lhs) / rhs
+  def /~(rhs: Number): Number = Number(lhs) / rhs
+  def %(rhs: Number): Number = Number(lhs) % rhs
+  def /%(rhs: Number): (Number, Number) = Number(lhs) /% rhs
 }
 
-final class ArrayOps[@spec A](arr: Array[A]) {
-  def qsum(implicit ev: AdditiveMonoid[A]) = {
-    @tailrec
-    def f(i: Int, n: Int, t: A): A = if (i < n) f(i + 1, n, ev.plus(t, arr(i))) else t
-    f(0, arr.length, ev.zero)
+final class ArrayOps[@sp A](arr: Array[A]) {
+  def qsum(implicit ev: AdditiveMonoid[A]): A = {
+    var result = ev.zero
+    cfor(0)(_ < arr.length, _ + 1) { i => result += arr(i) }
+    result
   }
 
-  def qproduct(implicit ev: MultiplicativeMonoid[A]) = {
-    @tailrec
-    def f(i: Int, n: Int, t: A): A = if (i < n) f(i + 1, n, ev.times(t, arr(i))) else t
-    f(0, arr.length, ev.one)
+  def qproduct(implicit ev: MultiplicativeMonoid[A]): A = {
+    var result = ev.one
+    cfor(0)(_ < arr.length, _ + 1) { i => result *= arr(i) }
+    result
   }
 
-  def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]) = {
-    @tailrec
-    def f(i: Int, n: Int, t: A): A =
-      if (i < n) f(i + 1, n, ev.plus(t, ev.pow(s.abs(arr(i)), p))) else t
-    nr.nroot(f(0, arr.length, ev.one), p)
+  def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A = {
+    var result = ev.one
+    cfor(0)(_ < arr.length, _ + 1) { i => result += arr(i).abs.pow(p) }
+    result.nroot(p)
   }
 
-  def qmin(implicit ev: Order[A]) = {
-    if (arr.length == 0) sys.error("empty array")
-    @tailrec
-    def f(i: Int, n: Int, t: A): A = if (i < n) f(i + 1, n, ev.min(t, arr(i))) else t
-    f(1, arr.length, arr(0))
+  def qmin(implicit ev: Order[A]): A = {
+    if (arr.length == 0) throw new UnsupportedOperationException("empty array")
+    var result = arr(0)
+    cfor(1)(_ < arr.length, _ + 1) { i =>
+      result = result min arr(i)
+    }
+    result
   }
 
-  def qmax(implicit ev: Order[A]) = {
-    if (arr.length == 0) sys.error("empty array")
-    @tailrec
-    def f(i: Int, n: Int, t: A): A = if (i < n) f(i + 1, n, ev.max(t, arr(i))) else t
-    f(1, arr.length, arr(0))
+  def qmax(implicit ev: Order[A]): A = {
+    if (arr.length == 0) throw new UnsupportedOperationException("empty array")
+    var result = arr(0)
+    cfor(1)(_ < arr.length, _ + 1) { i =>
+      result = result max arr(i)
+    }
+    result
   }
 
   def qmean(implicit ev: Field[A]): A = {
-    if (arr.length == 0) sys.error("empty array")
-    var sum = ev.zero
-    @tailrec
-    def f(i: Int, j: Int, n: Int): A = if (i < n) {
-      val t = ev.div(ev.times(sum, ev.fromInt(i)), ev.fromInt(j))
-      val z = ev.div(arr(i), ev.fromInt(j))
-      sum = ev.plus(t, z)
-      f(i + 1, j + 1, n)
-    } else {
-      sum
+    if (arr.length == 0) throw new UnsupportedOperationException("empty array")
+    var result = ev.zero
+    cfor(0)(_ < arr.length, _ + 1) { i =>
+      result = (result * i / (i + 1)) + (arr(i) / (i + 1))
     }
-    f(0, 1, arr.length)
+    result
   }
 
   import spire.math.{Sorting, Selection, Searching}
@@ -125,16 +129,16 @@ final class ArrayOps[@spec A](arr: Array[A]) {
     Searching.search(arr, a)
   }
 
-  def qsort(implicit ev: Order[A], ct: ClassTag[A]) {
+  def qsort(implicit ev: Order[A], ct: ClassTag[A]): Unit = {
     Sorting.sort(arr)
   }
 
-  def qsortBy[@spec B](f: A => B)(implicit ev: Order[B], ct: ClassTag[A]) {
+  def qsortBy[@sp B](f: A => B)(implicit ev: Order[B], ct: ClassTag[A]): Unit = {
     implicit val ord: Order[A] = ev.on(f)
     Sorting.sort(arr)
   }
 
-  def qsortWith(f: (A, A) => Int)(implicit ct: ClassTag[A]) {
+  def qsortWith(f: (A, A) => Int)(implicit ct: ClassTag[A]): Unit = {
     implicit val ord: Order[A] = Order.from(f)
     Sorting.sort(arr)
   }
@@ -145,7 +149,7 @@ final class ArrayOps[@spec A](arr: Array[A]) {
     arr2
   }
 
-  def qsortedBy[@spec B](f: A => B)(implicit ev: Order[B], ct: ClassTag[A]): Array[A] = {
+  def qsortedBy[@sp B](f: A => B)(implicit ev: Order[B], ct: ClassTag[A]): Array[A] = {
     implicit val ord: Order[A] = ev.on(f)
     val arr2 = arr.clone
     Sorting.sort(arr2)
@@ -159,7 +163,7 @@ final class ArrayOps[@spec A](arr: Array[A]) {
     arr2
   }
 
-  def qselect(k: Int)(implicit ev: Order[A], ct: ClassTag[A]) {
+  def qselect(k: Int)(implicit ev: Order[A], ct: ClassTag[A]): Unit = {
     Selection.select(arr, k)
   }
 
@@ -183,47 +187,49 @@ final class ArrayOps[@spec A](arr: Array[A]) {
     gen.sampleFromArray(arr, n)
 }
 
-final class IndexedSeqOps[@spec A, CC[A] <: IndexedSeq[A]](as: CC[A]) {
+final class IndexedSeqOps[@sp A, CC[A] <: IndexedSeq[A]](as: CC[A]) {
   def qsearch(a: A)(implicit ev: Order[A]): Int =
     Searching.search(as, a)
 }
 
-final class SeqOps[@spec A, CC[A] <: Iterable[A]](as: CC[A]) {
-  def qsum(implicit ev: AdditiveMonoid[A]) = {
+final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) {
+  def qsum(implicit ev: AdditiveMonoid[A]): A = {
     var sum = ev.zero
-    val f: A => Unit = (a: A) => sum = ev.plus(sum, a)
-    as.foreach(f)
+    //val f: A => Unit = (a: A) => sum = ev.plus(sum, a)
+    as.foreach(a => sum += a)
     sum
   }
 
-  def qproduct(implicit ev: MultiplicativeMonoid[A]) = {
+  def qproduct(implicit ev: MultiplicativeMonoid[A]): A = {
     var prod = ev.one
-    as.foreach(a => prod = ev.times(prod, a))
+    //as.foreach(a => prod = ev.times(prod, a))
+    as.foreach(a => prod *= a)
     prod
   }
 
-  def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]) = {
+  def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A = {
     var t = ev.one
-    as.foreach(a => t = ev.plus(t, ev.pow(s.abs(a), p)))
-    nr.nroot(t, p)
+    //as.foreach(a => t = ev.plus(t, ev.pow(s.abs(a), p)))
+    as.foreach(a => t += a.abs.pow(p))
+    t.nroot(p)
   }
 
-  def qmin(implicit ev: Order[A]) = {
-    if (as.isEmpty) sys.error("empty seq")
+  def qmin(implicit ev: Order[A]): A = {
+    if (as.isEmpty) throw new UnsupportedOperationException("empty seq")
     var min = as.head
     as.foreach(a => min = ev.min(min, a))
     min
   }
 
-  def qmax(implicit ev: Order[A]) = {
-    if (as.isEmpty) sys.error("empty seq")
-    var max = as.head
-    as.foreach(a => max = ev.max(max, a))
-    max
+  def qmax(implicit ev: Order[A]): A = {
+    if (as.isEmpty) throw new UnsupportedOperationException("empty seq")
+    var zmax = as.head
+    as.foreach(a => zmax = zmax max a)
+    zmax
   }
 
   def qmean(implicit ev: Field[A]): A = {
-    if (as.isEmpty) sys.error("empty seq")
+    if (as.isEmpty) throw new UnsupportedOperationException("empty seq")
     var mean = ev.zero
     var i = 0
     var j = 1
@@ -239,66 +245,79 @@ final class SeqOps[@spec A, CC[A] <: Iterable[A]](as: CC[A]) {
 
   import spire.math.{Sorting, Selection}
 
-  protected[this] def toSizeAndArray(implicit ct: ClassTag[A]) = {
-    val len = as.size
-    val arr = new Array[A](len)
-    var i = 0
-    as.foreach { a =>
-      arr(i) = a
-      i += 1
-    }
-    (len, arr)
+  protected[this] def fromArray(arr: Array[A])(implicit cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+    val b = cbf(as)
+    b.sizeHint(arr.length)
+    cfor(0)(_ < arr.length, _ + 1) { i => b += arr(i) }
+    b.result
   }
 
-  protected[this] def fromSizeAndArray(len: Int, arr: Array[A])(implicit cbf: CanBuildFrom[CC[A], A, CC[A]]) = {
+  protected[this] def fromSizeAndArray(size: Int, arr: Array[A])(implicit cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     val b = cbf(as)
-    b.sizeHint(len)
-    var i = 0
-    while (i < len) {
-      b += arr(i)
-      i += 1
-    }
+    b.sizeHint(size)
+    cfor(0)(_ < size, _ + 1) { i => b += arr(i) }
     b.result
   }
 
   def qsorted(implicit ev: Order[A], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
-    val (len, arr) = toSizeAndArray
+    val arr = as.toArray
     Sorting.sort(arr)
-    fromSizeAndArray(len, arr)
+    fromArray(arr)
   }
   
-  def qsortedBy[@spec B](f: A => B)(implicit ev: Order[B], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
-    val (len, arr) = toSizeAndArray
+  def qsortedBy[@sp B](f: A => B)(implicit ev: Order[B], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     implicit val ord: Order[A] = ev.on(f)
+    val arr = as.toArray
     Sorting.sort(arr)
-    fromSizeAndArray(len, arr)
+    fromArray(arr)
   }
   
   def qsortedWith(f: (A, A) => Int)(implicit ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
-    val (len, arr) = toSizeAndArray
     implicit val ord: Order[A] = Order.from(f)
+    val arr = as.toArray
     Sorting.sort(arr)
-    fromSizeAndArray(len, arr)
+    fromArray(arr)
   }
   
   def qselected(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
-    val (len, arr) = toSizeAndArray
+    val arr = as.toArray
     Selection.select(arr, k)
-    fromSizeAndArray(len, arr)
+    fromArray(arr)
+  }
+
+  def qselectk(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+    val arr = as.toArray
+    if (arr.length <= k) {
+      fromArray(arr)
+    } else {
+      Selection.select(arr, k)
+      fromSizeAndArray(k, arr)
+    }
+  }
+
+  def qtopk(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+    val arr = as.toArray
+    if (arr.length <= k) {
+      Sorting.sort(arr)
+      fromArray(arr)
+    } else {
+      Selection.select(arr, k)
+      QuickSort.qsort(arr, 0, k)
+      fromSizeAndArray(k, arr)
+    }
   }
 
   import spire.random.mutable.Generator
 
   def qshuffled(implicit gen: Generator, ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
-    val (len, arr) = toSizeAndArray
+    val arr = as.toArray
     gen.shuffle(arr)
-    fromSizeAndArray(len, arr)
+    fromArray(arr)
   }
 
-  def qsampled(n: Int)(implicit gen: Generator, ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
-    val sampled = gen.sampleFromTraversable(as, n)
-    fromSizeAndArray(n, sampled)
-  }
+  def qsampled(n: Int)(implicit gen: Generator, ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] =
+    fromArray(gen.sampleFromTraversable(as, n))
 
-  def qchoose(implicit gen: Generator): A = gen.chooseFromIterable(as)
+  def qchoose(implicit gen: Generator): A =
+    gen.chooseFromIterable(as)
 }

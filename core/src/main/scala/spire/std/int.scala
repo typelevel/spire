@@ -52,11 +52,11 @@ trait IntOrder extends Order[Int] {
   override def gteqv(x: Int, y: Int) = x >= y
   override def lt(x: Int, y: Int) = x < y
   override def lteqv(x: Int, y: Int) = x <= y
-  def compare(x: Int, y: Int) = if (x < y) -1 else if (x > y) 1 else 0
+  def compare(x: Int, y: Int) = if (x < y) -1 else if (x == y) 0 else 1
 }
 
 trait IntIsSigned extends Signed[Int] {
-  def signum(a: Int): Int = a
+  def signum(a: Int): Int = java.lang.Integer.signum(a)
   def abs(a: Int): Int = if (a < 0) -a else a
 }
 

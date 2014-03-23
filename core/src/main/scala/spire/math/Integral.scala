@@ -4,14 +4,9 @@ import spire.algebra._
 import spire.std._
 import spire.macrosk.Ops
 
-import scala.{specialized => spec}
+import scala.{specialized => sp}
 
-trait Integral[@spec(Int,Long) A] extends EuclideanRing[A]
-with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A] {
-  def isNonzero(x: A) = neqv(x, zero)
-  def isPositive(x: A) = gt(x, zero)
-  def isNegative(x: A) = lt(x, zero)
-}
+trait Integral[@sp(Int,Long) A] extends EuclideanRing[A] with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A]
 
 object Integral {
   implicit final val IntIsIntegral = new IntIsIntegral
@@ -19,7 +14,13 @@ object Integral {
   implicit final val BigIntIsIntegral = new BigIntIsIntegral
   implicit final val SafeLongIsIntegral = new SafeLongIsIntegral
 
-  @inline final def apply[A](implicit ev:Integral[A]) = ev
+  @inline final def apply[A](implicit ev: Integral[A]) = ev
+}
+
+class IntegralOps[A](lhs: A)(implicit ev: Integral[A]) {
+  def factor: prime.Factors = prime.factor(toSafeLong)
+  def isPrime: Boolean = prime.isPrime(toSafeLong)
+  def toSafeLong: SafeLong = SafeLong(ev.toBigInt(lhs))
 }
 
 @SerialVersionUID(0L)

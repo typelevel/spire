@@ -28,10 +28,7 @@ class UInt(val signed: Int) extends AnyVal {
 
   override def toString: String = toLong.toString
   
-  def == (that: Long): Boolean = this.signed == that.toInt
   def == (that: UInt): Boolean = this.signed == that.signed
-
-  def != (that: Long): Boolean = this.signed != that.toInt
   def != (that: UInt): Boolean = this.signed != that.signed
 
   def <= (that: UInt) = this.toLong <= that.toLong
@@ -113,7 +110,7 @@ private[math] class UIntBitString extends BitString[UInt] with Serializable {
 }
 
 private[math] trait UIntIsSigned extends Signed[UInt] {
-  def signum(a: UInt): Int = if (a == UInt(0)) 0 else 1
+  def signum(a: UInt): Int = java.lang.Integer.signum(a.signed) & 1
   def abs(a: UInt): UInt = a
 }
 

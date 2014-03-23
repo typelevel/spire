@@ -130,7 +130,9 @@ trait IntegralSyntax extends
     EuclideanRingSyntax with
     ConvertableFromSyntax with
     OrderSyntax with
-    SignedSyntax
+    SignedSyntax {
+  implicit def integralOps[A: Integral](a: A) = new IntegralOps(a)
+}
 
 trait FractionalSyntax extends
     FieldSyntax with

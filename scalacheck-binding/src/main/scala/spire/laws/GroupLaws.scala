@@ -3,6 +3,8 @@ package spire.laws
 import spire.algebra._
 import spire.implicits._
 
+import org.typelevel.discipline.Laws
+
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
@@ -92,13 +94,13 @@ trait GroupLaws[A] extends Laws {
     name: String,
     parent: Option[GroupProperties],
     props: (String, Prop)*
-  ) extends DefaultProperties(name, parent, props: _*)
+  ) extends DefaultRuleSet(name, parent, props: _*)
 
   class AdditiveProperties(
     val base: GroupProperties,
     val parent: Option[AdditiveProperties],
     val props: (String, Prop)*
-  ) extends SpireProperties with HasOneParent {
+  ) extends RuleSet with HasOneParent {
     val name = base.name
     val bases = Seq("base" → base)
   }

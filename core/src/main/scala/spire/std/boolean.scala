@@ -11,7 +11,7 @@ trait BooleanIsBooleanAlgebra extends BooleanAlgebra[Boolean] {
   override def xor(a: Boolean, b: Boolean): Boolean = a ^ b
 }
 
-trait BooleanIsRig extends Rig[Boolean] {
+trait BooleanIsRig extends CRig[Boolean] {
   def one: Boolean = true
   def plus(a:Boolean, b:Boolean): Boolean = a || b
   override def pow(a:Boolean, b:Int): Boolean = a

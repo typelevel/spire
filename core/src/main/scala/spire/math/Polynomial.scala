@@ -83,10 +83,10 @@ object Polynomial extends PolynomialInstances {
       } else {
         val (op, s2) = operRe.findPrefixMatchOf(s) match {
           case Some(m) => (m.group(1), s.substring(m.end))
-          case None => if (ts.isEmpty) ("+", s) else sys.error(s"parse error: $s")
+          case None => if (ts.isEmpty) ("+", s) else throw new IllegalArgumentException(s)
         }
 
-        val m2 = termRe.findPrefixMatchOf(s2).getOrElse(sys.error(s"parse error: $s2"))
+        val m2 = termRe.findPrefixMatchOf(s2).getOrElse(throw new IllegalArgumentException(s2))
         val c0 = Option(m2.group(1)).getOrElse("1")
         val c = if (op == "-") "-" + c0 else c0
         val v = Option(m2.group(2)).getOrElse("")
@@ -96,7 +96,7 @@ object Polynomial extends PolynomialInstances {
         val t = try {
           T(Rational(c), v, e.toInt)
         } catch {
-          case _: Exception => sys.error(s"parse error: $c $e")
+          case _: Exception => throw new IllegalArgumentException(s"illegal term: $c*x^$e")
         }
         parse(s2.substring(m2.end), if (t.c == 0) ts else t :: ts)
       }
@@ -110,7 +110,7 @@ object Polynomial extends PolynomialInstances {
 
     // make sure we have at most one variable
     val vs = ts.view.map(_.v).toSet.filter(_ != "")
-    if (vs.size > 1) sys.error("only univariate polynomials supported")
+    if (vs.size > 1) throw new IllegalArgumentException("only univariate polynomials supported")
 
     // we're done!
     Polynomial(ts.map(t => (t.e, t.c)).toMap)
@@ -200,6 +200,16 @@ trait Polynomial[@spec(Double) C] { lhs =>
   /** Evaluate the polynomial at `x`. */
   def apply(x: C)(implicit r: Semiring[C]): C
 
+  /** Compose this polynomial with another. */
+  def compose(y: Polynomial[C])(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = {
+    var polynomial: Polynomial[C] = Polynomial.zero[C]
+    foreachNonZero { (e, c) =>
+      val z: Polynomial[C] = y.pow(e) :* c
+      polynomial = polynomial + z
+    }
+    polynomial
+  }
+
   /**
    * Returns this polynomial as a monic polynomial, where the leading
    * coefficient (ie. `maxOrderTermCoeff`) is 1.
@@ -218,6 +228,26 @@ trait Polynomial[@spec(Double) C] { lhs =>
   def /~(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = (lhs /% rhs)._1
   def /%(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): (Polynomial[C], Polynomial[C])
   def %(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = (lhs /% rhs)._2
+
+  def **(k: Int)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = pow(k)
+
+  def pow(k: Int)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = {
+    def loop(b: Polynomial[C], k: Int, extra: Polynomial[C]): Polynomial[C] =
+      if (k == 1)
+        b * extra
+      else
+        loop(b * b, k >>> 1, if ((k & 1) == 1) b * extra else extra)
+
+    if (k < 0) {
+      throw new IllegalArgumentException("negative exponent")
+    } else if (k == 0) {
+      Polynomial.one[C]
+    } else if (k == 1) {
+      this
+    } else {
+      loop(this, k - 1, this)
+    }
+  }
 
   // VectorSpace ops.
 

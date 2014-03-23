@@ -115,6 +115,14 @@ class FibBenchmarks extends MyBenchmark {
     a + b + c + d
   }
 
+  def timeSpireFib(reps: Int) = run(reps) {
+    val a = spire.math.fib(201)
+    val b = spire.math.fib(202)
+    val c = spire.math.fib(203)
+    val d = spire.math.fib(204)
+    a + b + c + d
+  }
+
   def scalaGenFib[@spec(Int, Long) A](n: Int)(implicit r: Rig[A]): A = {
     @tailrec def loop(n :Int, a: A, b: A): A =
       if (n == 0) a else loop(n - 1, b, a + b)

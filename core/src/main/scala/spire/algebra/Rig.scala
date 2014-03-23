@@ -13,10 +13,19 @@ trait Rig[@spec(Byte, Short, Int, Long, Float, Double) A] extends Semiring[A] wi
    * the multiplicative identity.
    */
   override def pow(a:A, n:Int):A =
-    if (n >= 0) Monoid.sumn(a, n)(multiplicative)
+    if (n >= 0) multiplicative.sumn(a, n)
     else throw new IllegalArgumentException(s"Illegal negative exponent $n to Monoid#pow")
 }
 
 object Rig {
   @inline final def apply[A](implicit r:Rig[A]): Rig[A] = r
+}
+
+/**
+ * CRig is a Rig that is commutative under multiplication.
+ */
+trait CRig[@spec(Byte, Short, Int, Long, Float, Double) A] extends Rig[A] with MultiplicativeCMonoid[A]
+
+object CRig {
+  @inline final def apply[A](implicit r: CRig[A]): CRig[A] = r
 }

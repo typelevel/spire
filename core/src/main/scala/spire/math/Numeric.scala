@@ -18,20 +18,43 @@ with AdditiveAbGroup[A] with MultiplicativeAbGroup[A] with NRoot[A]
 with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A]
 
 object Numeric {
-  implicit final val IntIsNumeric = new IntIsNumeric
-  implicit final val LongIsNumeric = new LongIsNumeric
-  implicit final val FloatIsNumeric = new FloatIsNumeric
-  implicit final val DoubleIsNumeric = new DoubleIsNumeric
-  implicit final val BigIntIsNumeric = new BigIntIsNumeric
-  implicit final val BigDecimalIsNumeric = new BigDecimalIsNumeric
-  implicit final val RealIsNumeric = new RealIsNumeric
+  implicit final val ByteIsNumeric: Numeric[Byte] = new ByteIsNumeric
+  implicit final val ShortIsNumeric: Numeric[Short] = new ShortIsNumeric
+  implicit final val IntIsNumeric: Numeric[Int] = new IntIsNumeric
+  implicit final val LongIsNumeric: Numeric[Long] = new LongIsNumeric
+  implicit final val FloatIsNumeric: Numeric[Float] = new FloatIsNumeric
+  implicit final val DoubleIsNumeric: Numeric[Double] = new DoubleIsNumeric
+  implicit final val BigIntIsNumeric: Numeric[BigInt] = new BigIntIsNumeric
+  implicit final val BigDecimalIsNumeric: Numeric[BigDecimal] = new BigDecimalIsNumeric
+  implicit final val AlgebraicIsNumeric: Numeric[Algebraic] = new AlgebraicIsNumeric
+  implicit final val RealIsNumeric: Numeric[Real] = new RealIsNumeric
 
-  implicit def RationalIsNumeric(implicit ctx: ApproximationContext[Rational] =
-      ApproximationContext(Rational(1, 1000000000))) = new RationalIsNumeric
+  private val defaultApprox = ApproximationContext(Rational(1, 1000000000))
+
+  implicit def RationalIsNumeric(implicit ctx: ApproximationContext[Rational] = defaultApprox): Numeric[Rational] =
+    new RationalIsNumeric
 
   implicit def complexIsNumeric[A: Fractional: Trig: IsReal] = new ComplexIsNumeric
 
-  @inline final def apply[A](implicit ev:Numeric[A]):Numeric[A] = ev
+  @inline final def apply[A](implicit ev: Numeric[A]):Numeric[A] = ev
+}
+
+@SerialVersionUID(0L)
+private[math] class ByteIsNumeric extends Numeric[Byte] with ByteIsEuclideanRing with ByteIsNRoot
+with ConvertableFromByte with ConvertableToByte with ByteIsReal with Serializable {
+  override def fromInt(n: Int): Byte = n.toByte
+  override def fromDouble(n: Double): Byte = n.toByte
+  override def toDouble(n: Byte): Double = n.toDouble
+  def div(a:Byte, b:Byte): Byte = (a / b).toByte
+}
+
+@SerialVersionUID(0L)
+private[math] class ShortIsNumeric extends Numeric[Short] with ShortIsEuclideanRing with ShortIsNRoot
+with ConvertableFromShort with ConvertableToShort with ShortIsReal with Serializable {
+  override def fromInt(n: Int): Short = n.toShort
+  override def fromDouble(n: Double): Short = n.toShort
+  override def toDouble(n: Short): Double = n.toDouble
+  def div(a:Short, b:Short): Short = (a / b).toShort
 }
 
 @SerialVersionUID(0L)
@@ -40,7 +63,7 @@ with ConvertableFromInt with ConvertableToInt with IntIsReal with Serializable {
   override def fromInt(n: Int): Int = n
   override def fromDouble(n: Double): Int = n.toInt
   override def toDouble(n: Int): Double = n.toDouble
-  def div(a:Int, b:Int) = a / b
+  def div(a: Int, b: Int): Int = a / b
 }
 
 @SerialVersionUID(0L)
@@ -49,7 +72,7 @@ with ConvertableFromLong with ConvertableToLong with LongIsReal with Serializabl
   override def fromInt(n: Int): Long = n
   override def fromDouble(n: Double): Long = n.toLong
   override def toDouble(n: Long): Double = n.toDouble
-  def div(a:Long, b:Long) = a / b
+  def div(a: Long, b: Long): Long = a / b
 }
 
 @SerialVersionUID(0L)
@@ -59,7 +82,7 @@ with BigIntIsReal with Serializable {
   override def fromInt(n: Int): BigInt = BigInt(n)
   override def fromDouble(n: Double): BigInt = BigDecimal(n).toBigInt
   override def toDouble(n: BigInt): Double = n.toDouble
-  def div(a:BigInt, b:BigInt) = a / b
+  def div(a: BigInt, b: BigInt): BigInt = a / b
 }
 
 @SerialVersionUID(0L)
@@ -100,27 +123,40 @@ with RationalIsReal with Serializable {
 }
 
 @SerialVersionUID(0L)
-private[math] class RealIsNumeric extends Numeric[Real] with RealIsField with RealIsNRoot
-with ConvertableFromReal with ConvertableToReal with RealIsReal with Serializable {
+private[math] class AlgebraicIsNumeric extends Numeric[Algebraic] with AlgebraicIsField with AlgebraicIsNRoot
+with ConvertableFromAlgebraic with ConvertableToAlgebraic with AlgebraicIsReal with Serializable {
+  override def fromInt(n: Int): Algebraic = Algebraic(n)
+  override def fromDouble(n: Double): Algebraic = Algebraic(n)
+  override def toDouble(n: Algebraic): Double = n.toDouble
+}
+
+@SerialVersionUID(0L)
+private[math] class RealIsNumeric extends Numeric[Real] with RealIsFractional with Serializable {
   override def fromInt(n: Int): Real = Real(n)
   override def fromDouble(n: Double): Real = Real(n)
   override def toDouble(n: Real): Double = n.toDouble
 }
 
 @SerialVersionUID(0L)
-class ComplexIsNumeric[A](implicit val f:Fractional[A], val t:Trig[A], val r:IsReal[A])
+class ComplexIsNumeric[A](implicit
+    val algebra: Fractional[A], val trig: Trig[A], val order: IsReal[A])
 extends ComplexEq[A] with ComplexIsField[A] with Numeric[Complex[A]]
 with ComplexIsTrig[A] with ComplexIsNRoot[A]
 with ConvertableFromComplex[A] with ConvertableToComplex[A]
 with Order[Complex[A]] with ComplexIsSigned[A] with Serializable {
+  def nroot: NRoot[A] = algebra
+
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
-  override def fromDouble(n: Double): Complex[A] = Complex[A](f.fromDouble(n))
+  override def fromDouble(n: Double): Complex[A] = Complex[A](algebra.fromDouble(n))
 
   override def eqv(x: Complex[A], y: Complex[A]): Boolean = x == y
   override def nroot(a: Complex[A], n: Int) = a.pow(reciprocal(fromInt(n)))
-  override def gt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  override def gteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  override def lt(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  override def lteqv(x:Complex[A], y:Complex[A]) = sys.error("undefined")
-  def compare(x:Complex[A], y:Complex[A]): Int = if (x eqv y) 0 else sys.error("undefined")
+
+  def compare(x:Complex[A], y:Complex[A]): Int =
+    if (x eqv y) 0 else throw new UnsupportedOperationException("undefined")
+
+  def ceil(a: Complex[A]): Complex[A] = a.ceil
+  def floor(a: Complex[A]): Complex[A] = a.floor
+  def isWhole(a: Complex[A]): Boolean = a.isWhole
+  def round(a: Complex[A]): Complex[A] = a.round
 }

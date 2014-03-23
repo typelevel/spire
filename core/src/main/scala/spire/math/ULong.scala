@@ -7,8 +7,14 @@ import spire.algebra._
 object ULong extends ULongInstances {
   @inline final def apply(n: Long): ULong = new ULong(n)
 
+  final def apply(s: String): ULong = fromBigInt(BigInt(s))
+
   final def fromInt(n: Int): ULong = new ULong(n & 0xffffffffL)
   final def fromLong(n: Long): ULong = new ULong(n)
+
+  final def fromBigInt(n: BigInt): ULong =
+    if (n < 0) throw new IllegalArgumentException(s"$n < 0")
+    else new ULong(n.toLong)
 
   implicit def ulongToBigInt(n: ULong): BigInt = n.toBigInt
 
@@ -54,7 +60,7 @@ class ULong(val signed: Long) extends AnyVal {
     this.signed.toString
   else
     (-BigInt(Long.MinValue) * 2 + BigInt(this.signed)).toString // ugh, fixme
-  
+
   final def == (that: ULong): Boolean = this.signed == that.signed
   final def != (that: ULong): Boolean = this.signed != that.signed
 
@@ -85,9 +91,15 @@ class ULong(val signed: Long) extends AnyVal {
       throw new java.lang.ArithmeticException("/ by zero")
     } else if (d < 0) {
       ULong(if (n >= 0 || n < d) 0 else 1)
+    } else if (n >= 0) {
+      ULong(n / d)
     } else {
       val half = n >>> 1
-      ULong(((half / d) << 1) + (((half % d) << 1) + (n & 1)) / d)
+      if (half < d) {
+        ULong(1L)
+      } else {
+        ULong(((half / d) << 1) + (((half % d) << 1) + (n & 1)) / d)
+      }
     }
   }
 
@@ -166,7 +178,7 @@ private[math] class ULongBitString extends BitString[ULong] with Serializable {
 }
 
 private[math] trait ULongIsSigned extends Signed[ULong] {
-  def signum(a: ULong): Int = if (a == ULong(0)) 0 else 1
+  def signum(a: ULong): Int = java.lang.Long.signum(a.signed) & 1
   def abs(a: ULong): ULong = a
 }
 

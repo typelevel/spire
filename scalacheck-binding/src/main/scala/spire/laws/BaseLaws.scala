@@ -3,6 +3,8 @@ package spire.laws
 import spire.algebra._
 import spire.implicits._
 
+import org.typelevel.discipline.Laws
+
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
@@ -19,14 +21,14 @@ trait BaseLaws[A] extends Laws {
   implicit def Arb: Arbitrary[A]
 
 
-  def signed(implicit A: Signed[A]) = new SimpleProperties(
+  def signed(implicit A: Signed[A]) = new SimpleRuleSet(
     name = "signed",
     "abs non-negative" → forAll((x: A) =>
       x.abs.sign != Sign.Negative
     )
   )
 
-  def metricSpace[R](implicit MSA: MetricSpace[A, R], SR: Signed[R], OR: Order[R], ASR: AdditiveSemigroup[R]) = new SimpleProperties(
+  def metricSpace[R](implicit MSA: MetricSpace[A, R], SR: Signed[R], OR: Order[R], ASR: AdditiveSemigroup[R]) = new SimpleRuleSet(
     name = "metricSpace",
     "non-negative" → forAll((a1: A, a2: A) =>
       MSA.distance(a1, a2).sign != Sign.Negative
