@@ -227,7 +227,9 @@ object MyBuild extends Build {
   lazy val testsSettings = Seq(
     name := "spire-tests",
     libraryDependencies ++= Seq(
-      scalaTest % "test"
+      scalaTest % "test",
+      "net.sf" % "jdistlib" % "0.0.7" % "test"
+      from "http://plastic-idolatry.com/jars/jdistlib-0.0.7.jar"
     )
   ) ++ noPublish
 
