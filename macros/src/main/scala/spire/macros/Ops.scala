@@ -207,6 +207,14 @@ object Ops extends Ops {
     ("$times$colon", "timesl"),
     ("$colon$times", "timesr"),
     ("$colon$div", "divr"),
-    ("$u22C5", "dot")
+    ("$u22C5", "dot"),
+
+    // GroupAction, Torsor, etc.
+    ("$plus$greater", "gplusl"),
+    ("$less$plus", "gplusr"),
+    ("$times$greater", "gtimesl"),
+    ("$less$times", "gtimesr"),
+    ("$less$minus$greater", "pminus"),
+    ("$less$div$greater", "pdiv")
   )
 }

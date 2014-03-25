@@ -354,26 +354,32 @@ final class BitStringOps[A](lhs: A)(implicit ev: BitString[A]) {
   def rotateRight(rhs: Int): A = macro Ops.binop[Int, A]
 }
 
-final class AdditiveGroupActionGroupOps[G](g: G) {
-  def +> [P](p: P)(implicit ga: AdditiveGroupAction[P, G]): P = ga.gplusl(g, p)
+final class AdditiveGroupActionGroupOps[G](lhs: G) {
+  def +> [P](rhs: P)(implicit ev: AdditiveGroupAction[P, G]): P =
+    macro Ops.binopWithEv[P, AdditiveGroupAction[P, G], P]
 }
 
-final class AdditiveGroupActionPointOps[P](p: P) {
-  def <+ [G](g: G)(implicit ga: AdditiveGroupAction[P, G]): P = ga.gplusr(p, g)
+final class AdditiveGroupActionPointOps[P](lhs: P) {
+  def <+ [G](rhs: G)(implicit ev: AdditiveGroupAction[P, G]): P =
+    macro Ops.binopWithEv[G, AdditiveGroupAction[P, G], P]
 }
 
-final class MultiplicativeGroupActionGroupOps[G](g: G) {
-  def *> [P](p: P)(implicit ga: MultiplicativeGroupAction[P, G]): P = ga.gtimesl(g, p)
+final class MultiplicativeGroupActionGroupOps[G](lhs: G) {
+  def *> [P](rhs: P)(implicit ev: MultiplicativeGroupAction[P, G]): P =
+    macro Ops.binopWithEv[P, MultiplicativeGroupAction[P, G], P]
 }
 
-final class MultiplicativeGroupActionPointOps[P](p: P) {
-  def <* [G](g: G)(implicit ga: MultiplicativeGroupAction[P, G]): P = ga.gtimesr(p, g)
+final class MultiplicativeGroupActionPointOps[P](lhs: P) {
+  def <* [G](rhs: G)(implicit ev: MultiplicativeGroupAction[P, G]): P =
+    macro Ops.binopWithEv[G, MultiplicativeGroupAction[P, G], P]
 }
 
-final class AdditiveTorsorPointOps[P](p: P) {
-  def <-> [G](q: P)(implicit P: AdditiveTorsor[P, G]): G = P.pminus(p, q)
+final class AdditiveTorsorPointOps[P](lhs: P) {
+  def <-> [G](rhs: P)(implicit ev: AdditiveTorsor[P, G]): G =
+    macro Ops.binopWithEv[P, AdditiveTorsor[P, G], G]
 }
 
-final class MultiplicativeTorsorPointOps[P](p: P) {
-  def </> [G](q: P)(implicit P: MultiplicativeTorsor[P, G]): G = P.pdiv(p, q)
+final class MultiplicativeTorsorPointOps[P](lhs: P) {
+  def </> [G](rhs: P)(implicit ev: MultiplicativeTorsor[P, G]): G =
+    macro Ops.binopWithEv[P, MultiplicativeTorsor[P, G], G]
 }
