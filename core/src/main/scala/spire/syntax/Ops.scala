@@ -353,3 +353,27 @@ final class BitStringOps[A](lhs: A)(implicit ev: BitString[A]) {
   def rotateLeft(rhs: Int): A = macro Ops.binop[Int, A]
   def rotateRight(rhs: Int): A = macro Ops.binop[Int, A]
 }
+
+final class AdditiveGroupActionGroupOps[G](g: G) {
+  def +> [P](p: P)(implicit ga: AdditiveGroupAction[P, G]): P = ga.gplusl(g, p)
+}
+
+final class AdditiveGroupActionPointOps[P](p: P) {
+  def <+ [G](g: G)(implicit ga: AdditiveGroupAction[P, G]): P = ga.gplusr(p, g)
+}
+
+final class MultiplicativeGroupActionGroupOps[G](g: G) {
+  def *> [P](p: P)(implicit ga: MultiplicativeGroupAction[P, G]): P = ga.gtimesl(g, p)
+}
+
+final class MultiplicativeGroupActionPointOps[P](p: P) {
+  def <* [G](g: G)(implicit ga: MultiplicativeGroupAction[P, G]): P = ga.gtimesr(p, g)
+}
+
+final class AdditiveTorsorPointOps[P](p: P) {
+  def <-> [G](q: P)(implicit P: AdditiveTorsor[P, G]): G = P.pminus(p, q)
+}
+
+final class MultiplicativeTorsorPointOps[P](p: P) {
+  def </> [G](q: P)(implicit P: MultiplicativeTorsor[P, G]): G = P.pdiv(p, q)
+}
