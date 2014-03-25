@@ -44,6 +44,12 @@ package object syntax {
 
   object bitString extends BitStringSyntax
 
+  object additiveGroupAction extends AdditiveGroupActionSyntax
+  object multiplicativeGroupAction extends MultiplicativeGroupActionSyntax
+
+  object additiveTorsor extends AdditiveTorsorSyntax
+  object multiplicativeTorsor extends MultiplicativeTorsorSyntax
+
   object integral extends IntegralSyntax
   object fractional extends FractionalSyntax
   object numeric extends NumericSyntax
