@@ -126,22 +126,13 @@ trait BitStringSyntax {
   implicit def bitStringOps[A: BitString](a: A) = new BitStringOps(a)
 }
 
-trait AdditiveGroupActionSyntax {
-  implicit def additiveGroupActionGroupOps[G](g: G) = new AdditiveGroupActionGroupOps(g)
-  implicit def additiveGroupActionPointOps[P](p: P) = new AdditiveGroupActionPointOps(p)
+trait GroupActionSyntax {
+  implicit def groupActionGroupOps[G](g: G) = new GroupActionGroupOps(g)
+  implicit def groupActionPointOps[P](p: P) = new GroupActionPointOps(p)
 }
 
-trait MultiplicativeGroupActionSyntax {
-  implicit def multiplicativeGroupActionGroupOps[G](g: G) = new MultiplicativeGroupActionGroupOps(g)
-  implicit def multiplicativeGroupActionPointOps[P](p: P) = new MultiplicativeGroupActionPointOps(p)
-}
-
-trait AdditiveTorsorSyntax {
-  implicit def additiveTorsorPointOps[P](p: P) = new AdditiveTorsorPointOps[P](p)
-}
-
-trait MultiplicativeTorsorSyntax {
-  implicit def multiplicativeTorsorPointOps[P](p: P) = new MultiplicativeTorsorPointOps[P](p)
+trait TorsorSyntax {
+  implicit def torsorPointOps[P](p: P) = new TorsorPointOps(p)
 }
 
 trait IntegralSyntax extends
@@ -220,10 +211,8 @@ trait AllSyntax extends
     CoordinateSpaceSyntax with
     BooleanAlgebraSyntax with
     BitStringSyntax with
-    AdditiveGroupActionSyntax with
-    MultiplicativeGroupActionSyntax with
-    AdditiveTorsorSyntax with
-    MultiplicativeTorsorSyntax with
+    GroupActionSyntax with
+    TorsorSyntax with
     IntegralSyntax with
     FractionalSyntax with
     NumericSyntax with
