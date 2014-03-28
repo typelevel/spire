@@ -2,6 +2,19 @@ package spire.algebra
 
 import scala.{specialized => sp}
 
+/**
+ * A Torsor[V, R] requires an AbGroup[R] and provides GroupAction[V,
+ * R], plus a `diff` operator, `<->` in additive notation, such that:
+ * 
+ * 1. `(g <-> g) === scalar.id` for all `g` in `G`.
+ * 
+ * 2. `(g <-> h) +> h === g` for all `g`, `h` in `G`.
+ *
+ * 3. `(g <-> h) +> i === (i <-> h) +> g` for all `g`, `h` in `G`.
+ *
+ * 4. `(g <-> h) === -(h <-> g)` for all `g`, `h` in `G`.
+ * 
+ */
 trait Torsor[V, @sp(Int,Long,Float,Double) R] extends GroupAction[V, R] { self =>
   implicit def scalar: AbGroup[R]
 
