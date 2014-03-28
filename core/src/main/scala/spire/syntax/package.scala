@@ -52,4 +52,6 @@ package object syntax {
   object numeric extends NumericSyntax
 
   object all extends AllSyntax
+
+  object unbound extends UnboundSyntax
 }

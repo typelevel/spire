@@ -131,6 +131,21 @@ trait GroupActionSyntax {
   implicit def groupActionPointOps[P](p: P) = new GroupActionPointOps(p)
 }
 
+trait UnboundSyntax {
+  implicit def moduleUnboundOps[F](f: F)(implicit ev: Module[_, F]) =
+    new ModuleUnboundOps(f)
+
+  implicit def vectorSpaceUnboundOps[F](f: F)(implicit ev: VectorSpace[_, F]) =
+    new VectorSpaceUnboundOps(f)
+
+  implicit def groupActionUnboundOps[G](g: G)(implicit ev: GroupAction[_, G]) =
+    new GroupActionUnboundOps(g)
+  implicit def additiveGroupActionUnboundOps[G](g: G)(implicit ev: AdditiveGroupAction[_, G]) =
+    new AdditiveGroupActionUnboundOps(g)
+  implicit def multiplicativeGroupActionUnboundOps[G](g: G)(implicit ev: MultiplicativeGroupAction[_, G]) =
+    new MultiplicativeGroupActionUnboundOps(g)
+}
+
 trait TorsorSyntax {
   implicit def torsorPointOps[P](p: P) = new TorsorPointOps(p)
 }
