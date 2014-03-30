@@ -161,7 +161,9 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
       val n = x(p)
       val t = SafeLong.two.pow(p)
       val m = n % t
-      if (m == 0) n else n + t - m
+      if (m == 0) n
+      else if (n.signum >= 0) n + t - m
+      else n - m
     })
   }
 
@@ -171,7 +173,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
       val n = x(p)
       val t = SafeLong.two.pow(p)
       val m = n % t
-      n - m
+      if (n.signum >= 0) n - m else n - t - m
     })
   }
 
