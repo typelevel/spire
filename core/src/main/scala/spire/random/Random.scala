@@ -5,7 +5,7 @@ import spire.implicits._
 import spire.math._
 import spire.syntax.cfor._
 
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.{ArrayBuffer, Builder}
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 import scala.annotation.tailrec
@@ -60,7 +60,7 @@ object Random extends RandomCompanion[rng.Cmwc5] {
   def spawn[B](op: Op[B]) = new RandomCmwc5(op)
 }
 
-trait RandomCompanion[G <: Generator] {
+trait RandomCompanion[G <: Generator] { self =>
   type R[X] = Random[X, G]
 
   def initGenerator(): G //IO
@@ -92,22 +92,33 @@ trait RandomCompanion[G <: Generator] {
   def double = next(_.nextDouble)
 
   def string(size: Size): R[String] =
-    size.assemble(stringOfSize)(int(_, _))
+    size.random(this).flatMap(stringOfSize)
 
-  def stringOfSize(n: Int): R[String] =
-    char.listOfSize(n).map(_.mkString)
+  def stringOfSize(n: Int): Random[String, G] =
+    char.foldLeftOfSize(n)(new StringBuilder) { (sb, c) => sb.append(c); sb }.map(_.toString)
 
   implicit class RandomOps[A](lhs: R[A]) {
-
     def collection[CC[_]](size: Size)(implicit cbf: CanBuildFrom[CC[A], A, CC[A]]): Random[CC[A], G] =
-      size.assemble(collectionOfSize(_))(int(_, _))
+      size.random(self).flatMap(collectionOfSize(_))
 
     def collectionOfSize[CC[_]](n: Int)(implicit cbf: CanBuildFrom[CC[A], A, CC[A]]): Random[CC[A], G] =
-      lhs.listOfSize(n).map { as =>
-        val b = cbf()
-        as.foreach { b += _ }
-        b.result
-      }
+      foldLeftOfSize(n)(cbf()) { (b, a) => b += a; b }.map(_.result)
+
+    def foldLeftOfSize[B](n: Int)(init: => B)(f: (B, A) => B): Random[B, G] = {
+      def loop(n: Int, ma: Op[A]): Op[B] =
+        if (n <= 0) Const(init)
+        else More(() => loop(n - 1, ma)).flatMap(b => ma.map(a => f(b, a)))
+      spawn(loop(n, More(() => lhs.op)))
+    }
+
+    def unfold[B](init: B)(f: (B, A) => Option[B]): Random[B, G] = {
+      def loop(mb: Op[B], ma: Op[A]): Op[B] =
+        mb.flatMap(b => ma.flatMap(a => f(b, a) match {
+          case Some(b2) => More(() => loop(Const(b2), ma))
+          case None => Const(b)
+        }))
+      spawn(loop(Const(init), More(() => lhs.op)))
+    }
   }
 
   def tuple2[A, B](r1: R[A], r2: R[B]): R[(A, B)] =
@@ -153,17 +164,11 @@ abstract class Random[+A, G <: Generator](val op: Op[A]) { self =>
   def recurse[B](body: => Random[B, G]): Random[B, G] =
     companion.spawn(More(() => body.op))
 
-  def listOfSize(n: Int): Random[List[A], G] = {
-    def loop(n: Int): Op[List[A]] =
-      if (n <= 0) Const(Nil) else for {
-        as <- More(() => loop(n - 1))
-        a <- More(() => op)
-      } yield a :: as
-    companion.spawn(loop(n))
-  }
-
   def list(size: Size): Random[List[A], G] =
-    size.assemble(listOfSize)(companion.int(_, _))
+    size.random(companion).flatMap(listOfSize)
+
+  def listOfSize(n: Int): Random[List[A], G] =
+    companion.RandomOps(this).foldLeftOfSize(n)(List.empty[A])((as, a) => a :: as)
 }
 
 class RandomCmwc5[+A](op: Op[A]) extends Random[A, rng.Cmwc5](op) {
@@ -171,20 +176,21 @@ class RandomCmwc5[+A](op: Op[A]) extends Random[A, rng.Cmwc5](op) {
 }
 
 sealed trait Size {
-  def assemble[A, G <: Generator](f: Int => Random[A, G])(g: (Int, Int) => Random[Int, G]): Random[A, G] =
-    this match {
-      case Exact(n) => f(n)
-      case Between(n1, n2) => g(n1, n2).flatMap(f)
-    }
+  def random[G <: Generator](r: RandomCompanion[G]): Random[Int, G]
 }
-
-case class Exact(n: Int) extends Size
-case class Between(n1: Int, n2: Int) extends Size
 
 object Size {
   def apply(n: Int): Size = Exact(n)
   def upTo(n: Int): Size = Between(0, n)
   def between(n1: Int, n2: Int): Size = Between(n1, n2)
+
+  case class Exact(n: Int) extends Size {
+    def random[G <: Generator](r: RandomCompanion[G]): Random[Int, G] = r.spawn(Const(n))
+  }
+
+  case class Between(n1: Int, n2: Int) extends Size {
+    def random[G <: Generator](r: RandomCompanion[G]): Random[Int, G] = r.int(n1, n2)
+  }
 }
 
 class Seed private[spire] (private[spire] val bytes: Array[Byte])
