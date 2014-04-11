@@ -1,3 +1,12 @@
+package spire
+package random
+package mutable
+
+import spire.util.Pack
+import scala.math.max
+import java.nio.ByteBuffer
+import java.util.Arrays
+
 /**
  * This is a 32-bit Scala implementation of MersenneTwister based on MT19937.c.
  *
@@ -14,14 +23,6 @@
  * @see <a href="http://en.wikipedia.org/wiki/Mersenne_twister">Mersenne Twister @ Wikipedia</a>
  * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
  */
-
-package spire.random.mutable
-
-import spire.util.Pack
-import scala.math.max
-import java.nio.ByteBuffer
-import java.util.Arrays
-
 final class MersenneTwister32(private var seed: Int = 5489) extends IntBasedGenerator {
   @inline private def mag01(x: Int) = if((x & 1) == 0) 0 else 0x9908B0DF
 
