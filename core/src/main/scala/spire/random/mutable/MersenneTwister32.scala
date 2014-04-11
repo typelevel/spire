@@ -3,7 +3,7 @@ package random
 package mutable
 
 import spire.util.Pack
-import scala.math.max
+import spire.math.max
 import java.nio.ByteBuffer
 import java.util.Arrays
 
