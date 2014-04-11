@@ -24,13 +24,8 @@ import java.util.Arrays
  * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
  */
 final class MersenneTwister64(private var seed: Long = 5489) extends LongBasedGenerator {
-  @inline private def mag01(x: Long) = if((x & 1) == 0) 0L else 0xB5026F5AA96619EL
 
-  private val UpperMask = 0xFFFFFFFF80000000L
-  private val LowerMask = 0x7FFFFFFFL
-
-  private val N = 312
-  private val M = 156
+  import MersenneTwister64.{UpperMask, LowerMask, N, M, N_M, N_1, M_N, M_1, BYTES, mag01}
 
   private val mt = new Array[Long](N)
   private var mti = N + 1
@@ -96,8 +91,6 @@ final class MersenneTwister64(private var seed: Long = 5489) extends LongBasedGe
     copy
   }
 
-  private val BYTES = N * 8 + 4
-
   def getSeedBytes(): Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
@@ -122,34 +115,30 @@ final class MersenneTwister64(private var seed: Long = 5489) extends LongBasedGe
     var x = 0L
 
     if (mti >= N) {
-      if (mti == N + 1) {
-        seed(5489)
-      }
-
       var kk = 0
 
-      while (kk < N - M) {
+      while (kk < N_M) {
         x = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
-        mt(kk) = mt(kk + M) ^ (x >>> 1) ^ mag01(x & 0x1)
+        mt(kk) = mt(kk + M) ^ (x >>> 1) ^ mag01(x)
         kk += 1
       }
 
-      while (kk < N - 1) {
+      while (kk < N_1) {
         x = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
-        mt(kk) = mt(kk + (M - N)) ^ (x >>> 1) ^ mag01(x & 0x1)
+        mt(kk) = mt(kk + (M_N)) ^ (x >>> 1) ^ mag01(x)
         kk += 1
       }
 
-      x = (mt(N - 1) & UpperMask) | (mt(0) & LowerMask)
-      mt(N - 1) = mt(M - 1) ^ (x >>> 1) ^ mag01(x & 0x1)
+      x = (mt(N_1) & UpperMask) | (mt(0) & LowerMask)
+      mt(N_1) = mt(M_1) ^ (x >>> 1) ^ mag01(x)
 
       mti = 0
     }
 
-    x = mt(mti);
+    x = mt(mti)
     mti += 1
 
-    // Tempering
+    // tempering
     x ^= (x >>> 29) & 0x5555555555555555L
     x ^= (x  << 17) & 0x71D67FFFEDA60000L
     x ^= (x  << 37) & 0xFFF7EEE000000000L
@@ -160,6 +149,23 @@ final class MersenneTwister64(private var seed: Long = 5489) extends LongBasedGe
 }
 
 object MersenneTwister64 extends GeneratorCompanion[MersenneTwister64, Long] {
+
+  @inline private val UpperMask = 0xFFFFFFFF80000000L // = 0xFFFFFFFFFFFFFFFFL ^ Int.MinValue
+  @inline private val LowerMask = 0x7FFFFFFFL         // = Int.MinValue
+
+  @inline private val N = 312
+  @inline private val M = 156
+
+  @inline private val N_M = N - M
+  @inline private val N_1 = N - 1
+
+  @inline private val M_N = M - N
+  @inline private val M_1 = M - 1
+
+  @inline private val BYTES = N * 8 + 4
+
+  @inline private def mag01(x: Long) = if((x & 1) == 0) 0L else 0xB5026F5AA96619EL
+
   @volatile private var seedUniquifier = 8682522807148012L;
 
   def randomSeed(): Long =  { seedUniquifier += 1; (seedUniquifier + System.nanoTime) }

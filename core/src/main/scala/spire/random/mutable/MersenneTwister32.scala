@@ -24,13 +24,8 @@ import java.util.Arrays
  * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
  */
 final class MersenneTwister32(private var seed: Int = 5489) extends IntBasedGenerator {
-  @inline private def mag01(x: Int) = if((x & 1) == 0) 0 else 0x9908B0DF
 
-  private val UpperMask = 0x80000000
-  private val LowerMask = 0x7fffffff
-
-  private val N = 624
-  private val M = 397
+  import MersenneTwister32.{UpperMask, LowerMask, N, M, N_M, N_1, M_N, M_1, BYTES, mag01}
 
   private val mt = new Array[Int](N)
   private var mti = N + 1
@@ -61,7 +56,7 @@ final class MersenneTwister32(private var seed: Int = 5489) extends IntBasedGene
       j += 1
 
       if (i >= N) {
-        mt(0) = mt(N - 1)
+        mt(0) = mt(N_1)
         i = 1
       }
 
@@ -71,13 +66,13 @@ final class MersenneTwister32(private var seed: Int = 5489) extends IntBasedGene
       k -= 1
     }
 
-    k = N - 1
+    k = N_1
     while (k != 0) {
       mt(i) = (mt(i) ^ ((mt(i - 1) ^ (mt(i - 1) >>> 30)) * 1566083941)) - i
       i += 1
 
       if (i >= N) {
-        mt(0) = mt(N - 1)
+        mt(0) = mt(N_1)
         i = 1
       }
 
@@ -95,8 +90,6 @@ final class MersenneTwister32(private var seed: Int = 5489) extends IntBasedGene
     }
     copy
   }
-
-  private val BYTES = N * 4 + 4
 
   def getSeedBytes(): Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
@@ -124,25 +117,25 @@ final class MersenneTwister32(private var seed: Int = 5489) extends IntBasedGene
     if (mti >= N) {
       var kk = 0
 
-      while (kk < N - M) {
+      while (kk < N_M) {
         y = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
-        mt(kk) = mt(kk + M) ^ (y >>> 1) ^ mag01(y & 0x1)
+        mt(kk) = mt(kk + M) ^ (y >>> 1) ^ mag01(y)
         kk += 1
       }
 
-      while (kk < N - 1) {
+      while (kk < N_1) {
         y = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
-        mt(kk) = mt(kk + (M - N)) ^ (y >>> 1) ^ mag01(y & 0x1)
+        mt(kk) = mt(kk + (M_N)) ^ (y >>> 1) ^ mag01(y)
         kk += 1
       }
 
-      y = (mt(N - 1) & UpperMask) | (mt(0) & LowerMask)
-      mt(N - 1) = mt(M - 1) ^ (y >>> 1) ^ mag01(y & 0x1)
+      y = (mt(N_1) & UpperMask) | (mt(0) & LowerMask)
+      mt(N_1) = mt(M_1) ^ (y >>> 1) ^ mag01(y)
 
       mti = 0
     }
 
-    y = mt(mti);
+    y = mt(mti)
     mti += 1
 
     // Tempering
@@ -156,6 +149,23 @@ final class MersenneTwister32(private var seed: Int = 5489) extends IntBasedGene
 }
 
 object MersenneTwister32 extends GeneratorCompanion[MersenneTwister32, Int] {
+
+  @inline private val UpperMask = 0x80000000 // = Int.MinValue = 0xFFFFFFFF ^ Int.MaxValue
+  @inline private val LowerMask = 0x7FFFFFFF // = Int.MaxValue = 0xFFFFFFFF ^ Int.MinValue
+
+  @inline private val N = 624
+  @inline private val M = 397
+
+  @inline private val N_M = N - M
+  @inline private val N_1 = N - 1
+
+  @inline private val M_N = M - N
+  @inline private val M_1 = M - 1
+
+  @inline private val BYTES = N * 4 + 4
+
+  @inline private def mag01(x: Int) = if((x & 1) == 0) 0 else 0x9908B0DF
+
   @volatile private var seedUniquifier = 8682522807148012L;
 
   def randomSeed(): Int =  { seedUniquifier += 1; (seedUniquifier + System.nanoTime).toInt }
