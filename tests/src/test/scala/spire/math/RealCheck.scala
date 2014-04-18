@@ -147,15 +147,42 @@ class RealCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
     }
   }
 
-  // property("complex multiplication") {
-  //   forAll { (re: Real, im: Real) =>
-  //     val ma = (re.pow(2) + im.pow(2)).sqrt
-  //     val ph = Real.atan2(im, re)
-  // 
-  //     ma * Real.cos(ph) shouldBe re.pow(2) - im.pow(2)
-  //     ma * Real.sin(ph) shouldBe re * im * Real(2)
-  //   }
-  // }
+  property("x.round = (((x * 2).floor + 1) / 2).floor") {
+    forAll { (x0: Rational) =>
+      val x = Real(x0)
+      if (x.signum >= 0) {
+        x.round shouldBe (((x * 2).floor + 1) / 2).floor
+      } else {
+        x.round shouldBe (((x * 2).ceil - 1) / 2).ceil
+      }
+    }
+  }
+
+  import spire.compat.ordering
+
+  property("x.floor <= x.round <= x.ceil") {
+    forAll { (x: Real) =>
+      x.floor should be <= x.round
+      x.round should be <= x.ceil
+    }
+  }
+
+  property("complex multiplication") {
+    // too slow to use irrational numbers to test here
+    forAll { (re0: Rational, im0: Rational) =>
+      val re = Real(re0)
+      val im = Real(im0)
+
+      val ma = (re.pow(2) + im.pow(2)).sqrt
+      val ph = Real.atan2(im, re)
+  
+      val ma2 = ma.pow(2)
+      val ph2 = ph * Real(2)
+
+      ma2 * Real.cos(ph2) shouldBe re.pow(2) - im.pow(2)
+      ma2 * Real.sin(ph2) shouldBe re * im * Real(2)
+    }
+  }
 
   // def sample1(name: String)(f: Real => Real) {
   //   property(name) {
