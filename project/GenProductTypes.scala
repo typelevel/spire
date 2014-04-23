@@ -1,5 +1,8 @@
 object GenProductTypes {
-  val spec = "@spec(Int,Long,Float,Double) "
+  // TODO hack hack hack for 2.11
+  // scalac bug in 2.11 produces invalid class files:
+  //   java.lang.ClassFormatError: Duplicate method name&signature in class file spire/std/OrderProductInstances$$anon$228
+  val spec = " "
 
   case class ProductType(structure: String, parentStructure: Option[String], arity: Int) {
     val prefix = "structure"
