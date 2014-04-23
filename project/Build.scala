@@ -18,7 +18,7 @@ object MyBuild extends Build {
 
   // Dependencies
 
-  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.1.0"
+  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.1.3"
   lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.11.3"
 
   // Release step
