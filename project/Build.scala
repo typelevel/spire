@@ -52,6 +52,8 @@ object MyBuild extends Build {
 
     scalaVersion := "2.10.2",
 
+    crossScalaVersions := Seq("2.10.2", "2.11.0"),
+
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
@@ -195,7 +197,7 @@ object MyBuild extends Build {
   lazy val examplesSettings = Seq(
     name := "spire-examples",
     libraryDependencies ++= Seq(
-      "com.chuusai" %% "shapeless" % "1.2.3",
+      "com.chuusai" %% "shapeless" % "1.2.4",
       "org.apfloat" % "apfloat" % "1.6.3",
       "org.jscience" % "jscience" % "4.3.1"
     )
@@ -210,7 +212,7 @@ object MyBuild extends Build {
   lazy val scalacheckSettings = Seq(
     name := "spire-scalacheck-binding",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "discipline" % "0.2",
+      "org.typelevel" %% "discipline" % "0.2.1",
       scalaCheck
     )
   )
