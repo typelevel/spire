@@ -103,9 +103,6 @@ object ArbitrarySupport {
       Rational(n, d)
     })
 
-  // implicit val real: Arbitrary[Real] =
-  //   Arbitrary(arbitrary[Rational].map(n => Real(n)))
-
   case class Irrational(real: Real)
 
   implicit val irrational: Arbitrary[Irrational] =
@@ -118,8 +115,12 @@ object ArbitrarySupport {
       else Irrational(Real(b).sqrt * Real(n))
     })
 
+  // using irrationals is a bit too slow for now
+  // implicit val real: Arbitrary[Real] =
+  //   Arbitrary(arbitrary[Irrational].map(n => n.real))
+
   implicit val real: Arbitrary[Real] =
-    Arbitrary(arbitrary[Irrational].map(n => n.real))
+    Arbitrary(arbitrary[Rational].map(n => Real(n)))
 
   implicit def complex[A: Arbitrary: Fractional: Signed: Trig]: Arbitrary[Complex[A]] =
     Arbitrary(for {
