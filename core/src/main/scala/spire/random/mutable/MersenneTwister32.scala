@@ -1,3 +1,27 @@
+/************************************************************************\
+** Project                                                              **
+**       ______  ______   __    ______    ____                          **
+**      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+**     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+**    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+**   ____/ / / /      / /   / / | |   / /__                             **
+**  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+**                                                                      **
+**      Redistribution and use permitted under the MIT license.         **
+**                                                                      **
+\************************************************************************/
+
+
+package spire
+package random
+package mutable
+
+import spire.syntax.cfor._
+import spire.util.Pack
+import spire.math.max
+import java.nio.ByteBuffer
+import java.util.Arrays
+
 /**
  * This is a 32-bit Scala implementation of MersenneTwister based on MT19937.c.
  *
@@ -14,106 +38,27 @@
  * @see <a href="http://en.wikipedia.org/wiki/Mersenne_twister">Mersenne Twister @ Wikipedia</a>
  * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
  */
+final class MersenneTwister32 protected[random](mt: Array[Int], mti0: Int = 625) extends IntBasedGenerator { // N + 1 == 625
 
-package spire.random.mutable
+  import MersenneTwister32.{UpperMask, LowerMask, N, M, N_M, N_1, M_N, M_1, BYTES, mag01}
 
-import spire.util.Pack
-import scala.math.max
-import java.nio.ByteBuffer
-import java.util.Arrays
+  private var mti = mti0
 
-final class MersenneTwister32(private var seed: Int = 5489) extends IntBasedGenerator {
-  @inline private def mag01(x: Int) = if((x & 1) == 0) 0 else 0x9908B0DF
-
-  private val UpperMask = 0x80000000
-  private val LowerMask = 0x7fffffff
-
-  private val N = 624
-  private val M = 397
-
-  private val mt = new Array[Int](N)
-  private var mti = N + 1
-
-  this.seed(seed)
-
-  def this(seed: Array[Int]) {
-    this(19650218)
-    this.seed(seed)
-  }
-
-  @inline private def seed(seed: Int) {
-    mt(0) = seed
-
-    for (i <- 1 until N) {
-      mt(i) = 1812433253 * (mt(i - 1) ^ (mt(i - 1) >>> 30)) + i
-    }
-  }
-
-  @inline private def seed(seed: Array[Int]) {
-    var i = 1
-    var j = 0
-    var k = max(N, seed.length)
-
-    while (k != 0) {
-      mt(i) = (mt(i) ^ ((mt(i - 1) ^ (mt(i - 1) >>> 30)) * 1664525)) + seed(j) + j
-      i += 1
-      j += 1
-
-      if (i >= N) {
-        mt(0) = mt(N - 1)
-        i = 1
-      }
-
-      if (j >= seed.length) {
-        j = 0
-      }
-      k -= 1
-    }
-
-    k = N - 1
-    while (k != 0) {
-      mt(i) = (mt(i) ^ ((mt(i - 1) ^ (mt(i - 1) >>> 30)) * 1566083941)) - i
-      i += 1
-
-      if (i >= N) {
-        mt(0) = mt(N - 1)
-        i = 1
-      }
-
-      k -= 1
-    }
-
-    mt(0) = 0x80000000 // MSB is 1; assuring non-zero initial array
-  }
-
-  def copyInit: MersenneTwister32 = {
-    val copy = new MersenneTwister32(seed)
-    for (i <- 0 until N) {
-      copy.mt(i) = mt(i)
-      copy.mti = mti
-    }
-    copy
-  }
-
-  private val BYTES = N * 4 + 4
+  def copyInit: MersenneTwister32 = new MersenneTwister32(mt.clone, mti)
 
   def getSeedBytes(): Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
-    for (i <- 0 until N) {
-      bb.putInt(mt(i))
-    }
+
+    cfor(0)(_ < N, _ + 1) { i => bb.putInt(mt(i)) }
     bb.putInt(mti)
     bytes
   }
 
   def setSeedBytes(bytes: Array[Byte]) {
-    N * 8 + 4
     val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
-    for (i <- 0 until N) {
-      mt(i) = bb.getInt()
-    }
+    cfor(0)(_ < N, _ + 1) { i => mt(i) = bb.getInt() }
     mti = bb.getInt
   }
 
@@ -124,25 +69,25 @@ final class MersenneTwister32(private var seed: Int = 5489) extends IntBasedGene
     if (mti >= N) {
       var kk = 0
 
-      while (kk < N - M) {
+      while (kk < N_M) {
         y = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
-        mt(kk) = mt(kk + M) ^ (y >>> 1) ^ mag01(y & 0x1)
+        mt(kk) = mt(kk + M) ^ (y >>> 1) ^ mag01(y)
         kk += 1
       }
 
-      while (kk < N - 1) {
+      while (kk < N_1) {
         y = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
-        mt(kk) = mt(kk + (M - N)) ^ (y >>> 1) ^ mag01(y & 0x1)
+        mt(kk) = mt(kk + (M_N)) ^ (y >>> 1) ^ mag01(y)
         kk += 1
       }
 
-      y = (mt(N - 1) & UpperMask) | (mt(0) & LowerMask)
-      mt(N - 1) = mt(M - 1) ^ (y >>> 1) ^ mag01(y & 0x1)
+      y = (mt(N_1) & UpperMask) | (mt(0) & LowerMask)
+      mt(N_1) = mt(M_1) ^ (y >>> 1) ^ mag01(y)
 
       mti = 0
     }
 
-    y = mt(mti);
+    y = mt(mti)
     mti += 1
 
     // Tempering
@@ -155,12 +100,100 @@ final class MersenneTwister32(private var seed: Int = 5489) extends IntBasedGene
   }
 }
 
-object MersenneTwister32 extends GeneratorCompanion[MersenneTwister32, Int] {
+object MersenneTwister32 extends GeneratorCompanion[MersenneTwister32, (Array[Int], Int)] {
+
+  @inline private val UpperMask = 0x80000000 // = Int.MinValue = 0xFFFFFFFF ^ Int.MaxValue
+  @inline private val LowerMask = 0x7FFFFFFF // = Int.MaxValue = 0xFFFFFFFF ^ Int.MinValue
+
+  @inline private val N = 624
+  @inline private val M = 397
+
+  @inline private val N_M = N - M
+  @inline private val N_1 = N - 1
+
+  @inline private val M_N = M - N
+  @inline private val M_1 = M - 1
+
+  @inline private val BYTES = N * 4 + 4
+
+  @inline private def mag01(x: Int) = if((x & 1) == 0) 0 else 0x9908B0DF
+
   @volatile private var seedUniquifier = 8682522807148012L;
 
-  def randomSeed(): Int =  { seedUniquifier += 1; (seedUniquifier + System.nanoTime).toInt }
+  def randomSeed(): (Array[Int], Int) =  seedFromInt({ seedUniquifier += 1; (seedUniquifier + System.nanoTime).toInt })
 
-  def fromBytes(bytes: Array[Byte]): MersenneTwister32 = new MersenneTwister32(Pack.intsFromBytes(bytes, bytes.length / 4))
-  def fromSeed(seed: Int): MersenneTwister32 = new MersenneTwister32(seed)
-  def fromTime(time: Long = System.nanoTime) = new MersenneTwister32({seedUniquifier += 1; (seedUniquifier + time).toInt})
+  def fromBytes(bytes: Array[Byte]): MersenneTwister32 =
+    fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
+
+  def fromArray(arr: Array[Int]): MersenneTwister32 =
+    seedFromArray(arr) match {
+      case (mt, mti) => new MersenneTwister32(mt, mti)
+    }
+
+  def fromSeed(seed: (Array[Int], Int)): MersenneTwister32 =
+    seed match {
+      case (mt, mti) =>
+        assert(mt.length == N)
+        new MersenneTwister32(mt, mti)
+    }
+
+  def fromTime(time: Long = System.nanoTime) =
+    seedFromInt({
+      seedUniquifier += 1; (seedUniquifier + time).toInt
+    }) match {
+      case (mt, mti) => new MersenneTwister32(mt, mti)
+    }
+
+  def seedFromInt(seed: Int = 5489): (Array[Int], Int) = {
+    val mt = new Array[Int](N)
+    mt(0) = seed
+
+    cfor(1)(_ < N, _ + 1) { i =>
+      val x = mt(i - 1)
+      mt(i) = 1812433253 * (x ^ (x >>> 30)) + i
+    }
+    (mt, N + 1)
+  }
+
+  def seedFromArray(seed: Array[Int]): (Array[Int], Int) = {
+    val (mt, mti) = seedFromInt(19650218)
+
+    var i = 1
+    var j = 0
+    var k = max(N, seed.length)
+
+    while (k != 0) {
+      val x = mt(i - 1)
+      mt(i) = mt(i) ^ ((x ^ (x >>> 30)) * 1664525) + seed(j) + j
+      i += 1
+      j += 1
+
+      if (i >= N) {
+        mt(0) = mt(N_1)
+        i = 1
+      }
+
+      if (j >= seed.length) {
+        j = 0
+      }
+      k -= 1
+    }
+
+    k = N_1
+    while (k != 0) {
+      val x = mt(i - 1)
+      mt(i) = mt(i) ^ ((x ^ (x >>> 30)) * 1566083941) - i
+      i += 1
+
+      if (i >= N) {
+        mt(0) = mt(N_1)
+        i = 1
+      }
+
+      k -= 1
+    }
+
+    mt(0) = 0x80000000 // MSB is 1; assuring non-zero initial array
+    (mt, mti)
+  }
 }
