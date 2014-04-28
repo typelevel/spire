@@ -3,8 +3,8 @@ package spire.algebra
 import scala.{specialized => sp}
 
 /**
- * A Torsor[V, R] requires an AbGroup[R] and provides GroupAction[V,
- * R], plus a `diff` operator, `<->` in additive notation, such that:
+ * A Torsor[V, R] requires an AbGroup[R] and provides GroupAction[V, R],
+ * plus a `diff` operator, `<->` in additive notation, such that:
  * 
  * 1. `(g <-> g) === scalar.id` for all `g` in `G`.
  * 
@@ -43,8 +43,7 @@ trait AdditiveTorsor[V, @sp(Int,Long,Float,Double) R] extends AdditiveGroupActio
     }
 }
 
-trait MultiplicativeTorsor[V, @sp(Int,Long,Float,Double) R]
-    extends MultiplicativeGroupAction[V, R] { self =>
+trait MultiplicativeTorsor[V, @sp(Int,Long,Float,Double) R] extends MultiplicativeGroupAction[V, R] { self =>
   implicit def scalar: MultiplicativeAbGroup[R]
 
   def pdiv(v: V, w: V): R
@@ -60,4 +59,12 @@ trait MultiplicativeTorsor[V, @sp(Int,Long,Float,Double) R]
 
 object Torsor {
   @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: Torsor[V, R]) = V
+}
+
+object AdditiveTorsor {
+  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: AdditiveTorsor[V, R]) = V
+}
+
+object MultiplicativeTorsor {
+  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: MultiplicativeTorsor[V, R]) = V
 }
