@@ -40,6 +40,12 @@ trait Ops {
     c.Expr[R](Apply(Select(ev.tree, findMethodName(c)), List(lhs)))
   }
 
+  def unopWithScalar[R](c: Context)(): c.Expr[R] = {
+    import c.universe._
+    val (ev, lhs) = unpack(c)
+    val scalar = Select(ev, newTermName("scalar"))
+    c.Expr[R](Apply(Select(scalar, findMethodName(c)), List(lhs)))
+  }
 
   def flip[A, R](c: Context)(rhs: c.Expr[A]): c.Expr[R] = {
     import c.universe._
@@ -80,6 +86,20 @@ trait Ops {
     import c.universe._
     val (ev, rhs) = unpack(c)
     c.Expr[R](Apply(Select(ev, findMethodName(c)), List(lhs.tree, rhs)))
+  }
+
+  def binopWithScalar[A, R](c: Context)(rhs: c.Expr[A]): c.Expr[R] = {
+    import c.universe._
+    val (ev, lhs) = unpack(c)
+    val scalar = Select(ev, newTermName("scalar"))
+    c.Expr[R](Apply(Select(scalar, findMethodName(c)), List(lhs, rhs.tree)))
+  }
+
+  def rbinopWithScalar[A, R](c: Context)(lhs: c.Expr[A]): c.Expr[R] = {
+    import c.universe._
+    val (ev, rhs) = unpack(c)
+    val scalar = Select(ev, newTermName("scalar"))
+    c.Expr[R](Apply(Select(scalar, findMethodName(c)), List(lhs.tree, rhs)))
   }
 
   def binopWithEv[A, Ev, R](c: Context)(rhs: c.Expr[A])(ev:c.Expr[Ev]): c.Expr[R] = {
@@ -203,10 +223,23 @@ object Ops extends Ops {
     ("$greater$greater$greater", "rightShift"),
     ("$greater$greater", "signedRightShift"),
 
-    // VectorSpace
+    // VectorSpace (*: :* :/ ⋅)
     ("$times$colon", "timesl"),
     ("$colon$times", "timesr"),
     ("$colon$div", "divr"),
-    ("$u22C5", "dot")
+    ("$u22C5", "dot"),
+
+    // GroupAction (|+|> <|+| +> <+ *> <*)
+    ("$bar$plus$bar$greater", "gopl"),
+    ("$less$bar$plus$bar", "gopr"),
+    ("$plus$greater", "gplusl"),
+    ("$less$plus", "gplusr"),
+    ("$times$greater", "gtimesl"),
+    ("$less$times", "gtimesr"),
+
+    // Torsor (<|-|> <-> </>)
+    ("$less$bar$minus$bar$greater", "pdiff"),
+    ("$less$minus$greater", "pminus"),
+    ("$less$div$greater", "pdiv")
   )
 }
