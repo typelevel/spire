@@ -28,7 +28,7 @@ private[fpf] trait Fuser[C <: Context, A] {
   private def sqrt(a: TermName): Tree = q"java.lang.Math.sqrt($a)"
 
   case class Approx(apx: Tree, mes: Tree, ind: Tree, exact: Tree) {
-    def expr: Tree = q"spire.math.fpf.Fpf[$A]($apx, $mes, $ind, $exact)"
+    def expr: Tree = q"spire.math.fpf.FpFilter[$A]($apx, $mes, $ind, $exact)"
     def fused(stats0: List[Tree]): Fused = {
       val (apx0, mes0, ind0, exact0) = freshApproxNames()
       val stats1 = List(
@@ -82,10 +82,10 @@ private[fpf] trait Fuser[C <: Context, A] {
         case (apx, mes, ind, exact) => Fused(Nil, apx, mes, ind, exact)
       } getOrElse Approx(apx, mes, ind, exact).fused(Nil)
 
-    case _ if c.typeCheck(tree).tpe <:< c.weakTypeOf[FpfExact[A]] =>
+    case _ if c.typeCheck(tree).tpe <:< c.weakTypeOf[FpFilterExact[A]] =>
       liftExact(tree)
 
-    case _ if c.typeCheck(tree).tpe <:< c.weakTypeOf[FpfApprox[A]] =>
+    case _ if c.typeCheck(tree).tpe <:< c.weakTypeOf[FpFilterApprox[A]] =>
       liftApprox(tree)
 
     case q"$lift($exact)($ev)" if isExactLift(tree) =>
@@ -103,15 +103,15 @@ private[fpf] trait Fuser[C <: Context, A] {
   // Returns true if `tree` is lifting an exact type tpe 
   private def isExactLift(tree: Tree): Boolean = tree match {
     case q"$lift($exact)($ev)" =>
-      (c.typeCheck(tree).tpe <:< c.weakTypeOf[Fpf[A]]) &&
-        (c.typeCheck(exact).tpe <:< c.weakTypeOf[FpfExact[A]])
+      (c.typeCheck(tree).tpe <:< c.weakTypeOf[FpFilter[A]]) &&
+        (c.typeCheck(exact).tpe <:< c.weakTypeOf[FpFilterExact[A]])
     case _ => false
   }
 
   private def isApproxLift(tree: Tree): Boolean = tree match {
     case q"$lift($approx)($ev)" =>
-      (c.typeCheck(tree).tpe <:< c.weakTypeOf[Fpf[A]]) &&
-        (c.typeCheck(approx).tpe <:< c.weakTypeOf[FpfApprox[A]])
+      (c.typeCheck(tree).tpe <:< c.weakTypeOf[FpFilter[A]]) &&
+        (c.typeCheck(approx).tpe <:< c.weakTypeOf[FpFilterApprox[A]])
     case _ => false
   }
 

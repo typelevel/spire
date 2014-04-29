@@ -35,9 +35,9 @@ class FPFilterTest extends FunSuite {
     def isWhole(a:Bad): Boolean = evaluated
   }
 
-  test("Fpf doesn't evaluated for easy problems") {
-    val x = Fpf.exact[Bad](1D)
-    val y = Fpf.exact[Bad](1.2D)
+  test("FpFilter doesn't evaluated for easy problems") {
+    val x = FpFilter.exact[Bad](1D)
+    val y = FpFilter.exact[Bad](1.2D)
     assert((x + y).signum == 1)
     assert((x - y).signum == -1)
     assert((x * y).signum == 1)
@@ -46,15 +46,15 @@ class FPFilterTest extends FunSuite {
   }
 
   test("Find tricky zero") {
-    val x = Fpf.exact[Algebraic](18)
-    val y = Fpf.exact[Algebraic](8)
-    val z = Fpf.exact[Algebraic](2)
+    val x = FpFilter.exact[Algebraic](18)
+    val y = FpFilter.exact[Algebraic](8)
+    val z = FpFilter.exact[Algebraic](2)
     assert((x.sqrt - y.sqrt - z.sqrt).signum == 0)
   }
 
   test("Comparisons") {
-    val x = Fpf.exact[Algebraic](-2)
-    val y = Fpf.exact[Algebraic](8)
+    val x = FpFilter.exact[Algebraic](-2)
+    val y = FpFilter.exact[Algebraic](8)
 
     assert(x < y)
     assert(y > x)
@@ -66,9 +66,9 @@ class FPFilterTest extends FunSuite {
   }
 
   test("Mix-match macro and non-macro") {
-    val x = Fpf.exact[Algebraic](18)
-    val y = Fpf.exact[Algebraic](8)
-    val z = Fpf.exact[Algebraic](2)
+    val x = FpFilter.exact[Algebraic](18)
+    val y = FpFilter.exact[Algebraic](8)
+    val z = FpFilter.exact[Algebraic](2)
 
     val u = x.sqrt - y.sqrt
     val v = u - z.sqrt
