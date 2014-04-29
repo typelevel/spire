@@ -8,90 +8,70 @@ import org.scalatest.FunSuite
 
 
 class FPFilterTest extends FunSuite {
-  test("FPFilter is a Ring") {
-    def someRingStuff[A: Ring](a: A, b: A, sum: A, diff: A, prod: A) {
-      assert(a + b == sum)
-      assert(a - b == diff)
-      assert(a * b == prod)
-    }
+  final class Evaluated extends Exception
+  private def evaluated = throw new Evaluated
 
-    someRingStuff(FPFilter(BigDecimal("1.234")),
-                  FPFilter(BigDecimal("0.999")),
-                  FPFilter(BigDecimal("2.233")),
-                  FPFilter(BigDecimal("0.235")),
-                  FPFilter(BigDecimal("1.232766")))
+  sealed trait Bad
+  implicit object BadField extends Field[Bad] with IsReal[Bad] with NRoot[Bad] {
+    def zero: Bad = evaluated
+    def one: Bad = evaluated
+    def negate(a:Bad): Bad = evaluated
+    def plus(a:Bad, b:Bad): Bad = evaluated
+    def quot(a:Bad, b:Bad) = evaluated
+    def mod(a:Bad, b:Bad) = evaluated
+    def gcd(a:Bad, b:Bad):Bad = evaluated
+    override def fromDouble(n: Double): Bad = evaluated
+    def times(x:Bad, b:Bad): Bad = evaluated
+    def div(a:Bad, b:Bad): Bad = evaluated
+    def nroot(a: Bad, k: Int): Bad = evaluated
+    def fpow(a: Bad, b: Bad) = evaluated
+    def compare(x: Bad, y: Bad) = evaluated
+    def signum(a: Bad): Int = evaluated
+    def abs(a: Bad): Bad = evaluated
+    def toDouble(x: Bad): Double = evaluated
+    def ceil(a:Bad): Bad = evaluated
+    def floor(a:Bad): Bad = evaluated
+    def round(a:Bad): Bad = evaluated
+    def isWhole(a:Bad): Boolean = evaluated
   }
 
-  test("FPFilter is a EuclideanRing") {
-    def quotIt[A: EuclideanRing](a: A, b: A, quot: A, mod: A) {
-      assert(a /~ b == quot)
-      assert(a % b == mod)
-    }
-
-    quotIt(FPFilter(BigInt(7)),
-           FPFilter(BigInt(5)),
-           FPFilter(BigInt(1)),
-           FPFilter(BigInt(2)))
-
-    quotIt(FPFilter(BigDecimal(-3.7)),
-           FPFilter(BigDecimal(1.2)),
-           FPFilter(BigDecimal(-3)),
-           FPFilter(BigDecimal(-0.1)))
+  test("Fpf doesn't evaluated for easy problems") {
+    val x = Fpf.exact[Bad](1D)
+    val y = Fpf.exact[Bad](1.2D)
+    assert((x + y).signum == 1)
+    assert((x - y).signum == -1)
+    assert((x * y).signum == 1)
+    assert((x / y).signum == 1)
+    assert(y.sqrt.signum == 1)
   }
 
-  test("FPFilter is a Field") {
-    def divAndStuff[A: Field](a: A, b: A, c: A) {
-      assert(a / b == c)
-    }
-
-    divAndStuff(FPFilter(Rational(5)),
-                FPFilter(Rational(7)),
-                FPFilter(Rational(5, 7)))
+  test("Find tricky zero") {
+    val x = Fpf.exact[Algebraic](18)
+    val y = Fpf.exact[Algebraic](8)
+    val z = Fpf.exact[Algebraic](2)
+    assert((x.sqrt - y.sqrt - z.sqrt).signum == 0)
   }
 
-  test("FPFilter is Field:NRoot") {
-    def powerToTheRoot[A: Field:NRoot](a: A, b: A) {
-      assert(a.sqrt == b)
-      assert((a pow 2) == (b pow 4))
-    }
+  test("Comparisons") {
+    val x = Fpf.exact[Algebraic](-2)
+    val y = Fpf.exact[Algebraic](8)
 
-    powerToTheRoot(FPFilter(Algebraic(2)),
-                   FPFilter(Algebraic(2).sqrt))
+    assert(x < y)
+    assert(y > x)
+    assert(x <= y)
+    assert(x <= x)
+    assert(y >= x)
+    assert(y >= y)
+    assert(x === x)
   }
 
-  // TODO: Really sketchy.
-  def isEvaluated[A](x: FPFilter[A]): Boolean = {
-    classOf[FPFilter[_]].getField("bitmap$0").get(x) != 0
-  }
- 
-  test("Non-zero sign doesn't (always) evaluate value") {
-    def wrap(b:BigDecimal)(f:() => Unit) = new FPFilter(MaybeDouble(b), { f(); b })
+  test("Mix-match macro and non-macro") {
+    val x = Fpf.exact[Algebraic](18)
+    val y = Fpf.exact[Algebraic](8)
+    val z = Fpf.exact[Algebraic](2)
 
-    // used to track evaluation of FPFilter's lazy value
-    var zeroEval = false
-    var aEval = false
-    var bEval = false
-
-    val zero = wrap(BigDecimal(0))(() => zeroEval = true)
-    val a = wrap(BigDecimal(5))(() => aEval = true)
-    val b = wrap(BigDecimal(9))(() => bEval = true)
-
-    val sum = a + a
-    val prod = a * b
-    val quot = a / b
-
-    val s1 = sum == zero
-    val s2 = prod == zero
-    val s3 = quot == zero
-
-    // make sure we haven't evaluated the exact value yet
-    assert(!zeroEval)
-    assert(!aEval)
-    assert(!bEval)
-
-    // make sure a.value actaully evalutes
-    val x = a.value
-    assert(aEval)
+    val u = x.sqrt - y.sqrt
+    val v = u - z.sqrt
+    assert(v.signum == 0)
   }
 }
-

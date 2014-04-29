@@ -1,7 +1,5 @@
 package spire.math.algebraic
 
-import spire.math.fpf.MaybeDouble
-
 import spire.math._
 
 /**
