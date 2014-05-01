@@ -26,6 +26,7 @@ possible.
 * Kamushin: bug fixes
 * Rex Kerr: author of many of the PRNGs found in spire.random
 * Grzegorz Kossakowski: much build support, 2.11 upgrading help, bug reports
+* Christian Krause: suggestions around stats methods and spire.random.
 * Dušan Kysel: author of MersenneTwister PRNGs
 * Josh Marcus: bug reports and benchmarking
 * Brian McKenna: documentation fixes
@@ -37,7 +38,6 @@ possible.
 * Flaviu Tamas: byte-manipulation and bounds-checking macros
 * James Thompson: author of spire.math.Polynomial
 * Titorenko: bug fixes
-* Wookie Treiber: suggestions around stats methods and spire.random.
 * Vlad Ureche: specialization support, work on spire-miniboxing
 * Volth: bug reports and feedback around intervals
 * Kenji Yoshida: bug fixes
