@@ -473,6 +473,6 @@ criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
 Copyright 2011-2014 Erik Osheim, Tom Switzer
 
-A full list of contributors can be found in `AUTHORS.md`.
+A full list of contributors can be found in [AUTHORS.md](AUTHORS.md).
 
-The MIT software license is attached in the COPYING file.
+The MIT software license is attached in the [COPYING](COPYING) file.
