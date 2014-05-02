@@ -168,7 +168,7 @@ object ProductTypes {
 
   private val overrideEqv: Block = { tpe =>
     import tpe._
-    "  override def eqv(x0: (%s), x1: (%s)): Boolean = super.eqv(x0, x1)" format (types, types)
+    "  override def eqv(x0: (%s), x1: (%s)): Boolean = compare(x0, x1) == 0" format (types, types)
   }
 
   private val compare: Block = { tpe =>

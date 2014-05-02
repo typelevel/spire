@@ -18,7 +18,7 @@ object MyBuild extends Build {
 
   // Dependencies
 
-  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.1.0"
+  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.1.3"
   lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.11.3"
 
   // Release step
@@ -52,6 +52,8 @@ object MyBuild extends Build {
 
     scalaVersion := "2.10.2",
 
+    crossScalaVersions := Seq("2.10.2", "2.11.0"),
+
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
@@ -73,16 +75,18 @@ object MyBuild extends Build {
 
     resolvers += Resolver.sonatypeRepo("snapshots"),
     resolvers += Resolver.sonatypeRepo("releases"),
+
     libraryDependencies := {
       CrossVersion.partialVersion(scalaVersion.value) match {
         // if scala 2.11+ is used, quasiquotes are merged into scala-reflect
         case Some((2, scalaMajor)) if scalaMajor >= 11 =>
           libraryDependencies.value
+
         // in Scala 2.10, quasiquotes are provided by macro-paradise
         case Some((2, 10)) =>
           libraryDependencies.value ++ Seq(
-            compilerPlugin("org.scalamacros" % "paradise" % "2.0.0-M3" cross CrossVersion.full),
-            "org.scalamacros" %% "quasiquotes" % "2.0.0-M3" cross CrossVersion.full)
+            compilerPlugin("org.scalamacros" % "paradise" % "2.0.0" cross CrossVersion.full),
+            "org.scalamacros" %% "quasiquotes" % "2.0.0")
       }
     },
 
@@ -193,7 +197,7 @@ object MyBuild extends Build {
   lazy val examplesSettings = Seq(
     name := "spire-examples",
     libraryDependencies ++= Seq(
-      "com.chuusai" %% "shapeless" % "1.2.3",
+      "com.chuusai" %% "shapeless" % "1.2.4",
       "org.apfloat" % "apfloat" % "1.6.3",
       "org.jscience" % "jscience" % "4.3.1"
     )
@@ -208,7 +212,7 @@ object MyBuild extends Build {
   lazy val scalacheckSettings = Seq(
     name := "spire-scalacheck-binding",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "discipline" % "0.2",
+      "org.typelevel" %% "discipline" % "0.2.1",
       scalaCheck
     )
   )

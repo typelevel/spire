@@ -1,12 +1,35 @@
 package spire.std
 
 import spire.algebra._
+import spire.syntax.all._
 
 @SerialVersionUID(0L)
 class OptionMonoid[A: Semigroup] extends Monoid[Option[A]] with Serializable {
   def id: Option[A] = None
   def op(x: Option[A], y: Option[A]): Option[A] = (x, y) match {
-    case (Some(x), Some(y)) => Some(Semigroup[A].op(x, y))
+    case (Some(x), Some(y)) => Some(x |+| y)
+    case (None, None) => None
+    case (x, None) => x
+    case (None, y) => y
+  }
+}
+
+@SerialVersionUID(0L)
+class OptionAdditiveMonoid[A: AdditiveSemigroup] extends AdditiveMonoid[Option[A]] with Serializable {
+  def zero: Option[A] = None
+  def plus(x: Option[A], y: Option[A]): Option[A] = (x, y) match {
+    case (Some(x), Some(y)) => Some(x + y)
+    case (None, None) => None
+    case (x, None) => x
+    case (None, y) => y
+  }
+}
+
+@SerialVersionUID(0L)
+class OptionMultiplicativeMonoid[A: MultiplicativeSemigroup] extends MultiplicativeMonoid[Option[A]] with Serializable {
+  def one: Option[A] = None
+  def times(x: Option[A], y: Option[A]): Option[A] = (x, y) match {
+    case (Some(x), Some(y)) => Some(x * y)
     case (None, None) => None
     case (x, None) => x
     case (None, y) => y
@@ -46,6 +69,8 @@ trait OptionInstances0 {
 
 trait OptionInstances extends OptionInstances0 {
   implicit def OptionMonoid[A: Semigroup] = new OptionMonoid[A]
+  implicit def OptionAdditiveMonoid[A: AdditiveSemigroup] = new OptionAdditiveMonoid[A]
+  implicit def OptionMultiplicativeMonoid[A: MultiplicativeSemigroup] = new OptionMultiplicativeMonoid[A]
 
   implicit def OptionOrder[A: Order] = new OptionOrder[A]
 }

@@ -277,6 +277,17 @@ final class ModuleOps[V](x: V) {
   def :*[F](rhs:Int)(implicit ev: Module[V, F], F: Ring[F]): V = ev.timesr(x, F.fromInt(rhs))
 }
 
+final class ModuleUnboundOps[F](lhs: F)(implicit ev: Module[_, F]) {
+  def +(rhs: F): F = macro Ops.binopWithScalar[F, F]
+  def -(rhs: F): F = macro Ops.binopWithScalar[F, F]
+  def unary_-(): F = macro Ops.unopWithScalar[F]
+  
+  def *(rhs: F): F = macro Ops.binopWithScalar[F, F]
+  
+  def pow(rhs: Int): F = macro Ops.binopWithScalar[Int, F]
+  def **(rhs: Int): F = macro Ops.binopWithScalar[Int, F]
+}
+
 final class VectorSpaceOps[V](x: V) {
   def :/[F](rhs:F)(implicit ev: VectorSpace[V, F]): V = macro Ops.binopWithEv[F, VectorSpace[V, F], V]
 
@@ -285,6 +296,11 @@ final class VectorSpaceOps[V](x: V) {
 
   def :/[F](rhs:Int)(implicit ev: VectorSpace[V, F]): V = ev.divr(x, ev.scalar.fromInt(rhs))
   def :/[F](rhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.divr(x, ev.scalar.fromDouble(rhs))
+}
+
+final class VectorSpaceUnboundOps[F](lhs: F)(implicit ev: VectorSpace[_, F]) {
+  def /(rhs: F): F = macro Ops.binopWithScalar[F, F]
+  def reciprocal(): F = macro Ops.unopWithScalar[F]
 }
 
 final class InnerProductSpaceOps[V](lhs: V) {
@@ -352,4 +368,47 @@ final class BitStringOps[A](lhs: A)(implicit ev: BitString[A]) {
 
   def rotateLeft(rhs: Int): A = macro Ops.binop[Int, A]
   def rotateRight(rhs: Int): A = macro Ops.binop[Int, A]
+}
+
+final class GroupActionGroupOps[G](lhs: G) {
+  def |+|> [P](rhs: P)(implicit ev: GroupAction[P, G]): P =
+    macro Ops.binopWithEv[P, GroupAction[P, G], P]
+  def +> [P](rhs: P)(implicit ev: AdditiveGroupAction[P, G]): P =
+    macro Ops.binopWithEv[P, AdditiveGroupAction[P, G], P]
+  def *> [P](rhs: P)(implicit ev: MultiplicativeGroupAction[P, G]): P =
+    macro Ops.binopWithEv[P, MultiplicativeGroupAction[P, G], P]
+}
+
+final class GroupActionPointOps[P](lhs: P) {
+  def <|+| [G](rhs: G)(implicit ev: GroupAction[P, G]): P =
+    macro Ops.binopWithEv[G, GroupAction[P, G], P]
+  def <+ [G](rhs: G)(implicit ev: AdditiveGroupAction[P, G]): P =
+    macro Ops.binopWithEv[G, AdditiveGroupAction[P, G], P]
+  def <* [G](rhs: G)(implicit ev: MultiplicativeGroupAction[P, G]): P =
+    macro Ops.binopWithEv[G, MultiplicativeGroupAction[P, G], P]
+}
+
+final class GroupActionUnboundOps[G](lhs: G)(implicit ev: GroupAction[_, G]) {
+  def |+|(rhs: G): G = macro Ops.binopWithScalar[G, G]
+  def |-|(rhs: G): G = macro Ops.binopWithScalar[G, G]
+  def inverse(): G = macro Ops.unopWithScalar[G]
+}
+
+final class AdditiveGroupActionUnboundOps[G](lhs: G)(implicit ev: AdditiveGroupAction[_, G]) {
+  def +(rhs: G): G = macro Ops.binopWithScalar[G, G]
+  def -(rhs: G): G = macro Ops.binopWithScalar[G, G]
+  def unary_-(): G = macro Ops.unopWithScalar[G]
+}
+
+final class MultiplicativeGroupActionUnboundOps[G](lhs: G)(implicit ev: MultiplicativeGroupAction[_, G]) {
+  def *(rhs: G): G = macro Ops.binopWithScalar[G, G]
+  def /(rhs: G): G = macro Ops.binopWithScalar[G, G]
+  def reciprocal(): G = macro Ops.unopWithScalar[G]
+}
+
+final class TorsorPointOps[P](lhs: P) {
+  def <-> [G](rhs: P)(implicit ev: AdditiveTorsor[P, G]): G =
+    macro Ops.binopWithEv[P, AdditiveTorsor[P, G], G]
+  def </> [G](rhs: P)(implicit ev: MultiplicativeTorsor[P, G]): G =
+    macro Ops.binopWithEv[P, MultiplicativeTorsor[P, G], G]
 }
