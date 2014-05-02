@@ -14,7 +14,7 @@
 
 package spire
 package random
-package mutable
+package rng
 
 import spire.syntax.cfor._
 import spire.util.Pack
