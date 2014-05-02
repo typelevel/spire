@@ -16,6 +16,7 @@ possible.
 * Eugene Burmako: macros, tons of macro support, build contributions
 * Franco Callari: author of spire.math.Jet
 * Olivier Chafik: cfor macro assistance, bug fixes
+* Adelbert Chang: bug reports
 * Eric Christiansen: bug fixes
 * Jean-Remi Desjardins: documentation fixes
 * Suminda Dharmasena: feature requests and bug reports
