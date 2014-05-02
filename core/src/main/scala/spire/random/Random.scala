@@ -75,6 +75,8 @@ trait RandomCompanion[G <: Generator] { self =>
 
   def next[B](f: Generator => B): R[B] = spawn(Next(f))
 
+  def fromDist[B](dist: Dist[B]): R[B] = spawn(Next(g => dist(g)))
+
   def constant[B](b: B) = spawn(Const(b))
 
   def unit = constant(Unit)
