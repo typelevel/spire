@@ -128,7 +128,7 @@ trait MapInstances1 extends MapInstances0 {
 }
 
 trait MapInstances2 extends MapInstances1 {
-  implicit def MapInnerProductSpace[K, V: Field: NRoot] = new MapInnerProductSpace[K, V]
+  implicit def MapInnerProductSpace[K, V: Field] = new MapInnerProductSpace[K, V]
 
   implicit def MapEq[K, V](implicit V0: Eq[V]) = new MapEq[K, V]
 }
