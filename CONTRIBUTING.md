@@ -11,7 +11,7 @@ specific issue for that.
 
 We also gladly accept patches for documentation. Anything from fixing
 a typo to writing a full tutorial is a great way to help the
-project. Even if
+project.
 
 ### Reporting bugs, issues, or unexpected behavior
 
