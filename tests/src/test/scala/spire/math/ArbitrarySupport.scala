@@ -98,7 +98,7 @@ object ArbitrarySupport {
   implicit val rational: Arbitrary[Rational] =
     Arbitrary(for {
       n <- arbitrary[Long]
-      d <- arbitrary[Long].filter(_ != 0)
+      d <- arbitrary[Long].map(n => if (n == 0) 1L else n)
     } yield {
       Rational(n, d)
     })
