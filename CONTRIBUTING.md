@@ -40,7 +40,7 @@ Spire uses [ScalaTest](www.scalatest.org) and
 [ScalaCheck](http://scalacheck.org/) to test our code. The tests
 fulfill a number of important functions:
 
- * ensure our algorithms return correc results
+ * ensure our algorithms return correct results
  * check the visibility of our type class instances
  * confirm that the API works as we expect
  * test edge cases which might otherwise be missed
