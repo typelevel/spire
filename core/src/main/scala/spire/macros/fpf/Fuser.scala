@@ -1,4 +1,4 @@
-package spire.math.fpf
+package spire.macros.fpf
 
 import scala.language.experimental.macros
 
@@ -10,7 +10,7 @@ import spire.math._
 // TODO:
 // inline lifting - avoid useless companion object access
 
-private[fpf] trait Fuser[C <: Context, A] {
+private[spire] trait Fuser[C <: Context, A] {
   val c: C
   implicit def A: c.WeakTypeTag[A]
 
@@ -32,7 +32,7 @@ private[fpf] trait Fuser[C <: Context, A] {
   case class Approx(apx: Tree, mes: Tree, ind: Either[Tree, Int], exact: Tree) {
     def expr: Tree = {
       val ind0: Tree = ind.fold(t => t, intLit)
-      q"spire.math.fpf.FpFilter[$A]($apx, $mes, $ind0, $exact)"
+      q"spire.math.FpFilter[$A]($apx, $mes, $ind0, $exact)"
     }
 
     def fused(stats0: List[Tree]): Fused = {
@@ -259,7 +259,7 @@ private[fpf] trait Fuser[C <: Context, A] {
   }
 }
 
-private[fpf] object Fuser {
+private[spire] object Fuser {
   def apply[C <: Context, A: ctx.WeakTypeTag](ctx: C) = new Fuser[C, A] {
     val c = ctx
     val A = c.weakTypeTag[A]

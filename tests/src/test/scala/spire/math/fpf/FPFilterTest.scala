@@ -1,11 +1,10 @@
-package spire.math.fpf
+package spire.math
 
 import spire.algebra._
 import spire.math._
 import spire.implicits._
 
 import org.scalatest.FunSuite
-
 
 class FPFilterTest extends FunSuite {
   final class Evaluated extends Exception

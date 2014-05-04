@@ -1,5 +1,4 @@
 package spire.math
-package fpf
 
 import scala.language.experimental.macros
 
@@ -7,6 +6,7 @@ import scala.reflect.macros.Context
 
 import spire.algebra._
 import spire.syntax.isReal._
+import spire.macros.fpf._
 
 /**
  * A Floating-point Filter [1] provides a `Numeric` type that wraps another

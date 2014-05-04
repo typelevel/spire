@@ -1,7 +1,7 @@
-package spire.math.fpf
+package spire.macros.fpf
 
-private[fpf] sealed trait Cmp
-private[fpf] object Cmp {
+private[spire] sealed trait Cmp
+private[spire] object Cmp {
   case object Lt extends Cmp
   case object Gt extends Cmp
   case object LtEq extends Cmp
