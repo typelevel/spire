@@ -55,7 +55,6 @@ class FPFilterTest extends FunSuite {
   test("Comparisons") {
     val x = FpFilter.exact[Algebraic](-2)
     val y = FpFilter.exact[Algebraic](8)
-
     assert(x < y)
     assert(y > x)
     assert(x <= y)
@@ -69,7 +68,6 @@ class FPFilterTest extends FunSuite {
     val x = FpFilter.exact[Algebraic](18)
     val y = FpFilter.exact[Algebraic](8)
     val z = FpFilter.exact[Algebraic](2)
-
     val u = x.sqrt - y.sqrt
     val v = u - z.sqrt
     assert(v.signum == 0)
