@@ -22,7 +22,7 @@ class LUReconstructionTest extends FunSuite {
     val lu = Matrix(2,2)(2, 3,
                          4, 5)
     val lud = new LUDecomposition(lu, Permutation(1,1))
-    expectResult { Matrix(2,2)(8, 17,
+    assertResult { Matrix(2,2)(8, 17,
                                2,  3) } { lud.reconstructedOriginal }
   }
 
@@ -31,11 +31,11 @@ class LUReconstructionTest extends FunSuite {
                          -1,  5, -2,
                           2, -3,  4)
     val lud = new LUDecomposition(lu, Permutation.identity(3))
-    expectResult { Matrix(3,3)( 2,  3, -1,
+    assertResult { Matrix(3,3)( 2,  3, -1,
                                -2,  2, -1,
                                 4, -9,  8) } { lud.reconstructedOriginal }
     val lud1 = new LUDecomposition(lu, Permutation(1,2,2))
-    expectResult { Matrix(3,3)( 4, -9,  8,
+    assertResult { Matrix(3,3)( 4, -9,  8,
                                 2,  3, -1,
                                -2,  2, -1) } { lud1.reconstructedOriginal }
   }
@@ -46,7 +46,7 @@ class LUReconstructionTest extends FunSuite {
                          1, 3, 1,
                          3, 2, 4)
     val lud = new LUDecomposition(lu, Permutation(3,1,2,3))
-    expectResult { Matrix(4,3)(6, 16, 19,
+    assertResult { Matrix(4,3)(6, 16, 19,
                                8, 18, 15,
                                2, 10, 13,
                                2,  4,  3) } { lud.reconstructedOriginal }
@@ -59,7 +59,7 @@ class LUReconstructionTest extends FunSuite {
                          4, 4, 2,
                          4, 4, 2)
     val lud = new LUDecomposition(lu, Permutation.identity(3))
-    expectResult { Matrix(3,5)( 2,  4,  2,
+    assertResult { Matrix(3,5)( 2,  4,  2,
                                 3,  4,  2,
                                 6,  6,  4,
                                 8,  8, 20,
@@ -164,7 +164,7 @@ with BLAS.NaiveLevel3
                  s"""|Unexpected singularity for matrix type #imat:
                      |$a0
                      |""".stripMargin)
-          expectResult { zeroIdx.get } { ex.pivotIndex }
+          assertResult { zeroIdx.get } { ex.pivotIndex }
       }
     }
   }

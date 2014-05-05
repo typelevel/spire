@@ -22,16 +22,16 @@ trait BLASLevel2Test extends FunSuite with BLAS.Level2 {
     val alpha = 2
     val beta = -1
     gemv(NoTranspose, alpha, a, x, beta, y1)
-    expectResult(Vector(-26, -10, -17)) { y1 }
+    assertResult(Vector(-26, -10, -17)) { y1 }
     val y2 = y.copyToVector
     gemv(NoTranspose, alpha=0, a, x, beta, y2)
-    expectResult(Vector(-2, -2, -3)) { y2 }
+    assertResult(Vector(-2, -2, -3)) { y2 }
     val y3 = y.copyToVector
     gemv(NoTranspose, alpha, a, x, beta=0, y3)
-    expectResult(Vector(-24, -8, -14)) { y3 }
+    assertResult(Vector(-24, -8, -14)) { y3 }
     val y4 = y.copyToVector
     gemv(NoTranspose, alpha, a, x, beta=1, y4)
-    expectResult(Vector(-22, -6, -11)) { y4 }
+    assertResult(Vector(-22, -6, -11)) { y4 }
   }
 
   test("General Matrix Vector product (GEMV): transpose") {
@@ -44,16 +44,16 @@ trait BLASLevel2Test extends FunSuite with BLAS.Level2 {
     val alpha = 2
     val beta = -1
     gemv(Transpose, alpha, a, x, beta, y1)
-    expectResult(Vector(5, -1, 8, 25, -27)) { y1 }
+    assertResult(Vector(5, -1, 8, 25, -27)) { y1 }
     val y2 = y.copyToVector
     gemv(Transpose, alpha=0, a, x, beta, y2)
-    expectResult(Vector(3, -1, 2, -1, -3)) { y2 }
+    assertResult(Vector(3, -1, 2, -1, -3)) { y2 }
     val y3 = y.copyToVector
     gemv(Transpose, alpha, a, x, beta=0, y3)
-    expectResult(Vector(2, 0, 6, 26, -24)) { y3 }
+    assertResult(Vector(2, 0, 6, 26, -24)) { y3 }
     val y4 = y.copyToVector
     gemv(Transpose, alpha, a, x, beta=1, y4)
-    expectResult(Vector(-1, 1, 4, 27, -21)) { y4 }
+    assertResult(Vector(-1, 1, 4, 27, -21)) { y4 }
   }
 
   implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)

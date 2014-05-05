@@ -36,17 +36,17 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
       val c1 = c.copyToMatrix
       gemm(transA = transA, transB = transB,
            alpha = 0, a = a1, b = b1, beta = 0, c = c1)
-      expectResult(Matrix.zero(5,4)){ c1 }
+      assertResult(Matrix.zero(5,4)){ c1 }
 
       val c2 = c.copyToMatrix
       gemm(transA = transA, transB = transB,
            alpha = 0, a = a1, b = b1, beta = 1, c = c2)
-      expectResult(c){ c2 }
+      assertResult(c){ c2 }
 
       val c3 = c.copyToMatrix
       gemm(transA = transA, transB = transB,
            alpha = 0, a = a1, b = b1, beta = 2, c = c3)
-      expectResult(Matrix(5,4)(-2, 10, 10, 10,  -6,
+      assertResult(Matrix(5,4)(-2, 10, 10, 10,  -6,
                                -8,  8,  0, -6,  -8,
                                10,  8,  2,  2, -10,
                                -6,  4,  0, -8,  -2)) { c3 }
@@ -61,22 +61,22 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
     val c1 = c.copyToMatrix
     gemm(transA = NoTranspose, transB = NoTranspose,
          alpha = -3, a = a, b = b, beta = 0, c = c1)
-    expectResult(expectedC) { c1 }
+    assertResult(expectedC) { c1 }
 
     val c2 = c.copyToMatrix
     gemm(transA = Transpose, transB = NoTranspose,
          alpha = -3, a = a.transposed, b = b, beta = 0, c = c2)
-    expectResult(expectedC) { c2 }
+    assertResult(expectedC) { c2 }
 
     val c3 = c.copyToMatrix
     gemm(transA = NoTranspose, transB = Transpose,
          alpha = -3, a = a, b = b.transposed, beta = 0, c = c3)
-    expectResult(expectedC) { c3 }
+    assertResult(expectedC) { c3 }
 
     val c4 = c.copyToMatrix
     gemm(transA = Transpose, transB = Transpose,
          alpha = -3, a = a.transposed, b = b.transposed, beta = 0, c = c4)
-    expectResult(expectedC) { c4 }
+    assertResult(expectedC) { c4 }
   }
 
   test("GEMM: matrix x block") {
@@ -107,7 +107,7 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
                                   3,   1, -4,   5,  -5, -3,  2,
                                  -2,  -4, -1,  -2,   2,  0, -4,
                                   5,   3, -2,  -4,  -3,  0,  3)
-    expectResult(expectedB) { b }
+    assertResult(expectedB) { b }
   }
 
   test("Symmetric Rank-k Update (SYRK)") {
@@ -144,11 +144,11 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
     val uc1 = c.copyToMatrix
     syrk(uplo = Upper, trans = NoTranspose,
          alpha = -1, a = a1, beta = 2, c = uc1)
-    expectResult(euc1) { uc1 }
+    assertResult(euc1) { uc1 }
     val uc2 = c.copyToMatrix
     syrk(uplo = Upper, trans = Transpose,
          alpha = -1, a = a2, beta = 2, c = uc2)
-    expectResult(euc2) { uc2 }
+    assertResult(euc2) { uc2 }
 
     val elc1 = Matrix(5,5)(-46, -3, 2, -1, 0,
                            8, -71, 1, -2, -3,
@@ -158,7 +158,7 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
     val lc1 = c.copyToMatrix
     syrk(uplo = Lower, trans = NoTranspose,
          alpha = -1, a = a1, beta = 2, c = lc1)
-    expectResult(elc1) { lc1 }
+    assertResult(elc1) { lc1 }
 
     val elc2 = Matrix(5,5)(-35, -3, 2, -1, 0,
                            -7, -45, 1, -2, -3,
@@ -168,7 +168,7 @@ trait BLASLevel3Test extends FunSuite with BLAS.Level3 {
     val lc2 = c.copyToMatrix
     syrk(uplo = Lower, trans = Transpose,
          alpha = -1, a = a2, beta = 2, c = lc2)
-    expectResult(elc2) { lc2 }
+    assertResult(elc2) { lc2 }
   }
 
   implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)

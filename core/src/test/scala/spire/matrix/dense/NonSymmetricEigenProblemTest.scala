@@ -8,8 +8,7 @@ import spire.matrix.dense.BLAS
 import spire.matrix.dense.random._
 
 import scala.math._
-import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FunSuite,Matchers}
 
 trait NonSymmetricEigenProblemTestLike extends FunSuite
 with CommonMatrixPropertyTests
@@ -42,10 +41,10 @@ with BLAS.NaiveLevel3
                          300,   0, 600,
                          400, 300, 100)
     val h = HessenbergDecomposition.withUnblockedAlgorithm(m0.copyToMatrix)()
-    expectResult(Matrix(3,3)( 100, -860,   20,
+    assertResult(Matrix(3,3)( 100, -860,   20,
                              -500,  496,  -72,
                                 0,  228, -396))(h.reducedMatrix)
-    expectResult(Matrix(3,3)(1.0,  0.0 ,   0.0 ,
+    assertResult(Matrix(3,3)(1.0,  0.0 ,   0.0 ,
                              0.0, -0.60,  -0.80,
                              0.0, -0.80,   0.60)) {
       h.transformationWithUnblockedAlgorithm.round(9)
@@ -73,7 +72,7 @@ with BLAS.NaiveLevel3
       0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 3.0,
       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 4.0, 5.0,
       0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 6.0)
-    expectResult(expected) { h1.reducedMatrix }
+    assertResult(expected) { h1.reducedMatrix }
   }
 
   implicit val gen = Defaults.IntegerGenerator.fromTime(1)
@@ -139,7 +138,7 @@ extends NonSymmetricEigenProblemTestLike
 }
 
 class SchurDecomposition2x2Test
-extends FunSuite with ShouldMatchers with NumericPropertiesOfDouble
+extends FunSuite with Matchers with NumericPropertiesOfDouble
 {
   val eps = 2*precision
 
@@ -153,65 +152,65 @@ extends FunSuite with ShouldMatchers with NumericPropertiesOfDouble
   test("Upper Triangular") {
     val d = decompose(1.0, -1.0,
                       0.0,  2.0)
-    d.r  should be === PlaneRotation.identity
-    d.schurForm  should be === (1.0, -1.0,
+    d.r  shouldEqual PlaneRotation.identity
+    d.schurForm  shouldEqual (1.0, -1.0,
                                 0.0,  2.0)
-    d.eigenvalues  should be === ((1.0, 0), (2.0, 0))
+    d.eigenvalues  shouldEqual ((1.0, 0), (2.0, 0))
   }
 
   test("Lower Triangular") {
     val d = decompose(-1.0, 0.0,
                       4.0, 1.0)
-    d.r  should be === PlaneRotation.positiveQuarterRotation
-    d.schurForm  should be === (1.0, -4.0,
+    d.r  shouldEqual PlaneRotation.positiveQuarterRotation
+    d.schurForm  shouldEqual (1.0, -4.0,
                                 0.0, -1.0)
-    d.eigenvalues  should be === ((1.0, 0), (-1.0, 0))
+    d.eigenvalues  shouldEqual ((1.0, 0), (-1.0, 0))
   }
 
   test("Schur Form Already") {
     val d = decompose(1.0, -3.0,
                       3.0,  1.0)
-    d.r  should be === PlaneRotation.identity
-    d.schurForm  should be === (1.0, -3.0,
+    d.r  shouldEqual PlaneRotation.identity
+    d.schurForm  shouldEqual (1.0, -3.0,
                                 3.0,  1.0)
     val ((re1, im1), (re2, im2)) = d.eigenvalues
-    re1 should be ( 1.0 plusOrMinus eps)
-    im1 should be ( 3.0 plusOrMinus eps)
-    re2 should be ( 1.0 plusOrMinus eps)
-    im2 should be (-3.0 plusOrMinus eps)
+    re1 should be ( 1.0 +- eps)
+    im1 should be ( 3.0 +- eps)
+    re2 should be ( 1.0 +- eps)
+    im2 should be (-3.0 +- eps)
   }
 
   test("Complex conjugate eigenvalues") {
     val sd = decompose(1 + 3*sqrt(3)/4, 7.0/4,
                                -13.0/4, 1 - 3*sqrt(3)/4)
 
-    toDegrees(sd.r.angle) should be (30.0 plusOrMinus toDegrees(eps))
+    toDegrees(sd.r.angle) should be (30.0 +- toDegrees(eps))
 
     val (a, b,
          c, d) = sd.schurForm
-    a should be ( 1.0 plusOrMinus eps)
-    b should be ( 1.0 plusOrMinus eps)
-    c should be (-4.0 plusOrMinus eps)
-    d should be ( 1.0 plusOrMinus eps)
+    a should be ( 1.0 +- eps)
+    b should be ( 1.0 +- eps)
+    c should be (-4.0 +- eps)
+    d should be ( 1.0 +- eps)
 
     val ((re1, im1), (re2, im2)) = sd.eigenvalues
-    re1 should be ( 1.0 plusOrMinus eps)
-    im1 should be ( 2.0 plusOrMinus eps)
-    re2 should be ( 1.0 plusOrMinus eps)
-    im2 should be (-2.0 plusOrMinus eps)
+    re1 should be ( 1.0 +- eps)
+    im1 should be ( 2.0 +- eps)
+    re2 should be ( 1.0 +- eps)
+    im2 should be (-2.0 +- eps)
   }
 
   test("Clearly distinct real eigenvalues") {
     val s3 = sqrt(3)
     val sd = decompose(( 3 - s3)/2, (1 + s3)/2,
                        (-3 + s3)/2, (5 + s3)/2)
-    toDegrees(sd.r.angle) should be (-165.0 plusOrMinus toDegrees(eps))
+    toDegrees(sd.r.angle) should be (-165.0 +- toDegrees(eps))
     val (a, b,
          c, d) = sd.schurForm
-    a should be (1.0 plusOrMinus eps)
-    b should be (2.0 plusOrMinus eps)
-    c should be (0.0 plusOrMinus eps)
-    d should be (3.0 plusOrMinus eps)
+    a should be (1.0 +- eps)
+    b should be (2.0 +- eps)
+    c should be (0.0 +- eps)
+    d should be (3.0 +- eps)
   }
 
   test("Degenerate real eigenvalues") {
@@ -222,13 +221,13 @@ extends FunSuite with ShouldMatchers with NumericPropertiesOfDouble
     val s3 = sqrt(3)
     val sd = decompose(1.0 - s3/8,      1.0/8,
                            -3.0/8, 1.0 + s3/8)
-    toDegrees(sd.r.angle) should be (60.0 plusOrMinus toDegrees(eps))
+    toDegrees(sd.r.angle) should be (60.0 +- toDegrees(eps))
     val (a, b,
          c, d) = sd.schurForm
-    a should be (1.0 plusOrMinus eps)
-    b should be (0.5 plusOrMinus eps)
-    c should be (0.0 plusOrMinus eps)
-    d should be (1.0 plusOrMinus eps)
+    a should be (1.0 +- eps)
+    b should be (0.5 +- eps)
+    c should be (0.0 +- eps)
+    d should be (1.0 +- eps)
   }
 
   test("Nearly-degenerate real eigenvalues") {
@@ -236,14 +235,14 @@ extends FunSuite with ShouldMatchers with NumericPropertiesOfDouble
     val sd = decompose(1     , 0.5,
                        1e-16 , 1   )
     toDegrees(sd.r.angle) should be (
-      8.1028468454139541e-7 plusOrMinus toDegrees(eps))
+      8.1028468454139541e-7 +- toDegrees(eps))
     val (a, b,
          c, d) = sd.schurForm
-    a should be (1.00000000707106781 plusOrMinus eps)
-    b should be (0.499999999999999900 plusOrMinus eps)
-    c should be === 0.0
-    d should be (0.999999992928932188 plusOrMinus eps)
+    a should be (1.00000000707106781 +- eps)
+    b should be (0.499999999999999900 +- eps)
+    c shouldEqual 0.0
+    d should be (0.999999992928932188 +- eps)
     // That would be true if the branch mentionned above has been taken
-    a - 1 should be (1 - d plusOrMinus eps)
+    a - 1 should be (1 - d +- eps)
   }
 }

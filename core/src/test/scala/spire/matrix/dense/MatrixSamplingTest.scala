@@ -4,19 +4,18 @@ import spire.matrix.dense._
 import spire.matrix.dense.random._
 import spire.std.any._
 import spire.syntax.nroot._
-import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FunSuite,Matchers}
 import scala.collection.mutable
 import scala.math._
 
-class MatrixSamplingTest extends FunSuite with ShouldMatchers {
+class MatrixSamplingTest extends FunSuite with Matchers {
 
   implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
 
   test("General Matrix Samples") {
     val uniformIm1p1 = new ScalarUniformDistributionFromMinusOneToOne
     val matrices = new RandomUncorrelatedElements(elements=uniformIm1p1)
-    expectResult((1,1) :: (1,2) :: (1,3) :: (1,5) :: (1,10) :: (1,16) ::
+    assertResult((1,1) :: (1,2) :: (1,3) :: (1,5) :: (1,10) :: (1,16) ::
                  (2,1) :: (2,2) :: (2,3) :: (2,5) :: (2,10) :: (2,16) ::
                  (3,1) :: (3,2) :: (3,3) :: (3,5) :: (3,10) :: (3,16) ::
                  (5,1) :: (5,2) :: (5,3) :: (5,5) :: (5,10) :: (5,16) ::
@@ -26,7 +25,7 @@ class MatrixSamplingTest extends FunSuite with ShouldMatchers {
       matrices.generalMatrixSample.map(_.dimensions).toList
     }
 
-    expectResult(List.fill(36)(true)) {
+    assertResult(List.fill(36)(true)) {
       matrices.generalMatrixSample.map(_.forall(e => -1 <= e && e <= 1)).toList
     }
   }
@@ -51,28 +50,28 @@ class MatrixSamplingTest extends FunSuite with ShouldMatchers {
         case 4 => {
           a should be ('diagonal)
           a.diagonal.map(abs).sum should be (
-            sumArithmetic(n) plusOrMinus 5e-16)
+            sumArithmetic(n) +- 5e-16)
         }
         case 5 => {
           a should be ('diagonal)
           abs(a.diagonal.product) should be (
-            ulp**(0.5*n) plusOrMinus 5e-75)
+            ulp**(0.5*n) +- 5e-75)
         }
         case 6 => {
           a should be ('diagonal)
           abs(a.diagonal.map(abs).sum) should be (
-            1 + (n-1)*ulp plusOrMinus 5e-16)
+            1 + (n-1)*ulp +- 5e-16)
         }
         case 7 | 8 => {
           (a should be ('diagonal))
           val diag = a.diagonal
-          abs(diag(n-1)/diag(0)) should be === ulp
-          if(itype == 7) abs(diag(0)) should be === sqrtOverflowThreshold
-          else abs(diag(0)) should be === sqrtUnderflowThreshold
+          abs(diag(n-1)/diag(0)) shouldEqual ulp
+          if(itype == 7) abs(diag(0)) shouldEqual sqrtOverflowThreshold
+          else abs(diag(0)) shouldEqual sqrtUnderflowThreshold
         }
         case 19 => {
           a should not be ('diagonal)
-          a.forall(e => -1 <= e && e < 1) should be === true
+          a.forall(e => -1 <= e && e < 1) shouldEqual true
         }
         case 20 => {
           a should not be ('diagonal)
@@ -84,7 +83,7 @@ class MatrixSamplingTest extends FunSuite with ShouldMatchers {
         case 21 => {
           a should not be ('diagonal)
           a.forall(e => -sqrtUnderflowThreshold <= e
-                          && e <= sqrtUnderflowThreshold) should be === true
+                          && e <= sqrtUnderflowThreshold) shouldEqual true
         }
         case _ => {
           // To do better we would need at least a way to estimate condition
@@ -94,7 +93,7 @@ class MatrixSamplingTest extends FunSuite with ShouldMatchers {
         }
       }
     }
-    types.toList should be === (1 to 21).toList
+    types.toList shouldEqual (1 to 21).toList
   }
 
   test("Corner cases") {

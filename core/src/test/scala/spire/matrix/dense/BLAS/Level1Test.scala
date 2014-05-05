@@ -12,7 +12,7 @@ trait BLASLevel1Test extends FunSuite with BLAS.Level1 {
                         5, 6, 7, 8)
     scale(3.0, m.column(0))
     scale(-2.0, m.row(1).block(0,3))
-    expectResult(Matrix(2,4)(  3,   2,   3, 4,
+    assertResult(Matrix(2,4)(  3,   2,   3, 4,
                              -30, -12, -14, 8)) { m }
   }
 

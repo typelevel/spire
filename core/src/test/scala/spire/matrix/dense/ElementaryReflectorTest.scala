@@ -15,11 +15,11 @@ with EuclideanNorm
     val a = Matrix(m,n)(3,   1,  5,  1,
                         21, 22, 23, 24)
     val h = ElementaryReflector.annihilateAndConstruct(a.row(0))
-    expectResult(1.5) { h.tau }
-    expectResult(1.0/9 :: 5.0/9 :: 1.0/9 :: Nil) { h.essentialPart.toList }
-    expectResult(-6) { a.row(0)(0) }
-    expectResult(h.essentialPart) { a.row(0).block(1,n) }
-    expectResult(21 :: 22 :: 23 :: 24 :: Nil) { a.row(1).toList }
+    assertResult(1.5) { h.tau }
+    assertResult(1.0/9 :: 5.0/9 :: 1.0/9 :: Nil) { h.essentialPart.toList }
+    assertResult(-6) { a.row(0)(0) }
+    assertResult(h.essentialPart) { a.row(0).block(1,n) }
+    assertResult(21 :: 22 :: 23 :: 24 :: Nil) { a.row(1).toList }
   }
 
   test("Construction: tiny vector") {
@@ -48,7 +48,7 @@ with EuclideanNorm
   test("Construction: zero vector") {
     val x = Vector.zero(3)
     val h = ElementaryReflector.annihilateAndConstruct(x)
-    expectResult { 2 } { h.essentialPart.dimension }
+    assertResult { 2 } { h.essentialPart.dimension }
   }
 
   test("Product with a general matrix from the left") {
@@ -65,7 +65,7 @@ with EuclideanNorm
                                -20.0, 16.0, 1.0, -11.0, -3.0, 19.0, 5.0,
                                19.0, -18.0, -6.0, 6.0, 5.0, -18.0, -6.0)
     h.applyOnLeft(m)
-    expectResult(expected) { m }
+    assertResult(expected) { m }
   }
 
   test("Product with a general matrix from the right") {
@@ -82,7 +82,7 @@ with EuclideanNorm
                                -6.75, -7.5, 11.25, 5.5, -3.0, 9.5, 9.25,
                                10.5, 16.0, -19.5, -14.0, 1.0, -15.0, -22.5)
     h.applyOnRight(m)
-    expectResult(expected) { m }
+    assertResult(expected) { m }
   }
 
   test("Product from the right or left with trailing zeros") {
@@ -106,11 +106,11 @@ with EuclideanNorm
                                  4.0,   2.0,   4.0, 0.0, 0.0, 0.0,
                                  4.0,   5.0,   5.0, 1.0, 1.0, 1.0,
                                  5.0,   3.0,   3.0, 5.0, 1.0, 1.0)
-    expectResult(expected) { m1 }
+    assertResult(expected) { m1 }
 
     val m2 = m0.transposed
     h.applyOnRight(m2)
-    expectResult(expected.transposed) { m2 }
+    assertResult(expected.transposed) { m2 }
   }
 }
 
@@ -127,7 +127,7 @@ class TinyElementaryReflectorTest extends FunSuite {
     val a0 = a.copyToMatrix
     val h = TinyElementaryReflector.annihilateAndConstruct(a.column(0))
     h.applyOnLeft(a0)(startingRow=0)
-    expectResult { a0(0,0) } { a(0,0) }
+    assertResult { a0(0,0) } { a(0,0) }
   }
 
   test("Elementary Reflector 2 x 2: apply") {
@@ -135,13 +135,13 @@ class TinyElementaryReflectorTest extends FunSuite {
     val a = Matrix(2,3)( 1, 2,  3,
                         -1, 5, -2)
     h.applyOnLeft(a)(startingRow=0)
-    expectResult { Matrix(2,3)(   1.0/4, -19.0/4,  0,
+    assertResult { Matrix(2,3)(   1.0/4, -19.0/4,  0,
                                 -11.0/8,  13.0/8, -7.0/2) } { a }
     val b = Matrix(3,2)( 1, -1,
                          2,  3,
                         -1,  4)
     h.applyOnRight(b)(startingColumn=0)
-    expectResult { Matrix(3,2)(  1.0/4, -11.0/8,
+    assertResult { Matrix(3,2)(  1.0/4, -11.0/8,
                                -13.0/4,   3.0/8,
                                 -5.0/2,  13.0/4 ) } { b }
   }
@@ -153,12 +153,12 @@ class TinyElementaryReflectorTest extends FunSuite {
                          3, -3, 1)
     val aL = a.copyToMatrix
     h.applyOnLeft(aL)(startingRow=0)
-    expectResult { Matrix(3,3)(-17.0/4,   1.0/2,  3.0/4,
+    assertResult { Matrix(3,3)(-17.0/4,   1.0/2,  3.0/4,
                                  5.0/8,  -1.0/4, 41.0/8,
                                  3.0/8, -15.0/4, -1.0/8 )  } { aL }
     val aR = a.copyToMatrix
     h.applyOnRight(aR)(startingColumn=0)
-    expectResult { Matrix(3,3)( -5.0/4, 25.0/8,  15.0/8,
+    assertResult { Matrix(3,3)( -5.0/4, 25.0/8,  15.0/8,
                                -11.0/4, -5.0/8,  29.0/8,
                                 -9.0/2,  3.0/4, -11.0/4  )  } { aR }
 
