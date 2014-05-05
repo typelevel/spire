@@ -73,7 +73,11 @@ class LayeredGemmTest extends FunSuite {
   }
 }
 
-class TRSBPPackingTest extends fixture.FunSuite {
+trait TRSBPPackingTest extends FunSuite {
+  val kr:Int
+
+  val title = s"With kr=$kr"
+
   val aa = GEBP.threadLocalBlocking.get.bufferA
 
   def sample(zeroCond:(Int,Int) => Boolean,
@@ -102,16 +106,7 @@ class TRSBPPackingTest extends fixture.FunSuite {
     }
   }
 
-  type FixtureParam = Int
-
-  def withFixture(test: OneArgTest) {
-    test(2)
-    info(s"\tkr=2: ok!")
-    test(4)
-    info(s"\tkr=4: ok!")
-  }
-
-  test("Packing: Lower Triangular, Column Slicing") { kr =>
+  test("Packing: Lower Triangular, Column Slicing") {
     val packed = pack(sample(lower, canonical),
                       TRSBP.packLowerTriangleAsColumnSlices,
                       kr)
@@ -185,7 +180,7 @@ class TRSBPPackingTest extends fixture.FunSuite {
     }
   }
 
-  test("Colunm slicing: from upper to lower triangular") { kr =>
+  test("Colunm slicing: from upper to lower triangular") {
     val canons = pack(sample(upper, canonical),
                       TRSBP.packUpperTriangleAsColumnSlices, kr)
     val alternatives = pack(sample(upper, reversed),
@@ -195,7 +190,7 @@ class TRSBPPackingTest extends fixture.FunSuite {
     }
   }
 
-  test("Colunm slicing: from lower to upper triangular") { kr =>
+  test("Colunm slicing: from lower to upper triangular") {
     val canons = pack(sample(lower, canonical),
                       TRSBP.packLowerTriangleAsColumnSlices, kr)
     val alternatives = pack(sample(lower, reversed),
@@ -205,7 +200,7 @@ class TRSBPPackingTest extends fixture.FunSuite {
     }
   }
 
-  test("Row slicing: from upper to lower triangular") { kr =>
+  test("Row slicing: from upper to lower triangular") {
     val canons = pack(sample(upper, canonical),
                       TRSBP.packUpperTriangleAsRowSlices, kr)
     val alternatives = pack(sample(upper, reversed),
@@ -215,7 +210,7 @@ class TRSBPPackingTest extends fixture.FunSuite {
     }
   }
 
-  test("Row slicing: from lower to upper triangular") { kr =>
+  test("Row slicing: from lower to upper triangular") {
     val canons = pack(sample(lower, canonical),
                       TRSBP.packLowerTriangleAsRowSlices, kr)
     val alternatives = pack(sample(lower, reversed),
@@ -226,7 +221,7 @@ class TRSBPPackingTest extends fixture.FunSuite {
   }
 
   test("From upper triangular row slicing to lower triangular column slicing")
-  { kr =>
+  {
     val canons = pack(sample(upper, canonical),
                       TRSBP.packUpperTriangleAsRowSlices, kr)
     val alternatives = pack(sample(upper, transposed),
@@ -237,7 +232,7 @@ class TRSBPPackingTest extends fixture.FunSuite {
   }
 
   test("From lower triangular column slicing to upper triangular row slicing")
-  { kr =>
+  {
     val canons = pack(sample(lower, canonical),
                       TRSBP.packLowerTriangleAsColumnSlices, kr)
     val alternatives = pack(sample(lower, transposed),
@@ -248,7 +243,7 @@ class TRSBPPackingTest extends fixture.FunSuite {
   }
 
   test("From lower triangular row slicing to upper triangular column slicing")
-  { kr =>
+  {
     val canons = pack(sample(lower, canonical),
                       TRSBP.packLowerTriangleAsRowSlices, kr)
     val alternatives = pack(sample(lower, transposed),
@@ -259,7 +254,7 @@ class TRSBPPackingTest extends fixture.FunSuite {
   }
 
   test("From upper triangular column slicing to lower triangular row slicing")
-  { kr =>
+  {
     val canons = pack(sample(upper, canonical),
                       TRSBP.packUpperTriangleAsColumnSlices, kr)
     val alternatives = pack(sample(upper, transposed),
@@ -269,6 +264,9 @@ class TRSBPPackingTest extends fixture.FunSuite {
     }
   }
 }
+
+class TRSBPPackingTest2 extends TRSBPPackingTest { val kr = 2 }
+class TRSBPPackingTest4 extends TRSBPPackingTest { val kr = 4 }
 
 class LayeredTrsmTest extends FunSuite {
   import BLAS.NaiveLevel3.{trsm => referenceTrsm}
