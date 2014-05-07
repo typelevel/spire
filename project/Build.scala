@@ -237,8 +237,6 @@ object MyBuild extends Build {
     settings(benchmarkSettings: _*).
     dependsOn(core)
 
-  lazy val key = AttributeKey[Boolean]("javaOptionsPatched")
-
   lazy val benchmarkSettings = Seq(
     name := "spire-benchmark",
 
