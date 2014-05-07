@@ -45,6 +45,21 @@ case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val
   def maxOrderTermCoeff(implicit ring: Semiring[C]): C =
     if (isZero) ring.zero else coeff(coeff.length - 1)
 
+  def reductum(implicit e: Eq[C], ring: Semiring[C], ct: ClassTag[C]): Polynomial[C] = {
+    var i = coeff.length - 2
+    while (i >= 0 && coeff(i) === ring.zero) i -= 1
+    if (i < 0) {
+      new PolySparse(new Array[Int](0), new Array[C](0))
+    } else {
+      val len = i + 1
+      val es = new Array[Int](len)
+      val cs = new Array[C](len)
+      System.arraycopy(coeff, 0, cs, 0, len)
+      System.arraycopy(exp, 0, es, 0, len)
+      new PolySparse(es, cs)
+    }
+  }
+
   private final def expBits(x: C)(implicit ring: Semiring[C]): Array[C] = {
     val bits = new Array[C](math.max(2, 32 - numberOfLeadingZeros(degree)))
     bits(0) = x
