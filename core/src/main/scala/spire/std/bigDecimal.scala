@@ -68,7 +68,7 @@ trait BigDecimalIsField extends Field[BigDecimal] {
     if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp) else gcd0(bVal, bExp, aVal, aExp)
   }
 
-  override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
+  override def fromDouble(n: Double): BigDecimal = BigDecimal(n, MathContext.UNLIMITED)
   def div(a: BigDecimal, b: BigDecimal) = a / b
 }
 

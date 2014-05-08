@@ -2,6 +2,8 @@ package spire.benchmark
 
 import com.google.caliper.Param
 
+import java.math.MathContext.UNLIMITED
+
 import scala.util.Random
 
 import spire.math._
@@ -24,12 +26,12 @@ object Orient2 {
   // Slow, but correct.
   val slow = new Orient2 {
     def orient(p: Point2, q: Point2, r: Point2): Int = {
-      val px = BigDecimal(p.x)
-      val py = BigDecimal(p.y)
-      val qx = BigDecimal(q.x)
-      val qy = BigDecimal(q.y)
-      val rx = BigDecimal(r.x)
-      val ry = BigDecimal(r.y)
+      val px = BigDecimal(p.x, UNLIMITED)
+      val py = BigDecimal(p.y, UNLIMITED)
+      val qx = BigDecimal(q.x, UNLIMITED)
+      val qy = BigDecimal(q.y, UNLIMITED)
+      val rx = BigDecimal(r.x, UNLIMITED)
+      val ry = BigDecimal(r.y, UNLIMITED)
       ((qx - px) * (ry - py) - (rx - px) * (qy - py)).signum
     }
   }
