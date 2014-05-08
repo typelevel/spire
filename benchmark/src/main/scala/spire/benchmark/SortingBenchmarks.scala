@@ -9,7 +9,6 @@ import Random._
 
 import spire.algebra._
 import spire.math._
-import spire.math.fpf._
 import spire.implicits._
 
 import spire.math.{Numeric => SpireN}

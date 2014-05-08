@@ -7,9 +7,6 @@ import scala.reflect.macros.Context
 import spire.algebra._
 import spire.math._
 
-// TODO:
-// inline lifting - avoid useless companion object access
-
 private[spire] trait Fuser[C <: Context, A] {
   val c: C
   implicit def A: c.WeakTypeTag[A]
