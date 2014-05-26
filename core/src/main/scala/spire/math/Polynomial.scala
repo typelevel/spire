@@ -194,6 +194,9 @@ trait Polynomial[@spec(Double) C] { lhs =>
   /** Returns the coefficient of max term of this polynomial. */
   def maxOrderTermCoeff(implicit ring: Semiring[C]): C
 
+  /** Returns a polynomial with the max term removed. */
+  def reductum(implicit e: Eq[C], ring: Semiring[C], ct: ClassTag[C]): Polynomial[C]
+
   /** Returns `true` if this polynomial is `ring.zero`. */
   def isZero: Boolean
 

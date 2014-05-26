@@ -42,6 +42,18 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   def maxOrderTermCoeff(implicit ring: Semiring[C]): C =
     if (isZero) ring.zero else coeffs(degree)
 
+  def reductum(implicit e: Eq[C], ring: Semiring[C], ct: ClassTag[C]): Polynomial[C] = {
+    var i = coeffs.length - 2
+    while (i >= 0 && coeffs(i) === ring.zero) i -= 1
+    if (i < 0) {
+      new PolyDense(new Array[C](0))
+    } else {
+      val arr = new Array[C](i + 1)
+      System.arraycopy(coeffs, 0, arr, 0, i + 1)
+      new PolyDense(arr)
+    }
+  }
+
   def isZero: Boolean =
     coeffs.length == 0
 

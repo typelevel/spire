@@ -12,10 +12,12 @@ code without having to "bake in" particular numeric representations. In most
 cases, generic implementations using Spire's specialized type classes perform
 identically to corresponding direct implementations.
 
-Spire is provided to you as free software under the MIT license.
+Spire is provided to you as free software under the
+[MIT license](COPYING).
 
-The [Spire mailing list](http://groups.google.com/group/spire-math/) is the
-place to go for announcements and discussion around Spire.
+The [Spire mailing list](http://groups.google.com/group/spire-math/)
+is the place to go for announcements and discussion around Spire. We
+also have a guide on [contributing to Spire](CONTRIBUTING.md).
 
 [![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
 
@@ -471,6 +473,8 @@ measure relative as well as absolute performance.
 Code is offered as-is, with no implied warranty of any kind. Comments,
 criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
-Copyright 2011-2013 Erik Osheim, Tom Switzer
+Copyright 2011-2014 Erik Osheim, Tom Switzer
 
-The MIT software license is attached in the COPYING file.
+A full list of contributors can be found in [AUTHORS.md](AUTHORS.md).
+
+The MIT software license is attached in the [COPYING](COPYING) file.

@@ -52,7 +52,7 @@ object MyBuild extends Build {
 
     scalaVersion := "2.10.2",
 
-    crossScalaVersions := Seq("2.10.2", "2.11.0"),
+    crossScalaVersions := Seq("2.10.2", "2.11.1"),
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
@@ -236,8 +236,6 @@ object MyBuild extends Build {
   lazy val benchmark: Project = Project("benchmark", file("benchmark")).
     settings(benchmarkSettings: _*).
     dependsOn(core)
-
-  lazy val key = AttributeKey[Boolean]("javaOptionsPatched")
 
   lazy val benchmarkSettings = Seq(
     name := "spire-benchmark",
