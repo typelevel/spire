@@ -52,7 +52,7 @@ object MyBuild extends Build {
 
     scalaVersion := "2.10.2",
 
-    crossScalaVersions := Seq("2.10.2", "2.11.0"),
+    crossScalaVersions := Seq("2.10.2", "2.11.1"),
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
