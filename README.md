@@ -31,7 +31,7 @@ To get started with SBT, simply add the following to your `build.sbt` file:
 scalaVersion := "2.10.4"
 // or scalaVersion := "2.11.0"
 
-libraryDependencies += "org.spire-math" %% "spire" % "0.7.4"
+libraryDependencies += "org.spire-math" %% "spire" % "0.7.5"
 ```
 
 (If you must use Spire with 2.9.x, there is an older 0.3.0 release available.)
