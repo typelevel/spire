@@ -9,8 +9,8 @@ import Random._
 
 import spire.algebra._
 import spire.math._
+import spire.math.algebraic._
 import spire.implicits._
-import fpf._
 
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark
@@ -80,7 +80,6 @@ trait BenchmarkData extends MyBenchmark {
   lazy val floats = init(size)(nextFloat)
   lazy val doubles = init(size)(nextDouble)
   lazy val maybeDoubles = init(size)(MaybeDouble(nextDouble))
-  lazy val maybeFloats = init(size)(FastMaybeFloat(nextFloat))
 
   lazy val complexes = init(size)(nextComplex)
   lazy val fcomplexes = init(size)(FastComplex(nextFloat(), nextFloat()))

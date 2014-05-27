@@ -6,8 +6,8 @@ import Random._
 
 import spire.algebra._
 import spire.math._
+import spire.math.algebraic._
 import spire.implicits._
-import fpf._
 
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark
@@ -20,11 +20,9 @@ class MaybeAddBenchmarks extends MyBenchmark {
   var size:Int = 0
 
   var maybeDoubles:Array[MaybeDouble] = null
-  var maybeFloats:Array[Long] = null
 
   override protected def setUp() {
     maybeDoubles = init(size)(MaybeDouble(nextDouble))
-    maybeFloats = init(size)(FastMaybeFloat(nextFloat))
   }
 
   def addMaybeDoublesDirect(data: Array[MaybeDouble]): MaybeDouble = {
@@ -35,14 +33,5 @@ class MaybeAddBenchmarks extends MyBenchmark {
     total
   }
 
-  def addFastMaybeFloatsDirect(data: Array[Long]): Long = {
-    var total = FastMaybeFloat(0f)
-    var i = 0
-    val len = data.length - 1
-    while (i < len) { total = FastMaybeFloat.plus(data(i), data(i + 1)); i += 1 }
-    total
-  }
-
-  def timeAddFastMaybeFloatsDirect(reps:Int) = run(reps)(addFastMaybeFloatsDirect(maybeFloats))
   def timeAddMaybeDoublesDirect(reps:Int) = run(reps)(addMaybeDoublesDirect(maybeDoubles))
 }

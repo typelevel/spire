@@ -1,4 +1,4 @@
-package spire.math.fpf
+package spire.math.algebraic
 
 import spire.algebra.Sign
 import spire.algebra.Sign.{ Positive, Negative, Zero }
