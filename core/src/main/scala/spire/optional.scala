@@ -117,3 +117,55 @@ object rationalTrig {
     def toRadians(a: Rational): Rational = (a / r180) * pi
   }
 }
+
+object unicode {
+  import spire.math._
+
+  type ℍ = Quaternion[Real]
+  type ℂ = Complex[Real]
+  type ℝ = Real
+  type ℚ = Rational
+  type ℤ = SafeLong
+  type ℕ = Natural
+
+  val ⅇ = Real.e
+  val π = Real.pi
+  val φ = (Real(1) + Real(5).sqrt) / Real(2)
+  val ⅈ = Complex.i[Real]
+  val ⅉ = Quaternion.j[Real]
+
+  def ⊤[A](implicit ev: BooleanAlgebra[A]): A = ev.one
+  def ⊥[A](implicit ev: BooleanAlgebra[A]): A = ev.zero
+  def ¬[A](a: A)(implicit ev: BooleanAlgebra[A]): A = ev.complement(a)
+  def √[A](a: A)(implicit ev: NRoot[A]): A = ev.sqrt(a)
+  def ∛[A](a: A)(implicit ev: NRoot[A]): A = ev.nroot(a, 3)
+  def ∜[A](a: A)(implicit ev: NRoot[A]): A = ev.nroot(a, 4)
+
+  def Σ[A](as: Iterable[A])(implicit ev: AdditiveMonoid[A]): A =
+    as.foldLeft(ev.zero)(ev.plus)
+
+  def Π[A](as: Iterable[A])(implicit ev: MultiplicativeMonoid[A]): A =
+    as.foldLeft(ev.one)(ev.times)
+
+  implicit class TimesOp[A](lhs: A)(implicit ev: MultiplicativeSemigroup[A]) {
+    def ∙(rhs: A): A = ev.times(lhs, rhs)
+  }
+
+  implicit class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
+    def ≤(rhs: A): Boolean = ev.lteqv(lhs, rhs)
+    def ≥(rhs: A): Boolean = ev.gteqv(lhs, rhs)
+  }
+
+  implicit class BooleanAlgebraOps[A](lhs: A)(implicit ev: BooleanAlgebra[A]) {
+    def ∧(rhs: A): A = ev.and(lhs, rhs)
+    def ∨(rhs: A): A = ev.or(lhs, rhs)
+
+    def ⊻(rhs: A): A = ev.xor(lhs, rhs)
+    def ⊼(rhs: A): A = ev.nand(lhs, rhs)
+    def ⊽(rhs: A): A = ev.nor(lhs, rhs)
+
+    def ⊃(rhs: A): A = ev.imp(lhs, rhs)
+  }
+
+  implicit def setOps[A](lhs: Interval[A]) = new Interval.SymbolicSetOps(lhs)
+}
