@@ -151,6 +151,14 @@ object unicode {
     def ∙(rhs: A): A = ev.times(lhs, rhs)
   }
 
+  implicit class AnyOps[A](lhs: A) {
+  }
+
+  implicit class EqOps[A](lhs: A)(implicit ev: Eq[A]) {
+    def ≡(rhs: A): Boolean = ev.eqv(lhs, rhs)
+    def ≠(rhs: A): Boolean = a != b
+  }
+
   implicit class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
     def ≤(rhs: A): Boolean = ev.lteqv(lhs, rhs)
     def ≥(rhs: A): Boolean = ev.gteqv(lhs, rhs)
