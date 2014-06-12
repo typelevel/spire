@@ -1,7 +1,6 @@
 package spire.example
 
 import spire.implicits._
-import spire.math._
 
 import java.math.MathContext
 

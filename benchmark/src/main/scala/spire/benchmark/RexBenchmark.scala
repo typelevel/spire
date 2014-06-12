@@ -3,7 +3,6 @@ package spire.benchmark
 import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
-import spire.algebra._
 import spire.implicits._
 import spire.math._
 

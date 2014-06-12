@@ -2,12 +2,8 @@ package spire.math
 
 import spire.algebra.Sign
 import spire.algebra.Sign.{Negative, Zero, Positive}
-import spire.std.int._
-import spire.std.map._
 import spire.syntax.cfor._
-import spire.syntax.std.seq._
 import spire.syntax.nroot._
-import spire.syntax.rng._
 
 import scala.annotation.tailrec
 import scala.collection.mutable

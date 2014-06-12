@@ -4,7 +4,6 @@ import scala.language.experimental.macros
 
 import scala.reflect.macros.Context
 
-import spire.algebra._
 import spire.math._
 
 private[spire] trait Fuser[C <: Context, A] {

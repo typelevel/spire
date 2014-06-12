@@ -1,7 +1,6 @@
 package spire.random
 package mutable
 
-import spire.math._
 import java.io._
 
 class Device(f: File) extends Generator { self =>

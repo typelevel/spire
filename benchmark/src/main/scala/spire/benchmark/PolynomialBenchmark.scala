@@ -3,9 +3,7 @@ package spire.benchmark
 import scala.util.Random
 import Random._
 
-import spire.algebra._
 import spire.math._
-import spire.math.poly._
 import spire.implicits._
 
 import com.google.caliper.{ Runner, SimpleBenchmark, Param }

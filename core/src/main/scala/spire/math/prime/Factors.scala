@@ -5,8 +5,6 @@ import spire.algebra.Sign.{Negative, Zero, Positive}
 import spire.math.SafeLong
 import spire.std.int._
 import spire.std.map._
-import spire.syntax.std.seq._
-import spire.syntax.nroot._
 import spire.syntax.rng._
 
 import scala.annotation.tailrec

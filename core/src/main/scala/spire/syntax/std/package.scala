@@ -1,8 +1,6 @@
 package spire
 package syntax
 
-import spire.syntax.std._
-
 package object std {
   object int extends IntSyntax
   object long extends LongSyntax

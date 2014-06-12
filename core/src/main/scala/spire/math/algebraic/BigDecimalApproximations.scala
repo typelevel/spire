@@ -146,8 +146,6 @@ object BigDecimalApproximations {
         -apply(a, mc)
 
       case KRoot(a, k) => {
-        import spire.implicits._
-
         val ctxt = mc + 1
         val sub = apply(a, ctxt)
         NRoot.nroot(sub, k, ctxt)

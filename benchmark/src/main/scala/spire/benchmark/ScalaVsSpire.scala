@@ -7,7 +7,6 @@ import scala.util.Random
 import Random._
 
 import spire.algebra._
-import spire.math._
 import spire.std.any._
 
 import spire.math.{Numeric => SpireN}

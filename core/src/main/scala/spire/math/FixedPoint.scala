@@ -316,8 +316,6 @@ object FixedPoint {
       def isWhole(x: FixedPoint): Boolean = x.isWhole
       def round(x: FixedPoint): FixedPoint = x.round
 
-      import spire.std.any._
-
       def toRational(x: FixedPoint): Rational = x.toRational
       def toDouble(x: FixedPoint): Double = x.toRational.toDouble
       def toBigDecimal(x: FixedPoint): BigDecimal = x.toRational.toBigDecimal

@@ -1,11 +1,7 @@
 package spire.math
 
 import spire.algebra._
-import spire.std.float._
-import spire.std.double._
-import spire.std.bigDecimal._
 
-import spire.syntax.convertableFrom._
 import spire.syntax.field._
 import spire.syntax.isReal._
 import spire.syntax.nroot._

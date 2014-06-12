@@ -1,8 +1,5 @@
 package spire.math.algebraic
 
-import spire.math._
-
-
 /**
  * A mixin for a `Real` that let's us transform the tree as its being built.
  * In your implementation of `transform`, you'll likely want to play nice and

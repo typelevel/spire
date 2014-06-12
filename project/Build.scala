@@ -76,6 +76,15 @@ object MyBuild extends Build {
     resolvers += Resolver.sonatypeRepo("snapshots"),
     resolvers += Resolver.sonatypeRepo("releases"),
 
+    scalacOptions := {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, 10)) =>
+          scalacOptions.value
+        case Some((2, n)) if n >= 11 =>
+          scalacOptions.value ++ Seq("-Ywarn-unused-import")
+      }
+    },
+
     libraryDependencies := {
       CrossVersion.partialVersion(scalaVersion.value) match {
         // if scala 2.11+ is used, quasiquotes are merged into scala-reflect

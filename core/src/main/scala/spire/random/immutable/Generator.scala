@@ -1,8 +1,6 @@
 package spire.random
 package immutable
 
-import spire.math._
-
 import scala.annotation.tailrec
 import scala.{specialized => spec}
 import scala.reflect.ClassTag

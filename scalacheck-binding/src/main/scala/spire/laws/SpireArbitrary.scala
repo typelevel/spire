@@ -4,7 +4,6 @@ import scala.reflect.ClassTag
 
 import spire.algebra._
 import spire.math._
-import spire.math.Interval.{Bound, Open, Closed, Unbound}
 
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._

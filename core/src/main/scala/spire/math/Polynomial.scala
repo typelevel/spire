@@ -2,7 +2,6 @@ package spire.math
 
 import scala.collection.mutable.ArrayBuilder
 
-import compat._
 import spire.math.poly._
 import scala.annotation.tailrec
 import scala.reflect._

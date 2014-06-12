@@ -1,6 +1,5 @@
 package spire.math.poly
 
-import compat._
 import spire.math._
 import scala.annotation.tailrec
 import scala.reflect._

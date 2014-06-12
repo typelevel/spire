@@ -414,8 +414,6 @@ object Rational extends RationalInstances {
 
 
 private[math] abstract class Rationals[@specialized(Long) A](implicit integral: Integral[A]) {
-  import LongRationals._
-  import BigRationals._
   import integral._
 
   def build(n: A, d: A): Rational

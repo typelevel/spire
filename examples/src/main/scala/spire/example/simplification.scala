@@ -1,9 +1,7 @@
 package spire.example
 
-import spire.algebra._
 import spire.implicits._
 import spire.math._
-import spire.syntax._
 
 import scala.annotation.tailrec
 import scala.collection.IterableLike

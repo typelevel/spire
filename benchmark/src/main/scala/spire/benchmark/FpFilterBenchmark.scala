@@ -7,7 +7,6 @@ import java.math.MathContext.UNLIMITED
 import scala.util.Random
 
 import spire.math._
-import spire.syntax.signed._
 import spire.std.bigDecimal._
 
 case class Point2(x: Double, y: Double)

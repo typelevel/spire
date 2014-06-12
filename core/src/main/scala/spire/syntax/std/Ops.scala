@@ -1,10 +1,9 @@
 package spire.syntax.std
 
-import Predef.{any2stringadd => _, _}
+//import Predef.{any2stringadd => _, _}
 
 import spire.algebra._
 import spire.math._
-import spire.macrosk._
 
 import spire.syntax.cfor._
 import spire.syntax.field._

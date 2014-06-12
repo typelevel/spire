@@ -1,6 +1,5 @@
 package spire.math.algebraic
 
-import spire.math._
 import spire.algebra._
 import spire.std.bigInt._
 

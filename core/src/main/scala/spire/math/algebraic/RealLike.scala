@@ -2,7 +2,6 @@ package spire.math.algebraic
 
 import spire.algebra.Sign
 import spire.algebra.Sign.{ Positive, Zero, Negative }
-import spire.math._
 
 import java.math.MathContext
 

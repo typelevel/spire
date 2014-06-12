@@ -7,8 +7,6 @@ import scala.{specialized => spec}
 import scala.util.Random
 import Random._
 
-import spire.algebra._
-import spire.math._
 import spire.implicits._
 
 import com.google.caliper.Runner 
