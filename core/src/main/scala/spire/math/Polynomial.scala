@@ -2,13 +2,16 @@ package spire.math
 
 import scala.collection.mutable.ArrayBuilder
 
-import spire.math.poly._
 import scala.annotation.tailrec
-import scala.reflect._
-import spire.algebra._
-import spire.implicits._
-
+import scala.reflect.ClassTag
 import scala.{specialized => spec}
+
+import spire.algebra._
+import spire.math.poly._
+import spire.std.array._
+import spire.syntax.field._
+import spire.syntax.eq._
+import spire.syntax.std.seq._
 
 /**
  * Polynomial

@@ -1,12 +1,15 @@
 package spire.math.poly
 
-import spire.math._
 import scala.annotation.tailrec
-import scala.reflect._
-import spire.algebra._
-import spire.implicits._
-
+import scala.reflect.ClassTag
 import scala.{specialized => spec}
+
+import spire.algebra._
+import spire.math._
+import spire.std.array._
+import spire.syntax.cfor._
+import spire.syntax.eq._
+import spire.syntax.field._
 
 // Dense polynomials - Little Endian Coeffs e.g. x^0, x^1, ... x^n
 class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])

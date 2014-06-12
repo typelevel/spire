@@ -91,8 +91,6 @@ object BigDecimalApproximations {
         }
 
       case e @ KRoot(a, k) =>
-        import spire.implicits._
-
         val x = apply(a, max(bits + 1, 1 - a.decimalLowerBound / 2))
 
         // We need to use the upper bound to determine how many bits we need.

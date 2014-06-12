@@ -2,7 +2,8 @@ package spire.math.poly
 
 import spire.math._
 import spire.algebra._
-import spire.implicits._
+import spire.syntax.field._
+import spire.syntax.eq._
 
 import scala.{specialized => spec}
 

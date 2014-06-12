@@ -1,7 +1,7 @@
 package spire.random
 
 import spire.algebra._
-import spire.implicits._
+import spire.syntax.all._
 import spire.math._
 
 import scala.collection.mutable.ArrayBuffer
