@@ -1,9 +1,9 @@
 package spire.std
 
-import spire.algebra._
-
 import scala.collection.TraversableLike
 import scala.collection.generic.CanBuildFrom
+
+import spire.algebra.Monoid
 
 @SerialVersionUID(0L)
 final class IterableMonoid[A, SA <: TraversableLike[A, SA]](implicit cbf: CanBuildFrom[SA, A, SA])

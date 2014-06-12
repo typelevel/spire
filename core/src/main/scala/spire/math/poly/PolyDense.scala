@@ -4,7 +4,7 @@ import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import scala.{specialized => spec}
 
-import spire.algebra._
+import spire.algebra.{Eq, Field, Ring, Rng, Semiring}
 import spire.math.Polynomial
 import spire.std.array._
 import spire.syntax.cfor._

@@ -69,7 +69,7 @@ object SpireArbitrary {
     } yield poly.Term(c, e))
 
   implicit def PolynomialArbitrary[A: Arbitrary: Semiring: Eq: ClassTag]: Arbitrary[Polynomial[A]] =
-    Arbitrary(arbitrary[List[poly.Term[A]]].map(ts => Polynomial(ts)))
+    Arbitrary(arbitrary[List[poly.Term[A]]].map(ts => Polynomial(ts.take(6))))
 
   implicit def ComplexArbitrary[A: Arbitrary]: Arbitrary[Complex[A]] =
     Arbitrary(for {

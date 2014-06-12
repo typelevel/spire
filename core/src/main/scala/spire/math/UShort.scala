@@ -1,6 +1,6 @@
 package spire.math
 
-import spire.algebra._
+import spire.algebra.{IsIntegral, Order, Rig, Signed}
 
 object UShort extends UShortInstances {
   @inline final def apply(n: Char) = new UShort(n)

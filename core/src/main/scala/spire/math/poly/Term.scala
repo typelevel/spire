@@ -2,7 +2,7 @@ package spire.math.poly
 
 import scala.{specialized => spec}
 
-import spire.algebra._
+import spire.algebra.{Eq, Field, Order, Rig, Ring, Rng, Semiring}
 import spire.syntax.field._
 import spire.syntax.eq._
 

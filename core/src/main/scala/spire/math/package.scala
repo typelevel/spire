@@ -1,22 +1,20 @@
 package spire
 
-import spire.algebra._
-
-import scala.annotation.tailrec
-import scala.{specialized => spec}
-
-import spire.std.bigDecimal._
-import spire.syntax.nroot._
-
-import scala.math.ScalaNumericConversions
-
 import java.lang.Long.numberOfTrailingZeros
 import java.lang.Math
 import java.math.BigInteger
 import java.math.MathContext
 import java.math.RoundingMode
 
+import scala.annotation.tailrec
+import scala.{specialized => spec}
+import scala.math.ScalaNumericConversions
+
 import BigDecimal.RoundingMode.{FLOOR, HALF_UP, CEILING}
+
+import spire.algebra.{EuclideanRing, IsReal, NRoot, Order, Signed, Trig}
+import spire.std.bigDecimal._
+import spire.syntax.nroot._
 
 package object math {
 

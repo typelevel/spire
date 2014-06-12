@@ -3,13 +3,13 @@ package spire.math
 import Predef.{any2stringadd => _, _}
 
 import spire.algebra._
+import spire.math.poly.Term
 import spire.std.int._
 import spire.std.option._
 import spire.std.tuples._
 import spire.syntax.field._
 import spire.syntax.nroot._
 import spire.syntax.order._
-import spire.math.poly.Term
 
 /**
  * Interval represents a set of values, usually numbers.

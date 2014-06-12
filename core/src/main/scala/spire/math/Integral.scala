@@ -1,10 +1,9 @@
 package spire.math
 
-import spire.algebra._
-import spire.std._
-import spire.macrosk.Ops
-
 import scala.{specialized => sp}
+
+import spire.algebra.{EuclideanRing, IsReal}
+import spire.std._
 
 trait Integral[@sp(Int,Long) A] extends EuclideanRing[A] with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A]
 

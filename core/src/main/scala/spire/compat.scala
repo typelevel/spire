@@ -1,6 +1,6 @@
 package spire
 
-import spire.algebra._
+import spire.algebra.{Eq, EuclideanRing, Field, Order, Ring, Signed}
 import spire.math.{ConvertableFrom, ConvertableTo}
 import spire.math.{ScalaEquivWrapper, ScalaFractionalWrapper, ScalaIntegralWrapper, ScalaNumericWrapper, ScalaOrderingWrapper}
 

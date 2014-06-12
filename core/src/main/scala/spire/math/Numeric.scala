@@ -1,6 +1,6 @@
 package spire.math
 
-import spire.algebra._
+import spire.algebra.{AdditiveAbGroup, IsReal, MultiplicativeAbGroup, Order, NRoot, Ring, Trig}
 import spire.std._
 
 import scala.{specialized => spec}

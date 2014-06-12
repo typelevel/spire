@@ -1,6 +1,6 @@
 package spire.math.algebraic
 
-import spire.algebra._
+import spire.algebra.NRoot
 import spire.std.bigInt._
 
 /**

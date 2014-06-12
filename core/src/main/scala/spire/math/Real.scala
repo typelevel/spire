@@ -1,8 +1,9 @@
 package spire.math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
+
+import spire.algebra.{Order, Trig, Signed}
 import spire.syntax.nroot._
-import spire.algebra._
 
 sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 

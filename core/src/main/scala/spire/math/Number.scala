@@ -3,9 +3,8 @@ package spire.math
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
-import spire.algebra._
+import spire.algebra.{Eq, EuclideanRing, Field, IsReal, NRoot, Order, Ring, Signed, Trig}
 import spire.std.bigDecimal._
-
 import spire.syntax.isReal._
 import spire.syntax.nroot._
 

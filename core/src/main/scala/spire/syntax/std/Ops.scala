@@ -5,7 +5,7 @@ import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
 import scala.{specialized => sp}
 
-import spire.algebra._
+import spire.algebra.{AdditiveMonoid, Field, MultiplicativeMonoid, NRoot, Order, Signed}
 import spire.math.{Natural, Number, QuickSort, SafeLong, Searching, ULong}
 import spire.syntax.cfor._
 import spire.syntax.field._

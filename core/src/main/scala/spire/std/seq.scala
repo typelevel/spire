@@ -1,13 +1,12 @@
 package spire.std
 
-import spire.algebra._
-
-import spire.NoImplicit
-
 import scala.annotation.tailrec
 import scala.collection.SeqLike
 import scala.collection.mutable.Builder
 import scala.collection.generic.CanBuildFrom
+
+import spire.algebra._
+import spire.NoImplicit
 
 @SerialVersionUID(0L)
 class SeqModule[A, SA <: SeqLike[A, SA]](implicit val scalar: Ring[A], cbf: CanBuildFrom[SA,A,SA])

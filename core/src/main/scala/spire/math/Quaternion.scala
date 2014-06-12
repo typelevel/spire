@@ -1,15 +1,15 @@
 package spire.math
 
-import spire.algebra._
+import java.lang.Math
 
+import scala.annotation.tailrec
+import scala.math.{ScalaNumber, ScalaNumericConversions}
+import scala.{specialized => sp}
+
+import spire.algebra._
 import spire.syntax.field._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
-
-import scala.{specialized => sp}
-import scala.annotation.tailrec
-import scala.math.{ScalaNumber, ScalaNumericConversions}
-import java.lang.Math
 
 object Quaternion extends QuaternionInstances {
   def i[@sp(Float, Double) A](implicit f: Rig[A]): Quaternion[A] =

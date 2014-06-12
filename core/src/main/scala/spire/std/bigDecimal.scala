@@ -1,13 +1,13 @@
 package spire.std
 
-import spire.algebra._
+import java.lang.Math
+import java.math.MathContext
 
 import scala.annotation.tailrec
 
 import BigDecimal.RoundingMode.{CEILING, FLOOR, HALF_UP}
 
-import java.lang.Math
-import java.math.MathContext
+import spire.algebra.{Field, IsReal, NRoot, Order, Signed, Trig}
 
 trait BigDecimalIsField extends Field[BigDecimal] {
   override def minus(a: BigDecimal, b: BigDecimal): BigDecimal = a - b

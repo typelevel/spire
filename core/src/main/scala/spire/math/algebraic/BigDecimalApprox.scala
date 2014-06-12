@@ -1,14 +1,12 @@
 package spire.math.algebraic
 
-import spire.algebra._
+import spire.algebra.Sign
 import spire.algebra.Sign.{ Positive, Negative, Zero }
 import spire.math.{Approximation, ApproximationContext, Fractional, Rational}
 
 import java.math.MathContext
 
-trait BigDecimalApprox[A <: BigDecimalApprox[A]]
-extends RealLike[A] with SeparationBound[A] {
-  self: A =>
+trait BigDecimalApprox[A <: BigDecimalApprox[A]] extends RealLike[A] with SeparationBound[A] { self: A =>
   import BigDecimalApproximations._
 
   def sign: Sign = this match {

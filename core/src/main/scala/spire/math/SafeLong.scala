@@ -3,7 +3,7 @@ package spire.math
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.annotation.tailrec
 
-import spire.algebra._
+import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Ring, Signed}
 import spire.std.long._
 import spire.std.bigInt._
 
