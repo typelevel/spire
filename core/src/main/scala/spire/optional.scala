@@ -53,8 +53,6 @@ object vectorOrder extends VectorOrderLow {
   implicit def seqOrder[A, CC[A] <: SeqLike[A, CC[A]]](implicit
       A0: Order[A], module: Module[CC[A], A]) = new SeqVectorOrder[A, CC[A]]()(A0, module.scalar)
 
-  import spire.std.ArraySupport
-
   implicit def arrayOrder[@spec(Int,Long,Float,Double) A](implicit ev: Order[A], module: Module[Array[A], A]) =
     new ArrayVectorOrder[A]()(ev, module.scalar)
 }
@@ -151,12 +149,9 @@ object unicode {
     def ∙(rhs: A): A = ev.times(lhs, rhs)
   }
 
-  implicit class AnyOps[A](lhs: A) {
-  }
-
   implicit class EqOps[A](lhs: A)(implicit ev: Eq[A]) {
     def ≡(rhs: A): Boolean = ev.eqv(lhs, rhs)
-    def ≠(rhs: A): Boolean = a != b
+    def ≠(rhs: A): Boolean = lhs != rhs
   }
 
   implicit class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
