@@ -2,7 +2,7 @@ package spire.math.algebraic
 
 import spire.algebra._
 import spire.algebra.Sign.{ Positive, Negative, Zero }
-import spire.math._
+import spire.math.{Approximation, ApproximationContext, Fractional, Rational}
 
 import java.math.MathContext
 

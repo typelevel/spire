@@ -1,6 +1,6 @@
 package spire.math.algebraic
 
-import spire.math._
+import spire.math.Rational
 
 /**
  * An `Expr` describes a simple structure for algebraic expressions. Generally,

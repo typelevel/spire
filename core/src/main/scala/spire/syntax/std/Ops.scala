@@ -1,21 +1,17 @@
 package spire.syntax.std
 
-//import Predef.{any2stringadd => _, _}
+import scala.collection.SeqLike
+import scala.collection.generic.CanBuildFrom
+import scala.reflect.ClassTag
+import scala.{specialized => sp}
 
 import spire.algebra._
-import spire.math._
-
+import spire.math.{Natural, Number, QuickSort, SafeLong, Searching, ULong}
 import spire.syntax.cfor._
 import spire.syntax.field._
 import spire.syntax.nroot._
 import spire.syntax.order._
 import spire.syntax.signed._
-
-import scala.reflect.ClassTag
-import scala.{specialized => sp}
-
-import scala.collection.SeqLike
-import scala.collection.generic.CanBuildFrom
 
 final class LiteralIntOps(val lhs: Int) extends AnyVal {
   def /~(rhs: Int): Int = lhs / rhs

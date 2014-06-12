@@ -2,7 +2,7 @@ package spire.random
 
 import scala.{specialized => spec}
 
-import spire.math._
+import spire.math.{Rational, UInt, ULong}
 
 trait Uniform[@spec A] { self =>
   /**

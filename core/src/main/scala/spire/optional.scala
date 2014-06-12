@@ -1,20 +1,19 @@
 package spire.optional
 
-import scala.reflect.ClassTag
+import java.math.BigInteger
+import java.lang.Long.numberOfTrailingZeros
+import java.lang.Math
+
 import scala.annotation.tailrec
+import scala.collection.SeqLike
+import scala.reflect.ClassTag
 import scala.{specialized => spec}
 
 import spire.algebra._
+import spire.math.Rational
 import spire.std.{ SeqVectorEq, SeqVectorOrder }
 import spire.std.{ ArrayVectorEq, ArrayVectorOrder }
 import spire.std.MapVectorEq
-import spire.math._
-
-import java.lang.Long.numberOfTrailingZeros
-import java.lang.Math
-import java.math.BigInteger
-
-import scala.collection.SeqLike
 
 /**
  * This provides an implicit `Eq[A]` for any type `A` using Scala's (Java's)

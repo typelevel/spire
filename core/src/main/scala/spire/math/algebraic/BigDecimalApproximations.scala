@@ -4,7 +4,7 @@ import java.math.{ MathContext, BigDecimal => BigDec }
 
 import spire.algebra.{ NRoot }
 import spire.algebra.Sign.{ Positive, Zero, Negative }
-import spire.math._
+import spire.math.{Approximation, max}
 
 /**
  * Provides absolute and relative approximations to `RealLike` types that have

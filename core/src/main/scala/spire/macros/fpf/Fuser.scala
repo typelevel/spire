@@ -1,10 +1,9 @@
 package spire.macros.fpf
 
 import scala.language.experimental.macros
-
 import scala.reflect.macros.Context
 
-import spire.math._
+import spire.math.{FpFilter, FpFilterApprox, FpFilterExact}
 
 private[spire] trait Fuser[C <: Context, A] {
   val c: C

@@ -6,8 +6,8 @@ import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import scala.{specialized => spec}
 
-import spire.algebra._
-import spire.math._
+import spire.algebra.{Eq, Field, Ring, Rng, Semiring}
+import spire.math.Polynomial
 import spire.std.int._
 import spire.std.array._
 import spire.syntax.field._

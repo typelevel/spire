@@ -2,7 +2,7 @@ package spire.macrosk
 
 import scala.reflect.macros.Context
 
-import spire.math._
+import spire.math.{Rational, UByte, UShort, UInt, ULong}
 
 object Macros {
 

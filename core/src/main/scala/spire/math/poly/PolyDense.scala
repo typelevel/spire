@@ -5,7 +5,7 @@ import scala.reflect.ClassTag
 import scala.{specialized => spec}
 
 import spire.algebra._
-import spire.math._
+import spire.math.Polynomial
 import spire.std.array._
 import spire.syntax.cfor._
 import spire.syntax.eq._

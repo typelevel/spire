@@ -2,7 +2,7 @@ package spire.random
 
 import spire.algebra._
 import spire.syntax.all._
-import spire.math._
+import spire.math.{Complex, Interval, Natural, Rational, SafeLong, UByte, UShort, UInt, ULong}
 
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.SeqLike
