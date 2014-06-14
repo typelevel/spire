@@ -100,6 +100,8 @@ final class MersenneTwister64 protected[random](mt: Array[Long], mti0: Int = 313
   }
 }
 
+
+
 object MersenneTwister64 extends GeneratorCompanion[MersenneTwister64, (Array[Long], Int)] {
 
   @inline private val UpperMask = 0xFFFFFFFF80000000L // = 0xFFFFFFFFFFFFFFFFL ^ Int.MinValue
@@ -118,18 +120,7 @@ object MersenneTwister64 extends GeneratorCompanion[MersenneTwister64, (Array[Lo
 
   @inline private def mag01(x: Long) = if ((x & 1) == 0) 0L else 0xB5026F5AA96619EL
 
-  @volatile private var seedUniquifier = 8682522807148012L;
-
-  def randomSeed(): (Array[Long], Int) = seedFromLong({
-    seedUniquifier += 1; seedUniquifier + System.nanoTime
-  })
-
-  def fromBytes(bytes: Array[Byte]): MersenneTwister64 = fromArray(Pack.longsFromBytes(bytes, bytes.length / 8))
-
-  def fromArray(arr: Array[Long]): MersenneTwister64 =
-    seedFromArray(arr) match {
-      case (mt, mti) => new MersenneTwister64(mt, mti)
-    }
+  def randomSeed(): (Array[Long], Int) = (Utils.seedFromLong(N, Utils.longFromTime()), N + 1)
 
   def fromSeed(seed: (Array[Long], Int)): MersenneTwister64 =
     seed match {
@@ -138,65 +129,9 @@ object MersenneTwister64 extends GeneratorCompanion[MersenneTwister64, (Array[Lo
         new MersenneTwister64(mt, mti)
     }
 
-  def fromTime(time: Long = System.nanoTime) =
-    seedFromLong({
-      seedUniquifier += 1; seedUniquifier + time
-    }) match {
-      case (mt, mti) => new MersenneTwister64(mt, mti)
-    }
+  def fromArray(arr: Array[Long]): MersenneTwister64 = fromSeed((Utils.seedFromArray(N, arr), N + 1))
 
+  def fromBytes(bytes: Array[Byte]): MersenneTwister64 = fromArray(Pack.longsFromBytes(bytes, bytes.length / 8))
 
-  def seedFromLong(seed: Long = 5489): (Array[Long], Int) = {
-    val mt = new Array[Long](N)
-    mt(0) = seed
-
-    cfor(1)(_ < N, _ + 1) {
-      i =>
-        val x = mt(i - 1)
-        mt(i) = 6364136223846793005L * (x ^ (x >>> 62)) + i
-    }
-    (mt, N + 1)
-  }
-
-  def seedFromArray(seed: Array[Long]): (Array[Long], Int) = {
-    val (mt, mti) = seedFromLong(19650218)
-
-    var i = 1
-    var j = 0
-    var k = max(N, seed.length)
-
-    while (k != 0) {
-      val x = mt(i - 1)
-      mt(i) = mt(i) ^ ((x ^ (x >>> 62)) * 3935559000370003845L) + seed(j) + j
-      i += 1
-      j += 1
-
-      if (i >= N) {
-        mt(0) = mt(N_1)
-        i = 1
-      }
-
-      if (j >= seed.length) {
-        j = 0
-      }
-      k -= 1
-    }
-
-    k = N - 1
-    while (k != 0) {
-      val x = mt(i - 1)
-      mt(i) = mt(i) ^ ((x ^ (x >>> 62)) * 2862933555777941757L) - i
-      i += 1
-
-      if (i >= N) {
-        mt(0) = mt(N_1)
-        i = 1
-      }
-
-      k -= 1
-    }
-
-    mt(0) = 1L << 63 // MSB is 1; assuring non-zero initial array
-    (mt, mti)
-  }
+  def fromTime(time: Long = System.nanoTime): MersenneTwister64 = fromSeed((Utils.seedFromLong(N, Utils.longFromTime(time)), N + 1))
 }
