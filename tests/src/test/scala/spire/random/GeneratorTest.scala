@@ -32,7 +32,7 @@ class GeneratorTest extends FunSuite {
     g.getClass.getSimpleName.replace("$", "")
 
   val size: Int = 10000000
-  val threshold: Double = 0.003
+  val threshold: Double = 0.0035
 
   List(Lcg32, Lcg64, BurtleRot2, BurtleRot3, Marsaglia32a6, MersenneTwister32, MersenneTwister64, Cmwc5, Well512a, Well1024a).foreach { gen => 
     val name = getName(gen)
