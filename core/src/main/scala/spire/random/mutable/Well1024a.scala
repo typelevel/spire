@@ -109,8 +109,8 @@ object Well1024a extends GeneratorCompanion[Well1024a, (Array[Int], Int)] {
   /** Third parameter of the algorithm. */
   @inline private final val M3 : Int = 10
 
-  @inline private final def mat0pos(t: Int, v: Int)         = v ^ (v >>> t)
-  @inline private final def mat0neg(t: Int, v: Int)         = v ^ (v << -t)
+  @inline private final def mat0pos(t: Int, v: Int) = v ^ (v >>> t)
+  @inline private final def mat0neg(t: Int, v: Int) = v ^ (v << -t)
                                                                                    
   def randomSeed(): (Array[Int], Int) = (Utils.seedFromInt(R, Utils.intFromTime()), 0)
 
