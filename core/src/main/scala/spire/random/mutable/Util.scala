@@ -20,9 +20,9 @@ import spire.syntax.cfor._
 import spire.math.max
 
 /**
- * This object provides helper functions used for seeding arrays of integers or longs.
+ * This object provides helper functions used for seeding arrays of integers or longs as well as wrapping arrays with index transformers.
  *
- * This is an adaptation/port of code from the the 32-bit and 64-bit implementations of MersenneTwister (MT19937.c, MT19937-64.c).
+ * The seeding functions are an adaptation/port of code from the the 32-bit and 64-bit implementations of MersenneTwister (MT19937.c, MT19937-64.c).
  *
  * <p>MersenneTwister is a fast, 623-dimensionally equidistributed pseudo random number generator
  * with a <tt>2<sup>19937</sup>&nbsp;-&nbsp;1</tt> long period.
