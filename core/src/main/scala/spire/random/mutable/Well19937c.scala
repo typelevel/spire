@@ -23,7 +23,7 @@ import java.nio.ByteBuffer
 import java.util.Arrays
 
 /**
- * This is a Scala implementation of the Well19937c PRNG based on WELL1024a.c.
+ * This is a Scala implementation of the Well19937c PRNG based on WELL19937a.c.
  *
  * <p>The acronym WELL stands for Well Equidistributed Long-period Linear.
  *
@@ -32,7 +32,7 @@ import java.util.Arrays
  * "Improved Long-Period Generators Based on Linear Recurrences Modulo 2",
  * <i>ACM Transactions on Mathematical Software,</i> Vol. 32, No. 1, January 2006, pp 1--16.
  *
- * @see <a href="http://www.iro.umontreal.ca/~panneton/well/WELL19937a.c">WELL1024a.c</a>
+ * @see <a href="http://www.iro.umontreal.ca/~panneton/well/WELL19937a.c">WELL19937a.c</a>
  * @see <a href="http://www.iro.umontreal.ca/~panneton/WELLRNG.html">Well PRNG Home Page</a>
  * @see <a href="http://en.wikipedia.org/wiki/Well_Equidistributed_Long-period_Linear">WELL @ Wikipedia</a>
  * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
