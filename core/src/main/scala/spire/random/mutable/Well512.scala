@@ -14,6 +14,7 @@ import java.util.Arrays
  * 
  * This class uses WELL512a, which contains 512 bits of state.
  */
+@deprecated("Use class Well512a instead", "")
 class Well512 protected[random] (_i: Int, private var state: Array[Int]) extends IntBasedGenerator {
   var i: Int = _i
 

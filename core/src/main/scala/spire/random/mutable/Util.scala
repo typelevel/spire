@@ -40,6 +40,16 @@ import spire.math.max
  */
 object Utils {
 
+  final class IntArrayWrapper(transform: Int => Int, array: Array[Int]) {
+    def apply(i: Int) = array(transform(i))
+    def update(i: Int, v: Int) = array(transform(i)) = v
+  }
+
+  final class LongArrayWrapper(transform: Int => Int, array: Array[Long]) {
+    def apply(i: Int) = array(transform(i))
+    def update(i: Int, v: Int) = array(transform(i)) = v
+  }
+
   @volatile private var seedUniquifier = 8682522807148012L
 
   def intFromTime(time: Long = System.nanoTime) : Int = {
