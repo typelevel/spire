@@ -20,7 +20,7 @@ import spire.syntax.cfor._
 import spire.math.max
 
 /**
- * This object provides helper functions used for seeding arrays of integers or longs as well as wrapping arrays with index transformers.
+ * This object provides helper functions used for seeding arrays of integers or longs.
  *
  * The seeding functions are an adaptation/port of code from the the 32-bit and 64-bit implementations of MersenneTwister (MT19937.c, MT19937-64.c).
  *
@@ -39,16 +39,17 @@ import spire.math.max
  * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
  */
 object Utils {
+  /*
+    final class IntArrayWrapper(transform: Int => Int, array: Array[Int]) {
+      def apply(i: Int) = array(transform(i))
+      def update(i: Int, v: Int) = array(transform(i)) = v
+    }
 
-  final class IntArrayWrapper(transform: Int => Int, array: Array[Int]) {
-    def apply(i: Int) = array(transform(i))
-    def update(i: Int, v: Int) = array(transform(i)) = v
-  }
-
-  final class LongArrayWrapper(transform: Int => Int, array: Array[Long]) {
-    def apply(i: Int) = array(transform(i))
-    def update(i: Int, v: Int) = array(transform(i)) = v
-  }
+    final class LongArrayWrapper(transform: Int => Int, array: Array[Long]) {
+      def apply(i: Int) = array(transform(i))
+      def update(i: Int, v: Int) = array(transform(i)) = v
+   }
+  */
 
   @volatile private var seedUniquifier = 8682522807148012L
 

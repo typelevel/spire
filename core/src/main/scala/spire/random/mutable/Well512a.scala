@@ -41,12 +41,14 @@ final class Well512a protected[random](state: Array[Int], i0: Int) extends IntBa
 
   import Well512a.{K, R, R_1, BYTES, M1, M2, M3, mat0pos, mat0neg, mat3neg, mat4neg}
 
-  @inline private final val v0    = new Utils.IntArrayWrapper(i => i, state)
-  @inline private final val vm1   = new Utils.IntArrayWrapper(i => (i + M1)  & R_1, state)
-  @inline private final val vm2   = new Utils.IntArrayWrapper(i => (i + M2)  & R_1, state)
-  @inline private final val vrm1  = new Utils.IntArrayWrapper(i => (i + R_1) & R_1, state)
-  @inline private final val newV0 = vrm1
-  @inline private final val newV1 = v0
+  /*
+    @inline private final val v0    = new Utils.IntArrayWrapper(i => i, state)
+    @inline private final val vm1   = new Utils.IntArrayWrapper(i => (i + M1)  & R_1, state)
+    @inline private final val vm2   = new Utils.IntArrayWrapper(i => (i + M2)  & R_1, state)
+    @inline private final val vrm1  = new Utils.IntArrayWrapper(i => (i + R_1) & R_1, state)
+    @inline private final val newV0 = vrm1
+    @inline private final val newV1 = v0
+  */
 
   private var i : Int = i0
 
@@ -73,13 +75,26 @@ final class Well512a protected[random](state: Array[Int], i0: Int) extends IntBa
    * Generate an equally-distributed random Int.
    */
   def nextInt(): Int = {
-    val z0: Int = vrm1(i)
-    val z1: Int = mat0neg(-16, v0(i)) ^ mat0neg(-15, vm1(i))
-    val z2: Int = mat0pos(11, vm2(i))
 
-    newV1(i) = z1 ^ z2
-    newV0(i) = mat0neg(-2, z0) ^ mat0neg(-18, z1) ^ mat3neg(-28, z2) ^ mat4neg(-5, 0xda442d24, newV1(i))
-    i = (i + R_1) & R_1
+    @inline def map(r: Int) = (i + r) & R_1
+
+    val z0: Int = state(map(R_1))
+    val z1: Int = mat0neg(-16, state(i)) ^ mat0neg(-15, state(map(M1)))
+    val z2: Int = mat0pos(11, state(map(M2)))
+
+    state(i) = z1 ^ z2
+    state(map(R_1)) = mat0neg(-2, z0) ^ mat0neg(-18, z1) ^ mat3neg(-28, z2) ^ mat4neg(-5, 0xda442d24, state(i))
+    i = map(R_1)
+
+    /*
+      val z0: Int = vrm1(i)
+      val z1: Int = mat0neg(-16, v0(i)) ^ mat0neg(-15, vm1(i))
+      val z2: Int = mat0pos(11, vm2(i))
+
+      newV1(i) = z1 ^ z2
+      newV0(i) = mat0neg(-2, z0) ^ mat0neg(-18, z1) ^ mat3neg(-28, z2) ^ mat4neg(-5, 0xda442d24, newV1(i))
+      i = (i + R_1) & R_1
+    */
 
     state(i)
   }

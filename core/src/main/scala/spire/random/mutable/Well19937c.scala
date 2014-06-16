@@ -41,15 +41,17 @@ final class Well19937c protected[random](state: Array[Int], i0: Int) extends Int
 
   import Well19937c.{UpperMask, LowerMask, K, R, R_1, R_2, BYTES, M1, M2, M3, mat0pos, mat0neg, mat1, mat3pos, TemperB, TemperC}
 
-  @inline private final val v0      = new Utils.IntArrayWrapper(i => i, state)
-  @inline private final val vm1     = new Utils.IntArrayWrapper(i => (i + M1) & R_1, state)
-  @inline private final val vm2     = new Utils.IntArrayWrapper(i => (i + M2) & R_1, state)
-  @inline private final val vm3     = new Utils.IntArrayWrapper(i => (i + M3) & R_1, state)
-  @inline private final val vrm1    = new Utils.IntArrayWrapper(i => (i + R_1) & R_1, state)
-  @inline private final val vrm2    = new Utils.IntArrayWrapper(i => (i + R_2) & R_1, state)
-  @inline private final val newV0   = vrm1
-  @inline private final val newV1   = v0
-  @inline private final val newVrm1 = vrm2
+  /*
+    @inline private final val v0      = new Utils.IntArrayWrapper(i => i, state)
+    @inline private final val vm1     = new Utils.IntArrayWrapper(i => (i + M1) & R_1, state)
+    @inline private final val vm2     = new Utils.IntArrayWrapper(i => (i + M2) & R_1, state)
+    @inline private final val vm3     = new Utils.IntArrayWrapper(i => (i + M3) & R_1, state)
+    @inline private final val vrm1    = new Utils.IntArrayWrapper(i => (i + R_1) & R_1, state)
+    @inline private final val vrm2    = new Utils.IntArrayWrapper(i => (i + R_2) & R_1, state)
+    @inline private final val newV0   = vrm1
+    @inline private final val newV1   = v0
+    @inline private final val newVrm1 = vrm2
+  */
 
   private var i : Int = i0
 
@@ -76,16 +78,29 @@ final class Well19937c protected[random](state: Array[Int], i0: Int) extends Int
    * Generate an equally-distributed random Int.
    */
   def nextInt(): Int = {
-    val z0: Int = (vrm1(i) & LowerMask) | (vrm2(i) & UpperMask)
-    val z1: Int = mat0neg(-25, v0(i)) ^ mat0pos(27, vm1(i))
-    val z2: Int = mat3pos(9, vm2(i)) ^ mat0pos(1, vm3(i))
 
-    newV1(i) = z1 ^ z2
-    newV0(i) = mat1(z0) ^ mat0neg(-9, z1) ^ mat0neg(-21, z2) ^ mat0pos(21, newV1(i))
-    i = (i + R_1) & R_1
+    @inline def map(r: Int) = (i + r) & R_1
+
+    val z0: Int = (state(map(R_1)) & LowerMask) | (state(map(R_2)) & UpperMask)
+    val z1: Int = mat0neg(-25, state(i)) ^ mat0pos(27, state(map(M1)))
+    val z2: Int = mat3pos(9, state(map(M2))) ^ mat0pos(1, state(map(M3)))
+
+    state(i) = z1 ^ z2
+    state(map(R_1)) = mat1(z0) ^ mat0neg(-9, z1) ^ mat0neg(-21, z2) ^ mat0pos(21, state(i))
+    i = map(R_1)
+
+    /*
+      val z0: Int = (vrm1(i) & LowerMask) | (vrm2(i) & UpperMask)
+      val z1: Int = mat0neg(-25, v0(i)) ^ mat0pos(27, vm1(i))
+      val z2: Int = mat3pos(9, vm2(i)) ^ mat0pos(1, vm3(i))
+
+      newV1(i) = z1 ^ z2
+      newV0(i) = mat1(z0) ^ mat0neg(-9, z1) ^ mat0neg(-21, z2) ^ mat0pos(21, newV1(i))
+      i = (i + R_1) & R_1
+    */
 
     // Matsumoto-Kurita tempering to get a ME (maximally equidistributed) generator
-    val t0 = newV0(i)
+    val t0 = state(i)
     val t1 = t0 ^ ((t0 << 7) & TemperB)
     val t2 = t1 ^ ((t1 << 15) & TemperC)
 
