@@ -43,11 +43,11 @@ final class Well19937a protected[random](state: Array[Int], i0: Int) extends Int
 
   /*
     @inline private final val v0      = new Utils.IntArrayWrapper(i => i, state)
-    @inline private final val vm1     = new Utils.IntArrayWrapper(i => (i + M1) & R_1, state)
-    @inline private final val vm2     = new Utils.IntArrayWrapper(i => (i + M2) & R_1, state)
-    @inline private final val vm3     = new Utils.IntArrayWrapper(i => (i + M3) & R_1, state)
-    @inline private final val vrm1    = new Utils.IntArrayWrapper(i => (i + R_1) & R_1, state)
-    @inline private final val vrm2    = new Utils.IntArrayWrapper(i => (i + R_2) & R_1, state)
+    @inline private final val vm1     = new Utils.IntArrayWrapper(i => (i + M1) % R, state)
+    @inline private final val vm2     = new Utils.IntArrayWrapper(i => (i + M2) % R, state)
+    @inline private final val vm3     = new Utils.IntArrayWrapper(i => (i + M3) % R, state)
+    @inline private final val vrm1    = new Utils.IntArrayWrapper(i => (i + R_1) % R, state)
+    @inline private final val vrm2    = new Utils.IntArrayWrapper(i => (i + R_2) % R, state)
     @inline private final val newV0   = vrm1
     @inline private final val newV1   = v0
     @inline private final val newVrm1 = vrm2
@@ -79,7 +79,7 @@ final class Well19937a protected[random](state: Array[Int], i0: Int) extends Int
    */
   def nextInt(): Int = {
 
-    @inline def map(r: Int) = (i + r) & R_1
+    @inline def map(r: Int) = (i + r) % R
 
     val z0: Int = (state(map(R_1)) & LowerMask) | (state(map(R_2)) & UpperMask)
     val z1: Int = mat0neg(-25, state(i)) ^ mat0pos(27, state(map(M1)))
