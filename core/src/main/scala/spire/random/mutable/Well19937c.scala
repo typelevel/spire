@@ -79,7 +79,12 @@ final class Well19937c protected[random](state: Array[Int], i0: Int) extends Int
    */
   def nextInt(): Int = {
 
-    @inline def map(r: Int) = (i + r) % R
+    @inline def map(r: Int) = {
+      val n = i + r
+      if (n >= R) n - R
+      else if (n < 0) n + R
+      else n
+    }
 
     val z0: Int = (state(map(R_1)) & LowerMask) | (state(map(R_2)) & UpperMask)
     val z1: Int = mat0neg(-25, state(i)) ^ mat0pos(27, state(map(M1)))
