@@ -39,7 +39,7 @@ import java.util.Arrays
  */
 final class Well44497a protected[random](state: Array[Int], i0: Int) extends IntBasedGenerator {
 
-  import Well44497a.{UpperMask, LowerMask, K, R, R_1, R_2, BYTES, M1, M2, M3, mat0pos, mat0neg, mat1, mat2, mat3pos, mat3neg, mat4pos, mat4neg, mat5, TemperB, TemperC}
+  import Well44497a.{UpperMask, LowerMask, K, R, R_1, R_2, BYTES, M1, M2, M3, mat0pos, mat0neg, mat1, mat2, mat3pos, mat3neg, mat4pos, mat4neg, mat5}
 
   /*
     @inline private final val v0      = new Utils.IntArrayWrapper(i => i, state)
@@ -107,9 +107,6 @@ object Well44497a extends GeneratorCompanion[Well44497a, (Array[Int], Int)] {
 
   @inline private val UpperMask = 0xFFFFFFFF >>> 17
   @inline private val LowerMask = ~UpperMask
-
-  @inline private val TemperB = 0x93dd1400
-  @inline private val TemperC = 0xfa118000
 
   /** Number of bits in the pool. */
   @inline private final val K : Int = 44497
