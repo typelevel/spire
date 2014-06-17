@@ -375,7 +375,7 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextDouble())
   }
 
-  def timeNextDoubleWell19927c(reps: Int) = run(reps) {
+  def timeNextDoubleWell19937c(reps: Int) = run(reps) {
     val rng = well19937cRng
     var t = 0.0
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextDouble())
