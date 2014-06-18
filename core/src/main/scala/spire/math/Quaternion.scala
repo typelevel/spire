@@ -35,12 +35,12 @@ object Quaternion extends QuaternionInstances {
 }
 
 // really a skew field
+// TODO: This should be Serializable
 private[math] trait QuaternionAlgebra[A]
     extends Field[Quaternion[A]]
     with Eq[Quaternion[A]]
     with NRoot[Quaternion[A]]
-    with InnerProductSpace[Quaternion[A], A]
-    with FieldAlgebra[Quaternion[A], A] {
+    with InnerProductSpace[Quaternion[A], A] {
 
   implicit def f: Fractional[A]
   implicit def t: Trig[A]

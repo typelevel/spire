@@ -21,7 +21,7 @@ trait NormedVectorSpace[V, @spec(Int, Long, Float, Double) F]
 extends VectorSpace[V, F] with MetricSpace[V, F] {
   def norm(v: V): F
 
-  def normalize(v: V): V = divr(v, norm(v))
+  def normalize(v: V)(implicit F: Field[F]): V = divr(v, norm(v))
   def distance(v: V, w: V): F = norm(minus(v, w))
 }
 
@@ -35,7 +35,7 @@ trait NormedVectorSpace0 {
 }
 
 trait NormedVectorSpaceFunctions {
-  def max[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A], order0: Order[A],
+  def max[A, CC[A] <: SeqLike[A, CC[A]]](implicit rng0: Rng[A], order0: Order[A],
       signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] =
     new SeqMaxNormedVectorSpace[A, CC[A]]
 

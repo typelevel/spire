@@ -10,8 +10,8 @@ import scala.collection.mutable.Builder
 import scala.collection.generic.CanBuildFrom
 
 @SerialVersionUID(0L)
-class SeqModule[A, SA <: SeqLike[A, SA]](implicit val scalar: Ring[A], cbf: CanBuildFrom[SA,A,SA])
-extends Module[SA, A] with Serializable {
+class SeqVectorSpace[A, SA <: SeqLike[A, SA]](implicit val scalar: Rng[A], cbf: CanBuildFrom[SA,A,SA])
+extends VectorSpace[SA, A] with Serializable {
   def zero: SA = cbf().result
 
   def negate(sa: SA): SA = sa map (scalar.negate)
@@ -76,11 +76,7 @@ extends Module[SA, A] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class SeqVectorSpace[A, SA <: SeqLike[A, SA]](implicit override val scalar: Field[A], cbf: CanBuildFrom[SA,A,SA])
-extends SeqModule[A, SA] with VectorSpace[SA, A] with Serializable
-
-@SerialVersionUID(0L)
-class SeqInnerProductSpace[A: Field, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA])
+class SeqInnerProductSpace[A, SA <: SeqLike[A, SA]](implicit scalar: Rng[A], cbf: CanBuildFrom[SA,A,SA])
 extends SeqVectorSpace[A, SA] with InnerProductSpace[SA, A] with Serializable {
   def dot(x: SA, y: SA): A = {
     @tailrec
@@ -93,25 +89,6 @@ extends SeqVectorSpace[A, SA] with InnerProductSpace[SA, A] with Serializable {
     }
 
     loop(x.toIterator, y.toIterator, scalar.zero)
-  }
-}
-
-@SerialVersionUID(0L)
-class SeqCoordinateSpace[A: Field, SA <: SeqLike[A, SA]](val dimensions: Int)(implicit cbf: CanBuildFrom[SA,A,SA])
-extends SeqInnerProductSpace[A, SA] with CoordinateSpace[SA, A] with Serializable {
-  def coord(v: SA, i: Int): A = v(i)
-
-  override def dot(v: SA, w: SA): A = super[SeqInnerProductSpace].dot(v, w)
-
-  def axis(i: Int): SA = {
-    val b = cbf()
-
-    @tailrec def loop(j: Int): SA = if (i < dimensions) {
-      b += (if (i == j) scalar.one else scalar.zero)
-      loop(j + 1)
-    } else b.result
-
-    loop(0)
   }
 }
 
@@ -145,7 +122,7 @@ extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
  * norm).
  */
 @SerialVersionUID(0L)
-class SeqMaxNormedVectorSpace[A: Field: Order: Signed, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA]) 
+class SeqMaxNormedVectorSpace[A: Rng: Order: Signed, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA]) 
 extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
   def norm(v: SA): A = {
     @tailrec
@@ -158,7 +135,7 @@ extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
       }
     }
 
-    loop(v.toIterator, scalar.zero)
+    loop(v.toIterator, Rng[A].zero)
   }
 }
 
@@ -245,14 +222,8 @@ extends SeqVectorEq[A, SA] with Order[SA] with Serializable {
   }
 }
 
-trait SeqInstances0 {
-  implicit def SeqModule[A, CC[A] <: SeqLike[A, CC[A]]](implicit
-      ring0: Ring[A], cbf0: CanBuildFrom[CC[A], A, CC[A]],
-      ev: NoImplicit[VectorSpace[CC[A], A]]) = new SeqModule[A, CC[A]]
-}
-
-trait SeqInstances1 extends SeqInstances0 {
-  implicit def SeqVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
+trait SeqInstances1 {
+  implicit def SeqVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit rng0: Rng[A],
       cbf0: CanBuildFrom[CC[A], A, CC[A]],
       ev: NoImplicit[NormedVectorSpace[CC[A], A]]) = new SeqVectorSpace[A, CC[A]]
 
@@ -261,7 +232,7 @@ trait SeqInstances1 extends SeqInstances0 {
 }
 
 trait SeqInstances2 extends SeqInstances1 {
-  implicit def SeqInnerProductSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
+  implicit def SeqInnerProductSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit rng0: Rng[A],
       cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqInnerProductSpace[A, CC[A]]
 
   implicit def SeqOrder[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Order[A]) =

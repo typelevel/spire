@@ -60,7 +60,7 @@ class LawTests extends FunSuite with Discipline {
 
   val max = NormedVectorSpace.max[Rational, List]
   checkAll("List[Rational]",
-    VectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly))
+    VectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly, implicitly))
 
   checkAll("List[Int]",   GroupLaws[List[Int]].monoid)
   checkAll("Vector[Int]", GroupLaws[Vector[Int]].monoid)

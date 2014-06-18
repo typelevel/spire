@@ -114,6 +114,12 @@ trait Ops {
     c.Expr[R](Apply(Select(ev.tree, findMethodName(c)), List(lhs.tree, rhs)))
   }
 
+  def binopWithEv2[A, Ev1, Ev2, R](c: Context)(rhs: c.Expr[A])(ev1:c.Expr[Ev1], ev2:c.Expr[Ev2]): c.Expr[R] = {
+    import c.universe._
+    val lhs = unpackWithoutEv(c)
+    c.Expr[R](Apply(Apply(Select(ev1.tree, findMethodName(c)), List(lhs, rhs.tree)), List(ev2.tree)))
+  }
+
   /**
    * Given an expression like: xyz(lhs)(ev0).plus(rhs: Abc)(ev1)
    * This will create a tree like: ev0.plus(lhs, ev1.fromAbc(rhs))

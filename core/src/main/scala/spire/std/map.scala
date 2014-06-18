@@ -1,6 +1,7 @@
 package spire.std
 
 import spire.algebra._
+import spire.util.MapJoin
 
 import scala.{ specialized => spec }
 import scala.annotation.tailrec
@@ -28,7 +29,7 @@ with Group[Map[K, V]] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class MapRng[K, V](implicit val scalar: Rng[V]) extends RingAlgebra[Map[K, V], V]
+class MapRng[K, V](implicit val scalar: Rng[V]) extends Rng[Map[K, V]] with VectorSpace[Map[K, V], V]
 with Serializable { self =>
   def zero: Map[K, V] = Map.empty
 
@@ -78,6 +79,36 @@ with InnerProductSpace[Map[K, V], V] with Serializable {
 }
 
 @SerialVersionUID(0L)
+class MapBasis[I, K](implicit K: AdditiveMonoid[K]) extends IndexedBasis[Map[I, K], K, I] with Serializable {
+  type Idx = I
+
+  private def zero: K = K.zero
+
+  def hasKnownSize: Boolean = false
+  def size: Int = ???
+
+  def coord(v: Map[I, K], i: I): K = v(i)
+
+  def map(v: Map[I, K])(f: K => K): Map[I, K] =
+    v map { case (i, k) => (i, f(k)) }
+
+  def mapWithIndex(v: Map[I, K])(f: (Idx, K) => K): Map[I, K] =
+    v map { case (i, k) => (i, f(i, k)) }
+
+  def zipMap(v: Map[I, K], w: Map[I, K])(f: (K, K) => K): Map[I, K] =
+    zipMapWithIndex(v, w)((i, k0, k1) => f(k0, k1))
+
+  def zipMapWithIndex(v: Map[I, K], w: Map[I, K])(f: (I, K, K) => K): Map[I, K] =
+    MapJoin.Custom[I, K]((i, l) => f(i, l, zero), (i, r) => f(i, zero, r), f)(v, w)
+
+  def foreachNonZero[U](v: Map[I, K])(f: K => U): Unit =
+    v foreach { case (i, k) => f(k) }
+
+  def foreachNonZeroWithIndex[U](v: Map[I, K])(f: (I, K) => U): Unit =
+    v foreach f.tupled
+}
+
+@SerialVersionUID(0L)
 class MapEq[K, V](implicit V: Eq[V]) extends Eq[Map[K, V]] with Serializable {
   def eqv(x: Map[K, V], y: Map[K, V]): Boolean = {
     if (x.size != y.size) false else {
@@ -119,6 +150,8 @@ trait MapInstances0 {
   implicit def MapMonoid[K, V: Semigroup] = new MapMonoid[K, V]
 
   implicit def MapRng[K, V: Rng] = new MapRng[K, V]
+
+  implicit def MapBasis[K, V: AdditiveMonoid] = new MapBasis[K, V]
 }
 
 trait MapInstances1 extends MapInstances0 {

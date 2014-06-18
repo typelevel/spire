@@ -200,24 +200,15 @@ trait DistField[A] extends Field[Dist[A]] with DistEuclideanRing[A] {
   override def reciprocal(x: Dist[A]): Dist[A] = new DistFromGen(g => alg.reciprocal(x(g)))
 }
 
-trait DistModule[V, K] extends Module[Dist[V], Dist[K]] {
-  implicit def alg: Module[V, K]
+trait DistVectorSpace[V, K] extends VectorSpace[Dist[V], Dist[K]] {
+  implicit def alg: VectorSpace[V, K]
 
-  def scalar: Rng[Dist[K]] = Dist.rng(alg.scalar)
   def zero: Dist[V] = Dist.constant(alg.zero)
   def plus(x: Dist[V], y: Dist[V]): Dist[V] = new DistFromGen(g => x(g) + y(g))
   def negate(x: Dist[V]): Dist[V] = new DistFromGen(g => -x(g))
   override def minus(x: Dist[V], y: Dist[V]): Dist[V] = new DistFromGen(g => x(g) - y(g))
   def timesl(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => k(g) *: v(g))
   def timesr(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => v(g) :* k(g))
-}
-
-trait DistVectorSpace[V, K] extends DistModule[V, K] with VectorSpace[Dist[V], Dist[K]] {
-  implicit def alg: VectorSpace[V, K]
-
-  override def scalar: Field[Dist[K]] = Dist.field(alg.scalar)
-
-  override def divr(v: Dist[V], k: Dist[K]): Dist[V] = new DistFromGen(g => v(g) :/ k(g))
 }
 
 trait DistNormedVectorSpace[V, K] extends DistVectorSpace[V, K]
@@ -429,10 +420,7 @@ trait DistInstances4 extends DistInstances3 {
     new DistField[A] { def alg = ev }
 }
 
-trait DistInstances5 extends DistInstances4 {
-  implicit def module[V,K](implicit ev: Module[V,K]): Module[Dist[V],Dist[K]] =
-    new DistModule[V,K] { def alg = ev }
-}
+trait DistInstances5 extends DistInstances4
 
 trait DistInstances6 extends DistInstances5 {
   implicit def vectorSpace[V,K](implicit ev: VectorSpace[V,K]): VectorSpace[Dist[V],Dist[K]] =

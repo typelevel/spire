@@ -34,13 +34,13 @@ object genericEq {
 
 trait VectorOrderLow {
   implicit def seqEq[A, CC[A] <: SeqLike[A, CC[A]]](implicit
-      A0: Eq[A], module: Module[CC[A], A]) = new SeqVectorEq[A, CC[A]]()(A0, module.scalar)
+      A0: Eq[A], A1: AdditiveMonoid[A], module: VectorSpace[CC[A], A]) = new SeqVectorEq[A, CC[A]]()(A0, A1)
 
-  implicit def arrayEq[@spec(Int,Long,Float,Double) A](implicit ev: Eq[A], module: Module[Array[A], A]) =
-    new ArrayVectorEq[A]()(ev, module.scalar)
+  implicit def arrayEq[@spec(Int,Long,Float,Double) A](implicit A0: Eq[A], A1: AdditiveMonoid[A], module: VectorSpace[Array[A], A]) =
+    new ArrayVectorEq[A]()(A0, A1)
 
-  implicit def mapEq[K, V](implicit V0: Eq[V], module: Module[Map[K, V], V]) =
-    new MapVectorEq[K, V]()(V0, module.scalar)
+  implicit def mapEq[K, V](implicit V0: Eq[V], V1: AdditiveMonoid[V], module: VectorSpace[Map[K, V], V]) =
+    new MapVectorEq[K, V]()(V0, V1)
 }
 
 /**
@@ -51,12 +51,12 @@ trait VectorOrderLow {
  */
 object vectorOrder extends VectorOrderLow {
   implicit def seqOrder[A, CC[A] <: SeqLike[A, CC[A]]](implicit
-      A0: Order[A], module: Module[CC[A], A]) = new SeqVectorOrder[A, CC[A]]()(A0, module.scalar)
+      A0: Order[A], A1: AdditiveMonoid[A], module: VectorSpace[CC[A], A]) = new SeqVectorOrder[A, CC[A]]()(A0, A1)
 
   import spire.std.ArraySupport
 
-  implicit def arrayOrder[@spec(Int,Long,Float,Double) A](implicit ev: Order[A], module: Module[Array[A], A]) =
-    new ArrayVectorOrder[A]()(ev, module.scalar)
+  implicit def arrayOrder[@spec(Int,Long,Float,Double) A](implicit A0: Order[A], A1: AdditiveMonoid[A], module: VectorSpace[Array[A], A]) =
+    new ArrayVectorOrder[A]()(A0, A1)
 }
 
 /**
