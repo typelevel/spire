@@ -5,6 +5,28 @@ import spire.math.{SafeLong, log, max}
 import SieveUtil._
 
 /**
+ * Segmented Stream of Eratosthenes implementation
+ * 
+ * This section really needs some good comments.
+ * 
+ * Some future optimizations:
+ * 
+ * 0. Consider an option to use multiple threads
+ * 1. Faster heap/priority queue
+ * 2. Tune chunkSize
+ * 3. Use Long internally until we have to switch to SafeLong.
+ * 4. Compress the amount of space our heaps take up.
+ * 5. Read more efficient segmented sieves to get other ideas.
+ * 6. Try using a delta-encoded prime log
+ * 
+ * Obviously we are trying to be a bit more flexible than a
+ * traditional prime finder that knows ahead of time what range it
+ * will be operating over, which will hurt performance a bit. Also,
+ * it's not written in C/assembly. So it will probably never be truly
+ * competitive, but I'd like us to do as well as possible.
+ */
+
+/**
  * The Siever manages the segmented sieve process.
  *
  * At any given time, it holds onto a single sieve segment. Thus, the

@@ -206,4 +206,42 @@ package object prime {
     while (x > 1 && x % b == 0) { e += 1; x = x / b }
     (x, e)
   }
+
+  private val SieveSize = 9600 * 1000
+
+  def sieverUpToNth(n: Long): Siever = {
+    val upper = n * log(n) + n * log(log(n - 0.9385))
+    val cutoff = max(1000L, (sqrt(upper) + 512L).toLong)
+    prime.Siever(SieveSize, cutoff)
+  }
+
+  def nth(n: Long): SafeLong =
+    sieverUpToNth(n).nth(n)
+
+  import SafeLong.{two, three}
+
+  def fill(n: Int): Array[SafeLong] = {
+    if (n <= 0) throw new IllegalArgumentException(n.toString)
+    else if (n == 1) Array(two)
+    else {
+      val siever = sieverUpToNth(n)
+      val arr = new Array[SafeLong](n)
+      arr(0) = two
+      arr(1) = three
+      def loop(i: Int, last: SafeLong): Unit =
+        if (i < arr.length) {
+          val p = siever.nextAfter(last)
+          arr(i) = p
+          loop(i + 1, p)
+        }
+      loop(2, three)
+      arr
+    }
+  }
+
+  def stream: Stream[SafeLong] =
+    stream(SieveSize, SafeLong(1000000))
+
+  def stream(chunkSize: Int, cutoff: SafeLong): Stream[SafeLong] =
+    two #:: three #:: prime.Siever(chunkSize, cutoff).streamAfter(three)
 }
