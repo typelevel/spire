@@ -33,13 +33,13 @@ object SieveBenchmark {
     val ns = Try(args.toList.map(_.toLong).filter(_ > 0L)).getOrElse(defaults)
 
     println("warming up the sieves...")
-    defaults.take(8).foreach(n => sieve.nth(n))
+    defaults.take(8).foreach(n => nth(n))
     println("done")
 
     System.gc()
     Thread.sleep(1000)
 
     println("timing the sieve...")
-    ns.foreach(n => timer("  sieve.nth (%s)" format n)(sieve.nth(n)))
+    ns.foreach(n => timer("  sieve.nth (%s)" format n)(nth(n)))
   }
 }
