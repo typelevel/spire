@@ -116,8 +116,19 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
     nn
   }
 
-  def streamAfter(p: SafeLong): Stream[SafeLong] = {
-    val p2 = nextAfter(p)
-    p2 #:: streamAfter(p2)
+  def streamAfter(p0: SafeLong): Stream[SafeLong] = {
+    val p = nextAfter(p0)
+    p #:: streamAfter(p)
+  }
+
+  def arrayAt(p: SafeLong, size: Int): Array[SafeLong] = {
+    val arr = new Array[SafeLong](size)
+    def loop(i: Int, p: SafeLong): Unit =
+      if (i < arr.length) {
+        arr(i) = p
+        loop(i + 1, nextAfter(p))
+      }
+    loop(0, p)
+    arr
   }
 }

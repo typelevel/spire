@@ -239,6 +239,15 @@ package object prime {
     }
   }
 
+  def fill(start: Int, limit: Int): Array[SafeLong] =
+    if (start == 0) fill(limit) else {
+      val siever = sieverUpToNth(start + limit)
+      def loop(i: Int, p: SafeLong): Array[SafeLong] =
+        if (i < start) loop(i + 1, siever.nextAfter(p))
+        else siever.arrayAt(p, limit)
+      loop(1, three)
+    }
+
   def stream: Stream[SafeLong] =
     stream(SieveSize, SafeLong(1000000))
 
