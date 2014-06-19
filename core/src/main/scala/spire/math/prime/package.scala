@@ -23,7 +23,7 @@ import scala.collection.mutable
  * digits or so) and can support semiprimes (products of two
  * similarly-sized primes) of 20-40 digits.
  * 
- * The implementation does cheat, use BigInteger.isProbablePrime(30)
+ * The implementation does cheat, using BigInteger.isProbablePrime(40)
  * to test basic primality. This has a roughly 1-in-1,000,000,000,000
  * chance of being wrong.
  * 
@@ -38,10 +38,10 @@ package object prime {
   /**
    * Determine if the given integer is prime.
    * 
-   * Currently this using a strong pseudo-primality test (so there is
-   * a 1-in-1,000,000,000,000 chance of being wrong).
+   * Currently this is using a strong pseudo-primality test (so there
+   * is a 1-in-1,000,000,000,000 chance of being wrong).
    */
-  def isPrime(n: SafeLong): Boolean = n.isProbablePrime(30)
+  def isPrime(n: SafeLong): Boolean = n.isProbablePrime(40)
 
   /**
    * Factor the given integer with the default factorization method.
@@ -170,8 +170,7 @@ package object prime {
     def factor(n: SafeLong): Factors = {
       if (n == 1) {
         Factors.one
-      } else if (n.isProbablePrime(30)) {
-        // TODO: ~1-in-1T chance of being wrong. too risky?
+      } else if (isPrime(n)) {
         Factors(Map(n -> 1), Positive)
       } else if (n % 2 == 0) {
         var x = n / 2

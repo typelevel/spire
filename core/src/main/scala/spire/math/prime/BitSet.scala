@@ -21,24 +21,24 @@ object BitSet {
   }
 }
 
-case class BitSet(len: Int, arr: Array[Int]) {
-  def length: Int = len
+case class BitSet(len: Long, arr: Array[Int]) {
+  def length: Long = len
 
-  def +=(n: Int) {
-    val q = n >> 5
+  def +=(n: Long) {
+    val q = (n >>> 5).toInt
     arr(q) = arr(q) | (1 << (n & 31))
   }
 
-  def -=(n: Int) {
-    val q = n >> 5
+  def -=(n: Long) {
+    val q = (n >>> 5).toInt
     arr(q) = arr(q) & ~(1 << (n & 31))
   }
 
-  def update(n: Int, b: Boolean): Unit =
+  def update(n: Long, b: Boolean): Unit =
     if (b) this += n else this -= n
 
-  def apply(n: Int): Boolean = {
-    val q = n >> 5
+  def apply(n: Long): Boolean = {
+    val q = (n >>> 5).toInt
     ((arr(q) >>> (n & 31)) & 1) == 1
   }
 

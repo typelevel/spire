@@ -1,37 +1,31 @@
 package spire.math.prime
 
-import scala.reflect.ClassTag
-
-import spire.syntax.cfor._
-
-import Types._
+import SieveUtil._
 
 /**
- * Represents a prime factor which we need to keep track of.
- *
- * The first field 'p' is the prime itself. The 'next' field is the
- * next multiple of the prime that we expect to see.
+ * Simple heap implementation for storing Factors.
  * 
- * We use a slightly non-standard compare() function so that the
- * factor with the smallest 'next' field will be the largest.
- */
-case class Factor(p: N, var next: N) extends Ordered[Factor] {
-  def compare(that: Factor): Int = -(this.next compare that.next)
-}
-
-
-/**
+ * The heap can hold at most ~2B items, which means we can't store
+ * prime factors larger than this.
  * 
+ * The sieve implementation itself uses a cutoff anyway, so we would
+ * only need to be able to hold more than ~2B factors if we wanted to
+ * be able to find primes larger than the (2B * 2B)th prime number.
+ * For these reasons, this particular limitation isn't expected to be
+ * a problem.
  */
 class FactorHeap {
-  var arr: Array[Factor] = new Array[Factor](8)
-  var len: Int = 0
+
+  private[this] var arr: Array[Factor] = new Array[Factor](8)
+  private[this] var len: Int = 0
 
   override def toString: String =
     arr.filter(_ != null).map(_.next).mkString("FactorHeap(", ", ", ")")
 
   def isEmpty: Boolean = len == 0
+
   def nonEmpty: Boolean = len > 0
+
   def size: Int = len
 
   def resizeIfNecessary(): Unit =
