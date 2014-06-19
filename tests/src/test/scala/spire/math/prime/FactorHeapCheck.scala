@@ -17,6 +17,8 @@ import Ordinal._
 
 class FactorHeapCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
+  import SieveUtil._
+
   property("heap property") {
     forAll { (ns0: List[Int]) =>
       val ns = ns0.map(n => Factor(n, n))

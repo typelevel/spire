@@ -93,4 +93,9 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
     }
     nn
   }
+
+  def streamAfter(p: SafeLong): Stream[SafeLong] = {
+    val p2 = nextAfter(p)
+    p2 #:: streamAfter(p2)
+  }
 }
