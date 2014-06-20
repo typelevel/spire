@@ -1,7 +1,7 @@
 package spire.benchmark
 
 import spire.math.prime._
-import scala.util.Try
+import scala.util.{Success, Try}
 
 object SieveBenchmark {
 
@@ -30,7 +30,10 @@ object SieveBenchmark {
       Nil
     )
 
-    val ns = Try(args.toList.map(_.toLong).filter(_ > 0L)).getOrElse(defaults)
+    val ns = Try(args.toList.map(_.toLong).filter(_ > 0L)) match {
+      case Success(ns) if ns.nonEmpty => ns
+      case _ => defaults
+    }
 
     println("warming up the sieves...")
     defaults.take(8).foreach(n => nth(n))
