@@ -55,6 +55,25 @@ class RingIntervalTest extends FunSuite {
   test("b + b") { assert(b + b === cc(-16.0, 4.0)) }
   test("b - b") { assert(b - b === cc(-10.0, 10.0)) }
   test("b * b") { assert(b * b === cc(-16.0, 64.0)) }
+
+  import Interval.{Open, Unbound, Closed}
+  val c = 4.0
+  test("-(c, ∞) =  (-∞, -c)") { 
+    assert( -Interval.fromBounds(Open(c), Unbound()) ===
+      Interval.fromBounds(Unbound(), Open(-c)) )
+  }
+  test("-(-∞, c] =  [-c, ∞)") { 
+    assert( -Interval.fromBounds(Unbound(), Closed(c)) ===
+      Interval.fromBounds(Closed(-c), Unbound()) )
+  }
+  test("(c, ∞) * (-c) =  (-∞, -c * c), c > 0") { 
+    assert( Interval.fromBounds(Open(c), Unbound()) * (-c) ===
+      Interval.fromBounds(Unbound(), Open(-c*c)) )
+  }
+  test("(-∞, c] * (-c) =  [-c * c, ∞), c > 0") { 
+    assert( Interval.fromBounds(Unbound(), Closed(c)) * (-c) ===
+      Interval.fromBounds(Closed(-c*c), Unbound()) )
+  }
 }
 
 // TODO: this is just the tip of the iceberg... we also need to worry about
