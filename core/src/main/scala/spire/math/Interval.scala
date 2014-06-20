@@ -694,8 +694,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def unary_-()(implicit ev: AdditiveGroup[A]): Interval[A] =
     this match {
       case Ranged(l, u, f) => Ranged(-u, -l, swapFlags(f))
-      case Above(l, lf) => Above(-l, lowerFlagToUpper(lf))
-      case Below(u, uf) => Below(-u, upperFlagToLower(uf))
+      case Above(l, lf) => Below(-l, lowerFlagToUpper(lf))
+      case Below(u, uf) => Above(-u, upperFlagToLower(uf))
       case All() => this
     }
 
@@ -703,8 +703,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     if (rhs < ev.zero) {
       this match {
         case Ranged(l, u, f) => Ranged(u * rhs, l * rhs, swapFlags(f))
-        case Above(l, lf) => Above(l * rhs, lowerFlagToUpper(lf))
-        case Below(u, uf) => Below(u * rhs, upperFlagToLower(uf))
+        case Above(l, lf) => Below(l * rhs, lowerFlagToUpper(lf))
+        case Below(u, uf) => Above(u * rhs, upperFlagToLower(uf))
         case All() => this
       }
     } else if (rhs === ev.zero) {
