@@ -14,34 +14,28 @@ import spire.syntax.cfor._
  * want segments that big anyway, so this is OK.
  */
 object BitSet {
-  def alloc(nbuckets: Int): BitSet = {
-    val n: Int = (nbuckets >> 5)
-    val arr = new Array[Int](n)
-    new BitSet(nbuckets, arr)
-  }
+  def alloc(length: Int): BitSet =
+    new BitSet(length, new Array[Int](length >>> 5))
 }
 
-case class BitSet(len: Int, arr: Array[Int]) {
-  def length: Int = len
+case class BitSet(length: Int, array: Array[Int]) {
 
   def +=(n: Int) {
     val q = n >>> 5
-    arr(q) = arr(q) | (1 << (n & 31))
+    array(q) = array(q) | (1 << (n & 31))
   }
 
   def -=(n: Int) {
     val q = n >>> 5
-    arr(q) = arr(q) & ~(1 << (n & 31))
+    array(q) = array(q) & ~(1 << (n & 31))
   }
 
   def update(n: Int, b: Boolean): Unit =
     if (b) this += n else this -= n
 
-  def apply(n: Int): Boolean = {
-    val q = n >>> 5
-    ((arr(q) >>> (n & 31)) & 1) == 1
-  }
+  def apply(n: Int): Boolean =
+    ((array(n >>> 5) >>> (n & 31)) & 1) == 1
 
   def clear(): Unit =
-    cfor(0)(_ < arr.length, _ + 1)(arr(_) = 0)
+    cfor(0)(_ < array.length, _ + 1)(array(_) = 0)
 }

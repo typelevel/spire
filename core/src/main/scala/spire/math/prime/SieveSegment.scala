@@ -93,7 +93,7 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
   }
 
   def initMod30() {
-    val arr = primes.arr
+    val arr = primes.array
     assert(arr.length % 15 == 0)
     val limit = arr.length
     val wheel = SieveSegment.wheel30
