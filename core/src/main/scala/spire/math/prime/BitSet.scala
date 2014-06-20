@@ -9,9 +9,9 @@ import spire.syntax.cfor._
  * Scala's, and to support accessing its internals, which we do in
  * some cases.
  * 
- * The max Int length (~2B) is a current limit to how big individual
- * sieve segments can get. Until our sieving is more efficient, we
- * don't want segments that big anyway, so this is OK.
+ * The max length (~2B) is a current limit to how big individual sieve
+ * segments can get. Until our sieving is more efficient, we don't
+ * want segments that big anyway, so this is OK.
  */
 object BitSet {
   def alloc(nbuckets: Int): BitSet = {
@@ -21,24 +21,24 @@ object BitSet {
   }
 }
 
-case class BitSet(len: Long, arr: Array[Int]) {
-  def length: Long = len
+case class BitSet(len: Int, arr: Array[Int]) {
+  def length: Int = len
 
-  def +=(n: Long) {
-    val q = (n >>> 5).toInt
+  def +=(n: Int) {
+    val q = n >>> 5
     arr(q) = arr(q) | (1 << (n & 31))
   }
 
-  def -=(n: Long) {
-    val q = (n >>> 5).toInt
+  def -=(n: Int) {
+    val q = n >>> 5
     arr(q) = arr(q) & ~(1 << (n & 31))
   }
 
-  def update(n: Long, b: Boolean): Unit =
+  def update(n: Int, b: Boolean): Unit =
     if (b) this += n else this -= n
 
-  def apply(n: Long): Boolean = {
-    val q = (n >>> 5).toInt
+  def apply(n: Int): Boolean = {
+    val q = n >>> 5
     ((arr(q) >>> (n & 31)) & 1) == 1
   }
 

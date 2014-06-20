@@ -192,7 +192,7 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
     else
       primes.length
 
-    var i = 1L
+    var i = 1
     while (i < len) {
       if (primes(i)) {
         val p: SafeLong = start + i

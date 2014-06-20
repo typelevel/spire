@@ -6,13 +6,20 @@ import SieveUtil._
  * Simple heap implementation for storing Factors.
  * 
  * The heap can hold at most ~2B items, which means we can't store
- * prime factors larger than this.
+ * more than this many prime factors.
  * 
- * The sieve implementation itself uses a cutoff anyway, so we would
- * only need to be able to hold more than ~2B factors if we wanted to
- * be able to find primes larger than the (2B * 2B)th prime number.
- * For these reasons, this particular limitation isn't expected to be
- * a problem.
+ * Note that "fast factors" don't end up in this heap, so the number
+ * of primes we can sieve is actaully the max heap size + the number
+ * of fast factors.
+ * 
+ * The sieve implementation itself uses a cutoff, so to test primality
+ * of numbers <= K, we need to be able to store prime factors up to
+ * sqrt(K) in our heap. Since our heap can hold ~2B prime factors,
+ * this means the theoretical upper bound on our segmented sieve is
+ * (~2Bth prime)^2.
+ * 
+ * In practice the sieve will slow down to the point of not being
+ * useful far before we could reach this limit.
  */
 class FactorHeap {
 
