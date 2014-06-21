@@ -18,9 +18,8 @@ package mutable
 
 import spire.syntax.cfor._
 import spire.util.Pack
-import spire.math.max
 import java.nio.ByteBuffer
-import java.util.Arrays
+import java.util
 
 /**
  * This is a Scala implementation of the Well512a PRNG based on WELL512a.c.
@@ -39,7 +38,7 @@ import java.util.Arrays
  */
 final class Well512a protected[random](state: Array[Int], i0: Int) extends IntBasedGenerator {
 
-  import Well512a.{K, R, R_1, BYTES, M1, M2, M3, mat0pos, mat0neg, mat3neg, mat4neg}
+  import Well512a.{R, R_1, BYTES, M1, M2, mat0pos, mat0neg, mat3neg, mat4neg}
 
   /*
     @inline private final val v0    = new Utils.IntArrayWrapper(i => i, state)
@@ -52,7 +51,7 @@ final class Well512a protected[random](state: Array[Int], i0: Int) extends IntBa
 
   private var i : Int = i0
 
-  def copyInit: Well512a = new Well512a(state.clone, i)
+  def copyInit: Well512a = new Well512a(state.clone(), i)
 
   def getSeedBytes(): Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
@@ -64,10 +63,10 @@ final class Well512a protected[random](state: Array[Int], i0: Int) extends IntBa
   }
 
   def setSeedBytes(bytes: Array[Byte]) {
-    val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
+    val bs = if (bytes.length < BYTES) util.Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
 
-    cfor(0)(_ < R, _ + 1) { i => state(i) = bb.getInt() }
+    cfor(0)(_ < R, _ + 1) { i => state(i) = bb.getInt }
     i = bb.getInt
   }
 
@@ -121,7 +120,7 @@ object Well512a extends GeneratorCompanion[Well512a, (Array[Int], Int)] {
   @inline private final val M2 : Int = 9
 
   /** Third parameter of the algorithm. */
-  @inline private final val M3 : Int = 5
+  // @inline private final val M3 : Int = 5
 
   @inline private final def mat0pos(t: Int, v: Int)         = v ^ (v >>> t)
   @inline private final def mat0neg(t: Int, v: Int)         = v ^ (v << -t)
@@ -132,14 +131,14 @@ object Well512a extends GeneratorCompanion[Well512a, (Array[Int], Int)] {
 
   def fromSeed(seed: (Array[Int], Int)): Well512a =
     seed match {
-      case (state, statei) =>
+      case (state, stateIndex) =>
         assert(state.length == R)
-        new Well512a(state, statei)
+        new Well512a(state, stateIndex)
     }
 
-  def fromArray(arr: Array[Int]): Well512a = fromSeed((Utils.seedFromArray(R, arr)), 0)
+  def fromArray(arr: Array[Int]): Well512a = fromSeed(Utils.seedFromArray(R, arr), 0)
 
   def fromBytes(bytes: Array[Byte]): Well512a = fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
 
-  def fromTime(time: Long = System.nanoTime) : Well512a = fromSeed((Utils.seedFromInt(R, Utils.intFromTime(time))), 0)
+  def fromTime(time: Long = System.nanoTime) : Well512a = fromSeed(Utils.seedFromInt(R, Utils.intFromTime(time)), 0)
 }

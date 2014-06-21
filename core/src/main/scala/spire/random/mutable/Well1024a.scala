@@ -18,9 +18,8 @@ package mutable
 
 import spire.syntax.cfor._
 import spire.util.Pack
-import spire.math.max
 import java.nio.ByteBuffer
-import java.util.Arrays
+import java.util
 
 /**
  * This is a Scala implementation of the Well1024a PRNG based on WELL1024a.c.
@@ -39,7 +38,7 @@ import java.util.Arrays
  */
 final class Well1024a protected[random](state: Array[Int], i0: Int) extends IntBasedGenerator {
 
-  import Well1024a.{K, R, R_1, BYTES, M1, M2, M3, mat0pos, mat0neg}
+  import Well1024a.{R, R_1, BYTES, M1, M2, M3, mat0pos, mat0neg}
 
   /*
     @inline private final val v0   = new Utils.IntArrayWrapper(i => i, state)
@@ -53,7 +52,7 @@ final class Well1024a protected[random](state: Array[Int], i0: Int) extends IntB
 
   private var i : Int = i0
 
-  def copyInit: Well1024a = new Well1024a(state.clone, i)
+  def copyInit: Well1024a = new Well1024a(state.clone(), i)
 
   def getSeedBytes(): Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
@@ -65,10 +64,10 @@ final class Well1024a protected[random](state: Array[Int], i0: Int) extends IntB
   }
 
   def setSeedBytes(bytes: Array[Byte]) {
-    val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
+    val bs = if (bytes.length < BYTES) util.Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
 
-    cfor(0)(_ < R, _ + 1) { i => state(i) = bb.getInt() }
+    cfor(0)(_ < R, _ + 1) { i => state(i) = bb.getInt }
     i = bb.getInt
   }
 
@@ -131,14 +130,14 @@ object Well1024a extends GeneratorCompanion[Well1024a, (Array[Int], Int)] {
 
   def fromSeed(seed: (Array[Int], Int)): Well1024a =
     seed match {
-      case (state, statei) =>
+      case (state, stateIndex) =>
         assert(state.length == R)
-        new Well1024a(state, statei)
+        new Well1024a(state, stateIndex)
     }
 
-  def fromArray(arr: Array[Int]): Well1024a = fromSeed((Utils.seedFromArray(R, arr)), 0)
+  def fromArray(arr: Array[Int]): Well1024a = fromSeed(Utils.seedFromArray(R, arr), 0)
 
   def fromBytes(bytes: Array[Byte]): Well1024a = fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
 
-  def fromTime(time: Long = System.nanoTime) : Well1024a = fromSeed((Utils.seedFromInt(R, Utils.intFromTime(time))), 0)
+  def fromTime(time: Long = System.nanoTime) : Well1024a = fromSeed(Utils.seedFromInt(R, Utils.intFromTime(time)), 0)
 }
