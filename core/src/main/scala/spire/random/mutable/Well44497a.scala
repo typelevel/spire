@@ -18,9 +18,8 @@ package mutable
 
 import spire.syntax.cfor._
 import spire.util.Pack
-import spire.math.max
 import java.nio.ByteBuffer
-import java.util.Arrays
+import java.util
 
 /**
  * This is a Scala implementation of the Well44497a PRNG based on WELL44497a.c.
@@ -39,7 +38,7 @@ import java.util.Arrays
  */
 final class Well44497a protected[random](state: Array[Int], i0: Int) extends IntBasedGenerator {
 
-  import Well44497a.{UpperMask, LowerMask, K, R, R_1, R_2, BYTES, M1, M2, M3, mat0pos, mat0neg, mat1, mat2, mat3pos, mat3neg, mat4pos, mat4neg, mat5}
+  import Well44497a.{UpperMask, LowerMask, R, R_1, R_2, BYTES, M1, M2, M3, mat0pos, mat0neg, mat1, mat3neg, mat5}
 
   /*
     @inline private final val v0      = new Utils.IntArrayWrapper(i => i, state)
@@ -55,7 +54,7 @@ final class Well44497a protected[random](state: Array[Int], i0: Int) extends Int
 
   private var i : Int = i0
 
-  def copyInit: Well44497a = new Well44497a(state.clone, i)
+  def copyInit: Well44497a = new Well44497a(state.clone(), i)
 
   def getSeedBytes(): Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
@@ -67,10 +66,10 @@ final class Well44497a protected[random](state: Array[Int], i0: Int) extends Int
   }
 
   def setSeedBytes(bytes: Array[Byte]) {
-    val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
+    val bs = if (bytes.length < BYTES) util.Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
 
-    cfor(0)(_ < R, _ + 1) { i => state(i) = bb.getInt() }
+    cfor(0)(_ < R, _ + 1) { i => state(i) = bb.getInt }
     i = bb.getInt
   }
 
@@ -86,7 +85,7 @@ final class Well44497a protected[random](state: Array[Int], i0: Int) extends Int
       else n
     }
 
-    val z0: Int = (state(map(R_1)) & LowerMask) | (state(map(R_2) & UpperMask))
+    val z0: Int = (state(map(R_1)) & LowerMask) | (state(map(R_2)) & UpperMask)
     val z1: Int = mat0neg(-24, state(i)) ^ mat0pos(30, state(map(M1)))
     val z2: Int = mat0neg(-10, state(map(M2))) ^ mat3neg(-26, state(map(M3)))
 
@@ -140,11 +139,11 @@ object Well44497a extends GeneratorCompanion[Well44497a, (Array[Int], Int)] {
   @inline private final def mat0pos(t: Int, v: Int)         = v ^ (v >>> t)
   @inline private final def mat0neg(t: Int, v: Int)         = v ^ (v << -t)
   @inline private final def mat1(v: Int)                    = v
-  @inline private final def mat2(a: Int, v: Int)            = if ((v & 1) != 0) (v >>> 1) ^ a else (v >>> 1)
-  @inline private final def mat3pos(t: Int, v: Int)         = v >>> t
+  // @inline private final def mat2(a: Int, v: Int)            = if ((v & 1) != 0) (v >>> 1) ^ a else v >>> 1
+  // @inline private final def mat3pos(t: Int, v: Int)         = v >>> t
   @inline private final def mat3neg(t: Int, v: Int)         = v << -t
-  @inline private final def mat4pos(t: Int, b: Int, v: Int) = v ^ ((v >>> t) & b)
-  @inline private final def mat4neg(t: Int, b: Int, v: Int) = v ^ ((v << -t) & b)
+  // @inline private final def mat4pos(t: Int, b: Int, v: Int) = v ^ ((v >>> t) & b)
+  // @inline private final def mat4neg(t: Int, b: Int, v: Int) = v ^ ((v << -t) & b)
   @inline private final def mat5(r: Int, a: Int, ds: Int, dt: Int, v: Int) = {
     if ((v & dt) != 0) {
       (((v << r) ^ (v >>> (32 - r))) & ds) ^ a
@@ -157,14 +156,14 @@ object Well44497a extends GeneratorCompanion[Well44497a, (Array[Int], Int)] {
 
   def fromSeed(seed: (Array[Int], Int)): Well44497a =
     seed match {
-      case (state, statei) =>
+      case (state, stateIndex) =>
         assert(state.length == R)
-        new Well44497a(state, statei)
+        new Well44497a(state, stateIndex)
     }
 
-  def fromArray(arr: Array[Int]): Well44497a = fromSeed((Utils.seedFromArray(R, arr)), 0)
+  def fromArray(arr: Array[Int]): Well44497a = fromSeed(Utils.seedFromArray(R, arr), 0)
 
   def fromBytes(bytes: Array[Byte]): Well44497a = fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
 
-  def fromTime(time: Long = System.nanoTime) : Well44497a = fromSeed((Utils.seedFromInt(R, Utils.intFromTime(time))), 0)
+  def fromTime(time: Long = System.nanoTime) : Well44497a = fromSeed(Utils.seedFromInt(R, Utils.intFromTime(time)), 0)
 }
