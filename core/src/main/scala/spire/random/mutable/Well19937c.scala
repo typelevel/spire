@@ -38,19 +38,7 @@ import java.util
  */
 final class Well19937c protected[random](state: Array[Int], i0: Int) extends IntBasedGenerator {
 
-  import Well19937c.{UpperMask, LowerMask, R, R_1, R_2, BYTES, M1, M2, M3, mat0pos, mat0neg, mat1, mat3pos, TemperB, TemperC}
-
-  /*
-    @inline private final val v0      = new Utils.IntArrayWrapper(i => i, state)
-    @inline private final val vm1     = new Utils.IntArrayWrapper(i => (i + M1) % R, state)
-    @inline private final val vm2     = new Utils.IntArrayWrapper(i => (i + M2) % R, state)
-    @inline private final val vm3     = new Utils.IntArrayWrapper(i => (i + M3) % R, state)
-    @inline private final val vrm1    = new Utils.IntArrayWrapper(i => (i + R_1) % R, state)
-    @inline private final val vrm2    = new Utils.IntArrayWrapper(i => (i + R_2) % R, state)
-    @inline private final val newV0   = vrm1
-    @inline private final val newV1   = v0
-    @inline private final val newVrm1 = vrm2
-  */
+  import Well19937c.{UpperMask, LowerMask, R, BYTES, mat0pos, mat0neg, mat1, mat3pos, TemperB, TemperC}
 
   private var i : Int = i0
 
@@ -78,30 +66,15 @@ final class Well19937c protected[random](state: Array[Int], i0: Int) extends Int
    */
   def nextInt(): Int = {
 
-    @inline def map(r: Int) = {
-      val n = i + r
-      if (n >= R) n - R
-      else if (n < 0) n + R
-      else n
-    }
+    import Well19937acIndexCache._
 
-    val z0: Int = (state(map(R_1)) & LowerMask) | (state(map(R_2)) & UpperMask)
-    val z1: Int = mat0neg(-25, state(i)) ^ mat0pos(27, state(map(M1)))
-    val z2: Int = mat3pos(9, state(map(M2))) ^ mat0pos(1, state(map(M3)))
+    val z0: Int = (state(vrm1(i)) & LowerMask) | (state(vrm2(i)) & UpperMask)
+    val z1: Int = mat0neg(-25, state(i)) ^ mat0pos(27, state(vm1(i)))
+    val z2: Int = mat3pos(9, state(vm2(i))) ^ mat0pos(1, state(vm3(i)))
 
     state(i) = z1 ^ z2
-    state(map(R_1)) = mat1(z0) ^ mat0neg(-9, z1) ^ mat0neg(-21, z2) ^ mat0pos(21, state(i))
-    i = map(R_1)
-
-    /*
-      val z0: Int = (vrm1(i) & LowerMask) | (vrm2(i) & UpperMask)
-      val z1: Int = mat0neg(-25, v0(i)) ^ mat0pos(27, vm1(i))
-      val z2: Int = mat3pos(9, vm2(i)) ^ mat0pos(1, vm3(i))
-
-      newV1(i) = z1 ^ z2
-      newV0(i) = mat1(z0) ^ mat0neg(-9, z1) ^ mat0neg(-21, z2) ^ mat0pos(21, newV1(i))
-      i = (i + R_1) & R_1
-    */
+    state(vrm1(i)) = mat1(z0) ^ mat0neg(-9, z1) ^ mat0neg(-21, z2) ^ mat0pos(21, state(i))
+    i = vrm1(i)
 
     // Matsumoto-Kurita tempering to get a ME (maximally equidistributed) generator
     val t0 = state(i)
@@ -127,22 +100,22 @@ object Well19937c extends GeneratorCompanion[Well19937c, (Array[Int], Int)] {
   @inline private final val R : Int = (K + 31) / 32
 
   /** Length of the pool in ints -1. */
-  @inline private final val R_1 : Int = R - 1
+  // @inline private final val R_1 : Int = R - 1
 
   /** Length of the pool in ints -2. */
-  @inline private final val R_2 : Int = R - 2
+  // @inline private final val R_2 : Int = R - 2
 
   /** Length of the pool and index in bytes */
   @inline private final val BYTES = R * 4 + 4
 
   /** First parameter of the algorithm. */
-  @inline private final val M1 : Int = 70
+  // @inline private final val M1 : Int = 70
 
   /** Second parameter of the algorithm. */
-  @inline private final val M2 : Int = 179
+  // @inline private final val M2 : Int = 179
 
   /** Third parameter of the algorithm. */
-  @inline private final val M3 : Int = 449
+  // @inline private final val M3 : Int = 449
 
   @inline private final def mat0pos(t: Int, v: Int) = v ^ (v >>> t)
   @inline private final def mat0neg(t: Int, v: Int) = v ^ (v << -t)
