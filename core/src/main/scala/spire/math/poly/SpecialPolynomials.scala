@@ -4,9 +4,8 @@ import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import scala.{specialized => spec}
 
-import spire.algebra._
+import spire.algebra.{Eq, Field, Ring}
 import spire.math.Polynomial
-import spire.syntax.eq._
 import spire.syntax.field._
 
 object SpecialPolynomials {

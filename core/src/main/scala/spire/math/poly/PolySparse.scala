@@ -9,7 +9,6 @@ import scala.{specialized => spec}
 import spire.algebra.{Eq, Field, Ring, Rng, Semiring}
 import spire.math.Polynomial
 import spire.std.int._
-import spire.std.array._
 import spire.syntax.field._
 import spire.syntax.eq._
 import spire.syntax.cfor._

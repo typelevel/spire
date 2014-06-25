@@ -2,8 +2,6 @@ package spire.random
 package rng
 
 import spire.util.Pack
-import spire.math._
-import java.nio.ByteBuffer
 
 final class Serial(seed0: Long) extends LongBasedGenerator {
   private[this] var seed: Long = seed0

@@ -1,12 +1,6 @@
 package spire.math.prime
 
-import scala.annotation.tailrec
-import scala.collection.mutable.{ArrayBuffer, PriorityQueue}
-import System.arraycopy
-
-import spire.math._
-import spire.syntax.cfor._
-import spire.syntax.order._
+import spire.math.SafeLong
 
 object SieveUtil {
 

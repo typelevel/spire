@@ -1,10 +1,5 @@
 package spire.random
 
-import spire.algebra._
-import spire.implicits._
-import spire.math._
-import spire.syntax.cfor._
-
 import scala.collection.mutable.{ArrayBuffer, Builder}
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom

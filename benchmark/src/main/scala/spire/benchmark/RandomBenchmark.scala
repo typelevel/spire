@@ -1,6 +1,5 @@
 package spire.benchmark
 
-import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
 import spire.implicits._
@@ -36,26 +35,17 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
 
   val javaRng = new java.util.Random(long)
   val scalaRng = new scala.util.Random(long)
-<<<<<<< HEAD
   val lcg32Rng = spire.random.rng.Lcg32.fromSeed(int)
   val lcg64Rng = spire.random.rng.Lcg64.fromSeed(long)
   val burtle2Rng = spire.random.rng.BurtleRot2.fromSeed(ints4)
   val burtle3Rng = spire.random.rng.BurtleRot3.fromSeed(ints4)
   val cmwc5Rng = spire.random.rng.Cmwc5.fromSeed(longs5)
-  val well512Rng = spire.random.rng.Well512.fromSeed(ints16)
-=======
-  val lcg32Rng = spire.random.mutable.Lcg32.fromSeed(int)
-  val lcg64Rng = spire.random.mutable.Lcg64.fromSeed(long)
-  val burtle2Rng = spire.random.mutable.BurtleRot2.fromSeed(ints4)
-  val burtle3Rng = spire.random.mutable.BurtleRot3.fromSeed(ints4)
-  val cmwc5Rng = spire.random.mutable.Cmwc5.fromSeed(longs5)
-  val well512aRng = spire.random.mutable.Well512a.fromSeed(ints16, 0)
-  val well1024aRng = spire.random.mutable.Well1024a.fromArray(ints16)
-  val well19937aRng = spire.random.mutable.Well19937a.fromArray(ints16)
-  val well19937cRng = spire.random.mutable.Well19937c.fromArray(ints16)
-  val well44497aRng = spire.random.mutable.Well44497a.fromArray(ints16)
-  val well44497bRng = spire.random.mutable.Well44497b.fromArray(ints16)
->>>>>>> origin/master
+  val well512aRng = spire.random.rng.Well512a.fromSeed(ints16, 0)
+  val well1024aRng = spire.random.rng.Well1024a.fromArray(ints16)
+  val well19937aRng = spire.random.rng.Well19937a.fromArray(ints16)
+  val well19937cRng = spire.random.rng.Well19937c.fromArray(ints16)
+  val well44497aRng = spire.random.rng.Well44497a.fromArray(ints16)
+  val well44497bRng = spire.random.rng.Well44497b.fromArray(ints16)
 
   @inline final def nextLen = 1000000
 
