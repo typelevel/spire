@@ -20,13 +20,13 @@ class GaussianTest extends FunSuite {
     assert(isGaussian(xs, mean, stdDev) === true)
   }
 
-  test("mutable.Lcg64#nextGaussian is normal") {
-    val gen = mutable.Lcg64.fromTime(42L)
+  test("rng.Lcg64#nextGaussian is normal") {
+    val gen = rng.Lcg64.fromTime(42L)
     checkGaussian[Double](gen.nextGaussian(_, _))
   }
 
   def checkMarsagliaGaussian[A: Field: NRoot: Trig: IsReal: Uniform: ClassTag] = {
-    val gen = mutable.Lcg64.fromTime(42L)
+    val gen = rng.Lcg64.fromTime(42L)
     val gaussian = new MarsagliaGaussian[A]
     checkGaussian[A] { (mean, stdDev) =>
       gaussian(mean, stdDev)(gen)

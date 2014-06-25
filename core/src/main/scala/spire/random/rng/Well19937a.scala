@@ -14,7 +14,7 @@
 
 package spire
 package random
-package mutable
+package rng
 
 import spire.syntax.cfor._
 import spire.util.Pack
@@ -22,7 +22,7 @@ import java.nio.ByteBuffer
 import java.util
 
 /**
- * This is a Scala implementation of the Well1024a PRNG based on WELL1024a.c.
+ * This is a Scala implementation of the Well19937a PRNG based on WELL19937a.c.
  *
  * <p>The acronym WELL stands for Well Equidistributed Long-period Linear.
  *
@@ -31,28 +31,18 @@ import java.util
  * "Improved Long-Period Generators Based on Linear Recurrences Modulo 2",
  * <i>ACM Transactions on Mathematical Software,</i> Vol. 32, No. 1, January 2006, pp 1--16.
  *
- * @see <a href="http://www.iro.umontreal.ca/~panneton/well/WELL1024a.c">WELL1024a.c</a>
+ * @see <a href="http://www.iro.umontreal.ca/~panneton/well/WELL19937a.c">WELL19937a.c</a>
  * @see <a href="http://www.iro.umontreal.ca/~panneton/WELLRNG.html">Well PRNG Home Page</a>
  * @see <a href="http://en.wikipedia.org/wiki/Well_Equidistributed_Long-period_Linear">WELL @ Wikipedia</a>
  * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
  */
-final class Well1024a protected[random](state: Array[Int], i0: Int) extends IntBasedGenerator {
+final class Well19937a protected[random](state: Array[Int], i0: Int) extends IntBasedGenerator {
 
-  import Well1024a.{R, R_1, BYTES, M1, M2, M3, mat0pos, mat0neg}
-
-  /*
-    @inline private final val v0   = new Utils.IntArrayWrapper(i => i, state)
-    @inline private final val vm1  = new Utils.IntArrayWrapper(i => (i + M1)  & R_1, state)
-    @inline private final val vm2  = new Utils.IntArrayWrapper(i => (i + M2)  & R_1, state)
-    @inline private final val vm3  = new Utils.IntArrayWrapper(i => (i + M3)  & R_1, state)
-    @inline private final val vrm1 = new Utils.IntArrayWrapper(i => (i + R_1) & R_1, state)
-    @inline private final val newV0 = vrm1
-    @inline private final val newV1 = v0
-  */
+  import Well19937a.{UpperMask, LowerMask, R, BYTES, mat0pos, mat0neg, mat1, mat3pos}
 
   private var i : Int = i0
 
-  def copyInit: Well1024a = new Well1024a(state.clone(), i)
+  def copyInit: Well19937a = new Well19937a(state.clone(), i)
 
   def getSeedBytes(): Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
@@ -76,68 +66,66 @@ final class Well1024a protected[random](state: Array[Int], i0: Int) extends IntB
    */
   def nextInt(): Int = {
 
-    @inline def map(r: Int) = (i + r) & R_1
+    import Well19937acIndexCache._
 
-    val z0: Int = state(map(R_1))
-    val z1: Int = state(i) ^ mat0pos(8, state(map(M1)))
-    val z2: Int = mat0neg(-19, state(map(M2))) ^ mat0neg(-14, state(map(M3)))
+    val z0: Int = (state(vrm1(i)) & LowerMask) | (state(vrm2(i)) & UpperMask)
+    val z1: Int = mat0neg(-25, state(i)) ^ mat0pos(27, state(vm1(i)))
+    val z2: Int = mat3pos(9, state(vm2(i))) ^ mat0pos(1, state(vm3(i)))
 
     state(i) = z1 ^ z2
-    state(map(R_1)) = mat0neg(-11, z0) ^ mat0neg(-7, z1) ^ mat0neg(-13, z2)
-    i = map(R_1)
-
-    /*
-      val z0: Int = vrm1(i)
-      val z1: Int = v0(i) ^ mat0pos(8, vm1(i))
-      val z2: Int = mat0neg(-19, vm2(i)) ^ mat0neg(-14, vm3(i))
-
-      newV1(i) = z1 ^ z2
-      newV0(i) = mat0neg(-11, z0) ^ mat0neg(-7, z1) ^ mat0neg(-13, z2)
-      i = (i + R_1) & R_1
-    */
+    state(vrm1(i)) = mat1(z0) ^ mat0neg(-9, z1) ^ mat0neg(-21, z2) ^ mat0pos(21, state(i))
+    i = vrm1(i)
 
     state(i)
   }
 }
 
-object Well1024a extends GeneratorCompanion[Well1024a, (Array[Int], Int)] {
+object Well19937a extends GeneratorCompanion[Well19937a, (Array[Int], Int)] {
+
+  @inline private val UpperMask = 0x7FFFFFFF // = 0xFFFFFFFF ^ Int.MinValue
+  @inline private val LowerMask = 0x80000000 // = Int.MinValue
 
   /** Number of bits in the pool. */
-  @inline private final val K : Int = 1024
+  @inline private final val K : Int = 19937
 
   /** Length of the pool in ints. */
-  @inline private final val R : Int = K / 32
+  @inline private final val R : Int = (K + 31) / 32
 
   /** Length of the pool in ints -1. */
-  @inline private final val R_1 : Int = R - 1
+  // @inline private final val R_1 : Int = R - 1
+
+  /** Length of the pool in ints -2. */
+  // @inline private final val R_2 : Int = R - 2
 
   /** Length of the pool and index in bytes */
   @inline private final val BYTES = R * 4 + 4
 
   /** First parameter of the algorithm. */
-  @inline private final val M1 : Int = 3
+  // @inline private final val M1 : Int = 70
 
   /** Second parameter of the algorithm. */
-  @inline private final val M2 : Int = 24
+  // @inline private final val M2 : Int = 179
 
   /** Third parameter of the algorithm. */
-  @inline private final val M3 : Int = 10
+  // @inline private final val M3 : Int = 449
 
   @inline private final def mat0pos(t: Int, v: Int) = v ^ (v >>> t)
   @inline private final def mat0neg(t: Int, v: Int) = v ^ (v << -t)
+  @inline private final def mat1(v: Int)            = v
+  @inline private final def mat3pos(t: Int, v: Int) = v >>> t
                                                                                    
   def randomSeed(): (Array[Int], Int) = (Utils.seedFromInt(R, Utils.intFromTime()), 0)
 
-  def fromSeed(seed: (Array[Int], Int)): Well1024a =
+  def fromSeed(seed: (Array[Int], Int)): Well19937a =
     seed match {
       case (state, stateIndex) =>
         assert(state.length == R)
-        new Well1024a(state, stateIndex)
+        new Well19937a(state, stateIndex)
     }
 
-  def fromArray(arr: Array[Int]): Well1024a = fromSeed(Utils.seedFromArray(R, arr), 0)
+  def fromArray(arr: Array[Int]): Well19937a = fromSeed(Utils.seedFromArray(R, arr), 0)
 
-  def fromBytes(bytes: Array[Byte]): Well1024a = fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
+  def fromBytes(bytes: Array[Byte]): Well19937a = fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
 
-  def fromTime(time: Long = System.nanoTime) : Well1024a = fromSeed(Utils.seedFromInt(R, Utils.intFromTime(time)), 0)
+  def fromTime(time: Long = System.nanoTime) : Well19937a = fromSeed(Utils.seedFromInt(R, Utils.intFromTime(time)), 0)
 }

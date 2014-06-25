@@ -7,10 +7,8 @@ import scala.{specialized => sp}
 
 import spire.algebra._
 import spire.std.array._
-import spire.syntax.eq._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
-import spire.syntax.std.array._
 import spire.syntax.vectorSpace._
 
 /**

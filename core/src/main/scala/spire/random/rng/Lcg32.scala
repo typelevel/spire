@@ -1,13 +1,13 @@
 package spire.random
-package mutable
+package rng
 
 import spire.util.Pack
 
 // Linear congruent RNG with 32-bits of state.
 // Numbers as in Numerical Recipes in C, 2nd ed.
 // Contributed by Rex Kerr.
-class Lcg32(_seed: Int) extends IntBasedGenerator {
-  private var seed: Int = _seed
+class Lcg32(seed0: Int) extends IntBasedGenerator {
+  private var seed: Int = seed0
 
   def copyInit: Lcg32 = new Lcg32(seed)
 

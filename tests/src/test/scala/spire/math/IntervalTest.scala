@@ -187,6 +187,8 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
+  val rng = spire.random.GlobalRng
+
   property("(x -- y) ⊆ x && (x -- y) & y = Ø") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
       (x -- y).foreach { zi =>
@@ -215,8 +217,6 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
       (x -- Interval.all[Rational]) shouldBe Nil
     }
   }
-
-  val rng = spire.random.mutable.GlobalRng
 
   def sample(int: Interval[Rational], n: Int): Array[Rational] =
     if (int.isEmpty) {

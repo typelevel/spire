@@ -1,5 +1,5 @@
 package spire.random
-package mutable
+package rng
 
 import spire.util.Pack
 import java.nio.ByteBuffer

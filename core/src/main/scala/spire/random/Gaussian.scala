@@ -6,7 +6,6 @@ import scala.{specialized => spec}
 import scala.annotation.tailrec
 
 import spire.algebra.{Field, NRoot, Order, Trig}
-import spire.random.mutable.Generator
 
 trait Gaussian[@spec(Float,Double) A] {
   /**

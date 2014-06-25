@@ -14,7 +14,7 @@
 
 package spire
 package random
-package mutable
+package rng
 
 /**
  * This is an Index Cache for the Well19937a and Well19937c implementations.
