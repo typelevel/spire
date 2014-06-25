@@ -5,8 +5,7 @@ import java.math.MathContext
 import scala.{specialized => spec}
 import scala.annotation.tailrec
 
-import spire.math._
-import spire.algebra._
+import spire.algebra.{Field, NRoot, Order, Trig}
 
 trait Gaussian[@spec(Float,Double) A] {
   /**

@@ -1,11 +1,10 @@
-package spire.math.fpf
-
-import spire.algebra.Sign
-import spire.algebra.Sign.{ Positive, Negative, Zero }
-import spire.math._
+package spire.math.algebraic
 
 import java.lang.Double.{ NaN, isNaN, isInfinite }
 
+import spire.algebra.Sign
+import spire.algebra.Sign.{ Positive, Negative, Zero }
+import spire.math.{max, Rational}
 
 /**
  * A `MaybeDouble` will hold a `Double` approximation so long as the `Double`'s
@@ -42,7 +41,7 @@ final class MaybeDouble(val approx: Double, private val mes: Double, private val
   def isValid: Boolean = !invalid
 
 
-  def abs: MaybeDouble = new MaybeDouble(math.abs(approx), mes, ind)
+  def abs: MaybeDouble = new MaybeDouble(spire.math.abs(approx), mes, ind)
 
   def unary_-(): MaybeDouble = new MaybeDouble(-approx, mes, ind)
 
@@ -57,12 +56,12 @@ final class MaybeDouble(val approx: Double, private val mes: Double, private val
 
   def /(that: MaybeDouble): MaybeDouble =
     new MaybeDouble(approx / that.approx, 
-             (math.abs(approx) / math.abs(that.approx) + (mes / that.mes)) /
-                (math.abs(that.approx) / that.mes - (that.ind + 1) * eps),
+             (spire.math.abs(approx) / spire.math.abs(that.approx) + (mes / that.mes)) /
+                (spire.math.abs(that.approx) / that.mes - (that.ind + 1) * eps),
              1 + max(ind, that.ind + 1))
     
   def pow(k: Int): MaybeDouble = if (k > 0) {
-    new MaybeDouble(math.pow(approx, k), math.pow(mes, k), ind + k)
+    new MaybeDouble(spire.math.pow(approx, k), spire.math.pow(mes, k), ind + k)
   } else if (k == 0) {
     new MaybeDouble(1.0, 1.0, 0)
   } else {
@@ -70,7 +69,7 @@ final class MaybeDouble(val approx: Double, private val mes: Double, private val
     // In this case, we just do a positive pow, and divide 1 by it.
     
     val b = this.pow(-k)
-    val mes = (1 / math.abs(b.approx) + 1 / b.mes) / (math.abs(b.approx) / b.mes - (b.mes + 1) * eps)
+    val mes = (1 / spire.math.abs(b.approx) + 1 / b.mes) / (spire.math.abs(b.approx) / b.mes - (b.mes + 1) * eps)
     new MaybeDouble(1 / b.approx, mes, b.ind + 2)
   }
 
@@ -80,13 +79,13 @@ final class MaybeDouble(val approx: Double, private val mes: Double, private val
   def nroot(n: Int): MaybeDouble = if (n == 2) sqrt else Invalid
    
   def sqrt: MaybeDouble = {
-    val x = math.sqrt(approx)
+    val x = spire.math.sqrt(approx)
 
     if (invalid || approx <= 0.0) {
 
       // If a < 0, then sqrt(a) == NaN, which is OK for now.
       
-      new MaybeDouble(x, math.sqrt(mes) * (1 << 26), ind + 1)
+      new MaybeDouble(x, spire.math.sqrt(mes) * (1 << 26), ind + 1)
     } else {
       new MaybeDouble(x, (mes / approx) * x, ind + 1)
     }
@@ -236,8 +235,8 @@ object MaybeDouble {
   def apply(x: Rational): MaybeDouble = approx(x.toDouble)
   def apply(x: BigDecimal): MaybeDouble = approx(x.toDouble)
 
-  def exact(x: Double): MaybeDouble = new MaybeDouble(x, abs(x), 0)
-  def approx(x: Double): MaybeDouble = new MaybeDouble(x, abs(x), 1)
+  def exact(x: Double): MaybeDouble = new MaybeDouble(x, spire.math.abs(x), 0)
+  def approx(x: Double): MaybeDouble = new MaybeDouble(x, spire.math.abs(x), 1)
 }
 
 

@@ -87,7 +87,6 @@ abstract class AutoOps {
 }
 
 abstract class AutoAlgebra extends AutoOps { ops =>
-  import c.universe._
 
   def plus[A: c.WeakTypeTag]: c.Expr[A]
   def minus[A: c.WeakTypeTag]: c.Expr[A]

@@ -1,6 +1,6 @@
 package spire.std
 
-import spire.algebra._
+import spire.algebra.{Field, IsReal, NRoot, Order, Signed, Trig}
 
 import java.lang.Math
 import java.lang.Integer.{ numberOfTrailingZeros, numberOfLeadingZeros }

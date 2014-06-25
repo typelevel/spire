@@ -1,10 +1,10 @@
 package spire.random
 
-import spire.math._
-
 import scala.annotation.tailrec
 import scala.{specialized => spec}
 import scala.reflect.ClassTag
+
+import spire.math.{UInt, ULong}
 
 abstract class Generator {
   protected var extra: Boolean = false

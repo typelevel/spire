@@ -1,8 +1,9 @@
 package spire.math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
+
+import spire.algebra.{Order, Trig, Signed}
 import spire.syntax.nroot._
-import spire.algebra._
 
 sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
@@ -482,7 +483,7 @@ object Real {
     //powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ + 1, x)
     powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ * 2, x)
 
-  implicit val algebra = new RealIsFractional {}
+  implicit val algebra = new RealAlgebra {}
 
   case class Exact(n: Rational) extends Real {
     def apply(p: Int): SafeLong = Real.roundUp(Rational(2).pow(p) * n)
@@ -501,6 +502,9 @@ object Real {
     }
   }
 }
+
+@SerialVersionUID(0L)
+class RealAlgebra extends RealIsFractional {}
 
 trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Real] with Trig[Real] {
   def abs(x: Real): Real = x.abs
@@ -551,30 +555,34 @@ trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Rea
   def isWhole(x: Real): Boolean = x.isWhole
   def round(x: Real): Real = x.round
 
-  def toRational(x: Real): Rational = x.toRational
-  def toDouble(x: Real): Double = x.toRational.toDouble
-  def toBigDecimal(x: Real): BigDecimal = x.toRational.toBigDecimal
-  def toBigInt(x: Real): BigInt = x.toRational.toBigInt
   def toByte(x: Real): Byte = x.toRational.toByte
-  def toFloat(x: Real): Float = x.toRational.toFloat
   def toInt(x: Real): Int = x.toRational.toInt
-  def toLong(x: Real): Long = x.toRational.toLong
-  def toNumber(x: Real): Number = Number(x.toRational)
   def toShort(x: Real): Short = x.toRational.toShort
+  def toLong(x: Real): Long = x.toRational.toLong
+  def toFloat(x: Real): Float = x.toRational.toFloat
+  def toDouble(x: Real): Double = x.toRational.toDouble
+  def toBigInt(x: Real): BigInt = x.toRational.toBigInt
+  def toBigDecimal(x: Real): BigDecimal = x.toRational.toBigDecimal
+  def toRational(x: Real): Rational = x.toRational
+  def toAlgebraic(x: Real): Algebraic = Algebraic(x.toRational) //FIXME
+  def toReal(x: Real): Real = x
+  def toNumber(x: Real): Number = Number(x.toRational)
   def toString(x: Real): String = x.toString
 
   def toType[B](x: Real)(implicit ev: ConvertableTo[B]): B =
-    ev.fromRational(x.toRational)
+    ev.fromReal(x)
 
-  def fromBigDecimal(n: BigDecimal): Real = Real(n)
-  def fromBigInt(n: BigInt): Real = Real(n)
   def fromByte(n: Byte): Real = Real(n)
+  def fromShort(n: Short): Real = Real(n)
   def fromFloat(n: Float): Real = Real(n)
   def fromLong(n: Long): Real = Real(n)
+  def fromBigInt(n: BigInt): Real = Real(n)
+  def fromBigDecimal(n: BigDecimal): Real = Real(n)
   def fromRational(n: Rational): Real = Real(n)
-  def fromShort(n: Short): Real = Real(n)
+  def fromAlgebraic(n: Algebraic): Real = Real(n.toRational)
+  def fromReal(n: Real): Real = n
 
   def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): Real =
-    Real(ev.toRational(b))
+    ev.toReal(b)
 }
 

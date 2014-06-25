@@ -1,21 +1,19 @@
 package spire.optional
 
-import scala.reflect.ClassTag
+import java.math.BigInteger
+import java.lang.Long.numberOfTrailingZeros
+import java.lang.Math
+
 import scala.annotation.tailrec
+import scala.collection.SeqLike
+import scala.reflect.ClassTag
 import scala.{specialized => spec}
 
 import spire.algebra._
+import spire.math.Rational
 import spire.std.{ SeqVectorEq, SeqVectorOrder }
 import spire.std.{ ArrayVectorEq, ArrayVectorOrder }
 import spire.std.MapVectorEq
-import spire.math._
-import spire.macrosk._
-
-import java.lang.Long.numberOfTrailingZeros
-import java.lang.Math
-import java.math.BigInteger
-
-import scala.collection.SeqLike
 
 /**
  * This provides an implicit `Eq[A]` for any type `A` using Scala's (Java's)
@@ -52,8 +50,6 @@ trait VectorOrderLow {
 object vectorOrder extends VectorOrderLow {
   implicit def seqOrder[A, CC[A] <: SeqLike[A, CC[A]]](implicit
       A0: Order[A], module: Module[CC[A], A]) = new SeqVectorOrder[A, CC[A]]()(A0, module.scalar)
-
-  import spire.std.ArraySupport
 
   implicit def arrayOrder[@spec(Int,Long,Float,Double) A](implicit ev: Order[A], module: Module[Array[A], A]) =
     new ArrayVectorOrder[A]()(ev, module.scalar)
@@ -116,4 +112,61 @@ object rationalTrig {
     def toDegrees(a: Rational): Rational = (a * r180) / pi
     def toRadians(a: Rational): Rational = (a / r180) * pi
   }
+}
+
+object unicode {
+  import spire.math._
+
+  type ℍ = Quaternion[Real]
+  type ℂ = Complex[Real]
+  type ℝ = Real
+  type ℚ = Rational
+  type ℤ = SafeLong
+  type ℕ = Natural
+
+  val ⅇ = Real.e
+  val π = Real.pi
+  val φ = (Real(1) + Real(5).sqrt) / Real(2)
+  val ⅈ = Complex.i[Real]
+  val ⅉ = Quaternion.j[Real]
+
+  def ⊤[A](implicit ev: BooleanAlgebra[A]): A = ev.one
+  def ⊥[A](implicit ev: BooleanAlgebra[A]): A = ev.zero
+  def ¬[A](a: A)(implicit ev: BooleanAlgebra[A]): A = ev.complement(a)
+  def √[A](a: A)(implicit ev: NRoot[A]): A = ev.sqrt(a)
+  def ∛[A](a: A)(implicit ev: NRoot[A]): A = ev.nroot(a, 3)
+  def ∜[A](a: A)(implicit ev: NRoot[A]): A = ev.nroot(a, 4)
+
+  def Σ[A](as: Iterable[A])(implicit ev: AdditiveMonoid[A]): A =
+    as.foldLeft(ev.zero)(ev.plus)
+
+  def Π[A](as: Iterable[A])(implicit ev: MultiplicativeMonoid[A]): A =
+    as.foldLeft(ev.one)(ev.times)
+
+  implicit class TimesOp[A](lhs: A)(implicit ev: MultiplicativeSemigroup[A]) {
+    def ∙(rhs: A): A = ev.times(lhs, rhs)
+  }
+
+  implicit class EqOps[A](lhs: A)(implicit ev: Eq[A]) {
+    def ≡(rhs: A): Boolean = ev.eqv(lhs, rhs)
+    def ≠(rhs: A): Boolean = lhs != rhs
+  }
+
+  implicit class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
+    def ≤(rhs: A): Boolean = ev.lteqv(lhs, rhs)
+    def ≥(rhs: A): Boolean = ev.gteqv(lhs, rhs)
+  }
+
+  implicit class BooleanAlgebraOps[A](lhs: A)(implicit ev: BooleanAlgebra[A]) {
+    def ∧(rhs: A): A = ev.and(lhs, rhs)
+    def ∨(rhs: A): A = ev.or(lhs, rhs)
+
+    def ⊻(rhs: A): A = ev.xor(lhs, rhs)
+    def ⊼(rhs: A): A = ev.nand(lhs, rhs)
+    def ⊽(rhs: A): A = ev.nor(lhs, rhs)
+
+    def ⊃(rhs: A): A = ev.imp(lhs, rhs)
+  }
+
+  implicit def setOps[A](lhs: Interval[A]) = new Interval.SymbolicSetOps(lhs)
 }

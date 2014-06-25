@@ -1,7 +1,5 @@
 package spire
 
-import spire.syntax._
-
 package object syntax {
   object cfor extends CforSyntax
   object literals extends LiteralsSyntax

@@ -1,6 +1,6 @@
 package spire.math
 
-import spire.algebra._
+import spire.algebra.{IsIntegral, Order, Rig, Signed}
 
 object UByte extends UByteInstances {
   @inline final def apply(n: Byte) = new UByte(n)

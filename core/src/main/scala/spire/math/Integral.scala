@@ -1,10 +1,9 @@
 package spire.math
 
-import spire.algebra._
-import spire.std._
-import spire.macrosk.Ops
-
 import scala.{specialized => sp}
+
+import spire.algebra.{EuclideanRing, IsReal}
+import spire.std._
 
 trait Integral[@sp(Int,Long) A] extends EuclideanRing[A] with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A]
 
@@ -21,6 +20,16 @@ class IntegralOps[A](lhs: A)(implicit ev: Integral[A]) {
   def factor: prime.Factors = prime.factor(toSafeLong)
   def isPrime: Boolean = prime.isPrime(toSafeLong)
   def toSafeLong: SafeLong = SafeLong(ev.toBigInt(lhs))
+
+  def coerce(a: A): Long = {
+    val n = ev.toBigInt(a)
+    if (Long.MinValue <= n && n <= Long.MaxValue) ev.toLong(a)
+    else sys.error("$lhs too large")
+  }
+
+  def !(): BigInt = spire.math.fact(coerce(lhs))
+
+  def choose(rhs: A): BigInt = spire.math.choose(coerce(lhs), coerce(rhs))
 }
 
 @SerialVersionUID(0L)

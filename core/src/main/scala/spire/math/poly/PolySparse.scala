@@ -2,13 +2,18 @@ package spire.math.poly
 
 import java.lang.Integer.{ numberOfLeadingZeros, numberOfTrailingZeros }
 
-import spire.math._
 import scala.annotation.tailrec
 import scala.reflect.ClassTag
-import spire.algebra._
-import spire.implicits._
-
 import scala.{specialized => spec}
+
+import spire.algebra.{Eq, Field, Ring, Rng, Semiring}
+import spire.math.Polynomial
+import spire.std.int._
+import spire.std.array._
+import spire.syntax.field._
+import spire.syntax.eq._
+import spire.syntax.cfor._
+import spire.syntax.std.array._
 
 case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val coeff: Array[C])
     (implicit val ct: ClassTag[C]) extends Polynomial[C] { lhs =>
@@ -44,6 +49,21 @@ case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val
 
   def maxOrderTermCoeff(implicit ring: Semiring[C]): C =
     if (isZero) ring.zero else coeff(coeff.length - 1)
+
+  def reductum(implicit e: Eq[C], ring: Semiring[C], ct: ClassTag[C]): Polynomial[C] = {
+    var i = coeff.length - 2
+    while (i >= 0 && coeff(i) === ring.zero) i -= 1
+    if (i < 0) {
+      new PolySparse(new Array[Int](0), new Array[C](0))
+    } else {
+      val len = i + 1
+      val es = new Array[Int](len)
+      val cs = new Array[C](len)
+      System.arraycopy(coeff, 0, cs, 0, len)
+      System.arraycopy(exp, 0, es, 0, len)
+      new PolySparse(es, cs)
+    }
+  }
 
   private final def expBits(x: C)(implicit ring: Semiring[C]): Array[C] = {
     val bits = new Array[C](math.max(2, 32 - numberOfLeadingZeros(degree)))

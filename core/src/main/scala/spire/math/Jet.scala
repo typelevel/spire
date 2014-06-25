@@ -4,8 +4,14 @@ import scala.annotation.tailrec
 import scala.math._
 import scala.reflect._
 import scala.{specialized => sp}
+
 import spire.algebra._
-import spire.implicits._
+import spire.std.array._
+import spire.syntax.eq._
+import spire.syntax.isReal._
+import spire.syntax.nroot._
+import spire.syntax.std.array._
+import spire.syntax.vectorSpace._
 
 /**
  * Used to implicitly define the dimensionality of the Jet space.
@@ -202,6 +208,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
    * This is consistent with abs
    */
   def signum()(implicit r: Signed[T]): Int = real.signum()
+  //def signum()(implicit r: Signed[T]): Int = r.signum(real)
 
   def asTuple = (real, infinitesimal)
 

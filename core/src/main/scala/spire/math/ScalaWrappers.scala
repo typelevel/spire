@@ -1,6 +1,6 @@
 package spire.math
 
-import spire.algebra._
+import spire.algebra.{Eq, EuclideanRing, Field, Order, Ring, Signed}
 
 private[spire] trait ScalaEquivWrapper[A] extends scala.math.Equiv[A] {
   def eq: Eq[A]
@@ -23,8 +23,7 @@ private[spire] trait ScalaOrderingWrapper[A] extends scala.math.Ordering[A] {
   override def max(x:A, y:A): A = order.max(x, y)
 }
 
-private[spire] trait ScalaNumericWrapper[A] extends scala.math.Numeric[A]
-with ScalaOrderingWrapper[A] {
+private[spire] trait ScalaNumericWrapper[A] extends scala.math.Numeric[A] with ScalaOrderingWrapper[A] {
   def structure: Ring[A]
   def conversions: ConvertableFrom[A]
   def signed: Signed[A]
@@ -47,15 +46,13 @@ with ScalaOrderingWrapper[A] {
   override def abs(x: A): A = signed.abs(x)
 }
 
-private[spire] trait ScalaFractionalWrapper[A] extends ScalaNumericWrapper[A]
-with scala.math.Fractional[A] {
+private[spire] trait ScalaFractionalWrapper[A] extends ScalaNumericWrapper[A] with scala.math.Fractional[A] {
   def structure: Field[A]
 
   def div(x:A, y:A) = structure.div(x, y)
 }
 
-private[spire] trait ScalaIntegralWrapper[A] extends ScalaNumericWrapper[A]
-with scala.math.Integral[A]{
+private[spire] trait ScalaIntegralWrapper[A] extends ScalaNumericWrapper[A] with scala.math.Integral[A]{
   def structure: EuclideanRing[A]
 
   def quot(x:A, y:A): A = structure.quot(x, y)

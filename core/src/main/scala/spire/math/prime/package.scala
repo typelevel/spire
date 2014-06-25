@@ -2,12 +2,8 @@ package spire.math
 
 import spire.algebra.Sign
 import spire.algebra.Sign.{Negative, Zero, Positive}
-import spire.std.int._
-import spire.std.map._
 import spire.syntax.cfor._
-import spire.syntax.std.seq._
 import spire.syntax.nroot._
-import spire.syntax.rng._
 
 import scala.annotation.tailrec
 import scala.collection.mutable
@@ -27,7 +23,7 @@ import scala.collection.mutable
  * digits or so) and can support semiprimes (products of two
  * similarly-sized primes) of 20-40 digits.
  * 
- * The implementation does cheat, use BigInteger.isProbablePrime(30)
+ * The implementation does cheat, using BigInteger.isProbablePrime(40)
  * to test basic primality. This has a roughly 1-in-1,000,000,000,000
  * chance of being wrong.
  * 
@@ -42,10 +38,10 @@ package object prime {
   /**
    * Determine if the given integer is prime.
    * 
-   * Currently this using a strong pseudo-primality test (so there is
-   * a 1-in-1,000,000,000,000 chance of being wrong).
+   * Currently this is using a strong pseudo-primality test (so there
+   * is a 1-in-1,000,000,000,000 chance of being wrong).
    */
-  def isPrime(n: SafeLong): Boolean = n.isProbablePrime(30)
+  def isPrime(n: SafeLong): Boolean = n.isProbablePrime(40)
 
   /**
    * Factor the given integer with the default factorization method.
@@ -174,8 +170,7 @@ package object prime {
     def factor(n: SafeLong): Factors = {
       if (n == 1) {
         Factors.one
-      } else if (n.isProbablePrime(30)) {
-        // TODO: ~1-in-1T chance of being wrong. too risky?
+      } else if (isPrime(n)) {
         Factors(Map(n -> 1), Positive)
       } else if (n % 2 == 0) {
         var x = n / 2
@@ -211,4 +206,51 @@ package object prime {
     while (x > 1 && x % b == 0) { e += 1; x = x / b }
     (x, e)
   }
+
+  private val SieveSize = 9600 * 1000
+
+  def sieverUpToNth(n: Long): Siever = {
+    val upper = n * log(n) + n * log(log(n - 0.9385))
+    val cutoff = max(1000L, (sqrt(upper) + 512L).toLong)
+    prime.Siever(SieveSize, cutoff)
+  }
+
+  def nth(n: Long): SafeLong =
+    sieverUpToNth(n).nth(n)
+
+  import SafeLong.{two, three}
+
+  def fill(n: Int): Array[SafeLong] = {
+    if (n <= 0) throw new IllegalArgumentException(n.toString)
+    else if (n == 1) Array(two)
+    else {
+      val siever = sieverUpToNth(n)
+      val arr = new Array[SafeLong](n)
+      arr(0) = two
+      arr(1) = three
+      def loop(i: Int, last: SafeLong): Unit =
+        if (i < arr.length) {
+          val p = siever.nextAfter(last)
+          arr(i) = p
+          loop(i + 1, p)
+        }
+      loop(2, three)
+      arr
+    }
+  }
+
+  def fill(start: Int, limit: Int): Array[SafeLong] =
+    if (start == 0) fill(limit) else {
+      val siever = sieverUpToNth(start + limit)
+      def loop(i: Int, p: SafeLong): Array[SafeLong] =
+        if (i < start) loop(i + 1, siever.nextAfter(p))
+        else siever.arrayAt(p, limit)
+      loop(1, three)
+    }
+
+  def stream: Stream[SafeLong] =
+    stream(SieveSize, SafeLong(1000000))
+
+  def stream(chunkSize: Int, cutoff: SafeLong): Stream[SafeLong] =
+    two #:: three #:: prime.Siever(chunkSize, cutoff).streamAfter(three)
 }

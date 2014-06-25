@@ -1,6 +1,7 @@
 package spire.std
 
-import spire.algebra._
+import spire.algebra.{Eq, Monoid, Order, Semigroup}
+import spire.algebra.{AdditiveSemigroup, AdditiveMonoid, MultiplicativeMonoid, MultiplicativeSemigroup}
 import spire.syntax.all._
 
 @SerialVersionUID(0L)

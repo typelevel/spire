@@ -1,11 +1,7 @@
 package spire.math
 
 import spire.algebra._
-import spire.std.float._
-import spire.std.double._
-import spire.std.bigDecimal._
 
-import spire.syntax.convertableFrom._
 import spire.syntax.field._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
@@ -605,9 +601,7 @@ private[math] trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
 }
 
-private[math] trait ComplexIsField[@spec(Float,Double) A]
-extends ComplexIsRing[A] with Field[Complex[A]] {
-  import spire.syntax.order._
+private[math] trait ComplexIsField[@spec(Float,Double) A] extends ComplexIsRing[A] with Field[Complex[A]] {
 
   implicit def algebra: Field[A]
 

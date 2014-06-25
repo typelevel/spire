@@ -1,8 +1,5 @@
 package spire.math.algebraic
 
-import spire.math._
-
-
 /**
  * A mixin that will move all divisions up to the top of the expression tree,
  * ensuring there is, at most, one division in a `Real`. This is needed for

@@ -1,7 +1,5 @@
 package spire
 
-import spire.std._
-
 package object std {
   object any extends AnyInstances
 

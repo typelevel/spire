@@ -4,8 +4,6 @@ import scala.reflect.macros.Context
 
 case class SyntaxUtil[C <: Context with Singleton](val c: C) {
   import c.universe._
-  import definitions._
-  import Flag._
 
   def name(s: String) = newTermName(c.fresh(s + "$"))
 
@@ -31,7 +29,6 @@ class InlineUtil[C <: Context with Singleton](val c: C) {
 
   def inlineAndReset[T](tree: Tree): c.Expr[T] = {
     val inlined = inlineApplyRecursive(tree)
-    //c.Expr[T](c.resetAllAttrs(inlined))
     c.Expr[T](c.resetLocalAttrs(inlined))
   }
 

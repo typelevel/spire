@@ -5,12 +5,11 @@ import scala.reflect.ClassTag
 import scala.annotation.tailrec
 import scala.{specialized => spec}
 import scala.util.Random
-import Random._
 
 import spire.algebra._
 import spire.math._
+import spire.math.algebraic._
 import spire.implicits._
-import fpf._
 
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark
@@ -70,19 +69,6 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
     total
   }
 
-  def addFastMaybeFloatsDirect(data: Array[Long]): Long = {
-    var total = FastMaybeFloat(0f)
-    var i = 0
-    val len = data.length - 1
-
-    // This is slightly different from the others, because it'll overflow the
-    // FastMaybeFloat and apparently adding NaNs and Infinities is quite a bit
-    // slower than regular fp ops.
-    
-    while (i < len) { total += FastMaybeFloat.plus(data(i), data(i + 1)); i += 1 }
-    total
-  }
-
   def addComplexesDirect(data:Array[Complex[Double]]):Complex[Double] = {
     var total = Complex.zero[Double]
     var i = 0
@@ -107,7 +93,6 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
   
   def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
   def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
-  def timeAddFastMaybeFloatsDirect(reps:Int) = run(reps)(addFastMaybeFloatsDirect(maybeFloats))
   
   def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
   def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))

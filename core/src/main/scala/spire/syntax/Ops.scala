@@ -251,6 +251,9 @@ final class LiteralDoubleNRootOps(val lhs: Double) extends AnyVal {
 final class TrigOps[A](lhs: A)(implicit ev: Trig[A]) {
   def exp(): A = macro Ops.unop[A]
   def log(): A = macro Ops.unop[A]
+
+  def log(base: Int)(implicit f: Field[A]): A =
+    f.div(ev.log(lhs), ev.log(f.fromInt(base)))
 }
 
 final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {

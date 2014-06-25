@@ -16,6 +16,7 @@ possible.
 * Eugene Burmako: macros, tons of macro support, build contributions
 * Franco Callari: author of spire.math.Jet
 * Olivier Chafik: cfor macro assistance, bug fixes
+* Adelbert Chang: bug reports
 * Eric Christiansen: bug fixes
 * Jean-Remi Desjardins: documentation fixes
 * Suminda Dharmasena: feature requests and bug reports
@@ -27,7 +28,7 @@ possible.
 * Rex Kerr: author of many of the PRNGs found in spire.random
 * Grzegorz Kossakowski: much build support, 2.11 upgrading help, bug reports
 * Christian Krause: suggestions around stats methods and spire.random.
-* Dušan Kysel: author of MersenneTwister PRNGs
+* Dušan Kysel: author of MersenneTwister and WELL PRNGs
 * Josh Marcus: bug reports and benchmarking
 * Brian McKenna: documentation fixes
 * Simon Ochsenreither: bug reports and build contributions

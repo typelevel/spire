@@ -1,6 +1,6 @@
 package spire.std
 
-import spire.algebra._
+import spire.algebra.Order
 
 trait CharOrder extends Order[Char] {
   override def eqv(x:Char, y:Char) = x == y

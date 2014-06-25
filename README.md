@@ -12,10 +12,12 @@ code without having to "bake in" particular numeric representations. In most
 cases, generic implementations using Spire's specialized type classes perform
 identically to corresponding direct implementations.
 
-Spire is provided to you as free software under the MIT license.
+Spire is provided to you as free software under the
+[MIT license](COPYING).
 
-The [Spire mailing list](http://groups.google.com/group/spire-math/) is the
-place to go for announcements and discussion around Spire.
+The [Spire mailing list](http://groups.google.com/group/spire-math/)
+is the place to go for announcements and discussion around Spire. We
+also have a guide on [contributing to Spire](CONTRIBUTING.md).
 
 [![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
 
@@ -29,7 +31,7 @@ To get started with SBT, simply add the following to your `build.sbt` file:
 scalaVersion := "2.10.4"
 // or scalaVersion := "2.11.0"
 
-libraryDependencies += "org.spire-math" %% "spire" % "0.7.4"
+libraryDependencies += "org.spire-math" %% "spire" % "0.7.5"
 ```
 
 (If you must use Spire with 2.9.x, there is an older 0.3.0 release available.)

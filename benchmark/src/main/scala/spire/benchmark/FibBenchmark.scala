@@ -5,12 +5,10 @@ import scala.reflect.ClassTag
 import scala.annotation.tailrec
 import scala.{specialized => spec}
 import scala.util.Random
-import Random._
 
 import spire.algebra._
 import spire.math._
 import spire.implicits._
-import fpf._
 
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark
