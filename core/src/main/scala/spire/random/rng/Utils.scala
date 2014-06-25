@@ -14,6 +14,7 @@
 
 package spire
 package random
+package rng
 
 import spire.syntax.cfor._
 import spire.math.max
