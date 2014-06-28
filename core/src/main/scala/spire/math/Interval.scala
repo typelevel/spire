@@ -807,7 +807,16 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 case class All[A: Order] private[spire] () extends Interval[A]
 case class Above[A: Order] private[spire] (lower: A, flags: Int) extends Interval[A]
 case class Below[A: Order] private[spire] (upper: A, flags: Int) extends Interval[A]
-case class Ranged[A: Order] private[spire] (lower: A, upper: A, flags: Int) extends Interval[A]
+case class Ranged[A: Order] private[spire] (lower: A, upper: A, flags: Int) extends Interval[A] {
+  override def equals(that: Any): Boolean =
+    that match {
+      case r @ Ranged(l, u, f) => 
+        if (this.isEmpty) r.isEmpty
+        else lower == l && upper == u && flags == f
+      case _ =>
+        false
+    }
+}
 
 object Interval {
 

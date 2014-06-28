@@ -277,4 +277,20 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
       Interval(x.toString) shouldBe x
     }
   }
+
+  property("empty intervals are equal") {
+    forAll { (x: Rational, y: Rational) =>
+      val a = Interval.open(x, x)
+      val b = Interval.open(y, y)
+      val c = Interval.openAbove(x, x)
+      val d = Interval.openBelow(x, x)
+      val e = Interval.empty[Rational]
+
+      a shouldBe e
+      b shouldBe e
+      c shouldBe e
+      d shouldBe e
+      e shouldBe e
+    }
+  }
 }
