@@ -14,8 +14,6 @@ import scala.{specialized => spec}
 
 import java.math.MathContext
 
-import spire.math.fpf.FPFilter
-
 
 class SignedTest extends FunSuite {
   def runWith[@spec(Int, Long, Float, Double) A: Signed: ClassTag](neg: A, pos: A, zero: A) {

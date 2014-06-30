@@ -12,28 +12,32 @@ code without having to "bake in" particular numeric representations. In most
 cases, generic implementations using Spire's specialized type classes perform
 identically to corresponding direct implementations.
 
-Spire is provided to you as free software under the MIT license.
+Spire is provided to you as free software under the
+[MIT license](COPYING).
 
-The [Spire mailing list](http://groups.google.com/group/spire-math/) is the
-place to go for announcements and discussion around Spire.
+The [Spire mailing list](http://groups.google.com/group/spire-math/)
+is the place to go for announcements and discussion around Spire. We
+also have a guide on [contributing to Spire](CONTRIBUTING.md).
 
 [![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
 
 ### Set up
 
+Spire is currently available for Scala 2.10 and 2.11.
+
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-scalaVersion := "2.10.2"
+scalaVersion := "2.10.4"
+// or scalaVersion := "2.11.0"
 
-libraryDependencies += "org.spire-math" %% "spire" % "0.7.1"
+libraryDependencies += "org.spire-math" %% "spire" % "0.7.5"
 ```
 
-Moving forward Spire is tareting Scala 2.10.x and higher. If you want to use
-Spire with 2.9.x, there is an older 0.3.0 release available.
+(If you must use Spire with 2.9.x, there is an older 0.3.0 release available.)
 
-(For maven instructions, and to download the jars directly, visit the
-[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.7.1%7Cjar).)
+For maven instructions, and to download the jars directly, visit the
+[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.7.4%7Cjar).
 
 ### Playing Around
 
@@ -469,6 +473,8 @@ measure relative as well as absolute performance.
 Code is offered as-is, with no implied warranty of any kind. Comments,
 criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
-Copyright 2011-2013 Erik Osheim, Tom Switzer
+Copyright 2011-2014 Erik Osheim, Tom Switzer
 
-The MIT software license is attached in the COPYING file.
+A full list of contributors can be found in [AUTHORS.md](AUTHORS.md).
+
+The MIT software license is attached in the [COPYING](COPYING) file.

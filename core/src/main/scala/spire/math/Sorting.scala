@@ -1,10 +1,10 @@
 package spire.math
 
-import spire.algebra._
-
+import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import scala.{specialized => spec}
-import scala.annotation.tailrec
+
+import spire.algebra.Order
 
 /**
  *  Interface for a sorting strategy object.

@@ -1,8 +1,7 @@
 package spire.random
-package mutable
+package rng
 
 import spire.util.Pack
-import spire.math._
 import java.nio.ByteBuffer
 
 final class Lcg64(_seed: Long) extends LongBasedGenerator {

@@ -1,21 +1,20 @@
 package spire
 
-import spire.algebra._
-import spire.math._
-
-import scala.annotation.tailrec
-import scala.{specialized => spec}
-
-import spire.std.bigDecimal._
-import spire.syntax.nroot._
-
 import java.lang.Long.numberOfTrailingZeros
 import java.lang.Math
 import java.math.BigInteger
 import java.math.MathContext
 import java.math.RoundingMode
 
+import scala.annotation.tailrec
+import scala.{specialized => spec}
+import scala.math.ScalaNumericConversions
+
 import BigDecimal.RoundingMode.{FLOOR, HALF_UP, CEILING}
+
+import spire.algebra.{EuclideanRing, Field, IsReal, NRoot, Order, Signed, Trig}
+import spire.std.bigDecimal._
+import spire.syntax.nroot._
 
 package object math {
 
@@ -182,6 +181,9 @@ package object math {
    */
   final def log(n: Double): Double = Math.log(n)
 
+  final def log(n: Double, base: Int): Double =
+    Math.log(n) / Math.log(base)
+
   final def log(n: BigDecimal): BigDecimal = {
     val scale = n.mc.getPrecision
 
@@ -209,7 +211,14 @@ package object math {
     (ln(x) * BigDecimal(2).pow(i)).setScale(scale, HALF_UP)
   }
 
-  final def log[A](a: A)(implicit t: Trig[A]): A = t.log(a)
+  def log(n: BigDecimal, base: Int): BigDecimal =
+    log(n) / log(BigDecimal(base))
+
+  final def log[A](a: A)(implicit t: Trig[A]): A =
+    t.log(a)
+
+  final def log[A](a: A, base: Int)(implicit f: Field[A], t: Trig[A]): A =
+    f.div(t.log(a), t.log(f.fromInt(base)))
 
   /**
    * pow
@@ -392,8 +401,64 @@ package object math {
   final def ulp(x: Double): Double = Math.ulp(x)
   final def ulp(x: Float): Double = Math.ulp(x)
 
-  def anyIsZero(n: Any): Boolean = n == 0 || (n match {
-    case (n: scala.math.ScalaNumericConversions) => n.isValidInt && n.toInt == 0
-    case _ => false
-  })
+  // ugly internal scala.math.ScalaNumber utilities follow
+
+  private[spire] def anyIsZero(n: Any): Boolean =
+    n match {
+      case x if x == 0 => true
+      case c: ScalaNumericConversions => c.isValidInt && c.toInt == 0
+      case _ => false
+    }
+
+  private[spire] def anyToDouble(n: Any): Double =
+    n match {
+      case n: Byte => n.toDouble
+      case n: Short => n.toDouble
+      case n: Char => n.toDouble
+      case n: Int => n.toDouble
+      case n: Long => n.toDouble
+      case n: Float => n.toDouble
+      case n: Double => n
+      case c: ScalaNumericConversions => c.toDouble
+      case _ => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
+    }
+
+  private[spire] def anyToLong(n: Any): Long =
+    n match {
+      case n: Byte => n.toLong
+      case n: Short => n.toLong
+      case n: Char => n.toLong
+      case n: Int => n.toLong
+      case n: Long => n
+      case n: Float => n.toLong
+      case n: Double => n.toLong
+      case c: ScalaNumericConversions => c.toLong
+      case _ => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
+    }
+
+  private[spire] def anyIsWhole(n: Any): Boolean =
+    n match {
+      case _: Byte => true
+      case _: Short => true
+      case _: Char => true
+      case _: Int => true
+      case _: Long => true
+      case n: Float => n.isWhole
+      case n: Double => n.isWhole
+      case c: ScalaNumericConversions => c.isWhole
+      case _ => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
+    }
+
+  private[spire] def anyIsValidInt(n: Any): Boolean =
+    n match {
+      case _: Byte => true
+      case _: Short => true
+      case _: Char => true
+      case _: Int => true
+      case n: Long => n.isValidInt
+      case n: Float => n.isValidInt
+      case n: Double => n.isValidInt
+      case c: ScalaNumericConversions => c.isValidInt
+      case _ => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
+    }
 }

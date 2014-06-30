@@ -1,6 +1,6 @@
 package spire.std
 
-import spire.algebra._
+import spire.algebra.{BooleanAlgebra, CRig, Order}
 
 trait BooleanIsBooleanAlgebra extends BooleanAlgebra[Boolean] {
   def one: Boolean = true

@@ -2,7 +2,7 @@ package spire.math
 
 import scala.annotation.tailrec
 
-import spire.algebra._
+import spire.algebra.{IsIntegral, Order, Rig, Signed}
 
 object ULong extends ULongInstances {
   @inline final def apply(n: Long): ULong = new ULong(n)

@@ -6,16 +6,13 @@ import scala.reflect.ClassTag
 import org.scalatest.FunSuite
 
 // we need to disable our own === to avoid messing up ScalaTest.
-import spire.math.{Rational, Complex}
+import spire.math.{Rational, Complex, Jet, JetDim}
 import spire.implicits.{eqOps => _, _}
 
 // nice alias
 import scala.{specialized => spec}
 
 import java.math.MathContext
-
-import spire.math.fpf.FPFilter
-
 
 class RingTest extends FunSuite {
 
@@ -70,6 +67,7 @@ class RingTest extends FunSuite {
   }
 
   implicit val mc: MathContext = MathContext.DECIMAL128
+  implicit val jetDim = JetDim(7)
 
   // here's where we actually run all the tests, for each type we care about.
   runWith[Int]("Int")(-3, 3, -9)
@@ -84,7 +82,7 @@ class RingTest extends FunSuite {
   runWith[Complex[BigDecimal]]("Complex[BigDecimal]")(Complex(BigDecimal(-3), BigDecimal(0)),
                                Complex(BigDecimal(3), BigDecimal(0)),
                                Complex(BigDecimal(-9), BigDecimal(0)))
-  runWith[FPFilter[BigInt]]("FPFilter[BigInt]")(FPFilter[BigInt](-3), FPFilter[BigInt](3), FPFilter[BigInt](-9))
+  runWith[Jet[Double]]("Jet[Double]")(Jet(-3), Jet(3), Jet(-9))
 
 
   {

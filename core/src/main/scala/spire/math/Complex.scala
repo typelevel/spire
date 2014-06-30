@@ -1,11 +1,7 @@
 package spire.math
 
 import spire.algebra._
-import spire.std.float._
-import spire.std.double._
-import spire.std.bigDecimal._
 
-import spire.syntax.convertableFrom._
 import spire.syntax.field._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
@@ -13,7 +9,7 @@ import spire.syntax.order._
 
 import scala.{specialized => spec}
 import scala.annotation.tailrec
-import scala.math.{ScalaNumber, ScalaNumericConversions}
+import scala.math.{ScalaNumber, ScalaNumericConversions, ScalaNumericAnyConversions}
 import java.lang.Math
 
 
@@ -313,34 +309,26 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
     new Complex(t.sinh(r2) / d, t.sin(i2) / d)
   }
 
-  // Please, forgive me, for what is to come. - Tom
-
-  private def realScalaNum: ScalaNumericConversions = real match {
-    case (r: ScalaNumericConversions) => r
-    case _ => throw new UnsupportedOperationException(s"$real is not a ScalaNumber")
-  }
-
-  private def imagScalaNum: ScalaNumericConversions = imag match {
-    case (i: ScalaNumericConversions) => i
-    case _ => throw new UnsupportedOperationException(s"$imag is not a ScalaNumber")
-  }
-
-  def doubleValue: Double = realScalaNum.toDouble
-  def floatValue: Float = realScalaNum.toFloat
-  def longValue: Long = realScalaNum.toLong
-  def intValue: Int = realScalaNum.toInt
-  override def shortValue: Short = realScalaNum.toShort
-  override def byteValue: Byte = realScalaNum.toByte
-
-  def isWhole: Boolean = anyIsZero(imag) && realScalaNum.isWhole
+  // junky ScalaNumber stuff
+  def floatValue: Float = doubleValue.toFloat
+  def doubleValue: Double = anyToDouble(real)
+  override def byteValue: Byte = longValue.toByte
+  override def shortValue: Short = longValue.toShort
+  def intValue: Int = longValue.toInt
+  override def longValue: Long = anyToLong(real)
 
   def underlying: Object = this
 
-  override final def isValidInt: Boolean =
-    anyIsZero(imag) && realScalaNum.isValidInt
+  def isWhole: Boolean =
+    anyIsZero(imag) && anyIsWhole(real)
 
+  override final def isValidInt: Boolean =
+    anyIsZero(imag) && anyIsValidInt(real)
+
+  // important to keep in sync with Quaternion[_]
   override def hashCode: Int =
-    if (anyIsZero(imag)) real.## else 19 * real.## + 41 * imag.## + 97
+    if (anyIsZero(imag)) real.##
+    else (19 * real.##) + (41 * imag.##) + 97
 
   // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
@@ -352,7 +340,10 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
       anyIsZero(imag) && real == that
   }
 
-  override def toString: String = "(%s + %si)" format (real.toString, imag.toString)
+  override def toString: String = s"($real + ${imag}i)"
+
+  def toQuaternion(implicit ev: AdditiveMonoid[T]): Quaternion[T] =
+    Quaternion(real, imag, ev.zero, ev.zero)
 }
 
 
@@ -610,9 +601,7 @@ private[math] trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
 }
 
-private[math] trait ComplexIsField[@spec(Float,Double) A]
-extends ComplexIsRing[A] with Field[Complex[A]] {
-  import spire.syntax.order._
+private[math] trait ComplexIsField[@spec(Float,Double) A] extends ComplexIsRing[A] with Field[Complex[A]] {
 
   implicit def algebra: Field[A]
 

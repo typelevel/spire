@@ -1,22 +1,17 @@
 package spire.syntax.std
 
-import Predef.{any2stringadd => _, _}
+import scala.collection.SeqLike
+import scala.collection.generic.CanBuildFrom
+import scala.reflect.ClassTag
+import scala.{specialized => sp}
 
-import spire.algebra._
-import spire.math._
-import spire.macrosk._
-
+import spire.algebra.{AdditiveMonoid, Field, MultiplicativeMonoid, NRoot, Order, Signed}
+import spire.math.{Natural, Number, QuickSort, SafeLong, Searching, ULong}
 import spire.syntax.cfor._
 import spire.syntax.field._
 import spire.syntax.nroot._
 import spire.syntax.order._
 import spire.syntax.signed._
-
-import scala.reflect.ClassTag
-import scala.{specialized => sp}
-
-import scala.collection.SeqLike
-import scala.collection.generic.CanBuildFrom
 
 final class LiteralIntOps(val lhs: Int) extends AnyVal {
   def /~(rhs: Int): Int = lhs / rhs
@@ -24,6 +19,7 @@ final class LiteralIntOps(val lhs: Int) extends AnyVal {
   def pow(rhs: Int): Int = Math.pow(lhs, rhs).toInt
   def **(rhs: Int): Int = Math.pow(lhs, rhs).toInt
   def !(): BigInt = spire.math.fact(lhs)
+  def choose(rhs: Int): BigInt = spire.math.choose(lhs, rhs)
 }
 
 final class LiteralLongOps(val lhs: Long) extends AnyVal {
@@ -32,6 +28,7 @@ final class LiteralLongOps(val lhs: Long) extends AnyVal {
   def pow(rhs: Long): Long = spire.math.pow(lhs, rhs)
   def **(rhs: Long): Long = spire.math.pow(lhs, rhs)
   def !(): BigInt = spire.math.fact(lhs)
+  def choose(rhs: Long): BigInt = spire.math.choose(lhs, rhs)
 }
 
 final class LiteralDoubleOps(val lhs: Double) extends AnyVal {
@@ -173,7 +170,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
     arr2
   }
 
-  import spire.random.mutable.Generator
+  import spire.random.Generator
 
   def qshuffle()(implicit gen: Generator): Unit = gen.shuffle(arr)
 
@@ -307,7 +304,7 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) {
     }
   }
 
-  import spire.random.mutable.Generator
+  import spire.random.Generator
 
   def qshuffled(implicit gen: Generator, ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     val arr = as.toArray

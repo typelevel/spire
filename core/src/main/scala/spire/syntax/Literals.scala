@@ -2,7 +2,7 @@ package spire.syntax
 
 import scala.{specialized => spec}
 
-import spire.math._
+import spire.math.{Polynomial, Rational, UByte, UShort, UInt, ULong}
 import spire.macrosk.Macros
 
 class Literals(val s:StringContext) extends AnyVal {

@@ -5,7 +5,6 @@ import Predef.{any2stringadd => _, intWrapper => _, _}
 import spire.algebra._
 import spire.std.BooleanIsRig
 import spire.implicits._
-import spire.math._
 
 import scala.reflect.ClassTag
 import scala.annotation.tailrec

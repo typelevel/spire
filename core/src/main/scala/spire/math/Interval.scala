@@ -1,10 +1,15 @@
 package spire.math
 
-import spire.algebra._
-import spire.implicits._
-import spire.math.poly.Term
-
 import Predef.{any2stringadd => _, _}
+
+import spire.algebra._
+import spire.math.poly.Term
+import spire.std.int._
+import spire.std.option._
+import spire.std.tuples._
+import spire.syntax.field._
+import spire.syntax.nroot._
+import spire.syntax.order._
 
 /**
  * Interval represents a set of values, usually numbers.
@@ -689,8 +694,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def unary_-()(implicit ev: AdditiveGroup[A]): Interval[A] =
     this match {
       case Ranged(l, u, f) => Ranged(-u, -l, swapFlags(f))
-      case Above(l, lf) => Above(-l, lowerFlagToUpper(lf))
-      case Below(u, uf) => Below(-u, upperFlagToLower(uf))
+      case Above(l, lf) => Below(-l, lowerFlagToUpper(lf))
+      case Below(u, uf) => Above(-u, upperFlagToLower(uf))
       case All() => this
     }
 
@@ -698,8 +703,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     if (rhs < ev.zero) {
       this match {
         case Ranged(l, u, f) => Ranged(u * rhs, l * rhs, swapFlags(f))
-        case Above(l, lf) => Above(l * rhs, lowerFlagToUpper(lf))
-        case Below(u, uf) => Below(u * rhs, upperFlagToLower(uf))
+        case Above(l, lf) => Below(l * rhs, lowerFlagToUpper(lf))
+        case Below(u, uf) => Above(u * rhs, upperFlagToLower(uf))
         case All() => this
       }
     } else if (rhs === ev.zero) {
@@ -726,6 +731,9 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       Interval.point(r.one)
     } else if (k == 1) {
       this
+    } else if ((k & 1) == 0) {
+      val t = abs
+      loop(t, k - 1, t)
     } else {
       loop(this, k - 1, this)
     }
@@ -799,7 +807,16 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 case class All[A: Order] private[spire] () extends Interval[A]
 case class Above[A: Order] private[spire] (lower: A, flags: Int) extends Interval[A]
 case class Below[A: Order] private[spire] (upper: A, flags: Int) extends Interval[A]
-case class Ranged[A: Order] private[spire] (lower: A, upper: A, flags: Int) extends Interval[A]
+case class Ranged[A: Order] private[spire] (lower: A, upper: A, flags: Int) extends Interval[A] {
+  override def equals(that: Any): Boolean =
+    that match {
+      case r @ Ranged(l, u, f) => 
+        if (this.isEmpty) r.isEmpty
+        else lower == l && upper == u && flags == f
+      case _ =>
+        false
+    }
+}
 
 object Interval {
 
@@ -930,11 +947,12 @@ object Interval {
         (x.lowerPair === y.lowerPair) && (x.upperPair === y.upperPair)
     }
 
-  implicit def semiring[A](implicit ev: Semiring[A], o: Order[A]): Semiring[Interval[A]] =
+  implicit def semiring[A](implicit ev: Ring[A], o: Order[A]): Semiring[Interval[A]] =
     new Semiring[Interval[A]] {
       def zero: Interval[A] = Interval.point(ev.zero)
       def plus(x: Interval[A], y: Interval[A]): Interval[A] = x + y
       def times(x: Interval[A], y: Interval[A]): Interval[A] = x * y
+      override def pow(x: Interval[A], k: Int): Interval[A] = x.pow(k)
     }
 
   // TODO: maybe put this somewhere more global once we have other types that need these?

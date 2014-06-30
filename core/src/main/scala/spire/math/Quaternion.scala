@@ -1,19 +1,15 @@
 package spire.math
 
-import spire.algebra._
-import spire.std.float._
-import spire.std.double._
-import spire.std.bigDecimal._
+import java.lang.Math
 
-import spire.syntax.convertableFrom._
+import scala.annotation.tailrec
+import scala.math.{ScalaNumber, ScalaNumericConversions}
+import scala.{specialized => sp}
+
+import spire.algebra._
 import spire.syntax.field._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
-
-import scala.{specialized => sp}
-import scala.annotation.tailrec
-import scala.math.{ScalaNumber, ScalaNumericConversions}
-import java.lang.Math
 
 object Quaternion extends QuaternionInstances {
   def i[@sp(Float, Double) A](implicit f: Rig[A]): Quaternion[A] =
@@ -86,30 +82,41 @@ trait QuaternionInstances {
 }
 
 final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
-  //(implicit f: Fractional[A], trig: Trig[A], isr: IsReal[A])
     extends ScalaNumber with ScalaNumericConversions with Serializable { lhs =>
 
-  //import f.{zero, one, fromInt => int}
+  // junky ScalaNumber stuff
+  override def byteValue: Byte = longValue.toByte
+  override def shortValue: Short = longValue.toShort
+  def intValue: Int = longValue.toInt
+  override def longValue: Long = anyToLong(r)
+  def floatValue: Float = doubleValue.toFloat
+  def doubleValue: Double = anyToDouble(r)
 
-  private def realScalaNum: ScalaNumericConversions = r match {
-    case r: ScalaNumericConversions => r
-    case _ => throw new UnsupportedOperationException(s"$r is not a ScalaNumber")
+  private[this] def sillyIsReal: Boolean =
+    anyIsZero(i) && anyIsZero(j) && anyIsZero(k)
+
+  def underlying: Object = this
+
+  def isWhole: Boolean =
+    sillyIsReal && anyIsWhole(r)
+
+  override final def isValidInt: Boolean =
+    sillyIsReal && anyIsValidInt(r)
+
+  // important to keep in sync with Complex[_]
+  override def hashCode: Int =
+    if (sillyIsReal) r.##
+    else (19 * r.##) + (41 * i.##) + (13 * j.##) + (77 * k.##) + 97
+
+  // not typesafe, so this is the best we can do :(
+  override def equals(that: Any): Boolean = that match {
+    case that: Quaternion[_] =>
+      r == that.r && i == that.i && j == that.j && k == that.k
+    case that: Complex[_] =>
+      r == that.real && i == that.imag && anyIsZero(j) && anyIsZero(k)
+    case that =>
+      sillyIsReal && r == that
   }
-
-  private def sillyIsZero(n: Any): Boolean = n == 0 || (n match {
-    case n: ScalaNumericConversions => n.isValidInt && n.toInt == 0
-    case _ => false
-  })
-
-  private def sillyIsReal: Boolean =
-    sillyIsZero(i) && sillyIsZero(j) && sillyIsZero(k)
-
-  def doubleValue: Double = realScalaNum.toDouble
-  def floatValue: Float = realScalaNum.toFloat
-  def longValue: Long = realScalaNum.toLong
-  def intValue: Int = realScalaNum.toInt
-
-  def isWhole: Boolean = sillyIsReal && realScalaNum.isWhole
 
   def isZero(implicit o: IsReal[A]): Boolean = r.isZero && i.isZero && j.isZero && k.isZero
   def isReal(implicit o: IsReal[A]): Boolean = i.isZero && j.isZero && k.isZero
@@ -124,27 +131,6 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
   def pureAbs(implicit f: Field[A], o: IsReal[A], n: NRoot[A]): A =
     (i.pow(2) + j.pow(2) + k.pow(2)).sqrt
 
-  // def norm(implicit f: Field[A], o: IsReal[A], n: NRoot[A]): A =
-  //   (r.pow(2) + i.pow(2) + j.pow(2) + k.pow(2)).sqrt
-
-  override def isValidInt: Boolean =
-    sillyIsReal && realScalaNum.isValidInt
-
-  def underlying: Object = this
-
-  // important to keep in sync with Complex[_]
-  override def hashCode: Int =
-    if (sillyIsReal) r.## else 19 * r.## + 41 * i.## + 13 * j.## + 77 * k.## + 97
-
-  override def equals(that: Any): Boolean = that match {
-    case that: Quaternion[_] =>
-      r == that.r && i == that.i && j == that.j && k == that.k
-    case that: Complex[_] =>
-      r == that.real && i == that.imag && sillyIsZero(j) && sillyIsZero(k)
-    case that =>
-      sillyIsReal && r == that
-  }
-
   def eqv(rhs: Quaternion[A])(implicit o: Eq[A]): Boolean =
     lhs.r === rhs.r && lhs.i === rhs.i && lhs.j === rhs.j && lhs.k === rhs.k
 
@@ -152,6 +138,8 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
     lhs.r =!= rhs.r && lhs.i =!= rhs.i && lhs.j =!= rhs.j && lhs.k =!= rhs.k
 
   override def toString: String = s"($r + ${i}i + ${j}j + ${k}k)"
+
+  def toComplex: Complex[A] = Complex(r, i)
 
   def signum(implicit o: IsReal[A]): Int = r.signum match {
     case 0 => i.signum match {

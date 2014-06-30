@@ -1,6 +1,6 @@
 package spire.std
 
-import spire.algebra._
+import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Signed}
 import spire.math.BitString
 
 trait ShortIsEuclideanRing extends EuclideanRing[Short] {

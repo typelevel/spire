@@ -2,14 +2,16 @@ package spire.math
 
 import scala.collection.mutable.ArrayBuilder
 
-import compat._
-import spire.math.poly._
 import scala.annotation.tailrec
-import scala.reflect._
-import spire.algebra._
-import spire.implicits._
-
+import scala.reflect.ClassTag
 import scala.{specialized => spec}
+
+import spire.algebra._
+import spire.math.poly._
+import spire.std.array._
+import spire.syntax.field._
+import spire.syntax.eq._
+import spire.syntax.std.seq._
 
 /**
  * Polynomial
@@ -193,6 +195,9 @@ trait Polynomial[@spec(Double) C] { lhs =>
 
   /** Returns the coefficient of max term of this polynomial. */
   def maxOrderTermCoeff(implicit ring: Semiring[C]): C
+
+  /** Returns a polynomial with the max term removed. */
+  def reductum(implicit e: Eq[C], ring: Semiring[C], ct: ClassTag[C]): Polynomial[C]
 
   /** Returns `true` if this polynomial is `ring.zero`. */
   def isZero: Boolean

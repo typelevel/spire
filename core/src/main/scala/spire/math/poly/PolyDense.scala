@@ -1,13 +1,15 @@
 package spire.math.poly
 
-import compat._
-import spire.math._
 import scala.annotation.tailrec
-import scala.reflect._
-import spire.algebra._
-import spire.implicits._
-
+import scala.reflect.ClassTag
 import scala.{specialized => spec}
+
+import spire.algebra.{Eq, Field, Ring, Rng, Semiring}
+import spire.math.Polynomial
+import spire.std.array._
+import spire.syntax.cfor._
+import spire.syntax.eq._
+import spire.syntax.field._
 
 // Dense polynomials - Little Endian Coeffs e.g. x^0, x^1, ... x^n
 class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
@@ -42,19 +44,44 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
   def maxOrderTermCoeff(implicit ring: Semiring[C]): C =
     if (isZero) ring.zero else coeffs(degree)
 
+  def reductum(implicit e: Eq[C], ring: Semiring[C], ct: ClassTag[C]): Polynomial[C] = {
+    var i = coeffs.length - 2
+    while (i >= 0 && coeffs(i) === ring.zero) i -= 1
+    if (i < 0) {
+      new PolyDense(new Array[C](0))
+    } else {
+      val arr = new Array[C](i + 1)
+      System.arraycopy(coeffs, 0, arr, 0, i + 1)
+      new PolyDense(arr)
+    }
+  }
+
   def isZero: Boolean =
     coeffs.length == 0
 
-  def apply(x: C)(implicit ring: Semiring[C]): C =
-    if (isZero) {
-      ring.zero
-    } else {
-      var c = coeffs(coeffs.length - 1)
-      cfor(coeffs.length - 2)(_ >= 0, _ - 1) { i =>
-        c = coeffs(i) + c * x
-      }
-      c
+  def apply(x: C)(implicit ring: Semiring[C]): C = {
+    if (isZero) return ring.zero
+
+    var even = coeffs.length - 1
+    var odd = coeffs.length - 2
+    if ((even & 1) == 1) { even = odd; odd = coeffs.length - 1 }
+
+    var c0 = coeffs(even)
+    val x2 = x.pow(2)
+    cfor(even - 2)(_ >= 0, _ - 2) { i =>
+      c0 = coeffs(i) + c0 * x2
     }
+
+    if (odd >= 1) {
+      var c1 = coeffs(odd)
+      cfor(odd - 2)(_ >= 1, _ - 2) { i =>
+        c1 = coeffs(i) + c1 * x2
+      }
+      c0 + c1 * x
+    } else {
+      c0
+    }
+  }
 
   def derivative(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] = {
     if (isZero) return this

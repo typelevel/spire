@@ -1,13 +1,10 @@
 package spire.math
 
-import spire.algebra._
-
+import scala.annotation.tailrec
 import scala.reflect.ClassTag
-
 import scala.{specialized => spec}
 
-import scala.annotation.tailrec
-
+import spire.algebra.Order
 
 trait Select {
   def select[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit

@@ -4,7 +4,7 @@ import java.math.{ MathContext, BigDecimal => BigDec }
 
 import spire.algebra.{ NRoot }
 import spire.algebra.Sign.{ Positive, Zero, Negative }
-import spire.math._
+import spire.math.{Approximation, max}
 
 /**
  * Provides absolute and relative approximations to `RealLike` types that have
@@ -91,8 +91,6 @@ object BigDecimalApproximations {
         }
 
       case e @ KRoot(a, k) =>
-        import spire.implicits._
-
         val x = apply(a, max(bits + 1, 1 - a.decimalLowerBound / 2))
 
         // We need to use the upper bound to determine how many bits we need.
@@ -146,8 +144,6 @@ object BigDecimalApproximations {
         -apply(a, mc)
 
       case KRoot(a, k) => {
-        import spire.implicits._
-
         val ctxt = mc + 1
         val sub = apply(a, ctxt)
         NRoot.nroot(sub, k, ctxt)

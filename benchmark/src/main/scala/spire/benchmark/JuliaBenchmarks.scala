@@ -4,12 +4,9 @@ import scala.{specialized => spec}
 import scala.annotation.tailrec
 
 import scala.util.Random
-import Random._
 
-import spire.algebra._
 import spire.implicits._
 import spire.math._
-import fpf._
 
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark

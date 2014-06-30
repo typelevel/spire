@@ -55,6 +55,25 @@ class RingIntervalTest extends FunSuite {
   test("b + b") { assert(b + b === cc(-16.0, 4.0)) }
   test("b - b") { assert(b - b === cc(-10.0, 10.0)) }
   test("b * b") { assert(b * b === cc(-16.0, 64.0)) }
+
+  import Interval.{Open, Unbound, Closed}
+  val c = 4.0
+  test("-(c, ∞) =  (-∞, -c)") { 
+    assert( -Interval.fromBounds(Open(c), Unbound()) ===
+      Interval.fromBounds(Unbound(), Open(-c)) )
+  }
+  test("-(-∞, c] =  [-c, ∞)") { 
+    assert( -Interval.fromBounds(Unbound(), Closed(c)) ===
+      Interval.fromBounds(Closed(-c), Unbound()) )
+  }
+  test("(c, ∞) * (-c) =  (-∞, -c * c), c > 0") { 
+    assert( Interval.fromBounds(Open(c), Unbound()) * (-c) ===
+      Interval.fromBounds(Unbound(), Open(-c*c)) )
+  }
+  test("(-∞, c] * (-c) =  [-c * c, ∞), c > 0") { 
+    assert( Interval.fromBounds(Unbound(), Closed(c)) * (-c) ===
+      Interval.fromBounds(Closed(-c*c), Unbound()) )
+  }
 }
 
 // TODO: this is just the tip of the iceberg... we also need to worry about
@@ -168,6 +187,8 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
+  val rng = spire.random.GlobalRng
+
   property("(x -- y) ⊆ x && (x -- y) & y = Ø") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
       (x -- y).foreach { zi =>
@@ -185,19 +206,17 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
-  property("(x -- x = Ø") {
+  property("(x -- x) = Ø") {
     forAll { (x: Interval[Rational]) =>
       (x -- x) shouldBe Nil
     }
   }
 
-  property("(x -- (-∞, ∞) = Ø") {
+  property("(x -- (-∞, ∞)) = Ø") {
     forAll { (x: Interval[Rational]) =>
       (x -- Interval.all[Rational]) shouldBe Nil
     }
   }
-
-  val rng = spire.random.mutable.GlobalRng
 
   def sample(int: Interval[Rational], n: Int): Array[Rational] =
     if (int.isEmpty) {
@@ -256,6 +275,22 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
   property("toString/apply") {
     forAll { (x: Interval[Rational]) =>
       Interval(x.toString) shouldBe x
+    }
+  }
+
+  property("empty intervals are equal") {
+    forAll { (x: Rational, y: Rational) =>
+      val a = Interval.open(x, x)
+      val b = Interval.open(y, y)
+      val c = Interval.openAbove(x, x)
+      val d = Interval.openBelow(x, x)
+      val e = Interval.empty[Rational]
+
+      a shouldBe e
+      b shouldBe e
+      c shouldBe e
+      d shouldBe e
+      e shouldBe e
     }
   }
 }

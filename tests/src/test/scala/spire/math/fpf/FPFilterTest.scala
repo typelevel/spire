@@ -1,97 +1,158 @@
-package spire.math.fpf
+package spire.math
+
+import java.math.MathContext.UNLIMITED
 
 import spire.algebra._
 import spire.math._
 import spire.implicits._
 
 import org.scalatest.FunSuite
+import org.scalatest.prop.Checkers
 
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Arbitrary._
+import org.scalacheck.Prop._
 
-class FPFilterTest extends FunSuite {
-  test("FPFilter is a Ring") {
-    def someRingStuff[A: Ring](a: A, b: A, sum: A, diff: A, prod: A) {
-      assert(a + b == sum)
-      assert(a - b == diff)
-      assert(a * b == prod)
-    }
+case class Degenerate[A](value: A)
 
-    someRingStuff(FPFilter(BigDecimal("1.234")),
-                  FPFilter(BigDecimal("0.999")),
-                  FPFilter(BigDecimal("2.233")),
-                  FPFilter(BigDecimal("0.235")),
-                  FPFilter(BigDecimal("1.232766")))
+class FpFilterTest extends FunSuite with Checkers {
+  final class Evaluated extends java.lang.Exception
+  private def evaluated = throw new Evaluated
+
+  // This will always error out for any operation. It can be used to ensure
+  // operations are always performed with Doubles only and never fall back to
+  // the exact case, since it'll fail with an Evaluated excetion.
+  sealed trait Bad
+  implicit object BadField extends Field[Bad] with IsReal[Bad] with NRoot[Bad] {
+    def zero: Bad = evaluated
+    def one: Bad = evaluated
+    def negate(a:Bad): Bad = evaluated
+    def plus(a:Bad, b:Bad): Bad = evaluated
+    def quot(a:Bad, b:Bad) = evaluated
+    def mod(a:Bad, b:Bad) = evaluated
+    def gcd(a:Bad, b:Bad):Bad = evaluated
+    override def fromDouble(n: Double): Bad = evaluated
+    def times(x:Bad, b:Bad): Bad = evaluated
+    def div(a:Bad, b:Bad): Bad = evaluated
+    def nroot(a: Bad, k: Int): Bad = evaluated
+    def fpow(a: Bad, b: Bad) = evaluated
+    def compare(x: Bad, y: Bad) = evaluated
+    def signum(a: Bad): Int = evaluated
+    def abs(a: Bad): Bad = evaluated
+    def toDouble(x: Bad): Double = evaluated
+    def ceil(a:Bad): Bad = evaluated
+    def floor(a:Bad): Bad = evaluated
+    def round(a:Bad): Bad = evaluated
+    def isWhole(a:Bad): Boolean = evaluated
   }
 
-  test("FPFilter is a EuclideanRing") {
-    def quotIt[A: EuclideanRing](a: A, b: A, quot: A, mod: A) {
-      assert(a /~ b == quot)
-      assert(a % b == mod)
-    }
-
-    quotIt(FPFilter(BigInt(7)),
-           FPFilter(BigInt(5)),
-           FPFilter(BigInt(1)),
-           FPFilter(BigInt(2)))
-
-    quotIt(FPFilter(BigDecimal(-3.7)),
-           FPFilter(BigDecimal(1.2)),
-           FPFilter(BigDecimal(-3)),
-           FPFilter(BigDecimal(-0.1)))
+  test("FpFilter doesn't evaluated for easy problems") {
+    val x = FpFilter.exact[Bad](1D)
+    val y = FpFilter.exact[Bad](1.2D)
+    assert((x + y).signum == 1)
+    assert((x - y).signum == -1)
+    assert((x * y).signum == 1)
+    assert((x / y).signum == 1)
+    assert(y.sqrt.signum == 1)
   }
 
-  test("FPFilter is a Field") {
-    def divAndStuff[A: Field](a: A, b: A, c: A) {
-      assert(a / b == c)
-    }
-
-    divAndStuff(FPFilter(Rational(5)),
-                FPFilter(Rational(7)),
-                FPFilter(Rational(5, 7)))
+  test("Find tricky zero") {
+    val x = FpFilter.exact[Algebraic](18)
+    val y = FpFilter.exact[Algebraic](8)
+    val z = FpFilter.exact[Algebraic](2)
+    assert((x.sqrt - y.sqrt - z.sqrt).signum == 0)
   }
 
-  test("FPFilter is Field:NRoot") {
-    def powerToTheRoot[A: Field:NRoot](a: A, b: A) {
-      assert(a.sqrt == b)
-      assert((a pow 2) == (b pow 4))
-    }
-
-    powerToTheRoot(FPFilter(Algebraic(2)),
-                   FPFilter(Algebraic(2).sqrt))
+  test("Comparisons") {
+    val x = FpFilter.exact[Algebraic](-2)
+    val y = FpFilter.exact[Algebraic](8)
+    assert(x < y)
+    assert(y > x)
+    assert(x <= y)
+    assert(x <= x)
+    assert(y >= x)
+    assert(y >= y)
+    assert(x === x)
   }
 
-  // TODO: Really sketchy.
-  def isEvaluated[A](x: FPFilter[A]): Boolean = {
-    classOf[FPFilter[_]].getField("bitmap$0").get(x) != 0
+  test("Mix-match macro and non-macro") {
+    val x = FpFilter.exact[Algebraic](18)
+    val y = FpFilter.exact[Algebraic](8)
+    val z = FpFilter.exact[Algebraic](2)
+    val u = x.sqrt - y.sqrt
+    val v = u - z.sqrt
+    assert(v.signum == 0)
   }
- 
-  test("Non-zero sign doesn't (always) evaluate value") {
-    def wrap(b:BigDecimal)(f:() => Unit) = new FPFilter(MaybeDouble(b), { f(); b })
 
-    // used to track evaluation of FPFilter's lazy value
-    var zeroEval = false
-    var aEval = false
-    var bEval = false
+  case class Point(x: Double, y: Double)
+  case class Simplex(p: Point, q: Point, r: Point)
 
-    val zero = wrap(BigDecimal(0))(() => zeroEval = true)
-    val a = wrap(BigDecimal(5))(() => aEval = true)
-    val b = wrap(BigDecimal(9))(() => bEval = true)
-
-    val sum = a + a
-    val prod = a * b
-    val quot = a / b
-
-    val s1 = sum == zero
-    val s2 = prod == zero
-    val s3 = quot == zero
-
-    // make sure we haven't evaluated the exact value yet
-    assert(!zeroEval)
-    assert(!aEval)
-    assert(!bEval)
-
-    // make sure a.value actaully evalutes
-    val x = a.value
-    assert(aEval)
+  // I'm not trying to test things that won't ever work.
+  def genSimpleDouble: Gen[Double] = for {
+    n <- arbitrary[Long]
+  } yield {
+    (n >>> 11) * 1.1102230246251565e-16
   }
+
+  def genPoint: Gen[Point] = for {
+    x <- genSimpleDouble
+    y <- genSimpleDouble
+  } yield Point(x, y)
+
+  def genEpsilon: Gen[Double] =
+    genSimpleDouble map (_ * FpFilter.Eps)
+
+  def genSimplex: Gen[Simplex] = for {
+    p <- genPoint
+    q <- genPoint
+    r <- genPoint
+  } yield Simplex(p, q, r)
+
+  def genDegenerateSimplex: Gen[Simplex] = for {
+    p <- genPoint
+    q <- genPoint
+    ex <- genEpsilon
+    ey <- genEpsilon
+  } yield {
+    val dx = q.x - p.x
+    val dy = q.y - p.y
+    val r = Point(q.x + dx + ex, q.y + dy + ey)
+    Simplex(p, q, r)
+  }
+
+  def signExact(s: Simplex): Int = {
+    import s._
+    val px = BigDecimal(p.x, UNLIMITED)
+    val py = BigDecimal(p.y, UNLIMITED)
+    val qx = BigDecimal(q.x, UNLIMITED)
+    val qy = BigDecimal(q.y, UNLIMITED)
+    val rx = BigDecimal(r.x, UNLIMITED)
+    val ry = BigDecimal(r.y, UNLIMITED)
+    ((qx - px) * (ry - py) - (rx - px) * (qy - py)).signum
+  }
+
+  def signFpFilter(s: Simplex): Int = {
+    import s._
+    val px = FpFilter.exact[BigDecimal](p.x)
+    val py = FpFilter.exact[BigDecimal](p.y)
+    val qx = FpFilter.exact[BigDecimal](q.x)
+    val qy = FpFilter.exact[BigDecimal](q.y)
+    val rx = FpFilter.exact[BigDecimal](r.x)
+    val ry = FpFilter.exact[BigDecimal](r.y)
+    ((qx - px) * (ry - py) - (rx - px) * (qy - py)).signum
+  }
+
+  implicit def arbSimplex: Arbitrary[Simplex] =
+    Arbitrary(genSimplex)
+
+  implicit def arbDegenerateSimplex: Arbitrary[Degenerate[Simplex]] =
+    Arbitrary(genDegenerateSimplex map (new Degenerate(_)))
+
+  test("Orientation test for simple case")(check(forAll { (s: Simplex) =>
+    Sign(signExact(s)) == Sign(signFpFilter(s))
+  }))
+
+  test("Orientation test for degenerate case")(check(forAll { (s: Degenerate[Simplex]) =>
+    Sign(signExact(s.value)) == Sign(signFpFilter(s.value))
+  }))
 }
-

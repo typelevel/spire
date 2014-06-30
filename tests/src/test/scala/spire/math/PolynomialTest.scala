@@ -132,6 +132,12 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     property(s"$name (x /~ y) * y + (x % y) = x") {
       forAll { (x: P, y: P) => if (!y.isZero) (x /~ y) * y + (x % y) shouldBe x }
     }
+
+    property(s"$name p = p.reductum + p.maxTerm") {
+      forAll { (p: P) =>
+        p shouldBe p.reductum + Polynomial(p.maxTerm :: Nil)
+      }
+    }
   }
 
   property("(x compose y)(z) == x(y(z))") {

@@ -18,7 +18,7 @@ object MyBuild extends Build {
 
   // Dependencies
 
-  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.1.0"
+  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.1.3"
   lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.11.3"
 
   // Release step
@@ -52,6 +52,8 @@ object MyBuild extends Build {
 
     scalaVersion := "2.10.2",
 
+    crossScalaVersions := Seq("2.10.2", "2.11.1"),
+
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
@@ -73,16 +75,27 @@ object MyBuild extends Build {
 
     resolvers += Resolver.sonatypeRepo("snapshots"),
     resolvers += Resolver.sonatypeRepo("releases"),
+
+    scalacOptions := {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, 10)) =>
+          scalacOptions.value
+        case Some((2, n)) if n >= 11 =>
+          scalacOptions.value ++ Seq("-Ywarn-unused-import")
+      }
+    },
+
     libraryDependencies := {
       CrossVersion.partialVersion(scalaVersion.value) match {
         // if scala 2.11+ is used, quasiquotes are merged into scala-reflect
         case Some((2, scalaMajor)) if scalaMajor >= 11 =>
           libraryDependencies.value
+
         // in Scala 2.10, quasiquotes are provided by macro-paradise
         case Some((2, 10)) =>
           libraryDependencies.value ++ Seq(
-            compilerPlugin("org.scalamacros" % "paradise" % "2.0.0-M3" cross CrossVersion.full),
-            "org.scalamacros" %% "quasiquotes" % "2.0.0-M3" cross CrossVersion.full)
+            compilerPlugin("org.scalamacros" % "paradise" % "2.0.0" cross CrossVersion.full),
+            "org.scalamacros" %% "quasiquotes" % "2.0.0")
       }
     },
 
@@ -128,7 +141,7 @@ object MyBuild extends Build {
   lazy val spireSettings = Seq(
     name := "spire-aggregate"
   ) ++ noPublish ++ unidocSettings ++ Seq(
-    excludedProjects in unidoc in ScalaUnidoc ++= Seq("examples", "benchmark", "tests")
+    unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, tests)
   ) ++ releaseSettings ++ Seq(
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
@@ -193,7 +206,7 @@ object MyBuild extends Build {
   lazy val examplesSettings = Seq(
     name := "spire-examples",
     libraryDependencies ++= Seq(
-      "com.chuusai" %% "shapeless" % "1.2.3",
+      "com.chuusai" %% "shapeless" % "1.2.4",
       "org.apfloat" % "apfloat" % "1.6.3",
       "org.jscience" % "jscience" % "4.3.1"
     )
@@ -208,7 +221,7 @@ object MyBuild extends Build {
   lazy val scalacheckSettings = Seq(
     name := "spire-scalacheck-binding",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "discipline" % "0.2",
+      "org.typelevel" %% "discipline" % "0.2.1",
       scalaCheck
     )
   )
@@ -232,8 +245,6 @@ object MyBuild extends Build {
   lazy val benchmark: Project = Project("benchmark", file("benchmark")).
     settings(benchmarkSettings: _*).
     dependsOn(core)
-
-  lazy val key = AttributeKey[Boolean]("javaOptionsPatched")
 
   lazy val benchmarkSettings = Seq(
     name := "spire-benchmark",
@@ -260,31 +271,7 @@ object MyBuild extends Build {
     ),
 
     // enable forking in run
-    fork in run := true,
-
-    // custom kludge to get caliper to see the right classpath
-
-    // we need to add the runtime classpath as a "-cp" argument to the
-    // `javaOptions in run`, otherwise caliper will not see the right classpath
-    // and die with a ConfigurationException unfortunately `javaOptions` is a
-    // SettingsKey and `fullClasspath in Runtime` is a TaskKey, so we need to
-    // jump through these hoops here in order to feed the result of the latter
-    // into the former
-    onLoad in Global ~= { previous => state =>
-      previous {
-        state.get(key) match {
-          case None =>
-            // get the runtime classpath, turn into a colon-delimited string
-            val classPath = Project.runTask(fullClasspath in Runtime in benchmark, state).get._2.toEither.right.get.files.mkString(":")
-            // return a state with javaOptionsPatched = true and javaOptions set correctly
-            Project.extract(state).append(Seq(javaOptions in (benchmark, run) ++= Seq("-cp", classPath)), state.put(key, true))
-          case Some(_) =>
-            state // the javaOptions are already patched
-        }
-      }
-    }
-
-    // caliper stuff stolen shamelessly from scala-benchmarking-template
+    fork in run := true
   ) ++ noPublish
 
 }

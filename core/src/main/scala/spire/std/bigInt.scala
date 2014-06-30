@@ -1,6 +1,6 @@
 package spire.std
 
-import spire.algebra._
+import spire.algebra.{EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed}
 
 trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   override def minus(a:BigInt, b:BigInt): BigInt = a - b

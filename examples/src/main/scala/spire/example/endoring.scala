@@ -4,7 +4,6 @@ import language.implicitConversions
 
 import spire.algebra._
 import spire.implicits._
-import spire.math._
 
 object EndoRingExample extends App {
 

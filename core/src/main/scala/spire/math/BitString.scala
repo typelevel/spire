@@ -1,6 +1,5 @@
 package spire.math
 
-import spire.std._
 import spire.macrosk.Ops
 import spire.algebra.BooleanAlgebra
 

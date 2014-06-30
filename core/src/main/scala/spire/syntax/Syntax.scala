@@ -3,7 +3,6 @@ package spire.syntax
 import spire.algebra._
 import spire.math._
 import spire.macros.Syntax
-import spire.macrosk._
 import spire.syntax.std._
 
 trait EqSyntax {
@@ -126,6 +125,30 @@ trait BitStringSyntax {
   implicit def bitStringOps[A: BitString](a: A) = new BitStringOps(a)
 }
 
+trait GroupActionSyntax {
+  implicit def groupActionGroupOps[G](g: G) = new GroupActionGroupOps(g)
+  implicit def groupActionPointOps[P](p: P) = new GroupActionPointOps(p)
+}
+
+trait UnboundSyntax {
+  implicit def moduleUnboundOps[F](f: F)(implicit ev: Module[_, F]) =
+    new ModuleUnboundOps(f)
+
+  implicit def vectorSpaceUnboundOps[F](f: F)(implicit ev: VectorSpace[_, F]) =
+    new VectorSpaceUnboundOps(f)
+
+  implicit def groupActionUnboundOps[G](g: G)(implicit ev: GroupAction[_, G]) =
+    new GroupActionUnboundOps(g)
+  implicit def additiveGroupActionUnboundOps[G](g: G)(implicit ev: AdditiveGroupAction[_, G]) =
+    new AdditiveGroupActionUnboundOps(g)
+  implicit def multiplicativeGroupActionUnboundOps[G](g: G)(implicit ev: MultiplicativeGroupAction[_, G]) =
+    new MultiplicativeGroupActionUnboundOps(g)
+}
+
+trait TorsorSyntax {
+  implicit def torsorPointOps[P](p: P) = new TorsorPointOps(p)
+}
+
 trait IntegralSyntax extends
     EuclideanRingSyntax with
     ConvertableFromSyntax with
@@ -202,6 +225,8 @@ trait AllSyntax extends
     CoordinateSpaceSyntax with
     BooleanAlgebraSyntax with
     BitStringSyntax with
+    GroupActionSyntax with
+    TorsorSyntax with
     IntegralSyntax with
     FractionalSyntax with
     NumericSyntax with

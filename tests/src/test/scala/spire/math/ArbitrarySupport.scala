@@ -98,10 +98,26 @@ object ArbitrarySupport {
   implicit val rational: Arbitrary[Rational] =
     Arbitrary(for {
       n <- arbitrary[Long]
-      d <- arbitrary[Long].filter(_ != 0)
+      d <- arbitrary[Long].map(n => if (n == 0) 1L else n)
     } yield {
       Rational(n, d)
     })
+
+  case class Irrational(real: Real)
+
+  implicit val irrational: Arbitrary[Irrational] =
+    Arbitrary(for {
+      n <- arbitrary[Int]
+      b <- arbitrary[Byte]
+    } yield {
+      if (b == 0) Irrational(Real.zero)
+      else if (b < 0) Irrational(Real(-b).sqrt * Real(n))
+      else Irrational(Real(b).sqrt * Real(n))
+    })
+
+  // using irrationals is a bit too slow for now
+  // implicit val real: Arbitrary[Real] =
+  //   Arbitrary(arbitrary[Irrational].map(n => n.real))
 
   implicit val real: Arbitrary[Real] =
     Arbitrary(arbitrary[Rational].map(n => Real(n)))

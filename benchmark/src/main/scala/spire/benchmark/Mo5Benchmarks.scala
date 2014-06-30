@@ -7,7 +7,6 @@ import scala.reflect.ClassTag
 import scala.util.Random
 import Random._
 
-import spire.algebra._
 import spire.math._
 import spire.implicits._
 

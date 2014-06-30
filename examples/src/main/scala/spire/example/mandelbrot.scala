@@ -51,8 +51,8 @@ object MandelbrotDemo {
 
 object Xterm {
   // r, g, b should be 0-5
-  def color(r: Int, g: Int, b: Int) = "\033[38;5;%dm" format (16 + b + (g * 6) + (r * 36))
-  def clear() = "\033[0m"
+  def color(r: Int, g: Int, b: Int) = "\u001b[38;5;%dm" format (16 + b + (g * 6) + (r * 36))
+  def clear() = "\u001b[0m"
 
   // given things like rgb(0xffcc99) produce things like color(6, 5, 4)
   def rgb(n: Int) = color(scale(n & 0xff0000), scale(n & 0xff00), scale(n & 0xff))

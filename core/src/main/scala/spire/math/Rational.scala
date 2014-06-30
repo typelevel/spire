@@ -5,7 +5,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import java.lang.Math
 
-import spire.algebra._
+import spire.algebra.{Field, IsReal, NRoot, Sign}
 import spire.algebra.Sign.{ Positive, Zero, Negative }
 
 sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] { lhs =>
@@ -417,8 +417,6 @@ object Rational extends RationalInstances {
 
 
 private[math] abstract class Rationals[@specialized(Long) A](implicit integral: Integral[A]) {
-  import LongRationals._
-  import BigRationals._
   import integral._
 
   def build(n: A, d: A): Rational
