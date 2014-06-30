@@ -15,15 +15,8 @@ final class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A]) {
   def <(rhs: A): Boolean = macro Ops.binop[A, Boolean]
   def <=(rhs: A): Boolean = macro Ops.binop[A, Boolean]
 
-  def >*(rhs: A): Option[Boolean] = macro Ops.binop[A, Boolean]
-  def <*(rhs: A): Option[Boolean] = macro Ops.binop[A, Boolean]
-  def >=*(rhs: A): Option[Boolean] = macro Ops.binop[A, Boolean]
-  def <=*(rhs: A): Option[Boolean] = macro Ops.binop[A, Boolean]
-
-  def doubleCompare(rhs: A): Double = macro Ops.binop[A, Double]
+  def partialCompare(rhs: A): Double = macro Ops.binop[A, Double]
   def tryCompare(rhs: A): Option[Int] = macro Ops.binop[A, Option[Int]]
-  def tryMin(rhs: A): A = macro Ops.binop[A, Option[A]]
-  def tryMax(rhs: A): A = macro Ops.binop[A, Option[A]]
 
   def >(rhs: Int)(implicit ev1: Ring[A]): Boolean = macro Ops.binopWithLift[Int, Ring[A], A]
   def >=(rhs: Int)(implicit ev1: Ring[A]): Boolean = macro Ops.binopWithLift[Int, Ring[A], A]
@@ -42,10 +35,6 @@ final class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A]) {
 }
 
 final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
-/*  def >(rhs: A): Boolean = macro Ops.binop[A, Boolean]
-  def >=(rhs: A): Boolean = macro Ops.binop[A, Boolean]
-  def <(rhs: A): Boolean = macro Ops.binop[A, Boolean]
-  def <=(rhs: A): Boolean = macro Ops.binop[A, Boolean]*/
   def compare(rhs: A): Int = macro Ops.binop[A, Int]
   def min(rhs: A): A = macro Ops.binop[A, A]
   def max(rhs: A): A = macro Ops.binop[A, A]

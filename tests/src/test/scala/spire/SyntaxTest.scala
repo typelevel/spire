@@ -95,15 +95,19 @@ trait BaseSyntaxTest {
       ((a > b) == PartialOrder[A].gt(a, b)) &&
       ((a <= b) == PartialOrder[A].lteqv(a, b)) &&
       ((a >= b) == PartialOrder[A].gteqv(a, b)) &&
-      ((a <* b) == PartialOrder[A].tryLt(a, b)) &&
-      ((a >* b) == PartialOrder[A].tryGt(a, b)) &&
-      ((a <=* b) == PartialOrder[A].tryLteqv(a, b)) &&
-      ((a >=* b) == PartialOrder[A].tryGteqv(a, b))
+      ((a partialCompare b) == PartialOrder[A].partialCompare(a, b)) &&
+      ((a tryCompare b) == PartialOrder[A].tryCompare(a, b))
   }
 
   def testOrderSyntax[A: Order](a: A, b: A) = {
     import spire.syntax.order._
-    ((a min b) == Order[A].min(a, b)) &&
+    ((a === b) == Order[A].eqv(a, b)) &&
+      ((a =!= b) == Order[A].neqv(a, b)) &&
+      ((a < b) == Order[A].lt(a, b)) &&
+      ((a > b) == Order[A].gt(a, b)) &&
+      ((a <= b) == Order[A].lteqv(a, b)) &&
+      ((a >= b) == Order[A].gteqv(a, b))
+      ((a min b) == Order[A].min(a, b)) &&
       ((a max b) == Order[A].max(a, b)) &&
       ((a compare b) == Order[A].compare(a, b))
   }
