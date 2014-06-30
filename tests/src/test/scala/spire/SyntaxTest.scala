@@ -42,6 +42,7 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   import spire.math.ArbitrarySupport.rational
 
   test("Eq syntax")(check(forAll { (a: Int, b: Int) => testEqSyntax(a, b) }))
+  test("Partial order syntax")(check(forAll { (a: Int, b: Int) => testPartialOrderSyntax(a, b) }))
   test("Order syntax")(check(forAll { (a: Int, b: Int) => testOrderSyntax(a, b) }))
   test("Signed syntax")(check(forAll { (a: Int) => testSignedSyntax(a) }))
   test("IsReal syntax")(check(forAll { (a: Double) => testIsRealSyntax(a) }))
@@ -86,15 +87,23 @@ trait BaseSyntaxTest {
       ((a =!= b) == Eq[A].neqv(a, b))
   }
 
+  def testPartialOrderSyntax[A: PartialOrder](a: A, b: A) = {
+    import spire.syntax.order._
+    ((a === b) == PartialOrder[A].eqv(a, b)) &&
+      ((a =!= b) == PartialOrder[A].neqv(a, b)) &&
+      ((a < b) == PartialOrder[A].lt(a, b)) &&
+      ((a > b) == PartialOrder[A].gt(a, b)) &&
+      ((a <= b) == PartialOrder[A].lteqv(a, b)) &&
+      ((a >= b) == PartialOrder[A].gteqv(a, b)) &&
+      ((a <* b) == PartialOrder[A].tryLt(a, b)) &&
+      ((a >* b) == PartialOrder[A].tryGt(a, b)) &&
+      ((a <=* b) == PartialOrder[A].tryLteqv(a, b)) &&
+      ((a >=* b) == PartialOrder[A].tryGteqv(a, b))
+  }
+
   def testOrderSyntax[A: Order](a: A, b: A) = {
     import spire.syntax.order._
-    ((a === b) == Order[A].eqv(a, b)) &&
-      ((a =!= b) == Order[A].neqv(a, b)) &&
-      ((a < b) == Order[A].lt(a, b)) &&
-      ((a > b) == Order[A].gt(a, b)) &&
-      ((a <= b) == Order[A].lteqv(a, b)) &&
-      ((a >= b) == Order[A].gteqv(a, b)) &&
-      ((a min b) == Order[A].min(a, b)) &&
+    ((a min b) == Order[A].min(a, b)) &&
       ((a max b) == Order[A].max(a, b)) &&
       ((a compare b) == Order[A].compare(a, b))
   }

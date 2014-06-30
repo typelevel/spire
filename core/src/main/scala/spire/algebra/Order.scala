@@ -5,14 +5,16 @@ import scala.{specialized => spec}
 /**
  * The `Order` type class is used to define a total ordering on some type `A`.
  */
-trait Order[@spec A] extends Eq[A] {
+trait Order[@spec A] extends PartialOrder[A] {
   self =>
 
-  def eqv(x: A, y: A): Boolean = compare(x, y) == 0
-  def gt(x: A, y: A): Boolean = compare(x, y) > 0
-  def lt(x: A, y: A): Boolean = compare(x, y) < 0
-  def gteqv(x: A, y: A): Boolean = compare(x, y) >= 0
-  def lteqv(x: A, y: A): Boolean = compare(x, y) <= 0
+  def doubleCompare(x: A, y: A): Double = compare(x, y).toDouble
+
+  override def eqv(x: A, y: A): Boolean = compare(x, y) == 0
+  override def gt(x: A, y: A): Boolean = compare(x, y) > 0
+  override def lt(x: A, y: A): Boolean = compare(x, y) < 0
+  override def gteqv(x: A, y: A): Boolean = compare(x, y) >= 0
+  override def lteqv(x: A, y: A): Boolean = compare(x, y) <= 0
 
   def min(x: A, y: A): A = if (lt(x, y)) x else y
   def max(x: A, y: A): A = if (gt(x, y)) x else y
@@ -27,7 +29,7 @@ trait Order[@spec A] extends Eq[A] {
   /**
    * Defines an ordering on `A` where all arrows switch direction.
    */
-  def reverse: Order[A] = new ReversedOrder(this)
+  override def reverse: Order[A] = new ReversedOrder(this)
 }
 
 private[algebra] class MappedOrder[@spec A, @spec B](order: Order[B])(f: A => B) extends Order[A] {

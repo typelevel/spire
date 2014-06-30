@@ -9,7 +9,11 @@ trait EqSyntax {
   implicit def eqOps[A:Eq](a:A) = new EqOps(a)
 }
 
-trait OrderSyntax extends EqSyntax {
+trait PartialOrderSyntax extends EqSyntax {
+  implicit def partialOrderOps[A:PartialOrder](a:A) = new PartialOrderOps(a)
+}
+
+trait OrderSyntax extends PartialOrderSyntax {
   implicit def orderOps[A:Order](a:A) = new OrderOps(a)
   implicit def literalIntOrderOps(lhs: Int) = new LiteralIntOrderOps(lhs)
   implicit def literalLongOrderOps(lhs: Long) = new LiteralLongOrderOps(lhs)

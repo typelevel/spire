@@ -187,6 +187,12 @@ object Ops extends Ops {
     ("$eq$eq$eq", "eqv"),
     ("$eq$bang$eq", "neqv"),
 
+    // Partial order (>* <* >=* <=*)
+    ("$greater$times", "tryGt"),
+    ("$less$times", "tryLt"),
+    ("$greater$eq$times", "tryGteqv"),
+    ("$less$eq$times", "tryLteqv"),
+
     // Order (> >= < <=)
     ("$greater", "gt"),
     ("$greater$eq", "gteqv"),
