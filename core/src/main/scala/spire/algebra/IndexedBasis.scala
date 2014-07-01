@@ -5,18 +5,6 @@ import scala.{ specialized => spec }
 import spire.std.MapBasis
 
 /**
- * A builder for vectors `V` with elements of `K`, indexed by `I`.
- *
- * TODO: Move this to own file - possibly different package?
- */
-trait VectorBuilder[V, @spec(Int, Long, Float, Double) K, @spec(Int, Long) I] {
-  type State
-  def init: State
-  def update(s: State, i: I, k: K): State
-  def result(s: State): V
-}
-
-/**
  * An `IndexedBasis` of a [[VectorSpace]] `V` provides a coordinate system on `V`
  * with elements of type `K` indexed by `I`.
  *
