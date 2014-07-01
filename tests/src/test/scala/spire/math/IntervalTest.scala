@@ -287,10 +287,18 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
       val e = Interval.empty[Rational]
 
       a shouldBe e
+      a shouldBe b
       b shouldBe e
       c shouldBe e
       d shouldBe e
       e shouldBe e
+      import spire.algebra.Eq
+      assert(Eq[Interval[Rational]].eqv(a, e))
+      assert(Eq[Interval[Rational]].eqv(a, b))
+      assert(Eq[Interval[Rational]].eqv(b, e))
+      assert(Eq[Interval[Rational]].eqv(c, e))
+      assert(Eq[Interval[Rational]].eqv(d, e))
+      assert(Eq[Interval[Rational]].eqv(e, e))
     }
   }
 }
