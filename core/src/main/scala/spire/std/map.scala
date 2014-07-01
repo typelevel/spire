@@ -80,7 +80,12 @@ with InnerProductSpace[Map[K, V], V] with Serializable {
 
 @SerialVersionUID(0L)
 class MapBasis[I, K](implicit K: AdditiveMonoid[K]) extends IndexedBasis[Map[I, K], K, I] with Serializable {
-  type Idx = I
+  val builder = new VectorBuilder[Map[I, K], K, I] {
+    type State = Map[I, K]
+    def init: State = Map.empty
+    def update(s: State, i: I, k: K): State = s + (i -> k)
+    def result(s: State): Map[I, K] = s
+  }
 
   private def zero: K = K.zero
 
@@ -89,23 +94,42 @@ class MapBasis[I, K](implicit K: AdditiveMonoid[K]) extends IndexedBasis[Map[I, 
 
   def coord(v: Map[I, K], i: I): K = v(i)
 
-  def map(v: Map[I, K])(f: K => K): Map[I, K] =
-    v map { case (i, k) => (i, f(k)) }
+  def foreachWithIndex[U](v: Map[I, K])(f: (I, K) => U): Unit =
+    v foreach { case (i, k) => f(i, k) }
 
-  def mapWithIndex(v: Map[I, K])(f: (Idx, K) => K): Map[I, K] =
-    v map { case (i, k) => (i, f(i, k)) }
+  def zipForeachWithIndex[U](v: Map[I, K], w: Map[I, K])(f: (I, K, K) => U): Unit = {
+    v foreach { case (i, x) =>
+      w.get(i) match {
+        case Some(y) => f(i, x, y)
+        case None => f(i, x, zero)
+      }
+    }
+    w foreach { case (i, y) =>
+      if (!v.contains(i)) {
+        f(i, zero, y)
+      }
+    }
+  }
 
-  def zipMap(v: Map[I, K], w: Map[I, K])(f: (K, K) => K): Map[I, K] =
-    zipMapWithIndex(v, w)((i, k0, k1) => f(k0, k1))
+  override def apply(elems: (I, K)*): Map[I, K] = Map(elems: _*)
 
-  def zipMapWithIndex(v: Map[I, K], w: Map[I, K])(f: (I, K, K) => K): Map[I, K] =
+  override def foreach[U](v: Map[I, K])(f: K => U): Unit =
+    v.foreach(t => f(t._2))
+
+  override def map(v: Map[I, K])(f: K => K): Map[I, K] =
+    v.map { case (i, k) => i -> f(k) }
+
+  override def mapWithIndex(v: Map[I, K])(f: (I, K) => K): Map[I, K] =
+    v.map { case (i, k) => i -> f(i, k) }
+
+  override def foldMap[A](v: Map[I, K])(f: K => A)(implicit A: CMonoid[A]): A =
+    v.foldLeft(A.id) { case (sum, (_, k)) => A.op(sum, f(k)) }
+
+  override def foldMapWithIndex[A](v: Map[I, K])(f: (I, K) => A)(implicit A: CMonoid[A]): A =
+    v.foldLeft(A.id) { case (sum, (i, k)) => A.op(sum, f(i, k)) }
+
+  override def zipMapWithIndex(v: Map[I, K], w: Map[I, K])(f: (I, K, K) => K): Map[I, K] =
     MapJoin.Custom[I, K]((i, l) => f(i, l, zero), (i, r) => f(i, zero, r), f)(v, w)
-
-  def foreachNonZero[U](v: Map[I, K])(f: K => U): Unit =
-    v foreach { case (i, k) => f(k) }
-
-  def foreachNonZeroWithIndex[U](v: Map[I, K])(f: (I, K) => U): Unit =
-    v foreach f.tupled
 }
 
 @SerialVersionUID(0L)

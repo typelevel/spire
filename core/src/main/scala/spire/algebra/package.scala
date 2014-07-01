@@ -1,7 +1,5 @@
 package spire
 
-import spire.std.MapBasis
-
 package object algebra {
 
   /**
@@ -17,9 +15,7 @@ package object algebra {
   type Basis[V, K] = IndexedBasis[V, K, I] forSome { type I }
 
   object Basis {
-    case class Free[I, K: AdditiveMonoid](val basis: Set[I]) extends MapBasis[I, K] {
-      override val hasKnownSize: Boolean = true
-      override val size: Int = basis.size
-    }
+    def Free[I, K: AdditiveMonoid](basis: Set[I]): Basis[Map[I, K], K] =
+      IndexedBasis.Free(basis)
   }
 }

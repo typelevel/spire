@@ -6,30 +6,19 @@ package spire.algebra
 trait Frame[V, K] extends IndexedBasis[V, K, Int]
 
 object Frame {
-  def Free[I, K](basis: Set[I]): Free[I, K] = new Free(basis.toVector)
-
-  class Free[I, K](val basis: Vector[I]) extends Frame[Vector[K], K] {
-    val hasKnownSize: Boolean = true
-    val size: Int = basis.size
-
+  case class Free[I, K](val basis: Vector[I])(implicit K: AdditiveMonoid[K]) extends Frame[Vector[K], K] {
+    val builder = new VectorBuilder[Vector[K], K, Int] {
+      type State = Vector[K]
+      def init: State = Vector.fill(size)(K.zero)
+      def update(s: State, i: Int, k: K): State = s.updated(i, k)
+      def result(s: State): Vector[K] = s
+    }
+    def hasKnownSize: Boolean = true
+    def size: Int = basis.size
     def coord(v: Vector[K], i: Int): K = v(i)
-
-    def map(v: Vector[K])(f: K => K): Vector[K] =
-      v map f
-
-    def mapWithIndex(v: Vector[K])(f: (Int, K) => K): Vector[K] =
-      v.zipWithIndex map { case (k, i) => f(i, k) }
-
-    def zipMap(v: Vector[K], w: Vector[K])(f: (K, K) => K): Vector[K] =
-      v zip w map f.tupled
-
-    def zipMapWithIndex(v: Vector[K], w: Vector[K])(f: (Int, K, K) => K): Vector[K] =
-      v.zipWithIndex zip w map { case ((k0, i), k1) => f(i, k0, k1) }
-
-    def foreachNonZero[U](v: Vector[K])(f: K => U): Unit =
-      v foreach f
-
-    def foreachNonZeroWithIndex[U](v: Vector[K])(f: (Int, K) => U): Unit =
-      v.zipWithIndex foreach { case (k, i) => f(i, k) }
+    def foreachWithIndex[U](v: Vector[K])(f: (Int, K) => U): Unit =
+      (0 until size).foreach { i => f(i, v(i)) }
+    def zipForeachWithIndex[U](v: Vector[K], w: Vector[K])(f: (Int, K, K) => U): Unit =
+      (0 until size).foreach { i => f(i, v(i), w(i)) }
   }
 }
