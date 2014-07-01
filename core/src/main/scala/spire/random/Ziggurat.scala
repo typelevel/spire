@@ -29,12 +29,12 @@ import scala.annotation.tailrec
  * @see <a href="http://en.wikipedia.org/wiki/Ziggurat_algorithm">Ziggurat algorithm @ Wikipedia</a>
  * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
  */
-final object Ziggurat {
+object Ziggurat {
 
-  import Math.exp
-  import Math.sqrt
-  import Math.log
-  import Math.abs
+  import scala.math.exp
+  import scala.math.sqrt
+  import scala.math.log
+  import scala.math.abs
 
   private val kn = new Array[Long](128)
   private val wn = new Array[Double](128)
