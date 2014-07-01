@@ -943,8 +943,7 @@ object Interval {
 
   implicit def eq[A: Eq]: Eq[Interval[A]] =
     new Eq[Interval[A]] {
-      def eqv(x: Interval[A], y: Interval[A]): Boolean =
-        (x.lowerPair === y.lowerPair) && (x.upperPair === y.upperPair)
+      def eqv(x: Interval[A], y: Interval[A]): Boolean = x == y
     }
 
   implicit def semiring[A](implicit ev: Ring[A], o: Order[A]): Semiring[Interval[A]] =
