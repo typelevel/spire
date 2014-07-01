@@ -160,36 +160,4 @@ object Ziggurat {
       we(i) = de / m2
     }
   }
-
-  /**
-   * Generates Matlab files for data analysis via histogram and Distribution Fitting App (dfittool).
-   */
-  def main(a: Array[String]) = {
-
-    val g: Generator = spire.random.rng.Well512a.fromTime()
-    def samples = 200000
-    def generate(d : Generator => Double, n : Int) = Array.tabulate(n)(x => d(g))
-
-    val rnor = generate(spire.random.Ziggurat.rnor, samples)
-    val rexp = generate(spire.random.Ziggurat.rexp, samples)
-
-    val fnor = new java.io.PrintStream(new java.io.FileOutputStream("D:\\\\zigguratrnor.m"))
-    val fexp = new java.io.PrintStream(new java.io.FileOutputStream("D:\\\\zigguratrexp.m"))
-
-    fnor.print("rnor = [")
-    for (i <- rnor) { fnor.print(i); fnor.print(", ") }
-    fnor.println("]")
-    fnor.println("x = -5:0.05:5")
-    fnor.println("hist(rnor,x)")
-    fnor.println("dfittool(rnor)")
-    fnor.close()
-
-    fexp.print("rexp = [")
-    for (i <- rexp) { fexp.print(i); fexp.print(", ") }
-    fexp.println("]")
-    fexp.println("x = -1:0.05:10")
-    fexp.println("hist(rexp,x)")
-    fexp.println("dfittool(rexp)")
-    fexp.close()
-   }
 }
