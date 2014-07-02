@@ -152,7 +152,7 @@ object unicode {
     def ≠(rhs: A): Boolean = lhs != rhs
   }
 
-  implicit class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
+  implicit class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A]) {
     def ≤(rhs: A): Boolean = ev.lteqv(lhs, rhs)
     def ≥(rhs: A): Boolean = ev.gteqv(lhs, rhs)
   }

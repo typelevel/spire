@@ -14,6 +14,7 @@ object Auto {
     def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]): EuclideanRing[A] = macro ScalaAutoMacros.euclideanRingImpl[A]
     def field[A](z: A, o: A)(implicit ev: Eq[A]): Field[A] = macro ScalaAutoMacros.fieldImpl[A]
     def eq[A]: Eq[A] = macro ScalaAutoMacros.eqImpl[A]
+    // TODO: partialOrder ?
     def order[A]: Order[A] = macro ScalaAutoMacros.orderImpl[A]
 
     object collection {
@@ -30,6 +31,7 @@ object Auto {
     def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]): EuclideanRing[A] = macro JavaAutoMacros.euclideanRingImpl[A]
     def field[A](z: A, o: A)(implicit ev: Eq[A]): Field[A] = macro JavaAutoMacros.fieldImpl[A]
     def eq[A]: Eq[A] = macro JavaAutoMacros.eqImpl[A]
+    // TODO: partialOrder ?
     def order[A]: Order[A] = macro JavaAutoMacros.orderImpl[A]
 
     object collection {
