@@ -42,8 +42,14 @@ class ZigguratBenchmarks extends MyBenchmark with BenchmarkData {
   val gaussDist = mg(0d, 1d)
 
   @inline final def nextLen = 10000000
+ 
+  def timePolarRNORGenerator(reps: Int) = run(reps) {
+    val rng = well512aRng
+    var t = 0d
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextGaussian())
+  }
 
-  def timePolarRNOR(reps: Int) = run(reps) {
+  def timePolarRNORDist(reps: Int) = run(reps) {
     val rng = well512aRng
     var t = 0d
     cfor(0)(_ < nextLen, _ + 1)(_ => t += gaussDist(rng))
