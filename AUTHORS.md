@@ -28,7 +28,7 @@ possible.
 * Rex Kerr: author of many of the PRNGs found in spire.random
 * Grzegorz Kossakowski: much build support, 2.11 upgrading help, bug reports
 * Christian Krause: suggestions around stats methods and spire.random.
-* Dušan Kysel: author of MersenneTwister and WELL PRNGs
+* Dušan Kysel: author of Ziggurat, MersenneTwister and WELL PRNGs
 * Josh Marcus: bug reports and benchmarking
 * Brian McKenna: documentation fixes
 * Simon Ochsenreither: bug reports and build contributions

@@ -29,7 +29,7 @@ import java.util.Arrays
  * with a <tt>2<sup>19937</sup>&nbsp;-&nbsp;1</tt> long period.
  *
  * <p><b>Reference: </b>
- * Makato Matsumoto and Takuji Nishimura:
+ * Makoto Matsumoto and Takuji Nishimura:
  * "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform Pseudo-Random Number Generator",
  * <i>ACM Transactions on Modeling and Computer Simulation,</i> Vol. 8, No. 1, January 1998, pp 3--30.
  *
