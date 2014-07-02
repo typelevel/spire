@@ -13,7 +13,7 @@ trait VectorInstancesLow {
     new SeqBasis[A, Vector[A]]
 }
 
-trait VectorInstances {
+trait VectorInstances extends VectorInstancesLow {
   implicit def VectorOrder[A: Order]: Order[Vector[A]] =
     new SeqOrder[A, Vector[A]]
 }

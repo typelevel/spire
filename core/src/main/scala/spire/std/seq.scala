@@ -75,23 +75,6 @@ extends VectorSpace[SA, A] with Serializable {
   def timesl(r: A, sa: SA): SA = sa map (scalar.times(r, _))
 }
 
-@SerialVersionUID(0L)
-class SeqInnerProductSpace[A, SA <: SeqLike[A, SA]](implicit scalar: Rng[A], cbf: CanBuildFrom[SA,A,SA])
-extends SeqVectorSpace[A, SA] with InnerProductSpace[SA, A] with Serializable {
-  def dot(x: SA, y: SA): A = {
-    @tailrec
-    def loop(xi: Iterator[A], yi: Iterator[A], acc: A): A = {
-      if (xi.hasNext && yi.hasNext) {
-        loop(xi, yi, scalar.plus(acc, scalar.times(xi.next(), yi.next())))
-      } else {
-        acc
-      }
-    }
-
-    loop(x.toIterator, y.toIterator, scalar.zero)
-  }
-}
-
 /**
  * The L_p norm is equal to the `p`-th root of the sum of each element to the
  * power `p`. For instance, if `p = 1` we have the Manhattan distance. If you'd
