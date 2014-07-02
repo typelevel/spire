@@ -19,7 +19,8 @@ package object std {
   object string extends StringInstances
   object iterable extends IterableInstances
   object array extends ArrayInstances
-  object seq extends SeqInstances
+  object list extends ListInstances
+  object vector extends VectorInstances
   object map extends MapInstances
   object tuples extends ProductInstances
   object option extends OptionInstances

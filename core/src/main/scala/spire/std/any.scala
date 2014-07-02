@@ -15,7 +15,8 @@ trait AnyInstances extends BooleanInstances
                       with StringInstances
                       with IterableInstances
                       with ArrayInstances
-                      with SeqInstances
+                      with VectorInstances
+                      with ListInstances
                       with MapInstances
                       with ProductInstances
                       with OptionInstances

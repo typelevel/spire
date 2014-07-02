@@ -139,6 +139,98 @@ extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
   }
 }
 
+@SerialVersionUID(0L)
+private final class SeqBasis[A, SA <: SeqLike[A, SA]]
+    (implicit A: AdditiveMonoid[A], cbf: CanBuildFrom[SA,A,SA])
+    extends Frame[SA, A] with Serializable {
+  val builder = new VectorBuilder[SA, A, Int] {
+    type State = Map[Int, A]
+
+    def init: State = Map.empty
+
+    def update(s: State, i: Int, k: A): State =
+      s + (i -> k)
+
+    def result(s: State): SA =
+      if (s.isEmpty) cbf().result()
+      else {
+        val size = s.maxBy(_._1)._1
+        val bldr = cbf()
+        var i = 0
+        while (i < size) {
+          bldr += s.getOrElse(i, A.zero)
+          i += 1
+        }
+        bldr.result()
+      }
+  }
+
+  // Not really true, but we're pretending Int.MaxValue == Infinity.
+  def hasKnownSize: Boolean = false
+
+  def size: Int = ???
+
+  def coord(v: SA, i: Int): A = v(i)
+
+  def foreachWithIndex[U](v: SA)(f: (Int, A) => U): Unit =
+    v.foldLeft(0) { (i, x) => f(i, x); i + 1 }
+
+  def zipForeachWithIndex[U](v: SA, w: SA)(f: (Int, A, A) => U): Unit = {
+    val vi = v.iterator
+    val wi = w.iterator
+    var i = 0
+    while (vi.hasNext && wi.hasNext) {
+      f(i, vi.next(), wi.next())
+      i += 1
+    }
+    while (vi.hasNext) {
+      f(i, vi.next(), A.zero)
+      i += 1
+    }
+    while (wi.hasNext) {
+      f(i, wi.next(), A.zero)
+      i += 1
+    }
+  }
+
+  override def foreach[U](v: SA)(f: A => U): Unit =
+    v foreach f
+
+  override def map(v: SA)(f: A => A): SA =
+    v map f
+
+  override def mapWithIndex(v: SA)(f: (Int, A) => A): SA = {
+    val it = v.iterator
+    var i = 0
+    val bldr = cbf()
+    while (it.hasNext) {
+      bldr += f(i, it.next())
+      i += 1
+    }
+    bldr.result()
+  }
+
+  override def zipMapWithIndex(v: SA, w: SA)(f: (Int, A, A) => A): SA = {
+    val vi = v.iterator
+    val wi = w.iterator
+    var i = 0
+    val bldr = cbf()
+    while (vi.hasNext && wi.hasNext) {
+      bldr += f(i, vi.next(), wi.next())
+      i += 1
+    }
+    while (vi.hasNext) {
+      bldr += f(i, vi.next(), A.zero)
+      i += 1
+    }
+    while (wi.hasNext) {
+      bldr += f(i, wi.next(), A.zero)
+      i += 1
+    }
+    bldr.result()
+  }
+}
+
 private object SeqSupport {
   @tailrec
   final def forall[A](x: Iterator[A], y: Iterator[A])(f: (A, A) => Boolean, g: A => Boolean): Boolean = {
@@ -221,27 +313,3 @@ extends SeqVectorEq[A, SA] with Order[SA] with Serializable {
     loop(x.toIterator, y.toIterator)
   }
 }
-
-trait SeqInstances1 {
-  implicit def SeqVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit rng0: Rng[A],
-      cbf0: CanBuildFrom[CC[A], A, CC[A]],
-      ev: NoImplicit[NormedVectorSpace[CC[A], A]]) = new SeqVectorSpace[A, CC[A]]
-
-  implicit def SeqEq[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Eq[A]) =
-    new SeqEq[A, CC[A]]
-}
-
-trait SeqInstances2 extends SeqInstances1 {
-  implicit def SeqInnerProductSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit rng0: Rng[A],
-      cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqInnerProductSpace[A, CC[A]]
-
-  implicit def SeqOrder[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Order[A]) =
-    new SeqOrder[A, CC[A]]
-}
-
-trait SeqInstances3 extends SeqInstances2 {
-  implicit def SeqNormedVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
-      nroot0: NRoot[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]) = SeqInnerProductSpace[A, CC].normed
-}
-
-trait SeqInstances extends SeqInstances3
