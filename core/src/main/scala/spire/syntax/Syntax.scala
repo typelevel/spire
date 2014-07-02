@@ -201,6 +201,7 @@ trait AllSyntax extends
     LiteralsSyntax with
     CforSyntax with
     EqSyntax with
+    PartialOrderSyntax with
     OrderSyntax with
     SignedSyntax with
     IsRealSyntax with

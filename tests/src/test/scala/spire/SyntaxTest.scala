@@ -95,6 +95,8 @@ trait BaseSyntaxTest {
       ((a > b) == PartialOrder[A].gt(a, b)) &&
       ((a <= b) == PartialOrder[A].lteqv(a, b)) &&
       ((a >= b) == PartialOrder[A].gteqv(a, b)) &&
+      ((a pmin b) == Order[A].pmin(a, b)) &&
+      ((a pmax b) == Order[A].pmax(a, b)) &&
       ((a partialCompare b) == PartialOrder[A].partialCompare(a, b)) &&
       ((a tryCompare b) == PartialOrder[A].tryCompare(a, b))
   }

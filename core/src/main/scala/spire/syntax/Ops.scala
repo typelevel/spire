@@ -17,6 +17,8 @@ final class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A]) {
 
   def partialCompare(rhs: A): Double = macro Ops.binop[A, Double]
   def tryCompare(rhs: A): Option[Int] = macro Ops.binop[A, Option[Int]]
+  def pmin(rhs: A): Option[A] = macro Ops.binop[A, A]
+  def pmax(rhs: A): Option[A] = macro Ops.binop[A, A]
 
   def >(rhs: Int)(implicit ev1: Ring[A]): Boolean = macro Ops.binopWithLift[Int, Ring[A], A]
   def >=(rhs: Int)(implicit ev1: Ring[A]): Boolean = macro Ops.binopWithLift[Int, Ring[A], A]
