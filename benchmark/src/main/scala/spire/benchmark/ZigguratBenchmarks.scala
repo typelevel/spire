@@ -14,15 +14,10 @@
 
 package spire.benchmark
 
-import scala.reflect.ClassTag
 import spire.implicits._
 
-import com.google.caliper.Runner 
-import com.google.caliper.SimpleBenchmark
-import com.google.caliper.Param
-
 /**
- * This is benchmark comparing Marsaglias Polar Method implementation with the implementation of his Ziggurat algorithm.
+ * This is a benchmark comparing Marsaglias Polar Method implementation with the implementation of his Ziggurat algorithm.
  *
  * <p><b>Reference: </b>
  * George Marsaglia, Wai Wan Tsang:
