@@ -1,4 +1,5 @@
 package spire.math
+package expr
 
 /** The sides that an expression may appear on inside another expression. */
 sealed abstract class Side

@@ -1,5 +1,5 @@
 package spire.math
-
+package expr
 
 /** A trait for expression trees that can be parsed and pretty-printed. */
 trait Tree {
@@ -29,30 +29,40 @@ trait Tree {
     * The power operator ^ can only be represented as a binary operator.
     */
   sealed trait BinaryNode extends ParentNode {
-    self: {
-      def copy(left: Node, right: Node): BinaryNode
-    } =>
     def children = Seq(left, right)
-    def build(newChildren: Seq[Node]) = newChildren match {
-      case Seq(newLeft, newRight) => copy(newLeft, newRight)
-    }
     def left: Node
     def right: Node
   }
 
   /** Binary nodes used only to display/parse expressions. */
-  sealed trait DisplayBinaryNode extends BinaryNode {
-    self: {
-      def copy(left: Node, right: Node): BinaryNode
-    } =>
+  sealed trait DisplayBinaryNode extends BinaryNode
+  case class AddNode(left: Node, right: Node) extends DisplayBinaryNode {
+    def build(newChildren: Seq[Node]) = newChildren match {
+      case Seq(newLeft, newRight) => AddNode(newLeft, newRight)
+    }
   }
-  case class AddNode(left: Node, right: Node) extends DisplayBinaryNode
-  case class SubNode(left: Node, right: Node) extends DisplayBinaryNode
-  case class MulNode(left: Node, right: Node) extends DisplayBinaryNode
-  case class DivNode(left: Node, right: Node) extends DisplayBinaryNode
+  case class SubNode(left: Node, right: Node) extends DisplayBinaryNode {
+    def build(newChildren: Seq[Node]) = newChildren match {
+      case Seq(newLeft, newRight) => SubNode(newLeft, newRight)
+    }
+  }
+  case class MulNode(left: Node, right: Node) extends DisplayBinaryNode {
+    def build(newChildren: Seq[Node]) = newChildren match {
+      case Seq(newLeft, newRight) => MulNode(newLeft, newRight)
+    }
+  }
+  case class DivNode(left: Node, right: Node) extends DisplayBinaryNode {
+    def build(newChildren: Seq[Node]) = newChildren match {
+      case Seq(newLeft, newRight) => DivNode(newLeft, newRight)
+    }
+  }
 
   /** A node representing left to the power right. */
-  case class PowerNode(left: Node, right: Node) extends BinaryNode
+  case class PowerNode(left: Node, right: Node) extends BinaryNode {
+    def build(newChildren: Seq[Node]) = newChildren match {
+      case Seq(newLeft, newRight) => PowerNode(newLeft, newRight)
+    }
+  }
 
   /** Sequence node representing a sum or a product of terms.
     * 
@@ -63,16 +73,17 @@ trait Tree {
     * converted back to binary operators to be pretty-printed.
     */
   sealed trait SeqNode extends ParentNode {
-    self: {
-      def copy(args: Seq[Node]): SeqNode
-    } =>
     def children = args
-    def build(newChildren: Seq[Node]) = copy(newChildren)
+    def build(newChildren: Seq[Node]): SeqNode
     def args: Seq[Node]
   }
 
-  case class PlusNode(args: Seq[Node]) extends SeqNode
-  case class TimesNode(args: Seq[Node]) extends SeqNode
+  case class PlusNode(args: Seq[Node]) extends SeqNode {
+    def build(newChildren: Seq[Node]) = PlusNode(newChildren)
+  }
+  case class TimesNode(args: Seq[Node]) extends SeqNode {
+    def build(newChildren: Seq[Node]) = TimesNode(newChildren)
+  }
 
   /** Node representing unary operations. */
   sealed trait UnaryNode extends ParentNode {

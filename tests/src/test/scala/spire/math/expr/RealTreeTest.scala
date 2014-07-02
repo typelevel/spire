@@ -1,4 +1,5 @@
 package spire.math
+package expr
 
 import org.scalatest.FunSuite
 import org.scalatest.Matchers

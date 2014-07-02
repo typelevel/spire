@@ -1,57 +1,34 @@
 package spire.math
+package expr
 
-object RealTree extends ValueTree[Real] {
+import spire.algebra.{EuclideanRing, Field, Trig}
+
+object RealTree extends TrigValueTree[Real] with FieldValueTree[Real] {
   import spire.algebra.Trig
   import spire.implicits._
+  implicit def euclideanRing = EuclideanRing[Real]
+  implicit def field = Field[Real]
+  implicit def trig = Trig[Real]
 
-  def value(node: Node): Real = node match {
+  def fpow(a: Real, b: Real) = a.fpow(b)
+
+  def atomValue(atom: AtomNode) = atom match {
+    case ConstantNode("e") => Real.e
+    case ConstantNode("pi") => Real.pi
     case FloatNode(bd, powerOfTen) => Real(bd) * Real(10).fpow(powerOfTen)
     case RationalNode(r) => Real(r)
-    case PlusNode(seq) => seq.map(value(_)).reduce(_+_)
-    case TimesNode(seq) => seq.map(value(_)).reduce(_*_)
-    case InvNode(node) => value(node).reciprocal
-    case NegNode(node) => -value(node)
-    case PowerNode(left, right) => value(left).fpow(value(right))
-
-    case ConstantNode("e") => Trig[Real].e
-    case ConstantNode("pi") => Trig[Real].pi
-    case c: ConstantNode => sys.error(s"Invalid constant $c")
-    case a: AtomNode => sys.error("Should not happen")
-    case b: DisplayBinaryNode => sys.error(s"Node $b is in display format")
-
-    case FunNode("exp", node) => Trig[Real].exp(value(node))
-    case FunNode("expm1", node) => Trig[Real].expm1(value(node))
-    case FunNode("log", node) => Trig[Real].log(value(node))
-    case FunNode("log1p", node) => Trig[Real].log1p(value(node))
-
-    case FunNode("sin", node) => Trig[Real].sin(value(node))
-    case FunNode("cos", node) => Trig[Real].cos(value(node))
-    case FunNode("tan", node) => Trig[Real].tan(value(node))
-
-    case FunNode("asin", node) => Trig[Real].asin(value(node))
-    case FunNode("acos", node) => Trig[Real].acos(value(node))
-    case FunNode("atan", node) => Trig[Real].atan(value(node))
-      // atan2 not supported yet
-    case FunNode("sinh", node) => Trig[Real].sinh(value(node))
-    case FunNode("cosh", node) => Trig[Real].cosh(value(node))
-    case FunNode("tanh", node) => Trig[Real].tanh(value(node))
-
-    case FunNode("toRadians", node) => Trig[Real].toRadians(value(node))
-    case FunNode("toDegrees", node) => Trig[Real].toDegrees(value(node))
-    case f: FunNode => sys.error(s"Invalid function $f")
   }
 
   case class RationalNode(r: Rational) extends AtomNode
   case class FloatNode(bd: BigDecimal, powerOfTen: Int) extends AtomNode
-  case class ConstantNode(name: String) extends AtomNode
 
-  def rationalValue(node: Node): Rational = node match {
+  protected def exactRationalValue(node: Node): Rational = node match {
     case _: FloatNode => sys.error("Cannot transform a FloatNode to Rational.")
     case RationalNode(r) => r
-    case PlusNode(seq) => seq.map(rationalValue(_)).reduce(_+_)
-    case TimesNode(seq) => seq.map(rationalValue(_)).reduce(_*_)
-    case NegNode(n) => -rationalValue(n)
-    case InvNode(n) => rationalValue(n).reciprocal
+    case PlusNode(seq) => seq.map(exactRationalValue(_)).reduce(_+_)
+    case TimesNode(seq) => seq.map(exactRationalValue(_)).reduce(_*_)
+    case NegNode(n) => -exactRationalValue(n)
+    case InvNode(n) => exactRationalValue(n).reciprocal
     case _ => sys.error("Cannot transform node to Rational.")
   }
 
@@ -62,14 +39,14 @@ object RealTree extends ValueTree[Real] {
       case NegNode(FloatNode(bd, powerOfTen)) => return Some(FloatNode(-bd, powerOfTen))
       case PlusNode(seq) if seq.count(_.isInstanceOf[RationalNode]) > 1 =>
         val (rational, nonRational) = seq.partition(_.isInstanceOf[RationalNode])
-        val r = rationalValue(PlusNode(rational))
+        val r = exactRationalValue(PlusNode(rational))
         if (r != 0)
           return Some(PlusNode(nonRational :+ RationalNode(r)))
         else
           return Some(PlusNode(nonRational))
       case TimesNode(seq) if seq.count(_.isInstanceOf[RationalNode]) > 1 =>
         val (rational, nonRational) = seq.partition(_.isInstanceOf[RationalNode])
-        val r = rationalValue(TimesNode(rational))
+        val r = exactRationalValue(TimesNode(rational))
         if (r == 0)
           return Some(RationalNode(r))
         if (r != 1)
