@@ -77,10 +77,13 @@ trait TrigTree extends FieldTree {
   def TreeUnparser: TrigTreeUnparserTrait
 
   trait TrigTreeParserTrait extends FieldTreeParserTrait {
-    lazy val p_op: PackratParser[Node] =
-      ((primary <~ "^") ~ u_expr) ^^ {
-        case left ~ right => PowerNode(left, right)
-      }
+    // TODO: implement NRootTree with Rational exponents
+    override def buildPowerNode(base: Node, exponent: Node) =
+      nodeToInt(exponent).map(i => IntPowerNode(base, i)).getOrElse(PowerNode(base, exponent))
+
+    lazy val trigConstant: PackratParser[Node] = 
+      ("pi" ^^^ ConstantNode("pi")) |
+      ("e" ^^^ ConstantNode("e"))
 
     lazy val call: PackratParser[Node] = identifier ~ (("(" ~> a_expr) <~ ")") ^^ {
       case name ~ node => FunNode(name, node)
@@ -91,6 +94,7 @@ trait TrigTree extends FieldTree {
 
   trait TrigTreeUnparserTrait extends FieldTreeUnparserTrait {
     override def printable(n: Node) = n match {
+      case ConstantNode(name) => Value(name)
       case PowerNode(left, right) => RightAssoc(left, "^", right, priority = 40)
       case FunNode(name, node) => Enclosed(name + "(", node, ")")
       case _ => super.printable(n)

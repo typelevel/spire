@@ -28,6 +28,7 @@ trait RingEvaluator[T <: RingTree, A] extends Evaluator[T, A] {
     case tree.PlusNode(seq) => seq.map(value(_)).reduceOption(_+_).getOrElse(Ring[A].zero)
     case tree.TimesNode(seq) => seq.map(value(_)).reduceOption(_*_).getOrElse(Ring[A].one)
     case tree.NegNode(n) => -value(n)
+    case tree.IntPowerNode(base, exponent) => value(base)**exponent
     case _ => super.value(node)
   }
 }

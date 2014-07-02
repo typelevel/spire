@@ -5,6 +5,15 @@ import spire.algebra.Ring
 import spire.implicits._
 
 trait RingTree extends Tree {
+  case class IntPowerNode(base: Node, exponent: Int) extends ParentNode {
+    def children = Seq(base)
+    def build(newChildren: Seq[Node]) = newChildren match {
+      case Seq(newBase) => IntPowerNode(newBase, exponent)
+    }
+    def isValidCompact = base.isValidCompact
+    def isValidDisplay = base.isValidDisplay
+  }
+
   case class AddNode(left: Node, right: Node) extends DisplayBinaryNode {
     def build(newChildren: Seq[Node]) = newChildren match {
       case Seq(newLeft, newRight) => AddNode(newLeft, newRight)
@@ -38,13 +47,15 @@ trait RingTree extends Tree {
 
   def zeroNode: Node
   def oneNode: Node
-  def nodeFromInt(n: Int): Node
+  def nodeFromInt(i: Int): Node
+  def nodeToInt(n: Node): Option[Int]
 
   override def toCompact(displayNode: Node): Node = displayNode match {
     case NegNode(node) => -toCompact(node)
     case AddNode(left, right) => toCompact(left) + toCompact(right)
     case SubNode(left, right) => toCompact(left) - toCompact(right)
     case MulNode(left, right) => toCompact(left) * toCompact(right)
+    case IntPowerNode(base, exponent) => toCompact(base) ** exponent
     case _ => super.toCompact(displayNode)
   }
 
@@ -59,6 +70,7 @@ trait RingTree extends Tree {
     case TimesNode(Seq(head, tail@_*)) => (toDisplay(head) /: tail) {
       case (displayNode, node) => MulNode(displayNode, toDisplay(node))
     }
+    case IntPowerNode(base, exponent) => IntPowerNode(toDisplay(base), exponent)
     case _ => super.toDisplay(compactNode)
   }
 
@@ -66,10 +78,6 @@ trait RingTree extends Tree {
     tryExpanded(compactNode).map(expanded(_)).getOrElse(compactNode)
 
   def tryExpanded(compactNode: Node): Option[Node] = {
-    trySimplified(compactNode) match {
-      case some: Some[Node] => return some
-      case _ =>
-    }
     // can we expand the children ?
     compactNode match {
       case parent: ParentNode =>
@@ -84,9 +92,10 @@ trait RingTree extends Tree {
       case _ =>
     }
     compactNode match {
+      case IntPowerNode(base, exponent) => return Some(TimesNode(Seq.fill(exponent)(base)))
       case TimesNode(seq) if seq.exists(_.isInstanceOf[PlusNode]) =>
         val (before, Seq(PlusNode(terms), after@_*)) = seq.span(!_.isInstanceOf[PlusNode])
-        return Some(simplified(PlusNode(terms.map(term => TimesNode((before :+ term) ++ after)))))
+        return Some(PlusNode(terms.map(term => TimesNode((before :+ term) ++ after))))
       case _ =>
     }
     None
@@ -94,6 +103,12 @@ trait RingTree extends Tree {
 
   override def trySimplified(compactNode: Node): Option[Node] = {
     compactNode match {
+      case TimesNode(seq) if seq.exists(_.isInstanceOf[TimesNode]) =>
+        val (before, Seq(TimesNode(terms), after@_*)) = seq.span(!_.isInstanceOf[TimesNode])
+        return Some(TimesNode(before ++ terms ++ after))
+      case PlusNode(seq) if seq.exists(_.isInstanceOf[PlusNode]) =>
+        val (before, Seq(PlusNode(terms), after@_*)) = seq.span(!_.isInstanceOf[PlusNode])
+        return Some(PlusNode(before ++ terms ++ after))
       case TimesNode(Seq()) => return Some(oneNode)
       case PlusNode(Seq()) => return Some(zeroNode)
       case TimesNode(Seq(one)) => return Some(one)
@@ -146,6 +161,12 @@ trait RingTree extends Tree {
       case (NegNode(a), b) => negate(TimesNode(Seq(a, b)))
       case (a, b) => TimesNode(Seq(a, b))
     }
+
+    override def pow(base: Node, exponent: Int): Node = exponent match {
+      case 0 => oneNode
+      case 1 => base
+      case _ => IntPowerNode(base, exponent)
+    }
   }
 
   implicit def nodeRing: Ring[Node] = new NodeRing
@@ -154,6 +175,14 @@ trait RingTree extends Tree {
   def TreeUnparser: RingTreeUnparserTrait
 
   trait RingTreeParserTrait extends TreeParserTrait {
+    def buildPowerNode(base: Node, exponent: Node): Node =
+      IntPowerNode(base, nodeToInt(exponent).getOrElse(sys.error(s"Only integer powers are supported and $exponent is not an integer")))
+
+    lazy val p_op: PackratParser[Node] =
+      ((primary <~ "**") ~ u_expr) ^^ {
+        case base ~ exponent => buildPowerNode(base, exponent)
+      }
+
     lazy val u_op: PackratParser[Node] =
       (("-" ~> u_expr) ^^ (n => NegNode(n))) |||
       (("+" ~> u_expr) ^^ identity)
@@ -170,6 +199,7 @@ trait RingTree extends Tree {
 
   trait RingTreeUnparserTrait extends TreeUnparserTrait {
     override def printable(n: Node): Printable = n match {
+      case IntPowerNode(base, exponent) => RightAssoc(base, "**", nodeFromInt(exponent), priority = 40)
       case NegNode(node) => Prefix("-", node, priority = 30)
       case AddNode(left, right) => LeftAssoc(left, "+", right, priority = 10)
       case SubNode(left, right) => LeftAssoc(left, "-", right, priority = 10)

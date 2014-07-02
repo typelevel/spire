@@ -68,6 +68,8 @@ trait FieldTree extends RingTree {
     }
   }
 
+  def nodeToInt(node: Node): Option[Int]
+
   implicit def nodeField: Field[Node] = new NodeField
 
   def TreeParser: FieldTreeParserTrait

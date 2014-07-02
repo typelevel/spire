@@ -123,6 +123,7 @@ trait Tree {
     // grammar adapted from the Python grammar:
     // https://docs.python.org/3/reference/expressions.html
     lazy val primary: PackratParser[Node] = atom | call | parenth_form
+
     def atom: Parser[Node]
 
     lazy val enclosure: PackratParser[Node] = parenth_form
@@ -130,33 +131,32 @@ trait Tree {
     lazy val p_expr: PackratParser[Node] = primary |||
       p_op
 
-    def p_op: PackratParser[Node]
+    def p_op: Parser[Node]
 
     lazy val u_expr: PackratParser[Node] = p_expr |||
       u_op
 
     /** Unary operators */
-    def u_op: PackratParser[Node]
+    def u_op: Parser[Node]
 
     lazy val m_expr: PackratParser[Node] = u_expr |||
       (m_op | d_op)
 
     /** Multiplication */
-    def m_op: PackratParser[Node]
+    def m_op: Parser[Node]
     /** Division */
-    def d_op: PackratParser[Node]
-
+    def d_op: Parser[Node]
 
     lazy val a_expr: PackratParser[Node] = m_expr |||
       (a_op | s_op)
 
     /** Addition */
-    def a_op: PackratParser[Node]
+    def a_op: Parser[Node]
 
     /** Subtraction */
-    def s_op: PackratParser[Node]
+    def s_op: Parser[Node]
 
-    def call: PackratParser[Node]
+    def call: Parser[Node]
 
     lazy val parenth_form: PackratParser[Node] = "(" ~> a_expr <~ ")"
   }
