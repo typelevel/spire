@@ -168,5 +168,46 @@ object unicode {
     def ⊃(rhs: A): A = ev.imp(lhs, rhs)
   }
 
-  implicit def setOps[A](lhs: Interval[A]) = new Interval.SymbolicSetOps(lhs)
+  implicit class SymbolicIntervalOps[A](lhs: Interval[A]) {
+  
+    def ∋(rhs: A): Boolean = lhs contains rhs
+    def ∌(rhs: A): Boolean = !(lhs contains rhs)
+  
+    def ∈:(a: A): Boolean = lhs contains a
+    def ∉:(a: A): Boolean = !(lhs contains a)
+
+    def ∩(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
+      lhs intersect rhs
+  
+    def ∪(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
+      lhs union rhs
+  
+    def \(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): List[Interval[A]] =
+      lhs -- rhs
+  
+    def ⊂(rhs: Interval[A]): Boolean = lhs isProperSubsetOf rhs
+    def ⊃(rhs: Interval[A]): Boolean = lhs isProperSupersetOf rhs
+  
+    def ⊆(rhs: Interval[A]): Boolean = lhs isSubsetOf rhs
+    def ⊇(rhs: Interval[A]): Boolean = lhs isSupersetOf rhs
+  }
+
+
+  implicit class SymbolicSetOps[A](lhs: Set[A]) {
+    def ∋(rhs: A): Boolean = lhs contains rhs
+    def ∌(rhs: A): Boolean = !(lhs contains rhs)
+  
+    def ∈:(a: A): Boolean = lhs contains a
+    def ∉:(a: A): Boolean = !(lhs contains a)
+
+    def ∩(rhs: Set[A]): Set[A] = lhs & rhs
+    def ∪(rhs: Set[A]): Set[A] = lhs | rhs
+    def \(rhs: Set[A]): Set[A] = lhs -- rhs
+  
+    def ⊂(rhs: Set[A]): Boolean = lhs.size < rhs.size && lhs.forall(rhs)
+    def ⊃(rhs: Set[A]): Boolean = lhs.size > rhs.size && rhs.forall(lhs)
+  
+    def ⊆(rhs: Set[A]): Boolean = lhs.size <= rhs.size && lhs.forall(rhs)
+    def ⊇(rhs: Set[A]): Boolean = lhs.size >= rhs.size && rhs.forall(lhs)
+  }
 }

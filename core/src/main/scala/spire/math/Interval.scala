@@ -953,29 +953,4 @@ object Interval {
       def times(x: Interval[A], y: Interval[A]): Interval[A] = x * y
       override def pow(x: Interval[A], k: Int): Interval[A] = x.pow(k)
     }
-
-  // TODO: maybe put this somewhere more global once we have other types that need these?
-  implicit class SymbolicSetOps[A](lhs: Interval[A]) {
-  
-    def ∋(rhs: A): Boolean = lhs contains rhs
-    def ∌(rhs: A): Boolean = !(lhs contains rhs)
-  
-    def ∈:(a: A): Boolean = lhs contains a
-    def ∉:(a: A): Boolean = !(lhs contains a)
-
-    def ∩(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
-      lhs intersect rhs
-  
-    def ∪(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
-      lhs union rhs
-  
-    def \(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): List[Interval[A]] =
-      lhs -- rhs
-  
-    def ⊂(rhs: Interval[A]): Boolean = lhs isProperSubsetOf rhs
-    def ⊃(rhs: Interval[A]): Boolean = lhs isProperSupersetOf rhs
-  
-    def ⊆(rhs: Interval[A]): Boolean = lhs isSubsetOf rhs
-    def ⊇(rhs: Interval[A]): Boolean = lhs isSupersetOf rhs
-  }
 }
