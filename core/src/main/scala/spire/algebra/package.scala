@@ -15,6 +15,8 @@ package object algebra {
   type Basis[V, K] = IndexedBasis[V, K, I] forSome { type I }
 
   object Basis {
+    final def apply[V, K](implicit basis: Basis[V, K]): Basis[V, K] = basis
+
     def Free[I, K: AdditiveMonoid](basis: Set[I]): Basis[Map[I, K], K] =
       IndexedBasis.Free(basis)
   }

@@ -1,5 +1,7 @@
 package spire.std
 
+import java.lang.Integer.highestOneBit
+
 import spire.algebra._
 
 import spire.NoImplicit
@@ -112,6 +114,9 @@ trait ArrayInstances1 {
 
   implicit def ArrayEq[@spec A: Eq]: Eq[Array[A]] =
     new ArrayEq[A]
+
+  implicit def ArrayBasis[@spec(Int,Long,Float,Double) A: AdditiveMonoid: ClassTag]: Frame[Array[A], A] =
+    new ArrayBasis[A]
 }
 
 trait ArrayInstances2 extends ArrayInstances1 {
@@ -146,6 +151,132 @@ private final class ArrayVectorSpace[@spec(Int,Float,Long,Double) A: ClassTag: R
 private final class ArrayEq[@spec(Int,Float,Long,Double) A: Eq]
     extends Eq[Array[A]] with Serializable {
   def eqv(x: Array[A], y: Array[A]): Boolean = ArraySupport.eqv(x, y)
+}
+
+@SerialVersionUID(0L)
+private final class ArrayBasis[@spec(Int,Float,Long,Double) A: ClassTag]
+    (implicit A: AdditiveMonoid[A])
+    extends Frame[Array[A], A] with Serializable {
+  val builder = new VectorBuilder[Array[A], A, Int] {
+    final class State(var vector: Array[A], var size: Int)
+
+    def init: State = new State(Array.fill(8)(A.zero), 0)
+
+    def update(s: State, i: Int, k: A): State = {
+      if (i > s.vector.size) {
+        val sz = spire.math.max(highestOneBit(s.vector.size), highestOneBit(i)) << 1
+        val tmp = Array.fill(if (sz < 0) Int.MaxValue else sz)(A.zero)
+        System.arraycopy(s.vector, 0, tmp, 0, s.vector.length)
+        s.vector = tmp
+      }
+
+      s.vector(i) = k
+      s.size = spire.math.max(s.size, i + 1)
+      s
+    }
+
+    def result(s: State): Array[A] =
+      if (s.vector.size == s.size) s.vector
+      else {
+        val v = s.vector
+        val w = new Array[A](s.size)
+        var i = 0
+        while (i < w.length) {
+          w(i) = v(i)
+          i += 1
+        }
+        w
+      }
+  }
+
+  // Not really true, but we're pretending Int.MaxValue == Infinity.
+  def hasKnownSize: Boolean = false
+
+  def size: Int = ???
+
+  def coord(v: Array[A], i: Int): A = v(i)
+
+  def foreachWithIndex[U](v: Array[A])(f: (Int, A) => U): Unit = {
+    var i = 0
+    while (i < v.length) {
+      f(i, v(i))
+      i += 1
+    }
+  }
+
+  def zipForeachWithIndex[U](v: Array[A], w: Array[A])(f: (Int, A, A) => U): Unit = {
+    var i = 0
+    while (i < v.length && i < w.length) {
+      f(i, v(i), w(i))
+      i += 1
+    }
+    while (i < v.length) {
+      f(i, v(i), A.zero)
+      i += 1
+    }
+    while (i < w.length) {
+      f(i, A.zero, w(i))
+      i += 1
+    }
+  }
+
+  override def foreach[U](v: Array[A])(f: A => U): Unit =
+    v foreach f
+
+  override def map(v: Array[A])(f: A => A): Array[A] =
+    v map f
+
+  override def mapWithIndex(v: Array[A])(f: (Int, A) => A): Array[A] = {
+    val w = new Array[A](v.length)
+    var i = 0
+    while (i < v.length) {
+      w(i) = f(i, v(i))
+      i += 1
+    }
+    w
+  }
+
+  override def zipForeach[U](v: Array[A], w: Array[A])(f: (A, A) => U): Unit = {
+    var i = 0
+    while (i < v.length && i < w.length) {
+      f(v(i), w(i))
+      i += 1
+    }
+    while (i < v.length) {
+      f(v(i), A.zero)
+      i += 1
+    }
+    while (i < w.length) {
+      f(A.zero, w(i))
+      i += 1
+    }
+  }
+
+  override def zipMap(v: Array[A], w: Array[A])(f: (A, A) => A): Array[A] = {
+    val u = new Array[A](spire.math.max(v.length, w.length))
+    var i = 0
+    while (i < v.length && i < w.length) {
+      u(i) = f(v(i), w(i))
+      i += 1
+    }
+    while (i < v.length) {
+      u(i) = f(v(i), A.zero)
+      i += 1
+    }
+    while (i < w.length) {
+      u(i) = f(A.zero, w(i))
+      i += 1
+    }
+    u
+  }
+
+  override def zipMapWithIndex(v: Array[A], w: Array[A])(f: (Int, A, A) => A): Array[A] = {
+    val u = new Array[A](spire.math.max(v.length, w.length))
+    zipForeachWithIndex(v, w) { (i, x, y) =>
+      u(i) = f(i, x, y)
+    }
+    u
+  }
 }
 
 @SerialVersionUID(0L)

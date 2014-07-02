@@ -169,6 +169,8 @@ trait IndexedBasis[V, @spec(Int, Long, Float, Double) K, @spec(Int, Long) I] {
 }
 
 object IndexedBasis {
+  final def apply[V, @spec(Int, Long, Float, Double) K, @spec(Int, Long) I](implicit basis: IndexedBasis[V, K, I]): IndexedBasis[V, K, I] = basis
+
   case class Free[I, K: AdditiveMonoid](val basis: Set[I]) extends MapBasis[I, K] {
     override val hasKnownSize: Boolean = true
     override val size: Int = basis.size

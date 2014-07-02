@@ -1,11 +1,15 @@
 package spire.algebra
 
+import scala.{ specialized => spec }
+
 /**
  * A `Frame` is a finite, ordered [[Basis]].
  */
 trait Frame[V, K] extends IndexedBasis[V, K, Int]
 
 object Frame {
+  final def apply[V, @spec(Int, Long, Float, Double) K](implicit basis: Frame[V, K]): Frame[V, K] = basis
+
   case class Free[I, K](val basis: Vector[I])(implicit K: AdditiveMonoid[K]) extends Frame[Vector[K], K] {
     val builder = new VectorBuilder[Vector[K], K, Int] {
       type State = Vector[K]

@@ -13,4 +13,3 @@ trait VectorBuilder[V, @spec(Int, Long, Float, Double) K, @spec(Int, Long) I] {
   def update(s: State, i: I, k: K): State
   def result(s: State): V
 }
-
