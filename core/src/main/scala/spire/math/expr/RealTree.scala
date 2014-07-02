@@ -6,9 +6,9 @@ import spire.algebra.{EuclideanRing, Field, Trig}
 object RealTree extends TrigValueTree[Real] with FieldValueTree[Real] {
   import spire.algebra.Trig
   import spire.implicits._
-  implicit def euclideanRing = EuclideanRing[Real]
-  implicit def field = Field[Real]
-  implicit def trig = Trig[Real]
+  implicit def euclideanRing = Real.algebra
+  implicit def field = Real.algebra
+  implicit def trig = Real.algebra
 
   def fpow(a: Real, b: Real) = a.fpow(b)
 
