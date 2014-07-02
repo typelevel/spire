@@ -2,25 +2,35 @@ package spire.math
 package expr
 
 import spire.algebra.{EuclideanRing, Field, Trig}
+import spire.implicits._
 
-object RealTree extends TrigValueTree[Real] with FieldValueTree[Real] {
-  import spire.algebra.Trig
-  import spire.implicits._
-  implicit def euclideanRing = Real.algebra
-  implicit def field = Real.algebra
-  implicit def trig = Real.algebra
-
-  def fpow(a: Real, b: Real) = a.fpow(b)
-
-  def atomValue(atom: AtomNode) = atom match {
-    case ConstantNode("e") => Real.e
-    case ConstantNode("pi") => Real.pi
-    case FloatNode(bd, powerOfTen) => Real(bd) * Real(10).fpow(powerOfTen)
-    case RationalNode(r) => Real(r)
-  }
-
+object RealTree extends TrigTree {
   case class RationalNode(r: Rational) extends AtomNode
   case class FloatNode(bd: BigDecimal, powerOfTen: Int) extends AtomNode
+
+  val oneNode = RationalNode(Rational.one)
+  val zeroNode = RationalNode(Rational.zero)
+  def nodeFromInt(n: Int) = RationalNode(Rational(n))
+
+  override def toCompact(displayNode: Node): Node = displayNode match {
+    case c: ConstantNode => c
+    case r: RationalNode => r
+    case f: FloatNode => f
+    case _ => super.toCompact(displayNode)
+  }
+
+  override def toDisplay(compactNode: Node): Node = compactNode match {
+    case c: ConstantNode => c
+    case RationalNode(r) if r < 0 => 
+      NegNode(toDisplay(RationalNode(-r)))
+    case RationalNode(r) if r.denominator != 1 =>
+      DivNode(RationalNode(r.numerator), RationalNode(r.denominator))
+    case r: RationalNode => r
+    case FloatNode(bd, powerOfTen) if bd < 0 =>
+      NegNode(FloatNode(-bd, powerOfTen))
+    case f: FloatNode => f
+    case _ => super.toDisplay(compactNode)
+  }
 
   protected def exactRationalValue(node: Node): Rational = node match {
     case _: FloatNode => sys.error("Cannot transform a FloatNode to Rational.")
@@ -32,7 +42,7 @@ object RealTree extends TrigValueTree[Real] with FieldValueTree[Real] {
     case _ => sys.error("Cannot transform node to Rational.")
   }
 
-  override def trySimplify(compactNode: Node): Option[Node] = {
+  override def trySimplified(compactNode: Node): Option[Node] = {
     compactNode match {
       case NegNode(RationalNode(r)) => return Some(RationalNode(-r))
       case InvNode(RationalNode(r)) => return Some(RationalNode(r.reciprocal))
@@ -55,61 +65,61 @@ object RealTree extends TrigValueTree[Real] with FieldValueTree[Real] {
           return Some(TimesNode(nonRational))
       case _ =>
     }
-    super.trySimplify(compactNode)
+    super.trySimplified(compactNode)
   }
 
-  object NodeField extends NodeFieldTrait {
-    def zero = RationalNode(Rational.zero)
-    def one = RationalNode(Rational.one)
-    override def fromInt(n: Int): Node = RationalNode(Rational(n))
-  }
-
-  def displayAtom(atom: AtomNode): Node = atom match {
-    case c: ConstantNode => c
-    case RationalNode(r) if r < 0 => 
-      NegNode(displayAtom(RationalNode(-r)))
-    case RationalNode(r) if r.denominator != 1 =>
-      DivNode(RationalNode(r.numerator), RationalNode(r.denominator))
-    case r: RationalNode => r
-    case FloatNode(bd, powerOfTen) if bd < 0 =>
-      NegNode(FloatNode(-bd, powerOfTen))
-    case f: FloatNode => f
-  }
-
-  object TreeParser extends TreeParserTrait {
+  object TreeParser extends TrigTreeParserTrait {
     lazy val atom: PackratParser[Node] = float | integer | constant
+
     lazy val constant: PackratParser[Node] = 
       ("pi" ^^^ ConstantNode("pi")) |
       ("e" ^^^ ConstantNode("e"))
+
     lazy val float: PackratParser[Node] =
       (bigdecimal ~ opt(("e" | "E") ~> int))  ^^ { 
         case bd ~ None => FloatNode(bd, 0)
         case bd ~ Some(exp) => FloatNode(bd, exp)
       }
+
     lazy val integer: PackratParser[Node] =
       biginteger ^^ { case i => RationalNode(Rational(i)) }
+
     val int = """-?(0|([1-9]\d*))""".r ^^ { case s: String => s.toInt }
     val biginteger = """0|([1-9]\d*)""".r ^^ { case s: String => BigInt(s) }
     val bigdecimal = """(0|([1-9]\d*))?[.]\d*""".r ^^ { case s: String => BigDecimal(s) }
   }
-  object TreeUnparser extends TreeUnparserTrait {
+
+  object TreeUnparser extends TrigTreeUnparserTrait {
     // force printing the BigDecimal with a dot
     def printBigDecimal(bd: BigDecimal): String = bd.scale match {
       case 0 => bd.toString + "."
       case _ => bd.toString
     }
-    def printAtom(a: AtomNode): String = a match {
-      case ConstantNode(name) => name
+
+    override def printable(n: Node): Printable = n match {
+      case ConstantNode(name) => Value(name)
       case RationalNode(r) =>
         require(r >= 0)
         require(r.denominator == 1)
-        r.toString
+        Value(r.toString)
       case FloatNode(bd, 0) => 
         require(bd >= 0)
-        printBigDecimal(bd)
+        Value(printBigDecimal(bd))
       case FloatNode(bd, powerOfTen) =>
         require(bd >= 0)
-        s"${printBigDecimal(bd)}e${powerOfTen}"
+        Value(s"${printBigDecimal(bd)}e${powerOfTen}")
+      case _ => super.printable(n)
     }
+  }
+}
+
+object RealTreeEvaluator extends TrigEvaluator[RealTree.type, Real] {
+  val tree = RealTree
+  implicit val scalarAlgebra = Real.algebra
+  def fpow(a: Real, b: Real) = a.fpow(b)
+  override def value(node: tree.Node): Real = node match {
+    case tree.RationalNode(r) => Real(r)
+    case tree.FloatNode(bd, powerOfTen) => Real(bd) * Real(10).fpow(powerOfTen)
+    case _ => super.value(node)
   }
 }

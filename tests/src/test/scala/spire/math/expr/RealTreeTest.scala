@@ -8,7 +8,7 @@ import java.math.MathContext
 
 class RealTreeTest extends FunSuite with Matchers {
   test("parse sin(3.03) + 1/8 and verify value") {
-    val v = RealTree.value(RealTree.parse("sin(3.03) + 1/8").get)
+    val v = RealTreeEvaluator.value(RealTree.parse("sin(3.03) + 1/8").get)
     v === sin(Real("3.03")) + 1/Real(8) shouldBe true
   }
   test("pretty print 3+(3*4) removes parentheses") {
