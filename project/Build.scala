@@ -89,7 +89,9 @@ object MyBuild extends Build {
       CrossVersion.partialVersion(scalaVersion.value) match {
         // if scala 2.11+ is used, quasiquotes are merged into scala-reflect
         case Some((2, scalaMajor)) if scalaMajor >= 11 =>
-          libraryDependencies.value
+          libraryDependencies.value :+
+          ("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.1")
+
 
         // in Scala 2.10, quasiquotes are provided by macro-paradise
         case Some((2, 10)) =>
