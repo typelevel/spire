@@ -807,16 +807,46 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 case class All[A: Order] private[spire] () extends Interval[A]
 case class Above[A: Order] private[spire] (lower: A, flags: Int) extends Interval[A]
 case class Below[A: Order] private[spire] (upper: A, flags: Int) extends Interval[A]
-case class Ranged[A: Order] private[spire] (lower: A, upper: A, flags: Int) extends Interval[A] {
+
+sealed abstract class Ranged[A](implicit order: Order[A]) extends Interval[A] { lhs =>
+  def someA: A
   override def equals(that: Any): Boolean =
     that match {
-      case r @ Ranged(l, u, f) => 
+      case r @ Ranged(l, u, f) =>
+        val Ranged(lower, upper, flags) = this
         if (this.isEmpty) r.isEmpty
         else lower == l && upper == u && flags == f
       case _ =>
         false
     }
 }
+
+object Ranged {
+  val ClosedFlags = 0
+  val OpenFlags = 3
+  def apply[A: Order](lower: A, upper: A, flags: Int): Ranged[A] =
+    (Order[A].compare(lower, upper), flags) match {
+      case (0, ClosedFlags) => Point(lower)
+      case (0, _) => Empty(lower)
+      case (x, _) if x > 0 => Empty(lower)
+      case (_, _) => Bounded(lower, upper, flags)
+    }
+  def unapply[A](interval: Ranged[A]): Option[(A, A, Int)] = 
+    interval match {
+      case Bounded(lower, upper, flags) => Some((lower, upper, flags))
+      case Point(value) => Some((value, value, ClosedFlags))
+      case Empty(someA) => Some((someA, someA, OpenFlags))
+    }
+}
+
+// Bounded, non-empty interval with lower < upper
+case class Bounded[A: Order] private[spire] (lower: A, upper: A, flags: Int) extends Ranged[A] {
+  def someA = lower
+}
+case class Point[A: Order] private[spire] (value: A) extends Ranged[A] {
+  def someA = value
+}
+case class Empty[A: Order] private[spire] (someA: A) extends Ranged[A]
 
 object Interval {
 
