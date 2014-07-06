@@ -162,8 +162,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       upper > t || isClosedAbove(flags) && upper === t
     case Ranged(lower, upper, flags) =>
       upper > t || isClosedAbove(flags) && upper === t
-    case _ =>
-      true
+    case _: Above[_] => true
+    case _: All[_] => true
   }
 
   def isAtOrBelow(t: A) = this match {
@@ -171,8 +171,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       lower < t || isClosedBelow(flags) && lower === t
     case Ranged(lower, upper, flags) =>
       lower < t || isClosedBelow(flags) && lower === t
-    case _ =>
-      true
+    case _: Below[_] => true
+    case _: All[_] => true
   }
 
   def isAt(t: A) = this match {
@@ -830,6 +830,7 @@ object Ranged {
 
 // Bounded, non-empty interval with lower < upper
 case class Bounded[A: Order] private[spire] (lower: A, upper: A, flags: Int) extends Ranged[A] {
+  require(lower < upper) // TODO: remove after refactoring
   def someA = lower
 }
 case class Point[A: Order] private[spire] (value: A) extends Ranged[A] {
