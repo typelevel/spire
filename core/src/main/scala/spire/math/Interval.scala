@@ -909,19 +909,20 @@ object Interval {
       case (Open(x), Unbound()) => above(x)
       case (Unbound(), Closed(y)) => atOrBelow(y)
       case (Closed(x), Unbound()) => atOrAbove(x)
-      case (Closed(x), Open(y)) => openAbove(x, y)
-      case (Open(x), Closed(y)) => openBelow(x, y)
+      case (Closed(x), Open(y)) => openUpper(x, y)
+      case (Open(x), Closed(y)) => openLower(x, y)
       case (Unbound(), Unbound()) => all
     }
 
   def closed[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
     if (lower <= upper) Ranged(lower, upper, 0) else Interval.empty[A]
   def open[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
-    if (lower <= upper) Ranged(lower, upper, 3) else Interval.empty[A]
-  def openBelow[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
-    if (lower < upper) Ranged(lower, upper, 1) else Interval.empty[A]
-  def openAbove[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
-    if (lower < upper) Ranged(lower, upper, 2) else Interval.empty[A]
+    if (lower < upper) Bounded(lower, upper, 3) else Interval.empty[A]
+  // TODO: change openLower, openUpper to openUpper, openLower
+  def openLower[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
+    if (lower < upper) Bounded(lower, upper, 1) else Interval.empty[A]
+  def openUpper[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
+    if (lower < upper) Bounded(lower, upper, 2) else Interval.empty[A]
 
   def above[A: Order](a: A): Interval[A] = Above(a, 1)
   def below[A: Order](a: A): Interval[A] = Below(a, 2)
@@ -954,9 +955,9 @@ object Interval {
         case ("(", x, y, ")") =>
           Interval.open(Rational(x), Rational(y))
         case ("[", x, y, ")") =>
-          Interval.openAbove(Rational(x), Rational(y))
+          Interval.openUpper(Rational(x), Rational(y))
         case ("(", x, y, "]") =>
-          Interval.openBelow(Rational(x), Rational(y))
+          Interval.openLower(Rational(x), Rational(y))
         case _ =>
           throw new NumberFormatException("Impossible: " + s)
       }

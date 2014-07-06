@@ -15,8 +15,8 @@ import Arbitrary.arbitrary
 
 class IntervalTest extends FunSuite {
   def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)
-  def co(n1: Double, n2: Double) = Interval.openAbove(n1, n2)
-  def oc(n1: Double, n2: Double) = Interval.openBelow(n1, n2)
+  def co(n1: Double, n2: Double) = Interval.openUpper(n1, n2)
+  def oc(n1: Double, n2: Double) = Interval.openLower(n1, n2)
   def oo(n1: Double, n2: Double) = Interval.open(n1, n2)
 
   val e = Interval.empty[Double]
@@ -120,7 +120,7 @@ class IntervalReciprocalTest extends FunSuite {
   error(Interval.above(r"-1"))
 
   // atOrAbove(x)
-  t(Interval.atOrAbove(r"1/9"), Interval.openBelow(r"0", r"9"))
+  t(Interval.atOrAbove(r"1/9"), Interval.openLower(r"0", r"9"))
   error(Interval.atOrAbove(r"0"))
   error(Interval.atOrAbove(r"-2"))
 
@@ -131,19 +131,19 @@ class IntervalReciprocalTest extends FunSuite {
   error(Interval.closed(r"-1/9", r"0"))
   t(Interval.closed(r"-70", r"-14"), Interval.closed(r"-1/14", r"-1/70"))
 
-  // openBelow(x, y)
-  t(Interval.openBelow(r"1/2", r"4"), Interval.openAbove(r"1/4", r"2"))
-  t(Interval.openBelow(r"0", r"6"), Interval.atOrAbove(r"1/6")) //fixme
-  error(Interval.openBelow(r"-2", r"1/5"))
-  error(Interval.openBelow(r"-1/9", r"0"))
-  t(Interval.openBelow(r"-70", r"-14"), Interval.openAbove(r"-1/14", r"-1/70"))
+  // openLower(x, y)
+  t(Interval.openLower(r"1/2", r"4"), Interval.openUpper(r"1/4", r"2"))
+  t(Interval.openLower(r"0", r"6"), Interval.atOrAbove(r"1/6")) //fixme
+  error(Interval.openLower(r"-2", r"1/5"))
+  error(Interval.openLower(r"-1/9", r"0"))
+  t(Interval.openLower(r"-70", r"-14"), Interval.openUpper(r"-1/14", r"-1/70"))
 
-  // openAbove(x, y)
-  t(Interval.openAbove(r"1/2", r"4"), Interval.openBelow(r"1/4", r"2"))
-  error(Interval.openAbove(r"0", r"6"))
-  error(Interval.openAbove(r"-2", r"1/5"))
-  t(Interval.openAbove(r"-1/9", r"0"), Interval.atOrBelow(r"-9")) //fixme
-  t(Interval.openAbove(r"-70", r"-14"), Interval.openBelow(r"-1/14", r"-1/70"))
+  // openUpper(x, y)
+  t(Interval.openUpper(r"1/2", r"4"), Interval.openLower(r"1/4", r"2"))
+  error(Interval.openUpper(r"0", r"6"))
+  error(Interval.openUpper(r"-2", r"1/5"))
+  t(Interval.openUpper(r"-1/9", r"0"), Interval.atOrBelow(r"-9")) //fixme
+  t(Interval.openUpper(r"-70", r"-14"), Interval.openLower(r"-1/14", r"-1/70"))
 
   // open
   t(Interval.open(r"1/2", r"4"), Interval.open(r"1/4", r"2"))
@@ -160,7 +160,7 @@ class IntervalReciprocalTest extends FunSuite {
   // atOrBelow(x)
   error(Interval.atOrBelow(r"1/9"))
   error(Interval.atOrBelow(r"0"))
-  t(Interval.atOrBelow(r"-2"), Interval.openAbove(r"-1/2", r"0")) //fixme
+  t(Interval.atOrBelow(r"-2"), Interval.openUpper(r"-1/2", r"0")) //fixme
 }
 
 class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
@@ -282,8 +282,8 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     forAll { (x: Rational, y: Rational) =>
       val a = Interval.open(x, x)
       val b = Interval.open(y, y)
-      val c = Interval.openAbove(x, x)
-      val d = Interval.openBelow(x, x)
+      val c = Interval.openUpper(x, x)
+      val d = Interval.openLower(x, x)
       val e = Interval.empty[Rational]
 
       a shouldBe e
