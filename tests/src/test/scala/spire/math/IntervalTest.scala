@@ -22,6 +22,8 @@ class IntervalTest extends FunSuite {
   val e = Interval.empty[Double]
   val all = Interval.all[Double]
 
+  test("empty is empty") { assert(e.isEmpty) }
+  test("point is point") { assert(Interval.point(2).isPoint) }
   val a = cc(0.0, 4.0)
   test("a.contains(0.0) is true") { assert(a.contains(0.0) === true) }
   test("a.crosses(0.0) is false") { assert(a.crosses(0.0) === false) }

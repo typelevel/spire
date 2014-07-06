@@ -66,17 +66,11 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   @inline private[this] final def swapFlags(flags: Int): Int =
     ((flags & 1) << 1) | ((flags & 2) >>> 1)
 
-  def isEmpty: Boolean = this match {
-    case Ranged(lower, upper, flags) => isOpen(flags) && lower === upper
-    case _ => false
-  }
+  def isEmpty: Boolean = this.isInstanceOf[Empty[_]]
 
   def nonEmpty: Boolean = !isEmpty
 
-  def isPoint: Boolean = this match {
-    case Ranged(lower, upper, flags) => isClosed(flags) && lower === upper
-    case _ => false
-  }
+  def isPoint: Boolean = this.isInstanceOf[Point[_]]
 
   def contains(t: A): Boolean =
     isAtOrBelow(t) && isAtOrAbove(t)
