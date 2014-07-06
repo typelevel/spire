@@ -810,15 +810,6 @@ case class Below[A: Order] private[spire] (upper: A, flags: Int) extends Interva
 
 sealed abstract class Ranged[A](implicit order: Order[A]) extends Interval[A] { lhs =>
   def someA: A
-  override def equals(that: Any): Boolean =
-    that match {
-      case r @ Ranged(l, u, f) =>
-        val Ranged(lower, upper, flags) = this
-        if (this.isEmpty) r.isEmpty
-        else lower == l && upper == u && flags == f
-      case _ =>
-        false
-    }
 }
 
 object Ranged {
@@ -846,7 +837,9 @@ case class Bounded[A: Order] private[spire] (lower: A, upper: A, flags: Int) ext
 case class Point[A: Order] private[spire] (value: A) extends Ranged[A] {
   def someA = value
 }
-case class Empty[A: Order] private[spire] (someA: A) extends Ranged[A]
+case class Empty[A: Order] private[spire] (someA: A) extends Ranged[A] {
+  override def equals(any: Any) = any.isInstanceOf[Empty[_]]
+}
 
 object Interval {
 
