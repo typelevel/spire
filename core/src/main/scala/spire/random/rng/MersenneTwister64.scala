@@ -18,7 +18,6 @@ package rng
 
 import spire.syntax.cfor._
 import spire.util.Pack
-import spire.math.max
 import java.nio.ByteBuffer
 import java.util.Arrays
 
