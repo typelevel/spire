@@ -137,16 +137,24 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def isProperSubsetOf(rhs: Interval[A]): Boolean =
     rhs isProperSupersetOf lhs
 
+  // Does this interval contain any points above x?
   def isAbove(t: A): Boolean = this match {
+    case Empty(_) => false
+    case Point(p) => p > t
     case Below(upper, flags) => upper > t
-    case Ranged(lower, upper, flags) => upper > t
-    case _ => true
+    case Bounded(lower, upper, flags) => upper > t
+    case _: All[_] => true
+    case _: Above[_] => true
   }
 
+  // Does this interval contain any points below y?
   def isBelow(t: A): Boolean = this match {
+    case Empty(_) => false
+    case Point(p) => p < t
     case Above(lower, flags) => lower < t
-    case Ranged(lower, upper, flags) => lower < t
-    case _ => true
+    case Bounded(lower, upper, flags) => lower < t
+    case _: Below[_] => true
+    case _: All[_] => true
   }
 
   def isAtOrAbove(t: A) = this match {
@@ -168,10 +176,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   }
 
   def isAt(t: A) = this match {
-    case Ranged(lower, upper, flags) =>
-      isClosed(flags) && lower === t && t === upper
-    case _ =>
-      false
+    case Point(p) => t === p
+    case _ => false
   }
 
   private[this] def minLower(lower1: A, lower2: A, flags1: Int, flags2: Int): (A, Int) =
@@ -351,14 +357,12 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       if (isClosedBelow(flags)) s"[$lower, ∞)" else s"($lower, ∞)"
     case Below(upper, flags) =>
       if (isClosedAbove(flags)) s"(-∞, $upper]" else s"(-∞, $upper)"
-    case Ranged(lower, upper, flags) =>
-      if (lower === upper) {
-        if (isOpen(flags)) "(Ø)" else s"[$lower]"
-      } else {
-        val s1 = if (isClosedBelow(flags)) s"[$lower" else s"($lower"
-        val s2 = if (isClosedAbove(flags)) s"$upper]" else s"$upper)"
-        s"$s1, $s2"
-      }
+    case _: Empty[_] => "(Ø)"
+    case Point(p) => s"[$p]"
+    case Bounded(lower, upper, flags) =>
+      val s1 = if (isClosedBelow(flags)) s"[$lower" else s"($lower"
+      val s2 = if (isClosedAbove(flags)) s"$upper]" else s"$upper)"
+      s"$s1, $s2"
   }
 
   def abs(implicit m: AdditiveGroup[A]): Interval[A] =
@@ -882,14 +886,11 @@ object Interval {
       Interval.empty[A]
     }
 
-  def empty[A](implicit o: Order[A], r: AdditiveMonoid[A]): Interval[A] =
-    Ranged(r.zero, r.zero, 3)
+  def empty[A](implicit o: Order[A], r: AdditiveMonoid[A]): Interval[A] = Empty[A](r.zero)
 
-  def point[A: Order](a: A): Interval[A] =
-    Ranged(a, a, 0)
+  def point[A: Order](a: A): Interval[A] = Point(a)
 
-  def zero[A](implicit o: Order[A], r: Semiring[A]): Interval[A] =
-    Ranged(r.zero, r.zero, 0)
+  def zero[A](implicit o: Order[A], r: Semiring[A]): Interval[A] = Point(r.zero)
 
   def all[A: Order]: Interval[A] = All[A]()
 
@@ -908,11 +909,14 @@ object Interval {
       case (Unbound(), Unbound()) => all
     }
 
-  def closed[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
-    if (lower <= upper) Ranged(lower, upper, 0) else Interval.empty[A]
+  def closed[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] = {
+    val c = Order[A].compare(lower, upper)
+    if (c < 0) Bounded(lower, upper, 0)
+    else if (c == 0) Point(lower)
+    else Empty[A](lower)
+  }
   def open[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
     if (lower < upper) Bounded(lower, upper, 3) else Interval.empty[A]
-  // TODO: change openLower, openUpper to openUpper, openLower
   def openLower[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
     if (lower < upper) Bounded(lower, upper, 1) else Interval.empty[A]
   def openUpper[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =

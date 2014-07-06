@@ -24,6 +24,16 @@ class IntervalTest extends FunSuite {
 
   test("empty is empty") { assert(e.isEmpty) }
   test("point is point") { assert(Interval.point(2).isPoint) }
+  test("[2,2] is point") { assert(Interval.closed(2, 2).isPoint) }
+  test("[3,2] is empty") { assert(Interval.closed(3, 2).isEmpty) }
+  test("empty interval is not above -1") { assert(!Interval.empty[Int].isAbove(-1)) }
+  test("empty interval is not below 1") { assert(!Interval.empty[Int].isBelow(1)) }
+  test("[2] is above 0") { assert(Interval.point(2).isAbove(0)) }
+  test("[-2] is below 0") { assert(Interval.point(-2).isBelow(0)) }
+
+  test("Interval.point(2).toString == [2]") { assert(Interval.point(2).toString === "[2]") }
+  test("Interval.empty.toString == (Ø)") { assert(Interval.empty[Int].toString === "(Ø)") }
+
   val a = cc(0.0, 4.0)
   test("a.contains(0.0) is true") { assert(a.contains(0.0) === true) }
   test("a.crosses(0.0) is false") { assert(a.crosses(0.0) === false) }
