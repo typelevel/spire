@@ -109,13 +109,25 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     case All() =>
       true
     case Above(lower1, flags1) =>
-      rhs.lowerPair.map { case (lower2, flags2) =>
-        lowerPairBelow(lower1, flags1, lower2, flags2)
-      }.getOrElse(false)
+      rhs match {
+        case _: Empty[_] => true
+        case _: All[_] | _: Below[_] => false
+        case Point(rhsval) => lhs.contains(rhsval)
+        case _: Bounded[_] | _: Above[_] =>
+          rhs.lowerPair.map { case (lower2, flags2) =>
+              lowerPairBelow(lower1, flags1, lower2, flags2)
+          }.getOrElse(false)
+      }
     case Below(upper1, flags1) =>
-      rhs.upperPair.map { case (upper2, flags2) =>
-        upperPairAbove(upper1, flags1, upper2, flags2)
-      }.getOrElse(false)
+      rhs match {
+        case _: Empty[_] => true
+        case _: All[_] | _: Above[_] => false
+        case Point(rhsval) => lhs.contains(rhsval)
+        case _: Bounded[_] | _: Below[_] =>
+          rhs.upperPair.map { case (upper2, flags2) =>
+              upperPairAbove(upper1, flags1, upper2, flags2)
+          }.getOrElse(false)
+      }
     case _: Empty[_] => rhs.isEmpty
     case Point(lhsval) =>
       rhs match {
