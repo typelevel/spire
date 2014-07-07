@@ -27,10 +27,13 @@ class IntervalTest extends FunSuite {
   test("point is point") { assert(Interval.point(2).isPoint) }
   test("[2,2] is point") { assert(Interval.closed(2, 2).isPoint) }
   test("[3,2] is empty") { assert(Interval.closed(3, 2).isEmpty) }
-  test("empty interval is not above -1") { assert(!Interval.empty[Int].isAbove(-1)) }
-  test("empty interval is not below 1") { assert(!Interval.empty[Int].isBelow(1)) }
-  test("[2] is above 0") { assert(Interval.point(2).isAbove(0)) }
-  test("[-2] is below 0") { assert(Interval.point(-2).isBelow(0)) }
+  test("empty interval is not above -1") { assert(!Interval.empty[Int].hasAbove(-1)) }
+  test("empty interval is not below 1") { assert(!Interval.empty[Int].hasBelow(1)) }
+  test("[2] has above 0") { assert(Interval.point(2).hasAbove(0)) }
+  test("[-2] has below 0") { assert(Interval.point(-2).hasBelow(0)) }
+  test("[1, 2] has at or above 1") { assert(Interval.closed(1, 2).hasAtOrAbove(1)) }
+  test("[1, 2] has above 1") { assert(Interval.closed(1, 2).hasAtOrAbove(1)) }
+  test("(1, 2] has above 1") { assert(Interval.openLower(1, 2).hasAtOrAbove(1)) }
 
   test("Interval.point(2).toString == [2]") { assert(Interval.point(2).toString === "[2]") }
   test("Interval.empty.toString == (Ø)") { assert(Interval.empty[Int].toString === "(Ø)") }

@@ -46,12 +46,12 @@ import spire.syntax.order._
 sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   @inline private[this] final def isClosed(flags: Int): Boolean = flags == 0
-  @inline private[this] final def isClosedBelow(flags: Int): Boolean = (flags & 1) == 0
-  @inline private[this] final def isClosedAbove(flags: Int): Boolean = (flags & 2) == 0
+  @inline private[this] final def isClosedLower(flags: Int): Boolean = (flags & 1) == 0
+  @inline private[this] final def isClosedUpper(flags: Int): Boolean = (flags & 2) == 0
 
   @inline private[this] final def isOpen(flags: Int): Boolean = flags == 3
-  @inline private[this] final def isOpenBelow(flags: Int): Boolean = (flags & 1) == 1
-  @inline private[this] final def isOpenAbove(flags: Int): Boolean = (flags & 2) == 2
+  @inline private[this] final def isOpenLower(flags: Int): Boolean = (flags & 1) == 1
+  @inline private[this] final def isOpenUpper(flags: Int): Boolean = (flags & 2) == 2
 
   @inline private[this] final def lowerFlag(flags: Int): Int = flags & 1
   @inline private[this] final def upperFlag(flags: Int): Int = flags & 2
@@ -73,37 +73,37 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def isPoint: Boolean = this.isInstanceOf[Point[_]]
 
   def contains(t: A): Boolean =
-    isAtOrBelow(t) && isAtOrAbove(t)
+    hasAtOrBelow(t) && hasAtOrAbove(t)
 
   def crosses(t: A): Boolean =
-    isBelow(t) && isAbove(t)
+    hasBelow(t) && hasAbove(t)
 
   def crossesZero(implicit ev: AdditiveMonoid[A]): Boolean =
-    isBelow(ev.zero) && isAbove(ev.zero)
+    hasBelow(ev.zero) && hasAbove(ev.zero)
 
   private[spire] def lowerPair: Option[(A, Int)] = this match {
-    case Ranged(lower, upper, flags) => Some((lower, lowerFlag(flags)))
+    case Bounded(lower, upper, flags) => Some((lower, lowerFlag(flags)))
+    case Point(value) => Some((value, 0))
     case Above(lower, flags) => Some((lower, flags))
-    case _ => None
+    case _: All[_] => None
+    case _: Below[_] => None
+    case _: Empty[_] => sys.error("Should never be called on empty Interval") // TODO: remove this check used during refactoring
   }
 
   private[spire] def upperPair: Option[(A, Int)] = this match {
-    case Ranged(lower, upper, flags) => Some((upper, upperFlag(flags)))
+    case Bounded(lower, upper, flags) => Some((upper, upperFlag(flags)))
+    case Point(value) => Some((value, 0))
     case Below(upper, flags) => Some((upper, flags))
-    case _ => None
-  }
-
-  private[spire] def upperPairAsLower: Option[(A, Int)] = this match {
-    case Ranged(lower, upper, flags) => Some((upper, upperFlagToLower(flags)))
-    case Above(upper, flags) => Some((upper, upperFlagToLower(flags)))
-    case _ => None
+    case _: All[_] => None
+    case _: Above[_] => None
+    case _: Empty[_] => sys.error("Should never be called on empty Interval") // TODO: remove this check used during refactoring
   }
 
   private[this] def lowerPairBelow(lower1: A, flags1: Int, lower2: A, flags2: Int): Boolean =
-    lower1 < lower2 || lower1 === lower2 && (isClosedBelow(flags1) || isOpenBelow(flags2))
+    lower1 < lower2 || lower1 === lower2 && (isClosedLower(flags1) || isOpenLower(flags2))
 
   private[this] def upperPairAbove(upper1: A, flags1: Int, upper2: A, flags2: Int): Boolean =
-    upper1 > upper2 || upper1 === upper2 && (isClosedAbove(flags1) || isOpenAbove(flags2))
+    upper1 > upper2 || upper1 === upper2 && (isClosedUpper(flags1) || isOpenUpper(flags2))
 
   def isSupersetOf(rhs: Interval[A]): Boolean = lhs match {
     case All() =>
@@ -116,15 +116,21 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       rhs.upperPair.map { case (upper2, flags2) =>
         upperPairAbove(upper1, flags1, upper2, flags2)
       }.getOrElse(false)
-    case Ranged(lower1, upper1, flags1) =>
+    case _: Empty[_] => rhs.isEmpty
+    case Point(lhsval) =>
       rhs match {
-        case r if r.isEmpty =>
-          true
-        case Ranged(lower2, upper2, flags2) =>
+        case _: Empty[_] => true
+        case Point(rhsval) => lhsval === rhsval
+        case _: All[_] | _: Bounded[_] | _: Above[_] | _: Below[_] => false
+      }
+    case Bounded(lower1, upper1, flags1) =>
+      rhs match {
+        case _: Empty[_] => true
+        case Point(rhsval) => lhs.contains(rhsval)
+        case Bounded(lower2, upper2, flags2) =>
           lowerPairBelow(lower1, flags1, lower2, flags2) &&
           upperPairAbove(upper1, flags1, upper2, flags2)
-        case _ =>
-          false
+        case _: All[_] | _: Bounded[_] | _: Above[_] | _: Below[_] => false
       }
   }
 
@@ -138,7 +144,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     rhs isProperSupersetOf lhs
 
   // Does this interval contain any points above x?
-  def isAbove(t: A): Boolean = this match {
+  def hasAbove(t: A): Boolean = this match {
     case Empty(_) => false
     case Point(p) => p > t
     case Below(upper, flags) => upper > t
@@ -148,7 +154,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   }
 
   // Does this interval contain any points below y?
-  def isBelow(t: A): Boolean = this match {
+  def hasBelow(t: A): Boolean = this match {
     case Empty(_) => false
     case Point(p) => p < t
     case Above(lower, flags) => lower < t
@@ -157,20 +163,20 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     case _: All[_] => true
   }
 
-  def isAtOrAbove(t: A) = this match {
+  def hasAtOrAbove(t: A) = this match {
     case Below(upper, flags) =>
-      upper > t || isClosedAbove(flags) && upper === t
+      upper > t || isClosedUpper(flags) && upper === t
     case Ranged(lower, upper, flags) =>
-      upper > t || isClosedAbove(flags) && upper === t
+      upper > t || isClosedUpper(flags) && upper === t
     case _: Above[_] => true
     case _: All[_] => true
   }
 
-  def isAtOrBelow(t: A) = this match {
+  def hasAtOrBelow(t: A) = this match {
     case Above(lower, flags) =>
-      lower < t || isClosedBelow(flags) && lower === t
+      lower < t || isClosedLower(flags) && lower === t
     case Ranged(lower, upper, flags) =>
-      lower < t || isClosedBelow(flags) && lower === t
+      lower < t || isClosedLower(flags) && lower === t
     case _: Below[_] => true
     case _: All[_] => true
   }
@@ -354,14 +360,14 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     case All() =>
       "(-∞, ∞)"
     case Above(lower, flags) =>
-      if (isClosedBelow(flags)) s"[$lower, ∞)" else s"($lower, ∞)"
+      if (isClosedLower(flags)) s"[$lower, ∞)" else s"($lower, ∞)"
     case Below(upper, flags) =>
-      if (isClosedAbove(flags)) s"(-∞, $upper]" else s"(-∞, $upper)"
+      if (isClosedUpper(flags)) s"(-∞, $upper]" else s"(-∞, $upper)"
     case _: Empty[_] => "(Ø)"
     case Point(p) => s"[$p]"
     case Bounded(lower, upper, flags) =>
-      val s1 = if (isClosedBelow(flags)) s"[$lower" else s"($lower"
-      val s2 = if (isClosedAbove(flags)) s"$upper]" else s"$upper)"
+      val s1 = if (isClosedLower(flags)) s"[$lower" else s"($lower"
+      val s2 = if (isClosedUpper(flags)) s"$upper]" else s"$upper)"
       s"$s1, $s2"
   }
 
@@ -376,7 +382,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
         case _ =>
           Interval.atOrAbove(m.zero)
       }
-    } else if (isBelow(m.zero)) {
+    } else if (hasBelow(m.zero)) {
       -this
     } else {
       this
@@ -496,7 +502,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
           else Below(lower1 * upper2, lowerFlagToUpper(lf1) | uf2)
         case Ranged(lower2, upper2, flags2) =>
           if (rhs.crossesZero) All()
-          else if (rhs.isAbove(z)) Above(lower1 * lower2, lf1 | lowerFlag(flags2))
+          else if (rhs.hasAbove(z)) Above(lower1 * lower2, lf1 | lowerFlag(flags2))
           else Below(lower1 * upper2, lowerFlagToUpper(lf1) | upperFlag(flags2))
       }
 
@@ -511,7 +517,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
           else Above(upper1 * upper2, upperFlagToLower(uf1) | upperFlagToLower(uf2))
         case Ranged(lower2, upper2, flags2) =>
           if (rhs.crossesZero) All()
-          else if (rhs.isAbove(z)) Below(upper1 * lower2, uf1 | lowerFlagToUpper(flags2))
+          else if (rhs.hasAbove(z)) Below(upper1 * lower2, uf1 | lowerFlagToUpper(flags2))
           else Above(upper1 * lower2, upperFlagToLower(uf1) | lowerFlag(flags2))
       }
 
@@ -534,10 +540,10 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
           if (lcz && rcz) {
             fromTpls(minTpl(lu, ul), maxTpl(ll, uu))
           } else if (lcz) {
-            if (rhs.isAbove(z)) fromTpls(lu, uu) else fromTpls(ul, ll)
+            if (rhs.hasAbove(z)) fromTpls(lu, uu) else fromTpls(ul, ll)
           } else if (rcz) {
-            if (lhs.isAbove(z)) fromTpls(ul, uu) else fromTpls(lu, ll)
-          } else if (lhs.isBelow(z) == rhs.isBelow(z)) {
+            if (lhs.hasAbove(z)) fromTpls(ul, uu) else fromTpls(lu, ll)
+          } else if (lhs.hasBelow(z) == rhs.hasBelow(z)) {
             fromTpls(minTpl(ll, uu), maxTpl(ll, uu))
           } else {
             fromTpls(minTpl(lu, ul), maxTpl(lu, ul))
@@ -740,7 +746,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def nroot(k: Int)(implicit r: Ring[A], n: NRoot[A]): Interval[A] = {
     if (k == 1) {
       this
-    } else if ((k & 1) == 0 && isBelow(r.zero)) {
+    } else if ((k & 1) == 0 && hasBelow(r.zero)) {
       sys.error("can't take even root of negative number")
     } else {
       this match {
@@ -756,18 +762,18 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   def top(epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] = this match {
     case Below(upper, uf) =>
-      Some(if (isOpenAbove(uf)) upper - epsilon else upper)
+      Some(if (isOpenUpper(uf)) upper - epsilon else upper)
     case Ranged(_, upper, flags) =>
-      Some(if (isOpenAbove(flags)) upper - epsilon else upper)
+      Some(if (isOpenUpper(flags)) upper - epsilon else upper)
     case _ =>
       None
   }
 
   def bottom(min: A, epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] = this match {
     case Above(lower, lf) =>
-      Some(if (isOpenBelow(lf)) lower + epsilon else lower)
+      Some(if (isOpenLower(lf)) lower + epsilon else lower)
     case Ranged(lower, _, flags) =>
-      Some(if (isOpenBelow(flags)) lower + epsilon else lower)
+      Some(if (isOpenLower(flags)) lower + epsilon else lower)
     case _ =>
       None
   }
@@ -786,12 +792,12 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   import Interval.{Bound, Open, Closed, Unbound}
 
   def lowerBound: Bound[A] = lowerPair match {
-    case Some((a, n)) => if (isOpenBelow(n)) Open(a) else Closed(a)
+    case Some((a, n)) => if (isOpenLower(n)) Open(a) else Closed(a)
     case None => Unbound()
   }
 
   def upperBound: Bound[A] = upperPair match {
-    case Some((a, n)) => if (isOpenAbove(n)) Open(a) else Closed(a)
+    case Some((a, n)) => if (isOpenUpper(n)) Open(a) else Closed(a)
     case None => Unbound()
   }
 
