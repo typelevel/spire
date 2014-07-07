@@ -22,6 +22,7 @@ class IntervalTest extends FunSuite {
   val e = Interval.empty[Double]
   val all = Interval.all[Double]
 
+  test("[2, inf] is a superset of empty") { assert(Interval.atOrAbove(2).isSupersetOf(Interval.empty[Int])) }
   test("empty is empty") { assert(e.isEmpty) }
   test("point is point") { assert(Interval.point(2).isPoint) }
   test("[2,2] is point") { assert(Interval.closed(2, 2).isPoint) }
