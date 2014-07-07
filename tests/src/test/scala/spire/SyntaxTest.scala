@@ -108,7 +108,7 @@ trait BaseSyntaxTest {
       ((a < b) == Order[A].lt(a, b)) &&
       ((a > b) == Order[A].gt(a, b)) &&
       ((a <= b) == Order[A].lteqv(a, b)) &&
-      ((a >= b) == Order[A].gteqv(a, b))
+      ((a >= b) == Order[A].gteqv(a, b)) &&
       ((a min b) == Order[A].min(a, b)) &&
       ((a max b) == Order[A].max(a, b)) &&
       ((a compare b) == Order[A].compare(a, b))
