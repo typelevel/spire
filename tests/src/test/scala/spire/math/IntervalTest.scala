@@ -76,8 +76,10 @@ class RingIntervalTest extends FunSuite {
   }
 }
 
-class PartialOrderTest extends FunSuite {
-  import Interval.{openAbove, openBelow, closed, open}
+class IntervalGeometricPartialOrderTest extends FunSuite {
+  import spire.optional.intervalGeometricPartialOrder._
+
+  import Interval.{openAbove, openBelow, closed, open, point}
   test("[2, 3) === [2, 3)") { assert(openAbove(2, 3).partialCompare(openAbove(2, 3)) == 0.0) }
   test("[2, 3) < [3, 4]") { assert(openAbove(2, 3) < closed(3, 4)) }
   test("[2, 3] < (3, 4]") { assert(closed(2, 3) < openBelow(3, 4)) }
@@ -92,6 +94,23 @@ class PartialOrderTest extends FunSuite {
   test("empty.partialCompare(empty) == 0.0") { assert(open(2, 2).partialCompare(open(3, 3)) == 0.0) }
   test("empty cannot be compared to [2, 3]") { assert(open(2, 2).partialCompare(closed(2, 3)).isNaN) }
   test("[2, 3] cannot be compared to empty") { assert(closed(2, 3).partialCompare(open(2, 2)).isNaN) }
+  test("Minimal and maximal elements of {[1], [2, 3], [2, 4]}") {
+    val intervals = Seq(point(1), closed(2, 3), closed(2, 4))
+    assert(intervals.pmin.toSet == Set(point(1)))
+    assert(intervals.pmax.toSet == Set(closed(2, 3), closed(2, 4)))
+  }
+}
+
+class IntervalSubsetPartialOrderTest extends FunSuite {
+  import spire.optional.intervalSubsetPartialOrder._
+
+  import Interval.{openAbove, openBelow, closed, open, point}
+
+  test("Minimal and maximal elements of {[1, 3], [3], [2], [1]} by subset partial order") {
+    val intervals = Seq(closed(1, 3), point(3), point(2), point(1))
+    assert(intervals.pmin.toSet == Set(point(1), point(2), point(3)))
+    assert(intervals.pmax.toSet == Set(closed(1, 3)))
+  }
 }
 
 // TODO: this is just the tip of the iceberg... we also need to worry about
@@ -297,6 +316,8 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
   }
 
   property("points compare as scalars") {
+    import spire.optional.intervalGeometricPartialOrder._
+
     import spire.algebra.{Order, PartialOrder}
     forAll { (x: Rational, y: Rational) =>
       val a = Interval.point(x)
@@ -308,6 +329,8 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
   }
 
   property("(-inf, a] < [b, inf) if a < b") {
+    import spire.optional.intervalGeometricPartialOrder._
+
     import spire.algebra.{Order, PartialOrder}
     forAll { (a: Rational, b: Rational) =>
       whenever(a < b) {
@@ -322,6 +345,7 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
   }
 
   property("(-inf, a] does not compare to [b, inf) if a >= b") {
+    import spire.optional.intervalGeometricPartialOrder._
     import spire.algebra.{Order, PartialOrder}
     forAll { (a: Rational, b: Rational) =>
       whenever(a >= b) {
@@ -334,6 +358,7 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
   }
 
   property("(-inf, inf) does not compare with [a, b]") {
+    import spire.optional.intervalGeometricPartialOrder._
     import spire.algebra.{Order, PartialOrder}
     forAll { (a: Rational, b: Rational) =>
       val i = Interval.all[Rational]
