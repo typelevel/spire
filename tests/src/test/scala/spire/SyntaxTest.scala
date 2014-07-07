@@ -7,7 +7,7 @@ import spire.std.double._
 import spire.std.seq._
 import spire.std.string._
 
-import org.scalatest.FunSuite
+import org.scalatest.{FunSuite, Matchers}
 import org.scalatest.prop.Checkers
 
 import org.scalacheck.{Arbitrary, Gen}
@@ -379,4 +379,44 @@ trait BaseSyntaxTest {
       ((a ^ b) == BooleanAlgebra[A].xor(a, b)) &&
       (~a == BooleanAlgebra[A].complement(a))
   }
+}
+
+class PartialOrderSyntaxTest extends FunSuite with Matchers with Checkers {
+  import spire.algebra.PartialOrder
+  import spire.syntax.all._
+  object intDivisibility extends PartialOrder[Int] {
+    def partialCompare(a: Int, b: Int) = {
+      if (a == b)
+        0.0
+      else if (b % a == 0)
+        -1.0
+      else if (a % b == 0)
+        1.0
+      else
+        Double.NaN
+    }
+  }
+
+  test("With intDivisibility: Seq(2,3,6,9,12).pmin sameElements Seq(2,3)") {
+    Seq(2,3,6,9,12).pmin(intDivisibility).sameElements(Seq(2,3)) shouldBe true
+  }
+  test("With intDivisibility: Seq(2,3,6,9,12).pmax sameElements Seq(9,12)") {
+    Seq(2,3,6,9,12).pmax(intDivisibility).sameElements(Seq(9,12)) shouldBe true
+  }
+
+  case class PosInt(val x: Int)
+
+  implicit def ArbPosInt: Arbitrary[PosInt] = Arbitrary(Gen.choose(1, 30).map(PosInt))
+
+  test("pmin")(check(forAll { (posSeq: Seq[PosInt]) =>
+    val seq = posSeq.map(_.x)
+    def isMinimal(i: Int) = seq.forall(j => !(intDivisibility.partialCompare(i, j) > 0))
+    seq.pmin(intDivisibility).toSet === seq.filter(isMinimal).toSet
+  }))
+
+  test("pmax")(check(forAll { (posSeq: Seq[PosInt]) =>
+    val seq = posSeq.map(_.x)
+    def isMaximal(i: Int) = seq.forall(j => !(intDivisibility.partialCompare(i, j) < 0))
+    seq.pmax(intDivisibility).toSet === seq.filter(isMaximal).toSet
+  }))
 }
