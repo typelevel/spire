@@ -666,7 +666,7 @@ trig identities are also preserved:
 ```scala
 import Real.{sin, cos}
 def circle(a: Real): Real = (cos(a).pow(2) + sin(a).pow(2)).sqrt
-// will return CR(1) no matter what value is provided
+// will return Real(1) no matter what value is provided
 ```
 
 One interesting consequence of the design of computable real numbers
