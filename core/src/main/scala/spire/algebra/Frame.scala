@@ -3,7 +3,13 @@ package spire.algebra
 import scala.{ specialized => spec }
 
 /**
- * A `Frame` is a finite, ordered [[Basis]].
+ * A `Frame` is a finite, ordered [[Basis]]. A `Frame` must iterate over
+ * elements in the order of the indices.
+ *
+ * TODO: It would be nice if we could just say that we only need a Monoid
+ *       for the foldMap-like methods, and have it replace those methods.
+ *       However, this doesn't seem to work right when I need to "override"
+ *       them. Hrmm.
  */
 trait Frame[V, K] extends IndexedBasis[V, K, Int]
 
