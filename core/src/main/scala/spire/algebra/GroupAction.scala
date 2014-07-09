@@ -1,5 +1,7 @@
 package spire.algebra
 
+import scala.{ specialized => spec }
+
 /**
  * A (left) group action of `G` on `P` is simply the implementation of
  * a method `actl(g, p)`, or `g +> p` in additive notation, such that:
@@ -8,21 +10,21 @@ package spire.algebra
  * 
  * 2. `scalar.id +> p === p` for all `p` in `P`.
  */
-trait GroupAction[P, G] {
+trait GroupAction[@spec(Int) P, G] {
   def scalar: Group[G]
 
   def actl(g: G, p: P): P
   def actr(p: P, g: G): P = actl(g, p)
 }
 
-trait AdditiveGroupAction[P, G] {
+trait AdditiveGroupAction[@spec(Int) P, G] {
   def scalar: AdditiveGroup[G]
 
   def gplusl(g: G, p: P): P
   def gplusr(p: P, g: G): P = gplusl(g, p)
 }
 
-trait MultiplicativeGroupAction[P, G] {
+trait MultiplicativeGroupAction[@spec(Int) P, G] {
   def scalar: MultiplicativeGroup[G]
 
   def gtimesl(g: G, p: P): P
