@@ -1,12 +1,30 @@
 package spire.algebra
 package free
 
-final class FreeGroup[A](val terms: Vector[Either[A, A]]) extends AnyVal { lhs =>
+final class FreeGroup[A] private (val terms: Vector[Either[A, A]]) extends AnyVal { lhs =>
+
+  /**
+   * Map each term to type `B` and sum them using `B`'s [[Group]].
+   */
   def run[B](f: A => B)(implicit B: Group[B]): B =
     terms.foldLeft(B.id) {
       case (sum, Right(a)) => B.op(sum, f(a))
       case (sum, Left(a)) => B.opInverse(sum, f(a))
     }
+
+  def |+|(rhs: FreeGroup[A]): FreeGroup[A] =
+    reduce(lhs.terms.iterator ++ rhs.terms.iterator)
+
+  def |-|(rhs: FreeGroup[A]): FreeGroup[A] =
+    reduce(lhs.terms.iterator ++ rhs.terms.reverseIterator.map(_.swap))
+
+  def inverse: FreeGroup[A] = {
+    val bldr = Vector.newBuilder[Either[A, A]]
+    terms.reverseIterator foreach { term =>
+      bldr += term.swap
+    }
+    new FreeGroup(bldr.result())
+  }
 
   private def reduce(it: Iterator[Either[A, A]]): FreeGroup[A] = {
     def annihilated(x: Either[A, A], y: Either[A, A]): Boolean = (x, y) match {
@@ -26,20 +44,6 @@ final class FreeGroup[A](val terms: Vector[Either[A, A]]) extends AnyVal { lhs =
       } else acc
 
     new FreeGroup(loop(Vector.empty))
-  }
-
-  def |+|(rhs: FreeGroup[A]): FreeGroup[A] =
-    reduce(lhs.terms.iterator ++ rhs.terms.iterator)
-
-  def |-|(rhs: FreeGroup[A]): FreeGroup[A] =
-    reduce(lhs.terms.iterator ++ rhs.terms.reverseIterator.map(_.swap))
-
-  def inverse: FreeGroup[A] = {
-    val bldr = Vector.newBuilder[Either[A, A]]
-    terms.reverseIterator foreach { term =>
-      bldr += term.swap
-    }
-    new FreeGroup(bldr.result())
   }
 
   override def toString: String =
