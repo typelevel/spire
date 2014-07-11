@@ -50,5 +50,6 @@ object Sign {
         case Negative => A.negate(a)
         case Zero => A.zero
       }
+      def gtimesr(a: A, s: Sign): A = gtimesl(s, a)
     }
 }
