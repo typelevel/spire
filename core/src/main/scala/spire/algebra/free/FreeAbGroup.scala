@@ -73,7 +73,7 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
    */
   def split[B](f: A => B)(implicit B: CMonoid[B]): (B, B) =
     terms.foldLeft((B.id, B.id)) { case ((lsum, rsum), (a, n)) =>
-      if (n < 0) (B.op(lsum, B.sumn(f(a), n)), rsum)
+      if (n < 0) (B.op(lsum, B.sumn(f(a), -n)), rsum)
       else if (n > 0) (lsum, B.op(rsum, B.sumn(f(a), n)))
       else (lsum, rsum)
     }
