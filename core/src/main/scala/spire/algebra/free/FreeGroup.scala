@@ -28,8 +28,8 @@ final class FreeGroup[A] private (val terms: Vector[Either[A, A]]) extends AnyVa
 
   private def reduce(it: Iterator[Either[A, A]]): FreeGroup[A] = {
     def annihilated(x: Either[A, A], y: Either[A, A]): Boolean = (x, y) match {
-      case (Left(x0), Right(y0)) if x0 == y0 => true
-      case (Right(x0), Left(y0)) if x0 == y0 => true
+      case (Left(x0), Right(y0)) => x0 == y0
+      case (Right(x0), Left(y0)) => x0 == y0
       case _ => false
     }
 

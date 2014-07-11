@@ -120,6 +120,22 @@ object SpireArbitrary {
         case (acc, Right(a)) => acc |+| FreeGroup(a)
       }
     })
+
+  case class FreeAbTerm[A](a: A, n: Int)
+  implicit def FreeAbTermArbitrary[A: Arbitrary]: Arbitrary[FreeAbTerm[A]] =
+    Arbitrary(for {
+      a <- arbitrary[A]
+      n <- arbitrary[Short].map(_.toInt)
+    } yield FreeAbTerm(a, n))
+
+  implicit def FreeAbGroupArbitrary[A: Arbitrary]: Arbitrary[FreeAbGroup[A]] =
+    Arbitrary(for {
+      terms <- arbitrary[List[FreeAbTerm[A]]]
+    } yield {
+      terms.map { case FreeAbTerm(a, n) =>
+        Group[FreeAbGroup[A]].sumn(FreeAbGroup(a), n)
+      }.foldLeft(FreeAbGroup.id[A])(_ |+| _)
+    })
 }
 
 // vim: expandtab:ts=2:sw=2

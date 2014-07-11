@@ -7,7 +7,7 @@ final class FreeMonoid[A] private (val terms: List[A]) extends AnyVal { lhs =>
    * Map each term to type `B` and sum them using `B`'s [[Semigroup]],
    * as long as there is at least 1 term. Otherwise, return `None`.
    */
-  def runOption[B](f: A => B)(implicit B: Semigroup[B]): Option[B] =
+  def runSemigroup[B](f: A => B)(implicit B: Semigroup[B]): Option[B] =
     terms match {
       case head :: tail =>
         Some(tail.foldLeft(f(head)) { (acc, a) => B.op(acc, f(a)) })
