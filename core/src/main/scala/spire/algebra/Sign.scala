@@ -26,10 +26,9 @@ object Sign {
   implicit def apply(i: Int): Sign = 
     if (i == 0) Zero else if (i > 0) Positive else Negative
 
-  trait SignAlgebra extends AbGroup[Sign] with Signed[Sign] with Order[Sign] {
+  trait SignAlgebra extends CMonoid[Sign] with Signed[Sign] with Order[Sign] {
     def id: Sign = Positive
     def op(a: Sign, b: Sign): Sign = a * b
-    def inverse(a: Sign): Sign = -a
 
     override def sign(a: Sign): Sign = a
     def signum(a: Sign): Int = a.toInt
@@ -40,7 +39,7 @@ object Sign {
 
   implicit final val SignAlgebra = new SignAlgebra {}
 
-  implicit final val SignMultiplicativeGroup: MultiplicativeAbGroup[Sign] =
+  implicit final val SignMultiplicativeGroup: MultiplicativeCMonoid[Sign] =
     Multiplicative(SignAlgebra)
 
   implicit def SignAction[A](implicit A: AdditiveGroup[A]): MultiplicativeGroupAction[A, Sign] =
