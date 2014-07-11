@@ -59,7 +59,7 @@ object SpireArbitrary {
   implicit def VectorArbitrary[A: Arbitrary]: Arbitrary[Vector[A]] =
     Arbitrary(arbitrary[List[A]] map (Vector(_: _*)))
 
-  implicit def SignArbitrary[A: Arbitrary]: Arbitrary[Sign] =
+  implicit def SignArbitrary: Arbitrary[Sign] =
     Arbitrary(Gen.oneOf(Sign.Positive, Sign.Zero, Sign.Negative))
 
   implicit def TermArbitrary[A: Arbitrary]: Arbitrary[poly.Term[A]] =
