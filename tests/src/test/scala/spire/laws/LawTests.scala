@@ -1,6 +1,7 @@
 package spire.laws
 
 import spire.algebra._
+import spire.algebra.free._
 import spire.math._
 import spire.implicits.{
   SeqOrder => _, SeqEq => _,
@@ -71,4 +72,26 @@ class LawTests extends FunSuite with Discipline {
   checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
 
   checkAll("Sign", GroupActionLaws[Sign, Int].multiplicativeGroupAction)
+
+  implicit def eqFreeMonoid[A: Monoid: Eq]: Eq[FreeMonoid[A]] = new Eq[FreeMonoid[A]] {
+    def eqv(x: FreeMonoid[A], y: FreeMonoid[A]): Boolean =
+      Eq[A].eqv(x.run(n => n), y.run(n => n))
+  }
+
+  implicit def eqFreeGroup[A: Group: Eq]: Eq[FreeGroup[A]] = new Eq[FreeGroup[A]] {
+    def eqv(x: FreeGroup[A], y: FreeGroup[A]): Boolean =
+      Eq[A].eqv(x.run(n => n), y.run(n => n))
+  }
+
+  implicit def eqFreeAbGroup[A: AbGroup: Eq]: Eq[FreeAbGroup[A]] = new Eq[FreeAbGroup[A]] {
+    def eqv(x: FreeAbGroup[A], y: FreeAbGroup[A]): Boolean =
+      Eq[A].eqv(x.run(n => n), y.run(n => n))
+  }
+
+  checkAll("FreeMonoid", GroupLaws[FreeMonoid[String]].monoid)
+  checkAll("D3", GroupLaws[D3].group)
+  checkAll("FreeGroup", GroupLaws[FreeGroup[D3]].group)
+
+  implicit def intAbGroup: AbGroup[Int] = AbGroup.additive
+  checkAll("FreeAbGroup", GroupLaws[FreeAbGroup[Int]].abGroup)
 }
