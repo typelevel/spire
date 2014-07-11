@@ -69,4 +69,6 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Array[Int]",  GroupLaws[Array[Int]].monoid)
 
   checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
+
+  checkAll("Sign", GroupActionLaws[Sign, Int].multiplicativeGroupAction)
 }
