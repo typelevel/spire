@@ -5,7 +5,7 @@ import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
 import scala.{specialized => sp}
 
-import spire.algebra.{AdditiveMonoid, Field, MultiplicativeMonoid, NRoot, Order, Signed}
+import spire.algebra.{AdditiveMonoid, Field, MultiplicativeMonoid, NRoot, Order, PartialOrder, Signed}
 import spire.math.{Natural, Number, QuickSort, SafeLong, Searching, ULong}
 import spire.syntax.cfor._
 import spire.syntax.field._
@@ -210,6 +210,18 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) {
     as.foreach(a => t += a.abs.pow(p))
     t.nroot(p)
   }
+
+  /** Computes the minimal elements of a partially ordered set.
+    * If the poset contains multiple copies of a minimal element, the function
+    * will only return a single copy of it.
+    */
+  def pmin(implicit ev: PartialOrder[A]): Seq[A] = Searching.minimalElements(as)(ev)
+
+  /** Computes the maximal elements of a partially ordered set.
+    * If the posset contains multiple copies of a maximal element, the function
+    * will only return a single copy of it.
+    */
+  def pmax(implicit ev: PartialOrder[A]): Seq[A] = Searching.minimalElements(as)(ev.reverse)
 
   def qmin(implicit ev: Order[A]): A = {
     if (as.isEmpty) throw new UnsupportedOperationException("empty seq")

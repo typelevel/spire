@@ -114,6 +114,111 @@ object rationalTrig {
   }
 }
 
+object powerSetPartialOrder {
+  /** Set partial order defined as follows:
+    * 
+    * S <= T if S is a subset of T.
+    */
+  class PowerSetPartialOrder[A] extends PartialOrder[Set[A]] {
+    override def eqv(x: Set[A], y: Set[A]) = (x == y)
+    override def lteqv(x: Set[A], y: Set[A]) = x.subsetOf(y)
+    override def lt(x: Set[A], y: Set[A]) = x.subsetOf(y) && x != y
+    override def gteqv(x: Set[A], y: Set[A]) = y.subsetOf(x)
+    override def gt(x: Set[A], y: Set[A]) = y.subsetOf(x) && x != y
+
+    def partialCompare(x: Set[A], y: Set[A]): Double = {
+      if (eqv(x, y))
+        0.0
+      else if (lt(x, y))
+        -1.0
+      else if (gt(x, y))
+        1.0
+      else
+        Double.NaN
+    }
+  }
+  implicit def powerSetPartialOrder[A]: PartialOrder[Set[A]] = new PowerSetPartialOrder[A]
+}
+
+object intervalSubsetPartialOrder {
+  import spire.math.Interval
+  import spire.implicits._
+
+  /** Interval partial order defined as follows:
+    * 
+    * I <= J if I is a subset of J.
+    */
+  class IntervalSubsetPartialOrder[A: Order] extends PartialOrder[Interval[A]] {
+    override def eqv(x: Interval[A], y: Interval[A]) = (x == y)
+    override def lteqv(x: Interval[A], y: Interval[A]) = x.isSubsetOf(y)
+    override def lt(x: Interval[A], y: Interval[A]) = x.isProperSubsetOf(y)
+    override def gteqv(x: Interval[A], y: Interval[A]) = x.isSupersetOf(y)
+    override def gt(x: Interval[A], y: Interval[A]) = x.isProperSupersetOf(y)
+
+    def partialCompare(x: Interval[A], y: Interval[A]): Double = {
+      if (eqv(x, y))
+        0.0
+      else if (lt(x, y))
+        -1.0
+      else if (gt(x, y))
+        1.0
+      else
+        Double.NaN
+    }
+  }
+  implicit def intervalSubsetPartialOrder[A: Order]: PartialOrder[Interval[A]] = new IntervalSubsetPartialOrder[A]
+}
+
+object intervalGeometricPartialOrder {
+  import spire.math.Interval
+  import spire.implicits._
+  import Interval.{Open, Closed}
+  /** Interval partial order defined as follows:
+    *
+    * Involving empty intervals:
+    * 
+    * - if I and J are empty, then I === J.
+    * - if I (resp. J) is empty and J (resp. I) is non-empty,
+    *   the ordering is undefined (preserving antisymmetry).
+    * 
+    * For non-empty intervals:
+    * 
+    * - I === J is standard Eq semantics (I, J are intersubstituable)
+    * - I < J if all x \in I, y \in J have x < y
+    * - I > J if all x \in I, y \in J have x > y
+    */
+  class IntervalGeometricPartialOrder[A: Order] extends PartialOrder[Interval[A]] {
+    override def eqv(x: Interval[A], y: Interval[A]): Boolean = (x == y)
+
+    def partialCompare(i: Interval[A], j: Interval[A]): Double = {
+      import Double.NaN
+      if (eqv(i, j)) return 0.0
+      if (i.isEmpty || j.isEmpty)
+        return NaN
+
+      // test if i < j
+      (i.upperBound, j.lowerBound) match {
+        case (Open(x), Open(y)) if x <= y => return -1
+        case (Open(x), Closed(y)) if x <= y => return -1
+        case (Closed(x), Open(y)) if x <= y => return -1
+        case (Closed(x), Closed(y)) if x < y => return -1
+        case _ =>
+      }
+      // test if i > j
+        (i.lowerBound, j.upperBound) match {
+        case (Open(x), Open(y)) if x >= y => return 1
+        case (Open(x), Closed(y)) if x >= y => return 1
+        case (Closed(x), Open(y)) if x >= y => return 1
+        case (Closed(x), Closed(y)) if x > y => return 1
+        case _ =>
+      }
+      return NaN
+    }
+  }
+
+  implicit def intervalGeometricPartialOrder[A: Order]: PartialOrder[Interval[A]] = new IntervalGeometricPartialOrder[A]
+}
+
 object unicode {
   import spire.math._
 
@@ -152,7 +257,7 @@ object unicode {
     def ≠(rhs: A): Boolean = lhs != rhs
   }
 
-  implicit class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
+  implicit class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A]) {
     def ≤(rhs: A): Boolean = ev.lteqv(lhs, rhs)
     def ≥(rhs: A): Boolean = ev.gteqv(lhs, rhs)
   }

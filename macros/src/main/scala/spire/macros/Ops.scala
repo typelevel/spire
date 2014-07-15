@@ -187,7 +187,7 @@ object Ops extends Ops {
     ("$eq$eq$eq", "eqv"),
     ("$eq$bang$eq", "neqv"),
 
-    // Order (> >= < <=)
+    // Partial order (> >= < <=)
     ("$greater", "gt"),
     ("$greater$eq", "gteqv"),
     ("$less", "lt"),
