@@ -458,7 +458,12 @@ object FastComplex {
 
   // encode two floats representing a complex number
   @inline final def encode(real: Float, imag: Float): Long = {
-    (bits(imag).toLong << 32) + bits(real).toLong
+    val imagBits = bits(imag)
+    // don't use toLong directly - that moves the sign bit to the left of
+    // the long, and the shift would eliminate it
+    var res = (imagBits & 0x7fffffff).toLong << 32 // remove sign
+    if (imagBits < 0) res |= 0x8000000000000000l   // add sign again
+    res | bits(real).toLong
   }
 
   // encode two floats representing a complex number in polar form
