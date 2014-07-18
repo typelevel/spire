@@ -114,7 +114,7 @@ class ComplexTest extends FunSuite {
     assert(fc.real(z) == 0.0F)
     assert(fc.imag(z) < 0.000000001F)
 
-    assert(fc.multiply(fc.i, fc.i) === fc.one)
+    assert(fc.multiply(fc.i, fc.i) === fc(-1f, 0f))
     assert(fc.imag(fc(-1f, 0f)) === 0f)
   }
 
