@@ -3,6 +3,7 @@ package spire.laws
 import scala.reflect.ClassTag
 
 import spire.algebra._
+import spire.algebra.free._
 import spire.math._
 
 import org.scalacheck.{Arbitrary, Gen}
@@ -59,7 +60,7 @@ object SpireArbitrary {
   implicit def VectorArbitrary[A: Arbitrary]: Arbitrary[Vector[A]] =
     Arbitrary(arbitrary[List[A]] map (Vector(_: _*)))
 
-  implicit def SignArbitrary[A: Arbitrary]: Arbitrary[Sign] =
+  implicit def SignArbitrary: Arbitrary[Sign] =
     Arbitrary(Gen.oneOf(Sign.Positive, Sign.Zero, Sign.Negative))
 
   implicit def TermArbitrary[A: Arbitrary]: Arbitrary[poly.Term[A]] =
@@ -104,6 +105,37 @@ object SpireArbitrary {
       lower <- arbitrary[Interval.Bound[A]]
       upper <- arbitrary[Interval.Bound[A]]
     } yield Interval.fromBounds(lower, upper))
+
+  implicit def FreeMonoidArbitrary[A: Arbitrary]: Arbitrary[FreeMonoid[A]] =
+    Arbitrary(for {
+      terms <- arbitrary[List[A]].map(_.map(FreeMonoid(_)))
+    } yield terms.foldLeft(FreeMonoid.id[A])(_ |+| _))
+
+  implicit def FreeGroupArbitrary[A: Arbitrary]: Arbitrary[FreeGroup[A]] =
+    Arbitrary(for {
+      terms <- arbitrary[List[Either[A, A]]]
+    } yield {
+      terms.foldLeft(FreeGroup.id[A]) {
+        case (acc, Left(a)) => acc |-| FreeGroup(a)
+        case (acc, Right(a)) => acc |+| FreeGroup(a)
+      }
+    })
+
+  case class FreeAbTerm[A](a: A, n: Int)
+  implicit def FreeAbTermArbitrary[A: Arbitrary]: Arbitrary[FreeAbTerm[A]] =
+    Arbitrary(for {
+      a <- arbitrary[A]
+      n <- arbitrary[Short].map(_.toInt)
+    } yield FreeAbTerm(a, n))
+
+  implicit def FreeAbGroupArbitrary[A: Arbitrary]: Arbitrary[FreeAbGroup[A]] =
+    Arbitrary(for {
+      terms <- arbitrary[List[FreeAbTerm[A]]]
+    } yield {
+      terms.map { case FreeAbTerm(a, n) =>
+        Group[FreeAbGroup[A]].sumn(FreeAbGroup(a), n)
+      }.foldLeft(FreeAbGroup.id[A])(_ |+| _)
+    })
 }
 
 // vim: expandtab:ts=2:sw=2

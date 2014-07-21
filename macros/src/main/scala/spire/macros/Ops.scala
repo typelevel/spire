@@ -187,7 +187,7 @@ object Ops extends Ops {
     ("$eq$eq$eq", "eqv"),
     ("$eq$bang$eq", "neqv"),
 
-    // Order (> >= < <=)
+    // Partial order (> >= < <=)
     ("$greater", "gt"),
     ("$greater$eq", "gteqv"),
     ("$less", "lt"),
@@ -230,8 +230,8 @@ object Ops extends Ops {
     ("$u22C5", "dot"),
 
     // GroupAction (|+|> <|+| +> <+ *> <*)
-    ("$bar$plus$bar$greater", "gopl"),
-    ("$less$bar$plus$bar", "gopr"),
+    ("$bar$plus$bar$greater", "actl"),
+    ("$less$bar$plus$bar", "actr"),
     ("$plus$greater", "gplusl"),
     ("$less$plus", "gplusr"),
     ("$times$greater", "gtimesl"),

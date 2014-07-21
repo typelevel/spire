@@ -5,6 +5,7 @@ package object syntax {
   object literals extends LiteralsSyntax
 
   object eq extends EqSyntax
+  object partialOrder extends PartialOrderSyntax
   object order extends OrderSyntax
   object signed extends SignedSyntax
   object isReal extends IsRealSyntax

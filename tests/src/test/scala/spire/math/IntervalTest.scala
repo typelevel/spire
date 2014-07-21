@@ -92,6 +92,43 @@ class RingIntervalTest extends FunSuite {
   }
 }
 
+class IntervalGeometricPartialOrderTest extends FunSuite {
+  import spire.optional.intervalGeometricPartialOrder._
+
+  import Interval.{openAbove, openBelow, closed, open, point}
+  test("[2, 3) === [2, 3)") { assert(openAbove(2, 3).partialCompare(openAbove(2, 3)) == 0.0) }
+  test("[2, 3) < [3, 4]") { assert(openAbove(2, 3) < closed(3, 4)) }
+  test("[2, 3] < (3, 4]") { assert(closed(2, 3) < openBelow(3, 4)) }
+  test("[2, 3] cannot be compared to [3, 4]") { assert(closed(2, 3).partialCompare(closed(3, 4)).isNaN) }
+  test("[3, 4] > [2, 3)") { assert(closed(3, 4) > openAbove(2, 3)) }
+  test("[2, 3) <= [3, 4]") { assert(openAbove(2, 3) <= closed(3, 4)) }
+  test("[3, 4] >= [2, 3)") { assert(closed(3, 4) >= openAbove(2, 3)) }
+  test("not [2, 3] < [3, 4]") { assert(!(closed(2, 3) < closed(3, 4))) }
+  test("not [2, 3] <= [3, 4]") { assert(!(closed(2, 3) <= closed(3, 4))) }
+  test("not [3, 4] > [3, 4]") { assert(!(closed(2, 3) > closed(3, 4))) }
+  test("not [3, 4] >= [3, 4]") { assert(!(closed(2, 3) >= closed(3, 4))) }
+  test("empty.partialCompare(empty) == 0.0") { assert(open(2, 2).partialCompare(open(3, 3)) == 0.0) }
+  test("empty cannot be compared to [2, 3]") { assert(open(2, 2).partialCompare(closed(2, 3)).isNaN) }
+  test("[2, 3] cannot be compared to empty") { assert(closed(2, 3).partialCompare(open(2, 2)).isNaN) }
+  test("Minimal and maximal elements of {[1], [2, 3], [2, 4]}") {
+    val intervals = Seq(point(1), closed(2, 3), closed(2, 4))
+    assert(intervals.pmin.toSet == Set(point(1)))
+    assert(intervals.pmax.toSet == Set(closed(2, 3), closed(2, 4)))
+  }
+}
+
+class IntervalSubsetPartialOrderTest extends FunSuite {
+  import spire.optional.intervalSubsetPartialOrder._
+
+  import Interval.{openAbove, openBelow, closed, open, point}
+
+  test("Minimal and maximal elements of {[1, 3], [3], [2], [1]} by subset partial order") {
+    val intervals = Seq(closed(1, 3), point(3), point(2), point(1))
+    assert(intervals.pmin.toSet == Set(point(1), point(2), point(3)))
+    assert(intervals.pmax.toSet == Set(closed(1, 3)))
+  }
+}
+
 // TODO: this is just the tip of the iceberg... we also need to worry about
 // unbounded intervals, closed vs open bounds, etc.
 class ContinuousIntervalTest extends FunSuite {
@@ -294,8 +331,62 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
+  property("points compare as scalars") {
+    import spire.optional.intervalGeometricPartialOrder._
+
+    import spire.algebra.{Order, PartialOrder}
+    forAll { (x: Rational, y: Rational) =>
+      val a = Interval.point(x)
+      val b = Interval.point(y)
+      PartialOrder[Interval[Rational]].tryCompare(a, b).get shouldBe Order[Rational].compare(x, y)
+      a.pmin(b).get.asInstanceOf[Ranged[Rational]].lower shouldBe x.min(y)
+      a.pmax(b).get.asInstanceOf[Ranged[Rational]].lower shouldBe x.max(y)
+    }
+  }
+
+  property("(-inf, a] < [b, inf) if a < b") {
+    import spire.optional.intervalGeometricPartialOrder._
+
+    import spire.algebra.{Order, PartialOrder}
+    forAll { (a: Rational, b: Rational) =>
+      whenever(a < b) {
+        val i = Interval.atOrBelow(a)
+        val j = Interval.atOrAbove(b)
+        (i < j) shouldBe true
+        (i >= j) shouldBe false
+        (j > i) shouldBe true
+        (j <= i) shouldBe false
+      }
+    }
+  }
+
+  property("(-inf, a] does not compare to [b, inf) if a >= b") {
+    import spire.optional.intervalGeometricPartialOrder._
+    import spire.algebra.{Order, PartialOrder}
+    forAll { (a: Rational, b: Rational) =>
+      whenever(a >= b) {
+        val i = Interval.atOrBelow(a)
+        val j = Interval.atOrAbove(b)
+        i.partialCompare(j).isNaN shouldBe true
+        j.partialCompare(i).isNaN shouldBe true
+      }
+    }
+  }
+
+  property("(-inf, inf) does not compare with [a, b]") {
+    import spire.optional.intervalGeometricPartialOrder._
+    import spire.algebra.{Order, PartialOrder}
+    forAll { (a: Rational, b: Rational) =>
+      val i = Interval.all[Rational]
+      val j = Interval.closed(a, b)
+      i.partialCompare(j).isNaN shouldBe true
+      j.partialCompare(i).isNaN shouldBe true
+    }
+  }
+
   property("empty intervals are equal") {
     forAll { (x: Rational, y: Rational) =>
+      import spire.algebra.Eq
       val a = Interval.open(x, x)
       val b = Interval.open(y, y)
       val c = Interval.openUpper(x, x)
@@ -308,13 +399,12 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
       c shouldBe e
       d shouldBe e
       e shouldBe e
-      import spire.algebra.Eq
-      assert(Eq[Interval[Rational]].eqv(a, e))
-      assert(Eq[Interval[Rational]].eqv(a, b))
-      assert(Eq[Interval[Rational]].eqv(b, e))
-      assert(Eq[Interval[Rational]].eqv(c, e))
-      assert(Eq[Interval[Rational]].eqv(d, e))
-      assert(Eq[Interval[Rational]].eqv(e, e))
+      Eq[Interval[Rational]].eqv(a, e) shouldBe true
+      Eq[Interval[Rational]].eqv(a, b) shouldBe true
+      Eq[Interval[Rational]].eqv(b, e) shouldBe true
+      Eq[Interval[Rational]].eqv(c, e) shouldBe true
+      Eq[Interval[Rational]].eqv(d, e) shouldBe true
+      Eq[Interval[Rational]].eqv(e, e) shouldBe true
     }
   }
 }

@@ -34,7 +34,8 @@ possible.
 * Simon Ochsenreither: bug reports and build contributions
 * Erik Osheim: core maintainer
 * Adam Pingel: bug fixes
-* Denis Rosset: added rational support for to spire.math.Number
+* Denis Rosset: work on Number, PartialOrder, Interval, and more
+* Lukas Rytz: bug fixes
 * Tom Switzer: core maintainer
 * Flaviu Tamas: byte-manipulation and bounds-checking macros
 * James Thompson: author of spire.math.Polynomial

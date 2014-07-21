@@ -449,7 +449,7 @@ object FastComplex {
   @inline final def real(d: Long): Float = bits((d & 0xffffffff).toInt)
 
   // get the imaginary part of the complex number
-  @inline final def imag(d: Long): Float = bits((d >> 32).toInt)
+  @inline final def imag(d: Long): Float = bits((d >>> 32).toInt)
 
   // define some handy constants
   final val i = encode(0.0F, 1.0F)
@@ -457,14 +457,12 @@ object FastComplex {
   final val zero = encode(0.0F, 0.0F)
 
   // encode two floats representing a complex number
-  @inline final def encode(real: Float, imag: Float): Long = {
-    (bits(imag).toLong << 32) + bits(real).toLong
-  }
+  @inline final def encode(real: Float, imag: Float): Long =
+    (bits(real) & 0xffffffffL) | ((bits(imag) & 0xffffffffL) << 32)
 
   // encode two floats representing a complex number in polar form
-  @inline final def polar(magnitude: Float, angle: Float): Long = {
+  @inline final def polar(magnitude: Float, angle: Float): Long =
     encode(magnitude * cos(angle).toFloat, magnitude * sin(angle).toFloat)
-  }
 
   // decode should be avoided in fast code because it allocates a Tuple2.
   final def decode(d: Long): (Float, Float) = (real(d), imag(d))
