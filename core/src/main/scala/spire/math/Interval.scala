@@ -445,98 +445,101 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     Interval.withFlags(t1._1, t2._1, lowerFlag(t1._2) | lowerFlagToUpper(t2._2))
 
   def *(rhs: Interval[A])(implicit ev: Semiring[A]): Interval[A] = {
-    if (lhs.isEmpty) return lhs // TODO better handling of cases
-    if (rhs.isEmpty) return rhs
     val z = ev.zero
-    if (lhs.isAt(z) || rhs.isAt(z)) return Interval.point(z)
 
-    lhs match {
-      case All() => lhs
-
-      case Above(lower1, lf1) => rhs match {
-        case All() =>
-          rhs
-        case Above(lower2, lf2) =>
-          if (lower1 < z || lower2 < z) All()
-          else Above(lower1 * lower2, lf1 | lf2)
-        case Below(upper2, uf2) =>
-          if (lower1 < z || upper2 > z) All()
-          else Below(lower1 * upper2, lowerFlagToUpper(lf1) | uf2)
-        case Ranged(lower2, upper2, flags2) =>
-          if (rhs.crossesZero) All()
-          else if (rhs.hasAbove(z)) Above(lower1 * lower2, lf1 | lowerFlag(flags2))
-          else Below(lower1 * upper2, lowerFlagToUpper(lf1) | upperFlag(flags2))
-      }
-
-      case Below(upper1, uf1) => rhs match {
-        case All() =>
-          rhs
-        case Above(lower2, lf2) =>
-          if (upper1 > z || lower2 < z) All()
-          else Below(upper1 * lower2, uf1 | lowerFlagToUpper(lf2))
-        case Below(upper2, uf2) =>
-          if (upper1 > z || upper2 > z) All()
-          else Above(upper1 * upper2, upperFlagToLower(uf1) | upperFlagToLower(uf2))
-        case Ranged(lower2, upper2, flags2) =>
-          if (rhs.crossesZero) All()
-          else if (rhs.hasAbove(z)) Below(upper1 * lower2, uf1 | lowerFlagToUpper(flags2))
-          else Above(upper1 * lower2, upperFlagToLower(uf1) | lowerFlag(flags2))
-      }
-
-      case Ranged(lower1, upper1, flags1) => rhs match {
-        case All() =>
-          rhs
-        case Above(lower2, lf2) =>
-          if (lower2 < z) All()
-          else Above(lower1 * lower2, lowerFlag(flags1) | lf2)
-        case Below(upper2, uf2) =>
-          if (upper2 > z) All()
-          else Below(lower1 * upper2, lowerFlagToUpper(flags1) | uf2)
-        case Ranged(lower2, upper2, flags2) =>
-          val ll = (lower1 * lower2, lowerFlag(flags1) | lowerFlag(flags2))
-          val lu = (lower1 * upper2, lowerFlag(flags1) | upperFlagToLower(flags2))
-          val ul = (upper1 * lower2, upperFlagToLower(flags1) | lowerFlag(flags2))
-          val uu = (upper1 * upper2, upperFlagToLower(flags1) | upperFlagToLower(flags2))
-          val lcz = lhs.crossesZero
-          val rcz = rhs.crossesZero
-          if (lcz && rcz) {
-            fromTpls(minTpl(lu, ul), maxTpl(ll, uu))
-          } else if (lcz) {
-            if (rhs.hasAbove(z)) fromTpls(lu, uu) else fromTpls(ul, ll)
-          } else if (rcz) {
-            if (lhs.hasAbove(z)) fromTpls(ul, uu) else fromTpls(lu, ll)
-          } else if (lhs.hasBelow(z) == rhs.hasBelow(z)) {
-            fromTpls(minTpl(ll, uu), maxTpl(ll, uu))
-          } else {
-            fromTpls(minTpl(lu, ul), maxTpl(lu, ul))
-          }
-      }
+    (lhs, rhs) match {
+      case (Empty(), _) => lhs
+      case (_, Empty()) => rhs
+      case (Point(lv), _) => rhs * lv // use multiplication by scalar
+      case (_, Point(rv)) => lhs * rv
+      // now lhs and rhs are both intervals with more that one point
+      case (All(), _) => lhs
+      case (_, All()) => rhs        
+      case (Above(lower1, lf1), Above(lower2, lf2)) if lower1 < z || lower2 < z => All()
+      case (Above(lower1, lf1), Above(lower2, lf2)) => Above(lower1 * lower2, lf1 | lf2)
+      case (Above(lower1, lf1), Below(upper2, uf2)) if (lower1 < z || upper2 > z) => All()
+      case (Above(lower1, lf1), Below(upper2, uf2)) => 
+        Below(lower1 * upper2, lowerFlagToUpper(lf1) | uf2)
+      case (Above(lower1, lf1), Bounded(lower2, upper2, flags2)) =>
+        (rhs.hasBelow(z), rhs.hasAbove(z)) match {
+          case (true, true) => All() // rhs.crossesZero() == true
+          case (false, true) => Above(lower1 * lower2, lf1 | lowerFlag(flags2))
+          case _ => Below(lower1 * upper2, lowerFlagToUpper(lf1) | upperFlag(flags2))
+        }
+      case (Below(upper1, uf1), Above(lower2, lf2)) if (upper1 > z || lower2 < z) => All()
+      case (Below(upper1, uf1), Above(lower2, lf2)) => 
+        Below(upper1 * lower2, uf1 | lowerFlagToUpper(lf2))
+      case (Below(upper1, uf1), Below(upper2, uf2)) if (upper1 > z || upper2 > z) => All()
+      case (Below(upper1, uf1), Below(upper2, uf2)) =>
+        Above(upper1 * upper2, upperFlagToLower(uf1) | upperFlagToLower(uf2))
+      case (Below(upper1, uf1), Bounded(lower2, upper2, flags2)) =>
+        (rhs.hasBelow(z), rhs.hasAbove(z)) match {
+          case (true, true) => All() // rhs.crossesZero() == true
+          case (false, true) => Below(upper1 * lower2, uf1 | lowerFlagToUpper(flags2))
+          case _ => Above(upper1 * lower2, upperFlagToLower(uf1) | lowerFlag(flags2))
+        }
+      case (Bounded(lower1, upper1, flags1), Above(lower2, lf2)) if (lower2 < z) => All()
+      case (Bounded(lower1, upper1, flags1), Above(lower2, lf2)) =>
+        Above(lower1 * lower2, lowerFlag(flags1) | lf2)
+      case (Bounded(lower1, upper1, flags1), Below(upper2, uf2)) if (upper2 > z) => All()
+      case (Bounded(lower1, upper1, flags1), Below(upper2, uf2)) =>
+        Below(lower1 * upper2, lowerFlagToUpper(flags1) | uf2)
+      case (Bounded(lower1, upper1, flags1), Bounded(lower2, upper2, flags2)) =>
+        val ll = (lower1 * lower2, lowerFlag(flags1) | lowerFlag(flags2))
+        val lu = (lower1 * upper2, lowerFlag(flags1) | upperFlagToLower(flags2))
+        val ul = (upper1 * lower2, upperFlagToLower(flags1) | lowerFlag(flags2))
+        val uu = (upper1 * upper2, upperFlagToLower(flags1) | upperFlagToLower(flags2))
+        val lcz = lhs.crossesZero
+        val rcz = rhs.crossesZero
+        if (lcz && rcz) {
+          fromTpls(minTpl(lu, ul), maxTpl(ll, uu))
+        } else if (lcz) {
+          if (rhs.hasAbove(z)) fromTpls(lu, uu) else fromTpls(ul, ll)
+        } else if (rcz) {
+          if (lhs.hasAbove(z)) fromTpls(ul, uu) else fromTpls(lu, ll)
+        } else if (lhs.hasBelow(z) == rhs.hasBelow(z)) {
+          fromTpls(minTpl(ll, uu), maxTpl(ll, uu))
+        } else {
+          fromTpls(minTpl(lu, ul), maxTpl(lu, ul))
+        }
     }
   }
 
   def reciprocal(implicit ev: Field[A]): Interval[A] = {
-    if (lhs.isEmpty) return lhs
-
     val z = ev.zero
     def error = throw new java.lang.ArithmeticException("/ by zero")
-    if (contains(z)) return error
 
     this match {
-      case All() =>
-        error
+      case All() => error
+      case Empty() => this
 
       case Above(lower, lf) =>
-        if (lower === z) this
-        else Ranged(z, lower.reciprocal, 1 | lowerFlagToUpper(lf))
+        (lower.compare(z), isClosedLower(lf)) match {
+          case (x, _) if x < 0 => error // crosses zero
+          case (0, true) => error // contains zero
+          case (0, false) => this
+          case _ => Bounded(z, lower.reciprocal, 1 | lowerFlagToUpper(lf))
+        }
 
       case Below(upper, uf) =>
-        if (upper === z) this
-        else Ranged(upper.reciprocal, z, 2 | upperFlagToLower(uf))
+        (upper.compare(z), isClosedUpper(uf)) match {
+          case (x, _) if x > 0 => error // crosses zero
+          case (0, true) => error // contains zero
+          case (0, false) => this
+          case _ => Bounded(upper.reciprocal, z, 2 | upperFlagToLower(uf))
+        }
 
-      case Ranged(lower, upper, flags) =>
-        if (lower === z) Above(upper.reciprocal, upperFlagToLower(flags))
-        else if (upper === z) Below(lower.reciprocal, lowerFlagToUpper(flags))
-        else Ranged(upper.reciprocal, lower.reciprocal, swapFlags(flags))
+      case Point(v) => Point(v.reciprocal)
+
+      case Bounded(lower, upper, flags) =>
+        (lower.compare(z), upper.compare(z), isClosedLower(flags), isClosedUpper(flags)) match {
+          case (x, y, _, _) if x < 0 && y > 0 => error // crosses zero
+          case (0, _, true, _) => error // contains zero
+          case (_, 0, _, true) => error // contains zero
+          case (0, _, false, _) => Above(upper.reciprocal, upperFlagToLower(flags))
+          case (_, 0, _, false) => Below(lower.reciprocal, lowerFlagToUpper(flags))
+          case _ => Bounded(upper.reciprocal, lower.reciprocal, swapFlags(flags))
+        }
     }
   }
 
@@ -545,10 +548,11 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   def +(rhs: A)(implicit ev: AdditiveSemigroup[A]): Interval[A] =
     this match {
-      case Ranged(l, u, flags) => Ranged(l + rhs, u + rhs, flags)
+      case Point(v) => Point(v + rhs)
+      case Bounded(l, u, flags) => Bounded(l + rhs, u + rhs, flags)
       case Above(l, lf) => Above(l + rhs, lf)
       case Below(u, uf) => Below(u + rhs, uf)
-      case All() => this
+      case All() | Empty() => this
     }
 
   def -(rhs: A)(implicit ev: AdditiveGroup[A]): Interval[A] =
@@ -556,30 +560,31 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   def unary_-()(implicit ev: AdditiveGroup[A]): Interval[A] =
     this match {
-      case Empty() => Empty()
       case Point(v) => Point(-v)
       case Bounded(l, u, f) => Bounded(-u, -l, swapFlags(f))
       case Above(l, lf) => Below(-l, lowerFlagToUpper(lf))
       case Below(u, uf) => Above(-u, upperFlagToLower(uf))
-      case All() => this
+      case All() | Empty() => this
     }
 
   def *(rhs: A)(implicit ev: Semiring[A]): Interval[A] =
     if (rhs < ev.zero) {
       this match {
-        case Ranged(l, u, f) => Ranged(u * rhs, l * rhs, swapFlags(f))
+        case Point(v) => Point(v * rhs)
+        case Bounded(l, u, f) => Bounded(u * rhs, l * rhs, swapFlags(f))
         case Above(l, lf) => Below(l * rhs, lowerFlagToUpper(lf))
         case Below(u, uf) => Above(u * rhs, upperFlagToLower(uf))
-        case All() => this
+        case All() | Empty() => this
       }
     } else if (rhs === ev.zero) {
       Interval.zero
     } else {
       this match {
-        case Ranged(l, u, flags) => Ranged(l * rhs, u * rhs, flags)
+        case Point(v) => Point(v * rhs)
+        case Bounded(l, u, flags) => Bounded(l * rhs, u * rhs, flags)
         case Above(l, lf) => Above(l * rhs, lf)
         case Below(u, uf) => Below(u * rhs, uf)
-        case All() => this
+        case All() | Empty() => this
       }
     }
 
@@ -611,10 +616,11 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       sys.error("can't take even root of negative number")
     } else {
       this match {
-        case All() => this
+        case All() | Empty() => this
+        case Point(v) => Point(v.nroot(k))
         case Above(l, lf) => Above(l.nroot(k), lf)
         case Below(u, uf) => Below(u.nroot(k), uf)
-        case Ranged(l, u, flags) => Ranged(l.nroot(k), u.nroot(k), flags)
+        case Bounded(l, u, flags) => Bounded(l.nroot(k), u.nroot(k), flags)
       }
     }
   }
@@ -622,21 +628,21 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def sqrt(implicit r: Ring[A], n: NRoot[A]): Interval[A] = nroot(2)
 
   def top(epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] = this match {
+    case Empty() | All() | Above(_, _) => None // TOCHECK: changed semantics, Empty().top == None
     case Below(upper, uf) =>
       Some(if (isOpenUpper(uf)) upper - epsilon else upper)
-    case Ranged(_, upper, flags) =>
+    case Point(v) => Some(v)
+    case Bounded(_, upper, flags) =>
       Some(if (isOpenUpper(flags)) upper - epsilon else upper)
-    case _ =>
-      None
   }
 
   def bottom(min: A, epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] = this match {
+    case Empty() | All() | Below(_, _) => None // TOCHECK: changed semantics, Empty().bottom == None
     case Above(lower, lf) =>
       Some(if (isOpenLower(lf)) lower + epsilon else lower)
-    case Ranged(lower, _, flags) =>
+    case Point(v) => Some(v)
+    case Bounded(lower, _, flags) =>
       Some(if (isOpenLower(flags)) lower + epsilon else lower)
-    case _ =>
-      None
   }
 
   import spire.random.{Dist, Uniform}
@@ -655,35 +661,12 @@ case class All[A: Order] private[spire] () extends Interval[A]
 case class Above[A: Order] private[spire] (lower: A, flags: Int) extends Interval[A]
 case class Below[A: Order] private[spire] (upper: A, flags: Int) extends Interval[A]
 
-sealed abstract class Ranged[A](implicit order: Order[A]) extends Interval[A]
-
-object Ranged {
-  val ClosedFlags = 0
-  val OpenFlags = 3
-  def apply[A: Order](lower: A, upper: A, flags: Int): Ranged[A] =
-    (Order[A].compare(lower, upper), flags) match {
-      case (0, ClosedFlags) => Point(lower)
-      case (0, _) => Empty()
-      case (x, _) if x > 0 => Empty()
-      case (_, _) => Bounded(lower, upper, flags)
-    }
-  def unapply[A](interval: Ranged[A]): Option[(A, A, Int)] = 
-    interval match {
-      case Bounded(lower, upper, flags) => Some((lower, upper, flags))
-      case Point(value) => Some((value, value, ClosedFlags))
-      case Empty() => sys.error("Cannot call unapply on empty interval.")
-    }
-}
-
 // Bounded, non-empty interval with lower < upper
-case class Bounded[A: Order] private[spire] (lower: A, upper: A, flags: Int) extends Ranged[A] {
+case class Bounded[A: Order] private[spire] (lower: A, upper: A, flags: Int) extends Interval[A] {
   require(lower < upper) // TODO: remove after refactoring
 }
-case class Point[A: Order] private[spire] (value: A) extends Ranged[A]
-
-case class Empty[A: Order] private[spire] () extends Ranged[A] {
-  override def equals(any: Any) = any.isInstanceOf[Empty[_]]
-}
+case class Point[A: Order] private[spire] (value: A) extends Interval[A]
+case class Empty[A: Order] private[spire] () extends Interval[A]
 
 object Interval {
 
