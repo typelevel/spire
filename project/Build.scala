@@ -50,9 +50,9 @@ object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     organization := "org.spire-math",
 
-    scalaVersion := "2.10.2",
+    scalaVersion := "2.11.2",
 
-    crossScalaVersions := Seq("2.10.2", "2.11.1"),
+    crossScalaVersions := Seq("2.10.2", "2.11.2"),
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),

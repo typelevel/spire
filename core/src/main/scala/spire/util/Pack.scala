@@ -2,7 +2,8 @@ package spire.util
 
 import java.nio.ByteBuffer
 import scala.language.experimental.macros
-import scala.reflect.macros._
+
+import spire.macros.Compat.OldContext
 
 /**
  * These methods are all big-endian.
@@ -164,7 +165,7 @@ object Pack {
       throw new IllegalArgumentException(s"$index outside of 0-3")
     }
 
-  def intToByteMacro(c: Context)(n: c.Expr[Int])(index: c.Expr[Int]): c.Expr[Byte] = {
+  def intToByteMacro(c: OldContext)(n: c.Expr[Int])(index: c.Expr[Int]): c.Expr[Byte] = {
     import c.universe._
     index.tree match {
       case Literal(Constant(i: Int)) =>
@@ -186,7 +187,7 @@ object Pack {
       throw new IllegalArgumentException(s"$index outside of 0-7")
     }
 
-  def longToByteMacro(c: Context)(n: c.Expr[Long])(index: c.Expr[Int]): c.Expr[Byte] = {
+  def longToByteMacro(c: OldContext)(n: c.Expr[Long])(index: c.Expr[Int]): c.Expr[Byte] = {
     import c.universe._
     index.tree match {
       case Literal(Constant(i: Int)) =>
