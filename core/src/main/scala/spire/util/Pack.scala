@@ -3,8 +3,6 @@ package spire.util
 import java.nio.ByteBuffer
 import scala.language.experimental.macros
 
-//import scala.reflect.macros._
-
 import spire.macros.Compat.OldContext
 
 /**

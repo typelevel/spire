@@ -3,7 +3,7 @@ package spire.macros
 import scala.language.existentials
 
 import language.experimental.macros
-//import scala.reflect.macros.Context
+
 import spire.macros.Compat.{resetLocalAttrs, OldContext}
 
 case class ArithmeticOverflowException(message: String) extends ArithmeticException(message)

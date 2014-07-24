@@ -1,7 +1,6 @@
 package spire.macros
 
 import language.experimental.macros
-//import scala.reflect.macros.Context
 
 import spire.algebra._
 import spire.macros.Compat.{OldContext, termName}

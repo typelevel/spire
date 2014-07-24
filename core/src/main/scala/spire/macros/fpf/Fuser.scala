@@ -1,7 +1,6 @@
 package spire.macros.fpf
 
 import scala.language.experimental.macros
-//import scala.reflect.macros.Context
 
 import spire.macros.Compat.{freshTermName, resetLocalAttrs, typeCheck, OldContext}
 import spire.math.{FpFilter, FpFilterApprox, FpFilterExact}

@@ -1,7 +1,5 @@
 package spire.macrosk
 
-//import scala.reflect.macros.Context
-
 import spire.macros.Compat.OldContext
 import spire.math.{Rational, UByte, UShort, UInt, ULong}
 

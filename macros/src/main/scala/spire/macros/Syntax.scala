@@ -1,7 +1,5 @@
 package spire.macros
 
-//import scala.reflect.macros.Context
-
 import spire.macros.Compat.{termName, freshTermName, resetLocalAttrs, OldContext}
 
 case class SyntaxUtil[C <: OldContext with Singleton](val c: C) {

@@ -1,7 +1,5 @@
 package spire.macrosk
 
-//import scala.reflect.macros.Context
-
 import spire.macros.Compat.{termName, OldContext}
 
 /**
