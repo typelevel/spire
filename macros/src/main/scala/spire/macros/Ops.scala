@@ -1,6 +1,8 @@
 package spire.macrosk
 
-import scala.reflect.macros.Context
+//import scala.reflect.macros.Context
+
+import spire.macros.Compat.{termName, OldContext}
 
 /**
  * This trait has some nice methods for working with implicit Ops classes.
@@ -27,27 +29,27 @@ trait Ops {
    * So, we need to decompose ringOps[A](x)(ev) to get x and ev, and we need
    * to map "unary_-" into "negate".
    */
-  def unop[R](c:Context)():c.Expr[R] = {
+  def unop[R](c:OldContext)():c.Expr[R] = {
     import c.universe._
     val (ev, lhs) = unpack(c)
 
     c.Expr[R](Apply(Select(ev, findMethodName(c)), List(lhs)))
   }
 
-  def unopWithEv[Ev, R](c:Context)(ev: c.Expr[Ev]): c.Expr[R] = {
+  def unopWithEv[Ev, R](c:OldContext)(ev: c.Expr[Ev]): c.Expr[R] = {
     import c.universe._
     val lhs = unpackWithoutEv(c)
     c.Expr[R](Apply(Select(ev.tree, findMethodName(c)), List(lhs)))
   }
 
-  def unopWithScalar[R](c: Context)(): c.Expr[R] = {
+  def unopWithScalar[R](c: OldContext)(): c.Expr[R] = {
     import c.universe._
     val (ev, lhs) = unpack(c)
-    val scalar = Select(ev, newTermName("scalar"))
+    val scalar = Select(ev, termName(c)("scalar"))
     c.Expr[R](Apply(Select(scalar, findMethodName(c)), List(lhs)))
   }
 
-  def flip[A, R](c: Context)(rhs: c.Expr[A]): c.Expr[R] = {
+  def flip[A, R](c: OldContext)(rhs: c.Expr[A]): c.Expr[R] = {
     import c.universe._
     val lhs = unpackWithoutEv(c)
     c.Expr[R](Apply(Select(rhs.tree, findMethodName(c)), List(lhs)))
@@ -73,7 +75,7 @@ trait Ops {
    * So, we need to decompose ringOps[A](x)(ev) to get x and ev, and we need
    * to map "+" into "plus".
    */
-  def binop[A, R](c:Context)(rhs:c.Expr[A]):c.Expr[R] = {
+  def binop[A, R](c:OldContext)(rhs:c.Expr[A]):c.Expr[R] = {
     import c.universe._
     val (ev, lhs) = unpack(c)
     c.Expr[R](Apply(Select(ev, findMethodName(c)), List(lhs, rhs.tree)))
@@ -82,33 +84,33 @@ trait Ops {
   /**
    * Like binop, but for right-associative operators (eg. +:).
    */
-  def rbinop[A, R](c:Context)(lhs:c.Expr[A]):c.Expr[R] = {
+  def rbinop[A, R](c:OldContext)(lhs:c.Expr[A]):c.Expr[R] = {
     import c.universe._
     val (ev, rhs) = unpack(c)
     c.Expr[R](Apply(Select(ev, findMethodName(c)), List(lhs.tree, rhs)))
   }
 
-  def binopWithScalar[A, R](c: Context)(rhs: c.Expr[A]): c.Expr[R] = {
+  def binopWithScalar[A, R](c: OldContext)(rhs: c.Expr[A]): c.Expr[R] = {
     import c.universe._
     val (ev, lhs) = unpack(c)
-    val scalar = Select(ev, newTermName("scalar"))
+    val scalar = Select(ev, termName(c)("scalar"))
     c.Expr[R](Apply(Select(scalar, findMethodName(c)), List(lhs, rhs.tree)))
   }
 
-  def rbinopWithScalar[A, R](c: Context)(lhs: c.Expr[A]): c.Expr[R] = {
+  def rbinopWithScalar[A, R](c: OldContext)(lhs: c.Expr[A]): c.Expr[R] = {
     import c.universe._
     val (ev, rhs) = unpack(c)
-    val scalar = Select(ev, newTermName("scalar"))
+    val scalar = Select(ev, termName(c)("scalar"))
     c.Expr[R](Apply(Select(scalar, findMethodName(c)), List(lhs.tree, rhs)))
   }
 
-  def binopWithEv[A, Ev, R](c: Context)(rhs: c.Expr[A])(ev:c.Expr[Ev]): c.Expr[R] = {
+  def binopWithEv[A, Ev, R](c: OldContext)(rhs: c.Expr[A])(ev:c.Expr[Ev]): c.Expr[R] = {
     import c.universe._
     val lhs = unpackWithoutEv(c)
     c.Expr[R](Apply(Select(ev.tree, findMethodName(c)), List(lhs, rhs.tree)))
   }
 
-  def rbinopWithEv[A, Ev, R](c: Context)(lhs: c.Expr[A])(ev:c.Expr[Ev]): c.Expr[R] = {
+  def rbinopWithEv[A, Ev, R](c: OldContext)(lhs: c.Expr[A])(ev:c.Expr[Ev]): c.Expr[R] = {
     import c.universe._
     val rhs = unpackWithoutEv(c)
     c.Expr[R](Apply(Select(ev.tree, findMethodName(c)), List(lhs.tree, rhs)))
@@ -120,19 +122,19 @@ trait Ops {
    * Notably, this let's us use Ring's fromInt method and ConvertableTo's
    * fromDouble (etc.) before applying an op.
    */
-  def binopWithLift[A: c.WeakTypeTag, Ev, R](c: Context)(rhs: c.Expr[A])(ev1: c.Expr[Ev]): c.Expr[R] = {
+  def binopWithLift[A: c.WeakTypeTag, Ev, R](c: OldContext)(rhs: c.Expr[A])(ev1: c.Expr[Ev]): c.Expr[R] = {
     import c.universe._
     val (ev0, lhs) = unpack(c)
     val typeName = weakTypeOf[A].typeSymbol.name
-    val rhs1 = Apply(Select(ev1.tree, newTermName("from" + typeName)), List(rhs.tree))
+    val rhs1 = Apply(Select(ev1.tree, termName(c)("from" + typeName)), List(rhs.tree))
     c.Expr[R](Apply(Select(ev0, findMethodName(c)), List(lhs, rhs1)))
   }
 
-  def binopWithSelfLift[A: c.WeakTypeTag, Ev, R](c: Context)(rhs: c.Expr[A]): c.Expr[R] = {
+  def binopWithSelfLift[A: c.WeakTypeTag, Ev, R](c: OldContext)(rhs: c.Expr[A]): c.Expr[R] = {
     import c.universe._
     val (ev0, lhs) = unpack(c)
     val typeName = weakTypeOf[A].typeSymbol.name
-    val rhs1 = Apply(Select(ev0, newTermName("from" + typeName)), List(rhs.tree))
+    val rhs1 = Apply(Select(ev0, termName(c)("from" + typeName)), List(rhs.tree))
     c.Expr[R](Apply(Select(ev0, findMethodName(c)), List(lhs, rhs1)))
   }
 
@@ -142,7 +144,7 @@ trait Ops {
    *
    * Given "new FooOps(x)(ev)", this method returns (ev, x).
    */
-  def unpack[T[_], A](c:Context) = {
+  def unpack[T[_], A](c:OldContext) = {
     import c.universe._
     c.prefix.tree match {
       case Apply(Apply(TypeApply(_, _), List(x)), List(ev)) => (ev, x)
@@ -151,7 +153,7 @@ trait Ops {
     }
   }
 
-  def unpackWithoutEv(c:Context) = {
+  def unpackWithoutEv(c:OldContext) = {
     import c.universe._
     c.prefix.tree match {
       case Apply(TypeApply(_, _), List(lhs)) => lhs
@@ -172,10 +174,9 @@ trait Ops {
    * In general "textual" method names should just pass through to the
    * typeclass... it is probably not wise to provide mappings for them here.
    */
-  def findMethodName(c:Context) = {
-    import c.universe._
+  def findMethodName(c:OldContext) = {
     val s = c.macroApplication.symbol.name.toString
-    newTermName(operatorNames.getOrElse(s, s))
+    termName(c)(operatorNames.getOrElse(s, s))
   }
 
   def operatorNames: Map[String, String]

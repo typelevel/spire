@@ -3,7 +3,8 @@ package spire.macros
 import scala.language.existentials
 
 import language.experimental.macros
-import scala.reflect.macros.Context
+//import scala.reflect.macros.Context
+import spire.macros.Compat.{resetLocalAttrs, OldContext}
 
 case class ArithmeticOverflowException(message: String) extends ArithmeticException(message)
 
@@ -15,9 +16,9 @@ object Checked {
    */
   def checked[A](n: A): A = macro checkedImpl[A]
 
-  def checkedImpl[A](c: Context)(n: c.Expr[A]): c.Expr[A] = {
+  def checkedImpl[A](c: OldContext)(n: c.Expr[A]): c.Expr[A] = {
     val tree = CheckedRewriter[c.type](c)(n.tree)
-    val resetTree = c.resetLocalAttrs(tree) // See SI-6711
+    val resetTree = resetLocalAttrs(c)(tree) // See SI-6711
     c.Expr[A](resetTree)
   }
 
@@ -28,7 +29,7 @@ object Checked {
    */
   def option[A](n: A): Option[A] = macro optionImpl[A]
 
-  def optionImpl[A](c: Context)(n: c.Expr[A]): c.Expr[Option[A]] = {
+  def optionImpl[A](c: OldContext)(n: c.Expr[A]): c.Expr[Option[A]] = {
     val checkedExpr = checkedImpl[A](c)(n)
     c.universe.reify {
       try {
@@ -90,7 +91,7 @@ object Checked {
   }
 }
 
-private[macros] case class CheckedRewriter[C <: Context](c: C) {
+private[macros] case class CheckedRewriter[C <: OldContext](c: C) {
   import c.universe._
 
   def apply(tree: Tree): Tree = {
@@ -123,7 +124,7 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
     )
 
     def isCheckableUnop(tree: Tree): Boolean = tree match {
-      case Select(lhs, method) if (unaryOps contains method.decoded) && (lhs.tpe.widen <:< tpe) => true
+      case Select(lhs, method) if (unaryOps contains method.decodedName.toString) && (lhs.tpe.widen <:< tpe) => true
       case _ => false
     }
 
@@ -132,16 +133,18 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
       ((lt weak_<:< tpe) && (rt <:< tpe)) || ((lt <:< tpe) && (rt weak_<:< tpe))
     
     def isCheckableBinop(tree: Tree): Boolean = tree match {
-      case Apply(Select(lhs, method), rhs :: Nil) if (binaryOps contains method.decoded) && binopConforms(lhs.tpe.widen, rhs.tpe.widen) => true
-      case _ => false
+      case Apply(Select(lhs, method), rhs :: Nil) =>
+        (binaryOps contains method.decodedName.toString) && binopConforms(lhs.tpe.widen, rhs.tpe.widen)
+      case _ =>
+        false
     }
 
     def apply(rewrite: Tree => Tree): PartialFunction[Tree, Tree] = {
       case tree @ Select(sub, method) if isCheckableUnop(tree) =>
-        q"${unaryOps(method.decoded)}(${rewrite(sub)})"
+        q"${unaryOps(method.decodedName.toString)}(${rewrite(sub)})"
 
       case tree @ Apply(Select(lhs, method), rhs :: Nil) if isCheckableBinop(tree) =>
-        q"${binaryOps(method.decoded)}(${rewrite(lhs)}, ${rewrite(rhs)})"
+        q"${binaryOps(method.decodedName.toString)}(${rewrite(lhs)}, ${rewrite(rhs)})"
     }
   }
 

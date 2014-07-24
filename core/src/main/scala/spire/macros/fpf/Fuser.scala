@@ -1,17 +1,18 @@
 package spire.macros.fpf
 
 import scala.language.experimental.macros
-import scala.reflect.macros.Context
+//import scala.reflect.macros.Context
 
+import spire.macros.Compat.{freshTermName, resetLocalAttrs, typeCheck, OldContext}
 import spire.math.{FpFilter, FpFilterApprox, FpFilterExact}
 
-private[spire] trait Fuser[C <: Context, A] {
+private[spire] trait Fuser[C <: OldContext, A] {
   val c: C
   implicit def A: c.WeakTypeTag[A]
 
   import c.universe._
 
-  private def Epsilon: Tree = c.literal(2.220446049250313E-16).tree
+  private def Epsilon: Tree = q"2.220446049250313E-16"
   private def PositiveInfinity: Tree = q"java.lang.Double.POSITIVE_INFINITY"
   private def NegativeInfinity: Tree = q"java.lang.Double.NEGATIVE_INFINITY"
   private def isNaN(a: TermName): Tree = q"java.lang.Double.isNaN($a)"
@@ -22,7 +23,7 @@ private[spire] trait Fuser[C <: Context, A] {
   private def abs(a: Tree): Tree = q"java.lang.Math.abs($a)"
   private def sqrt(a: TermName): Tree = q"java.lang.Math.sqrt($a)"
 
-  def intLit(n: Int): Tree = c.literal(n).tree
+  def intLit(n: Int): Tree = q"$n"
 
   case class Approx(apx: Tree, mes: Tree, ind: Either[Tree, Int], exact: Tree) {
     def expr: Tree = {
@@ -43,11 +44,11 @@ private[spire] trait Fuser[C <: Context, A] {
 
   case class Fused(stats: List[Tree], apx: TermName, mes: TermName, ind: Either[TermName, Int], exact: TermName) {
     def approx: Approx = Approx(q"$apx", q"$mes", ind.left.map(ind0 => q"$ind0"), q"$exact")
-    def expr: Tree = c.resetLocalAttrs(Block(stats, approx.expr))
+    def expr: Tree = resetLocalAttrs(c)(Block(stats, approx.expr))
   }
 
   private def liftExact(exact: Tree): Fused = {
-    val tmp = newTermName(c.fresh("fpf$tmp$"))
+    val tmp = freshTermName(c)("fpf$tmp$")
     Approx(
       q"$tmp",
       abs(tmp),
@@ -57,7 +58,7 @@ private[spire] trait Fuser[C <: Context, A] {
   }
 
   private def liftApprox(approx: Tree): Fused = {
-    val tmp = newTermName(c.fresh("fpf$tmp$"))
+    val tmp = freshTermName(c)("fpf$tmp$")
     Approx(
       q"$tmp",
       abs(tmp),
@@ -66,14 +67,14 @@ private[spire] trait Fuser[C <: Context, A] {
     ).fused(q"val $tmp = spire.algebra.IsReal[$A].toDouble($approx.exact)" :: Nil)
   }
 
-  private def extract(tree: Tree): Fused = c.resetLocalAttrs(tree) match {
+  private def extract(tree: Tree): Fused = resetLocalAttrs(c)(tree) match {
     case block @ Block(stats, expr) =>
       extract(expr) match {
         case Fused(Nil, apx, mes, ind, exact) =>
           Fused(stats, apx, mes, ind, exact)
 
         case bounded =>
-          val tmp = newTermName(c.fresh("fpf$tmp$"))
+          val tmp = freshTermName(c)("fpf$tmp$")
           val stats0 = stats :+ q"val $tmp = ${bounded.expr}"
           Approx(q"$tmp.apx", q"$tmp.mes", Left(q"$tmp.ind"), q"$tmp.exact").fused(stats0)
       }
@@ -83,10 +84,10 @@ private[spire] trait Fuser[C <: Context, A] {
         case (apx, mes, ind, exact) => Fused(Nil, apx, mes, ind, exact)
       } getOrElse Approx(apx, mes, Left(ind), exact).fused(Nil)
 
-    case _ if c.typeCheck(tree).tpe <:< c.weakTypeOf[FpFilterExact[A]] =>
+    case _ if typeCheck(c)(tree).tpe <:< c.weakTypeOf[FpFilterExact[A]] =>
       liftExact(tree)
 
-    case _ if c.typeCheck(tree).tpe <:< c.weakTypeOf[FpFilterApprox[A]] =>
+    case _ if typeCheck(c)(tree).tpe <:< c.weakTypeOf[FpFilterApprox[A]] =>
       liftApprox(tree)
 
     case q"$lift($exact)($ev)" if isExactLift(tree) =>
@@ -96,7 +97,7 @@ private[spire] trait Fuser[C <: Context, A] {
       liftApprox(approx)
 
     case expr =>
-      val tmp = newTermName(c.fresh("fpf$tmp$"))
+      val tmp = freshTermName(c)("fpf$tmp$")
       val assign = q"val $tmp = $tree"
       Approx(q"$tmp.apx", q"$tmp.mes", Left(q"$tmp.ind"), q"$tmp.exact").fused(assign :: Nil)
   }
@@ -104,15 +105,15 @@ private[spire] trait Fuser[C <: Context, A] {
   // Returns true if `tree` is lifting an exact type tpe 
   private def isExactLift(tree: Tree): Boolean = tree match {
     case q"$lift($exact)($ev)" =>
-      (c.typeCheck(tree).tpe <:< c.weakTypeOf[FpFilter[A]]) &&
-        (c.typeCheck(exact).tpe <:< c.weakTypeOf[FpFilterExact[A]])
+      (typeCheck(c)(tree).tpe <:< c.weakTypeOf[FpFilter[A]]) &&
+        (typeCheck(c)(exact).tpe <:< c.weakTypeOf[FpFilterExact[A]])
     case _ => false
   }
 
   private def isApproxLift(tree: Tree): Boolean = tree match {
     case q"$lift($approx)($ev)" =>
-      (c.typeCheck(tree).tpe <:< c.weakTypeOf[FpFilter[A]]) &&
-        (c.typeCheck(approx).tpe <:< c.weakTypeOf[FpFilterApprox[A]])
+      (typeCheck(c)(tree).tpe <:< c.weakTypeOf[FpFilter[A]]) &&
+      (typeCheck(c)(approx).tpe <:< c.weakTypeOf[FpFilterApprox[A]])
     case _ => false
   }
 
@@ -135,10 +136,10 @@ private[spire] trait Fuser[C <: Context, A] {
   }
 
   private def freshApproxNames(): (TermName, TermName, TermName, TermName) = {
-    val apx = newTermName(c.fresh("fpf$apx$"))
-    val mes = newTermName(c.fresh("fpf$mes$"))
-    val ind = newTermName(c.fresh("fpf$ind$"))
-    val exact = newTermName(c.fresh("fpf$exact$"))
+    val apx = freshTermName(c)("fpf$apx$")
+    val mes = freshTermName(c)("fpf$mes$")
+    val ind = freshTermName(c)("fpf$ind$")
+    val exact = freshTermName(c)("fpf$exact$")
     (apx, mes, ind, exact)
   }
 
@@ -213,7 +214,7 @@ private[spire] trait Fuser[C <: Context, A] {
 
   def divide(lhs: Tree, rhs: Tree)(ev: Tree): Fused = fuse2(lhs, rhs) {
     case (Approx(lapx, lmes, lind, lexact), Approx(rapx, rmes, rind, rexact)) =>
-      val tmp = newTermName(c.fresh("fpf$tmp$"))
+      val tmp = freshTermName(c)("fpf$tmp$")
       val rindp1 = rind.fold(rind0 => q"$rind0 + 1", n => q"${intLit(n)} + 1")
       Approx(q"$lapx / $rapx",
         q"""
@@ -228,7 +229,7 @@ private[spire] trait Fuser[C <: Context, A] {
 
   def sign(tree: Tree)(signed: Tree): Tree = {
     val Fused(stats, apx, mes, ind, exact) = extract(tree)
-    val err = newTermName(c.fresh("fpf$err$"))
+    val err = freshTermName(c)("fpf$err$")
     val ind0 = ind.fold(name => q"$name", intLit)
     val block = Block(stats :+ q"val $err = $mes * $ind0 * $Epsilon",
       q"""
@@ -255,7 +256,7 @@ private[spire] trait Fuser[C <: Context, A] {
 }
 
 private[spire] object Fuser {
-  def apply[C <: Context, A: ctx.WeakTypeTag](ctx: C) = new Fuser[C, A] {
+  def apply[C <: OldContext, A: ctx.WeakTypeTag](ctx: C) = new Fuser[C, A] {
     val c = ctx
     val A = c.weakTypeTag[A]
   }
