@@ -15,11 +15,12 @@ import spire.syntax.order._
  * Interval represents a set of values, usually numbers.
  * 
  * Intervals have upper and lower bounds. Each bound can be one of
- * three kinds:
+ * four kinds:
  * 
  *   * Closed: The boundary value is included in the interval.
  *   * Open: The boundary value is excluded from the interval.
  *   * Unbound: There is no boundary value.
+ *   * EmptyBound: The interval itself is empty.
  *
  * When the underlying type of the interval supports it, intervals may
  * be used in arithmetic. There are several possible interpretations
@@ -85,18 +86,18 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     case Bounded(lower, upper, flags) => Some((lower, lowerFlag(flags)))
     case Point(value) => Some((value, 0))
     case Above(lower, flags) => Some((lower, flags))
-    case _: All[_] => None
-    case _: Below[_] => None
-    case _: Empty[_] => sys.error("Should never be called on empty Interval") // TODO: remove this check used during refactoring
+    case All() => None
+    case Below(_, _) => None
+    case Empty() => sys.error("Should never be called on empty Interval") // TODO: remove this check used during refactoring
   }
 
   private[spire] def upperPair: Option[(A, Int)] = this match {
     case Bounded(lower, upper, flags) => Some((upper, upperFlag(flags)))
     case Point(value) => Some((value, 0))
     case Below(upper, flags) => Some((upper, flags))
-    case _: All[_] => None
-    case _: Above[_] => None
-    case _: Empty[_] => sys.error("Should never be called on empty Interval") // TODO: remove this check used during refactoring
+    case All() => None
+    case Above(_, _) => None
+    case Empty() => sys.error("Should never be called on empty Interval") // TODO: remove this check used during refactoring
   }
 
   import Interval.{Bound, Open, Closed, Unbound, EmptyBound}
@@ -307,8 +308,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       maxUpper(lhs.upperBound, rhs.upperBound, false))
 
   override def toString(): String = this match {
-    case _: All[_] => "(-∞, ∞)"
-    case _: Empty[_] => "(Ø)"
+    case All() => "(-∞, ∞)"
+    case Empty() => "(Ø)"
     case Above(lower, flags) =>
       if (isClosedLower(flags)) s"[$lower, ∞)" else s"($lower, ∞)"
     case Below(upper, flags) =>
@@ -338,73 +339,66 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     }
 
   private[this] def minLower(lhs: Bound[A], rhs: Bound[A], emptyIsMin: Boolean): Bound[A] = 
-    (lhs, rhs, emptyIsMin) match {
-      case (EmptyBound(), _, true) => lhs
-      case (EmptyBound(), _, false) => rhs
-      case (_, EmptyBound(), true) => rhs
-      case (_, EmptyBound(), false) => lhs
-      case (Unbound(), _, _) | (_, Unbound(), _) => Unbound()
-      case (Closed(lv), Closed(rv), _) if lv <= rv => lhs
-      case (Closed(_), Closed(_), _) => rhs
-      case (Open(lv), Open(rv), _) if lv <= rv => lhs
-      case (Open(_), Open(_), _) => rhs
-      case (Closed(lv), Open(rv), _) if lv <= rv => lhs
-      case (Closed(_), Open(_), _) => rhs
-      case (Open(lv), Closed(rv), _) if rv <= lv => rhs
-      case (Open(_), Closed(_), _) => lhs
+    (lhs, rhs) match {
+      case (EmptyBound(), _) => if (emptyIsMin) lhs else rhs
+      case (_, EmptyBound()) => if (emptyIsMin) rhs else lhs
+      case (Unbound(), _) | (_, Unbound()) => Unbound()
+      case (Closed(lv), Closed(rv)) if lv <= rv => lhs
+      case (Closed(_), Closed(_)) => rhs
+      case (Open(lv), Open(rv)) if lv <= rv => lhs
+      case (Open(_), Open(_)) => rhs
+      case (Closed(lv), Open(rv)) if lv <= rv => lhs
+      case (Closed(_), Open(_)) => rhs
+      case (Open(lv), Closed(rv)) if rv <= lv => rhs
+      case (Open(_), Closed(_)) => lhs
   }
 
   private[this] def maxLower(lhs: Bound[A], rhs: Bound[A], emptyIsMax: Boolean): Bound[A] = 
-    (lhs, rhs, emptyIsMax) match {
-      case (EmptyBound(), _, true) => lhs
-      case (EmptyBound(), _, false) => rhs
-      case (_, EmptyBound(), true) => rhs
-      case (_, EmptyBound(), false) => lhs
-      case (Unbound(), _, _) => rhs
-      case (_, Unbound(), _) => lhs
-      case (Closed(lv), Closed(rv), _) if lv >= rv => lhs
-      case (Closed(_), Closed(_), _) => rhs
-      case (Open(lv), Open(rv), _) if lv >= rv => lhs
-      case (Open(_), Open(_), _) => rhs
-      case (Closed(lv), Open(rv), _) if rv >= lv => rhs
-      case (Closed(_), Open(_), _) => lhs
-      case (Open(lv), Closed(rv), _) if lv >= rv => lhs
-      case (Open(_), Closed(_), _) => rhs
+    (lhs, rhs) match {
+      case (EmptyBound(), _) => if (emptyIsMax) lhs else rhs
+      case (_, EmptyBound()) => if (emptyIsMax) rhs else lhs
+      case (Unbound(), _) => rhs
+      case (_, Unbound()) => lhs
+      case (Closed(lv), Closed(rv)) if lv >= rv => lhs
+      case (Closed(_), Closed(_)) => rhs
+      case (Open(lv), Open(rv)) if lv >= rv => lhs
+      case (Open(_), Open(_)) => rhs
+      case (Closed(lv), Open(rv)) if rv >= lv => rhs
+      case (Closed(_), Open(_)) => lhs
+      case (Open(lv), Closed(rv)) if lv >= rv => lhs
+      case (Open(_), Closed(_)) => rhs
     }
 
   private[this] def minUpper(lhs: Bound[A], rhs: Bound[A], emptyIsMin: Boolean): Bound[A] = 
-    (lhs, rhs, emptyIsMin) match {
-      case (EmptyBound(), _, true) => lhs
-      case (EmptyBound(), _, false) => rhs
-      case (_, EmptyBound(), true) => rhs
-      case (_, EmptyBound(), false) => lhs
-      case (Unbound(), _, _) => rhs
-      case (_, Unbound(), _) => lhs
-      case (Closed(lv), Closed(rv), _) if lv <= rv => lhs
-      case (Closed(_), Closed(_), _) => rhs
-      case (Open(lv), Open(rv), _) if lv <= rv => lhs
-      case (Open(_), Open(_), _) => rhs
-      case (Closed(lv), Open(rv), _) if rv <= lv => rhs
-      case (Closed(_), Open(_), _) => lhs
-      case (Open(lv), Closed(rv), _) if lv <= rv => lhs
-      case (Open(_), Closed(_), _) => rhs
+    (lhs, rhs) match {
+      case (EmptyBound(), _) => if (emptyIsMin) lhs else rhs
+      case (_, EmptyBound()) => if (emptyIsMin) rhs else lhs
+      case (Unbound(), _) => rhs
+      case (_, Unbound()) => lhs
+      case (Closed(lv), Closed(rv)) if lv <= rv => lhs
+      case (Closed(_), Closed(_)) => rhs
+      case (Open(lv), Open(rv)) if lv <= rv => lhs
+      case (Open(_), Open(_)) => rhs
+      case (Closed(lv), Open(rv)) if rv <= lv => rhs
+      case (Closed(_), Open(_)) => lhs
+      case (Open(lv), Closed(rv)) if lv <= rv => lhs
+      case (Open(_), Closed(_)) => rhs
     }
 
   private[this] def maxUpper(lhs: Bound[A], rhs: Bound[A], emptyIsMax: Boolean): Bound[A] = 
-    (lhs, rhs, emptyIsMax) match {
-      case (EmptyBound(), _, true) => lhs
-      case (EmptyBound(), _, false) => rhs
-      case (_, EmptyBound(), true) => rhs
-      case (_, EmptyBound(), false) => lhs
-      case (Unbound(), _, _) | (_, Unbound(), _) => Unbound()
-      case (Closed(lv), Closed(rv), _) if lv >= rv => lhs
-      case (Closed(_), Closed(_), _) => rhs
-      case (Open(lv), Open(rv), _) if lv >= rv => lhs
-      case (Open(_), Open(_), _) => rhs
-      case (Closed(lv), Open(rv), _) if lv >= rv => lhs
-      case (Closed(_), Open(_), _) => rhs
-      case (Open(lv), Closed(rv), _) if rv >= lv => rhs
-      case (Open(_), Closed(_), _) => lhs
+    (lhs, rhs) match {
+      case (EmptyBound(), _) => if (emptyIsMax) lhs else rhs
+      case (_, EmptyBound()) => if (emptyIsMax) rhs else lhs
+      case (_, EmptyBound()) => lhs
+      case (Unbound(), _) | (_, Unbound()) => Unbound()
+      case (Closed(lv), Closed(rv)) if lv >= rv => lhs
+      case (Closed(_), Closed(_)) => rhs
+      case (Open(lv), Open(rv)) if lv >= rv => lhs
+      case (Open(_), Open(_)) => rhs
+      case (Closed(lv), Open(rv)) if lv >= rv => lhs
+      case (Closed(_), Open(_)) => rhs
+      case (Open(lv), Closed(rv)) if rv >= lv => rhs
+      case (Open(_), Closed(_)) => lhs
     }
 
   // for all a in A, and all b in B, (A vmin B) is the interval that contains all (a min b)
