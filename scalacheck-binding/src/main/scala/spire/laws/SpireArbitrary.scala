@@ -23,6 +23,14 @@ object SpireArbitrary {
   implicit def ULongArbitrary: Arbitrary[ULong] =
     Arbitrary(arbitrary[Long].map(new ULong(_)))
 
+  implicit def trilean: Arbitrary[Trilean] =
+    Arbitrary(arbitrary[Byte].map { n =>
+      val r = (n & 0xff) % 3
+      if (r == 0) Trilean.True
+      else if (r == 1) Trilean.False
+      else Trilean.Unknown
+    })
+
   implicit def FixedScale: Arbitrary[FixedScale] =
     Arbitrary(arbitrary[Short].map(n => new FixedScale(n & 0xffff)))
 
