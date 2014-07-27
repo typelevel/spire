@@ -117,6 +117,20 @@ object Trilean {
   final def apply(t: scala.util.Try[Boolean]): Trilean =
     t.map(Trilean(_)).getOrElse(Unknown)
 
+  final def liftPf[A](p0: PartialFunction[A, Boolean]): A => Trilean = {
+    val p = p0.andThen(Trilean(_))
+    (a: A) => p.applyOrElse(a, (_: A) => Unknown)
+  }
+
+  final def testRef[A <: AnyRef](a: A)(f: A => Boolean): Trilean =
+    if (a == null) Unknown else Trilean(f(a))
+
+  final def testFloat(n: Float)(f: Float => Boolean): Trilean =
+    if (java.lang.Float.isNaN(n)) Unknown else Trilean(f(n))
+
+  final def testDouble(n: Double)(f: Double => Boolean): Trilean =
+    if (java.lang.Double.isNaN(n)) Unknown else Trilean(f(n))
+
   final def run(body: => Boolean): Trilean =
     try {
       apply(body)
