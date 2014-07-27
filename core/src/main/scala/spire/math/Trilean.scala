@@ -1,7 +1,5 @@
 package spire.math
 
-import spire.algebra.Order
-
 /**
  * Implementation of three-valued logic.
  * 
@@ -68,7 +66,7 @@ class Trilean (val value: Int) extends AnyVal { lhs =>
     if (value == 1) None else Some(value == -1)
 
   override def toString: String =
-    if (value == -1) "T" else if (value == 0) "F" else "U"
+    if (value == -1) "true" else if (value == 0) "false" else "unknown"
 
   def &&(rhs: => Trilean): Trilean =
     if (lhs.value == 0) lhs else lhs & rhs
@@ -110,5 +108,19 @@ object Trilean {
   final val False: Trilean = new Trilean(0)
   final val Unknown: Trilean = new Trilean(1)
 
-  final def apply(b: Boolean): Trilean = if (b) True else False
+  final def apply(b: Boolean): Trilean =
+    if (b) True else False
+
+  final def apply(o: Option[Boolean]): Trilean =
+    o.map(Trilean(_)).getOrElse(Unknown)
+
+  final def apply(t: scala.util.Try[Boolean]): Trilean =
+    t.map(Trilean(_)).getOrElse(Unknown)
+
+  final def run(body: => Boolean): Trilean =
+    try {
+      apply(body)
+    } catch {
+      case _: Exception => Unknown
+    }
 }
