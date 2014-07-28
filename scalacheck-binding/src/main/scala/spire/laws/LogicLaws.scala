@@ -1,8 +1,8 @@
 package spire.laws
 
-import spire.algebra.{Eq, BooleanAlgebra, Heyting}
+import spire.algebra.{Eq, Bool, Heyting}
 import spire.syntax.eq._
-import spire.syntax.booleanAlgebra._
+import spire.syntax.bool._
 
 import org.typelevel.discipline.Laws
 
@@ -21,9 +21,9 @@ trait LogicLaws[A] extends Laws {
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
 
-  def heytingAlgebra(implicit A: Heyting[A]) =
+  def heyting(implicit A: Heyting[A]) =
     new DefaultRuleSet(
-      name = "heytingAlgebra",
+      name = "heyting",
       parent = None,
       "associative" -> forAll { (x: A, y: A, z: A) =>
         ((x & y) & z) === (x & (y & z)) && ((x | y) | z) === (x | (y | z))
@@ -79,9 +79,9 @@ trait LogicLaws[A] extends Laws {
       "(0 → x) = 1" -> forAll { (x: A) => (A.zero imp x) === A.one }
     )
 
-  def booleanAlgebra(implicit A: BooleanAlgebra[A]) =
+  def bool(implicit A: Bool[A]) =
     new DefaultRuleSet(
-      name = "booleanAlgebra",
-      parent = Some(heytingAlgebra),
+      name = "bool",
+      parent = Some(heyting),
       "excluded middle" -> forAll { (x: A) => (x | ~x) === A.one })
 }

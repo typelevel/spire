@@ -9,12 +9,7 @@ import scala.{specialized => sp}
  * other. Also, both have an identity and they obey the absorption law; that
  * is `x & (y | x) == x` and `x | (x & y) == x`.
  */
-trait BooleanAlgebra[@sp(Boolean, Byte, Short, Int, Long) A] extends Heyting[A] {
-  def one: A
-  def zero: A
-  def complement(a: A): A
-  def and(a: A, b: A): A
-  def or(a: A, b: A): A
+trait Bool[@sp(Boolean, Byte, Short, Int, Long) A] extends Heyting[A] {
   def xor(a: A, b: A): A = or(and(a, complement(b)), and(complement(a), b))
 
   def imp(a: A, b: A): A = or(complement(a), b)
@@ -22,10 +17,10 @@ trait BooleanAlgebra[@sp(Boolean, Byte, Short, Int, Long) A] extends Heyting[A] 
   def nor(a: A, b: A): A = complement(or(a, b))
   def nxor(a: A, b: A): A = and(or(a, complement(b)), or(complement(a), b))
 
-  def dual: BooleanAlgebra[A] = new DualBooleanAlgebra(this)
+  def dual: Bool[A] = new DualBool(this)
 }
 
-class DualBooleanAlgebra[@sp(Boolean, Byte, Short, Int, Long) A](orig: BooleanAlgebra[A]) extends BooleanAlgebra[A] {
+class DualBool[@sp(Boolean, Byte, Short, Int, Long) A](orig: Bool[A]) extends Bool[A] {
   def one: A = orig.zero
   def zero: A = orig.one
   def and(a: A, b: A): A = orig.or(a, b)
@@ -38,9 +33,9 @@ class DualBooleanAlgebra[@sp(Boolean, Byte, Short, Int, Long) A](orig: BooleanAl
   override def nor(a: A, b: A): A = orig.nand(a, b)
   override def nxor(a: A, b: A): A = orig.xor(a, b)
 
-  override def dual: BooleanAlgebra[A] = orig
+  override def dual: Bool[A] = orig
 }
 
-object BooleanAlgebra {
-  @inline final def apply[@sp(Boolean, Byte, Short, Int, Long) A](implicit ev: BooleanAlgebra[A]): BooleanAlgebra[A] = ev
+object Bool {
+  @inline final def apply[@sp(Boolean, Byte, Short, Int, Long) A](implicit ev: Bool[A]): Bool[A] = ev
 }

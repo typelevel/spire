@@ -121,8 +121,12 @@ trait TrigSyntax {
   implicit def trigOps[A:Trig](a: A) = new TrigOps(a)
 }
 
-trait BooleanAlgebraSyntax {
-  implicit def booleanAlgebraOps[A:Heyting](a: A) = new BooleanAlgebraOps(a)
+trait HeytingSyntax {
+  implicit def heytingOps[A: Heyting](a: A) = new HeytingOps(a)
+}
+
+trait BoolSyntax extends HeytingSyntax {
+  implicit def boolOps[A: Bool](a: A) = new BoolOps(a)
 }
 
 trait BitStringSyntax {
@@ -228,7 +232,7 @@ trait AllSyntax extends
     NormedVectorSpaceSyntax with
     InnerProductSpaceSyntax with
     CoordinateSpaceSyntax with
-    BooleanAlgebraSyntax with
+    BoolSyntax with
     BitStringSyntax with
     GroupActionSyntax with
     TorsorSyntax with
