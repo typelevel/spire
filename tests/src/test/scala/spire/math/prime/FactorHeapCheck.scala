@@ -12,8 +12,8 @@ import Gen._
 import Arbitrary.arbitrary
 
 import spire.implicits._
-import spire.math.ArbitrarySupport._
-import Ordinal._
+//import spire.math.ArbitrarySupport._
+//import Ordinal._
 
 class FactorHeapCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 

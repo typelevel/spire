@@ -4,7 +4,7 @@ import spire.algebra._
 import spire.math.poly._
 import spire.std.bigDecimal._
 import spire.syntax.literals._
-import spire.syntax.euclideanRing._
+//import spire.syntax.euclideanRing._
 import spire.optional.rationalTrig._
 
 import scala.reflect.ClassTag

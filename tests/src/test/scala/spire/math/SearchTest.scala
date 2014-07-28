@@ -1,8 +1,8 @@
 package spire.math
 
 import spire.implicits._
-import spire.syntax.order._
-import spire.algebra._
+//import spire.syntax.order._
+//import spire.algebra._
 
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers

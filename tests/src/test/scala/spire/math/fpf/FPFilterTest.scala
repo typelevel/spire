@@ -3,7 +3,7 @@ package spire.math
 import java.math.MathContext.UNLIMITED
 
 import spire.algebra._
-import spire.math._
+//import spire.math._
 import spire.implicits._
 
 import org.scalatest.FunSuite

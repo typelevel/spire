@@ -2,7 +2,6 @@ package spire.math
 
 import org.scalatest.FunSuite
 
-import spire.math._
 import spire.std.int._
 
 class LiteralsTest extends FunSuite {

@@ -267,11 +267,12 @@ final class TrigOps[A](lhs: A)(implicit ev: Trig[A]) {
     f.div(ev.log(lhs), ev.log(f.fromInt(base)))
 }
 
-final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
+final class BooleanAlgebraOps[A](lhs:A)(implicit ev: Heyting[A]) {
   def unary_~(): A = macro Ops.unop[A]
   def &(rhs: A): A = macro Ops.binop[A, A]
   def |(rhs: A): A = macro Ops.binop[A, A]
   def ^(rhs: A): A = macro Ops.binop[A, A]
+  def imp(rhs: A): A = macro Ops.binop[A, A]
 
   def &(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
   def |(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]

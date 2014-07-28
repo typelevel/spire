@@ -122,7 +122,7 @@ trait TrigSyntax {
 }
 
 trait BooleanAlgebraSyntax {
-  implicit def booleanAlgebraOps[A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
+  implicit def booleanAlgebraOps[A:Heyting](a: A) = new BooleanAlgebraOps(a)
 }
 
 trait BitStringSyntax {

@@ -1,8 +1,6 @@
 package spire.algebra
 
-import scala.{specialized => spec}
-
-import spire.math.{ ConvertableFrom, ConvertableTo, Number }
+import scala.{specialized => sp}
 
 /**
  * A boolean algebra is a structure that defines a few basic operations, namely
@@ -11,7 +9,7 @@ import spire.math.{ ConvertableFrom, ConvertableTo, Number }
  * other. Also, both have an identity and they obey the absorption law; that
  * is `x & (y | x) == x` and `x | (x & y) == x`.
  */
-trait BooleanAlgebra[@spec(Boolean, Byte, Short, Int, Long) A] { self =>
+trait BooleanAlgebra[@sp(Boolean, Byte, Short, Int, Long) A] extends Heyting[A] {
   def one: A
   def zero: A
   def complement(a: A): A
@@ -24,19 +22,25 @@ trait BooleanAlgebra[@spec(Boolean, Byte, Short, Int, Long) A] { self =>
   def nor(a: A, b: A): A = complement(or(a, b))
   def nxor(a: A, b: A): A = and(or(a, complement(b)), or(complement(a), b))
 
-  def dual: BooleanAlgebra[A] = new BooleanAlgebra[A] {
-    def one: A = self.zero
-    def zero: A = self.one
-    def and(a: A, b: A): A = self.or(a, b)
-    def or(a: A, b: A): A = self.and(a, b)
-    def complement(a: A): A = self.complement(a)
-    override def xor(a: A, b: A): A = self.complement(self.xor(a, b))
+  def dual: BooleanAlgebra[A] = new DualBooleanAlgebra(this)
+}
 
-    override def dual: BooleanAlgebra[A] = self
-  }
+class DualBooleanAlgebra[@sp(Boolean, Byte, Short, Int, Long) A](orig: BooleanAlgebra[A]) extends BooleanAlgebra[A] {
+  def one: A = orig.zero
+  def zero: A = orig.one
+  def and(a: A, b: A): A = orig.or(a, b)
+  def or(a: A, b: A): A = orig.and(a, b)
+  def complement(a: A): A = orig.complement(a)
+  override def xor(a: A, b: A): A = orig.complement(orig.xor(a, b))
+
+  override def imp(a: A, b: A): A = orig.and(orig.complement(a), b)
+  override def nand(a: A, b: A): A = orig.nor(a, b)
+  override def nor(a: A, b: A): A = orig.nand(a, b)
+  override def nxor(a: A, b: A): A = orig.xor(a, b)
+
+  override def dual: BooleanAlgebra[A] = orig
 }
 
 object BooleanAlgebra {
-  @inline final def apply[@specialized(Boolean, Byte, Short, Int, Long) A](
-    implicit ev: BooleanAlgebra[A]): BooleanAlgebra[A] = ev
+  @inline final def apply[@sp(Boolean, Byte, Short, Int, Long) A](implicit ev: BooleanAlgebra[A]): BooleanAlgebra[A] = ev
 }
