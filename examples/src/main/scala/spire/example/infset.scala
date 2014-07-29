@@ -38,7 +38,7 @@ object PureSet {
     def op(x: PureSet[A], y: PureSet[A]): PureSet[A] = x | y
   }
 
-  implicit def booleanAlgebra[A] = new BooleanAlgebra[PureSet[A]] {
+  implicit def bool[A] = new Bool[PureSet[A]] {
     def one: PureSet[A] = infinite
     def zero: PureSet[A] = empty
     def complement(a: PureSet[A]): PureSet[A] = ~a
@@ -128,7 +128,7 @@ object MathSet {
     def op(x: MathSet[A], y: MathSet[A]): MathSet[A] = x | y
   }
 
-  implicit def booleanAlgebra[A] = new BooleanAlgebra[MathSet[A]] {
+  implicit def bool[A] = new Bool[MathSet[A]] {
     def one: MathSet[A] = infinite
     def zero: MathSet[A] = empty
     def complement(a: MathSet[A]): MathSet[A] = ~a

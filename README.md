@@ -246,12 +246,12 @@ as `Fractional` for all number types. Each type will attempt to "do the right
 thing" as far as possible, and throw errors otherwise. Users who are leery of
 this behavior are encouraged to use more precise type classes.
 
-#### BooleanAlgebra
+#### Bool
 
-BooleanAlgebras provide an abstraction of the familiar bitwise boolean
+Bool provides an abstraction of the familiar boolean/bitwise
 operators.
 
- * *BooleanAlgebra*
+ * *Bool*
    + complement (unary `~`): complement
    + and (`&`): conjunction
    + or (`|`): disjunction
@@ -261,8 +261,9 @@ operators.
    + nor: `~(a | b)`
    + nxor: `~(a ^ b)`
 
-BooleanAlgebras exist not just for `Boolean`, but also for `Byte`, `Short`,
-`Int`, `Long`, `UByte`, `UShort`, `UInt`,  and `ULong`.
+Bool exists not just for `Boolean`, but also for `Byte`, `Short`,
+`Int`, `Long`, `UByte`, `UShort`, `UInt`, and `ULong`. It can be
+defined for any boolean algebra.
 
 #### Trig
 

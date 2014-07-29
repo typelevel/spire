@@ -211,7 +211,7 @@ object Ops extends Ops {
     // Field (/)
     ("$div", "div"),
 
-    // BooleanAlgebra (^ | & ~)
+    // Bool (^ | & ~)
     ("$up", "xor"),
     ("$bar", "or"),
     ("$amp", "and"),
