@@ -352,13 +352,15 @@ def selectionSort(ns: Array[Int]) {
 }
 ```
 
-### Sorting and Selection
+### Sorting, Selection, and Searching
 
-Since Spire provides a specialized ordering type class, it makes sense that it
-also provides its own sorting and selection methods. These methods are defined
-on arrays and occur in-place, mutating the array. Other collections can take
-advantage of sorting by converting to an array, sorting, and converting back
-(which is what the Scala collections framework already does in most cases).
+Since Spire provides a specialized ordering type class, it makes sense
+that it also provides its own methods for doing operations based on
+order. These methods are defined on arrays and occur in-place,
+mutating the array. Other collections can take advantage of sorting by
+converting to an array, sorting, and converting back (which is what
+the Scala collections framework already does in most cases). Thus,
+Spire supports both mutable arrays and immutable collections.
 
 Sorting methods can be found in the `spire.math.Sorting` object. They are:
 
@@ -381,6 +383,18 @@ There are two methods defined:
  * `quickSelect` usually faster, not stable, potentially bad worst-case
  * `linearSelect` usually slower, but with guaranteed linear complexity
  * `select` alias for `quickSelect`
+ 
+ Searching methods are located in the `spire.math.Searching`
+ object. Given a sorted array (or indexed sequence), these methods
+ will locate the index of the desired element (or return -1 if it is
+ not found).
+ 
+  * `search(array, item)` finds the index of `item` in `array`
+  * `search(array, item, lower, upper)` only searches between `lower` and `upper`.
+  
+Searching also supports a more esoteric method:
+`minimalElements`. This method returns the minimal elements of a
+partially-ordered set.
 
 ### Pseudo-Random Number Generators
 
