@@ -76,6 +76,7 @@ object MyBuild extends Build {
 
     resolvers += Resolver.sonatypeRepo("snapshots"),
     resolvers += Resolver.sonatypeRepo("releases"),
+    resolvers += "bintray/non" at "http://dl.bintray.com/non/maven",
 
     scalacOptions := {
       CrossVersion.partialVersion(scalaVersion.value) match {
