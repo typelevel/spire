@@ -807,6 +807,9 @@ interface to creating uniform distributions of values.
 
 #### Pseudo-Random Number Generators
 
+**This section needs revising! Immutable generators have been replaced
+by the `Random[A]` monad, and the package structure has changed a bit!**
+
 Spire supports two types of PRNGs: mutable and immutable.
 
 The `mutable.Generator` trait represents a PRNG strategy. Using
