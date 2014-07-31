@@ -27,27 +27,25 @@ import java.util
  * <p>The acronym WELL stands for Well Equidistributed Long-period Linear.
  *
  * <p><b>Reference: </b>
- * Fran&ccedil;ois Panneton, Pierre L'Ecuyer and Makoto Matsumoto:
+ * François Panneton, Pierre L'Ecuyer and Makoto Matsumoto:
  * "Improved Long-Period Generators Based on Linear Recurrences Modulo 2",
  * <i>ACM Transactions on Mathematical Software,</i> Vol. 32, No. 1, January 2006, pp 1--16.
  *
  * @see <a href="http://www.iro.umontreal.ca/~panneton/well/WELL512a.c">WELL512a.c</a>
  * @see <a href="http://www.iro.umontreal.ca/~panneton/WELLRNG.html">Well PRNG Home Page</a>
  * @see <a href="http://en.wikipedia.org/wiki/Well_Equidistributed_Long-period_Linear">WELL @ Wikipedia</a>
- * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
+ * @author <a href="mailto:dusan.kysel@gmail.com">Dušan Kysel</a>
  */
 final class Well512a protected[random](state: Array[Int], i0: Int) extends IntBasedGenerator {
 
   import Well512a.{R, R_1, BYTES, M1, M2, mat0pos, mat0neg, mat3neg, mat4neg}
 
-  /*
-    @inline private final val v0    = new Utils.IntArrayWrapper(i => i, state)
-    @inline private final val vm1   = new Utils.IntArrayWrapper(i => (i + M1)  & R_1, state)
-    @inline private final val vm2   = new Utils.IntArrayWrapper(i => (i + M2)  & R_1, state)
-    @inline private final val vrm1  = new Utils.IntArrayWrapper(i => (i + R_1) & R_1, state)
-    @inline private final val newV0 = vrm1
-    @inline private final val newV1 = v0
-  */
+  // @inline private final val v0    = new Utils.IntArrayWrapper(i => i, state)
+  // @inline private final val vm1   = new Utils.IntArrayWrapper(i => (i + M1)  & R_1, state)
+  // @inline private final val vm2   = new Utils.IntArrayWrapper(i => (i + M2)  & R_1, state)
+  // @inline private final val vrm1  = new Utils.IntArrayWrapper(i => (i + R_1) & R_1, state)
+  // @inline private final val newV0 = vrm1
+  // @inline private final val newV1 = v0
 
   private var i : Int = i0
 
@@ -70,9 +68,6 @@ final class Well512a protected[random](state: Array[Int], i0: Int) extends IntBa
     i = bb.getInt
   }
 
-  /**
-   * Generate an equally-distributed random Int.
-   */
   def nextInt(): Int = {
 
     @inline def map(r: Int) = (i + r) & R_1
@@ -85,15 +80,13 @@ final class Well512a protected[random](state: Array[Int], i0: Int) extends IntBa
     state(map(R_1)) = mat0neg(-2, z0) ^ mat0neg(-18, z1) ^ mat3neg(-28, z2) ^ mat4neg(-5, 0xda442d24, state(i))
     i = map(R_1)
 
-    /*
-      val z0: Int = vrm1(i)
-      val z1: Int = mat0neg(-16, v0(i)) ^ mat0neg(-15, vm1(i))
-      val z2: Int = mat0pos(11, vm2(i))
-
-      newV1(i) = z1 ^ z2
-      newV0(i) = mat0neg(-2, z0) ^ mat0neg(-18, z1) ^ mat3neg(-28, z2) ^ mat4neg(-5, 0xda442d24, newV1(i))
-      i = (i + R_1) & R_1
-    */
+    // val z0: Int = vrm1(i)
+    // val z1: Int = mat0neg(-16, v0(i)) ^ mat0neg(-15, vm1(i))
+    // val z2: Int = mat0pos(11, vm2(i))
+    //
+    // newV1(i) = z1 ^ z2
+    // newV0(i) = mat0neg(-2, z0) ^ mat0neg(-18, z1) ^ mat3neg(-28, z2) ^ mat4neg(-5, 0xda442d24, newV1(i))
+    // i = (i + R_1) & R_1
 
     state(i)
   }
@@ -101,25 +94,25 @@ final class Well512a protected[random](state: Array[Int], i0: Int) extends IntBa
 
 object Well512a extends GeneratorCompanion[Well512a, (Array[Int], Int)] {
 
-  /** Number of bits in the pool. */
+  // Number of bits in the pool.
   @inline private final val K : Int = 512
 
-  /** Length of the pool in ints. */
+  // Length of the pool in ints.
   @inline private final val R : Int = K / 32
 
-  /** Length of the pool in ints -1. */
+  // Length of the pool in ints -1.
   @inline private final val R_1 : Int = R - 1
 
-  /** Length of the pool and index in bytes */
+  // Length of the pool and index in bytes
   @inline private final val BYTES = R * 4 + 4
 
-  /** First parameter of the algorithm. */
+  // First parameter of the algorithm.
   @inline private final val M1 : Int = 13
 
-  /** Second parameter of the algorithm. */
+  // Second parameter of the algorithm.
   @inline private final val M2 : Int = 9
 
-  /** Third parameter of the algorithm. */
+  // Third parameter of the algorithm.
   // @inline private final val M3 : Int = 5
 
   @inline private final def mat0pos(t: Int, v: Int)         = v ^ (v >>> t)
