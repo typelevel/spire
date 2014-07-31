@@ -101,10 +101,6 @@ object MyBuild extends Build {
       }
     },
 
-    // disable scaladoc
-    sources in (Compile,doc) := Seq.empty,
-    publishArtifact in (Compile, packageDoc) := false,
-
     publishMavenStyle := true,
     publishArtifact in Test := false,
     pomIncludeRepository := { _ => false },
