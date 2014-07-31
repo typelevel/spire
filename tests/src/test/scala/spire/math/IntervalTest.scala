@@ -276,7 +276,7 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     if (int.isEmpty) {
        Array.empty[Rational]
     } else {
-      import interval.ValueBound
+      import spire.math.interval.ValueBound
       val underlyingf: () => Rational = (int.lowerBound, int.upperBound) match {
         case (ValueBound(x) , ValueBound(y)) => () => x + Rational(rng.nextDouble) * (y - x)
         case (ValueBound(x) , _) => () => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
