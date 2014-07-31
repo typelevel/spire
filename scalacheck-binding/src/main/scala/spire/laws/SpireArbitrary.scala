@@ -94,16 +94,16 @@ object SpireArbitrary {
       k <- arbitrary[A]
     } yield Quaternion(r, i, j, k))
 
-  implicit def BoundArbitrary[A: Arbitrary]: Arbitrary[Interval.Bound[A]] =
+  implicit def BoundArbitrary[A: Arbitrary]: Arbitrary[interval.Bound[A]] =
     Arbitrary(Gen.oneOf(
-      arbitrary[A].map(Interval.Open(_)),
-      arbitrary[A].map(Interval.Closed(_)),
-      arbitrary[Unit].map(_ => Interval.Unbound[A])))
+      arbitrary[A].map(interval.Open(_)),
+      arbitrary[A].map(interval.Closed(_)),
+      arbitrary[Unit].map(_ => interval.Unbound[A])))
 
   implicit def IntervalArbitrary[A: Arbitrary: Order: AdditiveMonoid]: Arbitrary[Interval[A]] =
     Arbitrary(for {
-      lower <- arbitrary[Interval.Bound[A]]
-      upper <- arbitrary[Interval.Bound[A]]
+      lower <- arbitrary[interval.Bound[A]]
+      upper <- arbitrary[interval.Bound[A]]
     } yield Interval.fromBounds(lower, upper))
 
   implicit def FreeMonoidArbitrary[A: Arbitrary]: Arbitrary[FreeMonoid[A]] =

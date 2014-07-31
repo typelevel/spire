@@ -73,7 +73,7 @@ class RingIntervalTest extends FunSuite {
   test("b - b") { assert(b - b === cc(-10.0, 10.0)) }
   test("b * b") { assert(b * b === cc(-16.0, 64.0)) }
 
-  import Interval.{Open, Unbound, Closed}
+  import interval.{Open, Unbound, Closed}
   val c = 4.0
   test("-(c, ∞) =  (-∞, -c)") { 
     assert( -Interval.fromBounds(Open(c), Unbound()) ===
@@ -276,11 +276,11 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     if (int.isEmpty) {
        Array.empty[Rational]
     } else {
-      val underlyingf: () => Rational = (int.lowerPair, int.upperPair) match {
-        case (None, None) => () => Rational(rng.nextGaussian) * Long.MaxValue
-        case (Some((x, _)), None) => () => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
-        case (None, Some((y, _))) => () => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
-        case (Some((x, _)) ,Some((y, _))) => () => x + Rational(rng.nextDouble) * (y - x)
+      val underlyingf: () => Rational = (int.lowerBound, int.upperBound) match {
+        case (ValueBound(x) , ValueBound(y)) => () => x + Rational(rng.nextDouble) * (y - x)
+        case (ValueBound(x) , _) => () => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
+        case (_, ValueBound(y)) => () => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
+        case (_ , _) => () => Rational(rng.nextGaussian) * Long.MaxValue
       }
 
       def nextf(): Rational = {
