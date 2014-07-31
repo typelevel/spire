@@ -78,14 +78,17 @@ object MyBuild extends Build {
     resolvers += Resolver.sonatypeRepo("releases"),
     resolvers += "bintray/non" at "http://dl.bintray.com/non/maven",
 
-    scalacOptions := {
-      CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((2, 10)) =>
-          scalacOptions.value
-        case Some((2, n)) if n >= 11 =>
-          scalacOptions.value ++ Seq("-Ywarn-unused-import")
-      }
-    },
+    // re-enable to check imports, or once scala's REPL manages to not
+    // be useless under -Ywarn-unused-import.
+
+    // scalacOptions in Compile := {
+    //   CrossVersion.partialVersion(scalaVersion.value) match {
+    //     case Some((2, 10)) =>
+    //       scalacOptions.value
+    //     case Some((2, n)) if n >= 11 =>
+    //       scalacOptions.value ++ Seq("-Ywarn-unused-import")
+    //   }
+    // },
 
     libraryDependencies := {
       CrossVersion.partialVersion(scalaVersion.value) match {

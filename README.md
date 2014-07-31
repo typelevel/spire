@@ -31,13 +31,13 @@ To get started with SBT, simply add the following to your `build.sbt` file:
 scalaVersion := "2.10.4"
 // or scalaVersion := "2.11.2"
 
-libraryDependencies += "org.spire-math" %% "spire" % "0.7.5"
+libraryDependencies += "org.spire-math" %% "spire" % "0.8.2"
 ```
 
 (If you must use Spire with 2.9.x, there is an older 0.3.0 release available.)
 
 For maven instructions, and to download the jars directly, visit the
-[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.7.4%7Cjar).
+[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.8.2%7Cjar).
 
 ### Playing Around
 
@@ -49,7 +49,7 @@ SBT's console. Launch `sbt` and at the prompt, type `core/console`:
 [info] Generating spire/std/tuples.scala
 [info] Starting scala interpreter...
 [info]
-Welcome to Scala version 2.10.1 (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_29).
+Welcome to Scala version 2.11.2 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_45).
 Type in expressions to have them evaluated.
 Type :help for more information.
 
@@ -60,7 +60,7 @@ scala> import spire.math._
 import spire.math._
 
 scala> Complex(3.0, 5.0).sin
-res0: spire.math.Complex[Double] = (10.472508533940392 + 73.46062169567367i)
+res0: spire.math.Complex[Double] = (10.472508533940392 + -73.46062169567367i)
 ```
 
 ### Number Types
@@ -82,6 +82,8 @@ introduces several new ones, all of which can be found in `spire.math`:
  * `Interval[A]` arithmetic on open, closed, and unbound intervals
  * `Polynomial[A]` univariate (single-variable) polynomial expressions
  * `Trilean` value class supporting three-valued logic
+
+Detailed treatment of these types can be found in the [guide](GUIDE.md).
 
 ### Type Classes
 
@@ -123,6 +125,9 @@ to concepts from abstract algebra:
 In addition to the type classes themselves, `spire.implicits` defines many
 implicits which provide unary and infix operators for the type classes. The
 easiest way to use these is via a wildcard import of `spire.implicits._`.
+
+Detailed treatment of these type classes can be found in the
+[guide](GUIDE.md).
 
 ### Getting Started
 
