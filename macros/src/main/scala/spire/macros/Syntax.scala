@@ -1,11 +1,11 @@
 package spire.macros
 
-import scala.reflect.macros.Context
+import spire.macros.Compat.{termName, freshTermName, resetLocalAttrs, OldContext}
 
-case class SyntaxUtil[C <: Context with Singleton](val c: C) {
+case class SyntaxUtil[C <: OldContext with Singleton](val c: C) {
   import c.universe._
 
-  def name(s: String) = newTermName(c.fresh(s + "$"))
+  def name(s: String) = freshTermName(c)(s + "$")
 
   def names(bs: String*) = bs.toList.map(name)
 
@@ -22,18 +22,18 @@ case class SyntaxUtil[C <: Context with Singleton](val c: C) {
 // This is Scala reflection source compatibility hack between Scala 2.10 and 2.11
 private object HasCompat { val compat = ??? }; import HasCompat._
 
-class InlineUtil[C <: Context with Singleton](val c: C) {
+class InlineUtil[C <: OldContext with Singleton](val c: C) {
   import c.universe._
   // This is Scala reflection source compatibility hack between Scala 2.10 and 2.11
   import compat._
 
   def inlineAndReset[T](tree: Tree): c.Expr[T] = {
     val inlined = inlineApplyRecursive(tree)
-    c.Expr[T](c.resetLocalAttrs(inlined))
+    c.Expr[T](resetLocalAttrs(c)(inlined))
   }
 
   def inlineApplyRecursive(tree: Tree): Tree = {
-    val ApplyName = newTermName("apply")
+    val ApplyName = termName(c)("apply")
 
     class InlineSymbol(symbol: Symbol, value: Tree) extends Transformer {
       override def transform(tree: Tree): Tree = tree match {
@@ -72,7 +72,7 @@ class InlineUtil[C <: Context with Singleton](val c: C) {
 
 object Syntax {
 
-  def cforMacro[A](c: Context)(init: c.Expr[A])
+  def cforMacro[A](c: OldContext)(init: c.Expr[A])
      (test: c.Expr[A => Boolean], next: c.Expr[A => A])
      (body: c.Expr[A => Unit]): c.Expr[Unit] = {
 
@@ -124,7 +124,7 @@ v     */
     new InlineUtil[c.type](c).inlineAndReset[Unit](tree)
   }
 
-  def cforRangeMacro(c: Context)(r: c.Expr[Range])(body: c.Expr[Int => Unit]): c.Expr[Unit] = {
+  def cforRangeMacro(c: OldContext)(r: c.Expr[Range])(body: c.Expr[Int => Unit]): c.Expr[Unit] = {
 
     import c.universe._
     val util = SyntaxUtil[c.type](c)
@@ -216,7 +216,7 @@ v     */
     new InlineUtil[c.type](c).inlineAndReset[Unit](tree)
   }
 
-  def cforRange2Macro(c: Context)(r1: c.Expr[Range], r2: c.Expr[Range])
+  def cforRange2Macro(c: OldContext)(r1: c.Expr[Range], r2: c.Expr[Range])
     (body: c.Expr[(Int, Int) => Unit]): c.Expr[Unit] = {
 
     import c.universe._

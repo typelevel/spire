@@ -7,8 +7,6 @@ import prop._
 
 import spire.implicits._
 
-import BigDecimal.RoundingMode._
-
 class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   type C = Complex[BigDecimal]
 
@@ -128,8 +126,6 @@ class ComplexCheck2 extends PropSpec with Matchers with GeneratorDrivenPropertyC
       x.pow(2) shouldBe x * x
     }
   }
-
-  import Ordinal._
 
   // import spire.compat._
   // val threshold = Real("1/1000")

@@ -29,7 +29,7 @@ To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
 scalaVersion := "2.10.4"
-// or scalaVersion := "2.11.0"
+// or scalaVersion := "2.11.2"
 
 libraryDependencies += "org.spire-math" %% "spire" % "0.7.5"
 ```
@@ -73,6 +73,7 @@ introduces several new ones, all of which can be found in `spire.math`:
  * `Algebraic` lazily-computed, arbitrary precision algebraic numbers
  * `Real` computable real number implementation
  * `Complex[A]` complex numbers, points on the complex plane
+ * `Jet[A]` N-dimensional dual numbers, for automatic differentiation
  * `Quaternion[A]` extension of complex numbers into 4D space
  * `UByte` through `ULong` value classes supporting unsigned operations
  * `SafeLong` fast, overflow-proof integer type
@@ -80,6 +81,7 @@ introduces several new ones, all of which can be found in `spire.math`:
  * `FixedPoint` fractions with unboxed `Long` numerator and implicit denominator
  * `Interval[A]` arithmetic on open, closed, and unbound intervals
  * `Polynomial[A]` univariate (single-variable) polynomial expressions
+ * `Trilean` value class supporting three-valued logic
 
 ### Type Classes
 
@@ -116,6 +118,7 @@ to concepts from abstract algebra:
  * `InnerProductSpace[V,F]` types with an inner product
  * `MetricSpace[V,R]` types with an associated metric
  * `Trig[A]` types that support trigonometric functions
+ * `Bool[A]` types that form a boolean algebra
 
 In addition to the type classes themselves, `spire.implicits` defines many
 implicits which provide unary and infix operators for the type classes. The
@@ -246,23 +249,23 @@ as `Fractional` for all number types. Each type will attempt to "do the right
 thing" as far as possible, and throw errors otherwise. Users who are leery of
 this behavior are encouraged to use more precise type classes.
 
-#### BooleanAlgebra
+#### Bool
 
-BooleanAlgebras provide an abstraction of the familiar bitwise boolean
-operators.
+Bool supports Boolean algebras, an abstraction of the familiar bitwise
+boolean operators.
 
- * *BooleanAlgebra*
-   + complement (unary `~`): complement
+ * *Bool*
+   + complement (unary `~`): logical negation
    + and (`&`): conjunction
    + or (`|`): disjunction
    + xor (`^`): exclusive-disjunction
-   + imp: `~a | b`
-   + nand: `~(a & b)`
-   + nor: `~(a | b)`
-   + nxor: `~(a ^ b)`
+   + imp: implicitation, equivalent to `~a | b`
+   + nand: "not-and," equivalent to `~(a & b)`
+   + nor: "not-or," equivalent to `~(a | b)`
+   + nxor: "not-xor," equivalent to `~(a ^ b)`
 
-BooleanAlgebras exist not just for `Boolean`, but also for `Byte`, `Short`,
-`Int`, `Long`, `UByte`, `UShort`, `UInt`,  and `ULong`.
+Bool instances exist not just for `Boolean`, but also for `Byte`,
+`Short`, `Int`, `Long`, `UByte`, `UShort`, `UInt`, and `ULong`.
 
 #### Trig
 
@@ -349,13 +352,15 @@ def selectionSort(ns: Array[Int]) {
 }
 ```
 
-### Sorting and Selection
+### Sorting, Selection, and Searching
 
-Since Spire provides a specialized ordering type class, it makes sense that it
-also provides its own sorting and selection methods. These methods are defined
-on arrays and occur in-place, mutating the array. Other collections can take
-advantage of sorting by converting to an array, sorting, and converting back
-(which is what the Scala collections framework already does in most cases).
+Since Spire provides a specialized ordering type class, it makes sense
+that it also provides its own methods for doing operations based on
+order. These methods are defined on arrays and occur in-place,
+mutating the array. Other collections can take advantage of sorting by
+converting to an array, sorting, and converting back (which is what
+the Scala collections framework already does in most cases). Thus,
+Spire supports both mutable arrays and immutable collections.
 
 Sorting methods can be found in the `spire.math.Sorting` object. They are:
 
@@ -378,6 +383,18 @@ There are two methods defined:
  * `quickSelect` usually faster, not stable, potentially bad worst-case
  * `linearSelect` usually slower, but with guaranteed linear complexity
  * `select` alias for `quickSelect`
+ 
+ Searching methods are located in the `spire.math.Searching`
+ object. Given a sorted array (or indexed sequence), these methods
+ will locate the index of the desired element (or return -1 if it is
+ not found).
+ 
+  * `search(array, item)` finds the index of `item` in `array`
+  * `search(array, item, lower, upper)` only searches between `lower` and `upper`.
+  
+Searching also supports a more esoteric method:
+`minimalElements`. This method returns the minimal elements of a
+partially-ordered set.
 
 ### Pseudo-Random Number Generators
 

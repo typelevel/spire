@@ -3,7 +3,7 @@ package spire.syntax
 import scala.{specialized => spec}
 
 import spire.math.{Polynomial, Rational, UByte, UShort, UInt, ULong}
-import spire.macrosk.Macros
+import spire.macros.Macros
 
 class Literals(val s:StringContext) extends AnyVal {
   def b():Byte = macro Macros.byte

@@ -171,7 +171,7 @@ package object math {
     }
 
     val r = doit(k.mc.getPrecision + 3, 1000)
-    BigDecimal(r.bigDecimal, k.mc)
+    new BigDecimal(r.bigDecimal, k.mc)
   }
 
   final def exp[A](a: A)(implicit t: Trig[A]): A = t.exp(a)

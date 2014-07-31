@@ -4,7 +4,6 @@ import org.scalatest.Matchers
 import org.scalatest._
 import prop._
 
-import org.scalacheck.Arbitrary._
 import org.scalacheck._
 
 class ShufflingTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {

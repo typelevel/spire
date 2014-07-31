@@ -50,15 +50,16 @@ object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     organization := "org.spire-math",
 
-    scalaVersion := "2.10.2",
+    scalaVersion := "2.11.2",
 
-    crossScalaVersions := Seq("2.10.2", "2.11.1"),
+    crossScalaVersions := Seq("2.10.2", "2.11.2"),
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "org.typelevel" %% "machinist" % "0.3.0"
     ),
 
     scalacOptions ++= Seq(
@@ -75,6 +76,7 @@ object MyBuild extends Build {
 
     resolvers += Resolver.sonatypeRepo("snapshots"),
     resolvers += Resolver.sonatypeRepo("releases"),
+    resolvers += "bintray/non" at "http://dl.bintray.com/non/maven",
 
     scalacOptions := {
       CrossVersion.partialVersion(scalaVersion.value) match {

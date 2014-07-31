@@ -1,6 +1,5 @@
 package spire.math
 
-import spire.macrosk.Ops
 import spire.algebra.BooleanAlgebra
 
 import scala.{specialized => spec}
