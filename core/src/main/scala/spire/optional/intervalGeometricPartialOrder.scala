@@ -2,11 +2,10 @@ package spire.optional
 
 import spire.algebra._
 import spire.math.Interval
-import spire.math.Interval.{Open, Closed}
 import spire.syntax.order._
 
 object intervalGeometricPartialOrder {
-
+  import spire.math.interval._
   /** Interval partial order defined as follows:
     *
     * Involving empty intervals:
