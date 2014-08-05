@@ -18,8 +18,6 @@ object GroupActionLaws {
 
 trait GroupActionLaws[G, A] extends Laws {
 
-  implicit def scalar(implicit G: GroupAction[A, G]): Semigroup[G] = G.scalar
-
   val scalarLaws: GroupLaws[G]
 
   import scalarLaws.{ Equ => EqA, Arb => ArA }
@@ -27,9 +25,9 @@ trait GroupActionLaws[G, A] extends Laws {
   implicit def EquA: Eq[A]
   implicit def ArbA: Arbitrary[A]
 
-  def semigroupAction(implicit G: GroupAction[A, G]) = new ActionProperties(
+  def semigroupAction(implicit G: GroupAction[A, G], G0: Semigroup[G]) = new ActionProperties(
     name = "groupAction",
-    sl = _.semigroup(G.scalar),
+    sl = _.semigroup(G0),
     parent = None,
 
     "left compatibility" → forAll { (g: G, h: G, a: A) =>
