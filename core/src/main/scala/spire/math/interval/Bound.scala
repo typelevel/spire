@@ -18,8 +18,9 @@ sealed trait Bound[A] { lhs =>
     case (_, EmptyBound()) => rhs
     case (Unbound(), _) => lhs
     case (_, Unbound()) => rhs
-    case (Closed(a), y) => y.map(b => f(a, b))
-    case (x, Closed(b)) => x.map(a => f(a, b))
+    case (Closed(a), Closed(b)) => Closed(f(a, b))
+    case (Closed(a), Open(b)) => Open(f(a, b))
+    case (Open(a), Closed(b)) => Open(f(a, b))
     case (Open(a), Open(b)) => Open(f(a, b))
   }
 
@@ -111,9 +112,35 @@ case class EmptyBound[A]() extends Bound[A]
 
 case class Unbound[A]() extends Bound[A]
 
-sealed trait ValueBound[A] extends Bound[A] {
+sealed trait ValueBound[A] extends Bound[A] { lhs =>
   def a: A
   def isClosed: Boolean
+
+  override def unary_-()(implicit ev: AdditiveGroup[A]): ValueBound[A] =
+    if (isClosed) Closed(-a) else Open(-a)
+
+  override def reciprocal()(implicit ev: MultiplicativeGroup[A]): ValueBound[A] =
+    if (isClosed) Closed(a.reciprocal) else Open(a.reciprocal)
+
+  def +~(rhs: ValueBound[A])(implicit ev: AdditiveSemigroup[A]): ValueBound[A] = {
+    val m = lhs.a + rhs.a
+    if (lhs.isClosed && rhs.isClosed) Closed(m) else Open(m)
+  }
+
+  def -~(rhs: ValueBound[A])(implicit ev: AdditiveGroup[A]): ValueBound[A] = {
+    val m = lhs.a - rhs.a
+    if (lhs.isClosed && rhs.isClosed) Closed(m) else Open(m)
+  }
+
+  def *~(rhs: ValueBound[A])(implicit ev: MultiplicativeSemigroup[A]): ValueBound[A] = {
+    val m = lhs.a * rhs.a
+    if (lhs.isClosed && rhs.isClosed) Closed(m) else Open(m)
+  }
+
+  def /~(rhs: ValueBound[A])(implicit ev: MultiplicativeGroup[A]): ValueBound[A] = {
+    val m = lhs.a / rhs.a
+    if (lhs.isClosed && rhs.isClosed) Closed(m) else Open(m)
+  }
 }
 
 case class Open[A](a: A) extends ValueBound[A] {
