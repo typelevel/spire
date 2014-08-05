@@ -7,6 +7,7 @@ import spire.syntax.all._
 @SerialVersionUID(0L)
 class OptionMonoid[A: Semigroup] extends Monoid[Option[A]] with Serializable {
   def id: Option[A] = None
+  def isId(a: Option[A]) = a.isEmpty
   def op(x: Option[A], y: Option[A]): Option[A] = (x, y) match {
     case (Some(x), Some(y)) => Some(x |+| y)
     case (None, None) => None

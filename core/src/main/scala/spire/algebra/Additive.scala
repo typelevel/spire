@@ -14,17 +14,20 @@ object Additive {
   def apply[A](m: Monoid[A]): AdditiveMonoid[A] = new AdditiveMonoid[A] {
     def plus(x: A, y: A): A = m.op(x, y)
     def zero = m.id
+    def isZero(a: A) = m.isId(a)
   }
 
   def apply[A](m: CMonoid[A]): AdditiveCMonoid[A] = new AdditiveCMonoid[A] {
     def plus(x: A, y: A): A = m.op(x, y)
     def zero = m.id
+    def isZero(a: A) = m.isId(a)
   }
 
   def apply[A](g: Group[A]): AdditiveGroup[A] = new AdditiveGroup[A] {
     def plus(x: A, y: A): A = g.op(x, y)
     override def minus(x: A, y: A): A = g.op(x, g.inverse(y))
     def zero: A = g.id
+    def isZero(a: A) = g.isId(a)
     def negate(x: A): A = g.inverse(x)
   }
 
@@ -32,6 +35,7 @@ object Additive {
     def plus(x: A, y: A): A = g.op(x, y)
     override def minus(x: A, y: A): A = g.op(x, g.inverse(y))
     def zero: A = g.id
+    def isZero(a: A) = g.isId(a)
     def negate(x: A): A = g.inverse(x)
   }
 }
@@ -53,15 +57,18 @@ trait AdditiveCSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends
 trait AdditiveMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends AdditiveSemigroup[A] {
   override def additive: Monoid[A] = new Monoid[A] {
     def id = zero
+    def isId(a: A) = isZero(a)
     def op(x: A, y: A): A = plus(x, y)
   }
 
   def zero: A
+  def isZero(a: A): Boolean
 }
 
 trait AdditiveCMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends AdditiveMonoid[A] with AdditiveCSemigroup[A] {
   override def additive: CMonoid[A] = new CMonoid[A] {
     def id = zero
+    def isId(a: A) = isZero(a)
     def op(x: A, y: A): A = plus(x, y)
   }
 }
@@ -69,6 +76,7 @@ trait AdditiveCMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Ad
 trait AdditiveGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends AdditiveMonoid[A] {
   override def additive: Group[A] = new Group[A] {
     def id = zero
+    def isId(a: A) = isZero(a)
     def op(x: A, y: A): A = plus(x, y)
     def inverse(x: A): A = negate(x)
   }
@@ -80,6 +88,7 @@ trait AdditiveGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Addi
 trait AdditiveAbGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends AdditiveGroup[A] with AdditiveCMonoid[A] {
   override def additive: AbGroup[A] = new AbGroup[A] {
     def id = zero
+    def isId(a: A) = isZero(a)
     def op(x: A, y: A): A = plus(x, y)
     def inverse(x: A): A = negate(x)
   }

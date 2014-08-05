@@ -28,6 +28,7 @@ object Sign {
 
   trait SignAlgebra extends CMonoid[Sign] with Signed[Sign] with Order[Sign] {
     def id: Sign = Positive
+    def isId(a: Sign) = a == Positive
     def op(a: Sign, b: Sign): Sign = a * b
 
     override def sign(a: Sign): Sign = a

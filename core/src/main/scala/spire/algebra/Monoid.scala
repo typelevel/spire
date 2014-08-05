@@ -17,6 +17,11 @@ trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
   def id: A
 
   /**
+    * Tests if `a` is the identity.
+    */
+  def isId(a: A): Boolean
+
+  /**
    * Return `a` combined with itself `n` times.
    */
   override def sumn(a: A, n: Int): A =
