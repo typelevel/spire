@@ -103,6 +103,7 @@ to concepts from abstract algebra:
 
  * `Eq[A]` types that can be compared for equality
  * `Order[A]` types that can be compared and ordered
+ * `PartialOrder[A]` types that can be compared for equality, and for which certain pairs are ordered
  * `Semigroup[A]` types with an associative binary operator `|+|`
  * `Monoid[A]` semigroups that have an identity element
  * `Group[A]` monoids that have an inverse operator
@@ -150,11 +151,11 @@ The following is an outline in more detail of the type classes provided by
 Spire, as well as the operators that they use. While Spire avoids introducing
 novel operators when possible, in a few cases it was unavoidable.
 
-#### Eq and Order
+#### Eq, Order and PartialOrder
 
-The type classes provide type-safe equivalence and comparison functions. The
-orderings are total, although undefined elements like `NaN` or `null` will
-cause problems in the default implementations [1].
+The type classes provide type-safe equivalence and comparison functions. Orderings
+can be total (`Order`) or partial (`PartialOrder`); although undefined elements like
+`NaN` or `null` will cause problems in the default implementations [1].
 
  * *Eq*
    + eqv (`===`): equivalence
@@ -167,7 +168,13 @@ cause problems in the default implementations [1].
    + lteqv (`<=`): less-than-or-equivalent
    + min: find least value
    + max: find greatest value
-
+* *PartialOrder*
+   + partialCompare: less-than (`-1.0`), equivalent (`0.0`), greater-than (`1.0`) or incomparable (`NaN`)
+   + tryCompare: less-than (`Some(-1)`), equivalent (`Some(0)`), greater-than (`Some(1)`) or incomparable (`None`)
+   + pmin: find the least value if the elements are comparable; returns an `Option`
+   + pmax: find the greated value if the elements are comparable; returns an `Option`
+   + gt (`>`), gteqv (`>=`), lt (`<`) and lteqv (`<=`) return false if the elements are incomparable, or the result of their comparison
+   
 [1] For floating-point numbers, alternate implementations that take `NaN` into
 account can be imported from `spire.optional.totalfloat._`.
 
