@@ -8,7 +8,7 @@ import scala.{specialized => spec}
   * A partial order is defined by a relation <=, which obeys the following laws:
   * 
   * - x <= x (reflexivity)
-  * - if x <= y and y <= x, then x == y (antisymmetry)
+  * - if x <= y and y <= x, then x === y (anti-symmetry)
   * - if x <= y and y <= z, then x <= z (transitivity)
   * 
   * To compute both <= and >= at the same time, we use a Double number
@@ -16,10 +16,10 @@ import scala.{specialized => spec}
   * The truth table is defined as follows:
   * 
   * x <= y    x >= y      Double
-  * true      true        = 0     (corresponds to x == y)
-  * false     false       = NaN   (x and y cannot be compared)
-  * true      false       < 0     (corresponds to x < y)
-  * false     true        > 0     (corresponds to x > y)
+  * true      true        = 0.0     (corresponds to x === y)
+  * false     false       = NaN     (x and y cannot be compared)
+  * true      false       = -1.0    (corresponds to x < y)
+  * false     true        = 1.0     (corresponds to x > y)
   * 
   */
 trait PartialOrder[@spec A] extends Eq[A] {
@@ -41,33 +41,21 @@ trait PartialOrder[@spec A] extends Eq[A] {
     */  
   def tryCompare(x: A, y: A): Option[Int] = {
     val c = partialCompare(x, y)
-    if (c.isNaN) None else Some(c.signum)
+    if (c.isNaN) None else Some(c.toInt)
   }
 
   /** Returns Some(x) if x <= y, Some(y) if x > y, otherwise None. */
-  def pmin(x: A, y: A): Option[A] = {
-    val c = partialCompare(x, y)
-    if (c <= 0) 
-      Some(x) 
-    else {
-      if (c > 0) 
-        Some(y) 
-      else 
-        None
-    }
+  def pmin(x: A, y: A): Option[A] = partialCompare(x, y) match {
+    case -1.0 | 0.0 => Some(x)
+    case 1.0 => Some(y)
+    case _ => None
   }
 
   /** Returns Some(x) if x >= y, Some(y) if x < y, otherwise None. */
-  def pmax(x: A, y: A): Option[A] = {
-    val c = partialCompare(x, y)
-    if (c >= 0) 
-      Some(x) 
-    else {
-      if (c < 0) 
-        Some(y) 
-      else 
-        None
-    }
+  def pmax(x: A, y: A): Option[A] = partialCompare(x, y) match {
+    case 0.0 | 1.0 => Some(x)
+    case -1.0 => Some(y)
+    case _ => None
   }
 
   // The following should be overriden in priority for performance
@@ -77,11 +65,6 @@ trait PartialOrder[@spec A] extends Eq[A] {
 
   def gteqv(x: A, y: A): Boolean = lteqv(y, x)
   def gt(x: A, y: A): Boolean = lt(y, x)
-
-  def tryLteqv(x: A, y: A): Option[Boolean] = tryCompare(x, y).map(_ <= 0)
-  def tryGteqv(x: A, y: A): Option[Boolean] = tryCompare(x, y).map(_ >= 0)
-  def tryGt(x: A, y: A): Option[Boolean] = tryCompare(x, y).map(_ > 0)
-  def tryLt(x: A, y: A): Option[Boolean] = tryCompare(x, y).map(_ < 0)
 
   /**
    * Defines a partial order on `B` by mapping `B` to `A` using `f` and using `A`s
