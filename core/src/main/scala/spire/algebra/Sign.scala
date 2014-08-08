@@ -44,7 +44,6 @@ object Sign {
 
   implicit def SignAction[A](implicit A: AdditiveGroup[A]): MultiplicativeGroupAction[A, Sign] =
     new MultiplicativeGroupAction[A, Sign] {
-      def scalar = SignMultiplicativeGroup
       def gtimesl(s: Sign, a: A): A = s match {
         case Positive => a
         case Negative => A.negate(a)
