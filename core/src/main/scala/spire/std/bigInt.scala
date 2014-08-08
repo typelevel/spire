@@ -51,7 +51,8 @@ trait BigIntOrder extends Order[BigInt] {
   override def lteqv(x: BigInt, y: BigInt) = x <= y
   override def min(x: BigInt, y: BigInt) = x.min(y)
   override def max(x: BigInt, y: BigInt) = x.max(y)
-  def compare(x: BigInt, y: BigInt) = x.compare(y)
+  def compare(x: BigInt, y: BigInt) = x.compare(y) // Scala compareTo has no guarantee to return only
+                                                   // -1, 0 or 1, but it calls Java's compareTo which does
 }
 
 trait BigIntIsSigned extends Signed[BigInt] {

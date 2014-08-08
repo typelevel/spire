@@ -49,7 +49,7 @@ trait ShortOrder extends Order[Short] {
   override def gteqv(x: Short, y: Short) = x >= y
   override def lt(x: Short, y: Short) = x < y
   override def lteqv(x: Short, y: Short) = x <= y
-  def compare(x: Short, y: Short) = x - y
+  def compare(x: Short, y: Short) = (x - y).signum
 }
 
 trait ShortIsSigned extends Signed[Short] {
