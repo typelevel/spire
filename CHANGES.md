@@ -5,7 +5,7 @@ The project now builds for 2.11.2 by default.
 Additions:
 
 * added `Well1024a`, `Well19937a`, `Well19937c`, `Well44497a`, and `Well44497b` generators (Dušan Kysel)
-* added ziggurat gaussian generator (Dušan Kysel)
+* added `Ziggurat` generator for random variables with Gaussian and Exponential distributions (Dušan Kysel)
 * added `PartialOrder[A]` (Denis Rosset)
 * added free algebras (Tom Switzer)
 * added optional unicode operators (Erik Osheim)
