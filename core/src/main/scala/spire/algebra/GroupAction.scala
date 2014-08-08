@@ -11,8 +11,6 @@ import scala.{ specialized => spec }
  * 2. `scalar.id +> p === p` for all `p` in `P`.
  */
 trait GroupAction[@spec(Int) P, G] {
-  def scalar: Semigroup[G]
-
   def actl(g: G, p: P): P
   def actr(p: P, g: G): P
 }
@@ -25,12 +23,9 @@ object GroupAction {
 
 trait AdditiveGroupAction[@spec(Int) P, G] { self =>
   def additive: GroupAction[P, G] = new GroupAction[P, G] {
-    def scalar: Semigroup[G] = self.scalar.additive
     def actl(g: G, p: P): P = self.gplusl(g, p)
     def actr(p: P, g: G): P = self.gplusr(p, g)
   }
-
-  def scalar: AdditiveSemigroup[G]
 
   def gplusl(g: G, p: P): P
   def gplusr(p: P, g: G): P
@@ -38,12 +33,9 @@ trait AdditiveGroupAction[@spec(Int) P, G] { self =>
 
 trait MultiplicativeGroupAction[@spec(Int) P, G] { self =>
   def multiplicative: GroupAction[P, G] = new GroupAction[P, G] {
-    def scalar: Semigroup[G] = self.scalar.multiplicative
     def actl(g: G, p: P): P = self.gtimesl(g, p)
     def actr(p: P, g: G): P = self.gtimesr(p, g)
   }
-
-  def scalar: MultiplicativeSemigroup[G]
 
   def gtimesl(g: G, p: P): P
   def gtimesr(p: P, g: G): P
