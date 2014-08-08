@@ -9,8 +9,7 @@ import scala.annotation.tailrec
 class MapMonoid[K, V](implicit val scalar: Semigroup[V]) extends Monoid[Map[K, V]] 
 with Serializable {
   def id: Map[K, V] = Map.empty
-  def isId(a: Map[K, V]) = a.isEmpty
-  
+
   def op(x: Map[K, V], y: Map[K, V]): Map[K, V] = {
     var xx = x
     var yy = y

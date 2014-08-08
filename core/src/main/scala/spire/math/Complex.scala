@@ -124,9 +124,9 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
   def asTuple: (T, T) = (real, imag)
   def asPolarTuple(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): (T, T) = (abs, arg)
 
-  def isZero(implicit o: IsReal[T]): Boolean = real.isZero && imag.isZero
-  def isImaginary(implicit o: IsReal[T]): Boolean = real.isZero
-  def isReal(implicit o: IsReal[T]): Boolean = imag.isZero
+  def isZero(implicit o: IsReal[T]): Boolean = real.hasZeroSign && imag.hasZeroSign
+  def isImaginary(implicit o: IsReal[T]): Boolean = real.hasZeroSign
+  def isReal(implicit o: IsReal[T]): Boolean = imag.hasZeroSign
 
   def eqv(b: Complex[T])(implicit o: Eq[T]): Boolean = real === b.real && imag === b.imag
   def neqv(b: Complex[T])(implicit o: Eq[T]): Boolean = real =!= b.real || imag =!= b.imag
@@ -149,7 +149,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
 
   def **(e: T)(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] = this pow e
   def pow(e: T)(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] =
-    if (e.isZero) {
+    if (e.hasZeroSign) {
       Complex.one[T]
     } else if (this.isZero) {
       if (e < f.zero)

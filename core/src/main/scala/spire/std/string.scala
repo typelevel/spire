@@ -5,7 +5,6 @@ import spire.algebra.{MetricSpace, Monoid, Order}
 @SerialVersionUID(0L)
 class StringMonoid extends Monoid[String] with Serializable {
   def id = ""
-  def isId(a: String) = a.isEmpty
   def op(x: String, y: String): String = x + y
 }
 

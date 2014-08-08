@@ -92,11 +92,15 @@ final class SignedOps[A:Signed](lhs: A) {
   def abs(): A = macro Ops.unop[A]
   def sign(): Sign = macro Ops.unop[Sign]
   def signum(): Int = macro Ops.unop[Int]
-  def isZero(): Boolean = macro Ops.unop[Boolean]
+  def hasZeroSign(): Boolean = macro Ops.unop[Boolean]
 }
 
 final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
   def |+|(rhs:A): A = macro Ops.binop[A, A]
+}
+
+final class MonoidEqOps[A](lhs:A)(implicit ev: Monoid[A] with Eq[A]) {
+  def isId(): Boolean = macro Ops.unop[A]
 }
 
 final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
@@ -121,6 +125,10 @@ final class LiteralLongAdditiveSemigroupOps(val lhs: Long) extends AnyVal {
 
 final class LiteralDoubleAdditiveSemigroupOps(val lhs: Double) extends AnyVal {
   def +[A](rhs:A)(implicit ev:Field[A]): A = ev.plus(ev.fromDouble(lhs), rhs)
+}
+
+final class AdditiveMonoidEqOps[A](lhs: A)(implicit ev: AdditiveMonoid[A] with Eq[A]) {
+  def isZero(): Boolean = macro Ops.unop[A]
 }
 
 final class AdditiveGroupOps[A](lhs:A)(implicit ev:AdditiveGroup[A]) {
@@ -160,6 +168,10 @@ final class LiteralLongMultiplicativeSemigroupOps(val lhs: Long) extends AnyVal 
 
 final class LiteralDoubleMultiplicativeSemigroupOps(val lhs: Double) extends AnyVal {
   def *[A](rhs:A)(implicit ev:Field[A]): A = ev.times(ev.fromDouble(lhs), rhs)
+}
+
+final class MultiplicativeMonoidEqOps[A](lhs: A)(implicit ev: MultiplicativeMonoid[A] with Eq[A]) {
+  def isOne(): Boolean = macro Ops.unop[A]
 }
 
 final class MultiplicativeGroupOps[A](lhs:A)(implicit ev:MultiplicativeGroup[A]) {

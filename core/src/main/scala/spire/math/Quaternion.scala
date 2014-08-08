@@ -118,9 +118,9 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
       sillyIsReal && r == that
   }
 
-  def isZero(implicit o: IsReal[A]): Boolean = r.isZero && i.isZero && j.isZero && k.isZero
-  def isReal(implicit o: IsReal[A]): Boolean = i.isZero && j.isZero && k.isZero
-  def isPure(implicit o: IsReal[A]): Boolean = r.isZero
+  def isZero(implicit o: IsReal[A]): Boolean = r.hasZeroSign && i.hasZeroSign && j.hasZeroSign && k.hasZeroSign
+  def isReal(implicit o: IsReal[A]): Boolean = i.hasZeroSign && j.hasZeroSign && k.hasZeroSign
+  def isPure(implicit o: IsReal[A]): Boolean = r.hasZeroSign
 
   def real(implicit s: Semiring[A]): Quaternion[A] = Quaternion(r)
   def pure(implicit s: Semiring[A]): Quaternion[A] = Quaternion(s.zero, i, j, k)

@@ -19,7 +19,7 @@ trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
   /**
     * Tests if `a` is the identity.
     */
-  def isId(a: A): Boolean
+  def isId(a: A)(implicit ev: this.type <:< Eq[A]) = this.eqv(a, id)
 
   /**
    * Return `a` combined with itself `n` times.
