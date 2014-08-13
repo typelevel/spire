@@ -275,7 +275,7 @@ and `NaN` to `None`, allowing the use of `getOrElse` and higher-order methods, a
 
 Instances of `PartialOrder[A]` are required to observe the properties above.
 
-Note that `Order[A]` extends `PartialOrder[A]`, but for pegadogical purposes, `Order[A]` is presented first
+Note that `Order[A]` extends `PartialOrder[A]`, but for pedagogical purposes, `Order[A]` is presented first
 in this guide.
 
 #### Groups
