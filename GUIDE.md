@@ -285,7 +285,7 @@ associative binary operator (called `op` and represented as `|+|`):
 
  * `Semigroup[A]` just the associative operator `|+|`, nothing more.
  * `Monoid[A]` a semigroup that also has an identity element `id`.
- * `Group[A]` a monoid that also has an inverse operation (`inverse` or `-`).
+ * `Group[A]` a monoid that also has an inverse operation (`inverse` or `|-|`).
  * `CSemigroup[A]` a semigroup that is commutative.
  * `CMonoid[A]` a monoid that is commutative.
  * `AbGroup[A]` an "abelian group", a group that is commutative.
@@ -385,13 +385,13 @@ Spire does not have any fractional types that can represent irrational
 roots exactly. This means that many laws we might like to write about
 roots will be weaker than we would like:
 
- * `a.sqrt` = `(a nroot 2)` = `(a fpow 2)`
+ * `a.sqrt` = `(a nroot 2)` = `(a fpow 2.reciprocal)`
  * if `A` can represent `1/k` exactly, then `(a nroot k)` = `(a fpow k.reciprocal)`
  * if `(a nroot k)` is rational, then `(a nroot k).pow(k)` = `a`
  
 Approximate types like `Double` and `BigDecimal` have a built-in
 precision to which Spire can find roots. Exact types like `Rational`
-do not have `NRoot` instances defined by default, but instances can
+do not have `NRoot` instances defined by default, but instances can be
 instantiated with user-provided precision.
 
 Similarly, Spire supports the Trigonometric functions via
@@ -413,7 +413,7 @@ functions and values as well. The following methods are supported:
   * `asin(a)` inverse sine function, `asin(sin(a))` = `a`.
   * `acos(a)` inverse cosine function, `acos(cos(a))` = `a`.
   * `atan(a)` inverse tangent function, `atan(tan(a))` = `a`.
-  * `atan2(y, x)` like `atan` but returns results in `(0, 2pi)`.
+  * `atan2(y, x)` like `atan` but returns results in `(-pi, pi]`.
 
   * `sinh(x)` hyperbolic sine, y-coordinate of the unit hyperbola.
   * `cosh(x)` hyperbolic cosine, x-coordinate of the unit hyperbola.
