@@ -9,3 +9,5 @@ TAGS
 .lib
 .history
 .*.swp
+*.sublime-project
+java/
