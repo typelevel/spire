@@ -30,4 +30,11 @@ class PackageTest extends FunSuite {
     assert(pow(BigDecimal("1.00000001"), BigDecimal("2000000000")) === BigDecimal("485165146.8932734862594042197965646"))
     assert(pow(BigDecimal(Double.MaxValue) * 100, BigDecimal("0.00001")) === BigDecimal("1.007169457206495657176075115660221"))
   }
+
+  test("hypot") {
+    import spire.implicits._
+    assert(hypot(3.0, 4.0) == 5.0)
+    // check against overflow
+    assert(hypot((3e20).toFloat, (4e20).toFloat) == 5e20.toFloat)
+  }
 }
