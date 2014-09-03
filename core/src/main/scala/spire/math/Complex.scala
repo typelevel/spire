@@ -116,9 +116,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
   def arg(implicit f: Field[T], t: Trig[T], o: IsReal[T]): T =
     if (isZero) f.zero else t.atan2(imag, real)
 
-  def norm(implicit f: Field[T], n: NRoot[T], o: Order[T]): T =
-    if (real > imag) real.abs * (1 + (imag/real)**2).sqrt
-    else imag.abs * (1 + (real/imag)**2).sqrt
+  def norm(implicit f: Field[T], n: NRoot[T], o: Order[T]): T = hypot(real, imag)
 
   def conjugate(implicit f: Rng[T]): Complex[T] = new Complex(real, -imag)
 
