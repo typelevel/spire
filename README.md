@@ -29,15 +29,15 @@ To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
 scalaVersion := "2.10.4"
-// or scalaVersion := "2.11.0"
+// or scalaVersion := "2.11.2"
 
-libraryDependencies += "org.spire-math" %% "spire" % "0.7.5"
+libraryDependencies += "org.spire-math" %% "spire" % "0.8.2"
 ```
 
 (If you must use Spire with 2.9.x, there is an older 0.3.0 release available.)
 
 For maven instructions, and to download the jars directly, visit the
-[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.7.4%7Cjar).
+[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.8.2%7Cjar).
 
 ### Playing Around
 
@@ -49,7 +49,7 @@ SBT's console. Launch `sbt` and at the prompt, type `core/console`:
 [info] Generating spire/std/tuples.scala
 [info] Starting scala interpreter...
 [info]
-Welcome to Scala version 2.10.1 (Java HotSpot(TM) 64-Bit Server VM, Java 1.6.0_29).
+Welcome to Scala version 2.11.2 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_45).
 Type in expressions to have them evaluated.
 Type :help for more information.
 
@@ -60,7 +60,7 @@ scala> import spire.math._
 import spire.math._
 
 scala> Complex(3.0, 5.0).sin
-res0: spire.math.Complex[Double] = (10.472508533940392 + 73.46062169567367i)
+res0: spire.math.Complex[Double] = (10.472508533940392 + -73.46062169567367i)
 ```
 
 ### Number Types
@@ -73,6 +73,7 @@ introduces several new ones, all of which can be found in `spire.math`:
  * `Algebraic` lazily-computed, arbitrary precision algebraic numbers
  * `Real` computable real number implementation
  * `Complex[A]` complex numbers, points on the complex plane
+ * `Jet[A]` N-dimensional dual numbers, for automatic differentiation
  * `Quaternion[A]` extension of complex numbers into 4D space
  * `UByte` through `ULong` value classes supporting unsigned operations
  * `SafeLong` fast, overflow-proof integer type
@@ -80,6 +81,9 @@ introduces several new ones, all of which can be found in `spire.math`:
  * `FixedPoint` fractions with unboxed `Long` numerator and implicit denominator
  * `Interval[A]` arithmetic on open, closed, and unbound intervals
  * `Polynomial[A]` univariate (single-variable) polynomial expressions
+ * `Trilean` value class supporting three-valued logic
+
+Detailed treatment of these types can be found in the [guide](GUIDE.md).
 
 ### Type Classes
 
@@ -99,6 +103,7 @@ to concepts from abstract algebra:
 
  * `Eq[A]` types that can be compared for equality
  * `Order[A]` types that can be compared and ordered
+ * `PartialOrder[A]` types that can be compared for equality, and for which certain pairs are ordered
  * `Semigroup[A]` types with an associative binary operator `|+|`
  * `Monoid[A]` semigroups that have an identity element
  * `Group[A]` monoids that have an inverse operator
@@ -116,10 +121,14 @@ to concepts from abstract algebra:
  * `InnerProductSpace[V,F]` types with an inner product
  * `MetricSpace[V,R]` types with an associated metric
  * `Trig[A]` types that support trigonometric functions
+ * `Bool[A]` types that form a boolean algebra
 
 In addition to the type classes themselves, `spire.implicits` defines many
 implicits which provide unary and infix operators for the type classes. The
 easiest way to use these is via a wildcard import of `spire.implicits._`.
+
+Detailed treatment of these type classes can be found in the
+[guide](GUIDE.md).
 
 ### Getting Started
 
@@ -142,11 +151,11 @@ The following is an outline in more detail of the type classes provided by
 Spire, as well as the operators that they use. While Spire avoids introducing
 novel operators when possible, in a few cases it was unavoidable.
 
-#### Eq and Order
+#### Eq, Order and PartialOrder
 
-The type classes provide type-safe equivalence and comparison functions. The
-orderings are total, although undefined elements like `NaN` or `null` will
-cause problems in the default implementations [1].
+The type classes provide type-safe equivalence and comparison functions. Orderings
+can be total (`Order`) or partial (`PartialOrder`); although undefined elements like
+`NaN` or `null` will cause problems in the default implementations [1].
 
  * *Eq*
    + eqv (`===`): equivalence
@@ -159,7 +168,13 @@ cause problems in the default implementations [1].
    + lteqv (`<=`): less-than-or-equivalent
    + min: find least value
    + max: find greatest value
-
+* *PartialOrder*
+   + partialCompare: less-than (`-1.0`), equivalent (`0.0`), greater-than (`1.0`) or incomparable (`NaN`)
+   + tryCompare: less-than (`Some(-1)`), equivalent (`Some(0)`), greater-than (`Some(1)`) or incomparable (`None`)
+   + pmin: find the least value if the elements are comparable; returns an `Option`
+   + pmax: find the greated value if the elements are comparable; returns an `Option`
+   + gt (`>`), gteqv (`>=`), lt (`<`) and lteqv (`<=`) return false if the elements are incomparable, or the result of their comparison
+   
 [1] For floating-point numbers, alternate implementations that take `NaN` into
 account can be imported from `spire.optional.totalfloat._`.
 
@@ -246,23 +261,23 @@ as `Fractional` for all number types. Each type will attempt to "do the right
 thing" as far as possible, and throw errors otherwise. Users who are leery of
 this behavior are encouraged to use more precise type classes.
 
-#### BooleanAlgebra
+#### Bool
 
-BooleanAlgebras provide an abstraction of the familiar bitwise boolean
-operators.
+Bool supports Boolean algebras, an abstraction of the familiar bitwise
+boolean operators.
 
- * *BooleanAlgebra*
-   + complement (unary `~`): complement
+ * *Bool*
+   + complement (unary `~`): logical negation
    + and (`&`): conjunction
    + or (`|`): disjunction
    + xor (`^`): exclusive-disjunction
-   + imp: `~a | b`
-   + nand: `~(a & b)`
-   + nor: `~(a | b)`
-   + nxor: `~(a ^ b)`
+   + imp: implicitation, equivalent to `~a | b`
+   + nand: "not-and," equivalent to `~(a & b)`
+   + nor: "not-or," equivalent to `~(a | b)`
+   + nxor: "not-xor," equivalent to `~(a ^ b)`
 
-BooleanAlgebras exist not just for `Boolean`, but also for `Byte`, `Short`,
-`Int`, `Long`, `UByte`, `UShort`, `UInt`,  and `ULong`.
+Bool instances exist not just for `Boolean`, but also for `Byte`,
+`Short`, `Int`, `Long`, `UByte`, `UShort`, `UInt`, and `ULong`.
 
 #### Trig
 
@@ -349,13 +364,15 @@ def selectionSort(ns: Array[Int]) {
 }
 ```
 
-### Sorting and Selection
+### Sorting, Selection, and Searching
 
-Since Spire provides a specialized ordering type class, it makes sense that it
-also provides its own sorting and selection methods. These methods are defined
-on arrays and occur in-place, mutating the array. Other collections can take
-advantage of sorting by converting to an array, sorting, and converting back
-(which is what the Scala collections framework already does in most cases).
+Since Spire provides a specialized ordering type class, it makes sense
+that it also provides its own methods for doing operations based on
+order. These methods are defined on arrays and occur in-place,
+mutating the array. Other collections can take advantage of sorting by
+converting to an array, sorting, and converting back (which is what
+the Scala collections framework already does in most cases). Thus,
+Spire supports both mutable arrays and immutable collections.
 
 Sorting methods can be found in the `spire.math.Sorting` object. They are:
 
@@ -378,6 +395,18 @@ There are two methods defined:
  * `quickSelect` usually faster, not stable, potentially bad worst-case
  * `linearSelect` usually slower, but with guaranteed linear complexity
  * `select` alias for `quickSelect`
+ 
+ Searching methods are located in the `spire.math.Searching`
+ object. Given a sorted array (or indexed sequence), these methods
+ will locate the index of the desired element (or return -1 if it is
+ not found).
+ 
+  * `search(array, item)` finds the index of `item` in `array`
+  * `search(array, item, lower, upper)` only searches between `lower` and `upper`.
+  
+Searching also supports a more esoteric method:
+`minimalElements`. This method returns the minimal elements of a
+partially-ordered set.
 
 ### Pseudo-Random Number Generators
 

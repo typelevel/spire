@@ -1,14 +1,10 @@
 package spire.algebra
 
 import spire.math.Rational
-import spire.algebra._
 import spire.std.int._
 import spire.std.long._
 import spire.std.float._
 import spire.std.double._
-import spire.std.bigDecimal._
-import spire.std.seq._
-import spire.std.string._
 import spire.syntax.euclideanRing._
 import spire.syntax.isReal._
 

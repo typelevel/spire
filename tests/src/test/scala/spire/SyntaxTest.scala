@@ -7,7 +7,7 @@ import spire.std.double._
 import spire.std.seq._
 import spire.std.string._
 
-import org.scalatest.FunSuite
+import org.scalatest.{FunSuite, Matchers}
 import org.scalatest.prop.Checkers
 
 import org.scalacheck.{Arbitrary, Gen}
@@ -42,6 +42,7 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   import spire.math.ArbitrarySupport.rational
 
   test("Eq syntax")(check(forAll { (a: Int, b: Int) => testEqSyntax(a, b) }))
+  test("Partial order syntax")(check(forAll { (a: Int, b: Int) => testPartialOrderSyntax(a, b) }))
   test("Order syntax")(check(forAll { (a: Int, b: Int) => testOrderSyntax(a, b) }))
   test("Signed syntax")(check(forAll { (a: Int) => testSignedSyntax(a) }))
   test("IsReal syntax")(check(forAll { (a: Double) => testIsRealSyntax(a) }))
@@ -84,6 +85,20 @@ trait BaseSyntaxTest {
     import spire.syntax.eq._
     ((a === b) == Eq[A].eqv(a, b)) &&
       ((a =!= b) == Eq[A].neqv(a, b))
+  }
+
+  def testPartialOrderSyntax[A: PartialOrder](a: A, b: A) = {
+    import spire.syntax.order._
+    ((a === b) == PartialOrder[A].eqv(a, b)) &&
+      ((a =!= b) == PartialOrder[A].neqv(a, b)) &&
+      ((a < b) == PartialOrder[A].lt(a, b)) &&
+      ((a > b) == PartialOrder[A].gt(a, b)) &&
+      ((a <= b) == PartialOrder[A].lteqv(a, b)) &&
+      ((a >= b) == PartialOrder[A].gteqv(a, b)) &&
+      ((a pmin b) == PartialOrder[A].pmin(a, b)) &&
+      ((a pmax b) == PartialOrder[A].pmax(a, b)) &&
+      ((a partialCompare b) == PartialOrder[A].partialCompare(a, b)) &&
+      ((a tryCompare b) == PartialOrder[A].tryCompare(a, b))
   }
 
   def testOrderSyntax[A: Order](a: A, b: A) = {
@@ -364,4 +379,44 @@ trait BaseSyntaxTest {
       ((a ^ b) == BooleanAlgebra[A].xor(a, b)) &&
       (~a == BooleanAlgebra[A].complement(a))
   }
+}
+
+class PartialOrderSyntaxTest extends FunSuite with Matchers with Checkers {
+  import spire.algebra.PartialOrder
+  import spire.syntax.all._
+  object intDivisibility extends PartialOrder[Int] {
+    def partialCompare(a: Int, b: Int) = {
+      if (a == b)
+        0.0
+      else if (b % a == 0)
+        -1.0
+      else if (a % b == 0)
+        1.0
+      else
+        Double.NaN
+    }
+  }
+
+  test("With intDivisibility: Seq(2,3,6,9,12).pmin sameElements Seq(2,3)") {
+    Seq(2,3,6,9,12).pmin(intDivisibility).sameElements(Seq(2,3)) shouldBe true
+  }
+  test("With intDivisibility: Seq(2,3,6,9,12).pmax sameElements Seq(9,12)") {
+    Seq(2,3,6,9,12).pmax(intDivisibility).sameElements(Seq(9,12)) shouldBe true
+  }
+
+  case class PosInt(val x: Int)
+
+  implicit def ArbPosInt: Arbitrary[PosInt] = Arbitrary(Gen.choose(1, 30).map(PosInt))
+
+  test("pmin")(check(forAll { (posSeq: Seq[PosInt]) =>
+    val seq = posSeq.map(_.x)
+    def isMinimal(i: Int) = seq.forall(j => !(intDivisibility.partialCompare(i, j) > 0))
+    seq.pmin(intDivisibility).toSet === seq.filter(isMinimal).toSet
+  }))
+
+  test("pmax")(check(forAll { (posSeq: Seq[PosInt]) =>
+    val seq = posSeq.map(_.x)
+    def isMaximal(i: Int) = seq.forall(j => !(intDivisibility.partialCompare(i, j) < 0))
+    seq.pmax(intDivisibility).toSet === seq.filter(isMaximal).toSet
+  }))
 }

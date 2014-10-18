@@ -1,9 +1,9 @@
 package spire.macros
 
 import language.experimental.macros
-import scala.reflect.macros.Context
 
 import spire.algebra._
+import spire.macros.Compat.{OldContext, termName}
 
 object Auto {
   object scala {
@@ -14,6 +14,7 @@ object Auto {
     def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]): EuclideanRing[A] = macro ScalaAutoMacros.euclideanRingImpl[A]
     def field[A](z: A, o: A)(implicit ev: Eq[A]): Field[A] = macro ScalaAutoMacros.fieldImpl[A]
     def eq[A]: Eq[A] = macro ScalaAutoMacros.eqImpl[A]
+    // TODO: partialOrder ?
     def order[A]: Order[A] = macro ScalaAutoMacros.orderImpl[A]
 
     object collection {
@@ -30,6 +31,7 @@ object Auto {
     def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]): EuclideanRing[A] = macro JavaAutoMacros.euclideanRingImpl[A]
     def field[A](z: A, o: A)(implicit ev: Eq[A]): Field[A] = macro JavaAutoMacros.fieldImpl[A]
     def eq[A]: Eq[A] = macro JavaAutoMacros.eqImpl[A]
+    // TODO: partialOrder ?
     def order[A]: Order[A] = macro JavaAutoMacros.orderImpl[A]
 
     object collection {
@@ -39,16 +41,16 @@ object Auto {
 }
 
 abstract class AutoOps {
-  val c: Context
+  val c: OldContext
   import c.universe._
 
   def unop[A](name: String, x: String = "x"): c.Expr[A] =
-    c.Expr[A](Select(Ident(newTermName(x)), newTermName(name)))
+    c.Expr[A](Select(Ident(termName(c)(x)), termName(c)(name)))
 
   def binop[A](name: String, x: String = "x", y: String = "y"): c.Expr[A] =
     c.Expr[A](Apply(
-      Select(Ident(newTermName(x)), newTermName(name)),
-      List(Ident(newTermName(y)))))
+      Select(Ident(termName(c)(x)), termName(c)(name)),
+      List(Ident(termName(c)(y)))))
 
   def binopSearch[A: c.WeakTypeTag](names: List[String], x: String = "x", y: String = "y"): Option[c.Expr[A]] =
     names find { name => hasMethod1[A, A, A](name) } map (binop[A](_, x, y))
@@ -60,7 +62,7 @@ abstract class AutoOps {
     val tpeA = c.weakTypeTag[A].tpe
     val tpeB = c.weakTypeTag[B].tpe
     tpeA.members exists { m =>
-      m.isMethod && m.isPublic && m.name.encoded == name && (m.typeSignature match {
+      m.isMethod && m.isPublic && m.name.encodedName.toString == name && (m.typeSignature match {
         case MethodType(Nil, ret) => ret =:= tpeB
         case _ => false
       })
@@ -72,7 +74,7 @@ abstract class AutoOps {
     val tpeB = c.weakTypeTag[B].tpe
     val tpeC = c.weakTypeTag[C].tpe
     tpeA.members exists { m =>
-      m.isMethod && m.isPublic && m.name.encoded == name && (m.typeSignature match {
+      m.isMethod && m.isPublic && m.name.encodedName.toString == name && (m.typeSignature match {
         case MethodType(List(param), ret) =>
           param.typeSignature =:= tpeB && ret =:= tpeC
         case _ =>
@@ -196,7 +198,7 @@ abstract class AutoAlgebra extends AutoOps { ops =>
   }
 }
 
-case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
+case class ScalaAlgebra[C <: OldContext](c: C) extends AutoAlgebra {
   def plusplus[A] = binop[A]("$plus$plus")
   def plus[A: c.WeakTypeTag] = binop[A]("$plus")
   def minus[A: c.WeakTypeTag] = binop[A]("$minus")
@@ -209,7 +211,7 @@ case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
   def compare = binop[Int]("compare")
 }
 
-case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
+case class JavaAlgebra[C <: OldContext](c: C) extends AutoAlgebra {
   def plus[A: c.WeakTypeTag] = 
     binopSearch[A]("add" :: "plus" :: Nil) getOrElse failedSearch("plus", "+")
   def minus[A: c.WeakTypeTag] = 
@@ -224,8 +226,8 @@ case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
       // for JScience's Rational :(
       import c.universe._
       c.Expr[A](Apply(
-        Select(Ident(newTermName("zero")), newTermName("minus")),
-        List(Ident(newTermName("x")))))
+        Select(Ident(termName(c)("zero")), termName(c)("minus")),
+        List(Ident(termName(c)("x")))))
     }
   def quot[A: c.WeakTypeTag] =
     binopSearch[A]("quot" :: "divide" :: "div" :: Nil) getOrElse failedSearch("quot", "/~")
@@ -237,33 +239,33 @@ case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
 }
 
 object ScalaAutoMacros {
-  def semiringImpl[A: c.WeakTypeTag](c: Context): c.Expr[Semiring[A]] =
+  def semiringImpl[A: c.WeakTypeTag](c: OldContext): c.Expr[Semiring[A]] =
     ScalaAlgebra[c.type](c).Semiring[A]()
 
-  def rigImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A], o: c.Expr[A]): c.Expr[Rig[A]] =
+  def rigImpl[A: c.WeakTypeTag](c: OldContext)(z: c.Expr[A], o: c.Expr[A]): c.Expr[Rig[A]] =
     ScalaAlgebra[c.type](c).Rig[A](z, o)
 
-  def rngImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A]): c.Expr[Rng[A]] =
+  def rngImpl[A: c.WeakTypeTag](c: OldContext)(z: c.Expr[A]): c.Expr[Rng[A]] =
     ScalaAlgebra[c.type](c).Rng[A](z)
 
-  def ringImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A], o: c.Expr[A]): c.Expr[Ring[A]] =
+  def ringImpl[A: c.WeakTypeTag](c: OldContext)(z: c.Expr[A], o: c.Expr[A]): c.Expr[Ring[A]] =
     ScalaAlgebra[c.type](c).Ring[A](z, o)
 
-  def euclideanRingImpl[A: c.WeakTypeTag](c: Context)
+  def euclideanRingImpl[A: c.WeakTypeTag](c: OldContext)
       (z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[EuclideanRing[A]] =
     ScalaAlgebra[c.type](c).EuclideanRing[A](z, o)(ev)
 
-  def fieldImpl[A: c.WeakTypeTag](c: Context)
+  def fieldImpl[A: c.WeakTypeTag](c: OldContext)
       (z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[Field[A]] =
     ScalaAlgebra[c.type](c).Field[A](z, o)(ev)
 
-  def eqImpl[A: c.WeakTypeTag](c: Context): c.Expr[Eq[A]] =
+  def eqImpl[A: c.WeakTypeTag](c: OldContext): c.Expr[Eq[A]] =
     ScalaAlgebra[c.type](c).Eq[A]()
 
-  def orderImpl[A: c.WeakTypeTag](c: Context): c.Expr[Order[A]] =
+  def orderImpl[A: c.WeakTypeTag](c: OldContext): c.Expr[Order[A]] =
     ScalaAlgebra[c.type](c).Order[A]()
 
-  def collectionSemigroupImpl[A: c.WeakTypeTag](c: Context): c.Expr[Semigroup[A]] = {
+  def collectionSemigroupImpl[A: c.WeakTypeTag](c: OldContext): c.Expr[Semigroup[A]] = {
     val ops = ScalaAlgebra[c.type](c)
     c.universe.reify {
       new Semigroup[A] {
@@ -272,7 +274,7 @@ object ScalaAutoMacros {
     }
   }
 
-  def collectionMonoidImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A]): c.Expr[Monoid[A]] = {
+  def collectionMonoidImpl[A: c.WeakTypeTag](c: OldContext)(z: c.Expr[A]): c.Expr[Monoid[A]] = {
     val ops = ScalaAlgebra[c.type](c)
     c.universe.reify {
       new Monoid[A] {
@@ -284,33 +286,33 @@ object ScalaAutoMacros {
 }
 
 object JavaAutoMacros {
-  def semiringImpl[A: c.WeakTypeTag](c: Context): c.Expr[Semiring[A]] =
+  def semiringImpl[A: c.WeakTypeTag](c: OldContext): c.Expr[Semiring[A]] =
     JavaAlgebra[c.type](c).Semiring[A]()
 
-  def rigImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A], o: c.Expr[A]): c.Expr[Rig[A]] =
+  def rigImpl[A: c.WeakTypeTag](c: OldContext)(z: c.Expr[A], o: c.Expr[A]): c.Expr[Rig[A]] =
     JavaAlgebra[c.type](c).Rig[A](z, o)
 
-  def rngImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A]): c.Expr[Rng[A]] =
+  def rngImpl[A: c.WeakTypeTag](c: OldContext)(z: c.Expr[A]): c.Expr[Rng[A]] =
     JavaAlgebra[c.type](c).Rng[A](z)
 
-  def ringImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A], o: c.Expr[A]): c.Expr[Ring[A]] =
+  def ringImpl[A: c.WeakTypeTag](c: OldContext)(z: c.Expr[A], o: c.Expr[A]): c.Expr[Ring[A]] =
     JavaAlgebra[c.type](c).Ring[A](z, o)
 
-  def euclideanRingImpl[A: c.WeakTypeTag](c: Context)
+  def euclideanRingImpl[A: c.WeakTypeTag](c: OldContext)
       (z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[EuclideanRing[A]] =
     JavaAlgebra[c.type](c).EuclideanRing[A](z, o)(ev)
 
-  def fieldImpl[A: c.WeakTypeTag](c: Context)
+  def fieldImpl[A: c.WeakTypeTag](c: OldContext)
       (z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[Field[A]] =
     JavaAlgebra[c.type](c).Field[A](z, o)(ev)
 
-  def eqImpl[A: c.WeakTypeTag](c: Context): c.Expr[Eq[A]] =
+  def eqImpl[A: c.WeakTypeTag](c: OldContext): c.Expr[Eq[A]] =
     JavaAlgebra[c.type](c).Eq[A]()
 
-  def orderImpl[A: c.WeakTypeTag](c: Context): c.Expr[Order[A]] =
+  def orderImpl[A: c.WeakTypeTag](c: OldContext): c.Expr[Order[A]] =
     JavaAlgebra[c.type](c).Order[A]()
 
-  def collectionMonoidImpl[A: c.WeakTypeTag](c: Context)(empty: c.Expr[A]): c.Expr[Monoid[A]] = {
+  def collectionMonoidImpl[A: c.WeakTypeTag](c: OldContext)(empty: c.Expr[A]): c.Expr[Monoid[A]] = {
     val ops = JavaAlgebra[c.type](c)
     val addx = ops.binop[Unit]("addAll", "z", "x")
     val addy = ops.binop[Unit]("addAll", "z", "y")

@@ -4,11 +4,8 @@ import spire.algebra._
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
-import org.scalatest._
-import prop._
 
 import org.scalacheck._
-import Gen._
 import Arbitrary.arbitrary
 
 object ArbitrarySupport {
@@ -155,8 +152,8 @@ object ArbitrarySupport {
       else if (n < 0.20) Interval.below(upper)
       else if (n < 0.25) Interval.atOrBelow(upper)
       else if (n < 0.50) Interval.open(lower, upper)
-      else if (n < 0.60) Interval.openBelow(lower, upper)
-      else if (n < 0.70) Interval.openAbove(lower, upper)
+      else if (n < 0.60) Interval.openLower(lower, upper)
+      else if (n < 0.70) Interval.openUpper(lower, upper)
       else Interval.closed(lower, upper)
     })
   }

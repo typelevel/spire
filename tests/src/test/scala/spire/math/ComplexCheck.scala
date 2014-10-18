@@ -7,8 +7,6 @@ import prop._
 
 import spire.implicits._
 
-import BigDecimal.RoundingMode._
-
 class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   type C = Complex[BigDecimal]
 
@@ -129,8 +127,6 @@ class ComplexCheck2 extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
-  import Ordinal._
-
   // import spire.compat._
   // val threshold = Real("1/1000")
   // def near(x: C, y: C) = (x - y).abs should be <= threshold
@@ -155,4 +151,23 @@ class ComplexCheck2 extends PropSpec with Matchers with GeneratorDrivenPropertyC
   //     sz.num should be <= 10
   //   }
   // }
+}
+
+class FastComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+  property("encode/decode") {
+    forAll { (re: Float, im: Float) =>
+      val n: Long = FastComplex.encode(re, im)
+      val (r, i) = FastComplex.decode(n)
+
+      if (r != re || i != im) {
+        val rs = "%x" format FastComplex.bits(re)
+        val is = "%x" format FastComplex.bits(im)
+        val es = "%x" format n
+        println(s"expected $rs $is got $es")
+      }
+
+      r shouldBe re
+      i shouldBe im
+    }
+  }
 }

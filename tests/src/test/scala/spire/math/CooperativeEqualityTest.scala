@@ -2,7 +2,6 @@ package spire.math
 
 import org.scalatest.FunSuite
 
-import spire.algebra._
 import spire.implicits._
 
 class CooperativeEqualityTest extends FunSuite {
