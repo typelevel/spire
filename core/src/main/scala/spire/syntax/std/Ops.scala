@@ -93,6 +93,12 @@ final class ArrayOps[@sp A](arr: Array[A]) {
     result.nroot(p)
   }
 
+  def qnormWith[@sp(Double) R](p: Int)(f: A => R)(implicit ev: Field[R], s: Signed[R], nr: NRoot[R]): R = {
+    var result: R = ev.one
+    cfor(0)(_ < arr.length, _ + 1) { i => result += f(arr(i)).abs.pow(p) }
+    result.nroot(p)
+  }
+
   def qmin(implicit ev: Order[A]): A = {
     if (arr.length == 0) throw new UnsupportedOperationException("empty array")
     var result = arr(0)
@@ -116,6 +122,15 @@ final class ArrayOps[@sp A](arr: Array[A]) {
     var result = ev.zero
     cfor(0)(_ < arr.length, _ + 1) { i =>
       result = (result * i / (i + 1)) + (arr(i) / (i + 1))
+    }
+    result
+  }
+
+  def qmeanWith[@sp(Double) R](f: A => R)(implicit ev: Field[R]): R = {
+    if (arr.length == 0) throw new UnsupportedOperationException("empty array")
+    var result: R = ev.zero
+    cfor(0)(_ < arr.length, _ + 1) { i =>
+      result = (result * i / (i + 1)) + (f(arr(i)) / (i + 1))
     }
     result
   }
@@ -189,52 +204,41 @@ final class IndexedSeqOps[@sp A, CC[A] <: IndexedSeq[A]](as: CC[A]) {
     Searching.search(as, a)
 }
 
-final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) {
-  def qsum(implicit ev: AdditiveMonoid[A]): A = {
-    var sum = ev.zero
-    //val f: A => Unit = (a: A) => sum = ev.plus(sum, a)
-    as.foreach(a => sum += a)
-    sum
-  }
+final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
+  def qsum(implicit ev: AdditiveMonoid[A]): A =
+    as.aggregate(ev.zero)(ev.plus, ev.plus)
 
-  def qproduct(implicit ev: MultiplicativeMonoid[A]): A = {
-    var prod = ev.one
-    //as.foreach(a => prod = ev.times(prod, a))
-    as.foreach(a => prod *= a)
-    prod
-  }
+  def qproduct(implicit ev: MultiplicativeMonoid[A]): A =
+    as.aggregate(ev.one)(ev.times, ev.times)
 
-  def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A = {
-    var t = ev.one
-    //as.foreach(a => t = ev.plus(t, ev.pow(s.abs(a), p)))
-    as.foreach(a => t += a.abs.pow(p))
-    t.nroot(p)
-  }
+  def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A =
+    as.aggregate(ev.one)(_ + _.abs.pow(p), _ + _).nroot(p)
+
+  def qnormWith[R](p: Int)(f: A => R)(implicit ev: Field[R], s: Signed[R], nr: NRoot[R]): R =
+    as.aggregate(ev.one)((t, a) => t + f(a).abs.pow(p), _ + _).nroot(p)
 
   /** Computes the minimal elements of a partially ordered set.
-    * If the poset contains multiple copies of a minimal element, the function
-    * will only return a single copy of it.
-    */
-  def pmin(implicit ev: PartialOrder[A]): Seq[A] = Searching.minimalElements(as)(ev)
+   * If the poset contains multiple copies of a minimal element, the function
+   * will only return a single copy of it.
+   */
+  def pmin(implicit ev: PartialOrder[A]): Seq[A] =
+    Searching.minimalElements(as)(ev)
 
   /** Computes the maximal elements of a partially ordered set.
-    * If the posset contains multiple copies of a maximal element, the function
-    * will only return a single copy of it.
-    */
-  def pmax(implicit ev: PartialOrder[A]): Seq[A] = Searching.minimalElements(as)(ev.reverse)
+   * If the posset contains multiple copies of a maximal element, the function
+   * will only return a single copy of it.
+   */
+  def pmax(implicit ev: PartialOrder[A]): Seq[A] =
+    Searching.minimalElements(as)(ev.reverse)
 
   def qmin(implicit ev: Order[A]): A = {
     if (as.isEmpty) throw new UnsupportedOperationException("empty seq")
-    var min = as.head
-    as.foreach(a => min = ev.min(min, a))
-    min
+    as.aggregate(as.head)(ev.min, ev.min)
   }
 
   def qmax(implicit ev: Order[A]): A = {
     if (as.isEmpty) throw new UnsupportedOperationException("empty seq")
-    var zmax = as.head
-    as.foreach(a => zmax = zmax max a)
-    zmax
+    as.aggregate(as.head)(ev.max, ev.max)
   }
 
   def qmean(implicit ev: Field[A]): A = {
@@ -245,6 +249,21 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) {
     as.foreach { a =>
       val t = ev.div(ev.times(mean, ev.fromInt(i)), ev.fromInt(j))
       val z = ev.div(a, ev.fromInt(j))
+      mean = ev.plus(t, z)
+      i += 1
+      j += 1
+    }
+    mean
+  }
+
+  def qmeanWith[R](f: A => R)(implicit ev: Field[R]): R = {
+    if (as.isEmpty) throw new UnsupportedOperationException("empty seq")
+    var mean = ev.zero
+    var i = 0
+    var j = 1
+    as.foreach { a =>
+      val t = ev.div(ev.times(mean, ev.fromInt(i)), ev.fromInt(j))
+      val z = ev.div(f(a), ev.fromInt(j))
       mean = ev.plus(t, z)
       i += 1
       j += 1
