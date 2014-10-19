@@ -104,7 +104,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
 
   /**
    * This implements sgn(z), which (except for z=0) observes:
-   * 
+   *
    * `sgn(z) = z / abs(z) = abs(z) / z`
    */
   def complexSignum(implicit f: Field[T], o: IsReal[T], n: NRoot[T]): Complex[T] =
@@ -116,8 +116,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
   def arg(implicit f: Field[T], t: Trig[T], o: IsReal[T]): T =
     if (isZero) f.zero else t.atan2(imag, real)
 
-  def norm(implicit f: Field[T], n: NRoot[T]): T =
-    (real * real + imag * imag).sqrt
+  def norm(implicit f: Field[T], n: NRoot[T], o: Order[T]): T = hypot(real, imag)
 
   def conjugate(implicit f: Rng[T]): Complex[T] = new Complex(real, -imag)
 
@@ -285,11 +284,11 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
   def sinh(implicit f: Field[T], t: Trig[T]): Complex[T] =
     new Complex(t.sinh(real) * t.cos(imag), t.cosh(real) * t.sin(imag))
 
-  // cos(a+ci) = (cos(a) * cosh(c)) - (sin(a) * sinh(c))i 
+  // cos(a+ci) = (cos(a) * cosh(c)) - (sin(a) * sinh(c))i
   def cos(implicit f: Field[T], t: Trig[T]): Complex[T] =
     new Complex(t.cos(real) * t.cosh(imag), -t.sin(real) * t.sinh(imag))
 
-  // cosh(a+ci) = (cosh(a) * cos(c)) + (sinh(a) * sin(c))i 
+  // cosh(a+ci) = (cosh(a) * cos(c)) + (sinh(a) * sin(c))i
   def cosh(implicit f: Field[T], t: Trig[T]): Complex[T] =
     new Complex(t.cosh(real) * t.cos(imag), t.sinh(real) * t.sin(imag))
 

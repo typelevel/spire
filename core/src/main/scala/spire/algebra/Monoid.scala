@@ -33,7 +33,7 @@ trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
   /**
    *  Given a sequence of `as`, sum them using the monoid and return the total.
    */
-  def sum(as: TraversableOnce[A]): A = as.reduce(op)
+  def sum(as: TraversableOnce[A]): A = as.aggregate(id)(op, op)
 }
 
 object Monoid {

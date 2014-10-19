@@ -6,6 +6,8 @@ import sbtunidoc.Plugin.UnidocKeys._
 
 import com.typesafe.sbt.pgp.PgpKeys._
 
+import pl.project13.scala.sbt.SbtJmh
+
 import sbtrelease._
 import sbtrelease.ReleasePlugin._
 import sbtrelease.ReleasePlugin.ReleaseKeys._
@@ -277,6 +279,14 @@ object MyBuild extends Build {
 
     // enable forking in run
     fork in run := true
+  ) ++ noPublish
+
+  lazy val benchmarkJmh: Project = Project("benchmark-jmh", file("benchmark-jmh")).
+    settings(benchmarkJmhSettings: _*).
+    dependsOn(core, benchmark)
+
+  lazy val benchmarkJmhSettings = SbtJmh.jmhSettings ++ Seq(
+    name := "spire-benchmark-jmh"
   ) ++ noPublish
 
 }

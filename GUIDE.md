@@ -234,6 +234,50 @@ numbers, which breaks *O2*.  In these cases, users will need to be
 aware of the risks and limit their use to situations where the
 particular law is not needed.
 
+### PartialOrder
+
+Partial orderings in Spire are supported by the `PartialOrder[A]` type class.
+Its implementation differs from `scala.math.PartialOrdering` in two features: `PartialOrder`
+is specialized to avoid boxing, and the `partialCompare` method returns a `Double` and
+avoids allocation of an `Option[Int]` instance. `PartialOrder[A]` extends `Eq[A]`, and can
+be implemented via a single `partialCompare` method, described below. `PartialOrder` provides:
+
+ * `eqv` (`a === b`)
+ * `neqv` (`a =!= b`)
+ * `lt` (`a < b`)
+ * `gt` (`a > b`)
+ * `lteqv` (`a <= b`)
+ * `gteqv` (`a >= b`)
+ * `partialCompare` (`a partialCompare b`)
+ * `tryCompare` (`a tryCompare b`)
+ * `pmin` (`a pmin b`) -- returns the least element if they can be compared
+ * `pmax` (`a pmax b`) -- returns the greatest element if they can be compared
+
+A partial order is defined from a binary relation `<=`, which satisfies the relations:
+
+* `a <= a` (*reflexitivity*)
+* if `a <= b` and `b <= a`, then `a === c` (*anti-symmetry*)
+* if `a <= b` and `b <= c`, then `a <= c` (*transitivity*)
+
+To compute both `<=` and `>=` at the same time, the method `partialCompare` uses
+a `Double` number to encode the result of both comparisons. The truth table is defined as follows:
+
+| `a <= b` |`a >= b` |    `partialCompare(a, b)` |   corresponds to |
+|:----:|:------:|:-----:|:-----:|
+| `true` |  `true`  |  `0`  |   `a === b`  |
+| `false` | `false` | `NaN` | `a` incomparable with `b` |
+| `true` | `false` | `-1` | `a < b` |
+| `false` | `true` | `1` | `a > b` |
+
+The method `tryCompare` returns maps `-1.0`, `0.0`, `1.0` to `Some(-1)`, `Some(0)`, `Some(1)`,
+and `NaN` to `None`, allowing the use of `getOrElse` and higher-order methods, at the price of an
+`Option[Int]` allocation.
+
+Instances of `PartialOrder[A]` are required to observe the properties above.
+
+Note that `Order[A]` extends `PartialOrder[A]`, but for pedagogical purposes, `Order[A]` is presented first
+in this guide.
+
 #### Groups
 
 The most basic algebraic type classes Spire supports involve a single
@@ -241,7 +285,7 @@ associative binary operator (called `op` and represented as `|+|`):
 
  * `Semigroup[A]` just the associative operator `|+|`, nothing more.
  * `Monoid[A]` a semigroup that also has an identity element `id`.
- * `Group[A]` a monoid that also has an inverse operation (`inverse` or `-`).
+ * `Group[A]` a monoid that also has an inverse operation (`inverse` or `|-|`).
  * `CSemigroup[A]` a semigroup that is commutative.
  * `CMonoid[A]` a monoid that is commutative.
  * `AbGroup[A]` an "abelian group", a group that is commutative.
@@ -341,13 +385,13 @@ Spire does not have any fractional types that can represent irrational
 roots exactly. This means that many laws we might like to write about
 roots will be weaker than we would like:
 
- * `a.sqrt` = `(a nroot 2)` = `(a fpow 2)`
+ * `a.sqrt` = `(a nroot 2)` = `(a fpow 2.reciprocal)`
  * if `A` can represent `1/k` exactly, then `(a nroot k)` = `(a fpow k.reciprocal)`
  * if `(a nroot k)` is rational, then `(a nroot k).pow(k)` = `a`
  
 Approximate types like `Double` and `BigDecimal` have a built-in
 precision to which Spire can find roots. Exact types like `Rational`
-do not have `NRoot` instances defined by default, but instances can
+do not have `NRoot` instances defined by default, but instances can be
 instantiated with user-provided precision.
 
 Similarly, Spire supports the Trigonometric functions via
@@ -369,7 +413,7 @@ functions and values as well. The following methods are supported:
   * `asin(a)` inverse sine function, `asin(sin(a))` = `a`.
   * `acos(a)` inverse cosine function, `acos(cos(a))` = `a`.
   * `atan(a)` inverse tangent function, `atan(tan(a))` = `a`.
-  * `atan2(y, x)` like `atan` but returns results in `(0, 2pi)`.
+  * `atan2(y, x)` like `atan` but returns results in `(-pi, pi]`.
 
   * `sinh(x)` hyperbolic sine, y-coordinate of the unit hyperbola.
   * `cosh(x)` hyperbolic cosine, x-coordinate of the unit hyperbola.

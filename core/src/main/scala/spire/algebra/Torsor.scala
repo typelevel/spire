@@ -16,8 +16,6 @@ import scala.{specialized => sp}
  * 
  */
 trait Torsor[V, @sp(Int,Long,Float,Double) R] extends GroupAction[V, R] { self =>
-  implicit def scalar: AbGroup[R]
-
   def diff(v: V, w: V): R
 
   def fixOrigin(id0: V): AbGroup[V] =
