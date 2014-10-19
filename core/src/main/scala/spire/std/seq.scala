@@ -121,7 +121,7 @@ extends SeqInnerProductSpace[A, SA] with CoordinateSpace[SA, A] with Serializabl
  * `InnerProductSpace` instead.
  */
 @SerialVersionUID(0L)
-class SeqLpNormedVectorSpace[A: Field: NRoot: Signed, SA <: SeqLike[A, SA]](val p: Int)(implicit cbf: CanBuildFrom[SA,A,SA])
+class SeqLpNormedVectorSpace[A: Field: NRoot: IsReal, SA <: SeqLike[A, SA]](val p: Int)(implicit cbf: CanBuildFrom[SA,A,SA])
 extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
   require(p > 0, "p must be > 0")
 
@@ -129,7 +129,7 @@ extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
     @tailrec
     def loop(xi: Iterator[A], acc: A): A = {
       if (xi.hasNext) {
-        loop(xi, scalar.plus(acc, Signed[A].abs(scalar.pow(xi.next(), p))))
+        loop(xi, scalar.plus(acc, IsReal[A].abs(scalar.pow(xi.next(), p))))
       } else {
         NRoot[A].nroot(acc, p)
       }
@@ -144,13 +144,13 @@ extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
  * norm).
  */
 @SerialVersionUID(0L)
-class SeqMaxNormedVectorSpace[A: Field: Order: Signed, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA]) 
+class SeqMaxNormedVectorSpace[A: Field: IsReal, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA]) 
 extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
   def norm(v: SA): A = {
     @tailrec
     def loop(xi: Iterator[A], acc: A): A = {
       if (xi.hasNext) {
-        val x = Signed[A].abs(xi.next())
+        val x = IsReal[A].abs(xi.next())
         loop(xi, if (Order[A].gt(x, acc)) x else acc)
       } else {
         acc

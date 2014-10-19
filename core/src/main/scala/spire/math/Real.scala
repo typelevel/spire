@@ -507,7 +507,6 @@ object Real {
 class RealAlgebra extends RealIsFractional {}
 
 trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Real] with Trig[Real] {
-  def abs(x: Real): Real = x.abs
   def signum(x: Real): Int = x.signum
 
   override def eqv(x: Real, y: Real): Boolean = x eqv y
@@ -554,6 +553,7 @@ trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Rea
   def floor(x: Real): Real = x.floor
   def isWhole(x: Real): Boolean = x.isWhole
   def round(x: Real): Real = x.round
+  def abs(x: Real): Real = x.abs
 
   def toByte(x: Real): Byte = x.toRational.toByte
   def toInt(x: Real): Int = x.toRational.toInt
