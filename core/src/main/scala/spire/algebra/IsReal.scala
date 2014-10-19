@@ -11,6 +11,8 @@ trait IsReal[@spec A] extends Order[A] with Signed[A] {
   def round(a: A): A
   def isWhole(a: A): Boolean
   def toDouble(a: A): Double
+  /** An idempotent function that ensures an object has a non-negative sign. */
+  def abs(a: A): A
 }
 
 trait IsIntegral[@spec(Byte,Short,Int,Long) A] extends IsReal[A] {

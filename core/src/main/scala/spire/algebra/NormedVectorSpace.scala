@@ -35,11 +35,11 @@ trait NormedVectorSpace0 {
 }
 
 trait NormedVectorSpaceFunctions {
-  def max[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A], order0: Order[A],
-      signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] =
+  def max[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A], isReal0: IsReal[A],
+    cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] =
     new SeqMaxNormedVectorSpace[A, CC[A]]
 
   def Lp[A, CC[A] <: SeqLike[A, CC[A]]](p: Int)(implicit field0: Field[A], nroot0: NRoot[A],
-      signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] =
+      isReal0: IsReal[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] =
     new SeqLpNormedVectorSpace[A, CC[A]](p)
 }

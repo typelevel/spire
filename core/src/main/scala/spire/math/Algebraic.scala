@@ -131,7 +131,6 @@ private[math] trait AlgebraicOrder extends Order[Algebraic] {
 private[math] trait AlgebraicIsSigned extends Signed[Algebraic] {
   override def sign(a: Algebraic): Sign = a.sign
   def signum(a: Algebraic): Int = a.signum
-  def abs(a: Algebraic): Algebraic = a.abs
 }
 
 private[math] trait AlgebraicIsReal extends IsReal[Algebraic] with AlgebraicOrder with AlgebraicIsSigned {
@@ -143,6 +142,7 @@ private[math] trait AlgebraicIsReal extends IsReal[Algebraic] with AlgebraicOrde
     if (m < 0.5) a - m else a + 1 - m
   }
   def isWhole(a:Algebraic) = a % 1 == 0
+  def abs(a: Algebraic): Algebraic = a.abs
 }
 
 @SerialVersionUID(0L)

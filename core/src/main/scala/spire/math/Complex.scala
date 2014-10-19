@@ -116,7 +116,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
   def arg(implicit f: Field[T], t: Trig[T], o: IsReal[T]): T =
     if (isZero) f.zero else t.atan2(imag, real)
 
-  def norm(implicit f: Field[T], n: NRoot[T], o: Order[T]): T = hypot(real, imag)
+  def norm(implicit f: Field[T], n: NRoot[T], r: IsReal[T]): T = hypot(real, imag)
 
   def conjugate(implicit f: Rng[T]): Complex[T] = new Complex(real, -imag)
 
@@ -663,7 +663,6 @@ private[math] trait ComplexIsSigned[A] extends Signed[Complex[A]] {
   implicit def order: IsReal[A]
 
   def signum(a: Complex[A]): Int = a.signum
-  def abs(a: Complex[A]): Complex[A] = Complex[A](a.abs, algebra.zero)
 }
 
 @SerialVersionUID(1L)

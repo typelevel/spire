@@ -613,7 +613,6 @@ private[math] trait NumberOrder extends Order[Number] {
 
 private[math] trait NumberIsSigned extends Signed[Number] {
   def signum(a: Number): Int = a.signum
-  def abs(a: Number): Number = a.abs
 }
 
 private[math] trait NumberIsReal extends IsReal[Number] with NumberOrder with NumberIsSigned {
@@ -622,6 +621,7 @@ private[math] trait NumberIsReal extends IsReal[Number] with NumberOrder with Nu
   def floor(a:Number): Number = a.floor
   def round(a:Number): Number = a.round
   def isWhole(a:Number) = a.isWhole
+  def abs(a: Number): Number = a.abs
 }
 
 @SerialVersionUID(0L)

@@ -5,7 +5,7 @@ import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
 import scala.{specialized => sp}
 
-import spire.algebra.{AdditiveMonoid, Field, MultiplicativeMonoid, NRoot, Order, PartialOrder, Signed}
+import spire.algebra.{AdditiveMonoid, Field, IsReal, MultiplicativeMonoid, NRoot, Order, PartialOrder, Signed}
 import spire.math.{Natural, Number, QuickSort, SafeLong, Searching, ULong}
 import spire.syntax.cfor._
 import spire.syntax.field._
@@ -87,7 +87,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
     result
   }
 
-  def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A = {
+  def qnorm(p: Int)(implicit ev: Field[A], r: IsReal[A], nr: NRoot[A]): A = {
     var result = ev.one
     cfor(0)(_ < arr.length, _ + 1) { i => result += arr(i).abs.pow(p) }
     result.nroot(p)
@@ -204,7 +204,7 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) {
     prod
   }
 
-  def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A = {
+  def qnorm(p: Int)(implicit ev: Field[A], r: IsReal[A], nr: NRoot[A]): A = {
     var t = ev.one
     //as.foreach(a => t = ev.plus(t, ev.pow(s.abs(a), p)))
     as.foreach(a => t += a.abs.pow(p))

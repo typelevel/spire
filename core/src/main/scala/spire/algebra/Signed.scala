@@ -13,9 +13,6 @@ trait Signed[@spec(Double, Float, Int, Long) A] {
   /** Returns 0 if `a` is 0, > 0 if `a` is positive, and < 0 is `a` is negative. */
   def signum(a: A): Int
 
-  /** An idempotent function that ensures an object has a non-negative sign. */
-  def abs(a: A): A
-
   def isZero(a: A): Boolean = signum(a) == 0
 }
 

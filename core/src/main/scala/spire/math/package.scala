@@ -27,7 +27,7 @@ package object math {
   final def abs(n: Long): Long = Math.abs(n)
   final def abs(n: Float): Float = Math.abs(n)
   final def abs(n: Double): Double = Math.abs(n)
-  final def abs[A](a: A)(implicit ev: Signed[A]): A = ev.abs(a)
+  final def abs[A](a: A)(implicit ev: IsReal[A]): A = ev.abs(a)
 
   /**
    * ceil
@@ -401,7 +401,7 @@ package object math {
   final def ulp(x: Float): Double = Math.ulp(x)
 
   final def hypot[@spec(Float, Double) A](x: A, y: A)
-    (implicit f: Field[A], n: NRoot[A], o: Order[A]): A = {
+    (implicit f: Field[A], n: NRoot[A], r: IsReal[A]): A = {
     import spire.implicits._
     if (x > y) x.abs * (1 + (y/x)**2).sqrt
     else y.abs * (1 + (x/y)**2).sqrt
