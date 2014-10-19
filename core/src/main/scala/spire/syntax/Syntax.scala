@@ -33,7 +33,7 @@ trait SemigroupSyntax {
 }
 
 trait MonoidSyntax extends SemigroupSyntax {
-  implicit def monoidEqOps[A](a:A)(implicit ev: Monoid[A] with Eq[A]) = new MonoidEqOps(a)
+  implicit def monoidOps[A](a:A)(implicit ev: Monoid[A]) = new MonoidOps(a)
 }
 
 trait GroupSyntax extends MonoidSyntax {
@@ -48,7 +48,7 @@ trait AdditiveSemigroupSyntax {
 }
 
 trait AdditiveMonoidSyntax extends AdditiveSemigroupSyntax {
-  implicit def additiveMonoidEqOps[A](a:A)(implicit ev: AdditiveMonoid[A] with Eq[A]) = new AdditiveMonoidEqOps(a)
+  implicit def additiveMonoidOps[A](a:A)(implicit ev: AdditiveMonoid[A]) = new AdditiveMonoidOps(a)
 }
 
 trait AdditiveGroupSyntax extends AdditiveMonoidSyntax {
@@ -66,8 +66,8 @@ trait MultiplicativeSemigroupSyntax {
 }
 
 trait MultiplicativeMonoidSyntax extends MultiplicativeSemigroupSyntax {
-  implicit def multiplicativeMonoidEqOps[A](a:A)(implicit ev: MultiplicativeMonoid[A] with Eq[A]) =
-    new MultiplicativeMonoidEqOps(a)
+  implicit def multiplicativeMonoidOps[A](a:A)(implicit ev: MultiplicativeMonoid[A]) =
+    new MultiplicativeMonoidOps(a)
 }
 
 trait MultiplicativeGroupSyntax extends MultiplicativeMonoidSyntax {

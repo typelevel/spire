@@ -99,8 +99,8 @@ final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
   def |+|(rhs:A): A = macro Ops.binop[A, A]
 }
 
-final class MonoidEqOps[A](lhs:A)(implicit ev: Monoid[A] with Eq[A]) {
-  def isId(): Boolean = macro Ops.unop[A]
+final class MonoidOps[A](lhs:A)(implicit ev: Monoid[A]) {
+  def isId(implicit ev: Eq[A]): Boolean = macro Ops.unopWithEv[Eq[A], Boolean]
 }
 
 final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
@@ -127,8 +127,8 @@ final class LiteralDoubleAdditiveSemigroupOps(val lhs: Double) extends AnyVal {
   def +[A](rhs:A)(implicit ev:Field[A]): A = ev.plus(ev.fromDouble(lhs), rhs)
 }
 
-final class AdditiveMonoidEqOps[A](lhs: A)(implicit ev: AdditiveMonoid[A] with Eq[A]) {
-  def isZero(): Boolean = macro Ops.unop[A]
+final class AdditiveMonoidOps[A](lhs: A)(implicit ev: AdditiveMonoid[A]) {
+  def isZero(implicit ev: Eq[A]): Boolean = macro Ops.unopWithEv[Eq[A], Boolean]
 }
 
 final class AdditiveGroupOps[A](lhs:A)(implicit ev:AdditiveGroup[A]) {
@@ -170,8 +170,8 @@ final class LiteralDoubleMultiplicativeSemigroupOps(val lhs: Double) extends Any
   def *[A](rhs:A)(implicit ev:Field[A]): A = ev.times(ev.fromDouble(lhs), rhs)
 }
 
-final class MultiplicativeMonoidEqOps[A](lhs: A)(implicit ev: MultiplicativeMonoid[A] with Eq[A]) {
-  def isOne(): Boolean = macro Ops.unop[A]
+final class MultiplicativeMonoidOps[A](lhs: A)(implicit ev: MultiplicativeMonoid[A]) {
+  def isOne(implicit ev: Eq[A]): Boolean = macro Ops.unopWithEv[Eq[A], Boolean]
 }
 
 final class MultiplicativeGroupOps[A](lhs:A)(implicit ev:MultiplicativeGroup[A]) {

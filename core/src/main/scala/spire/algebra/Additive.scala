@@ -61,7 +61,7 @@ trait AdditiveMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Add
   /**
     * Tests if `a` is zero.
     */
-  def isZero(a: A)(implicit ev: this.type =:= Eq[A]): Boolean = this.eqv(a, zero)
+  def isZero(a: A)(implicit ev: Eq[A]): Boolean = ev.eqv(a, zero)
 }
 
 trait AdditiveCMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends AdditiveMonoid[A] with AdditiveCSemigroup[A] {

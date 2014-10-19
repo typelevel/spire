@@ -58,7 +58,7 @@ trait MultiplicativeMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] exten
 
   def one: A
 
-  def isOne(a: A)(implicit ev: this.type =:= Eq[A]): Boolean = this.eqv(a, one)
+  def isOne(a: A)(implicit ev: Eq[A]): Boolean = ev.eqv(a, one)
 }
 
 trait MultiplicativeCMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends MultiplicativeMonoid[A] with MultiplicativeCSemigroup[A] {
