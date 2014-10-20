@@ -147,8 +147,9 @@ trait BigDecimalOrder extends Order[BigDecimal] {
   override def lteqv(x: BigDecimal, y: BigDecimal) = x <= y
   override def min(x: BigDecimal, y: BigDecimal) = x.min(y)
   override def max(x: BigDecimal, y: BigDecimal) = x.max(y)
-  def compare(x: BigDecimal, y: BigDecimal) = x.compare(y) // Scala compareTo has no guarantee to return only
-                                                           // -1, 0 or 1, but it calls Java's compareTo which does
+  // Scala compareTo has no guarantee to return only -1, 0 or 1 as per Spire compare contract,
+  // so we call Java's compareTo which does
+  def compare(x: BigDecimal, y: BigDecimal) = x.bigDecimal.compareTo(y.bigDecimal)
 }
 
 trait BigDecimalIsSigned extends Signed[BigDecimal] {
