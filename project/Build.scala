@@ -61,7 +61,7 @@ object MyBuild extends Build {
 
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "org.typelevel" %% "machinist" % "0.3.0"
+      "org.typelevel" %% "machinist" % "0.3.1-SNAPSHOT"
     ),
 
     scalacOptions ++= Seq(
