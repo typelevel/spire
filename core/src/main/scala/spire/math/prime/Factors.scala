@@ -57,7 +57,7 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
 
   def compare(rhs: Factors): Int = {
     val n = lhs.signum - rhs.signum
-    if (n == 0) lhs.value compare rhs.value else n.signum
+    if (n == 0) lhs.value compare rhs.value else java.lang.Integer.signum(n)
   }
 
   def compare(rhs: Int): Int =
