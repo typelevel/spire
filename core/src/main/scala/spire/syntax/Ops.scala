@@ -92,7 +92,14 @@ final class SignedOps[A:Signed](lhs: A) {
   def abs(): A = macro Ops.unop[A]
   def sign(): Sign = macro Ops.unop[Sign]
   def signum(): Int = macro Ops.unop[Int]
-  def hasZeroSign(): Boolean = macro Ops.unop[Boolean]
+
+  def isSignZero(): Boolean = macro Ops.unop[Boolean]
+  def isSignPositive(): Boolean = macro Ops.unop[Boolean]
+  def isSignNegative(): Boolean = macro Ops.unop[Boolean]
+
+  def isSignNonZero(): Boolean = macro Ops.unop[Boolean]
+  def isSignNonPositive(): Boolean = macro Ops.unop[Boolean]
+  def isSignNonNegative(): Boolean = macro Ops.unop[Boolean]
 }
 
 final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
