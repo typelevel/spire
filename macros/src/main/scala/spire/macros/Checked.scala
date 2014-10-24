@@ -4,7 +4,7 @@ import scala.language.existentials
 
 import language.experimental.macros
 
-import spire.macros.Compat.{resetLocalAttrs, OldContext}
+import spire.macros.compat.{resetLocalAttrs, Context}
 
 case class ArithmeticOverflowException(message: String) extends ArithmeticException(message)
 
@@ -16,7 +16,7 @@ object Checked {
    */
   def checked[A](n: A): A = macro checkedImpl[A]
 
-  def checkedImpl[A](c: OldContext)(n: c.Expr[A]): c.Expr[A] = {
+  def checkedImpl[A](c: Context)(n: c.Expr[A]): c.Expr[A] = {
     val tree = CheckedRewriter[c.type](c)(n.tree)
     val resetTree = resetLocalAttrs(c)(tree) // See SI-6711
     c.Expr[A](resetTree)
@@ -29,7 +29,7 @@ object Checked {
    */
   def option[A](n: A): Option[A] = macro optionImpl[A]
 
-  def optionImpl[A](c: OldContext)(n: c.Expr[A]): c.Expr[Option[A]] = {
+  def optionImpl[A](c: Context)(n: c.Expr[A]): c.Expr[Option[A]] = {
     val checkedExpr = checkedImpl[A](c)(n)
     c.universe.reify {
       try {
@@ -91,7 +91,7 @@ object Checked {
   }
 }
 
-private[macros] case class CheckedRewriter[C <: OldContext](c: C) {
+private[macros] case class CheckedRewriter[C <: Context](c: C) {
   import c.universe._
 
   def apply(tree: Tree): Tree = {

@@ -171,7 +171,8 @@ object MyBuild extends Build {
 
   lazy val macroSettings = Seq(
     name := "spire-macros",
-    libraryDependencies ++= Seq(scalaTest % "test", scalaCheck % "test")
+    libraryDependencies ++= Seq(scalaTest % "test", scalaCheck % "test"),
+    unmanagedSourceDirectories in Compile += (sourceDirectory in Compile).value / s"scala_${scalaBinaryVersion.value}"
   )
 
   // Core
