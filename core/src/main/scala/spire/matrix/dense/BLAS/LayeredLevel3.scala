@@ -597,10 +597,10 @@ trait LayeredLevel3 extends Level3 {
    * the rows and the columns of A and let's denote by L (resp. U) a lower
    * (resp. upper) triangular matrix. Then:
    *
-   *  - the column slicing of L is equivalent to the column slicing of U'
-   *  - the column slicing of U is equivalent to the column slicing of L'
-   *  - the row slicing of L is equivalent to the row slicing of U'
-   *  - the row slicing of U is equivalent to the row slicing of L'
+   *  - the column slicing of L is equivalent to the column slicing of U''
+   *  - the column slicing of U is equivalent to the column slicing of L''
+   *  - the row slicing of L is equivalent to the row slicing of U''
+   *  - the row slicing of U is equivalent to the row slicing of L''
    *  - the column slicing of L is equivalent to the row slicing of L^T^
    *  - the column slicing of U is equivalent to the row slicing of U^T^
    *  - the row slicing of U is equivalent to the column slicing of U^T^
