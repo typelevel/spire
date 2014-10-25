@@ -39,6 +39,7 @@ package object syntax {
   object innerProductSpace extends InnerProductSpaceSyntax
   object coordinateSpace extends CoordinateSpaceSyntax
 
+  object semilattice extends SemilatticeSyntax
   object heyting extends HeytingSyntax
   object bool extends BoolSyntax
 
