@@ -2,6 +2,19 @@ package spire.macros
 
 import spire.macros.Compat.{termName, freshTermName, resetLocalAttrs, OldContext}
 
+import scala.language.higherKinds
+
+object Ops extends machinist.Ops {
+
+  val operatorNames = machinist.DefaultOps.operatorNames
+
+  def unopWithEv2[Ev1, R](c: OldContext)(ev1: c.Expr[Ev1]): c.Expr[R] = {
+    import c.universe._
+    val (ev, lhs) = unpack(c)
+    c.Expr[R](Apply(Apply(Select(ev, findMethodName(c)), List(lhs)), List(ev1.tree)))
+  }
+}
+
 case class SyntaxUtil[C <: OldContext with Singleton](val c: C) {
   import c.universe._
 
