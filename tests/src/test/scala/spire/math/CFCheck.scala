@@ -16,11 +16,37 @@ import Ordinal._
 
 class CFCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
+  import spire.math.{SafeLong => N}
+
   // property("Rational(n) = CF(n).toRational") {
   //   forAll { (n: BigInt) =>
   //     Rational(n) shouldBe CF(n).toRational
   //   }
   // }
+
+  property("x + y") {
+    forAll { (x: Int, y: Int) =>
+      CF(x) + CF(y) shouldBe CF(N(x) + N(y))
+    }
+  }
+
+  property("x - y") {
+    forAll { (x: Int, y: Int) =>
+      CF(x) - CF(y) shouldBe CF(N(x) - N(y))
+    }
+  }
+
+  property("x * y") {
+    forAll { (x: Int, y: Int) =>
+      CF(x) * CF(y) shouldBe CF(N(x) * N(y))
+    }
+  }
+
+  property("x / y") {
+    forAll { (x: Int, y: Int) =>
+      if (y != 0) CF(x) / CF(y) shouldBe CF(Rational(x, y))
+    }
+  }
   
   property("CF(n)/CF(d) = CF(n/d)") {
     forAll { (r: Rational) =>

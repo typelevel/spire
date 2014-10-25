@@ -21,25 +21,25 @@ trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
 
 // This is not included in the *Instances trait!
 trait BigIntIsNRoot extends NRoot[BigInt] {
-  def nroot(a: BigInt, k: Int): BigInt = if (a < 0 && k % 2 == 1) {
-    -nroot(-a, k)
-  } else if (a < 0) {
-    throw new ArithmeticException("Cannot find %d-root of negative number." format k)
-  } else {
-    def findNroot(b: BigInt, i: Int): BigInt = if (i < 0) {
-      b
+  def nroot(a: BigInt, k: Int): BigInt = {
+    def findNroot(b: BigInt, i: Int): BigInt =
+      if (i < 0) b else {
+        val c = b setBit i
+        val x = if ((c pow k) <= a) c else b
+        findNroot(x, i - 1)
+      }
+
+    if (a < 0 && k % 2 == 1) {
+      -nroot(-a, k)
+    } else if (a < 0) {
+      throw new ArithmeticException(s"Cannot find $k-root of negative number.")
     } else {
-      val c = b setBit i
-
-      if ((c pow k) <= a)
-        findNroot(c, i - 1)
-      else
-        findNroot(b, i - 1)
+      findNroot(0, a.bitLength - 1)
     }
-
-    findNroot(0, a.bitLength - 1)
   }
-  def fpow(a:BigInt, b:BigInt) = spire.math.pow(BigDecimal(a), BigDecimal(b)).toBigInt
+
+  def fpow(a:BigInt, b:BigInt): BigInt =
+    spire.math.pow(BigDecimal(a), BigDecimal(b)).toBigInt
 }
 
 trait BigIntOrder extends Order[BigInt] {

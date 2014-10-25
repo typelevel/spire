@@ -4,10 +4,9 @@ import scala.annotation.tailrec
 
 case class InvalidCFError(msg: String) extends Exception(msg)
 
-object Xyz { type Z = SafeLong }
-import Xyz.Z
-
 object Eval {
+
+  import spire.math.{SafeLong => Z}
 
   def eval4(a: Z, b: Z, c: Z, d: Z, cf: CF): CF = {
     @tailrec def loop4(a: Z, b: Z, c: Z, d: Z, cf: CF): CF = {
@@ -231,15 +230,6 @@ sealed trait CF { lhs =>
 
   def nroot(k: Int): CF = ???
 
-  def toList: List[SafeLong] = {
-    def unroll(cf: CF, acc: List[SafeLong]): List[SafeLong] =
-      cf match {
-        case CF(n, f) => unroll(f(), n :: acc)
-        case _ => acc
-      }
-    unroll(this, Nil).reverse
-  }
-
   def toStream: Stream[SafeLong] =
     this match {
       case CF(n, f) => n #:: f().toStream
@@ -248,20 +238,22 @@ sealed trait CF { lhs =>
 
   override def toString: String = getString(10)
 
-  def getString(t: Int): String = {
-    def loop(cf: CF, t: Int): List[String] =
-      if (t <= 0) "..." :: Nil else cf match {
-        case LongTerm(n, f) => n.toString :: loop(f(), t - 1)
-        case BigTerm(n, f) => n.toString :: loop(f(), t - 1)
+  def getList(t: Int): List[SafeLong] = {
+    def loop(cf: CF, t: Int): List[SafeLong] =
+      if (t <= 0) Nil else cf match {
+        case LongTerm(n, f) => SafeLong(n) :: loop(f(), t - 1)
+        case BigTerm(n, f) => SafeLong(n) :: loop(f(), t - 1)
         case inf => Nil
       }
+    loop(this, t)
+  }
 
-    loop(this, t) match {
+  def getString(t: Int): String =
+    getList(t) match {
       case Nil => "{}"
       case h :: Nil => "{" + h + "}"
       case h :: t => "{" + h + "; " + t.mkString("", ", ", "}")
     }
-  }
 
   def take(t: Int): CF =
     if (t <= 0) Infinity else this match {
@@ -324,4 +316,34 @@ object CF {
   }
 
   lazy val phi: CF = 1 ~: phi
+
+  lazy val pi: CF = ???
+
+  def sqrtOf(n: SafeLong): CF = {
+    import spire.std.bigInt._
+    import spire.syntax.nroot._
+    val m = n.sqrt
+    val m2 = m ** 2
+    val mult = SafeLong(1)
+    val numAdd = m
+    val denom = n - m2
+
+    def loop(add: SafeLong, denom: SafeLong): List[SafeLong] = {
+      val x = (m + add) / denom
+      val b = add - (x * denom)
+      val denom2 = (n - b.pow(2)) / denom
+      val tail = if (denom2 == 1) List(m - b) else loop(-b, denom2)
+      x :: tail
+    }
+
+    val whole :: digits = loop(SafeLong(0), SafeLong(1))
+
+    def build(ds: List[SafeLong]): CF =
+      ds match {
+        case Nil => build(digits)
+        case d :: ds => d ~: build(ds)
+      }
+
+    whole ~: build(digits)
+  }
 }
