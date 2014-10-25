@@ -4,7 +4,9 @@ import spire.algebra._
 import spire.algebra.lattice._
 import spire.math._
 
-object unicode {
+import spire.macros.Ops
+
+package object unicode {
 
   type ℍ = Quaternion[Real]
   type ℂ = Complex[Real]
@@ -13,9 +15,14 @@ object unicode {
   type ℤ = SafeLong
   type ℕ = Natural
 
+  val ℝ = Real
+  val ℚ = Rational
+  val ℤ = SafeLong
+  val ℕ = Natural
+
   val ⅇ = Real.e
   val π = Real.pi
-  val φ = (Real(1) + Real(5).sqrt) / Real(2)
+  val φ = Real.phi
   val ⅈ = Complex.i[Real]
   val ⅉ = Quaternion.j[Real]
 
@@ -37,58 +44,39 @@ object unicode {
   }
 
   implicit class EqOps[A](lhs: A)(implicit ev: Eq[A]) {
-    def ≡(rhs: A): Boolean = ev.eqv(lhs, rhs)
-    def ≠(rhs: A): Boolean = lhs != rhs
+    def ≡(rhs: A): Boolean = macro Ops.binop[A, A]
+    def ≠(rhs: A): Boolean = macro Ops.binop[A, A]
   }
 
   implicit class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A]) {
-    def ≤(rhs: A): Boolean = ev.lteqv(lhs, rhs)
-    def ≥(rhs: A): Boolean = ev.gteqv(lhs, rhs)
+    def ≤(rhs: A): Boolean = macro Ops.binop[A, A]
+    def ≥(rhs: A): Boolean = macro Ops.binop[A, A]
+  }
+
+  implicit class MeetSemilatticeOps[A](lhs: A)(implicit ev: MeetSemilattice[A]) {
+    def ∧(rhs: A): A = macro Ops.binop[A, A]
+  }
+
+  implicit class JoinSemilatticeOps[A](lhs: A)(implicit ev: JoinSemilattice[A]) {
+    def ∨(rhs: A): A = macro Ops.binop[A, A]
   }
 
   implicit class HeytingOps[A](lhs: A)(implicit ev: Heyting[A]) {
-    def ∧(rhs: A): A = ev.meet(lhs, rhs)
-    def ∨(rhs: A): A = ev.join(lhs, rhs)
-    def ⊃(rhs: A): A = ev.imp(lhs, rhs)
+    def ⊃(rhs: A): A = macro Ops.binop[A, A]
   }
 
   implicit class BoolOps[A](lhs: A)(implicit ev: Bool[A]) {
-    def ⊻(rhs: A): A = ev.xor(lhs, rhs)
-    def ⊼(rhs: A): A = ev.nand(lhs, rhs)
-    def ⊽(rhs: A): A = ev.nor(lhs, rhs)
+    def ⊻(rhs: A): A = macro Ops.binop[A, A]
+    def ⊼(rhs: A): A = macro Ops.binop[A, A]
+    def ⊽(rhs: A): A = macro Ops.binop[A, A]
   }
 
-  implicit class SymbolicIntervalOps[A](lhs: Interval[A]) {
+  implicit class SymbolicSetOps[A](val lhs: Set[A]) extends AnyVal {
+    def ∋(a: A): Boolean = lhs(a)
+    def ∌(a: A): Boolean = !lhs(a)
   
-    def ∋(rhs: A): Boolean = lhs contains rhs
-    def ∌(rhs: A): Boolean = !(lhs contains rhs)
-  
-    def ∈:(a: A): Boolean = lhs contains a
-    def ∉:(a: A): Boolean = !(lhs contains a)
-
-    def ∩(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
-      lhs intersect rhs
-  
-    def ∪(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
-      lhs union rhs
-  
-    def \(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): List[Interval[A]] =
-      lhs -- rhs
-  
-    def ⊂(rhs: Interval[A]): Boolean = lhs isProperSubsetOf rhs
-    def ⊃(rhs: Interval[A]): Boolean = lhs isProperSupersetOf rhs
-  
-    def ⊆(rhs: Interval[A]): Boolean = lhs isSubsetOf rhs
-    def ⊇(rhs: Interval[A]): Boolean = lhs isSupersetOf rhs
-  }
-
-
-  implicit class SymbolicSetOps[A](lhs: Set[A]) {
-    def ∋(rhs: A): Boolean = lhs contains rhs
-    def ∌(rhs: A): Boolean = !(lhs contains rhs)
-  
-    def ∈:(a: A): Boolean = lhs contains a
-    def ∉:(a: A): Boolean = !(lhs contains a)
+    def ∈:(a: A): Boolean = lhs(a)
+    def ∉:(a: A): Boolean = !lhs(a)
 
     def ∩(rhs: Set[A]): Set[A] = lhs & rhs
     def ∪(rhs: Set[A]): Set[A] = lhs | rhs
