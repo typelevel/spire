@@ -1,6 +1,6 @@
 package spire.math
 
-import spire.algebra.Heyting
+import spire.algebra.lattice.Heyting
 
 /**
  * Implementation of three-valued logic.

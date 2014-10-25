@@ -1,6 +1,7 @@
 package spire.laws
 
-import spire.algebra.{Eq, Bool, Heyting}
+import spire.algebra.{Eq, Bool}
+import spire.algebra.lattice.Heyting
 import spire.syntax.eq._
 import spire.syntax.bool._
 

@@ -1,6 +1,7 @@
 package spire.syntax
 
 import spire.algebra._
+import spire.algebra.lattice._
 import spire.macros.Ops
 import spire.math.{BitString, ConvertableTo, ConvertableFrom, Rational, Number}
 

@@ -2,6 +2,8 @@ package spire.algebra
 
 import scala.{specialized => sp}
 
+import spire.algebra.lattice.Heyting
+
 /**
  * A boolean algebra is a structure that defines a few basic operations, namely
  * as conjunction (&), disjunction (|), and negation (~). Both conjunction and
@@ -10,6 +12,12 @@ import scala.{specialized => sp}
  * is `x & (y | x) == x` and `x | (x & y) == x`.
  */
 trait Bool[@sp(Boolean, Byte, Short, Int, Long) A] extends Heyting[A] {
+  // def and(a: A, b: A): A
+  // def meet(a: A, b: A): A = and(a, b)
+  // 
+  // def or(a: A, b: A): A
+  // def join(a: A, b: A): A = or(a, b)
+
   def xor(a: A, b: A): A = or(and(a, complement(b)), and(complement(a), b))
 
   def imp(a: A, b: A): A = or(complement(a), b)

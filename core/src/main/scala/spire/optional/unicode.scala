@@ -1,6 +1,7 @@
 package spire.optional
 
 import spire.algebra._
+import spire.algebra.lattice._
 import spire.math._
 
 object unicode {
@@ -46,8 +47,8 @@ object unicode {
   }
 
   implicit class HeytingOps[A](lhs: A)(implicit ev: Heyting[A]) {
-    def ∧(rhs: A): A = ev.and(lhs, rhs)
-    def ∨(rhs: A): A = ev.or(lhs, rhs)
+    def ∧(rhs: A): A = ev.meet(lhs, rhs)
+    def ∨(rhs: A): A = ev.join(lhs, rhs)
     def ⊃(rhs: A): A = ev.imp(lhs, rhs)
   }
 
