@@ -1,6 +1,6 @@
 package spire.macros
 
-import spire.macros.Compat.{termName, freshTermName, resetLocalAttrs, OldContext}
+import spire.macros.compat.{termName, freshTermName, resetLocalAttrs, Context}
 
 import scala.language.higherKinds
 
@@ -8,14 +8,15 @@ object Ops extends machinist.Ops {
 
   val operatorNames = machinist.DefaultOps.operatorNames
 
-  def unopWithEv2[Ev1, R](c: OldContext)(ev1: c.Expr[Ev1]): c.Expr[R] = {
+  def unopWithEv2[Ev1, R](c: Context)(ev1: c.Expr[Ev1]): c.Expr[R] = {
     import c.universe._
     val (ev, lhs) = unpack(c)
     c.Expr[R](Apply(Apply(Select(ev, findMethodName(c)), List(lhs)), List(ev1.tree)))
   }
 }
 
-case class SyntaxUtil[C <: OldContext with Singleton](val c: C) {
+case class SyntaxUtil[C <: Context with Singleton](val c: C) {
+
   import c.universe._
 
   def name(s: String) = freshTermName(c)(s + "$")
@@ -35,7 +36,7 @@ case class SyntaxUtil[C <: OldContext with Singleton](val c: C) {
 // This is Scala reflection source compatibility hack between Scala 2.10 and 2.11
 private object HasCompat { val compat = ??? }; import HasCompat._
 
-class InlineUtil[C <: OldContext with Singleton](val c: C) {
+class InlineUtil[C <: Context with Singleton](val c: C) {
   import c.universe._
   // This is Scala reflection source compatibility hack between Scala 2.10 and 2.11
   import compat._
@@ -85,7 +86,7 @@ class InlineUtil[C <: OldContext with Singleton](val c: C) {
 
 object Syntax {
 
-  def cforMacro[A](c: OldContext)(init: c.Expr[A])
+  def cforMacro[A](c: Context)(init: c.Expr[A])
      (test: c.Expr[A => Boolean], next: c.Expr[A => A])
      (body: c.Expr[A => Unit]): c.Expr[Unit] = {
 
@@ -137,7 +138,7 @@ v     */
     new InlineUtil[c.type](c).inlineAndReset[Unit](tree)
   }
 
-  def cforRangeMacro(c: OldContext)(r: c.Expr[Range])(body: c.Expr[Int => Unit]): c.Expr[Unit] = {
+  def cforRangeMacro(c: Context)(r: c.Expr[Range])(body: c.Expr[Int => Unit]): c.Expr[Unit] = {
 
     import c.universe._
     val util = SyntaxUtil[c.type](c)
@@ -229,7 +230,7 @@ v     */
     new InlineUtil[c.type](c).inlineAndReset[Unit](tree)
   }
 
-  def cforRange2Macro(c: OldContext)(r1: c.Expr[Range], r2: c.Expr[Range])
+  def cforRange2Macro(c: Context)(r1: c.Expr[Range], r2: c.Expr[Range])
     (body: c.Expr[(Int, Int) => Unit]): c.Expr[Unit] = {
 
     import c.universe._
