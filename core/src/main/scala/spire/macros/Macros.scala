@@ -1,11 +1,11 @@
-package spire.macrosk
+package spire.macros
 
-import spire.macros.Compat.OldContext
+import spire.macros.compat.Context
 import spire.math.{Rational, UByte, UShort, UInt, ULong}
 
 object Macros {
 
-  case class LiteralUtil(c: OldContext) {
+  case class LiteralUtil(c: Context) {
     import c.universe._
 
     def getString: String = {
@@ -14,7 +14,7 @@ object Macros {
     }
   }
 
-  def parseContext(c: OldContext, lower: BigInt, upper: BigInt): Either[String, BigInt] =
+  def parseContext(c: Context, lower: BigInt, upper: BigInt): Either[String, BigInt] =
     parseNumber(LiteralUtil(c).getString, lower, upper)
 
   def parseNumber(s: String, lower: BigInt, upper: BigInt): Either[String, BigInt] =
@@ -25,7 +25,7 @@ object Macros {
       case _: Exception => Left("illegal constant: %s" format s)
     }
 
-  def byte(c: OldContext)(): c.Expr[Byte] = {
+  def byte(c: Context)(): c.Expr[Byte] = {
     import c.universe._
     parseContext(c, BigInt(-128), BigInt(255)) match {
       case Right(n) => c.Expr(q"${n.toByte}")
@@ -33,7 +33,7 @@ object Macros {
     }
   }
 
-  def ubyte(c: OldContext)(): c.Expr[UByte] = {
+  def ubyte(c: Context)(): c.Expr[UByte] = {
     import c.universe._
     parseContext(c, BigInt(0), BigInt(255)) match {
       case Right(n) => c.Expr(q"spire.math.UByte(${n.toByte})")
@@ -41,7 +41,7 @@ object Macros {
     }
   }
 
-  def short(c: OldContext)(): c.Expr[Short] = {
+  def short(c: Context)(): c.Expr[Short] = {
     import c.universe._
     parseContext(c, BigInt(-32768), BigInt(65535)) match {
       case Right(n) => c.Expr(q"${n.toShort}")
@@ -49,7 +49,7 @@ object Macros {
     }
   }
 
-  def ushort(c: OldContext)(): c.Expr[UShort] = {
+  def ushort(c: Context)(): c.Expr[UShort] = {
     import c.universe._
     parseContext(c, BigInt(0), BigInt(65535)) match {
       case Right(n) => c.Expr(q"spire.math.UShort(${n.toShort})")
@@ -57,7 +57,7 @@ object Macros {
     }
   }
 
-  def uint(c: OldContext)(): c.Expr[UInt] = {
+  def uint(c: Context)(): c.Expr[UInt] = {
     import c.universe._
     parseContext(c, BigInt(0), BigInt(4294967295L)) match {
       case Right(n) => c.Expr(q"spire.math.UInt(${n.toInt})")
@@ -65,7 +65,7 @@ object Macros {
     }
   }
 
-  def ulong(c: OldContext)(): c.Expr[ULong] = {
+  def ulong(c: Context)(): c.Expr[ULong] = {
     import c.universe._
     parseContext(c, BigInt(0), BigInt("18446744073709551615")) match {
       case Right(n) => c.Expr(q"spire.math.ULong(${n.toLong})")
@@ -73,7 +73,7 @@ object Macros {
     }
   }
 
-  def rational(c: OldContext)(): c.Expr[Rational] = {
+  def rational(c: Context)(): c.Expr[Rational] = {
     import c.universe._
 
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
@@ -86,7 +86,7 @@ object Macros {
       c.Expr(q"spire.math.Rational(BigInt(${n.toString}), BigInt(${d.toString}))")
   }
 
-  def formatWhole(c: OldContext, sep: String): String = {
+  def formatWhole(c: Context, sep: String): String = {
     val regex = "0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*" format sep
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
@@ -94,7 +94,7 @@ object Macros {
     s.replace(sep, "")
   }
 
-  def formatDecimal(c: OldContext, sep: String, dec: String): String = {
+  def formatDecimal(c: Context, sep: String, dec: String): String = {
     val regex = "0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*(%s[0-9]+)?" format (sep, dec)
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
@@ -102,7 +102,7 @@ object Macros {
     s.replace(sep, "").replace(dec, ".")
   }
 
-  def handleInt(c: OldContext, name: String, sep: String): c.Expr[Int] = {
+  def handleInt(c: Context, name: String, sep: String): c.Expr[Int] = {
     import c.universe._
     try {
       c.Expr[Int](Literal(Constant(formatWhole(c, sep).toInt)))
@@ -112,7 +112,7 @@ object Macros {
     }
   }
 
-  def handleLong(c: OldContext, name: String, sep: String): c.Expr[Long] = {
+  def handleLong(c: Context, name: String, sep: String): c.Expr[Long] = {
     import c.universe._
     try {
       c.Expr[Long](Literal(Constant(formatWhole(c, sep).toLong)))
@@ -122,7 +122,7 @@ object Macros {
     }
   }
 
-  def handleBigInt(c: OldContext, name: String, sep: String): c.Expr[BigInt] = {
+  def handleBigInt(c: Context, name: String, sep: String): c.Expr[BigInt] = {
     import c.universe._
     try {
       val s = formatWhole(c, sep)
@@ -134,7 +134,7 @@ object Macros {
     }
   }
 
-  def handleBigDecimal(c: OldContext, name: String, sep: String, dec: String): c.Expr[BigDecimal] = {
+  def handleBigDecimal(c: Context, name: String, sep: String, dec: String): c.Expr[BigDecimal] = {
     import c.universe._
     try {
       val s = formatDecimal(c, sep, dec)
@@ -146,22 +146,22 @@ object Macros {
     }
   }
 
-  def siInt(c: OldContext)(): c.Expr[Int] = handleInt(c, "SI", " ")
-  def siLong(c: OldContext)(): c.Expr[Long] = handleLong(c, "SI", " ")
-  def siBigInt(c: OldContext)(): c.Expr[BigInt] = handleBigInt(c, "SI", " ")
-  def siBigDecimal(c: OldContext)(): c.Expr[BigDecimal] = handleBigDecimal(c, "SI", " ", ".")
+  def siInt(c: Context)(): c.Expr[Int] = handleInt(c, "SI", " ")
+  def siLong(c: Context)(): c.Expr[Long] = handleLong(c, "SI", " ")
+  def siBigInt(c: Context)(): c.Expr[BigInt] = handleBigInt(c, "SI", " ")
+  def siBigDecimal(c: Context)(): c.Expr[BigDecimal] = handleBigDecimal(c, "SI", " ", ".")
 
-  def usInt(c: OldContext)(): c.Expr[Int] = handleInt(c, "US", ",")
-  def usLong(c: OldContext)(): c.Expr[Long] = handleLong(c, "US", ",")
-  def usBigInt(c: OldContext)(): c.Expr[BigInt] = handleBigInt(c, "US", ",")
-  def usBigDecimal(c: OldContext)(): c.Expr[BigDecimal] = handleBigDecimal(c, "US", ",", ".")
+  def usInt(c: Context)(): c.Expr[Int] = handleInt(c, "US", ",")
+  def usLong(c: Context)(): c.Expr[Long] = handleLong(c, "US", ",")
+  def usBigInt(c: Context)(): c.Expr[BigInt] = handleBigInt(c, "US", ",")
+  def usBigDecimal(c: Context)(): c.Expr[BigDecimal] = handleBigDecimal(c, "US", ",", ".")
 
-  def euInt(c: OldContext)(): c.Expr[Int] = handleInt(c, "EU", ".")
-  def euLong(c: OldContext)(): c.Expr[Long] = handleLong(c, "EU", ".")
-  def euBigInt(c: OldContext)(): c.Expr[BigInt] = handleBigInt(c, "EU", ".")
-  def euBigDecimal(c: OldContext)(): c.Expr[BigDecimal] = handleBigDecimal(c, "EU", ".", ",")
+  def euInt(c: Context)(): c.Expr[Int] = handleInt(c, "EU", ".")
+  def euLong(c: Context)(): c.Expr[Long] = handleLong(c, "EU", ".")
+  def euBigInt(c: Context)(): c.Expr[BigInt] = handleBigInt(c, "EU", ".")
+  def euBigDecimal(c: Context)(): c.Expr[BigDecimal] = handleBigDecimal(c, "EU", ".", ",")
 
-  def radix(c: OldContext)(): c.Expr[Int] = {
+  def radix(c: Context)(): c.Expr[Int] = {
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
 

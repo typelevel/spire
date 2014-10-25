@@ -17,6 +17,11 @@ trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
   def id: A
 
   /**
+    * Tests if `a` is the identity.
+    */
+  def isId(a: A)(implicit ev: Eq[A]) = ev.eqv(a, id)
+
+  /**
    * Return `a` combined with itself `n` times.
    */
   override def sumn(a: A, n: Int): A =
@@ -28,7 +33,7 @@ trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
   /**
    *  Given a sequence of `as`, sum them using the monoid and return the total.
    */
-  def sum(as: TraversableOnce[A]): A = as.reduce(op)
+  def sum(as: TraversableOnce[A]): A = as.aggregate(id)(op, op)
 }
 
 object Monoid {

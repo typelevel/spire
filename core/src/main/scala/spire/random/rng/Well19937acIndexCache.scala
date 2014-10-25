@@ -22,36 +22,36 @@ package rng
  * <p>The acronym WELL stands for Well Equidistributed Long-period Linear.
  *
  * <p><b>Reference: </b>
- * Fran&ccedil;ois Panneton, Pierre L'Ecuyer and Makoto Matsumoto:
+ * François Panneton, Pierre L'Ecuyer and Makoto Matsumoto:
  * "Improved Long-Period Generators Based on Linear Recurrences Modulo 2",
  * <i>ACM Transactions on Mathematical Software,</i> Vol. 32, No. 1, January 2006, pp 1--16.
  *
  * @see <a href="http://www.iro.umontreal.ca/~panneton/well/WELL19937a.c">WELL19937a.c</a>
  * @see <a href="http://www.iro.umontreal.ca/~panneton/WELLRNG.html">Well PRNG Home Page</a>
  * @see <a href="http://en.wikipedia.org/wiki/Well_Equidistributed_Long-period_Linear">WELL @ Wikipedia</a>
- * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
+ * @author <a href="mailto:dusan.kysel@gmail.com">Dušan Kysel</a>
  */
 private[random] object Well19937acIndexCache {
 
-  /** Number of bits in the pool. */
+  // Number of bits in the pool.
   @inline private final val K : Int = 19937
 
-  /** Length of the pool in ints. */
+  // Length of the pool in ints.
   @inline private final val R : Int = (K + 31) / 32
 
-  /** Length of the pool in ints -1. */
+  // Length of the pool in ints -1.
   @inline private final val R_1 : Int = R - 1
 
-  /** Length of the pool in ints -2. */
+  // Length of the pool in ints -2.
   @inline private final val R_2 : Int = R - 2
 
-  /** First parameter of the algorithm. */
+  // First parameter of the algorithm.
   @inline private final val M1 : Int = 70
 
-  /** Second parameter of the algorithm. */
+  // Second parameter of the algorithm.
   @inline private final val M2 : Int = 179
 
-  /** Third parameter of the algorithm. */
+  // Third parameter of the algorithm.
   @inline private final val M3 : Int = 449
 
   val vm1  = Array.tabulate(R)(i => (i + M1) % R)

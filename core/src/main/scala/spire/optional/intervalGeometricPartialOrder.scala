@@ -2,11 +2,10 @@ package spire.optional
 
 import spire.algebra._
 import spire.math.Interval
-import spire.math.Interval.{Open, Closed}
 import spire.syntax.order._
 
 object intervalGeometricPartialOrder {
-
+  import spire.math.interval._
   /** Interval partial order defined as follows:
     *
     * Involving empty intervals:
@@ -32,18 +31,18 @@ object intervalGeometricPartialOrder {
 
       // test if i < j
       (i.upperBound, j.lowerBound) match {
-        case (Open(x), Open(y)) if x <= y => return -1
-        case (Open(x), Closed(y)) if x <= y => return -1
-        case (Closed(x), Open(y)) if x <= y => return -1
-        case (Closed(x), Closed(y)) if x < y => return -1
+        case (Open(x), Open(y)) if x <= y => return -1.0
+        case (Open(x), Closed(y)) if x <= y => return -1.0
+        case (Closed(x), Open(y)) if x <= y => return -1.0
+        case (Closed(x), Closed(y)) if x < y => return -1.0
         case _ =>
       }
       // test if i > j
         (i.lowerBound, j.upperBound) match {
-        case (Open(x), Open(y)) if x >= y => return 1
-        case (Open(x), Closed(y)) if x >= y => return 1
-        case (Closed(x), Open(y)) if x >= y => return 1
-        case (Closed(x), Closed(y)) if x > y => return 1
+        case (Open(x), Open(y)) if x >= y => return 1.0
+        case (Open(x), Closed(y)) if x >= y => return 1.0
+        case (Closed(x), Open(y)) if x >= y => return 1.0
+        case (Closed(x), Closed(y)) if x > y => return 1.0
         case _ =>
       }
       return NaN

@@ -1,7 +1,7 @@
 package spire.syntax
 
 import spire.algebra._
-import spire.macrosk.Ops
+import spire.macros.Ops
 import spire.math.{BitString, ConvertableTo, ConvertableFrom, Rational, Number}
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
@@ -91,11 +91,22 @@ final class SignedOps[A:Signed](lhs: A) {
   def abs(): A = macro Ops.unop[A]
   def sign(): Sign = macro Ops.unop[Sign]
   def signum(): Int = macro Ops.unop[Int]
-  def isZero(): Boolean = macro Ops.unop[Boolean]
+
+  def isSignZero(): Boolean = macro Ops.unop[Boolean]
+  def isSignPositive(): Boolean = macro Ops.unop[Boolean]
+  def isSignNegative(): Boolean = macro Ops.unop[Boolean]
+
+  def isSignNonZero(): Boolean = macro Ops.unop[Boolean]
+  def isSignNonPositive(): Boolean = macro Ops.unop[Boolean]
+  def isSignNonNegative(): Boolean = macro Ops.unop[Boolean]
 }
 
 final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
   def |+|(rhs:A): A = macro Ops.binop[A, A]
+}
+
+final class MonoidOps[A](lhs:A)(implicit ev: Monoid[A]) {
+  def isId(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
 }
 
 final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
@@ -120,6 +131,10 @@ final class LiteralLongAdditiveSemigroupOps(val lhs: Long) extends AnyVal {
 
 final class LiteralDoubleAdditiveSemigroupOps(val lhs: Double) extends AnyVal {
   def +[A](rhs:A)(implicit ev:Field[A]): A = ev.plus(ev.fromDouble(lhs), rhs)
+}
+
+final class AdditiveMonoidOps[A](lhs: A)(implicit ev: AdditiveMonoid[A]) {
+  def isZero(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
 }
 
 final class AdditiveGroupOps[A](lhs:A)(implicit ev:AdditiveGroup[A]) {
@@ -159,6 +174,10 @@ final class LiteralLongMultiplicativeSemigroupOps(val lhs: Long) extends AnyVal 
 
 final class LiteralDoubleMultiplicativeSemigroupOps(val lhs: Double) extends AnyVal {
   def *[A](rhs:A)(implicit ev:Field[A]): A = ev.times(ev.fromDouble(lhs), rhs)
+}
+
+final class MultiplicativeMonoidOps[A](lhs: A)(implicit ev: MultiplicativeMonoid[A]) {
+  def isOne(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
 }
 
 final class MultiplicativeGroupOps[A](lhs:A)(implicit ev:MultiplicativeGroup[A]) {
