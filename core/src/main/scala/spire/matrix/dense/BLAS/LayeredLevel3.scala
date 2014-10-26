@@ -525,14 +525,17 @@ trait LayeredLevel3 extends Level3 {
     val aa = blocking.bufferA
     val bb = blocking.bufferB(n)
 
-    val panelB = if(transB == NoTranspose) (pLo:Int,pHi:Int) =>
-                   b.block(pLo,pHi)(0,n)
-                 else                      (pLo:Int,pHi:Int) =>
-                   b.block(0,n)(pLo,pHi)
-    val blockA = if(transA == NoTranspose) (iLo:Int,iHi:Int, pLo:Int,pHi:Int) =>
-                   a.block(iLo,iHi)(pLo,pHi)
-                 else                      (iLo:Int,iHi:Int, pLo:Int,pHi:Int) =>
-                   a.block(pLo,pHi)(iLo,iHi)
+    val panelB =
+      if(transB == NoTranspose)
+        (pLo:Int,pHi:Int) => b.block(pLo,pHi)(0,n)
+      else
+        (pLo:Int,pHi:Int) => b.block(0,n)(pLo,pHi)
+
+    val blockA =
+      if(transA == NoTranspose)
+        (iLo:Int,iHi:Int, pLo:Int,pHi:Int) => a.block(iLo,iHi)(pLo,pHi)
+      else
+        (iLo:Int,iHi:Int, pLo:Int,pHi:Int) => a.block(pLo,pHi)(iLo,iHi)
 
     val packB = if(transB == NoTranspose) GEBP.packColumnSlices(false) _
                 else                      GEBP.packRowSlices(false) _
