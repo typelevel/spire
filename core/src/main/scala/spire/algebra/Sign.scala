@@ -34,7 +34,7 @@ object Sign {
     def signum(a: Sign): Int = a.toInt
     def abs(a: Sign): Sign = if (a == Negative) Positive else a
 
-    def compare(x: Sign, y: Sign): Int = x.toInt - y.toInt
+    def compare(x: Sign, y: Sign): Int = java.lang.Integer.signum(x.toInt - y.toInt)
   }
 
   implicit final val SignAlgebra = new SignAlgebra {}

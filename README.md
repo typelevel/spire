@@ -188,6 +188,7 @@ beyond!
    + op (`|+|`): associative binary operator
  * *Monoid*
    + id: an identity element
+   + isId: checks (together with Eq) for identity
  * *Group*
    + inverse: an unary operator
 

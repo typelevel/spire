@@ -2,10 +2,10 @@ package spire.macros.fpf
 
 import scala.language.experimental.macros
 
-import spire.macros.Compat.{freshTermName, resetLocalAttrs, typeCheck, OldContext}
+import spire.macros.compat.{freshTermName, resetLocalAttrs, typeCheck, Context}
 import spire.math.{FpFilter, FpFilterApprox, FpFilterExact}
 
-private[spire] trait Fuser[C <: OldContext, A] {
+private[spire] trait Fuser[C <: Context, A] {
   val c: C
   implicit def A: c.WeakTypeTag[A]
 
@@ -255,7 +255,7 @@ private[spire] trait Fuser[C <: OldContext, A] {
 }
 
 private[spire] object Fuser {
-  def apply[C <: OldContext, A: ctx.WeakTypeTag](ctx: C) = new Fuser[C, A] {
+  def apply[C <: Context, A: ctx.WeakTypeTag](ctx: C) = new Fuser[C, A] {
     val c = ctx
     val A = c.weakTypeTag[A]
   }

@@ -25,6 +25,12 @@ trait BaseLaws[A] extends Laws {
     name = "signed",
     "abs non-negative" → forAll((x: A) =>
       x.abs.sign != Sign.Negative
+    ),
+    "signum returns -1/0/1" → forAll((x: A) =>
+      x.signum.abs <= 1
+    ),
+    "signum is sign.toInt" → forAll((x: A) =>
+      x.signum == x.sign.toInt
     )
   )
 

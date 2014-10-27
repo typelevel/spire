@@ -118,7 +118,13 @@ trait BaseSyntaxTest {
     import spire.syntax.signed._
     (a.sign == Signed[A].sign(a)) &&
       (a.signum == Signed[A].signum(a)) &&
-      (a.abs == Signed[A].abs(a))
+      (a.abs == Signed[A].abs(a)) &&
+      (a.isSignZero == Signed[A].isSignZero(a)) &&
+      (a.isSignPositive == Signed[A].isSignPositive(a)) &&
+      (a.isSignNegative == Signed[A].isSignNegative(a)) &&
+      (a.isSignNonZero == Signed[A].isSignNonZero(a)) &&
+      (a.isSignNonPositive == Signed[A].isSignNonPositive(a)) &&
+      (a.isSignNonNegative == Signed[A].isSignNonNegative(a))
   }
 
   def testIsRealSyntax[A: IsReal](a: A) = {
