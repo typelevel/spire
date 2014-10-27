@@ -84,6 +84,9 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def contains(t: A): Boolean =
     hasAtOrBelow(t) && hasAtOrAbove(t)
 
+  def doesNotContain(t: A): Boolean =
+    !hasAtOrBelow(t) || !hasAtOrAbove(t)
+
   def crosses(t: A): Boolean =
     hasBelow(t) && hasAbove(t)
 
@@ -527,6 +530,24 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     val p2 = Polynomial(terms2)
     p2(this)
   }
+
+  // optional unicode operators
+
+  def ∋(rhs: A): Boolean = lhs contains rhs
+  def ∌(rhs: A): Boolean = !(lhs contains rhs)
+  
+  def ∈:(a: A): Boolean = lhs contains a
+  def ∉:(a: A): Boolean = !(lhs contains a)
+
+  def ∩(rhs: Interval[A]): Interval[A] = lhs intersect rhs
+  def ∪(rhs: Interval[A]): Interval[A] = lhs union rhs
+  def \(rhs: Interval[A]): List[Interval[A]] = lhs -- rhs
+  
+  def ⊂(rhs: Interval[A]): Boolean = lhs isProperSubsetOf rhs
+  def ⊃(rhs: Interval[A]): Boolean = lhs isProperSupersetOf rhs
+  
+  def ⊆(rhs: Interval[A]): Boolean = lhs isSubsetOf rhs
+  def ⊇(rhs: Interval[A]): Boolean = lhs isSupersetOf rhs
 }
 
 case class All[A: Order] private[spire] () extends Interval[A] {

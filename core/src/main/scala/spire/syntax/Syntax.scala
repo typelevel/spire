@@ -1,6 +1,7 @@
 package spire.syntax
 
 import spire.algebra._
+import spire.algebra.lattice._
 import spire.math._
 import spire.macros.Syntax
 import spire.syntax.std._
@@ -128,8 +129,17 @@ trait TrigSyntax {
   implicit def trigOps[A:Trig](a: A) = new TrigOps(a)
 }
 
-trait BooleanAlgebraSyntax {
-  implicit def booleanAlgebraOps[A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
+trait LatticeSyntax {
+  implicit def meetOps[A: MeetSemilattice](a: A) = new MeetOps(a)
+  implicit def joinOps[A: JoinSemilattice](a: A) = new JoinOps(a)
+}
+
+trait HeytingSyntax {
+  implicit def heytingOps[A: Heyting](a: A) = new HeytingOps(a)
+}
+
+trait BoolSyntax extends HeytingSyntax {
+  implicit def boolOps[A: Bool](a: A) = new BoolOps(a)
 }
 
 trait BitStringSyntax {
@@ -235,7 +245,9 @@ trait AllSyntax extends
     NormedVectorSpaceSyntax with
     InnerProductSpaceSyntax with
     CoordinateSpaceSyntax with
-    BooleanAlgebraSyntax with
+    LatticeSyntax with
+    HeytingSyntax with
+    BoolSyntax with
     BitStringSyntax with
     GroupActionSyntax with
     TorsorSyntax with

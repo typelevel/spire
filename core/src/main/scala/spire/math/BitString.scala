@@ -1,11 +1,11 @@
 package spire.math
 
-import spire.algebra.BooleanAlgebra
+import spire.algebra.Bool
 
 import scala.{specialized => spec}
 import java.lang.Math
 
-trait BitString[@spec(Byte, Short, Int, Long) A] extends BooleanAlgebra[A] {
+trait BitString[@spec(Byte, Short, Int, Long) A] extends Bool[A] {
   def signed: Boolean
   def width: Int
   def toHexString(n: A): String

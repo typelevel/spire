@@ -1,6 +1,7 @@
 package spire.syntax
 
 import spire.algebra._
+import spire.algebra.lattice._
 import spire.macros.Ops
 import spire.math.{BitString, ConvertableTo, ConvertableFrom, Rational, Number}
 
@@ -286,18 +287,41 @@ final class TrigOps[A](lhs: A)(implicit ev: Trig[A]) {
     f.div(ev.log(lhs), ev.log(f.fromInt(base)))
 }
 
-final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
+final class MeetOps[A: MeetSemilattice](lhs: A) {
+  def meet(rhs: A): A = macro Ops.binop[A, A]
+  def ∧(rhs: A): A = macro Ops.binop[A, A]
+
+  def meet(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+  def ∧(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+}
+
+final class JoinOps[A: JoinSemilattice](lhs: A) {
+  def join(rhs: A): A = macro Ops.binop[A, A]
+  def ∨(rhs: A): A = macro Ops.binop[A, A]
+
+  def join(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+  def ∨(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+}
+
+final class HeytingOps[A: Heyting](lhs:A) {
   def unary_~(): A = macro Ops.unop[A]
+  def imp(rhs: A): A = macro Ops.binop[A, A]
+
   def &(rhs: A): A = macro Ops.binop[A, A]
   def |(rhs: A): A = macro Ops.binop[A, A]
-  def ^(rhs: A): A = macro Ops.binop[A, A]
 
   def &(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
   def |(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+}
+
+final class BoolOps[A: Bool](lhs:A) {
+  def ^(rhs: A): A = macro Ops.binop[A, A]
+  def nand(rhs: A): A = macro Ops.binop[A, A]
+  def nor(rhs: A): A = macro Ops.binop[A, A]
+  def nxor(rhs: A): A = macro Ops.binop[A, A]
+
   def ^(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
 
-  def &(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) & rhs
-  def |(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) | rhs
   def ^(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) ^ rhs
 }
 

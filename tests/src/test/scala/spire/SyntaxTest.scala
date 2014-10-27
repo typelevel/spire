@@ -77,7 +77,7 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   test("CoordinateSpace syntax")(check(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
     testCoordinateSpaceSyntax(v, w, a.x)(CoordinateSpace.seq[Rational, Vector](3))
   }))
-  test("BooleanAlgebra syntax")(check(forAll { (a: Int, b: Int) => testBooleanAlgebraSyntax(a, b) }))
+  test("Bool syntax")(check(forAll { (a: Int, b: Int) => testBoolSyntax(a, b) }))
 }
 
 trait BaseSyntaxTest {
@@ -378,12 +378,12 @@ trait BaseSyntaxTest {
       (v.coord(1) == V.coord(v, 1))
   }
 
-  def testBooleanAlgebraSyntax[A: BooleanAlgebra](a: A, b: A) = {
-    import spire.syntax.booleanAlgebra._
-    ((a & b) == BooleanAlgebra[A].and(a, b)) &&
-      ((a | b) == BooleanAlgebra[A].or(a, b)) &&
-      ((a ^ b) == BooleanAlgebra[A].xor(a, b)) &&
-      (~a == BooleanAlgebra[A].complement(a))
+  def testBoolSyntax[A: Bool](a: A, b: A) = {
+    import spire.syntax.bool._
+    ((a & b) == Bool[A].and(a, b)) &&
+      ((a | b) == Bool[A].or(a, b)) &&
+      ((a ^ b) == Bool[A].xor(a, b)) &&
+      (~a == Bool[A].complement(a))
   }
 }
 
