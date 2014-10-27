@@ -129,7 +129,7 @@ trait TrigSyntax {
   implicit def trigOps[A:Trig](a: A) = new TrigOps(a)
 }
 
-trait SemilatticeSyntax {
+trait LatticeSyntax {
   implicit def meetOps[A: MeetSemilattice](a: A) = new MeetOps(a)
   implicit def joinOps[A: JoinSemilattice](a: A) = new JoinOps(a)
 }
@@ -245,7 +245,7 @@ trait AllSyntax extends
     NormedVectorSpaceSyntax with
     InnerProductSpaceSyntax with
     CoordinateSpaceSyntax with
-    SemilatticeSyntax with
+    LatticeSyntax with
     HeytingSyntax with
     BoolSyntax with
     BitStringSyntax with
