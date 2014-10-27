@@ -1,8 +1,8 @@
 package spire.std
 
-import spire.algebra.{BooleanAlgebra, CRig, Order}
+import spire.algebra.{Bool, CRig, Order}
 
-trait BooleanIsBooleanAlgebra extends BooleanAlgebra[Boolean] {
+trait BooleanIsBool extends Bool[Boolean] {
   def one: Boolean = true
   def zero: Boolean = false
   def and(a: Boolean, b: Boolean): Boolean = a & b
@@ -37,8 +37,7 @@ trait BooleanOrder extends Order[Boolean] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class BooleanStructure extends BooleanIsBooleanAlgebra with BooleanIsRig
-with BooleanOrder with Serializable {
+class BooleanStructure extends BooleanIsBool with BooleanIsRig with BooleanOrder with Serializable {
   override def one: Boolean = true
   override def zero: Boolean = false
 }

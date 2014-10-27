@@ -39,7 +39,9 @@ package object syntax {
   object innerProductSpace extends InnerProductSpaceSyntax
   object coordinateSpace extends CoordinateSpaceSyntax
 
-  object booleanAlgebra extends BooleanAlgebraSyntax
+  object lattice extends LatticeSyntax
+  object heyting extends HeytingSyntax
+  object bool extends BoolSyntax
 
   object bitString extends BitStringSyntax
 

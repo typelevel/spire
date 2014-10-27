@@ -6,7 +6,29 @@ import scala.language.higherKinds
 
 object Ops extends machinist.Ops {
 
-  val operatorNames = machinist.DefaultOps.operatorNames
+  def uesc(c: Char): String = "$u%04X".format(c.toInt)
+
+  val operatorNames: Map[String, String] =
+    machinist.DefaultOps.operatorNames ++ Map(
+      // square root
+      (uesc('√'), "sqrt"),
+
+      // equality, comparisons
+      (uesc('≡'), "eqv"),
+      (uesc('≠'), "neqv"),
+      (uesc('≤'), "lteqv"),
+      (uesc('≥'), "gteqv"),
+
+      // lattices/heyting
+      (uesc('∧'), "meet"),
+      (uesc('∨'), "join"),
+      (uesc('⊃'), "imp"),
+      (uesc('¬'), "complement"),
+
+      // bool
+      (uesc('⊻'), "xor"),
+      (uesc('⊼'), "nand"),
+      (uesc('⊽'), "nor"))
 
   def unopWithEv2[Ev1, R](c: Context)(ev1: c.Expr[Ev1]): c.Expr[R] = {
     import c.universe._

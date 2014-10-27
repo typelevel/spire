@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.algebra.lattice.Heyting
+
 /**
  * Implementation of three-valued logic.
  * 
@@ -77,17 +79,33 @@ class Trilean (val value: Int) extends AnyVal { lhs =>
   def unary_! : Trilean =
     if (value == 1) lhs else new Trilean(~lhs.value)
 
+  //   T U F
+  // T T U F
+  // U U U F
+  // F F F F
   def &(rhs: Trilean): Trilean =
     new Trilean(lhs.value & rhs.value)
 
+  //   T U F
+  // T T T T
+  // U T U U
+  // F T U F
   def |(rhs: Trilean): Trilean =
     new Trilean(lhs.value | rhs.value)
 
+  //   T U F
+  // T F U T
+  // U U U U
+  // F T U F
   def ^(rhs: Trilean): Trilean =
     if (lhs.value == 1) lhs
     else if (rhs.value == 1) rhs
     else new Trilean(lhs.value ^ rhs.value)
 
+  //   T U F
+  // T T U F
+  // U T U U
+  // F T T T
   def imp(rhs: Trilean): Trilean =
     (!lhs) | rhs
 
@@ -97,6 +115,10 @@ class Trilean (val value: Int) extends AnyVal { lhs =>
   def nor(rhs: Trilean): Trilean =
     !(lhs | rhs)
 
+  //   T U F
+  // T T U F
+  // U U U U
+  // F F U T
   def nxor(rhs: Trilean): Trilean =
     if (lhs.value == 1) lhs
     else if (rhs.value == 1) rhs
@@ -137,4 +159,15 @@ object Trilean {
     } catch {
       case _: Exception => Unknown
     }
+
+  implicit val algebra = new TrileanAlgebra
+}
+
+class TrileanAlgebra extends Heyting[Trilean] {
+  def one: Trilean = Trilean.True
+  def zero: Trilean = Trilean.True
+  def complement(a: Trilean): Trilean = !a
+  def and(a: Trilean, b: Trilean): Trilean = a & b
+  def or(a: Trilean, b: Trilean): Trilean = a | b
+  def imp(a: Trilean, b: Trilean): Trilean = a imp b
 }
