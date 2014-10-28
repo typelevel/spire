@@ -4,9 +4,10 @@ import scala.language.existentials
 
 import language.experimental.macros
 
-import spire.macros.compat.{resetLocalAttrs, Context}
+import spire.macros.compat.{resetLocalAttrs, termName, Context}
 
 case class ArithmeticOverflowException(message: String) extends ArithmeticException(message)
+
 
 object Checked {
   /**
