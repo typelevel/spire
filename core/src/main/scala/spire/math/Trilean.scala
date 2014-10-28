@@ -165,7 +165,7 @@ object Trilean {
 
 class TrileanAlgebra extends Heyting[Trilean] {
   def one: Trilean = Trilean.True
-  def zero: Trilean = Trilean.True
+  def zero: Trilean = Trilean.False
   def complement(a: Trilean): Trilean = !a
   def and(a: Trilean, b: Trilean): Trilean = a & b
   def or(a: Trilean, b: Trilean): Trilean = a | b
