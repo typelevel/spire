@@ -199,7 +199,7 @@ object SafeLong extends SafeLongInstances {
 
 
 @SerialVersionUID(1L)
-private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong with Serializable {
+private[math] case class SafeLongLong(x: Long) extends SafeLong with Serializable {
 
   def isZero: Boolean = x == 0
   def signum: Int = java.lang.Long.signum(x)
@@ -319,7 +319,7 @@ private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong w
 }
 
 @SerialVersionUID(1L)
-private[math] case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong with Serializable {
+private[math] case class SafeLongBigInt(x: BigInt) extends SafeLong with Serializable {
 
   def isZero: Boolean = x.signum == 0
   def signum: Int = x.signum
