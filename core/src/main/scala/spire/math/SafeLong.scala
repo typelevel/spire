@@ -3,7 +3,7 @@ package spire.math
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.annotation.tailrec
 
-import spire.macros.{Checked2, Checked3}
+import spire.macros.Checked
 
 import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Ring, Signed}
 import spire.std.long._
@@ -204,19 +204,19 @@ private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def signum: Int = java.lang.Long.signum(x)
 
   def +(y: Long): SafeLong =
-    Checked3.tryOrReturn[SafeLong](SafeLongLong(x + y))(SafeLongBigInt(BigInt(x) + y))
+    Checked.tryOrReturn[SafeLong](SafeLongLong(x + y))(SafeLongBigInt(BigInt(x) + y))
 
   def -(y: Long): SafeLong =
-    Checked3.tryOrReturn[SafeLong](SafeLongLong(x - y))(SafeLongBigInt(BigInt(x) - y))
+    Checked.tryOrReturn[SafeLong](SafeLongLong(x - y))(SafeLongBigInt(BigInt(x) - y))
 
   def *(y: Long): SafeLong =
-    Checked3.tryOrReturn[SafeLong](SafeLongLong(x * y))(SafeLongBigInt(BigInt(x) * y))
+    Checked.tryOrReturn[SafeLong](SafeLongLong(x * y))(SafeLongBigInt(BigInt(x) * y))
 
   def /(y: Long): SafeLong =
-    Checked3.tryOrReturn[SafeLong](SafeLongLong(x / y))(SafeLongBigInt(Long.MaxValue) + 1)
+    Checked.tryOrReturn[SafeLong](SafeLongLong(x / y))(SafeLongBigInt(Long.MaxValue) + 1)
 
   def %(y: Long): SafeLong =
-    Checked3.tryOrReturn[SafeLong](SafeLongLong(x % y))(SafeLong.zero)
+    Checked.tryOrReturn[SafeLong](SafeLongLong(x % y))(SafeLong.zero)
 
   def /%(y: Long) =
     if (x == Long.MinValue && y == -1L)
@@ -240,7 +240,7 @@ private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def ^(y: BigInt): SafeLong = SafeLong(y ^ x)
 
   def unary_-(): SafeLong =
-    Checked3.tryOrReturn[SafeLong](SafeLongLong(-x))(SafeLongBigInt(-BigInt(x)))
+    Checked.tryOrReturn[SafeLong](SafeLongLong(-x))(SafeLongBigInt(-BigInt(x)))
 
   override def <(that: SafeLong): Boolean =
     that match {
