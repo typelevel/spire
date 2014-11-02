@@ -24,7 +24,7 @@ object Checked {
    * returned. If an error is detected, an ArithmeticOverflowException
    * will be thrown.
    */
-  def checked[A](n: A): A = macro optionImpl[A]
+  def checked[A](n: A): A = macro checkedImpl[A]
 
   /**
    * Performs overflow checking for Int/Long operations.
@@ -59,16 +59,12 @@ object Checked {
 
   def checkedImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A]): c.Expr[A] = {
     import c.universe._
-    val tree = CheckedRewriter[c.type](c).rewriteSafe[A](n.tree, q"throw new ArithmeticOverflowException()")
-    val resetTree = resetLocalAttrs(c)(tree) // See SI-6711
-    c.Expr[A](resetTree)
+    tryOrElseImpl[A](c)(n)(c.Expr[A](q"throw new spire.macros.ArithmeticOverflowException()"))
   }
 
-  def optionImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A]): c.Expr[A] = {
+  def optionImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A]): c.Expr[Option[A]] = {
     import c.universe._
-    val tree = CheckedRewriter[c.type](c).rewriteSafe[A](q"Some(${n.tree})", q"None")
-    val resetTree = resetLocalAttrs(c)(tree) // See SI-6711
-    c.Expr[A](resetTree)
+    tryOrElseImpl[Option[A]](c)(c.Expr[Option[A]](q"Option(${n.tree})"))(c.Expr[Option[A]](q"None"))
   }
 
   def tryOrReturnImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A])(orElse: c.Expr[A]): c.Expr[A] = {
