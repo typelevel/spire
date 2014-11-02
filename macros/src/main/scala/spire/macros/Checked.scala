@@ -24,7 +24,7 @@ object Checked {
    * returned. If an error is detected, an ArithmeticOverflowException
    * will be thrown.
    */
-  def tryOrError[A](n: A): A = macro optionImpl[A]
+  def checked[A](n: A): A = macro optionImpl[A]
 
   /**
    * Performs overflow checking for Int/Long operations.
@@ -57,7 +57,7 @@ object Checked {
     c.Expr[A](resetTree)
   }
 
-  def tryOrErrorImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A]): c.Expr[A] = {
+  def checkedImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A]): c.Expr[A] = {
     import c.universe._
     val tree = CheckedRewriter[c.type](c).rewriteSafe[A](n.tree, q"throw new ArithmeticOverflowException()")
     val resetTree = resetLocalAttrs(c)(tree) // See SI-6711
