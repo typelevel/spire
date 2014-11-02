@@ -1,7 +1,7 @@
 package spire.benchmark
 
 import scala.util.Random
-import spire.macros.{Checked, Checked2, Checked3, Checked4}
+import spire.macros.Checked
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
@@ -21,6 +21,16 @@ class CheckedBenchmarks extends MyBenchmark {
   override def setUp(): Unit =
     limit = start + len
 
+  def timeOption(reps: Int) = run(reps) {
+    var i = start
+    var sum = 0
+    while (i < limit) {
+      sum = Checked.option(sum + i * i + i).getOrElse(0)
+      i += 1
+    }
+    sum
+  }
+
   def timeChecked(reps: Int) = run(reps) {
     var i = start
     var sum = 0
@@ -31,22 +41,21 @@ class CheckedBenchmarks extends MyBenchmark {
     sum
   }
 
-  def timeChecked2(reps: Int) = run(reps) {
+  def timeTryOrElse(reps: Int) = run(reps) {
     var i = start
     var sum = 0
     while (i < limit) {
-      sum = Checked2.tryOrElse(sum + i * i + i)(0)
+      sum = Checked.tryOrElse(sum + i * i + i)(0)
       i += 1
     }
     sum
   }
 
-
-  def timeChecked4(reps: Int) = run(reps) {
+  def timeIncorrectRaw(reps: Int) = run(reps) {
     var i = start
     var sum = 0
     while (i < limit) {
-      sum = Checked4.tryOrReturn(sum + i * i + i)(0)
+      sum = sum + i * i + i
       i += 1
     }
     sum
