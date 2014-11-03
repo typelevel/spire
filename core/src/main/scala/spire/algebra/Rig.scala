@@ -13,7 +13,7 @@ trait Rig[@spec(Byte, Short, Int, Long, Float, Double) A] extends Semiring[A] wi
    * the multiplicative identity.
    */
   override def pow(a:A, n:Int):A =
-    if (n >= 0) multiplicative.sumn(a, n)
+    if (n >= 0) prodn(a, n)
     else throw new IllegalArgumentException(s"Illegal negative exponent $n to Monoid#pow")
 }
 

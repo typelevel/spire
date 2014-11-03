@@ -38,5 +38,5 @@ final case class ZModule[V](vector: Group[V]) extends Module[V, Int] {
   def zero: V = vector.id
   def negate(v: V): V = vector.inverse(v)
   def plus(v: V, w: V): V = vector.op(v, w)
-  def timesl(k: Int, v: V): V = vector.sumn(v, k)
+  def timesl(k: Int, v: V): V = vector.combinen(v, k)
 }

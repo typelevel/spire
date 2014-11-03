@@ -24,16 +24,16 @@ trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
   /**
    * Return `a` combined with itself `n` times.
    */
-  override def sumn(a: A, n: Int): A =
-    if (n < 0) throw new IllegalArgumentException("Repeated summation for monoids must have reptitions >= 0")
+  override def combinen(a: A, n: Int): A =
+    if (n < 0) throw new IllegalArgumentException("Repeated combination for monoids must have reptitions >= 0")
     else if (n == 0) id
     else if (n == 1) a
-    else sumnAboveOne(a, n)
+    else combinenAboveOne(a, n)
 
   /**
-   *  Given a sequence of `as`, sum them using the monoid and return the total.
+   *  Given a sequence of `as`, combine them using the monoid and return the total.
    */
-  def sum(as: TraversableOnce[A]): A = as.aggregate(id)(op, op)
+  def combine(as: TraversableOnce[A]): A = as.aggregate(id)(op, op)
 }
 
 object Monoid {
