@@ -3,6 +3,8 @@ scala:
   - 2.10.2
   - 2.11.2
 notifications:
-  irc: "chat.freenode.net#spire-math"
+  irc:
+    channels:
+      - "chat.freenode.net#spire-math"
     on_success: change
     on_failure: always
