@@ -2,7 +2,7 @@ package spire.algebra
 
 import scala.{specialized => spec}
 
-trait Trig[@spec(Float, Double) A] {
+trait Trig[@spec(Float, Double) A] extends Any {
   def e: A
   def pi: A
 

@@ -6,16 +6,15 @@ import spire.syntax.euclideanRing._
 
 import scala.{specialized => sp}
 
-trait JoinSemilattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] {
+trait JoinSemilattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any {
   def join(lhs: A, rhs: A): A
 }
 
-trait MeetSemilattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] {
+trait MeetSemilattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any {
   def meet(lhs: A, rhs: A): A
 }
 
-trait Lattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A]
-    extends JoinSemilattice[A] with MeetSemilattice[A]
+trait Lattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with JoinSemilattice[A] with MeetSemilattice[A]
 
 object Lattice {
   def min[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A](implicit ev: Order[A]): Lattice[A] =
@@ -35,13 +34,12 @@ class GcdLcmLattice[@sp(Byte, Short, Int, Long) A: EuclideanRing] extends Lattic
   def join(lhs: A, rhs: A): A = lhs lcm rhs
 }
 
-trait BoundedJoinSemilattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends JoinSemilattice[A] {
+trait BoundedJoinSemilattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with JoinSemilattice[A] {
   def one: A
 }
 
-trait BoundedMeetSemilattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends JoinSemilattice[A] {
+trait BoundedMeetSemilattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with JoinSemilattice[A] {
   def zero: A
 }
 
-trait BoundedLattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A]
-    extends Lattice[A] with BoundedMeetSemilattice[A] with BoundedJoinSemilattice[A]
+trait BoundedLattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Lattice[A] with BoundedMeetSemilattice[A] with BoundedJoinSemilattice[A]

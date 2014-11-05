@@ -26,7 +26,7 @@ object Sign {
   implicit def apply(i: Int): Sign = 
     if (i == 0) Zero else if (i > 0) Positive else Negative
 
-  trait SignAlgebra extends CMonoid[Sign] with Signed[Sign] with Order[Sign] {
+  class SignAlgebra extends CMonoid[Sign] with Signed[Sign] with Order[Sign] {
     def id: Sign = Positive
     def op(a: Sign, b: Sign): Sign = a * b
 
@@ -37,7 +37,7 @@ object Sign {
     def compare(x: Sign, y: Sign): Int = java.lang.Integer.signum(x.toInt - y.toInt)
   }
 
-  implicit final val SignAlgebra = new SignAlgebra {}
+  implicit final val SignAlgebra = new SignAlgebra
 
   implicit final val SignMultiplicativeGroup: MultiplicativeCMonoid[Sign] =
     Multiplicative(SignAlgebra)

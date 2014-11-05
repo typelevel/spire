@@ -4,7 +4,7 @@ import scala.{specialized => spec}
 
 import spire.algebra.{ Trig, IsReal }
 
-trait ConvertableTo[@spec A] {
+trait ConvertableTo[@spec A] extends Any {
   def fromByte(n: Byte): A
   def fromShort(n: Short): A
   def fromInt(n: Int): A
@@ -267,7 +267,7 @@ object ConvertableTo {
     new ConvertableToComplex[A] { val algebra = Integral[A] }
 }
 
-trait ConvertableFrom[@spec A] {
+trait ConvertableFrom[@spec A] extends Any {
   def toByte(a: A): Byte
   def toShort(a: A): Short
   def toInt(a: A): Int

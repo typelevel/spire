@@ -17,7 +17,7 @@ import java.math.MathContext
  * computation and testing if a value is negative may not be ideal. So, do not
  * count on `ArithmeticException`s to save you from bad arithmetic!
  */
-trait NRoot[@spec(Double,Float,Int,Long) A] {
+trait NRoot[@spec(Double,Float,Int,Long) A] extends Any {
   def nroot(a: A, n: Int): A
   def sqrt(a: A): A = nroot(a, 2)
   def fpow(a:A, b:A): A

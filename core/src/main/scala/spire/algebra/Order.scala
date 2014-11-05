@@ -19,7 +19,7 @@ import scala.{specialized => spec}
   * 
   * By the totality law, x <= y and y <= x cannot be both false.
   */
-trait Order[@spec A] extends PartialOrder[A] {
+trait Order[@spec A] extends Any with PartialOrder[A] {
   self =>
 
   def partialCompare(x: A, y: A): Double = compare(x, y).toDouble

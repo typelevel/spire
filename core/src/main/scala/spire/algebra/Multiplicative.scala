@@ -36,7 +36,7 @@ object Multiplicative {
   }
 }
 
-trait MultiplicativeSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] {
+trait MultiplicativeSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any {
   def multiplicative: Semigroup[A] = new Semigroup[A] {
     def op(x: A, y: A): A = times(x, y)
   }
@@ -44,13 +44,13 @@ trait MultiplicativeSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] {
   def times(x: A, y: A): A
 }
 
-trait MultiplicativeCSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends MultiplicativeSemigroup[A] {
+trait MultiplicativeCSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with MultiplicativeSemigroup[A] {
   override def multiplicative: CSemigroup[A] = new CSemigroup[A] {
     def op(x: A, y: A): A = times(x, y)
   }
 }
 
-trait MultiplicativeMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends MultiplicativeSemigroup[A] {
+trait MultiplicativeMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with MultiplicativeSemigroup[A] {
   override def multiplicative: Monoid[A] = new Monoid[A] {
     def id = one
     def op(x: A, y: A): A = times(x, y)
@@ -61,14 +61,14 @@ trait MultiplicativeMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] exten
   def isOne(a: A)(implicit ev: Eq[A]): Boolean = ev.eqv(a, one)
 }
 
-trait MultiplicativeCMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends MultiplicativeMonoid[A] with MultiplicativeCSemigroup[A] {
+trait MultiplicativeCMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with MultiplicativeMonoid[A] with MultiplicativeCSemigroup[A] {
   override def multiplicative: CMonoid[A] = new CMonoid[A] {
     def id = one
     def op(x: A, y: A): A = times(x, y)
   }
 }
 
-trait MultiplicativeGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends MultiplicativeMonoid[A] {
+trait MultiplicativeGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with MultiplicativeMonoid[A] {
   override def multiplicative: Group[A] = new Group[A] {
     def id = one
     def op(x: A, y: A): A = times(x, y)
@@ -79,7 +79,7 @@ trait MultiplicativeGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extend
   def div(x: A, y: A): A
 }
 
-trait MultiplicativeAbGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends MultiplicativeGroup[A] with MultiplicativeCMonoid[A] {
+trait MultiplicativeAbGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with MultiplicativeGroup[A] with MultiplicativeCMonoid[A] {
   override def multiplicative: AbGroup[A] = new AbGroup[A] {
     def id = one
     def op(x: A, y: A): A = times(x, y)
