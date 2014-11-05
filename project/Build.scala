@@ -216,7 +216,7 @@ object MyBuild extends Build {
   // Bit of the tests needed for benchmarks
   lazy val testSamples = Project(
     "matrixTestGen",
-    file("core/src/test/scala/spire/matrix/dense/testgen")).
+    file("tests/src/test/scala/spire/matrix/dense/testgen")).
     dependsOn(core)
   // Tests
 
