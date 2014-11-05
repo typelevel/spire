@@ -525,11 +525,11 @@ trait LayeredLevel3 extends Level3 {
     val aa = blocking.bufferA
     val bb = blocking.bufferB(n)
 
-    val panelB =
+    val blockB =
       if(transB == NoTranspose)
-        (pLo:Int,pHi:Int) => b.block(pLo,pHi)(0,n)
+        (pLo:Int,pHi:Int, nLo:Int,nHi:Int) => b.block(pLo,pHi)(nLo,nHi)
       else
-        (pLo:Int,pHi:Int) => b.block(0,n)(pLo,pHi)
+        (pLo:Int,pHi:Int, nLo:Int,nHi:Int) => b.block(nLo,nHi)(pLo,pHi)
 
     val blockA =
       if(transA == NoTranspose)
@@ -558,7 +558,7 @@ trait LayeredLevel3 extends Level3 {
       //     panel         panel
 
       // pack B(p:p+kc1, :) in a buffer
-      packB(panelB(p,p+kc1), nr, bb)
+      packB(blockB(p,p+kc1, 0,n), nr, bb)
 
       cfor(0)(_ < m, _ + mc) { i =>
         // the last panel is likely smaller
