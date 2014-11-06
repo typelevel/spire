@@ -4,7 +4,7 @@ import scala.{specialized => spec}
 
 import spire.math.{Rational, UInt, ULong}
 
-trait Uniform[@spec A] { self =>
+trait Uniform[@spec A] extends Any { self =>
   /**
    * Return an `A` that is uniformly distributed between `min` and `max` inclusive.
    */

@@ -22,7 +22,7 @@ import scala.{specialized => spec}
   * false     true        = 1.0     (corresponds to x > y)
   * 
   */
-trait PartialOrder[@spec A] extends Eq[A] {
+trait PartialOrder[@spec A] extends Any with Eq[A] {
   self =>
   /** Result of comparing `x` with `y`. Returns NaN if operands
     * are not comparable. If operands are comparable, returns a

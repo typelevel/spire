@@ -3,7 +3,7 @@ package spire.algebra
 import scala.annotation.tailrec
 import scala.{specialized => spec}
 
-trait EuclideanRing[@spec(Byte, Short, Int, Long, Float, Double) A] extends CRing[A] {
+trait EuclideanRing[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with CRing[A] {
   def quot(a: A, b: A): A
   def mod(a: A, b: A): A
   def quotmod(a: A, b: A): (A, A) = (quot(a, b), mod(a, b))

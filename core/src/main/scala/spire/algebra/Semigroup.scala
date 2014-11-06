@@ -6,7 +6,7 @@ import scala.annotation.{ switch, tailrec }
 /**
  * A semigroup is any set `A` with an associative operation (`op`).
  */
-trait Semigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] {
+trait Semigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any {
   def op(x: A, y: A): A
 
   /**
@@ -57,8 +57,7 @@ object Semigroup {
  * 
  * A semigroup is commutative if for all x and y, x |+| y === y |+| x.
  */
-trait CSemigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
-    extends Semigroup[A]
+trait CSemigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Semigroup[A]
 
 object CSemigroup {
   @inline final def apply[A](implicit ev: CSemigroup[A]): CSemigroup[A] = ev

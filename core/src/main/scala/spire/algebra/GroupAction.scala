@@ -10,7 +10,7 @@ import scala.{ specialized => spec }
  * 
  * 2. `scalar.id +> p === p` for all `p` in `P`.
  */
-trait GroupAction[@spec(Int) P, G] {
+trait GroupAction[@spec(Int) P, G] extends Any {
   def actl(g: G, p: P): P
   def actr(p: P, g: G): P
 }
@@ -21,7 +21,7 @@ object GroupAction {
   @inline def multiplicative[P, G](G: MultiplicativeGroupAction[P, G]) = G.multiplicative
 }
 
-trait AdditiveGroupAction[@spec(Int) P, G] { self =>
+trait AdditiveGroupAction[@spec(Int) P, G] extends Any { self =>
   def additive: GroupAction[P, G] = new GroupAction[P, G] {
     def actl(g: G, p: P): P = self.gplusl(g, p)
     def actr(p: P, g: G): P = self.gplusr(p, g)
@@ -31,7 +31,7 @@ trait AdditiveGroupAction[@spec(Int) P, G] { self =>
   def gplusr(p: P, g: G): P
 }
 
-trait MultiplicativeGroupAction[@spec(Int) P, G] { self =>
+trait MultiplicativeGroupAction[@spec(Int) P, G] extends Any { self =>
   def multiplicative: GroupAction[P, G] = new GroupAction[P, G] {
     def actl(g: G, p: P): P = self.gtimesl(g, p)
     def actr(p: P, g: G): P = self.gtimesr(p, g)
