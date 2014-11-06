@@ -77,9 +77,9 @@ trait LayeredLevel3 extends Level3 {
    *
    * Given two matrices A' and B' of respective dimensions m x k and k x n,
    * we are interested in the product C = A B where A is a block of A',
-   * A = A'(i1:i1+mc, p1:p1+kc), and B is a horizontal panel of B',
-   * B = B'(p1:p1+kc, :). Thus C is the block C'(i1:i1+mc, :) of the product
-   * C' = A' B'.
+   * A = A'(i:i+mc, p:p+kc), and B is a horizontal panel of B',
+   * B = B'(p:p+kc, :). Thus C is a contribution to the block C'(i:i+mc, :)
+   * of the product C' = A' B'.
    *
    * This turns out to be the workhorse of high-performance
    * BLAS level3 as explained in details in [1].
