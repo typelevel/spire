@@ -24,8 +24,8 @@ import scala.math.Ordering.Implicits._
  * to create a scratchpad large enough to work with the biggest matrix.
  * Therefore the lower level interfaces (e.g. Hessenberge.DecompositionXXX)
  * do not create a default scratchpad. But they provide an API to query the
- * minimum size of the scratchpad they need, so that client code can create
- * it without having to know about internal algorithmic details.
+ * scratchpad they need, so that client code can create it without having
+ * to know about internal algorithmic details.
  **/
 class Scratchpad(val spec:ScratchpadSpecs)
 {
