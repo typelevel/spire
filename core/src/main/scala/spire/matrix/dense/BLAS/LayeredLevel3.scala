@@ -129,7 +129,7 @@ trait LayeredLevel3 extends Level3 {
     }
 
     /** Provides per-thread instance of blocking */
-    val threadLocalBlocking = new ThreadLocal[Blocking] {
+    val blocking = new ThreadLocal[Blocking] {
         override def initialValue =
           new Blocking(mc=512, kc=256, mr=2, nr=4, np=512)
     }
@@ -516,81 +516,106 @@ trait LayeredLevel3 extends Level3 {
     }
   }
 
-  def gemm(transA:Transposition.Value, transB:Transposition.Value,
-           alpha:Double, a:Matrix, b:Matrix,
-           beta:Double, c:Matrix)
-  {
-    checkGemmPreconditions(transA, transB, alpha, a, b, beta, c)
+  /** Matrix-matrix product based on panel-panel product */
+  trait GEMM {
+    type Carver = (Int,Int, Int,Int) => Matrix
+    type Packer = (Matrix, Int, Long) => Unit
 
-    val (m, n) = c.dimensions
-    val k = if(transB == NoTranspose) b.dimensions._1 else b.dimensions._2
+    /**
+     * Panel-panel product
+     *
+     * Given two matrices A' and B' of respective dimensions m x k and k x n,
+     * we are interested in the product C = A B where A is a vertical panel
+     * of A', A = A'(:, p:p+kc), and B is a horizontal panel of B',
+     * B = B'(p:p+kc, :). Thus C is a contribution to the product C' = A' B'.
+     */
+    def gepp(blockA:Carver, packA:Packer, blockB:Carver, packB:Packer,
+             m:Int, k:Int, n:Int, pLo:Int, pHi:Int, alpha:Double, c:Matrix): Unit
 
-    val blocking = GEBP.threadLocalBlocking.get()
-    val mc = blocking.mc
-    val kc = blocking.kc
-    val mr = blocking.mr
-    val nr = blocking.nr
+    def apply(transA:Transposition.Value, transB:Transposition.Value,
+              alpha:Double, a:Matrix, b:Matrix, beta:Double, c:Matrix)
+    {
+      checkGemmPreconditions(transA, transB, alpha, a, b, beta, c)
 
-    // trivial case
-    if(alpha == 0) {
-      trivialGemm(transA, transB, a, b, beta, c)
-      return
-    }
+      val (m, n) = c.dimensions
+      val k = if(transB == NoTranspose) b.dimensions._1 else b.dimensions._2
 
-    // Charge!
-    val aa = blocking.bufferA.start
-    val bb = blocking.bufferB(n).start
 
-    val blockB =
-      if(transB == NoTranspose)
-        (pLo:Int,pHi:Int, nLo:Int,nHi:Int) => b.block(pLo,pHi)(nLo,nHi)
-      else
-        (pLo:Int,pHi:Int, nLo:Int,nHi:Int) => b.block(nLo,nHi)(pLo,pHi)
+      // trivial case
+      if(alpha == 0) {
+        trivialGemm(transA, transB, a, b, beta, c)
+        return
+      }
 
-    val blockA =
-      if(transA == NoTranspose)
-        (iLo:Int,iHi:Int, pLo:Int,pHi:Int) => a.block(iLo,iHi)(pLo,pHi)
-      else
-        (iLo:Int,iHi:Int, pLo:Int,pHi:Int) => a.block(pLo,pHi)(iLo,iHi)
+      // Charge!
+      val blockB =
+        if(transB == NoTranspose)
+          (pLo:Int,pHi:Int, nLo:Int,nHi:Int) => b.block(pLo,pHi)(nLo,nHi)
+        else
+          (pLo:Int,pHi:Int, nLo:Int,nHi:Int) => b.block(nLo,nHi)(pLo,pHi)
 
-    val packB = if(transB == NoTranspose) GEBP.packColumnSlices(false) _
-                else                      GEBP.packRowSlices(false) _
-    val packA = if(transA == NoTranspose) GEBP.packRowSlices(false) _
-                else                      GEBP.packColumnSlices(false) _
+      val blockA =
+        if(transA == NoTranspose)
+          (iLo:Int,iHi:Int, pLo:Int,pHi:Int) => a.block(iLo,iHi)(pLo,pHi)
+        else
+          (iLo:Int,iHi:Int, pLo:Int,pHi:Int) => a.block(pLo,pHi)(iLo,iHi)
 
-    if(beta == 0)
-      c := 0
-    else if(beta != 1)
-      cforRange2(0 until n, 0 until m) { (j,i) => c(i,j) *= beta }
+      val packB = if(transB == NoTranspose) GEBP.packColumnSlices(false) _
+                  else                      GEBP.packRowSlices(false) _
+      val packA = if(transA == NoTranspose) GEBP.packRowSlices(false) _
+                  else                      GEBP.packColumnSlices(false) _
 
-    cfor(0)(_ < k, _ + kc) { p =>
-      // the last panel is likely smaller
-      val kc1 = math.min(p + kc, k) - p
+      if(beta == 0)
+        c := 0
+      else if(beta != 1)
+        cforRange2(0 until n, 0 until m) { (j,i) => c(i,j) *= beta }
 
-      // we are going to compute the following panel-panel product:
-      //   A(:, p:p+kc1) B(p:p+kc1, :)
-      //   ------\/----- -----\/------
-      //     vertical      horizontal
-      //     panel         panel
-
-      // pack B(p:p+kc1, :) in a buffer
-      packB(blockB(p,p+kc1, 0,n), nr, bb)
-
-      cfor(0)(_ < m, _ + mc) { i =>
+      val kc = GEBP.blocking.get.kc
+      cfor(0)(_ < k, _ + kc) { pLo =>
         // the last panel is likely smaller
-        val mc1 = math.min(i + mc, m) -i
-
-        // we are going to compute the following block-panel product:
-        //   A(i:i+mc1, p:p+kc1) B(p:p+kc1, :)
-
-        // pack A(i:i+mc1, p:p+kc1) in a buffer
-        packA(blockA(i,i+mc1, p,p+kc1), mr, aa)
-
-        // block x panel
-        GEBP(kc1, mr, nr, alpha, aa, bb, c.block(i,i+mc1)(0,n))
+        val pHi = math.min(pLo + kc, k)
+        // C += A(:, pLo:pHi) B(pLo:pHi, :)
+        gepp(blockA, packA, blockB, packB, m, k, n, pLo, pHi, alpha, c)
       }
     }
   }
+
+  /** Serial version of GEMM */
+  object SerialGEMM extends GEMM {
+    def gepp(blockA:Carver, packA:Packer, blockB:Carver, packB:Packer,
+             m:Int, k:Int, n:Int, pLo:Int, pHi:Int, alpha:Double, c:Matrix) {
+      val blocking = GEBP.blocking.get
+      val mc = blocking.mc
+      val kc = pHi - pLo
+      val mr = blocking.mr
+      val nr = blocking.nr
+      val aa = blocking.bufferA.start
+      val bb = blocking.bufferB(n).start
+
+      // pack B(pLo:pHi, :) in a buffer
+      packB(blockB(pLo,pHi, 0,n), nr, bb)
+
+      cfor(0)(_ < m, _ + mc) { iLo =>
+        // the last panel is likely smaller
+        val iHi = math.min(iLo + mc, m)
+
+        // we are going to compute the following block-panel product:
+        //   A(iLo:iHi, pLo:pHi) B(pLo:pHi, :)
+
+        // pack A(iLo:iHi, pLo:pHi) in a buffer
+        packA(blockA(iLo,iHi, pLo,pHi), mr, aa)
+
+        // block x panel
+        GEBP(kc, mr, nr, alpha, aa, bb, c.block(iLo,iHi)(0,n))
+      }
+    }
+  }
+
+
+  def gemm(transA:Transposition.Value, transB:Transposition.Value,
+           alpha:Double, a:Matrix, b:Matrix,
+           beta:Double, c:Matrix) =
+    SerialGEMM(transA, transB, alpha, a, b, beta, c)
 
   def syrk(uplo:UpperOrLower.Value, trans:Transposition.Value,
            alpha:Double, a:Matrix, beta:Double, c:Matrix) {
@@ -1290,7 +1315,7 @@ trait LayeredLevel3 extends Level3 {
 
     val (m, n) = b.dimensions
 
-    val blocking = GEBP.threadLocalBlocking.get()
+    val blocking = GEBP.blocking.get()
     val mc = blocking.mc
     val kc = blocking.kc
     val mr = blocking.mr

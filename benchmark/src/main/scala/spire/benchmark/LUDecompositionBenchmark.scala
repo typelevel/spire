@@ -109,7 +109,7 @@ extends SpireLUDecompositionBenchmark {
   extends SpireLUDecompositionConstructionForBenchmark
   with LU.FusedLeftToRightBlockedDecompositionConstruction {
     val nb = blockSize
-    lazy val blocking = GEBP.threadLocalBlocking.get()
+    lazy val blocking = GEBP.blocking.get()
   }
 }
 

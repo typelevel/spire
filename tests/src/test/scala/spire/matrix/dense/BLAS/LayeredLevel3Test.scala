@@ -55,7 +55,7 @@ class LayeredGemmTest extends FunSuite {
   }
 
   test(s"$title (large matrices)") {
-    val blocking = GEBP.threadLocalBlocking.get
+    val blocking = GEBP.blocking.get
     val mc = blocking.mc
     val kc = blocking.kc
     for{
@@ -78,7 +78,7 @@ trait TRSBPPackingTest extends FunSuite {
 
   val title = s"With kr=$kr"
 
-  val aa = GEBP.threadLocalBlocking.get.bufferA.start
+  val aa = GEBP.blocking.get.bufferA.start
 
   def sample(zeroCond:(Int,Int) => Boolean,
              indicesMapping:(Int,Int,Int) => (Int,Int)) =
@@ -327,9 +327,9 @@ class LayeredTrsmTest extends FunSuite {
 
   test(s"$title (large matrices)") {
     import BLAS.LayeredLevel3._
-    val blockingForGEBP = GEBP.threadLocalBlocking.get()
+    val blockingForGEBP = GEBP.blocking.get()
     val mc = blockingForGEBP.mc
-    val blocking = GEBP.threadLocalBlocking.get()
+    val blocking = GEBP.blocking.get()
     val kc = blocking.kc
     for{
       (m,n) <- Iterator((mc+1, kc+1), (mc+mc/2, kc+kc/2))
