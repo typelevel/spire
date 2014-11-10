@@ -14,9 +14,11 @@ import spire.matrix.dense.tests.RandomUncorrelatedElements
 import org.scalatest.FunSuite
 import org.scalatest.fixture
 
-class LayeredGemmTest extends FunSuite {
-  import BLAS.NaiveLevel3.{gemm => referenceGemm}
-  import BLAS.LayeredLevel3.{gemm => layeredGemm}
+trait LayeredGemmTest extends FunSuite {
+  type GemmType = (Transposition.Value, Transposition.Value,
+                   Double, Matrix, Matrix, Double, Matrix) => Unit
+  val referenceGemm: GemmType
+  val layeredGemm: GemmType
 
   //implicit val gen = Defaults.IntegerGenerator.fromTime(System.nanoTime)
   implicit val gen = Defaults.IntegerGenerator.fromTime(1)
@@ -71,6 +73,11 @@ class LayeredGemmTest extends FunSuite {
              s"[$m x $k] [$k x $n]: layered GEMM disagrees with reference GEMM")
     }
   }
+}
+
+class SerialLayeredGemmTest extends LayeredGemmTest {
+  val referenceGemm = BLAS.NaiveLevel3.gemm _
+  val layeredGemm = BLAS.LayeredLevel3.SerialGEMM.apply _
 }
 
 trait TRSBPPackingTest extends FunSuite {
