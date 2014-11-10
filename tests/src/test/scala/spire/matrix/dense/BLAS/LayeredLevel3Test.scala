@@ -40,7 +40,7 @@ trait LayeredGemmTest extends FunSuite {
 
   val title = "Layered GEMM shall give the same results as reference GEMM"
 
-  test(s"$title (small matrices") {
+  test(s"$title (small matrices)") {
     for {
       (transA, transB, alpha, a, b, beta, c, m, n, k)
           <- elts.matrixProductSample
