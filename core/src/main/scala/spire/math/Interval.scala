@@ -482,7 +482,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     if (k == 1) {
       this
     } else if ((k & 1) == 0 && hasBelow(r.zero)) {
-      sys.error("can't take even root of negative number")
+      throw new IllegalArgumentException("can't take even root of negative number")
     } else {
       this match {
         case All() | Empty() => this
@@ -525,6 +525,16 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def dist(min: A, max: A, epsilon: A)(implicit u: Uniform[A], r: AdditiveGroup[A]): Dist[A] =
     u(bottom(min, epsilon).getOrElse(min), top(epsilon).getOrElse(max))
 
+  /**
+   * Apply the given polynomial to the interval.
+   *
+   * For every point contained in the interval, this method maps that
+   * point through the given polynomial. The resulting interval is the
+   * set of all the translated points. I.e.
+   * 
+   *     result = { p(x) | x ∈ interval }
+   * 
+   */
   def translate(p: Polynomial[A])(implicit ev: Field[A]): Interval[A] = {
     val terms2 = p.terms.map { case Term(c, e) => Term(Interval.point(c), e) }
     val p2 = Polynomial(terms2)
@@ -589,7 +599,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
         case EmptyBound() => ev.zero
         case Open(x) => x + step
         case Closed(x) => x
-        case Unbound() => sys.error(unboundError)
+        case Unbound() => throw new IllegalArgumentException(unboundError)
       }
 
     // build an iterator, using start, step, continue, and test.
@@ -613,7 +623,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     // out which "direction" we are moving (based on the sign of the
     // step) as well as what kind of limiting bounds we have.
     if (step === ev.zero) {
-      sys.error("zero step")
+      throw new IllegalArgumentException("zero step")
     } else if (step > ev.zero) {
       val x = getStart(lowerBound, "positive step with no lower bound")
       val test = (x1: A, x2: A) => x1 < x2
@@ -724,7 +734,8 @@ object Interval {
       case (Closed(x), Open(y)) => Bounded(x, y, closedLowerFlags | openUpperFlags)
       case (Open(x), Closed(y)) => Bounded(x, y, openLowerFlags | closedUpperFlags)
       case (Unbound(), Unbound()) => all
-      case (EmptyBound(), _) | (_, EmptyBound()) => sys.error("Invalid parameters")
+      case (EmptyBound(), _) | (_, EmptyBound()) =>
+        throw new IllegalArgumentException("invalid empty bound")
     }
 
   def fromBounds[A: Order](lower: Bound[A], upper: Bound[A]): Interval[A] =
@@ -739,7 +750,8 @@ object Interval {
       case (Closed(x), Open(y)) => openUpper(x, y)
       case (Open(x), Closed(y)) => openLower(x, y)
       case (Unbound(), Unbound()) => all
-      case (EmptyBound(), _) | (_, EmptyBound()) => sys.error("Invalid parameters")
+      case (EmptyBound(), _) | (_, EmptyBound()) =>
+        throw new IllegalArgumentException("invalid empty bound")
     }
 
   def closed[A: Order](lower: A, upper: A): Interval[A] = {
