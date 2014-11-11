@@ -38,7 +38,7 @@ import scala.math
  */
 trait LayeredLevel3 extends Level3 {
 
-  trait Buffer {
+  trait BufferAPI {
     import sun.misc.Unsafe
     // Using Unsafe.getUnsafe restrics users to trusted code,
     // hence this hack!
@@ -72,6 +72,31 @@ trait LayeredLevel3 extends Level3 {
     def freeBuffer(start:Long) { unsafe.freeMemory(start) }
   }
 
+  class Buffer(var _size:Int) extends BufferAPI {
+    private var _start = newBuffer(_size)
+    def start = _start
+    def size = _size
+    def size_=(s:Int) {
+      if(s != _size) {
+        _start = resizeBuffer(_start, s)
+        _size = s
+      }
+    }
+    override def finalize() {
+      freeBuffer(_start)
+    }
+  }
+
+  object Buffer {
+    def instantiateOrResize(buf:Buffer, size:Int): Buffer = {
+      if(buf == null) new Buffer(size)
+      else {
+        if(buf.size != size) buf.size = size
+        buf
+      }
+    }
+  }
+
   /**
    * Multiplication of a general block and a general panel
    *
@@ -84,7 +109,7 @@ trait LayeredLevel3 extends Level3 {
    * This turns out to be the workhorse of high-performance
    * BLAS level3 as explained in details in [1].
    */
-  object GEBP extends Buffer {
+  object GEBP extends BufferAPI {
 
     /** The blocking policy and buffers used by GEBP */
     class Blocking(val mc:Int, val kc:Int,
@@ -92,23 +117,14 @@ trait LayeredLevel3 extends Level3 {
                    val np:Int) {
 
       /** Buffer to store a block of A of size mc x kc */
-      val bufferA = newBuffer(mc*kc)
+      val bufferA = new Buffer(mc*kc)
 
-      private var actualBufferB = newBuffer(kc*np)
-      private var actualBufferBCols = np
+      private var _bufferB: Buffer = null
 
       /** Buffer to store a panel of B of size kc x n */
       def bufferB(n:Int) = {
-        if(n >= actualBufferBCols) {
-          actualBufferB = resizeBuffer(actualBufferB, kc*n)
-          actualBufferBCols = n
-        }
-        actualBufferB
-      }
-
-      override def finalize() {
-        freeBuffer(bufferA)
-        freeBuffer(actualBufferB)
+        _bufferB = Buffer.instantiateOrResize(_bufferB, kc*n)
+        _bufferB
       }
     }
 
@@ -522,8 +538,8 @@ trait LayeredLevel3 extends Level3 {
     }
 
     // Charge!
-    val aa = blocking.bufferA
-    val bb = blocking.bufferB(n)
+    val aa = blocking.bufferA.start
+    val bb = blocking.bufferB(n).start
 
     val blockB =
       if(transB == NoTranspose)
@@ -612,7 +628,7 @@ trait LayeredLevel3 extends Level3 {
    * By "equivalent", we mean that the resulting buffers have the same exact
    * content.
    */
-  object TRSBP extends Buffer {
+  object TRSBP extends BufferAPI {
 
     /**
      * Pack the lower triangular matrix A by slicing thin bands of columns
@@ -1291,7 +1307,7 @@ trait LayeredLevel3 extends Level3 {
     require(nr == 4)
     require(kc <= mc)
 
-    val aa = blocking.bufferA
+    val aa = blocking.bufferA.start
 
     val hasUnitDiagonal = diag == UnitDiagonal
 
@@ -1302,7 +1318,7 @@ trait LayeredLevel3 extends Level3 {
       // 1. L X = B
       case (FromLeft, Lower, NoTranspose) => {
         val kr = 2
-        val bb = blocking.bufferB(n)
+        val bb = blocking.bufferB(n).start
         cfor(0)(_ < m, _ + kc) { k =>
           val kc1 = math.min(m - k, kc)
           // Solve L(k:k+kc1, k:k+kc1) X(k:k+kc1, :) = B(k:k+kc1, :)
@@ -1325,7 +1341,7 @@ trait LayeredLevel3 extends Level3 {
       // 2. X U = B
       case (FromRight, Upper, NoTranspose) => {
         val kr = 4
-        val bb = blocking.bufferB(m)
+        val bb = blocking.bufferB(m).start
         cfor(0)(_ < n, _ + kc) { k =>
           val kc1 = math.min(n - k, kc)
           // Solve X(:, k:k+kc1) U(k:k+kc1, k:k+kc1) = B(:, k:k+kc1)
@@ -1348,7 +1364,7 @@ trait LayeredLevel3 extends Level3 {
       // 3. U X = B
       case (FromLeft, Upper, NoTranspose) => {
         val kr = 2
-        val bb = blocking.bufferB(n)
+        val bb = blocking.bufferB(n).start
         cfor(m)(_ > 0, _ - kc) { k =>
           val kc1 = math.min(k, kc)
           // Solve U(k-kc1:k, k-kc1:k) X(k-kc1:k, :) = B(k-kc1:k, :)
@@ -1371,7 +1387,7 @@ trait LayeredLevel3 extends Level3 {
       // 4. X L = B
       case (FromRight, Lower, NoTranspose) => {
         val kr = 4
-        val bb = blocking.bufferB(m)
+        val bb = blocking.bufferB(m).start
         cfor(n)(_ > 0, _ - kc) { k =>
           val kc1 = math.min(k, kc)
           // Solve X(:, k-kc1:k) L(k-kc1:k, k-kc1:k) = B(:, k-kc1:k)
@@ -1394,7 +1410,7 @@ trait LayeredLevel3 extends Level3 {
       // 5. L^T X = B
       case (FromLeft, Lower, Transpose) => {
         val kr = 2
-        val bb = blocking.bufferB(n)
+        val bb = blocking.bufferB(n).start
         cfor(m)(_ > 0, _ - kc) { k =>
           val kc1 = math.min(k, kc)
           // Solve L(k-kc1:k, k-kc1:k)^T X(k-kc1:k, :) = B(k-kc1:k, :)
@@ -1417,7 +1433,7 @@ trait LayeredLevel3 extends Level3 {
       // 6. X U^T = B
       case (FromRight, Upper, Transpose) => {
         val kr = 4
-        val bb = blocking.bufferB(m)
+        val bb = blocking.bufferB(m).start
         cfor(n)(_ > 0, _ - kc) { k =>
           val kc1 = math.min(k, kc)
           // Solve X(:, k-kc1:k) U(k-kc1:k, k-kc1:k)^T = B(:, k-kc1:k)
@@ -1440,7 +1456,7 @@ trait LayeredLevel3 extends Level3 {
       // 7. X L^T = B
       case (FromRight, Lower, Transpose) => {
         val kr = 4
-        val bb = blocking.bufferB(m)
+        val bb = blocking.bufferB(m).start
         cfor(0)(_ < n, _ + kc) { k =>
           val kc1 = math.min(n - k, kc)
           // Solve X(:, k:k+kc1) L(k:k+kc1, k:k+kc1)^T = B(:, k:k+kc1)
@@ -1463,7 +1479,7 @@ trait LayeredLevel3 extends Level3 {
       // 8. U^T X = B
       case (FromLeft, Upper, Transpose) => {
         val kr = 2
-        val bb = blocking.bufferB(n)
+        val bb = blocking.bufferB(n).start
         cfor(0)(_ < m, _ + kc) { k =>
           val kc1 = math.min(m - k, kc)
           // Solve U(k:k+kc1, k:k+kc1)^T X(k:k+kc1, :) = B(k:k+kc1, :)

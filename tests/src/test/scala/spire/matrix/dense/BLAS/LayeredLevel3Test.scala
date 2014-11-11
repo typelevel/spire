@@ -78,7 +78,7 @@ trait TRSBPPackingTest extends FunSuite {
 
   val title = s"With kr=$kr"
 
-  val aa = GEBP.threadLocalBlocking.get.bufferA
+  val aa = GEBP.threadLocalBlocking.get.bufferA.start
 
   def sample(zeroCond:(Int,Int) => Boolean,
              indicesMapping:(Int,Int,Int) => (Int,Int)) =

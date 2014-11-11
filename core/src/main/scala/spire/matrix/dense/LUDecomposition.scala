@@ -357,9 +357,9 @@ with BLAS.LayeredLevel3 {
     val kc = blocking.kc
     val mr = blocking.mr
     val nr = blocking.nr
-    val aa = blocking.bufferA
+    val aa = blocking.bufferA.start
     val kr = 2
-    val bb = blocking.bufferB(n)
+    val bb = blocking.bufferB(n).start
     TRSBP.packLowerTriangleAsColumnSlices(a.block(j,j+jb)(j,j+jb),
                                           true, kr, aa)
     GEBP.packColumnSlices(false)(a.block(j,j+jb)(j+jb,n), nr, bb)
