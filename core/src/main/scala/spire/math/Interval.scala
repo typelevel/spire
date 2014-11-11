@@ -548,6 +548,92 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   
   def ⊆(rhs: Interval[A]): Boolean = lhs isSubsetOf rhs
   def ⊇(rhs: Interval[A]): Boolean = lhs isSupersetOf rhs
+
+  // xyz
+
+  /**
+   * Build an Iterator[A] from an Interval[A] and a (step: A)
+   * parameter.
+   * 
+   * A positive 'step' means we are proceeding from the lower bound
+   * up, and a negative 'step' means we are proceeding from the upper
+   * bound down. In each case, the interval must be bounded on the
+   * side we are starting with (though it may be unbound on the
+   * opposite side). A zero 'step' is not allowed.
+   * 
+   * The step is repeatedly added to the starting parameter as long as
+   * the sum remains within the interval. This means that arithmetic
+   * error can accumulate (e.g. with doubles). However, this method
+   * does overflow checking to ensure that Intervals parameterized on
+   * integer types will behave correctly.
+   * 
+   * Users who want to avoid using arithmetic error should consider
+   * starting with an Interval[Rational], calling iterator with the
+   * exact step desired, then mapping to the original type
+   * (e.g. Double). For example:
+   * 
+   *     val ns = Interval.closed(Rational(0), Rational(5))
+   *     val it = ns.iterator(Rational(1, 7)).map(_.toDouble)
+   * 
+   * This method provides some of the same functionality as Scala's
+   * NumericRange class.
+   */
+  def iterator(step: A)(implicit ev: AdditiveMonoid[A]): Iterator[A] = {
+
+    // find the "first" value in our iterator. if step is positive we
+    // proceed from the lower bound up, and if negative from the upper
+    // bound down. thus, we always use addition when dealing with the
+    // step.
+    def getStart(bound: Bound[A], unboundError: String): A =
+      bound match {
+        case EmptyBound() => ev.zero
+        case Open(x) => x + step
+        case Closed(x) => x
+        case Unbound() => sys.error(unboundError)
+      }
+
+    // build an iterator, using start, step, continue, and test.
+    // test is used to detect overflow in cases where it can happen.
+    // it won't always be necessary but there isn't currently a typeclass
+    // that lets us know when we need to do it.
+    def iter(start: A, continue: A => Boolean, test: (A, A) => Boolean): Iterator[A] =
+      new Iterator[A] {
+        var x: A = start
+        var ok: Boolean = true
+        def hasNext: Boolean = ok && continue(x)
+        def next: A = {
+          val r = x
+          val next = x + step
+          if (test(x, next)) { x = next } else { ok = false }
+          r
+        }
+      }
+
+    // build the actual iterator, which primarily relies on figuring
+    // out which "direction" we are moving (based on the sign of the
+    // step) as well as what kind of limiting bounds we have.
+    if (step === ev.zero) {
+      sys.error("zero step")
+    } else if (step > ev.zero) {
+      val x = getStart(lowerBound, "positive step with no lower bound")
+      val test = (x1: A, x2: A) => x1 < x2
+      upperBound match {
+        case EmptyBound() => iter(x, _ => false, test)
+        case Unbound() => iter(x, _ => true, test)
+        case Closed(y) => iter(x, _ <= y, test)
+        case Open(y) => iter(x, _ < y, test)
+      }
+    } else {
+      val x = getStart(upperBound, "negative step with no lower bound")
+      val test = (x1: A, x2: A) => x1 > x2
+      lowerBound match {
+        case EmptyBound() => iter(x, _ => false, test)
+        case Unbound() => iter(x, _ => true, test)
+        case Closed(y) => iter(x, _ >= y, test)
+        case Open(y) => iter(x, _ > y, test)
+      }
+    }
+  }
 }
 
 case class All[A: Order] private[spire] () extends Interval[A] {
