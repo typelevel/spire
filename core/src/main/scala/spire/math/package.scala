@@ -91,7 +91,7 @@ package object math {
   final def floor(n: Float): Float = Math.floor(n).toFloat
   final def floor(n: Double): Double = Math.floor(n)
   final def floor(n: BigDecimal): BigDecimal = n.setScale(0, FLOOR)
-  final def floor[A](a: A)(implicit ev: IsReal[A]): A = ev.ceil(a)
+  final def floor[A](a: A)(implicit ev: IsReal[A]): A = ev.floor(a)
 
   /**
    * round
@@ -218,7 +218,7 @@ package object math {
   // TODO: figure out how much precision we need from log(base) to
   // make the exp() have the right precision
   final def pow(base: BigDecimal, exponent: BigDecimal) =
-    if (exponent.scale == 0 && 0 <= exponent && exponent <= 999999999)
+    if (exponent.abs <= 99999999 && exponent.isWhole)
       base.pow(exponent.toInt)
     else
       exp(log(base) * exponent)
@@ -391,4 +391,9 @@ package object math {
   final def toRadians(a: Double): Double = Math.toRadians(a)
   final def ulp(x: Double): Double = Math.ulp(x)
   final def ulp(x: Float): Double = Math.ulp(x)
+
+  def anyIsZero(n: Any): Boolean = n == 0 || (n match {
+    case (n: scala.math.ScalaNumericConversions) => n.isValidInt && n.toInt == 0
+    case _ => false
+  })
 }

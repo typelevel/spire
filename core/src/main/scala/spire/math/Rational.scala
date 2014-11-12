@@ -8,7 +8,7 @@ import java.lang.Math
 import spire.algebra._
 import spire.algebra.Sign.{ Positive, Zero, Negative }
 
-sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] {
+sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] { lhs =>
   import LongRationals.LongRational
   import BigRationals.BigRational
 
@@ -21,7 +21,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def isWhole: Boolean
 
   // ugh, ScalaNumber and ScalaNumericConversions in 2.10 require this hack
-  override def underlying: List[Any] = sys.error("unimplemented")
+  override def underlying: Object = this
 
   def abs: Rational = if (this < Rational.zero) -this else this
   def inverse: Rational = Rational.one / this
@@ -49,9 +49,11 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   override def shortValue = longValue.toShort
   override def byteValue = longValue.toByte
 
-  def floor: Rational = Rational(toBigInt)
-  def ceil: Rational = if (denominator == 1) floor else Rational(toBigInt + 1)
+  def floor: Rational
+  def ceil: Rational
   def round: Rational
+
+  def roundTo(denom: SafeLong): Rational = (this * denom).round / denom
 
   def pow(exp: Int): Rational
 
@@ -183,6 +185,12 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def compareToOne: Int
 
+  def min(rhs: Rational): Rational =
+    if ((lhs compare rhs) < 0) lhs else rhs
+
+  def max(rhs: Rational): Rational =
+    if ((lhs compare rhs) > 0) lhs else rhs
+
   /**
    * Returns a `Rational` whose numerator and denominator both fit in an `Int`.
    */
@@ -281,7 +289,9 @@ object Rational extends RationalInstances {
   val one: Rational = LongRational(1L, 1L)
   
   def apply(n: SafeLong, d: SafeLong): Rational = {
-    n.foldWith[Rational,LongRational,BigRational](d)(LongRational(_, _), BigRational(_, _))
+    if (d < 0) return apply(-n, -d)
+    val g = n gcd d
+    (n / g).foldWith[Rational,LongRational,BigRational](d / g)(LongRational(_, _), BigRational(_, _))
   }
 
   def apply(n: Long, d: Long): Rational = LongRationals.build(n, d)
@@ -290,10 +300,13 @@ object Rational extends RationalInstances {
   protected[math] def unsafeBuild(n: Long, d: Long) = LongRationals.unsafeBuild(n, d)
   protected[math] def unsafeBuild(n: BigInt, d: BigInt) = BigRationals.unsafeBuild(n, d)
 
-  implicit def apply(x:Long): Rational = LongRationals.build(x, 1L)
-  implicit def apply(x:BigInt): Rational = BigRationals.build(x, BigInt(1))
+  implicit def apply(x: Int): Rational = LongRationals.build(x, 1L)
+  implicit def apply(x: Long): Rational = LongRationals.build(x, 1L)
+  implicit def apply(x: BigInt): Rational = BigRationals.build(x, BigInt(1))
 
-  implicit def apply(x:Double): Rational = {
+  implicit def apply(x: Float): Rational = apply(x.toDouble)
+
+  implicit def apply(x: Double): Rational = {
     val bits = java.lang.Double.doubleToLongBits(x)
     val value = if ((bits >> 63) < 0) -(bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L)
                 else (bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L)
@@ -416,8 +429,6 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
 
     def isWhole: Boolean = den == one
 
-    override def underlying = List(num, den)
-
     def toBigInt: BigInt = (integral.toBigInt(num) / integral.toBigInt(den))
     def toBigDecimal: BigDecimal = integral.toBigDecimal(num) / integral.toBigDecimal(den)
 
@@ -465,15 +476,16 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
       else 29 * (37 * num.## + den.##)
 
     override def equals(that: Any): Boolean = that match {
-      //case that: Rational with Fraction[_] => num == that.num && den == that.den
+      case that: Real => this == that.toRational
+      case that: Algebraic => that == this
       case that: RationalLike => num == that.num && den == that.den
       case that: BigInt => isWhole && toBigInt == that
-      case that: BigDecimal =>
-        try {
-          toBigDecimal == that
-        } catch {
-          case ae: ArithmeticException => false
-        }
+      case that: BigDecimal => try { toBigDecimal == that } catch { case ae: ArithmeticException => false }
+      case that: SafeLong => SafeLong(toBigInt) == that
+      case that: Number => Number(this) == that
+      case that: Natural => isWhole && this == Rational(that.toBigInt)
+      case that: Complex[_] => that == this
+      case that: Quaternion[_] => that == this
       case that => unifiedPrimitiveEquals(that)
     }
 
@@ -490,10 +502,14 @@ private[math] object LongRationals extends Rationals[Long] {
 
   def build(n: Long, d: Long): Rational = {
     if (d == 0) throw new IllegalArgumentException("0 denominator")
-    unsafeBuild(n, d)
+    else if (d > 0) unsafeBuild(n, d)
+    else if (n == Long.MinValue || d == Long.MinValue) Rational(-BigInt(n), -BigInt(d))
+    else unsafeBuild(-n, -d)
   }
 
   def unsafeBuild(n: Long, d: Long): Rational = {
+    if (n == 0L) return Rational.zero
+
     val divisor = spire.math.gcd(n, d)
     if (divisor == 1L) {
       if (d < 0)
@@ -519,20 +535,17 @@ private[math] object LongRationals extends Rationals[Long] {
     def numeratorAsLong: Long = n
     def denominatorAsLong: Long = d
 
-    def reciprocal = if (n == 0L)
-      throw new ArithmeticException("reciprocal called on 0/1")
-    else if (n < 0L)
-      LongRational(-d, -n)
-    else
-      LongRational(d, n)
+    def reciprocal =
+      if (n == 0L) throw new ArithmeticException("reciprocal called on 0/1")
+      else if (n > 0L) LongRational(d, n)
+      else if (n == Long.MinValue || d == Long.MinValue) BigRational(-BigInt(d), -BigInt(n))
+      else LongRational(-d, -n)
 
-    override def signum: Int = if (n > 0) 1 else if (n < 0) -1 else 0
+    override def signum: Int = java.lang.Long.signum(n)
 
-    override def unary_-(): Rational = if (n == Long.MinValue) {
-      BigRational(-BigInt(Long.MinValue), BigInt(d))
-    } else {
-      LongRational(-n, d)
-    }
+    override def unary_-(): Rational =
+      if (n == Long.MinValue) BigRational(-BigInt(Long.MinValue), BigInt(d))
+      else LongRational(-n, d)
 
     def +(r: Rational): Rational = r match {
       case r: LongRationals.LongRational =>
@@ -636,6 +649,7 @@ private[math] object LongRationals extends Rationals[Long] {
 
     def /(r: Rational): Rational = {
       if (r == Rational.zero) throw new ArithmeticException("divide (/) by 0")
+      if (this == Rational.zero) return this
       r match {
         case r: LongRationals.LongRational => {
           val a = spire.math.gcd(n, r.n)
@@ -680,10 +694,24 @@ private[math] object LongRationals extends Rationals[Long] {
         }
     }
 
-    def round: Rational = {
-      val m = (n % d).abs
-      if (m >= (d - m).abs) Rational(n / d + 1) else Rational(n / d)
-    }
+    def floor: Rational =
+      if (d == 1L) this
+      else if (n >= 0) Rational(n / d, 1L)
+      else Rational(n / d - 1L, 1L)
+
+    def ceil: Rational =
+      if (d == 1L) this
+      else if (n >= 0) Rational(n / d + 1L, 1L)
+      else Rational(n / d, 1L)
+
+    def round: Rational =
+      if (n >= 0) {
+        val m = (n % d)
+        if (m >= (d - m)) Rational(n / d + 1) else Rational(n / d)
+      } else {
+        val m = -(n % d)
+        if (m >= (d - m)) Rational(n / d - 1) else Rational(n / d)
+      }
 
     def pow(exp: Int): Rational = if (exp == 0)
       Rational.one
@@ -718,10 +746,13 @@ private[math] object BigRationals extends Rationals[BigInt] {
 
   def build(n: BigInt, d: BigInt): Rational = {
     if (d == 0) throw new IllegalArgumentException("0 denominator")
-    unsafeBuild(n, d)
+    else if (d > 0) unsafeBuild(n, d)
+    else unsafeBuild(-n, -d)
   }
 
   def unsafeBuild(n: BigInt, d:BigInt): Rational = {
+    if (n == 0) return Rational.zero
+
     val gcd = n.gcd(d)
     if (gcd == 1) {
       if (d < 0)
@@ -829,10 +860,24 @@ private[math] object BigRationals extends Rationals[BigInt] {
         }
     }
 
-    def round: Rational = {
-      val m = (n % d).abs
-      if (m >= (d - m).abs) Rational(n / d + 1) else Rational(n / d)
-    }
+    def floor: Rational =
+      if (d == 1) this
+      else if (n >= 0) Rational(n / d, BigInt(1))
+      else Rational(n / d - 1, BigInt(1))
+
+    def ceil: Rational =
+      if (d == 1) this
+      else if (n >= 0) Rational(n / d + 1, BigInt(1))
+      else Rational(n / d, BigInt(1))
+
+    def round: Rational =
+      if (n >= 0) {
+        val m = (n % d)
+        if (m >= (d - m)) Rational(n / d + 1) else Rational(n / d)
+      } else {
+        val m = -(n % d)
+        if (m >= (d - m)) Rational(n / d - 1) else Rational(n / d)
+      }
 
     def pow(exp: Int): Rational = if (exp == 0)
       Rational.one

@@ -29,10 +29,7 @@ class UShort(val signed: Char) extends AnyVal {
 
   override def toString: String = toInt.toString
   
-  def == (that: Long): Boolean = this.signed == that.toShort
   def == (that: UShort): Boolean = this.signed == that.signed
-
-  def != (that: Long): Boolean = this.signed != that.toShort
   def != (that: UShort): Boolean = this.signed != that.signed
 
   def <= (that: UShort) = this.signed <= that.signed
@@ -120,7 +117,7 @@ private[math] class UShortBitString extends BitString[UShort] with Serializable 
 }
 
 private[math] trait UShortIsSigned extends Signed[UShort] {
-  def signum(a: UShort): Int = if (a == UShort(0)) 0 else 1
+  def signum(a: UShort): Int = java.lang.Integer.signum(a.signed) & 1
   def abs(a: UShort): UShort = a
 }
 

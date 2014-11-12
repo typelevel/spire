@@ -7,33 +7,33 @@ import spire.algebra._
 
 object Auto {
   object scala {
-    def semiring[A] = macro ScalaAutoMacros.semiringImpl[A]
-    def rig[A](z: A, o: A) = macro ScalaAutoMacros.rigImpl[A]
-    def rng[A](z: A) = macro ScalaAutoMacros.rngImpl[A]
-    def ring[A](z: A, o: A) = macro ScalaAutoMacros.ringImpl[A]
-    def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]) = macro ScalaAutoMacros.euclideanRingImpl[A]
-    def field[A](z: A, o: A)(implicit ev: Eq[A]) = macro ScalaAutoMacros.fieldImpl[A]
-    def eq[A] = macro ScalaAutoMacros.eqImpl[A]
-    def order[A] = macro ScalaAutoMacros.orderImpl[A]
+    def semiring[A]: Semiring[A] = macro ScalaAutoMacros.semiringImpl[A]
+    def rig[A](z: A, o: A): Rig[A] = macro ScalaAutoMacros.rigImpl[A]
+    def rng[A](z: A): Rng[A] = macro ScalaAutoMacros.rngImpl[A]
+    def ring[A](z: A, o: A): Ring[A] = macro ScalaAutoMacros.ringImpl[A]
+    def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]): EuclideanRing[A] = macro ScalaAutoMacros.euclideanRingImpl[A]
+    def field[A](z: A, o: A)(implicit ev: Eq[A]): Field[A] = macro ScalaAutoMacros.fieldImpl[A]
+    def eq[A]: Eq[A] = macro ScalaAutoMacros.eqImpl[A]
+    def order[A]: Order[A] = macro ScalaAutoMacros.orderImpl[A]
 
     object collection {
-      def semigroup[A] = macro ScalaAutoMacros.collectionSemigroupImpl[A]
-      def monoid[A](z: A) = macro ScalaAutoMacros.collectionMonoidImpl[A]
+      def semigroup[A]: Semigroup[A] = macro ScalaAutoMacros.collectionSemigroupImpl[A]
+      def monoid[A](z: A): Monoid[A] = macro ScalaAutoMacros.collectionMonoidImpl[A]
     }
   }
 
   object java {
-    def semiring[A] = macro JavaAutoMacros.semiringImpl[A]
-    def rig[A](z: A, o: A) = macro JavaAutoMacros.rigImpl[A]
-    def rng[A](z: A) = macro JavaAutoMacros.rngImpl[A]
-    def ring[A](z: A, o: A) = macro JavaAutoMacros.ringImpl[A]
-    def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]) = macro JavaAutoMacros.euclideanRingImpl[A]
-    def field[A](z: A, o: A)(implicit ev: Eq[A]) = macro JavaAutoMacros.fieldImpl[A]
-    def eq[A] = macro JavaAutoMacros.eqImpl[A]
-    def order[A] = macro JavaAutoMacros.orderImpl[A]
+    def semiring[A]: Semiring[A] = macro JavaAutoMacros.semiringImpl[A]
+    def rig[A](z: A, o: A): Rig[A] = macro JavaAutoMacros.rigImpl[A]
+    def rng[A](z: A): Rng[A] = macro JavaAutoMacros.rngImpl[A]
+    def ring[A](z: A, o: A): Ring[A] = macro JavaAutoMacros.ringImpl[A]
+    def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]): EuclideanRing[A] = macro JavaAutoMacros.euclideanRingImpl[A]
+    def field[A](z: A, o: A)(implicit ev: Eq[A]): Field[A] = macro JavaAutoMacros.fieldImpl[A]
+    def eq[A]: Eq[A] = macro JavaAutoMacros.eqImpl[A]
+    def order[A]: Order[A] = macro JavaAutoMacros.orderImpl[A]
 
     object collection {
-      def monoid[A](empty: A) = macro JavaAutoMacros.collectionMonoidImpl[A]
+      def monoid[A](empty: A): Monoid[A] = macro JavaAutoMacros.collectionMonoidImpl[A]
     }
   }
 }

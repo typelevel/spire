@@ -13,6 +13,8 @@ sealed abstract class Sign(val toInt: Int) {
   }
 
   def *(that: Sign): Sign = Sign(this.toInt * that.toInt)
+
+  def **(that: Int): Sign = Sign(spire.math.pow(this.toInt, that).toInt)
 }
 
 object Sign {

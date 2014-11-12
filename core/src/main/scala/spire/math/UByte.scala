@@ -10,28 +10,35 @@ object UByte extends UByteInstances {
   @inline final def MaxValue = UByte(-1)
 }
 
-class UByte(val signed: Byte) extends AnyVal {
-  def toByte: Byte = signed
-  def toChar: Char = (signed & 0xff).toChar
-  def toShort: Short = (signed & 0xff).toShort
-  def toInt: Int = signed & 0xff
-  def toLong: Long = signed & 0xffL
-  def toFloat: Float = toInt.toFloat
-  def toDouble: Double = toInt.toDouble
+class UByte(val signed: Byte) extends AnyVal with scala.math.ScalaNumericAnyConversions {
+  override def toByte: Byte = signed
+  override def toChar: Char = (signed & 0xff).toChar
+  override def toShort: Short = (signed & 0xff).toShort
+  override def toInt: Int = signed & 0xff
+  override def toLong: Long = signed & 0xffL
+  override def toFloat: Float = toInt.toFloat
+  override def toDouble: Double = toInt.toDouble
   def toBigInt: BigInt = BigInt(toInt)
 
-  def isValidByte = signed >= 0
-  def isValidShort = true
-  def isValidChar = true
-  def isValidInt = true
+  def byteValue(): Byte = toByte
+  def shortValue(): Short = toShort
+  def intValue(): Int = toInt
+  def longValue(): Long = toLong
+  def floatValue(): Float = toFloat
+  def doubleValue(): Double = toDouble
+
+  def isWhole(): Boolean = true
+  def underlying(): Any = signed
+
+  override def isValidByte = signed >= 0
+  override def isValidShort = true
+  override def isValidChar = true
+  override def isValidInt = true
   def isValidLong = true
 
   override def toString: String = toInt.toString
   
-  def == (that: Long): Boolean = this.signed == that.toByte
   def == (that: UByte): Boolean = this.signed == that.signed
-
-  def != (that: Long): Boolean = this.signed != that.toByte
   def != (that: UByte): Boolean = this.signed != that.signed
 
   def <= (that: UByte) = this.toInt <= that.toInt
@@ -87,7 +94,7 @@ private[math] trait UByteOrder extends Order[UByte] {
 }
 
 private[math] trait UByteIsSigned extends Signed[UByte] {
-  def signum(a: UByte): Int = if (a == UByte(0)) 0 else 1
+  def signum(a: UByte): Int = java.lang.Integer.signum(a.signed) & 1
   def abs(a: UByte): UByte = a
 }
 

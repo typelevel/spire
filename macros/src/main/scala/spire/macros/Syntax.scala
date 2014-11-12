@@ -21,8 +21,13 @@ case class SyntaxUtil[C <: Context with Singleton](val c: C) {
     }
 }
 
+// This is Scala reflection source compatibility hack between Scala 2.10 and 2.11
+private object HasCompat { val compat = ??? }; import HasCompat._
+
 class InlineUtil[C <: Context with Singleton](val c: C) {
   import c.universe._
+  // This is Scala reflection source compatibility hack between Scala 2.10 and 2.11
+  import compat._
 
   def inlineAndReset[T](tree: Tree): c.Expr[T] = {
     val inlined = inlineApplyRecursive(tree)
@@ -73,6 +78,7 @@ object Syntax {
   def cforMacro[A](c: Context)(init: c.Expr[A])
      (test: c.Expr[A => Boolean], next: c.Expr[A => A])
      (body: c.Expr[A => Unit]): c.Expr[Unit] = {
+
 
     import c.universe._
     val util = SyntaxUtil[c.type](c)

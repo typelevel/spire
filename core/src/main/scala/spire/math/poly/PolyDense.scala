@@ -46,10 +46,27 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
     coeffs.length == 0
 
   def apply(x: C)(implicit ring: Semiring[C]): C = {
-    val cs = coeffs
-    var c = cs(cs.length - 1)
-    cfor(cs.length - 2)(_ >= 0, _ - 1) { i => c = cs(i) + c * x }
-    c
+    if (isZero) return ring.zero
+
+    var even = coeffs.length - 1
+    var odd = coeffs.length - 2
+    if ((even & 1) == 1) { even = odd; odd = coeffs.length - 1 }
+
+    var c0 = coeffs(even)
+    val x2 = x.pow(2)
+    cfor(even - 2)(_ >= 0, _ - 2) { i =>
+      c0 = coeffs(i) + c0 * x2
+    }
+
+    if (odd >= 1) {
+      var c1 = coeffs(odd)
+      cfor(odd - 2)(_ >= 1, _ - 2) { i =>
+        c1 = coeffs(i) + c1 * x2
+      }
+      c0 + c1 * x
+    } else {
+      c0
+    }
   }
 
   def derivative(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] = {
@@ -114,7 +131,15 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
         (polyFromCoeffsLE(q), polyFromCoeffsBE(u))
       } else {
         val v0 = if (rhs.isZero) field.zero else rhs.maxOrderTermCoeff
-        val q0 = u(0) / v0
+        val q0 = try {
+          val q0 = u(0) / v0
+          q0
+        } catch {
+          case e: Exception =>
+            println("%s %s" format (rhs.isZero, v0))
+            println("%s / %s exploded" format (u(0), v0))
+            throw e
+        }
         val uprime = zipSum(u, rhs.coeffsArray.reverse.map(_ * -q0))
         eval(Array(q0) ++ q, uprime, n - 1)
       }

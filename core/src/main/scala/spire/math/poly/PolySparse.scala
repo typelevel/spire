@@ -48,7 +48,10 @@ case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val
   private final def expBits(x: C)(implicit ring: Semiring[C]): Array[C] = {
     val bits = new Array[C](math.max(2, 32 - numberOfLeadingZeros(degree)))
     bits(0) = x
-    cfor(1)(_ < bits.length, _ + 1) { i =>
+    // we use pow(2) here for the benefit of Interval[_], where
+    // x.pow(2) has better error bounds than than (x * x).
+    if (bits.length > 1) bits(1) = x.pow(2)
+    cfor(2)(_ < bits.length, _ + 1) { i =>
       val prev = bits(i - 1)
       bits(i) = prev * prev
     }

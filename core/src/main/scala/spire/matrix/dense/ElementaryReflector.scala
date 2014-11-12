@@ -46,7 +46,7 @@ trait ElementaryReflectorLike extends BLAS.Level2 with BLAS.Level1 {
    *
    * It is required to have a defined value only if tau is non-zero
    */
-  val essentialPart:VectorLike
+  val essentialPart:Vector
 
   def isIdentity = tau == 0
 
@@ -70,8 +70,11 @@ trait ElementaryReflectorLike extends BLAS.Level2 with BLAS.Level1 {
    *
    * then this is p
    */
-  val vectorNonZeroEndIndex: Int =
-    essentialPart.lastIndexWhere(_ != 0) + 2
+  val vectorNonZeroEndIndex: Int = {
+    var i = essentialPart.dimension - 1
+    while(i >= 0 && essentialPart(i) == 0) i -= 1
+    i + 2
+  }
 
   /**
    * Apply H on the left of C, in-place
@@ -83,7 +86,7 @@ trait ElementaryReflectorLike extends BLAS.Level2 with BLAS.Level1 {
    * Reference: subroutine DLARF in LAPACK [1] (our implementation
    * differs because we do not have the whole vector of the reflector)
    */
-  def applyOnLeft(c:MatrixLike)(implicit work:Scratchpad) {
+  def applyOnLeft(c:Matrix)(implicit work:Scratchpad) {
     /**
      * Decompose our vector v as
      *
@@ -136,7 +139,7 @@ trait ElementaryReflectorLike extends BLAS.Level2 with BLAS.Level1 {
    * Reference: subroutine DLARF in LAPACK [1] (our implementation
    * differs because we do not have the whole vector of the reflector)
    */
-  def applyOnRight(c:MatrixLike)(implicit work:Scratchpad) {
+  def applyOnRight(c:Matrix)(implicit work:Scratchpad) {
     /**
      * Decompose our vector v as
      *
@@ -189,7 +192,7 @@ trait ElementaryReflectorLikeCompanion
   val safeMinInv = 1.0/safeMin
 
   /** Factory method */
-  def apply(tau:Double, v:VectorLike): ElementaryReflectorLike
+  def apply(tau:Double, v:Vector): ElementaryReflectorLike
 
   /**
    * Construct a reflector whose application to y zeroes all but y(0)
@@ -230,10 +233,10 @@ trait ElementaryReflectorLikeCompanion
    *     Society for Industrial and Applied Mathematics,
    *     Philadelphia, PA, Third.
    */
-  def annihilateAndConstruct(y:VectorLike): ElementaryReflectorLike = {
-    if(y.length <= 1) this(0, Vector.empty(0))
+  def annihilateAndConstruct(y:Vector): ElementaryReflectorLike = {
+    if(y.dimension <= 1) this(0, Vector.empty(0))
     else {
-      var x = y.block(1, y.length)
+      var x = y.block(1, y.dimension)
       var xNorm = euclideanNorm(x)
       if(xNorm == 0) this(0, x)
       else { // Non-trivial case
@@ -274,13 +277,13 @@ trait ElementaryReflectorLikeCompanion
 
 
 class ElementaryReflectorWithNaiveBLAS(val tau:Double,
-                                       val essentialPart:VectorLike)
+                                       val essentialPart:Vector)
 extends ElementaryReflectorLike with BLAS.NaiveLevel1 with BLAS.NaiveLevel2
 
 object ElementaryReflectorWithNaiveBLAS
 extends ElementaryReflectorLikeCompanion
 with BLAS.NaiveLevel1 with BLAS.NaiveLevel2 {
-  def apply(tau:Double, v:VectorLike) =
+  def apply(tau:Double, v:Vector) =
     new ElementaryReflectorWithNaiveBLAS(tau, v)
 }
 
@@ -309,7 +312,7 @@ final class TinyElementaryReflector private[this](tau:Double,
    * Denoting by H this reflector, perform C(i:i+n, j1:j2) := H C(i:i+n, j1:j2)
    * where i = startingRow and (j1, j2) = columns
    */
-  def applyOnLeft(c:MatrixLike)(startingRow:Int,
+  def applyOnLeft(c:Matrix)(startingRow:Int,
                                 columns:(Int, Int)=(0, c.dimensions._2)) {
     val i = startingRow
     val (j1, j2) = columns
@@ -326,7 +329,7 @@ final class TinyElementaryReflector private[this](tau:Double,
    * Denoting by H this reflector, perform C(i1:i2, j:j+n) := C(i1:i2, j:j+n) H
    * where j = startingColumn and (i1, i2) = rows
    */
-  def applyOnRight(c:MatrixLike)(startingColumn:Int,
+  def applyOnRight(c:Matrix)(startingColumn:Int,
                                  rows:(Int, Int)=(0, c.dimensions._1)) {
     val (i1, i2) = rows
     val j = startingColumn
@@ -342,10 +345,10 @@ final class TinyElementaryReflector private[this](tau:Double,
 
 object TinyElementaryReflector {
 
-    def annihilateAndConstruct(y:VectorLike) = {
-      require(y.length == 2 || y.length == 3)
+    def annihilateAndConstruct(y:Vector) = {
+      require(y.dimension == 2 || y.dimension == 3)
       val h = ElementaryReflectorWithNaiveBLAS.annihilateAndConstruct(y)
-      if(y.length == 2)
+      if(y.dimension == 2)
         new TinyElementaryReflector(h.tau,
                                     h.essentialPart(0))
       else

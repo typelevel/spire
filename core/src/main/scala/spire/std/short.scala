@@ -19,6 +19,29 @@ trait ShortIsEuclideanRing extends EuclideanRing[Short] {
   def gcd(a: Short, b: Short): Short = spire.math.gcd(a, b).toShort
 }
 
+// Not included in Instances trait.
+trait ShortIsNRoot extends NRoot[Short] {
+  def nroot(x: Short, n: Int): Short = {
+    def findnroot(prev: Int, add: Int): Short = {
+      val next = prev | add
+      val e = Math.pow(next, n)
+
+      if (e == x || add == 0) {
+        next.toShort
+      } else if (e <= 0 || e > x) {
+        findnroot(prev, add >> 1)
+      } else {
+        findnroot(next, add >> 1)
+      }
+    }
+
+    findnroot(0, 1 << ((33 - n) / n))
+  }
+
+  def log(a: Short) = Math.log(a.toDouble).toShort
+  def fpow(a: Short, b: Short) = Math.pow(a, b).toShort
+}
+
 trait ShortOrder extends Order[Short] {
   override def eqv(x:Short, y:Short) = x == y
   override def neqv(x:Short, y:Short) = x != y
@@ -26,7 +49,7 @@ trait ShortOrder extends Order[Short] {
   override def gteqv(x: Short, y: Short) = x >= y
   override def lt(x: Short, y: Short) = x < y
   override def lteqv(x: Short, y: Short) = x <= y
-  def compare(x: Short, y: Short) = if (x < y) -1 else if (x > y) 1 else 0
+  def compare(x: Short, y: Short) = x - y
 }
 
 trait ShortIsSigned extends Signed[Short] {

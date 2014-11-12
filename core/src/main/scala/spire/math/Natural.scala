@@ -3,6 +3,7 @@ package spire.math
 import spire.algebra._
 
 import scala.annotation.tailrec
+import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.{specialized => spec}
 
 import Natural._
@@ -18,7 +19,8 @@ import Natural._
 // use in Scala, we should be able to efficiently build Digit chains
 // in a tail-recursive way.
 
-sealed trait Natural {
+@SerialVersionUID(0L)
+sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions with Serializable {
   lhs =>
 
   def digit: UInt
@@ -37,7 +39,7 @@ sealed trait Natural {
 
   def getNumBits: Int = {
     @tailrec
-    def bit(n: UInt, b: Int): Int = if (n == 0) b else bit(n >>> 1, b + 1)
+    def bit(n: UInt, b: Int): Int = if (n == UInt(0)) b else bit(n >>> 1, b + 1)
 
     @tailrec
     def recur(next: Natural, b: Int): Int = next match {
@@ -106,9 +108,16 @@ sealed trait Natural {
     recur(reversed).reversed
   }
 
-  def toInt: Int = digit.toInt & 0x7fffffff
+  def isWhole: Boolean = true
+  def underlying: Object = this
+  def intValue: Int = toInt
+  def longValue: Long = toLong
+  def floatValue: Float = toBigInt.toFloat
+  def doubleValue: Double = toBigInt.toDouble
 
-  def toLong: Long = this match {
+  override def toInt: Int = digit.toInt & 0x7fffffff
+
+  override def toLong: Long = this match {
     case End(d) => d.toLong
     case Digit(d, tail) => (tail.toLong << 32L) + d.toLong
   }
@@ -126,7 +135,7 @@ sealed trait Natural {
           d.toLong.toString + s
         case Digit(d, tail) =>
           val (q, r) = next /% Natural.denom
-          if (q == UInt(0))
+          if (q.isZero)
             r.digit.toLong.toString + s
           else
             recur(q, "%09d%s" format (r.digit.toLong, s))
@@ -166,7 +175,7 @@ sealed trait Natural {
       if ((n.signed & -n.signed) != n.signed) return -1
       // TODO: this could be better/faster
       var i = 1
-      while (i < 32 && (n >>> i) != 0) i += 1
+      while (i < 32 && (n >>> i) != UInt(0)) i += 1
       i - 1
     }
 
@@ -219,7 +228,16 @@ sealed trait Natural {
   final override def equals(rhs: Any): Boolean = rhs match {
     case rhs: Natural => (lhs compare rhs) == 0
     case rhs: UInt => (lhs compare rhs) == 0
-    case _ => false
+    case rhs: BigInt => lhs.toBigInt == rhs
+    case rhs: SafeLong => SafeLong(lhs.toBigInt) == rhs
+    case rhs: BigDecimal => rhs.isWhole && lhs.toBigInt == rhs
+    case rhs: Rational => rhs.isWhole && Rational(lhs.toBigInt) == rhs
+    case rhs: Algebraic => rhs == lhs
+    case rhs: Real => lhs == rhs.toRational
+    case rhs: Number => Number(lhs.toBigInt) == rhs
+    case rhs: Complex[_] => rhs == lhs
+    case rhs: Quaternion[_] => rhs == lhs
+    case that => unifiedPrimitiveEquals(that)
   }
 
   def <(rhs: Natural): Boolean = (lhs compare rhs) < 0
@@ -358,7 +376,7 @@ sealed trait Natural {
           End(UInt(0))
 
         case Digit(ld, ltail) => rhs.compare(UInt(1)) match {
-          case -1 => sys.error("/ by zero")
+          case -1 => throw new IllegalArgumentException("/ by zero")
           case 0 =>
             lhs
           case 1 =>
@@ -381,7 +399,7 @@ sealed trait Natural {
         case End(ld) => End(ld)
 
         case Digit(ld, ltail) => rhs.compare(UInt(1)) match {
-          case -1 => sys.error("/ by zero")
+          case -1 => throw new IllegalArgumentException("/ by zero")
           case 0 => End(UInt(0))
           case 1 =>
             val p = rhs.powerOfTwo
@@ -402,7 +420,7 @@ sealed trait Natural {
         case End(ld) => (End(UInt(0)), lhs)
 
         case Digit(ld, ltail) => rhs.compare(UInt(1)) match {
-          case -1 => sys.error("/ by zero")
+          case -1 => throw new IllegalArgumentException("/ by zero")
           case 0 => (lhs, Natural(0))
           case 1 =>
             val p = rhs.powerOfTwo
@@ -538,7 +556,7 @@ object Natural extends NaturalInstances {
 
   // required in big-endian order
   def apply(us: UInt*): Natural = {
-    if (us.isEmpty) sys.error("invalid arguments")
+    if (us.isEmpty) throw new IllegalArgumentException("invalid arguments")
     us.tail.foldLeft(End(us.head): Natural)((n, u) => Digit(u, n))
   }
 
@@ -548,7 +566,7 @@ object Natural extends NaturalInstances {
     Digit(UInt(n.toInt), End(UInt((n >> 32).toInt)))
 
   def apply(n: BigInt): Natural = if (n < 0)
-    sys.error("negative numbers not allowd: %s" format n)
+    throw new IllegalArgumentException("negative numbers not allowed: %s" format n)
   else if (n < 0xffffffffL)
     End(UInt(n.toLong))
   else
@@ -614,7 +632,7 @@ object Natural extends NaturalInstances {
       }
 
       if (n == UInt(0)) {
-        sys.error("/ by zero")
+        throw new IllegalArgumentException("/ by zero")
       } else if (n == UInt(1)) {
         (this, Natural(UInt(0)))
       } else {
@@ -624,7 +642,7 @@ object Natural extends NaturalInstances {
             val r = d % n
             recur(tail, r, End(q))
           case _ =>
-            sys.error("bug in reversed")
+            throw new IllegalArgumentException("bug in reversed")
         }
       }
     }
@@ -651,7 +669,7 @@ object Natural extends NaturalInstances {
       if (t >= 0L)
         End(UInt(t.toInt))
       else
-        sys.error("illegal subtraction: %s %s" format (this, n))
+        throw new IllegalArgumentException("illegal subtraction: %s %s" format (this, n))
     }
 
     def *(n: UInt): Natural = if (n == UInt(0))
@@ -662,12 +680,12 @@ object Natural extends NaturalInstances {
       Natural(d.toLong * n.toLong)
 
     def /(n: UInt): Natural = if (n == UInt(0))
-      sys.error("/ by zero")
+      throw new IllegalArgumentException("/ by zero")
     else
       End(d / n)
 
     def %(n: UInt): Natural = if (n == UInt(0))
-      sys.error("/ by zero")
+      throw new IllegalArgumentException("/ by zero")
     else
       End(d % n)
 

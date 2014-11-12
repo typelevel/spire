@@ -18,7 +18,7 @@ import spire.std.bigInt._
 sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] {
   lhs =>
 
-  def signum: Int = fold(spire.math.signum(_).toInt, _.signum)
+  def signum: Int = fold(java.lang.Long.signum, _.signum)
 
   def +(rhs: SafeLong): SafeLong = rhs.fold(this + _, this + _)
   def -(rhs: SafeLong): SafeLong = rhs.fold(this - _, this - _)
@@ -94,6 +94,18 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
 
   def unary_-(): SafeLong
 
+  override def isValidInt: Boolean = {
+    if (!isLong) return false
+    val n = toLong
+    Int.MinValue <= n && n <= Int.MaxValue
+  }
+
+  def isValidLong: Boolean = {
+    if (!isLong) return false
+    val n = toLong
+    Long.MinValue <= n && n <= Long.MaxValue
+  }
+
   def isLong: Boolean = fold(_ => true, _ => false)
   def isBigInt: Boolean = fold(_ => false, _ => true)
 
@@ -106,6 +118,11 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
   override def toString: String = fold(_.toString, _.toString)
 
   final def isWhole: Boolean = true
+
+  def isProbablePrime(c: Int): Boolean = toBigInt.isProbablePrime(c)
+
+  def bitLength: Int =
+    fold(64 - java.lang.Long.numberOfLeadingZeros(_), _.bitLength)
 
   def fold[A,B <: A,C <: A](f: Long => B, g: BigInt => C): A
 
@@ -128,6 +145,9 @@ object SafeLong extends SafeLongInstances {
 
   final val zero: SafeLong = SafeLongLong(0L)
   final val one: SafeLong = SafeLongLong(1L)
+  final val two: SafeLong = SafeLongLong(2L)
+  final val three: SafeLong = SafeLongLong(3L)
+  final val ten: SafeLong = SafeLongLong(10L)
 
   implicit def apply(x: Long): SafeLong = SafeLongLong(x)
 
@@ -181,8 +201,15 @@ private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong w
   else
     SafeLongBigInt(Long.MaxValue) + 1
 
-  def %(y: Long): SafeLong = SafeLongLong(x % y)
-  def /%(y: Long) = (SafeLongLong(x / y), SafeLongLong(x % y))
+  def %(y: Long): SafeLong = if (x == Long.MinValue && y == -1L)
+    SafeLongLong(0L)
+  else
+    SafeLongLong(x % y)
+
+  def /%(y: Long) = if (x == Long.MinValue && y == -1L)
+    (-SafeLongLong(x), SafeLongLong(0L))
+  else
+    (SafeLongLong(x / y), SafeLongLong(x % y))
 
   def &(y: Long): SafeLong = SafeLongLong(x & y)
   def |(y: Long): SafeLong = SafeLongLong(x | y)
@@ -240,16 +267,22 @@ private[math] case class SafeLongLong private[math] (x: Long) extends SafeLong w
   else
     SafeLongBigInt(BigInt(x) << n)
 
-  def >>(n: Int): SafeLong = if (n < 0) <<(-n) else SafeLongLong(x >> n)
+  def >>(n: Int): SafeLong =
+    if (n < 0) <<(-n) else if (n >= 64) SafeLongLong(0L) else SafeLongLong(x >> n)
 
   override def equals(that: Any): Boolean = that match {
     case SafeLongLong(y) => x == y
     case SafeLongBigInt(y) => x == y
-    case t: BigInt => if (t.bitLength > 63) false else t.toLong == x
-    case that => unifiedPrimitiveEquals(that)
+    case that: BigInt => if (that.bitLength > 63) false else that.toLong == x
+    case that => that == x
+    //case that => unifiedPrimitiveEquals(that)
   }
 
-  def gcd(that: SafeLong) = spire.math.gcd(x, that.fold(identity, n => (n % x).toLong))
+  def gcd(that: SafeLong): SafeLong = if (x == 0) {
+    if (that == 0) SafeLong.one else that
+  } else {
+    spire.math.gcd(x, that.fold(identity, n => (n % x).toLong))
+  }
 
   def doubleValue: Double = x.toDouble
   def floatValue: Float = x.toFloat
@@ -308,8 +341,9 @@ private[math] case class SafeLongBigInt private[math] (x: BigInt) extends SafeLo
   override def equals(that: Any): Boolean = that match {
     case SafeLongLong(y) => x == y
     case SafeLongBigInt(y) => x == y
-    case t: BigInt => x == t
-    case that => unifiedPrimitiveEquals(that)
+    case that: BigInt => x == that
+    case that => that == x
+    //case that => false
   }
 
   def gcd(that: SafeLong) = that match {
@@ -379,7 +413,7 @@ private[math] trait SafeLongOrder extends Order[SafeLong] {
 }
 
 private[math] trait SafeLongIsSigned extends Signed[SafeLong] {
-  def signum(a: SafeLong): Int = a.toBigInt.toInt
+  def signum(a: SafeLong): Int = a.signum
   def abs(a: SafeLong): SafeLong = a.abs
 }
 
