@@ -10,6 +10,7 @@ import UpperOrLower._
 import DiagonalProperty._
 
 import scala.math
+import scala.collection.parallel.ForkJoinTasks
 
 /**
  * High-performance BLAS level3
@@ -518,6 +519,10 @@ trait LayeredLevel3 extends Level3 {
 
   /** Matrix-matrix product based on panel-panel product */
   trait GEMM {
+
+    /** How many threads will be used by gepp? */
+    def parallelism = ForkJoinTasks.defaultForkJoinPool.getParallelism
+
     type Carver = (Int,Int, Int,Int) => Matrix
     type Packer = (Matrix, Int, Long) => Unit
 
@@ -611,6 +616,42 @@ trait LayeredLevel3 extends Level3 {
     }
   }
 
+  /** Parallel version of GEMM */
+  object ParallelGEMM extends GEMM {
+
+    /**
+     * Classic partition of n in c chunks of even size
+     *
+     * OpenMP static loop scheduling perform such a partition.
+     */
+    def partition(n:Int, c:Int) = {
+      val (q, r) = (n/c, n%c)
+      (for(i <- 0 until r) yield i*(q+1)) ++
+      (for(i <- r until c if q > 0) yield i*q + r) ++
+      Seq(c*q + r)
+    }
+
+    def gepp(blockA:Carver, packA:Packer, blockB:Carver, packB:Packer,
+             m:Int, k:Int, n:Int, pLo:Int, pHi:Int, alpha:Double, c:Matrix) {
+      val j = partition(n, parallelism)
+      for(t <- (0 to j.size-2).par) {
+        val blocking = GEBP.blocking.get
+        val mc = blocking.mc
+        val kc = pHi - pLo
+        val mr = blocking.mr
+        val nr = blocking.nr
+        val aa = blocking.bufferA.start
+        val bb = blocking.bufferB(n).start
+        val (jLo, jHi) = (j(t), j(t+1))
+        packB(blockB(pLo,pHi, jLo,jHi), nr, bb)
+        cfor(0)(_ < m, _ + mc) { iLo =>
+          val iHi = math.min(iLo + mc, m)
+          packA(blockA(iLo,iHi, pLo,pHi), mr, aa)
+          GEBP(kc, mr, nr, alpha, aa, bb, c.block(iLo,iHi)(jLo,jHi))
+        }
+      }
+    }
+  }
 
   def gemm(transA:Transposition.Value, transB:Transposition.Value,
            alpha:Double, a:Matrix, b:Matrix,

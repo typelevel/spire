@@ -82,22 +82,31 @@ trait GemmBenchmark extends MatrixBenchmark {
 }
 
 trait SpireGemmBenchmark extends GemmBenchmark {
-  val lvl3:BLAS.Level3
+  type GemmType = (Transposition.Value, Transposition.Value,
+                   Double, Matrix, Matrix, Double, Matrix) => Unit
+  val gemm:GemmType
   def benched(args:Arguments) = {
     val (a, b, c) = args
-    lvl3.gemm(NoTranspose, NoTranspose, 2.0, a, b, 1.0, c)
+    gemm(NoTranspose, NoTranspose, 2.0, a, b, 1.0, c)
     c
   }
 }
 
 trait SpireNaiveBenchmark extends MatrixBenchmark {
   def header = "spire (naive)"
-  val lvl3 = BLAS.NaiveLevel3
+  val gemm = BLAS.NaiveLevel3.gemm _
+  val trsm = BLAS.NaiveLevel3.trsm _
 }
 
 trait SpireLayeredBenchmark extends MatrixBenchmark {
   def header = "spire (layered)"
-  val lvl3 = BLAS.LayeredLevel3
+  val gemm = BLAS.LayeredLevel3.SerialGEMM.apply _
+  val trsm = BLAS.LayeredLevel3.trsm _
+}
+
+trait SpireParallelLayeredBenchmark extends MatrixBenchmark {
+  def header = "spire (layered, //)"
+  val gemm = BLAS.LayeredLevel3.ParallelGEMM.apply _
 }
 
 class JBlasGemmBenchmark extends GemmBenchmark {
@@ -151,6 +160,7 @@ object MatrixMultiplicationBenchmarks extends BenchmarkGenerator {
                      new NetlibJavaGemmBenchmark ::
                      new SpireGemmBenchmark with SpireNaiveBenchmark ::
                      new SpireGemmBenchmark with SpireLayeredBenchmark ::
+                     new SpireGemmBenchmark with SpireParallelLayeredBenchmark ::
                      Nil
     val benchmarksHeader = benchmarks.map(_.formatedHeader).mkString("  ")
     println(dimsHeader ++ "  " ++ benchmarksHeader)
@@ -211,10 +221,14 @@ trait Benchmark_X_U_eq_B extends TrsmBenchmark {
 }
 
 trait SpireTrsmBenchmark extends TrsmBenchmark {
-  val lvl3: BLAS.Level3
+  type TrsmType = (Sides.Value, UpperOrLower.Value,
+                   Transposition.Value, DiagonalProperty.Value,
+                   Double, Matrix, Matrix) => Unit
+  val trsm: TrsmType
+
   def benched(args:Arguments) = {
     val (a, b) = args
-    lvl3.trsm(side, uplo, trans, diag, 2.0, a, b)
+    trsm(side, uplo, trans, diag, 2.0, a, b)
     b
   }
 }

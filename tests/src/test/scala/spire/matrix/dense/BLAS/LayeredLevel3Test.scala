@@ -12,7 +12,10 @@ import spire.matrix.dense.random._
 
 import spire.matrix.dense.tests.RandomUncorrelatedElements
 import org.scalatest.FunSuite
-import org.scalatest.fixture
+import org.scalatest.Matchers
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalacheck.Gen
+import math.abs
 
 trait LayeredGemmTest extends FunSuite {
   type GemmType = (Transposition.Value, Transposition.Value,
@@ -49,10 +52,11 @@ trait LayeredGemmTest extends FunSuite {
     } {
       referenceGemm(transA, transB, alpha, a, b, beta, cRef)
       layeredGemm(transA, transB, alpha, a, b, beta, cLayered)
-      assert(cLayered == cRef,
-             s"""|Expected $cRef but got $cLayered with
-                 |${msg(transA, transB, alpha, beta, m, n, k)}
-                 |""".stripMargin)
+      Predef.assert(
+        cLayered == cRef,
+        s"""|Expected $cRef but got $cLayered with
+        |${msg(transA, transB, alpha, beta, m, n, k)}
+        |""".stripMargin)
     }
   }
 
@@ -69,8 +73,9 @@ trait LayeredGemmTest extends FunSuite {
     } {
       referenceGemm(NoTranspose, NoTranspose, 1.0, a, b, 0.0, cRef)
       layeredGemm(NoTranspose, NoTranspose, 1.0, a, b, 0.0, cLayered)
-      assert(cLayered == cRef,
-             s"[$m x $k] [$k x $n]: layered GEMM disagrees with reference GEMM")
+      Predef.assert(
+        cLayered == cRef,
+        s"[$m x $k] [$k x $n]: layered GEMM disagrees with reference GEMM")
     }
   }
 }
@@ -78,6 +83,61 @@ trait LayeredGemmTest extends FunSuite {
 class SerialLayeredGemmTest extends LayeredGemmTest {
   val referenceGemm = BLAS.NaiveLevel3.gemm _
   val layeredGemm = BLAS.LayeredLevel3.SerialGEMM.apply _
+}
+
+class EvenPartitionTest extends FunSuite
+with GeneratorDrivenPropertyChecks with Matchers {
+  import BLAS.LayeredLevel3.ParallelGEMM.partition
+
+  test("Partitions in 4 chunks of 0..n for n = 1 to 10") {
+    assertResult { Seq(0, 1)           } { partition( 1,4) }
+    assertResult { Seq(0, 1, 2)        } { partition( 2,4) }
+    assertResult { Seq(0, 1, 2, 3)     } { partition( 3,4) }
+    assertResult { Seq(0, 1, 2, 3,  4) } { partition( 4,4) }
+    assertResult { Seq(0, 2, 3, 4,  5) } { partition( 5,4) }
+    assertResult { Seq(0, 2, 4, 5,  6) } { partition( 6,4) }
+    assertResult { Seq(0, 2, 4, 6,  7) } { partition( 7,4) }
+    assertResult { Seq(0, 2, 4, 6,  8) } { partition( 8,4) }
+    assertResult { Seq(0, 3, 5, 7,  9) } { partition( 9,4) }
+    assertResult { Seq(0, 3, 6, 8, 10) } { partition(10,4) }
+  }
+
+  val sizes = Gen.choose(1, 32)
+  val chunks = Gen.choose(1, 8)
+
+  test("Partitions shall span elements range") {
+    forAll((sizes, "#elements"), (chunks, "#chunks")) { (n:Int, c:Int) =>
+      whenever(c > 1 && n > 1) {
+        val p = partition(n, c)
+        p.head should be (0)
+        p.last should be (n)
+      }
+    }
+  }
+  test("Chunks shall be properly ordered") {
+    forAll((sizes, "#elements"), (chunks, "#chunks")) { (n:Int, c:Int) =>
+      whenever(c > 1 && n > 1) {
+        val diffs = partition(n, c).sliding(2).map(x => x(1) - x(0)).toList
+        all(diffs) should be > 0
+      }
+    }
+  }
+
+  test("Partitions shall be evenly sized") {
+    forAll((sizes, "#elements"), (chunks, "#chunks")) { (n:Int, c:Int) =>
+      whenever(c > 1 && n > 1) {
+        val _2ndDiffs =
+          partition(n, c).sliding(3).map(x => abs(x(0) - 2*x(1) + x(2))).toList
+        all(_2ndDiffs) should be <= 1
+      }
+    }
+  }
+
+}
+
+class ParallelLayeredGemmTest extends LayeredGemmTest {
+  val referenceGemm = BLAS.LayeredLevel3.SerialGEMM.apply _
+  val layeredGemm = BLAS.LayeredLevel3.ParallelGEMM.apply _
 }
 
 trait TRSBPPackingTest extends FunSuite {
