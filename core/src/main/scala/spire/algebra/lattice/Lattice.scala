@@ -35,11 +35,13 @@ class GcdLcmLattice[@sp(Byte, Short, Int, Long) A: EuclideanRing] extends Lattic
 }
 
 trait BoundedJoinSemilattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with JoinSemilattice[A] {
-  def one: A
+  def zero: A
+  def isZero(a: A)(implicit ev: Eq[A]): Boolean = ev.eqv(a, zero)
 }
 
-trait BoundedMeetSemilattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with JoinSemilattice[A] {
-  def zero: A
+trait BoundedMeetSemilattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with MeetSemilattice[A] {
+  def one: A
+  def isOne(a: A)(implicit ev: Eq[A]): Boolean = ev.eqv(a, one)
 }
 
 trait BoundedLattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Lattice[A] with BoundedMeetSemilattice[A] with BoundedJoinSemilattice[A]

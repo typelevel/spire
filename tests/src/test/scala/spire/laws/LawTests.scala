@@ -2,6 +2,7 @@ package spire.laws
 
 import spire.algebra._
 import spire.algebra.free._
+import spire.algebra.lattice._
 import spire.math._
 import spire.implicits.{
   SeqOrder => _, SeqEq => _,
@@ -98,4 +99,11 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Bool[Boolean]", LogicLaws[Boolean].bool)
   checkAll("Bool[Int]", LogicLaws[Int].bool)
   checkAll("Heyting[Trilean]", LogicLaws[Int].heyting)
+
+  implicit object intMinMaxLattice extends MinMaxLattice[Int] with BoundedLattice[Int] {
+    def zero = Int.MinValue
+    def one = Int.MaxValue
+  }
+
+  checkAll("BoundedLattice[Int]", LatticeLaws[Int].boundedLattice(intMinMaxLattice))
 }
