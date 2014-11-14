@@ -8,7 +8,7 @@ import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
 import scala.annotation.tailrec
 
-trait CoordinateSpace[V, @spec(Float, Double) F] extends InnerProductSpace[V, F] {
+trait CoordinateSpace[V, @spec(Float, Double) F] extends Any with InnerProductSpace[V, F] {
   def dimensions: Int
 
   def coord(v: V, i: Int): F  // = v dot axis(i)

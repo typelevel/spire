@@ -8,8 +8,7 @@ import scala.{ specialized => spec }
  * `op(x, id) == op(id, x) == x`. For example, if we have `Monoid[String]`,
  * with `op` as string concatenation, then `id = ""`.
  */
-trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
-    extends Semigroup[A] {
+trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Semigroup[A] {
 
   /**
    * Return the identity element for this monoid.
@@ -58,8 +57,7 @@ object Monoid {
  * 
  * A monoid is commutative if for all x and y, x |+| y === y |+| x.
  */
-trait CMonoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
-    extends Monoid[A] with CSemigroup[A]
+trait CMonoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Monoid[A] with CSemigroup[A]
 
 object CMonoid {
   @inline final def apply[A](implicit ev: CMonoid[A]): CMonoid[A] = ev

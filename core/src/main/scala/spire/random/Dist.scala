@@ -11,7 +11,7 @@ import scala.annotation.tailrec
 import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
-trait Dist[@spec A] { self =>
+trait Dist[@spec A] extends Any { self =>
 
   def apply(gen: Generator): A
 

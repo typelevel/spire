@@ -7,7 +7,7 @@ import scala.annotation.tailrec
 
 import spire.algebra.{Field, NRoot, Order, Trig}
 
-trait Gaussian[@spec(Float,Double) A] {
+trait Gaussian[@spec(Float,Double) A] extends Any {
   /**
    * Return an `A` that is normally distributed about `mean` with a standard
    * deviation of `stdDev`.
