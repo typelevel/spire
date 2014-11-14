@@ -15,8 +15,8 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
    * [[AbGroup]] for `B`.
    */
   def run[B](f: A => B)(implicit B: AbGroup[B]): B =
-    terms.foldLeft(B.id) { case (sum, (a, n)) =>
-      B.op(sum, B.sumn(f(a), n))
+    terms.foldLeft(B.id) { case (total, (a, n)) =>
+      B.op(total, B.combinen(f(a), n))
     }
 
   /**
@@ -27,12 +27,12 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
   def runMonoid[B](f: A => B)(implicit B: CMonoid[B]): Option[B] = {
     val it = terms.iterator
 
-    @tailrec def loop(sum: B): Option[B] =
+    @tailrec def loop(total: B): Option[B] =
       if (it.hasNext) {
         val (a, n) = it.next()
         if (n < 0) None
-        else loop(B.op(sum, B.sumn(f(a), n)))
-      } else Some(sum)
+        else loop(B.op(total, B.combinen(f(a), n)))
+      } else Some(total)
 
     loop(B.id)
   }
@@ -46,20 +46,20 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
   def runSemigroup[B](f: A => B)(implicit B: CSemigroup[B]): Option[B] = {
     val it = terms.iterator
 
-    @tailrec def loop1(sum: B): Option[B] =
+    @tailrec def loop1(total: B): Option[B] =
       if (it.hasNext) {
         val (a, n) = it.next()
-        if (n == 0) loop1(sum)
+        if (n == 0) loop1(total)
         else if (n < 0) None
-        else loop1(B.op(sum, B.sumn(f(a), n)))
-      } else Some(sum)
+        else loop1(B.op(total, B.combinen(f(a), n)))
+      } else Some(total)
 
     @tailrec def loop0: Option[B] =
       if (it.hasNext) {
         val (a, n) = it.next()
         if (n == 0) loop0
         else if (n < 0) None
-        else loop1(B.sumn(f(a), n))
+        else loop1(B.combinen(f(a), n))
       } else None
 
     loop0
@@ -72,10 +72,10 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
    * positive terms on the right.
    */
   def split[B](f: A => B)(implicit B: CMonoid[B]): (B, B) =
-    terms.foldLeft((B.id, B.id)) { case ((lsum, rsum), (a, n)) =>
-      if (n < 0) (B.op(lsum, B.sumn(f(a), -n)), rsum)
-      else if (n > 0) (lsum, B.op(rsum, B.sumn(f(a), n)))
-      else (lsum, rsum)
+    terms.foldLeft((B.id, B.id)) { case ((ltotal, rtotal), (a, n)) =>
+      if (n < 0) (B.op(ltotal, B.combinen(f(a), -n)), rtotal)
+      else if (n > 0) (ltotal, B.op(rtotal, B.combinen(f(a), n)))
+      else (ltotal, rtotal)
     }
 
   /**

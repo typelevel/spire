@@ -141,7 +141,7 @@ object SpireArbitrary {
       terms <- arbitrary[List[FreeAbTerm[A]]]
     } yield {
       terms.map { case FreeAbTerm(a, n) =>
-        Group[FreeAbGroup[A]].sumn(FreeAbGroup(a), n)
+        Group[FreeAbGroup[A]].combinen(FreeAbGroup(a), n)
       }.foldLeft(FreeAbGroup.id[A])(_ |+| _)
     })
 }
