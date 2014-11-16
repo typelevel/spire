@@ -45,6 +45,30 @@ trait LatticePartialOrderLaws[A] extends Laws {
     bases = Seq.empty
   )
 
+  def boundedJoinSemilatticePartialOrder(implicit A: BoundedJoinSemilattice[A] with PartialOrder[A]) = new LatticePartialOrderProperties(
+    name = "boundedJoinSemilatticePartialOrder",
+    parents = Seq(joinSemilatticePartialOrder),
+    bases = Seq("lattice" → LatticeLaws[A].boundedJoinSemilattice),
+    "lteqv.zero" → forAll((x: A) =>
+      A.zero <= x
+    )
+  )
+
+  def boundedMeetSemilatticePartialOrder(implicit A: BoundedMeetSemilattice[A] with PartialOrder[A]) = new LatticePartialOrderProperties(
+    name = "boundedMeetSemilatticePartialOrder",
+    parents = Seq(meetSemilatticePartialOrder),
+    bases = Seq("lattice" → LatticeLaws[A].boundedMeetSemilattice),
+    "lteqv.one" → forAll((x: A) =>
+      x <= A.one
+    )
+  )
+
+  def boundedLatticePartialOrder(implicit A: BoundedLattice[A] with PartialOrder[A]) = new LatticePartialOrderProperties(
+    name = "boundedLatticePartialOrder",
+    parents = Seq(boundedJoinSemilatticePartialOrder, boundedMeetSemilatticePartialOrder),
+    bases = Seq("lattice" → LatticeLaws[A].boundedLattice)
+  )
+  
   class LatticePartialOrderProperties(
     val name: String,
     val parents: Seq[LatticePartialOrderProperties],

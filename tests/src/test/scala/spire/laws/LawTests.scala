@@ -106,6 +106,5 @@ class LawTests extends FunSuite with Discipline {
   }
 
   checkAll("Order[Int]", OrderLaws[Int].order)
-  checkAll("BoundedLattice[Int]", LatticeLaws[Int].boundedLattice(intMinMaxLattice))
-  checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].latticePartialOrder(intMinMaxLattice))
+  checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice))
 }
