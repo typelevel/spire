@@ -51,6 +51,9 @@ trait GroupLaws[A] extends Laws {
     ),
     "combine(Nil) === id" → forAll((a: A) =>
       A.combine(Nil) === A.id
+    ),
+    "isId" → forAll((x: A) =>
+      (x === A.id) === (x.isId)
     )
   )
 
