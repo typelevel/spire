@@ -72,7 +72,7 @@ class LawTests extends FunSuite with Discipline {
 
   checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
 
-  checkAll("Sign", GroupActionLaws[Sign, Int].multiplicativeGroupAction)
+  checkAll("Sign", GroupActionLaws[Sign, Int].multiplicativeMonoidAction)
 
   implicit def eqFreeMonoid[A: Monoid: Eq]: Eq[FreeMonoid[A]] = new Eq[FreeMonoid[A]] {
     def eqv(x: FreeMonoid[A], y: FreeMonoid[A]): Boolean =
