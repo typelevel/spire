@@ -28,8 +28,8 @@ with Group[Map[K, V]] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class MapRng[K, V](implicit val scalar: Rng[V]) extends RingAlgebra[Map[K, V], V]
-with Serializable { self =>
+class MapSemiring[K, V](implicit val scalar: Semiring[V]) extends Semiring[Map[K, V]] with Serializable {
+
   def zero: Map[K, V] = Map.empty
 
   def plus(x: Map[K, V], y: Map[K, V]): Map[K, V] = {
@@ -41,8 +41,6 @@ with Serializable { self =>
     }
   }
 
-  def negate(x: Map[K, V]): Map[K, V] = x mapValues (scalar.negate(_))
-
   def times(x: Map[K, V], y: Map[K, V]): Map[K, V] = {
     var xx = x
     var yy = y
@@ -52,13 +50,17 @@ with Serializable { self =>
       (xx get kv._1).map(u => z.updated(kv._1, f(u, kv._2))).getOrElse(z)
     }
   }
-  
+}
+
+@SerialVersionUID(0L)
+class MapRng[K, V](override implicit val scalar: Rng[V]) extends MapSemiring[K, V] with RingAlgebra[Map[K, V], V] with Serializable { self =>
+  def negate(x: Map[K, V]): Map[K, V] = x mapValues (scalar.negate(_))
+
   def timesl(r: V, v: Map[K, V]): Map[K, V] = v mapValues (scalar.times(r, _))
 }
 
 @SerialVersionUID(0L)
-class MapVectorSpace[K, V](override implicit val scalar: Field[V]) extends MapRng[K, V]
-with VectorSpace[Map[K, V], V] with Serializable {
+class MapVectorSpace[K, V](override implicit val scalar: Field[V]) extends MapRng[K, V] with VectorSpace[Map[K, V], V] with Serializable {
   override def times(x: Map[K, V], y: Map[K, V]): Map[K, V] = {
     var xx = x
     var yy = y
@@ -71,8 +73,7 @@ with VectorSpace[Map[K, V], V] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class MapInnerProductSpace[K, V: Field] extends MapVectorSpace[K, V]
-with InnerProductSpace[Map[K, V], V] with Serializable {
+class MapInnerProductSpace[K, V: Field] extends MapVectorSpace[K, V] with InnerProductSpace[Map[K, V], V] with Serializable {
   def dot(x: Map[K, V], y: Map[K, V]): V =
     times(x, y).foldLeft(scalar.zero) { (a, b) => scalar.plus(a, b._2) }
 }
@@ -118,19 +119,23 @@ class MapVectorEq[K, V](implicit V: Eq[V], scalar: AdditiveMonoid[V]) extends Eq
 trait MapInstances0 {
   implicit def MapMonoid[K, V: Semigroup] = new MapMonoid[K, V]
 
+  implicit def MapSemiring[K, V: Semiring] = new MapSemiring[K, V]
+}
+
+trait MapInstances1 {
   implicit def MapRng[K, V: Rng] = new MapRng[K, V]
 }
 
-trait MapInstances1 extends MapInstances0 {
+trait MapInstances2 extends MapInstances1 {
   implicit def MapGroup[K, V: Group] = new MapGroup[K, V]
 
   implicit def MapVectorSpace[K, V: Field] = new MapVectorSpace[K, V]
 }
 
-trait MapInstances2 extends MapInstances1 {
+trait MapInstances3 extends MapInstances2 {
   implicit def MapInnerProductSpace[K, V: Field] = new MapInnerProductSpace[K, V]
 
   implicit def MapEq[K, V](implicit V0: Eq[V]) = new MapEq[K, V]
 }
 
-trait MapInstances extends MapInstances2
+trait MapInstances extends MapInstances3
