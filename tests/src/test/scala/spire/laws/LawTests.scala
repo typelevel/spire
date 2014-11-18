@@ -100,10 +100,11 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Bool[Int]", LogicLaws[Int].bool)
   checkAll("Heyting[Trilean]", LogicLaws[Int].heyting)
 
-  implicit object intMinMaxLattice extends MinMaxLattice[Int] with BoundedLattice[Int] {
+  object intMinMaxLattice extends MinMaxLattice[Int] with BoundedLattice[Int] with spire.std.IntOrder {
     def zero = Int.MinValue
     def one = Int.MaxValue
   }
 
-  checkAll("BoundedLattice[Int]", LatticeLaws[Int].boundedLattice(intMinMaxLattice))
+  checkAll("Order[Int]", OrderLaws[Int].order)
+  checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 }
