@@ -26,7 +26,7 @@ trait GroupActionLaws[G, A] extends Laws {
   implicit def ArbA: Arbitrary[A]
 
   def semigroupAction(implicit G: GroupAction[A, G], G0: Semigroup[G]) = new ActionProperties(
-    name = "groupAction",
+    name = "semigroupAction",
     sl = _.semigroup(G0),
     parent = None,
 
@@ -38,8 +38,8 @@ trait GroupActionLaws[G, A] extends Laws {
     }
   )
 
-  def groupAction(implicit G: GroupAction[A, G], G0: Monoid[G]) = new ActionProperties(
-    name = "groupAction",
+  def monoidAction(implicit G: GroupAction[A, G], G0: Monoid[G]) = new ActionProperties(
+    name = "monoidAction",
     sl = _.monoid(G0),
     parent = Some(semigroupAction),
 
@@ -48,13 +48,23 @@ trait GroupActionLaws[G, A] extends Laws {
     }
   )
 
-  def additiveGroupAction(implicit G: AdditiveGroupAction[A, G], G0: AdditiveMonoid[G]) = new AdditiveProperties(
-    base = groupAction(G.additive, G0.additive),
+  def groupAction(implicit G: GroupAction[A, G], G0: Group[G]) = new ActionProperties(
+    name = "groupAction",
+    sl = _.group(G0),
+    parent = Some(monoidAction),
+
+    "left and right action compatibility" → forAll { (a: A, g: G) =>
+      (a <|+| g) === (g.inverse |+|> a)
+    }
+  )
+
+  def additiveMonoidAction(implicit G: AdditiveGroupAction[A, G], G0: AdditiveMonoid[G]) = new AdditiveProperties(
+    base = monoidAction(G.additive, G0.additive),
     parent = None
   )
 
-  def multiplicativeGroupAction(implicit G: MultiplicativeGroupAction[A, G], G0: MultiplicativeMonoid[G]) = new MultiplicativeProperties(
-    base = groupAction(G.multiplicative, G0.multiplicative),
+  def multiplicativeMonoidAction(implicit G: MultiplicativeGroupAction[A, G], G0: MultiplicativeMonoid[G]) = new MultiplicativeProperties(
+    base = monoidAction(G.multiplicative, G0.multiplicative),
     parent = None
   )
 
