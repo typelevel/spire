@@ -7,7 +7,7 @@ import scala.annotation.tailrec
 
 import spire.algebra.{Field, NRoot, Order, Trig}
 
-trait Gaussian[@spec(Float,Double) A] extends Any {
+trait Gaussian[@spec(Float, Double) A] extends Any {
   /**
    * Return an `A` that is normally distributed about `mean` with a standard
    * deviation of `stdDev`.
@@ -25,17 +25,26 @@ trait GaussianInstances {
   import spire.std.double._
   import spire.std.bigDecimal._
 
-  implicit val float = new MarsagliaGaussian[Float]
-  implicit val double = new MarsagliaGaussian[Double]
-  implicit def bigDecimal(implicit mc: MathContext = defaultMathContext) =
+  implicit val float: Gaussian[Float] =
+    new Gaussian[Float] {
+      def apply(mean: Float, stdDev: Float): Dist[Float] =
+        new DistFromGen(g => (Ziggurat.rnor(g) * stdDev + mean).toFloat)
+    }
+
+  implicit val double: Gaussian[Double] =
+    new Gaussian[Double] {
+      def apply(mean: Double, stdDev: Double): Dist[Double] =
+        new DistFromGen(g => Ziggurat.rnor(g) * stdDev + mean)
+    }
+
+  implicit def bigDecimal(implicit mc: MathContext = defaultMathContext): Gaussian[BigDecimal] =
     new MarsagliaGaussian[BigDecimal]
 }
 
 /**
  * An implementation of `Gaussian` that uses the Marsaglia algorithm.
  */
-final class MarsagliaGaussian[@spec(Float,Double) A: Field: NRoot: Trig: Order: Uniform]
-extends Gaussian[A] {
+final class MarsagliaGaussian[@spec(Float, Double) A: Field: NRoot: Trig: Order: Uniform] extends Gaussian[A] {
   import spire.syntax.field._
   import spire.syntax.nroot._
   import spire.syntax.trig._
@@ -58,6 +67,5 @@ extends Gaussian[A] {
       }
       loop()
     })
-
   }
 }
