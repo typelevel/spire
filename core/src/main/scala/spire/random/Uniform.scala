@@ -1,10 +1,10 @@
 package spire.random
 
-import scala.{specialized => spec}
+import scala.{specialized => sp}
 
 import spire.math.{Rational, UInt, ULong}
 
-trait Uniform[@spec A] extends Any { self =>
+trait Uniform[@sp A] extends Any { self =>
   /**
    * Return an `A` that is uniformly distributed between `min` and `max` inclusive.
    */
@@ -12,7 +12,9 @@ trait Uniform[@spec A] extends Any { self =>
 }
 
 object Uniform {
-  @inline final def apply[@spec A](implicit u: Uniform[A]): Uniform[A] = u
+  @inline final def apply[@sp A](implicit u: Uniform[A]): Uniform[A] = u
+
+  def apply[@sp A](min: A, max: A)(implicit u: Uniform[A]): Dist[A] = u(min, max)
 
   implicit val UniformInt: Uniform[Int] =
     new Uniform[Int] {
