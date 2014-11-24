@@ -21,6 +21,7 @@ object Number extends NumberInstances {
   final val zero: Number = Number(0)
   final val one: Number = Number(1)
 
+  implicit def apply(n: Int): Number = IntNumber(SafeLong(n))
   implicit def apply(n: Long): Number = IntNumber(SafeLong(n))
   implicit def apply(n: BigInt): Number = IntNumber(SafeLong(n))
   implicit def apply(n: SafeLong): Number = IntNumber(n)
@@ -28,17 +29,24 @@ object Number extends NumberInstances {
   implicit def apply(n: Rational): Number = RationalNumber(n)
   implicit def apply(n: Natural): Number = IntNumber(n.toBigInt)
 
+  implicit def apply(n: Float): Number =
+    if (java.lang.Float.isNaN(n) || java.lang.Float.isInfinite(n))
+      throw new IllegalArgumentException(n.toString)
+    else
+      FloatNumber(n)
+
   implicit def apply(n: Double): Number =
     if (java.lang.Double.isNaN(n) || java.lang.Double.isInfinite(n))
       throw new IllegalArgumentException(n.toString)
     else
       FloatNumber(n)
 
-  def apply(s: String): Number = try {
-    Number(SafeLong(s))
-  } catch {
-    case _: Exception => Number(BigDecimal(s))
-  }
+  def apply(s: String): Number =
+    try {
+      Number(SafeLong(s))
+    } catch {
+      case _: Exception => Number(BigDecimal(s))
+    }
 
   private[math] val minInt = SafeLong(Int.MinValue)
   private[math] val maxInt = SafeLong(Int.MaxValue)
