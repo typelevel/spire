@@ -261,16 +261,16 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
     new Jet(ar_div_br, br_inv *: (infinitesimal - (ar_div_br *: b.infinitesimal)))
   }
 
-  def /~(b: Jet[T])()(implicit f: Field[T], r: IsReal[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def /~(b: Jet[T])()(implicit c: ClassTag[T], f: Field[T], r: IsReal[T]): Jet[T] = {
     val q = this / b
-    new Jet[T](q.real.floor(), q.infinitesimal.map(r.floor).array.asInstanceOf[Array[T]])
+    new Jet[T](q.real.floor(), q.infinitesimal.map(r.floor))
   }
 
-  def %(b: Jet[T])(implicit f: Field[T], r: IsReal[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def %(b: Jet[T])(implicit c: ClassTag[T], f: Field[T], r: IsReal[T]): Jet[T] = {
     this - (this /~ b) * b
   }
 
-  def /%(b: Jet[T])(implicit f: Field[T], r: IsReal[T], v: VectorSpace[Array[T], T])
+  def /%(b: Jet[T])(implicit c: ClassTag[T], f: Field[T], r: IsReal[T])
       : (Jet[T], Jet[T]) = {
     val q = this /~ b
     (q, this - q * b)
@@ -289,14 +289,14 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
     pow(b)
   }
 
-  def floor()(implicit f: Field[T], r: IsReal[T]): Jet[T] = {
-    new Jet(real.floor(), infinitesimal.map(r.floor).array.asInstanceOf[Array[T]])
+  def floor()(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
+    new Jet(real.floor(), infinitesimal.map(r.floor))
   }
-  def ceil()(implicit f: Field[T], r: IsReal[T]): Jet[T] = {
-    new Jet(real.ceil(), infinitesimal.map(r.ceil).array.asInstanceOf[Array[T]])
+  def ceil()(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
+    new Jet(real.ceil(), infinitesimal.map(r.ceil))
   }
-  def round()(implicit f: Field[T], r: IsReal[T]): Jet[T] = {
-    new Jet(real.round(), infinitesimal.map(r.round).array.asInstanceOf[Array[T]])
+  def round()(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
+    new Jet(real.round(), infinitesimal.map(r.round))
   }
 
   // Elementary math functions
