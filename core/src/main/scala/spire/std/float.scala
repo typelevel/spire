@@ -122,4 +122,7 @@ class FloatAlgebra extends FloatIsField with FloatIsNRoot with FloatIsTrig with 
 
 trait FloatInstances {
   implicit final val FloatAlgebra = new FloatAlgebra
+  import Float._
+  import spire.math.Info._
+  implicit final val FloatInfo = new BuiltinFloatInfo(0F, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity)
 }

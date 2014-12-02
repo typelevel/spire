@@ -96,4 +96,6 @@ class IntAlgebra extends IntIsEuclideanRing with IntIsNRoot with IntIsReal with 
 trait IntInstances {
   implicit final val IntBitString = new IntIsBitString
   implicit final val IntAlgebra = new IntAlgebra
+  import spire.math.Info._
+  implicit final val IntInfo = new BuiltinIntInfo[Int](0, Int.MinValue, Int.MaxValue)
 }

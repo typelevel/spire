@@ -92,6 +92,8 @@ object Algebraic extends AlgebraicInstances {
 
 trait AlgebraicInstances {
   implicit final val AlgebraicAlgebra = new AlgebraicAlgebra
+  import Info._
+  implicit final val AlgebraicInfo = new LargeInfo[Algebraic](Exact, Algebraic(0))
 }
 
 private[math] trait AlgebraicIsRing extends Ring[Algebraic] {

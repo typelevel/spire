@@ -246,7 +246,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   }
 }
 
-object Real {
+object Real extends RealInstances {
 
   val zero: Real = Exact(Rational.zero)
   val one: Real = Exact(Rational.one)
@@ -488,8 +488,6 @@ object Real {
     //powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ + 1, x)
     powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ * 2, x)
 
-  implicit val algebra = new RealAlgebra {}
-
   case class Exact(n: Rational) extends Real {
     def apply(p: Int): SafeLong = Real.roundUp(Rational(2).pow(p) * n)
   }
@@ -506,6 +504,12 @@ object Real {
         result
     }
   }
+}
+
+trait RealInstances {
+  implicit final val algebra = new RealAlgebra
+  import Info._
+  implicit final val RealInfo = new LargeInfo[Real](Exact, Real.zero)
 }
 
 @SerialVersionUID(0L)

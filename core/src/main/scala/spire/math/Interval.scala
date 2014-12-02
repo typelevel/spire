@@ -93,6 +93,12 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def crossesZero(implicit ev: AdditiveMonoid[A]): Boolean =
     hasBelow(ev.zero) && hasAbove(ev.zero)
 
+  def isBounded: Boolean =
+    this match {
+      case Below(_, _) | Above(_, _) | All() => true
+      case _ => false
+    }
+
   def lowerBound: Bound[A]
 
   def upperBound: Bound[A]

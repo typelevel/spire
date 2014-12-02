@@ -253,7 +253,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def toString(implicit scale: FixedScale): String = toDouble.toString
 }
 
-object FixedPoint {
+object FixedPoint extends FixedPointInstances {
 
   val zero: FixedPoint = new FixedPoint(0L)
 
@@ -281,6 +281,9 @@ object FixedPoint {
       throw new FixedPointOverflow(x.toLong)
     new FixedPoint(x.toLong)
   }
+}
+
+trait FixedPointInstances {
 
   implicit def algebra(implicit scale: FixedScale) =
     new Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint] {
@@ -346,4 +349,9 @@ object FixedPoint {
       def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): FixedPoint =
         FixedPoint(ev.toRational(b))
     }
+
+  import Info._
+  implicit final val FixedPointInfo = new CustomInfo[FixedPoint](
+    Approximate, Some(FixedPoint.zero),
+    Some(FixedPoint.MinValue), Some(FixedPoint.MaxValue), true, true)
 }

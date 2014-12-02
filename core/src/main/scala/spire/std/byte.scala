@@ -99,4 +99,6 @@ class ByteAlgebra extends ByteIsEuclideanRing with ByteIsReal with Serializable
 trait ByteInstances {
   implicit final val ByteBitString = new ByteIsBitString
   implicit final val ByteAlgebra = new ByteAlgebra
+  import spire.math.Info._
+  implicit final val ByteInfo = new BuiltinIntInfo[Byte](0, Byte.MinValue, Byte.MaxValue)
 }
