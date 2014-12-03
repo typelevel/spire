@@ -39,6 +39,15 @@ class SignedTest extends FunSuite {
     runTest("neg.signum < 0")(assert(neg.signum < 0))
     runTest("pos.signum > 0")(assert(pos.signum > 0))
     runTest("zero.signum == 0")(assert(zero.signum === 0))
+    runTest("zero.isSignZero")(assert(zero.isSignZero))
+    runTest("neg.isSignNegative")(assert(neg.isSignNegative))
+    runTest("pos.isSignPositive")(assert(pos.isSignPositive))
+    runTest("neg.isSignNonZero")(assert(neg.isSignNonZero))
+    runTest("pos.isSignNonZero")(assert(pos.isSignNonZero))
+    runTest("pos.isSignNonNegative")(assert(pos.isSignNonNegative))
+    runTest("zero.isSignNonNegative")(assert(zero.isSignNonNegative))
+    runTest("neg.isSignNonPositive")(assert(neg.isSignNonPositive))
+    runTest("zero.isSignNonPositive")(assert(zero.isSignNonPositive))
   }
 
   runWith[Int](-3, 3, 0)

@@ -2,7 +2,8 @@ package spire.util
 
 import java.nio.ByteBuffer
 import scala.language.experimental.macros
-import scala.reflect.macros._
+
+import spire.macros.compat.Context
 
 /**
  * These methods are all big-endian.

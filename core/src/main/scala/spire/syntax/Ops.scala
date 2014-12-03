@@ -1,7 +1,8 @@
 package spire.syntax
 
 import spire.algebra._
-import spire.macrosk.Ops
+import spire.algebra.lattice._
+import spire.macros.Ops
 import spire.math.{BitString, ConvertableTo, ConvertableFrom, Rational, Number}
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
@@ -9,35 +10,46 @@ final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
   def =!=(rhs:A): Boolean = macro Ops.binop[A, Boolean]
 }
 
-final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
+final class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A]) {
   def >(rhs: A): Boolean = macro Ops.binop[A, Boolean]
   def >=(rhs: A): Boolean = macro Ops.binop[A, Boolean]
   def <(rhs: A): Boolean = macro Ops.binop[A, Boolean]
   def <=(rhs: A): Boolean = macro Ops.binop[A, Boolean]
-  def compare(rhs: A): Int = macro Ops.binop[A, Int]
-  def min(rhs: A): A = macro Ops.binop[A, A]
-  def max(rhs: A): A = macro Ops.binop[A, A]
+
+  def partialCompare(rhs: A): Double = macro Ops.binop[A, Double]
+  def tryCompare(rhs: A): Option[Int] = macro Ops.binop[A, Option[Int]]
+  def pmin(rhs: A): Option[A] = macro Ops.binop[A, A]
+  def pmax(rhs: A): Option[A] = macro Ops.binop[A, A]
 
   def >(rhs: Int)(implicit ev1: Ring[A]): Boolean = macro Ops.binopWithLift[Int, Ring[A], A]
   def >=(rhs: Int)(implicit ev1: Ring[A]): Boolean = macro Ops.binopWithLift[Int, Ring[A], A]
   def <(rhs: Int)(implicit ev1: Ring[A]): Boolean = macro Ops.binopWithLift[Int, Ring[A], A]
   def <=(rhs: Int)(implicit ev1: Ring[A]): Boolean = macro Ops.binopWithLift[Int, Ring[A], A]
-  def compare(rhs: Int)(implicit ev1: Ring[A]): Int = macro Ops.binopWithLift[Int, Ring[A], A]
-  def min(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
-  def max(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
 
   def >(rhs: Double)(implicit ev1: Field[A]): Boolean = macro Ops.binopWithLift[Int, Field[A], A]
   def >=(rhs: Double)(implicit ev1: Field[A]): Boolean = macro Ops.binopWithLift[Int, Field[A], A]
   def <(rhs: Double)(implicit ev1: Field[A]): Boolean = macro Ops.binopWithLift[Int, Field[A], A]
   def <=(rhs: Double)(implicit ev1: Field[A]): Boolean = macro Ops.binopWithLift[Int, Field[A], A]
-  def compare(rhs: Double)(implicit ev1: Field[A]): Int = macro Ops.binopWithLift[Int, Field[A], A]
-  def min(rhs: Double)(implicit ev1: Field[A]): A = macro Ops.binopWithLift[Int, Field[A], A]
-  def max(rhs: Double)(implicit ev1: Field[A]): A = macro Ops.binopWithLift[Int, Field[A], A]
 
   def >(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = c.toNumber(lhs) > rhs
   def >=(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = c.toNumber(lhs) >= rhs
   def <(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = c.toNumber(lhs) < rhs
   def <=(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = c.toNumber(lhs) <= rhs
+}
+
+final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
+  def compare(rhs: A): Int = macro Ops.binop[A, Int]
+  def min(rhs: A): A = macro Ops.binop[A, A]
+  def max(rhs: A): A = macro Ops.binop[A, A]
+
+  def compare(rhs: Int)(implicit ev1: Ring[A]): Int = macro Ops.binopWithLift[Int, Ring[A], A]
+  def min(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+  def max(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+
+  def compare(rhs: Double)(implicit ev1: Field[A]): Int = macro Ops.binopWithLift[Int, Field[A], A]
+  def min(rhs: Double)(implicit ev1: Field[A]): A = macro Ops.binopWithLift[Int, Field[A], A]
+  def max(rhs: Double)(implicit ev1: Field[A]): A = macro Ops.binopWithLift[Int, Field[A], A]
+
   def compare(rhs:Number)(implicit c:ConvertableFrom[A]): Int = c.toNumber(lhs) compare rhs
   def min(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) min rhs
   def max(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) max rhs
@@ -80,11 +92,22 @@ final class SignedOps[A:Signed](lhs: A) {
   def abs(): A = macro Ops.unop[A]
   def sign(): Sign = macro Ops.unop[Sign]
   def signum(): Int = macro Ops.unop[Int]
-  def isZero(): Boolean = macro Ops.unop[Boolean]
+
+  def isSignZero(): Boolean = macro Ops.unop[Boolean]
+  def isSignPositive(): Boolean = macro Ops.unop[Boolean]
+  def isSignNegative(): Boolean = macro Ops.unop[Boolean]
+
+  def isSignNonZero(): Boolean = macro Ops.unop[Boolean]
+  def isSignNonPositive(): Boolean = macro Ops.unop[Boolean]
+  def isSignNonNegative(): Boolean = macro Ops.unop[Boolean]
 }
 
 final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
   def |+|(rhs:A): A = macro Ops.binop[A, A]
+}
+
+final class MonoidOps[A](lhs:A)(implicit ev: Monoid[A]) {
+  def isId(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
 }
 
 final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
@@ -109,6 +132,10 @@ final class LiteralLongAdditiveSemigroupOps(val lhs: Long) extends AnyVal {
 
 final class LiteralDoubleAdditiveSemigroupOps(val lhs: Double) extends AnyVal {
   def +[A](rhs:A)(implicit ev:Field[A]): A = ev.plus(ev.fromDouble(lhs), rhs)
+}
+
+final class AdditiveMonoidOps[A](lhs: A)(implicit ev: AdditiveMonoid[A]) {
+  def isZero(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
 }
 
 final class AdditiveGroupOps[A](lhs:A)(implicit ev:AdditiveGroup[A]) {
@@ -148,6 +175,10 @@ final class LiteralLongMultiplicativeSemigroupOps(val lhs: Long) extends AnyVal 
 
 final class LiteralDoubleMultiplicativeSemigroupOps(val lhs: Double) extends AnyVal {
   def *[A](rhs:A)(implicit ev:Field[A]): A = ev.times(ev.fromDouble(lhs), rhs)
+}
+
+final class MultiplicativeMonoidOps[A](lhs: A)(implicit ev: MultiplicativeMonoid[A]) {
+  def isOne(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
 }
 
 final class MultiplicativeGroupOps[A](lhs:A)(implicit ev:MultiplicativeGroup[A]) {
@@ -251,20 +282,46 @@ final class LiteralDoubleNRootOps(val lhs: Double) extends AnyVal {
 final class TrigOps[A](lhs: A)(implicit ev: Trig[A]) {
   def exp(): A = macro Ops.unop[A]
   def log(): A = macro Ops.unop[A]
+
+  def log(base: Int)(implicit f: Field[A]): A =
+    f.div(ev.log(lhs), ev.log(f.fromInt(base)))
 }
 
-final class BooleanAlgebraOps[A](lhs:A)(implicit ev:BooleanAlgebra[A]) {
+final class MeetOps[A: MeetSemilattice](lhs: A) {
+  def meet(rhs: A): A = macro Ops.binop[A, A]
+  def ∧(rhs: A): A = macro Ops.binop[A, A]
+
+  def meet(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+  def ∧(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+}
+
+final class JoinOps[A: JoinSemilattice](lhs: A) {
+  def join(rhs: A): A = macro Ops.binop[A, A]
+  def ∨(rhs: A): A = macro Ops.binop[A, A]
+
+  def join(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+  def ∨(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+}
+
+final class HeytingOps[A: Heyting](lhs:A) {
   def unary_~(): A = macro Ops.unop[A]
+  def imp(rhs: A): A = macro Ops.binop[A, A]
+
   def &(rhs: A): A = macro Ops.binop[A, A]
   def |(rhs: A): A = macro Ops.binop[A, A]
-  def ^(rhs: A): A = macro Ops.binop[A, A]
 
   def &(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
   def |(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+}
+
+final class BoolOps[A: Bool](lhs:A) {
+  def ^(rhs: A): A = macro Ops.binop[A, A]
+  def nand(rhs: A): A = macro Ops.binop[A, A]
+  def nor(rhs: A): A = macro Ops.binop[A, A]
+  def nxor(rhs: A): A = macro Ops.binop[A, A]
+
   def ^(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
 
-  def &(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) & rhs
-  def |(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) | rhs
   def ^(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) ^ rhs
 }
 
@@ -276,7 +333,9 @@ final class VectorSpaceOps[V](x: V) {
   def *:[F](lhs:Int)(implicit ev: VectorSpace[V, F], F: Ring[F]): V = ev.timesl(F.fromInt(lhs), x)
   def :*[F](rhs:Int)(implicit ev: VectorSpace[V, F], F: Ring[F]): V = ev.timesr(x, F.fromInt(rhs))
 
-  def :/[F](rhs:F)(implicit ev1: VectorSpace[V, F], ev2: Field[F]): V = macro Ops.binopWithEv2[F, VectorSpace[V, F], Field[F], V]
+  // TODO: Support this in machinist.
+  // def :/[F](rhs:F)(implicit ev1: VectorSpace[V, F], ev2: Field[F]): V = macro Ops.binopWithEv2[F, VectorSpace[V, F], Field[F], V]
+  def :/[F](rhs:F)(implicit ev1: VectorSpace[V, F], ev2: Field[F]): V = ev1.divr(x, rhs)(ev2)
 
   //def *:[F](lhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesl(ev.scalar.fromDouble(lhs), x)
   //def :*[F](rhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesr(x, ev.scalar.fromDouble(rhs))

@@ -2,7 +2,6 @@ package spire.math
 
 import org.scalatest.FunSuite
 
-import spire.math._
 import spire.std.int._
 
 class LiteralsTest extends FunSuite {
@@ -18,7 +17,7 @@ class LiteralsTest extends FunSuite {
   }
 
   test("illegal byte literals") {
-    import spire.macrosk._
+    import spire.macros._
     def tryit(s: String) = Macros.parseNumber(s, BigInt(-128), BigInt(255))
     assert(tryit("-129") === Left("illegal constant: -129"))
     assert(tryit("256") === Left("illegal constant: 256"))

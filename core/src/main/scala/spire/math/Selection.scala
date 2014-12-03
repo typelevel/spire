@@ -1,15 +1,12 @@
 package spire.math
 
-import spire.algebra._
-
+import scala.annotation.tailrec
 import scala.reflect.ClassTag
-
 import scala.{specialized => spec}
 
-import scala.annotation.tailrec
+import spire.algebra.Order
 
-
-trait Select {
+trait Select extends Any {
   def select[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit
 }
 
@@ -17,7 +14,7 @@ trait Select {
  * Given a function for finding approximate medians, this will create an exact
  * median finder.
  */
-trait SelectLike extends Select {
+trait SelectLike extends Any with Select {
 
   def approxMedian[@spec A: Order](data: Array[A], left: Int, right: Int, stride: Int): A
 

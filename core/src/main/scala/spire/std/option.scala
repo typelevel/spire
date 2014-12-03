@@ -1,6 +1,7 @@
 package spire.std
 
 import spire.algebra._
+import spire.algebra.{AdditiveSemigroup, AdditiveMonoid, MultiplicativeMonoid, MultiplicativeSemigroup}
 import spire.syntax.all._
 
 @SerialVersionUID(0L)
@@ -13,6 +14,9 @@ class OptionMonoid[A: Semigroup] extends Monoid[Option[A]] with Serializable {
     case (None, y) => y
   }
 }
+
+@SerialVersionUID(0L)
+class OptionCMonoid[A: CSemigroup] extends OptionMonoid[A] with CMonoid[Option[A]]
 
 @SerialVersionUID(0L)
 class OptionAdditiveMonoid[A: AdditiveSemigroup] extends AdditiveMonoid[Option[A]] with Serializable {
@@ -65,10 +69,11 @@ class OptionOrder[A: Order] extends OptionEq[A] with Order[Option[A]] with Seria
 
 trait OptionInstances0 {
   implicit def OptionEq[A: Eq] = new OptionEq[A]
+  implicit def OptionMonoid[A: Semigroup] = new OptionMonoid[A]
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit def OptionMonoid[A: Semigroup] = new OptionMonoid[A]
+  implicit def OptionCMonoid[A: CSemigroup] = new OptionCMonoid[A]
   implicit def OptionAdditiveMonoid[A: AdditiveSemigroup] = new OptionAdditiveMonoid[A]
   implicit def OptionMultiplicativeMonoid[A: MultiplicativeSemigroup] = new OptionMultiplicativeMonoid[A]
 

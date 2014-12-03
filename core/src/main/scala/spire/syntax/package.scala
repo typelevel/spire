@@ -1,12 +1,11 @@
 package spire
 
-import spire.syntax._
-
 package object syntax {
   object cfor extends CforSyntax
   object literals extends LiteralsSyntax
 
   object eq extends EqSyntax
+  object partialOrder extends PartialOrderSyntax
   object order extends OrderSyntax
   object signed extends SignedSyntax
   object isReal extends IsRealSyntax
@@ -38,7 +37,9 @@ package object syntax {
   object normedVectorSpace extends NormedVectorSpaceSyntax
   object innerProductSpace extends InnerProductSpaceSyntax
 
-  object booleanAlgebra extends BooleanAlgebraSyntax
+  object lattice extends LatticeSyntax
+  object heyting extends HeytingSyntax
+  object bool extends BoolSyntax
 
   object bitString extends BitStringSyntax
 

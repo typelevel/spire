@@ -8,8 +8,7 @@ import scala.{ specialized => spec }
  * `op(x, id) == op(id, x) == x`. For example, if we have `Monoid[String]`,
  * with `op` as string concatenation, then `id = ""`.
  */
-trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
-    extends Semigroup[A] {
+trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Semigroup[A] {
 
   /**
    * Return the identity element for this monoid.
@@ -17,18 +16,23 @@ trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
   def id: A
 
   /**
-   * Return `a` combined with itself `n` times.
-   */
-  override def sumn(a: A, n: Int): A =
-    if (n < 0) throw new IllegalArgumentException("Repeated summation for monoids must have reptitions >= 0")
-    else if (n == 0) id
-    else if (n == 1) a
-    else sumnAboveOne(a, n)
+    * Tests if `a` is the identity.
+    */
+  def isId(a: A)(implicit ev: Eq[A]) = ev.eqv(a, id)
 
   /**
-   *  Given a sequence of `as`, sum them using the monoid and return the total.
+   * Return `a` combined with itself `n` times.
    */
-  def sum(as: TraversableOnce[A]): A = as.reduce(op)
+  override def combinen(a: A, n: Int): A =
+    if (n < 0) throw new IllegalArgumentException("Repeated combination for monoids must have reptitions >= 0")
+    else if (n == 0) id
+    else if (n == 1) a
+    else combinenAboveOne(a, n)
+
+  /**
+   *  Given a sequence of `as`, combine them using the monoid and return the total.
+   */
+  def combine(as: TraversableOnce[A]): A = as.aggregate(id)(op, op)
 }
 
 object Monoid {
@@ -53,8 +57,7 @@ object Monoid {
  * 
  * A monoid is commutative if for all x and y, x |+| y === y |+| x.
  */
-trait CMonoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
-    extends Monoid[A] with CSemigroup[A]
+trait CMonoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Monoid[A] with CSemigroup[A]
 
 object CMonoid {
   @inline final def apply[A](implicit ev: CMonoid[A]): CMonoid[A] = ev

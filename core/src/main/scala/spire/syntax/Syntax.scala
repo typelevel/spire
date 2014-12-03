@@ -1,16 +1,20 @@
 package spire.syntax
 
 import spire.algebra._
+import spire.algebra.lattice._
 import spire.math._
 import spire.macros.Syntax
-import spire.macrosk._
 import spire.syntax.std._
 
 trait EqSyntax {
   implicit def eqOps[A:Eq](a:A) = new EqOps(a)
 }
 
-trait OrderSyntax extends EqSyntax {
+trait PartialOrderSyntax extends EqSyntax {
+  implicit def partialOrderOps[A:PartialOrder](a:A) = new PartialOrderOps(a)
+}
+
+trait OrderSyntax extends PartialOrderSyntax {
   implicit def orderOps[A:Order](a:A) = new OrderOps(a)
   implicit def literalIntOrderOps(lhs: Int) = new LiteralIntOrderOps(lhs)
   implicit def literalLongOrderOps(lhs: Long) = new LiteralLongOrderOps(lhs)
@@ -29,7 +33,9 @@ trait SemigroupSyntax {
   implicit def semigroupOps[A:Semigroup](a:A) = new SemigroupOps(a)
 }
 
-trait MonoidSyntax extends SemigroupSyntax
+trait MonoidSyntax extends SemigroupSyntax {
+  implicit def monoidOps[A](a:A)(implicit ev: Monoid[A]) = new MonoidOps(a)
+}
 
 trait GroupSyntax extends MonoidSyntax {
   implicit def groupOps[A:Group](a:A) = new GroupOps(a)
@@ -42,7 +48,9 @@ trait AdditiveSemigroupSyntax {
   implicit def literalDoubleAdditiveSemigroupOps(lhs:Double) = new LiteralDoubleAdditiveSemigroupOps(lhs)
 }
 
-trait AdditiveMonoidSyntax extends AdditiveSemigroupSyntax
+trait AdditiveMonoidSyntax extends AdditiveSemigroupSyntax {
+  implicit def additiveMonoidOps[A](a:A)(implicit ev: AdditiveMonoid[A]) = new AdditiveMonoidOps(a)
+}
 
 trait AdditiveGroupSyntax extends AdditiveMonoidSyntax {
   implicit def additiveGroupOps[A:AdditiveGroup](a:A) = new AdditiveGroupOps(a)
@@ -58,7 +66,10 @@ trait MultiplicativeSemigroupSyntax {
   implicit def literalDoubleMultiplicativeSemigroupOps(lhs:Double) = new LiteralDoubleMultiplicativeSemigroupOps(lhs)
 }
 
-trait MultiplicativeMonoidSyntax extends MultiplicativeSemigroupSyntax
+trait MultiplicativeMonoidSyntax extends MultiplicativeSemigroupSyntax {
+  implicit def multiplicativeMonoidOps[A](a:A)(implicit ev: MultiplicativeMonoid[A]) =
+    new MultiplicativeMonoidOps(a)
+}
 
 trait MultiplicativeGroupSyntax extends MultiplicativeMonoidSyntax {
   implicit def multiplicativeGroupOps[A:MultiplicativeGroup](a:A) = new MultiplicativeGroupOps(a)
@@ -110,8 +121,17 @@ trait TrigSyntax {
   implicit def trigOps[A:Trig](a: A) = new TrigOps(a)
 }
 
-trait BooleanAlgebraSyntax {
-  implicit def booleanAlgebraOps[A:BooleanAlgebra](a: A) = new BooleanAlgebraOps(a)
+trait LatticeSyntax {
+  implicit def meetOps[A: MeetSemilattice](a: A) = new MeetOps(a)
+  implicit def joinOps[A: JoinSemilattice](a: A) = new JoinOps(a)
+}
+
+trait HeytingSyntax {
+  implicit def heytingOps[A: Heyting](a: A) = new HeytingOps(a)
+}
+
+trait BoolSyntax extends HeytingSyntax {
+  implicit def boolOps[A: Bool](a: A) = new BoolOps(a)
 }
 
 trait BitStringSyntax {
@@ -184,6 +204,7 @@ trait AllSyntax extends
     LiteralsSyntax with
     CforSyntax with
     EqSyntax with
+    PartialOrderSyntax with
     OrderSyntax with
     SignedSyntax with
     IsRealSyntax with
@@ -208,7 +229,9 @@ trait AllSyntax extends
     VectorSpaceSyntax with
     NormedVectorSpaceSyntax with
     InnerProductSpaceSyntax with
-    BooleanAlgebraSyntax with
+    LatticeSyntax with
+    HeytingSyntax with
+    BoolSyntax with
     BitStringSyntax with
     GroupActionSyntax with
     TorsorSyntax with

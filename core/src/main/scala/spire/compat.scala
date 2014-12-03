@@ -1,11 +1,13 @@
 package spire
 
-import spire.algebra._
-import spire.math._
+import spire.algebra.{Eq, EuclideanRing, Field, PartialOrder, Order, Ring, Signed}
+import spire.math.{ConvertableFrom, ConvertableTo}
+import spire.math.{ScalaEquivWrapper, ScalaFractionalWrapper, ScalaIntegralWrapper, ScalaNumericWrapper, ScalaPartialOrderingWrapper, ScalaOrderingWrapper}
 
 private[spire] trait CompatPriority1 {
   implicit def numeric[A: Ring: ConvertableFrom: Signed: Order]: scala.math.Numeric[A] =
     new ScalaNumericWrapper[A] {
+      val partialOrder = PartialOrder[A]
       val order = Order[A]
       val structure = Ring[A]
       val conversions = ConvertableFrom[A]
@@ -15,6 +17,11 @@ private[spire] trait CompatPriority1 {
   implicit def ordering[A: Order]: scala.math.Ordering[A] =
     new ScalaOrderingWrapper[A] {
       val order = Order[A]
+    }
+
+  implicit def partialOrdering[A: PartialOrder]: scala.math.PartialOrdering[A] =
+    new ScalaPartialOrderingWrapper[A] {
+      val partialOrder = PartialOrder[A]
     }
 
   implicit def equiv[A: Eq]: scala.math.Equiv[A] =

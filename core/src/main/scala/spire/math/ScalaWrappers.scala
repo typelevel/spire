@@ -1,12 +1,25 @@
 package spire.math
 
-import spire.algebra._
+import spire.algebra.{Eq, EuclideanRing, Field, PartialOrder, Order, Ring, Signed}
 
 private[spire] trait ScalaEquivWrapper[A] extends scala.math.Equiv[A] {
   def eq: Eq[A]
 
   def equiv(x:A, y:A): Boolean = eq.eqv(x, y)
 }
+
+private[spire] trait ScalaPartialOrderingWrapper[A] extends scala.math.PartialOrdering[A] {
+  def partialOrder: PartialOrder[A]
+
+  def tryCompare(x:A, y:A): Option[Int] = partialOrder.tryCompare(x, y)
+
+  override def equiv(x:A, y:A): Boolean = partialOrder.eqv(x, y)
+  override def gt(x:A, y:A): Boolean = partialOrder.gt(x, y)
+  override def gteq(x:A, y:A): Boolean = partialOrder.gteqv(x, y)
+  override def lt(x:A, y:A): Boolean = partialOrder.lt(x, y)
+  override def lteq(x:A, y:A): Boolean = partialOrder.lteqv(x, y)
+}
+
 
 private[spire] trait ScalaOrderingWrapper[A] extends scala.math.Ordering[A] {
   def order: Order[A]
@@ -23,8 +36,7 @@ private[spire] trait ScalaOrderingWrapper[A] extends scala.math.Ordering[A] {
   override def max(x:A, y:A): A = order.max(x, y)
 }
 
-private[spire] trait ScalaNumericWrapper[A] extends scala.math.Numeric[A]
-with ScalaOrderingWrapper[A] {
+private[spire] trait ScalaNumericWrapper[A] extends scala.math.Numeric[A] with ScalaOrderingWrapper[A] {
   def structure: Ring[A]
   def conversions: ConvertableFrom[A]
   def signed: Signed[A]
@@ -47,15 +59,13 @@ with ScalaOrderingWrapper[A] {
   override def abs(x: A): A = signed.abs(x)
 }
 
-private[spire] trait ScalaFractionalWrapper[A] extends ScalaNumericWrapper[A]
-with scala.math.Fractional[A] {
+private[spire] trait ScalaFractionalWrapper[A] extends ScalaNumericWrapper[A] with scala.math.Fractional[A] {
   def structure: Field[A]
 
   def div(x:A, y:A) = structure.div(x, y)
 }
 
-private[spire] trait ScalaIntegralWrapper[A] extends ScalaNumericWrapper[A]
-with scala.math.Integral[A]{
+private[spire] trait ScalaIntegralWrapper[A] extends ScalaNumericWrapper[A] with scala.math.Integral[A]{
   def structure: EuclideanRing[A]
 
   def quot(x:A, y:A): A = structure.quot(x, y)

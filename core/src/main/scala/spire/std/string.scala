@@ -1,6 +1,6 @@
 package spire.std
 
-import spire.algebra._
+import spire.algebra.{MetricSpace, Monoid, Order}
 
 @SerialVersionUID(0L)
 class StringMonoid extends Monoid[String] with Serializable {

@@ -4,11 +4,10 @@ import org.scalatest.Matchers
 import org.scalatest._
 import prop._
 
-import org.scalacheck.Arbitrary._
 import org.scalacheck._
 
 class SamplingTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
-  val rng = spire.random.mutable.Lcg64.fromTime()
+  val rng = spire.random.rng.Lcg64.fromTime()
 
   val Size = 100
   val range = (1 to Size)

@@ -1,11 +1,7 @@
 package spire.math
 
 import spire.algebra._
-import spire.std.float._
-import spire.std.double._
-import spire.std.bigDecimal._
 
-import spire.syntax.convertableFrom._
 import spire.syntax.field._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
@@ -108,7 +104,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
 
   /**
    * This implements sgn(z), which (except for z=0) observes:
-   * 
+   *
    * `sgn(z) = z / abs(z) = abs(z) / z`
    */
   def complexSignum(implicit f: Field[T], o: IsReal[T], n: NRoot[T]): Complex[T] =
@@ -120,17 +116,16 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
   def arg(implicit f: Field[T], t: Trig[T], o: IsReal[T]): T =
     if (isZero) f.zero else t.atan2(imag, real)
 
-  def norm(implicit f: Field[T], n: NRoot[T]): T =
-    (real * real + imag * imag).sqrt
+  def norm(implicit f: Field[T], n: NRoot[T], o: Order[T]): T = hypot(real, imag)
 
   def conjugate(implicit f: Rng[T]): Complex[T] = new Complex(real, -imag)
 
   def asTuple: (T, T) = (real, imag)
   def asPolarTuple(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): (T, T) = (abs, arg)
 
-  def isZero(implicit o: IsReal[T]): Boolean = real.isZero && imag.isZero
-  def isImaginary(implicit o: IsReal[T]): Boolean = real.isZero
-  def isReal(implicit o: IsReal[T]): Boolean = imag.isZero
+  def isZero(implicit o: IsReal[T]): Boolean = real.isSignZero && imag.isSignZero
+  def isImaginary(implicit o: IsReal[T]): Boolean = real.isSignZero
+  def isReal(implicit o: IsReal[T]): Boolean = imag.isSignZero
 
   def eqv(b: Complex[T])(implicit o: Eq[T]): Boolean = real === b.real && imag === b.imag
   def neqv(b: Complex[T])(implicit o: Eq[T]): Boolean = real =!= b.real || imag =!= b.imag
@@ -153,7 +148,7 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
 
   def **(e: T)(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] = this pow e
   def pow(e: T)(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] =
-    if (e.isZero) {
+    if (e.isSignZero) {
       Complex.one[T]
     } else if (this.isZero) {
       if (e < f.zero)
@@ -289,11 +284,11 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
   def sinh(implicit f: Field[T], t: Trig[T]): Complex[T] =
     new Complex(t.sinh(real) * t.cos(imag), t.cosh(real) * t.sin(imag))
 
-  // cos(a+ci) = (cos(a) * cosh(c)) - (sin(a) * sinh(c))i 
+  // cos(a+ci) = (cos(a) * cosh(c)) - (sin(a) * sinh(c))i
   def cos(implicit f: Field[T], t: Trig[T]): Complex[T] =
     new Complex(t.cos(real) * t.cosh(imag), -t.sin(real) * t.sinh(imag))
 
-  // cosh(a+ci) = (cosh(a) * cos(c)) + (sinh(a) * sin(c))i 
+  // cosh(a+ci) = (cosh(a) * cos(c)) + (sinh(a) * sin(c))i
   def cosh(implicit f: Field[T], t: Trig[T]): Complex[T] =
     new Complex(t.cosh(real) * t.cos(imag), t.sinh(real) * t.sin(imag))
 
@@ -453,7 +448,7 @@ object FastComplex {
   @inline final def real(d: Long): Float = bits((d & 0xffffffff).toInt)
 
   // get the imaginary part of the complex number
-  @inline final def imag(d: Long): Float = bits((d >> 32).toInt)
+  @inline final def imag(d: Long): Float = bits((d >>> 32).toInt)
 
   // define some handy constants
   final val i = encode(0.0F, 1.0F)
@@ -461,14 +456,12 @@ object FastComplex {
   final val zero = encode(0.0F, 0.0F)
 
   // encode two floats representing a complex number
-  @inline final def encode(real: Float, imag: Float): Long = {
-    (bits(imag).toLong << 32) + bits(real).toLong
-  }
+  @inline final def encode(real: Float, imag: Float): Long =
+    (bits(real) & 0xffffffffL) | ((bits(imag) & 0xffffffffL) << 32)
 
   // encode two floats representing a complex number in polar form
-  @inline final def polar(magnitude: Float, angle: Float): Long = {
+  @inline final def polar(magnitude: Float, angle: Float): Long =
     encode(magnitude * cos(angle).toFloat, magnitude * sin(angle).toFloat)
-  }
 
   // decode should be avoided in fast code because it allocates a Tuple2.
   final def decode(d: Long): (Float, Float) = (real(d), imag(d))
@@ -605,9 +598,7 @@ private[math] trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
 }
 
-private[math] trait ComplexIsField[@spec(Float,Double) A]
-extends ComplexIsRing[A] with Field[Complex[A]] {
-  import spire.syntax.order._
+private[math] trait ComplexIsField[@spec(Float,Double) A] extends ComplexIsRing[A] with Field[Complex[A]] {
 
   implicit def algebra: Field[A]
 

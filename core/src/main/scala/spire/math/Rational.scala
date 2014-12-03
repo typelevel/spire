@@ -5,7 +5,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import java.lang.Math
 
-import spire.algebra._
+import spire.algebra.{Field, IsReal, NRoot, Sign}
 import spire.algebra.Sign.{ Positive, Zero, Negative }
 
 sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] { lhs =>
@@ -291,7 +291,13 @@ object Rational extends RationalInstances {
   def apply(n: SafeLong, d: SafeLong): Rational = {
     if (d < 0) return apply(-n, -d)
     val g = n gcd d
-    (n / g).foldWith[Rational,LongRational,BigRational](d / g)(LongRational(_, _), BigRational(_, _))
+    (n / g) match {
+      case SafeLongLong(x) => (d / g) match {
+        case SafeLongLong(y) => LongRational(x, y)
+        case SafeLongBigInt(y) => BigRational(x, y)
+      }
+      case SafeLongBigInt(x) => BigRational(x, (d / g).toBigInt)
+    }
   }
 
   def apply(n: Long, d: Long): Rational = LongRationals.build(n, d)
@@ -342,8 +348,11 @@ object Rational extends RationalInstances {
     }
   }
 
-  implicit def apply(x: SafeLong): Rational =
-    x.fold(LongRationals.unsafeBuild(_, 1L), BigRationals.unsafeBuild(_, BigInt(1)))
+  implicit def apply(n: SafeLong): Rational =
+    n match {
+      case SafeLongLong(x) => LongRationals.unsafeBuild(x, 1L)
+      case SafeLongBigInt(x) => BigRationals.unsafeBuild(x, BigInt(1))
+    }
 
   implicit def apply(x: Number): Rational = x match {
     case RationalNumber(n) => apply(n)
@@ -414,8 +423,6 @@ object Rational extends RationalInstances {
 
 
 private[math] abstract class Rationals[@specialized(Long) A](implicit integral: Integral[A]) {
-  import LongRationals._
-  import BigRationals._
   import integral._
 
   def build(n: A, d: A): Rational
@@ -561,7 +568,12 @@ private[math] object LongRationals extends Rationals[Long] {
           val lden: Long = d / dgcd
           val rden: Long = r.d / dgcd
           val num: SafeLong = SafeLong(n) * rden + SafeLong(r.n) * lden
-          val ngcd: Long = num.fold(spire.math.gcd(_, dgcd), num => spire.math.gcd(dgcd, (num % dgcd).toLong))
+
+          val ngcd: Long = num match {
+            case SafeLongLong(x) => spire.math.gcd(x, dgcd)
+            case SafeLongBigInt(x) => spire.math.gcd(dgcd, (x % dgcd).toLong)
+          }
+
           if (ngcd == 1L)
             Rational(num, SafeLong(lden) * r.d)
           else
@@ -580,7 +592,11 @@ private[math] object LongRationals extends Rationals[Long] {
           val lden: Long = d / dgcd
           val rden: SafeLong = SafeLong(r.d) / dgcd
           val num: SafeLong = rden * n + SafeLong(r.n) * lden
-          val ngcd: Long = num.fold(spire.math.gcd(_, dgcd), num => spire.math.gcd(dgcd, (num % dgcd).toLong))
+          val ngcd: Long = num match {
+            case SafeLongLong(x) => spire.math.gcd(x, dgcd)
+            case SafeLongBigInt(x) => spire.math.gcd(dgcd, (x % dgcd).toLong)
+          }
+
           if (ngcd == 1L)
             Rational(num, SafeLong(lden) * r.d)
           else
@@ -604,7 +620,11 @@ private[math] object LongRationals extends Rationals[Long] {
           val lden: Long = d / dgcd
           val rden: Long = r.d / dgcd
           val num: SafeLong = SafeLong(n) * rden - SafeLong(r.n) * lden
-          val ngcd: Long = num.fold(spire.math.gcd(_, dgcd), num => spire.math.gcd(dgcd, (num % dgcd).toLong))
+          val ngcd: Long = num match {
+            case SafeLongLong(x) => spire.math.gcd(x, dgcd)
+            case SafeLongBigInt(x) => spire.math.gcd(dgcd, (x % dgcd).toLong)
+          }
+
           if (ngcd == 1L)
             Rational(num, SafeLong(lden) * r.d)
           else
@@ -623,7 +643,11 @@ private[math] object LongRationals extends Rationals[Long] {
           val lden: Long = d / dgcd
           val rden: SafeLong = SafeLong(r.d) / dgcd
           val num: SafeLong = rden * n - SafeLong(r.n) * lden
-          val ngcd: Long = num.fold(spire.math.gcd(_, dgcd), num => spire.math.gcd(dgcd, (num % dgcd).toLong))
+          val ngcd: Long = num match {
+            case SafeLongLong(x) => spire.math.gcd(x, dgcd)
+            case SafeLongBigInt(x) => spire.math.gcd(dgcd, (x % dgcd).toLong)
+          }
+
           if (ngcd == 1L)
             Rational(num, SafeLong(lden) * r.d)
           else

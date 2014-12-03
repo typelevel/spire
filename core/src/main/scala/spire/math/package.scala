@@ -1,23 +1,20 @@
 package spire
 
-import spire.algebra._
-import spire.math._
-
-import scala.annotation.tailrec
-import scala.{specialized => spec}
-
-import spire.std.bigDecimal._
-import spire.syntax.nroot._
-
-import scala.math.ScalaNumericConversions
-
 import java.lang.Long.numberOfTrailingZeros
 import java.lang.Math
 import java.math.BigInteger
 import java.math.MathContext
 import java.math.RoundingMode
 
+import scala.annotation.tailrec
+import scala.{specialized => spec}
+import scala.math.ScalaNumericConversions
+
 import BigDecimal.RoundingMode.{FLOOR, HALF_UP, CEILING}
+
+import spire.algebra.{EuclideanRing, Field, IsReal, NRoot, Order, Signed, Trig}
+import spire.std.bigDecimal._
+import spire.syntax.nroot._
 
 package object math {
 
@@ -174,7 +171,7 @@ package object math {
     }
 
     val r = doit(k.mc.getPrecision + 3, 1000)
-    BigDecimal(r.bigDecimal, k.mc)
+    new BigDecimal(r.bigDecimal, k.mc)
   }
 
   final def exp[A](a: A)(implicit t: Trig[A]): A = t.exp(a)
@@ -183,6 +180,9 @@ package object math {
    * log
    */
   final def log(n: Double): Double = Math.log(n)
+
+  final def log(n: Double, base: Int): Double =
+    Math.log(n) / Math.log(base)
 
   final def log(n: BigDecimal): BigDecimal = {
     val scale = n.mc.getPrecision
@@ -211,7 +211,14 @@ package object math {
     (ln(x) * BigDecimal(2).pow(i)).setScale(scale, HALF_UP)
   }
 
-  final def log[A](a: A)(implicit t: Trig[A]): A = t.log(a)
+  def log(n: BigDecimal, base: Int): BigDecimal =
+    log(n) / log(BigDecimal(base))
+
+  final def log[A](a: A)(implicit t: Trig[A]): A =
+    t.log(a)
+
+  final def log[A](a: A, base: Int)(implicit f: Field[A], t: Trig[A]): A =
+    f.div(t.log(a), t.log(f.fromInt(base)))
 
   /**
    * pow
@@ -247,7 +254,7 @@ package object math {
    * Exponentiation function, e.g. x^y
    *
    * If base^ex doesn't fit in a Long, the result will overflow (unlike
-   * Math.pow which will return +/- Infinity). 
+   * Math.pow which will return +/- Infinity).
    */
   final def pow(base: Long, exponent: Long): Long = {
     @tailrec def longPow(t: Long, b: Long, e: Long): Long =
@@ -273,11 +280,11 @@ package object math {
   final def gcd(_x: Long, _y: Long): Long = {
     if (_x == 0L) return Math.abs(_y)
     if (_y == 0L) return Math.abs(_x)
-  
+
     var x = _x
     var xz = numberOfTrailingZeros(x)
     x = Math.abs(x >> xz)
-  
+
     var y = _y
     var yz = numberOfTrailingZeros(y)
     y = Math.abs(y >> yz)
@@ -377,7 +384,6 @@ package object math {
   final def expm1(x: Double): Double = Math.expm1(x)
   final def getExponent(x: Double): Int = Math.getExponent(x)
   final def getExponent(x: Float): Int = Math.getExponent(x)
-  final def hypot(x: Double, y: Double): Double = Math.hypot(x, y)
   final def IEEEremainder(x: Double, d: Double): Double = Math.IEEEremainder(x, d)
   final def log10(x: Double): Double = Math.log10(x)
   final def log1p(x: Double): Double = Math.log1p(x)
@@ -393,6 +399,13 @@ package object math {
   final def toRadians(a: Double): Double = Math.toRadians(a)
   final def ulp(x: Double): Double = Math.ulp(x)
   final def ulp(x: Float): Double = Math.ulp(x)
+
+  final def hypot[@spec(Float, Double) A](x: A, y: A)
+    (implicit f: Field[A], n: NRoot[A], o: Order[A]): A = {
+    import spire.implicits._
+    if (x > y) x.abs * (1 + (y/x)**2).sqrt
+    else y.abs * (1 + (x/y)**2).sqrt
+  }
 
   // ugly internal scala.math.ScalaNumber utilities follow
 

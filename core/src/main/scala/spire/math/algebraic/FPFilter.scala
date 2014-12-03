@@ -1,8 +1,6 @@
 package spire.math.algebraic
 
-import spire.math._
 import spire.algebra.Sign
-
 
 /**
  * A mix-in for `RealLike` that adds an internal floating pointer filter.

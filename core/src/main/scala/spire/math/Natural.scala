@@ -1,10 +1,10 @@
 package spire.math
 
-import spire.algebra._
-
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.{specialized => spec}
+
+import spire.algebra.{IsIntegral, Order, Rig, Signed}
 
 import Natural._
 

@@ -1,6 +1,6 @@
 package spire.math
 
-import spire.algebra._
+import spire.algebra.{IsIntegral, Order, Rig, Signed}
 
 object UInt extends UIntInstances {
   @inline final def apply(n: Int) = new UInt(n)

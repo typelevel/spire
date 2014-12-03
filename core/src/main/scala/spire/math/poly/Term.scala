@@ -1,12 +1,10 @@
 package spire.math.poly
 
-import compat._
-import spire.math._
-import spire.algebra._
-import spire.implicits._
-import spire.syntax._
-
 import scala.{specialized => spec}
+
+import spire.algebra.{Eq, Field, Order, Rig, Ring, Rng, Semiring}
+import spire.syntax.field._
+import spire.syntax.eq._
 
 // Univariate polynomial term
 case class Term[@spec(Float, Double) C](coeff: C, exp: Int) { lhs =>
@@ -15,7 +13,7 @@ case class Term[@spec(Float, Double) C](coeff: C, exp: Int) { lhs =>
 
   def +(rhs: Term[C])(implicit r: Semiring[C]): Term[C] = {
     if (lhs.exp != rhs.exp)
-      throw new IllegalArgumentException(s"can't add terms of degree $exp and $e")
+      throw new IllegalArgumentException(s"can't add terms of degree $exp and ${rhs.exp}")
     Term(lhs.coeff + rhs.coeff, lhs.exp)
   }
 

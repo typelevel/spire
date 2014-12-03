@@ -15,9 +15,7 @@ import scala.{specialized => sp}
  * 4. `(g <-> h) === -(h <-> g)` for all `g`, `h` in `G`.
  * 
  */
-trait Torsor[V, @sp(Int,Long,Float,Double) R] extends GroupAction[V, R] { self =>
-  implicit def scalar: AbGroup[R]
-
+trait Torsor[V, @sp(Int,Long,Float,Double) R] extends Any with GroupAction[V, R] { self =>
   def diff(v: V, w: V): R
 
   def fixOrigin(id0: V): AbGroup[V] =
@@ -29,7 +27,7 @@ trait Torsor[V, @sp(Int,Long,Float,Double) R] extends GroupAction[V, R] { self =
     }
 }
 
-trait AdditiveTorsor[V, @sp(Int,Long,Float,Double) R] extends AdditiveGroupAction[V, R] { self =>
+trait AdditiveTorsor[V, @sp(Int,Long,Float,Double) R] extends Any with AdditiveGroupAction[V, R] { self =>
   implicit def scalar: AdditiveAbGroup[R]
 
   def pminus(v: V, w: V): R
@@ -43,7 +41,7 @@ trait AdditiveTorsor[V, @sp(Int,Long,Float,Double) R] extends AdditiveGroupActio
     }
 }
 
-trait MultiplicativeTorsor[V, @sp(Int,Long,Float,Double) R] extends MultiplicativeGroupAction[V, R] { self =>
+trait MultiplicativeTorsor[V, @sp(Int,Long,Float,Double) R] extends Any with MultiplicativeGroupAction[V, R] { self =>
   implicit def scalar: MultiplicativeAbGroup[R]
 
   def pdiv(v: V, w: V): R

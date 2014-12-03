@@ -2,12 +2,11 @@ package spire.std
 
 import java.lang.Integer.highestOneBit
 
-import spire.algebra._
-
-import spire.NoImplicit
-
 import scala.{ specialized => spec }
 import scala.reflect.ClassTag
+
+import spire.algebra._
+import spire.NoImplicit
 
 object ArraySupport {
   import spire.syntax.order._

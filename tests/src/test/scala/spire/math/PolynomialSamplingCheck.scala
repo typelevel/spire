@@ -3,9 +3,7 @@ package spire.math
 import spire.algebra._
 import spire.math.poly._
 import spire.std.bigDecimal._
-import spire.syntax.literals._
 import spire.syntax.euclideanRing._
-import spire.optional.rationalTrig._
 
 import scala.reflect.ClassTag
 
@@ -33,7 +31,7 @@ class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrive
     implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
-      Polynomial(ts).toDense
+      Polynomial(ts.take(6)).toDense
     })
     runTest[A](s"$typ/dense")
   }
@@ -42,7 +40,7 @@ class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrive
     implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
-      Polynomial(ts).toSparse
+      Polynomial(ts.take(6)).toSparse
     })
     runTest[A](s"$typ/sparse")
   }

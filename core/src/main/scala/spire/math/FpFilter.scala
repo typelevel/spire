@@ -2,10 +2,8 @@ package spire.math
 
 import scala.language.experimental.macros
 
-import scala.reflect.macros.Context
-
-import spire.algebra._
-import spire.syntax.isReal._
+import spire.algebra.{Field, IsReal, NRoot, Rng, Semiring, Signed}
+import spire.macros.compat.Context
 import spire.macros.fpf._
 
 /**

@@ -1,11 +1,8 @@
 package spire.benchmark
 
-import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
 import spire.implicits._
-import spire.math._
-//import spire.syntax._
 
 import com.google.caliper.Runner 
 import com.google.caliper.SimpleBenchmark
@@ -38,12 +35,17 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
 
   val javaRng = new java.util.Random(long)
   val scalaRng = new scala.util.Random(long)
-  val lcg32Rng = spire.random.mutable.Lcg32.fromSeed(int)
-  val lcg64Rng = spire.random.mutable.Lcg64.fromSeed(long)
-  val burtle2Rng = spire.random.mutable.BurtleRot2.fromSeed(ints4)
-  val burtle3Rng = spire.random.mutable.BurtleRot3.fromSeed(ints4)
-  val cmwc5Rng = spire.random.mutable.Cmwc5.fromSeed(longs5)
-  val well512Rng = spire.random.mutable.Well512.fromSeed(ints16)
+  val lcg32Rng = spire.random.rng.Lcg32.fromSeed(int)
+  val lcg64Rng = spire.random.rng.Lcg64.fromSeed(long)
+  val burtle2Rng = spire.random.rng.BurtleRot2.fromSeed(ints4)
+  val burtle3Rng = spire.random.rng.BurtleRot3.fromSeed(ints4)
+  val cmwc5Rng = spire.random.rng.Cmwc5.fromSeed(longs5)
+  val well512aRng = spire.random.rng.Well512a.fromSeed(ints16, 0)
+  val well1024aRng = spire.random.rng.Well1024a.fromArray(ints16)
+  val well19937aRng = spire.random.rng.Well19937a.fromArray(ints16)
+  val well19937cRng = spire.random.rng.Well19937c.fromArray(ints16)
+  val well44497aRng = spire.random.rng.Well44497a.fromArray(ints16)
+  val well44497bRng = spire.random.rng.Well44497b.fromArray(ints16)
 
   @inline final def nextLen = 1000000
 
@@ -90,8 +92,38 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
   }
 
-  def timeNextIntWell512(reps: Int) = run(reps) {
-    val rng = well512Rng
+  def timeNextIntWell512a(reps: Int) = run(reps) {
+    val rng = well512aRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntWell1024a(reps: Int) = run(reps) {
+    val rng = well1024aRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntWell19937a(reps: Int) = run(reps) {
+    val rng = well19937aRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntWell19937c(reps: Int) = run(reps) {
+    val rng = well19937cRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntWell44497a(reps: Int) = run(reps) {
+    val rng = well44497aRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntWell44497b(reps: Int) = run(reps) {
+    val rng = well44497bRng
     var t = 0
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
   }
@@ -139,8 +171,38 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
   }
 
-  def timeNextIntSyncWell512(reps: Int) = run(reps) {
-    val rng = well512Rng.sync
+  def timeNextIntSyncWell512a(reps: Int) = run(reps) {
+    val rng = well512aRng.sync
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntSyncWell1024a(reps: Int) = run(reps) {
+    val rng = well1024aRng.sync
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntSyncWell19937a(reps: Int) = run(reps) {
+    val rng = well19937aRng.sync
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntSyncWell19937c(reps: Int) = run(reps) {
+    val rng = well19937cRng.sync
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntSyncWell44497a(reps: Int) = run(reps) {
+    val rng = well44497aRng.sync
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntSyncWell44497b(reps: Int) = run(reps) {
+    val rng = well44497bRng.sync
     var t = 0
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
   }
@@ -188,8 +250,38 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextLong())
   }
 
-  def timeNextLongWell512(reps: Int) = run(reps) {
-    val rng = well512Rng
+  def timeNextLongWell512a(reps: Int) = run(reps) {
+    val rng = well512aRng
+    var t = 0L
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextLong())
+  }
+
+  def timeNextLongWell1024a(reps: Int) = run(reps) {
+    val rng = well1024aRng
+    var t = 0L
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextLong())
+  }
+
+  def timeNextLongWell19937a(reps: Int) = run(reps) {
+    val rng = well19937aRng
+    var t = 0L
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextLong())
+  }
+
+  def timeNextLongWell19937c(reps: Int) = run(reps) {
+    val rng = well19937cRng
+    var t = 0L
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextLong())
+  }
+
+  def timeNextLongWell44497a(reps: Int) = run(reps) {
+    val rng = well44497aRng
+    var t = 0L
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextLong())
+  }
+
+  def timeNextLongWell44497b(reps: Int) = run(reps) {
+    val rng = well44497bRng
     var t = 0L
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextLong())
   }
@@ -237,8 +329,38 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextDouble())
   }
 
-  def timeNextDoubleWell512(reps: Int) = run(reps) {
-    val rng = well512Rng
+  def timeNextDoubleWell512a(reps: Int) = run(reps) {
+    val rng = well512aRng
+    var t = 0.0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextDouble())
+  }
+
+  def timeNextDoubleWell1024a(reps: Int) = run(reps) {
+    val rng = well1024aRng
+    var t = 0.0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextDouble())
+  }
+
+  def timeNextDoubleWell19937a(reps: Int) = run(reps) {
+    val rng = well19937aRng
+    var t = 0.0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextDouble())
+  }
+
+  def timeNextDoubleWell19937c(reps: Int) = run(reps) {
+    val rng = well19937cRng
+    var t = 0.0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextDouble())
+  }
+
+  def timeNextDoubleWell44497a(reps: Int) = run(reps) {
+    val rng = well44497aRng
+    var t = 0.0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextDouble())
+  }
+
+  def timeNextDoubleWell44497b(reps: Int) = run(reps) {
+    val rng = well44497bRng
     var t = 0.0
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextDouble())
   }
@@ -286,8 +408,38 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt(100))
   }
 
-  def timeNextInt100Well512(reps: Int) = run(reps) {
-    val rng = well512Rng
+  def timeNextInt100Well512a(reps: Int) = run(reps) {
+    val rng = well512aRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt(100))
+  }
+
+  def timeNextInt100Well1024a(reps: Int) = run(reps) {
+    val rng = well1024aRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt(100))
+  }
+
+  def timeNextInt100Well19937a(reps: Int) = run(reps) {
+    val rng = well19937aRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt(100))
+  }
+
+  def timeNextInt100Well19937c(reps: Int) = run(reps) {
+    val rng = well19937cRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt(100))
+  }
+
+  def timeNextInt100Well44497a(reps: Int) = run(reps) {
+    val rng = well44497aRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt(100))
+  }
+
+  def timeNextInt100Well44497b(reps: Int) = run(reps) {
+    val rng = well44497bRng
     var t = 0
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt(100))
   }
@@ -337,9 +489,39 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
     cfor(0)(_ < fillLen, _ + 1)(_ => rng.fillBytes(bytes))
   }
 
-  def timeFillBytesWell512(reps: Int) = run(reps) {
+  def timeFillBytesWell512a(reps: Int) = run(reps) {
     val bytes = new Array[Byte](128)
-    val rng = well512Rng
+    val rng = well512aRng
+    cfor(0)(_ < fillLen, _ + 1)(_ => rng.fillBytes(bytes))
+  }
+
+  def timeFillBytesWell1024a(reps: Int) = run(reps) {
+    val bytes = new Array[Byte](128)
+    val rng = well1024aRng
+    cfor(0)(_ < fillLen, _ + 1)(_ => rng.fillBytes(bytes))
+  }
+
+  def timeFillBytesWell19937a(reps: Int) = run(reps) {
+    val bytes = new Array[Byte](128)
+    val rng = well19937aRng
+    cfor(0)(_ < fillLen, _ + 1)(_ => rng.fillBytes(bytes))
+  }
+
+  def timeFillBytesWell19937c(reps: Int) = run(reps) {
+    val bytes = new Array[Byte](128)
+    val rng = well19937cRng
+    cfor(0)(_ < fillLen, _ + 1)(_ => rng.fillBytes(bytes))
+  }
+
+  def timeFillBytesWell44497a(reps: Int) = run(reps) {
+    val bytes = new Array[Byte](128)
+    val rng = well44497aRng
+    cfor(0)(_ < fillLen, _ + 1)(_ => rng.fillBytes(bytes))
+  }
+
+  def timeFillBytesWell44497b(reps: Int) = run(reps) {
+    val bytes = new Array[Byte](128)
+    val rng = well44497bRng
     cfor(0)(_ < fillLen, _ + 1)(_ => rng.fillBytes(bytes))
   }
 }

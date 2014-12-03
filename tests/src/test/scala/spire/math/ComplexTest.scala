@@ -54,7 +54,7 @@ class ComplexTest extends FunSuite {
 
     assert(a + b === 5.0+5.0*i)
     assert(b + c === Complex(3.0, 2.0))
-    assert(b + c === Complex(3.0, 2.0))    
+    assert(b + c === Complex(3.0, 2.0))
 
     assert(a - b === Complex(3.0, 1.0))
     assert(b - c === Complex(-1.0, 2.0))
@@ -113,6 +113,9 @@ class ComplexTest extends FunSuite {
 
     assert(fc.real(z) == 0.0F)
     assert(fc.imag(z) < 0.000000001F)
+
+    assert(fc.multiply(fc.i, fc.i) === fc(-1f, 0f))
+    assert(fc.imag(fc(-1f, 0f)) === 0f)
   }
 
   test("try using FloatComplex") {
@@ -131,7 +134,7 @@ class ComplexTest extends FunSuite {
     val pi = FloatComplex(scala.math.Pi, 0.0)
 
     val z = e.pow(i * pi) + one
-    
+
     assert(z.real == 0.0F)
     assert(z.imag < 0.000000001F)
   }
@@ -148,5 +151,11 @@ class ComplexTest extends FunSuite {
     assert(Complex(3.0, -5.0).cos == Complex(-73.46729221264526, 10.471557674805572))
     assert(Complex(-3.0, 5.0).cos == Complex(-73.46729221264526, 10.471557674805572))
     assert(Complex(-3.0, -5.0).cos == Complex(-73.46729221264526, -10.471557674805572))
+  }
+
+  test("complex norm") {
+    assert(Complex(3.0, 4.0).norm == 5.0)
+    // check against overflow
+    assert(Complex((3e20).toFloat, (4e20).toFloat).norm == (5e20).toFloat)
   }
 }

@@ -6,6 +6,8 @@ import sbtunidoc.Plugin.UnidocKeys._
 
 import com.typesafe.sbt.pgp.PgpKeys._
 
+import pl.project13.scala.sbt.SbtJmh
+
 import sbtrelease._
 import sbtrelease.ReleasePlugin._
 import sbtrelease.ReleasePlugin.ReleaseKeys._
@@ -18,8 +20,8 @@ object MyBuild extends Build {
 
   // Dependencies
 
-  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.1.3"
-  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.11.3"
+  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.2.1"
+  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.11.6"
 
   // Release step
 
@@ -50,15 +52,16 @@ object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     organization := "org.spire-math",
 
-    scalaVersion := "2.10.2",
+    scalaVersion := "2.11.4",
 
-    crossScalaVersions := Seq("2.10.2", "2.11.1"),
+    crossScalaVersions := Seq("2.10.2", "2.11.4"),
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
-      "org.scala-lang" % "scala-reflect" % scalaVersion.value
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "org.typelevel" %% "machinist" % "0.3.0"
     ),
 
     scalacOptions ++= Seq(
@@ -75,6 +78,19 @@ object MyBuild extends Build {
 
     resolvers += Resolver.sonatypeRepo("snapshots"),
     resolvers += Resolver.sonatypeRepo("releases"),
+    resolvers += "bintray/non" at "http://dl.bintray.com/non/maven",
+
+    // re-enable to check imports, or once scala's REPL manages to not
+    // be useless under -Ywarn-unused-import.
+
+    // scalacOptions in Compile := {
+    //   CrossVersion.partialVersion(scalaVersion.value) match {
+    //     case Some((2, 10)) =>
+    //       scalacOptions.value
+    //     case Some((2, n)) if n >= 11 =>
+    //       scalacOptions.value ++ Seq("-Ywarn-unused-import")
+    //   }
+    // },
 
     libraryDependencies := {
       CrossVersion.partialVersion(scalaVersion.value) match {
@@ -155,7 +171,8 @@ object MyBuild extends Build {
 
   lazy val macroSettings = Seq(
     name := "spire-macros",
-    libraryDependencies ++= Seq(scalaTest % "test", scalaCheck % "test")
+    libraryDependencies ++= Seq(scalaTest % "test", scalaCheck % "test"),
+    unmanagedSourceDirectories in Compile += (sourceDirectory in Compile).value / s"scala_${scalaBinaryVersion.value}"
   )
 
   // Core
@@ -267,6 +284,14 @@ object MyBuild extends Build {
 
     // enable forking in run
     fork in run := true
+  ) ++ noPublish
+
+  lazy val benchmarkJmh: Project = Project("benchmark-jmh", file("benchmark-jmh")).
+    settings(benchmarkJmhSettings: _*).
+    dependsOn(core, benchmark)
+
+  lazy val benchmarkJmhSettings = SbtJmh.jmhSettings ++ Seq(
+    name := "spire-benchmark-jmh"
   ) ++ noPublish
 
 }

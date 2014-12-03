@@ -1,14 +1,12 @@
 package spire.math.poly
 
-import compat._
-import spire.math._
 import scala.annotation.tailrec
-import scala.reflect._
-import spire.algebra._
-import spire.implicits._
-import spire.syntax._
-
+import scala.reflect.ClassTag
 import scala.{specialized => spec}
+
+import spire.algebra.{Eq, Field, Ring}
+import spire.math.Polynomial
+import spire.syntax.field._
 
 object SpecialPolynomials {
 

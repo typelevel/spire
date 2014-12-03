@@ -316,30 +316,32 @@ object FixedPoint {
       def isWhole(x: FixedPoint): Boolean = x.isWhole
       def round(x: FixedPoint): FixedPoint = x.round
 
-      import spire.std.any._
-
-      def toRational(x: FixedPoint): Rational = x.toRational
-      def toDouble(x: FixedPoint): Double = x.toRational.toDouble
-      def toBigDecimal(x: FixedPoint): BigDecimal = x.toRational.toBigDecimal
-      def toBigInt(x: FixedPoint): BigInt = x.toRational.toBigInt
       def toByte(x: FixedPoint): Byte = x.toRational.toByte
-      def toFloat(x: FixedPoint): Float = x.toRational.toFloat
+      def toShort(x: FixedPoint): Short = x.toRational.toShort
       def toInt(x: FixedPoint): Int = x.toRational.toInt
       def toLong(x: FixedPoint): Long = x.toRational.toLong
+      def toFloat(x: FixedPoint): Float = x.toRational.toFloat
+      def toDouble(x: FixedPoint): Double = x.toRational.toDouble
+      def toBigInt(x: FixedPoint): BigInt = x.toRational.toBigInt
+      def toBigDecimal(x: FixedPoint): BigDecimal = x.toRational.toBigDecimal
+      def toRational(x: FixedPoint): Rational = x.toRational
+      def toAlgebraic(x: FixedPoint): Algebraic = Algebraic(x.toRational)
+      def toReal(x: FixedPoint): Real = Real(x.toRational)
       def toNumber(x: FixedPoint): Number = Number(x.toRational)
-      def toShort(x: FixedPoint): Short = x.toRational.toShort
       def toString(x: FixedPoint): String = x.toString
 
       def toType[B](x: FixedPoint)(implicit ev: ConvertableTo[B]): B =
         ev.fromRational(x.toRational)
 
-      def fromBigDecimal(n: BigDecimal): FixedPoint = FixedPoint(n)
-      def fromBigInt(n: BigInt): FixedPoint = FixedPoint(BigDecimal(n))
       def fromByte(n: Byte): FixedPoint = FixedPoint(n)
+      def fromShort(n: Short): FixedPoint = FixedPoint(n)
       def fromFloat(n: Float): FixedPoint = FixedPoint(n)
       def fromLong(n: Long): FixedPoint = FixedPoint(n)
+      def fromBigInt(n: BigInt): FixedPoint = FixedPoint(BigDecimal(n))
+      def fromBigDecimal(n: BigDecimal): FixedPoint = FixedPoint(n)
       def fromRational(n: Rational): FixedPoint = FixedPoint(n)
-      def fromShort(n: Short): FixedPoint = FixedPoint(n)
+      def fromAlgebraic(n: Algebraic): FixedPoint = FixedPoint(n.toRational)
+      def fromReal(n: Real): FixedPoint = FixedPoint(n.toRational)
 
       def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): FixedPoint =
         FixedPoint(ev.toRational(b))

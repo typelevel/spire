@@ -1,13 +1,13 @@
 package spire.std
 
-import spire.algebra._
+import java.lang.Math
+import java.math.MathContext
 
 import scala.annotation.tailrec
 
 import BigDecimal.RoundingMode.{CEILING, FLOOR, HALF_UP}
 
-import java.lang.Math
-import java.math.MathContext
+import spire.algebra.{Field, IsReal, NRoot, Order, Signed, Trig}
 
 trait BigDecimalIsField extends Field[BigDecimal] {
   override def minus(a: BigDecimal, b: BigDecimal): BigDecimal = a - b
@@ -147,7 +147,9 @@ trait BigDecimalOrder extends Order[BigDecimal] {
   override def lteqv(x: BigDecimal, y: BigDecimal) = x <= y
   override def min(x: BigDecimal, y: BigDecimal) = x.min(y)
   override def max(x: BigDecimal, y: BigDecimal) = x.max(y)
-  def compare(x: BigDecimal, y: BigDecimal) = x.compare(y)
+  // Scala compareTo has no guarantee to return only -1, 0 or 1 as per Spire compare contract,
+  // so we call Java's compareTo which does
+  def compare(x: BigDecimal, y: BigDecimal) = x.bigDecimal.compareTo(y.bigDecimal)
 }
 
 trait BigDecimalIsSigned extends Signed[BigDecimal] {

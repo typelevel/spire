@@ -7,7 +7,7 @@ import spire.std.double._
 import spire.std.seq._
 import spire.std.string._
 
-import org.scalatest.FunSuite
+import org.scalatest.{FunSuite, Matchers}
 import org.scalatest.prop.Checkers
 
 import org.scalacheck.{Arbitrary, Gen}
@@ -42,6 +42,7 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   import spire.math.ArbitrarySupport.rational
 
   test("Eq syntax")(check(forAll { (a: Int, b: Int) => testEqSyntax(a, b) }))
+  test("Partial order syntax")(check(forAll { (a: Int, b: Int) => testPartialOrderSyntax(a, b) }))
   test("Order syntax")(check(forAll { (a: Int, b: Int) => testOrderSyntax(a, b) }))
   test("Signed syntax")(check(forAll { (a: Int) => testSignedSyntax(a) }))
   test("IsReal syntax")(check(forAll { (a: Double) => testIsRealSyntax(a) }))
@@ -72,7 +73,7 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   test("InnerProductSpace syntax")(check(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
     testInnerProductSpaceSyntax(v, w, a.x)
   }))
-  test("BooleanAlgebra syntax")(check(forAll { (a: Int, b: Int) => testBooleanAlgebraSyntax(a, b) }))
+  test("Bool syntax")(check(forAll { (a: Int, b: Int) => testBoolSyntax(a, b) }))
 }
 
 trait BaseSyntaxTest {
@@ -80,6 +81,20 @@ trait BaseSyntaxTest {
     import spire.syntax.eq._
     ((a === b) == Eq[A].eqv(a, b)) &&
       ((a =!= b) == Eq[A].neqv(a, b))
+  }
+
+  def testPartialOrderSyntax[A: PartialOrder](a: A, b: A) = {
+    import spire.syntax.order._
+    ((a === b) == PartialOrder[A].eqv(a, b)) &&
+      ((a =!= b) == PartialOrder[A].neqv(a, b)) &&
+      ((a < b) == PartialOrder[A].lt(a, b)) &&
+      ((a > b) == PartialOrder[A].gt(a, b)) &&
+      ((a <= b) == PartialOrder[A].lteqv(a, b)) &&
+      ((a >= b) == PartialOrder[A].gteqv(a, b)) &&
+      ((a pmin b) == PartialOrder[A].pmin(a, b)) &&
+      ((a pmax b) == PartialOrder[A].pmax(a, b)) &&
+      ((a partialCompare b) == PartialOrder[A].partialCompare(a, b)) &&
+      ((a tryCompare b) == PartialOrder[A].tryCompare(a, b))
   }
 
   def testOrderSyntax[A: Order](a: A, b: A) = {
@@ -99,7 +114,13 @@ trait BaseSyntaxTest {
     import spire.syntax.signed._
     (a.sign == Signed[A].sign(a)) &&
       (a.signum == Signed[A].signum(a)) &&
-      (a.abs == Signed[A].abs(a))
+      (a.abs == Signed[A].abs(a)) &&
+      (a.isSignZero == Signed[A].isSignZero(a)) &&
+      (a.isSignPositive == Signed[A].isSignPositive(a)) &&
+      (a.isSignNegative == Signed[A].isSignNegative(a)) &&
+      (a.isSignNonZero == Signed[A].isSignNonZero(a)) &&
+      (a.isSignNonPositive == Signed[A].isSignNonPositive(a)) &&
+      (a.isSignNonNegative == Signed[A].isSignNonNegative(a))
   }
 
   def testIsRealSyntax[A: IsReal](a: A) = {
@@ -318,11 +339,82 @@ trait BaseSyntaxTest {
       ((v ⋅ w) == V.dot(v, w))
   }
 
+<<<<<<< HEAD
   def testBooleanAlgebraSyntax[A: BooleanAlgebra](a: A, b: A) = {
     import spire.syntax.booleanAlgebra._
     ((a & b) == BooleanAlgebra[A].and(a, b)) &&
       ((a | b) == BooleanAlgebra[A].or(a, b)) &&
       ((a ^ b) == BooleanAlgebra[A].xor(a, b)) &&
       (~a == BooleanAlgebra[A].complement(a))
+=======
+  def testCoordinateSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: CoordinateSpace[V, A]) = {
+    import spire.syntax.coordinateSpace._
+    implicit def A: Field[A] = V.scalar
+    ((v + w) == V.plus(v, w)) &&
+      ((v - w) == V.minus(v, w)) &&
+      (-v == V.negate(v)) &&
+      ((a *: v) == V.timesl(a, v)) &&
+      ((v :* a) == V.timesr(v, a)) &&
+      //((2 *: v) == V.timesl(A.fromInt(2), v)) &&
+      //((v :* 2) == V.timesr(v, A.fromInt(2))) &&
+      //((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
+      //((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
+      //((v :/ 2) == V.divr(v, A.fromInt(2))) &&
+      ((v dot w) == V.dot(v, w)) &&
+      ((v ⋅ w) == V.dot(v, w)) &&
+      (v._x == V._x(v)) &&
+      (v._y == V._y(v)) &&
+      (v._z == V._z(v)) &&
+      (v.coord(0) == V.coord(v, 0)) &&
+      (v.coord(1) == V.coord(v, 1))
   }
+
+  def testBoolSyntax[A: Bool](a: A, b: A) = {
+    import spire.syntax.bool._
+    ((a & b) == Bool[A].and(a, b)) &&
+      ((a | b) == Bool[A].or(a, b)) &&
+      ((a ^ b) == Bool[A].xor(a, b)) &&
+      (~a == Bool[A].complement(a))
+  }
+}
+
+class PartialOrderSyntaxTest extends FunSuite with Matchers with Checkers {
+  import spire.algebra.PartialOrder
+  import spire.syntax.all._
+  object intDivisibility extends PartialOrder[Int] {
+    def partialCompare(a: Int, b: Int) = {
+      if (a == b)
+        0.0
+      else if (b % a == 0)
+        -1.0
+      else if (a % b == 0)
+        1.0
+      else
+        Double.NaN
+    }
+  }
+
+  test("With intDivisibility: Seq(2,3,6,9,12).pmin sameElements Seq(2,3)") {
+    Seq(2,3,6,9,12).pmin(intDivisibility).sameElements(Seq(2,3)) shouldBe true
+>>>>>>> upstream/master
+  }
+  test("With intDivisibility: Seq(2,3,6,9,12).pmax sameElements Seq(9,12)") {
+    Seq(2,3,6,9,12).pmax(intDivisibility).sameElements(Seq(9,12)) shouldBe true
+  }
+
+  case class PosInt(val x: Int)
+
+  implicit def ArbPosInt: Arbitrary[PosInt] = Arbitrary(Gen.choose(1, 30).map(PosInt))
+
+  test("pmin")(check(forAll { (posSeq: Seq[PosInt]) =>
+    val seq = posSeq.map(_.x)
+    def isMinimal(i: Int) = seq.forall(j => !(intDivisibility.partialCompare(i, j) > 0))
+    seq.pmin(intDivisibility).toSet === seq.filter(isMinimal).toSet
+  }))
+
+  test("pmax")(check(forAll { (posSeq: Seq[PosInt]) =>
+    val seq = posSeq.map(_.x)
+    def isMaximal(i: Int) = seq.forall(j => !(intDivisibility.partialCompare(i, j) < 0))
+    seq.pmax(intDivisibility).toSet === seq.filter(isMaximal).toSet
+  }))
 }

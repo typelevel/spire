@@ -1,9 +1,9 @@
 package spire.macros
 
 import language.experimental.macros
-import scala.reflect.macros.Context
 
 import spire.algebra._
+import spire.macros.compat.{Context, termName}
 
 object Auto {
   object scala {
@@ -14,6 +14,7 @@ object Auto {
     def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]): EuclideanRing[A] = macro ScalaAutoMacros.euclideanRingImpl[A]
     def field[A](z: A, o: A)(implicit ev: Eq[A]): Field[A] = macro ScalaAutoMacros.fieldImpl[A]
     def eq[A]: Eq[A] = macro ScalaAutoMacros.eqImpl[A]
+    // TODO: partialOrder ?
     def order[A]: Order[A] = macro ScalaAutoMacros.orderImpl[A]
 
     object collection {
@@ -30,6 +31,7 @@ object Auto {
     def euclideanRing[A](z: A, o: A)(implicit ev: Eq[A]): EuclideanRing[A] = macro JavaAutoMacros.euclideanRingImpl[A]
     def field[A](z: A, o: A)(implicit ev: Eq[A]): Field[A] = macro JavaAutoMacros.fieldImpl[A]
     def eq[A]: Eq[A] = macro JavaAutoMacros.eqImpl[A]
+    // TODO: partialOrder ?
     def order[A]: Order[A] = macro JavaAutoMacros.orderImpl[A]
 
     object collection {
@@ -43,12 +45,12 @@ abstract class AutoOps {
   import c.universe._
 
   def unop[A](name: String, x: String = "x"): c.Expr[A] =
-    c.Expr[A](Select(Ident(newTermName(x)), newTermName(name)))
+    c.Expr[A](Select(Ident(termName(c)(x)), termName(c)(name)))
 
   def binop[A](name: String, x: String = "x", y: String = "y"): c.Expr[A] =
     c.Expr[A](Apply(
-      Select(Ident(newTermName(x)), newTermName(name)),
-      List(Ident(newTermName(y)))))
+      Select(Ident(termName(c)(x)), termName(c)(name)),
+      List(Ident(termName(c)(y)))))
 
   def binopSearch[A: c.WeakTypeTag](names: List[String], x: String = "x", y: String = "y"): Option[c.Expr[A]] =
     names find { name => hasMethod1[A, A, A](name) } map (binop[A](_, x, y))
@@ -60,7 +62,7 @@ abstract class AutoOps {
     val tpeA = c.weakTypeTag[A].tpe
     val tpeB = c.weakTypeTag[B].tpe
     tpeA.members exists { m =>
-      m.isMethod && m.isPublic && m.name.encoded == name && (m.typeSignature match {
+      m.isMethod && m.isPublic && m.name.encodedName.toString == name && (m.typeSignature match {
         case MethodType(Nil, ret) => ret =:= tpeB
         case _ => false
       })
@@ -72,7 +74,7 @@ abstract class AutoOps {
     val tpeB = c.weakTypeTag[B].tpe
     val tpeC = c.weakTypeTag[C].tpe
     tpeA.members exists { m =>
-      m.isMethod && m.isPublic && m.name.encoded == name && (m.typeSignature match {
+      m.isMethod && m.isPublic && m.name.encodedName.toString == name && (m.typeSignature match {
         case MethodType(List(param), ret) =>
           param.typeSignature =:= tpeB && ret =:= tpeC
         case _ =>
@@ -87,7 +89,6 @@ abstract class AutoOps {
 }
 
 abstract class AutoAlgebra extends AutoOps { ops =>
-  import c.universe._
 
   def plus[A: c.WeakTypeTag]: c.Expr[A]
   def minus[A: c.WeakTypeTag]: c.Expr[A]
@@ -225,8 +226,8 @@ case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
       // for JScience's Rational :(
       import c.universe._
       c.Expr[A](Apply(
-        Select(Ident(newTermName("zero")), newTermName("minus")),
-        List(Ident(newTermName("x")))))
+        Select(Ident(termName(c)("zero")), termName(c)("minus")),
+        List(Ident(termName(c)("x")))))
     }
   def quot[A: c.WeakTypeTag] =
     binopSearch[A]("quot" :: "divide" :: "div" :: Nil) getOrElse failedSearch("quot", "/~")

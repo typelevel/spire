@@ -1,16 +1,16 @@
 package spire.math
 
-import spire.algebra._
-
+import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import scala.{specialized => spec}
-import scala.annotation.tailrec
+
+import spire.algebra.Order
 
 /**
  *  Interface for a sorting strategy object.
  */
-trait Sort {
-  def sort[@spec A:Order:ClassTag](data:Array[A]): Unit
+trait Sort extends Any {
+  def sort[@spec A: Order: ClassTag](data:Array[A]): Unit
 }
 
 /**

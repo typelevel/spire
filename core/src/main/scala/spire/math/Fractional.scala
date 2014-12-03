@@ -1,13 +1,12 @@
 package spire.math
 
-import spire.algebra._
+import spire.algebra.{Field, NRoot}
 import spire.std._
-import spire.macrosk.Ops
 
 import scala.{specialized => spec}
 import java.lang.Math
 
-trait Fractional[@spec(Float, Double) A] extends Field[A] with NRoot[A] with Integral[A]
+trait Fractional[@spec(Float, Double) A] extends Any with Field[A] with NRoot[A] with Integral[A]
 
 object Fractional {
   private val ratCtx = ApproximationContext(Rational(1, 1000000000))

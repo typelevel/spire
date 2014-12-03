@@ -1,6 +1,6 @@
 package spire.std
 
-import spire.algebra._
+import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Signed}
 import spire.math.BitString
 
 trait ShortIsEuclideanRing extends EuclideanRing[Short] {
@@ -49,7 +49,7 @@ trait ShortOrder extends Order[Short] {
   override def gteqv(x: Short, y: Short) = x >= y
   override def lt(x: Short, y: Short) = x < y
   override def lteqv(x: Short, y: Short) = x <= y
-  def compare(x: Short, y: Short) = x - y
+  def compare(x: Short, y: Short) = java.lang.Integer.signum((x: Int) - (y: Int))
 }
 
 trait ShortIsSigned extends Signed[Short] {

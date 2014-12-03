@@ -1,20 +1,25 @@
 package spire.math
 
-import spire.algebra._
-import spire.implicits._
-import spire.math.poly.Term
-
 import Predef.{any2stringadd => _, _}
+
+import spire.algebra._
+import spire.math.poly.Term
+import spire.math.interval._
+import spire.math.interval.Bound._
+import spire.syntax.field._
+import spire.syntax.nroot._
+import spire.syntax.order._
 
 /**
  * Interval represents a set of values, usually numbers.
  * 
  * Intervals have upper and lower bounds. Each bound can be one of
- * three kinds:
+ * four kinds:
  * 
- *   * Closed: The boundary value is included in the interval.
- *   * Open: The boundary value is excluded from the interval.
- *   * Unbound: There is no boundary value.
+ *  * Closed: The boundary value is included in the interval.
+ *  * Open: The boundary value is excluded from the interval.
+ *  * Unbound: There is no boundary value.
+ *  * EmptyBound: The interval itself is empty.
  *
  * When the underlying type of the interval supports it, intervals may
  * be used in arithmetic. There are several possible interpretations
@@ -40,93 +45,97 @@ import Predef.{any2stringadd => _, _}
  */
 sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
-  @inline private[this] final def isClosed(flags: Int): Boolean = flags == 0
-  @inline private[this] final def isClosedBelow(flags: Int): Boolean = (flags & 1) == 0
-  @inline private[this] final def isClosedAbove(flags: Int): Boolean = (flags & 2) == 0
+  @inline protected[this] final def isClosed(flags: Int): Boolean = flags == 0
+  @inline protected[this] final def isClosedLower(flags: Int): Boolean = (flags & 1) == 0
+  @inline protected[this] final def isClosedUpper(flags: Int): Boolean = (flags & 2) == 0
 
-  @inline private[this] final def isOpen(flags: Int): Boolean = flags == 3
-  @inline private[this] final def isOpenBelow(flags: Int): Boolean = (flags & 1) == 1
-  @inline private[this] final def isOpenAbove(flags: Int): Boolean = (flags & 2) == 2
+  @inline protected[this] final def isOpen(flags: Int): Boolean = flags == 3
+  @inline protected[this] final def isOpenLower(flags: Int): Boolean = (flags & 1) == 1
+  @inline protected[this] final def isOpenUpper(flags: Int): Boolean = (flags & 2) == 2
 
-  @inline private[this] final def lowerFlag(flags: Int): Int = flags & 1
-  @inline private[this] final def upperFlag(flags: Int): Int = flags & 2
+  @inline protected[this] final def lowerFlag(flags: Int): Int = flags & 1
+  @inline protected[this] final def upperFlag(flags: Int): Int = flags & 2
 
-  @inline private[this] final def reverseLowerFlag(flags: Int): Int = flags ^ 1
-  @inline private[this] final def reverseUpperFlag(flags: Int): Int = flags ^ 2
-  @inline private[this] final def reverseFlags(flags: Int): Int = flags ^ 3
+  @inline protected[this] final def reverseLowerFlag(flags: Int): Int = flags ^ 1
+  @inline protected[this] final def reverseUpperFlag(flags: Int): Int = flags ^ 2
+  @inline protected[this] final def reverseFlags(flags: Int): Int = flags ^ 3
 
-  private[this] final def lowerFlagToUpper(flags: Int): Int = (flags & 1) << 1
-  private[this] final def upperFlagToLower(flags: Int): Int = (flags & 2) >>> 1
+  protected[this] final def lowerFlagToUpper(flags: Int): Int = (flags & 1) << 1
+  protected[this] final def upperFlagToLower(flags: Int): Int = (flags & 2) >>> 1
 
-  @inline private[this] final def swapFlags(flags: Int): Int =
+  @inline protected[this] final def swapFlags(flags: Int): Int =
     ((flags & 1) << 1) | ((flags & 2) >>> 1)
 
-  def isEmpty: Boolean = this match {
-    case Ranged(lower, upper, flags) => isOpen(flags) && lower === upper
-    case _ => false
-  }
+  protected[this] def lowerPairBelow(lower1: A, flags1: Int, lower2: A, flags2: Int): Boolean =
+    lower1 < lower2 || lower1 === lower2 && (isClosedLower(flags1) || isOpenLower(flags2))
 
-  def nonEmpty: Boolean = !isEmpty
+  protected[this] def upperPairAbove(upper1: A, flags1: Int, upper2: A, flags2: Int): Boolean =
+    upper1 > upper2 || upper1 === upper2 && (isClosedUpper(flags1) || isOpenUpper(flags2))
 
-  def isPoint: Boolean = this match {
-    case Ranged(lower, upper, flags) => isClosed(flags) && lower === upper
-    case _ => false
-  }
+  def isEmpty: Boolean =
+    this.isInstanceOf[Empty[_]]
+
+  def nonEmpty: Boolean =
+    !isEmpty
+
+  def isPoint: Boolean =
+    this.isInstanceOf[Point[_]]
 
   def contains(t: A): Boolean =
-    isAtOrBelow(t) && isAtOrAbove(t)
+    hasAtOrBelow(t) && hasAtOrAbove(t)
+
+  def doesNotContain(t: A): Boolean =
+    !hasAtOrBelow(t) || !hasAtOrAbove(t)
 
   def crosses(t: A): Boolean =
-    isBelow(t) && isAbove(t)
+    hasBelow(t) && hasAbove(t)
 
   def crossesZero(implicit ev: AdditiveMonoid[A]): Boolean =
-    isBelow(ev.zero) && isAbove(ev.zero)
+    hasBelow(ev.zero) && hasAbove(ev.zero)
 
-  private[spire] def lowerPair: Option[(A, Int)] = this match {
-    case Ranged(lower, upper, flags) => Some((lower, lowerFlag(flags)))
-    case Above(lower, flags) => Some((lower, flags))
-    case _ => None
-  }
+  def lowerBound: Bound[A]
 
-  private[spire] def upperPair: Option[(A, Int)] = this match {
-    case Ranged(lower, upper, flags) => Some((upper, upperFlag(flags)))
-    case Below(upper, flags) => Some((upper, flags))
-    case _ => None
-  }
+  def upperBound: Bound[A]
 
-  private[spire] def upperPairAsLower: Option[(A, Int)] = this match {
-    case Ranged(lower, upper, flags) => Some((upper, upperFlagToLower(flags)))
-    case Above(upper, flags) => Some((upper, upperFlagToLower(flags)))
-    case _ => None
-  }
+  def mapBounds[B: Order](f: A => B): Interval[B] =
+    Interval.fromBounds(lowerBound.map(f), upperBound.map(f))
 
-  private[this] def lowerPairBelow(lower1: A, flags1: Int, lower2: A, flags2: Int): Boolean =
-    lower1 < lower2 || lower1 === lower2 && (isClosedBelow(flags1) || isOpenBelow(flags2))
+  def fold[B](f: (Bound[A], Bound[A]) => B): B =
+    f(lowerBound, upperBound)
 
-  private[this] def upperPairAbove(upper1: A, flags1: Int, upper2: A, flags2: Int): Boolean =
-    upper1 > upper2 || upper1 === upper2 && (isClosedAbove(flags1) || isOpenAbove(flags2))
+  def isSupersetOf(rhs: Interval[A]): Boolean = (lhs, rhs) match {
+    // deal with All, Empty and Point on either left or right side
 
-  def isSupersetOf(rhs: Interval[A]): Boolean = lhs match {
-    case All() =>
-      true
-    case Above(lower1, flags1) =>
-      rhs.lowerPair.map { case (lower2, flags2) =>
-        lowerPairBelow(lower1, flags1, lower2, flags2)
-      }.getOrElse(false)
-    case Below(upper1, flags1) =>
-      rhs.upperPair.map { case (upper2, flags2) =>
-        upperPairAbove(upper1, flags1, upper2, flags2)
-      }.getOrElse(false)
-    case Ranged(lower1, upper1, flags1) =>
-      rhs match {
-        case r if r.isEmpty =>
-          true
-        case Ranged(lower2, upper2, flags2) =>
-          lowerPairBelow(lower1, flags1, lower2, flags2) &&
-          upperPairAbove(upper1, flags1, upper2, flags2)
-        case _ =>
-          false
-      }
+    case (All(), _) => true
+    case (_, All()) => false
+
+    case (_, Empty()) => true
+    case (Empty(), _) => false
+
+    case (Point(lhsval), Point(rhsval)) => lhsval === rhsval
+    case (Point(_), _) => false // rhs cannot be Empty or Point
+    case (_, Point(rhsval)) => lhs.contains(rhsval)
+
+    // remaining cases are Above, Below and Bounded, we deal first with the obvious false
+
+    case (Above(_, _), Below(_, _)) => false
+    case (Below(_, _), Above(_, _)) => false
+    case (Bounded(_, _, _), Below(_, _)) => false
+    case (Bounded(_, _, _), Above(_, _)) => false
+
+    case (Above(lower1, flags1), Bounded(lower2, _, flags2)) =>
+      lowerPairBelow(lower1, flags1, lower2, flags2)
+    case (Above(lower1, flags1), Above(lower2, flags2)) =>
+      lowerPairBelow(lower1, flags1, lower2, flags2)
+
+    case (Below(upper1, flags1), Below(upper2, flags2)) =>
+      upperPairAbove(upper1, flags1, upper2, flags2)
+    case (Below(upper1, flags1), Bounded(_, upper2, flags2)) =>
+      upperPairAbove(upper1, flags1, upper2, flags2)
+
+    case (Bounded(lower1, upper1, flags1), Bounded(lower2, upper2, flags2)) =>
+      lowerPairBelow(lower1, flags1, lower2, flags2) &&
+      upperPairAbove(upper1, flags1, upper2, flags2)
   }
 
   def isProperSupersetOf(rhs: Interval[A]): Boolean =
@@ -138,164 +147,91 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def isProperSubsetOf(rhs: Interval[A]): Boolean =
     rhs isProperSupersetOf lhs
 
-  def isAbove(t: A): Boolean = this match {
-    case Below(upper, flags) => upper > t
-    case Ranged(lower, upper, flags) => upper > t
-    case _ => true
+  // Does this interval contain any points above t ?
+  def hasAbove(t: A): Boolean = this match {
+    case Empty() => false
+    case Point(p) => p > t
+    case Below(upper, _) => upper > t
+    case Bounded(_, upper, _) => upper > t
+    case All() => true
+    case Above(_, _) => true
   }
 
-  def isBelow(t: A): Boolean = this match {
-    case Above(lower, flags) => lower < t
-    case Ranged(lower, upper, flags) => lower < t
-    case _ => true
+  // Does this interval contain any points below t ?
+  def hasBelow(t: A): Boolean = this match {
+    case Empty() => false
+    case Point(p) => p < t
+    case Above(lower, _) => lower < t
+    case Bounded(lower, _, _) => lower < t
+    case Below(_, _) => true
+    case All() => true
   }
 
-  def isAtOrAbove(t: A) = this match {
+  // Does this interval contains any points at or above t ?
+  def hasAtOrAbove(t: A) = this match {
+    case _: Empty[_] => false
+    case Point(p) => p >= t
     case Below(upper, flags) =>
-      upper > t || isClosedAbove(flags) && upper === t
-    case Ranged(lower, upper, flags) =>
-      upper > t || isClosedAbove(flags) && upper === t
-    case _ =>
-      true
+      upper > t || isClosedUpper(flags) && upper === t
+    case Bounded(lower, upper, flags) =>
+      upper > t || isClosedUpper(flags) && upper === t
+    case _: Above[_] => true
+    case _: All[_] => true
   }
 
-  def isAtOrBelow(t: A) = this match {
+  // Does this interval contains any points at or below t ?
+  def hasAtOrBelow(t: A) = this match {
+    case _: Empty[_] => false
+    case Point(p) => p <= t
     case Above(lower, flags) =>
-      lower < t || isClosedBelow(flags) && lower === t
-    case Ranged(lower, upper, flags) =>
-      lower < t || isClosedBelow(flags) && lower === t
-    case _ =>
-      true
+      lower < t || isClosedLower(flags) && lower === t
+    case Bounded(lower, upper, flags) =>
+      lower < t || isClosedLower(flags) && lower === t
+    case _: Below[_] => true
+    case _: All[_] => true
   }
 
   def isAt(t: A) = this match {
-    case Ranged(lower, upper, flags) =>
-      isClosed(flags) && lower === t && t === upper
-    case _ =>
-      false
+    case Point(p) => t === p
+    case _ => false
   }
 
-  private[this] def minLower(lower1: A, lower2: A, flags1: Int, flags2: Int): (A, Int) =
-    (lower1 compare lower2) match {
-      case -1 => (lower1, flags1)
-      case 0 => (lower1, flags1 & flags2)
-      case 1 => (lower2, flags2)
-    }
-
-  private[this] def maxLower(lower1: A, lower2: A, flags1: Int, flags2: Int): (A, Int) =
-    (lower1 compare lower2) match {
-      case -1 => (lower2, flags2)
-      case 0 => (lower1, flags1 | flags2)
-      case 1 => (lower1, flags1)
-    }
-
-  private[this] def minUpper(upper1: A, upper2: A, flags1: Int, flags2: Int): (A, Int) =
-    (upper1 compare upper2) match {
-      case -1 => (upper1, flags1)
-      case 0 => (upper1, flags1 | flags2)
-      case 1 => (upper2, flags2)
-    }
-
-  private[this] def maxUpper(upper1: A, upper2: A, flags1: Int, flags2: Int): (A, Int) =
-    (upper1 compare upper2) match {
-      case -1 => (upper2, flags2)
-      case 0 => (upper1, flags1 & flags2)
-      case 1 => (upper1, flags1)
-    }
-
-  def intersects(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Boolean =
+  def intersects(rhs: Interval[A]): Boolean =
     !(lhs intersect rhs).isEmpty
 
-  def &(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
+  def &(rhs: Interval[A]): Interval[A] =
     lhs intersect rhs
 
-  def intersect(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] = lhs match {
-    case All() => rhs
-    case Below(upper1, flags1) => rhs match {
-      case All() =>
-        lhs
-      case Below(upper2, flags2) =>
-        val (u, uf) = minUpper(upper1, upper2, flags1, flags2)
-        Below(u, uf)
-      case Above(lower2, flags2) =>
-        Interval.withFlags(lower2, upper1, flags1 | flags2)
-      case Ranged(lower2, upper2, flags2) =>
-        val (u, uf) = minUpper(upper1, upper2, flags1, flags2)
-        val xf = lowerFlag(flags2) | uf
-        if (lower2 === u && !isClosed(xf))
-          Interval.empty[A]
-        else
-          Interval.withFlags(lower2, u, xf)
-    }
-    case Above(lower1, flags1) => rhs match {
-      case All() =>
-        lhs
-      case Above(lower2, flags2) =>
-        val (l, lf) = maxLower(lower1, lower2, flags1, flags2)
-        Above(l, lf)
-      case Below(upper2, flags2) =>
-        Interval.withFlags(lower1, upper2, flags1 | flags2)
-      case Ranged(lower2, upper2, flags2) =>
-        val (l, lf) = maxLower(lower1, lower2, flags1, flags2)
-        val xf = lf | upperFlag(flags2)
-        if (l === upper2 && !isClosed(xf))
-          Interval.empty[A]
-        else
-          Interval.withFlags(l, upper2, xf)
-    }
-    case r1 if r1.isEmpty =>
-      Interval.empty[A]
-    case Ranged(lower1, upper1, flags1) =>
-      rhs match {
-        case All() =>
-          lhs
-        case Above(lower2, flags2) =>
-          val (l, lf) = maxLower(lower1, lower2, flags1, flags2)
-          val xf = lf | upperFlag(flags1)
-          if (l === upper1 && !isClosed(xf))
-            Interval.empty[A]
-          else
-            Interval.withFlags(l, upper1, xf)
-        case Below(upper2, flags2) =>
-          val (u, uf) = minUpper(upper1, upper2, flags1, flags2)
-          val xf = lowerFlag(flags1) | uf
-          if (lower1 === u && !isClosed(xf))
-            Interval.empty[A]
-          else
-            Interval.withFlags(lower1, u, xf)
-        case r2 if r2.isEmpty =>
-          Interval.empty[A]
-        case Ranged(lower2, upper2, flags2) =>
-          val (l, lf) = maxLower(lower1, lower2, flags1, flags2)
-          val (u, uf) = minUpper(upper1, upper2, flags1, flags2)
-          Interval.withFlags(l, u, lf | uf)
-      }
-  }
+  def intersect(rhs: Interval[A]): Interval[A] =
+    Interval.fromBounds(maxLower(lhs.lowerBound, rhs.lowerBound, true),
+      minUpper(lhs.upperBound, rhs.upperBound, true))
 
-  def unary_~(implicit r: AdditiveMonoid[A]): List[Interval[A]] =
+  def unary_~(): List[Interval[A]] =
     this match {
       case All() =>
         Nil
+      case Empty() =>
+        List(All())
       case Above(lower, lf) =>
         List(Below(lower, lowerFlagToUpper(reverseLowerFlag(lf))))
       case Below(upper, uf) =>
         List(Above(upper, upperFlagToLower(reverseUpperFlag(uf))))
-      case _ if isEmpty =>
-        List(All())
-      case Ranged(lower, upper, flags) =>
+      case Point(p) =>
+        List(Interval.below(p), Interval.above(p))
+      case Bounded(lower, upper, flags) =>
         val lx = lowerFlagToUpper(reverseLowerFlag(lowerFlag(flags)))
         val ux = upperFlagToLower(reverseUpperFlag(upperFlag(flags)))
         List(Below(lower, lx), Above(upper, ux))
     }
 
-  def --(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): List[Interval[A]] =
+  def --(rhs: Interval[A]): List[Interval[A]] =
     if (lhs intersects rhs) {
       (~rhs).map(lhs & _).filter(_.nonEmpty)
     } else {
-      (lhs :: Nil).filter(_.nonEmpty)
+      if (lhs.isEmpty) Nil else List(lhs)
     }
 
-  def split(t: A)(implicit r: AdditiveMonoid[A]): (Interval[A], Interval[A]) =
+  def split(t: A): (Interval[A], Interval[A]) =
     (this intersect Interval.below(t), this intersect Interval.above(t))
 
   def splitAtZero(implicit ev: AdditiveMonoid[A]): (Interval[A], Interval[A]) =
@@ -306,381 +242,186 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       case (a, b) => (f(a), f(b))
     }
 
-  def |(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
+  def |(rhs: Interval[A]): Interval[A] =
     lhs union rhs
 
-  def union(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
-    (lhs, rhs) match {
-      case (All(), _) => lhs
-      case (_, All()) => rhs
-      case (Above(_, _), Below(_, _)) => All()
-      case (Below(_, _), Above(_, _)) => All()
-
-      case (Below(upper1, flags1), Below(upper2, flags2)) =>
-        val (u, uf) = maxUpper(upper1, upper2, flags1, flags2)
-        Below(u, uf)
-      case (Below(upper1, flags1), Ranged(_, upper2, flags2)) =>
-        val (u, uf) = maxUpper(upper1, upper2, flags1, flags2)
-        Below(u, uf)
-      case (Ranged(_, upper1, flags1), Below(upper2, flags2)) =>
-        val (u, uf) = maxUpper(upper1, upper2, flags1, flags2)
-        Below(u, uf)
-
-      case (Above(lower1, flags1), Above(lower2, flags2)) =>
-        val (l, lf) = minLower(lower1, lower2, flags1, flags2)
-        Above(l, lf)
-      case (Above(lower1, flags1), Ranged(lower2, _, flags2)) =>
-        val (l, lf) = minLower(lower1, lower2, flags1, flags2)
-        Above(l, lf)
-      case (Ranged(lower1, _, flags1), Above(lower2, flags2)) =>
-        val (l, lf) = minLower(lower1, lower2, flags1, flags2)
-        Above(l, lf)
-
-      case (r1, r2) if r1.isEmpty => r2
-      case (r1, r2) if r2.isEmpty => r1
-
-      case (Ranged(lower1, upper1, flags1), Ranged(lower2, upper2, flags2)) =>
-        val (l, lf) = minLower(lower1, lower2, flags1, flags2)
-        val (u, uf) = maxUpper(upper1, upper2, flags1, flags2)
-        Interval.withFlags(l, u, lf | uf)
-    }
+  def union(rhs: Interval[A]): Interval[A] =
+    Interval.fromBounds(minLower(lhs.lowerBound, rhs.lowerBound, false),
+      maxUpper(lhs.upperBound, rhs.upperBound, false))
 
   override def toString(): String = this match {
     case All() =>
       "(-∞, ∞)"
+    case Empty() =>
+      "(Ø)"
     case Above(lower, flags) =>
-      if (isClosedBelow(flags)) s"[$lower, ∞)" else s"($lower, ∞)"
+      if (isClosedLower(flags)) s"[$lower, ∞)" else s"($lower, ∞)"
     case Below(upper, flags) =>
-      if (isClosedAbove(flags)) s"(-∞, $upper]" else s"(-∞, $upper)"
-    case Ranged(lower, upper, flags) =>
-      if (lower === upper) {
-        if (isOpen(flags)) "(Ø)" else s"[$lower]"
-      } else {
-        val s1 = if (isClosedBelow(flags)) s"[$lower" else s"($lower"
-        val s2 = if (isClosedAbove(flags)) s"$upper]" else s"$upper)"
-        s"$s1, $s2"
-      }
+      if (isClosedUpper(flags)) s"(-∞, $upper]" else s"(-∞, $upper)"
+    case Point(p) =>
+      s"[$p]"
+    case Bounded(lower, upper, flags) =>
+      val s1 = if (isClosedLower(flags)) s"[$lower" else s"($lower"
+      val s2 = if (isClosedUpper(flags)) s"$upper]" else s"$upper)"
+      s"$s1, $s2"
   }
 
   def abs(implicit m: AdditiveGroup[A]): Interval[A] =
-    if (crossesZero) {
+    if (crossesZero) { // only Bounded, Above or Below can cross zero
       this match {
-        case Ranged(lower, upper, fs) =>
+        case Bounded(lower, upper, fs) =>
           val x = -lower
-          if (x > upper) Ranged(m.zero, x, lowerFlagToUpper(fs))
-          else if (upper > x) Ranged(m.zero, upper, upperFlag(fs))
-          else Ranged(m.zero, x, lowerFlagToUpper(fs) & upperFlag(fs))
-        case _ =>
+          if (x > upper) Bounded(m.zero, x, lowerFlagToUpper(fs))
+          else if (upper > x) Bounded(m.zero, upper, upperFlag(fs))
+          else Bounded(m.zero, x, lowerFlagToUpper(fs) & upperFlag(fs))
+        case _ => // Above or Below
           Interval.atOrAbove(m.zero)
       }
-    } else if (isBelow(m.zero)) {
+    } else if (hasBelow(m.zero)) {
       -this
     } else {
       this
     }
 
-  def min(rhs: Interval[A])(implicit m: AdditiveMonoid[A]): Interval[A] = {
-    def zzz(x1: A, f1: Int, x2: A, f2: Int, f3: Int): (A, Int) =
-      if (x1 < x2) (x1, f1) else if (x2 < x1) (x2, f2) else (x1, f3)
+  // for all a in A, and all b in B, (A vmin B) is the interval that contains all (a min b)
+  def vmin(rhs: Interval[A])(implicit m: AdditiveMonoid[A]): Interval[A] =
+    Interval.fromBounds(minLower(lhs.lowerBound, rhs.lowerBound, true),
+      minUpper(lhs.upperBound, rhs.upperBound, true))
 
-    val lower = for {
-      (x1, f1) <- lhs.lowerPair
-      (x2, f2) <- rhs.lowerPair
-    } yield zzz(x1, f1, x2, f2, f1 & f2)
-
-    val upper = (lhs.upperPair, rhs.upperPair) match {
-      case (None, p2) => p2
-      case (p1, None) => p1
-      case (Some((x1, f1)), Some((x2, f2))) => Some(zzz(x1, f1, x2, f2, f1 | f2))
-    }
-
-    fromOptionalTpls(lower, upper)
-  }
-
-  def max(rhs: Interval[A])(implicit m: AdditiveMonoid[A]): Interval[A] = {
-    def zzz(x1: A, f1: Int, x2: A, f2: Int, f3: Int): (A, Int) =
-      if (x1 > x2) (x1, f1) else if (x2 > x1) (x2, f2) else (x1, f3)
-
-    val lower = (lhs.lowerPair, rhs.lowerPair) match {
-      case (None, p2) => p2
-      case (p1, None) => p1
-      case (Some((x1, f1)), Some((x2, f2))) => Some(zzz(x1, f1, x2, f2, f1 | f2))
-    }
-
-    val upper = for {
-      (x1, f1) <- lhs.upperPair
-      (x2, f2) <- rhs.upperPair
-    } yield zzz(x1, f1, x2, f2, f1 & f2)
-
-    fromOptionalTpls(lower, upper)
-  }
+  // for all a in A, and all b in B, (A vmax B) is the interval that contains all (a max b)
+  def vmax(rhs: Interval[A])(implicit m: AdditiveMonoid[A]): Interval[A] =
+    Interval.fromBounds(maxLower(lhs.lowerBound, rhs.lowerBound, true),
+      maxUpper(lhs.upperBound, rhs.upperBound, true))
 
   def combine(rhs: Interval[A])(f: (A, A) => A): Interval[A] = {
-    val ll: Option[(A, Int)] = for {
-      (x1, f1) <- lhs.lowerPair
-      (x2, f2) <- rhs.lowerPair
-    } yield (f(x1, x2), f1 | f2)
-
-    val uu: Option[(A, Int)] = for {
-      (x1, f1) <- lhs.upperPair
-      (x2, f2) <- rhs.upperPair
-    } yield (f(x1, x2), f1 | f2)
-
-    (ll, uu) match {
-      case (Some((l, lf)), Some((u, uf))) => Ranged(l, u, lf | uf)
-      case (None, Some((u, uf))) => Below(u, uf)
-      case (Some((l, lf)), None) => Above(l, lf)
-      case (None, None) => All()
-    }
+    val lb = lhs.lowerBound.combine(rhs.lowerBound)(f)
+    val ub = lhs.upperBound.combine(rhs.upperBound)(f)
+    Interval.fromBounds(lb, ub)
   }
 
   def +(rhs: Interval[A])(implicit ev: AdditiveSemigroup[A]): Interval[A] =
     combine(rhs)(_ + _)
 
-  def -(rhs: Interval[A])(implicit ev: AdditiveGroup[A]): Interval[A] = {
-    val ll: Option[(A, Int)] = for {
-      (x1, f1) <- lhs.lowerPair
-      (x2, f2) <- rhs.upperPair
-    } yield (x1 - x2, f1 | upperFlagToLower(f2))
-
-    val uu: Option[(A, Int)] = for {
-      (x1, f1) <- lhs.upperPair
-      (x2, f2) <- rhs.lowerPair
-    } yield (x1 - x2, f1 | lowerFlagToUpper(f2))
-
-    (ll, uu) match {
-      case (Some((l, lf)), Some((u, uf))) => Ranged(l, u, lf | uf)
-      case (None, Some((u, uf))) => Below(u, uf)
-      case (Some((l, lf)), None) => Above(l, lf)
-      case (None, None) => All()
-    }
-
-  }
-
-  private[this] def minTpl(t1: (A, Int), t2: (A, Int)): (A, Int) =
-    if (t1._1 < t2._1) t1 else t2
-
-  private[this] def maxTpl(t1: (A, Int), t2: (A, Int)): (A, Int) =
-    if (t1._1 > t2._1) t1 else t2
-
-  private[this] def fromOptionalTpls(t1: Option[(A, Int)], t2: Option[(A, Int)])(implicit r: AdditiveMonoid[A]): Interval[A] =
-    (t1, t2) match {
-      case (None, None) => Interval.all
-      case (Some((x1, f1)), None) => Above(x1, f1)
-      case (None, Some((x2, f2))) => Below(x2, f2)
-      case (Some(t1), Some(t2)) => fromTpls(t1, t2)
-    }
-
-  private[this] def fromTpls(t1: (A, Int), t2: (A, Int))(implicit r: AdditiveMonoid[A]): Interval[A] =
-    Interval.withFlags(t1._1, t2._1, lowerFlag(t1._2) | lowerFlagToUpper(t2._2))
+  def -(rhs: Interval[A])(implicit ev: AdditiveGroup[A]): Interval[A] =
+    lhs + (-rhs)
 
   def *(rhs: Interval[A])(implicit ev: Semiring[A]): Interval[A] = {
-    if (lhs.isEmpty || rhs.isEmpty) return Interval.empty[A]
     val z = ev.zero
-    if (lhs.isAt(z) || rhs.isAt(z)) return Interval.point(z)
 
-    lhs match {
-      case All() => lhs
+    def aboveBelow(lower1: A, lf1: Int, upper2: A, uf2: Int) =
+      if (lower1 < z || upper2 > z) All () else
+        Below(lower1 * upper2, lowerFlagToUpper(lf1) | uf2)
 
-      case Above(lower1, lf1) => rhs match {
-        case All() =>
-          rhs
-        case Above(lower2, lf2) =>
-          if (lower1 < z || lower2 < z) All()
-          else Above(lower1 * lower2, lf1 | lf2)
-        case Below(upper2, uf2) =>
-          if (lower1 < z || upper2 > z) All()
-          else Below(lower1 * upper2, lowerFlagToUpper(lf1) | uf2)
-        case Ranged(lower2, upper2, flags2) =>
-          if (rhs.crossesZero) All()
-          else if (rhs.isAbove(z)) Above(lower1 * lower2, lf1 | lowerFlag(flags2))
-          else Below(lower1 * upper2, lowerFlagToUpper(lf1) | upperFlag(flags2))
+    def aboveBounded(lower1: A, lf1: Int, lower2: A, upper2: A, flags2: Int) =
+      (rhs.hasBelow(z), rhs.hasAbove(z)) match {
+        case (true, true) => All() // rhs.crossesZero() == true
+        case (false, true) => Above(lower1 * lower2, lf1 | lowerFlag(flags2))
+        case _ => Below(lower1 * upper2, lowerFlagToUpper(lf1) | upperFlag(flags2))
       }
 
-      case Below(upper1, uf1) => rhs match {
-        case All() =>
-          rhs
-        case Above(lower2, lf2) =>
-          if (upper1 > z || lower2 < z) All()
-          else Below(upper1 * lower2, uf1 | lowerFlagToUpper(lf2))
-        case Below(upper2, uf2) =>
-          if (upper1 > z || upper2 > z) All()
-          else Above(upper1 * upper2, upperFlagToLower(uf1) | upperFlagToLower(uf2))
-        case Ranged(lower2, upper2, flags2) =>
-          if (rhs.crossesZero) All()
-          else if (rhs.isAbove(z)) Below(upper1 * lower2, uf1 | lowerFlagToUpper(flags2))
-          else Above(upper1 * lower2, upperFlagToLower(uf1) | lowerFlag(flags2))
+    def belowBounded(upper1: A, uf1: Int, lower2: A, upper2: A, flags2: Int) =
+      (rhs.hasBelow(z), rhs.hasAbove(z)) match {
+        case (true, true) => All() // rhs.crossesZero() == true
+        case (false, true) => Below(upper1 * lower2, uf1 | lowerFlagToUpper(flags2))
+        case _ => Above(upper1 * lower2, upperFlagToLower(uf1) | lowerFlag(flags2))
       }
 
-      case Ranged(lower1, upper1, flags1) => rhs match {
-        case All() =>
-          rhs
-        case Above(lower2, lf2) =>
-          if (lower2 < z) All()
-          else Above(lower1 * lower2, lowerFlag(flags1) | lf2)
-        case Below(upper2, uf2) =>
-          if (upper2 > z) All()
-          else Below(lower1 * upper2, lowerFlagToUpper(flags1) | uf2)
-        case Ranged(lower2, upper2, flags2) =>
-          val ll = (lower1 * lower2, lowerFlag(flags1) | lowerFlag(flags2))
-          val lu = (lower1 * upper2, lowerFlag(flags1) | upperFlagToLower(flags2))
-          val ul = (upper1 * lower2, upperFlagToLower(flags1) | lowerFlag(flags2))
-          val uu = (upper1 * upper2, upperFlagToLower(flags1) | upperFlagToLower(flags2))
-          val lcz = lhs.crossesZero
-          val rcz = rhs.crossesZero
-          if (lcz && rcz) {
-            fromTpls(minTpl(lu, ul), maxTpl(ll, uu))
-          } else if (lcz) {
-            if (rhs.isAbove(z)) fromTpls(lu, uu) else fromTpls(ul, ll)
-          } else if (rcz) {
-            if (lhs.isAbove(z)) fromTpls(ul, uu) else fromTpls(lu, ll)
-          } else if (lhs.isBelow(z) == rhs.isBelow(z)) {
-            fromTpls(minTpl(ll, uu), maxTpl(ll, uu))
-          } else {
-            fromTpls(minTpl(lu, ul), maxTpl(lu, ul))
-          }
-      }
+    (lhs, rhs) match {
+      case (Empty(), _) => lhs
+      case (_, Empty()) => rhs
+      case (Point(lv), _) => rhs * lv // use multiplication by scalar
+      case (_, Point(rv)) => lhs * rv
+      // now lhs and rhs are both intervals with more that one point
+      case (All(), _) => lhs
+      case (_, All()) => rhs
+
+      case (Above(lower1, lf1), Above(lower2, lf2)) => 
+        if (lower1 < z || lower2 < z) 
+          All() 
+        else 
+          Above(lower1 * lower2, lf1 | lf2)
+      case (Above(lower1, lf1), Below(upper2, uf2)) => aboveBelow(lower1, lf1, upper2, uf2)
+      case (Below(upper1, uf1), Above(lower2, lf2)) => aboveBelow(lower2, lf2, upper1, uf1)
+      case (Below(upper1, uf1), Below(upper2, uf2)) =>
+        if (upper1 > z || upper2 > z) 
+          All() 
+        else
+          Above(upper1 * upper2, upperFlagToLower(uf1) | upperFlagToLower(uf2))
+
+      case (Above(lower1, lf1), Bounded(lower2, upper2, flags2)) => 
+        aboveBounded(lower1, lf1, lower2, upper2, flags2)
+      case (Bounded(lower1, upper1, flags1), Above(lower2, lf2)) =>
+        aboveBounded(lower2, lf2, lower1, upper1, flags1)
+      case (Below(upper1, uf1), Bounded(lower2, upper2, flags2)) =>
+        belowBounded(upper1, uf1, lower2, upper2, flags2)
+      case (Bounded(lower1, upper1, flags1), Below(upper2, uf2)) =>
+        belowBounded(upper2, uf2, lower1, upper1, flags1)
+
+      case (bd1: Bounded[A], bd2: Bounded[A]) =>
+        val lb1 = bd1.lowerBound
+        val ub1 = bd1.upperBound
+        val lb2 = bd2.lowerBound
+        val ub2 = bd2.upperBound
+        val ll = (lb1 *~ lb2)
+        val lu = (lb1 *~ ub2)
+        val ul = (ub1 *~ lb2)
+        val uu = (ub1 *~ ub2)
+        ValueBound.union4(ll, lu, ul, uu)
     }
   }
 
   def reciprocal(implicit ev: Field[A]): Interval[A] = {
     val z = ev.zero
     def error = throw new java.lang.ArithmeticException("/ by zero")
-    if (contains(z)) return error
 
     this match {
-      case All() =>
-        error
+      case All() => error
+      case Empty() => this
 
       case Above(lower, lf) =>
-        if (lower === z) this
-        else Ranged(z, lower.reciprocal, 1 | lowerFlagToUpper(lf))
+        (lower.compare(z), isClosedLower(lf)) match {
+          case (x, _) if x < 0 => error // crosses zero
+          case (0, true) => error // contains zero
+          case (0, false) => this
+          case _ => Bounded(z, lower.reciprocal, 1 | lowerFlagToUpper(lf))
+        }
 
       case Below(upper, uf) =>
-        if (upper === z) this
-        else Ranged(upper.reciprocal, z, 2 | upperFlagToLower(uf))
+        (upper.compare(z), isClosedUpper(uf)) match {
+          case (x, _) if x > 0 => error // crosses zero
+          case (0, true) => error // contains zero
+          case (0, false) => this
+          case _ => Bounded(upper.reciprocal, z, 2 | upperFlagToLower(uf))
+        }
 
-      case Ranged(lower, upper, flags) =>
-        if (lower === z) Above(upper.reciprocal, upperFlagToLower(flags))
-        else if (upper === z) Below(lower.reciprocal, lowerFlagToUpper(flags))
-        else Ranged(upper.reciprocal, lower.reciprocal, swapFlags(flags))
+      case Point(v) => Point(v.reciprocal)
+
+      case Bounded(lower, upper, flags) =>
+        (lower.compare(z), upper.compare(z), isClosedLower(flags), isClosedUpper(flags)) match {
+          case (x, y, _, _) if x < 0 && y > 0 => error // crosses zero
+          case (0, _, true, _) => error // contains zero
+          case (_, 0, _, true) => error // contains zero
+          case (0, _, false, _) => Above(upper.reciprocal, upperFlagToLower(flags))
+          case (_, 0, _, false) => Below(lower.reciprocal, lowerFlagToUpper(flags))
+          case _ => Bounded(upper.reciprocal, lower.reciprocal, swapFlags(flags))
+        }
     }
   }
 
   def /(rhs: Interval[A])(implicit ev: Field[A]): Interval[A] =
-    lhs * rhs.reciprocal
-
-  // def baddiv(rhs: Interval[A])(implicit ev: Field[A]): Interval[A] = {
-  //   val z = ev.zero
-  //   def err = throw new java.lang.ArithmeticException("/ by zero")
-  //   rhs match {
-  //     case All() => err
-  //     case Above(lower2, lf2) if (lower2 <= z) => err
-  //     case Below(upper2, uf2) if (z <= upper2) => err
-  //     case Ranged(lower2, upper2, flags2) if (lower2 <= z && z <= upper2) => err
-  // 
-  //     case Above(lower2, lf2) => lhs match {
-  //       case All() =>
-  //         lhs
-  //       case Above(lower1, lf1) =>
-  //         Interval.above(z)
-  //       case Below(upper1, uf1) =>
-  //         Interval.below(z)
-  //       case Ranged(lower1, upper1, flags1) =>
-  //         if (lower1 < z) {
-  //           Ranged(lower1 / lower2, upper1 / lower2, flags1 | lf2 | lowerFlagToUpper(lf2))
-  //         } else {
-  //           Ranged(z, upper1 / lower2, 1 | upperFlag(flags1) | lowerFlagToUpper(lf2))
-  //         }
-  //     }
-  // 
-  //     case Below(upper2, uf2) => lhs match {
-  //       case All() =>
-  //         lhs
-  //       case Above(lower1, lf1) =>
-  //         Interval.below(z)
-  //       case Below(upper1, uf1) =>
-  //         Interval.above(z)
-  //       case Ranged(lower1, upper1, flags1) =>
-  //         if (lower1 < z) {
-  //           Ranged(upper1 / upper2, lower1 / upper2, swapFlags(flags1) | uf2 | upperFlagToLower(uf2))
-  //         } else {
-  //           Ranged(z, lower1 / upper2, 2 | lowerFlagToUpper(flags1) | uf2)
-  //         }
-  //     }
-  // 
-  //     case Ranged(lower2, upper2, flags2) =>
-  //       if (lower2 > z) {
-  //         // positive denominator
-  //         lhs match {
-  //           case All() =>
-  //             lhs
-  //           case Above(lower1, lf1) =>
-  //             if (lower1 >= z) {
-  //               Above(lower1 / upper2, lf1 | upperFlagToLower(flags2))
-  //             } else {
-  //               Above(lower1 / lower2, lf1 | lowerFlag(flags2))
-  //             }
-  //           case Below(upper1, uf1) =>
-  //             if (upper1 > z) {
-  //               Below(upper1 / lower2, uf1 | lowerFlagToUpper(flags2))
-  //             } else {
-  //               Below(upper1 / upper2, uf1 | upperFlag(flags2))
-  //             }
-  //           case Ranged(lower1, upper1, flags1) =>
-  //             if (lower1 >= z) {
-  //               // positive / positive
-  //               Ranged(lower1 / upper2, upper1 / lower2, flags1 | swapFlags(flags2))
-  //             } else if (upper1 > z) {
-  //               // both / positive
-  //               Ranged(lower1 / lower2, upper1 / lower2, flags1 | lowerFlag(flags2) | lowerFlagToUpper(flags2))
-  //             } else {
-  //               // negative / positive
-  //               Ranged(lower1 / lower2, upper1 / upper2, flags1 | flags2)
-  //             }
-  //         }
-  //       } else {
-  //         // negative denominator, since denominator interval can't cross zero
-  //         lhs match {
-  //           case All() =>
-  //             lhs
-  // 
-  //           case Above(lower1, lf1) =>
-  //             val uf1x = lowerFlagToUpper(lf1)
-  //             if (lower1 > z)
-  //               Below(lower1 / upper2, uf1x | upperFlag(flags2))
-  //             else
-  //               Below(lower1 / lower2, uf1x | lowerFlagToUpper(flags2))
-  // 
-  //           case Below(upper1, uf1) =>
-  //             val lf1x = upperFlagToLower(uf1)
-  //             if (upper1 > z)
-  //               Above(upper1 / upper2, lf1x | upperFlagToLower(flags2))
-  //             else
-  //               Above(upper1 / lower2, lf1x | lowerFlag(flags2))
-  // 
-  //           case Ranged(lower1, upper1, flags1) =>
-  //             if (lower1 >= z) {
-  //               // positive / negative [0,a,b] / [c,d,0] = [b/d,a/c,0]
-  //               Ranged(upper1 / upper2, lower1 / lower2, swapFlags(flags1 | flags2))
-  //             } else if (upper1 > z) {
-  //               // both / negative [a,0,b] / [c,d,0] = [b/d,0,a/d]
-  //               Ranged(upper1 / upper2, lower1 / upper2, swapFlags(flags1) | lowerFlag(flags2) | lowerFlagToUpper(flags2))
-  //             } else {
-  //               // negative / negative [a,b,0] / [c,d,0] = [0,b/c,a/d]
-  //               Ranged(upper1 / lower2, lower1 / upper2, swapFlags(flags1) | flags2)
-  //             }
-  //         }
-  //       }
-  //   }
-  // }
+    (lhs, rhs) match {
+      case (Point(lv), _) => rhs.reciprocal * lv
+      case (_, Point(rv)) => lhs * (rv.reciprocal)
+      case (_, _) => lhs * rhs.reciprocal
+    }
 
   def +(rhs: A)(implicit ev: AdditiveSemigroup[A]): Interval[A] =
     this match {
-      case Ranged(l, u, flags) => Ranged(l + rhs, u + rhs, flags)
+      case Point(v) => Point(v + rhs)
+      case Bounded(l, u, flags) => Bounded(l + rhs, u + rhs, flags)
       case Above(l, lf) => Above(l + rhs, lf)
       case Below(u, uf) => Below(u + rhs, uf)
-      case All() => this
+      case All() | Empty() => this
     }
 
   def -(rhs: A)(implicit ev: AdditiveGroup[A]): Interval[A] =
@@ -688,28 +429,31 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   def unary_-()(implicit ev: AdditiveGroup[A]): Interval[A] =
     this match {
-      case Ranged(l, u, f) => Ranged(-u, -l, swapFlags(f))
-      case Above(l, lf) => Above(-l, lowerFlagToUpper(lf))
-      case Below(u, uf) => Below(-u, upperFlagToLower(uf))
-      case All() => this
+      case Point(v) => Point(-v)
+      case Bounded(l, u, f) => Bounded(-u, -l, swapFlags(f))
+      case Above(l, lf) => Below(-l, lowerFlagToUpper(lf))
+      case Below(u, uf) => Above(-u, upperFlagToLower(uf))
+      case All() | Empty() => this
     }
 
   def *(rhs: A)(implicit ev: Semiring[A]): Interval[A] =
     if (rhs < ev.zero) {
       this match {
-        case Ranged(l, u, f) => Ranged(u * rhs, l * rhs, swapFlags(f))
-        case Above(l, lf) => Above(l * rhs, lowerFlagToUpper(lf))
-        case Below(u, uf) => Below(u * rhs, upperFlagToLower(uf))
-        case All() => this
+        case Point(v) => Point(v * rhs)
+        case Bounded(l, u, f) => Bounded(u * rhs, l * rhs, swapFlags(f))
+        case Above(l, lf) => Below(l * rhs, lowerFlagToUpper(lf))
+        case Below(u, uf) => Above(u * rhs, upperFlagToLower(uf))
+        case All() | Empty() => this
       }
     } else if (rhs === ev.zero) {
       Interval.zero
     } else {
       this match {
-        case Ranged(l, u, flags) => Ranged(l * rhs, u * rhs, flags)
+        case Point(v) => Point(v * rhs)
+        case Bounded(l, u, flags) => Bounded(l * rhs, u * rhs, flags)
         case Above(l, lf) => Above(l * rhs, lf)
         case Below(u, uf) => Below(u * rhs, uf)
-        case All() => this
+        case All() | Empty() => this
       }
     }
 
@@ -737,155 +481,291 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def nroot(k: Int)(implicit r: Ring[A], n: NRoot[A]): Interval[A] = {
     if (k == 1) {
       this
-    } else if ((k & 1) == 0 && isBelow(r.zero)) {
-      sys.error("can't take even root of negative number")
+    } else if ((k & 1) == 0 && hasBelow(r.zero)) {
+      throw new IllegalArgumentException("can't take even root of negative number")
     } else {
       this match {
-        case All() => this
+        case All() | Empty() => this
+        case Point(v) => Point(v.nroot(k))
         case Above(l, lf) => Above(l.nroot(k), lf)
         case Below(u, uf) => Below(u.nroot(k), uf)
-        case Ranged(l, u, flags) => Ranged(l.nroot(k), u.nroot(k), flags)
+        case Bounded(l, u, flags) => Bounded(l.nroot(k), u.nroot(k), flags)
       }
     }
   }
 
   def sqrt(implicit r: Ring[A], n: NRoot[A]): Interval[A] = nroot(2)
 
-  def top(epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] = this match {
-    case Below(upper, uf) =>
-      Some(if (isOpenAbove(uf)) upper - epsilon else upper)
-    case Ranged(_, upper, flags) =>
-      Some(if (isOpenAbove(flags)) upper - epsilon else upper)
-    case _ =>
-      None
-  }
+  def top(epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] =
+    this match {
+      case Empty() | All() | Above(_, _) =>
+        None // TOCHECK: changed semantics, Empty().top == None
+      case Below(upper, uf) =>
+        Some(if (isOpenUpper(uf)) upper - epsilon else upper)
+      case Point(v) =>
+        Some(v)
+      case Bounded(_, upper, flags) =>
+        Some(if (isOpenUpper(flags)) upper - epsilon else upper)
+    }
 
-  def bottom(min: A, epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] = this match {
-    case Above(lower, lf) =>
-      Some(if (isOpenBelow(lf)) lower + epsilon else lower)
-    case Ranged(lower, _, flags) =>
-      Some(if (isOpenBelow(flags)) lower + epsilon else lower)
-    case _ =>
-      None
-  }
+  def bottom(min: A, epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] =
+    this match {
+      case Empty() | All() | Below(_, _) =>
+        None // TOCHECK: changed semantics, Empty().bottom == None
+      case Above(lower, lf) =>
+        Some(if (isOpenLower(lf)) lower + epsilon else lower)
+      case Point(v) =>
+        Some(v)
+      case Bounded(lower, _, flags) =>
+        Some(if (isOpenLower(flags)) lower + epsilon else lower)
+    }
 
   import spire.random.{Dist, Uniform}
 
   def dist(min: A, max: A, epsilon: A)(implicit u: Uniform[A], r: AdditiveGroup[A]): Dist[A] =
     u(bottom(min, epsilon).getOrElse(min), top(epsilon).getOrElse(max))
 
+  /**
+   * Apply the given polynomial to the interval.
+   *
+   * For every point contained in the interval, this method maps that
+   * point through the given polynomial. The resulting interval is the
+   * set of all the translated points. I.e.
+   * 
+   *     result = { p(x) | x ∈ interval }
+   * 
+   */
   def translate(p: Polynomial[A])(implicit ev: Field[A]): Interval[A] = {
     val terms2 = p.terms.map { case Term(c, e) => Term(Interval.point(c), e) }
     val p2 = Polynomial(terms2)
     p2(this)
   }
 
-  import Interval.{Bound, Open, Closed, Unbound}
+  // optional unicode operators
 
-  def lowerBound: Bound[A] = lowerPair match {
-    case Some((a, n)) => if (isOpenBelow(n)) Open(a) else Closed(a)
-    case None => Unbound()
+  def ∋(rhs: A): Boolean = lhs contains rhs
+  def ∌(rhs: A): Boolean = !(lhs contains rhs)
+  
+  def ∈:(a: A): Boolean = lhs contains a
+  def ∉:(a: A): Boolean = !(lhs contains a)
+
+  def ∩(rhs: Interval[A]): Interval[A] = lhs intersect rhs
+  def ∪(rhs: Interval[A]): Interval[A] = lhs union rhs
+  def \(rhs: Interval[A]): List[Interval[A]] = lhs -- rhs
+  
+  def ⊂(rhs: Interval[A]): Boolean = lhs isProperSubsetOf rhs
+  def ⊃(rhs: Interval[A]): Boolean = lhs isProperSupersetOf rhs
+  
+  def ⊆(rhs: Interval[A]): Boolean = lhs isSubsetOf rhs
+  def ⊇(rhs: Interval[A]): Boolean = lhs isSupersetOf rhs
+
+  // xyz
+
+  /**
+   * Build an Iterator[A] from an Interval[A] and a (step: A)
+   * parameter.
+   * 
+   * A positive 'step' means we are proceeding from the lower bound
+   * up, and a negative 'step' means we are proceeding from the upper
+   * bound down. In each case, the interval must be bounded on the
+   * side we are starting with (though it may be unbound on the
+   * opposite side). A zero 'step' is not allowed.
+   * 
+   * The step is repeatedly added to the starting parameter as long as
+   * the sum remains within the interval. This means that arithmetic
+   * error can accumulate (e.g. with doubles). However, this method
+   * does overflow checking to ensure that Intervals parameterized on
+   * integer types will behave correctly.
+   * 
+   * Users who want to avoid using arithmetic error should consider
+   * starting with an Interval[Rational], calling iterator with the
+   * exact step desired, then mapping to the original type
+   * (e.g. Double). For example:
+   * 
+   *     val ns = Interval.closed(Rational(0), Rational(5))
+   *     val it = ns.iterator(Rational(1, 7)).map(_.toDouble)
+   * 
+   * This method provides some of the same functionality as Scala's
+   * NumericRange class.
+   */
+  def iterator(step: A)(implicit ev: AdditiveMonoid[A]): Iterator[A] = {
+
+    // find the "first" value in our iterator. if step is positive we
+    // proceed from the lower bound up, and if negative from the upper
+    // bound down. thus, we always use addition when dealing with the
+    // step.
+    def getStart(bound: Bound[A], unboundError: String): A =
+      bound match {
+        case EmptyBound() => ev.zero
+        case Open(x) => x + step
+        case Closed(x) => x
+        case Unbound() => throw new IllegalArgumentException(unboundError)
+      }
+
+    // build an iterator, using start, step, continue, and test.
+    // test is used to detect overflow in cases where it can happen.
+    // it won't always be necessary but there isn't currently a typeclass
+    // that lets us know when we need to do it.
+    def iter(start: A, continue: A => Boolean, test: (A, A) => Boolean): Iterator[A] =
+      new Iterator[A] {
+        var x: A = start
+        var ok: Boolean = true
+        def hasNext: Boolean = ok && continue(x)
+        def next: A = {
+          val r = x
+          val next = x + step
+          if (test(x, next)) { x = next } else { ok = false }
+          r
+        }
+      }
+
+    // build the actual iterator, which primarily relies on figuring
+    // out which "direction" we are moving (based on the sign of the
+    // step) as well as what kind of limiting bounds we have.
+    if (step === ev.zero) {
+      throw new IllegalArgumentException("zero step")
+    } else if (step > ev.zero) {
+      val x = getStart(lowerBound, "positive step with no lower bound")
+      val test = (x1: A, x2: A) => x1 < x2
+      upperBound match {
+        case EmptyBound() => iter(x, _ => false, test)
+        case Unbound() => iter(x, _ => true, test)
+        case Closed(y) => iter(x, _ <= y, test)
+        case Open(y) => iter(x, _ < y, test)
+      }
+    } else {
+      val x = getStart(upperBound, "negative step with no lower bound")
+      val test = (x1: A, x2: A) => x1 > x2
+      lowerBound match {
+        case EmptyBound() => iter(x, _ => false, test)
+        case Unbound() => iter(x, _ => true, test)
+        case Closed(y) => iter(x, _ >= y, test)
+        case Open(y) => iter(x, _ > y, test)
+      }
+    }
   }
-
-  def upperBound: Bound[A] = upperPair match {
-    case Some((a, n)) => if (isOpenAbove(n)) Open(a) else Closed(a)
-    case None => Unbound()
-  }
-
-  def mapBounds[B: Order: AdditiveMonoid](f: A => B): Interval[B] =
-    Interval.fromBounds(lowerBound.map(f), upperBound.map(f))
-
-  def fold[B](f: (Bound[A], Bound[A]) => B): B =
-    f(lowerBound, upperBound)
 }
 
-case class All[A: Order] private[spire] () extends Interval[A]
-case class Above[A: Order] private[spire] (lower: A, flags: Int) extends Interval[A]
-case class Below[A: Order] private[spire] (upper: A, flags: Int) extends Interval[A]
-case class Ranged[A: Order] private[spire] (lower: A, upper: A, flags: Int) extends Interval[A]
+case class All[A: Order] private[spire] () extends Interval[A] {
+  def lowerBound: Unbound[A] = Unbound()
+  def upperBound: Unbound[A] = Unbound()
+}
+
+case class Above[A: Order] private[spire] (lower: A, flags: Int) extends Interval[A] {
+  def lowerBound: ValueBound[A] = if (isOpenLower(flags)) Open(lower) else Closed(lower)
+  def upperBound: Unbound[A] = Unbound()
+}
+
+case class Below[A: Order] private[spire] (upper: A, flags: Int) extends Interval[A] {
+  def lowerBound: Unbound[A] = Unbound()
+  def upperBound: ValueBound[A] = if (isOpenUpper(flags)) Open(upper) else Closed(upper)
+}
+
+// Bounded, non-empty interval with lower < upper
+case class Bounded[A: Order] private[spire] (lower: A, upper: A, flags: Int) extends Interval[A] {
+  require(lower < upper) // TODO: remove after refactoring
+
+  def lowerBound: ValueBound[A] = if (isOpenLower(flags)) Open(lower) else Closed(lower)
+  def upperBound: ValueBound[A] = if (isOpenUpper(flags)) Open(upper) else Closed(upper)
+}
+
+case class Point[A: Order] private[spire] (value: A) extends Interval[A] {
+  def lowerBound: Closed[A] = Closed(value)
+  def upperBound: Closed[A] = Closed(value)
+}
+
+case class Empty[A: Order] private[spire] () extends Interval[A] {
+  def lowerBound: EmptyBound[A] = EmptyBound()
+  def upperBound: EmptyBound[A] = EmptyBound()
+}
 
 object Interval {
+  import interval._
 
-  sealed trait Bound[A] { lhs =>
-    def map[B](f: A => B): Bound[B] = this match {
-      case Open(a) => Open(f(a))
-      case Closed(a) => Closed(f(a))
-      case Unbound() => Unbound()
-    }
-    def combine[B](rhs: Bound[A])(f: (A, A) => A): Bound[A] = (lhs, rhs) match {
-      case (Unbound(), _) => lhs
-      case (_, Unbound()) => rhs
-      case (Closed(a), y) => y.map(b => f(a, b))
-      case (x, Closed(b)) => x.map(a => f(a, b))
-      case (Open(a), Open(b)) => Open(f(a, b))
-    }
-
-    def unary_-()(implicit ev: AdditiveGroup[A]): Bound[A] =
-      lhs.map(-_)
-    def reciprocal()(implicit ev: MultiplicativeGroup[A]): Bound[A] =
-      lhs.map(_.reciprocal)
-
-    def +(a: A)(implicit ev: AdditiveSemigroup[A]): Bound[A] = map(_ + a)
-    def -(a: A)(implicit ev: AdditiveGroup[A]): Bound[A] = map(_ - a)
-    def *(a: A)(implicit ev: MultiplicativeSemigroup[A]): Bound[A] = map(_ * a)
-    def /(a: A)(implicit ev: MultiplicativeGroup[A]): Bound[A] = map(_ / a)
-
-    def +(rhs: Bound[A])(implicit ev: AdditiveSemigroup[A]): Bound[A] =
-      lhs.combine(rhs)(_ + _)
-    def -(rhs: Bound[A])(implicit ev: AdditiveGroup[A]): Bound[A] =
-      lhs.combine(rhs)(_ - _)
-    def *(rhs: Bound[A])(implicit ev: MultiplicativeSemigroup[A]): Bound[A] =
-      lhs.combine(rhs)(_ * _)
-    def /(rhs: Bound[A])(implicit ev: MultiplicativeGroup[A]): Bound[A] =
-      lhs.combine(rhs)(_ / _)
-  }
-
-  case class Unbound[A]() extends Bound[A]
-  case class Open[A](a: A) extends Bound[A]
-  case class Closed[A](a: A) extends Bound[A]
-
-  private[spire] def withFlags[A: Order: AdditiveMonoid](lower: A, upper: A, flags: Int): Interval[A] =
-    if (lower < upper || lower === upper && flags == 0) {
-      Ranged(lower, upper, flags)
-    } else {
+  private[spire] def withFlags[A: Order](lower: A, upper: A, flags: Int): Interval[A] =
+    if (lower < upper)
+      Bounded(lower, upper, flags)
+    else if (lower === upper && flags == 0)
+      Point(lower)
+    else
       Interval.empty[A]
-    }
 
-  def empty[A](implicit o: Order[A], r: AdditiveMonoid[A]): Interval[A] =
-    Ranged(r.zero, r.zero, 3)
+  def empty[A](implicit o: Order[A]): Interval[A] = Empty[A]
 
-  def point[A: Order](a: A): Interval[A] =
-    Ranged(a, a, 0)
+  def point[A: Order](a: A): Interval[A] = Point(a)
 
-  def zero[A](implicit o: Order[A], r: Semiring[A]): Interval[A] =
-    Ranged(r.zero, r.zero, 0)
+  def zero[A](implicit o: Order[A], r: Semiring[A]): Interval[A] = Point(r.zero)
 
   def all[A: Order]: Interval[A] = All[A]()
 
-  def apply[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] = closed(lower, upper)
+  def apply[A: Order](lower: A, upper: A): Interval[A] = closed(lower, upper)
 
-  def fromBounds[A: Order: AdditiveMonoid](lower: Bound[A], upper: Bound[A]): Interval[A] =
+  @inline private[spire] final def closedLowerFlags = 0
+  @inline private[spire] final def openLowerFlags = 1
+  @inline private[spire] final def closedUpperFlags = 0
+  @inline private[spire] final def openUpperFlags = 2
+
+  /**
+   * Constructs an interval from bounds.
+   * 
+   * This method assumes that lower < upper to avoid comparisons.
+   * 
+   * - When one of the arguments is Unbound, the result will be All,
+   *   Above(x, _), or Below(y, _).
+   * 
+   * - When both arguments are Open/Closed (e.g. Open(x), Open(y)),
+   *   then x < y and the result will be a Bounded interval.
+   * 
+   * - If both arguments are EmptyBound, the result is Empty.
+   * 
+   * - Any other arguments are invalid.
+   * 
+   * This method cannot construct Point intervals.
+   */
+  private[spire] def fromOrderedBounds[A: Order](lower: Bound[A], upper: Bound[A]): Interval[A] =
     (lower, upper) match {
+      case (EmptyBound(), EmptyBound()) => empty
+      case (Closed(x), Closed(y)) => Bounded(x, y, closedLowerFlags | closedUpperFlags)
+      case (Open(x), Open(y)) => Bounded(x, y, openLowerFlags | openUpperFlags)
+      case (Unbound(), Open(y)) => below(y)
+      case (Open(x), Unbound()) => above(x)
+      case (Unbound(), Closed(y)) => atOrBelow(y)
+      case (Closed(x), Unbound()) => atOrAbove(x)
+      case (Closed(x), Open(y)) => Bounded(x, y, closedLowerFlags | openUpperFlags)
+      case (Open(x), Closed(y)) => Bounded(x, y, openLowerFlags | closedUpperFlags)
+      case (Unbound(), Unbound()) => all
+      case (EmptyBound(), _) | (_, EmptyBound()) =>
+        throw new IllegalArgumentException("invalid empty bound")
+    }
+
+  def fromBounds[A: Order](lower: Bound[A], upper: Bound[A]): Interval[A] =
+    (lower, upper) match {
+      case (EmptyBound(), EmptyBound()) => empty
       case (Closed(x), Closed(y)) => closed(x, y)
       case (Open(x), Open(y)) => open(x, y)
       case (Unbound(), Open(y)) => below(y)
       case (Open(x), Unbound()) => above(x)
       case (Unbound(), Closed(y)) => atOrBelow(y)
       case (Closed(x), Unbound()) => atOrAbove(x)
-      case (Closed(x), Open(y)) => openAbove(x, y)
-      case (Open(x), Closed(y)) => openBelow(x, y)
+      case (Closed(x), Open(y)) => openUpper(x, y)
+      case (Open(x), Closed(y)) => openLower(x, y)
       case (Unbound(), Unbound()) => all
+      case (EmptyBound(), _) | (_, EmptyBound()) =>
+        throw new IllegalArgumentException("invalid empty bound")
     }
 
-  def closed[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
-    if (lower <= upper) Ranged(lower, upper, 0) else Interval.empty[A]
-  def open[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
-    if (lower <= upper) Ranged(lower, upper, 3) else Interval.empty[A]
-  def openBelow[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
-    if (lower < upper) Ranged(lower, upper, 1) else Interval.empty[A]
-  def openAbove[A: Order: AdditiveMonoid](lower: A, upper: A): Interval[A] =
-    if (lower < upper) Ranged(lower, upper, 2) else Interval.empty[A]
-
+  def closed[A: Order](lower: A, upper: A): Interval[A] = {
+    val c = lower compare upper
+    if (c < 0) Bounded(lower, upper, 0)
+    else if (c == 0) Point(lower)
+    else Interval.empty[A]
+  }
+  def open[A: Order](lower: A, upper: A): Interval[A] =
+    if (lower < upper) Bounded(lower, upper, 3) else Interval.empty[A]
+  def openLower[A: Order](lower: A, upper: A): Interval[A] =
+    if (lower < upper) Bounded(lower, upper, 1) else Interval.empty[A]
+  def openUpper[A: Order](lower: A, upper: A): Interval[A] =
+    if (lower < upper) Bounded(lower, upper, 2) else Interval.empty[A]
   def above[A: Order](a: A): Interval[A] = Above(a, 1)
   def below[A: Order](a: A): Interval[A] = Below(a, 2)
   def atOrAbove[A: Order](a: A): Interval[A] = Above(a, 0)
@@ -895,42 +775,29 @@ object Interval {
   private val SingleRe = "^ *\\[ *([^,]+) *\\] *$".r
   private val PairRe = "^ *(\\[|\\() *(.+?) *, *(.+?) *(\\]|\\)) *$".r
 
-  def apply(s: String): Interval[Rational] = s match {
-    case NullRe() =>
-      Interval.empty[Rational]
-    case SingleRe(x) =>
-      Interval.point(Rational(x))
-    case PairRe(left, x, y, right) =>
-      (left, x, y, right) match {
-        case ("(", "-∞", "∞", ")") =>
-          Interval.all[Rational]
-        case ("(", "-∞", y, ")") =>
-          Interval.below(Rational(y))
-        case ("(", "∞", y, "]") =>
-          Interval.atOrBelow(Rational(y))
-        case ("(", x, "∞", ")") =>
-          Interval.above(Rational(x))
-        case ("[", x, "∞", ")") =>
-          Interval.atOrAbove(Rational(x))
-        case ("[", x, y, "]") =>
-          Interval.closed(Rational(x), Rational(y))
-        case ("(", x, y, ")") =>
-          Interval.open(Rational(x), Rational(y))
-        case ("[", x, y, ")") =>
-          Interval.openAbove(Rational(x), Rational(y))
-        case ("(", x, y, "]") =>
-          Interval.openBelow(Rational(x), Rational(y))
-        case _ =>
-          throw new NumberFormatException("Impossible: " + s)
-      }
-    case _ =>
-      throw new NumberFormatException("For input string: " + s)
-  }
+  def apply(s: String): Interval[Rational] =
+    s match {
+      case NullRe() => Interval.empty[Rational]
+      case SingleRe(x) => Interval.point(Rational(x))
+      case PairRe(left, x, y, right) =>
+        (left, x, y, right) match {
+          case ("(", "-∞", "∞", ")") => Interval.all[Rational]
+          case ("(", "-∞", y, ")") => Interval.below(Rational(y))
+          case ("(", "∞", y, "]") => Interval.atOrBelow(Rational(y))
+          case ("(", x, "∞", ")") => Interval.above(Rational(x))
+          case ("[", x, "∞", ")") => Interval.atOrAbove(Rational(x))
+          case ("[", x, y, "]") => Interval.closed(Rational(x), Rational(y))
+          case ("(", x, y, ")") => Interval.open(Rational(x), Rational(y))
+          case ("[", x, y, ")") => Interval.openUpper(Rational(x), Rational(y))
+          case ("(", x, y, "]") => Interval.openLower(Rational(x), Rational(y))
+          case _ => throw new NumberFormatException("Impossible: " + s)
+        }
+      case _ => throw new NumberFormatException("For input string: " + s)
+    }
 
   implicit def eq[A: Eq]: Eq[Interval[A]] =
     new Eq[Interval[A]] {
-      def eqv(x: Interval[A], y: Interval[A]): Boolean =
-        (x.lowerPair === y.lowerPair) && (x.upperPair === y.upperPair)
+      def eqv(x: Interval[A], y: Interval[A]): Boolean = x == y
     }
 
   implicit def semiring[A](implicit ev: Ring[A], o: Order[A]): Semiring[Interval[A]] =
@@ -940,32 +807,4 @@ object Interval {
       def times(x: Interval[A], y: Interval[A]): Interval[A] = x * y
       override def pow(x: Interval[A], k: Int): Interval[A] = x.pow(k)
     }
-
-  // TODO: maybe put this somewhere more global once we have other types that need these?
-  implicit class SymbolicSetOps[A](lhs: Interval[A]) {
-  
-    def ∋(rhs: A): Boolean =
-      lhs contains rhs
-  
-    def ∩(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
-      lhs intersect rhs
-  
-    def ∪(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): Interval[A] =
-      lhs union rhs
-  
-    def \(rhs: Interval[A])(implicit r: AdditiveMonoid[A]): List[Interval[A]] =
-      lhs -- rhs
-  
-    def ⊂(rhs: Interval[A]): Boolean =
-      lhs isProperSubsetOf rhs
-  
-    def ⊃(rhs: Interval[A]): Boolean =
-      lhs isProperSupersetOf rhs
-  
-    def ⊆(rhs: Interval[A]): Boolean =
-      lhs isSubsetOf rhs
-  
-    def ⊇(rhs: Interval[A]): Boolean =
-      lhs isSupersetOf rhs
-  }
 }

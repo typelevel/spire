@@ -1,7 +1,6 @@
 package spire.random
 
-import spire.syntax._
-import spire.random.mutable._
+import spire.random.rng._
 
 import org.scalatest.FunSuite
 
@@ -32,13 +31,13 @@ class GeneratorTest extends FunSuite {
     g.getClass.getSimpleName.replace("$", "")
 
   val size: Int = 10000000
-  val threshold: Double = 0.003
+  val threshold: Double = 0.0038
 
-  List(Lcg32, Lcg64, BurtleRot2, BurtleRot3, Marsaglia32a6, MersenneTwister32, MersenneTwister64, Cmwc5, Well512).foreach { gen => 
+  List(Lcg32, Lcg64, BurtleRot2, BurtleRot3, Marsaglia32a6, MersenneTwister32, MersenneTwister64, Cmwc5, Well512a, Well1024a, Well19937a, Well19937c, Well44497a, Well44497b).foreach { gen => 
     val name = getName(gen)
 
     List(3, 5, 7, 11, 13, 17).foreach { mod =>
-      test("%s nextInt(%d) distributed within %.1f%%" format (name, mod, threshold * 100)) {
+      test("%s nextInt(%d) distributed within %.2f%%" format (name, mod, threshold * 100)) {
         val histogram = new Array[Int](mod)
         //val rng = gen.fromTime()
         val rng = gen.fromTime(13572468L)
@@ -67,7 +66,7 @@ class GeneratorTest extends FunSuite {
   //   val jrng = new java.util.Random()
   //   nums.foreach(mod => doit("Java48", mod, jrng.nextInt _))
 
-  //   List(Lcg32, Lcg64, BurtleRot2, BurtleRot3, Marsaglia32a6, Cmwc5, Well512).foreach { gen =>
+  //   List(Lcg32, Lcg64, BurtleRot2, BurtleRot3, Marsaglia32a6, MersenneTwister32, MersenneTwister64, Cmwc5, Well512a, Well1024a, Well19937a, Well19937c, Well44497a, Well44497b).foreach { gen =>
   //     val name = getName(gen)
   //     val rng = gen.fromTime()
   //     nums.foreach(mod => doit(name, mod, rng.nextInt _))

@@ -1,19 +1,15 @@
 package spire.math
 
-import spire.algebra._
-import spire.std.float._
-import spire.std.double._
-import spire.std.bigDecimal._
+import java.lang.Math
 
-import spire.syntax.convertableFrom._
+import scala.annotation.tailrec
+import scala.math.{ScalaNumber, ScalaNumericConversions}
+import scala.{specialized => sp}
+
+import spire.algebra._
 import spire.syntax.field._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
-
-import scala.{specialized => sp}
-import scala.annotation.tailrec
-import scala.math.{ScalaNumber, ScalaNumericConversions}
-import java.lang.Math
 
 object Quaternion extends QuaternionInstances {
   def i[@sp(Float, Double) A](implicit f: Rig[A]): Quaternion[A] =
@@ -122,9 +118,9 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
       sillyIsReal && r == that
   }
 
-  def isZero(implicit o: IsReal[A]): Boolean = r.isZero && i.isZero && j.isZero && k.isZero
-  def isReal(implicit o: IsReal[A]): Boolean = i.isZero && j.isZero && k.isZero
-  def isPure(implicit o: IsReal[A]): Boolean = r.isZero
+  def isZero(implicit o: IsReal[A]): Boolean = r.isSignZero && i.isSignZero && j.isSignZero && k.isSignZero
+  def isReal(implicit o: IsReal[A]): Boolean = i.isSignZero && j.isSignZero && k.isSignZero
+  def isPure(implicit o: IsReal[A]): Boolean = r.isSignZero
 
   def real(implicit s: Semiring[A]): Quaternion[A] = Quaternion(r)
   def pure(implicit s: Semiring[A]): Quaternion[A] = Quaternion(s.zero, i, j, k)

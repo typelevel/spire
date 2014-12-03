@@ -1,13 +1,12 @@
 package spire.std
 
-import spire.algebra._
-
-import spire.NoImplicit
-
 import scala.annotation.tailrec
 import scala.collection.SeqLike
 import scala.collection.mutable.Builder
 import scala.collection.generic.CanBuildFrom
+
+import spire.algebra._
+import spire.NoImplicit
 
 @SerialVersionUID(0L)
 class SeqVectorSpace[A, SA <: SeqLike[A, SA]](implicit val scalar: Rng[A], cbf: CanBuildFrom[SA,A,SA])

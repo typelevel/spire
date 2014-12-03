@@ -1,13 +1,47 @@
 package spire.macros
 
-import scala.reflect.macros.Context
+import spire.macros.compat.{termName, freshTermName, resetLocalAttrs, Context}
+
+import scala.language.higherKinds
+
+object Ops extends machinist.Ops {
+
+  def uesc(c: Char): String = "$u%04X".format(c.toInt)
+
+  val operatorNames: Map[String, String] =
+    machinist.DefaultOps.operatorNames ++ Map(
+      // square root
+      (uesc('√'), "sqrt"),
+
+      // equality, comparisons
+      (uesc('≡'), "eqv"),
+      (uesc('≠'), "neqv"),
+      (uesc('≤'), "lteqv"),
+      (uesc('≥'), "gteqv"),
+
+      // lattices/heyting
+      (uesc('∧'), "meet"),
+      (uesc('∨'), "join"),
+      (uesc('⊃'), "imp"),
+      (uesc('¬'), "complement"),
+
+      // bool
+      (uesc('⊻'), "xor"),
+      (uesc('⊼'), "nand"),
+      (uesc('⊽'), "nor"))
+
+  def unopWithEv2[Ev1, R](c: Context)(ev1: c.Expr[Ev1]): c.Expr[R] = {
+    import c.universe._
+    val (ev, lhs) = unpack(c)
+    c.Expr[R](Apply(Apply(Select(ev, findMethodName(c)), List(lhs)), List(ev1.tree)))
+  }
+}
 
 case class SyntaxUtil[C <: Context with Singleton](val c: C) {
-  import c.universe._
-  import definitions._
-  import Flag._
 
-  def name(s: String) = newTermName(c.fresh(s + "$"))
+  import c.universe._
+
+  def name(s: String) = freshTermName(c)(s + "$")
 
   def names(bs: String*) = bs.toList.map(name)
 
@@ -31,12 +65,11 @@ class InlineUtil[C <: Context with Singleton](val c: C) {
 
   def inlineAndReset[T](tree: Tree): c.Expr[T] = {
     val inlined = inlineApplyRecursive(tree)
-    //c.Expr[T](c.resetAllAttrs(inlined))
-    c.Expr[T](c.resetLocalAttrs(inlined))
+    c.Expr[T](resetLocalAttrs(c)(inlined))
   }
 
   def inlineApplyRecursive(tree: Tree): Tree = {
-    val ApplyName = newTermName("apply")
+    val ApplyName = termName(c)("apply")
 
     class InlineSymbol(symbol: Symbol, value: Tree) extends Transformer {
       override def transform(tree: Tree): Tree = tree match {

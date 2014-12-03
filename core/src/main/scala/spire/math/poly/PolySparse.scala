@@ -2,13 +2,17 @@ package spire.math.poly
 
 import java.lang.Integer.{ numberOfLeadingZeros, numberOfTrailingZeros }
 
-import spire.math._
 import scala.annotation.tailrec
 import scala.reflect.ClassTag
-import spire.algebra._
-import spire.implicits._
-
 import scala.{specialized => spec}
+
+import spire.algebra.{Eq, Field, Ring, Rng, Semiring}
+import spire.math.Polynomial
+import spire.std.int._
+import spire.syntax.field._
+import spire.syntax.eq._
+import spire.syntax.cfor._
+import spire.syntax.std.array._
 
 case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val coeff: Array[C])
     (implicit val ct: ClassTag[C]) extends Polynomial[C] { lhs =>
