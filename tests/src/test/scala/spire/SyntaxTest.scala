@@ -4,7 +4,8 @@ import spire.math.Rational
 import spire.algebra._
 import spire.std.int._
 import spire.std.double._
-import spire.std.seq._
+import spire.std.list._
+import spire.std.vector._
 import spire.std.string._
 
 import org.scalatest.{FunSuite, Matchers}
@@ -339,36 +340,6 @@ trait BaseSyntaxTest {
       ((v ⋅ w) == V.dot(v, w))
   }
 
-<<<<<<< HEAD
-  def testBooleanAlgebraSyntax[A: BooleanAlgebra](a: A, b: A) = {
-    import spire.syntax.booleanAlgebra._
-    ((a & b) == BooleanAlgebra[A].and(a, b)) &&
-      ((a | b) == BooleanAlgebra[A].or(a, b)) &&
-      ((a ^ b) == BooleanAlgebra[A].xor(a, b)) &&
-      (~a == BooleanAlgebra[A].complement(a))
-=======
-  def testCoordinateSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: CoordinateSpace[V, A]) = {
-    import spire.syntax.coordinateSpace._
-    implicit def A: Field[A] = V.scalar
-    ((v + w) == V.plus(v, w)) &&
-      ((v - w) == V.minus(v, w)) &&
-      (-v == V.negate(v)) &&
-      ((a *: v) == V.timesl(a, v)) &&
-      ((v :* a) == V.timesr(v, a)) &&
-      //((2 *: v) == V.timesl(A.fromInt(2), v)) &&
-      //((v :* 2) == V.timesr(v, A.fromInt(2))) &&
-      //((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
-      //((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
-      //((v :/ 2) == V.divr(v, A.fromInt(2))) &&
-      ((v dot w) == V.dot(v, w)) &&
-      ((v ⋅ w) == V.dot(v, w)) &&
-      (v._x == V._x(v)) &&
-      (v._y == V._y(v)) &&
-      (v._z == V._z(v)) &&
-      (v.coord(0) == V.coord(v, 0)) &&
-      (v.coord(1) == V.coord(v, 1))
-  }
-
   def testBoolSyntax[A: Bool](a: A, b: A) = {
     import spire.syntax.bool._
     ((a & b) == Bool[A].and(a, b)) &&
@@ -396,7 +367,6 @@ class PartialOrderSyntaxTest extends FunSuite with Matchers with Checkers {
 
   test("With intDivisibility: Seq(2,3,6,9,12).pmin sameElements Seq(2,3)") {
     Seq(2,3,6,9,12).pmin(intDivisibility).sameElements(Seq(2,3)) shouldBe true
->>>>>>> upstream/master
   }
   test("With intDivisibility: Seq(2,3,6,9,12).pmax sameElements Seq(9,12)") {
     Seq(2,3,6,9,12).pmax(intDivisibility).sameElements(Seq(9,12)) shouldBe true

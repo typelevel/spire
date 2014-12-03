@@ -5,7 +5,8 @@ import spire.algebra.free._
 import spire.algebra.lattice._
 import spire.math._
 import spire.implicits.{
-  SeqOrder => _, SeqEq => _,
+  ListOrder => _, ListEq => _,
+  VectorOrder => _, VectorEq => _,
   ArrayOrder => _, ArrayEq => _,
   MapEq => _,
   _ }
