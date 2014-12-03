@@ -6,7 +6,7 @@ import scala.reflect._
 import scala.{specialized => sp}
 
 import spire.algebra._
-import spire.std.array.ArrayEq
+import spire.std.ArraySupport
 import spire.syntax.isReal._
 import spire.syntax.nroot._
 import spire.syntax.vectorSpace._
@@ -206,7 +206,6 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
    * This is consistent with abs
    */
   def signum()(implicit r: Signed[T]): Int = real.signum()
-  //def signum()(implicit r: Signed[T]): Int = r.signum(real)
 
   def asTuple = (real, infinitesimal)
 
@@ -215,10 +214,10 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   def isInfinitesimal(implicit r: IsReal[T]): Boolean = anyIsZero(real) && !isReal
 
   def eqv(b: Jet[T])(implicit o: Eq[T]): Boolean = {
-    real === b.real && infinitesimal === b.infinitesimal
+    real === b.real && ArraySupport.eqv(infinitesimal, b.infinitesimal)
   }
   def neqv(b: Jet[T])(implicit o: Eq[T]): Boolean = {
-    real =!= b.real || infinitesimal =!= b.infinitesimal
+    !(this eqv b)
   }
 
   def unary_-()(implicit f: Field[T], v: VectorSpace[Array[T], T]): Jet[T] = {
