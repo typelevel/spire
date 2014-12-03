@@ -350,8 +350,8 @@ trait FixedPointInstances {
         FixedPoint(ev.toRational(b))
     }
 
-  import Info._
-  implicit final val FixedPointInfo = new CustomInfo[FixedPoint](
+  import NumberTag._
+  implicit final val FixedPointTag = new CustomTag[FixedPoint](
     Approximate, Some(FixedPoint.zero),
     Some(FixedPoint.MinValue), Some(FixedPoint.MaxValue), true, true)
 }

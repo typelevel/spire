@@ -109,6 +109,6 @@ class LongAlgebra extends LongIsEuclideanRing with LongIsNRoot with LongIsReal w
 trait LongInstances {
   implicit final val LongBitString = new LongIsBitString
   implicit final val LongAlgebra = new LongAlgebra
-  import spire.math.Info._
-  implicit final val LongInfo = new BuiltinIntInfo[Long](0L, Long.MinValue, Long.MaxValue)
+  import spire.math.NumberTag._
+  implicit final val LongTag = new BuiltinIntTag[Long](0L, Long.MinValue, Long.MaxValue)
 }

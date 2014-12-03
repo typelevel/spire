@@ -934,8 +934,8 @@ private[math] object BigRationals extends Rationals[BigInt] {
 trait RationalInstances {
   implicit final val RationalAlgebra = new RationalAlgebra
   implicit def RationalIsNRoot(implicit c:ApproximationContext[Rational]) = new RationalIsNRoot0
-  import Info._
-  implicit final val RationalInfo = new LargeInfo[Rational](Exact, Rational.zero)
+  import NumberTag._
+  implicit final val RationalTag = new LargeTag[Rational](Exact, Rational.zero)
 
 }
 

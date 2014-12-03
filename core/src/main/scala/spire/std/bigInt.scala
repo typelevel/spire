@@ -74,6 +74,6 @@ class BigIntAlgebra extends BigIntIsEuclideanRing with BigIntIsNRoot with BigInt
 
 trait BigIntInstances {
   implicit final val BigIntAlgebra = new BigIntAlgebra
-  import spire.math.Info._
-  implicit final val BigIntInfo = new LargeInfo[BigInt](Integral, BigInt(0))
+  import spire.math.NumberTag._
+  implicit final val BigIntTag = new LargeTag[BigInt](Integral, BigInt(0))
 }

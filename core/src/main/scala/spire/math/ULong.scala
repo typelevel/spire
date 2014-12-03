@@ -127,7 +127,8 @@ class ULong(val signed: Long) extends AnyVal {
 trait ULongInstances {
   implicit final val ULongAlgebra = new ULongAlgebra
   implicit final val ULongBitString = new ULongBitString
-  implicit final val ULongInfo = new Info.UnsignedIntInfo[ULong](ULong.MinValue, ULong.MaxValue)
+  import spire.math.NumberTag._
+  implicit final val ULongTag = new UnsignedIntTag[ULong](ULong.MinValue, ULong.MaxValue)
 }
 
 private[math] trait ULongIsRig extends Rig[ULong] {

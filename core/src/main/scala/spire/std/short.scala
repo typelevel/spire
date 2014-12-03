@@ -99,6 +99,6 @@ class ShortAlgebra extends ShortIsEuclideanRing with ShortIsReal with Serializab
 trait ShortInstances {
   implicit final val ShortBitString = new ShortIsBitString
   implicit final val ShortAlgebra = new ShortAlgebra
-  import spire.math.Info._
-  implicit final val ShortInfo = new BuiltinIntInfo[Short](0, Short.MinValue, Short.MaxValue)
+  import spire.math.NumberTag._
+  implicit final val ShortTag = new BuiltinIntTag[Short](0, Short.MinValue, Short.MaxValue)
 }

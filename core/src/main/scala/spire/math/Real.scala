@@ -508,8 +508,8 @@ object Real extends RealInstances {
 
 trait RealInstances {
   implicit final val algebra = new RealAlgebra
-  import Info._
-  implicit final val RealInfo = new LargeInfo[Real](Exact, Real.zero)
+  import NumberTag._
+  implicit final val RealTag = new LargeTag[Real](Exact, Real.zero)
 }
 
 @SerialVersionUID(0L)

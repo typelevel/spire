@@ -695,8 +695,8 @@ object Natural extends NaturalInstances {
 
 trait NaturalInstances {
   implicit final val NaturalAlgebra = new NaturalAlgebra
-  import Info._
-  implicit final val NaturalInfo = new CustomInfo[Natural](
+  import NumberTag._
+  implicit final val NaturalTag = new CustomTag[Natural](
     Integral, Some(Natural.zero), Some(Natural.zero), None, false, false)
 }
 
