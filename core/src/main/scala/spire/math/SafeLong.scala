@@ -402,6 +402,9 @@ trait SafeLongInstances {
 
   @SerialVersionUID(1L)
   implicit object SafeLongIsReal extends SafeLongIsReal with Serializable
+
+  import NumberTag._
+  implicit final val SafeLongTag = new LargeTag[SafeLong](Integral, SafeLong.zero)
 }
 
 private[math] trait SafeLongIsRing extends Ring[SafeLong] {

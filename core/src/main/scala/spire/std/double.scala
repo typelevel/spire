@@ -121,4 +121,7 @@ class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig w
 
 trait DoubleInstances {
   implicit final val DoubleAlgebra = new DoubleAlgebra
+  import Double._
+  import spire.math.NumberTag._
+  implicit final val DoubleTag = new BuiltinFloatTag(0D, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity)
 }

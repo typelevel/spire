@@ -174,4 +174,7 @@ trait BigDecimalInstances {
   implicit final val BigDecimalAlgebra = new BigDecimalAlgebra
   implicit def BigDecimalIsTrig(implicit mc: MathContext = defaultMathContext) =
     new BigDecimalIsTrig(mc)
+
+  import spire.math.NumberTag._
+  implicit final val BigDecimalTag = new LargeTag[BigDecimal](Approximate, BigDecimal(0))
 }
