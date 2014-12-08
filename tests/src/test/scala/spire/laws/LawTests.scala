@@ -5,7 +5,8 @@ import spire.algebra.free._
 import spire.algebra.lattice._
 import spire.math._
 import spire.implicits.{
-  SeqOrder => _, SeqEq => _,
+  ListOrder => _, ListEq => _,
+  VectorOrder => _, VectorEq => _,
   ArrayOrder => _, ArrayEq => _,
   MapEq => _,
   _ }
@@ -62,7 +63,7 @@ class LawTests extends FunSuite with Discipline {
 
   val max = NormedVectorSpace.max[Rational, List]
   checkAll("List[Rational]",
-    VectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly))
+    VectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly, implicitly))
 
   checkAll("List[Int]",   GroupLaws[List[Int]].monoid)
   checkAll("Vector[Int]", GroupLaws[Vector[Int]].monoid)

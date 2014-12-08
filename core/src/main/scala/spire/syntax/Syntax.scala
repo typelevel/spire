@@ -101,28 +101,20 @@ trait NRootSyntax {
   implicit def nrootOps[A: NRoot](a: A) = new NRootOps(a)
 }
 
-trait ModuleSyntax extends RingSyntax {
-  implicit def moduleOps[V](v:V) = new ModuleOps[V](v)
-}
-
-trait VectorSpaceSyntax extends ModuleSyntax with FieldSyntax {
+trait VectorSpaceSyntax extends FieldSyntax {
   implicit def vectorSpaceOps[V](v:V) = new VectorSpaceOps[V](v)
 }
 
-trait MetricSpaceSyntax extends VectorSpaceSyntax {
+trait MetricSpaceSyntax {
   implicit def metricSpaceOps[V](v:V) = new MetricSpaceOps[V](v)
 }
 
-trait NormedVectorSpaceSyntax extends MetricSpaceSyntax {
+trait NormedVectorSpaceSyntax extends VectorSpaceSyntax with MetricSpaceSyntax {
   implicit def normedVectorSpaceOps[V](v:V) = new NormedVectorSpaceOps[V](v)
 }
 
 trait InnerProductSpaceSyntax extends VectorSpaceSyntax {
   implicit def innerProductSpaceOps[V](v:V) = new InnerProductSpaceOps[V](v)
-}
-
-trait CoordinateSpaceSyntax extends InnerProductSpaceSyntax {
-  implicit def coordianteSpaceOps[V](v:V) = new CoordinateSpaceOps[V](v)
 }
 
 trait TrigSyntax {
@@ -152,12 +144,6 @@ trait GroupActionSyntax {
 }
 
 trait UnboundSyntax {
-  implicit def moduleUnboundOps[F](f: F)(implicit ev: Module[_, F]) =
-    new ModuleUnboundOps(f)
-
-  implicit def vectorSpaceUnboundOps[F](f: F)(implicit ev: VectorSpace[_, F]) =
-    new VectorSpaceUnboundOps(f)
-
   implicit def groupActionUnboundOps[G](g: G)(implicit ev: GroupAction[_, G]) =
     new GroupActionUnboundOps(g)
   implicit def additiveGroupActionUnboundOps[G](g: G)(implicit ev: AdditiveGroupAction[_, G]) =
@@ -240,11 +226,9 @@ trait AllSyntax extends
     FieldSyntax with
     NRootSyntax with
     TrigSyntax with
-    ModuleSyntax with
     VectorSpaceSyntax with
     NormedVectorSpaceSyntax with
     InnerProductSpaceSyntax with
-    CoordinateSpaceSyntax with
     LatticeSyntax with
     HeytingSyntax with
     BoolSyntax with

@@ -1,5 +1,7 @@
 package spire.std
 
+import java.lang.Integer.highestOneBit
+
 import scala.{ specialized => spec }
 import scala.reflect.ClassTag
 
@@ -60,7 +62,7 @@ object ArraySupport {
     z
   }
 
-  def negate[@spec(Int, Long, Float, Double) A: ClassTag: Ring](x: Array[A]): Array[A] = {
+  def negate[@spec(Int, Long, Float, Double) A: ClassTag: Rng](x: Array[A]): Array[A] = {
     val y = new Array[A](x.length)
     var i = 0
     while (i < x.length) {
@@ -95,41 +97,29 @@ object ArraySupport {
     y
   }
 
-  def dot[@spec(Int, Long, Float, Double) A](x: Array[A], y: Array[A])(implicit sc: Rig[A]): A = {
+  def dot[@spec(Int, Long, Float, Double) A](x: Array[A], y: Array[A])(implicit sc: Semiring[A]): A = {
     var z = sc.zero
     var i = 0
     while (i < x.length && i < y.length) { z += x(i) * y(i); i += 1 }
     z
   }
-
-  def axis[@spec(Float, Double) A](dimensions: Int, i: Int)(implicit ct: ClassTag[A], sc: Rig[A]): Array[A] = {
-    val v = new Array[A](dimensions)
-    var j = 0
-    while (j < v.length) { v(j) = sc.zero; j += 1 }
-    if (i < dimensions) v(i) = sc.one
-    v
-  }
 }
 
-trait ArrayInstances0 {
-  type NI0[A] = NoImplicit[VectorSpace[Array[A], A]]
-
-  implicit def ArrayModule[@spec(Int,Long,Float,Double) A: NI0: ClassTag: Ring]: Module[Array[A], A] =
-    new ArrayModule[A]
-}
-
-trait ArrayInstances1 extends ArrayInstances0 {
+trait ArrayInstances1 {
   type NI1[A] = NoImplicit[NormedVectorSpace[Array[A], A]]
 
-  implicit def ArrayVectorSpace[@spec(Int,Long,Float,Double) A: NI1: ClassTag: Field]: VectorSpace[Array[A], A] =
+  implicit def ArrayVectorSpace[@spec(Int,Long,Float,Double) A: NI1: Rng: ClassTag]: VectorSpace[Array[A], A] =
     new ArrayVectorSpace[A]
 
   implicit def ArrayEq[@spec A: Eq]: Eq[Array[A]] =
     new ArrayEq[A]
+
+  implicit def ArrayBasis[@spec(Int,Long,Float,Double) A: AdditiveMonoid: ClassTag]: Frame[Array[A], A] =
+    new ArrayBasis[A]
 }
 
 trait ArrayInstances2 extends ArrayInstances1 {
-  implicit def ArrayInnerProductSpace[@spec(Float, Double) A: Field: ClassTag]: InnerProductSpace[Array[A], A] =
+  implicit def ArrayInnerProductSpace[@spec(Float, Double) A: Rng: ClassTag]: InnerProductSpace[Array[A], A] =
     new ArrayInnerProductSpace[A]
 
   implicit def ArrayOrder[@spec A: Order]: Order[Array[A]] =
@@ -147,22 +137,8 @@ trait ArrayInstances extends ArrayInstances3 {
 }
 
 @SerialVersionUID(0L)
-private final class ArrayModule[@spec(Int,Long,Float,Double) A: ClassTag: Ring]
-    (implicit nvs: NoImplicit[VectorSpace[Array[A], A]])
-    extends Module[Array[A], A] with Serializable {
-  def scalar = Ring[A]
-  def zero: Array[A] = new Array[A](0)
-  def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
-  def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
-  override def minus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.minus(x, y)
-  def timesl(r: A, x: Array[A]): Array[A] = ArraySupport.timesl(r, x)
-}
-
-@SerialVersionUID(0L)
-private final class ArrayVectorSpace[@spec(Int,Float,Long,Double) A: ClassTag: Field]
-    (implicit nnvs: NoImplicit[NormedVectorSpace[Array[A], A]])
+private final class ArrayVectorSpace[@spec(Int,Float,Long,Double) A: ClassTag: Rng]
     extends VectorSpace[Array[A], A] with Serializable {
-  def scalar = Field[A]
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
   def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
@@ -177,9 +153,134 @@ private final class ArrayEq[@spec(Int,Float,Long,Double) A: Eq]
 }
 
 @SerialVersionUID(0L)
-private final class ArrayInnerProductSpace[@spec(Int,Float,Long,Double) A: ClassTag: Field]
+private final class ArrayBasis[@spec(Int,Float,Long,Double) A: ClassTag]
+    (implicit A: AdditiveMonoid[A])
+    extends Frame[Array[A], A] with Serializable {
+  val builder = new VectorBuilder[Array[A], A, Int] {
+    final class State(var vector: Array[A], var size: Int)
+
+    def init: State = new State(Array.fill(8)(A.zero), 0)
+
+    def update(s: State, i: Int, k: A): State = {
+      if (i > s.vector.size) {
+        val sz = spire.math.max(highestOneBit(s.vector.size), highestOneBit(i)) << 1
+        val tmp = Array.fill(if (sz < 0) Int.MaxValue else sz)(A.zero)
+        System.arraycopy(s.vector, 0, tmp, 0, s.vector.length)
+        s.vector = tmp
+      }
+
+      s.vector(i) = k
+      s.size = spire.math.max(s.size, i + 1)
+      s
+    }
+
+    def result(s: State): Array[A] =
+      if (s.vector.size == s.size) s.vector
+      else {
+        val v = s.vector
+        val w = new Array[A](s.size)
+        var i = 0
+        while (i < w.length) {
+          w(i) = v(i)
+          i += 1
+        }
+        w
+      }
+  }
+
+  // Not really true, but we're pretending Int.MaxValue == Infinity.
+  def hasKnownSize: Boolean = false
+
+  def size: Int = ???
+
+  def coord(v: Array[A], i: Int): A = v(i)
+
+  def foreachWithIndex[U](v: Array[A])(f: (Int, A) => U): Unit = {
+    var i = 0
+    while (i < v.length) {
+      f(i, v(i))
+      i += 1
+    }
+  }
+
+  def zipForeachWithIndex[U](v: Array[A], w: Array[A])(f: (Int, A, A) => U): Unit = {
+    var i = 0
+    while (i < v.length && i < w.length) {
+      f(i, v(i), w(i))
+      i += 1
+    }
+    while (i < v.length) {
+      f(i, v(i), A.zero)
+      i += 1
+    }
+    while (i < w.length) {
+      f(i, A.zero, w(i))
+      i += 1
+    }
+  }
+
+  override def foreach[U](v: Array[A])(f: A => U): Unit =
+    v foreach f
+
+  override def map(v: Array[A])(f: A => A): Array[A] =
+    v map f
+
+  override def mapWithIndex(v: Array[A])(f: (Int, A) => A): Array[A] = {
+    val w = new Array[A](v.length)
+    var i = 0
+    while (i < v.length) {
+      w(i) = f(i, v(i))
+      i += 1
+    }
+    w
+  }
+
+  override def zipForeach[U](v: Array[A], w: Array[A])(f: (A, A) => U): Unit = {
+    var i = 0
+    while (i < v.length && i < w.length) {
+      f(v(i), w(i))
+      i += 1
+    }
+    while (i < v.length) {
+      f(v(i), A.zero)
+      i += 1
+    }
+    while (i < w.length) {
+      f(A.zero, w(i))
+      i += 1
+    }
+  }
+
+  override def zipMap(v: Array[A], w: Array[A])(f: (A, A) => A): Array[A] = {
+    val u = new Array[A](spire.math.max(v.length, w.length))
+    var i = 0
+    while (i < v.length && i < w.length) {
+      u(i) = f(v(i), w(i))
+      i += 1
+    }
+    while (i < v.length) {
+      u(i) = f(v(i), A.zero)
+      i += 1
+    }
+    while (i < w.length) {
+      u(i) = f(A.zero, w(i))
+      i += 1
+    }
+    u
+  }
+
+  override def zipMapWithIndex(v: Array[A], w: Array[A])(f: (Int, A, A) => A): Array[A] = {
+    val u = new Array[A](spire.math.max(v.length, w.length))
+    zipForeachWithIndex(v, w) { (i, x, y) =>
+      u(i) = f(i, x, y)
+    }
+    u
+  }
+}
+
+@SerialVersionUID(0L)
+private final class ArrayInnerProductSpace[@spec(Int,Float,Long,Double) A: ClassTag: Rng]
     extends InnerProductSpace[Array[A], A] with Serializable {
-  def scalar = Field[A]
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
   def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
@@ -200,19 +301,6 @@ private final class ArrayMonoid[@spec(Int,Float,Long,Double) A: ClassTag]
     extends Monoid[Array[A]] with Serializable {
   def id = new Array[A](0)
   def op(x: Array[A], y: Array[A]) = ArraySupport.concat(x, y)
-}
-
-@SerialVersionUID(0L)
-class ArrayCoordinateSpace[@spec(Int,Long,Float,Double) A: ClassTag](final val dimensions: Int)(implicit val scalar: Field[A])
-extends CoordinateSpace[Array[A], A] with Serializable {
-  def zero: Array[A] = new Array[A](0)
-  def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
-  def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
-  override def minus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.minus(x, y)
-  def timesl(r: A, x: Array[A]): Array[A] = ArraySupport.timesl(r, x)
-  override def dot(x: Array[A], y: Array[A]): A = ArraySupport.dot(x, y)
-  def coord(v: Array[A], i: Int): A = v(i)
-  def axis(i: Int): Array[A] = ArraySupport.axis(dimensions, i)
 }
 
 @SerialVersionUID(0L)

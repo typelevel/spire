@@ -325,39 +325,23 @@ final class BoolOps[A: Bool](lhs:A) {
   def ^(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) ^ rhs
 }
 
-final class ModuleOps[V](x: V) {
-  def *:[F](lhs:F)(implicit ev: Module[V, F]): V = macro Ops.rbinopWithEv[F, Module[V, F], V]
-  def :*[F](rhs:F)(implicit ev: Module[V, F]): V = macro Ops.binopWithEv[F, Module[V, F], V]
+final class VectorSpaceOps[V](x: V) {
+  def *:[F](lhs:F)(implicit ev: VectorSpace[V, F]): V = macro Ops.rbinopWithEv[F, VectorSpace[V, F], V]
+  def :*[F](rhs:F)(implicit ev: VectorSpace[V, F]): V = macro Ops.binopWithEv[F, VectorSpace[V, F], V]
 
   // TODO: Are macros worth it here?
-  def *:[F](lhs:Int)(implicit ev: Module[V, F], F: Ring[F]): V = ev.timesl(F.fromInt(lhs), x)
-  def :*[F](rhs:Int)(implicit ev: Module[V, F], F: Ring[F]): V = ev.timesr(x, F.fromInt(rhs))
-}
+  def *:[F](lhs:Int)(implicit ev: VectorSpace[V, F], F: Ring[F]): V = ev.timesl(F.fromInt(lhs), x)
+  def :*[F](rhs:Int)(implicit ev: VectorSpace[V, F], F: Ring[F]): V = ev.timesr(x, F.fromInt(rhs))
 
-final class ModuleUnboundOps[F](lhs: F)(implicit ev: Module[_, F]) {
-  def +(rhs: F): F = macro Ops.binopWithScalar[F, F]
-  def -(rhs: F): F = macro Ops.binopWithScalar[F, F]
-  def unary_-(): F = macro Ops.unopWithScalar[F]
-  
-  def *(rhs: F): F = macro Ops.binopWithScalar[F, F]
-  
-  def pow(rhs: Int): F = macro Ops.binopWithScalar[Int, F]
-  def **(rhs: Int): F = macro Ops.binopWithScalar[Int, F]
-}
-
-final class VectorSpaceOps[V](x: V) {
-  def :/[F](rhs:F)(implicit ev: VectorSpace[V, F]): V = macro Ops.binopWithEv[F, VectorSpace[V, F], V]
+  // TODO: Support this in machinist.
+  // def :/[F](rhs:F)(implicit ev1: VectorSpace[V, F], ev2: Field[F]): V = macro Ops.binopWithEv2[F, VectorSpace[V, F], Field[F], V]
+  def :/[F](rhs:F)(implicit ev1: VectorSpace[V, F], ev2: Field[F]): V = ev1.divr(x, rhs)(ev2)
 
   //def *:[F](lhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesl(ev.scalar.fromDouble(lhs), x)
   //def :*[F](rhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesr(x, ev.scalar.fromDouble(rhs))
 
-  def :/[F](rhs:Int)(implicit ev: VectorSpace[V, F]): V = ev.divr(x, ev.scalar.fromInt(rhs))
-  def :/[F](rhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.divr(x, ev.scalar.fromDouble(rhs))
-}
-
-final class VectorSpaceUnboundOps[F](lhs: F)(implicit ev: VectorSpace[_, F]) {
-  def /(rhs: F): F = macro Ops.binopWithScalar[F, F]
-  def reciprocal(): F = macro Ops.unopWithScalar[F]
+  def :/[F](rhs:Int)(implicit V: VectorSpace[V, F], F: Field[F]): V = V.divr(x, F.fromInt(rhs))(F)
+  def :/[F](rhs:Double)(implicit V: VectorSpace[V, F], F: Field[F]): V = V.divr(x, F.fromDouble(rhs))(F)
 }
 
 final class InnerProductSpaceOps[V](lhs: V) {
@@ -365,23 +349,6 @@ final class InnerProductSpaceOps[V](lhs: V) {
     macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
   def ⋅[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
     macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
-}
-
-final class CoordinateSpaceOps[V](v: V) {
-  def _x[F](implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], F]
-
-  def _y[F](implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], F]
-
-  def _z[F](implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], F]
-
-  def coord[F](rhs: Int)(implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.binopWithEv[Int, CoordinateSpace[V, F], F]
-
-  def dimensions[F](implicit ev: CoordinateSpace[V, F]): Int =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], Int]
 }
 
 final class MetricSpaceOps[V](lhs: V) {
