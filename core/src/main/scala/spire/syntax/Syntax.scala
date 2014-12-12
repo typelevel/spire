@@ -146,9 +146,9 @@ trait BitStringSyntax {
   implicit def bitStringOps[A: BitString](a: A) = new BitStringOps(a)
 }
 
-trait GroupActionSyntax {
-  implicit def groupActionGroupOps[G](g: G) = new GroupActionGroupOps(g)
-  implicit def groupActionPointOps[P](p: P) = new GroupActionPointOps(p)
+trait ActionSyntax {
+  implicit def actionGroupOps[G](g: G) = new ActionGroupOps(g)
+  implicit def actionPointOps[P](p: P) = new ActionPointOps(p)
 }
 
 trait UnboundSyntax {
@@ -158,12 +158,12 @@ trait UnboundSyntax {
   implicit def vectorSpaceUnboundOps[F](f: F)(implicit ev: VectorSpace[_, F]) =
     new VectorSpaceUnboundOps(f)
 
-  implicit def groupActionUnboundOps[G](g: G)(implicit ev: GroupAction[_, G]) =
-    new GroupActionUnboundOps(g)
-  implicit def additiveGroupActionUnboundOps[G](g: G)(implicit ev: AdditiveGroupAction[_, G]) =
-    new AdditiveGroupActionUnboundOps(g)
-  implicit def multiplicativeGroupActionUnboundOps[G](g: G)(implicit ev: MultiplicativeGroupAction[_, G]) =
-    new MultiplicativeGroupActionUnboundOps(g)
+  implicit def groupActionUnboundOps[G](g: G)(implicit ev: Action[_, G]) =
+    new ActionUnboundOps(g)
+  implicit def additiveActionUnboundOps[G](g: G)(implicit ev: AdditiveAction[_, G]) =
+    new AdditiveActionUnboundOps(g)
+  implicit def multiplicativeActionUnboundOps[G](g: G)(implicit ev: MultiplicativeAction[_, G]) =
+    new MultiplicativeActionUnboundOps(g)
 }
 
 trait TorsorSyntax {
@@ -249,7 +249,7 @@ trait AllSyntax extends
     HeytingSyntax with
     BoolSyntax with
     BitStringSyntax with
-    GroupActionSyntax with
+    ActionSyntax with
     TorsorSyntax with
     IntegralSyntax with
     FractionalSyntax with

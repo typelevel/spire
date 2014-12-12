@@ -427,37 +427,37 @@ final class BitStringOps[A](lhs: A)(implicit ev: BitString[A]) {
   def rotateRight(rhs: Int): A = macro Ops.binop[Int, A]
 }
 
-final class GroupActionGroupOps[G](lhs: G) {
-  def |+|> [P](rhs: P)(implicit ev: GroupAction[P, G]): P =
-    macro Ops.binopWithEv[P, GroupAction[P, G], P]
-  def +> [P](rhs: P)(implicit ev: AdditiveGroupAction[P, G]): P =
-    macro Ops.binopWithEv[P, AdditiveGroupAction[P, G], P]
-  def *> [P](rhs: P)(implicit ev: MultiplicativeGroupAction[P, G]): P =
-    macro Ops.binopWithEv[P, MultiplicativeGroupAction[P, G], P]
+final class ActionGroupOps[G](lhs: G) {
+  def |+|> [P](rhs: P)(implicit ev: Action[P, G]): P =
+    macro Ops.binopWithEv[P, Action[P, G], P]
+  def +> [P](rhs: P)(implicit ev: AdditiveAction[P, G]): P =
+    macro Ops.binopWithEv[P, AdditiveAction[P, G], P]
+  def *> [P](rhs: P)(implicit ev: MultiplicativeAction[P, G]): P =
+    macro Ops.binopWithEv[P, MultiplicativeAction[P, G], P]
 }
 
-final class GroupActionPointOps[P](lhs: P) {
-  def <|+| [G](rhs: G)(implicit ev: GroupAction[P, G]): P =
-    macro Ops.binopWithEv[G, GroupAction[P, G], P]
-  def <+ [G](rhs: G)(implicit ev: AdditiveGroupAction[P, G]): P =
-    macro Ops.binopWithEv[G, AdditiveGroupAction[P, G], P]
-  def <* [G](rhs: G)(implicit ev: MultiplicativeGroupAction[P, G]): P =
-    macro Ops.binopWithEv[G, MultiplicativeGroupAction[P, G], P]
+final class ActionPointOps[P](lhs: P) {
+  def <|+| [G](rhs: G)(implicit ev: Action[P, G]): P =
+    macro Ops.binopWithEv[G, Action[P, G], P]
+  def <+ [G](rhs: G)(implicit ev: AdditiveAction[P, G]): P =
+    macro Ops.binopWithEv[G, AdditiveAction[P, G], P]
+  def <* [G](rhs: G)(implicit ev: MultiplicativeAction[P, G]): P =
+    macro Ops.binopWithEv[G, MultiplicativeAction[P, G], P]
 }
 
-final class GroupActionUnboundOps[G](lhs: G)(implicit ev: GroupAction[_, G]) {
+final class ActionUnboundOps[G](lhs: G)(implicit ev: Action[_, G]) {
   def |+|(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def |-|(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def inverse(): G = macro Ops.unopWithScalar[G]
 }
 
-final class AdditiveGroupActionUnboundOps[G](lhs: G)(implicit ev: AdditiveGroupAction[_, G]) {
+final class AdditiveActionUnboundOps[G](lhs: G)(implicit ev: AdditiveAction[_, G]) {
   def +(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def -(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def unary_-(): G = macro Ops.unopWithScalar[G]
 }
 
-final class MultiplicativeGroupActionUnboundOps[G](lhs: G)(implicit ev: MultiplicativeGroupAction[_, G]) {
+final class MultiplicativeActionUnboundOps[G](lhs: G)(implicit ev: MultiplicativeAction[_, G]) {
   def *(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def /(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def reciprocal(): G = macro Ops.unopWithScalar[G]
