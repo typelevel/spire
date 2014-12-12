@@ -45,7 +45,7 @@ package object syntax {
 
   object bitString extends BitStringSyntax
 
-  object groupAction extends GroupActionSyntax
+  object action extends ActionSyntax
   object torsor extends TorsorSyntax
 
   object integral extends IntegralSyntax
