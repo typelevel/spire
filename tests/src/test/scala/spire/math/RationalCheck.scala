@@ -56,4 +56,10 @@ class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
   rat2("x / y == x * (y^-1)") { (x: Q, y: Q) => if (y != 0) x / y shouldBe x * y.reciprocal }
 
   rat3("(x + y) * z == x * z + y * z") { (x: Q, y: Q, z: Q) => (x + y) * z shouldBe x * z + y * z }
+
+  property("Round-trip Double") {
+    forAll("x") { (n: Double) =>
+      Rational(n).toDouble == n
+    }
+  }
 }

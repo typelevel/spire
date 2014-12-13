@@ -312,7 +312,9 @@ object Rational extends RationalInstances {
 
   implicit def apply(x: Float): Rational = apply(x.toDouble)
 
-  implicit def apply(x: Double): Rational = {
+  implicit def apply(x: Double): Rational = if (x == 0D) {
+    zero
+  } else {
     val bits = java.lang.Double.doubleToLongBits(x)
     val value = if ((bits >> 63) < 0) -(bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L)
                 else (bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L)
