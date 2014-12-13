@@ -291,4 +291,8 @@ class RationalTest extends FunSuite {
     val z = Rational("1/287380324068203382157064120376241062")
     assert(x.gcd(y) === z) // As confirmed by Wolfram Alpha
   }
+
+  test("Rational(0D) is Zero") {
+    assert(Rational(0D) === Rational.zero)
+  }
 }
