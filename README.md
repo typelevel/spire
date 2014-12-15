@@ -12,14 +12,22 @@ code without having to "bake in" particular numeric representations. In most
 cases, generic implementations using Spire's specialized type classes perform
 identically to corresponding direct implementations.
 
+[![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
+
 Spire is provided to you as free software under the
 [MIT license](COPYING).
 
 The [Spire mailing list](http://groups.google.com/group/spire-math/)
 is the place to go for announcements and discussion around Spire. We
-also have a guide on [contributing to Spire](CONTRIBUTING.md).
+also have a guide on [contributing to Spire](CONTRIBUTING.md) as well
+as a guide that provides information on [Spire's design](GUIDE.md).
 
-[![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
+People are expected to follow the [Typelevel Code of Conduct](http://typelevel.org/conduct.html)
+when discussing Spire on the Github page, IRC channel, mailing list,
+or other venues.
+
+Concerns or issues can be sent to Erik Osheim (*erik@osheim.org*) or
+to [Typelevel](http://typelevel.org/about.html).
 
 ### Set up
 
