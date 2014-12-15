@@ -10,6 +10,8 @@ import spire.syntax.field._
 import spire.syntax.nroot._
 import spire.syntax.order._
 
+import java.lang.Double.isNaN
+
 /**
  * Interval represents a set of values, usually numbers.
  * 
@@ -19,7 +21,7 @@ import spire.syntax.order._
  *  * Closed: The boundary value is included in the interval.
  *  * Open: The boundary value is excluded from the interval.
  *  * Unbound: There is no boundary value.
- *  * EmptyBound: The interval itself is empty.
+ *  * Empty: The interval itself is empty.
  *
  * When the underlying type of the interval supports it, intervals may
  * be used in arithmetic. There are several possible interpretations
@@ -567,6 +569,18 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   // xyz
 
+  // find the "first" value in our iterator. if step is positive we
+  // proceed from the lower bound up, and if negative from the upper
+  // bound down. thus, we always use addition when dealing with the
+  // step.
+  private[this] def getStart(bound: Bound[A], step: A, unboundError: String)(implicit ev: AdditiveMonoid[A]): A =
+    bound match {
+      case EmptyBound() => ev.zero
+      case Open(x) => x + step
+      case Closed(x) => x
+      case Unbound() => throw new IllegalArgumentException(unboundError)
+    }
+
   /**
    * Build an Iterator[A] from an Interval[A] and a (step: A)
    * parameter.
@@ -594,25 +608,27 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
    * This method provides some of the same functionality as Scala's
    * NumericRange class.
    */
-  def iterator(step: A)(implicit ev: AdditiveMonoid[A]): Iterator[A] = {
+  def iterator(step: A)(implicit ev: AdditiveMonoid[A], nt: NumberTag[A]): Iterator[A] = {
 
-    // find the "first" value in our iterator. if step is positive we
-    // proceed from the lower bound up, and if negative from the upper
-    // bound down. thus, we always use addition when dealing with the
-    // step.
-    def getStart(bound: Bound[A], unboundError: String): A =
-      bound match {
-        case EmptyBound() => ev.zero
-        case Open(x) => x + step
-        case Closed(x) => x
-        case Unbound() => throw new IllegalArgumentException(unboundError)
+    // build an iterator, using start, step, and continue.
+    // this can be used in cases where we don't have to worry about
+    // overflow (e.g. Double, or Rational).
+    def iter0(start: A, continue: A => Boolean): Iterator[A] =
+      new Iterator[A] {
+        var x: A = start
+        def hasNext: Boolean = continue(x)
+        def next: A = {
+          val r = x
+          x += step
+          r
+        }
       }
 
     // build an iterator, using start, step, continue, and test.
     // test is used to detect overflow in cases where it can happen.
     // it won't always be necessary but there isn't currently a typeclass
     // that lets us know when we need to do it.
-    def iter(start: A, continue: A => Boolean, test: (A, A) => Boolean): Iterator[A] =
+    def iter1(start: A, continue: A => Boolean, test: (A, A) => Boolean): Iterator[A] =
       new Iterator[A] {
         var x: A = start
         var ok: Boolean = true
@@ -625,31 +641,44 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
         }
       }
 
+    def iter(start: A, safe: Boolean, continue: A => Boolean, test: (A, A) => Boolean): Iterator[A] =
+      if (nt.overflows && !safe) {
+        iter1(start, continue, test)
+      } else {
+        iter0(start, continue)
+      }
+
     // build the actual iterator, which primarily relies on figuring
     // out which "direction" we are moving (based on the sign of the
     // step) as well as what kind of limiting bounds we have.
     if (step === ev.zero) {
       throw new IllegalArgumentException("zero step")
     } else if (step > ev.zero) {
-      val x = getStart(lowerBound, "positive step with no lower bound")
+      val x = getStart(lowerBound, step, "positive step with no lower bound")
       val test = (x1: A, x2: A) => x1 < x2
       upperBound match {
-        case EmptyBound() => iter(x, _ => false, test)
-        case Unbound() => iter(x, _ => true, test)
-        case Closed(y) => iter(x, _ <= y, test)
-        case Open(y) => iter(x, _ < y, test)
+        case EmptyBound() => Iterator.empty
+        case Unbound() => iter(x, false, _ => true, test)
+        case Closed(y) => iter(x, y + step > y, _ <= y, test)
+        case Open(y) => iter(x, y + step > y, _ < y, test)
       }
     } else {
-      val x = getStart(upperBound, "negative step with no lower bound")
+      val x = getStart(upperBound, step, "negative step with no lower bound")
       val test = (x1: A, x2: A) => x1 > x2
       lowerBound match {
-        case EmptyBound() => iter(x, _ => false, test)
-        case Unbound() => iter(x, _ => true, test)
-        case Closed(y) => iter(x, _ >= y, test)
-        case Open(y) => iter(x, _ > y, test)
+        case EmptyBound() => Iterator.empty
+        case Unbound() => iter(x, false, _ => true, test)
+        case Closed(y) => iter(x, y + step < y, _ >= y, test)
+        case Open(y) => iter(x, y + step < y, _ > y, test)
       }
     }
   }
+
+  def loop(step: A)(f: A => Unit)(implicit ev: AdditiveMonoid[A], nt: NumberTag[A]): Unit =
+    iterator(step).foreach(f)
+
+  def foldOver[B](init: B, step: A)(f: (B, A) => B)(implicit ev: AdditiveMonoid[A], nt: NumberTag[A]): B =
+    iterator(step).foldLeft(init)(f)
 }
 
 case class All[A: Order] private[spire] () extends Interval[A] {
@@ -705,6 +734,31 @@ object Interval {
   def all[A: Order]: Interval[A] = All[A]()
 
   def apply[A: Order](lower: A, upper: A): Interval[A] = closed(lower, upper)
+
+  /**
+   * Return an Interval[Rational] that corresponds to the error bounds
+   * for the given Double value.
+   * 
+   * The error bounds are represented as a closed interval, whose
+   * lower point is midway between d and the adjacent Double value
+   * below it. Similarly, the upper bound is the point midway between
+   * d and the adjacent Double value above it.
+   * 
+   * 
+   */
+  def errorBounds(d: Double): Interval[Rational] =
+    if (d == Double.PositiveInfinity) {
+      Interval.above(Double.MaxValue)
+    } else if (d == Double.NegativeInfinity) {
+      Interval.below(Double.MinValue)
+    } else if (isNaN(d)) {
+      Interval.empty[Rational]
+    } else {
+      val n0 = Rational(Math.nextAfter(d, -1.0))
+      val n1 = Rational(d)
+      val n2 = Rational(Math.nextUp(d))
+      Interval((n1 - n0) / 2 + n0, (n2 - n1) / 2 + n1)
+    }
 
   @inline private[spire] final def closedLowerFlags = 0
   @inline private[spire] final def openLowerFlags = 1

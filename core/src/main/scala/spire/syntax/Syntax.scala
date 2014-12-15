@@ -151,6 +151,11 @@ trait GroupActionSyntax {
   implicit def groupActionPointOps[P](p: P) = new GroupActionPointOps(p)
 }
 
+trait IntervalSyntax {
+  implicit def groupActionGroupOps[A: Order: AdditiveGroup](a: A) =
+    new IntervalPointOps(a)
+}
+
 trait UnboundSyntax {
   implicit def moduleUnboundOps[F](f: F)(implicit ev: Module[_, F]) =
     new ModuleUnboundOps(f)
@@ -240,6 +245,7 @@ trait AllSyntax extends
     FieldSyntax with
     NRootSyntax with
     TrigSyntax with
+    IntervalSyntax with
     ModuleSyntax with
     VectorSpaceSyntax with
     NormedVectorSpaceSyntax with

@@ -3,7 +3,7 @@ package spire.syntax
 import spire.algebra._
 import spire.algebra.lattice._
 import spire.macros.Ops
-import spire.math.{BitString, ConvertableTo, ConvertableFrom, Rational, Number}
+import spire.math.{BitString, ConvertableTo, ConvertableFrom, Interval, Rational, Number}
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
   def ===(rhs:A): Boolean = macro Ops.binop[A, Boolean]
@@ -468,4 +468,11 @@ final class TorsorPointOps[P](lhs: P) {
     macro Ops.binopWithEv[P, AdditiveTorsor[P, G], G]
   def </> [G](rhs: P)(implicit ev: MultiplicativeTorsor[P, G]): G =
     macro Ops.binopWithEv[P, MultiplicativeTorsor[P, G], G]
+}
+
+final class IntervalPointOps[A](lhs: A)(implicit o: Order[A], ev: AdditiveGroup[A]) {
+  def ±(rhs: A): Interval[A] =
+    Interval(ev.minus(lhs, rhs), ev.plus(lhs, rhs))
+  def +/-(rhs: A): Interval[A] =
+    Interval(ev.minus(lhs, rhs), ev.plus(lhs, rhs))
 }
