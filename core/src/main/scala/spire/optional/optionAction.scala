@@ -24,7 +24,7 @@ trait OptionRightAction[P, G] extends Any with RightAction[Option[P], Option[G]]
   }
 }
 
-trait OptionAction[P, G] extends Any with Action[Option[P], Option[G]] with OptionLeftAction[P, G] with OptionRightAction[P, G] {
+trait OptionActionTrait[P, G] extends Any with Action[Option[P], Option[G]] with OptionLeftAction[P, G] with OptionRightAction[P, G] {
   implicit def partial: PartialAction[P, G]
 }
 
@@ -39,9 +39,9 @@ trait optionActionLowPriority {
     }
 }
 
-object optionAction {
+object optionAction extends optionActionLowPriority {
   implicit def optionAction[P, G](implicit ev: PartialAction[P, G]): Action[Option[P], Option[G]] =
-    new OptionAction[P, G] {
+    new OptionActionTrait[P, G] {
       def partial = ev
     }
 }
