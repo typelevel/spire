@@ -21,6 +21,52 @@ trait GroupLaws[A] extends Laws {
   implicit def Arb: Arbitrary[A]
 
 
+  // groupoids
+
+  def semigroupoid(implicit A: Semigroupoid[A]) = new GroupProperties(
+    name = "semigroupoid",
+    parent = None,
+    "associative: a ?+? b && b ?+? c imply (a |+|! b) ?+? c" → forAll((a: A, b: A, c: A) =>
+      !((a ?+? b) && (b ?+? c)) || ((a |+|! b) ?+? c)
+    ),
+
+    "associative: (a |+|? b) |+|? c === a |+|? (b |+|? c)" → forAll((a: A, b: A, c: A) => {
+      import spire.optional.optionSemigroup._
+
+      ((Option(a) |+| Option(b)) |+| Option(c)) === (Option(a) |+| (Option(b) |+| Option(c)))
+    }
+    )
+  )
+
+  def partialMonoid(implicit A: PartialMonoid[A]) = new GroupProperties(
+    name = "partialMonoid",
+    parent = Some(semigroupoid),
+
+    "left identity" → forAll((a: A) =>
+      (a.leftId ?+? a) && ((a.leftId() |+|! a) === a)
+    ),
+
+    "right identity" → forAll((a: A) =>
+      (a ?+? a.rightId) && ((a |+|! a.rightId) === a)
+    )
+  )
+
+  def groupoid(implicit A: Groupoid[A]) = new GroupProperties(
+    name = "groupoid",
+    parent = Some(partialMonoid),
+
+    "product with inverse is always defined" → forAll((a: A) =>
+      (a ?+? a.inverse) && (a.inverse ?+? a)
+    ),
+
+    "product with inverse is a left and right identity" → forAll((a: A, b: A) =>
+      !(a ?+? b) || (
+        (a |+|! b |+|! b.inverse) === a &&
+          (a.inverse |+|! a |+|! b) === b
+      )
+    )
+  )
+
   // groups
 
   def semigroup(implicit A: Semigroup[A]) = new GroupProperties(
