@@ -21,13 +21,6 @@ trait Semigroupoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] exte
     case Some(result) => result
     case _ => throw new IllegalArgumentException(s"$f |+|! $g is not defined")
   }
-
-  /**
-   *  Given a sequence of `as`, combine them using the semigroup and return the total.
-   * 
-   *  If the sequence is empty, returns None. Otherwise, returns Some(total).
-   */
-//  def combineOption(as: TraversableOnce[A]): Option[A] = as.reduceOption(op)
 }
 
 object Semigroupoid {
