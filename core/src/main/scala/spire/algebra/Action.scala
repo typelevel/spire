@@ -100,7 +100,7 @@ trait RightAction[@spec(Int) P, G] extends Any with RightPartialAction[P, G] {
   * 
   * 1. `p <|+| g === g.inverse |+|> p`
   */
-trait Action[@spec(Int) P, G] extends Any with LeftAction[P, G] with RightAction[P, G]
+trait Action[@spec(Int) P, G] extends Any with LeftAction[P, G] with RightAction[P, G] with PartialAction[P, G]
 
 object Action {
   @inline def apply[P, G](G: Action[P, G]) = G
