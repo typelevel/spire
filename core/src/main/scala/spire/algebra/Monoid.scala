@@ -8,17 +8,20 @@ import scala.{ specialized => spec }
  * `op(x, id) == op(id, x) == x`. For example, if we have `Monoid[String]`,
  * with `op` as string concatenation, then `id = ""`.
  */
-trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Semigroup[A] {
+trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Semigroup[A] with PartialMonoid[A] {
 
   /**
    * Return the identity element for this monoid.
    */
   def id: A
 
+  def leftId(a: A): A = id
+  def rightId(a: A): A = id
+
   /**
     * Tests if `a` is the identity.
     */
-  def isId(a: A)(implicit ev: Eq[A]) = ev.eqv(a, id)
+  override def isId(a: A)(implicit ev: Eq[A]) = ev.eqv(a, id)
 
   /**
    * Return `a` combined with itself `n` times.
@@ -33,6 +36,7 @@ trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends An
    *  Given a sequence of `as`, combine them using the monoid and return the total.
    */
   def combine(as: TraversableOnce[A]): A = as.aggregate(id)(op, op)
+
 }
 
 object Monoid {
