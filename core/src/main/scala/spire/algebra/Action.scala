@@ -23,21 +23,6 @@ trait LeftPartialAction[@spec(Int) P, G] extends Any {
     case Some(result) => result
     case None => throw new IllegalArgumentException(s"Action $g |+|> is not compatible with $p")
   }
-  /*
-  implicit def Forced: Action[P, G] = new LeftAction[P, G] {
-    def actl(g: G, p: P): P = forceActl(g, p)
-    def actr(p: P, g: G): P = forceActr(p, g)
-  }
-  implicit def OptionAction: Action[Option[P], G] = new Action[Option[P], G] {
-    def actl(g: G, pOpt: Option[P]): Option[P] = pOpt match {
-      case Some(p) => partialActl(g, p)
-      case None => None
-    }
-    def actr(pOpt: Option[P], g: G): Option[P] = pOpt match {
-      case Some(p) => partialActr(p, g)
-      case None => None
-    }
-  }*/
 }
 
 /**
