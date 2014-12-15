@@ -15,7 +15,7 @@ import scala.annotation.{ switch, tailrec }
   * are defined and (f |+| g) |+| h = f |+| (g |+| h).
   */
 trait Semigroupoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any {
-  def isOpDefined(f: A, g: A): Boolean
+  def isOpDefined(f: A, g: A): Boolean = partialOp(f, g).nonEmpty
   def partialOp(f: A, g: A): Option[A]
   def forceOp(f: A, g: A): A = partialOp(f, g) match {
     case Some(result) => result
