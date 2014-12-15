@@ -106,6 +106,11 @@ object Action {
   @inline def apply[P, G](G: Action[P, G]) = G
   @inline def additive[P, G](G: AdditiveAction[P, G]) = G.additive
   @inline def multiplicative[P, G](G: MultiplicativeAction[P, G]) = G.multiplicative
+
+  @inline def forced[P, G](G: PartialAction[P, G]): Action[P, G] = new Action[P, G] {
+    def actl(g: G, p: P): P = G.forceActl(g, p)
+    def actr(p: P, g: G): P = G.forceActr(p, g)
+  }
 }
 
 trait AdditiveAction[@spec(Int) P, G] extends Any { self =>
