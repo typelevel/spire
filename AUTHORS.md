@@ -25,6 +25,7 @@ possible.
 * Lars Hupel: core maintainer, law-checking, release support
 * Ben Hutchison: bug reports and design suggestions
 * Kamushin: bug fixes
+* Rüdiger Klaehn: bug fixes
 * Rex Kerr: author of many of the PRNGs found in spire.random
 * Grzegorz Kossakowski: much build support, 2.11 upgrading help, bug reports
 * Christian Krause: suggestions around stats methods and spire.random.
