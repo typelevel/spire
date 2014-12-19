@@ -121,7 +121,7 @@ private[math] trait AlgebraicIsField extends Field[Algebraic] with AlgebraicIsEu
 
 private[math] trait AlgebraicIsNRoot extends NRoot[Algebraic] {
   def nroot(a: Algebraic, k: Int): Algebraic = a nroot k
-  def fpow(a:Algebraic, b:Algebraic) = sys.error("fixme")
+  def fpow(a:Algebraic, b:Algebraic) = throw new ArithmeticException("fpow not supported by Algebraic")
 }
 
 private[math] trait AlgebraicOrder extends Order[Algebraic] {
