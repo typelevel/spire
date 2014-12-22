@@ -12,6 +12,7 @@ A successful open-source project relies upon the community to:
 This file lists the people whose contributions have made Spire
 possible.
 
+* Ben Barnard: documentation fixes
 * Luc J. Bourhis: author of spire.matrix.*
 * Eugene Burmako: macros, tons of macro support, build contributions
 * Franco Callari: author of spire.math.Jet
@@ -43,6 +44,7 @@ possible.
 * Titorenko: bug fixes
 * Vlad Ureche: specialization support, work on spire-miniboxing
 * Volth: bug reports and feedback around intervals
+* William Waites: bug fixes
 * Kenji Yoshida: bug fixes
 * Benito van der Zander: many bug reports, and much good testing
 

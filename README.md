@@ -36,16 +36,16 @@ Spire is currently available for Scala 2.10 and 2.11.
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-scalaVersion := "2.10.4"
-// or scalaVersion := "2.11.2"
+or scalaVersion := "2.11.4"
+// or scalaVersion := "2.10.4"
 
-libraryDependencies += "org.spire-math" %% "spire" % "0.8.2"
+libraryDependencies += "org.spire-math" %% "spire" % "0.9.0"
 ```
 
 (If you must use Spire with 2.9.x, there is an older 0.3.0 release available.)
 
-For maven instructions, and to download the jars directly, visit the
-[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.8.2%7Cjar).
+For Maven instructions, and to download the jars directly, visit the
+[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.9.0%7Cjar).
 
 ### Playing Around
 
@@ -129,7 +129,8 @@ to concepts from abstract algebra:
  * `InnerProductSpace[V,F]` types with an inner product
  * `MetricSpace[V,R]` types with an associated metric
  * `Trig[A]` types that support trigonometric functions
- * `Bool[A]` types that form a boolean algebra
+ * `Bool[A]` types that form a Boolean algebra
+ * `Heyting[A]` types that form a Heyting algebra
 
 In addition to the type classes themselves, `spire.implicits` defines many
 implicits which provide unary and infix operators for the type classes. The

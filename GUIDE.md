@@ -880,28 +880,36 @@ a mutable generator are also applicable here.
 
 #### Creation random values with Dist[A]
 
-The `Dist[A]` type class represents a strategy for generating a distribution
-of `A` values given a `Generator` instance. `Dist[A]` makes no guarantee as to
-how the `A` values are distributed (for instance, it may always return the
-same value). Users who are interested in particular distributions should use
-the `Uniform[A]` and `Gaussian[A]` traits to generate `Dist[A]` instances that
-correspond to their needs.
+The `Dist[A]` type class represents a strategy for generating a
+distribution of `A` values given a `Generator` instance. `Dist[A]`
+makes no guarantee as to how the `A` values are distributed (for
+instance, it may always return the same value). Users who are
+interested in particular distributions should use the `Uniform[A]`,
+`Gaussian[A]`, and `Exponential[A]` traits to generate `Dist[A]`
+instances that correspond to their needs.
 
-The `Dist[A]` objects themselves are immutable and are powered by generators
-(both mutable and immutable). They can be transformed via `map`, `flatMap`,
-and other combinators. Given the appropriate structure on `A`, `Dist[A]`
-instances can also be operated on as if they were value.
+The `Dist[A]` objects themselves are immutable and are powered by
+generators (both mutable and immutable). They can be transformed via
+`map`, `flatMap`, and other combinators. Given the appropriate
+structure on `A`, `Dist[A]` instances can also be operated on as if
+they were value.
 
 #### Distributions
 
-Currently, `spire.random` provides `Uniform[A]` and `Gaussian[A]` type classes
-which given appropriate parameters can produce `Dist[A]` instances. Since most
-types have a (approximately) infinite number of possible values, bounds and
-other constraints need to be put on these types before we can usefully talk
-about (or implement) probability distributions in Spire.
+Currently, `spire.random` provides `Uniform[A]`, `Gaussian[A]`, and
+`Exponential[A]` type classes which given appropriate parameters can
+produce `Dist[A]` instances. Since most types have a (approximately)
+infinite number of possible values, bounds and other constraints need
+to be put on these types before we can usefully talk about (or
+implement) probability distributions in Spire.
 
-Given `min` and `max`, a `Uniform[A]` instance can produce a
-uniformly-distributed `Dist[A]` instance.
+ * Given `min` and `max`, a `Uniform[A]` instance can produce a
+   uniformly-distributed `Dist[A]` instance.
 
-Given a `mean` and `stdDev`, a `Gaussian[A]` instance can produce a `Dist[A]`
-whose values are distributed according to the desired gaussian distribution.
+ * Given `mean` and `stdDev`, a `Gaussian[A]` instance can produce a
+   `Dist[A]` whose values are distributed according to the desired
+   gaussian distribution.
+
+ * Given `rate`, a `Gaussian[A]` instance can produce a `Dist[A]`
+   whose values are distributed according to the desired exponential
+   distribution.
