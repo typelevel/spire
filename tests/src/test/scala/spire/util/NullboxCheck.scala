@@ -66,6 +66,7 @@ class NullboxCheck extends FunSuite {
     }
   }
 
+  /* Disabled because CI is done also for Scala 2.10
   test("Name-based extractor") {
     Nullbox(2) match {
       case Nullbox(x) => // success
@@ -76,6 +77,7 @@ class NullboxCheck extends FunSuite {
       case _ => // success
     }
   }
+   */
 
   test("Nullbox.filter") {
     def isEven(i: Int): Boolean = (i % 2 == 0)
