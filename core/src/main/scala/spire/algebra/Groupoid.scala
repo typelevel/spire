@@ -2,6 +2,7 @@ package spire.algebra
 
 import scala.{ specialized => spec }
 
+import spire.util.Nullbox
 
 /** A groupoid is a partial monoid, where every element has an inverse.
   *
@@ -10,11 +11,14 @@ import scala.{ specialized => spec }
   */
 trait Groupoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with PartialMonoid[A] {
   def inverse(a: A): A
-  def partialOpInverse(x: A, y: A): Option[A] = partialOp(x, inverse(y))
-  def forceOpInverse(x: A, y: A): A = forceOp(x, inverse(y))
-  def isOpInverseDefined(x: A, y: A): Boolean = isOpDefined(x, inverse(y))
-  def leftId(a: A): A = forceOp(a, inverse(a))
-  def rightId(a: A): A = forceOp(inverse(a), a)
+  def opInverse(x: A, y: A): A = op(x, inverse(y))
+  def opInverseIsDefined(x: A, y: A): Boolean = opIsDefined(x, inverse(y))
+  def leftId(a: A): A = op(a, inverse(a))
+  def rightId(a: A): A = op(inverse(a), a)
+}
+
+trait NullboxGroupoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Groupoid[A] with NullboxPartialMonoid[A] {
+  def partialOpInverse(x: A, y: A): Nullbox[A] = partialOp(x, inverse(y))
 }
 
 object Groupoid {

@@ -7,8 +7,8 @@ object optionSemigroup {
     implicit def partial: Semigroupoid[A]
     def op(xOpt: Option[A], yOpt: Option[A]) = xOpt match {
       case Some(x) => yOpt match {
-        case Some(y) => partial.partialOp(x, y)
-        case None => None
+        case Some(y) if partial.opIsDefined(x, y) => Some(partial.op(x, y))
+        case _ => None
       }
       case None => None
     }

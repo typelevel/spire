@@ -4,6 +4,7 @@ import spire.algebra._
 import spire.algebra.lattice._
 import spire.macros.Ops
 import spire.math.{BitString, ConvertableTo, ConvertableFrom, Rational, Number}
+import spire.util.Nullbox
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
   def ===(rhs:A): Boolean = macro Ops.binop[A, Boolean]
@@ -103,9 +104,12 @@ final class SignedOps[A:Signed](lhs: A) {
 }
 
 final class SemigroupoidOps[A](lhs: A)(implicit ev: Semigroupoid[A]) {
-  def |+|? (rhs: A): Option[A] = macro Ops.binop[A, Option[A]]
-  def |+|! (rhs: A): A = macro Ops.binop[A, A]
-  def ?+? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
+  def |+|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
+  def |+|(rhs:A): A = macro Ops.binop[A, A]
+}
+
+final class NullboxSemigroupoidOps[A](lhs: A)(implicit ev: NullboxSemigroupoid[A]) {
+  def |+|? (rhs: A): Nullbox[A] = macro Ops.binop[A, Option[A]]
 }
 
 final class PartialMonoidOps[A](lhs: A)(implicit ev: PartialMonoid[A]) {
@@ -116,13 +120,12 @@ final class PartialMonoidOps[A](lhs: A)(implicit ev: PartialMonoid[A]) {
 
 final class GroupoidOps[A](lhs: A)(implicit ev: Groupoid[A]) {
   def inverse(): A = macro Ops.unop[A]
-  def |-|? (rhs: A): Option[A] = macro Ops.binop[A, Option[A]]
-  def |-|! (rhs: A): A = macro Ops.binop[A, A]
-  def ?-? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
+  def |-|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
+  def |-|(rhs:A): A = macro Ops.binop[A, A]
 }
 
-final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
-  def |+|(rhs:A): A = macro Ops.binop[A, A]
+final class NullboxGroupoidOps[A](lhs: A)(implicit ev: NullboxGroupoid[A]) {
+  def |-|? (rhs: A): Nullbox[A] = macro Ops.binop[A, Option[A]]
 }
 
 final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
@@ -442,26 +445,24 @@ final class BitStringOps[A](lhs: A)(implicit ev: BitString[A]) {
 }
 
 final class LeftPartialActionOps[G](lhs: G) {
-  def ?|+|> [P](rhs: P)(implicit ev: LeftPartialAction[P, G]): Option[P] =
-    macro Ops.binopWithEv[P, LeftPartialAction[P, G], Option[P]]
-  def ?+|> [P](rhs: P)(implicit ev: LeftPartialAction[P, G]): Boolean =
+  def ?|+|> [P](rhs: P)(implicit ev: NullboxLeftPartialAction[P, G]): Nullbox[P] =
+    macro Ops.binopWithEv[P, NullboxLeftPartialAction[P, G], Nullbox[P]]
+  def ??|+|> [P](rhs: P)(implicit ev: LeftPartialAction[P, G]): Boolean =
     macro Ops.binopWithEv[P, LeftPartialAction[P, G], Boolean]
-  def !|+|> [P](rhs: P)(implicit ev: LeftPartialAction[P, G]): P =
+  def |+|> [P](rhs: P)(implicit ev: LeftPartialAction[P, G]): P =
     macro Ops.binopWithEv[P, LeftPartialAction[P, G], P]
 }
 
 final class RightPartialActionOps[P](lhs: P) {
-  def <|+|? [G](rhs: G)(implicit ev: RightPartialAction[P, G]): Option[P] =
-    macro Ops.binopWithEv[G, RightPartialAction[P, G], Option[P]]
-  def <|+? [G](rhs: G)(implicit ev: RightPartialAction[P, G]): Boolean =
+  def <|+|? [G](rhs: G)(implicit ev: NullboxRightPartialAction[P, G]): Nullbox[P] =
+    macro Ops.binopWithEv[G, NullboxRightPartialAction[P, G], Nullbox[P]]
+  def <|+|?? [G](rhs: G)(implicit ev: RightPartialAction[P, G]): Boolean =
     macro Ops.binopWithEv[G, RightPartialAction[P, G], Boolean]
-  def <|+|! [G](rhs: G)(implicit ev: RightPartialAction[P, G]): P =
+  def <|+| [G](rhs: G)(implicit ev: RightPartialAction[P, G]): P =
     macro Ops.binopWithEv[G, RightPartialAction[P, G], P]
 }
 
 final class LeftActionOps[G](lhs: G) {
-  def |+|> [P](rhs: P)(implicit ev: LeftAction[P, G]): P =
-    macro Ops.binopWithEv[P, LeftAction[P, G], P]
   def +> [P](rhs: P)(implicit ev: AdditiveAction[P, G]): P =
     macro Ops.binopWithEv[P, AdditiveAction[P, G], P]
   def *> [P](rhs: P)(implicit ev: MultiplicativeAction[P, G]): P =
@@ -469,8 +470,6 @@ final class LeftActionOps[G](lhs: G) {
 }
 
 final class RightActionOps[P](lhs: P) {
-  def <|+| [G](rhs: G)(implicit ev: RightAction[P, G]): P =
-    macro Ops.binopWithEv[G, RightAction[P, G], P]
   def <+ [G](rhs: G)(implicit ev: AdditiveAction[P, G]): P =
     macro Ops.binopWithEv[G, AdditiveAction[P, G], P]
   def <* [G](rhs: G)(implicit ev: MultiplicativeAction[P, G]): P =

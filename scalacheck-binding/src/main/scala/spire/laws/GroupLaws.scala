@@ -26,8 +26,8 @@ trait GroupLaws[A] extends Laws {
   def semigroupoid(implicit A: Semigroupoid[A]) = new GroupProperties(
     name = "semigroupoid",
     parent = None,
-    "associative: a ?+? b && b ?+? c imply (a |+|! b) ?+? c" → forAll((a: A, b: A, c: A) =>
-      !((a ?+? b) && (b ?+? c)) || ((a |+|! b) ?+? c)
+    "associative: a |+|?? b && b |+|?? c imply (a |+| b) |+|?? c" → forAll((a: A, b: A, c: A) =>
+      !((a |+|?? b) && (b |+|?? c)) || ((a |+| b) |+|?? c)
     ),
 
     "associative: (a |+|? b) |+|? c === a |+|? (b |+|? c)" → forAll((a: A, b: A, c: A) => {
@@ -43,11 +43,11 @@ trait GroupLaws[A] extends Laws {
     parent = Some(semigroupoid),
 
     "left identity" → forAll((a: A) =>
-      (a.leftId ?+? a) && ((a.leftId() |+|! a) === a)
+      (a.leftId |+|?? a) && ((a.leftId() |+| a) === a)
     ),
 
     "right identity" → forAll((a: A) =>
-      (a ?+? a.rightId) && ((a |+|! a.rightId) === a)
+      (a |+|?? a.rightId) && ((a |+| a.rightId) === a)
     )
   )
 
@@ -56,13 +56,13 @@ trait GroupLaws[A] extends Laws {
     parent = Some(partialMonoid),
 
     "product with inverse is always defined" → forAll((a: A) =>
-      (a ?+? a.inverse) && (a.inverse ?+? a)
+      (a |+|?? a.inverse) && (a.inverse |+|?? a)
     ),
 
     "product with inverse is a left and right identity" → forAll((a: A, b: A) =>
-      !(a ?+? b) || (
-        (a |+|! b |+|! b.inverse) === a &&
-          (a.inverse |+|! a |+|! b) === b
+      !(a |+|?? b) || (
+        (a |+| b |+| b.inverse) === a &&
+          (a.inverse |+| a |+| b) === b
       )
     )
   )

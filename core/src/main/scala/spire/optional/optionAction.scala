@@ -6,8 +6,8 @@ trait OptionLeftAction[P, G] extends Any with LeftAction[Option[P], Option[G]] {
   implicit def partial: LeftPartialAction[P, G]
   def actl(gOpt: Option[G], pOpt: Option[P]) = gOpt match {
     case Some(g) => pOpt match {
-      case Some(p) => partial.partialActl(g, p)
-      case None => None
+      case Some(p) if partial.actlIsDefined(g, p) => Some(partial.actl(g, p))
+      case _ => None
     }
     case None => None
   }
@@ -17,8 +17,8 @@ trait OptionRightAction[P, G] extends Any with RightAction[Option[P], Option[G]]
   implicit def partial: RightPartialAction[P, G]
   def actr(pOpt: Option[P], gOpt: Option[G]) = pOpt match {
     case Some(p) => gOpt match {
-      case Some(g) => partial.partialActr(p, g)
-      case None => None
+      case Some(g) if partial.actrIsDefined(p, g) => Some(partial.actr(p, g))
+      case _ => None
     }
     case None => None
   }

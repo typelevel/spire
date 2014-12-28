@@ -31,8 +31,8 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq.empty,
 
     "left compatibility" → forAll { (g: G, h: G, a: A) =>
-      ( (h ?+|> a) && (g ?+? h) ) ==>
-      ((g |+|! h) ?+|> a) && ((g |+|! h) !|+|> a) === (g !|+|> (h !|+|> a))
+      ( (h ??|+|> a) && (g |+|?? h) ) ==>
+      ((g |+| h) ??|+|> a) && ((g |+| h) |+|> a) === (g |+|> (h |+|> a))
     }
   )
 
@@ -42,8 +42,8 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq.empty,
 
     "right compatibility" → forAll { (g: G, h: G, a: A) =>
-      ( (a <|+? g) && (g ?+? h) ) ==>
-      (a <|+? (g |+|! h)) && ((a <|+|! (g |+|! h)) === ((a <|+|! g) <|+|! h))
+      ( (a <|+|?? g) && (g |+|?? h) ) ==>
+      (a <|+|?? (g |+| h)) && ((a <|+| (g |+| h)) === ((a <|+| g) <|+| h))
     }
   )
 
@@ -59,8 +59,8 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq(leftSemigroupoidPartialAction),
 
     "left action identity" → forAll { (g: G, a: A) =>
-      (g ?+|> a) ==>
-      ((g.rightId ?+|> a) && ((g.rightId !|+|> a) === a))
+      (g ??|+|> a) ==>
+      ((g.rightId ??|+|> a) && ((g.rightId |+|> a) === a))
     }
   )
 
@@ -70,8 +70,8 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq(rightSemigroupoidPartialAction),
 
     "right action identity" → forAll { (g: G, a: A) =>
-      (a <|+? g) ==>
-      ((a <|+? g.leftId) && ((a <|+|! g.leftId) === a))
+      (a <|+|?? g) ==>
+      ((a <|+|?? g.leftId) && ((a <|+| g.leftId) === a))
     }
   )
 
@@ -87,8 +87,8 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq(partialMonoidPartialAction),
 
     "left and right partial action compatibility" → forAll { (a: A, g: G) =>
-      (a <|+? g) ==>
-      ((g.inverse ?+|> a) && ((a <|+|! g) === (g.inverse !|+|> a)))
+      (a <|+|?? g) ==>
+      ((g.inverse ??|+|> a) && ((a <|+| g) === (g.inverse |+|> a)))
     }
   )
 
@@ -99,8 +99,8 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq.empty,
 
     "left compatibility" → forAll { (g: G, h: G, a: A) =>
-      ( (h ?+|> a) && ((g |+| h) ?+|> a) ) ==>
-      (((g |+| h) !|+|> a) === (g !|+|> (h !|+|> a)))
+      ( (h ??|+|> a) && ((g |+| h) ??|+|> a) ) ==>
+      (((g |+| h) |+|> a) === (g |+|> (h |+|> a)))
     }
   )
 
@@ -110,8 +110,8 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq.empty,
 
     "right compatibility" → forAll { (a: A, g: G, h: G) =>
-      ( (a <|+? g) && (a <|+? (g |+| h)) ) ==>
-      ((a <|+|! (g |+| h)) === ((a <|+|! g) <|+|! h))
+      ( (a <|+|?? g) && (a <|+|?? (g |+| h)) ) ==>
+      ((a <|+| (g |+| h)) === ((a <|+| g) <|+| h))
     }
   )
 
@@ -127,7 +127,7 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq(leftSemigroupPartialAction),
 
     "left identity" → forAll { (a: A) =>
-      (G0.id ?+|> a) && ((G0.id !|+|> a) === a)
+      (G0.id ??|+|> a) && ((G0.id |+|> a) === a)
     }
   )
 
@@ -137,7 +137,7 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq(rightSemigroupPartialAction),
 
     "right identity" → forAll { (a: A) =>
-      (a <|+? G0.id) && ((a <|+|! G0.id) === a)
+      (a <|+|?? G0.id) && ((a <|+| G0.id) === a)
     }
   )
 
@@ -154,11 +154,11 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq(monoidPartialAction),
 
     "right -> left action compatibility" → forAll { (a: A, g: G) =>
-      !(a <|+? g) || ((g ?+|> a) && ((a <|+|! g) === (g.inverse !|+|> a)))
+      !(a <|+|?? g) || ((g ??|+|> a) && ((a <|+| g) === (g.inverse |+|> a)))
     },
 
     "left -> right action compatibility" → forAll { (a: A, g: G) =>
-      !(g ?+|> a) || ((a <|+? g) && ((g !|+|> a) === (a <|+|! g.inverse)))
+      !(g ??|+|> a) || ((a <|+|?? g) && ((g |+|> a) === (a <|+| g.inverse)))
     }
   )
 

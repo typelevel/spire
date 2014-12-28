@@ -9,10 +9,7 @@ import scala.annotation.{ switch, tailrec }
 trait Semigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Semigroupoid[A] {
   def op(x: A, y: A): A
 
-  // trivial implementation of the underlying semigroupoid partial algebra 
-  override def isOpDefined(x: A, y: A): Boolean = true
-  def partialOp(x: A, y: A): Option[A] = Some(op(x, y))
-  override def forceOp(x: A, y: A): A = op(x, y)
+  def opIsDefined(x: A, y: A): Boolean = true
 
   /**
    * Return `a` combined with itself `n` times.

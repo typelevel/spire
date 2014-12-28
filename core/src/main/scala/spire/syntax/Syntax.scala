@@ -31,6 +31,7 @@ trait SignedSyntax {
 
 trait SemigroupoidSyntax {
   implicit def semigroupoidOps[A:Semigroupoid](a:A) = new SemigroupoidOps[A](a)
+  implicit def nullboxSemigroupoidOps[A:NullboxSemigroupoid](a:A) = new NullboxSemigroupoidOps[A](a)
 }
 
 trait PartialMonoidSyntax extends SemigroupoidSyntax {
@@ -39,11 +40,10 @@ trait PartialMonoidSyntax extends SemigroupoidSyntax {
 
 trait GroupoidSyntax extends PartialMonoidSyntax {
   implicit def groupoidOps[A](a:A)(implicit ev: Groupoid[A]) = new GroupoidOps[A](a)
+  implicit def nullboxGroupoidOps[A](a:A)(implicit ev: NullboxGroupoid[A]) = new NullboxGroupoidOps[A](a)
 }
 
-trait SemigroupSyntax extends SemigroupoidSyntax {
-  implicit def semigroupOps[A:Semigroup](a:A) = new SemigroupOps(a)
-}
+trait SemigroupSyntax extends SemigroupoidSyntax
 
 trait MonoidSyntax extends SemigroupSyntax with PartialMonoidSyntax
 

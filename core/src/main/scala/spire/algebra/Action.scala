@@ -2,6 +2,8 @@ package spire.algebra
 
 import scala.{ specialized => spec }
 
+import spire.util.Nullbox
+
 /**
   * A left partial action of a semigroupoid `G` on `P` is simply the implementation of
   * a method `partialActl(g, p)`, or `g ?|+|> p` returning `Option[P]`, such that:
@@ -14,14 +16,19 @@ import scala.{ specialized => spec }
   * 
   * 2. for all `g` in `G` and `p` in `P` such that `g ?|+|> p` is defined:
   * 
-  * `g.rightId !|+|> p === p`, the operation `!|+|>` being defined.
+  * `g.rightId |+|> p === p`, the operation `|+|>` being defined.
   */
 trait LeftPartialAction[@spec(Int) P, G] extends Any {
-  def partialActl(g: G, p: P): Option[P]
-  def isActlDefined(g: G, p: P): Boolean = partialActl(g, p).nonEmpty
-  def forceActl(g: G, p: P): P = partialActl(g, p) match {
-    case Some(result) => result
-    case None => throw new IllegalArgumentException(s"Action $g |+|> is not compatible with $p")
+  def actlIsDefined(g: G, p: P): Boolean
+  def actl(g: G, p: P): P
+}
+
+trait NullboxLeftPartialAction[@spec(Int) P, G] extends Any with LeftPartialAction[P, G] {
+  def partialActl(g: G, p: P): Nullbox[P]
+  def actlIsDefined(g: G, p: P): Boolean = partialActl(g, p).nonEmpty
+  def actl(g: G, p: P): P = {
+    val res = partialActl(g, p)
+    if (res.isEmpty) throw new IllegalArgumentException(s"Action $g |+|> is not compatible with $p") else res.get
   }
 }
 
@@ -40,11 +47,16 @@ trait LeftPartialAction[@spec(Int) P, G] extends Any {
   * `p <|+|! g.leftId === p`, the operation `<|+|!` being defined.
   */
 trait RightPartialAction[@spec(Int) P, G] extends Any {
-  def partialActr(p: P, g: G): Option[P]
-  def isActrDefined(p: P, g: G): Boolean = partialActr(p, g).nonEmpty
-  def forceActr(p: P, g: G): P = partialActr(p, g) match {
-    case Some(result) => result
-    case None => throw new IllegalArgumentException(s"$p is not compatible with action <|+| $g")
+  def actrIsDefined(p: P, g: G): Boolean
+  def actr(p: P, g: G): P
+}
+
+trait NullboxRightPartialAction[@spec(Int) P, G] extends Any with RightPartialAction[P, G] {
+  def partialActr(p: P, g: G): Nullbox[P]
+  def actrIsDefined(p: P, g: G): Boolean = partialActr(p, g).nonEmpty
+  def actr(p: P, g: G): P = {
+    val res = partialActr(p, g)
+    if (res.isEmpty) throw new IllegalArgumentException(s"$p is not compatible with action <|+| $g") else res.get
   }
 }
 
@@ -57,6 +69,8 @@ trait RightPartialAction[@spec(Int) P, G] extends Any {
   * 2. if `g !|+|> p` is defined, then `p <|+|! g.inverse === g !|+|> p` is defined.
   */
 trait PartialAction[@spec(Int) P, G] extends Any with LeftPartialAction[P, G] with RightPartialAction[P, G]
+
+trait NullboxPartialAction[@spec(Int) P, G] extends Any with PartialAction[P, G] with NullboxLeftPartialAction[P, G] with NullboxRightPartialAction[P, G]
 
 /**
   * A left semigroup action of `G` on `P` is simply the implementation of
@@ -71,10 +85,7 @@ trait PartialAction[@spec(Int) P, G] extends Any with LeftPartialAction[P, G] wi
 trait LeftAction[@spec(Int) P, G] extends Any with LeftPartialAction[P, G] {
   def actl(g: G, p: P): P
 
-  // trivial implementation of the partial left action
-  def partialActl(g: G, p: P): Option[P] = Some(actl(g, p))
-  override def isActlDefined(g: G, p: P): Boolean = true
-  override def forceActl(g: G, p: P): P = actl(g, p)
+  def actlIsDefined(g: G, p: P): Boolean = true
 }
 
 /**
@@ -88,10 +99,7 @@ trait LeftAction[@spec(Int) P, G] extends Any with LeftPartialAction[P, G] {
 trait RightAction[@spec(Int) P, G] extends Any with RightPartialAction[P, G] {
   def actr(p: P, g: G): P
 
-  // trivial implementation of the partial right action
-  def partialActr(p: P, g: G): Option[P] = Some(actr(p, g))
-  override def isActrDefined(p: P, g: G): Boolean = true
-  override def forceActr(p: P, g: G): P = actr(p, g)
+  def actrIsDefined(p: P, g: G): Boolean = true
 }
 
 /**
@@ -106,11 +114,6 @@ object Action {
   @inline def apply[P, G](G: Action[P, G]) = G
   @inline def additive[P, G](G: AdditiveAction[P, G]) = G.additive
   @inline def multiplicative[P, G](G: MultiplicativeAction[P, G]) = G.multiplicative
-
-  @inline def forced[P, G](G: PartialAction[P, G]): Action[P, G] = new Action[P, G] {
-    def actl(g: G, p: P): P = G.forceActl(g, p)
-    def actr(p: P, g: G): P = G.forceActr(p, g)
-  }
 }
 
 trait AdditiveAction[@spec(Int) P, G] extends Any { self =>

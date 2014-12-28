@@ -15,12 +15,10 @@ trait Group[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Mon
   /**
    * Combine `x` with the inverse of `y`.
    */
-  def opInverse(x: A, y: A): A = op(x, inverse(y))
+  override def opInverse(x: A, y: A): A = op(x, inverse(y))
 
   // trivial implementations of the groupoid partial algebra
-  override def partialOpInverse(x: A, y: A): Option[A] = Some(opInverse(x, y))
-  override def isOpInverseDefined(x: A, y: A): Boolean = true
-  override def forceOpInverse(x: A, y: A): A = opInverse(x, y)
+  override def opInverseIsDefined(x: A, y: A): Boolean = true
   override def leftId(a: A): A = id
   override def rightId(a: A): A = id
 
@@ -33,7 +31,6 @@ trait Group[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Mon
     else if (n == 0) id
     else if (n == 1) a
     else combinenAboveOne(a, n)
-
 }
 
 object Group {

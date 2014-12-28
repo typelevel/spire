@@ -17,6 +17,8 @@ trait PartialMonoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] ext
   def rightId(a: A): A
 }
 
+trait NullboxPartialMonoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with PartialMonoid[A] with NullboxSemigroupoid[A]
+
 object PartialMonoid {
   @inline final def apply[A](implicit m: PartialMonoid[A]): PartialMonoid[A] = m
 }
