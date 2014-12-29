@@ -32,3 +32,20 @@ trait NullboxSemigroupoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) 
 object Semigroupoid {
   @inline final def apply[A](implicit s: Semigroupoid[A]) = s
 }
+
+object NullboxSemigroupoid {
+  implicit def enrichSemigroupoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A](implicit sgd: Semigroupoid[A]): NullboxSemigroupoid[A] = sgd match {
+    case nbsgd: NullboxSemigroupoid[A] => nbsgd
+    case sg: Semigroup[A] => new NullboxSemigroupoid[A] {
+      override def op(f: A, g: A): A = sg.op(f, g)
+      override def opIsDefined(f: A, g: A) = true
+      def partialOp(f: A, g: A): Nullbox[A] = Nullbox[A](sg.op(f, g))
+    }
+    case _ => new NullboxSemigroupoid[A] {
+      override def opIsDefined(f: A, g: A) = sgd.opIsDefined(f, g)
+      override def op(f: A, g: A): A = sgd.op(f, g)
+      def partialOp(f: A, g: A): Nullbox[A] =
+        if (sgd.opIsDefined(f, g)) Nullbox[A](sgd.op(f, g)) else Nullbox.empty[A]
+    }
+  }
+}

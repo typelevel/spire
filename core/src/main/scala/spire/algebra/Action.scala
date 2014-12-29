@@ -32,6 +32,23 @@ trait NullboxLeftPartialAction[@spec(Int) P, G] extends Any with LeftPartialActi
   }
 }
 
+object NullboxLeftPartialAction {
+  implicit def enrichLeftPartialAction[@spec(Int) P, G](implicit lpa: LeftPartialAction[P, G]): NullboxLeftPartialAction[P, G] = lpa match {
+    case nblpa: NullboxLeftPartialAction[P, G] => nblpa
+    case la: LeftAction[P, G] => new NullboxLeftPartialAction[P, G] {
+      def partialActl(g: G, p: P): Nullbox[P] = Nullbox[P](la.actl(g, p))
+      override def actlIsDefined(g: G, p: P) = true
+      override def actl(g: G, p: P) = la.actl(g, p)
+    }
+    case _ => new NullboxLeftPartialAction[P, G] {
+      def partialActl(g: G, p: P): Nullbox[P] =
+        if (lpa.actlIsDefined(g, p)) Nullbox[P](lpa.actl(g, p)) else Nullbox.empty[P]
+      override def actl(g: G, p: P) = lpa.actl(g, p)
+      override def actlIsDefined(g: G, p: P) = lpa.actlIsDefined(g, p)
+    }
+  }
+}
+
 /**
   * A right partial action of a semigroupoid `G` on `P` is simply the implementation of
   * a method `partialActr(p, g)`, or `p <|+|? g` returning `Option[P]`, such that:
@@ -60,6 +77,23 @@ trait NullboxRightPartialAction[@spec(Int) P, G] extends Any with RightPartialAc
   }
 }
 
+object NullboxRightPartialAction {
+  implicit def enrichRightPartialAction[@spec(Int) P, G](implicit rpa: RightPartialAction[P, G]): NullboxRightPartialAction[P, G] = rpa match {
+    case nbrpa: NullboxRightPartialAction[P, G] => nbrpa
+    case ra: RightAction[P, G] => new NullboxRightPartialAction[P, G] {
+      def partialActr(p: P, g: G): Nullbox[P] = Nullbox[P](ra.actr(p, g))
+      override def actrIsDefined(p: P, g: G) = true
+      override def actr(p: P, g: G) = ra.actr(p, g)
+    }
+    case _ => new NullboxRightPartialAction[P, G] {
+      def partialActr(p: P, g: G): Nullbox[P] =
+        if (rpa.actrIsDefined(p, g)) Nullbox[P](rpa.actr(p, g)) else Nullbox.empty[P]
+      override def actr(p: P, g: G) = rpa.actr(p, g)
+      override def actrIsDefined(p: P, g: G) = rpa.actrIsDefined(p, g)
+    }
+  }
+}
+
 /**
   * A partial action which is both a left and right partial action.
   * 
@@ -71,6 +105,30 @@ trait NullboxRightPartialAction[@spec(Int) P, G] extends Any with RightPartialAc
 trait PartialAction[@spec(Int) P, G] extends Any with LeftPartialAction[P, G] with RightPartialAction[P, G]
 
 trait NullboxPartialAction[@spec(Int) P, G] extends Any with PartialAction[P, G] with NullboxLeftPartialAction[P, G] with NullboxRightPartialAction[P, G]
+
+object NullboxPartialAction {
+  implicit def enrichPartialAction[@spec(Int) P, G](implicit pa: PartialAction[P, G]): NullboxPartialAction[P, G] = pa match {
+    case nbpa: NullboxPartialAction[P, G] => nbpa
+    case a: Action[P, G] => new NullboxPartialAction[P, G] {
+      def partialActl(g: G, p: P): Nullbox[P] = Nullbox[P](a.actl(g, p))
+      override def actlIsDefined(g: G, p: P) = true
+      override def actl(g: G, p: P) = a.actl(g, p)
+      def partialActr(p: P, g: G): Nullbox[P] = Nullbox[P](a.actr(p, g))
+      override def actrIsDefined(p: P, g: G) = true
+      override def actr(p: P, g: G) = a.actr(p, g)
+    }
+    case _ => new NullboxPartialAction[P, G] {
+      def partialActl(g: G, p: P): Nullbox[P] =
+        if (pa.actlIsDefined(g, p)) Nullbox[P](pa.actl(g, p)) else Nullbox.empty[P]
+      override def actl(g: G, p: P) = pa.actl(g, p)
+      override def actlIsDefined(g: G, p: P) = pa.actlIsDefined(g, p)
+      def partialActr(p: P, g: G): Nullbox[P] =
+        if (pa.actrIsDefined(p, g)) Nullbox[P](pa.actr(p, g)) else Nullbox.empty[P]
+      override def actr(p: P, g: G) = pa.actr(p, g)
+      override def actrIsDefined(p: P, g: G) = pa.actrIsDefined(p, g)
+    }
+  }
+}
 
 /**
   * A left semigroup action of `G` on `P` is simply the implementation of
