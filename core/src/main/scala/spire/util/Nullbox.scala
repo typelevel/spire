@@ -36,4 +36,22 @@ class Nullbox[A](val ref: A) extends AnyVal {
   def getOrElseFast[B >: A](default: B): B = if (ref == null) default else ref
 
   def toOption: Option[A] = if (ref == null) None else Some(ref)
+
+  def toList: List[A] = if (ref == null) Nil else (ref :: Nil)
+
+  def contains[A1 >: A](elem: A1): Boolean = if (ref == null) false else ref == elem
+
+  def exists(p: A => Boolean): Boolean = if (ref == null) false else p(ref)
+
+  def forall(p: A => Boolean): Boolean = if (ref == null) true else p(ref)
+
+  def foreach[U](f: A => U): Unit = if (ref != null) f(ref)
+
+  def iterator: Iterator[A] = if (ref == null) collection.Iterator.empty else collection.Iterator.single(ref)
+
+  def toRight[X](left: => X) =
+    if (ref == null) Left(left) else Right(ref)
+
+  def toLeft[X](right: => X) =
+    if (ref == null) Right(right) else Left(ref)
 }
