@@ -343,7 +343,8 @@ trait FixedPointInstances {
       def fromBigInt(n: BigInt): FixedPoint = FixedPoint(BigDecimal(n))
       def fromBigDecimal(n: BigDecimal): FixedPoint = FixedPoint(n)
       def fromRational(n: Rational): FixedPoint = FixedPoint(n)
-      def fromAlgebraic(n: Algebraic): FixedPoint = FixedPoint(n.toRational)
+      def fromAlgebraic(n: Algebraic): FixedPoint =
+        FixedPoint(n.rational.getOrElse(n.toRational(64)))
       def fromReal(n: Real): FixedPoint = FixedPoint(n.toRational)
 
       def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): FixedPoint =

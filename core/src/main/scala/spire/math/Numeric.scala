@@ -26,7 +26,7 @@ object Numeric {
   implicit final val DoubleIsNumeric: Numeric[Double] = new DoubleIsNumeric
   implicit final val BigIntIsNumeric: Numeric[BigInt] = new BigIntIsNumeric
   implicit final val BigDecimalIsNumeric: Numeric[BigDecimal] = new BigDecimalIsNumeric
-  implicit final val AlgebraicIsNumeric: Numeric[Algebraic] = new AlgebraicIsNumeric
+  //implicit final val AlgebraicIsNumeric: Numeric[Algebraic] = new AlgebraicIsNumeric
   implicit final val RealIsNumeric: Numeric[Real] = new RealIsNumeric
 
   private val defaultApprox = ApproximationContext(Rational(1, 1000000000))
@@ -122,13 +122,13 @@ with RationalIsReal with Serializable {
   override def fromDouble(n: Double): Rational = Rational(n)
 }
 
-@SerialVersionUID(0L)
-private[math] class AlgebraicIsNumeric extends Numeric[Algebraic] with AlgebraicIsField with AlgebraicIsNRoot
-with ConvertableFromAlgebraic with ConvertableToAlgebraic with AlgebraicIsReal with Serializable {
-  override def fromInt(n: Int): Algebraic = Algebraic(n)
-  override def fromDouble(n: Double): Algebraic = Algebraic(n)
-  override def toDouble(n: Algebraic): Double = n.toDouble
-}
+//@SerialVersionUID(0L)
+//private[math] class AlgebraicIsNumeric extends Numeric[Algebraic] with AlgebraicIsField with AlgebraicIsNRoot
+//with ConvertableFromAlgebraic with ConvertableToAlgebraic with AlgebraicIsReal with Serializable {
+//  override def fromInt(n: Int): Algebraic = Algebraic(n)
+//  override def fromDouble(n: Double): Algebraic = Algebraic(n)
+//  override def toDouble(n: Algebraic): Double = n.toDouble
+//}
 
 @SerialVersionUID(0L)
 private[math] class RealIsNumeric extends Numeric[Real] with RealIsFractional with Serializable {
