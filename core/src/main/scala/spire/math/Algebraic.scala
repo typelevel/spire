@@ -36,11 +36,6 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   import Algebraic.{ Zero, One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue, JBigDecimalOrder, roundExact }
 
   /**
-   * Absolute approximation to scale decimal places.
-   */
-  def toBigDecimal(scale: Int): BigDecimal = expr.toBigDecimal(scale)
-
-  /**
    * Returns an `Int` with the same sign as this algebraic number. Algebraic
    * numbers support exact sign tests, so this is guaranteed to be accurate.
    */
@@ -51,6 +46,9 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
    * sign tests, so this is guaranteed to be accurate.
    */
   def sign: Sign = Sign(signum)
+
+  def abs: Algebraic =
+    if (this.signum < 0) -this else this
 
   def unary_- : Algebraic =
     new Algebraic(Expr.Neg(expr))
@@ -66,6 +64,12 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
 
   def /(that: Algebraic): Algebraic =
     new Algebraic(Expr.Div(this.expr, that.expr))
+
+  def /~(that: Algebraic): Algebraic =
+    Algebraic((this / that).toBigInt)
+
+  def %(that: Algebraic): Algebraic =
+    this - (this /~ that) * that
 
   def sqrt: Algebraic = nroot(2)
 
@@ -140,10 +144,9 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
    * than `Int.MinValue`, then `Int.MinValue` is returned.
    */
   def intValue: Int = {
-    val n = toBigDecimal(1).bigDecimal.setScale(0, RoundingMode.DOWN)
-    val cmp = n.compareTo(MinIntValue)
-    if (cmp < 0) Int.MinValue
-    else if (cmp > 0) Int.MaxValue
+    val n = toBigInt
+    if (n < MinIntValue) Int.MinValue
+    else if (n > MaxIntValue) Int.MaxValue
     else n.intValue
   }
 
@@ -157,10 +160,9 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
    * than `Long.MinValue`, then `Long.MinValue` is returned.
    */
   def longValue: Long = {
-    val n = toBigDecimal(1).bigDecimal.setScale(0, RoundingMode.DOWN)
-    val cmp = n.compareTo(MinLongValue)
-    if (cmp < 0) Long.MinValue
-    else if (cmp > 0) Long.MaxValue
+    val n = toBigInt
+    if (n < MinLongValue) Long.MinValue
+    else if (n > MaxLongValue) Long.MaxValue
     else n.longValue
   }
 
@@ -174,10 +176,14 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
    * If this `Algebraic` represented 1.2, then this would return 1. If this
    * represented -3.3, then this would return -3.
    */
-  def toBigInt: BigInt = {
-    val n = toBigDecimal(1).bigDecimal.setScale(0, RoundingMode.DOWN)
-    BigInt(n.toBigInteger)
-  }
+  def toBigInt: BigInt =
+    toBigDecimal(0, RoundingMode.DOWN).toBigInt
+
+  /**
+   * Absolute approximation to scale decimal places.
+   */
+  def toBigDecimal(scale: Int, roundingMode: RoundingMode): BigDecimal =
+    BigDecimal(roundExact(this, expr.toBigDecimal(scale + 2), scale, roundingMode))
 
   def toBigDecimal(mc: MathContext): BigDecimal = {
     import Expr._
@@ -235,10 +241,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
       .round(mc) // We perform a final round, since roundExact uses scales.
   }
 
-  def isWhole: Boolean = {
-    val n = toBigDecimal(1).bigDecimal.setScale(0, RoundingMode.HALF_UP)
-    (this - Algebraic(n)).signum == 0
-  }
+  def isWhole: Boolean = this == Algebraic(toBigInt)
 
   /**
    * Returns `true` if this Algebraic number is a whole number (no fractional
@@ -246,10 +249,10 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
    * then `Algebraic(x.toInt) == x`.
    */
   override def isValidInt: Boolean = {
-    val n = toBigDecimal(1).bigDecimal.setScale(0, RoundingMode.HALF_UP)
-    (n.compareTo(MaxIntValue) <= 0) &&
-    (n.compareTo(MinIntValue) >= 0) &&
-    ((this - Algebraic(n)).signum == 0)
+    val n = toBigInt
+    (n <= MaxIntValue) &&
+    (n >= MinIntValue) &&
+    (this == Algebraic(n))
   }
 
   /**
@@ -258,10 +261,10 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
    * then `Algebraic(x.toLong) == x`.
    */
   def isValidLong: Boolean = {
-    val n = toBigDecimal(1).bigDecimal.setScale(0, RoundingMode.HALF_UP)
-    (n.compareTo(MaxLongValue) <= 0) &&
-    (n.compareTo(MinLongValue) >= 0) &&
-    ((this - Algebraic(n)).signum == 0)
+    val n = toBigInt
+    (n <= MaxLongValue) &&
+    (n >= MinLongValue) &&
+    (this == Algebraic(n))
   }
 
   /**
@@ -325,10 +328,10 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
 }
 
 object Algebraic extends AlgebraicInstances {
-  private val MaxIntValue: JBigDecimal = new JBigDecimal(Int.MaxValue)
-  private val MinIntValue: JBigDecimal = new JBigDecimal(Int.MinValue)
-  private val MaxLongValue: JBigDecimal = new JBigDecimal(Long.MaxValue)
-  private val MinLongValue: JBigDecimal = new JBigDecimal(Long.MinValue)
+  private val MaxIntValue: BigInteger = BigInteger.valueOf(Int.MaxValue.toLong)
+  private val MinIntValue: BigInteger = BigInteger.valueOf(Int.MinValue.toLong)
+  private val MaxLongValue: BigInteger = BigInteger.valueOf(Long.MaxValue)
+  private val MinLongValue: BigInteger = BigInteger.valueOf(Long.MinValue)
 
   val Zero: Algebraic = new Algebraic(Expr.ConstantLong(0))
   val One: Algebraic = new Algebraic(Expr.ConstantLong(1))
@@ -1023,61 +1026,42 @@ object Algebraic extends AlgebraicInstances {
 }
 
 trait AlgebraicInstances {
-//  implicit final val AlgebraicAlgebra = new AlgebraicAlgebra
+  implicit final val AlgebraicAlgebra = new AlgebraicAlgebra
   import NumberTag._
   implicit final val AlgebraicTag = new LargeTag[Algebraic](Exact, Algebraic(0))
 }
 
-//private[math] trait AlgebraicIsRing extends Ring[Algebraic] {
-//  override def minus(a: Algebraic, b: Algebraic): Algebraic = a - b
-//  def negate(a: Algebraic): Algebraic = -a
-//  def one: Algebraic = Algebraic(1)
-//  def plus(a: Algebraic, b: Algebraic): Algebraic = a + b
-//  override def pow(a: Algebraic, b: Int): Algebraic = a pow b
-//  override def times(a: Algebraic, b: Algebraic): Algebraic = a * b
-//  def zero: Algebraic = Algebraic(0)
-//  
-//  override def fromInt(n: Int): Algebraic = Algebraic(n)
-//}
-//
-//private[math] trait AlgebraicIsEuclideanRing extends EuclideanRing[Algebraic] with AlgebraicIsRing {
-//  def quot(a: Algebraic, b: Algebraic): Algebraic = a /~ b
-//  def mod(a: Algebraic, b: Algebraic): Algebraic = a % b
-//  def gcd(a: Algebraic, b: Algebraic): Algebraic = euclid(a, b)(Eq[Algebraic])
-//}
-//
-//private[math] trait AlgebraicIsField extends Field[Algebraic] with AlgebraicIsEuclideanRing {
-//  override def fromDouble(n: Double): Algebraic = Algebraic(n)
-//  def div(a:Algebraic, b:Algebraic) = a / b
-//}
-//
-//private[math] trait AlgebraicIsNRoot extends NRoot[Algebraic] {
-//  def nroot(a: Algebraic, k: Int): Algebraic = a nroot k
-//  def fpow(a:Algebraic, b:Algebraic) = sys.error("fixme")
-//}
-//
-//private[math] trait AlgebraicOrder extends Order[Algebraic] {
-//  override def eqv(x: Algebraic, y: Algebraic) = (x - y).isZero
-//  override def neqv(x: Algebraic, y: Algebraic) = (x - y).isNonZero
-//  def compare(x: Algebraic, y: Algebraic) = (x - y).signum
-//}
-//
-//private[math] trait AlgebraicIsSigned extends Signed[Algebraic] {
-//  override def sign(a: Algebraic): Sign = a.sign
-//  def signum(a: Algebraic): Int = a.signum
-//  def abs(a: Algebraic): Algebraic = a.abs
-//}
-//
-//private[math] trait AlgebraicIsReal extends IsReal[Algebraic] with AlgebraicOrder with AlgebraicIsSigned {
-//  def toDouble(x: Algebraic): Double = x.toDouble
-//  def ceil(a:Algebraic) = if (a % 1 == 0) a else a + 1 - (a % 1)
-//  def floor(a:Algebraic) = a - (a % 1)
-//  def round(a:Algebraic) = {
-//    val m = a % 1
-//    if (m < 0.5) a - m else a + 1 - m
-//  }
-//  def isWhole(a:Algebraic) = a % 1 == 0
-//}
-//
-//@SerialVersionUID(0L)
-//class AlgebraicAlgebra extends AlgebraicIsField with AlgebraicIsNRoot with AlgebraicIsReal with Serializable
+private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoot[Algebraic] {
+  def zero: Algebraic = Algebraic.Zero
+  def one: Algebraic = Algebraic.One
+  def plus(a: Algebraic, b: Algebraic): Algebraic = a + b
+  def negate(a: Algebraic): Algebraic = -a
+  override def minus(a: Algebraic, b: Algebraic): Algebraic = a - b
+  override def pow(a: Algebraic, b: Int): Algebraic = a pow b
+  override def times(a: Algebraic, b: Algebraic): Algebraic = a * b
+  def quot(a: Algebraic, b: Algebraic): Algebraic = a /~ b
+  def mod(a: Algebraic, b: Algebraic): Algebraic = a % b
+  def gcd(a: Algebraic, b: Algebraic): Algebraic = euclid(a, b)(Eq[Algebraic])
+  def div(a:Algebraic, b:Algebraic) = a / b
+  def nroot(a: Algebraic, k: Int): Algebraic = a nroot k
+  def fpow(a:Algebraic, b:Algebraic) = throw new UnsupportedOperationException("unsupported operation")
+  override def fromInt(n: Int): Algebraic = Algebraic(n)
+  override def fromDouble(n: Double): Algebraic = Algebraic(n)
+}
+
+private[math] trait AlgebraicIsReal extends IsReal[Algebraic] {
+  def toDouble(x: Algebraic): Double = x.toDouble
+  def ceil(a:Algebraic) = Algebraic(a.toBigDecimal(0, RoundingMode.CEILING))
+  def floor(a:Algebraic) = Algebraic(a.toBigDecimal(0, RoundingMode.FLOOR))
+  def round(a:Algebraic) = Algebraic(a.toBigDecimal(0, RoundingMode.HALF_EVEN))
+  def isWhole(a:Algebraic) = a.isWhole
+  override def sign(a: Algebraic): Sign = a.sign
+  def signum(a: Algebraic): Int = a.signum
+  def abs(a: Algebraic): Algebraic = a.abs
+  override def eqv(x: Algebraic, y: Algebraic) = x.compare(y) == 0
+  override def neqv(x: Algebraic, y: Algebraic) = x.compare(y) != 0
+  def compare(x: Algebraic, y: Algebraic) = x.compare(y)
+}
+
+@SerialVersionUID(1L)
+class AlgebraicAlgebra extends AlgebraicIsFieldWithNRoot with AlgebraicIsReal with Serializable
