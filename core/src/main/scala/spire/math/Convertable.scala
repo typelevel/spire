@@ -1,5 +1,7 @@
 package spire.math
 
+import java.math.MathContext
+
 import scala.{specialized => spec}
 
 import spire.algebra.{ Trig, IsReal }
@@ -159,7 +161,7 @@ private[math] trait ConvertableToRational extends ConvertableTo[Rational] {
   def fromBigDecimal(a: BigDecimal): Rational = Rational(a)
   def fromRational(a: Rational): Rational = a
   def fromAlgebraic(a: Algebraic): Rational =
-    a.rational.getOrElse(a.toRational(64))
+    a.rational.getOrElse(Rational(a.toBigDecimal(MathContext.DECIMAL64)))
   def fromReal(a: Real): Rational = a.toRational
 
   def fromType[B: ConvertableFrom](b: B): Rational = ConvertableFrom[B].toRational(b)
@@ -226,7 +228,7 @@ private[math] trait ConvertableToNumber extends ConvertableTo[Number] {
   def fromBigDecimal(a: BigDecimal): Number = Number(a)
   def fromRational(a: Rational): Number = Number(a)
   def fromAlgebraic(a: Algebraic): Number =
-    Number(a.rational.getOrElse(a.toRational(64)))
+    Number(a.rational.getOrElse(Rational(a.toBigDecimal(MathContext.DECIMAL64))))
   def fromReal(a: Real): Number = Number(a.toRational)
 
   def fromType[B: ConvertableFrom](b: B): Number = Number(ConvertableFrom[B].toDouble(b))
@@ -461,7 +463,7 @@ private[math] trait ConvertableFromAlgebraic extends ConvertableFrom[Algebraic] 
   def toBigDecimal(a: Algebraic): BigDecimal =
     a.toBigDecimal(java.math.MathContext.DECIMAL128)
   def toRational(a: Algebraic): Rational =
-    a.rational.getOrElse(a.toRational(64))
+    a.rational.getOrElse(Rational(a.toBigDecimal(MathContext.DECIMAL64)))
   def toAlgebraic(a: Algebraic): Algebraic = a
   def toReal(a: Algebraic): Real = a.evaluateWith[Real]
   def toNumber(a: Algebraic): Number =

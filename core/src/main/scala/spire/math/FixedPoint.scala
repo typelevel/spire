@@ -6,6 +6,7 @@ import spire.syntax.convertableFrom._
 
 import spire.algebra.{Order, Signed}
 
+import java.math.MathContext
 import scala.{specialized => spec}
 
 class FixedPointOverflow(n: Long) extends Exception(n.toString)
@@ -344,7 +345,7 @@ trait FixedPointInstances {
       def fromBigDecimal(n: BigDecimal): FixedPoint = FixedPoint(n)
       def fromRational(n: Rational): FixedPoint = FixedPoint(n)
       def fromAlgebraic(n: Algebraic): FixedPoint =
-        FixedPoint(n.rational.getOrElse(n.toRational(64)))
+        FixedPoint(n.rational.getOrElse(Rational(n.toBigDecimal(MathContext.DECIMAL64))))
       def fromReal(n: Real): FixedPoint = FixedPoint(n.toRational)
 
       def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): FixedPoint =

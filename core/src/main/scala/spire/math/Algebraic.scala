@@ -30,7 +30,9 @@ import spire.algebra.Sign.{ Positive, Negative, Zero }
 import spire.macros.Checked.checked
 import spire.syntax.order._
 
-final class Algebraic(val expr: Algebraic.Expr) {
+@SerialVersionUID(1L)
+final class Algebraic(val expr: Algebraic.Expr)
+extends ScalaNumber with ScalaNumericConversions with Serializable {
   import Algebraic.{ Zero, One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue, JBigDecimalOrder, roundExact }
 
   /**
@@ -44,6 +46,10 @@ final class Algebraic(val expr: Algebraic.Expr) {
    */
   def signum: Int = expr.signum
 
+  /**
+   * Returns the sign of this Algebraic number. Algebraic numbers support exact
+   * sign tests, so this is guaranteed to be accurate.
+   */
   def sign: Sign = Sign(signum)
 
   def unary_- : Algebraic =
@@ -97,13 +103,32 @@ final class Algebraic(val expr: Algebraic.Expr) {
 
   def compare(that: Algebraic): Int = (this - that).signum
 
-  def equals(that: Algebraic): Boolean = that match {
-    case (that: Algebraic) => compare(that) == 0
-    case _ => false
+  def isZero: Boolean = signum == 0
+
+  override def equals(that: Any) = that match {
+    case (that: Algebraic) => this.compare(that) == 0
+    case (that: Real) => this.toReal == that
+    case (that: Number) => this.compare(Algebraic(that.toBigDecimal)) == 0
+    case (that: Rational) => this.compare(Algebraic(that)) == 0
+    case (that: BigInt) => isWhole && toBigInt == that
+    case (that: Natural) => isWhole && signum >= 0 && that == toBigInt
+    case (that: SafeLong) => isWhole && that == this
+    case (that: Complex[_]) => that == this
+    case (that: Quaternion[_]) => that == this
+    case (that: BigDecimal) => try {
+      toBigDecimal(that.mc) == that
+    } catch {
+      case ae: ArithmeticException => false
+    }
+    case _ => unifiedPrimitiveEquals(that)
   }
 
-  def toByte: Byte = toInt.toByte // TODO: This what we want?
-  def toShort: Short = toInt.toShort
+  override def hashCode: Int = if (isWhole && isValidLong) {
+    unifiedPrimitiveHashcode
+  } else {
+    val x = toBigDecimal(java.math.MathContext.DECIMAL64)
+    x.underlying.unscaledValue.hashCode + 23 * x.scale.hashCode + 17
+  }
 
   /**
    * Returns the nearest, valid `Int` value to this Algebraic, without going
@@ -114,7 +139,7 @@ final class Algebraic(val expr: Algebraic.Expr) {
    * `Int.MaxValue`, then `Int.MaxValue` is returned. If this value is less
    * than `Int.MinValue`, then `Int.MinValue` is returned.
    */
-  def toInt: Int = {
+  def intValue: Int = {
     val n = toBigDecimal(1).bigDecimal.setScale(0, RoundingMode.DOWN)
     val cmp = n.compareTo(MinIntValue)
     if (cmp < 0) Int.MinValue
@@ -131,13 +156,16 @@ final class Algebraic(val expr: Algebraic.Expr) {
    * `Long.MaxValue`, then `Long.MaxValue` is returned. If this value is less
    * than `Long.MinValue`, then `Long.MinValue` is returned.
    */
-  def toLong: Long = {
+  def longValue: Long = {
     val n = toBigDecimal(1).bigDecimal.setScale(0, RoundingMode.DOWN)
     val cmp = n.compareTo(MinLongValue)
     if (cmp < 0) Long.MinValue
     else if (cmp > 0) Long.MaxValue
     else n.longValue
   }
+
+  def floatValue: Float = ???
+  def doubleValue: Double = ???
 
   /**
    * Returns the nearest, valid `BigInt` value to this Algebraic, without going
@@ -151,8 +179,6 @@ final class Algebraic(val expr: Algebraic.Expr) {
     BigInt(n.toBigInteger)
   }
 
-  def toFloat: Float = ???
-  def toDouble: Double = ???
   def toBigDecimal(mc: MathContext): BigDecimal = {
     import Expr._
 
@@ -201,13 +227,13 @@ final class Algebraic(val expr: Algebraic.Expr) {
         subValue.pow(digits, new MathContext(digits, roundingMode))
     }
     val approx = rec(expr, mc.getPrecision + 2)
-      .round(new MathContext(mc.getPrecision + 2, RoundingMode.UNNECESSARY))
     val newScale = approx.scale - approx.precision + mc.getPrecision
-    roundExact(this, approx, newScale, roundingMode)
+    val adjustedApprox =
+      if (newScale <= approx.scale) approx.setScale(newScale + 1)
+      else approx
+    roundExact(this, adjustedApprox, newScale, roundingMode)
       .round(mc) // We perform a final round, since roundExact uses scales.
   }
-
-  def toRational(bits: Int): Rational = ???
 
   def isWhole: Boolean = {
     val n = toBigDecimal(1).bigDecimal.setScale(0, RoundingMode.HALF_UP)
@@ -219,7 +245,7 @@ final class Algebraic(val expr: Algebraic.Expr) {
    * part) and fits within the bounds of an `Int`. That is, if `x.isValidInt`,
    * then `Algebraic(x.toInt) == x`.
    */
-  def isValidInt: Boolean = {
+  override def isValidInt: Boolean = {
     val n = toBigDecimal(1).bigDecimal.setScale(0, RoundingMode.HALF_UP)
     (n.compareTo(MaxIntValue) <= 0) &&
     (n.compareTo(MinIntValue) >= 0) &&
@@ -293,6 +319,9 @@ final class Algebraic(val expr: Algebraic.Expr) {
    * Returns an exact [[Real]] representation of this number.
    */
   def toReal: Real = evaluateWith[Real]
+
+  // ScalaNumber. Because of course all Scala numbers are wrappers.
+  def underlying: AnyRef = this
 }
 
 object Algebraic extends AlgebraicInstances {
