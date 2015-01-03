@@ -3,7 +3,7 @@ package spire.math
 import spire.algebra.Sign
 
 import org.scalatest.FunSuite
-import java.math.MathContext
+import java.math.{ MathContext, RoundingMode }
 
 
 class AlgebraicTest extends FunSuite {
@@ -14,7 +14,7 @@ class AlgebraicTest extends FunSuite {
   }
 
   test("Relative approximation of zero is zero") {
-    assert((Algebraic(0) approximateTo MathContext.DECIMAL128) === BigDecimal(0))
+    assert((Algebraic(0).toBigDecimal(MathContext.DECIMAL128)) === BigDecimal(0))
     assert(trickyZero.toDouble === 0.0)
   }
 
@@ -23,8 +23,7 @@ class AlgebraicTest extends FunSuite {
     val dblSqrt2x100 = math.sqrt(2) * 100
 
     val err = BigDecimal(0.0001)
-  
-    val approx = sqrt2x100 +/- err
+    val approx = sqrt2x100.toBigDecimal(4, RoundingMode.HALF_EVEN)
 
     assert(approx - err <= dblSqrt2x100 && dblSqrt2x100 <= approx + err)
   }
@@ -32,7 +31,7 @@ class AlgebraicTest extends FunSuite {
   test("Relative approximation of addition is correct") {
     val sum = Iterator.fill(29)(Algebraic(1) / 29) reduce (_ + _)
     assert(sum.toDouble === 1.0)
-    assert(sum.toBigDecimal === BigDecimal(1))
+    assert(sum.toBigDecimal(MathContext.DECIMAL128) === BigDecimal(1))
   }
 
   test("Absolute approximation of subtraction is correct") {
@@ -40,7 +39,7 @@ class AlgebraicTest extends FunSuite {
     val dblNegSqrt2x98 = -math.sqrt(2) * 98
 
     val err = BigDecimal(0.0001)
-    val approx = negSqrt2x98 +/- err
+    val approx = negSqrt2x98.toBigDecimal(4, RoundingMode.HALF_EVEN)
     assert(approx - err <= dblNegSqrt2x98 && dblNegSqrt2x98 <= approx + err)
   }
 
@@ -48,7 +47,7 @@ class AlgebraicTest extends FunSuite {
     val prod = Iterator.fill(32)(Algebraic(2).sqrt) reduce (_ * _)
     val err = BigDecimal(0.0001)
 
-    val approx = prod +/- err
+    val approx = prod.toBigDecimal(4, RoundingMode.HALF_EVEN)
     val actual = BigDecimal(1 << 16)
 
     assert(actual - err <= approx && approx <= actual + err)
@@ -57,7 +56,7 @@ class AlgebraicTest extends FunSuite {
   test("Relative approximation of multiplication is correct") {
     val prod = Iterator.fill(32)(Algebraic(2).sqrt) reduce (_ * _)
 
-    val approx = prod approximateTo MathContext.DECIMAL64
+    val approx = prod.toBigDecimal(MathContext.DECIMAL64)
     val actual = BigDecimal(1 << 16)
 
     assert(approx === actual)
@@ -67,7 +66,7 @@ class AlgebraicTest extends FunSuite {
     val quot = Algebraic(2).sqrt / 2
     val actual = 0.7071067811865476
     val err = BigDecimal(0.0001)
-    val approx = quot +/- err
+    val approx = quot.toBigDecimal(4, RoundingMode.HALF_EVEN)
     assert(actual - err <= approx && approx <= actual + err)
   }
 
@@ -91,12 +90,12 @@ class AlgebraicTest extends FunSuite {
     val a = Algebraic(2).sqrt
     val err = BigDecimal(0.00001)
     val actual = BigDecimal(1.4142135623730951)
-    val approx = a +/- err
+    val approx = a.toBigDecimal(5, RoundingMode.HALF_EVEN)
     assert(actual - err <= approx && approx <= actual + err)
 
     val b = Algebraic(-4) nroot 3
     val bctual = BigDecimal(-1.5874010519681994) // give or take
-    val bpprox = b +/- err
+    val bpprox = b.toBigDecimal(5, RoundingMode.HALF_EVEN)
     assert(bctual - err <= bpprox && bpprox <= bctual + err)
   }
 

@@ -30,8 +30,15 @@ import spire.algebra.Sign.{ Positive, Negative, Zero }
 import spire.macros.Checked.checked
 import spire.syntax.order._
 
+/**
+ * Algebraic provides an exact number type for many algebraic numbers. With it,
+ * we can represent expressions involving addition, multiplication, division,
+ * and n-roots. So, it is similar [[Rational]], but adds n-roots as a valid,
+ * exact operation. The cost is that this will not be as fast as [[Rational]]
+ * for many operations.
+ */
 @SerialVersionUID(1L)
-final class Algebraic(val expr: Algebraic.Expr)
+final class Algebraic private (val expr: Algebraic.Expr)
 extends ScalaNumber with ScalaNumericConversions with Serializable {
   import Algebraic.{ Zero, One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue, JBigDecimalOrder, roundExact }
 
@@ -47,6 +54,9 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
    */
   def sign: Sign = Sign(signum)
 
+  /**
+   * Return a non-negative `Algebraic` with the same magnitude as this one.
+   */
   def abs: Algebraic =
     if (this.signum < 0) -this else this
 
@@ -65,16 +75,25 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def /(that: Algebraic): Algebraic =
     new Algebraic(Expr.Div(this.expr, that.expr))
 
+  def quot(that: Algebraic): Algebraic =
+    this /~ that
+
   def /~(that: Algebraic): Algebraic =
     Algebraic((this / that).toBigInt)
+
+  def mod(that: Algebraic): Algebraic =
+    this % that
 
   def %(that: Algebraic): Algebraic =
     this - (this /~ that) * that
 
+  /** Returns the square root of this number. */
   def sqrt: Algebraic = nroot(2)
 
+  /** Returns the cube root of this number. */
   def cbrt: Algebraic = nroot(3)
 
+  /** Returns the `k`-th root of this number. */
   def nroot(k: Int): Algebraic = if (k < 0) {
     new Algebraic(Expr.Div(Expr.ConstantLong(1), Expr.KRoot(this.expr, -k)))
   } else if (k > 0) {
@@ -83,6 +102,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     throw new ArithmeticException("divide by zero (0-root)")
   }
 
+  /** Raise this number to the `k`-th power. */
   def pow(k: Int): Algebraic =
     if (k == Int.MinValue) {
       throw new ArithmeticException("illegal exponent (${Int.MinValue})")
@@ -107,6 +127,9 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
 
   def compare(that: Algebraic): Int = (this - that).signum
 
+  /**
+   * Returns `true` iff this Algebraic number is exactly 0.
+   */
   def isZero: Boolean = signum == 0
 
   override def equals(that: Any) = that match {
@@ -132,6 +155,15 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   } else {
     val x = toBigDecimal(java.math.MathContext.DECIMAL64)
     x.underlying.unscaledValue.hashCode + 23 * x.scale.hashCode + 17
+  }
+
+  override def toString: String = {
+    val approx = toBigDecimal(MathContext.DECIMAL64)
+    if (this == Algebraic(approx)) {
+      s"Algebraic(${approx.bigDecimal.stripTrailingZeros})"
+    } else {
+      s"Algebraic(~$approx)"
+    }
   }
 
   /**
@@ -166,8 +198,19 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     else n.longValue
   }
 
-  def floatValue: Float = ???
-  def doubleValue: Double = ???
+  /**
+   * Returns a `Float` that approximates this value. If the exponent is too
+   * large to fit in a float, the `Float.PositiveInfinity` or
+   * `Float.NegativeInfinity` is returned.
+   */
+  def floatValue: Float = toBigDecimal(MathContext.DECIMAL32).toFloat
+
+  /**
+   * Returns a `Double` that approximates this value. If the exponent is too
+   * large to fit in a double, the `Double.PositiveInfinity` or
+   * `Double.NegativeInfinity` is returned.
+   */
+  def doubleValue: Double = toBigDecimal(MathContext.DECIMAL64).toDouble
 
   /**
    * Returns the nearest, valid `BigInt` value to this Algebraic, without going
@@ -180,11 +223,16 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     toBigDecimal(0, RoundingMode.DOWN).toBigInt
 
   /**
-   * Absolute approximation to scale decimal places.
+   * Absolute approximation to `scale` decimal places with the given rounding
+   * mode. Rounding is always exact.
    */
   def toBigDecimal(scale: Int, roundingMode: RoundingMode): BigDecimal =
     BigDecimal(roundExact(this, expr.toBigDecimal(scale + 2), scale, roundingMode))
 
+  /**
+   * Relative approximation to the precision specified in `mc` with the given
+   * rounding mode. Rounding is always exact.
+   */
   def toBigDecimal(mc: MathContext): BigDecimal = {
     import Expr._
 
@@ -230,17 +278,20 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
           .round(new MathContext(digits, roundingMode))
       case Pow(sub, k) =>
         val subValue = rec(sub, digits + ceil(log(k.toDouble)).toInt)
-        subValue.pow(digits, new MathContext(digits, roundingMode))
+        subValue.pow(k, new MathContext(digits, roundingMode))
     }
     val approx = rec(expr, mc.getPrecision + 2)
     val newScale = approx.scale - approx.precision + mc.getPrecision
     val adjustedApprox =
-      if (newScale <= approx.scale) approx.setScale(newScale + 1)
+      if (newScale <= approx.scale) approx.setScale(newScale + 1, RoundingMode.DOWN)
       else approx
     roundExact(this, adjustedApprox, newScale, roundingMode)
       .round(mc) // We perform a final round, since roundExact uses scales.
   }
 
+  /**
+   * Returns `true` iff this Algebraic exactly represents a valid `BigInt`.
+   */
   def isWhole: Boolean = this == Algebraic(toBigInt)
 
   /**
@@ -278,7 +329,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
    * [[Rational]]. Otherwise, this is a radical expression and `None` is
    * returned.
    */
-  def rational: Option[Rational] =
+  def toRational: Option[Rational] =
     if (expr.flags.isRational) {
       implicit val nroot: NRoot[Rational] = new NRoot[Rational] {
         def nroot(a: Rational, n: Int): Rational = ???
@@ -328,24 +379,35 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
 }
 
 object Algebraic extends AlgebraicInstances {
-  private val MaxIntValue: BigInteger = BigInteger.valueOf(Int.MaxValue.toLong)
-  private val MinIntValue: BigInteger = BigInteger.valueOf(Int.MinValue.toLong)
-  private val MaxLongValue: BigInteger = BigInteger.valueOf(Long.MaxValue)
-  private val MinLongValue: BigInteger = BigInteger.valueOf(Long.MinValue)
 
+  /** Returns an Algebraic expression equal to 0. */
   val Zero: Algebraic = new Algebraic(Expr.ConstantLong(0))
+
+  /** Returns an Algebraic expression equal to 1. */
   val One: Algebraic = new Algebraic(Expr.ConstantLong(1))
 
-  def apply(n: Int): Algebraic =
+  /** Returns an Algebraic expression equivalent to `n`. */
+  implicit def apply(n: Int): Algebraic =
     new Algebraic(Expr.ConstantLong(n))
 
+  /** Returns an Algebraic expression equivalent to `n`. */
   def apply(n: Long): Algebraic =
     new Algebraic(Expr.ConstantLong(n))
 
+  /**
+   * Returns an Algebraic expression equivalent to `n`, if `n` is finite. If
+   * `n` is either infinite or `NaN`, then an `IllegalArgumentException` is
+   * thrown.
+   */
   def apply(n: Float): Algebraic =
     Algebraic(n.toDouble)
 
-  def apply(n: Double): Algebraic =
+  /**
+   * Returns an Algebraic expression equivalent to `n`, if `n` is finite. If
+   * `n` is either infinite or `NaN`, then an `IllegalArgumentException` is
+   * thrown.
+   */
+  implicit def apply(n: Double): Algebraic =
     if (java.lang.Double.isInfinite(n)) {
       throw new IllegalArgumentException("cannot construct inifinite Algebraic")
     } else if (java.lang.Double.isNaN(n)) {
@@ -354,21 +416,35 @@ object Algebraic extends AlgebraicInstances {
       new Algebraic(Expr.ConstantDouble(n))
     }
 
+  /** Returns an Algebraic expression equivalent to `n`. */
   def apply(n: BigInt): Algebraic =
     new Algebraic(Expr.ConstantBigDecimal(BigDecimal(n)))
 
+  /** Returns an Algebraic expression equivalent to `n`. */
   def apply(n: BigDecimal): Algebraic =
     new Algebraic(Expr.ConstantBigDecimal(n))
 
+  /** Returns an Algebraic expression equivalent to `n`. */
   def apply(n: Rational): Algebraic =
     new Algebraic(Expr.ConstantRational(n))
 
+  /**
+   * Returns an Algebraic expression equivalent to `BigDecimal(n)`. If `n` is
+   * not parseable as a `BigDecimal` then an exception is thrown.
+   */
   def apply(n: String): Algebraic =
     Algebraic(BigDecimal(new JBigDecimal(n)))
 
-  sealed abstract class Expr {
+  /**
+   * The [[Algebraic]] expression AST. `Algebraic` simply stores an expression
+   * tree representing all operations performed on it. We then use this tree to
+   * deduce certain properties about the algebraic expression and use them to
+   * perform exact sign tests, compute approximations, etc.
+   */
+  sealed abstract class Expr extends Serializable {
     import Expr._
 
+    /** A set of flags we can quickly compute for an [[Algebraic]] expression. */
     def flags: Flags
 
     private val bounds: TrieMap[ZeroBoundFunction, Any] =
@@ -394,43 +470,128 @@ object Algebraic extends AlgebraicInstances {
         }
       }).asInstanceOf[zbf.Bound]
 
-    lazy val degreeBound: Long = this match {
-      case KRoot(sub, k) =>
-        checked(sub.degreeBound * k)
-      case _ =>
-        children
-          .map(_.degreeBound)
-          .foldLeft(1L) { (a, b) =>
-            checked(a * b)
-          }
+    /**
+     * Returns a bound on the degree of this expression.
+     */
+    lazy val degreeBound: Long = {
+      // We only need to include *unique* expressions in the product. To avoid
+      // including equal sub-expressions more than once, we maintain a map from
+      // sub-expressions -> degree, so we can see which expressions have been
+      // visited previously. To avoid re-computation of the hashCode at many
+      // nodes, we key the map by Key, which has a hash which will only ever be
+      // computed once per node.
+
+      case class Key(expr: Expr, hash: Int) {
+        override def hashCode: Int = hash
+        override def equals(that: Any): Boolean = that match {
+          case Key(e, _) => expr == e
+          case _ => false
+        }
+      }
+
+      def constant[A](e: Constant[A], acc: Map[Key, Long]): (Key, Long, Map[Key, Long]) =
+        (Key(e, e.value.hashCode), 1, acc)
+
+      def binary(e: BinaryExpr, id: Int, acc: Map[Key, Long]): (Key, Long, Map[Key, Long]) = {
+        val (lKey, lDeg, acc0) = rec(e.lhs, acc)
+        val (rKey, rDeg, acc1) = rec(e.rhs, acc0)
+        val key = Key(e, 31 * lKey.hash + 23 * rKey.hash + id)
+        val deg = lDeg * rDeg
+        (key, deg, acc1)
+      }
+
+      def rec(e: Expr, acc: Map[Key, Long]): (Key, Long, Map[Key, Long]) = e match {
+        case e: Constant[a] => constant(e, acc)
+        case     Neg(sub) => rec(sub, acc)
+        case e @ Add(_, _) => binary(e, 631, acc)
+        case e @ Sub(_, _) => binary(e, 251, acc)
+        case e @ Mul(_, _) => binary(e, 797, acc)
+        case e @ Div(_, _) => binary(e, 131, acc)
+        case     Pow(sub, _) => rec(sub, acc)
+        case e @ KRoot(sub, k) =>
+          val (subKey, subDeg, acc0) = rec(sub, acc)
+          val key = Key(e, subKey.hash * 29 + 53)
+          val deg =
+            if (acc0 contains key) 1
+            else subDeg * k
+          val acc1 = acc0 + (key -> deg)
+          (key, deg, acc1)
+      }
+
+      rec(this, Map.empty[Key, Long])._2
     }
 
+    /**
+     * Returns the BFMSS separation bound.
+     */
     def bfmssBound: BitBound =
       getBound(bfmss).getBitBound(degreeBound)
 
+    /**
+     * Returns a separation bound for this expression as a bit bound. A
+     * separation bound is a lower-bound on the value of this expression that
+     * is only valid if this expression is not 0. This bound can thus be used
+     * to determine if this value is actually 0 and, if not, the sign, by
+     * simply approximating the expression with enough accuracy that it falls
+     * on one side or the other of the separation bound.
+     */
     def separationBound: BitBound = bfmssBound
 
+    /**
+     * Returns an asbolute approximation to this expression as a BigDecimal
+     * that is accurate up to +/- 10^-digits.
+     */
     def toBigDecimal(digits: Int): JBigDecimal
+
+    /**
+     * Returns an upper bound on the absolute value of this expression as a
+     * bit bound.
+     */
     def upperBound: BitBound
+
+    /** Returns an integer with the same sign as this expression. */
     def signum: Int
 
+    /**
+     * Returns a list of the children of this expression. A child is a
+     * sub-expression required by this expression. For instance, `Add` has 2
+     * children, the left-hand and right-hand side sub-expressions. A numeric
+     * literal expression, such as `ConstantDouble` or `ConstantRational` has
+     * no children.
+     */
     def children: List[Expr]
   }
 
   object Expr {
     private def mc(digits: Int): MathContext = new MathContext(digits, RoundingMode.DOWN)
 
+    /**
+     * A set of flags for algebraic expressions, so we can quickly determine
+     * some properties, like whether the expression is rational, radical, what
+     * types of leaf nodes it has, etc. This is used to help guide algorithmic
+     * choices, such as what separation bound to use.
+     */
     final class Flags(val bits: Int) extends AnyVal {
       import Flags._
 
+      /** Returns the union of flags `this` and `that`. */
       def | (that: Flags): Flags = new Flags(bits | that.bits)
 
-      def check(n: Int): Boolean = (bits & n) != 0
+      private def check(n: Int): Boolean = (bits & n) != 0
 
+      /** Returns `true` iff this expression is composed only of rational operations. */
       def isRational: Boolean = !isRadical
+
+      /** Returns `true` iff this expression contains an n-th root operation. */
       def isRadical: Boolean = check(RadicalFlag)
+
+      /** Returns `true` iff this expression contains a `ConstantDouble` leaf node. */
       def hasDoubleLeaf: Boolean = check(HasDoubleLeaf)
+
+      /** Returns `true` iff this expression contains a `ConstantBigDecimal` leaf node. */
       def hasBigDecimalLeaf: Boolean = check(HasBigDecimalLeaf)
+
+      /** Returns `true` iff this expression contains a `ConstantRational` leaf node. */
       def hasRationalLeaf: Boolean = check(HasRationalLeaf)
     }
 
@@ -447,15 +608,19 @@ object Algebraic extends AlgebraicInstances {
       final val IsRadical: Flags = new Flags(RadicalFlag)
     }
 
-    sealed abstract class Constant extends Expr {
+    /** Constant expressions are leaf nodes, contains literal numbers. */
+    sealed abstract class Constant[A] extends Expr {
+      def value: A
       def children: List[Expr] = Nil
     }
 
+    /** Unary expressions contain only a single child expression. */
     sealed abstract class UnaryExpr extends Expr {
       val sub: Expr
       def children: List[Expr] = sub :: Nil
     }
 
+    /** Binary expressions contain 2 child expression. */
     sealed abstract class BinaryExpr extends Expr {
       val lhs: Expr
       val rhs: Expr
@@ -463,57 +628,73 @@ object Algebraic extends AlgebraicInstances {
       def children: List[Expr] = lhs :: rhs :: Nil
     }
 
-    case class ConstantLong(n: Long) extends Constant {
+    @SerialVersionUID(0L)
+    case class ConstantLong(value: Long) extends Constant[Long] {
       def flags: Flags = Flags.IntegerLeaf
 
       def upperBound: BitBound =
-        if (n == 0L) new BitBound(0L)
-        else if (n == Long.MinValue) new BitBound(64)
-        else new BitBound(64 - numberOfLeadingZeros(abs(n) - 1))
+        if (value == 0L) new BitBound(0L)
+        else if (value == Long.MinValue) new BitBound(64)
+        else new BitBound(64 - numberOfLeadingZeros(abs(value) - 1))
 
-      def signum: Int = n.signum
+      def signum: Int = value.signum
 
       def toBigDecimal(digits: Int): JBigDecimal =
-        new JBigDecimal(n).setScale(digits, RoundingMode.HALF_UP)
+        new JBigDecimal(value).setScale(digits, RoundingMode.HALF_UP)
     }
 
-    case class ConstantDouble(n: Double) extends Constant {
+    @SerialVersionUID(0L)
+    case class ConstantDouble(value: Double) extends Constant[Double] {
       def flags: Flags = Flags.DoubleLeaf
 
-      def upperBound: BitBound = new BitBound(ceil(log(n)).toLong)
+      def upperBound: BitBound = if (value == 0D) {
+        new BitBound(0)
+      } else {
+        new BitBound(ceil(log(abs(value))).toLong)
+      }
 
-      def signum: Int = n.signum
+      def signum: Int =
+        if (value < 0D) -1
+        else if (value > 0D) 1
+        else 0
 
       def toBigDecimal(digits: Int): JBigDecimal =
-        new JBigDecimal(n).setScale(digits, RoundingMode.HALF_UP)
+        new JBigDecimal(value).setScale(digits, RoundingMode.HALF_UP)
     }
 
-    case class ConstantBigDecimal(n: BigDecimal) extends Constant {
+    @SerialVersionUID(0L)
+    case class ConstantBigDecimal(value: BigDecimal) extends Constant[BigDecimal] {
       def flags: Flags = Flags.BigDecimalLeaf
 
-      def upperBound: BitBound = new BitBound(ceil(log(n)).toLong)
+      def upperBound: BitBound = if (value.signum == 0) {
+        new BitBound(0)
+      } else {
+        new BitBound(ceil(log(value.abs)).toLong)
+      }
 
-      def signum: Int = n.signum
+      def signum: Int = value.signum
 
       def toBigDecimal(digits: Int): JBigDecimal =
-        n.bigDecimal.setScale(digits, RoundingMode.HALF_UP)
+        value.bigDecimal.setScale(digits, RoundingMode.HALF_UP)
     }
 
-    case class ConstantRational(n: Rational) extends Constant {
+    @SerialVersionUID(0L)
+    case class ConstantRational(value: Rational) extends Constant[Rational] {
       def flags: Flags = Flags.RationalLeaf
 
       def upperBound: BitBound =
-        new BitBound(n.numerator.abs.bitLength - n.denominator.bitLength + 1)
+        new BitBound(value.numerator.abs.bitLength - value.denominator.bitLength + 1)
 
-      def signum: Int = n.signum
+      def signum: Int = value.signum
 
       def toBigDecimal(digits: Int): JBigDecimal = {
-        val num = new JBigDecimal(n.numerator.bigInteger)
-        val den = new JBigDecimal(n.denominator.bigInteger)
+        val num = new JBigDecimal(value.numerator.bigInteger)
+        val den = new JBigDecimal(value.denominator.bigInteger)
         num.divide(den, digits, RoundingMode.DOWN)
       }
     }
 
+    @SerialVersionUID(0L)
     case class Neg(sub: Expr) extends UnaryExpr {
       def flags: Flags = sub.flags
       def upperBound: BitBound = sub.upperBound
@@ -522,6 +703,7 @@ object Algebraic extends AlgebraicInstances {
         sub.toBigDecimal(digits).negate()
     }
 
+    @SerialVersionUID(0L)
     sealed abstract class AddOrSubExpr extends BinaryExpr {
       def upperBound: BitBound =
         new BitBound(max(lhs.upperBound.bitBound, rhs.upperBound.bitBound) + 1)
@@ -560,10 +742,13 @@ object Algebraic extends AlgebraicInstances {
       }
     }
 
+    @SerialVersionUID(0L)
     case class Add(lhs: Expr, rhs: Expr) extends AddOrSubExpr
 
+    @SerialVersionUID(0L)
     case class Sub(lhs: Expr, rhs: Expr) extends AddOrSubExpr
 
+    @SerialVersionUID(0L)
     case class Mul(lhs: Expr, rhs: Expr) extends BinaryExpr {
       def upperBound: BitBound = lhs.upperBound + rhs.upperBound
       def signum: Int = lhs.signum * rhs.signum
@@ -580,11 +765,13 @@ object Algebraic extends AlgebraicInstances {
       }
     }
 
+    @SerialVersionUID(0L)
     case class Div(lhs: Expr, rhs: Expr) extends BinaryExpr {
       // Chee Yap's paper has lhs.upperBound - rhs.separationBound, but it
       // makes much more sense to have lhs.upperBound + rhs.separationBound,
       // since separationBound is -lg of the lower bound (for a valid div).
-      // That is, lg(x/y) <= ub(x) / lb(y).
+      // That is, lg(x/y) <= ub(x) / lb(y). I'm guessing the formula in the
+      // paper was just a typo.
       def upperBound: BitBound = lhs.upperBound + rhs.separationBound
       def signum: Int = if (rhs.signum == 0) {
         throw new ArithmeticException("divide by 0")
@@ -608,6 +795,7 @@ object Algebraic extends AlgebraicInstances {
       }
     }
 
+    @SerialVersionUID(0L)
     case class KRoot(sub: Expr, k: Int) extends UnaryExpr {
       val flags: Flags = sub.flags | Flags.IsRadical
 
@@ -633,6 +821,7 @@ object Algebraic extends AlgebraicInstances {
       }
     }
 
+    @SerialVersionUID(0L)
     case class Pow(sub: Expr, k: Int) extends UnaryExpr {
       require(k > 1)
 
@@ -646,7 +835,7 @@ object Algebraic extends AlgebraicInstances {
           else if (k == 0) throw new ArithmeticException("indeterminate")
           else 0
         } else if (k % 2 == 0) {
-          s.abs
+          if (s < 0) 1 else s
         } else {
           s
         }
@@ -665,13 +854,13 @@ object Algebraic extends AlgebraicInstances {
     }
   }
 
+  /**
+   * A bit bound represents either an upper or lower bound as some
+   * power of 2. Specifically, the bound is typically either `2^bitBound` or
+   * `2^-bitBound`.
+   */
   final class BitBound(val bitBound: Long) extends AnyVal {
     import BitBound.bitsToDecimalDigits
-
-    /**
-     * Returns the bit bound as a BigDecimal.
-     */
-    def bound: BigDecimal = ???
 
     /**
      * Returns the minimum number of absolute decimal digits required to
@@ -707,38 +896,84 @@ object Algebraic extends AlgebraicInstances {
    * A zero bound function, defined over an algebraic expression algebra.
    */
   sealed trait ZeroBoundFunction {
+
+    /**
+     * Some state that is computed for each node in the expression tree. This
+     * state is typically memoized, to avoid recomputation.
+     */
     type Bound
 
-    def integer(n: Long): Bound = integer(BigInt(n))
+    /**
+     * Returns a bound for `n`. The default implementation treats `n` as a
+     * BigInt.
+     */
+    def integer(n: Long): Bound =
+      integer(BigInt(n))
 
+    /**
+     * Returns a bound for an integer `n`.
+     */
     def integer(n: BigInt): Bound
 
+    /**
+     * Returns a bound for `n`. The default implementation treats `n` as a
+     * rational number (division of 2 BigInts) and so introduces a division.
+     */
     def rational(n: Double): Bound =
       rational(BigDecimal(n))
 
+    /**
+     * Returns a bound for `n`. The default implementation treats `n` as a
+     * rational number (division of 2 BigInts) and so introduces a division.
+     */
     def rational(n: BigDecimal): Bound =
       rational(Rational(n))
 
+    /**
+     * Returns a bound for `n`. The default implementation treats `n` as a
+     * division of 2 `BigInt`s and so introduces a division.
+     */
     def rational(n: Rational): Bound =
       div(integer(n.numerator), integer(n.denominator))
 
+    /** Returns the bound for the negation of `sub`. */
     def negate(sub: Bound): Bound
 
+    /** Returns the bound for the addition of the 2 sub expressions `lhs` and `rhs`. */
     def add(lhs: Bound, rhs: Bound): Bound
 
+    /** Returns the bound for the subtraction of the 2 sub expressions `lhs` and `rhs`. */
     def sub(lhs: Bound, rhs: Bound): Bound
 
+    /** Returns the bound for the multiplication of the 2 sub expressions `lhs` and `rhs`. */
     def mul(lhs: Bound, rhs: Bound): Bound
 
+    /** Returns the bound for the division of the 2 sub expressions `lhs` and `rhs`. */
     def div(lhs: Bound, rhs: Bound): Bound
 
+    /** Returns the bound on the k-th root of `sub`. */
     def nroot(sub: Bound, k: Int): Bound
 
+    /** Returns the bound on the power of `sub`. */
     def pow(sub: Bound, k: Int): Bound
   }
 
+  /**
+   * An implementation of "A Separation Bound for Real Algebraic Expressions",
+   * by Burnikel, Funke, Mehlhorn, Schirra, and Schmitt. This provides a good
+   * [[ZeroBoundFunction]] for use in sign tests.
+   *
+   * Unlike the paper, we use log-arithmetic instead of working with exact,
+   * big integer values. This means our bound isn't technically as good as it
+   * could be, but we save the cost of working with arithmetic. We also perform
+   * all log arithmetic using `Long`s and check for overflow (throwing
+   * `ArithmeticException`s when detected). In practice we shouldn't hit this
+   * limit, but in case we do, we prefer to throw over failing silently.
+   */
+  @SerialVersionUID(0L)
   case object bfmss extends ZeroBoundFunction {
 
+    /** Our state that we store, per node. */
     final case class Bound(l: Long, u: Long) {
       def getBitBound(degreeBound: Long): BitBound =
         new BitBound(l + u * (degreeBound - 1))
@@ -841,8 +1076,8 @@ object Algebraic extends AlgebraicInstances {
     // We then add in (x.scale - width) % n to our initial scale so that the
     // remaining exponenent is divisible by n.
     val safeWidth = width + (x.scale - width) % k
-    val approx = new JBigDecimal(x.unscaledValue, safeWidth).doubleValue
-    new JBigDecimal(pow(approx, 1D / k))
+    val approx = new JBigDecimal(x.unscaledValue.abs, safeWidth).doubleValue
+    new JBigDecimal(x.signum * pow(approx, 1D / k))
       .scaleByPowerOfTen(-(x.scale - safeWidth) / k)
       .round(MathContext.DECIMAL64)
   }
@@ -857,9 +1092,10 @@ object Algebraic extends AlgebraicInstances {
    * relative approximation returns an adaptive one, that uses the previous
    * value to guide the required epsilon.
    */
-  private final def nroot(value: JBigDecimal, k: Int)(getEps: JBigDecimal => Int): JBigDecimal = {
-    if (value.compareTo(JBigDecimal.ZERO) == 0)
+  private final def nroot(signedValue: JBigDecimal, k: Int)(getEps: JBigDecimal => Int): JBigDecimal = {
+    if (signedValue.compareTo(JBigDecimal.ZERO) == 0)
       return JBigDecimal.ZERO
+    val value = signedValue.abs
     val n = new JBigDecimal(k)
     @tailrec def loop(prev: JBigDecimal, prevDigits: Int, prevEps: JBigDecimal): JBigDecimal = {
       val digits = getEps(prev)
@@ -868,14 +1104,16 @@ object Algebraic extends AlgebraicInstances {
         else JBigDecimal.ONE.movePointLeft(digits)
       val prevExp = prev.pow(k - 1)
       val delta = value
-        .divide(prev, digits, RoundingMode.HALF_UP)
+        .divide(prevExp, digits, RoundingMode.HALF_UP)
         .subtract(prev)
         .divide(n, digits, RoundingMode.HALF_UP)
       if (delta.abs.compareTo(eps) <= 0) prev
       else loop(prev.add(delta), digits, eps)
     }
     val init = nrootApprox(value, k)
-    loop(init, Int.MinValue, JBigDecimal.ZERO)
+    val unsignedResult = loop(init, Int.MinValue, JBigDecimal.ZERO)
+    if (signedValue.signum < 0) unsignedResult.negate
+    else unsignedResult
   }
 
   private val bits2dec: Double = log(2, 10)
@@ -931,7 +1169,7 @@ object Algebraic extends AlgebraicInstances {
         case UP | FLOOR if exact.signum < 0 =>
           new JBigDecimal(BigInteger.ONE.negate, scale)
         case _ =>
-          approx.setScale(scale)
+          approx.setScale(scale, RoundingMode.DOWN)
       }
     } else if (approx.signum > 0) {
       roundPositive(exact, approx, scale, mode)
@@ -954,11 +1192,11 @@ object Algebraic extends AlgebraicInstances {
       approx
     } else if (cutoff < 0) {
       // Just add some 0s and we're done!
-      approx.setScale(scale)
+      approx.setScale(scale, RoundingMode.DOWN)
     } else if (cutoff > 18) {
       // We'd like to work with Long arithmetic, if possible. Our rounding is
       // exact anyways, so it doesn't hurt to remove some digits.
-      roundPositive(exact, approx.setScale(scale + 18), scale, mode)
+      roundPositive(exact, approx.setScale(scale + 18, RoundingMode.DOWN), scale, mode)
     } else {
       val unscale = spire.math.pow(10L, cutoff.toLong)
       val Array(truncatedUnscaledValue, bigRemainder) =
@@ -1023,10 +1261,16 @@ object Algebraic extends AlgebraicInstances {
       rounded
     }
   }
+
+  private val MaxIntValue: BigInteger = BigInteger.valueOf(Int.MaxValue.toLong)
+  private val MinIntValue: BigInteger = BigInteger.valueOf(Int.MinValue.toLong)
+  private val MaxLongValue: BigInteger = BigInteger.valueOf(Long.MaxValue)
+  private val MinLongValue: BigInteger = BigInteger.valueOf(Long.MinValue)
 }
 
 trait AlgebraicInstances {
   implicit final val AlgebraicAlgebra = new AlgebraicAlgebra
+
   import NumberTag._
   implicit final val AlgebraicTag = new LargeTag[Algebraic](Exact, Algebraic(0))
 }
