@@ -177,7 +177,7 @@ can be total (`Order`) or partial (`PartialOrder`); although undefined elements 
    + lteqv (`<=`): less-than-or-equivalent
    + min: find least value
    + max: find greatest value
-* *PartialOrder*
+ * *PartialOrder*
    + partialCompare: less-than (`-1.0`), equivalent (`0.0`), greater-than (`1.0`) or incomparable (`NaN`)
    + tryCompare: less-than (`Some(-1)`), equivalent (`Some(0)`), greater-than (`Some(1)`) or incomparable (`None`)
    + pmin: find the least value if the elements are comparable; returns an `Option`
@@ -260,7 +260,7 @@ are parameterized on 2 types: the vector type and the scalar type.
 
 These high-level type classes will pull in all of the relevant algebraic type
 classes. Users who aren't concerned with algebraic properties directly, or who
-wish for more flexibility, should prefer these type classes.
+wish for more permissiveness, should prefer these type classes.
 
  * *Integral*: whole number types (e.g. `Int`, `BigInt`)
  * *Fractional*: fractional/decimal types (e.g. `Double`, `Rational`)
@@ -406,13 +406,13 @@ There are two methods defined:
  * `linearSelect` usually slower, but with guaranteed linear complexity
  * `select` alias for `quickSelect`
  
- Searching methods are located in the `spire.math.Searching`
- object. Given a sorted array (or indexed sequence), these methods
- will locate the index of the desired element (or return -1 if it is
- not found).
+Searching methods are located in the `spire.math.Searching`
+object. Given a sorted array (or indexed sequence), these methods
+will locate the index of the desired element (or return -1 if it is
+not found).
  
-  * `search(array, item)` finds the index of `item` in `array`
-  * `search(array, item, lower, upper)` only searches between `lower` and `upper`.
+ * `search(array, item)` finds the index of `item` in `array`
+ * `search(array, item, lower, upper)` only searches between `lower` and `upper`.
   
 Searching also supports a more esoteric method:
 `minimalElements`. This method returns the minimal elements of a
@@ -458,12 +458,12 @@ user-defined types.
 In addition, Spire provides many other methods which are "missing" from
 `java.Math` (and `scala.math`), such as:
 
- * log(BigDecimal): BigDecimal
- * exp(BigDecimal): BigDecimal
- * pow(BigDecimal): BigDecimal
- * pow(Long): Long
- * gcd(Long, Long): Long
- * and so on...
+ * `log(BigDecimal): BigDecimal`
+ * `exp(BigDecimal): BigDecimal`
+ * `pow(BigDecimal): BigDecimal`
+ * `pow(Long): Long`
+ * `gcd(Long, Long): Long`
+ * *and so on...*
 
 ### Benchmarks
 
@@ -512,7 +512,7 @@ measure relative as well as absolute performance.
 Code is offered as-is, with no implied warranty of any kind. Comments,
 criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
-Copyright 2011-2014 Erik Osheim, Tom Switzer
+Copyright 2011-2015 Erik Osheim, Tom Switzer
 
 A full list of contributors can be found in [AUTHORS.md](AUTHORS.md).
 
