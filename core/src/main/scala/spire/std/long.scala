@@ -39,7 +39,7 @@ trait LongIsNRoot extends NRoot[Long] {
   def nroot(x: Long, n: Int): Long = {
     def findnroot(prev: Long, add: Long): Long = {
       val next = prev | add
-      val e = Math.pow(next, n)
+      val e = spire.math.pow(next, n)
 
       if (e == x || add == 0) {
         next
