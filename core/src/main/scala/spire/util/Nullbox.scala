@@ -8,7 +8,7 @@ object Nullbox {
   def unapply[A](n: Nullbox[A]): Nullbox[A] = n
 }
 
-class Nullbox[A](val ref: A) extends AnyVal {
+class Nullbox[+A](val ref: A) extends AnyVal {
   def isDefined: Boolean = ref != null
   def nonEmpty: Boolean = ref != null
   def isEmpty: Boolean = ref == null
