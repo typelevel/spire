@@ -35,8 +35,8 @@ object NullboxGroupoid {
       override def op(x: A, y: A): A = gp.op(x, y)
       override def opIsDefined(f: A, g: A) = true
       def partialOp(x: A, y: A): Nullbox[A] = Nullbox[A](gp.op(x, y))
-      override def opInverse(x: A, y: A) = gp.opInverse(x, y)
-      override def opInverseIsDefined(x: A, y: A) = true
+      override def opInverse(x: A, y: A): A = gp.opInverse(x, y)
+      override def opInverseIsDefined(x: A, y: A): Boolean = true
       override def partialOpInverse(x: A, y: A): Nullbox[A] = Nullbox[A](gp.opInverse(x, y))
     }
     case _ => new NullboxGroupoid[A] {

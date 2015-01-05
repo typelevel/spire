@@ -16,16 +16,16 @@ import spire.util.Nullbox
   * are defined and (f |+| g) |+| h = f |+| (g |+| h).
   */
 trait Semigroupoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any {
-  def opIsDefined(f: A, g: A): Boolean
-  def op(f: A, g: A): A
+  def opIsDefined(x: A, y: A): Boolean
+  def op(x: A, y: A): A
 }
 
 trait NullboxSemigroupoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Semigroupoid[A] {
-  def partialOp(f: A, g: A): Nullbox[A]
-  def opIsDefined(f: A, g: A): Boolean = partialOp(f, g).nonEmpty
-  def op(f: A, g: A): A = {
-    val res = partialOp(f, g)
-    if (res.isEmpty) throw new IllegalArgumentException(s"$f |+| $g is not defined") else res.get
+  def partialOp(x: A, y: A): Nullbox[A]
+  def opIsDefined(x: A, y: A): Boolean = partialOp(x, y).nonEmpty
+  def op(x: A, y: A): A = {
+    val res = partialOp(x, y)
+    if (res.isEmpty) throw new IllegalArgumentException(s"$x |+| $y is not defined") else res.get
   }
 }
 
@@ -33,19 +33,23 @@ object Semigroupoid {
   @inline final def apply[A](implicit s: Semigroupoid[A]) = s
 }
 
+final class EnrichedSemigroupoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A](sgd: Semigroupoid[A]) extends NullboxSemigroupoid[A] {
+  override def opIsDefined(x: A, y: A) = sgd.opIsDefined(x, y)
+  override def op(x: A, y: A): A = sgd.op(x, y)
+  def partialOp(x: A, y: A): Nullbox[A] =
+    if (sgd.opIsDefined(x, y)) Nullbox[A](sgd.op(x, y)) else Nullbox.empty[A]
+}
+
+final class EnrichedSemigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A](sg: Semigroup[A]) extends NullboxSemigroupoid[A] {
+  override def op(x: A, y: A): A = sg.op(x, y)
+  override def opIsDefined(x: A, y: A) = true
+  def partialOp(x: A, y: A): Nullbox[A] = Nullbox[A](sg.op(x, y))
+}
+
 object NullboxSemigroupoid {
   implicit def enrichSemigroupoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A](implicit sgd: Semigroupoid[A]): NullboxSemigroupoid[A] = sgd match {
     case nbsgd: NullboxSemigroupoid[A] => nbsgd
-    case sg: Semigroup[A] => new NullboxSemigroupoid[A] {
-      override def op(f: A, g: A): A = sg.op(f, g)
-      override def opIsDefined(f: A, g: A) = true
-      def partialOp(f: A, g: A): Nullbox[A] = Nullbox[A](sg.op(f, g))
-    }
-    case _ => new NullboxSemigroupoid[A] {
-      override def opIsDefined(f: A, g: A) = sgd.opIsDefined(f, g)
-      override def op(f: A, g: A): A = sgd.op(f, g)
-      def partialOp(f: A, g: A): Nullbox[A] =
-        if (sgd.opIsDefined(f, g)) Nullbox[A](sgd.op(f, g)) else Nullbox.empty[A]
-    }
+    case sg: Semigroup[A] => new EnrichedSemigroup[A](sg)
+    case _ => new EnrichedSemigroupoid[A](sgd)
   }
 }
