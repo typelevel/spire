@@ -1134,7 +1134,7 @@ object Algebraic extends AlgebraicInstances {
       }
     }
 
-    def apply(expr: Algebraic.Expr): Bound = {
+    def apply(expr: Algebraic.Expr): Bound = checked {
       // Unfortunately, we must call degreeBound early, to avoid many redundant
       // traversals of the Expr tree. Getting this out of the way early on
       // means that we will traverse the tree once and populate the degreeBound
