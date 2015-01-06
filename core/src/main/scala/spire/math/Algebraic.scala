@@ -31,16 +31,18 @@ import spire.macros.Checked.checked
 import spire.syntax.order._
 
 /**
- * Algebraic provides an exact number type for many algebraic numbers. With it,
- * we can represent expressions involving addition, multiplication, division,
- * and n-roots. So, it is similar [[Rational]], but adds n-roots as a valid,
- * exact operation. The cost is that this will not be as fast as [[Rational]]
- * for many operations.
+ * Algebraic provides an exact number type for algebraic numbers. Algebraic
+ * numbers are roots of polynomials with rational coefficients. With it, we can
+ * represent expressions involving addition, multiplication, division, and
+ * n-roots (eg. `sqrt` or `cbrt`) (roots of rational polynomials will be
+ * supported in a later release). So, it is similar [[Rational]], but adds
+ * n-roots as a valid, exact operation. The cost is that this will not be as
+ * fast as [[Rational]] for many operations.
  */
 @SerialVersionUID(1L)
 final class Algebraic private (val expr: Algebraic.Expr)
 extends ScalaNumber with ScalaNumericConversions with Serializable {
-  import Algebraic.{ Zero, One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue, JBigDecimalOrder, roundExact }
+  import Algebraic.{ Zero, One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue, JBigDecimalOrder, roundExact, BFMSS, LiYap }
 
   /**
    * Returns an `Int` with the same sign as this algebraic number. Algebraic
@@ -160,7 +162,11 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   override def toString: String = {
     val approx = toBigDecimal(MathContext.DECIMAL64)
     if (this == Algebraic(approx)) {
-      s"Algebraic(${approx.bigDecimal.stripTrailingZeros})"
+      if (approx.signum == 0) {
+        "Algebraic(0)"
+      } else {
+        s"Algebraic(${approx.bigDecimal.stripTrailingZeros})"
+      }
     } else {
       s"Algebraic(~$approx)"
     }
@@ -454,78 +460,49 @@ object Algebraic extends AlgebraicInstances {
      * Returns the bound for `zbf`, using a cached value if it is available.
      */
     def getBound(zbf: ZeroBoundFunction): zbf.Bound =
-      bounds.getOrElseUpdate(zbf, {
-        this match {
-          case ConstantLong(n) => zbf.integer(n)
-          case ConstantDouble(n) => zbf.rational(n)
-          case ConstantBigDecimal(n) => zbf.rational(n)
-          case ConstantRational(n) => zbf.rational(n)
-          case Neg(sub) => zbf.negate(sub.getBound(zbf))
-          case Add(lhs, rhs) => zbf.add(lhs.getBound(zbf), rhs.getBound(zbf))
-          case Sub(lhs, rhs) => zbf.sub(lhs.getBound(zbf), rhs.getBound(zbf))
-          case Mul(lhs, rhs) => zbf.mul(lhs.getBound(zbf), rhs.getBound(zbf))
-          case Div(lhs, rhs) => zbf.div(lhs.getBound(zbf), rhs.getBound(zbf))
-          case KRoot(sub, k) => zbf.nroot(sub.getBound(zbf), k)
-          case Pow(sub, k) => zbf.pow(sub.getBound(zbf), k)
+      bounds.getOrElseUpdate(zbf, zbf(this)).asInstanceOf[zbf.Bound]
+
+    @volatile
+    private var cachedDegreeBound: Long = 0L
+
+    private def radicalNodes(): Set[KRoot] = {
+      val childRadicals = children.foldLeft(Set.empty[KRoot]) { (acc, child) =>
+        acc ++ child.radicalNodes()
+      }
+      val radicals = this match {
+        case expr @ KRoot(sub, k) =>
+          childRadicals + expr
+        case _ =>
+          childRadicals
+      }
+      if (cachedDegreeBound == 0L) {
+        cachedDegreeBound = radicals.foldLeft(1L) { (acc, kroot) =>
+          checked { acc * kroot.k }
         }
-      }).asInstanceOf[zbf.Bound]
+      }
+      radicals
+    }
 
     /**
      * Returns a bound on the degree of this expression.
      */
-    lazy val degreeBound: Long = {
-      // We only need to include *unique* expressions in the product. To avoid
-      // including equal sub-expressions more than once, we maintain a map from
-      // sub-expressions -> degree, so we can see which expressions have been
-      // visited previously. To avoid re-computation of the hashCode at many
-      // nodes, we key the map by Key, which has a hash which will only ever be
-      // computed once per node.
-
-      case class Key(expr: Expr, hash: Int) {
-        override def hashCode: Int = hash
-        override def equals(that: Any): Boolean = that match {
-          case Key(e, _) => expr == e
-          case _ => false
-        }
-      }
-
-      def constant[A](e: Constant[A], acc: Map[Key, Long]): (Key, Long, Map[Key, Long]) =
-        (Key(e, e.value.hashCode), 1, acc)
-
-      def binary(e: BinaryExpr, id: Int, acc: Map[Key, Long]): (Key, Long, Map[Key, Long]) = {
-        val (lKey, lDeg, acc0) = rec(e.lhs, acc)
-        val (rKey, rDeg, acc1) = rec(e.rhs, acc0)
-        val key = Key(e, 31 * lKey.hash + 23 * rKey.hash + id)
-        val deg = lDeg * rDeg
-        (key, deg, acc1)
-      }
-
-      def rec(e: Expr, acc: Map[Key, Long]): (Key, Long, Map[Key, Long]) = e match {
-        case e: Constant[a] => constant(e, acc)
-        case     Neg(sub) => rec(sub, acc)
-        case e @ Add(_, _) => binary(e, 631, acc)
-        case e @ Sub(_, _) => binary(e, 251, acc)
-        case e @ Mul(_, _) => binary(e, 797, acc)
-        case e @ Div(_, _) => binary(e, 131, acc)
-        case     Pow(sub, _) => rec(sub, acc)
-        case e @ KRoot(sub, k) =>
-          val (subKey, subDeg, acc0) = rec(sub, acc)
-          val key = Key(e, subKey.hash * 29 + 53)
-          val deg =
-            if (acc0 contains key) 1
-            else subDeg * k
-          val acc1 = acc0 + (key -> deg)
-          (key, deg, acc1)
-      }
-
-      rec(this, Map.empty[Key, Long])._2
+    def degreeBound: Long = {
+      if (cachedDegreeBound == 0L)
+        radicalNodes()
+      cachedDegreeBound
     }
 
     /**
      * Returns the BFMSS separation bound.
      */
     def bfmssBound: BitBound =
-      getBound(bfmss).getBitBound(degreeBound)
+      new BitBound(getBound(BFMSS).getBitBound(degreeBound))
+
+    /**
+     * Returns the Li & Yap separation bound.
+     */
+    def liYapBound: BitBound =
+      new BitBound(getBound(LiYap).getBitBound(degreeBound))
 
     /**
      * Returns a separation bound for this expression as a bit bound. A
@@ -535,7 +512,8 @@ object Algebraic extends AlgebraicInstances {
      * simply approximating the expression with enough accuracy that it falls
      * on one side or the other of the separation bound.
      */
-    def separationBound: BitBound = bfmssBound
+    def separationBound: BitBound =
+      bfmssBound min liYapBound
 
     /**
      * Returns an asbolute approximation to this expression as a BigDecimal
@@ -819,6 +797,11 @@ object Algebraic extends AlgebraicInstances {
           Algebraic.nroot(value, k, digits, RoundingMode.DOWN)
         }
       }
+
+      // To avoid multiple traversals during degreeBound, we cache the hashCode
+      // for KRoots.
+      override lazy val hashCode: Int =
+        sub.hashCode * 23 + k * 29 + 13
     }
 
     @SerialVersionUID(0L)
@@ -877,6 +860,11 @@ object Algebraic extends AlgebraicInstances {
     def -(rhs: Int): BitBound = new BitBound(this.bitBound - rhs)
     def *(rhs: Int): BitBound = new BitBound(this.bitBound * rhs)
     def /(rhs: Int): BitBound = new BitBound(this.bitBound / rhs)
+
+    def min(that: BitBound): BitBound =
+      if (bitBound < that.bitBound) this else that
+
+    override def toString: String = s"BitBound($bitBound)"
   }
 
   object BitBound {
@@ -890,166 +878,6 @@ object Algebraic extends AlgebraicInstances {
       ceil(n.toDouble * lg2ToLg10).toLong
 
     final def apply(n: Int): BitBound = new BitBound(n)
-  }
-
-  /**
-   * A zero bound function, defined over an algebraic expression algebra.
-   */
-  sealed trait ZeroBoundFunction {
-
-    /**
-     * Some state that is computed for each node in the expression tree. This
-     * state is typically memoized, to avoid recomputation.
-     */
-    type Bound
-
-    /**
-     * Returns a bound for `n`. The default implementation treats `n` as a
-     * BigInt.
-     */
-    def integer(n: Long): Bound =
-      integer(BigInt(n))
-
-    /**
-     * Returns a bound for an integer `n`.
-     */
-    def integer(n: BigInt): Bound
-
-    /**
-     * Returns a bound for `n`. The default implementation treats `n` as a
-     * rational number (division of 2 BigInts) and so introduces a division.
-     */
-    def rational(n: Double): Bound =
-      rational(BigDecimal(n))
-
-    /**
-     * Returns a bound for `n`. The default implementation treats `n` as a
-     * rational number (division of 2 BigInts) and so introduces a division.
-     */
-    def rational(n: BigDecimal): Bound =
-      rational(Rational(n))
-
-    /**
-     * Returns a bound for `n`. The default implementation treats `n` as a
-     * division of 2 `BigInt`s and so introduces a division.
-     */
-    def rational(n: Rational): Bound =
-      div(integer(n.numerator), integer(n.denominator))
-
-    /** Returns the bound for the negation of `sub`. */
-    def negate(sub: Bound): Bound
-
-    /** Returns the bound for the addition of the 2 sub expressions `lhs` and `rhs`. */
-    def add(lhs: Bound, rhs: Bound): Bound
-
-    /** Returns the bound for the subtraction of the 2 sub expressions `lhs` and `rhs`. */
-    def sub(lhs: Bound, rhs: Bound): Bound
-
-    /** Returns the bound for the multiplication of the 2 sub expressions `lhs` and `rhs`. */
-    def mul(lhs: Bound, rhs: Bound): Bound
-
-    /** Returns the bound for the division of the 2 sub expressions `lhs` and `rhs`. */
-    def div(lhs: Bound, rhs: Bound): Bound
-
-    /** Returns the bound on the k-th root of `sub`. */
-    def nroot(sub: Bound, k: Int): Bound
-
-    /** Returns the bound on the power of `sub`. */
-    def pow(sub: Bound, k: Int): Bound
-  }
-
-  /**
-   * An implementation of "A Separation Bound for Real Algebraic Expressions",
-   * by Burnikel, Funke, Mehlhorn, Schirra, and Schmitt. This provides a good
-   * [[ZeroBoundFunction]] for use in sign tests.
-   *
-   * Unlike the paper, we use log-arithmetic instead of working with exact,
-   * big integer values. This means our bound isn't technically as good as it
-   * could be, but we save the cost of working with arithmetic. We also perform
-   * all log arithmetic using `Long`s and check for overflow (throwing
-   * `ArithmeticException`s when detected). In practice we shouldn't hit this
-   * limit, but in case we do, we prefer to throw over failing silently.
-   */
-  @SerialVersionUID(0L)
-  case object bfmss extends ZeroBoundFunction {
-
-    /** Our state that we store, per node. */
-    final case class Bound(l: Long, u: Long) {
-      def getBitBound(degreeBound: Long): BitBound =
-        new BitBound(l + u * (degreeBound - 1))
-    }
-
-    def integer(n: BigInt): Bound =
-      Bound(0, n.abs.bitLength + 1)
-
-    def negate(sub: Bound): Bound =
-      sub
-
-    // We're not being fair to the BFMSS bound here. We're really just
-    // setting a bound on the max value. However, the alternative would
-    // require us to work outside of log arithmetic.
-    def add(lhs: Bound, rhs: Bound): Bound = checked {
-      Bound(
-        lhs.l + rhs.l,
-        math.max(lhs.u + rhs.l, lhs.l + rhs.u) + 1
-      )
-    }
-
-    def sub(lhs: Bound, rhs: Bound): Bound =
-      add(lhs, rhs)
-
-    def mul(lhs: Bound, rhs: Bound): Bound = checked {
-      Bound(
-        lhs.l + rhs.l,
-        lhs.u + rhs.u
-      )
-    }
-
-    def div(lhs: Bound, rhs: Bound): Bound = checked {
-      Bound(
-        lhs.l + rhs.u,
-        lhs.u + rhs.l
-      )
-    }
-
-    def nroot(sub: Bound, k: Int): Bound = checked {
-      if (sub.u < sub.l) {
-        Bound(
-          (sub.l + (k - 1) * sub.u) / k,
-          sub.u
-        )
-      } else {
-        Bound(
-          sub.l,
-          (sub.u * (k - 1) * sub.l) / k
-        )
-      }
-    }
-
-    def pow(sub: Bound, k: Int): Bound = {
-      @tailrec def sum(acc: Long, k: Int, extra: Long): Long =
-        if (k == 1) {
-          checked(acc + extra)
-        } else {
-          val x =
-            if ((k & 1) == 1) checked(acc + extra)
-            else extra
-          sum(checked(acc + acc), k >>> 1, x)
-        }
-
-      if (k > 1) {
-        Bound(
-          sum(sub.l, k - 1, sub.l),
-          sum(sub.u, k - 1, sub.u)
-        )
-      } else if (k == 1) {
-        sub
-      } else if (k == 0) {
-        throw new IllegalArgumentException("exponent cannot be 0")
-      } else {
-        throw new IllegalArgumentException("exponent cannot be negative")
-      }
-    }
   }
 
   /**
@@ -1266,6 +1094,243 @@ object Algebraic extends AlgebraicInstances {
   private val MinIntValue: BigInteger = BigInteger.valueOf(Int.MinValue.toLong)
   private val MaxLongValue: BigInteger = BigInteger.valueOf(Long.MaxValue)
   private val MinLongValue: BigInteger = BigInteger.valueOf(Long.MinValue)
+
+  /**
+   * A zero bound function, defined over an algebraic expression algebra.
+   */
+  sealed abstract class ZeroBoundFunction {
+
+    /**
+     * Some state that is computed for each node in the expression tree. This
+     * state is typically memoized, to avoid recomputation.
+     */
+    type Bound
+
+    def apply(expr: Algebraic.Expr): Bound
+  }
+
+  /** 
+   * An implementation of "A New Constructive Root Bound for Algebraic
+   * Expressions" by Chen Li & Chee Yap.
+   */
+  @SerialVersionUID(0L)
+  case object LiYap extends ZeroBoundFunction {
+    import Expr._
+
+    final case class Bound(
+      /** Bound on the leading coefficient. */
+      lc: Long,
+      /** Bound on the trailing coefficient. */
+      tc: Long,
+      /** Bound on the measure. */
+      measure: Long,
+      /** Lower bound on the value. */
+      lb: Long,
+      /** Upper bound on the value. */
+      ub: Long
+    ) {
+      def getBitBound(degreeBound: Long): Long = checked {
+        ub * (degreeBound - 1) + lc
+      }
+    }
+
+    def apply(expr: Algebraic.Expr): Bound = {
+      // Unfortunately, we must call degreeBound early, to avoid many redundant
+      // traversals of the Expr tree. Getting this out of the way early on
+      // means that we will traverse the tree once and populate the degreeBound
+      // cache in all nodes right away. If we do it in a bottom up fashion,
+      // then we risk terrible runtime behaviour.
+      val degreeBound = expr.degreeBound
+      expr match {
+        case ConstantLong(n) =>
+          rational(Rational(n))
+
+        case ConstantDouble(n) =>
+          rational(Rational(n))
+
+        case ConstantBigDecimal(n) =>
+          rational(Rational(n))
+
+        case ConstantRational(n) =>
+          rational(n)
+
+        case Neg(sub) =>
+          sub.getBound(this)
+
+        case expr: AddOrSubExpr =>
+          val lhsExpr = expr.lhs
+          val rhsExpr = expr.rhs
+          val lhs = lhsExpr.getBound(this)
+          val rhs = rhsExpr.getBound(this)
+          val lc = lhs.lc * rhsExpr.degreeBound + rhs.lc * lhsExpr.degreeBound
+          val tc = lhs.measure * rhsExpr.degreeBound + rhs.measure * lhsExpr.degreeBound + 2 * degreeBound
+          val measure = tc
+          val ub = max(lhs.ub, rhs.ub) + 1
+          val lb = max(-measure, -(ub * (degreeBound - 1) + lc))
+          Bound(lc, tc, measure, lb, ub)
+
+        case Mul(lhsExpr, rhsExpr) =>
+          val lhs = lhsExpr.getBound(this)
+          val rhs = rhsExpr.getBound(this)
+          val lc = lhs.lc * rhsExpr.degreeBound + rhs.lc * lhsExpr.degreeBound
+          val tc = lhs.tc * rhsExpr.degreeBound + rhs.tc * lhsExpr.degreeBound
+          val measure = lhs.measure * rhsExpr.degreeBound + rhs.measure * lhsExpr.degreeBound
+          val lb = lhs.lb + rhs.lb
+          val ub = lhs.ub + rhs.ub
+          Bound(lc, tc, measure, lb, ub)
+
+        case Div(lhsExpr, rhsExpr) =>
+          val lhs = lhsExpr.getBound(this)
+          val rhs = rhsExpr.getBound(this)
+          val lc = lhs.lc * rhsExpr.degreeBound + rhs.tc * lhsExpr.degreeBound
+          val tc = lhs.tc * rhsExpr.degreeBound + rhs.lc * lhsExpr.degreeBound
+          val measure = lhs.measure * rhsExpr.degreeBound + rhs.measure * lhsExpr.degreeBound
+          val lb = lhs.lb - rhs.ub
+          val ub = lhs.ub - rhs.lb
+          Bound(lc, tc, measure, lb, ub)
+
+        case KRoot(subExpr, k) =>
+          val sub = subExpr.getBound(this)
+          val lb = sub.lb / k
+          val ub = if (sub.ub % k == 0) (sub.ub / k)
+                   else ((sub.ub / k) + 1)
+          Bound(sub.lc, sub.tc, sub.measure, lb, ub)
+
+        case Pow(subExpr, k) =>
+          val sub = subExpr.getBound(this)
+          Bound(sub.lc * k, sub.tc * k, sub.measure * k, sub.lb * k, sub.ub * k)
+      }
+    }
+
+    private def rational(n: Rational): Bound = {
+      // TODO: We can do better here. The + 1 isn't always needed in a & b.
+      // Also, the upper and lower bounds could be much tighter if we actually
+      // partially perform the division.
+      val a = n.numerator.abs.bitLength + 1
+      if (n.denominator == BigInt(1)) {
+        Bound(0, a, a, a - 1, a)
+      } else {
+        val b = n.denominator.bitLength + 1
+        Bound(b, a, max(a, b), a - b - 1, a - b + 1)
+      }
+    }
+  }
+
+  /**
+   * An implementation of "A Separation Bound for Real Algebraic Expressions",
+   * by Burnikel, Funke, Mehlhorn, Schirra, and Schmitt. This provides a good
+   * [[ZeroBoundFunction]] for use in sign tests.
+   *
+   * Unlike the paper, we use log-arithmetic instead of working with exact,
+   * big integer values. This means our bound isn't technically as good as it
+   * could be, but we save the cost of working with arithmetic. We also perform
+   * all log arithmetic using `Long`s and check for overflow (throwing
+   * `ArithmeticException`s when detected). In practice we shouldn't hit this
+   * limit, but in case we do, we prefer to throw over failing silently.
+   */
+  @SerialVersionUID(0L)
+  case object BFMSS extends ZeroBoundFunction {
+    import Expr._
+
+    /** Our state that we store, per node. */
+    final case class Bound(l: Long, u: Long) {
+      def getBitBound(degreeBound: Long): Long = checked {
+        l + u * (degreeBound - 1)
+      }
+    }
+
+    def apply(expr: Algebraic.Expr): Bound = expr match {
+      case ConstantLong(n) => integer(n)
+      case ConstantDouble(n) => rational(n)
+      case ConstantBigDecimal(n) => rational(n)
+      case ConstantRational(n) => rational(n)
+      case Neg(sub) => sub.getBound(this)
+      case Add(lhs, rhs) => add(lhs.getBound(this), rhs.getBound(this))
+      case Sub(lhs, rhs) => add(lhs.getBound(this), rhs.getBound(this))
+      case Mul(lhs, rhs) => mul(lhs.getBound(this), rhs.getBound(this))
+      case Div(lhs, rhs) => div(lhs.getBound(this), rhs.getBound(this))
+      case KRoot(sub, k) => nroot(sub.getBound(this), k)
+      case Pow(sub, k) => pow(sub.getBound(this), k)
+    }
+
+    private def integer(n: Long): Bound =
+      integer(BigInt(n))
+
+    private def integer(n: BigInt): Bound =
+      Bound(0, n.abs.bitLength + 1)
+
+    private def rational(n: Double): Bound =
+      rational(BigDecimal(n))
+
+    private def rational(n: BigDecimal): Bound =
+      rational(Rational(n))
+
+    private def rational(n: Rational): Bound =
+      div(integer(n.numerator), integer(n.denominator))
+
+    // We're not being fair to the BFMSS bound here. We're really just
+    // setting a bound on the max value. However, the alternative would
+    // require us to work outside of log arithmetic.
+    private def add(lhs: Bound, rhs: Bound): Bound = checked {
+      Bound(
+        lhs.l + rhs.l,
+        math.max(lhs.u + rhs.l, lhs.l + rhs.u) + 1
+      )
+    }
+
+    private def mul(lhs: Bound, rhs: Bound): Bound = checked {
+      Bound(
+        lhs.l + rhs.l,
+        lhs.u + rhs.u
+      )
+    }
+
+    private def div(lhs: Bound, rhs: Bound): Bound = checked {
+      Bound(
+        lhs.l + rhs.u,
+        lhs.u + rhs.l
+      )
+    }
+
+    private def nroot(sub: Bound, k: Int): Bound = checked {
+      if (sub.u < sub.l) {
+        Bound(
+          (sub.l + (k - 1) * sub.u) / k,
+          sub.u
+        )
+      } else {
+        Bound(
+          sub.l,
+          (sub.u * (k - 1) * sub.l) / k
+        )
+      }
+    }
+
+    private def pow(sub: Bound, k: Int): Bound = {
+      @tailrec def sum(acc: Long, k: Int, extra: Long): Long =
+        if (k == 1) {
+          checked(acc + extra)
+        } else {
+          val x =
+            if ((k & 1) == 1) checked(acc + extra)
+            else extra
+          sum(checked(acc + acc), k >>> 1, x)
+        }
+
+      if (k > 1) {
+        Bound(
+          sum(sub.l, k - 1, sub.l),
+          sum(sub.u, k - 1, sub.u)
+        )
+      } else if (k == 1) {
+        sub
+      } else if (k == 0) {
+        throw new IllegalArgumentException("exponent cannot be 0")
+      } else {
+        throw new IllegalArgumentException("exponent cannot be negative")
+      }
+    }
+  }
 }
 
 trait AlgebraicInstances {
