@@ -142,6 +142,83 @@ object Polynomial extends PolynomialInstances {
       }
     loop(Polynomial.zero[C], Nil, points.toList)
   }
+
+  final def VAS(poly: Polynomial[BigInt]): Vector[Interval[Rational]] = {
+    import spire.std.bigInt._
+
+    val x = Polynomial.x[BigInt]
+    val one = Polynomial.one[BigInt]
+
+    // Return an upper bound on the roots of the polynomial p.
+    def upperBound(p: Polynomial[BigInt]): Int = {
+      val lgLastCoeff = p.maxOrderTermCoeff.abs.bitLength
+      val n = p.degree
+      var maxBound = Double.NegativeInfinity
+      p.foreachNonZero { (k, coeff) =>
+        if (k != n) {
+          val i = n - k
+          val bound = ((coeff.abs.bitLength - lgLastCoeff - 1) / i) + 2
+          maxBound = max(maxBound, bound.toDouble)
+        }
+      }
+      if (maxBound.isValidInt) {
+        maxBound.toInt
+      } else {
+        throw new ArithmeticException("bound too large")
+      }
+    }
+
+    // Return a lower bound on the roots of the polynomial p.
+    def lowerBound(p: Polynomial[BigInt]): Int =
+      -upperBound(p.reciprocal)
+
+    // Find all roots recursively that are between (0, 1) and (1, infinity).
+    def split1(p: Polynomial[BigInt], a: BigInt, b: BigInt, c: BigInt, d: BigInt): Vector[Interval[Rational]] = {
+      val r = p.compose(x + one)
+      val rRoots = rec(r, a, b, c + a, d + b)
+      if (r.signVariations < p.signVariations) {
+        var l = p.reciprocal.compose(x + one)
+        while (l(0) == 0)
+          l = l.mapTerms { case Term(coeff, exp) => Term(coeff, exp - 1) }
+        val lRoots = rec(l, b, a + b, d, c + d)
+        lRoots ++ rRoots
+      } else {
+        rRoots
+      }
+    }
+
+    // Isolate all positive roots in polynomial p.
+    def rec(p: Polynomial[BigInt], a: BigInt, b: BigInt, c: BigInt, d: BigInt): Vector[Interval[Rational]] = {
+      if (p(BigInt(0)) == BigInt(0)) {
+        val p0 = p.mapTerms { case Term(coeff, exp) => Term(coeff, exp - 1) }
+        Interval.point(Rational(c, d)) +: rec(p0, a, b, c, d)
+      } else {
+        p.signVariations match {
+          case 0 => // No roots.
+            Vector.empty
+
+          case 1 => // Isolated exactly 1 root.
+            def ub = Rational(BigInt(1) << upperBound(p))
+            val i0 = if (c == 0) ub else Rational(a, c)
+            val i1 = if (d == 0) ub else Rational(b, d)
+            if (i0 < i1) Vector(Interval.open(i0, i1))
+            else Vector(Interval.open(i1, i0))
+
+          case _ => // Exists 0 or 2 or more roots.
+            val lb = lowerBound(p)
+            if (lb < 0) {
+              split1(p, a, b, c, d)
+            } else {
+              val flr = BigInt(1) << lb
+              split1(p.compose(x + constant(flr)), a, b + a * flr, c, d + c * flr)
+            }
+        }
+      }
+    }
+
+    val zeroInterval = Interval.point(Rational.zero)
+    rec(poly, 1, 0, 0, 1) ++ rec(poly.flip, 1, 0, 0, 1).map(-_).filter(_ != zeroInterval)
+  }
 }
 
 trait Polynomial[@spec(Double) C] { lhs =>
@@ -153,8 +230,18 @@ trait Polynomial[@spec(Double) C] { lhs =>
   /** Returns a polynomial that has a sparse representation. */
   def toSparse(implicit ring: Semiring[C], eq: Eq[C]): PolySparse[C]
 
+  /**
+   * Traverses each term in this polynomial, in order of degree, lowest to
+   * highest (eg. constant term would be first) and calls `f` with the degree
+   * of term and its coefficient. This may skip zero terms, or it may not.
+   */
   def foreach[U](f: (Int, C) => U): Unit
 
+  /**
+   * Traverses each non-zero term in this polynomial, in order of degree, lowest
+   * to highest (eg. constant term would be first) and calls `f` with the degree
+   * of term and its coefficient.
+   */
   def foreachNonZero[U](f: (Int, C) => U)(implicit ring: Semiring[C], eq: Eq[C]): Unit =
     foreach { (e, c) => if (c =!= ring.zero) f(e, c) }
 
@@ -223,6 +310,48 @@ trait Polynomial[@spec(Double) C] { lhs =>
 
   def derivative(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C]
   def integral(implicit field: Field[C], eq: Eq[C]): Polynomial[C]
+
+  /**
+   * Returns the number of sign variations in the coefficients of this
+   * polynomial. Given 2 consecutive terms (ignoring 0 terms), a sign variation
+   * is indicated when the terms have differing signs.
+   */
+  def signVariations(implicit ring: Semiring[C], eq: Eq[C], signed: Signed[C]): Int = {
+    var prevSign: Sign = Sign.Zero
+    var variations = 0
+    foreachNonZero { (_, c) =>
+      val sign = signed.sign(c)
+      if (Sign.Zero != prevSign && sign != prevSign) {
+        variations += 1
+      }
+      prevSign = sign
+    }
+    variations
+  }
+
+  def mapTerms[D: Semiring: Eq: ClassTag](f: Term[C] => Term[D])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[D] =
+    Polynomial(terms map f)
+
+  /**
+   * Replace `x`, the variable, in this polynomial with `-x`. This will
+   * flip/mirror the polynomial about the y-axis.
+   */
+  def flip(implicit ring: Rng[C], eq: Eq[C]): Polynomial[C] =
+    mapTerms { case term @ Term(coeff, exp) =>
+      if (exp % 2 == 0) term
+      else Term(-coeff, exp)
+    }
+
+  /**
+   * Returns the reciprocal of this polynomial. Essentially, if this polynomial
+   * is `p` with degree `n`, then returns a polynomial `q(x) = x^n*p(1/x)`.
+   *
+   * @see http://en.wikipedia.org/wiki/Reciprocal_polynomial
+   */
+  def reciprocal(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] =
+    mapTerms { case term @ Term(coeff, exp) =>
+      Term(coeff, degree - exp)
+    }
 
   // EuclideanRing ops.
 
