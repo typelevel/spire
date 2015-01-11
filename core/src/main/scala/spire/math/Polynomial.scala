@@ -9,6 +9,7 @@ import scala.{specialized => spec}
 import spire.algebra._
 import spire.math.poly._
 import spire.std.array._
+import spire.std.bigInt._
 import spire.syntax.field._
 import spire.syntax.eq._
 import spire.syntax.std.seq._
@@ -143,6 +144,32 @@ object Polynomial extends PolynomialInstances {
     loop(Polynomial.zero[C], Nil, points.toList)
   }
 
+  /**
+   * Isolates the roots of the [[Rational]] polynomial `poly`. This returns a
+   * sequence of intervals that each contain a single root of `poly`. A root
+   * will appear in the sequence as many times as its multiplicity in the
+   * polynomial. Other than this, all root intervals are disjoint and are
+   * either open on both ends or is a single point.
+   */
+  final def isolateRoots(poly: Polynomial[Rational]): Vector[Interval[Rational]] = {
+    val coeffs = poly.coeffsArray
+    val factors = coeffs.foldLeft(BigInt(1)) { (acc, coeff) =>
+      val d = coeff.denominator
+      acc * (d / acc.gcd(d))
+    }
+    val zCoeffs = coeffs.map(n => n.numerator * (factors / n.denominator))
+    val zPoly = dense(zCoeffs)
+    VAS(zPoly)
+  }
+
+  /**
+   * An implementation of the VAS real root isolation algorithm.
+   *
+   * See "A Comparative Study of Two Real Root Isolation Methods" for the paper
+   * that originally presented the method implemented here, and "Complexity
+   * Analysis of Algorithms in Algebraic Computation" by Vikram Sharma which
+   * goes into greater detail.
+   */
   final def VAS(poly: Polynomial[BigInt]): Vector[Interval[Rational]] = {
     import spire.std.bigInt._
 
@@ -175,7 +202,7 @@ object Polynomial extends PolynomialInstances {
     // Find all roots recursively that are between (0, 1) and (1, infinity).
     def split1(p: Polynomial[BigInt], a: BigInt, b: BigInt, c: BigInt, d: BigInt): Vector[Interval[Rational]] = {
       val r = p.compose(x + one)
-      val rRoots = rec(r, a, b, c + a, d + b)
+      val rRoots = rec(r, a, b + a, c, d + c)
       if (r.signVariations < p.signVariations) {
         var l = p.reciprocal.compose(x + one)
         while (l(0) == 0)
@@ -217,7 +244,9 @@ object Polynomial extends PolynomialInstances {
     }
 
     val zeroInterval = Interval.point(Rational.zero)
-    rec(poly, 1, 0, 0, 1) ++ rec(poly.flip, 1, 0, 0, 1).map(-_).filter(_ != zeroInterval)
+    val posRoots = rec(poly, 1, 0, 0, 1)
+    val negRoots = rec(poly.flip, 1, 0, 0, 1).map(-_).filter(_ != zeroInterval)
+    negRoots ++ posRoots
   }
 }
 
