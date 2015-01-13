@@ -31,9 +31,8 @@ trait GroupLaws[A] extends Laws {
     ),
 
     "associative: (a |+|? b) |+|? c === a |+|? (b |+|? c)" → forAll((a: A, b: A, c: A) => {
-      import spire.optional.optionSemigroup._
-
-      ((Option(a) |+| Option(b)) |+| Option(c)) === (Option(a) |+| (Option(b) |+| Option(c)))
+      (!(a |+|?? b) || !(b |+|?? c)) ||
+      ((a |+| b) |+| c) === (a |+| (b |+| c))
     }
     )
   )
