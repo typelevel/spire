@@ -13,6 +13,7 @@ cases, generic implementations using Spire's specialized type classes perform
 identically to corresponding direct implementations.
 
 [![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/non/spire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Spire is provided to you as free software under the
 [MIT license](COPYING).
