@@ -1,5 +1,7 @@
 ## Spire
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/non/spire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ### Overview
 
 Spire is a numeric library for Scala which is intended to be generic, fast,
