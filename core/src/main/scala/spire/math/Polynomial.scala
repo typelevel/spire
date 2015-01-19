@@ -202,8 +202,8 @@ object Polynomial extends PolynomialInstances {
       if (dx.compareTo(eps) <= 0) {
         Interval.open(lx, rx)
       } else {
-        val delta = dx.multiply(s.ulp).setScale(digits + 1, RoundingMode.HALF_UP)
-        val k = s.unscaledValue.intValue
+        val delta = dx.multiply(s.ulp)
+        val k = s.unscaledValue
         val x1 = lx.add(delta.multiply(new JBigDecimal(k))).setScale(digits, RoundingMode.HALF_UP)
         val y1 = evalExact(x1)
         val s1 = y1.sign
@@ -376,7 +376,7 @@ object Polynomial extends PolynomialInstances {
     def rec(p: Polynomial[BigInt], a: BigInt, b: BigInt, c: BigInt, d: BigInt): Vector[Interval[Rational]] = {
       if (p(BigInt(0)) == BigInt(0)) {
         val p0 = p.mapTerms { case Term(coeff, exp) => Term(coeff, exp - 1) }
-        Interval.point(Rational(c, d)) +: rec(p0, a, b, c, d)
+        Interval.point(Rational(b, d)) +: rec(p0, a, b, c, d)
       } else {
         p.signVariations match {
           case 0 => // No roots.
