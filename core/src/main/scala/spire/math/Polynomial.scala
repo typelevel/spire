@@ -63,6 +63,8 @@ object Polynomial extends PolynomialInstances {
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map(0 -> c))
   def linear[@spec(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map(1 -> c))
+  def linear[@spec(Double) C: Eq: Semiring: ClassTag](c1: C, c0: C): Polynomial[C] =
+    Polynomial(Map(1 -> c1, 0 -> c0))
   def quadratic[@spec(Double) C: Eq: Semiring: ClassTag](c1: C, c0: C): Polynomial[C] =
     Polynomial(Map(1 -> c1, 0 -> c0))
   def quadratic[@spec(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
@@ -383,7 +385,11 @@ object Polynomial extends PolynomialInstances {
             Vector.empty
 
           case 1 => // Isolated exactly 1 root.
-            def ub = Rational(BigInt(1) << upperBound(p))
+            def ub = {
+              val exp = upperBound(p)
+              if (exp >= 0) Rational(BigInt(1) << exp)
+              else Rational(1, BigInt(1) << -exp)
+            }
             val i0 = if (c == 0) ub else Rational(a, c)
             val i1 = if (d == 0) ub else Rational(b, d)
             if (i0 < i1) Vector(Interval.open(i0, i1))
