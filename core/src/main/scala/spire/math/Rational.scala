@@ -4,6 +4,7 @@ import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import java.lang.Math
+import java.math.{ BigDecimal => JBigDecimal, MathContext, RoundingMode }
 
 import spire.algebra.{Field, IsReal, NRoot, Sign}
 import spire.algebra.Sign.{ Positive, Zero, Negative }
@@ -43,6 +44,18 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   }
 
   def gcd(rhs: Rational): Rational
+
+  def toBigDecimal(scale: Int, mode: RoundingMode): BigDecimal = {
+    val n = new JBigDecimal(numerator.bigInteger)
+    val d = new JBigDecimal(denominator.bigInteger)
+    BigDecimal(n.divide(d, scale, mode))
+  }
+
+  def toBigDecimal(mc: MathContext): BigDecimal = {
+    val n = new JBigDecimal(numerator.bigInteger)
+    val d = new JBigDecimal(denominator.bigInteger)
+    BigDecimal(n.divide(d, mc))
+  }
 
   def toBigInt: BigInt
   def toBigDecimal: BigDecimal
