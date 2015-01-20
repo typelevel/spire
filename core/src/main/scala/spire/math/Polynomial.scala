@@ -166,17 +166,35 @@ object Polynomial extends PolynomialInstances {
 
     // TODO: See if Algebraic is faster.
     def evalExact(x: JBigDecimal): JBigDecimal =
-      poly(Rational(BigDecimal(x, MathContext.UNLIMITED)))
+      poly(Rational(new BigDecimal(x, MathContext.UNLIMITED)))
         .toBigDecimal(digits, RoundingMode.UP)
         .bigDecimal
 
     val lb = lowerBound.toBigDecimal(digits, RoundingMode.CEILING).bigDecimal
     val ub = upperBound.toBigDecimal(digits, RoundingMode.FLOOR).bigDecimal
 
-    // TODO: Re-use evalExact for lb/ub in QIR.
-    if (poly(lowerBound).sign != evalExact(lb).sign) {
+    val qlb = Rational(new BigDecimal(lb, MathContext.UNLIMITED))
+    val qub = Rational(new BigDecimal(ub, MathContext.UNLIMITED))
+
+    // Returns true if there is a root in the open sub-interval (l, r).
+    def hasRoot(l: Rational, r: Rational): Boolean =
+      if (l != r) {
+        // Ue Descartes' rule of signs to see if the root in the open interval
+        // is actually in the sub interval (l, r).
+        val poly0 = poly
+          .shift(l)
+          .removeZeroRoots
+          .reciprocal
+          .shift((r - l).reciprocal)
+          .removeZeroRoots
+        poly0.signVariations % 2 == 1
+      } else {
+        false
+      }
+
+    if (hasRoot(lowerBound, qlb)) {
       Interval.point(BigDecimal(lb))
-    } else if (poly(upperBound).sign != evalExact(ub).sign) {
+    } else if (hasRoot(qub, upperBound)) {
       Interval.point(BigDecimal(ub))
     } else {
       QIR(lb, ub, digits)(evalExact).mapBounds(BigDecimal(_))
@@ -470,6 +488,17 @@ trait Polynomial[@spec(Double) C] { lhs =>
   /** Returns the term of the highest degree in this polynomial. */
   def maxTerm(implicit ring: Semiring[C]): Term[C] = Term(maxOrderTermCoeff, degree)
 
+  /**
+   * Returns the non-zero term of the minimum degree in this polynomial, unless
+   * it is zero. If this polynomial is zero, then this returns a zero term.
+   */
+  def minTerm(implicit ring: Semiring[C], eq: Eq[C]): Term[C] = {
+    foreachNonZero { (n, c) =>
+      return Term(c, n)
+    }
+    Term(ring.zero, 0)
+  }
+
   /** Returns the degree of this polynomial. */
   def degree: Int
 
@@ -522,8 +551,30 @@ trait Polynomial[@spec(Double) C] { lhs =>
     variations
   }
 
+  /**
+   * Removes all zero roots from this polynomial.
+   */
+  def removeZeroRoots(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] = {
+    val Term(_, k) = minTerm
+    mapTerms { case Term(c, n) => Term(c, n - k) }
+  }
+
   def mapTerms[D: Semiring: Eq: ClassTag](f: Term[C] => Term[D])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[D] =
     Polynomial(terms map f)
+
+  /**
+   * Returns this polynomial shifted by `h`. Equivalent to calling
+   * `poly.compose(x + h)`.
+   */
+  def shift(h: C)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] =
+    compose(Polynomial.x[C] + Polynomial.constant(h))
+
+  /**
+   * Translates this polynomial by `h`. Equivalent to calling
+   * `poly.compose(x - h)`.
+   */
+  def translate(h: C)(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] =
+    compose(Polynomial.x[C] - Polynomial.constant(h))
 
   /**
    * Replace `x`, the variable, in this polynomial with `-x`. This will
