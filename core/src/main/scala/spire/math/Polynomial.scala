@@ -157,70 +157,6 @@ object Polynomial extends PolynomialInstances {
   }
 
   /**
-   * A trait that can be used to retreive the (possibly approximated) real
-   * roots of the polynomial `poly`.
-   */
-  trait Roots[A] { self =>
-
-    /** The polynomial the roots belong to. */
-    def poly: Polynomial[A]
-
-    /** Returns the number of real roots of `poly`. */
-    def count: Int
-
-    /**
-     * Returns the `i`-th real root of `poly`, or throws an
-     * `IndexOutOfBoundsException` if there is no `i`-th real root.
-     */
-    def get(i: Int): A
-  }
-
-  /**
-   * A type class that can find roots of a polynomial.
-   */
-  trait RootFinder[A] {
-
-    /**
-     * Returns the roots of the polynomial `poly`.
-     */
-    def findRoots(poly: Polynomial[A]): Roots[A]
-  }
-
-  object RootFinder {
-    implicit def BigDecimalScaleRootFinder(scale: Int): RootFinder[BigDecimal] =
-      new RootFinder[BigDecimal] {
-        def findRoots(poly: Polynomial[BigDecimal]): Roots[BigDecimal] =
-          new BigDecimalRoots(poly, scale)
-      }
-  }
-
-  private class BigDecimalRoots(
-    val poly: Polynomial[BigDecimal],
-    scale: Int
-  ) extends Roots[BigDecimal] {
-    private val qPoly: Polynomial[Rational] = poly.map(Rational(_))
-    private val isolated: Vector[Interval[Rational]] = isolateRoots(qPoly)
-
-    def count: Int = isolated.size
-
-    def get(i: Int): BigDecimal = if (i < 0 || i >= count) {
-      throw new IndexOutOfBoundsException(i.toString)
-    } else {
-      isolated(i) match {
-        case Point(value) =>
-          value.toBigDecimal(scale, RoundingMode.HALF_EVEN)
-        case Bounded(lb, ub, _) =>
-          new BigDecimal(
-            BigDecimalRootRefinement.QIR(qPoly, lb, ub, scale).approximation,
-            MathContext.UNLIMITED
-          )
-        case _ =>
-          throw new RuntimeException("invalid isolated root interval")
-      }
-    }
-  }
-
-  /**
    * Isolates the roots of the [[Rational]] polynomial `poly`. This returns a
    * sequence of intervals that each contain a single root of `poly`. A root
    * will appear in the sequence as many times as its multiplicity in the
@@ -380,7 +316,25 @@ trait Polynomial[@spec(Double) C] { lhs =>
     bldr.result()
   }
 
-  def roots(implicit finder: Polynomial.RootFinder[C]): Polynomial.Roots[C] =
+  /**
+   * Returns the real roots of this polynomial.
+   *
+   * Depending on `C`, the `finder` argument may need to be passed "explicitly"
+   * via an implicit conversion. This is because some types (eg `BigDecimal`,
+   * `Rational`, etc) require an error bound, and so provide implicit
+   * conversions to `RootFinder`s from the error type.  For instance,
+   * `BigDecimal` requires either a scale or MathContext. So, we'd call this
+   * method with `poly.roots(MathContext.DECIMAL128)`, which would return a
+   * `Roots[BigDecimal` whose roots are approximated to the precision specified
+   * in `DECIMAL128` and rounded appropriately.
+   *
+   * On the other hand, a type like `Double` doesn't require an error bound and
+   * so can be called without specifying the `RootFinder`.
+   *
+   * @param finder a root finder to extract roots with
+   * @return the real roots of this polynomial
+   */
+  def roots(implicit finder: RootFinder[C]): Roots[C] =
     finder.findRoots(this)
 
   /** Returns the coefficient of the n-th degree term. */
