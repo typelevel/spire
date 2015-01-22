@@ -28,7 +28,11 @@ import scala.collection.concurrent.TrieMap
 import spire.algebra.{Eq, EuclideanRing, Field, IsReal, NRoot, Order, Ring, Sign, Signed}
 import spire.algebra.Sign.{ Positive, Negative, Zero }
 import spire.macros.Checked.checked
+import spire.math.poly.{ Term, BigDecimalRootRefinement, RootFinder, Roots }
+import spire.std.bigInt._
+import spire.std.long._
 import spire.syntax.order._
+import spire.syntax.std.seq._
 
 /**
  * Algebraic provides an exact number type for algebraic numbers. Algebraic
@@ -255,6 +259,8 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
         val num = new JBigDecimal(n.numerator.bigInteger)
         val den = new JBigDecimal(n.denominator.bigInteger)
         num.divide(den, new MathContext(digits, roundingMode))
+      case ConstantRoot(poly, lb, ub) =>
+        BigDecimalRootRefinement(poly, lb, ub, new MathContext(digits, roundingMode)).approximation
       case Add(_, _) | Sub(_, _) if e.signum == 0 =>
         JBigDecimal.ZERO
       case Add(lhs, rhs) =>
@@ -363,6 +369,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
       case ConstantDouble(n) => conv.fromDouble(n)
       case ConstantBigDecimal(n) => conv.fromBigDecimal(n)
       case ConstantRational(n) => conv.fromRational(n)
+      case ConstantRoot(_, _, _) => ???
       case Neg(n) => -eval(n)
       case Add(a, b) => eval(a) + eval(b)
       case Sub(a, b) => eval(a) - eval(b)
@@ -433,6 +440,27 @@ object Algebraic extends AlgebraicInstances {
   /** Returns an Algebraic expression equivalent to `n`. */
   def apply(n: Rational): Algebraic =
     new Algebraic(Expr.ConstantRational(n))
+
+  /** Returns an Algebraic expression equivalent to the i-th real root of `poly`. */
+  def root(poly: Polynomial[Rational], i: Int): Algebraic = {
+    if (i < 0) {
+      throw new ArithmeticException(s"invalid real root index: $i")
+    } else {
+      val zpoly = Roots.removeFractions(poly)
+      val intervals = Roots.isolateRoots(zpoly)
+      if (i >= intervals.size) {
+        throw new ArithmeticException(s"cannot extract root $i, there are only ${intervals.size} roots")
+      }
+      intervals(i) match {
+        case Point(value) =>
+          new Algebraic(Expr.ConstantRational(value))
+        case Bounded(lb, ub, _) =>
+          new Algebraic(Expr.ConstantRoot(zpoly, lb, ub))
+        case _ =>
+          throw new RuntimeException("invalid isolated root interval")
+      }
+    }
+  }
 
   /**
    * Returns an Algebraic expression equivalent to `BigDecimal(n)`. If `n` is
@@ -670,6 +698,30 @@ object Algebraic extends AlgebraicInstances {
         val den = new JBigDecimal(value.denominator.bigInteger)
         num.divide(den, digits, RoundingMode.DOWN)
       }
+    }
+
+    @SerialVersionUID(0L)
+    case class ConstantRoot(poly: Polynomial[BigInt], lb: Rational, ub: Rational) extends Constant[Polynomial[BigInt]] {
+      def value: Polynomial[BigInt] = poly
+
+      def flags: Flags = Flags.IsRadical
+
+      def upperBound: BitBound =
+        if (ub.signum > 0) {
+          new BitBound(ub.numerator.bitLength - ub.denominator.bitLength + 1)
+        } else {
+          new BitBound(lb.numerator.abs.bitLength - lb.denominator.bitLength + 1)
+        }
+
+      def signum: Int =
+        if (lb.signum != 0) lb.signum
+        else ub.signum
+
+      def toBigDecimal(digits: Int): JBigDecimal =
+        BigDecimalRootRefinement(poly, lb, ub, digits).approximation
+
+      def lead: BigInt = poly.maxTerm.coeff
+      def tail: BigInt = poly.minTerm.coeff
     }
 
     @SerialVersionUID(0L)
@@ -1154,6 +1206,19 @@ object Algebraic extends AlgebraicInstances {
         case ConstantRational(n) =>
           rational(n)
 
+        case root @ ConstantRoot(poly, _, _) =>
+          // Bound on the euclidean distance of the coefficients.
+          val distBound = poly.terms.map { case Term(c, _) =>
+            2L * c.bitLength
+          }.qsum / 2L + 1L
+          Bound(
+            root.lead.bitLength + 1L,
+            root.tail.bitLength + 1L,
+            distBound,
+            Roots.lowerBound(poly),
+            Roots.upperBound(poly)
+          )
+
         case Neg(sub) =>
           sub.getBound(this)
 
@@ -1244,6 +1309,8 @@ object Algebraic extends AlgebraicInstances {
       case ConstantDouble(n) => rational(n)
       case ConstantBigDecimal(n) => rational(n)
       case ConstantRational(n) => rational(n)
+      case root @ ConstantRoot(poly, _, _) =>
+        Bound(root.lead.bitLength + 1, Roots.upperBound(poly))
       case Neg(sub) => sub.getBound(this)
       case Add(lhs, rhs) => add(lhs.getBound(this), rhs.getBound(this))
       case Sub(lhs, rhs) => add(lhs.getBound(this), rhs.getBound(this))

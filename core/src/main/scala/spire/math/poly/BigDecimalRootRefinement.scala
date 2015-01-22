@@ -6,6 +6,7 @@ import scala.annotation.tailrec
 import java.math.{ BigDecimal => JBigDecimal, RoundingMode, MathContext }
 
 import spire.algebra._
+import spire.std.bigInt._
 import spire.syntax.signed._
 
 sealed abstract class BigDecimalRootRefinement {
@@ -35,21 +36,56 @@ object BigDecimalRootRefinement {
     def compare(x: JBigDecimal, y: JBigDecimal): Int = x compareTo y
   }
 
+  def apply(poly: Polynomial[BigInt], lowerBound: Rational, upperBound: Rational, scale: Int): BigDecimalRootRefinement = {
+    // TODO: See if Algebraic is faster.
+    val qpoly = poly.map(Rational(_))
+    def evalExact(x: JBigDecimal): JBigDecimal =
+      qpoly(Rational(new BigDecimal(x, MathContext.UNLIMITED)))
+        .toBigDecimal(scale, RoundingMode.UP)
+        .bigDecimal
+
+    val lb = lowerBound.toBigDecimal(scale, RoundingMode.CEILING).bigDecimal
+    val ub = upperBound.toBigDecimal(scale, RoundingMode.FLOOR).bigDecimal
+
+    val getEps: JBigDecimal => Int = { _ => scale }
+
+    QIR(poly, lowerBound, upperBound, lb, ub, getEps, evalExact)
+  }
+
+  private val bits2dec: Double = log(2, 10)
+
+  def apply(poly: Polynomial[BigInt], lowerBound: Rational, upperBound: Rational, mc: MathContext): BigDecimalRootRefinement = {
+    // TODO: See if Algebraic is faster.
+    val qpoly = poly.map(Rational(_))
+    def evalExact(x: JBigDecimal): JBigDecimal =
+      qpoly(Rational(new BigDecimal(x, MathContext.UNLIMITED)))
+        .toBigDecimal(mc)
+        .bigDecimal
+
+    val lb = lowerBound.toBigDecimal(new MathContext(mc.getPrecision, RoundingMode.CEILING)).bigDecimal
+    val ub = upperBound.toBigDecimal(new MathContext(mc.getPrecision, RoundingMode.FLOOR)).bigDecimal
+
+    val getEps: JBigDecimal => Int = { x =>
+      x.scale - ceil(x.unscaledValue.bitLength * bits2dec).toInt + mc.getPrecision + 1
+    }
+
+    QIR(poly, lowerBound, upperBound, lb, ub, getEps, evalExact)
+  }
+
   /**
    * An implementation of "Quadratic Interval Refinement for Real Roots" by
    * John Abbot for `BigDecimal`.
    */
-  def QIR(poly: Polynomial[Rational], lowerBound: Rational, upperBound: Rational, digits: Int): BigDecimalRootRefinement = {
-
-    // TODO: See if Algebraic is faster.
-    def evalExact(x: JBigDecimal): JBigDecimal =
-      poly(Rational(new BigDecimal(x, MathContext.UNLIMITED)))
-        .toBigDecimal(digits, RoundingMode.UP)
-        .bigDecimal
-
-    val lb = lowerBound.toBigDecimal(digits, RoundingMode.CEILING).bigDecimal
-    val ub = upperBound.toBigDecimal(digits, RoundingMode.FLOOR).bigDecimal
-
+  private def QIR(
+    poly: Polynomial[BigInt],
+    lowerBound: Rational,
+    upperBound: Rational,
+    lb: JBigDecimal,
+    ub: JBigDecimal,
+    getEps: JBigDecimal => Int,
+    evalExact: JBigDecimal => JBigDecimal
+  ): BigDecimalRootRefinement = {
+    val qpoly = poly.map(Rational(_))
     val qlb = Rational(new BigDecimal(lb, MathContext.UNLIMITED))
     val qub = Rational(new BigDecimal(ub, MathContext.UNLIMITED))
 
@@ -58,7 +94,7 @@ object BigDecimalRootRefinement {
       if (l != r) {
         // Ue Descartes' rule of signs to see if the root in the open interval
         // is actually in the sub interval (l, r).
-        val poly0 = poly
+        val poly0 = qpoly
           .shift(l)
           .removeZeroRoots
           .reciprocal
@@ -74,7 +110,7 @@ object BigDecimalRootRefinement {
     } else if (hasRoot(qub, upperBound)) {
       BoundedRight(ub, upperBound)
     } else {
-      QIR(lb, ub, digits)(evalExact)
+      QIR(lb, ub, getEps, evalExact)
     }
   }
 
@@ -82,8 +118,7 @@ object BigDecimalRootRefinement {
    * An implementation of "Quadratic Interval Refinement for Real Roots" by
    * John Abbot for `BigDecimal`.
    */
-  def QIR(lowerBound: JBigDecimal, upperBound: JBigDecimal, digits: Int)(evalExact: JBigDecimal => JBigDecimal): BigDecimalRootRefinement = {
-    val eps = JBigDecimal.valueOf(1, digits)
+  private def QIR(lowerBound: JBigDecimal, upperBound: JBigDecimal, getEps: JBigDecimal => Int, evalExact: JBigDecimal => JBigDecimal): BigDecimalRootRefinement = {
 
     @tailrec
     def loop(
@@ -96,23 +131,28 @@ object BigDecimalRootRefinement {
       val dy = ly.subtract(ry)
       val s = ly.divide(dy, n, RoundingMode.HALF_UP)
       val dx = rx.subtract(lx)
+      val scale = max(getEps(lx), getEps(rx))
+      val eps = JBigDecimal.valueOf(1, scale)
       if (dx.compareTo(eps) <= 0) {
-        Bounded(lx, rx)
+        Bounded(
+          lx.setScale(scale, RoundingMode.FLOOR),
+          rx.setScale(scale, RoundingMode.CEILING)
+        )
       } else {
         val delta = dx.multiply(s.ulp)
         val k = s.unscaledValue
-        val x1 = lx.add(delta.multiply(new JBigDecimal(k))).setScale(digits, RoundingMode.HALF_UP)
+        val x1 = lx.add(delta.multiply(new JBigDecimal(k))).setScale(scale, RoundingMode.HALF_UP)
         val y1 = evalExact(x1)
         val s1 = y1.sign
         if (s1 == ly.sign) {
-          val x2 = x1.add(delta).setScale(digits, RoundingMode.CEILING)
+          val x2 = x1.add(delta).setScale(scale, RoundingMode.CEILING)
           val y2 = evalExact(x2)
           val s2 = y2.sign
           if (s2 == s1) loop0(lx, ly, rx, ry)
           else if (s2 == ry.sign) loop(x1, y1, x2, y2, 2 * n)
           else ExactRoot(x2)
         } else if (s1 == ry.sign) {
-          val x0 = x1.subtract(delta).setScale(digits, RoundingMode.FLOOR)
+          val x0 = x1.subtract(delta).setScale(scale, RoundingMode.FLOOR)
           val y0 = evalExact(x0)
           val s0 = y0.sign
           if (s0 == s1) loop0(lx, ly, rx, ry)
@@ -192,13 +232,6 @@ object BigDecimalRootRefinement {
     val ly = evalExact(lx)
     val rx = upperBound
     val ry = evalExact(rx)
-    loop0(lx, ly, rx, ry) match {
-      case Bounded(lowerBound, upperBound) =>
-        Bounded(
-          lowerBound.setScale(digits, RoundingMode.FLOOR),
-          upperBound.setScale(digits, RoundingMode.CEILING))
-      case root =>
-        root
-    }
+    loop0(lx, ly, rx, ry)
   }
 }

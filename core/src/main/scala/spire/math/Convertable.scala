@@ -95,7 +95,7 @@ private[math] trait ConvertableToFloat extends ConvertableTo[Float] {
   def fromDouble(a: Double): Float = a.toFloat
   def fromBigInt(a: BigInt): Float = a.toFloat
   def fromBigDecimal(a: BigDecimal): Float = a.toFloat
-  def fromRational(a: Rational): Float = a.toBigDecimal.toFloat
+  def fromRational(a: Rational): Float = a.toBigDecimal(MathContext.DECIMAL64).toFloat
   def fromAlgebraic(a: Algebraic): Float = a.toFloat
   def fromReal(a: Real): Float = a.toFloat
 
@@ -111,7 +111,7 @@ private[math] trait ConvertableToDouble extends ConvertableTo[Double] {
   def fromDouble(a: Double): Double = a
   def fromBigInt(a: BigInt): Double = a.toDouble
   def fromBigDecimal(a: BigDecimal): Double = a.toDouble
-  def fromRational(a: Rational): Double = a.toBigDecimal.toDouble
+  def fromRational(a: Rational): Double = a.toBigDecimal(MathContext.DECIMAL64).toDouble
   def fromAlgebraic(a: Algebraic): Double = a.toDouble
   def fromReal(a: Real): Double = a.toDouble
 
@@ -143,8 +143,8 @@ private[math] trait ConvertableToBigDecimal extends ConvertableTo[BigDecimal] {
   def fromDouble(a: Double): BigDecimal = BigDecimal(a)
   def fromBigInt(a: BigInt): BigDecimal = BigDecimal(a)
   def fromBigDecimal(a: BigDecimal): BigDecimal = a
-  def fromRational(a: Rational): BigDecimal = a.toBigDecimal
-  def fromAlgebraic(a: Algebraic): BigDecimal = a.toBigDecimal(java.math.MathContext.DECIMAL64)
+  def fromRational(a: Rational): BigDecimal = a.toBigDecimal(MathContext.DECIMAL64)
+  def fromAlgebraic(a: Algebraic): BigDecimal = a.toBigDecimal(MathContext.DECIMAL64)
   def fromReal(a: Real): BigDecimal = fromRational(a.toRational)
 
   def fromType[B: ConvertableFrom](b: B): BigDecimal = ConvertableFrom[B].toBigDecimal(b)
@@ -438,10 +438,10 @@ private[math] trait ConvertableFromRational extends ConvertableFrom[Rational] {
   def toShort(a: Rational): Short = a.toBigInt.toShort
   def toInt(a: Rational): Int = a.toBigInt.toInt
   def toLong(a: Rational): Long = a.toBigInt.toLong
-  def toFloat(a: Rational): Float = a.toBigDecimal.toFloat
-  def toDouble(a: Rational): Double = a.toBigDecimal.toDouble
+  def toFloat(a: Rational): Float = a.toBigDecimal(MathContext.DECIMAL64).toFloat
+  def toDouble(a: Rational): Double = a.toBigDecimal(MathContext.DECIMAL64).toDouble
   def toBigInt(a: Rational): BigInt = a.toBigInt
-  def toBigDecimal(a: Rational): BigDecimal = a.toBigDecimal
+  def toBigDecimal(a: Rational): BigDecimal = a.toBigDecimal(MathContext.DECIMAL64)
   def toRational(a: Rational): Rational = a
   def toAlgebraic(a: Rational): Algebraic = Algebraic(a)
   def toReal(a: Rational): Real = Real(a)

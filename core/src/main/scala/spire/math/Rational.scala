@@ -58,7 +58,6 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   }
 
   def toBigInt: BigInt
-  def toBigDecimal: BigDecimal
   override def shortValue = longValue.toShort
   override def byteValue = longValue.toByte
 
@@ -450,7 +449,6 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
     def isWhole: Boolean = den == one
 
     def toBigInt: BigInt = (integral.toBigInt(num) / integral.toBigInt(den))
-    def toBigDecimal: BigDecimal = integral.toBigDecimal(num) / integral.toBigDecimal(den)
 
     def longValue = toBigInt.longValue    // Override if possible.
     def intValue = longValue.intValue
@@ -500,7 +498,7 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
       case that: Algebraic => that == this
       case that: RationalLike => num == that.num && den == that.den
       case that: BigInt => isWhole && toBigInt == that
-      case that: BigDecimal => try { toBigDecimal == that } catch { case ae: ArithmeticException => false }
+      case that: BigDecimal => try { toBigDecimal(that.mc) == that } catch { case ae: ArithmeticException => false }
       case that: SafeLong => SafeLong(toBigInt) == that
       case that: Number => Number(this) == that
       case that: Natural => isWhole && this == Rational(that.toBigInt)

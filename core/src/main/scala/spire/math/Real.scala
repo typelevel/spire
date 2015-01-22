@@ -571,7 +571,7 @@ trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Rea
   def toFloat(x: Real): Float = x.toRational.toFloat
   def toDouble(x: Real): Double = x.toRational.toDouble
   def toBigInt(x: Real): BigInt = x.toRational.toBigInt
-  def toBigDecimal(x: Real): BigDecimal = x.toRational.toBigDecimal
+  def toBigDecimal(x: Real): BigDecimal = x.toRational.toBigDecimal(java.math.MathContext.DECIMAL64)
   def toRational(x: Real): Rational = x.toRational
   def toAlgebraic(x: Real): Algebraic = Algebraic(x.toRational) //FIXME
   def toReal(x: Real): Real = x
