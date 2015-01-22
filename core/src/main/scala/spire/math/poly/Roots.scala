@@ -130,9 +130,45 @@ private[poly] class BigDecimalRelativeRoots(
       case Point(value) =>
         value.toBigDecimal(mc)
       case Bounded(lb, ub, _) =>
-        Algebraic.unsafeRoot(zpoly, lb, ub).toBigDecimal(mc)
+        Algebraic.unsafeRoot(zpoly, i, lb, ub).toBigDecimal(mc)
       case _ =>
         throw new RuntimeException("invalid isolated root interval")
     }
   }
+}
+
+// FIXME: This is pretty hacky. We should implement proper exact real roots:
+// http://arxiv.org/pdf/1011.0344v2.pdf
+// http://arxiv.org/pdf/1104.1362v3.pdf
+private[poly] class FixedRealRoots(
+  val poly: Polynomial[Real]
+) extends Roots[Real] {
+  private val zpoly: Polynomial[BigInt] = Roots.removeFractions(poly.map(_.toRational))
+  private val isolated: Vector[Interval[Rational]] = Roots.isolateRoots(zpoly)
+
+  def count: Int = isolated.size
+
+  def get(i: Int): Real = if (i < 0 || i >= count) {
+    throw new IndexOutOfBoundsException(i.toString)
+  } else {
+    isolated(i) match {
+      case Point(value) =>
+        Real(value)
+      case Bounded(lb, ub, _) =>
+        Real(Algebraic.unsafeRoot(zpoly, i, lb, ub)
+          .toBigDecimal(new MathContext(Real.digits, RoundingMode.HALF_EVEN)))
+      case _ =>
+        throw new RuntimeException("invalid isolated root interval")
+    }
+  }
+}
+
+private[poly] class NumberRoots(
+  val poly: Polynomial[Number]
+) extends Roots[Number] {
+  private val roots = new BigDecimalRelativeRoots(poly.map(_.toBigDecimal), BigDecimal.defaultMathContext)
+
+  def count: Int = roots.count
+
+  def get(i: Int): Number = Number(roots.get(i))
 }

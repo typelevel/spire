@@ -518,7 +518,7 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
   def intValue = n.toInt
 
   def toBigInt: BigInt = n.toBigInt
-  def toBigDecimal: BigDecimal = n.toBigDecimal(java.math.MathContext.DECIMAL64)
+  def toBigDecimal: BigDecimal = n.toBigDecimal(BigDecimal.defaultMathContext)
   def toRational: Rational = n
 
   def compare(rhs: Number) = n compare rhs.toRational

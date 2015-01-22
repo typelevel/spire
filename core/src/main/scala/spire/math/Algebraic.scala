@@ -22,8 +22,9 @@ import java.lang.Double.{ isInfinite, isNaN }
 import java.math.{ MathContext, RoundingMode, BigInteger, BigDecimal => JBigDecimal }
 
 import scala.annotation.tailrec
-import scala.math.{ ScalaNumber, ScalaNumericConversions }
 import scala.collection.concurrent.TrieMap
+import scala.math.{ ScalaNumber, ScalaNumericConversions }
+import scala.reflect.ClassTag
 
 import spire.algebra.{Eq, EuclideanRing, Field, IsReal, NRoot, Order, Ring, Sign, Signed}
 import spire.algebra.Sign.{ Positive, Negative, Zero }
@@ -259,7 +260,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
         val num = new JBigDecimal(n.numerator.bigInteger)
         val den = new JBigDecimal(n.denominator.bigInteger)
         num.divide(den, new MathContext(digits, roundingMode))
-      case ConstantRoot(poly, lb, ub) =>
+      case ConstantRoot(poly, _, lb, ub) =>
         BigDecimalRootRefinement(poly, lb, ub, new MathContext(digits, roundingMode)).approximation
       case Add(_, _) | Sub(_, _) if e.signum == 0 =>
         JBigDecimal.ZERO
@@ -343,10 +344,14 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
    */
   def toRational: Option[Rational] =
     if (expr.flags.isRational) {
-      implicit val nroot: NRoot[Rational] = new NRoot[Rational] {
-        def nroot(a: Rational, n: Int): Rational = ???
-        def fpow(a:Rational, b:Rational): Rational = ???
-      }
+      implicit val nroot: NRoot[Rational] with RootFinder[Rational] =
+        new NRoot[Rational] with RootFinder[Rational] {
+          private def fail =
+            throw new ArithmeticException(s"Rational cannot support exact algebraic operations")
+          def nroot(a: Rational, n: Int): Rational = fail
+          def fpow(a:Rational, b:Rational): Rational = fail
+          def findRoots(poly: Polynomial[Rational]): Roots[Rational] = fail
+        }
       Some(evaluateWith[Rational])
     } else {
       None
@@ -358,8 +363,10 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
    * to *replay* the stored expression using a different type. This will
    * accumulate errors as if the number type had been used from the beginning
    * and is only really suitable for more exact number types, like [[Real]].
+   *
+   * TODO: Eq/ClassTag come from poly.map - would love to get rid of them.
    */
-  def evaluateWith[A: Field: NRoot](implicit conv: ConvertableTo[A]): A = {
+  def evaluateWith[A: Field: NRoot: RootFinder: Eq: ClassTag](implicit conv: ConvertableTo[A]): A = {
     import spire.syntax.field._
     import spire.syntax.nroot._
     import Expr._
@@ -369,7 +376,8 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
       case ConstantDouble(n) => conv.fromDouble(n)
       case ConstantBigDecimal(n) => conv.fromBigDecimal(n)
       case ConstantRational(n) => conv.fromRational(n)
-      case ConstantRoot(_, _, _) => ???
+      case ConstantRoot(poly, i, _, _) =>
+        RootFinder[A].findRoots(poly.map(conv.fromBigInt)).get(i)
       case Neg(n) => -eval(n)
       case Add(a, b) => eval(a) + eval(b)
       case Sub(a, b) => eval(a) - eval(b)
@@ -441,7 +449,18 @@ object Algebraic extends AlgebraicInstances {
   def apply(n: Rational): Algebraic =
     new Algebraic(Expr.ConstantRational(n))
 
-  /** Returns an Algebraic expression equivalent to the i-th real root of `poly`. */
+  /**
+   * Returns an Algebraic expression whose value is equivalent to the `i`-th
+   * real root of the [[Polynomial]] `poly`. If `i` is negative or does not an
+   * index a real root (eg the value is greater than or equal to the number of
+   * real roots) then an `ArithmeticException` is thrown. Roots are indexed
+   * starting at 0.  So if there are 3 roots, then they are indexed as 0, 1,
+   * and 2.
+   *
+   * @param poly the polynomial containing at least i real roots
+   * @param i    the index (0-based) of the root
+   * @return an algebraic whose value is the i-th root of the polynomial
+   */
   def root(poly: Polynomial[Rational], i: Int): Algebraic = {
     if (i < 0) {
       throw new ArithmeticException(s"invalid real root index: $i")
@@ -455,15 +474,24 @@ object Algebraic extends AlgebraicInstances {
         case Point(value) =>
           new Algebraic(Expr.ConstantRational(value))
         case Bounded(lb, ub, _) =>
-          new Algebraic(Expr.ConstantRoot(zpoly, lb, ub))
+          new Algebraic(Expr.ConstantRoot(zpoly, i, lb, ub))
         case _ =>
           throw new RuntimeException("invalid isolated root interval")
       }
     }
   }
 
-  def unsafeRoot(poly: Polynomial[BigInt], lb: Rational, ub: Rational): Algebraic =
-    new Algebraic(Expr.ConstantRoot(poly, lb, ub))
+  /**
+   * Returns an Algebraic whose value is the real root within (lb, ub). This is
+   * potentially unsafe, as we assume that exactly 1 real root lies within the
+   * interval, otherwise the results are undetermined.
+   *
+   * @param poly a polynomial with a real root within (lb, ub)
+   * @param lb   the lower bound of the open interval containing the root
+   * @param ub   the upper bound of the open interval containing the root
+   */
+  def unsafeRoot(poly: Polynomial[BigInt], i: Int, lb: Rational, ub: Rational): Algebraic =
+    new Algebraic(Expr.ConstantRoot(poly, i, lb, ub))
 
   /**
    * Returns an Algebraic expression equivalent to `BigDecimal(n)`. If `n` is
@@ -704,7 +732,7 @@ object Algebraic extends AlgebraicInstances {
     }
 
     @SerialVersionUID(0L)
-    case class ConstantRoot(poly: Polynomial[BigInt], lb: Rational, ub: Rational) extends Constant[Polynomial[BigInt]] {
+    case class ConstantRoot(poly: Polynomial[BigInt], i: Int, lb: Rational, ub: Rational) extends Constant[Polynomial[BigInt]] {
       def value: Polynomial[BigInt] = poly
 
       def flags: Flags = Flags.IsRadical
@@ -1209,7 +1237,7 @@ object Algebraic extends AlgebraicInstances {
         case ConstantRational(n) =>
           rational(n)
 
-        case root @ ConstantRoot(poly, _, _) =>
+        case root @ ConstantRoot(poly, _, _, _) =>
           // Bound on the euclidean distance of the coefficients.
           val distBound = poly.terms.map { case Term(c, _) =>
             2L * c.bitLength
@@ -1312,7 +1340,7 @@ object Algebraic extends AlgebraicInstances {
       case ConstantDouble(n) => rational(n)
       case ConstantBigDecimal(n) => rational(n)
       case ConstantRational(n) => rational(n)
-      case root @ ConstantRoot(poly, _, _) =>
+      case root @ ConstantRoot(poly, _, _, _) =>
         Bound(root.lead.bitLength + 1, Roots.upperBound(poly))
       case Neg(sub) => sub.getBound(this)
       case Add(lhs, rhs) => add(lhs.getBound(this), rhs.getBound(this))
