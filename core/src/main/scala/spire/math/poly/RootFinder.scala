@@ -1,6 +1,8 @@
 package spire.math
 package poly
 
+import java.math.MathContext
+
 /**
  * A type class that can find roots of a polynomial.
  */
@@ -16,6 +18,12 @@ object RootFinder {
   implicit def BigDecimalScaleRootFinder(scale: Int): RootFinder[BigDecimal] =
     new RootFinder[BigDecimal] {
       def findRoots(poly: Polynomial[BigDecimal]): Roots[BigDecimal] =
-        new BigDecimalRoots(poly, scale)
+        new BigDecimalSimpleRoots(poly, scale)
+    }
+
+  implicit def BigDecimalMathContextRootFinder(mc: MathContext): RootFinder[BigDecimal] =
+    new RootFinder[BigDecimal] {
+      def findRoots(poly: Polynomial[BigDecimal]): Roots[BigDecimal] =
+        new BigDecimalRelativeRoots(poly, mc)
     }
 }

@@ -462,6 +462,9 @@ object Algebraic extends AlgebraicInstances {
     }
   }
 
+  def unsafeRoot(poly: Polynomial[BigInt], lb: Rational, ub: Rational): Algebraic =
+    new Algebraic(Expr.ConstantRoot(poly, lb, ub))
+
   /**
    * Returns an Algebraic expression equivalent to `BigDecimal(n)`. If `n` is
    * not parseable as a `BigDecimal` then an exception is thrown.

@@ -88,7 +88,7 @@ object Roots {
     -upperBound(p.reciprocal)
 }
 
-private[poly] class BigDecimalRoots(
+private[poly] class BigDecimalSimpleRoots(
   val poly: Polynomial[BigDecimal],
   scale: Int
 ) extends Roots[BigDecimal] {
@@ -108,6 +108,29 @@ private[poly] class BigDecimalRoots(
           BigDecimalRootRefinement(zpoly, lb, ub, scale).approximation,
           MathContext.UNLIMITED
         )
+      case _ =>
+        throw new RuntimeException("invalid isolated root interval")
+    }
+  }
+}
+
+private[poly] class BigDecimalRelativeRoots(
+  val poly: Polynomial[BigDecimal],
+  mc: MathContext
+) extends Roots[BigDecimal] {
+  private val zpoly: Polynomial[BigInt] = Roots.removeDecimal(poly)
+  private val isolated: Vector[Interval[Rational]] = Roots.isolateRoots(zpoly)
+
+  def count: Int = isolated.size
+
+  def get(i: Int): BigDecimal = if (i < 0 || i >= count) {
+    throw new IndexOutOfBoundsException(i.toString)
+  } else {
+    isolated(i) match {
+      case Point(value) =>
+        value.toBigDecimal(mc)
+      case Bounded(lb, ub, _) =>
+        Algebraic.unsafeRoot(zpoly, lb, ub).toBigDecimal(mc)
       case _ =>
         throw new RuntimeException("invalid isolated root interval")
     }
