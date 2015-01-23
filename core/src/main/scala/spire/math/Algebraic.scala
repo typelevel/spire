@@ -1,20 +1,3 @@
-/**
- * The `Algebraic` number type's goal is to create a guaranteed accuracy number [1].
- * That is, a `Algebraic` can always be approximated to any given accuracy and, in
- * addition, you are guaranteed that if a `Algebraic` `a` represents a real number
- * `r`, then `a.sign == r.sign`.
- *
- * Central to this is the idea of a zero-bound function; this is a function
- * `lowerBound` s.t. if `r != 0` then `r > r.lowerBound`. Here we use the 
- * BFMSS bound [2], though it seems other (C++) libraries use the max of the
- * BFMSS bound and Li/Yap bound [3].
- *
- * [1] "On Guaranteed Accuracy Computation." C. K. Yap.
- *   http://www.cs.nyu.edu/exact/doc/guaranteed.pdf
- * [2] "A Separation Bound for Real Algebraic Expressions." C. Burnikel, et al.
- *   http://stubber.math-inf.uni-greifswald.de/informatik/PEOPLE/Papers/ESA01/sepbound01.pd
- * [3] "A New Constructive Root Bound for Algebraic Expressions." C. Li and C. Yap.
- */
 package spire.math
 
 import java.lang.Long.numberOfLeadingZeros
@@ -38,11 +21,22 @@ import spire.syntax.std.seq._
 /**
  * Algebraic provides an exact number type for algebraic numbers. Algebraic
  * numbers are roots of polynomials with rational coefficients. With it, we can
- * represent expressions involving addition, multiplication, division, and
- * n-roots (eg. `sqrt` or `cbrt`) (roots of rational polynomials will be
- * supported in a later release). So, it is similar [[Rational]], but adds
- * n-roots as a valid, exact operation. The cost is that this will not be as
- * fast as [[Rational]] for many operations.
+ * represent expressions involving addition, multiplication, division, n-roots
+ * (eg. `sqrt` or `cbrt`), and roots of rational polynomials. So, it is similar
+ * [[Rational]], but adds roots as a valid, exact operation. The cost is that
+ * this will not be as fast as [[Rational]] for many operations.
+ *
+ * In general, you can assume all operations on this number type are exact,
+ * except for those that explicitly construct approximations to an Algebraic
+ * number, such as `toBigDecimal`.
+ *
+ * For an overview of the ideas, algorithms, and proofs of this number type,
+ * you can read the following papers:
+ *
+ *  - "On Guaranteed Accuracy Computation." C. K. Yap.
+ *  - "Recent Progress in Exact Geometric Computation." C. Li, S. Pion, and C. K. Yap.
+ *  - "A New Constructive Root Bound for Algebraic Expressions" by C. Li & C. K. Yap.
+ *  - "A Separation Bound for Real Algebraic Expressions." C. Burnikel, et al.
  */
 @SerialVersionUID(1L)
 final class Algebraic private (val expr: Algebraic.Expr)
@@ -82,15 +76,25 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def /(that: Algebraic): Algebraic =
     new Algebraic(Expr.Div(this.expr, that.expr))
 
+  /**
+   * Returns an `Algebraic` whose value is just the integer part of
+   * `this / that`. This operation is exact.
+   */
   def quot(that: Algebraic): Algebraic =
     this /~ that
 
+  /** An alias for [[quot]]. */
   def /~(that: Algebraic): Algebraic =
     Algebraic((this / that).toBigInt)
 
+  /**
+   * Returns an `Algebraic` whose value is the difference between `this` and
+   * `(this /~ that) * that` -- the modulus.
+   */
   def mod(that: Algebraic): Algebraic =
     this % that
 
+  /** An alias for [[mod]]. */
   def %(that: Algebraic): Algebraic =
     this - (this /~ that) * that
 
@@ -132,6 +136,11 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def <= (that: Algebraic): Boolean = compare(that) <= 0
   def >= (that: Algebraic): Boolean = compare(that) >= 0
 
+  /**
+   * Returns an integer with the same sign as `this - that`. Specifically, if
+   * `this &lt; that`, then the sign is negative, if `this &gt; that`, then the
+   * sign is positive, otherwise `this == that` and this returns 0.
+   */
   def compare(that: Algebraic): Int = (this - that).signum
 
   /**
@@ -242,7 +251,12 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
 
   /**
    * Relative approximation to the precision specified in `mc` with the given
-   * rounding mode. Rounding is always exact.
+   * rounding mode. Rounding is always exact. The sign is always correct; the
+   * sign of the returned `BigDecimal` matches the sign of the exact value this
+   * `Algebraic` represents.
+   *
+   * @param mc the precision and rounding mode of the final result
+   * @return an approximation to the value of this algebraic number
    */
   def toBigDecimal(mc: MathContext): BigDecimal = {
     import Expr._
@@ -505,6 +519,9 @@ object Algebraic extends AlgebraicInstances {
    * tree representing all operations performed on it. We then use this tree to
    * deduce certain properties about the algebraic expression and use them to
    * perform exact sign tests, compute approximations, etc.
+   *
+   * Generally, this should be regarded as an internal implementation detail of
+   * `Algebraic`.
    */
   sealed abstract class Expr extends Serializable {
     import Expr._
@@ -1051,9 +1068,7 @@ object Algebraic extends AlgebraicInstances {
   final def nroot(value: JBigDecimal, n: Int, scale: Int, roundingMode: RoundingMode): JBigDecimal =
     nroot(value, n)(_ => scale + 1).setScale(scale, roundingMode)
 
-  private[math] val Half = new JBigDecimal(0.5)
-
-  implicit val JBigDecimalOrder: Order[JBigDecimal] = new Order[JBigDecimal] {
+  private implicit val JBigDecimalOrder: Order[JBigDecimal] = new Order[JBigDecimal] {
     def compare(x: JBigDecimal, y: JBigDecimal): Int = x compareTo y
   }
 
