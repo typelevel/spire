@@ -37,7 +37,7 @@ Spire is currently available for Scala 2.10 and 2.11.
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-or scalaVersion := "2.11.4"
+scalaVersion := "2.11.4"
 // or scalaVersion := "2.10.4"
 
 libraryDependencies += "org.spire-math" %% "spire" % "0.9.0"
