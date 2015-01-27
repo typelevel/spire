@@ -455,4 +455,5 @@ private[math] trait SafeLongIsSigned extends Signed[SafeLong] {
 
 private[math] trait SafeLongIsReal extends IsIntegral[SafeLong] with SafeLongOrder with SafeLongIsSigned {
   def toDouble(n: SafeLong): Double = n.toDouble
+  def toBigInt(n: SafeLong): BigInt = n.toBigInt
 }

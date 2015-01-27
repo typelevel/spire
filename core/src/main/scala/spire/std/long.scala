@@ -75,6 +75,7 @@ trait LongIsSigned extends Signed[Long] {
 
 trait LongIsReal extends IsIntegral[Long] with LongOrder with LongIsSigned {
   def toDouble(n: Long): Double = n.toDouble
+  def toBigInt(n: Long): BigInt = BigInt(n)
 }
 
 @SerialVersionUID(0L)

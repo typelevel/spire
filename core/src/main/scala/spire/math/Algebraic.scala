@@ -9,7 +9,7 @@ import scala.collection.concurrent.TrieMap
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
 import scala.reflect.ClassTag
 
-import spire.algebra.{Eq, EuclideanRing, Field, IsReal, NRoot, Order, Ring, Sign, Signed}
+import spire.algebra.{Eq, EuclideanRing, Field, IsAlgebraic, NRoot, Order, Ring, Sign, Signed}
 import spire.algebra.Sign.{ Positive, Negative, Zero }
 import spire.macros.Checked.checked
 import spire.math.poly.{ Term, BigDecimalRootRefinement, RootFinder, Roots }
@@ -276,6 +276,8 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
         num.divide(den, new MathContext(digits, roundingMode))
       case ConstantRoot(poly, _, lb, ub) =>
         BigDecimalRootRefinement(poly, lb, ub, new MathContext(digits, roundingMode)).approximation
+      case Neg(sub) =>
+        rec(sub, digits).negate()
       case Add(_, _) | Sub(_, _) if e.signum == 0 =>
         JBigDecimal.ZERO
       case Add(lhs, rhs) =>
@@ -501,6 +503,7 @@ object Algebraic extends AlgebraicInstances {
    * interval, otherwise the results are undetermined.
    *
    * @param poly a polynomial with a real root within (lb, ub)
+   * @param i    the index of the root in the polynomial
    * @param lb   the lower bound of the open interval containing the root
    * @param ub   the upper bound of the open interval containing the root
    */
@@ -1471,8 +1474,9 @@ private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoo
   override def fromDouble(n: Double): Algebraic = Algebraic(n)
 }
 
-private[math] trait AlgebraicIsReal extends IsReal[Algebraic] {
+private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
   def toDouble(x: Algebraic): Double = x.toDouble
+  def toAlgebraic(x: Algebraic): Algebraic = x
   def ceil(a:Algebraic) = Algebraic(a.toBigDecimal(0, RoundingMode.CEILING))
   def floor(a:Algebraic) = Algebraic(a.toBigDecimal(0, RoundingMode.FLOOR))
   def round(a:Algebraic) = Algebraic(a.toBigDecimal(0, RoundingMode.HALF_EVEN))

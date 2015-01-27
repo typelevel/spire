@@ -102,6 +102,7 @@ private[math] trait UByteIsSigned extends Signed[UByte] {
 
 private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteOrder with UByteIsSigned {
   def toDouble(n: UByte): Double = n.toDouble
+  def toBigInt(n: UByte): BigInt = n.toBigInt
 }
 
 @SerialVersionUID(0L)

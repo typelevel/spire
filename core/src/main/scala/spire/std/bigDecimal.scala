@@ -7,7 +7,8 @@ import scala.annotation.tailrec
 
 import BigDecimal.RoundingMode.{CEILING, FLOOR, HALF_UP}
 
-import spire.algebra.{Field, IsReal, NRoot, Order, Signed, Trig}
+import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
+import spire.math.Rational
 
 trait BigDecimalIsField extends Field[BigDecimal] {
   override def minus(a: BigDecimal, b: BigDecimal): BigDecimal = a - b
@@ -157,12 +158,13 @@ trait BigDecimalIsSigned extends Signed[BigDecimal] {
   def abs(a: BigDecimal): BigDecimal = a.abs
 }
 
-trait BigDecimalIsReal extends IsReal[BigDecimal] with BigDecimalOrder with BigDecimalIsSigned {
+trait BigDecimalIsReal extends IsRational[BigDecimal] with BigDecimalOrder with BigDecimalIsSigned {
   def toDouble(x: BigDecimal): Double = x.toDouble
   def ceil(a: BigDecimal): BigDecimal = a.setScale(0, CEILING)
   def floor(a: BigDecimal): BigDecimal = a.setScale(0, FLOOR)
   def round(a: BigDecimal): BigDecimal = a.setScale(0, HALF_UP)
   def isWhole(a: BigDecimal) = a % 1.0 == 0.0
+  def toRational(a:BigDecimal): Rational = Rational(a)
 }
 
 @SerialVersionUID(0L)

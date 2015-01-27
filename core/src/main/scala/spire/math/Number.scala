@@ -3,7 +3,7 @@ package spire.math
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 
-import spire.algebra.{Eq, EuclideanRing, Field, IsReal, NRoot, Order, Ring, Signed, Trig}
+import spire.algebra.{Eq, EuclideanRing, Field, IsReal, IsRational, NRoot, Order, Ring, Signed, Trig}
 import spire.std.bigDecimal._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
@@ -646,12 +646,13 @@ private[math] trait NumberIsSigned extends Signed[Number] {
   def abs(a: Number): Number = a.abs
 }
 
-private[math] trait NumberIsReal extends IsReal[Number] with NumberOrder with NumberIsSigned {
+private[math] trait NumberIsReal extends IsRational[Number] with NumberOrder with NumberIsSigned {
   def toDouble(x: Number): Double = x.toDouble
   def ceil(a:Number): Number = a.ceil
   def floor(a:Number): Number = a.floor
   def round(a:Number): Number = a.round
   def isWhole(a:Number) = a.isWhole
+  def toRational(a:Number): Rational = a.toRational
 }
 
 @SerialVersionUID(0L)

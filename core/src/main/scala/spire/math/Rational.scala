@@ -6,7 +6,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.lang.Math
 import java.math.{ BigDecimal => JBigDecimal, MathContext, RoundingMode }
 
-import spire.algebra.{Field, IsReal, NRoot, Sign}
+import spire.algebra.{Field, IsRational, NRoot, Sign}
 import spire.algebra.Sign.{ Positive, Zero, Negative }
 
 sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] { lhs =>
@@ -973,7 +973,7 @@ private[math] trait RationalIsNRoot extends NRoot[Rational] with Serializable {
   def fpow(a: Rational, b: Rational): Rational = a.pow(b)
 }
 
-private[math] trait RationalIsReal extends IsReal[Rational] {
+private[math] trait RationalIsReal extends IsRational[Rational] {
   override def eqv(x:Rational, y:Rational) = x == y
   override def neqv(x:Rational, y:Rational) = x != y
   override def gt(x: Rational, y: Rational) = x > y
@@ -991,6 +991,7 @@ private[math] trait RationalIsReal extends IsReal[Rational] {
   def floor(a:Rational): Rational = a.floor
   def round(a:Rational): Rational = a.round
   def isWhole(a:Rational) = a.denominator == 1
+  def toRational(a: Rational): Rational = a
 }
 
 @SerialVersionUID(0L)
