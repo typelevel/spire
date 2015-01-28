@@ -6,7 +6,7 @@ object Nullbox extends NullboxVersions {
 }
 
 class Nullbox[+A](val ref: A) extends NullboxVersions.Base {
-  override def hashCode = ref.hashCode
+  def scala2_10hashCode = ref.hashCode
   def scala2_10equals(other: Any) = other match {
     case that: Nullbox[_] => ref == that.ref
     case _ => false

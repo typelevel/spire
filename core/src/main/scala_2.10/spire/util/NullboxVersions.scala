@@ -8,5 +8,6 @@ object NullboxVersions {
   trait Base extends AnyRef {
     self: Nullbox[_] =>
     override def equals(other: Any): Boolean = scala2_10equals(other)
+    override def hashCode: Int = scala2_10hashCode
   }
 }
