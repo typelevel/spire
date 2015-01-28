@@ -5,5 +5,8 @@ trait NullboxVersions {
 }
 
 object NullboxVersions {
-  type Base = AnyRef
+  trait Base extends AnyRef {
+    self: Nullbox[_] =>
+    override def equals(other: Any): Boolean = scala2_10equals(other)
+  }
 }
