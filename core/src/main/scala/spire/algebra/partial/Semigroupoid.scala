@@ -1,9 +1,6 @@
 package spire.algebra
 package partial
 
-import scala.{ specialized => spec }
-import scala.annotation.{ switch, tailrec }
-
 import spire.util.Nullbox
 
 /**

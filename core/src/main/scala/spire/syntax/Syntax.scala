@@ -30,19 +30,29 @@ trait SignedSyntax {
   implicit def signedOps[A: Signed](a: A) = new SignedOps(a)
 }
 
+trait HasIsIdSyntax {
+  implicit def hasIsIdOps[A](a:A)(implicit ev: HasIsId[A]) = new HasIsIdOps(a)
+}
+
+trait HasInverseSyntax {
+  implicit def hasInverseOps[A](a:A)(implicit ev: HasInverse[A]) = new HasInverseOps(a) 
+}
+
 trait SemigroupoidSyntax {
   implicit def semigroupoidOps[A:Semigroupoid](a:A) = new SemigroupoidOps[A](a)
+}
+
+trait GroupoidSyntax extends SemigroupoidSyntax with HasIsIdSyntax with HasInverseSyntax {
+  implicit def groupoidOps[A](a:A)(implicit ev: Groupoid[A]) = new GroupoidOps[A](a)
 }
 
 trait SemigroupSyntax {
   implicit def semigroupOps[A:Semigroup](a:A) = new SemigroupOps(a)
 }
 
-trait MonoidSyntax extends SemigroupSyntax {
-  implicit def monoidOps[A](a:A)(implicit ev: Monoid[A]) = new MonoidOps(a)
-}
+trait MonoidSyntax extends SemigroupSyntax with HasIsIdSyntax
 
-trait GroupSyntax extends MonoidSyntax {
+trait GroupSyntax extends MonoidSyntax with HasInverseSyntax {
   implicit def groupOps[A:Group](a:A) = new GroupOps(a)
 }
 
@@ -229,6 +239,7 @@ trait AllSyntax extends
     IsRealSyntax with
     ConvertableFromSyntax with
     SemigroupoidSyntax with
+    GroupoidSyntax with
     SemigroupSyntax with
     MonoidSyntax with
     GroupSyntax with

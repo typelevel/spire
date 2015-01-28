@@ -12,6 +12,7 @@ package object syntax {
   object convertableFrom extends ConvertableFromSyntax
 
   object semigroupoid extends SemigroupoidSyntax
+  object groupoid extends GroupoidSyntax
   
   object semigroup extends SemigroupSyntax
   object monoid extends MonoidSyntax
