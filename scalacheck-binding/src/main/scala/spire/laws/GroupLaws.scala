@@ -1,6 +1,7 @@
 package spire.laws
 
 import spire.algebra._
+import spire.algebra.partial._
 import spire.implicits._
 
 import org.typelevel.discipline.Laws
@@ -20,6 +21,22 @@ trait GroupLaws[A] extends Laws {
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
 
+
+  // partial groups
+
+  def semigroupoid(implicit A: Semigroupoid[A]) = new GroupProperties(
+    name = "semigroupoid",
+    parent = None,
+    "associative: a |+|?? b && b |+|?? c imply (a |+| b) |+|?? c" → forAll((a: A, b: A, c: A) =>
+      !((a |+|?? b) && (b |+|?? c)) || ((a |+|? b).get |+|?? c)
+    ),
+
+    "associative: (a |+|? b) |+|? c === a |+|? (b |+|? c)" → forAll((a: A, b: A, c: A) => {
+      (!(a |+|?? b) || !(b |+|?? c)) ||
+      ((a |+|? b).get |+|? c).get === (a |+|? (b |+|? c).get).get
+    }
+    )
+  )
 
   // groups
 

@@ -2,6 +2,7 @@ package spire.syntax
 
 import spire.algebra._
 import spire.algebra.lattice._
+import spire.algebra.partial._
 import spire.math._
 import spire.macros.Syntax
 import spire.syntax.std._
@@ -27,6 +28,10 @@ trait IsRealSyntax extends OrderSyntax with SignedSyntax {
 
 trait SignedSyntax {
   implicit def signedOps[A: Signed](a: A) = new SignedOps(a)
+}
+
+trait SemigroupoidSyntax {
+  implicit def semigroupoidOps[A:Semigroupoid](a:A) = new SemigroupoidOps[A](a)
 }
 
 trait SemigroupSyntax {
@@ -223,6 +228,7 @@ trait AllSyntax extends
     SignedSyntax with
     IsRealSyntax with
     ConvertableFromSyntax with
+    SemigroupoidSyntax with
     SemigroupSyntax with
     MonoidSyntax with
     GroupSyntax with

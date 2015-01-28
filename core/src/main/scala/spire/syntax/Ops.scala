@@ -2,8 +2,10 @@ package spire.syntax
 
 import spire.algebra._
 import spire.algebra.lattice._
+import spire.algebra.partial._
 import spire.macros.Ops
 import spire.math.{BitString, ConvertableTo, ConvertableFrom, Rational, Number}
+import spire.util.Nullbox
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
   def ===(rhs:A): Boolean = macro Ops.binop[A, Boolean]
@@ -100,6 +102,11 @@ final class SignedOps[A:Signed](lhs: A) {
   def isSignNonZero(): Boolean = macro Ops.unop[Boolean]
   def isSignNonPositive(): Boolean = macro Ops.unop[Boolean]
   def isSignNonNegative(): Boolean = macro Ops.unop[Boolean]
+}
+
+final class SemigroupoidOps[A](lhs:A)(implicit ev:Semigroupoid[A]) {
+  def |+|? (rhs: A): Nullbox[A] = macro Ops.binop[A, Nullbox[A]]
+  def |+|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
 }
 
 final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {

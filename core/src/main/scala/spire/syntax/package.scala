@@ -11,6 +11,8 @@ package object syntax {
   object isReal extends IsRealSyntax
   object convertableFrom extends ConvertableFromSyntax
 
+  object semigroupoid extends SemigroupoidSyntax
+  
   object semigroup extends SemigroupSyntax
   object monoid extends MonoidSyntax
   object group extends GroupSyntax
