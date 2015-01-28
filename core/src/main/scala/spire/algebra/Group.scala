@@ -5,7 +5,7 @@ import scala.{ specialized => spec }
 /**
  * A group is a monoid where each element has an inverse.
  */
-trait Group[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Monoid[A] {
+trait Group[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Monoid[A] with Groupoid[A] {
 
   /**
    * Return the inverse of `a`.
@@ -13,9 +13,16 @@ trait Group[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Mon
   def inverse(a: A): A
 
   /**
-   * Combine `a` with the inverse of `b`.
+   * Combine `x` with the inverse of `y`.
    */
-  def opInverse(a: A, b: A): A = op(a, inverse(b))
+  def opInverse(x: A, y: A): A = op(x, inverse(y))
+
+  // trivial implementations of the groupoid partial algebra
+  override def partialOpInverse(x: A, y: A): Option[A] = Some(opInverse(x, y))
+  override def isOpInverseDefined(x: A, y: A): Boolean = true
+  override def forceOpInverse(x: A, y: A): A = opInverse(x, y)
+  override def leftId(a: A): A = id
+  override def rightId(a: A): A = id
 
   /**
    * Return `a` combined with itself `n` times.
@@ -26,6 +33,7 @@ trait Group[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Mon
     else if (n == 0) id
     else if (n == 1) a
     else combinenAboveOne(a, n)
+
 }
 
 object Group {
