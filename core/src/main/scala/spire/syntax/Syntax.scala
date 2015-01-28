@@ -29,15 +29,25 @@ trait SignedSyntax {
   implicit def signedOps[A: Signed](a: A) = new SignedOps(a)
 }
 
-trait SemigroupSyntax {
-  implicit def semigroupOps[A:Semigroup](a:A) = new SemigroupOps(a)
+trait SemigroupoidSyntax {
+  implicit def semigroupoidOps[A:Semigroupoid](a:A) = new SemigroupoidOps[A](a)
+  implicit def nullboxSemigroupoidOps[A:NullboxSemigroupoid](a:A) = new NullboxSemigroupoidOps[A](a)
 }
 
-trait MonoidSyntax extends SemigroupSyntax {
-  implicit def monoidOps[A](a:A)(implicit ev: Monoid[A]) = new MonoidOps(a)
+trait PartialMonoidSyntax extends SemigroupoidSyntax {
+  implicit def partialMonoidOps[A](a:A)(implicit ev: PartialMonoid[A]) = new PartialMonoidOps[A](a)
 }
 
-trait GroupSyntax extends MonoidSyntax {
+trait GroupoidSyntax extends PartialMonoidSyntax {
+  implicit def groupoidOps[A](a:A)(implicit ev: Groupoid[A]) = new GroupoidOps[A](a)
+  implicit def nullboxGroupoidOps[A](a:A)(implicit ev: NullboxGroupoid[A]) = new NullboxGroupoidOps[A](a)
+}
+
+trait SemigroupSyntax extends SemigroupoidSyntax
+
+trait MonoidSyntax extends SemigroupSyntax with PartialMonoidSyntax
+
+trait GroupSyntax extends MonoidSyntax with GroupoidSyntax {
   implicit def groupOps[A:Group](a:A) = new GroupOps(a)
 }
 
@@ -146,9 +156,14 @@ trait BitStringSyntax {
   implicit def bitStringOps[A: BitString](a: A) = new BitStringOps(a)
 }
 
-trait ActionSyntax {
-  implicit def actionGroupOps[G](g: G) = new ActionGroupOps(g)
-  implicit def actionPointOps[P](p: P) = new ActionPointOps(p)
+trait PartialActionSyntax {
+  implicit def leftPartialActionOps[G](g: G) = new LeftPartialActionOps(g)
+  implicit def rightPartialActionOps[P](p: P) = new RightPartialActionOps(p)
+}
+
+trait ActionSyntax extends PartialActionSyntax {
+  implicit def leftActionOps[G](g: G) = new LeftActionOps(g)
+  implicit def rightActionOps[P](p: P) = new RightActionOps(p)
 }
 
 trait UnboundSyntax {
@@ -158,7 +173,7 @@ trait UnboundSyntax {
   implicit def vectorSpaceUnboundOps[F](f: F)(implicit ev: VectorSpace[_, F]) =
     new VectorSpaceUnboundOps(f)
 
-  implicit def groupActionUnboundOps[G](g: G)(implicit ev: Action[_, G]) =
+  implicit def actionUnboundOps[G](g: G)(implicit ev: Action[_, G]) =
     new ActionUnboundOps(g)
   implicit def additiveActionUnboundOps[G](g: G)(implicit ev: AdditiveAction[_, G]) =
     new AdditiveActionUnboundOps(g)
@@ -223,6 +238,9 @@ trait AllSyntax extends
     SignedSyntax with
     IsRealSyntax with
     ConvertableFromSyntax with
+    SemigroupoidSyntax with
+    PartialMonoidSyntax with
+    GroupoidSyntax with
     SemigroupSyntax with
     MonoidSyntax with
     GroupSyntax with
@@ -249,6 +267,7 @@ trait AllSyntax extends
     HeytingSyntax with
     BoolSyntax with
     BitStringSyntax with
+    PartialActionSyntax with
     ActionSyntax with
     TorsorSyntax with
     IntegralSyntax with

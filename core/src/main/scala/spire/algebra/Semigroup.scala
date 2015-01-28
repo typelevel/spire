@@ -6,8 +6,10 @@ import scala.annotation.{ switch, tailrec }
 /**
  * A semigroup is any set `A` with an associative operation (`op`).
  */
-trait Semigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any {
+trait Semigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Semigroupoid[A] {
   def op(x: A, y: A): A
+
+  def opIsDefined(x: A, y: A): Boolean = true
 
   /**
    * Return `a` combined with itself `n` times.
