@@ -1,11 +1,11 @@
 package spire.util
  
-object Nullbox extends NullboxExtractor {
+object Nullbox extends NullboxVersions {
   def apply[A](a: A): Nullbox[A] = new Nullbox(a)
   def empty[A]: Nullbox[A] = new Nullbox[A](null.asInstanceOf[A])
 }
 
-class Nullbox[+A](val ref: A) extends AnyVal {
+class Nullbox[+A](val ref: A) extends NullboxVersions.Base {
   def isDefined: Boolean = ref != null
   def nonEmpty: Boolean = ref != null
   def isEmpty: Boolean = ref == null

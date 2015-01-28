@@ -1,5 +1,9 @@
 package spire.util
  
-trait NullboxExtractor {
+trait NullboxVersions {
   def unapply[A](n: Nullbox[A]): Option[A] = n.toOption
+}
+
+object NullboxVersions {
+  type Base = AnyRef
 }
