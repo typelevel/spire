@@ -147,8 +147,8 @@ trait BitStringSyntax {
 }
 
 trait ActionSyntax {
-  implicit def actionGroupOps[G](g: G) = new ActionGroupOps(g)
-  implicit def actionPointOps[P](p: P) = new ActionPointOps(p)
+  implicit def leftActionOps[G](g: G) = new LeftActionOps(g)
+  implicit def rightActionOps[P](p: P) = new RightActionOps(p)
 }
 
 trait UnboundSyntax {

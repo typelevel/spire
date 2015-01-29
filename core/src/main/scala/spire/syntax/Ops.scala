@@ -427,8 +427,8 @@ final class BitStringOps[A](lhs: A)(implicit ev: BitString[A]) {
   def rotateRight(rhs: Int): A = macro Ops.binop[Int, A]
 }
 
-final class ActionGroupOps[G](lhs: G) {
-  def |+|> [P](rhs: P)(implicit ev: Action[P, G]): P =
+final class LeftActionOps[G](lhs: G) {
+  def |+|> [P](rhs: P)(implicit ev: LeftAction[P, G]): P =
     macro Ops.binopWithEv[P, Action[P, G], P]
   def +> [P](rhs: P)(implicit ev: AdditiveAction[P, G]): P =
     macro Ops.binopWithEv[P, AdditiveAction[P, G], P]
@@ -436,8 +436,8 @@ final class ActionGroupOps[G](lhs: G) {
     macro Ops.binopWithEv[P, MultiplicativeAction[P, G], P]
 }
 
-final class ActionPointOps[P](lhs: P) {
-  def <|+| [G](rhs: G)(implicit ev: Action[P, G]): P =
+final class RightActionOps[P](lhs: P) {
+  def <|+| [G](rhs: G)(implicit ev: RightAction[P, G]): P =
     macro Ops.binopWithEv[G, Action[P, G], P]
   def <+ [G](rhs: G)(implicit ev: AdditiveAction[P, G]): P =
     macro Ops.binopWithEv[G, AdditiveAction[P, G], P]
