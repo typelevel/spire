@@ -15,7 +15,7 @@ import spire.util.Opt
   * are defined and ((f |+|? g).get |+|? h).get = (f |+|? (g |+|? h).get).get
   */
 trait Semigroupoid[A] extends Any {
-  def opIsDefined(x: A, y: A): Boolean
+  def opIsDefined(x: A, y: A): Boolean = partialOp(x, y).nonEmpty
   def partialOp(x: A, y: A): Opt[A]
 }
 
@@ -24,7 +24,7 @@ object Semigroupoid {
 
   implicit def fromSemigroup[A](implicit semigroup: Semigroup[A]): Semigroupoid[A] =
     new Semigroupoid[A] {
-      def opIsDefined(x: A, y: A): Boolean = true
+      override def opIsDefined(x: A, y: A): Boolean = true
       def partialOp(x: A, y: A): Opt[A] = Opt(semigroup.op(x, y))
     }
 }

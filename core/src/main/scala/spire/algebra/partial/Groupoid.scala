@@ -27,7 +27,7 @@ object Groupoid {
 
   implicit def fromGroup[A](implicit group: Group[A]): Groupoid[A] =
     new Groupoid[A] {
-      def opIsDefined(x: A, y: A): Boolean = true
+      override def opIsDefined(x: A, y: A): Boolean = true
       override def opInverseIsDefined(x: A, y: A): Boolean = true
       def inverse(a: A): A = group.inverse(a)
       def partialOp(x: A, y: A): Opt[A] = Opt(group.op(x, y))
