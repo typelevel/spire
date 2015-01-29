@@ -1,5 +1,6 @@
 package spire.syntax
 
+import spire.NoImplicit
 import spire.algebra._
 import spire.algebra.lattice._
 import spire.algebra.partial._
@@ -30,19 +31,12 @@ trait SignedSyntax {
   implicit def signedOps[A: Signed](a: A) = new SignedOps(a)
 }
 
-trait HasIsIdSyntax {
-  implicit def hasIsIdOps[A](a:A)(implicit ev: HasIsId[A]) = new HasIsIdOps(a)
-}
-
-trait HasInverseSyntax {
-  implicit def hasInverseOps[A](a:A)(implicit ev: HasInverse[A]) = new HasInverseOps(a) 
-}
-
 trait SemigroupoidSyntax {
   implicit def semigroupoidOps[A:Semigroupoid](a:A) = new SemigroupoidOps[A](a)
 }
 
-trait GroupoidSyntax extends SemigroupoidSyntax with HasIsIdSyntax with HasInverseSyntax {
+trait GroupoidSyntax extends SemigroupoidSyntax {
+  implicit def groupoidCommonOps[A](a:A)(implicit ev: Groupoid[A], ni: NoImplicit[Monoid[A]]) = new GroupoidCommonOps[A](a)(ev)
   implicit def groupoidOps[A](a:A)(implicit ev: Groupoid[A]) = new GroupoidOps[A](a)
 }
 
@@ -50,9 +44,11 @@ trait SemigroupSyntax {
   implicit def semigroupOps[A:Semigroup](a:A) = new SemigroupOps(a)
 }
 
-trait MonoidSyntax extends SemigroupSyntax with HasIsIdSyntax
+trait MonoidSyntax extends SemigroupSyntax {
+  implicit def monoidOps[A](a:A)(implicit ev: Monoid[A]) = new MonoidOps(a)
+}
 
-trait GroupSyntax extends MonoidSyntax with HasInverseSyntax {
+trait GroupSyntax extends MonoidSyntax {
   implicit def groupOps[A:Group](a:A) = new GroupOps(a)
 }
 
@@ -162,8 +158,8 @@ trait BitStringSyntax {
 }
 
 trait ActionSyntax {
-  implicit def leftActionOps[G](g: G) = new LeftActionOps(g)
-  implicit def rightActionOps[P](p: P) = new RightActionOps(p)
+  implicit def actionGroupOps[G](g: G) = new ActionGroupOps(g)
+  implicit def actionPointOps[P](p: P) = new ActionPointOps(p)
 }
 
 trait UnboundSyntax {

@@ -104,17 +104,14 @@ final class SignedOps[A:Signed](lhs: A) {
   def isSignNonNegative(): Boolean = macro Ops.unop[Boolean]
 }
 
-final class HasIsIdOps[A](lhs:A)(implicit ev: HasIsId[A]) {
-  def isId(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
-}
-
-final class HasInverseOps[A](lhs:A)(implicit ev: HasInverse[A]) {
-  def inverse(): A = macro Ops.unop[A]
-}
-
 final class SemigroupoidOps[A](lhs:A)(implicit ev:Semigroupoid[A]) {
   def |+|? (rhs: A): Opt[A] = macro Ops.binop[A, Opt[A]]
   def |+|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
+}
+
+final class GroupoidCommonOps[A](lhs:A)(implicit ev:Groupoid[A]) {
+  def inverse(): A = ev.inverse(lhs)
+  def isId(implicit ev1: Eq[A]): Boolean = ev.isId(lhs)(ev1)
 }
 
 final class GroupoidOps[A](lhs:A)(implicit ev:Groupoid[A]) {
@@ -128,7 +125,12 @@ final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
   def |+|(rhs:A): A = macro Ops.binop[A, A]
 }
 
+final class MonoidOps[A](lhs:A)(implicit ev: Monoid[A]) {
+  def isId(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
+}
+
 final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
+  def inverse(): A = macro Ops.unop[A]
   def |-|(rhs:A): A = macro Ops.binop[A, A]
 }
 
@@ -444,8 +446,8 @@ final class BitStringOps[A](lhs: A)(implicit ev: BitString[A]) {
   def rotateRight(rhs: Int): A = macro Ops.binop[Int, A]
 }
 
-final class LeftActionOps[G](lhs: G) {
-  def |+|> [P](rhs: P)(implicit ev: LeftAction[P, G]): P =
+final class ActionGroupOps[G](lhs: G) {
+  def |+|> [P](rhs: P)(implicit ev: Action[P, G]): P =
     macro Ops.binopWithEv[P, Action[P, G], P]
   def +> [P](rhs: P)(implicit ev: AdditiveAction[P, G]): P =
     macro Ops.binopWithEv[P, AdditiveAction[P, G], P]
@@ -453,8 +455,8 @@ final class LeftActionOps[G](lhs: G) {
     macro Ops.binopWithEv[P, MultiplicativeAction[P, G], P]
 }
 
-final class RightActionOps[P](lhs: P) {
-  def <|+| [G](rhs: G)(implicit ev: RightAction[P, G]): P =
+final class ActionPointOps[P](lhs: P) {
+  def <|+| [G](rhs: G)(implicit ev: Action[P, G]): P =
     macro Ops.binopWithEv[G, Action[P, G], P]
   def <+ [G](rhs: G)(implicit ev: AdditiveAction[P, G]): P =
     macro Ops.binopWithEv[G, AdditiveAction[P, G], P]

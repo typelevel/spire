@@ -2,27 +2,22 @@ package spire.algebra
 
 import scala.{ specialized => spec }
 
-trait HasIsId[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any {
-  /**
-    * Tests if `a` is the identity.
-    */
-  def isId(a: A)(implicit ev: Eq[A]): Boolean
-}
-
 /**
  * A monoid is a semigroup with an identity. A monoid is a specialization of a
  * semigroup, so its operation must be associative. Additionally,
  * `op(x, id) == op(id, x) == x`. For example, if we have `Monoid[String]`,
  * with `op` as string concatenation, then `id = ""`.
  */
-trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Semigroup[A] with HasIsId[A] {
+trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Semigroup[A] {
 
   /**
    * Return the identity element for this monoid.
    */
   def id: A
 
-  // default implementation
+  /**
+    * Tests if `a` is the identity.
+    */
   def isId(a: A)(implicit ev: Eq[A]) = ev.eqv(a, id)
 
   /**
