@@ -6,9 +6,9 @@ import scala.{ specialized => spec }
  * A (left) semigroup/monoid/group action of `G` on `P` is simply the implementation of
  * a method `actl(g, p)`, or `g +> p` in additive notation, such that:
  * 
- * 1. `(g |+| h) +> p === g +> (h +> p)` for all `g`, `h` in `G` and `p` in `P`.
+ * 1. `(g |+| h) |+|> p === g |+|> (h |+|> p)` for all `g`, `h` in `G` and `p` in `P`.
  * 
- * 2. `id +> p === p` for all `p` in `P` (if `id` is defined)
+ * 2. `id |+|> p === p` for all `p` in `P` (if `id` is defined)
  */
 trait Action[@spec(Int) P, G] extends Any {
   def actl(g: G, p: P): P
