@@ -22,9 +22,7 @@ trait Groupoid[A] extends Any with Semigroupoid[A] with HasIsId[A] with HasInver
   def opInverseIsDefined(x: A, y: A): Boolean = opIsDefined(x, inverse(y))
 }
 
-object Groupoid {
-  @inline final def apply[A](implicit g: Groupoid[A]): Groupoid[A] = g
-
+trait GroupoidLowPriority {
   implicit def fromGroup[A](implicit group: Group[A]): Groupoid[A] =
     new Groupoid[A] {
       override def opIsDefined(x: A, y: A): Boolean = true
@@ -33,4 +31,8 @@ object Groupoid {
       def partialOp(x: A, y: A): Opt[A] = Opt(group.op(x, y))
       override def partialOpInverse(x: A, y: A): Opt[A] = Opt(group.opInverse(x, y))
     }
+}
+
+object Groupoid extends GroupoidLowPriority {
+  @inline final def apply[A](implicit g: Groupoid[A]): Groupoid[A] = g
 }

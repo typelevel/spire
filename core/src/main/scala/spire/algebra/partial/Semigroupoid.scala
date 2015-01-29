@@ -19,12 +19,14 @@ trait Semigroupoid[A] extends Any {
   def partialOp(x: A, y: A): Opt[A]
 }
 
-object Semigroupoid {
-  @inline final def apply[A](implicit s: Semigroupoid[A]) = s
-
+trait SemigroupoidLowPriority {
   implicit def fromSemigroup[A](implicit semigroup: Semigroup[A]): Semigroupoid[A] =
     new Semigroupoid[A] {
       override def opIsDefined(x: A, y: A): Boolean = true
       def partialOp(x: A, y: A): Opt[A] = Opt(semigroup.op(x, y))
     }
+}
+
+object Semigroupoid extends SemigroupoidLowPriority {
+  @inline final def apply[A](implicit s: Semigroupoid[A]) = s
 }
