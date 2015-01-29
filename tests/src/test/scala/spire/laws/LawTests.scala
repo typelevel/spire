@@ -4,6 +4,7 @@ import spire.algebra._
 import spire.algebra.free._
 import spire.algebra.lattice._
 import spire.math._
+import spire.optional.partialIterable._
 import spire.implicits.{
   SeqOrder => _, SeqEq => _,
   ArrayOrder => _, ArrayEq => _,
@@ -69,6 +70,9 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Set[Int]",    GroupLaws[Set[Int]](spire.optional.genericEq.generic, implicitly).monoid)
   checkAll("String[Int]", GroupLaws[String].monoid)
   checkAll("Array[Int]",  GroupLaws[Array[Int]].monoid)
+
+  checkAll("Seq[String]", PartialGroupLaws[Seq[String]](spire.optional.genericEq.generic, implicitly).semigroupoid)
+  checkAll("Seq[Int]",    PartialGroupLaws[Seq[Int]].groupoid)
 
   checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
 
