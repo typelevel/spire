@@ -21,7 +21,7 @@ object MyBuild extends Build {
   // Dependencies
 
   lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.2.1"
-  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.11.6"
+  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.12.1"
 
   // Release step
 
@@ -52,9 +52,9 @@ object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     organization := "org.spire-math",
 
-    scalaVersion := "2.11.4",
+    scalaVersion := "2.11.5",
 
-    crossScalaVersions := Seq("2.10.2", "2.11.4"),
+    crossScalaVersions := Seq("2.10.4", "2.11.5"),
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
