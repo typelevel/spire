@@ -14,9 +14,14 @@ import spire.syntax.eq._
   *       `((a.inverse |+|? a).get |+|? b) === b`
   * 
   */
-trait Groupoid[A] extends Any with Semigroupoid[A] with HasIsId[A] with HasInverse[A] {
+trait Groupoid[A] extends Any with Semigroupoid[A] {
+  /** Tests if `a` is an identity. */
   def isId(a: A)(implicit ev: Eq[A]) = a === leftId(a)
+  /** Returns the inverse element of `a` such that `(a |+|? a.inverse).get` is an identity. */
+  def inverse(a: A): A
+  /** Returns the left identity of `a`. */
   def leftId(a: A): A = partialOp(a, inverse(a)).get
+  /** Returns the right identity of `a`. */
   def rightId(a: A): A = partialOp(inverse(a), a).get
   def partialOpInverse(x: A, y: A): Opt[A] = partialOp(x, inverse(y))
   def opInverseIsDefined(x: A, y: A): Boolean = opIsDefined(x, inverse(y))

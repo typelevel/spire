@@ -2,17 +2,15 @@ package spire.algebra
 
 import scala.{ specialized => spec }
 
-trait HasInverse[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any {
-  /**
-    * Return the inverse of `a`.
-    */
-  def inverse(a: A): A
-}
-
 /**
  * A group is a monoid where each element has an inverse.
  */
-trait Group[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Monoid[A] with HasInverse[A] {
+trait Group[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Monoid[A] {
+
+  /**
+   * Return the inverse of `a`.
+   */
+  def inverse(a: A): A
 
   /**
    * Combine `a` with the inverse of `b`.
