@@ -1,8 +1,20 @@
 package spire.util
+
+import spire.algebra.Eq
+import spire.syntax.eq._
  
 object Nullbox extends NullboxVersions {
   def apply[A](a: A): Nullbox[A] = new Nullbox(a)
   def empty[A]: Nullbox[A] = new Nullbox[A](null.asInstanceOf[A])
+
+  implicit def Eq[A: Eq]: Eq[Nullbox[A]] = new Eq[Nullbox[A]] {
+    def eqv(x: Nullbox[A], y: Nullbox[A]): Boolean =
+      if (x.isEmpty) y.isEmpty else {
+        if (y.isEmpty)
+          false
+        x.ref === y.ref
+      }
+  }
 }
 
 class Nullbox[+A](val ref: A) extends NullboxVersions.Base {
