@@ -10,9 +10,11 @@ object Ops extends machinist.Ops {
 
   val operatorNames: Map[String, String] =
     machinist.DefaultOps.operatorNames ++ Map(
-      // partial operations |+|? |+|??
+      // partial operations |+|? |+|?? |-|? |-|??
       ("$bar$plus$bar$qmark$qmark", "opIsDefined"),
+      ("$bar$minus$bar$qmark$qmark", "opInverseIsDefined"),
       ("$bar$plus$bar$qmark", "partialOp"),
+      ("$bar$minus$bar$qmark", "partialOpInverse"),
 
       // square root
       (uesc('√'), "sqrt"),
