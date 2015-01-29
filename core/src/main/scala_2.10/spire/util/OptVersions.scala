@@ -1,12 +1,12 @@
 package spire.util
  
-trait NullboxVersions {
-  def unapply[A](n: Nullbox[A]): Option[A] = n.toOption
+trait OptVersions {
+  def unapply[A](n: Opt[A]): Option[A] = n.toOption
 }
 
-object NullboxVersions {
+object OptVersions {
   trait Base extends AnyRef {
-    self: Nullbox[_] =>
+    self: Opt[_] =>
     override def equals(other: Any): Boolean = scala2_10equals(other)
     override def hashCode: Int = scala2_10hashCode
   }

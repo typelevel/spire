@@ -1,7 +1,7 @@
 package spire.algebra
 package partial
 
-import spire.util.Nullbox
+import spire.util.Opt
 import spire.syntax.eq._
 
 /** A groupoid is a semigroupoid where inverse are defined for all elements,
@@ -18,7 +18,7 @@ trait Groupoid[A] extends Any with Semigroupoid[A] with HasIsId[A] with HasInver
   def isId(a: A)(implicit ev: Eq[A]) = a === leftId(a)
   def leftId(a: A): A = partialOp(a, inverse(a)).get
   def rightId(a: A): A = partialOp(inverse(a), a).get
-  def partialOpInverse(x: A, y: A): Nullbox[A] = partialOp(x, inverse(y))
+  def partialOpInverse(x: A, y: A): Opt[A] = partialOp(x, inverse(y))
   def opInverseIsDefined(x: A, y: A): Boolean = opIsDefined(x, inverse(y))
 }
 
@@ -30,7 +30,7 @@ object Groupoid {
       def opIsDefined(x: A, y: A): Boolean = true
       override def opInverseIsDefined(x: A, y: A): Boolean = true
       def inverse(a: A): A = group.inverse(a)
-      def partialOp(x: A, y: A): Nullbox[A] = Nullbox(group.op(x, y))
-      override def partialOpInverse(x: A, y: A): Nullbox[A] = Nullbox(group.opInverse(x, y))
+      def partialOp(x: A, y: A): Opt[A] = Opt(group.op(x, y))
+      override def partialOpInverse(x: A, y: A): Opt[A] = Opt(group.opInverse(x, y))
     }
 }

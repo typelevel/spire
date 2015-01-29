@@ -1,7 +1,7 @@
 package spire.algebra
 package partial
 
-import spire.util.Nullbox
+import spire.util.Opt
 
 /**
  * A semigroupoid is any set `A` with a partial binary associative operation (`partialOp`), 
@@ -16,7 +16,7 @@ import spire.util.Nullbox
   */
 trait Semigroupoid[A] extends Any {
   def opIsDefined(x: A, y: A): Boolean
-  def partialOp(x: A, y: A): Nullbox[A]
+  def partialOp(x: A, y: A): Opt[A]
 }
 
 object Semigroupoid {
@@ -25,6 +25,6 @@ object Semigroupoid {
   implicit def fromSemigroup[A](implicit semigroup: Semigroup[A]): Semigroupoid[A] =
     new Semigroupoid[A] {
       def opIsDefined(x: A, y: A): Boolean = true
-      def partialOp(x: A, y: A): Nullbox[A] = Nullbox(semigroup.op(x, y))
+      def partialOp(x: A, y: A): Opt[A] = Opt(semigroup.op(x, y))
     }
 }

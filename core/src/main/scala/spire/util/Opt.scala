@@ -1,33 +1,33 @@
 package spire.util
  
-object Nullbox extends NullboxVersions {
-  def apply[A](a: A): Nullbox[A] = new Nullbox(a)
-  def empty[A]: Nullbox[A] = new Nullbox[A](null.asInstanceOf[A])
+object Opt extends OptVersions {
+  def apply[A](a: A): Opt[A] = new Opt(a)
+  def empty[A]: Opt[A] = new Opt[A](null.asInstanceOf[A])
 }
 
-class Nullbox[+A](val ref: A) extends NullboxVersions.Base {
+class Opt[+A](val ref: A) extends OptVersions.Base {
   def scala2_10hashCode = ref.hashCode
   def scala2_10equals(other: Any) = other match {
-    case that: Nullbox[_] => ref == that.ref
+    case that: Opt[_] => ref == that.ref
     case _ => false
   }
   def isDefined: Boolean = ref != null
   def nonEmpty: Boolean = ref != null
   def isEmpty: Boolean = ref == null
 
-  def get: A = if (ref == null) throw new NoSuchElementException("Nullbox.empty.get") else ref
+  def get: A = if (ref == null) throw new NoSuchElementException("Opt.empty.get") else ref
 
   override def toString: String =
-    if (ref == null) "Nullbox.empty" else s"Nullbox($ref)"
+    if (ref == null) "Opt.empty" else s"Opt($ref)"
   
-  def filter(f: A => Boolean): Nullbox[A] =
-    if (ref != null && f(ref)) this else Nullbox.empty
+  def filter(f: A => Boolean): Opt[A] =
+    if (ref != null && f(ref)) this else Opt.empty
   
-  def map[B](f: A => B): Nullbox[B] =
-    if (ref == null) Nullbox.empty else Nullbox(f(ref))
+  def map[B](f: A => B): Opt[B] =
+    if (ref == null) Opt.empty else Opt(f(ref))
   
-  def flatMap[B](f: A => Nullbox[B]): Nullbox[B] =
-    if (ref == null) Nullbox.empty else f(ref)
+  def flatMap[B](f: A => Opt[B]): Opt[B] =
+    if (ref == null) Opt.empty else f(ref)
   
   def fold[B](b: => B)(f: A => B): B =
     if (ref == null) b else f(ref)

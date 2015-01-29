@@ -5,7 +5,7 @@ import spire.algebra.lattice._
 import spire.algebra.partial._
 import spire.macros.Ops
 import spire.math.{BitString, ConvertableTo, ConvertableFrom, Rational, Number}
-import spire.util.Nullbox
+import spire.util.Opt
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
   def ===(rhs:A): Boolean = macro Ops.binop[A, Boolean]
@@ -113,14 +113,14 @@ final class HasInverseOps[A](lhs:A)(implicit ev: HasInverse[A]) {
 }
 
 final class SemigroupoidOps[A](lhs:A)(implicit ev:Semigroupoid[A]) {
-  def |+|? (rhs: A): Nullbox[A] = macro Ops.binop[A, Nullbox[A]]
+  def |+|? (rhs: A): Opt[A] = macro Ops.binop[A, Opt[A]]
   def |+|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
 }
 
 final class GroupoidOps[A](lhs:A)(implicit ev:Groupoid[A]) {
   def leftId(): A = macro Ops.unop[A]
   def rightId(): A = macro Ops.unop[A]
-  def |-|? (rhs: A): Nullbox[A] = macro Ops.binop[A, Option[A]]
+  def |-|? (rhs: A): Opt[A] = macro Ops.binop[A, Option[A]]
   def |-|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
 }
 

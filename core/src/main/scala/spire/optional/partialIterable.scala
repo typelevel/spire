@@ -12,7 +12,7 @@ import spire.util._
 final class IterableSemigroupoid[A, SA <: IterableLike[A, SA]](implicit cbf: CanBuildFrom[SA, A, SA], A: Semigroup[A]) extends Semigroupoid[SA] {
   def opIsDefined(x: SA, y: SA) = x.size == y.size
   def partialOp(x: SA, y: SA) =
-    if (opIsDefined(x, y)) Nullbox({
+    if (opIsDefined(x, y)) Opt({
       val xIt = x.iterator
       val yIt = y.iterator
       val builder = cbf()
@@ -21,13 +21,13 @@ final class IterableSemigroupoid[A, SA <: IterableLike[A, SA]](implicit cbf: Can
         builder += A.op(xIt.next, yIt.next)
       }
       builder.result()
-    }) else Nullbox.empty[SA]
+    }) else Opt.empty[SA]
 }
 
 final class IterableGroupoid[A, SA <: IterableLike[A, SA]](implicit cbf: CanBuildFrom[SA, A, SA], A: Group[A]) extends Groupoid[SA] {
   def opIsDefined(x: SA, y: SA) = x.size == y.size
   def partialOp(x: SA, y: SA) =
-    if (opIsDefined(x, y)) Nullbox({
+    if (opIsDefined(x, y)) Opt({
       val xIt = x.iterator
       val yIt = y.iterator
       val builder = cbf()
@@ -36,7 +36,7 @@ final class IterableGroupoid[A, SA <: IterableLike[A, SA]](implicit cbf: CanBuil
         builder += A.op(xIt.next, yIt.next)
       }
       builder.result()
-    }) else Nullbox.empty[SA]
+    }) else Opt.empty[SA]
   def inverse(a: SA) = a.map(A.inverse(_))(cbf)
   override def leftId(a: SA): SA = a.map(x => A.id)(cbf)
   override def rightId(a: SA): SA = a.map(x => A.id)(cbf)
