@@ -161,6 +161,11 @@ trait BitStringSyntax {
   implicit def bitStringOps[A: BitString](a: A) = new BitStringOps(a)
 }
 
+trait PartialActionSyntax {
+  implicit def leftPartialActionOps[G](g: G) = new LeftPartialActionOps(g)
+  implicit def rightPartialActionOps[P](p: P) = new RightPartialActionOps(p)
+}
+
 trait ActionSyntax {
   implicit def leftActionOps[G](g: G) = new LeftActionOps(g)
   implicit def rightActionOps[P](p: P) = new RightActionOps(p)
@@ -266,6 +271,7 @@ trait AllSyntax extends
     HeytingSyntax with
     BoolSyntax with
     BitStringSyntax with
+    PartialActionSyntax with
     ActionSyntax with
     TorsorSyntax with
     IntegralSyntax with
