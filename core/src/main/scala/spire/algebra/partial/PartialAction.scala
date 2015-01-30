@@ -19,7 +19,7 @@ import spire.util.Opt
   * `(g.rightId ?|+|> p).get === p`, the operation `?|+|>` being defined.
   */
 trait LeftPartialAction[P, G] extends Any {
-  def actlIsDefined(g: G, p: P): Boolean
+  def actlIsDefined(g: G, p: P): Boolean = partialActl(g, p).nonEmpty
   def partialActl(g: G, p: P): Opt[P]
 }
 
@@ -28,7 +28,7 @@ object LeftPartialAction {
 
   implicit def fromLeftAction[P, G](implicit G: LeftAction[P, G]): LeftPartialAction[P, G] =
     new LeftPartialAction[P, G] {
-      def actlIsDefined(g: G, p: P) = true
+      override def actlIsDefined(g: G, p: P) = true
       def partialActl(g: G, p: P): Opt[P] = Opt(G.actl(g, p))
     }
 }
@@ -50,7 +50,7 @@ object LeftPartialAction {
   */
 
 trait RightPartialAction[P, G] extends Any {
-  def actrIsDefined(p: P, g: G): Boolean
+  def actrIsDefined(p: P, g: G): Boolean = partialActr(p, g).nonEmpty
   def partialActr(p: P, g: G): Opt[P]
 }
 
@@ -59,7 +59,7 @@ object RightPartialAction {
 
   implicit def fromRightAction[P, G](implicit G: RightAction[P, G]): RightPartialAction[P, G] =
     new RightPartialAction[P, G] {
-      def actrIsDefined(p: P, g: G) = true
+      override def actrIsDefined(p: P, g: G) = true
       def partialActr(p: P, g: G): Opt[P] = Opt(G.actr(p, g))
     }
 }
@@ -72,10 +72,9 @@ object PartialAction {
 
   implicit def fromAction[P, G](implicit G: Action[P, G]): PartialAction[P, G] =
     new PartialAction[P, G] {
-      def actlIsDefined(g: G, p: P) = true
+      override def actlIsDefined(g: G, p: P) = true
       def partialActl(g: G, p: P): Opt[P] = Opt(G.actl(g, p))
-      def actrIsDefined(p: P, g: G) = true
+      override def actrIsDefined(p: P, g: G) = true
       def partialActr(p: P, g: G): Opt[P] = Opt(G.actr(p, g))
     }
-
 }
