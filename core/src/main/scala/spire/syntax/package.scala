@@ -48,6 +48,7 @@ package object syntax {
 
   object bitString extends BitStringSyntax
 
+  object partialAction extends PartialActionSyntax
   object action extends ActionSyntax
   object torsor extends TorsorSyntax
 

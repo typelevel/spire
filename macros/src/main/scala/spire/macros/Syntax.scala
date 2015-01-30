@@ -16,6 +16,12 @@ object Ops extends machinist.Ops {
       ("$bar$plus$bar$qmark", "partialOp"),
       ("$bar$minus$bar$qmark", "partialOpInverse"),
 
+      // partial actions ?|+|> ??|+|> <|+|? <|+|??
+      ("$qmark$bar$plus$bar$greater", "partialActl"),
+      ("$qmark$qmark$bar$plus$bar$greater", "actlIsDefined"),
+      ("$less$bar$plus$bar$qmark", "partialActr"),
+      ("$less$bar$plus$bar$qmark$qmark", "actrIsDefined"),
+      
       // square root
       (uesc('√'), "sqrt"),
 
