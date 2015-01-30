@@ -3,7 +3,7 @@ package spire.algebra
 import scala.{specialized => sp}
 
 /**
- * A Torsor[V, R] requires an AbGroup[R] and provides GroupAction[V, R],
+ * A Torsor[V, R] requires an AbGroup[R] and provides Action[V, R],
  * plus a `diff` operator, `<->` in additive notation, such that:
  * 
  * 1. `(g <-> g) === scalar.id` for all `g` in `G`.
@@ -15,7 +15,7 @@ import scala.{specialized => sp}
  * 4. `(g <-> h) === -(h <-> g)` for all `g`, `h` in `G`.
  * 
  */
-trait Torsor[V, @sp(Int,Long,Float,Double) R] extends Any with GroupAction[V, R] { self =>
+trait Torsor[V, @sp(Int,Long,Float,Double) R] extends Any with Action[V, R] { self =>
   def diff(v: V, w: V): R
 
   def fixOrigin(id0: V): AbGroup[V] =
@@ -27,7 +27,7 @@ trait Torsor[V, @sp(Int,Long,Float,Double) R] extends Any with GroupAction[V, R]
     }
 }
 
-trait AdditiveTorsor[V, @sp(Int,Long,Float,Double) R] extends Any with AdditiveGroupAction[V, R] { self =>
+trait AdditiveTorsor[V, @sp(Int,Long,Float,Double) R] extends Any with AdditiveAction[V, R] { self =>
   implicit def scalar: AdditiveAbGroup[R]
 
   def pminus(v: V, w: V): R
@@ -41,7 +41,7 @@ trait AdditiveTorsor[V, @sp(Int,Long,Float,Double) R] extends Any with AdditiveG
     }
 }
 
-trait MultiplicativeTorsor[V, @sp(Int,Long,Float,Double) R] extends Any with MultiplicativeGroupAction[V, R] { self =>
+trait MultiplicativeTorsor[V, @sp(Int,Long,Float,Double) R] extends Any with MultiplicativeAction[V, R] { self =>
   implicit def scalar: MultiplicativeAbGroup[R]
 
   def pdiv(v: V, w: V): R

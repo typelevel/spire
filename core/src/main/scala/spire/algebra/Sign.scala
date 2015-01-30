@@ -42,8 +42,8 @@ object Sign {
   implicit final val SignMultiplicativeGroup: MultiplicativeCMonoid[Sign] =
     Multiplicative(SignAlgebra)
 
-  implicit def SignAction[A](implicit A: AdditiveGroup[A]): MultiplicativeGroupAction[A, Sign] =
-    new MultiplicativeGroupAction[A, Sign] {
+  implicit def SignAction[A](implicit A: AdditiveGroup[A]): MultiplicativeAction[A, Sign] =
+    new MultiplicativeAction[A, Sign] {
       def gtimesl(s: Sign, a: A): A = s match {
         case Positive => a
         case Negative => A.negate(a)

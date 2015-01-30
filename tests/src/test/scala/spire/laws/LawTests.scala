@@ -4,6 +4,7 @@ import spire.algebra._
 import spire.algebra.free._
 import spire.algebra.lattice._
 import spire.math._
+import spire.optional.partialIterable._
 import spire.implicits.{
   SeqOrder => _, SeqEq => _,
   ArrayOrder => _, ArrayEq => _,
@@ -70,9 +71,12 @@ class LawTests extends FunSuite with Discipline {
   checkAll("String[Int]", GroupLaws[String].monoid)
   checkAll("Array[Int]",  GroupLaws[Array[Int]].monoid)
 
+  checkAll("Seq[String]", PartialGroupLaws[Seq[String]](spire.optional.genericEq.generic, implicitly).semigroupoid)
+  checkAll("Seq[Int]",    PartialGroupLaws[Seq[Int]].groupoid)
+
   checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
 
-  checkAll("Sign", GroupActionLaws[Sign, Int].multiplicativeMonoidAction)
+  checkAll("Sign", ActionLaws[Sign, Int].multiplicativeMonoidAction)
 
   implicit def eqFreeMonoid[A: Monoid: Eq]: Eq[FreeMonoid[A]] = new Eq[FreeMonoid[A]] {
     def eqv(x: FreeMonoid[A], y: FreeMonoid[A]): Boolean =
@@ -106,5 +110,5 @@ class LawTests extends FunSuite with Discipline {
   }
 
   checkAll("Order[Int]", OrderLaws[Int].order)
-  checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice))
+  checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 }

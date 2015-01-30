@@ -122,7 +122,7 @@ trait MapInstances0 {
   implicit def MapSemiring[K, V: Semiring] = new MapSemiring[K, V]
 }
 
-trait MapInstances1 {
+trait MapInstances1 extends MapInstances0 {
   implicit def MapRng[K, V: Rng] = new MapRng[K, V]
 }
 

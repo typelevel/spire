@@ -12,6 +12,7 @@ A successful open-source project relies upon the community to:
 This file lists the people whose contributions have made Spire
 possible.
 
+* Ben Barnard: documentation fixes
 * Luc J. Bourhis: author of spire.matrix.*
 * Eugene Burmako: macros, tons of macro support, build contributions
 * Franco Callari: author of spire.math.Jet
@@ -25,6 +26,7 @@ possible.
 * Lars Hupel: core maintainer, law-checking, release support
 * Ben Hutchison: bug reports and design suggestions
 * Kamushin: bug fixes
+* Rüdiger Klaehn: bug fixes
 * Rex Kerr: author of many of the PRNGs found in spire.random
 * Grzegorz Kossakowski: much build support, 2.11 upgrading help, bug reports
 * Christian Krause: suggestions around stats methods and spire.random.
@@ -42,6 +44,7 @@ possible.
 * Titorenko: bug fixes
 * Vlad Ureche: specialization support, work on spire-miniboxing
 * Volth: bug reports and feedback around intervals
+* William Waites: bug fixes
 * Kenji Yoshida: bug fixes
 * Benito van der Zander: many bug reports, and much good testing
 

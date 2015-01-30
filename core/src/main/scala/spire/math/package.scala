@@ -239,7 +239,7 @@ package object math {
       else bigIntPow(t, b * b, e >> 1)
 
     if (ex.signum < 0) {
-      if (base.signum == 0) sys.error("zero can't be raised to negative power")
+      if (base.signum == 0) throw new ArithmeticException("zero can't be raised to negative power")
       else if (base == 1) base
       else if (base == -1) if (ex.testBit(0)) BigInt(1) else base
       else BigInt(0)
@@ -263,7 +263,7 @@ package object math {
       else longPow(t, b * b, e >> 1L)
 
     if (exponent < 0L) {
-      if(base == 0L) sys.error("zero can't be raised to negative power")
+      if(base == 0L) throw new ArithmeticException("zero can't be raised to negative power")
       else if (base == 1L) 1L
       else if (base == -1L) if ((exponent & 1L) == 0L) -1L else 1L
       else 0L

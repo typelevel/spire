@@ -843,7 +843,7 @@ object Interval {
         (left, x, y, right) match {
           case ("(", "-∞", "∞", ")") => Interval.all[Rational]
           case ("(", "-∞", y, ")") => Interval.below(Rational(y))
-          case ("(", "∞", y, "]") => Interval.atOrBelow(Rational(y))
+          case ("(", "-∞", y, "]") => Interval.atOrBelow(Rational(y))
           case ("(", x, "∞", ")") => Interval.above(Rational(x))
           case ("[", x, "∞", ")") => Interval.atOrAbove(Rational(x))
           case ("[", x, y, "]") => Interval.closed(Rational(x), Rational(y))
