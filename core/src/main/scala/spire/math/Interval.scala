@@ -423,6 +423,9 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       case (_, _) => lhs * rhs.reciprocal
     }
 
+  def /(rhs: A)(implicit ev: Field[A]): Interval[A] =
+    lhs * rhs.reciprocal
+
   def +(rhs: A)(implicit ev: AdditiveSemigroup[A]): Interval[A] =
     this match {
       case Point(v) => Point(v + rhs)
