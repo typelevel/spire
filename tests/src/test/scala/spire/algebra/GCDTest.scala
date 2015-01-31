@@ -1,6 +1,6 @@
 package spire.algebra
 
-import spire.math.Rational
+import spire.math.{ Rational, NumberTag }
 import spire.std.int._
 import spire.std.long._
 import spire.std.float._
@@ -28,12 +28,17 @@ class GCDTest extends FunSuite with Checkers {
     d <- arbitrary[Long] if d != 0
   } yield Rational(n, d))
 
-  def testGcd[A: EuclideanRing: IsReal: ClassTag](x: A, y: A): Boolean = {
+  def testGcd[A: EuclideanRing: IsReal: NumberTag](x: A, y: A): Boolean = {
     (x == Ring[A].zero || y == Ring[A].zero) || {
       val den = spire.math.gcd(x, y)
       val x0 = x /~ den
       val y0 = y /~ den
-      x0.isWhole && y0.isWhole && (spire.math.gcd(x0, y0) == Ring[A].one)
+      if (NumberTag[A].isFinite(x0) && NumberTag[A].isFinite(y0)) {
+        x0.isWhole && y0.isWhole && (spire.math.gcd(x0, y0) == Ring[A].one)
+      } else {
+        // Ideally we'd filter this out at the ScalaCheck level.
+        true
+      }
     }
   }
 
