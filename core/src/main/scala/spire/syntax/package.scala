@@ -58,4 +58,6 @@ package object syntax {
   object all extends AllSyntax
 
   object unbound extends UnboundSyntax
+
+  object interval extends IntervalSyntax
 }
