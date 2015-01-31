@@ -124,5 +124,8 @@ trait FloatInstances {
   implicit final val FloatAlgebra = new FloatAlgebra
   import Float._
   import spire.math.NumberTag._
-  implicit final val FloatTag = new BuiltinFloatTag(0F, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity)
+  implicit final val FloatTag = new BuiltinFloatTag(0F, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
+    def isInfinite(a: Float): Boolean = java.lang.Float.isInfinite(a)
+    def isNaN(a: Float): Boolean =  java.lang.Float.isNaN(a)
+  }
 }

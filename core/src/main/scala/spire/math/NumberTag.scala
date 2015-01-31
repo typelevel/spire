@@ -22,6 +22,9 @@ object NumberTag {
 
     def overflows: Boolean = true
     def isSigned: Boolean = true
+
+    def isInfinite(a: A): Boolean = false
+    def isNaN(a: A): Boolean = false
   }
 
   class UnsignedIntTag[A](zero: A, max: A) extends NumberTag[A] {
@@ -37,9 +40,12 @@ object NumberTag {
 
     def overflows: Boolean = true
     def isSigned: Boolean = false
+
+    def isInfinite(a: A): Boolean = false
+    def isNaN(a: A): Boolean = false
   }
 
-  class BuiltinFloatTag[A](zero: A, min: A, max: A, nan: A, posInf: A, negInf: A) extends NumberTag[A] {
+  abstract class BuiltinFloatTag[A](zero: A, min: A, max: A, nan: A, posInf: A, negInf: A) extends NumberTag[A] {
     def resolution: Resolution = Approximate
 
     val hasZero: Option[A] = Some(zero)
@@ -65,6 +71,9 @@ object NumberTag {
 
     def overflows: Boolean = false
     def isSigned: Boolean = true
+
+    def isInfinite(a: A): Boolean = false
+    def isNaN(a: A): Boolean = false
   }
 
   class CustomTag[A](val resolution: Resolution,
@@ -74,6 +83,8 @@ object NumberTag {
     def hasNaN: Option[A] = None
     def hasPositiveInfinity: Option[A] = None
     def hasNegativeInfinity: Option[A] = None
+    def isInfinite(a: A): Boolean = false
+    def isNaN(a: A): Boolean = false
   }
 }
 
@@ -91,9 +102,13 @@ trait NumberTag[A] {
   def overflows: Boolean
   def isSigned: Boolean
 
-  def isFinite: Boolean =
+  def finite: Boolean =
     hasMinValue.isDefined && hasMaxValue.isDefined
 
-  def isInfinite: Boolean =
+  def infinite: Boolean =
     hasMinValue.isEmpty || hasMaxValue.isEmpty
+
+  def isInfinite(a: A): Boolean
+  def isNaN(a: A): Boolean
+  def isFinite(a: A): Boolean = !(isInfinite(a) || isNaN(a))
 }
