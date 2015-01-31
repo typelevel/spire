@@ -747,7 +747,11 @@ object Interval {
    * below it. Similarly, the upper bound is the point midway between
    * d and the adjacent Double value above it.
    * 
+   * There are three Double values that return "special" intervals:
    * 
+   *    Infinity => Interval.above(Double.MaxValue)
+   *   -Infinity => Interval.below(Double.MinValue)
+   *         NaN => Interval.empty
    */
   def errorBounds(d: Double): Interval[Rational] =
     if (d == Double.PositiveInfinity) {
