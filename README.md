@@ -116,6 +116,7 @@ to concepts from abstract algebra:
  * `Semigroup[A]` types with an associative binary operator `|+|`
  * `Monoid[A]` semigroups that have an identity element
  * `Group[A]` monoids that have an inverse operator
+ * `(Left/Right/)Action[P, G]` left/right/ actions of semigroups/monoids/groups
  * `Semiring[A]` types that form semigroups under `+` and `*`
  * `Rng[A]` types that form a group under `+` and a semigroup under `*`
  * `Rig[A]` types that form monoids under `+` and `*`
@@ -132,6 +133,9 @@ to concepts from abstract algebra:
  * `Trig[A]` types that support trigonometric functions
  * `Bool[A]` types that form a Boolean algebra
  * `Heyting[A]` types that form a Heyting algebra
+
+Variants of Semigroup/Monoid/Group/Action with partial operations are
+defined in the `spire.algebra.partial` subpackage.
 
 In addition to the type classes themselves, `spire.implicits` defines many
 implicits which provide unary and infix operators for the type classes. The
