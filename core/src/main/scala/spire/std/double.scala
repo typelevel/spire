@@ -123,5 +123,8 @@ trait DoubleInstances {
   implicit final val DoubleAlgebra = new DoubleAlgebra
   import Double._
   import spire.math.NumberTag._
-  implicit final val DoubleTag = new BuiltinFloatTag(0D, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity)
+  implicit final val DoubleTag = new BuiltinFloatTag(0D, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
+    def isInfinite(a: Double): Boolean = java.lang.Double.isInfinite(a)
+    def isNaN(a: Double): Boolean =  java.lang.Double.isNaN(a)
+  }
 }
