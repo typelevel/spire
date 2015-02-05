@@ -763,6 +763,11 @@ private[math] object LongRationals extends Rationals[Long] {
         else
           (SafeLong(n) * (r.d / dgcd) - SafeLong(r.n) * (d / dgcd)).signum
     }
+
+    override def equals(that: Any) = that match {
+      case that: LongRational => this.n == that.n && this.d == that.d
+      case _ => super.equals(that)
+    }
   }
 }
 
