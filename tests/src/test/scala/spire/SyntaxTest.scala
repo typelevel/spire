@@ -6,13 +6,13 @@ import spire.std.int._
 import spire.std.double._
 import spire.std.seq._
 import spire.std.string._
-
 import org.scalatest.{FunSuite, Matchers}
 import org.scalatest.prop.Checkers
-
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
+import spire.algebra.Dim3CoordinateSpace
+import spire.algebra.Dim3CoordinateSpace._
 
 class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   // This tests 2 things:
@@ -77,6 +77,9 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   test("CoordinateSpace syntax")(check(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
     testCoordinateSpaceSyntax(v, w, a.x)(CoordinateSpace.seq[Rational, Vector](3))
   }))
+  test("Dim3CoordinateSpace syntax")(check(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
+    testCoordinateSpaceSyntax(v, w, a.x)(Dim3CoordinateSpace.seq[Rational, Vector](3))
+  }))  
   test("Bool syntax")(check(forAll { (a: Int, b: Int) => testBoolSyntax(a, b) }))
 }
 
