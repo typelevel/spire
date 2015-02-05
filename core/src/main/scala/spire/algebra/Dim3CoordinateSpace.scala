@@ -12,8 +12,8 @@ trait Dim3CoordinateSpace[V, @spec(Float, Double) F] extends Any with Coordinate
 
   override def dimensions : Int = 3
   def cross(v: V, w: V): V 
-  def :*:(v: V, w: V): V = cross(v,w)
-//   def angle(v: V, w: V): F = v dot w
+//  def :*:(v: V, w: V): V = cross(v,w)
+//  def angle(v: V, w: V): F
 }
 
 object Dim3CoordinateSpace {
@@ -33,19 +33,13 @@ extends SeqInnerProductSpace[A, SA] with Dim3CoordinateSpace[SA, A] with Seriali
   def cross(x: SA, y: SA): SA = {
     val b = cbf()
     b+=(
+      // also possible to use _x, _y, _z      
       // x(1) * y(2) - x(2) * y(1)
-      scalar.plus(scalar.times(x(1), y(2)), scalar.negate(scalar.times(x(2), y(1)))),
-      // x(2) * y(0) - x(0) * y(2),
-      scalar.plus(scalar.times(x(2), y(0)), scalar.negate(scalar.times(x(0), y(2)))),            
+      scalar.minus(scalar.times(x(1), y(2)), scalar.times(x(2), y(1))),
+      // x(2) * y(0) - x(0) * y(2)
+      scalar.minus(scalar.times(x(2), y(0)), scalar.times(x(0), y(2))),            
       // x(0) * y(1) - x(1) * y(0)
-      scalar.plus(scalar.times(x(0), y(1)), scalar.negate(scalar.times(x(1), y(0)))))
-// also possible to use _x, _y, _z      
-//      _y(x) * _z(y) - _z(x) * _y(y)
-//    scalar.plus(scalar.times(_y(x), _z(y)), scalar.negate(scalar.times(_z(x), _y(y))))
-//      _z(x) * _x(y) - _x(x) * _z(y)
-//    scalar.plus(scalar.times(_z(x), _x(y)), scalar.negate(scalar.times(_x(x), _z(y))))
-//      _x(x) * _y(y) - _y(x) * _x(y)
-//    scalar.plus(scalar.times(_x(x), _y(y)), scalar.negate(scalar.times(_y(x), _x(y))))
+      scalar.minus(scalar.times(x(0), y(1)), scalar.times(x(1), y(0))))
       
     b.result()    
   } 
@@ -73,11 +67,11 @@ extends Dim3CoordinateSpace[Array[A], A] with Serializable {
   def cross(x: Array[A], y: Array[A]) : Array[A] =
     Array( 
       // x(1) * y(2) - x(2) * y(1),
-      scalar.plus(scalar.times(x(1), y(2)), scalar.negate(scalar.times(x(2), y(1)))),
+      scalar.minus(scalar.times(x(1), y(2)), scalar.times(x(2), y(1))),
       // x(2) * y(0) - x(0) * y(2),
-      scalar.plus(scalar.times(x(2), y(0)), scalar.negate(scalar.times(x(0), y(2)))),            
+      scalar.minus(scalar.times(x(2), y(0)), scalar.times(x(0), y(2))),            
       // x(0) * y(1) - x(1) * y(0)
-      scalar.plus(scalar.times(x(0), y(1)), scalar.negate(scalar.times(x(1), y(0)))))
+      scalar.minus(scalar.times(x(0), y(1)), scalar.times(x(1), y(0))))
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
   def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
