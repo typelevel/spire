@@ -273,9 +273,9 @@ trait BaseSyntaxTest {
       ((a gcd b) === EuclideanRing[A].gcd(a, b)) &&
       ((a lcm b) === EuclideanRing[A].lcm(a, b)) &&
       ((a + 42) === Ring[A].plus(a, Ring[A].fromInt(42))) &&
-      ((42 + a) === Ring[A].plus(Ring[A].fromInt(42), a)) &&
+      (((42 + a): A) === Ring[A].plus(Ring[A].fromInt(42), a)) &&
       ((a - 42) === Ring[A].minus(a, Ring[A].fromInt(42))) &&
-      ((42 - a) === Ring[A].minus(Ring[A].fromInt(42), a)) &&
+      (((42 - a): A) === Ring[A].minus(Ring[A].fromInt(42), a)) &&
       ((a * 42) === Ring[A].times(a, Ring[A].fromInt(42))) &&
       ((42 * a) === Ring[A].times(Ring[A].fromInt(42), a)) &&
       ((a /~ 42) === EuclideanRing[A].quot(a, Ring[A].fromInt(42))) &&
@@ -283,9 +283,9 @@ trait BaseSyntaxTest {
       ((a % 42) === EuclideanRing[A].mod(a, Ring[A].fromInt(42))) &&
       ((42 % b) === EuclideanRing[A].mod(Ring[A].fromInt(42), b)) &&
       ((a + 3.14) === Ring[A].plus(a, Field[A].fromDouble(3.14))) &&
-      ((3.14 + b) === Ring[A].plus(Field[A].fromDouble(3.14), b)) &&
+      (((3.14 + b): A) === Ring[A].plus(Field[A].fromDouble(3.14), b)) &&
       ((a - 3.14) === Ring[A].minus(a, Field[A].fromDouble(3.14))) &&
-      ((3.14 - b) === Ring[A].minus(Field[A].fromDouble(3.14), b)) &&
+      (((3.14 - b): A) === Ring[A].minus(Field[A].fromDouble(3.14), b)) &&
       ((a * 3.14) === Ring[A].times(a, Field[A].fromDouble(3.14))) &&
       ((3.14 * b) === Ring[A].times(Field[A].fromDouble(3.14), b)) &&
       ((a / 3.14) === Field[A].div(a, Field[A].fromDouble(3.14))) &&
