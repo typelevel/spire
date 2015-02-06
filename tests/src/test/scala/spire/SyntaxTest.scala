@@ -260,36 +260,37 @@ trait BaseSyntaxTest {
     import spire.syntax.field._
     import spire.std.tuples._
     import spire.optional.totalfloat._
+
+    ((42 + a) === Ring[A].plus(Ring[A].fromInt(42), a)) &&
+    ((42 - a) === Ring[A].minus(Ring[A].fromInt(42), a)) &&
+    ((3.14 + b) === Ring[A].plus(Field[A].fromDouble(3.14), b)) &&
+    ((3.14 - b) === Ring[A].minus(Field[A].fromDouble(3.14), b)) &&
     ((a + b) === Ring[A].plus(a, b)) &&
-      ((a - b) === Ring[A].minus(a, b)) &&
-      (-a === Ring[A].negate(a)) &&
-      ((a * b) === Ring[A].times(a, b)) &&
-      ((a /~ b) === EuclideanRing[A].quot(a, b)) &&
-      ((a % b) === EuclideanRing[A].mod(a, b)) &&
-      ((a /% b) === EuclideanRing[A].quotmod(a, b)) &&
-      ((a / b) === Field[A].div(a, b)) &&
-      ((a ** 2) === Ring[A].pow(a, 2)) &&
-      ((a pow 2) === Ring[A].pow(a, 2)) &&
-      ((a gcd b) === EuclideanRing[A].gcd(a, b)) &&
-      ((a lcm b) === EuclideanRing[A].lcm(a, b)) &&
-      ((a + 42) === Ring[A].plus(a, Ring[A].fromInt(42))) &&
-      (((42 + a): A) === Ring[A].plus(Ring[A].fromInt(42), a)) &&
-      ((a - 42) === Ring[A].minus(a, Ring[A].fromInt(42))) &&
-      (((42 - a): A) === Ring[A].minus(Ring[A].fromInt(42), a)) &&
-      ((a * 42) === Ring[A].times(a, Ring[A].fromInt(42))) &&
-      ((42 * a) === Ring[A].times(Ring[A].fromInt(42), a)) &&
-      ((a /~ 42) === EuclideanRing[A].quot(a, Ring[A].fromInt(42))) &&
-      ((42 /~ b) === EuclideanRing[A].quot(Ring[A].fromInt(42), b)) &&
-      ((a % 42) === EuclideanRing[A].mod(a, Ring[A].fromInt(42))) &&
-      ((42 % b) === EuclideanRing[A].mod(Ring[A].fromInt(42), b)) &&
-      ((a + 3.14) === Ring[A].plus(a, Field[A].fromDouble(3.14))) &&
-      (((3.14 + b): A) === Ring[A].plus(Field[A].fromDouble(3.14), b)) &&
-      ((a - 3.14) === Ring[A].minus(a, Field[A].fromDouble(3.14))) &&
-      (((3.14 - b): A) === Ring[A].minus(Field[A].fromDouble(3.14), b)) &&
-      ((a * 3.14) === Ring[A].times(a, Field[A].fromDouble(3.14))) &&
-      ((3.14 * b) === Ring[A].times(Field[A].fromDouble(3.14), b)) &&
-      ((a / 3.14) === Field[A].div(a, Field[A].fromDouble(3.14))) &&
-      ((3.14 / b) === Field[A].div(Field[A].fromDouble(3.14), b))
+    ((a - b) === Ring[A].minus(a, b)) &&
+    (-a === Ring[A].negate(a)) &&
+    ((a * b) === Ring[A].times(a, b)) &&
+    ((a /~ b) === EuclideanRing[A].quot(a, b)) &&
+    ((a % b) === EuclideanRing[A].mod(a, b)) &&
+    ((a /% b) === EuclideanRing[A].quotmod(a, b)) &&
+    ((a / b) === Field[A].div(a, b)) &&
+    ((a ** 2) === Ring[A].pow(a, 2)) &&
+    ((a pow 2) === Ring[A].pow(a, 2)) &&
+    ((a gcd b) === EuclideanRing[A].gcd(a, b)) &&
+    ((a lcm b) === EuclideanRing[A].lcm(a, b)) &&
+    ((a + 42) === Ring[A].plus(a, Ring[A].fromInt(42))) &&
+    ((a - 42) === Ring[A].minus(a, Ring[A].fromInt(42))) &&
+    ((a * 42) === Ring[A].times(a, Ring[A].fromInt(42))) &&
+    ((42 * a) === Ring[A].times(Ring[A].fromInt(42), a)) &&
+    ((a /~ 42) === EuclideanRing[A].quot(a, Ring[A].fromInt(42))) &&
+    ((42 /~ b) === EuclideanRing[A].quot(Ring[A].fromInt(42), b)) &&
+    ((a % 42) === EuclideanRing[A].mod(a, Ring[A].fromInt(42))) &&
+    ((42 % b) === EuclideanRing[A].mod(Ring[A].fromInt(42), b)) &&
+    ((a + 3.14) === Ring[A].plus(a, Field[A].fromDouble(3.14))) &&
+    ((a - 3.14) === Ring[A].minus(a, Field[A].fromDouble(3.14))) &&
+    ((a * 3.14) === Ring[A].times(a, Field[A].fromDouble(3.14))) &&
+    ((3.14 * b) === Ring[A].times(Field[A].fromDouble(3.14), b)) &&
+    ((a / 3.14) === Field[A].div(a, Field[A].fromDouble(3.14))) &&
+    ((3.14 / b) === Field[A].div(Field[A].fromDouble(3.14), b))
   }
 
   def testNRootSyntax[A: NRoot: Field](a: A) = {
