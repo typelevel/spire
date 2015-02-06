@@ -441,7 +441,7 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
     def toBigInt: BigInt = (integral.toBigInt(num) / integral.toBigInt(den))
     def toBigDecimal: BigDecimal = integral.toBigDecimal(num) / integral.toBigDecimal(den)
 
-    def longValue = toBigInt.longValue    // Override if possible.
+    def longValue = toBigInt.longValue
     def intValue = longValue.intValue
 
     def floatValue = doubleValue.toFloat
@@ -478,11 +478,6 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
       val bits = (m | ((1023L - e) << 52))
       java.lang.Double.longBitsToDouble(bits)
     }
-      
-
-    override def hashCode: Int =
-      if (isWhole && toBigInt == toLong) unifiedPrimitiveHashcode
-      else 29 * (37 * num.## + den.##)
 
     override def equals(that: Any): Boolean = that match {
       case that: Real => this == that.toRational
@@ -763,6 +758,19 @@ private[math] object LongRationals extends Rationals[Long] {
         else
           (SafeLong(n) * (r.d / dgcd) - SafeLong(r.n) * (d / dgcd)).signum
     }
+
+    override def equals(that: Any): Boolean = that match {
+      case that: LongRational => this.n == that.n && this.d == that.d
+      case _ => super.equals(that)
+    }
+
+    override def longValue: Long =
+      if(d == 1L) n
+      else n / d
+
+    override def hashCode: Int =
+      if (d==1) unifiedPrimitiveHashcode
+      else 29 * (37 * n.## + d.##)
   }
 }
 
@@ -930,6 +938,9 @@ private[math] object BigRationals extends Rationals[BigInt] {
           (SafeLong(r.d / dgcd) * n - SafeLong(d / dgcd) * r.n).signum
       }
     }
+
+    override def hashCode: Int =
+      29 * (37 * n.## + d.##)
   }
 }
 

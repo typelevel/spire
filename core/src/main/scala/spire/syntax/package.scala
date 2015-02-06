@@ -11,6 +11,9 @@ package object syntax {
   object isReal extends IsRealSyntax
   object convertableFrom extends ConvertableFromSyntax
 
+  object semigroupoid extends SemigroupoidSyntax
+  object groupoid extends GroupoidSyntax
+  
   object semigroup extends SemigroupSyntax
   object monoid extends MonoidSyntax
   object group extends GroupSyntax
@@ -45,6 +48,7 @@ package object syntax {
 
   object bitString extends BitStringSyntax
 
+  object partialAction extends PartialActionSyntax
   object action extends ActionSyntax
   object torsor extends TorsorSyntax
 
@@ -55,4 +59,6 @@ package object syntax {
   object all extends AllSyntax
 
   object unbound extends UnboundSyntax
+
+  object interval extends IntervalSyntax
 }

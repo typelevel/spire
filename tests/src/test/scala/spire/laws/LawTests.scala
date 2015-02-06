@@ -4,10 +4,12 @@ import spire.algebra._
 import spire.algebra.free._
 import spire.algebra.lattice._
 import spire.math._
+import spire.optional.partialIterable._
+import spire.optional.mapIntIntPermutation._
 import spire.implicits.{
   SeqOrder => _, SeqEq => _,
   ArrayOrder => _, ArrayEq => _,
-  MapEq => _,
+  MapEq => _, MapGroup => _,
   _ }
 
 import scala.{ specialized => spec }
@@ -15,6 +17,7 @@ import scala.{ specialized => spec }
 import org.typelevel.discipline.scalatest.Discipline
 
 import org.scalatest.FunSuite
+import org.scalacheck.Arbitrary
 
 class LawTests extends FunSuite with Discipline {
 
@@ -70,6 +73,9 @@ class LawTests extends FunSuite with Discipline {
   checkAll("String[Int]", GroupLaws[String].monoid)
   checkAll("Array[Int]",  GroupLaws[Array[Int]].monoid)
 
+  checkAll("Seq[String]", PartialGroupLaws[Seq[String]](spire.optional.genericEq.generic, implicitly).semigroupoid)
+  checkAll("Seq[Int]",    PartialGroupLaws[Seq[Int]].groupoid)
+
   checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
 
   checkAll("Sign", ActionLaws[Sign, Int].multiplicativeMonoidAction)
@@ -107,4 +113,6 @@ class LawTests extends FunSuite with Discipline {
 
   checkAll("Order[Int]", OrderLaws[Int].order)
   checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
+
+  checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbPerm.arbitrary.map(_.map)), implicitly, implicitly).groupPartialAction)
 }

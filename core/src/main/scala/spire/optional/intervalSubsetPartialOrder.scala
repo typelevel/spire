@@ -6,9 +6,9 @@ import spire.math.Interval
 object intervalSubsetPartialOrder {
 
   /** Interval partial order defined as follows:
-    * 
-    * I <= J if I is a subset of J.
-    */
+   * 
+   * I <= J if I is a subset of J.
+   */
   class IntervalSubsetPartialOrder[A: Order] extends PartialOrder[Interval[A]] {
     override def eqv(x: Interval[A], y: Interval[A]) = (x == y)
     override def lteqv(x: Interval[A], y: Interval[A]) = x.isSubsetOf(y)
@@ -17,14 +17,10 @@ object intervalSubsetPartialOrder {
     override def gt(x: Interval[A], y: Interval[A]) = x.isProperSupersetOf(y)
 
     def partialCompare(x: Interval[A], y: Interval[A]): Double = {
-      if (eqv(x, y))
-        0.0
-      else if (lt(x, y))
-        -1.0
-      else if (gt(x, y))
-        1.0
-      else
-        Double.NaN
+      if (eqv(x, y)) 0.0
+      else if (lt(x, y)) -1.0
+      else if (gt(x, y)) 1.0
+      else Double.NaN
     }
   }
   implicit def intervalSubsetPartialOrder[A: Order]: PartialOrder[Interval[A]] = new IntervalSubsetPartialOrder[A]

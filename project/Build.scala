@@ -198,7 +198,9 @@ object MyBuild extends Build {
     libraryDependencies ++= Seq(
       scalaCheck % "test",
       scalaTest % "test"
-    )
+    ),
+    unmanagedSourceDirectories in Compile += (sourceDirectory in Compile).value / s"scala_${scalaBinaryVersion.value}"
+
   ) ++ buildInfoSettings ++ Seq(
     sourceGenerators in Compile <+= buildInfo,
     buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
