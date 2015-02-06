@@ -77,8 +77,8 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   test("CoordinateSpace syntax")(check(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
     testCoordinateSpaceSyntax(v, w, a.x)(CoordinateSpace.seq[Rational, Vector](3))
   }))
-  test("Dim3CoordinateSpace syntax")(check(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
-    testCoordinateSpaceSyntax(v, w, a.x)(Dim3CoordinateSpace.seq[Rational, Vector](3))
+  test("Dim3CoordinateSpace syntax")(check(forAll { (v: Vector[Double], w: Vector[Double], a: NonZero[Double]) =>
+    testCoordinateSpaceSyntax(v, w, a.x)(Dim3CoordinateSpace.seq[Double, Vector](3))
   }))  
   test("Bool syntax")(check(forAll { (a: Int, b: Int) => testBoolSyntax(a, b) }))
 }
