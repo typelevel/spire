@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.macros.Checked
+import spire.std.long.LongAlgebra
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
@@ -745,11 +747,15 @@ private[math] object LongRationals extends Rationals[Long] {
 
     def compare(r: Rational): Int = r match {
       case r: LongRationals.LongRational =>
-        val dgcd = spire.math.gcd(d, r.d)
-        if (dgcd == 1L)
-          (SafeLong(n) * r.d - SafeLong(r.n) * d).signum
-        else
-          (SafeLong(n) * (r.d / dgcd) - SafeLong(r.n) * (d / dgcd)).signum
+        Checked.tryOrElse {
+          LongAlgebra.compare(n * r.d, r.n * d)
+        } {
+          val dgcd = spire.math.gcd(d, r.d)
+          if (dgcd == 1L)
+            (SafeLong(n) * r.d - SafeLong(r.n) * d).signum
+          else
+            (SafeLong(n) * (r.d / dgcd) - SafeLong(r.n) * (d / dgcd)).signum
+        }
 
       case r: BigRational =>
         val dgcd = spire.math.gcd(d, (r.d % d).toLong)
