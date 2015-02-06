@@ -11,8 +11,27 @@ import org.scalatest.prop.Checkers
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
-import spire.algebra.Dim3CoordinateSpace
-import spire.algebra.Dim3CoordinateSpace._
+
+trait ReferenceSystem[V[_], T] {
+  trait VectorMagnitude[V[_], T]
+  
+  case class Position[V[_], T](val p : V[T]) extends VectorMagnitude[V,T]
+  case class Velocity[V[_], T](val v : V[T]) extends VectorMagnitude[V, T]
+  case class Acceleration[V[_], T](val a : V[T]) extends VectorMagnitude[V, T]
+  case class AngularMomentum[V[_], T](val l : V[T]) extends VectorMagnitude[V, T]
+  
+}
+
+class J2000[V[_],T] extends ReferenceSystem[V, T] {
+  
+  def toGCRF[V[_],T](refSystem : ReferenceSystem[V[T]])(m : refSystem.VectorMagnitude) : V[T]
+}
+
+
+class GCRF[V[_], T] extends ReferenceSystem[V, T] {
+  
+  def toJ2000[V,T](refSystem : ReferenceSystem[V[T]])(m : refSystem.VectorMagnitude) : V[T]
+}
 
 class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   // This tests 2 things:
@@ -78,7 +97,7 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
     testCoordinateSpaceSyntax(v, w, a.x)(CoordinateSpace.seq[Rational, Vector](3))
   }))
   test("Dim3CoordinateSpace syntax")(check(forAll { (v: Vector[Double], w: Vector[Double], a: NonZero[Double]) =>
-    testCoordinateSpaceSyntax(v, w, a.x)(Dim3CoordinateSpace.seq[Double, Vector](3))
+    testDim3CoordinateSpaceSyntax(v, w, a.x)(Dim3CoordinateSpace.seq[Double, Vector])
   }))  
   test("Bool syntax")(check(forAll { (a: Int, b: Int) => testBoolSyntax(a, b) }))
 }
@@ -379,6 +398,29 @@ trait BaseSyntaxTest {
       (v._z == V._z(v)) &&
       (v.coord(0) == V.coord(v, 0)) &&
       (v.coord(1) == V.coord(v, 1))
+  }
+
+  def testDim3CoordinateSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: Dim3CoordinateSpace[V, A]) = {
+    import spire.syntax.dim3coordinateSpace._
+    implicit def A: Field[A] = V.scalar
+    ((v + w) == V.plus(v, w)) &&
+      ((v - w) == V.minus(v, w)) &&
+      (-v == V.negate(v)) &&
+      ((a *: v) == V.timesl(a, v)) &&
+      ((v :* a) == V.timesr(v, a)) &&
+      //((2 *: v) == V.timesl(A.fromInt(2), v)) &&
+      //((v :* 2) == V.timesr(v, A.fromInt(2))) &&
+      //((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
+      //((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
+      //((v :/ 2) == V.divr(v, A.fromInt(2))) &&
+      ((v dot w) == V.dot(v, w)) &&
+      ((v ⋅ w) == V.dot(v, w)) &&
+      (v._x == V._x(v)) &&
+      (v._y == V._y(v)) &&
+      (v._z == V._z(v)) &&
+      (v.coord(0) == V.coord(v, 0)) &&
+      (v.coord(1) == V.coord(v, 1)) &&
+      ((v cross w) == V.cross(v, w))
   }
 
   def testBoolSyntax[A: Bool](a: A, b: A) = {
