@@ -12,26 +12,6 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 
-trait ReferenceSystem[V[_], T] {
-  trait VectorMagnitude[V[_], T]
-  
-  case class Position[V[_], T](val p : V[T]) extends VectorMagnitude[V,T]
-  case class Velocity[V[_], T](val v : V[T]) extends VectorMagnitude[V, T]
-  case class Acceleration[V[_], T](val a : V[T]) extends VectorMagnitude[V, T]
-  case class AngularMomentum[V[_], T](val l : V[T]) extends VectorMagnitude[V, T]
-  
-}
-
-class J2000[V[_],T] extends ReferenceSystem[V, T] {
-  
-  def toGCRF[V[_],T](refSystem : ReferenceSystem[V[T]])(m : refSystem.VectorMagnitude) : V[T]
-}
-
-
-class GCRF[V[_], T] extends ReferenceSystem[V, T] {
-  
-  def toJ2000[V,T](refSystem : ReferenceSystem[V[T]])(m : refSystem.VectorMagnitude) : V[T]
-}
 
 class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   // This tests 2 things:
