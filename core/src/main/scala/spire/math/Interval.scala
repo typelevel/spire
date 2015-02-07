@@ -349,7 +349,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
         else 
           Above(lower1 * lower2, lf1 | lf2)
       case (Above(lower1, lf1), Below(upper2, uf2)) => aboveBelow(lower1, lf1, upper2, uf2)
-      case (Below(upper1, uf1), Above(lower2, lf2)) => aboveBelow(lower2, lf2, upper1, uf1)
+      case (Below(upper1, uf1), Above(lower2, lf2)) => rhs * lhs
       case (Below(upper1, uf1), Below(upper2, uf2)) =>
         if (upper1 > z || upper2 > z) 
           All() 
@@ -358,12 +358,10 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
       case (Above(lower1, lf1), Bounded(lower2, upper2, flags2)) => 
         aboveBounded(lower1, lf1, lower2, upper2, flags2)
-      case (Bounded(lower1, upper1, flags1), Above(lower2, lf2)) =>
-        aboveBounded(lower2, lf2, lower1, upper1, flags1)
+      case (Bounded(lower1, upper1, flags1), Above(lower2, lf2)) => rhs * lhs
       case (Below(upper1, uf1), Bounded(lower2, upper2, flags2)) =>
         belowBounded(upper1, uf1, lower2, upper2, flags2)
-      case (Bounded(lower1, upper1, flags1), Below(upper2, uf2)) =>
-        belowBounded(upper2, uf2, lower1, upper1, flags1)
+      case (Bounded(lower1, upper1, flags1), Below(upper2, uf2)) => rhs * lhs
 
       case (bd1: Bounded[A], bd2: Bounded[A]) =>
         val lb1 = bd1.lowerBound
