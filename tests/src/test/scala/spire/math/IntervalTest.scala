@@ -93,6 +93,15 @@ class RingIntervalTest extends FunSuite {
     assert( Interval.fromBounds(Unbound(), Closed(c)) * (-c) ===
       Interval.fromBounds(Closed(-c*c), Unbound()) )
   }
+  test("Interval multiplication bug #372")   {
+    val a = Interval(-1, 1)
+    val b = Interval.above(1)
+    val x = -1
+    val y = 10
+    assert(a.contains(x))
+    assert(b.contains(y))
+    assert((a*b).contains(x*y))
+  }
 }
 
 class IntervalGeometricPartialOrderTest extends FunSuite {
@@ -117,15 +126,6 @@ class IntervalGeometricPartialOrderTest extends FunSuite {
     val intervals = Seq(point(1), closed(2, 3), closed(2, 4))
     assert(intervals.pmin.toSet == Set(point(1)))
     assert(intervals.pmax.toSet == Set(closed(2, 3), closed(2, 4)))
-  }
-  test("Interval multiplication bug #372")   {
-    val a = Interval(-1, 1)
-    val b = Interval.above(1)
-    val x = -1
-    val y = 10
-    assert(a.contains(x))
-    assert(b.contains(y))
-    assert((a*b).contains(x*y))
   }
 }
 
