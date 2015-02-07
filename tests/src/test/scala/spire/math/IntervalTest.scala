@@ -118,6 +118,15 @@ class IntervalGeometricPartialOrderTest extends FunSuite {
     assert(intervals.pmin.toSet == Set(point(1)))
     assert(intervals.pmax.toSet == Set(closed(2, 3), closed(2, 4)))
   }
+  test("Interval multiplication bug #372")   {
+    val a = Interval(-1, 1)
+    val b = Interval.above(1)
+    val x = -1
+    val y = 10
+    assert(a.contains(x))
+    assert(b.contains(y))
+    assert((a*b).contains(x*y))
+  }
 }
 
 class IntervalSubsetPartialOrderTest extends FunSuite {
