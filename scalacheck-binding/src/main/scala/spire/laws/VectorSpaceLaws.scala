@@ -17,18 +17,15 @@ object VectorSpaceLaws {
 
 trait VectorSpaceLaws[V, A] extends Laws {
 
-  implicit def scalar(implicit V: Module[V, A]): Rng[A] = V.scalar
-
   val scalarLaws: RingLaws[A]
   val vectorLaws: GroupLaws[V]
 
   import scalarLaws.{ Equ => EqA, Arb => ArA }
   import vectorLaws.{ Equ => EqV, Arb => ArV }
 
-
-  def module(implicit V: Module[V, A]) = new SpaceProperties(
+  def module(implicit V: VectorSpace[V, A], A: Rng[A]) = new SpaceProperties(
     name = "module",
-    sl = _.rng(V.scalar),
+    sl = _.rng(A),
     vl = _.abGroup(V.additive),
     parents = Seq.empty,
 
@@ -48,9 +45,9 @@ trait VectorSpaceLaws[V, A] extends Laws {
     )*/
   )
 
-  def vectorSpace(implicit V: VectorSpace[V, A]) = new SpaceProperties(
+  def vectorSpace(implicit V: VectorSpace[V, A], A: Field[A]) = new SpaceProperties(
     name = "vector space",
-    sl = _.field(V.scalar),
+    sl = _.field(A),
     vl = _.abGroup(V.additive),
     parents = Seq(module)
   )
@@ -72,9 +69,9 @@ trait VectorSpaceLaws[V, A] extends Laws {
     )
   )
 
-  def normedVectorSpace(implicit V: NormedVectorSpace[V, A], ev0: Order[A], ev1: Signed[A]) = new SpaceProperties(
+  def normedVectorSpace(implicit V: NormedVectorSpace[V, A], A: Field[A], ev0: Order[A], ev1: Signed[A]) = new SpaceProperties(
     name = "normed vector space",
-    sl = _.field(V.scalar),
+    sl = _.field(A),
     vl = _.abGroup(V.additive),
     parents = Seq(vectorSpace, metricSpace),
 
@@ -89,7 +86,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     )
   )
 
-  def linearity(f: V => A)(implicit V: Module[V, A]) = new SimpleRuleSet(
+  def linearity(f: V => A)(implicit V: VectorSpace[V, A], A: Rng[A]) = new SimpleRuleSet(
     name = "linearity",
 
     "homogeneity" → forAll((r: A, v: V) =>
@@ -100,7 +97,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     )
   )
 
-  def innerProductSpace(implicit V: InnerProductSpace[V, A], A: Order[A], A0: Signed[A]) = SpaceProperties.fromParent(
+  def innerProductSpace(implicit V: InnerProductSpace[V, A], A0: Order[A], A1: Signed[A], A2: Field[A]) = SpaceProperties.fromParent(
     name = "inner-product space",
     parent = vectorSpace,
 

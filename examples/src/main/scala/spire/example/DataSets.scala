@@ -17,7 +17,7 @@ import scala.util.Random.shuffle
 final class DataSet[V, @spec(Double) F, @spec(Double) K](
     val name: String,
     val variables: List[Variable[F]],
-    val space: CoordinateSpace[V, F],
+    val space: Frame[V, F],
     val data: List[(V, K)]) {
 
   def describe: String = {
@@ -34,7 +34,7 @@ final class DataSet[V, @spec(Double) F, @spec(Double) K](
       s"    %2d. ${v.label} (${varType(v)})" format (i + 1)
     } mkString "\n"
 
-    s"""$name - ${data.size} points with ${variables.size} variables (${space.dimensions} effective):
+    s"""$name - ${data.size} points with ${variables.size} variables (${space.size} effective):
        |$vars""".stripMargin
   }
 }
@@ -84,7 +84,7 @@ object DataSet {
 
   def fromResource[CC[_], @spec(Double) F, @spec(Double) K](name: String, res: String, sep: Char,
       variables: List[Variable[F]], out: Output[K])(
-      cs: Int => CoordinateSpace[CC[F], F])(implicit
+      cs: Int => Frame[CC[F], F])(implicit
       cbf: CanBuildFrom[Nothing, F, CC[F]]): DataSet[CC[F], F, K] = {
 
     val lines = readDataSet(res)
@@ -105,7 +105,7 @@ object DataSet {
 
   def Iris = fromResource[Vector, Rational, String](
     "Iris", "/datasets/iris.data", ',',
-    IrisVars, (4, identity))(CoordinateSpace.seq)
+    IrisVars, (4, identity))(Frame.seq)
 
   private val YeastVars = List[Variable[Double]](
     Ignored("Protein"),
@@ -121,7 +121,7 @@ object DataSet {
 
   def Yeast = fromResource[Array, Double, String](
     "Yeast", "/datasets/yeast.data", ',',
-    YeastVars, (9, identity))(CoordinateSpace.array)
+    YeastVars, (9, identity))(Frame.array)
 
   private val MpgVars = List[Variable[Double]](
     Ignored("MPG"),
@@ -136,7 +136,7 @@ object DataSet {
 
   def MPG = fromResource[Array, Double, Double](
     "MPG", "/datasets/auto-mpg.data", ',',
-    MpgVars, (0, _.toDouble))(CoordinateSpace.array)
+    MpgVars, (0, _.toDouble))(Frame.array)
 }
 
 sealed trait Variable[+F] extends CanBuildFrom[Nothing, String, String => List[F]] {
@@ -220,12 +220,12 @@ object CrossValidation {
    * predictor results.
    */
   def crossValidate[V, @spec(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
-      train: CoordinateSpace[V, F] => List[(V, K)] => (V => K))(
-      score: List[Result[V, K]] => F): F = {
-    implicit val field = dataset.space.scalar
+      train: Frame[V, F] => List[(V, K)] => (V => K))(
+      score: List[Result[V, K]] => F)(implicit m: AdditiveMonoid[F]): F = {
+   // implicit val field = dataset.space.scalar
 
     @tailrec
-    def loop(left: List[(V, K)], right0: List[(V, K)], n: Int, sum: F): F = {
+    def loop(left: List[(V, K)], right0: List[(V, K)], n: Int, sum: F)(implicit m: AdditiveMonoid[F]): F = {
       if (n <= 0) {
         sum / k
       } else {
@@ -239,7 +239,7 @@ object CrossValidation {
       }
     }
 
-    loop(Nil, shuffle(dataset.data), k, dataset.space.scalar.zero)
+    loop(Nil, shuffle(dataset.data), k, m.zero)
   }
 
   /**
@@ -247,12 +247,12 @@ object CrossValidation {
    * predictor.
    */
   def crossValidateClassification[V, @spec(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
-      train: CoordinateSpace[V, F] => List[(V, K)] => (V => K)): F = {
-    implicit val field = dataset.space.scalar
-
+      train: Frame[V, F] => List[(V, K)] => (V => K))(implicit m: AdditiveMonoid[F]): F = {
+    // implicit val field = dataset.space.scalar
+    
     def accuracy(results: List[Result[V, K]]): F = {
-      results.foldLeft(field.zero) { case (acc, Result(_, output, predicted)) =>
-        acc + (if (predicted == output) field.one else field.zero)
+      results.foldLeft(m.zero) { case (acc, Result(_, output, predicted)) =>
+        acc + (if (predicted == output) m.one else m.zero)
       } / results.size
     }
 
@@ -263,8 +263,8 @@ object CrossValidation {
    * For cross-validating regression, we use the R^2 to score the predictor.
    */
   def crossValidateRegression[V, @spec(Double) F](dataset: DataSet[V, F, F], k: Int = 10)(
-      train: CoordinateSpace[V, F] => List[(V, F)] => (V => F)): F = {
-    implicit val field = dataset.space.scalar
+      train: Frame[V, F] => List[(V, F)] => (V => F)): F = {
+  //  implicit val field = dataset.space.scalar
 
     def rSquared(results: List[Result[V, F]]): F = {
       val mean = results.foldLeft(field.zero)(_ + _.output) / results.size

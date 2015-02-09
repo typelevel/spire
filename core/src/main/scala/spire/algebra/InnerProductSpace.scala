@@ -6,26 +6,31 @@ import scala.annotation.tailrec
 trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends Any with VectorSpace[V, F] { self =>
   def dot(v: V, w: V): F
 
-  def normed(implicit ev: NRoot[F]): NormedVectorSpace[V, F] = new NormedInnerProductSpace[V, F] {
-    def space = self
-    def nroot = ev
-  }
+  def normed(implicit ev: NRoot[F]): NormedVectorSpace[V, F] =
+    new NormedInnerProductSpace()(this, ev)
 }
 
 object InnerProductSpace {
   @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: InnerProductSpace[V, R]) = V
+
+  implicit def RealInnerProductSpace[V, @spec(Int, Long, Float, Double) K]
+    (implicit V: VectorSpace[V, K], basis: Basis[V, K],
+      K: Rng[K], K0: IsReal[K]): InnerProductSpace[V, K] =
+    new RealInnerProductSpace()(V, basis, K, K0)
 }
 
-private[algebra] trait NormedInnerProductSpace[V, @spec(Float, Double) F] extends Any with NormedVectorSpace[V, F] {
-  def space: InnerProductSpace[V, F]
-  def scalar: Field[F] = space.scalar
-  def nroot: NRoot[F]
+@SerialVersionUID(1L)
+private[algebra] class NormedInnerProductSpace[V, @spec(Float, Double) F]
+    (implicit val vectorSpace: InnerProductSpace[V, F], val nroot: NRoot[F])
+    extends NormedVectorSpace[V, F] with PassThroughVectorSpace[V, F] {
+  def norm(v: V): F = nroot.sqrt(vectorSpace.dot(v, v))
+}
 
-  def zero: V = space.zero
-  def plus(v: V, w: V): V = space.plus(v, w)
-  def negate(v: V): V = space.negate(v)
-  override def minus(v: V, w: V): V = space.minus(v, w)
-  def timesl(f: F, v: V): V = space.timesl(f, v)
-  override def divr(v: V, f: F): V = space.divr(v, f)
-  def norm(v: V): F = nroot.sqrt(space.dot(v, v))
+private[algebra] class RealInnerProductSpace[V, @spec(Int, Long, Float, Double) K]
+    (implicit val vectorSpace: VectorSpace[V, K], basis: Basis[V, K], K: Rng[K], K0: IsReal[K])
+    extends InnerProductSpace[V, K] with PassThroughVectorSpace[V, K] {
+  private val K1 = K.additive
+
+  def dot(v: V, w: V): K =
+    basis.zipFoldMap(v, w)(K.times)(K1)
 }

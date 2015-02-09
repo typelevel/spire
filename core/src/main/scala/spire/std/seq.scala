@@ -9,8 +9,8 @@ import spire.algebra._
 import spire.NoImplicit
 
 @SerialVersionUID(0L)
-class SeqModule[A, SA <: SeqLike[A, SA]](implicit val scalar: Ring[A], cbf: CanBuildFrom[SA,A,SA])
-extends Module[SA, A] with Serializable {
+class SeqVectorSpace[A, SA <: SeqLike[A, SA]](implicit val scalar: Rng[A], cbf: CanBuildFrom[SA,A,SA])
+extends VectorSpace[SA, A] with Serializable {
   def zero: SA = cbf().result
 
   def negate(sa: SA): SA = sa map (scalar.negate)
@@ -73,95 +73,6 @@ extends Module[SA, A] with Serializable {
 
   def timesl(r: A, sa: SA): SA = sa map (scalar.times(r, _))
 }
-
-@SerialVersionUID(0L)
-class SeqVectorSpace[A, SA <: SeqLike[A, SA]](implicit override val scalar: Field[A], cbf: CanBuildFrom[SA,A,SA])
-extends SeqModule[A, SA] with VectorSpace[SA, A] with Serializable
-
-@SerialVersionUID(0L)
-class SeqInnerProductSpace[A: Field, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA])
-extends SeqVectorSpace[A, SA] with InnerProductSpace[SA, A] with Serializable {
-  def dot(x: SA, y: SA): A = {
-    @tailrec
-    def loop(xi: Iterator[A], yi: Iterator[A], acc: A): A = {
-      if (xi.hasNext && yi.hasNext) {
-        loop(xi, yi, scalar.plus(acc, scalar.times(xi.next(), yi.next())))
-      } else {
-        acc
-      }
-    }
-
-    loop(x.toIterator, y.toIterator, scalar.zero)
-  }
-}
-
-@SerialVersionUID(0L)
-class SeqCoordinateSpace[A: Field, SA <: SeqLike[A, SA]](val dimensions: Int)(implicit cbf: CanBuildFrom[SA,A,SA])
-extends SeqInnerProductSpace[A, SA] with CoordinateSpace[SA, A] with Serializable {
-  def coord(v: SA, i: Int): A = v(i)
-
-  override def dot(v: SA, w: SA): A = super[SeqInnerProductSpace].dot(v, w)
-
-  def axis(i: Int): SA = {
-    val b = cbf()
-
-    @tailrec def loop(j: Int): SA = if (i < dimensions) {
-      b += (if (i == j) scalar.one else scalar.zero)
-      loop(j + 1)
-    } else b.result
-
-    loop(0)
-  }
-}
-
-@SerialVersionUID(0L)
-// no dimensions value needed so no inheriting from SeqCoordinateSpace, but from SeqInnerProductSpace
-class EuclideanSeqCoordinateSpace[A: Field, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA])
-extends SeqInnerProductSpace[A, SA] with EuclideanCoordinateSpace[SA, A] with Serializable {
-  
-  def cross(v: SA, w: SA): SA = {
-    val b = cbf()
-    b+=(
-      // also possible to use _x, _y, _z      
-      // x(1) * y(2) - x(2) * y(1)
-      scalar.minus(scalar.times(v(1), w(2)), scalar.times(v(2), w(1))),
-      // x(2) * y(0) - x(0) * y(2)
-      scalar.minus(scalar.times(v(2), w(0)), scalar.times(v(0), w(2))),            
-      // x(0) * y(1) - x(1) * y(0)
-      scalar.minus(scalar.times(v(0), w(1)), scalar.times(v(1), w(0))))
-      
-    b.result()    
-  } 
-  
-  def angle(v: SA, w: SA)(implicit nroot: NRoot[A], trig: Trig[A]): A = {
-    // law of cosines
-    // c2 = a2 + b2 - 2ab cos(angle)
-    val v2 = dot(v, v)
-    val w2 = dot(w, w)
-    val c  = minus(v,w)
-    val c2 = dot(c,c)
-    val n  = scalar.minus(scalar.plus(v2, w2),c2)
-    val d  = scalar.times(scalar.times(NRoot[A].sqrt(v2), NRoot[A].sqrt(w2)), scalar.fromInt(2)) 
-    spire.math.acos(scalar.div(n, d))
-  }
-  
-  def coord(v: SA, i: Int): A = v(i)
-
-  override def dot(v: SA, w: SA): A = super[SeqInnerProductSpace].dot(v, w)
-
-  def axis(i: Int): SA = {
-    val b = cbf()
-
-    @tailrec def loop(j: Int): SA = if (i < dimensions) {
-      b += (if (i == j) scalar.one else scalar.zero)
-      loop(j + 1)
-    } else b.result
-
-    loop(0)
-  }
-  
-}
-
 /**
  * The L_p norm is equal to the `p`-th root of the sum of each element to the
  * power `p`. For instance, if `p = 1` we have the Manhattan distance. If you'd
@@ -192,7 +103,7 @@ extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
  * norm).
  */
 @SerialVersionUID(0L)
-class SeqMaxNormedVectorSpace[A: Field: Order: Signed, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA]) 
+class SeqMaxNormedVectorSpace[A: Rng: Order: Signed, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA]) 
 extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
   def norm(v: SA): A = {
     @tailrec
@@ -205,7 +116,99 @@ extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
       }
     }
 
-    loop(v.toIterator, scalar.zero)
+    loop(v.toIterator, Rng[A].zero)
+  }
+}
+
+@SerialVersionUID(0L)
+private final class SeqBasis[A, SA <: SeqLike[A, SA]]
+    (implicit A: AdditiveMonoid[A], cbf: CanBuildFrom[SA,A,SA])
+    extends Frame[SA, A] with Serializable {
+  val builder = new VectorBuilder[SA, A, Int] {
+    type State = Map[Int, A]
+
+    def init: State = Map.empty
+
+    def update(s: State, i: Int, k: A): State =
+      s + (i -> k)
+
+    def result(s: State): SA =
+      if (s.isEmpty) cbf().result()
+      else {
+        val size = s.maxBy(_._1)._1
+        val bldr = cbf()
+        var i = 0
+        while (i < size) {
+          bldr += s.getOrElse(i, A.zero)
+          i += 1
+        }
+        bldr.result()
+      }
+  }
+
+  // Not really true, but we're pretending Int.MaxValue == Infinity.
+  def hasKnownSize: Boolean = false
+
+  def size: Int = ???
+
+  def coord(v: SA, i: Int): A = v(i)
+
+  def foreachWithIndex[U](v: SA)(f: (Int, A) => U): Unit =
+    v.foldLeft(0) { (i, x) => f(i, x); i + 1 }
+
+  def zipForeachWithIndex[U](v: SA, w: SA)(f: (Int, A, A) => U): Unit = {
+    val vi = v.iterator
+    val wi = w.iterator
+    var i = 0
+    while (vi.hasNext && wi.hasNext) {
+      f(i, vi.next(), wi.next())
+      i += 1
+    }
+    while (vi.hasNext) {
+      f(i, vi.next(), A.zero)
+      i += 1
+    }
+    while (wi.hasNext) {
+      f(i, wi.next(), A.zero)
+      i += 1
+    }
+  }
+
+  override def foreach[U](v: SA)(f: A => U): Unit =
+    v foreach f
+
+  override def map(v: SA)(f: A => A): SA =
+    v map f
+
+  override def mapWithIndex(v: SA)(f: (Int, A) => A): SA = {
+    val it = v.iterator
+    var i = 0
+    val bldr = cbf()
+    while (it.hasNext) {
+      bldr += f(i, it.next())
+      i += 1
+    }
+    bldr.result()
+  }
+
+  override def zipMapWithIndex(v: SA, w: SA)(f: (Int, A, A) => A): SA = {
+    val vi = v.iterator
+    val wi = w.iterator
+    var i = 0
+    val bldr = cbf()
+    while (vi.hasNext && wi.hasNext) {
+      bldr += f(i, vi.next(), wi.next())
+      i += 1
+    }
+    while (vi.hasNext) {
+      bldr += f(i, vi.next(), A.zero)
+      i += 1
+    }
+    while (wi.hasNext) {
+      bldr += f(i, wi.next(), A.zero)
+      i += 1
+    }
+    bldr.result()
   }
 }
 
@@ -291,33 +294,3 @@ extends SeqVectorEq[A, SA] with Order[SA] with Serializable {
     loop(x.toIterator, y.toIterator)
   }
 }
-
-trait SeqInstances0 {
-  implicit def SeqModule[A, CC[A] <: SeqLike[A, CC[A]]](implicit
-      ring0: Ring[A], cbf0: CanBuildFrom[CC[A], A, CC[A]],
-      ev: NoImplicit[VectorSpace[CC[A], A]]) = new SeqModule[A, CC[A]]
-}
-
-trait SeqInstances1 extends SeqInstances0 {
-  implicit def SeqVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
-      cbf0: CanBuildFrom[CC[A], A, CC[A]],
-      ev: NoImplicit[NormedVectorSpace[CC[A], A]]) = new SeqVectorSpace[A, CC[A]]
-
-  implicit def SeqEq[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Eq[A]) =
-    new SeqEq[A, CC[A]]
-}
-
-trait SeqInstances2 extends SeqInstances1 {
-  implicit def SeqInnerProductSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
-      cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqInnerProductSpace[A, CC[A]]
-
-  implicit def SeqOrder[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Order[A]) =
-    new SeqOrder[A, CC[A]]
-}
-
-trait SeqInstances3 extends SeqInstances2 {
-  implicit def SeqNormedVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
-      nroot0: NRoot[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]) = SeqInnerProductSpace[A, CC].normed
-}
-
-trait SeqInstances extends SeqInstances3
