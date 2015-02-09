@@ -6,13 +6,12 @@ import spire.std.int._
 import spire.std.double._
 import spire.std.seq._
 import spire.std.string._
-
 import org.scalatest.{FunSuite, Matchers}
 import org.scalatest.prop.Checkers
-
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
+
 
 class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   // This tests 2 things:
@@ -38,7 +37,15 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
     y <- arbitrary[A]
     z <- arbitrary[A]
   } yield Vector(x, y, z))
+  
+  val doubles = Gen.choose(-10.0E25, 10E25)
 
+  val vector3D: Gen[Vector[Double]] = for {
+    x <- doubles
+    y <- doubles
+    z <- doubles
+  } yield Vector(x, y, z)
+  
   import spire.math.ArbitrarySupport.rational
 
   test("Eq syntax")(check(forAll { (a: Int, b: Int) => testEqSyntax(a, b) }))
@@ -79,6 +86,9 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   test("CoordinateSpace syntax")(check(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
     testCoordinateSpaceSyntax(v, w, a.x)(CoordinateSpace.seq[Rational, Vector](3))
   }))
+  test("EuclideanCoordinateSpace syntax")(check(forAll(vector3D, vector3D, doubles) { (v: Vector[Double], w: Vector[Double], a: Double) =>
+    testEuclideanCoordinateSpaceSyntax(v, w, a)(EuclideanCoordinateSpace.seq[Double, Vector])
+  }))  
   test("Bool syntax")(check(forAll { (a: Int, b: Int) => testBoolSyntax(a, b) }))
 }
 
@@ -382,6 +392,29 @@ trait BaseSyntaxTest {
       (v._z == V._z(v)) &&
       (v.coord(0) == V.coord(v, 0)) &&
       (v.coord(1) == V.coord(v, 1))
+  }
+
+  def testEuclideanCoordinateSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: EuclideanCoordinateSpace[V, A]) = {
+    import spire.syntax.euclideanCoordinateSpace._
+    implicit def A: Field[A] = V.scalar
+    ((v + w) == V.plus(v, w)) &&
+      ((v - w) == V.minus(v, w)) &&
+      (-v == V.negate(v)) &&
+      ((a *: v) == V.timesl(a, v)) &&
+      ((v :* a) == V.timesr(v, a)) &&
+      //((2 *: v) == V.timesl(A.fromInt(2), v)) &&
+      //((v :* 2) == V.timesr(v, A.fromInt(2))) &&
+      //((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
+      //((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
+      //((v :/ 2) == V.divr(v, A.fromInt(2))) &&
+      ((v dot w) == V.dot(v, w)) &&
+      ((v ⋅ w) == V.dot(v, w)) &&
+      (v._x == V._x(v)) &&
+      (v._y == V._y(v)) &&
+      (v._z == V._z(v)) &&
+      (v.coord(0) == V.coord(v, 0)) &&
+      (v.coord(1) == V.coord(v, 1)) &&
+      ((v cross w) == V.cross(v, w))
   }
 
   def testBoolSyntax[A: Bool](a: A, b: A) = {

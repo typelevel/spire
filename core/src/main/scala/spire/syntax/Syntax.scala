@@ -133,7 +133,11 @@ trait InnerProductSpaceSyntax extends VectorSpaceSyntax {
 }
 
 trait CoordinateSpaceSyntax extends InnerProductSpaceSyntax {
-  implicit def coordianteSpaceOps[V](v:V) = new CoordinateSpaceOps[V](v)
+  implicit def coordinateSpaceOps[V](v:V) = new CoordinateSpaceOps[V](v)
+}
+
+trait EuclideanCoordinateSpaceSyntax extends CoordinateSpaceSyntax {
+  implicit def euclideanCoordinateSpaceOps[V](v:V) = new EuclideanCoordinateSpaceOps[V](v)
 }
 
 trait TrigSyntax {
@@ -269,6 +273,7 @@ trait AllSyntax extends
     NormedVectorSpaceSyntax with
     InnerProductSpaceSyntax with
     CoordinateSpaceSyntax with
+    EuclideanCoordinateSpaceSyntax with
     LatticeSyntax with
     HeytingSyntax with
     BoolSyntax with

@@ -216,6 +216,41 @@ extends CoordinateSpace[Array[A], A] with Serializable {
 }
 
 @SerialVersionUID(0L)
+class EuclideanArrayCoordinateSpace[@spec(Int,Long,Float,Double) A: ClassTag](implicit val scalar: Field[A])
+extends EuclideanCoordinateSpace[Array[A], A] with Serializable {
+
+  def cross(v: Array[A], w: Array[A]) : Array[A] =
+    Array( 
+      // x(1) * y(2) - x(2) * y(1),
+      scalar.minus(scalar.times(v(1), w(2)), scalar.times(v(2), w(1))),
+      // x(2) * y(0) - x(0) * y(2),
+      scalar.minus(scalar.times(v(2), w(0)), scalar.times(v(0), w(2))),            
+      // x(0) * y(1) - x(1) * y(0)
+      scalar.minus(scalar.times(v(0), w(1)), scalar.times(v(1), w(0))))
+      
+  def angle(v: Array[A], y: Array[A])(implicit nroot: NRoot[A], trig: Trig[A]): A = {
+    // law of cosines
+    // c2 = x2 + y2 - 2xy cos(angle)
+    val x2 = dot(v, v)
+    val y2 = dot(y, y)
+    val c  = minus(v,y)
+    val c2 = dot(c,c)
+    val n  = scalar.minus(scalar.plus(x2, y2),c2)
+    val d  = scalar.times(scalar.times(NRoot[A].sqrt(x2), NRoot[A].sqrt(y2)), scalar.fromInt(2)) 
+    spire.math.acos(scalar.div(n, d))
+  }
+  def zero: Array[A] = new Array[A](0)
+  def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
+  def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
+  override def minus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.minus(x, y)
+  def timesl(r: A, x: Array[A]): Array[A] = ArraySupport.timesl(r, x)
+  override def dot(x: Array[A], y: Array[A]): A = ArraySupport.dot(x, y)
+  def coord(v: Array[A], i: Int): A = v(i)
+  def axis(i: Int): Array[A] = ArraySupport.axis(dimensions, i)
+     
+}
+
+@SerialVersionUID(0L)
 class ArrayVectorEq[@spec(Int,Long,Float,Double) A: Eq: AdditiveMonoid]
 extends Eq[Array[A]] with Serializable {
   def eqv(x: Array[A], y: Array[A]): Boolean = ArraySupport.vectorEqv(x, y)

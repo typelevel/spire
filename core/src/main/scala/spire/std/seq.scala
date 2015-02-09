@@ -114,6 +114,54 @@ extends SeqInnerProductSpace[A, SA] with CoordinateSpace[SA, A] with Serializabl
   }
 }
 
+@SerialVersionUID(0L)
+// no dimensions value needed so no inheriting from SeqCoordinateSpace, but from SeqInnerProductSpace
+class EuclideanSeqCoordinateSpace[A: Field, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA])
+extends SeqInnerProductSpace[A, SA] with EuclideanCoordinateSpace[SA, A] with Serializable {
+  
+  def cross(v: SA, w: SA): SA = {
+    val b = cbf()
+    b+=(
+      // also possible to use _x, _y, _z      
+      // x(1) * y(2) - x(2) * y(1)
+      scalar.minus(scalar.times(v(1), w(2)), scalar.times(v(2), w(1))),
+      // x(2) * y(0) - x(0) * y(2)
+      scalar.minus(scalar.times(v(2), w(0)), scalar.times(v(0), w(2))),            
+      // x(0) * y(1) - x(1) * y(0)
+      scalar.minus(scalar.times(v(0), w(1)), scalar.times(v(1), w(0))))
+      
+    b.result()    
+  } 
+  
+  def angle(v: SA, w: SA)(implicit nroot: NRoot[A], trig: Trig[A]): A = {
+    // law of cosines
+    // c2 = a2 + b2 - 2ab cos(angle)
+    val v2 = dot(v, v)
+    val w2 = dot(w, w)
+    val c  = minus(v,w)
+    val c2 = dot(c,c)
+    val n  = scalar.minus(scalar.plus(v2, w2),c2)
+    val d  = scalar.times(scalar.times(NRoot[A].sqrt(v2), NRoot[A].sqrt(w2)), scalar.fromInt(2)) 
+    spire.math.acos(scalar.div(n, d))
+  }
+  
+  def coord(v: SA, i: Int): A = v(i)
+
+  override def dot(v: SA, w: SA): A = super[SeqInnerProductSpace].dot(v, w)
+
+  def axis(i: Int): SA = {
+    val b = cbf()
+
+    @tailrec def loop(j: Int): SA = if (i < dimensions) {
+      b += (if (i == j) scalar.one else scalar.zero)
+      loop(j + 1)
+    } else b.result
+
+    loop(0)
+  }
+  
+}
+
 /**
  * The L_p norm is equal to the `p`-th root of the sum of each element to the
  * power `p`. For instance, if `p = 1` we have the Manhattan distance. If you'd
