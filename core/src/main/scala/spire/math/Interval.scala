@@ -316,23 +316,71 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def *(rhs: Interval[A])(implicit ev: Semiring[A]): Interval[A] = {
     val z = ev.zero
 
+    def aboveAbove(lower1: A, lf1: Int, lower2: A, lf2: Int) =
+        if (lower1 < z || lower2 < z) All() else
+          Above(lower1 * lower2, lf1 | lf2)
+
+    def belowBelow(upper1: A, uf1: Int, upper2: A, uf2: Int) =
+        if (upper1 > z || upper2 > z) All() else
+          Above(upper1 * upper2, upperFlagToLower(uf1) | upperFlagToLower(uf2))
+
     def aboveBelow(lower1: A, lf1: Int, upper2: A, uf2: Int) =
       if (lower1 < z || upper2 > z) All () else
         Below(lower1 * upper2, lowerFlagToUpper(lf1) | uf2)
 
-    def aboveBounded(lower1: A, lf1: Int, lower2: A, upper2: A, flags2: Int) =
-      (rhs.hasBelow(z), rhs.hasAbove(z)) match {
-        case (true, true) => All() // rhs.crossesZero() == true
-        case (false, true) => Above(lower1 * lower2, lf1 | lowerFlag(flags2))
-        case _ => Below(lower1 * upper2, lowerFlagToUpper(lf1) | upperFlag(flags2))
-      }
+    def aboveBounded(lower1: A, lf1: Int, lower2: A, upper2: A, flags2: Int) = {
+      val hasBelowZero1 = lower1 < z
+      val hasBelowZero2 = lower2 < z
+      val hasAboveZero2 = upper2 > z
+      if (hasBelowZero2 && hasAboveZero2) All() // bounded interval crosses zero
 
-    def belowBounded(upper1: A, uf1: Int, lower2: A, upper2: A, flags2: Int) =
-      (rhs.hasBelow(z), rhs.hasAbove(z)) match {
-        case (true, true) => All() // rhs.crossesZero() == true
-        case (false, true) => Below(upper1 * lower2, uf1 | lowerFlagToUpper(flags2))
-        case _ => Above(upper1 * lower2, upperFlagToLower(uf1) | lowerFlag(flags2))
+      else if (hasAboveZero2) { // bounded interval is fully above zero
+        if (hasBelowZero1) // the minimal point is lower1(-) * upper2(+)
+          Above(lower1 * upper2, lf1 | upperFlagToLower(flags2))
+        else // the minimal point is lower1(+) * lower2(+)
+          Above(lower1 * lower2, lf1 | lowerFlag(flags2))
+
+      } else { // bounded interval is fully below zero
+        assert(hasBelowZero2)
+        if (hasBelowZero1) // the maximal point is lower1(-) * lower2(-)
+          Below(lower1 * lower2, lowerFlagToUpper(lf1) | lowerFlagToUpper(flags2))
+        else // the maximal point is lower1(+) * upper2(-)
+          Below(lower1 * upper2, lowerFlagToUpper(lf1) | upperFlag(flags2))
       }
+    }
+
+    def belowBounded(upper1: A, uf1: Int, lower2: A, upper2: A, flags2: Int) = {
+      val hasAboveZero1 = upper1 > z
+      val hasBelowZero2 = lower2 < z
+      val hasAboveZero2 = upper2 > z
+      if (hasBelowZero2 && hasAboveZero2) All() // bounded interval crosses zero
+
+      else if (hasAboveZero2) { // bounded interval is fully above zero
+        if (hasAboveZero1) // the maximal point is upper1(+) * upper2(+)
+          Below(upper1 * upper2, uf1 | upperFlag(flags2))
+        else // the maximal point is upper1(+) * lower2(-)
+          Below(upper1 * lower2, uf1 | lowerFlagToUpper(flags2))
+
+      } else { // bounded interval is fully below zero
+        if (hasAboveZero1) // the minimal point is upper1(+) * lower2(-)
+          Above(upper1 * lower2, upperFlagToLower(uf1) | lowerFlag(flags2))
+        else // the minimal point is upper1(-) * upper2(-)
+          Above(upper1 * upper2, upperFlagToLower(uf1) | upperFlagToLower(flags2))
+      }
+    }
+
+    def boundedBounded(bd1: Bounded[A], bd2: Bounded[A]) = {
+      val lb1 = bd1.lowerBound
+      val ub1 = bd1.upperBound
+      val lb2 = bd2.lowerBound
+      val ub2 = bd2.upperBound
+      val ll = (lb1 *~ lb2)
+      val lu = (lb1 *~ ub2)
+      val ul = (ub1 *~ lb2)
+      val uu = (ub1 *~ ub2)
+      ValueBound.union4(ll, lu, ul, uu)
+    }
+
 
     (lhs, rhs) match {
       case (Empty(), _) => lhs
@@ -343,36 +391,21 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       case (All(), _) => lhs
       case (_, All()) => rhs
 
-      case (Above(lower1, lf1), Above(lower2, lf2)) => 
-        if (lower1 < z || lower2 < z) 
-          All() 
-        else 
-          Above(lower1 * lower2, lf1 | lf2)
+      case (Above(lower1, lf1), Above(lower2, lf2)) => aboveAbove(lower1, lf1, lower2, lf2)
       case (Above(lower1, lf1), Below(upper2, uf2)) => aboveBelow(lower1, lf1, upper2, uf2)
-      case (Below(upper1, uf1), Above(lower2, lf2)) => rhs * lhs
-      case (Below(upper1, uf1), Below(upper2, uf2)) =>
-        if (upper1 > z || upper2 > z) 
-          All() 
-        else
-          Above(upper1 * upper2, upperFlagToLower(uf1) | upperFlagToLower(uf2))
+      case (Below(upper1, uf1), Above(lower2, lf2)) => aboveBelow(lower2, lf2, upper1, uf1)
+      case (Below(upper1, uf1), Below(upper2, uf2)) => belowBelow(upper1, uf1, upper2, uf2)
 
       case (Above(lower1, lf1), Bounded(lower2, upper2, flags2)) => 
         aboveBounded(lower1, lf1, lower2, upper2, flags2)
-      case (Bounded(lower1, upper1, flags1), Above(lower2, lf2)) => rhs * lhs
+      case (Bounded(lower1, upper1, flags1), Above(lower2, lf2)) =>
+        aboveBounded(lower2, lf2, lower1, upper1, flags1)
       case (Below(upper1, uf1), Bounded(lower2, upper2, flags2)) =>
         belowBounded(upper1, uf1, lower2, upper2, flags2)
-      case (Bounded(lower1, upper1, flags1), Below(upper2, uf2)) => rhs * lhs
+      case (Bounded(lower1, upper1, flags1), Below(upper2, uf2)) =>
+        belowBounded(upper2, uf2, lower1, upper1, flags1)
 
-      case (bd1: Bounded[A], bd2: Bounded[A]) =>
-        val lb1 = bd1.lowerBound
-        val ub1 = bd1.upperBound
-        val lb2 = bd2.lowerBound
-        val ub2 = bd2.upperBound
-        val ll = (lb1 *~ lb2)
-        val lu = (lb1 *~ ub2)
-        val ul = (ub1 *~ lb2)
-        val uu = (ub1 *~ ub2)
-        ValueBound.union4(ll, lu, ul, uu)
+      case (bd1: Bounded[A], bd2: Bounded[A]) => boundedBounded(bd1, bd2)
     }
   }
 
