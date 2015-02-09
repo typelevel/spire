@@ -4,11 +4,11 @@ import spire.algebra._
 import spire.implicits._
 import spire.math.Rational
 
-object Dim3CoordinateSpaceExample extends App {
+object EuclideanCoordinateSpaceExample extends App {
 
-  implicit val V: Dim3CoordinateSpace[List[Double], Double] = Dim3CoordinateSpace.seq
-  implicit val R: Dim3CoordinateSpace[Vector[Rational], Rational] = Dim3CoordinateSpace.seq
-  implicit val D: Dim3CoordinateSpace[Array[BigDecimal], BigDecimal] = Dim3CoordinateSpace.array
+  implicit val V: EuclideanCoordinateSpace[List[Double], Double] = EuclideanCoordinateSpace.seq
+  implicit val R: EuclideanCoordinateSpace[Vector[Rational], Rational] = EuclideanCoordinateSpace.seq
+  implicit val D: EuclideanCoordinateSpace[Array[BigDecimal], BigDecimal] = EuclideanCoordinateSpace.array
   //implicit val T: BigDecimalIsTrig = BigDecimalInstances._
   //import spire.std.bigDecimal._
   

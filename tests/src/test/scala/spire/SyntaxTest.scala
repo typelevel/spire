@@ -37,7 +37,15 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
     y <- arbitrary[A]
     z <- arbitrary[A]
   } yield Vector(x, y, z))
+  
+  val doubles = Gen.choose(-10.0E25, 10E25)
 
+  val vector3D: Gen[Vector[Double]] = for {
+    x <- doubles
+    y <- doubles
+    z <- doubles
+  } yield Vector(x, y, z)
+  
   import spire.math.ArbitrarySupport.rational
 
   test("Eq syntax")(check(forAll { (a: Int, b: Int) => testEqSyntax(a, b) }))
@@ -76,8 +84,8 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   test("CoordinateSpace syntax")(check(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
     testCoordinateSpaceSyntax(v, w, a.x)(CoordinateSpace.seq[Rational, Vector](3))
   }))
-  test("Dim3CoordinateSpace syntax")(check(forAll { (v: Vector[Double], w: Vector[Double], a: NonZero[Double]) =>
-    testDim3CoordinateSpaceSyntax(v, w, a.x)(Dim3CoordinateSpace.seq[Double, Vector])
+  test("EuclideanCoordinateSpace syntax")(check(forAll(vector3D, vector3D, doubles) { (v: Vector[Double], w: Vector[Double], a: Double) =>
+    testEuclideanCoordinateSpaceSyntax(v, w, a)(EuclideanCoordinateSpace.seq[Double, Vector])
   }))  
   test("Bool syntax")(check(forAll { (a: Int, b: Int) => testBoolSyntax(a, b) }))
 }
@@ -380,8 +388,8 @@ trait BaseSyntaxTest {
       (v.coord(1) == V.coord(v, 1))
   }
 
-  def testDim3CoordinateSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: Dim3CoordinateSpace[V, A]) = {
-    import spire.syntax.dim3coordinateSpace._
+  def testEuclideanCoordinateSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: EuclideanCoordinateSpace[V, A]) = {
+    import spire.syntax.euclideanCoordinateSpace._
     implicit def A: Field[A] = V.scalar
     ((v + w) == V.plus(v, w)) &&
       ((v - w) == V.minus(v, w)) &&

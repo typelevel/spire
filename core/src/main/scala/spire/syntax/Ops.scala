@@ -403,9 +403,9 @@ final class CoordinateSpaceOps[V](v: V) {
     macro Ops.unopWithEv[CoordinateSpace[V, F], Int]
 }
 
-final class Dim3CoordinateSpaceOps[V](lhs: V) {
-  def cross[F](rhs: V)(implicit ev: Dim3CoordinateSpace[V, F], F: Ring[F]): V = ev.cross(lhs, rhs)
-  def angle[F](rhs: V)(implicit ev: Dim3CoordinateSpace[V, F], F: NRoot[F], T: Trig[F]): F = ev.angle(lhs, rhs)
+final class EuclideanCoordinateSpaceOps[V](lhs: V) {
+  def cross[F](rhs: V)(implicit ev: EuclideanCoordinateSpace[V, F], F: Ring[F]): V = ev.cross(lhs, rhs)
+  def angle[F](rhs: V)(implicit ev: EuclideanCoordinateSpace[V, F], F: NRoot[F], T: Trig[F]): F = ev.angle(lhs, rhs)
 }
 
 final class MetricSpaceOps[V](lhs: V) {

@@ -41,7 +41,7 @@ package object syntax {
   object normedVectorSpace extends NormedVectorSpaceSyntax
   object innerProductSpace extends InnerProductSpaceSyntax
   object coordinateSpace extends CoordinateSpaceSyntax
-  object dim3coordinateSpace extends Dim3CoordinateSpaceSyntax
+  object euclideanCoordinateSpace extends EuclideanCoordinateSpaceSyntax
   
 
   object lattice extends LatticeSyntax

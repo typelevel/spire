@@ -116,8 +116,8 @@ extends SeqInnerProductSpace[A, SA] with CoordinateSpace[SA, A] with Serializabl
 
 @SerialVersionUID(0L)
 // no dimensions value needed so no inheriting from SeqCoordinateSpace, but from SeqInnerProductSpace
-class Dim3SeqCoordinateSpace[A: Field, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA])
-extends SeqInnerProductSpace[A, SA] with Dim3CoordinateSpace[SA, A] with Serializable {
+class EuclideanSeqCoordinateSpace[A: Field, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA])
+extends SeqInnerProductSpace[A, SA] with EuclideanCoordinateSpace[SA, A] with Serializable {
   
   def cross(v: SA, w: SA): SA = {
     val b = cbf()

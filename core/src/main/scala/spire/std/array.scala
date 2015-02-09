@@ -216,8 +216,8 @@ extends CoordinateSpace[Array[A], A] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class Dim3ArrayCoordinateSpace[@spec(Int,Long,Float,Double) A: ClassTag](implicit val scalar: Field[A])
-extends Dim3CoordinateSpace[Array[A], A] with Serializable {
+class EuclideanArrayCoordinateSpace[@spec(Int,Long,Float,Double) A: ClassTag](implicit val scalar: Field[A])
+extends EuclideanCoordinateSpace[Array[A], A] with Serializable {
 
   def cross(v: Array[A], w: Array[A]) : Array[A] =
     Array( 
