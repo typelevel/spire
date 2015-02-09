@@ -12,7 +12,6 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 
-
 class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   // This tests 2 things:
   //  1) That the ops work as they're suppose to,
@@ -414,7 +413,7 @@ trait BaseSyntaxTest {
       (v._z == V._z(v)) &&
       (v.coord(0) == V.coord(v, 0)) &&
       (v.coord(1) == V.coord(v, 1)) &&
-      ((v cross w) == V.cross(v, w))
+      ((v cross w) == V.negate(V.cross(w, v)))
   }
 
   def testBoolSyntax[A: Bool](a: A, b: A) = {
