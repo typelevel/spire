@@ -137,20 +137,27 @@ object ArbitrarySupport {
       Quaternion(r, i, j, k)
     })
 
+  case class Percentage(lhs: Int) {
+    def <(rhs: Int): Boolean = lhs < rhs
+  }
+
+  implicit val percentage: Arbitrary[Percentage] =
+    Arbitrary(Gen.choose(0, 99).map(Percentage))
+
   implicit def interval[A: Arbitrary: Order: AdditiveMonoid]: Arbitrary[Interval[A]] = {
     Arbitrary(for {
-      n <- arbitrary[Double]
+      n <- arbitrary[Percentage]
       lower <- arbitrary[A]
       upper <- arbitrary[A]
     } yield {
-      if (n < 0.05) Interval.all[A]
-      else if (n < 0.10) Interval.above(lower)
-      else if (n < 0.15) Interval.atOrAbove(lower)
-      else if (n < 0.20) Interval.below(upper)
-      else if (n < 0.25) Interval.atOrBelow(upper)
-      else if (n < 0.50) Interval.open(lower, upper)
-      else if (n < 0.60) Interval.openLower(lower, upper)
-      else if (n < 0.70) Interval.openUpper(lower, upper)
+      if (n < 5) Interval.all[A]
+      else if (n < 10) Interval.above(lower)
+      else if (n < 15) Interval.atOrAbove(lower)
+      else if (n < 20) Interval.below(upper)
+      else if (n < 25) Interval.atOrBelow(upper)
+      else if (n < 50) Interval.open(lower, upper)
+      else if (n < 60) Interval.openLower(lower, upper)
+      else if (n < 70) Interval.openUpper(lower, upper)
       else Interval.closed(lower, upper)
     })
   }
