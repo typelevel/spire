@@ -2,11 +2,14 @@ package spire.math
 
 import spire.algebra.Sign
 
+import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.FunSuite
+import org.scalatest.prop.PropertyChecks
 import java.math.{ MathContext, RoundingMode }
 
 
-class AlgebraicTest extends FunSuite {
+class AlgebraicTest extends FunSuite with PropertyChecks {
   def trickyZero: Algebraic = Algebraic(18).sqrt - Algebraic(8).sqrt - Algebraic(2).sqrt
 
   test("Sign of tricky zero is Zero") {
@@ -71,10 +74,6 @@ class AlgebraicTest extends FunSuite {
   }
 
   test("Relative approximation of division is correct") {
-    
-    // The bubble-up div transform will actually just transform this to
-    // 65536 / 65536... so not sure how good of a test it is.
-
     val quot = Iterator.fill(16)(Algebraic(2)).foldLeft(Algebraic(1 << 16))(_ / _)
     assert(quot.toDouble === 1.0)
 
@@ -105,5 +104,110 @@ class AlgebraicTest extends FunSuite {
     val z = Algebraic(1)
     assert((x + (y + z)) === (x + y + z))
   }
-}
 
+  test("approximation of sqrt of rational is correct") {
+    forAll("rational") { (qa: RationalAlgebraic) =>
+      println("...")
+      val RationalAlgebraic(a, q) = qa
+      println(s"a = $a, q = $q")
+      val x = a.sqrt.toBigDecimal(MathContext.DECIMAL64)
+      val error = x.ulp * 4
+      val xSq = x * x
+      println(",,,")
+      Rational(xSq - error) < q && Rational(xSq + error) > q
+    }
+  }
+
+  /**
+   * An algebraic expression + the exact rational value of this expression.
+   */
+  case class RationalAlgebraic(
+    algebraic: Algebraic,
+    rational: Rational
+  )
+
+  object RationalAlgebraic {
+    implicit val ArbitraryRationalAlgebraic: Arbitrary[RationalAlgebraic] =
+      Arbitrary(genRationalAlgebraic(1))
+
+    val MaxDepth = 3
+
+    def genRationalAlgebraic(depth: Int): Gen[RationalAlgebraic] =
+      if (depth < MaxDepth) {
+        Gen.frequency(
+          1 -> genAdd(depth + 1),
+          1 -> genSub(depth + 1),
+          1 -> genMul(depth + 1),
+          1 -> genDiv(depth + 1),
+          1 -> genNeg(depth + 1),
+          1 -> genPow(depth + 1, arbitrary[Byte].map(_.toInt)),
+          7 -> genLeaf
+        )
+      } else {
+        genLeaf
+      }
+
+    def genBigInt: Gen[BigInt] = for {
+      bytes <- Gen.listOf(arbitrary[Byte])
+      signum <- arbitrary[Boolean].map(n => if (n) -1 else 1)
+    } yield BigInt(signum, if (bytes.isEmpty) Array(0: Byte) else bytes.toArray)
+
+    def genLong: Gen[RationalAlgebraic] = for {
+      n <- arbitrary[Long]
+    } yield RationalAlgebraic(Algebraic(n), Rational(n))
+
+    def genRational: Gen[RationalAlgebraic] = for {
+      n <- genBigInt
+      d <- genBigInt
+      if (d.signum != 0)
+      q = Rational(n, d)
+    } yield RationalAlgebraic(Algebraic(q), q)
+
+    def genBigDecimal: Gen[RationalAlgebraic] = for {
+      unscaledValue <- genBigInt
+      scale <- arbitrary[Byte]
+      x = BigDecimal(unscaledValue, scale)
+    } yield RationalAlgebraic(Algebraic(x), Rational(x))
+
+    def genDouble: Gen[RationalAlgebraic] = for {
+      x <- arbitrary[Double]
+    } yield RationalAlgebraic(Algebraic(x), Rational(x))
+
+    def genLeaf: Gen[RationalAlgebraic] = Gen.oneOf(
+      genRational,
+      genBigDecimal,
+      genDouble,
+      genLong
+    )
+
+    def genAdd(depth: Int): Gen[RationalAlgebraic] = for {
+      RationalAlgebraic(lhsA, lhsQ) <- genRationalAlgebraic(depth + 1)
+      RationalAlgebraic(rhsA, rhsQ) <- genRationalAlgebraic(depth + 1)
+    } yield RationalAlgebraic(lhsA + rhsA, lhsQ + rhsQ)
+
+    def genSub(depth: Int): Gen[RationalAlgebraic] = for {
+      RationalAlgebraic(lhsA, lhsQ) <- genRationalAlgebraic(depth + 1)
+      RationalAlgebraic(rhsA, rhsQ) <- genRationalAlgebraic(depth + 1)
+    } yield RationalAlgebraic(lhsA - rhsA, lhsQ - rhsQ)
+
+    def genMul(depth: Int): Gen[RationalAlgebraic] = for {
+      RationalAlgebraic(lhsA, lhsQ) <- genRationalAlgebraic(depth + 1)
+      RationalAlgebraic(rhsA, rhsQ) <- genRationalAlgebraic(depth + 1)
+    } yield RationalAlgebraic(lhsA * rhsA, lhsQ * rhsQ)
+
+    def genDiv(depth: Int): Gen[RationalAlgebraic] = for {
+      RationalAlgebraic(lhsA, lhsQ) <- genRationalAlgebraic(depth + 1)
+      RationalAlgebraic(rhsA, rhsQ) <- genRationalAlgebraic(depth + 1)
+      if (rhsQ.signum != 0)
+    } yield RationalAlgebraic(lhsA / rhsA, lhsQ / rhsQ)
+
+    def genNeg(depth: Int): Gen[RationalAlgebraic] = for {
+      RationalAlgebraic(subA, subQ) <- genRationalAlgebraic(depth + 1)
+    } yield RationalAlgebraic(-subA, -subQ)
+
+    def genPow(depth: Int, genExp: Gen[Int]): Gen[RationalAlgebraic] = for {
+      RationalAlgebraic(subA, subQ) <- genRationalAlgebraic(depth + 1)
+      exp <- genExp
+    } yield RationalAlgebraic(subA.pow(exp), subQ.pow(exp))
+  }
+}

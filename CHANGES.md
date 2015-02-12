@@ -1,3 +1,41 @@
+## Version 0.9.0
+
+The project now builds with Scala 2.11.4 by default.
+
+This was a major update with many additions, changes, and bug fixes.
+
+Additions:
+
+ * Added and reworked group actions (Denis Rosset)
+ * Add Lattices and Heyting algebras (Erik Osheim)
+ * More useful symbolic operators (Erik Osheim)
+ * Introduce Exponential[A] distribution (Erik Osheim)
+ * Introduce NumberTag[A] type class (Erik Osheim)
+
+Fixes:
+
+ * Fix typos (Ben Barnard)
+ * Fix possible overflow for Complex norm (William Waites)
+ * Reduce macro warnings building Spire (Erik Osheim & Tom Switzer)
+ * Add missing Number implicits (Erik Osheim)
+ * Replace sys.error with proper Exceptions (Tom Switzer)
+ * Fix Rational(0D) constructor bug (Tom Switzer)
+ * Fix Trilean bug (Erik Osheim)
+ * Fix SafeLong bugs (Erik Osheim)
+ * Fix Jet bugs (Robert Garden & Erik Osheim)
+ * Fix Interval parsing (Ruediger Klaehn)
+
+Changes:
+
+ * Major interval improvements and bug fixes (Denis Rosset)
+ * Improve Gaussian[A] distribution using Ziggurat (Erik Osheim)
+ * Use aggreate instead of fold to enable parallelism (Adam Pingel)
+ * Clarified and improved partial orders (Denis Rosset)
+ * Improve Checked arithmetic macros (Tom Switzer & Erik Osheim)
+ * Remove almost all closure allocations in SafeLong (Erik Osheim)
+ * Made type classes universal traits where possible
+ * Update library dependency versions
+
 ## Version 0.8.2
 
 The project now builds for 2.11.2 by default.

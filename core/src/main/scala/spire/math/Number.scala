@@ -102,11 +102,11 @@ sealed trait Number extends ScalaNumericConversions with Serializable {
   final def >(rhs: Number): Boolean = compare(rhs) > 0
   final def >=(rhs: Number): Boolean = compare(rhs) >= 0
 
-  def &(rhs: Number): Number = sys.error("%s not an integer" format this)
-  def |(rhs: Number): Number = sys.error("%s not an integer" format this)
-  def ^(rhs: Number): Number = sys.error("%s not an integer" format this)
-  def <<(rhs: Number): Number = sys.error("%s not an integer" format this)
-  def >>(rhs: Number): Number = sys.error("%s not an integer" format this)
+  def &(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer" format this)
+  def |(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer" format this)
+  def ^(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer" format this)
+  def <<(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer" format this)
+  def >>(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer" format this)
 
   def floor: Number
   def ceil: Number
@@ -230,23 +230,23 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
 
   override def &(rhs: Number): Number = rhs match {
     case IntNumber(x) => IntNumber(n & x)
-    case _ => sys.error("%s not an integer" format rhs)
+    case _ => throw new IllegalArgumentException("%s not an integer" format rhs)
   }
   override def |(rhs: Number): Number = rhs match {
     case IntNumber(x) => IntNumber(n | x)
-    case _ => sys.error("%s not an integer" format rhs)
+    case _ => throw new IllegalArgumentException("%s not an integer" format rhs)
   }
   override def ^(rhs: Number): Number = rhs match {
     case IntNumber(x) => IntNumber(n ^ x)
-    case _ => sys.error("%s not an integer" format rhs)
+    case _ => throw new IllegalArgumentException("%s not an integer" format rhs)
   }
   override def <<(rhs: Number): Number = rhs match {
     case IntNumber(x) => IntNumber(n << x.toInt)
-    case _ => sys.error("%s not an integer" format rhs)
+    case _ => throw new IllegalArgumentException("%s not an integer" format rhs)
   }
   override def >>(rhs: Number): Number = rhs match {
     case IntNumber(x) => IntNumber(n >> x.toInt)
-    case _ => sys.error("%s not an integer" format rhs)
+    case _ => throw new IllegalArgumentException("%s not an integer" format rhs)
   }
 
   def sqrt: Number =
