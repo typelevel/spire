@@ -118,6 +118,9 @@ object FpFilter {
 
   @inline final def apply[A](apx: Double, mes: Double, ind: Int, exact: => A) = new FpFilter[A](apx, mes, ind, exact)
 
+  def apply[A](approx: Double, exact: => A): FpFilter[A] =
+    new FpFilter[A](approx, spire.math.abs(approx), 1, exact)
+
   def negateImpl[A: c.WeakTypeTag](c: Context)(ev: c.Expr[Rng[A]]): c.Expr[FpFilter[A]] =
     c.Expr[FpFilter[A]](Fuser[c.type, A](c).negate(c.prefix.tree)(ev.tree).expr)
 
