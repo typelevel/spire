@@ -513,7 +513,15 @@ private[math] object LongRationals extends Rationals[Long] {
     else unsafeBuild(-n, -d)
   }
 
-  private[this] def div(a:Long, b:Long): Long = a / b
+  private[this] def buildWithDiv(num: Long, ngcd: Long, rd: Long, lden: Long): Rational = {
+    val n = num / ngcd
+    val d = rd / ngcd
+    Checked.tryOrReturn {
+      build(n, lden * d)
+    } {
+      Rational(BigInt(n), BigInt(lden) * d)
+    }
+  }
 
   def unsafeBuild(n: Long, d: Long): Rational = {
     if (n == 0L) return Rational.zero
@@ -577,7 +585,7 @@ private[math] object LongRationals extends Rationals[Long] {
             if (ngcd == 1L)
               build(num, lden * r.d)
             else
-              build(div(num, ngcd), lden * div(r.d, ngcd))
+              buildWithDiv(num, ngcd, r.d, lden)
           } {
             val num: BigInt = BigInt(n) * rden + BigInt(r.n) * lden
 
@@ -638,7 +646,7 @@ private[math] object LongRationals extends Rationals[Long] {
             if (ngcd == 1L)
               build(num, lden * r.d)
             else
-              build(div(num, ngcd), lden * div(r.d, ngcd))
+              buildWithDiv(num, ngcd, r.d, lden)
           } {
             val num: BigInt = BigInt(n) * rden - BigInt(r.n) * lden
 
