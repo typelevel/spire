@@ -305,11 +305,8 @@ object Rational extends RationalInstances {
   def apply(n: Long, d: Long): Rational = LongRationals.build(n, d)
   def apply(n: BigInt, d: BigInt): Rational = BigRationals.build(n, d)
 
-  protected[math] def unsafeBuild(n: Long, d: Long) = LongRationals.unsafeBuild(n, d)
-  protected[math] def unsafeBuild(n: BigInt, d: BigInt) = BigRationals.unsafeBuild(n, d)
-
-  implicit def apply(x: Int): Rational = LongRationals.build(x, 1L)
-  implicit def apply(x: Long): Rational = LongRationals.build(x, 1L)
+  implicit def apply(x: Int): Rational = if(x == 0) Rational.zero else LongRational(x, 1L)
+  implicit def apply(x: Long): Rational = if(x == 0L) Rational.zero else LongRational(x, 1L)
   implicit def apply(x: BigInt): Rational = BigRationals.build(x, BigInt(1))
 
   implicit def apply(x: Float): Rational = apply(x.toDouble)
