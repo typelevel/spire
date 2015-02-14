@@ -661,7 +661,15 @@ private[math] object LongRationals extends Rationals[Long] {
         case r: LongRationals.LongRational =>
           val a = spire.math.gcd(n, r.d)
           val b = spire.math.gcd(d, r.n)
-          Rational(SafeLong(n / a) * (r.n / b), SafeLong(d / b) * (r.d / a))
+          val n1 = n / a
+          val n2 = r.n / b
+          val d1 = d / b
+          val d2 = r.d / a
+          Checked.tryOrReturn[Rational] {
+            LongRational(n1 * n2, d1 * d2)
+          } {
+            Rational(SafeLong(n1) * n2, SafeLong(d1) * d2)
+          }
         case r: BigRational =>
           val a = spire.math.gcd(n, (r.d % n).toLong)
           val b = spire.math.gcd(d, (r.n % d).toLong)
@@ -677,9 +685,27 @@ private[math] object LongRationals extends Rationals[Long] {
         case r: LongRationals.LongRational => {
           val a = spire.math.gcd(n, r.n)
           val b = spire.math.gcd(d, r.d)
-          val num = SafeLong(n / a) * (r.d / b)
-          val den = SafeLong(d / b) * (r.n / a)
-          if (den < SafeLong.zero) Rational(-num, -den) else Rational(num, den)
+          // this does not have to happen within the checked block, since the divisions are guaranteed to work
+          val n1 = n / a
+          val n2 = r.n / a
+          val d1 = d / b
+          val d2 = r.d / b
+          if(n2 < 0) {
+            // denumerators are always positive, so negating them can not yield an overflow
+            val minus_d2 = -d2
+            val minus_d1 = -d1
+            Checked.tryOrReturn[Rational] {
+              LongRational(n1 * minus_d2, minus_d1 * n2)
+            } {
+              Rational(SafeLong(n1) * minus_d2, SafeLong(minus_d1) * n2)
+            }
+          }
+          else
+            Checked.tryOrReturn[Rational] {
+              LongRational(n1 * d2, d1 * n2)
+            } {
+              Rational(SafeLong(n1) * d2, SafeLong(d1) * n2)
+            }
         }
         case r: BigRational => {
           val a = spire.math.gcd(n, (r.n % n).toLong)

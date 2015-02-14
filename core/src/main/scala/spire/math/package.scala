@@ -279,7 +279,9 @@ package object math {
    */
   final def gcd(_x: Long, _y: Long): Long = {
     if (_x == 0L) return Math.abs(_y)
+    if (_x == 1L) return 1L
     if (_y == 0L) return Math.abs(_x)
+    if (_y == 1L) return 1L
 
     var x = _x
     var xz = numberOfTrailingZeros(x)
