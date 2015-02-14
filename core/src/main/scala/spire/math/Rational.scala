@@ -689,7 +689,9 @@ private[math] object LongRationals extends Rationals[Long] {
         Checked.tryOrReturn[Rational] {
           LongRational(n1 * n2, d1 * d2)
         } {
-          Rational(SafeLong(n1) * n2, SafeLong(d1) * d2)
+          // we know that the result does not fit into a LongRational, and also that the denominators are positive.
+          // so we can just call BigRational.apply directly
+          BigRational(BigInt(n1) * n2, BigInt(d1) * d2)
         }
       case r: BigRational =>
         val a = spire.math.gcd(n, (r.d % n).toLong)
@@ -719,7 +721,9 @@ private[math] object LongRationals extends Rationals[Long] {
         Checked.tryOrReturn[Rational] {
           LongRational(n1 * d2, d1 * n2)
         } {
-          Rational(SafeLong(n1) * d2, SafeLong(d1) * n2)
+          // we know that the result does not fit into a LongRational, and we have made sure that the product of d1
+          // and n2 is positive. So we can just call BigRational.apply directly
+          BigRational(BigInt(n1) * d2, BigInt(d1) * n2)
         }
       case r: BigRational =>
         if (n == 0L) return this
