@@ -354,8 +354,8 @@ object Rational extends RationalInstances {
 
   implicit def apply(n: SafeLong): Rational =
     n match {
-      case SafeLongLong(x) => LongRationals.unsafeBuild(x, 1L)
-      case SafeLongBigInt(x) => BigRationals.unsafeBuild(x, BigInt(1))
+      case SafeLongLong(x) => if (x == 0) Rational.zero else LongRational(x, 1L)
+      case SafeLongBigInt(x) => BigRational(x, BigInt(1))
     }
 
   implicit def apply(x: Number): Rational = x match {
