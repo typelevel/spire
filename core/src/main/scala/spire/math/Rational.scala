@@ -25,10 +25,10 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   // ugh, ScalaNumber and ScalaNumericConversions in 2.10 require this hack
   override def underlying: Object = this
 
-  def abs: Rational = if (this < Rational.zero) -this else this
+  def abs: Rational = if (signum < 0) -this else this
   def inverse: Rational = Rational.one / this
   def reciprocal: Rational
-  def signum: Int = numerator.signum
+  def signum: Int
 
   def unary_-(): Rational = Rational.zero - this
 
@@ -435,8 +435,6 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
   sealed trait RationalLike extends Rational {
     def num: A
     def den: A
-    
-    override def signum: Int = scala.math.signum(integral.compare(num, zero))
 
     def isWhole: Boolean = den == one
 
