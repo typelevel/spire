@@ -25,10 +25,10 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   // ugh, ScalaNumber and ScalaNumericConversions in 2.10 require this hack
   override def underlying: Object = this
 
-  def abs: Rational = if (this < Rational.zero) -this else this
+  def abs: Rational = if (signum < 0) -this else this
   def inverse: Rational = Rational.one / this
   def reciprocal: Rational
-  def signum: Int = numerator.signum
+  def signum: Int
 
   def unary_-(): Rational = Rational.zero - this
 
@@ -305,11 +305,8 @@ object Rational extends RationalInstances {
   def apply(n: Long, d: Long): Rational = LongRationals.build(n, d)
   def apply(n: BigInt, d: BigInt): Rational = BigRationals.build(n, d)
 
-  protected[math] def unsafeBuild(n: Long, d: Long) = LongRationals.unsafeBuild(n, d)
-  protected[math] def unsafeBuild(n: BigInt, d: BigInt) = BigRationals.unsafeBuild(n, d)
-
-  implicit def apply(x: Int): Rational = LongRationals.build(x, 1L)
-  implicit def apply(x: Long): Rational = LongRationals.build(x, 1L)
+  implicit def apply(x: Int): Rational = if(x == 0) Rational.zero else LongRational(x, 1L)
+  implicit def apply(x: Long): Rational = if(x == 0L) Rational.zero else LongRational(x, 1L)
   implicit def apply(x: BigInt): Rational = BigRationals.build(x, BigInt(1))
 
   implicit def apply(x: Float): Rational = apply(x.toDouble)
@@ -354,8 +351,8 @@ object Rational extends RationalInstances {
 
   implicit def apply(n: SafeLong): Rational =
     n match {
-      case SafeLongLong(x) => LongRationals.unsafeBuild(x, 1L)
-      case SafeLongBigInt(x) => BigRationals.unsafeBuild(x, BigInt(1))
+      case SafeLongLong(x) => if (x == 0) Rational.zero else LongRational(x, 1L)
+      case SafeLongBigInt(x) => BigRational(x, BigInt(1))
     }
 
   implicit def apply(x: Number): Rational = x match {
@@ -435,8 +432,6 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
   sealed trait RationalLike extends Rational {
     def num: A
     def den: A
-    
-    override def signum: Int = scala.math.signum(integral.compare(num, zero))
 
     def isWhole: Boolean = den == one
 
