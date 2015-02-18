@@ -1039,7 +1039,7 @@ private[math] trait RationalIsReal extends IsReal[Rational] {
   override def gteqv(x: Rational, y: Rational) = x >= y
   override def lt(x: Rational, y: Rational) = x < y
   override def lteqv(x: Rational, y: Rational) = x <= y
-  def compare(x: Rational, y: Rational) = if (x < y) -1 else if (x > y) 1 else 0
+  def compare(x: Rational, y: Rational) = x compare y
 
   override def sign(a: Rational): Sign = a.sign
   def signum(a: Rational): Int = a.signum
