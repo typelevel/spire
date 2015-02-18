@@ -559,6 +559,16 @@ private[math] object LongRationals extends Rationals[Long] {
 
     override def signum: Int = java.lang.Long.signum(n)
 
+    override def isWhole: Boolean = d == 1L
+
+    override def isValidChar: Boolean = isWhole && n.isValidChar
+
+    override def isValidByte: Boolean = isWhole && n.isValidByte
+
+    override def isValidShort: Boolean = isWhole && n.isValidShort
+
+    override def isValidInt: Boolean = isWhole && n.isValidInt
+
     override def unary_-(): Rational =
       if (n == Long.MinValue) BigRational(-BigInt(Long.MinValue), BigInt(d))
       else LongRational(-n, d)
@@ -879,6 +889,14 @@ private[math] object BigRationals extends Rationals[BigInt] {
 
     override def signum: Int = n.signum
 
+    override def isValidChar = false
+
+    override def isValidByte = false
+
+    override def isValidShort = false
+
+    override def isValidInt = false
+
     override def unary_-(): Rational = Rational(-SafeLong(n), SafeLong(d))
 
     def +(r: Rational): Rational = r match {
@@ -1049,7 +1067,7 @@ private[math] trait RationalIsReal extends IsReal[Rational] {
   def ceil(a:Rational): Rational = a.ceil
   def floor(a:Rational): Rational = a.floor
   def round(a:Rational): Rational = a.round
-  def isWhole(a:Rational) = a.denominator == 1
+  def isWhole(a:Rational) = a.isWhole
 }
 
 @SerialVersionUID(0L)
