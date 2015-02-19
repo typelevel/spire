@@ -5,8 +5,6 @@ import spire.std.long.LongAlgebra
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import java.lang.Math
-
 import spire.algebra.{Field, IsReal, NRoot, Sign}
 import spire.algebra.Sign.{ Positive, Zero, Negative }
 
