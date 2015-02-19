@@ -291,7 +291,7 @@ object Rational extends RationalInstances {
   val one: Rational = LongRational(1L, 1L)
   
   def apply(n: SafeLong, d: SafeLong): Rational = {
-    if (d < 0) return apply(-n, -d)
+    if (d.signum < 0) return apply(-n, -d)
     val g = n gcd d
     (n / g) match {
       case SafeLongLong(x) => (d / g) match {
