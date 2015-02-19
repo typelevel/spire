@@ -26,11 +26,11 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   override def underlying: Object = this
 
   def abs: Rational = if (signum < 0) -this else this
-  def inverse: Rational = Rational.one / this
+  def inverse: Rational = reciprocal
   def reciprocal: Rational
   def signum: Int
 
-  def unary_-(): Rational = Rational.zero - this
+  def unary_-(): Rational
 
   def +(rhs: Rational): Rational
   def -(rhs: Rational): Rational
