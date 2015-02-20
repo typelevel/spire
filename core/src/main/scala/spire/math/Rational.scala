@@ -5,8 +5,6 @@ import spire.std.long.LongAlgebra
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import java.lang.Math
-
 import spire.algebra.{Field, IsReal, NRoot, Sign}
 import spire.algebra.Sign.{ Positive, Zero, Negative }
 
@@ -26,11 +24,11 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   override def underlying: Object = this
 
   def abs: Rational = if (signum < 0) -this else this
-  def inverse: Rational = Rational.one / this
+  def inverse: Rational = reciprocal
   def reciprocal: Rational
   def signum: Int
 
-  def unary_-(): Rational = Rational.zero - this
+  def unary_-(): Rational
 
   def +(rhs: Rational): Rational
   def -(rhs: Rational): Rational
@@ -291,7 +289,7 @@ object Rational extends RationalInstances {
   val one: Rational = LongRational(1L, 1L)
   
   def apply(n: SafeLong, d: SafeLong): Rational = {
-    if (d < 0) return apply(-n, -d)
+    if (d.signum < 0) return apply(-n, -d)
     val g = n gcd d
     (n / g) match {
       case SafeLongLong(x) => (d / g) match {
