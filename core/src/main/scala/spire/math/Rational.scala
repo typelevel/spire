@@ -18,6 +18,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def numeratorAsLong: Long
   def denominatorAsLong: Long
 
+  def isValidLong: Boolean
+
   def isWhole: Boolean
 
   // ugh, ScalaNumber and ScalaNumericConversions in 2.10 require this hack
@@ -57,6 +59,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def pow(exp: Int): Rational
 
+  // $COVERAGE-OFF$
   /**
    * Returns this `Rational` to the exponent `exp`. Both the numerator and
    * denominator of `exp` must be valid integers. Anything larger will cause
@@ -180,6 +183,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
       findNthRoot(high, 0)
     }
   }
+  // $COVERAGE-ON$
 
   def sign: Sign = Sign(signum)
 
@@ -354,12 +358,13 @@ object Rational extends RationalInstances {
     }
 
   implicit def apply(x: Number): Rational = x match {
-    case RationalNumber(n) => apply(n)
+    case RationalNumber(n) => n
     case IntNumber(n) => apply(n)
     case FloatNumber(n) => apply(n)
     case DecimalNumber(n) => apply(n)
   }
 
+  // $COVERAGE-OFF$
   /**
    * Returns an interval that bounds the nth-root of the integer x.
    *
@@ -416,6 +421,7 @@ object Rational extends RationalInstances {
     // TODO: Could probably get a better initial add then this.
     findnroot(0, 1L << ((65 - n) / n))
   }
+  // $COVERAGE-ON$
 }
 
 
@@ -516,21 +522,14 @@ private[math] object LongRationals extends Rationals[Long] {
     }
   }
 
-  def unsafeBuild(n: Long, d: Long): Rational = {
+  private[this] def unsafeBuild(n: Long, d: Long): Rational = {
     if (n == 0L) return Rational.zero
 
     val divisor = spire.math.gcd(n, d)
-    if (divisor == 1L) {
-      if (d < 0)
-        Rational(SafeLong(-n), SafeLong(-d))
-      else
-        LongRational(n, d)
-    } else {
-      if (d < 0)
-        LongRational(-n / divisor, -d / divisor)
-      else
-        LongRational(n / divisor, d / divisor)
-    }
+    if (divisor == 1L)
+      LongRational(n, d)
+    else
+      LongRational(n / divisor, d / divisor)
   }
 
   @SerialVersionUID(0L)
@@ -561,6 +560,8 @@ private[math] object LongRationals extends Rationals[Long] {
     override def isValidShort: Boolean = isWhole && n.isValidShort
 
     override def isValidInt: Boolean = isWhole && n.isValidInt
+
+    override def isValidLong: Boolean = isWhole
 
     override def unary_-(): Rational =
       if (n == Long.MinValue) BigRational(-BigInt(Long.MinValue), BigInt(d))
@@ -844,21 +845,14 @@ private[math] object BigRationals extends Rationals[BigInt] {
     else unsafeBuild(-n, -d)
   }
 
-  def unsafeBuild(n: BigInt, d:BigInt): Rational = {
+  private[this] def unsafeBuild(n: BigInt, d:BigInt): Rational = {
     if (n == 0) return Rational.zero
 
     val gcd = n.gcd(d)
-    if (gcd == 1) {
-      if (d < 0)
-        Rational(SafeLong(-n), SafeLong(-d))
-      else
-        Rational(SafeLong(n), SafeLong(d))
-    } else {
-      if (d < 0)
-        Rational(-SafeLong(n / gcd), -SafeLong(d / gcd))
-      else
-        Rational(SafeLong(n / gcd), SafeLong(d / gcd))
-    }
+    if (gcd == 1)
+      Rational(SafeLong(n), SafeLong(d))
+    else
+      Rational(SafeLong(n / gcd), SafeLong(d / gcd))
   }
 
 
@@ -873,9 +867,7 @@ private[math] object BigRationals extends Rationals[BigInt] {
     def numeratorAsLong: Long = n.toLong
     def denominatorAsLong: Long = d.toLong
 
-    def reciprocal = if (n == 0)
-      throw new ArithmeticException("reciprocal called on 0/1")
-    else if (n < 0)
+    def reciprocal = if (signum < 0)
       BigRational(-d, -n)
     else
       BigRational(d, n)
@@ -889,6 +881,8 @@ private[math] object BigRationals extends Rationals[BigInt] {
     override def isValidShort = false
 
     override def isValidInt = false
+
+    override def isValidLong = false
 
     override def unary_-(): Rational = Rational(-SafeLong(n), SafeLong(d))
 
