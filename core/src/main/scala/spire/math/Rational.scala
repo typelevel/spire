@@ -516,21 +516,14 @@ private[math] object LongRationals extends Rationals[Long] {
     }
   }
 
-  def unsafeBuild(n: Long, d: Long): Rational = {
+  private[this] def unsafeBuild(n: Long, d: Long): Rational = {
     if (n == 0L) return Rational.zero
 
     val divisor = spire.math.gcd(n, d)
-    if (divisor == 1L) {
-      if (d < 0)
-        Rational(SafeLong(-n), SafeLong(-d))
-      else
-        LongRational(n, d)
-    } else {
-      if (d < 0)
-        LongRational(-n / divisor, -d / divisor)
-      else
-        LongRational(n / divisor, d / divisor)
-    }
+    if (divisor == 1L)
+      LongRational(n, d)
+    else
+      LongRational(n / divisor, d / divisor)
   }
 
   @SerialVersionUID(0L)
@@ -844,21 +837,14 @@ private[math] object BigRationals extends Rationals[BigInt] {
     else unsafeBuild(-n, -d)
   }
 
-  def unsafeBuild(n: BigInt, d:BigInt): Rational = {
+  private[this] def unsafeBuild(n: BigInt, d:BigInt): Rational = {
     if (n == 0) return Rational.zero
 
     val gcd = n.gcd(d)
-    if (gcd == 1) {
-      if (d < 0)
-        Rational(SafeLong(-n), SafeLong(-d))
-      else
-        Rational(SafeLong(n), SafeLong(d))
-    } else {
-      if (d < 0)
-        Rational(-SafeLong(n / gcd), -SafeLong(d / gcd))
-      else
-        Rational(SafeLong(n / gcd), SafeLong(d / gcd))
-    }
+    if (gcd == 1)
+      Rational(SafeLong(n), SafeLong(d))
+    else
+      Rational(SafeLong(n / gcd), SafeLong(d / gcd))
   }
 
 
