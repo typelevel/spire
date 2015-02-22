@@ -381,4 +381,11 @@ class RationalTest extends FunSuite {
     check(Rational(Long.MinValue), true, false, false, false, false, true)
     check(Rational(Long.MinValue) - 1, true, false, false, false, false, false)
   }
+  test("applyNumber") {
+    def rationalFromNumber(x:Number) = Rational(x)
+    assert(rationalFromNumber(1) == 1)
+    assert(rationalFromNumber(1.0) == 1)
+    assert(rationalFromNumber(Rational.one) == 1)
+    assert(rationalFromNumber(1:BigDecimal) == 1)
+  }
 }
