@@ -10,11 +10,22 @@ class RationalTest extends FunSuite {
     val r = Rational(5,6)
     assert(r.numerator === BigInt(5))
     assert(r.denominator === BigInt(6))
+    intercept[IllegalArgumentException] {
+      Rational(1,0)
+    }
+    intercept[IllegalArgumentException] {
+      Rational(BigInt(1),0)
+    }
   }
   test("rational degenerate construction") {
     val r = Rational(30, 345)
     assert(r.numerator === BigInt(2))
     assert(r.denominator === BigInt(23))
+  }
+  test("rational parse") {
+    intercept[NumberFormatException] {
+      Rational("x")
+    }
   }
   
   test("RationalIsFractional implicit exists") {
@@ -162,6 +173,9 @@ class RationalTest extends FunSuite {
     intercept[ArithmeticException] {
       Rational.one / 0
     }
+    intercept[ArithmeticException] {
+      Rational.zero.reciprocal
+    }
   }
   
   test("pow") {
@@ -171,6 +185,9 @@ class RationalTest extends FunSuite {
     }
     
     val b = Rational(-3, 1)
+    assertResult(Rational.one) {
+      b pow 0
+    }
     assertResult(Rational(9, 1)) {
       b pow 2
     }
@@ -294,5 +311,17 @@ class RationalTest extends FunSuite {
 
   test("Rational(0D) is Zero") {
     assert(Rational(0D) === Rational.zero)
+  }
+
+  test("compareToOne") {
+    val d = Rational(1, Long.MaxValue)
+    assert(Rational.one.compareToOne === 0)
+    assert((Rational.one + d).compareToOne == 1)
+    assert((Rational.one - d).compareToOne == -1)
+  }
+  test("limitToLong") {
+    val d = Rational(1, Long.MaxValue)
+    // re-enable once #393 is fixed
+    // assert((Rational.one + d).limitToLong == Rational.one)
   }
 }
