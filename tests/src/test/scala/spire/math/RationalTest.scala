@@ -194,6 +194,10 @@ class RationalTest extends FunSuite {
     assertResult(Rational(-27, 1)) {
       b pow 3
     }
+    val l = Rational(Long.MaxValue) * 2
+    assertResult(Rational.one) {
+      l pow 0
+    }
   }
   
     test("longValue") { assert(Rational("5000000000").toLong === 5000000000L) }
@@ -323,5 +327,20 @@ class RationalTest extends FunSuite {
     val d = Rational(1, Long.MaxValue)
     // re-enable once #393 is fixed
     // assert((Rational.one + d).limitToLong == Rational.one)
+  }
+  test("numeratorAndDenominatorAsLong") {
+    assert(Rational(2,3).numeratorAsLong === 2L)
+    assert(Rational(2,3).denominatorAsLong === 3L)
+
+    assert((Rational(1, Long.MaxValue) / 2).numeratorAsLong === 1L)
+    assert((Rational(Long.MaxValue) * 2).denominatorAsLong === 1L)
+  }
+  test("quotMod") {
+    val a = Rational(31, 4)
+    val b = Rational(7, 9)
+    assertResult(a) {
+      val (q, m) = Rational.RationalAlgebra.quotmod(a, b)
+      q * b + m
+    }
   }
 }
