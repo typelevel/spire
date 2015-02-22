@@ -859,9 +859,7 @@ private[math] object BigRationals extends Rationals[BigInt] {
     def numeratorAsLong: Long = n.toLong
     def denominatorAsLong: Long = d.toLong
 
-    def reciprocal = if (n == 0)
-      throw new ArithmeticException("reciprocal called on 0/1")
-    else if (n < 0)
+    def reciprocal = if (signum < 0)
       BigRational(-d, -n)
     else
       BigRational(d, n)
