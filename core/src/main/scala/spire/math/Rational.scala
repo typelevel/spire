@@ -57,6 +57,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def pow(exp: Int): Rational
 
+  // $COVERAGE-OFF$
   /**
    * Returns this `Rational` to the exponent `exp`. Both the numerator and
    * denominator of `exp` must be valid integers. Anything larger will cause
@@ -180,6 +181,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
       findNthRoot(high, 0)
     }
   }
+  // $COVERAGE-ON$
 
   def sign: Sign = Sign(signum)
 
@@ -360,6 +362,7 @@ object Rational extends RationalInstances {
     case DecimalNumber(n) => apply(n)
   }
 
+  // $COVERAGE-OFF$
   /**
    * Returns an interval that bounds the nth-root of the integer x.
    *
@@ -416,6 +419,7 @@ object Rational extends RationalInstances {
     // TODO: Could probably get a better initial add then this.
     findnroot(0, 1L << ((65 - n) / n))
   }
+  // $COVERAGE-ON$
 }
 
 
