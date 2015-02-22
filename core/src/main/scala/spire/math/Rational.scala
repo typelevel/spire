@@ -18,6 +18,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def numeratorAsLong: Long
   def denominatorAsLong: Long
 
+  def isValidLong: Boolean
+
   def isWhole: Boolean
 
   // ugh, ScalaNumber and ScalaNumericConversions in 2.10 require this hack
@@ -559,6 +561,8 @@ private[math] object LongRationals extends Rationals[Long] {
 
     override def isValidInt: Boolean = isWhole && n.isValidInt
 
+    override def isValidLong: Boolean = isWhole
+
     override def unary_-(): Rational =
       if (n == Long.MinValue) BigRational(-BigInt(Long.MinValue), BigInt(d))
       else LongRational(-n, d)
@@ -877,6 +881,8 @@ private[math] object BigRationals extends Rationals[BigInt] {
     override def isValidShort = false
 
     override def isValidInt = false
+
+    override def isValidLong = false
 
     override def unary_-(): Rational = Rational(-SafeLong(n), SafeLong(d))
 

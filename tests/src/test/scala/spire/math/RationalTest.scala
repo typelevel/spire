@@ -343,4 +343,42 @@ class RationalTest extends FunSuite {
       q * b + m
     }
   }
+  test("isValidFlags") {
+    def check(x:Rational, whole:Boolean, char:Boolean, byte:Boolean, short:Boolean, int:Boolean, long:Boolean): Unit = {
+      assert(x.isWhole == whole)
+      assert(x.isValidChar == char)
+      assert(x.isValidByte == byte)
+      assert(x.isValidShort == short)
+      assert(x.isValidInt == int)
+      assert(x.isValidLong == long)
+    }
+
+    check(Rational.one, true, true, true, true, true, true)
+    check(Rational(1,2), false, false, false, false, false, false)
+
+    check(Rational(Byte.MaxValue), true, true, true, true, true, true)
+    check(Rational(Byte.MaxValue) + 1, true, true, false, true, true, true)
+    check(Rational(Byte.MinValue), true, false, true, true, true, true)
+    check(Rational(Byte.MinValue) - 1, true, false, false, true, true, true)
+
+    check(Rational(Short.MaxValue), true, true, false, true, true, true)
+    check(Rational(Short.MaxValue) + 1, true, true, false, false, true, true)
+    check(Rational(Short.MinValue), true, false, false, true, true, true)
+    check(Rational(Short.MinValue) - 1, true, false, false, false, true, true)
+
+    check(Rational(Char.MaxValue), true, true, false, false, true, true)
+    check(Rational(Char.MaxValue) + 1, true, false, false, false, true, true)
+    check(Rational(Char.MinValue), true, true, true, true, true, true)
+    check(Rational(Char.MinValue) - 1, true, false, true, true, true, true)
+
+    check(Rational(Int.MaxValue), true, false, false, false, true, true)
+    check(Rational(Int.MaxValue) + 1, true, false, false, false, false, true)
+    check(Rational(Int.MinValue), true, false, false, false, true, true)
+    check(Rational(Int.MinValue) - 1, true, false, false, false, false, true)
+
+    check(Rational(Long.MaxValue), true, false, false, false, false, true)
+    check(Rational(Long.MaxValue) + 1, true, false, false, false, false, false)
+    check(Rational(Long.MinValue), true, false, false, false, false, true)
+    check(Rational(Long.MinValue) - 1, true, false, false, false, false, false)
+  }
 }
