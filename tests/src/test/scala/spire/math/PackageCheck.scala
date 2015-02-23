@@ -6,6 +6,8 @@ import org.scalatest._
 import prop._
 
 class PackageCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+  fib(0) shouldBe 0
+  fib(1) shouldBe 1
   property("fib(n + 2) = fib(n + 1) + fib(n)") {
     forAll { (n0: Byte) =>
       val n = n0.toLong.abs
@@ -14,6 +16,7 @@ class PackageCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
   }
 
   property("(n + 1)! = n! * (n + 1)") {
+    fact(0) shouldBe 1
     forAll { (n0: Byte) =>
       val n = n0.toLong.abs + 1
       fact(n + 1) shouldBe fact(n) * (n + 1)

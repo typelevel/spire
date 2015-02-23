@@ -93,6 +93,24 @@ class RingIntervalTest extends FunSuite {
     assert( Interval.fromBounds(Unbound(), Closed(c)) * (-c) ===
       Interval.fromBounds(Closed(-c*c), Unbound()) )
   }
+  test("Interval multiplication bug #372")   {
+    val a = Interval(-1, 1)
+    val b = Interval.above(1)
+    val x = -1
+    val y = 10
+    assert(a.contains(x))
+    assert(b.contains(y))
+    assert((a*b).contains(x*y))
+  }
+  test("Interval multiplication bug variant")   {
+    val a = Interval(-3, -2)
+    val b = Interval.above(-10)
+    val x = -3
+    val y = -9
+    assert(a.contains(x))
+    assert(b.contains(y))
+    assert((a*b).contains(x*y))
+  }
 }
 
 class IntervalGeometricPartialOrderTest extends FunSuite {
@@ -311,6 +329,8 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     forAll { (a: Interval[Rational], b: Interval[Rational]) =>
       val c: Interval[Rational] = f(a, b)
       sample(a, tries).zip(sample(b, tries)).foreach { case (x, y) =>
+        if (!a.contains(x)) println("%s does not contain %s" format (a, x))
+        if (!b.contains(y)) println("%s does not contain %s" format (b, y))
         val ok = c.contains(g(x, y))
         if (!ok) println("(%s, %s) failed on (%s, %s)" format (a, b, x.toString, y.toString))
         ok shouldBe true
