@@ -15,7 +15,7 @@ import CrossValidation._
 /**
  * An example of constructing Random Forests for both regression and
  * classification. This example shows off the utility of vector spaces (in this
- * case `Frame`), fields, and orders to create random forests.
+ * case `CoordinateSpace`), fields, and orders to create random forests.
  */
 object RandomForestExample extends App {
 
@@ -75,8 +75,8 @@ case class RandomForestOptions(
  * these outputs using the `Region`.
  */
 trait RandomForest[V, @spec(Double) F, @spec(Double) K] {
-  implicit def V: Frame[V, F]
-  implicit def F: AdditiveMonoid[F]
+  implicit def V: CoordinateSpace[V, F]
+  implicit def F: Field[F] = V.scalar
   implicit def order: Order[F]
   implicit def vectorClassTag: ClassTag[V]
 
@@ -118,7 +118,7 @@ trait RandomForest[V, @spec(Double) F, @spec(Double) K] {
    * Construct a random forest.
    */
   protected def randomForest(data: Array[V], outputs: Array[K], opts: FixedOptions): Forest = {
-    require(opts.numAxesSample <= V.size, "Cannot sample more dimension than exist in V.")
+    require(opts.numAxesSample <= V.dimensions, "Cannot sample more dimension than exist in V.")
     require(data.length == outputs.length, "Number of dependent and independent variables must match.")
 
     // Selects a set of `m` predictors to use as coordiante indices. The
@@ -127,7 +127,7 @@ trait RandomForest[V, @spec(Double) F, @spec(Double) K] {
     def predictors(): Array[Int] = {
       val indices = new Array[Int](opts.numAxesSample)
       cfor(0)(_ < indices.length, _ + 1) { i => indices(i) = i }
-      cfor(V.size- 1)(_ >= indices.length, _ - 1) { i =>
+      cfor(V.dimensions - 1)(_ >= indices.length, _ - 1) { i =>
         val j = nextInt(i + 1)
         if (j < indices.length)
           indices(j) = i
@@ -265,7 +265,7 @@ trait RandomForest[V, @spec(Double) F, @spec(Double) K] {
  * final predicted output is the average of the individual tress output (which
  * itself is just the mean of all outputs in the region the point lands in.
  */
-class RandomForestRegression[V, @spec(Double) F](implicit val V: Frame[V, F],
+class RandomForestRegression[V, @spec(Double) F](implicit val V: CoordinateSpace[V, F],
     val order: Order[F], val vectorClassTag: ClassTag[V]) extends RandomForest[V, F, F] {
 
   // Our "disparity" measure is just the squared error of the region.
@@ -286,7 +286,7 @@ class RandomForestRegression[V, @spec(Double) F](implicit val V: Frame[V, F],
   }
 
   protected def defaultOptions(size: Int): FixedOptions = {
-    val axes = math.max(V.size/ 3, math.min(V.size, 2))
+    val axes = math.max(V.dimensions / 3, math.min(V.dimensions, 2))
     val sampleSize = math.max(size * 2 / 3, 1)
     FixedOptions(axes, sampleSize, size, 5, true)
   }
@@ -307,7 +307,7 @@ class RandomForestRegression[V, @spec(Double) F](implicit val V: Frame[V, F],
  * Within a forest, each tree casts its vote for classification of a point and
  * the majority wins. Again, ties are broken randomly (again, not really).
  */
-class RandomForestClassification[V, @spec(Double) F, K](implicit val V: Frame[V, F],
+class RandomForestClassification[V, @spec(Double) F, K](implicit val V: CoordinateSpace[V, F],
     val order: Order[F], val vectorClassTag: ClassTag[V]) extends RandomForest[V, F, K] {
 
   // Our "disparity" measure here is the Gini index. It basically measures how
@@ -332,7 +332,7 @@ class RandomForestClassification[V, @spec(Double) F, K](implicit val V: Frame[V,
   }
 
   protected def defaultOptions(size: Int): FixedOptions = {
-    val axes = math.max(math.sqrt(V.size.toDouble).toInt, math.min(V.size, 2))
+    val axes = math.max(math.sqrt(V.dimensions.toDouble).toInt, math.min(V.dimensions, 2))
     val sampleSize = math.max(size * 2 / 3, 1)
     FixedOptions(axes, sampleSize, size, 5, true)
   }
@@ -349,38 +349,38 @@ class RandomForestClassification[V, @spec(Double) F, K](implicit val V: Frame[V,
 object RandomForest {
 
   def regression[V, @spec(Double) F](data: Array[V], out: Array[F], options: RandomForestOptions)(implicit
-      V: Frame[V, F], order: Order[F], ev: ClassTag[V]): V => F = {
+      V: CoordinateSpace[V, F], order: Order[F], ev: ClassTag[V]): V => F = {
     val rfr = new RandomForestRegression[V, F]
     rfr(data, out, options)
   }
 
   def regression[V, @spec(Double) F](data: Iterable[V], out: Iterable[F],
-      options: RandomForestOptions)(implicit V: Frame[V, F], order: Order[F],
+      options: RandomForestOptions)(implicit V: CoordinateSpace[V, F], order: Order[F],
       classTagV: ClassTag[V], classTagF: ClassTag[F]): V => F = {
     regression(data.toArray, out.toArray, options)
   }
 
   def regression[V, @spec(Double) F](data: Iterable[(V, F)], options: RandomForestOptions)(implicit
-      V: Frame[V, F], order: Order[F],
+      V: CoordinateSpace[V, F], order: Order[F],
       classTagV: ClassTag[V], classTagF: ClassTag[F]): V => F = {
     val (in, out) = data.unzip
     regression(in.toArray, out.toArray, options)
   }
 
   def classification[V, @spec(Double) F, K](data: Array[V], out: Array[K], options: RandomForestOptions)(implicit
-      V: Frame[V, F], order: Order[F], ev: ClassTag[V]): V => K = {
+      V: CoordinateSpace[V, F], order: Order[F], ev: ClassTag[V]): V => K = {
     val rfc = new RandomForestClassification[V, F, K]
     rfc(data, out, options)
   }
 
   def classification[V, @spec(Double) F, K](data: Iterable[V], out: Iterable[K],
-      options: RandomForestOptions)(implicit V: Frame[V, F],
+      options: RandomForestOptions)(implicit V: CoordinateSpace[V, F],
       order: Order[F], classTagV: ClassTag[V], classTagK: ClassTag[K]): V => K = {
     classification(data.toArray, out.toArray, options)
   }
 
   def classification[V, @spec(Double) F, K](data: Iterable[(V, K)], options: RandomForestOptions)(implicit
-      V: Frame[V, F], order: Order[F],
+      V: CoordinateSpace[V, F], order: Order[F],
       classTagV: ClassTag[V], classTagK: ClassTag[K]): V => K = {
     val (in, out) = data.unzip
     classification(in.toArray, out.toArray, options)
@@ -396,7 +396,7 @@ object RandomForest {
  * output its value.
  */
 sealed trait DecisionTree[V, F, K] {
-  def apply(v: V)(implicit V: Frame[V, F], F: Order[F]): K = {
+  def apply(v: V)(implicit V: CoordinateSpace[V, F], F: Order[F]): K = {
     @tailrec def loop(tree: DecisionTree[V, F, K]): K = tree match {
       case Split(i, boundary, left, right) =>
         if (v.coord(i) <= boundary) loop(left) else loop(right)
