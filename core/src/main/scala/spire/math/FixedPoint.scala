@@ -111,7 +111,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     } catch {
       case _: FixedPointOverflow =>
         val n = (SafeLong(rhs.long) * r) / d
-        if (n.isLong)
+        if (n.isValidLong)
           new FixedPoint(n.toLong)
         else
           throw new FixedPointOverflow(n.toLong)
