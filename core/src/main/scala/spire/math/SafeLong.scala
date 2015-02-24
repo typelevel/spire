@@ -222,7 +222,7 @@ object SafeLong extends SafeLongInstances {
 }
 
 
-case class SafeLongLong private[math] (x: Long) extends SafeLong {
+private[math] case class SafeLongLong(x: Long) extends SafeLong {
 
   def isZero: Boolean = x == 0
   def signum: Int = java.lang.Long.signum(x)
@@ -341,7 +341,7 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
   override def equals(that: Any): Boolean =
     that match {
       case SafeLongLong(y) => x == y
-      case SafeLongBigInt(y) => x == y
+      case SafeLongBigInt(y) => false
       case that: BigInt => if (that.bitLength > 63) false else that.toLong == x
       case that => that == x
     }
@@ -375,7 +375,7 @@ case class SafeLongLong private[math] (x: Long) extends SafeLong {
   def bitLength: Int = 64 - java.lang.Long.numberOfLeadingZeros(x)
 }
 
-case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
+private[math] case class SafeLongBigInt(x: BigInt) extends SafeLong {
 
   def isZero: Boolean = x.signum == 0
   def signum: Int = x.signum
@@ -438,7 +438,7 @@ case class SafeLongBigInt private[math] (x: BigInt) extends SafeLong {
 
   override def equals(that: Any): Boolean =
     that match {
-      case SafeLongLong(y) => x == y
+      case SafeLongLong(y) => false
       case SafeLongBigInt(y) => x == y
       case that: BigInt => x == that
       case that => that == x
