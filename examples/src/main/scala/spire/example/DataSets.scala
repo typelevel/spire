@@ -17,7 +17,8 @@
 //final class DataSet[V, @spec(Double) F, @spec(Double) K](
 //    val name: String,
 //    val variables: List[Variable[F]],
-//    val space: CoordinateSpace[V, F],
+//    val space: VectorSpace[V, F],
+//    val frame: Frame[V, F],
 //    val data: List[(V, K)]) {
 //
 //  def describe: String = {
@@ -33,8 +34,11 @@
 //    val vars = variables.zipWithIndex map { case (v, i) =>
 //      s"    %2d. ${v.label} (${varType(v)})" format (i + 1)
 //    } mkString "\n"
-//
-//    s"""$name - ${data.size} points with ${variables.size} variables (${space.dimensions} effective):
+//    
+//    // val size = variables.filterNot(p => p instanceOf Ignored).size
+//    val size = 3
+//    
+//    s"""$name - ${data.size} points with ${variables.size} variables (${size} effective):
 //       |$vars""".stripMargin
 //  }
 //}
@@ -67,6 +71,7 @@
 //    }
 //
 //    // Perform our second pass, converting strings to variables.
+//    // TBC should we here build a Frame and return it instead of dimensions ? 
 //    val maps = builders map (_.result())
 //    val (dimensions, datar) = lines.foldLeft((Int.MaxValue, List.empty[(CC[F], K)])) {
 //      case ((dim, res), fields) =>
@@ -84,7 +89,7 @@
 //
 //  def fromResource[CC[_], @spec(Double) F, @spec(Double) K](name: String, res: String, sep: Char,
 //      variables: List[Variable[F]], out: Output[K])(
-//      cs: Int => CoordinateSpace[CC[F], F])(implicit
+//      cs: Int => VectorSpace[CC[F], F])(implicit
 //      cbf: CanBuildFrom[Nothing, F, CC[F]]): DataSet[CC[F], F, K] = {
 //
 //    val lines = readDataSet(res)

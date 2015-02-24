@@ -75,7 +75,9 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Array[Int]",  GroupLaws[Array[Int]].monoid)
 
   checkAll("Seq[String]", PartialGroupLaws[Seq[String]](spire.optional.genericEq.generic, implicitly).semigroupoid)
- // FIXME checkAll("Seq[Int]",    PartialGroupLaws[Seq[Int]].groupoid)
+ // FIXME? checkAll("Seq[Int]",    PartialGroupLaws[Seq[Int]].groupoid)
+  checkAll("Vector[Int]", PartialGroupLaws[Vector[Int]].groupoid)
+  checkAll("List[Int]", PartialGroupLaws[List[Int]].groupoid)
 
   checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
 
@@ -115,5 +117,6 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Order[Int]", OrderLaws[Int].order)
   checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 
-// FIXME  checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbPerm.arbitrary.map(_.map)), implicitly, implicitly).groupPartialAction)
+// FIXME?  checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbPerm.arbitrary.map(_.map)), implicitly, implicitly).groupPartialAction)
+  checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Vector[Int]](implicitly, Arbitrary(arbPerm.arbitrary.map(_.map)), implicitly, implicitly).groupPartialAction)
 }

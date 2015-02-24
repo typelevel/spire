@@ -27,7 +27,7 @@ trait IndexedBasis[V, @spec(Int, Long, Float, Double) K, @spec(Int, Long) I] {
   /**
    * Returns `true` if [[size]] is defined.
    */
-  def hasKnownSize: Boolean
+  // def hasKnownSize: Boolean
 
   /**
    * Returns the number of elements in a vector, but only if [[hasKnownSize]]
@@ -173,6 +173,6 @@ object IndexedBasis {
 
   case class Free[I, K: AdditiveMonoid](val basis: Set[I]) extends MapBasis[I, K] {
     override val hasKnownSize: Boolean = true
-//    override val size: Int = basis.size
+    val size: Int = basis.size
   }
 }
