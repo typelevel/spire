@@ -6,7 +6,7 @@ import spire.std.long._
 import spire.std.float._
 import spire.std.double._
 import spire.syntax.euclideanRing._
-import spire.syntax.isReal._
+import spire.syntax.isReal.{ eqOps => _, _ }
 
 import scala.reflect.ClassTag
 
@@ -40,6 +40,15 @@ class GCDTest extends FunSuite with Checkers {
         true
       }
     }
+  }
+
+  test("GCD of floats with 0 exponent in result is correct") {
+    val x = -1.586002E-34f
+    val y = 3.3793717E-7f
+    val d = spire.math.gcd(x, y)
+    assert((x / d).isWhole === true)
+    assert((y / d).isWhole === true)
+    assert(spire.math.gcd(x / d, y / d) === 1f)
   }
 
   test("Int GCD")(check(forAll { (a: Int, b: Int) => testGcd(a, b) }))
