@@ -27,16 +27,23 @@ trait DoubleIsField extends Field[Double] {
 
     def exp(bits: Long): Int = ((bits >> 52) & 0x7FF).toInt
 
+    // Computes the GCD of 2 fp values. Here, we are guaranteed that exp0 < exp1.
     def gcd0(val0: Long, exp0: Int, val1: Long, exp1: Int): Double = {
       val tz0 = numberOfTrailingZeros(val0)
       val tz1 = numberOfTrailingZeros(val1)
       val tzShared = spire.math.min(tz0, tz1 + exp1 - exp0)
+      // We trim of the power of 2s, then add back the shared portion.
       val n = spire.math.gcd(val0 >>> tz0, val1 >>> tz1) << tzShared
-
+      // Number of bits to move the leading 1 to bit position 23.
       val shift = numberOfLeadingZeros(n) - 11 // Number of bits to move 1 to bit 52
-      val mantissa = (n << shift) & 0x000FFFFFFFFFFFFFL
       val exp = (exp0 - shift).toLong
-      if (exp < 0) 0.0 else longBitsToDouble((exp << 52) | mantissa)
+      // If exp is 0, then the value is actually just the mantissa * 2^−126,
+      // so we need to adjust the *shift* accordingly.
+      val shift0 = if (exp == 0) shift - 1 else shift
+      val mantissa = (n << shift0) & 0x000FFFFFFFFFFFFFL
+      // If exp < 0, then we have underflowed; not much we can do but return 0.
+      if (exp < 0) 0.0
+      else longBitsToDouble((exp << 52) | mantissa)
     }
 
     if (a == 0D) b
