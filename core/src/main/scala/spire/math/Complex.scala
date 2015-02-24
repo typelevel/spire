@@ -688,7 +688,6 @@ private[math] class ComplexAlgebra[@spec(Float, Double) A](implicit
     with ComplexIsNRoot[A]
     with ComplexIsSigned[A]
     with InnerProductSpace[Complex[A], A]
-    with FieldAlgebra[Complex[A], A]
     with Serializable {
   def scalar = algebra
   def timesl(a: A, v: Complex[A]): Complex[A] = Complex(a, scalar.zero) * v

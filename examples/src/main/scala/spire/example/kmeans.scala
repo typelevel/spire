@@ -22,7 +22,7 @@ object KMeansExample extends App {
    * `points0`.
    */
   def kMeans[V, @spec(Double) A, CC[V] <: Iterable[V]](points0: CC[V], k: Int)(implicit
-      vs: NormedVectorSpace[V, A], order: Order[A],
+      vs: NormedVectorSpace[V, A], order: Order[A], field: Field[A],
       cbf: CanBuildFrom[Nothing, V, CC[V]], ct: ClassTag[V]): CC[V] = {
 
     val points = points0.toArray
@@ -68,7 +68,7 @@ object KMeansExample extends App {
           counts(idx) += 1
         }
         cfor(0)(_ < clusters.length, _ + 1) { j =>
-          clusters(j) = clusters(j) :/ vs.scalar.fromInt(counts(j))
+          clusters(j) = clusters(j) :/ field.fromInt(counts(j))
         }
         loop(assignments, clusters)
       }

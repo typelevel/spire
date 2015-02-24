@@ -3,20 +3,32 @@ package spire.optional
 import scala.collection.SeqLike
 import scala.{specialized => sp}
 
-import spire.algebra.{ Eq, Module, Order }
+import spire.algebra.{ Eq, Order, VectorSpace, AdditiveMonoid }
 import spire.std.{ SeqVectorEq, SeqVectorOrder }
 import spire.std.{ ArrayVectorEq, ArrayVectorOrder }
 import spire.std.MapVectorEq
 
 trait VectorOrderLow {
   implicit def seqEq[A, CC[A] <: SeqLike[A, CC[A]]](implicit
-      A0: Eq[A], module: Module[CC[A], A]) = new SeqVectorEq[A, CC[A]]()(A0, module.scalar)
+    order: Eq[A],
+    vectorSpace: VectorSpace[CC[A], A],
+    scalar: AdditiveMonoid[A]
+  ): Eq[CC[A]] =
+    new SeqVectorEq[A, CC[A]]()(order, scalar)
 
-  implicit def arrayEq[@sp(Int,Long,Float,Double) A](implicit ev: Eq[A], module: Module[Array[A], A]) =
-    new ArrayVectorEq[A]()(ev, module.scalar)
+  implicit def arrayEq[@sp(Int,Long,Float,Double) A](implicit
+    order: Eq[A],
+    vectorSpace: VectorSpace[Array[A], A],
+    scalar: AdditiveMonoid[A]
+  ): Eq[Array[A]] =
+    new ArrayVectorEq[A]()(order, scalar)
 
-  implicit def mapEq[K, V](implicit V0: Eq[V], module: Module[Map[K, V], V]) =
-    new MapVectorEq[K, V]()(V0, module.scalar)
+  implicit def mapEq[K, V](implicit
+    order: Eq[V],
+    vectorSpace: VectorSpace[Map[K, V], V],
+    scalar: AdditiveMonoid[V]
+  ): Eq[Map[K, V]] =
+    new MapVectorEq[K, V]()(order, scalar)
 }
 
 /**
@@ -27,8 +39,16 @@ trait VectorOrderLow {
  */
 object vectorOrder extends VectorOrderLow {
   implicit def seqOrder[A, CC[A] <: SeqLike[A, CC[A]]](implicit
-      A0: Order[A], module: Module[CC[A], A]) = new SeqVectorOrder[A, CC[A]]()(A0, module.scalar)
+    order: Order[A],
+    vectorSpace: VectorSpace[CC[A], A],
+    scalar: AdditiveMonoid[A]
+  ): Order[CC[A]] =
+    new SeqVectorOrder[A, CC[A]]()(order, scalar)
 
-  implicit def arrayOrder[@sp(Int,Long,Float,Double) A](implicit ev: Order[A], module: Module[Array[A], A]) =
-    new ArrayVectorOrder[A]()(ev, module.scalar)
+  implicit def arrayOrder[@sp(Int,Long,Float,Double) A](implicit
+    order: Order[A],
+    vectorSpace: VectorSpace[Array[A], A],
+    scalar: AdditiveMonoid[A]
+  ): Order[Array[A]] =
+    new ArrayVectorOrder[A]()(order, scalar)
 }
