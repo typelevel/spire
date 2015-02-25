@@ -27,16 +27,23 @@ trait FloatIsField extends Field[Float] {
 
     def exp(bits: Int): Int = ((bits >> 23) & 0xFF).toInt
 
+    // Computes the GCD of 2 fp values. Here, we are guaranteed that exp0 < exp1.
     def gcd0(val0: Int, exp0: Int, val1: Int, exp1: Int): Float = {
       val tz0 = numberOfTrailingZeros(val0)
       val tz1 = numberOfTrailingZeros(val1)
       val tzShared = spire.math.min(tz0, tz1 + exp1 - exp0)
+      // We trim of the power of 2s, then add back the shared portion.
       val n = spire.math.gcd(val0 >>> tz0, val1 >>> tz1).toInt << tzShared
-
-      val shift = numberOfLeadingZeros(n) - 8 // Number of bits to move 1 to bit 23
-      val mantissa = (n << shift) & 0x007FFFFF
+      // Number of bits to move the leading 1 to bit position 23.
+      val shift = numberOfLeadingZeros(n) - 8 
       val exp = (exp0 - shift)
-      if (exp < 0) 0F else intBitsToFloat((exp << 23) | mantissa)
+      // If exp is 0, then the value is actually just the mantissa * 2^−126,
+      // so we need to adjust the *shift* accordingly.
+      val shift0 = if (exp == 0) shift - 1 else shift
+      val mantissa = (n << shift0) & 0x007FFFFF
+      // If exp < 0, then we have underflowed; not much we can do but return 0.
+      if (exp < 0) 0F
+      else intBitsToFloat((exp << 23) | mantissa)
     }
 
     if (a == 0F) b
