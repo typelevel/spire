@@ -4,14 +4,33 @@ This document is intended to describe design goals, invariants and implementatio
 
 ## SafeLong
 
+The design goal of SafeLong is to provide worry-free arbitrary precision integers that nevertheless have performance approaching boxed Longs for calculations that remain within the range of a 64bit signed integer.
+
+This is achieved by having two cases: `SafeLongLong(x: Long)` is used for numbers within the long range. `SafeLongBigInt(x: BigInt)` is used if this is not the case.
+
+### Invariants
+
+- A number in the long range must *always* be represented as a `SafeLongLong`. This is used both within the SafeLong operations and from other classes in spire.math. Consequences of this invariant are
+  - `SafeLongBigInt` can never be zero
+  - A `SafeLongBigInt` can never be equal to a `SafeLongLong`
+
+### Implementation notes
+
+Operations of `SafeLongBigInt` use the underyling BigInt and create the appropriate kind of result depending on whether the result is a valid long.
+
+Operations on `SafeLongLong` use the Checked macro to perform operations using long integers, and only fall back to using `BigInt` in case of numeric overflow.
+
+### Performance tips
+
+- comparison to zero is more efficient using signum than using compare
+- the `isValidLong` method can be used to check if a `SafeLong` can be losslessly converted to a long using `toLong`
+
 ## Rational
 
-The design goal of Rational is to provide good performance and low memory overhead in the very frequent case of rational
-numbers with small magnitude, while still being able to represent rational numbers of arbitrary size.
+The design goal of Rational is to provide good performance and low memory overhead in the very frequent case of rational numbers with small magnitude, while still being able to represent rational numbers of arbitrary size.
 
 To achieve this goal, there are two different cases. `LongRational(n: Long, d: Long)` is used to represent small
-rational numbers. `BigRational(n: BigInt, d: BigInt)` is used whenever either numerator or denominator are too large to
-be stored in a `LongRational`.
+rational numbers. `BigRational(n: BigInt, d: BigInt)` is used whenever either numerator or denominator are too large to be stored in a `LongRational`.
 
 ### Invariants
 
