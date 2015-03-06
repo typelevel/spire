@@ -5,7 +5,6 @@ package rng
 import java.util.concurrent.atomic.AtomicLong
 
 import scala.annotation.tailrec
-import spire.math.ULong
 import spire.syntax.literals._
 import spire.util.Pack
 
@@ -20,35 +19,35 @@ import spire.util.Pack
  * @see <a href="http://www.pcg-random.org">PCG Home Page</a>
  * @author <a href="mailto:alexey.v.romanov@gmail.com">Alexey Romanov</a>
  */
-class PcgXshRr64_32 private (private var state: ULong, private var inc: ULong) extends IntBasedGenerator {
+class PcgXshRr64_32 private (private var state: Long, private var inc: Long) extends IntBasedGenerator {
   protected[this] def copyInit = new PcgXshRr64_32(state, inc)
 
   def nextInt() = {
     val oldState = state
 
-    state = oldState * ULong(6364136223846793005L) + inc
+    state = oldState * 6364136223846793005L + inc
     val xorShifted = (((oldState >>> 18) ^ oldState) >>> 27).toInt
     val rot = (oldState >>> 59).toInt
     Integer.rotateRight(xorShifted, rot)
   }
 
   def seed(initState: Long, initSeq: Long): Unit = {
-    state = ULong(0)
-    inc = (ULong(initSeq) << 1) | ULong(1)
+    state = 0L
+    inc = (initSeq << 1) | 1L
     nextInt()
-    state += ULong(initState)
+    state += initState
     nextInt()
   }
 
   def seed(seed: PcgSeed64): Unit = this.seed(seed.initState, seed.initSeq)
 
   override def getSeedBytes(): Array[Byte] =
-    Pack.longsToBytes(Array(state.signed, inc.signed))
+    Pack.longsToBytes(Array(state, inc))
 
   override def setSeedBytes(bytes: Array[Byte]): Unit = {
     val longs = Pack.longsFromBytes(bytes, 2)
-    state = ULong(longs(0))
-    inc = ULong(longs(1))
+    state = longs(0)
+    inc = longs(1)
   }
 }
 
@@ -60,7 +59,7 @@ object PcgXshRr64_32 extends GeneratorCompanion[PcgXshRr64_32, PcgSeed64] {
     fromSeed(PcgSeed64(time, nextStreamId()))
 
   override def fromSeed(seed: PcgSeed64): PcgXshRr64_32 = {
-    val gen = new PcgXshRr64_32(ULong(0), ULong(0))
+    val gen = new PcgXshRr64_32(0L, 0L)
     gen.seed(seed)
     gen
   }
