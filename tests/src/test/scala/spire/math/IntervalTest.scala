@@ -298,9 +298,19 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     } else {
       import spire.math.interval.ValueBound
       val underlyingf: () => Rational = (int.lowerBound, int.upperBound) match {
-        case (ValueBound(x) , ValueBound(y)) => () => x + Rational(rng.nextDouble) * (y - x)
-        case (ValueBound(x) , _) => () => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
-        case (_, ValueBound(y)) => () => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
+        case (ValueBound(x) , ValueBound(y)) => () => rng.nextInt(10) match {
+          case 0 => x
+          case 9 => y
+          case _ => x + Rational(rng.nextDouble) * (y - x)
+        }
+        case (ValueBound(x) , _) => () => rng.nextInt(5) match {
+          case 0 => x
+          case _ => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
+        }
+        case (_, ValueBound(y)) => () => rng.nextInt(5) match {
+          case 4 => y
+          case _ => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
+        }
         case (_ , _) => () => Rational(rng.nextGaussian) * Long.MaxValue
       }
 
