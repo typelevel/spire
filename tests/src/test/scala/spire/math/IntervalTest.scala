@@ -102,7 +102,7 @@ class RingIntervalTest extends FunSuite {
     assert(b.contains(y))
     assert((a*b).contains(x*y))
   }
-  test("Interval multiplication bug variant")   {
+  test("Interval multiplication bug 1")   {
     val a = Interval(-3, -2)
     val b = Interval.above(-10)
     val x = -3
@@ -111,9 +111,19 @@ class RingIntervalTest extends FunSuite {
     assert(b.contains(y))
     assert((a*b).contains(x*y))
   }
-  test("Interval multiplication bug") {
+  test("Interval multiplication bug 2") {
     val a = Interval.atOrBelow(0)
     val b = Interval.below(-1)
+    assert((a*b).contains(0))
+  }
+  test("Interval multiplication bug 3") {
+    val a = Interval.atOrBelow(0)
+    val b = Interval.open(-2, -1)
+    assert((a*b).contains(0))
+  }
+  test("Interval multiplication bug 4") {
+    val a = Interval.above(2)
+    val b = Interval.closed(0, 1)
     assert((a*b).contains(0))
   }
 }
