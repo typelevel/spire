@@ -111,6 +111,11 @@ class RingIntervalTest extends FunSuite {
     assert(b.contains(y))
     assert((a*b).contains(x*y))
   }
+  test("Interval multiplication bug") {
+    val a = Interval.atOrBelow(0)
+    val b = Interval.below(-1)
+    assert((a*b).contains(0))
+  }
 }
 
 class IntervalGeometricPartialOrderTest extends FunSuite {
