@@ -102,7 +102,7 @@ class RingIntervalTest extends FunSuite {
     assert(b.contains(y))
     assert((a*b).contains(x*y))
   }
-  test("Interval multiplication bug variant")   {
+  test("Interval multiplication bug 1")   {
     val a = Interval(-3, -2)
     val b = Interval.above(-10)
     val x = -3
@@ -110,6 +110,21 @@ class RingIntervalTest extends FunSuite {
     assert(a.contains(x))
     assert(b.contains(y))
     assert((a*b).contains(x*y))
+  }
+  test("Interval multiplication bug 2") {
+    val a = Interval.atOrBelow(0)
+    val b = Interval.below(-1)
+    assert((a*b).contains(0))
+  }
+  test("Interval multiplication bug 3") {
+    val a = Interval.atOrBelow(0)
+    val b = Interval.open(-2, -1)
+    assert((a*b).contains(0))
+  }
+  test("Interval multiplication bug 4") {
+    val a = Interval.above(2)
+    val b = Interval.closed(0, 1)
+    assert((a*b).contains(0))
   }
 }
 
@@ -298,9 +313,19 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     } else {
       import spire.math.interval.ValueBound
       val underlyingf: () => Rational = (int.lowerBound, int.upperBound) match {
-        case (ValueBound(x) , ValueBound(y)) => () => x + Rational(rng.nextDouble) * (y - x)
-        case (ValueBound(x) , _) => () => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
-        case (_, ValueBound(y)) => () => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
+        case (ValueBound(x) , ValueBound(y)) => () => rng.nextInt(10) match {
+          case 0 => x
+          case 9 => y
+          case _ => x + Rational(rng.nextDouble) * (y - x)
+        }
+        case (ValueBound(x) , _) => () => rng.nextInt(5) match {
+          case 0 => x
+          case _ => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
+        }
+        case (_, ValueBound(y)) => () => rng.nextInt(5) match {
+          case 4 => y
+          case _ => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
+        }
         case (_ , _) => () => Rational(rng.nextGaussian) * Long.MaxValue
       }
 
