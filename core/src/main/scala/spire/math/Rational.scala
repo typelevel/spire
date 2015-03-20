@@ -491,6 +491,7 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
       case that: Natural => isWhole && this == Rational(that.toBigInt)
       case that: Complex[_] => that == this
       case that: Quaternion[_] => that == this
+      case that: Long => isValidLong && toLong == that
       case that => unifiedPrimitiveEquals(that)
     }
 
