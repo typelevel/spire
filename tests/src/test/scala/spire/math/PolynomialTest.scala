@@ -115,12 +115,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     property(s"$name p /~ p = 1") {
       forAll { (p: P) =>
         if (!p.isZero) {
-          val x = p /~ p
-          if (x != one) {
-            println(s"x=$x x.degree=${x.degree} x.##=${x.##} x.terms=${x.termsIterator.toList}")
-            println(s"one=$one one.degree=${one.degree} one.##=${one.##} one.terms=${one.termsIterator.toList}")
-          }
-          x shouldBe one
+          p /~ p x shouldBe one
         }
       }
     }
