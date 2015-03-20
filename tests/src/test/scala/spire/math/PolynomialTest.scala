@@ -113,7 +113,16 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
 
     property(s"$name p /~ p = 1") {
-      forAll { (p: P) => if (!p.isZero) p /~ p shouldBe one }
+      forAll { (p: P) =>
+        if (!p.isZero) {
+          val x = p /~ p
+          if (x != one) {
+            println(s"x=$x x.degree=${x.degree} x.##=${x.##} x.terms=${x.termsIterator.toList}")
+            println(s"one=$one one.degree=${one.degree} one.##=${one.##} one.terms=${one.termsIterator.toList}")
+          }
+          x shouldBe one
+        }
+      }
     }
 
     property(s"$name p % p = 0") {
@@ -177,13 +186,19 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
   property("sparse p = p") {
     forAll { (p: PolySparse[Rational]) =>
+      val d = p.toDense
       p shouldBe p
+      p shouldBe d
+      p.## shouldBe d.##
     }
   }
 
   property("dense p = p") {
     forAll { (p: PolyDense[Rational]) =>
+      val s = p.toSparse
       p shouldBe p
+      p shouldBe s
+      p.## shouldBe s.##
     }
   }
 
@@ -208,6 +223,14 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   property("apply(p.toString) = p") {
     forAll { (p: PolyDense[Rational]) =>
       Polynomial(p.toString) shouldBe p
+    }
+  }
+
+  property("apply(r, 0) = r") {
+    forAll { (r: Rational) =>
+      val p = Polynomial(r, 0)
+      p shouldBe r
+      p.## shouldBe r.##
     }
   }
 
