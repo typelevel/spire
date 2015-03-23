@@ -20,8 +20,8 @@ object MyBuild extends Build {
 
   // Dependencies
 
-  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.2.1"
-  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.12.1"
+  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.2.4"
+  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.12.2"
 
   // Release step
 
@@ -52,16 +52,16 @@ object MyBuild extends Build {
   override lazy val settings = super.settings ++ Seq(
     organization := "org.spire-math",
 
-    scalaVersion := "2.11.5",
+    scalaVersion := "2.11.6",
 
-    crossScalaVersions := Seq("2.10.4", "2.11.5"),
+    crossScalaVersions := Seq("2.10.5", "2.11.6"),
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "org.typelevel" %% "machinist" % "0.3.0"
+      "org.typelevel" %% "machinist" % "0.3.0" // TODO: 0.3.1 causes compilation errors
     ),
 
     scalacOptions ++= Seq(
@@ -98,8 +98,8 @@ object MyBuild extends Build {
         // in Scala 2.10, quasiquotes are provided by macro-paradise
         case Some((2, 10)) =>
           libraryDependencies.value ++ Seq(
-            compilerPlugin("org.scalamacros" % "paradise" % "2.0.0" cross CrossVersion.full),
-            "org.scalamacros" %% "quasiquotes" % "2.0.0")
+            compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full),
+            "org.scalamacros" %% "quasiquotes" % "2.0.1")
       }
     },
 
@@ -214,7 +214,7 @@ object MyBuild extends Build {
     name := "spire-examples",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "1.2.4",
-      "org.apfloat" % "apfloat" % "1.6.3",
+      "org.apfloat" % "apfloat" % "1.8.2",
       "org.jscience" % "jscience" % "4.3.1"
     )
   ) ++ noPublish
@@ -265,16 +265,16 @@ object MyBuild extends Build {
       // comparisons
       "org.apfloat" % "apfloat" % "1.6.3",
       "org.jscience" % "jscience" % "4.3.1",
-      "org.apache.commons" % "commons-math3" % "3.2",
+      "org.apache.commons" % "commons-math3" % "3.4.1",
 
       // thyme
       "ichi.bench" % "thyme" % "0.1.0" from "http://plastic-idolatry.com/jars/thyme-0.1.0.jar",
 
       // caliper stuff
-      "com.google.guava" % "guava" % "r09",
-      "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.0",
+      "com.google.guava" % "guava" % "18.0",
+      "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.1",
       "com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" from "http://plastic-idolatry.com/jars/caliper-1.0-SNAPSHOT.jar",
-      "com.google.code.gson" % "gson" % "1.7.1"
+      "com.google.code.gson" % "gson" % "1.7.2"
     ),
 
     // enable forking in run
