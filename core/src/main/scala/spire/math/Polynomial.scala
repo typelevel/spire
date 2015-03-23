@@ -106,16 +106,17 @@ object Polynomial extends PolynomialInstances {
     // do some pre-processing to remove whitespace/outer parens
     val t = s.trim
     val u = if (t.startsWith("(") && t.endsWith(")")) t.substring(1, t.length - 1) else t
+    val v = Term.removeSuperscript(u)
 
     // parse out the terms
-    val ts = parse(u, Nil)
+    val ts = parse(v, Nil)
 
     // make sure we have at most one variable
     val vs = ts.view.map(_.v).toSet.filter(_ != "")
     if (vs.size > 1) throw new IllegalArgumentException("only univariate polynomials supported")
 
     // we're done!
-    Polynomial(ts.map(t => (t.e, t.c)).toMap)
+    (Polynomial.zero[Rational] /: ts)((a, t) => a + Polynomial(t.c, t.e))
   }
 
   private final def split[@spec(Double) C: ClassTag](poly: Polynomial[C]): (Array[Int], Array[C]) = {

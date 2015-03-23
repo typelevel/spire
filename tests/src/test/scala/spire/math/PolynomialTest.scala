@@ -258,6 +258,8 @@ class PolynomialTest extends FunSuite {
     val p = Polynomial(Array(Term(r"1/2", 0), Term(r"1/4", 2), Term(r"2", 1)))
     assert(p.terms.toSet === Set(Term(r"1/2", 0), Term(r"1/4", 2), Term(r"2", 1)))
     assert(p === Polynomial("1/4x^2 + 2x + 1/2"))
+    assert(p === Polynomial("1/4x² + 2x + 1/2"))
+    assert(p === Polynomial("1/4x² + x + x + 1/2"))
     assert(p === Polynomial(Map(2 -> r"1/4", 1 -> r"2", 0 -> r"1/2")))
   }
 
