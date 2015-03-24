@@ -177,13 +177,19 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
   property("sparse p = p") {
     forAll { (p: PolySparse[Rational]) =>
+      val d = p.toDense
       p shouldBe p
+      p shouldBe d
+      p.## shouldBe d.##
     }
   }
 
   property("dense p = p") {
     forAll { (p: PolyDense[Rational]) =>
+      val s = p.toSparse
       p shouldBe p
+      p shouldBe s
+      p.## shouldBe s.##
     }
   }
 
@@ -208,6 +214,14 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   property("apply(p.toString) = p") {
     forAll { (p: PolyDense[Rational]) =>
       Polynomial(p.toString) shouldBe p
+    }
+  }
+
+  property("apply(r, 0) = r") {
+    forAll { (r: Rational) =>
+      val p = Polynomial(r, 0)
+      p shouldBe r
+      p.## shouldBe r.##
     }
   }
 
