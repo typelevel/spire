@@ -63,7 +63,7 @@ object ArbitrarySupport {
   implicit def sized[A: EuclideanRing: Signed: Arbitrary, L: Size, U: Size]: Arbitrary[Sized[A, L, U]] =
     Arbitrary(arbitrary[A].map(a => Sized((a % (Size[U] - Size[L])).abs + Size[L])))
 
-  implicit def positive[A: Signed: Arbitrary]: Arbitrary[Positive[A]] =
+  implicit def positive[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[Positive[A]] =
     Arbitrary(arbitrary[A].map(_.abs).filter(_.signum > 0).map(Positive(_)))
   implicit def negative[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[Negative[A]] =
     Arbitrary(arbitrary[A].map(-_.abs).filter(_.signum < 0).map(Negative(_)))

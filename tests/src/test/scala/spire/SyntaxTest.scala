@@ -116,7 +116,7 @@ trait BaseSyntaxTest {
       ((a compare b) == Order[A].compare(a, b))
   }
 
-  def testSignedSyntax[A: Signed](a: A) = {
+  def testSignedSyntax[A: Signed: AdditiveGroup](a: A) = {
     import spire.syntax.signed._
     (a.sign == Signed[A].sign(a)) &&
       (a.signum == Signed[A].signum(a)) &&

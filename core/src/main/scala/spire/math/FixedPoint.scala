@@ -4,7 +4,7 @@ import spire.syntax.ring._
 import spire.syntax.order._
 import spire.syntax.convertableFrom._
 
-import spire.algebra.{Order, Signed}
+import spire.algebra.{AdditiveGroup, Order, Signed}
 
 import scala.{specialized => spec}
 
@@ -290,7 +290,7 @@ trait FixedPointInstances {
       implicit val ctxt: ApproximationContext[Rational] =
         ApproximationContext(Rational(1L, scale.denom) * 2)
 
-      def abs(x: FixedPoint): FixedPoint = x.abs
+      override def abs(x: FixedPoint)(implicit ev: AdditiveGroup[FixedPoint]): FixedPoint = x.abs
       def signum(x: FixedPoint): Int = x.signum
 
       override def eqv(x: FixedPoint, y: FixedPoint): Boolean = x == y

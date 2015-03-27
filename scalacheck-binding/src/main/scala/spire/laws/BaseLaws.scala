@@ -21,7 +21,7 @@ trait BaseLaws[A] extends Laws {
   implicit def Arb: Arbitrary[A]
 
 
-  def signed(implicit A: Signed[A]) = new SimpleRuleSet(
+  def signed(implicit A: Signed[A] with AdditiveGroup[A]) = new SimpleRuleSet(
     name = "signed",
     "abs non-negative" → forAll((x: A) =>
       x.abs.sign != Sign.Negative

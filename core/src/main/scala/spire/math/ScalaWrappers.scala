@@ -56,7 +56,7 @@ private[spire] trait ScalaNumericWrapper[A] extends scala.math.Numeric[A] with S
   def toLong(x: A) = conversions.toLong(x)
 
   override def signum(x:A): Int = signed.signum(x)
-  override def abs(x: A): A = signed.abs(x)
+  override def abs(x: A): A = signed.abs(x)(structure)
 }
 
 private[spire] trait ScalaFractionalWrapper[A] extends ScalaNumericWrapper[A] with scala.math.Fractional[A] {

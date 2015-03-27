@@ -14,7 +14,8 @@ trait Signed[@spec(Double, Float, Int, Long) A] extends Any {
   def signum(a: A): Int
 
   /** An idempotent function that ensures an object has a non-negative sign. */
-  def abs(a: A): A
+  def abs(a: A)(implicit ev: AdditiveGroup[A]): A =
+    if (signum(a) < 0) ev.negate(a) else a
 
   def isSignZero(a: A): Boolean = signum(a) == 0
   def isSignPositive(a: A): Boolean = signum(a) > 0
@@ -33,5 +34,5 @@ object Signed {
 
 private[algebra] class OrderedRingIsSigned[A](implicit o: Order[A], r: Ring[A]) extends Signed[A] {
   def signum(a: A) = o.compare(a, r.zero)
-  def abs(a: A) = if (signum(a) < 0) r.negate(a) else a
+  override def abs(a: A)(implicit ev: AdditiveGroup[A]) = if (signum(a) < 0) r.negate(a) else a
 }

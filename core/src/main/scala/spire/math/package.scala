@@ -12,7 +12,7 @@ import scala.math.ScalaNumericConversions
 
 import BigDecimal.RoundingMode.{FLOOR, HALF_UP, CEILING}
 
-import spire.algebra.{EuclideanRing, Field, IsReal, NRoot, Order, Signed, Trig}
+import spire.algebra.{AdditiveGroup, EuclideanRing, Field, IsReal, NRoot, Order, Signed, Trig}
 import spire.std.bigDecimal._
 import spire.syntax.nroot._
 
@@ -27,7 +27,7 @@ package object math {
   final def abs(n: Long): Long = Math.abs(n)
   final def abs(n: Float): Float = Math.abs(n)
   final def abs(n: Double): Double = Math.abs(n)
-  final def abs[A](a: A)(implicit ev: Signed[A]): A = ev.abs(a)
+  final def abs[A](a: A)(implicit ev: Signed[A] with AdditiveGroup[A]): A = ev.abs(a)
 
   /**
    * ceil
