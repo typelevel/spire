@@ -40,13 +40,13 @@ To get started with SBT, simply add the following to your `build.sbt` file:
 scalaVersion := "2.11.4"
 // or scalaVersion := "2.10.4"
 
-libraryDependencies += "org.spire-math" %% "spire" % "0.9.0"
+libraryDependencies += "org.spire-math" %% "spire" % "0.9.1"
 ```
 
 (If you must use Spire with 2.9.x, there is an older 0.3.0 release available.)
 
 For Maven instructions, and to download the jars directly, visit the
-[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.9.0%7Cjar).
+[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.11%7C0.9.1%7Cjar).
 
 ### Playing Around
 
