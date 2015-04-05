@@ -18,7 +18,8 @@ sealed trait Op[+A] {
   def map[B](f: A => B): Op[B] =
     flatMap(a => Const(f(a)))
 
-  def resume(gen: Generator): Either[() => Op[A], A] =
+  @tailrec
+  final def resume(gen: Generator): Either[() => Op[A], A] =
     this match {
       case Const(a) =>
         Right(a)
@@ -31,7 +32,7 @@ sealed trait Op[+A] {
           case Const(x) => f(x).resume(gen)
           case More(k) => Left(() => FlatMap(k(), f))
           case Next(g) => f(g(gen)).resume(gen)
-          case FlatMap(b, g) => FlatMap(b, (x: Any) => FlatMap(g(x), f)).resume(gen)
+          case FlatMap(b, g) => (FlatMap(b, (x: Any) => FlatMap(g(x), f)): Op[A]).resume(gen)
         }
     }
 
