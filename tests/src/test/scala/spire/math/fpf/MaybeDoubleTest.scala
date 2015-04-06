@@ -57,7 +57,7 @@ class MaybeDoubleTest extends FunSuite {
     assert(md.error > 0.0)
   }
 
-  def assertAlmostEqual(a: MaybeDouble, x: Double) {
+  def assertAlmostEqual(a: MaybeDouble, x: Double): Unit = {
     assert(a.approx - a.error <= x && x <= a.approx + a.error)
   }
 

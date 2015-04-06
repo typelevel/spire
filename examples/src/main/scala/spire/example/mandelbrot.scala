@@ -22,7 +22,7 @@ object MandelbrotDemo {
   /**
    * Print an ASCII approximation of the 4x4 box from -2-2i to 2+2i.
    */
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     val res = 26 // number of iterations to try before including pt in the set
     val rows = if (args.isEmpty) 20 else args(0).toInt // rows to print
     val cols = rows * 2 // cols to print. most fonts are roughly 1:2

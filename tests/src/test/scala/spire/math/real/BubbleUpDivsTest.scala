@@ -7,14 +7,14 @@ import org.scalatest.FunSuite
 
 
 class BubbleUpDivsTest extends FunSuite {
-  def hasRootDiv(a: Algebraic) {
+  def hasRootDiv(a: Algebraic): Unit = {
     assert(a match {
         case Div(_, _) => true
         case _ => false
       }, "Root Algebraic expr is not a Div")
   }
 
-  def hasOneDiv(a: Algebraic) {
+  def hasOneDiv(a: Algebraic): Unit = {
     assert(countDivs(a) == 1, "Algebraic has more than 1 Div in expr")
   }
 
@@ -29,7 +29,7 @@ class BubbleUpDivsTest extends FunSuite {
     case BigIntLit(_) => 0
   }
 
-  def assertDivBubbledUp(a: Algebraic) {
+  def assertDivBubbledUp(a: Algebraic): Unit = {
     hasOneDiv(a)
     hasRootDiv(a)
   }

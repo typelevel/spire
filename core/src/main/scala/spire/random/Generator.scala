@@ -199,7 +199,7 @@ abstract class Generator {
   /**
    * Fill an array with random Longs.
    */
-  def fillLongs(arr: Array[Long]) {
+  def fillLongs(arr: Array[Long]): Unit = {
     var i = 0
     val len = arr.length
     while (i < len) {
@@ -220,7 +220,7 @@ abstract class Generator {
   /**
    * Fill an array with random Ints.
    */
-  def fillInts(arr: Array[Int]) {
+  def fillInts(arr: Array[Int]): Unit = {
     var i = 0
     val len = arr.length
     while (i < len) {
@@ -241,7 +241,7 @@ abstract class Generator {
   /**
    * Fill an array with random Shorts.
    */
-  def fillShorts(arr: Array[Short]) {
+  def fillShorts(arr: Array[Short]): Unit = {
     var i = 0
     val len = arr.length
     val llen = len & 0xfffffffe
@@ -267,7 +267,7 @@ abstract class Generator {
   /**
    * Fill an array with random Bytes.
    */
-  def fillBytes(arr: Array[Byte]) {
+  def fillBytes(arr: Array[Byte]): Unit = {
     var i = 0
     val len = arr.length
     val llen = len & 0xfffffffc
@@ -302,7 +302,7 @@ abstract class Generator {
   /**
    * Fill an Array[A] using the given Dist[A] instance.
    */
-  def fillArray[@spec A: Dist](arr: Array[A]) {
+  def fillArray[@spec A: Dist](arr: Array[A]): Unit = {
     var i = 0
     val len = arr.length
     while (i < len) {
@@ -365,7 +365,7 @@ abstract class Generator {
     chosen
   }
 
-  def shuffle[@spec A](as: Array[A])(implicit gen: Generator) {
+  def shuffle[@spec A](as: Array[A])(implicit gen: Generator): Unit = {
     var i: Int = as.length - 1
     while (i > 0) {
       val n: Int = gen.nextInt(i)
@@ -400,11 +400,11 @@ abstract class Generator {
   def fillGaussians(arr: Array[Double]): Unit =
     fillGaussians(arr, 0.0, 1.0)
 
-  def fillGaussians(arr: Array[Double], mean: Double, stddev: Double) {
+  def fillGaussians(arr: Array[Double], mean: Double, stddev: Double): Unit = {
     var i = 0
     val len = arr.length & 0xfffffffe
 
-    @tailrec def loop(i: Int, x: Double, y: Double) {
+    @tailrec def loop(i: Int, x: Double, y: Double): Unit = {
       val s = x * x + y * y
       if (s >= 1.0 || s == 0.0) {
         loop(i, nextDouble() * 2 - 1, nextDouble() * 2 - 1)

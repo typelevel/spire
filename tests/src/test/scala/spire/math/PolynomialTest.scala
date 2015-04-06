@@ -64,7 +64,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   // runDense[BigDecimal]("decimal")(arbitraryBigDecimal, sbd, fbd, cbd)
   // runSparse[BigDecimal]("decimal")(arbitraryBigDecimal, sbd, fbd, cbd)
 
-  def runDense[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
+  def runDense[A: Arbitrary: Eq: Field: ClassTag](typ: String): Unit = {
     implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
@@ -73,7 +73,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     runTest[A](s"$typ/dense")
   }
 
-  def runSparse[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
+  def runSparse[A: Arbitrary: Eq: Field: ClassTag](typ: String): Unit = {
     implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
@@ -82,7 +82,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     runTest[A](s"$typ/sparse")
   }
 
-  def runTest[A: Eq: Field: ClassTag](name: String)(implicit arb: Arbitrary[Polynomial[A]], arb2: Arbitrary[A]) {
+  def runTest[A: Eq: Field: ClassTag](name: String)(implicit arb: Arbitrary[Polynomial[A]], arb2: Arbitrary[A]): Unit = {
     type P = Polynomial[A]
 
     val zero = Polynomial.zero[A]
@@ -164,7 +164,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
   property("terms") {
     forAll { (t: Term[Rational]) =>
-      t.toTuple shouldBe (t.exp, t.coeff)
+      t.toTuple shouldBe ((t.exp, t.coeff))
       t.isIndexZero shouldBe (t.exp == 0)
       forAll { (x: Rational) =>
         t.eval(x) shouldBe t.coeff * x.pow(t.exp.toInt)
@@ -225,7 +225,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
-  def gcdTest(x: Polynomial[Rational], y: Polynomial[Rational]) {
+  def gcdTest(x: Polynomial[Rational], y: Polynomial[Rational]): Unit = {
     if (!x.isZero || !y.isZero) {
       val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
       if (!gcd.isZero) {

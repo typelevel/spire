@@ -27,7 +27,7 @@ class ArrayOrderBenchmarks extends MyBenchmark {
   var e: Array[Int] = null
   var f: Array[Int] = null
 
-  override protected def setUp() {
+  override protected def setUp(): Unit = {
     val size = spire.math.pow(2, pow).toInt
 
     a = init(size)(nextInt)

@@ -20,7 +20,7 @@ import scala.collection.generic.CanBuildFrom
  */
 object Simplification {
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     if (args.isEmpty) {
       println("usage: %s [nrat | rats | nprime | primes | snap] [number]")
     } else {
@@ -185,9 +185,9 @@ trait BigStream[A] extends Iterable[A] with IterableLike[A, BigStream[A]] { self
 
   def iterator: Iterator[A] = new Iterator[A] {
     var stream = self
-  
+
     def hasNext: Boolean = !stream.isEmpty
-  
+
     def next: A = if (stream.isEmpty) {
       throw new NoSuchElementException
     } else {
@@ -197,7 +197,7 @@ trait BigStream[A] extends Iterable[A] with IterableLike[A, BigStream[A]] { self
     }
   }
 
-  override def foreach[U](f: A => U) {
+  override def foreach[U](f: A => U): Unit = {
     @tailrec
     def loop(stream: BigStream[A]): Unit = if (!stream.isEmpty) {
       f(stream.head)

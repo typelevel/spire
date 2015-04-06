@@ -35,7 +35,7 @@ class NaturalBenchmarks extends MyBenchmark {
   var bigints: Array[BigInt] = _
   var safes: Array[SafeLong] = _
 
-  override def setUp() {
+  override def setUp(): Unit = {
     size = Math.pow(2, pow).toInt
     bigints = init(size)(BigInt(bits, Random))
     nats = bigints.map(Natural(_))

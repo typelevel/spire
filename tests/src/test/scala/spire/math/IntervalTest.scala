@@ -339,7 +339,7 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
 
   val tries = 100
 
-  def testUnop(f: Interval[Rational] => Interval[Rational])(g: Rational => Rational) {
+  def testUnop(f: Interval[Rational] => Interval[Rational])(g: Rational => Rational): Unit = {
     forAll { (a: Interval[Rational]) =>
       val c: Interval[Rational] = f(a)
       sample(a, tries).foreach { x =>
@@ -350,7 +350,7 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
-  def testBinop(f: (Interval[Rational], Interval[Rational]) => Interval[Rational])(g: (Rational, Rational) => Rational) {
+  def testBinop(f: (Interval[Rational], Interval[Rational]) => Interval[Rational])(g: (Rational, Rational) => Rational): Unit = {
     forAll { (a: Interval[Rational], b: Interval[Rational]) =>
       val c: Interval[Rational] = f(a, b)
       sample(a, tries).zip(sample(b, tries)).foreach { case (x, y) =>
@@ -470,7 +470,7 @@ class IntervalIteratorCheck extends PropSpec with Matchers with GeneratorDrivenP
 
       val num = ((num0 & 255) % 13) + 1
 
-      def testEndpoints(interval: Interval[Rational], step: Rational, hasLower: Boolean, hasUpper: Boolean) {
+      def testEndpoints(interval: Interval[Rational], step: Rational, hasLower: Boolean, hasUpper: Boolean): Unit = {
         val ns = interval.iterator(step).toSet
         ns(x) shouldBe hasLower
         ns(y) shouldBe hasUpper

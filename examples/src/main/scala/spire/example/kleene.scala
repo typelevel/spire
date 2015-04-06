@@ -484,9 +484,9 @@ object KleeneDemo {
   }
 
   /**
-   * 
+   *
    */
-  def graphExample() {
+  def graphExample(): Unit = {
     // our example graph will be 5x5
     implicit val dim = Dim(5)
 
@@ -515,7 +515,7 @@ object KleeneDemo {
     println("path exprs:\n%s" format expred.kstar.show)
   }
 
-  def pathExample() {
+  def pathExample(): Unit = {
     // our example graph will be 5x5
     implicit val dim = Dim(6)
 
@@ -578,7 +578,7 @@ object KleeneDemo {
     println("least-cost via evalExpr:\n" + leastCostExprs.show)
   }
 
-  def solvingExample() {
+  def solvingExample(): Unit = {
     // our example matrix is 2x2
     implicit val dim = Dim(2)
 
@@ -592,7 +592,7 @@ object KleeneDemo {
     println("2x2 inverse:\n" + inverse(m).show)
   }
 
-  def languageExample() {
+  def languageExample(): Unit = {
     val bit = Language(Stream(Stream('0'), Stream('1')))
     val lang1 = bit.pow(4)
     val lang2 = bit.kstar
@@ -600,7 +600,7 @@ object KleeneDemo {
     println(lang2.wss.take(10).map(_.take(10).mkString + "...").toList)
   }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     graphExample()
     pathExample()
     solvingExample()

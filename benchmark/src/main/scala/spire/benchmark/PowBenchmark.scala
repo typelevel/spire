@@ -24,7 +24,7 @@ class PowBenchmarks extends MyBenchmark {
   var longs: Array[Long] = null
   var ints: Array[Int] = null
 
-  override def setUp() {
+  override def setUp(): Unit = {
     ints = init(200000)(nextInt)
     longs = init(200000)(nextLong)
   }

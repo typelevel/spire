@@ -20,7 +20,7 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
   var fs: Array[Float] = null
   var ds: Array[Double] = null
 
-  override protected def setUp() {
+  override protected def setUp(): Unit = {
     val size = spire.math.pow(2, pow).toInt
     fs = mkarray(size, "random")(nextGaussian.toFloat)
     ds = mkarray(size, "random")(nextGaussian)

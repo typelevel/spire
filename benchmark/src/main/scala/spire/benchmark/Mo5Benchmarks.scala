@@ -24,7 +24,7 @@ class Mo5Benchmarks extends MyBenchmark {
 
   val len = 5000000
 
-  override protected def setUp() {
+  override protected def setUp(): Unit = {
     as = init(len)(nextInt)
   }
 

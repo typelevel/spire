@@ -54,7 +54,7 @@ final class MersenneTwister64 protected[random](mt: Array[Long], mti0: Int = 313
     bytes
   }
 
-  def setSeedBytes(bytes: Array[Byte]) {
+  def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
     cfor(0)(_ < N, _ + 1) { i => mt(i) = bb.getLong() }

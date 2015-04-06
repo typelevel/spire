@@ -19,7 +19,7 @@ class MaybeAddBenchmarks extends MyBenchmark {
 
   var maybeDoubles:Array[MaybeDouble] = null
 
-  override protected def setUp() {
+  override protected def setUp(): Unit = {
     maybeDoubles = init(size)(MaybeDouble(nextDouble))
   }
 
