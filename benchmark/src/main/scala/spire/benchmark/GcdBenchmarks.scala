@@ -24,7 +24,7 @@ class GcdBenchmarks extends MyBenchmark {
   var longs: Array[Long] = null
   var bigs: Array[BigInteger] = null
 
-  override def setUp() {
+  override def setUp(): Unit = {
     longs = init(200000)(nextLong)
     bigs = init(200000)(new BigInteger(nextLong.toString))
   }

@@ -97,7 +97,7 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
     return SafeLong(0) // impossible
   }
 
-  private def initNextSieve() {
+  private def initNextSieve(): Unit = {
     start += chunkSize
     limit += chunkSize
     val csq = cutoff ** 2

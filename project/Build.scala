@@ -65,15 +65,19 @@ object MyBuild extends Build {
     ),
 
     scalacOptions ++= Seq(
-      //"-no-specialization", // use this to build non-specialized jars
       "-Yinline-warnings",
       "-deprecation",
+      "-encoding", "UTF-8", // yes, this is 2 args
+      "-feature",
       "-unchecked",
+      //"-Xfatal-warnings", // inliner warnings mean we leave this off
+      "-Xlint",
+      "-Xfuture",
+      "-Yno-adapted-args",
       "-optimize",
       "-language:experimental.macros",
       "-language:higherKinds",
-      "-language:implicitConversions",
-      "-feature"
+      "-language:implicitConversions"
     ),
 
     resolvers += Resolver.sonatypeRepo("snapshots"),

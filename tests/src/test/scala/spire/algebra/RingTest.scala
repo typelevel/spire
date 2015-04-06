@@ -22,7 +22,7 @@ class RingTest extends FunSuite {
    *
    *   a=-3  b=3  c=-9
    */
-  def runWith[@spec A:Ring:ClassTag](cls:String)(a:A, b:A, c:A) {
+  def runWith[@spec A:Ring:ClassTag](cls:String)(a:A, b:A, c:A): Unit = {
 
     val m = implicitly[ClassTag[A]]
 

@@ -15,4 +15,7 @@ object compat {
 
   def resetLocalAttrs[C <: Context](c: C)(t: c.Tree) =
     c.resetLocalAttrs(t)
+
+  def setOrig[C <: Context](c: C)(tt: c.TypeTree, t: c.Tree) =
+    tt.setOriginal(t)
 }

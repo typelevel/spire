@@ -7,7 +7,7 @@ import scala.reflect.ClassTag
 
 
 class NRootTest extends FunSuite {
-  def testIntegralNRoot[A: Numeric: ClassTag] {
+  def testIntegralNRoot[A: Numeric: ClassTag]: Unit = {
     val cls = implicitly[ClassTag[A]].runtimeClass.getSimpleName
     test("Integral NRoot (%s)" format cls) {
       val one = Rig[A].one
@@ -27,7 +27,7 @@ class NRootTest extends FunSuite {
   def eps(x: BigDecimal): BigDecimal =
     x.round(DECIMAL1) * BigDecimal(1, x.mc.getPrecision - 1)
 
-  def checkNRoot(x: BigDecimal, n: Int) {
+  def checkNRoot(x: BigDecimal, n: Int): Unit = {
     import spire.implicits._
 
     val y = x nroot n

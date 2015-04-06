@@ -32,7 +32,7 @@ class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extend
     ints
   }
 
-  def setSeed(seed: Array[Int]) {
+  def setSeed(seed: Array[Int]): Unit = {
     val zs = if (seed.length < 6) Arrays.copyOf(seed, 6) else seed
     x = zs(0)
     y = zs(0)
@@ -54,7 +54,7 @@ class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extend
     bytes
   }
 
-  def setSeedBytes(bytes: Array[Byte]) {
+  def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < 24) Arrays.copyOf(bytes, 24) else bytes
     val bb = ByteBuffer.wrap(bs)
     x = bb.getInt()

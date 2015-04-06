@@ -57,7 +57,7 @@ object Searching {
     var candidates = ArrayBuffer.empty[A]
     // removes the j-th element of candidates by swapping the last
     // element with it
-    def fastRemove(j: Int) {
+    def fastRemove(j: Int): Unit = {
       if (j < candidates.length - 1)
         candidates(j) = candidates(candidates.length - 1)
       candidates.remove(candidates.length - 1)
@@ -66,7 +66,7 @@ object Searching {
       // if we prove that a is not minimal, it should not be added to candidates
       var aIsNotMinimal = false
       // compare a against each candidate, starting from the last
-      @tailrec def inspect(i: Int) {
+      @tailrec def inspect(i: Int): Unit = {
         if (i >= 0) {
           val c = a.partialCompare(candidates(i))
           // if a <= candidates(i), this candidate can be removed

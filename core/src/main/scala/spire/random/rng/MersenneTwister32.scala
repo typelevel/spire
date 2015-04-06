@@ -54,7 +54,7 @@ final class MersenneTwister32 protected[random](mt: Array[Int], mti0: Int = 625)
     bytes
   }
 
-  def setSeedBytes(bytes: Array[Byte]) {
+  def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
     cfor(0)(_ < N, _ + 1) { i => mt(i) = bb.getInt() }
@@ -126,9 +126,12 @@ object MersenneTwister32 extends GeneratorCompanion[MersenneTwister32, (Array[In
         new MersenneTwister32(mt, mti)
     }
 
-  def fromArray(arr: Array[Int]): MersenneTwister32 = fromSeed((Utils.seedFromArray(N, arr)), N + 1)
+  def fromArray(arr: Array[Int]): MersenneTwister32 =
+    fromSeed((Utils.seedFromArray(N, arr), N + 1))
 
-  def fromBytes(bytes: Array[Byte]): MersenneTwister32 = fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
+  def fromBytes(bytes: Array[Byte]): MersenneTwister32 =
+    fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
 
-  def fromTime(time: Long = System.nanoTime) : MersenneTwister32 = fromSeed((Utils.seedFromInt(N, Utils.intFromTime(time))), N + 1)
+  def fromTime(time: Long = System.nanoTime) : MersenneTwister32 =
+    fromSeed((Utils.seedFromInt(N, Utils.intFromTime(time)), N + 1))
 }

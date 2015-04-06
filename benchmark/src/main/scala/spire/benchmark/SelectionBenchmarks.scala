@@ -55,7 +55,7 @@ class SelectionBenchmarks extends MyBenchmark {
     if (layout == "sorted") data else data.reverse
   }
 
-  override protected def setUp() {
+  override protected def setUp(): Unit = {
     val size = spire.math.pow(2, pow).toInt
 
     is = if (typ == "int") mkarray(size, layout)(nextInt) else null

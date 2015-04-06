@@ -13,7 +13,7 @@ import org.scalatest.FunSuite
 class GaussianTest extends FunSuite {
   import AndersonDarlingTest._
 
-  def checkGaussian[A: Field: Trig: NRoot: IsReal: ClassTag](nextGaussian: (A, A) => A) {
+  def checkGaussian[A: Field: Trig: NRoot: IsReal: ClassTag](nextGaussian: (A, A) => A): Unit = {
     val mean = Field[A].zero
     val stdDev = Field[A].one
     val xs = Array.fill(20)(nextGaussian(mean, stdDev))

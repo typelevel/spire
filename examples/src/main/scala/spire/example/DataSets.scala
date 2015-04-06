@@ -153,7 +153,7 @@ object Variable {
   case class Ignored(label: String = Unlabeled) extends Variable[Nothing] {
     def apply() = new Builder[String, String => List[Nothing]] {
       def += (s: String) = this
-      def clear() { }
+      def clear(): Unit = ()
       def result() = s => Nil
     }
   }
@@ -161,7 +161,7 @@ object Variable {
   case class Continuous[+F](label: String = Unlabeled, f: String => F) extends Variable[F] {
     def apply() = new Builder[String, String => List[F]] {
       def += (s: String) = this
-      def clear() { }
+      def clear(): Unit = ()
       def result() = { s => f(s) :: Nil }
     }
   }
@@ -174,7 +174,7 @@ object Variable {
         categories += s
         this
       }
-      def clear() { categories = Set.empty }
+      def clear(): Unit = { categories = Set.empty }
       def result() = {
         val orderedCategories = categories.toList
 
@@ -197,7 +197,7 @@ object Variable {
         }
         this
       }
-      def clear() { values.clear(); defaultBuilder.clear() }
+      def clear(): Unit = { values.clear(); defaultBuilder.clear() }
       def result() = {
         val real = defaultBuilder.result()
         val occurences = values.foldLeft(Map.empty[List[F], Int]) { (acc, v) =>
