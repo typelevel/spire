@@ -188,7 +188,7 @@ object MyBuild extends Build {
 
   lazy val coreSettings = Seq(
     name := "spire",
-    sourceGenerators in Compile <+= (genProductTypes in Compile).task,
+    sourceGenerators in Compile <+= (genProductTypes in Compile),
     genProductTypes <<= (sourceManaged in Compile, streams) map { (scalaSource, s) =>
       s.log.info("Generating spire/std/tuples.scala")
       val algebraSource = ProductTypes.algebraProductTypes
