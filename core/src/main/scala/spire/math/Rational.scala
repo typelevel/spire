@@ -137,7 +137,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     @tailrec
     def closest(l: Rational, u: Rational): Rational = {
       val mediant = Rational(l.numerator + u.numerator, l.denominator + u.denominator)
-    
+
       if (mediant.denominator > limit) {
         if ((this - l).abs > (u - this).abs) u else l
       } else if (mediant == this) {
@@ -167,7 +167,7 @@ object Rational extends RationalInstances {
 
   val zero: Rational = LongRational(0L, 1L)
   val one: Rational = LongRational(1L, 1L)
-  
+
   def apply(n: SafeLong, d: SafeLong): Rational = {
     if (d.signum < 0) return apply(-n, -d)
     val g = n gcd d

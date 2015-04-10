@@ -210,8 +210,6 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Everybody is Numeric") {
-    implicit val ac = ApproximationContext(Rational(1, 100))
-
     hasNumeric[Int]
     hasNumeric[Long]
     hasNumeric[BigInt]
@@ -223,8 +221,6 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Float, Double, Rational, BigDecimal, and Algebraic are Fractional") {
-    implicit val ac = ApproximationContext(Rational(1, 100))
-
     hasFractional[Float]
     hasFractional[Double]
     hasFractional[BigDecimal]
