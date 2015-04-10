@@ -194,13 +194,11 @@ class TypeclassExistenceTest extends FunSuite {
     hasNRoot[BigDecimal]
   }
 
-  test("Rational is FieldWithNRoot") {
-    implicit val ac = ApproximationContext(Rational(1, 100))
+  test("Rational is Field") {
     hasEq[Rational]
     hasRing[Rational]
     hasEuclideanRing[Rational]
     hasField[Rational]
-    hasNRoot[Rational]
   }
 
   test("Algebraic is FieldWithNRoot") {

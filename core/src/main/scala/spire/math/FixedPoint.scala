@@ -1,7 +1,9 @@
 package spire.math
 
-import spire.syntax.ring._
+//import spire.syntax.ring._
+import spire.std.long._
 import spire.syntax.order._
+import spire.syntax.euclideanRing._
 import spire.syntax.convertableFrom._
 
 import spire.algebra.{Order, Signed}
@@ -13,9 +15,6 @@ class FixedPointOverflow(n: Long) extends Exception(n.toString)
 case class FixedScale(denom: Int) {
   if (denom < 1)
     throw new IllegalArgumentException("illegal denominator: %s" format denom)
-
-  implicit val ctxt: ApproximationContext[Rational] =
-    ApproximationContext(Rational(1L, denom) * 2)
 }
 
 /**
@@ -208,6 +207,9 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def toRational(implicit scale: FixedScale): Rational =
     Rational(long, scale.denom)
 
+  def toReal(implicit scale: FixedScale): Real =
+    Real(toRational)
+
   def **(k: Int)(implicit scale: FixedScale): FixedPoint = pow(k)
 
   def pow(k: Int)(implicit scale: FixedScale): FixedPoint = {
@@ -233,19 +235,18 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
 
   import spire.syntax.nroot._
 
-  def sqrt(implicit scale: FixedScale): FixedPoint = {
-    import scale.ctxt
-    FixedPoint(toRational.sqrt)
-  }
+  def sqrt(implicit scale: FixedScale): FixedPoint =
+    FixedPoint(toReal.sqrt.toRational)
 
-  def nroot(k: Int)(implicit scale: FixedScale): FixedPoint = {
-    import scale.ctxt
-    FixedPoint(toRational.nroot(k))
-  }
+  def nroot(k: Int)(implicit scale: FixedScale): FixedPoint =
+    FixedPoint(toReal.nroot(k).toRational)
 
-  def fpow(y: FixedPoint)(implicit scale: FixedScale): FixedPoint = {
-    import scale.ctxt
-    FixedPoint(toRational.fpow(y.toRational))
+  def fpow(k: FixedPoint)(implicit scale: FixedScale): FixedPoint = {
+    val r = this.toRational
+    val g = k.long gcd scale.denom
+    val n = (k.long / g).toInt //FIXME
+    val d = (scale.denom / g).toInt // FIXME
+    FixedPoint(Real(r ** n).nroot(d).toRational)
   }
 
   override def toString: String = long.toString + "/?"
@@ -287,9 +288,6 @@ trait FixedPointInstances {
 
   implicit def algebra(implicit scale: FixedScale) =
     new Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint] {
-      implicit val ctxt: ApproximationContext[Rational] =
-        ApproximationContext(Rational(1L, scale.denom) * 2)
-
       def abs(x: FixedPoint): FixedPoint = x.abs
       def signum(x: FixedPoint): Int = x.signum
 

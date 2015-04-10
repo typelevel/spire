@@ -2,7 +2,7 @@ package spire.math.algebraic
 
 import spire.algebra.Sign
 import spire.algebra.Sign.{ Positive, Negative, Zero }
-import spire.math.{Approximation, ApproximationContext, Fractional, Rational}
+import spire.math.{Approximation, Fractional, Rational}
 
 import java.math.MathContext
 
@@ -91,7 +91,7 @@ trait BigDecimalApprox[A <: BigDecimalApprox[A]] extends RealLike[A] with Separa
     case Neg(a) => f.negate(a.simulate[B])
   }
 
-  def toRational(implicit ac: ApproximationContext[Rational] = ApproximationContext(Rational(1L, 10000000000000000L))): Rational = simulate[Rational]
+  def toRational: Rational = simulate[Rational]
 
   def isWhole: Boolean = (this % IntLit(1)).sign == Zero
 
