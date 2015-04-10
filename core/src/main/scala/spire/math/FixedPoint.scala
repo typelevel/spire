@@ -20,16 +20,16 @@ case class FixedScale(denom: Int) {
 /**
  * FixedPoint is a value class that provides fixed point arithmetic
  * operations (using an implicit denominator) to unboxed Long values.
- * 
+ *
  * Working with FixedPoint values is similar to other fractional
  * types, except that most operations require an implicit FixedScale
  * instance (which provides the denominator).
- * 
+ *
  * For example:
- * 
+ *
  * // interpret FixedPoint(n) as n/1000
  * implicit val scale = FixedScale(1000)
- * 
+ *
  * // these three values are equivalent
  * val a = FixedPoint("12.345")            // decimal repr
  * val b = FixedPoint(Rational(2469, 200)) // fraction repr
@@ -244,9 +244,13 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def fpow(k: FixedPoint)(implicit scale: FixedScale): FixedPoint = {
     val r = this.toRational
     val g = k.long gcd scale.denom
-    val n = (k.long / g).toInt //FIXME
-    val d = (scale.denom / g).toInt // FIXME
-    FixedPoint(Real(r ** n).nroot(d).toRational)
+    val n = (k.long / g)
+    val d = (scale.denom / g)
+    if (n.isValidInt && d.isValidInt) {
+      FixedPoint(Real(r ** n.toInt).nroot(d.toInt).toRational)
+    } else {
+      throw new ArithmeticException(s"exponent $r is too complex")
+    }
   }
 
   override def toString: String = long.toString + "/?"
