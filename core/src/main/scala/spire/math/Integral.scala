@@ -51,7 +51,7 @@ with ConvertableFromLong with ConvertableToLong with LongIsReal with Serializabl
   override def toRational(n: Long): Rational = super[LongIsReal].toRational(n)
   override def toAlgebraic(n: Long): Algebraic = super[LongIsReal].toAlgebraic(n)
   override def toReal(n: Long): Real = super[LongIsReal].toReal(n)
-  override def toBigInt(n: Long): BigInt = super[LongIsReal].toBigInt(n)
+  override def toBigInt(n: Long): BigInt = BigInt(n)
 }
 
 @SerialVersionUID(0L)

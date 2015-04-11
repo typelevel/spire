@@ -173,6 +173,29 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     x.underlying.unscaledValue.hashCode + 23 * x.scale.hashCode + 17
   }
 
+  def toExprString: String = {
+    import Expr._
+
+    def recur(e: Expr): String = e match {
+      case ConstantLong(n) => n.toString
+      case ConstantDouble(n) => n.toString
+      case ConstantBigDecimal(n) => n.toString
+      case ConstantRational(n) => s"(${n})"
+      case ConstantRoot(poly, i, _, _) => s"root($poly, $i)"
+      case Neg(sub) => s"-$sub"
+      case Add(lhs, rhs) => s"(${recur(lhs)}) + (${recur(rhs)})"
+      case Sub(lhs, rhs) => s"(${recur(lhs)}) - (${recur(rhs)})"
+      case Mul(lhs, rhs) => s"(${recur(lhs)}) * (${recur(rhs)})"
+      case Div(lhs, rhs) => s"(${recur(lhs)}) / (${recur(rhs)})"
+      case KRoot(sub, 2) => s"(${recur(sub)}).sqrt"
+      case KRoot(sub, 3) => s"(${recur(sub)}).cbrt"
+      case KRoot(sub, k) => s"(${recur(sub)}).nroot($k)"
+      case Pow(sub, k) => s"${recur(sub)}.pow(k)"
+    }
+
+    recur(expr)
+  }
+
   override def toString: String = {
     val approx = toBigDecimal(MathContext.DECIMAL64)
     if (this == Algebraic(approx)) {
@@ -606,6 +629,14 @@ object Algebraic extends AlgebraicInstances {
      */
     def upperBound: BitBound
 
+    /**
+     * Returns a lower bound on the absolute value of this expression as a
+     * bit bound.
+     *
+     * TODO: We could do better here wrt to addition (need a fastSignum: Option[Int])
+     */
+    def lowerBound: BitBound = -separationBound
+
     /** Returns an integer with the same sign as this expression. */
     def signum: Int
 
@@ -848,22 +879,17 @@ object Algebraic extends AlgebraicInstances {
 
     @SerialVersionUID(0L)
     case class Div(lhs: Expr, rhs: Expr) extends BinaryExpr {
-      // Chee Yap's paper has lhs.upperBound - rhs.separationBound, but it
-      // makes much more sense to have lhs.upperBound + rhs.separationBound,
-      // since separationBound is -lg of the lower bound (for a valid div).
-      // That is, lg(x/y) <= ub(x) / lb(y). I'm guessing the formula in the
-      // paper was just a typo.
-      def upperBound: BitBound = lhs.upperBound + rhs.separationBound
+      def upperBound: BitBound = lhs.upperBound - rhs.lowerBound
       def signum: Int = if (rhs.signum == 0) {
         throw new ArithmeticException("divide by 0")
       } else {
         lhs.signum * rhs.signum
       }
       def toBigDecimal(digits: Int): JBigDecimal = checked {
-        val lDigits = digits + 2 - rhs.separationBound.decimalDigits
+        val lDigits = digits + 2 - rhs.lowerBound.decimalDigits
         val rDigits = max(
-          1 - rhs.separationBound.decimalDigits,
-          digits + 4 - 2 * rhs.separationBound.decimalDigits + lhs.upperBound.decimalDigits
+          1 - rhs.lowerBound.decimalDigits,
+          digits + 4 - 2 * rhs.lowerBound.decimalDigits + lhs.upperBound.decimalDigits
         )
         if (lDigits >= Int.MaxValue || rDigits >= Int.MaxValue) {
           throw new IllegalArgumentException("required precision is too high")
@@ -891,7 +917,7 @@ object Algebraic extends AlgebraicInstances {
       def toBigDecimal(digits: Int): JBigDecimal = {
         val digits0 = max(
           checked(digits + 1),
-          checked(1 - (sub.separationBound.decimalDigits + 1) / 2)
+          checked(1 - (sub.lowerBound.decimalDigits + 1) / 2)
         )
         if (digits0 >= Int.MaxValue) {
           throw new IllegalArgumentException("required precision is too high")
@@ -953,6 +979,8 @@ object Algebraic extends AlgebraicInstances {
      * represent this separation bound.
      */
     def decimalDigits: Long = bitsToDecimalDigits(bitBound)
+
+    def unary_- : BitBound = new BitBound(-bitBound)
 
     def +(that: BitBound): BitBound = new BitBound(this.bitBound + that.bitBound)
     def -(that: BitBound): BitBound = new BitBound(this.bitBound - that.bitBound)

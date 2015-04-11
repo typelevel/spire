@@ -107,13 +107,10 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
 
   test("approximation of sqrt of rational is correct") {
     forAll("rational") { (qa: RationalAlgebraic) =>
-      println("...")
       val RationalAlgebraic(a, q) = qa
-      println(s"a = $a, q = $q")
       val x = a.sqrt.toBigDecimal(MathContext.DECIMAL64)
       val error = x.ulp * 4
       val xSq = x * x
-      println(",,,")
       Rational(xSq - error) < q && Rational(xSq + error) > q
     }
   }
@@ -130,7 +127,7 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     implicit val ArbitraryRationalAlgebraic: Arbitrary[RationalAlgebraic] =
       Arbitrary(genRationalAlgebraic(1))
 
-    val MaxDepth = 3
+    val MaxDepth = 2
 
     def genRationalAlgebraic(depth: Int): Gen[RationalAlgebraic] =
       if (depth < MaxDepth) {
@@ -208,6 +205,7 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     def genPow(depth: Int, genExp: Gen[Int]): Gen[RationalAlgebraic] = for {
       RationalAlgebraic(subA, subQ) <- genRationalAlgebraic(depth + 1)
       exp <- genExp
+      if subQ.signum != 0 || exp > 0
     } yield RationalAlgebraic(subA.pow(exp), subQ.pow(exp))
   }
 }
