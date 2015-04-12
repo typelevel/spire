@@ -10,6 +10,7 @@ import java.math.{ MathContext, RoundingMode }
 
 
 class AlgebraicTest extends FunSuite with PropertyChecks {
+
   def trickyZero: Algebraic = Algebraic(18).sqrt - Algebraic(8).sqrt - Algebraic(2).sqrt
 
   test("Sign of tricky zero is Zero") {
@@ -108,7 +109,7 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
   test("equality test of rational algebraic is correct") {
     forAll("rational") { (qa: RationalAlgebraic) =>
       val RationalAlgebraic(a, q) = qa
-      (a - Algebraic(q)).signum == 0
+      a == Algebraic(q)
     }
   }
 
@@ -119,6 +120,16 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
       val error = x.ulp * 4
       val xSq = x * x
       Rational(xSq - error) < q && Rational(xSq + error) > q
+    }
+  }
+
+  test("simple zero sum of sqrt") {
+    forAll("rational") { (z0: Double) =>
+      val z = Rational(z0)
+      val y = z.pow(3)
+      val x = y + 2 * z.pow(2) + z
+      val zero = Algebraic(x).sqrt - Algebraic(y).sqrt - Algebraic(z).sqrt
+      zero.isZero
     }
   }
 
