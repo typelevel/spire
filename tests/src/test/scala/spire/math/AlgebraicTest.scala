@@ -127,7 +127,7 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     implicit val ArbitraryRationalAlgebraic: Arbitrary[RationalAlgebraic] =
       Arbitrary(genRationalAlgebraic(1))
 
-    val MaxDepth = 2
+    val MaxDepth = 3
 
     def genRationalAlgebraic(depth: Int): Gen[RationalAlgebraic] =
       if (depth < MaxDepth) {
@@ -137,7 +137,7 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
           1 -> genMul(depth + 1),
           1 -> genDiv(depth + 1),
           1 -> genNeg(depth + 1),
-          1 -> genPow(depth + 1, arbitrary[Byte].map(_.toInt)),
+          1 -> genPow(depth + 1, arbitrary[Byte].map(_.toInt % 7)),
           7 -> genLeaf
         )
       } else {
