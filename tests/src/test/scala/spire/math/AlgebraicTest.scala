@@ -105,6 +105,13 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     assert((x + (y + z)) === (x + y + z))
   }
 
+  test("equality test of rational algebraic is correct") {
+    forAll("rational") { (qa: RationalAlgebraic) =>
+      val RationalAlgebraic(a, q) = qa
+      (a - Algebraic(q)).signum == 0
+    }
+  }
+
   test("approximation of sqrt of rational is correct") {
     forAll("rational") { (qa: RationalAlgebraic) =>
       val RationalAlgebraic(a, q) = qa
