@@ -23,7 +23,7 @@ class ComplexAddBenchmarks extends MyBenchmark {
   var longs:Array[Long] = null
   var fcs:Array[FloatComplex] = null
 
-  override protected def setUp() {
+  override protected def setUp(): Unit = {
     complexes = init(size)(Complex(nextFloat(), nextFloat()))
     longs = init(size)(FastComplex(nextFloat(), nextFloat()))
     fcs = init(size)(FloatComplex(nextFloat(), nextFloat()))

@@ -457,7 +457,7 @@ private[math] trait ConvertableFromAlgebraic extends ConvertableFrom[Algebraic] 
   def toBigInt(a: Algebraic): BigInt = a.toBigInt
   // TODO: Figure out how to deal with variable approximability.
   def toBigDecimal(a: Algebraic): BigDecimal = a.toBigDecimal(java.math.MathContext.DECIMAL128)
-  def toRational(a: Algebraic): Rational = a.toRational(ApproximationContext(Rational(1L, 100000000000000000L)))
+  def toRational(a: Algebraic): Rational = a.toRational
   def toAlgebraic(a: Algebraic): Algebraic = a
   def toReal(a: Algebraic): Real = Real(a.toRational) //FIXME
   def toNumber(a: Algebraic): Number = Number(a.toRational)

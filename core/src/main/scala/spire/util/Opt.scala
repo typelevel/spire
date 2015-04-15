@@ -63,9 +63,9 @@ class Opt[+A](val ref: A) extends OptVersions.Base {
 
   def iterator: Iterator[A] = if (ref == null) collection.Iterator.empty else collection.Iterator.single(ref)
 
-  def toRight[X](left: => X) =
+  def toRight[X](left: => X): Either[X, A] =
     if (ref == null) Left(left) else Right(ref)
 
-  def toLeft[X](right: => X) =
+  def toLeft[X](right: => X): Either[A, X] =
     if (ref == null) Right(right) else Left(ref)
 }

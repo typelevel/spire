@@ -79,13 +79,13 @@ class SafeLongTest extends PropSpec with Matchers with GeneratorDrivenPropertyCh
         val sy = SafeLong(y)
         sx /% sy shouldBe x /% y
         sx /% y shouldBe x /% y
-        sx /% sy shouldBe (invariant(sx / sy), invariant(sx % sy))
+        sx /% sy shouldBe ((invariant(sx / sy), invariant(sx % sy)))
       }
     }
 
-    smin /% SafeLong(-1) shouldBe (-smin, zero)
-    smin /% -1L shouldBe (-smin, zero)
-    smin /% BigInt(-1) shouldBe (-smin, zero)
+    (smin /% SafeLong(-1)) shouldBe ((-smin, zero))
+    (smin /% -1L) shouldBe ((-smin, zero))
+    (smin /% BigInt(-1)) shouldBe ((-smin, zero))
   }
 
   property("x ** y") {
@@ -221,7 +221,7 @@ class SafeLongTest extends PropSpec with Matchers with GeneratorDrivenPropertyCh
     smin % (-smin) shouldBe zero
 
     // quotmod
-    smin /% (-smin) shouldBe (SafeLong.minusOne, zero)
+    smin /% (-smin) shouldBe ((SafeLong.minusOne, zero))
 
     // gcd
     smin gcd smin shouldBe firstBig

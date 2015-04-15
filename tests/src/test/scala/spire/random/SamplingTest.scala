@@ -14,7 +14,7 @@ class SamplingTest extends PropSpec with Matchers with GeneratorDrivenPropertyCh
   val ns = range.toArray
   val gen = Gen.chooseNum(1, Size)
 
-  def verify(result: Array[Int], n: Int) {
+  def verify(result: Array[Int], n: Int): Unit = {
     result.toSet.size shouldBe n
     result.toSet.forall(range.contains) shouldBe true
   }

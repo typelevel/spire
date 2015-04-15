@@ -30,6 +30,23 @@ case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val
 
   def degree: Int = if (isZero) 0 else exp(exp.length - 1)
 
+  def termsIterator: Iterator[Term[C]] =
+    new TermIterator
+
+  class TermIterator extends Iterator[Term[C]] {
+    private[this] var i: Int = 0
+    private[this] def findNext(): Unit =
+      while (i < exp.length && coeff(i) == 0) i += 1
+    findNext()
+    def hasNext: Boolean = i < exp.length
+    def next: Term[C] = {
+      val term = Term[C](coeff(i), exp(i))
+      i += 1
+      findNext()
+      term
+    }
+  }
+
   def coeffsArray(implicit ring: Semiring[C]): Array[C] = if (isZero) {
     new Array[C](0)
   } else {

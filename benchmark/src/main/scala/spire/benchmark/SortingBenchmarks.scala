@@ -62,7 +62,7 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
   var cs: Array[Complex[Double]] = null
   var cs2: Array[FakeComplex[Double]] = null
 
-  override protected def setUp() {
+  override protected def setUp(): Unit = {
     val size = spire.math.pow(2, pow).toInt
 
     def complexToFake(c: Complex[Double]) = new FakeComplex(c.real, c.imag)

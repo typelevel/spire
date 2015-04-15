@@ -28,7 +28,7 @@ class RatComparisonBenchmarks extends MyBenchmark {
   var nums:Array[Int] = null
   var denoms:Array[Int] = null
 
-  override protected def setUp() {
+  override protected def setUp(): Unit = {
     nums = init(size)(nextInt)
     denoms = init(size)(nextInt)
 

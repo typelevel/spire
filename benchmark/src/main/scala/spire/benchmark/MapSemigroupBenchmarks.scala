@@ -80,7 +80,7 @@ class MapSemigroupBenchmarks extends MyBenchmark with BenchmarkData {
     arr
   }
 
-  override protected def setUp() {
+  override protected def setUp(): Unit = {
     if (mapType == "random") {
       maps = genMaps { i => (nextInt, nextInt) }
     } else if (mapType == "sparse") {

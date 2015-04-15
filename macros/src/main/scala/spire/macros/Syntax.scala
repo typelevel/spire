@@ -1,6 +1,6 @@
 package spire.macros
 
-import spire.macros.compat.{termName, freshTermName, resetLocalAttrs, Context}
+import spire.macros.compat.{termName, freshTermName, resetLocalAttrs, Context, setOrig}
 
 import scala.language.higherKinds
 
@@ -21,7 +21,7 @@ object Ops extends machinist.Ops {
       ("$qmark$qmark$bar$plus$bar$greater", "actlIsDefined"),
       ("$less$bar$plus$bar$qmark", "partialActr"),
       ("$less$bar$plus$bar$qmark$qmark", "actrIsDefined"),
-      
+
       // square root
       (uesc('√'), "sqrt"),
 
@@ -88,7 +88,8 @@ class InlineUtil[C <: Context with Singleton](val c: C) {
         case Ident(_) if tree.symbol == symbol =>
           value
         case tt: TypeTree if tt.original != null =>
-          super.transform(TypeTree().setOriginal(transform(tt.original)))
+          //super.transform(TypeTree().setOriginal(transform(tt.original)))
+          super.transform(setOrig(c)(TypeTree(), transform(tt.original)))
         case _ =>
           super.transform(tree)
       }

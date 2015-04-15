@@ -53,7 +53,7 @@ final class Well44497b protected[random](state: Array[Int], i0: Int) extends Int
     bytes
   }
 
-  def setSeedBytes(bytes: Array[Byte]) {
+  def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < BYTES) util.Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
 
@@ -129,8 +129,9 @@ object Well44497b extends GeneratorCompanion[Well44497b, (Array[Int], Int)] {
       ((v << r) ^ (v >>> (32 - r))) & ds
     }
   }
-                                                                                   
-  def randomSeed(): (Array[Int], Int) = (Utils.seedFromInt(R, Utils.intFromTime()), 0)
+
+  def randomSeed(): (Array[Int], Int) =
+    (Utils.seedFromInt(R, Utils.intFromTime()), 0)
 
   def fromSeed(seed: (Array[Int], Int)): Well44497b =
     seed match {
@@ -139,9 +140,12 @@ object Well44497b extends GeneratorCompanion[Well44497b, (Array[Int], Int)] {
         new Well44497b(state, stateIndex)
     }
 
-  def fromArray(arr: Array[Int]): Well44497b = fromSeed(Utils.seedFromArray(R, arr), 0)
+  def fromArray(arr: Array[Int]): Well44497b =
+    fromSeed((Utils.seedFromArray(R, arr), 0))
 
-  def fromBytes(bytes: Array[Byte]): Well44497b = fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
+  def fromBytes(bytes: Array[Byte]): Well44497b =
+    fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
 
-  def fromTime(time: Long = System.nanoTime) : Well44497b = fromSeed(Utils.seedFromInt(R, Utils.intFromTime(time)), 0)
+  def fromTime(time: Long = System.nanoTime): Well44497b =
+    fromSeed((Utils.seedFromInt(R, Utils.intFromTime(time)), 0))
 }

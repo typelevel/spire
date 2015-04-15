@@ -119,7 +119,7 @@ object Well1024a extends GeneratorCompanion[Well1024a, (Array[Int], Int)] {
 
   @inline private final def mat0pos(t: Int, v: Int): Int = v ^ (v >>> t)
   @inline private final def mat0neg(t: Int, v: Int): Int = v ^ (v << -t)
-                                                                                   
+
   def randomSeed(): (Array[Int], Int) =
     (Utils.seedFromInt(R, Utils.intFromTime()), 0)
 
@@ -131,11 +131,11 @@ object Well1024a extends GeneratorCompanion[Well1024a, (Array[Int], Int)] {
     }
 
   def fromArray(arr: Array[Int]): Well1024a =
-    fromSeed(Utils.seedFromArray(R, arr), 0)
+    fromSeed((Utils.seedFromArray(R, arr), 0))
 
   def fromBytes(bytes: Array[Byte]): Well1024a =
     fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
 
   def fromTime(time: Long = System.nanoTime): Well1024a =
-    fromSeed(Utils.seedFromInt(R, Utils.intFromTime(time)), 0)
+    fromSeed((Utils.seedFromInt(R, Utils.intFromTime(time)), 0))
 }

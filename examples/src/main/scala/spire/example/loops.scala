@@ -4,19 +4,19 @@ import spire.implicits._
 import scala.annotation.tailrec
 
 class Loops {
-  def nested {
+  def nested(): Unit = {
     cfor(0)(_ < 5, _ + 1) {
       y => cfor(0)(_ < 3, _ + 1) { x =>
         println((x, y))
       }
     }
   }
-  
-  def simple {
+
+  def simple(): Unit = {
     cfor(0)(_ < 10, _ + 1) { i => println(i) }
   }
 
-  def simplew {
+  def simplew(): Unit = {
     var i = 0
     while (i < 10) {
       println(i)
@@ -24,8 +24,8 @@ class Loops {
     }
   }
 
-  def simplet {
-    @tailrec def loop(i: Int) {
+  def simplet(): Unit = {
+    @tailrec def loop(i: Int): Unit = {
       if (i < 10) {
         println(i)
         loop(i + 1)

@@ -13,7 +13,7 @@ object SieveBenchmark {
     a
   }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     val defaults: List[Long] = (
       1L ::
       10L ::
