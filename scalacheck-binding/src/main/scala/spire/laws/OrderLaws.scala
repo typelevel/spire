@@ -1,7 +1,6 @@
 package spire.laws
 
 import spire.algebra._
-import spire.algebra.lattice._
 import spire.implicits._
 
 import org.typelevel.discipline.Laws
