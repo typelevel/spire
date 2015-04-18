@@ -5,7 +5,6 @@ package rng
 import java.util.concurrent.atomic.AtomicLong
 
 import scala.annotation.tailrec
-import spire.syntax.literals._
 import spire.util.Pack
 
 /**

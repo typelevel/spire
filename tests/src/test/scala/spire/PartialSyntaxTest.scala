@@ -5,7 +5,6 @@ import spire.algebra.partial._
 import spire.optional.partialIterable._
 import spire.optional.mapIntIntPermutation._
 import spire.std.int._
-import spire.util._
 
 import org.scalatest.{FunSuite, Matchers, NonImplicitAssertions}
 import org.scalatest.prop.Checkers
@@ -15,7 +14,6 @@ import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 
 import spire.syntax.eq._
-import spire.syntax.cfor._
 import spire.std.boolean._
 
 class PartialSyntaxTest extends FunSuite with Checkers with BaseSyntaxTest with NonImplicitAssertions {

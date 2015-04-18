@@ -2,8 +2,6 @@ package spire.math
 
 import spire.algebra.{AdditiveAbGroup, IsReal, MultiplicativeAbGroup, Order, NRoot, Ring, Trig}
 import spire.std._
-import spire.std.double._
-import spire.syntax.nroot._
 
 import scala.{specialized => spec}
 
