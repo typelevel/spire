@@ -521,6 +521,26 @@ object Algebraic extends AlgebraicInstances {
   }
 
   /**
+   * Returns all of the real roots of the given polynomial, in order from
+   * smallest to largest.
+   *
+   * @param poly the polynomial to return the real roots of
+   * @return all the real roots of `poly`
+   */
+  def roots(poly: Polynomial[Rational]): Vector[Algebraic] = {
+    val zpoly = Roots.removeFractions(poly)
+    val intervals = Roots.isolateRoots(zpoly)
+    intervals.zipWithIndex map {
+      case (Point(value), _) =>
+        new Algebraic(Expr.ConstantRational(value))
+      case (Bounded(lb, ub, _), i) =>
+        new Algebraic(Expr.ConstantRoot(zpoly, i, lb, ub))
+      case _ =>
+        throw new RuntimeException("invalid isolated root interval")
+    }
+  }
+
+  /**
    * Returns an Algebraic whose value is the real root within (lb, ub). This is
    * potentially unsafe, as we assume that exactly 1 real root lies within the
    * interval, otherwise the results are undetermined.

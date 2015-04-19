@@ -124,14 +124,58 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
   }
 
   test("simple zero sum of sqrt") {
-    forAll("rational") { (z0: Double) =>
-      val z = Rational(z0)
+    forAll("rational") { (z0: RationalAlgebraic) =>
+      val RationalAlgebraic(a, z) = z0
       val y = z.pow(3)
       val x = y + 2 * z.pow(2) + z
-      val zero = Algebraic(x).sqrt - Algebraic(y).sqrt - Algebraic(z).sqrt
+      val zero = Algebraic(x).sqrt - Algebraic(y).sqrt - a.sqrt
       zero.isZero
     }
   }
+
+  test("algebraic root is zero") {
+    import spire.implicits._
+    val genRootSelection: Gen[(List[Rational], Int)] = for {
+      roots <- Gen.nonEmptyListOf(genRational)
+      i <- Gen.choose(0, roots.size)
+    } yield (roots, i)
+
+    // These tests can be a bit slow, so we bump down the # and size.
+    forAll(Gen.nonEmptyListOf(genRational), minSuccessful(20), maxSize(8)) { roots =>
+      val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
+      val algebraicRoots = Algebraic.roots(poly)
+      (roots.sorted zip algebraicRoots).forall { case (qRoot, aRoot) =>
+        aRoot == Algebraic(qRoot)
+      }
+    }
+  }
+
+  test("divide by zero bug on near-zero root refinement") {
+    import spire.implicits._
+    // A failing special case of "algebraic root is zero", where the root is
+    // closer to 0 then the approximation required to test.
+    val roots = List(Rational("8791167214431305472/8377325351665"), Rational("12785/4238682313717812603653317580032"), Rational("0"))
+    val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
+    val algebraicRoots = Algebraic.roots(poly)
+    (roots.sorted zip algebraicRoots).forall { case (qRoot, aRoot) =>
+      aRoot == Algebraic(qRoot)
+    }
+  }
+
+  def genBigInt: Gen[BigInt] = for {
+    bytes <- Gen.listOf(arbitrary[Byte])
+    signum <- arbitrary[Boolean].map(n => if (n) -1 else 1)
+  } yield BigInt(signum, if (bytes.isEmpty) Array(0: Byte) else bytes.toArray)
+
+  def genRational: Gen[Rational] = for {
+    n <- genBigInt
+    d <- genBigInt
+    if (d.signum != 0)
+  } yield Rational(n, d)
+
+  def genRationalPoly: Gen[Polynomial[Rational]] = for {
+    coeffs <- Gen.listOf(genRational)
+  } yield Polynomial.dense(coeffs.toArray)
 
   /**
    * An algebraic expression + the exact rational value of this expression.
@@ -162,21 +206,9 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
         genLeaf
       }
 
-    def genBigInt: Gen[BigInt] = for {
-      bytes <- Gen.listOf(arbitrary[Byte])
-      signum <- arbitrary[Boolean].map(n => if (n) -1 else 1)
-    } yield BigInt(signum, if (bytes.isEmpty) Array(0: Byte) else bytes.toArray)
-
     def genLong: Gen[RationalAlgebraic] = for {
       n <- arbitrary[Long]
     } yield RationalAlgebraic(Algebraic(n), Rational(n))
-
-    def genRational: Gen[RationalAlgebraic] = for {
-      n <- genBigInt
-      d <- genBigInt
-      if (d.signum != 0)
-      q = Rational(n, d)
-    } yield RationalAlgebraic(Algebraic(q), q)
 
     def genBigDecimal: Gen[RationalAlgebraic] = for {
       unscaledValue <- genBigInt
@@ -189,7 +221,7 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     } yield RationalAlgebraic(Algebraic(x), Rational(x))
 
     def genLeaf: Gen[RationalAlgebraic] = Gen.oneOf(
-      genRational,
+      genRational.map { q => RationalAlgebraic(Algebraic(q), q) },
       genBigDecimal,
       genDouble,
       genLong

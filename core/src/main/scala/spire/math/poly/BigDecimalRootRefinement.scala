@@ -30,6 +30,10 @@ object BigDecimalRootRefinement {
     def approximation: JBigDecimal = lowerBound
   }
 
+  // In this case we cannot find an approximation in the desired precision
+  // that is within the bounds specified.
+  case class OutOfBounds(lowerBound: Rational, upperBound: Rational, approximation: JBigDecimal) extends BigDecimalRootRefinement
+
   private implicit object JBigDecimalOrder extends Signed[JBigDecimal] with Order[JBigDecimal] {
     def signum(a: JBigDecimal): Int = a.signum
     def abs(a: JBigDecimal): JBigDecimal = a.abs
@@ -92,34 +96,78 @@ object BigDecimalRootRefinement {
     // Returns true if there is a root in the open sub-interval (l, r).
     def hasRoot(l: Rational, r: Rational): Boolean =
       if (l != r) {
-        // Ue Descartes' rule of signs to see if the root in the open interval
-        // is actually in the sub interval (l, r).
         val poly0 = qpoly
           .shift(l)
           .removeZeroRoots
           .reciprocal
           .shift((r - l).reciprocal)
           .removeZeroRoots
+        // Ue Descartes' rule of signs to see if the root in the open interval
+        // is actually in the sub interval (l, r).
         poly0.signVariations % 2 == 1
       } else {
         false
       }
 
-    if (hasRoot(lowerBound, qlb)) {
-      BoundedLeft(lowerBound, lb)
-    } else if (hasRoot(qub, upperBound)) {
-      BoundedRight(ub, upperBound)
-    } else {
-      QIR(lb, ub, getEps, evalExact)
+    // QIR expects that (lx,rx) contain exactly 1 root and that they evaluate
+    // to different, non-zero signs. However, we may find 1 or both of the
+    // bounds to be 0, or to have "overshot" the root, so we have to either
+    // find a good (lx, rx) or return an approximation early.
+    def adjust(lx: JBigDecimal, lyOpt: Option[JBigDecimal], rx: JBigDecimal, ryOpt: Option[JBigDecimal]): BigDecimalRootRefinement = {
+      def qlx = Rational(new BigDecimal(lx, MathContext.UNLIMITED))
+      def qrx = Rational(new BigDecimal(rx, MathContext.UNLIMITED))
+
+      if (lx.compareTo(rx) < 0) {
+        val ly = lyOpt.getOrElse(evalExact(lx))
+        val ry = ryOpt.getOrElse(evalExact(rx))
+        if (ly.signum == 0) {
+          if (qlx > lowerBound) {
+            // We've "bumped" the lowerbound up to an exact root, coincidentally.
+            ExactRoot(lx)
+          } else {
+            // We try to push lx up a bit to get the sign to change.
+            adjust(lx.add(JBigDecimal.valueOf(1, getEps(lx))), Some(ly), rx, Some(ry))
+          }
+        } else if (ry.signum == 0) {
+          if (qrx < upperBound) {
+            // We've "bumped" the lowerbound up to an exact root, coincidentally.
+            ExactRoot(rx)
+          } else {
+            // We try to push rx down a bit to get the sign to change.
+            adjust(lx, Some(ly), rx.subtract(JBigDecimal.valueOf(1, getEps(rx))), Some(ry))
+          }
+        } else if (ry.signum == ly.signum) {
+          // We've managed to overshoot the actual root, but since we're still
+          // "in-bounds", we know it's in either the left cut off bit or the
+          // right.
+          if (hasRoot(lowerBound, qlx)) {
+            BoundedLeft(lowerBound, lb)
+          } else {
+            BoundedRight(ub, upperBound)
+          }
+        } else {
+          // Yay! We've successfully approximated the lower/upper bounds with
+          // big decimal, while keeping the root within (lx, rx).
+          QIR(lx, ly, rx, ry, getEps, evalExact)
+        }
+      } else {
+        // We overshot a root.
+        OutOfBounds(lowerBound, upperBound, lx)
+      }
     }
+
+    adjust(lb, None, ub, None)
   }
 
   /**
    * An implementation of "Quadratic Interval Refinement for Real Roots" by
    * John Abbot for `BigDecimal`.
    */
-  private def QIR(lowerBound: JBigDecimal, upperBound: JBigDecimal, getEps: JBigDecimal => Int, evalExact: JBigDecimal => JBigDecimal): BigDecimalRootRefinement = {
-
+  private def QIR(
+    lowerBound: JBigDecimal, lowerBoundValue: JBigDecimal,
+    upperBound: JBigDecimal, upperBoundValue: JBigDecimal,
+    getEps: JBigDecimal => Int, evalExact: JBigDecimal => JBigDecimal
+  ): BigDecimalRootRefinement = {
     @tailrec
     def loop(
       lx: JBigDecimal,
