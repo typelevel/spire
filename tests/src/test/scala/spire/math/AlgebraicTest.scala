@@ -11,18 +11,7 @@ import java.math.{ MathContext, RoundingMode }
 
 class AlgebraicTest extends FunSuite with PropertyChecks {
 
-  def trickyZero: Algebraic = Algebraic(18).sqrt - Algebraic(8).sqrt - Algebraic(2).sqrt
-
-  test("Sign of tricky zero is Zero") {
-    assert(trickyZero.sign === Sign.Zero)
-  }
-
-  test("Relative approximation of zero is zero") {
-    assert((Algebraic(0).toBigDecimal(MathContext.DECIMAL128)) === BigDecimal(0))
-    assert(trickyZero.toDouble === 0.0)
-  }
-
-  test("Absolute approximation of addition is correct") {
+  test("absolute approximation of addition is correct") {
     val sqrt2x100 = Iterator.fill(100)(Algebraic(2).sqrt) reduce (_ + _)
     val dblSqrt2x100 = math.sqrt(2) * 100
 
@@ -32,13 +21,13 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     assert(approx - err <= dblSqrt2x100 && dblSqrt2x100 <= approx + err)
   }
 
-  test("Relative approximation of addition is correct") {
+  test("relative approximation of addition is correct") {
     val sum = Iterator.fill(29)(Algebraic(1) / 29) reduce (_ + _)
     assert(sum.toDouble === 1.0)
     assert(sum.toBigDecimal(MathContext.DECIMAL128) === BigDecimal(1))
   }
 
-  test("Absolute approximation of subtraction is correct") {
+  test("absolute approximation of subtraction is correct") {
     val negSqrt2x98 = Iterator.fill(100)(Algebraic(2).sqrt) reduce (_ - _)
     val dblNegSqrt2x98 = -math.sqrt(2) * 98
 
@@ -47,7 +36,7 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     assert(approx - err <= dblNegSqrt2x98 && dblNegSqrt2x98 <= approx + err)
   }
 
-  test("Absolute approximation of multiplication is correct") {
+  test("absolute approximation of multiplication is correct") {
     val prod = Iterator.fill(32)(Algebraic(2).sqrt) reduce (_ * _)
     val err = BigDecimal(0.0001)
 
@@ -57,7 +46,7 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     assert(actual - err <= approx && approx <= actual + err)
   }
 
-  test("Relative approximation of multiplication is correct") {
+  test("relative approximation of multiplication is correct") {
     val prod = Iterator.fill(32)(Algebraic(2).sqrt) reduce (_ * _)
 
     val approx = prod.toBigDecimal(MathContext.DECIMAL64)
@@ -66,7 +55,7 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     assert(approx === actual)
   }
 
-  test("Absolute approximation of division is correct") {
+  test("absolute approximation of division is correct") {
     val quot = Algebraic(2).sqrt / 2
     val actual = 0.7071067811865476
     val err = BigDecimal(0.0001)
@@ -74,7 +63,7 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     assert(actual - err <= approx && approx <= actual + err)
   }
 
-  test("Relative approximation of division is correct") {
+  test("relative approximation of division is correct") {
     val quot = Iterator.fill(16)(Algebraic(2)).foldLeft(Algebraic(1 << 16))(_ / _)
     assert(quot.toDouble === 1.0)
 
@@ -86,7 +75,7 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     assert(aThird2.toBigDecimal(MathContext.DECIMAL128) === actual)
   }
 
-  test("Absolute approximation of roots is correct") {
+  test("absolute approximation of roots is correct") {
     val a = Algebraic(2).sqrt
     val err = BigDecimal(0.00001)
     val actual = BigDecimal(1.4142135623730951)
@@ -99,13 +88,15 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     assert(bctual - err <= bpprox && bpprox <= bctual + err)
   }
 
-  test("Associativity with large and small numbers") {
+  test("associativity with large and small numbers") {
     val x = Algebraic(1e308)
     val y = Algebraic(-1e308)
     val z = Algebraic(1)
     assert((x + (y + z)) === (x + y + z))
   }
 
+  // This generates rational Algebraic expressions along with their Rational
+  // value, then tests that the 2 are equal.
   test("equality test of rational algebraic is correct") {
     forAll("rational") { (qa: RationalAlgebraic) =>
       val RationalAlgebraic(a, q) = qa
@@ -113,6 +104,9 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     }
   }
 
+  // This generates a Algebraic expression that we know if rational, along with
+  // its actual Rational value. We then verify that the computed square root
+  // using Algebraic is actually a good approximation to the real square root.
   test("approximation of sqrt of rational is correct") {
     forAll("rational") { (qa: RationalAlgebraic) =>
       val RationalAlgebraic(a, q) = qa
@@ -123,6 +117,9 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     }
   }
 
+  // This generates a class of sums of square-roots that evaluate to 0. We
+  // simply verify that Algebraic agrees they are 0. Many of the terms
+  // generated will be irrational.
   test("simple zero sum of sqrt") {
     forAll("rational") { (z0: RationalAlgebraic) =>
       val RationalAlgebraic(a, z) = z0
@@ -133,7 +130,22 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     }
   }
 
-  test("algebraic root is zero") {
+  def trickyZero = Algebraic(18).sqrt - Algebraic(8).sqrt - Algebraic(2).sqrt
+
+  // This is just a simpler special case of the property test above.
+  test("sign of tricky zero is Zero") {
+    assert(trickyZero.sign === Sign.Zero)
+  }
+
+  test("relative approximation of zero is zero") {
+    assert((Algebraic(0).toBigDecimal(MathContext.DECIMAL128)) === BigDecimal(0))
+    assert(trickyZero.toDouble === 0.0)
+  }
+
+  // Generate a bunch of rational roots for a polynomial, then construct a
+  // rational polynomial with these roots, and then verify that Algebraic.roots
+  // finds all the roots exactly.
+  test("find all rational roots of rational polynomial") {
     import spire.implicits._
     val genRootSelection: Gen[(List[Rational], Int)] = for {
       roots <- Gen.nonEmptyListOf(genRational)
@@ -150,11 +162,16 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     }
   }
 
+  // This was a failing test case found using the property tests above.
   test("divide by zero bug on near-zero root refinement") {
     import spire.implicits._
     // A failing special case of "algebraic root is zero", where the root is
     // closer to 0 then the approximation required to test.
-    val roots = List(Rational("8791167214431305472/8377325351665"), Rational("12785/4238682313717812603653317580032"), Rational("0"))
+    val roots = List(
+      Rational("8791167214431305472/8377325351665"),
+      Rational("12785/4238682313717812603653317580032"),
+      Rational("0")
+    )
     val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
     val algebraicRoots = Algebraic.roots(poly)
     (roots.sorted zip algebraicRoots).forall { case (qRoot, aRoot) =>
@@ -162,13 +179,16 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     }
   }
 
+  // Generate random rational polynomials, find the exact roots using
+  // Algebraic.roots, then test that those are actually roots be evaluating
+  // the polynomial and checking if the result isZero.
   test("roots of polynomial evaluate to 0") {
-    var i = 1
+    // This test can be a bit slow, so we limit the tests here. If making major
+    // changes to Algebraic, root isolation, refinement, etc, it is a good idea
+    // to drop the limits and just give it a bit of time to run.
     forAll(genRationalPoly, minSuccessful(20), maxSize(6)) { poly =>
-      i += 1
-      val roots = Algebraic.roots(poly)
       val apoly = poly.map(Algebraic(_))
-      roots.forall { root =>
+      Algebraic.roots(poly).forall { root =>
         apoly(root).isZero
       }
     }
