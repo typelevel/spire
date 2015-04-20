@@ -3,6 +3,7 @@ package spire.math
 import java.lang.Long.numberOfLeadingZeros
 import java.lang.Double.{ isInfinite, isNaN }
 import java.math.{ MathContext, RoundingMode, BigInteger, BigDecimal => JBigDecimal }
+import java.util.concurrent.atomic.AtomicReference
 
 import scala.annotation.tailrec
 import scala.collection.concurrent.TrieMap
@@ -298,7 +299,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
         val den = new JBigDecimal(n.denominator.bigInteger)
         num.divide(den, new MathContext(digits, roundingMode))
       case ConstantRoot(poly, _, lb, ub) =>
-        BigDecimalRootRefinement(poly, lb, ub, new MathContext(digits, roundingMode)).approximation
+        BigDecimalRootRefinement(poly, lb, ub, new MathContext(digits, roundingMode)).approximateValue
       case Neg(sub) =>
         rec(sub, digits).negate()
       case Add(_, _) | Sub(_, _) if e.signum == 0 =>
@@ -819,8 +820,15 @@ object Algebraic extends AlgebraicInstances {
         if (lb.signum != 0) lb.signum
         else ub.signum
 
-      def toBigDecimal(digits: Int): JBigDecimal =
-        BigDecimalRootRefinement(poly, lb, ub, digits).approximation
+      private val refinement: AtomicReference[BigDecimalRootRefinement] =
+        new AtomicReference(BigDecimalRootRefinement(poly, lb, ub))
+
+      def toBigDecimal(digits: Int): JBigDecimal = {
+        val oldRefinement = refinement.get
+        val newRefinement = oldRefinement.refine(digits)
+        refinement.set(newRefinement)
+        newRefinement.approximateValue
+      }
 
       def lead: BigInt = poly.maxTerm.coeff
       def tail: BigInt = poly.minTerm.coeff

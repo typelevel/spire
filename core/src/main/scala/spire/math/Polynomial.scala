@@ -245,6 +245,10 @@ trait Polynomial[@spec(Double) C] { lhs =>
     Term(ring.zero, 0)
   }
 
+  /** Returns `true` iff this polynomial is constant. */
+  def isConstant: Boolean =
+    degree == 0
+
   /** Returns the degree of this polynomial. */
   def degree: Int
 

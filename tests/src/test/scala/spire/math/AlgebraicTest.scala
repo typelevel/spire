@@ -162,6 +162,18 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
     }
   }
 
+  test("roots of polynomial evaluate to 0") {
+    var i = 1
+    forAll(genRationalPoly, minSuccessful(20), maxSize(6)) { poly =>
+      i += 1
+      val roots = Algebraic.roots(poly)
+      val apoly = poly.map(Algebraic(_))
+      roots.forall { root =>
+        apoly(root).isZero
+      }
+    }
+  }
+
   def genBigInt: Gen[BigInt] = for {
     bytes <- Gen.listOf(arbitrary[Byte])
     signum <- arbitrary[Boolean].map(n => if (n) -1 else 1)
