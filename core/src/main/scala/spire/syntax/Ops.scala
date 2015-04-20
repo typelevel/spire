@@ -2,8 +2,10 @@ package spire.syntax
 
 import spire.algebra._
 import spire.algebra.lattice._
+import spire.algebra.partial._
 import spire.macros.Ops
-import spire.math.{BitString, ConvertableTo, ConvertableFrom, Rational, Number}
+import spire.math.{BitString, ConvertableTo, ConvertableFrom, Interval, Rational, Number}
+import spire.util.Opt
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
   def ===(rhs:A): Boolean = macro Ops.binop[A, Boolean]
@@ -100,6 +102,23 @@ final class SignedOps[A:Signed](lhs: A) {
   def isSignNonZero(): Boolean = macro Ops.unop[Boolean]
   def isSignNonPositive(): Boolean = macro Ops.unop[Boolean]
   def isSignNonNegative(): Boolean = macro Ops.unop[Boolean]
+}
+
+final class SemigroupoidOps[A](lhs:A)(implicit ev:Semigroupoid[A]) {
+  def |+|? (rhs: A): Opt[A] = macro Ops.binop[A, Opt[A]]
+  def |+|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
+}
+
+final class GroupoidCommonOps[A](lhs:A)(implicit ev:Groupoid[A]) {
+  def inverse(): A = ev.inverse(lhs)
+  def isId(implicit ev1: Eq[A]): Boolean = ev.isId(lhs)(ev1)
+}
+
+final class GroupoidOps[A](lhs:A)(implicit ev:Groupoid[A]) {
+  def leftId(): A = macro Ops.unop[A]
+  def rightId(): A = macro Ops.unop[A]
+  def |-|? (rhs: A): Opt[A] = macro Ops.binop[A, Option[A]]
+  def |-|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
 }
 
 final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
@@ -427,8 +446,22 @@ final class BitStringOps[A](lhs: A)(implicit ev: BitString[A]) {
   def rotateRight(rhs: Int): A = macro Ops.binop[Int, A]
 }
 
-final class ActionGroupOps[G](lhs: G) {
-  def |+|> [P](rhs: P)(implicit ev: Action[P, G]): P =
+final class LeftPartialActionOps[G](lhs: G) {
+  def ?|+|> [P](rhs: P)(implicit ev: LeftPartialAction[P, G]): Opt[P] =
+    macro Ops.binopWithEv[P, LeftPartialAction[P, G], Opt[P]]
+  def ??|+|> [P](rhs: P)(implicit ev: LeftPartialAction[P, G]): Boolean =
+    macro Ops.binopWithEv[P, LeftPartialAction[P, G], Boolean]
+}
+
+final class RightPartialActionOps[P](lhs: P) {
+  def <|+|? [G](rhs: G)(implicit ev: RightPartialAction[P, G]): Opt[P] =
+    macro Ops.binopWithEv[G, RightPartialAction[P, G], Opt[P]]
+  def <|+|?? [G](rhs: G)(implicit ev: RightPartialAction[P, G]): Boolean =
+    macro Ops.binopWithEv[G, RightPartialAction[P, G], Boolean]
+}
+
+final class LeftActionOps[G](lhs: G) {
+  def |+|> [P](rhs: P)(implicit ev: LeftAction[P, G]): P =
     macro Ops.binopWithEv[P, Action[P, G], P]
   def +> [P](rhs: P)(implicit ev: AdditiveAction[P, G]): P =
     macro Ops.binopWithEv[P, AdditiveAction[P, G], P]
@@ -436,8 +469,8 @@ final class ActionGroupOps[G](lhs: G) {
     macro Ops.binopWithEv[P, MultiplicativeAction[P, G], P]
 }
 
-final class ActionPointOps[P](lhs: P) {
-  def <|+| [G](rhs: G)(implicit ev: Action[P, G]): P =
+final class RightActionOps[P](lhs: P) {
+  def <|+| [G](rhs: G)(implicit ev: RightAction[P, G]): P =
     macro Ops.binopWithEv[G, Action[P, G], P]
   def <+ [G](rhs: G)(implicit ev: AdditiveAction[P, G]): P =
     macro Ops.binopWithEv[G, AdditiveAction[P, G], P]
@@ -468,4 +501,11 @@ final class TorsorPointOps[P](lhs: P) {
     macro Ops.binopWithEv[P, AdditiveTorsor[P, G], G]
   def </> [G](rhs: P)(implicit ev: MultiplicativeTorsor[P, G]): G =
     macro Ops.binopWithEv[P, MultiplicativeTorsor[P, G], G]
+}
+
+final class IntervalPointOps[A](lhs: A)(implicit o: Order[A], ev: AdditiveGroup[A]) {
+  def ±(rhs: A): Interval[A] =
+    Interval(ev.minus(lhs, rhs), ev.plus(lhs, rhs))
+  def +/-(rhs: A): Interval[A] =
+    Interval(ev.minus(lhs, rhs), ev.plus(lhs, rhs))
 }

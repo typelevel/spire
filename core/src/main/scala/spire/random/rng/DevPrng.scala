@@ -43,7 +43,7 @@ class CycledFile(f: File) extends Generator { self =>
       throw new IllegalArgumentException("%s contains less than 8 bytes" format f)
   }
 
-  def reinit() {
+  def reinit(): Unit = {
     if (dis != null) dis.close()
     dis = new DataInputStream(new FileInputStream(f))
   }

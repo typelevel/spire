@@ -27,7 +27,7 @@ class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrive
   runDense[Rational]("rational")
   runSparse[Rational]("rational")
 
-  def runDense[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
+  def runDense[A: Arbitrary: Eq: Field: ClassTag](typ: String): Unit = {
     implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
@@ -36,7 +36,7 @@ class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrive
     runTest[A](s"$typ/dense")
   }
 
-  def runSparse[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
+  def runSparse[A: Arbitrary: Eq: Field: ClassTag](typ: String): Unit = {
     implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
@@ -45,27 +45,27 @@ class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrive
     runTest[A](s"$typ/sparse")
   }
 
-  def runTest[A: Eq: Field: ClassTag](name: String)(implicit arb: Arbitrary[Polynomial[A]], arb2: Arbitrary[A]) {
+  def runTest[A: Eq: Field: ClassTag](name: String)(implicit arb: Arbitrary[Polynomial[A]], arb2: Arbitrary[A]): Unit = {
     type P = Polynomial[A]
 
     val zero = Polynomial.zero[A]
     val one = Polynomial.one[A]
 
-    def testUnop(f: P => P)(g: A => A) {
+    def testUnop(f: P => P)(g: A => A): Unit = {
       forAll { (x: P, a: A) =>
         val z = f(x)
         g(x(a)) shouldBe z(a)
       }
     }
 
-    def testBinop(f: (P, P) => P)(g: (A, A) => A) {
+    def testBinop(f: (P, P) => P)(g: (A, A) => A): Unit = {
       forAll { (x: P, y: P, a: A) =>
         val z = f(x, y)
         g(x(a), y(a)) shouldBe z(a)
       }
     }
 
-    def testBinopNonzero(f: (P, P) => P)(g: (A, A) => A) {
+    def testBinopNonzero(f: (P, P) => P)(g: (A, A) => A): Unit = {
       forAll { (x: P, y: P, a: A) =>
         if (!y.isZero && y(a) != Field[A].zero) {
           val z = f(x, y)

@@ -25,33 +25,62 @@ trait ActionLaws[G, A] extends Laws {
   implicit def EquA: Eq[A]
   implicit def ArbA: Arbitrary[A]
 
-  def semigroupAction(implicit G: Action[A, G], G0: Semigroup[G]) = new ActionProperties(
-    name = "semigroupAction",
+    def leftSemigroupAction(implicit G: LeftAction[A, G], G0: Semigroup[G]) = new ActionProperties(
+    name = "leftSemigroupAction",
     sl = _.semigroup(G0),
-    parent = None,
+    parents = Seq.empty,
 
     "left compatibility" → forAll { (g: G, h: G, a: A) =>
       ((g |+| h) |+|> a) === (g |+|> (h |+|> a))
-    },
+    }
+  )
+
+  def rightSemigroupAction(implicit G: RightAction[A, G], G0: Semigroup[G]) = new ActionProperties(
+    name = "rightSemigroupAction",
+    sl = _.semigroup(G0),
+    parents = Seq.empty,
+
     "right compatibility" → forAll { (a: A, g: G, h: G) =>
       (a <|+| (g |+| h)) === ((a <|+| g) <|+| h)
+    }
+  )
+
+  def semigroupAction(implicit G: Action[A, G], G0: Semigroup[G]) = new ActionProperties(
+    name = "semigroupAction",
+    sl = _.semigroup(G0),
+    parents = Seq(leftSemigroupAction, rightSemigroupAction)
+  )
+
+  def leftMonoidAction(implicit G: LeftAction[A, G], G0: Monoid[G]) = new ActionProperties(
+    name = "leftMonoidAction",
+    sl = _.monoid(G0),
+    parents = Seq(leftSemigroupAction),
+
+    "left identity" → forAll { (a: A) =>
+      (G0.id |+|> a) === a
+    }
+  )
+
+  def rightMonoidAction(implicit G: RightAction[A, G], G0: Monoid[G]) = new ActionProperties(
+    name = "rightMonoidAction",
+    sl = _.monoid(G0),
+    parents = Seq(rightSemigroupAction),
+
+    "right identity" → forAll { (a: A) =>
+      (a <|+| G0.id) === a
     }
   )
 
   def monoidAction(implicit G: Action[A, G], G0: Monoid[G]) = new ActionProperties(
     name = "monoidAction",
     sl = _.monoid(G0),
-    parent = Some(semigroupAction),
-
-    "identity" → forAll { (a: A) =>
-      (G0.id |+|> a) === a
-    }
+    parents = Seq(leftMonoidAction, rightMonoidAction)
   )
 
   def groupAction(implicit G: Action[A, G], G0: Group[G]) = new ActionProperties(
     name = "groupAction",
     sl = _.group(G0),
-    parent = Some(monoidAction),
+    parents = Seq(monoidAction),
 
     "left and right action compatibility" → forAll { (a: A, g: G) =>
       (a <|+| g) === (g.inverse |+|> a)
@@ -71,11 +100,10 @@ trait ActionLaws[G, A] extends Laws {
   class ActionProperties(
     val name: String,
     val sl: scalarLaws.type => scalarLaws.RuleSet,
-    val parent: Option[ActionProperties],
+    val parents: Seq[ActionProperties],
     val props: (String, Prop)*
   ) extends RuleSet {
     val bases = Seq("scalar" → sl(scalarLaws))
-    val parents = parent.toSeq
   }
 
   class AdditiveProperties(

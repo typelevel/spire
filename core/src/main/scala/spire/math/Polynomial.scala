@@ -119,16 +119,17 @@ object Polynomial extends PolynomialInstances {
     // do some pre-processing to remove whitespace/outer parens
     val t = s.trim
     val u = if (t.startsWith("(") && t.endsWith(")")) t.substring(1, t.length - 1) else t
+    val v = Term.removeSuperscript(u)
 
     // parse out the terms
-    val ts = parse(u, Nil)
+    val ts = parse(v, Nil)
 
     // make sure we have at most one variable
     val vs = ts.view.map(_.v).toSet.filter(_ != "")
     if (vs.size > 1) throw new IllegalArgumentException("only univariate polynomials supported")
 
     // we're done!
-    Polynomial(ts.map(t => (t.e, t.c)).toMap)
+    (Polynomial.zero[Rational] /: ts)((a, t) => a + Polynomial(t.c, t.e))
   }
 
   private final def split[@spec(Double) C: ClassTag](poly: Polynomial[C]): (Array[Int], Array[C]) = {
@@ -197,6 +198,17 @@ trait Polynomial[@spec(Double) C] { lhs =>
     }
     lb.result()
   }
+
+  /**
+   * Return an iterator of non-zero terms.
+   *
+   * This method is used to implement equals and hashCode.
+   *
+   * NOTE: This method uses a (_ == 0) test to prune zero values. This
+   * makes sense in a context where Semiring[C] and Eq[C] are
+   * unavailable, but not other places.
+   */
+  def termsIterator: Iterator[Term[C]]
 
   /** Returns a map from exponent to coefficient of this polynomial. */
   def data(implicit ring: Semiring[C], eq: Eq[C]): Map[Int, C] = {
@@ -389,27 +401,28 @@ trait Polynomial[@spec(Double) C] { lhs =>
   def :* (k: C)(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] = k *: lhs
   def :/ (k: C)(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = this :* k.reciprocal
 
+  override def hashCode: Int = {
+    val it = lhs.termsIterator
+    @tailrec def loop(n: Int): Int =
+      if (it.hasNext) {
+        val term = it.next
+        loop(n ^ (0xfeed1257 * term.exp ^ term.coeff.##))
+      } else n
+    loop(0)
+  }
+
   override def equals(that: Any): Boolean = that match {
     case rhs: Polynomial[_] if lhs.degree == rhs.degree =>
-      val (les, lcs) = Polynomial.split(lhs)
-      val (res, rcs) = Polynomial.split[Any](rhs.asInstanceOf[Polynomial[Any]])
-
-      @tailrec
-      def loop(i: Int, j: Int): Boolean = {
-        if (i >= les.length && j >= res.length) {
-          true
-        } else if (j >= res.length || les(i) < res(j)) {
-          if (lcs(i) == 0) loop(i + 1, j) else false
-        } else if (i >= les.length || les(i) > res(j)) {
-          if (rcs(j) == 0) loop(i, j + 1) else false
-        } else if (lcs(i) == rcs(j)) {
-          loop(i + 1, j + 1)
-        } else {
-          false
-        }
+      val it1 = lhs.termsIterator
+      val it2 = rhs.termsIterator
+      @tailrec def loop(): Boolean = {
+        val has1 = it1.hasNext
+        val has2 = it2.hasNext
+        if (has1 && has2) {
+          if (it1.next == it2.next) loop() else false
+        } else has1 == has2
       }
-
-      loop(0, 0)
+      loop()
 
     case rhs: Polynomial[_] =>
       false

@@ -15,4 +15,7 @@ object compat {
 
   def resetLocalAttrs[C <: Context](c: C)(t: c.Tree) =
     c.untypecheck(t)
+
+  def setOrig[C <: Context](c: C)(tt: c.universe.TypeTree, t: c.Tree) =
+    c.universe.internal.setOriginal(tt, t)
 }

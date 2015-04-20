@@ -57,7 +57,7 @@ class FpFilterBenchmark extends MyBenchmark {
 
   var points: Array[Point2] = _
 
-  override protected def setUp() {
+  override protected def setUp(): Unit = {
     points = init(size)(Point2(Random.nextDouble, Random.nextDouble))
   }
 

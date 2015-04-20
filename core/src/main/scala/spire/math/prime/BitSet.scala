@@ -20,12 +20,12 @@ object BitSet {
 
 case class BitSet(length: Int, array: Array[Int]) {
 
-  def +=(n: Int) {
+  def +=(n: Int): Unit = {
     val q = n >>> 5
     array(q) = array(q) | (1 << (n & 31))
   }
 
-  def -=(n: Int) {
+  def -=(n: Int): Unit = {
     val q = n >>> 5
     array(q) = array(q) & ~(1 << (n & 31))
   }

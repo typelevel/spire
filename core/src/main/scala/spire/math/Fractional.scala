@@ -9,16 +9,12 @@ import java.lang.Math
 trait Fractional[@spec(Float, Double) A] extends Any with Field[A] with NRoot[A] with Integral[A]
 
 object Fractional {
-  private val ratCtx = ApproximationContext(Rational(1, 1000000000))
-
   implicit final val FloatIsFractional = new FloatIsFractional
   implicit final val DoubleIsFractional = new DoubleIsFractional
   implicit final val BigDecimalIsFractional = new BigDecimalIsFractional
   implicit final val AlgebraicIsFractional = new AlgebraicIsFractional
   implicit final val NumberIsFractional = new NumberIsFractional
-
-  implicit def RationalIsFractional(implicit ctx: ApproximationContext[Rational] = ratCtx) =
-    new RationalIsFractional
+  implicit final val RationalIsFractional = new RationalIsFractional
 
   @inline final def apply[A](implicit ev:Fractional[A]) = ev
 }
@@ -59,11 +55,13 @@ with BigDecimalIsReal with Serializable {
   override def toReal(n: BigDecimal): Real = super[BigDecimalIsReal].toReal(n)
 }
 
-@SerialVersionUID(0L)
-private[math] class RationalIsFractional(implicit val context: ApproximationContext[Rational])
-extends Fractional[Rational] with RationalIsField with RationalIsNRoot
-with ConvertableFromRational with ConvertableToRational
-with RationalIsReal with Serializable {
+@SerialVersionUID(1L)
+private[math] class RationalIsFractional extends Fractional[Rational]
+    with RationalIsField
+    with RationalApproximateNRoot
+    with ConvertableFromRational with ConvertableToRational
+    with RationalIsReal with Serializable {
+
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
   override def toDouble(n: Rational): Double = n.toDouble

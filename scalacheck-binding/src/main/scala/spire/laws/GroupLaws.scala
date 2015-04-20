@@ -1,6 +1,7 @@
 package spire.laws
 
 import spire.algebra._
+import spire.algebra.partial._
 import spire.implicits._
 
 import org.typelevel.discipline.Laws
@@ -19,7 +20,6 @@ trait GroupLaws[A] extends Laws {
 
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
-
 
   // groups
 

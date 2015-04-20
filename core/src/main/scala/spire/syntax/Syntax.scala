@@ -1,7 +1,9 @@
 package spire.syntax
 
+import spire.NoImplicit
 import spire.algebra._
 import spire.algebra.lattice._
+import spire.algebra.partial._
 import spire.math._
 import spire.macros.Syntax
 import spire.syntax.std._
@@ -27,6 +29,15 @@ trait IsRealSyntax extends OrderSyntax with SignedSyntax {
 
 trait SignedSyntax {
   implicit def signedOps[A: Signed](a: A) = new SignedOps(a)
+}
+
+trait SemigroupoidSyntax {
+  implicit def semigroupoidOps[A:Semigroupoid](a:A) = new SemigroupoidOps[A](a)
+}
+
+trait GroupoidSyntax extends SemigroupoidSyntax {
+  implicit def groupoidCommonOps[A](a:A)(implicit ev: Groupoid[A], ni: NoImplicit[Monoid[A]]) = new GroupoidCommonOps[A](a)(ev)
+  implicit def groupoidOps[A](a:A)(implicit ev: Groupoid[A]) = new GroupoidOps[A](a)
 }
 
 trait SemigroupSyntax {
@@ -146,9 +157,19 @@ trait BitStringSyntax {
   implicit def bitStringOps[A: BitString](a: A) = new BitStringOps(a)
 }
 
+trait PartialActionSyntax {
+  implicit def leftPartialActionOps[G](g: G) = new LeftPartialActionOps(g)
+  implicit def rightPartialActionOps[P](p: P) = new RightPartialActionOps(p)
+}
+
 trait ActionSyntax {
-  implicit def actionGroupOps[G](g: G) = new ActionGroupOps(g)
-  implicit def actionPointOps[P](p: P) = new ActionPointOps(p)
+  implicit def leftActionOps[G](g: G) = new LeftActionOps(g)
+  implicit def rightActionOps[P](p: P) = new RightActionOps(p)
+}
+
+trait IntervalSyntax {
+  implicit def groupActionGroupOps[A: Order: AdditiveGroup](a: A) =
+    new IntervalPointOps(a)
 }
 
 trait UnboundSyntax {
@@ -223,6 +244,8 @@ trait AllSyntax extends
     SignedSyntax with
     IsRealSyntax with
     ConvertableFromSyntax with
+    SemigroupoidSyntax with
+    GroupoidSyntax with
     SemigroupSyntax with
     MonoidSyntax with
     GroupSyntax with
@@ -240,6 +263,7 @@ trait AllSyntax extends
     FieldSyntax with
     NRootSyntax with
     TrigSyntax with
+    IntervalSyntax with
     ModuleSyntax with
     VectorSpaceSyntax with
     NormedVectorSpaceSyntax with
@@ -249,6 +273,7 @@ trait AllSyntax extends
     HeytingSyntax with
     BoolSyntax with
     BitStringSyntax with
+    PartialActionSyntax with
     ActionSyntax with
     TorsorSyntax with
     IntegralSyntax with

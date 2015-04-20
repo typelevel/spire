@@ -28,7 +28,7 @@ class PolynomialBenchmarks extends MyBenchmark {
   var spireSparseDoublePolys: Array[Polynomial[Double]] = null
   var commonsDoublePolys: Array[PolynomialFunction] = null
 
-  override protected def setUp() {
+  override protected def setUp(): Unit = {
 
     val coeffs: Array[Array[Rational]] =
       init(100)(init(size)(arbitraryRational))

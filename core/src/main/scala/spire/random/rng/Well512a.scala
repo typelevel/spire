@@ -60,7 +60,7 @@ final class Well512a protected[random](state: Array[Int], i0: Int) extends IntBa
     bytes
   }
 
-  def setSeedBytes(bytes: Array[Byte]) {
+  def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < BYTES) util.Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
 
@@ -119,8 +119,9 @@ object Well512a extends GeneratorCompanion[Well512a, (Array[Int], Int)] {
   @inline private final def mat0neg(t: Int, v: Int)         = v ^ (v << -t)
   @inline private final def mat3neg(t: Int, v: Int)         = v << -t
   @inline private final def mat4neg(t: Int, b: Int, v: Int) = v ^ ((v << -t) & b)
-                                                                                   
-  def randomSeed(): (Array[Int], Int) = (Utils.seedFromInt(R, Utils.intFromTime()), 0)
+
+  def randomSeed(): (Array[Int], Int) =
+    (Utils.seedFromInt(R, Utils.intFromTime()), 0)
 
   def fromSeed(seed: (Array[Int], Int)): Well512a =
     seed match {
@@ -129,9 +130,12 @@ object Well512a extends GeneratorCompanion[Well512a, (Array[Int], Int)] {
         new Well512a(state, stateIndex)
     }
 
-  def fromArray(arr: Array[Int]): Well512a = fromSeed(Utils.seedFromArray(R, arr), 0)
+  def fromArray(arr: Array[Int]): Well512a =
+    fromSeed((Utils.seedFromArray(R, arr), 0))
 
-  def fromBytes(bytes: Array[Byte]): Well512a = fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
+  def fromBytes(bytes: Array[Byte]): Well512a =
+    fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
 
-  def fromTime(time: Long = System.nanoTime) : Well512a = fromSeed(Utils.seedFromInt(R, Utils.intFromTime(time)), 0)
+  def fromTime(time: Long = System.nanoTime): Well512a =
+    fromSeed((Utils.seedFromInt(R, Utils.intFromTime(time)), 0))
 }

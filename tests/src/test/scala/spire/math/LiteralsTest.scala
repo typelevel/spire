@@ -39,9 +39,9 @@ class LiteralsTest extends FunSuite {
   test("int operators") {
     import spire.syntax.std.int._
     import spire.syntax.nroot._
-    assert(5 ** 2 === 25)
-    assert(5 /~ 2 === 2)
-    assert(5 /% 2 === (2, 1))
+    assert((5 ** 2) === 25)
+    assert((5 /~ 2) === 2)
+    assert((5 /% 2) === ((2, 1)))
     assert(25.sqrt === 5)
   }
 

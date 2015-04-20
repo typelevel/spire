@@ -117,7 +117,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   /** Raise this number to the `k`-th power. */
   def pow(k: Int): Algebraic =
     if (k == Int.MinValue) {
-      throw new ArithmeticException("illegal exponent (${Int.MinValue})")
+      throw new ArithmeticException(s"illegal exponent (${Int.MinValue})")
     } else if (k == 0) {
       if (signum == 0) {
         throw new ArithmeticException("undeterminate result (0^0)")

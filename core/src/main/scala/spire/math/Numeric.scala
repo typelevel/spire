@@ -2,6 +2,8 @@ package spire.math
 
 import spire.algebra.{AdditiveAbGroup, IsReal, MultiplicativeAbGroup, Order, NRoot, Ring, Trig}
 import spire.std._
+import spire.std.double._
+import spire.syntax.nroot._
 
 import scala.{specialized => spec}
 
@@ -28,11 +30,7 @@ object Numeric {
   implicit final val BigDecimalIsNumeric: Numeric[BigDecimal] = new BigDecimalIsNumeric
   implicit final val AlgebraicIsNumeric: Numeric[Algebraic] = new AlgebraicIsNumeric
   implicit final val RealIsNumeric: Numeric[Real] = new RealIsNumeric
-
-  private val defaultApprox = ApproximationContext(Rational(1, 1000000000))
-
-  implicit def RationalIsNumeric(implicit ctx: ApproximationContext[Rational] = defaultApprox): Numeric[Rational] =
-    new RationalIsNumeric
+  implicit final val RationalIsNumeric: Numeric[Rational] = new RationalIsNumeric
 
   implicit def complexIsNumeric[A: Fractional: Trig: IsReal] = new ComplexIsNumeric
 
@@ -142,10 +140,15 @@ with BigDecimalIsReal with Serializable {
 }
 
 @SerialVersionUID(0L)
-private[math] class RationalIsNumeric(implicit val context: ApproximationContext[Rational])
-extends Numeric[Rational] with RationalIsField with RationalIsNRoot
-with ConvertableFromRational with ConvertableToRational
-with RationalIsReal with Serializable {
+private[math] class RationalIsNumeric
+    extends Numeric[Rational]
+    with RationalIsField
+    with RationalApproximateNRoot
+    with ConvertableFromRational
+    with ConvertableToRational
+    with RationalIsReal
+    with Serializable {
+
   override def toDouble(n: Rational): Double = n.toDouble
   override def toRational(n: Rational): Rational = n
   override def toAlgebraic(n: Rational): Algebraic = super[RationalIsReal].toAlgebraic(n)
