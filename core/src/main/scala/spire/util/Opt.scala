@@ -9,11 +9,7 @@ object Opt extends OptVersions {
 
   implicit def Eq[A: Eq]: Eq[Opt[A]] = new Eq[Opt[A]] {
     def eqv(x: Opt[A], y: Opt[A]): Boolean =
-      if (x.isEmpty) y.isEmpty else {
-        if (y.isEmpty)
-          false
-        x.ref === y.ref
-      }
+      if (x.isEmpty) y.isEmpty else x.ref === y.ref
   }
 }
 
