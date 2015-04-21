@@ -14,19 +14,33 @@ object CooperativeEquality extends Properties("Algebraic") {
 
 	def coopEquals[A](x: A, y: A) = x == y && x.hashCode == y.hashCode
 
-	val genAlgebraicInt: Gen[Algebraic] = arbitrary[Int].map(Algebraic(_))
+	val genAlgebraicInt: Gen[Algebraic]      = arbitrary[Int].map(Algebraic(_))
+  val genAlgebraicDouble: Gen[Algebraic]   = arbitrary[Double].map(Algebraic(_))
+  val genAlgebraicBigInt: Gen[Algebraic]   = arbitrary[Double].map(Algebraic(_))
+  //val genAlgebraicRational: Gen[Algebraic] = arbitrary[Rational].map(Algebraic(_))
 
-	property("commutative +") = forAll(genAlgebraicInt, genAlgebraicInt) { (a: Algebraic, b: Algebraic) =>
-  	coopEquals(a+b,b+a) 
-	}
+  val intProps: List[Prop]    = algebraicProps(genAlgebraicInt)
+  val doubleProps: List[Prop] = algebraicProps(genAlgebraicDouble)
+  val bigIntProps: List[Prop] = algebraicProps(genAlgebraicBigInt)
 
-	property("commutative *") = forAll(genAlgebraicInt, genAlgebraicInt) { (a: Algebraic, b: Algebraic) =>
-  	coopEquals(a*b,b*a) 
-	}
+  println("Checking Algebraic's Commutativity for Addition and Multiplicate with Int")
+  intProps.foreach(_.check)
+  println("Checking Algebraic's Commutativity for Addition and Multiplicate with Double")
+  doubleProps.foreach(_.check)
+  println("Checking Algebraic's Commutativity for Addition and Multiplicate with BigInt")
+  bigIntProps.foreach(_.check)
 
-  //TODO: improve since only a handful of the 100 runs could 'truly' evaluate to true
-	property("tranisitive ==") = forAll(genAlgebraicInt, genAlgebraicInt, genAlgebraicInt) { (a: Algebraic, b: Algebraic, c: Algebraic) =>
-    if( coopEquals(a, b) && coopEquals(b, c)) coopEquals(a, c) else true
-	}
+  def algebraicProps(g: Gen[Algebraic]): List[Prop] = {
+    val commutativeAdd = forAll(g, g) { (a: Algebraic, b: Algebraic) =>
+      coopEquals(a+b,b+a) 
+    }
+    val commutativeMult = forAll(g, g) { (a: Algebraic, b: Algebraic) =>
+      coopEquals(a*b,b*a) 
+    }
+    val transitive = forAll(g, g, g) { (a: Algebraic, b: Algebraic, c: Algebraic) =>
+      if( coopEquals(a, b) && coopEquals(b, c)) coopEquals(a, c) else true
+    }
+    List(commutativeAdd, commutativeMult, transitive)
+  }
 
 }
