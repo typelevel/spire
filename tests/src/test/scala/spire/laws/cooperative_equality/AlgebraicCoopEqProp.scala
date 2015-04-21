@@ -1,4 +1,4 @@
-package spire.laws
+package spire.laws.cooperative_equality
 
 import org.scalacheck.{Prop, Properties, Arbitrary, Gen}
 import org.scalacheck.Prop.forAll
@@ -10,9 +10,7 @@ import spire.math.{Algebraic, Rational, SafeLong}
 /** 
  * Cooperative Equality = equals and hashCode agree
  */
-object CooperativeEquality extends Properties("Algebraic") {
-
-	def coopEquals[A](x: A, y: A) = x == y && x.hashCode == y.hashCode
+object AlgebraicCoopEqProp extends Properties("Algebraic") {
 
 	val genAlgebraicInt: Gen[Algebraic]                 = arbitrary[Int].map(Algebraic(_))
   val genAlgebraicLong: Gen[Algebraic]                = arbitrary[Long].map(Algebraic(_))
@@ -28,12 +26,12 @@ object CooperativeEquality extends Properties("Algebraic") {
   } yield Rational(num, den)
   val genAlgebraicBigDecimal: Gen[Algebraic] = arbitrary[BigDecimal].map(Algebraic(_))
 
-  val intProps: List[Prop]        = algebraicProps(genAlgebraicInt)
-  val longProps: List[Prop]       = algebraicProps(genAlgebraicLong)
-  val doubleProps: List[Prop]     = algebraicProps(genAlgebraicDouble)
-  val bigIntProps: List[Prop]     = algebraicProps(genAlgebraicBigInt)
-  val rationalProps: List[Prop]   = algebraicProps(genAlgebraicRational)
-  val bigDecimalProps: List[Prop] = algebraicProps(genAlgebraicBigDecimal)
+  val intProps: List[Prop]        = Utility.props[Algebraic](genAlgebraicInt)
+  val longProps: List[Prop]       = Utility.props[Algebraic](genAlgebraicLong)
+  val doubleProps: List[Prop]     = Utility.props[Algebraic](genAlgebraicDouble)
+  val bigIntProps: List[Prop]     = Utility.props[Algebraic](genAlgebraicBigInt)
+  val rationalProps: List[Prop]   = Utility.props[Algebraic](genAlgebraicRational)
+  val bigDecimalProps: List[Prop] = Utility.props[Algebraic](genAlgebraicBigDecimal)
 
   printPreTestRun("Int")
   intProps.foreach(_.check)
@@ -56,17 +54,17 @@ object CooperativeEquality extends Properties("Algebraic") {
   
   def printPreTestRun(t: String): Unit = println(s"Checking Algebraic's Commutativity for + and *, as well as Transitivity, for $t")
 
-  def algebraicProps(g: Gen[Algebraic]): List[Prop] = {
-    val commutativeAdd = forAll(g, g) { (a: Algebraic, b: Algebraic) =>
-      coopEquals(a+b,b+a) 
-    }
-    val commutativeMult = forAll(g, g) { (a: Algebraic, b: Algebraic) =>
-      coopEquals(a*b,b*a) 
-    }
-    val transitive = forAll(g, g, g) { (a: Algebraic, b: Algebraic, c: Algebraic) =>
-      if( coopEquals(a, b) && coopEquals(b, c)) coopEquals(a, c) else true
-    }
-    List(commutativeAdd, commutativeMult, transitive)
-  }
+  // def algebraicProps(g: Gen[Algebraic]): List[Prop] = {
+  //   val commutativeAdd = forAll(g, g) { (a: Algebraic, b: Algebraic) =>
+  //     coopEquals(a+b,b+a) 
+  //   }
+  //   val commutativeMult = forAll(g, g) { (a: Algebraic, b: Algebraic) =>
+  //     coopEquals(a*b,b*a) 
+  //   }
+  //   val transitive = forAll(g, g, g) { (a: Algebraic, b: Algebraic, c: Algebraic) =>
+  //     if( coopEquals(a, b) && coopEquals(b, c)) coopEquals(a, c) else true
+  //   }
+  //   List(commutativeAdd, commutativeMult, transitive)
+  // }
 
 }
