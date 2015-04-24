@@ -259,7 +259,6 @@ trait BaseSyntaxTest {
     import spire.syntax.eq._
     import spire.syntax.field._
     import spire.std.tuples._
-    import spire.optional.totalfloat._
 
     ((42 + a) === Ring[A].plus(Ring[A].fromInt(42), a)) &&
     ((42 - a) === Ring[A].minus(Ring[A].fromInt(42), a)) &&

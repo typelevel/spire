@@ -49,7 +49,7 @@ object MyBuild extends Build {
 
   // Settings
 
-  override lazy val settings = super.settings ++ Seq(
+  lazy val commonSettings = Seq(
     organization := "org.spire-math",
 
     scalaVersion := "2.11.6",
@@ -85,7 +85,7 @@ object MyBuild extends Build {
     resolvers += Resolver.sonatypeRepo("releases"),
     resolvers += "bintray/non" at "http://dl.bintray.com/non/maven",
 
-    scalacOptions in (Compile, compile) := {
+    scalacOptions ++= {
       CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((2, 10)) =>
           scalacOptions.value
@@ -93,6 +93,8 @@ object MyBuild extends Build {
           scalacOptions.value ++ Seq("-Ywarn-unused-import")
       }
     },
+    scalacOptions in (Compile, console) ~= {_.filterNot("-Ywarn-unused-import" == _)},
+    scalacOptions in (Test, console) <<= (scalacOptions in (Compile, console)),
 
     libraryDependencies := {
       CrossVersion.partialVersion(scalaVersion.value) match {
@@ -149,7 +151,7 @@ object MyBuild extends Build {
 
   lazy val spireSettings = Seq(
     name := "spire-aggregate"
-  ) ++ noPublish ++ unidocSettings ++ Seq(
+  ) ++ commonSettings ++ noPublish ++ unidocSettings ++ Seq(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, tests)
   ) ++ releaseSettings ++ Seq(
     releaseProcess := Seq[ReleaseStep](
@@ -171,7 +173,7 @@ object MyBuild extends Build {
   lazy val macros = Project("macros", file("macros")).
     settings(macroSettings: _*)
 
-  lazy val macroSettings = Seq(
+  lazy val macroSettings = commonSettings ++ Seq(
     name := "spire-macros",
     libraryDependencies ++= Seq(scalaTest % "test", scalaCheck % "test"),
     unmanagedSourceDirectories in Compile += (sourceDirectory in Compile).value / s"scala_${scalaBinaryVersion.value}"
@@ -186,7 +188,7 @@ object MyBuild extends Build {
   lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types",
     "Generates several type classes for Tuple2-22.")
 
-  lazy val coreSettings = Seq(
+  lazy val coreSettings = commonSettings ++ Seq(
     name := "spire",
     sourceGenerators in Compile <+= (genProductTypes in Compile),
     genProductTypes <<= (sourceManaged in Compile, streams) map { (scalaSource, s) =>
@@ -215,7 +217,7 @@ object MyBuild extends Build {
     settings(examplesSettings: _*).
     dependsOn(core)
 
-  lazy val examplesSettings = Seq(
+  lazy val examplesSettings = commonSettings ++ Seq(
     name := "spire-examples",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "1.2.4",
@@ -230,7 +232,7 @@ object MyBuild extends Build {
     settings(scalacheckSettings: _*).
     dependsOn(core)
 
-  lazy val scalacheckSettings = Seq(
+  lazy val scalacheckSettings = commonSettings ++ Seq(
     name := "spire-scalacheck-binding",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "discipline" % "0.2.1",
@@ -244,7 +246,7 @@ object MyBuild extends Build {
     settings(testsSettings: _*).
     dependsOn(core, scalacheckBinding)
 
-  lazy val testsSettings = Seq(
+  lazy val testsSettings = commonSettings ++ Seq(
     name := "spire-tests",
     libraryDependencies ++= Seq(
       scalaTest % "test"
@@ -258,7 +260,7 @@ object MyBuild extends Build {
     settings(benchmarkSettings: _*).
     dependsOn(core)
 
-  lazy val benchmarkSettings = Seq(
+  lazy val benchmarkSettings = commonSettings ++ Seq(
     name := "spire-benchmark",
 
     // raise memory limits here if necessary
@@ -290,7 +292,7 @@ object MyBuild extends Build {
     settings(benchmarkJmhSettings: _*).
     dependsOn(core, benchmark)
 
-  lazy val benchmarkJmhSettings = SbtJmh.jmhSettings ++ Seq(
+  lazy val benchmarkJmhSettings = commonSettings ++ SbtJmh.jmhSettings ++ Seq(
     name := "spire-benchmark-jmh"
   ) ++ noPublish
 
