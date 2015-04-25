@@ -163,6 +163,20 @@ class AlgebraicTest extends FunSuite with PropertyChecks {
   }
 
   // This was a failing test case found using the property tests above.
+  test("root isolation uses inverse transform to map upper-bound") {
+    import spire.implicits._
+    val roots = List(
+      Rational("16279/50267"),
+      Rational("223/175")
+    )
+    val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
+    val algebraicRoots = Algebraic.roots(poly)
+    (roots.sorted zip algebraicRoots).forall { case (qRoot, aRoot) =>
+      aRoot == Algebraic(qRoot)
+    }
+  }
+
+  // This was a failing test case found using the property tests above.
   test("divide by zero bug on near-zero root refinement") {
     import spire.implicits._
     // A failing special case of "algebraic root is zero", where the root is

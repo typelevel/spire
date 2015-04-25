@@ -77,10 +77,15 @@ object RootIsolator {
               rec(rest, acc)
 
             case 1 => // Isolated exactly 1 root.
-              def ub = {
+              def ub: Rational = {
                 val exp = Roots.upperBound(p)
-                if (exp >= 0) Rational(BigInt(1) << exp)
-                else Rational(1, BigInt(1) << -exp)
+                // This is an upper bound for p, but not for the initial poly.
+                val ub0 =
+                  if (exp >= 0) Rational(BigInt(1) << exp)
+                  else Rational(1, BigInt(1) << -exp)
+                // We map the upper bound for p back to a bound for the initial
+                // polynomial by using the inverse Mobius transformation.
+                (Rational(d) * ub0 - Rational(b)) / (Rational(-c) * ub0 + Rational(a))
               }
               val i0 = if (c == 0) ub else Rational(a, c)
               val i1 = if (d == 0) ub else Rational(b, d)

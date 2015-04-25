@@ -536,8 +536,8 @@ object Algebraic extends AlgebraicInstances {
         new Algebraic(Expr.ConstantRational(value))
       case (Bounded(lb, ub, _), i) =>
         new Algebraic(Expr.ConstantRoot(zpoly, i, lb, ub))
-      case _ =>
-        throw new RuntimeException("invalid isolated root interval")
+      case x =>
+        throw new RuntimeException(s"invalid isolated root interval: $x")
     }
   }
 
