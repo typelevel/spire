@@ -8,9 +8,6 @@ import org.scalacheck.Arbitrary._
 import spire.math.{Jet, JetDim}
 import spire.implicits._
 
-/** 
- * Cooperative Equality for Jet.
- */
 object JetCoopEqProp extends Properties("Jet") {
 
 	implicit val jetDim: JetDim = JetDim(23) // 23 is arbitrary

@@ -17,6 +17,7 @@ object Utility {
   val COMPLEX   = "Complex"
   val JET       = "Jet"
   val NATURAL   = "Natural"
+  val NUMBER    = "Number"
 
   val INT         = "Int"
   val LONG 	      = "Long"
@@ -25,6 +26,7 @@ object Utility {
   val BIG_INT     = "BigInt"
   val RATIONAL    = "Rational"
   val BIG_DECIMAL = "BigDecimal"
+  val SAFE_LONG   = "SafeLong"
 
   val genSafeLong: Gen[SafeLong]                      = arbitrary[Long].map(SafeLong(_))
   implicit val arbitrarySafeLong: Arbitrary[SafeLong] = Arbitrary(genSafeLong)

@@ -9,9 +9,6 @@ import org.scalacheck.Test.Parameters
 import spire.math.{Algebraic, Rational, SafeLong}
 import spire.laws.cooperative_equality.Utility.arbitrarySafeLong
 
-/** 
- * Cooperative Equality for Algebraic
- */
 object AlgebraicCoopEqProp extends Properties("Algebraic") {
 
 	val genAlgebraicInt: Gen[Algebraic]                 = arbitrary[Int].map(Algebraic(_))

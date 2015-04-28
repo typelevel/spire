@@ -11,9 +11,6 @@ import spire.implicits._
 
 import spire.laws.cooperative_equality.Utility.arbitraryRational
 
-/** 
- * Cooperative Equality for Complex.
- */
 object ComplexCoopEqProp extends Properties("Complex") {
 
 	val genComplexInt: Gen[Complex[Int]] = for {
