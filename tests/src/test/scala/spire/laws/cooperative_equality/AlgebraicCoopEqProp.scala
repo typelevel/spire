@@ -20,7 +20,7 @@ object AlgebraicCoopEqProp extends Properties("Algebraic") {
     neg <- Gen.choose(Long.MinValue, -1)
     pos <- Gen.choose(1, Long.MaxValue)
     den <- Gen.oneOf(neg, pos)
-  } yield Rational(num, den)
+  } yield Algebraic(Rational(num, den))
   val genAlgebraicBigDecimal: Gen[Algebraic] = arbitrary[BigDecimal].map(Algebraic(_))
 
   val intProps: List[Prop]        = Utility.props[Algebraic](genAlgebraicInt)
