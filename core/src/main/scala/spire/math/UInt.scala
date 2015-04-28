@@ -118,6 +118,7 @@ private[math] trait UIntIsSigned extends Signed[UInt] {
 
 private[math] trait UIntIsReal extends IsIntegral[UInt] with UIntOrder with UIntIsSigned {
   def toDouble(n: UInt): Double = n.toDouble
+  def toBigInt(n: UInt): BigInt = n.toBigInt
 }
 
 @SerialVersionUID(0L)

@@ -62,6 +62,7 @@ trait IntIsSigned extends Signed[Int] {
 
 trait IntIsReal extends IsIntegral[Int] with IntOrder with IntIsSigned {
   def toDouble(n: Int): Double = n.toDouble
+  def toBigInt(n: Int): BigInt = BigInt(n)
 }
 
 @SerialVersionUID(0L)

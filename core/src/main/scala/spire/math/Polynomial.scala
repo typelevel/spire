@@ -6,11 +6,16 @@ import scala.annotation.tailrec
 import scala.reflect.ClassTag
 import scala.{specialized => spec}
 
+import java.math.{ BigDecimal => JBigDecimal, RoundingMode, MathContext }
+
 import spire.algebra._
 import spire.math.poly._
 import spire.std.array._
+import spire.std.bigInt._
+import spire.std.bigDecimal._
 import spire.syntax.field._
 import spire.syntax.eq._
+import spire.syntax.signed._
 import spire.syntax.std.seq._
 
 /**
@@ -58,10 +63,18 @@ object Polynomial extends PolynomialInstances {
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map(0 -> c))
   def linear[@spec(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map(1 -> c))
+  def linear[@spec(Double) C: Eq: Semiring: ClassTag](c1: C, c0: C): Polynomial[C] =
+    Polynomial(Map(1 -> c1, 0 -> c0))
+  def quadratic[@spec(Double) C: Eq: Semiring: ClassTag](c1: C, c0: C): Polynomial[C] =
+    Polynomial(Map(1 -> c1, 0 -> c0))
   def quadratic[@spec(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map(2 -> c))
+  def quadratic[@spec(Double) C: Eq: Semiring: ClassTag](c2: C, c1: C, c0: C): Polynomial[C] =
+    Polynomial(Map(2 -> c2, 1 -> c1, 0 -> c0))
   def cubic[@spec(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
     if (c === Semiring[C].zero) zero[C] else Polynomial(Map(3 -> c))
+  def cubic[@spec(Double) C: Eq: Semiring: ClassTag](c3: C, c2: C, c1: C, c0: C): Polynomial[C] =
+    Polynomial(Map(3 -> c3, 2 -> c2, 1 -> c1, 0 -> c0))
   def one[@spec(Double) C: Eq: Rig: ClassTag]: Polynomial[C] =
     constant(Rig[C].one)
   def x[@spec(Double) C: Eq: Rig: ClassTag]: Polynomial[C] =
@@ -154,8 +167,18 @@ trait Polynomial[@spec(Double) C] { lhs =>
   /** Returns a polynomial that has a sparse representation. */
   def toSparse(implicit ring: Semiring[C], eq: Eq[C]): PolySparse[C]
 
+  /**
+   * Traverses each term in this polynomial, in order of degree, lowest to
+   * highest (eg. constant term would be first) and calls `f` with the degree
+   * of term and its coefficient. This may skip zero terms, or it may not.
+   */
   def foreach[U](f: (Int, C) => U): Unit
 
+  /**
+   * Traverses each non-zero term in this polynomial, in order of degree, lowest
+   * to highest (eg. constant term would be first) and calls `f` with the degree
+   * of term and its coefficient.
+   */
   def foreachNonZero[U](f: (Int, C) => U)(implicit ring: Semiring[C], eq: Eq[C]): Unit =
     foreach { (e, c) => if (c =!= ring.zero) f(e, c) }
 
@@ -196,11 +219,47 @@ trait Polynomial[@spec(Double) C] { lhs =>
     bldr.result()
   }
 
+  /**
+   * Returns the real roots of this polynomial.
+   *
+   * Depending on `C`, the `finder` argument may need to be passed "explicitly"
+   * via an implicit conversion. This is because some types (eg `BigDecimal`,
+   * `Rational`, etc) require an error bound, and so provide implicit
+   * conversions to `RootFinder`s from the error type.  For instance,
+   * `BigDecimal` requires either a scale or MathContext. So, we'd call this
+   * method with `poly.roots(MathContext.DECIMAL128)`, which would return a
+   * `Roots[BigDecimal` whose roots are approximated to the precision specified
+   * in `DECIMAL128` and rounded appropriately.
+   *
+   * On the other hand, a type like `Double` doesn't require an error bound and
+   * so can be called without specifying the `RootFinder`.
+   *
+   * @param finder a root finder to extract roots with
+   * @return the real roots of this polynomial
+   */
+  def roots(implicit finder: RootFinder[C]): Roots[C] =
+    finder.findRoots(this)
+
   /** Returns the coefficient of the n-th degree term. */
   def nth(n: Int)(implicit ring: Semiring[C]): C
 
   /** Returns the term of the highest degree in this polynomial. */
   def maxTerm(implicit ring: Semiring[C]): Term[C] = Term(maxOrderTermCoeff, degree)
+
+  /**
+   * Returns the non-zero term of the minimum degree in this polynomial, unless
+   * it is zero. If this polynomial is zero, then this returns a zero term.
+   */
+  def minTerm(implicit ring: Semiring[C], eq: Eq[C]): Term[C] = {
+    foreachNonZero { (n, c) =>
+      return Term(c, n)
+    }
+    Term(ring.zero, 0)
+  }
+
+  /** Returns `true` iff this polynomial is constant. */
+  def isConstant: Boolean =
+    degree == 0
 
   /** Returns the degree of this polynomial. */
   def degree: Int
@@ -216,6 +275,9 @@ trait Polynomial[@spec(Double) C] { lhs =>
 
   /** Evaluate the polynomial at `x`. */
   def apply(x: C)(implicit r: Semiring[C]): C
+
+  def evalWith[A: Semiring: Eq: ClassTag](x: A)(f: C => A)(implicit ring: Semiring[C], eq: Eq[C]): A =
+    this.map(f).apply(x)
 
   /** Compose this polynomial with another. */
   def compose(y: Polynomial[C])(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = {
@@ -235,6 +297,73 @@ trait Polynomial[@spec(Double) C] { lhs =>
 
   def derivative(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C]
   def integral(implicit field: Field[C], eq: Eq[C]): Polynomial[C]
+
+  /**
+   * Returns the number of sign variations in the coefficients of this
+   * polynomial. Given 2 consecutive terms (ignoring 0 terms), a sign variation
+   * is indicated when the terms have differing signs.
+   */
+  def signVariations(implicit ring: Semiring[C], eq: Eq[C], signed: Signed[C]): Int = {
+    var prevSign: Sign = Sign.Zero
+    var variations = 0
+    foreachNonZero { (_, c) =>
+      val sign = signed.sign(c)
+      if (Sign.Zero != prevSign && sign != prevSign) {
+        variations += 1
+      }
+      prevSign = sign
+    }
+    variations
+  }
+
+  /**
+   * Removes all zero roots from this polynomial.
+   */
+  def removeZeroRoots(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] = {
+    val Term(_, k) = minTerm
+    mapTerms { case Term(c, n) => Term(c, n - k) }
+  }
+
+  def map[D: Semiring: Eq: ClassTag](f: C => D)(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[D] =
+    mapTerms { case Term(c, n) => Term(f(c), n) }
+
+  def mapTerms[D: Semiring: Eq: ClassTag](f: Term[C] => Term[D])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[D] =
+    Polynomial(terms map f)
+
+  /**
+   * Returns this polynomial shifted by `h`. Equivalent to calling
+   * `poly.compose(x + h)`.
+   */
+  def shift(h: C)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] =
+    compose(Polynomial.x[C] + Polynomial.constant(h))
+
+  /**
+   * Translates this polynomial by `h`. Equivalent to calling
+   * `poly.compose(x - h)`.
+   */
+  def translate(h: C)(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] =
+    compose(Polynomial.x[C] - Polynomial.constant(h))
+
+  /**
+   * Replace `x`, the variable, in this polynomial with `-x`. This will
+   * flip/mirror the polynomial about the y-axis.
+   */
+  def flip(implicit ring: Rng[C], eq: Eq[C]): Polynomial[C] =
+    mapTerms { case term @ Term(coeff, exp) =>
+      if (exp % 2 == 0) term
+      else Term(-coeff, exp)
+    }
+
+  /**
+   * Returns the reciprocal of this polynomial. Essentially, if this polynomial
+   * is `p` with degree `n`, then returns a polynomial `q(x) = x^n*p(1/x)`.
+   *
+   * @see http://en.wikipedia.org/wiki/Reciprocal_polynomial
+   */
+  def reciprocal(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] =
+    mapTerms { case term @ Term(coeff, exp) =>
+      Term(coeff, degree - exp)
+    }
 
   // EuclideanRing ops.
 

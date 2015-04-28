@@ -730,6 +730,7 @@ private[math] trait NaturalIsSigned extends Signed[Natural] {
 private[math] trait NaturalIsReal extends IsIntegral[Natural]
 with NaturalOrder with NaturalIsSigned {
   def toDouble(n: Natural): Double = n.toDouble
+  def toBigInt(n: Natural): BigInt = n.toBigInt
 }
 
 @SerialVersionUID(0L)

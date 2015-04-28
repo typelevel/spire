@@ -125,6 +125,7 @@ private[math] trait UShortIsSigned extends Signed[UShort] {
 
 private[math] trait UShortIsReal extends IsIntegral[UShort] with UShortOrder with UShortIsSigned {
   def toDouble(n: UShort): Double = n.toDouble
+  def toBigInt(n: UShort): BigInt = n.toBigInt
 }
 
 @SerialVersionUID(0L)

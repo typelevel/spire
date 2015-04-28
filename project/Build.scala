@@ -55,7 +55,7 @@ object MyBuild extends Build {
     scalaVersion := "2.11.6",
 
     // https://github.com/non/spire/pull/413#issuecomment-89896773
-    crossScalaVersions := Seq("2.10.2", "2.11.6"),
+    crossScalaVersions := Seq("2.10.4", "2.11.6"),
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
