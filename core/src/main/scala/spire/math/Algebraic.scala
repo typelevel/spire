@@ -573,8 +573,15 @@ object Algebraic extends AlgebraicInstances {
   sealed abstract class Expr extends Serializable {
     import Expr._
 
-    /** A set of flags we can quickly compute for an [[Algebraic]] expression. */
-    def flags: Flags
+    protected def flagBits: Int
+
+    /**
+     * A set of flags we can quickly compute for an [[Algebraic]] expression.
+     *
+     * @note we have to do this round-about trip between flagsBits and flags
+     * because of 
+     */
+    def flags: Flags = new Flags(flagBits)
 
     private val bounds: TrieMap[ZeroBoundFunction, Any] =
       new TrieMap
@@ -732,13 +739,13 @@ object Algebraic extends AlgebraicInstances {
     sealed abstract class BinaryExpr extends Expr {
       val lhs: Expr
       val rhs: Expr
-      val flags: Flags = lhs.flags | rhs.flags
+      val flagBits: Int = (lhs.flags | rhs.flags).bits
       def children: List[Expr] = lhs :: rhs :: Nil
     }
 
     @SerialVersionUID(0L)
     case class ConstantLong(value: Long) extends Constant[Long] {
-      def flags: Flags = Flags.IntegerLeaf
+      def flagBits: Int = Flags.IntegerLeaf.bits
 
       def upperBound: BitBound =
         if (value == 0L) new BitBound(0L)
@@ -753,7 +760,7 @@ object Algebraic extends AlgebraicInstances {
 
     @SerialVersionUID(0L)
     case class ConstantDouble(value: Double) extends Constant[Double] {
-      def flags: Flags = Flags.DoubleLeaf
+      def flagBits: Int = Flags.DoubleLeaf.bits
 
       def upperBound: BitBound = if (value == 0D) {
         new BitBound(0)
@@ -772,7 +779,7 @@ object Algebraic extends AlgebraicInstances {
 
     @SerialVersionUID(0L)
     case class ConstantBigDecimal(value: BigDecimal) extends Constant[BigDecimal] {
-      def flags: Flags = Flags.BigDecimalLeaf
+      def flagBits: Int = Flags.BigDecimalLeaf.bits
 
       def upperBound: BitBound = if (value.signum == 0) {
         new BitBound(0)
@@ -788,7 +795,7 @@ object Algebraic extends AlgebraicInstances {
 
     @SerialVersionUID(0L)
     case class ConstantRational(value: Rational) extends Constant[Rational] {
-      def flags: Flags = Flags.RationalLeaf
+      def flagBits: Int = Flags.RationalLeaf.bits
 
       def upperBound: BitBound =
         new BitBound(value.numerator.abs.bitLength - value.denominator.bitLength + 1)
@@ -806,7 +813,7 @@ object Algebraic extends AlgebraicInstances {
     case class ConstantRoot(poly: Polynomial[BigInt], i: Int, lb: Rational, ub: Rational) extends Constant[Polynomial[BigInt]] {
       def value: Polynomial[BigInt] = poly
 
-      def flags: Flags = Flags.IsRadical
+      def flagBits: Int = Flags.IsRadical.bits
 
       def upperBound: BitBound =
         if (ub.signum > 0) {
@@ -835,7 +842,7 @@ object Algebraic extends AlgebraicInstances {
 
     @SerialVersionUID(0L)
     case class Neg(sub: Expr) extends UnaryExpr {
-      def flags: Flags = sub.flags
+      def flagBits: Int = sub.flags.bits
       def upperBound: BitBound = sub.upperBound
       def signum: Int = -sub.signum
       def toBigDecimal(digits: Int): JBigDecimal =
@@ -931,7 +938,7 @@ object Algebraic extends AlgebraicInstances {
 
     @SerialVersionUID(0L)
     case class KRoot(sub: Expr, k: Int) extends UnaryExpr {
-      val flags: Flags = sub.flags | Flags.IsRadical
+      val flagBits: Int = (sub.flags | Flags.IsRadical).bits
 
       def upperBound: BitBound = (sub.upperBound + 1) / 2
 
@@ -964,7 +971,7 @@ object Algebraic extends AlgebraicInstances {
     case class Pow(sub: Expr, k: Int) extends UnaryExpr {
       require(k > 1)
 
-      def flags: Flags = sub.flags
+      def flagBits: Int = sub.flags.bits
 
       def upperBound: BitBound = sub.upperBound * k
       def signum: Int = {
