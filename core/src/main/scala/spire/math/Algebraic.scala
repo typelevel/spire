@@ -672,7 +672,6 @@ object Algebraic extends AlgebraicInstances {
   }
 
   object Expr {
-    private def mc(digits: Int): MathContext = new MathContext(digits, RoundingMode.DOWN)
 
     /**
      * A set of flags for algebraic expressions, so we can quickly determine
