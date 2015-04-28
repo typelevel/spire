@@ -64,5 +64,4 @@ object ComplexCoopEqProp extends Properties("Complex") {
 
   	Utility.printPreTestRun(Utility.COMPLEX, Utility.RATIONAL)
   	rationalProps.foreach(_.check)  
-
 }

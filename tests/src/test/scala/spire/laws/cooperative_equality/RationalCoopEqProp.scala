@@ -13,5 +13,4 @@ object RationalCoopEqProp extends Properties("Rational") {
 
 	println("Checking Rational's (1) Cooperative Equality, Commutativity for (2) + and (3) *, as well as (4) Transitivity.")
 	props.foreach(_.check)
-
 }

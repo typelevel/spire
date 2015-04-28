@@ -19,5 +19,4 @@ object UByteCoopEqProp extends Properties("UByte") {
 
 	Utility.printPreTestRun(Utility.UBYTE, Utility.INT)
   	intProps.foreach(_.check)  	
-
 }

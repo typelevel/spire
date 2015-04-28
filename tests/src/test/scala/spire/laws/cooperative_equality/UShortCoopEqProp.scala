@@ -24,5 +24,4 @@ object UShortCoopEqProp extends Properties("UShort") {
 
 	Utility.printPreTestRun(Utility.USHORT, Utility.INT)
   	intProps.foreach(_.check)
-
 }

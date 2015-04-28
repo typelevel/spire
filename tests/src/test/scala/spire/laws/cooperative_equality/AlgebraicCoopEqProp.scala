@@ -48,5 +48,4 @@ object AlgebraicCoopEqProp extends Properties("Algebraic") {
   // ERROR: failed to terminate after ~1 hour
   // Utility.printPreTestRun(Utility.ALGEBRAIC, Utility.BIG_DECIMAL)
   // bigDecimalProps.foreach(_.check(Parameters.default.withMinSuccessfulTests(10)))
-
 }

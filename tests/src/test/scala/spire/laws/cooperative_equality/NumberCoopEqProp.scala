@@ -36,5 +36,4 @@ object NumberCoopEqProp extends Properties("Number") {
 
     Utility.printPreTestRun(Utility.NUMBER, Utility.RATIONAL)
   	rationalProps.foreach(_.check)  	 	  	
-
 }
