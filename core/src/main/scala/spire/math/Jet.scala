@@ -11,12 +11,19 @@ import spire.syntax.isReal._
 import spire.syntax.nroot._
 import spire.syntax.vectorSpace._
 
+import spire.macros.JetDimMacro
+
 /**
  * Used to implicitly define the dimensionality of the Jet space.
  * @param dimension the number of dimensions.
  */
 case class JetDim(dimension: Int) {
   require(dimension > 0)
+}
+
+object JetDim {
+  import language.experimental.macros
+  def apply(dimension: Int): JetDim = macro JetDimMacro.apply
 }
 
 /**
