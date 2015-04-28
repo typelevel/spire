@@ -9,7 +9,6 @@ import org.scalacheck.Test.Parameters
 import spire.math.{Number, SafeLong, Rational}
 
 object NumberCoopEqProp extends Properties("Number") {
-	
 
 	val genInt: Gen[Number]        = arbitrary[Int].map(Number(_))
 	val genLong: Gen[Number]       = arbitrary[Long].map(Number(_))
@@ -22,7 +21,6 @@ object NumberCoopEqProp extends Properties("Number") {
 	val bigIntProps: List[Prop] = Utility.props[Number](genBigInt)
 	val safeLongProps: List[Prop] = Utility.props[Number](genSafeLong)
 	val rationalProps: List[Prop] = Utility.props[Number](genRational)
-
 
     Utility.printPreTestRun(Utility.NUMBER, Utility.INT)
   	intProps.foreach(_.check)

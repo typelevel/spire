@@ -5,19 +5,26 @@ import org.scalacheck.Prop.forAll
 import org.scalacheck.Prop._
 import org.scalacheck.Arbitrary._
 
-import spire.algebra.Ring
+import spire.algebra.Semiring
 import spire.math.{SafeLong, Rational}
 import spire.implicits._
 
 object Utility {
 
-  def coopEquals[A](x: A, y: A): Boolean = x == y && x.hashCode == y.hashCode
+  def coopEquals[A](x: A, y: A): Boolean = 
+    x == y && x.hashCode == y.hashCode
 
-  val ALGEBRAIC = "Algebraic"
-  val COMPLEX   = "Complex"
-  val JET       = "Jet"
-  val NATURAL   = "Natural"
-  val NUMBER    = "Number"
+  val ALGEBRAIC  = "Algebraic"
+  val COMPLEX    = "Complex"
+  val JET        = "Jet"
+  val NATURAL    = "Natural"
+  val NUMBER     = "Number"
+  val QUATERNION = "Quaterion"
+  val REAL       = "Real"
+  val UBYTE      = "UByte"
+  val USHORT     = "UShort"
+  val UINT       = "UInt"
+  val ULONG      = "ULong"
 
   val INT         = "Int"
   val LONG 	      = "Long"
@@ -27,11 +34,17 @@ object Utility {
   val RATIONAL    = "Rational"
   val BIG_DECIMAL = "BigDecimal"
   val SAFE_LONG   = "SafeLong"
+  val STRING      = "String"
+  val BYTE        = "Byte"
+  val SHORT       = "Short"
+  val CHAR        = "Char"
 
   val genSafeLong: Gen[SafeLong]                      = arbitrary[Long].map(SafeLong(_))
   implicit val arbitrarySafeLong: Arbitrary[SafeLong] = Arbitrary(genSafeLong)
 
-  def props[A : Ring](g: Gen[A]): List[Prop] = {
+  // Note - it's assumed that the SemiRing instance supports commutativity
+  // https://groups.google.com/forum/#!topic/spire-math/7r7SDbMd4AM
+  def props[A : Semiring](g: Gen[A]): List[Prop] = {
     val commutativeAdd = forAll(g, g) { (a: A, b: A) =>
       coopEquals(a+b,b+a) 
     }
