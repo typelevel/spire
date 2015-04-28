@@ -16,7 +16,6 @@ import spire.laws.cooperative_equality.Utility.arbitraryRational
  */
 object ComplexCoopEqProp extends Properties("Complex") {
 
-	// TODO: scrap boilerplate?
 	val genComplexInt: Gen[Complex[Int]] = for {
 		x <- arbitrary[Int]
 		y <- arbitrary[Int]
