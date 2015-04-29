@@ -22,8 +22,8 @@ case class JetDim(dimension: Int) {
 }
 
 object JetDim {
-  import language.experimental.macros
-  def apply(dimension: Int): JetDim = macro JetDimMacro.apply
+  private def validate(dimension: Int): Int = macro JetDimMacro.apply
+  def build(dimension: Int): JetDim = JetDim(validate(dimension))
 }
 
 /**
