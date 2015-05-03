@@ -7,6 +7,7 @@ import java.math.{ BigDecimal => JBigDecimal, RoundingMode, MathContext }
 
 import spire.algebra._
 import spire.std.bigInt._
+import spire.std.bigDecimal._
 import spire.syntax.signed._
 
 case class BigDecimalRootRefinement(
@@ -65,13 +66,19 @@ case class BigDecimalRootRefinement(
 }
 
 object BigDecimalRootRefinement {
-  def apply(poly: Polynomial[BigInt], lowerBound: Rational, upperBound: Rational): BigDecimalRootRefinement =
-    BigDecimalRootRefinement(AbsoluteContext(poly.map(Rational(_))), Unbounded(lowerBound, upperBound))
+  def apply(poly: Polynomial[BigDecimal], lowerBound: Rational, upperBound: Rational): BigDecimalRootRefinement = {
+    // We expect the polynomial to evaluate with exact arithmetic, so we ditch
+    // whatever MathContext the user provided and use an UNLIMITED context. It
+    // would probably be best just to use JBigDecimal and avoid the unexpected
+    // precision loss inherent with using them.
+    val upoly = poly.map { n => new BigDecimal(n.bigDecimal, MathContext.UNLIMITED) }
+    BigDecimalRootRefinement(AbsoluteContext(upoly), Unbounded(lowerBound, upperBound))
+  }
 
-  def apply(poly: Polynomial[BigInt], lowerBound: Rational, upperBound: Rational, scale: Int): BigDecimalRootRefinement =
+  def apply(poly: Polynomial[BigDecimal], lowerBound: Rational, upperBound: Rational, scale: Int): BigDecimalRootRefinement =
     apply(poly, lowerBound, upperBound).refine(scale)
 
-  def apply(poly: Polynomial[BigInt], lowerBound: Rational, upperBound: Rational, mc: MathContext): BigDecimalRootRefinement =
+  def apply(poly: Polynomial[BigDecimal], lowerBound: Rational, upperBound: Rational, mc: MathContext): BigDecimalRootRefinement =
     apply(poly, lowerBound, upperBound).refine(mc)
 
   private implicit object JBigDecimalOrder extends Signed[JBigDecimal] with Order[JBigDecimal] {
@@ -90,7 +97,7 @@ object BigDecimalRootRefinement {
   case class Unbounded(lowerBound: Rational, upperBound: Rational) extends Approximation
 
   sealed abstract class ApproximationContext {
-    def poly: Polynomial[Rational]
+    def poly: Polynomial[BigDecimal]
     def getEps(x: JBigDecimal): Int
     def evalExact(x: JBigDecimal): JBigDecimal
     def floor(x: Rational): JBigDecimal
@@ -99,13 +106,13 @@ object BigDecimalRootRefinement {
     def ceil(x: JBigDecimal): JBigDecimal
   }
 
-  case class AbsoluteContext(poly: Polynomial[Rational], scale: Int = Int.MinValue) extends ApproximationContext {
+  case class AbsoluteContext private[poly] (poly: Polynomial[BigDecimal], scale: Int = Int.MinValue) extends ApproximationContext {
     def getEps(x: JBigDecimal): Int = scale
 
     def evalExact(x: JBigDecimal): JBigDecimal =
-      poly(Rational(new BigDecimal(x, MathContext.UNLIMITED)))
-        .toBigDecimal(scale, RoundingMode.UP)
+      poly(new BigDecimal(x, MathContext.UNLIMITED))
         .bigDecimal
+        .setScale(scale, RoundingMode.UP)
 
     def floor(x: Rational): JBigDecimal =
       x.toBigDecimal(scale, RoundingMode.FLOOR).bigDecimal
@@ -120,14 +127,14 @@ object BigDecimalRootRefinement {
       x.setScale(scale, RoundingMode.CEILING)
   }
 
-  case class RelativeContext(poly: Polynomial[Rational], mc: MathContext = new MathContext(0)) extends ApproximationContext {
+  case class RelativeContext private[poly] (poly: Polynomial[BigDecimal], mc: MathContext = new MathContext(0)) extends ApproximationContext {
     def getEps(x: JBigDecimal): Int =
       x.scale - spire.math.ceil(x.unscaledValue.bitLength * bits2dec).toInt + mc.getPrecision + 1
 
     def evalExact(x: JBigDecimal): JBigDecimal =
-      poly(Rational(new BigDecimal(x, MathContext.UNLIMITED)))
-        .toBigDecimal(mc)
+      poly(new BigDecimal(x, MathContext.UNLIMITED))
         .bigDecimal
+        .round(mc)
 
     def floor(x: Rational): JBigDecimal =
       x.toBigDecimal(new MathContext(mc.getPrecision, RoundingMode.CEILING)).bigDecimal
@@ -155,20 +162,28 @@ object BigDecimalRootRefinement {
   ): Approximation = {
     import context._
 
-    val qlb = Rational(new BigDecimal(lb, MathContext.UNLIMITED))
-    val qub = Rational(new BigDecimal(ub, MathContext.UNLIMITED))
+    // We avoid rational arithmetic by using the fact:
+    // poly.compose(x + a/b) == poly.compose(x/b).compose(b*x + a)
+    // If we first scale the polynomial by b^poly.degree, then the roots
+    // remain the same, but the first composition will partially cancel with
+    // b^poly.degree, leaving an integer.
+    def shift(poly: Polynomial[BigDecimal], h: Rational): Polynomial[BigDecimal] = {
+      val n = poly.degree
+      poly
+        .mapTerms { case Term(coeff, k) =>
+          val a = BigDecimal(h.denominator.pow(n - k), MathContext.UNLIMITED)
+          Term(coeff * a, k)
+        }
+        .compose(Polynomial.linear[BigDecimal](BigDecimal(h.denominator, MathContext.UNLIMITED), BigDecimal(h.numerator, MathContext.UNLIMITED)))
+        .removeZeroRoots
+    }
 
     // Returns true if there is a root in the open sub-interval (l, r).
     def hasRoot(l: Rational, r: Rational): Boolean =
       if (l != r) {
-        val poly0 = poly
-          .shift(l)
-          .removeZeroRoots
-          .reciprocal
-          .shift((r - l).reciprocal)
-          .removeZeroRoots
         // Ue Descartes' rule of signs to see if the root in the open interval
         // is actually in the sub interval (l, r).
+        val poly0 = shift(shift(poly, l), (r - l).reciprocal)
         poly0.signVariations % 2 == 1
       } else {
         false

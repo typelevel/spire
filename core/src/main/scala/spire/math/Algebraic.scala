@@ -15,6 +15,7 @@ import spire.algebra.Sign.{ Positive, Negative, Zero }
 import spire.macros.Checked.checked
 import spire.math.poly.{ Term, BigDecimalRootRefinement, RootFinder, Roots }
 import spire.std.bigInt._
+import spire.std.bigDecimal._
 import spire.std.long._
 import spire.syntax.order._
 import spire.syntax.std.seq._
@@ -299,7 +300,9 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
         val den = new JBigDecimal(n.denominator.bigInteger)
         num.divide(den, new MathContext(digits, roundingMode))
       case ConstantRoot(poly, _, lb, ub) =>
-        BigDecimalRootRefinement(poly, lb, ub, new MathContext(digits, roundingMode)).approximateValue
+        // Ugh - on an airplane and can't trust BigDecimal's constructors.
+        val poly0 = poly.map { n => new BigDecimal(new JBigDecimal(n.bigInteger), MathContext.UNLIMITED) }
+        BigDecimalRootRefinement(poly0, lb, ub, new MathContext(digits, roundingMode)).approximateValue
       case Neg(sub) =>
         rec(sub, digits).negate()
       case Add(_, _) | Sub(_, _) if e.signum == 0 =>
@@ -784,7 +787,9 @@ object Algebraic extends AlgebraicInstances {
       def upperBound: BitBound = if (value.signum == 0) {
         new BitBound(0)
       } else {
-        new BitBound(ceil(log(value.abs)).toLong)
+        // We just need a couple of digits, really.
+        val mc = new MathContext(4, RoundingMode.UP)
+        new BitBound(ceil(log(value.abs(mc))).toLong)
       }
 
       def signum: Int = value.signum
@@ -826,8 +831,10 @@ object Algebraic extends AlgebraicInstances {
         if (lb.signum != 0) lb.signum
         else ub.signum
 
-      private val refinement: AtomicReference[BigDecimalRootRefinement] =
-        new AtomicReference(BigDecimalRootRefinement(poly, lb, ub))
+      private val refinement: AtomicReference[BigDecimalRootRefinement] = {
+        val poly0 = poly.map { n => new BigDecimal(new JBigDecimal(n.bigInteger), MathContext.UNLIMITED) }
+        new AtomicReference(BigDecimalRootRefinement(poly0, lb, ub))
+      }
 
       def toBigDecimal(digits: Int): JBigDecimal = {
         val oldRefinement = refinement.get
@@ -854,7 +861,7 @@ object Algebraic extends AlgebraicInstances {
       def upperBound: BitBound =
         new BitBound(max(lhs.upperBound.bitBound, rhs.upperBound.bitBound) + 1)
 
-      def signum: Int = {
+      lazy val signum: Int = {
         val maxDigits = separationBound.decimalDigits + 1
         val approxOnly = maxDigits > Int.MaxValue
 

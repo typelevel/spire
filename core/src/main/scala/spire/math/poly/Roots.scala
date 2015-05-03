@@ -105,7 +105,7 @@ private[poly] class BigDecimalSimpleRoots(
         value.toBigDecimal(scale, RoundingMode.HALF_EVEN)
       case Bounded(lb, ub, _) =>
         new BigDecimal(
-          BigDecimalRootRefinement(zpoly, lb, ub, scale).approximateValue,
+          BigDecimalRootRefinement(poly, lb, ub, scale).approximateValue,
           MathContext.UNLIMITED
         )
       case _ =>
