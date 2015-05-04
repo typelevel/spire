@@ -340,11 +340,14 @@ case class SafeLongLong(x: Long) extends SafeLong {
 
   override def equals(that: Any): Boolean =
     that match {
-      case SafeLongLong(y) => x == y
+      case that: SafeLongLong => ===(that)
       case SafeLongBigInt(y) => false
       case that: BigInt => if (that.bitLength > 63) false else that.toLong == x
       case that => that == x
     }
+
+  def ===(that: SafeLongLong): Boolean =
+    x == that.x
 
   def abs: SafeLong =
     if (x >= 0) this
@@ -439,10 +442,13 @@ case class SafeLongBigInt(x: BigInt) extends SafeLong {
   override def equals(that: Any): Boolean =
     that match {
       case SafeLongLong(y) => false
-      case SafeLongBigInt(y) => x == y
+      case that: SafeLongBigInt => ===(that)
       case that: BigInt => x == that
       case that => that == x
     }
+
+  def ===(that: SafeLongBigInt): Boolean = 
+    x == that.x
 
   def abs: SafeLong =
     if (x.signum >= 0) this

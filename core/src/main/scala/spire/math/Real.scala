@@ -28,9 +28,13 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   override def hashCode(): Int = toRational.hashCode
 
   override def equals(y: Any): Boolean = y match {
-    case y: Real => x eqv y
+    case y: Real => ===(y)
     case y => toRational.equals(y)
   }
+
+  // TODO: should `eqv` and `===` both be used?
+  def ===(y: Real): Boolean =
+    x eqv y
 
   def eqv(y: Real): Boolean = (x compare y) == 0
 
