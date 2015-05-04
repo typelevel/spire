@@ -154,6 +154,7 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
 
   override def equals(that: Any): Boolean = that match {
     case that: IntNumber => this === that
+    case that: Number => that == this
     case that => n == that
   }
 
