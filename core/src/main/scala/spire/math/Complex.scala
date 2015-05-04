@@ -331,13 +331,15 @@ final case class Complex[@spec(Float, Double) T](real: T, imag: T)
 
   // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
-    case that: Complex[_] =>
-      real == that.real && imag == that.imag
+    case that: Complex[_]    => ===(that)
     case that: Quaternion[_] =>
       real == that.r && imag == that.i && anyIsZero(that.j) && anyIsZero(that.k)
     case that =>
       anyIsZero(imag) && real == that
   }
+
+  def ===(that: Complex[_]): Boolean =
+    real == that.real && imag == that.imag
 
   override def toString: String = s"($real + ${imag}i)"
 

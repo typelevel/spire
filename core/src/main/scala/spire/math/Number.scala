@@ -153,10 +153,12 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
   }
 
   override def equals(that: Any): Boolean = that match {
-    case IntNumber(m) => n == m
-    case that: Number => that == this
+    case that: IntNumber => ===(that)
     case that => n == that
   }
+
+  def ===(that: IntNumber): Boolean =
+    n == that.n
 
   def unary_- = Number(-n)
 
@@ -299,11 +301,14 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   }
 
   override def equals(that: Any): Boolean = that match {
+    case that: FloatNumber => ===(that)
     case IntNumber(m) => m == m.toDouble.toLong && m == n
-    case FloatNumber(m) => n == m
     case that: Number => that == this
     case that => n == that
   }
+
+  def ===(that: FloatNumber): Boolean = 
+    n == that.n
 
   def unary_- = Number(-n)
 
@@ -448,12 +453,15 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
   def compare(rhs: Number) = n compare rhs.toBigDecimal
 
   override def equals(that: Any): Boolean = that match {
+    case that: DecimalNumber => ===(that)
     case IntNumber(m) => n == m.toBigDecimal
     case FloatNumber(m) => n == m
-    case DecimalNumber(m) => n == m
     case RationalNumber(m) => m == n
     case that => that == n
   }
+
+  def ===(that: DecimalNumber): Boolean =
+    n == that.n
 
   def unary_- = Number(-n)
 
@@ -524,12 +532,15 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
   def compare(rhs: Number) = n compare rhs.toRational
 
   override def equals(that: Any): Boolean = that match {
+    case that: RationalNumber => ===(that)
     case IntNumber(m) => n == m.toBigDecimal
     case FloatNumber(m) => n == m
-    case DecimalNumber(m) => n == m
-    case RationalNumber(m) => n == m
+    case DecimalNumber(m) => n == m    
     case that => n == that
   }
+
+  def ===(that: RationalNumber): Boolean =
+    n == that.n
 
   def unary_- = Number(-n)
 
