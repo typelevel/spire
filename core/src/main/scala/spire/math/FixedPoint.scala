@@ -42,6 +42,9 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     else throw new FixedPointOverflow(long)
 
   def === (rhs: FixedPoint): Boolean = lhs.long == rhs.long
+
+  def =!= (rhs: FixedPoint): Boolean = !(this === rhs)
+
   def != (rhs: FixedPoint): Boolean = lhs.long != rhs.long
 
   def abs: FixedPoint =

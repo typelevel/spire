@@ -49,6 +49,9 @@ class UByte(val signed: Byte) extends AnyVal with scala.math.ScalaNumericAnyConv
   def ===(that: UByte) = 
     this.signed == that.signed
 
+  def =!=(that: UByte) = 
+    !(this === that)  
+
   def unary_- = UByte(-this.signed)
 
   def + (that: UByte) = UByte(this.signed + that.signed)
