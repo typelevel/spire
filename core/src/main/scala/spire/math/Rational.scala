@@ -709,9 +709,12 @@ private[math] object LongRationals extends Rationals[Long] {
     }
 
     override def equals(that: Any): Boolean = that match {
-      case that: LongRational => this.n == that.n && this.d == that.d
+      case that: LongRational => ===(that)
       case _ => super.equals(that)
     }
+
+    def ===(that: LongRational): Boolean =
+      this.n == that.n && this.d == that.d
 
     override def longValue: Long =
       if(d == 1L) n
