@@ -3,7 +3,9 @@ package spire.math
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import spire.algebra.{Field, IsReal, NRoot, Sign}
+import java.math.{ BigDecimal => JBigDecimal, MathContext, RoundingMode }
+
+import spire.algebra.{Field, IsRational, NRoot, Sign}
 import spire.algebra.Sign.{ Positive, Zero, Negative }
 import spire.macros.Checked
 import spire.std.long.LongAlgebra
@@ -48,8 +50,19 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def gcd(rhs: Rational): Rational
 
+  def toBigDecimal(scale: Int, mode: RoundingMode): BigDecimal = {
+    val n = new JBigDecimal(numerator.bigInteger)
+    val d = new JBigDecimal(denominator.bigInteger)
+    BigDecimal(n.divide(d, scale, mode))
+  }
+
+  def toBigDecimal(mc: MathContext): BigDecimal = {
+    val n = new JBigDecimal(numerator.bigInteger)
+    val d = new JBigDecimal(denominator.bigInteger)
+    BigDecimal(n.divide(d, mc))
+  }
+
   def toBigInt: BigInt
-  def toBigDecimal: BigDecimal
   override def shortValue = longValue.toShort
   override def byteValue = longValue.toByte
 
@@ -315,7 +328,6 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
     def isWhole: Boolean = den == one
 
     def toBigInt: BigInt = (integral.toBigInt(num) / integral.toBigInt(den))
-    def toBigDecimal: BigDecimal = integral.toBigDecimal(num) / integral.toBigDecimal(den)
 
     def longValue = toBigInt.longValue
     def intValue = longValue.intValue
@@ -334,7 +346,7 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
       val n = integral.toBigInt(num)
       val d = integral.toBigInt(den)
 
-      val sharedLength = Math.min(n.bitLength, d.bitLength)
+      val sharedLength = java.lang.Math.min(n.bitLength, d.bitLength)
       val dLowerLength = d.bitLength - sharedLength
 
       val nShared = n >> (n.bitLength - sharedLength)
@@ -360,7 +372,7 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
       case that: Algebraic => that == this
       case that: RationalLike => num == that.num && den == that.den
       case that: BigInt => isWhole && toBigInt == that
-      case that: BigDecimal => try { toBigDecimal == that } catch { case ae: ArithmeticException => false }
+      case that: BigDecimal => try { toBigDecimal(that.mc) == that } catch { case ae: ArithmeticException => false }
       case that: SafeLong => SafeLong(toBigInt) == that
       case that: Number => Number(this) == that
       case that: Natural => isWhole && this == Rational(that.toBigInt)
@@ -920,7 +932,7 @@ private[math] trait RationalIsField extends Field[Rational] {
   def div(a:Rational, b:Rational) = a / b
 }
 
-private[math] trait RationalIsReal extends IsReal[Rational] {
+private[math] trait RationalIsReal extends IsRational[Rational] {
   override def eqv(x:Rational, y:Rational) = x == y
   override def neqv(x:Rational, y:Rational) = x != y
   override def gt(x: Rational, y: Rational) = x > y
@@ -937,6 +949,7 @@ private[math] trait RationalIsReal extends IsReal[Rational] {
   def ceil(a:Rational): Rational = a.ceil
   def floor(a:Rational): Rational = a.floor
   def round(a:Rational): Rational = a.round
+  def toRational(a: Rational): Rational = a
   def isWhole(a:Rational) = a.isWhole
 }
 

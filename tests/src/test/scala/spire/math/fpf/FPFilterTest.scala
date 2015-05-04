@@ -39,6 +39,7 @@ class FpFilterTest extends FunSuite with Checkers {
     def signum(a: Bad): Int = evaluated
     def abs(a: Bad): Bad = evaluated
     def toDouble(x: Bad): Double = evaluated
+    def toReal(x: Bad): Real = evaluated
     def ceil(a:Bad): Bad = evaluated
     def floor(a:Bad): Bad = evaluated
     def round(a:Bad): Bad = evaluated

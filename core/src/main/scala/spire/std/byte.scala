@@ -59,6 +59,7 @@ trait ByteOrder extends Order[Byte] {
 
 trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned {
   def toDouble(n: Byte): Double = n.toDouble
+  def toBigInt(n: Byte): BigInt = BigInt(n)
 }
 
 @SerialVersionUID(0L)

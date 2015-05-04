@@ -59,6 +59,7 @@ trait ShortIsSigned extends Signed[Short] {
 
 trait ShortIsReal extends IsIntegral[Short] with ShortOrder with ShortIsSigned {
   def toDouble(n: Short): Double = n.toDouble
+  def toBigInt(n: Short): BigInt = BigInt(n)
 }
 
 @SerialVersionUID(0L)

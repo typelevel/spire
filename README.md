@@ -437,6 +437,7 @@ strategy for getting random values using a `Generator` instance. For
 instance:
 
 ```scala
+import spire.implicits._
 import spire.math._
 import spire.random._
 

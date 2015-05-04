@@ -1,6 +1,7 @@
 package spire.std
 
-import spire.algebra.{Field, IsReal, NRoot, Order, Signed, Trig}
+import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
+import spire.math.Rational
 
 import java.lang.Math
 import java.lang.Integer.{ numberOfTrailingZeros, numberOfLeadingZeros }
@@ -116,12 +117,13 @@ trait FloatOrder extends Order[Float] {
   def compare(x: Float, y: Float) = java.lang.Float.compare(x, y)
 }
 
-trait FloatIsReal extends IsReal[Float] with FloatOrder with FloatIsSigned {
+trait FloatIsReal extends IsRational[Float] with FloatOrder with FloatIsSigned {
   def toDouble(x: Float): Double = x.toDouble
   def ceil(a:Float): Float = Math.floor(a).toFloat
   def floor(a:Float): Float = Math.floor(a).toFloat
   def round(a:Float): Float = spire.math.round(a)
   def isWhole(a:Float) = a % 1.0 == 0.0
+  def toRational(a:Float): Rational = Rational(a)
 }
 
 @SerialVersionUID(0L)
