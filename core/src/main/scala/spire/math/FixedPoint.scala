@@ -41,7 +41,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     if (long != Long.MinValue) new FixedPoint(-long)
     else throw new FixedPointOverflow(long)
 
-  def == (rhs: FixedPoint): Boolean = lhs.long == rhs.long
+  def === (rhs: FixedPoint): Boolean = lhs.long == rhs.long
   def != (rhs: FixedPoint): Boolean = lhs.long != rhs.long
 
   def abs: FixedPoint =
