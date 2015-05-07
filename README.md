@@ -18,9 +18,11 @@ identically to corresponding direct implementations.
 Spire is provided to you as free software under the
 [MIT license](COPYING).
 
-The [Spire mailing list](http://groups.google.com/group/spire-math/)
-is the place to go for announcements and discussion around Spire. We
-also have a guide on [contributing to Spire](CONTRIBUTING.md) as well
+The [Spire mailing list](http://groups.google.com/group/typelevel/)
+is shared with other [Typelevel projects](http://typelevel.org). 
+It is the place to go for announcements and discussions around Spire. 
+When posting, place the word [spire] at the begining of your subject.
+We also have a guide on [contributing to Spire](CONTRIBUTING.md) as well
 as a guide that provides information on [Spire's design](GUIDE.md).
 
 People are expected to follow the [Typelevel Code of Conduct](http://typelevel.org/conduct.html)
