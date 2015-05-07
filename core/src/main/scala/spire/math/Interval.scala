@@ -596,7 +596,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
         Some(if (isOpenUpper(flags)) upper - epsilon else upper)
     }
 
-  def bottom(min: A, epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] =
+  def bottom(epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] =
     this match {
       case Empty() | All() | Below(_, _) =>
         None // TOCHECK: changed semantics, Empty().bottom == None
@@ -611,7 +611,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   import spire.random.{Dist, Uniform}
 
   def dist(min: A, max: A, epsilon: A)(implicit u: Uniform[A], r: AdditiveGroup[A]): Dist[A] =
-    u(bottom(min, epsilon).getOrElse(min), top(epsilon).getOrElse(max))
+    u(bottom(epsilon).getOrElse(min), top(epsilon).getOrElse(max))
 
   /**
    * Apply the given polynomial to the interval.
