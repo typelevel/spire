@@ -11,11 +11,8 @@ import java.math.{ BigDecimal => JBigDecimal, RoundingMode, MathContext }
 import spire.algebra._
 import spire.math.poly._
 import spire.std.array._
-import spire.std.bigInt._
-import spire.std.bigDecimal._
 import spire.syntax.field._
 import spire.syntax.eq._
-import spire.syntax.signed._
 import spire.syntax.std.seq._
 
 /**

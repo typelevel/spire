@@ -6,7 +6,6 @@ import scala.annotation.tailrec
 import java.math.{ BigDecimal => JBigDecimal, RoundingMode, MathContext }
 
 import spire.algebra._
-import spire.std.bigInt._
 import spire.std.bigDecimal._
 import spire.syntax.signed._
 

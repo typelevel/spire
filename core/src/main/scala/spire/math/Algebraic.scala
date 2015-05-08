@@ -17,7 +17,6 @@ import spire.math.poly.{ Term, BigDecimalRootRefinement, RootFinder, Roots }
 import spire.std.bigInt._
 import spire.std.bigDecimal._
 import spire.std.long._
-import spire.syntax.order._
 import spire.syntax.std.seq._
 
 /**
