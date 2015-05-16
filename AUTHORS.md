@@ -22,6 +22,7 @@ possible.
 * Jean-Remi Desjardins: documentation fixes
 * Suminda Dharmasena: feature requests and bug reports
 * Rob Emanuele: cfor macro bug reports and fixes, benchmarking
+* Siddhartha Gadgil: bug fixes
 * Christopher Hodapp: documentation fixes
 * Lars Hupel: core maintainer, law-checking, release support
 * Ben Hutchison: bug reports and design suggestions
@@ -33,11 +34,15 @@ possible.
 * Dušan Kysel: author of Ziggurat, MersenneTwister and WELL PRNGs
 * Josh Marcus: bug reports and benchmarking
 * Brian McKenna: documentation fixes
+* Kevin Meredith: bug fixes, bug reports, and documentation
 * Simon Ochsenreither: bug reports and build contributions
 * Erik Osheim: core maintainer
 * Adam Pingel: bug fixes
+* Pablo Pita: documentation
+* Alexey Romanov: add PCG random number generator
 * Denis Rosset: work on Number, PartialOrder, Interval, and more
 * Lukas Rytz: bug fixes
+* Kazuhiro Sera: build updates and support
 * Tom Switzer: core maintainer
 * Flaviu Tamas: byte-manipulation and bounds-checking macros
 * James Thompson: author of spire.math.Polynomial
@@ -47,6 +52,7 @@ possible.
 * William Waites: bug fixes
 * Kenji Yoshida: bug fixes
 * Benito van der Zander: many bug reports, and much good testing
+* Alec Zorab: clean up and tests
 
 We've tried to include everyone, but if you've made a contribution to
 Spire and are not listed, please feel free to open an issue or pull
