@@ -27,7 +27,7 @@ possible.
 * Lars Hupel: core maintainer, law-checking, release support
 * Ben Hutchison: bug reports and design suggestions
 * Kamushin: bug fixes
-* Rüdiger Klaehn: bug fixes
+* Rüdiger Klaehn: core maintainer, rational improvements, testing
 * Rex Kerr: author of many of the PRNGs found in spire.random
 * Grzegorz Kossakowski: much build support, 2.11 upgrading help, bug reports
 * Christian Krause: suggestions around stats methods and spire.random.
@@ -40,7 +40,7 @@ possible.
 * Adam Pingel: bug fixes
 * Pablo Pita: documentation
 * Alexey Romanov: add PCG random number generator
-* Denis Rosset: work on Number, PartialOrder, Interval, and more
+* Denis Rosset: core maintainer, interval fixes, partial algebras/orders, etc
 * Lukas Rytz: bug fixes
 * Kazuhiro Sera: build updates and support
 * Tom Switzer: core maintainer
