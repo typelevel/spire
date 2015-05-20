@@ -176,7 +176,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   }
 
   // Does this interval contains any points at or above t ?
-  def hasAtOrAbove(t: A) = this match {
+  def hasAtOrAbove(t: A): Boolean = this match {
     case _: Empty[_] => false
     case Point(p) => p >= t
     case Below(upper, flags) =>
@@ -188,7 +188,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   }
 
   // Does this interval contains any points at or below t ?
-  def hasAtOrBelow(t: A) = this match {
+  def hasAtOrBelow(t: A): Boolean = this match {
     case _: Empty[_] => false
     case Point(p) => p <= t
     case Above(lower, flags) =>
@@ -199,7 +199,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     case _: All[_] => true
   }
 
-  def isAt(t: A) = this match {
+  def isAt(t: A): Boolean = this match {
     case Point(p) => t === p
     case _ => false
   }
@@ -316,7 +316,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def *(rhs: Interval[A])(implicit ev: Semiring[A]): Interval[A] = {
     val z = ev.zero
 
-    def aboveAbove(lower1: A, lf1: Int, lower2: A, lf2: Int) = {
+    def aboveAbove(lower1: A, lf1: Int, lower2: A, lf2: Int): Above[A] = {
       val lower1s = lower1.compare(z)
       val lower2s = lower2.compare(z)
 
@@ -327,7 +327,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       }
     }
 
-    def belowBelow(upper1: A, uf1: Int, upper2: A, uf2: Int) = {
+    def belowBelow(upper1: A, uf1: Int, upper2: A, uf2: Int): Above[A] = {
       val upper1s = upper1.compare(z)
       val upper2s = upper2.compare(z)
       if (upper1s > 0 || upper2s > 0) All() else {
@@ -337,7 +337,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       }
     }
 
-    def aboveBelow(lower1: A, lf1: Int, upper2: A, uf2: Int) = {
+    def aboveBelow(lower1: A, lf1: Int, upper2: A, uf2: Int): Below[A] = {
       val lower1s = lower1.compare(z)
       val upper2s = upper2.compare(z)
       if (lower1s < 0 || upper2s > 0) All () else {
@@ -347,7 +347,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       }
     }
 
-    def aboveBounded(lower1: A, lf1: Int, lower2: A, upper2: A, flags2: Int) = {
+    def aboveBounded(lower1: A, lf1: Int, lower2: A, upper2: A, flags2: Int): Interval[A] = {
       val lower1s = lower1.compare(z)
       val lower2s = lower2.compare(z)
       val upper2s = upper2.compare(z)
@@ -379,7 +379,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       }
     }
 
-    def belowBounded(upper1: A, uf1: Int, lower2: A, upper2: A, flags2: Int) = {
+    def belowBounded(upper1: A, uf1: Int, lower2: A, upper2: A, flags2: Int): Interval[A] = {
       val upper1s = upper1.compare(z)
       val lower2s = lower2.compare(z)
       val upper2s = upper2.compare(z)
@@ -410,7 +410,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       }
     }
 
-    def boundedBounded(bd1: Bounded[A], bd2: Bounded[A]) = {
+    def boundedBounded(bd1: Bounded[A], bd2: Bounded[A]): Interval[A] = {
       val lb1 = bd1.lowerBound
       val ub1 = bd1.upperBound
       val lb2 = bd2.lowerBound
@@ -457,7 +457,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   def reciprocal(implicit ev: Field[A]): Interval[A] = {
     val z = ev.zero
-    def error = throw new java.lang.ArithmeticException("/ by zero")
+    def error: Nothing = throw new java.lang.ArithmeticException("/ by zero")
 
     this match {
       case All() => error

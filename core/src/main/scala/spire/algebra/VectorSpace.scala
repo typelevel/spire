@@ -17,5 +17,5 @@ trait VectorSpace[V, @spec(Int, Long, Float, Double) F] extends Any with Module[
 }
 
 object VectorSpace {
-  @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: VectorSpace[V, R]) = V
+  @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: VectorSpace[V, R]): VectorSpace[V, R] = V
 }

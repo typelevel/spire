@@ -8,12 +8,12 @@ trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends Any with V
 
   def normed(implicit ev: NRoot[F]): NormedVectorSpace[V, F] = new NormedInnerProductSpace[V, F] {
     def space = self
-    def nroot = ev
+    def nroot: NRoot[F] = ev
   }
 }
 
 object InnerProductSpace {
-  @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: InnerProductSpace[V, R]) = V
+  @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: InnerProductSpace[V, R]): InnerProductSpace[V, R] = V
 }
 
 private[algebra] trait NormedInnerProductSpace[V, @spec(Float, Double) F] extends Any with NormedVectorSpace[V, F] {

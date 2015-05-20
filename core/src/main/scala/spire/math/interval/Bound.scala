@@ -143,11 +143,11 @@ sealed trait ValueBound[A] extends Bound[A] { lhs =>
 }
 
 case class Open[A](a: A) extends ValueBound[A] {
-  def isClosed = false
+  def isClosed: Boolean = false
 }
 
 case class Closed[A](a: A) extends ValueBound[A] {
-  def isClosed = true
+  def isClosed: Boolean = true
 }
 
 /** Companion object for open/closed bounds, used to construct intervals from

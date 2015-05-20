@@ -28,5 +28,5 @@ trait SemigroupoidLowPriority {
 }
 
 object Semigroupoid extends SemigroupoidLowPriority {
-  @inline final def apply[A](implicit s: Semigroupoid[A]) = s
+  @inline final def apply[A](implicit s: Semigroupoid[A]): Semigroupoid[A] = s
 }

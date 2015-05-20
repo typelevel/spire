@@ -149,7 +149,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
    */
   def isZero: Boolean = signum == 0
 
-  override def equals(that: Any) = that match {
+  override def equals(that: Any): Boolean = that match {
     case (that: Algebraic) => this.compare(that) == 0
     case (that: Real) => this.toReal == that
     case (that: Number) => this.compare(Algebraic(that.toBigDecimal)) == 0
@@ -1201,7 +1201,7 @@ object Algebraic extends AlgebraicInstances {
           .unscaledValue
           .divideAndRemainder(BigInteger.valueOf(unscale))
       val truncated = new JBigDecimal(truncatedUnscaledValue, scale)
-      def epsilon = new JBigDecimal(BigInteger.ONE, scale)
+      def epsilon: JBigDecimal = new JBigDecimal(BigInteger.ONE, scale)
       val remainder = bigRemainder.longValue
       val rounded = mode match {
         case UNNECESSARY =>
@@ -1535,9 +1535,9 @@ private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoo
   def quot(a: Algebraic, b: Algebraic): Algebraic = a /~ b
   def mod(a: Algebraic, b: Algebraic): Algebraic = a % b
   def gcd(a: Algebraic, b: Algebraic): Algebraic = euclid(a, b)(Eq[Algebraic])
-  def div(a:Algebraic, b:Algebraic) = a / b
+  def div(a:Algebraic, b:Algebraic): Algebraic = a / b
   def nroot(a: Algebraic, k: Int): Algebraic = a nroot k
-  def fpow(a:Algebraic, b:Algebraic) = throw new UnsupportedOperationException("unsupported operation")
+  def fpow(a:Algebraic, b:Algebraic): Algebraic = throw new UnsupportedOperationException("unsupported operation")
   override def fromInt(n: Int): Algebraic = Algebraic(n)
   override def fromDouble(n: Double): Algebraic = Algebraic(n)
 }
@@ -1545,16 +1545,16 @@ private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoo
 private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
   def toDouble(x: Algebraic): Double = x.toDouble
   def toAlgebraic(x: Algebraic): Algebraic = x
-  def ceil(a:Algebraic) = Algebraic(a.toBigDecimal(0, RoundingMode.CEILING))
-  def floor(a:Algebraic) = Algebraic(a.toBigDecimal(0, RoundingMode.FLOOR))
-  def round(a:Algebraic) = Algebraic(a.toBigDecimal(0, RoundingMode.HALF_EVEN))
-  def isWhole(a:Algebraic) = a.isWhole
+  def ceil(a:Algebraic): Algebraic = Algebraic(a.toBigDecimal(0, RoundingMode.CEILING))
+  def floor(a:Algebraic): Algebraic = Algebraic(a.toBigDecimal(0, RoundingMode.FLOOR))
+  def round(a:Algebraic): Algebraic = Algebraic(a.toBigDecimal(0, RoundingMode.HALF_EVEN))
+  def isWhole(a:Algebraic): Boolean = a.isWhole
   override def sign(a: Algebraic): Sign = a.sign
   def signum(a: Algebraic): Int = a.signum
   def abs(a: Algebraic): Algebraic = a.abs
-  override def eqv(x: Algebraic, y: Algebraic) = x.compare(y) == 0
-  override def neqv(x: Algebraic, y: Algebraic) = x.compare(y) != 0
-  def compare(x: Algebraic, y: Algebraic) = x.compare(y)
+  override def eqv(x: Algebraic, y: Algebraic): Boolean = x.compare(y) == 0
+  override def neqv(x: Algebraic, y: Algebraic): Boolean = x.compare(y) != 0
+  def compare(x: Algebraic, y: Algebraic): Int = x.compare(y)
 }
 
 @SerialVersionUID(1L)

@@ -16,7 +16,7 @@ import spire.syntax.eq._
   */
 trait Groupoid[A] extends Any with Semigroupoid[A] {
   /** Tests if `a` is an identity. */
-  def isId(a: A)(implicit ev: Eq[A]) = a === leftId(a)
+  def isId(a: A)(implicit ev: Eq[A]): Boolean = a === leftId(a)
   /** Returns the inverse element of `a` such that `(a |+|? a.inverse).get` is an identity. */
   def inverse(a: A): A
   /** Returns the left identity of `a`. */

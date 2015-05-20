@@ -37,19 +37,19 @@ trait Semigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends
 }
 
 object Semigroup {
-  @inline final def apply[A](implicit s: Semigroup[A]) = s
+  @inline final def apply[A](implicit s: Semigroup[A]): Semigroup[A] = s
 
   /**
    * If there exists an implicit `AdditiveSemigroup[A]`, this returns a
    * `Semigroup[A]` using `plus` for `op`.
    */
-  @inline final def additive[A](implicit A: AdditiveSemigroup[A]) =  A.additive
+  @inline final def additive[A](implicit A: AdditiveSemigroup[A]): Semigroup[A] = A.additive
 
   /**
    * If there exists an implicit `MultiplicativeSemigroup[A]`, this returns a
    * `Semigroup[A]` using `times` for `op`.
    */
-  @inline final def multiplicative[A](implicit A: MultiplicativeSemigroup[A]) = A.multiplicative
+  @inline final def multiplicative[A](implicit A: MultiplicativeSemigroup[A]): Semigroup[A] = A.multiplicative
 }
 
 /**

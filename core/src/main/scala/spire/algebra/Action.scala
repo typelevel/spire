@@ -15,7 +15,7 @@ trait LeftAction[@spec(Int) P, G] extends Any {
 }
 
 object LeftAction {
-  @inline def apply[P, G](G: LeftAction[P, G]) = G
+  @inline def apply[P, G](G: LeftAction[P, G]): LeftAction[P, G] = G
 }
 
 /**
@@ -31,7 +31,7 @@ trait RightAction[@spec(Int) P, G] extends Any {
 }
 
 object RightAction {
-  @inline def apply[P, G](G: RightAction[P, G]) = G
+  @inline def apply[P, G](G: RightAction[P, G]): RightAction[P, G] = G
 }
 
 /**
@@ -57,9 +57,9 @@ object RightAction {
 trait Action[@spec(Int) P, G] extends Any with LeftAction[P, G] with RightAction[P, G]
 
 object Action {
-  @inline def apply[P, G](G: Action[P, G]) = G
-  @inline def additive[P, G](G: AdditiveAction[P, G]) = G.additive
-  @inline def multiplicative[P, G](G: MultiplicativeAction[P, G]) = G.multiplicative
+  @inline def apply[P, G](G: Action[P, G]): Action[P, G] = G
+  @inline def additive[P, G](G: AdditiveAction[P, G]): Action[P, G] = G.additive
+  @inline def multiplicative[P, G](G: MultiplicativeAction[P, G]): Action[P, G] = G.multiplicative
 }
 
 trait AdditiveAction[@spec(Int) P, G] extends Any { self =>

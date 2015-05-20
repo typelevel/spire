@@ -713,13 +713,13 @@ private[math] trait NaturalIsRig extends Rig[Natural] {
 }
 
 private[math] trait NaturalOrder extends Order[Natural] {
-  override def eqv(x: Natural, y: Natural) = x == y
-  override def neqv(x: Natural, y: Natural) = x != y
-  override def gt(x: Natural, y: Natural) = x > y
-  override def gteqv(x: Natural, y: Natural) = x >= y
-  override def lt(x: Natural, y: Natural) = x < y
-  override def lteqv(x: Natural, y: Natural) = x <= y
-  def compare(x: Natural, y: Natural) = x.compare(y)
+  override def eqv(x: Natural, y: Natural): Boolean = x == y
+  override def neqv(x: Natural, y: Natural): Boolean = x != y
+  override def gt(x: Natural, y: Natural): Boolean = x > y
+  override def gteqv(x: Natural, y: Natural): Boolean = x >= y
+  override def lt(x: Natural, y: Natural): Boolean = x < y
+  override def lteqv(x: Natural, y: Natural): Boolean = x <= y
+  def compare(x: Natural, y: Natural): Int = x.compare(y)
 }
 
 private[math] trait NaturalIsSigned extends Signed[Natural] {

@@ -56,13 +56,13 @@ trait MultiplicativeTorsor[V, @sp(Int,Long,Float,Double) R] extends Any with Mul
 }
 
 object Torsor {
-  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: Torsor[V, R]) = V
+  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: Torsor[V, R]): Torsor[V, R] = V
 }
 
 object AdditiveTorsor {
-  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: AdditiveTorsor[V, R]) = V
+  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: AdditiveTorsor[V, R]): AdditiveTorsor[V, R] = V
 }
 
 object MultiplicativeTorsor {
-  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: MultiplicativeTorsor[V, R]) = V
+  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: MultiplicativeTorsor[V, R]): MultiplicativeTorsor[V, R] = V
 }

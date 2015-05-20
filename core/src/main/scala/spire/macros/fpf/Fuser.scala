@@ -255,7 +255,7 @@ private[spire] trait Fuser[C <: Context, A] {
 }
 
 private[spire] object Fuser {
-  def apply[C <: Context, A: ctx.WeakTypeTag](ctx: C) = new Fuser[C, A] {
+  def apply[C <: Context, A: ctx.WeakTypeTag](ctx: C): Fuser[C, A] = new Fuser[C, A] {
     val c = ctx
     val A = c.weakTypeTag[A]
   }

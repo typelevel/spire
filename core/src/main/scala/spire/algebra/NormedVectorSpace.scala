@@ -25,7 +25,7 @@ trait NormedVectorSpace[V, @spec(Int, Long, Float, Double) F] extends Any with V
 }
 
 object NormedVectorSpace extends NormedVectorSpace0 with NormedVectorSpaceFunctions {
-  @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: NormedVectorSpace[V, R]) = V
+  @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: NormedVectorSpace[V, R]): NormedVectorSpace[V, R] = V
 }
 
 private[algebra] trait NormedVectorSpace0 {
