@@ -9,7 +9,7 @@ import Random._
 
 import spire.math._
 
-import com.google.caliper.Runner 
+import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 

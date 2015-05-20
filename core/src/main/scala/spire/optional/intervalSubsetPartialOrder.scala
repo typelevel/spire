@@ -6,7 +6,7 @@ import spire.math.Interval
 object intervalSubsetPartialOrder {
 
   /** Interval partial order defined as follows:
-   * 
+   *
    * I <= J if I is a subset of J.
    */
   class IntervalSubsetPartialOrder[A: Order] extends PartialOrder[Interval[A]] {

@@ -30,7 +30,7 @@ trait Semigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends
 
   /**
    *  Given a sequence of `as`, combine them using the semigroup and return the total.
-   * 
+   *
    *  If the sequence is empty, returns None. Otherwise, returns Some(total).
    */
   def combineOption(as: TraversableOnce[A]): Option[A] = as.reduceOption(op)
@@ -54,7 +54,7 @@ object Semigroup {
 
 /**
  * CSemigroup represents a commutative semigroup.
- * 
+ *
  * A semigroup is commutative if for all x and y, x |+| y === y |+| x.
  */
 trait CSemigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Semigroup[A]

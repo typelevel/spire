@@ -212,15 +212,15 @@ case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
 }
 
 case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
-  def plus[A: c.WeakTypeTag] = 
+  def plus[A: c.WeakTypeTag] =
     binopSearch[A]("add" :: "plus" :: Nil) getOrElse failedSearch("plus", "+")
-  def minus[A: c.WeakTypeTag] = 
+  def minus[A: c.WeakTypeTag] =
     binopSearch[A]("subtract" :: "minus" :: Nil) getOrElse failedSearch("minus", "-")
-  def times[A: c.WeakTypeTag] = 
+  def times[A: c.WeakTypeTag] =
     binopSearch[A]("multiply" :: "times" :: Nil) getOrElse failedSearch("times", "*")
-  def div[A: c.WeakTypeTag] = 
+  def div[A: c.WeakTypeTag] =
     binopSearch[A]("divide" :: "div" :: Nil) getOrElse failedSearch("div", "/")
-  def negate[A: c.WeakTypeTag] = 
+  def negate[A: c.WeakTypeTag] =
     unopSearch[A]("negate" :: "negative" :: Nil) getOrElse {
       // We can implement negate interms of minus. This is actually required
       // for JScience's Rational :(

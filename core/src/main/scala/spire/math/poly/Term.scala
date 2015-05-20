@@ -25,7 +25,7 @@ case class Term[@spec(Float, Double) C](coeff: C, exp: Int) { lhs =>
   def eval(x: C)(implicit r: Semiring[C]): C =
     if (exp != 0) coeff * (x pow exp) else coeff
 
-  def isIndexZero: Boolean = 
+  def isIndexZero: Boolean =
     exp == 0
 
   def isZero(implicit ring: Semiring[C], eq: Eq[C]): Boolean =
@@ -73,11 +73,11 @@ object Term {
     def compare(x: Term[C], y: Term[C]): Int = x.exp compare y.exp
   }
 
-  def fromTuple[@spec(Float, Double) C](tpl: (Int, C)): Term[C] = 
+  def fromTuple[@spec(Float, Double) C](tpl: (Int, C)): Term[C] =
     Term(tpl._2, tpl._1)
   def zero[@spec(Float, Double) C](implicit r: Semiring[C]): Term[C] =
     Term(r.zero, 0)
-  def one[@spec(Float, Double) C](implicit r: Rig[C]): Term[C] = 
+  def one[@spec(Float, Double) C](implicit r: Rig[C]): Term[C] =
     Term(r.one, 0)
 
   private val IsZero = "0".r

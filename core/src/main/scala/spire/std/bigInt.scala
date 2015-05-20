@@ -10,7 +10,7 @@ trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   override def pow(a:BigInt, b:Int): BigInt = a pow b
   override def times(a:BigInt, b:BigInt): BigInt = a * b
   val zero: BigInt = BigInt(0)
-  
+
   override def fromInt(n: Int): BigInt = BigInt(n)
 
   def quot(a:BigInt, b:BigInt) = a / b

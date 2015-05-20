@@ -17,7 +17,7 @@ trait FloatIsField extends Field[Float] {
   override def pow(a:Float, b:Int): Float = Math.pow(a, b).toFloat
   override def times(a:Float, b:Float): Float = a * b
   def zero: Float = 0.0F
-  
+
   override def fromInt(n: Int): Float = n
 
   def quot(a:Float, b:Float) = (a - (a % b)) / b
@@ -36,7 +36,7 @@ trait FloatIsField extends Field[Float] {
       // We trim of the power of 2s, then add back the shared portion.
       val n = spire.math.gcd(val0 >>> tz0, val1 >>> tz1).toInt << tzShared
       // Number of bits to move the leading 1 to bit position 23.
-      val shift = numberOfLeadingZeros(n) - 8 
+      val shift = numberOfLeadingZeros(n) - 8
       val exp = (exp0 - shift)
       // If exp is 0, then the value is actually just the mantissa * 2^−126,
       // so we need to adjust the *shift* accordingly.

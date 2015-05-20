@@ -6,7 +6,7 @@ import scala.{ specialized => spec }
 import scala.annotation.tailrec
 
 @SerialVersionUID(0L)
-class MapMonoid[K, V](implicit val scalar: Semigroup[V]) extends Monoid[Map[K, V]] 
+class MapMonoid[K, V](implicit val scalar: Semigroup[V]) extends Monoid[Map[K, V]]
 with Serializable {
   def id: Map[K, V] = Map.empty
 

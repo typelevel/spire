@@ -130,7 +130,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   def %(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx % ny)
-    case _ => Real({ p => 
+    case _ => Real({ p =>
       val d = x / y
       val s = d(2)
       val d2 = if (s >= 0) d.floor else d.ceil

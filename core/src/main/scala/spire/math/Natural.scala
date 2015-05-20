@@ -276,7 +276,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
       case End(ld) => right match {
         case End(rd) =>
           Natural(ld.toLong + rd.toLong + carry)
-          
+
         case Digit(rd, rtail) =>
           val t = ld.toLong + rd.toLong + carry
           Digit(UInt(t), rtail + UInt(t >> 32))
@@ -286,7 +286,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
         case End(rd) =>
           val t = ld.toLong + rd.toLong + carry
           Digit(UInt(t), ltail + UInt(t >> 32))
-          
+
         case Digit(rd, rtail) =>
           val t = ld.toLong + rd.toLong + carry
           Digit(UInt(t), recur(ltail, rtail, t >> 32))
@@ -300,7 +300,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
       case End(ld) => right match {
         case End(rd) =>
           Natural(ld.toLong - rd.toLong - carry)
-          
+
         case Digit(rd, rtail) =>
           val t = ld.toLong - rd.toLong - carry
           val tl = rtail - UInt(-(t >> 32))
@@ -318,7 +318,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
             End(UInt(t))
           else
             Digit(UInt(t), tl)
-          
+
         case Digit(rd, rtail) =>
           val t = ld.toLong - rd.toLong - carry
           val tl = recur(ltail, rtail, -(t >> 32))
@@ -370,7 +370,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
     rhs match {
       case End(rd) =>
         lhs / rd
-  
+
       case Digit(rd, rtail) => lhs match {
         case End(ld) =>
           End(UInt(0))
@@ -394,7 +394,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
   def %(rhs: Natural): Natural = {
     rhs match {
       case End(rd) => lhs % rd
-  
+
       case Digit(rd, rtail) => lhs match {
         case End(ld) => End(ld)
 
@@ -415,7 +415,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
   def /%(rhs: Natural): (Natural, Natural) = {
     rhs match {
       case End(rd) => (lhs / rd, lhs % rd)
-  
+
       case Digit(rd, rtail) => lhs match {
         case End(ld) => (End(UInt(0)), lhs)
 

@@ -26,7 +26,7 @@ trait LongIsEuclideanRing extends EuclideanRing[Long] {
   }
   override def times(a:Long, b:Long): Long = a * b
   def zero: Long = 0L
-  
+
   override def fromInt(n: Int): Long = n
 
   def quot(a:Long, b:Long) = a / b

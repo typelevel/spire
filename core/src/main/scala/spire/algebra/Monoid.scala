@@ -54,7 +54,7 @@ object Monoid {
 
 /**
  * CMonoid represents a commutative monoid.
- * 
+ *
  * A monoid is commutative if for all x and y, x |+| y === y |+| x.
  */
 trait CMonoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Monoid[A] with CSemigroup[A]

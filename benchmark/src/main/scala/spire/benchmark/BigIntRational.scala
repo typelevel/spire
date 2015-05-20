@@ -56,7 +56,7 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
     val b = d.gcd(r.n)
     new BigIntRational((n / a) * (r.n / b), (d / b) * (r.d / a))
   }
-  
+
 
   def /(r: BigIntRational): BigIntRational = {
     val a = n.gcd(r.n)

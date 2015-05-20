@@ -65,7 +65,7 @@ trait MultiplicativeSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] ex
 
   /**
    *  Given a sequence of `as`, sum them using the semigroup and return the total.
-   * 
+   *
    *  If the sequence is empty, returns None. Otherwise, returns Some(total).
    */
   def prodOption(as: TraversableOnce[A]): Option[A] = as.reduceOption(times)

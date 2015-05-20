@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 import scala.util.Random
 import Random._
 
-import com.google.caliper.Runner 
+import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
@@ -316,7 +316,7 @@ class CForBenchmarks extends MyBenchmark {
   def doCForIntArrayMultiply(): Unit = {
     val arr2 = arr.clone
     val len = size
-    cfor(0)(_ < len, _ + 1) { 
+    cfor(0)(_ < len, _ + 1) {
       i => {
         val value = arr2(i)
         arr2(i) = value * 2

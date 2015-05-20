@@ -2,7 +2,7 @@ package spire.benchmark
 
 import scala.util.Random
 import spire.macros.Checked
-import com.google.caliper.Runner 
+import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 

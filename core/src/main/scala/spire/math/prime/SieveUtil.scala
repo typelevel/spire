@@ -9,7 +9,7 @@ object SieveUtil {
    *
    * The first field 'p' is the prime itself. The 'next' field is the
    * next multiple of the prime that we expect to see.
-   * 
+   *
    * We use a slightly non-standard compare() function so that the
    * factor with the smallest 'next' field will be the largest.
    */
@@ -19,7 +19,7 @@ object SieveUtil {
 
   /**
    * Reprsents a prime factor which we need to keep track of.
-   * 
+   *
    * Similar to Factor, but in this case the prime is small enough that
    * it fits in an Int. This means that each of our sieve segments will
    * contain at least one multiple of 'p' if not more. So we can use a

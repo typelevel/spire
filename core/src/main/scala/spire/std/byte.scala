@@ -11,7 +11,7 @@ trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
   override def pow(a: Byte, b:Int): Byte = Math.pow(a, b).toByte
   override def times(a:Byte, b:Byte): Byte = (a * b).toByte
   def zero: Byte = 0.toByte
-  
+
   override def fromInt(n: Int): Byte = n.toByte
 
   def quot(a: Byte, b: Byte) = (a / b).toByte

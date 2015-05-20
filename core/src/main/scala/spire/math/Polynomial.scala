@@ -17,9 +17,9 @@ import spire.syntax.std.seq._
 
 /**
  * Polynomial
- * A univariate polynomial class and EuclideanRing extension trait 
- * for arithmetic operations. Polynomials can be instantiated using 
- * any type C for which a Ring[C] and Signed[C] are in scope, with 
+ * A univariate polynomial class and EuclideanRing extension trait
+ * for arithmetic operations. Polynomials can be instantiated using
+ * any type C for which a Ring[C] and Signed[C] are in scope, with
  * exponents given by Int values. Some operations require a Field[C]
  * to be in scope.
 */

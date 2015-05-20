@@ -66,7 +66,7 @@ trait AdditiveSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends 
 
   /**
    *  Given a sequence of `as`, sum them using the semigroup and return the total.
-   * 
+   *
    *  If the sequence is empty, returns None. Otherwise, returns Some(total).
    */
   def sumOption(as: TraversableOnce[A]): Option[A] = as.reduceOption(plus)

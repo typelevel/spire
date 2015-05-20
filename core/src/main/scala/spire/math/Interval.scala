@@ -14,10 +14,10 @@ import java.lang.Double.isNaN
 
 /**
  * Interval represents a set of values, usually numbers.
- * 
+ *
  * Intervals have upper and lower bounds. Each bound can be one of
  * four kinds:
- * 
+ *
  *  * Closed: The boundary value is included in the interval.
  *  * Open: The boundary value is excluded from the interval.
  *  * Unbound: There is no boundary value.
@@ -34,7 +34,7 @@ import java.lang.Double.isNaN
  * One common pitfall with interval arithmetic is that many familiar
  * algebraic relations do not hold. For instance, given two intervals
  * a and b:
- * 
+ *
  *   a == b does not imply a * a == a * b
  *
  * Consider a = b = [-1, 1]. Since any number times itself is
@@ -442,7 +442,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       case (Below(upper1, uf1), Above(lower2, lf2)) => aboveBelow(lower2, lf2, upper1, uf1)
       case (Below(upper1, uf1), Below(upper2, uf2)) => belowBelow(upper1, uf1, upper2, uf2)
 
-      case (Above(lower1, lf1), Bounded(lower2, upper2, flags2)) => 
+      case (Above(lower1, lf1), Bounded(lower2, upper2, flags2)) =>
         aboveBounded(lower1, lf1, lower2, upper2, flags2)
       case (Bounded(lower1, upper1, flags1), Above(lower2, lf2)) =>
         aboveBounded(lower2, lf2, lower1, upper1, flags1)
@@ -619,9 +619,9 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
    * For every point contained in the interval, this method maps that
    * point through the given polynomial. The resulting interval is the
    * set of all the translated points. I.e.
-   * 
+   *
    *     result = { p(x) | x ∈ interval }
-   * 
+   *
    */
   def translate(p: Polynomial[A])(implicit ev: Field[A]): Interval[A] = {
     val terms2 = p.terms.map { case Term(c, e) => Term(Interval.point(c), e) }
@@ -633,17 +633,17 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   def ∋(rhs: A): Boolean = lhs contains rhs
   def ∌(rhs: A): Boolean = !(lhs contains rhs)
-  
+
   def ∈:(a: A): Boolean = lhs contains a
   def ∉:(a: A): Boolean = !(lhs contains a)
 
   def ∩(rhs: Interval[A]): Interval[A] = lhs intersect rhs
   def ∪(rhs: Interval[A]): Interval[A] = lhs union rhs
   def \(rhs: Interval[A]): List[Interval[A]] = lhs -- rhs
-  
+
   def ⊂(rhs: Interval[A]): Boolean = lhs isProperSubsetOf rhs
   def ⊃(rhs: Interval[A]): Boolean = lhs isProperSupersetOf rhs
-  
+
   def ⊆(rhs: Interval[A]): Boolean = lhs isSubsetOf rhs
   def ⊇(rhs: Interval[A]): Boolean = lhs isSupersetOf rhs
 
@@ -664,27 +664,27 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   /**
    * Build an Iterator[A] from an Interval[A] and a (step: A)
    * parameter.
-   * 
+   *
    * A positive 'step' means we are proceeding from the lower bound
    * up, and a negative 'step' means we are proceeding from the upper
    * bound down. In each case, the interval must be bounded on the
    * side we are starting with (though it may be unbound on the
    * opposite side). A zero 'step' is not allowed.
-   * 
+   *
    * The step is repeatedly added to the starting parameter as long as
    * the sum remains within the interval. This means that arithmetic
    * error can accumulate (e.g. with doubles). However, this method
    * does overflow checking to ensure that Intervals parameterized on
    * integer types will behave correctly.
-   * 
+   *
    * Users who want to avoid using arithmetic error should consider
    * starting with an Interval[Rational], calling iterator with the
    * exact step desired, then mapping to the original type
    * (e.g. Double). For example:
-   * 
+   *
    *     val ns = Interval.closed(Rational(0), Rational(5))
    *     val it = ns.iterator(Rational(1, 7)).map(_.toDouble)
-   * 
+   *
    * This method provides some of the same functionality as Scala's
    * NumericRange class.
    */
@@ -818,14 +818,14 @@ object Interval {
   /**
    * Return an Interval[Rational] that corresponds to the error bounds
    * for the given Double value.
-   * 
+   *
    * The error bounds are represented as a closed interval, whose
    * lower point is midway between d and the adjacent Double value
    * below it. Similarly, the upper bound is the point midway between
    * d and the adjacent Double value above it.
-   * 
+   *
    * There are three Double values that return "special" intervals:
-   * 
+   *
    *    Infinity => Interval.above(Double.MaxValue)
    *   -Infinity => Interval.below(Double.MinValue)
    *         NaN => Interval.empty
@@ -851,19 +851,19 @@ object Interval {
 
   /**
    * Constructs an interval from bounds.
-   * 
+   *
    * This method assumes that lower < upper to avoid comparisons.
-   * 
+   *
    * - When one of the arguments is Unbound, the result will be All,
    *   Above(x, _), or Below(y, _).
-   * 
+   *
    * - When both arguments are Open/Closed (e.g. Open(x), Open(y)),
    *   then x < y and the result will be a Bounded interval.
-   * 
+   *
    * - If both arguments are EmptyBound, the result is Empty.
-   * 
+   *
    * - Any other arguments are invalid.
-   * 
+   *
    * This method cannot construct Point intervals.
    */
   private[spire] def fromOrderedBounds[A: Order](lower: Bound[A], upper: Bound[A]): Interval[A] =

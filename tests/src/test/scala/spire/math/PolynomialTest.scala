@@ -56,7 +56,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   val ebd = Eq[BigDecimal]
   val fbd = Field[BigDecimal]
   val cbd = implicitly[ClassTag[BigDecimal]]
- 
+
   runDense[Rational]("rational")
   runSparse[Rational]("rational")
   runDense[Complex[Rational]]("complex")

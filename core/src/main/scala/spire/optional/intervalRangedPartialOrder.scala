@@ -8,7 +8,7 @@ import spire.syntax.order._
 object intervalValuePartialOrder {
 
   /** Interval partial order defined as follows:
-   * 
+   *
    * I <= J if I is a subset of J.
    */
   class IntervalValuePartialOrder[A: Order] extends PartialOrder[Interval[A]] {

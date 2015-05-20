@@ -35,7 +35,7 @@ import java.util
  * @see <a href="http://www.iro.umontreal.ca/~panneton/WELLRNG.html">Well PRNG Home Page</a>
  * @see <a href="http://en.wikipedia.org/wiki/Well_Equidistributed_Long-period_Linear">WELL @ Wikipedia</a>
  * @author <a href="mailto:dusan.kysel@gmail.com">Dušan Kysel</a>
- * 
+ *
  */
 final class Well1024a protected[random](state: Array[Int], i0: Int) extends IntBasedGenerator {
 

@@ -139,7 +139,7 @@ abstract class Random[+A, G <: Generator](val op: Op[A]) { self =>
 
   def run(): A =
     op.run(companion.initGenerator) //IO
-  
+
   def run(seed: Seed): A = { //IO
     val gen = companion.initGenerator()
     gen.setSeedBytes(seed.bytes)

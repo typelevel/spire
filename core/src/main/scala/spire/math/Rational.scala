@@ -351,7 +351,7 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
 
       val nShared = n >> (n.bitLength - sharedLength)
       val dShared = d >> dLowerLength
-    
+
       d.underlying.getLowestSetBit() < dLowerLength
       val addBit = if (nShared < dShared || (nShared == dShared && d.underlying.getLowestSetBit() < dLowerLength)) {
         1

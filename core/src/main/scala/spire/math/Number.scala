@@ -375,7 +375,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
     case FloatNumber(m) => Number(Math.floor(m / n))
     case t => t /~ lhs
   }
-  
+
   def %(rhs: Number) = rhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(n % x)
@@ -561,7 +561,7 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
     Number(n.pow(rhs.intValue))
   } else {
     // FIXME: we should actually try to return values with a meaningful approximation context
-    Number(spire.math.pow(n.toDouble, rhs.toDouble)) 
+    Number(spire.math.pow(n.toDouble, rhs.toDouble))
   }
 
   import spire.algebra.Field
@@ -583,7 +583,7 @@ private[math] trait NumberIsRing extends Ring[Number] {
   override def pow(a:Number, b:Int): Number = a.pow(Number(b))
   override def times(a:Number, b:Number): Number = a * b
   def zero: Number = Number.zero
-  
+
   override def fromInt(n: Int): Number = Number(n)
 }
 

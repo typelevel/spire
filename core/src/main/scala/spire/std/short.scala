@@ -11,7 +11,7 @@ trait ShortIsEuclideanRing extends EuclideanRing[Short] {
   override def pow(a: Short, b:Int): Short = Math.pow(a, b).toShort
   override def times(a:Short, b:Short): Short = (a * b).toShort
   def zero: Short = 0.toShort
-  
+
   override def fromInt(n: Int): Short = n.toShort
 
   def quot(a: Short, b: Short) = (a / b).toShort

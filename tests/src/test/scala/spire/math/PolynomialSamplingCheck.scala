@@ -23,7 +23,7 @@ class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrive
   val ebd = Eq[BigDecimal]
   val fbd = Field[BigDecimal]
   val cbd = implicitly[ClassTag[BigDecimal]]
- 
+
   runDense[Rational]("rational")
   runSparse[Rational]("rational")
 

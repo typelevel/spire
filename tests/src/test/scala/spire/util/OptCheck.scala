@@ -62,10 +62,10 @@ class OptCheck extends FunSuite {
     val a = Opt(33)
     val b = Opt(1999)
     val c = Opt(2)
-    
+
     val d = a.filter(_ % 2 == 1)
     val e = b.map(_ + 999)
-    
+
     assertResult(Opt(6029)) {
       for {
         q <- Opt(0)

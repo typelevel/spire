@@ -7,7 +7,7 @@ import spire.implicits._
 import spire.math._
 
 import scala.util.Random._
-import com.google.caliper.Runner 
+import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 

@@ -581,7 +581,7 @@ object Algebraic extends AlgebraicInstances {
      * A set of flags we can quickly compute for an [[Algebraic]] expression.
      *
      * @note we have to do this round-about trip between flagsBits and flags
-     * because of 
+     * because of
      */
     def flags: Flags = new Flags(flagBits)
 
@@ -1278,7 +1278,7 @@ object Algebraic extends AlgebraicInstances {
     def apply(expr: Algebraic.Expr): Bound
   }
 
-  /** 
+  /**
    * An implementation of "A New Constructive Root Bound for Algebraic
    * Expressions" by Chen Li & Chee Yap.
    */

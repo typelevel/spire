@@ -153,7 +153,7 @@ case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val
       es(i) = e
       cs(i) = coeff(i) / field.fromInt(e)
     }
-    
+
     PolySparse.safe(es, cs)
   }
 

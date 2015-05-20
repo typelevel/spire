@@ -33,7 +33,7 @@ object NRoot {
    * if we're looking for some integer `x` and `f(x')` is guaranteed to return
    * `true` iff `x' <= x`, then this will return `x`.
    *
-   * This can be used, for example, to find an integer `x` s.t. 
+   * This can be used, for example, to find an integer `x` s.t.
    * `x * x < y < (x+1)*(x+1)`, by using `intSearch(x => x * x <= y)`.
    */
   private def intSearch(f: Int => Boolean): Int = {
@@ -130,7 +130,7 @@ object NRoot {
         (i, ny)
       } else {
         val nr = target - (ny pow k)
-        
+
         // TODO: Add stopping condition for when nr == 0 and there are no more
         // digits. Tricky part is refactoring to know when digits end...
 
