@@ -19,6 +19,7 @@ case class JetDim(dimension: Int) {
   require(dimension > 0)
 }
 
+// scalastyle:off regex
 /**
  * ==Overview==
  * A simple implementation of N-dimensional dual numbers, for automatically
