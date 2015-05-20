@@ -162,15 +162,7 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
         (polyFromCoeffsLE(q), polyFromCoeffsBE(u))
       } else {
         val v0 = if (rhs.isZero) field.zero else rhs.maxOrderTermCoeff
-        val q0 = try {
-          val q0 = u(0) / v0
-          q0
-        } catch {
-          case e: Exception =>
-            println("%s %s" format (rhs.isZero, v0))
-            println("%s / %s exploded" format (u(0), v0))
-            throw e
-        }
+        val q0 = u(0) / v0
         val uprime = zipSum(u, rhs.coeffsArray.reverse.map(_ * -q0))
         eval(Array(q0) ++ q, uprime, n - 1)
       }

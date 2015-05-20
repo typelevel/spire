@@ -166,7 +166,6 @@ package object math {
       if (i <= leeway) {
         sum.setScale(k.mc.getPrecision - sum.precision + sum.scale, FLOOR)
       } else {
-        println("  restarted %s" format i)
         doit(precision + 3, leeway * 1000)
       }
     }
