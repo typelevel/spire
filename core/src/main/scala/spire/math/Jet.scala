@@ -532,7 +532,7 @@ private[math] trait JetIsEuclideanRing[@sp(Float,Double) T]
 
   def quot(a: Jet[T], b: Jet[T]): Jet[T] = a /~ b
   def mod(a: Jet[T], b: Jet[T]): Jet[T] = a % b
-  override def quotmod(a: Jet[T], b: Jet[T]): Jet[T] = a /% b
+  override def quotmod(a: Jet[T], b: Jet[T]): (Jet[T], Jet[T]) = a /% b
   def gcd(a: Jet[T], b: Jet[T]): Jet[T] = {
     @tailrec def _gcd(a: Jet[T], b: Jet[T]): Jet[T] =
       if (b.isZero) a else _gcd(b, a - (a / b).round * b)

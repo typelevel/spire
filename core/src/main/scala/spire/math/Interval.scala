@@ -316,7 +316,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def *(rhs: Interval[A])(implicit ev: Semiring[A]): Interval[A] = {
     val z = ev.zero
 
-    def aboveAbove(lower1: A, lf1: Int, lower2: A, lf2: Int): Above[A] = {
+    def aboveAbove(lower1: A, lf1: Int, lower2: A, lf2: Int): Interval[A] = {
       val lower1s = lower1.compare(z)
       val lower2s = lower2.compare(z)
 
@@ -327,7 +327,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       }
     }
 
-    def belowBelow(upper1: A, uf1: Int, upper2: A, uf2: Int): Above[A] = {
+    def belowBelow(upper1: A, uf1: Int, upper2: A, uf2: Int): Interval[A] = {
       val upper1s = upper1.compare(z)
       val upper2s = upper2.compare(z)
       if (upper1s > 0 || upper2s > 0) All() else {
@@ -337,7 +337,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       }
     }
 
-    def aboveBelow(lower1: A, lf1: Int, upper2: A, uf2: Int): Below[A] = {
+    def aboveBelow(lower1: A, lf1: Int, upper2: A, uf2: Int): Interval[A] = {
       val lower1s = lower1.compare(z)
       val upper2s = upper2.compare(z)
       if (lower1s < 0 || upper2s > 0) All () else {
