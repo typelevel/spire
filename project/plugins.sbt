@@ -12,4 +12,4 @@ addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.1.6")
 
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.0.4")
 
-addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.6.0")
+addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.7.0")
