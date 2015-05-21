@@ -51,9 +51,9 @@ case class Next[+A](f: Generator => A) extends Op[A]
 case class FlatMap[A, +B](sub: Op[A], k: A => Op[B]) extends Op[B]
 
 object Random extends RandomCompanion[rng.Cmwc5] {
-  def initGenerator() = rng.Cmwc5.fromTime()
+  def initGenerator(): spire.random.rng.Cmwc5 = rng.Cmwc5.fromTime()
 
-  def spawn[B](op: Op[B]) = new RandomCmwc5(op)
+  def spawn[B](op: Op[B]): RandomCmwc5[B] = new RandomCmwc5(op)
 }
 
 trait RandomCompanion[G <: Generator] { self =>
@@ -73,21 +73,21 @@ trait RandomCompanion[G <: Generator] { self =>
 
   def fromDist[B](dist: Dist[B]): R[B] = spawn(Next(g => dist(g)))
 
-  def constant[B](b: B) = spawn(Const(b))
+  def constant[B](b: B): R[B] = spawn(Const(b))
 
-  def unit = constant(Unit)
-  def boolean = next(_.nextBoolean)
-  def byte = next(_.nextInt.toByte)
-  def short = next(_.nextInt.toShort)
-  def char = next(_.nextInt.toChar)
+  def unit: R[Unit] = constant(Unit)
+  def boolean: R[Boolean] = next(_.nextBoolean)
+  def byte: R[Byte] = next(_.nextInt.toByte)
+  def short: R[Short] = next(_.nextInt.toShort)
+  def char: R[Char] = next(_.nextInt.toChar)
 
-  def int = next(_.nextInt)
-  def int(n: Int) = next(_.nextInt(n))
-  def int(n1: Int, n2: Int) = next(_.nextInt(n1, n2))
+  def int: R[Int] = next(_.nextInt)
+  def int(n: Int): R[Int] = next(_.nextInt(n))
+  def int(n1: Int, n2: Int): R[Int] = next(_.nextInt(n1, n2))
 
-  def float = next(_.nextFloat)
-  def long = next(_.nextLong)
-  def double = next(_.nextDouble)
+  def float: R[Float] = next(_.nextFloat)
+  def long: R[Long] = next(_.nextLong)
+  def double: R[Double] = next(_.nextDouble)
 
   def string(size: Size): R[String] =
     size.random(this).flatMap(stringOfSize)
@@ -170,7 +170,7 @@ abstract class Random[+A, G <: Generator](val op: Op[A]) { self =>
 }
 
 class RandomCmwc5[+A](op: Op[A]) extends Random[A, rng.Cmwc5](op) {
-  def companion = Random
+  def companion: Random.type = Random
 }
 
 sealed trait Size {

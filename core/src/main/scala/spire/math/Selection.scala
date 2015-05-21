@@ -345,12 +345,12 @@ object QuickSelect extends SelectLike with HighBranchingMedianOf5 {
 }
 
 object Selection {
-  final def select[@spec A: Order: ClassTag](data: Array[A], k: Int) =
+  final def select[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit =
     quickSelect(data, k)
 
-  final def linearSelect[@spec A: Order: ClassTag](data: Array[A], k: Int) =
+  final def linearSelect[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit =
     LinearSelect.select(data, k)
 
-  final def quickSelect[@spec A: Order: ClassTag](data: Array[A], k: Int) =
+  final def quickSelect[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit =
     QuickSelect.select(data, k)
 }

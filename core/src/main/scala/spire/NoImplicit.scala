@@ -8,7 +8,7 @@ package spire
 final class NoImplicit[A]
 
 object NoImplicit {
-  implicit def noImplicit0[A] = new NoImplicit[A]
-  implicit def noImplicit1[A](implicit ev: A) = new NoImplicit[A]
+  implicit def noImplicit0[A]: NoImplicit[A] = new NoImplicit[A]
+  implicit def noImplicit1[A](implicit ev: A): NoImplicit[A] = new NoImplicit[A]
 }
 

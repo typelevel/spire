@@ -12,13 +12,13 @@ object intervalValuePartialOrder {
    * I <= J if I is a subset of J.
    */
   class IntervalValuePartialOrder[A: Order] extends PartialOrder[Interval[A]] {
-    override def eqv(x: Interval[A], y: Interval[A]) =
+    override def eqv(x: Interval[A], y: Interval[A]): Boolean =
       (x, y) match {
         case (Point(p1), Point(p2)) => p1 === p2
         case _ => false
       }
 
-    override def lteqv(x: Interval[A], y: Interval[A]) =
+    override def lteqv(x: Interval[A], y: Interval[A]): Boolean =
       x.upperBound match {
         case v1: ValueBound[A] =>
           y.lowerBound match {
@@ -29,7 +29,7 @@ object intervalValuePartialOrder {
           false
       }
 
-    override def lt(x: Interval[A], y: Interval[A]) =
+    override def lt(x: Interval[A], y: Interval[A]): Boolean =
       x.upperBound match {
         case Open(a1) =>
           y.lowerBound match {
@@ -45,8 +45,8 @@ object intervalValuePartialOrder {
         case _ => false
       }
 
-    override def gteqv(x: Interval[A], y: Interval[A]) = lteqv(y, x)
-    override def gt(x: Interval[A], y: Interval[A]) = lt(y, x)
+    override def gteqv(x: Interval[A], y: Interval[A]): Boolean = lteqv(y, x)
+    override def gt(x: Interval[A], y: Interval[A]): Boolean = lt(y, x)
 
     def partialCompare(x: Interval[A], y: Interval[A]): Double =
       if (eqv(x, y)) 0.0

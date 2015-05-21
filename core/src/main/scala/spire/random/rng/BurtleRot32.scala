@@ -18,7 +18,7 @@ abstract class BurtleRot32(_a: Int, _b: Int, _c: Int, _d: Int) extends IntBasedG
   protected var c = _c
   protected var d = _d
 
-  def nextInt = { advance(); d }
+  def nextInt: Int = { advance(); d }
 
   protected def advance(): Unit
 
@@ -84,7 +84,7 @@ final class BurtleRot2(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_
 }
 
 object BurtleRot2 extends BurtleCompanion[BurtleRot2] {
-  def create(a: Int, b: Int, c: Int, d: Int) = new BurtleRot2(a, b, c, d)
+  def create(a: Int, b: Int, c: Int, d: Int): BurtleRot2 = new BurtleRot2(a, b, c, d)
 }
 
 /**
@@ -106,5 +106,5 @@ final class BurtleRot3(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_
 }
 
 object BurtleRot3 extends BurtleCompanion[BurtleRot3] {
-  def create(a: Int, b: Int, c: Int, d: Int) = new BurtleRot3(a, b, c, d)
+  def create(a: Int, b: Int, c: Int, d: Int): BurtleRot3 = new BurtleRot3(a, b, c, d)
 }

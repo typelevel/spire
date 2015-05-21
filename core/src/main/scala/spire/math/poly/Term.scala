@@ -40,7 +40,7 @@ case class Term[@spec(Float, Double) C](coeff: C, exp: Int) { lhs =>
   def int(implicit f: Field[C]): Term[C] =
     Term(coeff / f.fromInt(exp + 1), exp + 1)
 
-  override def toString = {
+  override def toString: String = {
     import Term._
 
     def expString = exp match {
@@ -69,7 +69,7 @@ case class Term[@spec(Float, Double) C](coeff: C, exp: Int) { lhs =>
 }
 
 object Term {
-  implicit def ordering[C] = new Order[Term[C]] {
+  implicit def ordering[C]: Order[Term[C]] = new Order[Term[C]] {
     def compare(x: Term[C], y: Term[C]): Int = x.exp compare y.exp
   }
 

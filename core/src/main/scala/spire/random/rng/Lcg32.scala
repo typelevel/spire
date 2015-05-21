@@ -26,7 +26,7 @@ object Lcg32 extends GeneratorCompanion[Lcg32, Int] {
 
   def fromBytes(bytes: Array[Byte]): Lcg32 = new Lcg32(Pack.intFromBytes(bytes))
   def fromSeed(seed: Int): Lcg32 = new Lcg32(seed)
-  def fromTime(time: Long = System.nanoTime) = new Lcg32(time.toInt)
+  def fromTime(time: Long = System.nanoTime): Lcg32 = new Lcg32(time.toInt)
 
   def step(n: Int): Int = 1664525 * n + 1013904223
 }

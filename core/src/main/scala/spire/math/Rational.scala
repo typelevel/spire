@@ -63,8 +63,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   }
 
   def toBigInt: BigInt
-  override def shortValue = longValue.toShort
-  override def byteValue = longValue.toByte
+  override def shortValue: Short = longValue.toShort
+  override def byteValue: Byte = longValue.toByte
 
   def floor: Rational
   def ceil: Rational
@@ -329,10 +329,10 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
 
     def toBigInt: BigInt = (integral.toBigInt(num) / integral.toBigInt(den))
 
-    def longValue = toBigInt.longValue
-    def intValue = longValue.intValue
+    def longValue: Long = toBigInt.longValue
+    def intValue: Int = longValue.intValue
 
-    def floatValue = doubleValue.toFloat
+    def floatValue: Float = doubleValue.toFloat
 
     def doubleValue: Double = if (num == zero) {
       0.0
@@ -425,13 +425,13 @@ private[math] object LongRationals extends Rationals[Long] {
     def num: Long = n
     def den: Long = d
 
-    def numerator = ConvertableFrom[Long].toBigInt(n)
-    def denominator = ConvertableFrom[Long].toBigInt(d)
+    def numerator: BigInt = ConvertableFrom[Long].toBigInt(n)
+    def denominator: BigInt = ConvertableFrom[Long].toBigInt(d)
 
     def numeratorAsLong: Long = n
     def denominatorAsLong: Long = d
 
-    def reciprocal =
+    def reciprocal: Rational =
       if (n == 0L) throw new ArithmeticException("reciprocal called on 0/1")
       else if (n > 0L) LongRational(d, n)
       else if (n == Long.MinValue || d == Long.MinValue) BigRational(-BigInt(d), -BigInt(n))
@@ -749,28 +749,28 @@ private[math] object BigRationals extends Rationals[BigInt] {
     def num: BigInt = n
     def den: BigInt = d
 
-    def numerator = n
-    def denominator = d
+    def numerator: BigInt = n
+    def denominator: BigInt = d
 
     def numeratorAsLong: Long = n.toLong
     def denominatorAsLong: Long = d.toLong
 
-    def reciprocal = if (signum < 0)
+    def reciprocal: BigRational = if (signum < 0)
       BigRational(-d, -n)
     else
       BigRational(d, n)
 
     override def signum: Int = n.signum
 
-    override def isValidChar = false
+    override def isValidChar: Boolean = false
 
-    override def isValidByte = false
+    override def isValidByte: Boolean = false
 
-    override def isValidShort = false
+    override def isValidShort: Boolean = false
 
-    override def isValidInt = false
+    override def isValidInt: Boolean = false
 
-    override def isValidLong = false
+    override def isValidLong: Boolean = false
 
     override def unary_-(): Rational = Rational(-SafeLong(n), SafeLong(d))
 
@@ -923,23 +923,23 @@ private[math] trait RationalIsField extends Field[Rational] {
   override def pow(a:Rational, b:Int): Rational = a.pow(b)
   override def times(a:Rational, b:Rational): Rational = a * b
   def zero: Rational = Rational.zero
-  def quot(a:Rational, b:Rational) = a /~ b
-  def mod(a:Rational, b:Rational) = a % b
-  override def quotmod(a:Rational, b:Rational) = a /% b
-  def gcd(a:Rational, b:Rational):Rational = a gcd b
+  def quot(a:Rational, b:Rational): Rational = a /~ b
+  def mod(a:Rational, b:Rational): Rational = a % b
+  override def quotmod(a:Rational, b:Rational): (Rational, Rational) = a /% b
+  def gcd(a:Rational, b:Rational): Rational = a gcd b
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
-  def div(a:Rational, b:Rational) = a / b
+  def div(a:Rational, b:Rational): Rational = a / b
 }
 
 private[math] trait RationalIsReal extends IsRational[Rational] {
-  override def eqv(x:Rational, y:Rational) = x == y
-  override def neqv(x:Rational, y:Rational) = x != y
-  override def gt(x: Rational, y: Rational) = x > y
-  override def gteqv(x: Rational, y: Rational) = x >= y
-  override def lt(x: Rational, y: Rational) = x < y
-  override def lteqv(x: Rational, y: Rational) = x <= y
-  def compare(x: Rational, y: Rational) = x compare y
+  override def eqv(x:Rational, y:Rational): Boolean = x == y
+  override def neqv(x:Rational, y:Rational): Boolean = x != y
+  override def gt(x: Rational, y: Rational): Boolean = x > y
+  override def gteqv(x: Rational, y: Rational): Boolean = x >= y
+  override def lt(x: Rational, y: Rational): Boolean = x < y
+  override def lteqv(x: Rational, y: Rational): Boolean = x <= y
+  def compare(x: Rational, y: Rational): Int = x compare y
 
   override def sign(a: Rational): Sign = a.sign
   def signum(a: Rational): Int = a.signum
@@ -950,7 +950,7 @@ private[math] trait RationalIsReal extends IsRational[Rational] {
   def floor(a:Rational): Rational = a.floor
   def round(a:Rational): Rational = a.round
   def toRational(a: Rational): Rational = a
-  def isWhole(a:Rational) = a.isWhole
+  def isWhole(a:Rational): Boolean = a.isWhole
 }
 
 @SerialVersionUID(1L)

@@ -16,5 +16,5 @@ final class SyncGenerator(gen: Generator) extends Generator {
 }
 
 object SyncGenerator {
-  def apply(gen: Generator) = new SyncGenerator(gen)
+  def apply(gen: Generator): SyncGenerator = new SyncGenerator(gen)
 }

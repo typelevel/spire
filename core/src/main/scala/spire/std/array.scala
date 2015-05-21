@@ -150,7 +150,7 @@ trait ArrayInstances extends ArrayInstances3 {
 private final class ArrayModule[@spec(Int,Long,Float,Double) A: ClassTag: Ring]
     (implicit nvs: NoImplicit[VectorSpace[Array[A], A]])
     extends Module[Array[A], A] with Serializable {
-  def scalar = Ring[A]
+  def scalar: Ring[A] = Ring[A]
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
   def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
@@ -162,7 +162,7 @@ private final class ArrayModule[@spec(Int,Long,Float,Double) A: ClassTag: Ring]
 private final class ArrayVectorSpace[@spec(Int,Float,Long,Double) A: ClassTag: Field]
     (implicit nnvs: NoImplicit[NormedVectorSpace[Array[A], A]])
     extends VectorSpace[Array[A], A] with Serializable {
-  def scalar = Field[A]
+  def scalar: Field[A] = Field[A]
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
   def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
@@ -179,7 +179,7 @@ private final class ArrayEq[@spec(Int,Float,Long,Double) A: Eq]
 @SerialVersionUID(0L)
 private final class ArrayInnerProductSpace[@spec(Int,Float,Long,Double) A: ClassTag: Field]
     extends InnerProductSpace[Array[A], A] with Serializable {
-  def scalar = Field[A]
+  def scalar: Field[A] = Field[A]
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
   def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
@@ -198,8 +198,8 @@ private final class ArrayOrder[@spec(Int,Float,Long,Double) A: Order]
 @SerialVersionUID(0L)
 private final class ArrayMonoid[@spec(Int,Float,Long,Double) A: ClassTag]
     extends Monoid[Array[A]] with Serializable {
-  def id = new Array[A](0)
-  def op(x: Array[A], y: Array[A]) = ArraySupport.concat(x, y)
+  def id: Array[A] = new Array[A](0)
+  def op(x: Array[A], y: Array[A]): Array[A] = ArraySupport.concat(x, y)
 }
 
 @SerialVersionUID(0L)

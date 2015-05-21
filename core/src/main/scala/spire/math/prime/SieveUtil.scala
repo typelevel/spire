@@ -35,6 +35,6 @@ object SieveUtil {
   case class FastFactors(var arr: Array[FastFactor])
 
   object FastFactors {
-    def empty = FastFactors(new Array[FastFactor](0))
+    def empty: FastFactors = FastFactors(new Array[FastFactor](0))
   }
 }

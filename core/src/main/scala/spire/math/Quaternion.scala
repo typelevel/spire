@@ -71,7 +71,7 @@ private[math] trait QuaternionAlgebra[A]
 }
 
 trait QuaternionInstances {
-  implicit def QuaternionAlgebra[A](implicit fr: Fractional[A], tr: Trig[A], isr: IsReal[A]) =
+  implicit def QuaternionAlgebra[A](implicit fr: Fractional[A], tr: Trig[A], isr: IsReal[A]): QuaternionAlgebra[A] =
     new QuaternionAlgebra[A] {
       val f = fr
       val t = tr

@@ -3,11 +3,11 @@ package spire.math
 import spire.algebra.{IsIntegral, Order, Rig, Signed}
 
 object UInt extends UIntInstances {
-  @inline final def apply(n: Int) = new UInt(n)
-  @inline final def apply(n: Long) = new UInt(n.toInt)
+  @inline final def apply(n: Int): UInt = new UInt(n)
+  @inline final def apply(n: Long): UInt = new UInt(n.toInt)
 
-  @inline final val MinValue = UInt(0)
-  @inline final val MaxValue = UInt(-1)
+  @inline final val MinValue: UInt = UInt(0)
+  @inline final val MaxValue: UInt = UInt(-1)
 }
 
 class UInt(val signed: Int) extends AnyVal {
@@ -20,40 +20,40 @@ class UInt(val signed: Int) extends AnyVal {
   def toDouble: Double = toLong.toDouble
   def toBigInt: BigInt = BigInt(toLong)
 
-  def isValidByte = toInt == toByte
-  def isValidShort = toInt == toShort
-  def isValidChar = toInt == toChar
-  def isValidInt = signed >= 0
-  def isValidLong = true
+  def isValidByte: Boolean = toInt == toByte
+  def isValidShort: Boolean = toInt == toShort
+  def isValidChar: Boolean = toInt == toChar
+  def isValidInt: Boolean = signed >= 0
+  def isValidLong: Boolean = true
 
   override def toString: String = toLong.toString
 
   def == (that: UInt): Boolean = this.signed == that.signed
   def != (that: UInt): Boolean = this.signed != that.signed
 
-  def <= (that: UInt) = this.toLong <= that.toLong
-  def < (that: UInt) = this.toLong < that.toLong
-  def >= (that: UInt) = this.toLong >= that.toLong
-  def > (that: UInt) = this.toLong > that.toLong
+  def <= (that: UInt): Boolean = this.toLong <= that.toLong
+  def < (that: UInt): Boolean = this.toLong < that.toLong
+  def >= (that: UInt): Boolean = this.toLong >= that.toLong
+  def > (that: UInt): Boolean = this.toLong > that.toLong
 
-  def unary_- = UInt(this.signed)
+  def unary_- : UInt = UInt(this.signed)
 
-  def + (that: UInt) = UInt(this.signed + that.signed)
-  def - (that: UInt) = UInt(this.signed - that.signed)
-  def * (that: UInt) = UInt(this.signed * that.signed)
-  def / (that: UInt) = UInt(this.toLong / that.toLong)
-  def % (that: UInt) = UInt(this.toLong % that.toLong)
+  def + (that: UInt): UInt = UInt(this.signed + that.signed)
+  def - (that: UInt): UInt = UInt(this.signed - that.signed)
+  def * (that: UInt): UInt = UInt(this.signed * that.signed)
+  def / (that: UInt): UInt = UInt(this.toLong / that.toLong)
+  def % (that: UInt): UInt = UInt(this.toLong % that.toLong)
 
-  def unary_~ = UInt(~this.signed)
+  def unary_~ : UInt = UInt(~this.signed)
 
-  def << (shift: Int) = UInt(signed << shift)
-  def >> (shift: Int) = UInt(signed >>> shift)
-  def >>> (shift: Int) = UInt(signed >>> shift)
-  def & (that: UInt) = UInt(this.signed & that.signed)
-  def | (that: UInt) = UInt(this.signed | that.signed)
-  def ^ (that: UInt) = UInt(this.signed ^ that.signed)
+  def << (shift: Int): UInt = UInt(signed << shift)
+  def >> (shift: Int): UInt = UInt(signed >>> shift)
+  def >>> (shift: Int): UInt = UInt(signed >>> shift)
+  def & (that: UInt): UInt = UInt(this.signed & that.signed)
+  def | (that: UInt): UInt = UInt(this.signed | that.signed)
+  def ^ (that: UInt): UInt = UInt(this.signed ^ that.signed)
 
-  def ** (that: UInt) = UInt(pow(this.toLong, that.toLong))
+  def ** (that: UInt): UInt = UInt(pow(this.toLong, that.toLong))
 }
 
 trait UIntInstances {
@@ -76,13 +76,13 @@ private[math] trait UIntIsRig extends Rig[UInt] {
 }
 
 private[math] trait UIntOrder extends Order[UInt] {
-  override def eqv(x:UInt, y:UInt) = x == y
-  override def neqv(x:UInt, y:UInt) = x != y
-  override def gt(x: UInt, y: UInt) = x > y
-  override def gteqv(x: UInt, y: UInt) = x >= y
-  override def lt(x: UInt, y: UInt) = x < y
-  override def lteqv(x: UInt, y: UInt) = x <= y
-  def compare(x: UInt, y: UInt) = if (x < y) -1 else if (x > y) 1 else 0
+  override def eqv(x:UInt, y:UInt): Boolean = x == y
+  override def neqv(x:UInt, y:UInt): Boolean = x != y
+  override def gt(x: UInt, y: UInt): Boolean = x > y
+  override def gteqv(x: UInt, y: UInt): Boolean = x >= y
+  override def lt(x: UInt, y: UInt): Boolean = x < y
+  override def lteqv(x: UInt, y: UInt): Boolean = x <= y
+  def compare(x: UInt, y: UInt): Int = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 @SerialVersionUID(0L)

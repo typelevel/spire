@@ -19,7 +19,7 @@ trait Sort extends Any {
  * Works for small arrays but due to O(n^2) complexity is not generally good.
  */
 object InsertionSort extends Sort {
-  final def sort[@spec A:Order:ClassTag](data:Array[A]) =
+  final def sort[@spec A:Order:ClassTag](data:Array[A]): Unit =
     sort(data, 0, data.length)
 
   final def sort[@spec A](data:Array[A], start:Int, end:Int)(implicit o:Order[A], ct:ClassTag[A]): Unit = {
@@ -45,8 +45,8 @@ object InsertionSort extends Sort {
  * small arrays.
  */
 object MergeSort extends Sort {
-  @inline final def startWidth = 8
-  @inline final def startStep = 16
+  @inline final def startWidth: Int = 8
+  @inline final def startStep: Int = 16
 
   final def sort[@spec A:Order:ClassTag](data:Array[A]): Unit = {
     val len = data.length
@@ -111,9 +111,9 @@ object MergeSort extends Sort {
  * sorting very small arrays.
  */
 object QuickSort {
-  @inline final def limit = 16
+  @inline final def limit: Int = 16
 
-  final def sort[@spec A:Order:ClassTag](data:Array[A]) = qsort(data, 0, data.length - 1)
+  final def sort[@spec A:Order:ClassTag](data:Array[A]): Unit = qsort(data, 0, data.length - 1)
 
   final def qsort[@spec A](data:Array[A], left: Int, right: Int)(implicit o:Order[A], ct:ClassTag[A]): Unit = {
 
@@ -160,9 +160,9 @@ object QuickSort {
  * insertionSort(), which is slow except for small arrays.
  */
 object Sorting {
-  final def sort[@spec A:Order:ClassTag](data:Array[A]) = QuickSort.sort(data)
+  final def sort[@spec A:Order:ClassTag](data:Array[A]): Unit = QuickSort.sort(data)
 
-  final def insertionSort[@spec A:Order:ClassTag](data:Array[A]) = InsertionSort.sort(data)
-  final def mergeSort[@spec A:Order:ClassTag](data:Array[A]) = MergeSort.sort(data)
-  final def quickSort[@spec K:Order:ClassTag](data:Array[K]) = QuickSort.sort(data)
+  final def insertionSort[@spec A:Order:ClassTag](data:Array[A]): Unit = InsertionSort.sort(data)
+  final def mergeSort[@spec A:Order:ClassTag](data:Array[A]): Unit = MergeSort.sort(data)
+  final def quickSort[@spec K:Order:ClassTag](data:Array[K]): Unit = QuickSort.sort(data)
 }

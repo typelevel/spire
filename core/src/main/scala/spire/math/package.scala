@@ -226,13 +226,13 @@ package object math {
 
   // TODO: figure out how much precision we need from log(base) to
   // make the exp() have the right precision
-  final def pow(base: BigDecimal, exponent: BigDecimal) =
+  final def pow(base: BigDecimal, exponent: BigDecimal): BigDecimal =
     if (exponent.abs <= 99999999 && exponent.isWhole)
       base.pow(exponent.toInt)
     else
       exp(log(base) * exponent)
 
-  final def pow(base: BigInt, ex: BigInt) = {
+  final def pow(base: BigInt, ex: BigInt): BigInt = {
     @tailrec def bigIntPow(t: BigInt, b: BigInt, e: BigInt): BigInt =
       if (e.signum == 0) t
       else if (e.testBit(0)) bigIntPow(t * b, b * b, e >> 1)
@@ -272,7 +272,7 @@ package object math {
     }
   }
 
-  final def pow(base: Double, exponent: Double) = Math.pow(base, exponent)
+  final def pow(base: Double, exponent: Double): Double = Math.pow(base, exponent)
 
   /**
    * gcd
@@ -327,7 +327,7 @@ package object math {
   final def min(x: Long, y: Long): Long = Math.min(x, y)
   final def min(x: Float, y: Float): Float = Math.min(x, y)
   final def min(x: Double, y: Double): Double = Math.min(x, y)
-  final def min[A](x: A, y: A)(implicit ev: Order[A]) = ev.min(x, y)
+  final def min[A](x: A, y: A)(implicit ev: Order[A]): A = ev.min(x, y)
 
   /**
    * max
@@ -338,7 +338,7 @@ package object math {
   final def max(x: Long, y: Long): Long = Math.max(x, y)
   final def max(x: Float, y: Float): Float = Math.max(x, y)
   final def max(x: Double, y: Double): Double = Math.max(x, y)
-  final def max[A](x: A, y: A)(implicit ev: Order[A]) = ev.max(x, y)
+  final def max[A](x: A, y: A)(implicit ev: Order[A]): A = ev.max(x, y)
 
   /**
    * signum
