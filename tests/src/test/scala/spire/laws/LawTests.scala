@@ -7,7 +7,8 @@ import spire.math._
 import spire.optional.partialIterable._
 import spire.optional.mapIntIntPermutation._
 import spire.implicits.{
-  SeqOrder => _, SeqEq => _,
+  ListOrder => _, ListEq => _,
+  VectorOrder => _, VectorEq => _,
   ArrayOrder => _, ArrayEq => _,
   MapEq => _, MapGroup => _,
   _ }
@@ -65,7 +66,7 @@ class LawTests extends FunSuite with Discipline {
 
   val max = NormedVectorSpace.max[Rational, List]
   checkAll("List[Rational]",
-    VectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly))
+    VectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly, implicitly))
 
   checkAll("List[Int]",   GroupLaws[List[Int]].monoid)
   checkAll("Vector[Int]", GroupLaws[Vector[Int]].monoid)
@@ -74,7 +75,9 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Array[Int]",  GroupLaws[Array[Int]].monoid)
 
   checkAll("Seq[String]", PartialGroupLaws[Seq[String]](spire.optional.genericEq.generic, implicitly).semigroupoid)
-  checkAll("Seq[Int]",    PartialGroupLaws[Seq[Int]].groupoid)
+ // FIXME? checkAll("Seq[Int]",    PartialGroupLaws[Seq[Int]].groupoid)
+  checkAll("Vector[Int]", PartialGroupLaws[Vector[Int]].groupoid)
+  checkAll("List[Int]", PartialGroupLaws[List[Int]].groupoid)
 
   checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
 
@@ -114,5 +117,6 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Order[Int]", OrderLaws[Int].order)
   checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 
-  checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbPerm.arbitrary.map(_.map)), implicitly, implicitly).groupPartialAction)
+// FIXME?  checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbPerm.arbitrary.map(_.map)), implicitly, implicitly).groupPartialAction)
+  checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Vector[Int]](implicitly, Arbitrary(arbPerm.arbitrary.map(_.map)), implicitly, implicitly).groupPartialAction)
 }

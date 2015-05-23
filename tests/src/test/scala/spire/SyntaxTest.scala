@@ -3,8 +3,8 @@ package spire
 import spire.math.Rational
 import spire.algebra._
 import spire.std.int._
+import spire.std.vector._
 import spire.std.double._
-import spire.std.seq._
 import spire.std.string._
 
 import org.scalatest.{FunSuite, Matchers}
@@ -66,7 +66,6 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
     testFieldSyntax(a, b.x)(implicitly, spire.optional.totalfloat.TotalDoubleOrder)
   }))
   test("NRoot syntax")(check(forAll { (a: Positive[Double]) => testNRootSyntax(a.x) }))
-  test("Module syntax")(check(forAll { (v: Vector[Int], w: Vector[Int], a: Int) => testModuleSyntax(v, w, a) }))
   test("VectorSpace syntax")(check(forAll { (v: Vector[Double], w: Vector[Double], a: NonZero[Double]) =>
     testVectorSpaceSyntax(v, w, a.x)
   }))
@@ -75,9 +74,6 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   }))
   test("InnerProductSpace syntax")(check(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
     testInnerProductSpaceSyntax(v, w, a.x)
-  }))
-  test("CoordinateSpace syntax")(check(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
-    testCoordinateSpaceSyntax(v, w, a.x)(CoordinateSpace.seq[Rational, Vector](3))
   }))
   test("Bool syntax")(check(forAll { (a: Int, b: Int) => testBoolSyntax(a, b) }))
 }
@@ -301,20 +297,8 @@ trait BaseSyntaxTest {
       ((a ** 0.5) == NRoot[A].fpow(a, half))
   }
 
-  def testModuleSyntax[V, A](v: V, w: V, a: A)(implicit V: Module[V, A], A: Ring[A]) = {
-    import spire.syntax.module._
-    ((v + w) == V.plus(v, w)) &&
-      ((v - w) == V.minus(v, w)) &&
-      (-v == V.negate(v)) &&
-      ((a *: v) == V.timesl(a, v)) &&
-      ((v :* a) == V.timesr(v, a)) &&
-      //((2 *: v) == V.timesl(A.fromInt(2), v)) &&
-      ((v :* 2) == V.timesr(v, A.fromInt(2)))
-  }
-
-  def testVectorSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: VectorSpace[V, A]) = {
+  def testVectorSpaceSyntax[V, A](v: V, w: V, a: A)(implicit A: Field[A], V: VectorSpace[V, A]) = {
     import spire.syntax.vectorSpace._
-    implicit def A: Field[A] = V.scalar
     ((v + w) == V.plus(v, w)) &&
       ((v - w) == V.minus(v, w)) &&
       (-v == V.negate(v)) &&
@@ -327,9 +311,8 @@ trait BaseSyntaxTest {
       //((v :/ 2) == V.divr(v, A.fromInt(2)))
   }
 
-  def testNormedVectorSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: NormedVectorSpace[V, A]) = {
+  def testNormedVectorSpaceSyntax[V, A](v: V, w: V, a: A)(implicit A: Field[A], V: NormedVectorSpace[V, A]) = {
     import spire.syntax.normedVectorSpace._
-    implicit def A: Field[A] = V.scalar
     ((v + w) == V.plus(v, w)) &&
       ((v - w) == V.minus(v, w)) &&
       (-v == V.negate(v)) &&
@@ -344,9 +327,8 @@ trait BaseSyntaxTest {
       ((V.norm(v) == A.zero) || (v.normalize == V.normalize(v)))
   }
 
-  def testInnerProductSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: InnerProductSpace[V, A]) = {
+  def testInnerProductSpaceSyntax[V, A](v: V, w: V, a: A)(implicit A: Field[A], V: InnerProductSpace[V, A]) = {
     import spire.syntax.innerProductSpace._
-    implicit def A: Field[A] = V.scalar
     ((v + w) == V.plus(v, w)) &&
       ((v - w) == V.minus(v, w)) &&
       (-v == V.negate(v)) &&
@@ -359,28 +341,6 @@ trait BaseSyntaxTest {
       //((v :/ 2) == V.divr(v, A.fromInt(2))) &&
       ((v dot w) == V.dot(v, w)) &&
       ((v ⋅ w) == V.dot(v, w))
-  }
-
-  def testCoordinateSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: CoordinateSpace[V, A]) = {
-    import spire.syntax.coordinateSpace._
-    implicit def A: Field[A] = V.scalar
-    ((v + w) == V.plus(v, w)) &&
-      ((v - w) == V.minus(v, w)) &&
-      (-v == V.negate(v)) &&
-      ((a *: v) == V.timesl(a, v)) &&
-      ((v :* a) == V.timesr(v, a)) &&
-      //((2 *: v) == V.timesl(A.fromInt(2), v)) &&
-      //((v :* 2) == V.timesr(v, A.fromInt(2))) &&
-      //((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
-      //((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
-      //((v :/ 2) == V.divr(v, A.fromInt(2))) &&
-      ((v dot w) == V.dot(v, w)) &&
-      ((v ⋅ w) == V.dot(v, w)) &&
-      (v._x == V._x(v)) &&
-      (v._y == V._y(v)) &&
-      (v._z == V._z(v)) &&
-      (v.coord(0) == V.coord(v, 0)) &&
-      (v.coord(1) == V.coord(v, 1))
   }
 
   def testBoolSyntax[A: Bool](a: A, b: A) = {

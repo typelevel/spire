@@ -326,7 +326,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   // pow -- base is a constant, exponent (this) is a differentiable function.
   // b^(p + du) ~= b^p + b^p * log(b) du
   def powScalarToJet(a: T)(implicit
-      c: ClassTag[T], e: Eq[T], f: Field[T], m: Module[Array[T], T], r: IsReal[T], t: Trig[T]): Jet[T] = {
+      c: ClassTag[T], e: Eq[T], f: Field[T], m: VectorSpace[Array[T], T], r: IsReal[T], t: Trig[T]): Jet[T] = {
     if (isZero) {
       Jet.one[T]
     } else {
@@ -355,7 +355,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
    * pow -- both base (this) and exponent are differentiable functions.
    * (a + du)^(b + dv) ~= a^b + b * a^(b-1) du + a^b log(a) dv
    */
-  def pow(b: Jet[T])(implicit c: ClassTag[T], e: Eq[T], f: Field[T], m: Module[Array[T], T], r: IsReal[T], t: Trig[T])
+  def pow(b: Jet[T])(implicit c: ClassTag[T], e: Eq[T], f: Field[T], m: VectorSpace[Array[T], T], r: IsReal[T], t: Trig[T])
       : Jet[T] = {
     if (b.isZero) {
       Jet.one[T]
@@ -377,10 +377,9 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   /**
    * sqrt(a + du) ~= sqrt(a) + du / (2 sqrt(a))
    */
-  def sqrt()(implicit f: Field[T], n: NRoot[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def sqrt()(implicit c: ClassTag[T], f: Field[T], n: NRoot[T], r: IsReal[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val sa = real.sqrt
-    val oneHalf = f.one / (f.one + f.one)
-    new Jet(sa, (oneHalf / sa) *: infinitesimal)
+    new Jet(sa, infinitesimal :/ (sa + sa))
   }
 
   /**
@@ -411,10 +410,10 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
    * Defined with "this" as the y coordinate: this.atan2(a) == atan2(this, a) == atan(this / a)
    * atan2(b + dv, a + du) ~= atan2(b, a) + (- b du + a dv) / (a^2 + b^2)
    */
-  def atan2(a: Jet[T])(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
-    val tmp = f.one / (a.real * a.real + real * real)
+  def atan2(a: Jet[T])(implicit f: Field[T], t: Trig[T], r: IsReal[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+    val tmp = (a.real * a.real + real * real)
     new Jet(spire.math.atan2(real, a.real),
-            ((tmp * (-real)) *: a.infinitesimal) + ((tmp * a.real) *: infinitesimal))
+            ((((-real) / tmp) *: a.infinitesimal) + ((a.real / tmp) *: infinitesimal)))
   }
 
   /**
@@ -622,7 +621,6 @@ private[math] class JetAlgebra[@sp(Float, Double) T](implicit
   with JetIsNRoot[T]
   with JetIsSigned[T]
   with VectorSpace[Jet[T], T]
-  with FieldAlgebra[Jet[T], T]
   with Serializable {
   def scalar = f
   def nroot = f

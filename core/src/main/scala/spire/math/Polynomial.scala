@@ -468,11 +468,12 @@ with Rig[Polynomial[C]] {
 }
 
 trait PolynomialRng[@spec(Double) C] extends PolynomialSemiring[C]
-with RingAlgebra[Polynomial[C], C] {
+with Rng[Polynomial[C]] with VectorSpace[Polynomial[C], C] {
   implicit override val scalar: Rng[C]
 
   def timesl(r: C, v: Polynomial[C]): Polynomial[C] = r *: v
   def negate(x: Polynomial[C]): Polynomial[C] = -x
+  override def divr(x: Polynomial[C], k: C)(implicit C: Field[C]): Polynomial[C] = x :/ k
 }
 
 trait PolynomialRing[@spec(Double) C] extends PolynomialRng[C]
@@ -483,10 +484,9 @@ with Ring[Polynomial[C]] {
 }
 
 trait PolynomialEuclideanRing[@spec(Double) C] extends PolynomialRing[C]
-with EuclideanRing[Polynomial[C]] with VectorSpace[Polynomial[C], C] {
+with EuclideanRing[Polynomial[C]] {
   implicit override val scalar: Field[C]
 
-  override def divr(x: Polynomial[C], k: C): Polynomial[C] = x :/ k
   def quot(x: Polynomial[C], y: Polynomial[C]) = x /~ y
   def mod(x: Polynomial[C], y: Polynomial[C]) = x % y
   override def quotmod(x: Polynomial[C], y: Polynomial[C]) = x /% y

@@ -199,6 +199,10 @@ object MyBuild extends Build {
 
       Seq[File](algebraFile)
     },
+    initialCommands := """
+    | import spire.math._
+    | import spire.algebra._
+    | import spire.implicits._""".stripMargin('|'),
     libraryDependencies ++= Seq(
       scalaCheck % "test",
       scalaTest % "test"
