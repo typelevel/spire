@@ -1,3 +1,44 @@
+## Version 0.10.1
+
+(Version 0.10.0 was aborted due to errors during the release.)
+
+Fixes:
+
+ * Major refactor/improvements to Algebraic (Tom Switzer)
+ * Remove unneeded imports (Kenji Yoshida)
+ * Fix SBT build (Kenji Yoshida)
+ * Update README to display correct mailing list (Pablo Pita)
+ * Remove superfluous Interval#min param (Siddhartha Gadgil)
+ * Fix code examples in README (Kevin Meredith)
+ * Add support for pattern matching SafeLong (Kevin Meredith)
+ * Improve Opt and add tests (Alec Zorab)
+ * Fix tail recursion with Opt (Kenji Yoshida)
+ * Remove ApproximationContext entirely (Erik Osheim)
+ * Update sbt, scala and library versions (Kazuhiro Sera)
+ * Fix hashCode/equals for polynomials (Erik Osheim)
+ * Add pretty stringifcation to polynomials (Rüdiger Klaehn)
+ * Many new polynomial tests (Rüdiger Klaehn)
+ * Fix cooperative equality on Rational (Erik Osheim)
+ * Create DESIGN.md for implementation docs (Rüdiger Klaehn)
+ * Improve Interval tests, fix bugs (Denis Rosset)
+ * Add PCG-based Generator (Alexey Romanov)
+ * Fix Float/Double GCD bugs (Tom Switzer)
+ * Improve SafeLong test coverage (Erik Osheim)
+ * Improve Rational test coverage, fix bugs (Rüdiger Klaehn)
+ * Many Rational efficiency improvements (Rüdiger Klaehn)
+ * Add scoverage support (Rüdiger Klaehn)
+ * Fix ULong bugs (Erik Osheim)
+
+## Version 0.9.1
+
+ * Interval bug fixes (Denis Rosset)
+ * Efficiency improvements for Rational (Rüdiger Klaehn)
+ * Improve and document NumberTag (Tom Switzer)
+ * Add support and tests for partial actions (Denis Rosset)
+ * Add Opt[_] type for unboxed optional values (Denis Rosset)
+ * Add Gitter chat room to README (Erik Osheim)
+ * Fix bug with root-finding for Long values (Erik Osheim)
+
 ## Version 0.9.0
 
 The project now builds with Scala 2.11.4 by default.

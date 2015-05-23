@@ -1,11 +1,10 @@
 package spire.example
 
-import spire.algebra._
 import spire.implicits._
 import spire.math._
 
 object Graphing {
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
 
     val r = 9.0
 

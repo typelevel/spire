@@ -17,52 +17,52 @@ import org.scalatest.FunSuite
  */
 class TypeclassExistenceTest extends FunSuite {
 
-  def hasRig[A](implicit rig: Rig[A] = null, m: ClassTag[A]) {
+  def hasRig[A](implicit rig: Rig[A] = null, m: ClassTag[A]): Unit = {
     assert(rig != null, "Expected implicit Rig[%s] instance, but it was not found." format m)
   }
 
-  def hasRing[A](implicit ring: Ring[A] = null, m: ClassTag[A]) {
+  def hasRing[A](implicit ring: Ring[A] = null, m: ClassTag[A]): Unit = {
     assert(ring != null, "Expected implicit Ring[%s] instance, but it was not found." format m)
   }
    
-  def hasEuclideanRing[A](implicit e: EuclideanRing[A] = null, m: ClassTag[A]) {
+  def hasEuclideanRing[A](implicit e: EuclideanRing[A] = null, m: ClassTag[A]): Unit = {
     assert(e!= null, "Expected implicit EuclideanRing[%s] instance, but it was not found." format m)
   }
 
-  def hasField[A](implicit f: Field[A] = null, m: ClassTag[A]) {
+  def hasField[A](implicit f: Field[A] = null, m: ClassTag[A]): Unit = {
     assert(f != null, "Expected implicit Field[%s] instance, but it was not found." format m)
   }
 
-  def hasNumeric[A](implicit n: Numeric[A] = null, m: ClassTag[A]) {
+  def hasNumeric[A](implicit n: Numeric[A] = null, m: ClassTag[A]): Unit = {
     assert(n != null, "Expected implicit Numeric[%s] instance, but it was not found." format m)
   }
    
-  def hasFractional[A](implicit f: Fractional[A] = null, m: ClassTag[A]) {
+  def hasFractional[A](implicit f: Fractional[A] = null, m: ClassTag[A]): Unit = {
     assert(f != null, "Expected implicit Fractional[%s] instance, but it was not found." format m)
   }
  
-  def hasOrder[A](implicit ev: Order[A] = null, m: ClassTag[A]) {
+  def hasOrder[A](implicit ev: Order[A] = null, m: ClassTag[A]): Unit = {
     assert(ev != null, "Expected implicit Order[%s] instance, but it was not found." format m)
   }
   
-  def hasEq[A](implicit ev: Eq[A] = null, m: ClassTag[A]) {
+  def hasEq[A](implicit ev: Eq[A] = null, m: ClassTag[A]): Unit = {
     assert(ev != null, "Expected implicit Eq[%s] instance, but it was not found." format m)
   }
  
-  def hasConvertableFrom[A](implicit ev: ConvertableFrom[A] = null, m: ClassTag[A]) {
+  def hasConvertableFrom[A](implicit ev: ConvertableFrom[A] = null, m: ClassTag[A]): Unit = {
     assert(ev != null, "Expected implicit ConvertableFrom[%s] instance, but it was not found." format m)
   }
   
-  def hasConvertableTo[A](implicit ev: ConvertableTo[A] = null, m: ClassTag[A]) {
+  def hasConvertableTo[A](implicit ev: ConvertableTo[A] = null, m: ClassTag[A]): Unit = {
     assert(ev != null, "Expected implicit ConvertableTo[%s] instance, but it was not found." format m)
   }
 
-  def hasNRoot[A](implicit ev: NRoot[A] = null, m: ClassTag[A]) {
+  def hasNRoot[A](implicit ev: NRoot[A] = null, m: ClassTag[A]): Unit = {
     assert(ev != null, "Expected implicit NRoot[%s] instance, but it was not found." format m)
   }
 
   test("Numeric is ConvertableTo") {
-    def check[A: Numeric : ClassTag] {
+    def check[A: Numeric : ClassTag]: Unit = {
       hasConvertableTo[A]
     }
 
@@ -70,7 +70,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Numeric is ConvertableFrom") {
-    def check[A: Numeric : ClassTag] {
+    def check[A: Numeric : ClassTag]: Unit = {
       hasConvertableFrom[A]
     }
 
@@ -78,7 +78,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Rings are Rigs") {
-    def check[A: Ring: ClassTag] {
+    def check[A: Ring: ClassTag]: Unit = {
       hasRig[A]
     }
 
@@ -86,7 +86,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("EuclideanRings are Rings") {
-    def check[A: EuclideanRing: ClassTag] {
+    def check[A: EuclideanRing: ClassTag]: Unit = {
       hasRing[A]
     }
 
@@ -94,7 +94,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Fields are EuclideanRings") {
-    def check[A: Field: ClassTag] {
+    def check[A: Field: ClassTag]: Unit = {
       hasEuclideanRing[A]
     }
 
@@ -102,7 +102,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Numerics have Order, NRoot, and are Rigs") {
-    def check[A: Numeric: ClassTag] {
+    def check[A: Numeric: ClassTag]: Unit = {
       hasRig[A]
       hasOrder[A]
       hasNRoot[A]
@@ -112,7 +112,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Fractional have Order, NRoot and are Fields") {
-    def check[A: Fractional: ClassTag] {
+    def check[A: Fractional: ClassTag]: Unit = {
       hasOrder[A]
       hasEuclideanRing[A]
       hasField[A]
@@ -194,13 +194,11 @@ class TypeclassExistenceTest extends FunSuite {
     hasNRoot[BigDecimal]
   }
 
-  test("Rational is FieldWithNRoot") {
-    implicit val ac = ApproximationContext(Rational(1, 100))
+  test("Rational is Field") {
     hasEq[Rational]
     hasRing[Rational]
     hasEuclideanRing[Rational]
     hasField[Rational]
-    hasNRoot[Rational]
   }
 
   test("Algebraic is FieldWithNRoot") {
@@ -212,8 +210,6 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Everybody is Numeric") {
-    implicit val ac = ApproximationContext(Rational(1, 100))
-
     hasNumeric[Int]
     hasNumeric[Long]
     hasNumeric[BigInt]
@@ -225,8 +221,6 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("Float, Double, Rational, BigDecimal, and Algebraic are Fractional") {
-    implicit val ac = ApproximationContext(Rational(1, 100))
-
     hasFractional[Float]
     hasFractional[Double]
     hasFractional[BigDecimal]
@@ -235,7 +229,7 @@ class TypeclassExistenceTest extends FunSuite {
   }
 
   test("NRoot[Rational] requires implicit ApproximationContext") {
-    def check[A](implicit e: NRoot[A] = null) {
+    def check[A](implicit e: NRoot[A] = null): Unit = {
       assert(e == null)
     }
 

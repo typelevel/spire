@@ -21,7 +21,7 @@ class NumericTest extends FunSuite {
    *
    *   a=-3  b=3  c=9
    */
-  def runWith[@spec A:Numeric:ClassTag](cls:String)(a:A, b:A, c:A) {
+  def runWith[@spec A:Numeric:ClassTag](cls:String)(a:A, b:A, c:A): Unit = {
 
     // the name to use for this A
     //val cls = implicitly[ClassTag[A]].erasure.getSimpleName

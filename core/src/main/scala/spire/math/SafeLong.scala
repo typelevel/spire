@@ -185,7 +185,7 @@ object SafeLong extends SafeLongInstances {
   implicit def apply(x: BigInt): SafeLong =
     if (x.isValidLong) SafeLongLong(x.toLong) else SafeLongBigInt(x)
 
-  def apply(s: String): SafeLong =
+  private [math] def apply(s: String): SafeLong =
     try {
       SafeLong(java.lang.Long.parseLong(s))
     } catch {
@@ -222,7 +222,7 @@ object SafeLong extends SafeLongInstances {
 }
 
 
-private[math] case class SafeLongLong(x: Long) extends SafeLong {
+case class SafeLongLong(x: Long) extends SafeLong {
 
   def isZero: Boolean = x == 0
   def signum: Int = java.lang.Long.signum(x)
@@ -375,7 +375,7 @@ private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def bitLength: Int = 64 - java.lang.Long.numberOfLeadingZeros(x)
 }
 
-private[math] case class SafeLongBigInt(x: BigInt) extends SafeLong {
+case class SafeLongBigInt(x: BigInt) extends SafeLong {
 
   def isZero: Boolean = x.signum == 0
   def signum: Int = x.signum
@@ -531,4 +531,5 @@ private[math] trait SafeLongIsSigned extends Signed[SafeLong] {
 
 private[math] trait SafeLongIsReal extends IsIntegral[SafeLong] with SafeLongOrder with SafeLongIsSigned {
   def toDouble(n: SafeLong): Double = n.toDouble
+  def toBigInt(n: SafeLong): BigInt = n.toBigInt
 }

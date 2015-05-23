@@ -23,8 +23,6 @@ object Gaussian extends GaussianInstances {
 
 trait GaussianInstances {
   import BigDecimal.defaultMathContext
-  import spire.std.float._
-  import spire.std.double._
   import spire.std.bigDecimal._
 
   implicit val float: Gaussian[Float] =

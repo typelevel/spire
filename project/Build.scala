@@ -20,8 +20,8 @@ object MyBuild extends Build {
 
   // Dependencies
 
-  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.2.1"
-  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.12.1"
+  lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.2.4"
+  lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.12.2"
 
   // Release step
 
@@ -49,48 +49,52 @@ object MyBuild extends Build {
 
   // Settings
 
-  override lazy val settings = super.settings ++ Seq(
+  lazy val commonSettings = Seq(
     organization := "org.spire-math",
 
-    scalaVersion := "2.11.5",
+    scalaVersion := "2.11.6",
 
-    crossScalaVersions := Seq("2.10.4", "2.11.5"),
+    // https://github.com/non/spire/pull/413#issuecomment-89896773
+    crossScalaVersions := Seq("2.10.4", "2.11.6"),
 
     licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
     homepage := Some(url("http://spire-math.org")),
 
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-      "org.typelevel" %% "machinist" % "0.3.0"
+      "org.typelevel" %% "machinist" % "0.3.0" // TODO: 0.3.1 causes compilation errors
     ),
 
     scalacOptions ++= Seq(
-      //"-no-specialization", // use this to build non-specialized jars
       "-Yinline-warnings",
       "-deprecation",
+      "-encoding", "UTF-8", // yes, this is 2 args
+      "-feature",
       "-unchecked",
+      //"-Xfatal-warnings", // inliner warnings mean we leave this off
+      "-Xlint",
+      "-Xfuture",
+      "-Yno-adapted-args",
       "-optimize",
       "-language:experimental.macros",
       "-language:higherKinds",
-      "-language:implicitConversions",
-      "-feature"
+      "-language:implicitConversions"
     ),
 
     resolvers += Resolver.sonatypeRepo("snapshots"),
     resolvers += Resolver.sonatypeRepo("releases"),
     resolvers += "bintray/non" at "http://dl.bintray.com/non/maven",
 
-    // re-enable to check imports, or once scala's REPL manages to not
-    // be useless under -Ywarn-unused-import.
-
-    // scalacOptions in Compile := {
-    //   CrossVersion.partialVersion(scalaVersion.value) match {
-    //     case Some((2, 10)) =>
-    //       scalacOptions.value
-    //     case Some((2, n)) if n >= 11 =>
-    //       scalacOptions.value ++ Seq("-Ywarn-unused-import")
-    //   }
-    // },
+    scalacOptions ++= {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, 10)) =>
+          scalacOptions.value
+        case Some((2, n)) if n >= 11 =>
+          scalacOptions.value ++ Seq("-Ywarn-unused-import")
+      }
+    },
+    scalacOptions in (Compile, console) ~= {_.filterNot("-Ywarn-unused-import" == _)},
+    scalacOptions in (Test, console) <<= (scalacOptions in (Compile, console)),
 
     libraryDependencies := {
       CrossVersion.partialVersion(scalaVersion.value) match {
@@ -101,8 +105,8 @@ object MyBuild extends Build {
         // in Scala 2.10, quasiquotes are provided by macro-paradise
         case Some((2, 10)) =>
           libraryDependencies.value ++ Seq(
-            compilerPlugin("org.scalamacros" % "paradise" % "2.0.0" cross CrossVersion.full),
-            "org.scalamacros" %% "quasiquotes" % "2.0.0")
+            compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full),
+            "org.scalamacros" %% "quasiquotes" % "2.0.1")
       }
     },
 
@@ -147,7 +151,7 @@ object MyBuild extends Build {
 
   lazy val spireSettings = Seq(
     name := "spire-aggregate"
-  ) ++ noPublish ++ unidocSettings ++ Seq(
+  ) ++ commonSettings ++ noPublish ++ unidocSettings ++ Seq(
     unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, tests)
   ) ++ releaseSettings ++ Seq(
     releaseProcess := Seq[ReleaseStep](
@@ -169,7 +173,7 @@ object MyBuild extends Build {
   lazy val macros = Project("macros", file("macros")).
     settings(macroSettings: _*)
 
-  lazy val macroSettings = Seq(
+  lazy val macroSettings = commonSettings ++ Seq(
     name := "spire-macros",
     libraryDependencies ++= Seq(scalaTest % "test", scalaCheck % "test"),
     unmanagedSourceDirectories in Compile += (sourceDirectory in Compile).value / s"scala_${scalaBinaryVersion.value}"
@@ -184,9 +188,9 @@ object MyBuild extends Build {
   lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types",
     "Generates several type classes for Tuple2-22.")
 
-  lazy val coreSettings = Seq(
+  lazy val coreSettings = commonSettings ++ Seq(
     name := "spire",
-    sourceGenerators in Compile <+= (genProductTypes in Compile).task,
+    sourceGenerators in Compile <+= (genProductTypes in Compile),
     genProductTypes <<= (sourceManaged in Compile, streams) map { (scalaSource, s) =>
       s.log.info("Generating spire/std/tuples.scala")
       val algebraSource = ProductTypes.algebraProductTypes
@@ -217,11 +221,11 @@ object MyBuild extends Build {
     settings(examplesSettings: _*).
     dependsOn(core)
 
-  lazy val examplesSettings = Seq(
+  lazy val examplesSettings = commonSettings ++ Seq(
     name := "spire-examples",
     libraryDependencies ++= Seq(
       "com.chuusai" %% "shapeless" % "1.2.4",
-      "org.apfloat" % "apfloat" % "1.6.3",
+      "org.apfloat" % "apfloat" % "1.8.2",
       "org.jscience" % "jscience" % "4.3.1"
     )
   ) ++ noPublish
@@ -232,7 +236,7 @@ object MyBuild extends Build {
     settings(scalacheckSettings: _*).
     dependsOn(core)
 
-  lazy val scalacheckSettings = Seq(
+  lazy val scalacheckSettings = commonSettings ++ Seq(
     name := "spire-scalacheck-binding",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "discipline" % "0.2.1",
@@ -246,7 +250,7 @@ object MyBuild extends Build {
     settings(testsSettings: _*).
     dependsOn(core, scalacheckBinding)
 
-  lazy val testsSettings = Seq(
+  lazy val testsSettings = commonSettings ++ Seq(
     name := "spire-tests",
     libraryDependencies ++= Seq(
       scalaTest % "test"
@@ -260,7 +264,7 @@ object MyBuild extends Build {
     settings(benchmarkSettings: _*).
     dependsOn(core)
 
-  lazy val benchmarkSettings = Seq(
+  lazy val benchmarkSettings = commonSettings ++ Seq(
     name := "spire-benchmark",
 
     // raise memory limits here if necessary
@@ -272,16 +276,16 @@ object MyBuild extends Build {
       // comparisons
       "org.apfloat" % "apfloat" % "1.6.3",
       "org.jscience" % "jscience" % "4.3.1",
-      "org.apache.commons" % "commons-math3" % "3.2",
+      "org.apache.commons" % "commons-math3" % "3.4.1",
 
       // thyme
       "ichi.bench" % "thyme" % "0.1.0" from "http://plastic-idolatry.com/jars/thyme-0.1.0.jar",
 
       // caliper stuff
-      "com.google.guava" % "guava" % "r09",
-      "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.0",
+      "com.google.guava" % "guava" % "18.0",
+      "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.1",
       "com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" from "http://plastic-idolatry.com/jars/caliper-1.0-SNAPSHOT.jar",
-      "com.google.code.gson" % "gson" % "1.7.1"
+      "com.google.code.gson" % "gson" % "1.7.2"
     ),
 
     // enable forking in run
@@ -292,7 +296,7 @@ object MyBuild extends Build {
     settings(benchmarkJmhSettings: _*).
     dependsOn(core, benchmark)
 
-  lazy val benchmarkJmhSettings = SbtJmh.jmhSettings ++ Seq(
+  lazy val benchmarkJmhSettings = commonSettings ++ SbtJmh.jmhSettings ++ Seq(
     name := "spire-benchmark-jmh"
   ) ++ noPublish
 

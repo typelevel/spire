@@ -25,7 +25,7 @@ class AnyValAddBenchmarks extends MyBenchmark {
   var floats:Array[Float] = null
   var doubles:Array[Double] = null
 
-  override protected def setUp() {
+  override protected def setUp(): Unit = {
     bytes = init(size)(nextInt.toByte)
     shorts = init(size)(nextInt.toShort)
     ints = init(size)(nextInt)

@@ -64,7 +64,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   // runDense[BigDecimal]("decimal")(arbitraryBigDecimal, sbd, fbd, cbd)
   // runSparse[BigDecimal]("decimal")(arbitraryBigDecimal, sbd, fbd, cbd)
 
-  def runDense[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
+  def runDense[A: Arbitrary: Eq: Field: ClassTag](typ: String): Unit = {
     implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
@@ -73,7 +73,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     runTest[A](s"$typ/dense")
   }
 
-  def runSparse[A: Arbitrary: Eq: Field: ClassTag](typ: String) {
+  def runSparse[A: Arbitrary: Eq: Field: ClassTag](typ: String): Unit = {
     implicit val arb: Arbitrary[Polynomial[A]] = Arbitrary(for {
       ts <- arbitrary[List[Term[A]]]
     } yield {
@@ -82,7 +82,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     runTest[A](s"$typ/sparse")
   }
 
-  def runTest[A: Eq: Field: ClassTag](name: String)(implicit arb: Arbitrary[Polynomial[A]], arb2: Arbitrary[A]) {
+  def runTest[A: Eq: Field: ClassTag](name: String)(implicit arb: Arbitrary[Polynomial[A]], arb2: Arbitrary[A]): Unit = {
     type P = Polynomial[A]
 
     val zero = Polynomial.zero[A]
@@ -164,7 +164,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
   property("terms") {
     forAll { (t: Term[Rational]) =>
-      t.toTuple shouldBe (t.exp, t.coeff)
+      t.toTuple shouldBe ((t.exp, t.coeff))
       t.isIndexZero shouldBe (t.exp == 0)
       forAll { (x: Rational) =>
         t.eval(x) shouldBe t.coeff * x.pow(t.exp.toInt)
@@ -177,13 +177,19 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
   property("sparse p = p") {
     forAll { (p: PolySparse[Rational]) =>
+      val d = p.toDense
       p shouldBe p
+      p shouldBe d
+      p.## shouldBe d.##
     }
   }
 
   property("dense p = p") {
     forAll { (p: PolyDense[Rational]) =>
+      val s = p.toSparse
       p shouldBe p
+      p shouldBe s
+      p.## shouldBe s.##
     }
   }
 
@@ -211,7 +217,15 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
-  def gcdTest(x: Polynomial[Rational], y: Polynomial[Rational]) {
+  property("apply(r, 0) = r") {
+    forAll { (r: Rational) =>
+      val p = Polynomial(r, 0)
+      p shouldBe r
+      p.## shouldBe r.##
+    }
+  }
+
+  def gcdTest(x: Polynomial[Rational], y: Polynomial[Rational]): Unit = {
     if (!x.isZero || !y.isZero) {
       val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
       if (!gcd.isZero) {
@@ -258,6 +272,8 @@ class PolynomialTest extends FunSuite {
     val p = Polynomial(Array(Term(r"1/2", 0), Term(r"1/4", 2), Term(r"2", 1)))
     assert(p.terms.toSet === Set(Term(r"1/2", 0), Term(r"1/4", 2), Term(r"2", 1)))
     assert(p === Polynomial("1/4x^2 + 2x + 1/2"))
+    assert(p === Polynomial("1/4x² + 2x + 1/2"))
+    assert(p === Polynomial("1/4x² + x + x + 1/2"))
     assert(p === Polynomial(Map(2 -> r"1/4", 1 -> r"2", 0 -> r"1/2")))
   }
 

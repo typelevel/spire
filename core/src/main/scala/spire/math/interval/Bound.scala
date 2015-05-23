@@ -3,7 +3,6 @@ package interval
 
 import spire.syntax.order._
 import spire.syntax.field._
-import spire.syntax.nroot._
 import spire.algebra._
 
 sealed trait Bound[A] { lhs =>

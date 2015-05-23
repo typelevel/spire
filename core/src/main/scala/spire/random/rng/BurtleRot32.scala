@@ -32,7 +32,7 @@ abstract class BurtleRot32(_a: Int, _b: Int, _c: Int, _d: Int) extends IntBasedG
     bytes
   }
 
-  def setSeedBytes(bytes: Array[Byte]) {
+  def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < 16) Arrays.copyOf(bytes, 16) else bytes
     val bb = ByteBuffer.wrap(bs)
     a = bb.getInt()
@@ -72,7 +72,7 @@ abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, A
  * from [[http://burtleburtle.net/bob/rand/]]
  */
 final class BurtleRot2(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_a, _b, _c, _d) {
-  protected def advance() {
+  protected def advance(): Unit = {
     val e = a - rotateLeft(b,27)
     a = b ^ rotateLeft(c,17)
     b = c + d
@@ -94,7 +94,7 @@ object BurtleRot2 extends BurtleCompanion[BurtleRot2] {
  * Algorithm from [[http://burtleburtle.net/bob/rand/]]
  */
 final class BurtleRot3(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_a, _b, _c, _d) {
-  protected def advance() {
+  protected def advance(): Unit = {
     val e = a - rotateLeft(b, 23)
     a = b ^ rotateLeft(c, 16)
     b = c + rotateLeft(d, 11)

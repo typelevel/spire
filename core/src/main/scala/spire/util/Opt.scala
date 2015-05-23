@@ -9,11 +9,7 @@ object Opt extends OptVersions {
 
   implicit def Eq[A: Eq]: Eq[Opt[A]] = new Eq[Opt[A]] {
     def eqv(x: Opt[A], y: Opt[A]): Boolean =
-      if (x.isEmpty) y.isEmpty else {
-        if (y.isEmpty)
-          false
-        x.ref === y.ref
-      }
+      if (x.isEmpty) y.isEmpty else x.ref === y.ref
   }
 }
 
@@ -63,9 +59,9 @@ class Opt[+A](val ref: A) extends OptVersions.Base {
 
   def iterator: Iterator[A] = if (ref == null) collection.Iterator.empty else collection.Iterator.single(ref)
 
-  def toRight[X](left: => X) =
+  def toRight[X](left: => X): Either[X, A] =
     if (ref == null) Left(left) else Right(ref)
 
-  def toLeft[X](right: => X) =
+  def toLeft[X](right: => X): Either[A, X] =
     if (ref == null) Right(right) else Left(ref)
 }

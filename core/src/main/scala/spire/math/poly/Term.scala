@@ -46,7 +46,7 @@ case class Term[@spec(Float, Double) C](coeff: C, exp: Int) { lhs =>
     def expString = exp match {
       case 0 => ""
       case 1 => "x"
-      case _ => s"x^$exp"
+      case _ => "x" + exp.toString.map(superscript)
     }
 
     def simpleCoeff: Option[String] = coeff match {
@@ -82,4 +82,31 @@ object Term {
 
   private val IsZero = "0".r
   private val IsNegative = "-(.*)".r
+
+  private val digitToSuperscript = Array(
+    '0' -> '\u2070',
+    '1' -> '\u2071',
+    '2' -> '\u2072',
+    '3' -> '\u2073',
+    '4' -> '\u2074',
+    '5' -> '\u2075',
+    '6' -> '\u2076',
+    '7' -> '\u2077',
+    '8' -> '\u2078',
+    '9' -> '\u2079',
+    '-' -> '\u207B',
+    '1' -> '\u00B9',
+    '2' -> '\u00B2',
+    '3' -> '\u00B3'
+  )
+
+  private val superscriptRegex =
+    "[\\u2070\\u2071\\u2072\\u2073\\u2074\\u2075\\u2076\\u2077\\u2078\\u2079\\u207B\\u00B9\\u00B2\\u00B3]+".r
+
+  private[spire] def removeSuperscript(text: String): String =
+    superscriptRegex.replaceAllIn(text, "^" + _.group(0).map(removeSuperscript))
+
+  private val superscript : (Char => Char) = Map(digitToSuperscript:_*)
+
+  private val removeSuperscript : (Char => Char) = Map(digitToSuperscript.map(_.swap):_*)
 }

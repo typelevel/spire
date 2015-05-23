@@ -1,6 +1,7 @@
 package spire.std
 
-import spire.algebra.{Field, IsReal, NRoot, Order, Signed, Trig}
+import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
+import spire.math.Rational
 
 import java.lang.Math
 import java.lang.Long.{ numberOfTrailingZeros, numberOfLeadingZeros }
@@ -115,12 +116,13 @@ trait DoubleIsSigned extends Signed[Double] {
   def abs(a: Double): Double = if (a < 0.0) -a else a
 }
 
-trait DoubleIsReal extends IsReal[Double] with DoubleOrder with DoubleIsSigned {
+trait DoubleIsReal extends IsRational[Double] with DoubleOrder with DoubleIsSigned {
   def toDouble(x: Double): Double = x
   def ceil(a:Double): Double = Math.floor(a)
   def floor(a:Double): Double = Math.floor(a)
   def round(a:Double): Double = spire.math.round(a)
   def isWhole(a:Double) = a % 1.0 == 0.0
+  def toRational(a:Double): Rational = Rational(a)
 }
 
 @SerialVersionUID(0L)

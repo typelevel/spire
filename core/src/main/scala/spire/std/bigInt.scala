@@ -63,6 +63,7 @@ trait BigIntIsSigned extends Signed[BigInt] {
 
 trait BigIntIsReal extends IsIntegral[BigInt] with BigIntOrder with BigIntIsSigned with Serializable {
   def toDouble(n: BigInt): Double = n.toDouble
+  def toBigInt(n: BigInt): BigInt = n
 }
 
 trait BigIntIsMetricSpace extends MetricSpace[BigInt, BigInt] {

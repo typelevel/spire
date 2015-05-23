@@ -105,7 +105,7 @@ class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
   import spire.compat.ordering
 
-  def dumpDiff(label: String, base: H, gen: H) {
+  def dumpDiff(label: String, base: H, gen: H): Unit = {
     println(s"$label $base $gen")
     val (gr, gi, gj, gk) = (gen.r, gen.i, gen.j, gen.k)
     val (br, bi, bj, bk) = (base.r, base.i, base.j, base.k)

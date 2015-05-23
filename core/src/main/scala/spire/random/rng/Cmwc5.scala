@@ -23,7 +23,7 @@ final class Cmwc5(_x: Long, _y: Long, _z: Long, _w: Long, _v: Long) extends Long
     longs
   }
 
-  def setSeed(longs: Array[Long]) {
+  def setSeed(longs: Array[Long]): Unit = {
     x = longs(0)
     y = longs(1)
     z = longs(2)
@@ -42,7 +42,7 @@ final class Cmwc5(_x: Long, _y: Long, _z: Long, _w: Long, _v: Long) extends Long
     bytes
   }
 
-  def setSeedBytes(bytes: Array[Byte]) {
+  def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < 40) Arrays.copyOf(bytes, 40) else bytes
     val bb = ByteBuffer.wrap(bs)
     x = bb.getLong()

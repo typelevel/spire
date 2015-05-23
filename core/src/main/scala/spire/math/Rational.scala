@@ -1,12 +1,16 @@
 package spire.math
 
-import spire.macros.Checked
-import spire.std.long.LongAlgebra
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import spire.algebra.{Field, IsReal, NRoot, Sign}
+import java.math.{ BigDecimal => JBigDecimal, MathContext, RoundingMode }
+
+import spire.algebra.{Field, IsRational, NRoot, Sign}
 import spire.algebra.Sign.{ Positive, Zero, Negative }
+import spire.macros.Checked
+import spire.std.long.LongAlgebra
+import spire.std.double._
+import spire.syntax.nroot._
 
 sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] { lhs =>
   import LongRationals.LongRational
@@ -46,8 +50,19 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def gcd(rhs: Rational): Rational
 
+  def toBigDecimal(scale: Int, mode: RoundingMode): BigDecimal = {
+    val n = new JBigDecimal(numerator.bigInteger)
+    val d = new JBigDecimal(denominator.bigInteger)
+    BigDecimal(n.divide(d, scale, mode))
+  }
+
+  def toBigDecimal(mc: MathContext): BigDecimal = {
+    val n = new JBigDecimal(numerator.bigInteger)
+    val d = new JBigDecimal(denominator.bigInteger)
+    BigDecimal(n.divide(d, mc))
+  }
+
   def toBigInt: BigInt
-  def toBigDecimal: BigDecimal
   override def shortValue = longValue.toShort
   override def byteValue = longValue.toByte
 
@@ -58,132 +73,6 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def roundTo(denom: SafeLong): Rational = (this * denom).round / denom
 
   def pow(exp: Int): Rational
-
-  // $COVERAGE-OFF$
-  /**
-   * Returns this `Rational` to the exponent `exp`. Both the numerator and
-   * denominator of `exp` must be valid integers. Anything larger will cause
-   * `pow` to throw an `ArithmeticException`.
-   */
-  def pow(exp: Rational)(implicit ctxt: ApproximationContext[Rational]): Rational = {
-    if (exp < 0) {
-      this.inverse.pow(-exp)(ctxt)
-    } else if (!(exp.numerator.isValidInt) || !(exp.denominator.isValidInt)) {
-      throw new ArithmeticException("Exponent is too large!")
-    } else {
-      
-      // nroot must be done last so the context is still valid, otherwise, we'd
-      // need to adjust the error, as the absolute error would increase,
-      // relatively, by (1 + e)^exp.numerator if nroot was done before the pow.
-
-      (this pow exp.numerator.toInt).nroot(exp.denominator.toInt)(ctxt)
-    }
-  }
-
-
-  /**
-   * Find the n-th root of this `Rational`. This requires an (implicit)
-   * `ApproximationContext` to bound the allowable absolute error of the answer.
-   */
-  def nroot(k: Int)(implicit ctxt: ApproximationContext[Rational]): Rational = if (k == 0) {
-    Rational.one
-  } else if (k < 0) {
-    this.inverse.nroot(-k)(ctxt)
-  } else if (numerator == 0) {
-    Rational.zero
-  } else {
-
-    // TODO: Is this necessary with the better init. approx in the else?
-
-    val (low, high) = this match {
-      case LongRational(n, d) => {
-        val n_ = Rational.nroot(n, k)
-        val d_ = Rational.nroot(d, k)
-        (Rational(n_._1, d_._2), Rational(n_._2, d_._1))
-      }
-      case BigRational(n, d) => {
-        val n_ = Rational.nroot(n, k)
-        val d_ = Rational.nroot(d, k)
-        (Rational(n_._1, d_._2), Rational(n_._2, d_._1))
-      }
-    }
-    
-    if (low == high) {
-      low
-    } else {
-    
-      import Rational.{ nroot => intNroot }
-
-      // To ensure the initial approximation is within (relatively) 1/n of the
-      // actual root, we need to ensure the num. and den. are both >= min.
-      // Otherwise, we need to find a single multiplier for them that can
-      // guarantee this. From there, we can simply use the integer version of
-      // nroot to get a good approximation.
-
-      val min = (BigInt(k) * 2 + 1) pow k
-      val mul = min / (this.numerator min this.denominator) + 1
-      val numIntRt = intNroot(numerator * mul, k)
-      val denIntRt = intNroot(denominator * mul, k)
-      val low = Rational(numIntRt._1, denIntRt._2)
-      val high = Rational(numIntRt._2, denIntRt._1)
-
-      // Reduction in absolute error from n-th root algorithm:
-      // Let x(k) be the approximation at step k, x(oo) be the n-th root. Let
-      // e(k) be the relative error at step k, thus x(k) = x(oo)(1 + e(k)). If
-      // x(0) > x(oo), then x(k) > x(oo) (this can be seen during the
-      // derivation).
-      //
-      // x(k+1) = 1/n [(n-1) * x(k) + x(oo)^n / x(k)^(n-1)]
-      //          1/n [(n-1) * x(oo) * (1 + e(k)) + x(oo)^n / (x(oo) * (1 + e(k)))^(n-1)]
-      //          x(oo)[(n-1)*(1+e(k)) / n + 1 / (n * (1 + e(k))^(n-1))]
-      //          x(oo)[1 + e(k) + (1 + e(k))/n + 1 / (n * (1 + e(k))^(n-1))]
-      //          x(oo)[1 + e(k) * (1 - ((1 + e(k))^n - 1) / (e(k) * n * (1 + e(k))^(n-1))]
-      //          x(oo)[1 + e(k) * (1 - ((1 + n*e(k) + nC2*e(k)^2 + ... + e(k)^n) - 1) / (.. as above ..))]
-      //          x(oo)[1 + e(k) * (1 - (1 + nC2*e^2/n + ... + e^(n-1)/n) / (1 + e(k))^(n-1))]
-      //        < x(oo)[1 + e(k) * (1 - 1 / (1 + e(k))^(n-1))]
-      //        < x(oo)[1 + e(k) * (1 - 1 / (1 + 1/n)^(n-1))]
-      // Let e = (1 + 1/n)^(n-1).
-      //        < x(oo)[1 + e(k) * (e - 1 / e)]
-      //          
-      // So, we use a = (e - 1) / e as the relative error multiplier.
-
-      val e = Rational(k + 1, k) pow (k - 1)
-      val a = (e - 1) / e   // The relative error is multiplied by this each iter.
-      val error = ctxt.error
-      val absErr = high - low // I have no idea why I had this: high / k
-
-      // absErr * a^k < error => a^k = error / absErr => k = log(error / absErr) / log(a)
-      val maxiters = math.ceil(math.log((error / absErr).toDouble) / math.log(a.toDouble)).toInt
-      
-      // A single step of the nth-root algorithm.
-      @inline def refine(x: Rational) = (x * (k - 1) + this / (x pow (k - 1))) / k
-
-      def findNthRoot(prev: Rational, i: Int): Rational = if (i == maxiters) {
-        prev
-      } else {
-        val next = refine(prev)
-        
-        // We know x(e0 - e1) > (1 - a)xe0, so xe0 < x(e0 - e1) / (1 - a).
-        // Thus, if we have the difference, we can recalculate our guess of the
-        // absolute error more "accurately" by dividing the difference of the
-        // previous 2 guesses by (1 - a).
-        //
-        // This recalculation helps a lot. The numbers are a lot saner.
-
-        // TODO: If we remove the iters constraint and just use this, will we
-        //       ever perform worse than iters + 1 iterations? Need proof.
-
-        if (prev == next || ((prev - next) / (Rational(1) - a)) < error) {
-          prev
-        } else {
-          findNthRoot(next, i + 1)
-        }
-      }
-
-      findNthRoot(high, 0)
-    }
-  }
-  // $COVERAGE-ON$
 
   def sign: Sign = Sign(signum)
 
@@ -261,7 +150,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     @tailrec
     def closest(l: Rational, u: Rational): Rational = {
       val mediant = Rational(l.numerator + u.numerator, l.denominator + u.denominator)
-    
+
       if (mediant.denominator > limit) {
         if ((this - l).abs > (u - this).abs) u else l
       } else if (mediant == this) {
@@ -291,7 +180,7 @@ object Rational extends RationalInstances {
 
   val zero: Rational = LongRational(0L, 1L)
   val one: Rational = LongRational(1L, 1L)
-  
+
   def apply(n: SafeLong, d: SafeLong): Rational = {
     if (d.signum < 0) return apply(-n, -d)
     val g = n gcd d
@@ -432,7 +321,6 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
 
   def build(n: A, d: A): Rational
 
-  //sealed trait RationalLike extends Rational with Fraction[A] {
   sealed trait RationalLike extends Rational {
     def num: A
     def den: A
@@ -440,7 +328,6 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
     def isWhole: Boolean = den == one
 
     def toBigInt: BigInt = (integral.toBigInt(num) / integral.toBigInt(den))
-    def toBigDecimal: BigDecimal = integral.toBigDecimal(num) / integral.toBigDecimal(den)
 
     def longValue = toBigInt.longValue
     def intValue = longValue.intValue
@@ -459,7 +346,7 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
       val n = integral.toBigInt(num)
       val d = integral.toBigInt(den)
 
-      val sharedLength = Math.min(n.bitLength, d.bitLength)
+      val sharedLength = java.lang.Math.min(n.bitLength, d.bitLength)
       val dLowerLength = d.bitLength - sharedLength
 
       val nShared = n >> (n.bitLength - sharedLength)
@@ -485,12 +372,13 @@ private[math] abstract class Rationals[@specialized(Long) A](implicit integral: 
       case that: Algebraic => that == this
       case that: RationalLike => num == that.num && den == that.den
       case that: BigInt => isWhole && toBigInt == that
-      case that: BigDecimal => try { toBigDecimal == that } catch { case ae: ArithmeticException => false }
+      case that: BigDecimal => try { toBigDecimal(that.mc) == that } catch { case ae: ArithmeticException => false }
       case that: SafeLong => SafeLong(toBigInt) == that
       case that: Number => Number(this) == that
       case that: Natural => isWhole && this == Rational(that.toBigInt)
       case that: Complex[_] => that == this
       case that: Quaternion[_] => that == this
+      case that: Long => isValidLong && toLong == that
       case that => unifiedPrimitiveEquals(that)
     }
 
@@ -1008,10 +896,23 @@ private[math] object BigRationals extends Rationals[BigInt] {
 
 trait RationalInstances {
   implicit final val RationalAlgebra = new RationalAlgebra
-  implicit def RationalIsNRoot(implicit c:ApproximationContext[Rational]) = new RationalIsNRoot0
   import NumberTag._
   implicit final val RationalTag = new LargeTag[Rational](Exact, Rational.zero)
 
+}
+
+/**
+ * Used for Fractional[Rational] and Numeric[Rational] to provide
+ * approximate sqrt and nroot implementations.
+ *
+ * These operations occur at Double precision.
+ */
+private[math] trait RationalApproximateNRoot extends NRoot[Rational] {
+  def nroot(n: Rational, k: Int): Rational =
+    Rational(n.toDouble nroot k)
+
+  def fpow(n: Rational, k: Rational): Rational =
+    Rational(n.toDouble ** k.toDouble)
 }
 
 private[math] trait RationalIsField extends Field[Rational] {
@@ -1031,13 +932,7 @@ private[math] trait RationalIsField extends Field[Rational] {
   def div(a:Rational, b:Rational) = a / b
 }
 
-private[math] trait RationalIsNRoot extends NRoot[Rational] with Serializable {
-  implicit def context:ApproximationContext[Rational]
-  def nroot(a: Rational, k: Int): Rational = a.nroot(k)
-  def fpow(a: Rational, b: Rational): Rational = a.pow(b)
-}
-
-private[math] trait RationalIsReal extends IsReal[Rational] {
+private[math] trait RationalIsReal extends IsRational[Rational] {
   override def eqv(x:Rational, y:Rational) = x == y
   override def neqv(x:Rational, y:Rational) = x != y
   override def gt(x: Rational, y: Rational) = x > y
@@ -1054,12 +949,9 @@ private[math] trait RationalIsReal extends IsReal[Rational] {
   def ceil(a:Rational): Rational = a.ceil
   def floor(a:Rational): Rational = a.floor
   def round(a:Rational): Rational = a.round
+  def toRational(a: Rational): Rational = a
   def isWhole(a:Rational) = a.isWhole
 }
 
-@SerialVersionUID(0L)
+@SerialVersionUID(1L)
 class RationalAlgebra extends RationalIsField with RationalIsReal with Serializable
-
-@SerialVersionUID(0L)
-class RationalIsNRoot0(implicit val context: ApproximationContext[Rational])
-extends RationalIsNRoot with Serializable

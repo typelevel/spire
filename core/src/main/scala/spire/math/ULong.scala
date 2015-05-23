@@ -31,7 +31,11 @@ object ULong extends ULongInstances {
     if (b == new ULong(0L)) a else gcd(b, a % b)
   }
 
-  private[spire] final val bigIntOffset: BigInt = BigInt(Long.MaxValue) + 1
+  private[spire] final val LimitAsDouble: Double =
+    spire.math.pow(2.0, 64)
+
+  private[spire] final val LimitAsBigInt: BigInt =
+    BigInt(1) << 64
 }
 
 class ULong(val signed: Long) extends AnyVal {
@@ -41,25 +45,24 @@ class ULong(val signed: Long) extends AnyVal {
   final def toInt: Int = signed.toInt
   final def toLong: Long = signed
 
-  final def toFloat: Float = if (signed < 0)
-    -(Long.MinValue.toFloat) - signed.toFloat
-  else
-    signed.toFloat
+  final def toFloat: Float = {
+    if (signed < 0) (ULong.LimitAsDouble + signed.toDouble).toFloat
+    else signed.toFloat
+  }
 
-  final def toDouble: Double = if (signed < 0)
-    -(Long.MinValue.toDouble) - signed.toDouble
-  else
-    signed.toDouble
+  // FIXME: it would be nice to write some "real" floating-point code
+  // to correctly find the nearest Double.
+  final def toDouble: Double =
+    toBigInt.toDouble
 
-  final def toBigInt: BigInt = if (signed >= 0)
-    BigInt(signed)
-  else
-    ULong.bigIntOffset + (signed & Long.MaxValue)
+  final def toBigInt: BigInt =
+    if (signed < 0) ULong.LimitAsBigInt + signed
+    else BigInt(signed)
 
-  override final def toString: String = if (this.signed >= 0L)
-    this.signed.toString
-  else
-    (-BigInt(Long.MinValue) * 2 + BigInt(this.signed)).toString // ugh, fixme
+  // FIXME: it would be nice to avoid converting to BigInt here
+  override final def toString: String =
+    if (signed >= 0L) signed.toString
+    else (ULong.LimitAsBigInt + signed).toString
 
   final def == (that: ULong): Boolean = this.signed == that.signed
   final def != (that: ULong): Boolean = this.signed != that.signed
@@ -76,7 +79,7 @@ class ULong(val signed: Long) extends AnyVal {
 
   @inline final def >= (that: ULong) = that <= this
   @inline final def > (that: ULong) = that < this
-  
+
   final def unary_- = ULong(this.signed)
 
   final def + (that: ULong) = ULong(this.signed + that.signed)
@@ -186,6 +189,7 @@ private[math] trait ULongIsSigned extends Signed[ULong] {
 
 private[math] trait ULongIsReal extends IsIntegral[ULong] with ULongOrder with ULongIsSigned {
   def toDouble(n: ULong): Double = n.toDouble
+  def toBigInt(n: ULong): BigInt = n.toBigInt
 }
 
 @SerialVersionUID(0L)

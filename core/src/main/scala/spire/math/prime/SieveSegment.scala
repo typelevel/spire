@@ -80,7 +80,7 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
     SafeLong(-1L) // fail
   }
 
-  def init(fastq: FastFactors, slowq: FactorHeap) {
+  def init(fastq: FastFactors, slowq: FactorHeap): Unit = {
     initMod30()
     if (start == 0) {
       initFirst(fastq, slowq)
@@ -92,7 +92,7 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
     }
   }
 
-  def initMod30() {
+  def initMod30(): Unit = {
     val arr = primes.array
     assert(arr.length % 15 == 0)
     val limit = arr.length
@@ -106,7 +106,7 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
     }
   }
 
-  private def initFromArray(fastq: FastFactors) {
+  private def initFromArray(fastq: FastFactors): Unit = {
     val arr = fastq.arr
     var i = 0
 
@@ -131,7 +131,7 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
     }
   }
 
-  @tailrec private def initFromQueue(limit: SafeLong, q: FactorHeap) {
+  @tailrec private def initFromQueue(limit: SafeLong, q: FactorHeap): Unit = {
     if (q.isEmpty) return ()
 
     val factor = q.dequeue
@@ -157,7 +157,7 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
     }
   }
 
-  def initFirst(fastq: FastFactors, slowq: FactorHeap) {
+  def initFirst(fastq: FastFactors, slowq: FactorHeap): Unit = {
     var p: Int = 1
     val len = primes.length
     val buf = ArrayBuffer.empty[FastFactor]
@@ -184,7 +184,7 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
     fastq.arr = buf.toArray
   }
 
-  def initRest(slowq: FactorHeap) {
+  def initRest(slowq: FactorHeap): Unit = {
     if (start >= cutoff) return ()
 
     val len: Long = if (start + primes.length >= cutoff)
