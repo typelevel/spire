@@ -40,12 +40,24 @@ trait RingLaws[A] extends GroupLaws[A] {
 
   def multiplicativeSemigroup(implicit A: MultiplicativeSemigroup[A]) = new MultiplicativeProperties(
     base = _.semigroup(A.multiplicative),
-    parent = None
+    parent = None,
+    "prodn(a, 1) === a" → forAll((a: A) =>
+      A.prodn(a, 1) === a
+    ),
+    "prodn(a, 2) === a * a" → forAll((a: A) =>
+      A.prodn(a, 2) === (a * a)
+    )
   )
 
   def multiplicativeMonoid(implicit A: MultiplicativeMonoid[A]) = new MultiplicativeProperties(
     base = _.monoid(A.multiplicative),
-    parent = Some(multiplicativeSemigroup)
+    parent = Some(multiplicativeSemigroup),
+    "prodn(a, 0) === one" → forAll((a: A) =>
+      A.prodn(a, 0) === A.one
+    ),
+    "prod(Nil) === one" → forAll((a: A) =>
+      A.prod(Nil) === A.one
+    )
   )
 
   def multiplicativeGroup(implicit A: MultiplicativeGroup[A]) = new MultiplicativeProperties(

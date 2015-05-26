@@ -93,7 +93,7 @@ class CooperativeEqualityTest extends FunSuite {
   testEquals(Algebraic(3), "Algebraic", Real(3), "Real")
   testEquals(Real(3), "Real", Real(3), "Real")
 
-  def testComplex[A: ConvertableFrom](a: A, name: String) {
+  def testComplex[A: ConvertableFrom](a: A, name: String): Unit = {
     testEquals(a, name, Complex(a.toFloat), "Complex[Float]")
     testEquals(a, name, Complex(a.toDouble), "Complex[Double]")
     // testEquals(a, name, Complex(a.toBigDecimal), "Complex[BigDecimal]")
@@ -113,7 +113,7 @@ class CooperativeEqualityTest extends FunSuite {
   testComplex(Algebraic(3), "Algebraic")
   testComplex(Real(3), "Real")
 
-  def testQuaternion[A: ConvertableFrom](a: A, name: String) {
+  def testQuaternion[A: ConvertableFrom](a: A, name: String): Unit = {
     testEquals(a, name, Quaternion(a.toFloat), "Quaternion[Float]")
     testEquals(a, name, Quaternion(a.toDouble), "Quaternion[Double]")
     // testEquals(a, name, Quaternion(a.toBigDecimal), "Quaternion[BigDecimal]")

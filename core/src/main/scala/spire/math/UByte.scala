@@ -69,6 +69,8 @@ class UByte(val signed: Byte) extends AnyVal with scala.math.ScalaNumericAnyConv
 trait UByteInstances {
   implicit final val UByteAlgebra = new UByteAlgebra
   implicit final val UByteBitString = new UByteBitString
+  import spire.math.NumberTag._
+  implicit final val UByteTag = new UnsignedIntTag[UByte](UByte.MinValue, UByte.MaxValue)
 }
 
 private[math] trait UByteIsRig extends Rig[UByte] {
@@ -100,6 +102,7 @@ private[math] trait UByteIsSigned extends Signed[UByte] {
 
 private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteOrder with UByteIsSigned {
   def toDouble(n: UByte): Double = n.toDouble
+  def toBigInt(n: UByte): BigInt = n.toBigInt
 }
 
 @SerialVersionUID(0L)

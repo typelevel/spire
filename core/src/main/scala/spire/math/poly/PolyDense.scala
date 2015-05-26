@@ -36,6 +36,23 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
     }
   }
 
+  def termsIterator: Iterator[Term[C]] =
+    new TermIterator
+
+  class TermIterator extends Iterator[Term[C]] {
+    private[this] var e: Int = 0
+    private[this] def findNext(): Unit =
+      while (e < coeffs.length && coeffs(e) == 0) e += 1
+    findNext()
+    def hasNext: Boolean = e < coeffs.length
+    def next: Term[C] = {
+      val term = Term[C](coeffs(e), e)
+      e += 1
+      findNext()
+      term
+    }
+  }
+
   def coeffsArray(implicit ring: Semiring[C]): Array[C] = coeffs
 
   def nth(n: Int)(implicit ring: Semiring[C]): C =

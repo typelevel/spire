@@ -10,11 +10,22 @@ class RationalTest extends FunSuite {
     val r = Rational(5,6)
     assert(r.numerator === BigInt(5))
     assert(r.denominator === BigInt(6))
+    intercept[IllegalArgumentException] {
+      Rational(1,0)
+    }
+    intercept[IllegalArgumentException] {
+      Rational(BigInt(1),0)
+    }
   }
   test("rational degenerate construction") {
     val r = Rational(30, 345)
     assert(r.numerator === BigInt(2))
     assert(r.denominator === BigInt(23))
+  }
+  test("rational parse") {
+    intercept[NumberFormatException] {
+      Rational("x")
+    }
   }
   
   test("RationalIsFractional implicit exists") {
@@ -162,6 +173,9 @@ class RationalTest extends FunSuite {
     intercept[ArithmeticException] {
       Rational.one / 0
     }
+    intercept[ArithmeticException] {
+      Rational.zero.reciprocal
+    }
   }
   
   test("pow") {
@@ -171,11 +185,18 @@ class RationalTest extends FunSuite {
     }
     
     val b = Rational(-3, 1)
+    assertResult(Rational.one) {
+      b pow 0
+    }
     assertResult(Rational(9, 1)) {
       b pow 2
     }
     assertResult(Rational(-27, 1)) {
       b pow 3
+    }
+    val l = Rational(Long.MaxValue) * 2
+    assertResult(Rational.one) {
+      l pow 0
     }
   }
   
@@ -290,5 +311,81 @@ class RationalTest extends FunSuite {
     val y = Rational("1919191919191919191919/373737373737373737")
     val z = Rational("1/287380324068203382157064120376241062")
     assert(x.gcd(y) === z) // As confirmed by Wolfram Alpha
+  }
+
+  test("Rational(0D) is Zero") {
+    assert(Rational(0D) === Rational.zero)
+  }
+
+  test("compareToOne") {
+    val d = Rational(1, Long.MaxValue)
+    assert(Rational.one.compareToOne === 0)
+    assert((Rational.one + d).compareToOne == 1)
+    assert((Rational.one - d).compareToOne == -1)
+  }
+  test("limitToLong") {
+    val d = Rational(1, Long.MaxValue)
+    // re-enable once #393 is fixed
+    // assert((Rational.one + d).limitToLong == Rational.one)
+  }
+  test("numeratorAndDenominatorAsLong") {
+    assert(Rational(2,3).numeratorAsLong === 2L)
+    assert(Rational(2,3).denominatorAsLong === 3L)
+
+    assert((Rational(1, Long.MaxValue) / 2).numeratorAsLong === 1L)
+    assert((Rational(Long.MaxValue) * 2).denominatorAsLong === 1L)
+  }
+  test("quotMod") {
+    val a = Rational(31, 4)
+    val b = Rational(7, 9)
+    assertResult(a) {
+      val (q, m) = Rational.RationalAlgebra.quotmod(a, b)
+      q * b + m
+    }
+  }
+  test("isValidFlags") {
+    def check(x:Rational, whole:Boolean, char:Boolean, byte:Boolean, short:Boolean, int:Boolean, long:Boolean): Unit = {
+      assert(x.isWhole == whole)
+      assert(x.isValidChar == char)
+      assert(x.isValidByte == byte)
+      assert(x.isValidShort == short)
+      assert(x.isValidInt == int)
+      assert(x.isValidLong == long)
+    }
+
+    check(Rational.one, true, true, true, true, true, true)
+    check(Rational(1,2), false, false, false, false, false, false)
+
+    check(Rational(Byte.MaxValue), true, true, true, true, true, true)
+    check(Rational(Byte.MaxValue) + 1, true, true, false, true, true, true)
+    check(Rational(Byte.MinValue), true, false, true, true, true, true)
+    check(Rational(Byte.MinValue) - 1, true, false, false, true, true, true)
+
+    check(Rational(Short.MaxValue), true, true, false, true, true, true)
+    check(Rational(Short.MaxValue) + 1, true, true, false, false, true, true)
+    check(Rational(Short.MinValue), true, false, false, true, true, true)
+    check(Rational(Short.MinValue) - 1, true, false, false, false, true, true)
+
+    check(Rational(Char.MaxValue), true, true, false, false, true, true)
+    check(Rational(Char.MaxValue) + 1, true, false, false, false, true, true)
+    check(Rational(Char.MinValue), true, true, true, true, true, true)
+    check(Rational(Char.MinValue) - 1, true, false, true, true, true, true)
+
+    check(Rational(Int.MaxValue), true, false, false, false, true, true)
+    check(Rational(Int.MaxValue) + 1, true, false, false, false, false, true)
+    check(Rational(Int.MinValue), true, false, false, false, true, true)
+    check(Rational(Int.MinValue) - 1, true, false, false, false, false, true)
+
+    check(Rational(Long.MaxValue), true, false, false, false, false, true)
+    check(Rational(Long.MaxValue) + 1, true, false, false, false, false, false)
+    check(Rational(Long.MinValue), true, false, false, false, false, true)
+    check(Rational(Long.MinValue) - 1, true, false, false, false, false, false)
+  }
+  test("applyNumber") {
+    def rationalFromNumber(x:Number) = Rational(x)
+    assert(rationalFromNumber(1) == 1)
+    assert(rationalFromNumber(1.0) == 1)
+    assert(rationalFromNumber(Rational.one) == 1)
+    assert(rationalFromNumber(1:BigDecimal) == 1)
   }
 }

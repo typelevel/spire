@@ -62,6 +62,7 @@ trait IntIsSigned extends Signed[Int] {
 
 trait IntIsReal extends IsIntegral[Int] with IntOrder with IntIsSigned {
   def toDouble(n: Int): Double = n.toDouble
+  def toBigInt(n: Int): BigInt = BigInt(n)
 }
 
 @SerialVersionUID(0L)
@@ -96,4 +97,6 @@ class IntAlgebra extends IntIsEuclideanRing with IntIsNRoot with IntIsReal with 
 trait IntInstances {
   implicit final val IntBitString = new IntIsBitString
   implicit final val IntAlgebra = new IntAlgebra
+  import spire.math.NumberTag._
+  implicit final val IntTag = new BuiltinIntTag[Int](0, Int.MinValue, Int.MaxValue)
 }

@@ -63,6 +63,7 @@ trait BigIntIsSigned extends Signed[BigInt] {
 
 trait BigIntIsReal extends IsIntegral[BigInt] with BigIntOrder with BigIntIsSigned with Serializable {
   def toDouble(n: BigInt): Double = n.toDouble
+  def toBigInt(n: BigInt): BigInt = n
 }
 
 trait BigIntIsMetricSpace extends MetricSpace[BigInt, BigInt] {
@@ -74,4 +75,6 @@ class BigIntAlgebra extends BigIntIsEuclideanRing with BigIntIsNRoot with BigInt
 
 trait BigIntInstances {
   implicit final val BigIntAlgebra = new BigIntAlgebra
+  import spire.math.NumberTag._
+  implicit final val BigIntTag = new LargeTag[BigInt](Integral, BigInt(0))
 }

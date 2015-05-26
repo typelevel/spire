@@ -38,7 +38,7 @@ import SieveUtil._
  * will instantiate a Siever for you with reasonable parameters.
  */
 case class Siever(chunkSize: Int, cutoff: SafeLong) {
-  if (chunkSize % 480 != 0) sys.error("chunkSize must be a multiple of 480")
+  require(chunkSize % 480 != 0, "chunkSize must be a multiple of 480")
 
   val arr = BitSet.alloc(chunkSize)
   var start: SafeLong = SafeLong(0)
@@ -49,7 +49,7 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
   sieve.init(fastq, slowq)
 
   def largestBelow(n: SafeLong): SafeLong = {
-    if (n < 3) sys.error("invalid argument: %s" format n)
+    if (n < 3) throw new IllegalArgumentException("invalid argument: %s" format n)
     if (n == 3) return SafeLong(2)
 
     var i = 3
@@ -97,7 +97,7 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
     return SafeLong(0) // impossible
   }
 
-  private def initNextSieve() {
+  private def initNextSieve(): Unit = {
     start += chunkSize
     limit += chunkSize
     val csq = cutoff ** 2

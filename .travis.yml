@@ -1,4 +1,11 @@
 language: scala
 scala:
+  # https://github.com/non/spire/pull/413#issuecomment-89896773
   - 2.10.2
-  - 2.11.2
+  - 2.11.6
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#spire-math"
+    on_success: change
+    on_failure: always

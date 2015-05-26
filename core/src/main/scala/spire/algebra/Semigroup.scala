@@ -6,18 +6,18 @@ import scala.annotation.{ switch, tailrec }
 /**
  * A semigroup is any set `A` with an associative operation (`op`).
  */
-trait Semigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] {
+trait Semigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any {
   def op(x: A, y: A): A
 
   /**
    * Return `a` combined with itself `n` times.
    */
-  def sumn(a: A, n: Int): A =
-    if (n <= 0) throw new IllegalArgumentException("Repeated summation for semigroups must have reptitions > 0")
+  def combinen(a: A, n: Int): A =
+    if (n <= 0) throw new IllegalArgumentException("Repeated combination for semigroups must have repetitions > 0")
     else if (n == 1) a
-    else sumnAboveOne(a, n)
+    else combinenAboveOne(a, n)
 
-  protected def sumnAboveOne(a: A, n: Int): A = {
+  protected def combinenAboveOne(a: A, n: Int): A = {
     @tailrec def loop(b: A, k: Int, extra: A): A =
       if (k == 1) {
         op(b, extra)
@@ -29,11 +29,11 @@ trait Semigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] {
   }
 
   /**
-   *  Given a sequence of `as`, sum them using the semigroup and return the total.
+   *  Given a sequence of `as`, combine them using the semigroup and return the total.
    * 
    *  If the sequence is empty, returns None. Otherwise, returns Some(total).
    */
-  def sumOption(as: TraversableOnce[A]): Option[A] = as.reduceOption(op)
+  def combineOption(as: TraversableOnce[A]): Option[A] = as.reduceOption(op)
 }
 
 object Semigroup {
@@ -57,8 +57,7 @@ object Semigroup {
  * 
  * A semigroup is commutative if for all x and y, x |+| y === y |+| x.
  */
-trait CSemigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A]
-    extends Semigroup[A]
+trait CSemigroup[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Semigroup[A]
 
 object CSemigroup {
   @inline final def apply[A](implicit ev: CSemigroup[A]): CSemigroup[A] = ev

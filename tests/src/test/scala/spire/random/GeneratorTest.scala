@@ -33,10 +33,13 @@ class GeneratorTest extends FunSuite {
   val size: Int = 10000000
   val threshold: Double = 0.0038
 
-  List(Lcg32, Lcg64, BurtleRot2, BurtleRot3, Marsaglia32a6, MersenneTwister32, MersenneTwister64, Cmwc5, Well512a, Well1024a, Well19937a, Well19937c, Well44497a, Well44497b).foreach { gen => 
+  //val bases: List[Int] = List(3, 5, 7, 11, 13, 17)
+  val bases: List[Int] = Nil
+
+  List(Lcg32, Lcg64, BurtleRot2, BurtleRot3, Marsaglia32a6, MersenneTwister32, MersenneTwister64, Cmwc5, Well512a, Well1024a, Well19937a, Well19937c, Well44497a, Well44497b, PcgXshRr64_32).foreach { gen =>
     val name = getName(gen)
 
-    List(3, 5, 7, 11, 13, 17).foreach { mod =>
+    bases.foreach { mod =>
       test("%s nextInt(%d) distributed within %.2f%%" format (name, mod, threshold * 100)) {
         val histogram = new Array[Int](mod)
         //val rng = gen.fromTime()

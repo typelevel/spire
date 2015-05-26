@@ -59,6 +59,8 @@ class UInt(val signed: Int) extends AnyVal {
 trait UIntInstances {
   implicit final val UIntAlgebra = new UIntAlgebra
   implicit final val UIntBitString = new UIntBitString
+  import spire.math.NumberTag._
+  implicit final val UIntTag = new UnsignedIntTag[UInt](UInt.MinValue, UInt.MaxValue)
 }
 
 private[math] trait UIntIsRig extends Rig[UInt] {
@@ -116,6 +118,7 @@ private[math] trait UIntIsSigned extends Signed[UInt] {
 
 private[math] trait UIntIsReal extends IsIntegral[UInt] with UIntOrder with UIntIsSigned {
   def toDouble(n: UInt): Double = n.toDouble
+  def toBigInt(n: UInt): BigInt = n.toBigInt
 }
 
 @SerialVersionUID(0L)

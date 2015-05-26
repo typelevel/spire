@@ -259,7 +259,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   }
 }
 
-object Real {
+object Real extends RealInstances {
 
   val zero: Real = Exact(Rational.zero)
   val one: Real = Exact(Rational.one)
@@ -290,7 +290,7 @@ object Real {
   def log(x: Real): Real = {
     val t = x(2)
     val n = sizeInBase(t, 2) - 3
-    if (t < 0) sys.error("log of negative number")
+    if (t < 0) throw new ArithmeticException("log of negative number")
     else if (t < 4) -log(x.reciprocal)
     else if (t < 8) logDr(x)
     else logDr(div2n(x, n)) + Real(n) * log2
@@ -300,7 +300,7 @@ object Real {
     val u = x / log2
     val n = u(0)
     val s = x - Real(n) * log2
-    if (!n.isValidInt) sys.error("sorry")
+    if (!n.isValidInt) throw new ArithmeticException("invalid power in exp")
     else if (n < 0) div2n(expDr(s), -n.toInt)
     else if (n > 0) mul2n(expDr(s), n.toInt)
     else expDr(s)
@@ -501,8 +501,6 @@ object Real {
     //powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ + 1, x)
     powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ * 2, x)
 
-  implicit val algebra = new RealAlgebra {}
-
   case class Exact(n: Rational) extends Real {
     def apply(p: Int): SafeLong = Real.roundUp(Rational(2).pow(p) * n)
   }
@@ -519,6 +517,12 @@ object Real {
         result
     }
   }
+}
+
+trait RealInstances {
+  implicit final val algebra = new RealAlgebra
+  import NumberTag._
+  implicit final val RealTag = new LargeTag[Real](Exact, Real.zero)
 }
 
 @SerialVersionUID(0L)
@@ -581,7 +585,7 @@ trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Rea
   def toFloat(x: Real): Float = x.toRational.toFloat
   def toDouble(x: Real): Double = x.toRational.toDouble
   def toBigInt(x: Real): BigInt = x.toRational.toBigInt
-  def toBigDecimal(x: Real): BigDecimal = x.toRational.toBigDecimal
+  def toBigDecimal(x: Real): BigDecimal = x.toRational.toBigDecimal(java.math.MathContext.DECIMAL64)
   def toRational(x: Real): Rational = x.toRational
   def toAlgebraic(x: Real): Algebraic = Algebraic(x.toRational) //FIXME
   def toReal(x: Real): Real = x
@@ -598,7 +602,7 @@ trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Rea
   def fromBigInt(n: BigInt): Real = Real(n)
   def fromBigDecimal(n: BigDecimal): Real = Real(n)
   def fromRational(n: Rational): Real = Real(n)
-  def fromAlgebraic(n: Algebraic): Real = Real(n.toRational)
+  def fromAlgebraic(n: Algebraic): Real = n.evaluateWith[Real]
   def fromReal(n: Real): Real = n
 
   def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): Real =

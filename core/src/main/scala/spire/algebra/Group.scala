@@ -5,8 +5,7 @@ import scala.{ specialized => spec }
 /**
  * A group is a monoid where each element has an inverse.
  */
-trait Group[@spec(Byte, Short, Int, Long, Float, Double) A]
-    extends Monoid[A] {
+trait Group[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Monoid[A] {
 
   /**
    * Return the inverse of `a`.
@@ -21,12 +20,12 @@ trait Group[@spec(Byte, Short, Int, Long, Float, Double) A]
   /**
    * Return `a` combined with itself `n` times.
    */
-  override def sumn(a: A, n: Int): A =
-    if (n == Int.MinValue) op(sumn(inverse(a), Int.MaxValue), inverse(a))
-    else if (n < 0) sumn(inverse(a), -n)
+  override def combinen(a: A, n: Int): A =
+    if (n == Int.MinValue) op(combinen(inverse(a), Int.MaxValue), inverse(a))
+    else if (n < 0) combinen(inverse(a), -n)
     else if (n == 0) id
     else if (n == 1) a
-    else sumnAboveOne(a, n)
+    else combinenAboveOne(a, n)
 }
 
 object Group {
@@ -38,8 +37,7 @@ object Group {
 /**
  * An abelian group is a group whose operation is commutative.
  */
-trait AbGroup[@spec(Byte, Short, Int, Long, Float, Double) A]
-    extends Group[A] with CMonoid[A]
+trait AbGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Group[A] with CMonoid[A]
 
 object AbGroup {
   @inline final def apply[A](implicit ev: AbGroup[A]): AbGroup[A] = ev

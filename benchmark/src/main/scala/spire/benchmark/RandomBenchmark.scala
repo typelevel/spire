@@ -40,7 +40,7 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
   val burtle2Rng = spire.random.rng.BurtleRot2.fromSeed(ints4)
   val burtle3Rng = spire.random.rng.BurtleRot3.fromSeed(ints4)
   val cmwc5Rng = spire.random.rng.Cmwc5.fromSeed(longs5)
-  val well512aRng = spire.random.rng.Well512a.fromSeed(ints16, 0)
+  val well512aRng = spire.random.rng.Well512a.fromSeed((ints16, 0))
   val well1024aRng = spire.random.rng.Well1024a.fromArray(ints16)
   val well19937aRng = spire.random.rng.Well19937a.fromArray(ints16)
   val well19937cRng = spire.random.rng.Well19937c.fromArray(ints16)

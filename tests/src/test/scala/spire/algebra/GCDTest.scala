@@ -1,12 +1,12 @@
 package spire.algebra
 
-import spire.math.Rational
+import spire.math.{ Rational, NumberTag }
 import spire.std.int._
 import spire.std.long._
 import spire.std.float._
 import spire.std.double._
 import spire.syntax.euclideanRing._
-import spire.syntax.isReal._
+import spire.syntax.isReal.{ eqOps => _, _ }
 
 import scala.reflect.ClassTag
 
@@ -28,13 +28,27 @@ class GCDTest extends FunSuite with Checkers {
     d <- arbitrary[Long] if d != 0
   } yield Rational(n, d))
 
-  def testGcd[A: EuclideanRing: IsReal: ClassTag](x: A, y: A): Boolean = {
+  def testGcd[A: EuclideanRing: IsReal: NumberTag](x: A, y: A): Boolean = {
     (x == Ring[A].zero || y == Ring[A].zero) || {
       val den = spire.math.gcd(x, y)
       val x0 = x /~ den
       val y0 = y /~ den
-      x0.isWhole && y0.isWhole && (spire.math.gcd(x0, y0) == Ring[A].one)
+      if (NumberTag[A].isFinite(x0) && NumberTag[A].isFinite(y0)) {
+        x0.isWhole && y0.isWhole && (spire.math.gcd(x0, y0) == Ring[A].one)
+      } else {
+        // Ideally we'd filter this out at the ScalaCheck level.
+        true
+      }
     }
+  }
+
+  test("GCD of floats with 0 exponent in result is correct") {
+    val x = -1.586002E-34f
+    val y = 3.3793717E-7f
+    val d = spire.math.gcd(x, y)
+    assert((x / d).isWhole === true)
+    assert((y / d).isWhole === true)
+    assert(spire.math.gcd(x / d, y / d) === 1f)
   }
 
   test("Int GCD")(check(forAll { (a: Int, b: Int) => testGcd(a, b) }))

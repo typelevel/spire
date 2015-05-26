@@ -59,6 +59,7 @@ trait ShortIsSigned extends Signed[Short] {
 
 trait ShortIsReal extends IsIntegral[Short] with ShortOrder with ShortIsSigned {
   def toDouble(n: Short): Double = n.toDouble
+  def toBigInt(n: Short): BigInt = BigInt(n)
 }
 
 @SerialVersionUID(0L)
@@ -99,4 +100,6 @@ class ShortAlgebra extends ShortIsEuclideanRing with ShortIsReal with Serializab
 trait ShortInstances {
   implicit final val ShortBitString = new ShortIsBitString
   implicit final val ShortAlgebra = new ShortAlgebra
+  import spire.math.NumberTag._
+  implicit final val ShortTag = new BuiltinIntTag[Short](0, Short.MinValue, Short.MaxValue)
 }

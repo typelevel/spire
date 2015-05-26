@@ -141,9 +141,28 @@ object SpireArbitrary {
       terms <- arbitrary[List[FreeAbTerm[A]]]
     } yield {
       terms.map { case FreeAbTerm(a, n) =>
-        Group[FreeAbGroup[A]].sumn(FreeAbGroup(a), n)
+        Group[FreeAbGroup[A]].combinen(FreeAbGroup(a), n)
       }.foldLeft(FreeAbGroup.id[A])(_ |+| _)
     })
+
+  /** Represents a permutation encoded as a map from preimages to images, including
+    * only pairs that are moved by the permutation (so the identity is Map.empty).
+    */
+  case class Perm(map: Map[Int, Int])
+  implicit def arbPerm: Arbitrary[Perm] = Arbitrary(Gen.parameterized { parameters =>
+    import parameters.rng
+    val domainSize = parameters.size / 10 + 1
+    val images = new Array[Int](domainSize)
+    spire.syntax.cfor.cforRange(0 until domainSize) { i =>
+      val j = rng.nextInt(i + 1) // uses the Fisher-Yates shuffle, inside out variant
+      images(i) = images(j)
+      images(j) = i
+    }
+    Perm((Map.empty[Int, Int] /: images.zipWithIndex) {
+      case (prevMap, (preimage, image)) if preimage != image => prevMap + (preimage -> image)
+      case (prevMap, _) => prevMap
+    })
+  })
 }
 
 // vim: expandtab:ts=2:sw=2

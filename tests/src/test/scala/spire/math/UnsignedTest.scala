@@ -103,6 +103,20 @@ class ULongTest extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
       n.toString shouldBe n.toBigInt.toString
     }
   }
+
+  property("toFloat") {
+    forAll { (n: ULong) =>
+      n.toFloat shouldBe n.toBigInt.toFloat
+    }
+  }
+
+  property("toDouble") {
+    forAll { (n: ULong) =>
+      val d = new java.math.BigDecimal(n.toDouble).toPlainString
+      println(s"$n versus $d")
+      n.toDouble shouldBe n.toBigInt.toDouble
+    }
+  }
 }
 
 class UIntTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {

@@ -59,6 +59,7 @@ trait ByteOrder extends Order[Byte] {
 
 trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned {
   def toDouble(n: Byte): Double = n.toDouble
+  def toBigInt(n: Byte): BigInt = BigInt(n)
 }
 
 @SerialVersionUID(0L)
@@ -99,4 +100,6 @@ class ByteAlgebra extends ByteIsEuclideanRing with ByteIsReal with Serializable
 trait ByteInstances {
   implicit final val ByteBitString = new ByteIsBitString
   implicit final val ByteAlgebra = new ByteAlgebra
+  import spire.math.NumberTag._
+  implicit final val ByteTag = new BuiltinIntTag[Byte](0, Byte.MinValue, Byte.MaxValue)
 }

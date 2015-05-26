@@ -100,7 +100,8 @@ sealed trait CF { lhs =>
   }
 
   // TODO: use implicit parameter to specify approximation
-  def compare(rhs: CF): Int = (lhs - rhs).signum
+  def compare(rhs: CF): Int =
+    (lhs - rhs).signum
 
   // TODO: use implicit parameter to specify approximation
   override def equals(rhs: Any): Boolean =
@@ -127,10 +128,8 @@ sealed trait CF { lhs =>
       case inf => inf
     }
 
-  def +(rhs: Long): CF = {
-    val n = SafeLong(rhs)
-    Eval.eval4(one, n, zero, one, this)
-  }
+  def +(rhs: Long): CF =
+    Eval.eval4(one, SafeLong(rhs), zero, one, this)
 
   def +(rhs: Rational): CF = {
     val n = SafeLong(rhs.numerator)
@@ -209,11 +208,12 @@ sealed trait CF { lhs =>
   def reciprocal: CF =
     this match {
       case LongTerm(0L, f) => f()
-      case BigTerm(n, f) if n == 0 => f()
+      case BigTerm(n, f) if n.signum == 0 => f()
       case cf => LongTerm(0L, () => cf)
     }
 
-  def **(k: Int): CF = this pow k
+  def **(k: Int): CF =
+    this pow k
 
   def pow(k: Int): CF = {
     def loop(b: CF, k: Int, extra: CF): CF =
@@ -279,19 +279,29 @@ object CF {
     def ~:(lhs: Int): CF = LongTerm(lhs, f _)
     def ~:(lhs: Long): CF = LongTerm(lhs, f _)
     def ~:(lhs: BigInt): CF = BigTerm(lhs, f _)
-    def ~:(lhs: SafeLong): CF = lhs.fold(LongTerm(_, f _), BigTerm(_, f _))
+    def ~:(lhs: SafeLong): CF = construct(lhs, f _)
   }
 
-  val infinity: CF = Infinity
+  val infinity: CF =
+    Infinity
 
-  private val done: Function0[CF] = () => Infinity
+  private val done: Function0[CF] =
+    () => Infinity
 
-  def apply(n: Long): CF = LongTerm(n, done)
-  def apply(n: BigInt): CF = BigTerm(n, done)
-  def apply(n: SafeLong): CF = n.fold(apply(_), apply(_))
+  def apply(n: Long): CF =
+    LongTerm(n, done)
+
+  def apply(n: BigInt): CF =
+    BigTerm(n, done)
+
+  def apply(n: SafeLong): CF =
+    construct(n, done)
 
   def construct(n: SafeLong, f: () => CF): CF =
-    n.fold(LongTerm(_, f), BigTerm(_, f))
+    n match {
+      case SafeLongLong(n) => LongTerm(n, f)
+      case SafeLongBigInt(n) => BigTerm(n, f)
+    }
 
   val zero = 0 ~: Infinity
   val one = 1 ~: Infinity
@@ -303,12 +313,11 @@ object CF {
       case s => CF(Rational(s))
     }
 
-  def apply(n: Rational): CF = {
-    val p = n.toBigInt
-    val dd = n.numerator - p * n.denominator
-    val f = if (dd == 0) done else () => apply(Rational(n.denominator, dd))
-    BigTerm(p, f)
-  }
+  def apply(r: Rational): CF =
+    if (r.isWhole) CF(r.toSafeLong) else {
+      val x = r.floor
+      CF.construct(x.toSafeLong, () => CF(r - x))
+    }
 
   val e: CF = {
     def loop(n: SafeLong): CF = n ~: 1 ~: 1 ~: loop(n + 2)
@@ -320,7 +329,6 @@ object CF {
   lazy val pi: CF = ???
 
   def sqrtOf(n: SafeLong): CF = {
-    import spire.std.bigInt._
     import spire.syntax.nroot._
     val m = n.sqrt
     val m2 = m ** 2

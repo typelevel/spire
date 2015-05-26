@@ -12,14 +12,25 @@ code without having to "bake in" particular numeric representations. In most
 cases, generic implementations using Spire's specialized type classes perform
 identically to corresponding direct implementations.
 
+[![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/non/spire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Spire is provided to you as free software under the
 [MIT license](COPYING).
 
-The [Spire mailing list](http://groups.google.com/group/spire-math/)
-is the place to go for announcements and discussion around Spire. We
-also have a guide on [contributing to Spire](CONTRIBUTING.md).
+The [Spire mailing list](http://groups.google.com/group/typelevel/)
+is shared with other [Typelevel projects](http://typelevel.org).
+It is the place to go for announcements and discussions around Spire.
+When posting, place the word [spire] at the begining of your subject.
+We also have a guide on [contributing to Spire](CONTRIBUTING.md) as well
+as a guide that provides information on [Spire's design](GUIDE.md).
 
-[![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
+People are expected to follow the [Typelevel Code of Conduct](http://typelevel.org/conduct.html)
+when discussing Spire on the Github page, IRC channel, mailing list,
+or other venues.
+
+Concerns or issues can be sent to Erik Osheim (*erik@osheim.org*) or
+to [Typelevel](http://typelevel.org/about.html).
 
 ### Set up
 
@@ -28,16 +39,14 @@ Spire is currently available for Scala 2.10 and 2.11.
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-scalaVersion := "2.10.4"
-// or scalaVersion := "2.11.2"
+scalaVersion := "2.11.4"
+// or scalaVersion := "2.10.4"
 
-libraryDependencies += "org.spire-math" %% "spire" % "0.8.2"
+libraryDependencies += "org.spire-math" %% "spire" % "0.10.1"
 ```
 
-(If you must use Spire with 2.9.x, there is an older 0.3.0 release available.)
-
-For maven instructions, and to download the jars directly, visit the
-[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.10%7C0.8.2%7Cjar).
+For Maven instructions, and to download the jars directly, visit the
+[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.11%7C0.10.1%7Cjar).
 
 ### Playing Around
 
@@ -107,6 +116,7 @@ to concepts from abstract algebra:
  * `Semigroup[A]` types with an associative binary operator `|+|`
  * `Monoid[A]` semigroups that have an identity element
  * `Group[A]` monoids that have an inverse operator
+ * `(Left/Right/)Action[P, G]` left/right/ actions of semigroups/monoids/groups
  * `Semiring[A]` types that form semigroups under `+` and `*`
  * `Rng[A]` types that form a group under `+` and a semigroup under `*`
  * `Rig[A]` types that form monoids under `+` and `*`
@@ -121,7 +131,11 @@ to concepts from abstract algebra:
  * `InnerProductSpace[V,F]` types with an inner product
  * `MetricSpace[V,R]` types with an associated metric
  * `Trig[A]` types that support trigonometric functions
- * `Bool[A]` types that form a boolean algebra
+ * `Bool[A]` types that form a Boolean algebra
+ * `Heyting[A]` types that form a Heyting algebra
+
+Variants of Semigroup/Monoid/Group/Action with partial operations are
+defined in the `spire.algebra.partial` subpackage.
 
 In addition to the type classes themselves, `spire.implicits` defines many
 implicits which provide unary and infix operators for the type classes. The
@@ -168,13 +182,13 @@ can be total (`Order`) or partial (`PartialOrder`); although undefined elements 
    + lteqv (`<=`): less-than-or-equivalent
    + min: find least value
    + max: find greatest value
-* *PartialOrder*
+ * *PartialOrder*
    + partialCompare: less-than (`-1.0`), equivalent (`0.0`), greater-than (`1.0`) or incomparable (`NaN`)
    + tryCompare: less-than (`Some(-1)`), equivalent (`Some(0)`), greater-than (`Some(1)`) or incomparable (`None`)
    + pmin: find the least value if the elements are comparable; returns an `Option`
    + pmax: find the greated value if the elements are comparable; returns an `Option`
    + gt (`>`), gteqv (`>=`), lt (`<`) and lteqv (`<=`) return false if the elements are incomparable, or the result of their comparison
-   
+
 [1] For floating-point numbers, alternate implementations that take `NaN` into
 account can be imported from `spire.optional.totalfloat._`.
 
@@ -241,7 +255,7 @@ are parameterized on 2 types: the vector type and the scalar type.
    + timesl (`*:`): scalar multiplication
  * *VectorSpace*
    + divr (`:/`): scalar division
- * *NormedVectorSpace* 
+ * *NormedVectorSpace*
    + norm: vector norm
    + normalize: normalizes vector (so norm is 1)
  * *InnerProductSpace*
@@ -251,7 +265,7 @@ are parameterized on 2 types: the vector type and the scalar type.
 
 These high-level type classes will pull in all of the relevant algebraic type
 classes. Users who aren't concerned with algebraic properties directly, or who
-wish for more flexibility, should prefer these type classes.
+wish for more permissiveness, should prefer these type classes.
 
  * *Integral*: whole number types (e.g. `Int`, `BigInt`)
  * *Fractional*: fractional/decimal types (e.g. `Double`, `Rational`)
@@ -396,15 +410,15 @@ There are two methods defined:
  * `quickSelect` usually faster, not stable, potentially bad worst-case
  * `linearSelect` usually slower, but with guaranteed linear complexity
  * `select` alias for `quickSelect`
- 
- Searching methods are located in the `spire.math.Searching`
- object. Given a sorted array (or indexed sequence), these methods
- will locate the index of the desired element (or return -1 if it is
- not found).
- 
-  * `search(array, item)` finds the index of `item` in `array`
-  * `search(array, item, lower, upper)` only searches between `lower` and `upper`.
-  
+
+Searching methods are located in the `spire.math.Searching`
+object. Given a sorted array (or indexed sequence), these methods
+will locate the index of the desired element (or return -1 if it is
+not found).
+
+ * `search(array, item)` finds the index of `item` in `array`
+ * `search(array, item, lower, upper)` only searches between `lower` and `upper`.
+
 Searching also supports a more esoteric method:
 `minimalElements`. This method returns the minimal elements of a
 partially-ordered set.
@@ -423,6 +437,7 @@ strategy for getting random values using a `Generator` instance. For
 instance:
 
 ```scala
+import spire.implicits._
 import spire.math._
 import spire.random._
 
@@ -449,12 +464,12 @@ user-defined types.
 In addition, Spire provides many other methods which are "missing" from
 `java.Math` (and `scala.math`), such as:
 
- * log(BigDecimal): BigDecimal
- * exp(BigDecimal): BigDecimal
- * pow(BigDecimal): BigDecimal
- * pow(Long): Long
- * gcd(Long, Long): Long
- * and so on...
+ * `log(BigDecimal): BigDecimal`
+ * `exp(BigDecimal): BigDecimal`
+ * `pow(BigDecimal): BigDecimal`
+ * `pow(Long): Long`
+ * `gcd(Long, Long): Long`
+ * *and so on...*
 
 ### Benchmarks
 
@@ -503,7 +518,7 @@ measure relative as well as absolute performance.
 Code is offered as-is, with no implied warranty of any kind. Comments,
 criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
-Copyright 2011-2014 Erik Osheim, Tom Switzer
+Copyright 2011-2015 Erik Osheim, Tom Switzer
 
 A full list of contributors can be found in [AUTHORS.md](AUTHORS.md).
 

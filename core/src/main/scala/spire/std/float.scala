@@ -1,6 +1,7 @@
 package spire.std
 
-import spire.algebra.{Field, IsReal, NRoot, Order, Signed, Trig}
+import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
+import spire.math.Rational
 
 import java.lang.Math
 import java.lang.Integer.{ numberOfTrailingZeros, numberOfLeadingZeros }
@@ -27,16 +28,23 @@ trait FloatIsField extends Field[Float] {
 
     def exp(bits: Int): Int = ((bits >> 23) & 0xFF).toInt
 
+    // Computes the GCD of 2 fp values. Here, we are guaranteed that exp0 < exp1.
     def gcd0(val0: Int, exp0: Int, val1: Int, exp1: Int): Float = {
       val tz0 = numberOfTrailingZeros(val0)
       val tz1 = numberOfTrailingZeros(val1)
       val tzShared = spire.math.min(tz0, tz1 + exp1 - exp0)
+      // We trim of the power of 2s, then add back the shared portion.
       val n = spire.math.gcd(val0 >>> tz0, val1 >>> tz1).toInt << tzShared
-
-      val shift = numberOfLeadingZeros(n) - 8 // Number of bits to move 1 to bit 23
-      val mantissa = (n << shift) & 0x007FFFFF
+      // Number of bits to move the leading 1 to bit position 23.
+      val shift = numberOfLeadingZeros(n) - 8 
       val exp = (exp0 - shift)
-      if (exp < 0) 0F else intBitsToFloat((exp << 23) | mantissa)
+      // If exp is 0, then the value is actually just the mantissa * 2^−126,
+      // so we need to adjust the *shift* accordingly.
+      val shift0 = if (exp == 0) shift - 1 else shift
+      val mantissa = (n << shift0) & 0x007FFFFF
+      // If exp < 0, then we have underflowed; not much we can do but return 0.
+      if (exp < 0) 0F
+      else intBitsToFloat((exp << 23) | mantissa)
     }
 
     if (a == 0F) b
@@ -109,12 +117,13 @@ trait FloatOrder extends Order[Float] {
   def compare(x: Float, y: Float) = java.lang.Float.compare(x, y)
 }
 
-trait FloatIsReal extends IsReal[Float] with FloatOrder with FloatIsSigned {
+trait FloatIsReal extends IsRational[Float] with FloatOrder with FloatIsSigned {
   def toDouble(x: Float): Double = x.toDouble
   def ceil(a:Float): Float = Math.floor(a).toFloat
   def floor(a:Float): Float = Math.floor(a).toFloat
   def round(a:Float): Float = spire.math.round(a)
   def isWhole(a:Float) = a % 1.0 == 0.0
+  def toRational(a:Float): Rational = Rational(a)
 }
 
 @SerialVersionUID(0L)
@@ -122,4 +131,10 @@ class FloatAlgebra extends FloatIsField with FloatIsNRoot with FloatIsTrig with 
 
 trait FloatInstances {
   implicit final val FloatAlgebra = new FloatAlgebra
+  import Float._
+  import spire.math.NumberTag._
+  implicit final val FloatTag = new BuiltinFloatTag(0F, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
+    def isInfinite(a: Float): Boolean = java.lang.Float.isInfinite(a)
+    def isNaN(a: Float): Boolean =  java.lang.Float.isNaN(a)
+  }
 }

@@ -39,7 +39,7 @@ trait LongIsNRoot extends NRoot[Long] {
   def nroot(x: Long, n: Int): Long = {
     def findnroot(prev: Long, add: Long): Long = {
       val next = prev | add
-      val e = Math.pow(next, n)
+      val e = spire.math.pow(next, n)
 
       if (e == x || add == 0) {
         next
@@ -75,6 +75,7 @@ trait LongIsSigned extends Signed[Long] {
 
 trait LongIsReal extends IsIntegral[Long] with LongOrder with LongIsSigned {
   def toDouble(n: Long): Double = n.toDouble
+  def toBigInt(n: Long): BigInt = BigInt(n)
 }
 
 @SerialVersionUID(0L)
@@ -109,4 +110,6 @@ class LongAlgebra extends LongIsEuclideanRing with LongIsNRoot with LongIsReal w
 trait LongInstances {
   implicit final val LongBitString = new LongIsBitString
   implicit final val LongAlgebra = new LongAlgebra
+  import spire.math.NumberTag._
+  implicit final val LongTag = new BuiltinIntTag[Long](0L, Long.MinValue, Long.MaxValue)
 }

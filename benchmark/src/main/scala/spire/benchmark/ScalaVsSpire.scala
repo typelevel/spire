@@ -29,7 +29,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
   var bs: Array[Int] = null
   var cs: Array[Int] = null
 
-  override protected def setUp() {
+  override protected def setUp(): Unit = {
     size = spire.math.pow(2, pow).toInt
     //as = init(size)(scala.math.abs(nextInt).toInt % 1000 + 1)
     //bs = init(size)(scala.math.abs(nextInt).toInt % 1000 + 1)
@@ -61,20 +61,20 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
   /**
    * Pairwise addition between arrays
    */
-  def doPairwiseDirect(as: Array[Int], bs: Array[Int], cs: Array[Int]) {
+  def doPairwiseDirect(as: Array[Int], bs: Array[Int], cs: Array[Int]): Unit = {
     var i = 0
     val len = as.length
     while (i < len) { cs(i) = as(i) + bs(i); i += 1 }
   }
 
-  def doPairwiseGeneric[A:ScalaN](as:Array[A], bs: Array[A], cs: Array[A]) {
+  def doPairwiseGeneric[A:ScalaN](as:Array[A], bs: Array[A], cs: Array[A]): Unit = {
     import ScalaN.Implicits._
     var i = 0
     val len = as.length
     while (i < len) { cs(i) = as(i) + bs(i); i += 1 }
   }
 
-  def doPairwiseSpire[@spec(Int) A:Ring](as:Array[A], bs: Array[A], cs: Array[A]) {
+  def doPairwiseSpire[@spec(Int) A:Ring](as:Array[A], bs: Array[A], cs: Array[A]): Unit = {
     import spire.implicits._
     var i = 0
     val len = as.length

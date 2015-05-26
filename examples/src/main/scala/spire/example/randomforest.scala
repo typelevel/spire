@@ -31,8 +31,7 @@ object RandomForestExample extends App {
   testRegression[Array[Double], Double](DataSet.MPG, RandomForestOptions(numPointsSample = Some(200), numTrees = Some(50)))
 
 
-  def testClassification[V, @spec(Double) F, K](dataset: DataSet[V, F, K], opts: RandomForestOptions)(implicit
-      order: Order[F], classTagV: ClassTag[V], classTagK: ClassTag[K], real: IsReal[F]) {
+  def testClassification[V, @spec(Double) F, K](dataset: DataSet[V, F, K], opts: RandomForestOptions)(implicit order: Order[F], classTagV: ClassTag[V], classTagK: ClassTag[K], real: IsReal[F]): Unit = {
 
     println(s"\n${dataset.describe}\n")
     println(s"Cross-validating ${dataset.name} with random forest classification...")
@@ -42,8 +41,7 @@ object RandomForestExample extends App {
     println("... accuracy of %.2f%%\n" format (real.toDouble(accuracy) * 100))
   }
 
-  def testRegression[V, @spec(Double) F](dataset: DataSet[V, F, F], opts: RandomForestOptions)(implicit
-      order: Order[F], classTagV: ClassTag[V], classTagF: ClassTag[F], real: IsReal[F]) {
+  def testRegression[V, @spec(Double) F](dataset: DataSet[V, F, F], opts: RandomForestOptions)(implicit order: Order[F], classTagV: ClassTag[V], classTagF: ClassTag[F], real: IsReal[F]): Unit = {
 
     println(s"\n${dataset.describe}\n")
     println(s"Cross-validating ${dataset.name} with random forest regression...")

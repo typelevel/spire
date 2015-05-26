@@ -60,11 +60,12 @@ package object math {
    * factorial
    */
   def fact(n: Long): BigInt = {
-    if (n < 0) throw new IllegalArgumentException(n.toString)
     @tailrec def loop(lo: Long, hi: Long, prod: BigInt): BigInt =
       if (lo > hi) prod
       else loop(lo + 1L, hi - 1L, BigInt(lo) * BigInt(hi) * prod)
-    if ((n & 1) == 1) loop(1L, n - 1L, BigInt(n))
+    if (n < 0) throw new IllegalArgumentException(n.toString)
+    else if (n == 0) BigInt(1)
+    else if ((n & 1) == 1) loop(1L, n - 1L, BigInt(n))
     else loop(2L, n - 1L, BigInt(n))
   }
 
@@ -239,7 +240,7 @@ package object math {
       else bigIntPow(t, b * b, e >> 1)
 
     if (ex.signum < 0) {
-      if (base.signum == 0) sys.error("zero can't be raised to negative power")
+      if (base.signum == 0) throw new ArithmeticException("zero can't be raised to negative power")
       else if (base == 1) base
       else if (base == -1) if (ex.testBit(0)) BigInt(1) else base
       else BigInt(0)
@@ -263,7 +264,7 @@ package object math {
       else longPow(t, b * b, e >> 1L)
 
     if (exponent < 0L) {
-      if(base == 0L) sys.error("zero can't be raised to negative power")
+      if(base == 0L) throw new ArithmeticException("zero can't be raised to negative power")
       else if (base == 1L) 1L
       else if (base == -1L) if ((exponent & 1L) == 0L) -1L else 1L
       else 0L
@@ -279,7 +280,9 @@ package object math {
    */
   final def gcd(_x: Long, _y: Long): Long = {
     if (_x == 0L) return Math.abs(_y)
+    if (_x == 1L) return 1L
     if (_y == 0L) return Math.abs(_x)
+    if (_y == 1L) return 1L
 
     var x = _x
     var xz = numberOfTrailingZeros(x)

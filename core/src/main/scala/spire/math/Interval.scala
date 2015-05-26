@@ -10,6 +10,8 @@ import spire.syntax.field._
 import spire.syntax.nroot._
 import spire.syntax.order._
 
+import java.lang.Double.isNaN
+
 /**
  * Interval represents a set of values, usually numbers.
  * 
@@ -19,7 +21,7 @@ import spire.syntax.order._
  *  * Closed: The boundary value is included in the interval.
  *  * Open: The boundary value is excluded from the interval.
  *  * Unbound: There is no boundary value.
- *  * EmptyBound: The interval itself is empty.
+ *  * Empty: The interval itself is empty.
  *
  * When the underlying type of the interval supports it, intervals may
  * be used in arithmetic. There are several possible interpretations
@@ -92,6 +94,12 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   def crossesZero(implicit ev: AdditiveMonoid[A]): Boolean =
     hasBelow(ev.zero) && hasAbove(ev.zero)
+
+  def isBounded: Boolean =
+    this match {
+      case Below(_, _) | Above(_, _) | All() => true
+      case _ => false
+    }
 
   def lowerBound: Bound[A]
 
@@ -308,23 +316,117 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def *(rhs: Interval[A])(implicit ev: Semiring[A]): Interval[A] = {
     val z = ev.zero
 
-    def aboveBelow(lower1: A, lf1: Int, upper2: A, uf2: Int) =
-      if (lower1 < z || upper2 > z) All () else
-        Below(lower1 * upper2, lowerFlagToUpper(lf1) | uf2)
+    def aboveAbove(lower1: A, lf1: Int, lower2: A, lf2: Int) = {
+      val lower1s = lower1.compare(z)
+      val lower2s = lower2.compare(z)
 
-    def aboveBounded(lower1: A, lf1: Int, lower2: A, upper2: A, flags2: Int) =
-      (rhs.hasBelow(z), rhs.hasAbove(z)) match {
-        case (true, true) => All() // rhs.crossesZero() == true
-        case (false, true) => Above(lower1 * lower2, lf1 | lowerFlag(flags2))
-        case _ => Below(lower1 * upper2, lowerFlagToUpper(lf1) | upperFlag(flags2))
+      if (lower1s < 0 || lower2s < 0) All() else {
+        val strongZero = (lower1s == 0 && isClosedLower(lf1)) || (lower2s == 0 && isClosedLower(lf2))
+        val flags = if (strongZero) 0 else lf1 | lf2
+        Above(lower1 * lower2, flags)
       }
+    }
 
-    def belowBounded(upper1: A, uf1: Int, lower2: A, upper2: A, flags2: Int) =
-      (rhs.hasBelow(z), rhs.hasAbove(z)) match {
-        case (true, true) => All() // rhs.crossesZero() == true
-        case (false, true) => Below(upper1 * lower2, uf1 | lowerFlagToUpper(flags2))
-        case _ => Above(upper1 * lower2, upperFlagToLower(uf1) | lowerFlag(flags2))
+    def belowBelow(upper1: A, uf1: Int, upper2: A, uf2: Int) = {
+      val upper1s = upper1.compare(z)
+      val upper2s = upper2.compare(z)
+      if (upper1s > 0 || upper2s > 0) All() else {
+        val strongZero = (upper1s == 0 && isClosedUpper(uf1)) || (upper2s == 0 && isClosedUpper(uf2))
+        val flags = if (strongZero) 0 else upperFlagToLower(uf1) | upperFlagToLower(uf2)
+        Above(upper1 * upper2, flags)
       }
+    }
+
+    def aboveBelow(lower1: A, lf1: Int, upper2: A, uf2: Int) = {
+      val lower1s = lower1.compare(z)
+      val upper2s = upper2.compare(z)
+      if (lower1s < 0 || upper2s > 0) All () else {
+        val strongZero = (lower1s == 0 && isClosedLower(lf1)) || (upper2s == 0 && isClosedUpper(uf2))
+        val flags = if (strongZero) 0 else lowerFlagToUpper(lf1) | uf2
+        Below(lower1 * upper2, flags)
+      }
+    }
+
+    def aboveBounded(lower1: A, lf1: Int, lower2: A, upper2: A, flags2: Int) = {
+      val lower1s = lower1.compare(z)
+      val lower2s = lower2.compare(z)
+      val upper2s = upper2.compare(z)
+      val hasBelowZero1 = lower1s < 0
+      val hasBelowZero2 = lower2s < 0
+      val hasAboveZero2 = upper2s > 0
+      if (hasBelowZero2 && hasAboveZero2) All() // bounded interval crosses zero
+
+      else if (hasAboveZero2) { // bounded interval is fully above zero
+        if (hasBelowZero1) // the minimal point is lower1(-) * upper2(+)
+          Above(lower1 * upper2, lf1 | upperFlagToLower(flags2))
+        else { // the minimal point is lower1(+) * lower2(+)
+          val strongZero = (lower1s == 0 && isClosedLower(lf1)) || (lower2s == 0 && isClosedLower(flags2))
+          val flags = if (strongZero) 0 else lf1 | lowerFlag(flags2)
+          Above(lower1 * lower2, flags)
+        }
+      } else { // bounded interval is fully below zero
+        assert(hasBelowZero2)
+        if (hasBelowZero1) { // the maximal point is lower1(-) * lower2(-)
+          val strongZero = (lower1s == 0 && isClosedLower(lf1)) || (lower2s == 0 && isClosedLower(flags2))
+          val flags = if (strongZero) 0 else lowerFlagToUpper(lf1) | lowerFlagToUpper(flags2)
+          Below(lower1 * lower2, flags)
+        }
+        else { // the maximal point is lower1(+) * upper2(-)
+          val strongZero = (lower1s == 0 && isClosedLower(lf1)) || (upper2s == 0 && isClosedUpper(flags2))
+          val flags = if (strongZero) 0 else lowerFlagToUpper(lf1) | upperFlag(flags2)
+          Below(lower1 * upper2, flags)
+        }
+      }
+    }
+
+    def belowBounded(upper1: A, uf1: Int, lower2: A, upper2: A, flags2: Int) = {
+      val upper1s = upper1.compare(z)
+      val lower2s = lower2.compare(z)
+      val upper2s = upper2.compare(z)
+      val hasAboveZero1 = upper1s > 0
+      val hasBelowZero2 = lower2s < 0
+      val hasAboveZero2 = upper2s > 0
+      if (hasBelowZero2 && hasAboveZero2) All() // bounded interval crosses zero
+
+      else if (hasAboveZero2) { // bounded interval is fully above zero
+        if (hasAboveZero1) // the maximal point is upper1(+) * upper2(+)
+          Below(upper1 * upper2, uf1 | upperFlag(flags2))
+        else { // the maximal point is upper1(+) * lower2(-)
+          val strongZero = (upper1s == 0 && isClosedUpper(uf1)) || (lower2s == 0 && isClosedLower(flags2))
+          val flags = if (strongZero) 0 else uf1 | lowerFlagToUpper(flags2)
+          Below(upper1 * lower2, flags)
+        }
+      } else { // bounded interval is fully below zero
+        if (hasAboveZero1) { // the minimal point is upper1(+) * lower2(-)
+          val strongZero = (lower2s == 0 && isClosedLower(flags2))
+          val flags = if (strongZero) 0 else upperFlagToLower(uf1) | lowerFlag(flags2)
+          Above(upper1 * lower2, flags)
+        }
+        else { // the minimal point is upper1(-) * upper2(-)
+          val strongZero = (upper1s == 0 && isClosedUpper(uf1)) || (upper2s == 0 && isClosedUpper(flags2))
+          val flags = if (strongZero) 0 else upperFlagToLower(uf1) | upperFlagToLower(flags2)
+          Above(upper1 * upper2, flags)
+        }
+      }
+    }
+
+    def boundedBounded(bd1: Bounded[A], bd2: Bounded[A]) = {
+      val lb1 = bd1.lowerBound
+      val ub1 = bd1.upperBound
+      val lb2 = bd2.lowerBound
+      val ub2 = bd2.upperBound
+      val lb1sz = lb1.a === z && lb1.isClosed
+      val lb2sz = lb2.a === z && lb2.isClosed
+      val ub1sz = ub1.a === z && ub1.isClosed
+      val ub2sz = ub2.a === z && ub2.isClosed
+
+      val ll = if (lb1sz || lb2sz) interval.Closed(z) else (lb1 *~ lb2)
+      val lu = if (lb1sz || ub2sz) interval.Closed(z) else (lb1 *~ ub2)
+      val ul = if (ub1sz || lb2sz) interval.Closed(z) else (ub1 *~ lb2)
+      val uu = if (ub1sz || ub2sz) interval.Closed(z) else (ub1 *~ ub2)
+      ValueBound.union4(ll, lu, ul, uu)
+    }
+
 
     (lhs, rhs) match {
       case (Empty(), _) => lhs
@@ -335,18 +437,10 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       case (All(), _) => lhs
       case (_, All()) => rhs
 
-      case (Above(lower1, lf1), Above(lower2, lf2)) => 
-        if (lower1 < z || lower2 < z) 
-          All() 
-        else 
-          Above(lower1 * lower2, lf1 | lf2)
+      case (Above(lower1, lf1), Above(lower2, lf2)) => aboveAbove(lower1, lf1, lower2, lf2)
       case (Above(lower1, lf1), Below(upper2, uf2)) => aboveBelow(lower1, lf1, upper2, uf2)
       case (Below(upper1, uf1), Above(lower2, lf2)) => aboveBelow(lower2, lf2, upper1, uf1)
-      case (Below(upper1, uf1), Below(upper2, uf2)) =>
-        if (upper1 > z || upper2 > z) 
-          All() 
-        else
-          Above(upper1 * upper2, upperFlagToLower(uf1) | upperFlagToLower(uf2))
+      case (Below(upper1, uf1), Below(upper2, uf2)) => belowBelow(upper1, uf1, upper2, uf2)
 
       case (Above(lower1, lf1), Bounded(lower2, upper2, flags2)) => 
         aboveBounded(lower1, lf1, lower2, upper2, flags2)
@@ -357,16 +451,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       case (Bounded(lower1, upper1, flags1), Below(upper2, uf2)) =>
         belowBounded(upper2, uf2, lower1, upper1, flags1)
 
-      case (bd1: Bounded[A], bd2: Bounded[A]) =>
-        val lb1 = bd1.lowerBound
-        val ub1 = bd1.upperBound
-        val lb2 = bd2.lowerBound
-        val ub2 = bd2.upperBound
-        val ll = (lb1 *~ lb2)
-        val lu = (lb1 *~ ub2)
-        val ul = (ub1 *~ lb2)
-        val uu = (ub1 *~ ub2)
-        ValueBound.union4(ll, lu, ul, uu)
+      case (bd1: Bounded[A], bd2: Bounded[A]) => boundedBounded(bd1, bd2)
     }
   }
 
@@ -414,6 +499,9 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
       case (_, Point(rv)) => lhs * (rv.reciprocal)
       case (_, _) => lhs * rhs.reciprocal
     }
+
+  def /(rhs: A)(implicit ev: Field[A]): Interval[A] =
+    lhs * rhs.reciprocal
 
   def +(rhs: A)(implicit ev: AdditiveSemigroup[A]): Interval[A] =
     this match {
@@ -482,7 +570,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
     if (k == 1) {
       this
     } else if ((k & 1) == 0 && hasBelow(r.zero)) {
-      sys.error("can't take even root of negative number")
+      throw new IllegalArgumentException("can't take even root of negative number")
     } else {
       this match {
         case All() | Empty() => this
@@ -508,7 +596,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
         Some(if (isOpenUpper(flags)) upper - epsilon else upper)
     }
 
-  def bottom(min: A, epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] =
+  def bottom(epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] =
     this match {
       case Empty() | All() | Below(_, _) =>
         None // TOCHECK: changed semantics, Empty().bottom == None
@@ -523,8 +611,18 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   import spire.random.{Dist, Uniform}
 
   def dist(min: A, max: A, epsilon: A)(implicit u: Uniform[A], r: AdditiveGroup[A]): Dist[A] =
-    u(bottom(min, epsilon).getOrElse(min), top(epsilon).getOrElse(max))
+    u(bottom(epsilon).getOrElse(min), top(epsilon).getOrElse(max))
 
+  /**
+   * Apply the given polynomial to the interval.
+   *
+   * For every point contained in the interval, this method maps that
+   * point through the given polynomial. The resulting interval is the
+   * set of all the translated points. I.e.
+   * 
+   *     result = { p(x) | x ∈ interval }
+   * 
+   */
   def translate(p: Polynomial[A])(implicit ev: Field[A]): Interval[A] = {
     val terms2 = p.terms.map { case Term(c, e) => Term(Interval.point(c), e) }
     val p2 = Polynomial(terms2)
@@ -548,6 +646,119 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   
   def ⊆(rhs: Interval[A]): Boolean = lhs isSubsetOf rhs
   def ⊇(rhs: Interval[A]): Boolean = lhs isSupersetOf rhs
+
+  // xyz
+
+  // find the "first" value in our iterator. if step is positive we
+  // proceed from the lower bound up, and if negative from the upper
+  // bound down. thus, we always use addition when dealing with the
+  // step.
+  private[this] def getStart(bound: Bound[A], step: A, unboundError: String)(implicit ev: AdditiveMonoid[A]): A =
+    bound match {
+      case EmptyBound() => ev.zero
+      case Open(x) => x + step
+      case Closed(x) => x
+      case Unbound() => throw new IllegalArgumentException(unboundError)
+    }
+
+  /**
+   * Build an Iterator[A] from an Interval[A] and a (step: A)
+   * parameter.
+   * 
+   * A positive 'step' means we are proceeding from the lower bound
+   * up, and a negative 'step' means we are proceeding from the upper
+   * bound down. In each case, the interval must be bounded on the
+   * side we are starting with (though it may be unbound on the
+   * opposite side). A zero 'step' is not allowed.
+   * 
+   * The step is repeatedly added to the starting parameter as long as
+   * the sum remains within the interval. This means that arithmetic
+   * error can accumulate (e.g. with doubles). However, this method
+   * does overflow checking to ensure that Intervals parameterized on
+   * integer types will behave correctly.
+   * 
+   * Users who want to avoid using arithmetic error should consider
+   * starting with an Interval[Rational], calling iterator with the
+   * exact step desired, then mapping to the original type
+   * (e.g. Double). For example:
+   * 
+   *     val ns = Interval.closed(Rational(0), Rational(5))
+   *     val it = ns.iterator(Rational(1, 7)).map(_.toDouble)
+   * 
+   * This method provides some of the same functionality as Scala's
+   * NumericRange class.
+   */
+  def iterator(step: A)(implicit ev: AdditiveMonoid[A], nt: NumberTag[A]): Iterator[A] = {
+
+    // build an iterator, using start, step, and continue.
+    // this can be used in cases where we don't have to worry about
+    // overflow (e.g. Double, or Rational).
+    def iter0(start: A, continue: A => Boolean): Iterator[A] =
+      new Iterator[A] {
+        var x: A = start
+        def hasNext: Boolean = continue(x)
+        def next: A = {
+          val r = x
+          x += step
+          r
+        }
+      }
+
+    // build an iterator, using start, step, continue, and test.
+    // test is used to detect overflow in cases where it can happen.
+    // it won't always be necessary but there isn't currently a typeclass
+    // that lets us know when we need to do it.
+    def iter1(start: A, continue: A => Boolean, test: (A, A) => Boolean): Iterator[A] =
+      new Iterator[A] {
+        var x: A = start
+        var ok: Boolean = true
+        def hasNext: Boolean = ok && continue(x)
+        def next: A = {
+          val r = x
+          val next = x + step
+          if (test(x, next)) { x = next } else { ok = false }
+          r
+        }
+      }
+
+    def iter(start: A, safe: Boolean, continue: A => Boolean, test: (A, A) => Boolean): Iterator[A] =
+      if (nt.overflows && !safe) {
+        iter1(start, continue, test)
+      } else {
+        iter0(start, continue)
+      }
+
+    // build the actual iterator, which primarily relies on figuring
+    // out which "direction" we are moving (based on the sign of the
+    // step) as well as what kind of limiting bounds we have.
+    if (step === ev.zero) {
+      throw new IllegalArgumentException("zero step")
+    } else if (step > ev.zero) {
+      val x = getStart(lowerBound, step, "positive step with no lower bound")
+      val test = (x1: A, x2: A) => x1 < x2
+      upperBound match {
+        case EmptyBound() => Iterator.empty
+        case Unbound() => iter(x, false, _ => true, test)
+        case Closed(y) => iter(x, y + step > y, _ <= y, test)
+        case Open(y) => iter(x, y + step > y, _ < y, test)
+      }
+    } else {
+      val x = getStart(upperBound, step, "negative step with no lower bound")
+      val test = (x1: A, x2: A) => x1 > x2
+      lowerBound match {
+        case EmptyBound() => Iterator.empty
+        case Unbound() => iter(x, false, _ => true, test)
+        case Closed(y) => iter(x, y + step < y, _ >= y, test)
+        case Open(y) => iter(x, y + step < y, _ > y, test)
+      }
+    }
+  }
+
+  def loop(step: A)(f: A => Unit)(implicit ev: AdditiveMonoid[A], nt: NumberTag[A]): Unit =
+    iterator(step).foreach(f)
+
+  def foldOver[B](init: B, step: A)(f: (B, A) => B)(implicit ev: AdditiveMonoid[A], nt: NumberTag[A]): B =
+    iterator(step).foldLeft(init)(f)
 }
 
 case class All[A: Order] private[spire] () extends Interval[A] {
@@ -604,6 +815,35 @@ object Interval {
 
   def apply[A: Order](lower: A, upper: A): Interval[A] = closed(lower, upper)
 
+  /**
+   * Return an Interval[Rational] that corresponds to the error bounds
+   * for the given Double value.
+   * 
+   * The error bounds are represented as a closed interval, whose
+   * lower point is midway between d and the adjacent Double value
+   * below it. Similarly, the upper bound is the point midway between
+   * d and the adjacent Double value above it.
+   * 
+   * There are three Double values that return "special" intervals:
+   * 
+   *    Infinity => Interval.above(Double.MaxValue)
+   *   -Infinity => Interval.below(Double.MinValue)
+   *         NaN => Interval.empty
+   */
+  def errorBounds(d: Double): Interval[Rational] =
+    if (d == Double.PositiveInfinity) {
+      Interval.above(Double.MaxValue)
+    } else if (d == Double.NegativeInfinity) {
+      Interval.below(Double.MinValue)
+    } else if (isNaN(d)) {
+      Interval.empty[Rational]
+    } else {
+      val n0 = Rational(Math.nextAfter(d, -1.0))
+      val n1 = Rational(d)
+      val n2 = Rational(Math.nextUp(d))
+      Interval((n1 - n0) / 2 + n0, (n2 - n1) / 2 + n1)
+    }
+
   @inline private[spire] final def closedLowerFlags = 0
   @inline private[spire] final def openLowerFlags = 1
   @inline private[spire] final def closedUpperFlags = 0
@@ -638,7 +878,8 @@ object Interval {
       case (Closed(x), Open(y)) => Bounded(x, y, closedLowerFlags | openUpperFlags)
       case (Open(x), Closed(y)) => Bounded(x, y, openLowerFlags | closedUpperFlags)
       case (Unbound(), Unbound()) => all
-      case (EmptyBound(), _) | (_, EmptyBound()) => sys.error("Invalid parameters")
+      case (EmptyBound(), _) | (_, EmptyBound()) =>
+        throw new IllegalArgumentException("invalid empty bound")
     }
 
   def fromBounds[A: Order](lower: Bound[A], upper: Bound[A]): Interval[A] =
@@ -653,7 +894,8 @@ object Interval {
       case (Closed(x), Open(y)) => openUpper(x, y)
       case (Open(x), Closed(y)) => openLower(x, y)
       case (Unbound(), Unbound()) => all
-      case (EmptyBound(), _) | (_, EmptyBound()) => sys.error("Invalid parameters")
+      case (EmptyBound(), _) | (_, EmptyBound()) =>
+        throw new IllegalArgumentException("invalid empty bound")
     }
 
   def closed[A: Order](lower: A, upper: A): Interval[A] = {
@@ -685,7 +927,7 @@ object Interval {
         (left, x, y, right) match {
           case ("(", "-∞", "∞", ")") => Interval.all[Rational]
           case ("(", "-∞", y, ")") => Interval.below(Rational(y))
-          case ("(", "∞", y, "]") => Interval.atOrBelow(Rational(y))
+          case ("(", "-∞", y, "]") => Interval.atOrBelow(Rational(y))
           case ("(", x, "∞", ")") => Interval.above(Rational(x))
           case ("[", x, "∞", ")") => Interval.atOrAbove(Rational(x))
           case ("[", x, y, "]") => Interval.closed(Rational(x), Rational(y))

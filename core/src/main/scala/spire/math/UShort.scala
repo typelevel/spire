@@ -60,6 +60,8 @@ class UShort(val signed: Char) extends AnyVal {
 trait UShortInstances {
   implicit final val UShortAlgebra = new UShortAlgebra
   implicit final val UShortBitString = new UShortBitString
+  import spire.math.NumberTag._
+  implicit final val UShortTag = new UnsignedIntTag[UShort](UShort.MinValue, UShort.MaxValue)
 }
 
 private[math] trait UShortIsRig extends Rig[UShort] {
@@ -123,6 +125,7 @@ private[math] trait UShortIsSigned extends Signed[UShort] {
 
 private[math] trait UShortIsReal extends IsIntegral[UShort] with UShortOrder with UShortIsSigned {
   def toDouble(n: UShort): Double = n.toDouble
+  def toBigInt(n: UShort): BigInt = n.toBigInt
 }
 
 @SerialVersionUID(0L)

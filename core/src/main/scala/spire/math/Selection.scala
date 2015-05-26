@@ -6,7 +6,7 @@ import scala.{specialized => spec}
 
 import spire.algebra.Order
 
-trait Select {
+trait Select extends Any {
   def select[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit
 }
 
@@ -14,7 +14,7 @@ trait Select {
  * Given a function for finding approximate medians, this will create an exact
  * median finder.
  */
-trait SelectLike extends Select {
+trait SelectLike extends Any with Select {
 
   def approxMedian[@spec A: Order](data: Array[A], left: Int, right: Int, stride: Int): A
 
@@ -26,12 +26,12 @@ trait SelectLike extends Select {
    * This is an in-place algorithm and is not stable and it WILL mess up the
    * order of equal elements.
    */
-  final def select[@spec A: Order: ClassTag](data: Array[A], k: Int) {
+  final def select[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit = {
     select(data, 0, data.length, 1, k)
   }
 
   // Copy of InsertSort.sort, but with a stride.
-  final def sort[@spec A](data: Array[A], left: Int, right: Int, stride: Int)(implicit o: Order[A]) {
+  final def sort[@spec A](data: Array[A], left: Int, right: Int, stride: Int)(implicit o: Order[A]): Unit = {
     var i = left
     while (i < right) {
       val item = data(i)
@@ -46,7 +46,7 @@ trait SelectLike extends Select {
   }
 
   @tailrec
-  protected final def select[@spec A: Order](data: Array[A], left: Int, right: Int, stride: Int, k: Int) {
+  protected final def select[@spec A: Order](data: Array[A], left: Int, right: Int, stride: Int, k: Int): Unit = {
     val length = (right - left + stride - 1) / stride
     if (length < 10) {
       sort(data, left, right, stride)
@@ -110,7 +110,7 @@ trait SelectLike extends Select {
 }
 
 trait MutatingMedianOf5 {
-  final def mo5[@spec A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]) {
+  final def mo5[@spec A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]): Unit = {
     var i0 = offset
     var i1 = offset + 1 * stride
     var i2 = offset + 2 * stride
@@ -152,7 +152,7 @@ trait HighBranchingMedianOf5 {
 
   // Benchmarks show that this is slightly faster than the version above.
 
-  final def mo5[@spec A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]) {
+  final def mo5[@spec A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]): Unit = {
     val ai1 = data(offset)
     val ai2 = data(offset + stride)
     val ai3 = data(offset + 2 * stride)

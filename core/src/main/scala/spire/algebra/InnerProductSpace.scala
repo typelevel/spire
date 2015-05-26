@@ -3,7 +3,7 @@ package spire.algebra
 import scala.{ specialized => spec }
 import scala.annotation.tailrec
 
-trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends VectorSpace[V, F] { self =>
+trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends Any with VectorSpace[V, F] { self =>
   def dot(v: V, w: V): F
 
   def normed(implicit ev: NRoot[F]): NormedVectorSpace[V, F] = new NormedInnerProductSpace[V, F] {
@@ -16,7 +16,7 @@ object InnerProductSpace {
   @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: InnerProductSpace[V, R]) = V
 }
 
-private[algebra] trait NormedInnerProductSpace[V, @spec(Float, Double) F] extends NormedVectorSpace[V, F] {
+private[algebra] trait NormedInnerProductSpace[V, @spec(Float, Double) F] extends Any with NormedVectorSpace[V, F] {
   def space: InnerProductSpace[V, F]
   def scalar: Field[F] = space.scalar
   def nroot: NRoot[F]

@@ -1,11 +1,14 @@
 package spire.math
 
-import spire.syntax.ring._
+//import spire.syntax.ring._
+import spire.std.long._
 import spire.syntax.order._
+import spire.syntax.euclideanRing._
 import spire.syntax.convertableFrom._
 
 import spire.algebra.{Order, Signed}
 
+import java.math.MathContext
 import scala.{specialized => spec}
 
 class FixedPointOverflow(n: Long) extends Exception(n.toString)
@@ -13,24 +16,21 @@ class FixedPointOverflow(n: Long) extends Exception(n.toString)
 case class FixedScale(denom: Int) {
   if (denom < 1)
     throw new IllegalArgumentException("illegal denominator: %s" format denom)
-
-  implicit val ctxt: ApproximationContext[Rational] =
-    ApproximationContext(Rational(1L, denom) * 2)
 }
 
 /**
  * FixedPoint is a value class that provides fixed point arithmetic
  * operations (using an implicit denominator) to unboxed Long values.
- * 
+ *
  * Working with FixedPoint values is similar to other fractional
  * types, except that most operations require an implicit FixedScale
  * instance (which provides the denominator).
- * 
+ *
  * For example:
- * 
+ *
  * // interpret FixedPoint(n) as n/1000
  * implicit val scale = FixedScale(1000)
- * 
+ *
  * // these three values are equivalent
  * val a = FixedPoint("12.345")            // decimal repr
  * val b = FixedPoint(Rational(2469, 200)) // fraction repr
@@ -111,7 +111,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     } catch {
       case _: FixedPointOverflow =>
         val n = (SafeLong(rhs.long) * r) / d
-        if (n.isLong)
+        if (n.isValidLong)
           new FixedPoint(n.toLong)
         else
           throw new FixedPointOverflow(n.toLong)
@@ -208,6 +208,9 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def toRational(implicit scale: FixedScale): Rational =
     Rational(long, scale.denom)
 
+  def toReal(implicit scale: FixedScale): Real =
+    Real(toRational)
+
   def **(k: Int)(implicit scale: FixedScale): FixedPoint = pow(k)
 
   def pow(k: Int)(implicit scale: FixedScale): FixedPoint = {
@@ -233,19 +236,22 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
 
   import spire.syntax.nroot._
 
-  def sqrt(implicit scale: FixedScale): FixedPoint = {
-    import scale.ctxt
-    FixedPoint(toRational.sqrt)
-  }
+  def sqrt(implicit scale: FixedScale): FixedPoint =
+    FixedPoint(toReal.sqrt.toRational)
 
-  def nroot(k: Int)(implicit scale: FixedScale): FixedPoint = {
-    import scale.ctxt
-    FixedPoint(toRational.nroot(k))
-  }
+  def nroot(k: Int)(implicit scale: FixedScale): FixedPoint =
+    FixedPoint(toReal.nroot(k).toRational)
 
-  def fpow(y: FixedPoint)(implicit scale: FixedScale): FixedPoint = {
-    import scale.ctxt
-    FixedPoint(toRational.fpow(y.toRational))
+  def fpow(k: FixedPoint)(implicit scale: FixedScale): FixedPoint = {
+    val r = this.toRational
+    val g = k.long gcd scale.denom
+    val n = (k.long / g)
+    val d = (scale.denom / g)
+    if (n.isValidInt && d.isValidInt) {
+      FixedPoint(Real(r ** n.toInt).nroot(d.toInt).toRational)
+    } else {
+      throw new ArithmeticException(s"exponent $r is too complex")
+    }
   }
 
   override def toString: String = long.toString + "/?"
@@ -253,7 +259,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def toString(implicit scale: FixedScale): String = toDouble.toString
 }
 
-object FixedPoint {
+object FixedPoint extends FixedPointInstances {
 
   val zero: FixedPoint = new FixedPoint(0L)
 
@@ -281,12 +287,12 @@ object FixedPoint {
       throw new FixedPointOverflow(x.toLong)
     new FixedPoint(x.toLong)
   }
+}
+
+trait FixedPointInstances {
 
   implicit def algebra(implicit scale: FixedScale) =
     new Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint] {
-      implicit val ctxt: ApproximationContext[Rational] =
-        ApproximationContext(Rational(1L, scale.denom) * 2)
-
       def abs(x: FixedPoint): FixedPoint = x.abs
       def signum(x: FixedPoint): Int = x.signum
 
@@ -323,7 +329,7 @@ object FixedPoint {
       def toFloat(x: FixedPoint): Float = x.toRational.toFloat
       def toDouble(x: FixedPoint): Double = x.toRational.toDouble
       def toBigInt(x: FixedPoint): BigInt = x.toRational.toBigInt
-      def toBigDecimal(x: FixedPoint): BigDecimal = x.toRational.toBigDecimal
+      def toBigDecimal(x: FixedPoint): BigDecimal = x.toRational.toBigDecimal(MathContext.DECIMAL64)
       def toRational(x: FixedPoint): Rational = x.toRational
       def toAlgebraic(x: FixedPoint): Algebraic = Algebraic(x.toRational)
       def toReal(x: FixedPoint): Real = Real(x.toRational)
@@ -340,10 +346,16 @@ object FixedPoint {
       def fromBigInt(n: BigInt): FixedPoint = FixedPoint(BigDecimal(n))
       def fromBigDecimal(n: BigDecimal): FixedPoint = FixedPoint(n)
       def fromRational(n: Rational): FixedPoint = FixedPoint(n)
-      def fromAlgebraic(n: Algebraic): FixedPoint = FixedPoint(n.toRational)
+      def fromAlgebraic(n: Algebraic): FixedPoint =
+        FixedPoint(n.toRational.getOrElse(Rational(n.toBigDecimal(MathContext.DECIMAL64))))
       def fromReal(n: Real): FixedPoint = FixedPoint(n.toRational)
 
       def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): FixedPoint =
         FixedPoint(ev.toRational(b))
     }
+
+  import NumberTag._
+  implicit final val FixedPointTag = new CustomTag[FixedPoint](
+    Approximate, Some(FixedPoint.zero),
+    Some(FixedPoint.MinValue), Some(FixedPoint.MaxValue), true, true)
 }

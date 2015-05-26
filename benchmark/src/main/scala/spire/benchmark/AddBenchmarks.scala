@@ -8,7 +8,6 @@ import scala.util.Random
 
 import spire.algebra._
 import spire.math._
-import spire.math.algebraic._
 import spire.implicits._
 
 import com.google.caliper.Runner 
@@ -61,14 +60,6 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
     total
   }
 
-  def addMaybeDoublesDirect(data: Array[MaybeDouble]): MaybeDouble = {
-    var total = MaybeDouble(0.0)
-    var i = 0
-    val len = data.length
-    while (i < len) { total += data(i); i += 1 }
-    total
-  }
-
   def addComplexesDirect(data:Array[Complex[Double]]):Complex[Double] = {
     var total = Complex.zero[Double]
     var i = 0
@@ -96,7 +87,6 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
   
   def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
   def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
-  def timeAddMaybeDoublesDirect(reps:Int) = run(reps)(addMaybeDoublesDirect(maybeDoubles))
 
   def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
   def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))

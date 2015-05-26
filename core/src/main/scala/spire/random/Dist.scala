@@ -11,7 +11,7 @@ import scala.annotation.tailrec
 import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
-trait Dist[@spec A] { self =>
+trait Dist[@spec A] extends Any { self =>
 
   def apply(gen: Generator): A
 
@@ -72,7 +72,7 @@ trait Dist[@spec A] { self =>
     }
   }
 
-  def repeat[CC[A] <: Seq[A]](n: Int)(implicit cbf: CanBuildFrom[Nothing, A, CC[A]]): Dist[CC[A]] =
+  def repeat[CC[X] <: Seq[X]](n: Int)(implicit cbf: CanBuildFrom[Nothing, A, CC[A]]): Dist[CC[A]] =
     new Dist[CC[A]] {
       def apply(gen: Generator): CC[A] = {
         val builder = cbf()
@@ -110,7 +110,7 @@ trait Dist[@spec A] { self =>
 
   import scala.collection.generic.CanBuildFrom
 
-  def sample[CC[A] <: Iterable[A]](n: Int)(implicit gen: Generator, cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+  def sample[CC[X] <: Iterable[X]](n: Int)(implicit gen: Generator, cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     val b = cbf()
     b.sizeHint(n)
     var i = 0
@@ -149,7 +149,7 @@ trait Dist[@spec A] { self =>
 }
 
 final class DistIterator[A](next: Dist[A], gen: Generator) extends Iterator[A] {
-  final def hasNext(): Boolean = true
+  final def hasNext: Boolean = true
   final def next(): A = next(gen)
 }
 

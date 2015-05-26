@@ -1,5 +1,7 @@
 package spire.math
 
+import scala.util.Try
+
 import org.scalatest.FunSuite
 import spire.implicits.{eqOps => _, _}
 import spire.random.{Uniform, Dist}
@@ -90,6 +92,39 @@ class RingIntervalTest extends FunSuite {
   test("(-∞, c] * (-c) =  [-c * c, ∞), c > 0") { 
     assert( Interval.fromBounds(Unbound(), Closed(c)) * (-c) ===
       Interval.fromBounds(Closed(-c*c), Unbound()) )
+  }
+  test("Interval multiplication bug #372")   {
+    val a = Interval(-1, 1)
+    val b = Interval.above(1)
+    val x = -1
+    val y = 10
+    assert(a.contains(x))
+    assert(b.contains(y))
+    assert((a*b).contains(x*y))
+  }
+  test("Interval multiplication bug 1")   {
+    val a = Interval(-3, -2)
+    val b = Interval.above(-10)
+    val x = -3
+    val y = -9
+    assert(a.contains(x))
+    assert(b.contains(y))
+    assert((a*b).contains(x*y))
+  }
+  test("Interval multiplication bug 2") {
+    val a = Interval.atOrBelow(0)
+    val b = Interval.below(-1)
+    assert((a*b).contains(0))
+  }
+  test("Interval multiplication bug 3") {
+    val a = Interval.atOrBelow(0)
+    val b = Interval.open(-2, -1)
+    assert((a*b).contains(0))
+  }
+  test("Interval multiplication bug 4") {
+    val a = Interval.above(2)
+    val b = Interval.closed(0, 1)
+    assert((a*b).contains(0))
   }
 }
 
@@ -278,9 +313,19 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     } else {
       import spire.math.interval.ValueBound
       val underlyingf: () => Rational = (int.lowerBound, int.upperBound) match {
-        case (ValueBound(x) , ValueBound(y)) => () => x + Rational(rng.nextDouble) * (y - x)
-        case (ValueBound(x) , _) => () => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
-        case (_, ValueBound(y)) => () => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
+        case (ValueBound(x) , ValueBound(y)) => () => rng.nextInt(10) match {
+          case 0 => x
+          case 9 => y
+          case _ => x + Rational(rng.nextDouble) * (y - x)
+        }
+        case (ValueBound(x) , _) => () => rng.nextInt(5) match {
+          case 0 => x
+          case _ => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
+        }
+        case (_, ValueBound(y)) => () => rng.nextInt(5) match {
+          case 4 => y
+          case _ => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
+        }
         case (_ , _) => () => Rational(rng.nextGaussian) * Long.MaxValue
       }
 
@@ -294,7 +339,7 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
 
   val tries = 100
 
-  def testUnop(f: Interval[Rational] => Interval[Rational])(g: Rational => Rational) {
+  def testUnop(f: Interval[Rational] => Interval[Rational])(g: Rational => Rational): Unit = {
     forAll { (a: Interval[Rational]) =>
       val c: Interval[Rational] = f(a)
       sample(a, tries).foreach { x =>
@@ -305,10 +350,12 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
-  def testBinop(f: (Interval[Rational], Interval[Rational]) => Interval[Rational])(g: (Rational, Rational) => Rational) {
+  def testBinop(f: (Interval[Rational], Interval[Rational]) => Interval[Rational])(g: (Rational, Rational) => Rational): Unit = {
     forAll { (a: Interval[Rational], b: Interval[Rational]) =>
       val c: Interval[Rational] = f(a, b)
       sample(a, tries).zip(sample(b, tries)).foreach { case (x, y) =>
+        if (!a.contains(x)) println("%s does not contain %s" format (a, x))
+        if (!b.contains(y)) println("%s does not contain %s" format (b, y))
         val ok = c.contains(g(x, y))
         if (!ok) println("(%s, %s) failed on (%s, %s)" format (a, b, x.toString, y.toString))
         ok shouldBe true
@@ -409,6 +456,79 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
       Eq[Interval[Rational]].eqv(c, e) shouldBe true
       Eq[Interval[Rational]].eqv(d, e) shouldBe true
       Eq[Interval[Rational]].eqv(e, e) shouldBe true
+    }
+  }
+}
+
+class IntervalIteratorCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+
+  import ArbitrarySupport._
+
+  property("bounded intervals are ok") {
+    forAll { (n1: Rational, n2: Rational, num0: Byte) =>
+      val (x, y) = if (n1 <= n2) (n1, n2) else (n2, n1)
+
+      val num = ((num0 & 255) % 13) + 1
+
+      def testEndpoints(interval: Interval[Rational], step: Rational, hasLower: Boolean, hasUpper: Boolean): Unit = {
+        val ns = interval.iterator(step).toSet
+        ns(x) shouldBe hasLower
+        ns(y) shouldBe hasUpper
+        val extra = if (hasLower && hasUpper) 2 else if (hasLower || hasUpper) 1 else 0
+        ns.size shouldBe (num - 1 + extra)
+      }
+
+      val cc = Interval.closed(x, y)     // [x, y]
+      val oo = Interval.open(x, y)       // (x, y)
+      val oc = Interval.openLower(x, y)  // (x, y]
+      val co = Interval.openUpper(x, y)  // [x, y)
+
+      val step = (y - x) / num
+
+      if (step.isZero) {
+        List(cc, oo, oc, co).foreach { xs =>
+          Try(xs.iterator(0)).isFailure shouldBe true
+        }
+      } else {
+        val triples = List((cc, true, true), (oo, false, false), (oc, false, true), (co, true, false))
+        triples.foreach { case (interval, hasLower, hasUpper) =>
+          testEndpoints(interval, step, hasLower, hasUpper)
+          testEndpoints(interval, -step, hasLower, hasUpper)
+        }
+      }
+    }
+  }
+
+  property("half-unbound intervals are ok") {
+    forAll { (n: Rational, s: Rational) =>
+
+      val step0 = s.abs
+
+      val cu = Interval.atOrAbove(n) // [n, ∞)
+      val ou = Interval.above(n)     // (n, ∞)
+      val uc = Interval.atOrBelow(n) // (-∞, n]
+      val uo = Interval.below(n)     // (-∞, n)
+
+      if (step0.isZero) {
+        List(cu, ou, uc, uo).foreach { xs =>
+          Try(xs.iterator(0)).isFailure shouldBe true
+        }
+      } else {
+        val triples = List((cu, true, 1), (ou, false, 1), (uc, true, -1), (uo, false, -1))
+        triples.foreach { case (interval, hasN, mult) =>
+          val step = step0 * mult
+          val it = interval.iterator(step)
+          val expected = if (hasN) n else n + step
+          it.next() shouldBe expected
+          Try(interval.iterator(-step)).isFailure shouldBe true
+        }
+      }
+    }
+  }
+
+  property("unbound intervals are not supported") {
+    forAll { (step: Rational) =>
+      Try(Interval.all[Rational].iterator(step)).isFailure shouldBe true
     }
   }
 }
