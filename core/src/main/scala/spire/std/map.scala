@@ -117,25 +117,25 @@ class MapVectorEq[K, V](implicit V: Eq[V], scalar: AdditiveMonoid[V]) extends Eq
 }
 
 trait MapInstances0 {
-  implicit def MapMonoid[K, V: Semigroup] = new MapMonoid[K, V]
+  implicit def MapMonoid[K, V: Semigroup]: MapMonoid[K, V] = new MapMonoid[K, V]
 
-  implicit def MapSemiring[K, V: Semiring] = new MapSemiring[K, V]
+  implicit def MapSemiring[K, V: Semiring]: MapSemiring[K, V] = new MapSemiring[K, V]
 }
 
 trait MapInstances1 extends MapInstances0 {
-  implicit def MapRng[K, V: Rng] = new MapRng[K, V]
+  implicit def MapRng[K, V: Rng]: MapRng[K, V] = new MapRng[K, V]
 }
 
 trait MapInstances2 extends MapInstances1 {
-  implicit def MapGroup[K, V: Group] = new MapGroup[K, V]
+  implicit def MapGroup[K, V: Group]: MapGroup[K, V] = new MapGroup[K, V]
 
-  implicit def MapVectorSpace[K, V: Field] = new MapVectorSpace[K, V]
+  implicit def MapVectorSpace[K, V: Field]: MapVectorSpace[K, V] = new MapVectorSpace[K, V]
 }
 
 trait MapInstances3 extends MapInstances2 {
-  implicit def MapInnerProductSpace[K, V: Field] = new MapInnerProductSpace[K, V]
+  implicit def MapInnerProductSpace[K, V: Field]: MapInnerProductSpace[K, V] = new MapInnerProductSpace[K, V]
 
-  implicit def MapEq[K, V](implicit V0: Eq[V]) = new MapEq[K, V]
+  implicit def MapEq[K, V](implicit V0: Eq[V]): MapEq[K, V] = new MapEq[K, V]
 }
 
 trait MapInstances extends MapInstances3

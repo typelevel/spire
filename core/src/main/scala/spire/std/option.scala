@@ -42,7 +42,7 @@ class OptionMultiplicativeMonoid[A: MultiplicativeSemigroup] extends Multiplicat
 
 @SerialVersionUID(0L)
 class OptionEq[A: Eq] extends Eq[Option[A]] with Serializable {
-  def eqv(x: Option[A], y: Option[A]) = (x, y) match {
+  def eqv(x: Option[A], y: Option[A]): Boolean = (x, y) match {
     case (Some(x), Some(y)) => Eq[A].eqv(x, y)
     case (None, None) => true
     case _ => false
@@ -51,7 +51,7 @@ class OptionEq[A: Eq] extends Eq[Option[A]] with Serializable {
 
 @SerialVersionUID(0L)
 class OptionOrder[A: Order] extends OptionEq[A] with Order[Option[A]] with Serializable {
-  override def eqv(x: Option[A], y: Option[A]) = (x, y) match {
+  override def eqv(x: Option[A], y: Option[A]): Boolean = (x, y) match {
     case (Some(x), Some(y)) => Eq[A].eqv(x, y)
     case (None, None) => true
     case _ => false
@@ -68,14 +68,14 @@ class OptionOrder[A: Order] extends OptionEq[A] with Order[Option[A]] with Seria
 }
 
 trait OptionInstances0 {
-  implicit def OptionEq[A: Eq] = new OptionEq[A]
-  implicit def OptionMonoid[A: Semigroup] = new OptionMonoid[A]
+  implicit def OptionEq[A: Eq]: OptionEq[A] = new OptionEq[A]
+  implicit def OptionMonoid[A: Semigroup]: OptionMonoid[A] = new OptionMonoid[A]
 }
 
 trait OptionInstances extends OptionInstances0 {
-  implicit def OptionCMonoid[A: CSemigroup] = new OptionCMonoid[A]
-  implicit def OptionAdditiveMonoid[A: AdditiveSemigroup] = new OptionAdditiveMonoid[A]
-  implicit def OptionMultiplicativeMonoid[A: MultiplicativeSemigroup] = new OptionMultiplicativeMonoid[A]
+  implicit def OptionCMonoid[A: CSemigroup]: OptionCMonoid[A] = new OptionCMonoid[A]
+  implicit def OptionAdditiveMonoid[A: AdditiveSemigroup]: OptionAdditiveMonoid[A] = new OptionAdditiveMonoid[A]
+  implicit def OptionMultiplicativeMonoid[A: MultiplicativeSemigroup]: OptionMultiplicativeMonoid[A] = new OptionMultiplicativeMonoid[A]
 
-  implicit def OptionOrder[A: Order] = new OptionOrder[A]
+  implicit def OptionOrder[A: Order]: OptionOrder[A] = new OptionOrder[A]
 }

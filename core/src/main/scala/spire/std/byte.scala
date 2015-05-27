@@ -14,8 +14,8 @@ trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
 
   override def fromInt(n: Int): Byte = n.toByte
 
-  def quot(a: Byte, b: Byte) = (a / b).toByte
-  def mod(a: Byte, b: Byte) = (a % b).toByte
+  def quot(a: Byte, b: Byte): Byte = (a / b).toByte
+  def mod(a: Byte, b: Byte): Byte = (a % b).toByte
   def gcd(a: Byte, b: Byte): Byte = spire.math.gcd(a, b).toByte
 }
 
@@ -38,8 +38,8 @@ trait ByteIsNRoot extends NRoot[Byte] {
     findnroot(0, 1 << ((33 - n) / n))
   }
 
-  def log(a: Byte) = Math.log(a.toDouble).toByte
-  def fpow(a: Byte, b: Byte) = Math.pow(a, b).toByte
+  def log(a: Byte): Byte = Math.log(a.toDouble).toByte
+  def fpow(a: Byte, b: Byte): Byte = Math.pow(a, b).toByte
 }
 
 trait ByteIsSigned extends Signed[Byte] {
@@ -48,13 +48,13 @@ trait ByteIsSigned extends Signed[Byte] {
 }
 
 trait ByteOrder extends Order[Byte] {
-  override def eqv(x:Byte, y:Byte) = x == y
-  override def neqv(x:Byte, y:Byte) = x != y
-  override def gt(x: Byte, y: Byte) = x > y
-  override def gteqv(x: Byte, y: Byte) = x >= y
-  override def lt(x: Byte, y: Byte) = x < y
-  override def lteqv(x: Byte, y: Byte) = x <= y
-  def compare(x: Byte, y: Byte) = java.lang.Integer.signum((x: Int) - (y: Int))
+  override def eqv(x:Byte, y:Byte): Boolean = x == y
+  override def neqv(x:Byte, y:Byte): Boolean = x != y
+  override def gt(x: Byte, y: Byte): Boolean = x > y
+  override def gteqv(x: Byte, y: Byte): Boolean = x >= y
+  override def lt(x: Byte, y: Byte): Boolean = x < y
+  override def lteqv(x: Byte, y: Byte): Boolean = x <= y
+  def compare(x: Byte, y: Byte): Int = java.lang.Integer.signum((x: Int) - (y: Int))
 }
 
 trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned {

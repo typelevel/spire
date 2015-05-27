@@ -17,8 +17,8 @@ trait IntIsEuclideanRing extends EuclideanRing[Int] {
 
   override def fromInt(n: Int): Int = n
 
-  def quot(a:Int, b:Int) = a / b
-  def mod(a:Int, b:Int) = a % b
+  def quot(a:Int, b:Int): Int = a / b
+  def mod(a:Int, b:Int): Int = a % b
   def gcd(a:Int, b:Int): Int = spire.math.gcd(a, b).toInt
 }
 
@@ -41,18 +41,18 @@ trait IntIsNRoot extends NRoot[Int] {
     findnroot(0, 1 << ((33 - n) / n))
   }
 
-  def log(a:Int) = Math.log(a.toDouble).toInt
-  def fpow(a:Int, b:Int) = Math.pow(a, b).toInt
+  def log(a:Int): Int = Math.log(a.toDouble).toInt
+  def fpow(a:Int, b:Int): Int = Math.pow(a, b).toInt
 }
 
 trait IntOrder extends Order[Int] {
-  override def eqv(x: Int, y: Int) = x == y
-  override def neqv(x: Int, y: Int) = x != y
-  override def gt(x: Int, y: Int) = x > y
-  override def gteqv(x: Int, y: Int) = x >= y
-  override def lt(x: Int, y: Int) = x < y
-  override def lteqv(x: Int, y: Int) = x <= y
-  def compare(x: Int, y: Int) = if (x < y) -1 else if (x == y) 0 else 1
+  override def eqv(x: Int, y: Int): Boolean = x == y
+  override def neqv(x: Int, y: Int): Boolean = x != y
+  override def gt(x: Int, y: Int): Boolean = x > y
+  override def gteqv(x: Int, y: Int): Boolean = x >= y
+  override def lt(x: Int, y: Int): Boolean = x < y
+  override def lteqv(x: Int, y: Int): Boolean = x <= y
+  def compare(x: Int, y: Int): Int = if (x < y) -1 else if (x == y) 0 else 1
 }
 
 trait IntIsSigned extends Signed[Int] {

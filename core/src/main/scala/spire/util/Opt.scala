@@ -14,8 +14,8 @@ object Opt extends OptVersions {
 }
 
 class Opt[+A](val ref: A) extends OptVersions.Base {
-  def scala2_10hashCode = ref.hashCode
-  def scala2_10equals(other: Any) = other match {
+  def scala2_10hashCode: Int = ref.hashCode
+  def scala2_10equals(other: Any): Boolean = other match {
     case that: Opt[_] => ref == that.ref
     case _ => false
   }

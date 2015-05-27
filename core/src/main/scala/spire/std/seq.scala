@@ -247,29 +247,29 @@ extends SeqVectorEq[A, SA] with Order[SA] with Serializable {
 trait SeqInstances0 {
   implicit def SeqModule[A, CC[A] <: SeqLike[A, CC[A]]](implicit
       ring0: Ring[A], cbf0: CanBuildFrom[CC[A], A, CC[A]],
-      ev: NoImplicit[VectorSpace[CC[A], A]]) = new SeqModule[A, CC[A]]
+      ev: NoImplicit[VectorSpace[CC[A], A]]): SeqModule[A, CC[A]] = new SeqModule[A, CC[A]]
 }
 
 trait SeqInstances1 extends SeqInstances0 {
   implicit def SeqVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
       cbf0: CanBuildFrom[CC[A], A, CC[A]],
-      ev: NoImplicit[NormedVectorSpace[CC[A], A]]) = new SeqVectorSpace[A, CC[A]]
+      ev: NoImplicit[NormedVectorSpace[CC[A], A]]): SeqVectorSpace[A, CC[A]] = new SeqVectorSpace[A, CC[A]]
 
-  implicit def SeqEq[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Eq[A]) =
+  implicit def SeqEq[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Eq[A]): SeqEq[A, CC[A]] =
     new SeqEq[A, CC[A]]
 }
 
 trait SeqInstances2 extends SeqInstances1 {
   implicit def SeqInnerProductSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
-      cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqInnerProductSpace[A, CC[A]]
+      cbf0: CanBuildFrom[CC[A], A, CC[A]]): SeqInnerProductSpace[A, CC[A]] = new SeqInnerProductSpace[A, CC[A]]
 
-  implicit def SeqOrder[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Order[A]) =
+  implicit def SeqOrder[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Order[A]): SeqOrder[A, CC[A]] =
     new SeqOrder[A, CC[A]]
 }
 
 trait SeqInstances3 extends SeqInstances2 {
   implicit def SeqNormedVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
-      nroot0: NRoot[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]) = SeqInnerProductSpace[A, CC].normed
+      nroot0: NRoot[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] = SeqInnerProductSpace[A, CC].normed
 }
 
 trait SeqInstances extends SeqInstances3
