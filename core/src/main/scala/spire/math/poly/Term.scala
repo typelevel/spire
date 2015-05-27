@@ -100,8 +100,10 @@ object Term {
     '3' -> '\u00B3'
   )
 
+  // call Regex constructor directly to get rid of compiler warning
+  // replace with "".r once SI-6723 is fixed
   private val superscriptRegex =
-    "[\\u2070\\u2071\\u2072\\u2073\\u2074\\u2075\\u2076\\u2077\\u2078\\u2079\\u207B\\u00B9\\u00B2\\u00B3]+".r
+    new scala.util.matching.Regex("[\\u2070\\u2071\\u2072\\u2073\\u2074\\u2075\\u2076\\u2077\\u2078\\u2079\\u207B\\u00B9\\u00B2\\u00B3]+")
 
   private[spire] def removeSuperscript(text: String): String =
     superscriptRegex.replaceAllIn(text, "^" + _.group(0).map(removeSuperscript))
