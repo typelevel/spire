@@ -199,28 +199,28 @@ abstract class AutoAlgebra extends AutoOps { ops =>
 }
 
 case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
-  def plusplus[A] = binop[A]("$plus$plus")
-  def plus[A: c.WeakTypeTag] = binop[A]("$plus")
-  def minus[A: c.WeakTypeTag] = binop[A]("$minus")
-  def times[A: c.WeakTypeTag] = binop[A]("$times")
-  def negate[A: c.WeakTypeTag] = unop[A]("unary_$minus")
-  def quot[A: c.WeakTypeTag] = binopSearch[A]("quot" :: "$div" :: Nil) getOrElse failedSearch("quot", "/~")
-  def div[A: c.WeakTypeTag] = binop[A]("$div")
-  def mod[A: c.WeakTypeTag](stub: => c.Expr[A]) = binop[A]("$percent")
-  def equals = binop[Boolean]("$eq$eq")
-  def compare = binop[Int]("compare")
+  def plusplus[A]: c.Expr[A] = binop[A]("$plus$plus")
+  def plus[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$plus")
+  def minus[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$minus")
+  def times[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$times")
+  def negate[A: c.WeakTypeTag]: c.Expr[A] = unop[A]("unary_$minus")
+  def quot[A: c.WeakTypeTag]: c.Expr[A] = binopSearch[A]("quot" :: "$div" :: Nil) getOrElse failedSearch("quot", "/~")
+  def div[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$div")
+  def mod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] = binop[A]("$percent")
+  def equals: c.Expr[Boolean] = binop[Boolean]("$eq$eq")
+  def compare: c.Expr[Int] = binop[Int]("compare")
 }
 
 case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
-  def plus[A: c.WeakTypeTag] =
+  def plus[A: c.WeakTypeTag]: c.Expr[A] =
     binopSearch[A]("add" :: "plus" :: Nil) getOrElse failedSearch("plus", "+")
-  def minus[A: c.WeakTypeTag] =
+  def minus[A: c.WeakTypeTag]: c.Expr[A] =
     binopSearch[A]("subtract" :: "minus" :: Nil) getOrElse failedSearch("minus", "-")
-  def times[A: c.WeakTypeTag] =
+  def times[A: c.WeakTypeTag]: c.Expr[A] =
     binopSearch[A]("multiply" :: "times" :: Nil) getOrElse failedSearch("times", "*")
-  def div[A: c.WeakTypeTag] =
+  def div[A: c.WeakTypeTag]: c.Expr[A] =
     binopSearch[A]("divide" :: "div" :: Nil) getOrElse failedSearch("div", "/")
-  def negate[A: c.WeakTypeTag] =
+  def negate[A: c.WeakTypeTag]: c.Expr[A] =
     unopSearch[A]("negate" :: "negative" :: Nil) getOrElse {
       // We can implement negate interms of minus. This is actually required
       // for JScience's Rational :(
@@ -229,13 +229,13 @@ case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
         Select(Ident(termName(c)("zero")), termName(c)("minus")),
         List(Ident(termName(c)("x")))))
     }
-  def quot[A: c.WeakTypeTag] =
+  def quot[A: c.WeakTypeTag]: c.Expr[A] =
     binopSearch[A]("quot" :: "divide" :: "div" :: Nil) getOrElse failedSearch("quot", "/~")
-  def mod[A: c.WeakTypeTag](stub: => c.Expr[A]) =
+  def mod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] =
     binopSearch("mod" :: "remainder" :: Nil) getOrElse stub
 
-  def equals = binop[Boolean]("equals")
-  def compare = binop[Int]("compareTo")
+  def equals: c.Expr[Boolean] = binop[Boolean]("equals")
+  def compare: c.Expr[Int] = binop[Int]("compareTo")
 }
 
 object ScalaAutoMacros {
