@@ -626,7 +626,7 @@ private[math] class JetAlgebra[@sp(Float, Double) T](implicit
   with FieldAlgebra[Jet[T], T]
   with Serializable {
   def scalar: Field[T] = f
-  def nroot = f
+  def nroot: NRoot[T] = n
   def timesl(a: T, w: Jet[T]): Jet[T] = Jet(a) * w
   def dot(x: Jet[T], y: Jet[T]): T = {
     x.infinitesimal.zip(y.infinitesimal).foldLeft{scalar.times(x.real, y.real)}{
