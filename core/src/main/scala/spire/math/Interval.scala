@@ -313,6 +313,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
   def -(rhs: Interval[A])(implicit ev: AdditiveGroup[A]): Interval[A] =
     lhs + (-rhs)
 
+  // scalastyle:off method.length
   def *(rhs: Interval[A])(implicit ev: Semiring[A]): Interval[A] = {
     val z = ev.zero
 
@@ -492,6 +493,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
         }
     }
   }
+  // scalastyle:on method.length
 
   def /(rhs: Interval[A])(implicit ev: Field[A]): Interval[A] =
     (lhs, rhs) match {

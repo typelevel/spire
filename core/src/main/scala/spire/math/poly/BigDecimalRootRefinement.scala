@@ -242,6 +242,7 @@ object BigDecimalRootRefinement {
    * An implementation of "Quadratic Interval Refinement for Real Roots" by
    * John Abbot for `BigDecimal`.
    */
+  // scalastyle:off method.length
   private def QIR(
     context: ApproximationContext,
     lowerBound: JBigDecimal, lowerBoundValue: JBigDecimal,
@@ -366,4 +367,5 @@ object BigDecimalRootRefinement {
       loop(lx, ly, rx, ry, n0)
     }
   }
+  // scalastyle:on method.length
 }
