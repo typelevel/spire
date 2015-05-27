@@ -23,9 +23,9 @@ class Device(f: File) extends Generator { self =>
 }
 
 object Device {
-  def apply(path: String) = new Device(new File(path))
-  def random = new Device(new File("/dev/random"))
-  def urandom = new Device(new File("/dev/urandom"))
+  def apply(path: String): Device = new Device(new File(path))
+  def random: Device = new Device(new File("/dev/random"))
+  def urandom: Device = new Device(new File("/dev/urandom"))
 }
 
 class CycledFile(f: File) extends Generator { self =>
@@ -74,5 +74,5 @@ class CycledFile(f: File) extends Generator { self =>
 }
 
 object CycledFile {
-  def apply(path: String) = new CycledFile(new File(path))
+  def apply(path: String): CycledFile = new CycledFile(new File(path))
 }

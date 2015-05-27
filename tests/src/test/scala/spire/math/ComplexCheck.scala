@@ -130,7 +130,7 @@ class ComplexCheck2 extends PropSpec with Matchers with GeneratorDrivenPropertyC
   // import spire.compat._
   // val threshold = Real("1/1000")
   // def near(x: C, y: C) = (x - y).abs should be <= threshold
-  
+
   // property("x.sqrt.pow(2) = x.pow(2).sqrt = x") {
   //   forAll { (x: C) =>
   //     near(x.sqrt.pow(2), x)

@@ -31,7 +31,7 @@ private[spire] trait CompatPriority1 {
 }
 
 private[spire] trait CompatPriority2 extends CompatPriority1 {
-  implicit def fractional [A: Field: ConvertableFrom: Signed: Order]: scala.math.Fractional[A] =
+  implicit def fractional[A: Field: ConvertableFrom: Signed: Order]: scala.math.Fractional[A] =
     new ScalaFractionalWrapper[A] {
       val order = Order[A]
       val structure = Field[A]

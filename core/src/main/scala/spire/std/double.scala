@@ -20,8 +20,8 @@ trait DoubleIsField extends Field[Double] {
 
   override def fromInt(n: Int): Double = n
 
-  def quot(a:Double, b:Double) = (a - (a % b)) / b
-  def mod(a:Double, b:Double) = a % b
+  def quot(a:Double, b:Double): Double = (a - (a % b)) / b
+  def mod(a:Double, b:Double): Double = a % b
 
   final def gcd(a:Double, b:Double):Double = {
     def value(bits: Long): Long = bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L
@@ -64,13 +64,13 @@ trait DoubleIsField extends Field[Double] {
   }
 
   override def fromDouble(n: Double): Double = n
-  def div(a:Double, b:Double) = a / b
+  def div(a:Double, b:Double): Double = a / b
 }
 
 trait DoubleIsNRoot extends NRoot[Double] {
   def nroot(a: Double, k: Int): Double = Math.pow(a, 1 / k.toDouble)
   override def sqrt(a: Double): Double = Math.sqrt(a)
-  def fpow(a: Double, b: Double) = Math.pow(a, b)
+  def fpow(a: Double, b: Double): Double = Math.pow(a, b)
 }
 
 trait DoubleIsTrig extends Trig[Double] {
@@ -79,8 +79,8 @@ trait DoubleIsTrig extends Trig[Double] {
 
   def exp(a: Double): Double = Math.exp(a)
   def expm1(a: Double): Double = Math.expm1(a)
-  def log(a: Double) = Math.log(a)
-  def log1p(a: Double) = Math.log1p(a)
+  def log(a: Double): Double = Math.log(a)
+  def log1p(a: Double): Double = Math.log1p(a)
 
   def sin(a: Double): Double = Math.sin(a)
   def cos(a: Double): Double = Math.cos(a)
@@ -100,15 +100,15 @@ trait DoubleIsTrig extends Trig[Double] {
 }
 
 trait DoubleOrder extends Order[Double] {
-  override def eqv(x:Double, y:Double) = x == y
-  override def neqv(x:Double, y:Double) = x != y
-  override def gt(x: Double, y: Double) = x > y
-  override def gteqv(x: Double, y: Double) = x >= y
-  override def lt(x: Double, y: Double) = x < y
-  override def lteqv(x: Double, y: Double) = x <= y
-  override def min(x: Double, y: Double) = Math.min(x, y)
-  override def max(x: Double, y: Double) = Math.max(x, y)
-  def compare(x: Double, y: Double) = java.lang.Double.compare(x, y)
+  override def eqv(x:Double, y:Double): Boolean = x == y
+  override def neqv(x:Double, y:Double): Boolean = x != y
+  override def gt(x: Double, y: Double): Boolean = x > y
+  override def gteqv(x: Double, y: Double): Boolean = x >= y
+  override def lt(x: Double, y: Double): Boolean = x < y
+  override def lteqv(x: Double, y: Double): Boolean = x <= y
+  override def min(x: Double, y: Double): Double = Math.min(x, y)
+  override def max(x: Double, y: Double): Double = Math.max(x, y)
+  def compare(x: Double, y: Double): Int = java.lang.Double.compare(x, y)
 }
 
 trait DoubleIsSigned extends Signed[Double] {
@@ -121,7 +121,7 @@ trait DoubleIsReal extends IsRational[Double] with DoubleOrder with DoubleIsSign
   def ceil(a:Double): Double = Math.floor(a)
   def floor(a:Double): Double = Math.floor(a)
   def round(a:Double): Double = spire.math.round(a)
-  def isWhole(a:Double) = a % 1.0 == 0.0
+  def isWhole(a:Double): Boolean = a % 1.0 == 0.0
   def toRational(a:Double): Rational = Rational(a)
 }
 

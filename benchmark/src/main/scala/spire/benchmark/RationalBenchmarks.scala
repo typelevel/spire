@@ -9,7 +9,7 @@ import scala.util.Random
 import spire.math._
 import spire.implicits._
 
-import com.google.caliper.Runner 
+import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
@@ -21,7 +21,7 @@ object RationalBenchmarks extends MyRunner(classOf[RationalBenchmarks])
 class RationalBenchmarks extends MyBenchmark with BenchmarkData {
   @Param(Array("8", "16", "24", "32", "40", "48", "56", "64",
                "80", "96", "112", "128",
-               "160", "192", "224", "256")) 
+               "160", "192", "224", "256"))
   var bits: Int = 0
 
   private var rats: Array[Rational] = _

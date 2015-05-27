@@ -18,7 +18,7 @@ trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends An
   /**
     * Tests if `a` is the identity.
     */
-  def isId(a: A)(implicit ev: Eq[A]) = ev.eqv(a, id)
+  def isId(a: A)(implicit ev: Eq[A]): Boolean = ev.eqv(a, id)
 
   /**
    * Return `a` combined with itself `n` times.
@@ -42,19 +42,19 @@ object Monoid {
    * If an implicit `AdditiveMonoid[A]` exists, then it is converted to a plain
    * `Monoid[A]`.
    */
-  @inline final def additive[A](implicit A: AdditiveMonoid[A]) = A.additive
+  @inline final def additive[A](implicit A: AdditiveMonoid[A]): Monoid[A] = A.additive
 
   /**
    * If an implicit `MultiplicativeMonoid[A]` exists, then it is converted to a
    * plain `Monoid[A]`.
    */
-  @inline final def multiplicative[A](implicit A: MultiplicativeMonoid[A]) = A.multiplicative
+  @inline final def multiplicative[A](implicit A: MultiplicativeMonoid[A]): Monoid[A] = A.multiplicative
 
 }
 
 /**
  * CMonoid represents a commutative monoid.
- * 
+ *
  * A monoid is commutative if for all x and y, x |+| y === y |+| x.
  */
 trait CMonoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Monoid[A] with CSemigroup[A]

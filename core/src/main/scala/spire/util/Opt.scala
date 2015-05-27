@@ -14,8 +14,8 @@ object Opt extends OptVersions {
 }
 
 class Opt[+A](val ref: A) extends OptVersions.Base {
-  def scala2_10hashCode = ref.hashCode
-  def scala2_10equals(other: Any) = other match {
+  def scala2_10hashCode: Int = ref.hashCode
+  def scala2_10equals(other: Any): Boolean = other match {
     case that: Opt[_] => ref == that.ref
     case _ => false
   }
@@ -27,16 +27,16 @@ class Opt[+A](val ref: A) extends OptVersions.Base {
 
   override def toString: String =
     if (ref == null) "Opt.empty" else s"Opt($ref)"
-  
+
   def filter(f: A => Boolean): Opt[A] =
     if (ref != null && f(ref)) this else Opt.empty
-  
+
   def map[B](f: A => B): Opt[B] =
     if (ref == null) Opt.empty else Opt(f(ref))
-  
+
   def flatMap[B](f: A => Opt[B]): Opt[B] =
     if (ref == null) Opt.empty else f(ref)
-  
+
   def fold[B](b: => B)(f: A => B): B =
     if (ref == null) b else f(ref)
 

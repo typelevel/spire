@@ -74,17 +74,17 @@ package object unicode {
   implicit class SymbolicSetOps[A](val lhs: Set[A]) extends AnyVal {
     def ∋(a: A): Boolean = lhs(a)
     def ∌(a: A): Boolean = !lhs(a)
-  
+
     def ∈:(a: A): Boolean = lhs(a)
     def ∉:(a: A): Boolean = !lhs(a)
 
     def ∩(rhs: Set[A]): Set[A] = lhs & rhs
     def ∪(rhs: Set[A]): Set[A] = lhs | rhs
     def \(rhs: Set[A]): Set[A] = lhs -- rhs
-  
+
     def ⊂(rhs: Set[A]): Boolean = lhs.size < rhs.size && lhs.forall(rhs)
     def ⊃(rhs: Set[A]): Boolean = lhs.size > rhs.size && rhs.forall(lhs)
-  
+
     def ⊆(rhs: Set[A]): Boolean = lhs.size <= rhs.size && lhs.forall(rhs)
     def ⊇(rhs: Set[A]): Boolean = lhs.size >= rhs.size && rhs.forall(lhs)
   }

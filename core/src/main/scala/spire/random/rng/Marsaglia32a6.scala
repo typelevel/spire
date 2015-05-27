@@ -65,7 +65,7 @@ class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extend
     d = bb.getInt()
   }
 
-  def nextInt() = {
+  def nextInt(): Int = {
     val t = x ^ (x >>> 2)
     x = y
     y = z

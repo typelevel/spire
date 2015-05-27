@@ -176,7 +176,7 @@ private[math] trait ConvertableToAlgebraic extends ConvertableTo[Algebraic] {
   def fromDouble(a: Double): Algebraic = Algebraic(a)
   def fromBigInt(a: BigInt): Algebraic = Algebraic(a)
   def fromBigDecimal(a: BigDecimal): Algebraic = Algebraic(a)
-  def fromRational(a: Rational) = Algebraic(a)
+  def fromRational(a: Rational): Algebraic = Algebraic(a)
   def fromAlgebraic(a: Algebraic): Algebraic = a
   def fromReal(a: Real): Algebraic = Algebraic(a.toRational) //FIXME
 
@@ -251,7 +251,7 @@ private[math] trait ConvertableToNatural extends ConvertableTo[Natural] {
 }
 
 object ConvertableTo {
-  @inline final def apply[A](implicit ev: ConvertableTo[A]) = ev
+  @inline final def apply[A](implicit ev: ConvertableTo[A]): ConvertableTo[A] = ev
 
   implicit final val ConvertableToByte = new ConvertableToByte {}
   implicit final val ConvertableToShort = new ConvertableToShort {}
@@ -267,7 +267,7 @@ object ConvertableTo {
   implicit final val ConvertableToNumber = new ConvertableToNumber {}
   implicit final val ConvertableToNatural = new ConvertableToNatural {}
 
-  implicit def convertableToComplex[A: Integral] =
+  implicit def convertableToComplex[A: Integral]: ConvertableToComplex[A] =
     new ConvertableToComplex[A] { val algebra = Integral[A] }
 }
 
@@ -549,7 +549,7 @@ private[math] trait ConvertableFromNatural extends ConvertableFrom[Natural] {
 
 
 object ConvertableFrom {
-  @inline final def apply[A](implicit ev: ConvertableFrom[A]) = ev
+  @inline final def apply[A](implicit ev: ConvertableFrom[A]): ConvertableFrom[A] = ev
 
   implicit final val ConvertableFromByte = new ConvertableFromByte {}
   implicit final val ConvertableFromShort = new ConvertableFromShort {}
@@ -565,6 +565,6 @@ object ConvertableFrom {
   implicit final val ConvertableFromNumber = new ConvertableFromNumber {}
   implicit final val ConvertableFromNatural = new ConvertableFromNatural {}
 
-  implicit def convertableFromComplex[A: Integral] =
+  implicit def convertableFromComplex[A: Integral]: ConvertableFromComplex[A] =
     new ConvertableFromComplex[A] { val algebra = Integral[A] }
 }

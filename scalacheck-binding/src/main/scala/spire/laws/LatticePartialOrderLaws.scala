@@ -80,7 +80,7 @@ trait LatticePartialOrderLaws[A] extends Laws {
     parents = Seq(boundedJoinSemilatticePartialOrder, boundedMeetSemilatticePartialOrder),
     bases = Seq("lattice" → LatticeLaws[A].boundedLattice)
   )
-  
+
   class LatticePartialOrderProperties(
     val name: String,
     val parents: Seq[LatticePartialOrderProperties],

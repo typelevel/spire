@@ -13,7 +13,7 @@ import scala.collection.generic.CanBuildFrom
  * with numbers.
  *
  * There are three modes:
- * 
+ *
  * nth: print the nth rational, according to diagonalization
  * all: print the first n rationals, according to diagonalization
  * snap: given y, look for solutions to y = nroot(x, k) / d
@@ -52,7 +52,7 @@ object Simplification {
   /**
    * Using Cantor's diagonalization method, create an infinite stream
    * of all rational numbers.
-   * 
+   *
    * This stream will only be able to generate the first
    * 42,535,295,865,117,307,928,310,139,910,543,638,528 values, so it
    * is not really infinite. Even so, it's unlikely that a user will
@@ -81,7 +81,7 @@ object Simplification {
   /**
    * Naive prime stream. For each odd number, this method tries
    * dividing by all previous primes <= sqrt(n).
-   * 
+   *
    * There are a lot of ways to improve this. For now it's a toy.
    * It can generate the millionth prime in ~9s on my computer.
    */
@@ -102,7 +102,7 @@ object Simplification {
 
   /**
    * Given a Double y, look for whole numbers x, k, and d such that:
-   * 
+   *
    *   y = nroot(x, k) / d
    *
    * The limit (default: 10) describes the largest root (and divisor)
@@ -139,7 +139,7 @@ object Simplification {
 
 /**
  * BigStream is a non-memoizing stream.
- * 
+ *
  * It's similar to Scala's Stream[A] except that it won't exhaust your
  * memory for very large streams. This makes it useful for situations
  * where re-computing the stream is preferrable to trying to store

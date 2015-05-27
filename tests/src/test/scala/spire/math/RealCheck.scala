@@ -31,61 +31,61 @@ class RealCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
       Rational(n) shouldBe Real(n).toRational
     }
   }
-  
+
   property("Real(n)/Real(d) = Real(n/d)") {
     forAll { (r: Rational) =>
       Real(r.numerator) / Real(r.denominator) shouldBe Real(r)
     }
   }
-  
+
   property("x + 0 = x") {
     forAll { (x: Real) =>
       x + Real.zero shouldBe x
     }
   }
-  
+
   property("x * 0 = 0") {
     forAll { (x: Real) =>
       x * Real.zero shouldBe Real.zero
     }
   }
-  
+
   property("x * 1 = x") {
     forAll { (x: Real) =>
       x + Real.zero shouldBe x
     }
   }
-  
+
   property("x + y = y + x") {
     forAll { (x: Real, y: Real) =>
       x + y shouldBe y + x
     }
   }
-  
+
   property("x + (-x) = 0") {
     forAll { (x: Real) =>
       x + (-x) shouldBe Real.zero
     }
   }
-  
+
   property("x / x = 1") {
     forAll { (x: Real) =>
       if (x != 0) x / x shouldBe Real.one
     }
   }
-  
+
   property("x * y = y * x") {
     forAll { (x: Real, y: Real) =>
       x * y shouldBe y * x
     }
   }
-  
+
   property("x + x = 2x") {
     forAll { (x: Real) =>
       x + x shouldBe x * Real(2)
     }
   }
-  
+
   property("x * (y + z) = xy + xz") {
     forAll { (x: Real, y: Real, z: Real) =>
       x * (y + z) shouldBe x * y + x * z
@@ -103,14 +103,14 @@ class RealCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
       x.pow(2) shouldBe x * x
     }
   }
-  
+
   property("x.pow(k).nroot(k) = x") {
     forAll { (x0: Real, k: Sized[Int, _1, _10]) =>
       val x = x0.abs
       x.pow(k.num).nroot(k.num) shouldBe x
     }
   }
-  
+
   property("x.nroot(k).pow(k) = x") {
     forAll { (x0: Real, k: Sized[Int, _1, _10]) =>
       val x = x0.abs
@@ -172,13 +172,13 @@ class RealCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
   //   forAll { (re0: Rational, im0: Rational) =>
   //     val re = Real(re0)
   //     val im = Real(im0)
-  // 
+  //
   //     val ma = (re.pow(2) + im.pow(2)).sqrt
   //     val ph = Real.atan2(im, re)
-  // 
+  //
   //     val ma2 = ma.pow(2)
   //     val ph2 = ph * Real(2)
-  // 
+  //
   //     ma2 * Real.cos(ph2) shouldBe re.pow(2) - im.pow(2)
   //     ma2 * Real.sin(ph2) shouldBe re * im * Real(2)
   //   }
@@ -191,7 +191,7 @@ class RealCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
   //       val i = (i0 & 0xff) % 250 + 1
   //       val j = (j0 & 0xff) % 250 + 1
   //       val (k1, k2) = if (i <= j) (i, j) else (j, i)
-  //       val v1 = x(k1) 
+  //       val v1 = x(k1)
   //       val v2 = x(k2)
   //       val v3 = Real.roundUp(Rational(v2, SafeLong(2).pow(k2 - k1)))
   //       v1 shouldBe v3

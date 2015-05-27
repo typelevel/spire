@@ -17,14 +17,14 @@ import SieveUtil._
  * segment. 'cutoff' specifies the largest prime factor we're
  * interested in. This means that cutoff**2-1 is the largest number we
  * could reliably identify as prime.
- * 
+ *
  * We are using a mod30 wheel, which means that we don't need to
  * manually factor using 2, 3, or 5 (30 is the lcm of 2, 3, and
  * 5). Since each wheel turn is 30-bits, and our bitset groups
  * elements into 32-bit groups (integers), we have a 480-bit (15
  * integer) period between the wheel and the bitset. This requires our
  * segment length to be divisible by 480.
- * 
+ *
  * When building a sieve, we will first initialize using the mod30
  * wheel. Then, if we are on the first segment, we'll do a traditional
  * sieve. We'll save any primes greater than 5 we find as factors,

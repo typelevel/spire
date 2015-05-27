@@ -29,5 +29,5 @@ trait Trig[@spec(Float, Double) A] extends Any {
 }
 
 object Trig {
-  @inline final def apply[A](implicit t: Trig[A]) = t
+  @inline final def apply[A](implicit t: Trig[A]): Trig[A] = t
 }

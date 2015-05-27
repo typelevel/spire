@@ -153,7 +153,7 @@ class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   //     q.nroot(k) shouldBe q.fpow(Real(Rational(1, k)))
   //   }
   // }
-  // 
+  //
   // property("q.fpow(1/k).fpow(k) = q") {
   //   forAll { (q: H, k0: Byte) =>
   //     val k = Real(Rational((k0 % 10).abs))

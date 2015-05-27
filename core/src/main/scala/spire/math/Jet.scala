@@ -19,6 +19,7 @@ case class JetDim(dimension: Int) {
   require(dimension > 0)
 }
 
+// scalastyle:off regex
 /**
  * ==Overview==
  * A simple implementation of N-dimensional dual numbers, for automatically
@@ -160,11 +161,11 @@ object Jet extends JetInstances {
   def h[@sp(Float, Double) T](k: Int)(implicit c: ClassTag[T], d: JetDim, r: Rig[T]): Jet[T] =
       Jet(r.zero, k)
 
-  def one[@sp(Float, Double) T](implicit c: ClassTag[T], d: JetDim, r: Rig[T]) = Jet(r.one)
+  def one[@sp(Float, Double) T](implicit c: ClassTag[T], d: JetDim, r: Rig[T]): Jet[T] = Jet(r.one)
 
-  def zero[@sp(Float, Double) T](implicit c: ClassTag[T], d: JetDim, s: Semiring[T]) = Jet(s.zero)
+  def zero[@sp(Float, Double) T](implicit c: ClassTag[T], d: JetDim, s: Semiring[T]): Jet[T] = Jet(s.zero)
 
-  def fromInt[@sp(Float, Double) T](n: Int)(implicit c: ClassTag[T], d: JetDim, r: Ring[T]) =
+  def fromInt[@sp(Float, Double) T](n: Int)(implicit c: ClassTag[T], d: JetDim, r: Ring[T]): Jet[T] =
       Jet(r.fromInt(n))
 
   implicit def intToJet(n: Int)(implicit d: JetDim): Jet[Double] = {
@@ -200,14 +201,14 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   import spire.syntax.order._
 
   def dimension: Int = infinitesimal.size
-  implicit def jetDimension = JetDim(dimension)
+  implicit def jetDimension: JetDim = JetDim(dimension)
 
   /**
    * This is consistent with abs
    */
   def signum()(implicit r: Signed[T]): Int = real.signum()
 
-  def asTuple = (real, infinitesimal)
+  def asTuple: (T, Array[T]) = (real, infinitesimal)
 
   def isReal: Boolean = infinitesimal.forall(anyIsZero)
   def isZero: Boolean = anyIsZero(real) && isReal
@@ -498,12 +499,12 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
 trait JetInstances {
   implicit def JetAlgebra[@sp(Float, Double) T](implicit
       c: ClassTag[T], d: JetDim, eq: Eq[T], f: Field[T], n: NRoot[T],
-      t: Trig[T], r: IsReal[T]) = {
+      t: Trig[T], r: IsReal[T]): JetAlgebra[T] = {
     import spire.std.array.ArrayVectorSpace
     new JetAlgebra[T]
   }
 
-  implicit def JetEq[T : Eq] = new JetEq[T]
+  implicit def JetEq[T : Eq]: Eq[Jet[T]] = new JetEq[T]
 }
 
 private[math] trait JetIsRing[@sp(Float, Double) T] extends Ring[Jet[T]] {
@@ -529,9 +530,9 @@ private[math] trait JetIsRing[@sp(Float, Double) T] extends Ring[Jet[T]] {
 private[math] trait JetIsEuclideanRing[@sp(Float,Double) T]
   extends JetIsRing[T] with EuclideanRing[Jet[T]] {
 
-  def quot(a: Jet[T], b: Jet[T]) = a /~ b
-  def mod(a: Jet[T], b: Jet[T]) = a % b
-  override def quotmod(a: Jet[T], b: Jet[T]) = a /% b
+  def quot(a: Jet[T], b: Jet[T]): Jet[T] = a /~ b
+  def mod(a: Jet[T], b: Jet[T]): Jet[T] = a % b
+  override def quotmod(a: Jet[T], b: Jet[T]): (Jet[T], Jet[T]) = a /% b
   def gcd(a: Jet[T], b: Jet[T]): Jet[T] = {
     @tailrec def _gcd(a: Jet[T], b: Jet[T]): Jet[T] =
       if (b.isZero) a else _gcd(b, a - (a / b).round * b)
@@ -542,11 +543,11 @@ private[math] trait JetIsEuclideanRing[@sp(Float,Double) T]
 private[math] trait JetIsField[@sp(Float,Double) T]
   extends JetIsEuclideanRing[T] with Field[Jet[T]] {
   override def fromDouble(n: Double): Jet[T] = Jet(f.fromDouble(n))
-  def div(a: Jet[T], b: Jet[T]) = a / b
+  def div(a: Jet[T], b: Jet[T]): Jet[T] = a / b
   def ceil(a: Jet[T]): Jet[T] = a.ceil
   def floor(a: Jet[T]): Jet[T] = a.floor
   def round(a: Jet[T]): Jet[T] = a.round
-  def isWhole(a: Jet[T]) = a.isWhole
+  def isWhole(a: Jet[T]): Boolean = a.isWhole
 }
 
 private[math] trait JetIsTrig[@sp(Float, Double) T] extends Trig[Jet[T]] {
@@ -599,8 +600,8 @@ private[math] trait JetIsNRoot[T] extends NRoot[Jet[T]] {
 
 @SerialVersionUID(0L)
 private[math] class JetEq[T : Eq] extends Eq[Jet[T]] with Serializable {
-  def eqv(x: Jet[T], y: Jet[T]) = x eqv y
-  override def neqv(x: Jet[T], y: Jet[T]) = x neqv y
+  def eqv(x: Jet[T], y: Jet[T]): Boolean = x eqv y
+  override def neqv(x: Jet[T], y: Jet[T]): Boolean = x neqv y
 }
 
 private[math] trait JetIsSigned[T] extends Signed[Jet[T]] {
@@ -624,8 +625,8 @@ private[math] class JetAlgebra[@sp(Float, Double) T](implicit
   with VectorSpace[Jet[T], T]
   with FieldAlgebra[Jet[T], T]
   with Serializable {
-  def scalar = f
-  def nroot = f
+  def scalar: Field[T] = f
+  def nroot: NRoot[T] = n
   def timesl(a: T, w: Jet[T]): Jet[T] = Jet(a) * w
   def dot(x: Jet[T], y: Jet[T]): T = {
     x.infinitesimal.zip(y.infinitesimal).foldLeft{scalar.times(x.real, y.real)}{

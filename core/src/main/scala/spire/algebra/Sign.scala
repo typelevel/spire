@@ -23,7 +23,7 @@ object Sign {
   case object Negative extends Sign(-1)
 
   implicit def sign2int(s: Sign): Int = s.toInt
-  implicit def apply(i: Int): Sign = 
+  implicit def apply(i: Int): Sign =
     if (i == 0) Zero else if (i > 0) Positive else Negative
 
   class SignAlgebra extends CMonoid[Sign] with Signed[Sign] with Order[Sign] {
