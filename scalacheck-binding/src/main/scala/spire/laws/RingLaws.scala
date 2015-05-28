@@ -46,6 +46,12 @@ trait RingLaws[A] extends GroupLaws[A] {
     ),
     "prodn(a, 2) === a * a" → forAll((a: A) =>
       A.prodn(a, 2) === (a * a)
+    ),
+    "prodOption" → forAll((a: A) =>
+      (A.prodOption(Seq.empty[A]) === None) &&
+      (A.prodOption(Seq(a)) === Some(a)) &&
+      (A.prodOption(Seq(a, a)) === Some(a * a)) &&
+      (A.prodOption(Seq(a, a, a)) === Some(a * a * a))
     )
   )
 
