@@ -86,6 +86,9 @@ trait RingLaws[A] extends GroupLaws[A] {
     parents = Seq.empty,
     "distributive" → forAll((x: A, y: A, z: A) =>
       (x * (y + z) === (x * y + x * z)) && (((x + y) * z) === (x * z + y * z))
+    ),
+    "pow" → forAll((x: A) =>
+      ((x pow 1) === x) && ((x pow 2) === x * x) && ((x pow 3) === x * x * x)
     )
   )
 

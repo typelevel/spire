@@ -11,7 +11,7 @@ trait IntIsEuclideanRing extends EuclideanRing[Int] {
   def negate(a:Int): Int = -a
   def one: Int = 1
   def plus(a:Int, b:Int): Int = a + b
-  override def pow(a:Int, b:Int): Int = Math.pow(a, b).toInt
+  override def pow(a:Int, b:Int): Int = spire.math.pow(a, b).toInt
   override def times(a:Int, b:Int): Int = a * b
   def zero: Int = 0
 
