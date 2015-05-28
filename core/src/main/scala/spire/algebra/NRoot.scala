@@ -26,14 +26,14 @@ trait NRoot[@spec(Double,Float,Int,Long) A] extends Any {
 import spire.math.{ConvertableTo, ConvertableFrom, Number}
 
 object NRoot {
-  @inline final def apply[@spec(Int,Long,Float,Double) A](implicit ev:NRoot[A]) = ev
+  @inline final def apply[@spec(Int,Long,Float,Double) A](implicit ev:NRoot[A]): NRoot[A] = ev
 
   /**
    * This will return the largest integer that meets some criteria. Specifically,
    * if we're looking for some integer `x` and `f(x')` is guaranteed to return
    * `true` iff `x' <= x`, then this will return `x`.
    *
-   * This can be used, for example, to find an integer `x` s.t. 
+   * This can be used, for example, to find an integer `x` s.t.
    * `x * x < y < (x+1)*(x+1)`, by using `intSearch(x => x * x <= y)`.
    */
   private def intSearch(f: Int => Boolean): Int = {
@@ -130,7 +130,7 @@ object NRoot {
         (i, ny)
       } else {
         val nr = target - (ny pow k)
-        
+
         // TODO: Add stopping condition for when nr == 0 and there are no more
         // digits. Tricky part is refactoring to know when digits end...
 

@@ -30,7 +30,7 @@ object Numeric {
   implicit final val RealIsNumeric: Numeric[Real] = new RealIsNumeric
   implicit final val RationalIsNumeric: Numeric[Rational] = new RationalIsNumeric
 
-  implicit def complexIsNumeric[A: Fractional: Trig: IsReal] = new ComplexIsNumeric
+  implicit def complexIsNumeric[A: Fractional: Trig: IsReal]: ComplexIsNumeric[A] = new ComplexIsNumeric
 
   @inline final def apply[A](implicit ev: Numeric[A]):Numeric[A] = ev
 }
@@ -185,7 +185,7 @@ with Order[Complex[A]] with ComplexIsSigned[A] with Serializable {
   override def fromDouble(n: Double): Complex[A] = Complex[A](algebra.fromDouble(n))
 
   override def eqv(x: Complex[A], y: Complex[A]): Boolean = x == y
-  override def nroot(a: Complex[A], n: Int) = a.pow(reciprocal(fromInt(n)))
+  override def nroot(a: Complex[A], n: Int): Complex[A] = a.pow(reciprocal(fromInt(n)))
 
   def compare(x:Complex[A], y:Complex[A]): Int =
     if (x eqv y) 0 else throw new UnsupportedOperationException("undefined")

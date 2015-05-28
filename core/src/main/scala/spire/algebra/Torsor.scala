@@ -5,15 +5,15 @@ import scala.{specialized => sp}
 /**
  * A Torsor[V, R] requires an AbGroup[R] and provides Action[V, R],
  * plus a `diff` operator, `<->` in additive notation, such that:
- * 
+ *
  * 1. `(g <-> g) === scalar.id` for all `g` in `G`.
- * 
+ *
  * 2. `(g <-> h) +> h === g` for all `g`, `h` in `G`.
  *
  * 3. `(g <-> h) +> i === (i <-> h) +> g` for all `g`, `h` in `G`.
  *
  * 4. `(g <-> h) === -(h <-> g)` for all `g`, `h` in `G`.
- * 
+ *
  */
 trait Torsor[V, @sp(Int,Long,Float,Double) R] extends Any with Action[V, R] { self =>
   def diff(v: V, w: V): R
@@ -56,13 +56,13 @@ trait MultiplicativeTorsor[V, @sp(Int,Long,Float,Double) R] extends Any with Mul
 }
 
 object Torsor {
-  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: Torsor[V, R]) = V
+  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: Torsor[V, R]): Torsor[V, R] = V
 }
 
 object AdditiveTorsor {
-  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: AdditiveTorsor[V, R]) = V
+  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: AdditiveTorsor[V, R]): AdditiveTorsor[V, R] = V
 }
 
 object MultiplicativeTorsor {
-  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: MultiplicativeTorsor[V, R]) = V
+  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: MultiplicativeTorsor[V, R]): MultiplicativeTorsor[V, R] = V
 }

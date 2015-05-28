@@ -9,7 +9,7 @@ import Random._
 
 import spire.implicits._
 
-import com.google.caliper.Runner 
+import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
@@ -74,15 +74,15 @@ class GcdBenchmarks extends MyBenchmark {
   def binaryGcdLong(_x: Long, _y: Long): Long = {
     if (_x == 0L) return _y
     if (_y == 0L) return _x
-  
+
     var x = Math.abs(_x)
     var xz = numberOfTrailingZeros(x)
     x >>= xz
-  
+
     var y = Math.abs(_y)
     var yz = numberOfTrailingZeros(y)
     y >>= yz
-  
+
     while (x != y) {
       if (x > y) {
         x -= y
@@ -92,7 +92,7 @@ class GcdBenchmarks extends MyBenchmark {
         y >>= numberOfTrailingZeros(y)
       }
     }
-  
+
     if (xz < yz) x << xz else x << yz
   }
 }

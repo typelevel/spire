@@ -9,13 +9,13 @@ object intervalGeometricPartialOrder {
   /** Interval partial order defined as follows:
     *
     * Involving empty intervals:
-    * 
+    *
     * - if I and J are empty, then I === J.
     * - if I (resp. J) is empty and J (resp. I) is non-empty,
     *   the ordering is undefined (preserving antisymmetry).
-    * 
+    *
     * For non-empty intervals:
-    * 
+    *
     * - I === J is standard Eq semantics (I, J are intersubstituable)
     * - I < J if all x \in I, y \in J have x < y
     * - I > J if all x \in I, y \in J have x > y

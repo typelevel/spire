@@ -6,11 +6,11 @@ import SieveUtil._
 
 /**
  * Segmented Stream of Eratosthenes implementation
- * 
+ *
  * This section really needs some good comments.
- * 
+ *
  * Some future optimizations:
- * 
+ *
  * 0. Consider an option to use multiple threads
  * 1. Faster heap/priority queue
  * 2. Tune chunkSize
@@ -18,7 +18,7 @@ import SieveUtil._
  * 4. Compress the amount of space our heaps take up.
  * 5. Read more efficient segmented sieves to get other ideas.
  * 6. Try using a delta-encoded prime log
- * 
+ *
  * Obviously we are trying to be a bit more flexible than a
  * traditional prime finder that knows ahead of time what range it
  * will be operating over, which will hurt performance a bit. Also,

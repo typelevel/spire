@@ -83,7 +83,7 @@ final class FpFilterApprox[A](val exact: A) extends AnyVal {
 }
 
 object FpFilterApprox {
-  implicit def liftApprox[A: IsReal](approx: FpFilterApprox[A]) = {
+  implicit def liftApprox[A: IsReal](approx: FpFilterApprox[A]): FpFilter[A] = {
     val apx = IsReal[A].toDouble(approx.exact)
     new FpFilter[A](apx, spire.math.abs(apx), 1, approx.exact)
   }
@@ -105,18 +105,18 @@ final class FpFilterExact[A](val value: Double) extends AnyVal {
 }
 
 object FpFilterExact {
-  implicit def liftExact[A: Field](exact: FpFilterExact[A]) =
+  implicit def liftExact[A: Field](exact: FpFilterExact[A]): FpFilter[A] =
     new FpFilter(exact.value, spire.math.abs(exact.value), 0, Field[A].fromDouble(exact.value))
 }
 
 object FpFilter {
   final val Eps = java.lang.Double.longBitsToDouble((1023L - 52) << 52)
 
-  @inline final def exact[A](value: Double) = new FpFilterExact[A](value)
+  @inline final def exact[A](value: Double): FpFilterExact[A] = new FpFilterExact[A](value)
 
-  @inline final def approx[A](exact: A) = new FpFilterApprox[A](exact)
+  @inline final def approx[A](exact: A): FpFilterApprox[A] = new FpFilterApprox[A](exact)
 
-  @inline final def apply[A](apx: Double, mes: Double, ind: Int, exact: => A) = new FpFilter[A](apx, mes, ind, exact)
+  @inline final def apply[A](apx: Double, mes: Double, ind: Int, exact: => A): FpFilter[A] = new FpFilter[A](apx, mes, ind, exact)
 
   def apply[A](approx: Double, exact: => A): FpFilter[A] =
     new FpFilter[A](approx, spire.math.abs(approx), 1, exact)

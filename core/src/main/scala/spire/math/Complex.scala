@@ -14,22 +14,22 @@ import java.lang.Math
 
 
 object Complex extends ComplexInstances {
-  def i[@spec(Float, Double) T](implicit T: Rig[T]) =
+  def i[@spec(Float, Double) T](implicit T: Rig[T]): Complex[T] =
     new Complex(T.zero, T.one)
 
-  def one[@spec(Float, Double) T](implicit T: Rig[T]) =
+  def one[@spec(Float, Double) T](implicit T: Rig[T]): Complex[T] =
     new Complex(T.one, T.zero)
 
-  def zero[@spec(Float, Double) T](implicit T: Semiring[T]) =
+  def zero[@spec(Float, Double) T](implicit T: Semiring[T]): Complex[T] =
     new Complex(T.zero, T.zero)
 
-  def fromInt[@spec(Float, Double) T](n: Int)(implicit f: Ring[T]) =
+  def fromInt[@spec(Float, Double) T](n: Int)(implicit f: Ring[T]): Complex[T] =
     new Complex(f.fromInt(n), f.zero)
 
-  implicit def intToComplex(n: Int) = new Complex(n.toDouble, 0.0)
-  implicit def longToComplex(n: Long) = new Complex(n.toDouble, 0.0)
-  implicit def floatToComplex(n: Float) = new Complex(n, 0.0F)
-  implicit def doubleToComplex(n: Double) = new Complex(n, 0.0)
+  implicit def intToComplex(n: Int): Complex[Double] = new Complex(n.toDouble, 0.0)
+  implicit def longToComplex(n: Long): Complex[Double] = new Complex(n.toDouble, 0.0)
+  implicit def floatToComplex(n: Float): Complex[Float] = new Complex(n, 0.0F)
+  implicit def doubleToComplex(n: Double): Complex[Double] = new Complex(n, 0.0)
 
   implicit def bigIntToComplex(n: BigInt): Complex[BigDecimal] =
     bigDecimalToComplex(BigDecimal(n))
@@ -352,15 +352,15 @@ object FloatComplex {
   final def apply(real: Float, imag: Float): FloatComplex =
     new FloatComplex(encode(real, imag))
 
-  final def apply(real: Double, imag: Double) =
+  final def apply(real: Double, imag: Double): FloatComplex =
     new FloatComplex(encode(real.toFloat, imag.toFloat))
 
-  def polar(magnitude: Float, angle: Float) =
+  def polar(magnitude: Float, angle: Float): FloatComplex =
     new FloatComplex(FastComplex.polar(magnitude, angle))
 
-  final val i = new FloatComplex(4575657221408423936L)
-  final val one = new FloatComplex(1065353216L)
-  final val zero = new FloatComplex(0L)
+  final val i: FloatComplex = new FloatComplex(4575657221408423936L)
+  final val one: FloatComplex = new FloatComplex(1065353216L)
+  final val zero: FloatComplex = new FloatComplex(0L)
 }
 
 /**
@@ -374,31 +374,31 @@ class FloatComplex(val u: Long) extends AnyVal {
 
   final def real: Float = FastComplex.real(u)
   final def imag: Float = FastComplex.imag(u)
-  final def repr = "FloatComplex(%s, %s)" format(real, imag)
+  final def repr: String = "FloatComplex(%s, %s)" format(real, imag)
   final def abs: Float = FastComplex.abs(u)
   final def angle: Float = FastComplex.angle(u)
-  final def conjugate = new FloatComplex(FastComplex.conjugate(u))
+  final def conjugate: FloatComplex = new FloatComplex(FastComplex.conjugate(u))
   final def isWhole: Boolean = FastComplex.isWhole(u)
   final def signum: Int = FastComplex.signum(u)
-  final def complexSignum = new FloatComplex(FastComplex.complexSignum(u))
-  final def negate = new FloatComplex(FastComplex.negate(u))
+  final def complexSignum: FloatComplex = new FloatComplex(FastComplex.complexSignum(u))
+  final def negate: FloatComplex = new FloatComplex(FastComplex.negate(u))
 
-  final def +(b: FloatComplex) = new FloatComplex(FastComplex.add(u, b.u))
-  final def -(b: FloatComplex) = new FloatComplex(FastComplex.subtract(u, b.u))
-  final def *(b: FloatComplex) = new FloatComplex(FastComplex.multiply(u, b.u))
-  final def /(b: FloatComplex) = new FloatComplex(FastComplex.divide(u, b.u))
-  final def /~(b: FloatComplex) = new FloatComplex(FastComplex.quot(u, b.u))
-  final def %(b: FloatComplex) = new FloatComplex(FastComplex.mod(u, b.u))
+  final def +(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.add(u, b.u))
+  final def -(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.subtract(u, b.u))
+  final def *(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.multiply(u, b.u))
+  final def /(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.divide(u, b.u))
+  final def /~(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.quot(u, b.u))
+  final def %(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.mod(u, b.u))
 
-  final def /%(b: FloatComplex) = FastComplex.quotmod(u, b.u) match {
+  final def /%(b: FloatComplex): (FloatComplex, FloatComplex) = FastComplex.quotmod(u, b.u) match {
     case (q, m) => (new FloatComplex(q), new FloatComplex(m))
   }
 
-  final def pow(b: FloatComplex) = new FloatComplex(FastComplex.pow(u, b.u))
-  final def **(b: FloatComplex) = pow(b)
+  final def pow(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.pow(u, b.u))
+  final def **(b: FloatComplex): FloatComplex = pow(b)
 
-  final def pow(b: Int) = new FloatComplex(FastComplex.pow(u, FastComplex(b.toFloat, 0.0F)))
-  final def **(b: Int) = pow(b)
+  final def pow(b: Int): FloatComplex = new FloatComplex(FastComplex.pow(u, FastComplex(b.toFloat, 0.0F)))
+  final def **(b: Int): FloatComplex = pow(b)
 }
 
 
@@ -435,8 +435,8 @@ object FastComplex {
 
   // note the superstitious use of @inline and final everywhere
 
-  final def apply(real: Float, imag: Float) = encode(real, imag)
-  final def apply(real: Double, imag: Double) = encode(real.toFloat, imag.toFloat)
+  final def apply(real: Float, imag: Float): Long = encode(real, imag)
+  final def apply(real: Double, imag: Double): Long = encode(real.toFloat, imag.toFloat)
 
   // encode a float as some bits
   @inline final def bits(n: Float): Int = java.lang.Float.floatToRawIntBits(n)
@@ -451,9 +451,9 @@ object FastComplex {
   @inline final def imag(d: Long): Float = bits((d >>> 32).toInt)
 
   // define some handy constants
-  final val i = encode(0.0F, 1.0F)
-  final val one = encode(1.0F, 0.0F)
-  final val zero = encode(0.0F, 0.0F)
+  final val i: Long = encode(0.0F, 1.0F)
+  final val one: Long = encode(1.0F, 0.0F)
+  final val zero: Long = encode(0.0F, 0.0F)
 
   // encode two floats representing a complex number
   @inline final def encode(real: Float, imag: Float): Long =
@@ -578,7 +578,7 @@ trait ComplexInstances1 extends ComplexInstances0 {
 }
 
 trait ComplexInstances extends ComplexInstances1 {
-  implicit def ComplexAlgebra[@spec(Float, Double) A: Fractional: Trig: IsReal] =
+  implicit def ComplexAlgebra[@spec(Float, Double) A: Fractional: Trig: IsReal]: ComplexAlgebra[A] =
     new ComplexAlgebra[A]
 
   implicit def ComplexEq[A: Eq]: Eq[Complex[A]] = new ComplexEq[A]
@@ -603,10 +603,10 @@ private[math] trait ComplexIsField[@spec(Float,Double) A] extends ComplexIsRing[
   implicit def algebra: Field[A]
 
   override def fromDouble(n: Double): Complex[A] = Complex(algebra.fromDouble(n))
-  def div(a: Complex[A], b: Complex[A]) = a / b
-  def quot(a: Complex[A], b: Complex[A]) = a /~ b
-  def mod(a: Complex[A], b: Complex[A]) = a % b
-  override def quotmod(a: Complex[A], b: Complex[A]) = a /% b
+  def div(a: Complex[A], b: Complex[A]): Complex[A] = a / b
+  def quot(a: Complex[A], b: Complex[A]): Complex[A] = a /~ b
+  def mod(a: Complex[A], b: Complex[A]): Complex[A] = a % b
+  override def quotmod(a: Complex[A], b: Complex[A]): (Complex[A], Complex[A]) = a /% b
   def gcd(a: Complex[A], b: Complex[A]): Complex[A] = {
     @tailrec def _gcd(a: Complex[A], b: Complex[A]): Complex[A] =
       if (b.isZero) a else _gcd(b, a - (a / b).round * b)
@@ -668,8 +668,8 @@ private[math] trait ComplexIsSigned[A] extends Signed[Complex[A]] {
 
 @SerialVersionUID(1L)
 private[math] class ComplexEq[A: Eq] extends Eq[Complex[A]] with Serializable {
-  def eqv(x: Complex[A], y: Complex[A]) = x eqv y
-  override def neqv(x: Complex[A], y: Complex[A]) = x neqv y
+  def eqv(x: Complex[A], y: Complex[A]): Boolean = x eqv y
+  override def neqv(x: Complex[A], y: Complex[A]): Boolean = x neqv y
 }
 
 @SerialVersionUID(1L)
@@ -690,7 +690,7 @@ private[math] class ComplexAlgebra[@spec(Float, Double) A](implicit
     with InnerProductSpace[Complex[A], A]
     with FieldAlgebra[Complex[A], A]
     with Serializable {
-  def scalar = algebra
+  def scalar: Field[A] = algebra
   def timesl(a: A, v: Complex[A]): Complex[A] = Complex(a, scalar.zero) * v
   def dot(x: Complex[A], y: Complex[A]): A =
     scalar.plus(scalar.times(x.real, y.real), scalar.times(x.imag, y.imag))

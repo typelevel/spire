@@ -67,26 +67,26 @@ class ULong(val signed: Long) extends AnyVal {
   final def == (that: ULong): Boolean = this.signed == that.signed
   final def != (that: ULong): Boolean = this.signed != that.signed
 
-  final def <= (that: ULong) = if (this.signed >= 0L)
+  final def <= (that: ULong): Boolean = if (this.signed >= 0L)
     this.signed <= that.signed || that.signed < 0L
   else
     that.signed >= this.signed && that.signed < 0L
 
-  final def < (that: ULong) = if (this.signed >= 0L)
+  final def < (that: ULong): Boolean = if (this.signed >= 0L)
     this.signed < that.signed || that.signed < 0L
   else
     that.signed > this.signed && that.signed < 0L
 
-  @inline final def >= (that: ULong) = that <= this
-  @inline final def > (that: ULong) = that < this
+  @inline final def >= (that: ULong): Boolean = that <= this
+  @inline final def > (that: ULong): Boolean = that < this
 
-  final def unary_- = ULong(this.signed)
+  final def unary_- : ULong = ULong(this.signed)
 
-  final def + (that: ULong) = ULong(this.signed + that.signed)
-  final def - (that: ULong) = ULong(this.signed - that.signed)
-  final def * (that: ULong) = ULong(this.signed * that.signed)
+  final def + (that: ULong): ULong = ULong(this.signed + that.signed)
+  final def - (that: ULong): ULong = ULong(this.signed - that.signed)
+  final def * (that: ULong): ULong = ULong(this.signed * that.signed)
 
-  final def / (that: ULong) = {
+  final def / (that: ULong): ULong = {
     val n: Long = this.signed
     val d: Long = that.signed
 
@@ -106,25 +106,25 @@ class ULong(val signed: Long) extends AnyVal {
     }
   }
 
-  final def % (that: ULong) = this - (this / that) * that
+  final def % (that: ULong): ULong = this - (this / that) * that
 
-  final def /% (that: ULong) = {
+  final def /% (that: ULong): (ULong, ULong) = {
     val q = this / that
     (q, this - q * that)
   }
 
-  final def unary_~ = ULong(~this.signed)
+  final def unary_~ : ULong = ULong(~this.signed)
 
-  final def << (shift: Int) = ULong(signed << shift)
-  final def >> (shift: Int) = ULong(signed >>> shift)
-  final def >>> (shift: Int) = ULong(signed >>> shift)
-  final def & (that: ULong) = ULong(this.signed & that.signed)
-  final def | (that: ULong) = ULong(this.signed | that.signed)
-  final def ^ (that: ULong) = ULong(this.signed ^ that.signed)
+  final def << (shift: Int): ULong = ULong(signed << shift)
+  final def >> (shift: Int): ULong = ULong(signed >>> shift)
+  final def >>> (shift: Int): ULong = ULong(signed >>> shift)
+  final def & (that: ULong): ULong = ULong(this.signed & that.signed)
+  final def | (that: ULong): ULong = ULong(this.signed | that.signed)
+  final def ^ (that: ULong): ULong = ULong(this.signed ^ that.signed)
 
-  final def ** (that: ULong) = ULong.pow(1L, this.signed, that.signed)
+  final def ** (that: ULong): ULong = ULong.pow(1L, this.signed, that.signed)
 
-  final def gcd (that: ULong) = ULong.gcd(this, that)
+  final def gcd (that: ULong): ULong = ULong.gcd(this, that)
 }
 
 trait ULongInstances {
@@ -147,13 +147,13 @@ private[math] trait ULongIsRig extends Rig[ULong] {
 }
 
 private[math] trait ULongOrder extends Order[ULong] {
-  override def eqv(x:ULong, y:ULong) = x == y
-  override def neqv(x:ULong, y:ULong) = x != y
-  override def gt(x: ULong, y: ULong) = x > y
-  override def gteqv(x: ULong, y: ULong) = x >= y
-  override def lt(x: ULong, y: ULong) = x < y
-  override def lteqv(x: ULong, y: ULong) = x <= y
-  def compare(x: ULong, y: ULong) = if (x < y) -1 else if (x > y) 1 else 0
+  override def eqv(x:ULong, y:ULong): Boolean = x == y
+  override def neqv(x:ULong, y:ULong): Boolean = x != y
+  override def gt(x: ULong, y: ULong): Boolean = x > y
+  override def gteqv(x: ULong, y: ULong): Boolean = x >= y
+  override def lt(x: ULong, y: ULong): Boolean = x < y
+  override def lteqv(x: ULong, y: ULong): Boolean = x <= y
+  def compare(x: ULong, y: ULong): Int = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 @SerialVersionUID(0L)

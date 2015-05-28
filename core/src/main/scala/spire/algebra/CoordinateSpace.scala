@@ -33,10 +33,10 @@ trait CoordinateSpace[V, @spec(Float, Double) F] extends Any with InnerProductSp
 }
 
 object CoordinateSpace {
-  @inline final def apply[V, @spec(Float,Double) F](implicit V: CoordinateSpace[V, F]) = V
+  @inline final def apply[V, @spec(Float,Double) F](implicit V: CoordinateSpace[V, F]): CoordinateSpace[V, F] = V
 
   def seq[A: Field, CC[A] <: SeqLike[A, CC[A]]](dimensions: Int)(implicit
-      cbf0: CanBuildFrom[CC[A], A, CC[A]]) = new SeqCoordinateSpace[A, CC[A]](dimensions)
+      cbf0: CanBuildFrom[CC[A], A, CC[A]]): SeqCoordinateSpace[A, CC[A]] = new SeqCoordinateSpace[A, CC[A]](dimensions)
 
   def array[@spec(Float, Double) A: Field: ClassTag](dimensions: Int): CoordinateSpace[Array[A], A] =
     new ArrayCoordinateSpace[A](dimensions)

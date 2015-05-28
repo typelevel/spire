@@ -117,8 +117,8 @@ object MyBuild extends Build {
     publishTo <<= version {
       (v: String) =>
       val nexus = "https://oss.sonatype.org/"
-      if (v.trim.endsWith("SNAPSHOT")) 
-        Some("snapshots" at nexus + "content/repositories/snapshots") 
+      if (v.trim.endsWith("SNAPSHOT"))
+        Some("snapshots" at nexus + "content/repositories/snapshots")
       else
         Some("releases"  at nexus + "service/local/staging/deploy/maven2")
     },
@@ -265,7 +265,7 @@ object MyBuild extends Build {
 
     // raise memory limits here if necessary
     // TODO: this doesn't seem to be working with caliper at the moment :(
-  
+
     javaOptions in run += "-Xmx4G",
 
     libraryDependencies ++= Seq(

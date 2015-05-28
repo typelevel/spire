@@ -56,7 +56,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Vector[Int]",      VectorSpaceLaws[Vector[Int], Int].module)
   checkAll("List[Rational]",   VectorSpaceLaws[List[Rational], Rational].vectorSpace)
   checkAll("Vector[Rational]", VectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
-  
+
   checkAll("Array[Int]",         VectorSpaceLaws[Array[Int], Int].module)
   checkAll("Array[VectorSpace]", VectorSpaceLaws[Array[Rational], Rational].vectorSpace)
 

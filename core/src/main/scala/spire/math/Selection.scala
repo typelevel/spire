@@ -152,6 +152,7 @@ trait HighBranchingMedianOf5 {
 
   // Benchmarks show that this is slightly faster than the version above.
 
+  // scalastyle:off method.length
   final def mo5[@spec A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]): Unit = {
     val ai1 = data(offset)
     val ai2 = data(offset + stride)
@@ -289,6 +290,7 @@ trait HighBranchingMedianOf5 {
     data(i) = data(offset)
     data(offset) = m
   }
+  // scalastyle:on method.length
 }
 
 object LinearSelect extends SelectLike with HighBranchingMedianOf5 {
@@ -345,12 +347,12 @@ object QuickSelect extends SelectLike with HighBranchingMedianOf5 {
 }
 
 object Selection {
-  final def select[@spec A: Order: ClassTag](data: Array[A], k: Int) =
+  final def select[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit =
     quickSelect(data, k)
 
-  final def linearSelect[@spec A: Order: ClassTag](data: Array[A], k: Int) =
+  final def linearSelect[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit =
     LinearSelect.select(data, k)
 
-  final def quickSelect[@spec A: Order: ClassTag](data: Array[A], k: Int) =
+  final def quickSelect[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit =
     QuickSelect.select(data, k)
 }

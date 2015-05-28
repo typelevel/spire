@@ -26,12 +26,12 @@ trait LongIsEuclideanRing extends EuclideanRing[Long] {
   }
   override def times(a:Long, b:Long): Long = a * b
   def zero: Long = 0L
-  
+
   override def fromInt(n: Int): Long = n
 
-  def quot(a:Long, b:Long) = a / b
-  def mod(a:Long, b:Long) = a % b
-  def gcd(a:Long, b:Long) = spire.math.gcd(a, b)
+  def quot(a:Long, b:Long): Long = a / b
+  def mod(a:Long, b:Long): Long = a % b
+  def gcd(a:Long, b:Long): Long = spire.math.gcd(a, b)
 }
 
 // Not included in Instances trait!
@@ -54,18 +54,18 @@ trait LongIsNRoot extends NRoot[Long] {
     else if (n == 1) x
     else findnroot(0, 1L << ((65 - n) / n))
   }
-  def log(a:Long) = Math.log(a.toDouble).toLong
-  def fpow(a:Long, b:Long) = spire.math.pow(a, b) // xyz
+  def log(a:Long): Long = Math.log(a.toDouble).toLong
+  def fpow(a:Long, b:Long): Long = spire.math.pow(a, b) // xyz
 }
 
 trait LongOrder extends Order[Long] {
-  override def eqv(x:Long, y:Long) = x == y
-  override def neqv(x:Long, y:Long) = x != y
-  override def gt(x: Long, y: Long) = x > y
-  override def gteqv(x: Long, y: Long) = x >= y
-  override def lt(x: Long, y: Long) = x < y
-  override def lteqv(x: Long, y: Long) = x <= y
-  def compare(x: Long, y: Long) = if (x < y) -1 else if (x == y) 0 else 1
+  override def eqv(x:Long, y:Long): Boolean = x == y
+  override def neqv(x:Long, y:Long): Boolean = x != y
+  override def gt(x: Long, y: Long): Boolean = x > y
+  override def gteqv(x: Long, y: Long): Boolean = x >= y
+  override def lt(x: Long, y: Long): Boolean = x < y
+  override def lteqv(x: Long, y: Long): Boolean = x <= y
+  def compare(x: Long, y: Long): Int = if (x < y) -1 else if (x == y) 0 else 1
 }
 
 trait LongIsSigned extends Signed[Long] {

@@ -292,21 +292,21 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
     Sorting.sort(arr)
     fromArray(arr)
   }
-  
+
   def qsortedBy[@sp B](f: A => B)(implicit ev: Order[B], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     implicit val ord: Order[A] = ev.on(f)
     val arr = as.toArray
     Sorting.sort(arr)
     fromArray(arr)
   }
-  
+
   def qsortedWith(f: (A, A) => Int)(implicit ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     implicit val ord: Order[A] = Order.from(f)
     val arr = as.toArray
     Sorting.sort(arr)
     fromArray(arr)
   }
-  
+
   def qselected(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
     val arr = as.toArray
     Selection.select(arr, k)

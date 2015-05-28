@@ -101,7 +101,7 @@ private[spire] trait Fuser[C <: Context, A] {
       Approx(q"$tmp.apx", q"$tmp.mes", Left(q"$tmp.ind"), q"$tmp.exact").fused(assign :: Nil)
   }
 
-  // Returns true if `tree` is lifting an exact type tpe 
+  // Returns true if `tree` is lifting an exact type tpe
   private def isExactLift(tree: Tree): Boolean = tree match {
     case q"$lift($exact)($ev)" =>
       (typeCheck(c)(tree).tpe <:< c.weakTypeOf[FpFilter[A]]) &&
@@ -255,7 +255,7 @@ private[spire] trait Fuser[C <: Context, A] {
 }
 
 private[spire] object Fuser {
-  def apply[C <: Context, A: ctx.WeakTypeTag](ctx: C) = new Fuser[C, A] {
+  def apply[C <: Context, A: ctx.WeakTypeTag](ctx: C): Fuser[C, A] = new Fuser[C, A] {
     val c = ctx
     val A = c.weakTypeTag[A]
   }

@@ -25,7 +25,7 @@ case class Term[@spec(Float, Double) C](coeff: C, exp: Int) { lhs =>
   def eval(x: C)(implicit r: Semiring[C]): C =
     if (exp != 0) coeff * (x pow exp) else coeff
 
-  def isIndexZero: Boolean = 
+  def isIndexZero: Boolean =
     exp == 0
 
   def isZero(implicit ring: Semiring[C], eq: Eq[C]): Boolean =
@@ -40,7 +40,7 @@ case class Term[@spec(Float, Double) C](coeff: C, exp: Int) { lhs =>
   def int(implicit f: Field[C]): Term[C] =
     Term(coeff / f.fromInt(exp + 1), exp + 1)
 
-  override def toString = {
+  override def toString: String = {
     import Term._
 
     def expString = exp match {
@@ -69,15 +69,15 @@ case class Term[@spec(Float, Double) C](coeff: C, exp: Int) { lhs =>
 }
 
 object Term {
-  implicit def ordering[C] = new Order[Term[C]] {
+  implicit def ordering[C]: Order[Term[C]] = new Order[Term[C]] {
     def compare(x: Term[C], y: Term[C]): Int = x.exp compare y.exp
   }
 
-  def fromTuple[@spec(Float, Double) C](tpl: (Int, C)): Term[C] = 
+  def fromTuple[@spec(Float, Double) C](tpl: (Int, C)): Term[C] =
     Term(tpl._2, tpl._1)
   def zero[@spec(Float, Double) C](implicit r: Semiring[C]): Term[C] =
     Term(r.zero, 0)
-  def one[@spec(Float, Double) C](implicit r: Rig[C]): Term[C] = 
+  def one[@spec(Float, Double) C](implicit r: Rig[C]): Term[C] =
     Term(r.one, 0)
 
   private val IsZero = "0".r
@@ -100,8 +100,10 @@ object Term {
     '3' -> '\u00B3'
   )
 
+  // call Regex constructor directly to get rid of compiler warning
+  // replace with "".r once SI-6723 is fixed
   private val superscriptRegex =
-    "[\\u2070\\u2071\\u2072\\u2073\\u2074\\u2075\\u2076\\u2077\\u2078\\u2079\\u207B\\u00B9\\u00B2\\u00B3]+".r
+    new scala.util.matching.Regex("[\\u2070\\u2071\\u2072\\u2073\\u2074\\u2075\\u2076\\u2077\\u2078\\u2079\\u207B\\u00B9\\u00B2\\u00B3]+")
 
   private[spire] def removeSuperscript(text: String): String =
     superscriptRegex.replaceAllIn(text, "^" + _.group(0).map(removeSuperscript))

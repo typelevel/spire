@@ -11,7 +11,7 @@ trait MetricSpace[V, @spec(Int, Long, Float, Double) R] extends Any {
 }
 
 object MetricSpace extends MetricSpace0 {
-  @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: MetricSpace[V, R]) = V
+  @inline final def apply[V, @spec(Int,Long,Float,Double) R](implicit V: MetricSpace[V, R]): MetricSpace[V, R] = V
 
   def distance[V, @spec(Int,Long,Float,Double) R](v: V, w: V)(implicit
     metric: MetricSpace[V, R]): R = metric.distance(v, w)
@@ -27,7 +27,7 @@ object MetricSpace extends MetricSpace0 {
 
 private[algebra] trait MetricSpace0 {
   implicit def realMetricSpace[@spec(Int,Long,Float,Double) R](implicit
-      R0: IsReal[R], R1: Rng[R]) = new MetricSpace[R, R] {
+      R0: IsReal[R], R1: Rng[R]): MetricSpace[R, R] = new MetricSpace[R, R] {
     def distance(v: R, w: R): R = R0.abs(R1.minus(v, w))
   }
 }

@@ -143,21 +143,21 @@ sealed trait ValueBound[A] extends Bound[A] { lhs =>
 }
 
 case class Open[A](a: A) extends ValueBound[A] {
-  def isClosed = false
+  def isClosed: Boolean = false
 }
 
 case class Closed[A](a: A) extends ValueBound[A] {
-  def isClosed = true
+  def isClosed: Boolean = true
 }
 
 /** Companion object for open/closed bounds, used to construct intervals from
   * a set of bounds.
-  * 
+  *
   * In the comments, we write
-  * 
+  *
   * - [v, (v or ?v when the bound is interpreted as a lower bound,
   * - v], v), v? when the bound is interpreted as an upper bound.
-  * 
+  *
   * The symbols [], (), ? correspond to closed, open or unknown bounds.
   */
 object ValueBound {
@@ -181,10 +181,10 @@ object ValueBound {
     }
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a === v2.a < v3.a.
     */
-  @inline def union3_1approx2_2less3[A: Order](v1: ValueBound[A], 
+  @inline def union3_1approx2_2less3[A: Order](v1: ValueBound[A],
     v2: ValueBound[A], v3: ValueBound[A]): Interval[A] =
     if (v1.isClosed) // [v1 ~ ?v2 < v3?
       Interval.fromOrderedBounds(v1, v3)
@@ -192,10 +192,10 @@ object ValueBound {
       Interval.fromOrderedBounds(v2, v3)
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a < v2.a === v3.a.
     */
-  @inline def union3_1less2_2approx3[A: Order](v1: ValueBound[A], 
+  @inline def union3_1less2_2approx3[A: Order](v1: ValueBound[A],
     v2: ValueBound[A], v3: ValueBound[A]): Interval[A] =
     if (v2.isClosed) // ?v1 < v2] ~ v3?
       Interval.fromOrderedBounds(v1, v2)
@@ -203,7 +203,7 @@ object ValueBound {
       Interval.fromOrderedBounds(v1, v3)
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a === v2.a === v3.a.
     */
   @inline def union3_1approx2_2approx3[A: Order](v1: ValueBound[A],
@@ -214,10 +214,10 @@ object ValueBound {
       Interval.empty[A]
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a === v2.a.
     */
-  @inline def union3_1approx2[A: Order](v1: ValueBound[A], 
+  @inline def union3_1approx2[A: Order](v1: ValueBound[A],
     v2: ValueBound[A], v3: ValueBound[A]): Interval[A] =
     v2.a.compare(v3.a).signum match {
       case -1 => // v1 ~ v2 < v3
@@ -229,11 +229,11 @@ object ValueBound {
     }
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a < v2.a.
     */
   @inline def union3_1less2[A: Order](v1: ValueBound[A],
-    v2: ValueBound[A], v3: ValueBound[A]): Interval[A] = 
+    v2: ValueBound[A], v3: ValueBound[A]): Interval[A] =
     v2.a.compare(v3.a).signum match {
       case -1 => // v1 < v2 < v3
         Interval.fromOrderedBounds(v1, v3)
@@ -251,7 +251,7 @@ object ValueBound {
     }
 
   /** Returns the interval which contains all the given bounds. */
-  @inline def union3[A: Order](v1: ValueBound[A], 
+  @inline def union3[A: Order](v1: ValueBound[A],
     v2: ValueBound[A], v3: ValueBound[A]): Interval[A] =
     v1.a.compare(v2.a).signum match {
       case -1 => // v1 < v2
@@ -263,7 +263,7 @@ object ValueBound {
     }
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a === v2.a === v3.a < v4.a.
     */
   @inline def union4_1approx2_2approx3_3less4[A: Order](v1: ValueBound[A], v2: ValueBound[A],
@@ -276,7 +276,7 @@ object ValueBound {
       Interval.fromOrderedBounds(v3, v4)
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a === v2.a < v3.a === v4.a.
     */
   @inline def union4_1approx2_2less3_3approx4[A: Order](v1: ValueBound[A], v2: ValueBound[A],
@@ -293,7 +293,7 @@ object ValueBound {
     }
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a < v2.a === v3.a === v4.a.
     */
   @inline def union4_1less2_2approx3_3approx4[A: Order](v1: ValueBound[A], v2: ValueBound[A],
@@ -307,7 +307,7 @@ object ValueBound {
 
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a < v3.a === v4.a and v2.a < v3.a === v4.a.
     */
   @inline def union4_1less3_2less3_3approx4[A: Order](v1: ValueBound[A], v2: ValueBound[A],
@@ -322,7 +322,7 @@ object ValueBound {
     }
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a < v2.a === v3.a.
     */
   @inline def union4_1less2_2approx3[A: Order](v1: ValueBound[A], v2: ValueBound[A],
@@ -337,7 +337,7 @@ object ValueBound {
     }
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a === v2.a < v3.a.
     */
   @inline def union4_1approx2_2less3[A: Order](v1: ValueBound[A], v2: ValueBound[A],
@@ -359,7 +359,7 @@ object ValueBound {
     }
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a === v2.a == v3.a.
     */
   @inline def union4_1approx2_2approx3[A: Order](v1: ValueBound[A], v2: ValueBound[A],
@@ -370,7 +370,7 @@ object ValueBound {
       union3_1approx2(v1, v2, v4)
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a === v2.a.
     */
   @inline def union4_1approx2[A: Order](v1: ValueBound[A], v2: ValueBound[A],
@@ -385,7 +385,7 @@ object ValueBound {
     }
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a < v2.a and v1.a < v3.a (i.e. v1 is the minimum of all).
     */
   @inline def union4_1less2_1less3[A: Order](v1: ValueBound[A], v2: ValueBound[A],
@@ -400,7 +400,7 @@ object ValueBound {
     }
 
   /** Returns the interval which contains all the given bounds.
-    * 
+    *
     * Assumption: v1.a < v3.a and v2.a < v3.a (i.e. v3 is the maximum of all).
     */
   @inline def union4_1less3_2less3[A: Order](v1: ValueBound[A], v2: ValueBound[A],

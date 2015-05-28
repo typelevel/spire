@@ -10,7 +10,7 @@ object Checked {
 
   /**
    * Performs overflow checking for Int/Long operations.
-   * 
+   *
    * If no errors are detected, the expected result will be
    * returned. If there are errors, the 'orElse' block will be
    * evaluated and returned.
@@ -19,7 +19,7 @@ object Checked {
 
   /**
    * Performs overflow checking for Int/Long operations.
-   * 
+   *
    * If no errors are detected, the expected result will be
    * returned. If an error is detected, an ArithmeticOverflowException
    * will be thrown.
@@ -28,7 +28,7 @@ object Checked {
 
   /**
    * Performs overflow checking for Int/Long operations.
-   * 
+   *
    * If no errors are detected, the expected result will be returned
    * in a Some wrapper. If an error is detected, None will be
    * returned.
@@ -37,11 +37,11 @@ object Checked {
 
   /**
    * Performs overflow checking for Int/Long operations.
-   * 
+   *
    * If no errors are detected, the expected result will be
    * returned. If there are errors, the 'orElse' block will be
    * evaluated and returned.
-   * 
+   *
    * In the error case, this macro will actually evaluate a return
    * statement in the outer method context. Thus, it should only be
    * called from within a method that you would like to "return out
@@ -49,7 +49,7 @@ object Checked {
    */
   def tryOrReturn[A](n: A)(orElse: A): A = macro tryOrReturnImpl[A]
 
-  
+
   def tryOrElseImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A])(orElse: c.Expr[A]): c.Expr[A] = {
     val tree = CheckedRewriter[c.type](c).rewriteSafe[A](n.tree, orElse.tree)
     val resetTree = resetLocalAttrs(c)(tree) // See SI-6711
@@ -93,7 +93,7 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
     q"""{ def $fname: $A = $fallback; $attempt }"""
   }
 
-  def warnOnSimpleTree(tree: Tree): Unit = 
+  def warnOnSimpleTree(tree: Tree): Unit =
     tree match {
       case Literal(_) => c.warning(tree.pos, "checked used with literal")
       case Ident(_) => c.warning(tree.pos, "checked used with simple identifier")

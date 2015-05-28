@@ -10,7 +10,7 @@ import spire.algebra._
 import spire.math._
 import spire.implicits._
 
-import com.google.caliper.Runner 
+import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
@@ -78,13 +78,13 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
 
   def timeAddIntsDirect(reps:Int) = run(reps)(addIntsDirect(ints))
   def timeAddIntsGeneric(reps:Int) = run(reps)(addGeneric(ints))
-  
+
   def timeAddLongsDirect(reps:Int) = run(reps)(addLongsDirect(longs))
   def timeAddLongsGeneric(reps:Int) = run(reps)(addGeneric(longs))
-  
+
   def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
   def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
-  
+
   def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
   def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
 

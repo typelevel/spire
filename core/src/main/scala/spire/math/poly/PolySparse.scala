@@ -14,7 +14,7 @@ import spire.syntax.eq._
 import spire.syntax.cfor._
 import spire.syntax.std.array._
 
-case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val coeff: Array[C])
+case class PolySparse[@spec(Double) C] private [spire](val exp: Array[Int], val coeff: Array[C])
     (implicit val ct: ClassTag[C]) extends Polynomial[C] { lhs =>
 
   def toDense(implicit ring: Semiring[C], eq: Eq[C]): PolyDense[C] =
@@ -153,7 +153,7 @@ case class PolySparse[@spec(Double) C] private [spire] (val exp: Array[Int], val
       es(i) = e
       cs(i) = coeff(i) / field.fromInt(e)
     }
-    
+
     PolySparse.safe(es, cs)
   }
 

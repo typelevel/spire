@@ -21,9 +21,9 @@ trait BigDecimalIsField extends Field[BigDecimal] {
 
   override def fromInt(n: Int): BigDecimal = BigDecimal(n)
 
-  def quot(a: BigDecimal, b: BigDecimal) = a.quot(b)
-  def mod(a: BigDecimal, b: BigDecimal) = a % b
-  override def quotmod(a: BigDecimal, b: BigDecimal) = a /% b
+  def quot(a: BigDecimal, b: BigDecimal): BigDecimal = a.quot(b)
+  def mod(a: BigDecimal, b: BigDecimal): BigDecimal = a % b
+  override def quotmod(a: BigDecimal, b: BigDecimal): (BigDecimal, BigDecimal) = a /% b
   def gcd(a: BigDecimal, b: BigDecimal): BigDecimal = {
     import java.math.BigInteger
 
@@ -70,7 +70,7 @@ trait BigDecimalIsField extends Field[BigDecimal] {
   }
 
   override def fromDouble(n: Double): BigDecimal = BigDecimal(n, MathContext.UNLIMITED)
-  def div(a: BigDecimal, b: BigDecimal) = a / b
+  def div(a: BigDecimal, b: BigDecimal): BigDecimal = a / b
 }
 
 trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
@@ -99,7 +99,7 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
     loop(BigDecimal(0, n.mc), approxSqrt(n))
   }
 
-  def fpow(a: BigDecimal, b: BigDecimal) = spire.math.pow(a, b)
+  def fpow(a: BigDecimal, b: BigDecimal): BigDecimal = spire.math.pow(a, b)
 }
 
 @SerialVersionUID(1L)
@@ -116,8 +116,8 @@ class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends 
 
   def exp(x: BigDecimal): BigDecimal = fromReal(Real.exp(Real(x)))
   def expm1(x: BigDecimal): BigDecimal = fromReal(Real.exp(Real(x)) - Real.one)
-  def log(a: BigDecimal) = fromReal(Real.log(Real(a)))
-  def log1p(a: BigDecimal) = fromReal(Real.log(Real(a) + Real.one))
+  def log(a: BigDecimal): BigDecimal = fromReal(Real.log(Real(a)))
+  def log1p(a: BigDecimal): BigDecimal = fromReal(Real.log(Real(a) + Real.one))
 
   lazy val degreesPerRadian = fromReal(Real(360) / (Real.pi * Real(2)))
   def toRadians(a: BigDecimal): BigDecimal = a / degreesPerRadian
@@ -140,17 +140,17 @@ class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends 
 }
 
 trait BigDecimalOrder extends Order[BigDecimal] {
-  override def eqv(x: BigDecimal, y: BigDecimal) = x == y
-  override def neqv(x: BigDecimal, y: BigDecimal) = x != y
-  override def gt(x: BigDecimal, y: BigDecimal) = x > y
-  override def gteqv(x: BigDecimal, y: BigDecimal) = x >= y
-  override def lt(x: BigDecimal, y: BigDecimal) = x < y
-  override def lteqv(x: BigDecimal, y: BigDecimal) = x <= y
-  override def min(x: BigDecimal, y: BigDecimal) = x.min(y)
-  override def max(x: BigDecimal, y: BigDecimal) = x.max(y)
+  override def eqv(x: BigDecimal, y: BigDecimal): Boolean = x == y
+  override def neqv(x: BigDecimal, y: BigDecimal): Boolean = x != y
+  override def gt(x: BigDecimal, y: BigDecimal): Boolean = x > y
+  override def gteqv(x: BigDecimal, y: BigDecimal): Boolean = x >= y
+  override def lt(x: BigDecimal, y: BigDecimal): Boolean = x < y
+  override def lteqv(x: BigDecimal, y: BigDecimal): Boolean = x <= y
+  override def min(x: BigDecimal, y: BigDecimal): BigDecimal = x.min(y)
+  override def max(x: BigDecimal, y: BigDecimal): BigDecimal = x.max(y)
   // Scala compareTo has no guarantee to return only -1, 0 or 1 as per Spire compare contract,
   // so we call Java's compareTo which does
-  def compare(x: BigDecimal, y: BigDecimal) = x.bigDecimal.compareTo(y.bigDecimal)
+  def compare(x: BigDecimal, y: BigDecimal): Int = x.bigDecimal.compareTo(y.bigDecimal)
 }
 
 trait BigDecimalIsSigned extends Signed[BigDecimal] {
@@ -163,7 +163,7 @@ trait BigDecimalIsReal extends IsRational[BigDecimal] with BigDecimalOrder with 
   def ceil(a: BigDecimal): BigDecimal = a.setScale(0, CEILING)
   def floor(a: BigDecimal): BigDecimal = a.setScale(0, FLOOR)
   def round(a: BigDecimal): BigDecimal = a.setScale(0, HALF_UP)
-  def isWhole(a: BigDecimal) = a % 1.0 == 0.0
+  def isWhole(a: BigDecimal): Boolean = a % 1.0 == 0.0
   def toRational(a:BigDecimal): Rational = Rational(a)
 }
 
@@ -174,7 +174,7 @@ trait BigDecimalInstances {
   import BigDecimal.defaultMathContext
 
   implicit final val BigDecimalAlgebra = new BigDecimalAlgebra
-  implicit def BigDecimalIsTrig(implicit mc: MathContext = defaultMathContext) =
+  implicit def BigDecimalIsTrig(implicit mc: MathContext = defaultMathContext): BigDecimalIsTrig =
     new BigDecimalIsTrig(mc)
 
   import spire.math.NumberTag._

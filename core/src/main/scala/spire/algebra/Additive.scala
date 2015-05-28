@@ -15,12 +15,12 @@ object Additive {
 
   def apply[A](m: Monoid[A]): AdditiveMonoid[A] = new AdditiveMonoid[A] {
     def plus(x: A, y: A): A = m.op(x, y)
-    def zero = m.id
+    def zero: A = m.id
   }
 
   def apply[A](m: CMonoid[A]): AdditiveCMonoid[A] = new AdditiveCMonoid[A] {
     def plus(x: A, y: A): A = m.op(x, y)
-    def zero = m.id
+    def zero: A = m.id
   }
 
   def apply[A](g: Group[A]): AdditiveGroup[A] = new AdditiveGroup[A] {
@@ -66,7 +66,7 @@ trait AdditiveSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends 
 
   /**
    *  Given a sequence of `as`, sum them using the semigroup and return the total.
-   * 
+   *
    *  If the sequence is empty, returns None. Otherwise, returns Some(total).
    */
   def sumOption(as: TraversableOnce[A]): Option[A] = as.reduceOption(plus)
@@ -80,7 +80,7 @@ trait AdditiveCSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends
 
 trait AdditiveMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveSemigroup[A] {
   override def additive: Monoid[A] = new Monoid[A] {
-    def id = zero
+    def id: A = zero
     def op(x: A, y: A): A = plus(x, y)
   }
 
@@ -108,14 +108,14 @@ trait AdditiveMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any
 
 trait AdditiveCMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveMonoid[A] with AdditiveCSemigroup[A] {
   override def additive: CMonoid[A] = new CMonoid[A] {
-    def id = zero
+    def id: A = zero
     def op(x: A, y: A): A = plus(x, y)
   }
 }
 
 trait AdditiveGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveMonoid[A] {
   override def additive: Group[A] = new Group[A] {
-    def id = zero
+    def id: A = zero
     def op(x: A, y: A): A = plus(x, y)
     def inverse(x: A): A = negate(x)
   }
@@ -136,7 +136,7 @@ trait AdditiveGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any 
 
 trait AdditiveAbGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveGroup[A] with AdditiveCMonoid[A] {
   override def additive: AbGroup[A] = new AbGroup[A] {
-    def id = zero
+    def id: A = zero
     def op(x: A, y: A): A = plus(x, y)
     def inverse(x: A): A = negate(x)
   }

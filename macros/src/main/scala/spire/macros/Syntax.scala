@@ -104,7 +104,7 @@ class InlineUtil[C <: Context with Singleton](val c: C) {
           params.zip(args).foldLeft(body) { case (b, (param, arg)) =>
             inlineSymbol(param.symbol, b, arg)
           }
-          
+
         case Apply(Function(params, body), args) =>
           params.zip(args).foldLeft(body) { case (b, (param, arg)) =>
             inlineSymbol(param.symbol, b, arg)
@@ -134,7 +134,7 @@ object Syntax {
      * If our arguments are all "clean" (anonymous functions or simple
      * identifiers) then we can go ahead and just inline them directly
      * into a while loop.
-     * 
+     *
      * If one or more of our arguments are "dirty" (something more
      * complex than an anonymous function or simple identifier) then
      * we will go ahead and bind each argument to a val just to be
