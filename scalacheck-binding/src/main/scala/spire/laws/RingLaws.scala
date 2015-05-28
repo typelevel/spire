@@ -57,6 +57,9 @@ trait RingLaws[A] extends GroupLaws[A] {
     ),
     "prod(Nil) === one" → forAll((a: A) =>
       A.prod(Nil) === A.one
+    ),
+    "isOne" → forAll((a: A) =>
+      a.isOne === (a === A.one)
     )
   )
 

@@ -97,6 +97,9 @@ trait GroupLaws[A] extends Laws {
     ),
     "sum(Nil) === zero" → forAll((a: A) =>
       A.sum(Nil) === A.zero
+    ),
+    "isZero" → forAll((a: A) =>
+      a.isZero === (a === A.zero)
     )
   )
 
