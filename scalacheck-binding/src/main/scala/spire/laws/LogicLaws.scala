@@ -86,8 +86,8 @@ trait LogicLaws[A] extends Laws {
       parent = Some(heyting),
       "excluded middle" -> forAll { (x: A) => (x | ~x) === A.one },
       "xor" -> forAll { (a: A, b: A) => (a ^ b) === ((a & ~b) | (~a & b)) },
-      "nxor" -> forAll { (a: A, b: A) => (a | ~b) & (~a | b) },
+      "nxor" -> forAll { (a: A, b: A) => (a nxor b) === ((a | ~b) & (~a | b)) },
       "imp" -> forAll { (a: A, b: A) => (a imp b) === (~a | b) },
-      "nand" -> forAll { (a: A, b: A) => ~(a & b) },
-      "nor" -> forAll { (a: A, b: A) => ~(a | b) })
+      "nand" -> forAll { (a: A, b: A) => (a nand b) === ~(a & b) },
+      "nor" -> forAll { (a: A, b: A) => (a nor b) === ~(a | b) })
 }
