@@ -1,0 +1,53 @@
+package spire.stats.distribution
+
+import scala.reflect.runtime.universe._
+import spire.algebra._
+import spire.random.Generator
+import spire.random.Ziggurat
+
+trait UniformDistribution[A] extends ContinuousDistribution[A] {
+  val min: A
+  val max: A
+}
+
+object Uniform {
+  def Standard[A: Field: IsReal: TypeTag](): UniformDistribution[A] = new StandardUniformDistributionImpl[A]()
+
+  def apply[A: Field: IsReal: TypeTag](min: A, max: A): UniformDistribution[A] = new UniformDistributionImpl[A](min, max)
+
+  class StandardUniformDistributionImpl[A: Field: IsReal: TypeTag] extends UniformDistribution[A] {
+    import spire.syntax.isReal._
+    import RichGenerator._
+
+    val min = Field[A].zero
+    val max = Field[A].one
+
+    private[stats] val transform: (Generator => A) = (gen => gen.next0[A])
+
+    def pdf(x: A): A = x match {
+      case x if (Field[A].zero <= x) && (x <= Field[A].one) => Field[A].one
+      case _ => Field[A].zero
+    }
+
+    def cdf(x: A): A = x match {
+      case x if (x <  Field[A].zero) => Field[A].zero
+      case x if (x >= Field[A].one)  => Field[A].one
+      case _ => x
+    }
+  }
+
+  class UniformDistributionImpl[A: Field: IsReal: TypeTag](val min: A, val max: A) extends UniformDistribution[A] {
+    import spire.syntax.field._
+
+    val family = new LocationScaleFamily[A] {
+      val stdDist = Standard[A]
+      val location = min
+      val scale = max - min
+    }
+
+    private[stats] val transform = family.transform
+    def pdf(x: A) = family.pdf(x)
+    def cdf(x: A) = family.cdf(x)
+  }
+}
+
