@@ -31,3 +31,16 @@ trait DiscreteDistribution[A] extends Distribution[A] {
   def cdf(x: A): A
 }
 
+// Should a method that returns the next random value based on a
+// specified type be included in the Generator class itself?
+object RichGenerator {
+  import scala.reflect.runtime.universe._
+
+  implicit class RichGenerator(gen: Generator) {
+    def next0[A : TypeTag](): A = typeOf[A] match {
+      case t if t =:= typeOf[Double] => gen.nextDouble.asInstanceOf[A]
+      case _ => ???
+    }
+  }
+}
+
