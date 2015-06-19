@@ -112,6 +112,7 @@ class LawTests extends FunSuite with Discipline {
   }
 
   checkAll("Order[Int]", OrderLaws[Int].order)
+  checkAll("Order[Unit]", OrderLaws[Unit].order)
   checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 
   checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbPerm.arbitrary.map(_.map)), implicitly, implicitly).groupPartialAction)
