@@ -1,6 +1,6 @@
 package spire.std
 
-import spire.algebra.Order
+import spire.algebra.{Field, AbGroup, Order}
 
 trait UnitOrder extends Order[Unit] with Serializable {
   override def eqv(x:Unit, y:Unit): Boolean = true
@@ -15,8 +15,14 @@ trait UnitOrder extends Order[Unit] with Serializable {
   def compare(x: Unit, y: Unit): Int = 0
 }
 
+trait UnitAbGroup extends AbGroup[Unit] {
+  override def inverse(a: Unit): Unit = {}
+  override def id: Unit = {}
+  override def op(x: Unit, y: Unit): Unit = {}
+}
+
 @SerialVersionUID(0L)
-class UnitAlgebra extends UnitOrder with Serializable
+class UnitAlgebra extends UnitAbGroup with UnitOrder with Serializable
 
 trait UnitInstances {
   implicit final val UnitAlgebra = new UnitAlgebra

@@ -17,6 +17,10 @@ import org.scalatest.FunSuite
  */
 class TypeclassExistenceTest extends FunSuite {
 
+  def hasAbGroup[A](implicit g: AbGroup[A] = null, m: ClassTag[A]): Unit = {
+    assert(g != null, "Expected implicit AbGroup[%s] instance, but it was not found." format m)
+  }
+
   def hasRig[A](implicit rig: Rig[A] = null, m: ClassTag[A]): Unit = {
     assert(rig != null, "Expected implicit Rig[%s] instance, but it was not found." format m)
   }
@@ -125,6 +129,7 @@ class TypeclassExistenceTest extends FunSuite {
   test("Unit has Eq:Order") {
     hasEq[Unit]
     hasOrder[Unit]
+    hasAbGroup[Unit]
   }
 
   test("UByte has Eq:Order:Rig") {
