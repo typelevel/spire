@@ -21,4 +21,5 @@ package object std {
   object map extends MapInstances
   object tuples extends ProductInstances
   object option extends OptionInstances
+  object unit extends UnitInstances
 }
