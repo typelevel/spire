@@ -1,6 +1,6 @@
 package spire.std
 
-import spire.algebra.{Field, AbGroup, Order}
+import spire.algebra.{AbGroup, Order}
 
 trait UnitOrder extends Order[Unit] with Serializable {
   override def eqv(x:Unit, y:Unit): Boolean = true
