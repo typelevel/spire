@@ -11,9 +11,33 @@ trait ExponentialDistribution[A] extends ContinuousDistribution[A] {
 }
 
 object Exponential {
-  def Standard[A: Field: Trig: IsReal: TypeTag](): ExponentialDistribution[A] = new StandardExponentialDistributionImpl[A]()
+  def Standard[A: Field: Trig: IsReal: TypeTag: StandardBuilder](): ExponentialDistribution[A] = implicitly[StandardBuilder[A]].apply()
 
-  def apply[A: Field: Trig: IsReal: TypeTag](mode: A, rate: A): ExponentialDistribution[A] = new ExponentialDistributionImpl[A](mode, rate)
+  def apply[A: Field: Trig: IsReal: TypeTag: Builder](mode: A, rate: A): ExponentialDistribution[A] = implicitly[Builder[A]].apply(mode, rate)
+
+  abstract class StandardBuilder[A: Field: IsReal: TypeTag] {
+    def apply(): ExponentialDistribution[A]
+  }
+
+  abstract class Builder[A: Field: IsReal: TypeTag] {
+    def apply(mean: A, stdDev: A): ExponentialDistribution[A]
+  }
+
+  object StandardBuilder {
+    import spire.std.double._
+
+    implicit val doubleBuilder = new StandardBuilder[Double] {
+      def apply() = new StandardExponentialDistributionImpl()
+    }
+  }
+
+  object Builder {
+    import spire.std.double._
+
+    implicit val doubleBuilder = new Builder[Double] {
+      def apply(mean: Double, stdDev: Double) = new ExponentialDistributionImpl(mean, stdDev)
+    }
+  }
 
   class StandardExponentialDistributionImpl[A: Field: Trig: IsReal: TypeTag] extends ExponentialDistribution[A] {
     import spire.math._
@@ -36,7 +60,7 @@ object Exponential {
     }
   }
 
-  class ExponentialDistributionImpl[A: Field: Trig: IsReal: TypeTag](val mode: A, val rate: A) extends ExponentialDistribution[A] {
+  class ExponentialDistributionImpl[A: Field: Trig: IsReal: TypeTag: StandardBuilder](val mode: A, val rate: A) extends ExponentialDistribution[A] {
     import spire.syntax.field._
 
     val family = new LocationScaleFamily[A] {
@@ -44,6 +68,7 @@ object Exponential {
       val location = mode
       val scale = Field[A].one / rate
     }
+
     private[stats] val transform = family.transform
     def pdf(x: A) = family.pdf(x)
     def cdf(x: A) = family.cdf(x)
