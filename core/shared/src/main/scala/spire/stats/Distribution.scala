@@ -2,14 +2,14 @@ package spire.stats.distribution
 
 import spire.random.Generator
 
-trait Distribution[A] {
+trait Distribution[A, B] {
 
   /** Function used to transform the values drawn from a Generator according to this probability distribution function
     */
   private[stats] val transform: (Generator => A)
 }
 
-trait ContinuousDistribution[A] extends Distribution[A] {
+trait ContinuousDistribution[A] extends Distribution[A, A] {
 
   /** Returns the probability density function (pdf) of this distribution at the value x
     */
@@ -20,15 +20,15 @@ trait ContinuousDistribution[A] extends Distribution[A] {
   def cdf(x: A): A
 }
 
-trait DiscreteDistribution[A] extends Distribution[A] {
+trait DiscreteDistribution[A, B] extends Distribution[A, B] {
 
   /** Returns the probability mass function (pmf) of this distribution at the value x
     */
-  def pmf(x: A): A
+  def pmf(x: B): B
 
   /** Returns the cumulative distribution function (cdf) of this distribution at the value x
     */
-  def cdf(x: A): A
+  def cdf(x: B): B
 }
 
 // Should a method that returns the next random value based on a

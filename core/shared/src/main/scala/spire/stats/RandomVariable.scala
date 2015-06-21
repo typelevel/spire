@@ -31,10 +31,10 @@ sealed abstract class RandomVariable[A] {
 }
 
 object RandomVariable {
-  def apply[A](distribution: Distribution[A]) = new RandomVariableWithDistribution(distribution)
+  def apply[A, B](distribution: Distribution[A, B]) = new RandomVariableWithDistribution(distribution)
 }
 
-class RandomVariableWithDistribution[A](distribution: Distribution[A]) extends RandomVariable[A] {
+class RandomVariableWithDistribution[A, B](distribution: Distribution[A, B]) extends RandomVariable[A] {
   def observe(gen: Generator) = distribution.transform(gen)
 }
 
