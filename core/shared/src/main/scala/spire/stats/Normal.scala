@@ -11,9 +11,33 @@ trait NormalDistribution[A] extends ContinuousDistribution[A] {
 }
 
 object Normal {
-  def Standard[A: Field: Trig: IsReal: TypeTag](): NormalDistribution[A] = new StandardNormalDistributionImpl[A]()
+  def Standard[A: Field: Trig: IsReal: TypeTag: StandardBuilder](): NormalDistribution[A] = implicitly[StandardBuilder[A]].apply()
 
-  def apply[A: Field: Trig: IsReal: TypeTag](min: A, max: A): NormalDistribution[A] = new NormalDistributionImpl[A](min, max)
+  def apply[A: Field: Trig: IsReal: TypeTag: Builder](mean: A, stdDev: A): NormalDistribution[A] = implicitly[Builder[A]].apply(mean, stdDev)
+
+  abstract class StandardBuilder[A: Field: IsReal: TypeTag] {
+    def apply(): NormalDistribution[A]
+  }
+
+  abstract class Builder[A: Field: IsReal: TypeTag] {
+    def apply(mean: A, stdDev: A): NormalDistribution[A]
+  }
+
+  object StandardBuilder {
+    import spire.std.double._
+
+    implicit val doubleBuilder = new StandardBuilder[Double] {
+      def apply() = new StandardNormalDistributionImpl()
+    }
+  }
+
+  object Builder {
+    import spire.std.double._
+
+    implicit val doubleBuilder = new Builder[Double] {
+      def apply(mean: Double, stdDev: Double) = new NormalDistributionImpl(mean, stdDev)
+    }
+  }
 
   class StandardNormalDistributionImpl[A: Field: Trig: IsReal: TypeTag] extends NormalDistribution[A] {
     import spire.math._
@@ -43,12 +67,13 @@ object Normal {
     }
   }
 
-  class NormalDistributionImpl[A: Field: Trig: IsReal: TypeTag](val mean: A, val stdDev: A) extends NormalDistribution[A] {
+  class NormalDistributionImpl[A: Field: Trig: IsReal: TypeTag: StandardBuilder](val mean: A, val stdDev: A) extends NormalDistribution[A] {
     val family = new LocationScaleFamily[A] {
       val stdDist = Standard[A]
       val location = mean
       val scale = stdDev
     }
+
     private[stats] val transform = family.transform
     def pdf(x: A) = family.pdf(x)
     def cdf(x: A) = family.cdf(x)
