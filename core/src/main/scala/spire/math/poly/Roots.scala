@@ -23,6 +23,9 @@ trait Roots[A] { self =>
    * `IndexOutOfBoundsException` if there is no `i`-th real root.
    */
   def get(i: Int): A
+
+  override def toString: String =
+    (0 until count).map(get).mkString("Roots(", ", ", ")")
 }
 
 object Roots {
