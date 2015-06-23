@@ -10,7 +10,9 @@ import spire.std.bigDecimal._
  * A trait that can be used to retreive the (possibly approximated) real
  * roots of the polynomial `poly`.
  */
-trait Roots[A] { self =>
+trait Roots[A] extends Iterable[A] { self =>
+
+  def iterator: Iterator[A] = Iterator.tabulate(count)(get)
 
   /** The polynomial the roots belong to. */
   def poly: Polynomial[A]
@@ -25,7 +27,7 @@ trait Roots[A] { self =>
   def get(i: Int): A
 
   override def toString: String =
-    (0 until count).map(get).mkString("Roots(", ", ", ")")
+    mkString("Roots(", ", ", ")")
 }
 
 object Roots {
