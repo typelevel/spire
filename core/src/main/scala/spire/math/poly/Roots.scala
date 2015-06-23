@@ -12,8 +12,6 @@ import spire.std.bigDecimal._
  */
 trait Roots[A] extends Iterable[A] { self =>
 
-  def iterator: Iterator[A] = Iterator.tabulate(count)(get)
-
   /** The polynomial the roots belong to. */
   def poly: Polynomial[A]
 
@@ -25,6 +23,10 @@ trait Roots[A] extends Iterable[A] { self =>
    * `IndexOutOfBoundsException` if there is no `i`-th real root.
    */
   def get(i: Int): A
+
+  def iterator: Iterator[A] = Iterator.tabulate(count)(get)
+
+  override def size: Int = count
 
   override def toString: String =
     mkString("Roots(", ", ", ")")
