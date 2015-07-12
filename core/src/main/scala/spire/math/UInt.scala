@@ -36,7 +36,7 @@ class UInt(val signed: Int) extends AnyVal {
   def >= (that: UInt): Boolean = this.toLong >= that.toLong
   def > (that: UInt): Boolean = this.toLong > that.toLong
 
-  def unary_- : UInt = UInt(this.signed)
+  def unary_- : UInt = UInt(-this.signed)
 
   def + (that: UInt): UInt = UInt(this.signed + that.signed)
   def - (that: UInt): UInt = UInt(this.signed - that.signed)
