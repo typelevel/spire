@@ -83,7 +83,7 @@ class ULongTest extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
   }
 
   property("n + (-n) == 0") {
-    forAll { (n: ULong) => n + (-n) == zero shouldBe true }
+    forAll { (n: ULong) => n + (-n) shouldBe zero }
   }
 
   property("a < b") {
@@ -195,7 +195,7 @@ class UIntTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks
   }
 
   property("n + (-n) == 0") {
-    forAll { (n: UInt) => n + (-n) == zero shouldBe true }
+    forAll { (n: UInt) => n + (-n) shouldBe zero }
   }
 
   property("a < b") {
@@ -287,7 +287,7 @@ class UShortTest extends PropSpec with Matchers with GeneratorDrivenPropertyChec
   }
 
   property("n + (-n) == 0") {
-    forAll { (n: UShort) => n + (-n) == zero shouldBe true }
+    forAll { (n: UShort) => n + (-n) shouldBe zero }
   }
 
   property("a < b") {
@@ -379,7 +379,7 @@ class UByteTest extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
   }
 
   property("n + (-n) == 0") {
-    forAll { (n: UByte) => n + (-n) == zero shouldBe true }
+    forAll { (n: UByte) => n + (-n) shouldBe zero }
   }
 
   property("a < b") {
