@@ -80,7 +80,7 @@ class ULong(val signed: Long) extends AnyVal {
   @inline final def >= (that: ULong): Boolean = that <= this
   @inline final def > (that: ULong): Boolean = that < this
 
-  final def unary_- : ULong = ULong(this.signed)
+  final def unary_- : ULong = ULong(-this.signed)
 
   final def + (that: ULong): ULong = ULong(this.signed + that.signed)
   final def - (that: ULong): ULong = ULong(this.signed - that.signed)
