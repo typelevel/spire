@@ -22,16 +22,17 @@ object SpecialPolynomials {
   // Legendre recurrence function
   private[this] def legendreFn[C: Eq: ClassTag](implicit f: Field[C]): (Polynomial[C], Polynomial[C], Int) => Polynomial[C] =
     (pn: Polynomial[C], pnm1: Polynomial[C], n: Int) => {
-      val a = Polynomial(Map(0 -> f.fromInt(1) / f.fromInt(n + 1)))
-      val b = Polynomial(Map(1 -> f.fromInt(2 * n + 1)))
-      val c = Polynomial(Map(0 -> -f.fromInt(n)))
+      val a = Polynomial(Map((0, f.fromInt(1) / f.fromInt(n + 1))))
+      val b = Polynomial(Map((1, f.fromInt(2 * n + 1))))
+      val c = Polynomial(Map((0, -f.fromInt(n))))
       a * (b * pn + c * pnm1)
     }
 
   // Laguerre recurrence function
   private[this] def laguerreFn[C: Eq: ClassTag](implicit f: Field[C]): (Polynomial[C], Polynomial[C], Int) => Polynomial[C] =
     (pn: Polynomial[C], pnm1: Polynomial[C], n: Int) => {
-      Polynomial(Map(0 -> f.one / f.fromInt(n + 1))) * (Polynomial(Map(0 -> f.fromInt(2 * n + 1), 1 -> -f.one)) * pn - pnm1 * Polynomial(Map(0 -> f.fromInt(n))))
+      Polynomial(Map((0, f.one / f.fromInt(n + 1)))) *
+      (Polynomial(Map((0, f.fromInt(2 * n + 1)), (1, -f.one))) * pn - pnm1 * Polynomial(Map((0, f.fromInt(n)))))
     }
 
   // Chebyshev recurrence function
@@ -52,7 +53,7 @@ object SpecialPolynomials {
 
   // Laguerre polynomials
   def laguerres[C: Eq: ClassTag](num: Int)(implicit f: Field[C]): Stream[Polynomial[C]] =
-    hornerScheme(Polynomial.one[C], Polynomial(Map(0 -> f.one, 1 -> -f.one)), laguerreFn[C]).take(num)
+    hornerScheme(Polynomial.one[C], Polynomial(Map((0, f.one), (1, -f.one))), laguerreFn[C]).take(num)
 
   // Chebyshev polynomials of the first kind
   def chebyshevsFirstKind[C: Ring: Eq: ClassTag](num: Int): Stream[Polynomial[C]] =

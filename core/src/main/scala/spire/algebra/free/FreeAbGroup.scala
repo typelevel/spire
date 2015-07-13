@@ -109,7 +109,7 @@ object FreeAbGroup { companion =>
   final def id[A]: FreeAbGroup[A] = new FreeAbGroup(Map.empty)
 
   final def apply[A](a: A): FreeAbGroup[A] = lift(a)
-  final def lift[A](a: A): FreeAbGroup[A] = new FreeAbGroup[A](Map(a -> 1))
+  final def lift[A](a: A): FreeAbGroup[A] = new FreeAbGroup[A](Map((a, 1)))
 
   implicit def FreeAbGroupGroup[A]: AbGroup[FreeAbGroup[A]] = new AbGroup[FreeAbGroup[A]] {
     def id: FreeAbGroup[A] = companion.id
