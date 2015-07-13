@@ -57,21 +57,21 @@ object Polynomial extends PolynomialInstances {
   def zero[@spec(Double) C: Eq: Semiring: ClassTag]: Polynomial[C] =
     PolySparse.zero[C]
   def constant[@spec(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
-    if (c === Semiring[C].zero) zero[C] else Polynomial(Map(0 -> c))
+    if (c === Semiring[C].zero) zero[C] else Polynomial(Map((0, c)))
   def linear[@spec(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
-    if (c === Semiring[C].zero) zero[C] else Polynomial(Map(1 -> c))
+    if (c === Semiring[C].zero) zero[C] else Polynomial(Map((1, c)))
   def linear[@spec(Double) C: Eq: Semiring: ClassTag](c1: C, c0: C): Polynomial[C] =
-    Polynomial(Map(1 -> c1, 0 -> c0))
+    Polynomial(Map((1, c1), (0, c0)))
   def quadratic[@spec(Double) C: Eq: Semiring: ClassTag](c1: C, c0: C): Polynomial[C] =
-    Polynomial(Map(1 -> c1, 0 -> c0))
+    Polynomial(Map((1, c1), (0, c0)))
   def quadratic[@spec(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
-    if (c === Semiring[C].zero) zero[C] else Polynomial(Map(2 -> c))
+    if (c === Semiring[C].zero) zero[C] else Polynomial(Map((2, c)))
   def quadratic[@spec(Double) C: Eq: Semiring: ClassTag](c2: C, c1: C, c0: C): Polynomial[C] =
-    Polynomial(Map(2 -> c2, 1 -> c1, 0 -> c0))
+    Polynomial(Map((2, c2), (1, c1), (0, c0)))
   def cubic[@spec(Double) C: Eq: Semiring: ClassTag](c: C): Polynomial[C] =
-    if (c === Semiring[C].zero) zero[C] else Polynomial(Map(3 -> c))
+    if (c === Semiring[C].zero) zero[C] else Polynomial(Map((3, c)))
   def cubic[@spec(Double) C: Eq: Semiring: ClassTag](c3: C, c2: C, c1: C, c0: C): Polynomial[C] =
-    Polynomial(Map(3 -> c3, 2 -> c2, 1 -> c1, 0 -> c0))
+    Polynomial(Map((3, c3), (2, c2), (1, c1), (0, c0)))
   def one[@spec(Double) C: Eq: Rig: ClassTag]: Polynomial[C] =
     constant(Rig[C].one)
   def x[@spec(Double) C: Eq: Rig: ClassTag]: Polynomial[C] =

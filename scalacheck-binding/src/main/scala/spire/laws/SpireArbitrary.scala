@@ -159,7 +159,7 @@ object SpireArbitrary {
       images(j) = i
     }
     Perm((Map.empty[Int, Int] /: images.zipWithIndex) {
-      case (prevMap, (preimage, image)) if preimage != image => prevMap + (preimage -> image)
+      case (prevMap, (preimage, image)) if preimage != image => prevMap + ((preimage, image))
       case (prevMap, _) => prevMap
     })
   })

@@ -25,7 +25,7 @@ final class MapIntIntGroup extends Group[Map[Int, Int]] {
       case (prevMap, preimage) =>
         val imageX = x.getOrElse(preimage, preimage)
         val image = y.getOrElse(imageX, imageX)
-        if (preimage != image) prevMap + (preimage -> image) else prevMap
+        if (preimage != image) prevMap + ((preimage, image)) else prevMap
     }
   }
   def inverse(a: Map[Int, Int]): Map[Int, Int] = a.map(_.swap).toMap
