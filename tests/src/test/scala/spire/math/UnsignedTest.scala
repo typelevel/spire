@@ -5,7 +5,7 @@ import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
-import ArbitrarySupport.{ubyte, ushort, uint, ulong}
+import spire.laws.arb.{ubyte, ushort, uint, ulong}
 
 class ULongTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 

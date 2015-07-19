@@ -1,6 +1,7 @@
 package spire.math
 
 import spire.implicits._
+import spire.laws.arb.{rational, real}
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._

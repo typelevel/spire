@@ -1,6 +1,7 @@
 package spire.math
 
 import spire.implicits._
+import spire.laws.arb.{quaternion, real}
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
@@ -10,8 +11,6 @@ import prop._
 import org.scalacheck._
 import Gen._
 import Arbitrary.arbitrary
-
-import ArbitrarySupport._
 
 class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 

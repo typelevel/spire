@@ -5,7 +5,7 @@ import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
-import spire.laws.SpireArbitrary._
+import spire.laws.arb._
 
 class TrileanCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 

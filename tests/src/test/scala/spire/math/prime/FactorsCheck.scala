@@ -1,5 +1,7 @@
 package spire.math.prime
 
+import spire.implicits._
+import spire.laws.arb.safeLong
 import spire.math.SafeLong
 
 import org.scalatest.Matchers
@@ -11,7 +13,6 @@ import org.scalacheck._
 import Gen._
 import Arbitrary.arbitrary
 
-import spire.implicits._
 import spire.math.ArbitrarySupport._
 import Ordinal._
 

@@ -2,13 +2,11 @@ package spire.math
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
-import org.scalatest._
-import prop._
 
-import org.scalatest.FunSuite
-import spire.implicits.{eqOps => _, _}
+import spire.implicits._
+import spire.tests._
 
-class BitStringTest extends FunSuite {
+class BitStringTest extends SpireTests {
 
   case class I[A: BitString](b: A, bc: Int, hob: A, lob: A, nlz: Int, ntz: Int)
 
@@ -19,7 +17,7 @@ class BitStringTest extends FunSuite {
         b, b.bitCount, b.highestOneBit, b.lowestOneBit,
         b.numberOfLeadingZeros, b.numberOfTrailingZeros
       )
-      assert(found === expected)
+      found shouldBe expected
     }
 
   test("BitString[Byte]") {
@@ -69,7 +67,8 @@ class BitStringTest extends FunSuite {
   }
 
   test("BitString[Long]") {
-    testCases(I(0L, 0, 0L, 0L, 64, 64) ::
+    testCases(
+      I(0L, 0, 0L, 0L, 64, 64) ::
       I(7L, 3, 4L, 1L, 61, 0) ::
       I(62L, 5, 32L, 2L, 58, 1) ::
       I(127L, 7, 64L, 1L, 57, 0) ::
@@ -91,35 +90,35 @@ class BitStringTest extends FunSuite {
   def rs[A: BitString](n: A, i: Int): A = n >>> i
   def srs[A: BitString](n: A, i: Int): A = n >> i
 
-  def xyz[A](n: A)(f: (A, Int) => A): List[A] =
+  def eval[A](n: A)(f: (A, Int) => A): List[A] =
     List(f(n, 0), f(n, 1), f(n, 3), f(n, 4), f(n, 7))
 
   test("byte shifting") {
     import spire.syntax.literals._
 
-    assert(xyz(b"1")(ls) === List(b"1", b"2", b"8", b"16", b"-128"))
-    assert(xyz(b"1")(rs) === List(b"1", b"0", b"0", b"0", b"0"))
-    assert(xyz(b"1")(srs) === List(b"1", b"0", b"0", b"0", b"0"))
+    eval(b"1")(ls) shouldBe List(b"1", b"2", b"8", b"16", b"-128")
+    eval(b"1")(rs) shouldBe List(b"1", b"0", b"0", b"0", b"0")
+    eval(b"1")(srs) shouldBe List(b"1", b"0", b"0", b"0", b"0")
 
-    assert(xyz(b"7")(ls) === List(b"7", b"14", b"56", b"112", b"-128"))
-    assert(xyz(b"7")(rs) === List(b"7", b"3", b"0", b"0", b"0"))
-    assert(xyz(b"7")(srs) === List(b"7", b"3", b"0", b"0", b"0"))
+    eval(b"7")(ls) shouldBe List(b"7", b"14", b"56", b"112", b"-128")
+    eval(b"7")(rs) shouldBe List(b"7", b"3", b"0", b"0", b"0")
+    eval(b"7")(srs) shouldBe List(b"7", b"3", b"0", b"0", b"0")
 
-    assert(xyz(b"127")(ls) === List(b"127", b"-2", b"-8", b"-16", b"-128"))
-    assert(xyz(b"127")(rs) === List(b"127", b"63", b"15", b"7", b"0"))
-    assert(xyz(b"127")(srs) === List(b"127", b"63", b"15", b"7", b"0"))
+    eval(b"127")(ls) shouldBe List(b"127", b"-2", b"-8", b"-16", b"-128")
+    eval(b"127")(rs) shouldBe List(b"127", b"63", b"15", b"7", b"0")
+    eval(b"127")(srs) shouldBe List(b"127", b"63", b"15", b"7", b"0")
 
-    assert(xyz(b"-1")(ls) === List(b"-1", b"-2", b"-8", b"-16", b"-128"))
-    assert(xyz(b"-1")(rs) === List(b"-1", b"127", b"31", b"15", b"1"))
-    assert(xyz(b"-1")(srs) === List(b"-1", b"-1", b"-1", b"-1", b"-1"))
+    eval(b"-1")(ls) shouldBe List(b"-1", b"-2", b"-8", b"-16", b"-128")
+    eval(b"-1")(rs) shouldBe List(b"-1", b"127", b"31", b"15", b"1")
+    eval(b"-1")(srs) shouldBe List(b"-1", b"-1", b"-1", b"-1", b"-1")
 
-    assert(xyz(b"-128")(ls) === List(b"-128", b"0", b"0", b"0", b"0"))
-    assert(xyz(b"-128")(rs) === List(b"-128", b"64", b"16", b"8", b"1"))
-    assert(xyz(b"-128")(srs) === List(b"-128", b"-64", b"-16", b"-8", b"-1"))
+    eval(b"-128")(ls) shouldBe List(b"-128", b"0", b"0", b"0", b"0")
+    eval(b"-128")(rs) shouldBe List(b"-128", b"64", b"16", b"8", b"1")
+    eval(b"-128")(srs) shouldBe List(b"-128", b"-64", b"-16", b"-8", b"-1")
   }
 }
 
-class BitStringCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class BitStringCheck extends SpireProperties {
   property("operator mappings") {
     def byOp[A: BitString](n: A, i: Int): List[A] =
       List(n << i, n >>> i, n >> i)
