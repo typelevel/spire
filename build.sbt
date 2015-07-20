@@ -1,17 +1,9 @@
+import sbtbuildinfo.Plugin._
 import sbtunidoc.{Plugin => UnidocPlugin}
 import sbtunidoc.Plugin.UnidocKeys._
-
-import com.typesafe.sbt.pgp.PgpKeys._
-
+//import com.typesafe.sbt.pgp.PgpKeys._
 import pl.project13.scala.sbt.SbtJmh
-
-import sbtrelease._
-import sbtrelease.ReleasePlugin._
-import sbtrelease.ReleasePlugin.ReleaseKeys._
-import sbtrelease.ReleaseStateTransformations._
-import sbtrelease.Utilities._
-
-import sbtbuildinfo.Plugin._
+import ReleaseTransformations._
 
 // Projects
 
@@ -73,9 +65,9 @@ lazy val benchmarkJmh: Project = project.in(file("benchmark-jmh"))
 
 lazy val buildSettings = Seq(
   organization := "org.spire-math",
-  scalaVersion := "2.11.6",
+  scalaVersion := "2.11.7",
   // https://github.com/non/spire/pull/413#issuecomment-89896773
-  crossScalaVersions := Seq("2.10.4", "2.11.6")
+  crossScalaVersions := Seq("2.10.4", "2.11.7")
 )
 
 lazy val commonSettings = Seq(
@@ -130,7 +122,9 @@ lazy val commonSettings = Seq(
 
 lazy val publishSettings = Seq(
   homepage := Some(url("http://spire-math.org")),
-  licenses := Seq("BSD-style" -> url("http://opensource.org/licenses/MIT")),
+  licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
+  releaseCrossBuild := true,
+  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   publishMavenStyle := true,
   publishArtifact in Test := false,
   pomIncludeRepository := Function.const(false),
@@ -142,6 +136,7 @@ lazy val publishSettings = Seq(
     else
       Some("Releases" at nexus + "service/local/staging/deploy/maven2")
   },
+
   pomExtra := (
     <scm>
       <url>git@github.com:non/spire.git</url>
@@ -160,44 +155,25 @@ lazy val publishSettings = Seq(
       </developer>
     </developers>
   ),
+
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,
     inquireVersions,
+    runClean,
     runTest,
     setReleaseVersion,
     commitReleaseVersion,
     tagRelease,
-    publishSignedArtifacts,
+    ReleaseStep(action = Command.process("publishSigned", _)),
     setNextVersion,
     commitNextVersion,
-    pushChanges
-  )
-)
+    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+    pushChanges))
 
 lazy val noPublishSettings = Seq(
   publish := (),
   publishLocal := (),
-  publishArtifact := false
-)
-
-
-// Release step
-
-lazy val publishSignedArtifacts = ReleaseStep(
-  action = st => {
-    val extracted = st.extract
-    val ref = extracted.get(thisProjectRef)
-    extracted.runAggregated(publishSigned in Global in ref, st)
-  },
-  check = st => {
-    // getPublishTo fails if no publish repository is set up.
-    val ex = st.extract
-    val ref = ex.get(thisProjectRef)
-    Classpaths.getPublishTo(ex.get(publishTo in Global in ref))
-    st
-  },
-  enableCrossBuild = true
-)
+  publishArtifact := false)
 
 
 // Dependencies
@@ -208,7 +184,7 @@ lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.12.2"
 
 // Project's settings
 
-lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings ++ releaseSettings
+lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings
 
 lazy val unidocSettings = UnidocPlugin.unidocSettings ++ Seq(
   unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, tests)
@@ -287,4 +263,3 @@ lazy val benchmarkSettings = Seq(
   // enable forking in run
   fork in run := true
 )
-
