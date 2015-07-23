@@ -6,6 +6,7 @@ import org.scalatest._
 import prop._
 
 import spire.implicits._
+import spire.laws.arb.{complex, real}
 
 class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   type C = Complex[BigDecimal]
@@ -45,8 +46,6 @@ class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
 
 class ComplexCheck2 extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   type C = Complex[Real]
-
-  import ArbitrarySupport._
 
   val zero = Complex.zero[Real]
   val one = Complex.one[Real]
@@ -124,6 +123,12 @@ class ComplexCheck2 extends PropSpec with Matchers with GeneratorDrivenPropertyC
   property("x.pow(2) = x * x") {
     forAll { (x: C) =>
       x.pow(2) shouldBe x * x
+    }
+  }
+
+  property("c = c.r iff c.isReal") {
+    forAll { (c: C) =>
+      c == c.real shouldBe c.isReal
     }
   }
 

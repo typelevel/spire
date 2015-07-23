@@ -4,6 +4,7 @@ import scala.util.Try
 
 import org.scalatest.FunSuite
 import spire.implicits.{eqOps => _, _}
+import spire.laws.arb.{interval => interval_, rational}
 import spire.random.{Uniform, Dist}
 
 import org.scalatest.Matchers
@@ -254,7 +255,6 @@ class IntervalReciprocalTest extends FunSuite {
 
 class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
-  import ArbitrarySupport.{interval, rational}
 
   property("x ⊆ x") {
     forAll { (x: Interval[Rational]) => (x isSupersetOf x) shouldBe true }
@@ -461,8 +461,6 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
 }
 
 class IntervalIteratorCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
-
-  import ArbitrarySupport._
 
   property("bounded intervals are ok") {
     forAll { (n1: Rational, n2: Rational, num0: Byte) =>

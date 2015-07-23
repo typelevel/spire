@@ -25,6 +25,31 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   def longValue(): Long = toRational.toLong
   def underlying(): Object = this
 
+  override def isValidChar: Boolean = {
+    val r = toRational
+    r.isWhole && r.isValidChar
+  }
+
+  override def isValidByte: Boolean = {
+    val r = toRational
+    r.isWhole && r.isValidByte
+  }
+
+  override def isValidShort: Boolean = {
+    val r = toRational
+    r.isWhole && r.isValidShort
+  }
+
+  override def isValidInt: Boolean = {
+    val r = toRational
+    r.isWhole && r.isValidInt
+  }
+
+  def isValidLong: Boolean = {
+    val r = toRational
+    r.isWhole && r.isValidLong
+  }
+
   override def hashCode(): Int = toRational.hashCode
 
   override def equals(y: Any): Boolean = y match {

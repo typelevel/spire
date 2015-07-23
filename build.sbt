@@ -12,8 +12,8 @@ lazy val spire = project.in(file("."))
   .settings(spireSettings)
   .settings(unidocSettings)
   .settings(noPublishSettings)
-  .aggregate(macros, core, examples, scalacheckBinding, tests, benchmark)
-  .dependsOn(macros, core, examples, scalacheckBinding, tests, benchmark)
+  .aggregate(macros, core, examples, laws, tests, benchmark)
+  .dependsOn(macros, core, examples, laws, tests, benchmark)
 
 lazy val macros = project
   .settings(moduleName := "spire-macros")
@@ -33,8 +33,8 @@ lazy val examples = project
   .settings(noPublishSettings)
   .dependsOn(core)
 
-lazy val scalacheckBinding = project.in(file("scalacheck-binding"))
-  .settings(moduleName := "spire-scalacheck-binding")
+lazy val laws = project.in(file("laws"))
+  .settings(moduleName := "spire-laws")
   .settings(spireSettings)
   .settings(scalacheckSettings)
   .dependsOn(core)
@@ -44,7 +44,7 @@ lazy val tests = project
   .settings(spireSettings)
   .settings(testsSettings)
   .settings(noPublishSettings)
-  .dependsOn(core, scalacheckBinding)
+  .dependsOn(core, laws)
 
 lazy val benchmark = project
   .settings(moduleName := "spire-benchmark")

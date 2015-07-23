@@ -39,7 +39,7 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
     z <- arbitrary[A]
   } yield Vector(x, y, z))
 
-  import spire.math.ArbitrarySupport.rational
+  import spire.laws.arb.rational
 
   test("Eq syntax")(check(forAll { (a: Int, b: Int) => testEqSyntax(a, b) }))
   test("Partial order syntax")(check(forAll { (a: Int, b: Int) => testPartialOrderSyntax(a, b) }))
