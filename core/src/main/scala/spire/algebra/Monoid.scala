@@ -24,7 +24,7 @@ trait Monoid[@spec(Boolean, Byte, Short, Int, Long, Float, Double) A] extends An
    * Return `a` combined with itself `n` times.
    */
   override def combinen(a: A, n: Int): A =
-    if (n < 0) throw new IllegalArgumentException("Repeated combination for monoids must have reptitions >= 0")
+    if (n < 0) throw new IllegalArgumentException("Repeated combination for monoids must have repetitions >= 0")
     else if (n == 0) id
     else if (n == 1) a
     else combinenAboveOne(a, n)
