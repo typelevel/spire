@@ -2,7 +2,6 @@ package spire.math
 package poly
 
 import spire.std.bigInt._
-import spire.std.bigDecimal._
 
 /**
  * A type class for retreiving isolated roots.

@@ -14,7 +14,7 @@ import spire.implicits._
 import spire.math.{Numeric => SpireN}
 import scala.math.{Numeric => ScalaN}
 
-import com.google.caliper.Runner 
+import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
@@ -88,7 +88,7 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
       val arr = cs2.clone.asInstanceOf[Array[Object]]; java.util.Arrays.sort(arr); arr.length
     }
   }
-  
+
   def timeScalaQuicksort(reps:Int) = run(reps) {
     if (typ == "int") {
       val arr = is.clone; scala.util.Sorting.quickSort(arr); arr.length
@@ -103,10 +103,10 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
       val arr = cs.clone; scala.util.Sorting.quickSort(arr); arr.length
     }
   }
-  
+
   def timeSpireInsertionSort(reps:Int): Unit = run(reps) {
     val n = if (pow > 13) 2 else spire.math.pow(2, pow).toInt
-  
+
     if (typ == "int") {
       val arr = is.clone; spire.math.InsertionSort.sort(arr, 0, n); arr.length
     } else if (typ == "long") {
@@ -119,7 +119,7 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
       val arr = cs.clone; spire.math.InsertionSort.sort(arr, 0, n); arr.length
     }
   }
-  
+
   def timeSpireMergeSort(reps:Int) = run(reps) {
     if (typ == "int") {
       val arr = is.clone; spire.math.Sorting.mergeSort(arr); arr.length

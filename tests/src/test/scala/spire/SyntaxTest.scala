@@ -39,7 +39,7 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
     z <- arbitrary[A]
   } yield Vector(x, y, z))
 
-  import spire.math.ArbitrarySupport.rational
+  import spire.laws.arb.rational
 
   test("Eq syntax")(check(forAll { (a: Int, b: Int) => testEqSyntax(a, b) }))
   test("Partial order syntax")(check(forAll { (a: Int, b: Int) => testPartialOrderSyntax(a, b) }))
@@ -259,7 +259,6 @@ trait BaseSyntaxTest {
     import spire.syntax.eq._
     import spire.syntax.field._
     import spire.std.tuples._
-    import spire.optional.totalfloat._
 
     ((42 + a) === Ring[A].plus(Ring[A].fromInt(42), a)) &&
     ((42 - a) === Ring[A].minus(Ring[A].fromInt(42), a)) &&

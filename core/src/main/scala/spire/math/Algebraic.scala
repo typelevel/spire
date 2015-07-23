@@ -15,8 +15,8 @@ import spire.algebra.Sign.{ Positive, Negative, Zero }
 import spire.macros.Checked.checked
 import spire.math.poly.{ Term, BigDecimalRootRefinement, RootFinder, Roots }
 import spire.std.bigInt._
+import spire.std.bigDecimal._
 import spire.std.long._
-import spire.syntax.order._
 import spire.syntax.std.seq._
 
 /**
@@ -167,10 +167,10 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     case _ => unifiedPrimitiveEquals(that)
   }
 
-  def ===(that: Algebraic): Boolean = 
+  def ===(that: Algebraic): Boolean =
     this.compare(that) == 0
 
-  def =!=(that: Algebraic): Boolean = 
+  def =!=(that: Algebraic): Boolean =
     !(this === that)
 
   override def hashCode: Int = if (isWhole && isValidLong) {
@@ -305,7 +305,9 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
         val den = new JBigDecimal(n.denominator.bigInteger)
         num.divide(den, new MathContext(digits, roundingMode))
       case ConstantRoot(poly, _, lb, ub) =>
-        BigDecimalRootRefinement(poly, lb, ub, new MathContext(digits, roundingMode)).approximateValue
+        // Ugh - on an airplane and can't trust BigDecimal's constructors.
+        val poly0 = poly.map { n => new BigDecimal(new JBigDecimal(n.bigInteger), MathContext.UNLIMITED) }
+        BigDecimalRootRefinement(poly0, lb, ub, new MathContext(digits, roundingMode)).approximateValue
       case Neg(sub) =>
         rec(sub, digits).negate()
       case Add(_, _) | Sub(_, _) if e.signum == 0 =>
@@ -585,7 +587,7 @@ object Algebraic extends AlgebraicInstances {
      * A set of flags we can quickly compute for an [[Algebraic]] expression.
      *
      * @note we have to do this round-about trip between flagsBits and flags
-     * because of 
+     * because of
      */
     def flags: Flags = new Flags(flagBits)
 
@@ -790,7 +792,9 @@ object Algebraic extends AlgebraicInstances {
       def upperBound: BitBound = if (value.signum == 0) {
         new BitBound(0)
       } else {
-        new BitBound(ceil(log(value.abs)).toLong)
+        // We just need a couple of digits, really.
+        val mc = new MathContext(4, RoundingMode.UP)
+        new BitBound(ceil(log(value.abs(mc))).toLong)
       }
 
       def signum: Int = value.signum
@@ -832,8 +836,10 @@ object Algebraic extends AlgebraicInstances {
         if (lb.signum != 0) lb.signum
         else ub.signum
 
-      private val refinement: AtomicReference[BigDecimalRootRefinement] =
-        new AtomicReference(BigDecimalRootRefinement(poly, lb, ub))
+      private val refinement: AtomicReference[BigDecimalRootRefinement] = {
+        val poly0 = poly.map { n => new BigDecimal(new JBigDecimal(n.bigInteger), MathContext.UNLIMITED) }
+        new AtomicReference(BigDecimalRootRefinement(poly0, lb, ub))
+      }
 
       def toBigDecimal(digits: Int): JBigDecimal = {
         val oldRefinement = refinement.get
@@ -860,7 +866,7 @@ object Algebraic extends AlgebraicInstances {
       def upperBound: BitBound =
         new BitBound(max(lhs.upperBound.bitBound, rhs.upperBound.bitBound) + 1)
 
-      def signum: Int = {
+      lazy val signum: Int = {
         val maxDigits = separationBound.decimalDigits + 1
         val approxOnly = maxDigits > Int.MaxValue
 
@@ -1201,7 +1207,7 @@ object Algebraic extends AlgebraicInstances {
           .unscaledValue
           .divideAndRemainder(BigInteger.valueOf(unscale))
       val truncated = new JBigDecimal(truncatedUnscaledValue, scale)
-      def epsilon = new JBigDecimal(BigInteger.ONE, scale)
+      def epsilon: JBigDecimal = new JBigDecimal(BigInteger.ONE, scale)
       val remainder = bigRemainder.longValue
       val rounded = mode match {
         case UNNECESSARY =>
@@ -1278,7 +1284,7 @@ object Algebraic extends AlgebraicInstances {
     def apply(expr: Algebraic.Expr): Bound
   }
 
-  /** 
+  /**
    * An implementation of "A New Constructive Root Bound for Algebraic
    * Expressions" by Chen Li & Chee Yap.
    */
@@ -1535,9 +1541,9 @@ private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoo
   def quot(a: Algebraic, b: Algebraic): Algebraic = a /~ b
   def mod(a: Algebraic, b: Algebraic): Algebraic = a % b
   def gcd(a: Algebraic, b: Algebraic): Algebraic = euclid(a, b)(Eq[Algebraic])
-  def div(a:Algebraic, b:Algebraic) = a / b
+  def div(a:Algebraic, b:Algebraic): Algebraic = a / b
   def nroot(a: Algebraic, k: Int): Algebraic = a nroot k
-  def fpow(a:Algebraic, b:Algebraic) = throw new UnsupportedOperationException("unsupported operation")
+  def fpow(a:Algebraic, b:Algebraic): Algebraic = throw new UnsupportedOperationException("unsupported operation")
   override def fromInt(n: Int): Algebraic = Algebraic(n)
   override def fromDouble(n: Double): Algebraic = Algebraic(n)
 }
@@ -1545,16 +1551,16 @@ private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoo
 private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
   def toDouble(x: Algebraic): Double = x.toDouble
   def toAlgebraic(x: Algebraic): Algebraic = x
-  def ceil(a:Algebraic) = Algebraic(a.toBigDecimal(0, RoundingMode.CEILING))
-  def floor(a:Algebraic) = Algebraic(a.toBigDecimal(0, RoundingMode.FLOOR))
-  def round(a:Algebraic) = Algebraic(a.toBigDecimal(0, RoundingMode.HALF_EVEN))
-  def isWhole(a:Algebraic) = a.isWhole
+  def ceil(a:Algebraic): Algebraic = Algebraic(a.toBigDecimal(0, RoundingMode.CEILING))
+  def floor(a:Algebraic): Algebraic = Algebraic(a.toBigDecimal(0, RoundingMode.FLOOR))
+  def round(a:Algebraic): Algebraic = Algebraic(a.toBigDecimal(0, RoundingMode.HALF_EVEN))
+  def isWhole(a:Algebraic): Boolean = a.isWhole
   override def sign(a: Algebraic): Sign = a.sign
   def signum(a: Algebraic): Int = a.signum
   def abs(a: Algebraic): Algebraic = a.abs
-  override def eqv(x: Algebraic, y: Algebraic) = x.compare(y) == 0
-  override def neqv(x: Algebraic, y: Algebraic) = x.compare(y) != 0
-  def compare(x: Algebraic, y: Algebraic) = x.compare(y)
+  override def eqv(x: Algebraic, y: Algebraic): Boolean = x.compare(y) == 0
+  override def neqv(x: Algebraic, y: Algebraic): Boolean = x.compare(y) != 0
+  def compare(x: Algebraic, y: Algebraic): Int = x.compare(y)
 }
 
 @SerialVersionUID(1L)

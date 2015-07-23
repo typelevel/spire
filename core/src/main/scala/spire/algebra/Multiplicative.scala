@@ -14,12 +14,12 @@ object Multiplicative {
 
   def apply[A](m: Monoid[A]): MultiplicativeMonoid[A] = new MultiplicativeMonoid[A] {
     def times(x: A, y: A): A = m.op(x, y)
-    def one = m.id
+    def one: A = m.id
   }
 
   def apply[A](m: CMonoid[A]): MultiplicativeCMonoid[A] = new MultiplicativeCMonoid[A] {
     def times(x: A, y: A): A = m.op(x, y)
-    def one = m.id
+    def one: A = m.id
   }
 
   def apply[A](g: Group[A]): MultiplicativeGroup[A] = new MultiplicativeGroup[A] {
@@ -65,7 +65,7 @@ trait MultiplicativeSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] ex
 
   /**
    *  Given a sequence of `as`, sum them using the semigroup and return the total.
-   * 
+   *
    *  If the sequence is empty, returns None. Otherwise, returns Some(total).
    */
   def prodOption(as: TraversableOnce[A]): Option[A] = as.reduceOption(times)
@@ -79,7 +79,7 @@ trait MultiplicativeCSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] e
 
 trait MultiplicativeMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with MultiplicativeSemigroup[A] {
   override def multiplicative: Monoid[A] = new Monoid[A] {
-    def id = one
+    def id: A = one
     def op(x: A, y: A): A = times(x, y)
   }
 
@@ -104,14 +104,14 @@ trait MultiplicativeMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] exten
 
 trait MultiplicativeCMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with MultiplicativeMonoid[A] with MultiplicativeCSemigroup[A] {
   override def multiplicative: CMonoid[A] = new CMonoid[A] {
-    def id = one
+    def id: A = one
     def op(x: A, y: A): A = times(x, y)
   }
 }
 
 trait MultiplicativeGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with MultiplicativeMonoid[A] {
   override def multiplicative: Group[A] = new Group[A] {
-    def id = one
+    def id: A = one
     def op(x: A, y: A): A = times(x, y)
     def inverse(x: A): A = reciprocal(x)
   }
@@ -132,7 +132,7 @@ trait MultiplicativeGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extend
 
 trait MultiplicativeAbGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with MultiplicativeGroup[A] with MultiplicativeCMonoid[A] {
   override def multiplicative: AbGroup[A] = new AbGroup[A] {
-    def id = one
+    def id: A = one
     def op(x: A, y: A): A = times(x, y)
     def inverse(x: A): A = reciprocal(x)
   }

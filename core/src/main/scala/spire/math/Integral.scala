@@ -13,7 +13,7 @@ object Integral {
   implicit final val BigIntIsIntegral = new BigIntIsIntegral
   implicit final val SafeLongIsIntegral = new SafeLongIsIntegral
 
-  @inline final def apply[A](implicit ev: Integral[A]) = ev
+  @inline final def apply[A](implicit ev: Integral[A]): Integral[A] = ev
 }
 
 class IntegralOps[A](lhs: A)(implicit ev: Integral[A]) {

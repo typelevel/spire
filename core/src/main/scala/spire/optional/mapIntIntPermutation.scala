@@ -17,15 +17,15 @@ final class MapIntIntIntAction extends Action[Int, Map[Int, Int]] {
 }
 
 final class MapIntIntGroup extends Group[Map[Int, Int]] {
-  def id = Map.empty[Int, Int]
-  def op(x: Map[Int, Int], y: Map[Int, Int]) = {
+  def id: Map[Int, Int] = Map.empty[Int, Int]
+  def op(x: Map[Int, Int], y: Map[Int, Int]): Map[Int, Int] = {
     val preimages = x.keys ++ y.keys
 
     (Map.empty[Int, Int] /: preimages) {
       case (prevMap, preimage) =>
         val imageX = x.getOrElse(preimage, preimage)
         val image = y.getOrElse(imageX, imageX)
-        if (preimage != image) prevMap + (preimage -> image) else prevMap
+        if (preimage != image) prevMap + ((preimage, image)) else prevMap
     }
   }
   def inverse(a: Map[Int, Int]): Map[Int, Int] = a.map(_.swap).toMap
@@ -42,7 +42,7 @@ final class MapIntIntSeqPartialAction[A, SA <: SeqLike[A, SA]](implicit cbf: Can
     }
     Opt(builder.result())
   }
-  def partialActr(sa: SA, perm: Map[Int, Int]) =
+  def partialActr(sa: SA, perm: Map[Int, Int]): Opt[SA] =
     partialActl(perm.inverse, sa)
 }
 

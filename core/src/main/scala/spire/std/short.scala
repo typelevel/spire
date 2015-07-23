@@ -11,11 +11,11 @@ trait ShortIsEuclideanRing extends EuclideanRing[Short] {
   override def pow(a: Short, b:Int): Short = Math.pow(a, b).toShort
   override def times(a:Short, b:Short): Short = (a * b).toShort
   def zero: Short = 0.toShort
-  
+
   override def fromInt(n: Int): Short = n.toShort
 
-  def quot(a: Short, b: Short) = (a / b).toShort
-  def mod(a: Short, b: Short) = (a % b).toShort
+  def quot(a: Short, b: Short): Short = (a / b).toShort
+  def mod(a: Short, b: Short): Short = (a % b).toShort
   def gcd(a: Short, b: Short): Short = spire.math.gcd(a, b).toShort
 }
 
@@ -38,18 +38,18 @@ trait ShortIsNRoot extends NRoot[Short] {
     findnroot(0, 1 << ((33 - n) / n))
   }
 
-  def log(a: Short) = Math.log(a.toDouble).toShort
-  def fpow(a: Short, b: Short) = Math.pow(a, b).toShort
+  def log(a: Short): Short = Math.log(a.toDouble).toShort
+  def fpow(a: Short, b: Short): Short = Math.pow(a, b).toShort
 }
 
 trait ShortOrder extends Order[Short] {
-  override def eqv(x:Short, y:Short) = x == y
-  override def neqv(x:Short, y:Short) = x != y
-  override def gt(x: Short, y: Short) = x > y
-  override def gteqv(x: Short, y: Short) = x >= y
-  override def lt(x: Short, y: Short) = x < y
-  override def lteqv(x: Short, y: Short) = x <= y
-  def compare(x: Short, y: Short) = java.lang.Integer.signum((x: Int) - (y: Int))
+  override def eqv(x:Short, y:Short): Boolean = x == y
+  override def neqv(x:Short, y:Short): Boolean = x != y
+  override def gt(x: Short, y: Short): Boolean = x > y
+  override def gteqv(x: Short, y: Short): Boolean = x >= y
+  override def lt(x: Short, y: Short): Boolean = x < y
+  override def lteqv(x: Short, y: Short): Boolean = x <= y
+  def compare(x: Short, y: Short): Int = java.lang.Integer.signum((x: Int) - (y: Int))
 }
 
 trait ShortIsSigned extends Signed[Short] {

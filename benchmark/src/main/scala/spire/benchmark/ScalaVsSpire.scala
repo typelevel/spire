@@ -12,7 +12,7 @@ import spire.std.any._
 import spire.math.{Numeric => SpireN}
 import scala.math.{Numeric => ScalaN}
 
-import com.google.caliper.Runner 
+import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
@@ -41,11 +41,11 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
   def timePairwiseDirect(reps:Int) = run(reps)(doPairwiseDirect(as, bs, cs))
   def timePairwiseGeneric(reps:Int) = run(reps)(doPairwiseGeneric(as, bs, cs))
   def timePairwiseSpire(reps:Int) = run(reps)(doPairwiseSpire(as, bs, cs))
-  
+
   def timeIncrementDirect(reps:Int) = run(reps)(doIncrementDirect(0, size))
   def timeIncrementGeneric(reps:Int) = run(reps)(doIncrementGeneric(0, size))
   def timeIncrementSpire(reps:Int) = run(reps)(doIncrementSpire(0, size))
-  
+
   def timeMinMaxDirect(reps:Int) = run(reps)(doMinMaxDirect(as))
   def timeMinMaxGeneric(reps:Int) = run(reps)(doMinMaxGeneric(as))
   def timeMinMaxSpire(reps:Int) = run(reps)(doMinMaxSpire(as))

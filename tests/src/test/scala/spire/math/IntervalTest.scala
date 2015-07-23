@@ -4,6 +4,7 @@ import scala.util.Try
 
 import org.scalatest.FunSuite
 import spire.implicits.{eqOps => _, _}
+import spire.laws.arb.{interval => interval_, rational}
 import spire.random.{Uniform, Dist}
 
 import org.scalatest.Matchers
@@ -77,19 +78,19 @@ class RingIntervalTest extends FunSuite {
 
   import interval.{Open, Unbound, Closed}
   val c = 4.0
-  test("-(c, ∞) =  (-∞, -c)") { 
+  test("-(c, ∞) =  (-∞, -c)") {
     assert( -Interval.fromBounds(Open(c), Unbound()) ===
       Interval.fromBounds(Unbound(), Open(-c)) )
   }
-  test("-(-∞, c] =  [-c, ∞)") { 
+  test("-(-∞, c] =  [-c, ∞)") {
     assert( -Interval.fromBounds(Unbound(), Closed(c)) ===
       Interval.fromBounds(Closed(-c), Unbound()) )
   }
-  test("(c, ∞) * (-c) =  (-∞, -c * c), c > 0") { 
+  test("(c, ∞) * (-c) =  (-∞, -c * c), c > 0") {
     assert( Interval.fromBounds(Open(c), Unbound()) * (-c) ===
       Interval.fromBounds(Unbound(), Open(-c*c)) )
   }
-  test("(-∞, c] * (-c) =  [-c * c, ∞), c > 0") { 
+  test("(-∞, c] * (-c) =  [-c * c, ∞), c > 0") {
     assert( Interval.fromBounds(Unbound(), Closed(c)) * (-c) ===
       Interval.fromBounds(Closed(-c*c), Unbound()) )
   }
@@ -182,7 +183,7 @@ class ContinuousIntervalTest extends FunSuite {
   // numerator interval is positive
   test("[a,b] / [-d,-c]") { assert(cc(a, b) / cc(-d, -c) === cc(b / -c, a / -d)) }
   test("[a,b] / [c,d]") { assert(cc(a, b) / cc(c, d) === cc(a / d, b / c)) }
-  
+
   // numerator interval is negative
   test("[-b,-a] / [-d,-c]") { assert(cc(-b, -a) / cc(-d, -c) === cc(-a / -d, -b / -c)) }
   test("[-b,-a] / [c,d]") { assert(cc(-b, -a) / cc(c, d) === cc(-b / c, -a / d)) }
@@ -254,7 +255,6 @@ class IntervalReciprocalTest extends FunSuite {
 
 class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
-  import ArbitrarySupport.{interval, rational}
 
   property("x ⊆ x") {
     forAll { (x: Interval[Rational]) => (x isSupersetOf x) shouldBe true }
@@ -461,8 +461,6 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
 }
 
 class IntervalIteratorCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
-
-  import ArbitrarySupport._
 
   property("bounded intervals are ok") {
     forAll { (n1: Rational, n2: Rational, num0: Byte) =>

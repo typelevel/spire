@@ -46,7 +46,7 @@ object Pack {
   def intFromBytes(bytes: Array[Byte]): Int =
     intFromByteBuffer(ByteBuffer.wrap(bytes))
 
-  def intFromBytes(b1: Byte, b2: Byte, b3: Byte, b4: Byte) =
+  def intFromBytes(b1: Byte, b2: Byte, b3: Byte, b4: Byte): Int =
     (b1 & 0xff) << 24 | (b2 & 0xff) << 16 | (b3 & 0xff) << 8 | (b4 & 0xff)
 
   def intFromByteBuffer(bb: ByteBuffer): Int =
@@ -114,7 +114,7 @@ object Pack {
   def longFromBytes(bytes: Array[Byte]): Long =
     longFromByteBuffer(ByteBuffer.wrap(bytes))
 
-  def longFromBytes(b1: Byte, b2: Byte, b3: Byte, b4: Byte, b5: Byte, b6: Byte, b7: Byte, b8: Byte) =
+  def longFromBytes(b1: Byte, b2: Byte, b3: Byte, b4: Byte, b5: Byte, b6: Byte, b7: Byte, b8: Byte): Long =
     (b1 & 0xffL) << 56 | (b2 & 0xffL) << 48 | (b3 & 0xffL) << 40 |
       (b4 & 0xffL) << 32 | (b5 & 0xffL) << 24 | (b6 & 0xffL) << 16 |
       (b7 & 0xffL) << 8 | (b8 & 0xffL)

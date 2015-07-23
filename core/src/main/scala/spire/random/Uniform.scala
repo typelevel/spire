@@ -67,7 +67,7 @@ object Uniform {
           val mask = if (mask0 == 0) 255 else mask0
           new DistFromGen[BigInt]({ gen =>
             val bytes = new Array[Byte]((width + 7) / 8)
-            
+
             def loop(): BigInt = {
               gen.fillBytes(bytes)
               bytes(0) = (bytes(0) & mask).toByte

@@ -5,7 +5,6 @@ package rng
 import java.util.concurrent.atomic.AtomicLong
 
 import scala.annotation.tailrec
-import spire.syntax.literals._
 import spire.util.Pack
 
 /**
@@ -22,7 +21,7 @@ import spire.util.Pack
 class PcgXshRr64_32 private (private var state: Long, private var inc: Long) extends IntBasedGenerator {
   protected[this] def copyInit = new PcgXshRr64_32(state, inc)
 
-  def nextInt() = {
+  def nextInt(): Int = {
     val oldState = state
 
     state = oldState * 6364136223846793005L + inc

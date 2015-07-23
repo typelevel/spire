@@ -10,7 +10,7 @@ import spire.std.bigDecimal._
  * A trait that can be used to retreive the (possibly approximated) real
  * roots of the polynomial `poly`.
  */
-trait Roots[A] { self =>
+trait Roots[A] extends Iterable[A] { self =>
 
   /** The polynomial the roots belong to. */
   def poly: Polynomial[A]
@@ -23,6 +23,13 @@ trait Roots[A] { self =>
    * `IndexOutOfBoundsException` if there is no `i`-th real root.
    */
   def get(i: Int): A
+
+  def iterator: Iterator[A] = Iterator.tabulate(count)(get)
+
+  override def size: Int = count
+
+  override def toString: String =
+    mkString("Roots(", ", ", ")")
 }
 
 object Roots {
@@ -105,7 +112,7 @@ private[poly] class BigDecimalSimpleRoots(
         value.toBigDecimal(scale, RoundingMode.HALF_EVEN)
       case Bounded(lb, ub, _) =>
         new BigDecimal(
-          BigDecimalRootRefinement(zpoly, lb, ub, scale).approximateValue,
+          BigDecimalRootRefinement(poly, lb, ub, scale).approximateValue,
           MathContext.UNLIMITED
         )
       case _ =>

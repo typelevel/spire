@@ -5,7 +5,7 @@ import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
-import ArbitrarySupport.{ubyte, ushort, uint, ulong}
+import spire.laws.arb.{ubyte, ushort, uint, ulong}
 
 class ULongTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
@@ -80,6 +80,10 @@ class ULongTest extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
         n + one > n shouldBe true
       }
     }
+  }
+
+  property("n + (-n) == 0") {
+    forAll { (n: ULong) => n + (-n) shouldBe zero }
   }
 
   property("a < b") {
@@ -190,6 +194,10 @@ class UIntTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks
     }
   }
 
+  property("n + (-n) == 0") {
+    forAll { (n: UInt) => n + (-n) shouldBe zero }
+  }
+
   property("a < b") {
     forAll { (a: UInt, b: UInt) => a < b shouldBe a.toLong < b.toLong }
   }
@@ -278,6 +286,10 @@ class UShortTest extends PropSpec with Matchers with GeneratorDrivenPropertyChec
     }
   }
 
+  property("n + (-n) == 0") {
+    forAll { (n: UShort) => n + (-n) shouldBe zero }
+  }
+
   property("a < b") {
     forAll { (a: UShort, b: UShort) => a < b shouldBe a.toLong < b.toLong }
   }
@@ -364,6 +376,10 @@ class UByteTest extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
     forAll { (n: UByte) =>
       whenever (n != UByte.MaxValue) { n + one > n shouldBe true }
     }
+  }
+
+  property("n + (-n) == 0") {
+    forAll { (n: UByte) => n + (-n) shouldBe zero }
   }
 
   property("a < b") {

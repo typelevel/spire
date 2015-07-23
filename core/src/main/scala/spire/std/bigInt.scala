@@ -10,13 +10,13 @@ trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   override def pow(a:BigInt, b:Int): BigInt = a pow b
   override def times(a:BigInt, b:BigInt): BigInt = a * b
   val zero: BigInt = BigInt(0)
-  
+
   override def fromInt(n: Int): BigInt = BigInt(n)
 
-  def quot(a:BigInt, b:BigInt) = a / b
-  def mod(a:BigInt, b:BigInt) = a % b
-  override def quotmod(a:BigInt, b:BigInt) = a /% b
-  def gcd(a:BigInt, b:BigInt) = a.gcd(b)
+  def quot(a:BigInt, b:BigInt): BigInt = a / b
+  def mod(a:BigInt, b:BigInt): BigInt = a % b
+  override def quotmod(a:BigInt, b:BigInt): (BigInt, BigInt) = a /% b
+  def gcd(a:BigInt, b:BigInt): BigInt = a.gcd(b)
 }
 
 // This is not included in the *Instances trait!
@@ -39,21 +39,21 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
 
     findNroot(0, a.bitLength - 1)
   }
-  def fpow(a:BigInt, b:BigInt) = spire.math.pow(BigDecimal(a), BigDecimal(b)).toBigInt
+  def fpow(a:BigInt, b:BigInt): BigInt = spire.math.pow(BigDecimal(a), BigDecimal(b)).toBigInt
 }
 
 trait BigIntOrder extends Order[BigInt] {
-  override def eqv(x:BigInt, y:BigInt) = x == y
-  override def neqv(x:BigInt, y:BigInt) = x != y
-  override def gt(x: BigInt, y: BigInt) = x > y
-  override def gteqv(x: BigInt, y: BigInt) = x >= y
-  override def lt(x: BigInt, y: BigInt) = x < y
-  override def lteqv(x: BigInt, y: BigInt) = x <= y
-  override def min(x: BigInt, y: BigInt) = x.min(y)
-  override def max(x: BigInt, y: BigInt) = x.max(y)
+  override def eqv(x:BigInt, y:BigInt): Boolean = x == y
+  override def neqv(x:BigInt, y:BigInt): Boolean = x != y
+  override def gt(x: BigInt, y: BigInt): Boolean = x > y
+  override def gteqv(x: BigInt, y: BigInt): Boolean = x >= y
+  override def lt(x: BigInt, y: BigInt): Boolean = x < y
+  override def lteqv(x: BigInt, y: BigInt): Boolean = x <= y
+  override def min(x: BigInt, y: BigInt): BigInt = x.min(y)
+  override def max(x: BigInt, y: BigInt): BigInt = x.max(y)
   // Scala compareTo has no guarantee to return only -1, 0 or 1, as per Spire's compare contractm
   // so we call Java's compareTo which does
-  def compare(x: BigInt, y: BigInt) = x.bigInteger.compareTo(y.bigInteger)
+  def compare(x: BigInt, y: BigInt): Int = x.bigInteger.compareTo(y.bigInteger)
 }
 
 trait BigIntIsSigned extends Signed[BigInt] {
@@ -67,7 +67,7 @@ trait BigIntIsReal extends IsIntegral[BigInt] with BigIntOrder with BigIntIsSign
 }
 
 trait BigIntIsMetricSpace extends MetricSpace[BigInt, BigInt] {
-  def distance(v: BigInt, w: BigInt) = (w - v).abs
+  def distance(v: BigInt, w: BigInt): BigInt = (w - v).abs
 }
 
 @SerialVersionUID(0L)

@@ -464,7 +464,7 @@ object Generator {
 object GlobalRng extends LongBasedGenerator {
   private val rng = spire.random.rng.Cmwc5.fromTime().sync
 
-  override def sync = rng
+  override def sync: spire.random.rng.SyncGenerator  = rng
 
   def copyInit: Generator = rng.copyInit
 

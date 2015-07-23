@@ -17,3 +17,4 @@ trait AnyInstances extends BooleanInstances
     with MapInstances
     with ProductInstances
     with OptionInstances
+    with UnitInstances

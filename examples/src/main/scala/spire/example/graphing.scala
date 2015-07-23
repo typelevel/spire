@@ -1,6 +1,5 @@
 package spire.example
 
-import spire.algebra._
 import spire.implicits._
 import spire.math._
 

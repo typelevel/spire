@@ -3,12 +3,12 @@ package spire.math
 import spire.algebra.{IsIntegral, Order, Rig, Signed}
 
 object UShort extends UShortInstances {
-  @inline final def apply(n: Char) = new UShort(n)
-  @inline final def apply(n: Short) = new UShort(n.toChar)
-  @inline final def apply(n: Int) = new UShort(n.toChar)
+  @inline final def apply(n: Char): UShort = new UShort(n)
+  @inline final def apply(n: Short): UShort = new UShort(n.toChar)
+  @inline final def apply(n: Int): UShort = new UShort(n.toChar)
 
-  @inline final def MinValue = UShort(0)
-  @inline final def MaxValue = UShort(Char.MaxValue)
+  @inline final def MinValue: UShort = UShort(0)
+  @inline final def MaxValue: UShort = UShort(Char.MaxValue)
 }
 
 class UShort(val signed: Char) extends AnyVal {
@@ -21,46 +21,43 @@ class UShort(val signed: Char) extends AnyVal {
   def toDouble: Double = signed.toDouble
   def toBigInt: BigInt = BigInt(toInt)
 
-  def isValidByte = signed == toByte
-  def isValidShort = signed == toShort
-  def isValidChar = true
-  def isValidInt = true
-  def isValidLong = true
+  def isValidByte: Boolean = signed == toByte
+  def isValidShort: Boolean = signed == toShort
+  def isValidChar: Boolean = true
+  def isValidInt: Boolean = true
+  def isValidLong: Boolean = true
 
   override def toString: String = toInt.toString
-  
+
   def == (that: UShort): Boolean = this.signed == that.signed
   def != (that: UShort): Boolean = this.signed != that.signed
 
-  def <= (that: UShort) = this.signed <= that.signed
-  def < (that: UShort) = this.signed < that.signed
-  def >= (that: UShort) = this.signed >= that.signed
-  def > (that: UShort) = this.signed > that.signed
-  
-  def ===(that: UShort): Boolean = 
-    this.signed == that.signed
+  def ===(that: UShort): Boolean = this.signed == that.signed
+  def =!=(that: UShort): Boolean = this.signed != that.signed
 
-  def =!=(that: UShort): Boolean =
-    !(this === that)
+  def <= (that: UShort): Boolean = this.signed <= that.signed
+  def < (that: UShort): Boolean = this.signed < that.signed
+  def >= (that: UShort): Boolean = this.signed >= that.signed
+  def > (that: UShort): Boolean = this.signed > that.signed
 
-  def unary_- = UShort(-this.signed)
+  def unary_- : UShort = UShort(-this.signed)
 
-  def + (that: UShort) = UShort(this.signed + that.signed)
-  def - (that: UShort) = UShort(this.signed - that.signed)
-  def * (that: UShort) = UShort(this.signed * that.signed)
-  def / (that: UShort) = UShort(this.signed / that.signed)
-  def % (that: UShort) = UShort(this.signed % that.signed)
+  def + (that: UShort): UShort = UShort(this.signed + that.signed)
+  def - (that: UShort): UShort = UShort(this.signed - that.signed)
+  def * (that: UShort): UShort = UShort(this.signed * that.signed)
+  def / (that: UShort): UShort = UShort(this.signed / that.signed)
+  def % (that: UShort): UShort = UShort(this.signed % that.signed)
 
-  def unary_~ = UShort(~this.signed)
+  def unary_~ : UShort = UShort(~this.signed)
 
-  def << (shift: Int) = UShort((signed & 0xffff) << (shift & 15))
-  def >> (shift: Int) = UShort((signed & 0xffff) >>> (shift & 15))
-  def >>> (shift: Int) = UShort((signed & 0xffff) >>> (shift & 15))
-  def & (that: UShort) = UShort(this.signed & that.signed)
-  def | (that: UShort) = UShort(this.signed | that.signed)
-  def ^ (that: UShort) = UShort(this.signed ^ that.signed)
+  def << (shift: Int): UShort = UShort((signed & 0xffff) << (shift & 15))
+  def >> (shift: Int): UShort = UShort((signed & 0xffff) >>> (shift & 15))
+  def >>> (shift: Int): UShort = UShort((signed & 0xffff) >>> (shift & 15))
+  def & (that: UShort): UShort = UShort(this.signed & that.signed)
+  def | (that: UShort): UShort = UShort(this.signed | that.signed)
+  def ^ (that: UShort): UShort = UShort(this.signed ^ that.signed)
 
-  def ** (that: UShort) = UShort(pow(this.toLong, that.toLong).toChar)
+  def ** (that: UShort): UShort = UShort(pow(this.toLong, that.toLong).toChar)
 }
 
 trait UShortInstances {
@@ -83,13 +80,13 @@ private[math] trait UShortIsRig extends Rig[UShort] {
 }
 
 private[math] trait UShortOrder extends Order[UShort] {
-  override def eqv(x:UShort, y:UShort) = x == y
-  override def neqv(x:UShort, y:UShort) = x != y
-  override def gt(x: UShort, y: UShort) = x > y
-  override def gteqv(x: UShort, y: UShort) = x >= y
-  override def lt(x: UShort, y: UShort) = x < y
-  override def lteqv(x: UShort, y: UShort) = x <= y
-  def compare(x: UShort, y: UShort) = if (x < y) -1 else if (x > y) 1 else 0
+  override def eqv(x:UShort, y:UShort): Boolean = x == y
+  override def neqv(x:UShort, y:UShort): Boolean = x != y
+  override def gt(x: UShort, y: UShort): Boolean = x > y
+  override def gteqv(x: UShort, y: UShort): Boolean = x >= y
+  override def lt(x: UShort, y: UShort): Boolean = x < y
+  override def lteqv(x: UShort, y: UShort): Boolean = x <= y
+  def compare(x: UShort, y: UShort): Int = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 @SerialVersionUID(0L)

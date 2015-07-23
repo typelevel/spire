@@ -357,9 +357,9 @@ final class ModuleUnboundOps[F](lhs: F)(implicit ev: Module[_, F]) {
   def +(rhs: F): F = macro Ops.binopWithScalar[F, F]
   def -(rhs: F): F = macro Ops.binopWithScalar[F, F]
   def unary_-(): F = macro Ops.unopWithScalar[F]
-  
+
   def *(rhs: F): F = macro Ops.binopWithScalar[F, F]
-  
+
   def pow(rhs: Int): F = macro Ops.binopWithScalar[Int, F]
   def **(rhs: Int): F = macro Ops.binopWithScalar[Int, F]
 }

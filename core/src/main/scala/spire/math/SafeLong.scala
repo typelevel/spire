@@ -185,7 +185,7 @@ object SafeLong extends SafeLongInstances {
   implicit def apply(x: BigInt): SafeLong =
     if (x.isValidLong) SafeLongLong(x.toLong) else SafeLongBigInt(x)
 
-  private [math] def apply(s: String): SafeLong =
+  private[math] def apply(s: String): SafeLong =
     try {
       SafeLong(java.lang.Long.parseLong(s))
     } catch {
@@ -242,7 +242,7 @@ case class SafeLongLong(x: Long) extends SafeLong {
   def %(y: Long): SafeLong =
     Checked.tryOrReturn[SafeLong](SafeLongLong(x % y))(SafeLong.zero)
 
-  def /%(y: Long) =
+  def /%(y: Long): (SafeLong, SafeLong) =
     if (x == Long.MinValue && y == -1L)
       (SafeLongBigInt(Long.MaxValue) + 1, SafeLong.zero)
     else
@@ -274,7 +274,7 @@ case class SafeLongLong(x: Long) extends SafeLong {
     else if (x == Long.MinValue && -y == x) SafeLong.zero
     else this
 
-  def /%(y: BigInt) =
+  def /%(y: BigInt): (SafeLong, SafeLong) =
     if (y.bitLength <= 63) this /% y.toLong
     else if (x == Long.MinValue && -y == x) (SafeLong.minusOne, SafeLong.zero)
     else (SafeLong.zero, this)
@@ -376,7 +376,7 @@ case class SafeLongLong(x: Long) extends SafeLong {
 
   override def toLong: Long = x
   def toBigInt: BigInt = BigInt(x)
-  def toBigDecimal = BigDecimal(x)
+  def toBigDecimal: BigDecimal = BigDecimal(x)
 
   def bitLength: Int = 64 - java.lang.Long.numberOfLeadingZeros(x)
 }
@@ -460,7 +460,7 @@ case class SafeLongBigInt(x: BigInt) extends SafeLong {
     if (x.signum >= 0) this
     else SafeLongBigInt(-x)
 
-  def gcd(that: SafeLong) =
+  def gcd(that: SafeLong): SafeLong =
     that match {
       case SafeLongLong(y) => SafeLong.mixedGcd(y, x)
       case SafeLongBigInt(y) => SafeLong(x gcd y)
@@ -479,7 +479,7 @@ case class SafeLongBigInt(x: BigInt) extends SafeLong {
 
   override def toLong: Long = x.toLong
   def toBigInt: BigInt = x
-  def toBigDecimal = BigDecimal(x)
+  def toBigDecimal: BigDecimal = BigDecimal(x)
 
   def bitLength: Int = x.bitLength
 }
@@ -527,13 +527,13 @@ private[math] trait SafeLongIsNRoot extends NRoot[SafeLong] {
 }
 
 private[math] trait SafeLongOrder extends Order[SafeLong] {
-  override def eqv(x: SafeLong, y: SafeLong) = x == y
-  override def neqv(x: SafeLong, y: SafeLong) = x != y
-  override def gt(x: SafeLong, y: SafeLong) = x > y
-  override def gteqv(x: SafeLong, y: SafeLong) = x >= y
-  override def lt(x: SafeLong, y: SafeLong) = x < y
-  override def lteqv(x: SafeLong, y: SafeLong) = x <= y
-  def compare(x: SafeLong, y: SafeLong) = x compare y
+  override def eqv(x: SafeLong, y: SafeLong): Boolean = x == y
+  override def neqv(x: SafeLong, y: SafeLong): Boolean = x != y
+  override def gt(x: SafeLong, y: SafeLong): Boolean = x > y
+  override def gteqv(x: SafeLong, y: SafeLong): Boolean = x >= y
+  override def lt(x: SafeLong, y: SafeLong): Boolean = x < y
+  override def lteqv(x: SafeLong, y: SafeLong): Boolean = x <= y
+  def compare(x: SafeLong, y: SafeLong): Int = x compare y
 }
 
 private[math] trait SafeLongIsSigned extends Signed[SafeLong] {

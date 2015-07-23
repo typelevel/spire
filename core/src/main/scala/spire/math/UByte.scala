@@ -3,11 +3,11 @@ package spire.math
 import spire.algebra.{IsIntegral, Order, Rig, Signed}
 
 object UByte extends UByteInstances {
-  @inline final def apply(n: Byte) = new UByte(n)
-  @inline final def apply(n: Int) = new UByte(n.toByte)
+  @inline final def apply(n: Byte): UByte = new UByte(n)
+  @inline final def apply(n: Int): UByte = new UByte(n.toByte)
 
-  @inline final def MinValue = UByte(0)
-  @inline final def MaxValue = UByte(-1)
+  @inline final def MinValue: UByte = UByte(0)
+  @inline final def MaxValue: UByte = UByte(-1)
 }
 
 class UByte(val signed: Byte) extends AnyVal with scala.math.ScalaNumericAnyConversions {
@@ -30,46 +30,43 @@ class UByte(val signed: Byte) extends AnyVal with scala.math.ScalaNumericAnyConv
   def isWhole(): Boolean = true
   def underlying(): Any = signed
 
-  override def isValidByte = signed >= 0
-  override def isValidShort = true
-  override def isValidChar = true
-  override def isValidInt = true
-  def isValidLong = true
+  override def isValidByte: Boolean = signed >= 0
+  override def isValidShort: Boolean = true
+  override def isValidChar: Boolean = true
+  override def isValidInt: Boolean = true
+  def isValidLong: Boolean = true
 
   override def toString: String = toInt.toString
-  
+
   def == (that: UByte): Boolean = this.signed == that.signed
   def != (that: UByte): Boolean = this.signed != that.signed
 
-  def <= (that: UByte) = this.toInt <= that.toInt
-  def < (that: UByte) = this.toInt < that.toInt
-  def >= (that: UByte) = this.toInt >= that.toInt
-  def > (that: UByte) = this.toInt > that.toInt
-  
-  def ===(that: UByte) = 
-    this.signed == that.signed
+  def ===(that: UByte): Boolean = this.signed == that.signed
+  def =!=(that: UByte): Boolean = this.signed != that.signed
 
-  def =!=(that: UByte) = 
-    !(this === that)  
+  def <= (that: UByte): Boolean = this.toInt <= that.toInt
+  def < (that: UByte): Boolean = this.toInt < that.toInt
+  def >= (that: UByte): Boolean = this.toInt >= that.toInt
+  def > (that: UByte): Boolean = this.toInt > that.toInt
 
-  def unary_- = UByte(-this.signed)
+  def unary_- : UByte = UByte(-this.signed)
 
-  def + (that: UByte) = UByte(this.signed + that.signed)
-  def - (that: UByte) = UByte(this.signed - that.signed)
-  def * (that: UByte) = UByte(this.signed * that.signed)
-  def / (that: UByte) = UByte(this.toInt / that.toInt)
-  def % (that: UByte) = UByte(this.toInt % that.toInt)
+  def + (that: UByte): UByte = UByte(this.signed + that.signed)
+  def - (that: UByte): UByte = UByte(this.signed - that.signed)
+  def * (that: UByte): UByte = UByte(this.signed * that.signed)
+  def / (that: UByte): UByte = UByte(this.toInt / that.toInt)
+  def % (that: UByte): UByte = UByte(this.toInt % that.toInt)
 
-  def unary_~ = UByte(~this.signed)
+  def unary_~ : UByte = UByte(~this.signed)
 
-  def << (shift: Int) = UByte((signed & 0xff) << (shift & 7))
-  def >> (shift: Int) = UByte((signed & 0xff) >>> (shift & 7))
-  def >>> (shift: Int) = UByte((signed & 0xff) >>> (shift & 7))
-  def & (that: UByte) = UByte((this.signed & 0xff) & (that.signed & 0xff))
-  def | (that: UByte) = UByte((this.signed & 0xff) | (that.signed & 0xff))
-  def ^ (that: UByte) = UByte((this.signed & 0xff) ^ (that.signed & 0xff))
+  def << (shift: Int): UByte = UByte((signed & 0xff) << (shift & 7))
+  def >> (shift: Int): UByte = UByte((signed & 0xff) >>> (shift & 7))
+  def >>> (shift: Int): UByte = UByte((signed & 0xff) >>> (shift & 7))
+  def & (that: UByte): UByte = UByte((this.signed & 0xff) & (that.signed & 0xff))
+  def | (that: UByte): UByte = UByte((this.signed & 0xff) | (that.signed & 0xff))
+  def ^ (that: UByte): UByte = UByte((this.signed & 0xff) ^ (that.signed & 0xff))
 
-  def ** (that: UByte) = UByte(pow(this.toLong, that.toLong).toInt)
+  def ** (that: UByte): UByte = UByte(pow(this.toLong, that.toLong).toInt)
 }
 
 trait UByteInstances {
@@ -92,13 +89,13 @@ private[math] trait UByteIsRig extends Rig[UByte] {
 }
 
 private[math] trait UByteOrder extends Order[UByte] {
-  override def eqv(x:UByte, y:UByte) = x == y
-  override def neqv(x:UByte, y:UByte) = x != y
-  override def gt(x: UByte, y: UByte) = x > y
-  override def gteqv(x: UByte, y: UByte) = x >= y
-  override def lt(x: UByte, y: UByte) = x < y
-  override def lteqv(x: UByte, y: UByte) = x <= y
-  def compare(x: UByte, y: UByte) = if (x < y) -1 else if (x > y) 1 else 0
+  override def eqv(x:UByte, y:UByte): Boolean = x == y
+  override def neqv(x:UByte, y:UByte): Boolean = x != y
+  override def gt(x: UByte, y: UByte): Boolean = x > y
+  override def gteqv(x: UByte, y: UByte): Boolean = x >= y
+  override def lt(x: UByte, y: UByte): Boolean = x < y
+  override def lteqv(x: UByte, y: UByte): Boolean = x <= y
+  def compare(x: UByte, y: UByte): Int = if (x < y) -1 else if (x > y) 1 else 0
 }
 
 private[math] trait UByteIsSigned extends Signed[UByte] {

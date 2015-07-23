@@ -6,6 +6,7 @@ import org.scalatest._
 import prop._
 
 import spire.implicits._
+import spire.laws.arb.{complex, real}
 
 class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   type C = Complex[BigDecimal]
@@ -45,8 +46,6 @@ class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
 
 class ComplexCheck2 extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   type C = Complex[Real]
-
-  import ArbitrarySupport._
 
   val zero = Complex.zero[Real]
   val one = Complex.one[Real]
@@ -127,10 +126,16 @@ class ComplexCheck2 extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
+  property("c = c.r iff c.isReal") {
+    forAll { (c: C) =>
+      c == c.real shouldBe c.isReal
+    }
+  }
+
   // import spire.compat._
   // val threshold = Real("1/1000")
   // def near(x: C, y: C) = (x - y).abs should be <= threshold
-  
+
   // property("x.sqrt.pow(2) = x.pow(2).sqrt = x") {
   //   forAll { (x: C) =>
   //     near(x.sqrt.pow(2), x)

@@ -62,7 +62,7 @@ final class LongRational private (val n: Long, val d: Long) {
     val b = gcd(d, r.n)
     new LongRational((n / a) * (r.n / b), (d / b) * (r.d / a))
   }
-  
+
 
   def /(r: LongRational): LongRational = {
     val a = gcd(n, r.n)

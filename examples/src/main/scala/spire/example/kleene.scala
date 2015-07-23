@@ -56,7 +56,7 @@ object KleeneDemo {
 
   /**
    * StarRig[A] is a Rig[A] that also has an asteration operator: kstar.
-   * 
+   *
    * Laws:
    * 1. a.star = 1 + a * a.star = 1 + a.star * a
    */
@@ -113,7 +113,7 @@ object KleeneDemo {
 
   /**
    * Dim is a cute little class that let's us have implicit size information.
-   * 
+   *
    * This is to work around the fact that we don't currently have
    * implementations of Bounded[A] or Ix[A] like Haskell does.
    *
@@ -164,10 +164,10 @@ object KleeneDemo {
 
   /**
    * Mutable ArrayMatrix implementation.
-   * 
+   *
    * The mutability should only be used to initialize a matrix. Once it's built
    * it will be typed as Matrix[A] with no interface for further mutation.
-   * 
+   *
    * The matrix also has naive implementations of addition and multiplication.
    * These are not optimized--do not use this class in the wild!
    */
@@ -225,9 +225,9 @@ object KleeneDemo {
 
   /**
    * Edge is a simple class used to construct adjacency matrices.
-   * 
+   *
    * It's important to remember that edges go: y -> x.
-   * 
+   *
    * Thus from is the y-coordinate and to is the x-coordinate.
    */
   case class Edge(from: Int, to: Int)
@@ -257,7 +257,7 @@ object KleeneDemo {
 
   /**
    * Expr[A] implements an AST for regular expressions.
-   * 
+   *
    * Basic regular consist of the following:
    *  1. the empty set (Nul)        -- a set with no strings
    *  2. the empty string (Empty)   -- set containing the empty string
@@ -265,7 +265,7 @@ object KleeneDemo {
    *  4. concatenation (Then(a, b)) -- set of all xy, for x in a, y in b
    *  5. alternation (Or(a, b))     -- union set of a and b
    *  6. kleene star (Star(a))      -- set produced by 0+ concatenations from a
-   * 
+   *
    * For example, (a|bc)* includes "", "a", "bc", "abcaaaabc" but not "bc".
    */
   sealed trait Expr[+A]
@@ -440,7 +440,7 @@ object KleeneDemo {
   }
 
   /**
-   * 
+   *
    */
   trait Compact[+A] {
     def map[B: Field](f: A => B): Compact[B] = this match {

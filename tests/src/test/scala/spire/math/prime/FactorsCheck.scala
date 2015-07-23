@@ -1,5 +1,7 @@
 package spire.math.prime
 
+import spire.implicits._
+import spire.laws.arb.safeLong
 import spire.math.SafeLong
 
 import org.scalatest.Matchers
@@ -11,7 +13,6 @@ import org.scalacheck._
 import Gen._
 import Arbitrary.arbitrary
 
-import spire.implicits._
 import spire.math.ArbitrarySupport._
 import Ordinal._
 
@@ -27,25 +28,25 @@ class FactorsCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
       Factors(n).value shouldBe n
     }
   }
-  
+
   property("Factors(n) + Factors(m) = n + m") {
     forAll { (n: Long, m: Long) =>
       (Factors(n) + Factors(m)).value shouldBe SafeLong(n) + SafeLong(m)
     }
   }
-  
+
   property("Factors(n) - Factors(m) = n - m") {
     forAll { (n: Long, m: Long) =>
       (Factors(n) - Factors(m)).value shouldBe SafeLong(n) - SafeLong(m)
     }
   }
-  
+
   property("Factors(n) * Factors(m) = n * m") {
     forAll { (n: Long, m: Long) =>
       (Factors(n) * Factors(m)).value shouldBe SafeLong(n) * SafeLong(m)
     }
   }
-  
+
   property("Factors(n) / Factors(m) = n / m") {
     forAll { (n: Long, m: Long) =>
       whenever (m != 0) {
@@ -53,7 +54,7 @@ class FactorsCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
       }
     }
   }
-  
+
   property("Factors(n) % Factors(m) = n % m") {
     forAll { (n: Long, m: Long) =>
       whenever (m != 0) {
@@ -70,7 +71,7 @@ class FactorsCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
       }
     }
   }
-  
+
   property("Factors(n).pow(k) = n.pow(k)") {
     forAll { (n: Long, k: Sized[Int, _1, _10]) =>
       Factors(n).pow(k.num).value shouldBe SafeLong(n).pow(k.num)
