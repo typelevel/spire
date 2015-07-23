@@ -130,20 +130,15 @@ class RealCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
     }
   }
 
-  property("cos(atan2(y, x)) = x/mag") {
-    forAll { (y: Real, x: Real) =>
-      if (x.signum != 0 || y.signum != 0) {
-        val mag = (x.pow(2) + y.pow(2)).sqrt
-        Real.cos(Real.atan2(y, x)) shouldBe (x / mag)
-      }
-    }
-  }
-
-  property("sin(atan2(y, x)) = y/mag") {
-    forAll { (y: Real, x: Real) =>
-      if (x.signum != 0 || y.signum != 0) {
-        val mag = (x.pow(2) + y.pow(2)).sqrt
+  // since atan2 has branch cuts, we limit the magnitue of x and y
+  property("sin(atan2(y, x)) = y/mag, cos(atan2(y, x)) = x/mag") {
+    forAll { (yn: Long, yd: Long, xn: Long, xd: Long) =>
+      if (xd != 0 && yd != 0 && (xn != 0 || yn != 0)) {
+        val x = Real(Rational(xn, xd))
+        val y = Real(Rational(yn, yd))
+        val mag = (x ** 2 + y ** 2).sqrt
         Real.sin(Real.atan2(y, x)) shouldBe (y / mag)
+        Real.cos(Real.atan2(y, x)) shouldBe (x / mag)
       }
     }
   }

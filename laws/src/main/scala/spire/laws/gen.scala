@@ -45,11 +45,16 @@ object gen {
       arbitrary[Long].map(n => Natural(n & Long.MaxValue)),
       arbitrary[BigInt].map(n => Natural(n.abs)))
 
-  lazy val rational: Gen[Rational] =
+  lazy val rationalFromLongs: Gen[Rational] =
     for {
       n <- arbitrary[Long]
       d <- arbitrary[Long].map(n => if (n == 0) 1L else n)
     } yield Rational(n, d)
+
+  lazy val rational: Gen[Rational] =
+    Gen.oneOf(
+      rationalFromLongs,
+      arbitrary[Double].map(n => Rational(n)))
 
   lazy val number: Gen[Number] =
     Gen.oneOf(

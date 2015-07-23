@@ -126,6 +126,12 @@ class ComplexCheck2 extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
+  property("c = c.r iff c.isReal") {
+    forAll { (c: C) =>
+      c == c.real shouldBe c.isReal
+    }
+  }
+
   // import spire.compat._
   // val threshold = Real("1/1000")
   // def near(x: C, y: C) = (x - y).abs should be <= threshold
