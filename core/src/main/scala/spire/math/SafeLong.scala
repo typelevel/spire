@@ -9,6 +9,7 @@ import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Ring, Signed}
 import spire.std.long._
 import spire.std.bigInt._
 
+//scalastyle:off equals.hash.code
 /**
  * Provides a type to do safe long arithmetic. This type will never overflow,
  * but rather convert the underlying long to a BigInt as need and back down
