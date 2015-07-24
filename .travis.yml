@@ -3,6 +3,8 @@ scala:
   # https://github.com/non/spire/pull/413#issuecomment-89896773
   - 2.10.2
   - 2.11.6
+script:
+  sbt ++$TRAVIS_SCALA_VERSION validate
 notifications:
   irc:
     channels:
