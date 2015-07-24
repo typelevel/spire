@@ -41,12 +41,6 @@ object Ops extends machinist.Ops {
       (uesc('⊻'), "xor"),
       (uesc('⊼'), "nand"),
       (uesc('⊽'), "nor"))
-
-  def unopWithEv2[Ev1, R](c: Context)(ev1: c.Expr[Ev1]): c.Expr[R] = {
-    import c.universe._
-    val (ev, lhs) = unpack(c)
-    c.Expr[R](Apply(Apply(Select(ev, findMethodName(c)), List(lhs)), List(ev1.tree)))
-  }
 }
 
 case class SyntaxUtil[C <: Context with Singleton](val c: C) {
