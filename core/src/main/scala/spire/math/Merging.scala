@@ -117,19 +117,19 @@ object BinaryMerge extends Merge {
 
   private class ArrayBinaryMerge[@specialized T](a: Array[T], b: Array[T])(implicit o: Order[T], c: ClassTag[T]) extends BinaryMerge {
 
-    def compare(ai: Int, bi: Int) = o.compare(a(ai), b(bi))
+    def compare(ai: Int, bi: Int): Int = o.compare(a(ai), b(bi))
 
-    def fromA(a0: Int, a1: Int, bi: Int) = {
+    def fromA(a0: Int, a1: Int, bi: Int): Unit = {
       System.arraycopy(a, a0, r, ri, a1 - a0)
       ri += a1 - a0
     }
 
-    def fromB(ai: Int, b0: Int, b1: Int) = {
+    def fromB(ai: Int, b0: Int, b1: Int): Unit = {
       System.arraycopy(b, b0, r, ri, b1 - b0)
       ri += b1 - b0
     }
 
-    def collision(ai: Int, bi: Int) = {
+    def collision(ai: Int, bi: Int): Unit = {
       r(ri) = a(ai)
       ri += 1
       r(ri) = b(bi)
@@ -140,7 +140,7 @@ object BinaryMerge extends Merge {
     var ri = 0
     merge0(0, a.length, 0, b.length)
 
-    def result = r
+    def result: Array[T] = r
   }
 }
 

@@ -175,6 +175,7 @@ lazy val noPublishSettings = Seq(
   publishLocal := (),
   publishArtifact := false)
 
+addCommandAlias("validate", ";core/scalastyle;compile;test")
 
 // Dependencies
 

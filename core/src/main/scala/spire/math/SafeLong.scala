@@ -9,6 +9,7 @@ import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Ring, Signed}
 import spire.std.long._
 import spire.std.bigInt._
 
+//scalastyle:off equals.hash.code
 /**
  * Provides a type to do safe long arithmetic. This type will never overflow,
  * but rather convert the underlying long to a BigInt as need and back down
@@ -350,7 +351,7 @@ case class SafeLongLong(x: Long) extends SafeLong {
     x == that.x
 
   def =!=(that: SafeLongLong): Boolean =
-    !(this === that)    
+    !(this === that)
 
   def abs: SafeLong =
     if (x >= 0) this
@@ -450,10 +451,10 @@ case class SafeLongBigInt(x: BigInt) extends SafeLong {
       case that => that == x
     }
 
-  def ===(that: SafeLongBigInt): Boolean = 
+  def ===(that: SafeLongBigInt): Boolean =
     x == that.x
 
-  def =!=(that: SafeLongBigInt): Boolean = 
+  def =!=(that: SafeLongBigInt): Boolean =
     !(this === that)
 
   def abs: SafeLong =

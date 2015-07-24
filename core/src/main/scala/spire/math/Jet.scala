@@ -493,7 +493,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
     real == that.real && dimension == that.dimension &&
       infinitesimal.zip(that.infinitesimal).forall{ case (x, y) => x == y }
 
-  def =!=(that: Jet[_]): Boolean = 
+  def =!=(that: Jet[_]): Boolean =
     !(this === that)
 
   override def toString: String = {

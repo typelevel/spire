@@ -12,6 +12,7 @@ import spire.std.long.LongAlgebra
 import spire.std.double._
 import spire.syntax.nroot._
 
+//scalastyle:off equals.hash.code
 sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] { lhs =>
   import LongRationals.LongRational
   import BigRationals.BigRational

@@ -117,10 +117,10 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
       sillyIsReal && r == that
   }
 
-  def ===(that: Quaternion[_]): Boolean = 
+  def ===(that: Quaternion[_]): Boolean =
     r == that.r && i == that.i && j == that.j && k == that.k
 
-  def =!=(that: Quaternion[_]): Boolean = 
+  def =!=(that: Quaternion[_]): Boolean =
     !(this === that)
 
   def isZero(implicit o: IsReal[A]): Boolean = r.isSignZero && i.isSignZero && j.isSignZero && k.isSignZero
