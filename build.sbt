@@ -4,6 +4,7 @@ import sbtunidoc.Plugin.UnidocKeys._
 //import com.typesafe.sbt.pgp.PgpKeys._
 import pl.project13.scala.sbt.SbtJmh
 import ReleaseTransformations._
+import ScoverageSbtPlugin._
 
 // Projects
 
@@ -185,7 +186,7 @@ lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.12.2"
 
 // Project's settings
 
-lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings
+lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
 
 lazy val unidocSettings = UnidocPlugin.unidocSettings ++ Seq(
   unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, tests)
@@ -263,4 +264,11 @@ lazy val benchmarkSettings = Seq(
 
   // enable forking in run
   fork in run := true
+)
+
+lazy val scoverageSettings = Seq(
+  ScoverageKeys.coverageMinimum := 40,
+  ScoverageKeys.coverageFailOnMinimum := false,
+  ScoverageKeys.coverageHighlighting := scalaBinaryVersion.value != "2.10",
+  ScoverageKeys.coverageExcludedPackages := "spire\\.macros\\..*"
 )

@@ -4,7 +4,12 @@ scala:
   - 2.10.2
   - 2.11.6
 script:
-  sbt ++$TRAVIS_SCALA_VERSION validate
+  - if [[ "$TRAVIS_SCALA_VERSION" == "2.10.2"
+    ]]; then
+      sbt ++$TRAVIS_SCALA_VERSION validate ;
+    else
+      sbt ++$TRAVIS_SCALA_VERSION coverage validate coverageReport && bash <(curl -s https://codecov.io/bash) ;
+    fi
 notifications:
   irc:
     channels:
