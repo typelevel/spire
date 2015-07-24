@@ -11,3 +11,4 @@ notifications:
       - "chat.freenode.net#spire-math"
     on_success: change
     on_failure: always
+sudo: false
