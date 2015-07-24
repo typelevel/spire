@@ -149,7 +149,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
    */
   def isZero: Boolean = signum == 0
 
-  override def equals(that: Any) = that match {
+  override def equals(that: Any): Boolean = that match {
     case (that: Algebraic) => this === that
     case (that: Real) => this.toReal == that
     case (that: Number) => this.compare(Algebraic(that.toBigDecimal)) == 0

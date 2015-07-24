@@ -240,10 +240,10 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
     case that => unifiedPrimitiveEquals(that)
   }
 
-  def ===(rhs: Natural): Boolean = 
+  def ===(rhs: Natural): Boolean =
     (lhs compare rhs) == 0
 
-  def =!=(rhs: Natural): Boolean = 
+  def =!=(rhs: Natural): Boolean =
     !(this === rhs)
 
   def <(rhs: Natural): Boolean = (lhs compare rhs) < 0
