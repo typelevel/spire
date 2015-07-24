@@ -32,6 +32,9 @@ class UShort(val signed: Char) extends AnyVal {
   def == (that: UShort): Boolean = this.signed == that.signed
   def != (that: UShort): Boolean = this.signed != that.signed
 
+  def ===(that: UShort): Boolean = this.signed == that.signed
+  def =!=(that: UShort): Boolean = this.signed != that.signed
+
   def <= (that: UShort): Boolean = this.signed <= that.signed
   def < (that: UShort): Boolean = this.signed < that.signed
   def >= (that: UShort): Boolean = this.signed >= that.signed

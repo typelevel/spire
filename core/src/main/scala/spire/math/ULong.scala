@@ -64,8 +64,12 @@ class ULong(val signed: Long) extends AnyVal {
     if (signed >= 0L) signed.toString
     else (ULong.LimitAsBigInt + signed).toString
 
+  // TODO: replace these with `===` and `=!=`? Don't we get `==` and `!=` for free with value classes?
   final def == (that: ULong): Boolean = this.signed == that.signed
   final def != (that: ULong): Boolean = this.signed != that.signed
+
+  final def === (that: ULong): Boolean = this.signed == that.signed
+  final def =!= (that: ULong): Boolean = this.signed != that.signed
 
   final def <= (that: ULong): Boolean = if (this.signed >= 0L)
     this.signed <= that.signed || that.signed < 0L
