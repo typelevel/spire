@@ -270,5 +270,5 @@ lazy val scoverageSettings = Seq(
   ScoverageKeys.coverageMinimum := 40,
   ScoverageKeys.coverageFailOnMinimum := false,
   ScoverageKeys.coverageHighlighting := scalaBinaryVersion.value != "2.10",
-  ScoverageKeys.coverageExcludedPackages := ""
+  ScoverageKeys.coverageExcludedPackages := "spire\\.macros\\..*"
 )
