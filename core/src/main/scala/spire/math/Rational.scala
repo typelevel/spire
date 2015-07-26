@@ -225,21 +225,11 @@ object Rational extends RationalInstances {
       java.lang.Double.longBitsToDouble(bits)
   }
 
-  def apply(n: BigInt, d: BigInt): Rational = {
-    def build0(n: BigInt, d:BigInt): Rational = if (n == 0) zero else {
-      val gcd = n.gcd(d)
-      if (gcd == 1)
-        Rational(SafeLong(n), SafeLong(d))
-      else
-        Rational(SafeLong(n / gcd), SafeLong(d / gcd))
-    }
-    if (d == 0) throw new IllegalArgumentException("0 denominator")
-    else if (d > 0) build0(n, d)
-    else build0(-n, -d)
-  }
+  def apply(n: BigInt, d: BigInt): Rational =
+    apply(SafeLong(n), SafeLong(d))
 
   def apply(n: Long, d: Long): Rational = {
-    def build0(n: Long, d: Long): Rational = if (n == 0L) zero else {
+    def build0(n: Long, d: Long) = if (n == 0L) zero else {
       val divisor = spire.math.gcd(n, d)
       if (divisor == 1L)
         LongRational(n, d)
@@ -263,6 +253,7 @@ object Rational extends RationalInstances {
   }
 
   def apply(n: SafeLong, d: SafeLong): Rational = {
+    if (d.isZero) throw new IllegalArgumentException("0 denominator")
     if (d.signum < 0) return apply(-n, -d)
     val g = n gcd d
     (n / g) match {
@@ -398,8 +389,6 @@ private[math] case class LongRational(n: Long, d: Long) extends Rational with Se
 
   def numeratorAsLong: Long = n
   def denominatorAsLong: Long = d
-
-  0L.isValidLong
 
   def reciprocal: Rational =
     if (n == 0L) throw new ArithmeticException("reciprocal called on 0/1")
