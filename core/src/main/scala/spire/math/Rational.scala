@@ -700,20 +700,14 @@ private[math] object LongRationals {
           (SafeLong(n) * (r.d / dgcd) - SafeLong(r.n) * (d / dgcd)).signum
     }
 
-    override def equals(that: Any): Boolean = that match {
-      case that: LongRational => this === that
-      case _ => super.equals(that)
-    }
-
-    def ===(that: LongRational): Boolean =
-      this.n == that.n && this.d == that.d
-
-    def =!=(that: LongRational): Boolean =
-      !(this === that)
-
     override def longValue: Long =
       if(d == 1L) n
       else n / d
+
+    override def equals(that: Any): Boolean = that match {
+      case that: LongRational => this.n == that.n && this.d == that.d
+      case _ => super.equals(that)
+    }
 
     override def hashCode: Int =
       if (d==1) unifiedPrimitiveHashcode
@@ -877,6 +871,11 @@ private[math] object BigRationals {
         else
           (SafeLong(r.d / dgcd) * n - SafeLong(d / dgcd) * r.n).signum
       }
+    }
+
+    override def equals(that: Any): Boolean = that match {
+      case that: BigRational => this.n == that.n && this.d == that.d
+      case _ => super.equals(that)
     }
 
     override def hashCode: Int =
