@@ -39,6 +39,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def reciprocal: Rational
   def signum: Int
   def isZero: Boolean
+  def isOne: Boolean
 
   def unary_-(): Rational
 
@@ -419,6 +420,8 @@ private[math] case class LongRational(n: Long, d: Long) extends Rational with Se
 
   override def isZero: Boolean = n == 0L
 
+  override def isOne: Boolean = isWhole && n == 1L
+
   override def isValidChar: Boolean = isWhole && n.isValidChar
 
   override def isValidByte: Boolean = isWhole && n.isValidByte
@@ -724,6 +727,8 @@ private[math] case class BigRational(n: BigInt, d: BigInt) extends Rational with
   override def isWhole: Boolean = d == 1
 
   override def isZero: Boolean = false
+
+  override def isOne: Boolean = false
 
   override def isValidChar: Boolean = false
 
