@@ -87,7 +87,8 @@ object Macros {
   }
 
   def formatWhole(c: Context, sep: String): String = {
-    val regex = "0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*" format sep
+    val esep = if (sep == ".") "\\." else sep
+    val regex = "(0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*)" format esep
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
     if (!s.matches(regex)) c.error(c.enclosingPosition, "invalid whole number")
@@ -95,7 +96,9 @@ object Macros {
   }
 
   def formatDecimal(c: Context, sep: String, dec: String): String = {
-    val regex = "0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*(%s[0-9]+)?" format (sep, dec)
+    val esep = if (sep == ".") "\\." else sep
+    val edec = if (dec == ".") "\\." else dec
+    val regex = "-?(0|[1-9][0-9]{0,2}(%s[0-9]{3})*)(%s[0-9]+)?" format (esep, edec)
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
     if (!s.matches(regex)) c.error(c.enclosingPosition, "invalid decimal number")
@@ -149,12 +152,12 @@ object Macros {
   def siInt(c: Context)(): c.Expr[Int] = handleInt(c, "SI", " ")
   def siLong(c: Context)(): c.Expr[Long] = handleLong(c, "SI", " ")
   def siBigInt(c: Context)(): c.Expr[BigInt] = handleBigInt(c, "SI", " ")
-  def siBigDecimal(c: Context)(): c.Expr[BigDecimal] = handleBigDecimal(c, "SI", " ", ".")
+  def siBigDecimal(c: Context)(): c.Expr[BigDecimal] = handleBigDecimal(c, "SI", " ", "\\.")
 
   def usInt(c: Context)(): c.Expr[Int] = handleInt(c, "US", ",")
   def usLong(c: Context)(): c.Expr[Long] = handleLong(c, "US", ",")
   def usBigInt(c: Context)(): c.Expr[BigInt] = handleBigInt(c, "US", ",")
-  def usBigDecimal(c: Context)(): c.Expr[BigDecimal] = handleBigDecimal(c, "US", ",", ".")
+  def usBigDecimal(c: Context)(): c.Expr[BigDecimal] = handleBigDecimal(c, "US", ",", "\\.")
 
   def euInt(c: Context)(): c.Expr[Int] = handleInt(c, "EU", ".")
   def euLong(c: Context)(): c.Expr[Long] = handleLong(c, "EU", ".")

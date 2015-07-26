@@ -431,3 +431,100 @@ class PartialOrderSyntaxTest extends FunSuite with Matchers with Checkers {
     seq.pmax(intDivisibility).toSet === seq.filter(isMaximal).toSet
   }))
 }
+
+class LiteralSyntaxTest extends FunSuite with Matchers {
+  test("rationals") {
+    import spire.syntax.literals._
+    r"0" shouldBe Rational(0)
+    r"-1" shouldBe Rational(-1)
+    r"1" shouldBe Rational(1)
+    r"10/100" shouldBe Rational(1, 10)
+    r"-13/7" shouldBe Rational(-13, 7)
+    r"0/1" shouldBe Rational(0)
+    r"0/7" shouldBe Rational(0)
+    r"60/60" shouldBe Rational(1)
+    r"60/60" shouldBe Rational(1)
+    r"2/-3" shouldBe Rational(-2, 3)
+  }
+
+  test("si literals") {
+    import spire.syntax.literals.si._
+    i"1 444 222 999" shouldBe 1444222999
+    i"0" shouldBe 0
+    i"-22 345" shouldBe -22345
+
+    j"1 444 222 999" shouldBe 1444222999
+    j"0" shouldBe 0
+    j"-22 345" shouldBe -22345
+    j"-9 223 372 036 854 775 808" shouldBe Long.MinValue
+
+    big"0" shouldBe BigInt(0)
+    big"1 000" shouldBe BigInt(1000)
+    big"-999 999 999 999 999 999 999 999 999" shouldBe BigInt("-999999999999999999999999999")
+    big"1 000 000 000 000 000" shouldBe BigInt("1000000000000000")
+
+    dec"0" shouldBe BigDecimal(0)
+    dec"0.0" shouldBe BigDecimal(0)
+    dec"0.0" shouldBe BigDecimal(0)
+    dec"0.0000" shouldBe BigDecimal(0)
+    dec"0.1" shouldBe BigDecimal("0.1")
+    dec"-0.998722" shouldBe BigDecimal("-0.998722")
+    dec"1 000" shouldBe BigDecimal(1000)
+    dec"1 234 567.9913" shouldBe BigDecimal("1234567.9913")
+    dec"1 000 000 000 000 000" shouldBe BigDecimal("1000000000000000")
+  }
+
+  test("us literals") {
+    import spire.syntax.literals.us._
+    i"1,444,222,999" shouldBe 1444222999
+    i"0" shouldBe 0
+    i"-22,345" shouldBe -22345
+
+    j"1,444,222,999" shouldBe 1444222999
+    j"0" shouldBe 0
+    j"-22,345" shouldBe -22345
+    j"-9,223,372,036,854,775,808" shouldBe Long.MinValue
+
+    big"0" shouldBe BigInt(0)
+    big"1,000" shouldBe BigInt(1000)
+    big"-999,999,999,999,999,999,999,999,999" shouldBe BigInt("-999999999999999999999999999")
+    big"1,000,000,000,000,000" shouldBe BigInt("1000000000000000")
+
+    dec"0" shouldBe BigDecimal(0)
+    dec"0.0" shouldBe BigDecimal(0)
+    dec"0.0" shouldBe BigDecimal(0)
+    dec"0.0000" shouldBe BigDecimal(0)
+    dec"0.1" shouldBe BigDecimal("0.1")
+    dec"-0.998722" shouldBe BigDecimal("-0.998722")
+    dec"1,000" shouldBe BigDecimal(1000)
+    dec"1,234,567.9913" shouldBe BigDecimal("1234567.9913")
+    dec"1,000,000,000,000,000" shouldBe BigDecimal("1000000000000000")
+  }
+
+  test("eu literals") {
+    import spire.syntax.literals.eu._
+    i"1.444.222.999" shouldBe 1444222999
+    i"0" shouldBe 0
+    i"-22.345" shouldBe -22345
+
+    j"1.444.222.999" shouldBe 1444222999
+    j"0" shouldBe 0
+    j"-22.345" shouldBe -22345
+    j"-9.223.372.036.854.775.808" shouldBe Long.MinValue
+
+    big"0" shouldBe BigInt(0)
+    big"1.000" shouldBe BigInt(1000)
+    big"-999.999.999.999.999.999.999.999.999" shouldBe BigInt("-999999999999999999999999999")
+    big"1.000.000.000.000.000" shouldBe BigInt("1000000000000000")
+
+    dec"0" shouldBe BigDecimal(0)
+    dec"0,0" shouldBe BigDecimal(0)
+    dec"0,0" shouldBe BigDecimal(0)
+    dec"0,0000" shouldBe BigDecimal(0)
+    dec"0,1" shouldBe BigDecimal("0.1")
+    dec"-0,998722" shouldBe BigDecimal("-0.998722")
+    dec"1.000" shouldBe BigDecimal(1000)
+    dec"1.234.567,9913" shouldBe BigDecimal("1234567.9913")
+    dec"1.000.000.000.000.000" shouldBe BigDecimal("1000000000000000")
+  }
+}
