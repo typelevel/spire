@@ -6,10 +6,10 @@ import java.math.{ MathContext, RoundingMode, BigInteger, BigDecimal => JBigDeci
 import java.util.concurrent.atomic.AtomicReference
 
 import scala.annotation.tailrec
-import scala.collection.concurrent.TrieMap
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
 import scala.reflect.ClassTag
 
+import spire.Platform
 import spire.algebra.{Eq, EuclideanRing, Field, IsAlgebraic, NRoot, Order, Ring, Sign, Signed}
 import spire.algebra.Sign.{ Positive, Negative, Zero }
 import spire.macros.Checked.checked
@@ -591,8 +591,7 @@ object Algebraic extends AlgebraicInstances {
      */
     def flags: Flags = new Flags(flagBits)
 
-    private val bounds: TrieMap[ZeroBoundFunction, Any] =
-      new TrieMap
+    private val bounds: Platform.TrieMap[ZeroBoundFunction, Any] = Platform.TrieMap()
 
     /**
      * Returns the bound for `zbf`, using a cached value if it is available.

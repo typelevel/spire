@@ -1,7 +1,6 @@
 import sbtbuildinfo.Plugin._
 import sbtunidoc.{Plugin => UnidocPlugin}
 import sbtunidoc.Plugin.UnidocKeys._
-//import com.typesafe.sbt.pgp.PgpKeys._
 import pl.project13.scala.sbt.SbtJmh
 import ReleaseTransformations._
 import ScoverageSbtPlugin._
@@ -9,135 +8,223 @@ import ScoverageSbtPlugin._
 // Projects
 
 lazy val spire = project.in(file("."))
+  .settings(moduleName := "spire-root")
+  .settings(spireSettings)
+  .settings(unidocSettings)
+  .settings(noPublishSettings)
+  .aggregate(spireJVM, spireJS)
+  .dependsOn(spireJVM, spireJS)
+
+lazy val spireJVM = project.in(file(".spireJVM"))
   .settings(moduleName := "spire-aggregate")
   .settings(spireSettings)
   .settings(unidocSettings)
   .settings(noPublishSettings)
-  .aggregate(macros, core, examples, laws, tests, benchmark)
-  .dependsOn(macros, core, examples, laws, tests, benchmark)
+  .aggregate(macrosJVM, coreJVM, examples, lawsJVM, testsJVM, benchmark)
+  .dependsOn(macrosJVM, coreJVM, examples, lawsJVM, testsJVM, benchmark)
 
-lazy val macros = project
+lazy val spireJS = project.in(file(".spireJS"))
+  .settings(moduleName := "spire-aggregate")
+  .settings(spireSettings)
+  .settings(unidocSettings)
+  .settings(noPublishSettings)
+  .aggregate(macrosJS, coreJS, lawsJS, testsJS)
+  .dependsOn(macrosJS, coreJS, lawsJS, testsJS)
+  .enablePlugins(ScalaJSPlugin)
+
+lazy val macros = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-macros")
-  .settings(spireSettings)
-  .settings(macroSettings)
+  .settings(spireSettings:_*)
+  .settings(scalaCheckSettings:_*)
+  .settings(scalaTestSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
 
-lazy val core = project
+lazy val macrosJVM = macros.jvm
+lazy val macrosJS = macros.js
+
+lazy val core = crossProject
   .settings(moduleName := "spire")
-  .settings(spireSettings)
-  .settings(coreSettings)
+  .settings(spireSettings:_*)
+  .settings(coreSettings:_*)
+  .settings(buildInfoSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
   .dependsOn(macros)
+
+lazy val coreJVM = core.jvm
+lazy val coreJS = core.js
 
 lazy val examples = project
   .settings(moduleName := "spire-examples")
   .settings(spireSettings)
-  .settings(examplesSettings)
+  .settings(libraryDependencies ++= Seq(
+    "com.chuusai" %% "shapeless" % "1.2.4",
+    "org.apfloat" % "apfloat" % "1.8.2",
+    "org.jscience" % "jscience" % "4.3.1"
+  ))
   .settings(noPublishSettings)
-  .dependsOn(core)
+  .settings(commonJvmSettings)
+  .dependsOn(coreJVM)
 
-lazy val laws = project.in(file("laws"))
+lazy val laws = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-laws")
-  .settings(spireSettings)
-  .settings(scalacheckSettings)
+  .settings(spireSettings:_*)
+  .settings(libraryDependencies ++= Seq(
+    "org.typelevel" %%% "discipline" % "0.4",
+    "org.scalacheck" %%% "scalacheck" % "1.12.4"
+  ))
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
   .dependsOn(core)
 
-lazy val tests = project
+lazy val lawsJVM = laws.jvm
+lazy val lawsJS = laws.js
+
+// Todo: As all tests in this list are commented out, no tests in testJS are run - but they are compiled.
+//       This list is TEMPORARY as tests are migrated to scala-js
+lazy val jsTests = List(
+ /* "spire.PartialOrderSyntaxTest",
+  "spire.PartialSyntaxTest",
+  "spire.SyntaxTest",
+  //"spire.algebra.GCDTest",
+  "spire.algebra.NRootTest",
+  "spire.algebra.PartialOrderTest",
+  "spire.algebra.RingTest","*/
+  "spire.algebra.SignedTest"/*,
+  "spire.algebra.TrigTest",
+  "spire.laws.LawTests",
+  "spire.math.AlgebraicTest",
+  "spire.math.BinaryMergeCheck",
+  "spire.math.BitStringCheck",
+  "spire.math.BitStringTest",
+  "spire.math.ComplexCheck",
+  "spire.math.ComplexCheck2",
+  "spire.math.ComplexTest",
+  "spire.math.ContinuousIntervalTest",
+  "spire.math.CooperativeEqualityTest",
+  "spire.math.FastComplexCheck",
+  "spire.math.FixedPointCheck",
+  "spire.math.FpFilterTest",
+  "spire.math.IntervalCheck",
+  "spire.math.IntervalGeometricPartialOrderTest",
+  "spire.math.IntervalIteratorCheck",
+  "spire.math.IntervalReciprocalTest",
+  "spire.math.IntervalSubsetPartialOrderTest",
+  "spire.math.IntervalTest",
+  "spire.math.JetTest",
+  "spire.math.LinearSelectTest",
+  "spire.math.LiteralsTest",
+  "spire.math.MergingTest",
+  "spire.math.NaturalTest",
+  "spire.math.NumberPropertiesTest",
+  "spire.math.NumberTest",
+  "spire.math.NumericTest",
+  "spire.math.PackageCheck",
+  "spire.math.PackageTest",
+  "spire.math.PolynomialCheck",
+  "spire.math.PolynomialSamplingCheck",
+  "spire.math.PolynomialTest",
+  "spire.math.QuaternionCheck",
+  "spire.math.QuickSelectTest",
+  "spire.math.RationalCheck",
+  "spire.math.RationalTest",
+  "spire.math.RealCheck",
+  "spire.math.RingIntervalTest",
+  "spire.math.SafeLongTest",
+  "spire.math.SearchTest",
+  "spire.math.SortingTest",
+  "spire.math.TrileanCheck",
+  "spire.math.UByteTest",
+  "spire.math.UIntTest",
+  "spire.math.ULongTest",
+  "spire.math.UShortTest",
+  "spire.math.prime.FactorHeapCheck",
+  "spire.math.prime.FactorsCheck",
+  "spire.random.GaussianTest",      
+  "spire.random.GeneratorTest",
+  "spire.random.SamplingTest",
+  "spire.random.ShufflingTest",
+  "spire.syntax.CforTest",
+  "spire.util.OptCheck",
+  "spire.util.PackCheck",
+  "test.scala.spire.math.TypeclassExistenceTest"
+*/
+)
+
+lazy val tests = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-tests")
-  .settings(spireSettings)
-  .settings(testsSettings)
-  .settings(noPublishSettings)
+  .settings(spireSettings:_*)
+  .settings(scalaTestSettings:_*)
+  .settings(noPublishSettings:_*)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(testOptions in Test := Seq(Tests.Filter(s => jsTests.contains(s))))
+  .jsSettings(commonJsSettings:_*)
   .dependsOn(core, laws)
+
+lazy val testsJVM = tests.jvm
+lazy val testsJS = tests.js
 
 lazy val benchmark = project
   .settings(moduleName := "spire-benchmark")
   .settings(spireSettings)
   .settings(benchmarkSettings)
   .settings(noPublishSettings)
-  .dependsOn(core)
+  .settings(commonJvmSettings)
+  .dependsOn(coreJVM)
 
 lazy val benchmarkJmh: Project = project.in(file("benchmark-jmh"))
   .settings(moduleName := "spire-benchmark-jmh")
   .settings(spireSettings)
   .settings(SbtJmh.jmhSettings)
   .settings(noPublishSettings)
-  .dependsOn(core, benchmark)
-
+  .settings(commonJvmSettings)
+  .dependsOn(coreJVM, benchmark)
 
 // General settings
+
+addCommandAlias("validateJVM", ";coreJVM/scalastyle;macrosJVM/test;coreJVM/test;lawsJVM/test;testsJVM/test;examples/test;benchmark/test")
+
+addCommandAlias("validateJS", ";macrosJS/test;coreJS/test;lawsJS/test;testsJS/test")
+
+addCommandAlias("validate", ";validateJVM;validateJS")
 
 lazy val buildSettings = Seq(
   organization := "org.spire-math",
   scalaVersion := "2.11.7",
-  // https://github.com/non/spire/pull/413#issuecomment-89896773
-  crossScalaVersions := Seq("2.10.4", "2.11.7")
+  crossScalaVersions := Seq("2.10.2", "2.11.7")
 )
 
 lazy val commonSettings = Seq(
-  scalacOptions ++= Seq(
-    "-Yinline-warnings",
-    "-deprecation",
-    "-encoding", "UTF-8", // yes, this is 2 args
-    "-feature",
-    "-unchecked",
-    //"-Xfatal-warnings", // inliner warnings mean we leave this off
-    "-Xlint",
-    "-Xfuture",
-    "-Yno-adapted-args",
-    "-optimize",
-    "-language:experimental.macros",
-    "-language:higherKinds",
-    "-language:implicitConversions"
-  ),
+  scalacOptions ++= commonScalacOptions.diff(Seq(
+    "-Xfatal-warnings", 
+    "-language:existentials",
+    "-Ywarn-dead-code",
+    "-Ywarn-numeric-widen",
+    "-Ywarn-value-discard"
+  )),
   resolvers ++= Seq(
     "bintray/non" at "http://dl.bintray.com/non/maven",
-    Resolver.sonatypeRepo("releases"),
     Resolver.sonatypeRepo("snapshots")
   ),
-  libraryDependencies ++= Seq(
-    "org.scala-lang" % "scala-reflect" % scalaVersion.value,
-    "org.typelevel" %% "machinist" % "0.3.0" // TODO: 0.3.1 causes compilation errors
-  ) ++ {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      // if scala 2.11+ is used, quasiquotes are merged into scala-reflect
-      case Some((2, scalaMajor)) if scalaMajor >= 11 =>
-        Seq()
+  libraryDependencies += "org.typelevel" %%% "machinist" % "0.4.1"
+) ++ scalaMacroDependencies ++ warnUnusedImport
 
-      // in Scala 2.10, quasiquotes are provided by macro-paradise
-      case Some((2, 10)) =>
-        Seq(
-          compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full),
-          "org.scalamacros" %% "quasiquotes" % "2.0.1"
-        )
-    }
-  },
-  scalacOptions ++= {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, 10)) =>
-        Seq()
-      case Some((2, n)) if n >= 11 =>
-        Seq("-Ywarn-unused-import")
-    }
-  },
-  scalacOptions in (Compile, console) ~= {_.filterNot("-Ywarn-unused-import" == _)},
-  scalacOptions in (Test, console) <<= (scalacOptions in (Compile, console))
+lazy val commonJsSettings = Seq(
+  scalaJSStage in Global := FastOptStage,
+  parallelExecution in Test := false
+)
+
+lazy val commonJvmSettings = Seq(
+  // -optimize has no effect in scala-js other than slowing down the build
+  scalacOptions += "-optimize"
 )
 
 lazy val publishSettings = Seq(
   homepage := Some(url("http://spire-math.org")),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-  releaseCrossBuild := true,
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-  publishMavenStyle := true,
-  publishArtifact in Test := false,
-  pomIncludeRepository := Function.const(false),
-
-  publishTo <<= (version).apply { v =>
-    val nexus = "https://oss.sonatype.org/"
-    if (v.trim.endsWith("SNAPSHOT"))
-      Some("Snapshots" at nexus + "content/repositories/snapshots")
-    else
-      Some("Releases" at nexus + "service/local/staging/deploy/maven2")
-  },
-
   pomExtra := (
     <scm>
       <url>git@github.com:non/spire.git</url>
@@ -155,91 +242,17 @@ lazy val publishSettings = Seq(
         <url>http://github.com/tixxit/</url>
       </developer>
     </developers>
-  ),
+  )
+) ++ sharedPublishSettings ++ sharedReleaseProcess
 
-  releaseProcess := Seq[ReleaseStep](
-    checkSnapshotDependencies,
-    inquireVersions,
-    runClean,
-    runTest,
-    setReleaseVersion,
-    commitReleaseVersion,
-    tagRelease,
-    ReleaseStep(action = Command.process("publishSigned", _)),
-    setNextVersion,
-    commitNextVersion,
-    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
-    pushChanges))
-
-lazy val noPublishSettings = Seq(
-  publish := (),
-  publishLocal := (),
-  publishArtifact := false)
-
-addCommandAlias("validate", ";core/scalastyle;compile;test")
-
-// Dependencies
-
-lazy val scalaTest = "org.scalatest" %% "scalatest" % "2.2.4"
-lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.12.2"
-
+lazy val scoverageSettings = Seq(
+  ScoverageKeys.coverageMinimum := 40,
+  ScoverageKeys.coverageFailOnMinimum := false,
+  ScoverageKeys.coverageHighlighting := scalaBinaryVersion.value != "2.10",
+  ScoverageKeys.coverageExcludedPackages := "spire\\.benchmark\\..*;spire\\.macros\\..*"
+)
 
 // Project's settings
-
-lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
-
-lazy val unidocSettings = UnidocPlugin.unidocSettings ++ Seq(
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, tests)
-)
-
-lazy val macroSettings = Seq(
-  libraryDependencies ++= Seq(scalaTest % "test", scalaCheck % "test"),
-  unmanagedSourceDirectories in Compile += (sourceDirectory in Compile).value / s"scala_${scalaBinaryVersion.value}"
-)
-
-lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types", "Generates several type classes for Tuple2-22.")
-
-lazy val coreSettings = Seq(
-  sourceGenerators in Compile <+= (genProductTypes in Compile),
-  genProductTypes <<= (sourceManaged in Compile, streams) map { (scalaSource, s) =>
-    s.log.info("Generating spire/std/tuples.scala")
-    val algebraSource = ProductTypes.algebraProductTypes
-    val algebraFile = (scalaSource / "spire" / "std" / "tuples.scala").asFile
-    IO.write(algebraFile, algebraSource)
-
-    Seq[File](algebraFile)
-  },
-  libraryDependencies ++= Seq(
-    scalaCheck % "test",
-    scalaTest % "test"
-  ),
-  unmanagedSourceDirectories in Compile += (sourceDirectory in Compile).value / s"scala_${scalaBinaryVersion.value}"
-) ++ buildInfoSettings ++ Seq(
-  sourceGenerators in Compile <+= buildInfo,
-  buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
-  buildInfoPackage := "spire"
-)
-
-lazy val examplesSettings = Seq(
-  libraryDependencies ++= Seq(
-    "com.chuusai" %% "shapeless" % "1.2.4",
-    "org.apfloat" % "apfloat" % "1.8.2",
-    "org.jscience" % "jscience" % "4.3.1"
-  )
-)
-
-lazy val scalacheckSettings = Seq(
-  libraryDependencies ++= Seq(
-    "org.typelevel" %% "discipline" % "0.2.1",
-    scalaCheck
-  )
-)
-
-lazy val testsSettings = Seq(
-  libraryDependencies ++= Seq(
-    scalaTest % "test"
-  )
-)
 
 lazy val benchmarkSettings = Seq(
   // raise memory limits here if necessary
@@ -248,16 +261,16 @@ lazy val benchmarkSettings = Seq(
 
   libraryDependencies ++= Seq(
     // comparisons
-    "org.apfloat" % "apfloat" % "1.6.3",
+    "org.apfloat" % "apfloat" % "1.8.2",
     "org.jscience" % "jscience" % "4.3.1",
     "org.apache.commons" % "commons-math3" % "3.4.1",
 
     // thyme
-    "ichi.bench" % "thyme" % "0.1.0" from "http://plastic-idolatry.com/jars/thyme-0.1.0.jar",
+    "ichi.bench" % "thyme" %  "0.1.0" from "http://plastic-idolatry.com/jars/thyme-0.1.0.jar",
 
     // caliper stuff
-    "com.google.guava" % "guava" % "18.0",
-    "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" % "2.1",
+    "com.google.guava" % "guava" %  "18.0",
+    "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" %  "2.1",
     "com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" from "http://plastic-idolatry.com/jars/caliper-1.0-SNAPSHOT.jar",
     "com.google.code.gson" % "gson" % "1.7.2"
   ),
@@ -266,9 +279,138 @@ lazy val benchmarkSettings = Seq(
   fork in run := true
 )
 
-lazy val scoverageSettings = Seq(
-  ScoverageKeys.coverageMinimum := 40,
-  ScoverageKeys.coverageFailOnMinimum := false,
-  ScoverageKeys.coverageHighlighting := scalaBinaryVersion.value != "2.10",
-  ScoverageKeys.coverageExcludedPackages := "spire\\.macros\\..*"
+lazy val coreSettings = Seq(
+  sourceGenerators in Compile <+= buildInfo,
+  buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
+  buildInfoPackage := "spire",
+  sourceGenerators in Compile <+= (genProductTypes in Compile),
+  genProductTypes <<= (sourceManaged in Compile, streams) map { (scalaSource, s) =>
+    s.log.info("Generating spire/std/tuples.scala")
+    val algebraSource = ProductTypes.algebraProductTypes
+    val algebraFile = (scalaSource / "spire" / "std" / "tuples.scala").asFile
+    IO.write(algebraFile, algebraSource)
+
+    Seq[File](algebraFile)
+  }
 )
+
+lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types", "Generates several type classes for Tuple2-22.")
+
+lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.12.4" % "test")
+
+lazy val scalaTestSettings = Seq(libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.0-M7" % "test")
+
+lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
+
+lazy val unidocSettings = UnidocPlugin.unidocSettings ++ Seq(
+  unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, testsJVM)
+)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Base Build Settings - Should not need to edit below this line. 
+// These settings could also come from another file or a plugin.
+// The only issue if coming from a plugin is that the Macro lib versions 
+// are hard coded, so an overided facility would be required.
+
+addCommandAlias("gitSnapshots", ";set version in ThisBuild := git.gitDescribedVersion.value.get + \"-SNAPSHOT\"")
+
+lazy val noPublishSettings = Seq(
+  publish := (),
+  publishLocal := (),
+  publishArtifact := false
+)
+
+lazy val crossVersionSharedSources: Seq[Setting[_]] =
+  Seq(Compile, Test).map { sc =>
+    (unmanagedSourceDirectories in sc) ++= {
+      (unmanagedSourceDirectories in sc ).value.map {
+        dir:File => new File(dir.getPath + "_" + scalaBinaryVersion.value)
+      }
+    }
+  }
+
+lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
+  libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
+  libraryDependencies ++= {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      // if scala 2.11+ is used, quasiquotes are merged into scala-reflect
+      case Some((2, scalaMajor)) if scalaMajor >= 11 => Seq()
+      // in Scala 2.10, quasiquotes are provided by macro paradise
+      case Some((2, 10)) =>
+        Seq(
+          compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full),
+              "org.scalamacros" %% "quasiquotes" % "2.0.1" cross CrossVersion.binary
+        )
+    }
+  }
+)
+
+lazy val commonScalacOptions = Seq(
+  "-deprecation",
+  "-encoding", "UTF-8",
+  "-feature",
+  "-language:existentials",
+  "-language:higherKinds",
+  "-language:implicitConversions",
+  "-language:experimental.macros",
+  "-unchecked",
+  "-Xfatal-warnings",
+  "-Xlint",
+  "-Yinline-warnings",
+  "-Yno-adapted-args",
+  "-Ywarn-dead-code",
+  "-Ywarn-numeric-widen",
+  "-Ywarn-value-discard",
+  "-Xfuture"
+)
+
+lazy val sharedPublishSettings = Seq(
+  releaseCrossBuild := true,
+  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
+  publishMavenStyle := true,
+  publishArtifact in Test := false,
+  pomIncludeRepository := Function.const(false),
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (isSnapshot.value)
+      Some("Snapshots" at nexus + "content/repositories/snapshots")
+    else
+      Some("Releases" at nexus + "service/local/staging/deploy/maven2")
+  }
+)
+ 
+lazy val sharedReleaseProcess = Seq(
+  releaseProcess := Seq[ReleaseStep](
+    checkSnapshotDependencies,
+    inquireVersions,
+    runClean,
+    runTest,
+    setReleaseVersion,
+    commitReleaseVersion,
+    tagRelease,
+    publishArtifacts,
+    setNextVersion,
+    commitNextVersion,
+    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+    pushChanges)
+)
+
+lazy val warnUnusedImport = Seq(
+  scalacOptions ++= {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, 10)) =>
+        Seq()
+      case Some((2, n)) if n >= 11 =>
+        Seq("-Ywarn-unused-import")
+    }
+  },
+  scalacOptions in (Compile, console) ~= {_.filterNot("-Ywarn-unused-import" == _)},
+  scalacOptions in (Test, console) <<= (scalacOptions in (Compile, console))
+)
+
+// For Travis CI - see http://www.cakesolutions.net/teamblogs/publishing-artefacts-to-oss-sonatype-nexus-using-sbt-and-travis-ci
+credentials ++= (for {
+  username <- Option(System.getenv().get("SONATYPE_USERNAME"))
+  password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
+} yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)).toSeq
+

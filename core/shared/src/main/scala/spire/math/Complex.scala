@@ -444,7 +444,7 @@ object FastComplex {
   final def apply(real: Double, imag: Double): Long = encode(real.toFloat, imag.toFloat)
 
   // encode a float as some bits
-  @inline final def bits(n: Float): Int = java.lang.Float.floatToRawIntBits(n)
+  @inline final def bits(n: Float): Int = java.lang.Float.floatToIntBits(n)
 
   // decode some bits into a float
   @inline final def bits(n: Int): Float = java.lang.Float.intBitsToFloat(n)
