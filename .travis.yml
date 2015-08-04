@@ -2,14 +2,16 @@ language: scala
 scala:
   # https://github.com/non/spire/pull/413#issuecomment-89896773
   - 2.10.2
-  - 2.11.6
+  - 2.11.7
 script:
-  - if [[ "$TRAVIS_SCALA_VERSION" == "2.10.2"
-    ]]; then
-      sbt ++$TRAVIS_SCALA_VERSION validate ;
-    else
-      sbt ++$TRAVIS_SCALA_VERSION coverage validate coverageReport && bash <(curl -s https://codecov.io/bash) ;
-    fi
+- if [[ "$TRAVIS_PULL_REQUEST" == "false" &&
+        "$TRAVIS_BRANCH" == "master" &&
+        $(cat version.sbt) =~ "-SNAPSHOT"
+  ]]; then
+    sbt ++$TRAVIS_SCALA_VERSION coverage validateJVM coverageReport && bash <(curl -s https://codecov.io/bash) && sbt clean validateJVM validateJS publish gitSnapshots publish ;
+  else
+    sbt ++$TRAVIS_SCALA_VERSION coverage validateJVM coverageReport && bash <(curl -s https://codecov.io/bash) && sbt clean validateJVM validateJS publishLocal ;
+  fi
 notifications:
   irc:
     channels:
