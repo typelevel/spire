@@ -387,8 +387,8 @@ case class SafeLongLong private[math](x: Long) extends SafeLong {
 
 case class SafeLongBigInt private[math](x: BigInt) extends SafeLong {
 
-  def isZero: Boolean = x.signum == 0
-  def isOne: Boolean = x == 1
+  def isZero: Boolean = false // 0 will always be represented as a SafeLongLong
+  def isOne: Boolean = false // 1 will always be represented as a SafeLongLong
   def signum: Int = x.signum
 
   def +(y: Long): SafeLong =
