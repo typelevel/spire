@@ -600,7 +600,7 @@ private[math] case class LongRational(n: Long, d: Long) extends Rational with Se
       if (den < SafeLong.zero) Rational(-num, -den) else Rational(num, den)
   }
 
-  def gcd(r: Rational): Rational = r match {
+  def gcd(r: Rational): Rational = if(isZero) r.abs else if(isOne) this else r match {
     case r: LongRational =>
       val dgcd: Long = spire.math.gcd(d, r.d)
       val n0 = spire.math.abs(n)
