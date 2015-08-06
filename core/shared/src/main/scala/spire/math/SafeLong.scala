@@ -19,6 +19,8 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
 
   def isZero: Boolean
 
+  def isOne: Boolean
+
   def signum: Int
 
   final def +(rhs: SafeLong): SafeLong =
@@ -223,9 +225,10 @@ object SafeLong extends SafeLongInstances {
 }
 
 
-case class SafeLongLong(x: Long) extends SafeLong {
+case class SafeLongLong private[math](x: Long) extends SafeLong {
 
-  def isZero: Boolean = x == 0
+  def isZero: Boolean = x == 0L
+  def isOne: Boolean = x == 1L
   def signum: Int = java.lang.Long.signum(x)
 
   def +(y: Long): SafeLong =
@@ -382,9 +385,10 @@ case class SafeLongLong(x: Long) extends SafeLong {
   def bitLength: Int = 64 - java.lang.Long.numberOfLeadingZeros(x)
 }
 
-case class SafeLongBigInt(x: BigInt) extends SafeLong {
+case class SafeLongBigInt private[math](x: BigInt) extends SafeLong {
 
-  def isZero: Boolean = x.signum == 0
+  def isZero: Boolean = false // 0 will always be represented as a SafeLongLong
+  def isOne: Boolean = false // 1 will always be represented as a SafeLongLong
   def signum: Int = x.signum
 
   def +(y: Long): SafeLong =
