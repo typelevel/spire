@@ -3,7 +3,7 @@ package spire.math
 import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import java.math.{ BigDecimal => JBigDecimal, MathContext, RoundingMode }
+import java.math.{BigDecimal => JBigDecimal, BigInteger, MathContext, RoundingMode}
 
 import spire.algebra.{Field, IsRational, NRoot, Sign}
 import spire.algebra.Sign.{ Positive, Zero, Negative }
@@ -259,9 +259,9 @@ object Rational extends RationalInstances {
     (n / g) match {
       case SafeLongLong(x) => (d / g) match {
         case SafeLongLong(y) => LongRational(x, y)
-        case SafeLongBigInt(y) => BigRational(x, y)
+        case SafeLongBigInteger(y) => BigRational(x, y)
       }
-      case SafeLongBigInt(x) => BigRational(x, (d / g).toBigInt)
+      case SafeLongBigInteger(x) => BigRational(x, (d / g).toBigInt)
     }
   }
 
@@ -312,7 +312,7 @@ object Rational extends RationalInstances {
   implicit def apply(n: SafeLong): Rational =
     n match {
       case SafeLongLong(x) => if (x == 0) Rational.zero else LongRational(x, 1L)
-      case SafeLongBigInt(x) => BigRational(x, BigInt(1))
+      case SafeLongBigInteger(x) => BigRational(x, BigInt(1))
     }
 
   implicit def apply(x: Number): Rational = x match {
@@ -471,7 +471,7 @@ private[math] case class LongRational(n: Long, d: Long) extends Rational with Se
         val num: SafeLong = rden * n + SafeLong(r.n) * lden
         val ngcd: Long = num match {
           case SafeLongLong(x) => spire.math.gcd(x, dgcd)
-          case SafeLongBigInt(x) => spire.math.gcd(dgcd, (x % dgcd).toLong)
+          case SafeLongBigInteger(x) => spire.math.gcd(dgcd, (x mod BigInteger.valueOf(dgcd)).longValue)
         }
 
         if (ngcd == 1L)
@@ -531,7 +531,7 @@ private[math] case class LongRational(n: Long, d: Long) extends Rational with Se
         val num: SafeLong = rden * n - SafeLong(r.n) * lden
         val ngcd: Long = num match {
           case SafeLongLong(x) => spire.math.gcd(x, dgcd)
-          case SafeLongBigInt(x) => spire.math.gcd(dgcd, (x % dgcd).toLong)
+          case SafeLongBigInteger(x) => spire.math.gcd(dgcd, (x mod BigInteger.valueOf(dgcd)).longValue)
         }
 
         if (ngcd == 1L)
