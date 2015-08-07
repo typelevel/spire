@@ -312,16 +312,16 @@ class RationalTest extends FunSuite {
     val y = Rational("1919191919191919191919/373737373737373737")
     val z = Rational("1/287380324068203382157064120376241062")
     assert(x.gcd(y) === z) // As confirmed by Wolfram Alpha
-//    // test gcd special cases (0 and 1)
-//    for(w ← Seq(Rational(Int.MaxValue), Rational(BigInt(2).pow(100)))) {
-//      val n = -w
-//      assert(Rational.zero.gcd(w) === w)
-//      assert(w.gcd(Rational.zero) === w)
-//      assert(Rational.zero.gcd(n) === w)
-//      assert(n.gcd(Rational.zero) === w)
-//      assert(Rational.one.gcd(w) === Rational.one)
-//      assert(w.gcd(Rational.one) === Rational.one)
-//    }
+    // test gcd special cases (0 and 1)
+    for(w ← Seq(Rational(Int.MaxValue), Rational(BigInt(2).pow(100)))) {
+      val n = -w
+      assert(Rational.zero.gcd(w) === w)
+      assert(w.gcd(Rational.zero) === w)
+      assert(Rational.zero.gcd(n) === w)
+      assert(n.gcd(Rational.zero) === w)
+      assert(Rational.one.gcd(w) === Rational.one)
+      assert(w.gcd(Rational.one) === Rational.one)
+    }
   }
 
   test("Rational(0D) is Zero") {
