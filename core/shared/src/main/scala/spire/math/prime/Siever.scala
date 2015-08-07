@@ -38,7 +38,7 @@ import SieveUtil._
  * will instantiate a Siever for you with reasonable parameters.
  */
 case class Siever(chunkSize: Int, cutoff: SafeLong) {
-  require(chunkSize % 480 != 0, "chunkSize must be a multiple of 480")
+  require(chunkSize % 480 == 0, "chunkSize must be a multiple of 480")
 
   val arr = BitSet.alloc(chunkSize)
   var start: SafeLong = SafeLong(0)
