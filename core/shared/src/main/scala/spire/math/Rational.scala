@@ -94,14 +94,16 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   /**
    * Returns a `Rational` whose numerator and denominator both fit in an `Int`.
    */
-  def limitToInt: Rational = limitTo(BigInt(Int.MaxValue))
-
+  def limitToInt: Rational =
+    if (signum < 0) -(-this).limitTo(Rational.Two31m0)
+    else limitTo(Rational.Two31m1)
 
   /**
    * Returns a `Rational` whose numerator and denominator both fit in a `Long`.
    */
-  def limitToLong: Rational = limitTo(BigInt(Long.MaxValue))
-
+  def limitToLong: Rational =
+    if (signum < 0) -(-this).limitTo(Rational.Two63m0)
+    else limitTo(Rational.Two63m1)
 
   /**
    * Returns a `Rational` whose denominator and numerator are no larger than
@@ -200,6 +202,11 @@ object Rational extends RationalInstances {
 
   val zero: Rational = LongRational(0L, 1L)
   val one: Rational = LongRational(1L, 1L)
+
+  private[math] val Two31m1: BigInt = BigInt(Int.MaxValue)
+  private[math] val Two31m0: BigInt = -BigInt(Int.MinValue)
+  private[math] val Two63m1: BigInt = BigInt(Long.MaxValue)
+  private[math] val Two63m0: BigInt = -BigInt(Long.MinValue)
 
   private[math] def toDouble(n: BigInt, d: BigInt): Double = n.signum match {
     case 0 => 0.0
