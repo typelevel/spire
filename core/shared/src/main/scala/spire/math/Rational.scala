@@ -111,21 +111,24 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
    *
    * @param max A positive integer.
    */
-  def limitTo(max: BigInt): Rational = if (this.signum < 0) {
-    -((-this).limitTo(max))
-  } else {
+  def limitTo(max: BigInt): Rational = {
     require(max > 0, "Limit must be a positive integer.")
-
-    val half = max >> 1
-    val floor = this.toBigInt
-    if (floor >= max) {
-      Rational(max)
-    } else if (floor >= (max >> 1)) {
-      Rational(floor.toLong)
-    } else if (this < Rational(1)) {
-      limitDenominatorTo(max)
+    if (this.signum < 0) {
+      -((-this).limitTo(max))
+    } else if (numerator < max && denominator < max) {
+      this
     } else {
-      limitDenominatorTo(max * denominator / numerator)
+      val half = max >> 1
+      val floor = this.toBigInt
+      if (floor >= max) {
+        Rational(max)
+      } else if (floor >= (max >> 1)) {
+        Rational(floor.toLong)
+      } else if (this < Rational(1)) {
+        limitDenominatorTo(max)
+      } else {
+        limitDenominatorTo(max * denominator / numerator)
+      }
     }
   }
 
