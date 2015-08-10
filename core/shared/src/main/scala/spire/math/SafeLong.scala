@@ -181,7 +181,7 @@ object SafeLong extends SafeLongInstances {
   final val three: SafeLong = SafeLongLong(3L)
   final val ten: SafeLong = SafeLongLong(10L)
 
-  private[spire] final val big64: BigInt = BigInt(1) << 63
+  private[spire] final val big64: BigInteger = BigInteger.ONE.shiftLeft(63)
   private[spire] final val safe64: SafeLong = SafeLong(big64)
   private[spire] final val longMaxValuePlusOne = SafeLongBigInteger(BigInteger.valueOf(Long.MaxValue).add(BigInteger.ONE))
 
@@ -220,7 +220,7 @@ object SafeLong extends SafeLongInstances {
     } else if (x == 0L) {
       SafeLong(y.abs)
     } else if (x == Long.MinValue) {
-      SafeLong(SafeLong.big64 gcd y)
+      SafeLong(SafeLong.big64 gcd y.bigInteger)
     } else {
       SafeLongLong(spire.math.gcd(x, (y % x).toLong))
     }
