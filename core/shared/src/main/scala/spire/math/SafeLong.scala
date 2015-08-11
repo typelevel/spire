@@ -9,12 +9,12 @@ import spire.macros.Checked
 
 import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Ring, Signed}
 import spire.std.long._
-import spire.std.bigInt._
+import spire.std.bigInteger._
 
 //scalastyle:off equals.hash.code
 /**
  * Provides a type to do safe long arithmetic. This type will never overflow,
- * but rather convert the underlying long to a BigInt as need and back down
+ * but rather convert the underlying long to a BigInteger as need and back down
  * to a Long when possible.
  */
 sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] { lhs =>
@@ -165,8 +165,9 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
   override def toByte: Byte = toLong.toByte
   override def toShort: Short = toLong.toShort
   override def toInt: Int = toLong.toInt
-  def toBigInt: BigInt
+  final def toBigInt: BigInt = toBigInteger
   def toBigDecimal: BigDecimal
+  def toBigInteger: BigInteger
 
   override def toString: String =
     this match {
@@ -177,7 +178,7 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
   final def isWhole: Boolean = true
 
   final def isProbablePrime(c: Int): Boolean =
-    toBigInt.isProbablePrime(c)
+    toBigInteger.isProbablePrime(c)
 
   def bitLength: Int
 }
@@ -388,7 +389,7 @@ private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def getLong: Option[Long] = Some(x)
 
   override def toLong: Long = x
-  def toBigInt: BigInt = BigInt(x)
+  def toBigInteger: BigInteger = BigInteger.valueOf(x)
   def toBigDecimal: BigDecimal = BigDecimal(x)
 
   def bitLength: Int = 64 - java.lang.Long.numberOfLeadingZeros(x)
@@ -492,7 +493,7 @@ private[math] case class SafeLongBigInteger(x: BigInteger) extends SafeLong {
   def getLong: Option[Long] = None
 
   override def toLong: Long = x.longValue
-  def toBigInt: BigInt = BigInt(x)
+  def toBigInteger: BigInteger = x
   def toBigDecimal: BigDecimal = BigDecimal(x)
 
   def bitLength: Int = x.bitLength
@@ -532,12 +533,12 @@ private[math] trait SafeLongIsNRoot extends NRoot[SafeLong] {
   def nroot(a: SafeLong, k: Int): SafeLong =
     a match {
       case SafeLongLong(n) => SafeLong(NRoot[Long].nroot(n, k))
-      case SafeLongBigInteger(n) => SafeLong(NRoot[BigInt].nroot(n, k))
+      case SafeLongBigInteger(n) => SafeLong(NRoot[BigInteger].nroot(n, k))
     }
 
   def fpow(a: SafeLong, b: SafeLong): SafeLong =
     if (b.isValidInt) a.pow(b.toInt)
-    else SafeLong(NRoot[BigInt].fpow(a.toBigInt, b.toBigInt))
+    else SafeLong(NRoot[BigInteger].fpow(a.toBigInteger, b.toBigInteger))
 }
 
 private[math] trait SafeLongOrder extends Order[SafeLong] {
