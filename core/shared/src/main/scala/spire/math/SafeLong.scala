@@ -133,7 +133,7 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
     if (k < 0) throw new IllegalArgumentException(s"negative exponent: $k")
 
     @tailrec def loop(total: SafeLong, base: SafeLong, exp: Int): SafeLong = {
-      if (exp == 0) return total
+      if (exp == 0) total
       else if ((exp & 1) == 1) loop(total * base, base * base, exp >> 1)
       else loop(total, base * base, exp >> 1)
     }
@@ -145,7 +145,7 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
     if (k < 0) throw new IllegalArgumentException(s"negative exponent: $k")
 
     @tailrec def loop(total: SafeLong, base: SafeLong, k: Int, mod: SafeLong): SafeLong = {
-      if (k == 0) return total
+      if (k == 0) total
       else if ((k & 1) == 1) loop((total * base) % mod, (base * base) % mod, k >> 1, mod)
       else loop(total, (base * base) % mod, k >> 1, mod)
     }
@@ -193,7 +193,6 @@ object SafeLong extends SafeLongInstances {
 
   private[spire] final val big64: BigInteger = BigInteger.ONE.shiftLeft(63)
   private[spire] final val safe64: SafeLong = SafeLong(big64)
-  private[spire] final val longMaxValuePlusOne = SafeLongBigInteger(BigInteger.valueOf(Long.MaxValue).add(BigInteger.ONE))
 
   implicit def apply(x: Long): SafeLong = SafeLongLong(x)
 
@@ -204,7 +203,7 @@ object SafeLong extends SafeLongInstances {
     try {
       SafeLong(java.lang.Long.parseLong(s))
     } catch {
-      case _: Exception => SafeLong(BigInt(s))
+      case _: Exception => SafeLong(new BigInteger(s))
     }
 
   def longGcd(x: Long, y: Long): SafeLong = {
@@ -252,14 +251,14 @@ private[math] case class SafeLongLong(x: Long) extends SafeLong {
     Checked.tryOrReturn[SafeLong](SafeLongLong(x * y))(SafeLongBigInteger(BigInteger.valueOf(x) multiply BigInteger.valueOf(y)))
 
   def /(y: Long): SafeLong =
-    Checked.tryOrReturn[SafeLong](SafeLongLong(x / y))(SafeLong.longMaxValuePlusOne)
+    Checked.tryOrReturn[SafeLong](SafeLongLong(x / y))(SafeLong.safe64)
 
   def %(y: Long): SafeLong =
     Checked.tryOrReturn[SafeLong](SafeLongLong(x % y))(SafeLong.zero)
 
   def /%(y: Long): (SafeLong, SafeLong) =
     if (x == Long.MinValue && y == -1L)
-      (SafeLong.longMaxValuePlusOne, SafeLong.zero)
+      (SafeLong.safe64, SafeLong.zero)
     else
       (SafeLongLong(x / y), SafeLongLong(x % y))
 
@@ -281,17 +280,17 @@ private[math] case class SafeLongLong(x: Long) extends SafeLong {
 
   def /(y: BigInteger): SafeLong =
     if (y.bitLength <= 63) this / y.longValue
-    else if (x == Long.MinValue && -BigInt(y) == x) SafeLong.minusOne
+    else if (x == Long.MinValue && (y equals SafeLong.big64)) SafeLong.minusOne
     else SafeLong.zero
 
   def %(y: BigInteger): SafeLong =
     if (y.bitLength <= 63) this % y.longValue
-    else if (x == Long.MinValue && -BigInt(y) == x) SafeLong.zero
+    else if (x == Long.MinValue && (y equals SafeLong.big64)) SafeLong.zero
     else this
 
   def /%(y: BigInteger): (SafeLong, SafeLong) =
     if (y.bitLength <= 63) this /% y.longValue
-    else if (x == Long.MinValue && -BigInt(y) == x) (SafeLong.minusOne, SafeLong.zero)
+    else if (x == Long.MinValue && (y equals SafeLong.big64)) (SafeLong.minusOne, SafeLong.zero)
     else (SafeLong.zero, this)
 
   def &(y: BigInteger): SafeLong = SafeLong(BigInteger.valueOf(x) and y)
