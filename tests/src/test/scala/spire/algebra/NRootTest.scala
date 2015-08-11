@@ -1,25 +1,27 @@
 package spire.algebra
 
-import spire.math._
+import java.math.BigInteger
+
+import spire.implicits._
 import org.scalatest.FunSuite
 
 import scala.reflect.ClassTag
 
-
 class NRootTest extends FunSuite {
-  def testIntegralNRoot[A: Numeric: ClassTag]: Unit = {
+  def testIntegralNRoot[A: Ring: NRoot: ClassTag]: Unit = {
     val cls = implicitly[ClassTag[A]].runtimeClass.getSimpleName
     test("Integral NRoot (%s)" format cls) {
       val one = Rig[A].one
       assert(NRoot[A].nroot(Rig[A].one, 2) === Rig[A].one)
-      assert(NRoot[A].nroot(Numeric[A].fromInt(1234), 2) === Numeric[A].fromInt(35))
-      assert(NRoot[A].nroot(Numeric[A].fromInt(912384), 3) === Numeric[A].fromInt(96))
+      assert(NRoot[A].nroot(Ring[A].fromInt(1234), 2) === Ring[A].fromInt(35))
+      assert(NRoot[A].nroot(Ring[A].fromInt(912384), 3) === Ring[A].fromInt(96))
     }
   }
 
   testIntegralNRoot[Int]
   testIntegralNRoot[Long]
   testIntegralNRoot[BigInt]
+  testIntegralNRoot[BigInteger]
 
   val DECIMAL1 = new java.math.MathContext(1)
 

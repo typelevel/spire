@@ -12,6 +12,7 @@ package object std {
   object float extends FloatInstances
   object double extends DoubleInstances
   object bigInt extends BigIntInstances
+  object bigInteger extends BigIntegerInstances
   object bigDecimal extends BigDecimalInstances
 
   object string extends StringInstances
