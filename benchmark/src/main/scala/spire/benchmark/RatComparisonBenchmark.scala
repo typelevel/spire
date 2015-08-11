@@ -49,13 +49,13 @@ class RatComparisonBenchmarks extends MyBenchmark {
   }
 
   def spireToAp(r:Rational) = new Aprational(
-    new Apint(r.numerator.bigInteger),
-    new Apint(r.denominator.bigInteger)
+    new Apint(r.numerator.toBigInteger),
+    new Apint(r.denominator.toBigInteger)
   )
 
   def spireToJsci(r:Rational) = number.Rational.valueOf(
-    number.LargeInteger.valueOf(r.numerator.bigInteger),
-    number.LargeInteger.valueOf(r.denominator.bigInteger)
+    number.LargeInteger.valueOf(r.numerator.toBigInteger),
+    number.LargeInteger.valueOf(r.denominator.toBigInteger)
   )
 
   // this is slow... it probably takes as long as one full run of the benchmark

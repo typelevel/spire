@@ -170,10 +170,10 @@ object BigDecimalRootRefinement {
       val n = poly.degree
       poly
         .mapTerms { case Term(coeff, k) =>
-          val a = BigDecimal(h.denominator.pow(n - k), MathContext.UNLIMITED)
+          val a = BigDecimal(h.denominator.toBigInteger.pow(n - k), MathContext.UNLIMITED)
           Term(coeff * a, k)
         }
-        .compose(Polynomial.linear[BigDecimal](BigDecimal(h.denominator, MathContext.UNLIMITED), BigDecimal(h.numerator, MathContext.UNLIMITED)))
+        .compose(Polynomial.linear[BigDecimal](BigDecimal(h.denominator.toBigInteger, MathContext.UNLIMITED), BigDecimal(h.numerator.toBigInteger, MathContext.UNLIMITED)))
         .removeZeroRoots
     }
 
