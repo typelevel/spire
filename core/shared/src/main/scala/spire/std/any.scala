@@ -9,6 +9,7 @@ trait AnyInstances extends BooleanInstances
     with FloatInstances
     with DoubleInstances
     with BigIntInstances
+    with BigIntegerInstances
     with BigDecimalInstances
     with StringInstances
     with IterableInstances

@@ -1,5 +1,7 @@
 package spire.laws
 
+import java.math.BigInteger
+
 import scala.reflect.ClassTag
 
 import spire.algebra._
@@ -34,6 +36,9 @@ object gen {
 
   lazy val fixedPoint: Gen[FixedPoint] =
     arbitrary[Long].map(new FixedPoint(_))
+
+  lazy val bigInteger: Gen[BigInteger] =
+    arbitrary[BigInt].map(_.bigInteger)
 
   lazy val safeLong: Gen[SafeLong] =
     Gen.frequency(
