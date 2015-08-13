@@ -309,9 +309,9 @@ lazy val coreSettings = Seq(
 )
 
 lazy val extrasSettings = Seq(
-  sourceGenerators in Compile <+= buildInfo,
-  buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
-  buildInfoPackage := "spire-extras"
+//  sourceGenerators in Compile <+= buildInfo,
+//  buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
+//  buildInfoPackage := "spire.extras"
 )
 
 lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types", "Generates several type classes for Tuple2-22.")
