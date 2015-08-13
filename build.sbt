@@ -20,16 +20,16 @@ lazy val spireJVM = project.in(file(".spireJVM"))
   .settings(spireSettings)
   .settings(unidocSettings)
   .settings(noPublishSettings)
-  .aggregate(macrosJVM, coreJVM, examples, lawsJVM, testsJVM, benchmark)
-  .dependsOn(macrosJVM, coreJVM, examples, lawsJVM, testsJVM, benchmark)
+  .aggregate(macrosJVM, coreJVM, extrasJVM, examples, lawsJVM, testsJVM, benchmark)
+  .dependsOn(macrosJVM, coreJVM, extrasJVM, examples, lawsJVM, testsJVM, benchmark)
 
 lazy val spireJS = project.in(file(".spireJS"))
   .settings(moduleName := "spire-aggregate")
   .settings(spireSettings)
   .settings(unidocSettings)
   .settings(noPublishSettings)
-  .aggregate(macrosJS, coreJS, lawsJS, testsJS)
-  .dependsOn(macrosJS, coreJS, lawsJS, testsJS)
+  .aggregate(macrosJS, coreJS, extrasJS, lawsJS, testsJS)
+  .dependsOn(macrosJS, coreJS, extrasJS, lawsJS, testsJS)
   .enablePlugins(ScalaJSPlugin)
 
 lazy val macros = crossProject.crossType(CrossType.Pure)
@@ -57,6 +57,19 @@ lazy val core = crossProject
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 
+lazy val extras = crossProject
+  .settings(moduleName := "spire-extras")
+  .settings(spireSettings:_*)
+  .settings(extrasSettings:_*)
+  .settings(buildInfoSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+  .dependsOn(core)
+
+lazy val extrasJVM = extras.jvm
+lazy val extrasJS = extras.js
+
 lazy val examples = project
   .settings(moduleName := "spire-examples")
   .settings(spireSettings)
@@ -67,7 +80,7 @@ lazy val examples = project
   ))
   .settings(noPublishSettings)
   .settings(commonJvmSettings)
-  .dependsOn(coreJVM)
+  .dependsOn(coreJVM, extrasJVM)
 
 lazy val laws = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-laws")
@@ -162,7 +175,7 @@ lazy val tests = crossProject.crossType(CrossType.Pure)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(testOptions in Test := Seq(Tests.Filter(s => jsTests.contains(s))))
   .jsSettings(commonJsSettings:_*)
-  .dependsOn(core, laws)
+  .dependsOn(core, extras, laws)
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS = tests.js
@@ -293,6 +306,12 @@ lazy val coreSettings = Seq(
 
     Seq[File](algebraFile)
   }
+)
+
+lazy val extrasSettings = Seq(
+  sourceGenerators in Compile <+= buildInfo,
+  buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
+  buildInfoPackage := "spire-extras"
 )
 
 lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types", "Generates several type classes for Tuple2-22.")
