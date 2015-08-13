@@ -198,9 +198,9 @@ lazy val benchmarkJmh: Project = project.in(file("benchmark-jmh"))
 
 // General settings
 
-addCommandAlias("validateJVM", ";coreJVM/scalastyle;macrosJVM/test;coreJVM/test;lawsJVM/test;testsJVM/test;examples/test;benchmark/test")
+addCommandAlias("validateJVM", ";coreJVM/scalastyle;macrosJVM/test;coreJVM/test;extrasJVM/test;lawsJVM/test;testsJVM/test;examples/test;benchmark/test")
 
-addCommandAlias("validateJS", ";macrosJS/test;coreJS/test;lawsJS/test;testsJS/test")
+addCommandAlias("validateJS", ";macrosJS/test;coreJS/test;extrasJS/test;lawsJS/test;testsJS/test")
 
 addCommandAlias("validate", ";validateJVM;validateJS")
 
