@@ -91,7 +91,7 @@ lazy val laws = crossProject.crossType(CrossType.Pure)
   ))
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
-  .dependsOn(core)
+  .dependsOn(core, extras)
 
 lazy val lawsJVM = laws.jvm
 lazy val lawsJS = laws.js
