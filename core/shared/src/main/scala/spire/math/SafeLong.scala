@@ -236,7 +236,7 @@ object SafeLong extends SafeLongInstances {
     }
 }
 
-private[math] case class SafeLongLong(x: Long) extends SafeLong {
+private[math] final case class SafeLongLong(x: Long) extends SafeLong {
 
   def isZero: Boolean = x == 0L
   def isOne: Boolean = x == 1L
@@ -395,7 +395,7 @@ private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def bitLength: Int = 64 - java.lang.Long.numberOfLeadingZeros(x)
 }
 
-private[math] case class SafeLongBigInteger(x: BigInteger) extends SafeLong {
+private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLong {
 
   def isZero: Boolean = false // 0 will always be represented as a SafeLongLong
   def isOne: Boolean = false // 1 will always be represented as a SafeLongLong
