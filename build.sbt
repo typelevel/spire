@@ -57,7 +57,7 @@ lazy val core = crossProject
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 
-lazy val extras = crossProject
+lazy val extras = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-extras")
   .settings(spireSettings:_*)
   .settings(extrasSettings:_*)
