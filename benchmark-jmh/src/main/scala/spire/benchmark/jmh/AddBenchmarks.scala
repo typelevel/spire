@@ -9,7 +9,6 @@ import org.openjdk.jmh.annotations._
 import spire.algebra._
 import spire.implicits._
 import spire.math._
-import spire.math.algebraic._
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
@@ -84,16 +83,6 @@ class AddBenchmarks {
 
   @Benchmark
   def addDoublesGeneric(state:DoubleState): Double = addGeneric(state.values)
-
-  @Benchmark
-  def addMaybeDoublesDirect(state:MaybeDoubleState): MaybeDouble = {
-    val data = state.values
-    var total = MaybeDouble(0.0)
-    var i = 0
-    val len = data.length
-    while (i < len) { total += data(i); i += 1 }
-    total
-  }
 
   @Benchmark
   def addComplexesDirect(state:ComplexState): Complex[Double] = {
