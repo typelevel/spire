@@ -306,25 +306,25 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
   override def <(that: SafeLong): Boolean =
     that match {
       case SafeLongLong(y) => x < y
-      case SafeLongBigInteger(y) => BigInteger.valueOf(x).compareTo(y) < 0
+      case SafeLongBigInteger(y) => y.signum > 0
     }
 
   override def <=(that: SafeLong): Boolean =
     that match {
       case SafeLongLong(y) => x <= y
-      case SafeLongBigInteger(y) => BigInteger.valueOf(x).compareTo(y) <= 0
+      case SafeLongBigInteger(y) => y.signum > 0
     }
 
   override def >(that: SafeLong): Boolean =
     that match {
       case SafeLongLong(y) => x > y
-      case SafeLongBigInteger(y) => BigInteger.valueOf(x).compareTo(y) > 0
+      case SafeLongBigInteger(y) => y.signum < 0
     }
 
   override def >=(that: SafeLong): Boolean =
     that match {
       case SafeLongLong(y) => x >= y
-      case SafeLongBigInteger(y) => BigInteger.valueOf(x).compareTo(y) >= 0
+      case SafeLongBigInteger(y) => y.signum < 0
     }
 
   def compare(that: SafeLong): Int =
@@ -332,7 +332,7 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
       case SafeLongLong(y) =>
         x compare y
       case SafeLongBigInteger(y) =>
-        BigInteger.valueOf(x).compareTo(y)
+        -y.signum
     }
 
   def <<(n: Int): SafeLong = {
@@ -450,8 +450,7 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
   def compare(that: SafeLong): Int =
     that match {
       case SafeLongLong(y) =>
-        // x can't be a valid Long, so x != y
-        if (x.compareTo(BigInteger.valueOf(y)) < 0) -1 else 1
+        x.signum
       case SafeLongBigInteger(y) =>
         x compareTo y
     }
