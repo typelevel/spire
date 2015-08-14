@@ -251,7 +251,7 @@ object Rational extends RationalInstances {
     }
   }
 
-  def apply(n: SafeLong, d: SafeLong): Rational = {                                                                   2
+  def apply(n: SafeLong, d: SafeLong): Rational = {
     if (d.isZero) throw new IllegalArgumentException("0 denominator")
     else if (n.isValidLong && d.isValidLong) apply(n.toLong, d.toLong)
     else if (d.signum < 0) return apply(-n, -d)
@@ -810,7 +810,7 @@ private[math] final case class BigRational(n: SafeLong, d: SafeLong) extends Rat
 
   def round: Rational =
     if (n.signum >= 0) {
-      val m = (n % d)
+      val m = n % d
       if (m >= (d - m)) Rational(n / d + 1) else Rational(n / d)
     } else {
       val m = -(n % d)
@@ -827,20 +827,18 @@ private[math] final case class BigRational(n: SafeLong, d: SafeLong) extends Rat
   def compareToOne: Int = n compare d
 
   def compare(r: Rational): Int = r match {
-    case r: LongRational => {
+    case r: LongRational =>
       val dgcd = spire.math.gcd(r.d, (d % r.d).toLong)
       if (dgcd == 1L)
         (n * r.d) compare (SafeLong(r.n) * d)
       else
         (n * (r.d / dgcd)) compare (SafeLong(r.n) * (d / dgcd))
-    }
-    case r: BigRational => {
+    case r: BigRational =>
       val dgcd = d.gcd(r.d)
       if (dgcd.isOne)
         (n * r.d) compare (r.n * d)
       else
         ((r.d / dgcd) * n) compare ((d / dgcd) * r.n)
-    }
   }
 
   override def equals(that: Any): Boolean = that match {
