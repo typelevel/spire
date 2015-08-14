@@ -251,16 +251,19 @@ object Rational extends RationalInstances {
     }
   }
 
-  def apply(n: SafeLong, d: SafeLong): Rational = {
+  def apply(n: SafeLong, d: SafeLong): Rational = {                                                                   2
     if (d.isZero) throw new IllegalArgumentException("0 denominator")
-    if (d.signum < 0) return apply(-n, -d)
-    val g = n gcd d
-    (n / g) match {
-      case SafeLongLong(x) => (d / g) match {
-        case SafeLongLong(y) => LongRational(x, y)
-        case y:SafeLongBigInteger => BigRational(x, y)
+    else if (n.isValidLong && d.isValidLong) apply(n.toLong, d.toLong)
+    else if (d.signum < 0) return apply(-n, -d)
+    else {
+      val g = n gcd d
+      (n / g) match {
+        case SafeLongLong(x) => (d / g) match {
+          case SafeLongLong(y) => LongRational(x, y)
+          case y: SafeLongBigInteger => BigRational(x, y)
+        }
+        case x: SafeLongBigInteger => BigRational(x, (d / g).toBigInt)
       }
-      case x:SafeLongBigInteger => BigRational(x, (d / g).toBigInt)
     }
   }
 
