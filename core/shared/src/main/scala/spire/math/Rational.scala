@@ -698,8 +698,8 @@ private[math] case class BigRational(n: BigInt, d: BigInt) extends Rational with
   def numeratorAsLong: Long = n.toLong
   def denominatorAsLong: Long = d.toLong
 
-  def reciprocal: BigRational = if (signum < 0)
-    BigRational(-d, -n)
+  def reciprocal: Rational = if (signum < 0)
+    Rational(-d, -n)
   else
     BigRational(d, n)
 
