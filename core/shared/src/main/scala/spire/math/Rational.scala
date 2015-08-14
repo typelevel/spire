@@ -257,12 +257,12 @@ object Rational extends RationalInstances {
     else if (d.signum < 0) return apply(-n, -d)
     else {
       val g = n gcd d
-      (n / g) match {
+      n / g match {
         case SafeLongLong(x) => (d / g) match {
           case SafeLongLong(y) => LongRational(x, y)
           case y: SafeLongBigInteger => BigRational(x, y)
         }
-        case x: SafeLongBigInteger => BigRational(x, (d / g).toBigInt)
+        case x: SafeLongBigInteger => BigRational(x, d / g)
       }
     }
   }
