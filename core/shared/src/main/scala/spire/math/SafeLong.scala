@@ -102,15 +102,15 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
   final def |(rhs: BigInt): SafeLong = this | rhs.bigInteger
   final def ^(rhs: BigInt): SafeLong = this ^ rhs.bigInteger
 
-  def +(rhs: BigInteger): SafeLong
-  def -(rhs: BigInteger): SafeLong
-  def *(rhs: BigInteger): SafeLong
-  def /(rhs: BigInteger): SafeLong
-  def %(rhs: BigInteger): SafeLong
-  def /%(rhs: BigInteger): (SafeLong, SafeLong)
-  def &(rhs: BigInteger): SafeLong
-  def |(rhs: BigInteger): SafeLong
-  def ^(rhs: BigInteger): SafeLong
+  private[math] def +(rhs: BigInteger): SafeLong
+  private[math] def -(rhs: BigInteger): SafeLong
+  private[math] def *(rhs: BigInteger): SafeLong
+  private[math] def /(rhs: BigInteger): SafeLong
+  private[math] def %(rhs: BigInteger): SafeLong
+  private[math] def /%(rhs: BigInteger): (SafeLong, SafeLong)
+  private[math] def &(rhs: BigInteger): SafeLong
+  private[math] def |(rhs: BigInteger): SafeLong
+  private[math] def ^(rhs: BigInteger): SafeLong
 
   final def min(that: SafeLong): SafeLong =
     if (this < that) this else that
@@ -167,7 +167,7 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
   override def toInt: Int = toLong.toInt
   final def toBigInt: BigInt = toBigInteger
   def toBigDecimal: BigDecimal
-  def toBigInteger: BigInteger
+  private[math] def toBigInteger: BigInteger
 
   override def toString: String =
     this match {
@@ -506,8 +506,7 @@ trait SafeLongInstances {
   @SerialVersionUID(1L)
   implicit object SafeLongIsReal extends SafeLongIsReal with Serializable
 
-  import NumberTag._
-  implicit final val SafeLongTag = new LargeTag[SafeLong](Integral, SafeLong.zero)
+  implicit final val SafeLongTag = new NumberTag.LargeTag[SafeLong](NumberTag.Integral, SafeLong.zero)
 }
 
 private[math] trait SafeLongIsRing extends Ring[SafeLong] {

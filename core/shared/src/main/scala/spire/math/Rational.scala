@@ -697,8 +697,8 @@ private[math] final case class BigRational(n: SafeLong, d: SafeLong) extends Rat
   def numeratorAsLong: Long = n.toLong
   def denominatorAsLong: Long = d.toLong
 
-  def reciprocal: BigRational = if (signum < 0)
-    BigRational(-d, -n)
+  def reciprocal: Rational = if (signum < 0)
+    Rational(-d, -n)
   else
     BigRational(d, n)
 
