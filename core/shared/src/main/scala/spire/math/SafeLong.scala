@@ -2,6 +2,8 @@ package spire.math
 
 import java.math.BigInteger
 
+import spire.util.Opt
+
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.annotation.tailrec
 
@@ -160,7 +162,7 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
   def unary_-(): SafeLong
 
   def isValidLong: Boolean
-  def getLong: Option[Long]
+  def getLong: Opt[Long]
 
   override def toByte: Byte = toLong.toByte
   override def toShort: Short = toLong.toShort
@@ -386,7 +388,7 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
 
   override def isValidInt: Boolean = Int.MinValue <= x && x <= Int.MaxValue
   def isValidLong: Boolean = true
-  def getLong: Option[Long] = Some(x)
+  def getLong: Opt[Long] = Opt(x)
 
   override def toLong: Long = x
   def toBigInteger: BigInteger = BigInteger.valueOf(x)
@@ -490,7 +492,7 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
 
   override def isValidInt: Boolean = false
   def isValidLong: Boolean = false
-  def getLong: Option[Long] = None
+  def getLong: Opt[Long] = Opt.empty[Long]
 
   override def toLong: Long = x.longValue
   def toBigInteger: BigInteger = x

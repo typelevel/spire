@@ -6,6 +6,7 @@ import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
+import spire.util.Opt
 
 class SafeLongTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
@@ -172,7 +173,7 @@ class SafeLongTest extends PropSpec with Matchers with GeneratorDrivenPropertyCh
       intercept[IllegalArgumentException] { sx pow -1 }
 
       sx.toLong shouldBe x
-      sx.getLong shouldBe Some(x)
+      sx.getLong shouldBe Opt(x)
       sx.isWhole shouldBe true
       sx.isValidInt shouldBe x.isValidInt
       sx.isValidLong shouldBe true
