@@ -23,14 +23,14 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
 
   implicit def ArbNonZero[A: Ring: Eq: Arbitrary]: Arbitrary[NonZero[A]] = {
     import spire.syntax.eq._
-    Arbitrary(arbitrary[A] filter (_ =!= Ring[A].zero) map (NonZero[A](_)))
+    Arbitrary(arbitrary[A].filter(_ =!= Ring[A].zero).map(NonZero[A](_)))
   }
 
   case class Positive[A](val x: A)
 
   implicit def ArbPositive[A: Ring: Signed: Arbitrary]: Arbitrary[Positive[A]] = {
     import spire.syntax.signed._
-    Arbitrary(arbitrary[A] filter (_.sign != Sign.Negative) map (Positive[A](_)))
+    Arbitrary(arbitrary[A].map(_.abs).filter(_.sign != Sign.Zero).map(Positive(_)))
   }
 
   implicit def ArbVector[A: Arbitrary]: Arbitrary[Vector[A]] = Arbitrary(for {
