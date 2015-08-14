@@ -19,7 +19,7 @@ import spire.std.bigInteger._
  * but rather convert the underlying long to a BigInteger as need and back down
  * to a Long when possible.
  */
-sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] { lhs =>
+sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] { lhs =>
 
   def isZero: Boolean
 
