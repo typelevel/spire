@@ -62,4 +62,11 @@ class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
       Rational(n).toDouble == n
     }
   }
+
+  property("limitToInt does not change small Rationals") {
+    forAll { (n: Int, d: Int) =>
+      val r = Rational(n, if (d < 1) 1 else d)
+      r.limitToInt shouldBe r
+    }
+  }
 }
