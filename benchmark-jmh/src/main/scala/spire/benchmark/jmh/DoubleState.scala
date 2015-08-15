@@ -8,5 +8,5 @@ import scala.util.Random._
 class DoubleState extends StateSupport {
   var values: Array[Double] = _
   @Setup
-  def setup: Unit = values = init(size)(nextDouble)
+  def setup(): Unit = values = init(size)(nextDouble)
 }

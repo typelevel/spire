@@ -9,5 +9,5 @@ import scala.util.Random._
 class FastComplexState extends StateSupport {
   var values: Array[Long] = _
   @Setup
-  def setup: Unit = values = init(size)(FastComplex(nextFloat(), nextFloat()))
+  def setup(): Unit = values = init(size)(FastComplex(nextFloat(), nextFloat()))
 }

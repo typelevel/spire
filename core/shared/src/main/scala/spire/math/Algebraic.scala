@@ -301,8 +301,8 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
       case ConstantBigDecimal(n) =>
         n.bigDecimal.round(new MathContext(digits, roundingMode))
       case ConstantRational(n) =>
-        val num = new JBigDecimal(n.numerator.bigInteger)
-        val den = new JBigDecimal(n.denominator.bigInteger)
+        val num = new JBigDecimal(n.numerator.toBigInteger)
+        val den = new JBigDecimal(n.denominator.toBigInteger)
         num.divide(den, new MathContext(digits, roundingMode))
       case ConstantRoot(poly, _, lb, ub) =>
         // Ugh - on an airplane and can't trust BigDecimal's constructors.
@@ -812,8 +812,8 @@ object Algebraic extends AlgebraicInstances {
       def signum: Int = value.signum
 
       def toBigDecimal(digits: Int): JBigDecimal = {
-        val num = new JBigDecimal(value.numerator.bigInteger)
-        val den = new JBigDecimal(value.denominator.bigInteger)
+        val num = new JBigDecimal(value.numerator.toBigInteger)
+        val den = new JBigDecimal(value.denominator.toBigInteger)
         num.divide(den, digits, RoundingMode.DOWN)
       }
     }
@@ -1445,7 +1445,7 @@ object Algebraic extends AlgebraicInstances {
     private def integer(n: Long): Bound =
       integer(BigInt(n))
 
-    private def integer(n: BigInt): Bound =
+    private def integer(n: SafeLong): Bound =
       Bound(0, n.abs.bitLength + 1)
 
     private def rational(n: Double): Bound =

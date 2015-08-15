@@ -7,5 +7,5 @@ import spire.math.Complex
 class ComplexState extends StateSupport {
   var values: Array[Complex[Double]] = _
   @Setup
-  def setup: Unit = values = init(size)(nextComplex)
+  def setup(): Unit = values = init(size)(nextComplex)
 }

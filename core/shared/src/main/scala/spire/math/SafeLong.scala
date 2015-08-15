@@ -2,6 +2,8 @@ package spire.math
 
 import java.math.BigInteger
 
+import spire.util.Opt
+
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.annotation.tailrec
 
@@ -17,7 +19,7 @@ import spire.std.bigInteger._
  * but rather convert the underlying long to a BigInteger as need and back down
  * to a Long when possible.
  */
-sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] { lhs =>
+sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] { lhs =>
 
   def isZero: Boolean
 
@@ -160,7 +162,7 @@ sealed trait SafeLong extends ScalaNumber with ScalaNumericConversions with Orde
   def unary_-(): SafeLong
 
   def isValidLong: Boolean
-  def getLong: Option[Long]
+  def getLong: Opt[Long]
 
   override def toByte: Byte = toLong.toByte
   override def toShort: Short = toLong.toShort
@@ -236,7 +238,7 @@ object SafeLong extends SafeLongInstances {
     }
 }
 
-private[math] case class SafeLongLong(x: Long) extends SafeLong {
+private[math] final case class SafeLongLong(x: Long) extends SafeLong {
 
   def isZero: Boolean = x == 0L
   def isOne: Boolean = x == 1L
@@ -304,25 +306,25 @@ private[math] case class SafeLongLong(x: Long) extends SafeLong {
   override def <(that: SafeLong): Boolean =
     that match {
       case SafeLongLong(y) => x < y
-      case SafeLongBigInteger(y) => BigInteger.valueOf(x).compareTo(y) < 0
+      case SafeLongBigInteger(y) => y.signum > 0
     }
 
   override def <=(that: SafeLong): Boolean =
     that match {
       case SafeLongLong(y) => x <= y
-      case SafeLongBigInteger(y) => BigInteger.valueOf(x).compareTo(y) <= 0
+      case SafeLongBigInteger(y) => y.signum > 0
     }
 
   override def >(that: SafeLong): Boolean =
     that match {
       case SafeLongLong(y) => x > y
-      case SafeLongBigInteger(y) => BigInteger.valueOf(x).compareTo(y) > 0
+      case SafeLongBigInteger(y) => y.signum < 0
     }
 
   override def >=(that: SafeLong): Boolean =
     that match {
       case SafeLongLong(y) => x >= y
-      case SafeLongBigInteger(y) => BigInteger.valueOf(x).compareTo(y) >= 0
+      case SafeLongBigInteger(y) => y.signum < 0
     }
 
   def compare(that: SafeLong): Int =
@@ -330,7 +332,7 @@ private[math] case class SafeLongLong(x: Long) extends SafeLong {
       case SafeLongLong(y) =>
         x compare y
       case SafeLongBigInteger(y) =>
-        BigInteger.valueOf(x).compareTo(y)
+        -y.signum
     }
 
   def <<(n: Int): SafeLong = {
@@ -386,7 +388,7 @@ private[math] case class SafeLongLong(x: Long) extends SafeLong {
 
   override def isValidInt: Boolean = Int.MinValue <= x && x <= Int.MaxValue
   def isValidLong: Boolean = true
-  def getLong: Option[Long] = Some(x)
+  def getLong: Opt[Long] = Opt(x)
 
   override def toLong: Long = x
   def toBigInteger: BigInteger = BigInteger.valueOf(x)
@@ -395,7 +397,7 @@ private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def bitLength: Int = 64 - java.lang.Long.numberOfLeadingZeros(x)
 }
 
-private[math] case class SafeLongBigInteger(x: BigInteger) extends SafeLong {
+private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLong {
 
   def isZero: Boolean = false // 0 will always be represented as a SafeLongLong
   def isOne: Boolean = false // 1 will always be represented as a SafeLongLong
@@ -448,8 +450,7 @@ private[math] case class SafeLongBigInteger(x: BigInteger) extends SafeLong {
   def compare(that: SafeLong): Int =
     that match {
       case SafeLongLong(y) =>
-        // x can't be a valid Long, so x != y
-        if (x.compareTo(BigInteger.valueOf(y)) < 0) -1 else 1
+        x.signum
       case SafeLongBigInteger(y) =>
         x compareTo y
     }
@@ -490,7 +491,7 @@ private[math] case class SafeLongBigInteger(x: BigInteger) extends SafeLong {
 
   override def isValidInt: Boolean = false
   def isValidLong: Boolean = false
-  def getLong: Option[Long] = None
+  def getLong: Opt[Long] = Opt.empty[Long]
 
   override def toLong: Long = x.longValue
   def toBigInteger: BigInteger = x

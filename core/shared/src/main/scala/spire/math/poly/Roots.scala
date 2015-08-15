@@ -42,10 +42,10 @@ object Roots {
   final def removeFractions(poly: Polynomial[Rational]): Polynomial[BigInt] = {
     val coeffs = poly.coeffsArray
     val factors = coeffs.foldLeft(BigInt(1)) { (acc, coeff) =>
-      val d = coeff.denominator
+      val d = coeff.denominator.toBigInt
       acc * (d / acc.gcd(d))
     }
-    val zCoeffs = coeffs.map(n => n.numerator * (factors / n.denominator))
+    val zCoeffs = coeffs.map(n => (n.numerator * (factors / n.denominator)).toBigInt)
     Polynomial.dense(zCoeffs)
   }
 

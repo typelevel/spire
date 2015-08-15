@@ -8,7 +8,7 @@ import spire.math.SafeLong
 import SafeLongUtil._
 
 object SafeLongUtil {
-  private def isBig(x: SafeLong) = x.getClass.getSimpleName.endsWith("BigInt")
+  private def isBig(x: SafeLong) = x.getClass.getSimpleName.endsWith("BigInteger")
 
   def classify(a: SafeLong): String =
     if (isBig(a)) "b" else "l"
