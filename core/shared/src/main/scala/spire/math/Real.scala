@@ -1,5 +1,6 @@
 package spire.math
 
+import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import spire.algebra.{Order, Trig, Signed}
@@ -133,6 +134,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   def **(k: Int): Real = pow(k)
 
   def pow(k: Int): Real = {
+    @tailrec
     def loop(b: Real, k: Int, extra: Real): Real =
       if (k == 1)
         b * extra

@@ -184,9 +184,9 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
     case IntNumber(m) => n match {
       case SafeLongLong(x) => m match {
         case SafeLongLong(y) => Number(x.toDouble / y.toDouble)
-        case SafeLongBigInt(y) => DecimalNumber(BigDecimal(x) / BigDecimal(y))
+        case SafeLongBigInteger(y) => DecimalNumber(BigDecimal(x) / BigDecimal(y))
       }
-      case SafeLongBigInt(x) => Number(BigDecimal(x) / m.toBigDecimal)
+      case SafeLongBigInteger(x) => Number(BigDecimal(x) / m.toBigDecimal)
     }
     case t => t r_/ lhs
   }
@@ -211,9 +211,9 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
     case IntNumber(m) => n match {
       case SafeLongLong(x) => m match {
         case SafeLongLong(y) => Number(y.toDouble / x.toDouble)
-        case SafeLongBigInt(y) => DecimalNumber(BigDecimal(y) / BigDecimal(x))
+        case SafeLongBigInteger(y) => DecimalNumber(BigDecimal(y) / BigDecimal(x))
       }
-      case SafeLongBigInt(x) => Number(m.toBigDecimal / BigDecimal(x))
+      case SafeLongBigInteger(x) => Number(m.toBigDecimal / BigDecimal(x))
     }
     case t => t / lhs
   }
@@ -324,7 +324,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   def +(rhs: Number): Number = rhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(n + x)
-      case SafeLongBigInt(x) => Number(BigDecimal(x) + n)
+      case SafeLongBigInteger(x) => Number(BigDecimal(x) + n)
     }
     case FloatNumber(m) => Number(n + m)
     case t => t + lhs
@@ -333,7 +333,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   def *(rhs: Number): Number = rhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(n * x)
-      case SafeLongBigInt(x) => Number(BigDecimal(n) * BigDecimal(x))
+      case SafeLongBigInteger(x) => Number(BigDecimal(n) * BigDecimal(x))
     }
     case FloatNumber(m) => Number(n * m)
     case t => t * lhs
@@ -342,7 +342,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   def -(rhs: Number): Number = rhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(n - x)
-      case SafeLongBigInt(x) => Number(BigDecimal(n) + BigDecimal(x))
+      case SafeLongBigInteger(x) => Number(BigDecimal(n) + BigDecimal(x))
     }
     case FloatNumber(m) => Number(n - m)
     case t => t r_- lhs
@@ -350,7 +350,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   private[math] def r_-(lhs: Number): Number = lhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(x - n)
-      case SafeLongBigInt(x) => Number(BigDecimal(x) - BigDecimal(n))
+      case SafeLongBigInteger(x) => Number(BigDecimal(x) - BigDecimal(n))
     }
     case FloatNumber(m) => Number(m - n)
     case t => t - lhs
@@ -359,7 +359,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   def /(rhs: Number): Number = rhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(n / x)
-      case SafeLongBigInt(x) => Number(BigDecimal(n) / BigDecimal(x))
+      case SafeLongBigInteger(x) => Number(BigDecimal(n) / BigDecimal(x))
     }
     case FloatNumber(m) => Number(n / m)
     case t => t r_/ lhs
@@ -367,7 +367,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   private[math] def r_/(lhs: Number): Number = lhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(x / n)
-      case SafeLongBigInt(x) => Number(BigDecimal(x) / BigDecimal(n))
+      case SafeLongBigInteger(x) => Number(BigDecimal(x) / BigDecimal(n))
     }
     case FloatNumber(m) => Number(m / n)
     case t => t / lhs
@@ -376,7 +376,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   def /~(rhs: Number): Number = rhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(Math.floor(n / x))
-      case SafeLongBigInt(x) => Number(BigDecimal(n) quot BigDecimal(x))
+      case SafeLongBigInteger(x) => Number(BigDecimal(n) quot BigDecimal(x))
     }
     case FloatNumber(m) => Number(Math.floor(n / m))
     case t => t r_/~ lhs
@@ -384,7 +384,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   private[math] def r_/~(lhs: Number): Number = lhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(Math.floor(x / n))
-      case SafeLongBigInt(x) => Number(BigDecimal(x) quot n)
+      case SafeLongBigInteger(x) => Number(BigDecimal(x) quot n)
     }
     case FloatNumber(m) => Number(Math.floor(m / n))
     case t => t /~ lhs
@@ -393,7 +393,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   def %(rhs: Number): Number = rhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(n % x)
-      case SafeLongBigInt(x) => Number(BigDecimal(n) % BigDecimal(x))
+      case SafeLongBigInteger(x) => Number(BigDecimal(n) % BigDecimal(x))
     }
     case FloatNumber(m) => Number(n % m)
     case t => t.r_%(lhs)
@@ -401,7 +401,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   private[math] def r_%(lhs: Number): Number = lhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(x % n)
-      case SafeLongBigInt(x) => Number(BigDecimal(x) % n)
+      case SafeLongBigInteger(x) => Number(BigDecimal(x) % n)
     }
     case FloatNumber(m) => Number(m % n)
     case t => t % lhs

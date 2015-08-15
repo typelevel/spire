@@ -1,9 +1,12 @@
 package spire.math
 
+import java.math.BigInteger
+
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
+import spire.util.Opt
 
 class SafeLongTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
@@ -15,7 +18,7 @@ class SafeLongTest extends PropSpec with Matchers with GeneratorDrivenPropertyCh
   def invariant(z: SafeLong): SafeLong = {
     z match {
       case SafeLongLong(_) => ()
-      case SafeLongBigInt(n) => n.isValidLong shouldBe false
+      case SafeLongBigInteger(n) => BigInt(n).isValidLong shouldBe false
     }
     z
   }
@@ -170,7 +173,7 @@ class SafeLongTest extends PropSpec with Matchers with GeneratorDrivenPropertyCh
       intercept[IllegalArgumentException] { sx pow -1 }
 
       sx.toLong shouldBe x
-      sx.getLong shouldBe Some(x)
+      sx.getLong shouldBe Opt(x)
       sx.isWhole shouldBe true
       sx.isValidInt shouldBe x.isValidInt
       sx.isValidLong shouldBe true
@@ -229,9 +232,9 @@ class SafeLongTest extends PropSpec with Matchers with GeneratorDrivenPropertyCh
     zero gcd smin shouldBe firstBig
     SafeLong(2) gcd smin shouldBe SafeLong(2)
     smin gcd smin shouldBe firstBig
-    SafeLong(13) gcd SafeLongBigInt(BigInt(0)) shouldBe SafeLong(13)
-    smin gcd SafeLongBigInt(BigInt(0)) shouldBe firstBig
-    SafeLong.minusOne gcd SafeLongBigInt(BigInt(0)) shouldBe SafeLong.one
+    SafeLong(13) gcd SafeLongBigInteger(BigInteger.ZERO) shouldBe SafeLong(13)
+    smin gcd SafeLongBigInteger(BigInteger.ZERO) shouldBe firstBig
+    SafeLong.minusOne gcd SafeLongBigInteger(BigInteger.ZERO) shouldBe SafeLong.one
 
     (SafeLong(0) gcd SafeLong(-13)) shouldBe SafeLong(13)
     (SafeLong(0) gcd smin) shouldBe firstBig

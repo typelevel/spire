@@ -1,5 +1,7 @@
 package spire.laws
 
+import java.math.BigInteger
+
 import scala.reflect.ClassTag
 
 import spire.algebra._
@@ -31,6 +33,9 @@ object arb {
 
   implicit val fixedPoint: Arbitrary[FixedPoint] =
     Arbitrary(gen.fixedPoint)
+
+  implicit val bigInteger: Arbitrary[BigInteger] =
+    Arbitrary(gen.bigInteger)
 
   implicit val safeLong: Arbitrary[SafeLong] =
     Arbitrary(gen.safeLong)

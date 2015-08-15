@@ -1,5 +1,7 @@
 package spire.laws
 
+import java.math.BigInteger
+
 import scala.reflect.ClassTag
 
 import spire.algebra._
@@ -35,26 +37,46 @@ object gen {
   lazy val fixedPoint: Gen[FixedPoint] =
     arbitrary[Long].map(new FixedPoint(_))
 
+  lazy val bigInteger: Gen[BigInteger] =
+    arbitrary[BigInt].map(_.bigInteger)
+
   lazy val safeLong: Gen[SafeLong] =
-    Gen.oneOf(
-      arbitrary[Long].map(SafeLong(_)),
-      arbitrary[BigInt].map(SafeLong(_)))
+    Gen.frequency(
+      1 → SafeLong(BigInt("393050634124102232869567034555427371542904833")),
+      100 → arbitrary[Long].map(SafeLong(_)),
+      100 → arbitrary[BigInt].map(SafeLong(_)))
 
   lazy val natural: Gen[Natural] =
     Gen.oneOf(
       arbitrary[Long].map(n => Natural(n & Long.MaxValue)),
       arbitrary[BigInt].map(n => Natural(n.abs)))
 
-  lazy val rationalFromLongs: Gen[Rational] =
-    for {
-      n <- arbitrary[Long]
-      d <- arbitrary[Long].map(n => if (n == 0) 1L else n)
-    } yield Rational(n, d)
+  lazy val rational: Gen[Rational] = {
+    val rationalFromLongs: Gen[Rational] =
+      for {
+        n <- arbitrary[Long]
+        d <- arbitrary[Long].map(n => if (n == 0) 1L else n)
+      } yield Rational(n, d)
 
-  lazy val rational: Gen[Rational] =
-    Gen.oneOf(
-      rationalFromLongs,
-      arbitrary[Double].map(n => Rational(n)))
+    val rationalFromSafeLongs: Gen[Rational] =
+      for {
+        n <- safeLong
+        d <- safeLong.map(n => if (n.isZero) SafeLong.one else n)
+      } yield Rational(n, d)
+
+    val bigRational: Gen[Rational] = {
+      val m = Rational("1/393050634124102232869567034555427371542904833")
+      rationalFromSafeLongs.map(_ * m)
+    }
+
+    Gen.frequency(
+      10 → rationalFromLongs, // we keep this to make long/long rationals more frequent
+      10 → arbitrary[Double].map(n => Rational(n)),
+      1 → rationalFromSafeLongs,
+      1 → bigRational, // a rational that is guaranteed to have a big denominator
+      1 → bigRational.map(x ⇒ if(x.isZero) Rational.one else x.inverse)
+    )
+  }
 
   lazy val number: Gen[Number] =
     Gen.oneOf(

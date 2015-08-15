@@ -1,5 +1,6 @@
 package spire.laws
 
+import java.math.BigInteger
 import spire.algebra._
 import spire.algebra.free._
 import spire.algebra.lattice._
@@ -33,11 +34,12 @@ class LawTests extends FunSuite with Discipline {
   }
 
   // Float and Double fail these tests
-  checkAll("Int",      RingLaws[Int].euclideanRing)
-  checkAll("Long",     RingLaws[Long].euclideanRing)
-  checkAll("BigInt",   RingLaws[BigInt].euclideanRing)
-  checkAll("Rational", RingLaws[Rational].field)
-  checkAll("Real",     RingLaws[Real].field)
+  checkAll("Int",        RingLaws[Int].euclideanRing)
+  checkAll("Long",       RingLaws[Long].euclideanRing)
+  checkAll("BigInt",     RingLaws[BigInt].euclideanRing)
+  checkAll("BigInteger", RingLaws[BigInteger].euclideanRing)
+  checkAll("Rational",   RingLaws[Rational].field)
+  checkAll("Real",       RingLaws[Real].field)
 
   checkAll("Levenshtein distance", BaseLaws[String].metricSpace)
   checkAll("BigInt",               BaseLaws[BigInt].metricSpace)
@@ -113,6 +115,7 @@ class LawTests extends FunSuite with Discipline {
   }
 
   checkAll("Order[Int]", OrderLaws[Int].order)
+  checkAll("Order[BigInteger]", OrderLaws[BigInteger].order)
   checkAll("Order[Unit]", OrderLaws[Unit].order)
   checkAll("AbGroup[Unit]", GroupLaws[Unit].abGroup)
   checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
