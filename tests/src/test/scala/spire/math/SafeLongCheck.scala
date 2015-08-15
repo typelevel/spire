@@ -8,7 +8,7 @@ import org.scalatest._
 import prop._
 import spire.util.Opt
 
-class SafeLongTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class SafeLongCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   import SafeLong.zero
 
