@@ -1,20 +1,23 @@
 package spire
 
-import spire.math.Rational
 import spire.algebra._
+import spire.math.{Rational, Searching}
 import spire.std.int._
 import spire.std.double._
 import spire.std.seq._
 import spire.std.string._
+import spire.syntax.all._
+import spire.tests.{SpireTests, SpireProperties}
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.FunSuite
+import org.scalatest.Matchers
 import org.scalatest.prop.Checkers
 
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 
-class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
+class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   // This tests 2 things:
   //  1) That the ops work as they're suppose to,
   //  2) That this actually compiles (ie. ops exist at all, given an import).
@@ -22,15 +25,17 @@ class SyntaxTest extends FunSuite with Checkers with BaseSyntaxTest {
   case class NonZero[A](val x: A)
 
   implicit def ArbNonZero[A: Ring: Eq: Arbitrary]: Arbitrary[NonZero[A]] = {
-    import spire.syntax.eq._
-    Arbitrary(arbitrary[A] filter (_ =!= Ring[A].zero) map (NonZero[A](_)))
+    Arbitrary(arbitrary[A].map { a =>
+      if (a === Ring[A].zero) Ring[A].one else a
+    }.map(NonZero[A](_)))
   }
 
   case class Positive[A](val x: A)
 
-  implicit def ArbPositive[A: Ring: Signed: Arbitrary]: Arbitrary[Positive[A]] = {
-    import spire.syntax.signed._
-    Arbitrary(arbitrary[A] filter (_.sign != Sign.Negative) map (Positive[A](_)))
+  implicit def ArbPositive[A: Ring: Eq: Signed: Arbitrary]: Arbitrary[Positive[A]] = {
+    Arbitrary(arbitrary[A].map { a =>
+      if (a === Ring[A].zero) Ring[A].one else a.abs
+    }.filter(_.sign == Sign.Positive).map(Positive(_)))
   }
 
   implicit def ArbVector[A: Arbitrary]: Arbitrary[Vector[A]] = Arbitrary(for {
@@ -392,42 +397,49 @@ trait BaseSyntaxTest {
   }
 }
 
-class PartialOrderSyntaxTest extends FunSuite with Matchers with Checkers {
-  import spire.algebra.PartialOrder
-  import spire.syntax.all._
-  object intDivisibility extends PartialOrder[Int] {
-    def partialCompare(a: Int, b: Int) = {
-      if (a == b)
-        0.0
-      else if (b % a == 0)
-        -1.0
-      else if (a % b == 0)
-        1.0
-      else
-        Double.NaN
+object IntDivisibility extends PartialOrder[Int] {
+  def partialCompare(a: Int, b: Int) =
+    if (a == b) 0.0
+    else if (b % a == 0) -1.0
+    else if (a % b == 0) 1.0
+    else Double.NaN
+}
+
+class PartialOrderSyntaxTest extends SpireProperties {
+
+  property("minimal elements of {2,3,6,9,12} are {2,3} under divisibility") {
+    Seq(2,3,6,9,12).pmin(IntDivisibility).toSet shouldBe Set(2,3)
+  }
+
+  property("maximal elements of {2,3,6,9,12} are {2,3} under divisibility") {
+    Seq(2,3,6,9,12).pmax(IntDivisibility).toSet shouldBe Set(9,12)
+  }
+
+  case class PosInt(x: Int)
+
+  implicit def ArbPosInt: Arbitrary[PosInt] =
+    Arbitrary(Gen.choose(1, 30).map(PosInt))
+
+  def isMinimal(seq: Seq[Int], i: Int): Boolean =
+    seq.forall(j => !(IntDivisibility.partialCompare(i, j) > 0))
+  def isMaximal(seq: Seq[Int], i: Int): Boolean =
+    seq.forall(j => !(IntDivisibility.partialCompare(i, j) < 0))
+
+  property("pmin") {
+    forAll { (posSeq: Seq[PosInt]) =>
+      val seq = posSeq.map(_.x)
+      val result = seq.pmin(IntDivisibility).toSet
+      result shouldBe Searching.minimalElements(seq)(IntDivisibility).toSet
+      result shouldBe seq.filter(i => isMinimal(seq, i)).toSet
     }
   }
 
-  test("With intDivisibility: Seq(2,3,6,9,12).pmin sameElements Seq(2,3)") {
-    Seq(2,3,6,9,12).pmin(intDivisibility).sameElements(Seq(2,3)) shouldBe true
+  property("pmax") {
+    forAll { (posSeq: Seq[PosInt]) =>
+      val seq = posSeq.map(_.x)
+      val result = seq.pmax(IntDivisibility).toSet
+      result shouldBe Searching.minimalElements(seq)(IntDivisibility.reverse).toSet
+      result shouldBe seq.filter(i => isMaximal(seq, i)).toSet
+    }
   }
-  test("With intDivisibility: Seq(2,3,6,9,12).pmax sameElements Seq(9,12)") {
-    Seq(2,3,6,9,12).pmax(intDivisibility).sameElements(Seq(9,12)) shouldBe true
-  }
-
-  case class PosInt(val x: Int)
-
-  implicit def ArbPosInt: Arbitrary[PosInt] = Arbitrary(Gen.choose(1, 30).map(PosInt))
-
-  test("pmin")(check(forAll { (posSeq: Seq[PosInt]) =>
-    val seq = posSeq.map(_.x)
-    def isMinimal(i: Int) = seq.forall(j => !(intDivisibility.partialCompare(i, j) > 0))
-    seq.pmin(intDivisibility).toSet === seq.filter(isMinimal).toSet
-  }))
-
-  test("pmax")(check(forAll { (posSeq: Seq[PosInt]) =>
-    val seq = posSeq.map(_.x)
-    def isMaximal(i: Int) = seq.forall(j => !(intDivisibility.partialCompare(i, j) < 0))
-    seq.pmax(intDivisibility).toSet === seq.filter(isMaximal).toSet
-  }))
 }
