@@ -183,7 +183,9 @@ class RationalTest extends FunSuite {
     assertResult(Rational(1, BigInt("4294967296"))) {
       a pow 32
     }
-
+    assertResult(Rational(2, 1)) {
+      a pow -1
+    }
     val b = Rational(-3, 1)
     assertResult(Rational.one) {
       b pow 0
@@ -197,6 +199,9 @@ class RationalTest extends FunSuite {
     val l = Rational(Long.MaxValue) * 2
     assertResult(Rational.one) {
       l pow 0
+    }
+    assertResult(l.reciprocal) {
+      l pow -1
     }
   }
 

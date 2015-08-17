@@ -84,6 +84,12 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
       case SafeLongBigInteger(n) => lhs ^ n
     }
 
+  def ===(that: SafeLong): Boolean =
+    this == that
+
+  def =!=(that: SafeLong): Boolean =
+    !(this === that)
+
   def +(rhs: Long): SafeLong
   def -(rhs: Long): SafeLong
   def *(rhs: Long): SafeLong
@@ -349,24 +355,18 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
   }
 
   def >>(n: Int): SafeLong =
-    if (n >= 64) (if (x >= 0) SafeLong.zero else SafeLong(-1))
+    if (n >= 64) (if (x >= 0) SafeLong.zero else SafeLong.minusOne)
     else if (n >= 0) SafeLongLong(x >> n)
     else if (n == Int.MinValue) throw new ArithmeticException(">> MinValue not supported")
     else this << -n
 
   override def equals(that: Any): Boolean =
     that match {
-      case that: SafeLongLong => this === that
+      case SafeLongLong(y) => x == y
       case SafeLongBigInteger(y) => false
       case that: BigInt => if (that.bitLength > 63) false else that.toLong == x
       case that => that == x
     }
-
-  def ===(that: SafeLongLong): Boolean =
-    x == that.x
-
-  def =!=(that: SafeLongLong): Boolean =
-    !(this === that)
 
   def abs: SafeLong =
     if (x >= 0) this
@@ -385,8 +385,6 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
   def intValue: Int = x.toInt
 
   def underlying: java.lang.Long = new java.lang.Long(x)
-
-  override def isValidInt: Boolean = Int.MinValue <= x && x <= Int.MaxValue
   def isValidLong: Boolean = true
   def getLong: Opt[Long] = Opt(x)
 
@@ -461,16 +459,10 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
   override def equals(that: Any): Boolean =
     that match {
       case SafeLongLong(y) => false
-      case that: SafeLongBigInteger => this === that
+      case SafeLongBigInteger(y) => x == y
       case that: BigInt => x equals that.bigInteger
       case that => that == BigInt(x)
     }
-
-  def ===(that: SafeLongBigInteger): Boolean =
-    x equals that.x
-
-  def =!=(that: SafeLongBigInteger): Boolean =
-    !(this === that)
 
   def abs: SafeLong =
     if (x.signum >= 0) this
@@ -486,11 +478,14 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
   def floatValue: Float = x.floatValue
   def longValue: Long = x.longValue
   def intValue: Int = x.intValue
+  override def isValidByte: Boolean = false
+  override def isValidShort: Boolean = false
+  override def isValidInt: Boolean = false
+  override def isValidLong: Boolean = false
+  override def isValidChar: Boolean = false
 
   def underlying: BigInt = BigInt(x)
 
-  override def isValidInt: Boolean = false
-  def isValidLong: Boolean = false
   def getLong: Opt[Long] = Opt.empty[Long]
 
   override def toLong: Long = x.longValue
