@@ -69,7 +69,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     BigDecimal(n.divide(d, mc))
   }
 
-  def toBigInt: BigInt
+  def toSafeLong: SafeLong
+  final def toBigInt: BigInt = toSafeLong.toBigInt
   override def shortValue: Short = longValue.toShort
   override def byteValue: Byte = longValue.toByte
 
@@ -111,13 +112,13 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
    *
    * @param max A positive integer.
    */
-  def limitTo(max: BigInt): Rational = if (this.signum < 0) {
+  def limitTo(max: SafeLong): Rational = if (this.signum < 0) {
     -((-this).limitTo(max))
   } else {
-    require(max > 0, "Limit must be a positive integer.")
+    require(max.signum > 0, "Limit must be a positive integer.")
 
     val half = max >> 1
-    val floor = this.toBigInt
+    val floor = SafeLong(this.toBigInt)
     if (floor >= max) {
       Rational(max)
     } else if (floor >= (max >> 1)) {
@@ -284,13 +285,13 @@ object Rational extends RationalInstances {
                 else (bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L)
     val exp = ((bits >> 52) & 0x7FF).toInt - 1075 // 1023 + 52
     if (exp > 10) {
-        apply(BigInt(value) << exp, BigInt(1))
+        apply(SafeLong(value) << exp, SafeLong.one)
     } else if (exp >= 0) {
       apply(value << exp, 1L)
     } else if (exp >= -52 && (~((-1L) << (-exp)) & value) == 0L) {
       apply(value >> (-exp), 1L)
     } else {
-      apply(BigInt(value), BigInt(1) << (-exp))
+      apply(SafeLong(value), SafeLong.one << (-exp))
     }
   }
 
@@ -418,7 +419,7 @@ object Rational extends RationalInstances {
 
     override def isValidLong: Boolean = isWhole
 
-    override def toBigInt: BigInt = BigInt(n / d)
+    override def toSafeLong: SafeLong = SafeLong(n / d)
 
     override def doubleValue: Double = Rational.toDouble(n, d)
 
@@ -726,7 +727,7 @@ object Rational extends RationalInstances {
 
     override def isValidLong: Boolean = false
 
-    override def toBigInt: BigInt = (n / d).toBigInt
+    override def toSafeLong: SafeLong = n / d
 
     override def doubleValue: Double = Rational.toDouble(n, d)
 
@@ -803,13 +804,13 @@ object Rational extends RationalInstances {
 
     def floor: Rational =
       if (isWhole) this
-      else if (n.signum >= 0) Rational(n / d, BigInt(1))
-      else Rational(n / d - 1, BigInt(1))
+      else if (n.signum >= 0) Rational(n / d, SafeLong.one)
+      else Rational(n / d - 1, SafeLong.one)
 
     def ceil: Rational =
       if (isWhole) this
-      else if (n.signum >= 0) Rational(n / d + 1, BigInt(1))
-      else Rational(n / d, BigInt(1))
+      else if (n.signum >= 0) Rational(n / d + 1, SafeLong.one)
+      else Rational(n / d, SafeLong.one)
 
     def round: Rational =
       if (n.signum >= 0) {
