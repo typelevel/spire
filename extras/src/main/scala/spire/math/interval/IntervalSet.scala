@@ -5,7 +5,6 @@ import java.util.Arrays
 import spire.algebra.{Bool, Eq, Order}
 import spire.math.{Rational, Interval}
 import scala.annotation.tailrec
-import scala.collection.{AbstractIterator, AbstractTraversable}
 import scala.reflect.ClassTag
 
 final class IntervalSet[T] private (
@@ -158,7 +157,8 @@ final class IntervalSet[T] private (
     }
   }
 
-  def intervals = new AbstractTraversable[Interval[T]] {
+  // todo: switch to AbstractTraversable once we no longer need to support scala 2.10
+  def intervals: Traversable[Interval[T]] = new Traversable[Interval[T]] {
     override def foreach[U](f: (Interval[T]) => U): Unit = foreachInterval(f)
   }
 
@@ -584,7 +584,8 @@ object IntervalSet {
     override def fromB(a: Boolean, b0: Int, b1: Int): Boolean = !a
   }
 
-  private final class IntervalIterator[T:Order](s: IntervalSet[T]) extends AbstractIterator[Interval[T]] {
+  // todo: switch to AbstractIterator once we no longer need to support 2.10
+  private final class IntervalIterator[T:Order](s: IntervalSet[T]) extends Iterator[Interval[T]] {
 
     private[this] val values = s.values
 
