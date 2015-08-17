@@ -69,7 +69,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     BigDecimal(n.divide(d, mc))
   }
 
-  def toBigInt: BigInt
+  def toSafeLong: SafeLong
+  final def toBigInt: BigInt = toSafeLong.toBigInt
   override def shortValue: Short = longValue.toShort
   override def byteValue: Byte = longValue.toByte
 
@@ -418,7 +419,7 @@ object Rational extends RationalInstances {
 
     override def isValidLong: Boolean = isWhole
 
-    override def toBigInt: BigInt = BigInt(n / d)
+    override def toSafeLong: SafeLong = SafeLong(n / d)
 
     override def doubleValue: Double = Rational.toDouble(n, d)
 
@@ -726,7 +727,7 @@ object Rational extends RationalInstances {
 
     override def isValidLong: Boolean = false
 
-    override def toBigInt: BigInt = (n / d).toBigInt
+    override def toSafeLong: SafeLong = n / d
 
     override def doubleValue: Double = Rational.toDouble(n, d)
 
