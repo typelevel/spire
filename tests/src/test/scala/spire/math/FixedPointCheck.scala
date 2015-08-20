@@ -1,6 +1,8 @@
 package spire.math
 
 import spire.implicits._
+import spire.laws.arb.rational
+
 import scala.util.Try
 
 import org.scalatest.Matchers
@@ -13,8 +15,6 @@ import Gen._
 import Arbitrary.arbitrary
 
 class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
-
-  import ArbitrarySupport._
 
   implicit val arbFixedScale: Arbitrary[FixedScale] =
     Arbitrary(arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale))

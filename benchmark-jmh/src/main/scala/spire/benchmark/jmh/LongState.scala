@@ -8,5 +8,5 @@ import scala.util.Random._
 class LongState extends StateSupport {
   var values: Array[Long] = _
   @Setup
-  def setup: Unit = values = init(size)(nextLong)
+  def setup(): Unit = values = init(size)(nextLong)
 }

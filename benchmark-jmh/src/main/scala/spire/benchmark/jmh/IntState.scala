@@ -8,5 +8,5 @@ import scala.util.Random._
 class IntState extends StateSupport {
   var values: Array[Int] = _
   @Setup
-  def setup: Unit = values = init(size)(nextInt)
+  def setup(): Unit = values = init(size)(nextInt)
 }

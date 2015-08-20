@@ -1,29 +1,31 @@
 package spire.laws
 
+import java.math.BigInteger
 import spire.algebra._
 import spire.algebra.free._
 import spire.algebra.lattice._
+import spire.laws.arb._
 import spire.math._
 import spire.optional.partialIterable._
 import spire.optional.mapIntIntPermutation._
+
 import spire.implicits.{
   SeqOrder => _, SeqEq => _,
   ArrayOrder => _, ArrayEq => _,
   MapEq => _, MapGroup => _,
   _ }
 
-import scala.{ specialized => spec }
+import scala.{specialized => sp}
 
 import org.typelevel.discipline.scalatest.Discipline
 
 import org.scalatest.FunSuite
 import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary._
 
 class LawTests extends FunSuite with Discipline {
 
-  import SpireArbitrary._
-
-  def fuzzyEq[@spec(Float,Double) A: Ring: Signed: Order](eps: A): Eq[A] = new Eq[A] {
+  def fuzzyEq[@sp(Float,Double) A: Ring: Signed: Order](eps: A): Eq[A] = new Eq[A] {
     def eqv(x: A, y: A): Boolean = {
       val delta = Order[A].max(x.abs, y.abs) * eps
       println("d = %f, (x - y).abs = %f" format (delta, (x - y).abs))
@@ -32,11 +34,12 @@ class LawTests extends FunSuite with Discipline {
   }
 
   // Float and Double fail these tests
-  checkAll("Int",      RingLaws[Int].euclideanRing)
-  checkAll("Long",     RingLaws[Long].euclideanRing)
-  checkAll("BigInt",   RingLaws[BigInt].euclideanRing)
-  checkAll("Rational", RingLaws[Rational].field)
-  checkAll("Real",     RingLaws[Real].field)
+  checkAll("Int",        RingLaws[Int].euclideanRing)
+  checkAll("Long",       RingLaws[Long].euclideanRing)
+  checkAll("BigInt",     RingLaws[BigInt].euclideanRing)
+  checkAll("BigInteger", RingLaws[BigInteger].euclideanRing)
+  checkAll("Rational",   RingLaws[Rational].field)
+  checkAll("Real",       RingLaws[Real].field)
 
   checkAll("Levenshtein distance", BaseLaws[String].metricSpace)
   checkAll("BigInt",               BaseLaws[BigInt].metricSpace)
@@ -56,7 +59,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Vector[Int]",      VectorSpaceLaws[Vector[Int], Int].module)
   checkAll("List[Rational]",   VectorSpaceLaws[List[Rational], Rational].vectorSpace)
   checkAll("Vector[Rational]", VectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
-  
+
   checkAll("Array[Int]",         VectorSpaceLaws[Array[Int], Int].module)
   checkAll("Array[VectorSpace]", VectorSpaceLaws[Array[Rational], Rational].vectorSpace)
 
@@ -112,7 +115,10 @@ class LawTests extends FunSuite with Discipline {
   }
 
   checkAll("Order[Int]", OrderLaws[Int].order)
+  checkAll("Order[BigInteger]", OrderLaws[BigInteger].order)
+  checkAll("Order[Unit]", OrderLaws[Unit].order)
+  checkAll("AbGroup[Unit]", GroupLaws[Unit].abGroup)
   checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 
-  checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbPerm.arbitrary.map(_.map)), implicitly, implicitly).groupPartialAction)
+  checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbitrary[Perm].map(_.map)), implicitly, implicitly).groupPartialAction)
 }

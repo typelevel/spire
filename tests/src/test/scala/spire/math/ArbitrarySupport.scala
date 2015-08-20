@@ -4,7 +4,6 @@ import spire.algebra._
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
-
 import org.scalacheck._
 import Arbitrary.arbitrary
 
@@ -73,92 +72,4 @@ object ArbitrarySupport {
     Arbitrary(arbitrary[A].map(-_.abs).filter(_.signum < 1).map(NonPositive(_)))
   implicit def nonNegative[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[NonNegative[A]] =
     Arbitrary(arbitrary[A].map(_.abs).filter(_.signum > -1).map(NonNegative(_)))
-
-  implicit val ubyte: Arbitrary[UByte] =
-    Arbitrary(arbitrary[Byte].map(n => UByte(n)))
-
-  implicit val ushort: Arbitrary[UShort] =
-    Arbitrary(arbitrary[Short].map(n => UShort(n)))
-
-  implicit val uint: Arbitrary[UInt] =
-    Arbitrary(arbitrary[Int].map(n => UInt(n)))
-
-  implicit val ulong: Arbitrary[ULong] =
-    Arbitrary(arbitrary[Long].map(n => ULong(n)))
-
-  implicit val natural: Arbitrary[Natural] =
-    Arbitrary(arbitrary[BigInt].map(n => Natural(n.abs)))
-
-  implicit val safeLong: Arbitrary[SafeLong] =
-    Arbitrary(arbitrary[BigInt].map(n => SafeLong(n)))
-
-  implicit val rational: Arbitrary[Rational] =
-    Arbitrary(for {
-      n <- arbitrary[Long]
-      d <- arbitrary[Long].map(n => if (n == 0) 1L else n)
-    } yield {
-      Rational(n, d)
-    })
-
-  case class Irrational(real: Real)
-
-  implicit val irrational: Arbitrary[Irrational] =
-    Arbitrary(for {
-      n <- arbitrary[Int]
-      b <- arbitrary[Byte]
-    } yield {
-      if (b == 0) Irrational(Real.zero)
-      else if (b < 0) Irrational(Real(-b).sqrt * Real(n))
-      else Irrational(Real(b).sqrt * Real(n))
-    })
-
-  // using irrationals is a bit too slow for now
-  // implicit val real: Arbitrary[Real] =
-  //   Arbitrary(arbitrary[Irrational].map(n => n.real))
-
-  implicit val real: Arbitrary[Real] =
-    Arbitrary(arbitrary[Rational].map(n => Real(n)))
-
-  implicit def complex[A: Arbitrary: Fractional: Signed: Trig]: Arbitrary[Complex[A]] =
-    Arbitrary(for {
-      re <- arbitrary[A]
-      im <- arbitrary[A]
-    } yield {
-      Complex(re, im)
-    })
-
-  implicit def quaternion[A: Arbitrary: Fractional: Signed: Trig]: Arbitrary[Quaternion[A]] =
-    Arbitrary(for {
-      r <- arbitrary[A]
-      i <- arbitrary[A]
-      j <- arbitrary[A]
-      k <- arbitrary[A]
-    } yield {
-      Quaternion(r, i, j, k)
-    })
-
-  case class Percentage(lhs: Int) {
-    def <(rhs: Int): Boolean = lhs < rhs
-  }
-
-  implicit val percentage: Arbitrary[Percentage] =
-    Arbitrary(Gen.choose(0, 99).map(Percentage))
-
-  implicit def interval[A: Arbitrary: Order: AdditiveMonoid]: Arbitrary[Interval[A]] = {
-    Arbitrary(for {
-      n <- arbitrary[Percentage]
-      lower <- arbitrary[A]
-      upper <- arbitrary[A]
-    } yield {
-      if (n < 5) Interval.all[A]
-      else if (n < 10) Interval.above(lower)
-      else if (n < 15) Interval.atOrAbove(lower)
-      else if (n < 20) Interval.below(upper)
-      else if (n < 25) Interval.atOrBelow(upper)
-      else if (n < 50) Interval.open(lower, upper)
-      else if (n < 60) Interval.openLower(lower, upper)
-      else if (n < 70) Interval.openUpper(lower, upper)
-      else Interval.closed(lower, upper)
-    })
-  }
 }

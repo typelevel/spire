@@ -8,5 +8,5 @@ import scala.util.Random._
 class FloatState extends StateSupport {
   var values: Array[Float] = _
   @Setup
-  def setup: Unit = values = init(size)(nextFloat)
+  def setup(): Unit = values = init(size)(nextFloat)
 }

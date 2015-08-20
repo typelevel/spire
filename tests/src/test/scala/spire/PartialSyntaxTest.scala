@@ -2,10 +2,13 @@ package spire
 
 import spire.algebra._
 import spire.algebra.partial._
+import spire.laws.arb._
+import spire.laws.Perm
 import spire.optional.partialIterable._
 import spire.optional.mapIntIntPermutation._
+import spire.std.boolean._
 import spire.std.int._
-import spire.util._
+import spire.syntax.eq._
 
 import org.scalatest.{FunSuite, Matchers, NonImplicitAssertions}
 import org.scalatest.prop.Checkers
@@ -14,13 +17,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 
-import spire.syntax.eq._
-import spire.syntax.cfor._
-import spire.std.boolean._
-
 class PartialSyntaxTest extends FunSuite with Checkers with BaseSyntaxTest with NonImplicitAssertions {
-
-  import laws.SpireArbitrary._
 
   implicit val IntGroup: Group[Int] = implicitly[AdditiveGroup[Int]].additive
   implicit val SeqIntEq: Eq[Seq[Int]] = spire.optional.genericEq.generic[Seq[Int]]

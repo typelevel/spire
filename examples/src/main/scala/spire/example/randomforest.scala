@@ -134,7 +134,7 @@ trait RandomForest[V, @spec(Double) F, @spec(Double) K] {
     }
 
     // Randomly samples `n` points with replacement from `data`. Note that our
-    // sample is actually an array of indices. 
+    // sample is actually an array of indices.
 
     def sample(): Array[Int] = {
       val sample = new Array[Int](opts.numPointsSample)

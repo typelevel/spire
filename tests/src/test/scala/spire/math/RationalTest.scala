@@ -27,11 +27,11 @@ class RationalTest extends FunSuite {
       Rational("x")
     }
   }
-  
+
   test("RationalIsFractional implicit exists") {
     import spire.implicits._
     def doStuff[NT:Fractional](a: NT, b: NT):NT = a / b
-  
+
     assertResult(Rational(1, 2)) {
       doStuff(Rational(1), Rational(2))
     }
@@ -42,12 +42,12 @@ class RationalTest extends FunSuite {
     val b = Rational(8, 16)
     assert(a === b)
   }
-  
+
   test("non-equivalent rationals are not equal") {
     val a = Rational(1, 2)
     val b = Rational(1, 3)
     val c = Rational(2, 1)
-    
+
     assertResult(false)(a == b)
     assertResult(false)(a == c)
   }
@@ -78,30 +78,30 @@ class RationalTest extends FunSuite {
     assert(c === 0.125f)
     assert(0.125f === c)
   }
-  
+
   test("addition") {
     val a = Rational(3, 10)
     val b = Rational(4, 19)
-  
+
     // This will go through the coprime denominator path.
     // Since, 97 and 190 are coprime, 97/190 is canonical too.
     assertResult(Rational(97, 190)) {
       a + b
     }
-  
+
     val c = Rational(1, 2)
     val d = Rational(1, 6)
-  
+
     // This will go through the non-coprime denominator path. Since the
     // GCD of 2 and 6 is 2, the numerator 1 * 3 + 1 * 1 = 4 is tried first.
     // The GCD of 4 and 2 is 2, so the numerator will need to be reduced.
     assertResult(Rational(1 * 6 + 1 * 2, 2 * 6)) {
       c + d
     }
-  
+
     val e = Rational(1, 2)
     val f = Rational(3, 4)
-    
+
     // This will go through the non-coprime denominator path. Since the
     // GCD of 2 and 4 is 2, the numerator 5 is tried first, which is
     // coprime with 2, so the numerator need not be reduced.
@@ -109,7 +109,7 @@ class RationalTest extends FunSuite {
       e + f
     }
   }
-  
+
   test("subtraction") {
     // Just ripped from addition
     val a = Rational(3, 10)
@@ -117,58 +117,58 @@ class RationalTest extends FunSuite {
     assertResult(Rational(3 * 19 - 4 * 10, 10 * 19)) {
       a - b
     }
-  
+
     val c = Rational(1, 2)
     val d = Rational(1, 6)
     assertResult(Rational(1 * 6 - 1 * 2, 2 * 6)) {
       c - d
     }
-  
+
     val e = Rational(1, 2)
     val f = Rational(3, 4)
     assertResult(Rational(1 * 4 - 3 * 2, 2 * 4)) {
       e - f
     }
   }
-  
+
   test("multiplication") {
     val a = Rational(2, 3)
     val b = Rational(1, 2)
     assertResult(Rational(1, 3)) {
       a * b
     }
-  
+
     val c = Rational(-321, 23)
     val d = Rational(23, 13)
     assertResult(Rational(-321 * 23, 23 * 13)) {
       c * d
     }
-  
+
     val e = Rational(-1, 2)
     assertResult(Rational(1, 4)) {
       e * e
     }
   }
-  
+
   test("division") {
     val a = Rational(2, 3)
     val b = Rational(1, 2)
     assertResult(Rational(4, 3)) {
       a / b
     }
-  
+
     val c = Rational(-21, 5)
     val d = Rational(7, 18)
     assertResult(Rational(-54, 5)) {
       c / d
     }
-  
+
     val e = Rational(-23, 19)
     assertResult(Rational.one) {
       e / e
     }
   }
-  
+
   test("division by 0") {
     intercept[ArithmeticException] {
       Rational.one / 0
@@ -177,13 +177,15 @@ class RationalTest extends FunSuite {
       Rational.zero.reciprocal
     }
   }
-  
+
   test("pow") {
     val a = Rational(1, 2)
     assertResult(Rational(1, BigInt("4294967296"))) {
       a pow 32
     }
-    
+    assertResult(Rational(2, 1)) {
+      a pow -1
+    }
     val b = Rational(-3, 1)
     assertResult(Rational.one) {
       b pow 0
@@ -198,8 +200,11 @@ class RationalTest extends FunSuite {
     assertResult(Rational.one) {
       l pow 0
     }
+    assertResult(l.reciprocal) {
+      l pow -1
+    }
   }
-  
+
     test("longValue") { assert(Rational("5000000000").toLong === 5000000000L) }
     test("intValue") {
         assert(Rational(3).toInt === 3)
@@ -227,34 +232,34 @@ class RationalTest extends FunSuite {
     assert(Rational(1, -2).toString === "-1/2")
     assert(Rational(2, 4).toString === "1/2")
   }
-  
+
   test("hashCode is the same for equivalent rats") {
     assert(Rational(1, 2).hashCode === Rational(2, 4).hashCode)
     assert(Rational(0).hashCode === Rational(0, 5).hashCode)
     assert(Rational(-1, 2).hashCode === Rational(1, -2).hashCode)
   }
-  
+
   test("reverse primitive equality") {
     assert(1 == Rational.one)
     //assert(-23L == Rational(-23L, 1L))
   }
-  
+
   test("limiting 0 to any number returns 0") {
     assert(Rational.zero.limitDenominatorTo(1234) === Rational.zero)
     assert(Rational.zero.limitDenominatorTo(1) === Rational.zero)
     assert(Rational.zero.limitTo(23) === Rational.zero)
   }
-  
+
   test("limiting to non-positive number throws exception") {
     intercept[IllegalArgumentException] {
       val a = Rational(123, 456).limitDenominatorTo(-1)
     }
-    
+
     intercept[IllegalArgumentException] {
       val a = Rational(123, 456).limitTo(-1)
     }
   }
-  
+
   /**
    * Finds the closest `Rational` to `a` whose denominator is no greater than
    * `limit` by brute-force. This is used to compare with the version used by
@@ -286,18 +291,18 @@ class RationalTest extends FunSuite {
       //})
     }
   }
-  
+
   test("limit large number to small number returns small number") {
     assert(Rational(1231, 2).limitTo(12) === Rational(12))
     assert(Rational(-321, 3).limitTo(7) === Rational(-7))
   }
-  
+
   test("limitToInt makes rationals fit in Ints") {
     val rng = new Random(2919234)
     val rationals = List.fill(100)(Rational(BigInt(128, rng), BigInt(128, rng).abs + 1))
     rationals foreach { a =>
       val b = a.limitToInt
-      assert(b.numerator.isValidInt && b.denominator.isValidInt, 
+      assert(b.numerator.isValidInt && b.denominator.isValidInt,
         "%s (from %s) doesn't fit in Ints" format (b.toString, a.toString))
     }
   }
@@ -307,10 +312,21 @@ class RationalTest extends FunSuite {
     assert(Rational(11, 12).gcd(Rational(43, 22)) === Rational(1, 132))
     assert(Rational(-1, 2).gcd(Rational(1, 3)) === Rational(1, 6))
     assert(Rational(11, 12).gcd(Rational(-43, 22)) === Rational(1, 132))
+    assert(Rational(11, 12).gcd(Rational(-43, 22)) === Rational(1, 132))
     val x = Rational("1234123412341234/87658765876587658764")
     val y = Rational("1919191919191919191919/373737373737373737")
     val z = Rational("1/287380324068203382157064120376241062")
     assert(x.gcd(y) === z) // As confirmed by Wolfram Alpha
+    // test gcd special cases (0 and 1)
+    for(w ← Seq(Rational(Int.MaxValue), Rational(BigInt(2).pow(100)))) {
+      val n = -w
+      assert(Rational.zero.gcd(w) === w)
+      assert(w.gcd(Rational.zero) === w)
+      assert(Rational.zero.gcd(n) === w)
+      assert(n.gcd(Rational.zero) === w)
+      assert(Rational.one.gcd(w) === Rational.one)
+      assert(w.gcd(Rational.one) === Rational.one)
+    }
   }
 
   test("Rational(0D) is Zero") {

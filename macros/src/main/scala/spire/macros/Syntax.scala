@@ -41,12 +41,6 @@ object Ops extends machinist.Ops {
       (uesc('⊻'), "xor"),
       (uesc('⊼'), "nand"),
       (uesc('⊽'), "nor"))
-
-  def unopWithEv2[Ev1, R](c: Context)(ev1: c.Expr[Ev1]): c.Expr[R] = {
-    import c.universe._
-    val (ev, lhs) = unpack(c)
-    c.Expr[R](Apply(Apply(Select(ev, findMethodName(c)), List(lhs)), List(ev1.tree)))
-  }
 }
 
 case class SyntaxUtil[C <: Context with Singleton](val c: C) {
@@ -104,7 +98,7 @@ class InlineUtil[C <: Context with Singleton](val c: C) {
           params.zip(args).foldLeft(body) { case (b, (param, arg)) =>
             inlineSymbol(param.symbol, b, arg)
           }
-          
+
         case Apply(Function(params, body), args) =>
           params.zip(args).foldLeft(body) { case (b, (param, arg)) =>
             inlineSymbol(param.symbol, b, arg)
@@ -134,7 +128,7 @@ object Syntax {
      * If our arguments are all "clean" (anonymous functions or simple
      * identifiers) then we can go ahead and just inline them directly
      * into a while loop.
-     * 
+     *
      * If one or more of our arguments are "dirty" (something more
      * complex than an anonymous function or simple identifier) then
      * we will go ahead and bind each argument to a val just to be

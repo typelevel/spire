@@ -7,7 +7,7 @@ import Random._
 import spire.math._
 import spire.implicits._
 
-import com.google.caliper.Runner 
+import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
@@ -49,13 +49,13 @@ class RatComparisonBenchmarks extends MyBenchmark {
   }
 
   def spireToAp(r:Rational) = new Aprational(
-    new Apint(r.numerator.bigInteger),
-    new Apint(r.denominator.bigInteger)
+    new Apint(r.numerator.toBigInt.bigInteger),
+    new Apint(r.denominator.toBigInt.bigInteger)
   )
 
   def spireToJsci(r:Rational) = number.Rational.valueOf(
-    number.LargeInteger.valueOf(r.numerator.bigInteger),
-    number.LargeInteger.valueOf(r.denominator.bigInteger)
+    number.LargeInteger.valueOf(r.numerator.toBigInt.bigInteger),
+    number.LargeInteger.valueOf(r.denominator.toBigInt.bigInteger)
   )
 
   // this is slow... it probably takes as long as one full run of the benchmark
@@ -75,7 +75,7 @@ class RatComparisonBenchmarks extends MyBenchmark {
       val a = aps(i)
       val j = jscis(i)
 
-      // compare r and a 
+      // compare r and a
       if (spireToAp(r) != a)
         sys.error("items %s and %s differ" format (r, a))
       if (spireToJsci(r) != j)
@@ -138,7 +138,7 @@ class RatComparisonBenchmarks extends MyBenchmark {
     while (i < len) { total += spires(i); i += 1 }
     total
   }
-  
+
   def timeSumAp(reps:Int) = run(reps) {
     val len = size
     var total = new Aprational(new Apint(0), new Apint(1))
