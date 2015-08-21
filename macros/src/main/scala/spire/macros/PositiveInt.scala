@@ -16,11 +16,11 @@ object PositiveInt {
 
     val tree = n.tree match {
       case Literal(Constant(x: Int)) if x > 0 =>
-        q"_root_.spire.math.PositiveInt($n)"
+        q"_root_.spire.macros.PositiveInt($n)"
       case Literal(Constant(x: Int)) =>
         c.abort(c.enclosingPosition, s"$x <= 0")
       case _ => 
-        q"_root_.spire.math.PositiveInt($n)"
+        q"_root_.spire.macros.PositiveInt($n)"
     }
     c.Expr(tree)
   }
