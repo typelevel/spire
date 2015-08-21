@@ -1,5 +1,7 @@
 package spire.syntax
 
+import spire.algebra.{Field, Ring}
+
 import scala.{specialized => spec}
 
 import spire.math.{Polynomial, Rational, UByte, UShort, UInt, ULong}
@@ -59,4 +61,14 @@ class EuLiterals(s:StringContext) {
   def j():Long = macro Macros.euLong
   def big():BigInt = macro Macros.euBigInt
   def dec():BigDecimal = macro Macros.euBigDecimal
+}
+
+object primitives {
+  implicit class IntAs(val n:Int) extends AnyVal {
+    def as[A](implicit ev:Ring[A]) = ev.fromInt(n)
+  }
+
+  implicit class DoubleAs(val n:Double) extends AnyVal {
+    def as[A](implicit ev:Field[A]) = ev.fromDouble(n)
+  }
 }
