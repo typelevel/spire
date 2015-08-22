@@ -1,5 +1,6 @@
 package spire.macros
 
+import spire.algebra.{Field, Ring}
 import spire.macros.compat.Context
 import spire.math.{Rational, UByte, UShort, UInt, ULong}
 
@@ -173,5 +174,23 @@ object Macros {
     val n = java.lang.Integer.parseInt(s, base)
 
     c.Expr[Int](Literal(Constant(n)))
+  }
+
+  def intAs[A : c.WeakTypeTag](c:Context)(ev : c.Expr[Ring[A]]):c.Tree = {
+    import c.universe._
+    c.prefix.tree match {
+      case Apply((_, List(Literal(Constant(0))))) => q"$ev.zero"
+      case Apply((_, List(Literal(Constant(1))))) => q"$ev.one"
+      case Apply((_, List(n))) => q"$ev.fromInt($n)"
+    }
+  }
+
+  def dblAs[A : c.WeakTypeTag](c:Context)(ev : c.Expr[Field[A]]):c.Tree = {
+    import c.universe._
+    c.prefix.tree match {
+      case Apply((_, List(Literal(Constant(0.0))))) => q"$ev.zero"
+      case Apply((_, List(Literal(Constant(1.0))))) => q"$ev.one"
+      case Apply((_, List(n))) => q"$ev.fromDouble($n)"
+    }
   }
 }
