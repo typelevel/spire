@@ -64,11 +64,11 @@ class EuLiterals(s:StringContext) {
 }
 
 object primitives {
-  implicit class IntAs(val n:Int) extends AnyVal {
+  implicit class IntAs(n:Int) {
     def as[A](implicit ev:Ring[A]):A = macro Macros.intAs[A]
   }
 
-  implicit class DoubleAs(val n:Double) extends AnyVal {
+  implicit class DoubleAs(n:Double) {
     def as[A](implicit ev:Field[A]):A = macro Macros.dblAs[A]
   }
 }
