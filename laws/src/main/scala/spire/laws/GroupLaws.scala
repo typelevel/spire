@@ -88,10 +88,10 @@ trait GroupLaws[A] extends Laws {
       A.sumn(a, 2) === (a + a)
     ),
     "sumOption" → forAll((a: A) =>
-      (A.sumOption(Seq.empty[A]) === None) &&
-      (A.sumOption(Seq(a)) === Some(a)) &&
-      (A.sumOption(Seq(a, a)) === Some(a + a)) &&
-      (A.sumOption(Seq(a, a, a)) === Some(a + a + a))
+      (A.sumOption(Seq.empty[A]) === Option.empty[A]) &&
+      (A.sumOption(Seq(a)) === Option(a)) &&
+      (A.sumOption(Seq(a, a)) === Option(a + a)) &&
+      (A.sumOption(Seq(a, a, a)) === Option(a + a + a))
     )
   )
 
