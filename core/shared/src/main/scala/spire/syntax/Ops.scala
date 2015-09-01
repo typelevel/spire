@@ -8,8 +8,8 @@ import spire.math.{BitString, ConvertableTo, ConvertableFrom, Interval, Rational
 import spire.util.Opt
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
-  def ===(rhs:A): Boolean = macro Ops.binop[A, Boolean]
-  def =!=(rhs:A): Boolean = macro Ops.binop[A, Boolean]
+  def ===[B](rhs:B)(implicit ev: B =:= A): Boolean = macro Ops.eqv[A, B]
+  def =!=[B](rhs:B)(implicit ev: B =:= A): Boolean = macro Ops.neqv[A, B]
 }
 
 final class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A]) {

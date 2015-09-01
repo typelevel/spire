@@ -1,5 +1,7 @@
 package spire.math
 
+import spire.math.ArbitrarySupport.{Positive, NonNegative}
+
 import scala.util.Try
 
 import org.scalatest.FunSuite
@@ -399,28 +401,28 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     import spire.optional.intervalGeometricPartialOrder._
 
     import spire.algebra.{Order, PartialOrder}
-    forAll { (a: Rational, b: Rational) =>
-      whenever(a < b) {
-        val i = Interval.atOrBelow(a)
-        val j = Interval.atOrAbove(b)
-        (i < j) shouldBe true
-        (i >= j) shouldBe false
-        (j > i) shouldBe true
-        (j <= i) shouldBe false
-      }
+    forAll { (a: Rational, w: Positive[Rational]) =>
+      val b = a + w.num
+      // a < b
+      val i = Interval.atOrBelow(a)
+      val j = Interval.atOrAbove(b)
+      (i < j) shouldBe true
+      (i >= j) shouldBe false
+      (j > i) shouldBe true
+      (j <= i) shouldBe false
     }
   }
 
   property("(-inf, a] does not compare to [b, inf) if a >= b") {
     import spire.optional.intervalGeometricPartialOrder._
     import spire.algebra.{Order, PartialOrder}
-    forAll { (a: Rational, b: Rational) =>
-      whenever(a >= b) {
-        val i = Interval.atOrBelow(a)
-        val j = Interval.atOrAbove(b)
-        i.partialCompare(j).isNaN shouldBe true
-        j.partialCompare(i).isNaN shouldBe true
-      }
+    forAll { (a: Rational, w: NonNegative[Rational]) =>
+      val b = a - w.num
+      // a >= b
+      val i = Interval.atOrBelow(a)
+      val j = Interval.atOrAbove(b)
+      i.partialCompare(j).isNaN shouldBe true
+      j.partialCompare(i).isNaN shouldBe true
     }
   }
 
