@@ -9,7 +9,7 @@ case class PositiveInt(value: Int) {
 }
 
 object PositiveInt {
-  implicit def wrapConstantInt(n: Int): PositiveInt = macro verifyPositiveInt
+  def buildPositiveInt(n: Int): PositiveInt = macro verifyPositiveInt
 
   def verifyPositiveInt(c: Context)(n: c.Expr[Int]): c.Expr[PositiveInt] = {
     import c.universe._
