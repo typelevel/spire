@@ -9,7 +9,7 @@ case class PositiveInt private[spire] (value: Int) {
 }
 
 object PositiveInt {
-  def buildPositiveInt(n: Int): PositiveInt = macro verifyPositiveInt
+  def build(n: Int): PositiveInt = macro verifyPositiveInt
 
   def verifyPositiveInt(c: Context)(n: c.Expr[Int]): c.Expr[PositiveInt] = {
     import c.universe._
