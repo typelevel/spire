@@ -319,7 +319,7 @@ lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types", "Generates se
 lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.12.4" % "test")
 
 lazy val scalaTestSettings = Seq(
-  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.0-M7" % "test",
+  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.0-M8" % "test",
   libraryDependencies += "com.chuusai" %% "shapeless" % "2.2.5" % "test"
 )
 

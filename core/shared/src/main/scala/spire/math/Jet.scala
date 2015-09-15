@@ -11,12 +11,14 @@ import spire.syntax.isReal._
 import spire.syntax.nroot._
 import spire.syntax.vectorSpace._
 
+import spire.macros.PositiveInt
+
 /**
  * Used to implicitly define the dimensionality of the Jet space.
  * @param dimension the number of dimensions.
  */
-case class JetDim(dimension: Int) {
-  require(dimension > 0)
+case class JetDim(dimension: PositiveInt) {
+  require(dimension.value > 0)
 }
 
 // scalastyle:off regex
@@ -147,12 +149,12 @@ object Jet extends JetInstances {
 
   // From real.
   def apply[@sp(Float, Double) T](real: T)(implicit c: ClassTag[T], d: JetDim, s: Semiring[T])
-      : Jet[T] = new Jet(real, Array.fill[T](d.dimension)(s.zero))
+      : Jet[T] = new Jet(real, Array.fill[T](d.dimension.value)(s.zero))
 
   // From real, to compute k-th partial derivative.
   def apply[@sp(Float, Double) T](a: T, k: Int)(implicit c: ClassTag[T], d: JetDim, r: Rig[T])
       : Jet[T] = {
-    val v = Array.fill[T](d.dimension)(r.zero)
+    val v = Array.fill[T](d.dimension.value)(r.zero)
     v(k) = r.one
     new Jet(a, v)
   }
@@ -177,11 +179,11 @@ object Jet extends JetInstances {
   }
 
   implicit def floatToJet(n: Float)(implicit d: JetDim): Jet[Float] = {
-    new Jet(n.toFloat, Array.fill[Float](d.dimension)(0.0f))
+    new Jet(n.toFloat, Array.fill[Float](d.dimension.value)(0.0f))
   }
 
   implicit def doubleToJet(n: Double)(implicit d: JetDim): Jet[Double] = {
-    new Jet(n, Array.fill[Double](d.dimension)(0.0))
+    new Jet(n, Array.fill[Double](d.dimension.value)(0.0))
   }
 
   implicit def bigIntToJet(n: BigInt)(implicit d: JetDim): Jet[BigDecimal] = {
@@ -190,7 +192,7 @@ object Jet extends JetInstances {
 
   implicit def bigDecimalToJet(n: BigDecimal)(implicit d: JetDim): Jet[BigDecimal] = {
     implicit val mc = n.mc
-    new Jet(n, Array.fill[BigDecimal](d.dimension)(0.0))
+    new Jet(n, Array.fill[BigDecimal](d.dimension.value)(0.0))
   }
 }
 
@@ -199,9 +201,11 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   extends ScalaNumber with ScalaNumericConversions with Serializable { lhs =>
 
   import spire.syntax.order._
+  import spire.macros.PositiveInt
 
   def dimension: Int = infinitesimal.size
-  implicit def jetDimension: JetDim = JetDim(dimension)
+
+  implicit def jetDimension: JetDim = JetDim(PositiveInt(dimension))
 
   /**
    * This is consistent with abs
