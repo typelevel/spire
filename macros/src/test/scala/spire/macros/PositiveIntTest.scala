@@ -18,24 +18,19 @@ class PositiveIntTest extends FunSuite with Matchers {
   val positiveInteger: Gen[Int] = posNum[Int]
   val negativeInteger: Gen[Int] = negNum[Int]
 
-  private def throwsUponCall[A, E](f: Function0[A]): Boolean = {
+  private def throwsUponCall[A](f: Function0[A]): Boolean = {
     try {
       f.apply
       false
     }
     catch {
-      case _: E => true
-      case _    => false
+      case _: IllegalArgumentException => true
+      case _                          => false
     }
   }
 
   val shallThrowWithNegNumInCaseClassApply: Prop =
-    forAll(negativeInteger) { i: Int => throwsUponCall( () =>  PositiveInt(i) ) }
-
-  val shallNotCompileWithNegConstNumInBuildMethod: Prop =
-    forAll(negativeInteger) {
-      i: Int => s"import spire.macros.PositiveInt; PositiveInt.build(${i}})".shouldNot(compile)
-    }
+    forAll(negativeInteger) { i: Int => throwsUponCall[PositiveInt]( () =>  PositiveInt(i) ) }
 
   val shallReturnPositiveIntForPositiveIntConst: Prop =
     forAll(positiveInteger) {
@@ -43,11 +38,17 @@ class PositiveIntTest extends FunSuite with Matchers {
     }
 
   shallThrowWithNegNumInCaseClassApply.check
-  shallNotCompileWithNegConstNumInBuildMethod.check
   shallReturnPositiveIntForPositiveIntConst.check
 
+  test("Constructing with its companion method, 'build', should fail to compile with a negative numbers.") {
+    "import spire.macros.PositiveInt; PositiveInt.build(-55)".shouldNot(compile)
+    "import spire.macros.PositiveInt; PositiveInt.build(-1)".shouldNot(compile)
+    "import spire.macros.PositiveInt; PositiveInt.build(-9999)".shouldNot(compile)
+    "import spire.macros.PositiveInt; PositiveInt.build(-1234)".shouldNot(compile)
+  }
+
   test("Constructing a `PositiveInt` via its case class with a (0 :Int) should throw") {
-    assert( throwsUponCall( () => PositiveInt(0) ) )
+    assert( throwsUponCall[PositiveInt]( () => PositiveInt(0) ) )
   }
 
 }
