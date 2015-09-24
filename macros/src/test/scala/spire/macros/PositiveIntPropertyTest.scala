@@ -1,31 +1,23 @@
 package spire.macros
 
+import org.scalatest._
+import org.scalatest.prop.PropertyChecks
+
 import org.scalacheck.{Gen, Properties}
 import org.scalacheck.Gen._
 import org.scalacheck.Prop.forAll
 
-class PositiveIntPropertyTest extends Properties("PositiveInt")  {
+class PositiveIntPropertyTest extends FunSuite with PropertyChecks with Matchers {
 
-  val positiveInteger: Gen[Int] = posNum[Int]
-  val negativeInteger: Gen[Int] = negNum[Int]
-
-  private def throwsUponCall[A](f: Function0[A]): Boolean = {
-    try {
-      f.apply
-      false
-    }
-    catch {
-      case _: IllegalArgumentException => true
-      case _                          => false
+  test("throws exception on negative integers") {
+    forAll(negNum[Int]) { (i: Int) =>
+      an [IllegalArgumentException] should be thrownBy { PositiveInt(i) }
     }
   }
 
-  property("shallThrowWithNegNumInCaseClassApply") =
-    forAll(negativeInteger) { i: Int => throwsUponCall[PositiveInt](() => PositiveInt(i)) }
-
-  property("shallThrowWithNegNumInCaseClassApply") =
-    forAll(positiveInteger) {
-      i: Int => PositiveInt.build(i) == PositiveInt(i)
+  test("successfully built with positive integers ") {
+    forAll(posNum[Int]) { (i: Int) =>
+      PositiveInt(i).value shouldBe i
     }
-
+  }
 }

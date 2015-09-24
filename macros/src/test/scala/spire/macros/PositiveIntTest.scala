@@ -9,18 +9,29 @@ import org.scalatest._
  * values that are > 0.
  */
 class PositiveIntTest extends FunSuite with Matchers {
-
-  test("Constructing with its companion method, 'build', should fail to compile with a negative numbers.") {
-    "import spire.macros.PositiveInt; PositiveInt.build(-55)".shouldNot(compile)
-    "import spire.macros.PositiveInt; PositiveInt.build(-1)".shouldNot(compile)
-    "import spire.macros.PositiveInt; PositiveInt.build(-9999)".shouldNot(compile)
-    "import spire.macros.PositiveInt; PositiveInt.build(-1234)".shouldNot(compile)
+  test("PositiveInt(n) does not compile for literal n <= 0") {
+    "PositiveInt(0)" shouldNot compile
+    "PositiveInt(-1)" shouldNot compile
+    "PositiveInt(-123421)" shouldNot compile
+    "PositiveInt(Int.MinValue)" shouldNot compile
   }
 
-  test("Constructing a `PositiveInt` via its case class with a (0 :Int) should throw") {
-    intercept[IllegalArgumentException] {
-      PositiveInt(0)
-    }
+  test("PositiveInt(n) works for n > 0") {
+    PositiveInt(1).value shouldBe 1
+    PositiveInt(1234321).value shouldBe 1234321
+    PositiveInt(Int.MaxValue).value shouldBe Int.MaxValue
   }
 
+  test("PositiveInt.check(n) throws IllegalArgumentException for n <= 0") {
+    an [IllegalArgumentException] should be thrownBy { PositiveInt.check(0) }
+    an [IllegalArgumentException] should be thrownBy { PositiveInt.check(-1) }
+    an [IllegalArgumentException] should be thrownBy { PositiveInt.check(-1234321) }
+    an [IllegalArgumentException] should be thrownBy { PositiveInt.check(Int.MinValue) }
+  }
+
+  test("PositiveInt.check(n) works for n > 0") {
+    PositiveInt.check(1).value shouldBe 1
+    PositiveInt.check(1234321).value shouldBe 1234321
+    PositiveInt.check(Int.MaxValue).value shouldBe Int.MaxValue
+  }
 }
