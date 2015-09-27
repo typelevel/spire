@@ -61,8 +61,8 @@ trait VectorSpaceLaws[V, A] extends Laws {
     vl = _.emptyRuleSet,
     parents = Seq.empty,
     "identity" → forAll((x: V, y: V) =>
-      if (x === y) V.distance(x, y) === AdditiveMonoid[A].zero
-      else V.distance(x, y) =!= AdditiveMonoid[A].zero
+      if (x === y) V.distance(x, y) === A.zero
+      else V.distance(x, y) =!= A.zero
     ),
     "symmetric" → forAll((x: V, y: V) =>
       V.distance(x, y) === V.distance(y, x)
