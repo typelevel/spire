@@ -119,7 +119,7 @@ trait FloatOrder extends Order[Float] {
 
 trait FloatIsReal extends IsRational[Float] with FloatOrder with FloatIsSigned {
   def toDouble(x: Float): Double = x.toDouble
-  def ceil(a:Float): Float = Math.floor(a).toFloat
+  def ceil(a:Float): Float = Math.ceil(a).toFloat
   def floor(a:Float): Float = Math.floor(a).toFloat
   def round(a:Float): Float = spire.math.round(a)
   def isWhole(a:Float): Boolean = a % 1.0 == 0.0

@@ -55,14 +55,14 @@ trait VectorSpaceLaws[V, A] extends Laws {
     parents = Seq(module)
   )
 
-  def metricSpace(implicit V: MetricSpace[V, A], o: Order[A], A: Rng[A]) = new SpaceProperties(
+  def metricSpace(implicit V: MetricSpace[V, A], o: Order[A], A: AdditiveMonoid[A]) = new SpaceProperties(
     name = "metric space",
     sl = _.emptyRuleSet,
     vl = _.emptyRuleSet,
     parents = Seq.empty,
     "identity" → forAll((x: V, y: V) =>
-      if (x === y) V.distance(x, y) === Rng[A].zero
-      else V.distance(x, y) =!= Rng[A].zero
+      if (x === y) V.distance(x, y) === A.zero
+      else V.distance(x, y) =!= A.zero
     ),
     "symmetric" → forAll((x: V, y: V) =>
       V.distance(x, y) === V.distance(y, x)

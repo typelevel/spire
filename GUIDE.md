@@ -216,7 +216,7 @@ Instances of `Order[A]` are required to observe the following
 properties:
 
  * if `a <= b` and `b <= a` then `a === b` (*anti-symmetry*)
- * if `a <= b` and `b <= c` then `a <= b` (*transitivity*)
+ * if `a <= b` and `b <= c` then `a <= c` (*transitivity*)
  * either `a <= b` or `b <= a` (*totality*)
 
 Additionally, total orderings across fields should obey the following
