@@ -1,19 +1,22 @@
-package spire.math.interval
+package spire.math.extras.interval
 
-import language.implicitConversions
 import java.util.Arrays
+
 import spire.algebra.{Bool, Eq, Order}
-import spire.math.{Rational, Interval}
+import spire.math.interval._
+import spire.math.{Interval, Rational}
+
 import scala.annotation.tailrec
+import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
-final class IntervalSet[T] private (
+final class IntervalSeq[T] private (
     val belowAll: Boolean,
     private val values: Array[T],
     private val kinds: Array[Byte],
-    private implicit val order: Order[T]) { lhs =>
+    private implicit val order: Order[T]) extends IntervalSet[T, IntervalSeq[T]] { lhs =>
 
-  import IntervalSet._
+  import IntervalSeq._
 
   private def binarySearch(key: T): Int = {
     var low = 0
@@ -74,22 +77,22 @@ final class IntervalSet[T] private (
 
   def aboveAll = if (values.isEmpty) belowAll else valueAbove(kinds.last)
 
-  def unary_~ :IntervalSet[T] = copy(belowAll = !belowAll, kinds = negateKinds(kinds))
+  def unary_~ :IntervalSeq[T] = copy(belowAll = !belowAll, kinds = negateKinds(kinds))
 
-  def |(rhs:IntervalSet[T]) = new Or[T](lhs, rhs).result
+  def |(rhs:IntervalSeq[T]) = new Or[T](lhs, rhs).result
 
-  def &(rhs:IntervalSet[T]) = new And[T](lhs, rhs).result
+  def &(rhs:IntervalSeq[T]) = new And[T](lhs, rhs).result
 
-  def ^(rhs:IntervalSet[T]) = new Xor[T](lhs, rhs).result
+  def ^(rhs:IntervalSeq[T]) = new Xor[T](lhs, rhs).result
 
-  def intersects(rhs: IntervalSet[T]): Boolean = !new Disjoint[T](lhs, rhs).result
+  def intersects(rhs: IntervalSeq[T]): Boolean = !new Disjoint[T](lhs, rhs).result
 
-  def isSupersetOf(rhs: IntervalSet[T]): Boolean = new IsSupersetOf[T](lhs, rhs).result
+  def isSupersetOf(rhs: IntervalSeq[T]): Boolean = new IsSupersetOf[T](lhs, rhs).result
 
-  def isProperSupersetOf(rhs: IntervalSet[T]): Boolean = isSupersetOf(rhs) && (lhs != rhs)
+  def isProperSupersetOf(rhs: IntervalSeq[T]): Boolean = isSupersetOf(rhs) && (lhs != rhs)
 
   private def copy(belowAll:Boolean = belowAll, values:Array[T] = values, kinds:Array[Byte] = kinds) =
-    new IntervalSet[T](belowAll, values, kinds, order)
+    new IntervalSeq[T](belowAll, values, kinds, order)
 
   override def toString = {
     if(isEmpty)
@@ -103,7 +106,7 @@ final class IntervalSet[T] private (
   }
 
   override def equals(rhs:Any) = rhs match {
-    case rhs:IntervalSet[_] =>
+    case rhs:IntervalSeq[_] =>
       lhs.belowAll == rhs.belowAll &&
         Arrays.equals(lhs.kinds, rhs.kinds) &&
         Arrays.equals(values.asInstanceOf[Array[AnyRef]], rhs.values.asInstanceOf[Array[AnyRef]])
@@ -195,10 +198,27 @@ final class IntervalSet[T] private (
       f(Interval.fromBounds(prev, Unbound()))
   }
 
-  private[interval] def kindsAccessor = kinds
+  private[extras] def kindsAccessor = kinds
 }
 
-object IntervalSet {
+object IntervalSeq {
+
+  implicit def algebra[T:Order]: Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] = new Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] {
+
+    def eqv(x: IntervalSeq[T], y: IntervalSeq[T]) = x == y
+
+    def zero = IntervalSeq.empty[T]
+
+    def one = IntervalSeq.all[T]
+
+    def complement(a: IntervalSeq[T]) = ~a
+
+    def or(a: IntervalSeq[T], b: IntervalSeq[T]) = a | b
+
+    def and(a: IntervalSeq[T], b: IntervalSeq[T]) = a & b
+
+    override def xor(a: IntervalSeq[T], b: IntervalSeq[T]) = a ^ b
+  }
 
   def atOrAbove[T: Order](value: T) = singleton(false, value, K11)
 
@@ -212,13 +232,13 @@ object IntervalSet {
 
   def hole[T: Order](value: T) = singleton(true, value, K01)
 
-  def empty[T: Order]: IntervalSet[T] = new IntervalSet[T](false, Array()(classTag), Array(), implicitly[Order[T]])
+  def empty[T: Order]: IntervalSeq[T] = new IntervalSeq[T](false, Array()(classTag), Array(), implicitly[Order[T]])
 
-  def all[T: Order]: IntervalSet[T] = new IntervalSet[T](true, Array()(classTag), Array(), implicitly[Order[T]])
+  def all[T: Order]: IntervalSeq[T] = new IntervalSeq[T](true, Array()(classTag), Array(), implicitly[Order[T]])
 
-  implicit def apply[T: Order](value: Boolean) : IntervalSet[T] = new IntervalSet[T](value, Array()(classTag), Array(), implicitly[Order[T]])
+  implicit def apply[T: Order](value: Boolean) : IntervalSeq[T] = new IntervalSeq[T](value, Array()(classTag), Array(), implicitly[Order[T]])
 
-  implicit def apply[T: Order](interval: Interval[T]): IntervalSet[T] = interval.fold {
+  implicit def apply[T: Order](interval: Interval[T]): IntervalSeq[T] = interval.fold {
     case (Closed(a),    Closed(b)) if a == b => point(a)
     case (Unbound(),    Open(x))      => below(x)
     case (Unbound(),    Closed(x))    => atOrBelow(x)
@@ -232,20 +252,37 @@ object IntervalSet {
     case (EmptyBound(), EmptyBound()) => empty[T]
   }
 
-  def apply(text:String) : IntervalSet[Rational] = {
+  def apply(text:String) : IntervalSeq[Rational] = {
     val intervals = text.split(';').map(Interval.apply)
-    def intervalToIntervalSet(i:Interval[Rational]) : IntervalSet[Rational] = apply(i)
+    def intervalToIntervalSet(i:Interval[Rational]) : IntervalSeq[Rational] = apply(i)
     val simpleSets = intervals.map(intervalToIntervalSet)
     (empty[Rational] /: simpleSets)(_ | _)
   }
 
+  implicit def booleanAlgebra[T:Order] = new Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] {
+
+    def eqv(x: IntervalSeq[T], y: IntervalSeq[T]) = x == y
+
+    def zero = IntervalSeq.empty[T]
+
+    def one = IntervalSeq.all[T]
+
+    def complement(a: IntervalSeq[T]) = ~a
+
+    def or(a: IntervalSeq[T], b: IntervalSeq[T]) = a | b
+
+    def and(a: IntervalSeq[T], b: IntervalSeq[T]) = a & b
+
+    override def xor(a: IntervalSeq[T], b: IntervalSeq[T]) = a ^ b
+  }
+
   private def fromTo[T: Order](a:T, ak:Byte, b:T, bk:Byte) =
-    new IntervalSet[T](false, Array(a,b)(classTag), Array(ak,bk), implicitly[Order[T]])
+    new IntervalSeq[T](false, Array(a,b)(classTag), Array(ak,bk), implicitly[Order[T]])
 
   private def wrong : Nothing = throw new IllegalStateException("")
 
-  private def singleton[T: Order](belowAll: Boolean, value: T, kind: Byte): IntervalSet[T] =
-    new IntervalSet(belowAll, Array(value)(classTag), Array(kind), implicitly[Order[T]])
+  private def singleton[T: Order](belowAll: Boolean, value: T, kind: Byte): IntervalSeq[T] =
+    new IntervalSeq(belowAll, Array(value)(classTag), Array(kind), implicitly[Order[T]])
 
   private val K00 = 0.toByte
 
@@ -275,9 +312,9 @@ object IntervalSet {
 
   private abstract class MergeOperation[T] {
 
-    def lhs:IntervalSet[T]
+    def lhs:IntervalSeq[T]
 
-    def rhs:IntervalSet[T]
+    def rhs:IntervalSeq[T]
 
     private[this] val a0 = lhs.belowAll
 
@@ -412,15 +449,15 @@ object IntervalSet {
 
     merge0(0, a.length, 0, b.length)
 
-    def result : IntervalSet[T] = {
+    def result : IntervalSeq[T] = {
       if(ri == r.length)
-        new IntervalSet(r0, r, rk, order)
+        new IntervalSeq(r0, r, rk, order)
       else
-        new IntervalSet(r0, r.take(ri), rk.take(ri), order)
+        new IntervalSeq(r0, r.take(ri), rk.take(ri), order)
     }
   }
 
-  private class And[T](val lhs:IntervalSet[T], val rhs:IntervalSet[T]) extends MergeOperation[T] {
+  private class And[T](val lhs:IntervalSeq[T], val rhs:IntervalSeq[T]) extends MergeOperation[T] {
 
     override def op(a: Boolean, b: Boolean): Boolean = a & b
 
@@ -435,7 +472,7 @@ object IntervalSet {
         copyB(b0,b1)
   }
 
-  private class Or[T](val lhs:IntervalSet[T], val rhs:IntervalSet[T]) extends MergeOperation[T] {
+  private class Or[T](val lhs:IntervalSeq[T], val rhs:IntervalSeq[T]) extends MergeOperation[T] {
 
     override def op(a: Boolean, b: Boolean): Boolean = a | b
 
@@ -450,7 +487,7 @@ object IntervalSet {
         copyB(b0,b1)
   }
 
-  private class Xor[T](val lhs:IntervalSet[T], val rhs:IntervalSet[T]) extends MergeOperation[T] {
+  private class Xor[T](val lhs:IntervalSeq[T], val rhs:IntervalSeq[T]) extends MergeOperation[T] {
 
     override def op(a: Boolean, b: Boolean): Boolean = a ^ b
 
@@ -471,9 +508,9 @@ object IntervalSet {
 
   private abstract class BooleanOperation[T] {
 
-    def lhs:IntervalSet[T]
+    def lhs:IntervalSeq[T]
 
-    def rhs:IntervalSet[T]
+    def rhs:IntervalSeq[T]
 
     private[this] val a0 = lhs.belowAll
 
@@ -562,7 +599,7 @@ object IntervalSet {
     val result = op(a0, b0) && merge0(0, a.length, 0, b.length)
   }
 
-  private class IsSupersetOf[T](val lhs:IntervalSet[T], val rhs:IntervalSet[T]) extends BooleanOperation[T] {
+  private class IsSupersetOf[T](val lhs:IntervalSeq[T], val rhs:IntervalSeq[T]) extends BooleanOperation[T] {
 
     override def op(a: Boolean, b: Boolean): Boolean = a | !b
 
@@ -573,7 +610,7 @@ object IntervalSet {
     override def fromB(a: Boolean, b0: Int, b1: Int): Boolean = a
   }
 
-  private class Disjoint[T](val lhs:IntervalSet[T], val rhs:IntervalSet[T]) extends BooleanOperation[T] {
+  private class Disjoint[T](val lhs:IntervalSeq[T], val rhs:IntervalSeq[T]) extends BooleanOperation[T] {
 
     override def op(a: Boolean, b: Boolean): Boolean = !(a & b)
 
@@ -585,7 +622,7 @@ object IntervalSet {
   }
 
   // todo: switch to AbstractIterator once we no longer need to support 2.10
-  private final class IntervalIterator[T:Order](s: IntervalSet[T]) extends Iterator[Interval[T]] {
+  private final class IntervalIterator[T:Order](s: IntervalSeq[T]) extends Iterator[Interval[T]] {
 
     private[this] val values = s.values
 
@@ -646,25 +683,5 @@ object IntervalSet {
       else
         next()
     }
-  }
-}
-
-object IntervalSetAlgebra {
-
-  implicit def booleanAlgebra[T:Order] = new Bool[IntervalSet[T]] with Eq[IntervalSet[T]] {
-
-    def eqv(x: IntervalSet[T], y: IntervalSet[T]) = x == y
-
-    def zero = IntervalSet.empty[T]
-
-    def one = IntervalSet.all[T]
-
-    def complement(a: IntervalSet[T]) = ~a
-
-    def or(a: IntervalSet[T], b: IntervalSet[T]) = a | b
-
-    def and(a: IntervalSet[T], b: IntervalSet[T]) = a & b
-
-    override def xor(a: IntervalSet[T], b: IntervalSet[T]) = a ^ b
   }
 }

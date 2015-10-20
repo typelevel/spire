@@ -1,11 +1,11 @@
-package spire.math.interval
+package spire.math.extras.interval
 
 import org.scalatest.FunSuite
 import spire.implicits._
 
 class IntervalSetTest extends FunSuite {
 
-  import IntervalSet._
+  import IntervalSeq._
 
   test("leafOperation") {
     val a = above(1L)
@@ -44,15 +44,15 @@ class IntervalSetTest extends FunSuite {
   }
 
   test("algebra") {
-    val algebra = IntervalSetAlgebra.booleanAlgebra[Long]
-    val a = IntervalSet.above(1L)
-    val b = IntervalSet.below(1L)
+    val algebra = IntervalSeq.algebra[Long]
+    val a = IntervalSeq.above(1L)
+    val b = IntervalSeq.below(1L)
     assert((a ^ b) == algebra.xor(a, b))
   }
 
   test("iteratorAfterEnd") {
     intercept[NoSuchElementException] {
-      val all = IntervalSet.empty[Int]
+      val all = IntervalSeq.empty[Int]
       val it = all.intervalIterator
       it.next()
     }
@@ -61,7 +61,7 @@ class IntervalSetTest extends FunSuite {
 
   test("illegalStateHull1") {
     intercept[IllegalStateException] {
-      val t = IntervalSet.above(1)
+      val t = IntervalSeq.above(1)
       t.kindsAccessor(0) = 9
       t.hull
     }
@@ -70,7 +70,7 @@ class IntervalSetTest extends FunSuite {
 
   test("illegalStateHull2") {
     intercept[IllegalStateException] {
-      val t = IntervalSet.below(1)
+      val t = IntervalSeq.below(1)
       t.kindsAccessor(0) = 9
       t.hull
     }
@@ -79,7 +79,7 @@ class IntervalSetTest extends FunSuite {
 
   test("illegalStateIterator1") {
     intercept[IllegalStateException] {
-      val t = IntervalSet.above(1)
+      val t = IntervalSeq.above(1)
       t.kindsAccessor(0) = 9
       t.intervalIterator.next()
     }
@@ -88,7 +88,7 @@ class IntervalSetTest extends FunSuite {
 
   test("illegalStateIterator2") {
     intercept[IllegalStateException] {
-      val t = IntervalSet.below(1)
+      val t = IntervalSeq.below(1)
       t.kindsAccessor(0) = 9
       t.intervalIterator.next()
     }
