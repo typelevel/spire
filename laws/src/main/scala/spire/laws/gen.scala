@@ -2,6 +2,8 @@ package spire.laws
 
 import java.math.BigInteger
 
+import spire.math.extras.{FixedPoint, FixedScale}
+
 import scala.reflect.ClassTag
 
 import spire.algebra._

@@ -1,6 +1,7 @@
-package spire.math
+package spire.math.extras
 
 //import spire.syntax.ring._
+import spire.math._
 import spire.std.long._
 import spire.syntax.order._
 import spire.syntax.euclideanRing._
