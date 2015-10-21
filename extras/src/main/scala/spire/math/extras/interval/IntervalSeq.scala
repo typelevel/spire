@@ -6,7 +6,7 @@ import spire.algebra.{Bool, Eq, Order}
 import spire.math.interval._
 import spire.math.{Searching, Interval, Rational}
 
-import scala.annotation.tailrec
+import scala.annotation.{switch, tailrec}
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
@@ -111,14 +111,14 @@ final class IntervalSeq[T] private (
       }
     }
 
-  private[this] def lowerBound(i:Int) = kinds(i) match {
+  private[this] def lowerBound(i:Int) = (kinds(i): @switch) match {
     case K01 => Open(values(i))
     case K11 => Closed(values(i))
     case K10 => Closed(values(i))
     case _ => wrong
   }
 
-  private[this] def upperBound(i:Int) = kinds(i) match {
+  private[this] def upperBound(i:Int) = (kinds(i): @switch) match {
     case K10 => Closed(values(i))
     case K00 => Open(values(i))
     case _ => wrong
@@ -262,13 +262,13 @@ object IntervalSeq {
   private def singleton[T: Order](belowAll: Boolean, value: T, kind: Byte): IntervalSeq[T] =
     new IntervalSeq(belowAll, Array(value)(classTag), Array(kind), implicitly[Order[T]])
 
-  private val K00 = 0.toByte
+  private final val K00 = 0
 
-  private val K10 = 1.toByte
+  private final val K10 = 1
 
-  private val K01 = 2.toByte
+  private final val K01 = 2
 
-  private val K11 = 3.toByte
+  private final val K11 = 3
 
   private def classTag[T] = ClassTag.AnyRef.asInstanceOf[ClassTag[T]]
 
@@ -572,7 +572,7 @@ object IntervalSeq {
         val kind = kinds(i)
         val value = values(i)
         i += 1
-        if (lower eq null) kind match {
+        if (lower eq null) (kind: @switch) match {
           case K10 =>
             result = Interval.point(value)
             lower = null
@@ -583,7 +583,7 @@ object IntervalSeq {
             result = null
             lower = Open(value)
           case _ => wrong
-        } else kind match {
+        } else (kind: @switch) match {
           case K01 =>
             val upper = Open(value)
             result = Interval.fromBounds[T](lower, upper)
