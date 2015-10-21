@@ -84,12 +84,6 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
       case SafeLongBigInteger(n) => lhs ^ n
     }
 
-  def ===(that: SafeLong): Boolean =
-    this == that
-
-  def =!=(that: SafeLong): Boolean =
-    !(this === that)
-
   def +(rhs: Long): SafeLong
   def -(rhs: Long): SafeLong
   def *(rhs: Long): SafeLong
