@@ -118,7 +118,7 @@ trait DoubleIsSigned extends Signed[Double] {
 
 trait DoubleIsReal extends IsRational[Double] with DoubleOrder with DoubleIsSigned {
   def toDouble(x: Double): Double = x
-  def ceil(a:Double): Double = Math.floor(a)
+  def ceil(a:Double): Double = Math.ceil(a)
   def floor(a:Double): Double = Math.floor(a)
   def round(a:Double): Double = spire.math.round(a)
   def isWhole(a:Double): Boolean = a % 1.0 == 0.0

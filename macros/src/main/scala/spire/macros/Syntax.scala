@@ -41,6 +41,18 @@ object Ops extends machinist.Ops {
       (uesc('⊻'), "xor"),
       (uesc('⊼'), "nand"),
       (uesc('⊽'), "nor"))
+
+  def eqv[A, B](c: Context)(rhs: c.Expr[B])(ev: c.Expr[A =:= B]): c.Expr[Boolean] = {
+    import c.universe._
+    val (e, lhs) = unpack(c)
+    c.Expr[Boolean](q"$e.eqv($lhs, $rhs)")
+  }
+
+  def neqv[A, B](c: Context)(rhs: c.Expr[B])(ev: c.Expr[A =:= B]): c.Expr[Boolean] = {
+    import c.universe._
+    val (e, lhs) = unpack(c)
+    c.Expr[Boolean](q"$e.neqv($lhs, $rhs)")
+  }
 }
 
 case class SyntaxUtil[C <: Context with Singleton](val c: C) {
