@@ -175,25 +175,25 @@ object IntervalTrie {
     IntervalTrie[T](false, bound)
   }
 
-  def constant[T:Element](value:Boolean) = IntervalTrie[T](value, null)
+  def constant[T:Element](value:Boolean): IntervalTrie[T] = IntervalTrie[T](value, null)
 
-  def empty[T:Element] = constant[T](false)
+  def empty[T:Element]: IntervalTrie[T] = constant[T](false)
 
-  def point[T:Element](value:T) = IntervalTrie[T](false, Tree.Leaf(toPrefix(value), true, false))
+  def point[T:Element](value:T): IntervalTrie[T] = IntervalTrie[T](false, Tree.Leaf(toPrefix(value), true, false))
 
-  def atOrAbove[T:Element](value:T) = IntervalTrie[T](false, Tree.Leaf(toPrefix(value), true, true))
+  def atOrAbove[T:Element](value:T): IntervalTrie[T] = IntervalTrie[T](false, Tree.Leaf(toPrefix(value), true, true))
 
-  def above[T:Element](value:T) = IntervalTrie[T](false, Tree.Leaf(toPrefix(value), false, true))
+  def above[T:Element](value:T): IntervalTrie[T] = IntervalTrie[T](false, Tree.Leaf(toPrefix(value), false, true))
 
-  def all[T:Element] = constant[T](true)
+  def all[T:Element]: IntervalTrie[T] = constant[T](true)
 
-  def hole[T:Element](value:T) = IntervalTrie[T](true, Tree.Leaf(toPrefix(value), true, false))
+  def hole[T:Element](value:T): IntervalTrie[T] = IntervalTrie[T](true, Tree.Leaf(toPrefix(value), true, false))
 
-  def below[T:Element](value:T) = IntervalTrie[T](true, Tree.Leaf(toPrefix(value), true, true))
+  def below[T:Element](value:T): IntervalTrie[T] = IntervalTrie[T](true, Tree.Leaf(toPrefix(value), true, true))
 
-  def atOrBelow[T:Element](value:T) = IntervalTrie[T](true, Tree.Leaf(toPrefix(value), false, true))
+  def atOrBelow[T:Element](value:T): IntervalTrie[T] = IntervalTrie[T](true, Tree.Leaf(toPrefix(value), false, true))
 
-  def apply[T:Element](interval:Interval[T]) : IntervalTrie[T] = interval.fold {
+  def apply[T:Element](interval:Interval[T]): IntervalTrie[T] = interval.fold {
     case (Closed(a),    Closed(b)) if a == b => point(a)
     case (Unbound(),    Open(x))      => below(x)
     case (Unbound(),    Closed(x))    => atOrBelow(x)
@@ -232,7 +232,7 @@ object IntervalTrie {
     IntervalTrie[T](false, concat(a, b))
   }
 
-  def apply(text:String) : IntervalTrie[Long] = {
+  def apply(text:String): IntervalTrie[Long] = {
     val la = spire.std.long.LongAlgebra
     def rationalToLong(r:Rational) : Long = {
       if(r>Long.MaxValue || r<Long.MinValue)
@@ -323,7 +323,7 @@ object IntervalTrie {
 
     private[this] var lower: Bound[T] = if(e.belowAll) Unbound() else null
 
-    private[this] def nextInterval() = {
+    private[this] def nextInterval(): Interval[T] = {
       import element.{fromLong, order}
       var result : Interval[T] = null
       if(hasNextLeaf) {
@@ -368,7 +368,7 @@ object IntervalTrie {
       result
     }
 
-    def hasNext = hasNextLeaf || (lower ne null)
+    def hasNext: Boolean = hasNextLeaf || (lower ne null)
 
     @tailrec
     override def next(): Interval[T] = {

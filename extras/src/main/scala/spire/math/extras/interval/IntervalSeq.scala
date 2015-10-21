@@ -4,7 +4,7 @@ import java.util.Arrays
 
 import spire.algebra.{Bool, Eq, Order}
 import spire.math.interval._
-import spire.math.{Interval, Rational}
+import spire.math.{Searching, Interval, Rational}
 
 import scala.annotation.tailrec
 import scala.language.implicitConversions
@@ -18,29 +18,7 @@ final class IntervalSeq[T] private (
 
   import IntervalSeq._
 
-  private def binarySearch(key: T): Int = {
-    var low = 0
-    var high = values.length - 1
-    while (low <= high) {
-      val mid = (low + high) >>> 1
-      val midVal = values(mid)
-      val c = order.compare(midVal, key)
-      if (c < 0) {
-        low = mid + 1
-      }
-      else if (c > 0) {
-        high = mid - 1
-      }
-      else {
-        // scalastyle:off return
-        return mid
-        // scalastyle:on return
-      }
-    }
-    -(low + 1)
-  }
-
-  def below(index: Int): Boolean = {
+  private def belowIndex(index: Int): Boolean = {
     if (index == 0)
       belowAll
     else
@@ -48,42 +26,42 @@ final class IntervalSeq[T] private (
   }
 
   def at(value: T): Boolean = {
-    val index = binarySearch(value)
+    val index = Searching.search(values, value)
     if (index >= 0)
       valueAt(kinds(index))
     else
-      below(-index - 1)
+      belowIndex(-index - 1)
   }
 
   def above(value: T): Boolean = {
-    val index = binarySearch(value)
+    val index = Searching.search(values, value)
     if (index >= 0)
       valueAbove(kinds(index))
     else
-      below(-index - 1)
+      belowIndex(-index - 1)
   }
 
   def below(value: T): Boolean = {
-    val index = binarySearch(value)
+    val index = Searching.search(values, value)
     if (index > 0)
       valueAbove(kinds(index - 1))
     else if (index == 0)
       belowAll
     else
-      below(-index - 1)
+      belowIndex(-index - 1)
   }
 
-  def apply(value:T) = at(value)
+  def apply(value:T): Boolean = at(value)
 
-  def aboveAll = if (values.isEmpty) belowAll else valueAbove(kinds.last)
+  def aboveAll: Boolean = if (values.isEmpty) belowAll else valueAbove(kinds.last)
 
   def unary_~ :IntervalSeq[T] = copy(belowAll = !belowAll, kinds = negateKinds(kinds))
 
-  def |(rhs:IntervalSeq[T]) = new Or[T](lhs, rhs).result
+  def |(rhs:IntervalSeq[T]): IntervalSeq[T] = new Or[T](lhs, rhs).result
 
-  def &(rhs:IntervalSeq[T]) = new And[T](lhs, rhs).result
+  def &(rhs:IntervalSeq[T]): IntervalSeq[T] = new And[T](lhs, rhs).result
 
-  def ^(rhs:IntervalSeq[T]) = new Xor[T](lhs, rhs).result
+  def ^(rhs:IntervalSeq[T]): IntervalSeq[T] = new Xor[T](lhs, rhs).result
 
   def intersects(rhs: IntervalSeq[T]): Boolean = !new Disjoint[T](lhs, rhs).result
 
@@ -94,18 +72,18 @@ final class IntervalSeq[T] private (
   private def copy(belowAll:Boolean = belowAll, values:Array[T] = values, kinds:Array[Byte] = kinds) =
     new IntervalSeq[T](belowAll, values, kinds, order)
 
-  override def toString = {
+  override def toString: String = {
     if(isEmpty)
       Interval.empty[T].toString()
     else
       intervals.mkString(";")
   }
 
-  override def hashCode = {
+  override def hashCode: Int = {
     belowAll.## * 41 + Arrays.hashCode(kinds) * 23 + Arrays.hashCode(values.asInstanceOf[Array[AnyRef]])
   }
 
-  override def equals(rhs:Any) = rhs match {
+  override def equals(rhs:Any): Boolean = rhs match {
     case rhs:IntervalSeq[_] =>
       lhs.belowAll == rhs.belowAll &&
         Arrays.equals(lhs.kinds, rhs.kinds) &&
@@ -205,38 +183,38 @@ object IntervalSeq {
 
   implicit def algebra[T:Order]: Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] = new Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] {
 
-    def eqv(x: IntervalSeq[T], y: IntervalSeq[T]) = x == y
+    def eqv(x: IntervalSeq[T], y: IntervalSeq[T]): Boolean = x == y
 
-    def zero = IntervalSeq.empty[T]
+    def zero: IntervalSeq[T] = IntervalSeq.empty[T]
 
-    def one = IntervalSeq.all[T]
+    def one: IntervalSeq[T] = IntervalSeq.all[T]
 
-    def complement(a: IntervalSeq[T]) = ~a
+    def complement(a: IntervalSeq[T]): IntervalSeq[T] = ~a
 
-    def or(a: IntervalSeq[T], b: IntervalSeq[T]) = a | b
+    def or(a: IntervalSeq[T], b: IntervalSeq[T]): IntervalSeq[T] = a | b
 
-    def and(a: IntervalSeq[T], b: IntervalSeq[T]) = a & b
+    def and(a: IntervalSeq[T], b: IntervalSeq[T]): IntervalSeq[T] = a & b
 
-    override def xor(a: IntervalSeq[T], b: IntervalSeq[T]) = a ^ b
+    override def xor(a: IntervalSeq[T], b: IntervalSeq[T]): IntervalSeq[T] = a ^ b
   }
 
-  def atOrAbove[T: Order](value: T) = singleton(false, value, K11)
+  def atOrAbove[T: Order](value: T): IntervalSeq[T] = singleton(false, value, K11)
 
-  def above[T: Order](value: T) = singleton(false, value, K01)
+  def above[T: Order](value: T): IntervalSeq[T] = singleton(false, value, K01)
 
-  def atOrBelow[T: Order](value: T) = singleton(true, value, K10)
+  def atOrBelow[T: Order](value: T): IntervalSeq[T] = singleton(true, value, K10)
 
-  def below[T: Order](value: T) = singleton(true, value, K00)
+  def below[T: Order](value: T): IntervalSeq[T] = singleton(true, value, K00)
 
-  def point[T: Order](value: T) = singleton(false, value, K10)
+  def point[T: Order](value: T): IntervalSeq[T] = singleton(false, value, K10)
 
-  def hole[T: Order](value: T) = singleton(true, value, K01)
+  def hole[T: Order](value: T): IntervalSeq[T] = singleton(true, value, K01)
 
   def empty[T: Order]: IntervalSeq[T] = new IntervalSeq[T](false, Array()(classTag), Array(), implicitly[Order[T]])
 
   def all[T: Order]: IntervalSeq[T] = new IntervalSeq[T](true, Array()(classTag), Array(), implicitly[Order[T]])
 
-  implicit def apply[T: Order](value: Boolean) : IntervalSeq[T] = new IntervalSeq[T](value, Array()(classTag), Array(), implicitly[Order[T]])
+  implicit def apply[T: Order](value: Boolean): IntervalSeq[T] = new IntervalSeq[T](value, Array()(classTag), Array(), implicitly[Order[T]])
 
   implicit def apply[T: Order](interval: Interval[T]): IntervalSeq[T] = interval.fold {
     case (Closed(a),    Closed(b)) if a == b => point(a)
@@ -252,7 +230,7 @@ object IntervalSeq {
     case (EmptyBound(), EmptyBound()) => empty[T]
   }
 
-  def apply(text:String) : IntervalSeq[Rational] = {
+  def apply(text:String): IntervalSeq[Rational] = {
     val intervals = text.split(';').map(Interval.apply)
     def intervalToIntervalSet(i:Interval[Rational]) : IntervalSeq[Rational] = apply(i)
     val simpleSets = intervals.map(intervalToIntervalSet)
@@ -396,28 +374,6 @@ object IntervalSeq {
 
     protected[this] def rBelow = if(ri > 0) valueAbove(rk(ri-1)) else r0
 
-    def binarySearch(array: Array[T], key: T, from: Int, until: Int): Int = {
-      var low = from
-      var high = until - 1
-      while (low <= high) {
-        val mid = (low + high) >>> 1
-        val midVal = array(mid)
-        val c = order.compare(midVal, key)
-        if (c < 0) {
-          low = mid + 1
-        }
-        else if (c > 0) {
-          high = mid - 1
-        }
-        else {
-          // scalastyle:off return
-          return mid
-          // scalastyle:on return
-        }
-      }
-      -(low + 1)
-    }
-
     def merge0(a0: Int, a1: Int, b0: Int, b1: Int): Unit = {
       if (a0 == a1) {
         fromB(aBelow(a0), b0, b1)
@@ -425,7 +381,7 @@ object IntervalSeq {
         fromA(a0, a1, bBelow(b0))
       } else {
         val am = (a0 + a1) / 2
-        val res = binarySearch(b, a(am), b0, b1)
+        val res = Searching.search(b, a(am), b0, b1 - 1)(order)
         if (res >= 0) {
           // same elements
           val bm = res
@@ -543,28 +499,6 @@ object IntervalSeq {
 
     protected[this] def bBelow(i:Int) = if(i>0) valueAbove(bk(i-1)) else b0
 
-    def binarySearch(array: Array[T], key: T, from: Int, until: Int): Int = {
-      var low = from
-      var high = until - 1
-      while (low <= high) {
-        val mid = (low + high) >>> 1
-        val midVal = array(mid)
-        val c = order.compare(midVal, key)
-        if (c < 0) {
-          low = mid + 1
-        }
-        else if (c > 0) {
-          high = mid - 1
-        }
-        else {
-          // scalastyle:off return
-          return mid
-          // scalastyle:on return
-        }
-      }
-      -(low + 1)
-    }
-
     def merge0(a0: Int, a1: Int, b0: Int, b1: Int): Boolean = {
       if(a0 == a1 && b0 == b1) {
         true
@@ -574,7 +508,7 @@ object IntervalSeq {
         fromA(a0, a1, bBelow(b0))
       } else {
         val am = (a0 + a1) / 2
-        val res = binarySearch(b, a(am), b0, b1)
+        val res = Searching.search(b, a(am), b0, b1 - 1)(order)
         if (res >= 0) {
           // same elements
           val bm = res
