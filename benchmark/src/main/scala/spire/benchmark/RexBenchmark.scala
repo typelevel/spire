@@ -1,7 +1,6 @@
 package spire
 package benchmark
 
-import scala.reflect.ClassTag
 
 import spire.implicits._
 import spire.math._

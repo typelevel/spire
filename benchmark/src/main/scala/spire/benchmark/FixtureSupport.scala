@@ -1,8 +1,8 @@
-package spire.benchmark
+package spire
+package benchmark
 
 import spire.math.Complex
 
-import scala.reflect.ClassTag
 
 import spire.algebra.Order
 

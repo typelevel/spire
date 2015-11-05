@@ -1,6 +1,5 @@
+package spire
 package test.scala.spire.math
-
-import scala.reflect.ClassTag
 
 import spire.algebra._
 import spire.math._

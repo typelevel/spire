@@ -4,7 +4,6 @@ package math
 import spire.algebra._
 import spire.std.int._
 
-import scala.reflect.ClassTag
 
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers

@@ -7,7 +7,6 @@ import java.math.{ MathContext, RoundingMode, BigInteger, BigDecimal => JBigDeci
 import java.util.concurrent.atomic.AtomicReference
 
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
-import scala.reflect.ClassTag
 
 import spire.Platform
 import spire.algebra.{Eq, EuclideanRing, Field, IsAlgebraic, NRoot, Order, Ring, Sign, Signed}

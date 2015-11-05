@@ -1,6 +1,5 @@
 package spire.benchmark
 
-import scala.reflect.ClassTag
 
 import spire.implicits._
 

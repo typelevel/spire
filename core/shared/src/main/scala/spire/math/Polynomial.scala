@@ -3,7 +3,6 @@ package math
 
 import scala.collection.mutable.ArrayBuilder
 
-import scala.reflect.ClassTag
 
 import java.math.{ BigDecimal => JBigDecimal, RoundingMode, MathContext }
 

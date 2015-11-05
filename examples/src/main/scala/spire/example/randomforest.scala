@@ -6,7 +6,6 @@ import spire.implicits._
 
 import scala.util.Random.nextInt
 
-import scala.reflect.ClassTag
 
 import CrossValidation._
 

@@ -1,8 +1,6 @@
 package spire
 package random
 
-import scala.reflect.ClassTag
-
 import spire.algebra._
 import spire.std.float._
 import spire.std.double._

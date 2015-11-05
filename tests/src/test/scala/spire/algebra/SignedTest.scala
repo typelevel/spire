@@ -1,7 +1,6 @@
 package spire
 package algebra
 
-import scala.reflect.ClassTag
 
 // scalatest
 import org.scalatest.FunSuite

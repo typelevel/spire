@@ -4,7 +4,6 @@ package std
 
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 import spire.algebra.{AdditiveMonoid, Field, Monoid, MultiplicativeMonoid, NRoot, Order, PartialOrder, Signed}
 import spire.math.{Natural, Number, QuickSort, SafeLong, Searching, ULong}
 import spire.syntax.cfor._

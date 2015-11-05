@@ -4,7 +4,6 @@ package poly
 
 import java.lang.Integer.{ numberOfLeadingZeros, numberOfTrailingZeros }
 
-import scala.reflect.ClassTag
 
 import spire.algebra.{Eq, Field, Ring, Rng, Semiring}
 import spire.math.Polynomial

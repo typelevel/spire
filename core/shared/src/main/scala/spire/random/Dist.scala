@@ -8,7 +8,6 @@ import spire.math.{Complex, Interval, Natural, Rational, SafeLong, UByte, UShort
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 
 trait Dist[@sp A] extends Any { self =>
 

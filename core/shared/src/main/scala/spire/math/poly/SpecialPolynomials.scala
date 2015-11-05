@@ -2,7 +2,6 @@ package spire
 package math
 package poly
 
-import scala.reflect.ClassTag
 
 import spire.algebra.{Eq, Field, Ring}
 import spire.math.Polynomial

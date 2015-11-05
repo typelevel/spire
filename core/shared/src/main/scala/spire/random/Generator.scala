@@ -1,7 +1,6 @@
 package spire
 package random
 
-import scala.reflect.ClassTag
 
 import spire.math.{UInt, ULong}
 

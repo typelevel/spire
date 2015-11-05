@@ -7,7 +7,6 @@ import spire.algebra._
 import spire.std.BooleanIsRig
 import spire.implicits._
 
-import scala.reflect.ClassTag
 
 /**
  * These examples are taken from http://r6.ca/blog/20110808T035622Z.html.

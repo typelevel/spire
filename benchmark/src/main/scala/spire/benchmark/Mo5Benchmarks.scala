@@ -1,7 +1,6 @@
 package spire
 package benchmark
 
-import scala.reflect.ClassTag
 
 import scala.util.Random
 import Random._

@@ -1,7 +1,6 @@
 package spire
 package math
 
-import scala.reflect.ClassTag
 
 import spire.algebra.Order
 

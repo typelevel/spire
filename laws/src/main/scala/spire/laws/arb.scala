@@ -1,8 +1,8 @@
-package spire.laws
+package spire
+package laws
 
 import java.math.BigInteger
 
-import scala.reflect.ClassTag
 
 import spire.algebra._
 import spire.algebra.free._

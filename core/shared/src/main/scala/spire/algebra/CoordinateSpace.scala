@@ -5,7 +5,6 @@ import spire.std._
 
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 
 trait CoordinateSpace[V, @sp(Float, Double) F] extends Any with InnerProductSpace[V, F] {
   def dimensions: Int

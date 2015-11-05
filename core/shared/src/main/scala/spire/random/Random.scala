@@ -4,7 +4,6 @@ package random
 import scala.collection.mutable.{ArrayBuffer, Builder}
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 
 sealed trait Op[+A] {
 

@@ -1,7 +1,6 @@
 package spire
 package std
 
-import scala.reflect.ClassTag
 
 import spire.algebra._
 import spire.NoImplicit

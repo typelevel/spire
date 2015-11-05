@@ -5,7 +5,6 @@ import spire.algebra._
 import spire.implicits._
 
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
 import scala.util.Random.{ nextInt, nextDouble, nextGaussian }
 
 /**

@@ -2,7 +2,6 @@ package spire
 package math
 import spire.algebra.Order
 
-import scala.reflect.ClassTag
 
 /**
  *  Interface for a merging strategy object.
