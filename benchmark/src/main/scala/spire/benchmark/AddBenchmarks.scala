@@ -19,7 +19,7 @@ import java.math.BigInteger
 object AddBenchmarks extends MyRunner(classOf[AddBenchmarks])
 
 class AddBenchmarks extends MyBenchmark with BenchmarkData {
-  def addGeneric[@spec(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
+  def addGeneric[@sp(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
     var total = Ring[A].zero
     var i = 0
     val len = data.length

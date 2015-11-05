@@ -24,7 +24,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
 
   def digit: UInt
 
-  def foldDigitsLeft[@spec A](a: A)(f: (A, UInt) => A): A = {
+  def foldDigitsLeft[@sp A](a: A)(f: (A, UInt) => A): A = {
     @tailrec def recur(next: Natural, sofar: A): A = next match {
       case End(d) => f(a, d)
       case Digit(d, tail) => recur(tail, f(a, d))
@@ -33,7 +33,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
   }
 
 
-  def foldDigitsRight[@spec A](a: A)(f: (A, UInt) => A): A =
+  def foldDigitsRight[@sp A](a: A)(f: (A, UInt) => A): A =
     reversed.foldDigitsLeft(a)(f)
 
   def getNumBits: Int = {

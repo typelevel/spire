@@ -20,7 +20,7 @@ object KMeansExample extends App {
    * Returns a collection of k points which are the centers of k clusters of
    * `points0`.
    */
-  def kMeans[V, @spec(Double) A, CC[V] <: Iterable[V]](points0: CC[V], k: Int)(implicit
+  def kMeans[V, @sp(Double) A, CC[V] <: Iterable[V]](points0: CC[V], k: Int)(implicit
       vs: NormedVectorSpace[V, A], order: Order[A],
       cbf: CanBuildFrom[Nothing, V, CC[V]], ct: ClassTag[V]): CC[V] = {
 
@@ -92,7 +92,7 @@ object KMeansExample extends App {
   // This method let's us generate a set of n points which are clustered around
   // k centers in d-dimensions.
 
-  def genPoints[CC[_], V, @spec(Double) A](d: Int, k: Int, n: Int)(f: Array[Double] => V)(implicit
+  def genPoints[CC[_], V, @sp(Double) A](d: Int, k: Int, n: Int)(f: Array[Double] => V)(implicit
       vs: VectorSpace[V, A], cbf: CanBuildFrom[Nothing, V, CC[V]]): CC[V] = {
 
     def randPoint(gen: => Double): V = f((1 to d).map(_ => gen)(collection.breakOut))

@@ -6,7 +6,7 @@ package algebra
  * A `RingAlgebra` is a module that is also a `Rng`. An example is the Gaussian
  * numbers.
  */
-trait RingAlgebra[V, @spec R] extends Any with Module[V, R] with Rng[V]
+trait RingAlgebra[V, @sp R] extends Any with Module[V, R] with Rng[V]
 
 object RingAlgebra {
   implicit def ZAlgebra[A](implicit vector0: Ring[A], scalar0: Ring[Int]): ZAlgebra[A] = new ZAlgebra[A] {
@@ -39,4 +39,4 @@ trait ZAlgebra[V] extends Any with RingAlgebra[V, Int] with Ring[V] {
  * A `FieldAlgebra` is a vector space that is also a `Ring`. An example is the
  * complex numbers.
  */
-trait FieldAlgebra[V, @spec(Float, Double) F] extends Any with RingAlgebra[V, F] with VectorSpace[V, F]
+trait FieldAlgebra[V, @sp(Float, Double) F] extends Any with RingAlgebra[V, F] with VectorSpace[V, F]

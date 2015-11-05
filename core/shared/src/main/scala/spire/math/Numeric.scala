@@ -13,7 +13,7 @@ import spire.std._
  * 6. Start to worry about things like e.g. pow(BigInt, BigInt)
  */
 
-trait Numeric[@spec(Int,Long,Float,Double) A] extends Any with Ring[A]
+trait Numeric[@sp(Int,Long,Float,Double) A] extends Any with Ring[A]
 with AdditiveAbGroup[A] with MultiplicativeAbGroup[A] with NRoot[A]
 with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A]
 

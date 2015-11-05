@@ -6,7 +6,7 @@ package algebra
  * (i.e. it is semigroup, not a monoid). Put another way, a Rng is a Ring
  * without an identity.
  */
-trait Rng[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Semiring[A] with AdditiveAbGroup[A]
+trait Rng[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Semiring[A] with AdditiveAbGroup[A]
 
 object Rng {
   @inline final def apply[A](implicit r:Rng[A]):Rng[A] = r

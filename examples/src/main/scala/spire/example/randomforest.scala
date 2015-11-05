@@ -30,7 +30,7 @@ object RandomForestExample extends App {
   testRegression[Array[Double], Double](DataSet.MPG, RandomForestOptions(numPointsSample = Some(200), numTrees = Some(50)))
 
 
-  def testClassification[V, @spec(Double) F, K](dataset: DataSet[V, F, K], opts: RandomForestOptions)(implicit order: Order[F], classTagV: ClassTag[V], classTagK: ClassTag[K], real: IsReal[F]): Unit = {
+  def testClassification[V, @sp(Double) F, K](dataset: DataSet[V, F, K], opts: RandomForestOptions)(implicit order: Order[F], classTagV: ClassTag[V], classTagK: ClassTag[K], real: IsReal[F]): Unit = {
 
     println(s"\n${dataset.describe}\n")
     println(s"Cross-validating ${dataset.name} with random forest classification...")
@@ -40,7 +40,7 @@ object RandomForestExample extends App {
     println("... accuracy of %.2f%%\n" format (real.toDouble(accuracy) * 100))
   }
 
-  def testRegression[V, @spec(Double) F](dataset: DataSet[V, F, F], opts: RandomForestOptions)(implicit order: Order[F], classTagV: ClassTag[V], classTagF: ClassTag[F], real: IsReal[F]): Unit = {
+  def testRegression[V, @sp(Double) F](dataset: DataSet[V, F, F], opts: RandomForestOptions)(implicit order: Order[F], classTagV: ClassTag[V], classTagF: ClassTag[F], real: IsReal[F]): Unit = {
 
     println(s"\n${dataset.describe}\n")
     println(s"Cross-validating ${dataset.name} with random forest regression...")
@@ -71,7 +71,7 @@ case class RandomForestOptions(
  * care about. We then have a way of determining the error of some subset of
  * these outputs using the `Region`.
  */
-trait RandomForest[V, @spec(Double) F, @spec(Double) K] {
+trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
   implicit def V: CoordinateSpace[V, F]
   implicit def F: Field[F] = V.scalar
   implicit def order: Order[F]
@@ -262,7 +262,7 @@ trait RandomForest[V, @spec(Double) F, @spec(Double) K] {
  * final predicted output is the average of the individual tress output (which
  * itself is just the mean of all outputs in the region the point lands in.
  */
-class RandomForestRegression[V, @spec(Double) F](implicit val V: CoordinateSpace[V, F],
+class RandomForestRegression[V, @sp(Double) F](implicit val V: CoordinateSpace[V, F],
     val order: Order[F], val vectorClassTag: ClassTag[V]) extends RandomForest[V, F, F] {
 
   // Our "disparity" measure is just the squared error of the region.
@@ -304,7 +304,7 @@ class RandomForestRegression[V, @spec(Double) F](implicit val V: CoordinateSpace
  * Within a forest, each tree casts its vote for classification of a point and
  * the majority wins. Again, ties are broken randomly (again, not really).
  */
-class RandomForestClassification[V, @spec(Double) F, K](implicit val V: CoordinateSpace[V, F],
+class RandomForestClassification[V, @sp(Double) F, K](implicit val V: CoordinateSpace[V, F],
     val order: Order[F], val vectorClassTag: ClassTag[V]) extends RandomForest[V, F, K] {
 
   // Our "disparity" measure here is the Gini index. It basically measures how
@@ -345,38 +345,38 @@ class RandomForestClassification[V, @spec(Double) F, K](implicit val V: Coordina
 
 object RandomForest {
 
-  def regression[V, @spec(Double) F](data: Array[V], out: Array[F], options: RandomForestOptions)(implicit
+  def regression[V, @sp(Double) F](data: Array[V], out: Array[F], options: RandomForestOptions)(implicit
       V: CoordinateSpace[V, F], order: Order[F], ev: ClassTag[V]): V => F = {
     val rfr = new RandomForestRegression[V, F]
     rfr(data, out, options)
   }
 
-  def regression[V, @spec(Double) F](data: Iterable[V], out: Iterable[F],
+  def regression[V, @sp(Double) F](data: Iterable[V], out: Iterable[F],
       options: RandomForestOptions)(implicit V: CoordinateSpace[V, F], order: Order[F],
       classTagV: ClassTag[V], classTagF: ClassTag[F]): V => F = {
     regression(data.toArray, out.toArray, options)
   }
 
-  def regression[V, @spec(Double) F](data: Iterable[(V, F)], options: RandomForestOptions)(implicit
+  def regression[V, @sp(Double) F](data: Iterable[(V, F)], options: RandomForestOptions)(implicit
       V: CoordinateSpace[V, F], order: Order[F],
       classTagV: ClassTag[V], classTagF: ClassTag[F]): V => F = {
     val (in, out) = data.unzip
     regression(in.toArray, out.toArray, options)
   }
 
-  def classification[V, @spec(Double) F, K](data: Array[V], out: Array[K], options: RandomForestOptions)(implicit
+  def classification[V, @sp(Double) F, K](data: Array[V], out: Array[K], options: RandomForestOptions)(implicit
       V: CoordinateSpace[V, F], order: Order[F], ev: ClassTag[V]): V => K = {
     val rfc = new RandomForestClassification[V, F, K]
     rfc(data, out, options)
   }
 
-  def classification[V, @spec(Double) F, K](data: Iterable[V], out: Iterable[K],
+  def classification[V, @sp(Double) F, K](data: Iterable[V], out: Iterable[K],
       options: RandomForestOptions)(implicit V: CoordinateSpace[V, F],
       order: Order[F], classTagV: ClassTag[V], classTagK: ClassTag[K]): V => K = {
     classification(data.toArray, out.toArray, options)
   }
 
-  def classification[V, @spec(Double) F, K](data: Iterable[(V, K)], options: RandomForestOptions)(implicit
+  def classification[V, @sp(Double) F, K](data: Iterable[(V, K)], options: RandomForestOptions)(implicit
       V: CoordinateSpace[V, F], order: Order[F],
       classTagV: ClassTag[V], classTagK: ClassTag[K]): V => K = {
     val (in, out) = data.unzip

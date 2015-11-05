@@ -292,7 +292,7 @@ abstract class Generator {
   /**
    * Generate an Array[A] using the given Dist[A] instance.
    */
-  def generateArray[@spec A: Dist: ClassTag](n: Int): Array[A] = {
+  def generateArray[@sp A: Dist: ClassTag](n: Int): Array[A] = {
     val arr = new Array[A](n)
     fillArray(arr)
     arr
@@ -301,7 +301,7 @@ abstract class Generator {
   /**
    * Fill an Array[A] using the given Dist[A] instance.
    */
-  def fillArray[@spec A: Dist](arr: Array[A]): Unit = {
+  def fillArray[@sp A: Dist](arr: Array[A]): Unit = {
     var i = 0
     val len = arr.length
     while (i < len) {
@@ -312,7 +312,7 @@ abstract class Generator {
 
   def oneOf[A](as: A*): A = chooseFromSeq(as)(this)
 
-  def chooseFromArray[@spec A](arr: Array[A])(implicit gen: Generator): A =
+  def chooseFromArray[@sp A](arr: Array[A])(implicit gen: Generator): A =
     arr(gen.nextInt(arr.length))
 
   def chooseFromSeq[A](seq: Seq[A])(implicit gen: Generator): A =
@@ -321,7 +321,7 @@ abstract class Generator {
   def chooseFromIterable[A](as: Iterable[A])(implicit gen: Generator): A =
     as.iterator.drop(gen.nextInt(as.size)).next()
 
-  def sampleFromArray[@spec A: ClassTag](as: Array[A], size: Int)(implicit gen: Generator): Array[A] = {
+  def sampleFromArray[@sp A: ClassTag](as: Array[A], size: Int)(implicit gen: Generator): Array[A] = {
     val chosen: Array[A] = new Array[A](size)
     if (size < 1) {
       throw new IllegalArgumentException("illegal sample size (%d)" format size)
@@ -346,7 +346,7 @@ abstract class Generator {
     chosen
   }
 
-  def sampleFromTraversable[@spec A: ClassTag](as: Traversable[A], size: Int)(implicit gen: Generator): Array[A] = {
+  def sampleFromTraversable[@sp A: ClassTag](as: Traversable[A], size: Int)(implicit gen: Generator): Array[A] = {
     val chosen: Array[A] = new Array[A](size)
     var i: Int = 0
     as.foreach { a =>
@@ -364,7 +364,7 @@ abstract class Generator {
     chosen
   }
 
-  def shuffle[@spec A](as: Array[A])(implicit gen: Generator): Unit = {
+  def shuffle[@sp A](as: Array[A])(implicit gen: Generator): Unit = {
     var i: Int = as.length - 1
     while (i > 0) {
       val n: Int = gen.nextInt(i)
@@ -445,7 +445,7 @@ abstract class LongBasedGenerator extends Generator { self =>
     (nextLong >>> 32).toInt
 }
 
-trait GeneratorCompanion[G, @spec(Int, Long) S] {
+trait GeneratorCompanion[G, @sp(Int, Long) S] {
   def randomSeed(): S
 
   def fromBytes(bytes: Array[Byte]): G

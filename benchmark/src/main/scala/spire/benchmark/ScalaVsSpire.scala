@@ -72,7 +72,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     while (i < len) { cs(i) = as(i) + bs(i); i += 1 }
   }
 
-  def doPairwiseSpire[@spec(Int) A:Ring](as:Array[A], bs: Array[A], cs: Array[A]): Unit = {
+  def doPairwiseSpire[@sp(Int) A:Ring](as:Array[A], bs: Array[A], cs: Array[A]): Unit = {
     import spire.implicits._
     var i = 0
     val len = as.length
@@ -99,7 +99,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     t
   }
 
-  def doIncrementSpire[@spec(Int) A:Ring:Order](start: A, n: A) = {
+  def doIncrementSpire[@sp(Int) A:Ring:Order](start: A, n: A) = {
     import spire.implicits._
     val ev = Ring[A]
     var t = start
@@ -142,7 +142,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     (zmin, zmax)
   }
 
-  def doMinMaxSpire[@spec(Int) A:Ring:Order](ns: Array[A]) = {
+  def doMinMaxSpire[@sp(Int) A:Ring:Order](ns: Array[A]) = {
     import spire.implicits._
 
     var zmin = ns(0)
@@ -182,12 +182,12 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     while (i < len) { cs(i) = gcdGeneric(as(i), bs(i)); i += 1 }
   }
 
-  @tailrec final def gcdSpire[@spec(Int) A](a: A, b: A)(implicit ev1:EuclideanRing[A], ev2:Eq[A]): A = {
+  @tailrec final def gcdSpire[@sp(Int) A](a: A, b: A)(implicit ev1:EuclideanRing[A], ev2:Eq[A]): A = {
     import spire.implicits._
     if (a % b === ev1.zero) b else gcdSpire(b, a % b)
   }
 
-  def doGcdSpire[@spec(Int) A:EuclideanRing:Eq](as: Array[A], bs: Array[A], cs: Array[A]) = {
+  def doGcdSpire[@sp(Int) A:EuclideanRing:Eq](as: Array[A], bs: Array[A], cs: Array[A]) = {
     var i = 0
     val len = as.length
     while (i < len) { cs(i) = gcdSpire(as(i), bs(i)); i += 1 }
@@ -209,7 +209,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     while (i < len) { cs(i) = as(i) * n / d; i += 1}
   }
 
-  def doScaleSpire[@spec(Int) A:EuclideanRing](as: Array[A], n: A, d: A, cs: Array[A]) = {
+  def doScaleSpire[@sp(Int) A:EuclideanRing](as: Array[A], n: A, d: A, cs: Array[A]) = {
     import spire.implicits._
     var i = 0
     val len = as.length
@@ -224,7 +224,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
 //}
 //
 //object Spire {
-//  @tailrec final def gcd[@spec(Int) A: Integral](a: A, b: A): A =
+//  @tailrec final def gcd[@sp(Int) A: Integral](a: A, b: A): A =
 //    if (a % b === Integral[A].zero) b else gcd(b, a % b)
 //}
 //

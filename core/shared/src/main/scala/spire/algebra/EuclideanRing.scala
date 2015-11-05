@@ -1,7 +1,7 @@
 package spire
 package algebra
 
-trait EuclideanRing[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with CRing[A] {
+trait EuclideanRing[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with CRing[A] {
   def quot(a: A, b: A): A
   def mod(a: A, b: A): A
   def quotmod(a: A, b: A): (A, A) = (quot(a, b), mod(a, b))

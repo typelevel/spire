@@ -6,7 +6,7 @@ import spire.std._
 
 import java.lang.Math
 
-trait Fractional[@spec(Float, Double) A] extends Any with Field[A] with NRoot[A] with Integral[A]
+trait Fractional[@sp(Float, Double) A] extends Any with Field[A] with NRoot[A] with Integral[A]
 
 object Fractional {
   implicit final val FloatIsFractional = new FloatIsFractional

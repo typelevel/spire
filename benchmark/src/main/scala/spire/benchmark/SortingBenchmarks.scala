@@ -19,7 +19,7 @@ import com.google.caliper.Param
 
 object SortingBenchmarks extends MyRunner(classOf[SortingBenchmarks])
 
-final class FakeComplex[@spec(Float, Double) T](val real:T, val imag:T)(implicit f:Fractional[T], t:Trig[T]) extends Ordered[FakeComplex[T]] {
+final class FakeComplex[@sp(Float, Double) T](val real:T, val imag:T)(implicit f:Fractional[T], t:Trig[T]) extends Ordered[FakeComplex[T]] {
   def compare(b: FakeComplex[T]): Int = {
     if (f.lt(real, b.real)) -1
     else if (f.gt(real, b.real)) 1

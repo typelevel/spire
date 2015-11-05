@@ -13,16 +13,16 @@ import java.lang.Math
 
 
 object Complex extends ComplexInstances {
-  def i[@spec(Float, Double) T](implicit T: Rig[T]): Complex[T] =
+  def i[@sp(Float, Double) T](implicit T: Rig[T]): Complex[T] =
     new Complex(T.zero, T.one)
 
-  def one[@spec(Float, Double) T](implicit T: Rig[T]): Complex[T] =
+  def one[@sp(Float, Double) T](implicit T: Rig[T]): Complex[T] =
     new Complex(T.one, T.zero)
 
-  def zero[@spec(Float, Double) T](implicit T: Semiring[T]): Complex[T] =
+  def zero[@sp(Float, Double) T](implicit T: Semiring[T]): Complex[T] =
     new Complex(T.zero, T.zero)
 
-  def fromInt[@spec(Float, Double) T](n: Int)(implicit f: Ring[T]): Complex[T] =
+  def fromInt[@sp(Float, Double) T](n: Int)(implicit f: Ring[T]): Complex[T] =
     new Complex(f.fromInt(n), f.zero)
 
   implicit def intToComplex(n: Int): Complex[Double] = new Complex(n.toDouble, 0.0)
@@ -38,13 +38,13 @@ object Complex extends ComplexInstances {
     new Complex(n, BigDecimal(0))
   }
 
-  def polar[@spec(Float, Double) T: Field: Trig](magnitude: T, angle: T): Complex[T] =
+  def polar[@sp(Float, Double) T: Field: Trig](magnitude: T, angle: T): Complex[T] =
     new Complex(magnitude * Trig[T].cos(angle), magnitude * Trig[T].sin(angle))
 
-  def apply[@spec(Float, Double) T: Semiring](real: T): Complex[T] =
+  def apply[@sp(Float, Double) T: Semiring](real: T): Complex[T] =
     new Complex(real, Semiring[T].zero)
 
-  def rootOfUnity[@spec(Float, Double) T](n: Int, x: Int)(implicit f: Field[T], t: Trig[T], r: IsReal[T]): Complex[T] = {
+  def rootOfUnity[@sp(Float, Double) T](n: Int, x: Int)(implicit f: Field[T], t: Trig[T], r: IsReal[T]): Complex[T] = {
     if (x == 0) return one[T]
 
     if (n % 2 == 0) {
@@ -58,7 +58,7 @@ object Complex extends ComplexInstances {
     polar(f.one, (t.pi * 2 * x) / n)
   }
 
-  def rootsOfUnity[@spec(Float, Double) T](n: Int)(implicit f: Field[T], t: Trig[T], r: IsReal[T]): Array[Complex[T]] = {
+  def rootsOfUnity[@sp(Float, Double) T](n: Int)(implicit f: Field[T], t: Trig[T], r: IsReal[T]): Array[Complex[T]] = {
     val roots = new Array[Complex[T]](n)
     var sum = one[T]
     roots(0) = sum
@@ -87,7 +87,7 @@ object Complex extends ComplexInstances {
 }
 
 @SerialVersionUID(0L)
-final case class Complex[@spec(Float, Double) T](real: T, imag: T)
+final case class Complex[@sp(Float, Double) T](real: T, imag: T)
     extends ScalaNumber with ScalaNumericConversions with Serializable { lhs =>
 
   import spire.syntax.order._
@@ -582,13 +582,13 @@ trait ComplexInstances1 extends ComplexInstances0 {
 }
 
 trait ComplexInstances extends ComplexInstances1 {
-  implicit def ComplexAlgebra[@spec(Float, Double) A: Fractional: Trig: IsReal]: ComplexAlgebra[A] =
+  implicit def ComplexAlgebra[@sp(Float, Double) A: Fractional: Trig: IsReal]: ComplexAlgebra[A] =
     new ComplexAlgebra[A]
 
   implicit def ComplexEq[A: Eq]: Eq[Complex[A]] = new ComplexEq[A]
 }
 
-private[math] trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A]] {
+private[math] trait ComplexIsRing[@sp(Float, Double) A] extends Ring[Complex[A]] {
   implicit def algebra: Ring[A]
   implicit def order: IsReal[A]
 
@@ -602,7 +602,7 @@ private[math] trait ComplexIsRing[@spec(Float, Double) A] extends Ring[Complex[A
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
 }
 
-private[math] trait ComplexIsField[@spec(Float,Double) A] extends ComplexIsRing[A] with Field[Complex[A]] {
+private[math] trait ComplexIsField[@sp(Float,Double) A] extends ComplexIsRing[A] with Field[Complex[A]] {
 
   implicit def algebra: Field[A]
 
@@ -618,7 +618,7 @@ private[math] trait ComplexIsField[@spec(Float,Double) A] extends ComplexIsRing[
   }
 }
 
-private[math] trait ComplexIsTrig[@spec(Float, Double) A] extends Trig[Complex[A]] {
+private[math] trait ComplexIsTrig[@sp(Float, Double) A] extends Trig[Complex[A]] {
   implicit def algebra: Field[A]
   implicit def nroot: NRoot[A]
   implicit def trig: Trig[A]
@@ -677,15 +677,15 @@ private[math] class ComplexEq[A: Eq] extends Eq[Complex[A]] with Serializable {
 }
 
 @SerialVersionUID(1L)
-private[math] final class ComplexIsRingImpl[@spec(Float,Double) A](implicit
+private[math] final class ComplexIsRingImpl[@sp(Float,Double) A](implicit
     val algebra: Ring[A], val order: IsReal[A]) extends ComplexIsRing[A] with Serializable
 
 @SerialVersionUID(1L)
-private[math] final class ComplexIsFieldImpl[@spec(Float,Double) A](implicit
+private[math] final class ComplexIsFieldImpl[@sp(Float,Double) A](implicit
     val algebra: Field[A], val order: IsReal[A]) extends ComplexIsField[A] with Serializable
 
 @SerialVersionUID(1L)
-private[math] class ComplexAlgebra[@spec(Float, Double) A](implicit
+private[math] class ComplexAlgebra[@sp(Float, Double) A](implicit
       val algebra: Field[A], val nroot: NRoot[A], val trig: Trig[A], val order: IsReal[A])
     extends ComplexIsField[A]
     with ComplexIsTrig[A]

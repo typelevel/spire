@@ -1,7 +1,7 @@
 package spire
 package algebra
 
-trait Trig[@spec(Float, Double) A] extends Any {
+trait Trig[@sp(Float, Double) A] extends Any {
   def e: A
   def pi: A
 

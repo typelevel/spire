@@ -81,7 +81,7 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
     ai(k)
   }
 
-  def nearlyMaxG[@spec A: Numeric: ClassTag](a: Array[A], k: Int, start: Int = 0, end: Int = -1): A = {
+  def nearlyMaxG[@sp A: Numeric: ClassTag](a: Array[A], k: Int, start: Int = 0, end: Int = -1): A = {
     val i0 = if (start >= 0) start else a.length + start
     val i1 = if (end >= 0) end else a.length + end + 1
     val ai = new Array[A](max(k, 0) + 1)

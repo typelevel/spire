@@ -16,7 +16,7 @@ import java.math.MathContext
 
 
 class SignedTest extends FunSuite {
-  def runWith[@spec(Int, Long, Float, Double) A: Signed: ClassTag](neg: A, pos: A, zero: A): Unit = {
+  def runWith[@sp(Int, Long, Float, Double) A: Signed: ClassTag](neg: A, pos: A, zero: A): Unit = {
     val m = implicitly[ClassTag[A]]
 
     //// the name to use for this A

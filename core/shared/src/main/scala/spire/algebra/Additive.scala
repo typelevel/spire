@@ -37,7 +37,7 @@ object Additive {
   }
 }
 
-trait AdditiveSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any {
+trait AdditiveSemigroup[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any {
   def additive: Semigroup[A] = new Semigroup[A] {
     def op(x: A, y: A): A = plus(x, y)
   }
@@ -71,13 +71,13 @@ trait AdditiveSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends 
   def sumOption(as: TraversableOnce[A]): Option[A] = as.reduceOption(plus)
 }
 
-trait AdditiveCSemigroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveSemigroup[A] {
+trait AdditiveCSemigroup[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveSemigroup[A] {
   override def additive: CSemigroup[A] = new CSemigroup[A] {
     def op(x: A, y: A): A = plus(x, y)
   }
 }
 
-trait AdditiveMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveSemigroup[A] {
+trait AdditiveMonoid[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveSemigroup[A] {
   override def additive: Monoid[A] = new Monoid[A] {
     def id: A = zero
     def op(x: A, y: A): A = plus(x, y)
@@ -105,14 +105,14 @@ trait AdditiveMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any
   def sum(as: TraversableOnce[A]): A = as.aggregate(zero)(plus, plus)
 }
 
-trait AdditiveCMonoid[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveMonoid[A] with AdditiveCSemigroup[A] {
+trait AdditiveCMonoid[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveMonoid[A] with AdditiveCSemigroup[A] {
   override def additive: CMonoid[A] = new CMonoid[A] {
     def id: A = zero
     def op(x: A, y: A): A = plus(x, y)
   }
 }
 
-trait AdditiveGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveMonoid[A] {
+trait AdditiveGroup[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveMonoid[A] {
   override def additive: Group[A] = new Group[A] {
     def id: A = zero
     def op(x: A, y: A): A = plus(x, y)
@@ -133,7 +133,7 @@ trait AdditiveGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any 
     else sumnAboveOne(a, n)
 }
 
-trait AdditiveAbGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveGroup[A] with AdditiveCMonoid[A] {
+trait AdditiveAbGroup[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with AdditiveGroup[A] with AdditiveCMonoid[A] {
   override def additive: AbGroup[A] = new AbGroup[A] {
     def id: A = zero
     def op(x: A, y: A): A = plus(x, y)

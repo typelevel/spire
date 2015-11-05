@@ -5,7 +5,7 @@ import spire.algebra.Bool
 
 import java.lang.Math
 
-trait BitString[@spec(Byte, Short, Int, Long) A] extends Any with Bool[A] {
+trait BitString[@sp(Byte, Short, Int, Long) A] extends Any with Bool[A] {
   def signed: Boolean
   def width: Int
   def toHexString(n: A): String

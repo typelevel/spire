@@ -7,8 +7,6 @@ import spire.syntax.order._
 import spire.syntax.euclideanRing._
 import spire.syntax.convertableFrom._
 
-import spire.algebra.{Order, Signed}
-
 import java.math.MathContext
 import spire.algebra.{Order, Signed}
 
@@ -285,7 +283,7 @@ object FixedPoint extends FixedPointInstances {
   def apply(s: String)(implicit scale: FixedScale): FixedPoint =
     apply(Rational(s))
 
-  def apply[@spec(Float, Double) A](a: A)(implicit scale: FixedScale, fr: Fractional[A]): FixedPoint = {
+  def apply[@sp(Float, Double) A](a: A)(implicit scale: FixedScale, fr: Fractional[A]): FixedPoint = {
     val x = a * scale.denom
     if (x < fr.fromLong(Long.MinValue) || fr.fromLong(Long.MaxValue) < x)
       throw new FixedPointOverflow(x.toLong)

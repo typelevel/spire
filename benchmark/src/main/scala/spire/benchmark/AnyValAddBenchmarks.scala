@@ -34,7 +34,7 @@ class AnyValAddBenchmarks extends MyBenchmark {
     doubles = init(size)(nextDouble)
   }
 
-  def addGeneric[@spec(Byte, Short, Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
+  def addGeneric[@sp(Byte, Short, Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
     var total = Ring[A].zero
     var i = 0
     val len = data.length

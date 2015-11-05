@@ -22,11 +22,11 @@ trait BigIntSyntax {
 }
 
 trait ArraySyntax {
-  implicit def arrayOps[@spec A](lhs:Array[A]): ArrayOps[A] = new ArrayOps(lhs)
+  implicit def arrayOps[@sp A](lhs:Array[A]): ArrayOps[A] = new ArrayOps(lhs)
 }
 
 trait SeqSyntax {
-  implicit def seqOps[@spec A, CC[A] <: Iterable[A]](lhs:CC[A]): SeqOps[A, CC] = new SeqOps[A, CC](lhs)
-  implicit def indexedSeqOps[@spec A, CC[A] <: IndexedSeq[A]](lhs:CC[A]): IndexedSeqOps[A, CC] = new IndexedSeqOps[A, CC](lhs)
+  implicit def seqOps[@sp A, CC[A] <: Iterable[A]](lhs:CC[A]): SeqOps[A, CC] = new SeqOps[A, CC](lhs)
+  implicit def indexedSeqOps[@sp A, CC[A] <: IndexedSeq[A]](lhs:CC[A]): IndexedSeqOps[A, CC] = new IndexedSeqOps[A, CC](lhs)
 }
 

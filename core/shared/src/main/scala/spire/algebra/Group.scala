@@ -5,7 +5,7 @@ package algebra
 /**
  * A group is a monoid where each element has an inverse.
  */
-trait Group[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Monoid[A] {
+trait Group[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Monoid[A] {
 
   /**
    * Return the inverse of `a`.
@@ -37,7 +37,7 @@ object Group {
 /**
  * An abelian group is a group whose operation is commutative.
  */
-trait AbGroup[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Group[A] with CMonoid[A]
+trait AbGroup[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Group[A] with CMonoid[A]
 
 object AbGroup {
   @inline final def apply[A](implicit ev: AbGroup[A]): AbGroup[A] = ev

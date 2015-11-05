@@ -6,10 +6,10 @@ import spire.syntax.order._
 
 
 object Searching {
-  final def search[@spec A: Order](as: Array[A], item: A): Int =
+  final def search[@sp A: Order](as: Array[A], item: A): Int =
     search(as, item, 0, as.length - 1)
 
-  final def search[@spec A: Order](as: Array[A], item: A, lower: Int, upper: Int): Int = {
+  final def search[@sp A: Order](as: Array[A], item: A, lower: Int, upper: Int): Int = {
     var first = lower
     var last = upper
     while (first <= last) {
@@ -23,10 +23,10 @@ object Searching {
     -first - 1
   }
 
-  final def search[@spec A: Order](as: IndexedSeq[A], item: A): Int =
+  final def search[@sp A: Order](as: IndexedSeq[A], item: A): Int =
     search(as, item, 0, as.length - 1)
 
-  final def search[@spec A: Order](as: IndexedSeq[A], item: A, lower: Int, upper: Int): Int = {
+  final def search[@sp A: Order](as: IndexedSeq[A], item: A, lower: Int, upper: Int): Int = {
     var first = lower
     var last = upper
     while (first <= last) {

@@ -13,7 +13,7 @@ import org.scalatest.prop.Checkers
 trait SelectTest extends FunSuite /* with Checkers */ {
   def selector: Select
 
-  final def select[@spec A: Order: ClassTag](data: Array[A], k: Int) =
+  final def select[@sp A: Order: ClassTag](data: Array[A], k: Int) =
     selector.select(data, k)
 
   def shuffle[A: ClassTag](as: Array[A]): Array[A] =

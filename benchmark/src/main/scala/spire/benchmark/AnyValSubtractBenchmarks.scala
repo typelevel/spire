@@ -33,7 +33,7 @@ class AnyValSubtractBenchmarks extends MyBenchmark {
     doubles = init(size)(nextDouble)
   }
 
-  def subtractGeneric[@spec(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
+  def subtractGeneric[@sp(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
     var total = Ring[A].zero
     var i = 0
     val len = data.length
