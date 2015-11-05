@@ -1,4 +1,5 @@
-package spire.random
+package spire
+package random
 package rng
 
 final class SyncGenerator(gen: Generator) extends Generator {

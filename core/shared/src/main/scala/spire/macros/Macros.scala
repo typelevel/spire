@@ -1,4 +1,5 @@
-package spire.macros
+package spire
+package macros
 
 import spire.algebra.{Field, Ring}
 import spire.macros.compat.Context

@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.lang.Math

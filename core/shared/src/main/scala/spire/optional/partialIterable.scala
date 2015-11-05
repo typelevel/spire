@@ -1,4 +1,5 @@
-package spire.optional
+package spire
+package optional
 
 import scala.collection.IterableLike
 import scala.collection.generic.CanBuildFrom

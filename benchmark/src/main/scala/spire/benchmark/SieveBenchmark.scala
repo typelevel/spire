@@ -1,4 +1,5 @@
-package spire.benchmark
+package spire
+package benchmark
 
 import spire.math.prime._
 import scala.util.{Success, Try}

@@ -1,4 +1,5 @@
-package spire.algebra
+package spire
+package algebra
 package free
 
 final class FreeMonoid[A] private (val terms: List[A]) extends AnyVal { lhs =>

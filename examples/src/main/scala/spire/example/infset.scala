@@ -1,4 +1,5 @@
-package spire.examples
+package spire
+package examples
 
 import spire.algebra._
 import spire.math.{Natural, UInt}

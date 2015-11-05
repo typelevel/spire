@@ -1,4 +1,5 @@
-package spire.laws
+package spire
+package laws
 
 import spire.algebra._
 import spire.implicits._

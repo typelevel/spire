@@ -1,4 +1,5 @@
-package spire.optional
+package spire
+package optional
 
 import spire.algebra.Trig
 import spire.math.Rational

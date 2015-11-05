@@ -1,4 +1,5 @@
-package spire.algebra
+package spire
+package algebra
 
 import spire.math.{ Rational, NumberTag }
 import spire.std.int._

@@ -1,4 +1,5 @@
-package spire.optional
+package spire
+package optional
 
 import java.lang.Math
 

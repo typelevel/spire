@@ -1,4 +1,5 @@
-package spire.util
+package spire
+package util
 
 import java.nio.ByteBuffer
 import scala.language.experimental.macros

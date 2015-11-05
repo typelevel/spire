@@ -1,4 +1,5 @@
-package spire.benchmark
+package spire
+package benchmark
 
 import scala.util.Random
 import spire.macros.Checked
