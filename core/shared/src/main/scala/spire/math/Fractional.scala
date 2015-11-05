@@ -1,9 +1,9 @@
-package spire.math
+package spire
+package math
 
 import spire.algebra.{Field, NRoot}
 import spire.std._
 
-import scala.{specialized => spec}
 import java.lang.Math
 
 trait Fractional[@spec(Float, Double) A] extends Any with Field[A] with NRoot[A] with Integral[A]

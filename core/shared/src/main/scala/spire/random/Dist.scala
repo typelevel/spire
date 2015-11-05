@@ -1,4 +1,5 @@
-package spire.random
+package spire
+package random
 
 import spire.algebra._
 import spire.syntax.all._
@@ -7,8 +8,6 @@ import spire.math.{Complex, Interval, Natural, Rational, SafeLong, UByte, UShort
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
-import scala.annotation.tailrec
-import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
 trait Dist[@spec A] extends Any { self =>

@@ -1,6 +1,6 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.{ specialized => spec }
 
 /**
  * A module generalizes a vector space by requiring its scalar need only form

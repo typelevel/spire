@@ -1,7 +1,6 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.{ specialized => spec }
-import scala.annotation.tailrec
 
 
 object Additive {

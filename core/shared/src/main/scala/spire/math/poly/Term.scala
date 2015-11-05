@@ -1,6 +1,6 @@
-package spire.math.poly
-
-import scala.{specialized => spec}
+package spire
+package math
+package poly
 
 import spire.algebra.{Eq, Field, Order, Rig, Ring, Rng, Semiring}
 import spire.syntax.field._

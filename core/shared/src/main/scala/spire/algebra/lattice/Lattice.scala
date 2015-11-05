@@ -1,10 +1,9 @@
-package spire.algebra
+package spire
+package algebra
 package lattice
 
 import spire.syntax.order._
 import spire.syntax.euclideanRing._
-
-import scala.{specialized => sp}
 
 trait JoinSemilattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any {
   def join(lhs: A, rhs: A): A

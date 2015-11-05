@@ -6,7 +6,6 @@ import spire.implicits._
 import com.google.caliper.{ Runner, SimpleBenchmark, Param }
 
 import scala.util.Random._
-import scala.annotation.tailrec
 
 object MapSemigroupBenchmarks extends MyRunner(classOf[MapSemigroupBenchmarks])
 

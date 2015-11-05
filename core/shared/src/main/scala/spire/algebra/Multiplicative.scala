@@ -1,7 +1,6 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.{ specialized => spec }
-import scala.annotation.tailrec
 
 object Multiplicative {
   def apply[A](s: Semigroup[A]): MultiplicativeSemigroup[A] = new MultiplicativeSemigroup[A] {

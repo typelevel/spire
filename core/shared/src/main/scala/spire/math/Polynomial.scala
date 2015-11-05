@@ -1,10 +1,9 @@
-package spire.math
+package spire
+package math
 
 import scala.collection.mutable.ArrayBuilder
 
-import scala.annotation.tailrec
 import scala.reflect.ClassTag
-import scala.{specialized => spec}
 
 import java.math.{ BigDecimal => JBigDecimal, RoundingMode, MathContext }
 

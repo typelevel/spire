@@ -1,8 +1,5 @@
-package spire.algebra
-
-import annotation.tailrec
-import scala.{specialized => spec}
-
+package spire
+package algebra
 
 /**
  * Semiring is a ring without identities or an inverse. Thus, it has no

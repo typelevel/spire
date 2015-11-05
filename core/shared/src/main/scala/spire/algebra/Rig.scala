@@ -1,7 +1,5 @@
-package spire.algebra
-
-import annotation.tailrec
-import scala.{specialized => spec}
+package spire
+package algebra
 
 /**
  * Rig is a ring whose additive structure doesn't have an inverse (ie. it is

@@ -1,6 +1,5 @@
-package spire.algebra
-
-import scala.{specialized => spec}
+package spire
+package algebra
 
 /**
   * The `Order` type class is used to define a total ordering on some type `A`.

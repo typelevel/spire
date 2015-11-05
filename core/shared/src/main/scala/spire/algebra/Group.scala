@@ -1,6 +1,6 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.{ specialized => spec }
 
 /**
  * A group is a monoid where each element has an inverse.

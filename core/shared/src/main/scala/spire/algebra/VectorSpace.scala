@@ -1,6 +1,6 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.{ specialized => spec }
 
 /**
  * A vector space is a group `V` that can be multiplied by scalars in `F` that

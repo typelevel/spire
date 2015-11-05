@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 //import spire.syntax.ring._
 import spire.std.long._
@@ -9,7 +10,7 @@ import spire.syntax.convertableFrom._
 import spire.algebra.{Order, Signed}
 
 import java.math.MathContext
-import scala.{specialized => spec}
+import spire.algebra.{Order, Signed}
 
 class FixedPointOverflow(n: Long) extends Exception(n.toString)
 

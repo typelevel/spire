@@ -1,10 +1,8 @@
-package spire.math
+package spire
+package math
 
-import scala.annotation.tailrec
 import scala.math._
 import scala.reflect._
-import scala.{specialized => sp}
-
 import spire.algebra._
 import spire.std.ArraySupport
 import spire.syntax.isReal._

@@ -1,13 +1,12 @@
-package spire.example
+package spire
+package example
 
 import spire.algebra._
 import spire.implicits._
 
 import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
-import scala.{ specialized => spec }
 import scala.util.Random.{ nextInt, nextDouble, nextGaussian }
-import scala.annotation.tailrec
 
 /**
  * An example using `NormedVectorSpace`s to create a generic k-Means

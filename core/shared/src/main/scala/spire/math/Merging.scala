@@ -1,8 +1,7 @@
-package spire.math
+package spire
+package math
 import spire.algebra.Order
-import scala.{specialized => spec}
 
-import scala.annotation.tailrec
 import scala.reflect.ClassTag
 
 /**

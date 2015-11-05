@@ -1,6 +1,5 @@
-package spire.algebra
-
-import scala.{specialized => spec}
+package spire
+package algebra
 
 trait Trig[@spec(Float, Double) A] extends Any {
   def e: A

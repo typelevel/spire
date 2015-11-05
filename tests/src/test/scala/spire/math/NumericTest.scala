@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 import scala.reflect.ClassTag
 
@@ -11,7 +12,6 @@ import spire.implicits.{eqOps => _, _}
 import java.math.MathContext
 
 // nice alias
-import scala.{specialized => spec}
 
 class NumericTest extends FunSuite {
 

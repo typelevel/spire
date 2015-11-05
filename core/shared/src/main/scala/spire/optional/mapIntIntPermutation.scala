@@ -1,7 +1,5 @@
 package spire.optional
 
-import scala.{specialized => sp}
-
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 

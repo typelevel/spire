@@ -1,6 +1,6 @@
-package spire.std
+package spire
+package std
 
-import scala.{ specialized => spec }
 import scala.reflect.ClassTag
 
 import spire.algebra._

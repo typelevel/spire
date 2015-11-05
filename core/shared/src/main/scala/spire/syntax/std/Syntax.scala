@@ -1,7 +1,8 @@
-package spire.syntax.std
+package spire
+package syntax
+package std
 
 import spire.math.ConvertableTo
-import scala.{specialized => spec}
 
 trait IntSyntax {
   implicit def literalIntOps(n: Int): LiteralIntOps = new LiteralIntOps(n)

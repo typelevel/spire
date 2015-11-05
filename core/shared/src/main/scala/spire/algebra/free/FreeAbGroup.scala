@@ -1,7 +1,7 @@
-package spire.algebra
+package spire
+package algebra
 package free
 
-import scala.annotation.tailrec
 
 import spire.std.option._
 import spire.std.map._

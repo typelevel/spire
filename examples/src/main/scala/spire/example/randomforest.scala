@@ -1,10 +1,9 @@
-package spire.example
+package spire
+package example
 
 import spire.algebra._
 import spire.implicits._
 
-import scala.{ specialized => spec }
-import scala.annotation.tailrec
 import scala.util.Random.nextInt
 
 import scala.reflect.ClassTag

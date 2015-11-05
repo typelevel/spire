@@ -1,6 +1,6 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.{ specialized => spec }
 
 /**
  * A `RingAlgebra` is a module that is also a `Rng`. An example is the Gaussian

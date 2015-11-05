@@ -1,6 +1,6 @@
-package spire.random
+package spire
+package random
 
-import scala.annotation.tailrec
 import scala.reflect.ClassTag
 
 import spire.algebra._

@@ -1,7 +1,5 @@
-package spire.algebra
-
-import annotation.tailrec
-import scala.{specialized => spec}
+package spire
+package algebra
 
 /**
  * Ring represents a set (A) that is a group over addition (+) and a monoid

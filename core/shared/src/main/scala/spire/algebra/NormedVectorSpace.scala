@@ -1,8 +1,8 @@
-package spire.algebra
+package spire
+package algebra
 
 import spire.std._
 
-import scala.{ specialized => spec }
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 

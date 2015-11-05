@@ -1,6 +1,6 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.{ specialized => spec }
 
 /**
  * This type class models a metric space `V`. The distance between 2 points in

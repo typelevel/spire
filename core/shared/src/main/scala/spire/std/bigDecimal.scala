@@ -1,9 +1,9 @@
-package spire.std
+package spire
+package std
 
 import java.lang.Math
 import java.math.MathContext
 
-import scala.annotation.tailrec
 
 import BigDecimal.RoundingMode.{CEILING, FLOOR, HALF_UP}
 

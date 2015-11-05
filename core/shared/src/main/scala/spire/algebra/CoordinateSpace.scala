@@ -1,12 +1,11 @@
-package spire.algebra
+package spire
+package algebra
 
 import spire.std._
 
-import scala.{ specialized => spec }
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 import scala.reflect.ClassTag
-import scala.annotation.tailrec
 
 trait CoordinateSpace[V, @spec(Float, Double) F] extends Any with InnerProductSpace[V, F] {
   def dimensions: Int

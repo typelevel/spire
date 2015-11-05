@@ -1,11 +1,9 @@
-package spire.math
+package spire
+package math
 
 import java.lang.Math
 
-import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
-import scala.{specialized => sp}
-
 import spire.algebra._
 import spire.syntax.field._
 import spire.syntax.isReal._

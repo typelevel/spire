@@ -1,6 +1,6 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.{ specialized => spec }
 
 /**
  * A (left) semigroup/monoid/group action of `G` on `P` is simply the implementation of

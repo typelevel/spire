@@ -1,7 +1,6 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.{ specialized => spec }
-import scala.annotation.tailrec
 
 trait InnerProductSpace[V, @spec(Int, Long, Float, Double) F] extends Any with VectorSpace[V, F] { self =>
   def dot(v: V, w: V): F

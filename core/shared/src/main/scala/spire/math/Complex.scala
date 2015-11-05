@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 import spire.algebra._
 
@@ -7,8 +8,6 @@ import spire.syntax.isReal._
 import spire.syntax.nroot._
 import spire.syntax.order._
 
-import scala.{specialized => spec}
-import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions, ScalaNumericAnyConversions}
 import java.lang.Math
 

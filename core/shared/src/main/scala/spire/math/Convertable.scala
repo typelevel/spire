@@ -1,8 +1,8 @@
-package spire.math
+package spire
+package math
 
 import java.math.MathContext
 
-import scala.{specialized => spec}
 
 import spire.algebra.{ Trig, IsReal }
 

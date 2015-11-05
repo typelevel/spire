@@ -1,6 +1,5 @@
-package spire.algebra
-
-import scala.{specialized => spec}
+package spire
+package algebra
 
 import java.lang.Double.{ isInfinite, isNaN, doubleToLongBits }
 import java.lang.Long.{ numberOfTrailingZeros }

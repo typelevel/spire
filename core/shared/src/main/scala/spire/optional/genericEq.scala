@@ -1,6 +1,6 @@
-package spire.optional
+package spire
+package optional
 
-import scala.{specialized => sp}
 import spire.algebra.Eq
 
 /**

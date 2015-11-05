@@ -6,8 +6,6 @@ import java.math.BigInteger
 import java.math.MathContext
 import java.math.RoundingMode
 
-import scala.annotation.tailrec
-import scala.{specialized => spec}
 import scala.math.ScalaNumericConversions
 
 import BigDecimal.RoundingMode.{FLOOR, HALF_UP, CEILING}

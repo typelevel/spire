@@ -1,9 +1,9 @@
-package spire.math
+package spire
+package math
 
 import spire.algebra._
 import spire.std.int._
 
-import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
 import org.scalatest.FunSuite

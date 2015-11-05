@@ -1,9 +1,9 @@
-package spire.math
+package spire
+package math
 
 import spire.algebra.{AdditiveAbGroup, IsReal, MultiplicativeAbGroup, Order, NRoot, Ring, Trig}
 import spire.std._
 
-import scala.{specialized => spec}
 
 /**
  * TODO

@@ -1,8 +1,8 @@
-package spire.benchmark.jmh
+package spire
+package benchmark.jmh
 
 import java.util.concurrent.TimeUnit
 
-import scala.{specialized => spec}
 
 import org.openjdk.jmh.annotations._
 

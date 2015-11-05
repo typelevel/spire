@@ -1,6 +1,5 @@
-package spire.algebra
-
-import scala.{specialized => spec}
+package spire
+package algebra
 
 /**
  * A type class used to determine equality between 2 instances of the same

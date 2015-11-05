@@ -1,7 +1,7 @@
-package spire.math
+package spire
+package math
 package poly
 
-import scala.annotation.tailrec
 
 import java.math.{ BigDecimal => JBigDecimal, RoundingMode, MathContext }
 

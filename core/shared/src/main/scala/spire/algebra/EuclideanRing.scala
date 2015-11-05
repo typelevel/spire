@@ -1,7 +1,5 @@
-package spire.algebra
-
-import scala.annotation.tailrec
-import scala.{specialized => spec}
+package spire
+package algebra
 
 trait EuclideanRing[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with CRing[A] {
   def quot(a: A, b: A): A

@@ -1,11 +1,11 @@
-package spire.math
+package spire
+package math
 
 import java.math.BigInteger
 
 import spire.util.Opt
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
-import scala.annotation.tailrec
 
 import spire.macros.Checked
 

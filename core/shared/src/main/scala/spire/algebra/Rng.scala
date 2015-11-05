@@ -1,7 +1,5 @@
-package spire.algebra
-
-import annotation.tailrec
-import scala.{specialized => spec}
+package spire
+package algebra
 
 /**
  * Rng is a ring whose multiplicative structure doesn't have an identity

@@ -1,7 +1,5 @@
-package spire.algebra
-
-import scala.{ specialized => spec }
-import scala.annotation.{ switch, tailrec }
+package spire
+package algebra
 
 /**
  * A semigroup is any set `A` with an associative operation (`op`).

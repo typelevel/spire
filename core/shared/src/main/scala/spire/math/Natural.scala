@@ -1,8 +1,7 @@
-package spire.math
+package spire
+package math
 
-import scala.annotation.tailrec
 import scala.math.{ScalaNumber, ScalaNumericConversions}
-import scala.{specialized => spec}
 
 import spire.algebra.{IsIntegral, Order, Rig, Signed}
 

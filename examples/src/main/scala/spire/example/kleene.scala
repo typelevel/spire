@@ -1,4 +1,5 @@
-package spire.example
+package spire
+package example
 
 import Predef.{any2stringadd => _, intWrapper => _, _}
 
@@ -7,7 +8,6 @@ import spire.std.BooleanIsRig
 import spire.implicits._
 
 import scala.reflect.ClassTag
-import scala.annotation.tailrec
 
 /**
  * These examples are taken from http://r6.ca/blog/20110808T035622Z.html.

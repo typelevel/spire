@@ -1,6 +1,6 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.{specialized => spec}
 import java.math.MathContext
 
 // NOTE: fpow vs pow is a bit of a trainwreck :P

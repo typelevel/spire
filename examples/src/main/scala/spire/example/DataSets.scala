@@ -1,11 +1,10 @@
-package spire.example
+package spire
+package example
 
 import spire.algebra._
 import spire.math.Rational
 import spire.implicits._
 
-import scala.{ specialized => spec }
-import scala.annotation.tailrec
 import scala.collection.IterableLike
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable.{ Builder, ListBuffer }

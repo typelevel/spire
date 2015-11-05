@@ -1,9 +1,7 @@
-package spire.random
+package spire
+package random
 
 import java.math.MathContext
-
-import scala.{specialized => sp}
-import scala.annotation.tailrec
 
 import spire.algebra.{Field, NRoot, Order, Trig}
 

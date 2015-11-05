@@ -1,4 +1,5 @@
-package spire.algebra
+package spire
+package algebra
 
 import scala.reflect.ClassTag
 
@@ -10,7 +11,6 @@ import spire.math.{Rational, Complex, Jet, JetDim}
 import spire.implicits.{eqOps => _, _}
 
 // nice alias
-import scala.{specialized => spec}
 
 import java.math.MathContext
 

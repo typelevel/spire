@@ -1,7 +1,6 @@
-package spire.random
+package spire
+package random
 
-import scala.annotation.tailrec
-import scala.{specialized => spec}
 import scala.reflect.ClassTag
 
 import spire.math.{UInt, ULong}

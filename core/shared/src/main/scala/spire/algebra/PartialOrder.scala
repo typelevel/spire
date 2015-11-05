@@ -1,6 +1,5 @@
-package spire.algebra
-
-import scala.{specialized => spec}
+package spire
+package algebra
 
 /**
   * The `PartialOrder` type class is used to define a partial ordering on some type `A`.

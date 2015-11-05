@@ -1,4 +1,5 @@
-package spire.syntax
+package spire
+package syntax
 
 import spire.algebra._
 import spire.algebra.lattice._
