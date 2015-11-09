@@ -1,6 +1,6 @@
-package spire.benchmark
+package spire
+package benchmark
 
-import scala.reflect.ClassTag
 
 import spire.implicits._
 

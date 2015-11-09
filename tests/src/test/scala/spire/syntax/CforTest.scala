@@ -1,4 +1,5 @@
-package spire.syntax
+package spire
+package syntax
 
 import scala.collection.mutable
 

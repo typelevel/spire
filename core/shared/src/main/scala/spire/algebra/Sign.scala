@@ -1,4 +1,5 @@
-package spire.algebra
+package spire
+package algebra
 
 /**
  * A simple ADT representing the `Sign` of an object.

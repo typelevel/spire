@@ -1,8 +1,6 @@
-package spire.benchmark
+package spire
+package benchmark
 
-import scala.{specialized => spec}
-import scala.annotation.tailrec
-import scala.reflect.ClassTag
 
 import scala.util.Random
 import Random._

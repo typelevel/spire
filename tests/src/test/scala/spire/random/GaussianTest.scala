@@ -1,7 +1,5 @@
-package spire.random
-
-import scala.annotation.tailrec
-import scala.reflect.ClassTag
+package spire
+package random
 
 import spire.algebra._
 import spire.std.float._

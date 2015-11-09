@@ -1,6 +1,6 @@
-package spire.algebra.lattice
-
-import scala.{specialized => sp}
+package spire
+package algebra
+package lattice
 
 trait Heyting[@sp(Boolean, Byte, Short, Int, Long) A] extends Any with BoundedLattice[A] {
   def and(a: A, b: A): A

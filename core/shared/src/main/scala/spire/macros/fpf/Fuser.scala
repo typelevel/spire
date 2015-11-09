@@ -1,4 +1,5 @@
-package spire.macros.fpf
+package spire
+package macros.fpf
 
 import scala.language.experimental.macros
 

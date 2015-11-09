@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 //import spire.syntax.ring._
 import spire.std.long._
@@ -6,10 +7,8 @@ import spire.syntax.order._
 import spire.syntax.euclideanRing._
 import spire.syntax.convertableFrom._
 
-import spire.algebra.{Order, Signed}
-
 import java.math.MathContext
-import scala.{specialized => spec}
+import spire.algebra.{Order, Signed}
 
 class FixedPointOverflow(n: Long) extends Exception(n.toString)
 
@@ -284,7 +283,7 @@ object FixedPoint extends FixedPointInstances {
   def apply(s: String)(implicit scale: FixedScale): FixedPoint =
     apply(Rational(s))
 
-  def apply[@spec(Float, Double) A](a: A)(implicit scale: FixedScale, fr: Fractional[A]): FixedPoint = {
+  def apply[@sp(Float, Double) A](a: A)(implicit scale: FixedScale, fr: Fractional[A]): FixedPoint = {
     val x = a * scale.denom
     if (x < fr.fromLong(Long.MinValue) || fr.fromLong(Long.MaxValue) < x)
       throw new FixedPointOverflow(x.toLong)

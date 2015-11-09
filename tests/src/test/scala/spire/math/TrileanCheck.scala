@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._

@@ -1,4 +1,5 @@
-package spire.random
+package spire
+package random
 
 import spire.algebra._
 import spire.syntax.all._
@@ -7,11 +8,8 @@ import spire.math.{Complex, Interval, Natural, Rational, SafeLong, UByte, UShort
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
-import scala.annotation.tailrec
-import scala.{specialized => spec}
-import scala.reflect.ClassTag
 
-trait Dist[@spec A] extends Any { self =>
+trait Dist[@sp A] extends Any { self =>
 
   def apply(gen: Generator): A
 
@@ -153,7 +151,7 @@ final class DistIterator[A](next: Dist[A], gen: Generator) extends Iterator[A] {
   final def next(): A = next(gen)
 }
 
-class DistFromGen[@spec A](f: Generator => A) extends Dist[A] {
+class DistFromGen[@sp A](f: Generator => A) extends Dist[A] {
   def apply(gen: Generator): A = f(gen)
 }
 

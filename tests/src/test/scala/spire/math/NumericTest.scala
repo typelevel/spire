@@ -1,6 +1,6 @@
-package spire.math
+package spire
+package math
 
-import scala.reflect.ClassTag
 
 // scalatest
 import org.scalatest.FunSuite
@@ -11,7 +11,6 @@ import spire.implicits.{eqOps => _, _}
 import java.math.MathContext
 
 // nice alias
-import scala.{specialized => spec}
 
 class NumericTest extends FunSuite {
 
@@ -21,7 +20,7 @@ class NumericTest extends FunSuite {
    *
    *   a=-3  b=3  c=9
    */
-  def runWith[@spec A:Numeric:ClassTag](cls:String)(a:A, b:A, c:A): Unit = {
+  def runWith[@sp A:Numeric:ClassTag](cls:String)(a:A, b:A, c:A): Unit = {
 
     // the name to use for this A
     //val cls = implicitly[ClassTag[A]].erasure.getSimpleName

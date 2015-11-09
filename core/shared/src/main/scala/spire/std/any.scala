@@ -1,4 +1,5 @@
-package spire.std
+package spire
+package std
 
 trait AnyInstances extends BooleanInstances
     with CharInstances

@@ -1,4 +1,5 @@
-package spire.benchmark
+package spire
+package benchmark
 
 import spire.implicits._
 

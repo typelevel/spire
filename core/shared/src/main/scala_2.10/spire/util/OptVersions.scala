@@ -1,4 +1,5 @@
-package spire.util
+package spire
+package util
 
 trait OptVersions {
   def unapply[A](n: Opt[A]): Option[A] = n.toOption

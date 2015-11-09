@@ -1,4 +1,5 @@
-package spire.std
+package spire
+package std
 
 import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
 import spire.math.Rational
@@ -7,7 +8,6 @@ import java.lang.Math
 import java.lang.Long.{ numberOfTrailingZeros, numberOfLeadingZeros }
 import java.lang.Double.{ longBitsToDouble, doubleToLongBits }
 
-import scala.annotation.tailrec
 
 trait DoubleIsField extends Field[Double] {
   override def minus(a:Double, b:Double): Double = a - b

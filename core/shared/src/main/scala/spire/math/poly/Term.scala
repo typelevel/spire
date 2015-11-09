@@ -1,13 +1,13 @@
-package spire.math.poly
-
-import scala.{specialized => spec}
+package spire
+package math
+package poly
 
 import spire.algebra.{Eq, Field, Order, Rig, Ring, Rng, Semiring}
 import spire.syntax.field._
 import spire.syntax.eq._
 
 // Univariate polynomial term
-case class Term[@spec(Float, Double) C](coeff: C, exp: Int) { lhs =>
+case class Term[@sp(Float, Double) C](coeff: C, exp: Int) { lhs =>
 
   def unary_-(implicit r: Rng[C]): Term[C] = Term(-coeff, exp)
 
@@ -73,11 +73,11 @@ object Term {
     def compare(x: Term[C], y: Term[C]): Int = x.exp compare y.exp
   }
 
-  def fromTuple[@spec(Float, Double) C](tpl: (Int, C)): Term[C] =
+  def fromTuple[@sp(Float, Double) C](tpl: (Int, C)): Term[C] =
     Term(tpl._2, tpl._1)
-  def zero[@spec(Float, Double) C](implicit r: Semiring[C]): Term[C] =
+  def zero[@sp(Float, Double) C](implicit r: Semiring[C]): Term[C] =
     Term(r.zero, 0)
-  def one[@spec(Float, Double) C](implicit r: Rig[C]): Term[C] =
+  def one[@sp(Float, Double) C](implicit r: Rig[C]): Term[C] =
     Term(r.one, 0)
 
   private val IsZero = "0".r

@@ -1,9 +1,9 @@
-package spire.math
+package spire
+package math
 
 import spire.algebra.{AdditiveAbGroup, IsReal, MultiplicativeAbGroup, Order, NRoot, Ring, Trig}
 import spire.std._
 
-import scala.{specialized => spec}
 
 /**
  * TODO
@@ -13,7 +13,7 @@ import scala.{specialized => spec}
  * 6. Start to worry about things like e.g. pow(BigInt, BigInt)
  */
 
-trait Numeric[@spec(Int,Long,Float,Double) A] extends Any with Ring[A]
+trait Numeric[@sp(Int,Long,Float,Double) A] extends Any with Ring[A]
 with AdditiveAbGroup[A] with MultiplicativeAbGroup[A] with NRoot[A]
 with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A]
 

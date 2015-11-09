@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 package poly
 
 import spire.std.bigInt._

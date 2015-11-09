@@ -1,13 +1,11 @@
-package spire.math
+package spire
+package math
 
-import scala.annotation.tailrec
-import scala.reflect.ClassTag
-import scala.{specialized => spec}
 
 import spire.algebra.Order
 
 trait Select extends Any {
-  def select[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit
+  def select[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit
 }
 
 /**
@@ -16,7 +14,7 @@ trait Select extends Any {
  */
 trait SelectLike extends Any with Select {
 
-  def approxMedian[@spec A: Order](data: Array[A], left: Int, right: Int, stride: Int): A
+  def approxMedian[@sp A: Order](data: Array[A], left: Int, right: Int, stride: Int): A
 
   /**
    * Puts the k-th element of data, according to some Order, in the k-th
@@ -26,12 +24,12 @@ trait SelectLike extends Any with Select {
    * This is an in-place algorithm and is not stable and it WILL mess up the
    * order of equal elements.
    */
-  final def select[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit = {
+  final def select[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit = {
     select(data, 0, data.length, 1, k)
   }
 
   // Copy of InsertSort.sort, but with a stride.
-  final def sort[@spec A](data: Array[A], left: Int, right: Int, stride: Int)(implicit o: Order[A]): Unit = {
+  final def sort[@sp A](data: Array[A], left: Int, right: Int, stride: Int)(implicit o: Order[A]): Unit = {
     var i = left
     while (i < right) {
       val item = data(i)
@@ -46,7 +44,7 @@ trait SelectLike extends Any with Select {
   }
 
   @tailrec
-  protected final def select[@spec A: Order](data: Array[A], left: Int, right: Int, stride: Int, k: Int): Unit = {
+  protected final def select[@sp A: Order](data: Array[A], left: Int, right: Int, stride: Int, k: Int): Unit = {
     val length = (right - left + stride - 1) / stride
     if (length < 10) {
       sort(data, left, right, stride)
@@ -66,7 +64,7 @@ trait SelectLike extends Any with Select {
     }
   }
 
-  final def equalSpan[@spec A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]): Int = {
+  final def equalSpan[@sp A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]): Int = {
     val m = data(offset)
     var i = offset + stride
     var len = 1
@@ -77,7 +75,7 @@ trait SelectLike extends Any with Select {
     len
   }
 
-  final def partition[@spec A](data: Array[A], left: Int, right: Int, stride: Int)(m: A)(implicit o: Order[A]): Int = {
+  final def partition[@sp A](data: Array[A], left: Int, right: Int, stride: Int)(m: A)(implicit o: Order[A]): Int = {
     var i = left  // Iterator.
     var j = left  // Pointer to first element > m.
     var k = left  // Pointer to end of equal elements.
@@ -110,7 +108,7 @@ trait SelectLike extends Any with Select {
 }
 
 trait MutatingMedianOf5 {
-  final def mo5[@spec A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]): Unit = {
+  final def mo5[@sp A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]): Unit = {
     var i0 = offset
     var i1 = offset + 1 * stride
     var i2 = offset + 2 * stride
@@ -153,7 +151,7 @@ trait HighBranchingMedianOf5 {
   // Benchmarks show that this is slightly faster than the version above.
 
   // scalastyle:off method.length
-  final def mo5[@spec A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]): Unit = {
+  final def mo5[@sp A](data: Array[A], offset: Int, stride: Int)(implicit o: Order[A]): Unit = {
     val ai1 = data(offset)
     val ai2 = data(offset + stride)
     val ai3 = data(offset + 2 * stride)
@@ -300,7 +298,7 @@ object LinearSelect extends SelectLike with HighBranchingMedianOf5 {
   // one side. This makes this quite a bit slower in the general case (though
   // not terribly so), but doesn't suffer from bad worst-case behaviour.
 
-  final def approxMedian[@spec A: Order](data: Array[A], left: Int, right: Int, stride: Int): A = {
+  final def approxMedian[@sp A: Order](data: Array[A], left: Int, right: Int, stride: Int): A = {
     var offset = left
     var last = left + 4 * stride
     val nextStride = 5 * stride
@@ -324,7 +322,7 @@ object QuickSelect extends SelectLike with HighBranchingMedianOf5 {
   // pivot, quickly is essential. So, we have 3 cases, getting slightly smarter
   // about our pivot as the array grows.
 
-  final def approxMedian[@spec A: Order](data: Array[A], left: Int, right: Int, stride: Int): A = {
+  final def approxMedian[@sp A: Order](data: Array[A], left: Int, right: Int, stride: Int): A = {
     val length = (right - left + stride - 1) / stride
 
     if (length >= 5) {
@@ -347,12 +345,12 @@ object QuickSelect extends SelectLike with HighBranchingMedianOf5 {
 }
 
 object Selection {
-  final def select[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit =
+  final def select[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit =
     quickSelect(data, k)
 
-  final def linearSelect[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit =
+  final def linearSelect[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit =
     LinearSelect.select(data, k)
 
-  final def quickSelect[@spec A: Order: ClassTag](data: Array[A], k: Int): Unit =
+  final def quickSelect[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit =
     QuickSelect.select(data, k)
 }

@@ -1,6 +1,5 @@
-package spire.algebra
-
-import scala.{specialized => sp}
+package spire
+package algebra
 
 /**
  * A Torsor[V, R] requires an AbGroup[R] and provides Action[V, R],

@@ -1,6 +1,5 @@
-package spire.algebra
-
-import scala.{specialized => spec}
+package spire
+package algebra
 
 /**
   * The `Order` type class is used to define a total ordering on some type `A`.
@@ -19,7 +18,7 @@ import scala.{specialized => spec}
   *
   * By the totality law, x <= y and y <= x cannot be both false.
   */
-trait Order[@spec A] extends Any with PartialOrder[A] {
+trait Order[@sp A] extends Any with PartialOrder[A] {
   self =>
 
   def partialCompare(x: A, y: A): Double = compare(x, y).toDouble
@@ -38,7 +37,7 @@ trait Order[@spec A] extends Any with PartialOrder[A] {
    * Defines an order on `B` by mapping `B` to `A` using `f` and using `A`s
    * order to order `B`.
    */
-  override def on[@spec B](f: B => A): Order[B] = new MappedOrder(this)(f)
+  override def on[@sp B](f: B => A): Order[B] = new MappedOrder(this)(f)
 
   /**
    * Defines an ordering on `A` where all arrows switch direction.
@@ -46,20 +45,20 @@ trait Order[@spec A] extends Any with PartialOrder[A] {
   override def reverse: Order[A] = new ReversedOrder(this)
 }
 
-private[algebra] class MappedOrder[@spec A, @spec B](order: Order[B])(f: A => B) extends Order[A] {
+private[algebra] class MappedOrder[@sp A, @sp B](order: Order[B])(f: A => B) extends Order[A] {
   def compare(x: A, y: A): Int = order.compare(f(x), f(y))
 }
 
-private[algebra] class ReversedOrder[@spec A](order: Order[A]) extends Order[A] {
+private[algebra] class ReversedOrder[@sp A](order: Order[A]) extends Order[A] {
   def compare(x: A, y: A): Int = order.compare(y, x)
 }
 
 object Order {
   @inline final def apply[A](implicit o: Order[A]): Order[A] = o
 
-  def by[@spec A, @spec B](f: A => B)(implicit o: Order[B]): Order[A] = o.on(f)
+  def by[@sp A, @sp B](f: A => B)(implicit o: Order[B]): Order[A] = o.on(f)
 
-  def from[@spec A](f: (A, A) => Int): Order[A] = new Order[A] {
+  def from[@sp A](f: (A, A) => Int): Order[A] = new Order[A] {
     def compare(x: A, y: A): Int = f(x, y)
   }
 

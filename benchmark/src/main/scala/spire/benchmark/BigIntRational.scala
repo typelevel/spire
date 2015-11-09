@@ -1,4 +1,5 @@
-package spire.benchmark
+package spire
+package benchmark
 
 object BigIntRational {
   val Zero = new BigIntRational(0, 1)

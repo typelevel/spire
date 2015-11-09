@@ -1,9 +1,9 @@
-package spire.example
+package spire
+package example
 
 import spire.implicits._
 import spire.math._
 
-import scala.annotation.tailrec
 import scala.collection.IterableLike
 import scala.collection.mutable.{Builder, GrowingBuilder, MapBuilder}
 import scala.collection.generic.CanBuildFrom

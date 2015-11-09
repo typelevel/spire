@@ -1,4 +1,5 @@
-package spire.macros
+package spire
+package macros
 
 import language.experimental.macros
 

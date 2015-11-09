@@ -1,4 +1,5 @@
-package spire.random
+package spire
+package random
 
 import spire.random.rng._
 

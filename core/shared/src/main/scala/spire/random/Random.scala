@@ -1,11 +1,9 @@
-package spire.random
+package spire
+package random
 
 import scala.collection.mutable.{ArrayBuffer, Builder}
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
-import scala.annotation.tailrec
-import scala.{specialized => spec}
-import scala.reflect.ClassTag
 
 sealed trait Op[+A] {
 

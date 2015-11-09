@@ -1,4 +1,5 @@
-package spire.example
+package spire
+package example
 
 import org.apfloat._
 import org.jscience.mathematics.number.{ Rational => JRational }

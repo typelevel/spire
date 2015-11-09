@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 import spire.algebra.lattice.Heyting
 

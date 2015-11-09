@@ -1,4 +1,5 @@
-package spire.laws
+package spire
+package laws
 
 import java.math.BigInteger
 import spire.algebra._
@@ -14,8 +15,6 @@ import spire.implicits.{
   ArrayOrder => _, ArrayEq => _,
   MapEq => _, MapGroup => _,
   _ }
-
-import scala.{specialized => sp}
 
 import org.typelevel.discipline.scalatest.Discipline
 

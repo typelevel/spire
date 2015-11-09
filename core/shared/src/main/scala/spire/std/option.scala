@@ -1,4 +1,5 @@
-package spire.std
+package spire
+package std
 
 import spire.algebra._
 import spire.algebra.{AdditiveSemigroup, AdditiveMonoid, MultiplicativeMonoid, MultiplicativeSemigroup}

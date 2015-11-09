@@ -1,7 +1,7 @@
-package spire.example
+package spire
+package example
 
 import spire.implicits._
-import scala.annotation.tailrec
 
 class Loops {
   def nested(): Unit = {
