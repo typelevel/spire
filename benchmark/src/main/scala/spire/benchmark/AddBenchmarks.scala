@@ -1,9 +1,7 @@
-package spire.benchmark
+package spire
+package benchmark
 
-import scala.reflect.ClassTag
 
-import scala.annotation.tailrec
-import scala.{specialized => spec}
 import scala.util.Random
 
 import spire.algebra._
@@ -20,7 +18,7 @@ import java.math.BigInteger
 object AddBenchmarks extends MyRunner(classOf[AddBenchmarks])
 
 class AddBenchmarks extends MyBenchmark with BenchmarkData {
-  def addGeneric[@spec(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
+  def addGeneric[@sp(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
     var total = Ring[A].zero
     var i = 0
     val len = data.length

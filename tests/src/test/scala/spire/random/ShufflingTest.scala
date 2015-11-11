@@ -1,4 +1,5 @@
-package spire.random
+package spire
+package random
 
 import org.scalatest.Matchers
 import org.scalatest._

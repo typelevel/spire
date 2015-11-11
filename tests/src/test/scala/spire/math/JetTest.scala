@@ -1,6 +1,7 @@
-package spire.math
+package spire
+package math
+
 import org.scalatest._
-import scala.{specialized => sp}
 import spire.algebra._
 import spire.implicits._
 

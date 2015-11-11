@@ -1,4 +1,5 @@
-package spire.std
+package spire
+package std
 
 import spire.algebra.{MetricSpace, Monoid, Order}
 

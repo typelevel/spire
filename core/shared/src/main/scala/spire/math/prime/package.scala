@@ -1,11 +1,11 @@
-package spire.math
+package spire
+package math
 
 import spire.algebra.Sign
 import spire.algebra.Sign.{Negative, Zero, Positive}
 import spire.syntax.cfor._
 import spire.syntax.nroot._
 
-import scala.annotation.tailrec
 import scala.collection.mutable
 
 /**

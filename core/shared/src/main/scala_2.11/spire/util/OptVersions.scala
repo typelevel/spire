@@ -1,4 +1,5 @@
-package spire.util
+package spire
+package util
 
 trait OptVersions {
   // name-based extractor, cf. http://hseeberger.github.io/blog/2013/10/04/name-based-extractors-in-scala-2-dot-11/

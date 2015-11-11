@@ -1,9 +1,7 @@
-package spire.std
+package spire
+package std
 
 import spire.algebra._
-
-import scala.{ specialized => spec }
-import scala.annotation.tailrec
 
 @SerialVersionUID(0L)
 class MapMonoid[K, V](implicit val scalar: Semigroup[V]) extends Monoid[Map[K, V]]

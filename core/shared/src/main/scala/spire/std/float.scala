@@ -1,4 +1,5 @@
-package spire.std
+package spire
+package std
 
 import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
 import spire.math.Rational
@@ -7,7 +8,6 @@ import java.lang.Math
 import java.lang.Integer.{ numberOfTrailingZeros, numberOfLeadingZeros }
 import java.lang.Float.{ intBitsToFloat, floatToIntBits }
 
-import scala.annotation.tailrec
 
 trait FloatIsField extends Field[Float] {
   override def minus(a:Float, b:Float): Float = a - b

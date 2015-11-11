@@ -1,9 +1,7 @@
-package spire.benchmark
+package spire
+package benchmark
 
-import scala.reflect.ClassTag
 
-import scala.annotation.tailrec
-import scala.{specialized => spec}
 import scala.util.Random
 
 import spire.algebra._
@@ -121,7 +119,7 @@ class FibBenchmarks extends MyBenchmark {
     a + b + c + d
   }
 
-  def scalaGenFib[@spec(Int, Long) A](n: Int)(implicit r: Rig[A]): A = {
+  def scalaGenFib[@sp(Int, Long) A](n: Int)(implicit r: Rig[A]): A = {
     @tailrec def loop(n :Int, a: A, b: A): A =
       if (n == 0) a else loop(n - 1, b, a + b)
     loop(n, r.zero, r.one)

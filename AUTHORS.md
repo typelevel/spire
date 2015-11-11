@@ -14,6 +14,7 @@ possible.
 
 * Ben Barnard: documentation fixes
 * Luc J. Bourhis: author of spire.matrix.*
+* Brad Buchsbaum: bug fixes
 * Eugene Burmako: macros, tons of macro support, build contributions
 * Franco Callari: author of spire.math.Jet
 * Olivier Chafik: cfor macro assistance, bug fixes
@@ -26,6 +27,7 @@ possible.
 * Christopher Hodapp: documentation fixes
 * Lars Hupel: core maintainer, law-checking, release support
 * Ben Hutchison: bug reports and design suggestions
+* Sung-Ho Lee: bug fixes
 * Kamushin: bug fixes
 * Rüdiger Klaehn: core maintainer, rational improvements, testing
 * Rex Kerr: author of many of the PRNGs found in spire.random
@@ -38,11 +40,14 @@ possible.
 * Simon Ochsenreither: bug reports and build contributions
 * Erik Osheim: core maintainer
 * Adam Pingel: bug fixes
+* André L. F. Pinto: improve build configuration
 * Pablo Pita: documentation
+* r0estir0bbe: bug fixes
 * Alexey Romanov: add PCG random number generator
 * Denis Rosset: core maintainer, interval fixes, partial algebras/orders, etc
 * Lukas Rytz: bug fixes
 * Kazuhiro Sera: build updates and support
+* Jack Sullivan: literal conversion macros
 * Tom Switzer: core maintainer
 * Flaviu Tamas: byte-manipulation and bounds-checking macros
 * James Thompson: author of spire.math.Polynomial
@@ -50,6 +55,7 @@ possible.
 * Vlad Ureche: specialization support, work on spire-miniboxing
 * Volth: bug reports and feedback around intervals
 * William Waites: bug fixes
+* Jed Wesley-Smith: bug fixes
 * Kenji Yoshida: bug fixes
 * Benito van der Zander: many bug reports, and much good testing
 * Alec Zorab: clean up and tests

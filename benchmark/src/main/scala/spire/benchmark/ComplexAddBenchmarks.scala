@@ -1,6 +1,6 @@
-package spire.benchmark
+package spire
+package benchmark
 
-import scala.{specialized => spec}
 import scala.util.Random
 import Random._
 
@@ -29,7 +29,7 @@ class ComplexAddBenchmarks extends MyBenchmark {
     fcs = init(size)(FloatComplex(nextFloat(), nextFloat()))
   }
 
-  def addGeneric[@spec(Float) A:Ring](data:Array[A]):A = {
+  def addGeneric[@sp(Float) A:Ring](data:Array[A]):A = {
     var total = Ring[A].zero
     var i = 0
     val len = data.length

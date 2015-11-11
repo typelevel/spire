@@ -1,6 +1,5 @@
-package spire.algebra
-
-import scala.{specialized => sp}
+package spire
+package algebra
 
 import spire.algebra.lattice.Heyting
 

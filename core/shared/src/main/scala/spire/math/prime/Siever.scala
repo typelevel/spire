@@ -1,4 +1,5 @@
-package spire.math.prime
+package spire
+package math.prime
 
 import spire.math.{SafeLong, log, max}
 

@@ -1,13 +1,12 @@
-package spire.math
+package spire
+package math
 
 import java.lang.Long.numberOfLeadingZeros
 import java.lang.Double.{ isInfinite, isNaN }
 import java.math.{ MathContext, RoundingMode, BigInteger, BigDecimal => JBigDecimal }
 import java.util.concurrent.atomic.AtomicReference
 
-import scala.annotation.tailrec
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
-import scala.reflect.ClassTag
 
 import spire.Platform
 import spire.algebra.{Eq, EuclideanRing, Field, IsAlgebraic, NRoot, Order, Ring, Sign, Signed}

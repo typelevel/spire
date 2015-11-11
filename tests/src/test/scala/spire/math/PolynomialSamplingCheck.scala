@@ -1,11 +1,11 @@
-package spire.math
+package spire
+package math
 
 import spire.algebra._
 import spire.math.poly._
 import spire.std.bigDecimal._
 import spire.syntax.euclideanRing._
 
-import scala.reflect.ClassTag
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._

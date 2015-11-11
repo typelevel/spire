@@ -1,3 +1,32 @@
+## Version 0.11.0
+
+Spire has two new core maintainers: Rüdiger Klaehn and Denis Rosset.
+
+The spire-scalacheck-binding package has been renamed to spire-laws.
+The spire-extras package has been introduced, for types that are less
+widely-used (but still useful).
+
+Additions:
+ * Added spire.math.Merging for merging arrays
+ * Added qcombine (for generic Monoids)
+ * More benchmarks (Rational, SafeLong, ...)
+ * Scalastyle plugin and code clean up
+ * Scoverage plugin and coverage tracking
+ * Type class instances for java.math.BigInteger
+ * Useful .as syntax for converting literals
+
+Changes:
+ * Move FixedPoint into extras
+ * Improve Rational implemenation (clearer structure, faster)
+
+Fixes:
+ * Improved equality (===) support
+ * Lots of documentation bug fixes and typo correction
+ * Fixed unary - for unsigned int/long
+ * Clean up Arbitrary/Gen instances
+ * Drastically-improved test coverage for SafeLong, Rational, etc.
+ * Fixed bugs around ceil method
+
 ## Version 0.10.1
 
 (Version 0.10.0 was aborted due to errors during the release.)

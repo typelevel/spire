@@ -1,4 +1,5 @@
-package spire.algebra
+package spire
+package algebra
 
 import spire.math.{ Rational, NumberTag }
 import spire.std.int._
@@ -8,7 +9,6 @@ import spire.std.double._
 import spire.syntax.euclideanRing._
 import spire.syntax.isReal.{ eqOps => _, _ }
 
-import scala.reflect.ClassTag
 
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers

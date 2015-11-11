@@ -1,4 +1,5 @@
-package spire.math.extras.interval
+package spire
+package math.extras.interval
 
 import spire.algebra.{Bool, Eq, Order}
 import spire.math._
@@ -28,7 +29,7 @@ object IntervalTrie {
     override def xor(a: IntervalTrie[T], b: IntervalTrie[T]): IntervalTrie[T] = a ^ b
   }
 
-  trait Element[@specialized(Float, Int, Long, Double) T] {
+  trait Element[@sp(Float, Int, Long, Double) T] {
 
     implicit def order:Order[T]
 

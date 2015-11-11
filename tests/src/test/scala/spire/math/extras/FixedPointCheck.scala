@@ -1,4 +1,6 @@
-package spire.math.extras
+package spire
+package math
+package extras
 
 import org.scalacheck.Arbitrary.{arbitrary, _}
 import org.scalacheck._

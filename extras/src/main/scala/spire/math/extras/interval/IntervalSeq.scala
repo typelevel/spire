@@ -1,4 +1,5 @@
-package spire.math.extras.interval
+package spire
+package math.extras.interval
 
 import java.util.Arrays
 
@@ -8,7 +9,6 @@ import spire.math.{Searching, Interval, Rational}
 
 import scala.annotation.{switch, tailrec}
 import scala.language.implicitConversions
-import scala.reflect.ClassTag
 
 final class IntervalSeq[T] private (
     val belowAll: Boolean,

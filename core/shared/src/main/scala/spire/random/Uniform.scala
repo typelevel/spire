@@ -1,6 +1,5 @@
-package spire.random
-
-import scala.{specialized => sp}
+package spire
+package random
 
 import spire.math.{Rational, UInt, ULong}
 

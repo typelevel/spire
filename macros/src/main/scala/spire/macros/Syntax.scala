@@ -1,4 +1,5 @@
-package spire.macros
+package spire
+package macros
 
 import spire.macros.compat.{termName, freshTermName, resetLocalAttrs, Context, setOrig}
 

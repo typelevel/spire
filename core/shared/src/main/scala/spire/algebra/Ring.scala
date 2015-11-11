@@ -1,7 +1,5 @@
-package spire.algebra
-
-import annotation.tailrec
-import scala.{specialized => spec}
+package spire
+package algebra
 
 /**
  * Ring represents a set (A) that is a group over addition (+) and a monoid
@@ -12,7 +10,7 @@ import scala.{specialized => spec}
  * fundamental methods (zero, one and plus). Where possible, these methods
  * should be overridden by more efficient implementations.
  */
-trait Ring[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Rig[A] with Rng[A] {
+trait Ring[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Rig[A] with Rng[A] {
   /**
    * Defined to be equivalent to `additive.sumn(one, n)`. That is, `n`
    * repeated summations of this ring's `one`, or `-one` if `n` is
@@ -28,7 +26,7 @@ object Ring {
 /**
  * CRing is a Ring that is commutative under multiplication.
  */
-trait CRing[@spec(Byte, Short, Int, Long, Float, Double) A] extends Any with Ring[A] with MultiplicativeCMonoid[A]
+trait CRing[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Ring[A] with MultiplicativeCMonoid[A]
 
 object CRing {
   @inline final def apply[A](implicit r: CRing[A]): CRing[A] = r

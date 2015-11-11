@@ -1,6 +1,6 @@
-package spire.math.prime
+package spire
+package math.prime
 
-import scala.annotation.tailrec
 import scala.collection.mutable.{ArrayBuffer}
 import System.arraycopy
 

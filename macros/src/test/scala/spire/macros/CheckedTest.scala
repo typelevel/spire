@@ -1,4 +1,5 @@
-package spire.macros
+package spire
+package macros
 
 import org.scalatest.FunSuite
 import org.scalatest.Matchers

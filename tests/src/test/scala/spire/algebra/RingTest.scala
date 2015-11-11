@@ -1,6 +1,6 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.reflect.ClassTag
 
 // scalatest
 import org.scalatest.FunSuite
@@ -10,7 +10,6 @@ import spire.math.{Rational, Complex, Jet, JetDim}
 import spire.implicits.{eqOps => _, _}
 
 // nice alias
-import scala.{specialized => spec}
 
 import java.math.MathContext
 
@@ -22,7 +21,7 @@ class RingTest extends FunSuite {
    *
    *   a=-3  b=3  c=-9
    */
-  def runWith[@spec A:Ring:ClassTag](cls:String)(a:A, b:A, c:A): Unit = {
+  def runWith[@sp A:Ring:ClassTag](cls:String)(a:A, b:A, c:A): Unit = {
 
     val m = implicitly[ClassTag[A]]
 

@@ -1,6 +1,6 @@
-package spire.std
+package spire
+package std
 
-import scala.annotation.tailrec
 import scala.collection.SeqLike
 import scala.collection.mutable.Builder
 import scala.collection.generic.CanBuildFrom

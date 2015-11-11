@@ -6,8 +6,6 @@ import java.math.BigInteger
 import java.math.MathContext
 import java.math.RoundingMode
 
-import scala.annotation.tailrec
-import scala.{specialized => spec}
 import scala.math.ScalaNumericConversions
 
 import BigDecimal.RoundingMode.{FLOOR, HALF_UP, CEILING}
@@ -357,26 +355,26 @@ package object math {
    * e
    */
   final def e: Double = Math.E
-  final def e[@spec(Float, Double) A](implicit ev: Trig[A]): A = ev.e
+  final def e[@sp(Float, Double) A](implicit ev: Trig[A]): A = ev.e
 
   /**
    * pi
    */
   final def pi: Double = Math.PI
-  final def pi[@spec(Float, Double) A](implicit ev: Trig[A]): A = ev.pi
+  final def pi[@sp(Float, Double) A](implicit ev: Trig[A]): A = ev.pi
 
-  final def sin[@spec(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.sin(a)
-  final def cos[@spec(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.cos(a)
-  final def tan[@spec(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.tan(a)
+  final def sin[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.sin(a)
+  final def cos[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.cos(a)
+  final def tan[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.tan(a)
 
-  final def asin[@spec(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.asin(a)
-  final def acos[@spec(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.acos(a)
-  final def atan[@spec(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.atan(a)
-  final def atan2[@spec(Float, Double) A](y: A, x: A)(implicit ev: Trig[A]): A = ev.atan2(y, x)
+  final def asin[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.asin(a)
+  final def acos[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.acos(a)
+  final def atan[@sp(Float, Double) A](a: A)(implicit ev: Trig[A]): A = ev.atan(a)
+  final def atan2[@sp(Float, Double) A](y: A, x: A)(implicit ev: Trig[A]): A = ev.atan2(y, x)
 
-  final def sinh[@spec(Float, Double) A](x: A)(implicit ev: Trig[A]): A = ev.sinh(x)
-  final def cosh[@spec(Float, Double) A](x: A)(implicit ev: Trig[A]): A = ev.cosh(x)
-  final def tanh[@spec(Float, Double) A](x: A)(implicit ev: Trig[A]): A = ev.tanh(x)
+  final def sinh[@sp(Float, Double) A](x: A)(implicit ev: Trig[A]): A = ev.sinh(x)
+  final def cosh[@sp(Float, Double) A](x: A)(implicit ev: Trig[A]): A = ev.cosh(x)
+  final def tanh[@sp(Float, Double) A](x: A)(implicit ev: Trig[A]): A = ev.tanh(x)
 
   // java.lang.Math/scala.math.compatibility
   final def cbrt(x: Double): Double = Math.cbrt(x)
@@ -402,7 +400,7 @@ package object math {
   final def ulp(x: Double): Double = Math.ulp(x)
   final def ulp(x: Float): Double = Math.ulp(x)
 
-  final def hypot[@spec(Float, Double) A](x: A, y: A)
+  final def hypot[@sp(Float, Double) A](x: A, y: A)
     (implicit f: Field[A], n: NRoot[A], o: Order[A]): A = {
     import spire.implicits._
     if (x > y) x.abs * (1 + (y/x)**2).sqrt

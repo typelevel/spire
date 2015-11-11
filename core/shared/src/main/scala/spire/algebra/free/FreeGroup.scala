@@ -1,4 +1,5 @@
-package spire.algebra
+package spire
+package algebra
 package free
 
 final class FreeGroup[A] private (val terms: Vector[Either[A, A]]) extends AnyVal { lhs =>

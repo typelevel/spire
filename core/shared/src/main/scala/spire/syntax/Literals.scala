@@ -1,8 +1,8 @@
-package spire.syntax
+package spire
+package syntax
 
 import spire.algebra.{Field, Ring}
 
-import scala.{specialized => spec}
 
 import spire.math.{Polynomial, Rational, UByte, UShort, UInt, ULong}
 import spire.macros.Macros

@@ -1,10 +1,9 @@
-package spire.math
+package spire
+package math
 
 import spire.algebra._
 import spire.std.int._
 
-import scala.{specialized => spec}
-import scala.reflect.ClassTag
 
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers
@@ -13,7 +12,7 @@ import org.scalatest.prop.Checkers
 trait SelectTest extends FunSuite /* with Checkers */ {
   def selector: Select
 
-  final def select[@spec A: Order: ClassTag](data: Array[A], k: Int) =
+  final def select[@sp A: Order: ClassTag](data: Array[A], k: Int) =
     selector.select(data, k)
 
   def shuffle[A: ClassTag](as: Array[A]): Array[A] =

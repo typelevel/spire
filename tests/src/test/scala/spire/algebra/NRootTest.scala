@@ -1,11 +1,11 @@
-package spire.algebra
+package spire
+package algebra
 
 import java.math.BigInteger
 
 import spire.implicits._
 import org.scalatest.FunSuite
 
-import scala.reflect.ClassTag
 
 class NRootTest extends FunSuite {
   def testIntegralNRoot[A: Ring: NRoot: ClassTag]: Unit = {

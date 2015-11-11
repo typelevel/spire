@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 import org.scalatest.FunSuite
 import spire.implicits.{eqOps => _, _}
@@ -88,7 +89,7 @@ class ComplexTest extends FunSuite {
     assert(Complex.rootsOfUnity[Double](2) === Array(one, -one))
     assert(Complex.rootsOfUnity[Double](4) === Array(one, i, -one, -i))
 
-    val theta = 2.0 * math.Pi / 3.0
+    val theta = 2.0 * scala.math.Pi / 3.0
     val c1 = math.cos(theta) + math.sin(theta) * i
     val c2 = -one - c1
     assert(Complex.rootsOfUnity[Double](3) === Array(one, c1, c2))

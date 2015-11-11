@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 package interval
 
 import spire.syntax.order._

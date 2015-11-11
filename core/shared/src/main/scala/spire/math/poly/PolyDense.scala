@@ -1,8 +1,7 @@
-package spire.math.poly
+package spire
+package math
+package poly
 
-import scala.annotation.tailrec
-import scala.reflect.ClassTag
-import scala.{specialized => spec}
 
 import spire.algebra.{Eq, Field, Ring, Rng, Semiring}
 import spire.math.Polynomial
@@ -12,7 +11,7 @@ import spire.syntax.eq._
 import spire.syntax.field._
 
 // Dense polynomials - Little Endian Coeffs e.g. x^0, x^1, ... x^n
-class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
+class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])
     (implicit val ct: ClassTag[C]) extends Polynomial[C] { lhs =>
 
   def degree: Int = if (isZero) 0 else coeffs.length - 1

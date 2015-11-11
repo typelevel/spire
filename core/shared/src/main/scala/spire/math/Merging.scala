@@ -1,15 +1,13 @@
-package spire.math
+package spire
+package math
 import spire.algebra.Order
-import scala.{specialized => spec}
 
-import scala.annotation.tailrec
-import scala.reflect.ClassTag
 
 /**
  *  Interface for a merging strategy object.
  */
 trait Merge extends Any {
-  def merge[@spec A: Order: ClassTag](a:Array[A], b:Array[A]): Array[A]
+  def merge[@sp A: Order: ClassTag](a:Array[A], b:Array[A]): Array[A]
 }
 
 /**
@@ -100,7 +98,7 @@ abstract class BinaryMerge {
  */
 object BinaryMerge extends Merge {
 
-  def merge[@specialized T: Order: ClassTag](a: Array[T], b: Array[T]): Array[T] = {
+  def merge[@sp T: Order: ClassTag](a: Array[T], b: Array[T]): Array[T] = {
     new ArrayBinaryMerge(a,b).result
   }
 
@@ -149,7 +147,7 @@ object BinaryMerge extends Merge {
  */
 object LinearMerge extends Merge {
 
-  def merge[@spec T: Order : ClassTag](a: Array[T], b: Array[T]): Array[T] = {
+  def merge[@sp T: Order : ClassTag](a: Array[T], b: Array[T]): Array[T] = {
     val o = implicitly[Order[T]]
     val r = Array.ofDim[T](a.length + b.length)
     var ri = 0

@@ -1,6 +1,5 @@
-package spire.math
-
-import scala.{specialized => sp}
+package spire
+package math
 
 import spire.algebra.{EuclideanRing, IsReal}
 import spire.std._

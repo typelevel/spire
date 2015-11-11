@@ -19,35 +19,50 @@ identically to corresponding direct implementations.
 Spire is provided to you as free software under the
 [MIT license](COPYING).
 
+### Organization
+
 The [Spire mailing list](http://groups.google.com/group/typelevel/)
 is shared with other [Typelevel projects](http://typelevel.org).
 It is the place to go for announcements and discussions around Spire.
-When posting, place the word [spire] at the begining of your subject.
+When posting, place the word `[spire]` at the begining of your subject.
 We also have a guide on [contributing to Spire](CONTRIBUTING.md) as well
 as a guide that provides information on [Spire's design](GUIDE.md).
 
-People are expected to follow the [Typelevel Code of Conduct](http://typelevel.org/conduct.html)
-when discussing Spire on the Github page, IRC channel, mailing list,
-or other venues.
+Spire has maintainers who are responsible for signing-off on and
+merging pull requests, and for helping to guide the direction of Spire:
 
-Concerns or issues can be sent to Erik Osheim (*erik@osheim.org*) or
-to [Typelevel](http://typelevel.org/about.html).
+ * Erik Osheim (*erik@osheim.org*)
+ * Tom Switzer (*thomas.switzer@gmail.com*)
+ * Rüdiger Klaehn (*rklaehn@gmail.com*)
+ * Denis Rosset (*denis.rosset@unige.ch*)
+
+People are expected to follow the [Typelevel Code of Conduct](http://typelevel.org/conduct.html)
+when discussing Spire on the Github page, in Gitter, the IRC channel,
+mailing list, and other official venues.
+
+Concerns or issues can be sent to any of Spire's maintainers, or to the
+[Typelevel](http://typelevel.org/about.html) organization.
 
 ### Set up
 
-Spire is currently available for Scala 2.10 and 2.11.
+Spire is currently available for Scala 2.10 and 2.11 (and supports
+scala-js for both versions).
 
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-scalaVersion := "2.11.4"
-// or scalaVersion := "2.10.4"
-
-libraryDependencies += "org.spire-math" %% "spire" % "0.10.1"
+libraryDependencies += "org.spire-math" %% "spire" % "0.11.0"
 ```
 
 For Maven instructions, and to download the jars directly, visit the
-[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.11%7C0.10.1%7Cjar).
+[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.11%7C0.11.0%7Cjar).
+
+Here is a list of all of Spire's modules:
+
+ * `spire-macros`: macros and compile-time code (required by `spire`)
+ * `spire`: the core Spire library, the types and type classes
+ * `spire-laws`: optional support for law-checking and testing
+ * `spire-extras`: extra types which are more specific or esoteric
 
 ### Playing Around
 
@@ -55,11 +70,11 @@ If you clone the Spire repo, you can get a taste of what Spire can do using
 SBT's console. Launch `sbt` and at the prompt, type `core/console`:
 
 ```
-> core/console
+> coreJVM/console
 [info] Generating spire/std/tuples.scala
 [info] Starting scala interpreter...
 [info]
-Welcome to Scala version 2.11.2 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_45).
+Welcome to Scala version 2.11.7 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_51).
 Type in expressions to have them evaluated.
 Type :help for more information.
 
@@ -88,10 +103,10 @@ introduces several new ones, all of which can be found in `spire.math`:
  * `UByte` through `ULong` value classes supporting unsigned operations
  * `SafeLong` fast, overflow-proof integer type
  * `Number` boxed type supporting a traditional numeric tower
- * `FixedPoint` fractions with unboxed `Long` numerator and implicit denominator
  * `Interval[A]` arithmetic on open, closed, and unbound intervals
  * `Polynomial[A]` univariate (single-variable) polynomial expressions
  * `Trilean` value class supporting three-valued logic
+ * `FixedPoint` fractions with `Long` numerator and implicit denominator (in *extras*)
 
 Detailed treatment of these types can be found in the [guide](GUIDE.md).
 
