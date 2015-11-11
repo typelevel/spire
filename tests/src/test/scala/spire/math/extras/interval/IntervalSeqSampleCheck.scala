@@ -12,7 +12,7 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
   import IntervalSeqArbitrary._
 
   // a test that works by sampling the result at all relevant places and checks consistency with the boolean operation
-  def unarySampleTest(a:IntervalSeq[Long], r:IntervalSeq[Long], op:Boolean => Boolean) = {
+  def unarySampleTest(a:IntervalSeq[Int], r:IntervalSeq[Int], op:Boolean => Boolean) = {
     val support = a.edges.toArray.sorted.distinct
     support.forall { value =>
       val sameBefore = r.below(value) === op(a.below(value))
@@ -23,7 +23,7 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
   }
 
   // a test that works by sampling the result at all relevant places and checks consistency with the boolean operation
-  def binarySampleTest(a:IntervalSeq[Long], b:IntervalSeq[Long], r:IntervalSeq[Long], op:(Boolean, Boolean) => Boolean) = {
+  def binarySampleTest(a:IntervalSeq[Int], b:IntervalSeq[Int], r:IntervalSeq[Int], op:(Boolean, Boolean) => Boolean) = {
     val support = (a.edges ++ b.edges).toArray.sorted.distinct
     support.forall { value =>
       val sameBefore = r.below(value) === op(a.below(value), b.below(value))
@@ -34,7 +34,7 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
   }
 
   // a test that works by sampling the result at all relevant places and checks consistency with the boolean operation
-  def trinarySampleTest(a:IntervalSeq[Long], b:IntervalSeq[Long], c:IntervalSeq[Long], r:IntervalTrie[Long], op:(Boolean, Boolean, Boolean) => Boolean) = {
+  def trinarySampleTest(a:IntervalSeq[Int], b:IntervalSeq[Int], c:IntervalSeq[Int], r:IntervalTrie[Long], op:(Boolean, Boolean, Boolean) => Boolean) = {
     val support = (a.edges ++ b.edges ++ c.edges).toArray.sorted.distinct
     support.forall { value =>
       val sameBefore = r.below(value) === op(a.below(value), b.below(value), c.below(value))
@@ -44,23 +44,23 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
     }
   }
 
-  property("sample_not") = forAll { a: IntervalSeq[Long] =>
+  property("sample_not") = forAll { a: IntervalSeq[Int] =>
     unarySampleTest(a, ~a, ~_)
   }
 
-  property("sample_and") = forAll { (a: IntervalSeq[Long], b: IntervalSeq[Long]) =>
+  property("sample_and") = forAll { (a: IntervalSeq[Int], b: IntervalSeq[Int]) =>
     binarySampleTest(a, b, a & b, _ & _)
   }
 
-  property("sample_or") = forAll { (a: IntervalSeq[Long], b: IntervalSeq[Long]) =>
+  property("sample_or") = forAll { (a: IntervalSeq[Int], b: IntervalSeq[Int]) =>
     binarySampleTest(a, b, a | b, _ | _)
   }
 
-  property("sample_xor") = forAll { (a: IntervalSeq[Long], b: IntervalSeq[Long]) =>
+  property("sample_xor") = forAll { (a: IntervalSeq[Int], b: IntervalSeq[Int]) =>
     binarySampleTest(a, b, a ^ b, _ ^ _)
   }
 
-  property("toStringParse") = forAll { a0: IntervalSeq[Long] =>
+  property("toStringParse") = forAll { a0: IntervalSeq[Int] =>
     // first convert the interval of long to an interval of rationals, since that is what parse returns
     val rationalIntervals = a0.intervals.map(_.mapBounds(Rational.apply))
     val a : IntervalSeq[Rational] = (IntervalSeq.empty[Rational] /: rationalIntervals)(_ | IntervalSeq(_))
@@ -70,14 +70,14 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
     a == b
   }
 
-  property("isContiguous") = forAll { a: IntervalSeq[Long] =>
+  property("isContiguous") = forAll { a: IntervalSeq[Int] =>
     a.isContiguous == (a.intervals.size <= 1)
   }
 
-  property("hull") = forAll { a: IntervalSeq[Long] =>
+  property("hull") = forAll { a: IntervalSeq[Int] =>
     val hullSet = IntervalSeq(a.hull)
     val outside = ~hullSet
-    val nothingOutside = (a & outside) == IntervalSeq.empty[Long]
+    val nothingOutside = (a & outside) == IntervalSeq.empty[Int]
     val allInside = a.intervals.forall(i => hullSet.isSupersetOf(IntervalSeq(i)))
     nothingOutside & allInside
   }
@@ -85,7 +85,7 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
   /**
    * Check optimized intersects method against naive implementation using &
    */
-  property("intersects/intersection") = forAll { (a: IntervalSeq[Long], b: IntervalSeq[Long]) =>
+  property("intersects/intersection") = forAll { (a: IntervalSeq[Int], b: IntervalSeq[Int]) =>
     val r1 = a intersects b
     val r2 = !(a & b).isEmpty
     r1 == r2
@@ -94,28 +94,28 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
   /**
    * Check optimized isSupersetOf method against naive implementation using &
    */
-  property("isSupersetOf/intersection") = forAll { (a: IntervalSeq[Long], b: IntervalSeq[Long]) =>
+  property("isSupersetOf/intersection") = forAll { (a: IntervalSeq[Int], b: IntervalSeq[Int]) =>
     val r1 = a isSupersetOf b
     val r2 = (a & b) == b
     r1 == r2
   }
 
-  property("isSupersetOf") = forAll { (a: IntervalSeq[Long], x: Long) =>
+  property("isSupersetOf") = forAll { (a: IntervalSeq[Int], x: Int) =>
     val b = a & IntervalSeq.atOrAbove(x)
     a isSupersetOf b
   }
 
-  property("disjoint") = forAll { (s: IntervalSeq[Long], x: Long) =>
+  property("disjoint") = forAll { (s: IntervalSeq[Int], x: Int) =>
     val a = s & IntervalSeq.below(x)
     val b = s & IntervalSeq.atOrAbove(x)
     !(a intersects b)
   }
 
-  property("equals/hashCode") = forAll { (a: IntervalSeq[Long], b: IntervalSeq[Long]) =>
+  property("equals/hashCode") = forAll { (a: IntervalSeq[Int], b: IntervalSeq[Int]) =>
     if(a==b) a.hashCode == b.hashCode else true
   }
 
-  property("iterator") = forAll { a: IntervalSeq[Long] =>
+  property("iterator") = forAll { a: IntervalSeq[Int] =>
     a.intervalIterator.toIndexedSeq == a.intervals.toIndexedSeq
   }
 }

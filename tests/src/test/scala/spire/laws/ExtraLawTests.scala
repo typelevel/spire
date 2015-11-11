@@ -8,6 +8,6 @@ import spire.implicits._
 class ExtraLawTests extends FunSuite with Discipline {
   import IntervalSeqArbitrary._
   import IntervalTrieArbitrary._
-  checkAll("Bool[IntervalSeq[Long]]", LogicLaws[IntervalSeq[Long]].bool)
-  checkAll("Bool[IntervalTrie[Long]]", LogicLaws[IntervalTrie[Long]].bool)
+  checkAll("Bool[IntervalSeq[Int]]", LogicLaws[IntervalSeq[Int]].bool)
+//  checkAll("Bool[IntervalTrie[Long]]", LogicLaws[IntervalTrie[Long]].bool)
 }

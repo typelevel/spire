@@ -8,19 +8,19 @@ class IntervalSeqTest extends FunSuite {
   import IntervalSeq._
 
   test("leafOperation") {
-    val a = above(1L)
-    val b = atOrAbove(1L)
-    val c = point(1L)
-    val d = hole(1L)
-    assert(atOrAbove(1L) == (a | b))
-    assert(above(1L) == (a & b))
-    assert(point(1L) == (a ^ b))
-    assert(atOrAbove(1L) == (a | c))
-    assert(empty[Long] == (a & c))
-    assert(atOrAbove(1L) == (a ^ c))
-    assert(hole(1L) == (a | d))
-    assert(above(1L) == (a & d))
-    assert(below(1L) == (a ^ d))
+    val a = above(1)
+    val b = atOrAbove(1)
+    val c = point(1)
+    val d = hole(1)
+    assert(atOrAbove(1) == (a | b))
+    assert(above(1) == (a & b))
+    assert(point(1) == (a ^ b))
+    assert(atOrAbove(1) == (a | c))
+    assert(empty[Int] == (a & c))
+    assert(atOrAbove(1) == (a ^ c))
+    assert(hole(1) == (a | d))
+    assert(above(1) == (a & d))
+    assert(below(1) == (a ^ d))
   }
 
   test("atIsSameAsApply") {
@@ -44,9 +44,9 @@ class IntervalSeqTest extends FunSuite {
   }
 
   test("algebra") {
-    val algebra = IntervalSeq.algebra[Long]
-    val a = IntervalSeq.above(1L)
-    val b = IntervalSeq.below(1L)
+    val algebra = IntervalSeq.algebra[Int]
+    val a = IntervalSeq.above(1)
+    val b = IntervalSeq.below(1)
     assert((a ^ b) == algebra.xor(a, b))
   }
 
