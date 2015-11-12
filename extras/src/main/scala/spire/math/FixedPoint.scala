@@ -1,5 +1,6 @@
 package spire
 package math
+package extras
 
 //import spire.syntax.ring._
 import spire.std.long._

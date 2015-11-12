@@ -2,7 +2,7 @@ package spire
 package laws
 
 import java.math.BigInteger
-
+import spire.math.extras.{FixedPoint, FixedScale}
 
 import spire.algebra._
 import spire.algebra.free._
