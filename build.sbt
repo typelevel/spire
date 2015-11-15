@@ -257,7 +257,7 @@ lazy val publishSettings = Seq(
       </developer>
     </developers>
   )
-) ++ sharedPublishSettings ++ sharedReleaseProcess
+) ++ credentialSettings ++ sharedPublishSettings ++ sharedReleaseProcess
 
 lazy val scoverageSettings = Seq(
   ScoverageKeys.coverageMinimum := 40,
@@ -432,8 +432,9 @@ lazy val warnUnusedImport = Seq(
 )
 
 // For Travis CI - see http://www.cakesolutions.net/teamblogs/publishing-artefacts-to-oss-sonatype-nexus-using-sbt-and-travis-ci
-credentials ++= (for {
-  username <- Option(System.getenv().get("SONATYPE_USERNAME"))
-  password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
-} yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)).toSeq
-
+lazy val credentialSettings = Seq(
+  credentials ++= (for {
+    username <- Option(System.getenv().get("SONATYPE_USERNAME"))
+    password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
+  } yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)).toSeq
+)
