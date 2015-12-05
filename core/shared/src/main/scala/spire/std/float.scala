@@ -23,6 +23,8 @@ trait FloatIsField extends Field[Float] {
   def quot(a:Float, b:Float): Float = (a - (a % b)) / b
   def mod(a:Float, b:Float): Float = a % b
 
+  def lcm(a:Float, b:Float):Float = (a / gcd(a, b)) * b
+
   final def gcd(a:Float, b:Float):Float = {
     def value(bits: Int): Int = bits & 0x007FFFFF | 0x00800000
 

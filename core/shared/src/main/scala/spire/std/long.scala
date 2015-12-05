@@ -1,12 +1,12 @@
 package spire
 package std
 
-import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Signed}
+import spire.algebra.{EuclideanRing, Gcd, IsIntegral, NRoot, Order, Signed}
 import spire.math.BitString
 
 import java.lang.Math
 
-trait LongIsEuclideanRing extends EuclideanRing[Long] {
+trait LongIsEuclideanRing extends EuclideanRing[Long] with Gcd[Long] {
   override def minus(a:Long, b:Long): Long = a - b
   def negate(a:Long): Long = -a
   def one: Long = 1L
@@ -30,9 +30,10 @@ trait LongIsEuclideanRing extends EuclideanRing[Long] {
 
   override def fromInt(n: Int): Long = n
 
-  def quot(a:Long, b:Long): Long = a / b
-  def mod(a:Long, b:Long): Long = a % b
-  def gcd(a:Long, b:Long): Long = spire.math.gcd(a, b)
+  def quot(a:Long, b:Long) = a / b
+  def mod(a:Long, b:Long) = a % b
+  def gcd(a:Long, b:Long) = spire.math.gcd(a, b)
+  def lcm(a:Long, b:Long) = spire.math.lcm(a, b)
 }
 
 // Not included in Instances trait!

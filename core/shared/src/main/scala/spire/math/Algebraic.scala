@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
 
 import spire.Platform
-import spire.algebra.{Eq, EuclideanRing, Field, IsAlgebraic, NRoot, Order, Ring, Sign, Signed}
+import spire.algebra.{Eq, EuclideanRing, Field, Gcd, IsAlgebraic, NRoot, Order, Ring, Sign, Signed}
 import spire.algebra.Sign.{ Positive, Negative, Zero }
 import spire.macros.Checked.checked
 import spire.math.poly.{ Term, BigDecimalRootRefinement, RootFinder, Roots }
@@ -1528,7 +1528,7 @@ trait AlgebraicInstances {
   implicit final val AlgebraicTag = new LargeTag[Algebraic](Exact, Algebraic(0))
 }
 
-private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoot[Algebraic] {
+private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoot[Algebraic] with Gcd[Algebraic] {
   def zero: Algebraic = Algebraic.Zero
   def one: Algebraic = Algebraic.One
   def plus(a: Algebraic, b: Algebraic): Algebraic = a + b
@@ -1538,7 +1538,8 @@ private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoo
   override def times(a: Algebraic, b: Algebraic): Algebraic = a * b
   def quot(a: Algebraic, b: Algebraic): Algebraic = a /~ b
   def mod(a: Algebraic, b: Algebraic): Algebraic = a % b
-  def gcd(a: Algebraic, b: Algebraic): Algebraic = euclid(a, b)(Eq[Algebraic])
+  def gcd(a: Algebraic, b: Algebraic): Algebraic = euclid(a, b)(Eq[Algebraic], this)
+  def lcm(a: Algebraic, b: Algebraic): Algebraic = (a / gcd(a, b)) * b
   def div(a:Algebraic, b:Algebraic): Algebraic = a / b
   def nroot(a: Algebraic, k: Int): Algebraic = a nroot k
   def fpow(a:Algebraic, b:Algebraic): Algebraic = throw new UnsupportedOperationException("unsupported operation")

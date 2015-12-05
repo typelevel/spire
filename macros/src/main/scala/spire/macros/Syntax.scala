@@ -11,6 +11,27 @@ object Ops extends machinist.Ops {
 
   val operatorNames: Map[String, String] =
     machinist.DefaultOps.operatorNames ++ Map(
+      // Eq (=== =!=)
+      ("$eq$eq$eq", "eqv"),
+      ("$eq$bang$eq", "neqv"),
+
+      // PartialOrder (> >= < <=)
+      ("$greater", "gt"),
+      ("$greater$eq", "gteqv"),
+      ("$less", "lt"),
+      ("$less$eq", "lteqv"),
+
+      // Semigroup (|+| |-|)
+      ("$bar$plus$bar", "combine"),
+      ("$bar$minus$bar", "remove"),
+
+      // Ring (unary_- + - * **)
+      ("unary_$minus", "negate"),
+      ("$plus", "plus"),
+      ("$minus", "minus"),
+      ("$times", "times"),
+      ("$times$times", "pow"),
+
       // partial operations |+|? |+|?? |-|? |-|??
       ("$bar$plus$bar$qmark$qmark", "opIsDefined"),
       ("$bar$minus$bar$qmark$qmark", "opInverseIsDefined"),

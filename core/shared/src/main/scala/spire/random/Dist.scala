@@ -181,7 +181,12 @@ trait DistEuclideanRing[A] extends EuclideanRing[Dist[A]] with DistRing[A] {
   def alg: EuclideanRing[A]
   def quot(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.quot(x(g), y(g)))
   def mod(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.mod(x(g), y(g)))
+}
+
+trait DistGcd[A] extends Gcd[Dist[A]] {
+  def alg: Gcd[A]
   def gcd(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.gcd(x(g), y(g)))
+  def lcm(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.lcm(x(g), y(g)))
 }
 
 trait DistField[A] extends Field[Dist[A]] with DistEuclideanRing[A] {
@@ -412,6 +417,9 @@ trait DistInstances2 extends DistInstances1 {
 trait DistInstances3 extends DistInstances2 {
   implicit def euclideanRing[A](implicit ev: EuclideanRing[A]): EuclideanRing[Dist[A]] =
     new DistEuclideanRing[A] { def alg = ev }
+
+  implicit def gcd[A](implicit ev: Gcd[A]): Gcd[Dist[A]] =
+    new DistGcd[A] { def alg = ev }
 }
 
 trait DistInstances4 extends DistInstances3 {

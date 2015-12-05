@@ -187,6 +187,14 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     })
   }
 
+  def lcm(y: Real): Real = (x, y) match {
+    case (Exact(nx), Exact(ny)) => Exact(nx lcm ny)
+    case _ => Real({ p =>
+      val g = x.toRational(p) lcm y.toRational(p)
+      roundUp(g * SafeLong.two.pow(p))
+    })
+  }
+
   def ceil(): Real = x match {
     case Exact(n) => Exact(n.ceil)
     case _ => Real({ p =>
@@ -561,6 +569,7 @@ trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Rea
   def times(x: Real, y: Real): Real = x * y
 
   def gcd(x: Real, y: Real): Real = x gcd y
+  def lcm(x: Real, y: Real): Real = x lcm y
   def quot(x: Real, y: Real): Real = x /~ y
   def mod(x: Real, y: Real): Real = x % y
 

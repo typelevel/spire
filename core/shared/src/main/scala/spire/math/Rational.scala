@@ -55,6 +55,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     (q, this - q * rhs)
   }
 
+  def lcm(rhs: Rational): Rational = (lhs / (lhs gcd rhs)) * rhs
   def gcd(rhs: Rational): Rational
 
   def toBigDecimal(scale: Int, mode: RoundingMode): BigDecimal = {
@@ -890,6 +891,7 @@ private[math] trait RationalIsField extends Field[Rational] {
   def quot(a:Rational, b:Rational): Rational = a /~ b
   def mod(a:Rational, b:Rational): Rational = a % b
   override def quotmod(a:Rational, b:Rational): (Rational, Rational) = a /% b
+  def lcm(a:Rational, b:Rational):Rational = a lcm b
   def gcd(a:Rational, b:Rational): Rational = a gcd b
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)

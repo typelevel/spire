@@ -15,8 +15,8 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
    * [[AbGroup]] for `B`.
    */
   def run[B](f: A => B)(implicit B: AbGroup[B]): B =
-    terms.foldLeft(B.id) { case (total, (a, n)) =>
-      B.op(total, B.combinen(f(a), n))
+    terms.foldLeft(B.empty) { case (total, (a, n)) =>
+      B.combine(total, B.combineN(f(a), n))
     }
 
   /**
@@ -31,10 +31,10 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
       if (it.hasNext) {
         val (a, n) = it.next()
         if (n < 0) None
-        else loop(B.op(total, B.combinen(f(a), n)))
+        else loop(B.combine(total, B.combineN(f(a), n)))
       } else Some(total)
 
-    loop(B.id)
+    loop(B.empty)
   }
 
   /**
@@ -51,7 +51,7 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
         val (a, n) = it.next()
         if (n == 0) loop1(total)
         else if (n < 0) None
-        else loop1(B.op(total, B.combinen(f(a), n)))
+        else loop1(B.combine(total, B.combineN(f(a), n)))
       } else Some(total)
 
     @tailrec def loop0: Option[B] =
@@ -59,7 +59,7 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
         val (a, n) = it.next()
         if (n == 0) loop0
         else if (n < 0) None
-        else loop1(B.combinen(f(a), n))
+        else loop1(B.combineN(f(a), n))
       } else None
 
     loop0
@@ -72,9 +72,9 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
    * positive terms on the right.
    */
   def split[B](f: A => B)(implicit B: CMonoid[B]): (B, B) =
-    terms.foldLeft((B.id, B.id)) { case ((ltotal, rtotal), (a, n)) =>
-      if (n < 0) (B.op(ltotal, B.combinen(f(a), -n)), rtotal)
-      else if (n > 0) (ltotal, B.op(rtotal, B.combinen(f(a), n)))
+    terms.foldLeft((B.empty, B.empty)) { case ((ltotal, rtotal), (a, n)) =>
+      if (n < 0) (B.combine(ltotal, B.combineN(f(a), -n)), rtotal)
+      else if (n > 0) (ltotal, B.combine(rtotal, B.combineN(f(a), n)))
       else (ltotal, rtotal)
     }
 
@@ -112,9 +112,9 @@ object FreeAbGroup { companion =>
   final def lift[A](a: A): FreeAbGroup[A] = new FreeAbGroup[A](Map((a, 1)))
 
   implicit def FreeAbGroupGroup[A]: AbGroup[FreeAbGroup[A]] = new AbGroup[FreeAbGroup[A]] {
-    def id: FreeAbGroup[A] = companion.id
-    def op(a: FreeAbGroup[A], b: FreeAbGroup[A]): FreeAbGroup[A] = a |+| b
+    def empty: FreeAbGroup[A] = companion.id
+    def combine(a: FreeAbGroup[A], b: FreeAbGroup[A]): FreeAbGroup[A] = a |+| b
     def inverse(a: FreeAbGroup[A]): FreeAbGroup[A] = a.inverse
-    override def opInverse(a: FreeAbGroup[A], b: FreeAbGroup[A]): FreeAbGroup[A] = a |-| b
+    override def remove(a: FreeAbGroup[A], b: FreeAbGroup[A]): FreeAbGroup[A] = a |-| b
   }
 }

@@ -88,7 +88,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
   }
 
   def qcombine(implicit ev: Monoid[A]): A = {
-    var result = ev.id
+    var result = ev.empty
     cfor(0)(_ < arr.length, _ + 1) { i => result |+|= arr(i) }
     result
   }
@@ -218,7 +218,7 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
     as.aggregate(ev.one)(ev.times, ev.times)
 
   def qcombine(implicit ev: Monoid[A]): A =
-    as.aggregate(ev.id)(ev.op, ev.op)
+    as.aggregate(ev.empty)(ev.combine, ev.combine)
 
   def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A =
     as.aggregate(ev.one)(_ + _.abs.pow(p), _ + _).nroot(p)
