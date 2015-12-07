@@ -57,6 +57,10 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def gcd(rhs: Rational): Rational
 
+  def toReal: Real = Real(this)
+
+  def toAlgebraic: Algebraic = Algebraic(this)
+
   def toBigDecimal(scale: Int, mode: RoundingMode): BigDecimal = {
     val n = new JBigDecimal(numerator.toBigInteger)
     val d = new JBigDecimal(denominator.toBigInteger)
