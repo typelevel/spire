@@ -328,65 +328,6 @@ object Rational extends RationalInstances {
     case DecimalNumber(n) => apply(n)
   }
 
-  // $COVERAGE-OFF$
-  /**
-   * Returns an interval that bounds the nth-root of the integer x.
-   *
-   * TODO: This is really out-of-place too.
-   */
-  def nroot(x: SafeLong, n: Int): (SafeLong, SafeLong) = {
-    def findnroot(prev: SafeLong, add: Int): (SafeLong, SafeLong) = {
-      val min = SafeLong(prev.toBigInteger.setBit(add))
-      val max = min + 1
-
-      val fl = min pow n
-      val cl = max pow n
-
-      if (fl > x) {
-        findnroot(prev, add - 1)
-      } else if (cl < x) {
-        findnroot(min, add - 1)
-      } else if (cl == x) {
-        (max, max)
-      } else if (fl == x) {
-        (min, min)
-      } else {
-        (min, max)
-      }
-    }
-
-    findnroot(SafeLong.zero, (x.bitLength + n - 1) / n) // ceil(x.bitLength / n)
-  }
-
-
-  /**
-   * Returns an interval that bounds the nth-root of the integer x.
-   */
-  def nroot(x: Long, n: Int): (Long, Long) = {
-    def findnroot(prev: Long, add: Long): (Long, Long) = {
-      val min = prev | add
-      val max = min + 1
-      val fl = pow(min, n)
-      val cl = pow(max, n)
-
-      if (fl <= 0 || fl > x) {
-        findnroot(prev, add >> 1)
-      } else if (cl < x) {
-        findnroot(min, add >> 1)
-      } else if (cl == x) {
-        (max, max)
-      } else if (fl == x) {
-        (min, min)
-      } else {
-        (min, max)
-      }
-    }
-
-    // TODO: Could probably get a better initial add then this.
-    findnroot(0, 1L << ((65 - n) / n))
-  }
-  // $COVERAGE-ON$
-
   @SerialVersionUID(0L)
   private final class LongRational(val n: Long, val d: Long) extends Rational with Serializable {
     def numerator: SafeLong = SafeLong(n)
