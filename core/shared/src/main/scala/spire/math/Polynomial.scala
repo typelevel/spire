@@ -481,7 +481,7 @@ with Ring[Polynomial[C]] {
 }
 
 trait PolynomialEuclideanRing[@sp(Double) C] extends PolynomialRing[C]
-with EuclideanRing[Polynomial[C]] with VectorSpace[Polynomial[C], C] {
+with EuclideanRing[Polynomial[C]] with Gcd[Polynomial[C]] with VectorSpace[Polynomial[C], C] {
   implicit override val scalar: Field[C]
 
   override def divr(x: Polynomial[C], k: C): Polynomial[C] = x :/ k
@@ -491,8 +491,10 @@ with EuclideanRing[Polynomial[C]] with VectorSpace[Polynomial[C], C] {
 
   final def gcd(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = {
     val k = spire.math.gcd(x.coeffsArray ++ y.coeffsArray)
-    k *: euclid(x :/ k, y :/ k)(Polynomial.eq).monic
+    k *: euclid(x :/ k, y :/ k)(Polynomial.eq, this).monic
   }
+
+  def lcm(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = (x /~ gcd(x, y)) * y //FIXME?
 }
 
 trait PolynomialEq[@sp(Double) C] extends Eq[Polynomial[C]] {

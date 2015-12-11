@@ -9,7 +9,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import spire.macros.Checked
 
-import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Ring, Signed}
+import spire.algebra.{EuclideanRing, Gcd, IsIntegral, NRoot, Order, Ring, Signed}
 import spire.std.long._
 import spire.std.bigInteger._
 
@@ -164,6 +164,7 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
   def abs: SafeLong
 
   def gcd(that: SafeLong): SafeLong
+  def lcm(that: SafeLong): SafeLong = (this / (this gcd that)) * that
 
   def unary_-(): SafeLong
 
@@ -517,10 +518,11 @@ private[math] trait SafeLongIsRing extends Ring[SafeLong] {
   override def fromInt(n: Int): SafeLong = SafeLong(n)
 }
 
-private[math] trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with SafeLongIsRing {
+private[math] trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with Gcd[SafeLong] with SafeLongIsRing {
   def quot(a:SafeLong, b:SafeLong): SafeLong = a / b
   def mod(a:SafeLong, b:SafeLong): SafeLong = a % b
   override def quotmod(a:SafeLong, b:SafeLong): (SafeLong, SafeLong) = a /% b
+  def lcm(a:SafeLong, b:SafeLong): SafeLong = a lcm b
   def gcd(a:SafeLong, b:SafeLong): SafeLong = a gcd b
 }
 
