@@ -109,6 +109,10 @@ trait EuclideanRingSyntax extends RingSyntax {
 
 trait FieldSyntax extends EuclideanRingSyntax with MultiplicativeGroupSyntax
 
+trait GcdSyntax {
+  implicit def gcdOps[A: Gcd](a:A): GcdOps[A] = new GcdOps(a)
+}
+
 trait NRootSyntax {
   implicit def nrootOps[A: NRoot](a: A): NRootOps[A] = new NRootOps(a)
 }
@@ -261,6 +265,7 @@ trait AllSyntax extends
     RngSyntax with
     RingSyntax with
     EuclideanRingSyntax with
+    GcdSyntax with
     FieldSyntax with
     NRootSyntax with
     TrigSyntax with

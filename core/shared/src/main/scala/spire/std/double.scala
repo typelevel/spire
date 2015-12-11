@@ -23,6 +23,8 @@ trait DoubleIsField extends Field[Double] {
   def quot(a:Double, b:Double): Double = (a - (a % b)) / b
   def mod(a:Double, b:Double): Double = a % b
 
+  def lcm(a:Double, b:Double):Double = (a / gcd(a, b)) * b
+
   final def gcd(a:Double, b:Double):Double = {
     def value(bits: Long): Long = bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L
 

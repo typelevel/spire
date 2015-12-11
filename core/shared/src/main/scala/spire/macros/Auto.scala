@@ -158,7 +158,6 @@ abstract class AutoAlgebra extends AutoOps { ops =>
         def negate(x: A): A = ops.negate[A].splice
         def quot(x: A, y: A): A = ops.quot[A].splice
         def mod(x: A, y: A): A = ops.mod[A]().splice
-        def gcd(x: A, y: A): A = euclid(x, y)(ev.splice)
       }
     }
   }
@@ -175,7 +174,6 @@ abstract class AutoAlgebra extends AutoOps { ops =>
         def negate(x: A): A = ops.negate[A].splice
         def quot(x: A, y: A): A = ops.div[A].splice
         def mod(x: A, y: A): A = ops.mod[A](z).splice
-        def gcd(x: A, y: A): A = euclid(x, y)(ev.splice)
         def div(x: A, y: A): A = ops.div[A].splice
       }
     }
@@ -270,7 +268,7 @@ object ScalaAutoMacros {
     val ops = ScalaAlgebra[c.type](c)
     c.universe.reify {
       new Semigroup[A] {
-        def op(x: A, y: A): A = ops.plusplus[A].splice
+        def combine(x: A, y: A): A = ops.plusplus[A].splice
       }
     }
   }
@@ -279,8 +277,8 @@ object ScalaAutoMacros {
     val ops = ScalaAlgebra[c.type](c)
     c.universe.reify {
       new Monoid[A] {
-        def id: A = z.splice
-        def op(x: A, y: A): A = ops.plusplus[A].splice
+        def empty: A = z.splice
+        def combine(x: A, y: A): A = ops.plusplus[A].splice
       }
     }
   }
@@ -317,11 +315,12 @@ object JavaAutoMacros {
     val ops = JavaAlgebra[c.type](c)
     val addx = ops.binop[Unit]("addAll", "z", "x")
     val addy = ops.binop[Unit]("addAll", "z", "y")
+    val z = empty
     c.universe.reify {
       new Monoid[A] {
-        def id: A = empty.splice
-        def op(x: A, y: A): A = {
-          val z = id
+        def empty: A = z.splice
+        def combine(x: A, y: A): A = {
+          val z = empty
           addx.splice
           addy.splice
           z

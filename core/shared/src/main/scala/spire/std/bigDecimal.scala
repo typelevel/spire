@@ -21,9 +21,10 @@ trait BigDecimalIsField extends Field[BigDecimal] {
 
   override def fromInt(n: Int): BigDecimal = BigDecimal(n)
 
-  def quot(a: BigDecimal, b: BigDecimal): BigDecimal = a.quot(b)
-  def mod(a: BigDecimal, b: BigDecimal): BigDecimal = a % b
-  override def quotmod(a: BigDecimal, b: BigDecimal): (BigDecimal, BigDecimal) = a /% b
+  def quot(a: BigDecimal, b: BigDecimal) = a.quot(b)
+  def mod(a: BigDecimal, b: BigDecimal) = a % b
+  override def quotmod(a: BigDecimal, b: BigDecimal) = a /% b
+  def lcm(a: BigDecimal, b: BigDecimal): BigDecimal = (a / gcd(a, b)) * b
   def gcd(a: BigDecimal, b: BigDecimal): BigDecimal = {
     import java.math.BigInteger
 
@@ -77,7 +78,7 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
   def nroot(a: BigDecimal, k: Int): BigDecimal = {
     if (a.mc.getPrecision <= 0)
       throw new ArithmeticException("Cannot find the nroot of a BigDecimal with unlimited precision.")
-    NRoot.nroot(a, k, a.mc)
+    spire.math.nroot(a, k, a.mc)
   }
 
   private[this] val two = BigDecimal(2)

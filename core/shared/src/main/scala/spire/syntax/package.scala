@@ -34,6 +34,7 @@ package object syntax {
   object field extends FieldSyntax
   object nroot extends NRootSyntax
   object trig extends TrigSyntax
+  object gcd extends GcdSyntax
 
   object module extends ModuleSyntax
   object vectorSpace extends VectorSpaceSyntax
