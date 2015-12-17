@@ -45,6 +45,11 @@ import java.lang.Double.isNaN
  * These situations will result in loss of precision (in the form of
  * wider intervals). The result is not wrong per se, but less
  * acccurate than it could be.
+ * 
+ * These intervals should not be used with floating point bounds,
+ * as proper rounding is not implemented. Generally, the JVM is
+ * not an easy platform to perform robust arithmetic, as the
+ * IEEE 754 rounding modes cannot be set.
  */
 sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
