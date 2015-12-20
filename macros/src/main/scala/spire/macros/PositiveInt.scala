@@ -11,7 +11,7 @@ import spire.macros.compat.Context
  * technology requires it to remain public. Instead, you should
  * construct instances via the PositiveInt(_) factory constructor.
  */
-class PositiveInt(val value: Int) extends AnyVal {
+class PositiveInt private [spire] (val value: Int) extends AnyVal {
   override def toString: String = value.toString
 }
 
