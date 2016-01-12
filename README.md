@@ -18,10 +18,10 @@ cases, generic implementations using Spire's specialized type classes perform
 identically to corresponding direct implementations.
 
 ### Scaladoc
-[![Core](http://javadoc-badge.appspot.com/org.spire-math/spire_2.11.svg?label=core)](http://javadoc-badge.appspot.com/org.spire-math/spire_2.11)
+[![Core](http://javadoc-badge.appspot.com/org.spire-math/spire_2.11.svg?label=core)](http://javadoc-badge.appspot.com/org.spire-math/spire_2.11/index.html#spire.package)
 [![Extras](http://javadoc-badge.appspot.com/org.spire-math/spire-extras_2.11.svg?label=extras)](http://javadoc-badge.appspot.com/org.spire-math/spire-extras_2.11)
-[![Laws](http://javadoc-badge.appspot.com/org.spire-math/spire-laws_2.11.svg?label=laws)](http://javadoc-badge.appspot.com/org.spire-math/spire-laws_2.11)
-[![Macros](http://javadoc-badge.appspot.com/org.spire-math/spire-macros_2.11.svg?label=macros)](http://javadoc-badge.appspot.com/org.spire-math/spire-macros_2.11)
+[![Laws](http://javadoc-badge.appspot.com/org.spire-math/spire-laws_2.11.svg?label=laws)](http://javadoc-badge.appspot.com/org.spire-math/spire-laws_2.11/index.html#spire.laws.package)
+[![Macros](http://javadoc-badge.appspot.com/org.spire-math/spire-macros_2.11.svg?label=macros)](http://javadoc-badge.appspot.com/org.spire-math/spire-macros_2.11/index.html#spire.macros.package)
 
 Spire is provided to you as free software under the
 [MIT license](COPYING).
