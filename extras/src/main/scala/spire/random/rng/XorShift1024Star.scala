@@ -47,7 +47,7 @@ object XorShift1024Star extends GeneratorCompanion[XorShift1024Star, (Array[Long
   def fromSeed(seed: (Array[Long], Int)): XorShift1024Star =
     seed match {
       case (s, p) =>
-        assert(s.length == N && p < N && s.exists(_ != 0))
+        assert(s.length == N && p >= 0 && p < N && s.exists(_ != 0))
         new XorShift1024Star(s, p)
     }
 
