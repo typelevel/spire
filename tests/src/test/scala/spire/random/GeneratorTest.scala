@@ -2,6 +2,7 @@ package spire
 package random
 
 import spire.random.rng._
+import spire.random.rng.extras._
 
 import org.scalatest.FunSuite
 

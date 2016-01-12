@@ -1,6 +1,7 @@
 package spire
 package random
 package rng
+package extras
 
 import spire.syntax.cfor._
 import java.nio.ByteBuffer
