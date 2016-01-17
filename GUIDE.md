@@ -59,7 +59,7 @@ instances" at one go, import `spire.std.any._`. This pattern should
 also be used when supporting other number types that are not
 Spire-aware.
 
-Finally, syntax implicits are imported from objecs in
+Finally, syntax implicits are imported from objects in
 `spire.syntax`. To get the syntax for `Ring[A]` you'd import
 `spire.syntax.ring._`. Again, there is a shortcut package: you can
 import `spire.syntax.all._` to get all syntax.
@@ -294,7 +294,7 @@ Most types have many possible implementations of these types
 classes. In these cases Spire requires users to explicitly choose
 which implementation they want.
 
-Spire also defines two parallel group heirarchies for *additive* and
+Spire also defines two parallel group hierarchies for *additive* and
 *multiplicative* groups. These have the same properties but different
 names and symbols. The following list provides the generic, additive,
 and multiplicative variants:
@@ -399,7 +399,7 @@ Similarly, Spire supports the Trigonometric functions via
 functions and values as well. The following methods are supported:
 
   * `e` Euler's number
-  * `pi` Ratio of a circle's diameter to its circumfernce.
+  * `pi` Ratio of a circle's diameter to its circumference.
 
   * `exp(a)` Raise `e` to `a`-th power.
   * `expm1(a)` Equivalent to `exp(a) - 1` with less error.
@@ -622,8 +622,8 @@ with a single variable (e.g. *x*) with the following structure:
 ```
 c0 + (c1 * x^1) + (c2 * x^2) + ... + (cn * x^n)
 ```
-  
-The coefficents (`c0` through `cn`) are values of the type `C`, and
+
+The coefficients (`c0` through `cn`) are values of the type `C`, and
 the exponents (`1` through `n`) are `Int` values (this does mean that
 Spire's implementation only supports polynomials whose exponents are
 less than 2147483648).
@@ -744,7 +744,7 @@ range of numeric types that should address most needs.
 
 For non-negative numbers, the safe type to use is `Natural`. It is quite fast
 when representing small-ish numbers (128-bits or less), but has no upper bound
-on the values it can reprsent. However, its unique cons-structure means that
+on the values it can represent. However, its unique cons-structure means that
 for very large values `BigInt` and `SafeLong` may be faster. Since it only
 supports non-negative values, subtraction is non-total (and may throw an
 exception).
@@ -870,7 +870,7 @@ relying on a single generator across threads.
 
 Although the `mutable.Generator` trait itself only provides low-level methods
 like `nextInt`, it can produce values of any type using the `Dist[A]` type
-class, which will be discussed in the next seciton.
+class, which will be discussed in the next section.
 
 The `immutable.Generator` trait is similar to `mutable.Generator`, although
 the state it stores is immutable. Each time a number is generated a new
