@@ -282,8 +282,8 @@ in this guide.
   digraph G {
     aize ="4,4";
     node [shape="box"];
-    Eq -> PartialOrder
-    PartialOrder -> Order
+    "Eq[A]" -> "PartialOrder[A]"
+    "PartialOrder[A]" -> "Order[A]"
   }
 )
 
@@ -319,19 +319,19 @@ and multiplicative variants:
   digraph G {
     aize ="4,4";
     node [shape="box"];
-    Semigroup [group=g1]
-    Monoid [group=g1]
-    Group [group=g1]
-    CSemigroup [group=g2]
-    CMonoid [group=g2]
-    AbGroup [group=g2]
-    Semigroup -> Monoid
-    Monoid -> Group
-    CSemigroup -> CMonoid
-    CMonoid -> AbGroup
-    Semigroup -> CSemigroup
-    Monoid -> CMonoid
-    Group -> AbGroup
+    "Semigroup[A]" [group=g1]
+    "Monoid[A]" [group=g1]
+    "Group[A]" [group=g1]
+    "CSemigroup[A]" [group=g2]
+    "CMonoid[A]" [group=g2]
+    "AbGroup[A]" [group=g2]
+    "Semigroup[A]" -> "Monoid[A]"
+    "Monoid[A]" -> "Group[A]"
+    "CSemigroup[A]" -> "CMonoid[A]"
+    "CMonoid[A]" -> "AbGroup[A]"
+    "Semigroup[A]" -> "CSemigroup[A]"
+    "Monoid[A]" -> "CMonoid[A]"
+    "Group[A]" -> "AbGroup[A]"
   }
 )
 
@@ -363,11 +363,15 @@ Rings also provide a `pow` method (`**`) for doing repeated multiplication.
   digraph G {
     aize ="4,4";
     node [shape="box"];
-    Semiring -> Rig
-    Semiring -> Rng
-    Rig -> Ring
-    Rng -> Ring
-    Ring -> CRing
+    "AdditiveMonoid[A]" -> "Semiring[A]"
+    "MultiplicativeSemigroup[A]" -> "Semiring[A]"
+    "MultiplicativeMonoid[A]" -> "Rig[A]"
+    "AdditiveAbGroup[A]" -> "Rng[A]"
+    "Semiring[A]" -> "Rig[A]"
+    "Semiring[A]" -> "Rng[A]"
+    "Rig[A]" -> "Ring[A]"
+    "Rng[A]" -> "Ring[A]"
+    "Ring[A]" -> "CRing[A]"
   }
 )
 
