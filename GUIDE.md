@@ -386,22 +386,9 @@ and multiplicative variants:
     aize ="4,4"
     node [shape="box"]
     edge [dir=back]
-    "Semigroup[A]" [group=g1]
-    "Monoid[A]" [group=g1]
-    "Group[A]" [group=g1]
-    "CSemigroup[A]" [group=g2]
-    "CMonoid[A]" [group=g2]
-    "AbGroup[A]" [group=g2]
-    "Semigroup[A]" -> "Monoid[A]"
-    "Monoid[A]" -> "Group[A]"
-    "CSemigroup[A]" -> "CMonoid[A]"
-    "CMonoid[A]" -> "AbGroup[A]"
-    "Semigroup[A]" -> "CSemigroup[A]"
-    "Monoid[A]" -> "CMonoid[A]"
-    "Group[A]" -> "AbGroup[A]"
-    "MultiplicativeSemigroup[A]" [group=g3]
-    "MultiplicativeMonoid[A]" [group=g3]
-    "MultiplicativeGroup[A]" [group=g3]
+    "MultiplicativeSemigroup[A]" [group=g2]
+    "MultiplicativeMonoid[A]" [group=g2]
+    "MultiplicativeGroup[A]" [group=g2]
     "MultiplicativeCSemigroup[A]" [group=g4]
     "MultiplicativeCMonoid[A]" [group=g4]
     "MultiplicativeAbGroup[A]" [group=g4]
@@ -411,7 +398,19 @@ and multiplicative variants:
     "MultiplicativeCMonoid[A]" -> "MultiplicativeAbGroup[A]"
     "MultiplicativeSemigroup[A]" -> "MultiplicativeCSemigroup[A]"
     "MultiplicativeMonoid[A]" -> "MultiplicativeCMonoid[A]"
-    "MultiplicativeGroup[A]" -> "MultiplicativeAbGroup[A]"
+    "Semigroup[A]" [group=g1]
+    "Monoid[A]" [group=g1]
+    "Group[A]" [group=g1]
+    "CSemigroup[A]" [group=g3]
+    "CMonoid[A]" [group=g3]
+    "AbGroup[A]" [group=g3]
+    "Semigroup[A]" -> "Monoid[A]"
+    "Monoid[A]" -> "Group[A]"
+    "CSemigroup[A]" -> "CMonoid[A]"
+    "CMonoid[A]" -> "AbGroup[A]"
+    "Semigroup[A]" -> "CSemigroup[A]"
+    "Monoid[A]" -> "CMonoid[A]"
+    "Group[A]" -> "AbGroup[A]"
     edge [style="dashed", constraint=false]
     "Semigroup[A]" -> "MultiplicativeSemigroup[A]"
     "Monoid[A]" -> "MultiplicativeMonoid[A]"
