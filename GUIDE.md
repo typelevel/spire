@@ -451,6 +451,14 @@ Rings also provide a `pow` method (`**`) for doing repeated multiplication.
     aize ="4,4"
     node [shape="box"]
     edge [dir=back]
+    "AdditiveMonoid[A]" [group=g1]
+    "AdditiveAbGroup[A]" [group=g1]
+    "MultiplicativeSemigroup[A]" [group=g4]
+    "MultiplicativeMonoid[A]" [group=g4]
+    "Semiring[A]" [group=g2]
+    "Ring[A]" [group=g2]
+    "CRing[A]" [group=g2]
+    "EuclideanRing[A]" [group=g2]
     "AdditiveMonoid[A]" -> "Semiring[A]"
     "MultiplicativeSemigroup[A]" -> "Semiring[A]"
     "MultiplicativeMonoid[A]" -> "Rig[A]"
@@ -460,6 +468,10 @@ Rings also provide a `pow` method (`**`) for doing repeated multiplication.
     "Rig[A]" -> "Ring[A]"
     "Rng[A]" -> "Ring[A]"
     "Ring[A]" -> "CRing[A]"
+    "CRing[A]" -> "EuclideanRing[A]"
+    edge [style=invis]
+    "AdditiveMonoid[A]" -> "AdditiveAbGroup[A]"
+    "MultiplicativeSemigroup[A]" -> "MultiplicativeMonoid[A]" 
   }
 )
 
