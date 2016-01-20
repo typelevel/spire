@@ -319,12 +319,12 @@ and multiplicative variants:
   digraph G {
     aize ="4,4";
     node [shape="box"];
-    "Semigroup[A]" [group=g1]
-    "Monoid[A]" [group=g1]
-    "Group[A]" [group=g1]
-    "CSemigroup[A]" [group=g2]
-    "CMonoid[A]" [group=g2]
-    "AbGroup[A]" [group=g2]
+    "Semigroup[A]" [group=g3]
+    "Monoid[A]" [group=g3]
+    "Group[A]" [group=g3]
+    "CSemigroup[A]" [group=g4]
+    "CMonoid[A]" [group=g4]
+    "AbGroup[A]" [group=g4]
     "Semigroup[A]" -> "Monoid[A]"
     "Monoid[A]" -> "Group[A]"
     "CSemigroup[A]" -> "CMonoid[A]"
@@ -332,6 +332,32 @@ and multiplicative variants:
     "Semigroup[A]" -> "CSemigroup[A]"
     "Monoid[A]" -> "CMonoid[A]"
     "Group[A]" -> "AbGroup[A]"
+    "MultiplicativeSemigroup[A]" [group=g5]
+    "MultiplicativeMonoid[A]" [group=g5]
+    "MultiplicativeGroup[A]" [group=g5]
+    "MultiplicativeCSemigroup[A]" [group=g6]
+    "MultiplicativeCMonoid[A]" [group=g6]
+    "MultiplicativeAbGroup[A]" [group=g6]
+    "MultiplicativeSemigroup[A]" -> "MultiplicativeMonoid[A]"
+    "MultiplicativeMonoid[A]" -> "MultiplicativeGroup[A]"
+    "MultiplicativeCSemigroup[A]" -> "MultiplicativeCMonoid[A]"
+    "MultiplicativeCMonoid[A]" -> "MultiplicativeAbGroup[A]"
+    "MultiplicativeSemigroup[A]" -> "MultiplicativeCSemigroup[A]"
+    "MultiplicativeMonoid[A]" -> "MultiplicativeCMonoid[A]"
+    "MultiplicativeGroup[A]" -> "MultiplicativeAbGroup[A]"
+    "AdditiveSemigroup[A]" [group=g1]
+    "AdditiveMonoid[A]" [group=g1]
+    "AdditiveGroup[A]" [group=g1]
+    "AdditiveCSemigroup[A]" [group=g2]
+    "AdditiveCMonoid[A]" [group=g2]
+    "AdditiveAbGroup[A]" [group=g2]
+    "AdditiveSemigroup[A]" -> "AdditiveMonoid[A]"
+    "AdditiveMonoid[A]" -> "AdditiveGroup[A]"
+    "AdditiveCSemigroup[A]" -> "AdditiveCMonoid[A]"
+    "AdditiveCMonoid[A]" -> "AdditiveAbGroup[A]"
+    "AdditiveSemigroup[A]" -> "AdditiveCSemigroup[A]"
+    "AdditiveMonoid[A]" -> "AdditiveCMonoid[A]"
+    "AdditiveGroup[A]" -> "AdditiveAbGroup[A]"
   }
 )
 
