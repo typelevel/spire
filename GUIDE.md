@@ -460,6 +460,7 @@ Rings also provide a `pow` method (`**`) for doing repeated multiplication.
     "Ring[A]" [group=g2]
     "CRing[A]" [group=g2]
     "EuclideanRing[A]" [group=g2]
+    "Field[A]" [group=g2]
     "AdditiveMonoid[A]" -> "Semiring[A]"
     "MultiplicativeSemigroup[A]" -> "Semiring[A]"
     "MultiplicativeMonoid[A]" -> "Rig[A]"
