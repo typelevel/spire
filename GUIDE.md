@@ -278,6 +278,15 @@ Instances of `PartialOrder[A]` are required to observe the properties above.
 Note that `Order[A]` extends `PartialOrder[A]`, but for pedagogical purposes, `Order[A]` is presented first
 in this guide.
 
+![Order hierarchy](http://g.gravizo.com/g?
+  digraph G {
+    aize ="4,4";
+    node [shape="box"];
+    Eq -> PartialOrder
+    PartialOrder -> Order
+  }
+)
+
 #### Groups
 
 The most basic algebraic type classes Spire supports involve a single
@@ -306,6 +315,26 @@ and multiplicative variants:
  * inverse symbol: `inverse`, `-` (unary), `reciprocal`
  * inverse binary operator: `|-|`, `-` (binary), `/`
 
+![Group hierarchy](http://g.gravizo.com/g?
+  digraph G {
+    aize ="4,4";
+    node [shape="box"];
+    Semigroup [group=g1]
+    Monoid [group=g1]
+    Group [group=g1]
+    CSemigroup [group=g2]
+    CMonoid [group=g2]
+    AbGroup [group=g2]
+    Semigroup -> Monoid
+    Monoid -> Group
+    CSemigroup -> CMonoid
+    CMonoid -> AbGroup
+    Semigroup -> CSemigroup
+    Monoid -> CMonoid
+    Group -> AbGroup
+  }
+)
+
 #### Rings and Fields
 
 Rings are a set together with two binary operation (additive and
@@ -329,6 +358,18 @@ inheritance:
  * `CRing[A]` extends `Ring[A]` with `MultiplicativeCMonoid[A]`
 
 Rings also provide a `pow` method (`**`) for doing repeated multiplication.
+
+![Ring hierarchy](http://g.gravizo.com/g?
+  digraph G {
+    aize ="4,4";
+    node [shape="box"];
+    Semiring -> Rig
+    Semiring -> Rng
+    Rig -> Ring
+    Rng -> Ring
+    Ring -> CRing
+  }
+)
 
 #### EuclideanRings
 
