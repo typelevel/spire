@@ -280,8 +280,9 @@ in this guide.
 
 ![Order hierarchy](http://g.gravizo.com/g?
   digraph G {
-    aize ="4,4";
-    node [shape="box"];
+    aize ="4,4"
+    node [shape="box"]
+    edge [dir=back]
     "Eq[A]" -> "PartialOrder[A]"
     "PartialOrder[A]" -> "Order[A]"
   }
@@ -303,6 +304,27 @@ Most types have many possible implementations of these types
 classes. In these cases Spire requires users to explicitly choose
 which implementation they want.
 
+![Group hierarchy](http://g.gravizo.com/g?
+  digraph G {
+    aize ="4,4";
+    node [shape="box"]
+    edge [dir=back]
+    "Semigroup[A]" [group=g1]
+    "Monoid[A]" [group=g1]
+    "Group[A]" [group=g1]
+    "CSemigroup[A]" [group=g2]
+    "CMonoid[A]" [group=g2]
+    "AbGroup[A]" [group=g2]
+    "Semigroup[A]" -> "Monoid[A]"
+    "Monoid[A]" -> "Group[A]"
+    "CSemigroup[A]" -> "CMonoid[A]"
+    "CMonoid[A]" -> "AbGroup[A]"
+    "Semigroup[A]" -> "CSemigroup[A]"
+    "Monoid[A]" -> "CMonoid[A]"
+    "Group[A]" -> "AbGroup[A]"
+  }
+)
+
 Spire also defines two parallel group hierarchies for *additive* and
 *multiplicative* groups. These have the same properties but different
 names and symbols. The following list provides the generic, additive,
@@ -315,16 +337,17 @@ and multiplicative variants:
  * inverse symbol: `inverse`, `-` (unary), `reciprocal`
  * inverse binary operator: `|-|`, `-` (binary), `/`
 
-![Group hierarchy](http://g.gravizo.com/g?
+![Multiplicative Group hierarchy](http://g.gravizo.com/g?
   digraph G {
-    aize ="4,4";
-    node [shape="box"];
-    "Semigroup[A]" [group=g3]
-    "Monoid[A]" [group=g3]
-    "Group[A]" [group=g3]
-    "CSemigroup[A]" [group=g4]
-    "CMonoid[A]" [group=g4]
-    "AbGroup[A]" [group=g4]
+    aize ="4,4"
+    node [shape="box"]
+    edge [dir=back]
+    "Semigroup[A]" [group=g1]
+    "Monoid[A]" [group=g1]
+    "Group[A]" [group=g1]
+    "CSemigroup[A]" [group=g2]
+    "CMonoid[A]" [group=g2]
+    "AbGroup[A]" [group=g2]
     "Semigroup[A]" -> "Monoid[A]"
     "Monoid[A]" -> "Group[A]"
     "CSemigroup[A]" -> "CMonoid[A]"
@@ -332,12 +355,12 @@ and multiplicative variants:
     "Semigroup[A]" -> "CSemigroup[A]"
     "Monoid[A]" -> "CMonoid[A]"
     "Group[A]" -> "AbGroup[A]"
-    "MultiplicativeSemigroup[A]" [group=g5]
-    "MultiplicativeMonoid[A]" [group=g5]
-    "MultiplicativeGroup[A]" [group=g5]
-    "MultiplicativeCSemigroup[A]" [group=g6]
-    "MultiplicativeCMonoid[A]" [group=g6]
-    "MultiplicativeAbGroup[A]" [group=g6]
+    "MultiplicativeSemigroup[A]" [group=g3]
+    "MultiplicativeMonoid[A]" [group=g3]
+    "MultiplicativeGroup[A]" [group=g3]
+    "MultiplicativeCSemigroup[A]" [group=g4]
+    "MultiplicativeCMonoid[A]" [group=g4]
+    "MultiplicativeAbGroup[A]" [group=g4]
     "MultiplicativeSemigroup[A]" -> "MultiplicativeMonoid[A]"
     "MultiplicativeMonoid[A]" -> "MultiplicativeGroup[A]"
     "MultiplicativeCSemigroup[A]" -> "MultiplicativeCMonoid[A]"
@@ -345,19 +368,46 @@ and multiplicative variants:
     "MultiplicativeSemigroup[A]" -> "MultiplicativeCSemigroup[A]"
     "MultiplicativeMonoid[A]" -> "MultiplicativeCMonoid[A]"
     "MultiplicativeGroup[A]" -> "MultiplicativeAbGroup[A]"
-    "AdditiveSemigroup[A]" [group=g1]
-    "AdditiveMonoid[A]" [group=g1]
-    "AdditiveGroup[A]" [group=g1]
-    "AdditiveCSemigroup[A]" [group=g2]
-    "AdditiveCMonoid[A]" [group=g2]
-    "AdditiveAbGroup[A]" [group=g2]
+  }
+)
+
+![Additive Group hierarchy](http://g.gravizo.com/g?
+  digraph G {
+    aize ="4,4"
+    node [shape="box"]
+    edge [dir=back]
+    "AdditiveSemigroup[A]" [group=g2]
+    "AdditiveMonoid[A]" [group=g2]
+    "AdditiveGroup[A]" [group=g2]
+    "AdditiveCSemigroup[A]" [group=g4]
+    "AdditiveCMonoid[A]" [group=g4]
+    "AdditiveAbGroup[A]" [group=g4]
     "AdditiveSemigroup[A]" -> "AdditiveMonoid[A]"
     "AdditiveMonoid[A]" -> "AdditiveGroup[A]"
     "AdditiveCSemigroup[A]" -> "AdditiveCMonoid[A]"
     "AdditiveCMonoid[A]" -> "AdditiveAbGroup[A]"
     "AdditiveSemigroup[A]" -> "AdditiveCSemigroup[A]"
     "AdditiveMonoid[A]" -> "AdditiveCMonoid[A]"
-    "AdditiveGroup[A]" -> "AdditiveAbGroup[A]"
+    "Semigroup[A]" [group=g1]
+    "Monoid[A]" [group=g1]
+    "Group[A]" [group=g1]
+    "CSemigroup[A]" [group=g3]
+    "CMonoid[A]" [group=g3]
+    "AbGroup[A]" [group=g3]
+    "Semigroup[A]" -> "Monoid[A]"
+    "Monoid[A]" -> "Group[A]"
+    "CSemigroup[A]" -> "CMonoid[A]"
+    "CMonoid[A]" -> "AbGroup[A]"
+    "Semigroup[A]" -> "CSemigroup[A]"
+    "Monoid[A]" -> "CMonoid[A]"
+    "Group[A]" -> "AbGroup[A]"
+    edge [style="dashed", constraint=false]
+    "Semigroup[A]" -> "AdditiveSemigroup[A]"
+    "Monoid[A]" -> "AdditiveMonoid[A]"
+    "Group[A]" -> "AdditiveGroup[A]"
+    "CSemigroup[A]" -> "AdditiveCSemigroup[A]"
+    "CMonoid[A]" -> "AdditiveCMonoid[A]"
+    "AbGroup[A]" -> "AdditiveAbGroup[A]"
   }
 )
 
@@ -387,8 +437,9 @@ Rings also provide a `pow` method (`**`) for doing repeated multiplication.
 
 ![Ring hierarchy](http://g.gravizo.com/g?
   digraph G {
-    aize ="4,4";
-    node [shape="box"];
+    aize ="4,4"
+    node [shape="box"]
+    edge [dir=back]
     "AdditiveMonoid[A]" -> "Semiring[A]"
     "MultiplicativeSemigroup[A]" -> "Semiring[A]"
     "MultiplicativeMonoid[A]" -> "Rig[A]"
