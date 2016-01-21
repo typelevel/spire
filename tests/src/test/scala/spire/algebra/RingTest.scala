@@ -65,8 +65,10 @@ class RingTest extends FunSuite {
     runTest("3 pow 2")(assert((b pow 2) === -c))
   }
 
+  import spire.macros.PositiveInt
+
   implicit val mc: MathContext = MathContext.DECIMAL128
-  implicit val jetDim = JetDim(7)
+  implicit val jetDim: JetDim = JetDim(PositiveInt(7))
 
   // here's where we actually run all the tests, for each type we care about.
   runWith[Int]("Int")(-3, 3, -9)

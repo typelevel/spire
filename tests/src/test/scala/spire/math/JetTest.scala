@@ -4,23 +4,26 @@ package math
 import org.scalatest._
 import spire.algebra._
 import spire.implicits._
+import spire.macros.PositiveInt
 
 class JetTest extends FunSuite with Matchers {
+ 
+  implicit def intToPositiveInt(x: Int): PositiveInt = PositiveInt(x)
 
   // Default test with 3-dimensional Jet's
-  implicit val dim = JetDim(3)
+  implicit val dim: JetDim = JetDim(3)
   val maxError = 1.0e-12
 
   test("JetDim") {
-    dim.dimension should equal (3)
+    dim.dimension.value should equal (3)
   }
 
   test("Jet(scalar, array) constructor") {
     val a = Array[Double](2.3, 3.4, 4.5)
     val j = new Jet[Double](8.9, a)
-    j.dimension should equal (dim.dimension)
-    j.jetDimension.dimension should equal (dim.dimension)
-    j.infinitesimal.size should equal (dim.dimension)
+    j.dimension should equal (dim.dimension.value)
+    j.jetDimension.dimension.value should equal (dim.dimension.value)
+    j.infinitesimal.size should equal (dim.dimension.value)
     j.real should equal (8.9)
     j.infinitesimal.toArray should equal (a.toArray)
   }
@@ -28,7 +31,7 @@ class JetTest extends FunSuite with Matchers {
     val jz = Jet[Double]()
     jz.real should equal (0)
     jz.isReal should be (true)
-    jz.infinitesimal.size should equal (dim.dimension)
+    jz.infinitesimal.size should equal (dim.dimension.value)
     jz.isInfinitesimal should be (false)
     jz.isZero should be (true)
   }
@@ -36,7 +39,7 @@ class JetTest extends FunSuite with Matchers {
     val jzz = Jet.zero[Double]
     jzz.real should equal (0)
     jzz.isReal should be (true)
-    jzz.infinitesimal.size should equal (dim.dimension)
+    jzz.infinitesimal.size should equal (dim.dimension.value)
     jzz.isInfinitesimal should be (false)
     jzz.isZero should be (true)
   }
@@ -44,7 +47,7 @@ class JetTest extends FunSuite with Matchers {
     val jo = Jet.one[Double]
     jo.real should equal (1.0)
     jo.isReal should be (true)
-    jo.infinitesimal.size should equal (dim.dimension)
+    jo.infinitesimal.size should equal (dim.dimension.value)
     jo.isInfinitesimal should be (false)
   }
   test("Jet.h yields an infinitesimal jet") {
@@ -65,62 +68,62 @@ class JetTest extends FunSuite with Matchers {
     val jf = Jet(2.0f)
     jf.real should equal (2.0f)
     jf.isReal should be (true)
-    jf.infinitesimal.size should equal (dim.dimension)
+    jf.infinitesimal.size should equal (dim.dimension.value)
     jf.isInfinitesimal should be (false)
 
     val jd = Jet(2.6)
     jd.real should equal (2.6)
     jd.isReal should be (true)
-    jd.infinitesimal.size should equal (dim.dimension)
+    jd.infinitesimal.size should equal (dim.dimension.value)
     jd.isInfinitesimal should be (false)
 
     val jbd = Jet(BigDecimal(2847.694984))
     jbd.real should equal (BigDecimal(2847.694984))
     jbd.isReal should be (true)
-    jbd.infinitesimal.size should equal (dim.dimension)
+    jbd.infinitesimal.size should equal (dim.dimension.value)
     jbd.isInfinitesimal should be (false)
 
     val jfi = Jet.fromInt[Float](2)
     jfi.real should equal (2.0)
     jfi.isReal should be (true)
-    jfi.infinitesimal.size should equal (dim.dimension)
+    jfi.infinitesimal.size should equal (dim.dimension.value)
     jfi.isInfinitesimal should be (false)
   }
   test("Conversions from scalars") {
     val jfi = Jet.intToJet(2)
     jfi.real should equal (2.0)
     jfi.isReal should be (true)
-    jfi.infinitesimal.size should equal (dim.dimension)
+    jfi.infinitesimal.size should equal (dim.dimension.value)
     jfi.isInfinitesimal should be (false)
 
     val jfl = Jet.longToJet(2L)
     jfl.real should equal (2.0)
     jfl.isReal should be (true)
-    jfl.infinitesimal.size should equal (dim.dimension)
+    jfl.infinitesimal.size should equal (dim.dimension.value)
     jfl.isInfinitesimal should be (false)
 
     val jff = Jet.floatToJet(2.47f)
     jff.real should equal (2.47f)
     jff.isReal should be (true)
-    jff.infinitesimal.size should equal (dim.dimension)
+    jff.infinitesimal.size should equal (dim.dimension.value)
     jff.isInfinitesimal should be (false)
 
     val jfd = Jet.doubleToJet(2.47)
     jfd.real should equal (2.47)
     jfd.isReal should be (true)
-    jfd.infinitesimal.size should equal (dim.dimension)
+    jfd.infinitesimal.size should equal (dim.dimension.value)
     jfd.isInfinitesimal should be (false)
 
     val jfbi = Jet.bigIntToJet(BigInt(247847))
     jfbi.real should equal (BigDecimal(247847))
     jfbi.isReal should be (true)
-    jfbi.infinitesimal.size should equal (dim.dimension)
+    jfbi.infinitesimal.size should equal (dim.dimension.value)
     jfbi.isInfinitesimal should be (false)
 
     val jfbd = Jet.bigDecimalToJet(BigDecimal(247847.28375))
     jfbd.real should equal (BigDecimal(247847.28375))
     jfbd.isReal should be (true)
-    jfbd.infinitesimal.size should equal (dim.dimension)
+    jfbd.infinitesimal.size should equal (dim.dimension.value)
     jfbd.isInfinitesimal should be (false)
   }
   test("Conversions to scalars") {
