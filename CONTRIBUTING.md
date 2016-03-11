@@ -50,7 +50,7 @@ code you tried that failed). Adding these failing cases to Spire's
 tests provides a good way to ensure the bug is really fixed, and is
 also a good opportunity to start contributing.
 
-ALso, when you notice places that lack tests (or where the tests are
+Also, when you notice places that lack tests (or where the tests are
 sparse, incomplete, or just ugly) feel free to submit a pull request
 with improvements!
 
@@ -73,6 +73,15 @@ leave the PR open for awhile while commenting on it.
 
 You can always email the list, or visit the `#spire-math` IRC channel
 to get a second opinion on your idea or design.
+
+Before submitting code, make sure you validate it. There are two command
+aliases that will automatically run the checks you need: `validateJVM` and
+`validateJS`.  Before getting to the point where you want to check in
+code, you may want to do compile or test cycles that are quicker.  For
+compile, `coreJVM/test` will likely do what you want.  For testing,
+`testsJVM/test` will likely do what you want.  To slim things down even
+further, you can specify tests matching some name like this:
+`testsJVM/test-only *.YourClass*`.
 
 ### Ask questions and make suggestions
 
