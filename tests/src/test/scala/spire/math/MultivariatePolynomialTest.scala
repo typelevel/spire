@@ -6,13 +6,12 @@ import scala.reflect.ClassTag
 import spire.algebra._
 import spire.math.poly._
 import spire.syntax.literals._
-import spire.syntax.euclideanRing._
-import spire.optional.rationalTrig._
-import org.scalatest.matchers.ShouldMatchers
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Gen._
+import org.scalatest.Matchers
 import org.scalatest._
 import prop._
+import org.scalacheck.Arbitrary._
 import org.scalacheck._
 import Gen._
 import Arbitrary.arbitrary
@@ -35,7 +34,7 @@ object MonomialSetup {
 
 }
 
-class MonomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class MonomialCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   import MonomialSetup._
 
@@ -46,7 +45,7 @@ class MonomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPro
 
   runMonomialCheck[Rational]("rational")
 
-  def runMonomialCheck[A: Arbitrary: Order: Field: ClassTag](typ: String) {
+  def runMonomialCheck[A: Arbitrary: Order: Field: ClassTag](typ: String): Unit = {
     implicit val arb: Arbitrary[Monomial[A]] = Arbitrary(for {
       coeff <- arbitrary[A]
       vs <- arbitrary[List[(Char,Int)]]
@@ -54,39 +53,39 @@ class MonomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPro
     runTest[A](s"$typ/monomial")
   }
 
-  def runTest[A: Order: Field: ClassTag](name: String)(implicit arb: Arbitrary[Monomial[A]]) {
+  def runTest[A: Order: Field: ClassTag](name: String)(implicit arb: Arbitrary[Monomial[A]]): Unit = {
     type M = Monomial[A]
 
     val zero = Monomial.zero[A]
     val one = Monomial.one[A]
 
     property(s"$name m = m") {
-      forAll { (m: M) => m should be === m }
+      forAll { (m: M) => m shouldBe m }
     }
 
     property(s"$name m + 0 = m") {
-      forAll { (m: M) => m + zero should be === m }
+      forAll { (m: M) => m + zero shouldBe m }
     }
 
     property(s"$name m + (-m) = 0") {
-      forAll { (m: M) => m + (-m) should be === zero }
+      forAll { (m: M) => m + (-m) shouldBe zero }
     }
 
     property(s"$name m * 0 = 0") {
-      forAll { (m: M) => m * zero should be === zero }
+      forAll { (m: M) => m * zero shouldBe zero }
     }
 
     property(s"$name m * 1 = m") {
-      forAll { (m: M) => m * one should be === m }
+      forAll { (m: M) => m * one shouldBe m }
     }
 
     property(s"$name x * y = y * x") {
-      forAll { (x: M, y: M) => x * y should be === y * x }
+      forAll { (x: M, y: M) => x * y shouldBe y * x }
     }
 
     property(s"$name x + y = y + x") {
-      forAll { (x: M, y: M) => 
-        if(x.vars == y.vars) x + y should be === y + x }
+      forAll { (x: M, y: M) =>
+        if(x.vars == y.vars) x + y shouldBe y + x }
     }
 
   }
@@ -140,7 +139,7 @@ class MonomialTest extends FunSuite {
 
 }
 
-class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with GeneratorDrivenPropertyChecks {
+class MultivariatePolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
   import MonomialSetup._
 
@@ -170,68 +169,68 @@ class MultivariatePolynomialCheck extends PropSpec with ShouldMatchers with Gene
         a += reduction
         uniqueTerms(ts.filterNot(t => eq.eqv(t,ts(0))), a)
       }
-  }   
+  }
 
-  def runMVPCheck[A: Arbitrary: Field: Order: ClassTag](typ: String) {
+  def runMVPCheck[A: Arbitrary: Field: Order: ClassTag](typ: String): Unit = {
     implicit val arb: Arbitrary[MultivariatePolynomial[A]] = Arbitrary(for {
       m <- arbitrary[Array[Monomial[A]]]
     } yield MultivariatePolynomial(uniqueTerms(m)) )
     runTest[A](s"$typ/lexicographic")
   }
 
-  def runTest[A: Order: Field: ClassTag](name: String)(implicit arb: Arbitrary[MultivariatePolynomial[A]]) {
+  def runTest[A: Order: Field: ClassTag](name: String)(implicit arb: Arbitrary[MultivariatePolynomial[A]]): Unit = {
     type P = MultivariatePolynomial[A]
 
     val zero = MultivariatePolynomial.zero[A]
     val one = MultivariatePolynomial.one[A]
 
     property(s"$name p = p") {
-      forAll { (p: P) => p should be === p }
+      forAll { (p: P) => p shouldBe p }
     }
 
     property(s"$name p + 0 = p") {
-      forAll { (p: P) => p + zero should be === p }
+      forAll { (p: P) => p + zero shouldBe p }
     }
 
     property(s"$name p + (-p) = 0") {
-      forAll { (p: P) => p + (-p) should be === zero }
+      forAll { (p: P) => (p + (-p)) shouldBe zero }
     }
 
     property(s"$name p - p = 0") {
-      forAll { (p: P) => p - p should be === zero }
+      forAll { (p: P) => (p - p) shouldBe zero }
     }
 
     property(s"$name p * 0 = 0") {
-      forAll { (p: P) => p * zero should be === zero }
+      forAll { (p: P) => p * zero shouldBe zero }
     }
 
     property(s"$name p * 1 = p") {
-      forAll { (p: P) => p * one should be === p }
+      forAll { (p: P) => p * one shouldBe p }
     }
 
     property(s"$name p /~ 1 = p") {
-      forAll { (p: P) => p /~ one should be === p }
+      forAll { (p: P) => p /~ one shouldBe p }
     }
 
     property(s"$name p /~ p = 1") {
-      forAll { (p: P) => if (!p.isZero) p /~ p should be === one }
+      forAll { (p: P) => if (!p.isZero) p /~ p shouldBe one }
     }
 
     property(s"$name p % p = 0") {
-      forAll { (p: P) => if (!p.isZero) p % p should be === zero }
+      forAll { (p: P) => if (!p.isZero) p % p shouldBe zero }
     }
 
     property(s"$name x + y = y + x") {
-      forAll { (x: P, y: P) => if(y.terms.length < 6 && x.terms.length < 6) x + y should be === y + x }
+      forAll { (x: P, y: P) => if(y.terms.length < 6 && x.terms.length < 6) x + y shouldBe (y + x) }
     }
 
     property(s"$name x * y = y * x") {
-      forAll { (x: P, y: P) => if(y.terms.length < 6 && x.terms.length < 6) x * y should be === y * x }
+      forAll { (x: P, y: P) => if(y.terms.length < 6 && x.terms.length < 6) x * y shouldBe (y * x) }
     }
 
     property(s"$name (x /~ y) * y + (x % y) = x") {
-      forAll { (x: P, y: P) => if(y.terms.length < 6 && x.terms.length < 6 && !y.isZero) (x /~ y) * y + (x % y) should be === x }
-    }  
+      forAll { (x: P, y: P) => if(y.terms.length < 6 && x.terms.length < 6 && !y.isZero) (x /~ y) * y + (x % y) shouldBe x }
+    }
   }
 
 }
@@ -249,7 +248,7 @@ class MultivariatePolynomialTest extends FunSuite {
     assert(p === MultivariatePolynomial(m2, m3, m1))
     assert(MultivariatePolynomial.zero[Rational].toString === "(0)")
     assert(MultivariatePolynomial.one[Rational].toString === "(1)")
-    val l = List(m2, m1 , m3) 
+    val l = List(m2, m1 , m3)
     assert(MultivariatePolynomial(l) === p)
   }
 
@@ -272,32 +271,32 @@ class MultivariatePolynomialTest extends FunSuite {
     val m5 = Monomial(r"1/2",('d', 1), ('a', 1))
     val m6 = Monomial(r"2",('c', 2), ('a', 3))
     val p2 = MultivariatePolynomial(m4, m5, m6)
-    assert(p1 + p2 === MultivariatePolynomial(Monomial(r"2", ('a', 3), ('c', 2)), 
-                                              Monomial(r"2", ('a', 3)), 
-                                              Monomial(r"1/2", ('a', 1), ('c', 1)), 
-                                              Monomial(r"1/2", ('a', 1), ('d', 1)), 
-                                              Monomial(r"1/4", ('b', 3)), 
+    assert(p1 + p2 === MultivariatePolynomial(Monomial(r"2", ('a', 3), ('c', 2)),
+                                              Monomial(r"2", ('a', 3)),
+                                              Monomial(r"1/2", ('a', 1), ('c', 1)),
+                                              Monomial(r"1/2", ('a', 1), ('d', 1)),
+                                              Monomial(r"1/4", ('b', 3)),
                                               Monomial(r"3/2", ('b', 2), ('d', 3))))
-    assert(p2 + p1 === MultivariatePolynomial(Monomial(r"2", ('a', 3), ('c', 2)), 
-                                              Monomial(r"2", ('a', 3)), 
-                                              Monomial(r"1/2", ('a', 1), ('c', 1)), 
-                                              Monomial(r"1/2", ('a', 1), ('d', 1)), 
-                                              Monomial(r"1/4", ('b', 3)), 
+    assert(p2 + p1 === MultivariatePolynomial(Monomial(r"2", ('a', 3), ('c', 2)),
+                                              Monomial(r"2", ('a', 3)),
+                                              Monomial(r"1/2", ('a', 1), ('c', 1)),
+                                              Monomial(r"1/2", ('a', 1), ('d', 1)),
+                                              Monomial(r"1/4", ('b', 3)),
                                               Monomial(r"3/2", ('b', 2), ('d', 3))))
-    assert(p1 - p2 === MultivariatePolynomial(Monomial(r"-2", ('a', 3), ('c', 2)), 
-                                              Monomial(r"2", ('a', 3)), 
-                                              Monomial(r"1/2", ('a', 1), ('c', 1)), 
-                                              Monomial(r"-1/2", ('a', 1), ('d', 1)), 
-                                              Monomial(r"-1/4", ('b', 3)), 
+    assert(p1 - p2 === MultivariatePolynomial(Monomial(r"-2", ('a', 3), ('c', 2)),
+                                              Monomial(r"2", ('a', 3)),
+                                              Monomial(r"1/2", ('a', 1), ('c', 1)),
+                                              Monomial(r"-1/2", ('a', 1), ('d', 1)),
+                                              Monomial(r"-1/4", ('b', 3)),
                                               Monomial(r"3/2", ('b', 2), ('d', 3))))
-    assert(p1 * p2 === MultivariatePolynomial(Monomial(r"4", ('a', 6), ('c', 2)), 
-                                              Monomial(r"1",('a', 4), ('c', 3)), 
-                                              Monomial(r"1", ('a', 4), ('d', 1)), 
-                                              Monomial(r"1/2", ('a', 3), ('b', 3)), 
-                                              Monomial(r"3", ('a', 3), ('b', 2), ('c', 2), ('d', 3)), 
-                                              Monomial(r"1/4", ('a', 2), ('c', 1), ('d', 1)), 
-                                              Monomial(r"1/8", ('a', 1), ('b', 3), ('c', 1)), 
-                                              Monomial(r"3/4", ('a', 1), ('b', 2), ('d', 4)), 
+    assert(p1 * p2 === MultivariatePolynomial(Monomial(r"4", ('a', 6), ('c', 2)),
+                                              Monomial(r"1",('a', 4), ('c', 3)),
+                                              Monomial(r"1", ('a', 4), ('d', 1)),
+                                              Monomial(r"1/2", ('a', 3), ('b', 3)),
+                                              Monomial(r"3", ('a', 3), ('b', 2), ('c', 2), ('d', 3)),
+                                              Monomial(r"1/4", ('a', 2), ('c', 1), ('d', 1)),
+                                              Monomial(r"1/8", ('a', 1), ('b', 3), ('c', 1)),
+                                              Monomial(r"3/4", ('a', 1), ('b', 2), ('d', 4)),
                                               Monomial(r"3/8",('b', 5), ('d', 3))))
     assert(p2 :* r"1/2" === MultivariatePolynomial(Monomial(r"1/8",('b', 3)),
                                                    Monomial(r"1/4",('d', 1), ('a', 1)),
@@ -325,12 +324,14 @@ class MultivariatePolynomialTest extends FunSuite {
     val m6 = Monomial(r"1",('z', 3))
     val m7 = Monomial(r"-3",('x', 1), ('y', 1), ('z', 1))
     val p2 = MultivariatePolynomial(m4, m5, m6, m7)
-    assert(p2 /% p1 === (MultivariatePolynomial(Monomial(r"1", ('x', 2)),
+    assert((p2 /% p1) === (MultivariatePolynomial(Monomial(r"1", ('x', 2)),
                                                 Monomial(r"-1", ('x', 1), ('y', 1)),
                                                 Monomial(r"-1", ('x', 1), ('z', 1)),
                                                 Monomial(r"1", ('y', 2)),
                                                 Monomial(r"-1", ('y', 1), ('z', 1)),
-                                                Monomial(r"1", ('z', 2))), MultivariatePolynomial.zero[Rational]))
+                                                Monomial(r"1", ('z', 2)))
+                                              ->
+                                              MultivariatePolynomial.zero[Rational]))
     assert(p1 /~ p2 === MultivariatePolynomial.zero[Rational])
     assert((p2 /~ p1) * p1 + (p2 % p1) === p2)
     assert((p1 /~ p2) * p1 + (p1 % p2) === p1)

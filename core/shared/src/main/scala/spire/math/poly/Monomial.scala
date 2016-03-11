@@ -1,6 +1,5 @@
 package spire.math.poly
 
-import compat._
 import scala.annotation.tailrec
 import scala.reflect._
 import scala.{specialized => spec}
@@ -9,14 +8,14 @@ import spire.implicits._
 import spire.math._
 
 
-/*  A monomial is the product of a coefficient and a list of variables (Char as symbol) 
+/*  A monomial is the product of a coefficient and a list of variables (Char as symbol)
     each to a non-negative integer power.
 */
 
 class Monomial[@spec(Double) C: ClassTag: Order] private[spire] (val coeff: C, val vars: Map[Char, Int])
   (implicit r: Ring[C]) { lhs =>
 
-  lazy val degree: Int = 
+  lazy val degree: Int =
     vars.values.sum
 
   def isZero: Boolean =
@@ -25,19 +24,19 @@ class Monomial[@spec(Double) C: ClassTag: Order] private[spire] (val coeff: C, v
   def eval(values: Map[Char, C]): C =
     coeff * vars.map({ case (k,v) => values.get(k).get ** v }).reduce(_ * _)
 
-  def unary_- = 
+  def unary_- =
     Monomial[C](-coeff, vars)
 
   def *:(x: C): Monomial[C] =
     Monomial[C](coeff * x, lhs.vars)
 
-  def :*(k: C): Monomial[C] = 
+  def :*(k: C): Monomial[C] =
     k *: lhs
 
   def :/(x: C)(implicit f: Field[C]): Monomial[C] =
     lhs.*:(x.reciprocal)
 
-  def *(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] = 
+  def *(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] =
     if(lhs.isZero || rhs.isZero) Monomial.zero[C] else Monomial[C](lhs.coeff * rhs.coeff, lhs.vars + rhs.vars)
 
   // n.b. only monomials with the same variables form a ring or field
@@ -65,7 +64,7 @@ class Monomial[@spec(Double) C: ClassTag: Order] private[spire] (val coeff: C, v
           val k: Int = min(x.head._2, y.head._2)
           gcd_(Map(x.head._1 -> k) ++ z, x.tail, y.tail)
         }
-      } 
+      }
     }
     gcd_(Map[Char, Int](), lhs.vars, rhs.vars)
   }
@@ -79,7 +78,7 @@ class Monomial[@spec(Double) C: ClassTag: Order] private[spire] (val coeff: C, v
           val k: Int = max(x.head._2, y.head._2)
           lcm_(Map(x.head._1 -> k) ++ z, x.tail, y.tail)
         }
-      } 
+      }
     }
     lcm_(Map[Char, Int](), lhs.vars, rhs.vars)
   }
@@ -121,7 +120,7 @@ class Monomial[@spec(Double) C: ClassTag: Order] private[spire] (val coeff: C, v
 
 object Monomial {
 
-  def apply[@spec(Double) C: ClassTag: Order: Ring](c: C, v: (Char, Int)*): Monomial[C] = 
+  def apply[@spec(Double) C: ClassTag: Order: Ring](c: C, v: (Char, Int)*): Monomial[C] =
     checkCreateMonomial(c, v.toArray)
 
   def apply[@spec(Double) C: ClassTag: Order: Ring](c: C, v: List[(Char, Int)]): Monomial[C] =
@@ -143,7 +142,7 @@ object Monomial {
           }
           case _ => {
             QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
-            if(arr.forall(_._2 == 0)) xzero(c) else new Monomial[C](c, arr.filterNot(_._2 == 0).toMap) 
+            if(arr.forall(_._2 == 0)) xzero(c) else new Monomial[C](c, arr.filterNot(_._2 == 0).toMap)
           }
         }
       }
@@ -151,14 +150,14 @@ object Monomial {
 
   def zero[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] =
     new Monomial[C](r.zero, Map[Char, Int]())
-  
-  def one[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] = 
+
+  def one[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] =
     new Monomial[C](r.one, Map('x' -> 0))
 
   def xzero[@spec(Double) C: ClassTag: Order](c: C)(implicit r: Ring[C]): Monomial[C] =
     new Monomial[C](c, Map('x' -> 0))
 
-  def x[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] = 
+  def x[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] =
     new Monomial[C](r.one, Map('x' -> 1))
 
   private val IsZero = "0".r
@@ -177,12 +176,12 @@ trait MonomialEq[@spec(Double) C] extends Eq[Monomial[C]] {
   implicit def scalar: Semiring[C]
   implicit def ct: ClassTag[C]
   def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
-    x.vars.toArray === y.vars.toArray 
+    x.vars.toArray === y.vars.toArray
 }
 
 // Lexicographic ordering
 // e.g. x^2 > xy > xz > x > y^2 > yz > y > z^2 > z > 1
-trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]] 
+trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]]
 with MonomialEq[C] {
 
   implicit def ordCoeff: Order[C]
@@ -190,7 +189,7 @@ with MonomialEq[C] {
   implicit val ordInt = Order[Int]
 
   override def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
-    x.vars.toArray === y.vars.toArray 
+    x.vars.toArray === y.vars.toArray
 
   def compare(l: Monomial[C], r: Monomial[C]): Int = {
     @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
@@ -211,12 +210,12 @@ with MonomialEq[C] {
     }
     compare_(l.vars, r.vars)
   }
-  
+
 }
 
 // Graded lexicographic ordering
 // e.g. x^2 > xy > xz > y^2 > yz > z^2 > x > y > z > 1
-trait MonomialOrderingGlex[@spec(Double) C] extends Order[Monomial[C]] 
+trait MonomialOrderingGlex[@spec(Double) C] extends Order[Monomial[C]]
 with MonomialEq[C] {
 
   implicit def ordCoeff: Order[C]
@@ -244,7 +243,7 @@ with MonomialEq[C] {
               case 0 => compare_(x.tail, y.tail)
             }
           }
-        }  
+        }
       }
     }
     compare_(l.vars, r.vars)
@@ -253,7 +252,7 @@ with MonomialEq[C] {
 
 //Graded reverse lexicographic ordering
 // e.g. x^2 > xy > y^2 > xz > yz > z^2 > x > y > z
-trait MonomialOrderingGrevlex[@spec(Double) C] extends Order[Monomial[C]] 
+trait MonomialOrderingGrevlex[@spec(Double) C] extends Order[Monomial[C]]
 with MonomialEq[C] {
 
   implicit def ordCoeff: Order[C]

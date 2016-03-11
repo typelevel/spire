@@ -1,6 +1,5 @@
 package spire.math.poly
 
-import compat._
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuilder
 import scala.collection.mutable.Set
@@ -14,13 +13,13 @@ import spire.math._
 class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: Array[Monomial[C]])
   (implicit val ct: ClassTag[C], ordm: Order[Monomial[C]]) { lhs =>
 
-  def isZero(implicit r: Semiring[C], eq: Eq[C]): Boolean = 
+  def isZero(implicit r: Semiring[C], eq: Eq[C]): Boolean =
     terms.forall(_.isZero)
 
   def isEmpty: Boolean =
     terms.isEmpty
 
-  def degree: Int = 
+  def degree: Int =
     if(isEmpty) 0 else terms.map(_.degree).max
 
   def numTerms: Int =
@@ -39,7 +38,7 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
     terms.map(_.eval(values)).reduce(_ + _)
   }
 
-  def unary_-(implicit r: Rng[C]): MultivariatePolynomial[C] = 
+  def unary_-(implicit r: Rng[C]): MultivariatePolynomial[C] =
     MultivariatePolynomial[C](terms.map(_.unary_-))
 
   def head(implicit r: Ring[C]): Monomial[C] =
@@ -48,11 +47,11 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
   def headCoefficient(implicit r: Ring[C]): C =
     head.coeff
 
-  def tail(implicit r: Semiring[C]): MultivariatePolynomial[C] = 
+  def tail(implicit r: Semiring[C]): MultivariatePolynomial[C] =
     MultivariatePolynomial[C](allTerms.tail)
 
   def monic(implicit f: Field[C]): MultivariatePolynomial[C] =
-    if(isZero) MultivariatePolynomial.zero[C] else 
+    if(isZero) MultivariatePolynomial.zero[C] else
       MultivariatePolynomial[C](terms.map(_.:/(headCoefficient)))
 
   private final def sum(l: Array[Monomial[C]], r: Array[Monomial[C]])(implicit ring: Semiring[C]) = {
@@ -63,16 +62,16 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
       var added = false
       cfor(0)(_ < r.length, _ + 1) { j =>
         if(l(i) === r(j)) {
-          val sumTerm = l(i) + r(j) 
-          a += sumTerm 
+          val sumTerm = l(i) + r(j)
+          a += sumTerm
           added = true
           ar(j) = true
         }
       }
       if(!added) a += l(i)
     }
-    cfor(0)(_ < ar.length, _ + 1) { x => 
-      if(!ar(x)) a += r(x) 
+    cfor(0)(_ < ar.length, _ + 1) { x =>
+      if(!ar(x)) a += r(x)
     }
     a.result()
   }
@@ -86,7 +85,7 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
       a += reduction
       simplify(ts.filterNot(_ === ts(0)), a)
     }
-  }   
+  }
 
   // EuclideanRing ops
   def +(rhs: MultivariatePolynomial[C])(implicit r: Semiring[C]): MultivariatePolynomial[C] =
@@ -99,35 +98,35 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
     if(rhs == MultivariatePolynomial.one[C]) lhs else if(rhs == MultivariatePolynomial.zero[C]) MultivariatePolynomial.zero[C]
       else MultivariatePolynomial[C](simplify(lhs.terms.flatMap(lt => rhs.terms.map(rt => lt * rt))))
 
-  def /~(rhs: MultivariatePolynomial[C])(implicit f: Field[C], ct: ClassTag[C]): MultivariatePolynomial[C] = 
+  def /~(rhs: MultivariatePolynomial[C])(implicit f: Field[C], ct: ClassTag[C]): MultivariatePolynomial[C] =
     lhs./%(rhs)._1
 
-  def %(rhs: MultivariatePolynomial[C])(implicit f: Field[C], ct: ClassTag[C]): MultivariatePolynomial[C] = 
+  def %(rhs: MultivariatePolynomial[C])(implicit f: Field[C], ct: ClassTag[C]): MultivariatePolynomial[C] =
     lhs./%(rhs)._2
 
   def /%(rhs: MultivariatePolynomial[C])(implicit f: Field[C], ct: ClassTag[C]) = {
-  
+
     @tailrec def quotMod_(quot: MultivariatePolynomial[C],
                           dividend: MultivariatePolynomial[C],
                           divisor: MultivariatePolynomial[C]): (MultivariatePolynomial[C], MultivariatePolynomial[C]) = {
-      if(divisor.isEmpty || dividend.isEmpty) (quot, dividend) else { 
+      if(divisor.isEmpty || dividend.isEmpty) (quot, dividend) else {
         if(divisor.head.divides(dividend.head)) {
-          val divTerm = MultivariatePolynomial[C](dividend.head / divisor.head) 
-          val prod = divisor * divTerm 
-          val quotSum = quot + divTerm 
-          val rem = dividend - prod 
+          val divTerm = MultivariatePolynomial[C](dividend.head / divisor.head)
+          val prod = divisor * divTerm
+          val quotSum = quot + divTerm
+          val rem = dividend - prod
           if(rem.isZero) (quotSum, rem) else quotMod_(quotSum, rem, divisor)
         } else if(!rhs.allTerms.forall(t => t.divides(dividend.head))) (quot, dividend) else quotMod_(quot, dividend, divisor.tail)
       }
     }
 
     if(lhs == rhs) (MultivariatePolynomial.one[C], MultivariatePolynomial.zero[C]) else if(rhs == MultivariatePolynomial.one[C]) {
-      (lhs, MultivariatePolynomial.zero[C]) } else if(rhs == MultivariatePolynomial.zero[C]) { (lhs, MultivariatePolynomial.zero[C]) } 
+      (lhs, MultivariatePolynomial.zero[C]) } else if(rhs == MultivariatePolynomial.zero[C]) { (lhs, MultivariatePolynomial.zero[C]) }
         else if(!rhs.head.divides(lhs.head)) (MultivariatePolynomial.zero[C], lhs) else quotMod_(MultivariatePolynomial.zero[C], lhs, rhs)
   }
 
   // VectorSpace ops
-  def *:(k: C)(implicit r: Semiring[C]): MultivariatePolynomial[C] = 
+  def *:(k: C)(implicit r: Semiring[C]): MultivariatePolynomial[C] =
     if(k === r.zero) MultivariatePolynomial.zero[C] else MultivariatePolynomial[C](terms.map(_.*:(k)))
 
   def :*(k: C)(implicit r: Semiring[C]): MultivariatePolynomial[C] = k *: lhs
@@ -162,17 +161,17 @@ object MultivariatePolynomial {
     val scalar = Semiring[C]
     val ct = implicitly[ClassTag[C]]
   }
-  
-  def apply[@spec(Double) C: ClassTag: Semiring: Order](terms: Monomial[C]*): MultivariatePolynomial[C] = 
+
+  def apply[@spec(Double) C: ClassTag: Semiring: Order](terms: Monomial[C]*): MultivariatePolynomial[C] =
     new MultivariatePolynomial[C](terms.filterNot(t => t.isZero).toArray)
 
-  def apply[@spec(Double) C: ClassTag: Semiring: Order](terms: Traversable[Monomial[C]]): MultivariatePolynomial[C] = 
+  def apply[@spec(Double) C: ClassTag: Semiring: Order](terms: Traversable[Monomial[C]]): MultivariatePolynomial[C] =
     new MultivariatePolynomial[C](terms.filterNot(t => t.isZero).toArray)
 
-  def zero[@spec(Double) C: ClassTag: Order](implicit r: Semiring[C]) = 
+  def zero[@spec(Double) C: ClassTag: Order](implicit r: Semiring[C]) =
     new MultivariatePolynomial[C](new Array[Monomial[C]](0))
 
-  def one[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]) = 
+  def one[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]) =
     new MultivariatePolynomial[C](Array(Monomial.one[C]))
 
 }
