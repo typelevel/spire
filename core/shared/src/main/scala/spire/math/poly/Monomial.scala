@@ -1,54 +1,71 @@
 package spire.math.poly
 
+import scala.collection.SortedMap
 import scala.annotation.tailrec
 import scala.reflect._
 import scala.{specialized => spec}
 import spire.algebra._
 import spire.implicits._
 import spire.math._
+import scala.util.matching.Regex
 
 
-/*  A monomial is the product of a coefficient and a list of variables (Char as symbol)
-    each to a non-negative integer power.
+/**
+ *  A monomial is the product of a coefficient and a list of
+ *  variables (Char as symbol) each to an integer power.
 */
-
-class Monomial[@spec(Double) C: ClassTag: Order] private[spire] (val coeff: C, val vars: Map[Char, Int])
+class Monomial[@spec(Double) C: ClassTag: Order] private[spire] (val coeff: C, val vars: SortedMap[Char, Int])
   (implicit r: Ring[C]) { lhs =>
 
-  lazy val degree: Int =
-    vars.values.sum
+  def degree: Int = vars.values.sum
 
-  def isZero: Boolean =
-    lhs == Monomial.zero[C]
+  def isZero: Boolean = lhs == Monomial.zero[C]
 
-  def eval(values: Map[Char, C]): C =
-    coeff * vars.map({ case (k,v) => values.get(k).get ** v }).reduce(_ * _)
+  def isConstant: Boolean = vars.isEmpty
 
-  def unary_- =
-    Monomial[C](-coeff, vars)
+  def eval(values: Map[Char, C]): C = {
+    val m = evalPartial(values)
+    if (m.isConstant) m.coeff
+    else throw new Exception("Must pass in values for all variables when evaluating.")
+  }
 
-  def *:(x: C): Monomial[C] =
-    Monomial[C](coeff * x, lhs.vars)
+  def evalPartial(values: Map[Char, C]): Monomial[C] = {
+    val newCoeff = coeff * vars.map {
+      case (v, exp) => values.getOrElse(v, r.one) ** exp
+    }.reduce(_ * _)
+    val newVars = vars.filterNot {
+      case (k,v) => values contains k
+    }.toList
+    Monomial[C](newCoeff, newVars)
+  }
 
-  def :*(k: C): Monomial[C] =
-    k *: lhs
+  def unary_- = Monomial[C](-coeff, lhs.vars)
+
+  def *:(x: C): Monomial[C] = Monomial[C](coeff * x, lhs.vars)
+
+  def :*(k: C): Monomial[C] = k *: lhs
 
   def :/(x: C)(implicit f: Field[C]): Monomial[C] =
     lhs.*:(x.reciprocal)
 
   def *(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] =
-    if(lhs.isZero || rhs.isZero) Monomial.zero[C] else Monomial[C](lhs.coeff * rhs.coeff, lhs.vars + rhs.vars)
+    if(lhs.isZero || rhs.isZero) Monomial.zero[C]
+    else Monomial[C](lhs.coeff * rhs.coeff, lhs.vars + rhs.vars)
 
   // n.b. only monomials with the same variables form a ring or field
   // but it is like this as we do the arithmetic in MultivariatePolynomial.
-  def +(rhs: Monomial[C]): Monomial[C] =
-    Monomial[C](lhs.coeff + rhs.coeff, lhs.vars)
+  def add(rhs: Monomial[C]): Monomial[C] = {
+    if (rhs.isZero) lhs
+    else if (lhs.isZero) rhs
+    else if (lhs.vars == rhs.vars) Monomial[C](lhs.coeff + rhs.coeff, lhs.vars)
+    else throw new NumberFormatException("Cannot add unlike terms; use Multivariate Polynomial instead")
+  }
 
-  def -(rhs: Monomial[C]): Monomial[C] =
-    Monomial[C](lhs.coeff + -(rhs.coeff), lhs.vars)
+  def subtract(rhs: Monomial[C]): Monomial[C] = lhs add (-rhs)
 
   def /(rhs: Monomial[C])(implicit f: Field[C]): Monomial[C] =
-    if(lhs == rhs) Monomial.one[C] else Monomial[C](lhs.coeff / rhs.coeff, lhs.vars - rhs.vars)
+    if(lhs == rhs) Monomial.one[C]
+    else Monomial[C](lhs.coeff / rhs.coeff, (lhs.vars - rhs.vars).toList)
 
   def divides(rhs: Monomial[C])(implicit ordChar: Order[Char], ordInt: Order[Int]): Boolean = {
     if(lhs.degree == 0 && rhs.degree == 0 && lhs.coeff.abs < rhs.coeff.abs) true else if(lhs.degree == 0 && rhs.degree == 0) false else
@@ -56,32 +73,38 @@ class Monomial[@spec(Double) C: ClassTag: Order] private[spire] (val coeff: C, v
   }
 
   def gcd(rhs: Monomial[C])(implicit er: EuclideanRing[C]): Monomial[C] = {
-    @tailrec def gcd_(z: Map[Char, Int], x: Map[Char, Int], y: Map[Char, Int]) : Monomial[C] = {
-      if(x.isEmpty || y.isEmpty) Monomial[C](er.gcd(lhs.coeff, rhs.coeff), z) else x.head._1 compare y.head._1 match {
+    @tailrec def gcd_(z: SortedMap[Char, Int], x: SortedMap[Char, Int], y: SortedMap[Char, Int]) : Monomial[C] = {
+      if(x.isEmpty || y.isEmpty)
+        Monomial[C](er.gcd(lhs.coeff, rhs.coeff), z)
+      else x.head._1 compare y.head._1 match {
         case -1 => gcd_(z, x.tail, y)
         case 1 => gcd_(z, x, y.tail)
         case 0 => {
           val k: Int = min(x.head._2, y.head._2)
-          gcd_(Map(x.head._1 -> k) ++ z, x.tail, y.tail)
+          gcd_(SortedMap(x.head._1 -> k) ++ z, x.tail, y.tail)
         }
       }
     }
-    gcd_(Map[Char, Int](), lhs.vars, rhs.vars)
+    gcd_(SortedMap[Char, Int](), lhs.vars, rhs.vars)
   }
 
   def lcm(rhs: Monomial[C])(implicit er: EuclideanRing[C]): Monomial[C] = {
-    @tailrec def lcm_(z: Map[Char, Int], x: Map[Char, Int], y: Map[Char, Int]) : Monomial[C] = {
-      if(x.isEmpty || y.isEmpty) Monomial[C](er.lcm(lhs.coeff, rhs.coeff), z) else x.head._1 compare y.head._1 match {
+    @tailrec def lcm_(z: SortedMap[Char, Int], x: SortedMap[Char, Int], y: SortedMap[Char, Int]) : Monomial[C] = {
+      if(x.isEmpty || y.isEmpty)
+        Monomial[C](er.lcm(lhs.coeff, rhs.coeff), z)
+      else x.head._1 compare y.head._1 match {
         case -1 => lcm_(z, x.tail, y)
         case 1 => lcm_(z, x, y.tail)
         case 0 => {
           val k: Int = max(x.head._2, y.head._2)
-          lcm_(Map(x.head._1 -> k) ++ z, x.tail, y.tail)
+          lcm_(SortedMap(x.head._1 -> k) ++ z, x.tail, y.tail)
         }
       }
     }
-    lcm_(Map[Char, Int](), lhs.vars, rhs.vars)
+    lcm_(SortedMap[Char, Int](), lhs.vars, rhs.vars)
   }
+
+  def toPoly: MultivariatePolynomial[C] = MultivariatePolynomial[C](this)
 
   override def equals(that: Any): Boolean = that match {
     case rhs: Monomial[C] if lhs.coeff === rhs.coeff && lhs.vars == rhs.vars => true
@@ -90,33 +113,23 @@ class Monomial[@spec(Double) C: ClassTag: Order] private[spire] (val coeff: C, v
 
   override def toString = {
 
-    import Monomial._
+    // import Monomial._
 
-    val varStr = vars.map(v => v._2 match {
-        case 0 => ""
-        case 1 => s"${v._1}"
-        case e => s"${v._1}^$e"
-      }).mkString
-
-    def simpleCoeff: Option[String] = coeff match {
-      case 0 => Some("")
-      case 1 => if(vars.head._2 == 0) Some(s" + $coeff") else Some(s" + $varStr")
-      case -1 => if(vars.head._2 == 0) Some(s" - ${coeff.toString.tail.mkString}") else Some(s" - $varStr")
-      case _ => None
+    val varStr = vars.foldLeft("") {
+      case (str, (v, 0)) => str
+      case (str, (v, 1)) => str + v
+      case (str, (v, exp)) => s"$str$v^$exp"
     }
 
-    def stringCoeff: Option[String] = coeff.toString match {
-      case IsZero() => Some("")
-      case IsNegative(posPart) if vars.head._2 == 0 => Some(s" - $posPart")
-      case IsNegative(posPart) => Some(s" - $posPart$varStr")
-      case _ => None
-    }
+    val coeffStr =
+      if (!isConstant && coeff.isOne) ""
+      else if (!isConstant && coeff == -r.one) "-"
+      else coeff
 
-    if(vars.isEmpty) " + (0)" else simpleCoeff orElse stringCoeff getOrElse s" + $coeff$varStr"
+    coeffStr + varStr
   }
 
 }
-
 
 object Monomial {
 
@@ -129,36 +142,114 @@ object Monomial {
   def apply[@spec(Double) C: ClassTag: Order: Ring](c: C, v: Map[Char, Int]): Monomial[C] =
     checkCreateMonomial(c, v.toArray)
 
-  def checkCreateMonomial[@spec(Double) C: ClassTag: Order](c: C, arr: Array[(Char, Int)])
-    (implicit r: Ring[C]): Monomial[C] = c match {
-      case n if n === r.zero => zero[C]
+  def apply[@spec(Double) C: ClassTag: Order: Ring](c: C, v: SortedMap[Char, Int]): Monomial[C] =
+    checkCreateMonomial(c, v.toArray)
+
+  def apply(str: String): Monomial[Rational] = parseFractional[Rational](str)
+
+  def apply[@spec(Double) C: ClassTag: Order: Ring](c: Char): Monomial[C] =
+    variable(c)
+
+  def apply[@spec(Double) C: ClassTag: Order: Ring](c: C): Monomial[C] =
+    constant(c)
+
+  def checkCreateMonomial[@spec(Double) C: ClassTag](c: C, arr: Array[(Char, Int)])
+    (implicit r: Ring[C], o: Order[C]): Monomial[C] = c match {
+      case n if r.isZero(n) => zero[C]
       case _ => {
         arr.length match {
-          case 0 => zero[C]
-          case 1 => {
-            if(c === r.zero && arr(0)._2 == 0) zero[C] else if(arr(0)._2 == 0) xzero(c) else {
-              new Monomial[C](c, arr.toMap)
-            }
-          }
+          case 0 => constant(c)
           case _ => {
-            QuickSort.sort(arr)(Order[(Char, Int)], implicitly[ClassTag[(Char, Int)]])
-            if(arr.forall(_._2 == 0)) xzero(c) else new Monomial[C](c, arr.filterNot(_._2 == 0).toMap)
+            val map = arr.foldLeft(SortedMap[Char,Int]()) {
+              // combine any like vars so x^2x^3 becomes x^5
+              case (m, (v, exp)) =>
+                val initialExp = m.getOrElse(v, 0)
+                m + ((v, exp + initialExp))
+            }.filterNot {
+              // remove any variables to the 0 power
+              case (v, exp) => exp == 0
+            }
+            new Monomial[C](c, map)
           }
         }
       }
     }
 
   def zero[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] =
-    new Monomial[C](r.zero, Map[Char, Int]())
+    new Monomial[C](r.zero, SortedMap[Char, Int]())
 
   def one[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] =
-    new Monomial[C](r.one, Map('x' -> 0))
+    new Monomial[C](r.one, SortedMap[Char, Int]())
 
-  def xzero[@spec(Double) C: ClassTag: Order](c: C)(implicit r: Ring[C]): Monomial[C] =
-    new Monomial[C](c, Map('x' -> 0))
+  def constant[@spec(Double) C: ClassTag: Order](c: C)(implicit r: Ring[C]): Monomial[C] =
+    new Monomial[C](c, SortedMap[Char, Int]())
+
+  def variable[@spec(Double) C: ClassTag: Order](v: Char)(implicit r: Ring[C]): Monomial[C] =
+    new Monomial[C](r.one, SortedMap(v -> 1))
 
   def x[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] =
-    new Monomial[C](r.one, Map('x' -> 1))
+    new Monomial[C](r.one, SortedMap('x' -> 1))
+
+  object Re {
+    val variable = "[\u03B1-\u03C9a-zA-Z]".r
+    val numFractional = "[0-9]+(?:[/.][0-9]+)?".r
+    val numIntegral = "[0-9]+".r
+    val varExp = s"($variable)(?:\\^(-?[0-9]+))?".r
+
+    def term(number: Regex): Regex = s"(- *)?($number)?($varExp)*".r
+    val termFractional = term(numFractional)
+    val termIntegral = term(numIntegral)
+  }
+
+
+    // val terms = s"($negative)? *($number)?($varchar(\\^(-)?$number)?)*".r
+
+  final def parseFractional[@spec(Double) C: ClassTag: Fractional](str: String): Monomial[C] = {
+
+    val f = implicitly[Field[C]]
+    val c = implicitly[ConvertableTo[C]]
+
+    val stringToC: String => C = (str: String) => str.split('/') match {
+      case (Array(numerator, denominator)) =>
+        c.fromDouble(numerator.toDouble) / c.fromDouble(denominator.toDouble)
+      case (Array(number)) => c.fromDouble(number.toDouble)
+      case _ => throw new Exception("Could not parse number " + str)
+    }
+
+    parseGeneric(str, Re.termFractional, stringToC, f.one)
+  }
+
+  final def parseIntegral[@spec(Int, Long) C: Integral: ClassTag](str: String): Monomial[C] = {
+
+    val r = implicitly[Integral[C]]
+    val c = implicitly[ConvertableTo[C]]
+
+    val stringToC: String => C = (str: String) => c.fromBigInt(BigInt(str))
+
+    parseGeneric(str, Re.termIntegral, stringToC, r.one)
+  }
+
+  private [poly] final def parseGeneric[@spec(Double, Int, Long) C: ClassTag: Order: ConvertableTo: Ring](str: String, terms: Regex, stringToC: String => C, one: C): Monomial[C] = {
+
+    val m: Option[Monomial[C]] = terms.findFirstMatchIn(str).map { term =>
+      val coeff: C = term.subgroups.map(Option(_)) match {
+        case (List(Some(neg), Some(coeff), _, _, _)) => -stringToC(coeff)
+        case (List(None, Some(coeff), _, _, _)) => stringToC(coeff)
+        case (List(Some(neg), None, _, _, _)) => -one
+        case (List(None, None, _, _, _)) => one
+        case _ => one
+      }
+      val exponents = Re.varExp.findAllMatchIn(term.matched).toList.map {
+        _.subgroups match {
+          case (List(variable, null)) => variable(0) -> 1
+          case (List(variable, exp)) => variable(0) -> exp.toInt
+          case _ => throw new Exception("Couldn't parse term " + term)
+        }
+      }
+      Monomial[C](coeff, exponents)
+    }
+    m getOrElse(throw new Exception("Could not parse term "+str))
+  }
 
   private val IsZero = "0".r
   private val IsNegative = "-(.*)".r
@@ -192,7 +283,7 @@ with MonomialEq[C] {
     x.vars.toArray === y.vars.toArray
 
   def compare(l: Monomial[C], r: Monomial[C]): Int = {
-    @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
+    @tailrec def compare_(x: SortedMap[Char, Int], y: SortedMap[Char, Int]): Int = {
       (x.isEmpty, y.isEmpty) match {
         case (true, true) => l.coeff compare r.coeff
         case (false, true) => -1
@@ -226,7 +317,7 @@ with MonomialEq[C] {
     x.vars.toArray === y.vars.toArray
 
   def compare(l: Monomial[C], r: Monomial[C]): Int = {
-    @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
+    @tailrec def compare_(x: SortedMap[Char, Int], y: SortedMap[Char, Int]): Int = {
      (x.isEmpty, y.isEmpty) match {
         case (true, true) => l.coeff compare r.coeff
         case (false, true) => -1
@@ -263,7 +354,7 @@ with MonomialEq[C] {
     x.vars.toArray === y.vars.toArray
 
   def compare(l: Monomial[C], r: Monomial[C]): Int = {
-    @tailrec def compare_(x: Map[Char, Int], y: Map[Char, Int]): Int = {
+    @tailrec def compare_(x: SortedMap[Char, Int], y: SortedMap[Char, Int]): Int = {
       (x.isEmpty, y.isEmpty) match {
         case (true, true) => l.coeff compare r.coeff
         case (false, true) => -1
@@ -279,6 +370,6 @@ with MonomialEq[C] {
         }
       }
     }
-    compare_(l.vars.toArray.reverse.toMap, r.vars.toArray.reverse.toMap)
+    compare_(SortedMap(l.vars.toArray.reverse:_*), SortedMap(r.vars.toArray.reverse:_*))
   }
 }

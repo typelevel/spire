@@ -28,15 +28,15 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
   def allVariables: Array[Char] =
     terms.flatMap(t => t.vars.keys).distinct
 
-  def allTerms: Array[Monomial[C]] = {
-    terms.qsort
-    terms
-  }
+  def allTerms: Array[Monomial[C]] = terms
 
   def eval(values: Map[Char, C])(implicit r: Ring[C]): C = {
     require(allVariables.forall(values.contains), "Can't evaluate polynomial without all the variable (symbol) values!")
     terms.map(_.eval(values)).reduce(_ + _)
   }
+
+  def evalPartial(values: Map[Char, C])(implicit f: Field[C]): MultivariatePolynomial[C] =
+    MultivariatePolynomial(terms.map(_.evalPartial(values)))
 
   def unary_-(implicit r: Rng[C]): MultivariatePolynomial[C] =
     MultivariatePolynomial[C](terms.map(_.unary_-))
@@ -62,7 +62,7 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
       var added = false
       cfor(0)(_ < r.length, _ + 1) { j =>
         if(l(i) === r(j)) {
-          val sumTerm = l(i) + r(j)
+          val sumTerm = l(i) add r(j)
           a += sumTerm
           added = true
           ar(j) = true
@@ -76,16 +76,9 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
     a.result()
   }
 
-  @tailrec private final def simplify(ts: Array[Monomial[C]], a: ArrayBuilder[Monomial[C]] = ArrayBuilder.make[Monomial[C]])
-    (implicit r: Semiring[C]): Array[Monomial[C]] = ts.length match {
-    case 0 => a.result()
-    case 1 => a += ts(0); a.result()
-    case _ => {
-      val reduction = ts.filter(_ === ts(0)).reduce(_ + _)
-      a += reduction
-      simplify(ts.filterNot(_ === ts(0)), a)
-    }
-  }
+  private [poly] final def simplify(ts: Array[Monomial[C]])
+    (implicit r: Semiring[C]): Array[Monomial[C]] =
+    MultivariatePolynomial.simplify(ts)
 
   // EuclideanRing ops
   def +(rhs: MultivariatePolynomial[C])(implicit r: Semiring[C]): MultivariatePolynomial[C] =
@@ -120,9 +113,17 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
       }
     }
 
-    if(lhs == rhs) (MultivariatePolynomial.one[C], MultivariatePolynomial.zero[C]) else if(rhs == MultivariatePolynomial.one[C]) {
-      (lhs, MultivariatePolynomial.zero[C]) } else if(rhs == MultivariatePolynomial.zero[C]) { (lhs, MultivariatePolynomial.zero[C]) }
-        else if(!rhs.head.divides(lhs.head)) (MultivariatePolynomial.zero[C], lhs) else quotMod_(MultivariatePolynomial.zero[C], lhs, rhs)
+    if (lhs == rhs) {
+      (MultivariatePolynomial.one[C], MultivariatePolynomial.zero[C])
+    } else if (rhs == MultivariatePolynomial.one[C]) {
+      (lhs, MultivariatePolynomial.zero[C])
+    } else if (rhs == MultivariatePolynomial.zero[C]) {
+      (lhs, MultivariatePolynomial.zero[C])
+    } else if (!rhs.head.divides(lhs.head)) {
+      (MultivariatePolynomial.zero[C], lhs)
+    } else {
+      quotMod_(MultivariatePolynomial.zero[C], lhs, rhs)
+    }
   }
 
   // VectorSpace ops
@@ -143,14 +144,12 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
 
 
   override def toString =
-    if (isEmpty) {
-      "(0)"
-    } else {
+    if (isEmpty) "0"
+    else {
       QuickSort.sort(terms)(ordm, implicitly[ClassTag[Monomial[C]]])
-      val s = terms.mkString
-      "(" + (if (s.take(3) == " - ") "-" + s.drop(3) else s.drop(3)) + ")"
+      val s = terms.mkString(" + ")
+      s.replaceAll("\\+ -", "- ")
     }
-
 }
 
 
@@ -162,11 +161,16 @@ object MultivariatePolynomial {
     val ct = implicitly[ClassTag[C]]
   }
 
+  implicit def monomialToMultivariatePolynomial[@spec(Double) C: ClassTag: Semiring: Order](term: Monomial[C]): MultivariatePolynomial[C] = apply(term)
+
   def apply[@spec(Double) C: ClassTag: Semiring: Order](terms: Monomial[C]*): MultivariatePolynomial[C] =
-    new MultivariatePolynomial[C](terms.filterNot(t => t.isZero).toArray)
+    new MultivariatePolynomial[C](simplify(terms.filterNot(t => t.isZero).toArray))
 
   def apply[@spec(Double) C: ClassTag: Semiring: Order](terms: Traversable[Monomial[C]]): MultivariatePolynomial[C] =
-    new MultivariatePolynomial[C](terms.filterNot(t => t.isZero).toArray)
+    new MultivariatePolynomial[C](simplify(terms.filterNot(t => t.isZero).toArray))
+
+  def apply(str: String): MultivariatePolynomial[Rational] =
+    parseFractional[Rational](str)
 
   def zero[@spec(Double) C: ClassTag: Order](implicit r: Semiring[C]) =
     new MultivariatePolynomial[C](new Array[Monomial[C]](0))
@@ -174,5 +178,37 @@ object MultivariatePolynomial {
   def one[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]) =
     new MultivariatePolynomial[C](Array(Monomial.one[C]))
 
+  private [poly] final def simplify[@spec(Double) C: Order: ClassTag](ts: Array[Monomial[C]])
+    (implicit r: Semiring[C]): Array[Monomial[C]] = {
+
+    @tailrec
+    def go(ts: Array[Monomial[C]], a: ArrayBuilder[Monomial[C]]): Array[Monomial[C]] = ts.length match {
+      case 0 => a.result()
+      case 1 => a += ts(0); a.result()
+      case _ => {
+        val reduction = ts.filter(_.vars === ts(0).vars).reduce(_ add _)
+        a += reduction
+        go(ts.filterNot(_.vars === ts(0).vars), a)
+      }
+    }
+    val a: ArrayBuilder[Monomial[C]] = ArrayBuilder.make[Monomial[C]]
+    go(ts, a).qsorted
+  }
+
+  final def parseFractional[@spec(Double) C: ClassTag: Fractional](str: String): MultivariatePolynomial[C] = {
+    val terms = Monomial.Re.termFractional
+
+    val monomials: Array[Monomial[C]] =
+      terms.findAllIn(str).toArray.filter(_ != "").map(Monomial.parseFractional[C](_))
+    new MultivariatePolynomial[C](simplify(monomials))
+  }
+
+  final def parseIntegral[@spec(Int, Long) C: Integral: ClassTag](str: String): MultivariatePolynomial[C] = {
+    val terms = Monomial.Re.termIntegral
+
+    val monomials: Array[Monomial[C]] =
+      terms.findAllIn(str).toArray.filter(_ != "").map(Monomial.parseIntegral[C](_))
+    new MultivariatePolynomial[C](simplify(monomials))
+  }
 }
 
