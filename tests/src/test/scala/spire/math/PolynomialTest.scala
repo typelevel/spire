@@ -348,4 +348,12 @@ class PolynomialTest extends FunSuite {
     assert(spire.math.gcd(2 *: a, Polynomial("2")) == 2)
     assert(spire.math.gcd(2 *: a, 2 *: b) == 2)
   }
+
+  test("GCD doesn't run out of memory for BigDecimals") {
+    val a = Polynomial.linear(BigDecimal(2))
+    val b = Polynomial.constant(BigDecimal(3.4))
+    val c = (a + b) * (a + b) // (4x² + 13.6x + 11.56)
+    assert(spire.math.gcd(a, c) === 0.02)
+    assert(spire.math.gcd(a + b, c) === a + b)
+  }
 }
