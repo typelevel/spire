@@ -11,7 +11,7 @@ import spire.syntax.cfor._
 import spire.syntax.multiplicativeMonoid._
 import spire.util.Opt
 
-/** Trait for monomials.
+/** Monomial.
   * 
   * Properties:
   * 
@@ -152,21 +152,26 @@ final class Monomial private[spire] (private[spire] val _v: Array[Char], private
     res
   }
 
-  /** Substitutes the variables defined by the partial function `f` and returns the resulting
-   * coefficient and monomial. */
-  def evalPartial[@sp(Double, Long) C](f: PartialFunction[Char, C])(implicit C: MultiplicativeCMonoid[C]): (C, Monomial) = {
-    var res = C.one
+  def nUndefinedVariables(f: PartialFunction[Char, _]): Int = {
     var nUndefined = 0
     cforRange(0 until nVariables) { i =>
       if (!f.isDefinedAt(variable(i)))
         nUndefined += 1
     }
+    nUndefined
+  }
+
+  /** Substitutes the variables defined by the partial function `f` and returns the resulting
+   * coefficient and monomial. */
+  def evalPartial[@sp(Double, Long) C](f: PartialFunction[Char, C])(implicit C: MultiplicativeCMonoid[C]): (C, Monomial) = {
+    val nUndefined = nUndefinedVariables(f)
     if (nUndefined == 0)
       (eval(f), Monomial.empty)
     else {
       val newV = new Array[Char](nUndefined)
       val newE = new Array[Int](nUndefined)
       var ni = 0
+      var res = C.one
       cforRange(0 until nVariables) { i =>
         val v = variable(i)
         val e = exponent(i)
