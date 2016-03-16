@@ -151,6 +151,7 @@ final class MultivariatePolynomial[@spec(Double, Long) C:ClassTag:CRing:Eq] priv
         else
           map(mono) = rhs.coefficient(i)
       }
+      map.retain { (mono, coeff) => !coeff.isZero }
       MultivariatePolynomial.fromFilteredMap(map)
     }
 
@@ -172,6 +173,7 @@ final class MultivariatePolynomial[@spec(Double, Long) C:ClassTag:CRing:Eq] priv
             map(nm) = nc
         }
       }
+      map.retain { (mono, coeff) => !coeff.isZero }
       MultivariatePolynomial.fromFilteredMap(map)
     }
 
