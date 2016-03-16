@@ -1,375 +1,571 @@
-package spire.math.poly
+package spire
+package math
+package poly
 
-import scala.collection.SortedMap
 import scala.annotation.tailrec
-import scala.reflect._
-import scala.{specialized => spec}
+
 import spire.algebra._
-import spire.implicits._
 import spire.math._
-import scala.util.matching.Regex
+import spire.std.char._
+import spire.syntax.cfor._
+import spire.syntax.multiplicativeMonoid._
+import spire.util.Opt
 
+/** Trait for monomials.
+  * 
+  * Properties:
+  * 
+  * - variables are unique and sorted,
+  * - all variables have exponent > 0.
+  * 
+  * Note: the arrays _v and _e are wrapped and have to be considered immutable, as they can
+  * be shared between monomials.
+  * 
+  */
+final class Monomial private[spire] (private[spire] val _v: Array[Char], private[spire] val _e: Array[Int]) { lhs =>
 
-/**
- *  A monomial is the product of a coefficient and a list of
- *  variables (Char as symbol) each to an integer power.
-*/
-class Monomial[@spec(Double) C: ClassTag: Order] private[spire] (val coeff: C, val vars: SortedMap[Char, Int])
-  (implicit r: Ring[C]) { lhs =>
+  /* Future optimizations:
+   *
+   * - replace `_v: Array[Char]` by `_v: Array[Byte]` with a suitable encoding, or
+   * - replace both `_v` and `_e` by a single array to reduce the number of allocations.
+   */
 
-  def degree: Int = vars.values.sum
+  /** Number of variables involved in this monomial. */
+  @inline def nVariables: Int = _v.length
 
-  def isZero: Boolean = lhs == Monomial.zero[C]
+  /** Returns the index of the provided variable, or `-insertionIndex-1`. */
+  @inline def find(variable: Char): Int = Searching.search(_v, variable)
 
-  def isConstant: Boolean = vars.isEmpty
+  /** Symbol of the i-th variable. */
+  @inline def variable(i: Int): Char = _v(i)
 
-  def eval(values: Map[Char, C]): C = {
-    val m = evalPartial(values)
-    if (m.isConstant) m.coeff
-    else throw new Exception("Must pass in values for all variables when evaluating.")
+  /** Exponent of the i-th variable. By construction > 0. */
+  @inline def exponent(i: Int): Int = _e(i)
+
+  /** Returns the exponent corresponding to the given variable or throws. */
+  def exponent(variable: Char): Int = {
+    val i = find(variable)
+    if (i >= 0)
+      exponent(i)
+    else
+      throw new Exception(s"Variable $variable is not contained in this monomial")
   }
 
-  def evalPartial(values: Map[Char, C]): Monomial[C] = {
-    val newCoeff = coeff * vars.map {
-      case (v, exp) => values.getOrElse(v, r.one) ** exp
-    }.reduce(_ * _)
-    val newVars = vars.filterNot {
-      case (k,v) => values contains k
-    }.toList
-    Monomial[C](newCoeff, newVars)
-  }
-
-  def unary_- = Monomial[C](-coeff, lhs.vars)
-
-  def *:(x: C): Monomial[C] = Monomial[C](coeff * x, lhs.vars)
-
-  def :*(k: C): Monomial[C] = k *: lhs
-
-  def :/(x: C)(implicit f: Field[C]): Monomial[C] =
-    lhs.*:(x.reciprocal)
-
-  def *(rhs: Monomial[C])(implicit eqm: Eq[Monomial[C]]): Monomial[C] =
-    if(lhs.isZero || rhs.isZero) Monomial.zero[C]
-    else Monomial[C](lhs.coeff * rhs.coeff, lhs.vars + rhs.vars)
-
-  // n.b. only monomials with the same variables form a ring or field
-  // but it is like this as we do the arithmetic in MultivariatePolynomial.
-  def add(rhs: Monomial[C]): Monomial[C] = {
-    if (rhs.isZero) lhs
-    else if (lhs.isZero) rhs
-    else if (lhs.vars == rhs.vars) Monomial[C](lhs.coeff + rhs.coeff, lhs.vars)
-    else throw new NumberFormatException("Cannot add unlike terms; use Multivariate Polynomial instead")
-  }
-
-  def subtract(rhs: Monomial[C]): Monomial[C] = lhs add (-rhs)
-
-  def /(rhs: Monomial[C])(implicit f: Field[C]): Monomial[C] =
-    if(lhs == rhs) Monomial.one[C]
-    else Monomial[C](lhs.coeff / rhs.coeff, (lhs.vars - rhs.vars).toList)
-
-  def divides(rhs: Monomial[C])(implicit ordChar: Order[Char], ordInt: Order[Int]): Boolean = {
-    if(lhs.degree == 0 && rhs.degree == 0 && lhs.coeff.abs < rhs.coeff.abs) true else if(lhs.degree == 0 && rhs.degree == 0) false else
-      lhs.vars.view.zip(rhs.vars).forall(z => (z._1._2 <= z._2._2))
-  }
-
-  def gcd(rhs: Monomial[C])(implicit er: EuclideanRing[C]): Monomial[C] = {
-    @tailrec def gcd_(z: SortedMap[Char, Int], x: SortedMap[Char, Int], y: SortedMap[Char, Int]) : Monomial[C] = {
-      if(x.isEmpty || y.isEmpty)
-        Monomial[C](er.gcd(lhs.coeff, rhs.coeff), z)
-      else x.head._1 compare y.head._1 match {
-        case -1 => gcd_(z, x.tail, y)
-        case 1 => gcd_(z, x, y.tail)
-        case 0 => {
-          val k: Int = min(x.head._2, y.head._2)
-          gcd_(SortedMap(x.head._1 -> k) ++ z, x.tail, y.tail)
-        }
+  /** Count the number of unique variables in `lhs` and `rhs`. */
+  def nVariablesInTotal(rhs: Monomial): Int = {
+    @tailrec def count(nUnique: Int, li: Int, ri: Int): Int =
+      if (li == lhs.nVariables) nUnique + rhs.nVariables - ri
+      else if (ri == rhs.nVariables) nUnique + lhs.nVariables - li
+      else {
+        val lv = lhs.variable(li)
+        val rv = rhs.variable(ri)
+        if (lv == rv)
+          count(nUnique + 1, li + 1, ri + 1)
+        else if (lv < rv)
+          count(nUnique + 1, li + 1, ri)
+        else
+          count(nUnique + 1, li, ri + 1)
       }
-    }
-    gcd_(SortedMap[Char, Int](), lhs.vars, rhs.vars)
+    count(0, 0, 0)
   }
 
-  def lcm(rhs: Monomial[C])(implicit er: EuclideanRing[C]): Monomial[C] = {
-    @tailrec def lcm_(z: SortedMap[Char, Int], x: SortedMap[Char, Int], y: SortedMap[Char, Int]) : Monomial[C] = {
-      if(x.isEmpty || y.isEmpty)
-        Monomial[C](er.lcm(lhs.coeff, rhs.coeff), z)
-      else x.head._1 compare y.head._1 match {
-        case -1 => lcm_(z, x.tail, y)
-        case 1 => lcm_(z, x, y.tail)
-        case 0 => {
-          val k: Int = max(x.head._2, y.head._2)
-          lcm_(SortedMap(x.head._1 -> k) ++ z, x.tail, y.tail)
-        }
+  /** Count the number of common variables between `lhs` and `rhs`. */
+  def nVariablesInCommon(rhs: Monomial): Int = {
+    @tailrec def count(nCommon: Int, li: Int, ri: Int): Int =
+      if (li == lhs.nVariables) nCommon
+      else if (ri == rhs.nVariables) nCommon
+      else {
+        val lv = lhs.variable(li)
+        val rv = rhs.variable(ri)
+        if (lv == rv)
+          count(nCommon + 1, li + 1, ri + 1)
+        else if (lv < rv)
+          count(nCommon, li + 1, ri)
+        else
+          count(nCommon, li, ri + 1)
       }
-    }
-    lcm_(SortedMap[Char, Int](), lhs.vars, rhs.vars)
+    count(0, 0, 0)
   }
 
-  def toPoly: MultivariatePolynomial[C] = MultivariatePolynomial[C](this)
-
-  override def equals(that: Any): Boolean = that match {
-    case rhs: Monomial[C] if lhs.coeff === rhs.coeff && lhs.vars == rhs.vars => true
-    case _ => false
+  /** Degree of this monomial.
+    * 
+    * Cached because of its frequent use in monomial orderings.
+    */
+  lazy val degree = {
+    var res = 0
+    cforRange(0 until nVariables) { i => res += _e(i) }
+    res
   }
 
   override def toString = {
+    val sb = new StringBuilder
+    cforRange(0 until nVariables) { i =>
+      val v = variable(i)
+      val e = exponent(i)
+      sb += v
+      if (e > 1) {
+        sb += '^'
+        sb ++= e.toString
+      }
+    }
+    sb.toString
+  }
 
-    // import Monomial._
+  /** Cached hash value. */
+  protected lazy val hash = { // taken from MurmurHash3.unorderedHashing
+    import scala.util.hashing.MurmurHash3.{mix, finalizeHash}
+    var h = 0xe73a8b15
+    cforRange(0 until nVariables) { i =>
+      h = mix(h, (variable(i) << 16) + exponent(i))
+    }
+    finalizeHash(h, nVariables)
+  }
 
-    val varStr = vars.foldLeft("") {
-      case (str, (v, 0)) => str
-      case (str, (v, 1)) => str + v
-      case (str, (v, exp)) => s"$str$v^$exp"
+  override def hashCode = hash
+
+  override def equals(that: Any): Boolean = that match {
+    case rhs: Monomial =>
+      (lhs.nVariables == rhs.nVariables) &&
+      (lhs.hashCode == rhs.hashCode) && {
+        cforRange(0 until lhs.nVariables) { i =>
+          if (lhs.variable(i) != rhs.variable(i) || lhs.exponent(i) != rhs.exponent(i))
+            return false
+        }
+        true
+      }
+    case _ => false // TODO: canEqual, cooperative equality with MultivariatePolynomial ???
+  }
+
+  /** Is this monomial empty (i.e. == 1) ? */
+  def isEmpty = nVariables == 0
+
+  /** Returns the value of this monomial, when the values associated to the variables
+    * are given by the function `f`. 
+    * 
+    * By design, the variables are assumed to be commutative.
+    */
+  def eval[@sp(Double, Long) C](f: Char => C)(implicit C: MultiplicativeCMonoid[C]): C = {
+    var res = C.one
+    cforRange(0 until nVariables) { i =>
+      res = res * C.prodn(f(variable(i)), exponent(i))
+    }
+    res
+  }
+
+  /** Substitutes the variables defined by the partial function `f` and returns the resulting
+   * coefficient and monomial. */
+  def evalPartial[@sp(Double, Long) C](f: PartialFunction[Char, C])(implicit C: MultiplicativeCMonoid[C]): (C, Monomial) = {
+    var res = C.one
+    var nUndefined = 0
+    cforRange(0 until nVariables) { i =>
+      if (!f.isDefinedAt(variable(i)))
+        nUndefined += 1
+    }
+    if (nUndefined == 0)
+      (eval(f), Monomial.empty)
+    else {
+      val newV = new Array[Char](nUndefined)
+      val newE = new Array[Int](nUndefined)
+      var ni = 0
+      cforRange(0 until nVariables) { i =>
+        val v = variable(i)
+        val e = exponent(i)
+        if (f.isDefinedAt(v))
+          res = res * C.prodn(f(v), e)
+        else {
+          newV(ni) = v
+          newE(ni) = e
+          ni += 1
+        }
+      }
+      require(ni == nUndefined)
+      (res, new Monomial(newV, newE))
+    }
+  }
+
+  /** Product with variable and possible exponent. */
+  def *(variable: Char, exponent: Int = 1): Monomial =
+    if (exponent == 0) lhs else {
+      require(exponent > 0)
+      val ind = find(variable)
+      if (ind >= 0) {
+        val newV = _v.clone
+        val newE = _e.clone
+        newE(ind) += exponent
+        new Monomial(newV, newE)
+      } else {
+        val newV = new Array[Char](nVariables + 1)
+        val newE = new Array[Int](nVariables + 1)
+        val ins = -ind-1
+        Array.copy(_v, 0, newV, 0, ins)
+        Array.copy(_e, 0, newE, 0, ins)
+        newV(ins) = variable
+        newE(ins) = exponent
+        Array.copy(_v, ins, newV, ins + 1, nVariables - ins)
+        Array.copy(_e, ins, newE, ins + 1, nVariables - ins)
+        new Monomial(newV, newE)
+      }
     }
 
-    val coeffStr =
-      if (!isConstant && coeff.isOne) ""
-      else if (!isConstant && coeff == -r.one) "-"
-      else coeff
-
-    coeffStr + varStr
+  /** Multiplication by monomial. */
+  def *(rhs: Monomial): Monomial = {
+    val n = lhs.nVariablesInTotal(rhs)
+    val newV = new Array[Char](n)
+    val newE = new Array[Int](n)
+    @tailrec def rec(ni: Int, li: Int, ri: Int): Unit =
+      if (li == lhs.nVariables && ri == rhs.nVariables) {
+        // we are done
+      } else if (li == lhs.nVariables) {
+        // copy the remaining variables, we are done
+        Array.copy(rhs._v, ri, newV, ni, rhs.nVariables - ri)
+        Array.copy(rhs._e, ri, newE, ni, rhs.nVariables - ri)
+      } else if (ri == rhs.nVariables) {
+        // copy the remaining variables, we are done
+        Array.copy(lhs._v, li, newV, ni, lhs.nVariables - li)
+        Array.copy(lhs._e, li, newE, ni, lhs.nVariables - li)
+      } else {
+        val lv = lhs.variable(li)
+        val rv = rhs.variable(ri)
+        if (lv == rv) {
+          newV(ni) = lv
+          newE(ni) = lhs.exponent(li) + rhs.exponent(ri)
+          rec(ni + 1, li + 1, ri + 1)
+        } else if (lv < rv) {
+          newV(ni) = lv
+          newE(ni) = lhs.exponent(li)
+          rec(ni + 1, li + 1, ri)
+        } else { // lv > rv
+          newV(ni) = rv
+          newE(ni) = rhs.exponent(ri)
+          rec(ni + 1, li, ri + 1)
+        }
+      }
+    rec(0, 0, 0)
+    new Monomial(newV, newE)
   }
+
+  /** Power. */
+  def pow(rhs: Int): Monomial =
+    if (rhs == 0) Monomial.empty
+    else if (rhs == 1) lhs
+    else {
+      require(rhs >= 0)
+      val newE = new Array[Int](nVariables)
+      cforRange(0 until nVariables) { i =>
+        newE(i) = exponent(i) * rhs
+      }
+      new Monomial(_v, newE) // reusing the variable array, which we safely wrapped
+    }
+
+
+  /** Least common multiple. */
+  def lcm(rhs: Monomial): Monomial =
+    if (lhs.isEmpty) rhs
+    else if (rhs.isEmpty) lhs
+    else {
+      val n = lhs.nVariablesInTotal(rhs)
+      val newV = new Array[Char](n)
+      val newE = new Array[Int](n)
+      @tailrec def rec(ni: Int, li: Int, ri: Int): Unit =
+        if (li == lhs.nVariables && ri == rhs.nVariables) {
+          // we are done
+        } else if (li == lhs.nVariables) {
+          // copy the remaining variables, we are done
+          Array.copy(rhs._v, ri, newV, ni, rhs.nVariables - ri)
+          Array.copy(rhs._e, ri, newE, ni, rhs.nVariables - ri)
+        } else if (ri == rhs.nVariables) {
+          // copy the remaining variables, we are done
+          Array.copy(lhs._v, li, newV, ni, lhs.nVariables - li)
+          Array.copy(lhs._e, li, newE, ni, lhs.nVariables - li)
+        } else {
+          val lv = lhs.variable(li)
+          val rv = rhs.variable(ri)
+          if (lv == rv) {
+            newV(ni) = lv
+            newE(ni) = max(lhs.exponent(li), rhs.exponent(ri))
+            rec(ni + 1, li + 1, ri + 1)
+          } else if (lv < rv) {
+            newV(ni) = lv
+            newE(ni) = lhs.exponent(li)
+            rec(ni + 1, li + 1, ri)
+          } else { // lv > rv
+            newV(ni) = rv
+            newE(ni) = rhs.exponent(ri)
+            rec(ni + 1, li, ri + 1)
+          }
+        }
+      rec(0, 0, 0)
+      new Monomial(newV, newE)
+    }
+
+  /** Greatest common factor. */
+  def gcf(rhs: Monomial): Monomial = {
+    val n = lhs.nVariablesInCommon(rhs)
+    val newV = new Array[Char](n)
+    val newE = new Array[Int](n)
+    @tailrec def rec(ni: Int, li: Int, ri: Int): Unit =
+      if (li == lhs.nVariables || ri == rhs.nVariables) {
+        // we are done
+      } else {
+        val lv = lhs.variable(li)
+        val rv = rhs.variable(ri)
+        if (lv == rv) {
+          newV(ni) = lv
+          newE(ni) = min(lhs.exponent(li), rhs.exponent(ri))
+          rec(ni + 1, li + 1, ri + 1)
+        } else if (lv < rv)
+          rec(ni, li + 1, ri)
+        else // lv > rv
+          rec(ni, li, ri + 1)
+      }
+    rec(0, 0, 0)
+    new Monomial(newV, newE)
+  }
+
+  /** Returns whether there is a monomial `x` such that `lhs * x == rhs`. */
+  def divides(rhs: Monomial): Boolean = {
+    @tailrec def test(li: Int, ri: Int): Boolean =
+      if (li == lhs.nVariables) true // we could pass variables, and now the rest of `lhs` is empty
+      else if (ri == rhs.nVariables) false // after passing common variables, `rhs` is empty, but `lhs` is not
+      else {
+        val lv = lhs.variable(li)
+        val rv = rhs.variable(ri)
+        if (lv < rv)
+          false // there is a variable in `lhs` not present in `rhs`
+        else if (lv > rv)
+          test(li, ri + 1) // there is a variable is `rhs` not present in `lhs`, ok
+        else { // lv == rv, common variable
+          val le = lhs.exponent(li)
+          val re = rhs.exponent(ri)
+          if (le > re)
+            false // there is more of this variable in `lhs`
+          else
+            test(li + 1, ri + 1) // move on, the exponents are compatible
+        }
+      }
+    test(0, 0)
+  }
+
+  /** If `rhs.divides(lhs)`, returns `x` such that `rhs * x == lhs`. */
+  def /(rhs: Monomial): Opt[Monomial] =
+    if (rhs.isEmpty) Opt(lhs) else {
+      /** Counts the number of variables in the returned monomial. */
+      @tailrec def countNum(acc: Int, li: Int, ri: Int): Int =
+        if (ri == rhs.nVariables) acc + lhs.nVariables - li
+        else if (li == lhs.nVariables) -1 // rhs does not divides lhs
+        else {
+          val lv = lhs.variable(li)
+          val rv = rhs.variable(ri)
+          if (lv > rv) -1 // there is a variable in `rhs` not present in `lhs`
+          else if (lv < rv) countNum(acc + 1, li + 1, ri) // variable in `lhs` not present in `rhs`
+          else { // lv == rv, common variable
+            require(lv == rv)
+            val le = lhs.exponent(li)
+            val re = rhs.exponent(ri)
+            if (le < re) -1 // there is more of this variable in `rhs`
+            else if (le > re) countNum(acc + 1, li + 1, ri + 1)
+            else countNum(acc, li + 1, ri + 1) // le == re, the variable will be removed
+          }
+        }
+      val n = countNum(0, 0, 0)
+      if (n == -1)
+        Opt.empty[Monomial]
+      else if (n == 0)
+        Opt(Monomial.empty)
+      else {
+        val newV = new Array[Char](n)
+        val newE = new Array[Int](n)
+        @tailrec def rec(ni: Int, li: Int, ri: Int): Unit =
+          if (ri == rhs.nVariables) {
+            Array.copy(lhs._v, li, newV, ni, lhs.nVariables - li)
+            Array.copy(lhs._e, li, newE, ni, lhs.nVariables - li)
+          } else if (li == lhs.nVariables) sys.error("Already tested")
+          else {
+            val lv = lhs.variable(li)
+            val rv = rhs.variable(ri)
+            if (lv > rv) sys.error("Already tested")
+            else if (lv < rv) {
+              newV(ni) = lv // variable in `lhs` not present in `rhs`
+              newE(ni) = lhs.exponent(li)
+              rec(ni + 1, li + 1, ri)
+            } else { // lv == rv, common variable
+              val le = lhs.exponent(li)
+              val re = rhs.exponent(ri)
+              if (le < re) sys.error("Already tested")
+              else if (le > re) {
+                newV(ni) = lv // variable in `lhs` and `rhs` with a greater exponent in `lhs`
+                newE(ni) = lhs.exponent(li) - rhs.exponent(ri)
+                rec(ni + 1, li + 1, ri + 1)
+              } else // le == re, the variable is removed
+                rec(ni, li + 1, ri + 1)
+            }
+          }
+        rec(0, 0, 0)
+        Opt(new Monomial(newV, newE))
+      }
+    }
 
 }
 
 object Monomial {
 
-  def apply[@spec(Double) C: ClassTag: Order: Ring](c: C, v: (Char, Int)*): Monomial[C] =
-    checkCreateMonomial(c, v.toArray)
+  val empty = new Monomial(Array.empty[Char], Array.empty[Int])
 
-  def apply[@spec(Double) C: ClassTag: Order: Ring](c: C, v: List[(Char, Int)]): Monomial[C] =
-    checkCreateMonomial(c, v.toArray)
+  def apply(variable: Char): Monomial = new Monomial(Array(variable), Array(1))
 
-  def apply[@spec(Double) C: ClassTag: Order: Ring](c: C, v: Map[Char, Int]): Monomial[C] =
-    checkCreateMonomial(c, v.toArray)
+  def apply(variable: Char, exponent: Int): Monomial =
+    if (exponent < 0) throw new Exception("Negative exponents are not allowed")
+    else if (exponent == 0) empty
+    else new Monomial(Array(variable), Array(exponent))
 
-  def apply[@spec(Double) C: ClassTag: Order: Ring](c: C, v: SortedMap[Char, Int]): Monomial[C] =
-    checkCreateMonomial(c, v.toArray)
-
-  def apply(str: String): Monomial[Rational] = parseFractional[Rational](str)
-
-  def apply[@spec(Double) C: ClassTag: Order: Ring](c: Char): Monomial[C] =
-    variable(c)
-
-  def apply[@spec(Double) C: ClassTag: Order: Ring](c: C): Monomial[C] =
-    constant(c)
-
-  def checkCreateMonomial[@spec(Double) C: ClassTag](c: C, arr: Array[(Char, Int)])
-    (implicit r: Ring[C], o: Order[C]): Monomial[C] = c match {
-      case n if r.isZero(n) => zero[C]
-      case _ => {
-        arr.length match {
-          case 0 => constant(c)
-          case _ => {
-            val map = arr.foldLeft(SortedMap[Char,Int]()) {
-              // combine any like vars so x^2x^3 becomes x^5
-              case (m, (v, exp)) =>
-                val initialExp = m.getOrElse(v, 0)
-                m + ((v, exp + initialExp))
-            }.filterNot {
-              // remove any variables to the 0 power
-              case (v, exp) => exp == 0
-            }
-            new Monomial[C](c, map)
-          }
-        }
-      }
+  protected[spire] def fromFilteredMap(map: scala.collection.Map[Char, Int]): Monomial = {
+    val newV: Array[Char] = map.keys.toArray
+    Sorting.sort(newV)
+    val newE: Array[Int] = new Array[Int](newV.length)
+    cforRange(0 until newV.length) { ni =>
+      val v = newV(ni)
+      newE(ni) = map(v)
     }
+    new Monomial(newV, newE)
+  }
 
-  def zero[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] =
-    new Monomial[C](r.zero, SortedMap[Char, Int]())
+  def apply(map: Map[Char, Int]): Monomial = {
+    val filtered = map.filter {
+      case (k, v) =>
+        if (v < 0) throw new Exception("Negative exponents are not allowed")
+        v > 0
+    }
+    fromFilteredMap(filtered)
+  }
 
-  def one[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] =
-    new Monomial[C](r.one, SortedMap[Char, Int]())
-
-  def constant[@spec(Double) C: ClassTag: Order](c: C)(implicit r: Ring[C]): Monomial[C] =
-    new Monomial[C](c, SortedMap[Char, Int]())
-
-  def variable[@spec(Double) C: ClassTag: Order](v: Char)(implicit r: Ring[C]): Monomial[C] =
-    new Monomial[C](r.one, SortedMap(v -> 1))
-
-  def x[@spec(Double) C: ClassTag: Order](implicit r: Ring[C]): Monomial[C] =
-    new Monomial[C](r.one, SortedMap('x' -> 1))
+  def apply(varExps: TraversableOnce[(Char, Int)]): Monomial = {
+    import scala.collection.mutable.HashMap
+    val map = HashMap.empty[Char, Int]
+    for ( (v, e) <- varExps if e != 0 ) {
+      if (e < 0) throw new Exception("Negative exponents are not allowed")
+      map(v) = map.getOrElse(v, 0) + e
+    }
+    fromFilteredMap(map)
+  }
 
   object Re {
     val variable = "[\u03B1-\u03C9a-zA-Z]".r
-    val numFractional = "[0-9]+(?:[/.][0-9]+)?".r
-    val numIntegral = "[0-9]+".r
-    val varExp = s"($variable)(?:\\^(-?[0-9]+))?".r
-
-    def term(number: Regex): Regex = s"(- *)?($number)?($varExp)*".r
-    val termFractional = term(numFractional)
-    val termIntegral = term(numIntegral)
+    val varExp = s"($variable)(?:\\^([0-9]+))?".r // we do not allow negative exponents
+    val monomial = s"($varExp *)*".r
   }
 
-
-    // val terms = s"($negative)? *($number)?($varchar(\\^(-)?$number)?)*".r
-
-  final def parseFractional[@spec(Double) C: ClassTag: Fractional](str: String): Monomial[C] = {
-
-    val f = implicitly[Field[C]]
-    val c = implicitly[ConvertableTo[C]]
-
-    val stringToC: String => C = (str: String) => str.split('/') match {
-      case (Array(numerator, denominator)) =>
-        c.fromDouble(numerator.toDouble) / c.fromDouble(denominator.toDouble)
-      case (Array(number)) => c.fromDouble(number.toDouble)
-      case _ => throw new Exception("Could not parse number " + str)
-    }
-
-    parseGeneric(str, Re.termFractional, stringToC, f.one)
-  }
-
-  final def parseIntegral[@spec(Int, Long) C: Integral: ClassTag](str: String): Monomial[C] = {
-
-    val r = implicitly[Integral[C]]
-    val c = implicitly[ConvertableTo[C]]
-
-    val stringToC: String => C = (str: String) => c.fromBigInt(BigInt(str))
-
-    parseGeneric(str, Re.termIntegral, stringToC, r.one)
-  }
-
-  private [poly] final def parseGeneric[@spec(Double, Int, Long) C: ClassTag: Order: ConvertableTo: Ring](str: String, terms: Regex, stringToC: String => C, one: C): Monomial[C] = {
-
-    val m: Option[Monomial[C]] = terms.findFirstMatchIn(str).map { term =>
-      val coeff: C = term.subgroups.map(Option(_)) match {
-        case (List(Some(neg), Some(coeff), _, _, _)) => -stringToC(coeff)
-        case (List(None, Some(coeff), _, _, _)) => stringToC(coeff)
-        case (List(Some(neg), None, _, _, _)) => -one
-        case (List(None, None, _, _, _)) => one
-        case _ => one
-      }
-      val exponents = Re.varExp.findAllMatchIn(term.matched).toList.map {
+  def parse(str: String): Monomial = {
+    val m: Option[Monomial] = Re.monomial.findFirstMatchIn(str).map { term =>
+      val varExps = Re.varExp.findAllMatchIn(term.matched).map {
         _.subgroups match {
-          case (List(variable, null)) => variable(0) -> 1
-          case (List(variable, exp)) => variable(0) -> exp.toInt
-          case _ => throw new Exception("Couldn't parse term " + term)
+          case (List(variable, null)) => (variable(0), 1)
+          case (List(variable, exp)) => (variable(0), exp.toInt)
+          case _ => throw new Exception("Could not parse term " + term)
         }
       }
-      Monomial[C](coeff, exponents)
+      apply(varExps)
     }
-    m getOrElse(throw new Exception("Could not parse term "+str))
-  }
-
-  private val IsZero = "0".r
-  private val IsNegative = "-(.*)".r
-
-  implicit def monomialEq[@spec(Double) C: ClassTag: Order: Semiring] = new MonomialEq[C] {
-    val scalar = Semiring[C]
-    val ct = implicitly[ClassTag[C]]
+    m.getOrElse(throw new Exception("Could not parse term " + str))
   }
 
 }
 
-// An equivalent monomial has the same variables (that's all!)
-// not checking that the variable exponents are equal using this instance
-trait MonomialEq[@spec(Double) C] extends Eq[Monomial[C]] {
-  implicit def scalar: Semiring[C]
-  implicit def ct: ClassTag[C]
-  def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
-    x.vars.toArray === y.vars.toArray
+
+/** Eq type class for monomial. */
+trait MonomialEq extends Eq[Monomial] {
+
+  def eqv(x: Monomial, y: Monomial): Boolean = x == y // simple fallback to the equals method
+
 }
 
-// Lexicographic ordering
-// e.g. x^2 > xy > xz > x > y^2 > yz > y > z^2 > z > 1
-trait MonomialOrderingLex[@spec(Double) C] extends Order[Monomial[C]]
-with MonomialEq[C] {
+/** Lexicographic order for monomials, e.g. x^2 > xy > xz > x > y^2 > yz > y > z^2 > z > 1. */
+object MonomialLexOrder extends Order[Monomial] {
 
-  implicit def ordCoeff: Order[C]
-  implicit val ordChar = Order[Char]
-  implicit val ordInt = Order[Int]
+  override def eqv(x: Monomial, y: Monomial): Boolean = x == y // simple fallback to the equals method
+  override def neqv(x: Monomial, y: Monomial): Boolean = !(x == y)
 
-  override def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
-    x.vars.toArray === y.vars.toArray
-
-  def compare(l: Monomial[C], r: Monomial[C]): Int = {
-    @tailrec def compare_(x: SortedMap[Char, Int], y: SortedMap[Char, Int]): Int = {
-      (x.isEmpty, y.isEmpty) match {
-        case (true, true) => l.coeff compare r.coeff
-        case (false, true) => -1
-        case (true, false) => 1
-        case _ => ordChar.compare(x.head._1, y.head._1) match {
-          case -1 => -1
-          case 1 => 1
-          case 0 => ordInt.compare(x.head._2, y.head._2) match {
-            case -1 => 1
-            case 1 => -1
-            case 0 => compare_(x.tail, y.tail)
+  def compare(lhs: Monomial, rhs: Monomial): Int = {
+    @tailrec def rec(i: Int): Int =
+      if (i == lhs.nVariables) { // at the end of lhs
+        if (i == rhs.nVariables) // at the end of both
+          0
+        else
+          -1
+      } else { // not at the end of lhs
+        if (i == rhs.nVariables) // at the end of rhs
+          1
+        else { // not at the end of both lhs and rhs
+          val lv = lhs.variable(i)
+          val rv = rhs.variable(i)
+          if (lv < rv) 1
+          else if (lv > rv) -1
+          else { // same variable
+            val le = lhs.exponent(i)
+            val re = rhs.exponent(i)
+            if (le < re) -1
+            else if (le > re) 1
+            else rec(i + 1) // same variable and same exponent
           }
         }
       }
-    }
-    compare_(l.vars, r.vars)
+    rec(0)
   }
 
 }
 
-// Graded lexicographic ordering
-// e.g. x^2 > xy > xz > y^2 > yz > z^2 > x > y > z > 1
-trait MonomialOrderingGlex[@spec(Double) C] extends Order[Monomial[C]]
-with MonomialEq[C] {
+/** Graded lexicographic order for monomials, e.g. x^2 > xy > xz > y^2 > yz > z^2 > x > y > z > 1. */
+object MonomialGradLexOrder extends Order[Monomial] {
 
-  implicit def ordCoeff: Order[C]
-  implicit val ordChar = Order[Char]
-  implicit val ordInt = Order[Int]
+  override def eqv(x: Monomial, y: Monomial): Boolean = x == y // simple fallback to the equals method
+  override def neqv(x: Monomial, y: Monomial): Boolean = !(x == y)
 
-  override def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
-    x.vars.toArray === y.vars.toArray
-
-  def compare(l: Monomial[C], r: Monomial[C]): Int = {
-    @tailrec def compare_(x: SortedMap[Char, Int], y: SortedMap[Char, Int]): Int = {
-     (x.isEmpty, y.isEmpty) match {
-        case (true, true) => l.coeff compare r.coeff
-        case (false, true) => -1
-        case (true, false) => 1
-        case _ => ordInt.compare(x.values.sum, y.values.sum) match {
-          case -1 => 1
-          case 1 => -1
-          case 0 => ordChar.compare(x.head._1, y.head._1) match {
-            case -1 => -1
-            case 1 => 1
-            case 0 => ordInt.compare(x.head._2, y.head._2) match {
-              case -1 => 1
-              case 1 => -1
-              case 0 => compare_(x.tail, y.tail)
-            }
-          }
-        }
-      }
-    }
-    compare_(l.vars, r.vars)
+  def compare(lhs: Monomial, rhs: Monomial): Int = {
+    val ld = lhs.degree
+    val rd = rhs.degree
+    if (ld > rd) 1
+    else if (ld < rd) -1
+    else MonomialLexOrder.compare(lhs, rhs)
   }
+
 }
 
-//Graded reverse lexicographic ordering
-// e.g. x^2 > xy > y^2 > xz > yz > z^2 > x > y > z
-trait MonomialOrderingGrevlex[@spec(Double) C] extends Order[Monomial[C]]
-with MonomialEq[C] {
+/** Graded reverse lexicographic order for monomials, e.g. x^2 > xy > y^2 > xz > yz > z^2 > x > y > z > 1. */
+object MonomialGradRevLexOrder extends Order[Monomial] {
 
-  implicit def ordCoeff: Order[C]
-  implicit val ordChar = Order[Char]
-  implicit val ordInt = Order[Int]
+  override def eqv(x: Monomial, y: Monomial): Boolean = x == y // simple fallback to the equals method
+  override def neqv(x: Monomial, y: Monomial): Boolean = !(x == y)
 
-  override def eqv(x: Monomial[C], y: Monomial[C]): Boolean =
-    x.vars.toArray === y.vars.toArray
-
-  def compare(l: Monomial[C], r: Monomial[C]): Int = {
-    @tailrec def compare_(x: SortedMap[Char, Int], y: SortedMap[Char, Int]): Int = {
-      (x.isEmpty, y.isEmpty) match {
-        case (true, true) => l.coeff compare r.coeff
-        case (false, true) => -1
-        case (true, false) => 1
-        case _ => ordInt.compare(x.values.sum, y.values.sum) match {
-          case -1 => 1
-          case 1 => -1
-          case 0 => ordChar.compare(x.head._1, y.head._1) match {
-            case -1 => -1
-            case 1 => 1
-            case 0 => compare_(x.tail, y.tail)
+  def compare(lhs: Monomial, rhs: Monomial): Int = {
+    @tailrec def rec(li: Int, ri: Int): Int =
+      if (li == -1) { // at the end of lhs
+        if (ri == -1) // at the end of rhs
+          0
+        else
+          1
+      } else { // not at the end of lhs
+        if (ri == -1) // at the end of rhs
+          -1
+        else { // not at the end of both lhs and rhs
+          val lv = lhs.variable(li)
+          val rv = rhs.variable(ri)
+          if (lv < rv) // rv is the right-most variable
+            1 // and lhs.exponent(rv) - rhs.exponent(rv) < 0, so lhs is bigger
+          else if (lv > rv)
+            -1 //  lv is the right-most variable
+          else { // same variable
+            val le = lhs.exponent(li)
+            val re = rhs.exponent(ri)
+            if (le < re) 1
+            else if (le > re) -1
+            else rec(li - 1, ri - 1) // same variable and same exponent
           }
         }
       }
-    }
-    compare_(SortedMap(l.vars.toArray.reverse:_*), SortedMap(r.vars.toArray.reverse:_*))
+    val ld = lhs.degree
+    val rd = rhs.degree
+    if (ld > rd) 1
+    else if (ld < rd) -1
+    else rec(lhs.nVariables - 1, rhs.nVariables - 1)
   }
+
 }
