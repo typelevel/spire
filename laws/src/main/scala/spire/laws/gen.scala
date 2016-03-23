@@ -106,6 +106,30 @@ object gen {
       ts <- Gen.listOf(term[A])
     } yield Polynomial(ts.take(6))
 
+  def monomialVariable: Gen[Char] = Gen.oneOf('t', 'u', 'v', 'w', 'x', 'y', 'z')
+
+  def monomialTerm: Gen[poly.Monomial] =
+    for {
+      v <- monomialVariable
+      e <- Gen.choose(1, 100)
+    } yield poly.Monomial(v, e)
+
+  def monomial: Gen[poly.Monomial] =
+    for {
+      terms <- Gen.listOf(monomialTerm)
+    } yield terms.fold(poly.Monomial.one)(_ * _)
+
+  def singleTermMultivariatePolynomial[A: Arbitrary: ClassTag: CRing: Eq](implicit order: poly.MonomialOrder): Gen[poly.MultivariatePolynomial[A]] =
+    for {
+      coeff <- arbitrary[A]
+      m <- monomial
+    } yield poly.MultivariatePolynomial(Map(m -> coeff))
+
+  def multivariatePolynomial[A: Arbitrary: ClassTag: CRing: Eq](implicit order: poly.MonomialOrder): Gen[poly.MultivariatePolynomial[A]] =
+    for {
+      terms <- Gen.listOf(singleTermMultivariatePolynomial[A])
+    } yield terms.fold(poly.MultivariatePolynomial.zero[A])(_ + _)
+
   def complex[A: Arbitrary]: Gen[Complex[A]] =
     for {
       r <- arbitrary[A]

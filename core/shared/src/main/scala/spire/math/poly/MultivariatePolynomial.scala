@@ -20,7 +20,10 @@ import spire.syntax.field._
   * - the monomials are sorted according to the implicit order given,
   * - all coefficients are non-zero.
   */
-final class MultivariatePolynomial[@spec(Double, Long) C:ClassTag:CRing:Eq] private[spire] (private[spire] val _c: Array[C], private[spire] val _m: Array[Monomial])(implicit val order: Order[Monomial]) { lhs =>
+final class MultivariatePolynomial[@spec(Double, Long) C:ClassTag:CRing:Eq] private[spire] (
+  private[spire] val _c: Array[C],
+  private[spire] val _m: Array[Monomial])(
+  implicit val order: MonomialOrder) { lhs =>
 
   /** Number of terms in the polynomial. */
   def nTerms: Int = _c.length
@@ -33,7 +36,7 @@ final class MultivariatePolynomial[@spec(Double, Long) C:ClassTag:CRing:Eq] priv
 
   def isZero: Boolean = nTerms == 0
 
-  def isConstant: Boolean = (nTerms == 1) && monomial(0).isEmpty
+  def isConstant: Boolean = (nTerms == 1) && monomial(0).isOne
 
   /** Polynomial degree. */
   def degree: Int = {
@@ -85,7 +88,7 @@ final class MultivariatePolynomial[@spec(Double, Long) C:ClassTag:CRing:Eq] priv
       val mono = monomial(i)
       val nu = mono.nUndefinedVariables(f)
       if (nu == 0) {
-        if (mono.isEmpty) {
+        if (mono.isOne) {
           hasEmpty = true
           constant += coefficient(i)
         } else
@@ -101,7 +104,7 @@ final class MultivariatePolynomial[@spec(Double, Long) C:ClassTag:CRing:Eq] priv
     val newC: Array[C] = new Array[C](n)
     var ni = 0
     if (!zeroConstant) {
-      newM(0) = Monomial.empty
+      newM(0) = Monomial.one
       newC(0) = constant
       ni += 1
     }
@@ -188,7 +191,11 @@ final class MultivariatePolynomial[@spec(Double, Long) C:ClassTag:CRing:Eq] priv
 
 object MultivariatePolynomial {
 
-  protected[spire] def fromFilteredMap[C:ClassTag:CRing:Eq](map: scala.collection.Map[Monomial, C])(implicit order: Order[Monomial]): MultivariatePolynomial[C] = {
+  /** Builds a polynomial from a map providing the coefficients corresponding to monomials.
+    * 
+    * Requirement: `map` does not contain zero coefficients.
+    */
+  protected[spire] def fromFilteredMap[C:ClassTag:CRing:Eq](map: scala.collection.Map[Monomial, C])(implicit order: MonomialOrder): MultivariatePolynomial[C] = {
     val newM: Array[Monomial] = map.keys.toArray
     Sorting.sort(newM)(order, implicitly)
     val newC: Array[C] = new Array[C](newM.length)
@@ -198,14 +205,18 @@ object MultivariatePolynomial {
     new MultivariatePolynomial[C](newC, newM)
   }
 
-  def zero[C:ClassTag:CRing:Eq](implicit order: Order[Monomial]): MultivariatePolynomial[C] =
+  def zero[C:ClassTag:CRing:Eq](implicit order: MonomialOrder): MultivariatePolynomial[C] =
     new MultivariatePolynomial[C](Array.empty[C], Array.empty[Monomial])
 
-  def apply[C:ClassTag:CRing:Eq](map: Map[Monomial, C])(implicit order: Order[Monomial]): MultivariatePolynomial[C] = {
+  def apply[C:ClassTag:CRing:Eq](map: Map[Monomial, C])(implicit order: MonomialOrder): MultivariatePolynomial[C] =
     fromFilteredMap(map.filterNot(_._2.isZero))
-  }
 
-  final def sort[A, @spec B](data1: Array[A], data2: Array[B])(implicit o: Order[A]): Unit = {
+  /** Sorts in place the data contained in the two arrays `data1` and `data2` by the values
+    * contained in `data1`, using the order `o`.
+    * 
+    * The two arrays should have the same size. 
+    */
+  def sort[A, @spec B](data1: Array[A], data2: Array[B])(implicit o: Order[A]): Unit = {
     val end = data1.length
     var i = 1
     while (i < end) {

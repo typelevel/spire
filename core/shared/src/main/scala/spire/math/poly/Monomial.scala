@@ -136,8 +136,8 @@ final class Monomial private[spire] (private[spire] val _v: Array[Char], private
     case _ => false // TODO: canEqual, cooperative equality with MultivariatePolynomial ???
   }
 
-  /** Is this monomial empty (i.e. == 1) ? */
-  def isEmpty = nVariables == 0
+  /** Is this monomial one (i.e. empty) ? */
+  def isOne = nVariables == 0
 
   /** Returns the value of this monomial, when the values associated to the variables
     * are given by the function `f`. 
@@ -166,7 +166,7 @@ final class Monomial private[spire] (private[spire] val _v: Array[Char], private
   def evalPartial[@sp(Double, Long) C](f: PartialFunction[Char, C])(implicit C: MultiplicativeCMonoid[C]): (C, Monomial) = {
     val nUndefined = nUndefinedVariables(f)
     if (nUndefined == 0)
-      (eval(f), Monomial.empty)
+      (eval(f), Monomial.one)
     else {
       val newV = new Array[Char](nUndefined)
       val newE = new Array[Int](nUndefined)
@@ -251,7 +251,7 @@ final class Monomial private[spire] (private[spire] val _v: Array[Char], private
 
   /** Power. */
   def pow(rhs: Int): Monomial =
-    if (rhs == 0) Monomial.empty
+    if (rhs == 0) Monomial.one
     else if (rhs == 1) lhs
     else {
       require(rhs >= 0)
@@ -265,8 +265,8 @@ final class Monomial private[spire] (private[spire] val _v: Array[Char], private
 
   /** Least common multiple. */
   def lcm(rhs: Monomial): Monomial =
-    if (lhs.isEmpty) rhs
-    else if (rhs.isEmpty) lhs
+    if (lhs.isOne) rhs
+    else if (rhs.isOne) lhs
     else {
       val n = lhs.nVariablesInTotal(rhs)
       val newV = new Array[Char](n)
@@ -353,7 +353,7 @@ final class Monomial private[spire] (private[spire] val _v: Array[Char], private
 
   /** If `rhs.divides(lhs)`, returns `x` such that `rhs * x == lhs`. */
   def /(rhs: Monomial): Opt[Monomial] =
-    if (rhs.isEmpty) Opt(lhs) else {
+    if (rhs.isOne) Opt(lhs) else {
       /** Counts the number of variables in the returned monomial. */
       @tailrec def countNum(acc: Int, li: Int, ri: Int): Int =
         if (ri == rhs.nVariables) acc + lhs.nVariables - li
@@ -376,7 +376,7 @@ final class Monomial private[spire] (private[spire] val _v: Array[Char], private
       if (n == -1)
         Opt.empty[Monomial]
       else if (n == 0)
-        Opt(Monomial.empty)
+        Opt(Monomial.one)
       else {
         val newV = new Array[Char](n)
         val newE = new Array[Int](n)
@@ -414,13 +414,13 @@ final class Monomial private[spire] (private[spire] val _v: Array[Char], private
 
 object Monomial {
 
-  val empty = new Monomial(Array.empty[Char], Array.empty[Int])
+  val one = new Monomial(Array.empty[Char], Array.empty[Int])
 
   def apply(variable: Char): Monomial = new Monomial(Array(variable), Array(1))
 
   def apply(variable: Char, exponent: Int): Monomial =
     if (exponent < 0) throw new Exception("Negative exponents are not allowed")
-    else if (exponent == 0) empty
+    else if (exponent == 0) one
     else new Monomial(Array(variable), Array(exponent))
 
   protected[spire] def fromFilteredMap(map: scala.collection.Map[Char, Int]): Monomial = {
@@ -473,104 +473,28 @@ object Monomial {
     m.getOrElse(throw new Exception("Could not parse term " + str))
   }
 
-}
+/** Default Eq type class for monomial. */
+  object equ extends Eq[Monomial] {
 
+    def eqv(x: Monomial, y: Monomial): Boolean = x == y // simple fallback to the equals method
 
-/** Eq type class for monomial. */
-trait MonomialEq extends Eq[Monomial] {
-
-  def eqv(x: Monomial, y: Monomial): Boolean = x == y // simple fallback to the equals method
-
-}
-
-/** Lexicographic order for monomials, e.g. x^2 > xy > xz > x > y^2 > yz > y > z^2 > z > 1. */
-object MonomialLexOrder extends Order[Monomial] {
-
-  override def eqv(x: Monomial, y: Monomial): Boolean = x == y // simple fallback to the equals method
-  override def neqv(x: Monomial, y: Monomial): Boolean = !(x == y)
-
-  def compare(lhs: Monomial, rhs: Monomial): Int = {
-    @tailrec def rec(i: Int): Int =
-      if (i == lhs.nVariables) { // at the end of lhs
-        if (i == rhs.nVariables) // at the end of both
-          0
-        else
-          -1
-      } else { // not at the end of lhs
-        if (i == rhs.nVariables) // at the end of rhs
-          1
-        else { // not at the end of both lhs and rhs
-          val lv = lhs.variable(i)
-          val rv = rhs.variable(i)
-          if (lv < rv) 1
-          else if (lv > rv) -1
-          else { // same variable
-            val le = lhs.exponent(i)
-            val re = rhs.exponent(i)
-            if (le < re) -1
-            else if (le > re) 1
-            else rec(i + 1) // same variable and same exponent
-          }
-        }
-      }
-    rec(0)
   }
 
-}
+  /** Default `Eq[Monomial]` if no monomial order is selected. */
+  implicit def defaultEq(implicit ev: NoImplicit[MonomialOrder]): Eq[Monomial] = equ
 
-/** Graded lexicographic order for monomials, e.g. x^2 > xy > xz > y^2 > yz > z^2 > x > y > z > 1. */
-object MonomialGradLexOrder extends Order[Monomial] {
-
-  override def eqv(x: Monomial, y: Monomial): Boolean = x == y // simple fallback to the equals method
-  override def neqv(x: Monomial, y: Monomial): Boolean = !(x == y)
-
-  def compare(lhs: Monomial, rhs: Monomial): Int = {
-    val ld = lhs.degree
-    val rd = rhs.degree
-    if (ld > rd) 1
-    else if (ld < rd) -1
-    else MonomialLexOrder.compare(lhs, rhs)
-  }
+  implicit object multiplicativeCMonoid extends MonomialMultiplicativeCMonoid
 
 }
 
-/** Graded reverse lexicographic order for monomials, e.g. x^2 > xy > y^2 > xz > yz > z^2 > x > y > z > 1. */
-object MonomialGradRevLexOrder extends Order[Monomial] {
+trait MonomialMultiplicativeCMonoid extends MultiplicativeCMonoid[Monomial] {
 
-  override def eqv(x: Monomial, y: Monomial): Boolean = x == y // simple fallback to the equals method
-  override def neqv(x: Monomial, y: Monomial): Boolean = !(x == y)
+  def one = Monomial.one
 
-  def compare(lhs: Monomial, rhs: Monomial): Int = {
-    @tailrec def rec(li: Int, ri: Int): Int =
-      if (li == -1) { // at the end of lhs
-        if (ri == -1) // at the end of rhs
-          0
-        else
-          1
-      } else { // not at the end of lhs
-        if (ri == -1) // at the end of rhs
-          -1
-        else { // not at the end of both lhs and rhs
-          val lv = lhs.variable(li)
-          val rv = rhs.variable(ri)
-          if (lv < rv) // rv is the right-most variable
-            1 // and lhs.exponent(rv) - rhs.exponent(rv) < 0, so lhs is bigger
-          else if (lv > rv)
-            -1 //  lv is the right-most variable
-          else { // same variable
-            val le = lhs.exponent(li)
-            val re = rhs.exponent(ri)
-            if (le < re) 1
-            else if (le > re) -1
-            else rec(li - 1, ri - 1) // same variable and same exponent
-          }
-        }
-      }
-    val ld = lhs.degree
-    val rd = rhs.degree
-    if (ld > rd) 1
-    else if (ld < rd) -1
-    else rec(lhs.nVariables - 1, rhs.nVariables - 1)
-  }
+  def times(x: Monomial, y: Monomial): Monomial = x * y
+
+  override def prodn(x: Monomial, n: Int): Monomial = x.pow(n)
+
+  override def isOne(x: Monomial)(implicit ev: Eq[Monomial]): Boolean = x.isOne
 
 }

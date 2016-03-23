@@ -39,10 +39,6 @@ class MultivariatePolynomial[@spec(Double) C: Order] private[spire] (val terms: 
   def tail(implicit r: Semiring[C]): MultivariatePolynomial[C] =
     MultivariatePolynomial[C](allTerms.tail)
 
-  def monic(implicit f: Field[C]): MultivariatePolynomial[C] =
-    if(isZero) MultivariatePolynomial.zero[C] else
-      MultivariatePolynomial[C](terms.map(_.:/(headCoefficient)))
-
   private final def sum(l: Array[Monomial[C]], r: Array[Monomial[C]])(implicit ring: Semiring[C]) = {
     val a = ArrayBuilder.make[Monomial[C]]()
     val ar = new Array[Boolean](r.length)
