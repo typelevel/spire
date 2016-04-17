@@ -74,7 +74,7 @@ Here is a list of all of Spire's modules:
 ### Playing Around
 
 If you clone the Spire repo, you can get a taste of what Spire can do using
-SBT's console. Launch `sbt` and at the prompt, type `core/console`:
+SBT's console. Launch `sbt` and at the prompt, type `coreJVM/console`:
 
 ```
 > coreJVM/console
