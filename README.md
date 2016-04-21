@@ -81,7 +81,7 @@ SBT's console. Launch `sbt` and at the prompt, type `core/console`:
 [info] Generating spire/std/tuples.scala
 [info] Starting scala interpreter...
 [info]
-Welcome to Scala version 2.11.7 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_51).
+Welcome to Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_51).
 Type in expressions to have them evaluated.
 Type :help for more information.
 
