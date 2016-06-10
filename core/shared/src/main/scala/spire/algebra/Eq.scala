@@ -21,7 +21,7 @@ trait Eq[@sp A] extends Any {
 }
 
 private[algebra] class MappedEq[@sp A, @sp B](eq: Eq[B])(f: A => B) extends Eq[A] {
-  def eqv(x: A, y: A): Boolean = eq.eqv(f(x), f(x))
+  def eqv(x: A, y: A): Boolean = eq.eqv(f(x), f(y))
 }
 
 object Eq {
