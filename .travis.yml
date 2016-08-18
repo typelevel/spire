@@ -1,8 +1,8 @@
 language: scala
 
 scala:
-- 2.10.2
-- 2.11.7
+- 2.10.6
+- 2.11.8
 
 cache:
   directories:

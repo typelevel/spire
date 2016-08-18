@@ -74,14 +74,14 @@ Here is a list of all of Spire's modules:
 ### Playing Around
 
 If you clone the Spire repo, you can get a taste of what Spire can do using
-SBT's console. Launch `sbt` and at the prompt, type `core/console`:
+SBT's console. Launch `sbt` and at the prompt, type `coreJVM/console`:
 
 ```
 > coreJVM/console
 [info] Generating spire/std/tuples.scala
 [info] Starting scala interpreter...
 [info]
-Welcome to Scala version 2.11.7 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_51).
+Welcome to Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_51).
 Type in expressions to have them evaluated.
 Type :help for more information.
 
