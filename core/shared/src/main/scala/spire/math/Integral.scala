@@ -39,7 +39,7 @@ with ConvertableFromInt with ConvertableToInt with IntIsReal with Serializable {
   override def toRational(n: Int): Rational = super[IntIsReal].toRational(n)
   override def toAlgebraic(n: Int): Algebraic = super[IntIsReal].toAlgebraic(n)
   override def toReal(n: Int): Real = super[IntIsReal].toReal(n)
-  override def toBigInt(n: Int): BigInt = super[IntIsReal].toBigInt(n)
+  override def toBigInt(n: Int): BigInt = BigInt(n)
 }
 
 @SerialVersionUID(0L)
