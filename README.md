@@ -1,3 +1,8 @@
+[![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/non/spire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![codecov.io](http://codecov.io/github/non/spire/coverage.svg?branch=master)](http://codecov.io/github/non/spire?branch=master)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.spire-math/spire_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.spire-math/spire_2.11)
+
 ## Spire
 
 ### Overview
@@ -12,10 +17,11 @@ code without having to "bake in" particular numeric representations. In most
 cases, generic implementations using Spire's specialized type classes perform
 identically to corresponding direct implementations.
 
-[![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/non/spire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![codecov.io](http://codecov.io/github/non/spire/coverage.svg?branch=master)](http://codecov.io/github/non/spire?branch=master)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.spire-math/spire_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.spire-math/spire_2.11)
+### Scaladoc
+[![Core](http://javadoc-badge.appspot.com/org.spire-math/spire_2.11.svg?label=core)](http://javadoc-badge.appspot.com/org.spire-math/spire_2.11/index.html#spire.package)
+[![Extras](http://javadoc-badge.appspot.com/org.spire-math/spire-extras_2.11.svg?label=extras)](http://javadoc-badge.appspot.com/org.spire-math/spire-extras_2.11)
+[![Laws](http://javadoc-badge.appspot.com/org.spire-math/spire-laws_2.11.svg?label=laws)](http://javadoc-badge.appspot.com/org.spire-math/spire-laws_2.11/index.html#spire.laws.package)
+[![Macros](http://javadoc-badge.appspot.com/org.spire-math/spire-macros_2.11.svg?label=macros)](http://javadoc-badge.appspot.com/org.spire-math/spire-macros_2.11/index.html#spire.macros.package)
 
 Spire is provided to you as free software under the
 [MIT license](COPYING).
@@ -68,14 +74,14 @@ Here is a list of all of Spire's modules:
 ### Playing Around
 
 If you clone the Spire repo, you can get a taste of what Spire can do using
-SBT's console. Launch `sbt` and at the prompt, type `core/console`:
+SBT's console. Launch `sbt` and at the prompt, type `coreJVM/console`:
 
 ```
 > coreJVM/console
 [info] Generating spire/std/tuples.scala
 [info] Starting scala interpreter...
 [info]
-Welcome to Scala version 2.11.7 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_51).
+Welcome to Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_51).
 Type in expressions to have them evaluated.
 Type :help for more information.
 

@@ -490,8 +490,13 @@ with EuclideanRing[Polynomial[C]] with Gcd[Polynomial[C]] with VectorSpace[Polyn
   override def quotmod(x: Polynomial[C], y: Polynomial[C]): (Polynomial[C], Polynomial[C]) = x /% y
 
   final def gcd(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = {
-    val k = spire.math.gcd(x.coeffsArray ++ y.coeffsArray)
-    k *: euclid(x :/ k, y :/ k)(Polynomial.eq, this).monic
+    val result = euclid(x, y)(Polynomial.eq)
+    if (result.degree > 0) {
+      result
+    } else {
+      // return the gcd of all coefficients when there is no higher degree divisor
+      Polynomial.constant(spire.math.gcd(x.coeffsArray ++ y.coeffsArray))
+    }
   }
 
   def lcm(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = (x /~ gcd(x, y)) * y //FIXME?

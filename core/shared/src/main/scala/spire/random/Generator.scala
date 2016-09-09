@@ -441,7 +441,71 @@ abstract class IntBasedGenerator extends Generator { self =>
 
 abstract class LongBasedGenerator extends Generator { self =>
   def nextInt(): Int =
-    (nextLong >>> 32).toInt
+    (nextLong() >>> 32).toInt
+
+  override def fillInts(arr: Array[Int]): Unit = {
+    var i = 0
+    val len = arr.length
+    val llen = len & 0xfffffffe
+    while (i < llen) {
+      val n = nextLong()
+      arr(i) = (n & 0xffffffff).toInt
+      arr(i + 1) = ((n >>> 32) & 0xffffffff).toInt
+      i += 2
+    }
+
+    if (len != llen) arr(i) = nextInt()
+  }
+
+  override def fillShorts(arr: Array[Short]): Unit = {
+    var i = 0
+    val len = arr.length
+    val llen = len & 0xfffffffc
+    while (i < llen) {
+      val n = nextLong()
+      arr(i) = (n & 0xffff).toShort
+      arr(i + 1) = ((n >>> 16) & 0xffff).toShort
+      arr(i + 2) = ((n >>> 32) & 0xffff).toShort
+      arr(i + 3) = ((n >>> 48) & 0xffff).toShort
+      i += 4
+    }
+
+    if (i < len) {
+      var n = nextLong()
+      while (i < len) {
+        arr(i) = (n & 0xffff).toShort
+        n = n >>> 16
+        i += 1
+      }
+    }
+  }
+
+  override def fillBytes(arr: Array[Byte]): Unit = {
+    var i = 0
+    val len = arr.length
+    val llen = len & 0xfffffff8
+    while (i < llen) {
+      val n = nextLong()
+      arr(i) = (n & 0xff).toByte
+      arr(i + 1) = ((n >>> 8) & 0xff).toByte
+      arr(i + 2) = ((n >>> 16) & 0xff).toByte
+      arr(i + 3) = ((n >>> 24) & 0xff).toByte
+      arr(i + 4) = ((n >>> 32) & 0xff).toByte
+      arr(i + 5) = ((n >>> 40) & 0xff).toByte
+      arr(i + 6) = ((n >>> 48) & 0xff).toByte
+      arr(i + 7) = ((n >>> 56) & 0xff).toByte
+      i += 8
+    }
+
+    if (i < len) {
+      var n = nextLong()
+      while (i < len) {
+        arr(i) = (n & 0xff).toByte
+        n = n >>> 8
+        i += 1
+      }
+    }
+  }
 }
 
 trait GeneratorCompanion[G, @sp(Int, Long) S] {
