@@ -97,7 +97,7 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
     } else if (typ == "double") {
       val arr = ds.clone; scala.util.Sorting.quickSort(arr); arr.length
     } else if (typ == "complex") {
-      implicit val ordering = Order.ordering(lexicographic)
+      implicit val ordering = lexicographic.toOrdering
       val arr = cs.clone; scala.util.Sorting.quickSort(arr); arr.length
     }
   }
