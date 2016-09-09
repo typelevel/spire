@@ -223,7 +223,7 @@ lazy val commonSettings = Seq(
     Resolver.sonatypeRepo("snapshots")
   ),
   libraryDependencies += "org.typelevel" %%% "machinist" % "0.4.1",
-  libraryDependencies += "org.typelevel" %%% "algebra" % "0.5.1"
+  libraryDependencies += "org.typelevel" %%% "algebra" % "0.5.2-SNAPSHOT"
 ) ++ scalaMacroDependencies ++ warnUnusedImport
 
 lazy val commonJsSettings = Seq(
