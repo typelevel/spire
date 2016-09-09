@@ -206,13 +206,13 @@ addCommandAlias("validate", ";validateJVM;validateJS")
 
 lazy val buildSettings = Seq(
   organization := "org.spire-math",
-  scalaVersion := "2.11.7",
-  crossScalaVersions := Seq("2.10.2", "2.11.7")
+  scalaVersion := "2.11.8",
+  crossScalaVersions := Seq("2.10.6", "2.11.8")
 )
 
 lazy val commonSettings = Seq(
   scalacOptions ++= commonScalacOptions.diff(Seq(
-    "-Xfatal-warnings", 
+    "-Xfatal-warnings",
     "-language:existentials",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
@@ -223,7 +223,7 @@ lazy val commonSettings = Seq(
     Resolver.sonatypeRepo("snapshots")
   ),
   libraryDependencies += "org.typelevel" %%% "machinist" % "0.4.1",
-  libraryDependencies += "org.spire-math" %%% "algebra" % "0.3.1"
+  libraryDependencies += "org.typelevel" %%% "algebra" % "0.5.1"
 ) ++ scalaMacroDependencies ++ warnUnusedImport
 
 lazy val commonJsSettings = Seq(
@@ -331,9 +331,9 @@ lazy val unidocSettings = UnidocPlugin.unidocSettings ++ Seq(
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Base Build Settings - Should not need to edit below this line. 
+// Base Build Settings - Should not need to edit below this line.
 // These settings could also come from another file or a plugin.
-// The only issue if coming from a plugin is that the Macro lib versions 
+// The only issue if coming from a plugin is that the Macro lib versions
 // are hard coded, so an overided facility would be required.
 
 addCommandAlias("gitSnapshots", ";set version in ThisBuild := git.gitDescribedVersion.value.get + \"-SNAPSHOT\"")

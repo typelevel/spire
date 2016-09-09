@@ -74,7 +74,7 @@ class IntIsBitString extends BitString[Int] with Serializable {
   def and(a: Int, b: Int): Int = a & b
   def or(a: Int, b: Int): Int = a | b
   def complement(a: Int): Int = ~a
-  override def xor(a: Int, b: Int): Int = a ^ b
+  //override def xor(a: Int, b: Int): Int = a ^ b
 
   def signed: Boolean = true
   def width: Int = 32
