@@ -490,7 +490,7 @@ with EuclideanRing[Polynomial[C]] with Gcd[Polynomial[C]] with VectorSpace[Polyn
   override def quotmod(x: Polynomial[C], y: Polynomial[C]): (Polynomial[C], Polynomial[C]) = x /% y
 
   final def gcd(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = {
-    val result = euclid(x, y)(Polynomial.eq)
+    val result = euclid(x, y)(Polynomial.eq, this)
     if (result.degree > 0) {
       result
     } else {
