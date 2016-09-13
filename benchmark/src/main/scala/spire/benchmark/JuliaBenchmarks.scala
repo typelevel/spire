@@ -1,14 +1,8 @@
 package spire
 package benchmark
 
-import scala.util.Random
-
 import spire.implicits._
 import spire.math._
-
-import com.google.caliper.Runner
-import com.google.caliper.SimpleBenchmark
-import com.google.caliper.Param
 
 object JuliaBenchmarks extends MyRunner(classOf[JuliaBenchmarks])
 

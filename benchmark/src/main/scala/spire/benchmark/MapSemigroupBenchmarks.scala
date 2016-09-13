@@ -4,7 +4,7 @@ package benchmark
 import spire.algebra._
 import spire.implicits._
 
-import com.google.caliper.{ Runner, SimpleBenchmark, Param }
+import com.google.caliper.Param
 
 import scala.util.Random._
 
