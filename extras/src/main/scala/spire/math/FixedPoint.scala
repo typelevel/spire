@@ -2,8 +2,6 @@ package spire
 package math
 package extras
 
-//import spire.syntax.ring._
-import spire.std.long._
 import spire.syntax.order._
 import spire.syntax.euclideanRing._
 import spire.syntax.convertableFrom._
