@@ -12,8 +12,7 @@ sealed abstract class Overlap[A: Order] extends Serializable {
   def lhs: Interval[A]
   def rhs: Interval[A]
   def isStrictlyLess: Boolean
-  def isDisjoint: Boolean = isStrictlyLess
-  def isLess: Boolean
+  def isLessAndOverlaps: Boolean
   def isSubset: Boolean
   def isEqual: Boolean
 }
@@ -26,7 +25,7 @@ case class StrictlyLess[A: Order] private[spire](lhs: Interval[A], rhs: Interval
   def isSubset: Boolean = false
   def isEqual: Boolean = false
   def isStrictlyLess: Boolean = true
-  def isLess: Boolean = true
+  def isLessAndOverlaps: Boolean = false
 
   /**
     * An interval that joins [[lhs]] and [[rhs]] in a continuous interval without intersecting any of them.
@@ -48,7 +47,7 @@ sealed abstract class Intersects[A: Order] private[spire]() extends Overlap[A] {
   * For example: (-2, 10] and [5, 13)
   */
 case class LessAndOverlaps[A: Order] private[spire](lhs: Interval[A], rhs: Interval[A]) extends Intersects[A] {
-  def isLess: Boolean = true
+  def isLessAndOverlaps: Boolean = true
   def isSubset: Boolean = false
   def isEqual: Boolean = false
   def intersection: Interval[A] = lhs.intersect(rhs)
@@ -62,7 +61,7 @@ case class LessAndOverlaps[A: Order] private[spire](lhs: Interval[A], rhs: Inter
   * For example [1,4) and [1, 5]
   */
 case class Subset[A: Order] private[spire](lhs: Interval[A], rhs: Interval[A]) extends Intersects[A] {
-  def isLess: Boolean = false
+  def isLessAndOverlaps: Boolean = false
   def isGreater: Boolean = false
   def isSuperset: Boolean = false
   def isSubset: Boolean = true
@@ -74,7 +73,7 @@ case class Subset[A: Order] private[spire](lhs: Interval[A], rhs: Interval[A]) e
   * Intervals are equal
   */
 case class Equals[A: Order] private[spire](lhs: Interval[A], rhs: Interval[A]) extends Intersects[A] {
-  def isLess: Boolean = false
+  def isLessAndOverlaps: Boolean = false
   def isSubset: Boolean = true
   def isEqual: Boolean = true
 }
