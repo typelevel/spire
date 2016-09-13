@@ -164,7 +164,7 @@ object gen {
       openUpperInterval[A],
       closedInterval[A])
 
-  def interval[A: Arbitrary: Order: AdditiveMonoid]: Gen[Interval[A]] =
+  def interval[A: Arbitrary: Order]: Gen[Interval[A]] =
     Gen.frequency[Interval[A]](
       (1, Gen.const(Interval.all[A])),
       (1, arbitrary[A].map(Interval.above(_))),
