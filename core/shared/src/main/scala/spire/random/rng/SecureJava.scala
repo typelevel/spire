@@ -2,8 +2,6 @@ package spire
 package random
 package rng
 
-import java.nio.ByteBuffer
-import java.util.Arrays
 import java.security.SecureRandom
 
 class SecureJava(rand: SecureRandom) extends IntBasedGenerator {

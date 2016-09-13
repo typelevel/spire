@@ -2,15 +2,13 @@ package spire
 package math
 
 import java.lang.Long.numberOfLeadingZeros
-import java.lang.Double.{ isInfinite, isNaN }
 import java.math.{ MathContext, RoundingMode, BigInteger, BigDecimal => JBigDecimal }
 import java.util.concurrent.atomic.AtomicReference
 
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
 
 import spire.Platform
-import spire.algebra.{Eq, EuclideanRing, Field, Gcd, IsAlgebraic, NRoot, Order, Ring, Sign, Signed}
-import spire.algebra.Sign.{ Positive, Negative, Zero }
+import spire.algebra.{Eq, Field, Gcd, IsAlgebraic, NRoot, Order, Sign}
 import spire.macros.Checked.checked
 import spire.math.poly.{ Term, BigDecimalRootRefinement, RootFinder, Roots }
 import spire.std.bigInt._
@@ -41,7 +39,7 @@ import spire.syntax.std.seq._
 @SerialVersionUID(1L)
 final class Algebraic private (val expr: Algebraic.Expr)
 extends ScalaNumber with ScalaNumericConversions with Serializable {
-  import Algebraic.{ Zero, One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue, JBigDecimalOrder, roundExact, BFMSS, LiYap }
+  import Algebraic.{ One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue, roundExact }
 
   /**
    * Returns an `Int` with the same sign as this algebraic number. Algebraic

@@ -6,7 +6,6 @@ import spire.syntax.all._
 import spire.math.{Complex, Interval, Natural, Rational, SafeLong, UByte, UShort, UInt, ULong}
 
 import scala.collection.mutable.ArrayBuffer
-import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 
 trait Dist[@sp A] extends Any { self =>

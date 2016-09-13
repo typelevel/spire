@@ -3,8 +3,6 @@ package math
 
 import spire.algebra.Bool
 
-import java.lang.Math
-
 // TODO: restore specialization :/
 //trait BitString[@sp(Byte, Short, Int, Long) A] extends Any with Bool[A] {
 trait BitString[A] extends Any with Bool[A] {

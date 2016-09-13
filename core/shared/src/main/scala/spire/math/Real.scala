@@ -8,7 +8,7 @@ import spire.syntax.nroot._
 
 sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
-  import Real.{roundUp, Exact, Inexact}
+  import Real.{roundUp, Exact}
 
   def apply(p: Int): SafeLong
 

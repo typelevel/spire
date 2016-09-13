@@ -1,8 +1,6 @@
 package spire
 package macros.fpf
 
-import scala.language.experimental.macros
-
 import spire.macros.compat.{freshTermName, resetLocalAttrs, typeCheck, Context}
 import spire.math.{FpFilter, FpFilterApprox, FpFilterExact}
 

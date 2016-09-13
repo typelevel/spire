@@ -1,7 +1,7 @@
 package spire
 package math
 
-import scala.math.{ScalaNumber, ScalaNumericConversions}
+import scala.math.{ScalaNumericConversions}
 import java.lang.Math
 
 import spire.algebra.{Eq, EuclideanRing, Field, Gcd, IsReal, IsRational, NRoot, Order, Ring, Signed, Trig}
@@ -590,8 +590,6 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
     // FIXME: we should actually try to return values with a meaningful approximation context
     Number(spire.math.pow(n.toDouble, rhs.toDouble))
   }
-
-  import spire.algebra.Field
 
   def floor: Number = RationalNumber(IsReal[Rational].floor(n))
   def ceil: Number = RationalNumber(IsReal[Rational].ceil(n))

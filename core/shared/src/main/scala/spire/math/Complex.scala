@@ -8,9 +8,7 @@ import spire.syntax.isReal._
 import spire.syntax.nroot._
 import spire.syntax.order._
 
-import scala.math.{ScalaNumber, ScalaNumericConversions, ScalaNumericAnyConversions}
-import java.lang.Math
-
+import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 object Complex extends ComplexInstances {
   def i[@sp(Float, Double) T](implicit T: Rig[T]): Complex[T] =
@@ -435,7 +433,7 @@ class FloatComplex(val u: Long) extends AnyVal {
  * Not bad, eh?
  */
 object FastComplex {
-  import java.lang.Math.{atan2, cos, sin, sqrt}
+  import java.lang.Math.{atan2, cos, sin}
 
   // note the superstitious use of @inline and final everywhere
 

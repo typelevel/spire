@@ -3,9 +3,6 @@ package math
 
 import scala.collection.mutable.ArrayBuilder
 
-
-import java.math.{ BigDecimal => JBigDecimal, RoundingMode, MathContext }
-
 import spire.algebra._
 import spire.math.poly._
 import spire.std.array._
@@ -47,8 +44,6 @@ object Polynomial extends PolynomialInstances {
 
   def apply[@sp(Double) C: Semiring: Eq: ClassTag](c: C, e: Int): PolySparse[C] =
     PolySparse.safe(Array(e), Array(c))
-
-  import scala.util.{Try, Success, Failure}
 
   def apply(s: String): Polynomial[Rational] = parse(s)
 

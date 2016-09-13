@@ -2,7 +2,6 @@ package spire
 
 import java.lang.Long.numberOfTrailingZeros
 import java.lang.Math
-import java.math.BigInteger
 import java.math.MathContext
 import java.math.RoundingMode
 
@@ -10,7 +9,7 @@ import scala.math.ScalaNumericConversions
 
 import BigDecimal.RoundingMode.{FLOOR, HALF_UP, CEILING}
 
-import spire.algebra.{EuclideanRing, Field, Gcd, IsReal, NRoot, Order, Signed, Trig}
+import spire.algebra.{Field, Gcd, IsReal, NRoot, Order, Signed, Trig}
 import spire.std.bigDecimal._
 import spire.syntax.nroot._
 
