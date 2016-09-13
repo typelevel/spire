@@ -570,25 +570,27 @@ class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPr
     }
   }
 
-  property("[a, b) overlap (c, d] = LessAndOverlaps if a <= c < b <= d") {
+  property("[a, c) overlap (b, d] = LessAndOverlaps if a < b < c < d") {
     forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
 
       import spire.algebra.Order.ordering
 
       val sorted = List(x, y, m, n).sorted
-      whenever(sorted(1) < sorted(2)) {
+      whenever(sorted.distinct == sorted) {
         Interval.openUpper(sorted(0), sorted(2)).overlap(Interval.openLower(sorted(1), sorted(3))).isLessAndOverlaps shouldBe true
       }
     }
   }
 
-  property("[a, b] overlap [c, d] = LessAndOverlaps if a <= c <= b <= d") {
+  property("[a, c] overlap [b, d] = LessAndOverlaps if a < b <= c < d") {
     forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
 
       import spire.algebra.Order.ordering
 
       val sorted = List(x, y, m, n).sorted
-      Interval.closed(sorted(0), sorted(2)).overlap(Interval.closed(sorted(1), sorted(3))).isLessAndOverlaps shouldBe true
+      whenever(sorted.distinct.size >= 3 && sorted(0) != sorted(1)) {
+        Interval.closed(sorted(0), sorted(2)).overlap(Interval.closed(sorted(1), sorted(3))).isLessAndOverlaps shouldBe true
+      }
     }
   }
 
@@ -614,15 +616,17 @@ class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPr
     }
   }
 
-  property("[a, b) overlap (c, d] = StrictlyLess if a <= b <= c <= d") {
+  property("[a, b) overlap (c, d] = StrictlyLess if a < b <= c < d") {
     forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
 
       import spire.algebra.Order.ordering
 
       val sorted = List(x, y, m, n).sorted
-      val overlap = Interval.openUpper(sorted(0), sorted(1)).overlap(Interval.openLower(sorted(2), sorted(3)))
-      overlap.isStrictlyLess shouldBe true
-      overlap.asInstanceOf[StrictlyLess[Rational]].join shouldBe Interval.closed(sorted(1), sorted(2))
+      whenever(sorted(0) < sorted(1) && sorted(2) < sorted(3)) {
+        val overlap = Interval.openUpper(sorted(0), sorted(1)).overlap(Interval.openLower(sorted(2), sorted(3)))
+        overlap.isStrictlyLess shouldBe true
+        overlap.asInstanceOf[StrictlyLess[Rational]].join shouldBe Interval.closed(sorted(1), sorted(2))
+      }
     }
   }
 

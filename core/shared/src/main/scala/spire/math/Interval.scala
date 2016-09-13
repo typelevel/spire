@@ -788,8 +788,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
     */
   def overlap(rhs: Interval[A]): Overlap[A] = {
 
-    def lessAndOverlaps(intersectionLowerBound: A): Overlap[A] =
-      if (lhs.hasBelow(intersectionLowerBound)) LessAndOverlaps(lhs, rhs) else LessAndOverlaps(rhs, lhs)
+    def lessAndOverlaps(intersectionLowerBound: Bound[A]): Overlap[A] =
+      if (lhs.lowerBound === intersectionLowerBound) LessAndOverlaps(lhs, rhs) else LessAndOverlaps(rhs, lhs)
 
     if (lhs === rhs) {
       Equals(lhs, rhs)
@@ -799,8 +799,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
         case (sup, sub) if sup.isSupersetOf(sub) => Subset(sub, sup)
         // only possible cases left are disjoint (empty intersection) or partial overlap
         case _ => lhs.intersect(rhs) match {
-          case Bounded(lower, upper, _) => lessAndOverlaps(lower)
-          case Point(value) => lessAndOverlaps(value)
+          case i: Bounded[A] => lessAndOverlaps(i.lowerBound)
+          case i: Point[A] => lessAndOverlaps(i.lowerBound)
           case Empty() =>
             if (Interval.fromBounds(lhs.lowerBound, rhs.upperBound).isEmpty) StrictlyLess(rhs, lhs)
             else StrictlyLess(lhs, rhs)
