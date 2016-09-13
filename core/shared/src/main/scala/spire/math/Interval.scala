@@ -45,7 +45,7 @@ import java.lang.Double.isNaN
  * These situations will result in loss of precision (in the form of
  * wider intervals). The result is not wrong per se, but less
  * acccurate than it could be.
- * 
+ *
  * These intervals should not be used with floating point bounds,
  * as proper rounding is not implemented. Generally, the JVM is
  * not an easy platform to perform robust arithmetic, as the
@@ -767,6 +767,48 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
 
   def foldOver[B](init: B, step: A)(f: (B, A) => B)(implicit ev: AdditiveMonoid[A], nt: NumberTag[A]): B =
     iterator(step).foldLeft(init)(f)
+
+  /**
+    * Result of overlapping this interval with another one.
+    * Can be one of the following:
+    * - [[spire.math.interval.Equals]] if intervals are equal
+    * - [[spire.math.interval.StrictlyLess]] if intervals are notEmpty don't intersect
+    * - [[spire.math.interval.LessAndOverlaps]] if intervals intersect and neither is a subset of another
+    * - [[spire.math.interval.Subset]] if one interval (possibly empty) is a subset of another
+    *
+    * Note that lhs and rhs can be switched places in any result, except [[spire.math.interval.Equals]].
+    * For example (pseudo-code):
+    * {
+    * val lhs = [5, 6]
+    * val rhs = (0, 1)
+    *
+    * // this returns StrictlyLess(rhs, lhs). Note that lhs and rhs switched places in compare to the overlap call
+    * lhs.overlap(rhs)
+    * }
+    */
+  def overlap(rhs: Interval[A]): Overlap[A] = {
+
+    def lessAndOverlaps(intersectionLowerBound: A): Overlap[A] =
+      if (lhs.hasBelow(intersectionLowerBound)) LessAndOverlaps(lhs, rhs) else LessAndOverlaps(rhs, lhs)
+
+    if (lhs === rhs) {
+      Equals(lhs, rhs)
+    } else {
+      (lhs, rhs) match {
+        case (sub, sup) if sup.isSupersetOf(sub) => Subset(sub, sup)
+        case (sup, sub) if sup.isSupersetOf(sub) => Subset(sub, sup)
+        // only possible cases left are disjoint (empty intersection) or partial overlap
+        case _ => lhs.intersect(rhs) match {
+          case Bounded(lower, upper, _) => lessAndOverlaps(lower)
+          case Point(value) => lessAndOverlaps(value)
+          case Empty() =>
+            if (Interval.fromBounds(lhs.lowerBound, rhs.upperBound).isEmpty) StrictlyLess(rhs, lhs)
+            else StrictlyLess(lhs, rhs)
+          case _ => throw new Exception("impossible")
+        }
+      }
+    }
+  }
 }
 
 case class All[A: Order] private[spire] () extends Interval[A] {
