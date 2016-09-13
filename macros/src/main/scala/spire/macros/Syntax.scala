@@ -3,8 +3,6 @@ package macros
 
 import spire.macros.compat.{termName, freshTermName, resetLocalAttrs, Context, setOrig}
 
-import scala.language.higherKinds
-
 object Ops extends machinist.Ops {
 
   def uesc(c: Char): String = "$u%04X".format(c.toInt)
@@ -95,13 +93,8 @@ case class SyntaxUtil[C <: Context with Singleton](val c: C) {
     }
 }
 
-// This is Scala reflection source compatibility hack between Scala 2.10 and 2.11
-private object HasCompat { val compat = ??? }; import HasCompat._
-
 class InlineUtil[C <: Context with Singleton](val c: C) {
   import c.universe._
-  // This is Scala reflection source compatibility hack between Scala 2.10 and 2.11
-  import compat._
 
   def inlineAndReset[T](tree: Tree): c.Expr[T] = {
     val inlined = inlineApplyRecursive(tree)

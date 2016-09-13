@@ -218,11 +218,7 @@ lazy val commonSettings = Seq(
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard"
   )),
-  resolvers ++= Seq(
-    "bintray/non" at "http://dl.bintray.com/non/maven",
-    Resolver.sonatypeRepo("snapshots")
-  ),
-  libraryDependencies += "org.typelevel" %%% "machinist" % "0.4.1",
+  libraryDependencies += "org.typelevel" %%% "machinist" % "0.5.0",
   libraryDependencies += "org.typelevel" %%% "algebra" % "0.5.2-SNAPSHOT"
 ) ++ scalaMacroDependencies ++ warnUnusedImport
 
