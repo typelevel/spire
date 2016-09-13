@@ -3,9 +3,7 @@ package math
 
 import spire.algebra.Bool
 
-// TODO: restore specialization :/
-//trait BitString[@sp(Byte, Short, Int, Long) A] extends Any with Bool[A] {
-trait BitString[A] extends Any with Bool[A] {
+trait BitString[@sp(Byte, Short, Int, Long) A] extends Any with Bool[A] {
   def signed: Boolean
   def width: Int
   def toHexString(n: A): String
