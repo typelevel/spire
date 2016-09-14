@@ -14,7 +14,7 @@ import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
-import interval._
+import interval.Overlap._
 
 import org.scalacheck._
 import Gen._
@@ -543,9 +543,9 @@ class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPr
     }
   }
 
-  property("x overlap x = Equals(x, x)") {
+  property("x overlap x = Equal(x, x)") {
     forAll() { x: Interval[Rational] =>
-      x.overlap(x) shouldBe Equals(x, x)
+      x.overlap(x) shouldBe Equal[Rational]()
     }
   }
 
@@ -564,59 +564,59 @@ class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPr
     }
   }
 
-  property("(-inf, a] overlap [a, +inf) = LessAndOverlaps") {
+  property("(-inf, a] overlap [a, +inf) = PartialOverlap") {
     forAll() { (x: Rational) =>
-      Interval.atOrBelow(x).overlap(Interval.atOrAbove(x)) shouldBe a[LessAndOverlaps[_]]
+      Interval.atOrBelow(x).overlap(Interval.atOrAbove(x)) shouldBe a[PartialOverlap[_]]
     }
   }
 
-  property("[a, c) overlap (b, d] = LessAndOverlaps if a < b < c < d") {
+  property("[a, c) overlap (b, d] = PartialOverlap if a < b < c < d") {
     forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
 
       import spire.algebra.Order.ordering
 
       val sorted = List(x, y, m, n).sorted
       whenever(sorted.distinct == sorted) {
-        Interval.openUpper(sorted(0), sorted(2)).overlap(Interval.openLower(sorted(1), sorted(3))).isLessAndOverlaps shouldBe true
+        Interval.openUpper(sorted(0), sorted(2)).overlap(Interval.openLower(sorted(1), sorted(3))) shouldBe a[PartialOverlap[_]]
       }
     }
   }
 
-  property("[a, c] overlap [b, d] = LessAndOverlaps if a < b <= c < d") {
+  property("[a, c] overlap [b, d] = PartialOverlap if a < b <= c < d") {
     forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
 
       import spire.algebra.Order.ordering
 
       val sorted = List(x, y, m, n).sorted
       whenever(sorted.distinct.size >= 3 && sorted(0) != sorted(1)) {
-        Interval.closed(sorted(0), sorted(2)).overlap(Interval.closed(sorted(1), sorted(3))).isLessAndOverlaps shouldBe true
+        Interval.closed(sorted(0), sorted(2)).overlap(Interval.closed(sorted(1), sorted(3))) shouldBe a[PartialOverlap[_]]
       }
     }
   }
 
-  property("(-inf, a) overlap (b, +inf) = LessAndOverlaps if a > b") {
+  property("(-inf, a) overlap (b, +inf) = PartialOverlap if a > b") {
     forAll() { (x: Rational, y: Rational) =>
       whenever(x != y) {
-        Interval.below(max(x, y)).overlap(Interval.above(min(x, y))).isLessAndOverlaps shouldBe true
+        Interval.below(max(x, y)).overlap(Interval.above(min(x, y))) shouldBe a[PartialOverlap[_]]
       }
     }
   }
 
-  property("(-inf, a) overlap (b, +inf) = StrictlyLess if a <= b") {
+  property("(-inf, a) overlap (b, +inf) = Disjoint if a <= b") {
     forAll() { (x: Rational, y: Rational) =>
-      Interval.below(min(x, y)).overlap(Interval.above(max(x, y))).isStrictlyLess shouldBe true
+      Interval.below(min(x, y)).overlap(Interval.above(max(x, y))).isDisjoint shouldBe true
     }
   }
 
-  property("StrictlyLess((-inf, a), (b, +inf)).join = [a, b]") {
+  property("Disjoint((-inf, a), (b, +inf)).join = [a, b]") {
     forAll() { (x: Rational, y: Rational) =>
       val l = min(x, y)
       val u = max(x, y)
-      StrictlyLess(Interval.below(l), Interval.above(u)).join shouldBe Interval.closed(l, u)
+      Disjoint(Interval.below(l), Interval.above(u)).join shouldBe Interval.closed(l, u)
     }
   }
 
-  property("[a, b) overlap (c, d] = StrictlyLess if a < b <= c < d") {
+  property("[a, b) overlap (c, d] = Disjoint if a < b <= c < d") {
     forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
 
       import spire.algebra.Order.ordering
@@ -624,13 +624,13 @@ class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPr
       val sorted = List(x, y, m, n).sorted
       whenever(sorted(0) < sorted(1) && sorted(2) < sorted(3)) {
         val overlap = Interval.openUpper(sorted(0), sorted(1)).overlap(Interval.openLower(sorted(2), sorted(3)))
-        overlap.isStrictlyLess shouldBe true
-        overlap.asInstanceOf[StrictlyLess[Rational]].join shouldBe Interval.closed(sorted(1), sorted(2))
+        overlap.isDisjoint shouldBe true
+        overlap.asInstanceOf[Disjoint[Rational]].join shouldBe Interval.closed(sorted(1), sorted(2))
       }
     }
   }
 
-  property("[a, b] overlap [c, d] = StrictlyLess if a <= b < c <= d") {
+  property("[a, b] overlap [c, d] = Disjoint if a <= b < c <= d") {
     forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
 
       import spire.algebra.Order.ordering
@@ -638,15 +638,15 @@ class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPr
       val sorted = List(x, y, m, n).sorted
       whenever(sorted(1) < sorted(2)) {
         val overlap = Interval.closed(sorted(0), sorted(1)).overlap(Interval.closed(sorted(2), sorted(3)))
-        overlap.isStrictlyLess shouldBe true
-        overlap.asInstanceOf[StrictlyLess[Rational]].join shouldBe Interval.open(sorted(1), sorted(2))
+        overlap.isDisjoint shouldBe true
+        overlap.asInstanceOf[Disjoint[Rational]].join shouldBe Interval.open(sorted(1), sorted(2))
       }
     }
   }
 
-  property("x overlap [a] is never a LessAndOverlaps") {
+  property("x overlap [a] is never a PartialOverlap") {
     forAll() { (x: Interval[Rational], b: Rational) =>
-      x.overlap(Interval.point(b)).isLessAndOverlaps shouldNot be(true)
+      x.overlap(Interval.point(b)) should not be a[PartialOverlap[_]]
     }
   }
 }

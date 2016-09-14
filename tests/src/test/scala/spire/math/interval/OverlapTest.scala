@@ -4,6 +4,7 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{Matchers, PropSpec}
 import spire.laws.arb._
 import spire.math.{Interval, Rational}
+import spire.math.interval.Overlap._
 import spire.syntax.eq._
 
 class OverlapTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
@@ -15,14 +16,13 @@ class OverlapTest extends PropSpec with Matchers with GeneratorDrivenPropertyChe
 
         val eq = Eq[Overlap[Rational]]
 
-        eq.eqv(Equals(x, y), Equals(x, y)) shouldBe true
-        eq.eqv(Equals(x, y), Equals(y, x)) shouldBe false
+        eq.eqv(Equal(), Equal()) shouldBe true
 
-        eq.eqv(StrictlyLess(x, y), StrictlyLess(x, y)) shouldBe true
-        eq.eqv(StrictlyLess(x, y), StrictlyLess(y, x)) shouldBe false
+        eq.eqv(Disjoint(x, y), Disjoint(x, y)) shouldBe true
+        eq.eqv(Disjoint(x, y), Disjoint(y, x)) shouldBe false
 
-        eq.eqv(LessAndOverlaps(x, y), LessAndOverlaps(x, y)) shouldBe true
-        eq.eqv(LessAndOverlaps(x, y), LessAndOverlaps(y, x)) shouldBe false
+        eq.eqv(PartialOverlap(x, y), PartialOverlap(x, y)) shouldBe true
+        eq.eqv(PartialOverlap(x, y), PartialOverlap(y, x)) shouldBe false
 
         eq.eqv(Subset(x, y), Subset(x, y)) shouldBe true
         eq.eqv(Subset(x, y), Subset(y, x)) shouldBe false

@@ -7,6 +7,7 @@ import spire.algebra._
 import spire.math.poly.Term
 import spire.math.interval._
 import spire.math.interval.Bound._
+import spire.math.interval.Overlap._
 import spire.syntax.field._
 import spire.syntax.nroot._
 import spire.syntax.order._
@@ -771,28 +772,30 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
   /**
     * Result of overlapping this interval with another one.
     * Can be one of the following:
-    * - [[spire.math.interval.Equals]] if intervals are equal
-    * - [[spire.math.interval.StrictlyLess]] if intervals are notEmpty don't intersect
-    * - [[spire.math.interval.LessAndOverlaps]] if intervals intersect and neither is a subset of another
-    * - [[spire.math.interval.Subset]] if one interval (possibly empty) is a subset of another
+    * - [[Equal]] if intervals are equal
+    * - [[Disjoint]] if intervals are notEmpty don't intersect
+    * - [[PartialOverlap]] if intervals intersect and neither is a subset of another
+    * - [[Subset]] if one interval (possibly empty) is a subset of another
     *
-    * Note that lhs and rhs can be switched places in any result, except [[spire.math.interval.Equals]].
+    * Except for [[Equal]], both original intervals are bound to respective result fields,
+    * allowing to determine exact overlap type.
+    *
     * For example (pseudo-code):
     * {
-    * val lhs = [5, 6]
-    * val rhs = (0, 1)
+    * val a = [5, 6]
+    * val b = (0, 1)
     *
-    * // this returns StrictlyLess(rhs, lhs). Note that lhs and rhs switched places in compare to the overlap call
-    * lhs.overlap(rhs)
+    * // this returns Disjoint(b, a). Note a and b placement here, it means that b is strictly less then a.
+    * a.overlap(b)
     * }
     */
   def overlap(rhs: Interval[A]): Overlap[A] = {
 
     def lessAndOverlaps(intersectionLowerBound: Bound[A]): Overlap[A] =
-      if (lhs.lowerBound === intersectionLowerBound) LessAndOverlaps(lhs, rhs) else LessAndOverlaps(rhs, lhs)
+      if (lhs.lowerBound === intersectionLowerBound) PartialOverlap(lhs, rhs) else PartialOverlap(rhs, lhs)
 
     if (lhs === rhs) {
-      Equals(lhs, rhs)
+      Equal()
     } else {
       (lhs, rhs) match {
         case (sub, sup) if sup.isSupersetOf(sub) => Subset(sub, sup)
@@ -802,8 +805,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
           case i: Bounded[A] => lessAndOverlaps(i.lowerBound)
           case i: Point[A] => lessAndOverlaps(i.lowerBound)
           case Empty() =>
-            if (Interval.fromBounds(lhs.lowerBound, rhs.upperBound).isEmpty) StrictlyLess(rhs, lhs)
-            else StrictlyLess(lhs, rhs)
+            if (Interval.fromBounds(lhs.lowerBound, rhs.upperBound).isEmpty) Disjoint(rhs, lhs)
+            else Disjoint(lhs, rhs)
           case _ => throw new Exception("impossible")
         }
       }
