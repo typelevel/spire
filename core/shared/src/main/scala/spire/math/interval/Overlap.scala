@@ -62,8 +62,6 @@ case class LessAndOverlaps[A: Order] private[spire](lhs: Interval[A], rhs: Inter
   */
 case class Subset[A: Order] private[spire](lhs: Interval[A], rhs: Interval[A]) extends Intersects[A] {
   def isLessAndOverlaps: Boolean = false
-  def isGreater: Boolean = false
-  def isSuperset: Boolean = false
   def isSubset: Boolean = true
   def isEqual: Boolean = false
   def difference: List[Interval[A]] = rhs -- lhs
