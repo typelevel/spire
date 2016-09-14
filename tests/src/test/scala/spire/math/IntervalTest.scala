@@ -588,7 +588,7 @@ class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPr
       import spire.algebra.Order.ordering
 
       val sorted = List(x, y, m, n).sorted
-      whenever(sorted.distinct.size >= 3 && sorted(0) != sorted(1)) {
+      whenever(sorted.distinct.size >= 3 && sorted(0) != sorted(1) && sorted(2) != sorted(3)) {
         Interval.closed(sorted(0), sorted(2)).overlap(Interval.closed(sorted(1), sorted(3))) shouldBe a[PartialOverlap[_]]
       }
     }
