@@ -1,13 +1,13 @@
 package spire.math.interval
 
-import spire.algebra.{Eq, Order}
+import spire.algebra.Eq
 import spire.math.Interval
 import spire.math.interval.Overlap.{Disjoint, Equal, Subset}
 
 /**
   * An ADT that represents overlapping result for any two intervals.
   */
-sealed abstract class Overlap[A: Order] extends Serializable {
+sealed abstract class Overlap[A] extends Product with Serializable {
   def isDisjoint: Boolean = this.isInstanceOf[Disjoint[_]]
   def isSubset: Boolean = this match {
     case Subset(_, _) | Equal() => true
@@ -21,7 +21,7 @@ object Overlap {
     * Intervals are nonEmpty and don't intersect
     * [[lower.upperBound]] is strictly less than [[upper.lowerBound]].
     */
-  case class Disjoint[A: Order] private[spire](lower: Interval[A], upper: Interval[A]) extends Overlap[A] {
+  case class Disjoint[A] private[spire](lower: Interval[A], upper: Interval[A]) extends Overlap[A] {
 
     /**
       * An interval that joins [[lower]] and [[upper]] in a continuous interval without intersecting any of them.
@@ -35,7 +35,7 @@ object Overlap {
     * [[upper]] ∋ [[lower.upperBound]] && [[upper]] ∌ [[lower.lowerBound]]
     * For example: (-2, 10] and [5, 13)
     */
-  case class PartialOverlap[A: Order] private[spire](lower: Interval[A], upper: Interval[A]) extends Overlap[A]
+  case class PartialOverlap[A] private[spire](lower: Interval[A], upper: Interval[A]) extends Overlap[A]
 
   /**
     * [[inner]] is a subset of [[outer]].
@@ -44,12 +44,12 @@ object Overlap {
     *
     * For example [1,4) and [1, 5]
     */
-  case class Subset[A: Order] private[spire](inner: Interval[A], outer: Interval[A]) extends Overlap[A]
+  case class Subset[A] private[spire](inner: Interval[A], outer: Interval[A]) extends Overlap[A]
 
   /**
     * Intervals are equal
     */
-  case class Equal[A: Order] private[spire]() extends Overlap[A]
+  case class Equal[A] private[spire]() extends Overlap[A]
 
 
   implicit def eqInstance[A: Eq]: Eq[Overlap[A]] = new Eq[Overlap[A]] {
