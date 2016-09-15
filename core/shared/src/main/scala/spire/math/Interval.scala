@@ -7,7 +7,6 @@ import spire.algebra._
 import spire.math.poly.Term
 import spire.math.interval._
 import spire.math.interval.Bound._
-import spire.math.interval.Overlap._
 import spire.syntax.field._
 import spire.syntax.nroot._
 import spire.syntax.order._
@@ -789,29 +788,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
     * a.overlap(b)
     * }
     */
-  def overlap(rhs: Interval[A]): Overlap[A] = {
-
-    def lessAndOverlaps(intersectionLowerBound: Bound[A]): Overlap[A] =
-      if (lhs.lowerBound === intersectionLowerBound) PartialOverlap(lhs, rhs) else PartialOverlap(rhs, lhs)
-
-    if (lhs === rhs) {
-      Equal()
-    } else {
-      (lhs, rhs) match {
-        case (sub, sup) if sup.isSupersetOf(sub) => Subset(sub, sup)
-        case (sup, sub) if sup.isSupersetOf(sub) => Subset(sub, sup)
-        // only possible cases left are disjoint (empty intersection) or partial overlap
-        case _ => lhs.intersect(rhs) match {
-          case i: Bounded[A] => lessAndOverlaps(i.lowerBound)
-          case i: Point[A] => lessAndOverlaps(i.lowerBound)
-          case Empty() =>
-            if (Interval.fromBounds(lhs.lowerBound, rhs.upperBound).isEmpty) Disjoint(rhs, lhs)
-            else Disjoint(lhs, rhs)
-          case _ => throw new Exception("impossible")
-        }
-      }
-    }
-  }
+  def overlap(rhs: Interval[A]): Overlap[A] = Overlap(lhs, rhs)
 }
 
 case class All[A: Order] private[spire] () extends Interval[A] {
