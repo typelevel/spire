@@ -68,14 +68,14 @@ package object algebra {
 
     def apply[A](g: Group[A]): AdditiveGroup[A] = new AdditiveGroup[A] {
       def plus(x: A, y: A): A = g.combine(x, y)
-      override def minus(x: A, y: A): A = g.combine(x, g.inverse(y))
+      override def minus(x: A, y: A): A = g.remove(x, y)
       def zero: A = g.empty
       def negate(x: A): A = g.inverse(x)
     }
 
     def apply[A](g: AbGroup[A]): AdditiveAbGroup[A] = new AdditiveAbGroup[A] {
       def plus(x: A, y: A): A = g.combine(x, y)
-      override def minus(x: A, y: A): A = g.combine(x, g.inverse(y))
+      override def minus(x: A, y: A): A = g.remove(x, y)
       def zero: A = g.empty
       def negate(x: A): A = g.inverse(x)
     }
@@ -120,14 +120,14 @@ package object algebra {
 
     def apply[A](g: Group[A]): MultiplicativeGroup[A] = new MultiplicativeGroup[A] {
       def times(x: A, y: A): A = g.combine(x, y)
-      def div(x: A, y: A): A = g.combine(x, g.inverse(y))
+      def div(x: A, y: A): A = g.remove(x, y)
       def one: A = g.empty
       override def reciprocal(x: A): A = g.inverse(x)
     }
 
     def apply[A](g: AbGroup[A]): MultiplicativeAbGroup[A] = new MultiplicativeAbGroup[A] {
       def times(x: A, y: A): A = g.combine(x, y)
-      def div(x: A, y: A): A = g.combine(x, g.inverse(y))
+      def div(x: A, y: A): A = g.remove(x, y)
       def one: A = g.empty
       override def reciprocal(x: A): A = g.inverse(x)
     }

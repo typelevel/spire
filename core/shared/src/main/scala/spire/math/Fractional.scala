@@ -18,9 +18,14 @@ object Fractional {
 }
 
 @SerialVersionUID(0L)
-private[math] class FloatIsFractional extends Fractional[Float] with FloatIsField
-with FloatIsNRoot with ConvertableFromFloat with ConvertableToFloat
-with FloatIsReal with Serializable {
+private[math] class FloatIsFractional extends Fractional[Float]
+    with FloatIsField
+    with FloatIsGcd
+    with FloatIsNRoot
+    with ConvertableFromFloat
+    with ConvertableToFloat
+    with FloatIsReal
+    with Serializable {
   override def fromInt(n: Int): Float = n
   override def fromDouble(n: Double): Float = n.toFloat
   override def toDouble(n: Float): Double = n.toDouble
@@ -30,9 +35,14 @@ with FloatIsReal with Serializable {
 }
 
 @SerialVersionUID(0L)
-private[math] class DoubleIsFractional extends Fractional[Double] with DoubleIsField
-with DoubleIsNRoot with ConvertableFromDouble with ConvertableToDouble
-with DoubleIsReal with Serializable {
+private[math] class DoubleIsFractional extends Fractional[Double]
+    with DoubleIsField
+    with DoubleIsGcd
+    with DoubleIsNRoot
+    with ConvertableFromDouble
+    with ConvertableToDouble
+    with DoubleIsReal
+    with Serializable {
   override def fromInt(n: Int): Double = n
   override def fromDouble(n: Double): Double = n
   override def toDouble(n: Double): Double = n.toDouble
@@ -56,9 +66,12 @@ with BigDecimalIsReal with Serializable {
 @SerialVersionUID(1L)
 private[math] class RationalIsFractional extends Fractional[Rational]
     with RationalIsField
+    with RationalIsGcd
     with RationalApproximateNRoot
-    with ConvertableFromRational with ConvertableToRational
-    with RationalIsReal with Serializable {
+    with ConvertableFromRational
+    with ConvertableToRational
+    with RationalIsReal
+    with Serializable {
 
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
@@ -69,9 +82,14 @@ private[math] class RationalIsFractional extends Fractional[Rational]
 }
 
 @SerialVersionUID(1L)
-private[math] class AlgebraicIsFractional extends Fractional[Algebraic] with AlgebraicIsFieldWithNRoot
-with ConvertableFromAlgebraic with ConvertableToAlgebraic
-with AlgebraicIsReal with Serializable {
+private[math] class AlgebraicIsFractional extends Fractional[Algebraic]
+    with AlgebraicIsField
+    with AlgebraicIsGcd
+    with AlgebraicIsNRoot
+    with ConvertableFromAlgebraic
+    with ConvertableToAlgebraic
+    with AlgebraicIsReal
+    with Serializable {
   override def fromInt(n: Int): Algebraic = Algebraic(n)
   override def fromDouble(n: Double): Algebraic = Algebraic(n)
   override def toDouble(n: Algebraic): Double = n.toDouble
@@ -80,9 +98,15 @@ with AlgebraicIsReal with Serializable {
 }
 
 @SerialVersionUID(0L)
-private[math] class NumberIsFractional extends Fractional[Number] with NumberIsField
-with NumberIsNRoot with ConvertableFromNumber with ConvertableToNumber
-with NumberIsReal with Serializable {
+private[math] class NumberIsFractional
+    extends Fractional[Number]
+    with NumberIsField
+    with NumberIsGcd
+    with NumberIsNRoot
+    with ConvertableFromNumber
+    with ConvertableToNumber
+    with NumberIsReal
+    with Serializable {
   override def fromInt(n: Int): Number = Number(n)
   override def fromDouble(n: Double): Number = Number(n)
   override def toDouble(n: Number): Double = n.toDouble

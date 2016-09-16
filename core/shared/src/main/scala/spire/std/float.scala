@@ -1,7 +1,7 @@
 package spire
 package std
 
-import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
+import spire.algebra.{Field, Gcd, IsRational, NRoot, Order, Signed, Trig}
 import spire.math.Rational
 
 import java.lang.Math
@@ -20,12 +20,18 @@ trait FloatIsField extends Field[Float] {
 
   override def fromInt(n: Int): Float = n
 
+  def div(a:Float, b:Float): Float = a / b
   def quot(a:Float, b:Float): Float = (a - (a % b)) / b
   def mod(a:Float, b:Float): Float = a % b
 
+  override def fromDouble(n: Double): Float = n.toFloat
+}
+
+trait FloatIsGcd extends Gcd[Float] {
+
   def lcm(a:Float, b:Float):Float = (a / gcd(a, b)) * b
 
-  final def gcd(a:Float, b:Float):Float = {
+  def gcd(a:Float, b:Float):Float = {
     def value(bits: Int): Int = bits & 0x007FFFFF | 0x00800000
 
     def exp(bits: Int): Int = ((bits >> 23) & 0xFF).toInt
@@ -65,9 +71,6 @@ trait FloatIsField extends Field[Float] {
     }
   }
 
-  override def fromDouble(n: Double): Float = n.toFloat
-
-  def div(a:Float, b:Float): Float = a / b
 }
 
 trait FloatIsNRoot extends NRoot[Float] {
@@ -129,7 +132,13 @@ trait FloatIsReal extends IsRational[Float] with FloatOrder with FloatIsSigned {
 }
 
 @SerialVersionUID(0L)
-class FloatAlgebra extends FloatIsField with FloatIsNRoot with FloatIsTrig with FloatIsReal with Serializable
+class FloatAlgebra
+    extends FloatIsField
+    with FloatIsGcd
+    with FloatIsNRoot
+    with FloatIsTrig
+    with FloatIsReal
+    with Serializable
 
 trait FloatInstances {
   implicit final val FloatAlgebra = new FloatAlgebra

@@ -28,6 +28,11 @@ class GCDTest extends FunSuite with Checkers {
     d <- arbitrary[Long] if d != 0
   } yield Rational(n, d))
 
+  def testEuclideanGcd[A: EuclideanRing: IsReal: NumberTag](x: A, y: A): Boolean = {
+    implicit val gcd = Gcd.fromEuclideanRing[A]
+    testGcd(x, y)
+  }
+
   def testGcd[A: EuclideanRing: Gcd: IsReal: NumberTag](x: A, y: A): Boolean = {
     (x == Ring[A].zero || y == Ring[A].zero) || {
       val den = x gcd y
@@ -45,7 +50,7 @@ class GCDTest extends FunSuite with Checkers {
   test("GCD of floats with 0 exponent in result is correct") {
     val x = -1.586002E-34f
     val y = 3.3793717E-7f
-    val d = spire.math.gcd(x, y)
+    val d = spire.math.gcd(x, y)(Gcd.fromEuclideanRing)
     assert((x / d).isWhole === true)
     assert((y / d).isWhole === true)
     assert(spire.math.gcd(x / d, y / d) === 1f)

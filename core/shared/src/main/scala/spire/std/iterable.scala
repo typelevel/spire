@@ -11,6 +11,12 @@ final class IterableMonoid[A, SA <: TraversableLike[A, SA]](implicit cbf: CanBui
 extends Monoid[SA] with Serializable {
   def empty: SA = cbf().result()
   def combine(x: SA, y: SA): SA = x.++(y)(cbf)
+
+  override def combineAll(xs: TraversableOnce[SA]): SA = {
+    val b = cbf()
+    xs.foreach(b ++= _)
+    b.result()
+  }
 }
 
 trait IterableInstances {

@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
 
 import spire.Platform
-import spire.algebra.{Eq, Field, Gcd, IsAlgebraic, NRoot, Order, Sign}
+import spire.algebra.{Eq, EuclideanRing, Field, Gcd, IsAlgebraic, NRoot, Order, Sign}
 import spire.macros.Checked.checked
 import spire.math.poly.{ Term, BigDecimalRootRefinement, RootFinder, Roots }
 import spire.std.bigInt._
@@ -1526,7 +1526,7 @@ trait AlgebraicInstances {
   implicit final val AlgebraicTag = new LargeTag[Algebraic](Exact, Algebraic(0))
 }
 
-private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoot[Algebraic] with Gcd[Algebraic] {
+private[math] trait AlgebraicIsField extends Field[Algebraic] {
   def zero: Algebraic = Algebraic.Zero
   def one: Algebraic = Algebraic.One
   def plus(a: Algebraic, b: Algebraic): Algebraic = a + b
@@ -1536,13 +1536,20 @@ private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoo
   override def times(a: Algebraic, b: Algebraic): Algebraic = a * b
   def quot(a: Algebraic, b: Algebraic): Algebraic = a /~ b
   def mod(a: Algebraic, b: Algebraic): Algebraic = a % b
-  def gcd(a: Algebraic, b: Algebraic): Algebraic = euclid(a, b)(Eq[Algebraic], this)
-  def lcm(a: Algebraic, b: Algebraic): Algebraic = (a / gcd(a, b)) * b
   def div(a:Algebraic, b:Algebraic): Algebraic = a / b
   def nroot(a: Algebraic, k: Int): Algebraic = a nroot k
   def fpow(a:Algebraic, b:Algebraic): Algebraic = throw new UnsupportedOperationException("unsupported operation")
   override def fromInt(n: Int): Algebraic = Algebraic(n)
   override def fromDouble(n: Double): Algebraic = Algebraic(n)
+}
+
+private[math] trait AlgebraicIsGcd extends Gcd[Algebraic] {
+  def gcd(a: Algebraic, b: Algebraic): Algebraic =
+    Gcd.euclid(a, b)(Eq[Algebraic], EuclideanRing[Algebraic])
+  def lcm(a: Algebraic, b: Algebraic): Algebraic =
+    (a / gcd(a, b)) * b
+}
+private[math] trait AlgebraicIsNRoot extends NRoot[Algebraic] {
 }
 
 private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
@@ -1561,4 +1568,9 @@ private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
 }
 
 @SerialVersionUID(1L)
-class AlgebraicAlgebra extends AlgebraicIsFieldWithNRoot with AlgebraicIsReal with Serializable
+class AlgebraicAlgebra
+    extends AlgebraicIsField
+    with AlgebraicIsGcd
+    with AlgebraicIsNRoot
+    with AlgebraicIsReal
+    with Serializable

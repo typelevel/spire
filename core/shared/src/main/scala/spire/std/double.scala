@@ -1,7 +1,7 @@
 package spire
 package std
 
-import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
+import spire.algebra.{Field, Gcd, IsRational, NRoot, Order, Signed, Trig}
 import spire.math.Rational
 
 import java.lang.Math
@@ -23,9 +23,14 @@ trait DoubleIsField extends Field[Double] {
   def quot(a:Double, b:Double): Double = (a - (a % b)) / b
   def mod(a:Double, b:Double): Double = a % b
 
+  override def fromDouble(n: Double): Double = n
+  def div(a:Double, b:Double): Double = a / b
+}
+
+trait DoubleIsGcd extends Gcd[Double] {
   def lcm(a:Double, b:Double):Double = (a / gcd(a, b)) * b
 
-  final def gcd(a:Double, b:Double):Double = {
+  def gcd(a:Double, b:Double):Double = {
     def value(bits: Long): Long = bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L
 
     def exp(bits: Long): Int = ((bits >> 52) & 0x7FF).toInt
@@ -64,9 +69,6 @@ trait DoubleIsField extends Field[Double] {
       else gcd0(bVal, bExp, aVal, aExp)
     }
   }
-
-  override def fromDouble(n: Double): Double = n
-  def div(a:Double, b:Double): Double = a / b
 }
 
 trait DoubleIsNRoot extends NRoot[Double] {
@@ -128,7 +130,7 @@ trait DoubleIsReal extends IsRational[Double] with DoubleOrder with DoubleIsSign
 }
 
 @SerialVersionUID(0L)
-class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable
+class DoubleAlgebra extends DoubleIsField with DoubleIsGcd with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable
 
 trait DoubleInstances {
   implicit final val DoubleAlgebra = new DoubleAlgebra

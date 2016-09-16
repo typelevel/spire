@@ -13,11 +13,17 @@ import spire.std._
  * 6. Start to worry about things like e.g. pow(BigInt, BigInt)
  */
 
-trait Numeric[@sp(Int,Long,Float,Double) A] extends Any with Ring[A]
-with AdditiveAbGroup[A] with MultiplicativeAbGroup[A] with NRoot[A]
-with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A]
+trait Numeric[@sp(Int,Long,Float,Double) A] extends Any
+    with Ring[A]
+    with AdditiveAbGroup[A]
+    with MultiplicativeAbGroup[A]
+    with NRoot[A]
+    with ConvertableFrom[A]
+    with ConvertableTo[A]
+    with IsReal[A]
 
 object Numeric {
+
   implicit final val ByteIsNumeric: Numeric[Byte] = new ByteIsNumeric
   implicit final val ShortIsNumeric: Numeric[Short] = new ShortIsNumeric
   implicit final val IntIsNumeric: Numeric[Int] = new IntIsNumeric
@@ -36,8 +42,13 @@ object Numeric {
 }
 
 @SerialVersionUID(0L)
-private[math] class ByteIsNumeric extends Numeric[Byte] with ByteIsEuclideanRing with ByteIsNRoot
-with ConvertableFromByte with ConvertableToByte with ByteIsReal with Serializable {
+private[math] class ByteIsNumeric extends Numeric[Byte]
+    with ByteIsEuclideanRing
+    with ByteIsNRoot
+    with ConvertableFromByte
+    with ConvertableToByte
+    with ByteIsReal
+    with Serializable {
   override def fromInt(n: Int): Byte = n.toByte
   override def fromDouble(n: Double): Byte = n.toByte
   override def toDouble(n: Byte): Double = n.toDouble
@@ -49,8 +60,13 @@ with ConvertableFromByte with ConvertableToByte with ByteIsReal with Serializabl
 }
 
 @SerialVersionUID(0L)
-private[math] class ShortIsNumeric extends Numeric[Short] with ShortIsEuclideanRing with ShortIsNRoot
-with ConvertableFromShort with ConvertableToShort with ShortIsReal with Serializable {
+private[math] class ShortIsNumeric extends Numeric[Short]
+    with ShortIsEuclideanRing
+    with ShortIsNRoot
+    with ConvertableFromShort
+    with ConvertableToShort
+    with ShortIsReal
+    with Serializable {
   override def fromInt(n: Int): Short = n.toShort
   override def fromDouble(n: Double): Short = n.toShort
   override def toDouble(n: Short): Double = n.toDouble
@@ -62,8 +78,13 @@ with ConvertableFromShort with ConvertableToShort with ShortIsReal with Serializ
 }
 
 @SerialVersionUID(0L)
-private[math] class IntIsNumeric extends Numeric[Int] with IntIsEuclideanRing with IntIsNRoot
-with ConvertableFromInt with ConvertableToInt with IntIsReal with Serializable {
+private[math] class IntIsNumeric extends Numeric[Int]
+    with IntIsEuclideanRing
+    with IntIsNRoot
+    with ConvertableFromInt
+    with ConvertableToInt
+    with IntIsReal
+    with Serializable {
   override def fromInt(n: Int): Int = n
   override def fromDouble(n: Double): Int = n.toInt
   override def toDouble(n: Int): Double = n.toDouble
@@ -75,8 +96,13 @@ with ConvertableFromInt with ConvertableToInt with IntIsReal with Serializable {
 }
 
 @SerialVersionUID(0L)
-private[math] class LongIsNumeric extends Numeric[Long] with LongIsEuclideanRing with LongIsNRoot
-with ConvertableFromLong with ConvertableToLong with LongIsReal with Serializable {
+private[math] class LongIsNumeric extends Numeric[Long]
+    with LongIsEuclideanRing
+    with LongIsNRoot
+    with ConvertableFromLong
+    with ConvertableToLong
+    with LongIsReal
+    with Serializable {
   override def fromInt(n: Int): Long = n
   override def fromDouble(n: Double): Long = n.toLong
   override def toDouble(n: Long): Double = n.toDouble
@@ -88,9 +114,13 @@ with ConvertableFromLong with ConvertableToLong with LongIsReal with Serializabl
 }
 
 @SerialVersionUID(0L)
-private[math] class BigIntIsNumeric extends Numeric[BigInt] with BigIntIsEuclideanRing
-with BigIntIsNRoot with ConvertableFromBigInt with ConvertableToBigInt
-with BigIntIsReal with Serializable {
+private[math] class BigIntIsNumeric extends Numeric[BigInt]
+    with BigIntIsEuclideanRing
+    with BigIntIsNRoot
+    with ConvertableFromBigInt
+    with ConvertableToBigInt
+    with BigIntIsReal
+    with Serializable {
   override def fromInt(n: Int): BigInt = BigInt(n)
   override def fromDouble(n: Double): BigInt = BigDecimal(n).toBigInt
   override def toDouble(n: BigInt): Double = n.toDouble
@@ -102,9 +132,13 @@ with BigIntIsReal with Serializable {
 }
 
 @SerialVersionUID(0L)
-private[math] class FloatIsNumeric extends Numeric[Float] with FloatIsField
-with FloatIsNRoot with ConvertableFromFloat with ConvertableToFloat
-with FloatIsReal with Serializable {
+private[math] class FloatIsNumeric extends Numeric[Float]
+    with FloatIsField
+    with FloatIsNRoot
+    with ConvertableFromFloat
+    with ConvertableToFloat
+    with FloatIsReal
+    with Serializable {
   override def fromInt(n: Int): Float = n.toFloat
   override def fromDouble(n: Double): Float = n.toFloat
   override def toDouble(n: Float): Double = n.toDouble
@@ -114,9 +148,13 @@ with FloatIsReal with Serializable {
 }
 
 @SerialVersionUID(0L)
-private[math] class DoubleIsNumeric extends Numeric[Double] with DoubleIsField
-with DoubleIsNRoot with ConvertableFromDouble with ConvertableToDouble
-with DoubleIsReal with Serializable {
+private[math] class DoubleIsNumeric extends Numeric[Double]
+    with DoubleIsField
+    with DoubleIsNRoot
+    with ConvertableFromDouble
+    with ConvertableToDouble
+    with DoubleIsReal
+    with Serializable {
   override def fromInt(n: Int): Double = n.toDouble
   override def fromDouble(n: Double): Double = n
   override def toDouble(n: Double): Double = n.toDouble
@@ -126,9 +164,13 @@ with DoubleIsReal with Serializable {
 }
 
 @SerialVersionUID(0L)
-private[math] class BigDecimalIsNumeric extends Numeric[BigDecimal] with BigDecimalIsField
-with BigDecimalIsNRoot with ConvertableFromBigDecimal with ConvertableToBigDecimal
-with BigDecimalIsReal with Serializable {
+private[math] class BigDecimalIsNumeric extends Numeric[BigDecimal]
+    with BigDecimalIsField
+    with BigDecimalIsNRoot
+    with ConvertableFromBigDecimal
+    with ConvertableToBigDecimal
+    with BigDecimalIsReal
+    with Serializable {
   override def fromInt(n: Int): BigDecimal = BigDecimal(n)
   override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
   override def toDouble(n: BigDecimal): Double = n.toDouble
@@ -156,8 +198,14 @@ private[math] class RationalIsNumeric
 }
 
 @SerialVersionUID(1L)
-private[math] class AlgebraicIsNumeric extends Numeric[Algebraic] with AlgebraicIsFieldWithNRoot
-with ConvertableFromAlgebraic with ConvertableToAlgebraic with AlgebraicIsReal with Serializable {
+private[math] class AlgebraicIsNumeric extends Numeric[Algebraic]
+    with AlgebraicIsField
+    with AlgebraicIsGcd
+    with AlgebraicIsNRoot
+    with ConvertableFromAlgebraic
+    with ConvertableToAlgebraic
+    with AlgebraicIsReal
+    with Serializable {
   override def fromInt(n: Int): Algebraic = Algebraic(n)
   override def fromDouble(n: Double): Algebraic = Algebraic(n)
   override def toDouble(n: Algebraic): Double = n.toDouble
@@ -173,12 +221,18 @@ private[math] class RealIsNumeric extends Numeric[Real] with RealIsFractional wi
 }
 
 @SerialVersionUID(0L)
-class ComplexIsNumeric[A](implicit
-    val algebra: Fractional[A], val trig: Trig[A], val order: IsReal[A])
-extends ComplexEq[A] with ComplexIsField[A] with Numeric[Complex[A]]
-with ComplexIsTrig[A] with ComplexIsNRoot[A]
-with ConvertableFromComplex[A] with ConvertableToComplex[A]
-with Order[Complex[A]] with ComplexIsSigned[A] with Serializable {
+class ComplexIsNumeric[A](implicit val algebra: Fractional[A], val trig: Trig[A], val order: IsReal[A])
+    extends ComplexEq[A]
+    with ComplexIsField[A]
+    with Numeric[Complex[A]]
+    with ComplexIsTrig[A]
+    with ComplexIsNRoot[A]
+    with ConvertableFromComplex[A]
+    with ConvertableToComplex[A]
+    with Order[Complex[A]]
+    with ComplexIsSigned[A]
+    with Serializable {
+
   def nroot: NRoot[A] = algebra
 
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)

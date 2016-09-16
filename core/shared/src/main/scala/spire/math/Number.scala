@@ -612,11 +612,14 @@ private[math] trait NumberIsRing extends Ring[Number] {
   override def fromInt(n: Int): Number = Number(n)
 }
 
-private[math] trait NumberIsEuclideanRing extends EuclideanRing[Number] with Gcd[Number] with NumberIsRing {
+private[math] trait NumberIsEuclideanRing extends EuclideanRing[Number] with NumberIsRing {
   def quot(a:Number, b:Number) = a / b
   def mod(a:Number, b:Number) = a % b
   override def quotmod(a:Number, b:Number) = a /% b
-  def gcd(a: Number, b: Number): Number = euclid(a, b)(Eq[Number], this)
+}
+
+private[math] trait NumberIsGcd extends Gcd[Number] {
+  def gcd(a: Number, b: Number): Number = Gcd.euclid(a, b)(Eq[Number], EuclideanRing[Number])
   def lcm(a: Number, b: Number): Number = (a / gcd(a, b)) * b
 }
 
@@ -682,4 +685,10 @@ private[math] trait NumberIsReal extends IsRational[Number] with NumberOrder wit
 }
 
 @SerialVersionUID(0L)
-class NumberAlgebra extends NumberIsField with NumberIsNRoot with NumberIsTrig with NumberIsReal with Serializable
+class NumberAlgebra
+    extends NumberIsField
+    with NumberIsGcd
+    with NumberIsNRoot
+    with NumberIsTrig
+    with NumberIsReal
+    with Serializable

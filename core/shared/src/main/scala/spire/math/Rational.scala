@@ -5,7 +5,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import java.math.{BigDecimal => JBigDecimal, BigInteger, MathContext, RoundingMode}
 
-import spire.algebra.{Field, IsRational, NRoot, Sign}
+import spire.algebra.{Field, Gcd, IsRational, NRoot, Sign}
 import spire.algebra.Sign.{ Positive, Zero, Negative }
 import spire.macros.Checked
 import spire.std.long.LongAlgebra
@@ -836,11 +836,14 @@ private[math] trait RationalIsField extends Field[Rational] {
   def quot(a:Rational, b:Rational): Rational = a /~ b
   def mod(a:Rational, b:Rational): Rational = a % b
   override def quotmod(a:Rational, b:Rational): (Rational, Rational) = a /% b
-  def lcm(a:Rational, b:Rational):Rational = a lcm b
-  def gcd(a:Rational, b:Rational): Rational = a gcd b
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
   def div(a:Rational, b:Rational): Rational = a / b
+}
+
+private[math] trait RationalIsGcd extends Gcd[Rational] {
+  def lcm(a:Rational, b:Rational): Rational = a lcm b
+  def gcd(a:Rational, b:Rational): Rational = a gcd b
 }
 
 private[math] trait RationalIsReal extends IsRational[Rational] {
@@ -865,4 +868,8 @@ private[math] trait RationalIsReal extends IsRational[Rational] {
 }
 
 @SerialVersionUID(1L)
-class RationalAlgebra extends RationalIsField with RationalIsReal with Serializable
+class RationalAlgebra
+    extends RationalIsField
+    with RationalIsReal
+    with RationalIsGcd
+    with Serializable

@@ -53,7 +53,6 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   test("IsReal syntax")(check(forAll { (a: Double) => testIsRealSyntax(a) }))
   test("Semigroup syntax")(check(forAll { (a: String, b: String) => testSemigroupSyntax(a, b) }))
   test("Monoid syntax")(check(forAll { (a: String, b: String) => testMonoidSyntax(a, b) }))
-  //test("Group syntax")(check(forAll { (a: Int, b: Int) => testMonoidSyntax(a, b)(Group.additive[Int]) }))
   test("Group syntax")(check(forAll { (a: Int, b: Int) => testMonoidSyntax(a, b)(AdditiveGroup[Int].additive) }))
   test("AdditiveSemigroup syntax")(check(forAll { (a: Int, b: Int) => testAdditiveSemigroupSyntax(a, b) }))
   test("AdditiveMonoid syntax")(check(forAll { (a: Int, b: Int) => testAdditiveMonoidSyntax(a, b) }))
@@ -275,8 +274,6 @@ trait BaseSyntaxTest {
       ((a / b) == Field[A].div(a, b)) &&
       ((a ** 2) == Ring[A].pow(a, 2)) &&
       ((a pow 2) == Ring[A].pow(a, 2)) &&
-      // ((a gcd b) == Gcd[A].gcd(a, b)) &&
-      // ((a lcm b) == Gcd[A].lcm(a, b)) &&
       ((a + 42) == Ring[A].plus(a, Ring[A].fromInt(42))) &&
       ((42 + a) == Ring[A].plus(Ring[A].fromInt(42), a)) &&
       ((a - 42) == Ring[A].minus(a, Ring[A].fromInt(42))) &&

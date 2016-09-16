@@ -12,7 +12,7 @@ trait IntIsEuclideanRing extends EuclideanRing[Int] with Gcd[Int] {
   def negate(a:Int): Int = -a
   def one: Int = 1
   def plus(a:Int, b:Int): Int = a + b
-  //override def pow(a:Int, b:Int): Int = Math.pow(a, b).toInt //FIXME
+  override def pow(a:Int, b:Int): Int = spire.math.pow(a, b).toInt
   override def times(a:Int, b:Int): Int = a * b
   def zero: Int = 0
 
@@ -74,7 +74,6 @@ class IntIsBitString extends BitString[Int] with Serializable {
   def and(a: Int, b: Int): Int = a & b
   def or(a: Int, b: Int): Int = a | b
   def complement(a: Int): Int = ~a
-  //override def xor(a: Int, b: Int): Int = a ^ b
 
   def signed: Boolean = true
   def width: Int = 32
