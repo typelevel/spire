@@ -8,7 +8,6 @@ import scala.util.Try
 import org.scalatest.FunSuite
 import spire.implicits.{eqOps => _, _}
 import spire.laws.arb.{interval => interval_, rational}
-import spire.random.{Uniform, Dist}
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
@@ -17,7 +16,6 @@ import prop._
 
 import org.scalacheck._
 import Gen._
-import Arbitrary.arbitrary
 
 class IntervalTest extends FunSuite {
   def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)
@@ -160,7 +158,7 @@ class IntervalGeometricPartialOrderTest extends FunSuite {
 class IntervalSubsetPartialOrderTest extends FunSuite {
   import spire.optional.intervalSubsetPartialOrder._
 
-  import Interval.{openUpper, openLower, closed, open, point}
+  import Interval.{closed, point}
 
   test("Minimal and maximal elements of {[1, 3], [3], [2], [1]} by subset partial order") {
     val intervals = Seq(closed(1, 3), point(3), point(2), point(1))
@@ -401,7 +399,6 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
   property("(-inf, a] < [b, inf) if a < b") {
     import spire.optional.intervalGeometricPartialOrder._
 
-    import spire.algebra.{Order, PartialOrder}
     forAll { (a: Rational, w: Positive[Rational]) =>
       val b = a + w.num
       // a < b
@@ -416,7 +413,6 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
 
   property("(-inf, a] does not compare to [b, inf) if a >= b") {
     import spire.optional.intervalGeometricPartialOrder._
-    import spire.algebra.{Order, PartialOrder}
     forAll { (a: Rational, w: NonNegative[Rational]) =>
       val b = a - w.num
       // a >= b
@@ -429,7 +425,6 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
 
   property("(-inf, inf) does not compare with [a, b]") {
     import spire.optional.intervalGeometricPartialOrder._
-    import spire.algebra.{Order, PartialOrder}
     forAll { (a: Rational, b: Rational) =>
       val i = Interval.all[Rational]
       val j = Interval.closed(a, b)

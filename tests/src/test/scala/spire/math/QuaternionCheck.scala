@@ -11,7 +11,6 @@ import prop._
 
 import org.scalacheck._
 import Gen._
-import Arbitrary.arbitrary
 
 class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 

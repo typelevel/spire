@@ -9,8 +9,6 @@ import spire.std.string._
 import spire.syntax.all._
 import spire.tests.{SpireTests, SpireProperties}
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers
 import org.scalatest.prop.Checkers
 
 import org.scalacheck.{Arbitrary, Gen}
@@ -262,7 +260,6 @@ trait BaseSyntaxTest {
   }
 
   def testFieldSyntax[A: Field: Eq](a: A, b: A) = {
-    import spire.syntax.eq._
     import spire.syntax.field._
     ((a + b) == Ring[A].plus(a, b)) &&
       ((a - b) == Ring[A].minus(a, b)) &&

@@ -5,7 +5,6 @@ import org.scalacheck.Properties
 import spire.std.any._
 import spire.syntax.all._
 
-/*
 object IntervalTrieSampleCheck extends Properties("IntervalSet.Sample") {
 
   // this will resolve to the Arbitrary instance for Boolean from scalacheck
@@ -111,4 +110,3 @@ object IntervalTrieSampleCheck extends Properties("IntervalSet.Sample") {
     a.intervalIterator.toIndexedSeq == a.intervals.toIndexedSeq
   }
 }
-*/
