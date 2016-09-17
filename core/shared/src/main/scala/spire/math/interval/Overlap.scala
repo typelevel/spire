@@ -4,6 +4,7 @@ import spire.algebra.{Eq, Order}
 import spire.math.{Bounded, Empty, Interval, Point}
 import spire.math.interval.Overlap.{Disjoint, Equal, Subset}
 import spire.syntax.eq._
+
 /**
   * An ADT that represents overlapping result for any two intervals.
   */
@@ -57,22 +58,17 @@ object Overlap {
     def lessAndOverlaps(intersectionLowerBound: Bound[A]): Overlap[A] =
       if (lhs.lowerBound === intersectionLowerBound) PartialOverlap(lhs, rhs) else PartialOverlap(rhs, lhs)
 
-    if (lhs === rhs) {
-      Equal()
-    } else {
-      (lhs, rhs) match {
-        case (sub, sup) if sup.isSupersetOf(sub) => Subset(sub, sup)
-        case (sup, sub) if sup.isSupersetOf(sub) => Subset(sub, sup)
-        // only possible cases left are disjoint (empty intersection) or partial overlap
-        case _ => lhs.intersect(rhs) match {
-          case i: Bounded[A] => lessAndOverlaps(i.lowerBound)
-          case i: Point[A] => lessAndOverlaps(i.lowerBound)
-          case Empty() =>
-            if (Interval.fromBounds(lhs.lowerBound, rhs.upperBound).isEmpty) Disjoint(rhs, lhs)
-            else Disjoint(lhs, rhs)
-          case _ => throw new Exception("impossible")
-        }
-      }
+    if (lhs === rhs) Equal()
+    else if (rhs.isSupersetOf(lhs)) Subset(lhs, rhs)
+    else if (lhs.isSupersetOf(rhs)) Subset(rhs, lhs)
+    else lhs.intersect(rhs) match {
+      // only possible cases left are disjoint or partial overlap
+      case i: Bounded[A] => lessAndOverlaps(i.lowerBound)
+      case i: Point[A] => lessAndOverlaps(i.lowerBound)
+      case Empty() =>
+        if (Interval.fromBounds(lhs.lowerBound, rhs.upperBound).isEmpty) Disjoint(rhs, lhs)
+        else Disjoint(lhs, rhs)
+      case _ => throw new Exception("impossible")
     }
   }
 
