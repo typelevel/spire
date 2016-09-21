@@ -19,6 +19,13 @@ class AlgebraicTest extends SpireProperties {
     actual should be <= (approx + error)
   }
 
+  property("root isolation failure") {
+    val poly = Polynomial("4x^3 + 2x^2 - 3x - 1")
+    val roots = Algebraic.roots(poly) 
+    // should be -1}, (1 - sqrt(5))/4, (1 + sqrt(5))/4
+    (roots(0) - roots(1)).isZero shouldBe false 
+  }
+
   property("absolute approximation of addition is correct") {
     val sqrt2x100 = Iterator.fill(100)(Algebraic(2).sqrt).reduce(_ + _)
     val dblSqrt2x100 = math.sqrt(2) * 100
