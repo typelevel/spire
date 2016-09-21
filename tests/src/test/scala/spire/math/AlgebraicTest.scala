@@ -129,8 +129,6 @@ class AlgebraicTest extends SpireProperties {
     (trickyZero.toDouble shouldBe 0.0)
   }
 
-/*
-  // this causes frequent test failures. Todo: fix this
   // Generate a bunch of rational roots for a polynomial, then construct a
   // rational polynomial with these roots, and then verify that Algebraic.roots
   // finds all the roots exactly.
@@ -150,7 +148,6 @@ class AlgebraicTest extends SpireProperties {
       }
     }
   }
-  */
 
   // This was a failing test case found using the property tests above.
   property("root isolation uses inverse transform to map upper-bound") {
