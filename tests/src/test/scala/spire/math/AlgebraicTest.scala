@@ -22,7 +22,7 @@ class AlgebraicTest extends SpireProperties {
   property("root isolation failure") {
     val poly = Polynomial("4x^3 + 2x^2 - 3x - 1")
     val roots = Algebraic.roots(poly) 
-    // should be -1}, (1 - sqrt(5))/4, (1 + sqrt(5))/4
+    // should be -1, (1 - sqrt(5))/4, (1 + sqrt(5))/4
     (roots(0) - roots(1)).isZero shouldBe false 
   }
 
