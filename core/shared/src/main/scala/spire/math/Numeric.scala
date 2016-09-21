@@ -167,6 +167,7 @@ private[math] class DoubleIsNumeric extends Numeric[Double]
 private[math] class BigDecimalIsNumeric extends Numeric[BigDecimal]
     with BigDecimalIsField
     with BigDecimalIsNRoot
+    with BigDecimalIsGcd
     with ConvertableFromBigDecimal
     with ConvertableToBigDecimal
     with BigDecimalIsReal

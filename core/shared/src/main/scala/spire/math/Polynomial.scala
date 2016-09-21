@@ -476,13 +476,19 @@ with Ring[Polynomial[C]] {
 }
 
 trait PolynomialEuclideanRing[@sp(Double) C] extends PolynomialRing[C]
-with EuclideanRing[Polynomial[C]] with Gcd[Polynomial[C]] with VectorSpace[Polynomial[C], C] {
+    with EuclideanRing[Polynomial[C]]
+    with VectorSpace[Polynomial[C], C] {
   implicit override val scalar: Field[C]
 
   override def divr(x: Polynomial[C], k: C): Polynomial[C] = x :/ k
   def quot(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = x /~ y
   def mod(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = x % y
   override def quotmod(x: Polynomial[C], y: Polynomial[C]): (Polynomial[C], Polynomial[C]) = x /% y
+}
+
+trait PolynomialEuclideanRingWithGcd[@sp(Double) C] extends PolynomialEuclideanRing[C]
+    with Gcd[Polynomial[C]] {
+  implicit def cgcd: Gcd[C]
 
   final def gcd(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = {
     val result = Gcd.euclid(x, y)(Polynomial.eq, this)
@@ -490,12 +496,13 @@ with EuclideanRing[Polynomial[C]] with Gcd[Polynomial[C]] with VectorSpace[Polyn
       result
     } else {
       // return the gcd of all coefficients when there is no higher degree divisor
-      val g = Gcd.fromEuclideanRing[C]
-      Polynomial.constant(spire.math.gcd(x.coeffsArray ++ y.coeffsArray)(g))
+      val arr = x.coeffsArray ++ y.coeffsArray
+      val coeffs = arr.iterator.filterNot(_.isZero).toVector
+      Polynomial.constant(spire.math.gcd(coeffs)(cgcd))
     }
   }
 
-  def lcm(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = (x /~ gcd(x, y)) * y //FIXME?
+  def lcm(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = (x /~ gcd(x, y)) * y
 }
 
 trait PolynomialEq[@sp(Double) C] extends Eq[Polynomial[C]] {
@@ -542,19 +549,29 @@ trait PolynomialInstances1 extends PolynomialInstances0 {
 trait PolynomialInstances2 extends PolynomialInstances1 {
   implicit def ring[@sp(Double) C: ClassTag: Ring: Eq]: PolynomialRing[C] =
     new PolynomialRing[C] {
-      val scalar = Ring[C]
-      val eq = Eq[C]
-      val ct = implicitly[ClassTag[C]]
+      val scalar: Ring[C] = Ring[C]
+      val eq: Eq[C] = Eq[C]
+      val ct: ClassTag[C] = implicitly[ClassTag[C]]
     }
 }
 
 trait PolynomialInstances3 extends PolynomialInstances2 {
   implicit def euclideanRing[@sp(Double) C: ClassTag: Field: Eq]: PolynomialEuclideanRing[C] =
     new PolynomialEuclideanRing[C] {
-      val scalar = Field[C]
-      val eq = Eq[C]
-      val ct = implicitly[ClassTag[C]]
+      val scalar: Field[C] = Field[C]
+      val eq: Eq[C] = Eq[C]
+      val ct: ClassTag[C] = implicitly[ClassTag[C]]
     }
 }
 
-trait PolynomialInstances extends PolynomialInstances3
+trait PolynomialInstances4 extends PolynomialInstances3 {
+  implicit def euclideanRingWithGcd[@sp(Double) C: ClassTag: Field: Eq: Gcd]: PolynomialEuclideanRingWithGcd[C] =
+    new PolynomialEuclideanRingWithGcd[C] {
+      val scalar: Field[C] = Field[C]
+      val eq: Eq[C] = Eq[C]
+      val ct: ClassTag[C] = implicitly[ClassTag[C]]
+      val cgcd: Gcd[C] = Gcd[C]
+    }
+}
+
+trait PolynomialInstances extends PolynomialInstances4

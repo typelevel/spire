@@ -4,13 +4,12 @@ package std
 import java.lang.Math
 import java.math.MathContext
 
-
 import BigDecimal.RoundingMode.{CEILING, FLOOR, HALF_UP}
 
-import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
+import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig, Gcd}
 import spire.math.Rational
 
-trait BigDecimalIsField extends Field[BigDecimal] {
+trait BigDecimalIsField extends Field[BigDecimal] with Gcd[BigDecimal] {
   override def minus(a: BigDecimal, b: BigDecimal): BigDecimal = a - b
   def negate(a: BigDecimal): BigDecimal = -a
   val one: BigDecimal = BigDecimal(1.0)
@@ -24,7 +23,41 @@ trait BigDecimalIsField extends Field[BigDecimal] {
   def quot(a: BigDecimal, b: BigDecimal) = a.quot(b)
   def mod(a: BigDecimal, b: BigDecimal) = a % b
   override def quotmod(a: BigDecimal, b: BigDecimal) = a /% b
-  def lcm(a: BigDecimal, b: BigDecimal): BigDecimal = (a / gcd(a, b)) * b
+
+  override def fromDouble(n: Double): BigDecimal = BigDecimal(n, MathContext.UNLIMITED)
+  def div(a: BigDecimal, b: BigDecimal): BigDecimal = a / b
+}
+
+trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
+  def nroot(a: BigDecimal, k: Int): BigDecimal = {
+    if (a.mc.getPrecision <= 0)
+      throw new ArithmeticException("Cannot find the nroot of a BigDecimal with unlimited precision.")
+    spire.math.nroot(a, k, a.mc)
+  }
+
+  private[this] val two = BigDecimal(2)
+
+  // this is newton's method
+  override def sqrt(n: BigDecimal): BigDecimal = {
+    if (n.mc.getPrecision <= 0)
+      throw new ArithmeticException("Cannot find the sqrt of a BigDecimal with unlimited precision.")
+
+    def approxSqrt(x: BigDecimal): BigDecimal =
+      if (x < Double.MaxValue)
+        BigDecimal(Math.sqrt(x.toDouble), x.mc)
+      else
+        approxSqrt(x / Double.MaxValue) * BigDecimal(Math.sqrt(Double.MaxValue), x.mc)
+
+    @tailrec def loop(x: BigDecimal, y: BigDecimal): BigDecimal =
+      if (x == y) y else loop(y, ((n / y) + y) / two)
+
+    loop(BigDecimal(0, n.mc), approxSqrt(n))
+  }
+
+  def fpow(a: BigDecimal, b: BigDecimal): BigDecimal = spire.math.pow(a, b)
+}
+
+trait BigDecimalIsGcd extends Gcd[BigDecimal] {
   def gcd(a: BigDecimal, b: BigDecimal): BigDecimal = {
     import java.math.BigInteger
 
@@ -70,37 +103,7 @@ trait BigDecimalIsField extends Field[BigDecimal] {
     if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp) else gcd0(bVal, bExp, aVal, aExp)
   }
 
-  override def fromDouble(n: Double): BigDecimal = BigDecimal(n, MathContext.UNLIMITED)
-  def div(a: BigDecimal, b: BigDecimal): BigDecimal = a / b
-}
-
-trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
-  def nroot(a: BigDecimal, k: Int): BigDecimal = {
-    if (a.mc.getPrecision <= 0)
-      throw new ArithmeticException("Cannot find the nroot of a BigDecimal with unlimited precision.")
-    spire.math.nroot(a, k, a.mc)
-  }
-
-  private[this] val two = BigDecimal(2)
-
-  // this is newton's method
-  override def sqrt(n: BigDecimal): BigDecimal = {
-    if (n.mc.getPrecision <= 0)
-      throw new ArithmeticException("Cannot find the sqrt of a BigDecimal with unlimited precision.")
-
-    def approxSqrt(x: BigDecimal): BigDecimal =
-      if (x < Double.MaxValue)
-        BigDecimal(Math.sqrt(x.toDouble), x.mc)
-      else
-        approxSqrt(x / Double.MaxValue) * BigDecimal(Math.sqrt(Double.MaxValue), x.mc)
-
-    @tailrec def loop(x: BigDecimal, y: BigDecimal): BigDecimal =
-      if (x == y) y else loop(y, ((n / y) + y) / two)
-
-    loop(BigDecimal(0, n.mc), approxSqrt(n))
-  }
-
-  def fpow(a: BigDecimal, b: BigDecimal): BigDecimal = spire.math.pow(a, b)
+  def lcm(a: BigDecimal, b: BigDecimal): BigDecimal = (a / gcd(a, b)) * b
 }
 
 @SerialVersionUID(1L)
@@ -169,7 +172,11 @@ trait BigDecimalIsReal extends IsRational[BigDecimal] with BigDecimalOrder with 
 }
 
 @SerialVersionUID(0L)
-class BigDecimalAlgebra extends BigDecimalIsField with BigDecimalIsNRoot with BigDecimalIsReal with Serializable
+class BigDecimalAlgebra extends BigDecimalIsField
+    with BigDecimalIsNRoot
+    with BigDecimalIsGcd
+    with BigDecimalIsReal
+    with Serializable
 
 trait BigDecimalInstances {
   import BigDecimal.defaultMathContext

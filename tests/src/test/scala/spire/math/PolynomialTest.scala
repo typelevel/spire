@@ -351,6 +351,7 @@ class PolynomialTest extends FunSuite {
   }
 
   test("GCD doesn't run out of memory for BigDecimals") {
+    Gcd[BigDecimal]
     import Polynomial.{ linear, constant }
     val a = linear(BigDecimal("2"))     // 2x
     val b = constant(BigDecimal("3.4")) // 3.4

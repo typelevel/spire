@@ -52,9 +52,14 @@ private[math] class DoubleIsFractional extends Fractional[Double]
 }
 
 @SerialVersionUID(0L)
-private[math] class BigDecimalIsFractional extends Fractional[BigDecimal] with BigDecimalIsField
-with BigDecimalIsNRoot with ConvertableFromBigDecimal with ConvertableToBigDecimal
-with BigDecimalIsReal with Serializable {
+private[math] class BigDecimalIsFractional extends Fractional[BigDecimal]
+    with BigDecimalIsField
+    with BigDecimalIsNRoot
+    with BigDecimalIsGcd
+    with ConvertableFromBigDecimal
+    with ConvertableToBigDecimal
+    with BigDecimalIsReal
+    with Serializable {
   override def fromInt(n: Int): BigDecimal = BigDecimal(n)
   override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
   override def toDouble(n: BigDecimal): Double = n.toDouble
