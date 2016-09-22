@@ -136,10 +136,10 @@ object BigDecimalRootRefinement {
         .round(mc)
 
     def floor(x: Rational): JBigDecimal =
-      x.toBigDecimal(new MathContext(mc.getPrecision, RoundingMode.CEILING)).bigDecimal
+      x.toBigDecimal(new MathContext(mc.getPrecision, RoundingMode.FLOOR)).bigDecimal
 
     def ceil(x: Rational): JBigDecimal =
-      x.toBigDecimal(new MathContext(mc.getPrecision, RoundingMode.FLOOR)).bigDecimal
+      x.toBigDecimal(new MathContext(mc.getPrecision, RoundingMode.CEILING)).bigDecimal
 
     def floor(x: JBigDecimal): JBigDecimal =
       x.round(new MathContext(mc.getPrecision, RoundingMode.FLOOR))
@@ -180,7 +180,7 @@ object BigDecimalRootRefinement {
     // Returns true if there is a root in the open sub-interval (l, r).
     def hasRoot(l: Rational, r: Rational): Boolean =
       if (l != r) {
-        // Ue Descartes' rule of signs to see if the root in the open interval
+        // Use Descartes' rule of signs to see if the root in the open interval
         // is actually in the sub interval (l, r).
         val poly0 = shift(shift(poly, l), (r - l).reciprocal)
         poly0.signVariations % 2 == 1
@@ -205,7 +205,7 @@ object BigDecimalRootRefinement {
             ExactRoot(lx)
           } else {
             // We try to push lx up a bit to get the sign to change.
-            adjust(lx.add(JBigDecimal.valueOf(1, getEps(lx))), Some(ly), rx, Some(ry))
+            adjust(lx.add(JBigDecimal.valueOf(1, getEps(lx))), None, rx, Some(ry))
           }
         } else if (ry.signum == 0) {
           if (qrx < upperBound) {
@@ -213,7 +213,7 @@ object BigDecimalRootRefinement {
             ExactRoot(rx)
           } else {
             // We try to push rx down a bit to get the sign to change.
-            adjust(lx, Some(ly), rx.subtract(JBigDecimal.valueOf(1, getEps(rx))), Some(ry))
+            adjust(lx, Some(ly), rx.subtract(JBigDecimal.valueOf(1, getEps(rx))), None)
           }
         } else if (ry.signum == ly.signum) {
           // We've managed to overshoot the actual root, but since we're still
