@@ -129,6 +129,26 @@ class AlgebraicTest extends SpireProperties {
     (trickyZero.toDouble shouldBe 0.0)
   }
 
+  property("find root of polynomial with tight upper root bound") {
+    import spire.implicits._
+
+    // This was a failing test case, where we were slightly over-shooting
+    // our lower-bound estimate on the positive real roots (Roots.lowerBound).
+
+    val roots = List(
+      Rational("-1081344/22356499231175"),
+      Rational("-28414464067530789078740735/4297457707"),
+      Rational("77071380894799822485716959/4642859645897120421"),
+      Rational("281688347114773487959408761/4704056818866250252354"),
+      Rational("3039366250258967063/1099025186568")
+    )
+    val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
+    val algebraicRoots = Algebraic.roots(poly)
+    (roots.sorted zip algebraicRoots).foreach { case (qRoot, aRoot) =>
+      aRoot shouldBe Algebraic(qRoot)
+    }
+  }
+
   // Generate a bunch of rational roots for a polynomial, then construct a
   // rational polynomial with these roots, and then verify that Algebraic.roots
   // finds all the roots exactly.
@@ -140,11 +160,11 @@ class AlgebraicTest extends SpireProperties {
     } yield (roots, i)
 
     // These tests can be a bit slow, so we bump down the # and size.
-    forAll(Gen.nonEmptyListOf(genRational), minSuccessful(20), maxSize(8)) { roots =>
+    forAll(Gen.nonEmptyListOf(genRational), maxSize(8)) { roots =>
       val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
       val algebraicRoots = Algebraic.roots(poly)
-      (roots.sorted zip algebraicRoots).forall { case (qRoot, aRoot) =>
-        aRoot == Algebraic(qRoot)
+      (roots.sorted zip algebraicRoots.qsorted).foreach { case (qRoot, aRoot) =>
+        aRoot shouldBe Algebraic(qRoot)
       }
     }
   }
