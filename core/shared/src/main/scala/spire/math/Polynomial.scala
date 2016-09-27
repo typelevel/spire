@@ -3,9 +3,6 @@ package math
 
 import scala.collection.mutable.ArrayBuilder
 
-
-import java.math.{ BigDecimal => JBigDecimal, RoundingMode, MathContext }
-
 import spire.algebra._
 import spire.math.poly._
 import spire.std.array._
@@ -47,8 +44,6 @@ object Polynomial extends PolynomialInstances {
 
   def apply[@sp(Double) C: Semiring: Eq: ClassTag](c: C, e: Int): PolySparse[C] =
     PolySparse.safe(Array(e), Array(c))
-
-  import scala.util.{Try, Success, Failure}
 
   def apply(s: String): Polynomial[Rational] = parse(s)
 
@@ -285,6 +280,59 @@ trait Polynomial[@sp(Double) C] { lhs =>
   }
 
   /**
+   * Shift this polynomial along the x-axis by `h`, so that `this(x + h) ==
+   * this.shift(h).apply(x)`.  This is equivalent to calling
+   * `this.compose(Polynomial.x + h)`, but is likely to compute the shifted
+   * polynomial much faster.
+   *
+   * @note We *could* do this without a EuclideanRing, by keeping track of the
+   * the multipliers brought down by the derivative, and cancelling as
+   * required. This will require work though, so another time.
+   */
+  def shift(h: C)(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] = {
+    // The trick here came from this answer:
+    //   http://math.stackexchange.com/questions/694565/polynomial-shift
+    // This is a heavily optimized version of the same idea. This is fairly
+    // critical method to be fast, since it is the most expensive part of the
+    // VAS root isolation algorithm.
+
+    def fromSafeLong(x: SafeLong): C =
+      if (x.isValidInt) {
+        ring.fromInt(x.toInt)
+      } else {
+        val d = ring.fromInt(1 << 30)
+        val mask = (1L << 30) - 1
+
+        @tailrec def loop(k: C, y: SafeLong, acc: C): C =
+          if (y.isValidInt) {
+            k * ring.fromInt(y.toInt) + acc
+          } else {
+            val z = y >> 30
+            val r = ring.fromInt((y & mask).toInt)
+            loop(d * k, z, k * r + acc)
+          }
+
+        loop(ring.one, x, ring.zero)
+      }
+
+    val coeffs: Array[C] = this.coeffsArray.clone()
+    this.foreachNonZero { (deg, c) =>
+      var i = 1
+      var d = deg - 1
+      var m = SafeLong(1L)
+      var k = c
+      while (d >= 0) {
+        m = (m * (d + 1)) /~ i
+        k *= h
+        coeffs(d) = coeffs(d) + fromSafeLong(m) * k
+        d -= 1
+        i += 1
+      }
+    }
+    Polynomial.dense(coeffs)
+  }
+
+  /**
    * Returns this polynomial as a monic polynomial, where the leading
    * coefficient (ie. `maxOrderTermCoeff`) is 1.
    */
@@ -326,22 +374,8 @@ trait Polynomial[@sp(Double) C] { lhs =>
     Polynomial(terms map f)
 
   /**
-   * Returns this polynomial shifted by `h`. Equivalent to calling
-   * `poly.compose(x + h)`.
-   */
-  def shift(h: C)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] =
-    compose(Polynomial.x[C] + Polynomial.constant(h))
-
-  /**
-   * Translates this polynomial by `h`. Equivalent to calling
-   * `poly.compose(x - h)`.
-   */
-  def translate(h: C)(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] =
-    compose(Polynomial.x[C] - Polynomial.constant(h))
-
-  /**
-   * Replace `x`, the variable, in this polynomial with `-x`. This will
-   * flip/mirror the polynomial about the y-axis.
+   * This will flip/mirror the polynomial about the y-axis. It is equivalent to
+   * `poly.compose(-Polynomial.x)`, but will likely be faster to calculate.
    */
   def flip(implicit ring: Rng[C], eq: Eq[C]): Polynomial[C] =
     mapTerms { case term @ Term(coeff, exp) =>

@@ -4,9 +4,9 @@ package math
 import spire.algebra._
 import spire.math.poly._
 import spire.std.bigDecimal._
+import spire.std.bigInt._
 import spire.syntax.literals._
 import spire.optional.rationalTrig._
-
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
@@ -150,6 +150,14 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
+  implicit val arbPolynomial: Arbitrary[Polynomial[BigInt]] = Arbitrary(for {
+    ts <- arbitrary[List[Term[BigInt]]]
+    isDense <- arbitrary[Boolean]
+  } yield {
+    val p = Polynomial(ts)
+    if (isDense) p.toDense else p.toSparse
+  })
+
   implicit val arbDense: Arbitrary[PolyDense[Rational]] = Arbitrary(for {
     ts <- arbitrary[List[Term[Rational]]]
   } yield {
@@ -222,6 +230,12 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
       val p = Polynomial(r, 0)
       p shouldBe r
       p.## shouldBe r.##
+    }
+  }
+
+  property(s"p.shift(h) = p.compose(x + h)") {
+    forAll { (p: Polynomial[BigInt], h: BigInt) =>
+      p.shift(h) shouldBe p.compose(Polynomial.x[BigInt] + Polynomial.constant(h))
     }
   }
 

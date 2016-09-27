@@ -66,7 +66,7 @@ object RootIsolator {
       // We compose both the polynomial and the Mobius transform with x+1. This
       // polynomial will be shifted 1 to the left, so all our roots between (0,
       // 1) will become negative (and thus ignored in this algo).
-      val r = p.compose(x + one)
+      val r = p.shift(BigInt(1))
       val rRoots = TransformedPoly(r, a, b + a, c, d + c)
       if (r.signVariations < p.signVariations) {
         // There may still be roots between (0, 1), so we need to create a
@@ -75,7 +75,7 @@ object RootIsolator {
         // inf), then compose the reciprocal with x+1 to shift (1, inf) to
         // (0, inf). The positive real roots of this polynomial correspond to
         // exactly those roots in (0, 1).
-        var l = p.reciprocal.compose(x + one).removeZeroRoots
+        var l = p.reciprocal.shift(BigInt(1)).removeZeroRoots
         val lRoots = TransformedPoly(l, b, a + b, d, c + d)
         lRoots :: rRoots :: Nil
       } else {
@@ -140,7 +140,7 @@ object RootIsolator {
               } else {
                 // Lower-bound is >= 1, so make the lower-bound the new y-axis.
                 val flr = BigInt(1) << lb
-                val more = split1(p.compose(x + Polynomial.constant(flr)), a, b + a * flr, c, d + c * flr)
+                val more = split1(p.shift(flr), a, b + a * flr, c, d + c * flr)
                 rec(more reverse_::: rest, acc)
               }
           }
