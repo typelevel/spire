@@ -315,13 +315,21 @@ trait Polynomial[@sp(Double) C] { lhs =>
         loop(ring.one, x, ring.zero)
       }
 
+    // The basic idea here is that instead of working with all the derivatives
+    // of the whole polynomial, we can just break the polynomial up and work
+    // with the derivatives of the individual terms. This let's us save a whole
+    // bunch of allocations in a clean way.
     val coeffs: Array[C] = this.coeffsArray.clone()
     this.foreachNonZero { (deg, c) =>
-      var i = 1
-      var d = deg - 1
-      var m = SafeLong(1L)
-      var k = c
+      var i = 1 // Leading factor in factorial in denominator of Taylor series.
+      var d = deg - 1 // The degree of the current derivative of this term.
+      var m = SafeLong(1L) // The multiplier of our derivative
+      var k = c // The current delta (to some power) of the Taylor series.
       while (d >= 0) {
+        // Note that we do division, but only on SafeLongs. This is not just
+        // for performance, but also required for us to only ask for a Ring,
+        // rather than a EuclideanRing. We always know that m * (d + 1) is
+        // divisible by i, so this is exact.
         m = (m * (d + 1)) /~ i
         k *= h
         coeffs(d) = coeffs(d) + fromSafeLong(m) * k
