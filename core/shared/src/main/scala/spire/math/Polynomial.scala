@@ -39,8 +39,8 @@ object Polynomial extends PolynomialInstances {
   def apply[@sp(Double) C: Semiring: Eq: ClassTag](data: Map[Int, C]): PolySparse[C] =
     sparse(data)
 
-  def apply[@sp(Double) C: Semiring: Eq: ClassTag](terms: Iterable[Term[C]]): PolySparse[C] =
-    sparse(terms.map(_.toTuple)(collection.breakOut))
+  def apply[@sp(Double) C: Semiring: Eq: ClassTag](terms: TraversableOnce[Term[C]]): PolySparse[C] =
+    PolySparse(terms)
 
   def apply[@sp(Double) C: Semiring: Eq: ClassTag](c: C, e: Int): PolySparse[C] =
     PolySparse.safe(Array(e), Array(c))
@@ -371,7 +371,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
     mapTerms { case Term(c, n) => Term(f(c), n) }
 
   def mapTerms[D: Semiring: Eq: ClassTag](f: Term[C] => Term[D])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[D] =
-    Polynomial(terms map f)
+    Polynomial(termsIterator.map(f))
 
   /**
    * This will flip/mirror the polynomial about the y-axis. It is equivalent to
@@ -389,10 +389,12 @@ trait Polynomial[@sp(Double) C] { lhs =>
    *
    * @see http://en.wikipedia.org/wiki/Reciprocal_polynomial
    */
-  def reciprocal(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] =
+  def reciprocal(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] = {
+    val d = degree
     mapTerms { case term @ Term(coeff, exp) =>
-      Term(coeff, degree - exp)
+      Term(coeff, d - exp)
     }
+  }
 
   // EuclideanRing ops.
 

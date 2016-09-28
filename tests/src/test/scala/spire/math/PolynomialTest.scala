@@ -370,4 +370,30 @@ class PolynomialTest extends FunSuite {
     assert(spire.math.gcd(a, c) === BigDecimal("0.02"))
     assert(spire.math.gcd(a + b, c) === a + b)
   }
+
+  test("Polynomial(terms...) sums terms") {
+    val terms = List(
+      Term(Rational("-2/17"), 10),
+      Term(Rational("97/8"), 0),
+      Term(Rational("-8/7"), 0),
+      Term(Rational("-8/47"), 47),
+      Term(Rational("-1/71"), 26),
+      Term(Rational("1"), 0),
+      Term(Rational("0"), 1),
+      Term(Rational("-29/8"), 19),
+      Term(Rational("55/7"), 57),
+      Term(Rational("-8/97"), 93),
+      Term(Rational("-99/62"), 1),
+      Term(Rational("0"), 58),
+      Term(Rational("-7/22"), 1),
+      Term(Rational("-93/70"), 38),
+      Term(Rational("-2/21"), 54),
+      Term(Rational("34/79"), 47),
+      Term(Rational("-56/55"), 49),
+      Term(Rational("19/44"), 0))
+    val expected = terms
+      .map { case Term(c, k) => Polynomial(Map(k -> c)) }
+      .foldLeft(Polynomial.zero[Rational])(_ + _)
+    assert(Polynomial(terms) === expected)
+  }
 }
