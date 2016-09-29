@@ -236,16 +236,16 @@ object PolySparse {
     val zero = Semiring[C].zero
     var inReverseOrder = true
     var inOrder = true
-    var lastIndex = -1
+    var lastDeg = -1
 
     data.foreach { case Term(c, i) =>
       if (c =!= zero) {
         expBldr += i
         coeffBldr += c
+        inOrder &&= (lastDeg < i)
+        inReverseOrder &&= (lastDeg < 0 || lastDeg > i)
+        lastDeg = i
       }
-      inOrder &&= (lastIndex < i)
-      inReverseOrder &&= (lastIndex > i)
-      lastIndex = i
     }
 
     val exp = expBldr.result()
