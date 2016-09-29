@@ -207,7 +207,7 @@ class AlgebraicTest extends SpireProperties {
     // This test can be a bit slow, so we limit the tests here. If making major
     // changes to Algebraic, root isolation, refinement, etc, it is a good idea
     // to drop the limits and just give it a bit of time to run.
-    forAll(genRationalPoly, minSuccessful(20), maxSize(6)) { poly =>
+    forAll(genRationalPoly, maxSize(8)) { poly =>
       val apoly = poly.map(Algebraic(_))
       Algebraic.roots(poly).forall { root =>
         apoly(root).isZero
