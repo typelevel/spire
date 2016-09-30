@@ -284,10 +284,6 @@ trait Polynomial[@sp(Double) C] { lhs =>
    * this.shift(h).apply(x)`.  This is equivalent to calling
    * `this.compose(Polynomial.x + h)`, but is likely to compute the shifted
    * polynomial much faster.
-   *
-   * @note We *could* do this without a EuclideanRing, by keeping track of the
-   * the multipliers brought down by the derivative, and cancelling as
-   * required. This will require work though, so another time.
    */
   def shift(h: C)(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] = {
     // The trick here came from this answer:
