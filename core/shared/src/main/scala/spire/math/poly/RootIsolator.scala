@@ -86,7 +86,7 @@ object RootIsolator {
     // Isolate all positive roots in polynomial p.
     def rec(polys: List[TransformedPoly], acc: Vector[Interval[Rational]] = Vector.empty): Vector[Interval[Rational]] = polys match {
       case TransformedPoly(p, a, b, c, d) :: rest =>
-        if (p(BigInt(0)) == BigInt(0)) {
+        if (p.nth(0).signum == 0) {
           val p0 = p.mapTerms { case Term(coeff, exp) => Term(coeff, exp - 1) }
           rec(TransformedPoly(p0, a, b, c, d) :: rest, acc :+ Interval.point(Rational(b, d)))
         } else {
@@ -130,19 +130,29 @@ object RootIsolator {
               // find the first root. Luckily, we can easily compute a rough
               // lower bound on the positive real roots of the polynomial. If
               // this is > 1, then we shift the polynomial to the left so the
-              // lower bound is now 0.  Essentially, we take a shortcut and
-              // skip testing these fruitless polynomials.
-              val lb = Roots.lowerBound(p)
-              if (lb < 0) {
-                // Lower-bound is < 1, so no need to transform polynomial.
-                val more = split1(p, a, b, c, d)
-                rec(more reverse_::: rest, acc)
-              } else {
-                // Lower-bound is >= 1, so make the lower-bound the new y-axis.
-                val flr = BigInt(1) << lb
-                val more = split1(p.shift(flr), a, b + a * flr, c, d + c * flr)
-                rec(more reverse_::: rest, acc)
+              // lower bound is now 0. Essentially, we take a shortcut and skip
+              // testing these fruitless polynomials.
+              //
+              // Additionally, since split1 is actually quite expensive, we
+              // also take some time to make sure that our lower-bound is
+              // pretty tight (see the recursive findFloor below). Turns out
+              // this gives us an ~2x perf improvement.
+
+              def findFloor(q: Polynomial[BigInt], floor: Option[BigInt]): List[TransformedPoly] = {
+                val lb = Roots.lowerBound(q)
+                if (lb < 0) {
+                  floor.fold(split1(q, a, b, c, d)) { h =>
+                    split1(q, a, b + a * h, c, d + c * h)
+                  }
+                } else {
+                  val h = BigInt(1) << lb
+                  val q0 = q.shift(h)
+                  if (q0.signVariations == 0) Nil
+                  else findFloor(q0, Some(floor.fold(h)(_ + h)))
+                }
               }
+
+              rec(findFloor(p, None) reverse_::: rest, acc)
           }
         }
 

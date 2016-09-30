@@ -163,7 +163,7 @@ class AlgebraicTest extends SpireProperties {
     forAll(Gen.nonEmptyListOf(genRational), maxSize(8)) { roots =>
       val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
       val algebraicRoots = Algebraic.roots(poly)
-      (roots.sorted zip algebraicRoots.qsorted).foreach { case (qRoot, aRoot) =>
+      (roots.sorted zip algebraicRoots).foreach { case (qRoot, aRoot) =>
         aRoot shouldBe Algebraic(qRoot)
       }
     }
