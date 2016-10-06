@@ -230,7 +230,9 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   }
 
   def sqrt(): Real = Real(p => x(p * 2).sqrt)
-  def nroot(k: Int): Real = Real(p => x(p * k).nroot(k))
+  def nroot(k: Int): Real =
+    if (k >= 0) Real(p => x(p * k).nroot(k))
+    else Real(p => x.reciprocal.nroot(math.abs(k))(p))
 
   def fpow(r: Rational): Real =
     Real({ p =>
