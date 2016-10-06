@@ -144,33 +144,41 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def limitDenominatorTo(limit: SafeLong): Rational = {
     require(limit.signum > 0, "Cannot limit denominator to non-positive number.")
 
-    // TODO: We should always perform a binary search from the left or right to
-    //       speed up computation. For example, if in a search, we have a lower
-    //       bound of 1/2 for many steps, then each step will only add 1/2 to
-    //       the upper-bound, and so we'd converge on the number quite slowly.
-    //       However, we can speed this up by tentatively checking if we could
-    //       skip some intermediate values, by performing an adaptive search.
-    //       We'd simply keep doubling the number of steps we're skipping until
-    //       the upper-bound (eg) is now the lower bound, then go back to find
-    //       the greatest lower bound in the steps we missed by binary search.
-    //       Instead of adding 1/2 n times, we would try to add 1/2, 2/4, 4/8,
-    //       8/16, etc., until the upper-bound swiches to a lower bound. Say
-    //       this happens a (1/2)*2^k, then we simply perform a binary search in
-    //       between (1/2)*2^(k-1) and (1/2)*2^k to find the new lower bound.
-    //       This would reduce the number of steps to O(log n).
+    def nextK(curr: Option[SafeLong]): Option[SafeLong] = curr match {
+      case Some(k) => Some(k * 2)
+      case None => Some(SafeLong(2))
+    }
+
+    // This implements the basic mediant algorithm. However, we adapt it in 1
+    // way - by allowing an exponentially growing multiplier for either the
+    // lower bound or upper bound that we use when calculating the mediant.
+    // This fixes the cases where the algorithm is slow to converge. This
+    // happens when the lower bound or upper bound are made up of small
+    // numbers, thus requiring us to add it to the other bound many times, in
+    // succession in order to make a significant enough change to flip the
+    // direction of the search or find the mediant. For example, instead of
+    // adding u=1/2 n times to the mediant, we would instead try to add 1/2,
+    // 2/4, 4/8, 8/16, etc, until we either pass the limit or our bound no
+    // longer contains this Rational. Instead of requiring n additions, we only
+    // need log n.
 
     @tailrec
-    def closest(l: Rational, u: Rational): Rational = {
-      val mediant = Rational(l.numerator + u.numerator, l.denominator + u.denominator)
-
+    def closest(l: Rational, u: Rational, lk: Option[SafeLong], rk: Option[SafeLong]): Rational = {
+      val mediant = (lk, rk) match {
+        case (Some(m), None) => Rational(m * l.numerator + u.numerator, m * l.denominator + u.denominator)
+        case (None, Some(m)) => Rational(l.numerator + m * u.numerator, l.denominator + m * u.denominator)
+        case _ => Rational(l.numerator + u.numerator, l.denominator + u.denominator)
+      }
       if (mediant.denominator > limit) {
-        if ((this - l).abs > (u - this).abs) u else l
+        if (lk.isDefined || rk.isDefined) closest(l, u, None, None)
+        else if ((this - l).abs > (u - this).abs) u
+        else l
       } else if (mediant == this) {
         mediant
       } else if (mediant < this) {
-        closest(mediant, u)
+        closest(mediant, u, None, nextK(rk))
       } else {
-        closest(l, mediant)
+        closest(l, mediant, nextK(lk), None)
       }
     }
 
@@ -179,8 +187,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     import Rational.LongRational
     this.sign match {
       case Zero => this
-      case Positive => closest(Rational(this.toBigInt), new LongRational(1, 0))
-      case Negative => closest(new LongRational(-1, 0), Rational(this.toBigInt))
+      case Positive => closest(Rational(this.toBigInt), new LongRational(1, 0), None, None)
+      case Negative => closest(new LongRational(-1, 0), Rational(this.toBigInt), None, None)
     }
   }
 
