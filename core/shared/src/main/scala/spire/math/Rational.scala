@@ -11,6 +11,7 @@ import spire.macros.Checked
 import spire.std.long.LongAlgebra
 import spire.std.double._
 import spire.syntax.nroot._
+import spire.util.Opt
 
 //scalastyle:off equals.hash.code
 sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] { lhs =>
@@ -144,10 +145,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def limitDenominatorTo(limit: SafeLong): Rational = {
     require(limit.signum > 0, "Cannot limit denominator to non-positive number.")
 
-    def nextK(curr: Option[SafeLong]): Option[SafeLong] = curr match {
-      case Some(k) => Some(k * 2)
-      case None => Some(SafeLong(2))
-    }
+    def nextK(curr: Opt[SafeLong]): Opt[SafeLong] =
+      if (curr.isEmpty) Opt(SafeLong(2)) else Opt(curr.get * 2)
 
     // This implements the basic mediant algorithm. However, we adapt it in 1
     // way - by allowing an exponentially growing multiplier for either the
@@ -163,22 +162,22 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     // need log n.
 
     @tailrec
-    def closest(l: Rational, u: Rational, lk: Option[SafeLong], rk: Option[SafeLong]): Rational = {
-      val mediant = (lk, rk) match {
-        case (Some(m), None) => Rational(m * l.numerator + u.numerator, m * l.denominator + u.denominator)
-        case (None, Some(m)) => Rational(l.numerator + m * u.numerator, l.denominator + m * u.denominator)
+    def closest(l: Rational, u: Rational, lk: Opt[SafeLong], rk: Opt[SafeLong]): Rational = {
+      val mediant = (lk.nonEmpty, rk.nonEmpty) match {
+        case (true, false) => Rational(lk.get * l.numerator + u.numerator, lk.get * l.denominator + u.denominator)
+        case (false, true) => Rational(l.numerator + rk.get * u.numerator, l.denominator + rk.get * u.denominator)
         case _ => Rational(l.numerator + u.numerator, l.denominator + u.denominator)
       }
       if (mediant.denominator > limit) {
-        if (lk.isDefined || rk.isDefined) closest(l, u, None, None)
+        if (lk.nonEmpty || rk.nonEmpty) closest(l, u, Opt.empty, Opt.empty)
         else if ((this - l).abs > (u - this).abs) u
         else l
       } else if (mediant == this) {
         mediant
       } else if (mediant < this) {
-        closest(mediant, u, None, nextK(rk))
+        closest(mediant, u, Opt.empty, nextK(rk))
       } else {
-        closest(l, mediant, nextK(lk), None)
+        closest(l, mediant, nextK(lk), Opt.empty)
       }
     }
 
@@ -187,8 +186,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     import Rational.LongRational
     this.sign match {
       case Zero => this
-      case Positive => closest(Rational(this.toBigInt), new LongRational(1, 0), None, None)
-      case Negative => closest(new LongRational(-1, 0), Rational(this.toBigInt), None, None)
+      case Positive => closest(Rational(this.toBigInt), new LongRational(1, 0), Opt.empty, Opt.empty)
+      case Negative => closest(new LongRational(-1, 0), Rational(this.toBigInt), Opt.empty, Opt.empty)
     }
   }
 
