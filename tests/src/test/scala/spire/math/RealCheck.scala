@@ -241,4 +241,10 @@ class RealCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
   //     }
   //   }
   // }
+
+  property("x.pow(k) = x.fpow(k)") {
+    forAll { (x: Real, k: Byte) =>
+      x.pow(k & 0xff) shouldBe x.fpow(Rational(k & 0xff))
+    }
+  }
 }
