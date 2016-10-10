@@ -347,7 +347,13 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
   Seq(Compile, Test).map { sc =>
     (unmanagedSourceDirectories in sc) ++= {
       (unmanagedSourceDirectories in sc ).value.map {
-        dir:File => new File(dir.getPath + "_" + scalaBinaryVersion.value)
+        dir:File =>
+          CrossVersion.partialVersion(scalaBinaryVersion.value) match {
+            case Some((major, minor)) =>
+              new File(s"${dir.getPath}_$major.$minor")
+            case None =>
+              sys.error("couldn't parse scalaBinaryVersion ${scalaBinaryVersion.value}")
+          }
       }
     }
   }
