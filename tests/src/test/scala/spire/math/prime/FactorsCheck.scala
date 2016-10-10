@@ -19,8 +19,6 @@ import Ordinal._
 
 class FactorsCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
-  import Factors.{zero, one}
-
   implicit val arbitraryFactors: Arbitrary[Factors] =
     Arbitrary(arbitrary[SafeLong].map(n => Factors(n)))
 

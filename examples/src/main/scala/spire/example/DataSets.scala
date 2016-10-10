@@ -5,7 +5,6 @@ import spire.algebra._
 import spire.math.Rational
 import spire.implicits._
 
-import scala.collection.IterableLike
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable.{ Builder, ListBuffer }
 

@@ -1,8 +1,6 @@
 package spire
 package example
 
-import language.implicitConversions
-
 import spire.algebra._
 import spire.math._
 import spire.implicits._

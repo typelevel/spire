@@ -13,7 +13,7 @@ import spire.syntax.isReal.{ eqOps => _, _ }
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers
 
-import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 

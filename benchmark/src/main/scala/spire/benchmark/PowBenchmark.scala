@@ -7,14 +7,6 @@ import Random._
 
 import spire.implicits._
 
-import com.google.caliper.Runner
-import com.google.caliper.SimpleBenchmark
-import com.google.caliper.Param
-
-import java.lang.Math
-import java.math.BigInteger
-import java.lang.Long.numberOfTrailingZeros
-
 object PowBenchmarks extends MyRunner(classOf[PowBenchmarks])
 
 class PowBenchmarks extends MyBenchmark {

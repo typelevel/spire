@@ -10,10 +10,9 @@ import spire.std.boolean._
 import spire.std.int._
 import spire.syntax.eq._
 
-import org.scalatest.{FunSuite, Matchers, NonImplicitAssertions}
+import org.scalatest.{FunSuite, NonImplicitAssertions}
 import org.scalatest.prop.Checkers
 
-import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 

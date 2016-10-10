@@ -6,7 +6,7 @@ import spire.implicits._
 
 import org.typelevel.discipline.Laws
 
-import org.scalacheck.{Arbitrary, Prop}
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
 
 object BaseLaws {

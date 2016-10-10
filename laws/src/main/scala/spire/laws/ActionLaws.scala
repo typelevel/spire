@@ -21,7 +21,7 @@ trait ActionLaws[G, A] extends Laws {
 
   val scalarLaws: GroupLaws[G]
 
-  import scalarLaws.{ Equ => EqG, Arb => ArG }
+  import scalarLaws.{ Arb => ArG }
 
   implicit def EquA: Eq[A]
   implicit def ArbA: Arbitrary[A]

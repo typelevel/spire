@@ -1,8 +1,6 @@
 package spire
 package random
 
-import scala.collection.mutable.{ArrayBuffer, Builder}
-import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 
 sealed trait Op[+A] {
