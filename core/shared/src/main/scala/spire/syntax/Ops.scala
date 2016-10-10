@@ -127,7 +127,7 @@ final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
 }
 
 final class MonoidOps[A](lhs:A)(implicit ev: Monoid[A]) {
-  def isId(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
+  def isEmpty(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
 }
 
 final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {

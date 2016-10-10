@@ -16,7 +16,7 @@ trait Ring[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Rig[A]
    * repeated summations of this ring's `one`, or `-one` if `n` is
    * negative.
    */
-  def fromInt(n: Int): A = sumn(one, n)
+  def fromInt(n: Int): A = sumN(one, n)
 }
 
 object Ring {

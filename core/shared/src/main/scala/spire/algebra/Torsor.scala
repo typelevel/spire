@@ -19,10 +19,10 @@ trait Torsor[V, @sp(Int,Long,Float,Double) R] extends Any with Action[V, R] { se
 
   def fixOrigin(id0: V): AbGroup[V] =
     new AbGroup[V] {
-      def id: V = id0
-      def op(v: V, w: V): V = self.actl(self.diff(v, id0), w)
+      def empty: V = id0
+      def combine(v: V, w: V): V = self.actl(self.diff(v, id0), w)
       def inverse(v: V): V = self.actl(self.diff(id0, v), id0)
-      override def opInverse(v: V, w: V): V = self.actl(self.diff(v, w), id0)
+      override def remove(v: V, w: V): V = self.actl(self.diff(v, w), id0)
     }
 }
 

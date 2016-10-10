@@ -51,7 +51,7 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   test("IsReal syntax")(check(forAll { (a: Double) => testIsRealSyntax(a) }))
   test("Semigroup syntax")(check(forAll { (a: String, b: String) => testSemigroupSyntax(a, b) }))
   test("Monoid syntax")(check(forAll { (a: String, b: String) => testMonoidSyntax(a, b) }))
-  test("Group syntax")(check(forAll { (a: Int, b: Int) => testMonoidSyntax(a, b)(Group.additive[Int]) }))
+  test("Group syntax")(check(forAll { (a: Int, b: Int) => testMonoidSyntax(a, b)(AdditiveGroup[Int].additive) }))
   test("AdditiveSemigroup syntax")(check(forAll { (a: Int, b: Int) => testAdditiveSemigroupSyntax(a, b) }))
   test("AdditiveMonoid syntax")(check(forAll { (a: Int, b: Int) => testAdditiveMonoidSyntax(a, b) }))
   test("AdditiveGroup syntax")(check(forAll { (a: Int, b: Int) => testAdditiveGroupSyntax(a, b) }))
@@ -142,18 +142,18 @@ trait BaseSyntaxTest {
 
   def testSemigroupSyntax[A: Semigroup](a: A, b: A) = {
     import spire.syntax.semigroup._
-    ((a |+| b) == Semigroup[A].op(a, b))
+    ((a |+| b) == Semigroup[A].combine(a, b))
   }
 
   def testMonoidSyntax[A: Monoid](a: A, b: A) = {
     import spire.syntax.monoid._
-    ((a |+| b) == Monoid[A].op(a, b))
+    ((a |+| b) == Monoid[A].combine(a, b))
   }
 
   def testGroupSyntax[A: Group](a: A, b: A) = {
     import spire.syntax.group._
-    ((a |+| b) == Group[A].op(a, b)) &&
-      ((a |-| b) == Group[A].opInverse(a, b)) &&
+    ((a |+| b) == Group[A].combine(a, b)) &&
+      ((a |-| b) == Group[A].remove(a, b)) &&
       (a.inverse == Group[A].inverse(a))
   }
 
