@@ -1,7 +1,6 @@
 package spire
 package math
 
-import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 
 import spire.implicits._

@@ -8,8 +8,6 @@ import spire.std.int._
 import spire.std.map._
 import spire.syntax.rng._
 
-import scala.collection.mutable
-
 object Factors {
   val zero = Factors(Map.empty, Zero)
   val one = Factors(Map.empty, Positive)

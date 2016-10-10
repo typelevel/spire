@@ -4,10 +4,7 @@ package math
 import spire.algebra._
 import spire.std.int._
 
-
 import org.scalatest.FunSuite
-import org.scalatest.prop.Checkers
-
 
 trait SelectTest extends FunSuite /* with Checkers */ {
   def selector: Select

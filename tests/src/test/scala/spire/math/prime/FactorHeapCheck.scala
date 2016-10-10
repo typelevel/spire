@@ -10,7 +10,6 @@ import prop._
 
 import org.scalacheck._
 import Gen._
-import Arbitrary.arbitrary
 
 import spire.implicits._
 

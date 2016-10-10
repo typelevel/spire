@@ -9,8 +9,6 @@ import spire.algebra._
 import spire.math._
 import spire.implicits._
 
-import com.google.caliper.Runner
-import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
 object SelectionBenchmarks extends MyRunner(classOf[SelectionBenchmarks])

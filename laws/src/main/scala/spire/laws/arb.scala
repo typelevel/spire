@@ -7,7 +7,7 @@ import spire.math.extras.{FixedPoint, FixedScale}
 import spire.algebra._
 import spire.algebra.free._
 import spire.math._
-import spire.math.interval.{Bound, Closed, Open, Unbound}
+import spire.math.interval.Bound
 
 import org.scalacheck.Arbitrary
 

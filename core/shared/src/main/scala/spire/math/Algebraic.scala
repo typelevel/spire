@@ -39,7 +39,7 @@ import spire.syntax.std.seq._
 @SerialVersionUID(1L)
 final class Algebraic private (val expr: Algebraic.Expr)
 extends ScalaNumber with ScalaNumericConversions with Serializable {
-  import Algebraic.{ One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue, JBigDecimalOrder, roundExact }
+  import Algebraic.{ One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue, roundExact }
 
   /**
    * Returns an `Int` with the same sign as this algebraic number. Algebraic

@@ -4,7 +4,7 @@ package laws
 import spire.algebra._
 import spire.implicits._
 
-import org.typelevel.discipline.{Laws, Predicate}
+import org.typelevel.discipline.Predicate
 
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Arbitrary._

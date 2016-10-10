@@ -3,7 +3,6 @@ package math
 
 import spire.algebra._
 
-import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalacheck._
 import Arbitrary.arbitrary

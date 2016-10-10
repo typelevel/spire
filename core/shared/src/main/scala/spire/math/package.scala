@@ -2,7 +2,6 @@ package spire
 
 import java.lang.Long.numberOfTrailingZeros
 import java.lang.Math
-import java.math.BigInteger
 import java.math.MathContext
 import java.math.RoundingMode
 
