@@ -68,7 +68,7 @@ class NumericTest extends FunSuite {
   runWith[BigDecimal]("BigDecimal")(-3, 3, -9)
   runWith[Rational]("Rational")(-3, 3, -9)
   //runWith[Complex[Double]](-3, 3, -9) // There seems to be a bug.
-/*  runWith[Complex[BigDecimal]]("Complex[BigDecimal]")( TODO crashes with compare
+/*  runWith[Complex[BigDecimal]]("Complex[BigDecimal]")( // Complex is no longer Numeric
     Complex(BigDecimal(-3), BigDecimal(0)),
     Complex(BigDecimal(3), BigDecimal(0)),
     Complex(BigDecimal(-9), BigDecimal(0))
