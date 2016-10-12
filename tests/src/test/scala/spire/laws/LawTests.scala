@@ -101,7 +101,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("D3", GroupLaws[D3].group)
   checkAll("FreeGroup", GroupLaws[FreeGroup[D3]].group)
 
-  implicit def intAbGroup: AbGroup[Int] = AbGroup.additive
+  implicit def intAbGroup: AbGroup[Int] = AdditiveAbGroup[Int].additive
   checkAll("FreeAbGroup", GroupLaws[FreeAbGroup[Int]].abGroup)
 
   checkAll("Bool[Boolean]", LogicLaws[Boolean].bool)

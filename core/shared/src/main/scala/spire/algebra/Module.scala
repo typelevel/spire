@@ -35,8 +35,8 @@ private[algebra] trait IdentityModule[@sp(Int,Long,Float,Double) V] extends Any 
 final case class ZModule[V](vector: Group[V]) extends Module[V, Int] {
   def scalar: Rng[Int] = spire.std.int.IntAlgebra
 
-  def zero: V = vector.id
+  def zero: V = vector.empty
   def negate(v: V): V = vector.inverse(v)
-  def plus(v: V, w: V): V = vector.op(v, w)
-  def timesl(k: Int, v: V): V = vector.combinen(v, k)
+  def plus(v: V, w: V): V = vector.combine(v, w)
+  def timesl(k: Int, v: V): V = vector.combineN(v, k)
 }

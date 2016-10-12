@@ -346,7 +346,7 @@ trait FixedPointInstances {
       def fromShort(n: Short): FixedPoint = FixedPoint(n)
       def fromFloat(n: Float): FixedPoint = FixedPoint(n)
       def fromLong(n: Long): FixedPoint = FixedPoint(n)
-      def fromBigInt(n: BigInt): FixedPoint = FixedPoint(BigDecimal(n))
+      override def fromBigInt(n: BigInt): FixedPoint = FixedPoint(BigDecimal(n))
       def fromBigDecimal(n: BigDecimal): FixedPoint = FixedPoint(n)
       def fromRational(n: Rational): FixedPoint = FixedPoint(n)
       def fromAlgebraic(n: Algebraic): FixedPoint =
