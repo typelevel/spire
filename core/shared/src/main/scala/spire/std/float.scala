@@ -127,9 +127,7 @@ trait FloatIsReal extends IsRational[Float] with FloatOrder with FloatIsSigned {
 }
 
 @SerialVersionUID(0L)
-class FloatAlgebra extends FloatIsField with FloatIsNRoot with FloatIsTrig with FloatIsReal with Serializable {
-  def additiveAbGroup = this
-}
+class FloatAlgebra extends FloatIsField with FloatIsNRoot with FloatIsTrig with FloatIsReal with Serializable
 
 trait FloatInstances {
   implicit final val FloatAlgebra = new FloatAlgebra

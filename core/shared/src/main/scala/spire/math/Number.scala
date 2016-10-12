@@ -681,7 +681,4 @@ private[math] trait NumberIsReal extends IsRational[Number] with NumberOrder wit
 }
 
 @SerialVersionUID(0L)
-class NumberAlgebra extends NumberIsField with NumberIsNRoot with NumberIsTrig with NumberIsReal with Serializable {
-  def additiveAbGroup = this
-}
-
+class NumberAlgebra extends NumberIsField with NumberIsNRoot with NumberIsTrig with NumberIsReal with Serializable

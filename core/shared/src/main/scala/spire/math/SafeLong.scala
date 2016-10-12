@@ -500,9 +500,7 @@ trait SafeLongInstances {
   implicit object SafeLongAlgebra extends SafeLongIsEuclideanRing with SafeLongIsNRoot with Serializable
 
   @SerialVersionUID(1L)
-  implicit object SafeLongIsReal extends SafeLongIsReal with Serializable {
-    def additiveAbGroup = SafeLongAlgebra
-  }
+  implicit object SafeLongIsReal extends SafeLongIsReal with Serializable
 
   implicit final val SafeLongTag = new NumberTag.LargeTag[SafeLong](NumberTag.Integral, SafeLong.zero)
 }

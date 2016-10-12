@@ -106,9 +106,7 @@ class LongIsBitString extends BitString[Long] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class LongAlgebra extends LongIsEuclideanRing with LongIsNRoot with LongIsReal with Serializable {
-  def additiveAbGroup = this
-}
+class LongAlgebra extends LongIsEuclideanRing with LongIsNRoot with LongIsReal with Serializable
 
 trait LongInstances {
   implicit final val LongBitString = new LongIsBitString

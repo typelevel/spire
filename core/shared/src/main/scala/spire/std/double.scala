@@ -126,9 +126,7 @@ trait DoubleIsReal extends IsRational[Double] with DoubleOrder with DoubleIsSign
 }
 
 @SerialVersionUID(0L)
-class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable {
-  def additiveAbGroup = this
-}
+class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable
 
 trait DoubleInstances {
   implicit final val DoubleAlgebra = new DoubleAlgebra

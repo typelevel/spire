@@ -168,9 +168,7 @@ trait BigDecimalIsReal extends IsRational[BigDecimal] with BigDecimalOrder with 
 }
 
 @SerialVersionUID(0L)
-class BigDecimalAlgebra extends BigDecimalIsField with BigDecimalIsNRoot with BigDecimalIsReal with Serializable {
-  def additiveAbGroup = this
-}
+class BigDecimalAlgebra extends BigDecimalIsField with BigDecimalIsNRoot with BigDecimalIsReal with Serializable
 
 trait BigDecimalInstances {
   import BigDecimal.defaultMathContext

@@ -546,9 +546,7 @@ trait RealInstances {
 }
 
 @SerialVersionUID(0L)
-class RealAlgebra extends RealIsFractional {
-  def additiveAbGroup = this
-}
+class RealAlgebra extends RealIsFractional
 
 trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Real] with Trig[Real] {
   override def abs(x: Real): Real = x.abs

@@ -93,9 +93,7 @@ class IntIsBitString extends BitString[Int] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class IntAlgebra extends IntIsEuclideanRing with IntIsNRoot with IntIsReal with Serializable {
-  def additiveAbGroup = this
-}
+class IntAlgebra extends IntIsEuclideanRing with IntIsNRoot with IntIsReal with Serializable
 
 trait IntInstances {
   implicit final val IntBitString = new IntIsBitString

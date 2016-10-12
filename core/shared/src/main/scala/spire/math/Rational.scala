@@ -870,7 +870,4 @@ private[math] trait RationalIsReal extends IsRational[Rational] {
 }
 
 @SerialVersionUID(1L)
-class RationalAlgebra extends RationalIsField with RationalIsReal with Serializable {
-  def additiveAbGroup = this
-}
-
+class RationalAlgebra extends RationalIsField with RationalIsReal with Serializable

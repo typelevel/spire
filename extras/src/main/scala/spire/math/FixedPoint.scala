@@ -296,7 +296,6 @@ trait FixedPointInstances {
 
   implicit def algebra(implicit scale: FixedScale): Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint] =
     new Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint] { self =>
-      def additiveAbGroup = self
       override def abs(x: FixedPoint): FixedPoint = x.abs
       override def signum(x: FixedPoint): Int = x.signum
 

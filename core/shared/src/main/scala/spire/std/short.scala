@@ -96,9 +96,7 @@ class ShortIsBitString extends BitString[Short] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class ShortAlgebra extends ShortIsEuclideanRing with ShortIsReal with Serializable {
-  def additiveAbGroup = this
-}
+class ShortAlgebra extends ShortIsEuclideanRing with ShortIsReal with Serializable
 
 trait ShortInstances {
   implicit final val ShortBitString = new ShortIsBitString

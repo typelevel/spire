@@ -72,9 +72,7 @@ trait BigIntIsMetricSpace extends MetricSpace[BigInt, BigInt] {
 }
 
 @SerialVersionUID(0L)
-class BigIntAlgebra extends BigIntIsEuclideanRing with BigIntIsNRoot with BigIntIsMetricSpace with BigIntIsReal with Serializable {
-  def additiveAbGroup = this
-}
+class BigIntAlgebra extends BigIntIsEuclideanRing with BigIntIsNRoot with BigIntIsMetricSpace with BigIntIsReal with Serializable
 
 trait BigIntInstances {
   implicit final val BigIntAlgebra = new BigIntAlgebra

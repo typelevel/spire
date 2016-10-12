@@ -20,7 +20,6 @@ package algebra
  * extends `Signed`.
  */
 /* TODO sealed*/ trait Signed[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Order[A] {
-  def scalar: BigInt = 0
   /** Returns Zero if `a` is 0, Positive if `a` is positive, and Negative is `a` is negative. */
   def sign(a: A): Sign = Sign(signum(a))
 

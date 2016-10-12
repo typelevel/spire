@@ -96,9 +96,7 @@ class ByteIsBitString extends BitString[Byte] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class ByteAlgebra extends ByteIsEuclideanRing with ByteIsReal with Serializable {
-  def additiveAbGroup = this
-}
+class ByteAlgebra extends ByteIsEuclideanRing with ByteIsReal with Serializable
 
 trait ByteInstances {
   implicit final val ByteBitString = new ByteIsBitString
