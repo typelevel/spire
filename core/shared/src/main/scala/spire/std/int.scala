@@ -57,8 +57,8 @@ trait IntOrder extends Order[Int] {
 }
 
 trait IntIsSigned extends Signed[Int] {
-  def signum(a: Int): Int = java.lang.Integer.signum(a)
-  def abs(a: Int): Int = if (a < 0) -a else a
+  override def signum(a: Int): Int = java.lang.Integer.signum(a)
+  override def abs(a: Int): Int = if (a < 0) -a else a
 }
 
 trait IntIsReal extends IsIntegral[Int] with IntOrder with IntIsSigned {
@@ -93,7 +93,9 @@ class IntIsBitString extends BitString[Int] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class IntAlgebra extends IntIsEuclideanRing with IntIsNRoot with IntIsReal with Serializable
+class IntAlgebra extends IntIsEuclideanRing with IntIsNRoot with IntIsReal with Serializable {
+  def additiveAbGroup = this
+}
 
 trait IntInstances {
   implicit final val IntBitString = new IntIsBitString

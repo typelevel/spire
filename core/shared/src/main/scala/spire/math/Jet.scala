@@ -607,16 +607,6 @@ private[math] class JetEq[T : Eq] extends Eq[Jet[T]] with Serializable {
   override def neqv(x: Jet[T], y: Jet[T]): Boolean = x neqv y
 }
 
-private[math] trait JetIsSigned[T] extends Signed[Jet[T]] {
-  implicit def f: Field[T]
-  implicit def r: IsReal[T]
-  implicit def t: Trig[T]
-  implicit def v: VectorSpace[Array[T],T]
-
-  def signum(a: Jet[T]): Int = a.signum
-  def abs(a: Jet[T]): Jet[T] = a.abs
-}
-
 @SerialVersionUID(0L)
 private[math] class JetAlgebra[@sp(Float, Double) T](implicit
     val c: ClassTag[T], val d: JetDim, val eq: Eq[T], val f: Field[T], val n: NRoot[T],
@@ -624,7 +614,6 @@ private[math] class JetAlgebra[@sp(Float, Double) T](implicit
   extends JetIsField[T]
   with JetIsTrig[T]
   with JetIsNRoot[T]
-  with JetIsSigned[T]
   with VectorSpace[Jet[T], T]
   with FieldAlgebra[Jet[T], T]
   with Serializable {

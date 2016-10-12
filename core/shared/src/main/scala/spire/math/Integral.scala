@@ -34,6 +34,7 @@ class IntegralOps[A](lhs: A)(implicit ev: Integral[A]) {
 @SerialVersionUID(0L)
 private[math] class IntIsIntegral extends Integral[Int] with IntIsEuclideanRing
 with ConvertableFromInt with ConvertableToInt with IntIsReal with Serializable {
+  def additiveAbGroup = this
   override def fromInt(n: Int): Int = n
   override def toDouble(n: Int): Double = n.toDouble
   override def toRational(n: Int): Rational = super[IntIsReal].toRational(n)
@@ -45,6 +46,7 @@ with ConvertableFromInt with ConvertableToInt with IntIsReal with Serializable {
 @SerialVersionUID(0L)
 private[math] class LongIsIntegral extends Integral[Long] with LongIsEuclideanRing
 with ConvertableFromLong with ConvertableToLong with LongIsReal with Serializable {
+  def additiveAbGroup = this
   override def fromInt(n: Int): Long = n.toLong
   override def toDouble(n: Long): Double = n.toDouble
   override def toRational(n: Long): Rational = super[LongIsReal].toRational(n)
@@ -56,6 +58,7 @@ with ConvertableFromLong with ConvertableToLong with LongIsReal with Serializabl
 @SerialVersionUID(0L)
 private[math] class BigIntIsIntegral extends Integral[BigInt] with BigIntIsEuclideanRing
 with ConvertableFromBigInt with ConvertableToBigInt with BigIntIsReal with Serializable {
+  def additiveAbGroup = this
   override def fromInt(n: Int): BigInt = BigInt(n)
   override def toDouble(n: BigInt): Double = n.toDouble
   override def toRational(n: BigInt): Rational = super[BigIntIsReal].toRational(n)
@@ -67,6 +70,7 @@ with ConvertableFromBigInt with ConvertableToBigInt with BigIntIsReal with Seria
 @SerialVersionUID(0L)
 private[math] class SafeLongIsIntegral extends Integral[SafeLong] with SafeLongIsEuclideanRing
 with ConvertableFromSafeLong with ConvertableToSafeLong with SafeLongIsReal with Serializable {
+  def additiveAbGroup = this
   override def fromInt(n: Int): SafeLong = SafeLong(n)
   override def toDouble(n: SafeLong): Double = n.toDouble
   override def toRational(n: SafeLong): Rational = super[SafeLongIsReal].toRational(n)

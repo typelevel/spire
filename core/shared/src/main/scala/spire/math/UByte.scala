@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{IsIntegral, Order, Rig, Signed}
+import spire.algebra.{Order, Rig}
 
 object UByte extends UByteInstances {
   @inline final def apply(n: Byte): UByte = new UByte(n)
@@ -99,16 +99,6 @@ private[math] trait UByteOrder extends Order[UByte] {
   def compare(x: UByte, y: UByte): Int = if (x < y) -1 else if (x > y) 1 else 0
 }
 
-private[math] trait UByteIsSigned extends Signed[UByte] {
-  def signum(a: UByte): Int = java.lang.Integer.signum(a.signed) & 1
-  def abs(a: UByte): UByte = a
-}
-
-private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteOrder with UByteIsSigned {
-  def toDouble(n: UByte): Double = n.toDouble
-  def toBigInt(n: UByte): BigInt = n.toBigInt
-}
-
 @SerialVersionUID(0L)
 private[math] class UByteBitString extends BitString[UByte] with Serializable {
   def one: UByte = UByte(-1: Byte)
@@ -141,5 +131,12 @@ private[math] class UByteBitString extends BitString[UByte] with Serializable {
   }
 }
 
+/* TODO
+private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteOrder {
+  def toDouble(n: UByte): Double = n.toDouble
+  def toBigInt(n: UByte): BigInt = n.toBigInt
+}
+ */
+
 @SerialVersionUID(0L)
-private[math] class UByteAlgebra extends UByteIsRig with UByteIsReal with Serializable
+private[math] class UByteAlgebra extends UByteIsRig with UByteOrder with Serializable

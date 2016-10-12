@@ -2,7 +2,7 @@ package spire
 package math
 
 
-import spire.algebra.{IsIntegral, Order, Rig, Signed}
+import spire.algebra.{Order, Rig}
 
 object ULong extends ULongInstances {
   @inline final def apply(n: Long): ULong = new ULong(n)
@@ -186,15 +186,12 @@ private[math] class ULongBitString extends BitString[ULong] with Serializable {
   def rotateRight(n: ULong, i: Int): ULong = ULong(java.lang.Long.rotateRight(n.signed, i))
 }
 
-private[math] trait ULongIsSigned extends Signed[ULong] {
-  def signum(a: ULong): Int = java.lang.Long.signum(a.signed) & 1
-  def abs(a: ULong): ULong = a
-}
-
-private[math] trait ULongIsReal extends IsIntegral[ULong] with ULongOrder with ULongIsSigned {
+/* TODO
+private[math] trait ULongIsReal extends IsIntegral[ULong] with ULongOrder {
   def toDouble(n: ULong): Double = n.toDouble
   def toBigInt(n: ULong): BigInt = n.toBigInt
 }
+ */
 
 @SerialVersionUID(0L)
-private[math] class ULongAlgebra extends ULongIsRig with ULongIsReal with Serializable
+private[math] class ULongAlgebra extends ULongIsRig with ULongOrder with Serializable

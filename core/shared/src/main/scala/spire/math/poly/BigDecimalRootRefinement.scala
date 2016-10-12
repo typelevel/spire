@@ -80,9 +80,14 @@ object BigDecimalRootRefinement {
   def apply(poly: Polynomial[BigDecimal], lowerBound: Rational, upperBound: Rational, mc: MathContext): BigDecimalRootRefinement =
     apply(poly, lowerBound, upperBound).refine(mc)
 
-  private implicit object JBigDecimalOrder extends Signed[JBigDecimal] with Order[JBigDecimal] {
-    def signum(a: JBigDecimal): Int = a.signum
-    def abs(a: JBigDecimal): JBigDecimal = a.abs
+  private implicit object JBigDecimalOrder extends Signed[JBigDecimal] {
+    object additiveAbGroup extends AdditiveAbGroup[JBigDecimal] {
+      def negate(x: JBigDecimal) = x.negate
+      def zero = JBigDecimal.ZERO
+      def plus(x: JBigDecimal, y: JBigDecimal) = x.add(y)
+    }
+    override def signum(a: JBigDecimal): Int = a.signum
+    override def abs(a: JBigDecimal): JBigDecimal = a.abs
     def compare(x: JBigDecimal, y: JBigDecimal): Int = x compareTo y
   }
 

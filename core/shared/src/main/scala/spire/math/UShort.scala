@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{IsIntegral, Order, Rig, Signed}
+import spire.algebra.{Order, Rig}
 
 object UShort extends UShortInstances {
   @inline final def apply(n: Char): UShort = new UShort(n)
@@ -122,15 +122,12 @@ private[math] class UShortBitString extends BitString[UShort] with Serializable 
   }
 }
 
-private[math] trait UShortIsSigned extends Signed[UShort] {
-  def signum(a: UShort): Int = java.lang.Integer.signum(a.signed) & 1
-  def abs(a: UShort): UShort = a
-}
-
-private[math] trait UShortIsReal extends IsIntegral[UShort] with UShortOrder with UShortIsSigned {
+/* TODO
+private[math] trait UShortIsReal extends IsIntegral[UShort] with UShortOrder {
   def toDouble(n: UShort): Double = n.toDouble
   def toBigInt(n: UShort): BigInt = n.toBigInt
 }
+ */
 
 @SerialVersionUID(0L)
-private[math] class UShortAlgebra extends UShortIsRig with UShortIsReal with Serializable
+private[math] class UShortAlgebra extends UShortIsRig with UShortOrder with Serializable

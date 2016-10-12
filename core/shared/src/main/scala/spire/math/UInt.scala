@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{IsIntegral, Order, Rig, Signed}
+import spire.algebra.{Order, Rig}
 
 object UInt extends UIntInstances {
   @inline final def apply(n: Int): UInt = new UInt(n)
@@ -115,15 +115,10 @@ private[math] class UIntBitString extends BitString[UInt] with Serializable {
   def rotateRight(n: UInt, i: Int): UInt = UInt(Integer.rotateRight(n.signed, i))
 }
 
-private[math] trait UIntIsSigned extends Signed[UInt] {
-  def signum(a: UInt): Int = java.lang.Integer.signum(a.signed) & 1
-  def abs(a: UInt): UInt = a
-}
-
-private[math] trait UIntIsReal extends IsIntegral[UInt] with UIntOrder with UIntIsSigned {
+/*private[math] trait UIntIsReal extends IsIntegral[UInt] with UIntOrder {
   def toDouble(n: UInt): Double = n.toDouble
   def toBigInt(n: UInt): BigInt = n.toBigInt
-}
+}*/
 
 @SerialVersionUID(0L)
-private[math] class UIntAlgebra extends UIntIsRig with UIntIsReal with Serializable
+private[math] class UIntAlgebra extends UIntIsRig with UIntOrder with Serializable

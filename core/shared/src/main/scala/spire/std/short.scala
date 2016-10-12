@@ -54,8 +54,8 @@ trait ShortOrder extends Order[Short] {
 }
 
 trait ShortIsSigned extends Signed[Short] {
-  def signum(a: Short): Int = a
-  def abs(a: Short): Short = (if (a < 0) -a else a).toShort
+  override def signum(a: Short): Int = a
+  override def abs(a: Short): Short = (if (a < 0) -a else a).toShort
 }
 
 trait ShortIsReal extends IsIntegral[Short] with ShortOrder with ShortIsSigned {
@@ -96,7 +96,9 @@ class ShortIsBitString extends BitString[Short] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class ShortAlgebra extends ShortIsEuclideanRing with ShortIsReal with Serializable
+class ShortAlgebra extends ShortIsEuclideanRing with ShortIsReal with Serializable {
+  def additiveAbGroup = this
+}
 
 trait ShortInstances {
   implicit final val ShortBitString = new ShortIsBitString

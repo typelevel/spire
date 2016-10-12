@@ -154,8 +154,8 @@ trait BigDecimalOrder extends Order[BigDecimal] {
 }
 
 trait BigDecimalIsSigned extends Signed[BigDecimal] {
-  def signum(a: BigDecimal): Int = a.signum
-  def abs(a: BigDecimal): BigDecimal = a.abs
+  override def signum(a: BigDecimal): Int = a.signum
+  override def abs(a: BigDecimal): BigDecimal = a.abs
 }
 
 trait BigDecimalIsReal extends IsRational[BigDecimal] with BigDecimalOrder with BigDecimalIsSigned {
@@ -168,7 +168,9 @@ trait BigDecimalIsReal extends IsRational[BigDecimal] with BigDecimalOrder with 
 }
 
 @SerialVersionUID(0L)
-class BigDecimalAlgebra extends BigDecimalIsField with BigDecimalIsNRoot with BigDecimalIsReal with Serializable
+class BigDecimalAlgebra extends BigDecimalIsField with BigDecimalIsNRoot with BigDecimalIsReal with Serializable {
+  def additiveAbGroup = this
+}
 
 trait BigDecimalInstances {
   import BigDecimal.defaultMathContext

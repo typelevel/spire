@@ -44,8 +44,8 @@ trait ByteIsNRoot extends NRoot[Byte] {
 }
 
 trait ByteIsSigned extends Signed[Byte] {
-  def signum(a: Byte): Int = a
-  def abs(a: Byte): Byte = (if (a < 0) -a else a).toByte
+  override def signum(a: Byte): Int = a
+  override def abs(a: Byte): Byte = (if (a < 0) -a else a).toByte
 }
 
 trait ByteOrder extends Order[Byte] {
@@ -96,7 +96,9 @@ class ByteIsBitString extends BitString[Byte] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class ByteAlgebra extends ByteIsEuclideanRing with ByteIsReal with Serializable
+class ByteAlgebra extends ByteIsEuclideanRing with ByteIsReal with Serializable {
+  def additiveAbGroup = this
+}
 
 trait ByteInstances {
   implicit final val ByteBitString = new ByteIsBitString

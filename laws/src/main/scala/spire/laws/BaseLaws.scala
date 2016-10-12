@@ -24,6 +24,18 @@ trait BaseLaws[A] extends Laws {
 
   def signed(implicit A: Signed[A]) = new SimpleRuleSet(
     name = "signed",
+    "ordered group" → forAll { (x: A, y: A, z: A) =>
+      import A.additiveAbGroup
+      (x <= y) ==> (x + z <= y + z)
+    },
+    "triangle inequality" → forAll { (x: A, y: A) =>
+      import A.additiveAbGroup
+      (x + y).abs <= x.abs + y.abs
+    },
+    "abs(x) equals abs(-x)" → forAll { (x: A) =>
+      import A.additiveAbGroup
+      x.abs === (-x).abs
+    },
     "abs non-negative" → forAll((x: A) =>
       x.abs.sign != Sign.Negative
     ),

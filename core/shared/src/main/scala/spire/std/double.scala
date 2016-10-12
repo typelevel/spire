@@ -112,8 +112,8 @@ trait DoubleOrder extends Order[Double] {
 }
 
 trait DoubleIsSigned extends Signed[Double] {
-  def signum(a: Double): Int = Math.signum(a).toInt
-  def abs(a: Double): Double = if (a < 0.0) -a else a
+  override def signum(a: Double): Int = Math.signum(a).toInt
+  override def abs(a: Double): Double = if (a < 0.0) -a else a
 }
 
 trait DoubleIsReal extends IsRational[Double] with DoubleOrder with DoubleIsSigned {
@@ -126,7 +126,9 @@ trait DoubleIsReal extends IsRational[Double] with DoubleOrder with DoubleIsSign
 }
 
 @SerialVersionUID(0L)
-class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable
+class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable {
+  def additiveAbGroup = this
+}
 
 trait DoubleInstances {
   implicit final val DoubleAlgebra = new DoubleAlgebra

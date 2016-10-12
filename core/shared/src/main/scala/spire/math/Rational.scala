@@ -858,8 +858,8 @@ private[math] trait RationalIsReal extends IsRational[Rational] {
   def compare(x: Rational, y: Rational): Int = x compare y
 
   override def sign(a: Rational): Sign = a.sign
-  def signum(a: Rational): Int = a.signum
-  def abs(a: Rational): Rational = a.abs
+  override def signum(a: Rational): Int = a.signum
+  override def abs(a: Rational): Rational = a.abs
 
   def toDouble(r: Rational): Double = r.toDouble
   def ceil(a:Rational): Rational = a.ceil
@@ -870,4 +870,7 @@ private[math] trait RationalIsReal extends IsRational[Rational] {
 }
 
 @SerialVersionUID(1L)
-class RationalAlgebra extends RationalIsField with RationalIsReal with Serializable
+class RationalAlgebra extends RationalIsField with RationalIsReal with Serializable {
+  def additiveAbGroup = this
+}
+
