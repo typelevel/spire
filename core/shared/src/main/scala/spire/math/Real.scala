@@ -618,7 +618,7 @@ trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Rea
   def fromShort(n: Short): Real = Real(n)
   def fromFloat(n: Float): Real = Real(n)
   def fromLong(n: Long): Real = Real(n)
-  def fromBigInt(n: BigInt): Real = Real(n)
+  override def fromBigInt(n: BigInt): Real = Real(n)
   def fromBigDecimal(n: BigDecimal): Real = Real(n)
   def fromRational(n: Rational): Real = Real(n)
   def fromAlgebraic(n: Algebraic): Real = n.evaluateWith[Real]

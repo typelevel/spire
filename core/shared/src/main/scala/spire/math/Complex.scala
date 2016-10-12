@@ -23,6 +23,9 @@ object Complex extends ComplexInstances {
   def fromInt[@sp(Float, Double) T](n: Int)(implicit f: Ring[T]): Complex[T] =
     new Complex(f.fromInt(n), f.zero)
 
+  def fromBigInt[@sp(Float, Double) T](n: BigInt)(implicit f: Ring[T]): Complex[T] =
+    new Complex(f.fromBigInt(n), f.zero)
+
   implicit def intToComplex(n: Int): Complex[Double] = new Complex(n.toDouble, 0.0)
   implicit def longToComplex(n: Long): Complex[Double] = new Complex(n.toDouble, 0.0)
   implicit def floatToComplex(n: Float): Complex[Float] = new Complex(n, 0.0F)
