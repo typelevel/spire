@@ -24,18 +24,6 @@ trait BaseLaws[A] extends Laws {
 
   def signed(implicit A: Signed[A]) = new SimpleRuleSet(
     name = "signed",
-    "ordered group" → forAll { (x: A, y: A, z: A) =>
-      import A.additiveAbGroup
-      (x <= y) ==> (x + z <= y + z)
-    },
-    "triangle inequality" → forAll { (x: A, y: A) =>
-      import A.additiveAbGroup
-      (x + y).abs <= x.abs + y.abs
-    },
-    "abs(x) equals abs(-x)" → forAll { (x: A) =>
-      import A.additiveAbGroup
-      x.abs === (-x).abs
-    },
     "abs non-negative" → forAll((x: A) =>
       x.abs.sign != Sign.Negative
     ),
@@ -45,6 +33,25 @@ trait BaseLaws[A] extends Laws {
     "signum is sign.toInt" → forAll((x: A) =>
       x.signum == x.sign.toInt
     )
+  )
+
+  def signedAdditiveCMonoid(implicit signedA: Signed[A], additiveCMonoidA: AdditiveCMonoid[A]) = new DefaultRuleSet(
+    name = "signedAdditiveCMonoid",
+    parent = Some(signed),
+    "ordered group" → forAll { (x: A, y: A, z: A) =>
+      (x <= y) ==> (x + z <= y + z)
+    },
+    "triangle inequality" → forAll { (x: A, y: A) =>
+      (x + y).abs <= x.abs + y.abs
+    }
+  )
+
+  def signedAdditiveAbGroup(implicit signedA: Signed[A], additiveAbGroupA: AdditiveAbGroup[A]) = new DefaultRuleSet(
+    name = "signedAdditiveAbGroup",
+    parent = Some(signedAdditiveCMonoid),
+    "abs(x) equals abs(-x)" → forAll { (x: A) =>
+      x.abs === (-x).abs
+    }
   )
 
   def metricSpace[R](implicit MSA: MetricSpace[A, R], SR: Signed[R], OR: Order[R], ASR: AdditiveSemigroup[R]) = new SimpleRuleSet(

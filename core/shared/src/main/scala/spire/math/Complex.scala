@@ -98,7 +98,8 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   def complexSignum(implicit f: Field[T], n: NRoot[T], s: Signed[T]): Complex[T] =
     if (isZero) this else this / abs
 
-  def abs(implicit f: Field[T], n: NRoot[T], s: Signed[T]): T = hypot(real, imag)
+  def abs(implicit f: Field[T], n: NRoot[T], s: Signed[T]): T = // TODO why hypot(real, imag) makes test fail
+    (real * real + imag * imag).sqrt
 
   def arg(implicit f: Field[T], s: Signed[T], t: Trig[T]): T =
     if (isZero) f.zero else t.atan2(imag, real)

@@ -2,33 +2,33 @@ package spire
 package algebra
 
 /**
- * A trait for linearly ordered additive abelian groups. The following laws holds:
+ * A trait for linearly ordered additive commutative monoid. The following laws holds:
  *
  * (1) if `a <= b` then `a + c <= b + c` (linear order),
- * (2) `abs(x) = -x` if `x < 0`, or `x` otherwise,
- * (3) `signum(x) = -1` if `x < 0`, `signum(x) = 1` if `x > 0`, `signum(x) = 0` otherwise,
+ * (2) `signum(x) = -1` if `x < 0`, `signum(x) = 1` if `x > 0`, `signum(x) = 0` otherwise,
+ * 
+ * Negative elements only appear when `scalar` is a additive abelian group, and then
+ * (3) `abs(x) = -x` if `x < 0`, or `x` otherwise,
  *
- * from which we deduce
+ * Laws (1) and (2) lead to the triange inequality:
  * 
- * (3) `abs(a + b) <= abs(a) + abs(b)` (triangle inequality).
+ * (4) `abs(a + b) <= abs(a) + abs(b)`
  * 
+ * Signed should never be extended in implementations, rather the AdditiveCMonoid and AdditiveAbGroup subtraits.
+ * We cannot use self-types to express the constraint `self: AdditiveCMonoid =>`, do not want to have
+ * an `implicit def scalar: AdditiveCMonoid[A]`; the best solution would be to seal the trait, however `IsReal`
+ * extends `Signed`.
  */
-trait Signed[@sp(Double, Float, Int, Long) A] extends Any with Order[A] {
-  implicit def additiveAbGroup: AdditiveAbGroup[A]
-
+/* TODO sealed*/ trait Signed[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Order[A] {
+  def scalar: BigInt = 0
   /** Returns Zero if `a` is 0, Positive if `a` is positive, and Negative is `a` is negative. */
   def sign(a: A): Sign = Sign(signum(a))
 
   /** Returns 0 if `a` is 0, > 0 if `a` is positive, and < 0 is `a` is negative. */
-  def signum(a: A): Int = {
-    val c = compare(a, additiveAbGroup.zero)
-    if (c < 0) -1
-    else if (c > 0) 1
-    else 0
-  }
+  def signum(a: A): Int
 
   /** An idempotent function that ensures an object has a non-negative sign. */
-  def abs(a: A): A = if (signum(a) < 0) additiveAbGroup.negate(a) else a
+  def abs(a: A): A
 
   def isSignZero(a: A): Boolean = signum(a) == 0
   def isSignPositive(a: A): Boolean = signum(a) > 0
@@ -37,6 +37,20 @@ trait Signed[@sp(Double, Float, Int, Long) A] extends Any with Order[A] {
   def isSignNonZero(a: A): Boolean = signum(a) != 0
   def isSignNonPositive(a: A): Boolean = signum(a) <= 0
   def isSignNonNegative(a: A): Boolean = signum(a) >= 0
+}
+
+trait SignedAdditiveCMonoid[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Signed[A] with AdditiveCMonoid[A] {
+  /** Returns 0 if `a` is 0, > 0 if `a` is positive, and < 0 is `a` is negative. */
+  def signum(a: A): Int = {
+    val c = compare(a, zero)
+    if (c < 0) -1
+    else if (c > 0) 1
+    else 0
+  }
+}
+
+trait SignedAdditiveAbGroup[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with SignedAdditiveCMonoid[A] with AdditiveAbGroup[A] {
+  def abs(a: A): A = if (compare(a, zero) < 0) negate(a) else a
 }
 
 object Signed {

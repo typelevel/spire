@@ -1,8 +1,7 @@
 package spire
 package math
 
-
-import spire.algebra.{Order, Rig}
+import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid}
 
 object ULong extends ULongInstances {
   @inline final def apply(n: Long): ULong = new ULong(n)
@@ -138,7 +137,7 @@ trait ULongInstances {
   implicit final val ULongTag = new UnsignedIntTag[ULong](ULong.MinValue, ULong.MaxValue)
 }
 
-private[math] trait ULongIsRig extends Rig[ULong] {
+private[math] trait ULongIsCRig extends CRig[ULong] {
   def one: ULong = ULong(1)
   def plus(a:ULong, b:ULong): ULong = a + b
   override def pow(a:ULong, b:Int): ULong = {
@@ -150,7 +149,7 @@ private[math] trait ULongIsRig extends Rig[ULong] {
   def zero: ULong = ULong(0)
 }
 
-private[math] trait ULongOrder extends Order[ULong] {
+private[math] trait ULongSigned extends SignedAdditiveCMonoid[ULong] {
   override def eqv(x:ULong, y:ULong): Boolean = x == y
   override def neqv(x:ULong, y:ULong): Boolean = x != y
   override def gt(x: ULong, y: ULong): Boolean = x > y
@@ -158,6 +157,7 @@ private[math] trait ULongOrder extends Order[ULong] {
   override def lt(x: ULong, y: ULong): Boolean = x < y
   override def lteqv(x: ULong, y: ULong): Boolean = x <= y
   def compare(x: ULong, y: ULong): Int = if (x < y) -1 else if (x > y) 1 else 0
+  def abs(x: ULong): ULong = x
 }
 
 @SerialVersionUID(0L)
@@ -186,12 +186,10 @@ private[math] class ULongBitString extends BitString[ULong] with Serializable {
   def rotateRight(n: ULong, i: Int): ULong = ULong(java.lang.Long.rotateRight(n.signed, i))
 }
 
-/* TODO
-private[math] trait ULongIsReal extends IsIntegral[ULong] with ULongOrder {
+private[math] trait ULongIsReal extends IsIntegral[ULong] with ULongSigned {
   def toDouble(n: ULong): Double = n.toDouble
   def toBigInt(n: ULong): BigInt = n.toBigInt
 }
- */
 
 @SerialVersionUID(0L)
-private[math] class ULongAlgebra extends ULongIsRig with ULongOrder with Serializable
+private[math] class ULongAlgebra extends ULongIsCRig with ULongIsReal with Serializable

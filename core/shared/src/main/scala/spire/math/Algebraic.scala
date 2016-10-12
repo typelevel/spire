@@ -1560,6 +1560,4 @@ private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
 }
 
 @SerialVersionUID(1L)
-class AlgebraicAlgebra extends AlgebraicIsFieldWithNRoot with AlgebraicIsReal with Serializable {
-  def additiveAbGroup = this
-}
+class AlgebraicAlgebra extends AlgebraicIsFieldWithNRoot with AlgebraicIsReal with Serializable
