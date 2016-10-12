@@ -77,7 +77,7 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
   def nroot(a: BigDecimal, k: Int): BigDecimal = {
     if (a.mc.getPrecision <= 0)
       throw new ArithmeticException("Cannot find the nroot of a BigDecimal with unlimited precision.")
-    NRoot.nroot(a, k, a.mc)
+    NRoot.nroot(a, k, a.mc) // FIXME: what to do?
   }
 
   private[this] val two = BigDecimal(2)

@@ -23,14 +23,14 @@ object Multiplicative {
 
   def apply[A](g: Group[A]): MultiplicativeGroup[A] = new MultiplicativeGroup[A] {
     def times(x: A, y: A): A = g.combine(x, y)
-    def div(x: A, y: A): A = g.combine(x, g.inverse(y))
+    def div(x: A, y: A): A = g.combine(x, y)
     def one: A = g.empty
     override def reciprocal(x: A): A = g.inverse(x)
   }
 
   def apply[A](g: AbGroup[A]): MultiplicativeAbGroup[A] = new MultiplicativeAbGroup[A] {
     def times(x: A, y: A): A = g.combine(x, y)
-    def div(x: A, y: A): A = g.combine(x, g.inverse(y))
+    def div(x: A, y: A): A = g.remove(x, y)
     def one: A = g.empty
     override def reciprocal(x: A): A = g.inverse(x)
   }
