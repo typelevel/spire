@@ -14,15 +14,16 @@ trait Semigroup[@sp(Int, Long, Float, Double) A] extends Any {
     if (n <= 0) throw new IllegalArgumentException("Repeated combination for semigroups must have repetitions > 0")
     else repeatedCombineN(a, n)
 
+  /**
+   * Return `a` combined with itself more than once.
+   */
   protected[this] def repeatedCombineN(a: A, n: Int): A = {
     @tailrec def loop(b: A, k: Int, extra: A): A =
-      if (k == 1) {
-        combine(b, extra)
-      } else {
+      if (k == 1) combine(b, extra) else {
         val x = if ((k & 1) == 1) combine(b, extra) else extra
         loop(combine(b, b), k >>> 1, x)
       }
-    loop(a, n - 1, a)
+    if (n == 1) a else loop(a, n - 1, a)
   }
 
   /**
