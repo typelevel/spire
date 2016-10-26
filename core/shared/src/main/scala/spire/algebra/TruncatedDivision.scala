@@ -28,16 +28,13 @@ package algebra
  * and fmod corresponds to the REM function of the IEEE floating-point standard.
  */
 trait TruncatedDivision[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Signed[A] {
-
-//  def isWhole(x: A): Boolean
   def tdiv(x: A, y: A): BigInt
   def tmod(x: A, y: A): A
   def tdivmod(x: A, y: A): (BigInt, A) = (tdiv(x, y), tmod(x, y))
 
-  def fmod(x: A, y: A): A
   def fdiv(x: A, y: A): BigInt
+  def fmod(x: A, y: A): A
   def fdivmod(x: A, y: A): (BigInt, A)
-
 }
 
 trait TruncatedDivisionCRing[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with TruncatedDivision[A] with CRing[A] {
@@ -60,4 +57,8 @@ trait TruncatedDivisionCRing[@sp(Byte, Short, Int, Long, Float, Double) A] exten
     (fq, fm)
   }
 
+}
+
+object TruncatedDivision {
+  def apply[A](implicit ev: TruncatedDivision[A]): TruncatedDivision[A] = ev
 }

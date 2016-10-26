@@ -14,12 +14,13 @@ package algebra
  * 
  * (4) `abs(a + b) <= abs(a) + abs(b)`
  * 
- * Signed should never be extended in implementations, rather the AdditiveCMonoid and AdditiveAbGroup subtraits.
+ * Signed should never be extended in implementations, rather the SignedAdditiveCMonoid and
+ * AdditiveAbGroup subtraits.
  * We cannot use self-types to express the constraint `self: AdditiveCMonoid =>`, do not want to have
  * an `implicit def scalar: AdditiveCMonoid[A]`; the best solution would be to seal the trait, however `IsReal`
  * extends `Signed`.
  */
-/* TODO sealed*/ trait Signed[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Order[A] {
+trait Signed[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Order[A] {
   /** Returns Zero if `a` is 0, Positive if `a` is positive, and Negative is `a` is negative. */
   def sign(a: A): Sign = Sign(signum(a))
 
@@ -53,5 +54,5 @@ trait SignedAdditiveAbGroup[@sp(Byte, Short, Int, Long, Float, Double) A] extend
 }
 
 object Signed {
-  def apply[A](implicit s: Signed[A]): Signed[A] = s
+  def apply[A](implicit ev: Signed[A]): Signed[A] = ev
 }
