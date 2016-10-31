@@ -1534,9 +1534,6 @@ private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoo
   override def minus(a: Algebraic, b: Algebraic): Algebraic = a - b
   override def pow(a: Algebraic, b: Int): Algebraic = a pow b
   override def times(a: Algebraic, b: Algebraic): Algebraic = a * b
-  def quot(a: Algebraic, b: Algebraic): Algebraic = a /~ b
-  def mod(a: Algebraic, b: Algebraic): Algebraic = a % b
-  def gcd(a: Algebraic, b: Algebraic): Algebraic = euclid(a, b)(Eq[Algebraic])
   def div(a:Algebraic, b:Algebraic): Algebraic = a / b
   def nroot(a: Algebraic, k: Int): Algebraic = a nroot k
   def fpow(a:Algebraic, b:Algebraic): Algebraic = throw new UnsupportedOperationException("unsupported operation")

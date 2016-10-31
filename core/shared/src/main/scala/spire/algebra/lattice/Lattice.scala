@@ -28,7 +28,7 @@ class MinMaxLattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A: Order
   def join(lhs: A, rhs: A): A = lhs max rhs
 }
 
-class GcdLcmLattice[@sp(Byte, Short, Int, Long) A: EuclideanRing] extends Lattice[A] {
+class GcdLcmLattice[@sp(Byte, Short, Int, Long) A: GCDRing] extends Lattice[A] {
   def meet(lhs: A, rhs: A): A = lhs gcd rhs
   def join(lhs: A, rhs: A): A = lhs lcm rhs
 }

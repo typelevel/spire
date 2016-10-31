@@ -5,8 +5,13 @@ import spire.algebra.{MetricSpace, Monoid, Order}
 
 @SerialVersionUID(0L)
 class StringMonoid extends Monoid[String] with Serializable {
-  def id: String = ""
-  def op(x: String, y: String): String = x + y
+  def empty: String = ""
+  def combine(x: String, y: String): String = x + y
+  override def combineAll(xs: TraversableOnce[String]): String = {
+    val sb = new StringBuilder
+    xs.foreach(sb ++= _)
+    sb.result
+  }
 }
 
 @SerialVersionUID(0L)

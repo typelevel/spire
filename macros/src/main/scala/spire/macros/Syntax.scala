@@ -9,6 +9,11 @@ object Ops extends machinist.Ops {
 
   val operatorNames: Map[String, String] =
     machinist.DefaultOps.operatorNames ++ Map(
+
+      // Semigroup (|+| |-|)
+      ("$bar$plus$bar", "combine"), // TODO: update machinist defaults, or comment the present
+      ("$bar$minus$bar", "remove"), // override
+
       // partial operations |+|? |+|?? |-|? |-|??
       ("$bar$plus$bar$qmark$qmark", "opIsDefined"),
       ("$bar$minus$bar$qmark$qmark", "opInverseIsDefined"),

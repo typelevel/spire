@@ -212,7 +212,7 @@ lazy val buildSettings = Seq(
 
 lazy val commonSettings = Seq(
   scalacOptions ++= commonScalacOptions.diff(Seq(
-    "-Xfatal-warnings", 
+//    "-Xfatal-warnings", TODO: check
     "-language:existentials",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
@@ -222,7 +222,8 @@ lazy val commonSettings = Seq(
     "bintray/non" at "http://dl.bintray.com/non/maven",
     Resolver.sonatypeRepo("snapshots")
   ),
-  libraryDependencies += "org.typelevel" %%% "machinist" % "0.4.1"
+  libraryDependencies += "org.typelevel" %%% "machinist" % "0.5.0"
+    // libraryDependencies += "org.typelevel" %%% "algebra" % "0.5.2-SNAPSHOT" TODO: base on algebra
 ) ++ scalaMacroDependencies ++ warnUnusedImport
 
 lazy val commonJsSettings = Seq(
@@ -330,9 +331,9 @@ lazy val unidocSettings = UnidocPlugin.unidocSettings ++ Seq(
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Base Build Settings - Should not need to edit below this line. 
+// Base Build Settings - Should not need to edit below this line.
 // These settings could also come from another file or a plugin.
-// The only issue if coming from a plugin is that the Macro lib versions 
+// The only issue if coming from a plugin is that the Macro lib versions
 // are hard coded, so an overided facility would be required.
 
 addCommandAlias("gitSnapshots", ";set version in ThisBuild := git.gitDescribedVersion.value.get + \"-SNAPSHOT\"")

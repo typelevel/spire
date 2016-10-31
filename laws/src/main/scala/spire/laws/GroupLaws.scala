@@ -29,11 +29,11 @@ trait GroupLaws[A] extends Laws {
     "associative" → forAll((x: A, y: A, z: A) =>
       ((x |+| y) |+| z) === (x |+| (y |+| z))
     ),
-    "combinen(a, 1) === a" → forAll((a: A) =>
-      A.combinen(a, 1) === a
+    "combineN(a, 1) === a" → forAll((a: A) =>
+      A.combineN(a, 1) === a
     ),
-    "combinen(a, 2) === a |+| a" → forAll((a: A) =>
-      A.combinen(a, 2) === (a |+| a)
+    "combineN(a, 2) === a |+| a" → forAll((a: A) =>
+      A.combineN(a, 2) === (a |+| a)
     )
   )
 
@@ -41,19 +41,19 @@ trait GroupLaws[A] extends Laws {
     name = "monoid",
     parent = Some(semigroup),
     "left identity" → forAll((x: A) =>
-      (A.id |+| x) === x
+      (A.empty |+| x) === x
     ),
     "right identity" → forAll((x: A) =>
-      (x |+| A.id) === x
+      (x |+| A.empty) === x
     ),
-    "combinen(a, 0) === id" → forAll((a: A) =>
-      A.combinen(a, 0) === A.id
+    "combineN(a, 0) === empty" → forAll((a: A) =>
+      A.combineN(a, 0) === A.empty
     ),
-    "combine(Nil) === id" → forAll((a: A) =>
-      A.combine(Nil) === A.id
+    "combineAll(Nil) === empty" → forAll((a: A) =>
+      A.combineAll(Nil) === A.empty
     ),
-    "isId" → forAll((x: A) =>
-      (x === A.id) === (x.isId)
+    "isEmpty" → forAll((x: A) =>
+      (x === A.empty) === (x.isEmpty)
     )
   )
 
@@ -61,10 +61,10 @@ trait GroupLaws[A] extends Laws {
     name = "group",
     parent = Some(monoid),
     "left inverse" → forAll((x: A) =>
-      A.id === (x.inverse |+| x)
+      A.empty === (x.inverse |+| x)
     ),
     "right inverse" → forAll((x: A) =>
-      A.id === (x |+| x.inverse)
+      A.empty === (x |+| x.inverse)
     )
   )
 
@@ -82,25 +82,25 @@ trait GroupLaws[A] extends Laws {
   def additiveSemigroup(implicit A: AdditiveSemigroup[A]) = new AdditiveProperties(
     base = semigroup(A.additive),
     parent = None,
-    "sumn(a, 1) === a" → forAll((a: A) =>
-      A.sumn(a, 1) === a
+    "sumN(a, 1) === a" → forAll((a: A) =>
+      A.sumN(a, 1) === a
     ),
-    "combinen(a, 2) === a + a" → forAll((a: A) =>
-      A.sumn(a, 2) === (a + a)
+    "sumN(a, 2) === a + a" → forAll((a: A) =>
+      A.sumN(a, 2) === (a + a)
     ),
-    "sumOption" → forAll((a: A) =>
-      (A.sumOption(Seq.empty[A]) === Option.empty[A]) &&
-      (A.sumOption(Seq(a)) === Option(a)) &&
-      (A.sumOption(Seq(a, a)) === Option(a + a)) &&
-      (A.sumOption(Seq(a, a, a)) === Option(a + a + a))
+    "trySum" → forAll((a: A) =>
+      (A.trySum(Seq.empty[A]) === Option.empty[A]) &&
+      (A.trySum(Seq(a)) === Option(a)) &&
+      (A.trySum(Seq(a, a)) === Option(a + a)) &&
+      (A.trySum(Seq(a, a, a)) === Option(a + a + a))
     )
   )
 
   def additiveMonoid(implicit A: AdditiveMonoid[A]) = new AdditiveProperties(
     base = monoid(A.additive),
     parent = Some(additiveSemigroup),
-    "sumn(a, 0) === zero" → forAll((a: A) =>
-      A.sumn(a, 0) === A.zero
+    "sumN(a, 0) === zero" → forAll((a: A) =>
+      A.sumN(a, 0) === A.zero
     ),
     "sum(Nil) === zero" → forAll((a: A) =>
       A.sum(Nil) === A.zero

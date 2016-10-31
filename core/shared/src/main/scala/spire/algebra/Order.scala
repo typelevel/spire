@@ -43,6 +43,14 @@ trait Order[@sp A] extends Any with PartialOrder[A] {
    * Defines an ordering on `A` where all arrows switch direction.
    */
   override def reverse: Order[A] = new ReversedOrder(this)
+
+  /**
+    * Convert a `Order[A]` to a `scala.math.Ordering[A]`
+    * instance.
+    */
+  def toOrdering: Ordering[A] = new Ordering[A] {
+    def compare(x: A, y: A): Int = self.compare(x, y)
+  }
 }
 
 private[algebra] class MappedOrder[@sp A, @sp B](order: Order[B])(f: A => B) extends Order[A] {
@@ -60,9 +68,5 @@ object Order {
 
   def from[@sp A](f: (A, A) => Int): Order[A] = new Order[A] {
     def compare(x: A, y: A): Int = f(x, y)
-  }
-
-  implicit def ordering[A](implicit o: Order[A]): Ordering[A] = new Ordering[A] {
-    def compare(x: A, y: A): Int = o.compare(x, y)
   }
 }

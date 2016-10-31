@@ -302,10 +302,10 @@ package object math {
   }
 
   final def gcd(a: BigInt, b: BigInt): BigInt = a.gcd(b)
-  final def gcd[A](x: A, y: A)(implicit ev: EuclideanRing[A]): A = ev.gcd(x, y)
-  final def gcd[A](xs: Seq[A])(implicit ev: EuclideanRing[A]): A =
+  final def gcd[A](x: A, y: A)(implicit ev: GCDRing[A]): A = ev.gcd(x, y)
+  final def gcd[A](xs: Seq[A])(implicit ev: GCDRing[A]): A =
     xs.foldLeft(ev.zero) { (x, y) => gcd(y, x) }
-  final def gcd[A](x: A, y: A, z: A, rest: A*)(implicit ev: EuclideanRing[A]): A =
+  final def gcd[A](x: A, y: A, z: A, rest: A*)(implicit ev: GCDRing[A]): A =
     gcd(gcd(gcd(x, y), z), gcd(rest))
 
   /**
@@ -313,7 +313,7 @@ package object math {
    */
   final def lcm(x: Long, y: Long): Long = (x / gcd(x, y)) * y
   final def lcm(a: BigInt, b: BigInt): BigInt = (a / a.gcd(b)) * b
-  final def lcm[A](x: A, y: A)(implicit ev: EuclideanRing[A]): A = ev.lcm(x, y)
+  final def lcm[A](x: A, y: A)(implicit ev: GCDRing[A]): A = ev.lcm(x, y)
 
   /**
    * min

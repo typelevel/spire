@@ -30,13 +30,13 @@ object SetUtil {
   }
 }
 
-object PureSet {
+object PureSet { companion =>
   def empty[A]: PureSet[A] = PureSet[A](a => false)
   def infinite[A]: PureSet[A] = PureSet[A](a => true)
 
   implicit def monoid[A] = new Monoid[PureSet[A]] {
-    def id: PureSet[A] = empty
-    def op(x: PureSet[A], y: PureSet[A]): PureSet[A] = x | y
+    def empty: PureSet[A] = companion.empty
+    def combine(x: PureSet[A], y: PureSet[A]): PureSet[A] = x | y
   }
 
   implicit def bool[A] = new Bool[PureSet[A]] {
@@ -79,7 +79,7 @@ case class PureSet[A](f: A => Boolean) extends Function1[A, Boolean] { lhs =>
     SetUtil.powerStream(universe.filter(f))
 }
 
-object MathSet {
+object MathSet { companion =>
   def empty[A]: MathSet[A] = Fin(Set.empty)
   def apply[A](as: A*): MathSet[A] = Fin(as.toSet)
   def infinite[A]: MathSet[A] = Inf(Set.empty)
@@ -125,8 +125,8 @@ object MathSet {
   }
 
   implicit def monoid[A] = new Monoid[MathSet[A]] {
-    def id: MathSet[A] = empty
-    def op(x: MathSet[A], y: MathSet[A]): MathSet[A] = x | y
+    def empty: MathSet[A] = companion.empty
+    def combine(x: MathSet[A], y: MathSet[A]): MathSet[A] = x | y
   }
 
   implicit def bool[A] = new Bool[MathSet[A]] {

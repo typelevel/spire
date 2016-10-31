@@ -137,7 +137,7 @@ final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
 }
 
 final class MonoidOps[A](lhs:A)(implicit ev: Monoid[A]) {
-  def isId(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
+  def isEmpty(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
 }
 
 final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
@@ -236,44 +236,47 @@ final class SemiringOps[A](lhs:A)(implicit ev:Semiring[A]) {
   def **(rhs:Int): A = macro Ops.binop[Int, A]
 }
 
-final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
-  def quot(rhs:A): A = macro Ops.binop[A, A]
-  def mod(rhs:A): A = macro Ops.binop[A, A]
-  def quotmod(rhs:A): (A, A) = macro Ops.binop[A, (A, A)]
-
+final class GCDRingOps[A](lhs:A)(implicit ev:GCDRing[A]) {
   def gcd(rhs:A): A = macro Ops.binop[A, A]
   def lcm(rhs:A): A = macro Ops.binop[A, A]
+}
+
+final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
+  def euclideanFunction(): BigInt = macro Ops.unop[BigInt]
+  def equot(rhs:A): A = macro Ops.binop[A, A]
+  def emod(rhs:A): A = macro Ops.binop[A, A]
+  def equotmod(rhs:A): (A, A) = macro Ops.binop[A, (A, A)]
 
   // TODO: This is a bit
-  def quot(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
-  def mod(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
-  def quotmod(rhs:Int): (A, A) = macro Ops.binopWithSelfLift[Int, Ring[A], (A, A)]
+  def equot(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
+  def emod(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
+  def equotmod(rhs:Int): (A, A) = macro Ops.binopWithSelfLift[Int, Ring[A], (A, A)]
 
-  def quot(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
-  def mod(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
-  def quotmod(rhs:Double)(implicit ev1:Field[A]): (A, A) = macro Ops.binopWithLift[Double, Field[A], (A, A)]
+  def equot(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
+  def emod(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
+  def equotmod(rhs:Double)(implicit ev1:Field[A]): (A, A) = macro Ops.binopWithLift[Double, Field[A], (A, A)]
 
-  def quot(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) /~ rhs
-  def mod(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) % rhs
-  def quotmod(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = c.toNumber(lhs) /% rhs
+  def equot(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) /~ rhs
+  def emod(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) % rhs
+  def equotmod(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = c.toNumber(lhs) /% rhs
 }
 
 final class LiteralIntEuclideanRingOps(val lhs: Int) extends AnyVal {
-  def quot[A](rhs:A)(implicit ev: EuclideanRing[A]): A = ev.quot(ev.fromInt(lhs), rhs)
-  def mod[A](rhs:A)(implicit ev: EuclideanRing[A]): A = ev.mod(ev.fromInt(lhs), rhs)
-  def quotmod[A](rhs:A)(implicit ev: EuclideanRing[A]): (A, A) = ev.quotmod(ev.fromInt(lhs), rhs)
+  def equot[A](rhs:A)(implicit ev: EuclideanRing[A]): A = ev.equot(ev.fromInt(lhs), rhs)
+  def emod[A](rhs:A)(implicit ev: EuclideanRing[A]): A = ev.emod(ev.fromInt(lhs), rhs)
+  def equotmod[A](rhs:A)(implicit ev: EuclideanRing[A]): (A, A) = ev.equotmod(ev.fromInt(lhs), rhs)
 }
 
 final class LiteralLongEuclideanRingOps(val lhs: Long) extends AnyVal {
-  def quot[A](rhs:A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.quot(c.fromLong(lhs), rhs)
-  def mod[A](rhs:A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.mod(c.fromLong(lhs), rhs)
-  def quotmod[A](rhs:A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): (A, A) = ev.quotmod(c.fromLong(lhs), rhs)
+  def equot[A](rhs:A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.equot(c.fromLong(lhs), rhs)
+  def emod[A](rhs:A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.emod(c.fromLong(lhs), rhs)
+  def equotmod[A](rhs:A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): (A, A) = ev.equotmod(c.fromLong(lhs), rhs)
 }
 
 final class LiteralDoubleEuclideanRingOps(val lhs: Double) extends AnyVal {
-  def quot[A](rhs:A)(implicit ev: Field[A]): A = ev.quot(ev.fromDouble(lhs), rhs)
-  def mod[A](rhs:A)(implicit ev: Field[A]): A = ev.mod(ev.fromDouble(lhs), rhs)
-  def quotmod[A](rhs:A)(implicit ev: Field[A]): (A, A) = ev.quotmod(ev.fromDouble(lhs), rhs)
+  def equot[A](rhs:A)(implicit ev: Field[A]): A = ev.equot(ev.fromDouble(lhs), rhs)
+  def emod[A](rhs:A)(implicit ev: Field[A]): A = ev.emod(ev.fromDouble(lhs), rhs)
+  def equotmod[A](rhs:A)(implicit ev: Field[A]): (A, A) = ev.equotmod(ev.fromDouble(lhs), rhs)
 }
 
 final class IsRealOps[A](lhs:A)(implicit ev:IsReal[A]) {

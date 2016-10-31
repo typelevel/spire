@@ -24,12 +24,16 @@ trait OrderSyntax extends PartialOrderSyntax {
   implicit def literalDoubleOrderOps(lhs: Double): LiteralDoubleOrderOps = new LiteralDoubleOrderOps(lhs)
 }
 
-trait IsRealSyntax extends OrderSyntax with SignedSyntax {
+trait SignedSyntax extends OrderSyntax {
+  implicit def signedOps[A:Signed](a: A): SignedOps[A] = new SignedOps(a)
+}
+
+trait IsRealSyntax extends SignedSyntax {
   implicit def isRealOps[A:IsReal](a:A): IsRealOps[A] = new IsRealOps(a)
 }
 
-trait SignedSyntax {
-  implicit def signedOps[A: Signed](a: A): SignedOps[A] = new SignedOps(a)
+trait TruncatedDivisionSyntax extends SignedSyntax {
+  implicit def truncatedDivisionOps[A:TruncatedDivision](a: A): TruncatedDivisionOps[A] = new TruncatedDivisionOps(a)
 }
 
 trait SemigroupoidSyntax {
@@ -100,7 +104,11 @@ trait RngSyntax extends SemiringSyntax with AdditiveGroupSyntax
 
 trait RingSyntax extends RngSyntax with RigSyntax
 
-trait EuclideanRingSyntax extends RingSyntax {
+trait GCDRingSyntax extends RingSyntax {
+  implicit def gcdRingOps[A:GCDRing](a:A): GCDRingOps[A] = new GCDRingOps(a)
+}
+
+trait EuclideanRingSyntax extends GCDRingSyntax {
   implicit def euclideanRingOps[A:EuclideanRing](a:A): EuclideanRingOps[A] = new EuclideanRingOps(a)
   implicit def literalIntEuclideanRingOps(lhs:Int): LiteralIntEuclideanRingOps = new LiteralIntEuclideanRingOps(lhs)
   implicit def literalLongEuclideanRingOps(lhs:Long): LiteralLongEuclideanRingOps = new LiteralLongEuclideanRingOps(lhs)
@@ -243,6 +251,7 @@ trait AllSyntax extends
     PartialOrderSyntax with
     OrderSyntax with
     SignedSyntax with
+    TruncatedDivisionSyntax with
     IsRealSyntax with
     ConvertableFromSyntax with
     SemigroupoidSyntax with
@@ -260,6 +269,7 @@ trait AllSyntax extends
     RigSyntax with
     RngSyntax with
     RingSyntax with
+    GCDRingSyntax with
     EuclideanRingSyntax with
     FieldSyntax with
     NRootSyntax with

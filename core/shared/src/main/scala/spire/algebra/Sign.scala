@@ -28,9 +28,10 @@ object Sign {
     if (i == 0) Zero else if (i > 0) Positive else Negative
 
   class SignAlgebra extends CMonoid[Sign] with Signed[Sign] {
-    def id: Sign = Positive
-    def op(a: Sign, b: Sign): Sign = a * b
     // the Signum instance is slightly abusive, as Sign doesn't provide an additive monoid
+    def empty: Sign = Positive
+    def combine(a: Sign, b: Sign): Sign = a * b
+    override def sign(a: Sign): Sign = a
     def signum(a: Sign): Int = a.toInt
     def abs(a: Sign) = if (a == Negative) Positive else a
     def compare(x: Sign, y: Sign): Int = java.lang.Integer.signum(x.toInt - y.toInt)

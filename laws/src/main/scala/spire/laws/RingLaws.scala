@@ -42,25 +42,25 @@ trait RingLaws[A] extends GroupLaws[A] {
   def multiplicativeSemigroup(implicit A: MultiplicativeSemigroup[A]) = new MultiplicativeProperties(
     base = _.semigroup(A.multiplicative),
     parent = None,
-    "prodn(a, 1) === a" → forAll((a: A) =>
-      A.prodn(a, 1) === a
+    "pow(a, 1) === a" → forAll((a: A) =>
+      A.pow(a, 1) === a
     ),
-    "prodn(a, 2) === a * a" → forAll((a: A) =>
-      A.prodn(a, 2) === (a * a)
+    "pow(a, 2) === a * a" → forAll((a: A) =>
+      A.pow(a, 2) === (a * a)
     ),
-    "prodOption" → forAll((a: A) =>
-      (A.prodOption(Seq.empty[A]) === Option.empty[A]) &&
-      (A.prodOption(Seq(a)) === Option(a)) &&
-      (A.prodOption(Seq(a, a)) === Option(a * a)) &&
-      (A.prodOption(Seq(a, a, a)) === Option(a * a * a))
+    "tryProduct" → forAll((a: A) =>
+      (A.tryProduct(Seq.empty[A]) === Option.empty[A]) &&
+      (A.tryProduct(Seq(a)) === Option(a)) &&
+      (A.tryProduct(Seq(a, a)) === Option(a * a)) &&
+      (A.tryProduct(Seq(a, a, a)) === Option(a * a * a))
     )
   )
 
   def multiplicativeMonoid(implicit A: MultiplicativeMonoid[A]) = new MultiplicativeProperties(
     base = _.monoid(A.multiplicative),
     parent = Some(multiplicativeSemigroup),
-    "prodn(a, 0) === one" → forAll((a: A) =>
-      A.prodn(a, 0) === A.one
+    "pow(a, 0) === one" → forAll((a: A) =>
+      A.pow(a, 0) === A.one
     ),
     "prod(Nil) === one" → forAll((a: A) =>
       A.prod(Nil) === A.one
@@ -121,10 +121,40 @@ trait RingLaws[A] extends GroupLaws[A] {
     parents = Seq(rig, rng)
   )
 
+  def cRing(implicit A: CRing[A]) = new RingProperties(
+    name = "commutative ring",
+    al = additiveAbGroup,
+    ml = multiplicativeCMonoid,
+    parents = Seq(ring)
+  )
+
+  def gcdDomain(implicit A: GCDDomain[A]) = RingProperties.fromParent(
+    name = "gcd domain",
+    parent = cRing,
+    "gcd/lcm" → forAll { (x: A, y: A) =>
+      import spire.syntax.gcdDomain._
+      val d = x gcd y
+      val m = x lcm y
+      x * y === d * m
+    }
+  )
+
   def euclideanRing(implicit A: EuclideanRing[A]) = RingProperties.fromParent(
-    // TODO tests?!
     name = "euclidean ring",
-    parent = ring
+    parent = gcdDomain,
+    "euclidean function" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        val (q, r) = x equotmod y
+        r.isZero || (r.euclideanFunction < y.euclideanFunction)
+      }
+    },
+    "submultiplicative function" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      (pred(x) && pred(y)) ==> {
+        x.euclideanFunction <= (x * y).euclideanFunction
+      }
+    }
   )
 
   // Everything below fields (e.g. rings) does not require their multiplication

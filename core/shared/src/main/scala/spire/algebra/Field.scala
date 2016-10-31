@@ -5,6 +5,12 @@ import java.lang.Double.{ isInfinite, isNaN, doubleToLongBits }
 import java.lang.Long.{ numberOfTrailingZeros }
 
 trait Field[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with EuclideanRing[A] with MultiplicativeAbGroup[A] {
+  /* On a field, all nonzero elements are invertible, so the remainder of the
+   division is always 0. */
+  def euclideanFunction(a: A) = BigInt(0)
+  def emod(a: A, b: A): A = zero
+  def equot(a: A, b: A): A = div(a, b)
+  override def equotmod(a: A, b: A): (A, A) = (div(a, b), zero)
 
   /**
    * This is implemented in terms of basic Field ops. However, this is
@@ -37,6 +43,45 @@ trait Field[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Eucli
     }
 
     if (a < 0) negate(unsigned) else unsigned
+  }
+}
+
+/** Default implementations of gcd/lcm for fields with the integers as a subring.
+  * Inspired by the GCD domains of SAGE. 
+  */
+trait FieldWithZSubring[A] extends Any with Field[A] {
+  implicit def eqA: Eq[A]
+  def isWhole(a: A): Boolean
+  def toBigInt(a: A): BigInt
+  def gcd(x: A, y: A): A =
+    if (isWhole(x) && isWhole(y)) fromBigInt(toBigInt(x).gcd(toBigInt(y)))
+    else if (isZero(x) && isZero(y)) zero
+    else one
+  def lcm(x: A, y: A): A =
+    if (isWhole(x) && isWhole(y)) {
+      val bx = toBigInt(x)
+      val by = toBigInt(y)
+      fromBigInt(bx*by/bx.gcd(by))
+    } else times(x, y)
+}
+
+/** Default implementations of gcd/lcm for fraction fields.
+  * Inspired by the GCD domains of SAGE. 
+  */
+trait FieldOfFractionsGCD[A, R] extends Any with Field[A] {
+  implicit def R: GCDRing[R]
+  def numerator(a: A): R
+  def denominator(a: A): R
+  def fraction(num: R, den: R): A
+  def gcd(x: A, y: A): A = {
+    val num = R.gcd(numerator(x), numerator(y))
+    val den = R.lcm(denominator(x), denominator(y))
+    fraction(num, den)
+  }
+  def lcm(x: A, y: A): A = {
+    val num = R.lcm(numerator(x), numerator(y))
+    val den = R.gcd(denominator(x), denominator(y))
+    fraction(num, den)
   }
 }
 

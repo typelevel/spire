@@ -4,9 +4,10 @@ package math
 import scala.math.ScalaNumericConversions
 import java.lang.Math
 
-import spire.algebra.{Eq, EuclideanRing, Field, IsReal, IsRational, NRoot, Order, Ring, Signed, Trig}
+import spire.algebra.{CRing, EuclideanRing, Field, GCDRing, IsReal, IsRational, NRoot, Order, Signed, Trig}
 import spire.std.bigDecimal._
 import spire.syntax.isReal._
+import spire.syntax.field._
 import spire.syntax.nroot._
 
 // TODO: implement toNumber and fromNumber in ConvertableTo/From.
@@ -600,7 +601,7 @@ trait NumberInstances {
   implicit final val NumberAlgebra = new NumberAlgebra
 }
 
-private[math] trait NumberIsRing extends Ring[Number] {
+private[math] trait NumberIsRing extends CRing[Number] {
   override def minus(a:Number, b:Number): Number = a - b
   def negate(a:Number): Number = -a
   def one: Number = Number.one
@@ -612,11 +613,21 @@ private[math] trait NumberIsRing extends Ring[Number] {
   override def fromInt(n: Int): Number = Number(n)
 }
 
-private[math] trait NumberIsEuclideanRing extends EuclideanRing[Number] with NumberIsRing {
-  def quot(a:Number, b:Number): Number = a / b
-  def mod(a:Number, b:Number): Number = a % b
-  override def quotmod(a:Number, b:Number): (Number, Number) = a /% b
-  def gcd(a: Number, b: Number): Number = euclid(a, b)(Eq[Number])
+private[math] trait NumberIsGCDRing extends GCDRing[Number] with NumberIsRing {
+  def gcd(a: Number, b: Number): Number = {
+    if (a.isExact && b.isExact)
+      a.toRational gcd b.toRational
+    else Number.one
+  }
+  def lcm(a: Number, b: Number): Number = {
+    if (a.isExact && b.isExact)
+      a.toRational lcm b.toRational
+    else times(a, b)
+  }
+}
+
+private[math] trait NumberIsEuclideanRing extends EuclideanRing[Number] with NumberIsGCDRing {
+  // nothing, euclidean ring methods are provided by field
 }
 
 private[math] trait NumberIsField extends Field[Number] with NumberIsEuclideanRing {

@@ -14,10 +14,12 @@ import spire.syntax.std.seq._
  * Polynomial
  * A univariate polynomial class and EuclideanRing extension trait
  * for arithmetic operations. Polynomials can be instantiated using
- * any type C for which a Ring[C] and Signed[C] are in scope, with
- * exponents given by Int values. Some operations require a Field[C]
+ * any type C for which a Ring[C] and Eq[C] are in scope, with
+ * exponents given by Int values. Some operations require more precise
+ * algebraic structures, such as `GCDRing`,  `EuclideanRing` or `Field`
  * to be in scope.
-*/
+ *  
+ */
 
 object Polynomial extends PolynomialInstances {
 
@@ -406,9 +408,9 @@ trait Polynomial[@sp(Double) C] { lhs =>
   def +(rhs: Polynomial[C])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C]
   def -(rhs: Polynomial[C])(implicit ring: Rng[C], eq: Eq[C]): Polynomial[C] = lhs + (-rhs)
   def *(rhs: Polynomial[C])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C]
-  def /~(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = (lhs /% rhs)._1
-  def /%(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): (Polynomial[C], Polynomial[C])
-  def %(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = (lhs /% rhs)._2
+  def equot(rhs: Polynomial[C])(implicit ring: EuclideanRing[C], eq: Eq[C]): Polynomial[C] = (lhs equotmod rhs)._1
+  def equotmod(rhs: Polynomial[C])(implicit ring: EuclideanRing[C], eq: Eq[C]): (Polynomial[C], Polynomial[C])
+  def emod(rhs: Polynomial[C])(implicit ring: EuclideanRing[C], eq: Eq[C]): Polynomial[C] = (lhs equotmod rhs)._2
 
   def **(k: Int)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = pow(k)
 
@@ -520,9 +522,16 @@ with Ring[Polynomial[C]] {
   def one: Polynomial[C] = Polynomial.one[C]
 }
 
-trait PolynomialEuclideanRing[@sp(Double) C] extends PolynomialRing[C]
+trait PolynomialGCDRing[@sp(Double) C] extends PolynomialRing[C]
+with GCDRing[Polynomial[C]] {
+  implicit override val scalar: GCDRing[C]
+
+}
+
+
+trait PolynomialEuclideanRing[@sp(Double) C] extends PolynomialGCDRing[C]
 with EuclideanRing[Polynomial[C]] with VectorSpace[Polynomial[C], C] {
-  implicit override val scalar: Field[C]
+  implicit override val scalar: EuclideanRing[C]
 
   override def divr(x: Polynomial[C], k: C): Polynomial[C] = x :/ k
   def quot(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = x /~ y
