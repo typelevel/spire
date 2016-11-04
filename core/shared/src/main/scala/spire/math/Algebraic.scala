@@ -1539,6 +1539,9 @@ private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoo
   def fpow(a:Algebraic, b:Algebraic): Algebraic = throw new UnsupportedOperationException("unsupported operation")
   override def fromInt(n: Int): Algebraic = Algebraic(n)
   override def fromDouble(n: Double): Algebraic = Algebraic(n)
+  def gcd(a:Algebraic, b:Algebraic): Algebraic =
+    if (a.isZero && b.isZero) zero else one
+  def lcm(a:Algebraic, b:Algebraic): Algebraic = a * b
 }
 
 private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {

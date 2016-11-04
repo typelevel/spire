@@ -28,7 +28,7 @@ object Quaternion extends QuaternionInstances {
 
 // really a skew field
 private[math] trait QuaternionAlgebra[A]
-    extends Field[Quaternion[A]]
+    extends DivisionRing[Quaternion[A]]
     with Eq[Quaternion[A]]
     with NRoot[Quaternion[A]]
     with InnerProductSpace[Quaternion[A], A]

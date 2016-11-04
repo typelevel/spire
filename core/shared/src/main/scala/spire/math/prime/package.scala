@@ -134,7 +134,7 @@ package object prime {
 
     def rho(n: SafeLong, c: SafeLong): SafeLong = {
 
-      @inline def f(x: SafeLong): SafeLong = ((x * x) % n + c) % n
+      @inline def f(x: SafeLong): SafeLong = ((x * x) tmod n + c) tmod n
 
       @tailrec def fastRho(x: SafeLong, q0: SafeLong, r: SafeLong, m: SafeLong): SafeLong = {
         var y = x
@@ -149,7 +149,7 @@ package object prime {
           val limit = m min (r - k)
           cfor(0)(limit > _, _ + 1) { _ =>
             y = f(y)
-            q = (q * (x - y).abs) % n
+            q = (q * (x - y).abs) tmod n
           }
           if (q == 0) g = n else g = n gcd q
           k = k + m
@@ -172,10 +172,10 @@ package object prime {
         Factors.one
       } else if (isPrime(n)) {
         Factors(Map((n, 1)), Positive)
-      } else if (n % 2 == 0) {
+      } else if (n.isEven) {
         var x = n / 2
         var e = 1
-        while (x % 2 == 0) { x /= 2; e += 1 }
+        while (x.isEven) { x /= 2; e += 1 }
         Factors(Map((SafeLong(2), e)), Positive) * factor(x)
       } else {
         var divisor = rho(n, rand(n))
@@ -203,7 +203,7 @@ package object prime {
   private def findPowers(x0: SafeLong, b: SafeLong): (SafeLong, Int) = {
     var x = x0
     var e = 0
-    while (x > 1 && x % b == 0) { e += 1; x = x / b }
+    while (x > 1 && (x tmod b) == 0) { e += 1; x = x / b }
     (x, e)
   }
 

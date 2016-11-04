@@ -34,6 +34,9 @@ trait IsRealSyntax extends SignedSyntax {
 
 trait TruncatedDivisionSyntax extends SignedSyntax {
   implicit def truncatedDivisionOps[A:TruncatedDivision](a: A): TruncatedDivisionOps[A] = new TruncatedDivisionOps(a)
+  implicit def literalIntTruncatedDivisionOps(lhs:Int): LiteralIntTruncatedDivisionOps = new LiteralIntTruncatedDivisionOps(lhs)
+  implicit def literalLongTruncatedDivisionOps(lhs:Long): LiteralLongTruncatedDivisionOps = new LiteralLongTruncatedDivisionOps(lhs)
+  implicit def literalDoubleTruncatedDivisionOps(lhs:Double): LiteralDoubleTruncatedDivisionOps = new LiteralDoubleTruncatedDivisionOps(lhs)
 }
 
 trait SemigroupoidSyntax {

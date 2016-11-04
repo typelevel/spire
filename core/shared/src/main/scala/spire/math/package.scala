@@ -9,7 +9,7 @@ import scala.math.ScalaNumericConversions
 
 import BigDecimal.RoundingMode.{FLOOR, HALF_UP, CEILING}
 
-import spire.algebra.{EuclideanRing, Field, IsReal, NRoot, Order, Signed, Trig}
+import spire.algebra.{GCDRing, Field, IsReal, NRoot, Order, Signed, Trig}
 import spire.std.bigDecimal._
 import spire.syntax.nroot._
 
@@ -314,6 +314,69 @@ package object math {
   final def lcm(x: Long, y: Long): Long = (x / gcd(x, y)) * y
   final def lcm(a: BigInt, b: BigInt): BigInt = (a / a.gcd(b)) * b
   final def lcm[A](x: A, y: A)(implicit ev: GCDRing[A]): A = ev.lcm(x, y)
+
+  /**
+    * truncated division
+    */
+  def tquot(x: Int, y: Int): Int = x / y
+  def tquot(x: Long, y: Long): Long = x / y
+  def tquot(x: BigInt, y: BigInt): BigInt = x / y
+
+  def tmod(x: Int, y: Int): Int = x % y
+  def tmod(x: Long, y: Long): Long = x % y
+  def tmod(x: BigInt, y: BigInt): BigInt = x % y
+
+  def tquotmod(x: Int, y: Int): (Int, Int) = (x / y, x % y)
+  def tquotmod(x: Long, y: Long): (Long, Long) = (x / y, x % y)
+  def tquotmod(x: BigInt, y: BigInt): (BigInt, BigInt) = (x / y, x % y)
+
+  def fquot(x: Int, y: Int): Int = { // TODO: for java 1.8, replace by java.lang.Math.floorDiv
+    val tq = x / y
+    val tm = x % y
+    if (tm.signum == -y.signum) tq - 1 else tq
+  }
+  def fquot(x: Long, y: Long): Long = { // TODO: for java 1.8, replace by java.lang.Math.floorDiv
+    val tq = x / y
+    val tm = x % y
+    if (tm.signum == -y.signum) tq - 1 else tq
+  }
+  def fquot(x: BigInt, y: BigInt): BigInt = { // TODO: for java 1.8, replace by java.lang.Math.floorDiv
+    val tq = x / y
+    val tm = x % y
+    if (tm.signum == -y.signum) tq - 1 else tq
+  }
+
+  def fmod(x: Int, y: Int): Int = { // TODO: for java 1.8, replace by java.lang.Math.floorMod
+    val tm = x % y
+    if (tm.signum == -y.signum) tm + y else tm
+  }
+  def fmod(x: Long, y: Long): Long = { // TODO: for java 1.8, replace by java.lang.Math.floorMod
+    val tm = x % y
+    if (tm.signum == -y.signum) tm + y else tm
+  }
+  def fmod(x: BigInt, y: BigInt): BigInt = { // TODO: for java 1.8, replace by java.lang.Math.floorMod
+    val tm = x % y
+    if (tm.signum == -y.signum) tm + y else tm
+  }
+
+  def fquotmod(x: Int, y: Int): (Int, Int) = {
+    // TODO: for java 1.8, replace by java.lang.Math.floorDiv,Mod
+    val tq = x / y
+    val tm = x % y
+    if (tm.signum == -y.signum) (tq - 1, tm + y) else (tq, tm)
+  }
+  def fquotmod(x: Long, y: Long): (Long, Long) = {
+    // TODO: for java 1.8, replace by java.lang.Math.floorDiv,Mod
+    val tq = x / y
+    val tm = x % y
+    if (tm.signum == -y.signum) (tq - 1, tm + y) else (tq, tm)
+  }
+  def fquotmod(x: BigInt, y: BigInt): (BigInt, BigInt) = {
+    // TODO: for java 1.8, replace by java.lang.Math.floorDiv,Mod
+    val tq = x / y
+    val tm = x % y
+    if (tm.signum == -y.signum) (tq - 1, tm + y) else (tq, tm)
+  }
 
   /**
    * min

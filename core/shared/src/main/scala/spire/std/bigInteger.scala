@@ -16,13 +16,15 @@ trait BigIntegerIsEuclideanRing extends EuclideanRing[BigInteger] {
 
   override def fromInt(n: Int): BigInteger = BigInteger.valueOf(n)
 
-  def quot(a:BigInteger, b:BigInteger): BigInteger = a divide b
-  def mod(a:BigInteger, b:BigInteger): BigInteger = a remainder b
-  override def quotmod(a:BigInteger, b:BigInteger): (BigInteger, BigInteger) = {
+  def euclideanFunction(a: BigInteger): BigInt = BigInt(a.abs)
+  def equot(a: BigInteger, b: BigInteger): BigInteger = a divide b
+  def emod(a: BigInteger, b: BigInteger): BigInteger = a remainder b
+  override def equotmod(a: BigInteger, b: BigInteger): (BigInteger, BigInteger) = {
     val Array(d, r) = a.divideAndRemainder(b)
     (d, r)
   }
-  def gcd(a:BigInteger, b:BigInteger): BigInteger = a.gcd(b)
+  def gcd(a: BigInteger, b: BigInteger): BigInteger = a.gcd(b)
+  def lcm(a: BigInteger, b: BigInteger): BigInteger = a.divide(a.gcd(b)).multiply(b)
 }
 
 // This is not included in the *Instances trait!

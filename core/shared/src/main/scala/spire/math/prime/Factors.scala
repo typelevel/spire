@@ -122,33 +122,33 @@ case class Factors(factors: Map[SafeLong, Int], sign: Sign)
         if (n < rhs) Factors(n) else lhs / Factors(rhs)
     }
 
-  def %(rhs: Factors): Factors = {
+  def emod(rhs: Factors): Factors = {
     val (_, nn, dd, cc) = qm(rhs)
     if (dd.isEmpty) Factors.zero
-    else Factors(((prod(nn) * lhs.signum) % prod(dd)) * prod(cc))
+    else Factors(((prod(nn) * lhs.signum) emod prod(dd)) * prod(cc))
   }
 
-  def %(rhs: SafeLong): Factors =
-    lhs % Factors(rhs)
+  def emod(rhs: SafeLong): Factors =
+    lhs emod Factors(rhs)
 
-  def /%(rhs: Factors): (Factors, Factors) = {
+  def equotmod(rhs: Factors): (Factors, Factors) = {
     val (sign, nn, dd, cc) = qm(rhs)
     if (dd.isEmpty) {
       (Factors(nn, sign), Factors.zero)
     } else {
-      val (q, m) = prod(nn) /% prod(dd)
+      val (q, m) = prod(nn) equotmod prod(dd)
       (Factors(q) * sign, Factors(m * prod(cc)) * lhs.signum)
     }
   }
 
-  def /%(rhs: SafeLong): (Factors, Factors) =
+  def equotmod(rhs: SafeLong): (Factors, Factors) =
     factors.get(rhs) match {
       case Some(1) =>
         (Factors(factors - rhs, sign), Factors.zero)
       case Some(n) =>
         (Factors(factors.updated(rhs, n - 1), sign), Factors.zero)
       case None =>
-        val (q, m) = lhs.value /% rhs
+        val (q, m) = lhs.value equotmod rhs
         (Factors(q), Factors(m))
     }
 

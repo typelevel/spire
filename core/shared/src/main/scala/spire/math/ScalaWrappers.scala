@@ -69,6 +69,8 @@ private[spire] trait ScalaFractionalWrapper[A] extends ScalaNumericWrapper[A] wi
 private[spire] trait ScalaIntegralWrapper[A] extends ScalaNumericWrapper[A] with scala.math.Integral[A]{
   def structure: EuclideanRing[A]
 
-  def quot(x:A, y:A): A = structure.quot(x, y)
-  def rem(x:A, y:A): A = structure.mod(x, y)
+  // TODO: are we sure that quot/rem in scala.math.Integral correspond to the Euclidean ring laws,
+  // or do they correspond to truncated division?
+  def quot(x:A, y:A): A = structure.equot(x, y) 
+  def rem(x:A, y:A): A = structure.emod(x, y)
 }

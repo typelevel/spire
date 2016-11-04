@@ -18,47 +18,56 @@ package algebra
  * where sign is the sign function, and the absolute value 
  * function |x| is defined as |x| = x if x >=0, and |x| = -x otherwise.
  * 
- * We define functions tmod and tdiv such that:
- * q = tdiv(x, y) and r = tmod(x, y) obey rule (4t)
- * and functions fmod and fdiv such that:
- * q = fdiv(x, y) and r = fmod(x, y) obey rule (4f)
+ * We define functions tmod and tquot such that:
+ * q = tquot(x, y) and r = tmod(x, y) obey rule (4t)
+ * and functions fmod and fquot such that:
+ * q = fquot(x, y) and r = fmod(x, y) obey rule (4f)
  * 
  * Law (4t) corresponds to ISO C99 and Haskell's quot/rem.
  * Law (4f) is described by Knuth and used by Haskell,
  * and fmod corresponds to the REM function of the IEEE floating-point standard.
  */
 trait TruncatedDivision[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Signed[A] {
-  def tdiv(x: A, y: A): BigInt
-  def tmod(x: A, y: A): A
-  def tdivmod(x: A, y: A): (BigInt, A) = (tdiv(x, y), tmod(x, y))
+  /** Returns the integer `a` such that `x = a * one`, if it exists. */
+  def toBigIntOption(x: A): Option[BigInt]
 
-  def fdiv(x: A, y: A): BigInt
+  def tquot(x: A, y: A): A
+  def tmod(x: A, y: A): A
+  def tquotmod(x: A, y: A): (A, A) = (tquot(x, y), tmod(x, y))
+
+  def fquot(x: A, y: A): A
   def fmod(x: A, y: A): A
-  def fdivmod(x: A, y: A): (BigInt, A)
+  def fquotmod(x: A, y: A): (A, A)
 }
 
-trait TruncatedDivisionCRing[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with TruncatedDivision[A] with CRing[A] {
+trait TruncatedDivisionCRing[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with TruncatedDivision[A] with CRing[A] { self =>
 
   def fmod(x: A, y: A): A = {
-    val (tq, tm) = tdivmod(x, y)
+    val tm = tmod(x, y)
     if (signum(tm) == -signum(y)) plus(tm, y) else tm
   }
 
-  def fdiv(x: A, y: A): BigInt = {
-    val (tq, tm) = tdivmod(x, y)
-    if (signum(tm) == -signum(y)) tq - 1 else tq
+  def fquot(x: A, y: A): A = {
+    val (tq, tm) = tquotmod(x, y)
+    if (signum(tm) == -signum(y)) minus(tq, one) else tq
   }
 
-  def fdivmod(x: A, y: A): (BigInt, A) = {
-    val (tq, tm) = tdivmod(x, y)
-    val i = if (signum(tm) == -signum(y)) 1 else 0
-    val fq = tq - i
-    val fm = if (i == 1) plus(tm, y) else tm
-    (fq, fm)
+  def fquotmod(x: A, y: A): (A, A) = {
+    val (tq, tm) = tquotmod(x, y)
+    TruncatedDivision.fquotmodFromTquotmod(x, y, tq, tm)(self, self)
   }
 
 }
 
 object TruncatedDivision {
+
+  def fquotmodFromTquotmod[A:CRing:Signed](x: A, y: A, tquot: A, tmod: A): (A, A) = {
+    val signsDiffer = (Signed[A].signum(tmod) == -Signed[A].signum(y))
+    val fquot = if (signsDiffer) CRing[A].minus(tquot, CRing[A].one) else tquot
+    val fmod = if (signsDiffer) CRing[A].plus(tmod, y) else tmod
+    (fquot, fmod)
+  }
+
   def apply[A](implicit ev: TruncatedDivision[A]): TruncatedDivision[A] = ev
+
 }

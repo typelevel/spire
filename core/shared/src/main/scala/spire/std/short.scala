@@ -1,7 +1,7 @@
 package spire
 package std
 
-import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Signed}
+import spire.algebra._
 import spire.math.BitString
 
 trait ShortIsEuclideanRing extends EuclideanRing[Short] {
@@ -15,9 +15,11 @@ trait ShortIsEuclideanRing extends EuclideanRing[Short] {
 
   override def fromInt(n: Int): Short = n.toShort
 
-  def quot(a: Short, b: Short): Short = (a / b).toShort
-  def mod(a: Short, b: Short): Short = (a % b).toShort
+  def euclideanFunction(a: Short): BigInt = BigInt(a.toInt.abs)
+  def equot(a: Short, b: Short): Short = (a / b).toShort
+  def emod(a: Short, b: Short): Short = (a % b).toShort
   def gcd(a: Short, b: Short): Short = spire.math.gcd(a, b).toShort
+  def lcm(a: Short, b: Short): Short = spire.math.lcm(a, b).toShort
 }
 
 // Not included in Instances trait.
@@ -53,12 +55,18 @@ trait ShortOrder extends Order[Short] {
   def compare(x: Short, y: Short): Int = java.lang.Integer.signum((x: Int) - (y: Int))
 }
 
-trait ShortIsSigned extends Signed[Short] {
+trait ShortIsSigned extends Signed[Short] with ShortOrder {
   override def signum(a: Short): Int = a
   override def abs(a: Short): Short = (if (a < 0) -a else a).toShort
 }
 
-trait ShortIsReal extends IsIntegral[Short] with ShortOrder with ShortIsSigned {
+trait ShortTruncatedDivision extends TruncatedDivisionCRing[Short] with ShortIsSigned {
+  def toBigIntOption(x: Short): Option[BigInt] = Some(BigInt(x))
+  def tquot(a: Short, b: Short): Short = (a / b).toShort
+  def tmod(a: Short, b: Short): Short = (a % b).toShort
+}
+
+trait ShortIsReal extends IsIntegral[Short] with ShortTruncatedDivision {
   def toDouble(n: Short): Double = n.toDouble
   def toBigInt(n: Short): BigInt = BigInt(n)
 }

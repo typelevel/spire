@@ -1,13 +1,8 @@
 package spire
 package std
 
-import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
+import spire.algebra._
 import spire.math.Rational
-
-import java.lang.Math
-import java.lang.Integer.{ numberOfTrailingZeros, numberOfLeadingZeros }
-import java.lang.Float.{ intBitsToFloat, floatToIntBits }
-
 
 trait FloatIsField extends Field[Float] {
   override def minus(a:Float, b:Float): Float = a - b
@@ -19,53 +14,12 @@ trait FloatIsField extends Field[Float] {
   def zero: Float = 0.0F
 
   override def fromInt(n: Int): Float = n
-
-  def quot(a:Float, b:Float): Float = (a - (a % b)) / b
-  def mod(a:Float, b:Float): Float = a % b
-
-  final def gcd(a:Float, b:Float):Float = {
-    def value(bits: Int): Int = bits & 0x007FFFFF | 0x00800000
-
-    def exp(bits: Int): Int = ((bits >> 23) & 0xFF).toInt
-
-    // Computes the GCD of 2 fp values. Here, we are guaranteed that exp0 < exp1.
-    def gcd0(val0: Int, exp0: Int, val1: Int, exp1: Int): Float = {
-      val tz0 = numberOfTrailingZeros(val0)
-      val tz1 = numberOfTrailingZeros(val1)
-      val tzShared = spire.math.min(tz0, tz1 + exp1 - exp0)
-      // We trim of the power of 2s, then add back the shared portion.
-      val n = spire.math.gcd(val0 >>> tz0, val1 >>> tz1).toInt << tzShared
-      // Number of bits to move the leading 1 to bit position 23.
-      val shift = numberOfLeadingZeros(n) - 8
-      val exp = (exp0 - shift)
-      // If exp is 0, then the value is actually just the mantissa * 2^−126,
-      // so we need to adjust the *shift* accordingly.
-      val shift0 = if (exp == 0) shift - 1 else shift
-      val mantissa = (n << shift0) & 0x007FFFFF
-      // If exp < 0, then we have underflowed; not much we can do but return 0.
-      if (exp < 0) 0F
-      else intBitsToFloat((exp << 23) | mantissa)
-    }
-
-    if (a == 0F) b
-    else if (b == 0F) a
-    else {
-      val aBits = floatToIntBits(a)
-      val aVal = value(aBits)
-      val aExp = exp(aBits)
-
-      val bBits = floatToIntBits(b)
-      val bVal = value(bBits)
-      val bExp = exp(bBits)
-
-      if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp)
-      else gcd0(bVal, bExp, aVal, aExp)
-    }
-  }
-
   override def fromDouble(n: Double): Float = n.toFloat
 
   def div(a:Float, b:Float): Float = a / b
+
+  def gcd(a: Float, b: Float): Float = if (a == 0 && b == 0) 0 else 1
+  def lcm(a: Float, b: Float): Float = a * b
 }
 
 trait FloatIsNRoot extends NRoot[Float] {
@@ -100,11 +54,6 @@ trait FloatIsTrig extends Trig[Float] {
   def toDegrees(a: Float): Float = (a * 360) / (2 * pi)
 }
 
-trait FloatIsSigned extends Signed[Float] {
-  override def signum(a: Float): Int = Math.signum(a).toInt
-  override def abs(a: Float): Float = if (a < 0.0f) -a else a
-}
-
 trait FloatOrder extends Order[Float] {
   override def eqv(x:Float, y:Float): Boolean = x == y
   override def neqv(x:Float, y:Float): Boolean = x != y
@@ -117,7 +66,20 @@ trait FloatOrder extends Order[Float] {
   def compare(x: Float, y: Float): Int = java.lang.Float.compare(x, y)
 }
 
-trait FloatIsReal extends IsRational[Float] with FloatOrder with FloatIsSigned {
+trait FloatIsSigned extends Signed[Float] with FloatOrder {
+  override def signum(a: Float): Int = Math.signum(a).toInt
+  override def abs(a: Float): Float = if (a < 0.0f) -a else a
+}
+
+
+trait FloatTruncatedDivision extends TruncatedDivisionCRing[Float] with FloatIsSigned {
+  def toBigIntOption(x: Float): Option[BigInt] = // TODO: find better algorithm
+    if (x.isWhole) Some(Rational(x).toBigInt) else None
+  def tquot(a: Float, b: Float): Float = (a - (a % b)) / b
+  def tmod(a: Float, b: Float): Float = a % b
+}
+
+trait FloatIsReal extends IsRational[Float] with FloatTruncatedDivision {
   def toDouble(x: Float): Double = x.toDouble
   def ceil(a:Float): Float = Math.ceil(a).toFloat
   def floor(a:Float): Float = Math.floor(a).toFloat

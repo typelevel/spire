@@ -1,23 +1,25 @@
 package spire
 package std
 
-import spire.algebra.{EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed}
+import spire.algebra._
 
 trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
-  override def minus(a:BigInt, b:BigInt): BigInt = a - b
-  def negate(a:BigInt): BigInt = -a
+  override def minus(a: BigInt, b: BigInt): BigInt = a - b
+  def negate(a: BigInt): BigInt = -a
   val one: BigInt = BigInt(1)
-  def plus(a:BigInt, b:BigInt): BigInt = a + b
-  override def pow(a:BigInt, b:Int): BigInt = a pow b
-  override def times(a:BigInt, b:BigInt): BigInt = a * b
+  def plus(a: BigInt, b: BigInt): BigInt = a + b
+  override def pow(a: BigInt, b: Int): BigInt = a pow b
+  override def times(a: BigInt, b: BigInt): BigInt = a * b
   val zero: BigInt = BigInt(0)
 
   override def fromInt(n: Int): BigInt = BigInt(n)
 
-  def quot(a:BigInt, b:BigInt): BigInt = a / b
-  def mod(a:BigInt, b:BigInt): BigInt = a % b
-  override def quotmod(a:BigInt, b:BigInt): (BigInt, BigInt) = a /% b
-  def gcd(a:BigInt, b:BigInt): BigInt = a.gcd(b)
+  def euclideanFunction(a: BigInt): BigInt = a.abs
+  def equot(a: BigInt, b: BigInt): BigInt = a / b
+  def emod(a: BigInt, b: BigInt): BigInt = a % b
+  override def equotmod(a: BigInt, b: BigInt): (BigInt, BigInt) = a /% b
+  def gcd(a: BigInt, b: BigInt): BigInt = a.gcd(b)
+  def lcm(a: BigInt, b: BigInt): BigInt = (a / gcd(a,b)) * b
 }
 
 // This is not included in the *Instances trait!
@@ -57,12 +59,19 @@ trait BigIntOrder extends Order[BigInt] {
   def compare(x: BigInt, y: BigInt): Int = x.bigInteger.compareTo(y.bigInteger)
 }
 
-trait BigIntIsSigned extends Signed[BigInt] {
+trait BigIntIsSigned extends Signed[BigInt] with BigIntOrder {
   override def signum(a: BigInt): Int = a.signum
   override def abs(a: BigInt): BigInt = a.abs
 }
 
-trait BigIntIsReal extends IsIntegral[BigInt] with BigIntOrder with BigIntIsSigned with Serializable {
+trait BigIntTruncatedDivision extends TruncatedDivisionCRing[BigInt] with BigIntIsSigned {
+  def toBigIntOption(x: BigInt): Option[BigInt] = Some(x)
+  def tquot(a:BigInt, b:BigInt): BigInt = a / b
+  def tmod(a:BigInt, b:BigInt): BigInt = a % b
+  override def tquotmod(a:BigInt, b:BigInt): (BigInt, BigInt) = a /% b
+}
+
+trait BigIntIsReal extends IsIntegral[BigInt] with BigIntTruncatedDivision with Serializable {
   def toDouble(n: BigInt): Double = n.toDouble
   def toBigInt(n: BigInt): BigInt = n
 }

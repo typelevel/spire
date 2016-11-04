@@ -2,11 +2,10 @@ package spire
 package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
+import java.math.{BigInteger, MathContext, RoundingMode, BigDecimal => JBigDecimal}
 
-import java.math.{BigDecimal => JBigDecimal, BigInteger, MathContext, RoundingMode}
-
-import spire.algebra.{Field, IsRational, NRoot, Sign}
-import spire.algebra.Sign.{ Positive, Zero, Negative }
+import spire.algebra._
+import spire.algebra.Sign.{Negative, Positive, Zero}
 import spire.macros.Checked
 import spire.std.long.LongAlgebra
 import spire.std.double._
@@ -49,14 +48,31 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def *(rhs: Rational): Rational
   def /(rhs: Rational): Rational
 
-  def /~(rhs: Rational): Rational = Rational(SafeLong((this / rhs).toBigInt), SafeLong.one)
-  def %(rhs: Rational): Rational = this - (this /~ rhs) * rhs
-  def /%(rhs: Rational): (Rational, Rational) = {
-    val q = this /~ rhs
-    (q, this - q * rhs)
+  def tquot(rhs: Rational): Rational = Rational((this / rhs).toSafeLong)
+  def tmod(rhs: Rational): Rational = this - (this tquot rhs) * rhs
+  def tquotmod(rhs: Rational): (Rational, Rational) = {
+    val q = tquot(rhs)
+    (q, lhs - q * rhs)
+  }
+
+  def fquot(rhs: Rational): Rational = {
+    val (tq, tm) = lhs tquotmod rhs
+    if (tm.signum == -rhs.signum) tq - Rational.one else tq
+  }
+  def fmod(rhs: Rational): Rational = {
+    val tm = lhs tmod rhs
+    if (tm.signum == -rhs.signum) tm + rhs else tm
+  }
+  def fquotmod(rhs: Rational): (Rational, Rational) = {
+    val (tq, tm) = lhs tquotmod rhs
+    val signsDiffer = (tm.signum == -rhs.signum)
+    val fquot = if (signsDiffer) tq - Rational.one else tq
+    val fmod = if (signsDiffer) tm + rhs else tm
+    (fquot, fmod)
   }
 
   def gcd(rhs: Rational): Rational
+  def lcm(rhs: Rational): Rational = (lhs / lhs.gcd(rhs)) * rhs
 
   def toReal: Real = Real(this)
 
@@ -405,7 +421,7 @@ object Rational extends RationalInstances {
           } {
             val num: SafeLong = SafeLong(n) * rden + SafeLong(r.n) * lden
 
-            val ngcd: Long = spire.math.gcd(dgcd, (num % dgcd).toLong)
+            val ngcd: Long = spire.math.gcd(dgcd, (num tmod dgcd).toLong)
 
             if (ngcd == 1L)
               Rational(num, SafeLong(lden) * r.d)
@@ -414,7 +430,7 @@ object Rational extends RationalInstances {
           }
         }
       case r: BigRational =>
-        val dgcd: Long = spire.math.gcd(d, (r.d % d).toLong)
+        val dgcd: Long = spire.math.gcd(d, (r.d tmod d).toLong)
         if (dgcd == 1L) {
 
           val num = r.d * n + r.n * d
@@ -465,7 +481,7 @@ object Rational extends RationalInstances {
           } {
             val num: SafeLong = SafeLong(n) * rden - SafeLong(r.n) * lden
 
-            val ngcd: Long = spire.math.gcd(dgcd, (num % dgcd).toLong)
+            val ngcd: Long = spire.math.gcd(dgcd, (num tmod dgcd).toLong)
 
             if (ngcd == 1L)
               Rational(num, SafeLong(lden) * r.d)
@@ -474,7 +490,7 @@ object Rational extends RationalInstances {
           }
         }
       case r: BigRational =>
-        val dgcd: Long = spire.math.gcd(d, (r.d % d).toLong)
+        val dgcd: Long = spire.math.gcd(d, (r.d tmod d).toLong)
         if (dgcd == 1L) {
 
           val num = r.d * n - r.n * d
@@ -517,8 +533,8 @@ object Rational extends RationalInstances {
           bigRational(SafeLong(n1) * n2, SafeLong(d1) * d2)
         }
       case r: BigRational =>
-        val a = spire.math.gcd(n, (r.d % n).toLong)
-        val b = spire.math.gcd(d, (r.n % d).toLong)
+        val a = spire.math.gcd(n, (r.d tmod n).toLong)
+        val b = spire.math.gcd(d, (r.n tmod d).toLong)
         Rational(SafeLong(n / a) * (r.n / b), SafeLong(d / b) * (r.d / a))
     }
 
@@ -550,8 +566,8 @@ object Rational extends RationalInstances {
         }
       case r: BigRational =>
         if (n == 0L) return this
-        val a = spire.math.gcd(n, (r.n % n).toLong)
-        val b = spire.math.gcd(d, (r.d % d).toLong)
+        val a = spire.math.gcd(n, (r.n tmod n).toLong)
+        val b = spire.math.gcd(d, (r.d tmod d).toLong)
         val num = SafeLong(n / a) * (r.d / b)
         val den = SafeLong(d / b) * (r.n / a)
         if (den.signum < 0) Rational(-num, -den) else Rational(num, den)
@@ -571,9 +587,9 @@ object Rational extends RationalInstances {
         }
 
       case r: BigRational =>
-        val dgcd: Long = spire.math.gcd(d, (r.d % d).toLong)
+        val dgcd: Long = spire.math.gcd(d, (r.d tmod d).toLong)
         if (dgcd == 1L) {
-          Rational(spire.math.gcd(spire.math.abs(n), spire.math.abs((r.n % n).toLong)),
+          Rational(spire.math.gcd(spire.math.abs(n), spire.math.abs((r.n tmod n).toLong)),
             SafeLong(d) * r.d)
         } else {
           val lm = d / dgcd
@@ -624,7 +640,7 @@ object Rational extends RationalInstances {
         }
 
       case r: BigRational =>
-        val dgcd = spire.math.gcd(d, (r.d % d).toLong)
+        val dgcd = spire.math.gcd(d, (r.d tmod d).toLong)
         if (dgcd == 1L)
           (SafeLong(n) * r.d) compare (r.n * d)
         else
@@ -766,10 +782,10 @@ object Rational extends RationalInstances {
 
     def round: Rational =
       if (n.signum >= 0) {
-        val m = n % d
+        val m = n tmod d
         if (m >= (d - m)) Rational(n / d + 1) else Rational(n / d)
       } else {
-        val m = -(n % d)
+        val m = -(n tmod d)
         if (m >= (d - m)) Rational(n / d - 1) else Rational(n / d)
       }
 
@@ -784,7 +800,7 @@ object Rational extends RationalInstances {
 
     def compare(r: Rational): Int = r match {
       case r: LongRational =>
-        val dgcd = spire.math.gcd(r.d, (d % r.d).toLong)
+        val dgcd = spire.math.gcd(r.d, (d tmod r.d).toLong)
         if (dgcd == 1L)
           (n * r.d) compare (SafeLong(r.n) * d)
         else
@@ -839,16 +855,14 @@ private[math] trait RationalIsField extends Field[Rational] {
   override def pow(a:Rational, b:Int): Rational = a.pow(b)
   override def times(a:Rational, b:Rational): Rational = a * b
   def zero: Rational = Rational.zero
-  def quot(a:Rational, b:Rational): Rational = a /~ b
-  def mod(a:Rational, b:Rational): Rational = a % b
-  override def quotmod(a:Rational, b:Rational): (Rational, Rational) = a /% b
   def gcd(a:Rational, b:Rational): Rational = a gcd b
+  def lcm(a:Rational, b:Rational): Rational = a lcm b
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
   def div(a:Rational, b:Rational): Rational = a / b
 }
 
-private[math] trait RationalIsReal extends IsRational[Rational] {
+private[math] trait RationalTruncatedDivision extends TruncatedDivision[Rational] {
   override def eqv(x:Rational, y:Rational): Boolean = x == y
   override def neqv(x:Rational, y:Rational): Boolean = x != y
   override def gt(x: Rational, y: Rational): Boolean = x > y
@@ -861,6 +875,18 @@ private[math] trait RationalIsReal extends IsRational[Rational] {
   override def signum(a: Rational): Int = a.signum
   override def abs(a: Rational): Rational = a.abs
 
+  def toBigIntOption(x: Rational): Option[BigInt] =
+    if (x.isWhole) Some(x.numerator.toBigInt) else None
+  def tquot(x: Rational, y: Rational): Rational = x tquot y
+  def tmod(x: Rational, y: Rational): Rational = x tmod y
+  override def tquotmod(a:Rational, b:Rational): (Rational, Rational) = a tquotmod b
+
+  def fquot(x: Rational, y: Rational): Rational = x fquot y
+  def fmod(x: Rational, y: Rational): Rational = x fmod y
+  override def fquotmod(a:Rational, b:Rational): (Rational, Rational) = a fquotmod b
+}
+
+private[math] trait RationalIsReal extends IsRational[Rational] with RationalTruncatedDivision {
   def toDouble(r: Rational): Double = r.toDouble
   def ceil(a:Rational): Rational = a.ceil
   def floor(a:Rational): Rational = a.floor

@@ -46,42 +46,49 @@ trait Field[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Eucli
   }
 }
 
-/** Default implementations of gcd/lcm for fields with the integers as a subring.
-  * Inspired by the GCD domains of SAGE. 
-  */
-trait FieldWithZSubring[A] extends Any with Field[A] {
-  implicit def eqA: Eq[A]
-  def isWhole(a: A): Boolean
-  def toBigInt(a: A): BigInt
-  def gcd(x: A, y: A): A =
-    if (isWhole(x) && isWhole(y)) fromBigInt(toBigInt(x).gcd(toBigInt(y)))
-    else if (isZero(x) && isZero(y)) zero
-    else one
-  def lcm(x: A, y: A): A =
-    if (isWhole(x) && isWhole(y)) {
-      val bx = toBigInt(x)
-      val by = toBigInt(y)
-      fromBigInt(bx*by/bx.gcd(by))
-    } else times(x, y)
-}
+object FieldAsGCDRing {
 
-/** Default implementations of gcd/lcm for fraction fields.
-  * Inspired by the GCD domains of SAGE. 
-  */
-trait FieldOfFractionsGCD[A, R] extends Any with Field[A] {
-  implicit def R: GCDRing[R]
-  def numerator(a: A): R
-  def denominator(a: A): R
-  def fraction(num: R, den: R): A
-  def gcd(x: A, y: A): A = {
-    val num = R.gcd(numerator(x), numerator(y))
-    val den = R.lcm(denominator(x), denominator(y))
-    fraction(num, den)
+  def defaultGcd[A:CRing:Eq](x: A, y: A): A =
+    if(CRing[A].isZero(x) && CRing[A].isZero(y)) CRing[A].zero else CRing[A].one
+  def defaultLcm[A:CRing](x: A, y: A): A = CRing[A].times(x, y)
+
+  /** Default implementations of gcd/lcm for fields with the integers as a subring.
+    * Inspired by the GCD domains of SAGE. 
+    */
+  trait WithZSubring[A] extends Any with Field[A] {
+    implicit def eqA: Eq[A]
+    def isWhole(a: A): Boolean
+    def toBigInt(a: A): BigInt
+    def gcd(x: A, y: A): A =
+      if (isWhole(x) && isWhole(y)) fromBigInt(toBigInt(x).gcd(toBigInt(y)))
+      else if (isZero(x) && isZero(y)) zero
+      else one
+    def lcm(x: A, y: A): A =
+      if (isWhole(x) && isWhole(y)) {
+        val bx = toBigInt(x)
+        val by = toBigInt(y)
+        fromBigInt(bx*by/bx.gcd(by))
+      } else times(x, y)
   }
-  def lcm(x: A, y: A): A = {
-    val num = R.lcm(numerator(x), numerator(y))
-    val den = R.gcd(denominator(x), denominator(y))
-    fraction(num, den)
+
+  /** Default implementations of gcd/lcm for fraction fields.
+    * Inspired by the GCD domains of SAGE. 
+    */
+  trait AsFieldOfFractions[A, R] extends Any with Field[A] {
+    implicit def R: GCDRing[R]
+    def numerator(a: A): R
+    def denominator(a: A): R
+    def fraction(num: R, den: R): A
+    def gcd(x: A, y: A): A = {
+      val num = R.gcd(numerator(x), numerator(y))
+      val den = R.lcm(denominator(x), denominator(y))
+      fraction(num, den)
+    }
+    def lcm(x: A, y: A): A = {
+      val num = R.lcm(numerator(x), numerator(y))
+      val den = R.gcd(denominator(x), denominator(y))
+      fraction(num, den)
+    }
   }
 }
 

@@ -1,7 +1,7 @@
 package spire
 package std
 
-import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Signed}
+import spire.algebra._
 import spire.math.BitString
 
 trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
@@ -15,9 +15,11 @@ trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
 
   override def fromInt(n: Int): Byte = n.toByte
 
-  def quot(a: Byte, b: Byte): Byte = (a / b).toByte
-  def mod(a: Byte, b: Byte): Byte = (a % b).toByte
+  def euclideanFunction(a: Byte): BigInt = BigInt(a.toInt.abs)
+  def equot(a: Byte, b: Byte): Byte = (a / b).toByte
+  def emod(a: Byte, b: Byte): Byte = (a % b).toByte
   def gcd(a: Byte, b: Byte): Byte = spire.math.gcd(a, b).toByte
+  def lcm(a: Byte, b: Byte): Byte = spire.math.lcm(a, b).toByte
 }
 
 // Not included in Instances trait.
@@ -43,11 +45,6 @@ trait ByteIsNRoot extends NRoot[Byte] {
   def fpow(a: Byte, b: Byte): Byte = Math.pow(a, b).toByte
 }
 
-trait ByteIsSigned extends Signed[Byte] {
-  override def signum(a: Byte): Int = a
-  override def abs(a: Byte): Byte = (if (a < 0) -a else a).toByte
-}
-
 trait ByteOrder extends Order[Byte] {
   override def eqv(x:Byte, y:Byte): Boolean = x == y
   override def neqv(x:Byte, y:Byte): Boolean = x != y
@@ -58,7 +55,18 @@ trait ByteOrder extends Order[Byte] {
   def compare(x: Byte, y: Byte): Int = java.lang.Integer.signum((x: Int) - (y: Int))
 }
 
-trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned {
+trait ByteIsSigned extends Signed[Byte] with ByteOrder {
+  override def signum(a: Byte): Int = a
+  override def abs(a: Byte): Byte = (if (a < 0) -a else a).toByte
+}
+
+trait ByteTruncatedDivision extends TruncatedDivisionCRing[Byte] with ByteIsSigned {
+  def toBigIntOption(x: Byte): Option[BigInt] = Some(BigInt(x))
+  def tquot(a: Byte, b: Byte): Byte = (a / b).toByte
+  def tmod(a: Byte, b: Byte): Byte = (a % b).toByte
+}
+
+trait ByteIsReal extends IsIntegral[Byte] with ByteTruncatedDivision {
   def toDouble(n: Byte): Double = n.toDouble
   def toBigInt(n: Byte): BigInt = BigInt(n)
 }

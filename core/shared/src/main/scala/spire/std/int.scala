@@ -1,9 +1,8 @@
 package spire
 package std
 
-import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Signed}
+import spire.algebra._
 import spire.math.BitString
-
 import java.lang.Math
 import java.lang.Integer
 
@@ -18,9 +17,11 @@ trait IntIsEuclideanRing extends EuclideanRing[Int] {
 
   override def fromInt(n: Int): Int = n
 
-  def quot(a:Int, b:Int): Int = a / b
-  def mod(a:Int, b:Int): Int = a % b
+  def euclideanFunction(a: Int): BigInt = BigInt(a.toLong.abs)
+  def equot(a:Int, b:Int): Int = a / b
+  def emod(a:Int, b:Int): Int = a % b
   def gcd(a:Int, b:Int): Int = spire.math.gcd(a, b).toInt
+  def lcm(a:Int, b:Int): Int = spire.math.lcm(a, b).toInt
 }
 
 // Not included in Instances trait.
@@ -56,12 +57,18 @@ trait IntOrder extends Order[Int] {
   def compare(x: Int, y: Int): Int = if (x < y) -1 else if (x == y) 0 else 1
 }
 
-trait IntIsSigned extends Signed[Int] {
+trait IntIsSigned extends Signed[Int] with IntOrder {
   override def signum(a: Int): Int = java.lang.Integer.signum(a)
   override def abs(a: Int): Int = if (a < 0) -a else a
 }
 
-trait IntIsReal extends IsIntegral[Int] with IntOrder with IntIsSigned {
+trait IntTruncatedDivision extends TruncatedDivisionCRing[Int] with IntIsSigned {
+  def toBigIntOption(x: Int): Option[BigInt] = Some(BigInt(x))
+  def tquot(a: Int, b: Int): Int = a / b
+  def tmod(a: Int, b: Int): Int = a % b
+}
+
+trait IntIsReal extends IsIntegral[Int] with IntTruncatedDivision {
   def toDouble(n: Int): Double = n.toDouble
   def toBigInt(n: Int): BigInt = BigInt(n)
 }

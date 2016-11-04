@@ -3,7 +3,7 @@ package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import spire.algebra.{Order, Trig, Signed}
+import spire.algebra.{Trig, TruncatedDivisionCRing}
 import spire.syntax.nroot._
 
 sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
@@ -159,8 +159,8 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   def /(y: Real): Real = x * y.reciprocal
 
-  def %(y: Real): Real = (x, y) match {
-    case (Exact(nx), Exact(ny)) => Exact(nx % ny)
+  def tmod(y: Real): Real = (x, y) match {
+    case (Exact(nx), Exact(ny)) => Exact(nx tmod ny)
     case _ => Real({ p =>
       val d = x / y
       val s = d(2)
@@ -169,8 +169,8 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     })
   }
 
-  def /~(y: Real): Real = (x, y) match {
-    case (Exact(nx), Exact(ny)) => Exact(nx /~ ny)
+  def tquot(y: Real): Real = (x, y) match {
+    case (Exact(nx), Exact(ny)) => Exact(nx tquot ny)
     case _ => Real({ p =>
       val d = x / y
       val s = d(2)
@@ -179,20 +179,12 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     })
   }
 
-  def gcd(y: Real): Real = (x, y) match {
-    case (Exact(nx), Exact(ny)) => Exact(nx gcd ny)
-    case _ => Real({ p =>
-      val g = x.toRational(p) gcd y.toRational(p)
-      roundUp(g * SafeLong.two.pow(p))
-    })
-  }
-
   def ceil(): Real = x match {
     case Exact(n) => Exact(n.ceil)
     case _ => Real({ p =>
       val n = x(p)
       val t = SafeLong.two.pow(p)
-      val m = n % t
+      val m = n tmod t
       if (m == 0) n
       else if (n.signum >= 0) n + t - m
       else n - m
@@ -204,7 +196,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     case _ => Real({ p =>
       val n = x(p)
       val t = SafeLong.two.pow(p)
-      val m = n % t
+      val m = n tmod t
       if (n.signum >= 0) n - m else n - t - m
     })
   }
@@ -215,7 +207,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
       val n = x(p)
       val t = SafeLong.two.pow(p)
       val h = t / 2
-      val m = n % t
+      val m = n tmod t
       if (m < h) n - m else n - m + t
     })
   }
@@ -226,7 +218,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     case _ =>
       val n = x(Real.bits)
       val t = SafeLong.two.pow(Real.bits)
-        (n % t) == 0
+        (n tmod t) == 0
   }
 
   def sqrt(): Real = Real(p => x(p * 2).sqrt)
@@ -330,7 +322,7 @@ object Real extends RealInstances {
     val z = x / piBy4
     val s = roundUp(Rational(z(2), 4))
     val y = x - piBy4 * Real(s)
-    val m = (s % 8).toInt
+    val m = (s tmod 8).toInt // TODO: replace by fmod
     val n = if (m < 0) m + 8 else m
     n match {
       case 0 => sinDr(y)
@@ -348,7 +340,7 @@ object Real extends RealInstances {
     val z = x / piBy4
     val s = roundUp(Rational(z(2), 4))
     val y = x - piBy4 * Real(s)
-    val m = (s % 8).toInt
+    val m = (s tmod 8).toInt // TODO: replace by fmod
     val n = if (m < 0) m + 8 else m
     n match {
       case 0 => cosDr(y)
@@ -548,7 +540,7 @@ trait RealInstances {
 @SerialVersionUID(0L)
 class RealAlgebra extends RealIsFractional
 
-trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Real] with Trig[Real] {
+trait RealIsFractional extends Fractional[Real] with TruncatedDivisionCRing[Real] with Trig[Real] {
   override def abs(x: Real): Real = x.abs
   override def signum(x: Real): Int = x.signum
 
@@ -562,9 +554,15 @@ trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Rea
   override def minus(x: Real, y: Real): Real = x - y
   def times(x: Real, y: Real): Real = x * y
 
-  def gcd(x: Real, y: Real): Real = x gcd y
-  def quot(x: Real, y: Real): Real = x /~ y
-  def mod(x: Real, y: Real): Real = x % y
+  def gcd(x: Real, y: Real): Real = if(x.signum == 0 && y.signum == 0) 0 else 1
+  def lcm(x: Real, y: Real): Real = x * y
+
+
+  override def toBigIntOption(x: Real): Option[BigInt] =
+    if (x.isWhole) Some(x.toRational.toBigInt) else None
+
+  def tquot(x: Real, y: Real): Real = x tquot y
+  def tmod(x: Real, y: Real): Real = x tmod y
 
   override def reciprocal(x: Real): Real = x.reciprocal
   def div(x: Real, y: Real): Real = x / y

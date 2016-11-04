@@ -178,15 +178,20 @@ trait DistRing[A] extends DistRng[A] with Ring[Dist[A]] {
 
 trait DistEuclideanRing[A] extends EuclideanRing[Dist[A]] with DistRing[A] {
   def alg: EuclideanRing[A]
-  def quot(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.quot(x(g), y(g)))
-  def mod(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.mod(x(g), y(g)))
+  // TODO: check
+  override def euclideanFunction(a: Dist[A]): BigInt = sys.error("The Euclidean function is not defined on distributions")
+  def equot(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.equot(x(g), y(g)))
+  def emod(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.emod(x(g), y(g)))
   def gcd(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.gcd(x(g), y(g)))
+  def lcm(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.lcm(x(g), y(g)))
 }
 
 trait DistField[A] extends Field[Dist[A]] with DistEuclideanRing[A] {
   def alg: Field[A]
   def div(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.div(x(g), y(g)))
   override def reciprocal(x: Dist[A]): Dist[A] = new DistFromGen(g => alg.reciprocal(x(g)))
+  override def equot(x: Dist[A], y: Dist[A]): Dist[A] = super[Field].equot(x, y)
+  override def emod(x: Dist[A], y: Dist[A]): Dist[A] = super[Field].emod(x, y)
 }
 
 trait DistModule[V, K] extends Module[Dist[V], Dist[K]] {

@@ -106,13 +106,41 @@ final class SignedOps[A:Signed](lhs: A) {
 }
 
 final class TruncatedDivisionOps[A:TruncatedDivision](lhs: A) {
-  def tdiv(rhs: A): BigInt = macro Ops.binop[A, BigInt]
+  def toBigIntOption(): Option[BigInt] = macro Ops.unop[Option[BigInt]]
+  def tquot(rhs: A): A = macro Ops.binop[A, A]
   def tmod(rhs: A): A = macro Ops.binop[A, A]
-  def tdivmod(rhs: A): (BigInt, A) = macro Ops.binop[A, (BigInt, A)]
+  def tquotmod(rhs: A): (A, A) = macro Ops.binop[A, (A, A)]
 
   def fmod(rhs: A): A = macro Ops.binop[A, A]
-  def fdiv(rhs: A): BigInt = macro Ops.binop[A, BigInt]
-  def fdivmod(rhs: A): (BigInt, A) = macro Ops.binop[A, (BigInt, A)]
+  def fquot(rhs: A): A = macro Ops.binop[A, A]
+  def fquotmod(rhs: A): (A, A) = macro Ops.binop[A, (A, A)]
+}
+
+final class LiteralIntTruncatedDivisionOps(val lhs: Int) extends AnyVal {
+  def tquot[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromInt(lhs), rhs)
+  def tmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromInt(lhs), rhs)
+  def tquotmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.tquotmod(c.fromInt(lhs), rhs)
+  def fquot[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromInt(lhs), rhs)
+  def fmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromInt(lhs), rhs)
+  def fquotmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.fquotmod(c.fromInt(lhs), rhs)
+}
+
+final class LiteralLongTruncatedDivisionOps(val lhs: Long) extends AnyVal {
+  def tquot[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromLong(lhs), rhs)
+  def tmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromLong(lhs), rhs)
+  def tquotmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.tquotmod(c.fromLong(lhs), rhs)
+  def fquot[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromLong(lhs), rhs)
+  def fmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromLong(lhs), rhs)
+  def fquotmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.fquotmod(c.fromLong(lhs), rhs)
+}
+
+final class LiteralDoubleTruncatedDivisionOps(val lhs: Double) extends AnyVal {
+  def tquot[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromDouble(lhs), rhs)
+  def tmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromDouble(lhs), rhs)
+  def tquotmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.tquotmod(c.fromDouble(lhs), rhs)
+  def fquot[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromDouble(lhs), rhs)
+  def fmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromDouble(lhs), rhs)
+  def fquotmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.fquotmod(c.fromDouble(lhs), rhs)
 }
 
 final class SemigroupoidOps[A](lhs:A)(implicit ev:Semigroupoid[A]) {
@@ -252,13 +280,17 @@ final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def emod(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
   def equotmod(rhs:Int): (A, A) = macro Ops.binopWithSelfLift[Int, Ring[A], (A, A)]
 
+  // TODO: should we allow Long, SafeLong and BigInt rhs here ?
+
   def equot(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
   def emod(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
   def equotmod(rhs:Double)(implicit ev1:Field[A]): (A, A) = macro Ops.binopWithLift[Double, Field[A], (A, A)]
 
-  def equot(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) /~ rhs
-  def emod(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) % rhs
-  def equotmod(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = c.toNumber(lhs) /% rhs
+  /* TODO: remove Number instance, because Number is a Field, and thus the Euclidean ring division is trivial
+  def equot(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) equot rhs
+  def emod(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) emod rhs
+  def equotmod(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = c.toNumber(lhs) equotmod rhs
+  */
 }
 
 final class LiteralIntEuclideanRingOps(val lhs: Int) extends AnyVal {
@@ -273,6 +305,7 @@ final class LiteralLongEuclideanRingOps(val lhs: Long) extends AnyVal {
   def equotmod[A](rhs:A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): (A, A) = ev.equotmod(c.fromLong(lhs), rhs)
 }
 
+// TODO: kept for now, for completeness. Should we really?
 final class LiteralDoubleEuclideanRingOps(val lhs: Double) extends AnyVal {
   def equot[A](rhs:A)(implicit ev: Field[A]): A = ev.equot(ev.fromDouble(lhs), rhs)
   def emod[A](rhs:A)(implicit ev: Field[A]): A = ev.emod(ev.fromDouble(lhs), rhs)
