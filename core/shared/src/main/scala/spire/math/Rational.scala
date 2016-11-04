@@ -48,6 +48,9 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def *(rhs: Rational): Rational
   def /(rhs: Rational): Rational
 
+  def equot(rhs: Rational): Rational = Rational(this / rhs)
+  def emod(rhs: Rational): Rational = Rational.zero
+  def equotmod(rhs: Rational): (Rational, Rational) = (this / rhs, Rational.zero)
   def tquot(rhs: Rational): Rational = Rational((this / rhs).toSafeLong)
   def tmod(rhs: Rational): Rational = this - (this tquot rhs) * rhs
   def tquotmod(rhs: Rational): (Rational, Rational) = {

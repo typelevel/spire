@@ -196,8 +196,12 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     }
   }
 
+  // TODO: check if it is correct?
   def gcd(rhs: FixedPoint): FixedPoint =
     new FixedPoint(spire.math.gcd(lhs.long, rhs.long))
+
+  def lcm(rhs: FixedPoint): FixedPoint =
+    new FixedPoint(spire.math.lcm(lhs.long, rhs.long))
 
   def toLong(implicit scale: FixedScale): Long =
     long / scale.denom
@@ -310,6 +314,7 @@ trait FixedPointInstances {
       def times(x: FixedPoint, y: FixedPoint): FixedPoint = x * y
 
       def gcd(x: FixedPoint, y: FixedPoint): FixedPoint = x gcd y
+      def lcm(x: FixedPoint, y: FixedPoint): FixedPoint = x lcm y
       def quot(x: FixedPoint, y: FixedPoint): FixedPoint = x /~ y
       def mod(x: FixedPoint, y: FixedPoint): FixedPoint = x % y
 

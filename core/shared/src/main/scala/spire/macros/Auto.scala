@@ -96,8 +96,8 @@ abstract class AutoAlgebra extends AutoOps { ops =>
   def times[A: c.WeakTypeTag]: c.Expr[A]
   def negate[A: c.WeakTypeTag]: c.Expr[A]
   def div[A: c.WeakTypeTag]: c.Expr[A]
-  def quot[A: c.WeakTypeTag]: c.Expr[A]
-  def mod[A: c.WeakTypeTag](stub: => c.Expr[A] = failedSearch("mod", "%")): c.Expr[A]
+  def equot[A: c.WeakTypeTag]: c.Expr[A]
+  def emod[A: c.WeakTypeTag](stub: => c.Expr[A] = failedSearch("emod", "%")): c.Expr[A]
   def equals: c.Expr[Boolean]
   def compare: c.Expr[Int]
 
@@ -156,8 +156,8 @@ abstract class AutoAlgebra extends AutoOps { ops =>
         def times(x: A, y: A): A = ops.times[A].splice
         override def minus(x: A, y: A): A = ops.minus[A].splice
         def negate(x: A): A = ops.negate[A].splice
-        def quot(x: A, y: A): A = ops.quot[A].splice
-        def mod(x: A, y: A): A = ops.mod[A]().splice
+        def equot(x: A, y: A): A = ops.equot[A].splice
+        def emod(x: A, y: A): A = ops.emod[A]().splice
       }
     }
   }
@@ -172,8 +172,8 @@ abstract class AutoAlgebra extends AutoOps { ops =>
         def times(x: A, y: A): A = ops.times[A].splice
         override def minus(x: A, y: A): A = ops.minus[A].splice
         def negate(x: A): A = ops.negate[A].splice
-        def quot(x: A, y: A): A = ops.div[A].splice
-        def mod(x: A, y: A): A = ops.mod[A](z).splice
+        def equot(x: A, y: A): A = ops.equot[A].splice
+        def emod(x: A, y: A): A = ops.emod[A](z).splice
         def div(x: A, y: A): A = ops.div[A].splice
       }
     }
@@ -206,9 +206,10 @@ case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
   def minus[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "minus")
   def times[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "times")
   def negate[A: c.WeakTypeTag]: c.Expr[A] = unop[A]("unary_" + "$" + "minus")
-  def quot[A: c.WeakTypeTag]: c.Expr[A] = binopSearch[A]("quot" :: ("$" + "div") :: Nil) getOrElse failedSearch("quot", "/~")
+  // TODO: check the EuclideanRing stuff
+  def equot[A: c.WeakTypeTag]: c.Expr[A] = binopSearch[A]("equot" :: ("$" + "div") :: Nil) getOrElse failedSearch("equot", "/~")
   def div[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "div")
-  def mod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] = binop[A]("$" + "percent")
+  def emod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] = binopSearch[A]("emod" :: "$" + "percent" :: Nil) getOrElse failedSearch("emod", "%")
   def equals: c.Expr[Boolean] = binop[Boolean]("$" + "eq" + "$" + "eq")
   def compare: c.Expr[Int] = binop[Int]("compare")
 }
@@ -231,9 +232,10 @@ case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
         Select(Ident(termName(c)("zero")), termName(c)("minus")),
         List(Ident(termName(c)("x")))))
     }
-  def quot[A: c.WeakTypeTag]: c.Expr[A] =
+  // TODO: what to put here??
+  def equot[A: c.WeakTypeTag]: c.Expr[A] =
     binopSearch[A]("quot" :: "divide" :: "div" :: Nil) getOrElse failedSearch("quot", "/~")
-  def mod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] =
+  def emod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] =
     binopSearch("mod" :: "remainder" :: Nil) getOrElse stub
 
   def equals: c.Expr[Boolean] = binop[Boolean]("equals")
