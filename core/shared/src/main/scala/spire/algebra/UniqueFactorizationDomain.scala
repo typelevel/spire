@@ -22,4 +22,26 @@ object UniqueFactorizationDomain {
 
   def apply[A](implicit ev: UniqueFactorizationDomain[A]): UniqueFactorizationDomain[A] = ev
 
+  import spire.math.Integral
+
+  case class WrapFactors[A:Integral](safeLongFactors: spire.math.prime.Factors) extends Factors[A] {
+    def unit: A = safeLongFactors.sign match {
+      case Sign.Negative => Integral[A].negate(Integral[A].one)
+      case Sign.Positive => Integral[A].one
+      case _ => sys.error("Factorization of zero is undefined.")
+    }
+    override def factors: Map[A, Int] = safeLongFactors.factors.map {
+      case (f, exp) => ((Integral[A].fromBigInt(f.toBigInt), exp))
+    }
+  }
+
+  // TODO: move somewhere
+  implicit def uniqueFactorizationDomain[A](implicit ev: Integral[A]): UniqueFactorizationDomain[A] =
+    new UniqueFactorizationDomain[A] {
+      import spire.math.SafeLong
+      import SafeLong.SafeLongAlgebra
+      def isPrime(a: A): Boolean = SafeLongAlgebra.isPrime(SafeLong(ev.toBigInt(a)))
+      def factor(a: A): Factors[A] = WrapFactors[A](SafeLongAlgebra.factor(SafeLong(ev.toBigInt(a))))
+    }
+
 }
