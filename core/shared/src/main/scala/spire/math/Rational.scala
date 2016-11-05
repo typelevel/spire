@@ -75,7 +75,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   }
 
   def gcd(rhs: Rational): Rational
-  def lcm(rhs: Rational): Rational = (lhs / lhs.gcd(rhs)) * rhs
+  def lcm(rhs: Rational): Rational =
+    if (lhs.isZero || rhs.isZero) Rational.zero else (lhs / lhs.gcd(rhs)) * rhs
 
   def toReal: Real = Real(this)
 
