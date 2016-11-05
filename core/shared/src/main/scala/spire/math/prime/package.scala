@@ -134,7 +134,7 @@ package object prime {
 
     def rho(n: SafeLong, c: SafeLong): SafeLong = {
 
-      @inline def f(x: SafeLong): SafeLong = ((x * x) tmod n + c) tmod n
+      @inline def f(x: SafeLong): SafeLong = (((x * x) tmod n) + c) tmod n
 
       @tailrec def fastRho(x: SafeLong, q0: SafeLong, r: SafeLong, m: SafeLong): SafeLong = {
         var y = x
