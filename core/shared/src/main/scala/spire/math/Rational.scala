@@ -863,6 +863,8 @@ private[math] trait RationalIsField extends Field[Rational] {
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
   def div(a:Rational, b:Rational): Rational = a / b
+  override def gcd(a: Rational, b: Rational)(implicit ev: Eq[Rational]): Rational = a gcd b
+  override def lcm(a: Rational, b: Rational)(implicit ev: Eq[Rational]): Rational = a lcm b
 }
 
 private[math] trait RationalTruncatedDivision extends TruncatedDivision[Rational] {

@@ -19,9 +19,9 @@ trait ShortIsEuclideanRing extends EuclideanRing[Short] {
   def equot(a: Short, b: Short): Short = (a / b).toShort
   def emod(a: Short, b: Short): Short = (a % b).toShort
   override def gcd(a: Short, b: Short)(implicit ev: Eq[Short]): Short =
-    spire.math.gcd(a: Int, b: Int).toShort
+    spire.math.gcd(a: Long, b: Long).toShort
   override def lcm(a: Short, b: Short)(implicit ev: Eq[Short]): Short =
-    spire.math.lcm(a: Int, b: Int).toShort
+    spire.math.lcm(a: Long, b: Long).toShort
 }
 
 // Not included in Instances trait.

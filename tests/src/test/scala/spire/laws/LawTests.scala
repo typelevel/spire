@@ -33,8 +33,11 @@ class LawTests extends FunSuite with Discipline {
   }
 
   // Float and Double fail these tests
-  checkAll("Int",        RingLaws[Int].euclideanRing)
-  checkAll("Long",       RingLaws[Long].euclideanRing)
+  checkAll("Int",        RingLaws[Int].cRing)
+  checkAll("Long",       RingLaws[Long].cRing)
+  // abs laws check abs(-x) == abs(x), which does not work for XXX.MinValue
+//  checkAll("Int",        OrderLaws[Int].truncatedDivision)
+//  checkAll("Long",       OrderLaws[Long].truncatedDivision)
   checkAll("BigInt",     RingLaws[BigInt].euclideanRing)
   checkAll("BigInt",     OrderLaws[BigInt].truncatedDivision)
   checkAll("BigInteger", RingLaws[BigInteger].euclideanRing)
