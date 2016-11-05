@@ -59,9 +59,9 @@ class SafeLongTest extends FunSuite {
     }
     for(a ← Seq(SafeLong.one, SafeLong.two); b ← Seq(SafeLong.one, SafeLong.two)) {
       assert(Order[SafeLong].compare(a, b) == a.compare(b))
-      assert(EuclideanRing[SafeLong].quot(a, b) == a / b)
-      assert(EuclideanRing[SafeLong].mod(a, b) == a % b)
-      assert(EuclideanRing[SafeLong].quotmod(a, b) == a /% b)
+      assert(EuclideanRing[SafeLong].equot(a, b) == a / b)
+      assert(EuclideanRing[SafeLong].emod(a, b) == (a emod b))
+      assert(EuclideanRing[SafeLong].equotmod(a, b) == (a equotmod b))
       assert(EuclideanRing[SafeLong].gcd(a, b) == a.gcd(b))
     }
     assert(Ring[SafeLong].fromInt(1) == SafeLong.one)

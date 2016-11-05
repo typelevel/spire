@@ -182,8 +182,6 @@ trait DistEuclideanRing[A] extends EuclideanRing[Dist[A]] with DistRing[A] {
   override def euclideanFunction(a: Dist[A]): BigInt = sys.error("The Euclidean function is not defined on distributions")
   def equot(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.equot(x(g), y(g)))
   def emod(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.emod(x(g), y(g)))
-  def gcd(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.gcd(x(g), y(g)))
-  def lcm(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.lcm(x(g), y(g)))
 }
 
 trait DistField[A] extends Field[Dist[A]] with DistEuclideanRing[A] {

@@ -42,6 +42,17 @@ trait BaseLaws[A] extends Laws {
     )
   )
 
+  def uniqueFactorizationDomain(implicit U: UniqueFactorizationDomain[A], G: GCDRing[A]) = new SimpleRuleSet(
+    name = "uniqueFactorizationDomain",
+    "factors are prime" → forAll((a: A) =>
+      a.factor.factors.forall(_._1.isPrime)
+    ),
+    "factorization represents the element" → forAll { (a: A) =>
+      val factors = a.factor
+      a === (factors.unit * G.prod(factors.factors.map { case (f, exp) => f ** exp }))
+    }
+  )
+
 }
 
 // vim: expandtab:ts=2:sw=2

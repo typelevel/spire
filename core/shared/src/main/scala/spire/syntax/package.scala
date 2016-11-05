@@ -34,6 +34,7 @@ package object syntax {
   object gcdRing extends GCDRingSyntax
   object euclideanRing extends EuclideanRingSyntax
   object field extends FieldSyntax
+  object uniqueFactorizationDomain extends UniqueFactorizationDomainSyntax
   object nroot extends NRootSyntax
   object trig extends TrigSyntax
 

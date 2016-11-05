@@ -87,36 +87,54 @@ trait OrderLaws[A] extends Laws {
     }
   )
 
-  def truncatedDivision(implicit truncatedDivisionA: TruncatedDivision[A], cRingA: CRing[A]) =
+  def truncatedDivision(implicit cRingA: CRing[A], truncatedDivisionA: TruncatedDivision[A]) =
     new OrderProperties(
       name = "truncatedDivision",
       parent = Some(signedAdditiveAbGroup),
-      "division rule (tdivmod)" → forAll { (x: A, y: A) =>
-        val (q, r) = x tdivmod y
-        x === y * q + r
+      "division rule (tquotmod)" → forAll { (x: A, y: A) =>
+        y.isZero || {
+          val (q, r) = x tquotmod y
+          x === y * q + r
+        }
       },
-      "division rule (fdivmod)" → forAll { (x: A, y: A) =>
-        val (q, r) = x fdivmod y
-        x === y * q + r
+      "division rule (fquotmod)" → forAll { (x: A, y: A) =>
+        y.isZero || {
+          val (q, r) = x fquotmod y
+          x === y * q + r
+        }
+      },
+      "quotient is integer (tquot)" → forAll { (x: A, y: A) =>
+        y.isZero || (x tquot y).toBigIntOption.nonEmpty
+      },
+      "quotient is integer (fquot)" → forAll { (x: A, y: A) =>
+        y.isZero || (x fquot y).toBigIntOption.nonEmpty
       },
       "|r| < |y| (tmod)" → forAll { (x: A, y: A) =>
-        val r = x tmod y
-        r.abs < y.abs
+        y.isZero || {
+          val r = x tmod y
+          r.abs < y.abs
+        }
       },
       "|r| < |y| (fmod)" → forAll { (x: A, y: A) =>
-        val r = x fmod y
-        r.abs < y.abs
+        y.isZero || {
+          val r = x fmod y
+          r.abs < y.abs
+        }
       },
       "r = 0 or sign(r) = sign(x) (tmod)" → forAll { (x: A, y: A) =>
-        val r = x tmod y
-        r.isZero || (r.sign === x.sign)
+        y.isZero || {
+          val r = x tmod y
+          r.isZero || (r.sign === x.sign)
+        }
       },
       "r = 0 or sign(r) = sign(y) (fmod)" → forAll { (x: A, y: A) =>
-        val r = x fmod y
-        r.isZero || (r.sign === y.sign)
+        y.isZero || {
+          val r = x fmod y
+          r.isZero || (r.sign === y.sign)
+        }
       }
     )
-
+ 
   class OrderProperties(
     name: String,
     parent: Option[OrderProperties],

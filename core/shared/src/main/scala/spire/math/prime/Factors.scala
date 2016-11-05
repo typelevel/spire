@@ -1,8 +1,8 @@
 package spire
 package math.prime
 
-import spire.algebra.Sign
-import spire.algebra.Sign.{Negative, Zero, Positive}
+import spire.algebra.{Sign, UniqueFactorizationDomain}
+import spire.algebra.Sign.{Negative, Positive, Zero}
 import spire.math.SafeLong
 import spire.std.int._
 import spire.std.map._
@@ -19,7 +19,9 @@ object Factors {
 }
 
 case class Factors(factors: Map[SafeLong, Int], sign: Sign)
-    extends Iterable[(SafeLong, Int)] with Ordered[Factors] { lhs =>
+    extends UniqueFactorizationDomain.Factors[SafeLong] with Iterable[(SafeLong, Int)] with Ordered[Factors] { lhs =>
+
+  def unit = SafeLong(sign.toInt)
 
   private[prime] def prod(m: Map[SafeLong, Int]): SafeLong =
     m.foldLeft(SafeLong.one) { case (t, (p, e)) => t * p.pow(e) }

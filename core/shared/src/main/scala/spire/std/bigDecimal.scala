@@ -22,9 +22,6 @@ trait BigDecimalIsField extends Field[BigDecimal] {
   override def fromDouble(n: Double): BigDecimal = BigDecimal(n, MathContext.UNLIMITED)
 
   def div(a: BigDecimal, b: BigDecimal): BigDecimal = a / b
-
-  def gcd(a: BigDecimal, b: BigDecimal): BigDecimal = if (a == 0 && b == 0) 0 else 1
-  def lcm(a: BigDecimal, b: BigDecimal): BigDecimal = a * b
 }
 
 trait BigDecimalIsNRoot extends NRoot[BigDecimal] {

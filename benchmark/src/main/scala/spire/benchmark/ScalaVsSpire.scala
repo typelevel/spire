@@ -181,7 +181,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
 
   @tailrec final def gcdSpire[@sp(Int) A](a: A, b: A)(implicit ev1:EuclideanRing[A], ev2:Eq[A]): A = {
     import spire.implicits._
-    if (a % b === ev1.zero) b else gcdSpire(b, a % b)
+    if ((a emod b) === ev1.zero) b else gcdSpire(b, a emod b)
   }
 
   def doGcdSpire[@sp(Int) A:EuclideanRing:Eq](as: Array[A], bs: Array[A], cs: Array[A]) = {
@@ -210,7 +210,7 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
     import spire.implicits._
     var i = 0
     val len = as.length
-    while (i < len) { cs(i) = as(i) * n /~ d; i += 1}
+    while (i < len) { cs(i) = as(i) * n equot d; i += 1}
   }
 }
 

@@ -17,9 +17,6 @@ trait FloatIsField extends Field[Float] {
   override def fromDouble(n: Double): Float = n.toFloat
 
   def div(a:Float, b:Float): Float = a / b
-
-  def gcd(a: Float, b: Float): Float = if (a == 0 && b == 0) 0 else 1
-  def lcm(a: Float, b: Float): Float = a * b
 }
 
 trait FloatIsNRoot extends NRoot[Float] {

@@ -204,6 +204,7 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
   def abs: SafeLong
 
   def gcd(that: SafeLong): SafeLong
+  def lcm(that: SafeLong): SafeLong = (this / (this gcd that)) * that
 
   def unary_-(): SafeLong
 
@@ -225,8 +226,17 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
 
   final def isWhole: Boolean = true
 
-  final def isProbablePrime(c: Int): Boolean =
-    toBigInteger.isProbablePrime(c)
+  /** Returns true if this SafeLong is probably prime, false if it's definitely composite. If certainty is ≤ 0, true is returned.
+    * @param certainty a measure of the uncertainty that the caller is willing to tolerate:
+    *                  if the call returns true the probability that this BigInteger is
+    *                  prime exceeds (1 - 1/2^certainty).
+    */
+  final def isProbablePrime(certainty: Int): Boolean =
+    toBigInteger.isProbablePrime(certainty)
+
+  def isPrime: Boolean = prime.isPrime(this)
+
+  def factor: prime.Factors = prime.factor(this)
 
   def isOdd: Boolean
 
@@ -545,7 +555,8 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
 
 trait SafeLongInstances {
   @SerialVersionUID(1L)
-  implicit object SafeLongAlgebra extends SafeLongIsEuclideanRing with SafeLongIsNRoot with Serializable
+  implicit object SafeLongAlgebra extends SafeLongIsEuclideanRing with SafeLongIsNRoot
+    with SafeLongIsUniqueFactorizationDomain with Serializable
 
   @SerialVersionUID(1L)
   implicit object SafeLongIsReal extends SafeLongIsReal with Serializable
@@ -570,8 +581,8 @@ private[math] trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with
   def equot(a:SafeLong, b:SafeLong): SafeLong = a equot b
   def emod(a:SafeLong, b:SafeLong): SafeLong = a emod b
   override def equotmod(a:SafeLong, b:SafeLong): (SafeLong, SafeLong) = a equotmod b
-  def gcd(a:SafeLong, b:SafeLong): SafeLong = a gcd b
-  def lcm(a:SafeLong, b:SafeLong): SafeLong = (a / (a gcd b)) * b
+  override def gcd(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a gcd b
+  override def lcm(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a lcm b
 }
 
 private[math] trait SafeLongIsNRoot extends NRoot[SafeLong] {
@@ -584,6 +595,11 @@ private[math] trait SafeLongIsNRoot extends NRoot[SafeLong] {
   def fpow(a: SafeLong, b: SafeLong): SafeLong =
     if (b.isValidInt) a.pow(b.toInt)
     else SafeLong(NRoot[BigInteger].fpow(a.toBigInteger, b.toBigInteger))
+}
+
+private[math] trait SafeLongIsUniqueFactorizationDomain extends UniqueFactorizationDomain[SafeLong] {
+  def isPrime(a: SafeLong): Boolean = a.isPrime
+  def factor(a: SafeLong): prime.Factors = a.factor
 }
 
 private[math] trait SafeLongOrder extends Order[SafeLong] {

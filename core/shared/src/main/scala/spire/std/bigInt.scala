@@ -18,8 +18,7 @@ trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   def equot(a: BigInt, b: BigInt): BigInt = a / b
   def emod(a: BigInt, b: BigInt): BigInt = a % b
   override def equotmod(a: BigInt, b: BigInt): (BigInt, BigInt) = a /% b
-  def gcd(a: BigInt, b: BigInt): BigInt = a.gcd(b)
-  def lcm(a: BigInt, b: BigInt): BigInt = (a / gcd(a,b)) * b
+  override def gcd(a: BigInt, b: BigInt)(implicit ev: Eq[BigInt]): BigInt = a gcd b
 }
 
 // This is not included in the *Instances trait!

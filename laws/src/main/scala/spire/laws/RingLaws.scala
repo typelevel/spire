@@ -70,6 +70,11 @@ trait RingLaws[A] extends GroupLaws[A] {
     )
   )
 
+  def multiplicativeCMonoid(implicit A: MultiplicativeCMonoid[A]) = new MultiplicativeProperties(
+    base = _.cMonoid(A.multiplicative),
+    parent = Some(multiplicativeMonoid)
+  )
+
   def multiplicativeGroup(implicit A: MultiplicativeGroup[A]) = new MultiplicativeProperties(
     base = _.group(A.multiplicative),
     parent = Some(multiplicativeMonoid),
@@ -128,11 +133,11 @@ trait RingLaws[A] extends GroupLaws[A] {
     parents = Seq(ring)
   )
 
-  def gcdDomain(implicit A: GCDDomain[A]) = RingProperties.fromParent(
+  def gcdRing(implicit A: GCDRing[A]) = RingProperties.fromParent(
     name = "gcd domain",
     parent = cRing,
     "gcd/lcm" → forAll { (x: A, y: A) =>
-      import spire.syntax.gcdDomain._
+      import spire.syntax.gcdRing._
       val d = x gcd y
       val m = x lcm y
       x * y === d * m
@@ -141,7 +146,7 @@ trait RingLaws[A] extends GroupLaws[A] {
 
   def euclideanRing(implicit A: EuclideanRing[A]) = RingProperties.fromParent(
     name = "euclidean ring",
-    parent = gcdDomain,
+    parent = gcdRing,
     "euclidean function" → forAll { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       pred(y) ==> {
@@ -175,7 +180,6 @@ trait RingLaws[A] extends GroupLaws[A] {
   ) {
     override def nonZero = true
   }
-
 
   // property classes
 

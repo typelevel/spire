@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{EuclideanRing, IsReal}
+import spire.algebra.{EuclideanRing, IsReal, Sign, UniqueFactorizationDomain}
 import spire.std._
 
 trait Integral[@sp(Int,Long) A] extends Any with EuclideanRing[A] with ConvertableFrom[A] with ConvertableTo[A] with IsReal[A]
@@ -13,11 +13,28 @@ object Integral {
   implicit final val SafeLongIsIntegral = new SafeLongIsIntegral
 
   @inline final def apply[A](implicit ev: Integral[A]): Integral[A] = ev
+
+  case class WrapFactors[A:Integral](safeLongFactors: prime.Factors) extends UniqueFactorizationDomain.Factors[A] {
+    def unit: A = safeLongFactors.sign match {
+      case Sign.Negative => Integral[A].negate(Integral[A].one)
+      case Sign.Positive => Integral[A].one
+      case _ => sys.error("Factorization of zero is undefined.")
+    }
+    override def factors: Map[A, Int] = safeLongFactors.factors.map {
+      case (f, exp) => ((Integral[A].fromBigInt(f.toBigInt), exp))
+    }
+  }
+
+  implicit def uniqueFactorizationDomain[A](implicit ev: Integral[A]): UniqueFactorizationDomain[A] =
+    new UniqueFactorizationDomain[A] {
+      import UniqueFactorizationDomain.Factors
+      import SafeLong.SafeLongAlgebra
+      def isPrime(a: A): Boolean = SafeLongAlgebra.isPrime(SafeLong(ev.toBigInt(a)))
+      def factor(a: A): Factors[A] = WrapFactors[A](SafeLongAlgebra.factor(SafeLong(ev.toBigInt(a))))
+    }
 }
 
 class IntegralOps[A](lhs: A)(implicit ev: Integral[A]) {
-  def factor: prime.Factors = prime.factor(toSafeLong)
-  def isPrime: Boolean = prime.isPrime(toSafeLong)
   def toSafeLong: SafeLong = SafeLong(ev.toBigInt(lhs))
 
   def coerce(a: A): Long = {

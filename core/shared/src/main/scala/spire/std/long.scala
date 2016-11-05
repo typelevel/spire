@@ -29,11 +29,11 @@ trait LongIsEuclideanRing extends EuclideanRing[Long] {
 
   override def fromInt(n: Int): Long = n
 
-  def euclideanFunction(a: Long): BigInt = BigInt(a).abs
+  def euclideanFunction(a: Long): BigInt = BigInt(a).abs // change to BigInt first because of Long.MinValue
   def equot(a:Long, b:Long): Long = a / b
   def emod(a:Long, b:Long): Long = a % b
-  def gcd(a:Long, b:Long): Long = spire.math.gcd(a, b)
-  def lcm(a:Long, b:Long): Long = spire.math.lcm(a, b)
+  override def gcd(a:Long, b:Long)(implicit ev: Eq[Long]): Long = spire.math.gcd(a, b)
+  override def lcm(a:Long, b:Long)(implicit ev: Eq[Long]): Long = spire.math.lcm(a, b)
 }
 
 // Not included in Instances trait!

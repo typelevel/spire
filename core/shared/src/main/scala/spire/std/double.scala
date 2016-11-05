@@ -18,9 +18,6 @@ trait DoubleIsField extends Field[Double] {
 
   override def fromDouble(n: Double): Double = n
   def div(a:Double, b:Double): Double = a / b
-
-  def gcd(a: Double, b: Double): Double = if (a == 0 && b == 0) 0 else 1
-  def lcm(a: Double, b: Double): Double = a * b
 }
 
 trait DoubleIsNRoot extends NRoot[Double] {

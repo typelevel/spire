@@ -120,6 +120,10 @@ trait EuclideanRingSyntax extends GCDRingSyntax {
 
 trait FieldSyntax extends EuclideanRingSyntax with MultiplicativeGroupSyntax
 
+trait UniqueFactorizationDomainSyntax {
+  implicit def uniqueFactorizationDomainOps[A:UniqueFactorizationDomain](a:A): UniqueFactorizationDomainOps[A] = new UniqueFactorizationDomainOps[A](a)
+}
+
 trait NRootSyntax {
   implicit def nrootOps[A: NRoot](a: A): NRootOps[A] = new NRootOps(a)
 }
@@ -275,6 +279,7 @@ trait AllSyntax extends
     GCDRingSyntax with
     EuclideanRingSyntax with
     FieldSyntax with
+    UniqueFactorizationDomainSyntax with
     NRootSyntax with
     TrigSyntax with
     IntervalSyntax with

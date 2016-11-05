@@ -312,6 +312,12 @@ final class LiteralDoubleEuclideanRingOps(val lhs: Double) extends AnyVal {
   def equotmod[A](rhs:A)(implicit ev: Field[A]): (A, A) = ev.equotmod(ev.fromDouble(lhs), rhs)
 }
 
+final class UniqueFactorizationDomainOps[A](lhs:A)(implicit ev:UniqueFactorizationDomain[A]) {
+  import UniqueFactorizationDomain.Factors
+  def isPrime(): Boolean = macro Ops.unop[Boolean]
+  def factor(): Factors[A] = macro Ops.unop[Factors[A]]
+}
+
 final class IsRealOps[A](lhs:A)(implicit ev:IsReal[A]) {
   def isWhole(): Boolean = macro Ops.unop[Boolean]
   def ceil(): A = macro Ops.unop[A]

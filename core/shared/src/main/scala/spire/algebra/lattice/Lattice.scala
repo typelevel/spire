@@ -16,10 +16,10 @@ trait MeetSemilattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] ext
 trait Lattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with JoinSemilattice[A] with MeetSemilattice[A]
 
 object Lattice {
-  def min[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A](implicit ev: Order[A]): Lattice[A] =
+  def min[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A: Order]: Lattice[A] =
     new MinMaxLattice[A]
 
-  def gcd[@sp(Byte, Short, Int, Long) A](implicit ev: EuclideanRing[A]): Lattice[A] =
+  def gcd[@sp(Byte, Short, Int, Long) A: Eq: GCDRing]: Lattice[A] =
     new GcdLcmLattice[A]
 }
 
@@ -28,7 +28,7 @@ class MinMaxLattice[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A: Order
   def join(lhs: A, rhs: A): A = lhs max rhs
 }
 
-class GcdLcmLattice[@sp(Byte, Short, Int, Long) A: GCDRing] extends Lattice[A] {
+class GcdLcmLattice[@sp(Byte, Short, Int, Long) A: Eq: GCDRing] extends Lattice[A] {
   def meet(lhs: A, rhs: A): A = lhs gcd rhs
   def join(lhs: A, rhs: A): A = lhs lcm rhs
 }

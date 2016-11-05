@@ -18,6 +18,9 @@ object GroupLaws {
 
 trait GroupLaws[A] extends Laws {
 
+  // TODO: allow multiple parents, and remove the duplication between cMonoid
+  // and abGroup
+
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
 
@@ -54,6 +57,14 @@ trait GroupLaws[A] extends Laws {
     ),
     "isEmpty" → forAll((x: A) =>
       (x === A.empty) === (x.isEmpty)
+    )
+  )
+
+  def cMonoid(implicit A: CMonoid[A]) = new GroupProperties(
+    name = "commutative monoid",
+    parent = Some(monoid),
+    "commutative" → forAll((x: A, y: A) =>
+      (x |+| y) === (y |+| x)
     )
   )
 

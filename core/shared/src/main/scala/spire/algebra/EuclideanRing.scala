@@ -6,6 +6,8 @@ trait EuclideanRing[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any wi
   def equot(a: A, b: A): A
   def emod(a: A, b: A): A
   def equotmod(a: A, b: A): (A, A) = (equot(a, b), emod(a, b))
+  def gcd(a: A, b: A)(implicit ev: Eq[A]): A = EuclideanRing.euclid(a, b)(ev, EuclideanRing.this)
+  def lcm(a: A, b: A)(implicit ev: Eq[A]): A = times(equot(a, gcd(a, b)), b)
 }
 
 object EuclideanRing {
