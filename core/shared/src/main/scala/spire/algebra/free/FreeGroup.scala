@@ -9,8 +9,8 @@ final class FreeGroup[A] private (val terms: Vector[Either[A, A]]) extends AnyVa
    */
   def run[B](f: A => B)(implicit B: Group[B]): B =
     terms.foldLeft(B.id) {
-      case (sum, Right(a)) => B.op(sum, f(a))
-      case (sum, Left(a)) => B.opInverse(sum, f(a))
+      case (sum, Right(a)) => B.combine(sum, f(a))
+      case (sum, Left(a)) => B.remove(sum, f(a))
     }
 
   def |+|(rhs: FreeGroup[A]): FreeGroup[A] =
@@ -70,8 +70,8 @@ object FreeGroup { companion =>
 
   implicit def FreeGroupGroup[A]: Group[FreeGroup[A]] = new Group[FreeGroup[A]] {
     def id: FreeGroup[A] = companion.id
-    def op(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |+| b
+    def combine(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |+| b
     def inverse(a: FreeGroup[A]): FreeGroup[A] = a.inverse
-    override def opInverse(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |-| b
+    override def remove(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |-| b
   }
 }

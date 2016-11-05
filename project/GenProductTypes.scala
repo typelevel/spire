@@ -148,7 +148,7 @@ object ProductTypes {
     "  def isWhole(x: (%s)): Boolean = false" format (tpe.types)
   }
 
-  val semigroup = Definition("Semigroup")(binary("op") :: Nil)
+  val semigroup = Definition("Semigroup")(binary("combine") :: Nil)
   val monoid = Definition("Monoid", Some("Semigroup"))(const("id") :: Nil)
   val group = Definition("Group", Some("Monoid"))(unary("inverse") :: Nil)
   val abGroup = Definition("AbGroup", Some("Group"))(Nil)

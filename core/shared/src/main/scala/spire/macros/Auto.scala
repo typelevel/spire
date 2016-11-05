@@ -273,7 +273,7 @@ object ScalaAutoMacros {
     val ops = ScalaAlgebra[c.type](c)
     c.universe.reify {
       new Semigroup[A] {
-        def op(x: A, y: A): A = ops.plusplus[A].splice
+        def combine(x: A, y: A): A = ops.plusplus[A].splice
       }
     }
   }
@@ -283,7 +283,7 @@ object ScalaAutoMacros {
     c.universe.reify {
       new Monoid[A] {
         def id: A = z.splice
-        def op(x: A, y: A): A = ops.plusplus[A].splice
+        def combine(x: A, y: A): A = ops.plusplus[A].splice
       }
     }
   }
@@ -323,7 +323,7 @@ object JavaAutoMacros {
     c.universe.reify {
       new Monoid[A] {
         def id: A = empty.splice
-        def op(x: A, y: A): A = {
+        def combine(x: A, y: A): A = {
           val z = id
           addx.splice
           addy.splice

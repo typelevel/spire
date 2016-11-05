@@ -2,10 +2,13 @@ package spire
 package algebra
 
 /**
- * A semigroup is any set `A` with an associative operation (`op`).
+ * A semigroup is any set `A` with an associative operation (`combine`).
  */
 trait Semigroup[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any {
-  def op(x: A, y: A): A
+  def combine(x: A, y: A): A
+
+  @deprecated("use combine", "0.12.0")
+  final def op(x: A, y: A): A = combine(x, y)
 
   /**
    * Return `a` combined with itself `n` times.
@@ -18,10 +21,10 @@ trait Semigroup[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends A
   protected def combinenAboveOne(a: A, n: Int): A = {
     @tailrec def loop(b: A, k: Int, extra: A): A =
       if (k == 1) {
-        op(b, extra)
+        combine(b, extra)
       } else {
-        val x = if ((k & 1) == 1) op(b, extra) else extra
-        loop(op(b, b), k >>> 1, x)
+        val x = if ((k & 1) == 1) combine(b, extra) else extra
+        loop(combine(b, b), k >>> 1, x)
       }
     loop(a, n - 1, a)
   }
@@ -31,7 +34,7 @@ trait Semigroup[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends A
    *
    *  If the sequence is empty, returns None. Otherwise, returns Some(total).
    */
-  def combineOption(as: TraversableOnce[A]): Option[A] = as.reduceOption(op)
+  def combineOption(as: TraversableOnce[A]): Option[A] = as.reduceOption(combine)
 }
 
 object Semigroup {
@@ -39,13 +42,13 @@ object Semigroup {
 
   /**
    * If there exists an implicit `AdditiveSemigroup[A]`, this returns a
-   * `Semigroup[A]` using `plus` for `op`.
+   * `Semigroup[A]` using `plus` for `combine`.
    */
   @inline final def additive[A](implicit A: AdditiveSemigroup[A]): Semigroup[A] = A.additive
 
   /**
    * If there exists an implicit `MultiplicativeSemigroup[A]`, this returns a
-   * `Semigroup[A]` using `times` for `op`.
+   * `Semigroup[A]` using `times` for `combine`.
    */
   @inline final def multiplicative[A](implicit A: MultiplicativeSemigroup[A]): Semigroup[A] = A.multiplicative
 }

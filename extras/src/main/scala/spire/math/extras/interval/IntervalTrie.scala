@@ -250,7 +250,7 @@ object IntervalTrie {
   private final def foreachInterval[T:Element, U](a0:Boolean, a:Tree)(f:Interval[T] => U): Unit = {
     val x = implicitly[Element[T]]
     import x._
-    def op(b0:Bound[T], a0:Boolean, a:Tree): Bound[T] = a match {
+    def combine(b0:Bound[T], a0:Boolean, a:Tree): Bound[T] = a match {
       case Below(a) =>
         if(a0)
           f(Interval.fromBounds(b0, Open(fromLong(a))))
@@ -267,13 +267,13 @@ object IntervalTrie {
         Open(fromLong(a))
       case a:Branch =>
         val am = a0 ^ a.left.sign
-        val bm = op(b0, a0, a.left)
-        val b1 = op(bm, am, a.right)
+        val bm = combine(b0, a0, a.left)
+        val b1 = combine(bm, am, a.right)
         b1
       case _ =>
         Unbound()
     }
-    val last = op(Unbound(), a0, a)
+    val last = combine(Unbound(), a0, a)
     if(a0 ^ ((a ne null) && a.sign))
       f(Interval.fromBounds(last, Unbound()))
   }

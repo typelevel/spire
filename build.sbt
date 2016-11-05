@@ -222,7 +222,7 @@ lazy val commonSettings = Seq(
     "bintray/non" at "http://dl.bintray.com/non/maven",
     Resolver.sonatypeRepo("snapshots")
   ),
-  libraryDependencies += "org.typelevel" %%% "machinist" % "0.4.1"
+  libraryDependencies += "org.typelevel" %%% "machinist" % "0.6.1"
 ) ++ scalaMacroDependencies ++ warnUnusedImport
 
 lazy val commonJsSettings = Seq(

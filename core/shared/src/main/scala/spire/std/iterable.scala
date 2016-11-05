@@ -10,7 +10,7 @@ import spire.algebra.Monoid
 final class IterableMonoid[A, SA <: TraversableLike[A, SA]](implicit cbf: CanBuildFrom[SA, A, SA])
 extends Monoid[SA] with Serializable {
   def id: SA = cbf().result()
-  def op(x: SA, y: SA): SA = x.++(y)(cbf)
+  def combine(x: SA, y: SA): SA = x.++(y)(cbf)
 }
 
 trait IterableInstances {

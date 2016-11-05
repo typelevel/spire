@@ -36,7 +36,7 @@ object PureSet {
 
   implicit def monoid[A] = new Monoid[PureSet[A]] {
     def id: PureSet[A] = empty
-    def op(x: PureSet[A], y: PureSet[A]): PureSet[A] = x | y
+    def combine(x: PureSet[A], y: PureSet[A]): PureSet[A] = x | y
   }
 
   implicit def bool[A] = new Bool[PureSet[A]] {
@@ -126,7 +126,7 @@ object MathSet {
 
   implicit def monoid[A] = new Monoid[MathSet[A]] {
     def id: MathSet[A] = empty
-    def op(x: MathSet[A], y: MathSet[A]): MathSet[A] = x | y
+    def combine(x: MathSet[A], y: MathSet[A]): MathSet[A] = x | y
   }
 
   implicit def bool[A] = new Bool[MathSet[A]] {

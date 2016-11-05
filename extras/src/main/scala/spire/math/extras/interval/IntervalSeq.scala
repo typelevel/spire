@@ -298,7 +298,7 @@ object IntervalSeq {
 
     private[this] val b0 = rhs.belowAll
 
-    private[this] val r0 = op(a0, b0)
+    private[this] val r0 = combine(a0, b0)
 
     private[this] val a = lhs.values
 
@@ -348,12 +348,12 @@ object IntervalSeq {
       }
     }
 
-    def op(a:Boolean, b:Boolean) : Boolean
+    def combine(a:Boolean, b:Boolean) : Boolean
 
-    def op(a:Byte, b:Byte) : Int
+    def combine(a:Byte, b:Byte) : Int
 
     def collision(ai: Int, bi: Int): Unit = {
-      val kind = op(ak(ai), bk(bi)).toByte
+      val kind = combine(ak(ai), bk(bi)).toByte
       val below = rBelow
       if((below && kind != K11) || (!below && kind != K00)) {
         rk(ri) = kind
@@ -415,9 +415,9 @@ object IntervalSeq {
 
   private class And[T](val lhs:IntervalSeq[T], val rhs:IntervalSeq[T]) extends MergeOperation[T] {
 
-    override def op(a: Boolean, b: Boolean): Boolean = a & b
+    override def combine(a: Boolean, b: Boolean): Boolean = a & b
 
-    override def op(a: Byte, b: Byte): Int = a & b
+    override def combine(a: Byte, b: Byte): Int = a & b
 
     override def fromA(a0: Int, a1: Int, b: Boolean): Unit =
       if(b)
@@ -430,9 +430,9 @@ object IntervalSeq {
 
   private class Or[T](val lhs:IntervalSeq[T], val rhs:IntervalSeq[T]) extends MergeOperation[T] {
 
-    override def op(a: Boolean, b: Boolean): Boolean = a | b
+    override def combine(a: Boolean, b: Boolean): Boolean = a | b
 
-    override def op(a: Byte, b: Byte): Int = a | b
+    override def combine(a: Byte, b: Byte): Int = a | b
 
     override def fromA(a0: Int, a1: Int, b: Boolean): Unit =
       if(!b)
@@ -445,9 +445,9 @@ object IntervalSeq {
 
   private class Xor[T](val lhs:IntervalSeq[T], val rhs:IntervalSeq[T]) extends MergeOperation[T] {
 
-    override def op(a: Boolean, b: Boolean): Boolean = a ^ b
+    override def combine(a: Boolean, b: Boolean): Boolean = a ^ b
 
-    override def op(a: Byte, b: Byte): Int = a ^ b
+    override def combine(a: Byte, b: Byte): Int = a ^ b
 
     override def fromA(a0: Int, a1: Int, b: Boolean): Unit =
       if(!b)
@@ -482,12 +482,12 @@ object IntervalSeq {
 
     private[this] val order = lhs.order
 
-    protected[this] def op(a:Boolean, b:Boolean) : Boolean
+    protected[this] def combine(a:Boolean, b:Boolean) : Boolean
 
-    protected[this] def op(a:Byte, b:Byte) : Boolean
+    protected[this] def combine(a:Byte, b:Byte) : Boolean
 
     protected[this] def collision(ai: Int, bi: Int): Boolean =
-      op(ak(ai), bk(bi))
+      combine(ak(ai), bk(bi))
 
     protected[this] def fromA(a0:Int, a1: Int, b:Boolean) : Boolean
 
@@ -530,14 +530,14 @@ object IntervalSeq {
       }
     }
 
-    val result = op(a0, b0) && merge0(0, a.length, 0, b.length)
+    val result = combine(a0, b0) && merge0(0, a.length, 0, b.length)
   }
 
   private class IsSupersetOf[T](val lhs:IntervalSeq[T], val rhs:IntervalSeq[T]) extends BooleanOperation[T] {
 
-    override def op(a: Boolean, b: Boolean): Boolean = a | !b
+    override def combine(a: Boolean, b: Boolean): Boolean = a | !b
 
-    override def op(a: Byte, b: Byte): Boolean = ((a | ~b) & 3) == 3
+    override def combine(a: Byte, b: Byte): Boolean = ((a | ~b) & 3) == 3
 
     override def fromA(a0: Int, a1: Int, b: Boolean): Boolean = !b
 
@@ -546,9 +546,9 @@ object IntervalSeq {
 
   private class Disjoint[T](val lhs:IntervalSeq[T], val rhs:IntervalSeq[T]) extends BooleanOperation[T] {
 
-    override def op(a: Boolean, b: Boolean): Boolean = !(a & b)
+    override def combine(a: Boolean, b: Boolean): Boolean = !(a & b)
 
-    override def op(a: Byte, b: Byte): Boolean = (a & b) == 0
+    override def combine(a: Byte, b: Byte): Boolean = (a & b) == 0
 
     override def fromA(a0: Int, a1: Int, b: Boolean): Boolean = !b
 
