@@ -133,6 +133,26 @@ trait OrderLaws[A] extends Laws {
           val r = x fmod y
           r.isZero || (r.sign === y.sign)
         }
+      },
+      "tquot" → forAll { (x: A, y: A) =>
+        y.isZero || {
+          (x tquotmod y)._1 === (x tquot y)
+        }
+      },
+      "tmod" → forAll { (x: A, y: A) =>
+        y.isZero || {
+          (x tquotmod y)._2 === (x tmod y)
+        }
+      },
+      "fquot" → forAll { (x: A, y: A) =>
+        y.isZero || {
+          (x fquotmod y)._1 === (x fquot y)
+        }
+      },
+      "fmod" → forAll { (x: A, y: A) =>
+        y.isZero || {
+          (x fquotmod y)._2 === (x fmod y)
+        }
       }
     )
 
@@ -244,6 +264,26 @@ trait OrderLaws[A] extends Laws {
         !wellDefinedQuotMods(x, y) || {
           val r = x fmod y
           r.isZero || (r.sign === y.sign)
+        }
+      },
+      "tquot" → forAll { (x: A, y: A) =>
+        !wellDefinedQuotMods(x, y) || {
+          (x tquotmod y)._1 === (x tquot y)
+        }
+      },
+      "tmod" → forAll { (x: A, y: A) =>
+        !wellDefinedQuotMods(x, y) || {
+          (x tquotmod y)._2 === (x tmod y)
+        }
+      },
+      "fquot" → forAll { (x: A, y: A) =>
+        !wellDefinedQuotMods(x, y) || {
+          (x fquotmod y)._1 === (x fquot y)
+        }
+      },
+      "fmod" → forAll { (x: A, y: A) =>
+        !wellDefinedQuotMods(x, y) || {
+          (x fquotmod y)._2 === (x fmod y)
         }
       }
     )

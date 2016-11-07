@@ -148,12 +148,41 @@ trait RingLaws[A] extends GroupLaws[A] {
       val d = x gcd y
       val m = x lcm y
       x * y === d * m
-    }
+    },
+    // TODO: DISABLED as Rational.gcd is not commutative
+/*    "gcd is commutative" → forAll { (x: A, y: A) =>
+      import spire.syntax.gcdRing._
+        (x gcd y) === (y gcd x)
+    },
+    "lcm is commutative" → forAll { (x: A, y: A) =>
+      import spire.syntax.gcdRing._
+      (x lcm y) === (y lcm x)
+    },*/
+    "lcm(x, 0) == 0" → forAll { (x: A) => (x lcm A.zero) === A.zero }
   )
 
   def euclideanRing(implicit A: EuclideanRing[A]) = RingProperties.fromParent(
     name = "euclidean ring",
     parent = gcdRing,
+    "euclidean division rule" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        val (q, r) = x equotmod y
+        x === (y * q + r)
+      }
+    },
+    "equot" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        (x equotmod y)._1 === (x equot y)
+      }
+    },
+    "emod" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        (x equotmod y)._2 === (x emod y)
+      }
+    },
     "euclidean function" → forAll { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       pred(y) ==> {
@@ -172,6 +201,25 @@ trait RingLaws[A] extends GroupLaws[A] {
   def euclideanRingLimitedRange(implicit A: EuclideanRing[A]) = RingProperties.fromParent(
     name = "euclidean ring limited range",
     parent = gcdRing,
+    "euclidean division rule" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        val (q, r) = x equotmod y
+        x === (y * q + r)
+      }
+    },
+    "equot" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        (x equotmod y)._1 === (x equot y)
+      }
+    },
+    "emod" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        (x equotmod y)._2 === (x emod y)
+      }
+    },
     "euclidean function" → forAll { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       pred(y) ==> {

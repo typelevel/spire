@@ -859,8 +859,6 @@ private[math] trait RationalIsField extends Field[Rational] {
   override def pow(a:Rational, b:Int): Rational = a.pow(b)
   override def times(a:Rational, b:Rational): Rational = a * b
   def zero: Rational = Rational.zero
-  def gcd(a:Rational, b:Rational): Rational = a gcd b
-  def lcm(a:Rational, b:Rational): Rational = a lcm b
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
   def div(a:Rational, b:Rational): Rational = a / b
