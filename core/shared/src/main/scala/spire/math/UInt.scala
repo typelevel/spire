@@ -119,6 +119,13 @@ private[math] class UIntBitString extends BitString[UInt] with Serializable {
 private[math] trait UIntIsReal extends IsIntegral[UInt] with UIntSigned {
   def toDouble(n: UInt): Double = n.toDouble
   def toBigInt(n: UInt): BigInt = n.toBigInt
+  def toBigIntOption(n: UInt): Option[BigInt] = Some(n.toBigInt)
+  def tquot(a: UInt, b: UInt): UInt = a / b
+  def tmod(a: UInt, b: UInt): UInt = a % b
+  override def tquotmod(a: UInt, b: UInt): (UInt, UInt) = (a / b, a % b)
+  def fquot(a: UInt, b: UInt): UInt = a / b
+  def fmod(a: UInt, b: UInt): UInt = a % b
+  override def fquotmod(a: UInt, b: UInt): (UInt, UInt) = (a / b, a % b)
 }
 
 @SerialVersionUID(0L)

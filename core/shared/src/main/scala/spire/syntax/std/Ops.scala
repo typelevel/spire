@@ -55,6 +55,17 @@ class LiteralBigIntOps(val lhs: BigInt) extends AnyVal {
   def pow(rhs: BigInt): BigInt = spire.math.pow(lhs, rhs)
   def **(rhs: BigInt): BigInt = spire.math.pow(lhs, rhs)
 
+  import spire.std.bigInt.BigIntAlgebra
+  def equot(rhs: BigInt): BigInt = BigIntAlgebra.equot(lhs, rhs)
+  def emod(rhs: BigInt): BigInt = BigIntAlgebra.emod(lhs, rhs)
+  def equotmod(rhs: BigInt): (BigInt, BigInt) = BigIntAlgebra.equotmod(lhs, rhs)
+  def tquot(rhs: BigInt): BigInt = BigIntAlgebra.tquot(lhs, rhs)
+  def tmod(rhs: BigInt): BigInt = BigIntAlgebra.tmod(lhs, rhs)
+  def tquotmod(rhs: BigInt): (BigInt, BigInt) = BigIntAlgebra.tquotmod(lhs, rhs)
+  def fquot(rhs: BigInt): BigInt = BigIntAlgebra.fquot(lhs, rhs)
+  def fmod(rhs: BigInt): BigInt = BigIntAlgebra.fmod(lhs, rhs)
+  def fquotmod(rhs: BigInt): (BigInt, BigInt) = BigIntAlgebra.fquotmod(lhs, rhs)
+
   def +(rhs: SafeLong): SafeLong = SafeLong(lhs) + rhs
   def *(rhs: SafeLong): SafeLong = SafeLong(lhs) * rhs
   def -(rhs: SafeLong): SafeLong = SafeLong(lhs) - rhs

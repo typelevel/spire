@@ -189,6 +189,13 @@ private[math] class ULongBitString extends BitString[ULong] with Serializable {
 private[math] trait ULongIsReal extends IsIntegral[ULong] with ULongSigned {
   def toDouble(n: ULong): Double = n.toDouble
   def toBigInt(n: ULong): BigInt = n.toBigInt
+  def toBigIntOption(n: ULong): Option[BigInt] = Some(n.toBigInt)
+  def tquot(a: ULong, b: ULong): ULong = a / b
+  def tmod(a: ULong, b: ULong): ULong = a % b
+  override def tquotmod(a: ULong, b: ULong): (ULong, ULong) = (a / b, a % b)
+  def fquot(a: ULong, b: ULong): ULong = a / b
+  def fmod(a: ULong, b: ULong): ULong = a % b
+  override def fquotmod(a: ULong, b: ULong): (ULong, ULong) = (a / b, a % b)
 }
 
 @SerialVersionUID(0L)

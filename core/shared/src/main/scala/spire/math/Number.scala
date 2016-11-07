@@ -710,6 +710,13 @@ private[math] trait NumberIsReal extends IsRational[Number] with NumberOrder wit
   def round(a:Number): Number = a.round
   def isWhole(a:Number): Boolean = a.isWhole
   def toRational(a:Number): Rational = a.toRational
+  def toBigIntOption(x: Number): Option[BigInt] = if (x.isWhole) Some(x.toBigInt) else None
+  def tquot(x: Number, y: Number): Number = x tquot y
+  def tmod(x: Number, y: Number): Number = x tmod y
+  override def tquotmod(x: Number, y: Number): (Number, Number) = x tquotmod y
+  def fquot(x: Number, y: Number): Number = x fquot y
+  def fmod(x: Number, y: Number): Number = x fmod y
+  override def fquotmod(x: Number, y: Number): (Number, Number) = x fquotmod y
 }
 
 @SerialVersionUID(0L)

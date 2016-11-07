@@ -28,8 +28,11 @@ class FpFilterTest extends FunSuite with Checkers {
     def one: Bad = evaluated
     def negate(a:Bad): Bad = evaluated
     def plus(a:Bad, b:Bad): Bad = evaluated
-    def quot(a:Bad, b:Bad) = evaluated
-    def mod(a:Bad, b:Bad) = evaluated
+    def tquot(a:Bad, b:Bad) = evaluated
+    def tmod(a:Bad, b:Bad) = evaluated
+    def fquot(a:Bad, b:Bad) = evaluated
+    def fmod(a:Bad, b:Bad) = evaluated
+    def fquotmod(a:Bad, b:Bad) = evaluated
     def gcd(a:Bad, b:Bad):Bad = evaluated
     override def fromDouble(n: Double): Bad = evaluated
     def times(x:Bad, b:Bad): Bad = evaluated
@@ -39,6 +42,7 @@ class FpFilterTest extends FunSuite with Checkers {
     def compare(x: Bad, y: Bad) = evaluated
     override def signum(a: Bad): Int = evaluated
     override def abs(a: Bad): Bad = evaluated
+    def toBigIntOption(x: Bad): Option[BigInt] = evaluated
     def toDouble(x: Bad): Double = evaluated
     def toReal(x: Bad): Real = evaluated
     def ceil(a:Bad): Bad = evaluated

@@ -28,15 +28,15 @@ trait SignedSyntax extends OrderSyntax {
   implicit def signedOps[A:Signed](a: A): SignedOps[A] = new SignedOps(a)
 }
 
-trait IsRealSyntax extends SignedSyntax {
-  implicit def isRealOps[A:IsReal](a:A): IsRealOps[A] = new IsRealOps(a)
-}
-
 trait TruncatedDivisionSyntax extends SignedSyntax {
   implicit def truncatedDivisionOps[A:TruncatedDivision](a: A): TruncatedDivisionOps[A] = new TruncatedDivisionOps(a)
   implicit def literalIntTruncatedDivisionOps(lhs:Int): LiteralIntTruncatedDivisionOps = new LiteralIntTruncatedDivisionOps(lhs)
   implicit def literalLongTruncatedDivisionOps(lhs:Long): LiteralLongTruncatedDivisionOps = new LiteralLongTruncatedDivisionOps(lhs)
   implicit def literalDoubleTruncatedDivisionOps(lhs:Double): LiteralDoubleTruncatedDivisionOps = new LiteralDoubleTruncatedDivisionOps(lhs)
+}
+
+trait IsRealSyntax extends TruncatedDivisionSyntax {
+  implicit def isRealOps[A:IsReal](a:A): IsRealOps[A] = new IsRealOps(a)
 }
 
 trait SemigroupoidSyntax {
