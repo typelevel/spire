@@ -310,8 +310,10 @@ package object math {
   /**
    * lcm
    */
-  final def lcm(x: Long, y: Long): Long = (x / gcd(x, y)) * y
-  final def lcm(a: BigInt, b: BigInt): BigInt = (a / a.gcd(b)) * b
+  final def lcm(x: Long, y: Long): Long =
+    if (x == 0L || y == 0L) 0L else (x / gcd(x, y)) * y
+  final def lcm(a: BigInt, b: BigInt): BigInt =
+    if (a.signum == 0 || b.signum == 0) BigInt(0) else (a / a.gcd(b)) * b
   final def lcm[A](x: A, y: A)(implicit eqA: Eq[A], ringA: GCDRing[A]): A = ringA.lcm(x, y)
 
   /**

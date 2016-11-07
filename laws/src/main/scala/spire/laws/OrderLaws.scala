@@ -139,33 +139,51 @@ trait OrderLaws[A] extends Laws {
   def inRange(bi: BigInt)(implicit isIntegral: IsIntegral[A], numberTag: NumberTag[A]): Boolean = {
     val isTooLow = numberTag.hasMinValue.map(bi < isIntegral.toBigInt(_)).getOrElse(false)
     val isTooHigh = numberTag.hasMaxValue.map(bi > isIntegral.toBigInt(_)).getOrElse(false)
-    !isTooLow && !isTooHigh
+    (!isTooLow) && (!isTooHigh)
   }
 
   def tbi(a: A)(implicit isIntegral: IsIntegral[A]): BigInt = isIntegral.toBigInt(a)
 
+  // TODO: in all the laws below, we do not discard evaluations by using `==>` because
+  // it leads to too many evaluations discarded, to be fixed
+  // i.e. instead of P ==> X, we write !P || X
+  def signedLimitedRange(implicit signedA: Signed[A], isIntegral: IsIntegral[A], numberTag: NumberTag[A]) = new OrderProperties(
+    name = "signed (limited range)",
+    parent = Some(order),
+    "abs non-negative" → forAll((x: A) =>
+      !inRange(tbi(x).abs) || (x.abs.sign != Sign.Negative)
+    ),
+    "signum returns -1/0/1" → forAll((x: A) =>
+      x.signum.abs <= 1
+    ),
+    "signum is sign.toInt" → forAll((x: A) =>
+      x.signum == x.sign.toInt
+    )
+  )
+
+
   def signedAdditiveCMonoidLimitedRange(implicit signedA: Signed[A], additiveCMonoidA: AdditiveCMonoid[A], isIntegral: IsIntegral[A], numberTag: NumberTag[A]) =
     new OrderProperties(
       name = "signedAdditiveCMonoid (limited range)",
-      parent = Some(signed),
+      parent = Some(signedLimitedRange),
       "ordered group" → forAll { (x: A, y: A, z: A) =>
-        (inRange(tbi(x) + tbi(y)) && inRange(tbi(y) + tbi(z))) ==> {
+        !(inRange(tbi(x) + tbi(z)) && inRange(tbi(y) + tbi(z))) || {
           (x <= y) ==> (x + z <= y + z)
         }
       },
       "triangle inequality" → forAll { (x: A, y: A) =>
         val lhsInRange = inRange(tbi(x) + tbi(y)) && inRange((tbi(x) + tbi(y)).abs)
         val rhsInRange = inRange(tbi(x).abs) && inRange(tbi(y).abs) && inRange(tbi(x).abs + tbi(y).abs)
-        (lhsInRange && rhsInRange) ==> ( (x + y).abs <= x.abs + y.abs )
+        !(lhsInRange && rhsInRange) || ( (x + y).abs <= x.abs + y.abs )
       }
     )
 
   def signedAdditiveAbGroupLimitedRange(implicit signedA: Signed[A], additiveAbGroupA: AdditiveAbGroup[A], isIntegral: IsIntegral[A], numberTag: NumberTag[A]) =
     new OrderProperties(
-      name = "signedAdditiveAbGroup",
+      name = "signedAdditiveAbGroup (limited range)",
       parent = Some(signedAdditiveCMonoid),
       "abs(x) equals abs(-x)" → forAll { (x: A) =>
-        inRange(tbi(x).abs) && inRange(-tbi(x)) ==> (x.abs === (-x).abs)
+        !(inRange(tbi(x).abs) && inRange(-tbi(x))) || (x.abs === (-x).abs)
       }
     )
 
@@ -176,6 +194,7 @@ trait OrderLaws[A] extends Laws {
     if (yi.isZero) false else {
       val (tq, tm) = xi tquotmod yi
       val (fq, fm) = xi fquotmod yi
+      inRange(yi.abs) && // for the ... < |y| tests
       (inRange(tq) && inRange(tm) && inRange(tm.abs) &&
         inRange(fq) && inRange(fm) && inRange(fm.abs))
     }
@@ -183,46 +202,46 @@ trait OrderLaws[A] extends Laws {
 
   def truncatedDivisionLimitedRange(implicit cRigA: CRig[A], truncatedDivisionA: TruncatedDivision[A], isIntegral: IsIntegral[A], numberTag: NumberTag[A]) =
     new OrderProperties(
-      name = "truncatedDivision",
+      name = "truncatedDivision (limited range)",
       parent = Some(signedAdditiveCMonoidLimitedRange), // TODO: propose variant with abelian additive
       "division rule (tquotmod)" → forAll { (x: A, y: A) =>
-        wellDefinedQuotMods(x, y) ==> {
+        !wellDefinedQuotMods(x, y) || {
           val (q, r) = x tquotmod y
           x === y * q + r
         }
       },
       "division rule (fquotmod)" → forAll { (x: A, y: A) =>
-        wellDefinedQuotMods(x, y) ==> {
+        !wellDefinedQuotMods(x, y) || {
           val (q, r) = x fquotmod y
           x === y * q + r
         }
       },
       "quotient is integer (tquot)" → forAll { (x: A, y: A) =>
-        wellDefinedQuotMods(x, y) ==> (x tquot y).toBigIntOption.nonEmpty
+        !wellDefinedQuotMods(x, y) || (x tquot y).toBigIntOption.nonEmpty
       },
       "quotient is integer (fquot)" → forAll { (x: A, y: A) =>
-        wellDefinedQuotMods(x, y) ==> (x fquot y).toBigIntOption.nonEmpty
+        !wellDefinedQuotMods(x, y) || (x fquot y).toBigIntOption.nonEmpty
       },
       "|r| < |y| (tmod)" → forAll { (x: A, y: A) =>
-        wellDefinedQuotMods(x, y) ==> {
+        !wellDefinedQuotMods(x, y) || {
           val r = x tmod y
           r.abs < y.abs
         }
       },
       "|r| < |y| (fmod)" → forAll { (x: A, y: A) =>
-        wellDefinedQuotMods(x, y) ==> {
+        !wellDefinedQuotMods(x, y) || {
           val r = x fmod y
           r.abs < y.abs
         }
       },
       "r = 0 or sign(r) = sign(x) (tmod)" → forAll { (x: A, y: A) =>
-        wellDefinedQuotMods(x, y) ==> {
+        !wellDefinedQuotMods(x, y) || {
           val r = x tmod y
           r.isZero || (r.sign === x.sign)
         }
       },
       "r = 0 or sign(r) = sign(y) (fmod)" → forAll { (x: A, y: A) =>
-        wellDefinedQuotMods(x, y) ==> {
+        !wellDefinedQuotMods(x, y) || {
           val r = x fmod y
           r.isZero || (r.sign === y.sign)
         }

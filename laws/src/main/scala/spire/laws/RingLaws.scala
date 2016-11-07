@@ -169,6 +169,18 @@ trait RingLaws[A] extends GroupLaws[A] {
     }
   )
 
+  def euclideanRingLimitedRange(implicit A: EuclideanRing[A]) = RingProperties.fromParent(
+    name = "euclidean ring limited range",
+    parent = gcdRing,
+    "euclidean function" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        val (q, r) = x equotmod y
+        r.isZero || (r.euclideanFunction < y.euclideanFunction)
+      }
+    } // TODO: restore submultiplicative by adding bounds check
+  )
+
   // Everything below fields (e.g. rings) does not require their multiplication
   // operation to be a group. Hence, we do not check for the existence of an
   // inverse. On the other hand, fields require their multiplication to be an
