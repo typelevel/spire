@@ -63,7 +63,7 @@ object Ring {
 /**
  * CRing is a Ring that is commutative under multiplication.
  */
-trait CRing[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Ring[A] with MultiplicativeCMonoid[A]
+trait CRing[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Ring[A] with CRig[A] with MultiplicativeCMonoid[A]
 
 object CRing {
   @inline final def apply[A](implicit r: CRing[A]): CRing[A] = r

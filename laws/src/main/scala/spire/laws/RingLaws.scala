@@ -113,8 +113,15 @@ trait RingLaws[A] extends GroupLaws[A] {
 
   def rig(implicit A: Rig[A]) = new RingProperties(
     name = "rig",
-    al = additiveMonoid,
+    al = additiveCMonoid,
     ml = multiplicativeMonoid,
+    parents = Seq(semiring)
+  )
+
+  def cRig(implicit A: CRig[A]) = new RingProperties(
+    name = "commutative rig",
+    al = additiveCMonoid,
+    ml = multiplicativeCMonoid,
     parents = Seq(semiring)
   )
 

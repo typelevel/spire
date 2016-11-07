@@ -181,7 +181,7 @@ trait OrderLaws[A] extends Laws {
     }
   }
 
-  def truncatedDivisionLimitedRange(implicit cRingA: CRing[A], truncatedDivisionA: TruncatedDivision[A], isIntegral: IsIntegral[A], numberTag: NumberTag[A]) =
+  def truncatedDivisionLimitedRange(implicit cRigA: CRig[A], truncatedDivisionA: TruncatedDivision[A], isIntegral: IsIntegral[A], numberTag: NumberTag[A]) =
     new OrderProperties(
       name = "truncatedDivision",
       parent = Some(signedAdditiveCMonoidLimitedRange), // TODO: propose variant with abelian additive

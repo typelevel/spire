@@ -121,6 +121,20 @@ trait GroupLaws[A] extends Laws {
     )
   )
 
+  def additiveCMonoid(implicit A: AdditiveCMonoid[A]) = new AdditiveProperties(
+    base = cMonoid(A.additive),
+    parent = Some(additiveSemigroup),
+    "sumN(a, 0) === zero" → forAll((a: A) =>
+      A.sumN(a, 0) === A.zero
+    ),
+    "sum(Nil) === zero" → forAll((a: A) =>
+      A.sum(Nil) === A.zero
+    ),
+    "isZero" → forAll((a: A) =>
+      a.isZero === (a === A.zero)
+    )
+  )
+
   def additiveGroup(implicit A: AdditiveGroup[A]) = new AdditiveProperties(
     base = group(A.additive),
     parent = Some(additiveMonoid),
