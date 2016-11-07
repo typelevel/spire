@@ -75,7 +75,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   }
 
   def gcd(rhs: Rational): Rational
-  def lcm(rhs: Rational): Rational = (lhs / lhs.gcd(rhs)) * rhs
+  def lcm(rhs: Rational): Rational =
+    if (lhs.isZero || rhs.isZero) Rational.zero else (lhs / lhs.gcd(rhs)) * rhs
 
   def toReal: Real = Real(this)
 
@@ -863,6 +864,8 @@ private[math] trait RationalIsField extends Field[Rational] {
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
   def div(a:Rational, b:Rational): Rational = a / b
+  override def gcd(a: Rational, b: Rational)(implicit ev: Eq[Rational]): Rational = a gcd b
+  override def lcm(a: Rational, b: Rational)(implicit ev: Eq[Rational]): Rational = a lcm b
 }
 
 private[math] trait RationalTruncatedDivision extends TruncatedDivision[Rational] {

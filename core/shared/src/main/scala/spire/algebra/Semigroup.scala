@@ -22,7 +22,7 @@ trait Semigroup[@sp(Int, Long, Float, Double) A] extends Any {
         val x = if ((k & 1) == 1) combine(b, extra) else extra
         loop(combine(b, b), k >>> 1, x)
       }
-    loop(a, n - 1, a)
+    if (n == 1) a else loop(a, n - 1, a)
   }
 
   /**

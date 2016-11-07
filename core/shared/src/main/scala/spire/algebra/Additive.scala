@@ -60,7 +60,7 @@ trait AdditiveSemigroup[@sp(Byte, Short, Int, Long, Float, Double) A] extends An
         val x = if ((k & 1) == 1) plus(b, extra) else extra
         loop(plus(b, b), k >>> 1, x)
       }
-    loop(a, n - 1, a)
+    if (n == 1) a else loop(a, n - 1, a)
   }
 
   /**
