@@ -160,7 +160,7 @@ class AlgebraicTest extends SpireProperties {
     } yield (roots, i)
 
     // These tests can be a bit slow, so we bump down the # and size.
-    forAll(Gen.nonEmptyListOf(genRational), maxSize(8)) { roots =>
+    forAll(Gen.nonEmptyListOf(genRational), sizeRange(8)) { roots =>
       val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
       val algebraicRoots = Algebraic.roots(poly)
       (roots.sorted zip algebraicRoots).foreach { case (qRoot, aRoot) =>
@@ -207,7 +207,7 @@ class AlgebraicTest extends SpireProperties {
     // This test can be a bit slow, so we limit the tests here. If making major
     // changes to Algebraic, root isolation, refinement, etc, it is a good idea
     // to drop the limits and just give it a bit of time to run.
-    forAll(genRationalPoly, maxSize(8)) { poly =>
+    forAll(genRationalPoly, sizeRange(8)) { poly =>
       val apoly = poly.map(Algebraic(_))
       Algebraic.roots(poly).forall { root =>
         apoly(root).isZero
