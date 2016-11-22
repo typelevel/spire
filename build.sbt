@@ -231,7 +231,10 @@ lazy val commonJsSettings = Seq(
 
 lazy val commonJvmSettings = Seq(
   // -optimize has no effect in scala-js other than slowing down the build
-  scalacOptions += "-optimize",
+  scalacOptions ++= Seq(
+    "-optimize",
+    "-Yinline-warnings"
+  ),
   testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF")
 )
 
@@ -384,7 +387,6 @@ lazy val commonScalacOptions = Seq(
   "-unchecked",
   "-Xfatal-warnings",
   "-Xlint",
-//  "-Yinline-warnings",
   "-Yno-adapted-args",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
