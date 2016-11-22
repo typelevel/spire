@@ -101,6 +101,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     )
   )
 
+
   def innerProductSpace(implicit V: InnerProductSpace[V, A], A: Order[A], A0: Signed[A]) = SpaceProperties.fromParent(
     name = "inner-product space",
     parent = vectorSpace,
@@ -110,7 +111,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     ),
     "linearity of partial inner product" → forAll((w: V) =>
       // TODO this probably requires some thought -- should `linearity` be a full `RuleSet`?
-      linearity(_ ⋅ w).all
+      propertiesToProp(linearity(_ ⋅ w).all)
     )
   )
 
