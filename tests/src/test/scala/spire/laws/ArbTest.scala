@@ -1,8 +1,6 @@
 package spire
 package laws
 
-import scala.util.Random
-
 import org.scalacheck.Gen
 import org.scalacheck.rng.Seed
 import org.scalatest.FunSuite
