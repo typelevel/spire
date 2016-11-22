@@ -4,22 +4,21 @@ package laws
 import scala.util.Random
 
 import org.scalacheck.Gen
+import org.scalacheck.rng.Seed
 import org.scalatest.FunSuite
 import spire.math.interval._
 import spire.math.{Interval, SafeLong, Rational}
 
 class ArbTest extends FunSuite {
 
-  // params with a fixed random seed for
-  def params: Gen.Parameters = {
-    val seed = 0L
-    Gen.Parameters.default.withRng(new Random(seed))
-  }
+  // fixed random seed
+  def seed: Seed = Seed(0L)
+
+  def params: Gen.Parameters = Gen.Parameters.default
 
   test("arb.rational") {
     // generate a reasonably large number of rationals and check if we get each kind of rational at least once
-    val params = this.params
-    val samples = Array.fill(100)(spire.laws.arb.rational.arbitrary(params)).flatten
+    val samples = Array.fill(100)(spire.laws.arb.rational.arbitrary(params, seed)).flatten
     def classify(x: Rational): String = {
       if (x.isZero) "zero"
       else if (x.isOne) "one"
@@ -44,8 +43,7 @@ class ArbTest extends FunSuite {
   }
 
   test("arb.safeLong") {
-    val params = this.params
-    val samples = Array.fill(100)(spire.laws.arb.safeLong.arbitrary(params)).flatten
+    val samples = Array.fill(100)(spire.laws.arb.safeLong.arbitrary(params, seed)).flatten
     def classify(x: SafeLong): String = {
       if (x.isZero) "zero"
       else if (x.isOne) "one"
@@ -58,8 +56,7 @@ class ArbTest extends FunSuite {
 
   test("arb.interval") {
     import spire.std.int._
-    val params = this.params
-    val samples = Array.fill(100)(spire.laws.arb.interval[Int].arbitrary(params)).flatten
+    val samples = Array.fill(100)(spire.laws.arb.interval[Int].arbitrary(params, seed)).flatten
     def classify(x: Interval[Int]): String = x.fold {
       case (Unbound(), Unbound()) ⇒ "all"
       case (Unbound(), Open(_)) ⇒ ")"
