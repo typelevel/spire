@@ -96,6 +96,29 @@ lazy val laws = crossProject.crossType(CrossType.Pure)
 lazy val lawsJVM = laws.jvm
 lazy val lawsJS = laws.js
 
+lazy val docs = project.in(file("docs"))
+  .enablePlugins(MicrositesPlugin)
+  .settings(moduleName := "spire-docs")
+  .settings(spireSettings)
+  .settings(docsSettings)
+  .dependsOn(coreJVM)
+
+lazy val docsSettings = Seq(
+  micrositeName := "Spire",
+  micrositeDescription := "Powerful new number types and numeric abstractions for Scala.",
+  micrositeAuthor := "Spire contributors",
+  micrositeHomepage := "http://tixxit.github.io/spire",
+  micrositeBaseUrl := "spire",
+  /* micrositeDocumentationUrl := "api", */
+  micrositeGithubOwner := "non",
+  micrositeGithubRepo := "spire",
+  micrositeExtraMdFiles := Map(
+    file("AUTHORS.md") -> "authors.md",
+    file("CONTRIBUTING.md") -> "contributing.md"
+  ),
+  fork in tut := true
+)
+
 // Todo: As all tests in this list are commented out, no tests in testJS are run - but they are compiled.
 //       This list is TEMPORARY as tests are migrated to scala-js
 lazy val jsTests = List(

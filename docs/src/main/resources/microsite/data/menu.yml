@@ -1,0 +1,40 @@
+options:
+
+ - title: Numbers
+   url: numbers.html
+   menu_type: numbers
+   menu_section: numbers
+
+   nested_options:
+    - title: SafeLong
+      url: numbers/safelong.html
+
+    - title: Rational
+      url: numbers/rational.html
+
+    - title: Algebraic
+      url: numbers/algebraic.html
+
+    - title: Real
+      url: numbers/real.html
+
+    - title: Unsigned Integers
+      url: numbers/unsigned.html
+
+    - title: Natural
+      url: numbers/natural.html
+
+    - title: Number
+      url: numbers/number.html
+
+    - title: Complex
+      url: numbers/complex.html
+
+ - title: Type Classes
+   url: typeclasses.html
+   menu_type: typeclasses
+   menu_section: typeclasses
+
+   nested_options:
+    - title: Ring
+      url: typeclasses/ring.html
