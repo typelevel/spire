@@ -197,11 +197,13 @@ object gen {
 
   val perm: Gen[Perm] =
     Gen.parameterized { params =>
-      import params.rng.nextInt
       val domainSize = params.size / 10 + 1
+      Gen.containerOfN[Array, Int](domainSize, Gen.chooseNum(0, Int.MaxValue))
+    } flatMap { intArray =>
+      val domainSize = intArray.length
       val images = new Array[Int](domainSize)
       cforRange(0 until domainSize) { i =>
-        val j = nextInt(i + 1) // uses the Fisher-Yates shuffle, inside out variant
+        val j = intArray(i) % (i + 1) // uses the Fisher-Yates shuffle, inside out variant
         images(i) = images(j)
         images(j) = i
       }

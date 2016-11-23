@@ -9,6 +9,11 @@ object Ops extends machinist.Ops {
 
   val operatorNames: Map[String, String] =
     machinist.DefaultOps.operatorNames ++ Map(
+
+      // revert Semigroup (|+| |-|) to old conventions
+      ("$bar$plus$bar", "op"),
+      ("$bar$minus$bar", "opInverse"),
+
       // partial operations |+|? |+|?? |-|? |-|??
       ("$bar$plus$bar$qmark$qmark", "opIsDefined"),
       ("$bar$minus$bar$qmark$qmark", "opInverseIsDefined"),
@@ -238,15 +243,17 @@ v     */
         $index -= $stride
       }"""
 
+    val predef = spire.macros.compat.predef(c)
+
     val tree: Tree = r.tree match {
 
-      case q"scala.this.Predef.intWrapper($i).until($j)" =>
+      case q"$predef.intWrapper($i).until($j)" =>
         strideUpUntil(i, j, 1)
 
-      case q"scala.this.Predef.intWrapper($i).to($j)" =>
+      case q"$predef.intWrapper($i).to($j)" =>
         strideUpTo(i, j, 1)
 
-      case r @ q"scala.this.Predef.intWrapper($i).until($j).by($step)" =>
+      case r @ q"$predef.intWrapper($i).until($j).by($step)" =>
         isLiteral(step) match {
           case Some(k) if k > 0 => strideUpUntil(i, j, k)
           case Some(k) if k < 0 => strideDownUntil(i, j, -k)
@@ -258,7 +265,7 @@ v     */
             q"$r.foreach($body)"
         }
 
-      case r @ q"scala.this.Predef.intWrapper($i).to($j).by($step)" =>
+      case r @ q"$predef.intWrapper($i).to($j).by($step)" =>
         isLiteral(step) match {
           case Some(k) if k > 0 => strideUpTo(i, j, k)
           case Some(k) if k < 0 => strideDownTo(i, j, -k)
