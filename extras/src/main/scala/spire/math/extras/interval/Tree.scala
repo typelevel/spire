@@ -82,7 +82,7 @@ private[interval] object Tree {
       }
     }
 
-    protected def op(a:Boolean, b:Boolean) : Boolean
+    protected def combine(a:Boolean, b:Boolean) : Boolean
 
     /**
      * This is called if two leaves collide (have the same prefix)
@@ -120,7 +120,7 @@ private[interval] object Tree {
      * @param b a node (leaf or branch) from the rhs
      * @return the result, can be null
      */
-    private final def op(a0:Boolean, a: Tree, b0:Boolean, b: Tree): Boolean = {
+    private final def combine(a0:Boolean, a: Tree, b0:Boolean, b: Tree): Boolean = {
       val a_l = a.level
       val a_p = a.prefix
       val b_l = b.level
@@ -136,10 +136,10 @@ private[interval] object Tree {
             val am = a0 ^ a.left.sign
             if (zeroAt(b_p, a_l)) {
               // b fits into the left child of a
-              op(a0, a.left, b0, b) && overlapA(am, a.right, b0 ^ b.sign)
+              combine(a0, a.left, b0, b) && overlapA(am, a.right, b0 ^ b.sign)
             } else {
               // b fits into the right child of a
-              overlapA(a0, a.left, b0) && op(am, a.right, b0, b)
+              overlapA(a0, a.left, b0) && combine(am, a.right, b0, b)
             }
           // $COVERAGE-OFF$
           case _ => unreachable
@@ -155,10 +155,10 @@ private[interval] object Tree {
             val bm = b0 ^ b.left.sign
             if (zeroAt(a_p, b_l)) {
               // a fits into the left child of b
-              op(a0, a, b0, b.left) && overlapB(a0 ^ a.sign, bm, b.right)
+              combine(a0, a, b0, b.left) && overlapB(a0 ^ a.sign, bm, b.right)
             } else {
               // a fits into the right child of b
-              overlapB(a0, b0, b.left) && op(a0, a, bm, b.right)
+              overlapB(a0, b0, b.left) && combine(a0, a, bm, b.right)
             }
           // $COVERAGE-OFF$
           case _ => unreachable
@@ -173,7 +173,7 @@ private[interval] object Tree {
               val bm = b0 ^ b.left.sign
               // same prefix. leaves have to be merged
               // todo: check if we can return b unchanged
-              op(a0, a.left, b0, b.left) && op(am, a.right, bm, b.right)
+              combine(a0, a.left, b0, b.left) && combine(am, a.right, bm, b.right)
             case (a: Leaf, b: Leaf) =>
               collision(a0, a, b0, b)
             // $COVERAGE-OFF$
@@ -187,7 +187,7 @@ private[interval] object Tree {
       }
     }
 
-    final def apply(a0: Boolean, a: Tree, b0: Boolean, b: Tree) : Boolean = op(a0, b0) &&  {
+    final def apply(a0: Boolean, a: Tree, b0: Boolean, b: Tree) : Boolean = combine(a0, b0) &&  {
       if ((a eq null) && (b eq null))
         true
       else if (a eq null)
@@ -195,7 +195,7 @@ private[interval] object Tree {
       else if (b eq null)
         overlapA(a0, a, b0)
       else
-        op(a0, a, b0, b)
+        combine(a0, a, b0, b)
     }
   }
 
@@ -272,7 +272,7 @@ private[interval] object Tree {
      * @param b a node (leaf or branch) from the rhs
      * @return the result, can be null
      */
-    private final def op(a0:Boolean, a: Tree, b0:Boolean, b: Tree): Tree = {
+    private final def combine(a0:Boolean, a: Tree, b0:Boolean, b: Tree): Tree = {
       val a_l = a.level
       val a_p = a.prefix
       val b_l = b.level
@@ -288,10 +288,10 @@ private[interval] object Tree {
             val am = a0 ^ a.left.sign
             if (zeroAt(b_p, a_l)) {
               // b fits into the left child of a
-              a.lr(op(a0, a.left, b0, b), overlapA(am, a.right, b0 ^ b.sign))
+              a.lr(combine(a0, a.left, b0, b), overlapA(am, a.right, b0 ^ b.sign))
             } else {
               // b fits into the right child of a
-              a.lr(overlapA(a0, a.left, b0), op(am, a.right, b0, b))
+              a.lr(overlapA(a0, a.left, b0), combine(am, a.right, b0, b))
             }
           // $COVERAGE-OFF$
           case _ => unreachable
@@ -307,10 +307,10 @@ private[interval] object Tree {
             val bm = b0 ^ b.left.sign
             if (zeroAt(a_p, b_l)) {
               // a fits into the left child of b
-              b.lr(op(a0, a, b0, b.left), overlapB(a0 ^ a.sign, bm, b.right))
+              b.lr(combine(a0, a, b0, b.left), overlapB(a0 ^ a.sign, bm, b.right))
             } else {
               // a fits into the right child of b
-              b.lr(overlapB(a0, b0, b.left), op(a0, a, bm, b.right))
+              b.lr(overlapB(a0, b0, b.left), combine(a0, a, bm, b.right))
             }
           // $COVERAGE-OFF$
           case _ => unreachable
@@ -325,7 +325,7 @@ private[interval] object Tree {
               val bm = b0 ^ b.left.sign
               // same prefix. leaves have to be merged
               // todo: check if we can return b unchanged
-              a.lr(op(a0, a.left, b0, b.left), op(am, a.right, bm, b.right))
+              a.lr(combine(a0, a.left, b0, b.left), combine(am, a.right, bm, b.right))
             case (a: Leaf, b: Leaf) =>
               collision(a0, a, b0, b)
             // $COVERAGE-OFF$
@@ -347,13 +347,13 @@ private[interval] object Tree {
       else if (b eq null)
         overlapA(a0, a, b0)
       else
-        op(a0, a, b0, b)
+        combine(a0, a, b0, b)
     }
   }
 
   object DisjointCalculator extends BooleanBinaryOperator {
 
-    override protected def op(a: Boolean, b: Boolean): Boolean = !(a & b)
+    override protected def combine(a: Boolean, b: Boolean): Boolean = !(a & b)
 
     override protected def overlapB(a0: Boolean, b0: Boolean, b: Tree): Boolean = !a0
 
@@ -368,7 +368,7 @@ private[interval] object Tree {
 
   object SupersetOfCalculator extends BooleanBinaryOperator {
 
-    override protected def op(a: Boolean, b: Boolean): Boolean = a | !b
+    override protected def combine(a: Boolean, b: Boolean): Boolean = a | !b
 
     override protected def overlapB(a0: Boolean, b0: Boolean, b: Tree): Boolean = a0
 
@@ -444,7 +444,7 @@ private[interval] object Tree {
    */
   sealed abstract class Sampler {
 
-    def apply(a0:Boolean, a: Tree, value: Long) = op(a0, a, value)
+    def apply(a0:Boolean, a: Tree, value: Long) = combine(a0, a, value)
 
     /**
      * Method that is invoked when a leaf is found. This allows to customize whether we want at, before or after
@@ -453,7 +453,7 @@ private[interval] object Tree {
      */
     protected def onLeaf(a0: Boolean, a: Leaf): Boolean
 
-    private final def op(a0: Boolean, a: Tree, value: Long): Boolean = a match {
+    private final def combine(a0: Boolean, a: Tree, value: Long): Boolean = a match {
       case a: Branch =>
         val prefix = a.prefix
         val level = a.level
@@ -467,9 +467,9 @@ private[interval] object Tree {
         } else {
           // key is within a
           if (zeroAt(value, level))
-            op(a0, a.left, value)
+            combine(a0, a.left, value)
           else
-            op(a0 ^ a.left.sign, a.right, value)
+            combine(a0 ^ a.left.sign, a.right, value)
         }
       case a: Leaf =>
         if (a.prefix == value)

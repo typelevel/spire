@@ -142,18 +142,18 @@ trait BaseSyntaxTest {
 
   def testSemigroupSyntax[A: Semigroup](a: A, b: A) = {
     import spire.syntax.semigroup._
-    ((a |+| b) == Semigroup[A].op(a, b))
+    ((a |+| b) == Semigroup[A].combine(a, b))
   }
 
   def testMonoidSyntax[A: Monoid](a: A, b: A) = {
     import spire.syntax.monoid._
-    ((a |+| b) == Monoid[A].op(a, b))
+    ((a |+| b) == Monoid[A].combine(a, b))
   }
 
   def testGroupSyntax[A: Group](a: A, b: A) = {
     import spire.syntax.group._
-    ((a |+| b) == Group[A].op(a, b)) &&
-      ((a |-| b) == Group[A].opInverse(a, b)) &&
+    ((a |+| b) == Group[A].combine(a, b)) &&
+      ((a |-| b) == Group[A].remove(a, b)) &&
       (a.inverse == Group[A].inverse(a))
   }
 

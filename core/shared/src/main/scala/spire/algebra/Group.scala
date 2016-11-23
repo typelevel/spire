@@ -15,13 +15,16 @@ trait Group[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Monoi
   /**
    * Combine `a` with the inverse of `b`.
    */
-  def opInverse(a: A, b: A): A = op(a, inverse(b))
+  def remove(a: A, b: A): A = combine(a, inverse(b))
+
+  @deprecated("use remove", "0.12.0")
+  final def opInverse(a: A, b: A): A = remove(a, b)
 
   /**
    * Return `a` combined with itself `n` times.
    */
   override def combinen(a: A, n: Int): A =
-    if (n == Int.MinValue) op(combinen(inverse(a), Int.MaxValue), inverse(a))
+    if (n == Int.MinValue) combine(combinen(inverse(a), Int.MaxValue), inverse(a))
     else if (n < 0) combinen(inverse(a), -n)
     else if (n == 0) id
     else if (n == 1) a

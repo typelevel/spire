@@ -281,7 +281,7 @@ in this guide.
 #### Groups
 
 The most basic algebraic type classes Spire supports involve a single
-associative binary operator (called `op` and represented as `|+|`):
+associative binary operator (called `combine` and represented as `|+|`):
 
  * `Semigroup[A]` just the associative operator `|+|`, nothing more.
  * `Monoid[A]` a semigroup that also has an identity element `id`.
@@ -299,7 +299,7 @@ Spire also defines two parallel group hierarchies for *additive* and
 names and symbols. The following list provides the generic, additive,
 and multiplicative variants:
 
- * operator method: `op`, `plus`, `times`
+ * operator method: `combine`, `plus`, `times`
  * operator symbol: `|+|`, `+`, `*`
  * identity name: `id`, `zero`, `one`
  * inverse method: `inverse`, `negate`, `reciprocal`

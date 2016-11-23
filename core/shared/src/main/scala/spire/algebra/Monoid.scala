@@ -5,8 +5,8 @@ package algebra
 /**
  * A monoid is a semigroup with an identity. A monoid is a specialization of a
  * semigroup, so its operation must be associative. Additionally,
- * `op(x, id) == op(id, x) == x`. For example, if we have `Monoid[String]`,
- * with `op` as string concatenation, then `id = ""`.
+ * `combine(x, id) == combine(id, x) == x`. For example, if we have `Monoid[String]`,
+ * with `combine` as string concatenation, then `id = ""`.
  */
 trait Monoid[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any with Semigroup[A] {
 
@@ -32,7 +32,7 @@ trait Monoid[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A] extends Any 
   /**
    *  Given a sequence of `as`, combine them using the monoid and return the total.
    */
-  def combine(as: TraversableOnce[A]): A = as.aggregate(id)(op, op)
+  def combine(as: TraversableOnce[A]): A = as.aggregate(id)(combine, combine)
 }
 
 object Monoid {

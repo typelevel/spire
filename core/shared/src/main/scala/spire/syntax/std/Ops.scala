@@ -217,7 +217,7 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
     as.aggregate(ev.one)(ev.times, ev.times)
 
   def qcombine(implicit ev: Monoid[A]): A =
-    as.aggregate(ev.id)(ev.op, ev.op)
+    as.aggregate(ev.id)(ev.combine, ev.combine)
 
   def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A =
     as.aggregate(ev.one)(_ + _.abs.pow(p), _ + _).nroot(p)

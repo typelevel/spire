@@ -17,7 +17,7 @@ final class IterableSemigroupoid[A, SA <: IterableLike[A, SA]](implicit cbf: Can
       val builder = cbf()
       while (xIt.nonEmpty) {
         assert(yIt.nonEmpty)
-        builder += A.op(xIt.next, yIt.next)
+        builder += A.combine(xIt.next, yIt.next)
       }
       builder.result()
     }) else Opt.empty[SA]
@@ -32,7 +32,7 @@ final class IterableGroupoid[A, SA <: IterableLike[A, SA]](implicit cbf: CanBuil
       val builder = cbf()
       while (xIt.nonEmpty) {
         assert(yIt.nonEmpty)
-        builder += A.op(xIt.next, yIt.next)
+        builder += A.combine(xIt.next, yIt.next)
       }
       builder.result()
     }) else Opt.empty[SA]
