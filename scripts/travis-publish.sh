@@ -11,9 +11,10 @@ export publish_cmd="publishLocal"
 
 sbt_cmd="sbt ++$TRAVIS_SCALA_VERSION"
 
-coverage="$sbt_cmd coverage validateJVM coverageReport && bash <(curl -s https://codecov.io/bash)"
-scala_js="$sbt_cmd macrosJS/test && $sbt_cmd coreJS/test && $sbt_cmd extrasJS/test && $sbt_cmd && $sbt_cmd lawsJS/test && $sbt_cmd testsJS/test"
-scala_jvm="$sbt_cmd validateJVM"
+#coverage="$sbt_cmd coverage validateJVM coverageReport && bash <(curl -s https://codecov.io/bash)"
+scala_js="$sbt_cmd coverageOff validateJS"
+#scala_js="$sbt_cmd macrosJS/test && $sbt_cmd coreJS/test && $sbt_cmd extrasJS/test && $sbt_cmd && $sbt_cmd lawsJS/test && $sbt_cmd testsJS/test"
+scala_jvm="$sbt_cmd clean coverage validateJVM coverageReport coverageOff"
 
-run_cmd="$coverage && $scala_js && $scala_jvm $publish_cmd"
+run_cmd="$scala_js && $scala_jvm $publish_cmd"
 eval $run_cmd

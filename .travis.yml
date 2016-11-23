@@ -20,6 +20,9 @@ cache:
 script:
   - scripts/travis-publish.sh
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
+
 cache:
   directories:
   - $HOME/.sbt/0.13/dependency
