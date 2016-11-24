@@ -10,3 +10,5 @@ TAGS
 .history
 .*.swp
 .idea
+docs/src/main/tut/contributing.md
+docs/src/main/tut/authors.md
