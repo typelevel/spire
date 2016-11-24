@@ -101,13 +101,13 @@ lazy val docs = project.in(file("docs"))
   .settings(moduleName := "spire-docs")
   .settings(spireSettings)
   .settings(docsSettings)
-  .dependsOn(coreJVM)
+  .dependsOn(coreJVM, extrasJVM)
 
 lazy val docsSettings = Seq(
   micrositeName := "Spire",
   micrositeDescription := "Powerful new number types and numeric abstractions for Scala.",
   micrositeAuthor := "Spire contributors",
-  micrositeHomepage := "http://tixxit.github.io/spire",
+  micrositeHomepage := "http://typelevel.org/",
   micrositeBaseUrl := "spire",
   /* micrositeDocumentationUrl := "api", */
   micrositeGithubOwner := "non",

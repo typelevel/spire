@@ -1,11 +1,30 @@
 options:
 
- - title: Numbers
-   url: numbers.html
+ - title: Scala Built-in Numbers
+   url: numbers/builtin.html
    menu_type: numbers
    menu_section: numbers
-
    nested_options:
+    - title: Byte, Short, Int and Long
+      url: numbers/signed.html
+
+    - title: Float and Double
+      url: numbers/float.html
+
+    - title: BigInt
+      url: numbers/bigint.html
+
+    - title: BigDecimal
+      url: numbers/bigdecimal.html
+
+ - title: Exact Real Numbers
+   url: numbers/exact.html
+   menu_type: numbers
+   menu_section: numbers
+   nested_options:
+    - title: Natural
+      url: numbers/natural.html
+
     - title: SafeLong
       url: numbers/safelong.html
 
@@ -18,23 +37,44 @@ options:
     - title: Real
       url: numbers/real.html
 
-    - title: Unsigned Integers
-      url: numbers/unsigned.html
+ - title: Unsigned Fixed-width Integers
+   url: numbers/unsigned.html
+   menu_type: numbers
+   menu_section: numbers
 
-    - title: Natural
-      url: numbers/natural.html
-
+ - title: Other Number Types
+   url: numbers.html
+   menu_type: numbers
+   menu_section: numbers
+   nested_options:
     - title: Number
       url: numbers/number.html
 
     - title: Complex
       url: numbers/complex.html
 
+    - title: Quaternion
+      url: numbers/quaternion.html
+
+    - title: Interval
+      url: numbers/interval.html
+
+    - title: Polynomial
+      url: numbers/polynomial.html
+
+    - title: Trilean
+      url: numbers/trilean.html
+
+    - title: FixedPoint
+      url: numbers/fixedpoint.html
+
+    - title: Jet
+      url: numbers/jet.html
+
  - title: Type Classes
    url: typeclasses.html
    menu_type: typeclasses
    menu_section: typeclasses
-
    nested_options:
     - title: Ring
       url: typeclasses/ring.html
