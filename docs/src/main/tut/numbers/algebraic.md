@@ -33,3 +33,22 @@ sacrifices performance for this goal. If you don't need these extra operations,
 you should consider using [`Rational`](rational.html). If you don't need exact
 comparisons or sign operations, you should consider using an approximate number
 type like `Double` or `BigDecimal`.
+
+Here is an example, where we construct the square root of 2, an irrational
+number, in 3 different ways, with 3 different expressions, and then compare
+them. Algebraic will always be able to determine that they are equal, even
+though we have derived the number in different ways.
+
+```tut:book
+import spire.math.{Algebraic, Polynomial, Rational}
+import spire.syntax.literals._
+
+val p: Polynomial[Rational] = poly"x^5 - 2x^3 - 3x^2 + 6"
+val x: Algebraic = Algebraic.root(p, 1) // The 2nd real root of p.
+val y: Algebraic = Algebraic(2).sqrt // The easy case.
+val z: Algebraic = Algebraic(18).sqrt - Algebraic(8).sqrt // Gotta squint.
+
+x == y
+y == z
+x == z
+```
