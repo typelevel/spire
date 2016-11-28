@@ -1,5 +1,10 @@
 options:
 
+ - title: Numbers
+   url: numbers.html
+   menu_type: numbers
+   menu_section: numbers
+
  - title: Scala Built-in Numbers
    url: numbers/builtin.html
    menu_type: numbers
@@ -75,6 +80,47 @@ options:
    url: typeclasses.html
    menu_type: typeclasses
    menu_section: typeclasses
+
+ - title: Equality and Ordering
+   url: typeclasses/relations.html
+   menu_type: typeclasses
+   menu_section: typeclasses
+   nested_options:
+    - title: Eq
+      url: typeclasses/eq.html
+
+    - title: PartialOrder
+      url: typeclasses/partialorder.html
+
+    - title: Order
+      url: typeclasses/order.html
+
+ - title: Groups and Monoids
+   url: typeclasses/group.html
+   menu_type: typeclasses
+   menu_section: typeclasses
+
+ - title: Rings and Fields
+   url: typeclasses/rings.html
+   menu_type: typeclasses
+   menu_section: typeclasses
    nested_options:
     - title: Ring
       url: typeclasses/ring.html
+
+    - title: EuclideanRing
+      url: typeclasses/euclideanring.html
+
+    - title: Field
+      url: typeclasses/field.html
+
+    - title: NRoot
+      url: typeclasses/nroot.html
+
+    - title: Trig
+      url: typeclasses/trig.html
+
+ - title: Random Numbers
+   url: random.html
+   menu_type: random
+   menu_section: random
