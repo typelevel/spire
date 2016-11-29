@@ -147,6 +147,8 @@ abstract class AutoAlgebra extends AutoOps { ops =>
     }
   }
 
+  /* TODO: missing GCD ring. Any examples of types with .gcd and .lcm in Scala/Java ? */
+
   def EuclideanRing[A: c.WeakTypeTag](z: c.Expr[A], o: c.Expr[A])
       (ev: c.Expr[Eq[A]]): c.Expr[EuclideanRing[A]] = {
     c.universe.reify {
@@ -174,6 +176,7 @@ abstract class AutoAlgebra extends AutoOps { ops =>
         def times(x: A, y: A): A = ops.times[A].splice
         override def minus(x: A, y: A): A = ops.minus[A].splice
         def negate(x: A): A = ops.negate[A].splice
+        override def euclideanFunction(x: A): BigInt = BigInt(0)
         override def quot(x: A, y: A): A = ops.div[A].splice
         override def mod(x: A, y: A): A = ops.mod[A](z).splice
         def div(x: A, y: A): A = ops.div[A].splice
@@ -208,6 +211,7 @@ case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
   def minus[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "minus")
   def times[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "times")
   def negate[A: c.WeakTypeTag]: c.Expr[A] = unop[A]("unary_" + "$" + "minus")
+  /* TODO: this is a bit careless, but works for our examples */
   def euclideanFunction[A: c.WeakTypeTag]: c.Expr[BigInt] = {
     import c.universe._
     c.Expr[BigInt](q"x.toBigInt.abs")
@@ -237,6 +241,7 @@ case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
         Select(Ident(termName(c)("zero")), termName(c)("minus")),
         List(Ident(termName(c)("x")))))
     }
+  /* TODO: this is a bit careless, but works for our examples */
   def euclideanFunction[A: c.WeakTypeTag]: c.Expr[BigInt] = {
     import c.universe._
     c.Expr[BigInt](q"_root_.scala.BigInt(x.toBigInteger).abs")

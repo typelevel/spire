@@ -9,7 +9,7 @@ lazy val scalaTestVersion = "3.0.0"
 lazy val shapelessVersion = "2.3.2"
 lazy val disciplineVersion = "0.7.2"
 lazy val machinistVersion = "0.6.1"
-lazy val algebraVersion = "0.5.2-SNAPSHOT"
+lazy val algebraVersion = "0.6.0"
 // lazy val catsVersion = "0.8.1"
 
 lazy val apfloatVersion = "1.8.2"
@@ -318,7 +318,7 @@ lazy val coreSettings = Seq(
     val algebraSource = ProductTypes.algebraProductTypes
     val algebraFile = (scalaSource / "spire" / "std" / "tuples.scala").asFile
     IO.write(algebraFile, algebraSource)
-    
+
     Seq[File](algebraFile)
   }
 )

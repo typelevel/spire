@@ -232,6 +232,7 @@ final class GCDRingOps[A](lhs:A)(implicit ev:GCDRing[A]) {
 }
 
 final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
+  def euclideanFunction(): BigInt = macro Ops.unop[BigInt]
   def /~(rhs:A): A = macro Ops.binop[A, A]
   def %(rhs:A): A = macro Ops.binop[A, A]
   def /%(rhs:A): (A, A) = macro Ops.binop[A, (A, A)]

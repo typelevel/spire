@@ -62,7 +62,7 @@ class SafeLongTest extends FunSuite {
       assert(EuclideanRing[SafeLong].quot(a, b) == a / b)
       assert(EuclideanRing[SafeLong].mod(a, b) == a % b)
       assert(EuclideanRing[SafeLong].quotmod(a, b) == a /% b)
-      assert(Gcd[SafeLong].gcd(a, b) == a.gcd(b))
+      assert(GCDRing[SafeLong].gcd(a, b) == a.gcd(b))
     }
     assert(Ring[SafeLong].fromInt(1) == SafeLong.one)
   }
