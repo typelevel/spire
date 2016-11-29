@@ -1,7 +1,7 @@
 package spire
 package math.prime
 
-import spire.math.{SafeLong, log, max}
+import spire.math.SafeLong
 
 import SieveUtil._
 

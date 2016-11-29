@@ -1,8 +1,6 @@
 package spire
 package math
 
-import java.lang.Math
-
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import spire.algebra._
 import spire.syntax.field._

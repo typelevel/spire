@@ -1,19 +1,9 @@
 package spire
 package benchmark
 
-
-import scala.util.Random
-
 import spire.algebra._
 import spire.math._
 import spire.implicits._
-
-import com.google.caliper.Runner
-import com.google.caliper.SimpleBenchmark
-import com.google.caliper.Param
-
-import java.lang.Math
-import java.math.BigInteger
 
 object AddBenchmarks extends MyRunner(classOf[AddBenchmarks])
 

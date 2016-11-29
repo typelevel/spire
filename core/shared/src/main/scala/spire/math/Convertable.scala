@@ -3,9 +3,6 @@ package math
 
 import java.math.MathContext
 
-
-import spire.algebra.{ Trig, IsReal }
-
 trait ConvertableTo[@sp A] extends Any {
   def fromByte(n: Byte): A
   def fromShort(n: Short): A

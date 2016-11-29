@@ -3,7 +3,6 @@ package random
 package rng
 
 import spire.util.Pack
-import java.nio.ByteBuffer
 
 final class Lcg64(_seed: Long) extends LongBasedGenerator {
   private var seed: Long = _seed

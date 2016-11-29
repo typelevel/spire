@@ -9,8 +9,6 @@ import spire.std.string._
 import spire.syntax.all._
 import spire.tests.{SpireTests, SpireProperties}
 
-import org.scalatest.FunSuite
-import org.scalatest.Matchers
 import org.scalatest.prop.Checkers
 
 import org.scalacheck.{Arbitrary, Gen}

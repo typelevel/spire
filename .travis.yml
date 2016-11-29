@@ -1,8 +1,16 @@
 language: scala
 
 scala:
-- 2.10.6
-- 2.11.8
+  - 2.10.6
+  - 2.11.8
+
+jdk:
+  - oraclejdk7
+
+matrix:
+  include:
+  - scala: 2.12.0
+    jdk: oraclejdk8
 
 cache:
   directories:
@@ -11,6 +19,9 @@ cache:
 
 script:
   - scripts/travis-publish.sh
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 
 cache:
   directories:

@@ -200,15 +200,18 @@ abstract class AutoAlgebra extends AutoOps { ops =>
 }
 
 case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
-  def plusplus[A]: c.Expr[A] = binop[A]("$plus$plus")
-  def plus[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$plus")
-  def minus[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$minus")
-  def times[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$times")
-  def negate[A: c.WeakTypeTag]: c.Expr[A] = unop[A]("unary_$minus")
-  def quot[A: c.WeakTypeTag]: c.Expr[A] = binopSearch[A]("quot" :: "$div" :: Nil) getOrElse failedSearch("quot", "/~")
-  def div[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$div")
-  def mod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] = binop[A]("$percent")
-  def equals: c.Expr[Boolean] = binop[Boolean]("$eq$eq")
+  // we munge these names with dollar signs in them to avoid getting
+  // warnings about possible interpolations. these are not intended to
+  // be interpolations.
+  def plusplus[A]: c.Expr[A] = binop[A]("$" + "plus" + "$" + "plus")
+  def plus[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "plus")
+  def minus[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "minus")
+  def times[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "times")
+  def negate[A: c.WeakTypeTag]: c.Expr[A] = unop[A]("unary_" + "$" + "minus")
+  def quot[A: c.WeakTypeTag]: c.Expr[A] = binopSearch[A]("quot" :: ("$" + "div") :: Nil) getOrElse failedSearch("quot", "/~")
+  def div[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "div")
+  def mod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] = binop[A]("$" + "percent")
+  def equals: c.Expr[Boolean] = binop[Boolean]("$" + "eq" + "$" + "eq")
   def compare: c.Expr[Int] = binop[Int]("compare")
 }
 

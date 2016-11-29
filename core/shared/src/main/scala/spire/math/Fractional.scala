@@ -4,8 +4,6 @@ package math
 import spire.algebra.{Field, NRoot}
 import spire.std._
 
-import java.lang.Math
-
 trait Fractional[@sp(Float, Double) A] extends Any with Field[A] with NRoot[A] with Integral[A]
 
 object Fractional {

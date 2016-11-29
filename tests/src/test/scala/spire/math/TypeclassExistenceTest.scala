@@ -5,10 +5,7 @@ import spire.algebra._
 import spire.math._
 import spire.implicits._
 
-import java.math.MathContext
-
 import org.scalatest.FunSuite
-
 
 /**
  * Just some sanity tests to make sure that the type classes we expect to exist

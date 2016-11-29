@@ -1,13 +1,22 @@
 package spire
 package math
 
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.Matchers
-import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
 class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   type Q = Rational
+
+  implicit val arbRational: Arbitrary[Rational] = Arbitrary(for {
+    n <- arbitrary[BigInt]
+    d0 <- arbitrary[BigInt]
+  } yield {
+    val d = if (d0.signum == 0) BigInt(1) else d0
+    Rational(n, d)
+  })
 
   def rat1(name: String)(f: Q => Unit) =
     property(name) {
@@ -69,6 +78,17 @@ class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
   property("Round-trip Double") {
     forAll("x") { (n: Double) =>
       Rational(n).toDouble == n
+    }
+  }
+
+  property("limitTo(n) forces numerator and denominator to be less than n") {
+    implicit val arbSafeLong: Arbitrary[SafeLong] =
+      Arbitrary(arbitrary[BigInt].map { n => SafeLong(n.abs) }.filter(_.signum != 0))
+
+    forAll { (x: Rational, n: SafeLong) =>
+      val y = x.limitTo(n.abs)
+      (y.numerator <= n) shouldBe true
+      (y.denominator <= n) shouldBe true
     }
   }
 }

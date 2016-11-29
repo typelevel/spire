@@ -168,8 +168,6 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
   def isEven: Boolean = (digit & UInt(1)) == UInt(0)
 
   def powerOfTwo: Int = {
-    import java.lang.Integer.highestOneBit
-
     def test(n: UInt): Int = {
       if ((n.signed & -n.signed) != n.signed) return -1
       // TODO: this could be better/faster
