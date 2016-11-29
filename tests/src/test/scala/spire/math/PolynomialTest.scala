@@ -4,10 +4,9 @@ package math
 import spire.algebra._
 import spire.math.poly._
 import spire.std.bigDecimal._
-import spire.syntax.gcd._
+import spire.std.bigInt._
 import spire.syntax.literals._
 import spire.optional.rationalTrig._
-
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
@@ -151,6 +150,14 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
+  implicit val arbPolynomial: Arbitrary[Polynomial[BigInt]] = Arbitrary(for {
+    ts <- arbitrary[List[Term[BigInt]]]
+    isDense <- arbitrary[Boolean]
+  } yield {
+    val p = Polynomial(ts)
+    if (isDense) p.toDense else p.toSparse
+  })
+
   implicit val arbDense: Arbitrary[PolyDense[Rational]] = Arbitrary(for {
     ts <- arbitrary[List[Term[Rational]]]
   } yield {
@@ -226,6 +233,12 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
+  property(s"p.shift(h) = p.compose(x + h)") {
+    forAll { (p: Polynomial[BigInt], h: BigInt) =>
+      p.shift(h) shouldBe p.compose(Polynomial.x[BigInt] + Polynomial.constant(h))
+    }
+  }
+
   def gcdTest(x: Polynomial[Rational], y: Polynomial[Rational]): Unit = {
     if (!x.isZero || !y.isZero) {
       val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
@@ -259,6 +272,11 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 }
 
 class PolynomialTest extends FunSuite {
+
+  test("Polynomial(List(Term(0, 0), Term(0, 0))) should not throw") {
+    val ts = Term(r"0", 0) :: Term(r"0", 0) :: Nil
+    assert(Polynomial(ts) == Polynomial.zero[Rational])
+  }
 
   test("polynomial term implicit operations") {
     val t = Term(r"5/6", 2)
@@ -360,5 +378,31 @@ class PolynomialTest extends FunSuite {
     assert((a gcd c) === constant(BigDecimal("0.2")))
     assert((a gcd d) === constant(BigDecimal("0.04")))
     assert((c gcd d) === c)
+  }
+
+  test("Polynomial(terms...) sums terms") {
+    val terms = List(
+      Term(Rational("-2/17"), 10),
+      Term(Rational("97/8"), 0),
+      Term(Rational("-8/7"), 0),
+      Term(Rational("-8/47"), 47),
+      Term(Rational("-1/71"), 26),
+      Term(Rational("1"), 0),
+      Term(Rational("0"), 1),
+      Term(Rational("-29/8"), 19),
+      Term(Rational("55/7"), 57),
+      Term(Rational("-8/97"), 93),
+      Term(Rational("-99/62"), 1),
+      Term(Rational("0"), 58),
+      Term(Rational("-7/22"), 1),
+      Term(Rational("-93/70"), 38),
+      Term(Rational("-2/21"), 54),
+      Term(Rational("34/79"), 47),
+      Term(Rational("-56/55"), 49),
+      Term(Rational("19/44"), 0))
+    val expected = terms
+      .map { case Term(c, k) => Polynomial(Map(k -> c)) }
+      .foldLeft(Polynomial.zero[Rational])(_ + _)
+    assert(Polynomial(terms) === expected)
   }
 }

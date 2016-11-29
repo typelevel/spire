@@ -1,10 +1,10 @@
 package spire
 package math
 
-import scala.math.{ScalaNumericConversions}
+import scala.math.ScalaNumericConversions
 import java.lang.Math
 
-import spire.algebra.{Eq, EuclideanRing, Field, Gcd, IsReal, IsRational, NRoot, Order, Ring, Signed, Trig}
+import spire.algebra.{Field, IsReal, IsRational, NRoot, Order, CRing, Signed, Trig}
 import spire.std.bigDecimal._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
@@ -80,15 +80,20 @@ sealed trait Number extends ScalaNumericConversions with Serializable {
   def *(rhs: Number): Number
   def -(rhs: Number): Number
   def /(rhs: Number): Number
+
+  /* TODO: move to TruncatedDivision
   def /~(rhs: Number): Number
   def %(rhs: Number): Number
   def /%(rhs: Number): (Number, Number)
+   */
 
   private[math] def r_-(lhs: Number): Number
   private[math] def r_/(lhs: Number): Number
+  /* TODO: move to TruncatedDivision
   private[math] def r_/~(lhs: Number): Number
   private[math] def r_%(lhs: Number): Number
   private[math] def r_/%(lhs: Number): (Number, Number)
+   */
 
   def pow(rhs: Number): Number
   final def **(rhs: Number): Number = pow(rhs)
@@ -191,6 +196,8 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
     }
     case t => t r_/ lhs
   }
+
+  /* TODO: move to TruncatedDivision
   def /~(rhs: Number): Number = rhs match {
     case IntNumber(m) => IntNumber(n / m)
     case t => t r_/~ lhs
@@ -203,6 +210,7 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
     case IntNumber(m) => (IntNumber(n / m), IntNumber(n % m))
     case t => t r_/% lhs
   }
+   */
 
   private[math] def r_-(lhs: Number): Number = lhs match {
     case IntNumber(m) => IntNumber(m - n)
@@ -218,6 +226,7 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
     }
     case t => t / lhs
   }
+  /* TODO: move to TruncatedDivision
   private[math] def r_/~(lhs: Number): Number = lhs match {
     case IntNumber(m) => IntNumber(m / n)
     case t => t /~ lhs
@@ -230,6 +239,7 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
     case IntNumber(m) => (IntNumber(m / n), IntNumber(m % n))
     case t => t /% lhs
   }
+   */
 
   def pow(rhs: Number): Number = rhs match {
     case _ if rhs.canBeInt => Number(n.pow(rhs.intValue))
@@ -373,7 +383,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
     case FloatNumber(m) => Number(m / n)
     case t => t / lhs
   }
-
+  /* TODO: move to TruncatedDivision
   def /~(rhs: Number): Number = rhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(Math.floor(n / x))
@@ -418,7 +428,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
     case FloatNumber(m) => (Number(m / n), Number(m % n))
     case t => t /% lhs
   }
-
+   */
   def pow(rhs: Number): Number = rhs match {
     case FloatNumber(m) => Number(spire.math.pow(n, m))
     case _ if rhs.withinDouble => Number(spire.math.pow(n, rhs.doubleValue));
@@ -482,16 +492,18 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
   def *(rhs: Number): Number = Number(n * rhs.toBigDecimal)
   def -(rhs: Number): Number = Number(n - rhs.toBigDecimal)
   def /(rhs: Number): Number = Number(n / rhs.toBigDecimal)
+  /* TODO: move to TruncatedDivision
   def /~(rhs: Number): Number = Number(n quot rhs.toBigDecimal)
   def %(rhs: Number): Number = Number(n % rhs.toBigDecimal)
-
+   */
   def r_-(lhs: Number): Number = Number(lhs.toBigDecimal - n)
   def r_/(lhs: Number): Number = Number(lhs.toBigDecimal / n)
+  /* TODO: move to TruncatedDivision
   def r_/~(lhs: Number): Number = Number(lhs.toBigDecimal quot n)
   def r_%(lhs: Number): Number = Number(lhs.toBigDecimal % n)
-
+   */
   private def tuplize(t: (BigDecimal, BigDecimal)) = (DecimalNumber(t._1), DecimalNumber(t._2))
-
+  /* TODO: move to TruncatedDivision
   def /%(rhs: Number): (Number, Number) = {
     val t = n /% rhs.toBigDecimal
     (Number(t._1), Number(t._2))
@@ -501,7 +513,7 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
     val t = lhs.toBigDecimal /% n
     (Number(t._1), Number(t._2))
   }
-
+   */
   def pow(rhs: Number): Number = if (rhs.canBeInt) {
     Number(n.pow(rhs.intValue))
   } else {
@@ -564,16 +576,23 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
   def *(rhs: Number): Number = Number(n * rhs.toRational)
   def -(rhs: Number): Number = Number(n - rhs.toRational)
   def /(rhs: Number): Number = Number(n / rhs.toRational)
+
+  /* TODO: move to TruncatedDivision
   def /~(rhs: Number): Number = Number(n /~ rhs.toRational)
   def %(rhs: Number): Number = Number(n % rhs.toRational)
+   */
 
   def r_-(lhs: Number): Number = Number(lhs.toRational - n)
   def r_/(lhs: Number): Number = Number(lhs.toRational / n)
+
+  /* TODO: move to TruncatedDivision
   def r_/~(lhs: Number): Number = Number(lhs.toRational /~ n)
   def r_%(lhs: Number): Number = Number(lhs.toRational % n)
+   */
 
   private def tuplize(t: (Rational, Rational)) = (RationalNumber(t._1), RationalNumber(t._2))
 
+  /* TODO: move to TruncatedDivision
   def /%(rhs: Number): (Number, Number) = {
     val t = n /% rhs.toRational
     (Number(t._1), Number(t._2))
@@ -583,6 +602,7 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
     val t = lhs.toRational /% n
     (Number(t._1), Number(t._2))
   }
+   */
 
   def pow(rhs: Number): Number = if (rhs.canBeInt) {
     Number(n.pow(rhs.intValue))
@@ -600,7 +620,7 @@ trait NumberInstances {
   implicit final val NumberAlgebra = new NumberAlgebra
 }
 
-private[math] trait NumberIsRing extends Ring[Number] {
+private[math] trait NumberIsCRing extends CRing[Number] {
   override def minus(a:Number, b:Number): Number = a - b
   def negate(a:Number): Number = -a
   def one: Number = Number.one
@@ -612,18 +632,22 @@ private[math] trait NumberIsRing extends Ring[Number] {
   override def fromInt(n: Int): Number = Number(n)
 }
 
-private[math] trait NumberIsEuclideanRing extends EuclideanRing[Number] with NumberIsRing {
+/* TODO: remove or find a lawful gcd that is not constant for this field
+private[math] trait NumberIsGCDRing extends GCDRing[Number] with NumberIsCRing {
+  def gcd(a: Number, b: Number): Number = Gcd.euclid(a, b)(Eq[Number], EuclideanRing[Number])
+  def lcm(a: Number, b: Number): Number = (a / gcd(a, b)) * b
+}
+ */
+
+/* TODO: move to TruncatedDivision
+private[math] trait NumberIsEuclideanRing extends EuclideanRing[Number] with NumberIsCRing {
   def quot(a:Number, b:Number) = a / b
   def mod(a:Number, b:Number) = a % b
   override def quotmod(a:Number, b:Number) = a /% b
 }
+ */
 
-private[math] trait NumberIsGcd extends Gcd[Number] {
-  def gcd(a: Number, b: Number): Number = Gcd.euclid(a, b)(Eq[Number], EuclideanRing[Number])
-  def lcm(a: Number, b: Number): Number = (a / gcd(a, b)) * b
-}
-
-private[math] trait NumberIsField extends Field[Number] with NumberIsEuclideanRing {
+private[math] trait NumberIsField extends Field[Number] with NumberIsCRing {
   def div(a:Number, b:Number): Number = a / b
   override def fromDouble(a: Double): Number = Number(a)
 }
@@ -687,7 +711,6 @@ private[math] trait NumberIsReal extends IsRational[Number] with NumberOrder wit
 @SerialVersionUID(0L)
 class NumberAlgebra
     extends NumberIsField
-    with NumberIsGcd
     with NumberIsNRoot
     with NumberIsTrig
     with NumberIsReal

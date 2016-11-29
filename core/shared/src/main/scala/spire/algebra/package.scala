@@ -136,6 +136,9 @@ package object algebra {
   type Semiring[A] = _root_.algebra.ring.Semiring[A]
   val Semiring = _root_.algebra.ring.Semiring
 
+  type CSemiring[A] = _root_.algebra.ring.CommutativeSemiring[A]
+  val CSemiring = _root_.algebra.ring.CommutativeSemiring
+
   type Rig[A] = _root_.algebra.ring.Rig[A]
   val Rig = _root_.algebra.ring.Rig
 
@@ -145,17 +148,17 @@ package object algebra {
   type Rng[A] = _root_.algebra.ring.Rng[A]
   val Rng = _root_.algebra.ring.Rng
 
+  type CRng[A] = _root_.algebra.ring.CommutativeRng[A]
+  val CRng = _root_.algebra.ring.CommutativeRng
+
   type Ring[A] = _root_.algebra.ring.Ring[A]
   val Ring = _root_.algebra.ring.Ring
 
   type CRing[A] = _root_.algebra.ring.CommutativeRing[A]
   val CRing = _root_.algebra.ring.CommutativeRing
 
-  type EuclideanRing[A] = _root_.algebra.ring.EuclideanRing[A]
-  val EuclideanRing = _root_.algebra.ring.EuclideanRing
-
-  type Field[A] = _root_.algebra.ring.Field[A]
-  val Field = _root_.algebra.ring.Field
+  type AlgebraField[A] = _root_.algebra.ring.Field[A]
+  val AlgebraField = _root_.algebra.ring.Field
 
   type Bool[A] = _root_.algebra.lattice.Bool[A]
   val Bool = _root_.algebra.lattice.Bool

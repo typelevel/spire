@@ -9,27 +9,6 @@ object Ops extends machinist.Ops {
 
   val operatorNames: Map[String, String] =
     machinist.DefaultOps.operatorNames ++ Map(
-      // Eq (=== =!=)
-      ("$eq$eq$eq", "eqv"),
-      ("$eq$bang$eq", "neqv"),
-
-      // PartialOrder (> >= < <=)
-      ("$greater", "gt"),
-      ("$greater$eq", "gteqv"),
-      ("$less", "lt"),
-      ("$less$eq", "lteqv"),
-
-      // Semigroup (|+| |-|)
-      ("$bar$plus$bar", "combine"),
-      ("$bar$minus$bar", "remove"),
-
-      // Ring (unary_- + - * **)
-      ("unary_$minus", "negate"),
-      ("$plus", "plus"),
-      ("$minus", "minus"),
-      ("$times", "times"),
-      ("$times$times", "pow"),
-
       // partial operations |+|? |+|?? |-|? |-|??
       ("$bar$plus$bar$qmark$qmark", "opIsDefined"),
       ("$bar$minus$bar$qmark$qmark", "opInverseIsDefined"),
@@ -60,7 +39,8 @@ object Ops extends machinist.Ops {
       // bool
       (uesc('⊻'), "xor"),
       (uesc('⊼'), "nand"),
-      (uesc('⊽'), "nor"))
+      (uesc('⊽'), "nor")
+    )
 
   def eqv[A, B](c: Context)(rhs: c.Expr[B])(ev: c.Expr[A =:= B]): c.Expr[Boolean] = {
     import c.universe._
@@ -73,6 +53,37 @@ object Ops extends machinist.Ops {
     val (e, lhs) = unpack(c)
     c.Expr[Boolean](q"$e.neqv($lhs, $rhs)")
   }
+
+  /**
+   * Like [[binop]] and [[binopWithEv]], but there is ev provided by the implicit
+   * constructor, and ev1 provided by the method.
+   *
+   * If we see code like:
+   *
+   * {{{
+   *   lhs.gcd(rhs)
+   * }}}
+   *
+   * After typing and implicit resolution, we get trees like:
+   *
+   * {{{
+   *   conversion(lhs)(ev: Ev).gcd(rhs)(ev1: Ev1): R
+   * }}}
+   *
+   * The macro should produce trees like:
+   *
+   * {{{
+   *   ev.gcd(lhs, rhs)(ev1): R
+   * }}}
+   *
+   * @group macros
+   */
+  def binopWithEv2[A, Ev1, R](c: Context)(rhs: c.Expr[A])(ev1: c.Expr[Ev1]): c.Expr[R] = {
+    import c.universe._
+    val (ev, lhs) = unpack(c)
+    c.Expr[R](Apply(Apply(Select(ev, findMethodName(c)), List(lhs, rhs.tree)), List(ev1.tree)))
+  }
+
 }
 
 case class SyntaxUtil[C <: Context with Singleton](val c: C) {
@@ -252,15 +263,17 @@ v     */
         $index -= $stride
       }"""
 
+    val predef = spire.macros.compat.predef(c)
+
     val tree: Tree = r.tree match {
 
-      case q"scala.this.Predef.intWrapper($i).until($j)" =>
+      case q"$predef.intWrapper($i).until($j)" =>
         strideUpUntil(i, j, 1)
 
-      case q"scala.this.Predef.intWrapper($i).to($j)" =>
+      case q"$predef.intWrapper($i).to($j)" =>
         strideUpTo(i, j, 1)
 
-      case r @ q"scala.this.Predef.intWrapper($i).until($j).by($step)" =>
+      case r @ q"$predef.intWrapper($i).until($j).by($step)" =>
         isLiteral(step) match {
           case Some(k) if k > 0 => strideUpUntil(i, j, k)
           case Some(k) if k < 0 => strideDownUntil(i, j, -k)
@@ -272,7 +285,7 @@ v     */
             q"$r.foreach($body)"
         }
 
-      case r @ q"scala.this.Predef.intWrapper($i).to($j).by($step)" =>
+      case r @ q"$predef.intWrapper($i).to($j).by($step)" =>
         isLiteral(step) match {
           case Some(k) if k > 0 => strideUpTo(i, j, k)
           case Some(k) if k < 0 => strideDownTo(i, j, -k)

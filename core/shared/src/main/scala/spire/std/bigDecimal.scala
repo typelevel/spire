@@ -6,10 +6,10 @@ import java.math.MathContext
 
 import BigDecimal.RoundingMode.{CEILING, FLOOR, HALF_UP}
 
-import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig, Gcd}
+import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
 import spire.math.Rational
 
-trait BigDecimalIsField extends Field[BigDecimal] with Gcd[BigDecimal] {
+trait BigDecimalIsField extends Field[BigDecimal] {
   override def minus(a: BigDecimal, b: BigDecimal): BigDecimal = a - b
   def negate(a: BigDecimal): BigDecimal = -a
   val one: BigDecimal = BigDecimal(1.0)
@@ -19,11 +19,11 @@ trait BigDecimalIsField extends Field[BigDecimal] with Gcd[BigDecimal] {
   val zero: BigDecimal = BigDecimal(0.0)
 
   override def fromInt(n: Int): BigDecimal = BigDecimal(n)
-
+/* TODO: migrate to TruncatedDivision
   def quot(a: BigDecimal, b: BigDecimal) = a.quot(b)
   def mod(a: BigDecimal, b: BigDecimal) = a % b
   override def quotmod(a: BigDecimal, b: BigDecimal) = a /% b
-
+ */
   override def fromDouble(n: Double): BigDecimal = BigDecimal(n, MathContext.UNLIMITED)
   def div(a: BigDecimal, b: BigDecimal): BigDecimal = a / b
 }
@@ -57,6 +57,7 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
   def fpow(a: BigDecimal, b: BigDecimal): BigDecimal = spire.math.pow(a, b)
 }
 
+/* TODO: migrate to TruncatedDivision or remove
 trait BigDecimalIsGcd extends Gcd[BigDecimal] {
   def gcd(a: BigDecimal, b: BigDecimal): BigDecimal = {
     import java.math.BigInteger
@@ -105,6 +106,7 @@ trait BigDecimalIsGcd extends Gcd[BigDecimal] {
 
   def lcm(a: BigDecimal, b: BigDecimal): BigDecimal = (a / gcd(a, b)) * b
 }
+ */
 
 @SerialVersionUID(1L)
 class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends Trig[BigDecimal] with Serializable {
@@ -174,7 +176,6 @@ trait BigDecimalIsReal extends IsRational[BigDecimal] with BigDecimalOrder with 
 @SerialVersionUID(0L)
 class BigDecimalAlgebra extends BigDecimalIsField
     with BigDecimalIsNRoot
-    with BigDecimalIsGcd
     with BigDecimalIsReal
     with Serializable
 

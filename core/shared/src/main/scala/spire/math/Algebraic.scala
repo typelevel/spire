@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
 
 import spire.Platform
-import spire.algebra.{Eq, EuclideanRing, Field, Gcd, IsAlgebraic, NRoot, Order, Sign}
+import spire.algebra.{Eq, Field, IsAlgebraic, NRoot, Order, Sign}
 import spire.macros.Checked.checked
 import spire.math.poly.{ Term, BigDecimalRootRefinement, RootFinder, Roots }
 import spire.std.bigInt._
@@ -74,6 +74,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def /(that: Algebraic): Algebraic =
     new Algebraic(Expr.Div(this.expr, that.expr))
 
+/* TODO: migrate to TruncatedDivision
   /**
    * Returns an `Algebraic` whose value is just the integer part of
    * `this / that`. This operation is exact.
@@ -95,7 +96,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   /** An alias for [[mod]]. */
   def %(that: Algebraic): Algebraic =
     this - (this /~ that) * that
-
+ */
   /** Returns the square root of this number. */
   def sqrt: Algebraic = nroot(2)
 
@@ -1534,8 +1535,10 @@ private[math] trait AlgebraicIsField extends Field[Algebraic] {
   override def minus(a: Algebraic, b: Algebraic): Algebraic = a - b
   override def pow(a: Algebraic, b: Int): Algebraic = a pow b
   override def times(a: Algebraic, b: Algebraic): Algebraic = a * b
+  /* TODO: migrate to TruncatedDivision
   def quot(a: Algebraic, b: Algebraic): Algebraic = a /~ b
   def mod(a: Algebraic, b: Algebraic): Algebraic = a % b
+   */
   def div(a:Algebraic, b:Algebraic): Algebraic = a / b
   def nroot(a: Algebraic, k: Int): Algebraic = a nroot k
   def fpow(a:Algebraic, b:Algebraic): Algebraic = throw new UnsupportedOperationException("unsupported operation")
@@ -1543,14 +1546,7 @@ private[math] trait AlgebraicIsField extends Field[Algebraic] {
   override def fromDouble(n: Double): Algebraic = Algebraic(n)
 }
 
-private[math] trait AlgebraicIsGcd extends Gcd[Algebraic] {
-  def gcd(a: Algebraic, b: Algebraic): Algebraic =
-    Gcd.euclid(a, b)(Eq[Algebraic], EuclideanRing[Algebraic])
-  def lcm(a: Algebraic, b: Algebraic): Algebraic =
-    (a / gcd(a, b)) * b
-}
-private[math] trait AlgebraicIsNRoot extends NRoot[Algebraic] {
-}
+private[math] trait AlgebraicIsNRoot extends NRoot[Algebraic]
 
 private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
   def toDouble(x: Algebraic): Double = x.toDouble
@@ -1570,7 +1566,6 @@ private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
 @SerialVersionUID(1L)
 class AlgebraicAlgebra
     extends AlgebraicIsField
-    with AlgebraicIsGcd
     with AlgebraicIsNRoot
     with AlgebraicIsReal
     with Serializable

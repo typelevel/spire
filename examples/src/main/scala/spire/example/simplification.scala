@@ -5,7 +5,7 @@ import spire.implicits._
 import spire.math._
 
 import scala.collection.IterableLike
-import scala.collection.mutable.{Builder, GrowingBuilder, MapBuilder}
+import scala.collection.mutable.Builder
 import scala.collection.generic.CanBuildFrom
 
 /**

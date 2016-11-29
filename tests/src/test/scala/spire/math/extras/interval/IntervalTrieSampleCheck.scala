@@ -1,9 +1,9 @@
 package spire.math.extras.interval
 
-import org.scalacheck.Prop._
-import org.scalacheck.Properties
-import spire.std.any._
-import spire.syntax.all._
+//import org.scalacheck.Prop._
+//import org.scalacheck.Properties
+//import spire.std.any._
+//import spire.syntax.all._
 
 object IntervalTrieSampleCheck extends Properties("IntervalSet.Sample") {
 

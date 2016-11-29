@@ -72,13 +72,22 @@ object Roots {
    * Returns an upper bit bound on the roots of the polynomial `p`.
    */
   final def upperBound(p: Polynomial[BigInt]): Int = {
+    // We can construct an upper bound on the real roots of p, a polynomial of
+    // degree n, by computing a bound for each coefficient, except a_n, as
+    // `b_i = nroot(abs(a_i / a_n), n - i) + 1`. We then choose the maximum
+    // bound as the bound to return. However, since we're dealing with a pretty
+    // loose bound, we can actually skip the n-roots and division and work with
+    // bit-bounds instead, which let us replace division with subtraction and
+    // n-roots with division.
     val lgLastCoeff = p.maxOrderTermCoeff.abs.bitLength
     val n = p.degree
     var maxBound = Double.NegativeInfinity
     p.foreachNonZero { (k, coeff) =>
       if (k != n) {
         val i = n - k
-        val bound = ((coeff.abs.bitLength - lgLastCoeff - 1) / i) + 2
+        // Note: This corresponds to nroot(abs(a_i / a_n), n - 1) + 1, but we
+        // add 2 bits to account for the floor division and the +1 at the end.
+        val bound = ((coeff.abs.bitLength - lgLastCoeff + 1) / i) + 2
         maxBound = max(maxBound, bound.toDouble)
       }
     }

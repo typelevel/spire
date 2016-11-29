@@ -119,6 +119,13 @@ class RealCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
     }
   }
 
+  property("x.nroot(-k).pow(-k) = x") {
+    forAll { (x0: NonZero[Real], k: Sized[Int, _1, _10]) =>
+      val x = x0.num.abs
+      x.nroot(-k.num).pow(-k.num) shouldBe x
+    }
+  }
+
   property("pythagorean theorem") {
     forAll { (y: Real, x: Real) =>
       if (x.signum != 0 || y.signum != 0) {

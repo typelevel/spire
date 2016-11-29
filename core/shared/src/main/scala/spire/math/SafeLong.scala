@@ -9,7 +9,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import spire.macros.Checked
 
-import spire.algebra.{EuclideanRing, Gcd, IsIntegral, NRoot, Order, Ring, Signed}
+import spire.algebra.{Eq, EuclideanRing, GCDRing, IsIntegral, NRoot, Order, CRing, Signed}
 import spire.std.long._
 import spire.std.bigInteger._
 
@@ -506,7 +506,7 @@ trait SafeLongInstances {
   implicit final val SafeLongTag = new NumberTag.LargeTag[SafeLong](NumberTag.Integral, SafeLong.zero)
 }
 
-private[math] trait SafeLongIsRing extends Ring[SafeLong] {
+private[math] trait SafeLongIsCRing extends CRing[SafeLong] {
   override def minus(a:SafeLong, b:SafeLong): SafeLong = a - b
   def negate(a:SafeLong): SafeLong = -a
   val one: SafeLong = SafeLong.one
@@ -518,12 +518,18 @@ private[math] trait SafeLongIsRing extends Ring[SafeLong] {
   override def fromInt(n: Int): SafeLong = SafeLong(n)
 }
 
-private[math] trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with Gcd[SafeLong] with SafeLongIsRing {
+private[math] trait SafeLongIsGCDRing extends GCDRing[SafeLong] with SafeLongIsCRing {
+  def lcm(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a lcm b
+  def gcd(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a gcd b
+}
+
+private[math] trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with SafeLongIsGCDRing {
+  def euclideanFunction(a:SafeLong): BigInt = a.abs.toBigInt
   def quot(a:SafeLong, b:SafeLong): SafeLong = a / b
   def mod(a:SafeLong, b:SafeLong): SafeLong = a % b
   override def quotmod(a:SafeLong, b:SafeLong): (SafeLong, SafeLong) = a /% b
-  def lcm(a:SafeLong, b:SafeLong): SafeLong = a lcm b
-  def gcd(a:SafeLong, b:SafeLong): SafeLong = a gcd b
+  override def lcm(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a lcm b
+  override def gcd(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a gcd b
 }
 
 private[math] trait SafeLongIsNRoot extends NRoot[SafeLong] {

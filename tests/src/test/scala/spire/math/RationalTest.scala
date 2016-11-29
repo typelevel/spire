@@ -308,6 +308,10 @@ class RationalTest extends FunSuite {
     }
   }
 
+  test("Rational(1).limitToInt returns 1") {
+    assert(Rational(1).limitToInt === Rational(1))
+  }
+
   test("gcd returns the correct rational GCD") {
     assert(Rational(1, 2).gcd(Rational(1, 3)) === Rational(1, 6))
     assert(Rational(11, 12).gcd(Rational(43, 22)) === Rational(1, 132))

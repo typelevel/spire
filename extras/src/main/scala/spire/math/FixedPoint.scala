@@ -312,8 +312,10 @@ trait FixedPointInstances {
 
       def gcd(x: FixedPoint, y: FixedPoint): FixedPoint = x gcd y
       def lcm(x: FixedPoint, y: FixedPoint): FixedPoint = x lcm y
-      def quot(x: FixedPoint, y: FixedPoint): FixedPoint = x /~ y
-      def mod(x: FixedPoint, y: FixedPoint): FixedPoint = x % y
+
+/* TODO: check if it is not TruncatedDivision? */
+      override def quot(x: FixedPoint, y: FixedPoint): FixedPoint = x /~ y
+      override def mod(x: FixedPoint, y: FixedPoint): FixedPoint = x % y
 
       override def reciprocal(x: FixedPoint): FixedPoint = one / x
       def div(x: FixedPoint, y: FixedPoint): FixedPoint = x / y
@@ -348,7 +350,7 @@ trait FixedPointInstances {
       def fromShort(n: Short): FixedPoint = FixedPoint(n)
       def fromFloat(n: Float): FixedPoint = FixedPoint(n)
       def fromLong(n: Long): FixedPoint = FixedPoint(n)
-      def fromBigInt(n: BigInt): FixedPoint = FixedPoint(BigDecimal(n))
+      override def fromBigInt(n: BigInt): FixedPoint = FixedPoint(BigDecimal(n))
       def fromBigDecimal(n: BigDecimal): FixedPoint = FixedPoint(n)
       def fromRational(n: Rational): FixedPoint = FixedPoint(n)
       def fromAlgebraic(n: Algebraic): FixedPoint =

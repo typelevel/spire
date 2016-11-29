@@ -530,12 +530,10 @@ private[math] trait JetIsRing[@sp(Float, Double) T] extends Ring[Jet[T]] {
   override def fromInt(n: Int): Jet[T] = Jet.fromInt[T](n)
 }
 
-private[math] trait JetIsEuclideanRing[@sp(Float,Double) T]
-  extends JetIsRing[T] with EuclideanRing[Jet[T]] {
-
-  def quot(a: Jet[T], b: Jet[T]): Jet[T] = a /~ b
-  def mod(a: Jet[T], b: Jet[T]): Jet[T] = a % b
-  override def quotmod(a: Jet[T], b: Jet[T]): (Jet[T], Jet[T]) = a /% b
+/* TODO: Jet[T] is probably not a genuine GCD ring */
+private[math] trait JetIsGCDRing[@sp(Float, Double) T]
+    extends JetIsRing[T] with GCDRing[Jet[T]] {
+  /* TODO: What exactly is this GCD trying to achieve? Tests? */
   def gcd(a: Jet[T], b: Jet[T]): Jet[T] = {
     @tailrec def _gcd(a: Jet[T], b: Jet[T]): Jet[T] =
       if (b.isZero) a else _gcd(b, a - (a / b).round * b)
@@ -543,8 +541,25 @@ private[math] trait JetIsEuclideanRing[@sp(Float,Double) T]
   }
 }
 
+/* TODO: Jet[T] is probably not a genuine Euclidean ring */
+private[math] trait JetIsEuclideanRing[@sp(Float,Double) T]
+    extends JetIsGCDRing[T] with EuclideanRing[Jet[T]] {
+  def euclideanFunction(a: Jet[T]): BigInt = sys.error("Clarify Jet first, see #598")
+  /* TODO: what are exactly the laws of Jet with respect to EuclideanRing ? */
+  def quot(a: Jet[T], b: Jet[T]): Jet[T] = a /~ b
+  def mod(a: Jet[T], b: Jet[T]): Jet[T] = a % b
+  override def quotmod(a: Jet[T], b: Jet[T]): (Jet[T], Jet[T]) = a /% b
+}
+
+/* TODO: Jet[T] is probably not a genuine Field */
 private[math] trait JetIsField[@sp(Float,Double) T]
-  extends JetIsEuclideanRing[T] with Field[Jet[T]] {
+    extends JetIsEuclideanRing[T] with Field[Jet[T]] {
+  /* TODO: what are exactly the laws of Jet with respect to EuclideanRing ? */
+  override def euclideanFunction(a: Jet[T]): BigInt =
+    super[JetIsEuclideanRing].euclideanFunction(a)
+  override def quot(a: Jet[T], b: Jet[T]): Jet[T] = super[Field].quot(a, b)
+  override def mod(a: Jet[T], b: Jet[T]): Jet[T] = super[Field].mod(a, b)
+  override def quotmod(a: Jet[T], b: Jet[T]): (Jet[T], Jet[T]) = super[Field].quotmod(a, b)
   override def fromDouble(n: Double): Jet[T] = Jet(f.fromDouble(n))
   def div(a: Jet[T], b: Jet[T]): Jet[T] = a / b
   def ceil(a: Jet[T]): Jet[T] = a.ceil

@@ -172,12 +172,6 @@ case class PolySparse[@sp(Double) C] private [spire](val exp: Array[Int], val co
     PolySparse.multiplySparse(lhs, rhs)
   }
 
-  def /%(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): (Polynomial[C], Polynomial[C]) = {
-    require(!rhs.isZero, "Can't divide by polynomial of zero!")
-
-    PolySparse.quotmodSparse(lhs, PolySparse(rhs))
-  }
-
   def *: (k: C)(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] = {
     if (k === ring.zero) {
       PolySparse.zero[C]
@@ -193,7 +187,7 @@ case class PolySparse[@sp(Double) C] private [spire](val exp: Array[Int], val co
 
 
 object PolySparse {
-  private final def dense2sparse[@sp(Double) C: Semiring: Eq: ClassTag](poly: PolyDense[C]): PolySparse[C] = {
+  private[math] final def dense2sparse[@sp(Double) C: Semiring: Eq: ClassTag](poly: PolyDense[C]): PolySparse[C] = {
     val cs = poly.coeffs
     val es = new Array[Int](cs.length)
     cfor(0)(_ < es.length, _ + 1) { i => es(i) = i }
@@ -225,6 +219,76 @@ object PolySparse {
           }
         } else new PolySparse(es, cs)
       loop(0, 0)
+    }
+  }
+
+  final def apply[@sp(Double) C: Semiring: Eq: ClassTag](data: TraversableOnce[Term[C]]): PolySparse[C] = {
+    import scala.collection.mutable.ArrayBuilder
+
+    var expBldr = ArrayBuilder.make[Int]()
+    var coeffBldr = ArrayBuilder.make[C]()
+    val zero = Semiring[C].zero
+    var inReverseOrder = true
+    var inOrder = true
+    var lastDeg = -1
+
+    data.foreach { case Term(c, i) =>
+      if (c =!= zero) {
+        expBldr += i
+        coeffBldr += c
+        inOrder &&= (lastDeg < i)
+        inReverseOrder &&= (lastDeg < 0 || lastDeg > i)
+        lastDeg = i
+      }
+    }
+
+    val exp = expBldr.result()
+    val coeff = coeffBldr.result()
+    if (inOrder) {
+      PolySparse(exp, coeff)
+    } else if (inReverseOrder) {
+      reverse(exp); reverse(coeff)
+      PolySparse(exp, coeff)
+    } else {
+      val indices = Array.range(0, exp.length)
+      indices.qsortBy(exp(_))
+      expBldr = ArrayBuilder.make[Int]()
+      coeffBldr = ArrayBuilder.make[C]()
+      var i = 1
+      var j = indices(0)
+      var e = exp(j)
+      var c = coeff(j)
+      while (i < indices.length) {
+        val j0 = indices(i)
+        val e0 = exp(j0)
+        val c0 = coeff(j0)
+        if (e != e0) {
+          expBldr += e
+          coeffBldr += c
+          c = c0
+        } else {
+          c += c0
+        }
+        e = e0
+        j = j0
+        i += 1
+      }
+      expBldr += e
+      coeffBldr += c
+      val poly = PolySparse(expBldr.result(), coeffBldr.result())
+      poly
+    }
+  }
+
+  private def reverse[@sp(Double) A](arr: Array[A]): Unit = {
+    var i = 0
+    var j = arr.length - 1
+    while (i < j) {
+      val tmp = arr(i)
+      arr(i) = arr(j)
+      arr(j) = tmp
+      i += 1
+      j -= 1
     }
   }
 
@@ -399,7 +463,7 @@ object PolySparse {
     loop(0, 0, 0)
   }
 
-  private final def quotmodSparse[@sp(Double) C: Field: Eq: ClassTag]
+  private[math] final def quotmodSparse[@sp(Double) C: Field: Eq: ClassTag]
       (lhs: PolySparse[C], rhs: PolySparse[C]): (PolySparse[C], PolySparse[C]) = {
     val rdegree = rhs.degree
     val rmaxCoeff = rhs.maxOrderTermCoeff

@@ -226,6 +226,11 @@ final class SemiringOps[A](lhs:A)(implicit ev:Semiring[A]) {
   def **(rhs:Int): A = macro Ops.binop[Int, A]
 }
 
+final class GCDRingOps[A](lhs:A)(implicit ev:GCDRing[A]) {
+  def gcd(rhs:A)(implicit ev1: Eq[A]): A = macro Ops.binopWithEv2[A, Eq[A], A]
+  def lcm(rhs:A)(implicit ev1: Eq[A]): A = macro Ops.binopWithEv2[A, Eq[A], A]
+}
+
 final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def /~(rhs:A): A = macro Ops.binop[A, A]
   def %(rhs:A): A = macro Ops.binop[A, A]
@@ -240,14 +245,11 @@ final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def %(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
   def /%(rhs:Double)(implicit ev1:Field[A]): (A, A) = macro Ops.binopWithLift[Double, Field[A], (A, A)]
 
+  /* TODO: move to TruncatedDivision
   def /~(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) /~ rhs
   def %(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) % rhs
   def /%(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = c.toNumber(lhs) /% rhs
-}
-
-final class GcdOps[A](lhs:A)(implicit ev:Gcd[A]) {
-  def gcd(rhs:A): A = macro Ops.binop[A, A]
-  def lcm(rhs:A): A = macro Ops.binop[A, A]
+   */
 }
 
 final class LiteralIntEuclideanRingOps(val lhs: Int) extends AnyVal {

@@ -14,10 +14,12 @@ import spire.syntax.std.seq._
  * Polynomial
  * A univariate polynomial class and EuclideanRing extension trait
  * for arithmetic operations. Polynomials can be instantiated using
- * any type C for which a Ring[C] and Signed[C] are in scope, with
- * exponents given by Int values. Some operations require a Field[C]
+ * any type C for which a Ring[C] and Eq[C] are in scope, with
+ * exponents given by Int values. Some operations require more precise
+ * algebraic structures, such as `GCDRing`,  `EuclideanRing` or `Field`
  * to be in scope.
-*/
+ *  
+ */
 
 object Polynomial extends PolynomialInstances {
 
@@ -39,8 +41,8 @@ object Polynomial extends PolynomialInstances {
   def apply[@sp(Double) C: Semiring: Eq: ClassTag](data: Map[Int, C]): PolySparse[C] =
     sparse(data)
 
-  def apply[@sp(Double) C: Semiring: Eq: ClassTag](terms: Iterable[Term[C]]): PolySparse[C] =
-    sparse(terms.map(_.toTuple)(collection.breakOut))
+  def apply[@sp(Double) C: Semiring: Eq: ClassTag](terms: TraversableOnce[Term[C]]): PolySparse[C] =
+    PolySparse(terms)
 
   def apply[@sp(Double) C: Semiring: Eq: ClassTag](c: C, e: Int): PolySparse[C] =
     PolySparse.safe(Array(e), Array(c))
@@ -280,6 +282,63 @@ trait Polynomial[@sp(Double) C] { lhs =>
   }
 
   /**
+   * Shift this polynomial along the x-axis by `h`, so that `this(x + h) ==
+   * this.shift(h).apply(x)`.  This is equivalent to calling
+   * `this.compose(Polynomial.x + h)`, but is likely to compute the shifted
+   * polynomial much faster.
+   */
+  def shift(h: C)(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] = {
+    // The trick here came from this answer:
+    //   http://math.stackexchange.com/questions/694565/polynomial-shift
+    // This is a heavily optimized version of the same idea. This is fairly
+    // critical method to be fast, since it is the most expensive part of the
+    // VAS root isolation algorithm.
+
+    def fromSafeLong(x: SafeLong): C =
+      if (x.isValidInt) {
+        ring.fromInt(x.toInt)
+      } else {
+        val d = ring.fromInt(1 << 30)
+        val mask = (1L << 30) - 1
+
+        @tailrec def loop(k: C, y: SafeLong, acc: C): C =
+          if (y.isValidInt) {
+            k * ring.fromInt(y.toInt) + acc
+          } else {
+            val z = y >> 30
+            val r = ring.fromInt((y & mask).toInt)
+            loop(d * k, z, k * r + acc)
+          }
+
+        loop(ring.one, x, ring.zero)
+      }
+
+    // The basic idea here is that instead of working with all the derivatives
+    // of the whole polynomial, we can just break the polynomial up and work
+    // with the derivatives of the individual terms. This let's us save a whole
+    // bunch of allocations in a clean way.
+    val coeffs: Array[C] = this.coeffsArray.clone()
+    this.foreachNonZero { (deg, c) =>
+      var i = 1 // Leading factor in factorial in denominator of Taylor series.
+      var d = deg - 1 // The degree of the current derivative of this term.
+      var m = SafeLong(1L) // The multiplier of our derivative
+      var k = c // The current delta (to some power) of the Taylor series.
+      while (d >= 0) {
+        // Note that we do division, but only on SafeLongs. This is not just
+        // for performance, but also required for us to only ask for a Ring,
+        // rather than a EuclideanRing. We always know that m * (d + 1) is
+        // divisible by i, so this is exact.
+        m = (m * (d + 1)) / i
+        k *= h
+        coeffs(d) = coeffs(d) + fromSafeLong(m) * k
+        d -= 1
+        i += 1
+      }
+    }
+    Polynomial.dense(coeffs)
+  }
+
+  /**
    * Returns this polynomial as a monic polynomial, where the leading
    * coefficient (ie. `maxOrderTermCoeff`) is 1.
    */
@@ -318,25 +377,11 @@ trait Polynomial[@sp(Double) C] { lhs =>
     mapTerms { case Term(c, n) => Term(f(c), n) }
 
   def mapTerms[D: Semiring: Eq: ClassTag](f: Term[C] => Term[D])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[D] =
-    Polynomial(terms map f)
+    Polynomial(termsIterator.map(f))
 
   /**
-   * Returns this polynomial shifted by `h`. Equivalent to calling
-   * `poly.compose(x + h)`.
-   */
-  def shift(h: C)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] =
-    compose(Polynomial.x[C] + Polynomial.constant(h))
-
-  /**
-   * Translates this polynomial by `h`. Equivalent to calling
-   * `poly.compose(x - h)`.
-   */
-  def translate(h: C)(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] =
-    compose(Polynomial.x[C] - Polynomial.constant(h))
-
-  /**
-   * Replace `x`, the variable, in this polynomial with `-x`. This will
-   * flip/mirror the polynomial about the y-axis.
+   * This will flip/mirror the polynomial about the y-axis. It is equivalent to
+   * `poly.compose(-Polynomial.x)`, but will likely be faster to calculate.
    */
   def flip(implicit ring: Rng[C], eq: Eq[C]): Polynomial[C] =
     mapTerms { case term @ Term(coeff, exp) =>
@@ -350,20 +395,17 @@ trait Polynomial[@sp(Double) C] { lhs =>
    *
    * @see http://en.wikipedia.org/wiki/Reciprocal_polynomial
    */
-  def reciprocal(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] =
+  def reciprocal(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] = {
+    val d = degree
     mapTerms { case term @ Term(coeff, exp) =>
-      Term(coeff, degree - exp)
+      Term(coeff, d - exp)
     }
-
-  // EuclideanRing ops.
+  }
 
   def unary_-()(implicit ring: Rng[C]): Polynomial[C]
   def +(rhs: Polynomial[C])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C]
   def -(rhs: Polynomial[C])(implicit ring: Rng[C], eq: Eq[C]): Polynomial[C] = lhs + (-rhs)
   def *(rhs: Polynomial[C])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C]
-  def /~(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = (lhs /% rhs)._1
-  def /%(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): (Polynomial[C], Polynomial[C])
-  def %(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = (lhs /% rhs)._2
 
   def **(k: Int)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = pow(k)
 
@@ -442,7 +484,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
     }
 }
 
-trait PolynomialSemiring[@sp(Double) C]
+trait PolynomialOverSemiring[@sp(Double) C]
 extends Semiring[Polynomial[C]] {
   implicit def scalar: Semiring[C]
   implicit def eq: Eq[C]
@@ -453,14 +495,14 @@ extends Semiring[Polynomial[C]] {
   def times(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = x * y
 }
 
-trait PolynomialRig[@sp(Double) C] extends PolynomialSemiring[C]
+trait PolynomialOverRig[@sp(Double) C] extends PolynomialOverSemiring[C]
 with Rig[Polynomial[C]] {
   implicit override val scalar: Rig[C]
 
   def one: Polynomial[C] = Polynomial.one[C]
 }
 
-trait PolynomialRng[@sp(Double) C] extends PolynomialSemiring[C]
+trait PolynomialOverRng[@sp(Double) C] extends PolynomialOverSemiring[C]
 with RingAlgebra[Polynomial[C], C] {
   implicit override val scalar: Rng[C]
 
@@ -468,41 +510,47 @@ with RingAlgebra[Polynomial[C], C] {
   def negate(x: Polynomial[C]): Polynomial[C] = -x
 }
 
-trait PolynomialRing[@sp(Double) C] extends PolynomialRng[C]
+trait PolynomialOverRing[@sp(Double) C] extends PolynomialOverRng[C]
 with Ring[Polynomial[C]] {
   implicit override val scalar: Ring[C]
 
   def one: Polynomial[C] = Polynomial.one[C]
 }
 
-trait PolynomialEuclideanRing[@sp(Double) C] extends PolynomialRing[C]
-    with EuclideanRing[Polynomial[C]]
-    with VectorSpace[Polynomial[C], C] {
+trait PolynomialOverField[@sp(Double) C] extends PolynomialOverRing[C]
+    with EuclideanRing[Polynomial[C]] with VectorSpace[Polynomial[C], C] { self =>
   implicit override val scalar: Field[C]
 
   override def divr(x: Polynomial[C], k: C): Polynomial[C] = x :/ k
-  def quot(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = x /~ y
-  def mod(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = x % y
-  override def quotmod(x: Polynomial[C], y: Polynomial[C]): (Polynomial[C], Polynomial[C]) = x /% y
-}
 
-trait PolynomialEuclideanRingWithGcd[@sp(Double) C] extends PolynomialEuclideanRing[C]
-    with Gcd[Polynomial[C]] {
-  implicit def cgcd: Gcd[C]
-
-  final def gcd(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = {
-    val result = Gcd.euclid(x, y)(Polynomial.eq, this)
-    if (result.degree > 0) {
-      result
-    } else {
-      // return the gcd of all coefficients when there is no higher degree divisor
-      val arr = x.coeffsArray ++ y.coeffsArray
-      val coeffs = arr.iterator.filterNot(_.isZero).toVector
-      Polynomial.constant(spire.math.gcd(coeffs)(cgcd))
+  def euclideanFunction(x: Polynomial[C]): BigInt = x.degree
+  def quot(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = quotmod(x, y)._1
+  def mod(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = quotmod(x, y)._2
+  override def quotmod(x: Polynomial[C], y: Polynomial[C]): (Polynomial[C], Polynomial[C]) = {
+    require(!y.isZero, "Can't divide by polynomial of zero!")
+    x match {
+      case xd: poly.PolyDense[C] => poly.PolyDense.quotmodDense(xd, y)
+      case xs: poly.PolySparse[C] =>
+        val ys = y match {
+          case yd: poly.PolyDense[C] => poly.PolySparse.dense2sparse(yd)
+          case ys1: poly.PolySparse[C] => ys1
+        }
+        poly.PolySparse.quotmodSparse(xs, ys)
     }
   }
 
-  def lcm(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = (x /~ gcd(x, y)) * y
+  // TODO: why final?
+  final override def gcd(x: Polynomial[C], y: Polynomial[C])(implicit ev: Eq[Polynomial[C]]): Polynomial[C] = {
+    val result = EuclideanRing.euclid(x, y)(ev, self)
+    if (result.degree > 0) {
+      result
+    } else {
+      // TODO: I don't like so much this special case, can we fold it in the general result,
+      // TODO: as the gcd is defined up to a unit anyway?
+      // return the gcd of all coefficients when there is no higher degree divisor
+      Polynomial.constant(spire.math.gcd(x.coeffsArray ++ y.coeffsArray))
+    }
+  }
 }
 
 trait PolynomialEq[@sp(Double) C] extends Eq[Polynomial[C]] {
@@ -515,8 +563,8 @@ trait PolynomialEq[@sp(Double) C] extends Eq[Polynomial[C]] {
 }
 
 trait PolynomialInstances0 {
-  implicit def semiring[@sp(Double) C: ClassTag: Semiring: Eq]: PolynomialSemiring[C] =
-    new PolynomialSemiring[C] {
+  implicit def overSemiring[@sp(Double) C: ClassTag: Semiring: Eq]: PolynomialOverSemiring[C] =
+    new PolynomialOverSemiring[C] {
       val scalar = Semiring[C]
       val eq = Eq[C]
       val ct = implicitly[ClassTag[C]]
@@ -531,15 +579,15 @@ trait PolynomialInstances0 {
 }
 
 trait PolynomialInstances1 extends PolynomialInstances0 {
-  implicit def rig[@sp(Double) C: ClassTag: Rig: Eq]: PolynomialRig[C] =
-    new PolynomialRig[C] {
+  implicit def overRig[@sp(Double) C: ClassTag: Rig: Eq]: PolynomialOverRig[C] =
+    new PolynomialOverRig[C] {
       val scalar = Rig[C]
       val eq = Eq[C]
       val ct = implicitly[ClassTag[C]]
     }
 
-  implicit def rng[@sp(Double) C: ClassTag: Rng: Eq]: PolynomialRng[C] =
-    new PolynomialRng[C] {
+  implicit def overRng[@sp(Double) C: ClassTag: Rng: Eq]: PolynomialOverRng[C] =
+    new PolynomialOverRng[C] {
       val scalar = Rng[C]
       val eq = Eq[C]
       val ct = implicitly[ClassTag[C]]
@@ -547,31 +595,21 @@ trait PolynomialInstances1 extends PolynomialInstances0 {
 }
 
 trait PolynomialInstances2 extends PolynomialInstances1 {
-  implicit def ring[@sp(Double) C: ClassTag: Ring: Eq]: PolynomialRing[C] =
-    new PolynomialRing[C] {
-      val scalar: Ring[C] = Ring[C]
-      val eq: Eq[C] = Eq[C]
-      val ct: ClassTag[C] = implicitly[ClassTag[C]]
+  implicit def overRing[@sp(Double) C: ClassTag: Ring: Eq]: PolynomialOverRing[C] =
+    new PolynomialOverRing[C] {
+      val scalar = Ring[C]
+      val eq = Eq[C]
+      val ct = implicitly[ClassTag[C]]
     }
 }
 
 trait PolynomialInstances3 extends PolynomialInstances2 {
-  implicit def euclideanRing[@sp(Double) C: ClassTag: Field: Eq]: PolynomialEuclideanRing[C] =
-    new PolynomialEuclideanRing[C] {
-      val scalar: Field[C] = Field[C]
-      val eq: Eq[C] = Eq[C]
-      val ct: ClassTag[C] = implicitly[ClassTag[C]]
+  implicit def overField[@sp(Double) C: ClassTag: Field: Eq]: PolynomialOverField[C] =
+    new PolynomialOverField[C] {
+      val scalar = Field[C]
+      val eq = Eq[C]
+      val ct = implicitly[ClassTag[C]]
     }
 }
 
-trait PolynomialInstances4 extends PolynomialInstances3 {
-  implicit def euclideanRingWithGcd[@sp(Double) C: ClassTag: Field: Eq: Gcd]: PolynomialEuclideanRingWithGcd[C] =
-    new PolynomialEuclideanRingWithGcd[C] {
-      val scalar: Field[C] = Field[C]
-      val eq: Eq[C] = Eq[C]
-      val ct: ClassTag[C] = implicitly[ClassTag[C]]
-      val cgcd: Gcd[C] = Gcd[C]
-    }
-}
-
-trait PolynomialInstances extends PolynomialInstances4
+trait PolynomialInstances extends PolynomialInstances3
