@@ -9,7 +9,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import spire.macros.Checked
 
-import spire.algebra.{Eq, EuclideanRing, GCDRing, IsIntegral, NRoot, Order, CRing, Signed}
+import spire.algebra.{CRing, Eq, EuclideanRing, GCDRing, IsIntegral, NRoot, Order, Signed, UniqueFactorizationDomain}
 import spire.std.long._
 import spire.std.bigInteger._
 
@@ -186,10 +186,24 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
 
   final def isWhole: Boolean = true
 
+  /** Returns true if this SafeLong is probably prime, false if it's definitely composite. If certainty is ≤ 0, true is returned.
+    * @param certainty a measure of the uncertainty that the caller is willing to tolerate:
+    *                  if the call returns true the probability that this BigInteger is
+    *                  prime exceeds (1 - 1/2^certainty).
+    */
   final def isProbablePrime(c: Int): Boolean =
     toBigInteger.isProbablePrime(c)
 
+  def isPrime: Boolean = prime.isPrime(this)
+
+  def factor: prime.Factors = prime.factor(this)
+
+  def isOdd: Boolean
+
+  def isEven: Boolean
+
   def bitLength: Int
+
 }
 
 object SafeLong extends SafeLongInstances {
@@ -249,6 +263,9 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
 
   def isZero: Boolean = x == 0L
   def isOne: Boolean = x == 1L
+  def isOdd: Boolean = (x & 1L) != 0
+  def isEven: Boolean = (x & 1L) == 0
+
   def signum: Int = java.lang.Long.signum(x)
 
   def +(y: Long): SafeLong =
@@ -400,6 +417,8 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
 
   def isZero: Boolean = false // 0 will always be represented as a SafeLongLong
   def isOne: Boolean = false // 1 will always be represented as a SafeLongLong
+  def isOdd: Boolean = x.testBit(0)
+  def isEven: Boolean = !x.testBit(0)
   def signum: Int = x.signum
 
   def +(y: Long): SafeLong =
@@ -498,7 +517,7 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
 
 trait SafeLongInstances {
   @SerialVersionUID(1L)
-  implicit object SafeLongAlgebra extends SafeLongIsEuclideanRing with SafeLongIsNRoot with Serializable
+  implicit object SafeLongAlgebra extends SafeLongIsEuclideanRing with SafeLongIsNRoot with SafeLongIsUniqueFactorizationDomain with Serializable
 
   @SerialVersionUID(1L)
   implicit object SafeLongIsReal extends SafeLongIsReal with Serializable
@@ -553,6 +572,12 @@ private[math] trait SafeLongOrder extends Order[SafeLong] {
   override def lteqv(x: SafeLong, y: SafeLong): Boolean = x <= y
   def compare(x: SafeLong, y: SafeLong): Int = x compare y
 }
+
+private[math] trait SafeLongIsUniqueFactorizationDomain extends UniqueFactorizationDomain[SafeLong]  {
+  def isPrime(a: SafeLong): Boolean = a.isPrime
+  def factor(a: SafeLong): prime.Factors = a.factor
+}
+
 
 private[math] trait SafeLongIsSigned extends Signed[SafeLong] {
   def signum(a: SafeLong): Int = a.signum
