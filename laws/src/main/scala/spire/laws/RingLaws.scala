@@ -137,6 +137,14 @@ trait RingLaws[A] extends GroupLaws[A] {
     override def nonZero = true
   }
 
+  def divisionRing(implicit A: DivisionRing[A]) = new RingProperties(
+    name = "divisionRing",
+    al = additiveAbGroup,
+    ml = multiplicativeGroup,
+    parents = Seq(ring)
+  ) {
+    override def nonZero = true
+  }
 
   // property classes
 
