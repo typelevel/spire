@@ -28,7 +28,7 @@ object Quaternion extends QuaternionInstances {
 
 // really a skew field
 private[math] trait QuaternionAlgebra[A]
-    extends Field[Quaternion[A]]
+    extends DivisionRing[Quaternion[A]]
     with Eq[Quaternion[A]]
     with NRoot[Quaternion[A]]
     with InnerProductSpace[Quaternion[A], A]
@@ -279,6 +279,8 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
   def round(implicit o: IsReal[A]): Quaternion[A] =
     Quaternion(r.round, i.round, j.round, k.round)
 
+  /* TODO: motivation for truncated division on non-ordered rings
+
   // TODO: instead of floor for /~, should be round-toward-zero
 
   def /~(rhs: A)(implicit f: Field[A], o: IsReal[A]): Quaternion[A] =
@@ -307,7 +309,7 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
     val q = lhs /~ rhs
     (q, lhs - q)
   }
-
+   */
   def dot(rhs: Quaternion[A])(implicit f: Field[A]): A =
     (lhs.conjugate * rhs + rhs.conjugate * lhs).r / f.fromInt(2)
 }
