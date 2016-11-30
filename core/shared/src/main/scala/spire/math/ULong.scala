@@ -138,7 +138,7 @@ trait ULongInstances {
   implicit final val ULongTag = new UnsignedIntTag[ULong](ULong.MinValue, ULong.MaxValue)
 }
 
-private[math] trait ULongIsRig extends Rig[ULong] {
+private[math] trait ULongIsCRig extends CRig[ULong] {
   def one: ULong = ULong(1)
   def plus(a:ULong, b:ULong): ULong = a + b
   override def pow(a:ULong, b:Int): ULong = {
@@ -197,4 +197,4 @@ private[math] trait ULongIsReal extends IsIntegral[ULong] with ULongOrder with U
 }
 
 @SerialVersionUID(0L)
-private[math] class ULongAlgebra extends ULongIsRig with ULongIsReal with Serializable
+private[math] class ULongAlgebra extends ULongIsCRig with ULongIsReal with Serializable
