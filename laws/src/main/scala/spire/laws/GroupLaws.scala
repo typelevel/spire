@@ -112,6 +112,11 @@ trait GroupLaws[A] extends Laws {
     )
   )
 
+  def additiveCMonoid(implicit A: AdditiveCMonoid[A]) = new AdditiveProperties(
+    base = cMonoid(A.additive),
+    parent = Some(additiveMonoid)
+  )
+
   def additiveGroup(implicit A: AdditiveGroup[A]) = new AdditiveProperties(
     base = group(A.additive),
     parent = Some(additiveMonoid),
