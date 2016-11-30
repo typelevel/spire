@@ -1,14 +1,25 @@
 package spire
 package math
 
-import spire.algebra.{EuclideanRing, IsReal}
+import spire.algebra.{EuclideanRing, IsReal, UniqueFactorizationDomain}
 import spire.std._
 
 trait Integral[@sp(Int,Long) A] extends Any
     with EuclideanRing[A]
+    with UniqueFactorizationDomain[A]
     with ConvertableFrom[A]
     with ConvertableTo[A]
-    with IsReal[A]
+    with IsReal[A] { self =>
+
+  import UniqueFactorizationDomain.{Factors, WrapFactors}
+
+  def isPrime(a: A): Boolean = SafeLong(toBigInt(a)).isPrime
+
+  def factor(a: A): Factors[A] =
+    WrapFactors[A](SafeLong(toBigInt(a)).factor)(self)
+
+}
+
 
 object Integral {
   implicit final val IntIsIntegral = new IntIsIntegral
@@ -20,6 +31,8 @@ object Integral {
 }
 
 class IntegralOps[A](lhs: A)(implicit ev: Integral[A]) {
+  def factor: UniqueFactorizationDomain.Factors[A] = ev.factor(lhs)
+  def isPrime: Boolean = ev.isPrime(lhs)
   def toSafeLong: SafeLong = SafeLong(ev.toBigInt(lhs))
 
   def coerce(a: A): Long = {

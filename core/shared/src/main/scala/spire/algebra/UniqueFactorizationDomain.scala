@@ -8,7 +8,7 @@ package algebra
   * are costly, and a deliberate choice should be made by the user, for example to use
   * probabilistic algorithms with a specified probability of failure.
   */
-trait UniqueFactorizationDomain[@sp(Byte, Short, Int, Long) A] {
+trait UniqueFactorizationDomain[@sp(Byte, Short, Int, Long) A] extends Any {
   /** Tests whether the given nonzero element is prime. */
   def isPrime(a: A): Boolean
 
@@ -37,15 +37,5 @@ object UniqueFactorizationDomain {
       case (f, exp) => ((Integral[A].fromBigInt(f.toBigInt), exp))
     }
   }
-
-  // TODO: move somewhere
-  implicit def uniqueFactorizationDomain[A](implicit ev: Integral[A]): UniqueFactorizationDomain[A] =
-    new UniqueFactorizationDomain[A] {
-      import spire.math.SafeLong
-      import SafeLong.SafeLongAlgebra
-      def isPrime(a: A): Boolean = SafeLongAlgebra.isPrime(SafeLong(ev.toBigInt(a)))
-      def factor(a: A): Factors[A] = WrapFactors[A](SafeLongAlgebra.factor(SafeLong(ev.toBigInt(a))))
-      
-    }
 
 }
