@@ -57,6 +57,14 @@ trait GroupLaws[A] extends Laws {
     )
   )
 
+  def cMonoid(implicit A: CMonoid[A]) = new GroupProperties(
+    name = "commutative monoid",
+    parent = Some(monoid),
+    "commutative" → forAll((x: A, y: A) =>
+      (x |+| y) === (y |+| x)
+    )
+  )
+
   def group(implicit A: Group[A]) = new GroupProperties(
     name = "group",
     parent = Some(monoid),
