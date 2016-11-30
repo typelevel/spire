@@ -2,7 +2,7 @@ package spire
 package math
 
 
-import spire.algebra.{IsIntegral, Order, Rig, Signed}
+import spire.algebra.{CRig, IsIntegral, Order, Signed}
 
 object ULong extends ULongInstances {
   @inline final def apply(n: Long): ULong = new ULong(n)

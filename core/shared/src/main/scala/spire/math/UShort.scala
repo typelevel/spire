@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{IsIntegral, Order, Rig, Signed}
+import spire.algebra.{CRig, IsIntegral, Order, Signed}
 
 object UShort extends UShortInstances {
   @inline final def apply(n: Char): UShort = new UShort(n)
