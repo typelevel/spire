@@ -245,7 +245,11 @@ lazy val commonJsSettings = Seq(
 
 lazy val commonJvmSettings = Seq(
   // -optimize has no effect in scala-js other than slowing down the build
-//  scalacOptions += "-optimize", // disabling for now
+  //  scalacOptions += "-optimize", // disabling for now
+  scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, scalaMajor)) if scalaMajor <= 11 => Seq("-optimize")
+    case _ => Seq.empty
+  }),
   testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF")
 )
 
