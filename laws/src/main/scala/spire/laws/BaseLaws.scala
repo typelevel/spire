@@ -56,6 +56,19 @@ trait BaseLaws[A] extends Laws {
     )
   )
 
+    def uniqueFactorizationDomain(implicit A: UniqueFactorizationDomain[A], RA: CRing[A]) = new SimpleRuleSet(
+    name = "uniqueFactorizationDomain",
+    "all factors are prime" → forAll { (x: A) =>
+      val factorization = A.factor(x)
+      factorization.factors.keys.forall(A.isPrime(_))
+    },
+    "multiplying factors returns the original element" → forAll { (x: A) =>
+      val factorization = A.factor(x)
+      val prod = factorization.factors.map( f => RA.pow(f._1, f._2) ).foldLeft(RA.one)(RA.times)
+      RA.times(factorization.unit, prod) === x
+    }
+  )
+
 }
 
 // vim: expandtab:ts=2:sw=2

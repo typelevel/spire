@@ -1,6 +1,8 @@
 package spire
 package algebra
 
+import spire.math.{Integral, SafeLong}
+
 /** A unique factorization domain is a commutative ring in which each element can be written
   * as a product of prime elements and a unit.
   * 
@@ -25,8 +27,6 @@ object UniqueFactorizationDomain {
 
   def apply[A](implicit ev: UniqueFactorizationDomain[A]): UniqueFactorizationDomain[A] = ev
 
-  import spire.math.Integral
-
   case class WrapFactors[A:Integral](safeLongFactors: spire.math.prime.Factors) extends Factors[A] {
     def unit: A = safeLongFactors.sign match {
       case Sign.Negative => Integral[A].negate(Integral[A].one)
@@ -37,5 +37,11 @@ object UniqueFactorizationDomain {
       case (f, exp) => ((Integral[A].fromBigInt(f.toBigInt), exp))
     }
   }
+
+  implicit def uniqueFactorizationDomainFromIntegral[A](implicit A: Integral[A]): UniqueFactorizationDomain[A] =
+    new UniqueFactorizationDomain[A] {
+      def isPrime(a: A): Boolean = SafeLong(A.toBigInt(a)).isPrime
+      def factor(a: A): Factors[A] = WrapFactors[A](SafeLong(A.toBigInt(a)).factor)(A)
+    }
 
 }
