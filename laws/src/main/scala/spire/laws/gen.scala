@@ -176,7 +176,7 @@ object gen {
   def freeMonoid[A: Arbitrary]: Gen[FreeMonoid[A]] =
     for {
       as <- arbitrary[List[A]]
-    } yield as.foldLeft(FreeMonoid.id[A]) { (acc, a) =>
+    } yield as.foldLeft(FreeMonoid.empty[A]) { (acc, a) =>
       acc |+| FreeMonoid(a)
     }
 
@@ -192,7 +192,7 @@ object gen {
     for {
       tpls <- arbitrary[List[(A, Short)]]
     } yield tpls.foldLeft(FreeAbGroup.id[A]) { case (acc, (a, n)) =>
-      acc |+| Group[FreeAbGroup[A]].combinen(FreeAbGroup(a), n.toInt)
+      acc |+| Group[FreeAbGroup[A]].combineN(FreeAbGroup(a), n.toInt)
     }
 
   val perm: Gen[Perm] =

@@ -9,7 +9,7 @@ import scala.math.ScalaNumericConversions
 
 import BigDecimal.RoundingMode.{FLOOR, HALF_UP, CEILING}
 
-import spire.algebra.{EuclideanRing, Field, IsReal, NRoot, Order, Signed, Trig}
+import spire.algebra.{Eq, Field, GCDRing, IsReal, NRoot, Order, Signed, Trig}
 import spire.std.bigDecimal._
 import spire.syntax.nroot._
 
@@ -302,18 +302,19 @@ package object math {
   }
 
   final def gcd(a: BigInt, b: BigInt): BigInt = a.gcd(b)
-  final def gcd[A](x: A, y: A)(implicit ev: EuclideanRing[A]): A = ev.gcd(x, y)
-  final def gcd[A](xs: Seq[A])(implicit ev: EuclideanRing[A]): A =
-    xs.foldLeft(ev.zero) { (x, y) => gcd(y, x) }
-  final def gcd[A](x: A, y: A, z: A, rest: A*)(implicit ev: EuclideanRing[A]): A =
-    gcd(gcd(gcd(x, y), z), gcd(rest))
+  final def gcd[A:Eq](x: A, y: A)(implicit ev: GCDRing[A]): A = ev.gcd(x, y)
+  final def gcd[A:Eq](xs: Seq[A])(implicit ev: GCDRing[A]): A =
+    xs.reduceLeft(ev.gcd)
+  final def gcd[A:Eq](x: A, y: A, z: A, rest: A*)(implicit ev: GCDRing[A]): A =
+    if (rest.isEmpty) ev.gcd(ev.gcd(x, y), z)
+    else ev.gcd(ev.gcd(ev.gcd(x, y), z), gcd(rest))
 
   /**
    * lcm
    */
   final def lcm(x: Long, y: Long): Long = (x / gcd(x, y)) * y
   final def lcm(a: BigInt, b: BigInt): BigInt = (a / a.gcd(b)) * b
-  final def lcm[A](x: A, y: A)(implicit ev: EuclideanRing[A]): A = ev.lcm(x, y)
+  final def lcm[A:Eq](x: A, y: A)(implicit ev: GCDRing[A]): A = ev.lcm(x, y)
 
   /**
    * min
@@ -402,9 +403,125 @@ package object math {
   final def hypot[@sp(Float, Double) A](x: A, y: A)
     (implicit f: Field[A], n: NRoot[A], o: Order[A]): A = {
     import spire.implicits._
-    if (x > y) x.abs * (1 + (y/x)**2).sqrt
-    else y.abs * (1 + (x/y)**2).sqrt
+    def abs(n: A): A = if (n < f.zero) -n else n
+    if (x > y) abs(x) * (1 + (y/x)**2).sqrt
+    else abs(y) * (1 + (x/y)**2).sqrt
   }
+
+  // BigInt
+  /**
+   * This will return the largest integer that meets some criteria. Specifically,
+   * if we're looking for some integer `x` and `f(x')` is guaranteed to return
+   * `true` iff `x' <= x`, then this will return `x`.
+   *
+   * This can be used, for example, to find an integer `x` s.t. 
+   * `x * x < y < (x+1)*(x+1)`, by using `intSearch(x => x * x <= y)`.
+   */
+  private def intSearch(f: Int => Boolean): Int = {
+    val ceil = (0 until 32) find (i => !f(1 << i)) getOrElse 33
+    if (ceil == 0) {
+      0
+    } else {
+      (0 /: ((ceil - 1) to 0 by -1)) { (x, i) =>
+        val y = x | (1 << i)
+        if (f(y)) y else x
+      }
+    }
+  }
+
+
+  /**
+   * Returns the digits to the right of the decimal point of `x / y` in base
+   * `r` if x < y.
+   */
+  private def decDiv(x: BigInt, y: BigInt, r: Int): Stream[BigInt] = {
+    val expanded = x * r
+    val quot = expanded / y
+    val rem = expanded - (quot * y)
+
+    if (rem == 0) {
+      Stream.cons(quot, Stream.empty)
+    } else {
+      Stream.cons(quot, decDiv(rem, y, r))
+    }
+  }
+
+  /** Returns the digits of `x` in base `r`. */
+  private def digitize(x: BigInt, r: Int, prev: List[Int] = Nil): List[Int] =
+    if (x == 0) prev else digitize(x / r, r, (x % r).toInt :: prev)
+
+
+  /** Converts a list of digits in base `r` to a `BigInt`. */
+  private def undigitize(digits: Seq[Int], r: Int): BigInt =
+    (BigInt(0) /: digits)(_ * r + _)
+
+
+  // 1 billion: because it's the largest positive Int power of 10.
+  private val radix = 1000000000
+
+  /**
+   * An implementation of the shifting n-th root algorithm for BigDecimal. For
+   * the BigDecimal a, this is guaranteed to be accurate up to the precision
+   * specified in ctxt.
+   *
+   * See http://en.wikipedia.org/wiki/Shifting_nth_root_algorithm
+   *
+   * @param a A (positive if k % 2 == 0) `BigDecimal`.
+   * @param k A positive `Int` greater than 1.
+   * @param ctxt The `MathContext` to bound the precision of the result.
+   *
+   * returns A `BigDecimal` approximation to the `k`-th root of `a`.
+   */
+  def nroot(a: BigDecimal, k: Int, ctxt: MathContext): BigDecimal =
+    if (k == 0) {
+      BigDecimal(1)
+    } else if (a.signum < 0) {
+      if (k % 2 == 0) {
+        throw new ArithmeticException("%d-root of negative number" format k)
+      } else {
+        -nroot(-a, k, ctxt)
+      }
+    } else {
+      val underlying = BigInt(a.bigDecimal.unscaledValue.toByteArray)
+      val scale = BigInt(10) pow a.scale
+      val intPart = digitize(underlying / scale, radix)
+      val fracPart = decDiv(underlying % scale, scale, radix) map (_.toInt)
+      val leader = if (intPart.size % k == 0) Stream.empty else {
+        Stream.fill(k - intPart.size % k)(0)
+      }
+      val digits = leader ++ intPart.toStream ++ fracPart ++ Stream.continually(0)
+      val radixPowK = BigInt(radix) pow k
+
+      // Total # of digits to compute.
+      // Note: I originally had `+ 1` here, but some edge cases were missed, so now
+      // it is `+ 2`.
+      val maxSize = (ctxt.getPrecision + 8) / 9 + 2
+
+      def findRoot(digits: Stream[Int], y: BigInt, r: BigInt, i: Int): (Int, BigInt) = {
+        val y_ = y * radix
+        val a = undigitize(digits take k, radix)
+        // Note: target grows quite fast (so I imagine (y_ + b) pow k does too).
+        val target = radixPowK * r + a + (y_ pow k)
+        val b = intSearch(b => ((y_ + b) pow k) <= target)
+
+        val ny = y_ + b
+
+        if (i == maxSize) {
+          (i, ny)
+        } else {
+          val nr = target - (ny pow k)
+          
+          // TODO: Add stopping condition for when nr == 0 and there are no more
+          // digits. Tricky part is refactoring to know when digits end...
+
+          findRoot(digits drop k, ny, nr, i + 1)
+        }
+      }
+
+      val (size, unscaled) = findRoot(digits, 0, 0, 1)
+      val newscale = (size - (intPart.size + k - 1) / k) * 9
+      BigDecimal(unscaled, newscale, ctxt)
+    }
 
   // ugly internal scala.math.ScalaNumber utilities follow
 

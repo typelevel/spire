@@ -100,7 +100,11 @@ trait RngSyntax extends SemiringSyntax with AdditiveGroupSyntax
 
 trait RingSyntax extends RngSyntax with RigSyntax
 
-trait EuclideanRingSyntax extends RingSyntax {
+trait GCDRingSyntax extends RingSyntax {
+  implicit def gcdRingOps[A: GCDRing](a:A): GCDRingOps[A] = new GCDRingOps(a)
+}
+
+trait EuclideanRingSyntax extends GCDRingSyntax {
   implicit def euclideanRingOps[A:EuclideanRing](a:A): EuclideanRingOps[A] = new EuclideanRingOps(a)
   implicit def literalIntEuclideanRingOps(lhs:Int): LiteralIntEuclideanRingOps = new LiteralIntEuclideanRingOps(lhs)
   implicit def literalLongEuclideanRingOps(lhs:Long): LiteralLongEuclideanRingOps = new LiteralLongEuclideanRingOps(lhs)
@@ -108,6 +112,7 @@ trait EuclideanRingSyntax extends RingSyntax {
 }
 
 trait FieldSyntax extends EuclideanRingSyntax with MultiplicativeGroupSyntax
+
 
 trait NRootSyntax {
   implicit def nrootOps[A: NRoot](a: A): NRootOps[A] = new NRootOps(a)
@@ -260,6 +265,7 @@ trait AllSyntax extends
     RigSyntax with
     RngSyntax with
     RingSyntax with
+    GCDRingSyntax with
     EuclideanRingSyntax with
     FieldSyntax with
     NRootSyntax with

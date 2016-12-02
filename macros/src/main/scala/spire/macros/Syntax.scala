@@ -9,11 +9,6 @@ object Ops extends machinist.Ops {
 
   val operatorNames: Map[String, String] =
     machinist.DefaultOps.operatorNames ++ Map(
-
-      // revert Semigroup (|+| |-|) to old conventions
-      ("$bar$plus$bar", "op"),
-      ("$bar$minus$bar", "opInverse"),
-
       // partial operations |+|? |+|?? |-|? |-|??
       ("$bar$plus$bar$qmark$qmark", "opIsDefined"),
       ("$bar$minus$bar$qmark$qmark", "opInverseIsDefined"),
@@ -44,7 +39,8 @@ object Ops extends machinist.Ops {
       // bool
       (uesc('⊻'), "xor"),
       (uesc('⊼'), "nand"),
-      (uesc('⊽'), "nor"))
+      (uesc('⊽'), "nor")
+    )
 
   def eqv[A, B](c: Context)(rhs: c.Expr[B])(ev: c.Expr[A =:= B]): c.Expr[Boolean] = {
     import c.universe._
@@ -57,6 +53,37 @@ object Ops extends machinist.Ops {
     val (e, lhs) = unpack(c)
     c.Expr[Boolean](q"$e.neqv($lhs, $rhs)")
   }
+
+  /**
+   * Like [[binop]] and [[binopWithEv]], but there is ev provided by the implicit
+   * constructor, and ev1 provided by the method.
+   *
+   * If we see code like:
+   *
+   * {{{
+   *   lhs.gcd(rhs)
+   * }}}
+   *
+   * After typing and implicit resolution, we get trees like:
+   *
+   * {{{
+   *   conversion(lhs)(ev: Ev).gcd(rhs)(ev1: Ev1): R
+   * }}}
+   *
+   * The macro should produce trees like:
+   *
+   * {{{
+   *   ev.gcd(lhs, rhs)(ev1): R
+   * }}}
+   *
+   * @group macros
+   */
+  def binopWithEv2[A, Ev1, R](c: Context)(rhs: c.Expr[A])(ev1: c.Expr[Ev1]): c.Expr[R] = {
+    import c.universe._
+    val (ev, lhs) = unpack(c)
+    c.Expr[R](Apply(Apply(Select(ev, findMethodName(c)), List(lhs, rhs.tree)), List(ev1.tree)))
+  }
+
 }
 
 case class SyntaxUtil[C <: Context with Singleton](val c: C) {
@@ -77,15 +104,8 @@ case class SyntaxUtil[C <: Context with Singleton](val c: C) {
     }
 }
 
-// This is Scala reflection source compatibility hack between Scala 2.10 and 2.11
-// Will raise a Unused import warning on Scala 2.11
-private object HasCompat { val compat = ??? }; import HasCompat._
-
 class InlineUtil[C <: Context with Singleton](val c: C) {
   import c.universe._
-  // This is Scala reflection source compatibility hack between Scala 2.10 and 2.11
-  // Will raise a Unused import warning on Scala 2.11
-  import compat._
 
   def inlineAndReset[T](tree: Tree): c.Expr[T] = {
     val inlined = inlineApplyRecursive(tree)

@@ -4,6 +4,17 @@ import sbtunidoc.Plugin.UnidocKeys._
 import pl.project13.scala.sbt.SbtJmh
 import ReleaseTransformations._
 
+lazy val scalaCheckVersion = "1.13.4"
+lazy val scalaTestVersion = "3.0.0"
+lazy val shapelessVersion = "2.3.2"
+lazy val disciplineVersion = "0.7.2"
+lazy val machinistVersion = "0.6.1"
+lazy val algebraVersion = "0.6.0"
+// lazy val catsVersion = "0.8.1"
+
+lazy val apfloatVersion = "1.8.2"
+lazy val jscienceVersion = "4.3.1"
+
 // Projects
 
 lazy val spire = project.in(file("."))
@@ -73,9 +84,9 @@ lazy val examples = project
   .settings(moduleName := "spire-examples")
   .settings(spireSettings)
   .settings(libraryDependencies ++= Seq(
-    "com.chuusai" %% "shapeless" % "2.3.2",
-    "org.apfloat" % "apfloat" % "1.8.2",
-    "org.jscience" % "jscience" % "4.3.1"
+    "com.chuusai" %% "shapeless" % shapelessVersion,
+    "org.apfloat" % "apfloat" % apfloatVersion,
+    "org.jscience" % "jscience" % jscienceVersion
   ))
   .settings(noPublishSettings)
   .settings(commonJvmSettings)
@@ -85,8 +96,8 @@ lazy val laws = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-laws")
   .settings(spireSettings:_*)
   .settings(libraryDependencies ++= Seq(
-    "org.typelevel" %%% "discipline" % "0.7.2",
-    "org.scalacheck" %%% "scalacheck" % "1.13.4"
+    "org.typelevel" %%% "discipline" % disciplineVersion,
+    "org.scalacheck" %%% "scalacheck" % scalaCheckVersion
   ))
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
@@ -211,17 +222,20 @@ lazy val buildSettings = Seq(
 
 lazy val commonSettings = Seq(
   scalacOptions ++= commonScalacOptions.diff(Seq(
-    "-Xfatal-warnings", 
+    "-Xfatal-warnings",
     "-language:existentials",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard"
   )),
+  libraryDependencies ++= Seq(
+    "org.typelevel" %%% "machinist" % machinistVersion,
+    "org.typelevel" %%% "algebra" % algebraVersion
+  ),
   resolvers ++= Seq(
     "bintray/non" at "http://dl.bintray.com/non/maven",
     Resolver.sonatypeRepo("snapshots")
-  ),
-  libraryDependencies += "org.typelevel" %%% "machinist" % "0.6.1"
+  )
 ) ++ scalaMacroDependencies ++ warnUnusedImport
 
 lazy val commonJsSettings = Seq(
@@ -231,7 +245,11 @@ lazy val commonJsSettings = Seq(
 
 lazy val commonJvmSettings = Seq(
   // -optimize has no effect in scala-js other than slowing down the build
-  scalacOptions += "-optimize",
+  //  scalacOptions += "-optimize", // disabling for now
+  scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, scalaMajor)) if scalaMajor <= 11 => Seq("-optimize")
+    case _ => Seq.empty
+  }),
   testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF")
 )
 
@@ -293,11 +311,13 @@ lazy val benchmarkSettings = Seq(
 )
 
 lazy val coreSettings = Seq(
-  sourceGenerators in Compile <+= buildInfo,
+  sourceGenerators in Compile += buildInfo.taskValue,
   buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
   buildInfoPackage := "spire",
-  sourceGenerators in Compile <+= (genProductTypes in Compile),
-  genProductTypes <<= (sourceManaged in Compile, streams) map { (scalaSource, s) =>
+  sourceGenerators in Compile += (genProductTypes in Compile).taskValue,
+  genProductTypes := {
+    val scalaSource = (sourceManaged in Compile).value
+    val s = streams.value
     s.log.info("Generating spire/std/tuples.scala")
     val algebraSource = ProductTypes.algebraProductTypes
     val algebraFile = (scalaSource / "spire" / "std" / "tuples.scala").asFile
@@ -318,8 +338,8 @@ lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types", "Generates se
 lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.13.4" % "test")
 
 lazy val scalaTestSettings = Seq(
-  libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.1" % "test",
-  libraryDependencies += "com.chuusai" %% "shapeless" % "2.3.2" % "test"
+  libraryDependencies += "org.scalatest" %%% "scalatest" % scalaTestVersion % "test",
+  libraryDependencies += "com.chuusai" %% "shapeless" % shapelessVersion % "test"
 )
 
 lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
@@ -329,9 +349,9 @@ lazy val unidocSettings = UnidocPlugin.unidocSettings ++ Seq(
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Base Build Settings - Should not need to edit below this line. 
+// Base Build Settings - Should not need to edit below this line.
 // These settings could also come from another file or a plugin.
-// The only issue if coming from a plugin is that the Macro lib versions 
+// The only issue if coming from a plugin is that the Macro lib versions
 // are hard coded, so an overided facility would be required.
 
 addCommandAlias("gitSnapshots", ";set version in ThisBuild := git.gitDescribedVersion.value.get + \"-SNAPSHOT\"")
@@ -432,7 +452,7 @@ lazy val warnUnusedImport = Seq(
     }
   },
   scalacOptions in (Compile, console) ~= {_.filterNot("-Ywarn-unused-import" == _)},
-  scalacOptions in (Test, console) <<= (scalacOptions in (Compile, console))
+  scalacOptions in (Test, console) := (scalacOptions in (Compile, console)).value
 )
 
 // For Travis CI - see http://www.cakesolutions.net/teamblogs/publishing-artefacts-to-oss-sonatype-nexus-using-sbt-and-travis-ci

@@ -159,6 +159,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   def /(y: Real): Real = x * y.reciprocal
 
+  /* TODO: move to TruncatedDivision
   def %(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx % ny)
     case _ => Real({ p =>
@@ -186,6 +187,15 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
       roundUp(g * SafeLong.two.pow(p))
     })
   }
+
+  def lcm(y: Real): Real = (x, y) match {
+    case (Exact(nx), Exact(ny)) => Exact(nx lcm ny)
+    case _ => Real({ p =>
+      val g = x.toRational(p) lcm y.toRational(p)
+      roundUp(g * SafeLong.two.pow(p))
+    })
+  }
+   */
 
   def ceil(): Real = x match {
     case Exact(n) => Exact(n.ceil)
@@ -562,9 +572,12 @@ trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Rea
   override def minus(x: Real, y: Real): Real = x - y
   def times(x: Real, y: Real): Real = x * y
 
+  /* TODO: move to TruncatedDivision
   def gcd(x: Real, y: Real): Real = x gcd y
+  def lcm(x: Real, y: Real): Real = x lcm y
   def quot(x: Real, y: Real): Real = x /~ y
   def mod(x: Real, y: Real): Real = x % y
+   */
 
   override def reciprocal(x: Real): Real = x.reciprocal
   def div(x: Real, y: Real): Real = x / y
@@ -618,7 +631,7 @@ trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Rea
   def fromShort(n: Short): Real = Real(n)
   def fromFloat(n: Float): Real = Real(n)
   def fromLong(n: Long): Real = Real(n)
-  def fromBigInt(n: BigInt): Real = Real(n)
+  override def fromBigInt(n: BigInt): Real = Real(n)
   def fromBigDecimal(n: BigDecimal): Real = Real(n)
   def fromRational(n: Rational): Real = Real(n)
   def fromAlgebraic(n: Algebraic): Real = n.evaluateWith[Real]

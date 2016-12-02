@@ -111,7 +111,7 @@ trait PartialActionLaws[G, A] extends Laws {
     parents = Seq(leftSemigroupPartialAction),
 
     "left identity" → forAll { (a: A) =>
-      (G0.id ??|+|> a) && ((G0.id ?|+|> a).get === a)
+      (G0.empty ??|+|> a) && ((G0.empty ?|+|> a).get === a)
     }
   )
 
@@ -121,7 +121,7 @@ trait PartialActionLaws[G, A] extends Laws {
     parents = Seq(rightSemigroupPartialAction),
 
     "right identity" → forAll { (a: A) =>
-      (a <|+|?? G0.id) && ((a <|+|? G0.id).get === a)
+      (a <|+|?? G0.empty) && ((a <|+|? G0.empty).get === a)
     }
   )
 
