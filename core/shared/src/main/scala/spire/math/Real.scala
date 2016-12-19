@@ -54,15 +54,9 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   override def hashCode(): Int = toRational.hashCode
 
   override def equals(y: Any): Boolean = y match {
-    case y: Real => this === y
+    case y: Real => (x compare y) == 0
     case y => toRational.equals(y)
   }
-
-  def ===(y: Real): Boolean =
-    (x compare y) == 0
-
-  def =!=(y: Real): Boolean =
-    !(this === y)
 
   def compare(y: Real): Int = (x, y) match {
     case (Exact(nx), Exact(ny)) => nx compare ny
@@ -562,7 +556,7 @@ trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Rea
   def abs(x: Real): Real = x.abs
   def signum(x: Real): Int = x.signum
 
-  override def eqv(x: Real, y: Real): Boolean = x === y
+  override def eqv(x: Real, y: Real): Boolean = (x compare y) == 0
   def compare(x: Real, y: Real): Int = x compare y
 
   def zero: Real = Real.zero

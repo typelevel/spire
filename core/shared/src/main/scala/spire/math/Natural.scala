@@ -223,7 +223,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
   }
 
   final override def equals(rhs: Any): Boolean = rhs match {
-    case rhs: Natural => this === rhs
+    case rhs: Natural => (lhs compare rhs) == 0
     case rhs: UInt => (lhs compare rhs) == 0
     case rhs: BigInt => lhs.toBigInt == rhs
     case rhs: SafeLong => SafeLong(lhs.toBigInt) == rhs
@@ -236,12 +236,6 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
     case rhs: Quaternion[_] => rhs == lhs
     case that => unifiedPrimitiveEquals(that)
   }
-
-  def ===(rhs: Natural): Boolean =
-    (lhs compare rhs) == 0
-
-  def =!=(rhs: Natural): Boolean =
-    !(this === rhs)
 
   def <(rhs: Natural): Boolean = (lhs compare rhs) < 0
   def <=(rhs: Natural): Boolean = (lhs compare rhs) <= 0

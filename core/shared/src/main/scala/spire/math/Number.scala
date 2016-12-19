@@ -98,9 +98,6 @@ sealed trait Number extends ScalaNumericConversions with Serializable {
   def pow(rhs: Number): Number
   final def **(rhs: Number): Number = pow(rhs)
 
-  def ===(rhs: Number): Boolean
-  def =!=(rhs: Number): Boolean = !(this === rhs)
-
   def compare(rhs: Number): Int
   def min(rhs: Number): Number = if (this < rhs) this else rhs
   def max(rhs: Number): Number = if (this > rhs) this else rhs
@@ -162,14 +159,9 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
 
   override def equals(that: Any): Boolean =
     that match {
-      case that: Number => this === that
-      case that => n == that
-    }
-
-  def ===(that: Number): Boolean =
-    that match {
       case IntNumber(n2) => n == n2
-      case that => that === this
+      case that: Number => that == this
+      case that => n == that
     }
 
   def unary_- : Number = Number(-n)
@@ -319,15 +311,10 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
 
   override def equals(that: Any): Boolean =
     that match {
-      case that: Number => this === that
-      case that => n == that
-    }
-
-  def ===(that: Number): Boolean =
-    that match {
       case FloatNumber(n2) => n == n2
       case IntNumber(m) => m == m.toDouble.toLong && m == n
-      case _ => that == this
+      case that:Number => that == this
+      case that => n == that
     }
 
   def unary_- : Number = Number(-n)
@@ -474,16 +461,11 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
 
   override def equals(that: Any): Boolean =
     that match {
-      case that: Number => this === that
-      case that => that == n
-    }
-
-  def ===(that: Number): Boolean =
-    that match {
       case DecimalNumber(n2) => n == n2
       case IntNumber(m) => n == m.toBigDecimal
       case FloatNumber(m) => n == m
       case RationalNumber(m) => m == n
+      case that => that == n
     }
 
   def unary_- : Number = Number(-n)
@@ -558,16 +540,11 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
 
   override def equals(that: Any): Boolean =
     that match {
-      case that: Number => this === that
-      case that => n == that
-    }
-
-  def ===(that: Number): Boolean =
-    that match {
       case RationalNumber(n2) => n == n2
       case IntNumber(m) => n == m.toBigDecimal
       case FloatNumber(m) => n == m
       case DecimalNumber(m) => n == m
+      case that => n == that
     }
 
   def unary_- : Number = Number(-n)

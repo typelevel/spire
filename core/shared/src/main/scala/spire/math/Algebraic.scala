@@ -148,7 +148,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def isZero: Boolean = signum == 0
 
   override def equals(that: Any): Boolean = that match {
-    case (that: Algebraic) => this === that
+    case (that: Algebraic) => this.compare(that) == 0
     case (that: Real) => this.toReal == that
     case (that: Number) => this.compare(Algebraic(that.toBigDecimal)) == 0
     case (that: Rational) => this.compare(Algebraic(that)) == 0
@@ -164,12 +164,6 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     }
     case _ => unifiedPrimitiveEquals(that)
   }
-
-  def ===(that: Algebraic): Boolean =
-    this.compare(that) == 0
-
-  def =!=(that: Algebraic): Boolean =
-    !(this === that)
 
   override def hashCode: Int = if (isWhole && isValidLong) {
     unifiedPrimitiveHashcode

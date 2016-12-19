@@ -68,9 +68,6 @@ class ULong(val signed: Long) extends AnyVal {
   final def == (that: ULong): Boolean = this.signed == that.signed
   final def != (that: ULong): Boolean = this.signed != that.signed
 
-  final def === (that: ULong): Boolean = this.signed == that.signed
-  final def =!= (that: ULong): Boolean = this.signed != that.signed
-
   final def <= (that: ULong): Boolean = if (this.signed >= 0L)
     this.signed <= that.signed || that.signed < 0L
   else

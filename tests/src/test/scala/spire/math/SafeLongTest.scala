@@ -6,10 +6,6 @@ import spire.algebra._
 import spire.util.Opt
 
 class SafeLongTest extends FunSuite {
-  test("===") {
-    assert(SafeLong.one === SafeLong.one)
-    assert(!(SafeLong.one =!= SafeLong.one))
-  }
   test("getLong") {
     assert(SafeLong.one.getLong == Opt(1L))
     assert(SafeLong.safe64.getLong == Opt.empty[Long])
