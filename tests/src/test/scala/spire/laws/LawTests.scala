@@ -40,6 +40,10 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Rational",   RingLaws[Rational].field)
   checkAll("Real",       RingLaws[Real].field)
 
+  checkAll("Complex[Rational]", RingLaws[Complex[Rational]].field)
+
+  checkAll("Quaternion[Rational]", RingLaws[Quaternion[Rational]].divisionRing)
+
   checkAll("Levenshtein distance", BaseLaws[String].metricSpace)
   checkAll("BigInt",               BaseLaws[BigInt].metricSpace)
 

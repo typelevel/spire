@@ -112,6 +112,15 @@ trait RingLaws[A] extends GroupLaws[A] {
     parents = Seq(rig, rng)
   )
 
+  def divisionRing(implicit A: DivisionRing[A]) = new RingProperties(
+    name = "divisionRing",
+    al = additiveAbGroup,
+    ml = multiplicativeGroup,
+    parents = Seq(ring)
+  ) {
+    override def nonZero = true
+  }
+
   def euclideanRing(implicit A: EuclideanRing[A]) = RingProperties.fromParent(
     // TODO tests?!
     name = "euclidean ring",
