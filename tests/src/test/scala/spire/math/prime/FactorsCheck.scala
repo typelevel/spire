@@ -1,4 +1,5 @@
-package spire.math.prime
+package spire
+package math.prime
 
 import spire.implicits._
 import spire.laws.arb.safeLong
@@ -17,8 +18,6 @@ import spire.math.ArbitrarySupport._
 import Ordinal._
 
 class FactorsCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
-
-  import Factors.{zero, one}
 
   implicit val arbitraryFactors: Arbitrary[Factors] =
     Arbitrary(arbitrary[SafeLong].map(n => Factors(n)))

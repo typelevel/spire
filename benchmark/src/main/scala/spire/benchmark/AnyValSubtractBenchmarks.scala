@@ -1,14 +1,12 @@
-package spire.benchmark
+package spire
+package benchmark
 
-import scala.{specialized => spec}
 import scala.util.Random
 import Random._
 
 import spire.algebra._
 import spire.implicits._
 
-import com.google.caliper.Runner
-import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
 object AnyValSubtractBenchmarks extends MyRunner(cls = classOf[AnyValSubtractBenchmarks])
@@ -33,7 +31,7 @@ class AnyValSubtractBenchmarks extends MyBenchmark {
     doubles = init(size)(nextDouble)
   }
 
-  def subtractGeneric[@spec(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
+  def subtractGeneric[@sp(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
     var total = Ring[A].zero
     var i = 0
     val len = data.length

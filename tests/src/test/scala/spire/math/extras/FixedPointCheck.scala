@@ -1,18 +1,16 @@
-package spire.math
+package spire
+package math
+package extras
 
+import org.scalacheck.Arbitrary.{arbitrary, _}
+import org.scalacheck._
+import org.scalatest.{Matchers, _}
+import org.scalatest.prop._
 import spire.implicits._
 import spire.laws.arb.rational
+import spire.math.Rational
 
 import scala.util.Try
-
-import org.scalatest.Matchers
-import org.scalacheck.Arbitrary._
-import org.scalatest._
-import prop._
-
-import org.scalacheck._
-import Gen._
-import Arbitrary.arbitrary
 
 class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
 
@@ -42,8 +40,6 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
-  import BigDecimal.RoundingMode.FLOOR
-
   def build(x: Long, y0: Long, z: Byte, noZero: Boolean): (Int, Int, FixedPoint, FixedPoint, Rational, Rational) = {
     val y = if (y0 == 0L && noZero) 1L else y0
     val d = z.toInt.abs % 11
@@ -56,7 +52,7 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   type S2[A] = (A, A, FixedScale) => A
   type F2[A] = (A, A) => A
 
-  import scala.util.{Try, Success}
+  import scala.util.{Success, Try}
   def testBinop2(name: String, noZero: Boolean, f: S2[FixedPoint], g: F2[Rational]) =
     property(name) {
       forAll { (x: Long, y: Long, s: FixedScale) =>
@@ -105,7 +101,7 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
   testBinop2("division", true, (x, y, s) => (x)./(y)(s), _ / _)
 
-  testBinop2("modulus", true, (x, y, s) => x % y, _ % _)
+//  testBinop2("modulus", true, (x, y, s) => x % y, _ % _) // TODO: maybe test truncated division instead
 
   def buildHalf(x: Long, z: Byte): (Int, Int, FixedPoint, Rational) = {
     val d = z.toInt.abs % 11
@@ -149,7 +145,7 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
   testHalfop("h-division", true, (x, y, s) => x / y, _ / _)
 
-  testHalfop("h-modulus", true, (x, y, s) => (x).%(y)(s), _ % _)
+//  testHalfop("h-modulus", true, (x, y, s) => (x).%(y)(s), _ % _) // TODO: maybe test truncated division instead
 
   property("pow") {
     forAll { (x: Long, k0: Byte, d0: Byte) =>

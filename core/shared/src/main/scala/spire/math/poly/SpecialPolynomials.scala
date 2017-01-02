@@ -1,8 +1,7 @@
-package spire.math.poly
+package spire
+package math
+package poly
 
-import scala.annotation.tailrec
-import scala.reflect.ClassTag
-import scala.{specialized => spec}
 
 import spire.algebra.{Eq, Field, Ring}
 import spire.math.Polynomial

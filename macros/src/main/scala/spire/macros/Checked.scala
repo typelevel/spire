@@ -1,4 +1,5 @@
-package spire.macros
+package spire
+package macros
 
 import scala.language.existentials
 import language.experimental.macros

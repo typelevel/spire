@@ -1,6 +1,5 @@
-package spire.optional
-
-import scala.{specialized => sp}
+package spire
+package optional
 
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
@@ -17,8 +16,8 @@ final class MapIntIntIntAction extends Action[Int, Map[Int, Int]] {
 }
 
 final class MapIntIntGroup extends Group[Map[Int, Int]] {
-  def id: Map[Int, Int] = Map.empty[Int, Int]
-  def op(x: Map[Int, Int], y: Map[Int, Int]): Map[Int, Int] = {
+  def empty: Map[Int, Int] = Map.empty[Int, Int]
+  def combine(x: Map[Int, Int], y: Map[Int, Int]): Map[Int, Int] = {
     val preimages = x.keys ++ y.keys
 
     (Map.empty[Int, Int] /: preimages) {

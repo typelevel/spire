@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 package interval
 
 import spire.syntax.order._
@@ -104,6 +105,17 @@ object Bound {
       case (Closed(_), Open(_)) => rhs
       case (Open(lv), Closed(rv)) if rv >= lv => rhs
       case (Open(_), Closed(_)) => lhs
+    }
+
+  implicit def eq[A](implicit ev: Eq[A]): Eq[Bound[A]] =
+    new Eq[Bound[A]] {
+      def eqv(x: Bound[A], y: Bound[A]): Boolean = (x, y) match {
+        case (EmptyBound(), EmptyBound()) => true
+        case (Unbound(), Unbound()) => true
+        case (Closed(a), Closed(b)) => ev.eqv(a, b)
+        case (Open(a), Open(b)) => ev.eqv(a, b)
+        case _ => false
+      }
     }
 }
 

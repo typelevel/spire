@@ -1,12 +1,7 @@
-package spire.benchmark
-
-import scala.reflect.ClassTag
+package spire
+package benchmark
 
 import spire.implicits._
-
-import com.google.caliper.Runner
-import com.google.caliper.SimpleBenchmark
-import com.google.caliper.Param
 
 object RandomBenchmarks extends MyRunner(classOf[RandomBenchmarks])
 

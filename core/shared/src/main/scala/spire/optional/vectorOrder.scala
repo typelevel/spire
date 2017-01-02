@@ -1,8 +1,7 @@
-package spire.optional
+package spire
+package optional
 
 import scala.collection.SeqLike
-import scala.{specialized => sp}
-
 import spire.algebra.{ Eq, Module, Order }
 import spire.std.{ SeqVectorEq, SeqVectorOrder }
 import spire.std.{ ArrayVectorEq, ArrayVectorOrder }

@@ -1,4 +1,5 @@
-package spire.algebra
+package spire
+package algebra
 
 import org.scalatest.FunSuite
 import spire.math._

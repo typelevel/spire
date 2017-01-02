@@ -1,17 +1,14 @@
-package spire.math
+package spire
+package math
 
 import java.lang.Long.numberOfLeadingZeros
-import java.lang.Double.{ isInfinite, isNaN }
 import java.math.{ MathContext, RoundingMode, BigInteger, BigDecimal => JBigDecimal }
 import java.util.concurrent.atomic.AtomicReference
 
-import scala.annotation.tailrec
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
-import scala.reflect.ClassTag
 
 import spire.Platform
-import spire.algebra.{Eq, EuclideanRing, Field, IsAlgebraic, NRoot, Order, Ring, Sign, Signed}
-import spire.algebra.Sign.{ Positive, Negative, Zero }
+import spire.algebra.{Eq, Field, IsAlgebraic, NRoot, Order, Sign}
 import spire.macros.Checked.checked
 import spire.math.poly.{ Term, BigDecimalRootRefinement, RootFinder, Roots }
 import spire.std.bigInt._
@@ -42,7 +39,7 @@ import spire.syntax.std.seq._
 @SerialVersionUID(1L)
 final class Algebraic private (val expr: Algebraic.Expr)
 extends ScalaNumber with ScalaNumericConversions with Serializable {
-  import Algebraic.{ Zero, One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue, JBigDecimalOrder, roundExact, BFMSS, LiYap }
+  import Algebraic.{ One, Expr, MinIntValue, MaxIntValue, MinLongValue, MaxLongValue, roundExact }
 
   /**
    * Returns an `Int` with the same sign as this algebraic number. Algebraic
@@ -77,6 +74,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def /(that: Algebraic): Algebraic =
     new Algebraic(Expr.Div(this.expr, that.expr))
 
+/* TODO: migrate to TruncatedDivision
   /**
    * Returns an `Algebraic` whose value is just the integer part of
    * `this / that`. This operation is exact.
@@ -98,7 +96,7 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   /** An alias for [[mod]]. */
   def %(that: Algebraic): Algebraic =
     this - (this /~ that) * that
-
+ */
   /** Returns the square root of this number. */
   def sqrt: Algebraic = nroot(2)
 
@@ -1523,7 +1521,7 @@ trait AlgebraicInstances {
   implicit final val AlgebraicTag = new LargeTag[Algebraic](Exact, Algebraic(0))
 }
 
-private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoot[Algebraic] {
+private[math] trait AlgebraicIsField extends Field[Algebraic] {
   def zero: Algebraic = Algebraic.Zero
   def one: Algebraic = Algebraic.One
   def plus(a: Algebraic, b: Algebraic): Algebraic = a + b
@@ -1531,15 +1529,18 @@ private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoo
   override def minus(a: Algebraic, b: Algebraic): Algebraic = a - b
   override def pow(a: Algebraic, b: Int): Algebraic = a pow b
   override def times(a: Algebraic, b: Algebraic): Algebraic = a * b
+  /* TODO: migrate to TruncatedDivision
   def quot(a: Algebraic, b: Algebraic): Algebraic = a /~ b
   def mod(a: Algebraic, b: Algebraic): Algebraic = a % b
-  def gcd(a: Algebraic, b: Algebraic): Algebraic = euclid(a, b)(Eq[Algebraic])
+   */
   def div(a:Algebraic, b:Algebraic): Algebraic = a / b
   def nroot(a: Algebraic, k: Int): Algebraic = a nroot k
   def fpow(a:Algebraic, b:Algebraic): Algebraic = throw new UnsupportedOperationException("unsupported operation")
   override def fromInt(n: Int): Algebraic = Algebraic(n)
   override def fromDouble(n: Double): Algebraic = Algebraic(n)
 }
+
+private[math] trait AlgebraicIsNRoot extends NRoot[Algebraic]
 
 private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
   def toDouble(x: Algebraic): Double = x.toDouble
@@ -1557,4 +1558,8 @@ private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
 }
 
 @SerialVersionUID(1L)
-class AlgebraicAlgebra extends AlgebraicIsFieldWithNRoot with AlgebraicIsReal with Serializable
+class AlgebraicAlgebra
+    extends AlgebraicIsField
+    with AlgebraicIsNRoot
+    with AlgebraicIsReal
+    with Serializable

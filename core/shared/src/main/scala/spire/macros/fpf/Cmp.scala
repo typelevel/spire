@@ -1,4 +1,5 @@
-package spire.macros.fpf
+package spire
+package macros.fpf
 
 private[spire] sealed trait Cmp
 private[spire] object Cmp {

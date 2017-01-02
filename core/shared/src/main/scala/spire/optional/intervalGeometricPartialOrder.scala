@@ -1,4 +1,5 @@
-package spire.optional
+package spire
+package optional
 
 import spire.algebra._
 import spire.math.Interval

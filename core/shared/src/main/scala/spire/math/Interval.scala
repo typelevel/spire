@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 import Predef.{any2stringadd => _, _}
 
@@ -44,8 +45,13 @@ import java.lang.Double.isNaN
  * These situations will result in loss of precision (in the form of
  * wider intervals). The result is not wrong per se, but less
  * acccurate than it could be.
+ *
+ * These intervals should not be used with floating point bounds,
+ * as proper rounding is not implemented. Generally, the JVM is
+ * not an easy platform to perform robust arithmetic, as the
+ * IEEE 754 rounding modes cannot be set.
  */
-sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
+sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable { lhs =>
 
   @inline protected[this] final def isClosed(flags: Int): Boolean = flags == 0
   @inline protected[this] final def isClosedLower(flags: Int): Boolean = (flags & 1) == 0
@@ -761,6 +767,28 @@ sealed abstract class Interval[A](implicit order: Order[A]) { lhs =>
 
   def foldOver[B](init: B, step: A)(f: (B, A) => B)(implicit ev: AdditiveMonoid[A], nt: NumberTag[A]): B =
     iterator(step).foldLeft(init)(f)
+
+  /**
+    * Result of overlapping this interval with another one.
+    * Can be one of the following:
+    * - [[Equal]] if intervals are equal
+    * - [[Disjoint]] if intervals are notEmpty don't intersect
+    * - [[PartialOverlap]] if intervals intersect and neither is a subset of another
+    * - [[Subset]] if one interval (possibly empty) is a subset of another
+    *
+    * Except for [[Equal]], both original intervals are bound to respective result fields,
+    * allowing to determine exact overlap type.
+    *
+    * For example (pseudo-code):
+    * {
+    * val a = [5, 6]
+    * val b = (0, 1)
+    *
+    * // this returns Disjoint(b, a). Note a and b placement here, it means that b is strictly less then a.
+    * a.overlap(b)
+    * }
+    */
+  def overlap(rhs: Interval[A]): Overlap[A] = Overlap(lhs, rhs)
 }
 
 case class All[A: Order] private[spire] () extends Interval[A] {

@@ -1,12 +1,12 @@
-package spire.benchmark
+package spire
+package benchmark
 
 import spire.algebra._
 import spire.implicits._
 
-import com.google.caliper.{ Runner, SimpleBenchmark, Param }
+import com.google.caliper.Param
 
 import scala.util.Random._
-import scala.annotation.tailrec
 
 object MapSemigroupBenchmarks extends MyRunner(classOf[MapSemigroupBenchmarks])
 
@@ -32,9 +32,9 @@ class MapSemigroupBenchmarks extends MyBenchmark with BenchmarkData {
         .get(kv._1)
         .map { bigV =>
           if(bigOnLeft)
-            semigroup.op(bigV, kv._2)
+            semigroup.combine(bigV, kv._2)
           else
-            semigroup.op(kv._2, bigV)
+            semigroup.combine(kv._2, bigV)
         }
         .getOrElse(kv._2)
       oldMap + (kv._1 -> newV)
@@ -47,7 +47,7 @@ class MapSemigroupBenchmarks extends MyBenchmark with BenchmarkData {
       semigroup: Semigroup[V]): Map[K, V] = {
     y.foldLeft(x) { case (z, kv) =>
       z + ((kv._1, (x get kv._1) match {
-        case Some(u) => if (flip) semigroup.op(kv._2, u) else semigroup.op(u, kv._2)
+        case Some(u) => if (flip) semigroup.combine(kv._2, u) else semigroup.combine(u, kv._2)
         case None => kv._2
       }))
     }
@@ -93,7 +93,7 @@ class MapSemigroupBenchmarks extends MyBenchmark with BenchmarkData {
   }
 
   implicit val semigroup = new Semigroup[Int] {
-    def op(x: Int, y: Int): Int = x + y
+    def combine(x: Int, y: Int): Int = x + y
   }
 
   def timeAlgebirdMapAdd(reps: Int) = run(reps) {

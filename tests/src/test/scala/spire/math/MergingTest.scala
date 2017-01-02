@@ -1,10 +1,10 @@
-package spire.math
+package spire
+package math
 
 import spire.implicits._
 import org.scalatest.FunSuite
 import spire.algebra.Order
 
-import scala.reflect.ClassTag
 
 class CountingOrder[T:Order] extends Order[T] {
   val wrapped = implicitly[Order[T]]

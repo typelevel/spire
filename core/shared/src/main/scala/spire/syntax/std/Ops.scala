@@ -1,10 +1,8 @@
-package spire.syntax.std
+package spire
+package syntax
+package std
 
-import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
-import scala.reflect.ClassTag
-import scala.{specialized => sp}
-
 import spire.algebra.{AdditiveMonoid, Field, Monoid, MultiplicativeMonoid, NRoot, Order, PartialOrder, Signed}
 import spire.math.{Natural, Number, QuickSort, SafeLong, Searching, ULong}
 import spire.syntax.cfor._
@@ -89,7 +87,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
   }
 
   def qcombine(implicit ev: Monoid[A]): A = {
-    var result = ev.id
+    var result = ev.empty
     cfor(0)(_ < arr.length, _ + 1) { i => result |+|= arr(i) }
     result
   }
@@ -219,7 +217,7 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
     as.aggregate(ev.one)(ev.times, ev.times)
 
   def qcombine(implicit ev: Monoid[A]): A =
-    as.aggregate(ev.id)(ev.op, ev.op)
+    as.aggregate(ev.empty)(ev.combine, ev.combine)
 
   def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A =
     as.aggregate(ev.one)(_ + _.abs.pow(p), _ + _).nroot(p)

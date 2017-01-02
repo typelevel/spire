@@ -1,4 +1,5 @@
-package spire.math.prime
+package spire
+package math.prime
 
 import spire.algebra.Sign
 import spire.algebra.Sign.{Negative, Zero, Positive}
@@ -6,9 +7,6 @@ import spire.math.SafeLong
 import spire.std.int._
 import spire.std.map._
 import spire.syntax.rng._
-
-import scala.annotation.tailrec
-import scala.collection.mutable
 
 object Factors {
   val zero = Factors(Map.empty, Zero)

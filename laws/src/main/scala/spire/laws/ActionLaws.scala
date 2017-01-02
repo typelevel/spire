@@ -1,4 +1,5 @@
-package spire.laws
+package spire
+package laws
 
 import spire.algebra._
 import spire.implicits._
@@ -20,7 +21,7 @@ trait ActionLaws[G, A] extends Laws {
 
   val scalarLaws: GroupLaws[G]
 
-  import scalarLaws.{ Equ => EqG, Arb => ArG }
+  import scalarLaws.{ Arb => ArG }
 
   implicit def EquA: Eq[A]
   implicit def ArbA: Arbitrary[A]
@@ -57,7 +58,7 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq(leftSemigroupAction),
 
     "left identity" → forAll { (a: A) =>
-      (G0.id |+|> a) === a
+      (G0.empty |+|> a) === a
     }
   )
 
@@ -67,7 +68,7 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq(rightSemigroupAction),
 
     "right identity" → forAll { (a: A) =>
-      (a <|+| G0.id) === a
+      (a <|+| G0.empty) === a
     }
   )
 

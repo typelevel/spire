@@ -1,4 +1,5 @@
-package spire.laws
+package spire
+package laws
 
 import java.math.BigInteger
 import spire.algebra._
@@ -14,8 +15,6 @@ import spire.implicits.{
   ArrayOrder => _, ArrayEq => _,
   MapEq => _, MapGroup => _,
   _ }
-
-import scala.{specialized => sp}
 
 import org.typelevel.discipline.scalatest.Discipline
 
@@ -102,7 +101,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("D3", GroupLaws[D3].group)
   checkAll("FreeGroup", GroupLaws[FreeGroup[D3]].group)
 
-  implicit def intAbGroup: AbGroup[Int] = AbGroup.additive
+  implicit def intAbGroup: AbGroup[Int] = AdditiveAbGroup[Int].additive
   checkAll("FreeAbGroup", GroupLaws[FreeAbGroup[Int]].abGroup)
 
   checkAll("Bool[Boolean]", LogicLaws[Boolean].bool)

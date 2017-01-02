@@ -1,13 +1,11 @@
-package spire.std
+package spire
+package std
 
 import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
 import spire.math.Rational
 
 import java.lang.Math
-import java.lang.Long.{ numberOfTrailingZeros, numberOfLeadingZeros }
-import java.lang.Double.{ longBitsToDouble, doubleToLongBits }
 
-import scala.annotation.tailrec
 
 trait DoubleIsField extends Field[Double] {
   override def minus(a:Double, b:Double): Double = a - b
@@ -20,10 +18,20 @@ trait DoubleIsField extends Field[Double] {
 
   override def fromInt(n: Int): Double = n
 
+  /* TODO: move to TruncatedDivision
   def quot(a:Double, b:Double): Double = (a - (a % b)) / b
   def mod(a:Double, b:Double): Double = a % b
+   */
 
-  final def gcd(a:Double, b:Double):Double = {
+  override def fromDouble(n: Double): Double = n
+  def div(a:Double, b:Double): Double = a / b
+}
+
+/* TODO: move to TruncatedDivision or remove
+trait DoubleIsGcd extends Gcd[Double] {
+  def lcm(a:Double, b:Double):Double = (a / gcd(a, b)) * b
+
+  def gcd(a:Double, b:Double):Double = {
     def value(bits: Long): Long = bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L
 
     def exp(bits: Long): Int = ((bits >> 52) & 0x7FF).toInt
@@ -62,11 +70,8 @@ trait DoubleIsField extends Field[Double] {
       else gcd0(bVal, bExp, aVal, aExp)
     }
   }
-
-  override def fromDouble(n: Double): Double = n
-  def div(a:Double, b:Double): Double = a / b
 }
-
+ */
 trait DoubleIsNRoot extends NRoot[Double] {
   def nroot(a: Double, k: Int): Double = Math.pow(a, 1 / k.toDouble)
   override def sqrt(a: Double): Double = Math.sqrt(a)

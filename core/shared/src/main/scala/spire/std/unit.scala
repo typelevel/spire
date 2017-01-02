@@ -1,4 +1,5 @@
-package spire.std
+package spire
+package std
 
 import spire.algebra.{AbGroup, Order}
 
@@ -17,8 +18,8 @@ trait UnitOrder extends Order[Unit] with Serializable {
 
 trait UnitAbGroup extends AbGroup[Unit] {
   override def inverse(a: Unit): Unit = {}
-  override def id: Unit = {}
-  override def op(x: Unit, y: Unit): Unit = {}
+  override def empty: Unit = {}
+  override def combine(x: Unit, y: Unit): Unit = {}
 }
 
 @SerialVersionUID(0L)

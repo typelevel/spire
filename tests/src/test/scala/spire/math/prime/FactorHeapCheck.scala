@@ -1,4 +1,5 @@
-package spire.math.prime
+package spire
+package math.prime
 
 import spire.math.SafeLong
 
@@ -9,7 +10,6 @@ import prop._
 
 import org.scalacheck._
 import Gen._
-import Arbitrary.arbitrary
 
 import spire.implicits._
 

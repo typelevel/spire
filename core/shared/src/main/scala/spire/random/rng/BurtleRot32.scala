@@ -1,4 +1,5 @@
-package spire.random
+package spire
+package random
 package rng
 
 import java.nio.ByteBuffer

@@ -1,13 +1,13 @@
-package spire.math.poly
-
-import scala.{specialized => spec}
+package spire
+package math
+package poly
 
 import spire.algebra.{Eq, Field, Order, Rig, Ring, Rng, Semiring}
 import spire.syntax.field._
 import spire.syntax.eq._
 
 // Univariate polynomial term
-case class Term[@spec(Float, Double) C](coeff: C, exp: Int) { lhs =>
+case class Term[@sp(Float, Double) C](coeff: C, exp: Int) { lhs =>
 
   def unary_-(implicit r: Rng[C]): Term[C] = Term(-coeff, exp)
 
@@ -73,31 +73,31 @@ object Term {
     def compare(x: Term[C], y: Term[C]): Int = x.exp compare y.exp
   }
 
-  def fromTuple[@spec(Float, Double) C](tpl: (Int, C)): Term[C] =
+  def fromTuple[@sp(Float, Double) C](tpl: (Int, C)): Term[C] =
     Term(tpl._2, tpl._1)
-  def zero[@spec(Float, Double) C](implicit r: Semiring[C]): Term[C] =
+  def zero[@sp(Float, Double) C](implicit r: Semiring[C]): Term[C] =
     Term(r.zero, 0)
-  def one[@spec(Float, Double) C](implicit r: Rig[C]): Term[C] =
+  def one[@sp(Float, Double) C](implicit r: Rig[C]): Term[C] =
     Term(r.one, 0)
 
   private val IsZero = "0".r
   private val IsNegative = "-(.*)".r
 
   private val digitToSuperscript = Array(
-    '0' -> '\u2070',
-    '1' -> '\u2071',
-    '2' -> '\u2072',
-    '3' -> '\u2073',
-    '4' -> '\u2074',
-    '5' -> '\u2075',
-    '6' -> '\u2076',
-    '7' -> '\u2077',
-    '8' -> '\u2078',
-    '9' -> '\u2079',
-    '-' -> '\u207B',
-    '1' -> '\u00B9',
-    '2' -> '\u00B2',
-    '3' -> '\u00B3'
+    ('0', '\u2070'),
+    ('1', '\u2071'),
+    ('2', '\u2072'),
+    ('3', '\u2073'),
+    ('4', '\u2074'),
+    ('5', '\u2075'),
+    ('6', '\u2076'),
+    ('7', '\u2077'),
+    ('8', '\u2078'),
+    ('9', '\u2079'),
+    ('-', '\u207B'),
+    ('1', '\u00B9'),
+    ('2', '\u00B2'),
+    ('3', '\u00B3')
   )
 
   // call Regex constructor directly to get rid of compiler warning

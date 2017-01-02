@@ -1,6 +1,6 @@
-package spire.math
+package spire
+package math
 
-import scala.annotation.tailrec
 
 import spire.algebra.{IsIntegral, Order, Rig, Signed}
 

@@ -1,4 +1,5 @@
-package spire.syntax
+package spire
+package syntax
 
 import shapeless.test.illTyped
 import spire.tests.SpireProperties

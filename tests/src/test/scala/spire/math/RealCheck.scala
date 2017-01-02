@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 import spire.implicits._
 import spire.laws.arb.{rational, real}
@@ -10,7 +11,6 @@ import prop._
 
 import org.scalacheck._
 import Gen._
-import Arbitrary.arbitrary
 
 import ArbitrarySupport._
 import Ordinal._
@@ -116,6 +116,13 @@ class RealCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
     forAll { (x0: Real, k: Sized[Int, _1, _10]) =>
       val x = x0.abs
       x.nroot(k.num).pow(k.num) shouldBe x
+    }
+  }
+
+  property("x.nroot(-k).pow(-k) = x") {
+    forAll { (x0: NonZero[Real], k: Sized[Int, _1, _10]) =>
+      val x = x0.num.abs
+      x.nroot(-k.num).pow(-k.num) shouldBe x
     }
   }
 

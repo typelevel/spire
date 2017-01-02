@@ -1,6 +1,5 @@
-package spire.random
-
-import scala.{specialized => sp}
+package spire
+package random
 
 trait Exponential[@sp(Float, Double) A] extends Any {
   /**

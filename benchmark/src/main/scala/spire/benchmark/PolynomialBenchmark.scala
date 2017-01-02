@@ -1,4 +1,5 @@
-package spire.benchmark
+package spire
+package benchmark
 
 import scala.util.Random
 import Random._
@@ -6,9 +7,8 @@ import Random._
 import spire.math._
 import spire.implicits._
 
-import com.google.caliper.{ Runner, SimpleBenchmark, Param }
+import com.google.caliper.Param
 import org.apache.commons.math3.analysis.polynomials._
-import org.apache.commons.math3.analysis.UnivariateFunction
 
 object PolynomialBenchmarks extends MyRunner(classOf[PolynomialBenchmarks])
 

@@ -1,6 +1,6 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.{ specialized => spec }
 
 /**
  * A (left) semigroup/monoid/group action of `G` on `P` is simply the implementation of
@@ -10,7 +10,7 @@ import scala.{ specialized => spec }
  *
  * 2. `id |+|> p === p` for all `p` in `P` (if `id` is defined)
  */
-trait LeftAction[@spec(Int) P, G] extends Any {
+trait LeftAction[@sp(Int) P, G] extends Any {
   def actl(g: G, p: P): P
 }
 
@@ -26,7 +26,7 @@ object LeftAction {
  *
  * 2. `p <|+| id === p` for all `p` in `P` (if `id` is defined)
  */
-trait RightAction[@spec(Int) P, G] extends Any {
+trait RightAction[@sp(Int) P, G] extends Any {
   def actr(p: P, g: G): P
 }
 
@@ -54,7 +54,7 @@ object RightAction {
   *
   * 5. `g |+|> p === p <|+| g.inverse`.
   */
-trait Action[@spec(Int) P, G] extends Any with LeftAction[P, G] with RightAction[P, G]
+trait Action[@sp(Int) P, G] extends Any with LeftAction[P, G] with RightAction[P, G]
 
 object Action {
   @inline def apply[P, G](G: Action[P, G]): Action[P, G] = G
@@ -62,7 +62,7 @@ object Action {
   @inline def multiplicative[P, G](G: MultiplicativeAction[P, G]): Action[P, G] = G.multiplicative
 }
 
-trait AdditiveAction[@spec(Int) P, G] extends Any { self =>
+trait AdditiveAction[@sp(Int) P, G] extends Any { self =>
   def additive: Action[P, G] = new Action[P, G] {
     def actl(g: G, p: P): P = self.gplusl(g, p)
     def actr(p: P, g: G): P = self.gplusr(p, g)
@@ -72,7 +72,7 @@ trait AdditiveAction[@spec(Int) P, G] extends Any { self =>
   def gplusr(p: P, g: G): P
 }
 
-trait MultiplicativeAction[@spec(Int) P, G] extends Any { self =>
+trait MultiplicativeAction[@sp(Int) P, G] extends Any { self =>
   def multiplicative: Action[P, G] = new Action[P, G] {
     def actl(g: G, p: P): P = self.gtimesl(g, p)
     def actr(p: P, g: G): P = self.gtimesr(p, g)

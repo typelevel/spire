@@ -1,8 +1,7 @@
-package spire.math.poly
+package spire
+package math
+package poly
 
-import scala.annotation.tailrec
-import scala.reflect.ClassTag
-import scala.{specialized => spec}
 
 import spire.algebra.{Eq, Field, Ring, Rng, Semiring}
 import spire.math.Polynomial
@@ -12,7 +11,7 @@ import spire.syntax.eq._
 import spire.syntax.field._
 
 // Dense polynomials - Little Endian Coeffs e.g. x^0, x^1, ... x^n
-class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
+class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])
     (implicit val ct: ClassTag[C]) extends Polynomial[C] { lhs =>
 
   def degree: Int = if (isZero) 0 else coeffs.length - 1
@@ -145,42 +144,6 @@ class PolyDense[@spec(Double) C] private[spire] (val coeffs: Array[C])
     Polynomial.dense(cs)
   }
 
-  def /%(rhs: Polynomial[C])(implicit field: Field[C], eq: Eq[C]): (Polynomial[C], Polynomial[C]) = {
-    def zipSum(lcs: Array[C], rcs: Array[C])(implicit r: Ring[C]): Array[C] =
-      (lcs + rcs).tail
-
-    def polyFromCoeffsLE(cs: Array[C]): Polynomial[C] =
-      Polynomial.dense(cs)
-
-    def polyFromCoeffsBE(cs: Array[C]): Polynomial[C] = {
-      val ncs = cs.dropWhile(_ === field.zero)
-      Polynomial.dense(ncs.reverse)
-    }
-
-    @tailrec def eval(q: Array[C], u: Array[C], n: Int): (Polynomial[C], Polynomial[C]) = {
-      if (u.isEmpty || n < 0) {
-        (polyFromCoeffsLE(q), polyFromCoeffsBE(u))
-      } else {
-        val v0 = if (rhs.isZero) field.zero else rhs.maxOrderTermCoeff
-        val q0 = u(0) / v0
-        val uprime = zipSum(u, rhs.coeffsArray.reverse.map(_ * -q0))
-        eval(Array(q0) ++ q, uprime, n - 1)
-      }
-    }
-
-    val cs = rhs.coeffsArray
-    if (cs.length == 0) {
-      throw new ArithmeticException("/ by zero polynomial")
-    } else if (cs.length == 1) {
-      val c = cs(0)
-      val q = Polynomial.dense(lhs.coeffs.map(_ / c))
-      val r = Polynomial.dense(new Array[C](0))
-      (q, r)
-    } else {
-      eval(new Array[C](0), lhs.coeffs.reverse, lhs.degree - rhs.degree)
-    }
-  }
-
   def *: (k: C)(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] =
     if (k === ring.zero) {
       Polynomial.dense(new Array[C](0))
@@ -210,4 +173,42 @@ object PolyDense {
       Polynomial.dense(cs)
     }
   }
+
+  private[math] final def quotmodDense[@sp(Double) C: Field: Eq: ClassTag]
+    (lhs: PolyDense[C], rhs: Polynomial[C]): (Polynomial[C], Polynomial[C]) = {
+    def zipSum(lcs: Array[C], rcs: Array[C]): Array[C] =
+      (lcs + rcs).tail
+
+    def polyFromCoeffsLE(cs: Array[C]): Polynomial[C] =
+      Polynomial.dense(cs)
+
+    def polyFromCoeffsBE(cs: Array[C]): Polynomial[C] = {
+      val ncs = cs.dropWhile(_ === Field[C].zero)
+      Polynomial.dense(ncs.reverse)
+    }
+
+    @tailrec def eval(q: Array[C], u: Array[C], n: Int): (Polynomial[C], Polynomial[C]) = {
+      if (u.isEmpty || n < 0) {
+        (polyFromCoeffsLE(q), polyFromCoeffsBE(u))
+      } else {
+        val v0 = if (rhs.isZero) Field[C].zero else rhs.maxOrderTermCoeff
+        val q0 = u(0) / v0
+        val uprime = zipSum(u, rhs.coeffsArray.reverse.map(_ * -q0))
+        eval(Array(q0) ++ q, uprime, n - 1)
+      }
+    }
+
+    val cs = rhs.coeffsArray
+    if (cs.length == 0) {
+      throw new ArithmeticException("/ by zero polynomial")
+    } else if (cs.length == 1) {
+      val c = cs(0)
+      val q = Polynomial.dense(lhs.coeffs.map(_ / c))
+      val r = Polynomial.dense(new Array[C](0))
+      (q, r)
+    } else {
+      eval(new Array[C](0), lhs.coeffs.reverse, lhs.degree - rhs.degree)
+    }
+  }
+
 }

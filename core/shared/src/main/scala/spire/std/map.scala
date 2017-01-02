@@ -1,20 +1,18 @@
-package spire.std
+package spire
+package std
 
 import spire.algebra._
-
-import scala.{ specialized => spec }
-import scala.annotation.tailrec
 
 @SerialVersionUID(0L)
 class MapMonoid[K, V](implicit val scalar: Semigroup[V]) extends Monoid[Map[K, V]]
 with Serializable {
-  def id: Map[K, V] = Map.empty
+  def empty: Map[K, V] = Map.empty
 
-  def op(x: Map[K, V], y: Map[K, V]): Map[K, V] = {
+  def combine(x: Map[K, V], y: Map[K, V]): Map[K, V] = {
     var xx = x
     var yy = y
-    var f = scalar.op _
-    if (x.size < y.size) { xx = y; yy = x; f = (x: V, y: V) => scalar.op(y, x) }
+    var f = scalar.combine _
+    if (x.size < y.size) { xx = y; yy = x; f = (x: V, y: V) => scalar.combine(y, x) }
     yy.foldLeft(xx) { (z, kv) =>
       z.updated(kv._1, (xx get kv._1).map(u => f(u, kv._2)).getOrElse(kv._2))
     }

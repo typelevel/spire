@@ -1,6 +1,5 @@
-package spire.optional
-
-import scala.{specialized => sp}
+package spire
+package optional
 
 import scala.collection.IterableLike
 import scala.collection.generic.CanBuildFrom
@@ -18,7 +17,7 @@ final class IterableSemigroupoid[A, SA <: IterableLike[A, SA]](implicit cbf: Can
       val builder = cbf()
       while (xIt.nonEmpty) {
         assert(yIt.nonEmpty)
-        builder += A.op(xIt.next, yIt.next)
+        builder += A.combine(xIt.next, yIt.next)
       }
       builder.result()
     }) else Opt.empty[SA]
@@ -33,13 +32,13 @@ final class IterableGroupoid[A, SA <: IterableLike[A, SA]](implicit cbf: CanBuil
       val builder = cbf()
       while (xIt.nonEmpty) {
         assert(yIt.nonEmpty)
-        builder += A.op(xIt.next, yIt.next)
+        builder += A.combine(xIt.next, yIt.next)
       }
       builder.result()
     }) else Opt.empty[SA]
   def inverse(a: SA): SA = a.map(A.inverse(_))(cbf)
-  override def leftId(a: SA): SA = a.map(x => A.id)(cbf)
-  override def rightId(a: SA): SA = a.map(x => A.id)(cbf)
+  override def leftId(a: SA): SA = a.map(x => A.empty)(cbf)
+  override def rightId(a: SA): SA = a.map(x => A.empty)(cbf)
 }
 
 trait PartialIterable0 {

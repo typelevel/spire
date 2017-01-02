@@ -15,7 +15,6 @@
 package spire
 package random
 
-import scala.annotation.tailrec
 
 /**
  * This is a Scala implementation of the Ziggurat algorithm for generating random variables from decreasing densities.

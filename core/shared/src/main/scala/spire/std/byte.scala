@@ -1,4 +1,5 @@
-package spire.std
+package spire
+package std
 
 import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Signed}
 import spire.math.BitString
@@ -14,6 +15,7 @@ trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
 
   override def fromInt(n: Int): Byte = n.toByte
 
+  def euclideanFunction(a:Byte): BigInt = BigInt(a).abs
   def quot(a: Byte, b: Byte): Byte = (a / b).toByte
   def mod(a: Byte, b: Byte): Byte = (a % b).toByte
   def gcd(a: Byte, b: Byte): Byte = spire.math.gcd(a, b).toByte

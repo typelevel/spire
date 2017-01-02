@@ -1,8 +1,6 @@
-package spire.random
+package spire
+package random
 
-import scala.annotation.tailrec
-import scala.{specialized => spec}
-import scala.reflect.ClassTag
 
 import spire.math.{UInt, ULong}
 
@@ -293,7 +291,7 @@ abstract class Generator {
   /**
    * Generate an Array[A] using the given Dist[A] instance.
    */
-  def generateArray[@spec A: Dist: ClassTag](n: Int): Array[A] = {
+  def generateArray[@sp A: Dist: ClassTag](n: Int): Array[A] = {
     val arr = new Array[A](n)
     fillArray(arr)
     arr
@@ -302,7 +300,7 @@ abstract class Generator {
   /**
    * Fill an Array[A] using the given Dist[A] instance.
    */
-  def fillArray[@spec A: Dist](arr: Array[A]): Unit = {
+  def fillArray[@sp A: Dist](arr: Array[A]): Unit = {
     var i = 0
     val len = arr.length
     while (i < len) {
@@ -313,7 +311,7 @@ abstract class Generator {
 
   def oneOf[A](as: A*): A = chooseFromSeq(as)(this)
 
-  def chooseFromArray[@spec A](arr: Array[A])(implicit gen: Generator): A =
+  def chooseFromArray[@sp A](arr: Array[A])(implicit gen: Generator): A =
     arr(gen.nextInt(arr.length))
 
   def chooseFromSeq[A](seq: Seq[A])(implicit gen: Generator): A =
@@ -322,7 +320,7 @@ abstract class Generator {
   def chooseFromIterable[A](as: Iterable[A])(implicit gen: Generator): A =
     as.iterator.drop(gen.nextInt(as.size)).next()
 
-  def sampleFromArray[@spec A: ClassTag](as: Array[A], size: Int)(implicit gen: Generator): Array[A] = {
+  def sampleFromArray[@sp A: ClassTag](as: Array[A], size: Int)(implicit gen: Generator): Array[A] = {
     val chosen: Array[A] = new Array[A](size)
     if (size < 1) {
       throw new IllegalArgumentException("illegal sample size (%d)" format size)
@@ -347,7 +345,7 @@ abstract class Generator {
     chosen
   }
 
-  def sampleFromTraversable[@spec A: ClassTag](as: Traversable[A], size: Int)(implicit gen: Generator): Array[A] = {
+  def sampleFromTraversable[@sp A: ClassTag](as: Traversable[A], size: Int)(implicit gen: Generator): Array[A] = {
     val chosen: Array[A] = new Array[A](size)
     var i: Int = 0
     as.foreach { a =>
@@ -365,7 +363,7 @@ abstract class Generator {
     chosen
   }
 
-  def shuffle[@spec A](as: Array[A])(implicit gen: Generator): Unit = {
+  def shuffle[@sp A](as: Array[A])(implicit gen: Generator): Unit = {
     var i: Int = as.length - 1
     while (i > 0) {
       val n: Int = gen.nextInt(i)
@@ -443,10 +441,74 @@ abstract class IntBasedGenerator extends Generator { self =>
 
 abstract class LongBasedGenerator extends Generator { self =>
   def nextInt(): Int =
-    (nextLong >>> 32).toInt
+    (nextLong() >>> 32).toInt
+
+  override def fillInts(arr: Array[Int]): Unit = {
+    var i = 0
+    val len = arr.length
+    val llen = len & 0xfffffffe
+    while (i < llen) {
+      val n = nextLong()
+      arr(i) = (n & 0xffffffff).toInt
+      arr(i + 1) = ((n >>> 32) & 0xffffffff).toInt
+      i += 2
+    }
+
+    if (len != llen) arr(i) = nextInt()
+  }
+
+  override def fillShorts(arr: Array[Short]): Unit = {
+    var i = 0
+    val len = arr.length
+    val llen = len & 0xfffffffc
+    while (i < llen) {
+      val n = nextLong()
+      arr(i) = (n & 0xffff).toShort
+      arr(i + 1) = ((n >>> 16) & 0xffff).toShort
+      arr(i + 2) = ((n >>> 32) & 0xffff).toShort
+      arr(i + 3) = ((n >>> 48) & 0xffff).toShort
+      i += 4
+    }
+
+    if (i < len) {
+      var n = nextLong()
+      while (i < len) {
+        arr(i) = (n & 0xffff).toShort
+        n = n >>> 16
+        i += 1
+      }
+    }
+  }
+
+  override def fillBytes(arr: Array[Byte]): Unit = {
+    var i = 0
+    val len = arr.length
+    val llen = len & 0xfffffff8
+    while (i < llen) {
+      val n = nextLong()
+      arr(i) = (n & 0xff).toByte
+      arr(i + 1) = ((n >>> 8) & 0xff).toByte
+      arr(i + 2) = ((n >>> 16) & 0xff).toByte
+      arr(i + 3) = ((n >>> 24) & 0xff).toByte
+      arr(i + 4) = ((n >>> 32) & 0xff).toByte
+      arr(i + 5) = ((n >>> 40) & 0xff).toByte
+      arr(i + 6) = ((n >>> 48) & 0xff).toByte
+      arr(i + 7) = ((n >>> 56) & 0xff).toByte
+      i += 8
+    }
+
+    if (i < len) {
+      var n = nextLong()
+      while (i < len) {
+        arr(i) = (n & 0xff).toByte
+        n = n >>> 8
+        i += 1
+      }
+    }
+  }
 }
 
-trait GeneratorCompanion[G, @spec(Int, Long) S] {
+trait GeneratorCompanion[G, @sp(Int, Long) S] {
   def randomSeed(): S
 
   def fromBytes(bytes: Array[Byte]): G

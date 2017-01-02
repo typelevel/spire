@@ -1,4 +1,5 @@
-package spire.algebra
+package spire
+package algebra
 package free
 
 final class FreeGroup[A] private (val terms: Vector[Either[A, A]]) extends AnyVal { lhs =>
@@ -7,9 +8,9 @@ final class FreeGroup[A] private (val terms: Vector[Either[A, A]]) extends AnyVa
    * Map each term to type `B` and sum them using `B`'s [[Group]].
    */
   def run[B](f: A => B)(implicit B: Group[B]): B =
-    terms.foldLeft(B.id) {
-      case (sum, Right(a)) => B.op(sum, f(a))
-      case (sum, Left(a)) => B.opInverse(sum, f(a))
+    terms.foldLeft(B.empty) {
+      case (sum, Right(a)) => B.combine(sum, f(a))
+      case (sum, Left(a)) => B.remove(sum, f(a))
     }
 
   def |+|(rhs: FreeGroup[A]): FreeGroup[A] =
@@ -68,9 +69,15 @@ object FreeGroup { companion =>
   final def lift[A](a: A): FreeGroup[A] = new FreeGroup[A](Vector(Right(a)))
 
   implicit def FreeGroupGroup[A]: Group[FreeGroup[A]] = new Group[FreeGroup[A]] {
-    def id: FreeGroup[A] = companion.id
-    def op(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |+| b
+    def empty: FreeGroup[A] = companion.id
+    def combine(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |+| b
     def inverse(a: FreeGroup[A]): FreeGroup[A] = a.inverse
-    override def opInverse(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |-| b
+    override def remove(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |-| b
+
+    override def combineAll(as: TraversableOnce[FreeGroup[A]]): FreeGroup[A] = {
+      val bldr = Vector.newBuilder[Either[A, A]]
+      as.foreach(bldr ++= _.terms)
+      new FreeGroup(bldr.result())
+    }
   }
 }

@@ -1,11 +1,11 @@
-package spire.math
+package spire
+package math
 
 import spire.algebra.Sign
-import spire.algebra.Sign.{Negative, Zero, Positive}
+import spire.algebra.Sign.Positive
 import spire.syntax.cfor._
 import spire.syntax.nroot._
 
-import scala.annotation.tailrec
 import scala.collection.mutable
 
 /**
@@ -171,12 +171,12 @@ package object prime {
       if (n == 1) {
         Factors.one
       } else if (isPrime(n)) {
-        Factors(Map(n -> 1), Positive)
+        Factors(Map((n, 1)), Positive)
       } else if (n % 2 == 0) {
         var x = n / 2
         var e = 1
         while (x % 2 == 0) { x /= 2; e += 1 }
-        Factors(Map(SafeLong(2) -> e), Positive) * factor(x)
+        Factors(Map((SafeLong(2), e)), Positive) * factor(x)
       } else {
         var divisor = rho(n, rand(n))
         while (divisor == n) divisor = rho(n, rand(n))

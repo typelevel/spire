@@ -1,8 +1,9 @@
-package spire.laws
+package spire
+package laws
 
 import java.math.BigInteger
 
-import scala.reflect.ClassTag
+import spire.math.extras.{FixedPoint, FixedScale}
 
 import spire.algebra._
 import spire.algebra.free._
@@ -163,7 +164,7 @@ object gen {
       openUpperInterval[A],
       closedInterval[A])
 
-  def interval[A: Arbitrary: Order: AdditiveMonoid]: Gen[Interval[A]] =
+  def interval[A: Arbitrary: Order]: Gen[Interval[A]] =
     Gen.frequency[Interval[A]](
       (1, Gen.const(Interval.all[A])),
       (1, arbitrary[A].map(Interval.above(_))),
@@ -175,7 +176,7 @@ object gen {
   def freeMonoid[A: Arbitrary]: Gen[FreeMonoid[A]] =
     for {
       as <- arbitrary[List[A]]
-    } yield as.foldLeft(FreeMonoid.id[A]) { (acc, a) =>
+    } yield as.foldLeft(FreeMonoid.empty[A]) { (acc, a) =>
       acc |+| FreeMonoid(a)
     }
 
@@ -191,16 +192,18 @@ object gen {
     for {
       tpls <- arbitrary[List[(A, Short)]]
     } yield tpls.foldLeft(FreeAbGroup.id[A]) { case (acc, (a, n)) =>
-      acc |+| Group[FreeAbGroup[A]].combinen(FreeAbGroup(a), n.toInt)
+      acc |+| Group[FreeAbGroup[A]].combineN(FreeAbGroup(a), n.toInt)
     }
 
   val perm: Gen[Perm] =
     Gen.parameterized { params =>
-      import params.rng.nextInt
       val domainSize = params.size / 10 + 1
+      Gen.containerOfN[Array, Int](domainSize, Gen.chooseNum(0, Int.MaxValue))
+    } flatMap { intArray =>
+      val domainSize = intArray.length
       val images = new Array[Int](domainSize)
       cforRange(0 until domainSize) { i =>
-        val j = nextInt(i + 1) // uses the Fisher-Yates shuffle, inside out variant
+        val j = intArray(i) % (i + 1) // uses the Fisher-Yates shuffle, inside out variant
         images(i) = images(j)
         images(j) = i
       }

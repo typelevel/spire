@@ -1,4 +1,5 @@
-package spire.util
+package spire
+package util
 
 import spire.algebra.Eq
 import spire.syntax.eq._

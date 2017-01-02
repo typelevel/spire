@@ -1,12 +1,10 @@
-package spire.example
+package spire
+package example
 
 import spire.algebra._
 import spire.math.Rational
 import spire.implicits._
 
-import scala.{ specialized => spec }
-import scala.annotation.tailrec
-import scala.collection.IterableLike
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable.{ Builder, ListBuffer }
 
@@ -14,7 +12,7 @@ import java.io.{ BufferedReader, InputStreamReader }
 
 import scala.util.Random.shuffle
 
-final class DataSet[V, @spec(Double) F, @spec(Double) K](
+final class DataSet[V, @sp(Double) F, @sp(Double) K](
     val name: String,
     val variables: List[Variable[F]],
     val space: CoordinateSpace[V, F],
@@ -82,7 +80,7 @@ object DataSet {
     (dimensions, datar.reverse)
   }
 
-  def fromResource[CC[_], @spec(Double) F, @spec(Double) K](name: String, res: String, sep: Char,
+  def fromResource[CC[_], @sp(Double) F, @sp(Double) K](name: String, res: String, sep: Char,
       variables: List[Variable[F]], out: Output[K])(
       cs: Int => CoordinateSpace[CC[F], F])(implicit
       cbf: CanBuildFrom[Nothing, F, CC[F]]): DataSet[CC[F], F, K] = {
@@ -219,7 +217,7 @@ object CrossValidation {
    * Generic cross-validator that can be provided an arbitrary method to score
    * predictor results.
    */
-  def crossValidate[V, @spec(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
+  def crossValidate[V, @sp(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
       train: CoordinateSpace[V, F] => List[(V, K)] => (V => K))(
       score: List[Result[V, K]] => F): F = {
     implicit val field = dataset.space.scalar
@@ -246,7 +244,7 @@ object CrossValidation {
    * For cross-validating classification, we use the accuracy to score the
    * predictor.
    */
-  def crossValidateClassification[V, @spec(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
+  def crossValidateClassification[V, @sp(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
       train: CoordinateSpace[V, F] => List[(V, K)] => (V => K)): F = {
     implicit val field = dataset.space.scalar
 
@@ -262,7 +260,7 @@ object CrossValidation {
   /**
    * For cross-validating regression, we use the R^2 to score the predictor.
    */
-  def crossValidateRegression[V, @spec(Double) F](dataset: DataSet[V, F, F], k: Int = 10)(
+  def crossValidateRegression[V, @sp(Double) F](dataset: DataSet[V, F, F], k: Int = 10)(
       train: CoordinateSpace[V, F] => List[(V, F)] => (V => F)): F = {
     implicit val field = dataset.space.scalar
 

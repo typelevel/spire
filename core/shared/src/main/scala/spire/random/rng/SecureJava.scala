@@ -1,8 +1,7 @@
-package spire.random
+package spire
+package random
 package rng
 
-import java.nio.ByteBuffer
-import java.util.Arrays
 import java.security.SecureRandom
 
 class SecureJava(rand: SecureRandom) extends IntBasedGenerator {
@@ -18,6 +17,8 @@ class SecureJava(rand: SecureRandom) extends IntBasedGenerator {
 }
 
 object SecureJava {
+
+  @deprecated("seed is ignored except on windows. will be removed before 1.0", "0.12.0")
   def fromBytes(bytes: Array[Byte]): SecureJava =
     new SecureJava(new SecureRandom(bytes))
 

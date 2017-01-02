@@ -1,12 +1,12 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.{ specialized => spec }
 
 /**
  * A trait for things that have some notion of sign and the ability to ensure
  * something has a positive sign.
  */
-trait Signed[@spec(Double, Float, Int, Long) A] extends Any {
+trait Signed[@sp(Double, Float, Int, Long) A] extends Any {
   /** Returns Zero if `a` is 0, Positive if `a` is positive, and Negative is `a` is negative. */
   def sign(a: A): Sign = Sign(signum(a))
 

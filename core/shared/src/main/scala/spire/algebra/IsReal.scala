@@ -1,13 +1,13 @@
-package spire.algebra
+package spire
+package algebra
 
-import scala.{ specialized => spec }
 
 import spire.math.{ Real, Algebraic, Rational }
 
 /**
  * A simple type class for numeric types that are a subset of the reals.
  */
-trait IsReal[@spec A] extends Any with Order[A] with Signed[A] {
+trait IsReal[@sp A] extends Any with Order[A] with Signed[A] {
 
   /**
    * Rounds `a` the nearest integer that is greater than or equal to `a`.
@@ -38,28 +38,28 @@ trait IsReal[@spec A] extends Any with Order[A] with Signed[A] {
 }
 
 object IsReal {
-  def apply[@spec A](implicit A: IsReal[A]): IsReal[A] = A
+  def apply[@sp A](implicit A: IsReal[A]): IsReal[A] = A
 }
 
-trait IsAlgebraic[@spec A] extends Any with IsReal[A] {
+trait IsAlgebraic[@sp A] extends Any with IsReal[A] {
   def toAlgebraic(a: A): Algebraic
   def toReal(a: A): Real = toAlgebraic(a).toReal
 }
 
 object IsAlgebraic {
-  def apply[@spec A](implicit A: IsAlgebraic[A]): IsAlgebraic[A] = A
+  def apply[@sp A](implicit A: IsAlgebraic[A]): IsAlgebraic[A] = A
 }
 
-trait IsRational[@spec A] extends Any with IsAlgebraic[A] {
+trait IsRational[@sp A] extends Any with IsAlgebraic[A] {
   def toRational(a: A): Rational
   def toAlgebraic(a: A): Algebraic = Algebraic(toRational(a))
 }
 
 object IsRational {
-  def apply[@spec A](implicit A: IsRational[A]): IsRational[A] = A
+  def apply[@sp A](implicit A: IsRational[A]): IsRational[A] = A
 }
 
-trait IsIntegral[@spec(Byte,Short,Int,Long) A] extends Any with IsRational[A] {
+trait IsIntegral[@sp(Byte,Short,Int,Long) A] extends Any with IsRational[A] {
   def ceil(a: A): A = a
   def floor(a: A): A = a
   def round(a: A): A = a
@@ -69,5 +69,5 @@ trait IsIntegral[@spec(Byte,Short,Int,Long) A] extends Any with IsRational[A] {
 }
 
 object IsIntegral {
-  def apply[@spec A](implicit A: IsIntegral[A]): IsIntegral[A] = A
+  def apply[@sp A](implicit A: IsIntegral[A]): IsIntegral[A] = A
 }

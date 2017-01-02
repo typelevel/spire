@@ -1,4 +1,5 @@
-package spire.algebra
+package spire
+package algebra
 package partial
 
 import spire.util.Opt

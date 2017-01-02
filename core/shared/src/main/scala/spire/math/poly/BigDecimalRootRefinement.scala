@@ -1,7 +1,7 @@
-package spire.math
+package spire
+package math
 package poly
 
-import scala.annotation.tailrec
 
 import java.math.{ BigDecimal => JBigDecimal, RoundingMode, MathContext }
 
@@ -136,10 +136,10 @@ object BigDecimalRootRefinement {
         .round(mc)
 
     def floor(x: Rational): JBigDecimal =
-      x.toBigDecimal(new MathContext(mc.getPrecision, RoundingMode.CEILING)).bigDecimal
+      x.toBigDecimal(new MathContext(mc.getPrecision, RoundingMode.FLOOR)).bigDecimal
 
     def ceil(x: Rational): JBigDecimal =
-      x.toBigDecimal(new MathContext(mc.getPrecision, RoundingMode.FLOOR)).bigDecimal
+      x.toBigDecimal(new MathContext(mc.getPrecision, RoundingMode.CEILING)).bigDecimal
 
     def floor(x: JBigDecimal): JBigDecimal =
       x.round(new MathContext(mc.getPrecision, RoundingMode.FLOOR))
@@ -177,12 +177,43 @@ object BigDecimalRootRefinement {
         .removeZeroRoots
     }
 
+    // Returns a polynomial with the same roots as
+    // `poly.compose(Polynomial.linear(s))`, but without using any Rational
+    // arithmetic to compute it.
+    def mult(poly: Polynomial[BigDecimal], s: Rational): Polynomial[BigDecimal] = {
+      // Let s = a/b and n = poly.degree. The idea here is that we can scale
+      // poly by b^n, before composing this with the polynomial (1/b)x,
+      // followed by composing the result with the polynomial ax. The first 2
+      // steps, scaling + composition with (1/b)x, can be simulated by
+      // multiplying each term coefficient a_i by b^(n-i) (ie b^n/b^k=b^(n-k)).
+      // This rigamarole let's us avoid rational arithmetic. Most importantly,
+      // we avoid division, which we cannot do exactly with BigDecimal.
+      val n = poly.degree
+      poly
+        .mapTerms { case Term(coeff, k) =>
+          val a = BigDecimal(s.denominator.toBigInteger.pow(n - k), MathContext.UNLIMITED)
+          Term(coeff * a, k)
+        }
+        .compose(Polynomial.linear[BigDecimal](BigDecimal(s.numerator.toBigInteger, MathContext.UNLIMITED)))
+        .removeZeroRoots
+    }
+
     // Returns true if there is a root in the open sub-interval (l, r).
     def hasRoot(l: Rational, r: Rational): Boolean =
       if (l != r) {
-        // Ue Descartes' rule of signs to see if the root in the open interval
-        // is actually in the sub interval (l, r).
-        val poly0 = shift(shift(poly, l), (r - l).reciprocal)
+        // Use Descartes' rule of signs to see if the root in the open interval
+        // is actually in the sub interval (l, r). Since Descartes' rule of
+        // signs only reports positive roots, we need to first transform the
+        // polynomial by mapping the open interval (l, r) to (0, inf). This
+        // will ensure that the only positive roots are those in the open
+        // interval (l, r).  This is accomplished with following
+        // transformations:
+        //
+        // 1) shifting the polynomial by l by composing it with (x + l)
+        // 2) mapping (0, (r - l)) to (0, 1) by composing 1) with (r - l)
+        // 3) mapping (0, 1) to (1, inf) by taking the reciprocal of 2)
+        // 4) mapping (1, inf) to (0, inf) by composing 3) by x + 1.
+        val poly0 = mult(shift(poly, l), r - l).reciprocal.shift(1).removeZeroRoots
         poly0.signVariations % 2 == 1
       } else {
         false
@@ -205,7 +236,7 @@ object BigDecimalRootRefinement {
             ExactRoot(lx)
           } else {
             // We try to push lx up a bit to get the sign to change.
-            adjust(lx.add(JBigDecimal.valueOf(1, getEps(lx))), Some(ly), rx, Some(ry))
+            adjust(lx.add(JBigDecimal.valueOf(1, getEps(lx))), None, rx, Some(ry))
           }
         } else if (ry.signum == 0) {
           if (qrx < upperBound) {
@@ -213,16 +244,16 @@ object BigDecimalRootRefinement {
             ExactRoot(rx)
           } else {
             // We try to push rx down a bit to get the sign to change.
-            adjust(lx, Some(ly), rx.subtract(JBigDecimal.valueOf(1, getEps(rx))), Some(ry))
+            adjust(lx, Some(ly), rx.subtract(JBigDecimal.valueOf(1, getEps(rx))), None)
           }
         } else if (ry.signum == ly.signum) {
           // We've managed to overshoot the actual root, but since we're still
           // "in-bounds", we know it's in either the left cut off bit or the
           // right.
           if (hasRoot(lowerBound, qlx)) {
-            BoundedLeft(lowerBound, lb)
+            BoundedLeft(lowerBound, lx)
           } else {
-            BoundedRight(ub, upperBound)
+            BoundedRight(rx, upperBound)
           }
         } else {
           // Yay! We've successfully approximated the lower/upper bounds with
