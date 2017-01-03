@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{IsIntegral, Order, Rig, Signed}
+import spire.algebra.{CRig, IsIntegral, Order, Signed}
 
 object UShort extends UShortInstances {
   @inline final def apply(n: Char): UShort = new UShort(n)
@@ -68,7 +68,7 @@ trait UShortInstances {
   implicit final val UShortTag = new UnsignedIntTag[UShort](UShort.MinValue, UShort.MaxValue)
 }
 
-private[math] trait UShortIsRig extends Rig[UShort] {
+private[math] trait UShortIsCRig extends CRig[UShort] {
   def one: UShort = UShort(1)
   def plus(a:UShort, b:UShort): UShort = a + b
   override def pow(a:UShort, b:Int): UShort = {
@@ -133,4 +133,4 @@ private[math] trait UShortIsReal extends IsIntegral[UShort] with UShortOrder wit
 }
 
 @SerialVersionUID(0L)
-private[math] class UShortAlgebra extends UShortIsRig with UShortIsReal with Serializable
+private[math] class UShortAlgebra extends UShortIsCRig with UShortIsReal with Serializable
