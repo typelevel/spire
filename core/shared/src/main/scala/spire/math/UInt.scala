@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{IsIntegral, Order, Rig, Signed}
+import spire.algebra.{CRig, IsIntegral, Order, Signed}
 
 object UInt extends UIntInstances {
   @inline final def apply(n: Int): UInt = new UInt(n)
@@ -67,7 +67,7 @@ trait UIntInstances {
   implicit final val UIntTag = new UnsignedIntTag[UInt](UInt.MinValue, UInt.MaxValue)
 }
 
-private[math] trait UIntIsRig extends Rig[UInt] {
+private[math] trait UIntIsCRig extends CRig[UInt] {
   def one: UInt = UInt(1)
   def plus(a:UInt, b:UInt): UInt = a + b
   override def pow(a:UInt, b:Int): UInt = {
@@ -126,4 +126,4 @@ private[math] trait UIntIsReal extends IsIntegral[UInt] with UIntOrder with UInt
 }
 
 @SerialVersionUID(0L)
-private[math] class UIntAlgebra extends UIntIsRig with UIntIsReal with Serializable
+private[math] class UIntAlgebra extends UIntIsCRig with UIntIsReal with Serializable
