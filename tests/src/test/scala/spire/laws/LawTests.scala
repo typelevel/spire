@@ -41,6 +41,10 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Rational",   RingLaws[Rational].field)
   checkAll("Rational",     BaseLaws[BigInt].signedAdditiveAbGroup)
   checkAll("Real",       RingLaws[Real].field)
+  checkAll("UByte",      RingLaws[UInt].cRig)
+  checkAll("UShort",     RingLaws[UInt].cRig)
+  checkAll("UInt",       RingLaws[UInt].cRig)
+  checkAll("ULong",      RingLaws[ULong].cRig)
 
   checkAll("Levenshtein distance", BaseLaws[String].metricSpace)
   checkAll("BigInt",               BaseLaws[BigInt].metricSpace)
