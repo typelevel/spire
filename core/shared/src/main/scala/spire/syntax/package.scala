@@ -30,6 +30,7 @@ package object syntax {
   object rig extends RigSyntax
   object rng extends RngSyntax
   object ring extends RingSyntax
+  object gcdRing extends GCDRingSyntax
   object euclideanRing extends EuclideanRingSyntax
   object field extends FieldSyntax
   object nroot extends NRootSyntax

@@ -568,7 +568,8 @@ class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPr
   property("[a, c) overlap (b, d] = PartialOverlap if a < b < c < d") {
     forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
 
-      import spire.algebra.Order.ordering
+      /* TODO: the name `catsKernel` leaks here (and below), OK? */
+      import spire.algebra.Order.catsKernelOrderingForOrder
 
       val sorted = List(x, y, m, n).sorted
       whenever(sorted.distinct == sorted) {
@@ -580,7 +581,7 @@ class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPr
   property("[a, c] overlap [b, d] = PartialOverlap if a < b <= c < d") {
     forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
 
-      import spire.algebra.Order.ordering
+      import spire.algebra.Order.catsKernelOrderingForOrder
 
       val sorted = List(x, y, m, n).sorted
       whenever(sorted.distinct.size >= 3 && sorted(0) != sorted(1) && sorted(2) != sorted(3)) {
@@ -614,7 +615,7 @@ class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPr
   property("[a, b) overlap (c, d] = Disjoint if a < b <= c < d") {
     forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
 
-      import spire.algebra.Order.ordering
+      import spire.algebra.Order.catsKernelOrderingForOrder
 
       val sorted = List(x, y, m, n).sorted
       whenever(sorted(0) < sorted(1) && sorted(2) < sorted(3)) {
@@ -628,7 +629,7 @@ class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPr
   property("[a, b] overlap [c, d] = Disjoint if a <= b < c <= d") {
     forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
 
-      import spire.algebra.Order.ordering
+      import spire.algebra.Order.catsKernelOrderingForOrder
 
       val sorted = List(x, y, m, n).sorted
       whenever(sorted(1) < sorted(2)) {

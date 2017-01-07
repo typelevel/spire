@@ -49,14 +49,19 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def *(rhs: Rational): Rational
   def /(rhs: Rational): Rational
 
+  /* TODO: move to TruncatedDivision
   def /~(rhs: Rational): Rational = Rational(SafeLong((this / rhs).toBigInt), SafeLong.one)
   def %(rhs: Rational): Rational = this - (this /~ rhs) * rhs
   def /%(rhs: Rational): (Rational, Rational) = {
     val q = this /~ rhs
     (q, this - q * rhs)
   }
+   */
 
+  /* TODO: not commutative
+  def lcm(rhs: Rational): Rational = (lhs / (lhs gcd rhs)) * rhs
   def gcd(rhs: Rational): Rational
+   */
 
   def toReal: Real = Real(this)
 
@@ -556,7 +561,7 @@ object Rational extends RationalInstances {
         val den = SafeLong(d / b) * (r.n / a)
         if (den.signum < 0) Rational(-num, -den) else Rational(num, den)
     }
-
+/* TODO: restore commutativity
     def gcd(r: Rational): Rational = if(isZero) r.abs else if(isOne) this else r match {
       case r: LongRational =>
         val dgcd: Long = spire.math.gcd(d, r.d)
@@ -582,6 +587,7 @@ object Rational extends RationalInstances {
             SafeLong(dgcd) * lm * rm)
         }
     }
+ */
 
     def floor: Rational =
       if (d == 1L) this
@@ -741,6 +747,7 @@ object Rational extends RationalInstances {
         if (den.signum < 0) Rational(-num, -den) else Rational(num, den)
     }
 
+    /* TODO: restore commutativity
     def gcd(r: Rational): Rational = r match {
       case r: LongRational => r gcd this
       case r: BigRational =>
@@ -753,6 +760,7 @@ object Rational extends RationalInstances {
           Rational((n * rm).abs gcd (r.n * lm).abs, dgcd * lm * rm)
         }
     }
+     */
 
     def floor: Rational =
       if (isWhole) this
@@ -839,14 +847,22 @@ private[math] trait RationalIsField extends Field[Rational] {
   override def pow(a:Rational, b:Int): Rational = a.pow(b)
   override def times(a:Rational, b:Rational): Rational = a * b
   def zero: Rational = Rational.zero
+  /* TODO: move to TruncatedDivision
   def quot(a:Rational, b:Rational): Rational = a /~ b
   def mod(a:Rational, b:Rational): Rational = a % b
   override def quotmod(a:Rational, b:Rational): (Rational, Rational) = a /% b
-  def gcd(a:Rational, b:Rational): Rational = a gcd b
+   */
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
   def div(a:Rational, b:Rational): Rational = a / b
 }
+
+/* TODO: restore commutativity
+private[math] trait RationalIsGcd extends Gcd[Rational] {
+  def lcm(a:Rational, b:Rational): Rational = a lcm b
+  def gcd(a:Rational, b:Rational): Rational = a gcd b
+}
+ */
 
 private[math] trait RationalIsReal extends IsRational[Rational] {
   override def eqv(x:Rational, y:Rational): Boolean = x == y
@@ -870,4 +886,8 @@ private[math] trait RationalIsReal extends IsRational[Rational] {
 }
 
 @SerialVersionUID(1L)
-class RationalAlgebra extends RationalIsField with RationalIsReal with Serializable
+class RationalAlgebra
+    extends RationalIsField
+    with RationalIsReal
+//    with RationalIsGcd TODO
+    with Serializable

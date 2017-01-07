@@ -2,8 +2,6 @@ package spire
 package math
 package extras
 
-//import spire.syntax.ring._
-import spire.std.long._
 import spire.syntax.order._
 import spire.syntax.euclideanRing._
 import spire.syntax.convertableFrom._
@@ -199,6 +197,9 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def gcd(rhs: FixedPoint): FixedPoint =
     new FixedPoint(spire.math.gcd(lhs.long, rhs.long))
 
+  def lcm(rhs: FixedPoint): FixedPoint =
+    new FixedPoint(spire.math.lcm(lhs.long, rhs.long))
+
   def toLong(implicit scale: FixedScale): Long =
     long / scale.denom
 
@@ -247,7 +248,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
 
   def fpow(k: FixedPoint)(implicit scale: FixedScale): FixedPoint = {
     val r = this.toRational
-    val g = k.long gcd scale.denom
+    val g = spire.math.gcd(k.long, scale.denom)
     val n = (k.long / g)
     val d = (scale.denom / g)
     if (n.isValidInt && d.isValidInt) {
@@ -310,8 +311,11 @@ trait FixedPointInstances {
       def times(x: FixedPoint, y: FixedPoint): FixedPoint = x * y
 
       def gcd(x: FixedPoint, y: FixedPoint): FixedPoint = x gcd y
-      def quot(x: FixedPoint, y: FixedPoint): FixedPoint = x /~ y
-      def mod(x: FixedPoint, y: FixedPoint): FixedPoint = x % y
+      def lcm(x: FixedPoint, y: FixedPoint): FixedPoint = x lcm y
+
+/* TODO: check if it is not TruncatedDivision? */
+      override def quot(x: FixedPoint, y: FixedPoint): FixedPoint = x /~ y
+      override def mod(x: FixedPoint, y: FixedPoint): FixedPoint = x % y
 
       override def reciprocal(x: FixedPoint): FixedPoint = one / x
       def div(x: FixedPoint, y: FixedPoint): FixedPoint = x / y
@@ -346,7 +350,7 @@ trait FixedPointInstances {
       def fromShort(n: Short): FixedPoint = FixedPoint(n)
       def fromFloat(n: Float): FixedPoint = FixedPoint(n)
       def fromLong(n: Long): FixedPoint = FixedPoint(n)
-      def fromBigInt(n: BigInt): FixedPoint = FixedPoint(BigDecimal(n))
+      override def fromBigInt(n: BigInt): FixedPoint = FixedPoint(BigDecimal(n))
       def fromBigDecimal(n: BigDecimal): FixedPoint = FixedPoint(n)
       def fromRational(n: Rational): FixedPoint = FixedPoint(n)
       def fromAlgebraic(n: Algebraic): FixedPoint =

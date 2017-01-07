@@ -50,6 +50,7 @@ private[math] trait QuaternionAlgebra[A]
   def zero: Quaternion[A] = Quaternion.zero[A]
 
   def div(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a / b
+  /* TODO: is it sound?
   def quot(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a /~ b
   def mod(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a % b
   def gcd(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = {
@@ -57,6 +58,7 @@ private[math] trait QuaternionAlgebra[A]
       if (b.isZero) a else _gcd(b, a - (a / b).round * b)
     _gcd(a, b)
   }
+   */
 
   def nroot(a: Quaternion[A], k: Int): Quaternion[A] = a.nroot(k)
   override def sqrt(a: Quaternion[A]): Quaternion[A] = a.sqrt

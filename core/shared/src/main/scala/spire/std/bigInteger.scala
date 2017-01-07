@@ -16,6 +16,7 @@ trait BigIntegerIsEuclideanRing extends EuclideanRing[BigInteger] {
 
   override def fromInt(n: Int): BigInteger = BigInteger.valueOf(n)
 
+  def euclideanFunction(a:BigInteger): BigInt = BigInt(a).abs
   def quot(a:BigInteger, b:BigInteger): BigInteger = a divide b
   def mod(a:BigInteger, b:BigInteger): BigInteger = a remainder b
   override def quotmod(a:BigInteger, b:BigInteger): (BigInteger, BigInteger) = {

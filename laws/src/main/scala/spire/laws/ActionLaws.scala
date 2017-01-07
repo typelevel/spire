@@ -58,7 +58,7 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq(leftSemigroupAction),
 
     "left identity" → forAll { (a: A) =>
-      (G0.id |+|> a) === a
+      (G0.empty |+|> a) === a
     }
   )
 
@@ -68,7 +68,7 @@ trait ActionLaws[G, A] extends Laws {
     parents = Seq(rightSemigroupAction),
 
     "right identity" → forAll { (a: A) =>
-      (a <|+| G0.id) === a
+      (a <|+| G0.empty) === a
     }
   )
 

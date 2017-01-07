@@ -96,6 +96,7 @@ abstract class AutoAlgebra extends AutoOps { ops =>
   def times[A: c.WeakTypeTag]: c.Expr[A]
   def negate[A: c.WeakTypeTag]: c.Expr[A]
   def div[A: c.WeakTypeTag]: c.Expr[A]
+  def euclideanFunction[A: c.WeakTypeTag]: c.Expr[BigInt]
   def quot[A: c.WeakTypeTag]: c.Expr[A]
   def mod[A: c.WeakTypeTag](stub: => c.Expr[A] = failedSearch("mod", "%")): c.Expr[A]
   def equals: c.Expr[Boolean]
@@ -146,6 +147,8 @@ abstract class AutoAlgebra extends AutoOps { ops =>
     }
   }
 
+  /* TODO: missing GCD ring. Any examples of types with .gcd and .lcm in Scala/Java ? */
+
   def EuclideanRing[A: c.WeakTypeTag](z: c.Expr[A], o: c.Expr[A])
       (ev: c.Expr[Eq[A]]): c.Expr[EuclideanRing[A]] = {
     c.universe.reify {
@@ -156,9 +159,9 @@ abstract class AutoAlgebra extends AutoOps { ops =>
         def times(x: A, y: A): A = ops.times[A].splice
         override def minus(x: A, y: A): A = ops.minus[A].splice
         def negate(x: A): A = ops.negate[A].splice
+        def euclideanFunction(x: A): BigInt = ops.euclideanFunction[BigInt].splice
         def quot(x: A, y: A): A = ops.quot[A].splice
         def mod(x: A, y: A): A = ops.mod[A]().splice
-        def gcd(x: A, y: A): A = euclid(x, y)(ev.splice)
       }
     }
   }
@@ -173,9 +176,9 @@ abstract class AutoAlgebra extends AutoOps { ops =>
         def times(x: A, y: A): A = ops.times[A].splice
         override def minus(x: A, y: A): A = ops.minus[A].splice
         def negate(x: A): A = ops.negate[A].splice
-        def quot(x: A, y: A): A = ops.div[A].splice
-        def mod(x: A, y: A): A = ops.mod[A](z).splice
-        def gcd(x: A, y: A): A = euclid(x, y)(ev.splice)
+        override def euclideanFunction(x: A): BigInt = BigInt(0)
+        override def quot(x: A, y: A): A = ops.div[A].splice
+        override def mod(x: A, y: A): A = ops.mod[A](z).splice
         def div(x: A, y: A): A = ops.div[A].splice
       }
     }
@@ -208,6 +211,11 @@ case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
   def minus[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "minus")
   def times[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "times")
   def negate[A: c.WeakTypeTag]: c.Expr[A] = unop[A]("unary_" + "$" + "minus")
+  /* TODO: this is a bit careless, but works for our examples */
+  def euclideanFunction[A: c.WeakTypeTag]: c.Expr[BigInt] = {
+    import c.universe._
+    c.Expr[BigInt](q"x.toBigInt.abs")
+  }
   def quot[A: c.WeakTypeTag]: c.Expr[A] = binopSearch[A]("quot" :: ("$" + "div") :: Nil) getOrElse failedSearch("quot", "/~")
   def div[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "div")
   def mod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] = binop[A]("$" + "percent")
@@ -233,11 +241,15 @@ case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
         Select(Ident(termName(c)("zero")), termName(c)("minus")),
         List(Ident(termName(c)("x")))))
     }
+  /* TODO: this is a bit careless, but works for our examples */
+  def euclideanFunction[A: c.WeakTypeTag]: c.Expr[BigInt] = {
+    import c.universe._
+    c.Expr[BigInt](q"_root_.scala.BigInt(x.toBigInteger).abs")
+  }
   def quot[A: c.WeakTypeTag]: c.Expr[A] =
     binopSearch[A]("quot" :: "divide" :: "div" :: Nil) getOrElse failedSearch("quot", "/~")
   def mod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] =
     binopSearch("mod" :: "remainder" :: Nil) getOrElse stub
-
   def equals: c.Expr[Boolean] = binop[Boolean]("equals")
   def compare: c.Expr[Int] = binop[Int]("compareTo")
 }
@@ -273,7 +285,7 @@ object ScalaAutoMacros {
     val ops = ScalaAlgebra[c.type](c)
     c.universe.reify {
       new Semigroup[A] {
-        def op(x: A, y: A): A = ops.plusplus[A].splice
+        def combine(x: A, y: A): A = ops.plusplus[A].splice
       }
     }
   }
@@ -282,8 +294,8 @@ object ScalaAutoMacros {
     val ops = ScalaAlgebra[c.type](c)
     c.universe.reify {
       new Monoid[A] {
-        def id: A = z.splice
-        def op(x: A, y: A): A = ops.plusplus[A].splice
+        def empty: A = z.splice
+        def combine(x: A, y: A): A = ops.plusplus[A].splice
       }
     }
   }
@@ -320,11 +332,12 @@ object JavaAutoMacros {
     val ops = JavaAlgebra[c.type](c)
     val addx = ops.binop[Unit]("addAll", "z", "x")
     val addy = ops.binop[Unit]("addAll", "z", "y")
+    val z = empty
     c.universe.reify {
       new Monoid[A] {
-        def id: A = empty.splice
-        def op(x: A, y: A): A = {
-          val z = id
+        def empty: A = z.splice
+        def combine(x: A, y: A): A = {
+          val z = empty
           addx.splice
           addy.splice
           z

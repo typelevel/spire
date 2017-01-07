@@ -127,7 +127,7 @@ final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
 }
 
 final class MonoidOps[A](lhs:A)(implicit ev: Monoid[A]) {
-  def isId(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
+  def isEmpty(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
 }
 
 final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
@@ -226,13 +226,16 @@ final class SemiringOps[A](lhs:A)(implicit ev:Semiring[A]) {
   def **(rhs:Int): A = macro Ops.binop[Int, A]
 }
 
+final class GCDRingOps[A](lhs:A)(implicit ev:GCDRing[A]) {
+  def gcd(rhs:A)(implicit ev1: Eq[A]): A = macro Ops.binopWithEv2[A, Eq[A], A]
+  def lcm(rhs:A)(implicit ev1: Eq[A]): A = macro Ops.binopWithEv2[A, Eq[A], A]
+}
+
 final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
+  def euclideanFunction(): BigInt = macro Ops.unop[BigInt]
   def /~(rhs:A): A = macro Ops.binop[A, A]
   def %(rhs:A): A = macro Ops.binop[A, A]
   def /%(rhs:A): (A, A) = macro Ops.binop[A, (A, A)]
-
-  def gcd(rhs:A): A = macro Ops.binop[A, A]
-  def lcm(rhs:A): A = macro Ops.binop[A, A]
 
   // TODO: This is a bit
   def /~(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
@@ -243,9 +246,11 @@ final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def %(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
   def /%(rhs:Double)(implicit ev1:Field[A]): (A, A) = macro Ops.binopWithLift[Double, Field[A], (A, A)]
 
+  /* TODO: move to TruncatedDivision
   def /~(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) /~ rhs
   def %(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) % rhs
   def /%(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = c.toNumber(lhs) /% rhs
+   */
 }
 
 final class LiteralIntEuclideanRingOps(val lhs: Int) extends AnyVal {

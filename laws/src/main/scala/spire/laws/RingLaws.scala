@@ -42,31 +42,22 @@ trait RingLaws[A] extends GroupLaws[A] {
   def multiplicativeSemigroup(implicit A: MultiplicativeSemigroup[A]) = new MultiplicativeProperties(
     base = _.semigroup(A.multiplicative),
     parent = None,
-    "prodn(a, 1) === a" → forAll((a: A) =>
-      A.prodn(a, 1) === a
+    "pow(a, 1) === a" → forAll((a: A) =>
+      A.pow(a, 1) === a
     ),
-    "prodn(a, 2) === a * a" → forAll((a: A) =>
-      A.prodn(a, 2) === (a * a)
-    ),
-    "prodOption" → forAll((a: A) =>
-      (A.prodOption(Seq.empty[A]) === Option.empty[A]) &&
-      (A.prodOption(Seq(a)) === Option(a)) &&
-      (A.prodOption(Seq(a, a)) === Option(a * a)) &&
-      (A.prodOption(Seq(a, a, a)) === Option(a * a * a))
+    "pow(a, 2) === a * a" → forAll((a: A) =>
+      A.pow(a, 2) === (a * a)
     )
   )
 
   def multiplicativeMonoid(implicit A: MultiplicativeMonoid[A]) = new MultiplicativeProperties(
     base = _.monoid(A.multiplicative),
     parent = Some(multiplicativeSemigroup),
-    "prodn(a, 0) === one" → forAll((a: A) =>
-      A.prodn(a, 0) === A.one
+    "pow(a, 0) === one" → forAll((a: A) =>
+      A.pow(a, 0) === A.one
     ),
-    "prod(Nil) === one" → forAll((a: A) =>
-      A.prod(Nil) === A.one
-    ),
-    "isOne" → forAll((a: A) =>
-      a.isOne === (a === A.one)
+    "product(Nil) === one" → forAll((a: A) =>
+      A.product(Nil) === A.one
     )
   )
 

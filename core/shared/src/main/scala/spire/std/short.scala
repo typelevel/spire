@@ -15,6 +15,7 @@ trait ShortIsEuclideanRing extends EuclideanRing[Short] {
 
   override def fromInt(n: Int): Short = n.toShort
 
+  def euclideanFunction(a:Short): BigInt = BigInt(a).abs
   def quot(a: Short, b: Short): Short = (a / b).toShort
   def mod(a: Short, b: Short): Short = (a % b).toShort
   def gcd(a: Short, b: Short): Short = spire.math.gcd(a, b).toShort
