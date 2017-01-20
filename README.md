@@ -58,7 +58,7 @@ scala-js for both versions).
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-libraryDependencies += "org.spire-math" %% "spire" % "0.11.0"
+libraryDependencies += "org.spire-math" %% "spire" % "0.13.0"
 ```
 
 For Maven instructions, and to download the jars directly, visit the

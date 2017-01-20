@@ -107,10 +107,10 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   def complexSignum(implicit f: Field[T], o: IsReal[T], n: NRoot[T]): Complex[T] =
     if (isZero) this else this / abs
 
-  def abs(implicit f: Field[T], o: IsReal[T], n: NRoot[T]): T =
+  def abs(implicit f: Field[T], n: NRoot[T], s: Signed[T]): T =
     (real * real + imag * imag).sqrt
 
-  def arg(implicit f: Field[T], t: Trig[T], o: IsReal[T]): T =
+  def arg(implicit f: Field[T], s: Signed[T], t: Trig[T]): T =
     if (isZero) f.zero else t.atan2(imag, real)
 
   def norm(implicit f: Field[T], n: NRoot[T], o: Order[T]): T = hypot(real, imag)
@@ -120,9 +120,9 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   def asTuple: (T, T) = (real, imag)
   def asPolarTuple(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): (T, T) = (abs, arg)
 
-  def isZero(implicit o: IsReal[T]): Boolean = real.isSignZero && imag.isSignZero
-  def isImaginary(implicit o: IsReal[T]): Boolean = real.isSignZero
-  def isReal(implicit o: IsReal[T]): Boolean = imag.isSignZero
+  def isZero(implicit s: Signed[T]): Boolean = real.isSignZero && imag.isSignZero
+  def isImaginary(implicit s: Signed[T]): Boolean = real.isSignZero
+  def isReal(implicit s: Signed[T]): Boolean = imag.isSignZero
 
   def eqv(b: Complex[T])(implicit o: Eq[T]): Boolean = real === b.real && imag === b.imag
   def neqv(b: Complex[T])(implicit o: Eq[T]): Boolean = real =!= b.real || imag =!= b.imag
@@ -200,15 +200,15 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
 
   def **(b: Int)(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] = pow(b)
 
-  def nroot(k: Int)(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] =
+  def nroot(k: Int)(implicit f: Field[T], n: NRoot[T], o: Order[T], s: Signed[T], t: Trig[T]): Complex[T] =
     if (isZero) Complex.zero else pow(Complex(f.fromInt(k).reciprocal, f.zero))
 
-  def pow(b: Int)(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] =
+  def pow(b: Int)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] =
     if (isZero) Complex.zero else Complex.polar(abs.pow(b), arg * b)
 
-  def **(b: Complex[T])(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] = pow(b)
+  def **(b: Complex[T])(implicit f: Field[T], n: NRoot[T], o: Order[T], s: Signed[T], t: Trig[T]): Complex[T] = pow(b)
 
-  def pow(b: Complex[T])(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] =
+  def pow(b: Complex[T])(implicit f: Field[T], n: NRoot[T], o: Order[T], s: Signed[T], t: Trig[T]): Complex[T] =
     if (b.isZero) {
       Complex.one[T]
     } else if (this.isZero) {

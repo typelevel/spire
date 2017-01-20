@@ -61,6 +61,11 @@ trait RingLaws[A] extends GroupLaws[A] {
     )
   )
 
+  def multiplicativeCMonoid(implicit A: MultiplicativeCMonoid[A]) = new MultiplicativeProperties(
+    base = _.cMonoid(A.multiplicative),
+    parent = Some(multiplicativeMonoid)
+  )
+
   def multiplicativeGroup(implicit A: MultiplicativeGroup[A]) = new MultiplicativeProperties(
     base = _.group(A.multiplicative),
     parent = Some(multiplicativeMonoid),
@@ -99,8 +104,16 @@ trait RingLaws[A] extends GroupLaws[A] {
 
   def rig(implicit A: Rig[A]) = new RingProperties(
     name = "rig",
-    al = additiveMonoid,
+    al = additiveCMonoid,
     ml = multiplicativeMonoid,
+    parents = Seq(semiring)
+  )
+
+
+  def cRig(implicit A: CRig[A]) = new RingProperties(
+    name = "commutative rig",
+    al = additiveCMonoid,
+    ml = multiplicativeCMonoid,
     parents = Seq(semiring)
   )
 
@@ -112,10 +125,26 @@ trait RingLaws[A] extends GroupLaws[A] {
     parents = Seq(rig, rng)
   )
 
+  def divisionRing(implicit A: DivisionRing[A]) = new RingProperties(
+    name = "divisionRing",
+    al = additiveAbGroup,
+    ml = multiplicativeGroup,
+    parents = Seq(ring)
+  ) {
+    override def nonZero = true
+  }
+
+  def cRing(implicit A: CRing[A]) = new RingProperties(
+    name = "commutative ring",
+    al = additiveAbGroup,
+    ml = multiplicativeCMonoid,
+    parents = Seq(ring)
+  )
+
   def euclideanRing(implicit A: EuclideanRing[A]) = RingProperties.fromParent(
     // TODO tests?!
     name = "euclidean ring",
-    parent = ring
+    parent = cRing
   )
 
   // Everything below fields (e.g. rings) does not require their multiplication

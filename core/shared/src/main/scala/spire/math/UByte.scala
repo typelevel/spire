@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{IsIntegral, Order, Rig, Signed}
+import spire.algebra.{CRig, IsIntegral, Order, Signed}
 
 object UByte extends UByteInstances {
   @inline final def apply(n: Byte): UByte = new UByte(n)
@@ -77,7 +77,7 @@ trait UByteInstances {
   implicit final val UByteTag = new UnsignedIntTag[UByte](UByte.MinValue, UByte.MaxValue)
 }
 
-private[math] trait UByteIsRig extends Rig[UByte] {
+private[math] trait UByteIsCRig extends CRig[UByte] {
   def one: UByte = UByte(1)
   def plus(a:UByte, b:UByte): UByte = a + b
   override def pow(a:UByte, b:Int): UByte = {
@@ -142,4 +142,4 @@ private[math] class UByteBitString extends BitString[UByte] with Serializable {
 }
 
 @SerialVersionUID(0L)
-private[math] class UByteAlgebra extends UByteIsRig with UByteIsReal with Serializable
+private[math] class UByteAlgebra extends UByteIsCRig with UByteIsReal with Serializable
