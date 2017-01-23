@@ -172,10 +172,10 @@ package object prime {
         Factors.one
       } else if (isPrime(n)) {
         Factors(Map((n, 1)), Positive)
-      } else if (n % 2 == 0) {
+      } else if (n.isEven) {
         var x = n / 2
         var e = 1
-        while (x % 2 == 0) { x /= 2; e += 1 }
+        while (x.isEven) { x /= 2; e += 1 }
         Factors(Map((SafeLong(2), e)), Positive) * factor(x)
       } else {
         var divisor = rho(n, rand(n))
