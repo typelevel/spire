@@ -163,10 +163,10 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
     case n => n
   }
 
-  def quaternionSignum(implicit f: Field[A], o: Order[A], n: NRoot[A]): Quaternion[A] =
+  def quaternionSignum(implicit f: Field[A], n: NRoot[A], s: Signed[A]): Quaternion[A] =
     if (isZero) this else this / abs
 
-  def pureSignum(implicit f: Field[A], o: Order[A], n: NRoot[A]): Quaternion[A] =
+  def pureSignum(implicit f: Field[A], n: NRoot[A], s: Signed[A]): Quaternion[A] =
     if (isReal) Quaternion.zero[A] else (pure / pureAbs)
 
   def unary_-(implicit s: Rng[A]): Quaternion[A] =
