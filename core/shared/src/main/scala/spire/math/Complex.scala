@@ -191,15 +191,15 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
 
   def **(b: Int)(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] = pow(b)
 
-  def nroot(k: Int)(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] =
+  def nroot(k: Int)(implicit f: Field[T], n: NRoot[T], o: Order[T], s: Signed[T], t: Trig[T]): Complex[T] =
     if (isZero) Complex.zero else pow(Complex(f.fromInt(k).reciprocal, f.zero))
 
-  def pow(b: Int)(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] =
+  def pow(b: Int)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] =
     if (isZero) Complex.zero else Complex.polar(abs.pow(b), arg * b)
 
-  def **(b: Complex[T])(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] = pow(b)
+  def **(b: Complex[T])(implicit f: Field[T], n: NRoot[T], o: Order[T], s: Signed[T], t: Trig[T]): Complex[T] = pow(b)
 
-  def pow(b: Complex[T])(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] =
+  def pow(b: Complex[T])(implicit f: Field[T], n: NRoot[T], o: Order[T], s: Signed[T], t: Trig[T]): Complex[T] =
     if (b.isZero) {
       Complex.one[T]
     } else if (this.isZero) {

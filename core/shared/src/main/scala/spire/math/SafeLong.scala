@@ -25,6 +25,10 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
 
   def isOne: Boolean
 
+  def isOdd: Boolean
+
+  def isEven: Boolean
+
   def signum: Int
 
   final def +(rhs: SafeLong): SafeLong =
@@ -249,6 +253,8 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
 
   def isZero: Boolean = x == 0L
   def isOne: Boolean = x == 1L
+  def isOdd: Boolean = (x & 1L) != 0
+  def isEven: Boolean = (x & 1L) == 0
   def signum: Int = java.lang.Long.signum(x)
 
   def +(y: Long): SafeLong =
@@ -400,6 +406,8 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
 
   def isZero: Boolean = false // 0 will always be represented as a SafeLongLong
   def isOne: Boolean = false // 1 will always be represented as a SafeLongLong
+  def isOdd: Boolean = x.testBit(0)
+  def isEven: Boolean = !x.testBit(0)
   def signum: Int = x.signum
 
   def +(y: Long): SafeLong =
