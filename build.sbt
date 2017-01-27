@@ -334,7 +334,7 @@ lazy val extrasSettings = Seq(
 
 lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types", "Generates several type classes for Tuple2-22.")
 
-lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.13.4" % "test")
+lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion % "test")
 
 lazy val scalaTestSettings = Seq(
   libraryDependencies += "org.scalatest" %%% "scalatest" % scalaTestVersion % "test",
@@ -401,7 +401,7 @@ lazy val commonScalacOptions = Seq(
   "-language:implicitConversions",
   "-language:experimental.macros",
   "-unchecked",
-  "-Xfatal-warnings",
+//  "-Xfatal-warnings", // removed due to inlining problems
   "-Xlint",
   "-Yno-adapted-args",
   "-Ywarn-dead-code",

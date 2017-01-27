@@ -66,4 +66,4 @@ class GCDTest extends FunSuite with Checkers {
   // test("BigDecimal GCD")(check(forAll { (a: BigDecimal, b: BigDecimal) => testGcd(a, b) }))
   test("Rational GCD")(check(forAll { (a: Rational, b: Rational) => testGcd(a, b) }))
 }
- */
+*/

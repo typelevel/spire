@@ -21,7 +21,7 @@ trait Signed[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Orde
   /** Returns Zero if `a` is 0, Positive if `a` is positive, and Negative is `a` is negative. */
   def sign(a: A): Sign = Sign(signum(a))
 
-  /** Returns 0 if `a` is 0, > 0 if `a` is positive, and < 0 is `a` is negative. */
+  /** Returns 0 if `a` is 0, 1 if `a` is positive, and -1 is `a` is negative. */
   def signum(a: A): Int
 
   /** An idempotent function that ensures an object has a non-negative sign. */
@@ -51,5 +51,5 @@ trait SignedAdditiveAbGroup[@sp(Byte, Short, Int, Long, Float, Double) A] extend
 }
 
 object Signed {
-  def apply[A](implicit s: Signed[A]): Signed[A] = s
+  def apply[A](implicit ev: Signed[A]): Signed[A] = ev
 }

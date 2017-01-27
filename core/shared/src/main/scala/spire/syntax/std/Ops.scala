@@ -9,12 +9,19 @@ import spire.syntax.cfor._
 import spire.syntax.monoid._
 import spire.syntax.field._
 import spire.syntax.nroot._
-import spire.syntax.order._
 import spire.syntax.signed._
 
 final class LiteralIntOps(val lhs: Int) extends AnyVal {
-  def /~(rhs: Int): Int = lhs / rhs
-  def /%(rhs: Int): (Int, Int) = (lhs / rhs, lhs % rhs)
+  def equot(rhs: Int): Int = spire.math.tquot(lhs, rhs)
+  def emod(rhs: Int): Int = spire.math.tmod(lhs, rhs)
+  def equotmod(rhs: Int): (Int, Int) = spire.math.tquotmod(lhs, rhs)
+  def tquot(rhs: Int): Int = spire.math.tquot(lhs, rhs)
+  def tmod(rhs: Int): Int = spire.math.tmod(lhs, rhs)
+  def tquotmod(rhs: Int): (Int, Int) = spire.math.tquotmod(lhs, rhs)
+  def fquot(rhs: Int): Int = spire.math.fquot(lhs, rhs)
+  def fmod(rhs: Int): Int = spire.math.fmod(lhs, rhs)
+  def fquotmod(rhs: Int): (Int, Int) = spire.math.fquotmod(lhs, rhs)
+
   def pow(rhs: Int): Int = Math.pow(lhs, rhs).toInt
   def **(rhs: Int): Int = Math.pow(lhs, rhs).toInt
   def !(): BigInt = spire.math.fact(lhs)
@@ -22,8 +29,16 @@ final class LiteralIntOps(val lhs: Int) extends AnyVal {
 }
 
 final class LiteralLongOps(val lhs: Long) extends AnyVal {
-  def /~(rhs: Long): Long = lhs / rhs
-  def /%(rhs: Long): (Long, Long) = (lhs / rhs, lhs % rhs)
+  def equot(rhs: Long): Long = spire.math.tquot(lhs, rhs)
+  def emod(rhs: Long): Long = spire.math.tmod(lhs, rhs)
+  def equotmod(rhs: Long): (Long, Long) = spire.math.tquotmod(lhs, rhs)
+  def tquot(rhs: Long): Long = spire.math.tquot(lhs, rhs)
+  def tmod(rhs: Long): Long = spire.math.tmod(lhs, rhs)
+  def tquotmod(rhs: Long): (Long, Long) = spire.math.tquotmod(lhs, rhs)
+  def fquot(rhs: Long): Long = spire.math.fquot(lhs, rhs)
+  def fmod(rhs: Long): Long = spire.math.fmod(lhs, rhs)
+  def fquotmod(rhs: Long): (Long, Long) = spire.math.fquotmod(lhs, rhs)
+
   def pow(rhs: Long): Long = spire.math.pow(lhs, rhs)
   def **(rhs: Long): Long = spire.math.pow(lhs, rhs)
   def !(): BigInt = spire.math.fact(lhs)
@@ -40,37 +55,76 @@ class LiteralBigIntOps(val lhs: BigInt) extends AnyVal {
   def pow(rhs: BigInt): BigInt = spire.math.pow(lhs, rhs)
   def **(rhs: BigInt): BigInt = spire.math.pow(lhs, rhs)
 
+  import spire.std.bigInt.BigIntAlgebra
+  def equot(rhs: BigInt): BigInt = BigIntAlgebra.equot(lhs, rhs)
+  def emod(rhs: BigInt): BigInt = BigIntAlgebra.emod(lhs, rhs)
+  def equotmod(rhs: BigInt): (BigInt, BigInt) = BigIntAlgebra.equotmod(lhs, rhs)
+  def tquot(rhs: BigInt): BigInt = BigIntAlgebra.tquot(lhs, rhs)
+  def tmod(rhs: BigInt): BigInt = BigIntAlgebra.tmod(lhs, rhs)
+  def tquotmod(rhs: BigInt): (BigInt, BigInt) = BigIntAlgebra.tquotmod(lhs, rhs)
+  def fquot(rhs: BigInt): BigInt = BigIntAlgebra.fquot(lhs, rhs)
+  def fmod(rhs: BigInt): BigInt = BigIntAlgebra.fmod(lhs, rhs)
+  def fquotmod(rhs: BigInt): (BigInt, BigInt) = BigIntAlgebra.fquotmod(lhs, rhs)
+
   def +(rhs: SafeLong): SafeLong = SafeLong(lhs) + rhs
   def *(rhs: SafeLong): SafeLong = SafeLong(lhs) * rhs
   def -(rhs: SafeLong): SafeLong = SafeLong(lhs) - rhs
   def /(rhs: SafeLong): SafeLong = SafeLong(lhs) / rhs
-  def /~(rhs: SafeLong): SafeLong = SafeLong(lhs) /~ rhs
-  def %(rhs: SafeLong): SafeLong = SafeLong(lhs) % rhs
-  def /%(rhs: SafeLong): (SafeLong, SafeLong) = SafeLong(lhs) /% rhs
+  
+  def equot(rhs: SafeLong): SafeLong = SafeLong(lhs) equot rhs
+  def emod(rhs: SafeLong): SafeLong = SafeLong(lhs) emod rhs
+  def equotmod(rhs: SafeLong): (SafeLong, SafeLong) = SafeLong(lhs) equotmod rhs
+  def tquot(rhs: SafeLong): SafeLong = SafeLong(lhs) tquot rhs
+  def tmod(rhs: SafeLong): SafeLong = SafeLong(lhs) tmod rhs
+  def tquotmod(rhs: SafeLong): (SafeLong, SafeLong) = SafeLong(lhs) tquotmod rhs
+  def fquot(rhs: SafeLong): SafeLong = SafeLong(lhs) fquot rhs
+  def fmod(rhs: SafeLong): SafeLong = SafeLong(lhs) fmod rhs
+  def fquotmod(rhs: SafeLong): (SafeLong, SafeLong) = SafeLong(lhs) fquotmod rhs
 
   def +(rhs: Natural): BigInt = lhs + rhs.toBigInt
   def *(rhs: Natural): BigInt = lhs * rhs.toBigInt
   def -(rhs: Natural): BigInt = lhs - rhs.toBigInt
   def /(rhs: Natural): BigInt = lhs / rhs.toBigInt
-  def /~(rhs: Natural): BigInt = lhs / rhs.toBigInt
-  def %(rhs: Natural): BigInt = lhs % rhs.toBigInt
-  def /%(rhs: Natural): (BigInt, BigInt) = lhs /% rhs.toBigInt
+
+  def equot(rhs: Natural): BigInt = spire.math.tquot(lhs, rhs.toBigInt)
+  def emod(rhs: Natural): BigInt = spire.math.tmod(lhs, rhs.toBigInt)
+  def equotmod(rhs: Natural): (BigInt, BigInt) = spire.math.tquotmod(lhs, rhs.toBigInt)
+  def tquot(rhs: Natural): BigInt = spire.math.tquot(lhs, rhs.toBigInt)
+  def tmod(rhs: Natural): BigInt = spire.math.tmod(lhs, rhs.toBigInt)
+  def tquotmod(rhs: Natural): (BigInt, BigInt) = spire.math.tquotmod(lhs, rhs.toBigInt)
+  def fquot(rhs: Natural): BigInt = spire.math.fquot(lhs, rhs.toBigInt)
+  def fmod(rhs: Natural): BigInt = spire.math.fmod(lhs, rhs.toBigInt)
+  def fquotmod(rhs: Natural): (BigInt, BigInt) = spire.math.fquotmod(lhs, rhs.toBigInt)
 
   def +(rhs: ULong): BigInt = lhs + rhs.toBigInt
   def *(rhs: ULong): BigInt = lhs * rhs.toBigInt
   def -(rhs: ULong): BigInt = lhs - rhs.toBigInt
   def /(rhs: ULong): BigInt = lhs / rhs.toBigInt
-  def /~(rhs: ULong): BigInt = lhs / rhs.toBigInt
-  def %(rhs: ULong): BigInt = lhs % rhs.toBigInt
-  def /%(rhs: ULong): (BigInt, BigInt) = lhs /% rhs.toBigInt
+
+  def equot(rhs: ULong): BigInt = spire.math.tquot(lhs, rhs.toBigInt)
+  def emod(rhs: ULong): BigInt = spire.math.tmod(lhs, rhs.toBigInt)
+  def equotmod(rhs: ULong): (BigInt, BigInt) = spire.math.tquotmod(lhs, rhs.toBigInt)
+  def tquot(rhs: ULong): BigInt = spire.math.tquot(lhs, rhs.toBigInt)
+  def tmod(rhs: ULong): BigInt = spire.math.tmod(lhs, rhs.toBigInt)
+  def tquotmod(rhs: ULong): (BigInt, BigInt) = spire.math.tquotmod(lhs, rhs.toBigInt)
+  def fquot(rhs: ULong): BigInt = spire.math.fquot(lhs, rhs.toBigInt)
+  def fmod(rhs: ULong): BigInt = spire.math.fmod(lhs, rhs.toBigInt)
+  def fquotmod(rhs: ULong): (BigInt, BigInt) = spire.math.fquotmod(lhs, rhs.toBigInt)
 
   def +(rhs: Number): Number = Number(lhs) + rhs
   def *(rhs: Number): Number = Number(lhs) * rhs
   def -(rhs: Number): Number = Number(lhs) - rhs
   def /(rhs: Number): Number = Number(lhs) / rhs
-  def /~(rhs: Number): Number = Number(lhs) / rhs
-  def %(rhs: Number): Number = Number(lhs) % rhs
-  def /%(rhs: Number): (Number, Number) = Number(lhs) /% rhs
+
+  def equot(rhs: Number): Number = Number(lhs) equot rhs
+  def emod(rhs: Number): Number = Number(lhs) emod rhs
+  def equotmod(rhs: Number): (Number, Number) = Number(lhs) equotmod rhs
+  def tquot(rhs: Number): Number = Number(lhs) tquot rhs
+  def tmod(rhs: Number): Number = Number(lhs) tmod rhs
+  def tquotmod(rhs: Number): (Number, Number) = Number(lhs) tquotmod rhs
+  def fquot(rhs: Number): Number = Number(lhs) fquot rhs
+  def fmod(rhs: Number): Number = Number(lhs) fmod rhs
+  def fquotmod(rhs: Number): (Number, Number) = Number(lhs) fquotmod rhs
 }
 
 final class ArrayOps[@sp A](arr: Array[A]) {

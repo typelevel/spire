@@ -41,8 +41,8 @@ class LiteralsTest extends FunSuite {
     import spire.syntax.std.int._
     import spire.syntax.nroot._
     assert((5 ** 2) === 25)
-    assert((5 /~ 2) === 2)
-    assert((5 /% 2) === ((2, 1)))
+    assert((5 equot 2) === 2)
+    assert((5 equotmod 2) === ((2, 1)))
     assert(25.sqrt === 5)
   }
 

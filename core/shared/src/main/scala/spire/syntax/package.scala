@@ -8,6 +8,7 @@ package object syntax {
   object partialOrder extends PartialOrderSyntax
   object order extends OrderSyntax
   object signed extends SignedSyntax
+  object truncatedDivision extends TruncatedDivisionSyntax
   object isReal extends IsRealSyntax
   object convertableFrom extends ConvertableFromSyntax
 
@@ -33,6 +34,7 @@ package object syntax {
   object gcdRing extends GCDRingSyntax
   object euclideanRing extends EuclideanRingSyntax
   object field extends FieldSyntax
+  object uniqueFactorizationDomain extends UniqueFactorizationDomainSyntax
   object nroot extends NRootSyntax
   object trig extends TrigSyntax
 

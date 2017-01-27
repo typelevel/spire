@@ -259,6 +259,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
     new Jet(ar_div_br, br_inv *: (infinitesimal - (ar_div_br *: b.infinitesimal)))
   }
 
+  // TODO: what laws the following three operations obey?
   def /~(b: Jet[T])(implicit c: ClassTag[T], f: Field[T], r: IsReal[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val q = this / b
     new Jet[T](q.real.floor(), q.infinitesimal.map(r.floor))
@@ -530,42 +531,39 @@ private[math] trait JetIsRing[@sp(Float, Double) T] extends Ring[Jet[T]] {
   override def fromInt(n: Int): Jet[T] = Jet.fromInt[T](n)
 }
 
-/* TODO: Jet[T] is probably not a genuine GCD ring */
-private[math] trait JetIsGCDRing[@sp(Float, Double) T]
-    extends JetIsRing[T] with GCDRing[Jet[T]] {
-  /* TODO: What exactly is this GCD trying to achieve? Tests? */
+/*
+
+private[math] trait JetIsGCDRing[@sp(Float,Double) T]
+  extends JetIsRing[T] with GCDRing[Jet[T]] {
+
+  // TODO: check validity
   def gcd(a: Jet[T], b: Jet[T]): Jet[T] = {
     @tailrec def _gcd(a: Jet[T], b: Jet[T]): Jet[T] =
       if (b.isZero) a else _gcd(b, a - (a / b).round * b)
     _gcd(a, b)
   }
-}
 
-/* TODO: Jet[T] is probably not a genuine Euclidean ring */
+}*/
+
+/*
 private[math] trait JetIsEuclideanRing[@sp(Float,Double) T]
-    extends JetIsGCDRing[T] with EuclideanRing[Jet[T]] {
-  def euclideanFunction(a: Jet[T]): BigInt = sys.error("Clarify Jet first, see #598")
-  /* TODO: what are exactly the laws of Jet with respect to EuclideanRing ? */
-  def quot(a: Jet[T], b: Jet[T]): Jet[T] = a /~ b
-  def mod(a: Jet[T], b: Jet[T]): Jet[T] = a % b
-  override def quotmod(a: Jet[T], b: Jet[T]): (Jet[T], Jet[T]) = a /% b
-}
+  extends JetIsRing[T] with EuclideanRing[Jet[T]] {
 
-/* TODO: Jet[T] is probably not a genuine Field */
+  // TODO: add correct instances for Euclidean ring (or use the default Field implementation)?
+}
+*/
+
+
 private[math] trait JetIsField[@sp(Float,Double) T]
-    extends JetIsEuclideanRing[T] with Field[Jet[T]] {
-  /* TODO: what are exactly the laws of Jet with respect to EuclideanRing ? */
-  // duplicating methods because super[..].call() does not work on 2.10 and 2.11
-  override def euclideanFunction(a: Jet[T]): BigInt = sys.error("Clarify Jet first, see #598")
-  override def quot(a: Jet[T], b: Jet[T]): Jet[T] = a /~ b
-  override def mod(a: Jet[T], b: Jet[T]): Jet[T] = a % b
-  override def quotmod(a: Jet[T], b: Jet[T]): (Jet[T], Jet[T]) = a /% b
+  extends JetIsRing[T] with Field[Jet[T]] {
   override def fromDouble(n: Double): Jet[T] = Jet(f.fromDouble(n))
   def div(a: Jet[T], b: Jet[T]): Jet[T] = a / b
   def ceil(a: Jet[T]): Jet[T] = a.ceil
   def floor(a: Jet[T]): Jet[T] = a.floor
   def round(a: Jet[T]): Jet[T] = a.round
   def isWhole(a: Jet[T]): Boolean = a.isWhole
+  def gcd(a: Jet[T], b: Jet[T]): Jet[T] = if (a.isZero && b.isZero) zero else one
+  def lcm(a: Jet[T], b: Jet[T]): Jet[T] = a * b
 }
 
 private[math] trait JetIsTrig[@sp(Float, Double) T] extends Trig[Jet[T]] {
@@ -622,7 +620,7 @@ private[math] class JetEq[T : Eq] extends Eq[Jet[T]] with Serializable {
   override def neqv(x: Jet[T], y: Jet[T]): Boolean = x neqv y
 }
 
-/* TODO
+/* TODO Probably invalid
 private[math] trait JetIsSigned[T] extends Signed[Jet[T]] {
   implicit def f: Field[T]
   implicit def r: IsReal[T]
@@ -633,7 +631,7 @@ private[math] trait JetIsSigned[T] extends Signed[Jet[T]] {
   def abs(a: Jet[T]): Jet[T] = a.abs
   def compare(x: Jet[T], y: Jet[T]): Int = ???
 }
- */
+*/
 
 @SerialVersionUID(0L)
 private[math] class JetAlgebra[@sp(Float, Double) T](implicit

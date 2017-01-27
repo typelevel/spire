@@ -126,6 +126,13 @@ private[math] class UShortBitString extends BitString[UShort] with Serializable 
 private[math] trait UShortIsReal extends IsIntegral[UShort] with UShortSigned {
   def toDouble(n: UShort): Double = n.toDouble
   def toBigInt(n: UShort): BigInt = n.toBigInt
+  def toBigIntOption(n: UShort): Option[BigInt] = Some(n.toBigInt)
+  def tquot(a: UShort, b: UShort): UShort = a / b
+  def tmod(a: UShort, b: UShort): UShort = a % b
+  override def tquotmod(a: UShort, b: UShort): (UShort, UShort) = (a / b, a % b)
+  def fquot(a: UShort, b: UShort): UShort = a / b
+  def fmod(a: UShort, b: UShort): UShort = a % b
+  override def fquotmod(a: UShort, b: UShort): (UShort, UShort) = (a / b, a % b)
 }
 
 @SerialVersionUID(0L)

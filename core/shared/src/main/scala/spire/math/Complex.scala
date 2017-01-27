@@ -23,6 +23,9 @@ object Complex extends ComplexInstances {
   def fromInt[@sp(Float, Double) T](n: Int)(implicit f: Ring[T]): Complex[T] =
     new Complex(f.fromInt(n), f.zero)
 
+  def fromBigInt[@sp(Float, Double) T](n: BigInt)(implicit f: Ring[T]): Complex[T] =
+    new Complex(f.fromBigInt(n), f.zero)
+
   implicit def intToComplex(n: Int): Complex[Double] = new Complex(n.toDouble, 0.0)
   implicit def longToComplex(n: Long): Complex[Double] = new Complex(n.toDouble, 0.0)
   implicit def floatToComplex(n: Float): Complex[Float] = new Complex(n, 0.0F)
@@ -606,16 +609,8 @@ private[math] trait ComplexIsField[@sp(Float,Double) A] extends ComplexIsRing[A]
 
   override def fromDouble(n: Double): Complex[A] = Complex(algebra.fromDouble(n))
   def div(a: Complex[A], b: Complex[A]): Complex[A] = a / b
-  /* TODO: does it make sense?
-  def quot(a: Complex[A], b: Complex[A]): Complex[A] = a /~ b
-  def mod(a: Complex[A], b: Complex[A]): Complex[A] = a % b
-  override def quotmod(a: Complex[A], b: Complex[A]): (Complex[A], Complex[A]) = a /% b
-  def gcd(a: Complex[A], b: Complex[A]): Complex[A] = {
-    @tailrec def _gcd(a: Complex[A], b: Complex[A]): Complex[A] =
-      if (b.isZero) a else _gcd(b, a - (a / b).round * b)
-    _gcd(a, b)
-  }
-   */
+  def gcd(a: Complex[A], b: Complex[A]): Complex[A] = if (a.isZero && b.isZero) zero else one
+  def lcm(a: Complex[A], b: Complex[A]): Complex[A] = a * b
 }
 
 private[math] trait ComplexIsTrig[@sp(Float, Double) A] extends Trig[Complex[A]] {

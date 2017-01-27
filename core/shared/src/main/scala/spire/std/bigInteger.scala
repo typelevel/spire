@@ -3,7 +3,7 @@ package std
 
 import java.math.BigInteger
 
-import spire.algebra.{EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed}
+import spire.algebra._
 
 trait BigIntegerIsEuclideanRing extends EuclideanRing[BigInteger] {
   override def minus(a:BigInteger, b:BigInteger): BigInteger = a subtract b
@@ -16,14 +16,14 @@ trait BigIntegerIsEuclideanRing extends EuclideanRing[BigInteger] {
 
   override def fromInt(n: Int): BigInteger = BigInteger.valueOf(n)
 
-  def euclideanFunction(a:BigInteger): BigInt = BigInt(a).abs
-  def quot(a:BigInteger, b:BigInteger): BigInteger = a divide b
-  def mod(a:BigInteger, b:BigInteger): BigInteger = a remainder b
-  override def quotmod(a:BigInteger, b:BigInteger): (BigInteger, BigInteger) = {
+  def euclideanFunction(a: BigInteger): BigInt = BigInt(a.abs)
+  def equot(a: BigInteger, b: BigInteger): BigInteger = a divide b
+  def emod(a: BigInteger, b: BigInteger): BigInteger = a remainder b
+  override def equotmod(a: BigInteger, b: BigInteger): (BigInteger, BigInteger) = {
     val Array(d, r) = a.divideAndRemainder(b)
     (d, r)
   }
-  def gcd(a:BigInteger, b:BigInteger): BigInteger = a.gcd(b)
+  override def gcd(a: BigInteger, b: BigInteger)(implicit ev: Eq[BigInteger]): BigInteger = a gcd b
 }
 
 // This is not included in the *Instances trait!
@@ -66,9 +66,16 @@ trait BigIntegerIsSigned extends Signed[BigInteger] {
   override def abs(a: BigInteger): BigInteger = a.abs
 }
 
-trait BigIntegerIsReal extends IsIntegral[BigInteger] with BigIntegerOrder with BigIntegerIsSigned with Serializable {
+trait BigIntegerIsReal extends IsIntegral[BigInteger] with BigIntegerOrder with BigIntegerIsSigned with TruncatedDivisionCRing[BigInteger] with Serializable {
   def toDouble(n: BigInteger): Double = n.doubleValue
   def toBigInt(n: BigInteger): BigInt = n
+  def toBigIntOption(n: BigInteger): Option[BigInt] = Some(BigInt(n))
+  def tquot(a: BigInteger, b: BigInteger): BigInteger = a divide b
+  def tmod(a: BigInteger, b: BigInteger): BigInteger = a remainder b
+  override def tquotmod(a: BigInteger, b: BigInteger): (BigInteger, BigInteger) = {
+    val Array(d, r) = a.divideAndRemainder(b)
+    (d, r)
+  }
 }
 
 trait BigIntegerIsMetricSpace extends MetricSpace[BigInteger, BigInteger] {

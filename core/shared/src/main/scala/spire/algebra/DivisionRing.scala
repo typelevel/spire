@@ -14,7 +14,7 @@ object DivisionRing {
 
   @inline final def apply[A](implicit f: DivisionRing[A]): DivisionRing[A] = f
 
-  // TODO: use instead algebra Ring.fromDouble, if PR algebra/#190 is accepted
+  // TODO: use instead algebra Ring.fromDouble, when algebra > 0.6.0 is published
   /**
     * This is implemented in terms of basic ops. However, this is
     * probably significantly less efficient than can be done with a specific

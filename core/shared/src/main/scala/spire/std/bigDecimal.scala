@@ -6,7 +6,7 @@ import java.math.MathContext
 
 import BigDecimal.RoundingMode.{CEILING, FLOOR, HALF_UP}
 
-import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
+import spire.algebra._
 import spire.math.Rational
 
 trait BigDecimalIsField extends Field[BigDecimal] {
@@ -19,12 +19,8 @@ trait BigDecimalIsField extends Field[BigDecimal] {
   val zero: BigDecimal = BigDecimal(0.0)
 
   override def fromInt(n: Int): BigDecimal = BigDecimal(n)
-/* TODO: migrate to TruncatedDivision
-  def quot(a: BigDecimal, b: BigDecimal) = a.quot(b)
-  def mod(a: BigDecimal, b: BigDecimal) = a % b
-  override def quotmod(a: BigDecimal, b: BigDecimal) = a /% b
- */
   override def fromDouble(n: Double): BigDecimal = BigDecimal(n, MathContext.UNLIMITED)
+
   def div(a: BigDecimal, b: BigDecimal): BigDecimal = a / b
 }
 
@@ -56,57 +52,6 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
 
   def fpow(a: BigDecimal, b: BigDecimal): BigDecimal = spire.math.pow(a, b)
 }
-
-/* TODO: migrate to TruncatedDivision or remove
-trait BigDecimalIsGcd extends Gcd[BigDecimal] {
-  def gcd(a: BigDecimal, b: BigDecimal): BigDecimal = {
-    import java.math.BigInteger
-
-    val Two = BigInteger.valueOf(2)
-    val Five = BigInteger.valueOf(5)
-    val Ten = BigInteger.TEN
-
-    @tailrec
-    def reduce0(n: BigInteger, prime: BigInteger, shift: Int = 0): (Int, BigInteger) = {
-      val Array(div, rem) = n.divideAndRemainder(prime)
-      if (n == BigInteger.ZERO || rem != BigInteger.ZERO) {
-        (shift, n)
-      } else {
-        reduce0(div, prime, shift + 1)
-      }
-    }
-
-    def reduce(n: BigInteger): (Int, Int, BigInteger) = {
-      val (shift10, n0) = reduce0(n, Ten)
-      val (shift5, n1) = reduce0(n0, Five)
-      val (shift2, n2) = reduce0(n1, Two)
-      (shift2 + shift10, shift5 + shift10, n2)
-    }
-
-    def gcd0(val0: BigInteger, exp0: Int, val1: BigInteger, exp1: Int): BigDecimal = {
-      val (shiftTwo0, shiftFive0, shifted0) = reduce(val0)
-      val (shiftTwo1, shiftFive1, shifted1) = reduce(val1)
-      val sharedTwo = spire.math.min(shiftTwo0, shiftTwo1 + exp1 - exp0)
-      val sharedFive = spire.math.min(shiftFive0, shiftFive1 + exp1 - exp0)
-      val reshift = Two.pow(sharedTwo).multiply(Five.pow(sharedFive))
-      val n = (shifted0 gcd shifted1).multiply(reshift)
-      BigDecimal(new java.math.BigDecimal(n, -exp0))
-    }
-
-    val aJbd = a.bigDecimal
-    val aVal = aJbd.unscaledValue.abs
-    val aExp = -aJbd.scale
-
-    val bJbd = b.bigDecimal
-    val bVal = bJbd.unscaledValue.abs
-    val bExp = -bJbd.scale
-
-    if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp) else gcd0(bVal, bExp, aVal, aExp)
-  }
-
-  def lcm(a: BigDecimal, b: BigDecimal): BigDecimal = (a / gcd(a, b)) * b
-}
- */
 
 @SerialVersionUID(1L)
 class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext) extends Trig[BigDecimal] with Serializable {
@@ -159,17 +104,25 @@ trait BigDecimalOrder extends Order[BigDecimal] {
   def compare(x: BigDecimal, y: BigDecimal): Int = x.bigDecimal.compareTo(y.bigDecimal)
 }
 
-trait BigDecimalIsSigned extends Signed[BigDecimal] {
+trait BigDecimalIsSigned extends Signed[BigDecimal] with BigDecimalOrder {
   override def signum(a: BigDecimal): Int = a.signum
   override def abs(a: BigDecimal): BigDecimal = a.abs
 }
 
-trait BigDecimalIsReal extends IsRational[BigDecimal] with BigDecimalOrder with BigDecimalIsSigned {
+trait BigDecimalTruncatedDivision extends TruncatedDivisionCRing[BigDecimal] with BigDecimalIsSigned {
+  def toBigIntOption(x: BigDecimal): Option[BigInt] =
+    if (x.isWhole) Some(x.toBigInt) else None
+  def tquot(a: BigDecimal, b: BigDecimal): BigDecimal = a.quot(b)
+  def tmod(a: BigDecimal, b: BigDecimal): BigDecimal = a % b
+  override def tquotmod(a: BigDecimal, b: BigDecimal): (BigDecimal, BigDecimal) = a /% b
+}
+
+trait BigDecimalIsReal extends IsRational[BigDecimal] with BigDecimalTruncatedDivision {
   def toDouble(x: BigDecimal): Double = x.toDouble
   def ceil(a: BigDecimal): BigDecimal = a.setScale(0, CEILING)
   def floor(a: BigDecimal): BigDecimal = a.setScale(0, FLOOR)
   def round(a: BigDecimal): BigDecimal = a.setScale(0, HALF_UP)
-  def isWhole(a: BigDecimal): Boolean = a % 1.0 == 0.0
+  def isWhole(a: BigDecimal): Boolean = a.isWhole
   def toRational(a:BigDecimal): Rational = Rational(a)
 }
 

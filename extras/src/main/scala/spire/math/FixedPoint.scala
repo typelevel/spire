@@ -7,7 +7,7 @@ import spire.syntax.euclideanRing._
 import spire.syntax.convertableFrom._
 
 import java.math.MathContext
-import spire.algebra.{Order, Signed}
+import spire.algebra.{Order, Signed, TruncatedDivisionCRing}
 
 class FixedPointOverflow(n: Long) extends Exception(n.toString)
 
@@ -149,10 +149,10 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     else
       new FixedPoint(lhs.long / rhs)
 
-  def %(rhs: FixedPoint): FixedPoint =
+  def tmod(rhs: FixedPoint): FixedPoint =
     new FixedPoint(lhs.long % rhs.long)
 
-  def %(rhs: Long)(implicit scale: FixedScale): FixedPoint = {
+  def tmod(rhs: Long)(implicit scale: FixedScale): FixedPoint = {
     val d = scale.denom
     val p = rhs * d
     if (rhs == 0 || d == 0 || (d == p / rhs && (((rhs ^ d ^ p) & Long.MinValue) == 0)))
@@ -161,10 +161,10 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
       lhs
   }
 
-  def /~(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint = (lhs - lhs % rhs) / rhs
+  def tquot(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint = (lhs - lhs tmod rhs) / rhs
 
-  def /%(rhs: FixedPoint)(implicit scale: FixedScale): (FixedPoint, FixedPoint) = {
-    val rem = lhs % rhs
+  def tquotmod(rhs: FixedPoint)(implicit scale: FixedScale): (FixedPoint, FixedPoint) = {
+    val rem = lhs tmod rhs
     ((lhs - rem) / rhs, rem)
   }
 
@@ -194,6 +194,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     }
   }
 
+  // TODO: check if it is correct?
   def gcd(rhs: FixedPoint): FixedPoint =
     new FixedPoint(spire.math.gcd(lhs.long, rhs.long))
 
@@ -296,7 +297,7 @@ object FixedPoint extends FixedPointInstances {
 trait FixedPointInstances {
 
   implicit def algebra(implicit scale: FixedScale): Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint] =
-    new Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint] { self =>
+    new Fractional[FixedPoint] with TruncatedDivisionCRing[FixedPoint] { self =>
       override def abs(x: FixedPoint): FixedPoint = x.abs
       override def signum(x: FixedPoint): Int = x.signum
 
@@ -313,9 +314,10 @@ trait FixedPointInstances {
       def gcd(x: FixedPoint, y: FixedPoint): FixedPoint = x gcd y
       def lcm(x: FixedPoint, y: FixedPoint): FixedPoint = x lcm y
 
-/* TODO: check if it is not TruncatedDivision? */
-      override def quot(x: FixedPoint, y: FixedPoint): FixedPoint = x /~ y
-      override def mod(x: FixedPoint, y: FixedPoint): FixedPoint = x % y
+      def toBigIntOption(x: FixedPoint): Option[BigInt] = if (x.isWhole) Some(x.toBigInt) else None
+      def tquot(x: FixedPoint, y: FixedPoint): FixedPoint = x tquot y
+      def tmod(x: FixedPoint, y: FixedPoint): FixedPoint = x tmod y
+      override def tquotmod(x: FixedPoint, y: FixedPoint): (FixedPoint, FixedPoint) = x tquotmod y
 
       override def reciprocal(x: FixedPoint): FixedPoint = one / x
       def div(x: FixedPoint, y: FixedPoint): FixedPoint = x / y

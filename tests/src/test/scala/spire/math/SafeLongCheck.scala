@@ -52,7 +52,7 @@ class SafeLongCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     forAll { (x: BigInt, y: BigInt) =>
       if (y != 0) {
         val expected = x / y
-        invariant(SafeLong(x) /~ SafeLong(y)) shouldBe x / y
+        invariant(SafeLong(x) equot SafeLong(y)) shouldBe x / y
         invariant(SafeLong(x) / SafeLong(y)) shouldBe x / y
         invariant(SafeLong(x) / y) shouldBe x / y
       }
@@ -63,33 +63,33 @@ class SafeLongCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     invariant(smin / BigInt(-1)) shouldBe -smin
   }
 
-  property("x % y") {
+  property("x emod y") {
     forAll { (x: BigInt, y: BigInt) =>
       if (y != 0) {
-        invariant(SafeLong(x) % SafeLong(y)) shouldBe x % y
-        invariant(SafeLong(x) % y) shouldBe x % y
+        invariant(SafeLong(x) emod SafeLong(y)) shouldBe x % y
+        invariant(SafeLong(x) emod y) shouldBe x % y
       }
     }
 
-    invariant(smin % SafeLong(-1)) shouldBe zero
-    invariant(smin % -1L) shouldBe zero
-    invariant(smin % BigInt(-1)) shouldBe zero
+    invariant(smin emod SafeLong(-1)) shouldBe zero
+    invariant(smin emod -1L) shouldBe zero
+    invariant(smin emod BigInt(-1)) shouldBe zero
   }
 
-  property("x /% y") {
+  property("x equotmod y") {
     forAll { (x: BigInt, y: BigInt) =>
       if (y != 0) {
         val sx = SafeLong(x)
         val sy = SafeLong(y)
-        sx /% sy shouldBe x /% y
-        sx /% y shouldBe x /% y
-        sx /% sy shouldBe ((invariant(sx / sy), invariant(sx % sy)))
+        (sx equotmod sy) shouldBe (x /% y)
+        (sx equotmod y) shouldBe (x /% y)
+        (sx equotmod sy) shouldBe ((invariant(sx / sy), invariant(sx emod sy)))
       }
     }
 
-    (smin /% SafeLong(-1)) shouldBe ((-smin, zero))
-    (smin /% -1L) shouldBe ((-smin, zero))
-    (smin /% BigInt(-1)) shouldBe ((-smin, zero))
+    (smin equotmod SafeLong(-1)) shouldBe ((-smin, zero))
+    (smin equotmod -1L) shouldBe ((-smin, zero))
+    (smin equotmod BigInt(-1)) shouldBe ((-smin, zero))
   }
 
   property("x ** y") {
@@ -113,7 +113,7 @@ class SafeLongCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
         if (k < 0) {
           intercept[IllegalArgumentException] { sx.modPow(k, sm) }
         } else {
-          invariant(sx.modPow(k, sm)) shouldBe (sx pow k) % m
+          invariant(sx.modPow(k, sm)) shouldBe ((sx pow k) emod m)
         }
       }
       true shouldBe true
@@ -221,11 +221,11 @@ class SafeLongCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     // quotient
     smin / (-smin) shouldBe SafeLong.minusOne
 
-    // mod
-    smin % (-smin) shouldBe zero
+    // emod
+    (smin emod (-smin)) shouldBe zero
 
-    // quotmod
-    smin /% (-smin) shouldBe ((SafeLong.minusOne, zero))
+    // equotmod
+    (smin equotmod(-smin)) shouldBe ((SafeLong.minusOne, zero))
 
     // gcd
     smin gcd smin shouldBe firstBig

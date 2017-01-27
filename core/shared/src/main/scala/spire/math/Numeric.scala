@@ -50,8 +50,8 @@ private[math] class ByteIsNumeric extends Numeric[Byte]
     with ByteIsReal
     with Serializable {
   override def fromInt(n: Int): Byte = n.toByte
-  override def fromDouble(n: Double): Byte = n.toByte
   override def fromBigInt(n: BigInt): Byte = n.toByte
+  override def fromDouble(n: Double): Byte = n.toByte
   override def toDouble(n: Byte): Double = n.toDouble
   override def toRational(n: Byte): Rational = super[ByteIsReal].toRational(n)
   override def toAlgebraic(n: Byte): Algebraic = super[ByteIsReal].toAlgebraic(n)
@@ -69,8 +69,8 @@ private[math] class ShortIsNumeric extends Numeric[Short]
     with ShortIsReal
     with Serializable {
   override def fromInt(n: Int): Short = n.toShort
-  override def fromDouble(n: Double): Short = n.toShort
   override def fromBigInt(n: BigInt): Short = n.toShort
+  override def fromDouble(n: Double): Short = n.toShort
   override def toDouble(n: Short): Double = n.toDouble
   override def toRational(n: Short): Rational = super[ShortIsReal].toRational(n)
   override def toAlgebraic(n: Short): Algebraic = super[ShortIsReal].toAlgebraic(n)
@@ -88,8 +88,8 @@ private[math] class IntIsNumeric extends Numeric[Int]
     with IntIsReal
     with Serializable {
   override def fromInt(n: Int): Int = n
-  override def fromDouble(n: Double): Int = n.toInt
   override def fromBigInt(n: BigInt): Int = n.toInt
+  override def fromDouble(n: Double): Int = n.toInt
   override def toDouble(n: Int): Double = n.toDouble
   override def toRational(n: Int): Rational = super[IntIsReal].toRational(n)
   override def toAlgebraic(n: Int): Algebraic = super[IntIsReal].toAlgebraic(n)
@@ -107,8 +107,8 @@ private[math] class LongIsNumeric extends Numeric[Long]
     with LongIsReal
     with Serializable {
   override def fromInt(n: Int): Long = n
-  override def fromDouble(n: Double): Long = n.toLong
   override def fromBigInt(n: BigInt): Long = n.toLong
+  override def fromDouble(n: Double): Long = n.toLong
   override def toDouble(n: Long): Double = n.toDouble
   override def toRational(n: Long): Rational = super[LongIsReal].toRational(n)
   override def toAlgebraic(n: Long): Algebraic = super[LongIsReal].toAlgebraic(n)
@@ -126,8 +126,8 @@ private[math] class BigIntIsNumeric extends Numeric[BigInt]
     with BigIntIsReal
     with Serializable {
   override def fromInt(n: Int): BigInt = BigInt(n)
-  override def fromDouble(n: Double): BigInt = BigDecimal(n).toBigInt
   override def fromBigInt(n: BigInt): BigInt = n
+  override def fromDouble(n: Double): BigInt = BigDecimal(n).toBigInt
   override def toDouble(n: BigInt): Double = n.toDouble
   override def toRational(n: BigInt): Rational = super[BigIntIsReal].toRational(n)
   override def toAlgebraic(n: BigInt): Algebraic = super[BigIntIsReal].toAlgebraic(n)
@@ -145,8 +145,8 @@ private[math] class FloatIsNumeric extends Numeric[Float]
     with FloatIsReal
     with Serializable {
   override def fromInt(n: Int): Float = n.toFloat
-  override def fromDouble(n: Double): Float = n.toFloat
   override def fromBigInt(n: BigInt): Float = n.toFloat
+  override def fromDouble(n: Double): Float = n.toFloat
   override def toDouble(n: Float): Double = n.toDouble
   override def toRational(n: Float): Rational = super[FloatIsReal].toRational(n)
   override def toAlgebraic(n: Float): Algebraic = super[FloatIsReal].toAlgebraic(n)
@@ -162,8 +162,8 @@ private[math] class DoubleIsNumeric extends Numeric[Double]
     with DoubleIsReal
     with Serializable {
   override def fromInt(n: Int): Double = n.toDouble
-  override def fromDouble(n: Double): Double = n
   override def fromBigInt(n: BigInt): Double = n.toDouble
+  override def fromDouble(n: Double): Double = n
   override def toDouble(n: Double): Double = n.toDouble
   override def toRational(n: Double): Rational = super[DoubleIsReal].toRational(n)
   override def toAlgebraic(n: Double): Algebraic = super[DoubleIsReal].toAlgebraic(n)
@@ -179,8 +179,8 @@ private[math] class BigDecimalIsNumeric extends Numeric[BigDecimal]
     with BigDecimalIsReal
     with Serializable {
   override def fromInt(n: Int): BigDecimal = BigDecimal(n)
-  override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
   override def fromBigInt(n: BigInt): BigDecimal = BigDecimal(n)
+  override def fromDouble(n: Double): BigDecimal = BigDecimal(n)
   override def toDouble(n: BigDecimal): Double = n.toDouble
   override def toRational(n: BigDecimal): Rational = super[BigDecimalIsReal].toRational(n)
   override def toAlgebraic(n: BigDecimal): Algebraic = super[BigDecimalIsReal].toAlgebraic(n)
@@ -197,8 +197,8 @@ private[math] class RationalIsNumeric
     with RationalIsReal
     with Serializable {
   override def fromInt(n: Int): Rational = Rational(n)
-  override def fromDouble(n: Double): Rational = Rational(n)
   override def fromBigInt(n: BigInt): Rational = Rational(n)
+  override def fromDouble(n: Double): Rational = Rational(n)
   override def toDouble(n: Rational): Double = n.toDouble
   override def toRational(n: Rational): Rational = n
   override def toAlgebraic(n: Rational): Algebraic = super[RationalIsReal].toAlgebraic(n)
@@ -207,15 +207,14 @@ private[math] class RationalIsNumeric
 
 @SerialVersionUID(1L)
 private[math] class AlgebraicIsNumeric extends Numeric[Algebraic]
-    with AlgebraicIsField
-    with AlgebraicIsNRoot
+    with AlgebraicIsFieldWithNRoot
     with ConvertableFromAlgebraic
     with ConvertableToAlgebraic
     with AlgebraicIsReal
     with Serializable {
   override def fromInt(n: Int): Algebraic = Algebraic(n)
-  override def fromDouble(n: Double): Algebraic = Algebraic(n)
   override def fromBigInt(n: BigInt): Algebraic = Algebraic(n)
+  override def fromDouble(n: Double): Algebraic = Algebraic(n)
   override def toDouble(n: Algebraic): Double = n.toDouble
   override def toAlgebraic(n: Algebraic): Algebraic = n
   override def toReal(n: Algebraic): Real = super[AlgebraicIsReal].toReal(n)
@@ -257,6 +256,7 @@ class ComplexIsNumeric[A](implicit val algebra: Fractional[A], val trig: Trig[A]
   def nroot: NRoot[A] = algebra
 
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
+  override def fromBigInt(n: BigInt): Complex[A] = Complex.fromBigInt[A](n)
   override def fromDouble(n: Double): Complex[A] = Complex[A](algebra.fromDouble(n))
   override def fromBigInt(n: BigInt): Complex[A] = Complex[A](algebra.fromBigInt(n))
 

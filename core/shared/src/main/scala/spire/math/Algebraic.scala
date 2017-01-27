@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
 
 import spire.Platform
-import spire.algebra.{Eq, Field, IsAlgebraic, NRoot, Order, Sign}
+import spire.algebra.{Eq, Field, IsAlgebraic, NRoot, Order, Sign, TruncatedDivisionCRing}
 import spire.macros.Checked.checked
 import spire.math.poly.{ Term, BigDecimalRootRefinement, RootFinder, Roots }
 import spire.std.bigInt._
@@ -74,29 +74,26 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def /(that: Algebraic): Algebraic =
     new Algebraic(Expr.Div(this.expr, that.expr))
 
-/* TODO: migrate to TruncatedDivision
   /**
    * Returns an `Algebraic` whose value is just the integer part of
    * `this / that`. This operation is exact.
    */
-  def quot(that: Algebraic): Algebraic =
-    this /~ that
-
-  /** An alias for [[quot]]. */
-  def /~(that: Algebraic): Algebraic =
+  def tquot(that: Algebraic): Algebraic =
     Algebraic((this / that).toBigInt)
 
   /**
    * Returns an `Algebraic` whose value is the difference between `this` and
    * `(this /~ that) * that` -- the modulus.
    */
-  def mod(that: Algebraic): Algebraic =
-    this % that
+  def tmod(that: Algebraic): Algebraic =
+    this - (this tquot that) * that
 
-  /** An alias for [[mod]]. */
-  def %(that: Algebraic): Algebraic =
-    this - (this /~ that) * that
- */
+  def tquotmod(that: Algebraic): (Algebraic, Algebraic) = {
+    val tq = this tquot that
+    val tm = this - tq * that
+    (tq, tm)
+  }
+
   /** Returns the square root of this number. */
   def sqrt: Algebraic = nroot(2)
 
@@ -1527,7 +1524,7 @@ trait AlgebraicInstances {
   implicit final val AlgebraicTag = new LargeTag[Algebraic](Exact, Algebraic(0))
 }
 
-private[math] trait AlgebraicIsField extends Field[Algebraic] {
+private[math] trait AlgebraicIsFieldWithNRoot extends Field[Algebraic] with NRoot[Algebraic] {
   def zero: Algebraic = Algebraic.Zero
   def one: Algebraic = Algebraic.One
   def plus(a: Algebraic, b: Algebraic): Algebraic = a + b
@@ -1535,20 +1532,17 @@ private[math] trait AlgebraicIsField extends Field[Algebraic] {
   override def minus(a: Algebraic, b: Algebraic): Algebraic = a - b
   override def pow(a: Algebraic, b: Int): Algebraic = a pow b
   override def times(a: Algebraic, b: Algebraic): Algebraic = a * b
-  /* TODO: migrate to TruncatedDivision
-  def quot(a: Algebraic, b: Algebraic): Algebraic = a /~ b
-  def mod(a: Algebraic, b: Algebraic): Algebraic = a % b
-   */
   def div(a:Algebraic, b:Algebraic): Algebraic = a / b
   def nroot(a: Algebraic, k: Int): Algebraic = a nroot k
   def fpow(a:Algebraic, b:Algebraic): Algebraic = throw new UnsupportedOperationException("unsupported operation")
   override def fromInt(n: Int): Algebraic = Algebraic(n)
   override def fromDouble(n: Double): Algebraic = Algebraic(n)
+  def gcd(a:Algebraic, b:Algebraic): Algebraic =
+    if (a.isZero && b.isZero) zero else one
+  def lcm(a:Algebraic, b:Algebraic): Algebraic = a * b
 }
 
-private[math] trait AlgebraicIsNRoot extends NRoot[Algebraic]
-
-private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
+private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] with TruncatedDivisionCRing[Algebraic] {
   def toDouble(x: Algebraic): Double = x.toDouble
   def toAlgebraic(x: Algebraic): Algebraic = x
   def ceil(a:Algebraic): Algebraic = Algebraic(a.toBigDecimal(0, RoundingMode.CEILING))
@@ -1561,11 +1555,11 @@ private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
   override def eqv(x: Algebraic, y: Algebraic): Boolean = x.compare(y) == 0
   override def neqv(x: Algebraic, y: Algebraic): Boolean = x.compare(y) != 0
   def compare(x: Algebraic, y: Algebraic): Int = x.compare(y)
+  def toBigIntOption(x: Algebraic): Option[BigInt] = if (isWhole(x)) Some(x.toBigInt) else None
+  def tquot(x: Algebraic, y: Algebraic): Algebraic = x tquot y
+  def tmod(x: Algebraic, y: Algebraic): Algebraic = x tmod y
+  override def tquotmod(x: Algebraic, y: Algebraic): (Algebraic, Algebraic) = x tquotmod y
 }
 
 @SerialVersionUID(1L)
-class AlgebraicAlgebra
-    extends AlgebraicIsField
-    with AlgebraicIsNRoot
-    with AlgebraicIsReal
-    with Serializable
+class AlgebraicAlgebra extends AlgebraicIsFieldWithNRoot with AlgebraicIsReal with Serializable

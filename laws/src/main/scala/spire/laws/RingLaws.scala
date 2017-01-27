@@ -47,6 +47,12 @@ trait RingLaws[A] extends GroupLaws[A] {
     ),
     "pow(a, 2) === a * a" → forAll((a: A) =>
       A.pow(a, 2) === (a * a)
+    ),
+    "tryProduct" → forAll((a: A) =>
+      (A.tryProduct(Seq.empty[A]) === Option.empty[A]) &&
+      (A.tryProduct(Seq(a)) === Option(a)) &&
+      (A.tryProduct(Seq(a, a)) === Option(a * a)) &&
+      (A.tryProduct(Seq(a, a, a)) === Option(a * a * a))
     )
   )
 
@@ -109,7 +115,6 @@ trait RingLaws[A] extends GroupLaws[A] {
     parents = Seq(semiring)
   )
 
-
   def cRig(implicit A: CRig[A]) = new RingProperties(
     name = "commutative rig",
     al = additiveCMonoid,
@@ -141,10 +146,92 @@ trait RingLaws[A] extends GroupLaws[A] {
     parents = Seq(ring)
   )
 
+  def gcdRing(implicit A: GCDRing[A]) = RingProperties.fromParent(
+    name = "gcd domain",
+    parent = cRing,
+    "gcd/lcm" → forAll { (x: A, y: A) =>
+      import spire.syntax.gcdRing._
+      val d = x gcd y
+      val m = x lcm y
+      x * y === d * m
+    },
+    "gcd is commutative" → forAll { (x: A, y: A) =>
+      import spire.syntax.gcdRing._
+        (x gcd y) === (y gcd x)
+    },
+    "lcm is commutative" → forAll { (x: A, y: A) =>
+      import spire.syntax.gcdRing._
+      (x lcm y) === (y lcm x)
+    },
+    "lcm(x, 0) == 0" → forAll { (x: A) => (x lcm A.zero) === A.zero }
+  )
+
   def euclideanRing(implicit A: EuclideanRing[A]) = RingProperties.fromParent(
-    // TODO tests?!
     name = "euclidean ring",
-    parent = cRing
+    parent = gcdRing,
+    "euclidean division rule" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        val (q, r) = x equotmod y
+        x === (y * q + r)
+      }
+    },
+    "equot" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        (x equotmod y)._1 === (x equot y)
+      }
+    },
+    "emod" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        (x equotmod y)._2 === (x emod y)
+      }
+    },
+    "euclidean function" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        val (q, r) = x equotmod y
+        r.isZero || (r.euclideanFunction < y.euclideanFunction)
+      }
+    },
+    "submultiplicative function" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      (pred(x) && pred(y)) ==> {
+        x.euclideanFunction <= (x * y).euclideanFunction
+      }
+    }
+  )
+
+  def euclideanRingLimitedRange(implicit A: EuclideanRing[A]) = RingProperties.fromParent(
+    name = "euclidean ring limited range",
+    parent = gcdRing,
+    "euclidean division rule" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        val (q, r) = x equotmod y
+        x === (y * q + r)
+      }
+    },
+    "equot" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        (x equotmod y)._1 === (x equot y)
+      }
+    },
+    "emod" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        (x equotmod y)._2 === (x emod y)
+      }
+    },
+    "euclidean function" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        val (q, r) = x equotmod y
+        r.isZero || (r.euclideanFunction < y.euclideanFunction)
+      }
+    } // TODO: restore submultiplicative by adding bounds check
   )
 
   // Everything below fields (e.g. rings) does not require their multiplication
@@ -165,7 +252,6 @@ trait RingLaws[A] extends GroupLaws[A] {
   ) {
     override def nonZero = true
   }
-
 
   // property classes
 

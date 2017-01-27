@@ -63,13 +63,13 @@ final class FreeGroup[A] private (val terms: Vector[Either[A, A]]) extends AnyVa
 }
 
 object FreeGroup { companion =>
-  final def id[A]: FreeGroup[A] = new FreeGroup(Vector.empty)
+  final def empty[A]: FreeGroup[A] = new FreeGroup(Vector.empty)
 
   final def apply[A](a: A): FreeGroup[A] = lift(a)
   final def lift[A](a: A): FreeGroup[A] = new FreeGroup[A](Vector(Right(a)))
 
   implicit def FreeGroupGroup[A]: Group[FreeGroup[A]] = new Group[FreeGroup[A]] {
-    def empty: FreeGroup[A] = companion.id
+    def empty: FreeGroup[A] = companion.empty
     def combine(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |+| b
     def inverse(a: FreeGroup[A]): FreeGroup[A] = a.inverse
     override def remove(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |-| b

@@ -7,7 +7,7 @@ import spire.math.{ Real, Algebraic, Rational }
 /**
  * A simple type class for numeric types that are a subset of the reals.
  */
-trait IsReal[@sp A] extends Any with Signed[A] {
+trait IsReal[@sp A] extends Any with TruncatedDivision[A] {
   /**
    * Rounds `a` the nearest integer that is greater than or equal to `a`.
    */

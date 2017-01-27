@@ -524,9 +524,9 @@ trait PolynomialOverField[@sp(Double) C] extends PolynomialOverRing[C]
   override def divr(x: Polynomial[C], k: C): Polynomial[C] = x :/ k
 
   def euclideanFunction(x: Polynomial[C]): BigInt = x.degree
-  def quot(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = quotmod(x, y)._1
-  def mod(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = quotmod(x, y)._2
-  override def quotmod(x: Polynomial[C], y: Polynomial[C]): (Polynomial[C], Polynomial[C]) = {
+  def equot(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = equotmod(x, y)._1
+  def emod(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = equotmod(x, y)._2
+  override def equotmod(x: Polynomial[C], y: Polynomial[C]): (Polynomial[C], Polynomial[C]) = {
     require(!y.isZero, "Can't divide by polynomial of zero!")
     x match {
       case xd: poly.PolyDense[C] => poly.PolyDense.quotmodDense(xd, y)

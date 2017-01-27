@@ -145,7 +145,7 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
   testHalfop("h-division", true, (x, y, s) => x / y, _ / _)
 
-//  testHalfop("h-modulus", true, (x, y, s) => (x).%(y)(s), _ % _) // TODO: maybe test truncated division instead
+  // testHalfop("h-modulus", true, (x, y, s) => (x).%(y)(s), _ % _) // TODO: maybe test truncated division instead
 
   property("pow") {
     forAll { (x: Long, k0: Byte, d0: Byte) =>

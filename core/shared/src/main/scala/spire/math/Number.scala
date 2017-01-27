@@ -4,9 +4,10 @@ package math
 import scala.math.ScalaNumericConversions
 import java.lang.Math
 
-import spire.algebra.{Field, IsReal, IsRational, NRoot, Order, CRing, Signed, Trig}
+import spire.algebra.{CRing, EuclideanRing, Field, GCDRing, IsReal, IsRational, NRoot, Order, Signed, Trig}
 import spire.std.bigDecimal._
 import spire.syntax.isReal._
+import spire.syntax.field._
 import spire.syntax.nroot._
 
 // TODO: implement toNumber and fromNumber in ConvertableTo/From.
@@ -58,7 +59,7 @@ object Number extends NumberInstances {
   private[math] val maxDouble = BigDecimal(Double.MaxValue)
 }
 
-sealed trait Number extends ScalaNumericConversions with Serializable {
+sealed trait Number extends ScalaNumericConversions with Serializable { lhs =>
   def abs: Number
   def signum: Int
 
@@ -81,19 +82,35 @@ sealed trait Number extends ScalaNumericConversions with Serializable {
   def -(rhs: Number): Number
   def /(rhs: Number): Number
 
-  /* TODO: move to TruncatedDivision
-  def /~(rhs: Number): Number
-  def %(rhs: Number): Number
-  def /%(rhs: Number): (Number, Number)
-   */
+  def equot(rhs: Number): Number = lhs / rhs
+  def emod(rhs: Number): Number = Number.zero
+  def equotmod(rhs: Number): (Number, Number) =  (lhs / rhs, Number.zero)
+
+  def tquot(rhs: Number): Number
+  def tmod(rhs: Number): Number
+  def tquotmod(rhs: Number): (Number, Number)
+
+  def fquot(rhs: Number): Number = {
+    val (tq, tm) = lhs tquotmod rhs
+    if (tm.signum == -rhs.signum) tq - Number.one else tq
+  }
+  def fmod(rhs: Number): Number = {
+    val tm = lhs tmod rhs
+    if (tm.signum == -rhs.signum) tm + rhs else tm
+  }
+  def fquotmod(rhs: Number): (Number, Number) = {
+    val (tq, tm) = lhs tquotmod rhs
+    val signsDiffer = tm.signum == -rhs.signum
+    val fq = if (signsDiffer) tq - Number.one else tq
+    val fm = if (signsDiffer) tm + rhs else tm
+    (fq, fm)
+  }
 
   private[math] def r_-(lhs: Number): Number
   private[math] def r_/(lhs: Number): Number
-  /* TODO: move to TruncatedDivision
-  private[math] def r_/~(lhs: Number): Number
-  private[math] def r_%(lhs: Number): Number
-  private[math] def r_/%(lhs: Number): (Number, Number)
-   */
+  private[math] def r_tquot(lhs: Number): Number
+  private[math] def r_tmod(lhs: Number): Number
+  private[math] def r_tquotmod(lhs: Number): (Number, Number)
 
   def pow(rhs: Number): Number
   final def **(rhs: Number): Number = pow(rhs)
@@ -196,21 +213,18 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
     }
     case t => t r_/ lhs
   }
-
-  /* TODO: move to TruncatedDivision
-  def /~(rhs: Number): Number = rhs match {
+  def tquot(rhs: Number): Number = rhs match {
     case IntNumber(m) => IntNumber(n / m)
-    case t => t r_/~ lhs
+    case t => t r_tquot lhs
   }
-  def %(rhs: Number): Number = rhs match {
-    case IntNumber(m) => IntNumber(n % m)
-    case t => t r_% lhs
+  def tmod(rhs: Number): Number = rhs match {
+    case IntNumber(m) => IntNumber(n tmod m)
+    case t => t r_tmod lhs
   }
-  def /%(rhs: Number): (Number, Number) = rhs match {
-    case IntNumber(m) => (IntNumber(n / m), IntNumber(n % m))
-    case t => t r_/% lhs
+  def tquotmod(rhs: Number): (Number, Number) = rhs match {
+    case IntNumber(m) => (IntNumber(n tquot m), IntNumber(n tmod m))
+    case t => t r_tquotmod lhs
   }
-   */
 
   private[math] def r_-(lhs: Number): Number = lhs match {
     case IntNumber(m) => IntNumber(m - n)
@@ -226,20 +240,19 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
     }
     case t => t / lhs
   }
-  /* TODO: move to TruncatedDivision
-  private[math] def r_/~(lhs: Number): Number = lhs match {
-    case IntNumber(m) => IntNumber(m / n)
-    case t => t /~ lhs
+
+  private[math] def r_tquot(lhs: Number): Number = lhs match {
+    case IntNumber(m) => IntNumber(m tquot n)
+    case t => t tquot lhs
   }
-  private[math] def r_%(lhs: Number): Number = lhs match {
-    case IntNumber(m) => IntNumber(m % n)
-    case t => t % lhs
+  private[math] def r_tmod(lhs: Number): Number = lhs match {
+    case IntNumber(m) => IntNumber(m tmod n)
+    case t => t tmod lhs
   }
-  private[math] def r_/%(lhs: Number): (Number, Number) = lhs match {
-    case IntNumber(m) => (IntNumber(m / n), IntNumber(m % n))
-    case t => t /% lhs
+  private[math] def r_tquotmod(lhs: Number): (Number, Number) = lhs match {
+    case IntNumber(m) => (IntNumber(m tquot n), IntNumber(m tmod n))
+    case t => t tquotmod lhs
   }
-   */
 
   def pow(rhs: Number): Number = rhs match {
     case _ if rhs.canBeInt => Number(n.pow(rhs.intValue))
@@ -383,52 +396,52 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
     case FloatNumber(m) => Number(m / n)
     case t => t / lhs
   }
-  /* TODO: move to TruncatedDivision
-  def /~(rhs: Number): Number = rhs match {
+
+  def tquot(rhs: Number): Number = rhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(Math.floor(n / x))
       case SafeLongBigInteger(x) => Number(BigDecimal(n) quot BigDecimal(x))
     }
     case FloatNumber(m) => Number(Math.floor(n / m))
-    case t => t r_/~ lhs
+    case t => t r_tquot lhs
   }
-  private[math] def r_/~(lhs: Number): Number = lhs match {
+  private[math] def r_tquot(lhs: Number): Number = lhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(Math.floor(x / n))
       case SafeLongBigInteger(x) => Number(BigDecimal(x) quot n)
     }
     case FloatNumber(m) => Number(Math.floor(m / n))
-    case t => t /~ lhs
+    case t => t tquot lhs
   }
 
-  def %(rhs: Number): Number = rhs match {
+  def tmod(rhs: Number): Number = rhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(n % x)
       case SafeLongBigInteger(x) => Number(BigDecimal(n) % BigDecimal(x))
     }
     case FloatNumber(m) => Number(n % m)
-    case t => t.r_%(lhs)
+    case t => t.r_tmod(lhs)
   }
-  private[math] def r_%(lhs: Number): Number = lhs match {
+  private[math] def r_tmod(lhs: Number): Number = lhs match {
     case IntNumber(m) => m match {
       case SafeLongLong(x) => Number(x % n)
       case SafeLongBigInteger(x) => Number(BigDecimal(x) % n)
     }
     case FloatNumber(m) => Number(m % n)
-    case t => t % lhs
+    case t => t tmod lhs
   }
 
-  def /%(rhs: Number): (Number, Number) = rhs match {
+  def tquotmod(rhs: Number): (Number, Number) = rhs match {
     case IntNumber(m) => (Number(n / m.toDouble), Number(n % m.toDouble))
     case FloatNumber(m) => (Number(n / m), Number(n % m))
-    case t => t r_/% lhs
+    case t => t r_tquotmod lhs
   }
-  private[math] def r_/%(lhs: Number): (Number, Number) = lhs match {
+  private[math] def r_tquotmod(lhs: Number): (Number, Number) = lhs match {
     case IntNumber(m) => (Number(m.toDouble / n), Number(m.toDouble % n))
     case FloatNumber(m) => (Number(m / n), Number(m % n))
-    case t => t /% lhs
+    case t => t tquotmod lhs
   }
-   */
+
   def pow(rhs: Number): Number = rhs match {
     case FloatNumber(m) => Number(spire.math.pow(n, m))
     case _ if rhs.withinDouble => Number(spire.math.pow(n, rhs.doubleValue));
@@ -492,28 +505,27 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
   def *(rhs: Number): Number = Number(n * rhs.toBigDecimal)
   def -(rhs: Number): Number = Number(n - rhs.toBigDecimal)
   def /(rhs: Number): Number = Number(n / rhs.toBigDecimal)
-  /* TODO: move to TruncatedDivision
-  def /~(rhs: Number): Number = Number(n quot rhs.toBigDecimal)
-  def %(rhs: Number): Number = Number(n % rhs.toBigDecimal)
-   */
+
+  def tquot(rhs: Number): Number = Number(n quot rhs.toBigDecimal)
+  def tmod(rhs: Number): Number = Number(n % rhs.toBigDecimal)
+
   def r_-(lhs: Number): Number = Number(lhs.toBigDecimal - n)
   def r_/(lhs: Number): Number = Number(lhs.toBigDecimal / n)
-  /* TODO: move to TruncatedDivision
-  def r_/~(lhs: Number): Number = Number(lhs.toBigDecimal quot n)
-  def r_%(lhs: Number): Number = Number(lhs.toBigDecimal % n)
-   */
+  def r_tquot(lhs: Number): Number = Number(lhs.toBigDecimal quot n)
+  def r_tmod(lhs: Number): Number = Number(lhs.toBigDecimal % n)
+
   private def tuplize(t: (BigDecimal, BigDecimal)) = (DecimalNumber(t._1), DecimalNumber(t._2))
-  /* TODO: move to TruncatedDivision
-  def /%(rhs: Number): (Number, Number) = {
+
+  def tquotmod(rhs: Number): (Number, Number) = {
     val t = n /% rhs.toBigDecimal
     (Number(t._1), Number(t._2))
   }
 
-  def r_/%(lhs: Number): (Number, Number) = {
+  def r_tquotmod(lhs: Number): (Number, Number) = {
     val t = lhs.toBigDecimal /% n
     (Number(t._1), Number(t._2))
   }
-   */
+
   def pow(rhs: Number): Number = if (rhs.canBeInt) {
     Number(n.pow(rhs.intValue))
   } else {
@@ -577,32 +589,25 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
   def -(rhs: Number): Number = Number(n - rhs.toRational)
   def /(rhs: Number): Number = Number(n / rhs.toRational)
 
-  /* TODO: move to TruncatedDivision
-  def /~(rhs: Number): Number = Number(n /~ rhs.toRational)
-  def %(rhs: Number): Number = Number(n % rhs.toRational)
-   */
+  def tquot(rhs: Number): Number = Number(n tquot rhs.toRational)
+  def tmod(rhs: Number): Number = Number(n tmod rhs.toRational)
 
   def r_-(lhs: Number): Number = Number(lhs.toRational - n)
   def r_/(lhs: Number): Number = Number(lhs.toRational / n)
-
-  /* TODO: move to TruncatedDivision
-  def r_/~(lhs: Number): Number = Number(lhs.toRational /~ n)
-  def r_%(lhs: Number): Number = Number(lhs.toRational % n)
-   */
+  def r_tquot(lhs: Number): Number = Number(lhs.toRational tquot n)
+  def r_tmod(lhs: Number): Number = Number(lhs.toRational tmod n)
 
   private def tuplize(t: (Rational, Rational)) = (RationalNumber(t._1), RationalNumber(t._2))
 
-  /* TODO: move to TruncatedDivision
-  def /%(rhs: Number): (Number, Number) = {
-    val t = n /% rhs.toRational
+  def tquotmod(rhs: Number): (Number, Number) = {
+    val t = n tquotmod rhs.toRational
     (Number(t._1), Number(t._2))
   }
 
-  def r_/%(lhs: Number): (Number, Number) = {
-    val t = lhs.toRational /% n
+  def r_tquotmod(lhs: Number): (Number, Number) = {
+    val t = lhs.toRational tquotmod n
     (Number(t._1), Number(t._2))
   }
-   */
 
   def pow(rhs: Number): Number = if (rhs.canBeInt) {
     Number(n.pow(rhs.intValue))
@@ -632,20 +637,22 @@ private[math] trait NumberIsCRing extends CRing[Number] {
   override def fromInt(n: Int): Number = Number(n)
 }
 
-/* TODO: remove or find a lawful gcd that is not constant for this field
 private[math] trait NumberIsGCDRing extends GCDRing[Number] with NumberIsCRing {
-  def gcd(a: Number, b: Number): Number = Gcd.euclid(a, b)(Eq[Number], EuclideanRing[Number])
-  def lcm(a: Number, b: Number): Number = (a / gcd(a, b)) * b
+  def gcd(a: Number, b: Number): Number = {
+    if (a.isExact && b.isExact)
+      a.toRational gcd b.toRational
+    else Number.one
+  }
+  def lcm(a: Number, b: Number): Number = {
+    if (a.isExact && b.isExact)
+      a.toRational lcm b.toRational
+    else times(a, b)
+  }
 }
- */
 
-/* TODO: move to TruncatedDivision
-private[math] trait NumberIsEuclideanRing extends EuclideanRing[Number] with NumberIsCRing {
-  def quot(a:Number, b:Number) = a / b
-  def mod(a:Number, b:Number) = a % b
-  override def quotmod(a:Number, b:Number) = a /% b
+private[math] trait NumberIsEuclideanRing extends EuclideanRing[Number] with NumberIsGCDRing {
+  // nothing, euclidean ring methods are provided by field
 }
- */
 
 private[math] trait NumberIsField extends Field[Number] with NumberIsCRing {
   def div(a:Number, b:Number): Number = a / b
@@ -706,6 +713,13 @@ private[math] trait NumberIsReal extends IsRational[Number] with NumberOrder wit
   def round(a:Number): Number = a.round
   def isWhole(a:Number): Boolean = a.isWhole
   def toRational(a:Number): Rational = a.toRational
+  def toBigIntOption(x: Number): Option[BigInt] = if (x.isWhole) Some(x.toBigInt) else None
+  def tquot(x: Number, y: Number): Number = x tquot y
+  def tmod(x: Number, y: Number): Number = x tmod y
+  override def tquotmod(x: Number, y: Number): (Number, Number) = x tquotmod y
+  def fquot(x: Number, y: Number): Number = x fquot y
+  def fmod(x: Number, y: Number): Number = x fmod y
+  override def fquotmod(x: Number, y: Number): (Number, Number) = x fquotmod y
 }
 
 @SerialVersionUID(0L)

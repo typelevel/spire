@@ -18,6 +18,9 @@ object GroupLaws {
 
 trait GroupLaws[A] extends Laws {
 
+  // TODO: allow multiple parents, and remove the duplication between cMonoid
+  // and abGroup
+
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
 
@@ -52,7 +55,7 @@ trait GroupLaws[A] extends Laws {
     "combineAll(Nil) === id" → forAll((a: A) =>
       A.combineAll(Nil) === A.empty
     ),
-    "isId" → forAll((x: A) =>
+    "isEmpty" → forAll((x: A) =>
       (x === A.empty) === (x.isEmpty)
     )
   )
@@ -95,6 +98,12 @@ trait GroupLaws[A] extends Laws {
     ),
     "sumN(a, 2) === a + a" → forAll((a: A) =>
       A.sumN(a, 2) === (a + a)
+    ),
+    "trySum" → forAll((a: A) =>
+      (A.trySum(Seq.empty[A]) === Option.empty[A]) &&
+      (A.trySum(Seq(a)) === Option(a)) &&
+      (A.trySum(Seq(a, a)) === Option(a + a)) &&
+      (A.trySum(Seq(a, a, a)) === Option(a + a + a))
     )
   )
 
@@ -111,7 +120,6 @@ trait GroupLaws[A] extends Laws {
       a.isZero === (a === A.zero)
     )
   )
-
 
   def additiveCMonoid(implicit A: AdditiveCMonoid[A]) = new AdditiveProperties(
     base = cMonoid(A.additive),

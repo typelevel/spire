@@ -105,6 +105,44 @@ final class SignedOps[A:Signed](lhs: A) {
   def isSignNonNegative(): Boolean = macro Ops.unop[Boolean]
 }
 
+final class TruncatedDivisionOps[A:TruncatedDivision](lhs: A) {
+  def toBigIntOption(): Option[BigInt] = macro Ops.unop[Option[BigInt]]
+  def tquot(rhs: A): A = macro Ops.binop[A, A]
+  def tmod(rhs: A): A = macro Ops.binop[A, A]
+  def tquotmod(rhs: A): (A, A) = macro Ops.binop[A, (A, A)]
+
+  def fmod(rhs: A): A = macro Ops.binop[A, A]
+  def fquot(rhs: A): A = macro Ops.binop[A, A]
+  def fquotmod(rhs: A): (A, A) = macro Ops.binop[A, (A, A)]
+}
+
+final class LiteralIntTruncatedDivisionOps(val lhs: Int) extends AnyVal {
+  def tquot[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromInt(lhs), rhs)
+  def tmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromInt(lhs), rhs)
+  def tquotmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.tquotmod(c.fromInt(lhs), rhs)
+  def fquot[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromInt(lhs), rhs)
+  def fmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromInt(lhs), rhs)
+  def fquotmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.fquotmod(c.fromInt(lhs), rhs)
+}
+
+final class LiteralLongTruncatedDivisionOps(val lhs: Long) extends AnyVal {
+  def tquot[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromLong(lhs), rhs)
+  def tmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromLong(lhs), rhs)
+  def tquotmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.tquotmod(c.fromLong(lhs), rhs)
+  def fquot[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromLong(lhs), rhs)
+  def fmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromLong(lhs), rhs)
+  def fquotmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.fquotmod(c.fromLong(lhs), rhs)
+}
+
+final class LiteralDoubleTruncatedDivisionOps(val lhs: Double) extends AnyVal {
+  def tquot[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromDouble(lhs), rhs)
+  def tmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromDouble(lhs), rhs)
+  def tquotmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.tquotmod(c.fromDouble(lhs), rhs)
+  def fquot[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromDouble(lhs), rhs)
+  def fmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromDouble(lhs), rhs)
+  def fquotmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.fquotmod(c.fromDouble(lhs), rhs)
+}
+
 final class SemigroupoidOps[A](lhs:A)(implicit ev:Semigroupoid[A]) {
   def |+|? (rhs: A): Opt[A] = macro Ops.binop[A, Opt[A]]
   def |+|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
@@ -233,18 +271,20 @@ final class GCDRingOps[A](lhs:A)(implicit ev:GCDRing[A]) {
 
 final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def euclideanFunction(): BigInt = macro Ops.unop[BigInt]
-  def /~(rhs:A): A = macro Ops.binop[A, A]
-  def %(rhs:A): A = macro Ops.binop[A, A]
-  def /%(rhs:A): (A, A) = macro Ops.binop[A, (A, A)]
+  def equot(rhs:A): A = macro Ops.binop[A, A]
+  def emod(rhs:A): A = macro Ops.binop[A, A]
+  def equotmod(rhs:A): (A, A) = macro Ops.binop[A, (A, A)]
 
   // TODO: This is a bit
-  def /~(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
-  def %(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
-  def /%(rhs:Int): (A, A) = macro Ops.binopWithSelfLift[Int, Ring[A], (A, A)]
+  def equot(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
+  def emod(rhs:Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
+  def equotmod(rhs:Int): (A, A) = macro Ops.binopWithSelfLift[Int, Ring[A], (A, A)]
 
-  def /~(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
-  def %(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
-  def /%(rhs:Double)(implicit ev1:Field[A]): (A, A) = macro Ops.binopWithLift[Double, Field[A], (A, A)]
+  // TODO: should we allow Long, SafeLong and BigInt rhs here ?
+
+  def equot(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
+  def emod(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
+  def equotmod(rhs:Double)(implicit ev1:Field[A]): (A, A) = macro Ops.binopWithLift[Double, Field[A], (A, A)]
 
   /* TODO: move to TruncatedDivision
   def /~(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) /~ rhs
@@ -254,21 +294,28 @@ final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
 }
 
 final class LiteralIntEuclideanRingOps(val lhs: Int) extends AnyVal {
-  def /~[A](rhs:A)(implicit ev: EuclideanRing[A]): A = ev.quot(ev.fromInt(lhs), rhs)
-  def %[A](rhs:A)(implicit ev: EuclideanRing[A]): A = ev.mod(ev.fromInt(lhs), rhs)
-  def /%[A](rhs:A)(implicit ev: EuclideanRing[A]): (A, A) = ev.quotmod(ev.fromInt(lhs), rhs)
+  def equot[A](rhs:A)(implicit ev: EuclideanRing[A]): A = ev.equot(ev.fromInt(lhs), rhs)
+  def emod[A](rhs:A)(implicit ev: EuclideanRing[A]): A = ev.emod(ev.fromInt(lhs), rhs)
+  def equotmod[A](rhs:A)(implicit ev: EuclideanRing[A]): (A, A) = ev.equotmod(ev.fromInt(lhs), rhs)
 }
 
 final class LiteralLongEuclideanRingOps(val lhs: Long) extends AnyVal {
-  def /~[A](rhs:A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.quot(c.fromLong(lhs), rhs)
-  def %[A](rhs:A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.mod(c.fromLong(lhs), rhs)
-  def /%[A](rhs:A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): (A, A) = ev.quotmod(c.fromLong(lhs), rhs)
+  def equot[A](rhs:A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.equot(c.fromLong(lhs), rhs)
+  def emod[A](rhs:A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.emod(c.fromLong(lhs), rhs)
+  def equotmod[A](rhs:A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): (A, A) = ev.equotmod(c.fromLong(lhs), rhs)
 }
 
+// TODO: kept for now, for completeness. Should we really?
 final class LiteralDoubleEuclideanRingOps(val lhs: Double) extends AnyVal {
-  def /~[A](rhs:A)(implicit ev: Field[A]): A = ev.quot(ev.fromDouble(lhs), rhs)
-  def %[A](rhs:A)(implicit ev: Field[A]): A = ev.mod(ev.fromDouble(lhs), rhs)
-  def /%[A](rhs:A)(implicit ev: Field[A]): (A, A) = ev.quotmod(ev.fromDouble(lhs), rhs)
+  def equot[A](rhs:A)(implicit ev: Field[A]): A = ev.equot(ev.fromDouble(lhs), rhs)
+  def emod[A](rhs:A)(implicit ev: Field[A]): A = ev.emod(ev.fromDouble(lhs), rhs)
+  def equotmod[A](rhs:A)(implicit ev: Field[A]): (A, A) = ev.equotmod(ev.fromDouble(lhs), rhs)
+}
+
+final class UniqueFactorizationDomainOps[A](lhs:A)(implicit ev:UniqueFactorizationDomain[A]) {
+  import UniqueFactorizationDomain.Decomposition
+  def isPrime(): Boolean = macro Ops.unop[Boolean]
+  def factor(): Decomposition[A] = macro Ops.unop[Decomposition[A]]
 }
 
 final class IsRealOps[A](lhs:A)(implicit ev:IsReal[A]) {

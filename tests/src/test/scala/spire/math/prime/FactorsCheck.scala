@@ -53,18 +53,18 @@ class FactorsCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
     }
   }
 
-  property("Factors(n) % Factors(m) = n % m") {
+  property("Factors(n) emod Factors(m) = n emod m") {
     forAll { (n: Long, nz: NonZero[Long]) =>
       val m = nz.num
-      (Factors(n) % Factors(m)).value shouldBe SafeLong(n) % SafeLong(m)
+      (Factors(n) emod Factors(m)).value shouldBe (SafeLong(n) emod SafeLong(m))
     }
   }
 
   property("Factors(n) /% Factors(m) = n /% m") {
     forAll { (n: Long, nz: NonZero[Long]) =>
       val m = nz.num
-      val (x, y) = (Factors(n) /% Factors(m))
-      (x.value, y.value) shouldBe SafeLong(n) /% SafeLong(m)
+      val (x, y) = (Factors(n) equotmod Factors(m))
+      (x.value, y.value) shouldBe (SafeLong(n) equotmod SafeLong(m))
     }
   }
 

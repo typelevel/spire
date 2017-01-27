@@ -357,11 +357,11 @@ class RationalTest extends FunSuite {
     assert((Rational(1, Long.MaxValue) / 2).numeratorAsLong === 1L)
     assert((Rational(Long.MaxValue) * 2).denominatorAsLong === 1L)
   }
-  test("quotMod") {
+  test("equotmod") {
     val a = Rational(31, 4)
     val b = Rational(7, 9)
     assertResult(a) {
-      val (q, m) = Rational.RationalAlgebra.quotmod(a, b)
+      val (q, m) = Rational.RationalAlgebra.equotmod(a, b)
       q * b + m
     }
   }

@@ -183,7 +183,7 @@ object gen {
   def freeGroup[A: Arbitrary]: Gen[FreeGroup[A]] =
     for {
       aas <- arbitrary[List[Either[A, A]]]
-    } yield aas.foldLeft(FreeGroup.id[A]) {
+    } yield aas.foldLeft(FreeGroup.empty[A]) {
       case (acc, Left(a)) => acc |-| FreeGroup(a)
       case (acc, Right(a)) => acc |+| FreeGroup(a)
     }
@@ -191,7 +191,7 @@ object gen {
   def freeAbGroup[A: Arbitrary]: Gen[FreeAbGroup[A]] =
     for {
       tpls <- arbitrary[List[(A, Short)]]
-    } yield tpls.foldLeft(FreeAbGroup.id[A]) { case (acc, (a, n)) =>
+    } yield tpls.foldLeft(FreeAbGroup.empty[A]) { case (acc, (a, n)) =>
       acc |+| Group[FreeAbGroup[A]].combineN(FreeAbGroup(a), n.toInt)
     }
 

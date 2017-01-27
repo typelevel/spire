@@ -135,6 +135,13 @@ private[math] class UByteBitString extends BitString[UByte] with Serializable {
 private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteSigned {
   def toDouble(n: UByte): Double = n.toDouble
   def toBigInt(n: UByte): BigInt = n.toBigInt
+  def toBigIntOption(n: UByte): Option[BigInt] = Some(n.toBigInt)
+  def tquot(a: UByte, b: UByte): UByte = a / b
+  def tmod(a: UByte, b: UByte): UByte = a % b
+  override def tquotmod(a: UByte, b: UByte): (UByte, UByte) = (a / b, a % b)
+  def fquot(a: UByte, b: UByte): UByte = a / b
+  def fmod(a: UByte, b: UByte): UByte = a % b
+  override def fquotmod(a: UByte, b: UByte): (UByte, UByte) = (a / b, a % b)
 }
 
 @SerialVersionUID(0L)

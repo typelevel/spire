@@ -24,12 +24,19 @@ trait OrderSyntax extends PartialOrderSyntax {
   implicit def literalDoubleOrderOps(lhs: Double): LiteralDoubleOrderOps = new LiteralDoubleOrderOps(lhs)
 }
 
-trait IsRealSyntax extends OrderSyntax with SignedSyntax {
-  implicit def isRealOps[A:IsReal](a:A): IsRealOps[A] = new IsRealOps(a)
+trait SignedSyntax extends OrderSyntax {
+  implicit def signedOps[A:Signed](a: A): SignedOps[A] = new SignedOps(a)
 }
 
-trait SignedSyntax {
-  implicit def signedOps[A: Signed](a: A): SignedOps[A] = new SignedOps(a)
+trait TruncatedDivisionSyntax extends SignedSyntax {
+  implicit def truncatedDivisionOps[A:TruncatedDivision](a: A): TruncatedDivisionOps[A] = new TruncatedDivisionOps(a)
+  implicit def literalIntTruncatedDivisionOps(lhs:Int): LiteralIntTruncatedDivisionOps = new LiteralIntTruncatedDivisionOps(lhs)
+  implicit def literalLongTruncatedDivisionOps(lhs:Long): LiteralLongTruncatedDivisionOps = new LiteralLongTruncatedDivisionOps(lhs)
+  implicit def literalDoubleTruncatedDivisionOps(lhs:Double): LiteralDoubleTruncatedDivisionOps = new LiteralDoubleTruncatedDivisionOps(lhs)
+}
+
+trait IsRealSyntax extends TruncatedDivisionSyntax {
+  implicit def isRealOps[A:IsReal](a:A): IsRealOps[A] = new IsRealOps(a)
 }
 
 trait SemigroupoidSyntax {
@@ -113,6 +120,9 @@ trait EuclideanRingSyntax extends GCDRingSyntax {
 
 trait FieldSyntax extends EuclideanRingSyntax with MultiplicativeGroupSyntax
 
+trait UniqueFactorizationDomainSyntax {
+  implicit def uniqueFactorizationDomainOps[A:UniqueFactorizationDomain](a:A): UniqueFactorizationDomainOps[A] = new UniqueFactorizationDomainOps[A](a)
+}
 
 trait NRootSyntax {
   implicit def nrootOps[A: NRoot](a: A): NRootOps[A] = new NRootOps(a)
@@ -248,6 +258,7 @@ trait AllSyntax extends
     PartialOrderSyntax with
     OrderSyntax with
     SignedSyntax with
+    TruncatedDivisionSyntax with
     IsRealSyntax with
     ConvertableFromSyntax with
     SemigroupoidSyntax with
@@ -268,6 +279,7 @@ trait AllSyntax extends
     GCDRingSyntax with
     EuclideanRingSyntax with
     FieldSyntax with
+    UniqueFactorizationDomainSyntax with
     NRootSyntax with
     TrigSyntax with
     IntervalSyntax with
