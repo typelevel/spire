@@ -59,8 +59,8 @@ trait IntOrder extends Order[Int] {
 }
 
 trait IntIsSigned extends Signed[Int] {
-  def signum(a: Int): Int = java.lang.Integer.signum(a)
-  def abs(a: Int): Int = if (a < 0) -a else a
+  override def signum(a: Int): Int = java.lang.Integer.signum(a)
+  override def abs(a: Int): Int = if (a < 0) -a else a
 }
 
 trait IntIsReal extends IsIntegral[Int] with IntOrder with IntIsSigned {

@@ -3,7 +3,7 @@ package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import spire.algebra.{IsIntegral, Order, Rig, Signed}
+import spire.algebra.{IsIntegral, Order, Rig}
 
 import Natural._
 
@@ -725,16 +725,11 @@ private[math] trait NaturalOrder extends Order[Natural] {
   def compare(x: Natural, y: Natural): Int = x.compare(y)
 }
 
-private[math] trait NaturalIsSigned extends Signed[Natural] {
-  def signum(a: Natural): Int = if (a == Natural.zero) 0 else 1
-  def abs(a: Natural): Natural = a
-}
-
 private[math] trait NaturalIsReal extends IsIntegral[Natural]
-with NaturalOrder with NaturalIsSigned {
+with NaturalOrder {
   def toDouble(n: Natural): Double = n.toDouble
   def toBigInt(n: Natural): BigInt = n.toBigInt
 }
 
 @SerialVersionUID(0L)
-class NaturalAlgebra extends NaturalIsRig with NaturalIsReal with Serializable
+class NaturalAlgebra extends NaturalIsRig with NaturalOrder with Serializable

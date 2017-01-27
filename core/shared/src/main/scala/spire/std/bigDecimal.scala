@@ -160,8 +160,8 @@ trait BigDecimalOrder extends Order[BigDecimal] {
 }
 
 trait BigDecimalIsSigned extends Signed[BigDecimal] {
-  def signum(a: BigDecimal): Int = a.signum
-  def abs(a: BigDecimal): BigDecimal = a.abs
+  override def signum(a: BigDecimal): Int = a.signum
+  override def abs(a: BigDecimal): BigDecimal = a.abs
 }
 
 trait BigDecimalIsReal extends IsRational[BigDecimal] with BigDecimalOrder with BigDecimalIsSigned {

@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{AdditiveAbGroup, IsReal, MultiplicativeAbGroup, Order, NRoot, Ring, Trig}
+import spire.algebra.{AdditiveAbGroup, IsReal, MultiplicativeAbGroup, NRoot, Ring}
 import spire.std._
 
 
@@ -36,7 +36,7 @@ object Numeric {
   implicit final val RealIsNumeric: Numeric[Real] = new RealIsNumeric
   implicit final val RationalIsNumeric: Numeric[Rational] = new RationalIsNumeric
 
-  implicit def complexIsNumeric[A: Fractional: Trig: IsReal]: ComplexIsNumeric[A] = new ComplexIsNumeric
+  // TODO implicit def complexIsNumeric[A: Fractional: Trig: IsReal]: ComplexIsNumeric[A] = new ComplexIsNumeric
 
   @inline final def apply[A](implicit ev: Numeric[A]):Numeric[A] = ev
 }
@@ -229,7 +229,18 @@ private[math] class RealIsNumeric extends Numeric[Real] with RealIsFractional wi
   override def toDouble(n: Real): Double = n.toDouble
 }
 
+/* TODO: what to do with complex, which is not ordered?
+
 @SerialVersionUID(0L)
+<<<<<<< HEAD
+class ComplexIsNumeric[A](implicit
+    val algebra: Fractional[A], val trig: Trig[A], val order: IsReal[A])
+extends ComplexEq[A] with ComplexIsField[A] with Numeric[Complex[A]]
+with ComplexIsTrig[A] with ComplexIsNRoot[A]
+with ConvertableFromComplex[A] with ConvertableToComplex[A]
+with Serializable {
+  def scalar = this
+=======
 class ComplexIsNumeric[A](implicit val algebra: Fractional[A], val trig: Trig[A], val order: IsReal[A])
     extends ComplexEq[A]
     with ComplexIsField[A]
@@ -242,6 +253,7 @@ class ComplexIsNumeric[A](implicit val algebra: Fractional[A], val trig: Trig[A]
     with ComplexIsSigned[A]
     with Serializable {
 
+>>>>>>> master
   def nroot: NRoot[A] = algebra
 
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
@@ -259,3 +271,4 @@ class ComplexIsNumeric[A](implicit val algebra: Fractional[A], val trig: Trig[A]
   def isWhole(a: Complex[A]): Boolean = a.isWhole
   def round(a: Complex[A]): Complex[A] = a.round
 }
+ */

@@ -39,13 +39,18 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Long",       BaseLaws[Long].uniqueFactorizationDomain)
   checkAll("SafeLong",   RingLaws[SafeLong].euclideanRing)
   checkAll("BigInt",     RingLaws[BigInt].euclideanRing)
+  checkAll("BigInt",     BaseLaws[BigInt].signedAdditiveAbGroup)
   checkAll("BigInteger", RingLaws[BigInteger].euclideanRing)
   checkAll("Rational",   RingLaws[Rational].field)
+  checkAll("Rational",   BaseLaws[BigInt].signedAdditiveAbGroup)
   checkAll("Real",       RingLaws[Real].field)
-  checkAll("UByte",      RingLaws[UInt].cRig)
-  checkAll("UShort",     RingLaws[UInt].cRig)
+  checkAll("UByte",      RingLaws[UByte].cRig)
+  checkAll("UShort",     RingLaws[UShort].cRig)
   checkAll("UInt",       RingLaws[UInt].cRig)
   checkAll("ULong",      RingLaws[ULong].cRig)
+  checkAll("SafeLong",   RingLaws[SafeLong].euclideanRing)
+  checkAll("SafeLong",   BaseLaws[SafeLong].signedAdditiveAbGroup)
+
 
   checkAll("Complex[Rational]", RingLaws[Complex[Rational]].field)
 

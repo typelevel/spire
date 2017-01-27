@@ -25,6 +25,10 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
 
   def isOne: Boolean
 
+  def isOdd: Boolean
+
+  def isEven: Boolean
+
   def signum: Int
 
   final def +(rhs: SafeLong): SafeLong =
@@ -579,12 +583,12 @@ private[math] trait SafeLongIsUniqueFactorizationDomain extends UniqueFactorizat
 }
 
 
-private[math] trait SafeLongIsSigned extends Signed[SafeLong] {
-  def signum(a: SafeLong): Int = a.signum
-  def abs(a: SafeLong): SafeLong = a.abs
+private[math] trait SafeLongSigned extends Signed[SafeLong] with SafeLongOrder {
+  override def signum(a: SafeLong): Int = a.signum
+  override def abs(a: SafeLong): SafeLong = a.abs
 }
 
-private[math] trait SafeLongIsReal extends IsIntegral[SafeLong] with SafeLongOrder with SafeLongIsSigned {
+private[math] trait SafeLongIsReal extends IsIntegral[SafeLong] with SafeLongSigned {
   def toDouble(n: SafeLong): Double = n.toDouble
   def toBigInt(n: SafeLong): BigInt = n.toBigInt
 }

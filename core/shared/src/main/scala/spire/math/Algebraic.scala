@@ -1556,8 +1556,8 @@ private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
   def round(a:Algebraic): Algebraic = Algebraic(a.toBigDecimal(0, RoundingMode.HALF_EVEN))
   def isWhole(a:Algebraic): Boolean = a.isWhole
   override def sign(a: Algebraic): Sign = a.sign
-  def signum(a: Algebraic): Int = a.signum
-  def abs(a: Algebraic): Algebraic = a.abs
+  override def signum(a: Algebraic): Int = a.signum
+  override def abs(a: Algebraic): Algebraic = a.abs
   override def eqv(x: Algebraic, y: Algebraic): Boolean = x.compare(y) == 0
   override def neqv(x: Algebraic, y: Algebraic): Boolean = x.compare(y) != 0
   def compare(x: Algebraic, y: Algebraic): Int = x.compare(y)

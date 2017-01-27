@@ -59,8 +59,8 @@ trait LongOrder extends Order[Long] {
 }
 
 trait LongIsSigned extends Signed[Long] {
-  def signum(a: Long): Int = java.lang.Long.signum(a)
-  def abs(a: Long): Long = if (a < 0L) -a else a
+  override def signum(a: Long): Int = java.lang.Long.signum(a)
+  override def abs(a: Long): Long = if (a < 0L) -a else a
 }
 
 trait LongIsReal extends IsIntegral[Long] with LongOrder with LongIsSigned {

@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{CRig, IsIntegral, Order, Signed}
+import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid}
 
 object UInt extends UIntInstances {
   @inline final def apply(n: Int): UInt = new UInt(n)
@@ -79,7 +79,7 @@ private[math] trait UIntIsCRig extends CRig[UInt] {
   def zero: UInt = UInt(0)
 }
 
-private[math] trait UIntOrder extends Order[UInt] {
+private[math] trait UIntSigned extends SignedAdditiveCMonoid[UInt] {
   override def eqv(x:UInt, y:UInt): Boolean = x == y
   override def neqv(x:UInt, y:UInt): Boolean = x != y
   override def gt(x: UInt, y: UInt): Boolean = x > y
@@ -87,6 +87,7 @@ private[math] trait UIntOrder extends Order[UInt] {
   override def lt(x: UInt, y: UInt): Boolean = x < y
   override def lteqv(x: UInt, y: UInt): Boolean = x <= y
   def compare(x: UInt, y: UInt): Int = if (x < y) -1 else if (x > y) 1 else 0
+  def abs(x: UInt): UInt = x
 }
 
 @SerialVersionUID(0L)
@@ -115,12 +116,7 @@ private[math] class UIntBitString extends BitString[UInt] with Serializable {
   def rotateRight(n: UInt, i: Int): UInt = UInt(Integer.rotateRight(n.signed, i))
 }
 
-private[math] trait UIntIsSigned extends Signed[UInt] {
-  def signum(a: UInt): Int = java.lang.Integer.signum(a.signed) & 1
-  def abs(a: UInt): UInt = a
-}
-
-private[math] trait UIntIsReal extends IsIntegral[UInt] with UIntOrder with UIntIsSigned {
+private[math] trait UIntIsReal extends IsIntegral[UInt] with UIntSigned {
   def toDouble(n: UInt): Double = n.toDouble
   def toBigInt(n: UInt): BigInt = n.toBigInt
 }
