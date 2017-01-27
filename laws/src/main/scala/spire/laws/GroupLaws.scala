@@ -32,10 +32,10 @@ trait GroupLaws[A] extends Laws {
     "associative" → forAll((x: A, y: A, z: A) =>
       ((x |+| y) |+| z) === (x |+| (y |+| z))
     ),
-    "combineN(a, 1) === a" → forAll((a: A) =>
+    "combinen(a, 1) === a" → forAll((a: A) =>
       A.combineN(a, 1) === a
     ),
-    "combineN(a, 2) === a |+| a" → forAll((a: A) =>
+    "combinen(a, 2) === a |+| a" → forAll((a: A) =>
       A.combineN(a, 2) === (a |+| a)
     )
   )
@@ -49,10 +49,10 @@ trait GroupLaws[A] extends Laws {
     "right identity" → forAll((x: A) =>
       (x |+| A.empty) === x
     ),
-    "combineN(a, 0) === empty" → forAll((a: A) =>
+    "combineN(a, 0) === id" → forAll((a: A) =>
       A.combineN(a, 0) === A.empty
     ),
-    "combineAll(Nil) === empty" → forAll((a: A) =>
+    "combineAll(Nil) === id" → forAll((a: A) =>
       A.combineAll(Nil) === A.empty
     ),
     "isEmpty" → forAll((x: A) =>
@@ -123,16 +123,7 @@ trait GroupLaws[A] extends Laws {
 
   def additiveCMonoid(implicit A: AdditiveCMonoid[A]) = new AdditiveProperties(
     base = cMonoid(A.additive),
-    parent = Some(additiveSemigroup),
-    "sumN(a, 0) === zero" → forAll((a: A) =>
-      A.sumN(a, 0) === A.zero
-    ),
-    "sum(Nil) === zero" → forAll((a: A) =>
-      A.sum(Nil) === A.zero
-    ),
-    "isZero" → forAll((a: A) =>
-      a.isZero === (a === A.zero)
-    )
+    parent = Some(additiveMonoid)
   )
 
   def additiveGroup(implicit A: AdditiveGroup[A]) = new AdditiveProperties(

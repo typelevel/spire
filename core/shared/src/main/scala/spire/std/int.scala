@@ -1,7 +1,7 @@
 package spire
 package std
 
-import spire.algebra._
+import spire.algebra.{Eq, EuclideanRing, IsIntegral, NRoot, Order, Signed, TruncatedDivisionCRing}
 import spire.math.BitString
 import java.lang.Math
 import java.lang.Integer
@@ -80,7 +80,6 @@ class IntIsBitString extends BitString[Int] with Serializable {
   def and(a: Int, b: Int): Int = a & b
   def or(a: Int, b: Int): Int = a | b
   def complement(a: Int): Int = ~a
-  override def xor(a: Int, b: Int): Int = a ^ b
 
   def signed: Boolean = true
   def width: Int = 32

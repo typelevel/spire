@@ -108,7 +108,7 @@ trait RngSyntax extends SemiringSyntax with AdditiveGroupSyntax
 trait RingSyntax extends RngSyntax with RigSyntax
 
 trait GCDRingSyntax extends RingSyntax {
-  implicit def gcdRingOps[A:GCDRing](a:A): GCDRingOps[A] = new GCDRingOps(a)
+  implicit def gcdRingOps[A: GCDRing](a:A): GCDRingOps[A] = new GCDRingOps(a)
 }
 
 trait EuclideanRingSyntax extends GCDRingSyntax {

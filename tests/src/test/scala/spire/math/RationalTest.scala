@@ -312,6 +312,7 @@ class RationalTest extends FunSuite {
     assert(Rational(1).limitToInt === Rational(1))
   }
 
+  /* TODO: have a formal definition of Rational GCD and test it
   test("gcd returns the correct rational GCD") {
     assert(Rational(1, 2).gcd(Rational(1, 3)) === Rational(1, 6))
     assert(Rational(11, 12).gcd(Rational(43, 22)) === Rational(1, 132))
@@ -332,7 +333,7 @@ class RationalTest extends FunSuite {
       assert(Rational.one.gcd(w) === Rational.one)
       assert(w.gcd(Rational.one) === Rational.one)
     }
-  }
+  }*/
 
   test("Rational(0D) is Zero") {
     assert(Rational(0D) === Rational.zero)

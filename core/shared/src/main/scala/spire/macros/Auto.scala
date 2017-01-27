@@ -147,6 +147,8 @@ abstract class AutoAlgebra extends AutoOps { ops =>
     }
   }
 
+  /* TODO: missing GCD ring. Any examples of types with .gcd and .lcm in Scala/Java ? */
+
   def EuclideanRing[A: c.WeakTypeTag](z: c.Expr[A], o: c.Expr[A])
       (ev: c.Expr[Eq[A]]): c.Expr[EuclideanRing[A]] = {
     c.universe.reify {
@@ -207,12 +209,13 @@ case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
   def minus[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "minus")
   def times[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "times")
   def negate[A: c.WeakTypeTag]: c.Expr[A] = unop[A]("unary_" + "$" + "minus")
-  def equot[A: c.WeakTypeTag]: c.Expr[A] = binopSearch[A]("quot" :: ("$" + "div") :: Nil) getOrElse failedSearch("quot", "/~")
   def div[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "div")
+  /* TODO: this is a bit careless, but works for our examples */
   def euclideanFunction[A: c.WeakTypeTag]: c.Expr[BigInt] = {
     import c.universe._
     c.Expr[BigInt](q"x.toBigInt.abs")
   }
+  def equot[A: c.WeakTypeTag]: c.Expr[A] = binopSearch[A]("quot" :: ("$" + "div") :: Nil) getOrElse failedSearch("quot", "/~")
   def emod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] = binopSearch[A]("emod" :: "mod" :: "$" + "percent" :: Nil) getOrElse failedSearch("emod", "%")
   def equals: c.Expr[Boolean] = binop[Boolean]("$" + "eq" + "$" + "eq")
   def compare: c.Expr[Int] = binop[Int]("compare")
@@ -236,6 +239,7 @@ case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
         Select(Ident(termName(c)("zero")), termName(c)("minus")),
         List(Ident(termName(c)("x")))))
     }
+  /* TODO: this is a bit careless, but works for our examples */
   def euclideanFunction[A: c.WeakTypeTag]: c.Expr[BigInt] = {
     import c.universe._
     c.Expr[BigInt](q"_root_.scala.BigInt(x.toBigInteger).abs")
@@ -244,7 +248,6 @@ case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
     binopSearch[A]("quot" :: "divide" :: "div" :: Nil) getOrElse failedSearch("quot", "/~")
   def emod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] =
     binopSearch("mod" :: "remainder" :: Nil) getOrElse stub
-
   def equals: c.Expr[Boolean] = binop[Boolean]("equals")
   def compare: c.Expr[Int] = binop[Int]("compareTo")
 }

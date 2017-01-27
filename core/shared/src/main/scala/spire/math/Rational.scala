@@ -74,10 +74,6 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     (fquot, fmod)
   }
 
-  def gcd(rhs: Rational): Rational
-  def lcm(rhs: Rational): Rational =
-    if (lhs.isZero || rhs.isZero) Rational.zero else (lhs / lhs.gcd(rhs)) * rhs
-
   def toReal: Real = Real(this)
 
   def toAlgebraic: Algebraic = Algebraic(this)
@@ -576,7 +572,7 @@ object Rational extends RationalInstances {
         val den = SafeLong(d / b) * (r.n / a)
         if (den.signum < 0) Rational(-num, -den) else Rational(num, den)
     }
-
+/* TODO: restore commutativity
     def gcd(r: Rational): Rational = if(isZero) r.abs else if(isOne) this else r match {
       case r: LongRational =>
         val dgcd: Long = spire.math.gcd(d, r.d)
@@ -602,6 +598,7 @@ object Rational extends RationalInstances {
             SafeLong(dgcd) * lm * rm)
         }
     }
+ */
 
     def floor: Rational =
       if (d == 1L) this
@@ -761,6 +758,7 @@ object Rational extends RationalInstances {
         if (den.signum < 0) Rational(-num, -den) else Rational(num, den)
     }
 
+    /* TODO: restore commutativity
     def gcd(r: Rational): Rational = r match {
       case r: LongRational => r gcd this
       case r: BigRational =>
@@ -773,6 +771,7 @@ object Rational extends RationalInstances {
           Rational((n * rm).abs gcd (r.n * lm).abs, dgcd * lm * rm)
         }
     }
+     */
 
     def floor: Rational =
       if (isWhole) this
@@ -862,8 +861,10 @@ private[math] trait RationalIsField extends Field[Rational] {
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
   def div(a:Rational, b:Rational): Rational = a / b
+/* TODO: restore
   override def gcd(a: Rational, b: Rational)(implicit ev: Eq[Rational]): Rational = a gcd b
   override def lcm(a: Rational, b: Rational)(implicit ev: Eq[Rational]): Rational = a lcm b
+ */
 }
 
 private[math] trait RationalTruncatedDivision extends TruncatedDivision[Rational] {
@@ -900,4 +901,7 @@ private[math] trait RationalIsReal extends IsRational[Rational] with RationalTru
 }
 
 @SerialVersionUID(1L)
-class RationalAlgebra extends RationalIsField with RationalIsReal with Serializable
+class RationalAlgebra
+    extends RationalIsField
+    with RationalIsReal
+    with Serializable

@@ -101,7 +101,7 @@ class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
   testBinop2("division", true, (x, y, s) => (x)./(y)(s), _ / _)
 
-  // testBinop2("modulus", true, (x, y, s) => x % y, _ % _) // TODO: maybe test truncated division instead
+//  testBinop2("modulus", true, (x, y, s) => x % y, _ % _) // TODO: maybe test truncated division instead
 
   def buildHalf(x: Long, z: Byte): (Int, Int, FixedPoint, Rational) = {
     val d = z.toInt.abs % 11

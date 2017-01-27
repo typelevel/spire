@@ -1,7 +1,7 @@
 package spire
 package std
 
-import spire.algebra._
+import spire.algebra.{Eq, EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed, TruncatedDivisionCRing}
 
 trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   override def minus(a: BigInt, b: BigInt): BigInt = a - b
@@ -19,6 +19,7 @@ trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   def emod(a: BigInt, b: BigInt): BigInt = a % b
   override def equotmod(a: BigInt, b: BigInt): (BigInt, BigInt) = a /% b
   override def gcd(a: BigInt, b: BigInt)(implicit ev: Eq[BigInt]): BigInt = a gcd b
+  override def lcm(a: BigInt, b: BigInt)(implicit ev: Eq[BigInt]) = (a / a.gcd(b)) * b
 }
 
 // This is not included in the *Instances trait!

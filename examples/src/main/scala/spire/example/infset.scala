@@ -30,12 +30,12 @@ object SetUtil {
   }
 }
 
-object PureSet { companion =>
+object PureSet { self =>
   def empty[A]: PureSet[A] = PureSet[A](a => false)
   def infinite[A]: PureSet[A] = PureSet[A](a => true)
 
   implicit def monoid[A] = new Monoid[PureSet[A]] {
-    def empty: PureSet[A] = companion.empty
+    def empty: PureSet[A] = self.empty[A]
     def combine(x: PureSet[A], y: PureSet[A]): PureSet[A] = x | y
   }
 
@@ -79,7 +79,7 @@ case class PureSet[A](f: A => Boolean) extends Function1[A, Boolean] { lhs =>
     SetUtil.powerStream(universe.filter(f))
 }
 
-object MathSet { companion =>
+object MathSet { self =>
   def empty[A]: MathSet[A] = Fin(Set.empty)
   def apply[A](as: A*): MathSet[A] = Fin(as.toSet)
   def infinite[A]: MathSet[A] = Inf(Set.empty)
@@ -125,7 +125,7 @@ object MathSet { companion =>
   }
 
   implicit def monoid[A] = new Monoid[MathSet[A]] {
-    def empty: MathSet[A] = companion.empty
+    def empty: MathSet[A] = self.empty
     def combine(x: MathSet[A], y: MathSet[A]): MathSet[A] = x | y
   }
 

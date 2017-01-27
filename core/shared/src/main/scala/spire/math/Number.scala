@@ -240,6 +240,7 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
     }
     case t => t / lhs
   }
+
   private[math] def r_tquot(lhs: Number): Number = lhs match {
     case IntNumber(m) => IntNumber(m tquot n)
     case t => t tquot lhs
@@ -504,6 +505,7 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
   def *(rhs: Number): Number = Number(n * rhs.toBigDecimal)
   def -(rhs: Number): Number = Number(n - rhs.toBigDecimal)
   def /(rhs: Number): Number = Number(n / rhs.toBigDecimal)
+
   def tquot(rhs: Number): Number = Number(n quot rhs.toBigDecimal)
   def tmod(rhs: Number): Number = Number(n % rhs.toBigDecimal)
 
@@ -586,6 +588,7 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
   def *(rhs: Number): Number = Number(n * rhs.toRational)
   def -(rhs: Number): Number = Number(n - rhs.toRational)
   def /(rhs: Number): Number = Number(n / rhs.toRational)
+
   def tquot(rhs: Number): Number = Number(n tquot rhs.toRational)
   def tmod(rhs: Number): Number = Number(n tmod rhs.toRational)
 
@@ -622,7 +625,7 @@ trait NumberInstances {
   implicit final val NumberAlgebra = new NumberAlgebra
 }
 
-private[math] trait NumberIsRing extends CRing[Number] {
+private[math] trait NumberIsCRing extends CRing[Number] {
   override def minus(a:Number, b:Number): Number = a - b
   def negate(a:Number): Number = -a
   def one: Number = Number.one
@@ -634,7 +637,7 @@ private[math] trait NumberIsRing extends CRing[Number] {
   override def fromInt(n: Int): Number = Number(n)
 }
 
-private[math] trait NumberIsGCDRing extends GCDRing[Number] with NumberIsRing {
+private[math] trait NumberIsGCDRing extends GCDRing[Number] with NumberIsCRing {
   def gcd(a: Number, b: Number): Number = {
     if (a.isExact && b.isExact)
       a.toRational gcd b.toRational
@@ -651,7 +654,7 @@ private[math] trait NumberIsEuclideanRing extends EuclideanRing[Number] with Num
   // nothing, euclidean ring methods are provided by field
 }
 
-private[math] trait NumberIsField extends Field[Number] with NumberIsEuclideanRing {
+private[math] trait NumberIsField extends Field[Number] with NumberIsCRing {
   def div(a:Number, b:Number): Number = a / b
   override def fromDouble(a: Double): Number = Number(a)
 }
@@ -720,4 +723,9 @@ private[math] trait NumberIsReal extends IsRational[Number] with NumberOrder wit
 }
 
 @SerialVersionUID(0L)
-class NumberAlgebra extends NumberIsField with NumberIsNRoot with NumberIsTrig with NumberIsReal with Serializable
+class NumberAlgebra
+    extends NumberIsField
+    with NumberIsNRoot
+    with NumberIsTrig
+    with NumberIsReal
+    with Serializable

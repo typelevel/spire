@@ -7,7 +7,8 @@ import spire.util.Opt
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import spire.macros.Checked
-import spire.algebra._
+
+import spire.algebra.{CRing, Eq, EuclideanRing, GCDRing, IsIntegral, NRoot, Order, Signed, TruncatedDivision, UniqueFactorizationDomain}
 import spire.std.long._
 import spire.std.bigInteger._
 
@@ -22,6 +23,10 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
   def isZero: Boolean
 
   def isOne: Boolean
+
+  def isOdd: Boolean
+
+  def isEven: Boolean
 
   def signum: Int
 
@@ -228,7 +233,7 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
 
   /** Returns true if this SafeLong is probably prime, false if it's definitely composite. If certainty is ≤ 0, true is returned.
     * @param certainty a measure of the uncertainty that the caller is willing to tolerate:
-    *                  if the call returns true the probability that this BigInteger is
+    *                  if the call returns true the probability that this SafeLong is
     *                  prime exceeds (1 - 1/2^certainty).
     */
   final def isProbablePrime(certainty: Int): Boolean =
@@ -238,11 +243,8 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
 
   def factor: prime.Factors = prime.factor(this)
 
-  def isOdd: Boolean
-
-  def isEven: Boolean
-
   def bitLength: Int
+
 }
 
 object SafeLong extends SafeLongInstances {
@@ -554,6 +556,7 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
 }
 
 trait SafeLongInstances {
+
   @SerialVersionUID(1L)
   implicit object SafeLongAlgebra extends SafeLongIsEuclideanRing with SafeLongIsNRoot
     with SafeLongIsUniqueFactorizationDomain with Serializable
@@ -564,7 +567,7 @@ trait SafeLongInstances {
   implicit final val SafeLongTag = new NumberTag.LargeTag[SafeLong](NumberTag.Integral, SafeLong.zero)
 }
 
-private[math] trait SafeLongIsRing extends Ring[SafeLong] {
+private[math] trait SafeLongIsCRing extends CRing[SafeLong] {
   override def minus(a:SafeLong, b:SafeLong): SafeLong = a - b
   def negate(a:SafeLong): SafeLong = -a
   val one: SafeLong = SafeLong.one
@@ -576,13 +579,18 @@ private[math] trait SafeLongIsRing extends Ring[SafeLong] {
   override def fromInt(n: Int): SafeLong = SafeLong(n)
 }
 
-private[math] trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with SafeLongIsRing {
-  def euclideanFunction(a: SafeLong): BigInt = a.abs.toBigInt
+private[math] trait SafeLongIsGCDRing extends GCDRing[SafeLong] with SafeLongIsCRing {
+  def lcm(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a lcm b
+  def gcd(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a gcd b
+}
+
+private[math] trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with SafeLongIsGCDRing {
+  override def lcm(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a lcm b
+  override def gcd(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a gcd b
+  def euclideanFunction(a:SafeLong): BigInt = a.abs.toBigInt
   def equot(a:SafeLong, b:SafeLong): SafeLong = a equot b
   def emod(a:SafeLong, b:SafeLong): SafeLong = a emod b
   override def equotmod(a:SafeLong, b:SafeLong): (SafeLong, SafeLong) = a equotmod b
-  override def gcd(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a gcd b
-  override def lcm(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a lcm b
 }
 
 private[math] trait SafeLongIsNRoot extends NRoot[SafeLong] {
@@ -612,12 +620,12 @@ private[math] trait SafeLongOrder extends Order[SafeLong] {
   def compare(x: SafeLong, y: SafeLong): Int = x compare y
 }
 
-private[math] trait SafeLongIsSigned extends Signed[SafeLong] with SafeLongOrder {
+private[math] trait SafeLongSigned extends Signed[SafeLong] with SafeLongOrder {
   override def signum(a: SafeLong): Int = a.signum
   override def abs(a: SafeLong): SafeLong = a.abs
 }
 
-private[math] trait SafeLongTruncatedDivision extends TruncatedDivision[SafeLong] with SafeLongIsSigned {
+private[math] trait SafeLongTruncatedDivision extends TruncatedDivision[SafeLong] with SafeLongSigned {
   def toBigIntOption(x: SafeLong): Option[BigInt] = Some(x.toBigInt)
   def tquot(x: SafeLong, y: SafeLong): SafeLong = x tquot y
   def tmod(x: SafeLong, y: SafeLong): SafeLong = x tmod y

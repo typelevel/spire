@@ -176,20 +176,31 @@ trait DistRing[A] extends DistRng[A] with Ring[Dist[A]] {
   def one: Dist[A] = Dist.constant(alg.one)
 }
 
-trait DistEuclideanRing[A] extends EuclideanRing[Dist[A]] with DistRing[A] {
-  def alg: EuclideanRing[A]
-  // TODO: check
-  override def euclideanFunction(a: Dist[A]): BigInt = sys.error("The Euclidean function is not defined on distributions")
-  def equot(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.equot(x(g), y(g)))
-  def emod(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.emod(x(g), y(g)))
+trait DistGCDRing[A] extends DistRing[A] with GCDRing[Dist[A]] {
+  implicit def eqA: Eq[A]
+  def alg: GCDRing[A]
+  def gcd(x: Dist[A], y: Dist[A])(implicit ev: Eq[Dist[A]]): Dist[A] =
+    new DistFromGen(g => alg.gcd(x(g), y(g)))
+  def lcm(x: Dist[A], y: Dist[A])(implicit ev: Eq[Dist[A]]): Dist[A] =
+    new DistFromGen(g => alg.lcm(x(g), y(g)))
 }
 
-trait DistField[A] extends Field[Dist[A]] with DistEuclideanRing[A] {
+trait DistEuclideanRing[A] extends DistGCDRing[A] with EuclideanRing[Dist[A]] {
+  def alg: EuclideanRing[A]
+  def equot(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.equot(x(g), y(g)))
+  def emod(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.emod(x(g), y(g)))
+  override def euclideanFunction(x: Dist[A]): BigInt = sys.error("euclideanFunction is not defined, as Dist is a monad, and euclideanFunction should return Dist[BigInt]")
+  override def gcd(x: Dist[A], y: Dist[A])(implicit ev: Eq[Dist[A]]): Dist[A] = super[DistGCDRing].gcd(x, y)
+  override def lcm(x: Dist[A], y: Dist[A])(implicit ev: Eq[Dist[A]]): Dist[A] = super[DistGCDRing].lcm(x, y)
+}
+
+trait DistField[A] extends DistEuclideanRing[A] with Field[Dist[A]] {
   def alg: Field[A]
   def div(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.div(x(g), y(g)))
   override def reciprocal(x: Dist[A]): Dist[A] = new DistFromGen(g => alg.reciprocal(x(g)))
   override def equot(x: Dist[A], y: Dist[A]): Dist[A] = super[Field].equot(x, y)
   override def emod(x: Dist[A], y: Dist[A]): Dist[A] = super[Field].emod(x, y)
+  override def euclideanFunction(x: Dist[A]): BigInt = sys.error("euclideanFunction is not defined, as Dist is a monad, and euclideanFunction should return Dist[BigInt]")
 }
 
 trait DistModule[V, K] extends Module[Dist[V], Dist[K]] {
@@ -206,8 +217,9 @@ trait DistModule[V, K] extends Module[Dist[V], Dist[K]] {
 
 trait DistVectorSpace[V, K] extends DistModule[V, K] with VectorSpace[Dist[V], Dist[K]] {
   implicit def alg: VectorSpace[V, K]
+  implicit def eqK: Eq[K]
 
-  override def scalar: Field[Dist[K]] = Dist.field(alg.scalar)
+  override def scalar: Field[Dist[K]] = Dist.field(eqK, alg.scalar)
 
   override def divr(v: Dist[V], k: Dist[K]): Dist[V] = new DistFromGen(g => v(g) :/ k(g))
 }
@@ -226,7 +238,7 @@ with InnerProductSpace[Dist[V], Dist[K]] {
   def dot(v: Dist[V], w: Dist[V]): Dist[K] = new DistFromGen(g => v(g) dot w(g))
 }
 
-object Dist extends DistInstances8 {
+object Dist extends DistInstances9 {
   @inline final def apply[A](implicit na: Dist[A]): Dist[A] = na
 
   final def apply[A, B](f: A => B)(implicit na: Dist[A]): Dist[B] =
@@ -412,31 +424,36 @@ trait DistInstances2 extends DistInstances1 {
 }
 
 trait DistInstances3 extends DistInstances2 {
-  implicit def euclideanRing[A](implicit ev: EuclideanRing[A]): EuclideanRing[Dist[A]] =
-    new DistEuclideanRing[A] { def alg = ev }
+  implicit def gcdRing[A](implicit ev1: Eq[A], ev2: GCDRing[A]): GCDRing[Dist[A]] =
+    new DistGCDRing[A] { def alg = ev2; def eqA = ev1  }
 }
 
 trait DistInstances4 extends DistInstances3 {
-  implicit def field[A](implicit ev: Field[A]): Field[Dist[A]] =
-    new DistField[A] { def alg = ev }
+  implicit def euclideanRing[A](implicit ev1: Eq[A], ev2: EuclideanRing[A]): EuclideanRing[Dist[A]] =
+    new DistEuclideanRing[A] { def alg = ev2; def eqA = ev1 }
 }
 
 trait DistInstances5 extends DistInstances4 {
-  implicit def module[V,K](implicit ev: Module[V,K]): Module[Dist[V],Dist[K]] =
-    new DistModule[V,K] { def alg = ev }
+  implicit def field[A](implicit ev1: Eq[A], ev2: Field[A]): Field[Dist[A]] =
+    new DistField[A] { def alg = ev2; def eqA = ev1 }
 }
 
 trait DistInstances6 extends DistInstances5 {
-  implicit def vectorSpace[V,K](implicit ev: VectorSpace[V,K]): VectorSpace[Dist[V],Dist[K]] =
-    new DistVectorSpace[V,K] { def alg = ev }
+  implicit def module[V,K](implicit ev1: Eq[K], ev2: Module[V,K]): Module[Dist[V],Dist[K]] =
+    new DistModule[V,K] { def alg = ev2; def eqK = ev1 }
 }
 
 trait DistInstances7 extends DistInstances6 {
-  implicit def NormedVectorSpace[V,K](implicit ev: NormedVectorSpace[V,K]): NormedVectorSpace[Dist[V],Dist[K]] =
-    new DistNormedVectorSpace[V,K] { def alg = ev }
+  implicit def vectorSpace[V,K](implicit ev1: Eq[K], ev2: VectorSpace[V,K]): VectorSpace[Dist[V],Dist[K]] =
+    new DistVectorSpace[V,K] { def alg = ev2; def eqK = ev1 }
 }
 
 trait DistInstances8 extends DistInstances7 {
-  implicit def InnerProductSpace[V,K](implicit ev: InnerProductSpace[V,K]): InnerProductSpace[Dist[V],Dist[K]] =
-    new DistInnerProductSpace[V,K] { def alg = ev }
+  implicit def NormedVectorSpace[V,K](implicit ev1: Eq[K], ev2: NormedVectorSpace[V,K]): NormedVectorSpace[Dist[V],Dist[K]] =
+    new DistNormedVectorSpace[V,K] { def alg = ev2; def eqK = ev1 }
+}
+
+trait DistInstances9 extends DistInstances8 {
+  implicit def InnerProductSpace[V,K](implicit ev1: Eq[K], ev2: InnerProductSpace[V,K]): InnerProductSpace[Dist[V],Dist[K]] =
+    new DistInnerProductSpace[V,K] { def alg = ev2; def eqK = ev1 }
 }

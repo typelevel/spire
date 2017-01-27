@@ -33,7 +33,8 @@ class FpFilterTest extends FunSuite with Checkers {
     def fquot(a:Bad, b:Bad) = evaluated
     def fmod(a:Bad, b:Bad) = evaluated
     def fquotmod(a:Bad, b:Bad) = evaluated
-    def gcd(a:Bad, b:Bad):Bad = evaluated
+    override def gcd(a:Bad, b:Bad)(implicit ev: Eq[Bad]):Bad = evaluated
+    override def lcm(a:Bad, b:Bad)(implicit ev: Eq[Bad]):Bad = evaluated
     override def fromDouble(n: Double): Bad = evaluated
     def times(x:Bad, b:Bad): Bad = evaluated
     def div(a:Bad, b:Bad): Bad = evaluated

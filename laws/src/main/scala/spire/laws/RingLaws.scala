@@ -62,11 +62,8 @@ trait RingLaws[A] extends GroupLaws[A] {
     "pow(a, 0) === one" → forAll((a: A) =>
       A.pow(a, 0) === A.one
     ),
-    "prod(Nil) === one" → forAll((a: A) =>
-      A.prod(Nil) === A.one
-    ),
-    "isOne" → forAll((a: A) =>
-      a.isOne === (a === A.one)
+    "product(Nil) === one" → forAll((a: A) =>
+      A.product(Nil) === A.one
     )
   )
 
@@ -133,6 +130,15 @@ trait RingLaws[A] extends GroupLaws[A] {
     parents = Seq(rig, rng)
   )
 
+  def divisionRing(implicit A: DivisionRing[A]) = new RingProperties(
+    name = "divisionRing",
+    al = additiveAbGroup,
+    ml = multiplicativeGroup,
+    parents = Seq(ring)
+  ) {
+    override def nonZero = true
+  }
+
   def cRing(implicit A: CRing[A]) = new RingProperties(
     name = "commutative ring",
     al = additiveAbGroup,
@@ -149,15 +155,14 @@ trait RingLaws[A] extends GroupLaws[A] {
       val m = x lcm y
       x * y === d * m
     },
-    // TODO: DISABLED as Rational.gcd is not commutative
-/*    "gcd is commutative" → forAll { (x: A, y: A) =>
+    "gcd is commutative" → forAll { (x: A, y: A) =>
       import spire.syntax.gcdRing._
         (x gcd y) === (y gcd x)
     },
     "lcm is commutative" → forAll { (x: A, y: A) =>
       import spire.syntax.gcdRing._
       (x lcm y) === (y lcm x)
-    },*/
+    },
     "lcm(x, 0) == 0" → forAll { (x: A) => (x lcm A.zero) === A.zero }
   )
 

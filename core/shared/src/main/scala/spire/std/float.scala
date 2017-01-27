@@ -4,6 +4,8 @@ package std
 import spire.algebra._
 import spire.math.Rational
 
+import java.lang.Math
+
 trait FloatIsField extends Field[Float] {
   override def minus(a:Float, b:Float): Float = a - b
   def negate(a:Float): Float = -a
@@ -86,7 +88,12 @@ trait FloatIsReal extends IsRational[Float] with FloatTruncatedDivision {
 }
 
 @SerialVersionUID(0L)
-class FloatAlgebra extends FloatIsField with FloatIsNRoot with FloatIsTrig with FloatIsReal with Serializable
+class FloatAlgebra
+    extends FloatIsField
+    with FloatIsNRoot
+    with FloatIsTrig
+    with FloatIsReal
+    with Serializable
 
 trait FloatInstances {
   implicit final val FloatAlgebra = new FloatAlgebra

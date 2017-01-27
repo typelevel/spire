@@ -1,7 +1,7 @@
 package spire
 package std
 
-import spire.algebra._
+import spire.algebra.{Eq, EuclideanRing, IsIntegral, NRoot, Order, Signed, TruncatedDivisionCRing}
 import spire.math.BitString
 import java.lang.Math
 
@@ -10,20 +10,7 @@ trait LongIsEuclideanRing extends EuclideanRing[Long] {
   def negate(a:Long): Long = -a
   def one: Long = 1L
   def plus(a:Long, b:Long): Long = a + b
-  override def pow(a: Long, b:Int): Long = b match {
-    case 0 => 1
-    case 1 => a
-    case 2 => a * a
-    case 3 => a * a * a
-    case _ =>
-      if (b > 0) {
-        val e = b >> 1
-        val c = if ((b & 1) == 1) a else 1
-        c * pow(a, e) * pow(a, e)
-      } else {
-        0
-      }
-  }
+  override def pow(a: Long, b:Int): Long = spire.math.pow(a, b)
   override def times(a:Long, b:Long): Long = a * b
   def zero: Long = 0L
 

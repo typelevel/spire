@@ -2,7 +2,6 @@ package spire
 package math
 package extras
 
-import spire.std.long._
 import spire.syntax.order._
 import spire.syntax.euclideanRing._
 import spire.syntax.convertableFrom._
@@ -250,7 +249,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
 
   def fpow(k: FixedPoint)(implicit scale: FixedScale): FixedPoint = {
     val r = this.toRational
-    val g = k.long gcd scale.denom
+    val g = spire.math.gcd(k.long, scale.denom)
     val n = (k.long / g)
     val d = (scale.denom / g)
     if (n.isValidInt && d.isValidInt) {
@@ -314,6 +313,7 @@ trait FixedPointInstances {
 
       def gcd(x: FixedPoint, y: FixedPoint): FixedPoint = x gcd y
       def lcm(x: FixedPoint, y: FixedPoint): FixedPoint = x lcm y
+
       def toBigIntOption(x: FixedPoint): Option[BigInt] = if (x.isWhole) Some(x.toBigInt) else None
       def tquot(x: FixedPoint, y: FixedPoint): FixedPoint = x tquot y
       def tmod(x: FixedPoint, y: FixedPoint): FixedPoint = x tmod y

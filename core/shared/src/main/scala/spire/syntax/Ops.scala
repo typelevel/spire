@@ -265,8 +265,8 @@ final class SemiringOps[A](lhs:A)(implicit ev:Semiring[A]) {
 }
 
 final class GCDRingOps[A](lhs:A)(implicit ev:GCDRing[A]) {
-  def gcd(rhs:A): A = macro Ops.binop[A, A]
-  def lcm(rhs:A): A = macro Ops.binop[A, A]
+  def gcd(rhs:A)(implicit ev1: Eq[A]): A = macro Ops.binopWithEv2[A, Eq[A], A]
+  def lcm(rhs:A)(implicit ev1: Eq[A]): A = macro Ops.binopWithEv2[A, Eq[A], A]
 }
 
 final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
@@ -286,11 +286,11 @@ final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
   def emod(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
   def equotmod(rhs:Double)(implicit ev1:Field[A]): (A, A) = macro Ops.binopWithLift[Double, Field[A], (A, A)]
 
-  /* TODO: remove Number instance, because Number is a Field, and thus the Euclidean ring division is trivial
-  def equot(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) equot rhs
-  def emod(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) emod rhs
-  def equotmod(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = c.toNumber(lhs) equotmod rhs
-  */
+  /* TODO: move to TruncatedDivision
+  def /~(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) /~ rhs
+  def %(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) % rhs
+  def /%(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = c.toNumber(lhs) /% rhs
+   */
 }
 
 final class LiteralIntEuclideanRingOps(val lhs: Int) extends AnyVal {
@@ -313,9 +313,9 @@ final class LiteralDoubleEuclideanRingOps(val lhs: Double) extends AnyVal {
 }
 
 final class UniqueFactorizationDomainOps[A](lhs:A)(implicit ev:UniqueFactorizationDomain[A]) {
-  import UniqueFactorizationDomain.Factors
+  import UniqueFactorizationDomain.Decomposition
   def isPrime(): Boolean = macro Ops.unop[Boolean]
-  def factor(): Factors[A] = macro Ops.unop[Factors[A]]
+  def factor(): Decomposition[A] = macro Ops.unop[Decomposition[A]]
 }
 
 final class IsRealOps[A](lhs:A)(implicit ev:IsReal[A]) {

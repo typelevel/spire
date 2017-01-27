@@ -26,6 +26,7 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   case class NonZero[A](val x: A)
 
   implicit def ArbNonZero[A: Ring: Eq: Arbitrary]: Arbitrary[NonZero[A]] = {
+    import spire.syntax.eq._
     Arbitrary(arbitrary[A].map { a =>
       if (a === Ring[A].zero) Ring[A].one else a
     }.map(NonZero[A](_)))
@@ -34,6 +35,7 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   case class Positive[A](val x: A)
 
   implicit def ArbPositive[A: Ring: Eq: Signed: Arbitrary]: Arbitrary[Positive[A]] = {
+    import spire.syntax.eq._
     Arbitrary(arbitrary[A].map { a =>
       if (a === Ring[A].zero) Ring[A].one else a.abs
     }.filter(_.sign == Sign.Positive).map(Positive(_)))
@@ -328,7 +330,11 @@ trait BaseSyntaxTest {
     ((a * 3.14) === Ring[A].times(a, Field[A].fromDouble(3.14))) &&
     ((3.14 * b) === Ring[A].times(Field[A].fromDouble(3.14), b)) &&
     ((a / 3.14) === Field[A].div(a, Field[A].fromDouble(3.14))) &&
-    ((3.14 / b) === Field[A].div(Field[A].fromDouble(3.14), b))
+    ((3.14 / b) === Field[A].div(Field[A].fromDouble(3.14), b)) &&
+    ((a equot 42) === EuclideanRing[A].equot(a, Ring[A].fromInt(42))) &&
+    ((42 equot b) === EuclideanRing[A].equot(Ring[A].fromInt(42), b)) &&
+    ((a emod 42) === EuclideanRing[A].emod(a, Ring[A].fromInt(42))) &&
+    ((42 emod b) === EuclideanRing[A].emod(Ring[A].fromInt(42), b))
   }
 
   def testUniqueFactorizationDomainSyntax[A: UniqueFactorizationDomain](a: A) = {
@@ -336,7 +342,6 @@ trait BaseSyntaxTest {
     (a.isPrime == UniqueFactorizationDomain[A].isPrime(a)) &&
       (a.factor == UniqueFactorizationDomain[A].factor(a))
   }
-
 
   def testNRootSyntax[A: NRoot: Field: Eq](a: A) = {
     import spire.syntax.eq._

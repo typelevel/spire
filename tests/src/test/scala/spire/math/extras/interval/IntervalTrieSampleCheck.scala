@@ -5,7 +5,7 @@ package spire.math.extras.interval
 //import spire.std.any._
 //import spire.syntax.all._
 
-/*
+/* TODO: these tests have been commented out, why?
 object IntervalTrieSampleCheck extends Properties("IntervalSet.Sample") {
 
   // this will resolve to the Arbitrary instance for Boolean from scalacheck
@@ -111,4 +111,4 @@ object IntervalTrieSampleCheck extends Properties("IntervalSet.Sample") {
     a.intervalIterator.toIndexedSeq == a.intervals.toIndexedSeq
   }
 }
-*/
+ */

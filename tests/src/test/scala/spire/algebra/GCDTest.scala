@@ -10,7 +10,7 @@ import spire.std.float._
 import spire.std.double._
 import spire.syntax.euclideanRing._
 import spire.syntax.isReal.{ eqOps => _, _ }
-
+import spire.syntax.gcd._
 
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers
@@ -30,13 +30,18 @@ class GCDTest extends FunSuite with Checkers {
     d <- arbitrary[Long] if d != 0
   } yield Rational(n, d))
 
-  def testGcd[A: EuclideanRing: IsReal: NumberTag](x: A, y: A): Boolean = {
+  def testEuclideanGcd[A: EuclideanRing: IsReal: NumberTag](x: A, y: A): Boolean = {
+    implicit val gcd = Gcd.fromEuclideanRing[A]
+    testGcd(x, y)
+  }
+
+  def testGcd[A: EuclideanRing: Gcd: IsReal: NumberTag](x: A, y: A): Boolean = {
     (x == Ring[A].zero || y == Ring[A].zero) || {
-      val den = spire.math.gcd(x, y)
+      val den = x gcd y
       val x0 = x /~ den
       val y0 = y /~ den
       if (NumberTag[A].isFinite(x0) && NumberTag[A].isFinite(y0)) {
-        x0.isWhole && y0.isWhole && (spire.math.gcd(x0, y0) == Ring[A].one)
+        x0.isWhole && y0.isWhole && ((x0 gcd y0) == Ring[A].one)
       } else {
         // Ideally we'd filter this out at the ScalaCheck level.
         true
@@ -47,7 +52,7 @@ class GCDTest extends FunSuite with Checkers {
   test("GCD of floats with 0 exponent in result is correct") {
     val x = -1.586002E-34f
     val y = 3.3793717E-7f
-    val d = spire.math.gcd(x, y)
+    val d = spire.math.gcd(x, y)(Gcd.fromEuclideanRing)
     assert((x / d).isWhole === true)
     assert((y / d).isWhole === true)
     assert(spire.math.gcd(x / d, y / d) === 1f)

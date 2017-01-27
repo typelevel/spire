@@ -28,7 +28,7 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
   def nroot(a: BigDecimal, k: Int): BigDecimal = {
     if (a.mc.getPrecision <= 0)
       throw new ArithmeticException("Cannot find the nroot of a BigDecimal with unlimited precision.")
-    NRoot.nroot(a, k, a.mc)
+    spire.math.nroot(a, k, a.mc)
   }
 
   private[this] val two = BigDecimal(2)
@@ -127,7 +127,10 @@ trait BigDecimalIsReal extends IsRational[BigDecimal] with BigDecimalTruncatedDi
 }
 
 @SerialVersionUID(0L)
-class BigDecimalAlgebra extends BigDecimalIsField with BigDecimalIsNRoot with BigDecimalIsReal with Serializable
+class BigDecimalAlgebra extends BigDecimalIsField
+    with BigDecimalIsNRoot
+    with BigDecimalIsReal
+    with Serializable
 
 trait BigDecimalInstances {
   import BigDecimal.defaultMathContext

@@ -4,6 +4,7 @@ package std
 import spire.algebra._
 import spire.math.Rational
 
+import java.lang.Math
 
 trait DoubleIsField extends Field[Double] {
   override def minus(a:Double, b:Double): Double = a - b
@@ -15,8 +16,8 @@ trait DoubleIsField extends Field[Double] {
   def zero: Double = 0.0
 
   override def fromInt(n: Int): Double = n
-
   override def fromDouble(n: Double): Double = n
+
   def div(a:Double, b:Double): Double = a / b
 }
 

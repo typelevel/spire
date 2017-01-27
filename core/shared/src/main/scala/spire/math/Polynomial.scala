@@ -518,7 +518,7 @@ with Ring[Polynomial[C]] {
 }
 
 trait PolynomialOverField[@sp(Double) C] extends PolynomialOverRing[C]
-with EuclideanRing[Polynomial[C]] with VectorSpace[Polynomial[C], C] { self =>
+    with EuclideanRing[Polynomial[C]] with VectorSpace[Polynomial[C], C] { self =>
   implicit override val scalar: Field[C]
 
   override def divr(x: Polynomial[C], k: C): Polynomial[C] = x :/ k

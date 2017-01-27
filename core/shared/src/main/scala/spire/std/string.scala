@@ -7,6 +7,7 @@ import spire.algebra.{MetricSpace, Monoid, Order}
 class StringMonoid extends Monoid[String] with Serializable {
   def empty: String = ""
   def combine(x: String, y: String): String = x + y
+
   override def combineAll(xs: TraversableOnce[String]): String = {
     val sb = new StringBuilder
     xs.foreach(sb ++= _)

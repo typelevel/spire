@@ -24,17 +24,14 @@ final class FreeMonoid[A] private (val terms: List[A]) extends AnyVal { lhs =>
     terms.mkString(" |+| ")
 }
 
-object FreeMonoid {
-  companion =>
-  final def empty[A]: FreeMonoid[A] = new FreeMonoid(Nil) // TODO: check consistency, along with FreeGroup of empty/id
+object FreeMonoid { companion =>
+  final def empty[A]: FreeMonoid[A] = new FreeMonoid(Nil)
 
   final def apply[A](a: A): FreeMonoid[A] = lift(a)
-
   final def lift[A](a: A): FreeMonoid[A] = new FreeMonoid[A](a :: Nil)
 
   implicit def FreeMonoidMonoid[A]: Monoid[FreeMonoid[A]] = new Monoid[FreeMonoid[A]] {
     def empty: FreeMonoid[A] = companion.empty
-
     def combine(a: FreeMonoid[A], b: FreeMonoid[A]): FreeMonoid[A] = a |+| b
 
     override def combineAll(as: TraversableOnce[FreeMonoid[A]]): FreeMonoid[A] = {
