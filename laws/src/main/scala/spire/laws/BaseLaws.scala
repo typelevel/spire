@@ -61,13 +61,13 @@ trait BaseLaws[A] extends Laws {
       "all factors are prime" → forAll( (x: A) =>
         RA.isZero(x) || {
           val factorization = A.factor(x)
-          factorization.factors.keys.forall(A.isPrime(_))
+          factorization.elements.keys.forall(A.isPrime(_))
         }
       ),
       "multiplying factors returns the original element" → forAll( (x: A) =>
         RA.isZero(x) || {
           val factorization = A.factor(x)
-          val prod = factorization.factors.map( f => RA.pow(f._1, f._2) ).foldLeft(RA.one)(RA.times)
+          val prod = factorization.elements.map(f => RA.pow(f._1, f._2) ).foldLeft(RA.one)(RA.times)
           RA.times(factorization.unit, prod) === x
         }
       )
