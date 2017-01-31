@@ -251,4 +251,19 @@ class SafeLongCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     sx >> -23 shouldBe sx << 23
     sx >> -23 shouldBe bx >> -23
   }
+
+  property("isOdd") {
+    forAll { b: BigInt =>
+      SafeLong(b * 2).isOdd shouldBe false
+      SafeLong(b * 2 + 1).isOdd shouldBe true
+    }
+  }
+
+  property("isEven") {
+    forAll { b: BigInt =>
+      SafeLong(b * 2).isEven shouldBe true
+      SafeLong(b * 2 + 1).isEven shouldBe false
+    }
+  }
+  
 }
