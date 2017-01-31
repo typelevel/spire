@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{CRig, IsIntegral, Order, Signed}
+import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid}
 
 object UByte extends UByteInstances {
   @inline final def apply(n: Byte): UByte = new UByte(n)
@@ -89,7 +89,7 @@ private[math] trait UByteIsCRig extends CRig[UByte] {
   def zero: UByte = UByte(0)
 }
 
-private[math] trait UByteOrder extends Order[UByte] {
+private[math] trait UByteSigned extends SignedAdditiveCMonoid[UByte] {
   override def eqv(x:UByte, y:UByte): Boolean = x == y
   override def neqv(x:UByte, y:UByte): Boolean = x != y
   override def gt(x: UByte, y: UByte): Boolean = x > y
@@ -97,16 +97,7 @@ private[math] trait UByteOrder extends Order[UByte] {
   override def lt(x: UByte, y: UByte): Boolean = x < y
   override def lteqv(x: UByte, y: UByte): Boolean = x <= y
   def compare(x: UByte, y: UByte): Int = if (x < y) -1 else if (x > y) 1 else 0
-}
-
-private[math] trait UByteIsSigned extends Signed[UByte] {
-  def signum(a: UByte): Int = java.lang.Integer.signum(a.signed) & 1
-  def abs(a: UByte): UByte = a
-}
-
-private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteOrder with UByteIsSigned {
-  def toDouble(n: UByte): Double = n.toDouble
-  def toBigInt(n: UByte): BigInt = n.toBigInt
+  def abs(x: UByte): UByte = x
 }
 
 @SerialVersionUID(0L)
@@ -139,6 +130,11 @@ private[math] class UByteBitString extends BitString[UByte] with Serializable {
     val j = i & 7
     (n >>> j) | (n << (8 - j))
   }
+}
+
+private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteSigned {
+  def toDouble(n: UByte): Double = n.toDouble
+  def toBigInt(n: UByte): BigInt = n.toBigInt
 }
 
 @SerialVersionUID(0L)

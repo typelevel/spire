@@ -562,12 +562,12 @@ private[math] trait SafeLongOrder extends Order[SafeLong] {
   def compare(x: SafeLong, y: SafeLong): Int = x compare y
 }
 
-private[math] trait SafeLongIsSigned extends Signed[SafeLong] {
-  def signum(a: SafeLong): Int = a.signum
-  def abs(a: SafeLong): SafeLong = a.abs
+private[math] trait SafeLongSigned extends Signed[SafeLong] with SafeLongOrder {
+  override def signum(a: SafeLong): Int = a.signum
+  override def abs(a: SafeLong): SafeLong = a.abs
 }
 
-private[math] trait SafeLongIsReal extends IsIntegral[SafeLong] with SafeLongOrder with SafeLongIsSigned {
+private[math] trait SafeLongIsReal extends IsIntegral[SafeLong] with SafeLongSigned {
   def toDouble(n: SafeLong): Double = n.toDouble
   def toBigInt(n: SafeLong): BigInt = n.toBigInt
 }

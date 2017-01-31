@@ -61,8 +61,8 @@ trait BigIntOrder extends Order[BigInt] {
 }
 
 trait BigIntIsSigned extends Signed[BigInt] {
-  def signum(a: BigInt): Int = a.signum
-  def abs(a: BigInt): BigInt = a.abs
+  override def signum(a: BigInt): Int = a.signum
+  override def abs(a: BigInt): BigInt = a.abs
 }
 
 trait BigIntIsReal extends IsIntegral[BigInt] with BigIntOrder with BigIntIsSigned with Serializable {

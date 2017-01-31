@@ -108,8 +108,8 @@ trait FloatIsTrig extends Trig[Float] {
 }
 
 trait FloatIsSigned extends Signed[Float] {
-  def signum(a: Float): Int = Math.signum(a).toInt
-  def abs(a: Float): Float = if (a < 0.0f) -a else a
+  override def signum(a: Float): Int = Math.signum(a).toInt
+  override def abs(a: Float): Float = if (a < 0.0f) -a else a
 }
 
 trait FloatOrder extends Order[Float] {

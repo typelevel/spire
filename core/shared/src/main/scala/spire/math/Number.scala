@@ -695,8 +695,8 @@ private[math] trait NumberOrder extends Order[Number] {
 }
 
 private[math] trait NumberIsSigned extends Signed[Number] {
-  def signum(a: Number): Int = a.signum
-  def abs(a: Number): Number = a.abs
+  override def signum(a: Number): Int = a.signum
+  override def abs(a: Number): Number = a.abs
 }
 
 private[math] trait NumberIsReal extends IsRational[Number] with NumberOrder with NumberIsSigned {

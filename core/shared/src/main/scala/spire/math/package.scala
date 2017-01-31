@@ -401,7 +401,7 @@ package object math {
   final def ulp(x: Float): Double = Math.ulp(x)
 
   final def hypot[@sp(Float, Double) A](x: A, y: A)
-    (implicit f: Field[A], n: NRoot[A], o: Order[A]): A = {
+    (implicit f: Field[A], n: NRoot[A], s: Signed[A]): A = {
     import spire.implicits._
     def abs(n: A): A = if (n < f.zero) -n else n
     if (x > y) abs(x) * (1 + (y/x)**2).sqrt
