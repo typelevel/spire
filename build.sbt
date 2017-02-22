@@ -60,6 +60,7 @@ lazy val core = crossProject
   .settings(coreSettings:_*)
   .settings(buildInfoSettings:_*)
   .settings(crossVersionSharedSources:_*)
+  .settings(libraryDependencies += "com.chuusai" %% "shapeless" % shapelessVersion)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
   .dependsOn(macros)

@@ -12,6 +12,7 @@ import BigDecimal.RoundingMode.{FLOOR, HALF_UP, CEILING}
 import spire.algebra.{Eq, Field, GCDRing, IsReal, NRoot, Order, Signed, Trig}
 import spire.std.bigDecimal._
 import spire.syntax.nroot._
+import shapeless.nat
 
 package object math {
 
@@ -583,4 +584,18 @@ package object math {
       case c: ScalaNumericConversions => c.isValidInt
       case _ => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
     }
+
+  /** Vector type aliases */
+  type Vec2[A] = Vec[nat._2, A]
+  type Vec3[A] = Vec[nat._3, A]
+  type Vec4[A] = Vec[nat._4, A]
+  type Vec2i = Vec2[Int]
+  type Vec3i = Vec3[Int]
+  type Vec4i = Vec4[Int]
+  type Vec2f = Vec2[Float]
+  type Vec3f = Vec3[Float]
+  type Vec4f = Vec4[Float]
+  type Vec2d = Vec2[Double]
+  type Vec3d = Vec3[Double]
+  type Vec4d = Vec4[Double]
 }
