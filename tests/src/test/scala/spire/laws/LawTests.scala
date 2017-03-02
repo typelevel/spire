@@ -48,8 +48,11 @@ class LawTests extends FunSuite with Discipline {
   checkAll("SafeLong",   RingLaws[SafeLong].euclideanRing)
   checkAll("SafeLong",   BaseLaws[SafeLong].signedAdditiveAbGroup)
 
-  checkAll("Homomorphism[BigInt, SafeLong, CRing", HomomorphismLaws[BigInt].cRing[SafeLong])
-  checkAll("Homomorphism[SafeLong, BigInt, CRing", HomomorphismLaws[SafeLong].cRing[BigInt])
+  checkAll("Homomorphism[BigInt, SafeLong, CRing]", HomomorphismLaws[BigInt].cRing[SafeLong])
+  checkAll("Homomorphism[SafeLong, BigInt, CRing]", HomomorphismLaws[SafeLong].cRing[BigInt])
+  checkAll("Homomorphism[BigInt, Rational, CRing]", HomomorphismLaws[BigInt].cRing[Rational])
+  checkAll("Homomorphism[SafeLong, Rational, CRing]", HomomorphismLaws[SafeLong].cRing[Rational])
+
 
   checkAll("Complex[Rational]", RingLaws[Complex[Rational]].field)
 

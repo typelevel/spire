@@ -2,9 +2,17 @@ package spire.algebra
 
 import java.math.BigInteger
 
-import spire.math.{Complex, SafeLong}
+import spire.math.{Complex, Rational, SafeLong}
 
-trait Homomorphism[-A, +B, +F[_]] extends Function1[A, B]
+trait Homomorphism[-A, +B, +F[_]] { self =>
+
+  def apply(a: A): B
+
+  def toFunction: Function1[A, B] = new Function1[A, B] {
+    def apply(a: A): B = self.apply(a)
+  }
+
+}
 
 abstract class Homomorphism0 {
 
@@ -21,6 +29,13 @@ abstract class Homomorphism0 {
 }
 
 object Homomorphism extends Homomorphism0 {
+
+  implicit def identity[A, F[_]](implicit ev: F[A]): Homomorphism[A, A, F] =
+    new Homomorphism[A, A, F] {
+      def apply(a: A): A = a
+    }
+
+  // a few instances
 
   implicit object safeLongToBigInt extends Homomorphism[SafeLong, BigInt, EuclideanRing] {
     def apply(a: SafeLong): BigInt = a.toBigInt
@@ -49,6 +64,13 @@ object Homomorphism extends Homomorphism0 {
   implicit def realToComplex[A:Field]: Homomorphism[A, Complex[A], Field] =
     new Homomorphism[A, Complex[A], Field] {
       def apply(a: A): Complex[A] = Complex(a)
+    }
+
+  // some examples
+
+  implicit def integerToRational[A](implicit ev: Homomorphism[A, SafeLong, EuclideanRing]): Homomorphism[A, Rational, CRing] =
+    new Homomorphism[A, Rational, CRing] {
+      def apply(a: A): Rational = Rational(ev(a))
     }
 
 }
