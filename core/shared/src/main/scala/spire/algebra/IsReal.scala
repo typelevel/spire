@@ -49,16 +49,16 @@ object IsAlgebraic {
   def apply[@sp A](implicit A: IsAlgebraic[A]): IsAlgebraic[A] = A
 }
 
-trait IsRational[@sp A] extends Any with IsAlgebraic[A] {
+trait IsRational[A] extends Any with IsAlgebraic[A] {
   def toRational(a: A): Rational
   def toAlgebraic(a: A): Algebraic = Algebraic(toRational(a))
 }
 
 object IsRational {
-  def apply[@sp A](implicit A: IsRational[A]): IsRational[A] = A
+  def apply[A](implicit A: IsRational[A]): IsRational[A] = A
 }
 
-trait IsIntegral[@sp(Byte,Short,Int,Long) A] extends Any with IsRational[A] {
+trait IsIntegral[A] extends Any with IsRational[A] {
   def ceil(a: A): A = a
   def floor(a: A): A = a
   def round(a: A): A = a
@@ -68,5 +68,5 @@ trait IsIntegral[@sp(Byte,Short,Int,Long) A] extends Any with IsRational[A] {
 }
 
 object IsIntegral {
-  def apply[@sp A](implicit A: IsIntegral[A]): IsIntegral[A] = A
+  def apply[A](implicit A: IsIntegral[A]): IsIntegral[A] = A
 }

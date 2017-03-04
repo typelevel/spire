@@ -73,4 +73,23 @@ class NumericTest extends FunSuite {
     Complex(BigDecimal(3), BigDecimal(0)),
     Complex(BigDecimal(-9), BigDecimal(0))
   )*/
+
+  def testImplicitNumeric[N](cls: String)(implicit numN: Numeric[N]): Unit = {
+
+    def runTest(name:String)(f: => Unit) = test("%s:%s" format(cls, name))(f)
+
+    val n1 = numN.one
+
+    runTest("toDouble(1)")(assert(numN.toDouble(n1) === 1D))
+    runTest("toRational(1)")(assert(numN.toRational(n1) === Rational(1)))
+    runTest("toReal(1)")(assert(numN.toReal(n1) === Real(1)))
+  }
+
+  testImplicitNumeric[Int]("Int")
+  testImplicitNumeric[Long]("Long")
+  testImplicitNumeric[Float]("Float")
+  testImplicitNumeric[Double]("Double")
+  testImplicitNumeric[BigInt]("BigInt")
+  testImplicitNumeric[BigDecimal]("BigDecimal")
+  testImplicitNumeric[Rational]("Rational")
 }
