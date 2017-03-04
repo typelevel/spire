@@ -1,33 +1,45 @@
 package spire
 package math
 
-import spire.algebra.{CRing, EuclideanRing, Homomorphism}
-import spire.std.bigInt._
-import spire.std.bigInteger._
+import spire.algebra.{Conversion, CRing, Homomorphism}
 
 import java.math.BigInteger
 
 trait IsZ[A] {
-  def toSafeLong: Homomorphism[A, SafeLong, EuclideanRing]
-  def fromSafeLong: Homomorphism[SafeLong, A, EuclideanRing]
+  def fromSafeLong(sl: SafeLong): A
+  def toInverseHomomorphism: Homomorphism[SafeLong, A, CRing] = new Conversion[SafeLong, A] {
+    type Hom[X] = CRing[X]
+    def apply(sl: SafeLong): A = fromSafeLong(sl)
+  }
+  def toSafeLong(a: A): SafeLong
+  def toHomomorphism: Homomorphism[A, SafeLong, CRing] = new Conversion[A, SafeLong] {
+    type Hom[X] = CRing[X]
+    def apply(a: A): SafeLong = toSafeLong(a)
+  }
 }
 
 object IsZ {
 
-  implicit object SafeLongIsZ extends IsZ[SafeLong] {
-    val toSafeLong = Homomorphism.identity[SafeLong, EuclideanRing]
-    val fromSafeLong = toSafeLong
+  def apply[A](implicit ev: IsZ[A]): IsZ[A] = ev
+
+  def apply[A](f: A => SafeLong, g: SafeLong => A): IsZ[A] = new IsZ[A] {
+    def toSafeLong(a: A) = f(a)
+    def fromSafeLong(sl: SafeLong) = g(sl)
   }
 
-  implicit object BigIntIsZ extends IsZ[BigInt] {
-    val toSafeLong = Homomorphism[BigInt, SafeLong, EuclideanRing](SafeLong(_))
-    val fromSafeLong = Homomorphism[SafeLong, BigInt, EuclideanRing](_.toBigInt)
-  }
+  implicit val SafeLongIsZ: IsZ[SafeLong] = apply(identity, identity)
 
-  implicit object BigIntegerIsZ extends IsZ[BigInteger] {
-    val toSafeLong = Homomorphism[BigInteger, SafeLong, EuclideanRing](SafeLong(_))
-    val fromSafeLong = Homomorphism[SafeLong, BigInteger, EuclideanRing](_.toBigInteger)
-  }
+  implicit val BigIntIsZ: IsZ[BigInt] = apply(SafeLong(_), _.toBigInt)
+
+  implicit val BigIntegerIsZ: IsZ[BigInteger] = apply(SafeLong(_), _.toBigInteger)
+
+  implicit val LongIsZ: IsZ[Long] = apply(SafeLong(_), _.toLong)
+
+  implicit val IntIsZ: IsZ[Int] = apply(SafeLong(_), _.toInt)
+
+  implicit val ShortIsZ: IsZ[Short] = apply(SafeLong(_), _.toShort)
+
+  implicit val ByteIsZ: IsZ[Byte] = apply(SafeLong(_), _.toByte)
 
 }
 

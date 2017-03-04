@@ -5,7 +5,7 @@ import spire.algebra._
 import spire.algebra.lattice._
 import spire.algebra.partial._
 import spire.macros.Ops
-import spire.math.{BitString, ConvertableFrom, ConvertableTo, Interval, Number, NumberTag, Rational, SafeLong}
+import spire.math.{BitString, ConvertableFrom, ConvertableTo, Interval, Number, Rational}
 import spire.util.Opt
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
@@ -422,19 +422,9 @@ final class NormedVectorSpaceOps[V](lhs: V) {
     macro Ops.unopWithEv[NormedVectorSpace[V, F], V]
 }
 
-final class HomomorphismOps[A](lhs:A) {
-  def hIsValid[B](implicit AB: Homomorphism[A, B, F forSome { type F[_]}], BA: Homomorphism[B, A, F forSome { type F[_] }], B: NumberTag[B], A: Order[A]): Boolean = {
-    B.hasMaxValue match {
-      case Some(mx) => if (A.gt(lhs, BA(mx))) return false
-      case _ =>
-    }
-    B.hasMinValue match {
-      case Some(mn) => if (A.lt(lhs, BA(mn))) return false
-      case _ =>
-    }
-    true
-  }
-  def hTo[B](implicit AB: Homomorphism[A, B, F forSome { type F[_] }]): B = AB(lhs)
+final class ConversionOps[A](lhs:A) {
+  def convTo[B](implicit ev: Conversion[A, B]) = ev(lhs)
+  def isValid[B](implicit equ: Eq[A], ev: Conversion[A, B], inv: Conversion[B, A]) = ev.isValid(lhs)
 }
 
 final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {

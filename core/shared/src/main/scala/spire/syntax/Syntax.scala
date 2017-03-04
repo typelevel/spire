@@ -197,8 +197,8 @@ trait TorsorSyntax {
   implicit def torsorPointOps[P](p: P): TorsorPointOps[P] = new TorsorPointOps(p)
 }
 
-trait HomomorphismSyntax {
-  implicit def homomorphismOps[A](a: A): HomomorphismOps[A] = new HomomorphismOps(a)
+trait ConversionSyntax {
+  implicit def conversionOps[A](a: A): ConversionOps[A] = new ConversionOps(a)
 }
 
 trait IsZSyntax {
@@ -257,7 +257,7 @@ trait AllSyntax extends
     OrderSyntax with
     SignedSyntax with
     IsRealSyntax with
-    HomomorphismSyntax with
+    ConversionSyntax with
     ConvertableFromSyntax with
     SemigroupoidSyntax with
     GroupoidSyntax with
