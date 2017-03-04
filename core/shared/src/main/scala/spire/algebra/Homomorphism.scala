@@ -43,27 +43,27 @@ object Homomorphism extends Homomorphism0 {
 
   // a few instances
 
-  implicit object safeLongToBigInt extends Homomorphism[SafeLong, BigInt, EuclideanRing] {
+  implicit object safeLongToBigInt extends Homomorphism[SafeLong, BigInt, CRing] {
     def apply(a: SafeLong): BigInt = a.toBigInt
   }
 
-  implicit object bigIntToSafeLong extends Homomorphism[BigInt, SafeLong, EuclideanRing] {
+  implicit object bigIntToSafeLong extends Homomorphism[BigInt, SafeLong, CRing] {
     def apply(a: BigInt): SafeLong = SafeLong(a)
   }
 
-  implicit object safeLongToBigInteger extends Homomorphism[SafeLong, BigInteger, EuclideanRing] {
+  implicit object safeLongToBigInteger extends Homomorphism[SafeLong, BigInteger, CRing] {
     def apply(a: SafeLong): BigInteger = a.toBigInt.bigInteger
   }
 
-  implicit object bigIntToBigInteger extends Homomorphism[BigInt, BigInteger, EuclideanRing] {
+  implicit object bigIntToBigInteger extends Homomorphism[BigInt, BigInteger, CRing] {
     def apply(a: BigInt): BigInteger = a.bigInteger
   }
 
-  implicit object bigIntegerToSafeLong extends Homomorphism[BigInteger, SafeLong, EuclideanRing] {
+  implicit object bigIntegerToSafeLong extends Homomorphism[BigInteger, SafeLong, CRing] {
     def apply(a: BigInteger): SafeLong = SafeLong(a)
   }
 
-  implicit object bigIntegerToBigInt extends Homomorphism[BigInteger, BigInt, EuclideanRing] {
+  implicit object bigIntegerToBigInt extends Homomorphism[BigInteger, BigInt, CRing] {
     def apply(a: BigInteger): BigInt = BigInt(a)
   }
 
@@ -74,7 +74,7 @@ object Homomorphism extends Homomorphism0 {
 
   // some examples
 
-  implicit def integerToRational[A](implicit ev: Homomorphism[A, SafeLong, EuclideanRing]): Homomorphism[A, Rational, CRing] =
+  implicit def integerToRational[A](implicit ev: Homomorphism[A, SafeLong, CRing]): Homomorphism[A, Rational, CRing] =
     new Homomorphism[A, Rational, CRing] {
       def apply(a: A): Rational = Rational(ev(a))
     }
