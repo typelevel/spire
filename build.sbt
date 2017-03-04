@@ -4,6 +4,8 @@ import sbtunidoc.Plugin.UnidocKeys._
 import pl.project13.scala.sbt.SbtJmh
 import ReleaseTransformations._
 
+lazy val scalaVersions: Map[String, String] = Map("2.10" -> "2.10.6", "2.11" -> "2.11.8", "2.12" -> "2.12.1")
+
 lazy val scalaCheckVersion = "1.13.4"
 lazy val scalaTestVersion = "3.0.0"
 lazy val shapelessVersion = "2.3.2"
@@ -14,6 +16,8 @@ lazy val algebraVersion = "0.7.0"
 
 lazy val apfloatVersion = "1.8.2"
 lazy val jscienceVersion = "4.3.1"
+lazy val apacheCommonsMath3Version = "3.4.1"
+
 
 // Projects
 
@@ -216,8 +220,8 @@ addCommandAlias("validate", ";validateJVM;validateJS")
 
 lazy val buildSettings = Seq(
   organization := "org.spire-math",
-  scalaVersion := "2.12.0",
-  crossScalaVersions := Seq("2.10.6", "2.11.8", "2.12.0")
+  scalaVersion := scalaVersions("2.12"),
+  crossScalaVersions := Seq(scalaVersions("2.10"), scalaVersions("2.11"), scalaVersions("2.12"))
 )
 
 lazy val commonSettings = Seq(
@@ -292,9 +296,9 @@ lazy val benchmarkSettings = Seq(
 
   libraryDependencies ++= Seq(
     // comparisons
-    "org.apfloat" % "apfloat" % "1.8.2",
-    "org.jscience" % "jscience" % "4.3.1",
-    "org.apache.commons" % "commons-math3" % "3.4.1",
+    "org.apfloat" % "apfloat" % apfloatVersion,
+    "org.jscience" % "jscience" % jscienceVersion,
+    "org.apache.commons" % "commons-math3" % "apacheCommonsMath3Version,
 
     // thyme
     "ichi.bench" % "thyme" %  "0.1.0" from "http://plastic-idolatry.com/jars/thyme-0.1.0.jar",
