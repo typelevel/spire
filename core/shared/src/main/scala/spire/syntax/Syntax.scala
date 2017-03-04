@@ -197,6 +197,10 @@ trait TorsorSyntax {
   implicit def torsorPointOps[P](p: P): TorsorPointOps[P] = new TorsorPointOps(p)
 }
 
+trait IsZSyntax {
+  implicit def isZOps[A: IsZ](a: A): IsZOps[A] = new IsZOps(a)
+}
+
 trait IntegralSyntax extends
     EuclideanRingSyntax with
     ConvertableFromSyntax with
@@ -283,6 +287,7 @@ trait AllSyntax extends
     PartialActionSyntax with
     ActionSyntax with
     TorsorSyntax with
+    IsZSyntax with
     IntegralSyntax with
     FractionalSyntax with
     NumericSyntax with

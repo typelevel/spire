@@ -30,6 +30,12 @@ abstract class Homomorphism0 {
 
 object Homomorphism extends Homomorphism0 {
 
+  def apply[A, B, F[_]](f: A => B)(implicit ev1: F[A], ev2: F[B]): Homomorphism[A, B, F] =
+    new Homomorphism[A, B, F] {
+      override def toFunction = f
+      def apply(a: A): B = f(a)
+    }
+
   implicit def identity[A, F[_]](implicit ev: F[A]): Homomorphism[A, A, F] =
     new Homomorphism[A, A, F] {
       def apply(a: A): A = a
