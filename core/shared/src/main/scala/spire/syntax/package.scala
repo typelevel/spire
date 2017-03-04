@@ -9,6 +9,7 @@ package object syntax {
   object order extends OrderSyntax
   object signed extends SignedSyntax
   object isReal extends IsRealSyntax
+  object homomorphism extends HomomorphismSyntax
   object convertableFrom extends ConvertableFromSyntax
 
   object semigroupoid extends SemigroupoidSyntax
