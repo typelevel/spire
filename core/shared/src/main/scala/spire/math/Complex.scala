@@ -125,7 +125,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   def *(rhs: T)(implicit r: Semiring[T]): Complex[T] = new Complex(real * rhs, imag * rhs)
   def /(rhs: T)(implicit r: Field[T]): Complex[T] = new Complex(real / rhs, imag / rhs)
 
-    /* TODO: does it make sense?
+    /* TODO: does it make sense? Should match the behavior on Gaussian integers.
   // TODO: instead of floor should be round-toward-zero
 
   def /~(rhs: T)(implicit f: Field[T], o: IsReal[T]): Complex[T] = (this / rhs).floor
@@ -175,7 +175,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
     }
   }
 
-    /* TODO: does it make sense?
+    /* TODO: does it make sense? Should match the behavior on Gaussian integers.
   def /~(b: Complex[T])(implicit f: Field[T], o: IsReal[T]): Complex[T] = {
     val d = this / b
     new Complex(d.real.floor, d.imag.floor)
@@ -385,7 +385,7 @@ class FloatComplex(val u: Long) extends AnyVal {
   final def *(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.multiply(u, b.u))
   final def /(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.divide(u, b.u))
 
-    /* TODO: does it make sense?
+    /* TODO: does it make sense? Should match the behavior on Gaussian integers.
   final def /~(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.quot(u, b.u))
   final def %(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.mod(u, b.u))
 
@@ -536,7 +536,7 @@ object FastComplex {
     }
   }
  
-  /* TODO: does it make sense?
+  /* TODO: does it make sense? Should match the behvaior on Gaussian integers
    final def quot(a: Long, b: Long): Long =
     encode(Math.floor(real(divide(a, b))).toFloat, 0.0F)
 
@@ -606,16 +606,6 @@ private[math] trait ComplexIsField[@sp(Float,Double) A] extends ComplexIsRing[A]
 
   override def fromDouble(n: Double): Complex[A] = Complex(algebra.fromDouble(n))
   def div(a: Complex[A], b: Complex[A]): Complex[A] = a / b
-  /* TODO: does it make sense?
-  def quot(a: Complex[A], b: Complex[A]): Complex[A] = a /~ b
-  def mod(a: Complex[A], b: Complex[A]): Complex[A] = a % b
-  override def quotmod(a: Complex[A], b: Complex[A]): (Complex[A], Complex[A]) = a /% b
-  def gcd(a: Complex[A], b: Complex[A]): Complex[A] = {
-    @tailrec def _gcd(a: Complex[A], b: Complex[A]): Complex[A] =
-      if (b.isZero) a else _gcd(b, a - (a / b).round * b)
-    _gcd(a, b)
-  }
-   */
 }
 
 private[math] trait ComplexIsTrig[@sp(Float, Double) A] extends Trig[Complex[A]] {
