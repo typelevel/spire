@@ -1,6 +1,7 @@
 package spire
 package math
 
+import scala.reflect.ClassTag
 import spire.algebra._
 import shapeless._
 import shapeless.ops.nat.ToInt
@@ -75,7 +76,7 @@ object ArbitrarySupport {
   implicit def nonNegative[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[NonNegative[A]] =
     Arbitrary(arbitrary[A].map(_.abs).filter(_.signum > -1).map(NonNegative(_)))
 
-  implicit def vecArbitrary[N <: Nat, A](implicit arbA: Arbitrary[A], toInt: ToInt[N]): Arbitrary[Vec[N, A]] = Arbitrary {
-    Gen.listOfN(toInt(), arbA.arbitrary).map(as => Vec.sized[N, A](as.toVector))
+  implicit def vecArbitrary[N <: Nat, A](implicit arbA: Arbitrary[A], toInt: ToInt[N], act: ClassTag[A]): Arbitrary[Vec[N, A]] = Arbitrary {
+    Gen.listOfN(toInt(), arbA.arbitrary).map(as => Vec.sized[N, A](as.toArray))
   }
 }

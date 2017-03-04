@@ -37,14 +37,14 @@ class VecTests extends FunSuite with Discipline with GeneratorDrivenPropertyChec
   }
 
   test("Vec basis[2, 3] is the z axis in 3D") {
-    Vec.basis[nat._2, nat._3, Int] should ===(Vec.sized[nat._3, Int](Vector(0, 0, 1)))
+    Vec.basis[nat._2, nat._3, Int] should ===(Vec(0, 0, 1))
   }
 
   test("cross product follows right hand rule") {
-    (Vec.sized[nat._3, Float](Vector(1f, 0f, 0f)) × Vec.sized[nat._3, Float](Vector(0f, 1f, 0f))) should ===(Vec.sized[nat._3, Float](Vector(0f, 0f, 1f)))
+    Vec(1f, 0f, 0f) × Vec(0f, 1f, 0f) should ===(Vec(0f, 0f, 1f))
   }
 
   test("padOne pads a vector with 1") {
-    Vec.sized[nat._2, Int](Vector(0, 0)).padOne(3) should ===(Vec.sized[nat._3, Int](Vector(0, 0, 1)))
+    Vec(0, 0).padOne(3) should ===(Vec(0, 0, 1))
   }
 }
