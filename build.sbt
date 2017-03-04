@@ -298,7 +298,7 @@ lazy val benchmarkSettings = Seq(
     // comparisons
     "org.apfloat" % "apfloat" % apfloatVersion,
     "org.jscience" % "jscience" % jscienceVersion,
-    "org.apache.commons" % "commons-math3" % "apacheCommonsMath3Version,
+    "org.apache.commons" % "commons-math3" % apacheCommonsMath3Version,
 
     // thyme
     "ichi.bench" % "thyme" %  "0.1.0" from "http://plastic-idolatry.com/jars/thyme-0.1.0.jar",
