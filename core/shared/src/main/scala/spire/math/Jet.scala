@@ -515,7 +515,7 @@ private[math] trait JetIsRing[@sp(Float, Double) T] extends Ring[Jet[T]] {
   implicit def d: JetDim
   implicit def eq: Eq[T]
   implicit def f: Field[T]
-  implicit def r: IsReal[T]
+  implicit def s: Signed[T]
   implicit def t: Trig[T]
   implicit def v: VectorSpace[Array[T], T]
 
@@ -530,7 +530,7 @@ private[math] trait JetIsRing[@sp(Float, Double) T] extends Ring[Jet[T]] {
   override def fromInt(n: Int): Jet[T] = Jet.fromInt[T](n)
 }
 
-/* TODO: Jet[T] is probably not a genuine GCD ring */
+/* TODO: Jet[T] is probably not a genuine GCD ring, nor an Euclidean ring
 private[math] trait JetIsGCDRing[@sp(Float, Double) T]
     extends JetIsRing[T] with GCDRing[Jet[T]] {
   /* TODO: What exactly is this GCD trying to achieve? Tests? */
@@ -541,7 +541,6 @@ private[math] trait JetIsGCDRing[@sp(Float, Double) T]
   }
 }
 
-/* TODO: Jet[T] is probably not a genuine Euclidean ring */
 private[math] trait JetIsEuclideanRing[@sp(Float,Double) T]
     extends JetIsGCDRing[T] with EuclideanRing[Jet[T]] {
   def euclideanFunction(a: Jet[T]): BigInt = sys.error("Clarify Jet first, see #598")
@@ -550,22 +549,24 @@ private[math] trait JetIsEuclideanRing[@sp(Float,Double) T]
   def mod(a: Jet[T], b: Jet[T]): Jet[T] = a % b
   override def quotmod(a: Jet[T], b: Jet[T]): (Jet[T], Jet[T]) = a /% b
 }
+ */
 
 /* TODO: Jet[T] is probably not a genuine Field */
-private[math] trait JetIsField[@sp(Float,Double) T]
-    extends JetIsEuclideanRing[T] with Field[Jet[T]] {
+private[math] trait JetIsField[@sp(Float,Double) T] extends JetIsRing[T] with Field[Jet[T]] {
   /* TODO: what are exactly the laws of Jet with respect to EuclideanRing ? */
   // duplicating methods because super[..].call() does not work on 2.10 and 2.11
+/* 
   override def euclideanFunction(a: Jet[T]): BigInt = sys.error("Clarify Jet first, see #598")
   override def quot(a: Jet[T], b: Jet[T]): Jet[T] = a /~ b
   override def mod(a: Jet[T], b: Jet[T]): Jet[T] = a % b
   override def quotmod(a: Jet[T], b: Jet[T]): (Jet[T], Jet[T]) = a /% b
-  override def fromDouble(n: Double): Jet[T] = Jet(f.fromDouble(n))
-  def div(a: Jet[T], b: Jet[T]): Jet[T] = a / b
   def ceil(a: Jet[T]): Jet[T] = a.ceil
   def floor(a: Jet[T]): Jet[T] = a.floor
   def round(a: Jet[T]): Jet[T] = a.round
   def isWhole(a: Jet[T]): Boolean = a.isWhole
+ */
+  override def fromDouble(n: Double): Jet[T] = Jet(f.fromDouble(n))
+  def div(a: Jet[T], b: Jet[T]): Jet[T] = a / b
 }
 
 private[math] trait JetIsTrig[@sp(Float, Double) T] extends Trig[Jet[T]] {
@@ -645,7 +646,8 @@ private[math] class JetAlgebra[@sp(Float, Double) T](implicit
 //  with JetIsSigned[T]
   with VectorSpace[Jet[T], T]
   with FieldAlgebra[Jet[T], T]
-  with Serializable {
+    with Serializable {
+  def s = r
   def scalar: Field[T] = f
   def nroot: NRoot[T] = n
   def timesl(a: T, w: Jet[T]): Jet[T] = Jet(a) * w
