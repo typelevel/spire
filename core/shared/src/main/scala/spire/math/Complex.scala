@@ -606,6 +606,16 @@ private[math] trait ComplexIsField[@sp(Float,Double) A] extends ComplexIsRing[A]
 
   override def fromDouble(n: Double): Complex[A] = Complex(algebra.fromDouble(n))
   def div(a: Complex[A], b: Complex[A]): Complex[A] = a / b
+  /* TODO: does it make sense?
+  def quot(a: Complex[A], b: Complex[A]): Complex[A] = a /~ b
+  def mod(a: Complex[A], b: Complex[A]): Complex[A] = a % b
+  override def quotmod(a: Complex[A], b: Complex[A]): (Complex[A], Complex[A]) = a /% b
+  def gcd(a: Complex[A], b: Complex[A]): Complex[A] = {
+    @tailrec def _gcd(a: Complex[A], b: Complex[A]): Complex[A] =
+      if (b.isZero) a else _gcd(b, a - (a / b).round * b)
+    _gcd(a, b)
+  }
+   */
 }
 
 private[math] trait ComplexIsTrig[@sp(Float, Double) A] extends Trig[Complex[A]] {
