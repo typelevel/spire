@@ -210,7 +210,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
 
   def isReal: Boolean = infinitesimal.forall(anyIsZero)
   def isZero: Boolean = anyIsZero(real) && isReal
-  def isInfinitesimal(implicit r: IsReal[T]): Boolean = anyIsZero(real) && !isReal
+  def isInfinitesimal(implicit s: Signed[T]): Boolean = anyIsZero(real) && !isReal
 
   def eqv(b: Jet[T])(implicit o: Eq[T]): Boolean = {
     real === b.real && ArraySupport.eqv(infinitesimal, b.infinitesimal)
@@ -276,12 +276,12 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   def **(b: Int)(implicit e: Eq[T], f: Field[T], v: VectorSpace[Array[T], T]): Jet[T] = pow(b)
 
   def nroot(k: Int)(
-      implicit e: Eq[T], f: Field[T], r: IsReal[T], t: Trig[T], v: VectorSpace[Array[T], T])
+      implicit e: Eq[T], f: Field[T], s: Signed[T], t: Trig[T], v: VectorSpace[Array[T], T])
       : Jet[T] = {
     pow(f.fromInt(k).reciprocal())
   }
 
-  def **(b: Jet[T])(implicit c: ClassTag[T], e: Eq[T], f: Field[T], r: IsReal[T], t: Trig[T],
+  def **(b: Jet[T])(implicit c: ClassTag[T], e: Eq[T], f: Field[T], s: Signed[T], t: Trig[T],
         v: VectorSpace[Array[T], T]): Jet[T] = {
     pow(b)
   }
@@ -304,14 +304,14 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   /**
    * abs(x + du) ~= x + du or -(x + du)
    */
-  def abs()(implicit f: Field[T], r: IsReal[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def abs()(implicit f: Field[T], s: Signed[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     if (real < f.zero) new Jet(-real, -infinitesimal)
     else this
   }
 
   // spire.math. does not define this pow generically, so there it is
   private def powScalarToScalar(b: T, e: T)(implicit
-      f: Field[T], eq: Eq[T], r: IsReal[T], t: Trig[T]): T = {
+      f: Field[T], eq: Eq[T], s: Signed[T], t: Trig[T]): T = {
     if (e === f.zero) {
       f.one
     } else if (b === f.zero) {
@@ -325,7 +325,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   // pow -- base is a constant, exponent (this) is a differentiable function.
   // b^(p + du) ~= b^p + b^p * log(b) du
   def powScalarToJet(a: T)(implicit
-      c: ClassTag[T], e: Eq[T], f: Field[T], m: Module[Array[T], T], r: IsReal[T], t: Trig[T]): Jet[T] = {
+      c: ClassTag[T], e: Eq[T], f: Field[T], m: Module[Array[T], T], s: Signed[T], t: Trig[T]): Jet[T] = {
     if (isZero) {
       Jet.one[T]
     } else {
@@ -339,7 +339,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
    * pow(a + du, p) ~= pow(a, p) + p * pow(a, p-1) du
    */
   def pow(p: T)(implicit
-      e: Eq[T], f: Field[T], r: IsReal[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+      e: Eq[T], f: Field[T], s: Signed[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val tmp: T = p * powScalarToScalar(real, p - f.one)
     new Jet(powScalarToScalar(real, p), tmp *: infinitesimal)
   }
@@ -354,7 +354,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
    * pow -- both base (this) and exponent are differentiable functions.
    * (a + du)^(b + dv) ~= a^b + b * a^(b-1) du + a^b log(a) dv
    */
-  def pow(b: Jet[T])(implicit c: ClassTag[T], e: Eq[T], f: Field[T], m: Module[Array[T], T], r: IsReal[T], t: Trig[T])
+  def pow(b: Jet[T])(implicit c: ClassTag[T], e: Eq[T], f: Field[T], m: Module[Array[T], T], s: Signed[T], t: Trig[T])
       : Jet[T] = {
     if (b.isZero) {
       Jet.one[T]
@@ -502,7 +502,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
 trait JetInstances {
   implicit def JetAlgebra[@sp(Float, Double) T](implicit
       c: ClassTag[T], d: JetDim, eq: Eq[T], f: Field[T], n: NRoot[T],
-      t: Trig[T], r: IsReal[T]): JetAlgebra[T] = {
+      s: Signed[T], t: Trig[T]): JetAlgebra[T] = {
     import spire.std.array.ArrayVectorSpace
     new JetAlgebra[T]
   }
@@ -515,7 +515,7 @@ private[math] trait JetIsRing[@sp(Float, Double) T] extends Ring[Jet[T]] {
   implicit def d: JetDim
   implicit def eq: Eq[T]
   implicit def f: Field[T]
-  implicit def r: IsReal[T]
+  implicit def s: Signed[T]
   implicit def t: Trig[T]
   implicit def v: VectorSpace[Array[T], T]
 
@@ -534,21 +534,21 @@ private[math] trait JetIsRing[@sp(Float, Double) T] extends Ring[Jet[T]] {
 private[math] trait JetIsGCDRing[@sp(Float, Double) T]
     extends JetIsRing[T] with GCDRing[Jet[T]] {
   /* TODO: What exactly is this GCD trying to achieve? Tests? */
-  def gcd(a: Jet[T], b: Jet[T]): Jet[T] = {
+  /*def gcd(a: Jet[T], b: Jet[T]): Jet[T] = {
     @tailrec def _gcd(a: Jet[T], b: Jet[T]): Jet[T] =
       if (b.isZero) a else _gcd(b, a - (a / b).round * b)
     _gcd(a, b)
-  }
+  }*/
 }
 
 /* TODO: Jet[T] is probably not a genuine Euclidean ring */
 private[math] trait JetIsEuclideanRing[@sp(Float,Double) T]
     extends JetIsGCDRing[T] with EuclideanRing[Jet[T]] {
-  def euclideanFunction(a: Jet[T]): BigInt = sys.error("Clarify Jet first, see #598")
+  /*def euclideanFunction(a: Jet[T]): BigInt = sys.error("Clarify Jet first, see #598")
   /* TODO: what are exactly the laws of Jet with respect to EuclideanRing ? */
   def quot(a: Jet[T], b: Jet[T]): Jet[T] = a /~ b
   def mod(a: Jet[T], b: Jet[T]): Jet[T] = a % b
-  override def quotmod(a: Jet[T], b: Jet[T]): (Jet[T], Jet[T]) = a /% b
+  override def quotmod(a: Jet[T], b: Jet[T]): (Jet[T], Jet[T]) = a /% b*/
 }
 
 /* TODO: Jet[T] is probably not a genuine Field */
@@ -556,16 +556,8 @@ private[math] trait JetIsField[@sp(Float,Double) T]
     extends JetIsEuclideanRing[T] with Field[Jet[T]] {
   /* TODO: what are exactly the laws of Jet with respect to EuclideanRing ? */
   // duplicating methods because super[..].call() does not work on 2.10 and 2.11
-  override def euclideanFunction(a: Jet[T]): BigInt = sys.error("Clarify Jet first, see #598")
-  override def quot(a: Jet[T], b: Jet[T]): Jet[T] = a /~ b
-  override def mod(a: Jet[T], b: Jet[T]): Jet[T] = a % b
-  override def quotmod(a: Jet[T], b: Jet[T]): (Jet[T], Jet[T]) = a /% b
   override def fromDouble(n: Double): Jet[T] = Jet(f.fromDouble(n))
   def div(a: Jet[T], b: Jet[T]): Jet[T] = a / b
-  def ceil(a: Jet[T]): Jet[T] = a.ceil
-  def floor(a: Jet[T]): Jet[T] = a.floor
-  def round(a: Jet[T]): Jet[T] = a.round
-  def isWhole(a: Jet[T]): Boolean = a.isWhole
 }
 
 private[math] trait JetIsTrig[@sp(Float, Double) T] extends Trig[Jet[T]] {
@@ -573,7 +565,7 @@ private[math] trait JetIsTrig[@sp(Float, Double) T] extends Trig[Jet[T]] {
   implicit def d: JetDim
   implicit def f: Field[T]
   implicit def n: NRoot[T]
-  implicit def r: IsReal[T]
+  implicit def s: Signed[T]
   implicit def t: Trig[T]
   implicit def v: VectorSpace[Array[T], T]
 
@@ -606,7 +598,7 @@ private[math] trait JetIsNRoot[T] extends NRoot[Jet[T]] {
   implicit def f: Field[T]
   implicit def n: NRoot[T]
   implicit def t: Trig[T]
-  implicit def r: IsReal[T]
+  implicit def s: Signed[T]
   implicit def c: ClassTag[T]
   implicit def v: VectorSpace[Array[T], T]
 
@@ -638,7 +630,7 @@ private[math] trait JetIsSigned[T] extends Signed[Jet[T]] {
 @SerialVersionUID(0L)
 private[math] class JetAlgebra[@sp(Float, Double) T](implicit
     val c: ClassTag[T], val d: JetDim, val eq: Eq[T], val f: Field[T], val n: NRoot[T],
-    val t: Trig[T], val r: IsReal[T], val v: VectorSpace[Array[T], T])
+    val t: Trig[T], val s: Signed[T], val v: VectorSpace[Array[T], T])
   extends JetIsField[T]
   with JetIsTrig[T]
   with JetIsNRoot[T]
