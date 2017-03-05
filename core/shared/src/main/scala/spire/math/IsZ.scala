@@ -5,16 +5,22 @@ import spire.algebra.{Conversion, CRing, Homomorphism}
 
 import java.math.BigInteger
 
-trait IsZ[A] {
-  def fromSafeLong(sl: SafeLong): A
-  def toInverseHomomorphism: Homomorphism[SafeLong, A, CRing] = new Conversion[SafeLong, A] {
-    type Hom[X] = CRing[X]
-    def apply(sl: SafeLong): A = fromSafeLong(sl)
-  }
+trait IsInZ[A] extends IsInQ[A] {
+  def toRational(a: A): Rational = Rational(toSafeLong(a))
+  def doubleApprox(a: A): Double = toSafeLong(a).toDouble
+  def bigDecimalApprox(a: A, scale: Int): BigDecimal = toSafeLong(a).toBigDecimal
   def toSafeLong(a: A): SafeLong
   def toHomomorphism: Homomorphism[A, SafeLong, CRing] = new Conversion[A, SafeLong] {
     type Hom[X] = CRing[X]
     def apply(a: A): SafeLong = toSafeLong(a)
+  }
+}
+
+trait IsZ[A] extends IsInZ[A] {
+  def fromSafeLong(sl: SafeLong): A
+  def toInverseHomomorphism: Homomorphism[SafeLong, A, CRing] = new Conversion[SafeLong, A] {
+    type Hom[X] = CRing[X]
+    def apply(sl: SafeLong): A = fromSafeLong(sl)
   }
 }
 

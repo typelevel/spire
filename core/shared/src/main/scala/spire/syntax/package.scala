@@ -54,6 +54,7 @@ package object syntax {
   object action extends ActionSyntax
   object torsor extends TorsorSyntax
 
+  object isR extends IsRSyntax
   object isZ extends IsZSyntax
   object integral extends IntegralSyntax
   object fractional extends FractionalSyntax

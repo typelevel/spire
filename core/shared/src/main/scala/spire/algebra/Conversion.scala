@@ -1,6 +1,6 @@
 package spire.algebra
 
-import spire.math.{Complex, IsZ}
+import spire.math.{Complex, IsInQ, IsInR, IsZ}
 
 /** Conversion from type A to type B, also known as a homomorphism.
   *
@@ -38,15 +38,11 @@ abstract class Conversion0 {
       def apply(a: A): Complex[A] = Complex(a)
     }
 
+
 }
 
-object Conversion extends Conversion0 {
+abstract class Conversion1 extends Conversion0 {
 
-  implicit def realToComplexField[A:Field]: Homomorphism[A, Complex[A], Field] =
-    new Conversion[A, Complex[A]] {
-      type Hom[X] = Field[X]
-      def apply(a: A): Complex[A] = Complex(a)
-    }
 
   implicit def throughSafeLong[A, B](implicit A: IsZ[A], B: IsZ[B]): Homomorphism[A, B, CRing] =
     new Conversion[A, B] {
@@ -54,10 +50,51 @@ object Conversion extends Conversion0 {
       def apply(a: A): B = B.fromSafeLong(A.toSafeLong(a))
     }
 
-    implicit def throughSafeLongToCRing[A, B](implicit A: IsZ[A], B: CRing[B]): Homomorphism[A, B, CRing] =
+  implicit def throughSafeLongToCRing[A, B](implicit A: IsZ[A], B: CRing[B]): Homomorphism[A, B, CRing] =
     new Conversion[A, B] {
       type Hom[X] = CRing[X]
       def apply(a: A): B = B.fromBigInt(A.toSafeLong(a).toBigInt)
     }
+
+}
+
+abstract class Conversion2 extends Conversion1 {
+
+  implicit def throughRationalToField[A, B](implicit A: IsInQ[A], B: Field[B]): Conversion[A, B] =
+    new Conversion[A, B] {
+      def apply(a: A): B = {
+        val r = A.toRational(a)
+        B.div(B.fromBigInt(r.numerator.toBigInt), B.fromBigInt(r.denominator.toBigInt))
+      }
+    }
+
+  implicit def throughRationalToDivisionRing[A, B](implicit A: IsInQ[A], B: DivisionRing[B]): Conversion[A, B] =
+    new Conversion[A, B] {
+      def apply(a: A): B = {
+        val r = A.toRational(a)
+        B.div(B.fromBigInt(r.numerator.toBigInt), B.fromBigInt(r.denominator.toBigInt))
+      }
+    }
+
+}
+
+object Conversion extends Conversion2 {
+
+  implicit def approxToDouble[A](implicit A: IsInR[A]): Conversion[A, Double] =
+    new Conversion[A, Double] {
+      def apply(a: A): Double = A.doubleApprox(a)
+    }
+
+  implicit def approxToFloat[A](implicit A: IsInR[A]): Conversion[A, Float] =
+    new Conversion[A, Float] {
+      def apply(a: A): Float = A.doubleApprox(a).toFloat
+    }
+
+  /*
+  implicit def realToComplexField[A:Field]: Homomorphism[A, Complex[A], Field] =
+    new Conversion[A, Complex[A]] {
+      type Hom[X] = Field[X]
+      def apply(a: A): Complex[A] = Complex(a)
+    }*/
 
 }
