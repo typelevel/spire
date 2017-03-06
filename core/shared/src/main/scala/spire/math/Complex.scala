@@ -42,7 +42,7 @@ object Complex extends ComplexInstances {
   def apply[@sp(Float, Double) T: Semiring](real: T): Complex[T] =
     new Complex(real, Semiring[T].zero)
 
-  def rootOfUnity[@sp(Float, Double) T](n: Int, x: Int)(implicit f: Field[T], t: Trig[T], r: IsReal[T]): Complex[T] = {
+  def rootOfUnity[@sp(Float, Double) T](n: Int, x: Int)(implicit f: Field[T], t: Trig[T]): Complex[T] = {
     if (x == 0) return one[T]
 
     if (n % 2 == 0) {
@@ -56,7 +56,7 @@ object Complex extends ComplexInstances {
     polar(f.one, (t.pi * 2 * x) / n)
   }
 
-  def rootsOfUnity[@sp(Float, Double) T](n: Int)(implicit f: Field[T], t: Trig[T], r: IsReal[T]): Array[Complex[T]] = {
+  def rootsOfUnity[@sp(Float, Double) T](n: Int)(implicit f: Field[T], t: Trig[T]): Array[Complex[T]] = {
     val roots = new Array[Complex[T]](n)
     var sum = one[T]
     roots(0) = sum
@@ -125,7 +125,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   def *(rhs: T)(implicit r: Semiring[T]): Complex[T] = new Complex(real * rhs, imag * rhs)
   def /(rhs: T)(implicit r: Field[T]): Complex[T] = new Complex(real / rhs, imag / rhs)
 
-    /* TODO: does it make sense?
+    /* TODO: does it make sense? Should match the behavior on Gaussian integers.
   // TODO: instead of floor should be round-toward-zero
 
   def /~(rhs: T)(implicit f: Field[T], o: IsReal[T]): Complex[T] = (this / rhs).floor
@@ -136,8 +136,8 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   }
      */
 
-  def **(e: T)(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] = this pow e
-  def pow(e: T)(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] =
+  def **(e: T)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] = this pow e
+  def pow(e: T)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] =
     if (e.isSignZero) {
       Complex.one[T]
     } else if (this.isZero) {
@@ -175,7 +175,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
     }
   }
 
-    /* TODO: does it make sense?
+    /* TODO: does it make sense? Should match the behavior on Gaussian integers.
   def /~(b: Complex[T])(implicit f: Field[T], o: IsReal[T]): Complex[T] = {
     val d = this / b
     new Complex(d.real.floor, d.imag.floor)
@@ -189,17 +189,17 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   }
      */
 
-  def **(b: Int)(implicit f: Field[T], n: NRoot[T], t: Trig[T], o: IsReal[T]): Complex[T] = pow(b)
+  def **(b: Int)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] = pow(b)
 
-  def nroot(k: Int)(implicit f: Field[T], n: NRoot[T], o: Order[T], s: Signed[T], t: Trig[T]): Complex[T] =
+  def nroot(k: Int)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] =
     if (isZero) Complex.zero else pow(Complex(f.fromInt(k).reciprocal, f.zero))
 
   def pow(b: Int)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] =
     if (isZero) Complex.zero else Complex.polar(abs.pow(b), arg * b)
 
-  def **(b: Complex[T])(implicit f: Field[T], n: NRoot[T], o: Order[T], s: Signed[T], t: Trig[T]): Complex[T] = pow(b)
+  def **(b: Complex[T])(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] = pow(b)
 
-  def pow(b: Complex[T])(implicit f: Field[T], n: NRoot[T], o: Order[T], s: Signed[T], t: Trig[T]): Complex[T] =
+  def pow(b: Complex[T])(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] =
     if (b.isZero) {
       Complex.one[T]
     } else if (this.isZero) {
@@ -385,7 +385,7 @@ class FloatComplex(val u: Long) extends AnyVal {
   final def *(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.multiply(u, b.u))
   final def /(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.divide(u, b.u))
 
-    /* TODO: does it make sense?
+    /* TODO: does it make sense? Should match the behavior on Gaussian integers.
   final def /~(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.quot(u, b.u))
   final def %(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.mod(u, b.u))
 
@@ -536,7 +536,7 @@ object FastComplex {
     }
   }
  
-  /* TODO: does it make sense?
+  /* TODO: does it make sense? Should match the behvaior on Gaussian integers
    final def quot(a: Long, b: Long): Long =
     encode(Math.floor(real(divide(a, b))).toFloat, 0.0F)
 
@@ -572,15 +572,15 @@ object FastComplex {
 }
 
 trait ComplexInstances0 {
-  implicit def ComplexRing[A: Ring: IsReal]: Ring[Complex[A]] = new ComplexIsRingImpl[A]
+  implicit def ComplexRing[A: Ring: Signed]: Ring[Complex[A]] = new ComplexIsRingImpl[A]
 }
 
 trait ComplexInstances1 extends ComplexInstances0 {
-  implicit def ComplexField[A: Field: IsReal]: Field[Complex[A]] = new ComplexIsFieldImpl[A]
+  implicit def ComplexField[A: Field: Signed]: Field[Complex[A]] = new ComplexIsFieldImpl[A]
 }
 
 trait ComplexInstances extends ComplexInstances1 {
-  implicit def ComplexAlgebra[@sp(Float, Double) A: Fractional: Trig: IsReal]: ComplexAlgebra[A] =
+  implicit def ComplexAlgebra[@sp(Float, Double) A: Fractional: Trig: Signed]: ComplexAlgebra[A] =
     new ComplexAlgebra[A]
 
   implicit def ComplexEq[A: Eq]: Eq[Complex[A]] = new ComplexEq[A]
@@ -588,7 +588,7 @@ trait ComplexInstances extends ComplexInstances1 {
 
 private[math] trait ComplexIsRing[@sp(Float, Double) A] extends Ring[Complex[A]] {
   implicit def algebra: Ring[A]
-  implicit def order: IsReal[A]
+  implicit def signed: Signed[A]
 
   override def minus(a: Complex[A], b: Complex[A]): Complex[A] = a - b
   def negate(a: Complex[A]): Complex[A] = -a
@@ -606,23 +606,13 @@ private[math] trait ComplexIsField[@sp(Float,Double) A] extends ComplexIsRing[A]
 
   override def fromDouble(n: Double): Complex[A] = Complex(algebra.fromDouble(n))
   def div(a: Complex[A], b: Complex[A]): Complex[A] = a / b
-  /* TODO: does it make sense?
-  def quot(a: Complex[A], b: Complex[A]): Complex[A] = a /~ b
-  def mod(a: Complex[A], b: Complex[A]): Complex[A] = a % b
-  override def quotmod(a: Complex[A], b: Complex[A]): (Complex[A], Complex[A]) = a /% b
-  def gcd(a: Complex[A], b: Complex[A]): Complex[A] = {
-    @tailrec def _gcd(a: Complex[A], b: Complex[A]): Complex[A] =
-      if (b.isZero) a else _gcd(b, a - (a / b).round * b)
-    _gcd(a, b)
-  }
-   */
 }
 
 private[math] trait ComplexIsTrig[@sp(Float, Double) A] extends Trig[Complex[A]] {
   implicit def algebra: Field[A]
   implicit def nroot: NRoot[A]
   implicit def trig: Trig[A]
-  implicit def order: IsReal[A]
+  implicit def signed: Signed[A]
 
   def e: Complex[A] = new Complex[A](trig.e, algebra.zero)
   def pi: Complex[A] = new Complex[A](trig.pi, algebra.zero)
@@ -654,7 +644,7 @@ private[math] trait ComplexIsNRoot[A] extends NRoot[Complex[A]] {
   implicit def algebra: Field[A]
   implicit def nroot: NRoot[A]
   implicit def trig: Trig[A]
-  implicit def order: IsReal[A]
+  implicit def signed: Signed[A]
 
   def nroot(a: Complex[A], k: Int): Complex[A] = a.nroot(k)
   override def sqrt(a: Complex[A]): Complex[A] = a.sqrt
@@ -669,15 +659,15 @@ private[math] class ComplexEq[A: Eq] extends Eq[Complex[A]] with Serializable {
 
 @SerialVersionUID(1L)
 private[math] final class ComplexIsRingImpl[@sp(Float,Double) A](implicit
-    val algebra: Ring[A], val order: IsReal[A]) extends ComplexIsRing[A] with Serializable
+    val algebra: Ring[A], val signed: Signed[A]) extends ComplexIsRing[A] with Serializable
 
 @SerialVersionUID(1L)
 private[math] final class ComplexIsFieldImpl[@sp(Float,Double) A](implicit
-    val algebra: Field[A], val order: IsReal[A]) extends ComplexIsField[A] with Serializable
+    val algebra: Field[A], val signed: Signed[A]) extends ComplexIsField[A] with Serializable
 
 @SerialVersionUID(1L)
 private[math] class ComplexAlgebra[@sp(Float, Double) A](implicit
-      val algebra: Field[A], val nroot: NRoot[A], val trig: Trig[A], val order: IsReal[A])
+      val algebra: Field[A], val nroot: NRoot[A], val trig: Trig[A], val signed: Signed[A])
     extends ComplexIsField[A]
     with ComplexIsTrig[A]
     with ComplexIsNRoot[A]

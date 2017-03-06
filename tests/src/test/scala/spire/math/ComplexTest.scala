@@ -87,7 +87,13 @@ class ComplexTest extends FunSuite {
     val i = Complex.i[Double]
 
     assert(Complex.rootsOfUnity[Double](2) === Array(one, -one))
+    assert(Complex.rootOfUnity[Double](2, 0) === one)
+    assert(Complex.rootOfUnity[Double](2, 1) === -one)
     assert(Complex.rootsOfUnity[Double](4) === Array(one, i, -one, -i))
+    assert(Complex.rootOfUnity[Double](4, 0) === one)
+    assert(Complex.rootOfUnity[Double](4, 1) === i)
+    assert(Complex.rootOfUnity[Double](4, 2) === -one)
+    assert(Complex.rootOfUnity[Double](4, 3) === -i)
 
     val theta = 2.0 * scala.math.Pi / 3.0
     val c1 = math.cos(theta) + math.sin(theta) * i
