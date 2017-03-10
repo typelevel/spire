@@ -560,7 +560,10 @@ object Rational extends RationalInstances {
         if (den.signum < 0) Rational(-num, -den) else Rational(num, den)
     }
 
-    def gcd(r: Rational): Rational = if(isZero) r.abs else if(isOne) this else r match {
+    def gcd(r: Rational): Rational =
+      if(isZero) r.abs // gcd(0, r) == abs(r)
+      else if (isOne) Rational(1, r.denominator) // gcd(1/1, a/b) = gcd(1, a)/lcm(1, b) = 1/abs(b) TODO sign
+      else r match {
       case r: LongRational =>
         val dgcd: Long = spire.math.gcd(d, r.d)
         val n0 = spire.math.abs(n)
