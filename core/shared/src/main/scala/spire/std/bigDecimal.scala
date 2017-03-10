@@ -9,7 +9,7 @@ import BigDecimal.RoundingMode.{CEILING, FLOOR, HALF_UP}
 import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
 import spire.math.Rational
 
-trait BigDecimalIsField extends Field[BigDecimal] {
+trait BigDecimalIsField extends Field.WithDefaultGCD[BigDecimal] {
   override def minus(a: BigDecimal, b: BigDecimal): BigDecimal = a - b
   def negate(a: BigDecimal): BigDecimal = -a
   val one: BigDecimal = BigDecimal(1.0)

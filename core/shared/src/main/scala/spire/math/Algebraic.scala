@@ -1527,7 +1527,7 @@ trait AlgebraicInstances {
   implicit final val AlgebraicTag = new LargeTag[Algebraic](Exact, Algebraic(0))
 }
 
-private[math] trait AlgebraicIsField extends Field[Algebraic] {
+private[math] trait AlgebraicIsField extends Field.WithDefaultGCD[Algebraic] {
   def zero: Algebraic = Algebraic.Zero
   def one: Algebraic = Algebraic.One
   def plus(a: Algebraic, b: Algebraic): Algebraic = a + b

@@ -7,7 +7,7 @@ import spire.syntax.euclideanRing._
 import spire.syntax.convertableFrom._
 
 import java.math.MathContext
-import spire.algebra.{Order, Signed}
+import spire.algebra.{Field, Order, Signed}
 
 class FixedPointOverflow(n: Long) extends Exception(n.toString)
 
@@ -296,7 +296,7 @@ object FixedPoint extends FixedPointInstances {
 trait FixedPointInstances {
 
   implicit def algebra(implicit scale: FixedScale): Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint] =
-    new Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint] { self =>
+    new Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint] with Field.WithDefaultGCD[FixedPoint] { self =>
       override def abs(x: FixedPoint): FixedPoint = x.abs
       override def signum(x: FixedPoint): Int = x.signum
 

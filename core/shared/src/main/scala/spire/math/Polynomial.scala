@@ -518,7 +518,7 @@ with Ring[Polynomial[C]] {
 }
 
 trait PolynomialOverField[@sp(Double) C] extends PolynomialOverRing[C]
-    with EuclideanRing[Polynomial[C]] with VectorSpace[Polynomial[C], C] { self =>
+    with EuclideanRing.WithEuclideanAlgorithm[Polynomial[C]] with VectorSpace[Polynomial[C], C] { self =>
   implicit override val scalar: Field[C]
 
   override def divr(x: Polynomial[C], k: C): Polynomial[C] = x :/ k
@@ -539,6 +539,7 @@ trait PolynomialOverField[@sp(Double) C] extends PolynomialOverRing[C]
     }
   }
 
+  /* TODO: check if we can use directly Euclidean algorithm
   // TODO: why final?
   final override def gcd(x: Polynomial[C], y: Polynomial[C])(implicit ev: Eq[Polynomial[C]]): Polynomial[C] = {
     val result = EuclideanRing.euclid(x, y)(ev, self)
@@ -551,6 +552,8 @@ trait PolynomialOverField[@sp(Double) C] extends PolynomialOverRing[C]
       Polynomial.constant(spire.math.gcd(x.coeffsArray ++ y.coeffsArray))
     }
   }
+  def lcm(x: Polynomial[C], y: Polynomial[C])(implicit ev: Eq[Polynomial[C]]): Polynomial[C] =
+    div(*/
 }
 
 trait PolynomialEq[@sp(Double) C] extends Eq[Polynomial[C]] {

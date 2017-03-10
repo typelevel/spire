@@ -600,7 +600,7 @@ private[math] trait ComplexIsRing[@sp(Float, Double) A] extends Ring[Complex[A]]
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
 }
 
-private[math] trait ComplexIsField[@sp(Float,Double) A] extends ComplexIsRing[A] with Field[Complex[A]] {
+private[math] trait ComplexIsField[@sp(Float,Double) A] extends ComplexIsRing[A] with Field.WithDefaultGCD[Complex[A]] {
 
   implicit def algebra: Field[A]
 

@@ -7,7 +7,7 @@ import spire.math.Rational
 import java.lang.Math
 
 
-trait DoubleIsField extends Field[Double] {
+trait DoubleIsField extends Field.WithDefaultGCD[Double] {
   override def minus(a:Double, b:Double): Double = a - b
   def negate(a:Double): Double = -a
   def one: Double = 1.0

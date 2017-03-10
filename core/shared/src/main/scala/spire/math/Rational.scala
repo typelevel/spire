@@ -5,7 +5,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import java.math.{BigDecimal => JBigDecimal, BigInteger, MathContext, RoundingMode}
 
-import spire.algebra.{Field, IsRational, NRoot, Sign}
+import spire.algebra.{Eq, Field, IsRational, NRoot, Sign}
 import spire.algebra.Sign.{ Positive, Zero, Negative }
 import spire.macros.Checked
 import spire.std.long.LongAlgebra
@@ -58,10 +58,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   }
    */
 
-  /* TODO: not commutative
-  def lcm(rhs: Rational): Rational = (lhs / (lhs gcd rhs)) * rhs
+  def lcm(rhs: Rational): Rational = if (lhs.isZero || rhs.isZero) Rational.zero else (lhs / (lhs gcd rhs)) * rhs
   def gcd(rhs: Rational): Rational
-   */
 
   def toReal: Real = Real(this)
 
@@ -561,7 +559,7 @@ object Rational extends RationalInstances {
         val den = SafeLong(d / b) * (r.n / a)
         if (den.signum < 0) Rational(-num, -den) else Rational(num, den)
     }
-/* TODO: restore commutativity
+
     def gcd(r: Rational): Rational = if(isZero) r.abs else if(isOne) this else r match {
       case r: LongRational =>
         val dgcd: Long = spire.math.gcd(d, r.d)
@@ -587,7 +585,6 @@ object Rational extends RationalInstances {
             SafeLong(dgcd) * lm * rm)
         }
     }
- */
 
     def floor: Rational =
       if (d == 1L) this
@@ -747,7 +744,6 @@ object Rational extends RationalInstances {
         if (den.signum < 0) Rational(-num, -den) else Rational(num, den)
     }
 
-    /* TODO: restore commutativity
     def gcd(r: Rational): Rational = r match {
       case r: LongRational => r gcd this
       case r: BigRational =>
@@ -760,7 +756,6 @@ object Rational extends RationalInstances {
           Rational((n * rm).abs gcd (r.n * lm).abs, dgcd * lm * rm)
         }
     }
-     */
 
     def floor: Rational =
       if (isWhole) this
@@ -839,7 +834,14 @@ private[math] trait RationalApproximateNRoot extends NRoot[Rational] {
     Rational(n.toDouble ** k.toDouble)
 }
 
-private[math] trait RationalIsField extends Field[Rational] {
+private[math] trait RationalIsField extends Field.FieldOfFractionsGCD[Rational, SafeLong] {
+  override def gcd(x: Rational, y: Rational)(implicit ev: Eq[Rational]) = x.gcd(y)
+  override def lcm(x: Rational, y: Rational)(implicit ev: Eq[Rational]) = x.lcm(y)
+  def ringR = SafeLong.SafeLongAlgebra
+  def eqR = SafeLong.SafeLongIsReal
+  def numerator(a:Rational): SafeLong = a.numerator
+  def denominator(a:Rational): SafeLong = a.denominator
+  def fraction(num:SafeLong, den:SafeLong): Rational = Rational(num, den)
   override def minus(a:Rational, b:Rational): Rational = a - b
   def negate(a:Rational): Rational = -a
   def one: Rational = Rational.one
