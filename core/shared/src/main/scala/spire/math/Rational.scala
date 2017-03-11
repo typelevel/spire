@@ -19,7 +19,9 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def numerator: SafeLong
   def denominator: SafeLong
 
+  def numeratorIsValidLong: Boolean
   def numeratorAsLong: Long
+  def denominatorIsValidLong: Boolean
   def denominatorAsLong: Long
 
   def isValidLong: Boolean
@@ -59,7 +61,41 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
    */
 
   def lcm(rhs: Rational): Rational = if (lhs.isZero || rhs.isZero) Rational.zero else (lhs / (lhs gcd rhs)) * rhs
-  def gcd(rhs: Rational): Rational
+  def gcd(rhs: Rational): Rational = {
+    var newNumAsLong = 0L
+    var newNumAsSafeLong: Opt[SafeLong] = Opt.empty[SafeLong]
+    if (lhs.numeratorIsValidLong && rhs.numeratorIsValidLong)
+      newNumAsLong = spire.math.gcd(lhs.numeratorAsLong, rhs.numeratorAsLong)
+    else
+      newNumAsSafeLong = Opt(lhs.numerator.gcd(rhs.numerator))
+    if (lhs.denominatorIsValidLong && rhs.denominatorIsValidLong) {
+      val ld = lhs.denominatorAsLong
+      val rd = rhs.denominatorAsLong
+      val dengcd = spire.math.gcd(ld, rd)
+      val tmp = ld / dengcd // fits in Long
+      // Checked does not like Opt.unapply, so we use isEmpty/get
+      Checked.tryOrElse {
+        val newDenAsLong = tmp * rd
+        if (newNumAsSafeLong.isEmpty)
+          Rational(newNumAsLong, newDenAsLong)
+        else
+          Rational(newNumAsSafeLong.get, SafeLong(newDenAsLong))
+      } {
+        val newDenAsSafeLong = SafeLong(tmp) * rd
+        // Checked does not like Opt.unapply
+        if (newNumAsSafeLong.isEmpty)
+          Rational(SafeLong(newNumAsLong), newDenAsSafeLong)
+        else
+          Rational(newNumAsSafeLong.get, newDenAsSafeLong)
+      }
+    } else {
+      val newDenAsSafeLong = lhs.denominator.lcm(rhs.denominator)
+      newNumAsSafeLong match {
+        case Opt(sl) => Rational(sl, newDenAsSafeLong)
+        case _ => Rational(SafeLong(newNumAsLong), newDenAsSafeLong)
+      }
+    }
+  }
 
   def toReal: Real = Real(this)
 
@@ -348,7 +384,9 @@ object Rational extends RationalInstances {
     def denominator: SafeLong = SafeLong(d)
 
     def numeratorAsLong: Long = n
+    def numeratorIsValidLong = true
     def denominatorAsLong: Long = d
+    def denominatorIsValidLong = true
 
     def reciprocal: Rational =
       if (n == 0L) throw new ArithmeticException("reciprocal called on 0/1")
@@ -560,35 +598,6 @@ object Rational extends RationalInstances {
         if (den.signum < 0) Rational(-num, -den) else Rational(num, den)
     }
 
-    def gcd(r: Rational): Rational =
-      if(isZero) r.abs // gcd(0, r) == abs(r)
-      else if (isOne) Rational(1, r.denominator) // gcd(1/1, a/b) = gcd(1, a)/lcm(1, b) = 1/abs(b) TODO sign
-      else r match {
-      case r: LongRational =>
-        val dgcd: Long = spire.math.gcd(d, r.d)
-        val n0 = spire.math.abs(n)
-        val n1 = spire.math.abs(r.n)
-        if (dgcd == 1L) {
-          Rational(spire.math.gcd(n0, n1), SafeLong(d) * r.d)
-        } else {
-          val lm = d / dgcd
-          val rm = r.d / dgcd
-          Rational((SafeLong(n0) * rm) gcd (SafeLong(n1) * lm), SafeLong(dgcd) * lm * rm)
-        }
-
-      case r: BigRational =>
-        val dgcd: Long = spire.math.gcd(d, (r.d % d).toLong)
-        if (dgcd == 1L) {
-          Rational(spire.math.gcd(spire.math.abs(n), spire.math.abs((r.n % n).toLong)),
-            SafeLong(d) * r.d)
-        } else {
-          val lm = d / dgcd
-          val rm = r.d / dgcd
-          Rational((SafeLong(spire.math.abs(n)) * rm) gcd (r.n.abs * lm),
-            SafeLong(dgcd) * lm * rm)
-        }
-    }
-
     def floor: Rational =
       if (d == 1L) this
       else if (n >= 0) Rational(n / d, 1L)
@@ -660,7 +669,9 @@ object Rational extends RationalInstances {
     def denominator: SafeLong = d
 
     def numeratorAsLong: Long = n.toLong
+    def numeratorIsValidLong: Boolean = n.isValidLong
     def denominatorAsLong: Long = d.toLong
+    def denominatorIsValidLong: Boolean = d.isValidLong
 
     def reciprocal: Rational = if (signum < 0)
       Rational(-d, -n)
@@ -745,19 +756,6 @@ object Rational extends RationalInstances {
         val num = (n / a) * (r.d / b)
         val den = (d / b) * (r.n / a)
         if (den.signum < 0) Rational(-num, -den) else Rational(num, den)
-    }
-
-    def gcd(r: Rational): Rational = r match {
-      case r: LongRational => r gcd this
-      case r: BigRational =>
-        val dgcd: SafeLong = d.gcd(r.d)
-        if (dgcd.isOne) {
-          Rational(n.abs gcd r.n.abs, d * r.d)
-        } else {
-          val lm = d / dgcd
-          val rm = r.d / dgcd
-          Rational((n * rm).abs gcd (r.n * lm).abs, dgcd * lm * rm)
-        }
     }
 
     def floor: Rational =

@@ -87,6 +87,14 @@ class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
   }
 
+  property("Rational.numeratorIsValidLong") { (x: Q) =>
+    x.numeratorIsValidLong shouldBe x.numerator.isValidLong
+  }
+
+  property("Rational.denominatorIsValidLong") { (x: Q) =>
+    x.denominatorIsValidLong shouldBe x.denominator.isValidLong
+  }
+
   property("limitTo(n) forces numerator and denominator to be less than n") {
     implicit val arbSafeLong: Arbitrary[SafeLong] =
       Arbitrary(arbitrary[BigInt].map { n => SafeLong(n.abs) }.filter(_.signum != 0))
