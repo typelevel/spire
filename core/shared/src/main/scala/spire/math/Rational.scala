@@ -20,8 +20,10 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def denominator: SafeLong
 
   def numeratorIsValidLong: Boolean
+  protected def numeratorAbsIsValidLong: Boolean
   def numeratorAsLong: Long
   def denominatorIsValidLong: Boolean
+  protected def denominatorAbsIsValidLong: Boolean
   def denominatorAsLong: Long
 
   def isValidLong: Boolean
@@ -67,7 +69,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     // when the new numerator is a Long, the Opt is empty, otherwise
     // it contains the new SafeLong numerator
     var newNumAsSafeLong: Opt[SafeLong] = Opt.empty[SafeLong]
-    if (lhs.numeratorIsValidLong && rhs.numeratorIsValidLong)
+    if (lhs.numeratorAbsIsValidLong && rhs.numeratorAbsIsValidLong)
       newNumAsLong = spire.math.gcd(lhs.numeratorAsLong, rhs.numeratorAsLong)
     else {
       val newNum = lhs.numerator.gcd(rhs.numerator)
@@ -76,7 +78,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
       else
         newNumAsSafeLong = Opt(newNum)
     }
-    if (lhs.denominatorIsValidLong && rhs.denominatorIsValidLong) {
+    if (lhs.denominatorAbsIsValidLong && rhs.denominatorAbsIsValidLong) {
       val ld = lhs.denominatorAsLong
       val rd = rhs.denominatorAsLong
       val dengcd = spire.math.gcd(ld, rd)
@@ -393,8 +395,10 @@ object Rational extends RationalInstances {
 
     def numeratorAsLong: Long = n
     def numeratorIsValidLong = true
+    def numeratorAbsIsValidLong = n != Long.MinValue
     def denominatorAsLong: Long = d
     def denominatorIsValidLong = true
+    def denominatorAbsIsValidLong = d != Long.MinValue
 
     def reciprocal: Rational =
       if (n == 0L) throw new ArithmeticException("reciprocal called on 0/1")
@@ -678,8 +682,10 @@ object Rational extends RationalInstances {
 
     def numeratorAsLong: Long = n.toLong
     def numeratorIsValidLong: Boolean = n.isValidLong
+    def numeratorAbsIsValidLong: Boolean = n.isValidLong && (n.toLong != Long.MinValue)
     def denominatorAsLong: Long = d.toLong
     def denominatorIsValidLong: Boolean = d.isValidLong
+    def denominatorAbsIsValidLong: Boolean = d.isValidLong && (d.toLong != Long.MinValue)
 
     def reciprocal: Rational = if (signum < 0)
       Rational(-d, -n)
