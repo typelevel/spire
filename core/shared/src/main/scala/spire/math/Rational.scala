@@ -62,12 +62,18 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
 
   def lcm(rhs: Rational): Rational = if (lhs.isZero || rhs.isZero) Rational.zero else (lhs / (lhs gcd rhs)) * rhs
   def gcd(rhs: Rational): Rational = {
+    // stores either the new numerator as a Long
     var newNumAsLong = 0L
     var newNumAsSafeLong: Opt[SafeLong] = Opt.empty[SafeLong]
     if (lhs.numeratorIsValidLong && rhs.numeratorIsValidLong)
       newNumAsLong = spire.math.gcd(lhs.numeratorAsLong, rhs.numeratorAsLong)
-    else
-      newNumAsSafeLong = Opt(lhs.numerator.gcd(rhs.numerator))
+    else {
+      val newNum = lhs.numerator.gcd(rhs.numerator)
+      if (newNum.isValidLong)
+        newNumAsLong = newNum.toLong
+      else
+        newNumAsSafeLong = Opt(newNum)
+    }
     if (lhs.denominatorIsValidLong && rhs.denominatorIsValidLong) {
       val ld = lhs.denominatorAsLong
       val rd = rhs.denominatorAsLong
