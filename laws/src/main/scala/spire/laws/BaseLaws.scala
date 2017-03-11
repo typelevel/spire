@@ -54,6 +54,17 @@ trait BaseLaws[A] extends Laws {
     }
   )
 
+  // more a convention: as GCD is defined up to a unit, so up to a sign,
+  // on an ordered GCD ring we require gcd(x, y) >= 0, which is the common
+  // behavior of computer algebra systems
+  def signedGCDRing(implicit signedA: Signed[A], gcdRingA: GCDRing[A]) = new DefaultRuleSet(
+    name = "signedGCDRing",
+    parent = Some(signedAdditiveAbGroup),
+    "gcd(x, y) >= 0" → forAll { (x: A, y: A) =>
+      x.gcd(y).signum >= 0
+    }
+  )
+
   def metricSpace[R](implicit MSA: MetricSpace[A, R], SR: Signed[R], OR: Order[R], ASR: AdditiveSemigroup[R]) = new SimpleRuleSet(
     name = "metricSpace",
     "non-negative" → forAll((a1: A, a2: A) =>
