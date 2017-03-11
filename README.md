@@ -249,12 +249,13 @@ most users will expect.
    + zero: additive identity
    + one: multiplicative identity
  * *Ring* (Rng + Rig)
- * *EuclideanRing*
-   + quot (`/~`): quotient (floor division)
-   + mod (`%`): remainder
-   + quotmod (`/%`): quotient and mod
+ * *GCDRing*
    + gcd: greatest-common-divisor
    + lcm: least-common-multiple
+ * *EuclideanRing*
+   + quot (`/~`): quotient (Euclidean division)
+   + mod (`%`): remainder
+   + quotmod (`/%`): quotient and mod
  * *Field*
    + reciprocal: multiplicative inverse
    + div (`/`): division
