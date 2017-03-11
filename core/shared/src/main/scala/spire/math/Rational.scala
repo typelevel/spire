@@ -63,49 +63,56 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
    */
 
   def lcm(rhs: Rational): Rational = if (lhs.isZero || rhs.isZero) Rational.zero else (lhs / (lhs gcd rhs)) * rhs
-  def gcd(rhs: Rational): Rational = {
-    // stores either the new numerator as a Long or SafeLong
-    var newNumAsLong = 0L
-    // when the new numerator is a Long, the Opt is empty, otherwise
-    // it contains the new SafeLong numerator
-    var newNumAsSafeLong: Opt[SafeLong] = Opt.empty[SafeLong]
-    if (lhs.numeratorAbsIsValidLong && rhs.numeratorAbsIsValidLong)
-      newNumAsLong = spire.math.gcd(lhs.numeratorAsLong, rhs.numeratorAsLong)
+  def gcd(rhs: Rational): Rational =
+    // a few shortcuts (that are correctly handled by the generic algorithm anyhow)
+    if (lhs.isZero) rhs.abs
+    else if (rhs.isZero) lhs.abs
+    else if (lhs.isOne) lhs
+    else if (rhs.isOne) rhs
     else {
-      val newNum = lhs.numerator.gcd(rhs.numerator)
-      if (newNum.isValidLong)
-        newNumAsLong = newNum.toLong
-      else
-        newNumAsSafeLong = Opt(newNum)
-    }
-    if (lhs.denominatorAbsIsValidLong && rhs.denominatorAbsIsValidLong) {
-      val ld = lhs.denominatorAsLong
-      val rd = rhs.denominatorAsLong
-      val dengcd = spire.math.gcd(ld, rd)
-      val tmp = ld / dengcd // fits in Long
-      // Checked does not like Opt.unapply, so we use isEmpty/get
-      Checked.tryOrElse {
-        val newDenAsLong = tmp * rd
-        if (newNumAsSafeLong.isEmpty)
-          Rational(newNumAsLong, newDenAsLong)
+      // now the generic algorithm
+      // stores either the new numerator as a Long or SafeLong
+      var newNumAsLong = 0L
+      // when the new numerator is a Long, the Opt is empty, otherwise
+      // it contains the new SafeLong numerator
+      var newNumAsSafeLong: Opt[SafeLong] = Opt.empty[SafeLong]
+      if (lhs.numeratorAbsIsValidLong && rhs.numeratorAbsIsValidLong)
+        newNumAsLong = spire.math.gcd(lhs.numeratorAsLong, rhs.numeratorAsLong)
+      else {
+        val newNum = lhs.numerator.gcd(rhs.numerator)
+        if (newNum.isValidLong)
+          newNumAsLong = newNum.toLong
         else
-          Rational(newNumAsSafeLong.get, SafeLong(newDenAsLong))
-      } {
-        val newDenAsSafeLong = SafeLong(tmp) * rd
-        // Checked does not like Opt.unapply
-        if (newNumAsSafeLong.isEmpty)
-          Rational(SafeLong(newNumAsLong), newDenAsSafeLong)
-        else
-          Rational(newNumAsSafeLong.get, newDenAsSafeLong)
+          newNumAsSafeLong = Opt(newNum)
       }
-    } else {
-      val newDenAsSafeLong = lhs.denominator.lcm(rhs.denominator)
-      newNumAsSafeLong match {
-        case Opt(sl) => Rational(sl, newDenAsSafeLong)
-        case _ => Rational(SafeLong(newNumAsLong), newDenAsSafeLong)
+      if (lhs.denominatorAbsIsValidLong && rhs.denominatorAbsIsValidLong) {
+        val ld = lhs.denominatorAsLong
+        val rd = rhs.denominatorAsLong
+        val dengcd = spire.math.gcd(ld, rd)
+        val tmp = ld / dengcd // fits in Long
+                              // Checked does not like Opt.unapply, so we use isEmpty/get
+        Checked.tryOrElse {
+          val newDenAsLong = tmp * rd
+          if (newNumAsSafeLong.isEmpty)
+            Rational(newNumAsLong, newDenAsLong)
+          else
+            Rational(newNumAsSafeLong.get, SafeLong(newDenAsLong))
+        } {
+          val newDenAsSafeLong = SafeLong(tmp) * rd
+          // Checked does not like Opt.unapply
+          if (newNumAsSafeLong.isEmpty)
+            Rational(SafeLong(newNumAsLong), newDenAsSafeLong)
+          else
+            Rational(newNumAsSafeLong.get, newDenAsSafeLong)
+        }
+      } else {
+        val newDenAsSafeLong = lhs.denominator.lcm(rhs.denominator)
+        newNumAsSafeLong match {
+          case Opt(sl) => Rational(sl, newDenAsSafeLong)
+          case _ => Rational(SafeLong(newNumAsLong), newDenAsSafeLong)
+        }
       }
     }
-  }
 
   def toReal: Real = Real(this)
 
