@@ -62,6 +62,15 @@ trait BaseLaws[A] extends Laws {
     parent = Some(signedAdditiveAbGroup),
     "gcd(x, y) >= 0" → forAll { (x: A, y: A) =>
       x.gcd(y).signum >= 0
+    },
+    "gcd(x, 1) === 1" → forAll { (x: A) =>
+      x.gcd(Ring[A].one) === Ring[A].one
+    },
+    "gcd(x, 0) === abs(x)" → forAll { (x: A) =>
+      x.gcd(Ring[A].zero) === Signed[A].abs(x)
+    },
+    "lcm(x, 1) === x" → forAll { (x: A) =>
+      x.lcm(Ring[A].one) === x
     }
   )
 

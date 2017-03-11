@@ -164,7 +164,9 @@ trait RingLaws[A] extends GroupLaws[A] {
       import spire.syntax.gcdRing._
       (x lcm y) === (y lcm x)
     },
-    "lcm(x, 0) == 0" → forAll { (x: A) => (x lcm A.zero) === A.zero }
+    "gcd(0, 0)" → ((A.zero gcd A.zero) === A.zero),
+    "lcm(0, 0) === 0" → ((A.zero lcm A.zero) === A.zero),
+    "lcm(x, 0) === 0" → forAll { (x: A) => (x lcm A.zero) === A.zero }
   )
 
   def euclideanRing(implicit A: EuclideanRing[A]) = RingProperties.fromParent(
