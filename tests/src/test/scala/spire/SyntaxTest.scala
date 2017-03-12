@@ -126,7 +126,6 @@ trait BaseSyntaxTest {
 
   def testSignedSyntax[A: Signed: Eq](a: A) = {
     import spire.syntax.signed._
-    import spire.syntax.eq._
     (a.sign == Signed[A].sign(a)) &&
       (a.signum == Signed[A].signum(a)) &&
       (a.abs === Signed[A].abs(a)) &&

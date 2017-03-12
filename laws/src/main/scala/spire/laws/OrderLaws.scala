@@ -52,6 +52,22 @@ trait OrderLaws[A] extends Laws {
     )
   )
 
+  // copy of these laws in LimitedRangeLaws.scala
+
+  def signed(implicit A: Signed[A]) = new OrderProperties(
+    name = "signed",
+    parent = Some(order),
+    "abs non-negative" → forAll((x: A) =>
+      x.abs.sign != Sign.Negative
+    ),
+    "signum returns -1/0/1" → forAll((x: A) =>
+      x.signum.abs <= 1
+    ),
+    "signum is sign.toInt" → forAll((x: A) =>
+      x.signum == x.sign.toInt
+    )
+  )
+
   class OrderProperties(
     name: String,
     parent: Option[OrderProperties],

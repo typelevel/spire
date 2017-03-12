@@ -9,7 +9,6 @@ import spire.syntax.cfor._
 import spire.syntax.monoid._
 import spire.syntax.field._
 import spire.syntax.nroot._
-import spire.syntax.order._
 import spire.syntax.signed._
 
 final class LiteralIntOps(val lhs: Int) extends AnyVal {

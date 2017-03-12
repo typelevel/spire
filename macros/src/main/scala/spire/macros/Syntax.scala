@@ -21,6 +21,14 @@ object Ops extends machinist.Ops {
       ("$less$bar$plus$bar$qmark", "partialActr"),
       ("$less$bar$plus$bar$qmark$qmark", "actrIsDefined"),
 
+      // truncated division /~ % /%
+      ("t_$div$tilde", "tquot"),
+      ("t_$percent", "tmod"),
+      ("t_$div$percent", "tquotmod"),
+      ("f_$div$tilde", "fquot"),
+      ("f_$percent", "fmod"),
+      ("f_$div$percent", "fquotmod"),
+
       // square root
       (uesc('√'), "sqrt"),
 

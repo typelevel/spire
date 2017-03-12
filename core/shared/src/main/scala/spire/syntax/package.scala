@@ -7,6 +7,7 @@ package object syntax {
   object eq extends EqSyntax
   object partialOrder extends PartialOrderSyntax
   object order extends OrderSyntax
+  object truncatedDivision extends TruncatedDivisionSyntax
   object signed extends SignedSyntax
   object isReal extends IsRealSyntax
   object convertableFrom extends ConvertableFromSyntax

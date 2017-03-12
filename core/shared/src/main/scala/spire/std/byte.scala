@@ -1,8 +1,9 @@
 package spire
 package std
 
-import spire.algebra.{Eq, EuclideanRing, IsIntegral, NRoot, Order, Signed}
+import spire.algebra.{Eq, EuclideanRing, IsIntegral, NRoot, Order, Signed, TruncatedDivisionCRing}
 import spire.math.BitString
+import spire.util.Opt
 
 trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
   override def minus(a:Byte, b:Byte): Byte = (a - b).toByte
@@ -45,11 +46,6 @@ trait ByteIsNRoot extends NRoot[Byte] {
   def fpow(a: Byte, b: Byte): Byte = Math.pow(a, b).toByte
 }
 
-trait ByteIsSigned extends Signed[Byte] {
-  override def signum(a: Byte): Int = java.lang.Integer.signum(a)
-  override def abs(a: Byte): Byte = (if (a < 0) -a else a).toByte
-}
-
 trait ByteOrder extends Order[Byte] {
   override def eqv(x:Byte, y:Byte): Boolean = x == y
   override def neqv(x:Byte, y:Byte): Boolean = x != y
@@ -60,7 +56,18 @@ trait ByteOrder extends Order[Byte] {
   def compare(x: Byte, y: Byte): Int = java.lang.Integer.signum((x: Int) - (y: Int))
 }
 
-trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned {
+trait ByteSigned extends Signed[Byte] with ByteOrder {
+  override def signum(a: Byte): Int = java.lang.Integer.signum(a)
+  override def abs(a: Byte): Byte = (if (a < 0) -a else a).toByte
+}
+
+trait ByteTruncatedDivision extends TruncatedDivisionCRing[Byte] with ByteSigned {
+  def toBigIntOpt(x: Byte) = Opt(BigInt(x))
+  def tquot(x: Byte, y: Byte) = (x / y).toByte
+  def tmod(x: Byte, y: Byte) = (x % y).toByte
+}
+
+trait ByteIsReal extends IsIntegral[Byte] with ByteTruncatedDivision with ByteSigned {
   def toDouble(n: Byte): Double = n.toDouble
   def toBigInt(n: Byte): BigInt = BigInt(n)
 }
