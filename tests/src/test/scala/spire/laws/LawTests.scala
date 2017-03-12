@@ -56,6 +56,8 @@ class LawTests extends FunSuite with Discipline {
   checkAll("UInt",       LimitedRangeLaws[UInt].signedAdditiveCMonoid)
   checkAll("ULong",      RingLaws[ULong].cRig)
   checkAll("ULong",      LimitedRangeLaws[ULong].signedAdditiveCMonoid)
+  checkAll("Natural",    RingLaws[Natural].cRig)
+  checkAll("Natural",    CombinationLaws[Natural].signedAdditiveCMonoid)
   checkAll("SafeLong",   RingLaws[SafeLong].euclideanRing)
   checkAll("SafeLong",   CombinationLaws[SafeLong].signedGCDRing)
 
