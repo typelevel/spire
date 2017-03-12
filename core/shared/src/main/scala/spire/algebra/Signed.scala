@@ -21,7 +21,7 @@ trait Signed[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Orde
   /** Returns Zero if `a` is 0, Positive if `a` is positive, and Negative is `a` is negative. */
   def sign(a: A): Sign = Sign(signum(a))
 
-  /** Returns 0 if `a` is 0, > 0 if `a` is positive, and < 0 is `a` is negative. */
+  /** Returns 0 if `a` is 0, 1 if `a` is positive, and -1 is `a` is negative. */
   def signum(a: A): Int
 
   /** An idempotent function that ensures an object has a non-negative sign. */
@@ -37,7 +37,7 @@ trait Signed[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Orde
 }
 
 trait SignedAdditiveCMonoid[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Signed[A] with AdditiveCMonoid[A] {
-  /** Returns 0 if `a` is 0, > 0 if `a` is positive, and < 0 is `a` is negative. */
+  /** Returns 0 if `a` is 0, 1 if `a` is positive, and -1 is `a` is negative. */
   def signum(a: A): Int = {
     val c = compare(a, zero)
     if (c < 0) -1
