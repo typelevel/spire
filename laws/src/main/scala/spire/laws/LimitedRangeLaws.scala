@@ -15,6 +15,8 @@ trait LimitedRange[A] { self =>
 
   import LimitedRange.RangeCheck
 
+  implicit def Tag: NumberTag[A]
+
   /** Conversion for limited range type `A` to `BigInt`. Is total. */
   def toBigInt(a: A): BigInt
   def toBigInt(t: (A, A)): (BigInt, BigInt) = (toBigInt(t._1), toBigInt(t._2))
@@ -26,8 +28,6 @@ trait LimitedRange[A] { self =>
     * `fromBigInt(toBigInt(a)/2)` should always be defined.
     */
   def fromBigInt(b: BigInt): A
-
-  implicit def Tag: NumberTag[A]
 
   /** Shrinks the generated scalar by half. */
   def half(a: A): A = fromBigInt(toBigInt(a)/2)
@@ -41,6 +41,7 @@ trait LimitedRange[A] { self =>
     Tag.hasMaxValue.fold(true)(maxVal => y <= toBigInt(maxVal))
   }
 
+  /** Returns a generator for `A` that passes the provided range checks. */
   def restrictedGen1[S:RangeCheck](checks: BigInt => S)(implicit arb: Arbitrary[A]): Gen[A] =
     arb.arbitrary.map { x =>
       @tailrec def rec(x1: A): A =
@@ -48,6 +49,7 @@ trait LimitedRange[A] { self =>
       rec(x)
     }
 
+  /** Returns a generator for `(A, A)` that passes the provided range checks. */
   def restrictedGen2[S:RangeCheck](checks: (BigInt, BigInt) => S)(implicit arb: Arbitrary[A]): Gen[(A, A)] =
     for (x <- arb.arbitrary; y <- arb.arbitrary) yield {
       @tailrec def rec(t: (A, A)): (A, A) =
@@ -55,6 +57,7 @@ trait LimitedRange[A] { self =>
       rec((x, y))
     }
 
+  /** Returns a generator for `(A, A, A)` that passes the provided range checks. */
   def restrictedGen3[S:RangeCheck](checks: (BigInt, BigInt, BigInt) => S)(implicit arb: Arbitrary[A]): Gen[(A, A, A)] =
     for (x <- arb.arbitrary; y <- arb.arbitrary; z <- arb.arbitrary) yield {
       @tailrec def rec(t: (A, A, A)): (A, A, A) =
@@ -62,6 +65,7 @@ trait LimitedRange[A] { self =>
       rec((x, y, z))
     }
 
+  /** Returns a generator for `(A, A, A)` that passes the provided range checks. */
   def restrictedGen4[S:RangeCheck](checks: (BigInt, BigInt, BigInt, BigInt) => S)(implicit arb: Arbitrary[A]): Gen[(A, A, A, A)] =
     for (x <- arb.arbitrary; y <- arb.arbitrary; z <- arb.arbitrary; w <- arb.arbitrary) yield {
       @tailrec def rec(t: (A, A, A, A)): (A, A, A, A) =
@@ -75,6 +79,7 @@ object LimitedRange {
 
   def apply[A](implicit ev: LimitedRange[A]): LimitedRange[A] = ev
 
+  /** Creates a `LimitedRange` description from a `Integral` and `NumberTag` implicits. */
   implicit def fromIntegral[A](implicit A: Integral[A], Tag0: NumberTag[A]): LimitedRange[A] =
     new LimitedRange[A] {
       def toBigInt(a: A) = A.toBigInt(a)
@@ -82,6 +87,7 @@ object LimitedRange {
       def Tag = Tag0
     }
 
+  /** Create a `LimitedRange` description with the provided `NumberTag` and conversion functions. */
   def apply[A](f: A => BigInt, g: BigInt => A)(implicit Tag0: NumberTag[A]): LimitedRange[A] =
     new LimitedRange[A] {
       def toBigInt(a: A) = f(a)
@@ -94,7 +100,7 @@ object LimitedRange {
   implicit val uInt: LimitedRange[UInt] = apply(_.toBigInt, b => UInt(b.toLong))
   implicit val uLong: LimitedRange[ULong] = apply(_.toBigInt, ULong.fromBigInt)
 
-  /** Convenient syntax suger to support different kinds of return types for the size list:
+  /** Convenient syntax sugar to support different kinds of return types for the size list:
     * simple scalar, small tuples (size = 2,3,4) and seqs.
     */
   trait RangeCheck[S] {
