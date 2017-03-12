@@ -5,7 +5,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import java.math.{BigDecimal => JBigDecimal, BigInteger, MathContext, RoundingMode}
 
-import spire.algebra.{Eq, Field, IsRational, NRoot, Sign}
+import spire.algebra.{Eq, Field, IsRational, NRoot, Sign, TruncatedDivisionCRing}
 import spire.algebra.Sign.{ Positive, Zero, Negative }
 import spire.macros.Checked
 import spire.std.long.LongAlgebra
@@ -53,14 +53,12 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def *(rhs: Rational): Rational
   def /(rhs: Rational): Rational
 
-  /* TODO: move to TruncatedDivision
-  def /~(rhs: Rational): Rational = Rational(SafeLong((this / rhs).toBigInt), SafeLong.one)
-  def %(rhs: Rational): Rational = this - (this /~ rhs) * rhs
-  def /%(rhs: Rational): (Rational, Rational) = {
-    val q = this /~ rhs
+  def t_/~(rhs: Rational): Rational = Rational(SafeLong((this / rhs).toBigInt), SafeLong.one)
+  def t_%(rhs: Rational): Rational = this - (this t_/~ rhs) * rhs
+  def t_/%(rhs: Rational): (Rational, Rational) = {
+    val q = this t_/~ rhs
     (q, this - q * rhs)
   }
-   */
 
   def lcm(rhs: Rational): Rational = if (lhs.isZero || rhs.isZero) Rational.zero else (lhs / (lhs gcd rhs)) * rhs
   def gcd(rhs: Rational): Rational =
@@ -871,24 +869,12 @@ private[math] trait RationalIsField extends Field.FieldOfFractionsGCD[Rational, 
   override def pow(a:Rational, b:Int): Rational = a.pow(b)
   override def times(a:Rational, b:Rational): Rational = a * b
   def zero: Rational = Rational.zero
-  /* TODO: move to TruncatedDivision
-  def quot(a:Rational, b:Rational): Rational = a /~ b
-  def mod(a:Rational, b:Rational): Rational = a % b
-  override def quotmod(a:Rational, b:Rational): (Rational, Rational) = a /% b
-   */
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
   def div(a:Rational, b:Rational): Rational = a / b
 }
 
-/* TODO: restore commutativity
-private[math] trait RationalIsGcd extends Gcd[Rational] {
-  def lcm(a:Rational, b:Rational): Rational = a lcm b
-  def gcd(a:Rational, b:Rational): Rational = a gcd b
-}
- */
-
-private[math] trait RationalIsReal extends IsRational[Rational] {
+private[math] trait RationalIsReal extends IsRational[Rational] with TruncatedDivisionCRing[Rational] {
   override def eqv(x:Rational, y:Rational): Boolean = x == y
   override def neqv(x:Rational, y:Rational): Boolean = x != y
   override def gt(x: Rational, y: Rational): Boolean = x > y
@@ -907,6 +893,10 @@ private[math] trait RationalIsReal extends IsRational[Rational] {
   def round(a:Rational): Rational = a.round
   def toRational(a: Rational): Rational = a
   def isWhole(a:Rational): Boolean = a.isWhole
+  def toBigIntOpt(a: Rational): Opt[BigInt] = if (a.isWhole) Opt(a.toBigInt) else Opt.empty[BigInt]
+  def tquot(x: Rational, y: Rational): Rational = x t_/~ y
+  def tmod(x: Rational, y: Rational): Rational = x t_% y
+  override def tquotmod(x: Rational, y: Rational) = x t_/% y
 }
 
 @SerialVersionUID(1L)
