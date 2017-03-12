@@ -21,17 +21,25 @@ object LimitedRangeLaws {
   }
 }
 
+/** Syntax support for limited range forAll; the law provides not only a property to check,
+  * but also a list of intermediate results that should be contained in the range of the
+  * tested primitive type.
+  */
 trait LimitedRangeSyntax[A] {
 
   implicit def Arb: Arbitrary[A]
   implicit def Itg: Integral[A]
   implicit def Tag: NumberTag[A]
 
+  /** Checks that `y`, given as an arbitrary length integer, fits into the tested type `A`. */
   def inRange(y: BigInt): Boolean = {
     Tag.hasMinValue.fold(true)(minVal => Itg.toBigInt(minVal) <= y) &&
     Tag.hasMaxValue.fold(true)(maxVal => y <= Itg.toBigInt(maxVal))
   }
 
+  /** Convenient syntax suger to support different kinds of return types for the size list:
+    * simple scalar, small tuples (size = 2,3,4) and seqs.
+    */
   trait RangeCheck[S] {
     def check[B](b: B)(f: B => S): Boolean
   }
@@ -40,12 +48,12 @@ trait LimitedRangeSyntax[A] {
 
     def apply[S](implicit ev: RangeCheck[S]): RangeCheck[S] = ev
 
-    implicit object seq extends RangeCheck[Seq[BigInt]] {
-      def check[B](b: B)(f: B => Seq[BigInt]) = f(b).forall(inRange)
+    implicit object scalar extends RangeCheck[BigInt] {
+      def check[B](b: B)(f: B => BigInt) = inRange(f(b))
     }
 
-    implicit object bigInt extends RangeCheck[BigInt] {
-      def check[B](b: B)(f: B => BigInt) = inRange(f(b))
+    implicit object seq extends RangeCheck[Seq[BigInt]] {
+      def check[B](b: B)(f: B => Seq[BigInt]) = f(b).forall(inRange)
     }
 
     implicit object tuple2 extends RangeCheck[(BigInt, BigInt)] {
@@ -71,6 +79,7 @@ trait LimitedRangeSyntax[A] {
 
   }
 
+  /** Shrinks the generated scalar by half. */
   def half(a: A): A = Itg.fromBigInt(Itg.toBigInt(a) / 2)
 
   type ToProp[X] = X => Prop
@@ -126,8 +135,13 @@ trait LimitedRangeSyntax[A] {
 }
 
 
-/** Shadows tests from other Laws traits by allowing the property test only when the
-  * intermediate results are in the range of the tested type. 
+/** Shadows tests from other Laws traits by forcing the generated arguments to have proper size
+  * so that intermediate results fit in the tested type.
+  * 
+  * Contains only commutative variants (the primitive integers have commutative operations),
+  * and merges under one trait the additive, multiplicate monoid/group parts.
+  * As this is quite specialized, we aim for simplicitly, not generality.
+  * 
   */
 trait LimitedRangeLaws[A] extends LimitedRangeSyntax[A] with Laws {
 

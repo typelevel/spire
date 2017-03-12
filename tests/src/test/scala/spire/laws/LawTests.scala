@@ -49,9 +49,14 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Rational",   CombinationLaws[BigInt].signedGCDRing)
   checkAll("Real",       RingLaws[Real].field)
   checkAll("UByte",      RingLaws[UByte].cRig)
+  // no Integral[A] for unsigned integers. TODO.
+  //  checkAll("UByte",      LimitedRangeLaws[UByte].signedAdditiveCMonoid)
   checkAll("UShort",     RingLaws[UShort].cRig)
+  //  checkAll("UShort",     LimitedRangeLaws[UShort].signedAdditiveCMonoid)
   checkAll("UInt",       RingLaws[UInt].cRig)
+  //  checkAll("UInt",       LimitedRangeLaws[UInt].signedAdditiveCMonoid)
   checkAll("ULong",      RingLaws[ULong].cRig)
+  //  checkAll("ULong",      LimitedRangeLaws[ULong].signedAdditiveCMonoid)
   checkAll("SafeLong",   RingLaws[SafeLong].euclideanRing)
   checkAll("SafeLong",   CombinationLaws[SafeLong].signedGCDRing)
 
