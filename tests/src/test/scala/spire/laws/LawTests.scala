@@ -33,8 +33,14 @@ class LawTests extends FunSuite with Discipline {
   }
 
   // Float and Double fail these tests
-  checkAll("Int",        RingLaws[Int].cRing)
-  checkAll("Long",       RingLaws[Long].cRing)
+  checkAll("Byte",       LimitedRangeLaws[Byte].cRing)
+  checkAll("Byte",       LimitedRangeLaws[Byte].signedGCDRing)
+  checkAll("Short",      LimitedRangeLaws[Short].cRing)
+  checkAll("Short",      LimitedRangeLaws[Short].signedGCDRing)
+  checkAll("Int",        LimitedRangeLaws[Int].euclideanRing)
+  checkAll("Int",        LimitedRangeLaws[Int].signedGCDRing)
+  checkAll("Long",       LimitedRangeLaws[Long].euclideanRing)
+  checkAll("Long",       LimitedRangeLaws[Long].signedGCDRing)
   checkAll("BigInt",     RingLaws[BigInt].euclideanRing)
   checkAll("BigInt",     CombinationLaws[BigInt].signedGCDRing)
   checkAll("BigInteger", RingLaws[BigInteger].euclideanRing)
