@@ -2,23 +2,155 @@ package spire
 package laws
 
 import spire.algebra._
-import spire.math.{Integral, NumberTag}
+import spire.math.{Integral, NumberTag, UByte, UShort, UInt, ULong}
 import spire.implicits._
 
 import org.typelevel.discipline.{Laws, Predicate}
 
-import org.scalacheck.{Arbitrary, Prop}
+import org.scalacheck.{Arbitrary, Gen, Prop}
 import org.scalacheck.Prop._
+
+/** Self-contained description for limited range types. */
+trait LimitedRange[A] { self =>
+
+  import LimitedRange.RangeCheck
+
+  /** Conversion for limited range type `A` to `BigInt`. Is total. */
+  def toBigInt(a: A): BigInt
+  def toBigInt(t: (A, A)): (BigInt, BigInt) = (toBigInt(t._1), toBigInt(t._2))
+  def toBigInt(t: (A, A, A)): (BigInt, BigInt, BigInt) = (toBigInt(t._1), toBigInt(t._2), toBigInt(t._3))
+  def toBigInt(t: (A, A, A, A)): (BigInt, BigInt, BigInt, BigInt) = (toBigInt(t._1), toBigInt(t._2), toBigInt(t._3), toBigInt(t._4))
+
+  /** Conversion to limited range type `A` from `BigInt`. Is not necessarily total,
+    * but we must have `fromBigInt(toBigInt(a)) === a` and
+    * `fromBigInt(toBigInt(a)/2)` should always be defined.
+    */
+  def fromBigInt(b: BigInt): A
+
+  implicit def Tag: NumberTag[A]
+
+  /** Shrinks the generated scalar by half. */
+  def half(a: A): A = fromBigInt(toBigInt(a)/2)
+  def half(t: (A, A)): (A, A) = (half(t._1), half(t._2))
+  def half(t: (A, A, A)): (A, A, A) = (half(t._1), half(t._2), half(t._3))
+  def half(t: (A, A, A, A)): (A, A, A, A) = (half(t._1), half(t._2), half(t._3), half(t._4))
+
+  /** Checks that `y`, given as an arbitrary length integer, fits into the tested type `A`. */
+  def inRange(y: BigInt): Boolean = {
+    Tag.hasMinValue.fold(true)(minVal => toBigInt(minVal) <= y) &&
+    Tag.hasMaxValue.fold(true)(maxVal => y <= toBigInt(maxVal))
+  }
+
+  def restrictedGen1[S:RangeCheck](checks: BigInt => S)(implicit arb: Arbitrary[A]): Gen[A] =
+    arb.arbitrary.map { x =>
+      @tailrec def rec(x1: A): A =
+        if (RangeCheck[S].check(self, toBigInt(x1))(checks)) x1 else rec(half(x1))
+      rec(x)
+    }
+
+  def restrictedGen2[S:RangeCheck](checks: (BigInt, BigInt) => S)(implicit arb: Arbitrary[A]): Gen[(A, A)] =
+    for (x <- arb.arbitrary; y <- arb.arbitrary) yield {
+      @tailrec def rec(t: (A, A)): (A, A) =
+        if (RangeCheck[S].check(self, toBigInt(t))(checks.tupled)) t else rec(half(t))
+      rec((x, y))
+    }
+
+  def restrictedGen3[S:RangeCheck](checks: (BigInt, BigInt, BigInt) => S)(implicit arb: Arbitrary[A]): Gen[(A, A, A)] =
+    for (x <- arb.arbitrary; y <- arb.arbitrary; z <- arb.arbitrary) yield {
+      @tailrec def rec(t: (A, A, A)): (A, A, A) =
+        if (RangeCheck[S].check(self, toBigInt(t))(checks.tupled)) t else rec(half(t))
+      rec((x, y, z))
+    }
+
+  def restrictedGen4[S:RangeCheck](checks: (BigInt, BigInt, BigInt, BigInt) => S)(implicit arb: Arbitrary[A]): Gen[(A, A, A, A)] =
+    for (x <- arb.arbitrary; y <- arb.arbitrary; z <- arb.arbitrary; w <- arb.arbitrary) yield {
+      @tailrec def rec(t: (A, A, A, A)): (A, A, A, A) =
+        if (RangeCheck[S].check(self, toBigInt(t))(checks.tupled)) t else rec(half(t))
+      rec((x, y, z, w))
+    }
+
+}
+
+object LimitedRange {
+
+  def apply[A](implicit ev: LimitedRange[A]): LimitedRange[A] = ev
+
+  implicit def fromIntegral[A](implicit A: Integral[A], Tag0: NumberTag[A]): LimitedRange[A] =
+    new LimitedRange[A] {
+      def toBigInt(a: A) = A.toBigInt(a)
+      def fromBigInt(b: BigInt) = A.fromBigInt(b)
+      def Tag = Tag0
+    }
+
+  def apply[A](f: A => BigInt, g: BigInt => A)(implicit Tag0: NumberTag[A]): LimitedRange[A] =
+    new LimitedRange[A] {
+      def toBigInt(a: A) = f(a)
+      def fromBigInt(b: BigInt) = g(b)
+      def Tag = Tag0
+    }
+
+  implicit val uByte: LimitedRange[UByte] = apply(_.toBigInt, b => UByte(b.toInt))
+  implicit val uShort: LimitedRange[UShort] = apply(_.toBigInt, b => UShort(b.toInt))
+  implicit val uInt: LimitedRange[UInt] = apply(_.toBigInt, b => UInt(b.toLong))
+  implicit val uLong: LimitedRange[ULong] = apply(_.toBigInt, ULong.fromBigInt)
+
+  /** Convenient syntax suger to support different kinds of return types for the size list:
+    * simple scalar, small tuples (size = 2,3,4) and seqs.
+    */
+  trait RangeCheck[S] {
+    def check[T](range: LimitedRange[_], tuple: T)(f: T => S): Boolean
+  }
+
+  object RangeCheck {
+
+    def apply[S](implicit ev: RangeCheck[S]): RangeCheck[S] = ev
+
+    implicit object scalar extends RangeCheck[BigInt] {
+      def check[T](range: LimitedRange[_], tuple: T)(f: T => BigInt) = range.inRange(f(tuple))
+    }
+
+    implicit object seq extends RangeCheck[Seq[BigInt]] {
+      def check[T](range: LimitedRange[_], tuple: T)(f: T => Seq[BigInt]) = f(tuple).forall(range.inRange)
+    }
+
+    implicit object tuple2 extends RangeCheck[(BigInt, BigInt)] {
+      def check[T](range: LimitedRange[_], tuple: T)(f: T => (BigInt, BigInt)) = {
+        import range.inRange
+        val (b1, b2) = f(tuple)
+        inRange(b1) && inRange(b2)
+      }
+    }
+
+    implicit object tuple3 extends RangeCheck[(BigInt, BigInt, BigInt)] {
+      def check[T](range: LimitedRange[_], tuple: T)(f: T => (BigInt, BigInt, BigInt)) = {
+        import range.inRange
+        val (b1, b2, b3) = f(tuple)
+        inRange(b1) && inRange(b2) && inRange(b3)
+      }
+    }
+
+    implicit object tuple4 extends RangeCheck[(BigInt, BigInt, BigInt, BigInt)] {
+      def check[T](range: LimitedRange[_], tuple: T)(f: T => (BigInt, BigInt, BigInt, BigInt)) = {
+        import range.inRange
+        val (b1, b2, b3, b4) = f(tuple)
+        inRange(b1) && inRange(b2) && inRange(b3) && inRange(b4)
+      }
+    }
+
+  }
+
+}
+
 
 object LimitedRangeLaws {
 
-  def apply[A:Eq:Arbitrary:Integral:NumberTag](implicit _pred: Predicate[A]) = new LimitedRangeLaws[A] {
+  def apply[A:Eq:Arbitrary:LimitedRange](implicit _pred: Predicate[A]) = new LimitedRangeLaws[A] {
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
-    def Tag = NumberTag[A]
-    def Itg = Integral[A]
+    def LR = LimitedRange[A]
     def pred = _pred
   }
+
 }
 
 /** Syntax support for limited range forAll; the law provides not only a property to check,
@@ -27,113 +159,29 @@ object LimitedRangeLaws {
   */
 trait LimitedRangeSyntax[A] {
 
-  implicit def Arb: Arbitrary[A]
-  implicit def Itg: Integral[A]
-  implicit def Tag: NumberTag[A]
+  import LimitedRange.RangeCheck
 
-  /** Checks that `y`, given as an arbitrary length integer, fits into the tested type `A`. */
-  def inRange(y: BigInt): Boolean = {
-    Tag.hasMinValue.fold(true)(minVal => Itg.toBigInt(minVal) <= y) &&
-    Tag.hasMaxValue.fold(true)(maxVal => y <= Itg.toBigInt(maxVal))
-  }
-
-  /** Convenient syntax suger to support different kinds of return types for the size list:
-    * simple scalar, small tuples (size = 2,3,4) and seqs.
-    */
-  trait RangeCheck[S] {
-    def check[B](b: B)(f: B => S): Boolean
-  }
-
-  object RangeCheck {
-
-    def apply[S](implicit ev: RangeCheck[S]): RangeCheck[S] = ev
-
-    implicit object scalar extends RangeCheck[BigInt] {
-      def check[B](b: B)(f: B => BigInt) = inRange(f(b))
-    }
-
-    implicit object seq extends RangeCheck[Seq[BigInt]] {
-      def check[B](b: B)(f: B => Seq[BigInt]) = f(b).forall(inRange)
-    }
-
-    implicit object tuple2 extends RangeCheck[(BigInt, BigInt)] {
-      def check[B](b: B)(f: B => (BigInt, BigInt)) = {
-        val (b1, b2) = f(b)
-        inRange(b1) && inRange(b2)
-      }
-    }
-
-    implicit object tuple3 extends RangeCheck[(BigInt, BigInt, BigInt)] {
-      def check[B](b: B)(f: B => (BigInt, BigInt, BigInt)) = {
-        val (b1, b2, b3) = f(b)
-        inRange(b1) && inRange(b2) && inRange(b3)
-      }
-    }
-
-    implicit object tuple4 extends RangeCheck[(BigInt, BigInt, BigInt, BigInt)] {
-      def check[B](b: B)(f: B => (BigInt, BigInt, BigInt, BigInt)) = {
-        val (b1, b2, b3, b4) = f(b)
-        inRange(b1) && inRange(b2) && inRange(b3) && inRange(b4)
-      }
-    }
-
-  }
-
-  /** Shrinks the generated scalar by half. */
-  def half(a: A): A = Itg.fromBigInt(Itg.toBigInt(a) / 2)
+  implicit def LR: LimitedRange[A]
 
   type ToProp[X] = X => Prop
 
-  def forAllLimitedRange[S:RangeCheck, P:ToProp](checks: BigInt => S)(f: A => P): Prop = {
-    lazy val safeGen = Arb.arbitrary.map { x =>
-      @tailrec def rec(x1: A): A =
-        if (RangeCheck[S].check(Itg.toBigInt(x1))(checks)) x1 else rec(half(x1))
-      rec(x)
-    }
-    forAll(safeGen)(f)
+  def forAllLimitedRange[S:RangeCheck, P:ToProp](checks: BigInt => S)(f: A => P)(implicit arb: Arbitrary[A]): Prop = {
+    forAll(LR.restrictedGen1(checks))(f)
   }
 
-  def forAllLimitedRange[S:RangeCheck, P:ToProp](checks: (BigInt, BigInt) => S)(f: (A, A) => P)(implicit d1: DummyImplicit): Prop = {
-    lazy val safeGen = for {
-      x <- Arb.arbitrary
-      y <- Arb.arbitrary
-    } yield {
-      @tailrec def rec(x1: A, y1: A): (A, A) =
-        if (RangeCheck[S].check((Itg.toBigInt(x1), Itg.toBigInt(y1)))(checks.tupled)) (x1, y1) else rec(half(x1), half(y1))
-      rec(x, y)
-    }
-    forAll(safeGen)(f.tupled)
+  def forAllLimitedRange[S:RangeCheck, P:ToProp](checks: (BigInt, BigInt) => S)(f: (A, A) => P)(implicit arb: Arbitrary[A], d1: DummyImplicit): Prop = {
+    forAll(LR.restrictedGen2(checks))(f.tupled)
   }
 
-  def forAllLimitedRange[S:RangeCheck, P:ToProp](checks: (BigInt, BigInt, BigInt) => S)(f: (A, A, A) => P)(implicit d1: DummyImplicit, d2: DummyImplicit): Prop = {
-    lazy val safeGen = for {
-      x <- Arb.arbitrary
-      y <- Arb.arbitrary
-      z <- Arb.arbitrary
-    } yield {
-      @tailrec def rec(x1: A, y1: A, z1: A): (A, A, A) =
-        if (RangeCheck[S].check((Itg.toBigInt(x1), Itg.toBigInt(y1), Itg.toBigInt(z1)))(checks.tupled)) (x1, y1, z1) else rec(half(x1), half(y1), half(z1))
-      rec(x, y, z)
-    }
-    forAll(safeGen)(f.tupled)
+  def forAllLimitedRange[S:RangeCheck, P:ToProp](checks: (BigInt, BigInt, BigInt) => S)(f: (A, A, A) => P)(implicit arb: Arbitrary[A], d1: DummyImplicit, d2: DummyImplicit): Prop = {
+    forAll(LR.restrictedGen3(checks))(f.tupled)
   }
 
-  def forAllLimitedRange[S:RangeCheck, P:ToProp](checks: (BigInt, BigInt, BigInt, BigInt) => S)(f: (A, A, A, A) => P)(implicit d1: DummyImplicit, d2: DummyImplicit, d3: DummyImplicit): Prop = {
-    lazy val safeGen = for {
-      x <- Arb.arbitrary
-      y <- Arb.arbitrary
-      z <- Arb.arbitrary
-      t <- Arb.arbitrary
-    } yield {
-      @tailrec def rec(x1: A, y1: A, z1: A, t1: A): (A, A, A, A) =
-        if (RangeCheck[S].check((Itg.toBigInt(x1), Itg.toBigInt(y1), Itg.toBigInt(z1), Itg.toBigInt(t1)))(checks.tupled)) (x1, y1, z1, t1) else rec(half(x1), half(y1), half(z1), half(t1))
-      rec(x, y, z, t)
-    }
-    forAll(safeGen)(f.tupled)
+  def forAllLimitedRange[S:RangeCheck, P:ToProp](checks: (BigInt, BigInt, BigInt, BigInt) => S)(f: (A, A, A, A) => P)(implicit arb: Arbitrary[A], d1: DummyImplicit, d2: DummyImplicit, d3: DummyImplicit): Prop = {
+    forAll(LR.restrictedGen4(checks))(f.tupled)
   }
 
 }
-
 
 /** Shadows tests from other Laws traits by forcing the generated arguments to have proper size
   * so that intermediate results fit in the tested type.
@@ -145,7 +193,7 @@ trait LimitedRangeSyntax[A] {
   */
 trait LimitedRangeLaws[A] extends LimitedRangeSyntax[A] with Laws {
 
-  implicit override def Itg: Integral[A]
+  implicit def Arb: Arbitrary[A]
   implicit def Equ: Eq[A]
 
   def pred: Predicate[A]
@@ -238,7 +286,7 @@ trait LimitedRangeLaws[A] extends LimitedRangeSyntax[A] with Laws {
     )
   )
 
-  def additiveAbGroup(implicit A: AdditiveGroup[A]) = new DefaultRuleSet(
+  def additiveAbGroup(implicit A: AdditiveAbGroup[A]) = new DefaultRuleSet(
     name = "additiveAbGroup",
     parent = Some(additiveCMonoid),
     "minus consistent" → forAllLimitedRange( (x1, y1) => (x1 - y1, -y1) )( (x: A, y: A) =>
