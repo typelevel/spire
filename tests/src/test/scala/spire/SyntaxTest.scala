@@ -52,7 +52,7 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   test("Partial order syntax")(check(forAll { (a: Int, b: Int) => testPartialOrderSyntax(a, b) }))
   test("Order syntax")(check(forAll { (a: Int, b: Int) => testOrderSyntax(a, b) }))
   test("Signed syntax")(check(forAll { (a: Int) => testSignedSyntax(a) }))
-  test("TruncatedDivision syntax")(check(forAll { (a: Int, b: Int) => testTruncatedDivisionSyntax(a, b) }))
+  test("TruncatedDivision syntax")(check(forAll { (a: Int, b: NonZero[Int]) => testTruncatedDivisionSyntax(a, b.x) }))
   test("IsReal syntax")(check(forAll { (a: Double) => testIsRealSyntax(a) }))
   test("Semigroup syntax")(check(forAll { (a: String, b: String) => testSemigroupSyntax(a, b) }))
   test("Monoid syntax")(check(forAll { (a: String, b: String) => testMonoidSyntax(a, b) }))
