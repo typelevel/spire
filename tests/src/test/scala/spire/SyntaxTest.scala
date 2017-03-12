@@ -52,6 +52,7 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   test("Partial order syntax")(check(forAll { (a: Int, b: Int) => testPartialOrderSyntax(a, b) }))
   test("Order syntax")(check(forAll { (a: Int, b: Int) => testOrderSyntax(a, b) }))
   test("Signed syntax")(check(forAll { (a: Int) => testSignedSyntax(a) }))
+  test("TruncatedDivision syntax")(check(forAll { (a: Int, b: Int) => testTruncatedDivisionSyntax(a, b) }))
   test("IsReal syntax")(check(forAll { (a: Double) => testIsRealSyntax(a) }))
   test("Semigroup syntax")(check(forAll { (a: String, b: String) => testSemigroupSyntax(a, b) }))
   test("Monoid syntax")(check(forAll { (a: String, b: String) => testMonoidSyntax(a, b) }))
@@ -135,6 +136,18 @@ trait BaseSyntaxTest {
       (a.isSignNonZero == Signed[A].isSignNonZero(a)) &&
       (a.isSignNonPositive == Signed[A].isSignNonPositive(a)) &&
       (a.isSignNonNegative == Signed[A].isSignNonNegative(a))
+  }
+
+  def testTruncatedDivisionSyntax[A: TruncatedDivision](a: A, b: A) = {
+    import spire.syntax.truncatedDivision._
+    import spire.std.tuples._
+    (a.toBigIntOpt === TruncatedDivision[A].toBigIntOpt(a)) &&
+    ((a t_/~ b) === TruncatedDivision[A].tquot(a, b)) &&
+    ((a t_% b) === TruncatedDivision[A].tmod(a, b)) &&
+    ((a t_/% b) === TruncatedDivision[A].tquotmod(a, b)) &&
+    ((a f_/~ b) === TruncatedDivision[A].fquot(a, b)) &&
+    ((a f_% b) === TruncatedDivision[A].fmod(a, b)) &&
+    ((a f_/% b) === TruncatedDivision[A].fquotmod(a, b))
   }
 
   def testIsRealSyntax[A: IsReal](a: A) = {
