@@ -382,7 +382,7 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
   }
 
 lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
-  libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
+  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided",
   libraryDependencies ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
       // if scala 2.11+ is used, quasiquotes are merged into scala-reflect
@@ -390,7 +390,7 @@ lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
       // in Scala 2.10, quasiquotes are provided by macro paradise
       case Some((2, 10)) =>
         Seq(
-          compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full),
+          compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.patch),
               "org.scalamacros" %% "quasiquotes" % "2.0.1" cross CrossVersion.binary
         )
     }
