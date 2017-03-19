@@ -219,7 +219,7 @@ addCommandAlias("validateJS", ";macrosJS/test;coreJS/test;extrasJS/test;lawsJS/t
 addCommandAlias("validate", ";validateJVM;validateJS")
 
 lazy val buildSettings = Seq(
-  organization := "org.spire-math",
+  organization := "org.typelevel",
   scalaVersion := scalaVersions("2.12"),
   crossScalaVersions := Seq(scalaVersions("2.10"), scalaVersions("2.11"), scalaVersions("2.12"))
 )
