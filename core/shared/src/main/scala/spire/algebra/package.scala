@@ -2,6 +2,8 @@ package spire
 
 package object algebra {
 
+  type Homomorphism[A, B, F[_]] = Conversion[A, B] { type Hom[X] = F[X] }
+
   type Eq[A] = _root_.algebra.Eq[A]
   val Eq = _root_.algebra.Eq
 

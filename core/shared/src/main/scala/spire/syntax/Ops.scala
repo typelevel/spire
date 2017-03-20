@@ -5,7 +5,7 @@ import spire.algebra._
 import spire.algebra.lattice._
 import spire.algebra.partial._
 import spire.macros.Ops
-import spire.math.{BitString, ConvertableTo, ConvertableFrom, Interval, Rational, Number}
+import spire.math.{Approx, BitString, ConvertableFrom, ConvertableTo, Interval, IsInR, Number, Rational}
 import spire.util.Opt
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
@@ -420,6 +420,20 @@ final class NormedVectorSpaceOps[V](lhs: V) {
 
   def normalize[F](implicit ev: NormedVectorSpace[V, F]): V =
     macro Ops.unopWithEv[NormedVectorSpace[V, F], V]
+}
+
+final class ApproxOps[A, R](val lhs:A) extends AnyVal {
+  def apply()(implicit isR: IsInR[A], approx: Approx[Unit, R]): R = approx.approx(lhs, ())
+  def apply[P](p: P)(implicit isR: IsInR[A], approx: Approx[P, R]): R = approx.approx(lhs, p)
+}
+
+final class IsROps[A](val lhs:A) extends AnyVal {
+  def approx[R]: ApproxOps[A, R] = new ApproxOps[A, R](lhs)
+}
+
+final class ConversionOps[A](lhs:A) {
+  def convTo[B](implicit ev: Conversion[A, B]) = ev(lhs)
+  def isValid[B](implicit equ: Eq[A], ev: Conversion[A, B], inv: Conversion[B, A]) = ev.isValid(lhs)
 }
 
 final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {

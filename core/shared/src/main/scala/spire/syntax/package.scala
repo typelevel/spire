@@ -9,6 +9,7 @@ package object syntax {
   object order extends OrderSyntax
   object signed extends SignedSyntax
   object isReal extends IsRealSyntax
+  object conversion extends ConversionSyntax
   object convertableFrom extends ConvertableFromSyntax
 
   object semigroupoid extends SemigroupoidSyntax
@@ -53,6 +54,8 @@ package object syntax {
   object action extends ActionSyntax
   object torsor extends TorsorSyntax
 
+  object isR extends IsRSyntax
+  object isZ extends IsZSyntax
   object integral extends IntegralSyntax
   object fractional extends FractionalSyntax
   object numeric extends NumericSyntax

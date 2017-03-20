@@ -20,19 +20,14 @@ object Integral {
 }
 
 class IntegralOps[A](lhs: A)(implicit ev: Integral[A]) {
-  def factor: prime.Factors = prime.factor(toSafeLong)
-  def isPrime: Boolean = prime.isPrime(toSafeLong)
   def toSafeLong: SafeLong = SafeLong(ev.toBigInt(lhs))
-
-  def coerce(a: A): Long = {
+  def factor: prime.Factors = prime.factor(toSafeLong)
+  // coerce (to what?) should not be public, and thus available as syntax
+  private def coerce(a: A): Long = {
     val n = ev.toBigInt(a)
     if (Long.MinValue <= n && n <= Long.MaxValue) ev.toLong(a)
     else throw new IllegalArgumentException(s"$lhs too large")
   }
-
-  def ! : BigInt = spire.math.fact(coerce(lhs))
-
-  def choose(rhs: A): BigInt = spire.math.choose(coerce(lhs), coerce(rhs))
 }
 
 @SerialVersionUID(0L)
