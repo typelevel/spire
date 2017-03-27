@@ -52,17 +52,20 @@ Concerns or issues can be sent to any of Spire's maintainers, or to the
 
 ### Set up
 
-Spire is currently available for Scala 2.10 and 2.11 (and supports
-scala-js for both versions).
+Spire is currently available for Scala 2.10, 2.11, and 2.12, for the
+JVM and JS platforms.
 
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-libraryDependencies += "org.spire-math" %% "spire" % "0.13.0"
+libraryDependencies += "org.spire-math" %% "spire" % "0.14.0"
 ```
 
+(Previous to 0.14.0, Spire was published under *org.spire-math*
+instead of *org.typelevel*.)
+
 For Maven instructions, and to download the jars directly, visit the
-[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.11%7C0.11.0%7Cjar).
+[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.11%7C0.14.0%7Cjar).
 
 Here is a list of all of Spire's modules:
 
@@ -70,6 +73,10 @@ Here is a list of all of Spire's modules:
  * `spire`: the core Spire library, the types and type classes
  * `spire-laws`: optional support for law-checking and testing
  * `spire-extras`: extra types which are more specific or esoteric
+
+Spire depends on [typelevel/algebra](https://github.com/typelevel/algebra)
+and uses this project to interoperate with [Cats](https://github.com/typelevel/cats) and
+[Algebird](https://github.com/twitter/algebird).
 
 ### Playing Around
 
@@ -542,7 +549,7 @@ measure relative as well as absolute performance.
 Code is offered as-is, with no implied warranty of any kind. Comments,
 criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
-Copyright 2011-2015 Erik Osheim, Tom Switzer
+Copyright 2011-2017 Erik Osheim, Tom Switzer
 
 A full list of contributors can be found in [AUTHORS.md](AUTHORS.md).
 
