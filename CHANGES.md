@@ -9,14 +9,26 @@ with Cats and Algebird.
 Second of all, Spire is now published to the org.typelevel
 organization (which was previously org.spire-math).
 
-Additions:
- * Add GCDRing, generalized from EuclideanRing
- * Add DivisionRing, a field without commutative multiplication
+Additions: 
+ * Added GCDRing, part of the commutative ring hierarchy
+ * Clarified the laws of EuclideanRing
+ * Added DivisionRing, a ring in which division is possible
+   (generalization of fields to the noncommutative case;
+   used now by Spire's quaternions).
 
 Changes:
  * Many type classes are now aliases to algebra's type classes
- * The relationship between EuclideanRing and Gcd has changed
- * IsReal is no longer required to be ordered, only signed
+ * Algebra provides commutative rings and fields, but the
+   intemediate structures (GCDRing/EuclideanRing) are added
+   by Spire; thus Spire Field differs from algebra Field by
+   extending GCDRing and EuclideanRing.
+ * The EuclidenRing operations for Field have been corrected;
+   in particular, Float, Double no longer perform truncated division
+   but a /~ b = 0 for nonzero b, as a can always be divided by b in a
+   field.
+ * Signed now extends Order, thus IsReal only extends Signed.
+ * IsReal has been replaced by Signed for some operations in
+   e.g. Complex, making them more precise/general.
  * Many different efficiency improvements
 
 Fixes:

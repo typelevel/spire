@@ -171,7 +171,7 @@ Here's a brief description of some of the most common properties:
 In some cases the operator names are different (e.g. `+`, `*`) but the
 properties themselves remain the same.
 
-### Eq
+#### Eq
 
 Spire provides an `Eq[A]` type class to represent type-safe
 equality. This allows us to talk about types for which there isn't a
@@ -194,7 +194,7 @@ The anti-symmetry property may seem confusing. The idea is that if `a === b`
 then `a` and `b` must be substitutable for each other, such that for any
 expression `f(x)`, `f(a) === f(b)`.
 
-### Order
+#### Order
 
 Total orderings in Spire are supported by the `Order[A]` type
 class. Unlike other ordering type classes
@@ -234,7 +234,25 @@ numbers, which breaks *O2*.  In these cases, users will need to be
 aware of the risks and limit their use to situations where the
 particular law is not needed.
 
-### PartialOrder
+#### Signed
+
+Translation-invariant total orders are captured by the `Signed[A]` type class. In
+general, the type `A` is equipped with a commutative additive operation `+` and a
+zero element `0` (see the definition of commutative rings below). The following
+laws hold:
+
+ * if `a <= b` then `a + c <= b + c` (linear order),
+ * `signum(x) = -1` if `x < 0`, `signum(x) = 1` if `x > 0`, `signum(x) = 0` otherwise.
+
+If the type `A` is equipped with negative elements `-x`, then we have:
+
+ * `abs(x) = -x` if `x < 0`, or `x` otherwise,
+
+The above laws imply:
+
+ * `abs(a + b) <= abs(a) + abs(b)`
+
+#### PartialOrder
 
 Partial orderings in Spire are supported by the `PartialOrder[A]` type class.
 Its implementation differs from `scala.math.PartialOrdering` in two features: `PartialOrder`
@@ -330,13 +348,38 @@ inheritance:
 
 Rings also provide a `pow` method (`**`) for doing repeated multiplication.
 
+#### Commutative ring hierarchy
+
+Commutative rings (also called domains in the literature) have a rich
+structure.
+
+Spire focuses on the structures relevant for computational algebra
+(GCD rings, Euclidean rings and fields).
+
+ * `GCDRing[A]` extends `CRing[A]`
+ * `EuclideanRing[A]` extends `GCDRing[A]`
+ * `spire.Field[A]` extends` algebra.Field[A]` with `EuclideanRing[A]`
+
+#### GCDRings
+
+GCD rings define two operations:
+
+ * `gcd` (`a gcd b`) find the greatest common divisor of `a` and `b`.
+ * `lcm` (`a lcm b`) find the lowest common multiple of `a` and `b`.
+ 
+ obeying the following law:
+ 
+ * `d * m === a * b` for `d = gcd(a, b)` and `m = lcm(a, b)`.
+ 
+Note that the gcd is defined up to a divisible element (unit);
+in particular, its sign 
+
 #### EuclideanRings
 
 Spire supports euclidean domains (called `EuclideanRing[A]`). A
 euclidean domain is a commutative ring (`CRing[A]`) that also supports
-euclidean division (e.g. floor division or integer division). This
-structure generalizes many useful properties of the integers (for
-instance, quotients and remainders, and greatest common divisors).
+euclidean division. This structure generalizes many useful properties 
+of the integers (for instance, quotients and remainders).
 
 Formally, euclidean domains have a *euclidean function* f such that
 for any `x` and `y` in `A`, if `y` is nonzero, then there are `q` and
@@ -346,13 +389,16 @@ function.
 
 Spire's `EuclideanRing[A]` supports the following operations:
 
- * `quot` (`a /~ b`) finding the quotient (often integer division).
+ * `quot` (`a /~ b`) finding the quotient.
  * `mod` (`a % b`) the remainder from the quotient operation.
  * `quotmod` (`a /% b`) combines `quot` and `mod` into one operation.
- * `gcd` (`a gcd b`) find the greatest common divisor of `a` and `b`.
- * `lcm` (`a lcm b`) find the lowest common multiple of `a` and `b`.
 
 Spire requires that `b * (a /~ b) + (a % b)` is equivalent to `a`.
+
+On integers, Euclidean quotient and remainder corresponds to
+truncated division; however, the sign of the result is a matter
+of convention. On rational (or floating-point) numbers, `a /~ b = a / b`
+and `a % b = 0` by definition.
 
 #### Fields
 
