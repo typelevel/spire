@@ -7,6 +7,8 @@ import org.scalatest.Matchers
 import org.scalatest._
 import prop._
 
+import spire.algebra.Field
+
 class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   type Q = Rational
 
@@ -45,6 +47,10 @@ class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
       }
     }
 
+  property("Internal GCD implementation is similar to the field of fractions implementation") {
+    forAll { (x: Rational, y: Rational) => x.gcd(y) shouldBe Field[Rational].gcd(x, y) }
+  }
+
   rat1("x + 0 == x") { x: Q => x + Rational(0) shouldBe x }
   rat1("x * 1 == x") { x: Q => x * Rational(1) shouldBe x }
   rat1("x * 0 == 0") { x: Q => x * Rational(0) shouldBe Rational(0) }
@@ -79,6 +85,14 @@ class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     forAll("x") { (n: Double) =>
       Rational(n).toDouble == n
     }
+  }
+
+  property("Rational.numeratorIsValidLong") { (x: Q) =>
+    x.numeratorIsValidLong shouldBe x.numerator.isValidLong
+  }
+
+  property("Rational.denominatorIsValidLong") { (x: Q) =>
+    x.denominatorIsValidLong shouldBe x.denominator.isValidLong
   }
 
   property("limitTo(n) forces numerator and denominator to be less than n") {

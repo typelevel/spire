@@ -3,7 +3,7 @@ package std
 
 import java.math.BigInteger
 
-import spire.algebra.{EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed}
+import spire.algebra.{Eq, EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed}
 
 trait BigIntegerIsEuclideanRing extends EuclideanRing[BigInteger] {
   override def minus(a:BigInteger, b:BigInteger): BigInteger = a subtract b
@@ -23,7 +23,9 @@ trait BigIntegerIsEuclideanRing extends EuclideanRing[BigInteger] {
     val Array(d, r) = a.divideAndRemainder(b)
     (d, r)
   }
-  def gcd(a:BigInteger, b:BigInteger): BigInteger = a.gcd(b)
+  def gcd(a:BigInteger, b:BigInteger)(implicit ev: Eq[BigInteger]): BigInteger = a.gcd(b)
+  def lcm(a:BigInteger, b:BigInteger)(implicit ev: Eq[BigInteger]): BigInteger =
+    if (a.signum == 0 || b.signum == 0) zero else a.divide(a.gcd(b)).multiply(b)
 }
 
 // This is not included in the *Instances trait!

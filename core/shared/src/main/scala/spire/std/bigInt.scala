@@ -19,7 +19,7 @@ trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   def mod(a:BigInt, b:BigInt) = a % b
   override def quotmod(a:BigInt, b:BigInt) = a /% b
 
-  override def lcm(a:BigInt, b:BigInt)(implicit ev: Eq[BigInt]) = (a / a.gcd(b)) * b
+  override def lcm(a:BigInt, b:BigInt)(implicit ev: Eq[BigInt]) = if (a.signum == 0 || b.signum == 0) zero else (a / a.gcd(b)) * b
   override def gcd(a:BigInt, b:BigInt)(implicit ev: Eq[BigInt]) = a.gcd(b)
 }
 

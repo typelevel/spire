@@ -647,7 +647,7 @@ private[math] trait NumberIsEuclideanRing extends EuclideanRing[Number] with Num
 }
  */
 
-private[math] trait NumberIsField extends Field[Number] with NumberIsCRing {
+private[math] trait NumberIsField extends Field.WithDefaultGCD[Number] with NumberIsCRing {
   def div(a:Number, b:Number): Number = a / b
   override def fromDouble(a: Double): Number = Number(a)
 }

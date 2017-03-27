@@ -21,8 +21,8 @@ trait IntIsEuclideanRing extends EuclideanRing[Int] {
   def euclideanFunction(a:Int): BigInt = BigInt(a).abs
   def quot(a:Int, b:Int): Int = a / b
   def mod(a:Int, b:Int): Int = a % b
-  override def gcd(a:Int, b:Int)(implicit ev: Eq[Int]): Int = spire.math.gcd(a, b).toInt
-  override def lcm(a:Int, b:Int)(implicit ev: Eq[Int]): Int = spire.math.lcm(a, b).toInt
+  def gcd(a:Int, b:Int)(implicit ev: Eq[Int]): Int = spire.math.gcd(a, b).toInt
+  def lcm(a:Int, b:Int)(implicit ev: Eq[Int]): Int = spire.math.lcm(a, b).toInt
 }
 
 // Not included in Instances trait.

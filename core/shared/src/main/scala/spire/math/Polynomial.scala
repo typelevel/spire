@@ -518,7 +518,7 @@ with Ring[Polynomial[C]] {
 }
 
 trait PolynomialOverField[@sp(Double) C] extends PolynomialOverRing[C]
-    with EuclideanRing[Polynomial[C]] with VectorSpace[Polynomial[C], C] { self =>
+    with EuclideanRing.WithEuclideanAlgorithm[Polynomial[C]] with VectorSpace[Polynomial[C], C] { self =>
   implicit override val scalar: Field[C]
 
   override def divr(x: Polynomial[C], k: C): Polynomial[C] = x :/ k
@@ -539,18 +539,6 @@ trait PolynomialOverField[@sp(Double) C] extends PolynomialOverRing[C]
     }
   }
 
-  // TODO: why final?
-  final override def gcd(x: Polynomial[C], y: Polynomial[C])(implicit ev: Eq[Polynomial[C]]): Polynomial[C] = {
-    val result = EuclideanRing.euclid(x, y)(ev, self)
-    if (result.degree > 0) {
-      result
-    } else {
-      // TODO: I don't like so much this special case, can we fold it in the general result,
-      // TODO: as the gcd is defined up to a unit anyway?
-      // return the gcd of all coefficients when there is no higher degree divisor
-      Polynomial.constant(spire.math.gcd(x.coeffsArray ++ y.coeffsArray))
-    }
-  }
 }
 
 trait PolynomialEq[@sp(Double) C] extends Eq[Polynomial[C]] {

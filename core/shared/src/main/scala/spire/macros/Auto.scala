@@ -152,7 +152,15 @@ abstract class AutoAlgebra extends AutoOps { ops =>
   def EuclideanRing[A: c.WeakTypeTag](z: c.Expr[A], o: c.Expr[A])
       (ev: c.Expr[Eq[A]]): c.Expr[EuclideanRing[A]] = {
     c.universe.reify {
-      new EuclideanRing[A] {
+      new EuclideanRing[A] { self =>
+        // default implementations from EuclideanRing.WithEuclideanAlgorithm
+        @tailrec final def euclid(a: A, b: A)(implicit ev: Eq[A]): A =
+          if (isZero(b)) a else euclid(b, mod(a, b))
+        def gcd(a: A, b: A)(implicit ev: Eq[A]): A =
+          euclid(a, b)(ev)
+        def lcm(a: A, b: A)(implicit ev: Eq[A]): A =
+          if (isZero(a) || isZero(b)) zero else times(quot(a, gcd(a, b)), b)
+
         def zero: A = z.splice
         def one: A = o.splice
         def plus(x: A, y: A): A = ops.plus[A].splice
@@ -170,6 +178,11 @@ abstract class AutoAlgebra extends AutoOps { ops =>
       (z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[Field[A]] = {
     c.universe.reify {
       new Field[A] {
+        // default implementations from Field.WithDefaultGCD
+        override def gcd(a: A, b: A)(implicit eqA: Eq[A]): A =
+              if (isZero(a) && isZero(b)) zero else one
+        override def lcm(a: A, b: A)(implicit eqA: Eq[A]): A = times(a, b)
+
         def zero: A = z.splice
         def one: A = o.splice
         def plus(x: A, y: A): A = ops.plus[A].splice

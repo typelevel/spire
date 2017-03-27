@@ -22,10 +22,6 @@ trait EuclideanRing[@sp(Int, Long, Float, Double) A] extends Any with GCDRing[A]
   def quot(a: A, b: A): A
   def mod(a: A, b: A): A
   def quotmod(a: A, b: A): (A, A) = (quot(a, b), mod(a, b))
-  def gcd(a: A, b: A)(implicit ev: Eq[A]): A =
-    EuclideanRing.euclid(a, b)(ev, EuclideanRing.this)
-  def lcm(a: A, b: A)(implicit ev: Eq[A]): A =
-    if (isZero(a) || isZero(b)) zero else times(quot(a, gcd(a, b)), b)
 }
 
 trait EuclideanRingFunctions[R[T] <: EuclideanRing[T]] extends GCDRingFunctions[R] {
@@ -41,6 +37,13 @@ object EuclideanRing extends EuclideanRingFunctions[EuclideanRing] {
 
   @tailrec final def euclid[@sp(Int, Long, Float, Double) A:Eq:EuclideanRing](a: A, b: A): A = {
     if (EuclideanRing[A].isZero(b)) a else euclid(b, EuclideanRing[A].mod(a, b))
+  }
+
+  trait WithEuclideanAlgorithm[@sp(Int, Long, Float, Double) A] extends Any with EuclideanRing[A] { self =>
+    def gcd(a: A, b: A)(implicit ev: Eq[A]): A =
+      EuclideanRing.euclid(a, b)(ev, self)
+    def lcm(a: A, b: A)(implicit ev: Eq[A]): A =
+      if (isZero(a) || isZero(b)) zero else times(quot(a, gcd(a, b)), b)
   }
 
 }

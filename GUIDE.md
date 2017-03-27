@@ -362,7 +362,10 @@ Spire focuses on the structures relevant for computational algebra
 
 #### GCDRings
 
-GCD rings define two operations:
+GCDRings are commutative rings (`CRing[A]`) with existence of a
+greatest-common-divisor and least-common-multiple.
+
+Spire's `GCDRing[A]` supports the following operations:
 
  * `gcd` (`a gcd b`) find the greatest common divisor of `a` and `b`.
  * `lcm` (`a lcm b`) find the lowest common multiple of `a` and `b`.
@@ -374,12 +377,19 @@ GCD rings define two operations:
 Note that the gcd is defined up to a divisible element (unit);
 in particular, its sign 
 
+Spire requires these operations to be commutative. Note that fields
+have leeway to define the GCD operation. In practice, instances of
+`Field[A]` provide either a trivial implementation `gcd(x != 0 , y != 0) == 1`
+or a definition that extends the one used for the integer ring
+(`gcd(a/b, c/d) == gcd(a, c)/lcm(b, d)`).
+
 #### EuclideanRings
 
 Spire supports euclidean domains (called `EuclideanRing[A]`). A
-euclidean domain is a commutative ring (`CRing[A]`) that also supports
-euclidean division. This structure generalizes many useful properties 
-of the integers (for instance, quotients and remainders).
+euclidean domain is a GCD ring (`GCDRing[A]`) that also supports
+euclidean division (e.g. floor division or integer division). This
+structure generalizes many useful properties of the integers (for
+instance, quotients and remainders, and greatest common divisors).
 
 Formally, euclidean domains have a *euclidean function* f such that
 for any `x` and `y` in `A`, if `y` is nonzero, then there are `q` and

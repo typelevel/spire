@@ -168,7 +168,7 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
   def abs: SafeLong
 
   def gcd(that: SafeLong): SafeLong
-  def lcm(that: SafeLong): SafeLong = (this / (this gcd that)) * that
+  def lcm(that: SafeLong): SafeLong = if (this.isZero || that.isZero) SafeLong.zero else (this / (this gcd that)) * that
 
   def unary_-(): SafeLong
 
