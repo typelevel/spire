@@ -3,7 +3,7 @@ package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import spire.algebra.{Order, Trig, Signed}
+import spire.algebra.{Field, Order, Trig, Signed}
 import spire.syntax.nroot._
 
 sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
@@ -558,7 +558,7 @@ trait RealInstances {
 @SerialVersionUID(0L)
 class RealAlgebra extends RealIsFractional
 
-trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Real] with Trig[Real] {
+trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Real] with Trig[Real] with Field.WithDefaultGCD[Real] {
   override def abs(x: Real): Real = x.abs
   override def signum(x: Real): Int = x.signum
 

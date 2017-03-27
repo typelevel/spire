@@ -410,4 +410,16 @@ class RationalTest extends FunSuite {
     assert(rationalFromNumber(Rational.one) == 1)
     assert(rationalFromNumber(1:BigDecimal) == 1)
   }
+
+  test("Commutativity of gcd") {
+    val a = Rational(-1, SafeLong("7552476006398892199"))
+    val b = Rational.one
+    assert(a.gcd(b) === b.gcd(a))
+  }
+
+  test("Commutativity of gcd 2") {
+    val a = Rational(SafeLong("-9223372036854775808"), SafeLong("9223372036854775807"))
+    val b = Rational.zero
+    assert(a.gcd(b) === b.gcd(a))
+  }
 }

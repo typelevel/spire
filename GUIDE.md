@@ -330,10 +330,26 @@ inheritance:
 
 Rings also provide a `pow` method (`**`) for doing repeated multiplication.
 
+#### GCDRings
+
+GCDRings are commutative rings (`CRing[A]`) with existence of a
+greatest-common-divisor and least-common-multiple.
+
+Spire's `GCDRing[A]` supports the following operations:
+
+ * `gcd` (`a gcd b`) find the greatest common divisor of `a` and `b`.
+ * `lcm` (`a lcm b`) find the lowest common multiple of `a` and `b`.
+ 
+Spire requires these operations to be commutative. Note that fields
+have leeway to define the GCD operation. In practice, instances of
+`Field[A]` provide either a trivial implementation `gcd(x != 0 , y != 0) == 1`
+or a definition that extends the one used for the integer ring
+(`gcd(a/b, c/d) == gcd(a, c)/lcm(b, d)`).
+
 #### EuclideanRings
 
 Spire supports euclidean domains (called `EuclideanRing[A]`). A
-euclidean domain is a commutative ring (`CRing[A]`) that also supports
+euclidean domain is a GCD ring (`GCDRing[A]`) that also supports
 euclidean division (e.g. floor division or integer division). This
 structure generalizes many useful properties of the integers (for
 instance, quotients and remainders, and greatest common divisors).
@@ -349,8 +365,6 @@ Spire's `EuclideanRing[A]` supports the following operations:
  * `quot` (`a /~ b`) finding the quotient (often integer division).
  * `mod` (`a % b`) the remainder from the quotient operation.
  * `quotmod` (`a /% b`) combines `quot` and `mod` into one operation.
- * `gcd` (`a gcd b`) find the greatest common divisor of `a` and `b`.
- * `lcm` (`a lcm b`) find the lowest common multiple of `a` and `b`.
 
 Spire requires that `b * (a /~ b) + (a % b)` is equivalent to `a`.
 

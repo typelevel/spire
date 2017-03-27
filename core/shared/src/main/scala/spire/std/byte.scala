@@ -1,7 +1,7 @@
 package spire
 package std
 
-import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Signed}
+import spire.algebra.{Eq, EuclideanRing, IsIntegral, NRoot, Order, Signed}
 import spire.math.BitString
 
 trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
@@ -18,7 +18,8 @@ trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
   def euclideanFunction(a:Byte): BigInt = BigInt(a).abs
   def quot(a: Byte, b: Byte): Byte = (a / b).toByte
   def mod(a: Byte, b: Byte): Byte = (a % b).toByte
-  def gcd(a: Byte, b: Byte): Byte = spire.math.gcd(a, b).toByte
+  def gcd(a: Byte, b: Byte)(implicit ev: Eq[Byte]): Byte = spire.math.gcd(a, b).toByte
+  def lcm(a: Byte, b: Byte)(implicit ev: Eq[Byte]): Byte = spire.math.lcm(a, b).toByte
 }
 
 // Not included in Instances trait.

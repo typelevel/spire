@@ -6,7 +6,7 @@ import spire.math.Rational
 
 import java.lang.Math
 
-trait FloatIsField extends Field[Float] {
+trait FloatIsField extends Field.WithDefaultGCD[Float] {
   override def minus(a:Float, b:Float): Float = a - b
   def negate(a:Float): Float = -a
   def one: Float = 1.0F
