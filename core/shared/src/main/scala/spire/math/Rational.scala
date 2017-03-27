@@ -62,7 +62,10 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   }
    */
 
-  def lcm(rhs: Rational): Rational = if (lhs.isZero || rhs.isZero) Rational.zero else (lhs / (lhs gcd rhs)) * rhs
+  def lcm(rhs: Rational): Rational =
+    if (lhs.isZero || rhs.isZero) Rational.zero
+    else (lhs / (lhs gcd rhs)) * rhs
+
   def gcd(rhs: Rational): Rational =
     // a few shortcuts (that are correctly handled by the generic algorithm anyhow)
     if (lhs.isZero) rhs.abs
@@ -856,14 +859,9 @@ private[math] trait RationalApproximateNRoot extends NRoot[Rational] {
     Rational(n.toDouble ** k.toDouble)
 }
 
-private[math] trait RationalIsField extends Field.FieldOfFractionsGCD[Rational, SafeLong] {
+private[math] trait RationalIsField extends Field[Rational] {
   override def gcd(x: Rational, y: Rational)(implicit ev: Eq[Rational]) = x.gcd(y)
   override def lcm(x: Rational, y: Rational)(implicit ev: Eq[Rational]) = x.lcm(y)
-  def ringR = SafeLong.SafeLongAlgebra
-  def eqR = SafeLong.SafeLongIsReal
-  def numerator(a:Rational): SafeLong = a.numerator
-  def denominator(a:Rational): SafeLong = a.denominator
-  def fraction(num:SafeLong, den:SafeLong): Rational = Rational(num, den)
   override def minus(a:Rational, b:Rational): Rational = a - b
   def negate(a:Rational): Rational = -a
   def one: Rational = Rational.one
@@ -871,22 +869,10 @@ private[math] trait RationalIsField extends Field.FieldOfFractionsGCD[Rational, 
   override def pow(a:Rational, b:Int): Rational = a.pow(b)
   override def times(a:Rational, b:Rational): Rational = a * b
   def zero: Rational = Rational.zero
-  /* TODO: move to TruncatedDivision
-  def quot(a:Rational, b:Rational): Rational = a /~ b
-  def mod(a:Rational, b:Rational): Rational = a % b
-  override def quotmod(a:Rational, b:Rational): (Rational, Rational) = a /% b
-   */
   override def fromInt(n: Int): Rational = Rational(n)
   override def fromDouble(n: Double): Rational = Rational(n)
   def div(a:Rational, b:Rational): Rational = a / b
 }
-
-/* TODO: restore commutativity
-private[math] trait RationalIsGcd extends Gcd[Rational] {
-  def lcm(a:Rational, b:Rational): Rational = a lcm b
-  def gcd(a:Rational, b:Rational): Rational = a gcd b
-}
- */
 
 private[math] trait RationalIsReal extends IsRational[Rational] {
   override def eqv(x:Rational, y:Rational): Boolean = x == y

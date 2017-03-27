@@ -539,21 +539,6 @@ trait PolynomialOverField[@sp(Double) C] extends PolynomialOverRing[C]
     }
   }
 
-  /* TODO: check if we can use directly Euclidean algorithm
-  // TODO: why final?
-  final override def gcd(x: Polynomial[C], y: Polynomial[C])(implicit ev: Eq[Polynomial[C]]): Polynomial[C] = {
-    val result = EuclideanRing.euclid(x, y)(ev, self)
-    if (result.degree > 0) {
-      result
-    } else {
-      // TODO: I don't like so much this special case, can we fold it in the general result,
-      // TODO: as the gcd is defined up to a unit anyway?
-      // return the gcd of all coefficients when there is no higher degree divisor
-      Polynomial.constant(spire.math.gcd(x.coeffsArray ++ y.coeffsArray))
-    }
-  }
-  def lcm(x: Polynomial[C], y: Polynomial[C])(implicit ev: Eq[Polynomial[C]]): Polynomial[C] =
-    div(*/
 }
 
 trait PolynomialEq[@sp(Double) C] extends Eq[Polynomial[C]] {
