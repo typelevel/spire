@@ -70,8 +70,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     // a few shortcuts (that are correctly handled by the generic algorithm anyhow)
     if (lhs.isZero) rhs.abs
     else if (rhs.isZero) lhs.abs
-    else if (lhs.isOne) lhs
-    else if (rhs.isOne) rhs
+    else if (lhs.isOne && rhs.isOne) lhs
     else {
       // now the generic algorithm
       // stores either the new numerator as a Long or SafeLong
