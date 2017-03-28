@@ -370,12 +370,14 @@ Spire's `GCDRing[A]` supports the following operations:
  * `gcd` (`a gcd b`) find the greatest common divisor of `a` and `b`.
  * `lcm` (`a lcm b`) find the lowest common multiple of `a` and `b`.
  
- obeying the following law:
+ obeying the following laws:
  
- * `d * m === a * b` for `d = gcd(a, b)` and `m = lcm(a, b)`.
+ * `d * m === a * b` for `d = gcd(a, b)` and `m = lcm(a, b)`,
+ * gcd is associative and commutative,
+ * lcm is associatvie and commutative.
  
 Note that the gcd is defined up to a divisible element (unit);
-in particular, its sign 
+in particular, its sign is a matter of convention. 
 
 Spire requires these operations to be commutative. Note that fields
 have leeway to define the GCD operation. In practice, instances of
