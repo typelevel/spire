@@ -1,3 +1,16 @@
+## Version 0.14.1
+
+This version add laws for gcd/lcm operations, and fixes corner cases
+for the standard types such as Rational.
+
+Additions:
+ * Law tests for gcd/lcm
+ 
+Changes:
+ * gcd/lcm are associative and commutative, the Rational gcd/lcm have
+   been aligned to be compatible with the integer gcd/lcm.
+ * Corner cases such as gcd(a, 0) are handled correctly
+
 ## Version 0.14.0
 
 This release is a major milestone for Spire.
