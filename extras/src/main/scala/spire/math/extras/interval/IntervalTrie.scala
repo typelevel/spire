@@ -79,7 +79,7 @@ object IntervalTrie {
     def order: Order[Float] = spire.std.float.FloatAlgebra
 
     def toLong(value:Float): Long = {
-      if(value.isNaN)
+      if(java.lang.Float.isNaN(value))
         throw new IllegalArgumentException("NaN")
       // sign and magnitude signed integer
       val signAndMagnitude = java.lang.Float.floatToIntBits(value)
@@ -110,7 +110,7 @@ object IntervalTrie {
     def order: Order[Double] = spire.std.double.DoubleAlgebra
 
     def toLong(value:Double): Long = {
-      if(value.isNaN)
+      if(java.lang.Double.isNaN(value))
         throw new IllegalArgumentException("NaN")
       // sign and magnitude signed integer
       val signAndMagnitude = java.lang.Double.doubleToLongBits(value)
