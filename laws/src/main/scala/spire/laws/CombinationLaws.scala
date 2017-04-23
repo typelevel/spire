@@ -22,6 +22,8 @@ trait CombinationLaws[A] extends BaseLaws[A] {
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
 
+  // copy of those in LimitedRangeLaws
+
   def signedAdditiveCMonoid(implicit signedA: Signed[A], additiveCMonoidA: AdditiveCMonoid[A]) = new DefaultRuleSet(
     name = "signedAdditiveCMonoid",
     parent = Some(signed),
