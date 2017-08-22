@@ -41,6 +41,9 @@ class IntervalTest extends FunSuite {
   test("[1, 2] has above 1") { assert(Interval.closed(1, 2).hasAtOrAbove(1)) }
   test("(1, 2] has above 1") { assert(Interval.openLower(1, 2).hasAtOrAbove(1)) }
 
+  test("Interval.above(0).isBounded is false") { assert(!Interval.above(0).isBounded) }
+  test("Interval.closed(0, 5).isBounded is true") { assert(Interval.closed(0, 5).isBounded) }
+
   test("Interval.point(2).toString == [2]") { assert(Interval.point(2).toString === "[2]") }
   test("Interval.empty.toString == (Ø)") { assert(Interval.empty[Int].toString === "(Ø)") }
 
