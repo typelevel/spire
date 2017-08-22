@@ -41,7 +41,7 @@ merging pull requests, and for helping to guide the direction of Spire:
  * Erik Osheim (*erik@osheim.org*)
  * Tom Switzer (*thomas.switzer@gmail.com*)
  * Rüdiger Klaehn (*rklaehn@gmail.com*)
- * Denis Rosset (*denis.rosset@unige.ch*)
+ * Denis Rosset (*physics@denisrosset.com*)
 
 People are expected to follow the [Typelevel Code of Conduct](http://typelevel.org/conduct.html)
 when discussing Spire on the Github page, in Gitter, the IRC channel,
