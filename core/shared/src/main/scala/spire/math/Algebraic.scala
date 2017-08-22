@@ -272,10 +272,11 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
 
   /**
    * Absolute approximation to `scale` decimal places with the given rounding
-   * mode. Rounding is always exact.
+   * mode. Rounding is always exact. The returned `BigDecimal` will have use
+   * `java.math.MathContext.UNLIMITED` as it's context.
    */
   def toBigDecimal(scale: Int, roundingMode: RoundingMode): BigDecimal =
-    BigDecimal(roundExact(this, expr.toBigDecimal(scale + 2), scale, roundingMode))
+    new BigDecimal(roundExact(this, expr.toBigDecimal(scale + 2), scale, roundingMode), MathContext.UNLIMITED)
 
   /**
    * Relative approximation to the precision specified in `mc` with the given
@@ -344,8 +345,9 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
     val adjustedApprox =
       if (newScale <= approx.scale) approx.setScale(newScale + 1, RoundingMode.DOWN)
       else approx
-    roundExact(this, adjustedApprox, newScale, roundingMode)
+    val finalApprox = roundExact(this, adjustedApprox, newScale, roundingMode)
       .round(mc) // We perform a final round, since roundExact uses scales.
+    new BigDecimal(finalApprox, mc)
   }
 
   /**
