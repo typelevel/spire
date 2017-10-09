@@ -1,17 +1,9 @@
 package spire
 package util
 
-import spire.algebra.Eq
-import spire.syntax.eq._
-
 object Opt extends OptVersions {
   def apply[A](a: A): Opt[A] = new Opt(a)
   def empty[A]: Opt[A] = new Opt[A](null.asInstanceOf[A])
-
-  implicit def Eq[A: Eq]: Eq[Opt[A]] = new Eq[Opt[A]] {
-    def eqv(x: Opt[A], y: Opt[A]): Boolean =
-      if (x.isEmpty) y.isEmpty else x.ref === y.ref
-  }
 }
 
 class Opt[+A](val ref: A) extends OptVersions.Base {

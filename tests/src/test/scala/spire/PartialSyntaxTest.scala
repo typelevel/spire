@@ -8,6 +8,7 @@ import spire.optional.partialIterable._
 import spire.optional.mapIntIntPermutation._
 import spire.std.boolean._
 import spire.std.int._
+import spire.std.opt._
 import spire.syntax.eq._
 
 import org.scalatest.{FunSuite, NonImplicitAssertions}

@@ -34,16 +34,16 @@ lazy val spireJVM = project.in(file(".spireJVM"))
   .settings(spireSettings)
   .settings(unidocSettings)
   .settings(noPublishSettings)
-  .aggregate(macrosJVM, coreJVM, extrasJVM, examples, lawsJVM, testsJVM, benchmark)
-  .dependsOn(macrosJVM, coreJVM, extrasJVM, examples, lawsJVM, testsJVM, benchmark)
+  .aggregate(kernelJVM, macrosJVM, coreJVM, extrasJVM, examples, lawsJVM, testsJVM, benchmark)
+  .dependsOn(kernelJVM, macrosJVM, coreJVM, extrasJVM, examples, lawsJVM, testsJVM, benchmark)
 
 lazy val spireJS = project.in(file(".spireJS"))
   .settings(moduleName := "spire-aggregate")
   .settings(spireSettings)
   .settings(unidocSettings)
   .settings(noPublishSettings)
-  .aggregate(macrosJS, coreJS, extrasJS, lawsJS, testsJS)
-  .dependsOn(macrosJS, coreJS, extrasJS, lawsJS, testsJS)
+  .aggregate(kernelJS, macrosJS, coreJS, extrasJS, lawsJS, testsJS)
+  .dependsOn(kernelJS, macrosJS, coreJS, extrasJS, lawsJS, testsJS)
   .enablePlugins(ScalaJSPlugin)
 
 lazy val macros = crossProject.crossType(CrossType.Pure)
@@ -54,6 +54,7 @@ lazy val macros = crossProject.crossType(CrossType.Pure)
   .settings(crossVersionSharedSources:_*)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
+  .dependsOn(kernel)
 
 lazy val macrosJVM = macros.jvm
 lazy val macrosJS = macros.js
@@ -66,10 +67,22 @@ lazy val core = crossProject
   .settings(crossVersionSharedSources:_*)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
-  .dependsOn(macros)
+  .dependsOn(kernel, macros)
 
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
+
+lazy val kernel =  crossProject.crossType(CrossType.Full)
+  .settings(moduleName := "spire-kernel")
+  .settings(spireSettings: _*)
+  .settings(scalaCheckSettings:_*)
+  .settings(scalaTestSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+
+lazy val kernelJVM = kernel.jvm
+lazy val kernelJS = kernel.js
 
 lazy val extras = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-extras")
