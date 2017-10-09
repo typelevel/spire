@@ -6,7 +6,6 @@ import spire.algebra._
 import spire.algebra.lattice._
 import spire.algebra.partial._
 import spire.math._
-import spire.macros.Syntax
 import spire.syntax.std._
 
 trait EqSyntax {
@@ -221,15 +220,6 @@ trait NumericSyntax extends
 
 trait ConvertableFromSyntax {
   implicit def convertableOps[A:ConvertableFrom](a:A): ConvertableFromOps[A] = new ConvertableFromOps(a)
-}
-
-trait CforSyntax {
-  def cfor[A](init:A)(test:A => Boolean, next:A => A)(body:A => Unit): Unit =
-    macro Syntax.cforMacro[A]
-  def cforRange(r: Range)(body: Int => Unit): Unit =
-    macro Syntax.cforRangeMacro
-  def cforRange2(r1: Range, r2: Range)(body: (Int, Int) => Unit): Unit =
-    macro Syntax.cforRange2Macro
 }
 
 trait LiteralsSyntax {
