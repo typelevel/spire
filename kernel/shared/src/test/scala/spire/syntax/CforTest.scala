@@ -3,9 +3,12 @@ package syntax
 
 import scala.collection.mutable
 
-import spire.tests.SpireProperties
+import org.scalatest._
+import prop._
 
-class CforTest extends SpireProperties {
+class CforTest extends PropSpec with Matchers with PropertyChecks {
+
+  override def convertToEqualizer[T](left: T): Equalizer[T] = ???
 
   import spire.syntax.cfor._
 

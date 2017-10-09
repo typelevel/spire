@@ -12,7 +12,6 @@ lazy val shapelessVersion = "2.3.2"
 lazy val disciplineVersion = "0.7.2"
 lazy val machinistVersion = "0.6.1"
 lazy val algebraVersion = "0.7.0"
-// lazy val catsVersion = "0.8.1"
 
 lazy val apfloatVersion = "1.8.2"
 lazy val jscienceVersion = "4.3.1"
@@ -67,10 +66,22 @@ lazy val core = crossProject
   .settings(crossVersionSharedSources:_*)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
-  .dependsOn(kernel, macros)
+  .dependsOn(kernelMacros, kernel, macros)
 
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
+
+lazy val kernelMacros = crossProject.crossType(CrossType.Pure).in(file("kernel-macros"))
+  .settings(moduleName := "spire-kernel-macros")
+  .settings(spireSettings:_*)
+  .settings(scalaCheckSettings:_*)
+  .settings(scalaTestSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+
+lazy val kernelMacrosJVM = kernelMacros.jvm
+lazy val kernelMacrosJS = kernelMacros.js
 
 lazy val kernel =  crossProject.crossType(CrossType.Full)
   .settings(moduleName := "spire-kernel")
@@ -80,6 +91,7 @@ lazy val kernel =  crossProject.crossType(CrossType.Full)
   .settings(crossVersionSharedSources:_*)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
+  .dependsOn(kernelMacros)
 
 lazy val kernelJVM = kernel.jvm
 lazy val kernelJS = kernel.js
