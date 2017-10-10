@@ -1,8 +1,9 @@
 package spire
 package algebra
 
-/** We precise AlgebraField[_] = algebra.Field[_] by extending GCDRing/EuclideanRing with
-  * suitable default implementations.
+/** Field type class. While algebra already provides one, we provide one in Spire
+  * that integrates with the commutative ring hierarchy, in particular `GCDRing`
+  * and `EuclideanRing`.
   * 
   * On a field, all nonzero elements are invertible, so the remainder of the
   * division is always 0. The Euclidean function can take an arbitrary value on

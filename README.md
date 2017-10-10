@@ -1,7 +1,7 @@
 [![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/non/spire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![codecov.io](http://codecov.io/github/non/spire/coverage.svg?branch=master)](http://codecov.io/github/non/spire?branch=master)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.spire-math/spire_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.spire-math/spire_2.11)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.typelevel/spire_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.typelevel/spire_2.11)
 
 ## Spire
 
@@ -18,10 +18,10 @@ cases, generic implementations using Spire's specialized type classes perform
 identically to corresponding direct implementations.
 
 ### Scaladoc
-[![Core](http://javadoc-badge.appspot.com/org.spire-math/spire_2.11.svg?label=core)](http://javadoc-badge.appspot.com/org.spire-math/spire_2.11/index.html#spire.package)
-[![Extras](http://javadoc-badge.appspot.com/org.spire-math/spire-extras_2.11.svg?label=extras)](http://javadoc-badge.appspot.com/org.spire-math/spire-extras_2.11)
-[![Laws](http://javadoc-badge.appspot.com/org.spire-math/spire-laws_2.11.svg?label=laws)](http://javadoc-badge.appspot.com/org.spire-math/spire-laws_2.11/index.html#spire.laws.package)
-[![Macros](http://javadoc-badge.appspot.com/org.spire-math/spire-macros_2.11.svg?label=macros)](http://javadoc-badge.appspot.com/org.spire-math/spire-macros_2.11/index.html#spire.macros.package)
+[![Core](http://javadoc-badge.appspot.com/org.typelevel/spire_2.11.svg?label=core)](http://javadoc-badge.appspot.com/org.typelevel/spire_2.11/index.html#spire.package)
+[![Extras](http://javadoc-badge.appspot.com/org.typelevel/spire-extras_2.11.svg?label=extras)](http://javadoc-badge.appspot.com/org.typelevel/spire-extras_2.11)
+[![Laws](http://javadoc-badge.appspot.com/org.typelevel/spire-laws_2.11.svg?label=laws)](http://javadoc-badge.appspot.com/org.typelevel/spire-laws_2.11/index.html#spire.laws.package)
+[![Macros](http://javadoc-badge.appspot.com/org.typelevel/spire-macros_2.11.svg?label=macros)](http://javadoc-badge.appspot.com/org.typelevel/spire-macros_2.11/index.html#spire.macros.package)
 
 Spire is provided to you as free software under the
 [MIT license](COPYING).
@@ -41,7 +41,7 @@ merging pull requests, and for helping to guide the direction of Spire:
  * Erik Osheim (*erik@osheim.org*)
  * Tom Switzer (*thomas.switzer@gmail.com*)
  * Rüdiger Klaehn (*rklaehn@gmail.com*)
- * Denis Rosset (*denis.rosset@unige.ch*)
+ * Denis Rosset (*physics@denisrosset.com*)
 
 People are expected to follow the [Typelevel Code of Conduct](http://typelevel.org/conduct.html)
 when discussing Spire on the Github page, in Gitter, the IRC channel,
@@ -52,17 +52,20 @@ Concerns or issues can be sent to any of Spire's maintainers, or to the
 
 ### Set up
 
-Spire is currently available for Scala 2.10 and 2.11 (and supports
-scala-js for both versions).
+Spire is currently available for Scala 2.10, 2.11, and 2.12, for the
+JVM and JS platforms.
 
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-libraryDependencies += "org.spire-math" %% "spire" % "0.13.0"
+libraryDependencies += "org.typelevel" %% "spire" % "0.14.1"
 ```
 
+(Previous to 0.14.0, Spire was published under *org.spire-math*
+instead of *org.typelevel*.)
+
 For Maven instructions, and to download the jars directly, visit the
-[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.11%7C0.11.0%7Cjar).
+[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.typelevel%7Cspire_2.11%7C0.14.1%7Cjar).
 
 Here is a list of all of Spire's modules:
 
@@ -70,6 +73,10 @@ Here is a list of all of Spire's modules:
  * `spire`: the core Spire library, the types and type classes
  * `spire-laws`: optional support for law-checking and testing
  * `spire-extras`: extra types which are more specific or esoteric
+
+Spire depends on [typelevel/algebra](https://github.com/typelevel/algebra)
+and uses this project to interoperate with [Cats](https://github.com/typelevel/cats) and
+[Algebird](https://github.com/twitter/algebird).
 
 ### Playing Around
 
@@ -542,7 +549,7 @@ measure relative as well as absolute performance.
 Code is offered as-is, with no implied warranty of any kind. Comments,
 criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
-Copyright 2011-2015 Erik Osheim, Tom Switzer
+Copyright 2011-2017 Erik Osheim, Tom Switzer
 
 A full list of contributors can be found in [AUTHORS.md](AUTHORS.md).
 

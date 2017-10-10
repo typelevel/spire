@@ -1,3 +1,70 @@
+## Version 0.14.0
+
+This release is a major milestone for Spire.
+
+First of all, it introduces a dependency on typelevel/algebra (and
+thus on typelevel/cats-kernel). This provides immediate compatibility
+with Cats and Algebird.
+
+Second of all, Spire is now published to the org.typelevel
+organization (which was previously org.spire-math).
+
+Additions: 
+ * Added GCDRing, part of the commutative ring hierarchy
+ * Clarified the laws of EuclideanRing
+ * Added DivisionRing, a ring in which division is possible
+   (generalization of fields to the noncommutative case;
+   used now by Spire's quaternions).
+
+Changes:
+ * Many type classes are now aliases to algebra's type classes
+ * Algebra provides commutative rings and fields, but the
+   intemediate structures (GCDRing/EuclideanRing) are added
+   by Spire; thus Spire Field differs from algebra Field by
+   extending GCDRing and EuclideanRing.
+ * The EuclidenRing operations for Field have been corrected;
+   in particular, Float, Double no longer perform truncated division
+   but a /~ b = 0 for nonzero b, as a can always be divided by b in a
+   field.
+ * Signed now extends Order, thus IsReal only extends Signed.
+ * IsReal has been replaced by Signed for some operations in
+   e.g. Complex, making them more precise/general.
+ * Many different efficiency improvements
+
+Fixes:
+ * Instances for Complex and Quaternion are more precise
+ * Numeric[Complex[A]] is no longer provided
+ * Many bug fixes
+
+## Version 0.13.0
+
+Additions:
+ * Added Eq[Bound[A]] instance
+ * Added Interval#overlap and supporting machinery
+
+Changes:
+ * Improve Polynomial performance
+ * Support negative roots for Real
+ * Migrate to newer ScalaCheck
+
+Fixes:
+ * Fix bugs in root isolation/refinement for Algebraic
+ * Speed up convergence for Rational#limitTo
+
+## Version 0.12.0
+
+Additions:
+ * IntervalSeq and IntervalTrie added to spire-extras
+ * .toReal and .toAlgebraic methods on Rational
+
+Changes:
+ * Package restructuring and improvements
+ * Make Interval serializable
+ * Deprecate use of SecureJava.fromBytes
+
+Fixes:
+ * Numerous bug fixes
+
 ## Version 0.11.0
 
 Spire has two new core maintainers: Rüdiger Klaehn and Denis Rosset.

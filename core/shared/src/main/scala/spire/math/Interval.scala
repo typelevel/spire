@@ -103,8 +103,8 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
 
   def isBounded: Boolean =
     this match {
-      case Below(_, _) | Above(_, _) | All() => true
-      case _ => false
+      case Below(_, _) | Above(_, _) | All() => false
+      case _ => true
     }
 
   def lowerBound: Bound[A]

@@ -60,7 +60,10 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     (q, this - q * rhs)
   }
 
-  def lcm(rhs: Rational): Rational = if (lhs.isZero || rhs.isZero) Rational.zero else (lhs / (lhs gcd rhs)) * rhs
+  def lcm(rhs: Rational): Rational =
+    if (lhs.isZero || rhs.isZero) Rational.zero
+    else (lhs / (lhs gcd rhs)) * rhs
+
   def gcd(rhs: Rational): Rational =
     // a few shortcuts (that are correctly handled by the generic algorithm anyhow)
     if (lhs.isZero) rhs.abs
@@ -853,14 +856,9 @@ private[math] trait RationalApproximateNRoot extends NRoot[Rational] {
     Rational(n.toDouble ** k.toDouble)
 }
 
-private[math] trait RationalIsField extends Field.FieldOfFractionsGCD[Rational, SafeLong] {
+private[math] trait RationalIsField extends Field[Rational] {
   override def gcd(x: Rational, y: Rational)(implicit ev: Eq[Rational]) = x.gcd(y)
   override def lcm(x: Rational, y: Rational)(implicit ev: Eq[Rational]) = x.lcm(y)
-  def ringR = SafeLong.SafeLongAlgebra
-  def eqR = SafeLong.SafeLongIsReal
-  def numerator(a:Rational): SafeLong = a.numerator
-  def denominator(a:Rational): SafeLong = a.denominator
-  def fraction(num:SafeLong, den:SafeLong): Rational = Rational(num, den)
   override def minus(a:Rational, b:Rational): Rational = a - b
   def negate(a:Rational): Rational = -a
   def one: Rational = Rational.one
