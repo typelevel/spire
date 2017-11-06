@@ -17,7 +17,7 @@ trait AdditiveMonoidTests[A] extends AdditiveSemigroupTests[A] {
       Some(additiveSemigroup),
       "left zero" -> forAll(laws.leftZero _),
       "right zero" -> forAll(laws.rightZero _),
-      "sum0" -> forAll(laws.sum0 _),
+      "sumN0" -> forAll(laws.sumN0 _),
       "sumAll" -> laws.sumAll,
       "isZero" -> forAll((a: A) => laws.isZero(a, eqA))
     )

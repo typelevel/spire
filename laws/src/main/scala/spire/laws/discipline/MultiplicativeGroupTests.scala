@@ -14,9 +14,9 @@ trait MultiplicativeGroupTests[A] extends MultiplicativeMonoidTests[A] {
     new DefaultRuleSet(
       "MultiplicativeGroup",
       Some(MultiplicativeMonoid),
-      "left negate" -> forAll(laws.leftNegate _),
-      "right negate" -> forAll(laws.rightNegate _),
-      "consistent minus" -> forAll(laws.consistentMinus _)
+      "left reciprocal" -> forAll(laws.leftReciprocal _),
+      "right reciprocal" -> forAll(laws.rightReciprocal _),
+      "consistent div" -> forAll(laws.consistentDiv _)
     )
 }
 

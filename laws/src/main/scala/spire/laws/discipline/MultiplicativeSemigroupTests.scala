@@ -18,6 +18,7 @@ trait MultiplicativeSemigroupTests[A] extends Laws {
       "times associative" -> forAll(laws.timesAssociative _),
       "pow1" -> forAll(laws.pow1 _),
       "pow2" -> forAll(laws.pow2 _),
+      "pow3" -> forAll(laws.pow3 _),
       "tryProduct" -> forAll(laws.tryProduct _)
     )
 

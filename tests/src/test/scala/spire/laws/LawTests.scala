@@ -52,37 +52,37 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Int",        LimitedRangeLaws[Int].signedGCDRing)
   checkAll("Long",       LimitedRangeLaws[Long].euclideanRing)
   checkAll("Long",       LimitedRangeLaws[Long].signedGCDRing)
-  checkAll("BigInt",     RingLaws[BigInt].euclideanRing)
+  checkAll("BigInt",     OldRingLaws[BigInt].euclideanRing)
   checkAll("BigInt",     CombinationLaws[BigInt].signedGCDRing)
-  checkAll("BigInteger", RingLaws[BigInteger].euclideanRing)
+  checkAll("BigInteger", OldRingLaws[BigInteger].euclideanRing)
   checkAll("BigInteger", CombinationLaws[BigInteger].signedGCDRing)
-  checkAll("Rational",   RingLaws[Rational].field)
+  checkAll("Rational",   OldRingLaws[Rational].field)
   checkAll("Rational",   CombinationLaws[BigInt].signedGCDRing)
-  checkAll("Real",       RingLaws[Real].field)
-  checkAll("UByte",      RingLaws[UByte].cRig)
+  checkAll("Real",       OldRingLaws[Real].field)
+  checkAll("UByte",      OldRingLaws[UByte].cRig)
   checkAll("UByte",      LimitedRangeLaws[UByte].signedAdditiveCMonoid)
-  checkAll("UShort",     RingLaws[UShort].cRig)
+  checkAll("UShort",     OldRingLaws[UShort].cRig)
   checkAll("UShort",     LimitedRangeLaws[UShort].signedAdditiveCMonoid)
-  checkAll("UInt",       RingLaws[UInt].cRig)
+  checkAll("UInt",       OldRingLaws[UInt].cRig)
   checkAll("UInt",       LimitedRangeLaws[UInt].signedAdditiveCMonoid)
-  checkAll("ULong",      RingLaws[ULong].cRig)
+  checkAll("ULong",      OldRingLaws[ULong].cRig)
   checkAll("ULong",      LimitedRangeLaws[ULong].signedAdditiveCMonoid)
-  checkAll("Natural",    RingLaws[Natural].cRig)
+  checkAll("Natural",    OldRingLaws[Natural].cRig)
   checkAll("Natural",    CombinationLaws[Natural].signedAdditiveCMonoid)
-  checkAll("SafeLong",   RingLaws[SafeLong].euclideanRing)
+  checkAll("SafeLong",   OldRingLaws[SafeLong].euclideanRing)
   checkAll("SafeLong",   CombinationLaws[SafeLong].signedGCDRing)
 
-  checkAll("Complex[Rational]", RingLaws[Complex[Rational]].field)
+  checkAll("Complex[Rational]", OldRingLaws[Complex[Rational]].field)
 
-  checkAll("Quaternion[Rational]", RingLaws[Quaternion[Rational]].divisionRing)
+  checkAll("Quaternion[Rational]", OldRingLaws[Quaternion[Rational]].divisionRing)
 
   checkAll("Levenshtein distance", BaseLaws[String].metricSpace)
   checkAll("BigInt",               BaseLaws[BigInt].metricSpace)
 
   // We skip checking all tuple types, as they are all generated from the same
   // template.
-  checkAll("(Int,Int)",           RingLaws[(Int, Int)].ring)
-  checkAll("(Rational,Rational)", RingLaws[(Rational, Rational)].ring)
+  checkAll("(Int,Int)",           OldRingLaws[(Int, Int)].ring)
+  checkAll("(Rational,Rational)", OldRingLaws[(Rational, Rational)].ring)
 
   import spire.optional.vectorOrder._
 

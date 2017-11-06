@@ -14,6 +14,9 @@ trait MultiplicativeSemigroupLaws[A] {
   def pow2(a: A): IsEq[A] =
     S.pow(a, 2) <=> S.times(a, a)
 
+  def pow3(a: A): IsEq[A] =
+    S.pow(a, 3) <=> S.times(S.times(a, a), a)
+
   def tryProduct(xs: Vector[A]): IsEq[Option[A]] =
     S.tryProduct(xs) <=> xs.reduceOption(S.times)
 }

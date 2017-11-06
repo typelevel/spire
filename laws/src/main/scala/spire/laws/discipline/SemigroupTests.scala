@@ -16,8 +16,9 @@ trait SemigroupTests[A] extends Laws {
       "Semigroup",
       None,
       "combine associative" -> forAll(laws.combineAssociative _),
-      "combine1" -> forAll(laws.combine1 _),
-      "combine2" -> forAll(laws.combine2 _),
+      "combineN1" -> forAll(laws.combineN1 _),
+      "combineN2" -> forAll(laws.combineN2 _),
+      "combineN3" -> forAll(laws.combineN3 _),
       "tryCombine" -> forAll(laws.tryCombine _)
     )
 

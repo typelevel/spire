@@ -16,8 +16,9 @@ trait AdditiveSemigroupTests[A] extends Laws {
       "additiveSemigroup",
       None,
       "plus associative" -> forAll(laws.plusAssociative _),
-      "sum1" -> forAll(laws.sum1 _),
-      "sum2" -> forAll(laws.sum2 _),
+      "sumN1" -> forAll(laws.sumN1 _),
+      "sumN2" -> forAll(laws.sumN2 _),
+      "sumN3" -> forAll(laws.sumN3 _),
       "trySum" -> forAll(laws.trySum _)
     )
 

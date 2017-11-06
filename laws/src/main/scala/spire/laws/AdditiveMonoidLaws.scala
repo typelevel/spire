@@ -11,7 +11,7 @@ trait AdditiveMonoidLaws[A] extends AdditiveSemigroupLaws[A] {
   def rightZero(a: A): IsEq[A] =
     S.plus(a, S.zero) <=> a
 
-  def sum0(a: A): IsEq[A] =
+  def sumN0(a: A): IsEq[A] =
     S.sumN(a, 0) <=> S.zero
 
   def sumAll: IsEq[A] =

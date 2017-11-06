@@ -11,7 +11,7 @@ trait MonoidLaws[A] extends SemigroupLaws[A] {
   def rightEmpty(a: A): IsEq[A] =
     S.combine(a, S.empty) <=> a
 
-  def combine0(a: A): IsEq[A] =
+  def combineN0(a: A): IsEq[A] =
     S.combineN(a, 0) <=> S.empty
 
   def combineAll: IsEq[A] =
