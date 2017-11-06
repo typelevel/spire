@@ -80,7 +80,8 @@ object BigDecimalRootRefinement {
   def apply(poly: Polynomial[BigDecimal], lowerBound: Rational, upperBound: Rational, mc: MathContext): BigDecimalRootRefinement =
     apply(poly, lowerBound, upperBound).refine(mc)
 
-  private implicit val JBigDecimalOrder: Signed[JBigDecimal] = new SignedAdditiveAbGroup[JBigDecimal] {
+  private implicit val JBigDecimalOrder: Signed[JBigDecimal] = new Signed.OnAdditiveAbGroup[JBigDecimal] with AdditiveAbGroup[JBigDecimal] {
+    def additiveStructure = this
     def negate(x: JBigDecimal) = x.negate
     def zero = JBigDecimal.ZERO
     def plus(x: JBigDecimal, y: JBigDecimal) = x.add(y)
