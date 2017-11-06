@@ -21,6 +21,7 @@ trait BaseLaws[A] extends Laws {
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
 
+  // copy of these laws in LimitedRangeLaws.scala
 
   def signed(implicit A: Signed[A]) = new SimpleRuleSet(
     name = "signed",

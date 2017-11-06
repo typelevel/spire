@@ -46,7 +46,7 @@ trait ByteIsNRoot extends NRoot[Byte] {
 }
 
 trait ByteIsSigned extends Signed[Byte] {
-  override def signum(a: Byte): Int = a
+  override def signum(a: Byte): Int = java.lang.Integer.signum(a)
   override def abs(a: Byte): Byte = (if (a < 0) -a else a).toByte
 }
 

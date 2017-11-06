@@ -37,6 +37,8 @@ trait RingLaws[A] extends GroupLaws[A] {
   implicit def Equ: Eq[A] = nonZeroLaws.Equ
 
 
+  // the laws below are shadowed in LimitedRangeLaws
+
   // multiplicative groups
 
   def multiplicativeSemigroup(implicit A: MultiplicativeSemigroup[A]) = new MultiplicativeProperties(
