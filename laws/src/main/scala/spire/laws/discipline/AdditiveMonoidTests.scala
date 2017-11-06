@@ -13,7 +13,7 @@ trait AdditiveMonoidTests[A] extends AdditiveSemigroupTests[A] {
 
   def additiveMonoid(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
     new DefaultRuleSet(
-      "additive monoid",
+      "additiveMonoid",
       Some(additiveSemigroup),
       "left zero" -> forAll(laws.leftZero _),
       "right zero" -> forAll(laws.rightZero _),

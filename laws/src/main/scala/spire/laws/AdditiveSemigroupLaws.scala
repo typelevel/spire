@@ -16,7 +16,6 @@ trait AdditiveSemigroupLaws[A] {
 
   def trySum(xs: Vector[A]): IsEq[Option[A]] =
     S.trySum(xs) <=> xs.reduceOption(S.plus)
-
 }
 
 object AdditiveSemigroupLaws {
