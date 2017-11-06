@@ -127,7 +127,7 @@ trait NumberTag[A] {
 
   /**
    * If `A` has values that represent an undefined or invalid value, then a
-   * repsentitive value may be used here. Otherwise this returned `None` to
+   * representative value may be used here. Otherwise this returned `None` to
    * indicate that all values in `A` are valid numbers in the extended real
    * number line.
    */

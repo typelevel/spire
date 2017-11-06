@@ -3,8 +3,7 @@ package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import spire.algebra.{CRig, IsIntegral, Order, SignedAdditiveCMonoid}
-
+import spire.algebra._
 import Natural._
 
 // NOTE: this class works, but is only optimal for a relatively narrow
@@ -725,7 +724,9 @@ private[math] trait NaturalOrder extends Order[Natural] {
   def compare(x: Natural, y: Natural): Int = x.compare(y)
 }
 
-private[math] trait NaturalSigned extends NaturalOrder with SignedAdditiveCMonoid[Natural] {
+private[math] trait NaturalSigned extends NaturalOrder with Signed.OnAdditiveCMonoid[Natural] {
+  self: AdditiveCMonoid[Natural] =>
+  def additiveStructure = self
   def abs(x: Natural): Natural = x
 }
 
