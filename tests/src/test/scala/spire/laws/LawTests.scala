@@ -9,6 +9,7 @@ import spire.laws.arb._
 import spire.math._
 import spire.optional.partialIterable._
 import spire.optional.mapIntIntPermutation._
+import spire.laws.discipline.spireLawsArbitraryShaded
 
 import spire.implicits.{
   SeqOrder => _, SeqEq => _,
@@ -32,6 +33,16 @@ class LawTests extends FunSuite with Discipline {
     }
   }
 
+  implicit val shadowingUByte: Shadowing[UByte, BigInt] = Shadowing[UByte, BigInt](_.toBigInt, s => {
+    if (s < NumberTag[UByte].hasMinValue.get.toBigInt || s > NumberTag[UByte].hasMaxValue.get.toBigInt)
+      None
+    else
+      Some(UByte(s.toInt))
+  })
+
+  implicit val addSGUByte = Shaded.additiveCMonoid[UByte, BigInt]
+
+  checkAll("UByte",      spire.laws.discipline.AdditiveSemigroupTests[Shaded[UByte, BigInt]].additiveSemigroup)
   // Float and Double fail these tests
   checkAll("Byte",       LimitedRangeLaws[Byte].cRing)
   checkAll("Byte",       LimitedRangeLaws[Byte].signedGCDRing)
