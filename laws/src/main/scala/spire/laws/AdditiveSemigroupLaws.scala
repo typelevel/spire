@@ -5,7 +5,7 @@ import spire.algebra.AdditiveSemigroup
 trait AdditiveSemigroupLaws[A] {
   implicit def S: AdditiveSemigroup[A]
 
-  def semigroupAssociative(x: A, y: A, z: A): IsEq[A] =
+  def plusAssociative(x: A, y: A, z: A): IsEq[A] =
     S.plus(S.plus(x, y), z) <=> S.plus(x, S.plus(y, z))
 
   def sum1(a: A): IsEq[A] =

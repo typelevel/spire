@@ -15,10 +15,10 @@ trait AdditiveSemigroupTests[A] extends Laws {
     new DefaultRuleSet(
       "additiveSemigroup",
       None,
-      "additiveSemigroup associative" -> forAll(laws.semigroupAssociative _),
-      "additiveSemigroup repeat1" -> forAll(laws.sum1 _),
-      "additiveSemigroup repeat2" -> forAll(laws.sum2 _),
-      "additiveSemigroup trySum" -> forAll(laws.trySum _)
+      "plus associative" -> forAll(laws.plusAssociative _),
+      "sum1" -> forAll(laws.sum1 _),
+      "sum2" -> forAll(laws.sum2 _),
+      "trySum" -> forAll(laws.trySum _)
     )
 
 }

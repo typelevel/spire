@@ -5,7 +5,7 @@ import spire.algebra.AdditiveCSemigroup
 trait AdditiveCSemigroupLaws[A] extends AdditiveSemigroupLaws[A] {
   override implicit def S: AdditiveCSemigroup[A]
 
-  def commutative(x: A, y: A): IsEq[A] =
+  def plusCommutative(x: A, y: A): IsEq[A] =
     S.plus(x, y) <=> S.plus(y, x)
 
 }

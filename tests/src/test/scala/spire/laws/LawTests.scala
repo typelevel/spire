@@ -42,7 +42,7 @@ class LawTests extends FunSuite with Discipline {
 
   implicit val addSGUByte = Shaded.additiveCMonoid[UByte, BigInt]
 
-  checkAll("UByte",      spire.laws.discipline.AdditiveSemigroupTests[Shaded[UByte, BigInt]].additiveSemigroup)
+  checkAll("UByte",      spire.laws.discipline.AdditiveCMonoidTests[Shaded[UByte, BigInt]].additiveCMonoid)
   // Float and Double fail these tests
   checkAll("Byte",       LimitedRangeLaws[Byte].cRing)
   checkAll("Byte",       LimitedRangeLaws[Byte].signedGCDRing)
