@@ -14,7 +14,9 @@ package algebra
   * can be fixed arbitrarily. Some conventions with consistent defaults are provided in the 
   * spire.algebra.Field companion object.
   */
-trait Field[@sp(Int, Long, Float, Double) A] extends Any with AlgebraField[A] with EuclideanRing[A] {
+trait Field[@sp(Int, Long, Float, Double) A] extends Any with AlgebraField[A] with EuclideanRing[A] with DivisionRing[A] {
+  self =>
+  override def fromDouble(a: Double): A = Ring.defaultFromDouble[A](a)(self, self)
   def euclideanFunction(a: A): BigInt = BigInt(0)
   def quot(a: A, b: A): A = div(a, b)
   def mod(a: A, b: A): A = zero

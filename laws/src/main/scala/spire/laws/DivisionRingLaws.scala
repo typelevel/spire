@@ -11,7 +11,7 @@ trait DivisionRingLaws[A] extends RingLaws[A] {
   def rightReciprocal(x: NonZero[A]): IsEq[A] =
     S.times(x.a, S.reciprocal(x.a)) <=> S.one
 
-  def consistentDive(x: A, y: NonZero[A]): IsEq[A] =
+  def consistentDiv(x: A, y: NonZero[A]): IsEq[A] =
     S.div(x, y.a) <=> S.times(x, S.reciprocal(y.a))
 }
 
