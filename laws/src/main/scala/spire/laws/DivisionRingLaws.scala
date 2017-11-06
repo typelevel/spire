@@ -5,6 +5,9 @@ import spire.algebra.DivisionRing
 trait DivisionRingLaws[A] extends RingLaws[A] {
   override implicit def S: DivisionRing[A]
 
+  // small duplication from multiplicative group, because the multiplicative structure
+  // is a monoid over all elements, and a group over the nonzero elements
+
   def leftReciprocal(x: NonZero[A]): IsEq[A] =
     S.times(S.reciprocal(x.a), x.a) <=> S.one
 

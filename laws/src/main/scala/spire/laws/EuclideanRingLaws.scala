@@ -7,7 +7,7 @@ trait EuclideanRingLaws[A] extends CRigLaws[A] with CRngLaws[A] {
 
   def euclideanDivisionRule(x: A, y: NonZero[A]): IsEq[A] = {
     val (q, r) = S.quotmod(x, y.a)
-    x <=> S.plus(S.times(y, q), r)
+    x <=> S.plus(S.times(y.a, q), r)
   }
 
   def equot(x: A, y: NonZero[A]): IsEq[A] =
@@ -18,11 +18,11 @@ trait EuclideanRingLaws[A] extends CRigLaws[A] with CRngLaws[A] {
 
   def euclideanFunction(x: A, y: NonZero[A], eqA: Eq[A]): IsEq[Boolean] = {
     val (q, r) = S.quotmod(x, y.a)
-    (S.isZero(r)(eqA) || (S.euclideanFunction(r) < S.euclideanFunction(y))) <=> true
+    (S.isZero(r)(eqA) || (S.euclideanFunction(r) < S.euclideanFunction(y.a))) <=> true
   }
 
   def submultiplicativeEuclideanFunction(x: NonZero[A], y: NonZero[A]): IsEq[Boolean] =
-    (S.euclideanFunction(x) <= S.euclideanFunction(S.times(x, y))) <=> true
+    (S.euclideanFunction(x.a) <= S.euclideanFunction(S.times(x.a, y.a))) <=> true
 
 }
 
