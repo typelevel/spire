@@ -11,7 +11,7 @@ import org.scalacheck.Prop._
 
 object ActionLaws {
   def apply[G: Eq: Arbitrary, A: Eq: Arbitrary] = new ActionLaws[G, A] {
-    val scalarLaws = GroupLaws[G]
+    val scalarLaws = OldGroupLaws[G]
     def EquA = Eq[A]
     def ArbA = implicitly[Arbitrary[A]]
   }
@@ -19,7 +19,7 @@ object ActionLaws {
 
 trait ActionLaws[G, A] extends Laws {
 
-  val scalarLaws: GroupLaws[G]
+  val scalarLaws: OldGroupLaws[G]
 
   import scalarLaws.{ Arb => ArG }
 

@@ -15,7 +15,7 @@ object PartialGroupLaws {
   }
 }
 
-trait PartialGroupLaws[A] extends GroupLaws[A] {
+trait PartialGroupLaws[A] extends OldGroupLaws[A] {
 
   def semigroupoid(implicit A: Semigroupoid[A]) = new GroupProperties(
     name = "semigroupoid",

@@ -14,17 +14,17 @@ object RingLaws {
   def apply[A : Eq : Arbitrary](implicit _pred: Predicate[A]) = new RingLaws[A] {
     def Arb = implicitly[Arbitrary[A]]
     def pred = _pred
-    val nonZeroLaws = new GroupLaws[A] {
+    val nonZeroLaws = new OldGroupLaws[A] {
       def Arb = Arbitrary(arbitrary[A] filter _pred)
       def Equ = Eq[A]
     }
   }
 }
 
-trait RingLaws[A] extends GroupLaws[A] {
+trait RingLaws[A] extends OldGroupLaws[A] {
 
   // must be a val (stable identifier)
-  val nonZeroLaws: GroupLaws[A]
+  val nonZeroLaws: OldGroupLaws[A]
   def pred: Predicate[A]
 
   def withPred(_pred: Predicate[A], replace: Boolean = true): RingLaws[A] = RingLaws[A](
@@ -231,9 +231,9 @@ trait RingLaws[A] extends GroupLaws[A] {
   // property classes
 
   class MultiplicativeProperties(
-    val base: GroupLaws[A] => GroupLaws[A]#GroupProperties,
-    val parent: Option[MultiplicativeProperties],
-    val props: (String, Prop)*
+                                  val base: OldGroupLaws[A] => OldGroupLaws[A]#GroupProperties,
+                                  val parent: Option[MultiplicativeProperties],
+                                  val props: (String, Prop)*
   ) extends RuleSet with HasOneParent {
     private val _base = base(RingLaws.this)
 

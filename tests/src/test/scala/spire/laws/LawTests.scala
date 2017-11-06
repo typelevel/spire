@@ -105,11 +105,11 @@ class LawTests extends FunSuite with Discipline {
   checkAll("List[Rational]",
     VectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly))
 
-  checkAll("List[Int]",   GroupLaws[List[Int]].monoid)
-  checkAll("Vector[Int]", GroupLaws[Vector[Int]].monoid)
-  checkAll("Set[Int]",    GroupLaws[Set[Int]](spire.optional.genericEq.generic, implicitly).monoid)
-  checkAll("String[Int]", GroupLaws[String].monoid)
-  checkAll("Array[Int]",  GroupLaws[Array[Int]].monoid)
+  checkAll("List[Int]",   OldGroupLaws[List[Int]].monoid)
+  checkAll("Vector[Int]", OldGroupLaws[Vector[Int]].monoid)
+  checkAll("Set[Int]",    OldGroupLaws[Set[Int]](spire.optional.genericEq.generic, implicitly).monoid)
+  checkAll("String[Int]", OldGroupLaws[String].monoid)
+  checkAll("Array[Int]",  OldGroupLaws[Array[Int]].monoid)
 
   checkAll("Seq[String]", PartialGroupLaws[Seq[String]](spire.optional.genericEq.generic, implicitly).semigroupoid)
   checkAll("Seq[Int]",    PartialGroupLaws[Seq[Int]].groupoid)
@@ -133,12 +133,12 @@ class LawTests extends FunSuite with Discipline {
       Eq[A].eqv(x.run(n => n), y.run(n => n))
   }
 
-  checkAll("FreeMonoid", GroupLaws[FreeMonoid[String]].monoid)
-  checkAll("D3", GroupLaws[D3].group)
-  checkAll("FreeGroup", GroupLaws[FreeGroup[D3]].group)
+  checkAll("FreeMonoid", OldGroupLaws[FreeMonoid[String]].monoid)
+  checkAll("D3", OldGroupLaws[D3].group)
+  checkAll("FreeGroup", OldGroupLaws[FreeGroup[D3]].group)
 
   implicit def intAbGroup: AbGroup[Int] = AdditiveAbGroup[Int].additive
-  checkAll("FreeAbGroup", GroupLaws[FreeAbGroup[Int]].abGroup)
+  checkAll("FreeAbGroup", OldGroupLaws[FreeAbGroup[Int]].abGroup)
 
   checkAll("Bool[Boolean]", LogicLaws[Boolean].bool)
   checkAll("Bool[Int]", LogicLaws[Int].bool)
@@ -152,7 +152,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Order[Int]", OrderLaws[Int].order)
   checkAll("Order[BigInteger]", OrderLaws[BigInteger].order)
   checkAll("Order[Unit]", OrderLaws[Unit].order)
-  checkAll("AbGroup[Unit]", GroupLaws[Unit].abGroup)
+  checkAll("AbGroup[Unit]", OldGroupLaws[Unit].abGroup)
   checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 
   checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbitrary[Perm].map(_.map)), implicitly, implicitly).groupPartialAction)

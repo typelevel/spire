@@ -12,7 +12,7 @@ import org.scalacheck.Prop._
 object VectorSpaceLaws {
   def apply[V: Eq: Arbitrary, A: Eq: Arbitrary: Predicate] = new VectorSpaceLaws[V, A] {
     val scalarLaws = RingLaws[A]
-    val vectorLaws = GroupLaws[V]
+    val vectorLaws = OldGroupLaws[V]
   }
 }
 
@@ -21,7 +21,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
   implicit def scalar(implicit V: Module[V, A]): Rng[A] = V.scalar
 
   val scalarLaws: RingLaws[A]
-  val vectorLaws: GroupLaws[V]
+  val vectorLaws: OldGroupLaws[V]
 
   import scalarLaws.{ Equ => EqA, Arb => ArA }
   import vectorLaws.{ Equ => EqV, Arb => ArV }
