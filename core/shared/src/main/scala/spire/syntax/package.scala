@@ -1,7 +1,6 @@
 package spire
 
 package object syntax {
-  object cfor extends CforSyntax
   object literals extends LiteralsSyntax
 
   object eq extends EqSyntax
