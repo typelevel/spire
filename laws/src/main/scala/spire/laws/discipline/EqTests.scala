@@ -2,6 +2,7 @@ package spire.laws
 package discipline
 
 import spire.algebra.Eq
+import spire.std.boolean._
 
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
@@ -10,7 +11,7 @@ import org.typelevel.discipline.Laws
 trait EqTests[A] extends Laws {
   def laws: EqLaws[A]
 
-  def eqv(implicit arbA: Arbitrary[A], arbF: Arbitrary[A => A], eqA: Eq[A]): RuleSet =
+  def eqv(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
     new DefaultRuleSet(
       "eq",
       None,

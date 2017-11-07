@@ -21,6 +21,6 @@ trait EqLaws[A] {
 }
 
 object EqLaws {
-  def apply[A](implicit ev: Eq[A]): EqLaws[A] =
-    new EqLaws[A] { def E: Eq[A] = ev }
+  def apply[A:Eq]: EqLaws[A] =
+    new EqLaws[A] { def E: Eq[A] = implicitly }
 }

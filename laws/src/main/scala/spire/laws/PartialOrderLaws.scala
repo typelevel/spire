@@ -53,6 +53,6 @@ trait PartialOrderLaws[A] extends EqLaws[A] {
 }
 
 object PartialOrderLaws {
-  def apply[A](implicit ev: PartialOrder[A]): PartialOrderLaws[A] =
-    new PartialOrderLaws[A] { def E: PartialOrder[A] = ev }
+  def apply[A:PartialOrder]: PartialOrderLaws[A] =
+    new PartialOrderLaws[A] { def E: PartialOrder[A] = implicitly }
 }

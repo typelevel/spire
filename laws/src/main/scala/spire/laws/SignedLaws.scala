@@ -14,3 +14,8 @@ trait SignedLaws[A] extends OrderLaws[A] {
   def signumIsSignToInt(x: A): IsEq[Int] =
     E.signum(x) <=> E.sign(x).toInt
 }
+
+object SignedLaws {
+  def apply[A:Signed]: SignedLaws[A] =
+    new SignedLaws[A] { def E: Signed[A] = implicitly }
+}

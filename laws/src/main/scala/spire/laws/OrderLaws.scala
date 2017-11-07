@@ -31,6 +31,6 @@ trait OrderLaws[A] extends PartialOrderLaws[A] {
 }
 
 object OrderLaws {
-  def apply[A](implicit ev: Order[A]): OrderLaws[A] =
-    new OrderLaws[A] { def E: Order[A] = ev }
+  def apply[A:Order]: OrderLaws[A] =
+    new OrderLaws[A] { def E: Order[A] = implicitly }
 }

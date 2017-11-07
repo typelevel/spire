@@ -1,6 +1,6 @@
 package spire.laws
 
-import org.scalacheck.Prop.forAll
+import spire.algebra.{AdditiveCMonoid, Signed}
 
 trait SignedAdditiveCMonoidLaws[A] extends SignedLaws[A] with AdditiveCMonoidLaws[A] {
 
@@ -9,4 +9,9 @@ trait SignedAdditiveCMonoidLaws[A] extends SignedLaws[A] with AdditiveCMonoidLaw
 
   def triangleInequality(x: A, y: A): IsEq[Boolean] =
     E.lteqv(E.abs(S.plus(x, y)), S.plus(E.abs(x), E.abs(y))) <=> true
+}
+
+object SignedAdditiveCMonoidLaws {
+  def apply[A:Signed:AdditiveCMonoid]: SignedAdditiveCMonoidLaws[A] =
+    new SignedAdditiveCMonoidLaws[A] { def E = implicitly; def S = implicitly }
 }

@@ -7,6 +7,6 @@ trait FieldLaws[A] extends DivisionRingLaws[A] with EuclideanRingLaws[A] {
 }
 
 object FieldLaws {
-  def apply[A](implicit ev: Field[A]): FieldLaws[A] =
-    new FieldLaws[A] { def S: Field[A] = ev }
+  def apply[A:Field]: FieldLaws[A] =
+    new FieldLaws[A] { def S: Field[A] = implicitly }
 }
