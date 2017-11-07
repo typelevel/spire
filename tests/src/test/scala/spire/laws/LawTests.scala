@@ -2,6 +2,7 @@ package spire
 package laws
 
 import java.math.BigInteger
+
 import spire.algebra._
 import spire.algebra.free._
 import spire.algebra.lattice._
@@ -10,15 +11,10 @@ import spire.math._
 import spire.optional.partialIterable._
 import spire.optional.mapIntIntPermutation._
 import spire.laws.discipline._
-
-import spire.implicits.{
-  SeqOrder => _, SeqEq => _,
-  ArrayOrder => _, ArrayEq => _,
-  MapEq => _, MapGroup => _,
-  _ }
+import spire.implicits.{ArrayEq => _, ArrayOrder => _, MapEq => _, MapGroup => _, SeqEq => _, SeqOrder => _, _}
+import spire.laws.shadows.Shadowing
 
 import org.typelevel.discipline.scalatest.Discipline
-
 import org.scalatest.FunSuite
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._

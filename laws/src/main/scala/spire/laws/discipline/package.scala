@@ -1,6 +1,7 @@
 package spire.laws
 
 import spire.algebra.Eq
+import spire.laws.shadows.{Shadow, Shadowing}
 
 import org.scalacheck.{Arbitrary, Prop}
 
