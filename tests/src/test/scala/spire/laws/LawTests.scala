@@ -39,15 +39,17 @@ class LawTests extends FunSuite with Discipline {
   implicit val shadowingInt: Shadowing[Int, BigInt] = Shadowing.bigInt[Int](_.toInt)
   implicit val shadowingLong: Shadowing[Long, BigInt] = Shadowing.bigInt[Long](_.toLong)
 
+  implicit val shadowLongEuclideanRing: EuclideanRing[Shadow[Long, BigInt]] = Shadow.euclideanRing[Long, BigInt]
+
   // Float and Double fail these tests
-  checkAll("Byte",       LimitedRangeLaws[Byte].cRing)
-  checkAll("Byte",       LimitedRangeLaws[Byte].signedGCDRing)
-  checkAll("Short",      LimitedRangeLaws[Short].cRing)
-  checkAll("Short",      LimitedRangeLaws[Short].signedGCDRing)
-  checkAll("Int",        LimitedRangeLaws[Int].euclideanRing)
-  checkAll("Int",        LimitedRangeLaws[Int].signedGCDRing)
-  checkAll("Long",       LimitedRangeLaws[Long].euclideanRing)
-  checkAll("Long",       LimitedRangeLaws[Long].signedGCDRing)
+  checkAll("Byte",       EuclideanRingTests[Byte].euclideanRing)
+  checkAll("Byte",       SignedGCDRingTests[Byte].signedGCDRing)
+  checkAll("Short",      EuclideanRingTests[Short].euclideanRing)
+  checkAll("Short",      SignedGCDRingTests[Short].signedGCDRing)
+  checkAll("Int",        EuclideanRingTests[Int].euclideanRing)
+  checkAll("Int",        SignedGCDRingTests[Int].signedGCDRing)
+  checkAll("Long",       EuclideanRingTests[Shadow[Long, BigInt]].euclideanRing)
+  checkAll("Long",       SignedGCDRingTests[Shadow[Long, BigInt]].signedGCDRing)
   checkAll("BigInt",     EuclideanRingTests[BigInt].euclideanRing)
   checkAll("BigInt",     SignedGCDRingTests[BigInt].signedGCDRing)
   checkAll("BigInteger", EuclideanRingTests[BigInteger].euclideanRing)
