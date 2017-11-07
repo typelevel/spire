@@ -138,9 +138,9 @@ class LawTests extends FunSuite with Discipline {
     def one = Int.MaxValue
   }
 
-  checkAll("Order[Int]", OrderLaws[Int].order)
-  checkAll("Order[BigInteger]", OrderLaws[BigInteger].order)
-  checkAll("Order[Unit]", OrderLaws[Unit].order)
+  checkAll("Order[Int]", OldOrderLaws[Int].order)
+  checkAll("Order[BigInteger]", OldOrderLaws[BigInteger].order)
+  checkAll("Order[Unit]", OldOrderLaws[Unit].order)
   checkAll("AbGroup[Unit]", OldGroupLaws[Unit].abGroup)
   checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 
