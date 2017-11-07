@@ -2,7 +2,7 @@ package spire.laws
 
 import spire.algebra.CRing
 
-trait CRingLaws[A] extends CRigLaws[A] with CRngLaws[A] {
+trait CRingLaws[A] extends RingLaws[A] with CRigLaws[A] with CRngLaws[A] {
   override implicit def S: CRing[A]
 }
 
