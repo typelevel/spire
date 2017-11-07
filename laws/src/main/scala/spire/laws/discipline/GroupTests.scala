@@ -10,10 +10,10 @@ trait GroupTests[A] extends MonoidTests[A] {
 
   def laws: GroupLaws[A]
 
-  def Group(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
+  def group(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
     new DefaultRuleSet(
-      "Group",
-      Some(Monoid),
+      "group",
+      Some(monoid),
       "left inverse" -> forAll(laws.leftInverse _),
       "right inverse" -> forAll(laws.rightInverse _),
       "consistent remove" -> forAll(laws.consistentRemove _)

@@ -11,9 +11,9 @@ import org.typelevel.discipline.Laws
 trait SemigroupTests[A] extends Laws {
   def laws: SemigroupLaws[A]
 
-  def Semigroup(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
+  def semigroup(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
     new DefaultRuleSet(
-      "Semigroup",
+      "semigroup",
       None,
       "combine associative" -> forAll(laws.combineAssociative _),
       "combineN1" -> forAll(laws.combineN1 _),

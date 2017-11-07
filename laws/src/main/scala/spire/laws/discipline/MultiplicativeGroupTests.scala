@@ -10,10 +10,10 @@ trait MultiplicativeGroupTests[A] extends MultiplicativeMonoidTests[A] {
 
   def laws: MultiplicativeGroupLaws[A]
 
-  def MultiplicativeGroup(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
+  def multiplicativeGroup(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
     new DefaultRuleSet(
-      "MultiplicativeGroup",
-      Some(MultiplicativeMonoid),
+      "multiplicativeGroup",
+      Some(multiplicativeMonoid),
       "left reciprocal" -> forAll(laws.leftReciprocal _),
       "right reciprocal" -> forAll(laws.rightReciprocal _),
       "consistent div" -> forAll(laws.consistentDiv _)

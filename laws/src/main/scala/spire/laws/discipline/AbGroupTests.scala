@@ -3,19 +3,17 @@ package discipline
 
 import spire.algebra.{AbGroup, Eq}
 
-import org.scalacheck.{Arbitrary, Prop}
+import org.scalacheck.Arbitrary
 
 trait AbGroupTests[A] extends CMonoidTests[A] with GroupTests[A] {
   def laws: AbGroupLaws[A]
 
-  def AbGroup(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
-    new RuleSet {
-      val name: String = "AbGroup"
-      val bases: Seq[(String, RuleSet)] = Nil
-      val parents: Seq[RuleSet] = Seq(CMonoid, Group)
-      val props: Seq[(String, Prop)] = Nil
-    }
-
+  def abGroup(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
+    new CommutativeRuleSet(
+      "abGroup",
+      group,
+      Some(cMonoid)
+    )
 }
 
 object AbGroupTests {

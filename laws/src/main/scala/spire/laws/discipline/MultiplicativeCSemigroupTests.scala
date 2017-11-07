@@ -6,14 +6,15 @@ import spire.laws.MultiplicativeCSemigroupLaws
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 
-trait MultiplicativeCSemigroupTests[A] extends MultiplicativeSemigroupTests[A] {
+trait MultiplicativeCSemigroupTests[A] extends MultiplicativeSemigroupTests[A] with CommutativeTests {
 
   def laws: MultiplicativeCSemigroupLaws[A]
 
-  def MultiplicativeCSemigroup(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
-    new DefaultRuleSet(
-      "MultiplicativeCSemigroup",
-      Some(MultiplicativeSemigroup),
+  def multiplicativeCSemigroup(implicit arbA: Arbitrary[A], eqA: Eq[A]): CommutativeRuleSet =
+    new CommutativeRuleSet(
+      "multiplicativeCSemigroup",
+      multiplicativeSemigroup,
+      None,
       "times commutative" -> forAll(laws.timesCommutative _)
     )
 }

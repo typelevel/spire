@@ -11,10 +11,10 @@ trait MonoidTests[A] extends SemigroupTests[A] {
 
   def laws: MonoidLaws[A]
 
-  def Monoid(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
+  def monoid(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
     new DefaultRuleSet(
-      "Monoid",
-      Some(Semigroup),
+      "monoid",
+      Some(semigroup),
       "left identity" -> forAll(laws.leftEmpty _),
       "right identity" -> forAll(laws.rightEmpty _),
       "combineN0" -> forAll(laws.combineN0 _),

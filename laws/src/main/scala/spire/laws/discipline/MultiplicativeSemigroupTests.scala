@@ -11,9 +11,9 @@ import org.typelevel.discipline.Laws
 trait MultiplicativeSemigroupTests[A] extends Laws {
   def laws: MultiplicativeSemigroupLaws[A]
 
-  def MultiplicativeSemigroup(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
+  def multiplicativeSemigroup(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
     new DefaultRuleSet(
-      "MultiplicativeSemigroup",
+      "multiplicativeSemigroup",
       None,
       "times associative" -> forAll(laws.timesAssociative _),
       "pow1" -> forAll(laws.pow1 _),

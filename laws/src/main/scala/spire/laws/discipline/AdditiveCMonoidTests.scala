@@ -3,19 +3,17 @@ package discipline
 
 import spire.algebra.{AdditiveCMonoid, Eq}
 
-import org.scalacheck.{Arbitrary, Prop}
+import org.scalacheck.Arbitrary
 
 trait AdditiveCMonoidTests[A] extends AdditiveCSemigroupTests[A] with AdditiveMonoidTests[A] {
   def laws: AdditiveCMonoidLaws[A]
 
-  def additiveCMonoid(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
-    new RuleSet {
-      val name: String = "additiveCMonoid"
-      val bases: Seq[(String, RuleSet)] = Nil
-      val parents: Seq[RuleSet] = Seq(additiveCSemigroup, additiveMonoid)
-      val props: Seq[(String, Prop)] = Nil
-    }
-
+  def additiveCMonoid(implicit arbA: Arbitrary[A], eqA: Eq[A]): CommutativeRuleSet =
+    new CommutativeRuleSet(
+      "additiveCMonoid",
+      additiveMonoid,
+      Some(additiveCSemigroup)
+    )
 }
 
 object AdditiveCMonoidTests {

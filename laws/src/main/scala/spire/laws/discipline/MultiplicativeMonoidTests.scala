@@ -11,10 +11,10 @@ trait MultiplicativeMonoidTests[A] extends MultiplicativeSemigroupTests[A] {
 
   def laws: MultiplicativeMonoidLaws[A]
 
-  def MultiplicativeMonoid(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
+  def multiplicativeMonoid(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
     new DefaultRuleSet(
-      "MultiplicativeMonoid",
-      Some(MultiplicativeSemigroup),
+      "multiplicativeMonoid",
+      Some(multiplicativeSemigroup),
       "left one" -> forAll(laws.leftOne _),
       "right one" -> forAll(laws.rightOne _),
       "pow0" -> forAll(laws.pow0 _),

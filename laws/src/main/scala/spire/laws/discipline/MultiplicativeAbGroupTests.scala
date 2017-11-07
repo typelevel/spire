@@ -3,19 +3,17 @@ package discipline
 
 import spire.algebra.{MultiplicativeAbGroup, Eq}
 
-import org.scalacheck.{Arbitrary, Prop}
+import org.scalacheck.Arbitrary
 
 trait MultiplicativeAbGroupTests[A] extends MultiplicativeCMonoidTests[A] with MultiplicativeGroupTests[A] {
   def laws: MultiplicativeAbGroupLaws[A]
 
-  def MultiplicativeAbGroup(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
-    new RuleSet {
-      val name: String = "MultiplicativeAbGroup"
-      val bases: Seq[(String, RuleSet)] = Nil
-      val parents: Seq[RuleSet] = Seq(MultiplicativeCMonoid, MultiplicativeGroup)
-      val props: Seq[(String, Prop)] = Nil
-    }
-
+  def multiplicativeAbGroup(implicit arbA: Arbitrary[A], eqA: Eq[A]): CommutativeRuleSet =
+    new CommutativeRuleSet(
+      "multiplicativeAbGroup",
+      multiplicativeGroup,
+      Some(multiplicativeCMonoid)
+    )
 }
 
 object MultiplicativeAbGroupTests {
