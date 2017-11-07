@@ -2,7 +2,7 @@ package spire.laws
 
 import spire.algebra.Semiring
 
-trait SemiringLaws[A] extends AdditiveCSemigroupLaws[A] with MultiplicativeSemigroupLaws[A] {
+trait SemiringLaws[A] extends AdditiveCMonoidLaws[A] with MultiplicativeSemigroupLaws[A] {
   override implicit def S: Semiring[A]
 
   def leftDistributive(x: A, y: A, z: A): IsEq[A] =

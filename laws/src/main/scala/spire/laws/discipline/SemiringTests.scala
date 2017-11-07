@@ -6,13 +6,13 @@ import spire.algebra.{Semiring, Eq}
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop.forAll
 
-trait SemiringTests[A] extends AdditiveCSemigroupTests[A] with MultiplicativeSemigroupTests[A] {
+trait SemiringTests[A] extends AdditiveCMonoidTests[A] with MultiplicativeSemigroupTests[A] {
   def laws: SemiringLaws[A]
 
-  def semiring(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
+  def semiring(implicit arbA: Arbitrary[A], eqA: Eq[A]): RingRuleSet =
     new RingRuleSet(
       "semiring",
-      additiveCSemigroup,
+      additiveCMonoid,
       multiplicativeSemigroup,
       Nil,
       "left distributive" -> forAll(laws.leftDistributive _),
@@ -23,12 +23,12 @@ trait SemiringTests[A] extends AdditiveCSemigroupTests[A] with MultiplicativeSem
 
   class RingRuleSet(
     val name: String,
-    val al: RuleSet,
-    val ml: RuleSet,
+    val additiveRuleSet: RuleSet,
+    val multiplicativeRuleSet: RuleSet,
     val additionalParents: Seq[RingRuleSet],
     val props: (String, Prop)*
   ) extends RuleSet {
-    def parents = additionalParents ++ Seq(al, ml)
+    def parents = additionalParents ++ Seq(additiveRuleSet, multiplicativeRuleSet)
     def bases = Nil
  }
 }
