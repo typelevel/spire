@@ -2,7 +2,7 @@ package spire.laws
 
 import spire.algebra.{Eq, EuclideanRing}
 
-trait EuclideanRingLaws[A] extends CRigLaws[A] with CRngLaws[A] {
+trait EuclideanRingLaws[A] extends GCDRingLaws[A] {
   override implicit def S: EuclideanRing[A]
 
   def euclideanDivisionRule(x: A, y: NonZero[A]): IsEq[A] = {

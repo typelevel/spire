@@ -2,7 +2,7 @@ package spire.laws
 
 import spire.algebra.{Eq, GCDRing}
 
-trait GCDRingLaws[A] extends CRigLaws[A] with CRngLaws[A] {
+trait GCDRingLaws[A] extends CRingLaws[A] {
   override implicit def S: GCDRing[A]
 
   def gcdLcmProduct(x: A, y: A, eqA: Eq[A]): IsEq[A] =

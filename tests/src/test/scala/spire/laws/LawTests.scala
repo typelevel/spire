@@ -9,7 +9,7 @@ import spire.laws.arb._
 import spire.math._
 import spire.optional.partialIterable._
 import spire.optional.mapIntIntPermutation._
-import spire.laws.discipline.spireLawsArbitraryShaded
+import spire.laws.discipline._
 
 import spire.implicits.{
   SeqOrder => _, SeqEq => _,
@@ -33,16 +33,9 @@ class LawTests extends FunSuite with Discipline {
     }
   }
 
-  implicit val shadowingUByte: Shadowing[UByte, BigInt] = Shadowing[UByte, BigInt](_.toBigInt, s => {
-    if (s < NumberTag[UByte].hasMinValue.get.toBigInt || s > NumberTag[UByte].hasMaxValue.get.toBigInt)
-      None
-    else
-      Some(UByte(s.toInt))
-  })
+  implicit val shadowingUByte: Shadowing[UByte, BigInt] = Shadowing.bigInt[UByte](s => UByte(s.toInt))
+  implicit val shadowingUShort: Shadowing[UShort, BigInt] = Shadowing.bigInt[UShort](s => UShort(s.toInt))
 
-  implicit val addSGUByte = Shaded.additiveCMonoid[UByte, BigInt]
-
-  checkAll("UByte",      spire.laws.discipline.AdditiveCMonoidTests[Shaded[UByte, BigInt]].additiveCMonoid)
   // Float and Double fail these tests
   checkAll("Byte",       LimitedRangeLaws[Byte].cRing)
   checkAll("Byte",       LimitedRangeLaws[Byte].signedGCDRing)
@@ -52,7 +45,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Int",        LimitedRangeLaws[Int].signedGCDRing)
   checkAll("Long",       LimitedRangeLaws[Long].euclideanRing)
   checkAll("Long",       LimitedRangeLaws[Long].signedGCDRing)
-  checkAll("BigInt",     OldRingLaws[BigInt].euclideanRing)
+  checkAll("BigInt",     EuclideanRingTests[BigInt].euclideanRing)
   checkAll("BigInt",     CombinationLaws[BigInt].signedGCDRing)
   checkAll("BigInteger", OldRingLaws[BigInteger].euclideanRing)
   checkAll("BigInteger", CombinationLaws[BigInteger].signedGCDRing)

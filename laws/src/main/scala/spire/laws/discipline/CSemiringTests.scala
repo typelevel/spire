@@ -8,20 +8,20 @@ import org.scalacheck.{Arbitrary, Prop}
 trait CSemiringTests[A] extends SemiringTests[A] with MultiplicativeCSemigroupTests[A] {
   def laws: CSemiringLaws[A]
 
-  def cRing(implicit arbA: Arbitrary[A], eqA: Eq[A]): CRingRuleSet =
+  def cSemiring(implicit arbA: Arbitrary[A], eqA: Eq[A]): CRingRuleSet =
     new CRingRuleSet(
-      "cRing",
+      "cSemiring",
       semiring,
-      None
+      Nil
     )
 
   class CRingRuleSet(val name: String,
     val noncommutativeParent: RingRuleSet,
-    val commutativeParent: Option[CRingRuleSet],
+    val commutativeParents: Seq[CRingRuleSet],
     val props: (String, Prop)*
   ) extends RuleSet {
     def bases = Nil
-    val parents = Seq(noncommutativeParent) ++ commutativeParent.toSeq
+    val parents = Seq(noncommutativeParent) ++ commutativeParents
   }
 }
 
