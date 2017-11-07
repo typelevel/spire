@@ -12,8 +12,9 @@ trait EqLaws[A] {
   def symmetryEq(x: A, y: A): IsEq[Boolean] =
     E.eqv(x, y) <=> E.eqv(y, x)
 
+  /*
   def antiSymmetryEq(x: A, y: A, f: A => A): IsEq[Boolean] =
-    (!E.eqv(x, y) || E.eqv(f(x), f(y))) <=> true
+    (!E.eqv(x, y) || E.eqv(f(x), f(y))) <=> true*/
 
   def transitivityEq(x: A, y: A, z: A): IsEq[Boolean] =
     (!(E.eqv(x, y) && E.eqv(y, z)) || E.eqv(x, z)) <=> true
