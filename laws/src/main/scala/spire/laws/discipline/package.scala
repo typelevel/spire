@@ -9,6 +9,6 @@ package object discipline {
   implicit def spireLawsIsEqToProp[A](isEq: IsEq[A])(implicit ev: Eq[A]): Prop =
     isEq.fold((x, y) => Prop(ev.eqv(x, y)), Prop.undecided)
 
-  implicit def spireLawsArbitraryShaded[A, S](implicit A: Arbitrary[A], S: Shadowing[A, S]): Arbitrary[Shaded[A, S]] =
-    Arbitrary { A.arbitrary.map( a => Shaded(a, S.toShadow(a)) ) }
+  implicit def spireLawsArbitraryShadow[A, S](implicit A: Arbitrary[A], S: Shadowing[A, S]): Arbitrary[Shadow[A, S]] =
+    Arbitrary { A.arbitrary.map( a => Shadow(a, S.toShadow(a)) ) }
 }
