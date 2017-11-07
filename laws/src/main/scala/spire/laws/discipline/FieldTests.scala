@@ -10,7 +10,7 @@ trait FieldTests[A] extends DivisionRingTests[A] with EuclideanRingTests[A] {
 
   def field(implicit arbA: Arbitrary[A], eqA: Eq[A]): RuleSet =
     new RuleSet {
-      def name = "divisionRing"
+      def name = "field"
       def parents = Seq(divisionRing, euclideanRing)
       def bases = Nil
       def props = Nil
