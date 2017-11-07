@@ -2,7 +2,7 @@ package spire.laws
 
 import spire.algebra.{AdditiveAbGroup, Signed}
 
-trait SignedAdditiveAbGroupLaws[A] extends SignedLaws[A] with AdditiveAbGroupLaws[A] {
+trait SignedAdditiveAbGroupLaws[A] extends SignedAdditiveCMonoidLaws[A] with AdditiveAbGroupLaws[A] {
 
   def absNegate(x: A): IsEq[A] =
     E.abs(x) <=> E.abs(S.negate(x))
