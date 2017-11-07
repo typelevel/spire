@@ -35,7 +35,9 @@ package object syntax {
   object nroot extends NRootSyntax
   object trig extends TrigSyntax
 
-  object module extends ModuleSyntax
+  object leftModule extends LeftModuleSyntax
+  object rightModule extends RightModuleSyntax
+  object cModule extends CModuleSyntax
   object vectorSpace extends VectorSpaceSyntax
   object metricSpace extends MetricSpaceSyntax
   object normedVectorSpace extends NormedVectorSpaceSyntax
@@ -50,15 +52,12 @@ package object syntax {
 
   object partialAction extends PartialActionSyntax
   object action extends ActionSyntax
-  object torsor extends TorsorSyntax
 
   object integral extends IntegralSyntax
   object fractional extends FractionalSyntax
   object numeric extends NumericSyntax
 
   object all extends AllSyntax
-
-  object unbound extends UnboundSyntax
 
   object interval extends IntervalSyntax
 }

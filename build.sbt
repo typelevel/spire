@@ -4,12 +4,12 @@ import sbtunidoc.Plugin.UnidocKeys._
 import pl.project13.scala.sbt.SbtJmh
 import ReleaseTransformations._
 
-lazy val scalaVersions: Map[String, String] = Map("2.10" -> "2.10.6", "2.11" -> "2.11.8", "2.12" -> "2.12.1")
+lazy val scalaVersions: Map[String, String] = Map("2.10" -> "2.10.6", "2.11" -> "2.11.11", "2.12" -> "2.12.4")
 
 lazy val scalaCheckVersion = "1.13.4"
 lazy val scalaTestVersion = "3.0.0"
 lazy val shapelessVersion = "2.3.2"
-lazy val disciplineVersion = "0.8"
+lazy val disciplineVersion = "0.7.2"
 lazy val machinistVersion = "0.6.1"
 lazy val algebraVersion = "0.7.0"
 

@@ -9,8 +9,8 @@ import spire.algebra._
 import spire.NoImplicit
 
 @SerialVersionUID(0L)
-class SeqModule[A, SA <: SeqLike[A, SA]](implicit val scalar: Ring[A], cbf: CanBuildFrom[SA,A,SA])
-extends Module[SA, A] with Serializable {
+class SeqCModule[A, SA <: SeqLike[A, SA]](implicit val scalar: CRing[A], cbf: CanBuildFrom[SA,A,SA])
+extends CModule[SA, A] with Serializable {
   def zero: SA = cbf().result
 
   def negate(sa: SA): SA = sa map (scalar.negate)
@@ -76,11 +76,11 @@ extends Module[SA, A] with Serializable {
 
 @SerialVersionUID(0L)
 class SeqVectorSpace[A, SA <: SeqLike[A, SA]](implicit override val scalar: Field[A], cbf: CanBuildFrom[SA,A,SA])
-extends SeqModule[A, SA] with VectorSpace[SA, A] with Serializable
+extends SeqCModule[A, SA] with VectorSpace[SA, A] with Serializable
 
 @SerialVersionUID(0L)
 class SeqInnerProductSpace[A: Field, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA])
-extends SeqVectorSpace[A, SA] with InnerProductSpace[SA, A] with Serializable {
+extends SeqVectorSpace[A, SA] with RealInnerProductSpace[SA, A] with Serializable {
   def dot(x: SA, y: SA): A = {
     @tailrec
     def loop(xi: Iterator[A], yi: Iterator[A], acc: A): A = {
@@ -118,11 +118,11 @@ extends SeqInnerProductSpace[A, SA] with CoordinateSpace[SA, A] with Serializabl
  * The L_p norm is equal to the `p`-th root of the sum of each element to the
  * power `p`. For instance, if `p = 1` we have the Manhattan distance. If you'd
  * like the Euclidean norm (`p = 2`), then you'd probably be best to use an
- * `InnerProductSpace` instead.
+ * `RealInnerProductSpace` instead.
  */
 @SerialVersionUID(0L)
 class SeqLpNormedVectorSpace[A: Field: NRoot: Signed, SA <: SeqLike[A, SA]](val p: Int)(implicit cbf: CanBuildFrom[SA,A,SA])
-extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
+extends SeqVectorSpace[A, SA] with RealNormedVectorSpace[SA, A] with Serializable {
   require(p > 0, "p must be > 0")
 
   def norm(v: SA): A = {
@@ -145,7 +145,7 @@ extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
  */
 @SerialVersionUID(0L)
 class SeqMaxNormedVectorSpace[A: Field: Order: Signed, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA])
-extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
+extends SeqVectorSpace[A, SA] with RealNormedVectorSpace[SA, A] with Serializable {
   def norm(v: SA): A = {
     @tailrec
     def loop(xi: Iterator[A], acc: A): A = {
@@ -245,15 +245,15 @@ extends SeqVectorEq[A, SA] with Order[SA] with Serializable {
 }
 
 trait SeqInstances0 {
-  implicit def SeqModule[A, CC[A] <: SeqLike[A, CC[A]]](implicit
-      ring0: Ring[A], cbf0: CanBuildFrom[CC[A], A, CC[A]],
-      ev: NoImplicit[VectorSpace[CC[A], A]]): SeqModule[A, CC[A]] = new SeqModule[A, CC[A]]
+  implicit def SeqCModule[A, CC[A] <: SeqLike[A, CC[A]]](implicit
+      ring0: CRing[A], cbf0: CanBuildFrom[CC[A], A, CC[A]],
+      ev: NoImplicit[VectorSpace[CC[A], A]]): SeqCModule[A, CC[A]] = new SeqCModule[A, CC[A]]
 }
 
 trait SeqInstances1 extends SeqInstances0 {
   implicit def SeqVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
       cbf0: CanBuildFrom[CC[A], A, CC[A]],
-      ev: NoImplicit[NormedVectorSpace[CC[A], A]]): SeqVectorSpace[A, CC[A]] = new SeqVectorSpace[A, CC[A]]
+      ev: NoImplicit[RealNormedVectorSpace[CC[A], A]]): SeqVectorSpace[A, CC[A]] = new SeqVectorSpace[A, CC[A]]
 
   implicit def SeqEq[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Eq[A]): SeqEq[A, CC[A]] =
     new SeqEq[A, CC[A]]
@@ -269,7 +269,7 @@ trait SeqInstances2 extends SeqInstances1 {
 
 trait SeqInstances3 extends SeqInstances2 {
   implicit def SeqNormedVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
-      nroot0: NRoot[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] = SeqInnerProductSpace[A, CC].normed
+      nroot0: NRoot[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): RealNormedVectorSpace[CC[A], A] = SeqInnerProductSpace[A, CC].normed
 }
 
 trait SeqInstances extends SeqInstances3

@@ -9,14 +9,14 @@ import org.typelevel.discipline.{Laws, Predicate}
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
-object VectorSpaceLaws {
-  def apply[V: Eq: Arbitrary, A: Eq: Arbitrary: Predicate] = new VectorSpaceLaws[V, A] {
+object OldVectorSpaceLaws {
+  def apply[V: Eq: Arbitrary, A: Eq: Arbitrary: Predicate] = new OldVectorSpaceLaws[V, A] {
     val scalarLaws = OldRingLaws[A]
     val vectorLaws = OldGroupLaws[V]
   }
 }
 
-trait VectorSpaceLaws[V, A] extends Laws {
+trait OldVectorSpaceLaws[V, A] extends Laws {
 
   implicit def scalar(implicit V: Module[V, A]): Rng[A] = V.scalar
 
@@ -25,7 +25,6 @@ trait VectorSpaceLaws[V, A] extends Laws {
 
   import scalarLaws.{ Equ => EqA, Arb => ArA }
   import vectorLaws.{ Equ => EqV, Arb => ArV }
-
 
   def module(implicit V: Module[V, A]) = new SpaceProperties(
     name = "module",
@@ -73,7 +72,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     )
   )
 
-  def normedVectorSpace(implicit V: NormedVectorSpace[V, A], ev0: Order[A], ev1: Signed[A]) = new SpaceProperties(
+  def normedVectorSpace(implicit V: RealNormedVectorSpace[V, A], ev0: Order[A], ev1: Signed[A]) = new SpaceProperties(
     name = "normed vector space",
     sl = _.field(V.scalar),
     vl = _.abGroup(V.additive),
@@ -102,7 +101,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
   )
 
 
-  def innerProductSpace(implicit V: InnerProductSpace[V, A], A: Order[A], A0: Signed[A]) = SpaceProperties.fromParent(
+  def innerProductSpace(implicit V: RealInnerProductSpace[V, A], A: Order[A], A0: Signed[A]) = SpaceProperties.fromParent(
     name = "inner-product space",
     parent = vectorSpace,
 

@@ -113,12 +113,12 @@ object ArraySupport {
 trait ArrayInstances0 {
   type NI0[A] = NoImplicit[VectorSpace[Array[A], A]]
 
-  implicit def ArrayModule[@sp(Int,Long,Float,Double) A: NI0: ClassTag: Ring]: Module[Array[A], A] =
-    new ArrayModule[A]
+  implicit def ArrayCModule[@sp(Int,Long,Float,Double) A: NI0: ClassTag: CRing]: CModule[Array[A], A] =
+    new ArrayCModule[A]
 }
 
 trait ArrayInstances1 extends ArrayInstances0 {
-  type NI1[A] = NoImplicit[NormedVectorSpace[Array[A], A]]
+  type NI1[A] = NoImplicit[RealNormedVectorSpace[Array[A], A]]
 
   implicit def ArrayVectorSpace[@sp(Int,Long,Float,Double) A: NI1: ClassTag: Field]: VectorSpace[Array[A], A] =
     new ArrayVectorSpace[A]
@@ -128,7 +128,7 @@ trait ArrayInstances1 extends ArrayInstances0 {
 }
 
 trait ArrayInstances2 extends ArrayInstances1 {
-  implicit def ArrayInnerProductSpace[@sp(Float, Double) A: Field: ClassTag]: InnerProductSpace[Array[A], A] =
+  implicit def ArrayInnerProductSpace[@sp(Float, Double) A: Field: ClassTag]: RealInnerProductSpace[Array[A], A] =
     new ArrayInnerProductSpace[A]
 
   implicit def ArrayOrder[@sp A: Order]: Order[Array[A]] =
@@ -136,7 +136,7 @@ trait ArrayInstances2 extends ArrayInstances1 {
 }
 
 trait ArrayInstances3 extends ArrayInstances2 {
-  implicit def ArrayNormedVectorSpace[@sp(Float, Double) A: Field: NRoot: ClassTag]: NormedVectorSpace[Array[A], A] =
+  implicit def ArrayNormedVectorSpace[@sp(Float, Double) A: Field: NRoot: ClassTag]: RealNormedVectorSpace[Array[A], A] =
     ArrayInnerProductSpace[A].normed
 }
 
@@ -146,10 +146,10 @@ trait ArrayInstances extends ArrayInstances3 {
 }
 
 @SerialVersionUID(0L)
-private final class ArrayModule[@sp(Int,Long,Float,Double) A: ClassTag: Ring]
+private final class ArrayCModule[@sp(Int,Long,Float,Double) A: ClassTag: CRing]
     (implicit nvs: NoImplicit[VectorSpace[Array[A], A]])
-    extends Module[Array[A], A] with Serializable {
-  def scalar: Ring[A] = Ring[A]
+    extends CModule[Array[A], A] with Serializable {
+  def scalar: CRing[A] = CRing[A]
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
   def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
@@ -159,7 +159,7 @@ private final class ArrayModule[@sp(Int,Long,Float,Double) A: ClassTag: Ring]
 
 @SerialVersionUID(0L)
 private final class ArrayVectorSpace[@sp(Int,Float,Long,Double) A: ClassTag: Field]
-    (implicit nnvs: NoImplicit[NormedVectorSpace[Array[A], A]])
+    (implicit nnvs: NoImplicit[RealNormedVectorSpace[Array[A], A]])
     extends VectorSpace[Array[A], A] with Serializable {
   def scalar: Field[A] = Field[A]
   def zero: Array[A] = new Array[A](0)
@@ -177,7 +177,7 @@ private final class ArrayEq[@sp(Int,Float,Long,Double) A: Eq]
 
 @SerialVersionUID(0L)
 private final class ArrayInnerProductSpace[@sp(Int,Float,Long,Double) A: ClassTag: Field]
-    extends InnerProductSpace[Array[A], A] with Serializable {
+    extends RealInnerProductSpace[Array[A], A] with Serializable {
   def scalar: Field[A] = Field[A]
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)

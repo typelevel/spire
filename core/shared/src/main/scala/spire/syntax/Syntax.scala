@@ -112,16 +112,23 @@ trait EuclideanRingSyntax extends GCDRingSyntax {
 
 trait FieldSyntax extends EuclideanRingSyntax with MultiplicativeGroupSyntax
 
-
 trait NRootSyntax {
   implicit def nrootOps[A: NRoot](a: A): NRootOps[A] = new NRootOps(a)
 }
 
-trait ModuleSyntax extends RingSyntax {
-  implicit def moduleOps[V](v:V): ModuleOps[V] = new ModuleOps[V](v)
+trait LeftModuleSyntax extends RingSyntax {
+  implicit def leftModuleOps[V](v:V): LeftModuleOps[V] = new LeftModuleOps[V](v)
 }
 
-trait VectorSpaceSyntax extends ModuleSyntax with FieldSyntax {
+trait RightModuleSyntax extends RingSyntax {
+  implicit def rightModuleOps[V](v:V): RightModuleOps[V] = new RightModuleOps[V](v)
+}
+
+trait CModuleSyntax extends LeftModuleSyntax with RightModuleSyntax
+
+trait VectorSpaceSyntax extends CModuleSyntax with FieldSyntax {
+  // VectorSpaceSyntax needs to expand FieldSyntax because of the ambiguity
+  // of + and -
   implicit def vectorSpaceOps[V](v:V): VectorSpaceOps[V] = new VectorSpaceOps[V](v)
 }
 
@@ -175,25 +182,6 @@ trait ActionSyntax {
 trait IntervalSyntax {
   implicit def groupActionGroupOps[A: Order: AdditiveGroup](a: A): IntervalPointOps[A] =
     new IntervalPointOps(a)
-}
-
-trait UnboundSyntax {
-  implicit def moduleUnboundOps[F](f: F)(implicit ev: Module[_, F]): ModuleUnboundOps[F] =
-    new ModuleUnboundOps(f)
-
-  implicit def vectorSpaceUnboundOps[F](f: F)(implicit ev: VectorSpace[_, F]): VectorSpaceUnboundOps[F] =
-    new VectorSpaceUnboundOps(f)
-
-  implicit def groupActionUnboundOps[G](g: G)(implicit ev: Action[_, G]): ActionUnboundOps[G] =
-    new ActionUnboundOps(g)
-  implicit def additiveActionUnboundOps[G](g: G)(implicit ev: AdditiveAction[_, G]): AdditiveActionUnboundOps[G] =
-    new AdditiveActionUnboundOps(g)
-  implicit def multiplicativeActionUnboundOps[G](g: G)(implicit ev: MultiplicativeAction[_, G]): MultiplicativeActionUnboundOps[G] =
-    new MultiplicativeActionUnboundOps(g)
-}
-
-trait TorsorSyntax {
-  implicit def torsorPointOps[P](p: P): TorsorPointOps[P] = new TorsorPointOps(p)
 }
 
 trait IntegralSyntax extends
@@ -261,7 +249,9 @@ trait AllSyntax extends
     NRootSyntax with
     TrigSyntax with
     IntervalSyntax with
-    ModuleSyntax with
+    LeftModuleSyntax with   
+    RightModuleSyntax with
+    CModuleSyntax with
     VectorSpaceSyntax with
     NormedVectorSpaceSyntax with
     InnerProductSpaceSyntax with
@@ -272,7 +262,6 @@ trait AllSyntax extends
     BitStringSyntax with
     PartialActionSyntax with
     ActionSyntax with
-    TorsorSyntax with
     IntegralSyntax with
     FractionalSyntax with
     NumericSyntax with

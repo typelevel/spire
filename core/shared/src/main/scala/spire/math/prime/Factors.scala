@@ -2,7 +2,7 @@ package spire
 package math.prime
 
 import spire.algebra.Sign
-import spire.algebra.Sign.{Negative, Zero, Positive}
+import spire.algebra.Sign.{Negative, Positive, Zero}
 import spire.math.SafeLong
 import spire.std.int._
 import spire.std.map._

@@ -8,7 +8,7 @@ import scala.collection.generic.CanBuildFrom
 import scala.util.Random.{ nextInt, nextDouble, nextGaussian }
 
 /**
- * An example using `NormedVectorSpace`s to create a generic k-Means
+ * An example using `RealNormedVectorSpace`s to create a generic k-Means
  * implementation. We also abstract over the collection type for the fun of it.
  * We implement Lloyd's algorithm, which has problems of its own, but performs
  * well enough.
@@ -20,8 +20,8 @@ object KMeansExample extends App {
    * `points0`.
    */
   def kMeans[V, @sp(Double) A, CC[V] <: Iterable[V]](points0: CC[V], k: Int)(implicit
-      vs: NormedVectorSpace[V, A], order: Order[A],
-      cbf: CanBuildFrom[Nothing, V, CC[V]], ct: ClassTag[V]): CC[V] = {
+                                                                             vs: RealNormedVectorSpace[V, A], order: Order[A],
+                                                                             cbf: CanBuildFrom[Nothing, V, CC[V]], ct: ClassTag[V]): CC[V] = {
 
     val points = points0.toArray
 

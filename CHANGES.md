@@ -1,3 +1,27 @@
+## Experimental branch
+
+* split Opt and cfor macros in spire-kernel module #651
+* new shadowing infrastructure to test range-limited types such as Byte, UByte, ...
+  superceding the old code in #642
+* migrated spire-laws to the new cats 1.0.0-RC1 style, completed the tests along the way
+* small fixes in commutative rings (some types did not implement the correct ring typeclass)
+* refactored SignedXXX into Signed.OnXXX
+* fixed the sparse polynomial bug #653
+* split modules into left modules, right modules and modules over commutative ring
+* precised that our RingAlgebra is actually an associative algebra (otherwise it is not a Rng);
+  Wikipedia specifies that actually the module is a Ring, not a Rng, and the scalar is a CRing
+
+To review:
+* The vector spaces over Map, Seq; how do we handle zero elements?
+
+To discuss:
+* Removed Torsor, AdditiveAction, MultiplicativeAction which are not currently used?
+* We removed IdentityModule and ZModule (automatic derivation of that stuff can be dangerous),
+  and we would have to write IdentityLeftModule, IdentityRightModule, IdentityCModule, etc...
+* Removed the unbound ops (shouldn't the scalar typeclass be imported by the user if needed?)
+  because the module refactoring make the update nontrival
+
+
 ## Version 0.14.0
 
 This release is a major milestone for Spire.

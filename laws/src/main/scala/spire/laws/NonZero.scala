@@ -5,7 +5,7 @@ import spire.algebra.{AdditiveCMonoid, Eq}
 import org.scalacheck.Arbitrary
 import Arbitrary.arbitrary
 
-case class NonZero[A](val a: A) extends AnyVal
+case class NonZero[A](val a: A)
 
 object NonZero {
 

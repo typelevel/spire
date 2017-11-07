@@ -6,7 +6,7 @@ import spire.std._
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 
-trait CoordinateSpace[V, @sp(Float, Double) F] extends Any with InnerProductSpace[V, F] {
+trait CoordinateSpace[V, @sp(Float, Double) F] extends Any with RealInnerProductSpace[V, F] {
   def dimensions: Int
 
   def coord(v: V, i: Int): F  // = v dot axis(i)

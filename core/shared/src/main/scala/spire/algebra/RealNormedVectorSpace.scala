@@ -17,28 +17,28 @@ import scala.collection.generic.CanBuildFrom
  * An example of a normed vector space is R^n equipped with the euclidean
  * vector length as the norm.
  */
-trait NormedVectorSpace[V, @sp(Int, Long, Float, Double) F] extends Any with VectorSpace[V, F] with MetricSpace[V, F] {
+trait RealNormedVectorSpace[V, @sp(Int, Long, Float, Double) F] extends Any with VectorSpace[V, F] with MetricSpace[V, F] {
   def norm(v: V): F
 
   def normalize(v: V): V = divr(v, norm(v))
   def distance(v: V, w: V): F = norm(minus(v, w))
 }
 
-object NormedVectorSpace extends NormedVectorSpace0 with NormedVectorSpaceFunctions {
-  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: NormedVectorSpace[V, R]): NormedVectorSpace[V, R] = V
+object RealNormedVectorSpace extends NormedVectorSpace0 with NormedVectorSpaceFunctions {
+  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: RealNormedVectorSpace[V, R]): RealNormedVectorSpace[V, R] = V
 }
 
 private[algebra] trait NormedVectorSpace0 {
   implicit def InnerProductSpaceIsNormedVectorSpace[V, @sp(Int, Long, Float, Double) F](implicit
-    space: InnerProductSpace[V, F], nroot: NRoot[F]): NormedVectorSpace[V, F] = space.normed
+                                                                                        space: RealInnerProductSpace[V, F], nroot: NRoot[F]): RealNormedVectorSpace[V, F] = space.normed
 }
 
 private[algebra] trait NormedVectorSpaceFunctions {
   def max[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A], order0: Order[A],
-      signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] =
+      signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): RealNormedVectorSpace[CC[A], A] =
     new SeqMaxNormedVectorSpace[A, CC[A]]
 
   def Lp[A, CC[A] <: SeqLike[A, CC[A]]](p: Int)(implicit field0: Field[A], nroot0: NRoot[A],
-      signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] =
+      signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): RealNormedVectorSpace[CC[A], A] =
     new SeqLpNormedVectorSpace[A, CC[A]](p)
 }

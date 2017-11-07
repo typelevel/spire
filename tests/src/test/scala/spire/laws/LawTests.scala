@@ -88,20 +88,20 @@ class LawTests extends FunSuite with Discipline {
   // iterators and CanBuildFroms. So, presuming the Scala std lib is tested,
   // testing just List and Vector should suffice for us.
 
-  checkAll("List[Int]",        VectorSpaceLaws[List[Int], Int].module)
-  checkAll("Vector[Int]",      VectorSpaceLaws[Vector[Int], Int].module)
-  checkAll("List[Rational]",   VectorSpaceLaws[List[Rational], Rational].vectorSpace)
-  checkAll("Vector[Rational]", VectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
+  checkAll("List[Int]",        OldVectorSpaceLaws[List[Int], Int].module)
+  checkAll("Vector[Int]",      OldVectorSpaceLaws[Vector[Int], Int].module)
+  checkAll("List[Rational]",   OldVectorSpaceLaws[List[Rational], Rational].vectorSpace)
+  checkAll("Vector[Rational]", OldVectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
 
-  checkAll("Array[Int]",         VectorSpaceLaws[Array[Int], Int].module)
-  checkAll("Array[VectorSpace]", VectorSpaceLaws[Array[Rational], Rational].vectorSpace)
+  checkAll("Array[Int]",         OldVectorSpaceLaws[Array[Int], Int].module)
+  checkAll("Array[VectorSpace]", OldVectorSpaceLaws[Array[Rational], Rational].vectorSpace)
 
-  checkAll("Map[String,Int]",      VectorSpaceLaws[Map[String,Int], Int].module)
-  checkAll("Map[String,Rational]", VectorSpaceLaws[Map[String,Rational], Rational].vectorSpace)
+  checkAll("Map[String,Int]",      OldVectorSpaceLaws[Map[String,Int], Int].module)
+  checkAll("Map[String,Rational]", OldVectorSpaceLaws[Map[String,Rational], Rational].vectorSpace)
 
-  val max = NormedVectorSpace.max[Rational, List]
+  val max = RealNormedVectorSpace.max[Rational, List]
   checkAll("List[Rational]",
-    VectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly))
+    OldVectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly))
 
   checkAll("List[Int]",   MonoidTests[List[Int]].monoid)
   checkAll("Vector[Int]", MonoidTests[Vector[Int]].monoid)
@@ -112,7 +112,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Seq[String]", PartialGroupLaws[Seq[String]](Eq.fromUniversalEquals, implicitly).semigroupoid)
   checkAll("Seq[Int]",    PartialGroupLaws[Seq[Int]].groupoid)
 
-  checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
+  checkAll("String", OldVectorSpaceLaws[String, Int].metricSpace)
 
   checkAll("Sign", ActionLaws[Sign, Int].multiplicativeMonoidAction)
 

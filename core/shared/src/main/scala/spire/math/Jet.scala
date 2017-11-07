@@ -138,7 +138,7 @@ case class JetDim(dimension: Int) {
  * By pushing these things through generics, we can write routines that at same time
  * evaluate mathematical functions and compute their derivatives through automatic differentiation.
  */
-object Jet extends JetInstances {
+object Jet /*extends JetInstances*/ {
   // No-arg c.tor makes a zero Jet
   def apply[@sp(Float, Double) T]()(implicit c: ClassTag[T], d: JetDim, s: Semiring[T])
       : Jet[T] = Jet(s.zero)
@@ -325,7 +325,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   // pow -- base is a constant, exponent (this) is a differentiable function.
   // b^(p + du) ~= b^p + b^p * log(b) du
   def powScalarToJet(a: T)(implicit
-      c: ClassTag[T], e: Eq[T], f: Field[T], m: Module[Array[T], T], s: Signed[T], t: Trig[T]): Jet[T] = {
+      c: ClassTag[T], e: Eq[T], f: Field[T], m: CModule[Array[T], T], s: Signed[T], t: Trig[T]): Jet[T] = {
     if (isZero) {
       Jet.one[T]
     } else {
@@ -354,7 +354,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
    * pow -- both base (this) and exponent are differentiable functions.
    * (a + du)^(b + dv) ~= a^b + b * a^(b-1) du + a^b log(a) dv
    */
-  def pow(b: Jet[T])(implicit c: ClassTag[T], e: Eq[T], f: Field[T], m: Module[Array[T], T], s: Signed[T], t: Trig[T])
+  def pow(b: Jet[T])(implicit c: ClassTag[T], e: Eq[T], f: Field[T], m: CModule[Array[T], T], s: Signed[T], t: Trig[T])
       : Jet[T] = {
     if (b.isZero) {
       Jet.one[T]
@@ -499,6 +499,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   }
 }
 
+/*
 trait JetInstances {
   implicit def JetAlgebra[@sp(Float, Double) T](implicit
       c: ClassTag[T], d: JetDim, eq: Eq[T], f: Field[T], n: NRoot[T],
@@ -646,3 +647,4 @@ private[math] class JetAlgebra[@sp(Float, Double) T](implicit
       (xx, yy) => scalar.plus(xx, scalar.times(yy._1, yy._2))}
   }
 }
+*/
