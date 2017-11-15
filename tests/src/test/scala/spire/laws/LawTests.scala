@@ -6,6 +6,7 @@ import java.math.BigInteger
 import spire.algebra._
 import spire.algebra.free._
 import spire.algebra.lattice._
+import spire.algebra.real.NormedVectorSpace
 import spire.laws.arb._
 import spire.math._
 import spire.optional.partialIterable._
@@ -99,7 +100,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Map[String,Int]",      OldVectorSpaceLaws[Map[String,Int], Int].module)
   checkAll("Map[String,Rational]", OldVectorSpaceLaws[Map[String,Rational], Rational].vectorSpace)
 
-  val max = RealNormedVectorSpace.max[Rational, List]
+  val max = NormedVectorSpace.max[Rational, List]
   checkAll("List[Rational]",
     OldVectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly))
 

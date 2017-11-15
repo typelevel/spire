@@ -1,10 +1,8 @@
 package spire
 package syntax
 
-import spire.NoImplicit
 import spire.algebra._
 import spire.algebra.lattice._
-import spire.algebra.partial._
 import spire.math._
 import spire.syntax.std._
 
@@ -29,15 +27,6 @@ trait IsRealSyntax extends OrderSyntax with SignedSyntax {
 
 trait SignedSyntax {
   implicit def signedOps[A: Signed](a: A): SignedOps[A] = new SignedOps(a)
-}
-
-trait SemigroupoidSyntax {
-  implicit def semigroupoidOps[A:Semigroupoid](a:A): SemigroupoidOps[A] = new SemigroupoidOps[A](a)
-}
-
-trait GroupoidSyntax extends SemigroupoidSyntax {
-  implicit def groupoidCommonOps[A](a:A)(implicit ev: Groupoid[A], ni: NoImplicit[Monoid[A]]): GroupoidCommonOps[A] = new GroupoidCommonOps[A](a)(ev)
-  implicit def groupoidOps[A](a:A)(implicit ev: Groupoid[A]): GroupoidOps[A] = new GroupoidOps[A](a)
 }
 
 trait SemigroupSyntax {
@@ -136,18 +125,6 @@ trait MetricSpaceSyntax extends VectorSpaceSyntax {
   implicit def metricSpaceOps[V](v:V): MetricSpaceOps[V] = new MetricSpaceOps[V](v)
 }
 
-trait NormedVectorSpaceSyntax extends MetricSpaceSyntax {
-  implicit def normedVectorSpaceOps[V](v:V): NormedVectorSpaceOps[V] = new NormedVectorSpaceOps[V](v)
-}
-
-trait InnerProductSpaceSyntax extends VectorSpaceSyntax {
-  implicit def innerProductSpaceOps[V](v:V): InnerProductSpaceOps[V] = new InnerProductSpaceOps[V](v)
-}
-
-trait CoordinateSpaceSyntax extends InnerProductSpaceSyntax {
-  implicit def coordianteSpaceOps[V](v:V): CoordinateSpaceOps[V] = new CoordinateSpaceOps[V](v)
-}
-
 trait TrigSyntax {
   implicit def trigOps[A:Trig](a: A): TrigOps[A] = new TrigOps(a)
 }
@@ -167,11 +144,6 @@ trait BoolSyntax extends HeytingSyntax {
 
 trait BitStringSyntax {
   implicit def bitStringOps[A: BitString](a: A): BitStringOps[A] = new BitStringOps(a)
-}
-
-trait PartialActionSyntax {
-  implicit def leftPartialActionOps[G](g: G): LeftPartialActionOps[G] = new LeftPartialActionOps(g)
-  implicit def rightPartialActionOps[P](p: P): RightPartialActionOps[P] = new RightPartialActionOps(p)
 }
 
 trait ActionSyntax {
@@ -228,8 +200,6 @@ trait AllSyntax extends
     SignedSyntax with
     IsRealSyntax with
     ConvertableFromSyntax with
-    SemigroupoidSyntax with
-    GroupoidSyntax with
     SemigroupSyntax with
     MonoidSyntax with
     GroupSyntax with
@@ -253,14 +223,10 @@ trait AllSyntax extends
     RightModuleSyntax with
     CModuleSyntax with
     VectorSpaceSyntax with
-    NormedVectorSpaceSyntax with
-    InnerProductSpaceSyntax with
-    CoordinateSpaceSyntax with
     LatticeSyntax with
     HeytingSyntax with
     BoolSyntax with
     BitStringSyntax with
-    PartialActionSyntax with
     ActionSyntax with
     IntegralSyntax with
     FractionalSyntax with

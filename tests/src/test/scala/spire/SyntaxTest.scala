@@ -1,16 +1,16 @@
 package spire
 
 import spire.algebra._
+import spire.algebra.real.{CoordinateSpace, InnerProductSpace, NormedVectorSpace}
 import spire.math.{Rational, Searching}
 import spire.std.bigInt._
 import spire.std.double._
 import spire.std.int._
 import spire.std.seq._
 import spire.std.string._
-import spire.tests.{SpireTests, SpireProperties}
+import spire.tests.{SpireProperties, SpireTests}
 
 import org.scalatest.prop.Checkers
-
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
@@ -77,10 +77,10 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   test("VectorSpace syntax")(check(forAll { (v: Vector[Double], w: Vector[Double], a: NonZero[Double]) =>
     testVectorSpaceSyntax(v, w, a.x)
   }))
-  test("RealNormedVectorSpace syntax")(check(forAll { (v: Vector[Double], w: Vector[Double], a: NonZero[Double]) =>
+  test("NormedVectorSpace syntax")(check(forAll { (v: Vector[Double], w: Vector[Double], a: NonZero[Double]) =>
     testNormedVectorSpaceSyntax(v, w, a.x)
   }))
-  test("RealInnerProductSpace syntax")(check(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
+  test("InnerProductSpace syntax")(check(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
     testInnerProductSpaceSyntax(v, w, a.x)
   }))
   test("CoordinateSpace syntax")(check(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
@@ -363,7 +363,7 @@ trait BaseSyntaxTest {
       //((v :/ 2) == V.divr(v, A.fromInt(2)))
   }
 
-  def testNormedVectorSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: RealNormedVectorSpace[V, A], eqV: Eq[V], eqA: Eq[A]) = {
+  def testNormedVectorSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: NormedVectorSpace[V, A], eqV: Eq[V], eqA: Eq[A]) = {
     import spire.syntax.eq._
     import spire.syntax.normedVectorSpace._
     implicit def A: Field[A] = V.scalar
@@ -381,7 +381,7 @@ trait BaseSyntaxTest {
       ((V.norm(v) === A.zero) || (v.normalize === V.normalize(v)))
   }
 
-  def testInnerProductSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: RealInnerProductSpace[V, A], eqV: Eq[V], eqA: Eq[A]) = {
+  def testInnerProductSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: InnerProductSpace[V, A], eqV: Eq[V], eqA: Eq[A]) = {
     import spire.syntax.eq._
     import spire.syntax.innerProductSpace._
     implicit def A: Field[A] = V.scalar

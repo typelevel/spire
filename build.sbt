@@ -1,17 +1,15 @@
 import sbtbuildinfo.Plugin._
-import sbtunidoc.{Plugin => UnidocPlugin}
-import sbtunidoc.Plugin.UnidocKeys._
 import pl.project13.scala.sbt.SbtJmh
 import ReleaseTransformations._
 
-lazy val scalaVersions: Map[String, String] = Map("2.10" -> "2.10.6", "2.11" -> "2.11.11", "2.12" -> "2.12.4")
+lazy val scalaVersions: Map[String, String] = Map("2.10" -> "2.10.7", "2.11" -> "2.11.12", "2.12" -> "2.12.4")
 
-lazy val scalaCheckVersion = "1.13.4"
-lazy val scalaTestVersion = "3.0.0"
+lazy val scalaCheckVersion = "1.13.5"
+lazy val scalaTestVersion = "3.0.3"
 lazy val shapelessVersion = "2.3.2"
-lazy val disciplineVersion = "0.7.2"
+lazy val disciplineVersion = "0.8"
 lazy val machinistVersion = "0.6.1"
-lazy val algebraVersion = "0.7.0"
+lazy val algebraVersion = "0.7.1-SNAPSHOT"
 
 lazy val apfloatVersion = "1.8.2"
 lazy val jscienceVersion = "4.3.1"
@@ -21,6 +19,7 @@ lazy val apacheCommonsMath3Version = "3.4.1"
 // Projects
 
 lazy val spire = project.in(file("."))
+  .enablePlugins(ScalaUnidocPlugin)
   .settings(moduleName := "spire-root")
   .settings(spireSettings)
   .settings(unidocSettings)
@@ -29,14 +28,16 @@ lazy val spire = project.in(file("."))
   .dependsOn(spireJVM, spireJS)
 
 lazy val spireJVM = project.in(file(".spireJVM"))
+  .enablePlugins(ScalaUnidocPlugin)
   .settings(moduleName := "spire-aggregate")
   .settings(spireSettings)
   .settings(unidocSettings)
   .settings(noPublishSettings)
-  .aggregate(kernelJVM, macrosJVM, coreJVM, extrasJVM, examples, lawsJVM, testsJVM, benchmark)
-  .dependsOn(kernelJVM, macrosJVM, coreJVM, extrasJVM, examples, lawsJVM, testsJVM, benchmark)
+  .aggregate(kernelJVM, macrosJVM, coreJVM, extrasJVM, lawsJVM, testsJVM)
+  .dependsOn(kernelJVM, macrosJVM, coreJVM, extrasJVM, lawsJVM, testsJVM)
 
 lazy val spireJS = project.in(file(".spireJS"))
+  .enablePlugins(ScalaUnidocPlugin)
   .settings(moduleName := "spire-aggregate")
   .settings(spireSettings)
   .settings(unidocSettings)
@@ -108,18 +109,6 @@ lazy val extras = crossProject.crossType(CrossType.Pure)
 
 lazy val extrasJVM = extras.jvm
 lazy val extrasJS = extras.js
-
-lazy val examples = project
-  .settings(moduleName := "spire-examples")
-  .settings(spireSettings)
-  .settings(libraryDependencies ++= Seq(
-    "com.chuusai" %% "shapeless" % shapelessVersion,
-    "org.apfloat" % "apfloat" % apfloatVersion,
-    "org.jscience" % "jscience" % jscienceVersion
-  ))
-  .settings(noPublishSettings)
-  .settings(commonJvmSettings)
-  .dependsOn(coreJVM, extrasJVM)
 
 lazy val laws = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-laws")
@@ -219,25 +208,9 @@ lazy val tests = crossProject.crossType(CrossType.Pure)
 lazy val testsJVM = tests.jvm
 lazy val testsJS = tests.js
 
-lazy val benchmark = project
-  .settings(moduleName := "spire-benchmark")
-  .settings(spireSettings)
-  .settings(benchmarkSettings)
-  .settings(noPublishSettings)
-  .settings(commonJvmSettings)
-  .dependsOn(coreJVM, extrasJVM)
-
-lazy val benchmarkJmh: Project = project.in(file("benchmark-jmh"))
-  .settings(moduleName := "spire-benchmark-jmh")
-  .settings(spireSettings)
-  .settings(SbtJmh.jmhSettings)
-  .settings(noPublishSettings)
-  .settings(commonJvmSettings)
-  .dependsOn(coreJVM, extrasJVM, benchmark)
-
 // General settings
 
-addCommandAlias("validateJVM", ";coreJVM/scalastyle;macrosJVM/test;coreJVM/test;extrasJVM/test;lawsJVM/test;testsJVM/test;examples/test;benchmark/test")
+addCommandAlias("validateJVM", ";coreJVM/scalastyle;macrosJVM/test;coreJVM/test;extrasJVM/test;lawsJVM/test;testsJVM/test;examples/test")
 
 addCommandAlias("validateJS", ";macrosJS/test;coreJS/test;extrasJS/test;lawsJS/test;testsJS/test")
 
@@ -309,35 +282,10 @@ lazy val scoverageSettings = Seq(
   coverageMinimum := 40,
   coverageFailOnMinimum := false,
   coverageHighlighting := scalaBinaryVersion.value != "2.10",
-  coverageExcludedPackages := "spire\\.benchmark\\..*;spire\\.macros\\..*"
+  coverageExcludedPackages := "spire\\.macros\\..*"
 )
 
 // Project's settings
-
-lazy val benchmarkSettings = Seq(
-  // raise memory limits here if necessary
-  // TODO: this doesn't seem to be working with caliper at the moment :(
-  javaOptions in run += "-Xmx4G",
-
-  libraryDependencies ++= Seq(
-    // comparisons
-    "org.apfloat" % "apfloat" % apfloatVersion,
-    "org.jscience" % "jscience" % jscienceVersion,
-    "org.apache.commons" % "commons-math3" % apacheCommonsMath3Version,
-
-    // thyme
-    "ichi.bench" % "thyme" %  "0.1.0" from "http://plastic-idolatry.com/jars/thyme-0.1.0.jar",
-
-    // caliper stuff
-    "com.google.guava" % "guava" %  "18.0",
-    "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" %  "2.1",
-    "com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" from "http://plastic-idolatry.com/jars/caliper-1.0-SNAPSHOT.jar",
-    "com.google.code.gson" % "gson" % "1.7.2"
-  ),
-
-  // enable forking in run
-  fork in run := true
-)
 
 lazy val coreSettings = Seq(
   sourceGenerators in Compile += buildInfo.taskValue,
@@ -373,8 +321,8 @@ lazy val scalaTestSettings = Seq(
 
 lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
 
-lazy val unidocSettings = UnidocPlugin.unidocSettings ++ Seq(
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, testsJVM)
+lazy val unidocSettings = Seq(
+  unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(testsJVM)
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -432,8 +380,7 @@ lazy val commonScalacOptions = Seq(
   "-language:experimental.macros",
   "-unchecked",
   "-Xfatal-warnings",
-  "-Xlint",
-  "-Yno-adapted-args",
+  "-Yno-adapted-args", // TODO: put back Xlint
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
   "-Ywarn-value-discard",

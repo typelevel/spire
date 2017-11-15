@@ -11,7 +11,7 @@ import spire.syntax.vectorSpace._
 
 /**
  * Used to implicitly define the dimensionality of the Jet space.
- * @param dimension the number of dimensions.
+ * @param dimension the number of dimension.
  */
 case class JetDim(dimension: Int) {
   require(dimension > 0)

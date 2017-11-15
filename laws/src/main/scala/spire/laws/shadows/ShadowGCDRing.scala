@@ -1,6 +1,6 @@
 package spire.laws.shadows
 
-import spire.algebra.{CRing, CSemiring, Eq, GCDRing}
+import spire.algebra.{Eq, GCDRing}
 
 trait ShadowGCDRing[A, S] extends GCDRing[Shadow[A, S]] with ShadowCRing[A, S] {
   import shadowing._

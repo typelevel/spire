@@ -3,8 +3,7 @@ package random
 
 import spire.algebra._
 import spire.syntax.all._
-import spire.math.{Complex, Interval, Natural, Rational, SafeLong, UByte, UShort, UInt, ULong}
-
+import spire.math.{Complex, Interval, Natural, Rational, SafeLong, UByte, UInt, ULong, UShort}
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.generic.CanBuildFrom
 
@@ -225,21 +224,7 @@ trait DistVectorSpace[V, K] extends DistCModule[V, K] with VectorSpace[Dist[V], 
   override def divr(v: Dist[V], k: Dist[K]): Dist[V] = new DistFromGen(g => v(g) :/ k(g))
 }
 
-trait DistNormedVectorSpace[V, K] extends DistVectorSpace[V, K]
-with RealNormedVectorSpace[Dist[V], Dist[K]] {
-  implicit def alg: RealNormedVectorSpace[V, K]
-
-  def norm(v: Dist[V]): Dist[K] = v map alg.norm
-}
-
-trait DistInnerProductSpace[V, K] extends DistVectorSpace[V, K]
-with RealInnerProductSpace[Dist[V], Dist[K]] {
-  implicit def alg: RealInnerProductSpace[V, K]
-
-  def dot(v: Dist[V], w: Dist[V]): Dist[K] = new DistFromGen(g => v(g) dot w(g))
-}
-
-object Dist extends DistInstances9 {
+object Dist extends DistInstances7 {
   @inline final def apply[A](implicit na: Dist[A]): Dist[A] = na
 
   final def apply[A, B](f: A => B)(implicit na: Dist[A]): Dist[B] =
@@ -440,21 +425,11 @@ trait DistInstances5 extends DistInstances4 {
 }
 
 trait DistInstances6 extends DistInstances5 {
-  implicit def module[V,K](implicit ev1: Eq[K], ev2: CModule[V,K]): CModule[Dist[V],Dist[K]] =
+  implicit def cModule[V,K](implicit ev1: Eq[K], ev2: CModule[V,K]): CModule[Dist[V],Dist[K]] =
     new DistCModule[V,K] { def alg = ev2; def eqK = ev1 }
 }
 
 trait DistInstances7 extends DistInstances6 {
   implicit def vectorSpace[V,K](implicit ev1: Eq[K], ev2: VectorSpace[V,K]): VectorSpace[Dist[V],Dist[K]] =
     new DistVectorSpace[V,K] { def alg = ev2; def eqK = ev1 }
-}
-
-trait DistInstances8 extends DistInstances7 {
-  implicit def NormedVectorSpace[V,K](implicit ev1: Eq[K], ev2: RealNormedVectorSpace[V,K]): RealNormedVectorSpace[Dist[V],Dist[K]] =
-    new DistNormedVectorSpace[V,K] { def alg = ev2; def eqK = ev1 }
-}
-
-trait DistInstances9 extends DistInstances8 {
-  implicit def InnerProductSpace[V,K](implicit ev1: Eq[K], ev2: RealInnerProductSpace[V,K]): RealInnerProductSpace[Dist[V],Dist[K]] =
-    new DistInnerProductSpace[V,K] { def alg = ev2; def eqK = ev1 }
 }

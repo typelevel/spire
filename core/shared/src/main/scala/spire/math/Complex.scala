@@ -2,12 +2,10 @@ package spire
 package math
 
 import spire.algebra._
-
 import spire.syntax.field._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
 import spire.syntax.order._
-
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 object Complex extends ComplexInstances {
@@ -671,12 +669,9 @@ private[math] class ComplexAlgebra[@sp(Float, Double) A](implicit
     extends ComplexIsField[A]
     with ComplexIsTrig[A]
     with ComplexIsNRoot[A]
-    with RealInnerProductSpace[Complex[A], A]
     with FieldAssociativeAlgebra[Complex[A], A]
     with Serializable {
   def scalar: Field[A] = algebra
   def timesl(a: A, v: Complex[A]): Complex[A] = Complex(a, scalar.zero) * v
-  def dot(x: Complex[A], y: Complex[A]): A =
-    scalar.plus(scalar.times(x.real, y.real), scalar.times(x.imag, y.imag))
   override def pow(a: Complex[A], b: Int): Complex[A] = a.pow(b)
 }

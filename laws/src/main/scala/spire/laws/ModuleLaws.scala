@@ -67,6 +67,20 @@ trait VectorSpaceLaws[V, R] extends CModuleLaws[V, R] {
 }
 
 trait MetricSpaceLaws[V, R] extends Laws {
-  override implicit def R: CRing[R]
+  implicit def R: AdditiveMonoid[R]
   implicit def S: MetricSpace[V, R]
+
+  def identity(x: V): IsEq[R] = S.distance(x, x) <=> R.zero
+
+  def zeroNonZero(x: V, y: V, eqV: Eq[V], eqR: Eq[R]): IsEq[Boolean] =
+    eqR.eqv(S.distance(x, y), R.zero) <=> eqV.eqv(x, y)
+
+  def symmetric(x: V, y: V): IsEq[R] = S.distance(x, y) <=> S.distance(y, x)
+
+  def triangleInequality(x: V, y: V, z: V, orderR: Order[R]): IsEq[Boolean] =
+    orderR.lteqv(S.distance(x, z), R.plus(S.distance(x, y), S.distance(y, z))) <=> true
+
+  def nonNegative(x: V, y: V, signedR: Signed[R]): IsEq[Boolean] =
+    (signedR.sign(S.distance(x, y)) != Sign.Negative) <=> true
+
 }

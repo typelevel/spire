@@ -10,9 +10,6 @@ package object syntax {
   object isReal extends IsRealSyntax
   object convertableFrom extends ConvertableFromSyntax
 
-  object semigroupoid extends SemigroupoidSyntax
-  object groupoid extends GroupoidSyntax
-
   object semigroup extends SemigroupSyntax
   object monoid extends MonoidSyntax
   object group extends GroupSyntax
@@ -40,9 +37,6 @@ package object syntax {
   object cModule extends CModuleSyntax
   object vectorSpace extends VectorSpaceSyntax
   object metricSpace extends MetricSpaceSyntax
-  object normedVectorSpace extends NormedVectorSpaceSyntax
-  object innerProductSpace extends InnerProductSpaceSyntax
-  object coordinateSpace extends CoordinateSpaceSyntax
 
   object lattice extends LatticeSyntax
   object heyting extends HeytingSyntax
@@ -50,7 +44,6 @@ package object syntax {
 
   object bitString extends BitStringSyntax
 
-  object partialAction extends PartialActionSyntax
   object action extends ActionSyntax
 
   object integral extends IntegralSyntax

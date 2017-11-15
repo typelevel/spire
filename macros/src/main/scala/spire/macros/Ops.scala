@@ -1,7 +1,7 @@
 package spire
 package macros
 
-import spire.macros.compat.{termName, freshTermName, resetLocalAttrs, Context, setOrig}
+import spire.macros.compat.Context
 
 object Ops extends machinist.Ops {
 

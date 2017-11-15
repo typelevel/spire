@@ -20,7 +20,10 @@ To discuss:
   and we would have to write IdentityLeftModule, IdentityRightModule, IdentityCModule, etc...
 * Removed the unbound ops (shouldn't the scalar typeclass be imported by the user if needed?)
   because the module refactoring make the update nontrival
-
+* Removed automatic derivation of a metric for IsReal
+* Removed inner product spaces, coordinate spaces, normed vector spaces, as they are only properly
+  defined for real vector spaces
+* Revise and document the standard instances for Seq, Array, Map, ...
 
 ## Version 0.14.0
 

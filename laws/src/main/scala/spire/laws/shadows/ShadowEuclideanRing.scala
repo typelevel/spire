@@ -1,6 +1,6 @@
 package spire.laws.shadows
 
-import spire.algebra.{CRing, CSemiring, Eq, EuclideanRing}
+import spire.algebra.EuclideanRing
 
 trait ShadowEuclideanRing[A, S] extends EuclideanRing[Shadow[A, S]] with ShadowGCDRing[A, S] {
   import shadowing._

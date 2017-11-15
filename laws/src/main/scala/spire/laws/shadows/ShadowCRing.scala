@@ -1,6 +1,6 @@
 package spire.laws.shadows
 
-import spire.algebra.{CRing, CSemiring}
+import spire.algebra.CRing
 
 trait ShadowCRing[A, S] extends CRing[Shadow[A, S]]
   with ShadowCRig[A, S] with ShadowCRng[A, S] {

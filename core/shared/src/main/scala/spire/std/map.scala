@@ -26,7 +26,7 @@ with Group[Map[K, V]] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class MapCSemiring[K, V](implicit val scalar: CSemiring[V]) extends CSemiring[Map[K, V]] with Serializable {
+class MapSemiring[K, V](implicit val scalar: Semiring[V]) extends Semiring[Map[K, V]] with Serializable {
 
   def zero: Map[K, V] = Map.empty
 
@@ -50,9 +50,8 @@ class MapCSemiring[K, V](implicit val scalar: CSemiring[V]) extends CSemiring[Ma
   }
 }
 
-@SerialVersionUID(0L)
-class MapCRng[K, V](override implicit val scalar: CRing[V]) extends MapCSemiring[K, V] with CRng[Map[K, V]] with CModule[Map[K, V], V] with Serializable { self =>
-  // TODO: in the experimental branch, it is no longer an algebra, because it lacks an identity
+@SerialVersionUID(0L)// TODO: should we have MapRng again?
+class MapCRing[K, V](override implicit val scalar: CRing[V]) extends MapSemiring[K, V] with CModule[Map[K, V], V] with Serializable { self =>
 
   def negate(x: Map[K, V]): Map[K, V] = x mapValues (scalar.negate(_))
 
@@ -60,7 +59,7 @@ class MapCRng[K, V](override implicit val scalar: CRing[V]) extends MapCSemiring
 }
 
 @SerialVersionUID(0L)
-class MapVectorSpace[K, V](override implicit val scalar: Field[V]) extends MapCRng[K, V] with VectorSpace[Map[K, V], V] with Serializable {
+class MapVectorSpace[K, V](override implicit val scalar: Field[V]) extends MapCRing[K, V] with VectorSpace[Map[K, V], V] with Serializable {
   override def times(x: Map[K, V], y: Map[K, V]): Map[K, V] = {
     var xx = x
     var yy = y
@@ -70,12 +69,6 @@ class MapVectorSpace[K, V](override implicit val scalar: Field[V]) extends MapCR
       (xx get kv._1).map(u => z.updated(kv._1, scalar.times(u, kv._2))).getOrElse(z)
     }
   }
-}
-
-@SerialVersionUID(0L)
-class MapInnerProductSpace[K, V: Field] extends MapVectorSpace[K, V] with RealInnerProductSpace[Map[K, V], V] with Serializable {
-  def dot(x: Map[K, V], y: Map[K, V]): V =
-    times(x, y).foldLeft(scalar.zero) { (a, b) => scalar.plus(a, b._2) }
 }
 
 @SerialVersionUID(0L)
@@ -119,11 +112,11 @@ class MapVectorEq[K, V](implicit V: Eq[V], scalar: AdditiveMonoid[V]) extends Eq
 trait MapInstances0 {
   implicit def MapMonoid[K, V: Semigroup]: MapMonoid[K, V] = new MapMonoid[K, V]
 
-  implicit def MapCSemiring[K, V: CSemiring]: MapCSemiring[K, V] = new MapCSemiring[K, V]
+  implicit def MapSemiring[K, V: Semiring]: MapSemiring[K, V] = new MapSemiring[K, V]
 }
 
 trait MapInstances1 extends MapInstances0 {
-  implicit def MapCRng[K, V: CRing]: MapCRng[K, V] = new MapCRng[K, V]
+  implicit def MapCRing[K, V: CRing]: MapCRing[K, V] = new MapCRing[K, V]
 }
 
 trait MapInstances2 extends MapInstances1 {
@@ -133,7 +126,6 @@ trait MapInstances2 extends MapInstances1 {
 }
 
 trait MapInstances3 extends MapInstances2 {
-  implicit def MapInnerProductSpace[K, V: Field]: MapInnerProductSpace[K, V] = new MapInnerProductSpace[K, V]
 
   implicit def MapEq[K, V](implicit V0: Eq[V]): MapEq[K, V] = new MapEq[K, V]
 }

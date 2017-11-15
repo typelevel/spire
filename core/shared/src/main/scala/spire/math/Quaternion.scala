@@ -2,6 +2,7 @@ package spire
 package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
+
 import spire.algebra._
 import spire.syntax.field._
 import spire.syntax.isReal._
@@ -53,7 +54,7 @@ private[math] trait QuaternionOverField[A] extends Eq[Quaternion[A]]
 
 private[math] trait QuaternionOverRichField[A] extends QuaternionOverField[A]
   with NRoot[Quaternion[A]]
-  with RealInnerProductSpace[Quaternion[A], A] {
+  with VectorSpace[Quaternion[A], A] {
 
   implicit def n: NRoot[A]
   implicit def t: Trig[A]

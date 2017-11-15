@@ -4,7 +4,7 @@ package algebra
 
 /**
  * This type class models a metric space `V`. The distance between 2 points in
- * `V` is measured in `M`, which should be real.
+ * `V` is measured in `M`, a subset of the real numbers.
  */
 trait MetricSpace[V, @sp(Int, Long, Float, Double) M] extends Any {
   def distance(v: V, w: V): M
@@ -13,8 +13,7 @@ trait MetricSpace[V, @sp(Int, Long, Float, Double) M] extends Any {
 object MetricSpace {
   @inline final def apply[V, @sp(Int,Long,Float,Double) M](implicit V: MetricSpace[V, M]): MetricSpace[V, M] = V
 
-  def distance[V, @sp(Int,Long,Float,Double) M](v: V, w: V)(implicit
-    metric: MetricSpace[V, M]): M = metric.distance(v, w)
+  def distance[V, @sp(Int,Long,Float,Double) M](v: V, w: V)(implicit metric: MetricSpace[V, M]): M = metric.distance(v, w)
 
   /**
    * Returns `true` iff the distance between `x` and `y` is less than or equal
