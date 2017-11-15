@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid}
+import spire.algebra.{CRig, IsIntegral, Signed}
 
 object UShort extends UShortInstances {
   @inline final def apply(n: Char): UShort = new UShort(n)
@@ -80,7 +80,7 @@ private[math] trait UShortIsCRig extends CRig[UShort] {
   def zero: UShort = UShort(0)
 }
 
-private[math] trait UShortSigned extends SignedAdditiveCMonoid[UShort] {
+private[math] trait UShortSigned extends Signed.OnAdditiveCMonoid[UShort] {
   override def eqv(x:UShort, y:UShort): Boolean = x == y
   override def neqv(x:UShort, y:UShort): Boolean = x != y
   override def gt(x: UShort, y: UShort): Boolean = x > y
@@ -129,4 +129,6 @@ private[math] trait UShortIsReal extends IsIntegral[UShort] with UShortSigned {
 }
 
 @SerialVersionUID(0L)
-private[math] class UShortAlgebra extends UShortIsCRig with UShortIsReal with Serializable
+private[math] class UShortAlgebra extends UShortIsCRig with UShortIsReal with Serializable {
+  def additiveStructure = this
+}

@@ -2,22 +2,20 @@ package spire
 package laws
 
 import java.math.BigInteger
+
 import spire.algebra._
 import spire.algebra.free._
 import spire.algebra.lattice._
+import spire.algebra.real.NormedVectorSpace
 import spire.laws.arb._
 import spire.math._
 import spire.optional.partialIterable._
 import spire.optional.mapIntIntPermutation._
-
-import spire.implicits.{
-  SeqOrder => _, SeqEq => _,
-  ArrayOrder => _, ArrayEq => _,
-  MapEq => _, MapGroup => _,
-  _ }
+import spire.laws.discipline._
+import spire.implicits.{ArrayEq => _, ArrayOrder => _, MapEq => _, MapGroup => _, SeqEq => _, SeqOrder => _, _}
+import spire.laws.shadows.{Shadow, Shadowing}
 
 import org.typelevel.discipline.scalatest.Discipline
-
 import org.scalatest.FunSuite
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
@@ -32,34 +30,58 @@ class LawTests extends FunSuite with Discipline {
     }
   }
 
+  implicit val shadowingUByte: Shadowing[UByte, BigInt] = Shadowing.bigInt[UByte](s => UByte(s.toInt))
+  implicit val shadowingUShort: Shadowing[UShort, BigInt] = Shadowing.bigInt[UShort](s => UShort(s.toInt))
+  implicit val shadowingUInt: Shadowing[UInt, BigInt] = Shadowing.bigInt[UInt](s => UInt(s.toLong))
+  implicit val shadowingULong: Shadowing[ULong, BigInt] = Shadowing.bigInt[ULong](s => ULong.fromBigInt(s))
+
+  implicit val shadowingByte: Shadowing[Byte, BigInt] = Shadowing.bigInt[Byte](_.toByte)
+  implicit val shadowingShort: Shadowing[Short, BigInt] = Shadowing.bigInt[Short](_.toShort)
+  implicit val shadowingInt: Shadowing[Int, BigInt] = Shadowing.bigInt[Int](_.toInt)
+  implicit val shadowingLong: Shadowing[Long, BigInt] = Shadowing.bigInt[Long](_.toLong)
+
+  implicit val shadowLongEuclideanRing: EuclideanRing[Shadow[Long, BigInt]] = Shadow.euclideanRing[Long, BigInt]
+
   // Float and Double fail these tests
-  checkAll("Int",        RingLaws[Int].cRing)
-  checkAll("Long",       RingLaws[Long].cRing)
-  checkAll("BigInt",     RingLaws[BigInt].euclideanRing)
-  checkAll("BigInt",     CombinationLaws[BigInt].signedGCDRing)
-  checkAll("BigInteger", RingLaws[BigInteger].euclideanRing)
-  checkAll("BigInteger", CombinationLaws[BigInteger].signedGCDRing)
-  checkAll("Rational",   RingLaws[Rational].field)
-  checkAll("Rational",   CombinationLaws[BigInt].signedGCDRing)
-  checkAll("Real",       RingLaws[Real].field)
-  checkAll("UByte",      RingLaws[UByte].cRig)
-  checkAll("UShort",     RingLaws[UShort].cRig)
-  checkAll("UInt",       RingLaws[UInt].cRig)
-  checkAll("ULong",      RingLaws[ULong].cRig)
-  checkAll("SafeLong",   RingLaws[SafeLong].euclideanRing)
-  checkAll("SafeLong",   CombinationLaws[SafeLong].signedGCDRing)
+  checkAll("Byte",       EuclideanRingTests[Byte].euclideanRing)
+  checkAll("Byte",       SignedGCDRingTests[Byte].signedGCDRing)
+  checkAll("Short",      EuclideanRingTests[Short].euclideanRing)
+  checkAll("Short",      SignedGCDRingTests[Short].signedGCDRing)
+  checkAll("Int",        EuclideanRingTests[Int].euclideanRing)
+  checkAll("Int",        SignedGCDRingTests[Int].signedGCDRing)
+  checkAll("Long",       EuclideanRingTests[Shadow[Long, BigInt]].euclideanRing)
+  checkAll("Long",       SignedGCDRingTests[Shadow[Long, BigInt]].signedGCDRing)
+  checkAll("BigInt",     EuclideanRingTests[BigInt].euclideanRing)
+  checkAll("BigInt",     SignedGCDRingTests[BigInt].signedGCDRing)
+  checkAll("BigInteger", EuclideanRingTests[BigInteger].euclideanRing)
+  checkAll("BigInteger", SignedGCDRingTests[BigInteger].signedGCDRing)
+  checkAll("Rational",   FieldTests[Rational].field)
+  checkAll("Rational",   SignedGCDRingTests[BigInt].signedGCDRing)
+  checkAll("Real",       FieldTests[Real].field)
+  checkAll("UByte",      CRigTests[UByte].cRig)
+  checkAll("UByte",      SignedAdditiveCMonoidTests[Shadow[UByte, BigInt]].signedAdditiveCMonoid)
+  checkAll("UShort",     CRigTests[UShort].cRig)
+  checkAll("UShort",     SignedAdditiveCMonoidTests[Shadow[UShort, BigInt]].signedAdditiveCMonoid)
+  checkAll("UInt",       CRigTests[UInt].cRig)
+  checkAll("UInt",       SignedAdditiveCMonoidTests[Shadow[UInt, BigInt]].signedAdditiveCMonoid)
+  checkAll("ULong",      CRigTests[ULong].cRig)
+  checkAll("ULong",      SignedAdditiveCMonoidTests[Shadow[ULong, BigInt]].signedAdditiveCMonoid)
+  checkAll("Natural",    CRigTests[Natural].cRig)
+  checkAll("Natural",    SignedAdditiveCMonoidTests[Natural].signedAdditiveCMonoid)
+  checkAll("SafeLong",   EuclideanRingTests[SafeLong].euclideanRing)
+  checkAll("SafeLong",   SignedGCDRingTests[SafeLong].signedGCDRing)
 
-  checkAll("Complex[Rational]", RingLaws[Complex[Rational]].field)
+  checkAll("Complex[Rational]", FieldTests[Complex[Rational]].field)
 
-  checkAll("Quaternion[Rational]", RingLaws[Quaternion[Rational]].divisionRing)
+  checkAll("Quaternion[Rational]", DivisionRingTests[Quaternion[Rational]].divisionRing)
 
   checkAll("Levenshtein distance", BaseLaws[String].metricSpace)
   checkAll("BigInt",               BaseLaws[BigInt].metricSpace)
 
   // We skip checking all tuple types, as they are all generated from the same
   // template.
-  checkAll("(Int,Int)",           RingLaws[(Int, Int)].ring)
-  checkAll("(Rational,Rational)", RingLaws[(Rational, Rational)].ring)
+  checkAll("(Int,Int)",           RingTests[(Int, Int)].ring)
+  checkAll("(Rational,Rational)", RingTests[(Rational, Rational)].ring)
 
   import spire.optional.vectorOrder._
 
@@ -67,31 +89,31 @@ class LawTests extends FunSuite with Discipline {
   // iterators and CanBuildFroms. So, presuming the Scala std lib is tested,
   // testing just List and Vector should suffice for us.
 
-  checkAll("List[Int]",        VectorSpaceLaws[List[Int], Int].module)
-  checkAll("Vector[Int]",      VectorSpaceLaws[Vector[Int], Int].module)
-  checkAll("List[Rational]",   VectorSpaceLaws[List[Rational], Rational].vectorSpace)
-  checkAll("Vector[Rational]", VectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
+  checkAll("List[Int]",        OldVectorSpaceLaws[List[Int], Int].module)
+  checkAll("Vector[Int]",      OldVectorSpaceLaws[Vector[Int], Int].module)
+  checkAll("List[Rational]",   OldVectorSpaceLaws[List[Rational], Rational].vectorSpace)
+  checkAll("Vector[Rational]", OldVectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
 
-  checkAll("Array[Int]",         VectorSpaceLaws[Array[Int], Int].module)
-  checkAll("Array[VectorSpace]", VectorSpaceLaws[Array[Rational], Rational].vectorSpace)
+  checkAll("Array[Int]",         OldVectorSpaceLaws[Array[Int], Int].module)
+  checkAll("Array[VectorSpace]", OldVectorSpaceLaws[Array[Rational], Rational].vectorSpace)
 
-  checkAll("Map[String,Int]",      VectorSpaceLaws[Map[String,Int], Int].module)
-  checkAll("Map[String,Rational]", VectorSpaceLaws[Map[String,Rational], Rational].vectorSpace)
+  checkAll("Map[String,Int]",      OldVectorSpaceLaws[Map[String,Int], Int].module)
+  checkAll("Map[String,Rational]", OldVectorSpaceLaws[Map[String,Rational], Rational].vectorSpace)
 
   val max = NormedVectorSpace.max[Rational, List]
   checkAll("List[Rational]",
-    VectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly))
+    OldVectorSpaceLaws[List[Rational], Rational].normedVectorSpace(max, implicitly, implicitly))
 
-  checkAll("List[Int]",   GroupLaws[List[Int]].monoid)
-  checkAll("Vector[Int]", GroupLaws[Vector[Int]].monoid)
-  checkAll("Set[Int]",    GroupLaws[Set[Int]](spire.optional.genericEq.generic, implicitly).monoid)
-  checkAll("String[Int]", GroupLaws[String].monoid)
-  checkAll("Array[Int]",  GroupLaws[Array[Int]].monoid)
+  checkAll("List[Int]",   MonoidTests[List[Int]].monoid)
+  checkAll("Vector[Int]", MonoidTests[Vector[Int]].monoid)
+  checkAll("Set[Int]",    MonoidTests[Set[Int]].monoid(implicitly, Eq.fromUniversalEquals))
+  checkAll("String[Int]", MonoidTests[String].monoid)
+  checkAll("Array[Int]",  MonoidTests[Array[Int]].monoid)
 
-  checkAll("Seq[String]", PartialGroupLaws[Seq[String]](spire.optional.genericEq.generic, implicitly).semigroupoid)
+  checkAll("Seq[String]", PartialGroupLaws[Seq[String]](Eq.fromUniversalEquals, implicitly).semigroupoid)
   checkAll("Seq[Int]",    PartialGroupLaws[Seq[Int]].groupoid)
 
-  checkAll("String", VectorSpaceLaws[String, Int].metricSpace)
+  checkAll("String", OldVectorSpaceLaws[String, Int].metricSpace)
 
   checkAll("Sign", ActionLaws[Sign, Int].multiplicativeMonoidAction)
 
@@ -110,12 +132,12 @@ class LawTests extends FunSuite with Discipline {
       Eq[A].eqv(x.run(n => n), y.run(n => n))
   }
 
-  checkAll("FreeMonoid", GroupLaws[FreeMonoid[String]].monoid)
-  checkAll("D3", GroupLaws[D3].group)
-  checkAll("FreeGroup", GroupLaws[FreeGroup[D3]].group)
+  checkAll("FreeMonoid", MonoidTests[FreeMonoid[String]].monoid)
+  checkAll("D3", GroupTests[D3].group)
+  checkAll("FreeGroup", GroupTests[FreeGroup[D3]].group)
 
   implicit def intAbGroup: AbGroup[Int] = AdditiveAbGroup[Int].additive
-  checkAll("FreeAbGroup", GroupLaws[FreeAbGroup[Int]].abGroup)
+  checkAll("FreeAbGroup", AbGroupTests[FreeAbGroup[Int]].abGroup)
 
   checkAll("Bool[Boolean]", LogicLaws[Boolean].bool)
   checkAll("Bool[Int]", LogicLaws[Int].bool)
@@ -126,10 +148,10 @@ class LawTests extends FunSuite with Discipline {
     def one = Int.MaxValue
   }
 
-  checkAll("Order[Int]", OrderLaws[Int].order)
-  checkAll("Order[BigInteger]", OrderLaws[BigInteger].order)
-  checkAll("Order[Unit]", OrderLaws[Unit].order)
-  checkAll("AbGroup[Unit]", GroupLaws[Unit].abGroup)
+  checkAll("Order[Int]", OrderTests[Int].order)
+  checkAll("Order[BigInteger]", OrderTests[BigInteger].order)
+  checkAll("Order[Unit]", OrderTests[Unit].order)
+  checkAll("AbGroup[Unit]", AbGroupTests[Unit].abGroup)
   checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 
   checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbitrary[Perm].map(_.map)), implicitly, implicitly).groupPartialAction)

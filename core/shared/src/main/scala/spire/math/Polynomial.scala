@@ -478,7 +478,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
       foreach { (e, c) => bldr += Term(c, e) }
 
       val ts = bldr.result()
-      QuickSort.sort(ts)(Order[Term[C]].reverse, implicitly[ClassTag[Term[C]]])
+      QuickSort.sort(ts)(Order.reverse(Order[Term[C]]), implicitly[ClassTag[Term[C]]])
       val s = ts.mkString
       "(" + (if (s.take(3) == " - ") "-" + s.drop(3) else s.drop(3)) + ")"
     }
@@ -503,22 +503,29 @@ with Rig[Polynomial[C]] {
 }
 
 trait PolynomialOverRng[@sp(Double) C] extends PolynomialOverSemiring[C]
-with RingAlgebra[Polynomial[C], C] {
+with Rng[Polynomial[C]] {
   implicit override val scalar: Rng[C]
 
   def timesl(r: C, v: Polynomial[C]): Polynomial[C] = r *: v
   def negate(x: Polynomial[C]): Polynomial[C] = -x
 }
 
-trait PolynomialOverRing[@sp(Double) C] extends PolynomialOverRng[C]
-with Ring[Polynomial[C]] {
+trait PolynomialOverRing[@sp(Double) C] extends PolynomialOverRng[C] with Ring[Polynomial[C]]  {
   implicit override val scalar: Ring[C]
 
   def one: Polynomial[C] = Polynomial.one[C]
 }
 
+// we skip the CSemiring, CRng, CRig instances
+
+trait PolynomialOverCRing[@sp(Double) C] extends CRing[Polynomial[C]]
+  with PolynomialOverRing[C] with RingAssociativeAlgebra[Polynomial[C], C] {
+  implicit override val scalar: CRing[C]
+}
+
 trait PolynomialOverField[@sp(Double) C] extends PolynomialOverRing[C]
-    with EuclideanRing.WithEuclideanAlgorithm[Polynomial[C]] with VectorSpace[Polynomial[C], C] { self =>
+  with EuclideanRing.WithEuclideanAlgorithm[Polynomial[C]] with VectorSpace[Polynomial[C], C]
+  with FieldAssociativeAlgebra[Polynomial[C], C] { self =>
   implicit override val scalar: Field[C]
 
   override def divr(x: Polynomial[C], k: C): Polynomial[C] = x :/ k
@@ -538,7 +545,6 @@ trait PolynomialOverField[@sp(Double) C] extends PolynomialOverRing[C]
         poly.PolySparse.quotmodSparse(xs, ys)
     }
   }
-
 }
 
 trait PolynomialEq[@sp(Double) C] extends Eq[Polynomial[C]] {
@@ -592,6 +598,15 @@ trait PolynomialInstances2 extends PolynomialInstances1 {
 }
 
 trait PolynomialInstances3 extends PolynomialInstances2 {
+  implicit def overCRing[@sp(Double) C: ClassTag: CRing: Eq]: PolynomialOverCRing[C] =
+    new PolynomialOverCRing[C] {
+      val scalar = CRing[C]
+      val eq = Eq[C]
+      val ct = implicitly[ClassTag[C]]
+    }
+}
+
+trait PolynomialInstances4 extends PolynomialInstances3 {
   implicit def overField[@sp(Double) C: ClassTag: Field: Eq]: PolynomialOverField[C] =
     new PolynomialOverField[C] {
       val scalar = Field[C]
@@ -600,4 +615,4 @@ trait PolynomialInstances3 extends PolynomialInstances2 {
     }
 }
 
-trait PolynomialInstances extends PolynomialInstances3
+trait PolynomialInstances extends PolynomialInstances4

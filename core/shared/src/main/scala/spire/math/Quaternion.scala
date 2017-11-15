@@ -2,6 +2,7 @@ package spire
 package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
+
 import spire.algebra._
 import spire.syntax.field._
 import spire.syntax.isReal._
@@ -27,7 +28,8 @@ object Quaternion extends QuaternionInstances {
 }
 
 /** Quaternion algebra over an ordered field. */
-private[math] trait QuaternionOverField[A] extends Eq[Quaternion[A]] with DivisionRing[Quaternion[A]] with FieldAlgebra[Quaternion[A], A] {
+private[math] trait QuaternionOverField[A] extends Eq[Quaternion[A]]
+  with DivisionRing[Quaternion[A]] with FieldAssociativeAlgebra[Quaternion[A], A] {
 
   implicit def o: Order[A]
   implicit def s: Signed[A]
@@ -52,7 +54,7 @@ private[math] trait QuaternionOverField[A] extends Eq[Quaternion[A]] with Divisi
 
 private[math] trait QuaternionOverRichField[A] extends QuaternionOverField[A]
   with NRoot[Quaternion[A]]
-  with InnerProductSpace[Quaternion[A], A] {
+  with VectorSpace[Quaternion[A], A] {
 
   implicit def n: NRoot[A]
   implicit def t: Trig[A]

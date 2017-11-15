@@ -3,10 +3,8 @@ package syntax
 
 import spire.algebra._
 import spire.algebra.lattice._
-import spire.algebra.partial._
 import spire.macros.Ops
-import spire.math.{BitString, ConvertableTo, ConvertableFrom, Interval, Rational, Number}
-import spire.util.Opt
+import spire.math.{BitString, ConvertableFrom, ConvertableTo, Interval, Number, Rational}
 
 final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
   def ===[B](rhs:B)(implicit ev: B =:= A): Boolean = macro Ops.eqv[A, B]
@@ -103,23 +101,6 @@ final class SignedOps[A:Signed](lhs: A) {
   def isSignNonZero(): Boolean = macro Ops.unop[Boolean]
   def isSignNonPositive(): Boolean = macro Ops.unop[Boolean]
   def isSignNonNegative(): Boolean = macro Ops.unop[Boolean]
-}
-
-final class SemigroupoidOps[A](lhs:A)(implicit ev:Semigroupoid[A]) {
-  def |+|? (rhs: A): Opt[A] = macro Ops.binop[A, Opt[A]]
-  def |+|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
-}
-
-final class GroupoidCommonOps[A](lhs:A)(implicit ev:Groupoid[A]) {
-  def inverse(): A = ev.inverse(lhs)
-  def isId(implicit ev1: Eq[A]): Boolean = ev.isId(lhs)(ev1)
-}
-
-final class GroupoidOps[A](lhs:A)(implicit ev:Groupoid[A]) {
-  def leftId(): A = macro Ops.unop[A]
-  def rightId(): A = macro Ops.unop[A]
-  def |-|? (rhs: A): Opt[A] = macro Ops.binop[A, Option[A]]
-  def |-|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
 }
 
 final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
@@ -350,24 +331,15 @@ final class BoolOps[A: Bool](lhs:A) {
   def ^(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) ^ rhs
 }
 
-final class ModuleOps[V](x: V) {
-  def *:[F](lhs:F)(implicit ev: Module[V, F]): V = macro Ops.rbinopWithEv[F, Module[V, F], V]
-  def :*[F](rhs:F)(implicit ev: Module[V, F]): V = macro Ops.binopWithEv[F, Module[V, F], V]
-
+final class LeftModuleOps[V](x: V) {
+  def *:[F](lhs:F)(implicit ev: LeftModule[V, F]): V = macro Ops.rbinopWithEv[F, LeftModule[V, F], V]
   // TODO: Are macros worth it here?
-  def *:[F](lhs:Int)(implicit ev: Module[V, F], F: Ring[F]): V = ev.timesl(F.fromInt(lhs), x)
-  def :*[F](rhs:Int)(implicit ev: Module[V, F], F: Ring[F]): V = ev.timesr(x, F.fromInt(rhs))
+  def *:[F](lhs:Int)(implicit ev: LeftModule[V, F], F: Ring[F]): V = ev.timesl(F.fromInt(lhs), x)
 }
 
-final class ModuleUnboundOps[F](lhs: F)(implicit ev: Module[_, F]) {
-  def +(rhs: F): F = macro Ops.binopWithScalar[F, F]
-  def -(rhs: F): F = macro Ops.binopWithScalar[F, F]
-  def unary_-(): F = macro Ops.unopWithScalar[F]
-
-  def *(rhs: F): F = macro Ops.binopWithScalar[F, F]
-
-  def pow(rhs: Int): F = macro Ops.binopWithScalar[Int, F]
-  def **(rhs: Int): F = macro Ops.binopWithScalar[Int, F]
+final class RightModuleOps[V](x: V) {
+  def :*[F](rhs:F)(implicit ev: RightModule[V, F]): V = macro Ops.binopWithEv[F, RightModule[V, F], V]
+  def :*[F](rhs:Int)(implicit ev: RightModule[V, F], F: Ring[F]): V = ev.timesr(x, F.fromInt(rhs))
 }
 
 final class VectorSpaceOps[V](x: V) {
@@ -380,46 +352,9 @@ final class VectorSpaceOps[V](x: V) {
   def :/[F](rhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.divr(x, ev.scalar.fromDouble(rhs))
 }
 
-final class VectorSpaceUnboundOps[F](lhs: F)(implicit ev: VectorSpace[_, F]) {
-  def /(rhs: F): F = macro Ops.binopWithScalar[F, F]
-  def reciprocal(): F = macro Ops.unopWithScalar[F]
-}
-
-final class InnerProductSpaceOps[V](lhs: V) {
-  def dot[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
-    macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
-  def ⋅[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
-    macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
-}
-
-final class CoordinateSpaceOps[V](v: V) {
-  def _x[F](implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], F]
-
-  def _y[F](implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], F]
-
-  def _z[F](implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], F]
-
-  def coord[F](rhs: Int)(implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.binopWithEv[Int, CoordinateSpace[V, F], F]
-
-  def dimensions[F](implicit ev: CoordinateSpace[V, F]): Int =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], Int]
-}
-
 final class MetricSpaceOps[V](lhs: V) {
   def distance[F](rhs: V)(implicit ev: MetricSpace[V, F]): F =
     macro Ops.binopWithEv[V, MetricSpace[V, F], F]
-}
-
-final class NormedVectorSpaceOps[V](lhs: V) {
-  def norm[F](implicit ev: NormedVectorSpace[V, F]): F =
-    macro Ops.unopWithEv[NormedVectorSpace[V, F], F]
-
-  def normalize[F](implicit ev: NormedVectorSpace[V, F]): V =
-    macro Ops.unopWithEv[NormedVectorSpace[V, F], V]
 }
 
 final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {
@@ -452,61 +387,14 @@ final class BitStringOps[A](lhs: A)(implicit ev: BitString[A]) {
   def rotateRight(rhs: Int): A = macro Ops.binop[Int, A]
 }
 
-final class LeftPartialActionOps[G](lhs: G) {
-  def ?|+|> [P](rhs: P)(implicit ev: LeftPartialAction[P, G]): Opt[P] =
-    macro Ops.binopWithEv[P, LeftPartialAction[P, G], Opt[P]]
-  def ??|+|> [P](rhs: P)(implicit ev: LeftPartialAction[P, G]): Boolean =
-    macro Ops.binopWithEv[P, LeftPartialAction[P, G], Boolean]
-}
-
-final class RightPartialActionOps[P](lhs: P) {
-  def <|+|? [G](rhs: G)(implicit ev: RightPartialAction[P, G]): Opt[P] =
-    macro Ops.binopWithEv[G, RightPartialAction[P, G], Opt[P]]
-  def <|+|?? [G](rhs: G)(implicit ev: RightPartialAction[P, G]): Boolean =
-    macro Ops.binopWithEv[G, RightPartialAction[P, G], Boolean]
-}
-
 final class LeftActionOps[G](lhs: G) {
   def |+|> [P](rhs: P)(implicit ev: LeftAction[P, G]): P =
     macro Ops.binopWithEv[P, Action[P, G], P]
-  def +> [P](rhs: P)(implicit ev: AdditiveAction[P, G]): P =
-    macro Ops.binopWithEv[P, AdditiveAction[P, G], P]
-  def *> [P](rhs: P)(implicit ev: MultiplicativeAction[P, G]): P =
-    macro Ops.binopWithEv[P, MultiplicativeAction[P, G], P]
 }
 
 final class RightActionOps[P](lhs: P) {
   def <|+| [G](rhs: G)(implicit ev: RightAction[P, G]): P =
     macro Ops.binopWithEv[G, Action[P, G], P]
-  def <+ [G](rhs: G)(implicit ev: AdditiveAction[P, G]): P =
-    macro Ops.binopWithEv[G, AdditiveAction[P, G], P]
-  def <* [G](rhs: G)(implicit ev: MultiplicativeAction[P, G]): P =
-    macro Ops.binopWithEv[G, MultiplicativeAction[P, G], P]
-}
-
-final class ActionUnboundOps[G](lhs: G)(implicit ev: Action[_, G]) {
-  def |+|(rhs: G): G = macro Ops.binopWithScalar[G, G]
-  def |-|(rhs: G): G = macro Ops.binopWithScalar[G, G]
-  def inverse(): G = macro Ops.unopWithScalar[G]
-}
-
-final class AdditiveActionUnboundOps[G](lhs: G)(implicit ev: AdditiveAction[_, G]) {
-  def +(rhs: G): G = macro Ops.binopWithScalar[G, G]
-  def -(rhs: G): G = macro Ops.binopWithScalar[G, G]
-  def unary_-(): G = macro Ops.unopWithScalar[G]
-}
-
-final class MultiplicativeActionUnboundOps[G](lhs: G)(implicit ev: MultiplicativeAction[_, G]) {
-  def *(rhs: G): G = macro Ops.binopWithScalar[G, G]
-  def /(rhs: G): G = macro Ops.binopWithScalar[G, G]
-  def reciprocal(): G = macro Ops.unopWithScalar[G]
-}
-
-final class TorsorPointOps[P](lhs: P) {
-  def <-> [G](rhs: P)(implicit ev: AdditiveTorsor[P, G]): G =
-    macro Ops.binopWithEv[P, AdditiveTorsor[P, G], G]
-  def </> [G](rhs: P)(implicit ev: MultiplicativeTorsor[P, G]): G =
-    macro Ops.binopWithEv[P, MultiplicativeTorsor[P, G], G]
 }
 
 final class IntervalPointOps[A](lhs: A)(implicit o: Order[A], ev: AdditiveGroup[A]) {

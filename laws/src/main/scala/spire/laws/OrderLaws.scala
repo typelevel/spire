@@ -1,63 +1,36 @@
-package spire
-package laws
+package spire.laws
 
-import spire.algebra._
-import spire.implicits._
+import spire.algebra.Order
 
-import org.typelevel.discipline.Laws
+trait OrderLaws[A] extends PartialOrderLaws[A] {
+  override implicit def E: Order[A]
 
-import org.scalacheck.{Arbitrary, Prop}
-import org.scalacheck.Prop._
+  def totality(x: A, y: A): IsEq[Boolean] =
+    (E.lteqv(x, y) || E.lteqv(y, x)) <=> true
 
-object OrderLaws {
-  def apply[A : Eq : Arbitrary] = new OrderLaws[A] {
-    def Equ = Eq[A]
-    def Arb = implicitly[Arbitrary[A]]
+  def compare(x: A, y: A): IsEq[Boolean] = {
+    val c = E.compare(x, y)
+    (((c < 0) == E.lt(x, y)) && ((c == 0) == E.eqv(x, y)) && ((c > 0) == E.gt(x, y))) <=> true
+  }
+
+  def min(x: A, y: A): IsEq[Boolean] = {
+    val c = E.compare(x, y)
+    val m = E.min(x, y)
+    if (c < 0) E.eqv(m, x) <=> true
+    else if (c == 0) (E.eqv(m, x) && (E.eqv(m, y))) <=> true
+    else E.eqv(m, y) <=> true
+  }
+
+  def max(x: A, y: A): IsEq[Boolean] = {
+    val c = E.compare(x, y)
+    val m = E.max(x, y)
+    if (c < 0) E.eqv(m, y) <=> true
+    else if (c == 0) (E.eqv(m, x) && (E.eqv(m, y))) <=> true
+    else E.eqv(m, x) <=> true
   }
 }
 
-trait OrderLaws[A] extends Laws {
-
-  implicit def Equ: Eq[A]
-  implicit def Arb: Arbitrary[A]
-
-  def partialOrder(implicit A: PartialOrder[A]) = new OrderProperties(
-    name = "partialOrder",
-    parent = None,
-    "reflexitivity" → forAll((x: A) =>
-      x <= x
-    ),
-    "antisymmetry" → forAll((x: A, y: A) =>
-      (x <= y && y <= x) imp (x === y)
-    ),
-    "transitivity" → forAll((x: A, y: A, z: A) =>
-      (x <= y && y <= z) imp (x <= z)
-    ),
-    "gteqv" → forAll((x: A, y: A) =>
-      (x <= y) === (y >= x)
-    ),
-    "lt" → forAll((x: A, y: A) =>
-      (x < y) === (x <= y && x =!= y)
-    ),
-    "gt" → forAll((x: A, y: A) =>
-      (x < y) === (y > x)
-    )
-  )
-
-  def order(implicit A: Order[A]) = new OrderProperties(
-    name = "order",
-    parent = Some(partialOrder),
-    "totality" → forAll((x: A, y: A) =>
-      x <= y || y <= x
-    )
-  )
-
-  class OrderProperties(
-    name: String,
-    parent: Option[OrderProperties],
-    props: (String, Prop)*
-  ) extends DefaultRuleSet(name, parent, props: _*)
-
+object OrderLaws {
+  def apply[A:Order]: OrderLaws[A] =
+    new OrderLaws[A] { def E: Order[A] = implicitly }
 }
-
-// vim: expandtab:ts=2:sw=2

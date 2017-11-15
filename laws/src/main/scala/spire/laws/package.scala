@@ -9,6 +9,14 @@ import org.typelevel.discipline.Predicate
 
 package object laws {
 
+  implicit final class IsEqArrow[A](lhs: => A) {
+    def <=>(rhs: => A): IsEq[A] = try {
+      IsEq.valid(lhs, rhs)
+    } catch {
+      case e: IsEq.InvalidTestException => IsEq.invalid[A]
+    }
+  }
+
   implicit def PredicateFromMonoid[A: Eq](implicit A: AdditiveMonoid[A]): Predicate[A] = new Predicate[A] {
     def apply(a: A) = a =!= A.zero
   }

@@ -151,7 +151,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
   }
 
   def qsortBy[@sp B](f: A => B)(implicit ev: Order[B], ct: ClassTag[A]): Unit = {
-    implicit val ord: Order[A] = ev.on(f)
+    implicit val ord: Order[A] = Order.by(f)
     Sorting.sort(arr)
   }
 
@@ -167,7 +167,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
   }
 
   def qsortedBy[@sp B](f: A => B)(implicit ev: Order[B], ct: ClassTag[A]): Array[A] = {
-    implicit val ord: Order[A] = ev.on(f)
+    implicit val ord: Order[A] = Order.by(f)
     val arr2 = arr.clone
     Sorting.sort(arr2)
     arr2
@@ -237,7 +237,7 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
    * will only return a single copy of it.
    */
   def pmax(implicit ev: PartialOrder[A]): Seq[A] =
-    Searching.minimalElements(as)(ev.reverse)
+    Searching.minimalElements(as)(PartialOrder.reverse(ev))
 
   def qmin(implicit ev: Order[A]): A = {
     if (as.isEmpty) throw new UnsupportedOperationException("empty seq")
@@ -302,7 +302,7 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
   }
 
   def qsortedBy[@sp B](f: A => B)(implicit ev: Order[B], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
-    implicit val ord: Order[A] = ev.on(f)
+    implicit val ord: Order[A] = Order.by(f)
     val arr = as.toArray
     Sorting.sort(arr)
     fromArray(arr)

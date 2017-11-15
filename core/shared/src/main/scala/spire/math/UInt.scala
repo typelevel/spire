@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid}
+import spire.algebra.{CRig, IsIntegral, Signed}
 
 object UInt extends UIntInstances {
   @inline final def apply(n: Int): UInt = new UInt(n)
@@ -79,7 +79,7 @@ private[math] trait UIntIsCRig extends CRig[UInt] {
   def zero: UInt = UInt(0)
 }
 
-private[math] trait UIntSigned extends SignedAdditiveCMonoid[UInt] {
+private[math] trait UIntSigned extends Signed.OnAdditiveCMonoid[UInt] {
   override def eqv(x:UInt, y:UInt): Boolean = x == y
   override def neqv(x:UInt, y:UInt): Boolean = x != y
   override def gt(x: UInt, y: UInt): Boolean = x > y
@@ -122,4 +122,6 @@ private[math] trait UIntIsReal extends IsIntegral[UInt] with UIntSigned {
 }
 
 @SerialVersionUID(0L)
-private[math] class UIntAlgebra extends UIntIsCRig with UIntIsReal with Serializable
+private[math] class UIntAlgebra extends UIntIsCRig with UIntIsReal with Serializable {
+  def additiveStructure = this
+}

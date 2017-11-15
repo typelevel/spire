@@ -1,7 +1,6 @@
 package spire
 
 package object syntax {
-  object cfor extends CforSyntax
   object literals extends LiteralsSyntax
 
   object eq extends EqSyntax
@@ -10,9 +9,6 @@ package object syntax {
   object signed extends SignedSyntax
   object isReal extends IsRealSyntax
   object convertableFrom extends ConvertableFromSyntax
-
-  object semigroupoid extends SemigroupoidSyntax
-  object groupoid extends GroupoidSyntax
 
   object semigroup extends SemigroupSyntax
   object monoid extends MonoidSyntax
@@ -36,12 +32,11 @@ package object syntax {
   object nroot extends NRootSyntax
   object trig extends TrigSyntax
 
-  object module extends ModuleSyntax
+  object leftModule extends LeftModuleSyntax
+  object rightModule extends RightModuleSyntax
+  object cModule extends CModuleSyntax
   object vectorSpace extends VectorSpaceSyntax
   object metricSpace extends MetricSpaceSyntax
-  object normedVectorSpace extends NormedVectorSpaceSyntax
-  object innerProductSpace extends InnerProductSpaceSyntax
-  object coordinateSpace extends CoordinateSpaceSyntax
 
   object lattice extends LatticeSyntax
   object heyting extends HeytingSyntax
@@ -49,17 +44,13 @@ package object syntax {
 
   object bitString extends BitStringSyntax
 
-  object partialAction extends PartialActionSyntax
   object action extends ActionSyntax
-  object torsor extends TorsorSyntax
 
   object integral extends IntegralSyntax
   object fractional extends FractionalSyntax
   object numeric extends NumericSyntax
 
   object all extends AllSyntax
-
-  object unbound extends UnboundSyntax
 
   object interval extends IntervalSyntax
 }

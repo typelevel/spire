@@ -50,15 +50,16 @@ class MapSemiring[K, V](implicit val scalar: Semiring[V]) extends Semiring[Map[K
   }
 }
 
-@SerialVersionUID(0L)
-class MapRng[K, V](override implicit val scalar: Rng[V]) extends MapSemiring[K, V] with RingAlgebra[Map[K, V], V] with Serializable { self =>
+@SerialVersionUID(0L)// TODO: should we have MapRng again?
+class MapCRing[K, V](override implicit val scalar: CRing[V]) extends MapSemiring[K, V] with CModule[Map[K, V], V] with Serializable { self =>
+
   def negate(x: Map[K, V]): Map[K, V] = x mapValues (scalar.negate(_))
 
   def timesl(r: V, v: Map[K, V]): Map[K, V] = v mapValues (scalar.times(r, _))
 }
 
 @SerialVersionUID(0L)
-class MapVectorSpace[K, V](override implicit val scalar: Field[V]) extends MapRng[K, V] with VectorSpace[Map[K, V], V] with Serializable {
+class MapVectorSpace[K, V](override implicit val scalar: Field[V]) extends MapCRing[K, V] with VectorSpace[Map[K, V], V] with Serializable {
   override def times(x: Map[K, V], y: Map[K, V]): Map[K, V] = {
     var xx = x
     var yy = y
@@ -68,12 +69,6 @@ class MapVectorSpace[K, V](override implicit val scalar: Field[V]) extends MapRn
       (xx get kv._1).map(u => z.updated(kv._1, scalar.times(u, kv._2))).getOrElse(z)
     }
   }
-}
-
-@SerialVersionUID(0L)
-class MapInnerProductSpace[K, V: Field] extends MapVectorSpace[K, V] with InnerProductSpace[Map[K, V], V] with Serializable {
-  def dot(x: Map[K, V], y: Map[K, V]): V =
-    times(x, y).foldLeft(scalar.zero) { (a, b) => scalar.plus(a, b._2) }
 }
 
 @SerialVersionUID(0L)
@@ -121,7 +116,7 @@ trait MapInstances0 {
 }
 
 trait MapInstances1 extends MapInstances0 {
-  implicit def MapRng[K, V: Rng]: MapRng[K, V] = new MapRng[K, V]
+  implicit def MapCRing[K, V: CRing]: MapCRing[K, V] = new MapCRing[K, V]
 }
 
 trait MapInstances2 extends MapInstances1 {
@@ -131,7 +126,6 @@ trait MapInstances2 extends MapInstances1 {
 }
 
 trait MapInstances3 extends MapInstances2 {
-  implicit def MapInnerProductSpace[K, V: Field]: MapInnerProductSpace[K, V] = new MapInnerProductSpace[K, V]
 
   implicit def MapEq[K, V](implicit V0: Eq[V]): MapEq[K, V] = new MapEq[K, V]
 }

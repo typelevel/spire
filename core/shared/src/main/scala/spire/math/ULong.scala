@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid}
+import spire.algebra.{CRig, IsIntegral, Signed}
 
 object ULong extends ULongInstances {
   @inline final def apply(n: Long): ULong = new ULong(n)
@@ -149,7 +149,7 @@ private[math] trait ULongIsCRig extends CRig[ULong] {
   def zero: ULong = ULong(0)
 }
 
-private[math] trait ULongSigned extends SignedAdditiveCMonoid[ULong] {
+private[math] trait ULongSigned extends Signed.OnAdditiveCMonoid[ULong] {
   override def eqv(x:ULong, y:ULong): Boolean = x == y
   override def neqv(x:ULong, y:ULong): Boolean = x != y
   override def gt(x: ULong, y: ULong): Boolean = x > y
@@ -192,4 +192,6 @@ private[math] trait ULongIsReal extends IsIntegral[ULong] with ULongSigned {
 }
 
 @SerialVersionUID(0L)
-private[math] class ULongAlgebra extends ULongIsCRig with ULongIsReal with Serializable
+private[math] class ULongAlgebra extends ULongIsCRig with ULongIsReal with Serializable {
+  def additiveStructure = this
+}

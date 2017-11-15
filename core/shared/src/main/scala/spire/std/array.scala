@@ -1,7 +1,6 @@
 package spire
 package std
 
-
 import spire.algebra._
 import spire.NoImplicit
 
@@ -113,14 +112,13 @@ object ArraySupport {
 trait ArrayInstances0 {
   type NI0[A] = NoImplicit[VectorSpace[Array[A], A]]
 
-  implicit def ArrayModule[@sp(Int,Long,Float,Double) A: NI0: ClassTag: Ring]: Module[Array[A], A] =
-    new ArrayModule[A]
+  implicit def ArrayCModule[@sp(Int,Long,Float,Double) A: NI0: ClassTag: CRing]: CModule[Array[A], A] =
+    new ArrayCModule[A]
 }
 
 trait ArrayInstances1 extends ArrayInstances0 {
-  type NI1[A] = NoImplicit[NormedVectorSpace[Array[A], A]]
 
-  implicit def ArrayVectorSpace[@sp(Int,Long,Float,Double) A: NI1: ClassTag: Field]: VectorSpace[Array[A], A] =
+  implicit def ArrayVectorSpace[@sp(Int,Long,Float,Double) A: ClassTag: Field]: VectorSpace[Array[A], A] =
     new ArrayVectorSpace[A]
 
   implicit def ArrayEq[@sp A: Eq]: Eq[Array[A]] =
@@ -128,28 +126,20 @@ trait ArrayInstances1 extends ArrayInstances0 {
 }
 
 trait ArrayInstances2 extends ArrayInstances1 {
-  implicit def ArrayInnerProductSpace[@sp(Float, Double) A: Field: ClassTag]: InnerProductSpace[Array[A], A] =
-    new ArrayInnerProductSpace[A]
-
   implicit def ArrayOrder[@sp A: Order]: Order[Array[A]] =
     new ArrayOrder[A]
 }
 
-trait ArrayInstances3 extends ArrayInstances2 {
-  implicit def ArrayNormedVectorSpace[@sp(Float, Double) A: Field: NRoot: ClassTag]: NormedVectorSpace[Array[A], A] =
-    ArrayInnerProductSpace[A].normed
-}
-
-trait ArrayInstances extends ArrayInstances3 {
+trait ArrayInstances extends ArrayInstances2 {
   implicit def ArrayMonoid[@sp A: ClassTag]: Monoid[Array[A]] =
     new ArrayMonoid[A]
 }
 
 @SerialVersionUID(0L)
-private final class ArrayModule[@sp(Int,Long,Float,Double) A: ClassTag: Ring]
+private final class ArrayCModule[@sp(Int,Long,Float,Double) A: ClassTag: CRing]
     (implicit nvs: NoImplicit[VectorSpace[Array[A], A]])
-    extends Module[Array[A], A] with Serializable {
-  def scalar: Ring[A] = Ring[A]
+    extends CModule[Array[A], A] with Serializable {
+  def scalar: CRing[A] = CRing[A]
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
   def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
@@ -159,7 +149,6 @@ private final class ArrayModule[@sp(Int,Long,Float,Double) A: ClassTag: Ring]
 
 @SerialVersionUID(0L)
 private final class ArrayVectorSpace[@sp(Int,Float,Long,Double) A: ClassTag: Field]
-    (implicit nnvs: NoImplicit[NormedVectorSpace[Array[A], A]])
     extends VectorSpace[Array[A], A] with Serializable {
   def scalar: Field[A] = Field[A]
   def zero: Array[A] = new Array[A](0)
@@ -176,18 +165,6 @@ private final class ArrayEq[@sp(Int,Float,Long,Double) A: Eq]
 }
 
 @SerialVersionUID(0L)
-private final class ArrayInnerProductSpace[@sp(Int,Float,Long,Double) A: ClassTag: Field]
-    extends InnerProductSpace[Array[A], A] with Serializable {
-  def scalar: Field[A] = Field[A]
-  def zero: Array[A] = new Array[A](0)
-  def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
-  def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
-  override def minus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.minus(x, y)
-  def timesl(r: A, x: Array[A]): Array[A] = ArraySupport.timesl(r, x)
-  def dot(x: Array[A], y: Array[A]): A = ArraySupport.dot(x, y)
-}
-
-@SerialVersionUID(0L)
 private final class ArrayOrder[@sp(Int,Float,Long,Double) A: Order]
     extends Order[Array[A]] with Serializable {
   override def eqv(x: Array[A], y: Array[A]): Boolean = ArraySupport.eqv(x, y)
@@ -199,19 +176,6 @@ private final class ArrayMonoid[@sp(Int,Float,Long,Double) A: ClassTag]
     extends Monoid[Array[A]] with Serializable {
   def empty: Array[A] = new Array[A](0)
   def combine(x: Array[A], y: Array[A]): Array[A] = ArraySupport.concat(x, y)
-}
-
-@SerialVersionUID(0L)
-class ArrayCoordinateSpace[@sp(Int,Long,Float,Double) A: ClassTag](final val dimensions: Int)(implicit val scalar: Field[A])
-extends CoordinateSpace[Array[A], A] with Serializable {
-  def zero: Array[A] = new Array[A](0)
-  def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
-  def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
-  override def minus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.minus(x, y)
-  def timesl(r: A, x: Array[A]): Array[A] = ArraySupport.timesl(r, x)
-  override def dot(x: Array[A], y: Array[A]): A = ArraySupport.dot(x, y)
-  def coord(v: Array[A], i: Int): A = v(i)
-  def axis(i: Int): Array[A] = ArraySupport.axis(dimensions, i)
 }
 
 @SerialVersionUID(0L)

@@ -1,16 +1,16 @@
 package spire
 
 import spire.algebra._
+import spire.algebra.real.{CoordinateSpace, InnerProductSpace, NormedVectorSpace}
 import spire.math.{Rational, Searching}
 import spire.std.bigInt._
 import spire.std.double._
 import spire.std.int._
 import spire.std.seq._
 import spire.std.string._
-import spire.tests.{SpireTests, SpireProperties}
+import spire.tests.{SpireProperties, SpireTests}
 
 import org.scalatest.prop.Checkers
-
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._

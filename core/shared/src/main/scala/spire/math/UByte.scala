@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid}
+import spire.algebra.{CRig, IsIntegral, Signed}
 
 object UByte extends UByteInstances {
   @inline final def apply(n: Byte): UByte = new UByte(n)
@@ -89,7 +89,7 @@ private[math] trait UByteIsCRig extends CRig[UByte] {
   def zero: UByte = UByte(0)
 }
 
-private[math] trait UByteSigned extends SignedAdditiveCMonoid[UByte] {
+private[math] trait UByteSigned extends Signed.OnAdditiveCMonoid[UByte] {
   override def eqv(x:UByte, y:UByte): Boolean = x == y
   override def neqv(x:UByte, y:UByte): Boolean = x != y
   override def gt(x: UByte, y: UByte): Boolean = x > y
@@ -138,4 +138,6 @@ private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteSigned {
 }
 
 @SerialVersionUID(0L)
-private[math] class UByteAlgebra extends UByteIsCRig with UByteIsReal with Serializable
+private[math] class UByteAlgebra extends UByteIsCRig with UByteIsReal with Serializable {
+  def additiveStructure = this
+}
