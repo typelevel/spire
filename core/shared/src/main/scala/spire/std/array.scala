@@ -111,23 +111,30 @@ object ArraySupport {
 }
 
 trait ArrayInstances0 {
-  type NI0[A] = NoImplicit[VectorSpace[Array[A], A]]
+  type NIO[A] = NoImplicit[Module[Array[A], A]]
 
-  implicit def ArrayModule[@sp(Int,Long,Float,Double) A: NI0: ClassTag: Ring]: Module[Array[A], A] =
-    new ArrayModule[A]
+  implicit def ArrayLeftModule[@sp(Int,Long,Float,Double) A: NIO: ClassTag: Ring]: LeftModule[Array[A], A] =
+    new ArrayLeftModule[A]
 }
 
 trait ArrayInstances1 extends ArrayInstances0 {
-  type NI1[A] = NoImplicit[NormedVectorSpace[Array[A], A]]
+  type NI1[A] = NoImplicit[VectorSpace[Array[A], A]]
 
-  implicit def ArrayVectorSpace[@sp(Int,Long,Float,Double) A: NI1: ClassTag: Field]: VectorSpace[Array[A], A] =
+  implicit def ArrayModule[@sp(Int,Long,Float,Double) A: NI1: ClassTag: CRing]: Module[Array[A], A] =
+    new ArrayModule[A]
+}
+
+trait ArrayInstances2 extends ArrayInstances1 {
+  type NI2[A] = NoImplicit[NormedVectorSpace[Array[A], A]]
+
+  implicit def ArrayVectorSpace[@sp(Int,Long,Float,Double) A: NI2: ClassTag: Field]: VectorSpace[Array[A], A] =
     new ArrayVectorSpace[A]
 
   implicit def ArrayEq[@sp A: Eq]: Eq[Array[A]] =
     new ArrayEq[A]
 }
 
-trait ArrayInstances2 extends ArrayInstances1 {
+trait ArrayInstances3 extends ArrayInstances2 {
   implicit def ArrayInnerProductSpace[@sp(Float, Double) A: Field: ClassTag]: InnerProductSpace[Array[A], A] =
     new ArrayInnerProductSpace[A]
 
@@ -135,21 +142,31 @@ trait ArrayInstances2 extends ArrayInstances1 {
     new ArrayOrder[A]
 }
 
-trait ArrayInstances3 extends ArrayInstances2 {
+trait ArrayInstances extends ArrayInstances3 {
   implicit def ArrayNormedVectorSpace[@sp(Float, Double) A: Field: NRoot: ClassTag]: NormedVectorSpace[Array[A], A] =
     ArrayInnerProductSpace[A].normed
-}
 
-trait ArrayInstances extends ArrayInstances3 {
   implicit def ArrayMonoid[@sp A: ClassTag]: Monoid[Array[A]] =
     new ArrayMonoid[A]
 }
 
 @SerialVersionUID(0L)
-private final class ArrayModule[@sp(Int,Long,Float,Double) A: ClassTag: Ring]
+private final class ArrayLeftModule[@sp(Int,Long,Float,Double) A: ClassTag: Ring]
+    (implicit nvs: NoImplicit[VectorSpace[Array[A], A]])
+    extends LeftModule[Array[A], A] with Serializable {
+  def scalar: Ring[A] = Ring[A]
+  def zero: Array[A] = new Array[A](0)
+  def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
+  def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
+  override def minus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.minus(x, y)
+  def timesl(r: A, x: Array[A]): Array[A] = ArraySupport.timesl(r, x)
+}
+
+@SerialVersionUID(0L)
+private final class ArrayModule[@sp(Int,Long,Float,Double) A: ClassTag: CRing]
     (implicit nvs: NoImplicit[VectorSpace[Array[A], A]])
     extends Module[Array[A], A] with Serializable {
-  def scalar: Ring[A] = Ring[A]
+  def scalar: CRing[A] = CRing[A]
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)
   def plus(x: Array[A], y: Array[A]): Array[A] = ArraySupport.plus(x, y)
