@@ -18,7 +18,7 @@ object VectorSpaceLaws {
 
 trait VectorSpaceLaws[V, A] extends Laws {
 
-  implicit def scalar(implicit V: Module[V, A]): Rng[A] = V.scalar
+  implicit def scalar(implicit V: LeftModule[V, A]): Rng[A] = V.scalar
 
   val scalarLaws: RingLaws[A]
   val vectorLaws: GroupLaws[V]
@@ -27,7 +27,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
   import vectorLaws.{ Equ => EqV, Arb => ArV }
 
 
-  def module(implicit V: Module[V, A]) = new SpaceProperties(
+  def module(implicit V: LeftModule[V, A]) = new SpaceProperties(
     name = "module",
     sl = _.rng(V.scalar),
     vl = _.abGroup(V.additive),
