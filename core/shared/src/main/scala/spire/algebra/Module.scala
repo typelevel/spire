@@ -38,16 +38,34 @@ object RightModule {
 }
 
 /**
- * A module generalizes a vector space by requiring its scalar need only form
- * a ring, rather than a field.
+ * A bimodule admits both a left and right action by the scalar ring.
  */
-trait Module[V, @sp(Int,Long,Float,Double) R] extends Any with LeftModule[R, V] with RightModule[V, R] {
+trait Bimodule[V, @sp(Int,Long,Float,Double) R] extends Any with LeftModule[R, V] with RightModule[V, R] {
   implicit override def scalar: Rng[R]
 
   def timesl(r: R, v: V): V
-  override def timesr(v: V, r: R): V = timesl(r, v)
+  def timesr(v: V, r: R): V
+}
+object Bimodule {
+  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: Bimodule[V, R]): Bimodule[V, R] = V
+
+  implicit def IdentityBimodule[@sp(Int,Long,Float,Double) V](implicit ring: Ring[V]): IdentityBimodule[v] = {
+    new IdentityBimodule[V] {
+      val scalar = ring
+    }
+  }
 }
 
+/**
+ * Modules over commutative rings generalize vector spaces by allowing the scalars
+ * to belong to an arbitrary commutative ring rather than just a field.
+ */
+trait Module[V, @sp(Int,Long,Float,Double) R] extends Any with Bimodule[V, R] {
+  implicit override def scalar: CRing[R]
+
+  def timesl(r: R, v: V): V
+  def timesr(v: V, r: R): V = timesl(r, v)
+}
 object Module {
   @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: Module[V, R]): Module[V, R] = V
 
@@ -65,6 +83,16 @@ private[algebra] trait IdentityModule[@sp(Int,Long,Float,Double) V] extends Any 
   override def minus(v: V, w: V): V = scalar.minus(v, w)
 
   def timesl(r: V, v: V): V = scalar.times(r, v)
+}
+
+private[algebra] trait IdentityBimodule[@sp(Int,Long,Float,Double) V] extends Any with Module[V, V] {
+  def zero: V = scalar.zero
+  def negate(v: V): V = scalar.negate(v)
+  def plus(v: V, w: V): V = scalar.plus(v, w)
+  override def minus(v: V, w: V): V = scalar.minus(v, w)
+
+  def timesl(r: V, v: V): V = scalar.times(r, v)
+  def timesr(v: V, r: V): V = scalar.times(v, r)
 }
 
 private[algebra] trait IdentityLeftModule[@sp(Int,Long,Float,Double) V] extends Any with LeftModule[V, V] {
