@@ -27,8 +27,8 @@ trait VectorSpaceLaws[V, A] extends Laws {
   import vectorLaws.{ Equ => EqV, Arb => ArV }
 
 
-  def module(implicit V: LeftModule[V, A]) = new SpaceProperties(
-    name = "module",
+  def leftModule(implicit V: LeftModule[V, A]) = new SpaceProperties(
+    name = "leftModule",
     sl = _.rng(V.scalar),
     vl = _.abGroup(V.additive),
     parents = Seq.empty,
@@ -47,6 +47,39 @@ trait VectorSpaceLaws[V, A] extends Laws {
     "scalar identity is identity" → forAll((v: V) =>
       (V.scalar.one *: v) === v
     )*/
+  )
+
+  def module(implicit V: Module[V, A]) = new SpaceProperties(
+    name = "module",
+    sl = _.ring(V.scalar),
+    vl = _.abGroup(V.additive),
+    parents = Seq.empty,
+
+    "left associative scalar" → forAll { (r: A, s: A, v: V) =>
+      // TODO compiler crash if variable 'w' is replaced by its value
+      val w = r *: s *: v
+      w === ((r * s) *: v)
+    },
+    "left scalar distributes over vector" → forAll((r: A, v: V, w: V) =>
+      (r *: (v + w)) === ((r *: v) + (r *: w))
+    ),
+    "left vector distributes over scalar" → forAll((r: A, s: A, v: V) =>
+      ((r + s) *: v) === ((r *: v) + (s *: v))
+    ),
+    "right associative scalar" → forAll { (r: A, s: A, v: V) =>
+      // TODO compiler crash if variable 'w' is replaced by its value
+      val w = v :* r :* s
+      w === (v :* (r * s))
+    },
+    "right scalar distributes over vector" → forAll((r: A, v: V, w: V) =>
+      ((v + w) :* r) === ((v :* r) + (w :* r))
+    ),
+    "right vector distributes over scalar" → forAll((r: A, s: A, v: V) =>
+      (v :* (r + s)) === ((v :* r) + (v :* s))
+    ),
+    "commutative scalar action" -> forAll((r: A, v: V) =>
+      r *: v === v :* r
+    )
   )
 
   def vectorSpace(implicit V: VectorSpace[V, A]) = new SpaceProperties(

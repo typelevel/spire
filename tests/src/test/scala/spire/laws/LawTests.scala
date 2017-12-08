@@ -75,7 +75,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Array[Int]",         VectorSpaceLaws[Array[Int], Int].module)
   checkAll("Array[VectorSpace]", VectorSpaceLaws[Array[Rational], Rational].vectorSpace)
 
-  checkAll("Map[String,Int]",      VectorSpaceLaws[Map[String,Int], Int].module)
+  checkAll("Map[String,Int]",      VectorSpaceLaws[Map[String,Int], Int].leftModule)
   checkAll("Map[String,Rational]", VectorSpaceLaws[Map[String,Rational], Rational].vectorSpace)
 
   val max = NormedVectorSpace.max[Rational, List]

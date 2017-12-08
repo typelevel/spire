@@ -209,6 +209,18 @@ trait DistField[A] extends DistEuclideanRing[A] with Field[Dist[A]] {
   override def euclideanFunction(x: Dist[A]): BigInt = sys.error("euclideanFunction is not defined, as Dist is a monad, and euclideanFunction should return Dist[BigInt]")
 }
 
+trait DistLeftModule[V, K] extends LeftModule[Dist[V], Dist[K]] {
+  implicit def alg: LeftModule[V, K]
+
+  def scalar: Rng[Dist[K]] = Dist.rng(alg.scalar)
+  def zero: Dist[V] = Dist.constant(alg.zero)
+  def plus(x: Dist[V], y: Dist[V]): Dist[V] = new DistFromGen(g => x(g) + y(g))
+  def negate(x: Dist[V]): Dist[V] = new DistFromGen(g => -x(g))
+  override def minus(x: Dist[V], y: Dist[V]): Dist[V] = new DistFromGen(g => x(g) - y(g))
+  def timesl(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => k(g) *: v(g))
+
+}
+
 trait DistModule[V, K] extends Module[Dist[V], Dist[K]] {
   implicit def alg: Module[V, K]
 
