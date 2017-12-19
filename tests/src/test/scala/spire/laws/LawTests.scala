@@ -66,11 +66,14 @@ class LawTests extends FunSuite with Discipline {
   // Testing all A <: Seq is redundant, as we treat them uniformly via.
   // iterators and CanBuildFroms. So, presuming the Scala std lib is tested,
   // testing just List and Vector should suffice for us.
-
   checkAll("List[Int]",        VectorSpaceLaws[List[Int], Int].module)
   checkAll("Vector[Int]",      VectorSpaceLaws[Vector[Int], Int].module)
   checkAll("List[Rational]",   VectorSpaceLaws[List[Rational], Rational].vectorSpace)
   checkAll("Vector[Rational]", VectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
+
+  checkAll("Vector[Complex[Int]]", VectorSpaceLaws[Vector[Complex[Int]], Complex[Int]].leftModule)
+  checkAll("Complex[Int]", VectorSpaceLaws[Complex[Int], Complex[Int]].bimodule)
+  checkAll("Int", VectorSpaceLaws[Int, Int].module)
 
   checkAll("Array[Int]",         VectorSpaceLaws[Array[Int], Int].module)
   checkAll("Array[VectorSpace]", VectorSpaceLaws[Array[Rational], Rational].vectorSpace)

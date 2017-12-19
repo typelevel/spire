@@ -33,28 +33,6 @@ trait VectorSpaceLaws[V, A] extends Laws {
     vl = _.abGroup(V.additive),
     parents = Seq.empty,
 
-    "associative scalar" → forAll { (r: A, s: A, v: V) =>
-      // TODO compiler crash if variable 'w' is replaced by its value
-      val w = r *: s *: v
-      w === ((r * s) *: v)
-    },
-    "scalar distributes over vector" → forAll((r: A, v: V, w: V) =>
-      (r *: (v + w)) === ((r *: v) + (r *: w))
-    ),
-    "vector distributes over scalar" → forAll((r: A, s: A, v: V) =>
-      ((r + s) *: v) === ((r *: v) + (s *: v))
-    )/*,
-    "scalar identity is identity" → forAll((v: V) =>
-      (V.scalar.one *: v) === v
-    )*/
-  )
-
-  def module(implicit V: Module[V, A]) = new SpaceProperties(
-    name = "module",
-    sl = _.ring(V.scalar),
-    vl = _.abGroup(V.additive),
-    parents = Seq.empty,
-
     "left associative scalar" → forAll { (r: A, s: A, v: V) =>
       // TODO compiler crash if variable 'w' is replaced by its value
       val w = r *: s *: v
@@ -65,18 +43,53 @@ trait VectorSpaceLaws[V, A] extends Laws {
     ),
     "left vector distributes over scalar" → forAll((r: A, s: A, v: V) =>
       ((r + s) *: v) === ((r *: v) + (s *: v))
-    ),
+    )/*,
+    "scalar identity is identity" → forAll((v: V) =>
+      (V.scalar.one *: v) === v
+    )*/
+  )
+
+  def rightModule(implicit V: RightModule[V, A]) = {
+    // TODO: Get rid of this special scoped implicit
+    implicit def scalarR(implicit V: RightModule[V, A]): Rng[A] = V.scalar
+    new SpaceProperties(
+    name = "rightModule",
+    sl = _.rng(V.scalar),
+    vl = _.abGroup(V.additive),
+    parents = Seq.empty,
+
     "right associative scalar" → forAll { (r: A, s: A, v: V) =>
       // TODO compiler crash if variable 'w' is replaced by its value
       val w = v :* r :* s
-      w === (v :* (r * s))
+      val rs = r * s
+      w === (v :* rs)
     },
     "right scalar distributes over vector" → forAll((r: A, v: V, w: V) =>
       ((v + w) :* r) === ((v :* r) + (w :* r))
     ),
     "right vector distributes over scalar" → forAll((r: A, s: A, v: V) =>
       (v :* (r + s)) === ((v :* r) + (v :* s))
-    ),
+    )
+  )
+  }
+
+  def bimodule(implicit V: Bimodule[V, A]) = new SpaceProperties(
+    name = "bimodule",
+    sl = _.rng(V.scalar),
+    vl = _.abGroup(V.additive),
+    parents = Seq(leftModule, rightModule),
+
+    "left and right actions consistent" -> forAll((r: A, s: A, v: V) =>
+      (r *: (v :* s)) === ((r *: v) :* s)
+    )
+  )
+
+  def module(implicit V: Module[V, A]) = new SpaceProperties(
+    name = "module",
+    sl = _.ring(V.scalar),
+    vl = _.abGroup(V.additive),
+    parents = Seq(bimodule),
+
     "commutative scalar action" -> forAll((r: A, v: V) =>
       r *: v === v :* r
     )
