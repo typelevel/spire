@@ -41,5 +41,9 @@ class PackageTest extends FunSuite {
     assert(hypot(4.0, 3.0) == 5.0)
     // and similarly against overflow
     assert(hypot((4e20).toFloat, (3e20).toFloat) == 5e20.toFloat)
+    // check against division by zero
+    assert(hypot(4.0, 0.0) == 4.0)
+    assert(hypot(0.0, 4.0) == 4.0)
+    assert(hypot(0.0, 0.0) == 0.0)
   }
 }
