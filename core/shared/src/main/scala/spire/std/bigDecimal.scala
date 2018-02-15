@@ -49,7 +49,18 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
         approxSqrt(x / Double.MaxValue) * BigDecimal(Math.sqrt(Double.MaxValue), x.mc)
 
     @tailrec def loop(x: BigDecimal, y: BigDecimal): BigDecimal =
-      if (x == y) y else loop(y, ((n / y) + y) / two)
+      if (x == y)
+        y
+      else {
+        val y2 = ((n / y) + y) / two
+        if (y2 <= y)
+          y
+        else
+          loop(
+            y,
+            y2
+          )
+      }
 
     loop(BigDecimal(0, n.mc), approxSqrt(n))
   }
