@@ -1,7 +1,6 @@
 package spire.math
 
 import spire.algebra.DivisionRing
-import spire.syntax.ring._
 import org.scalatest.FunSuite
 
 class QuaternionTest extends FunSuite {

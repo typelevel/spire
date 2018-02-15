@@ -9,5 +9,5 @@ addSbtPlugin("org.scoverage"       % "sbt-scoverage"         % "1.5.0")
 addSbtPlugin("org.scalastyle"     %% "scalastyle-sbt-plugin" % "0.7.0")
 addSbtPlugin("com.typesafe.sbt"    % "sbt-git"               % "0.8.4")
 addSbtPlugin("org.xerial.sbt"      % "sbt-sonatype"          % "1.1")
-addSbtPlugin("org.scala-js"        % "sbt-scalajs"           % "0.6.14")
+addSbtPlugin("org.scala-js"        % "sbt-scalajs"           % "0.6.22")
 libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.7.12"

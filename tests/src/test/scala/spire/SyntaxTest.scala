@@ -477,7 +477,7 @@ class PartialOrderSyntaxTest extends SpireProperties {
       import spire.syntax.std.seq._
       val seq = posSeq.map(_.x)
       val result = seq.pmax(IntDivisibility).toSet
-      result shouldBe Searching.minimalElements(seq)(IntDivisibility.reverse).toSet
+      result shouldBe Searching.minimalElements(seq)(PartialOrder.reverse(IntDivisibility)).toSet
       result shouldBe seq.filter(i => isMaximal(seq, i)).toSet
     }
   }

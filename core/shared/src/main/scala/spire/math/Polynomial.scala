@@ -478,7 +478,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
       foreach { (e, c) => bldr += Term(c, e) }
 
       val ts = bldr.result()
-      QuickSort.sort(ts)(Order[Term[C]].reverse, implicitly[ClassTag[Term[C]]])
+      QuickSort.sort(ts)(Order.reverse(Order[Term[C]]), implicitly[ClassTag[Term[C]]])
       val s = ts.mkString
       "(" + (if (s.take(3) == " - ") "-" + s.drop(3) else s.drop(3)) + ")"
     }
