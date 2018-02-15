@@ -404,8 +404,8 @@ package object math {
     (implicit f: Field[A], n: NRoot[A], s: Signed[A]): A = {
     import spire.implicits._
     def abs(n: A): A = if (n < f.zero) -n else n
-    if (x == f.zero) y
-    else if (y == f.zero) x
+    if (x == f.zero) abs(y)
+    else if (y == f.zero) abs(x)
     else if (x > y) abs(x) * (1 + (y/x)**2).sqrt
     else abs(y) * (1 + (x/y)**2).sqrt
   }
