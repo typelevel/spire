@@ -17,7 +17,7 @@ class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
 
   def complex1(name: String)(f: C => Unit) =
     property(name) {
-      forAll(minSuccessful(500)) { (rx: Int, ix: Int) =>
+      forAll(minSuccessful(1000)) { (rx: Int, ix: Int) =>
         f(Complex(BigDecimal(rx), BigDecimal(ix)))
       }
     }
@@ -39,7 +39,7 @@ class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
       if (x == y)
         x shouldBe y
       else
-        (log(x) - log(y)).abs should be <= threshold
+        log(x / y).abs should be <= threshold
     }
 
   complex1("x + 0 == x") { x: C => x + zero shouldBe x }
@@ -58,14 +58,16 @@ class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
     logNear(x.sqrt.pow(2), x)
   }
 
-  complex1("x.pow(2).sqrt = x") { x: C ⇒
+  // use x*x instead of x.pow(2) because of rounding issues with the latter resulting in some brittleness about whether
+  // a subsequent sqrt ends up in the first or fourth quadrants
+  complex1("(x*x).sqrt = x") { x: C ⇒
     implicit val threshold = BigDecimal(3e-9)  // 1+110201870i has log-error-ratio 2.4e-9
     // Complex.sqrt returns the root with non-negative real value (and +i in the case of -1); adjust the "expected" RHS
     // accordingly
-    if (x.real.signum < 0)
-      logNear(x.pow(2).sqrt, -x)
+    if (x.real.signum < 0 || (x.real.signum == 0 && x.imag.signum < 0))
+      logNear((x*x).sqrt, -x)
     else
-      logNear(x.pow(2).sqrt, x)
+      logNear((x*x).sqrt, x)
   }
 
   complex1("x.nroot(2).pow(2) = x") { x: C ⇒
