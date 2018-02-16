@@ -209,6 +209,12 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   }
 
   property("p.toDense.toSparse = p") {
+    // this used to create an invalid polynomial
+    val t = Term(Rational(2), 1)  // 2x
+    val p = Polynomial(Seq(t, -t))
+    assert(p.isZero)
+    p.toDense.toSparse shouldBe p
+
     forAll { (p: PolySparse[Rational]) =>
       p.toDense.toSparse shouldBe p
     }
