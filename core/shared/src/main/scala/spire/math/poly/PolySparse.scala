@@ -263,8 +263,10 @@ object PolySparse {
         val e0 = exp(j0)
         val c0 = coeff(j0)
         if (e != e0) {
-          expBldr += e
-          coeffBldr += c
+          if (!c.isZero) {
+            expBldr += e
+            coeffBldr += c
+          }
           c = c0
         } else {
           c += c0
@@ -273,8 +275,10 @@ object PolySparse {
         j = j0
         i += 1
       }
-      expBldr += e
-      coeffBldr += c
+      if (!c.isZero) {
+        expBldr += e
+        coeffBldr += c
+      }
       val poly = PolySparse(expBldr.result(), coeffBldr.result())
       poly
     }

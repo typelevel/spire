@@ -274,6 +274,11 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 
 class PolynomialTest extends FunSuite {
 
+  test("Polynomial(List(Term(-1, 4), List(1, 4))).toSparse should be equal to Polynomial.zero") {
+    val ts = Term(r"-1", 4) :: Term(r"1", 4) :: Nil
+    assert(Polynomial(ts).toSparse == Polynomial.zero[Rational])
+  }
+
   test("Polynomial(List(Term(0, 0), Term(0, 0))) should not throw") {
     val ts = Term(r"0", 0) :: Term(r"0", 0) :: Nil
     assert(Polynomial(ts) == Polynomial.zero[Rational])
