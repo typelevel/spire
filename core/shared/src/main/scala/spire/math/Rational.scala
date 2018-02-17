@@ -403,11 +403,11 @@ object Rational extends RationalInstances {
     def denominator: SafeLong = SafeLong(d)
 
     def numeratorAsLong: Long = n
-    def numeratorIsValidLong = true
-    def numeratorAbsIsValidLong = n != Long.MinValue
+    def numeratorIsValidLong: Boolean = true
+    def numeratorAbsIsValidLong: Boolean = n != Long.MinValue
     def denominatorAsLong: Long = d
-    def denominatorIsValidLong = true
-    def denominatorAbsIsValidLong = d != Long.MinValue
+    def denominatorIsValidLong: Boolean = true
+    def denominatorAbsIsValidLong: Boolean = d != Long.MinValue
 
     def reciprocal: Rational =
       if (n == 0L) throw new ArithmeticException("reciprocal called on 0/1")
@@ -859,8 +859,8 @@ private[math] trait RationalApproximateNRoot extends NRoot[Rational] {
 }
 
 private[math] trait RationalIsField extends Field[Rational] {
-  override def gcd(x: Rational, y: Rational)(implicit ev: Eq[Rational]) = x.gcd(y)
-  override def lcm(x: Rational, y: Rational)(implicit ev: Eq[Rational]) = x.lcm(y)
+  override def gcd(x: Rational, y: Rational)(implicit ev: Eq[Rational]): Rational = x.gcd(y)
+  override def lcm(x: Rational, y: Rational)(implicit ev: Eq[Rational]): Rational = x.lcm(y)
   override def minus(a:Rational, b:Rational): Rational = a - b
   def negate(a:Rational): Rational = -a
   def one: Rational = Rational.one

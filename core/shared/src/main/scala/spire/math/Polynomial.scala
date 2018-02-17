@@ -18,7 +18,7 @@ import spire.syntax.std.seq._
  * exponents given by Int values. Some operations require more precise
  * algebraic structures, such as `GCDRing`,  `EuclideanRing` or `Field`
  * to be in scope.
- *  
+ *
  */
 
 object Polynomial extends PolynomialInstances {

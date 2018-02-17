@@ -15,12 +15,12 @@ trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   override def fromInt(n: Int): BigInt = BigInt(n)
 
   def euclideanFunction(a:BigInt): BigInt = a.abs
-  def quot(a:BigInt, b:BigInt) = a / b
-  def mod(a:BigInt, b:BigInt) = a % b
-  override def quotmod(a:BigInt, b:BigInt) = a /% b
+  def quot(a:BigInt, b:BigInt): BigInt = a / b
+  def mod(a:BigInt, b:BigInt): BigInt = a % b
+  override def quotmod(a:BigInt, b:BigInt): (BigInt, BigInt) = a /% b
 
-  override def lcm(a:BigInt, b:BigInt)(implicit ev: Eq[BigInt]) = if (a.signum == 0 || b.signum == 0) zero else (a / a.gcd(b)) * b
-  override def gcd(a:BigInt, b:BigInt)(implicit ev: Eq[BigInt]) = a.gcd(b)
+  override def lcm(a:BigInt, b:BigInt)(implicit ev: Eq[BigInt]): BigInt = if (a.signum == 0 || b.signum == 0) zero else (a / a.gcd(b)) * b
+  override def gcd(a:BigInt, b:BigInt)(implicit ev: Eq[BigInt]): BigInt = a.gcd(b)
 }
 
 // This is not included in the *Instances trait!

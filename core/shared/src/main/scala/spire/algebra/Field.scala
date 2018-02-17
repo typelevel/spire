@@ -4,14 +4,14 @@ package algebra
 /** Field type class. While algebra already provides one, we provide one in Spire
   * that integrates with the commutative ring hierarchy, in particular `GCDRing`
   * and `EuclideanRing`.
-  * 
+  *
   * On a field, all nonzero elements are invertible, so the remainder of the
   * division is always 0. The Euclidean function can take an arbitrary value on
   * nonzero elements (it is undefined for zero); for compatibility with the degree
   * of polynomials, we use the constant 0.
   *
   * The GCD and LCM are defined up to a unit; on a field, it means that either the GCD or LCM
-  * can be fixed arbitrarily. Some conventions with consistent defaults are provided in the 
+  * can be fixed arbitrarily. Some conventions with consistent defaults are provided in the
   * spire.algebra.Field companion object.
   */
 trait Field[@sp(Int, Long, Float, Double) A] extends Any with AlgebraField[A] with EuclideanRing[A] {
