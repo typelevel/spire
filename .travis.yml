@@ -3,14 +3,10 @@ language: scala
 scala:
   - 2.10.6
   - 2.11.8
+  - 2.12.0
 
 jdk:
-  - oraclejdk7
-
-matrix:
-  include:
-  - scala: 2.12.0
-    jdk: oraclejdk8
+  - oraclejdk8
 
 cache:
   directories:
@@ -25,7 +21,6 @@ after_success:
 
 cache:
   directories:
-  - $HOME/.sbt/0.13/dependency
   - $HOME/.sbt/boot/scala*
   - $HOME/.sbt/launchers
   - $HOME/.ivy2/cache

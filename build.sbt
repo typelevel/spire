@@ -1,7 +1,3 @@
-import sbtbuildinfo.Plugin._
-import sbtunidoc.{Plugin => UnidocPlugin}
-import sbtunidoc.Plugin.UnidocKeys._
-import pl.project13.scala.sbt.SbtJmh
 import ReleaseTransformations._
 
 lazy val scalaVersions: Map[String, String] = Map("2.10" -> "2.10.6", "2.11" -> "2.11.8", "2.12" -> "2.12.1")
@@ -25,6 +21,7 @@ lazy val spire = project.in(file("."))
   .settings(spireSettings)
   .settings(unidocSettings)
   .settings(noPublishSettings)
+  .enablePlugins(ScalaUnidocPlugin)
   .aggregate(spireJVM, spireJS)
   .dependsOn(spireJVM, spireJS)
 
@@ -33,6 +30,7 @@ lazy val spireJVM = project.in(file(".spireJVM"))
   .settings(spireSettings)
   .settings(unidocSettings)
   .settings(noPublishSettings)
+  .enablePlugins(ScalaUnidocPlugin)
   .aggregate(macrosJVM, coreJVM, extrasJVM, examples, lawsJVM, testsJVM, benchmark)
   .dependsOn(macrosJVM, coreJVM, extrasJVM, examples, lawsJVM, testsJVM, benchmark)
 
@@ -41,6 +39,7 @@ lazy val spireJS = project.in(file(".spireJS"))
   .settings(spireSettings)
   .settings(unidocSettings)
   .settings(noPublishSettings)
+  .enablePlugins(ScalaUnidocPlugin)
   .aggregate(macrosJS, coreJS, extrasJS, lawsJS, testsJS)
   .dependsOn(macrosJS, coreJS, extrasJS, lawsJS, testsJS)
   .enablePlugins(ScalaJSPlugin)
@@ -61,8 +60,8 @@ lazy val core = crossProject
   .settings(moduleName := "spire")
   .settings(spireSettings:_*)
   .settings(coreSettings:_*)
-  .settings(buildInfoSettings:_*)
   .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
   .dependsOn(macros)
@@ -74,8 +73,8 @@ lazy val extras = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-extras")
   .settings(spireSettings:_*)
   .settings(extrasSettings:_*)
-  .settings(buildInfoSettings:_*)
   .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
   .dependsOn(core)
@@ -204,9 +203,9 @@ lazy val benchmark = project
 lazy val benchmarkJmh: Project = project.in(file("benchmark-jmh"))
   .settings(moduleName := "spire-benchmark-jmh")
   .settings(spireSettings)
-  .settings(SbtJmh.jmhSettings)
   .settings(noPublishSettings)
   .settings(commonJvmSettings)
+  .enablePlugins(JmhPlugin)
   .dependsOn(coreJVM, extrasJVM, benchmark)
 
 // General settings
@@ -314,7 +313,6 @@ lazy val benchmarkSettings = Seq(
 )
 
 lazy val coreSettings = Seq(
-  sourceGenerators in Compile += buildInfo.taskValue,
   buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
   buildInfoPackage := "spire",
   sourceGenerators in Compile += (genProductTypes in Compile).taskValue,
@@ -347,7 +345,7 @@ lazy val scalaTestSettings = Seq(
 
 lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
 
-lazy val unidocSettings = UnidocPlugin.unidocSettings ++ Seq(
+lazy val unidocSettings = Seq(
   unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, testsJVM)
 )
 
@@ -360,8 +358,8 @@ lazy val unidocSettings = UnidocPlugin.unidocSettings ++ Seq(
 addCommandAlias("gitSnapshots", ";set version in ThisBuild := git.gitDescribedVersion.value.get + \"-SNAPSHOT\"")
 
 lazy val noPublishSettings = Seq(
-  publish := (),
-  publishLocal := (),
+  publish := (()),
+  publishLocal := (()),
   publishArtifact := false
 )
 
@@ -441,7 +439,7 @@ lazy val sharedReleaseProcess = Seq(
     publishArtifacts,
     setNextVersion,
     commitNextVersion,
-    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+    releaseStepCommand("sonatypeReleaseAll"),
     pushChanges)
 )
 
