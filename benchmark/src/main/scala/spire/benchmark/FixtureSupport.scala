@@ -29,7 +29,7 @@ trait FixtureSupport {
     layout match {
       case "random" =>
       case "sorted" => spire.math.Sorting.sort(data)(order, ct)
-      case "reversed" => spire.math.Sorting.sort(data)(order.reverse, ct)
+      case "reversed" => spire.math.Sorting.sort(data)(Order.reverse(order), ct)
       case _ => sys.error(s"unknown layout: $layout")
     }
     data
