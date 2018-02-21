@@ -45,5 +45,11 @@ class PackageTest extends FunSuite {
     assert(hypot(4.0, 0.0) == 4.0)
     assert(hypot(0.0, 4.0) == 4.0)
     assert(hypot(0.0, 0.0) == 0.0)
+    // verify least-surprising behavior for negative inputs (relied on by Complex.abs!)
+    assert(hypot(-3.0,  4.0) == 5.0)
+    assert(hypot(-3.0, -4.0) == 5.0)
+    assert(hypot( 3.0, -4.0) == 5.0)
+    assert(hypot( 0.0, -4.0) == 4.0)
+    assert(hypot(-4.0,  0.0) == 4.0)
   }
 }
