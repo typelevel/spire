@@ -351,12 +351,12 @@ final class BoolOps[A: Bool](lhs:A) {
 }
 
 final class ModuleOps[V](x: V) {
-  def *:[F](lhs:F)(implicit ev: Module[V, F]): V = macro Ops.rbinopWithEv[F, Module[V, F], V]
-  def :*[F](rhs:F)(implicit ev: Module[V, F]): V = macro Ops.binopWithEv[F, Module[V, F], V]
+  def *:[F](lhs:F)(implicit ev: LeftModule[V, F]): V = macro Ops.rbinopWithEv[F, LeftModule[V, F], V]
+  def :*[F](rhs:F)(implicit ev: RightModule[V, F]): V = macro Ops.binopWithEv[F, RightModule[V, F], V]
 
   // TODO: Are macros worth it here?
-  def *:[F](lhs:Int)(implicit ev: Module[V, F], F: Ring[F]): V = ev.timesl(F.fromInt(lhs), x)
-  def :*[F](rhs:Int)(implicit ev: Module[V, F], F: Ring[F]): V = ev.timesr(x, F.fromInt(rhs))
+  def *:[F](lhs:Int)(implicit ev: LeftModule[V, F], F: Ring[F]): V = ev.timesl(F.fromInt(lhs), x)
+  def :*[F](rhs:Int)(implicit ev: RightModule[V, F], F: Ring[F]): V = ev.timesr(x, F.fromInt(rhs))
 }
 
 final class ModuleUnboundOps[F](lhs: F)(implicit ev: Module[_, F]) {

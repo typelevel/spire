@@ -176,6 +176,11 @@ trait DistRing[A] extends DistRng[A] with Ring[Dist[A]] {
   def one: Dist[A] = Dist.constant(alg.one)
 }
 
+trait DistCRing[A] extends DistRng[A] with CRing[Dist[A]] {
+  def alg: CRing[A]
+  def one: Dist[A] = Dist.constant(alg.one)
+}
+
 trait DistGCDRing[A] extends DistRing[A] with GCDRing[Dist[A]] {
   implicit def eqA: Eq[A]
   def alg: GCDRing[A]
@@ -204,8 +209,8 @@ trait DistField[A] extends DistEuclideanRing[A] with Field[Dist[A]] {
   override def euclideanFunction(x: Dist[A]): BigInt = sys.error("euclideanFunction is not defined, as Dist is a monad, and euclideanFunction should return Dist[BigInt]")
 }
 
-trait DistModule[V, K] extends Module[Dist[V], Dist[K]] {
-  implicit def alg: Module[V, K]
+trait DistLeftModule[V, K] extends LeftModule[Dist[V], Dist[K]] {
+  implicit def alg: LeftModule[V, K]
 
   def scalar: Rng[Dist[K]] = Dist.rng(alg.scalar)
   def zero: Dist[V] = Dist.constant(alg.zero)
@@ -213,8 +218,22 @@ trait DistModule[V, K] extends Module[Dist[V], Dist[K]] {
   def negate(x: Dist[V]): Dist[V] = new DistFromGen(g => -x(g))
   override def minus(x: Dist[V], y: Dist[V]): Dist[V] = new DistFromGen(g => x(g) - y(g))
   def timesl(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => k(g) *: v(g))
-  def timesr(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => v(g) :* k(g))
+
 }
+
+trait DistModule[V, K] extends Module[Dist[V], Dist[K]] {
+  implicit def alg: Module[V, K]
+
+  def scalar: CRing[Dist[K]] = Dist.cring(alg.scalar)
+  def zero: Dist[V] = Dist.constant(alg.zero)
+  def plus(x: Dist[V], y: Dist[V]): Dist[V] = new DistFromGen(g => x(g) + y(g))
+  def negate(x: Dist[V]): Dist[V] = new DistFromGen(g => -x(g))
+  override def minus(x: Dist[V], y: Dist[V]): Dist[V] = new DistFromGen(g => x(g) - y(g))
+  def timesl(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => k(g) *: v(g))
+  def timesr(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => v(g) :* k(g))
+
+}
+
 
 trait DistVectorSpace[V, K] extends DistModule[V, K] with VectorSpace[Dist[V], Dist[K]] {
   implicit def alg: VectorSpace[V, K]
@@ -425,21 +444,24 @@ trait DistInstances2 extends DistInstances1 {
 }
 
 trait DistInstances3 extends DistInstances2 {
+  implicit def cring[A](implicit ev: CRing[A]): CRing[Dist[A]]=
+    new DistCRing[A] { def alg = ev }
+}
+
+trait DistInstances4 extends DistInstances3 {
   implicit def gcdRing[A](implicit ev1: Eq[A], ev2: GCDRing[A]): GCDRing[Dist[A]] =
     new DistGCDRing[A] { def alg = ev2; def eqA = ev1  }
 }
 
-trait DistInstances4 extends DistInstances3 {
+trait DistInstances5 extends DistInstances4 {
   implicit def euclideanRing[A](implicit ev1: Eq[A], ev2: EuclideanRing[A]): EuclideanRing[Dist[A]] =
     new DistEuclideanRing[A] { def alg = ev2; def eqA = ev1 }
 }
 
-trait DistInstances5 extends DistInstances4 {
+trait DistInstances6 extends DistInstances5 {
   implicit def field[A](implicit ev1: Eq[A], ev2: Field[A]): Field[Dist[A]] =
     new DistField[A] { def alg = ev2; def eqA = ev1 }
-}
 
-trait DistInstances6 extends DistInstances5 {
   implicit def module[V,K](implicit ev1: Eq[K], ev2: Module[V,K]): Module[Dist[V],Dist[K]] =
     new DistModule[V,K] { def alg = ev2; def eqK = ev1 }
 }
