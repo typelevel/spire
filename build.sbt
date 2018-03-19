@@ -1,12 +1,13 @@
 import ReleaseTransformations._
 
-lazy val scalaVersions: Map[String, String] = Map("2.10" -> "2.10.6", "2.11" -> "2.11.8", "2.12" -> "2.12.1")
+lazy val scalaVersions: Map[String, String] =
+  Map("2.10" -> "2.10.7", "2.11" -> "2.11.12", "2.12" -> "2.12.4")
 
-lazy val scalaCheckVersion = "1.13.4"
-lazy val scalaTestVersion = "3.0.0"
-lazy val shapelessVersion = "2.3.2"
-lazy val disciplineVersion = "0.7.2"
-lazy val machinistVersion = "0.6.1"
+lazy val scalaCheckVersion = "1.13.5"
+lazy val scalaTestVersion = "3.0.5"
+lazy val shapelessVersion = "2.3.3"
+lazy val disciplineVersion = "0.8"
+lazy val machinistVersion = "0.6.4"
 lazy val algebraVersion = "1.0.0"
 
 lazy val apfloatVersion = "1.8.2"
