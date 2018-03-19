@@ -1,14 +1,23 @@
 package spire
 package util
 
+import cats.kernel.Eq
+
 object Opt {
   def apply[A](a: A): Opt[A] = new Opt(a)
 
   def empty[A]: Opt[A] = new Opt[A](null.asInstanceOf[A])
 
-  // name-based extractor, cf.
-  // http://hseeberger.github.io/blog/2013/10/04/name-based-extractors-in-scala-2-dot-11/
+  // this is a name-based extractor. instead of returning Option[_] it
+  // is free to return any type with .isEmpty and .get, i.e. Opt[_].
+  //
+  // https://hseeberger.wordpress.com/2013/10/04/name-based-extractors-in-scala-2-11/
   def unapply[A](n: Opt[A]): Opt[A] = n
+
+  implicit def Eq[A](implicit ev: Eq[A]): Eq[Opt[A]] = new Eq[Opt[A]] {
+    def eqv(x: Opt[A], y: Opt[A]): Boolean =
+      if (x.isEmpty) y.isEmpty else ev.eqv(x.ref, y.ref)
+  }
 }
 
 class Opt[+A](val ref: A) extends AnyVal {
