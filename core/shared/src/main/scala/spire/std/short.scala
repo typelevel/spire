@@ -1,8 +1,9 @@
 package spire
 package std
 
-import spire.algebra.{Eq, EuclideanRing, IsIntegral, NRoot, Order, Signed}
+import spire.algebra.{Eq, EuclideanRing, IsIntegral, NRoot, Order, Signed, TruncatedDivisionCRing}
 import spire.math.BitString
+import spire.util.Opt
 
 trait ShortIsEuclideanRing extends EuclideanRing[Short] {
   override def minus(a:Short, b:Short): Short = (a - b).toShort
@@ -55,12 +56,18 @@ trait ShortOrder extends Order[Short] {
   def compare(x: Short, y: Short): Int = java.lang.Integer.signum((x: Int) - (y: Int))
 }
 
-trait ShortIsSigned extends Signed[Short] {
-  override def signum(a: Short): Int = a
+trait ShortSigned extends Signed[Short] with ShortOrder {
+  override def signum(a: Short): Int = java.lang.Integer.signum(a)
   override def abs(a: Short): Short = (if (a < 0) -a else a).toShort
 }
 
-trait ShortIsReal extends IsIntegral[Short] with ShortOrder with ShortIsSigned {
+trait ShortTruncatedDivision extends TruncatedDivisionCRing[Short] with ShortSigned {
+  def toBigIntOpt(x: Short) = Opt(BigInt(x))
+  def tquot(x: Short, y: Short) = (x / y).toShort
+  def tmod(x: Short, y: Short) = (x % y).toShort
+}
+
+trait ShortIsReal extends IsIntegral[Short] with ShortTruncatedDivision {
   def toDouble(n: Short): Double = n.toDouble
   def toBigInt(n: Short): BigInt = BigInt(n)
 }
@@ -98,7 +105,7 @@ class ShortIsBitString extends BitString[Short] with Serializable {
 }
 
 @SerialVersionUID(0L)
-class ShortAlgebra extends ShortIsEuclideanRing with ShortIsReal with Serializable
+class ShortAlgebra extends ShortIsEuclideanRing with ShortIsReal with ShortTruncatedDivision with Serializable
 
 trait ShortInstances {
   implicit final val ShortBitString = new ShortIsBitString

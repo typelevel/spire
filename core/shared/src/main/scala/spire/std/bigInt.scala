@@ -1,7 +1,8 @@
 package spire
 package std
 
-import spire.algebra.{Eq, EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed}
+import spire.algebra.{Eq, EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed, TruncatedDivisionCRing}
+import spire.util.Opt
 
 trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   override def minus(a:BigInt, b:BigInt): BigInt = a - b
@@ -60,12 +61,19 @@ trait BigIntOrder extends Order[BigInt] {
   def compare(x: BigInt, y: BigInt): Int = x.bigInteger.compareTo(y.bigInteger)
 }
 
-trait BigIntIsSigned extends Signed[BigInt] {
+trait BigIntSigned extends Signed[BigInt] with BigIntOrder {
   override def signum(a: BigInt): Int = a.signum
   override def abs(a: BigInt): BigInt = a.abs
 }
 
-trait BigIntIsReal extends IsIntegral[BigInt] with BigIntOrder with BigIntIsSigned with Serializable {
+trait BigIntTruncatedDivision extends TruncatedDivisionCRing[BigInt] with BigIntSigned {
+  def toBigIntOpt(x: BigInt): Opt[BigInt] = Opt(x)
+  def tquot(a:BigInt, b:BigInt): BigInt = a / b
+  def tmod(a:BigInt, b:BigInt): BigInt = a % b
+  override def tquotmod(a:BigInt, b:BigInt): (BigInt, BigInt) = a /% b
+}
+
+trait BigIntIsReal extends IsIntegral[BigInt] with BigIntTruncatedDivision with Serializable {
   def toDouble(n: BigInt): Double = n.toDouble
   def toBigInt(n: BigInt): BigInt = n
 }

@@ -3,8 +3,9 @@ package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import spire.algebra.{Field, Order, Trig, Signed}
+import spire.algebra.{Field, Trig, TruncatedDivisionCRing}
 import spire.syntax.nroot._
+import spire.util.Opt
 
 sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
@@ -159,9 +160,8 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   def /(y: Real): Real = x * y.reciprocal
 
-  /* TODO: move to TruncatedDivision
-  def %(y: Real): Real = (x, y) match {
-    case (Exact(nx), Exact(ny)) => Exact(nx % ny)
+  def t_%(y: Real): Real = (x, y) match {
+    case (Exact(nx), Exact(ny)) => Exact(nx t_% ny)
     case _ => Real({ p =>
       val d = x / y
       val s = d(2)
@@ -170,8 +170,8 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     })
   }
 
-  def /~(y: Real): Real = (x, y) match {
-    case (Exact(nx), Exact(ny)) => Exact(nx /~ ny)
+  def t_/~(y: Real): Real = (x, y) match {
+    case (Exact(nx), Exact(ny)) => Exact(nx t_/~ ny)
     case _ => Real({ p =>
       val d = x / y
       val s = d(2)
@@ -180,6 +180,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     })
   }
 
+  /* TODO: what to do with this definition of gcd/lcm?
   def gcd(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx gcd ny)
     case _ => Real({ p =>
@@ -558,7 +559,7 @@ trait RealInstances {
 @SerialVersionUID(0L)
 class RealAlgebra extends RealIsFractional
 
-trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Real] with Trig[Real] with Field.WithDefaultGCD[Real] {
+trait RealIsFractional extends Fractional[Real] with TruncatedDivisionCRing[Real] with Trig[Real] with Field.WithDefaultGCD[Real] {
   override def abs(x: Real): Real = x.abs
   override def signum(x: Real): Int = x.signum
 
@@ -572,12 +573,9 @@ trait RealIsFractional extends Fractional[Real] with Order[Real] with Signed[Rea
   override def minus(x: Real, y: Real): Real = x - y
   def times(x: Real, y: Real): Real = x * y
 
-  /* TODO: move to TruncatedDivision
-  def gcd(x: Real, y: Real): Real = x gcd y
-  def lcm(x: Real, y: Real): Real = x lcm y
-  def quot(x: Real, y: Real): Real = x /~ y
-  def mod(x: Real, y: Real): Real = x % y
-   */
+  def toBigIntOpt(x: Real): Opt[BigInt] = if (x.isWhole) Opt(x.toRational.toBigInt) else Opt.empty[BigInt]
+  def tquot(x: Real, y: Real) = x t_/~ y
+  def tmod(x: Real, y: Real) = x t_% y
 
   override def reciprocal(x: Real): Real = x.reciprocal
   def div(x: Real, y: Real): Real = x / y

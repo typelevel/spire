@@ -105,6 +105,44 @@ final class SignedOps[A:Signed](lhs: A) {
   def isSignNonNegative(): Boolean = macro Ops.unop[Boolean]
 }
 
+final class TruncatedDivisionOps[A:TruncatedDivision](lhs: A) {
+  def toBigIntOpt(): Opt[BigInt] = macro Ops.unop[Opt[BigInt]]
+  def t_/~(rhs: A): A = macro Ops.binop[A, A]
+  def t_%(rhs: A): A = macro Ops.binop[A, A]
+  def t_/%(rhs: A): (A, A) = macro Ops.binop[A, (A, A)]
+
+  def f_/~(rhs: A): A = macro Ops.binop[A, A]
+  def f_%(rhs: A): A = macro Ops.binop[A, A]
+  def f_/%(rhs: A): (A, A) = macro Ops.binop[A, (A, A)]
+}
+
+final class LiteralIntTruncatedDivisionOps(val lhs: Int) extends AnyVal {
+  def t_/~[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromInt(lhs), rhs)
+  def t_%[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromInt(lhs), rhs)
+  def t_/%[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.tquotmod(c.fromInt(lhs), rhs)
+  def f_/~[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromInt(lhs), rhs)
+  def f_%[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromInt(lhs), rhs)
+  def f_/%[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.fquotmod(c.fromInt(lhs), rhs)
+}
+
+final class LiteralLongTruncatedDivisionOps(val lhs: Long) extends AnyVal {
+  def t_/~[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromLong(lhs), rhs)
+  def t_%[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromLong(lhs), rhs)
+  def t_/%[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.tquotmod(c.fromLong(lhs), rhs)
+  def f_/~[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromLong(lhs), rhs)
+  def f_%[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromLong(lhs), rhs)
+  def f_/%[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.fquotmod(c.fromLong(lhs), rhs)
+}
+
+final class LiteralDoubleTruncatedDivisionOps(val lhs: Double) extends AnyVal {
+  def t_/~[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromDouble(lhs), rhs)
+  def t_%[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromDouble(lhs), rhs)
+  def t_/%[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.tquotmod(c.fromDouble(lhs), rhs)
+  def f_/~[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromDouble(lhs), rhs)
+  def f_%[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromDouble(lhs), rhs)
+  def f_/%[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.fquotmod(c.fromDouble(lhs), rhs)
+}
+
 final class SemigroupoidOps[A](lhs:A)(implicit ev:Semigroupoid[A]) {
   def |+|? (rhs: A): Opt[A] = macro Ops.binop[A, Opt[A]]
   def |+|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]

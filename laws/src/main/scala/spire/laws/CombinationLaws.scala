@@ -4,6 +4,8 @@ package laws
 import spire.algebra._
 import spire.implicits._
 
+import org.typelevel.discipline.Laws
+
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
 
@@ -17,14 +19,16 @@ object CombinationLaws {
 /** Contains laws that are obeying by combination of types, for example
   * various kinds of signed rings. 
   */
-trait CombinationLaws[A] extends BaseLaws[A] {
+trait CombinationLaws[A] extends Laws {
 
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
 
+  // copy of those in LimitedRangeLaws
+
   def signedAdditiveCMonoid(implicit signedA: Signed[A], additiveCMonoidA: AdditiveCMonoid[A]) = new DefaultRuleSet(
     name = "signedAdditiveCMonoid",
-    parent = Some(signed),
+    parent = None,
     "ordered group" → forAll { (x: A, y: A, z: A) =>
       (x <= y) ==> (x + z <= y + z)
     },
@@ -54,7 +58,6 @@ trait CombinationLaws[A] extends BaseLaws[A] {
       x.gcd(Ring[A].zero) === Signed[A].abs(x)
     }
   )
-
 }
 
 // vim: expandtab:ts=2:sw=2

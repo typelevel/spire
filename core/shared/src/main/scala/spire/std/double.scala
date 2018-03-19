@@ -1,8 +1,9 @@
 package spire
 package std
 
-import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
+import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig, TruncatedDivisionCRing}
 import spire.math.Rational
+import spire.util.Opt
 
 import java.lang.Math
 
@@ -17,11 +18,6 @@ trait DoubleIsField extends Field.WithDefaultGCD[Double] {
   def zero: Double = 0.0
 
   override def fromInt(n: Int): Double = n
-
-  /* TODO: move to TruncatedDivision
-  def quot(a:Double, b:Double): Double = (a - (a % b)) / b
-  def mod(a:Double, b:Double): Double = a % b
-   */
 
   override def fromDouble(n: Double): Double = n
   def div(a:Double, b:Double): Double = a / b
@@ -116,12 +112,18 @@ trait DoubleOrder extends Order[Double] {
   def compare(x: Double, y: Double): Int = java.lang.Double.compare(x, y)
 }
 
-trait DoubleIsSigned extends Signed[Double] {
+trait DoubleSigned extends Signed[Double] with DoubleOrder {
   override def signum(a: Double): Int = Math.signum(a).toInt
   override def abs(a: Double): Double = if (a < 0.0) -a else a
 }
 
-trait DoubleIsReal extends IsRational[Double] with DoubleOrder with DoubleIsSigned {
+trait DoubleTruncatedDivision extends TruncatedDivisionCRing[Double] with DoubleSigned {
+  def toBigIntOpt(a: Double): Opt[BigInt] = if (a.isWhole) Opt(BigDecimal(a).toBigInt) else Opt.empty[BigInt]
+  def tquot(a: Double, b: Double): Double = (a - (a % b)) / b
+  def tmod(a: Double, b: Double): Double = a % b
+}
+
+trait DoubleIsReal extends IsRational[Double] with DoubleTruncatedDivision {
   def toDouble(x: Double): Double = x
   def ceil(a:Double): Double = Math.ceil(a)
   def floor(a:Double): Double = Math.floor(a)
