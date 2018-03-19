@@ -52,6 +52,11 @@ trait OrderLaws[A] extends Laws {
     )
   )
 
+  def monomialOrder(implicit ord: math.poly.MonomialOrder, ev: A =:= math.poly.Monomial) = new OrderProperties(
+    name = "monomialOrder",
+    parent = Some(order(ord.asInstanceOf[Order[A]])) // authorized by `ev`
+  )
+
   class OrderProperties(
     name: String,
     parent: Option[OrderProperties],

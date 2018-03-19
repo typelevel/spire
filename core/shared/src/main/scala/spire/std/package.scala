@@ -20,6 +20,7 @@ package object std {
   object array extends ArrayInstances
   object seq extends SeqInstances
   object map extends MapInstances
+  object sortedMap extends SortedMapInstances
   object tuples extends ProductInstances
   object option extends OptionInstances
   object unit extends UnitInstances
