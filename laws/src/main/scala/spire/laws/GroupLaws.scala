@@ -85,7 +85,7 @@ trait GroupLaws[A] extends Laws {
   )
 
 
-  // additive groups
+  // additive groups, copy in LimitedRangeLaws
 
   def additiveSemigroup(implicit A: AdditiveSemigroup[A]) = new AdditiveProperties(
     base = semigroup(A.additive),

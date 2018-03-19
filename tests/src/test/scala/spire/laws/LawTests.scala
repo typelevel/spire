@@ -33,8 +33,14 @@ class LawTests extends FunSuite with Discipline {
   }
 
   // Float and Double fail these tests
-  checkAll("Int",        RingLaws[Int].cRing)
-  checkAll("Long",       RingLaws[Long].cRing)
+  checkAll("Byte",       LimitedRangeLaws[Byte].cRing)
+  checkAll("Byte",       LimitedRangeLaws[Byte].signedGCDRing)
+  checkAll("Short",      LimitedRangeLaws[Short].cRing)
+  checkAll("Short",      LimitedRangeLaws[Short].signedGCDRing)
+  checkAll("Int",        LimitedRangeLaws[Int].euclideanRing)
+  checkAll("Int",        LimitedRangeLaws[Int].signedGCDRing)
+  checkAll("Long",       LimitedRangeLaws[Long].euclideanRing)
+  checkAll("Long",       LimitedRangeLaws[Long].signedGCDRing)
   checkAll("BigInt",     RingLaws[BigInt].euclideanRing)
   checkAll("BigInt",     CombinationLaws[BigInt].signedGCDRing)
   checkAll("BigInteger", RingLaws[BigInteger].euclideanRing)
@@ -43,9 +49,15 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Rational",   CombinationLaws[BigInt].signedGCDRing)
   checkAll("Real",       RingLaws[Real].field)
   checkAll("UByte",      RingLaws[UByte].cRig)
+  checkAll("UByte",      LimitedRangeLaws[UByte].signedAdditiveCMonoid)
   checkAll("UShort",     RingLaws[UShort].cRig)
+  checkAll("UShort",     LimitedRangeLaws[UShort].signedAdditiveCMonoid)
   checkAll("UInt",       RingLaws[UInt].cRig)
+  checkAll("UInt",       LimitedRangeLaws[UInt].signedAdditiveCMonoid)
   checkAll("ULong",      RingLaws[ULong].cRig)
+  checkAll("ULong",      LimitedRangeLaws[ULong].signedAdditiveCMonoid)
+  checkAll("Natural",    RingLaws[Natural].cRig)
+  checkAll("Natural",    CombinationLaws[Natural].signedAdditiveCMonoid)
   checkAll("SafeLong",   RingLaws[SafeLong].euclideanRing)
   checkAll("SafeLong",   CombinationLaws[SafeLong].signedGCDRing)
 
