@@ -1,25 +1,18 @@
 package spire
 package util
 
-import spire.algebra.Eq
-import spire.syntax.eq._
-
-object Opt extends OptVersions {
+object Opt {
   def apply[A](a: A): Opt[A] = new Opt(a)
+
   def empty[A]: Opt[A] = new Opt[A](null.asInstanceOf[A])
 
-  implicit def Eq[A: Eq]: Eq[Opt[A]] = new Eq[Opt[A]] {
-    def eqv(x: Opt[A], y: Opt[A]): Boolean =
-      if (x.isEmpty) y.isEmpty else x.ref === y.ref
-  }
+  // name-based extractor, cf.
+  // http://hseeberger.github.io/blog/2013/10/04/name-based-extractors-in-scala-2-dot-11/
+  def unapply[A](n: Opt[A]): Opt[A] = n
 }
 
-class Opt[+A](val ref: A) extends OptVersions.Base {
-  def scala2_10hashCode: Int = ref.hashCode
-  def scala2_10equals(other: Any): Boolean = other match {
-    case that: Opt[_] => ref == that.ref
-    case _ => false
-  }
+class Opt[+A](val ref: A) extends AnyVal {
+
   def isDefined: Boolean = ref != null
   def nonEmpty: Boolean = ref != null
   def isEmpty: Boolean = ref == null

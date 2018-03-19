@@ -1,7 +1,7 @@
 import ReleaseTransformations._
 
 lazy val scalaVersions: Map[String, String] =
-  Map("2.10" -> "2.10.7", "2.11" -> "2.11.12", "2.12" -> "2.12.4")
+  Map("2.11" -> "2.11.12", "2.12" -> "2.12.4")
 
 lazy val scalaCheckVersion = "1.13.5"
 lazy val scalaTestVersion = "3.0.5"
@@ -45,6 +45,19 @@ lazy val spireJS = project.in(file(".spireJS"))
   .dependsOn(macrosJS, coreJS, extrasJS, lawsJS, testsJS)
   .enablePlugins(ScalaJSPlugin)
 
+lazy val platform = crossProject
+  .settings(moduleName := "spire-platform")
+  .settings(spireSettings:_*)
+  .settings(coreSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+  .dependsOn(macros, util)
+
+lazy val platformJVM = platform.jvm
+lazy val platformJS = platform.js
+
 lazy val macros = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-macros")
   .settings(spireSettings:_*)
@@ -57,7 +70,30 @@ lazy val macros = crossProject.crossType(CrossType.Pure)
 lazy val macrosJVM = macros.jvm
 lazy val macrosJS = macros.js
 
-lazy val core = crossProject
+lazy val data = crossProject.crossType(CrossType.Pure)
+  .settings(moduleName := "spire-data")
+  .settings(spireSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+
+lazy val dataJVM = data.jvm
+lazy val dataJS = data.js
+
+lazy val util = crossProject.crossType(CrossType.Pure)
+  .settings(moduleName := "spire-data")
+  .settings(spireSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+  .dependsOn(macros)
+
+lazy val utilJVM = util.jvm
+lazy val utilJS = util.js
+
+lazy val core = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire")
   .settings(spireSettings:_*)
   .settings(coreSettings:_*)
@@ -65,7 +101,7 @@ lazy val core = crossProject
   .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
-  .dependsOn(macros)
+  .dependsOn(macros, platform, util)
 
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
@@ -228,7 +264,7 @@ addCommandAlias("validate", ";validateJVM;validateJS")
 lazy val buildSettings = Seq(
   organization := "org.typelevel",
   scalaVersion := scalaVersions("2.12"),
-  crossScalaVersions := Seq(scalaVersions("2.10"), scalaVersions("2.11"), scalaVersions("2.12"))
+  crossScalaVersions := Seq(scalaVersions("2.11"), scalaVersions("2.12"))
 )
 
 lazy val commonSettings = Seq(
@@ -290,7 +326,7 @@ lazy val publishSettings = Seq(
 lazy val scoverageSettings = Seq(
   coverageMinimum := 40,
   coverageFailOnMinimum := false,
-  coverageHighlighting := scalaBinaryVersion.value != "2.10",
+  coverageHighlighting := true,
   coverageExcludedPackages := "spire\\.benchmark\\..*;spire\\.macros\\..*"
 )
 
@@ -388,19 +424,7 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
   }
 
 lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
-  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided",
-  libraryDependencies ++= {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      // if scala 2.11+ is used, quasiquotes are merged into scala-reflect
-      case Some((2, scalaMajor)) if scalaMajor >= 11 => Seq()
-      // in Scala 2.10, quasiquotes are provided by macro paradise
-      case Some((2, 10)) =>
-        Seq(
-          compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.patch),
-              "org.scalamacros" %% "quasiquotes" % "2.0.1" cross CrossVersion.binary
-        )
-    }
-  }
+  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided"
 )
 
 lazy val commonScalacOptions = Seq(
