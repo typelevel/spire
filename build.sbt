@@ -82,6 +82,14 @@ lazy val extras = crossProject.crossType(CrossType.Pure)
 lazy val extrasJVM = extras.jvm
 lazy val extrasJS = extras.js
 
+lazy val docs = project.in(file("docs"))
+  .dependsOn(macrosJVM, coreJVM, extrasJVM)
+  .settings(moduleName := "spire-docs")
+  .settings(spireSettings:_*)
+  .settings(noPublishSettings)
+  .enablePlugins(TutPlugin)
+  .settings(commonJvmSettings:_*)
+
 lazy val examples = project
   .settings(moduleName := "spire-examples")
   .settings(spireSettings)
