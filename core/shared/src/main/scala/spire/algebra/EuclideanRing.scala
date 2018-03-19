@@ -19,16 +19,20 @@ package algebra
  */
 trait EuclideanRing[@sp(Int, Long, Float, Double) A] extends Any with GCDRing[A] {
   def euclideanFunction(a: A): BigInt
-  def quot(a: A, b: A): A
-  def mod(a: A, b: A): A
-  def quotmod(a: A, b: A): (A, A) = (quot(a, b), mod(a, b))
+  def equot(a: A, b: A): A
+  def emod(a: A, b: A): A
+  def equotmod(a: A, b: A): (A, A) = (equot(a, b), emod(a, b))
 }
 
 trait EuclideanRingFunctions[R[T] <: EuclideanRing[T]] extends GCDRingFunctions[R] {
   def euclideanFunction[@sp(Int, Long, Float, Double) A](a: A)(implicit ev: R[A]): BigInt =
     ev.euclideanFunction(a)
-  def quot[@sp(Int, Long, Float, Double) A](a: A, b: A)(implicit ev: R[A]): A =
-    ev.quot(a, b)
+  def equot[@sp(Int, Long, Float, Double) A](a: A, b: A)(implicit ev: R[A]): A =
+    ev.equot(a, b)
+  def emod[@sp(Int, Long, Float, Double) A](a: A, b: A)(implicit ev: R[A]): A =
+    ev.emod(a, b)
+  def equotmod[@sp(Int, Long, Float, Double) A](a: A, b: A)(implicit ev: R[A]): (A, A) =
+    ev.equotmod(a, b)
 }
 
 object EuclideanRing extends EuclideanRingFunctions[EuclideanRing] {
@@ -36,14 +40,14 @@ object EuclideanRing extends EuclideanRingFunctions[EuclideanRing] {
   @inline final def apply[A](implicit e: EuclideanRing[A]): EuclideanRing[A] = e
 
   @tailrec final def euclid[@sp(Int, Long, Float, Double) A:Eq:EuclideanRing](a: A, b: A): A = {
-    if (EuclideanRing[A].isZero(b)) a else euclid(b, EuclideanRing[A].mod(a, b))
+    if (EuclideanRing[A].isZero(b)) a else euclid(b, EuclideanRing[A].emod(a, b))
   }
 
   trait WithEuclideanAlgorithm[@sp(Int, Long, Float, Double) A] extends Any with EuclideanRing[A] { self =>
     def gcd(a: A, b: A)(implicit ev: Eq[A]): A =
       EuclideanRing.euclid(a, b)(ev, self)
     def lcm(a: A, b: A)(implicit ev: Eq[A]): A =
-      if (isZero(a) || isZero(b)) zero else times(quot(a, gcd(a, b)), b)
+      if (isZero(a) || isZero(b)) zero else times(equot(a, gcd(a, b)), b)
   }
 
 }

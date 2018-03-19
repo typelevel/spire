@@ -110,15 +110,15 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
 
     property(s"$name p /~ 1 = p") {
-      forAll { (p: P) => p /~ one shouldBe p }
+      forAll { (p: P) => p equot one shouldBe p }
     }
 
     property(s"$name p /~ p = 1") {
-      forAll { (p: P) => if (!p.isZero) p /~ p shouldBe one }
+      forAll { (p: P) => if (!p.isZero) p equot p shouldBe one }
     }
 
     property(s"$name p % p = 0") {
-      forAll { (p: P) => if (!p.isZero) p % p shouldBe zero }
+      forAll { (p: P) => if (!p.isZero) p emod p shouldBe zero }
     }
 
     property(s"$name x + y = y + x") {
@@ -130,7 +130,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
 
     property(s"$name (x /~ y) * y + (x % y) = x") {
-      forAll { (x: P, y: P) => if (!y.isZero) (x /~ y) * y + (x % y) shouldBe x }
+      forAll { (x: P, y: P) => if (!y.isZero) (x equot y) * y + (x emod y) shouldBe x }
     }
 
     property(s"$name p = p.reductum + p.maxTerm") {
@@ -244,8 +244,8 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     if (!x.isZero || !y.isZero) {
       val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
       if (!gcd.isZero) {
-        (x % gcd) shouldBe 0
-        (y % gcd) shouldBe 0
+        (x emod gcd) shouldBe 0
+        (y emod gcd) shouldBe 0
       }
     }
   }
@@ -336,15 +336,15 @@ class PolynomialTest extends FunSuite {
 
     assert(p1 + p2 === Polynomial("1/2x^2 + 5x + 1"))
     assert(legSparse(2) * legSparse(3) === Polynomial("15/4x^5 - 7/2x^3 + 3/4x"))
-    assert(p1 % p2 === Polynomial("-x"))
-    assert(p1 /~ p2 === Polynomial("1"))
+    assert((p1 emod p2) === Polynomial("-x"))
+    assert((p1 equot p2) === Polynomial("1"))
 
     val legDense = legSparse.map(_.toDense)
 
     assert(p1 + p2 === Polynomial.dense(Array(r"1/1", r"5/1", r"1/2")))
     assert((legDense(2) * legDense(3)).coeffsArray === Array(r"0", r"3/4", r"0", r"-7/2", r"0", r"15/4"))
-    assert(p1 % p2 === Polynomial("-x"))
-    assert(p1 /~ p2 === Polynomial("1"))
+    assert((p1 emod p2) === Polynomial("-x"))
+    assert((p1 equot p2) === Polynomial("1"))
 
   }
 

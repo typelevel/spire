@@ -83,9 +83,9 @@ class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrive
     property(s"$name binop *") { testBinop(_ * _)(_ * _) }
     property(s"$name binop /~ and %") {
       testBinopNonzero({ (x, y) =>
-        (x /~ y) * y + (x % y)
+        (x equot y) * y + (x emod y)
       })({ (a, b) =>
-        (a /~ b) * b + (a % b)
+        (a equot b) * b + (a emod b)
       })
     }
   }

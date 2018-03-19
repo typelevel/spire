@@ -314,8 +314,8 @@ trait FixedPointInstances {
       def lcm(x: FixedPoint, y: FixedPoint): FixedPoint = x lcm y
 
 /* TODO: check if it is not TruncatedDivision? */
-      override def quot(x: FixedPoint, y: FixedPoint): FixedPoint = x /~ y
-      override def mod(x: FixedPoint, y: FixedPoint): FixedPoint = x % y
+      override def equot(x: FixedPoint, y: FixedPoint): FixedPoint = x /~ y
+      override def emod(x: FixedPoint, y: FixedPoint): FixedPoint = x % y
 
       override def reciprocal(x: FixedPoint): FixedPoint = one / x
       def div(x: FixedPoint, y: FixedPoint): FixedPoint = x / y

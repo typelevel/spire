@@ -533,9 +533,9 @@ private[math] trait SafeLongIsGCDRing extends GCDRing[SafeLong] with SafeLongIsC
 
 private[math] trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with SafeLongIsGCDRing {
   def euclideanFunction(a:SafeLong): BigInt = a.abs.toBigInt
-  def quot(a:SafeLong, b:SafeLong): SafeLong = a / b
-  def mod(a:SafeLong, b:SafeLong): SafeLong = a % b
-  override def quotmod(a:SafeLong, b:SafeLong): (SafeLong, SafeLong) = a /% b
+  def equot(a:SafeLong, b:SafeLong): SafeLong = a / b
+  def emod(a:SafeLong, b:SafeLong): SafeLong = a % b
+  override def equotmod(a:SafeLong, b:SafeLong): (SafeLong, SafeLong) = a /% b
   override def lcm(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a lcm b
   override def gcd(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a gcd b
 }

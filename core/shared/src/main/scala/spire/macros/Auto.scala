@@ -155,11 +155,11 @@ abstract class AutoAlgebra extends AutoOps { ops =>
       new EuclideanRing[A] { self =>
         // default implementations from EuclideanRing.WithEuclideanAlgorithm
         @tailrec final def euclid(a: A, b: A)(implicit ev: Eq[A]): A =
-          if (isZero(b)) a else euclid(b, mod(a, b))
+          if (isZero(b)) a else euclid(b, emod(a, b))
         def gcd(a: A, b: A)(implicit ev: Eq[A]): A =
           euclid(a, b)(ev)
         def lcm(a: A, b: A)(implicit ev: Eq[A]): A =
-          if (isZero(a) || isZero(b)) zero else times(quot(a, gcd(a, b)), b)
+          if (isZero(a) || isZero(b)) zero else times(equot(a, gcd(a, b)), b)
 
         def zero: A = z.splice
         def one: A = o.splice
@@ -168,8 +168,8 @@ abstract class AutoAlgebra extends AutoOps { ops =>
         override def minus(x: A, y: A): A = ops.minus[A].splice
         def negate(x: A): A = ops.negate[A].splice
         def euclideanFunction(x: A): BigInt = ops.euclideanFunction[BigInt].splice
-        def quot(x: A, y: A): A = ops.quot[A].splice
-        def mod(x: A, y: A): A = ops.mod[A]().splice
+        def equot(x: A, y: A): A = ops.quot[A].splice
+        def emod(x: A, y: A): A = ops.mod[A]().splice
       }
     }
   }
@@ -190,8 +190,8 @@ abstract class AutoAlgebra extends AutoOps { ops =>
         override def minus(x: A, y: A): A = ops.minus[A].splice
         def negate(x: A): A = ops.negate[A].splice
         override def euclideanFunction(x: A): BigInt = BigInt(0)
-        override def quot(x: A, y: A): A = ops.div[A].splice
-        override def mod(x: A, y: A): A = ops.mod[A](z).splice
+        override def equot(x: A, y: A): A = ops.div[A].splice
+        override def emod(x: A, y: A): A = ops.mod[A](z).splice
         def div(x: A, y: A): A = ops.div[A].splice
       }
     }

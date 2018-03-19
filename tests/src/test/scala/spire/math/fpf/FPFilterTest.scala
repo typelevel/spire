@@ -28,9 +28,9 @@ class FpFilterTest extends FunSuite with Checkers {
     def one: Bad = evaluated
     def negate(a:Bad): Bad = evaluated
     def plus(a:Bad, b:Bad): Bad = evaluated
-    override def mod(a:Bad, b:Bad) = evaluated
-    override def quot(a:Bad, b:Bad) = evaluated
-    override def quotmod(a:Bad, b:Bad) = evaluated
+    override def emod(a:Bad, b:Bad) = evaluated
+    override def equot(a:Bad, b:Bad) = evaluated
+    override def equotmod(a:Bad, b:Bad) = evaluated
     override def gcd(a:Bad, b:Bad)(implicit ev: Eq[Bad]):Bad = evaluated
     override def lcm(a:Bad, b:Bad)(implicit ev: Eq[Bad]):Bad = evaluated
     override def fromDouble(n: Double): Bad = evaluated

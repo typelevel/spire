@@ -361,7 +361,7 @@ class RationalTest extends FunSuite {
     val a = Rational(31, 4)
     val b = Rational(7, 9)
     assertResult(a) {
-      val (q, m) = Rational.RationalAlgebra.quotmod(a, b)
+      val (q, m) = Rational.RationalAlgebra.equotmod(a, b)
       q * b + m
     }
   }

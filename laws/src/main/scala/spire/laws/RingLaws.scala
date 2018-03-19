@@ -175,26 +175,26 @@ trait RingLaws[A] extends GroupLaws[A] {
     "euclidean division rule" → forAll { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       pred(y) ==> {
-        val (q, r) = x /% y
+        val (q, r) = x equotmod y
         x === (y * q + r)
       }
     },
     "equot" → forAll { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       pred(y) ==> {
-        (x /% y)._1 === (x /~ y)
+        (x equotmod y)._1 === (x equot y)
       }
     },
     "emod" → forAll { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       pred(y) ==> {
-        (x /% y)._2 === (x % y)
+        (x equotmod y)._2 === (x emod y)
       }
     },
     "euclidean function" → forAll { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       pred(y) ==> {
-        val (q, r) = x /% y
+        val (q, r) = x equotmod y
         r.isZero || (r.euclideanFunction < y.euclideanFunction)
       }
     },
