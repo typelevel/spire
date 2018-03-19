@@ -143,7 +143,7 @@ class PolynomialBenchmarks extends MyBenchmark {
     var total: (Polynomial[Rational], Polynomial[Rational]) = null
     var i = 0
     val len = data.length
-    while (i < len) { total = data(0) /% data(i); i += 1 }
+    while (i < len) { total = data(0) equotmod data(i); i += 1 }
     total
   }
 
@@ -151,7 +151,7 @@ class PolynomialBenchmarks extends MyBenchmark {
     var total: (Polynomial[Double], Polynomial[Double]) = null
     var i = 0
     val len = data.length
-    while (i < len) { total = data(0) /% data(i); i += 1 }
+    while (i < len) { total = data(0) equotmod data(i); i += 1 }
     total
   }
 

@@ -188,8 +188,8 @@ trait DistGCDRing[A] extends DistRing[A] with GCDRing[Dist[A]] {
 trait DistEuclideanRing[A] extends DistGCDRing[A] with EuclideanRing[Dist[A]] {
   def alg: EuclideanRing[A]
   override def euclideanFunction(x: Dist[A]): BigInt = sys.error("euclideanFunction is not defined, as Dist is a monad, and euclideanFunction should return Dist[BigInt]")
-  def quot(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.quot(x(g), y(g)))
-  def mod(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.mod(x(g), y(g)))
+  def equot(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.equot(x(g), y(g)))
+  def emod(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.emod(x(g), y(g)))
   override def gcd(x: Dist[A], y: Dist[A])(implicit ev: Eq[Dist[A]]): Dist[A] = super[DistGCDRing].gcd(x, y)
   override def lcm(x: Dist[A], y: Dist[A])(implicit ev: Eq[Dist[A]]): Dist[A] = super[DistGCDRing].lcm(x, y)
 }
@@ -197,9 +197,9 @@ trait DistEuclideanRing[A] extends DistGCDRing[A] with EuclideanRing[Dist[A]] {
 trait DistField[A] extends DistEuclideanRing[A] with Field[Dist[A]] {
   def alg: Field[A]
   def div(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.div(x(g), y(g)))
-  override def quot(x: Dist[A], y: Dist[A]): Dist[A] = super[DistEuclideanRing].quot(x, y)
-  override def mod(x: Dist[A], y: Dist[A]): Dist[A] = super[DistEuclideanRing].mod(x, y)
-  override def quotmod(x: Dist[A], y: Dist[A]): (Dist[A], Dist[A]) = super[DistEuclideanRing].quotmod(x, y)
+  override def equot(x: Dist[A], y: Dist[A]): Dist[A] = super[DistEuclideanRing].equot(x, y)
+  override def emod(x: Dist[A], y: Dist[A]): Dist[A] = super[DistEuclideanRing].emod(x, y)
+  override def equotmod(x: Dist[A], y: Dist[A]): (Dist[A], Dist[A]) = super[DistEuclideanRing].equotmod(x, y)
   override def reciprocal(x: Dist[A]): Dist[A] = new DistFromGen(g => alg.reciprocal(x(g)))
   override def euclideanFunction(x: Dist[A]): BigInt = sys.error("euclideanFunction is not defined, as Dist is a monad, and euclideanFunction should return Dist[BigInt]")
 }

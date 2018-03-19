@@ -16,9 +16,9 @@ package algebra
   */
 trait Field[@sp(Int, Long, Float, Double) A] extends Any with AlgebraField[A] with EuclideanRing[A] {
   def euclideanFunction(a: A): BigInt = BigInt(0)
-  def quot(a: A, b: A): A = div(a, b)
-  def mod(a: A, b: A): A = zero
-  override def quotmod(a: A, b: A): (A, A) = (div(a, b), zero)
+  def equot(a: A, b: A): A = div(a, b)
+  def emod(a: A, b: A): A = zero
+  override def equotmod(a: A, b: A): (A, A) = (div(a, b), zero)
 }
 
 

@@ -53,6 +53,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def *(rhs: Rational): Rational
   def /(rhs: Rational): Rational
 
+  def %(rhs: Rational): Rational = Rational.zero // TODO: this is for the Auto macro example to work
+
   /* TODO: move to TruncatedDivision
   def /~(rhs: Rational): Rational = Rational(SafeLong((this / rhs).toBigInt), SafeLong.one)
   def %(rhs: Rational): Rational = this - (this /~ rhs) * rhs

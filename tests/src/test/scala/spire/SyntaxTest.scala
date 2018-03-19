@@ -265,9 +265,9 @@ trait BaseSyntaxTest {
     (-a === Ring[A].negate(a)) &&
     ((a * b) === Ring[A].times(a, b)) &&
     ((a.euclideanFunction) === EuclideanRing[A].euclideanFunction(a)) &&
-    ((a /~ b) === EuclideanRing[A].quot(a, b)) &&
-    ((a % b) === EuclideanRing[A].mod(a, b)) &&
-    ((a /% b) === EuclideanRing[A].quotmod(a, b)) &&
+    ((a equot b) === EuclideanRing[A].equot(a, b)) &&
+    ((a emod b) === EuclideanRing[A].emod(a, b)) &&
+    ((a equotmod b) === EuclideanRing[A].equotmod(a, b)) &&
     ((a ** 2) === Ring[A].pow(a, 2)) &&
     ((a pow 2) === Ring[A].pow(a, 2)) &&
     ((a gcd b) === EuclideanRing[A].gcd(a, b)) &&
@@ -278,10 +278,10 @@ trait BaseSyntaxTest {
     litInt2 &&
     ((a * 42) === Ring[A].times(a, Ring[A].fromInt(42))) &&
     ((42 * a) === Ring[A].times(Ring[A].fromInt(42), a)) &&
-    ((a /~ 42) === EuclideanRing[A].quot(a, Ring[A].fromInt(42))) &&
-    ((42 /~ b) === EuclideanRing[A].quot(Ring[A].fromInt(42), b)) &&
-    ((a % 42) === EuclideanRing[A].mod(a, Ring[A].fromInt(42))) &&
-    ((42 % b) === EuclideanRing[A].mod(Ring[A].fromInt(42), b))
+    ((a equot 42) === EuclideanRing[A].equot(a, Ring[A].fromInt(42))) &&
+    ((42 equot b) === EuclideanRing[A].equot(Ring[A].fromInt(42), b)) &&
+    ((a emod 42) === EuclideanRing[A].emod(a, Ring[A].fromInt(42))) &&
+    ((42 emod b) === EuclideanRing[A].emod(Ring[A].fromInt(42), b))
   }
 
   def testFieldSyntax[A: Field: Eq](a: A, b: A) = {
@@ -297,9 +297,9 @@ trait BaseSyntaxTest {
     ((a - b) === Ring[A].minus(a, b)) &&
     (-a === Ring[A].negate(a)) &&
     ((a * b) === Ring[A].times(a, b)) &&
-    ((a /~ b) === EuclideanRing[A].quot(a, b)) &&
-    ((a % b) === EuclideanRing[A].mod(a, b)) &&
-    ((a /% b) === EuclideanRing[A].quotmod(a, b)) &&
+    ((a equot b) === EuclideanRing[A].equot(a, b)) &&
+    ((a emod b) === EuclideanRing[A].emod(a, b)) &&
+    ((a equotmod b) === EuclideanRing[A].equotmod(a, b)) &&
     ((a / b) === Field[A].div(a, b)) &&
     ((a ** 2) === Ring[A].pow(a, 2)) &&
     ((a pow 2) === Ring[A].pow(a, 2)) &&
@@ -309,20 +309,20 @@ trait BaseSyntaxTest {
     ((a - 42) === Ring[A].minus(a, Ring[A].fromInt(42))) &&
     ((a * 42) === Ring[A].times(a, Ring[A].fromInt(42))) &&
     ((42 * a) === Ring[A].times(Ring[A].fromInt(42), a)) &&
-    ((a /~ 42) === EuclideanRing[A].quot(a, Ring[A].fromInt(42))) &&
-    ((42 /~ b) === EuclideanRing[A].quot(Ring[A].fromInt(42), b)) &&
-    ((a % 42) === EuclideanRing[A].mod(a, Ring[A].fromInt(42))) &&
-    ((42 % b) === EuclideanRing[A].mod(Ring[A].fromInt(42), b)) &&
+    ((a equot 42) === EuclideanRing[A].equot(a, Ring[A].fromInt(42))) &&
+    ((42 equot b) === EuclideanRing[A].equot(Ring[A].fromInt(42), b)) &&
+    ((a emod 42) === EuclideanRing[A].emod(a, Ring[A].fromInt(42))) &&
+    ((42 emod b) === EuclideanRing[A].emod(Ring[A].fromInt(42), b)) &&
     ((a + 3.14) === Ring[A].plus(a, Field[A].fromDouble(3.14))) &&
     ((a - 3.14) === Ring[A].minus(a, Field[A].fromDouble(3.14))) &&
     ((a * 3.14) === Ring[A].times(a, Field[A].fromDouble(3.14))) &&
     ((3.14 * b) === Ring[A].times(Field[A].fromDouble(3.14), b)) &&
     ((a / 3.14) === Field[A].div(a, Field[A].fromDouble(3.14))) &&
     ((3.14 / b) === Field[A].div(Field[A].fromDouble(3.14), b)) &&
-    ((a /~ 42) === EuclideanRing[A].quot(a, Ring[A].fromInt(42))) &&
-    ((42 /~ b) === EuclideanRing[A].quot(Ring[A].fromInt(42), b)) &&
-    ((a % 42) === EuclideanRing[A].mod(a, Ring[A].fromInt(42))) &&
-    ((42 % b) === EuclideanRing[A].mod(Ring[A].fromInt(42), b))
+    ((a equot 42) === EuclideanRing[A].equot(a, Ring[A].fromInt(42))) &&
+    ((42 equot b) === EuclideanRing[A].equot(Ring[A].fromInt(42), b)) &&
+    ((a emod 42) === EuclideanRing[A].emod(a, Ring[A].fromInt(42))) &&
+    ((42 emod b) === EuclideanRing[A].emod(Ring[A].fromInt(42), b))
   }
 
   def testNRootSyntax[A: NRoot: Field: Eq](a: A) = {
