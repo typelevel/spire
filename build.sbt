@@ -267,6 +267,10 @@ lazy val buildSettings = Seq(
   crossScalaVersions := Seq(scalaVersions("2.11"), scalaVersions("2.12"))
 )
 
+lazy val commonDeps = Seq(libraryDependencies ++= Seq(
+  "org.typelevel" %%% "machinist" % machinistVersion,
+  "org.typelevel" %%% "algebra" % algebraVersion))
+
 lazy val commonSettings = Seq(
   scalacOptions ++= commonScalacOptions.diff(Seq(
     "-Xfatal-warnings",
@@ -275,14 +279,7 @@ lazy val commonSettings = Seq(
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard"
   )),
-  libraryDependencies ++= Seq(
-    "org.typelevel" %%% "machinist" % machinistVersion,
-    "org.typelevel" %%% "algebra" % algebraVersion
-  ),
-  resolvers ++= Seq(
-    "bintray/non" at "http://dl.bintray.com/non/maven",
-    Resolver.sonatypeRepo("snapshots")
-  )
+  resolvers += Resolver.sonatypeRepo("snapshots")
 ) ++ scalaMacroDependencies ++ warnUnusedImport
 
 lazy val commonJsSettings = Seq(
@@ -388,7 +385,7 @@ lazy val scalaTestSettings = Seq(
   libraryDependencies += "com.chuusai" %% "shapeless" % shapelessVersion % "test"
 )
 
-lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
+lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps ++ publishSettings ++ scoverageSettings
 
 lazy val unidocSettings = Seq(
   unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, testsJVM)
