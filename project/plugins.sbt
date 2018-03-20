@@ -11,5 +11,5 @@ addSbtPlugin("com.typesafe.sbt"    % "sbt-git"               % "0.9.3")
 addSbtPlugin("org.xerial.sbt"      % "sbt-sonatype"          % "2.3")
 addSbtPlugin("org.scala-js"        % "sbt-scalajs"           % "0.6.22")
 addSbtPlugin("org.tpolecat"        % "tut-plugin"            % "0.6.3")
-
+addSbtPlugin("net.virtual-void"    % "sbt-dependency-graph"  % "0.9.0")
 libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.7.12"
