@@ -388,7 +388,6 @@ The macro can be nested in itself and compares favorably with other looping
 constructs in Scala such as `for` and `while`:
 
 ```scala
-import spire.syntax.cfor._
 
 // print numbers 1 through 10
 cfor(0)(_ < 10, _ + 1) { i =>
@@ -468,11 +467,9 @@ strategy for getting random values using a `Generator` instance. For
 instance:
 
 ```scala
-import spire.implicits._
-import spire.math._
-import spire.random._
+import spire.random.Dist
 
-val rng = Cmwc5()
+val rng = spire.random.rng.Cmwc5()
 
 // produces a double in [0.0, 1.0)
 val n = rng.next[Double]
