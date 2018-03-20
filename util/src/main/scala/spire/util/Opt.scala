@@ -1,25 +1,27 @@
 package spire
 package util
 
-import spire.algebra.Eq
-import spire.syntax.eq._
+import cats.kernel.Eq
 
-object Opt extends OptVersions {
+object Opt {
   def apply[A](a: A): Opt[A] = new Opt(a)
+
   def empty[A]: Opt[A] = new Opt[A](null.asInstanceOf[A])
 
-  implicit def Eq[A: Eq]: Eq[Opt[A]] = new Eq[Opt[A]] {
+  // this is a name-based extractor. instead of returning Option[_] it
+  // is free to return any type with .isEmpty and .get, i.e. Opt[_].
+  //
+  // https://hseeberger.wordpress.com/2013/10/04/name-based-extractors-in-scala-2-11/
+  def unapply[A](n: Opt[A]): Opt[A] = n
+
+  implicit def Eq[A](implicit ev: Eq[A]): Eq[Opt[A]] = new Eq[Opt[A]] {
     def eqv(x: Opt[A], y: Opt[A]): Boolean =
-      if (x.isEmpty) y.isEmpty else x.ref === y.ref
+      if (x.isEmpty) y.isEmpty else ev.eqv(x.ref, y.ref)
   }
 }
 
-class Opt[+A](val ref: A) extends OptVersions.Base {
-  def scala2_10hashCode: Int = ref.hashCode
-  def scala2_10equals(other: Any): Boolean = other match {
-    case that: Opt[_] => ref == that.ref
-    case _ => false
-  }
+class Opt[+A](val ref: A) extends AnyVal {
+
   def isDefined: Boolean = ref != null
   def nonEmpty: Boolean = ref != null
   def isEmpty: Boolean = ref == null

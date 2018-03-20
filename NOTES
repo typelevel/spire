@@ -1,0 +1,15 @@
+ - merged https://github.com/non/spire/pull/672 sbt-1x
+
+div -> fields, division rings
+
+euclidean -> defined
+floor -> round toward -inf
+truncate -> round toward 0
+
+equotmod, equot, emod
+fquotmod, fquot, fmod
+tquotemod, tquot, tmod
+
+-7 /% 5
+  = (-1, -2)  truncated (% uses sign of dividend) -- jvm
+  = (-2, 3)   floor (% uses sign of divisor)

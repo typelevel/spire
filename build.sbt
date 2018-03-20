@@ -1,12 +1,13 @@
 import ReleaseTransformations._
 
-lazy val scalaVersions: Map[String, String] = Map("2.10" -> "2.10.6", "2.11" -> "2.11.8", "2.12" -> "2.12.1")
+lazy val scalaVersions: Map[String, String] =
+  Map("2.11" -> "2.11.12", "2.12" -> "2.12.4")
 
-lazy val scalaCheckVersion = "1.13.4"
-lazy val scalaTestVersion = "3.0.0"
-lazy val shapelessVersion = "2.3.2"
-lazy val disciplineVersion = "0.7.2"
-lazy val machinistVersion = "0.6.1"
+lazy val scalaCheckVersion = "1.13.5"
+lazy val scalaTestVersion = "3.0.5"
+lazy val shapelessVersion = "2.3.3"
+lazy val disciplineVersion = "0.8"
+lazy val machinistVersion = "0.6.4"
 lazy val algebraVersion = "1.0.0"
 
 lazy val apfloatVersion = "1.8.2"
@@ -44,6 +45,18 @@ lazy val spireJS = project.in(file(".spireJS"))
   .dependsOn(macrosJS, coreJS, extrasJS, lawsJS, testsJS)
   .enablePlugins(ScalaJSPlugin)
 
+lazy val platform = crossProject
+  .settings(moduleName := "spire-platform")
+  .settings(spireSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+  .dependsOn(macros, util)
+
+lazy val platformJVM = platform.jvm
+lazy val platformJS = platform.js
+
 lazy val macros = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-macros")
   .settings(spireSettings:_*)
@@ -56,7 +69,41 @@ lazy val macros = crossProject.crossType(CrossType.Pure)
 lazy val macrosJVM = macros.jvm
 lazy val macrosJS = macros.js
 
-lazy val core = crossProject
+lazy val data = crossProject.crossType(CrossType.Pure)
+  .settings(moduleName := "spire-data")
+  .settings(spireSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+
+lazy val dataJVM = data.jvm
+lazy val dataJS = data.js
+
+lazy val legacy = crossProject.crossType(CrossType.Pure)
+  .settings(moduleName := "spire-legacy")
+  .settings(spireSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+
+lazy val legacyJVM = legacy.jvm
+lazy val legacyJS = legacy.js
+
+lazy val util = crossProject.crossType(CrossType.Pure)
+  .settings(moduleName := "spire-util")
+  .settings(spireSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+  .dependsOn(macros)
+
+lazy val utilJVM = util.jvm
+lazy val utilJS = util.js
+
+lazy val core = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire")
   .settings(spireSettings:_*)
   .settings(coreSettings:_*)
@@ -64,7 +111,7 @@ lazy val core = crossProject
   .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
-  .dependsOn(macros)
+  .dependsOn(macros, platform, util)
 
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
@@ -77,7 +124,7 @@ lazy val extras = crossProject.crossType(CrossType.Pure)
   .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
-  .dependsOn(core)
+  .dependsOn(macros, platform, util, core, data)
 
 lazy val extrasJVM = extras.jvm
 lazy val extrasJS = extras.js
@@ -195,7 +242,7 @@ lazy val tests = crossProject.crossType(CrossType.Pure)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(testOptions in Test := Seq(Tests.Filter(s => jsTests.contains(s))))
   .jsSettings(commonJsSettings:_*)
-  .dependsOn(core, extras, laws)
+  .dependsOn(core, data, legacy, extras, laws)
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS = tests.js
@@ -227,8 +274,12 @@ addCommandAlias("validate", ";validateJVM;validateJS")
 lazy val buildSettings = Seq(
   organization := "org.typelevel",
   scalaVersion := scalaVersions("2.12"),
-  crossScalaVersions := Seq(scalaVersions("2.10"), scalaVersions("2.11"), scalaVersions("2.12"))
+  crossScalaVersions := Seq(scalaVersions("2.11"), scalaVersions("2.12"))
 )
+
+lazy val commonDeps = Seq(libraryDependencies ++= Seq(
+  "org.typelevel" %%% "machinist" % machinistVersion,
+  "org.typelevel" %%% "algebra" % algebraVersion))
 
 lazy val commonSettings = Seq(
   scalacOptions ++= commonScalacOptions.diff(Seq(
@@ -238,14 +289,7 @@ lazy val commonSettings = Seq(
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard"
   )),
-  libraryDependencies ++= Seq(
-    "org.typelevel" %%% "machinist" % machinistVersion,
-    "org.typelevel" %%% "algebra" % algebraVersion
-  ),
-  resolvers ++= Seq(
-    "bintray/non" at "http://dl.bintray.com/non/maven",
-    Resolver.sonatypeRepo("snapshots")
-  )
+  resolvers += Resolver.sonatypeRepo("snapshots")
 ) ++ scalaMacroDependencies ++ warnUnusedImport
 
 lazy val commonJsSettings = Seq(
@@ -289,7 +333,7 @@ lazy val publishSettings = Seq(
 lazy val scoverageSettings = Seq(
   coverageMinimum := 40,
   coverageFailOnMinimum := false,
-  coverageHighlighting := scalaBinaryVersion.value != "2.10",
+  coverageHighlighting := true,
   coverageExcludedPackages := "spire\\.benchmark\\..*;spire\\.macros\\..*"
 )
 
@@ -351,7 +395,7 @@ lazy val scalaTestSettings = Seq(
   libraryDependencies += "com.chuusai" %% "shapeless" % shapelessVersion % "test"
 )
 
-lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
+lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps ++ publishSettings ++ scoverageSettings
 
 lazy val unidocSettings = Seq(
   unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, testsJVM)
@@ -387,19 +431,7 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
   }
 
 lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
-  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided",
-  libraryDependencies ++= {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      // if scala 2.11+ is used, quasiquotes are merged into scala-reflect
-      case Some((2, scalaMajor)) if scalaMajor >= 11 => Seq()
-      // in Scala 2.10, quasiquotes are provided by macro paradise
-      case Some((2, 10)) =>
-        Seq(
-          compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.patch),
-              "org.scalamacros" %% "quasiquotes" % "2.0.1" cross CrossVersion.binary
-        )
-    }
-  }
+  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided"
 )
 
 lazy val commonScalacOptions = Seq(
