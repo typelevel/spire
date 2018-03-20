@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 import java.util.Arrays
 
@@ -6,7 +7,6 @@ import org.scalacheck.{Arbitrary, Properties}
 import org.scalacheck.Prop._
 import spire.implicits._
 
-import scala.reflect.ClassTag
 
 object BinaryMergeCheck extends Properties("QuickArrayMerge") {
 

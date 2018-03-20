@@ -1,9 +1,7 @@
-package spire.benchmark
+package spire
+package benchmark
 
-import scala.util.Random
 import spire.macros.Checked
-import com.google.caliper.Runner
-import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
 object CheckedBenchmarks extends MyRunner(classOf[CheckedBenchmarks])

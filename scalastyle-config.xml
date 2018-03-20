@@ -52,7 +52,7 @@
  </check>
  <check level="error" class="org.scalastyle.scalariform.UppercaseLChecker" enabled="true"></check>
  <check level="error" class="org.scalastyle.scalariform.SimplifyBooleanExpressionChecker" enabled="true"></check>
- <check level="error" class="org.scalastyle.scalariform.MethodLengthChecker" enabled="true">
+ <check level="warning" class="org.scalastyle.scalariform.MethodLengthChecker" enabled="true">
   <parameters>
    <parameter name="maxLength"><![CDATA[100]]></parameter>
   </parameters>

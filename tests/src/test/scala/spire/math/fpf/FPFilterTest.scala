@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 import java.math.MathContext.UNLIMITED
 
@@ -27,17 +28,19 @@ class FpFilterTest extends FunSuite with Checkers {
     def one: Bad = evaluated
     def negate(a:Bad): Bad = evaluated
     def plus(a:Bad, b:Bad): Bad = evaluated
-    def quot(a:Bad, b:Bad) = evaluated
-    def mod(a:Bad, b:Bad) = evaluated
-    def gcd(a:Bad, b:Bad):Bad = evaluated
+    override def emod(a:Bad, b:Bad) = evaluated
+    override def equot(a:Bad, b:Bad) = evaluated
+    override def equotmod(a:Bad, b:Bad) = evaluated
+    override def gcd(a:Bad, b:Bad)(implicit ev: Eq[Bad]):Bad = evaluated
+    override def lcm(a:Bad, b:Bad)(implicit ev: Eq[Bad]):Bad = evaluated
     override def fromDouble(n: Double): Bad = evaluated
     def times(x:Bad, b:Bad): Bad = evaluated
     def div(a:Bad, b:Bad): Bad = evaluated
     def nroot(a: Bad, k: Int): Bad = evaluated
     def fpow(a: Bad, b: Bad) = evaluated
     def compare(x: Bad, y: Bad) = evaluated
-    def signum(a: Bad): Int = evaluated
-    def abs(a: Bad): Bad = evaluated
+    override def signum(a: Bad): Int = evaluated
+    override def abs(a: Bad): Bad = evaluated
     def toDouble(x: Bad): Double = evaluated
     def toReal(x: Bad): Real = evaluated
     def ceil(a:Bad): Bad = evaluated

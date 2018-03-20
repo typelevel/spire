@@ -1,4 +1,5 @@
-// package spire.example
+// package spire
+package example
 //
 // import shapeless.{ Field => _, _ }
 // import spire.algebra._

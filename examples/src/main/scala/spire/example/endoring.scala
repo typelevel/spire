@@ -1,4 +1,5 @@
-package spire.example
+package spire
+package example
 
 import language.implicitConversions
 
@@ -12,9 +13,9 @@ object EndoRingExample extends App {
 
   object AbGroup {
     implicit object IntAbGroup extends AbGroup[Int] {
-      def op(a: Int, b: Int): Int = a + b
+      def combine(a: Int, b: Int): Int = a + b
       def inverse(a: Int): Int = -a
-      def id: Int = 0
+      def empty: Int = 0
     }
 
     /**
@@ -23,13 +24,13 @@ object EndoRingExample extends App {
      * us ensure it is commutative and that we always have an inverse.
      */
     implicit def PairedSetAbGroup[A] = new AbGroup[(Set[A], Set[A])] {
-      def op(a: (Set[A], Set[A]), b: (Set[A], Set[A])): (Set[A], Set[A]) = {
+      def combine(a: (Set[A], Set[A]), b: (Set[A], Set[A])): (Set[A], Set[A]) = {
         val (a1, a2) = a
         val (b1, b2) = b
         ((a1 -- b2) union (b1 -- a2), (a2 -- b1) union (b2 -- a1))
       }
       def inverse(a: (Set[A], Set[A])): (Set[A], Set[A]) = (a._2, a._1)
-      def id: (Set[A], Set[A]) = (Set.empty, Set.empty)
+      def empty: (Set[A], Set[A]) = (Set.empty, Set.empty)
     }
   }
 
@@ -53,7 +54,7 @@ object EndoRingExample extends App {
     def one: Endo[A] = a => a
 
     // Endomorphism to the trivial group.
-    def zero: Endo[A] = a => Group[A].id
+    def zero: Endo[A] = a => Group[A].empty
   }
 
   object EndoRing {

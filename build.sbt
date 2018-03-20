@@ -1,9 +1,19 @@
-import sbtbuildinfo.Plugin._
-import sbtunidoc.{Plugin => UnidocPlugin}
-import sbtunidoc.Plugin.UnidocKeys._
-import pl.project13.scala.sbt.SbtJmh
 import ReleaseTransformations._
-import ScoverageSbtPlugin._
+
+lazy val scalaVersions: Map[String, String] =
+  Map("2.11" -> "2.11.12", "2.12" -> "2.12.4")
+
+lazy val scalaCheckVersion = "1.13.5"
+lazy val scalaTestVersion = "3.0.5"
+lazy val shapelessVersion = "2.3.3"
+lazy val disciplineVersion = "0.8"
+lazy val machinistVersion = "0.6.4"
+lazy val algebraVersion = "1.0.0"
+
+lazy val apfloatVersion = "1.8.2"
+lazy val jscienceVersion = "4.3.1"
+lazy val apacheCommonsMath3Version = "3.4.1"
+
 
 // Projects
 
@@ -12,6 +22,7 @@ lazy val spire = project.in(file("."))
   .settings(spireSettings)
   .settings(unidocSettings)
   .settings(noPublishSettings)
+  .enablePlugins(ScalaUnidocPlugin)
   .aggregate(spireJVM, spireJS)
   .dependsOn(spireJVM, spireJS)
 
@@ -20,6 +31,7 @@ lazy val spireJVM = project.in(file(".spireJVM"))
   .settings(spireSettings)
   .settings(unidocSettings)
   .settings(noPublishSettings)
+  .enablePlugins(ScalaUnidocPlugin)
   .aggregate(macrosJVM, coreJVM, extrasJVM, examples, lawsJVM, testsJVM, benchmark)
   .dependsOn(macrosJVM, coreJVM, extrasJVM, examples, lawsJVM, testsJVM, benchmark)
 
@@ -28,9 +40,22 @@ lazy val spireJS = project.in(file(".spireJS"))
   .settings(spireSettings)
   .settings(unidocSettings)
   .settings(noPublishSettings)
+  .enablePlugins(ScalaUnidocPlugin)
   .aggregate(macrosJS, coreJS, extrasJS, lawsJS, testsJS)
   .dependsOn(macrosJS, coreJS, extrasJS, lawsJS, testsJS)
   .enablePlugins(ScalaJSPlugin)
+
+lazy val platform = crossProject
+  .settings(moduleName := "spire-platform")
+  .settings(spireSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+  .dependsOn(macros, util)
+
+lazy val platformJVM = platform.jvm
+lazy val platformJS = platform.js
 
 lazy val macros = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-macros")
@@ -44,15 +69,49 @@ lazy val macros = crossProject.crossType(CrossType.Pure)
 lazy val macrosJVM = macros.jvm
 lazy val macrosJS = macros.js
 
-lazy val core = crossProject
-  .settings(moduleName := "spire")
+lazy val data = crossProject.crossType(CrossType.Pure)
+  .settings(moduleName := "spire-data")
   .settings(spireSettings:_*)
-  .settings(coreSettings:_*)
-  .settings(buildInfoSettings:_*)
   .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+
+lazy val dataJVM = data.jvm
+lazy val dataJS = data.js
+
+lazy val legacy = crossProject.crossType(CrossType.Pure)
+  .settings(moduleName := "spire-legacy")
+  .settings(spireSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+
+lazy val legacyJVM = legacy.jvm
+lazy val legacyJS = legacy.js
+
+lazy val util = crossProject.crossType(CrossType.Pure)
+  .settings(moduleName := "spire-util")
+  .settings(spireSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
   .dependsOn(macros)
+
+lazy val utilJVM = util.jvm
+lazy val utilJS = util.js
+
+lazy val core = crossProject.crossType(CrossType.Pure)
+  .settings(moduleName := "spire")
+  .settings(spireSettings:_*)
+  .settings(coreSettings:_*)
+  .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
+  .jvmSettings(commonJvmSettings:_*)
+  .jsSettings(commonJsSettings:_*)
+  .dependsOn(macros, platform, util)
 
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
@@ -61,22 +120,30 @@ lazy val extras = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-extras")
   .settings(spireSettings:_*)
   .settings(extrasSettings:_*)
-  .settings(buildInfoSettings:_*)
   .settings(crossVersionSharedSources:_*)
+  .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
-  .dependsOn(core)
+  .dependsOn(macros, platform, util, core, data)
 
 lazy val extrasJVM = extras.jvm
 lazy val extrasJS = extras.js
+
+lazy val docs = project.in(file("docs"))
+  .dependsOn(macrosJVM, coreJVM, extrasJVM)
+  .settings(moduleName := "spire-docs")
+  .settings(spireSettings:_*)
+  .settings(noPublishSettings)
+  .enablePlugins(TutPlugin)
+  .settings(commonJvmSettings:_*)
 
 lazy val examples = project
   .settings(moduleName := "spire-examples")
   .settings(spireSettings)
   .settings(libraryDependencies ++= Seq(
-    "com.chuusai" %% "shapeless" % "1.2.4",
-    "org.apfloat" % "apfloat" % "1.8.2",
-    "org.jscience" % "jscience" % "4.3.1"
+    "com.chuusai" %% "shapeless" % shapelessVersion,
+    "org.apfloat" % "apfloat" % apfloatVersion,
+    "org.jscience" % "jscience" % jscienceVersion
   ))
   .settings(noPublishSettings)
   .settings(commonJvmSettings)
@@ -86,8 +153,8 @@ lazy val laws = crossProject.crossType(CrossType.Pure)
   .settings(moduleName := "spire-laws")
   .settings(spireSettings:_*)
   .settings(libraryDependencies ++= Seq(
-    "org.typelevel" %%% "discipline" % "0.4",
-    "org.scalacheck" %%% "scalacheck" % "1.12.4"
+    "org.typelevel" %%% "discipline" % disciplineVersion,
+    "org.scalacheck" %%% "scalacheck" % scalaCheckVersion
   ))
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
@@ -175,7 +242,7 @@ lazy val tests = crossProject.crossType(CrossType.Pure)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(testOptions in Test := Seq(Tests.Filter(s => jsTests.contains(s))))
   .jsSettings(commonJsSettings:_*)
-  .dependsOn(core, extras, laws)
+  .dependsOn(core, data, legacy, extras, laws)
 
 lazy val testsJVM = tests.jvm
 lazy val testsJS = tests.js
@@ -186,15 +253,15 @@ lazy val benchmark = project
   .settings(benchmarkSettings)
   .settings(noPublishSettings)
   .settings(commonJvmSettings)
-  .dependsOn(coreJVM)
+  .dependsOn(coreJVM, extrasJVM)
 
 lazy val benchmarkJmh: Project = project.in(file("benchmark-jmh"))
   .settings(moduleName := "spire-benchmark-jmh")
   .settings(spireSettings)
-  .settings(SbtJmh.jmhSettings)
   .settings(noPublishSettings)
   .settings(commonJvmSettings)
-  .dependsOn(coreJVM, benchmark)
+  .enablePlugins(JmhPlugin)
+  .dependsOn(coreJVM, extrasJVM, benchmark)
 
 // General settings
 
@@ -205,24 +272,24 @@ addCommandAlias("validateJS", ";macrosJS/test;coreJS/test;extrasJS/test;lawsJS/t
 addCommandAlias("validate", ";validateJVM;validateJS")
 
 lazy val buildSettings = Seq(
-  organization := "org.spire-math",
-  scalaVersion := "2.11.7",
-  crossScalaVersions := Seq("2.10.2", "2.11.7")
+  organization := "org.typelevel",
+  scalaVersion := scalaVersions("2.12"),
+  crossScalaVersions := Seq(scalaVersions("2.11"), scalaVersions("2.12"))
 )
+
+lazy val commonDeps = Seq(libraryDependencies ++= Seq(
+  "org.typelevel" %%% "machinist" % machinistVersion,
+  "org.typelevel" %%% "algebra" % algebraVersion))
 
 lazy val commonSettings = Seq(
   scalacOptions ++= commonScalacOptions.diff(Seq(
-    "-Xfatal-warnings", 
+    "-Xfatal-warnings",
     "-language:existentials",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard"
   )),
-  resolvers ++= Seq(
-    "bintray/non" at "http://dl.bintray.com/non/maven",
-    Resolver.sonatypeRepo("snapshots")
-  ),
-  libraryDependencies += "org.typelevel" %%% "machinist" % "0.4.1"
+  resolvers += Resolver.sonatypeRepo("snapshots")
 ) ++ scalaMacroDependencies ++ warnUnusedImport
 
 lazy val commonJsSettings = Seq(
@@ -232,7 +299,11 @@ lazy val commonJsSettings = Seq(
 
 lazy val commonJvmSettings = Seq(
   // -optimize has no effect in scala-js other than slowing down the build
-  scalacOptions += "-optimize",
+  //  scalacOptions += "-optimize", // disabling for now
+  scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, scalaMajor)) if scalaMajor <= 11 => Seq("-optimize")
+    case _ => Seq.empty
+  }),
   testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF")
 )
 
@@ -257,13 +328,13 @@ lazy val publishSettings = Seq(
       </developer>
     </developers>
   )
-) ++ sharedPublishSettings ++ sharedReleaseProcess
+) ++ credentialSettings ++ sharedPublishSettings ++ sharedReleaseProcess
 
 lazy val scoverageSettings = Seq(
-  ScoverageKeys.coverageMinimum := 40,
-  ScoverageKeys.coverageFailOnMinimum := false,
-  ScoverageKeys.coverageHighlighting := scalaBinaryVersion.value != "2.10",
-  ScoverageKeys.coverageExcludedPackages := "spire\\.benchmark\\..*;spire\\.macros\\..*"
+  coverageMinimum := 40,
+  coverageFailOnMinimum := false,
+  coverageHighlighting := true,
+  coverageExcludedPackages := "spire\\.benchmark\\..*;spire\\.macros\\..*"
 )
 
 // Project's settings
@@ -275,9 +346,9 @@ lazy val benchmarkSettings = Seq(
 
   libraryDependencies ++= Seq(
     // comparisons
-    "org.apfloat" % "apfloat" % "1.8.2",
-    "org.jscience" % "jscience" % "4.3.1",
-    "org.apache.commons" % "commons-math3" % "3.4.1",
+    "org.apfloat" % "apfloat" % apfloatVersion,
+    "org.jscience" % "jscience" % jscienceVersion,
+    "org.apache.commons" % "commons-math3" % apacheCommonsMath3Version,
 
     // thyme
     "ichi.bench" % "thyme" %  "0.1.0" from "http://plastic-idolatry.com/jars/thyme-0.1.0.jar",
@@ -294,11 +365,12 @@ lazy val benchmarkSettings = Seq(
 )
 
 lazy val coreSettings = Seq(
-  sourceGenerators in Compile <+= buildInfo,
   buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
   buildInfoPackage := "spire",
-  sourceGenerators in Compile <+= (genProductTypes in Compile),
-  genProductTypes <<= (sourceManaged in Compile, streams) map { (scalaSource, s) =>
+  sourceGenerators in Compile += (genProductTypes in Compile).taskValue,
+  genProductTypes := {
+    val scalaSource = (sourceManaged in Compile).value
+    val s = streams.value
     s.log.info("Generating spire/std/tuples.scala")
     val algebraSource = ProductTypes.algebraProductTypes
     val algebraFile = (scalaSource / "spire" / "std" / "tuples.scala").asFile
@@ -316,27 +388,30 @@ lazy val extrasSettings = Seq(
 
 lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types", "Generates several type classes for Tuple2-22.")
 
-lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.12.4" % "test")
+lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.13.4" % "test")
 
-lazy val scalaTestSettings = Seq(libraryDependencies += "org.scalatest" %%% "scalatest" % "3.0.0-M7" % "test")
+lazy val scalaTestSettings = Seq(
+  libraryDependencies += "org.scalatest" %%% "scalatest" % scalaTestVersion % "test",
+  libraryDependencies += "com.chuusai" %% "shapeless" % shapelessVersion % "test"
+)
 
-lazy val spireSettings = buildSettings ++ commonSettings ++ publishSettings ++ scoverageSettings
+lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps ++ publishSettings ++ scoverageSettings
 
-lazy val unidocSettings = UnidocPlugin.unidocSettings ++ Seq(
+lazy val unidocSettings = Seq(
   unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, testsJVM)
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-// Base Build Settings - Should not need to edit below this line. 
+// Base Build Settings - Should not need to edit below this line.
 // These settings could also come from another file or a plugin.
-// The only issue if coming from a plugin is that the Macro lib versions 
+// The only issue if coming from a plugin is that the Macro lib versions
 // are hard coded, so an overided facility would be required.
 
 addCommandAlias("gitSnapshots", ";set version in ThisBuild := git.gitDescribedVersion.value.get + \"-SNAPSHOT\"")
 
 lazy val noPublishSettings = Seq(
-  publish := (),
-  publishLocal := (),
+  publish := (()),
+  publishLocal := (()),
   publishArtifact := false
 )
 
@@ -344,25 +419,19 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
   Seq(Compile, Test).map { sc =>
     (unmanagedSourceDirectories in sc) ++= {
       (unmanagedSourceDirectories in sc ).value.map {
-        dir:File => new File(dir.getPath + "_" + scalaBinaryVersion.value)
+        dir:File =>
+          CrossVersion.partialVersion(scalaBinaryVersion.value) match {
+            case Some((major, minor)) =>
+              new File(s"${dir.getPath}_$major.$minor")
+            case None =>
+              sys.error("couldn't parse scalaBinaryVersion ${scalaBinaryVersion.value}")
+          }
       }
     }
   }
 
 lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
-  libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided",
-  libraryDependencies ++= {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      // if scala 2.11+ is used, quasiquotes are merged into scala-reflect
-      case Some((2, scalaMajor)) if scalaMajor >= 11 => Seq()
-      // in Scala 2.10, quasiquotes are provided by macro paradise
-      case Some((2, 10)) =>
-        Seq(
-          compilerPlugin("org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full),
-              "org.scalamacros" %% "quasiquotes" % "2.0.1" cross CrossVersion.binary
-        )
-    }
-  }
+  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided"
 )
 
 lazy val commonScalacOptions = Seq(
@@ -376,7 +445,6 @@ lazy val commonScalacOptions = Seq(
   "-unchecked",
   "-Xfatal-warnings",
   "-Xlint",
-  "-Yinline-warnings",
   "-Yno-adapted-args",
   "-Ywarn-dead-code",
   "-Ywarn-numeric-widen",
@@ -411,7 +479,7 @@ lazy val sharedReleaseProcess = Seq(
     publishArtifacts,
     setNextVersion,
     commitNextVersion,
-    ReleaseStep(action = Command.process("sonatypeReleaseAll", _)),
+    releaseStepCommand("sonatypeReleaseAll"),
     pushChanges)
 )
 
@@ -425,12 +493,13 @@ lazy val warnUnusedImport = Seq(
     }
   },
   scalacOptions in (Compile, console) ~= {_.filterNot("-Ywarn-unused-import" == _)},
-  scalacOptions in (Test, console) <<= (scalacOptions in (Compile, console))
+  scalacOptions in (Test, console) := (scalacOptions in (Compile, console)).value
 )
 
 // For Travis CI - see http://www.cakesolutions.net/teamblogs/publishing-artefacts-to-oss-sonatype-nexus-using-sbt-and-travis-ci
-credentials ++= (for {
-  username <- Option(System.getenv().get("SONATYPE_USERNAME"))
-  password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
-} yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)).toSeq
-
+lazy val credentialSettings = Seq(
+  credentials ++= (for {
+    username <- Option(System.getenv().get("SONATYPE_USERNAME"))
+    password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
+  } yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)).toSeq
+)

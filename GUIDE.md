@@ -59,7 +59,7 @@ instances" at one go, import `spire.std.any._`. This pattern should
 also be used when supporting other number types that are not
 Spire-aware.
 
-Finally, syntax implicits are imported from objecs in
+Finally, syntax implicits are imported from objects in
 `spire.syntax`. To get the syntax for `Ring[A]` you'd import
 `spire.syntax.ring._`. Again, there is a shortcut package: you can
 import `spire.syntax.all._` to get all syntax.
@@ -171,7 +171,7 @@ Here's a brief description of some of the most common properties:
 In some cases the operator names are different (e.g. `+`, `*`) but the
 properties themselves remain the same.
 
-### Eq
+#### Eq
 
 Spire provides an `Eq[A]` type class to represent type-safe
 equality. This allows us to talk about types for which there isn't a
@@ -194,7 +194,7 @@ The anti-symmetry property may seem confusing. The idea is that if `a === b`
 then `a` and `b` must be substitutable for each other, such that for any
 expression `f(x)`, `f(a) === f(b)`.
 
-### Order
+#### Order
 
 Total orderings in Spire are supported by the `Order[A]` type
 class. Unlike other ordering type classes
@@ -216,7 +216,7 @@ Instances of `Order[A]` are required to observe the following
 properties:
 
  * if `a <= b` and `b <= a` then `a === b` (*anti-symmetry*)
- * if `a <= b` and `b <= c` then `a <= b` (*transitivity*)
+ * if `a <= b` and `b <= c` then `a <= c` (*transitivity*)
  * either `a <= b` or `b <= a` (*totality*)
 
 Additionally, total orderings across fields should obey the following
@@ -234,7 +234,25 @@ numbers, which breaks *O2*.  In these cases, users will need to be
 aware of the risks and limit their use to situations where the
 particular law is not needed.
 
-### PartialOrder
+#### Signed
+
+Translation-invariant total orders are captured by the `Signed[A]` type class. In
+general, the type `A` is equipped with a commutative additive operation `+` and a
+zero element `0` (see the definition of commutative rings below). The following
+laws hold:
+
+ * if `a <= b` then `a + c <= b + c` (linear order),
+ * `signum(x) = -1` if `x < 0`, `signum(x) = 1` if `x > 0`, `signum(x) = 0` otherwise.
+
+If the type `A` is equipped with negative elements `-x`, then we have:
+
+ * `abs(x) = -x` if `x < 0`, or `x` otherwise,
+
+The above laws imply:
+
+ * `abs(a + b) <= abs(a) + abs(b)`
+
+#### PartialOrder
 
 Partial orderings in Spire are supported by the `PartialOrder[A]` type class.
 Its implementation differs from `scala.math.PartialOrdering` in two features: `PartialOrder`
@@ -294,7 +312,7 @@ Most types have many possible implementations of these types
 classes. In these cases Spire requires users to explicitly choose
 which implementation they want.
 
-Spire also defines two parallel group heirarchies for *additive* and
+Spire also defines two parallel group hierarchies for *additive* and
 *multiplicative* groups. These have the same properties but different
 names and symbols. The following list provides the generic, additive,
 and multiplicative variants:
@@ -330,10 +348,47 @@ inheritance:
 
 Rings also provide a `pow` method (`**`) for doing repeated multiplication.
 
+#### Commutative ring hierarchy
+
+Commutative rings (also called domains in the literature) have a rich
+structure.
+
+Spire focuses on the structures relevant for computational algebra
+(GCD rings, Euclidean rings and fields).
+
+ * `GCDRing[A]` extends `CRing[A]`
+ * `EuclideanRing[A]` extends `GCDRing[A]`
+ * `spire.Field[A]` extends` algebra.Field[A]` with `EuclideanRing[A]`
+
+#### GCDRings
+
+GCDRings are commutative rings (`CRing[A]`) with existence of a
+greatest-common-divisor and least-common-multiple.
+
+Spire's `GCDRing[A]` supports the following operations:
+
+ * `gcd` (`a gcd b`) find the greatest common divisor of `a` and `b`.
+ * `lcm` (`a lcm b`) find the lowest common multiple of `a` and `b`.
+ 
+ obeying the following laws:
+ 
+ * `d * m === a * b` for `d = gcd(a, b)` and `m = lcm(a, b)`,
+ * gcd is associative and commutative,
+ * lcm is associatvie and commutative.
+ 
+Note that the gcd is defined up to a divisible element (unit);
+in particular, its sign is a matter of convention. 
+
+Spire requires these operations to be commutative. Note that fields
+have leeway to define the GCD operation. In practice, instances of
+`Field[A]` provide either a trivial implementation `gcd(x != 0 , y != 0) == 1`
+or a definition that extends the one used for the integer ring
+(`gcd(a/b, c/d) == gcd(a, c)/lcm(b, d)`).
+
 #### EuclideanRings
 
 Spire supports euclidean domains (called `EuclideanRing[A]`). A
-euclidean domain is a commutative ring (`CRing[A]`) that also supports
+euclidean domain is a GCD ring (`GCDRing[A]`) that also supports
 euclidean division (e.g. floor division or integer division). This
 structure generalizes many useful properties of the integers (for
 instance, quotients and remainders, and greatest common divisors).
@@ -346,13 +401,16 @@ function.
 
 Spire's `EuclideanRing[A]` supports the following operations:
 
- * `quot` (`a /~ b`) finding the quotient (often integer division).
+ * `quot` (`a /~ b`) finding the quotient.
  * `mod` (`a % b`) the remainder from the quotient operation.
  * `quotmod` (`a /% b`) combines `quot` and `mod` into one operation.
- * `gcd` (`a gcd b`) find the greatest common divisor of `a` and `b`.
- * `lcm` (`a lcm b`) find the lowest common multiple of `a` and `b`.
 
 Spire requires that `b * (a /~ b) + (a % b)` is equivalent to `a`.
+
+On integers, Euclidean quotient and remainder corresponds to
+truncated division; however, the sign of the result is a matter
+of convention. On rational (or floating-point) numbers, `a /~ b = a / b`
+and `a % b = 0` by definition.
 
 #### Fields
 
@@ -399,7 +457,7 @@ Similarly, Spire supports the Trigonometric functions via
 functions and values as well. The following methods are supported:
 
   * `e` Euler's number
-  * `pi` Ratio of a circle's diameter to its circumfernce.
+  * `pi` Ratio of a circle's diameter to its circumference.
 
   * `exp(a)` Raise `e` to `a`-th power.
   * `expm1(a)` Equivalent to `exp(a) - 1` with less error.
@@ -622,8 +680,8 @@ with a single variable (e.g. *x*) with the following structure:
 ```
 c0 + (c1 * x^1) + (c2 * x^2) + ... + (cn * x^n)
 ```
-  
-The coefficents (`c0` through `cn`) are values of the type `C`, and
+
+The coefficients (`c0` through `cn`) are values of the type `C`, and
 the exponents (`1` through `n`) are `Int` values (this does mean that
 Spire's implementation only supports polynomials whose exponents are
 less than 2147483648).
@@ -744,7 +802,7 @@ range of numeric types that should address most needs.
 
 For non-negative numbers, the safe type to use is `Natural`. It is quite fast
 when representing small-ish numbers (128-bits or less), but has no upper bound
-on the values it can reprsent. However, its unique cons-structure means that
+on the values it can represent. However, its unique cons-structure means that
 for very large values `BigInt` and `SafeLong` may be faster. Since it only
 supports non-negative values, subtraction is non-total (and may throw an
 exception).
@@ -870,7 +928,7 @@ relying on a single generator across threads.
 
 Although the `mutable.Generator` trait itself only provides low-level methods
 like `nextInt`, it can produce values of any type using the `Dist[A]` type
-class, which will be discussed in the next seciton.
+class, which will be discussed in the next section.
 
 The `immutable.Generator` trait is similar to `mutable.Generator`, although
 the state it stores is immutable. Each time a number is generated a new

@@ -1,4 +1,5 @@
-package spire.laws
+package spire
+package laws
 
 import spire.algebra._
 import spire.algebra.partial._
@@ -21,7 +22,7 @@ trait PartialActionLaws[G, A] extends Laws {
 
   val scalarLaws: PartialGroupLaws[G]
 
-  import scalarLaws.{ Equ => EqG, Arb => ArG }
+  import scalarLaws.{ Arb => ArG }
 
   implicit def EquA: Eq[A]
   implicit def ArbA: Arbitrary[A]
@@ -110,7 +111,7 @@ trait PartialActionLaws[G, A] extends Laws {
     parents = Seq(leftSemigroupPartialAction),
 
     "left identity" → forAll { (a: A) =>
-      (G0.id ??|+|> a) && ((G0.id ?|+|> a).get === a)
+      (G0.empty ??|+|> a) && ((G0.empty ?|+|> a).get === a)
     }
   )
 
@@ -120,7 +121,7 @@ trait PartialActionLaws[G, A] extends Laws {
     parents = Seq(rightSemigroupPartialAction),
 
     "right identity" → forAll { (a: A) =>
-      (a <|+|?? G0.id) && ((a <|+|? G0.id).get === a)
+      (a <|+|?? G0.empty) && ((a <|+|? G0.empty).get === a)
     }
   )
 

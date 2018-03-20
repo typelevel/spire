@@ -1,12 +1,24 @@
-package spire.math
+package spire
+package math
 
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.Matchers
-import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
 
+import spire.algebra.Field
+
 class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   type Q = Rational
+
+  implicit val arbRational: Arbitrary[Rational] = Arbitrary(for {
+    n <- arbitrary[BigInt]
+    d0 <- arbitrary[BigInt]
+  } yield {
+    val d = if (d0.signum == 0) BigInt(1) else d0
+    Rational(n, d)
+  })
 
   def rat1(name: String)(f: Q => Unit) =
     property(name) {
@@ -35,6 +47,10 @@ class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
       }
     }
 
+  property("Internal GCD implementation is similar to the field of fractions implementation") {
+    forAll { (x: Rational, y: Rational) => x.gcd(y) shouldBe Field[Rational].gcd(x, y) }
+  }
+
   rat1("x + 0 == x") { x: Q => x + Rational(0) shouldBe x }
   rat1("x * 1 == x") { x: Q => x * Rational(1) shouldBe x }
   rat1("x * 0 == 0") { x: Q => x * Rational(0) shouldBe Rational(0) }
@@ -57,9 +73,36 @@ class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
 
   rat3("(x + y) * z == x * z + y * z") { (x: Q, y: Q, z: Q) => (x + y) * z shouldBe x * z + y * z }
 
+  rat1("Round-trip to Real") { (x: Q) =>
+    x.toReal.toRational shouldBe x
+  }
+
+  rat1("Round-trip to Algebraic") { (x: Q) =>
+    x.toAlgebraic.toRational shouldBe Some(x)
+  }
+
   property("Round-trip Double") {
     forAll("x") { (n: Double) =>
       Rational(n).toDouble == n
+    }
+  }
+
+  property("Rational.numeratorIsValidLong") { (x: Q) =>
+    x.numeratorIsValidLong shouldBe x.numerator.isValidLong
+  }
+
+  property("Rational.denominatorIsValidLong") { (x: Q) =>
+    x.denominatorIsValidLong shouldBe x.denominator.isValidLong
+  }
+
+  property("limitTo(n) forces numerator and denominator to be less than n") {
+    implicit val arbSafeLong: Arbitrary[SafeLong] =
+      Arbitrary(arbitrary[BigInt].map { n => SafeLong(n.abs) }.filter(_.signum != 0))
+
+    forAll { (x: Rational, n: SafeLong) =>
+      val y = x.limitTo(n.abs)
+      (y.numerator <= n) shouldBe true
+      (y.denominator <= n) shouldBe true
     }
   }
 }

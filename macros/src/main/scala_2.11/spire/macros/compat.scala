@@ -1,4 +1,5 @@
-package spire.macros
+package spire
+package macros
 
 object compat {
 
@@ -18,4 +19,10 @@ object compat {
 
   def setOrig[C <: Context](c: C)(tt: c.universe.TypeTree, t: c.Tree) =
     c.universe.internal.setOriginal(tt, t)
+
+  def predef[C <: Context](c: C): c.Tree = {
+    import c.universe._
+    q"scala.this.Predef"
+  }
+
 }

@@ -1,13 +1,9 @@
-package spire.benchmark
-
-import scala.{specialized => spec}
-import scala.annotation.tailrec
+package spire
+package benchmark
 
 import scala.util.Random
 import Random._
 
-import com.google.caliper.Runner
-import com.google.caliper.SimpleBenchmark
 import com.google.caliper.Param
 
 import spire.syntax.cfor._

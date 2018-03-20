@@ -1,22 +1,11 @@
-package spire.benchmark
-
-import scala.reflect.ClassTag
-
-import scala.annotation.tailrec
-import scala.{specialized => spec}
-import scala.util.Random
+package spire
+package benchmark
 
 import spire.algebra._
 import spire.math._
 import spire.implicits._
 
-import com.google.caliper.Runner
-import com.google.caliper.SimpleBenchmark
-import com.google.caliper.Param
-
-import java.lang.Math
 import java.math.BigInteger
-import java.lang.Long.numberOfTrailingZeros
 
 object BigIntegerIsRig extends Rig[BigInteger] {
   def zero: BigInteger = new BigInteger("0")
@@ -121,7 +110,7 @@ class FibBenchmarks extends MyBenchmark {
     a + b + c + d
   }
 
-  def scalaGenFib[@spec(Int, Long) A](n: Int)(implicit r: Rig[A]): A = {
+  def scalaGenFib[@sp(Int, Long) A](n: Int)(implicit r: Rig[A]): A = {
     @tailrec def loop(n :Int, a: A, b: A): A =
       if (n == 0) a else loop(n - 1, b, a + b)
     loop(n, r.zero, r.one)

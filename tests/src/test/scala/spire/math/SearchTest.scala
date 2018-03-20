@@ -1,9 +1,9 @@
-package spire.math
+package spire
+package math
 
 import spire.implicits._
 
 import org.scalatest.FunSuite
-import org.scalatest.prop.Checkers
 
 class SearchTest extends FunSuite {
   test("search when type provides a traditional comparison method") {

@@ -1,4 +1,5 @@
-package spire.laws
+package spire
+package laws
 
 import java.math.BigInteger
 import spire.algebra._
@@ -14,8 +15,6 @@ import spire.implicits.{
   ArrayOrder => _, ArrayEq => _,
   MapEq => _, MapGroup => _,
   _ }
-
-import scala.{specialized => sp}
 
 import org.typelevel.discipline.scalatest.Discipline
 
@@ -34,12 +33,25 @@ class LawTests extends FunSuite with Discipline {
   }
 
   // Float and Double fail these tests
-  checkAll("Int",        RingLaws[Int].euclideanRing)
-  checkAll("Long",       RingLaws[Long].euclideanRing)
+  checkAll("Int",        RingLaws[Int].cRing)
+  checkAll("Long",       RingLaws[Long].cRing)
   checkAll("BigInt",     RingLaws[BigInt].euclideanRing)
+  checkAll("BigInt",     CombinationLaws[BigInt].signedGCDRing)
   checkAll("BigInteger", RingLaws[BigInteger].euclideanRing)
+  checkAll("BigInteger", CombinationLaws[BigInteger].signedGCDRing)
   checkAll("Rational",   RingLaws[Rational].field)
+  checkAll("Rational",   CombinationLaws[BigInt].signedGCDRing)
   checkAll("Real",       RingLaws[Real].field)
+  checkAll("UByte",      RingLaws[UByte].cRig)
+  checkAll("UShort",     RingLaws[UShort].cRig)
+  checkAll("UInt",       RingLaws[UInt].cRig)
+  checkAll("ULong",      RingLaws[ULong].cRig)
+  checkAll("SafeLong",   RingLaws[SafeLong].euclideanRing)
+  checkAll("SafeLong",   CombinationLaws[SafeLong].signedGCDRing)
+
+  checkAll("Complex[Rational]", RingLaws[Complex[Rational]].field)
+
+  checkAll("Quaternion[Rational]", RingLaws[Quaternion[Rational]].divisionRing)
 
   checkAll("Levenshtein distance", BaseLaws[String].metricSpace)
   checkAll("BigInt",               BaseLaws[BigInt].metricSpace)
@@ -102,7 +114,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("D3", GroupLaws[D3].group)
   checkAll("FreeGroup", GroupLaws[FreeGroup[D3]].group)
 
-  implicit def intAbGroup: AbGroup[Int] = AbGroup.additive
+  implicit def intAbGroup: AbGroup[Int] = AdditiveAbGroup[Int].additive
   checkAll("FreeAbGroup", GroupLaws[FreeAbGroup[Int]].abGroup)
 
   checkAll("Bool[Boolean]", LogicLaws[Boolean].bool)

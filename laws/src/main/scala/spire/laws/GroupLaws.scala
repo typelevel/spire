@@ -1,4 +1,5 @@
-package spire.laws
+package spire
+package laws
 
 import spire.algebra._
 import spire.implicits._
@@ -29,10 +30,10 @@ trait GroupLaws[A] extends Laws {
       ((x |+| y) |+| z) === (x |+| (y |+| z))
     ),
     "combinen(a, 1) === a" → forAll((a: A) =>
-      A.combinen(a, 1) === a
+      A.combineN(a, 1) === a
     ),
     "combinen(a, 2) === a |+| a" → forAll((a: A) =>
-      A.combinen(a, 2) === (a |+| a)
+      A.combineN(a, 2) === (a |+| a)
     )
   )
 
@@ -40,19 +41,27 @@ trait GroupLaws[A] extends Laws {
     name = "monoid",
     parent = Some(semigroup),
     "left identity" → forAll((x: A) =>
-      (A.id |+| x) === x
+      (A.empty |+| x) === x
     ),
     "right identity" → forAll((x: A) =>
-      (x |+| A.id) === x
+      (x |+| A.empty) === x
     ),
-    "combinen(a, 0) === id" → forAll((a: A) =>
-      A.combinen(a, 0) === A.id
+    "combineN(a, 0) === id" → forAll((a: A) =>
+      A.combineN(a, 0) === A.empty
     ),
-    "combine(Nil) === id" → forAll((a: A) =>
-      A.combine(Nil) === A.id
+    "combineAll(Nil) === id" → forAll((a: A) =>
+      A.combineAll(Nil) === A.empty
     ),
     "isId" → forAll((x: A) =>
-      (x === A.id) === (x.isId)
+      (x === A.empty) === (x.isEmpty)
+    )
+  )
+
+  def cMonoid(implicit A: CMonoid[A]) = new GroupProperties(
+    name = "commutative monoid",
+    parent = Some(monoid),
+    "commutative" → forAll((x: A, y: A) =>
+      (x |+| y) === (y |+| x)
     )
   )
 
@@ -60,10 +69,10 @@ trait GroupLaws[A] extends Laws {
     name = "group",
     parent = Some(monoid),
     "left inverse" → forAll((x: A) =>
-      A.id === (x.inverse |+| x)
+      A.empty === (x.inverse |+| x)
     ),
     "right inverse" → forAll((x: A) =>
-      A.id === (x |+| x.inverse)
+      A.empty === (x |+| x.inverse)
     )
   )
 
@@ -81,25 +90,19 @@ trait GroupLaws[A] extends Laws {
   def additiveSemigroup(implicit A: AdditiveSemigroup[A]) = new AdditiveProperties(
     base = semigroup(A.additive),
     parent = None,
-    "sumn(a, 1) === a" → forAll((a: A) =>
-      A.sumn(a, 1) === a
+    "sumN(a, 1) === a" → forAll((a: A) =>
+      A.sumN(a, 1) === a
     ),
-    "combinen(a, 2) === a + a" → forAll((a: A) =>
-      A.sumn(a, 2) === (a + a)
-    ),
-    "sumOption" → forAll((a: A) =>
-      (A.sumOption(Seq.empty[A]) === None) &&
-      (A.sumOption(Seq(a)) === Some(a)) &&
-      (A.sumOption(Seq(a, a)) === Some(a + a)) &&
-      (A.sumOption(Seq(a, a, a)) === Some(a + a + a))
+    "sumN(a, 2) === a + a" → forAll((a: A) =>
+      A.sumN(a, 2) === (a + a)
     )
   )
 
   def additiveMonoid(implicit A: AdditiveMonoid[A]) = new AdditiveProperties(
     base = monoid(A.additive),
     parent = Some(additiveSemigroup),
-    "sumn(a, 0) === zero" → forAll((a: A) =>
-      A.sumn(a, 0) === A.zero
+    "sumN(a, 0) === zero" → forAll((a: A) =>
+      A.sumN(a, 0) === A.zero
     ),
     "sum(Nil) === zero" → forAll((a: A) =>
       A.sum(Nil) === A.zero
@@ -107,6 +110,12 @@ trait GroupLaws[A] extends Laws {
     "isZero" → forAll((a: A) =>
       a.isZero === (a === A.zero)
     )
+  )
+
+
+  def additiveCMonoid(implicit A: AdditiveCMonoid[A]) = new AdditiveProperties(
+    base = cMonoid(A.additive),
+    parent = Some(additiveMonoid)
   )
 
   def additiveGroup(implicit A: AdditiveGroup[A]) = new AdditiveProperties(

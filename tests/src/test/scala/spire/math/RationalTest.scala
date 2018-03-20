@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 import org.scalatest.FunSuite
 
@@ -183,7 +184,9 @@ class RationalTest extends FunSuite {
     assertResult(Rational(1, BigInt("4294967296"))) {
       a pow 32
     }
-
+    assertResult(Rational(2, 1)) {
+      a pow -1
+    }
     val b = Rational(-3, 1)
     assertResult(Rational.one) {
       b pow 0
@@ -197,6 +200,9 @@ class RationalTest extends FunSuite {
     val l = Rational(Long.MaxValue) * 2
     assertResult(Rational.one) {
       l pow 0
+    }
+    assertResult(l.reciprocal) {
+      l pow -1
     }
   }
 
@@ -302,6 +308,11 @@ class RationalTest extends FunSuite {
     }
   }
 
+  test("Rational(1).limitToInt returns 1") {
+    assert(Rational(1).limitToInt === Rational(1))
+  }
+
+  /* TODO: have a formal definition of Rational GCD and test it
   test("gcd returns the correct rational GCD") {
     assert(Rational(1, 2).gcd(Rational(1, 3)) === Rational(1, 6))
     assert(Rational(11, 12).gcd(Rational(43, 22)) === Rational(1, 132))
@@ -322,7 +333,7 @@ class RationalTest extends FunSuite {
       assert(Rational.one.gcd(w) === Rational.one)
       assert(w.gcd(Rational.one) === Rational.one)
     }
-  }
+  }*/
 
   test("Rational(0D) is Zero") {
     assert(Rational(0D) === Rational.zero)
@@ -350,7 +361,7 @@ class RationalTest extends FunSuite {
     val a = Rational(31, 4)
     val b = Rational(7, 9)
     assertResult(a) {
-      val (q, m) = Rational.RationalAlgebra.quotmod(a, b)
+      val (q, m) = Rational.RationalAlgebra.equotmod(a, b)
       q * b + m
     }
   }
@@ -398,5 +409,17 @@ class RationalTest extends FunSuite {
     assert(rationalFromNumber(1.0) == 1)
     assert(rationalFromNumber(Rational.one) == 1)
     assert(rationalFromNumber(1:BigDecimal) == 1)
+  }
+
+  test("Commutativity of gcd") {
+    val a = Rational(-1, SafeLong("7552476006398892199"))
+    val b = Rational.one
+    assert(a.gcd(b) === b.gcd(a))
+  }
+
+  test("Commutativity of gcd 2") {
+    val a = Rational(SafeLong("-9223372036854775808"), SafeLong("9223372036854775807"))
+    val b = Rational.zero
+    assert(a.gcd(b) === b.gcd(a))
   }
 }

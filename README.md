@@ -1,3 +1,8 @@
+[![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/non/spire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![codecov.io](http://codecov.io/github/non/spire/coverage.svg?branch=master)](http://codecov.io/github/non/spire?branch=master)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.typelevel/spire_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.typelevel/spire_2.11)
+
 ## Spire
 
 ### Overview
@@ -12,54 +17,78 @@ code without having to "bake in" particular numeric representations. In most
 cases, generic implementations using Spire's specialized type classes perform
 identically to corresponding direct implementations.
 
-[![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/non/spire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![codecov.io](http://codecov.io/github/non/spire/coverage.svg?branch=master)](http://codecov.io/github/non/spire?branch=master)
+### Scaladoc
+[![Core](http://javadoc-badge.appspot.com/org.typelevel/spire_2.11.svg?label=core)](http://javadoc-badge.appspot.com/org.typelevel/spire_2.11/index.html#spire.package)
+[![Extras](http://javadoc-badge.appspot.com/org.typelevel/spire-extras_2.11.svg?label=extras)](http://javadoc-badge.appspot.com/org.typelevel/spire-extras_2.11)
+[![Laws](http://javadoc-badge.appspot.com/org.typelevel/spire-laws_2.11.svg?label=laws)](http://javadoc-badge.appspot.com/org.typelevel/spire-laws_2.11/index.html#spire.laws.package)
+[![Macros](http://javadoc-badge.appspot.com/org.typelevel/spire-macros_2.11.svg?label=macros)](http://javadoc-badge.appspot.com/org.typelevel/spire-macros_2.11/index.html#spire.macros.package)
 
 Spire is provided to you as free software under the
 [MIT license](COPYING).
 
+### Organization
+
 The [Spire mailing list](http://groups.google.com/group/typelevel/)
 is shared with other [Typelevel projects](http://typelevel.org).
 It is the place to go for announcements and discussions around Spire.
-When posting, place the word [spire] at the begining of your subject.
+When posting, place the word `[spire]` at the begining of your subject.
 We also have a guide on [contributing to Spire](CONTRIBUTING.md) as well
 as a guide that provides information on [Spire's design](GUIDE.md).
 
-People are expected to follow the [Typelevel Code of Conduct](http://typelevel.org/conduct.html)
-when discussing Spire on the Github page, IRC channel, mailing list,
-or other venues.
+Spire has maintainers who are responsible for signing-off on and
+merging pull requests, and for helping to guide the direction of Spire:
 
-Concerns or issues can be sent to Erik Osheim (*erik@osheim.org*) or
-to [Typelevel](http://typelevel.org/about.html).
+ * Erik Osheim (*erik@osheim.org*)
+ * Tom Switzer (*thomas.switzer@gmail.com*)
+ * Rüdiger Klaehn (*rklaehn@gmail.com*)
+ * Denis Rosset (*physics@denisrosset.com*)
+
+People are expected to follow the [Typelevel Code of Conduct](http://typelevel.org/conduct.html)
+when discussing Spire on the Github page, in Gitter, the IRC channel,
+mailing list, and other official venues.
+
+Concerns or issues can be sent to any of Spire's maintainers, or to the
+[Typelevel](http://typelevel.org/about.html) organization.
 
 ### Set up
 
-Spire is currently available for Scala 2.10 and 2.11.
+Spire is currently available for Scala 2.10, 2.11, and 2.12, for the
+JVM and JS platforms.
 
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-scalaVersion := "2.11.4"
-// or scalaVersion := "2.10.4"
-
-libraryDependencies += "org.spire-math" %% "spire" % "0.10.1"
+libraryDependencies += "org.typelevel" %% "spire" % "0.14.1"
 ```
 
+(Previous to 0.14.0, Spire was published under *org.spire-math*
+instead of *org.typelevel*.)
+
 For Maven instructions, and to download the jars directly, visit the
-[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.spire-math%7Cspire_2.11%7C0.10.1%7Cjar).
+[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.typelevel%7Cspire_2.11%7C0.14.1%7Cjar).
+
+Here is a list of all of Spire's modules:
+
+ * `spire-macros`: macros and compile-time code (required by `spire`)
+ * `spire`: the core Spire library, the types and type classes
+ * `spire-laws`: optional support for law-checking and testing
+ * `spire-extras`: extra types which are more specific or esoteric
+
+Spire depends on [typelevel/algebra](https://github.com/typelevel/algebra)
+and uses this project to interoperate with [Cats](https://github.com/typelevel/cats) and
+[Algebird](https://github.com/twitter/algebird).
 
 ### Playing Around
 
 If you clone the Spire repo, you can get a taste of what Spire can do using
-SBT's console. Launch `sbt` and at the prompt, type `core/console`:
+SBT's console. Launch `sbt` and at the prompt, type `coreJVM/console`:
 
 ```
-> core/console
+> coreJVM/console
 [info] Generating spire/std/tuples.scala
 [info] Starting scala interpreter...
 [info]
-Welcome to Scala version 2.11.2 (Java HotSpot(TM) 64-Bit Server VM, Java 1.7.0_45).
+Welcome to Scala version 2.11.8 (Java HotSpot(TM) 64-Bit Server VM, Java 1.8.0_51).
 Type in expressions to have them evaluated.
 Type :help for more information.
 
@@ -88,10 +117,10 @@ introduces several new ones, all of which can be found in `spire.math`:
  * `UByte` through `ULong` value classes supporting unsigned operations
  * `SafeLong` fast, overflow-proof integer type
  * `Number` boxed type supporting a traditional numeric tower
- * `FixedPoint` fractions with unboxed `Long` numerator and implicit denominator
  * `Interval[A]` arithmetic on open, closed, and unbound intervals
  * `Polynomial[A]` univariate (single-variable) polynomial expressions
  * `Trilean` value class supporting three-valued logic
+ * `FixedPoint` fractions with `Long` numerator and implicit denominator (in *extras*)
 
 Detailed treatment of these types can be found in the [guide](GUIDE.md).
 
@@ -227,12 +256,13 @@ most users will expect.
    + zero: additive identity
    + one: multiplicative identity
  * *Ring* (Rng + Rig)
- * *EuclideanRing*
-   + quot (`/~`): quotient (floor division)
-   + mod (`%`): remainder
-   + quotmod (`/%`): quotient and mod
+ * *GCDRing*
    + gcd: greatest-common-divisor
    + lcm: least-common-multiple
+ * *EuclideanRing*
+   + quot (`/~`): quotient (Euclidean division)
+   + mod (`%`): remainder
+   + quotmod (`/%`): quotient and mod
  * *Field*
    + reciprocal: multiplicative inverse
    + div (`/`): division
@@ -358,7 +388,6 @@ The macro can be nested in itself and compares favorably with other looping
 constructs in Scala such as `for` and `while`:
 
 ```scala
-import spire.syntax.cfor._
 
 // print numbers 1 through 10
 cfor(0)(_ < 10, _ + 1) { i =>
@@ -438,11 +467,9 @@ strategy for getting random values using a `Generator` instance. For
 instance:
 
 ```scala
-import spire.implicits._
-import spire.math._
-import spire.random._
+import spire.random.Dist
 
-val rng = Cmwc5()
+val rng = spire.random.rng.Cmwc5()
 
 // produces a double in [0.0, 1.0)
 val n = rng.next[Double]
@@ -519,7 +546,7 @@ measure relative as well as absolute performance.
 Code is offered as-is, with no implied warranty of any kind. Comments,
 criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
-Copyright 2011-2015 Erik Osheim, Tom Switzer
+Copyright 2011-2017 Erik Osheim, Tom Switzer
 
 A full list of contributors can be found in [AUTHORS.md](AUTHORS.md).
 

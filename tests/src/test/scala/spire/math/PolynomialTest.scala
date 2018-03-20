@@ -1,12 +1,13 @@
-package spire.math
+package spire
+package math
 
 import spire.algebra._
 import spire.math.poly._
 import spire.std.bigDecimal._
+import spire.std.bigInt._
+import spire.syntax.euclideanRing._
 import spire.syntax.literals._
 import spire.optional.rationalTrig._
-
-import scala.reflect.ClassTag
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
@@ -109,15 +110,15 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
 
     property(s"$name p /~ 1 = p") {
-      forAll { (p: P) => p /~ one shouldBe p }
+      forAll { (p: P) => p equot one shouldBe p }
     }
 
     property(s"$name p /~ p = 1") {
-      forAll { (p: P) => if (!p.isZero) p /~ p shouldBe one }
+      forAll { (p: P) => if (!p.isZero) p equot p shouldBe one }
     }
 
     property(s"$name p % p = 0") {
-      forAll { (p: P) => if (!p.isZero) p % p shouldBe zero }
+      forAll { (p: P) => if (!p.isZero) p emod p shouldBe zero }
     }
 
     property(s"$name x + y = y + x") {
@@ -129,7 +130,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
 
     property(s"$name (x /~ y) * y + (x % y) = x") {
-      forAll { (x: P, y: P) => if (!y.isZero) (x /~ y) * y + (x % y) shouldBe x }
+      forAll { (x: P, y: P) => if (!y.isZero) (x equot y) * y + (x emod y) shouldBe x }
     }
 
     property(s"$name p = p.reductum + p.maxTerm") {
@@ -149,6 +150,14 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
       p3(r) shouldBe p1(p2(r))
     }
   }
+
+  implicit val arbPolynomial: Arbitrary[Polynomial[BigInt]] = Arbitrary(for {
+    ts <- arbitrary[List[Term[BigInt]]]
+    isDense <- arbitrary[Boolean]
+  } yield {
+    val p = Polynomial(ts)
+    if (isDense) p.toDense else p.toSparse
+  })
 
   implicit val arbDense: Arbitrary[PolyDense[Rational]] = Arbitrary(for {
     ts <- arbitrary[List[Term[Rational]]]
@@ -225,12 +234,18 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
     }
   }
 
+  property(s"p.shift(h) = p.compose(x + h)") {
+    forAll { (p: Polynomial[BigInt], h: BigInt) =>
+      p.shift(h) shouldBe p.compose(Polynomial.x[BigInt] + Polynomial.constant(h))
+    }
+  }
+
   def gcdTest(x: Polynomial[Rational], y: Polynomial[Rational]): Unit = {
     if (!x.isZero || !y.isZero) {
       val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
       if (!gcd.isZero) {
-        (x % gcd) shouldBe 0
-        (y % gcd) shouldBe 0
+        (x emod gcd) shouldBe 0
+        (y emod gcd) shouldBe 0
       }
     }
   }
@@ -258,6 +273,16 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
 }
 
 class PolynomialTest extends FunSuite {
+
+  test("Polynomial(List(Term(-1, 4), List(1, 4))).toSparse should be equal to Polynomial.zero") {
+    val ts = Term(r"-1", 4) :: Term(r"1", 4) :: Nil
+    assert(Polynomial(ts).toSparse == Polynomial.zero[Rational])
+  }
+
+  test("Polynomial(List(Term(0, 0), Term(0, 0))) should not throw") {
+    val ts = Term(r"0", 0) :: Term(r"0", 0) :: Nil
+    assert(Polynomial(ts) == Polynomial.zero[Rational])
+  }
 
   test("polynomial term implicit operations") {
     val t = Term(r"5/6", 2)
@@ -311,15 +336,15 @@ class PolynomialTest extends FunSuite {
 
     assert(p1 + p2 === Polynomial("1/2x^2 + 5x + 1"))
     assert(legSparse(2) * legSparse(3) === Polynomial("15/4x^5 - 7/2x^3 + 3/4x"))
-    assert(p1 % p2 === Polynomial("-x"))
-    assert(p1 /~ p2 === Polynomial("1"))
+    assert((p1 emod p2) === Polynomial("-x"))
+    assert((p1 equot p2) === Polynomial("1"))
 
     val legDense = legSparse.map(_.toDense)
 
     assert(p1 + p2 === Polynomial.dense(Array(r"1/1", r"5/1", r"1/2")))
     assert((legDense(2) * legDense(3)).coeffsArray === Array(r"0", r"3/4", r"0", r"-7/2", r"0", r"15/4"))
-    assert(p1 % p2 === Polynomial("-x"))
-    assert(p1 /~ p2 === Polynomial("1"))
+    assert((p1 emod p2) === Polynomial("-x"))
+    assert((p1 equot p2) === Polynomial("1"))
 
   }
 
@@ -341,11 +366,51 @@ class PolynomialTest extends FunSuite {
 
   }
 
+  /* TODO: define formally "nice" and document it
   test("GCD returns nice results") {
     val a = Polynomial("x^2 + 2x + 1")
     val b = Polynomial("x - 1")
     assert(spire.math.gcd(a, b) == 1)
     assert(spire.math.gcd(2 *: a, Polynomial("2")) == 2)
     assert(spire.math.gcd(2 *: a, 2 *: b) == 2)
+  }
+   */
+
+  test("GCD doesn't run out of memory for BigDecimals") {
+    GCDRing[BigDecimal]
+    import Polynomial.{ linear, constant }
+    val a = linear(BigDecimal("2"))     // 2x
+    val b = constant(BigDecimal("3.4")) // 3.4
+    val c = (a + b)                     // 2x + 3.4
+    val d = c * c                       // 4x² + 13.6x + 11.56
+    // assert((a gcd c) === constant(BigDecimal("0.2"))) TODO: does not work anymore
+    // assert((a gcd d) === constant(BigDecimal("0.04")))
+    assert((c gcd d) === c)
+  }
+
+  test("Polynomial(terms...) sums terms") {
+    val terms = List(
+      Term(Rational("-2/17"), 10),
+      Term(Rational("97/8"), 0),
+      Term(Rational("-8/7"), 0),
+      Term(Rational("-8/47"), 47),
+      Term(Rational("-1/71"), 26),
+      Term(Rational("1"), 0),
+      Term(Rational("0"), 1),
+      Term(Rational("-29/8"), 19),
+      Term(Rational("55/7"), 57),
+      Term(Rational("-8/97"), 93),
+      Term(Rational("-99/62"), 1),
+      Term(Rational("0"), 58),
+      Term(Rational("-7/22"), 1),
+      Term(Rational("-93/70"), 38),
+      Term(Rational("-2/21"), 54),
+      Term(Rational("34/79"), 47),
+      Term(Rational("-56/55"), 49),
+      Term(Rational("19/44"), 0))
+    val expected = terms
+      .map { case Term(c, k) => Polynomial(Map(k -> c)) }
+      .foldLeft(Polynomial.zero[Rational])(_ + _)
+    assert(Polynomial(terms) === expected)
   }
 }

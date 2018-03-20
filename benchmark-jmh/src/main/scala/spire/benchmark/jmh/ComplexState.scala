@@ -1,4 +1,5 @@
-package spire.benchmark.jmh
+package spire
+package benchmark.jmh
 
 import org.openjdk.jmh.annotations._
 import spire.math.Complex

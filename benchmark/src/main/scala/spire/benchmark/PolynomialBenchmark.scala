@@ -1,4 +1,5 @@
-package spire.benchmark
+package spire
+package benchmark
 
 import scala.util.Random
 import Random._
@@ -6,9 +7,8 @@ import Random._
 import spire.math._
 import spire.implicits._
 
-import com.google.caliper.{ Runner, SimpleBenchmark, Param }
+import com.google.caliper.Param
 import org.apache.commons.math3.analysis.polynomials._
-import org.apache.commons.math3.analysis.UnivariateFunction
 
 object PolynomialBenchmarks extends MyRunner(classOf[PolynomialBenchmarks])
 
@@ -143,7 +143,7 @@ class PolynomialBenchmarks extends MyBenchmark {
     var total: (Polynomial[Rational], Polynomial[Rational]) = null
     var i = 0
     val len = data.length
-    while (i < len) { total = data(0) /% data(i); i += 1 }
+    while (i < len) { total = data(0) equotmod data(i); i += 1 }
     total
   }
 
@@ -151,7 +151,7 @@ class PolynomialBenchmarks extends MyBenchmark {
     var total: (Polynomial[Double], Polynomial[Double]) = null
     var i = 0
     val len = data.length
-    while (i < len) { total = data(0) /% data(i); i += 1 }
+    while (i < len) { total = data(0) equotmod data(i); i += 1 }
     total
   }
 

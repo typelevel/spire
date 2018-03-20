@@ -1,13 +1,13 @@
-package spire.laws
+package spire
+package laws
 
 import java.math.BigInteger
-
-import scala.reflect.ClassTag
+import spire.math.extras.{FixedPoint, FixedScale}
 
 import spire.algebra._
 import spire.algebra.free._
 import spire.math._
-import spire.math.interval.{Bound, Closed, Open, Unbound}
+import spire.math.interval.Bound
 
 import org.scalacheck.Arbitrary
 
@@ -76,7 +76,7 @@ object arb {
   implicit def bound[A: Arbitrary]: Arbitrary[Bound[A]] =
     Arbitrary(gen.bound[A])
 
-  implicit def interval[A: Arbitrary: Order: AdditiveMonoid]: Arbitrary[Interval[A]] =
+  implicit def interval[A: Arbitrary: Order]: Arbitrary[Interval[A]] =
     Arbitrary(gen.interval[A])
 
   implicit def freeMonoid[A: Arbitrary]: Arbitrary[FreeMonoid[A]] =

@@ -1,12 +1,7 @@
-package spire.benchmark
-
-import scala.reflect.ClassTag
+package spire
+package benchmark
 
 import spire.implicits._
-
-import com.google.caliper.Runner
-import com.google.caliper.SimpleBenchmark
-import com.google.caliper.Param
 
 object RandomBenchmarks extends MyRunner(classOf[RandomBenchmarks])
 
@@ -33,6 +28,25 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
     intsToLong(ints16(8), ints16(9))
   )
 
+  val longs16: Array[Long] = Array(
+    intsToLong(ints16(0), ints16(1)),
+    intsToLong(ints16(1), ints16(2)),
+    intsToLong(ints16(2), ints16(3)),
+    intsToLong(ints16(3), ints16(4)),
+    intsToLong(ints16(4), ints16(5)),
+    intsToLong(ints16(5), ints16(6)),
+    intsToLong(ints16(6), ints16(7)),
+    intsToLong(ints16(7), ints16(8)),
+    intsToLong(ints16(8), ints16(9)),
+    intsToLong(ints16(9), ints16(10)),
+    intsToLong(ints16(10), ints16(11)),
+    intsToLong(ints16(11), ints16(12)),
+    intsToLong(ints16(12), ints16(13)),
+    intsToLong(ints16(13), ints16(14)),
+    intsToLong(ints16(14), ints16(15)),
+    intsToLong(ints16(15), ints16(0))
+  )
+
   val javaRng = new java.util.Random(long)
   val scalaRng = new scala.util.Random(long)
   val lcg32Rng = spire.random.rng.Lcg32.fromSeed(int)
@@ -46,6 +60,9 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
   val well19937cRng = spire.random.rng.Well19937c.fromArray(ints16)
   val well44497aRng = spire.random.rng.Well44497a.fromArray(ints16)
   val well44497bRng = spire.random.rng.Well44497b.fromArray(ints16)
+  val xorShift64StarRng = spire.random.rng.extras.XorShift64Star.fromSeed(long)
+  val xorShift1024StarRng = spire.random.rng.extras.XorShift1024Star.fromSeed((longs16, 0))
+  val xorShift128PlusRng = spire.random.rng.extras.XorShift128Plus.fromSeed((long, long))
 
   @inline final def nextLen = 1000000
 
@@ -124,6 +141,24 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
 
   def timeNextIntWell44497b(reps: Int) = run(reps) {
     val rng = well44497bRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntXorShift64Star(reps: Int) = run(reps) {
+    val rng = xorShift64StarRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntXorShift1024Star(reps: Int) = run(reps) {
+    val rng = xorShift1024StarRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntXorShift128Plus(reps: Int) = run(reps) {
+    val rng = xorShift128PlusRng
     var t = 0
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
   }
@@ -207,6 +242,24 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
   }
 
+  def timeNextIntSyncXorShift64Star(reps: Int) = run(reps) {
+    val rng = xorShift64StarRng.sync
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntSyncXorShift1024Star(reps: Int) = run(reps) {
+    val rng = xorShift1024StarRng.sync
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
+  def timeNextIntSyncXorShift128Plus(reps: Int) = run(reps) {
+    val rng = xorShift128PlusRng.sync
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt())
+  }
+
   // nextLong()
   def timeNextLongJava(reps: Int) = run(reps) {
     val rng = javaRng
@@ -282,6 +335,24 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
 
   def timeNextLongWell44497b(reps: Int) = run(reps) {
     val rng = well44497bRng
+    var t = 0L
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextLong())
+  }
+
+  def timeNextLongXorShift64Star(reps: Int) = run(reps) {
+    val rng = xorShift64StarRng
+    var t = 0L
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextLong())
+  }
+
+  def timeNextLongXorShift1024Star(reps: Int) = run(reps) {
+    val rng = xorShift1024StarRng
+    var t = 0L
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextLong())
+  }
+
+  def timeNextLongXorShift128Plus(reps: Int) = run(reps) {
+    val rng = xorShift128PlusRng
     var t = 0L
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextLong())
   }
@@ -365,6 +436,24 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextDouble())
   }
 
+  def timeNextDoubleXorShift64Star(reps: Int) = run(reps) {
+    val rng = xorShift64StarRng
+    var t = 0.0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextDouble())
+  }
+
+  def timeNextDoubleXorShift1024Star(reps: Int) = run(reps) {
+    val rng = xorShift1024StarRng
+    var t = 0.0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextDouble())
+  }
+
+  def timeNextDoubleXorShift128Plus(reps: Int) = run(reps) {
+    val rng = xorShift128PlusRng
+    var t = 0.0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextDouble())
+  }
+
   // nextInt(100)
   def timeNextInt100Java(reps: Int) = run(reps) {
     val rng = javaRng
@@ -440,6 +529,24 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
 
   def timeNextInt100Well44497b(reps: Int) = run(reps) {
     val rng = well44497bRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt(100))
+  }
+
+  def timeNextInt100XorShift64Star(reps: Int) = run(reps) {
+    val rng = xorShift64StarRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt(100))
+  }
+
+  def timeNextInt100XorShift1024Star(reps: Int) = run(reps) {
+    val rng = xorShift1024StarRng
+    var t = 0
+    cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt(100))
+  }
+
+  def timeNextInt100XorShift128Plus(reps: Int) = run(reps) {
+    val rng = xorShift128PlusRng
     var t = 0
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextInt(100))
   }
@@ -523,5 +630,23 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
     val bytes = new Array[Byte](128)
     val rng = well44497bRng
     cfor(0)(_ < fillLen, _ + 1)(_ => rng.fillBytes(bytes))
+  }
+
+  def timeFillBytesXorShift64Star(reps: Int) = run(reps) {
+    val bytes = new Array[Byte](128)
+    val rng = xorShift64StarRng
+    cfor(0)(_ < nextLen, _ + 1)(_ => rng.fillBytes(bytes))
+  }
+
+  def timeFillBytesXorShift1024Star(reps: Int) = run(reps) {
+    val bytes = new Array[Byte](128)
+    val rng = xorShift1024StarRng
+    cfor(0)(_ < nextLen, _ + 1)(_ => rng.fillBytes(bytes))
+  }
+
+  def timeFillBytesXorShift128Plus(reps: Int) = run(reps) {
+    val bytes = new Array[Byte](128)
+    val rng = xorShift128PlusRng
+    cfor(0)(_ < nextLen, _ + 1)(_ => rng.fillBytes(bytes))
   }
 }

@@ -1,9 +1,10 @@
-package spire.laws
+package spire
+package laws
 
 import spire.algebra._
 import spire.implicits._
 
-import org.typelevel.discipline.{Laws, Predicate}
+import org.typelevel.discipline.Predicate
 
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Arbitrary._
@@ -41,32 +42,34 @@ trait RingLaws[A] extends GroupLaws[A] {
   def multiplicativeSemigroup(implicit A: MultiplicativeSemigroup[A]) = new MultiplicativeProperties(
     base = _.semigroup(A.multiplicative),
     parent = None,
-    "prodn(a, 1) === a" → forAll((a: A) =>
-      A.prodn(a, 1) === a
+    "pow(a, 1) === a" → forAll((a: A) =>
+      A.pow(a, 1) === a
     ),
-    "prodn(a, 2) === a * a" → forAll((a: A) =>
-      A.prodn(a, 2) === (a * a)
+    "pow(a, 2) === a * a" → forAll((a: A) =>
+      A.pow(a, 2) === (a * a)
     ),
-    "prodOption" → forAll((a: A) =>
-      (A.prodOption(Seq.empty[A]) === None) &&
-      (A.prodOption(Seq(a)) === Some(a)) &&
-      (A.prodOption(Seq(a, a)) === Some(a * a)) &&
-      (A.prodOption(Seq(a, a, a)) === Some(a * a * a))
+    "tryProduct" → forAll((a: A) =>
+      (A.tryProduct(Seq.empty[A]) === Option.empty[A]) &&
+        (A.tryProduct(Seq(a)) === Option(a)) &&
+        (A.tryProduct(Seq(a, a)) === Option(a * a)) &&
+        (A.tryProduct(Seq(a, a, a)) === Option(a * a * a))
     )
   )
 
   def multiplicativeMonoid(implicit A: MultiplicativeMonoid[A]) = new MultiplicativeProperties(
     base = _.monoid(A.multiplicative),
     parent = Some(multiplicativeSemigroup),
-    "prodn(a, 0) === one" → forAll((a: A) =>
-      A.prodn(a, 0) === A.one
+    "pow(a, 0) === one" → forAll((a: A) =>
+      A.pow(a, 0) === A.one
     ),
-    "prod(Nil) === one" → forAll((a: A) =>
-      A.prod(Nil) === A.one
-    ),
-    "isOne" → forAll((a: A) =>
-      a.isOne === (a === A.one)
+    "product(Nil) === one" → forAll((a: A) =>
+      A.product(Nil) === A.one
     )
+  )
+
+  def multiplicativeCMonoid(implicit A: MultiplicativeCMonoid[A]) = new MultiplicativeProperties(
+    base = _.cMonoid(A.multiplicative),
+    parent = Some(multiplicativeMonoid)
   )
 
   def multiplicativeGroup(implicit A: MultiplicativeGroup[A]) = new MultiplicativeProperties(
@@ -107,8 +110,16 @@ trait RingLaws[A] extends GroupLaws[A] {
 
   def rig(implicit A: Rig[A]) = new RingProperties(
     name = "rig",
-    al = additiveMonoid,
+    al = additiveCMonoid,
     ml = multiplicativeMonoid,
+    parents = Seq(semiring)
+  )
+
+
+  def cRig(implicit A: CRig[A]) = new RingProperties(
+    name = "commutative rig",
+    al = additiveCMonoid,
+    ml = multiplicativeCMonoid,
     parents = Seq(semiring)
   )
 
@@ -120,10 +131,79 @@ trait RingLaws[A] extends GroupLaws[A] {
     parents = Seq(rig, rng)
   )
 
+  def divisionRing(implicit A: DivisionRing[A]) = new RingProperties(
+    name = "divisionRing",
+    al = additiveAbGroup,
+    ml = multiplicativeGroup,
+    parents = Seq(ring)
+  ) {
+    override def nonZero = true
+  }
+
+  def cRing(implicit A: CRing[A]) = new RingProperties(
+    name = "commutative ring",
+    al = additiveAbGroup,
+    ml = multiplicativeCMonoid,
+    parents = Seq(ring)
+  )
+
+  def gcdRing(implicit A: GCDRing[A]) = RingProperties.fromParent(
+    name = "gcd domain",
+    parent = cRing,
+    "gcd/lcm" → forAll { (x: A, y: A) =>
+      import spire.syntax.gcdRing._
+      val d = x gcd y
+      val m = x lcm y
+      x * y === d * m
+    },
+    "gcd is commutative" → forAll { (x: A, y: A) =>
+      import spire.syntax.gcdRing._
+        (x gcd y) === (y gcd x)
+    },
+    "lcm is commutative" → forAll { (x: A, y: A) =>
+      import spire.syntax.gcdRing._
+      (x lcm y) === (y lcm x)
+    },
+    "gcd(0, 0)" → ((A.zero gcd A.zero) === A.zero),
+    "lcm(0, 0) === 0" → ((A.zero lcm A.zero) === A.zero),
+    "lcm(x, 0) === 0" → forAll { (x: A) => (x lcm A.zero) === A.zero }
+  )
+
   def euclideanRing(implicit A: EuclideanRing[A]) = RingProperties.fromParent(
-    // TODO tests?!
     name = "euclidean ring",
-    parent = ring
+    parent = gcdRing,
+    "euclidean division rule" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        val (q, r) = x equotmod y
+        x === (y * q + r)
+      }
+    },
+    "equot" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        (x equotmod y)._1 === (x equot y)
+      }
+    },
+    "emod" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        (x equotmod y)._2 === (x emod y)
+      }
+    },
+    "euclidean function" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      pred(y) ==> {
+        val (q, r) = x equotmod y
+        r.isZero || (r.euclideanFunction < y.euclideanFunction)
+      }
+    },
+    "submultiplicative function" → forAll { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      (pred(x) && pred(y)) ==> {
+        x.euclideanFunction <= (x * y).euclideanFunction
+      }
+    }
   )
 
   // Everything below fields (e.g. rings) does not require their multiplication

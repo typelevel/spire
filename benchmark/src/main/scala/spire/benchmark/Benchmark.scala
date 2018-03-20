@@ -1,9 +1,7 @@
-package spire.benchmark
+package spire
+package benchmark
 
-import scala.reflect.ClassTag
 
-import scala.annotation.tailrec
-import scala.{specialized => spec}
 import scala.util.Random
 import Random._
 
@@ -11,10 +9,6 @@ import spire.math._
 
 import com.google.caliper.Runner
 import com.google.caliper.SimpleBenchmark
-import com.google.caliper.Param
-
-import java.lang.Math
-import java.math.BigInteger
 
 /**
  * Extend this to create an actual benchmarking class.

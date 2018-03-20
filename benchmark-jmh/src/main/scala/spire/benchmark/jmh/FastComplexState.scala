@@ -1,4 +1,5 @@
-package spire.benchmark.jmh
+package spire
+package benchmark.jmh
 
 import org.openjdk.jmh.annotations.{Scope, Setup, State}
 import spire.math.FastComplex

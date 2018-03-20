@@ -1,6 +1,6 @@
-package spire.math
+package spire
+package math
 
-import scala.reflect.ClassTag
 
 // scalatest
 import org.scalatest.FunSuite
@@ -11,7 +11,6 @@ import spire.implicits.{eqOps => _, _}
 import java.math.MathContext
 
 // nice alias
-import scala.{specialized => spec}
 
 class NumericTest extends FunSuite {
 
@@ -21,7 +20,7 @@ class NumericTest extends FunSuite {
    *
    *   a=-3  b=3  c=9
    */
-  def runWith[@spec A:Numeric:ClassTag](cls:String)(a:A, b:A, c:A): Unit = {
+  def runWith[@sp A:Numeric:ClassTag](cls:String)(a:A, b:A, c:A): Unit = {
 
     // the name to use for this A
     //val cls = implicitly[ClassTag[A]].erasure.getSimpleName
@@ -69,9 +68,28 @@ class NumericTest extends FunSuite {
   runWith[BigDecimal]("BigDecimal")(-3, 3, -9)
   runWith[Rational]("Rational")(-3, 3, -9)
   //runWith[Complex[Double]](-3, 3, -9) // There seems to be a bug.
-  runWith[Complex[BigDecimal]]("Complex[BigDecimal]")(
+/*  runWith[Complex[BigDecimal]]("Complex[BigDecimal]")( // Complex is no longer Numeric
     Complex(BigDecimal(-3), BigDecimal(0)),
     Complex(BigDecimal(3), BigDecimal(0)),
     Complex(BigDecimal(-9), BigDecimal(0))
-  )
+  )*/
+
+  def testImplicitNumeric[N](cls: String)(implicit numN: Numeric[N]): Unit = {
+
+    def runTest(name:String)(f: => Unit) = test("%s:%s" format(cls, name))(f)
+
+    val n1 = numN.one
+
+    runTest("toDouble(1)")(assert(numN.toDouble(n1) === 1D))
+    runTest("toRational(1)")(assert(numN.toRational(n1) === Rational(1)))
+    runTest("toReal(1)")(assert(numN.toReal(n1) === Real(1)))
+  }
+
+  testImplicitNumeric[Int]("Int")
+  testImplicitNumeric[Long]("Long")
+  testImplicitNumeric[Float]("Float")
+  testImplicitNumeric[Double]("Double")
+  testImplicitNumeric[BigInt]("BigInt")
+  testImplicitNumeric[BigDecimal]("BigDecimal")
+  testImplicitNumeric[Rational]("Rational")
 }

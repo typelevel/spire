@@ -1,4 +1,5 @@
-package spire.laws
+package spire
+package laws
 
 import spire.algebra.{Eq, Bool}
 import spire.algebra.lattice.Heyting
@@ -7,7 +8,7 @@ import spire.syntax.bool._
 
 import org.typelevel.discipline.Laws
 
-import org.scalacheck.{Arbitrary, Prop}
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
 
 object LogicLaws {

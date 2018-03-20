@@ -1,4 +1,5 @@
-package spire.math
+package spire
+package math
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
@@ -117,7 +118,6 @@ class ULongTest extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
   property("toDouble") {
     forAll { (n: ULong) =>
       val d = new java.math.BigDecimal(n.toDouble).toPlainString
-      println(s"$n versus $d")
       n.toDouble shouldBe n.toBigInt.toDouble
     }
   }

@@ -1,20 +1,22 @@
-package spire.math
+package spire
+package math
+
+import spire.math.ArbitrarySupport.{Positive, NonNegative}
 
 import scala.util.Try
 
 import org.scalatest.FunSuite
 import spire.implicits.{eqOps => _, _}
 import spire.laws.arb.{interval => interval_, rational}
-import spire.random.{Uniform, Dist}
 
 import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
 import org.scalatest._
 import prop._
+import interval.Overlap._
 
 import org.scalacheck._
 import Gen._
-import Arbitrary.arbitrary
 
 class IntervalTest extends FunSuite {
   def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)
@@ -38,6 +40,9 @@ class IntervalTest extends FunSuite {
   test("[1, 2] has at or above 1") { assert(Interval.closed(1, 2).hasAtOrAbove(1)) }
   test("[1, 2] has above 1") { assert(Interval.closed(1, 2).hasAtOrAbove(1)) }
   test("(1, 2] has above 1") { assert(Interval.openLower(1, 2).hasAtOrAbove(1)) }
+
+  test("Interval.above(0).isBounded is false") { assert(!Interval.above(0).isBounded) }
+  test("Interval.closed(0, 5).isBounded is true") { assert(Interval.closed(0, 5).isBounded) }
 
   test("Interval.point(2).toString == [2]") { assert(Interval.point(2).toString === "[2]") }
   test("Interval.empty.toString == (Ø)") { assert(Interval.empty[Int].toString === "(Ø)") }
@@ -157,7 +162,7 @@ class IntervalGeometricPartialOrderTest extends FunSuite {
 class IntervalSubsetPartialOrderTest extends FunSuite {
   import spire.optional.intervalSubsetPartialOrder._
 
-  import Interval.{openUpper, openLower, closed, open, point}
+  import Interval.{closed, point}
 
   test("Minimal and maximal elements of {[1, 3], [3], [2], [1]} by subset partial order") {
     val intervals = Seq(closed(1, 3), point(3), point(2), point(1))
@@ -398,35 +403,32 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
   property("(-inf, a] < [b, inf) if a < b") {
     import spire.optional.intervalGeometricPartialOrder._
 
-    import spire.algebra.{Order, PartialOrder}
-    forAll { (a: Rational, b: Rational) =>
-      whenever(a < b) {
-        val i = Interval.atOrBelow(a)
-        val j = Interval.atOrAbove(b)
-        (i < j) shouldBe true
-        (i >= j) shouldBe false
-        (j > i) shouldBe true
-        (j <= i) shouldBe false
-      }
+    forAll { (a: Rational, w: Positive[Rational]) =>
+      val b = a + w.num
+      // a < b
+      val i = Interval.atOrBelow(a)
+      val j = Interval.atOrAbove(b)
+      (i < j) shouldBe true
+      (i >= j) shouldBe false
+      (j > i) shouldBe true
+      (j <= i) shouldBe false
     }
   }
 
   property("(-inf, a] does not compare to [b, inf) if a >= b") {
     import spire.optional.intervalGeometricPartialOrder._
-    import spire.algebra.{Order, PartialOrder}
-    forAll { (a: Rational, b: Rational) =>
-      whenever(a >= b) {
-        val i = Interval.atOrBelow(a)
-        val j = Interval.atOrAbove(b)
-        i.partialCompare(j).isNaN shouldBe true
-        j.partialCompare(i).isNaN shouldBe true
-      }
+    forAll { (a: Rational, w: NonNegative[Rational]) =>
+      val b = a - w.num
+      // a >= b
+      val i = Interval.atOrBelow(a)
+      val j = Interval.atOrAbove(b)
+      i.partialCompare(j).isNaN shouldBe true
+      j.partialCompare(i).isNaN shouldBe true
     }
   }
 
   property("(-inf, inf) does not compare with [a, b]") {
     import spire.optional.intervalGeometricPartialOrder._
-    import spire.algebra.{Order, PartialOrder}
     forAll { (a: Rational, b: Rational) =>
       val i = Interval.all[Rational]
       val j = Interval.closed(a, b)
@@ -527,6 +529,123 @@ class IntervalIteratorCheck extends PropSpec with Matchers with GeneratorDrivenP
   property("unbound intervals are not supported") {
     forAll { (step: Rational) =>
       Try(Interval.all[Rational].iterator(step)).isFailure shouldBe true
+    }
+  }
+}
+
+class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+
+  property("(x overlap y) = (y overlap x)") {
+    forAll() { (x: Interval[Rational], y: Interval[Rational]) =>
+      x.overlap(y) shouldBe y.overlap(x)
+    }
+  }
+
+  property("x overlap x = Equal(x, x)") {
+    forAll() { x: Interval[Rational] =>
+      x.overlap(x) shouldBe Equal[Rational]()
+    }
+  }
+
+  property("(x overlap Ø) = Subset(Ø, x) id x != Ø") {
+    forAll() { x: Interval[Rational] =>
+      whenever(x.nonEmpty) {
+        val empty = Interval.empty[Rational]
+        x.overlap(empty) shouldBe Subset(empty, x)
+      }
+    }
+  }
+
+  property("consistency with Interval#isSubset") {
+    forAll() { (x: Interval[Rational], y: Interval[Rational]) =>
+      x.overlap(y).isSubset shouldBe (x.isSubsetOf(y) || y.isSubsetOf(x))
+    }
+  }
+
+  property("(-inf, a] overlap [a, +inf) = PartialOverlap") {
+    forAll() { (x: Rational) =>
+      Interval.atOrBelow(x).overlap(Interval.atOrAbove(x)) shouldBe a[PartialOverlap[_]]
+    }
+  }
+
+  property("[a, c) overlap (b, d] = PartialOverlap if a < b < c < d") {
+    forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
+
+      /* TODO: the name `catsKernel` leaks here (and below), OK? */
+      import spire.algebra.Order.catsKernelOrderingForOrder
+
+      val sorted = List(x, y, m, n).sorted
+      whenever(sorted.distinct == sorted) {
+        Interval.openUpper(sorted(0), sorted(2)).overlap(Interval.openLower(sorted(1), sorted(3))) shouldBe a[PartialOverlap[_]]
+      }
+    }
+  }
+
+  property("[a, c] overlap [b, d] = PartialOverlap if a < b <= c < d") {
+    forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
+
+      import spire.algebra.Order.catsKernelOrderingForOrder
+
+      val sorted = List(x, y, m, n).sorted
+      whenever(sorted.distinct.size >= 3 && sorted(0) != sorted(1) && sorted(2) != sorted(3)) {
+        Interval.closed(sorted(0), sorted(2)).overlap(Interval.closed(sorted(1), sorted(3))) shouldBe a[PartialOverlap[_]]
+      }
+    }
+  }
+
+  property("(-inf, a) overlap (b, +inf) = PartialOverlap if a > b") {
+    forAll() { (x: Rational, y: Rational) =>
+      whenever(x != y) {
+        Interval.below(max(x, y)).overlap(Interval.above(min(x, y))) shouldBe a[PartialOverlap[_]]
+      }
+    }
+  }
+
+  property("(-inf, a) overlap (b, +inf) = Disjoint if a <= b") {
+    forAll() { (x: Rational, y: Rational) =>
+      Interval.below(min(x, y)).overlap(Interval.above(max(x, y))).isDisjoint shouldBe true
+    }
+  }
+
+  property("Disjoint((-inf, a), (b, +inf)).join = [a, b]") {
+    forAll() { (x: Rational, y: Rational) =>
+      val l = min(x, y)
+      val u = max(x, y)
+      Disjoint(Interval.below(l), Interval.above(u)).join shouldBe Interval.closed(l, u)
+    }
+  }
+
+  property("[a, b) overlap (c, d] = Disjoint if a < b <= c < d") {
+    forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
+
+      import spire.algebra.Order.catsKernelOrderingForOrder
+
+      val sorted = List(x, y, m, n).sorted
+      whenever(sorted(0) < sorted(1) && sorted(2) < sorted(3)) {
+        val overlap = Interval.openUpper(sorted(0), sorted(1)).overlap(Interval.openLower(sorted(2), sorted(3)))
+        overlap.isDisjoint shouldBe true
+        overlap.asInstanceOf[Disjoint[Rational]].join shouldBe Interval.closed(sorted(1), sorted(2))
+      }
+    }
+  }
+
+  property("[a, b] overlap [c, d] = Disjoint if a <= b < c <= d") {
+    forAll() { (x: Rational, y: Rational, m: Rational, n: Rational) =>
+
+      import spire.algebra.Order.catsKernelOrderingForOrder
+
+      val sorted = List(x, y, m, n).sorted
+      whenever(sorted(1) < sorted(2)) {
+        val overlap = Interval.closed(sorted(0), sorted(1)).overlap(Interval.closed(sorted(2), sorted(3)))
+        overlap.isDisjoint shouldBe true
+        overlap.asInstanceOf[Disjoint[Rational]].join shouldBe Interval.open(sorted(1), sorted(2))
+      }
+    }
+  }
+
+  property("x overlap [a] is never a PartialOverlap") {
+    forAll() { (x: Interval[Rational], b: Rational) =>
+      x.overlap(Interval.point(b)) should not be a[PartialOverlap[_]]
     }
   }
 }
