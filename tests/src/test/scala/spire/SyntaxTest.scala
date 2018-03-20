@@ -483,7 +483,7 @@ class PartialOrderSyntaxTest extends SpireProperties {
   }
 }
 
-class LiteralSyntaxTest extends FunSuite with Matchers {
+class LiteralSyntaxTest extends SpireTests {
   test("rationals") {
     import spire.syntax.literals._
     r"0" shouldBe Rational(0)
