@@ -48,7 +48,6 @@ lazy val spireJS = project.in(file(".spireJS"))
 lazy val platform = crossProject
   .settings(moduleName := "spire-platform")
   .settings(spireSettings:_*)
-  .settings(coreSettings:_*)
   .settings(crossVersionSharedSources:_*)
   .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
