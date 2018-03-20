@@ -73,7 +73,9 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
     testFieldSyntax(a, b.x)(implicitly, spire.optional.totalfloat.TotalDoubleOrder)
   }))
   test("NRoot syntax")(check(forAll { (a: Positive[Double]) => testNRootSyntax(a.x) }))
-  test("Module syntax")(check(forAll { (v: Vector[Int], w: Vector[Int], a: Int) => testModuleSyntax(v, w, a) }))
+  test("LeftModule syntax")(check(forAll { (v: Vector[Int], w: Vector[Int], a: Int) => testLeftModuleSyntax(v, w, a) }))
+  test("RightModule syntax")(check(forAll { (v: Vector[Int], w: Vector[Int], a: Int) => testRightModuleSyntax(v, w, a) }))
+  test("CModule syntax")(check(forAll { (v: Vector[Int], w: Vector[Int], a: Int) => testCModuleSyntax(v, w, a) }))
   test("VectorSpace syntax")(check(forAll { (v: Vector[Double], w: Vector[Double], a: NonZero[Double]) =>
     testVectorSpaceSyntax(v, w, a.x)
   }))
@@ -335,16 +337,34 @@ trait BaseSyntaxTest {
       ((a ** 0.5) === NRoot[A].fpow(a, half))
   }
 
-  def testModuleSyntax[V: Eq, A](v: V, w: V, a: A)(implicit V: CModule[V, A], A: Ring[A]) = {
+  def testLeftModuleSyntax[V: Eq, A](v: V, w: V, a: A)(implicit V: LeftModule[V, A], A: Ring[A]) = {
     import spire.syntax.eq._
-    import spire.syntax.module._
+    import spire.syntax.leftModule._
     ((v + w) === V.plus(v, w)) &&
-      ((v - w) === V.minus(v, w)) &&
-      (-v === V.negate(v)) &&
-      ((a *: v) === V.timesl(a, v)) &&
-      ((v :* a) === V.timesr(v, a)) &&
-      //((2 *: v) == V.timesl(A.fromInt(2), v)) &&
-      ((v :* 2) === V.timesr(v, A.fromInt(2)))
+    ((v - w) === V.minus(v, w)) &&
+    (-v === V.negate(v)) &&
+    ((a *: v) === V.timesl(a, v))
+  }
+
+  def testRightModuleSyntax[V: Eq, A](v: V, w: V, a: A)(implicit V: RightModule[V, A], A: Ring[A]) = {
+    import spire.syntax.eq._
+    import spire.syntax.rightModule._
+    ((v + w) === V.plus(v, w)) &&
+    ((v - w) === V.minus(v, w)) &&
+    (-v === V.negate(v)) &&
+    ((v :* a) === V.timesr(v, a)) &&
+    ((v :* 2) === V.timesr(v, A.fromInt(2)))
+  }
+
+  def testCModuleSyntax[V: Eq, A](v: V, w: V, a: A)(implicit V: CModule[V, A], A: CRing[A]) = {
+    import spire.syntax.eq._
+    import spire.syntax.cModule._
+    ((v + w) === V.plus(v, w)) &&
+    ((v - w) === V.minus(v, w)) &&
+    (-v === V.negate(v)) &&
+    ((a *: v) === V.timesl(a, v)) &&
+    ((v :* a) === V.timesr(v, a)) &&
+    ((v :* 2) === V.timesr(v, A.fromInt(2)))
   }
 
   def testVectorSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: VectorSpace[V, A], eqV: Eq[V]) = {
