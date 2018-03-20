@@ -3,7 +3,7 @@ package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import spire.algebra.{IsIntegral, Order, Rig}
+import spire.algebra.{CRig, IsIntegral, Order, SignedAdditiveCMonoid}
 
 import Natural._
 
@@ -703,7 +703,7 @@ trait NaturalInstances {
     Integral, Some(Natural.zero), Some(Natural.zero), None, false, false)
 }
 
-private[math] trait NaturalIsRig extends Rig[Natural] {
+private[math] trait NaturalIsCRig extends CRig[Natural] {
   def one: Natural = Natural(1L)
   def plus(a:Natural, b:Natural): Natural = a + b
   override def pow(a:Natural, b:Int): Natural = {
@@ -725,6 +725,10 @@ private[math] trait NaturalOrder extends Order[Natural] {
   def compare(x: Natural, y: Natural): Int = x.compare(y)
 }
 
+private[math] trait NaturalSigned extends NaturalOrder with SignedAdditiveCMonoid[Natural] {
+  def abs(x: Natural): Natural = x
+}
+
 private[math] trait NaturalIsReal extends IsIntegral[Natural]
 with NaturalOrder {
   def toDouble(n: Natural): Double = n.toDouble
@@ -732,4 +736,4 @@ with NaturalOrder {
 }
 
 @SerialVersionUID(0L)
-class NaturalAlgebra extends NaturalIsRig with NaturalOrder with Serializable
+class NaturalAlgebra extends NaturalIsCRig with NaturalSigned with Serializable
