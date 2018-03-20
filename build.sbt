@@ -81,7 +81,7 @@ lazy val dataJVM = data.jvm
 lazy val dataJS = data.js
 
 lazy val util = crossProject.crossType(CrossType.Pure)
-  .settings(moduleName := "spire-data")
+  .settings(moduleName := "spire-util")
   .settings(spireSettings:_*)
   .settings(crossVersionSharedSources:_*)
   .enablePlugins(BuildInfoPlugin)
@@ -113,7 +113,7 @@ lazy val extras = crossProject.crossType(CrossType.Pure)
   .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
-  .dependsOn(core)
+  .dependsOn(core, data)
 
 lazy val extrasJVM = extras.jvm
 lazy val extrasJS = extras.js
