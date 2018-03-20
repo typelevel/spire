@@ -24,7 +24,7 @@ trait CombinationLaws[A] extends BaseLaws[A] {
 
   def signedAdditiveCMonoid(implicit signedA: Signed[A], additiveCMonoidA: AdditiveCMonoid[A]) = new DefaultRuleSet(
     name = "signedAdditiveCMonoid",
-    parent = Some(signed),
+    parent = None,
     "ordered group" → forAll { (x: A, y: A, z: A) =>
       (x <= y) ==> (x + z <= y + z)
     },

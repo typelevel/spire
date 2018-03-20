@@ -52,6 +52,87 @@ trait OrderLaws[A] extends Laws {
     )
   )
 
+  def signed(implicit A: Signed[A]) = new OrderProperties(
+    name = "signed",
+    parent = Some(order),
+    "abs non-negative" → forAll((x: A) =>
+      x.abs.sign != Sign.Negative
+    ),
+    "signum returns -1/0/1" → forAll((x: A) =>
+      x.signum.abs <= 1
+    ),
+    "signum is sign.toInt" → forAll((x: A) =>
+      x.signum == x.sign.toInt
+    )
+  )
+
+  def truncatedDivision(implicit cRingA: CRing[A], truncatedDivisionA: TruncatedDivision[A]) = new DefaultRuleSet(
+    name = "truncatedDivision",
+    parent = Some(signed),
+    "division rule (tquotmod)" → forAll { (x: A, y: A) =>
+      y.isZero || {
+        val (q, r) = x tquotmod y
+        x === y * q + r
+      }
+    },
+    "division rule (fquotmod)" → forAll { (x: A, y: A) =>
+      y.isZero || {
+        val (q, r) = x fquotmod y
+        x === y * q + r
+      }
+    },
+    "quotient is integer (tquot)" → forAll { (x: A, y: A) =>
+      y.isZero || (x tquot y).toBigIntOpt.nonEmpty
+    },
+    "quotient is integer (fquot)" → forAll { (x: A, y: A) =>
+      y.isZero || (x fquot y).toBigIntOpt.nonEmpty
+    },
+    "|r| < |y| (tmod)" → forAll { (x: A, y: A) =>
+      y.isZero || {
+        val r = x tmod y
+        r.abs < y.abs
+      }
+    },
+    "|r| < |y| (fmod)" → forAll { (x: A, y: A) =>
+      y.isZero || {
+        val r = x fmod y
+        r.abs < y.abs
+      }
+    },
+    "r = 0 or sign(r) = sign(x) (tmod)" → forAll { (x: A, y: A) =>
+      y.isZero || {
+        val r = x tmod y
+        r.isZero || (r.sign === x.sign)
+      }
+    },
+    "r = 0 or sign(r) = sign(y) (fmod)" → forAll { (x: A, y: A) =>
+      y.isZero || {
+        val r = x fmod y
+        r.isZero || (r.sign === y.sign)
+      }
+    },
+    "tquot" → forAll { (x: A, y: A) =>
+      y.isZero || {
+        (x tquotmod y)._1 === (x tquot y)
+      }
+    },
+    "tmod" → forAll { (x: A, y: A) =>
+      y.isZero || {
+        (x tquotmod y)._2 === (x tmod y)
+      }
+    },
+    "fquot" → forAll { (x: A, y: A) =>
+      y.isZero || {
+        (x fquotmod y)._1 === (x fquot y)
+      }
+    },
+    "fmod" → forAll { (x: A, y: A) =>
+      y.isZero || {
+        (x fquotmod y)._2 === (x fmod y)
+      }
+    }
+  )
+
   class OrderProperties(
     name: String,
     parent: Option[OrderProperties],
