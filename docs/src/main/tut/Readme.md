@@ -179,7 +179,7 @@ Detailed treatment of these type classes can be found in the
 Spire contains a lot of types, as well as other machinery to provide a nice
 user experience. The easiest way to use spire is via wildcard imports:
 
-```scala
+```tut
 import spire.algebra._   // provides algebraic type classes
 import spire.math._      // provides functions, types, and type classes
 import spire.implicits._ // provides infix operators, instances and conversions
@@ -351,7 +351,7 @@ encounter will occur at compile-time.
 
 For example:
 
-```scala
+```tut
 import spire.syntax.literals._
 
 // bytes and shorts
@@ -387,7 +387,7 @@ tail-recursive function, which will inline literal function arguments.
 The macro can be nested in itself and compares favorably with other looping
 constructs in Scala such as `for` and `while`:
 
-```scala
+```tut
 
 // print numbers 1 through 10
 cfor(0)(_ < 10, _ + 1) { i =>
@@ -466,7 +466,7 @@ the `spire.random.Dist[A]` type class. These instances represent a
 strategy for getting random values using a `Generator` instance. For
 instance:
 
-```scala
+```tut
 import spire.random.Dist
 
 val rng = spire.random.rng.Cmwc5()

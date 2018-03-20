@@ -23,8 +23,6 @@ object Integral {
 }
 
 class IntegralOps[A](lhs: A)(implicit ev: Integral[A]) {
-  def factor: prime.Factors = prime.factor(toSafeLong)
-  def isPrime: Boolean = prime.isPrime(toSafeLong)
   def toSafeLong: SafeLong = SafeLong(ev.toBigInt(lhs))
 
   def coerce(a: A): Long = {

@@ -6,10 +6,9 @@ import java.math.BigInteger
 import spire.util.Opt
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
-
 import spire.macros.Checked
 
-import spire.algebra.{Eq, EuclideanRing, GCDRing, IsIntegral, NRoot, Order, CRing, Signed, TruncatedDivision}
+import spire.algebra._
 import spire.std.long._
 import spire.std.bigInteger._
 
@@ -24,10 +23,6 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
   def isZero: Boolean
 
   def isOne: Boolean
-
-  def isOdd: Boolean
-
-  def isEven: Boolean
 
   def signum: Int
 
@@ -190,8 +185,21 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
 
   final def isWhole: Boolean = true
 
-  final def isProbablePrime(c: Int): Boolean =
-    toBigInteger.isProbablePrime(c)
+  def isOdd: Boolean
+
+  def isEven: Boolean
+
+  def isPrime: Boolean = prime.isPrime(this)
+
+  def factor: prime.Factors = prime.factor(this)
+
+  /** Returns true if this SafeLong is probably prime, false if it's definitely composite. If certainty is ≤ 0, true is returned.
+    * @param certainty a measure of the uncertainty that the caller is willing to tolerate:
+    *                  if the call returns true the probability that this BigInteger is
+    *                  prime exceeds (1 - 1/2^certainty).
+    */
+  final def isProbablePrime(certainty: Int): Boolean =
+    toBigInteger.isProbablePrime(certainty)
 
   def bitLength: Int
 }
@@ -506,7 +514,8 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
 
 trait SafeLongInstances {
   @SerialVersionUID(1L)
-  implicit object SafeLongAlgebra extends SafeLongIsEuclideanRing with SafeLongIsNRoot with Serializable
+  implicit object SafeLongAlgebra extends SafeLongIsEuclideanRing with SafeLongIsUniqueFactorizationDomain
+    with SafeLongIsNRoot with Serializable
 
   @SerialVersionUID(1L)
   implicit object SafeLongIsReal extends SafeLongIsReal with Serializable
@@ -590,6 +599,11 @@ private[math] trait SafeLongTruncatedDivision extends TruncatedDivision[SafeLong
     val tm = lhs % rhs
     if (tm.signum == -rhs.signum) tm + rhs else tm
   }
+}
+
+private[math] trait SafeLongIsUniqueFactorizationDomain extends UniqueFactorizationDomain[SafeLong]  {
+  def isPrime(a: SafeLong): Boolean = a.isPrime
+  def factor(a: SafeLong): prime.Factors = a.factor
 }
 
 private[math] trait SafeLongIsReal extends IsIntegral[SafeLong] with SafeLongTruncatedDivision {
