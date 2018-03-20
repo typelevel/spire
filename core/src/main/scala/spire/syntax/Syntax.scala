@@ -179,7 +179,7 @@ trait IntervalSyntax {
 }
 
 trait UnboundSyntax {
-  implicit def moduleUnboundOps[F](f: F)(implicit ev: Module[_, F]): ModuleUnboundOps[F] =
+  implicit def moduleUnboundOps[F](f: F)(implicit ev: CModule[_, F]): ModuleUnboundOps[F] =
     new ModuleUnboundOps(f)
 
   implicit def vectorSpaceUnboundOps[F](f: F)(implicit ev: VectorSpace[_, F]): VectorSpaceUnboundOps[F] =

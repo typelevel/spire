@@ -113,8 +113,8 @@ object ArraySupport {
 trait ArrayInstances0 {
   type NI0[A] = NoImplicit[VectorSpace[Array[A], A]]
 
-  implicit def ArrayModule[@sp(Int,Long,Float,Double) A: NI0: ClassTag: Ring]: Module[Array[A], A] =
-    new ArrayModule[A]
+  implicit def ArrayModule[@sp(Int,Long,Float,Double) A: NI0: ClassTag: Ring]: CModule[Array[A], A] =
+    new ArrayCModule[A]
 }
 
 trait ArrayInstances1 extends ArrayInstances0 {
@@ -146,9 +146,9 @@ trait ArrayInstances extends ArrayInstances3 {
 }
 
 @SerialVersionUID(0L)
-private final class ArrayModule[@sp(Int,Long,Float,Double) A: ClassTag: Ring]
+private final class ArrayCModule[@sp(Int,Long,Float,Double) A: ClassTag: Ring]
     (implicit nvs: NoImplicit[VectorSpace[Array[A], A]])
-    extends Module[Array[A], A] with Serializable {
+    extends CModule[Array[A], A] with Serializable {
   def scalar: Ring[A] = Ring[A]
   def zero: Array[A] = new Array[A](0)
   def negate(x: Array[A]): Array[A] = ArraySupport.negate(x)

@@ -204,8 +204,8 @@ trait DistField[A] extends DistEuclideanRing[A] with Field[Dist[A]] {
   override def euclideanFunction(x: Dist[A]): BigInt = sys.error("euclideanFunction is not defined, as Dist is a monad, and euclideanFunction should return Dist[BigInt]")
 }
 
-trait DistModule[V, K] extends Module[Dist[V], Dist[K]] {
-  implicit def alg: Module[V, K]
+trait DistCModule[V, K] extends CModule[Dist[V], Dist[K]] {
+  implicit def alg: CModule[V, K]
 
   def scalar: Rng[Dist[K]] = Dist.rng(alg.scalar)
   def zero: Dist[V] = Dist.constant(alg.zero)
@@ -216,7 +216,7 @@ trait DistModule[V, K] extends Module[Dist[V], Dist[K]] {
   def timesr(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => v(g) :* k(g))
 }
 
-trait DistVectorSpace[V, K] extends DistModule[V, K] with VectorSpace[Dist[V], Dist[K]] {
+trait DistVectorSpace[V, K] extends DistCModule[V, K] with VectorSpace[Dist[V], Dist[K]] {
   implicit def alg: VectorSpace[V, K]
   implicit def eqK: Eq[K]
 
@@ -440,8 +440,8 @@ trait DistInstances5 extends DistInstances4 {
 }
 
 trait DistInstances6 extends DistInstances5 {
-  implicit def module[V,K](implicit ev1: Eq[K], ev2: Module[V,K]): Module[Dist[V],Dist[K]] =
-    new DistModule[V,K] { def alg = ev2; def eqK = ev1 }
+  implicit def module[V,K](implicit ev1: Eq[K], ev2: CModule[V,K]): CModule[Dist[V],Dist[K]] =
+    new DistCModule[V,K] { def alg = ev2; def eqK = ev1 }
 }
 
 trait DistInstances7 extends DistInstances6 {

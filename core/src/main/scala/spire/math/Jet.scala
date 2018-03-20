@@ -325,7 +325,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   // pow -- base is a constant, exponent (this) is a differentiable function.
   // b^(p + du) ~= b^p + b^p * log(b) du
   def powScalarToJet(a: T)(implicit
-      c: ClassTag[T], e: Eq[T], f: Field[T], m: Module[Array[T], T], s: Signed[T], t: Trig[T]): Jet[T] = {
+                           c: ClassTag[T], e: Eq[T], f: Field[T], m: CModule[Array[T], T], s: Signed[T], t: Trig[T]): Jet[T] = {
     if (isZero) {
       Jet.one[T]
     } else {
@@ -354,7 +354,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
    * pow -- both base (this) and exponent are differentiable functions.
    * (a + du)^(b + dv) ~= a^b + b * a^(b-1) du + a^b log(a) dv
    */
-  def pow(b: Jet[T])(implicit c: ClassTag[T], e: Eq[T], f: Field[T], m: Module[Array[T], T], s: Signed[T], t: Trig[T])
+  def pow(b: Jet[T])(implicit c: ClassTag[T], e: Eq[T], f: Field[T], m: CModule[Array[T], T], s: Signed[T], t: Trig[T])
       : Jet[T] = {
     if (b.isZero) {
       Jet.one[T]

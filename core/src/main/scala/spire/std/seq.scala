@@ -9,8 +9,8 @@ import spire.algebra._
 import spire.NoImplicit
 
 @SerialVersionUID(0L)
-class SeqModule[A, SA <: SeqLike[A, SA]](implicit val scalar: Ring[A], cbf: CanBuildFrom[SA,A,SA])
-extends Module[SA, A] with Serializable {
+class SeqCModule[A, SA <: SeqLike[A, SA]](implicit val scalar: Ring[A], cbf: CanBuildFrom[SA,A,SA])
+extends CModule[SA, A] with Serializable {
   def zero: SA = cbf().result
 
   def negate(sa: SA): SA = sa map (scalar.negate)
@@ -76,7 +76,7 @@ extends Module[SA, A] with Serializable {
 
 @SerialVersionUID(0L)
 class SeqVectorSpace[A, SA <: SeqLike[A, SA]](implicit override val scalar: Field[A], cbf: CanBuildFrom[SA,A,SA])
-extends SeqModule[A, SA] with VectorSpace[SA, A] with Serializable
+extends SeqCModule[A, SA] with VectorSpace[SA, A] with Serializable
 
 @SerialVersionUID(0L)
 class SeqInnerProductSpace[A: Field, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA])
@@ -247,7 +247,7 @@ extends SeqVectorEq[A, SA] with Order[SA] with Serializable {
 trait SeqInstances0 {
   implicit def SeqModule[A, CC[A] <: SeqLike[A, CC[A]]](implicit
       ring0: Ring[A], cbf0: CanBuildFrom[CC[A], A, CC[A]],
-      ev: NoImplicit[VectorSpace[CC[A], A]]): SeqModule[A, CC[A]] = new SeqModule[A, CC[A]]
+      ev: NoImplicit[VectorSpace[CC[A], A]]): SeqCModule[A, CC[A]] = new SeqCModule[A, CC[A]]
 }
 
 trait SeqInstances1 extends SeqInstances0 {
