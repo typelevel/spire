@@ -8,13 +8,14 @@ import java.util.concurrent.atomic.AtomicReference
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
 
 import spire.Platform
-import spire.algebra.{Eq, Field, IsAlgebraic, NRoot, Order, Sign}
+import spire.algebra.{Eq, Field, IsAlgebraic, NRoot, Order, Sign, TruncatedDivisionCRing}
 import spire.macros.Checked.checked
 import spire.math.poly.{ Term, BigDecimalRootRefinement, RootFinder, Roots }
 import spire.std.bigInt._
 import spire.std.bigDecimal._
 import spire.std.long._
 import spire.syntax.std.seq._
+import spire.util.Opt
 
 /**
  * Algebraic provides an exact number type for algebraic numbers. Algebraic
@@ -74,29 +75,20 @@ extends ScalaNumber with ScalaNumericConversions with Serializable {
   def /(that: Algebraic): Algebraic =
     new Algebraic(Expr.Div(this.expr, that.expr))
 
-/* TODO: migrate to TruncatedDivision
   /**
-   * Returns an `Algebraic` whose value is just the integer part of
-   * `this / that`. This operation is exact.
-   */
-  def quot(that: Algebraic): Algebraic =
-    this /~ that
-
-  /** An alias for [[quot]]. */
-  def /~(that: Algebraic): Algebraic =
+    * Returns an `Algebraic` whose value is just the integer part of
+    * `this / that`. This operation is exact.
+    */
+  def tquot(that: Algebraic): Algebraic =
     Algebraic((this / that).toBigInt)
 
   /**
-   * Returns an `Algebraic` whose value is the difference between `this` and
-   * `(this /~ that) * that` -- the modulus.
-   */
-  def mod(that: Algebraic): Algebraic =
-    this % that
+    * Returns an `Algebraic` whose value is the difference between `this` and
+    * `(this /~ that) * that` -- the remainder of truncated division.
+    */
+  def tmod(that: Algebraic): Algebraic =
+    this - (this tquot that) * that
 
-  /** An alias for [[mod]]. */
-  def %(that: Algebraic): Algebraic =
-    this - (this /~ that) * that
- */
   /** Returns the square root of this number. */
   def sqrt: Algebraic = nroot(2)
 
@@ -1548,13 +1540,16 @@ private[math] trait AlgebraicIsField extends Field.WithDefaultGCD[Algebraic] {
 
 private[math] trait AlgebraicIsNRoot extends NRoot[Algebraic]
 
-private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] {
+private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] with TruncatedDivisionCRing[Algebraic] {
   def toDouble(x: Algebraic): Double = x.toDouble
   def toAlgebraic(x: Algebraic): Algebraic = x
   def ceil(a:Algebraic): Algebraic = Algebraic(a.toBigDecimal(0, RoundingMode.CEILING))
   def floor(a:Algebraic): Algebraic = Algebraic(a.toBigDecimal(0, RoundingMode.FLOOR))
   def round(a:Algebraic): Algebraic = Algebraic(a.toBigDecimal(0, RoundingMode.HALF_EVEN))
   def isWhole(a:Algebraic): Boolean = a.isWhole
+  def toBigIntOpt(a:Algebraic): Opt[BigInt] = if (isWhole(a)) Opt(a.toBigInt) else Opt.empty[BigInt]
+  def tquot(x: Algebraic, y: Algebraic): Algebraic = x tquot y
+  def tmod(x: Algebraic, y: Algebraic): Algebraic = x tmod y
   override def sign(a: Algebraic): Sign = a.sign
   override def signum(a: Algebraic): Int = a.signum
   override def abs(a: Algebraic): Algebraic = a.abs

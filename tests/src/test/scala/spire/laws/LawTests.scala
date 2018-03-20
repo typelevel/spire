@@ -44,6 +44,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("BigInteger", OrderLaws[BigInteger].truncatedDivision)
   checkAll("Rational",   RingLaws[Rational].field)
   checkAll("Rational",   CombinationLaws[Rational].signedGCDRing)
+  checkAll("Rational",   OrderLaws[Rational].truncatedDivision)
   checkAll("Real",       RingLaws[Real].field)
   checkAll("UByte",      RingLaws[UByte].cRig)
   checkAll("UShort",     RingLaws[UShort].cRig)
@@ -53,6 +54,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Natural",    CombinationLaws[Natural].signedAdditiveCMonoid)
   checkAll("SafeLong",   RingLaws[SafeLong].euclideanRing)
   checkAll("SafeLong",   CombinationLaws[SafeLong].signedGCDRing)
+  checkAll("SafeLong",   OrderLaws[SafeLong].truncatedDivision)
   checkAll("Order[Unit]",OrderLaws[Unit].order)
 
   checkAll("Complex[Rational]", RingLaws[Complex[Rational]].field)
