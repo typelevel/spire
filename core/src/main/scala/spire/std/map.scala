@@ -5,7 +5,7 @@ import spire.algebra._
 
 @SerialVersionUID(0L)
 class MapMonoid[K, V](implicit val scalar: Semigroup[V]) extends Monoid[Map[K, V]]
-with Serializable {
+  with Serializable {
   def empty: Map[K, V] = Map.empty
 
   def combine(x: Map[K, V], y: Map[K, V]): Map[K, V] = {
@@ -21,12 +21,12 @@ with Serializable {
 
 @SerialVersionUID(0L)
 class MapGroup[K, V](implicit override val scalar: Group[V]) extends MapMonoid[K, V]
-with Group[Map[K, V]] with Serializable {
+  with Group[Map[K, V]] with Serializable {
   def inverse(x: Map[K, V]): Map[K, V] = x.mapValues(scalar.inverse)
 }
 
 @SerialVersionUID(0L)
-class MapSemiring[K, V](implicit val scalar: Semiring[V]) extends Semiring[Map[K, V]] with Serializable {
+class MapCSemiring[K, V](implicit val scalar: CSemiring[V]) extends CSemiring[Map[K, V]] with Serializable {
 
   def zero: Map[K, V] = Map.empty
 
@@ -51,14 +51,16 @@ class MapSemiring[K, V](implicit val scalar: Semiring[V]) extends Semiring[Map[K
 }
 
 @SerialVersionUID(0L)
-class MapRng[K, V](override implicit val scalar: Rng[V]) extends MapSemiring[K, V] with RingAlgebra[Map[K, V], V] with Serializable { self =>
+class MapCRng[K, V](override implicit val scalar: CRing[V]) extends MapCSemiring[K, V] with CRng[Map[K, V]] with CModule[Map[K, V], V] with Serializable { self =>
+  // TODO: in the experimental branch, it is no longer an algebra, because it lacks an identity
+
   def negate(x: Map[K, V]): Map[K, V] = x mapValues (scalar.negate(_))
 
   def timesl(r: V, v: Map[K, V]): Map[K, V] = v mapValues (scalar.times(r, _))
 }
 
 @SerialVersionUID(0L)
-class MapVectorSpace[K, V](override implicit val scalar: Field[V]) extends MapRng[K, V] with VectorSpace[Map[K, V], V] with Serializable {
+class MapVectorSpace[K, V](override implicit val scalar: Field[V]) extends MapCRng[K, V] with VectorSpace[Map[K, V], V] with Serializable {
   override def times(x: Map[K, V], y: Map[K, V]): Map[K, V] = {
     var xx = x
     var yy = y
@@ -117,11 +119,11 @@ class MapVectorEq[K, V](implicit V: Eq[V], scalar: AdditiveMonoid[V]) extends Eq
 trait MapInstances0 {
   implicit def MapMonoid[K, V: Semigroup]: MapMonoid[K, V] = new MapMonoid[K, V]
 
-  implicit def MapSemiring[K, V: Semiring]: MapSemiring[K, V] = new MapSemiring[K, V]
+  implicit def MapCSemiring[K, V: CSemiring]: MapCSemiring[K, V] = new MapCSemiring[K, V]
 }
 
 trait MapInstances1 extends MapInstances0 {
-  implicit def MapRng[K, V: Rng]: MapRng[K, V] = new MapRng[K, V]
+  implicit def MapCRng[K, V: CRing]: MapCRng[K, V] = new MapCRng[K, V]
 }
 
 trait MapInstances2 extends MapInstances1 {

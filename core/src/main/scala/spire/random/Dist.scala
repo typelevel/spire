@@ -154,29 +154,29 @@ class DistFromGen[@sp A](f: Generator => A) extends Dist[A] {
   def apply(gen: Generator): A = f(gen)
 }
 
-trait DistSemiring[A] extends Semiring[Dist[A]] {
-  implicit def alg: Semiring[A]
+trait DistCSemiring[A] extends CSemiring[Dist[A]] {
+  implicit def alg: CSemiring[A]
   def zero: Dist[A] = Dist.constant(alg.zero)
   def plus(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => x(g) + y(g))
   def times(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => x(g) * y(g))
 }
 
-trait DistRng[A] extends DistSemiring[A] with Rng[Dist[A]] {
-  implicit def alg: Rng[A]
+trait DistCRng[A] extends DistCSemiring[A] with CRng[Dist[A]] {
+  implicit def alg: CRng[A]
   def negate(x: Dist[A]): Dist[A] = new DistFromGen(g => alg.negate(x(g)))
 }
 
-trait DistRig[A] extends DistSemiring[A] with Rig[Dist[A]] {
-  implicit def alg: Rig[A]
+trait DistCRig[A] extends DistCSemiring[A] with CRig[Dist[A]] {
+  implicit def alg: CRig[A]
   def one: Dist[A] = Dist.constant(alg.one)
 }
 
-trait DistRing[A] extends DistRng[A] with Ring[Dist[A]] {
-  def alg: Ring[A]
+trait DistCRing[A] extends DistCRng[A] with CRing[Dist[A]] {
+  def alg: CRing[A]
   def one: Dist[A] = Dist.constant(alg.one)
 }
 
-trait DistGCDRing[A] extends DistRing[A] with GCDRing[Dist[A]] {
+trait DistGCDRing[A] extends DistCRing[A] with GCDRing[Dist[A]] {
   implicit def eqA: Eq[A]
   def alg: GCDRing[A]
   def gcd(x: Dist[A], y: Dist[A])(implicit ev: Eq[Dist[A]]): Dist[A] =
@@ -207,7 +207,7 @@ trait DistField[A] extends DistEuclideanRing[A] with Field[Dist[A]] {
 trait DistCModule[V, K] extends CModule[Dist[V], Dist[K]] {
   implicit def alg: CModule[V, K]
 
-  def scalar: Rng[Dist[K]] = Dist.rng(alg.scalar)
+  def scalar: CRing[Dist[K]] = Dist.cRing(alg.scalar)
   def zero: Dist[V] = Dist.constant(alg.zero)
   def plus(x: Dist[V], y: Dist[V]): Dist[V] = new DistFromGen(g => x(g) + y(g))
   def negate(x: Dist[V]): Dist[V] = new DistFromGen(g => -x(g))
@@ -226,14 +226,14 @@ trait DistVectorSpace[V, K] extends DistCModule[V, K] with VectorSpace[Dist[V], 
 }
 
 trait DistNormedVectorSpace[V, K] extends DistVectorSpace[V, K]
-with NormedVectorSpace[Dist[V], Dist[K]] {
+  with NormedVectorSpace[Dist[V], Dist[K]] {
   implicit def alg: NormedVectorSpace[V, K]
 
   def norm(v: Dist[V]): Dist[K] = v map alg.norm
 }
 
 trait DistInnerProductSpace[V, K] extends DistVectorSpace[V, K]
-with InnerProductSpace[Dist[V], Dist[K]] {
+  with InnerProductSpace[Dist[V], Dist[K]] {
   implicit def alg: InnerProductSpace[V, K]
 
   def dot(v: Dist[V], w: Dist[V]): Dist[K] = new DistFromGen(g => v(g) dot w(g))
@@ -407,21 +407,21 @@ object Dist extends DistInstances9 {
 }
 
 trait DistInstances0 {
-  implicit def semiring[A](implicit ev: Semiring[A]): Semiring[Dist[A]] =
-    new DistSemiring[A] { def alg = ev }
+  implicit def cSemiring[A](implicit ev: CSemiring[A]): CSemiring[Dist[A]] =
+    new DistCSemiring[A] { def alg = ev }
 }
 
 trait DistInstances1 extends DistInstances0 {
-  implicit def rig[A](implicit ev: Rig[A]): Rig[Dist[A]] =
-    new DistRig[A] { def alg = ev }
+  implicit def rig[A](implicit ev: CRig[A]): CRig[Dist[A]] =
+    new DistCRig[A] { def alg = ev }
 
-  implicit def rng[A](implicit ev: Rng[A]): Rng[Dist[A]] =
-    new DistRng[A] { def alg = ev }
+  implicit def rng[A](implicit ev: CRng[A]): CRng[Dist[A]] =
+    new DistCRng[A] { def alg = ev }
 }
 
 trait DistInstances2 extends DistInstances1 {
-  implicit def ring[A](implicit ev: Ring[A]): Ring[Dist[A]] =
-    new DistRing[A] { def alg = ev }
+  implicit def cRing[A](implicit ev: CRing[A]): CRing[Dist[A]] =
+    new DistCRing[A] { def alg = ev }
 }
 
 trait DistInstances3 extends DistInstances2 {

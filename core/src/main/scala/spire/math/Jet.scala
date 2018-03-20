@@ -636,7 +636,7 @@ private[math] class JetAlgebra[@sp(Float, Double) T](implicit
   with JetIsNRoot[T]
 //  with JetIsSigned[T]
   with VectorSpace[Jet[T], T]
-  with FieldAlgebra[Jet[T], T]
+  with FieldAssociativeAlgebra[Jet[T], T]
   with Serializable {
   def scalar: Field[T] = f
   def nroot: NRoot[T] = n

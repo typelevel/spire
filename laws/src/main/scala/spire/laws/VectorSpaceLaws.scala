@@ -18,7 +18,9 @@ object VectorSpaceLaws {
 
 trait VectorSpaceLaws[V, A] extends Laws {
 
-  implicit def scalar(implicit V: CModule[V, A]): Rng[A] = V.scalar
+  implicit def ringFromLeftModule[A](implicit V: LeftModule[_, A], ev: NoImplicit[CModule[_, A]]): Ring[A] = V.scalar
+  implicit def ringFromRightModule[A](implicit V: RightModule[_, A], ev: NoImplicit[CModule[_, A]]): Ring[A] = V.scalar
+  implicit def cRingFromCModule(implicit V: CModule[V, A]): CRing[A] = V.scalar
 
   val scalarLaws: RingLaws[A]
   val vectorLaws: GroupLaws[V]
@@ -26,37 +28,62 @@ trait VectorSpaceLaws[V, A] extends Laws {
   import scalarLaws.{ Equ => EqA, Arb => ArA }
   import vectorLaws.{ Equ => EqV, Arb => ArV }
 
-
-  def module(implicit V: CModule[V, A]) = new SpaceProperties(
-    name = "module",
-    sl = _.rng(V.scalar),
+  def leftModule(implicit V: LeftModule[V, A]) = new SpaceProperties(
+    name = "leftModule",
+    sl = _.ring(V.scalar),
     vl = _.abGroup(V.additive),
     parents = Seq.empty,
-
-    "associative scalar" → forAll { (r: A, s: A, v: V) =>
-      // TODO compiler crash if variable 'w' is replaced by its value
-      val w = r *: s *: v
-      w === ((r * s) *: v)
-    },
-    "scalar distributes over vector" → forAll((r: A, v: V, w: V) =>
-      (r *: (v + w)) === ((r *: v) + (r *: w))
+    "left scalar distributes" -> forAll((r: A, v: V, w: V) =>
+      r *: (v + w) === (r *: v) + (r *: w)
     ),
-    "vector distributes over scalar" → forAll((r: A, s: A, v: V) =>
-      ((r + s) *: v) === ((r *: v) + (s *: v))
-    )/*,
-    "scalar identity is identity" → forAll((v: V) =>
-      (V.scalar.one *: v) === v
-    )*/
+    "left vector distributes" -> forAll((r: A, s: A, v: V) =>
+      (r + s) *: v === (r *: v) + (s *: v)
+    ),
+    "left associative scalar" -> forAll((r: A, s: A, v: V) =>
+      (r * s) *: v === r *: (s *: v)
+    ),
+    "left identity" -> forAll((v: V) =>
+      V.scalar.one *: v === v
+    )
   )
 
-  def vectorSpace(implicit V: VectorSpace[V, A]) = new SpaceProperties(
+  def rightModule(implicit V: RightModule[V, A]) = new SpaceProperties(
+    name = "rightModule",
+    sl = _.ring(V.scalar),
+    vl = _.abGroup(V.additive),
+    parents = Seq.empty,
+    "right scalar distributes" -> forAll((v: V, w: V, r: A) =>
+      (v + w) :* r === (v :* r) + (w :* r)
+    ),
+    "right vector distributes" -> forAll((v: V, r: A, s: A) =>
+      v :* (r + s) === (v :* r) + (v :* s)
+    ),
+    "right associative scalar" -> forAll((v: V, r: A, s: A) =>
+      v :* (r * s) === (v :* r) :* s
+    ),
+    "right identity" -> forAll((v: V) =>
+       v :* V.scalar.one === v
+    )
+  )
+
+  def cModule(implicit V: CModule[V, A]): SpaceProperties = new SpaceProperties(
+    name = "cModule",
+    sl = _.cRing(V.scalar),
+    vl = _.abGroup(V.additive),
+    parents = Seq(leftModule, rightModule),
+    "left and right multiplication are compatible" -> forAll((r: A, v: V, s: A) =>
+    r *: (v :* s) === (r *: v) :* s
+    )
+  )
+
+  def vectorSpace(implicit V: VectorSpace[V, A]): SpaceProperties = new SpaceProperties(
     name = "vector space",
     sl = _.field(V.scalar),
     vl = _.abGroup(V.additive),
-    parents = Seq(module)
+    parents = Seq(cModule)
   )
 
-  def metricSpace(implicit V: MetricSpace[V, A], o: Order[A], A: AdditiveMonoid[A]) = new SpaceProperties(
+  def metricSpace(implicit V: MetricSpace[V, A], o: Order[A], A: AdditiveMonoid[A]): SpaceProperties = new SpaceProperties(
     name = "metric space",
     sl = _.emptyRuleSet,
     vl = _.emptyRuleSet,
@@ -73,7 +100,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     )
   )
 
-  def normedVectorSpace(implicit V: NormedVectorSpace[V, A], ev0: Order[A], ev1: Signed[A]) = new SpaceProperties(
+  def normedVectorSpace(implicit V: NormedVectorSpace[V, A], ev0: Order[A], ev1: Signed[A]): SpaceProperties = new SpaceProperties(
     name = "normed vector space",
     sl = _.field(V.scalar),
     vl = _.abGroup(V.additive),
@@ -90,7 +117,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     )
   )
 
-  def linearity(f: V => A)(implicit V: CModule[V, A]) = new SimpleRuleSet(
+  def linearity(f: V => A)(implicit V: CModule[V, A]): SpaceProperties = new SimpleRuleSet(
     name = "linearity",
 
     "homogeneity" → forAll((r: A, v: V) =>
@@ -102,7 +129,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
   )
 
 
-  def innerProductSpace(implicit V: InnerProductSpace[V, A], A: Order[A], A0: Signed[A]) = SpaceProperties.fromParent(
+  def innerProductSpace(implicit V: InnerProductSpace[V, A], A: Order[A], A0: Signed[A]): SpaceProperties = SpaceProperties.fromParent(
     name = "inner-product space",
     parent = vectorSpace,
 
