@@ -568,10 +568,10 @@ private[math] trait SafeLongSigned extends Signed[SafeLong] with SafeLongOrder {
 }
 
 private[math] trait SafeLongTruncatedDivision extends TruncatedDivision[SafeLong] with SafeLongSigned {
-  def toBigIntOpt(n: SafeLong) = Opt(n.toBigInt)
-  def tquot(x: SafeLong, y: SafeLong) = x /~ y
-  def tmod(x: SafeLong, y: SafeLong) = x % y
-  override def tquotmod(x: SafeLong, y: SafeLong) = x /% y
+  def toBigIntOpt(n: SafeLong): Opt[BigInt] = Opt(n.toBigInt)
+  def tquot(x: SafeLong, y: SafeLong): SafeLong = x /~ y
+  def tmod(x: SafeLong, y: SafeLong): SafeLong = x % y
+  override def tquotmod(x: SafeLong, y: SafeLong): (SafeLong, SafeLong) = x /% y
 
   def fquotmod(lhs: SafeLong, rhs: SafeLong): (SafeLong, SafeLong) = {
     val (tq, tm) = lhs /% rhs
@@ -589,7 +589,7 @@ private[math] trait SafeLongTruncatedDivision extends TruncatedDivision[SafeLong
    def fmod(lhs: SafeLong, rhs: SafeLong): SafeLong = {
     val tm = lhs % rhs
     if (tm.signum == -rhs.signum) tm + rhs else tm
-  } 
+  }
 }
 
 private[math] trait SafeLongIsReal extends IsIntegral[SafeLong] with SafeLongTruncatedDivision {

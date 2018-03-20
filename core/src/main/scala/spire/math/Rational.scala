@@ -895,7 +895,7 @@ private[math] trait RationalIsReal extends IsRational[Rational] with TruncatedDi
   def toBigIntOpt(a: Rational): Opt[BigInt] = if (a.isWhole) Opt(a.toBigInt) else Opt.empty[BigInt]
   def tquot(x: Rational, y: Rational): Rational = x tquot y
   def tmod(x: Rational, y: Rational): Rational = x tmod y
-  override def tquotmod(x: Rational, y: Rational) = x tquotmod y
+  override def tquotmod(x: Rational, y: Rational): (Rational, Rational) = x tquotmod y
 }
 
 @SerialVersionUID(1L)

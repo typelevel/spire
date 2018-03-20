@@ -574,8 +574,8 @@ trait RealIsFractional extends Fractional[Real] with TruncatedDivisionCRing[Real
   def times(x: Real, y: Real): Real = x * y
 
   def toBigIntOpt(x: Real): Opt[BigInt] = if (x.isWhole) Opt(x.toRational.toBigInt) else Opt.empty[BigInt]
-  def tquot(x: Real, y: Real) = x tquot y
-  def tmod(x: Real, y: Real) = x tmod y
+  def tquot(x: Real, y: Real): Real = x tquot y
+  def tmod(x: Real, y: Real): Real = x tmod y
 
   override def reciprocal(x: Real): Real = x.reciprocal
   def div(x: Real, y: Real): Real = x / y

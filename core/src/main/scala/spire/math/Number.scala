@@ -676,9 +676,9 @@ private[math] trait NumberSigned extends Signed[Number] with NumberOrder {
 
 private[math] trait NumberTruncatedDivision extends TruncatedDivisionCRing[Number] with NumberSigned {
   def toBigIntOpt(a: Number): Opt[BigInt] = if (a.isWhole) Opt(a.toBigInt) else Opt.empty[BigInt]
-  def tquot(x: Number, y: Number) = x tquot y
-  def tmod(x: Number, y: Number) = x tmod y
-  override def tquotmod(x: Number, y: Number) = x tquotmod y
+  def tquot(x: Number, y: Number): Number = x tquot y
+  def tmod(x: Number, y: Number): Number = x tmod y
+  override def tquotmod(x: Number, y: Number): (Number, Number) = x tquotmod y
 }
 
 private[math] trait NumberIsReal extends IsRational[Number] with NumberTruncatedDivision {

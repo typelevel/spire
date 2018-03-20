@@ -62,9 +62,9 @@ trait ByteSigned extends Signed[Byte] with ByteOrder {
 }
 
 trait ByteTruncatedDivision extends TruncatedDivisionCRing[Byte] with ByteSigned {
-  def toBigIntOpt(x: Byte) = Opt(BigInt(x))
-  def tquot(x: Byte, y: Byte) = (x / y).toByte
-  def tmod(x: Byte, y: Byte) = (x % y).toByte
+  def toBigIntOpt(x: Byte): Opt[BigInt] = Opt(BigInt(x))
+  def tquot(x: Byte, y: Byte): Byte = (x / y).toByte
+  def tmod(x: Byte, y: Byte): Byte = (x % y).toByte
 }
 
 trait ByteIsReal extends IsIntegral[Byte] with ByteTruncatedDivision with ByteSigned {

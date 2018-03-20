@@ -62,9 +62,9 @@ trait ShortSigned extends Signed[Short] with ShortOrder {
 }
 
 trait ShortTruncatedDivision extends TruncatedDivisionCRing[Short] with ShortSigned {
-  def toBigIntOpt(x: Short) = Opt(BigInt(x))
-  def tquot(x: Short, y: Short) = (x / y).toShort
-  def tmod(x: Short, y: Short) = (x % y).toShort
+  def toBigIntOpt(x: Short): Opt[BigInt] = Opt(BigInt(x))
+  def tquot(x: Short, y: Short): Short = (x / y).toShort
+  def tmod(x: Short, y: Short): Short = (x % y).toShort
 }
 
 trait ShortIsReal extends IsIntegral[Short] with ShortTruncatedDivision {

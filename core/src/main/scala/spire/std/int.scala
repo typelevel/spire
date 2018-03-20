@@ -65,9 +65,9 @@ trait IntSigned extends Signed[Int] with IntOrder {
 }
 
 trait IntTruncatedDivision extends TruncatedDivisionCRing[Int] with IntSigned {
-  def toBigIntOpt(x: Int) = Opt(BigInt(x))
-  def tquot(x: Int, y: Int) = x / y
-  def tmod(x: Int, y: Int) = x % y
+  def toBigIntOpt(x: Int): Opt[BigInt] = Opt(BigInt(x))
+  def tquot(x: Int, y: Int): Int = x / y
+  def tmod(x: Int, y: Int): Int = x % y
 }
 
 trait IntIsReal extends IsIntegral[Int] with IntTruncatedDivision {

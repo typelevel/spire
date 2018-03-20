@@ -65,9 +65,9 @@ trait LongSigned extends Signed[Long] with LongOrder {
 }
 
 trait LongTruncatedDivision extends TruncatedDivisionCRing[Long] with LongSigned {
-  def toBigIntOpt(x: Long) = Opt(BigInt(x))
-  def tquot(x: Long, y: Long) = x / y
-  def tmod(x: Long, y: Long) = x % y
+  def toBigIntOpt(x: Long): Opt[BigInt] = Opt(BigInt(x))
+  def tquot(x: Long, y: Long): Long = x / y
+  def tmod(x: Long, y: Long): Long = x % y
 }
 
 trait LongIsReal extends IsIntegral[Long] with LongTruncatedDivision {

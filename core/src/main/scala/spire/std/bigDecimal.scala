@@ -173,9 +173,9 @@ trait BigDecimalSigned extends Signed[BigDecimal] with BigDecimalOrder {
 
 trait BigDecimalTruncatedDivision extends TruncatedDivisionCRing[BigDecimal] with BigDecimalSigned {
   def toBigIntOpt(a: BigDecimal): Opt[BigInt] = if (a.isWhole) Opt(a.toBigInt) else Opt.empty[BigInt]
-  def tquot(a: BigDecimal, b: BigDecimal) = a.quot(b)
-  def tmod(a: BigDecimal, b: BigDecimal) = a % b
-  override def tquotmod(a: BigDecimal, b: BigDecimal) = a /% b
+  def tquot(a: BigDecimal, b: BigDecimal): BigDecimal = a.quot(b)
+  def tmod(a: BigDecimal, b: BigDecimal): BigDecimal = a % b
+  override def tquotmod(a: BigDecimal, b: BigDecimal): (BigDecimal, BigDecimal) = a /% b
 }
 
 trait BigDecimalIsReal extends IsRational[BigDecimal] with BigDecimalTruncatedDivision {
