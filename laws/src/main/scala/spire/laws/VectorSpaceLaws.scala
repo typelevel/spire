@@ -117,7 +117,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     )
   )
 
-  def linearity(f: V => A)(implicit V: CModule[V, A]): SpaceProperties = new SimpleRuleSet(
+  def linearity(f: V => A)(implicit V: CModule[V, A]): SimpleRuleSet = new SimpleRuleSet(
     name = "linearity",
 
     "homogeneity" → forAll((r: A, v: V) =>
