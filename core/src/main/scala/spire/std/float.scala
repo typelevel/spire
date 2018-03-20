@@ -1,8 +1,9 @@
 package spire
 package std
 
-import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
+import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig, TruncatedDivisionCRing}
 import spire.math.Rational
+import spire.util.Opt
 
 import java.lang.Math
 
@@ -18,11 +19,6 @@ trait FloatIsField extends Field.WithDefaultGCD[Float] {
   override def fromInt(n: Int): Float = n
 
   def div(a:Float, b:Float): Float = a / b
-
-  /* TODO: move to TruncatedDivision
-   def quot(a:Float, b:Float): Float = (a - (a % b)) / b
-  def mod(a:Float, b:Float): Float = a % b
-   */
 
   override def fromDouble(n: Double): Float = n.toFloat
 }
@@ -107,11 +103,6 @@ trait FloatIsTrig extends Trig[Float] {
   def toDegrees(a: Float): Float = (a * 360) / (2 * pi)
 }
 
-trait FloatIsSigned extends Signed[Float] {
-  override def signum(a: Float): Int = Math.signum(a).toInt
-  override def abs(a: Float): Float = if (a < 0.0f) -a else a
-}
-
 trait FloatOrder extends Order[Float] {
   override def eqv(x:Float, y:Float): Boolean = x == y
   override def neqv(x:Float, y:Float): Boolean = x != y
@@ -124,7 +115,18 @@ trait FloatOrder extends Order[Float] {
   def compare(x: Float, y: Float): Int = java.lang.Float.compare(x, y)
 }
 
-trait FloatIsReal extends IsRational[Float] with FloatOrder with FloatIsSigned {
+trait FloatSigned extends Signed[Float] with FloatOrder {
+  override def signum(a: Float): Int = Math.signum(a).toInt
+  override def abs(a: Float): Float = if (a < 0.0f) -a else a
+}
+
+trait FloatTruncatedDivision extends TruncatedDivisionCRing[Float] with FloatSigned {
+  def toBigIntOpt(a: Float): Opt[BigInt] = if (a.isWhole) Opt(BigDecimal(a.toDouble).toBigInt) else Opt.empty[BigInt]
+  def tquot(a: Float, b: Float): Float = (a - (a % b)) / b
+  def tmod(a: Float, b: Float): Float = a % b
+}
+
+trait FloatIsReal extends IsRational[Float] with FloatTruncatedDivision {
   def toDouble(x: Float): Double = x.toDouble
   def ceil(a:Float): Float = Math.ceil(a).toFloat
   def floor(a:Float): Float = Math.floor(a).toFloat
