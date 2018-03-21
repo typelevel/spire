@@ -52,6 +52,7 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   test("Partial order syntax")(check(forAll { (a: Int, b: Int) => testPartialOrderSyntax(a, b) }))
   test("Order syntax")(check(forAll { (a: Int, b: Int) => testOrderSyntax(a, b) }))
   test("Signed syntax")(check(forAll { (a: Int) => testSignedSyntax(a) }))
+  test("TruncatedDivision syntax")(check(forAll { (a: Int, b: NonZero[Int]) => testTruncatedDivisionSyntax(a, b.x) }))
   test("IsReal syntax")(check(forAll { (a: Double) => testIsRealSyntax(a) }))
   test("Semigroup syntax")(check(forAll { (a: String, b: String) => testSemigroupSyntax(a, b) }))
   test("Monoid syntax")(check(forAll { (a: String, b: String) => testMonoidSyntax(a, b) }))
@@ -126,7 +127,6 @@ trait BaseSyntaxTest {
 
   def testSignedSyntax[A: Signed: Eq](a: A) = {
     import spire.syntax.signed._
-    import spire.syntax.eq._
     (a.sign == Signed[A].sign(a)) &&
       (a.signum == Signed[A].signum(a)) &&
       (a.abs === Signed[A].abs(a)) &&
@@ -136,6 +136,18 @@ trait BaseSyntaxTest {
       (a.isSignNonZero == Signed[A].isSignNonZero(a)) &&
       (a.isSignNonPositive == Signed[A].isSignNonPositive(a)) &&
       (a.isSignNonNegative == Signed[A].isSignNonNegative(a))
+  }
+
+  def testTruncatedDivisionSyntax[A: TruncatedDivision](a: A, b: A) = {
+    import spire.syntax.truncatedDivision._
+    import spire.std.tuples._
+    (a.toBigIntOpt === TruncatedDivision[A].toBigIntOpt(a)) &&
+    ((a tquot b) === TruncatedDivision[A].tquot(a, b)) &&
+    ((a tmod b) === TruncatedDivision[A].tmod(a, b)) &&
+    ((a tquotmod b) === TruncatedDivision[A].tquotmod(a, b)) &&
+    ((a fquot b) === TruncatedDivision[A].fquot(a, b)) &&
+    ((a fmod b) === TruncatedDivision[A].fmod(a, b)) &&
+    ((a fquotmod b) === TruncatedDivision[A].fquotmod(a, b))
   }
 
   def testIsRealSyntax[A: IsReal](a: A) = {

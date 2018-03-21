@@ -1,8 +1,9 @@
 package spire
 package std
 
-import spire.algebra.{Eq, EuclideanRing, IsIntegral, NRoot, Order, Signed}
+import spire.algebra.{Eq, EuclideanRing, IsIntegral, NRoot, Order, Signed, TruncatedDivisionCRing}
 import spire.math.BitString
+import spire.util.Opt
 
 import java.lang.Math
 import java.lang.Integer
@@ -58,12 +59,18 @@ trait IntOrder extends Order[Int] {
   def compare(x: Int, y: Int): Int = if (x < y) -1 else if (x == y) 0 else 1
 }
 
-trait IntIsSigned extends Signed[Int] {
+trait IntSigned extends Signed[Int] with IntOrder {
   override def signum(a: Int): Int = java.lang.Integer.signum(a)
   override def abs(a: Int): Int = if (a < 0) -a else a
 }
 
-trait IntIsReal extends IsIntegral[Int] with IntOrder with IntIsSigned {
+trait IntTruncatedDivision extends TruncatedDivisionCRing[Int] with IntSigned {
+  def toBigIntOpt(x: Int): Opt[BigInt] = Opt(BigInt(x))
+  def tquot(x: Int, y: Int): Int = x / y
+  def tmod(x: Int, y: Int): Int = x % y
+}
+
+trait IntIsReal extends IsIntegral[Int] with IntTruncatedDivision {
   def toDouble(n: Int): Double = n.toDouble
   def toBigInt(n: Int): BigInt = BigInt(n)
 }

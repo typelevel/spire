@@ -4,6 +4,7 @@ package math
 import spire.algebra.{EuclideanRing, IsReal}
 import spire.std._
 
+/** Integral number types, where `/` is truncated division. */
 trait Integral[@sp(Int,Long) A] extends Any
     with EuclideanRing[A]
     with ConvertableFrom[A]
@@ -11,6 +12,8 @@ trait Integral[@sp(Int,Long) A] extends Any
     with IsReal[A]
 
 object Integral {
+  implicit final val ByteIsIntegral = new ByteIsIntegral
+  implicit final val ShortIsIntegral = new ShortIsIntegral
   implicit final val IntIsIntegral = new IntIsIntegral
   implicit final val LongIsIntegral = new LongIsIntegral
   implicit final val BigIntIsIntegral = new BigIntIsIntegral
@@ -31,6 +34,30 @@ class IntegralOps[A](lhs: A)(implicit ev: Integral[A]) {
   def ! : BigInt = spire.math.fact(coerce(lhs))
 
   def choose(rhs: A): BigInt = spire.math.choose(coerce(lhs), coerce(rhs))
+}
+
+@SerialVersionUID(0L)
+private[math] class ByteIsIntegral extends Integral[Byte] with ByteIsEuclideanRing
+  with ConvertableFromByte with ConvertableToByte with ByteIsReal with Serializable {
+  override def fromInt(n: Int): Byte = n.toByte
+  override def fromBigInt(n: BigInt): Byte = n.toByte
+  override def toDouble(n: Byte): Double = n.toDouble
+  override def toRational(n: Byte): Rational = super[ByteIsReal].toRational(n)
+  override def toAlgebraic(n: Byte): Algebraic = super[ByteIsReal].toAlgebraic(n)
+  override def toReal(n: Byte): Real = super[ByteIsReal].toReal(n)
+  override def toBigInt(n: Byte): BigInt = BigInt(n)
+}
+
+@SerialVersionUID(0L)
+private[math] class ShortIsIntegral extends Integral[Short] with ShortIsEuclideanRing
+  with ConvertableFromShort with ConvertableToShort with ShortIsReal with Serializable {
+  override def fromInt(n: Int): Short = n.toShort
+  override def fromBigInt(n: BigInt): Short = n.toShort
+  override def toDouble(n: Short): Double = n.toDouble
+  override def toRational(n: Short): Rational = super[ShortIsReal].toRational(n)
+  override def toAlgebraic(n: Short): Algebraic = super[ShortIsReal].toAlgebraic(n)
+  override def toReal(n: Short): Real = super[ShortIsReal].toReal(n)
+  override def toBigInt(n: Short): BigInt = BigInt(n)
 }
 
 @SerialVersionUID(0L)

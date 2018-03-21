@@ -7,6 +7,7 @@ import spire.util.Opt
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 import spire.macros.Checked
+
 import spire.algebra._
 import spire.std.long._
 import spire.std.bigInteger._
@@ -575,13 +576,37 @@ private[math] trait SafeLongSigned extends Signed[SafeLong] with SafeLongOrder {
   override def abs(a: SafeLong): SafeLong = a.abs
 }
 
+private[math] trait SafeLongTruncatedDivision extends TruncatedDivision[SafeLong] with SafeLongSigned {
+  def toBigIntOpt(n: SafeLong): Opt[BigInt] = Opt(n.toBigInt)
+  def tquot(x: SafeLong, y: SafeLong): SafeLong = x /~ y
+  def tmod(x: SafeLong, y: SafeLong): SafeLong = x % y
+  override def tquotmod(x: SafeLong, y: SafeLong): (SafeLong, SafeLong) = x /% y
+
+  def fquotmod(lhs: SafeLong, rhs: SafeLong): (SafeLong, SafeLong) = {
+    val (tq, tm) = lhs /% rhs
+    val signsDiffer = (tm.signum == -rhs.signum)
+    val fq = if (signsDiffer) tq - 1 else tq
+    val fm = if (signsDiffer) tm + rhs else tm
+    (fq, fm)
+  }
+
+   def fquot(lhs: SafeLong, rhs: SafeLong): SafeLong = {
+    val (tq, tm) = lhs /% rhs
+    if (tm.signum == -rhs.signum) tq - 1 else tq
+  }
+
+   def fmod(lhs: SafeLong, rhs: SafeLong): SafeLong = {
+    val tm = lhs % rhs
+    if (tm.signum == -rhs.signum) tm + rhs else tm
+  }
+}
 
 private[math] trait SafeLongIsUniqueFactorizationDomain extends UniqueFactorizationDomain[SafeLong]  {
   def isPrime(a: SafeLong): Boolean = a.isPrime
   def factor(a: SafeLong): prime.Factors = a.factor
 }
 
-private[math] trait SafeLongIsReal extends IsIntegral[SafeLong] with SafeLongSigned {
+private[math] trait SafeLongIsReal extends IsIntegral[SafeLong] with SafeLongTruncatedDivision {
   def toDouble(n: SafeLong): Double = n.toDouble
   def toBigInt(n: SafeLong): BigInt = n.toBigInt
 }

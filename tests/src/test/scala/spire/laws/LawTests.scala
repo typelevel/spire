@@ -39,26 +39,33 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Long",       BaseLaws[Long].uniqueFactorizationDomain)
   checkAll("BigInt",     RingLaws[BigInt].euclideanRing)
   checkAll("BigInt",     CombinationLaws[BigInt].signedGCDRing)
-//  checkAll("BigInt",     BaseLaws[BigInt].uniqueFactorizationDomain) // TODO: fast enough
+  checkAll("BigInt",     OrderLaws[BigInt].truncatedDivision)
+  checkAll("BigInt",     BaseLaws[BigInt].metricSpace)
+  // checkAll("BigInt",     BaseLaws[BigInt].uniqueFactorizationDomain) // TODO: fast enough
   checkAll("BigInteger", RingLaws[BigInteger].euclideanRing)
   checkAll("BigInteger", CombinationLaws[BigInteger].signedGCDRing)
+  checkAll("BigInteger", OrderLaws[BigInteger].truncatedDivision)
   checkAll("Rational",   RingLaws[Rational].field)
-  checkAll("Rational",   CombinationLaws[BigInt].signedGCDRing)
+  checkAll("Rational",   CombinationLaws[Rational].signedGCDRing)
+  checkAll("Rational",   OrderLaws[Rational].truncatedDivision)
   checkAll("Real",       RingLaws[Real].field)
   checkAll("UByte",      RingLaws[UByte].cRig)
   checkAll("UShort",     RingLaws[UShort].cRig)
   checkAll("UInt",       RingLaws[UInt].cRig)
   checkAll("ULong",      RingLaws[ULong].cRig)
+  checkAll("Natural",    RingLaws[Natural].cRig)
+  checkAll("Natural",    CombinationLaws[Natural].signedAdditiveCMonoid)
   checkAll("SafeLong",   RingLaws[SafeLong].euclideanRing)
   checkAll("SafeLong",   CombinationLaws[SafeLong].signedGCDRing)
-//  checkAll("SafeLong",   BaseLaws[SafeLong].uniqueFactorizationDomain) // TODO: fast enough?
+  checkAll("SafeLong",   OrderLaws[SafeLong].truncatedDivision)
+  checkAll("Order[Unit]",OrderLaws[Unit].order)
+  // checkAll("SafeLong",   BaseLaws[SafeLong].uniqueFactorizationDomain) // TODO: fast enough?
 
   checkAll("Complex[Rational]", RingLaws[Complex[Rational]].field)
 
   checkAll("Quaternion[Rational]", RingLaws[Quaternion[Rational]].divisionRing)
 
   checkAll("Levenshtein distance", BaseLaws[String].metricSpace)
-  checkAll("BigInt",               BaseLaws[BigInt].metricSpace)
 
   // We skip checking all tuple types, as they are all generated from the same
   // template.
@@ -130,9 +137,6 @@ class LawTests extends FunSuite with Discipline {
     def one = Int.MaxValue
   }
 
-  checkAll("Order[Int]", OrderLaws[Int].order)
-  checkAll("Order[BigInteger]", OrderLaws[BigInteger].order)
-  checkAll("Order[Unit]", OrderLaws[Unit].order)
   checkAll("AbGroup[Unit]", GroupLaws[Unit].abGroup)
   checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 

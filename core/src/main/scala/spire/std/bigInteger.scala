@@ -3,7 +3,8 @@ package std
 
 import java.math.BigInteger
 
-import spire.algebra.{Eq, EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed}
+import spire.algebra.{Eq, EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, Signed, TruncatedDivisionCRing}
+import spire.util.Opt
 
 trait BigIntegerIsEuclideanRing extends EuclideanRing[BigInteger] {
   override def minus(a:BigInteger, b:BigInteger): BigInteger = a subtract b
@@ -63,12 +64,23 @@ trait BigIntegerOrder extends Order[BigInteger] {
   def compare(x: BigInteger, y: BigInteger): Int = x compareTo y
 }
 
-trait BigIntegerIsSigned extends Signed[BigInteger] {
+trait BigIntegerSigned extends Signed[BigInteger] with BigIntegerOrder {
   override def signum(a: BigInteger): Int = a.signum
   override def abs(a: BigInteger): BigInteger = a.abs
 }
 
-trait BigIntegerIsReal extends IsIntegral[BigInteger] with BigIntegerOrder with BigIntegerIsSigned with Serializable {
+
+trait BigIntegerTruncatedDivision extends TruncatedDivisionCRing[BigInteger] with BigIntegerSigned {
+  def toBigIntOpt(n: BigInteger): Opt[BigInt] = Opt(BigInt(n))
+  def tquot(a: BigInteger, b: BigInteger): BigInteger = a divide b
+  def tmod(a: BigInteger, b: BigInteger): BigInteger = a remainder b
+  override def tquotmod(a: BigInteger, b: BigInteger): (BigInteger, BigInteger) = {
+    val Array(d, r) = a.divideAndRemainder(b)
+    (d, r)
+  }
+}
+
+trait BigIntegerIsReal extends IsIntegral[BigInteger] with BigIntegerTruncatedDivision with Serializable {
   def toDouble(n: BigInteger): Double = n.doubleValue
   def toBigInt(n: BigInteger): BigInt = n
 }

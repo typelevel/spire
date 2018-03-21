@@ -48,7 +48,7 @@ class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
     }
 
   property("Internal GCD implementation is similar to the field of fractions implementation") {
-    forAll { (x: Rational, y: Rational) => x.gcd(y) shouldBe Field[Rational].gcd(x, y) }
+    forAll { (x: Rational, y: Rational) => x.gcd(y) shouldBe Rational(x.numerator gcd y.numerator, x.denominator lcm y.denominator) }
   }
 
   rat1("x + 0 == x") { x: Q => x + Rational(0) shouldBe x }

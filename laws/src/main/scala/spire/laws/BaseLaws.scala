@@ -21,20 +21,6 @@ trait BaseLaws[A] extends Laws {
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
 
-
-  def signed(implicit A: Signed[A]) = new SimpleRuleSet(
-    name = "signed",
-    "abs non-negative" → forAll((x: A) =>
-      x.abs.sign != Sign.Negative
-    ),
-    "signum returns -1/0/1" → forAll((x: A) =>
-      x.signum.abs <= 1
-    ),
-    "signum is sign.toInt" → forAll((x: A) =>
-      x.signum == x.sign.toInt
-    )
-  )
-
   def metricSpace[R](implicit MSA: MetricSpace[A, R], SR: Signed[R], OR: Order[R], ASR: AdditiveSemigroup[R]) = new SimpleRuleSet(
     name = "metricSpace",
     "non-negative" → forAll((a1: A, a2: A) =>

@@ -8,6 +8,8 @@ package object syntax {
   object partialOrder extends PartialOrderSyntax
   object order extends OrderSyntax
   object signed extends SignedSyntax
+  object truncatedDivision extends TruncatedDivisionSyntax
+
   object isReal extends IsRealSyntax
   object convertableFrom extends ConvertableFromSyntax
 
