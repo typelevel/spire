@@ -78,15 +78,15 @@ class LawTests extends FunSuite with Discipline {
   // iterators and CanBuildFroms. So, presuming the Scala std lib is tested,
   // testing just List and Vector should suffice for us.
 
-  checkAll("List[Int]",        VectorSpaceLaws[List[Int], Int].module)
-  checkAll("Vector[Int]",      VectorSpaceLaws[Vector[Int], Int].module)
+  checkAll("List[Int]",        VectorSpaceLaws[List[Int], Int].cModule)
+  checkAll("Vector[Int]",      VectorSpaceLaws[Vector[Int], Int].cModule)
   checkAll("List[Rational]",   VectorSpaceLaws[List[Rational], Rational].vectorSpace)
   checkAll("Vector[Rational]", VectorSpaceLaws[Vector[Rational], Rational].vectorSpace)
 
-  checkAll("Array[Int]",         VectorSpaceLaws[Array[Int], Int].module)
+  checkAll("Array[Int]",         VectorSpaceLaws[Array[Int], Int].cModule)
   checkAll("Array[VectorSpace]", VectorSpaceLaws[Array[Rational], Rational].vectorSpace)
 
-  checkAll("Map[String,Int]",      VectorSpaceLaws[Map[String,Int], Int].module)
+  checkAll("Map[String,Int]",      VectorSpaceLaws[Map[String,Int], Int].cModule)
   checkAll("Map[String,Rational]", VectorSpaceLaws[Map[String,Rational], Rational].vectorSpace)
 
   val max = NormedVectorSpace.max[Rational, List]

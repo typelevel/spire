@@ -38,7 +38,9 @@ package object syntax {
   object nroot extends NRootSyntax
   object trig extends TrigSyntax
 
-  object module extends ModuleSyntax
+  object leftModule extends LeftModuleSyntax
+  object rightModule extends RightModuleSyntax
+  object cModule extends CModuleSyntax
   object vectorSpace extends VectorSpaceSyntax
   object metricSpace extends MetricSpaceSyntax
   object normedVectorSpace extends NormedVectorSpaceSyntax

@@ -125,11 +125,18 @@ trait NRootSyntax {
   implicit def nrootOps[A: NRoot](a: A): NRootOps[A] = new NRootOps(a)
 }
 
-trait ModuleSyntax extends RingSyntax {
-  implicit def moduleOps[V](v:V): ModuleOps[V] = new ModuleOps[V](v)
+
+trait LeftModuleSyntax extends RingSyntax {
+  implicit def leftModuleOps[V](v:V): LeftModuleOps[V] = new LeftModuleOps[V](v)
 }
 
-trait VectorSpaceSyntax extends ModuleSyntax with FieldSyntax {
+trait RightModuleSyntax extends RingSyntax {
+  implicit def rightModuleOps[V](v:V): RightModuleOps[V] = new RightModuleOps[V](v)
+}
+
+trait CModuleSyntax extends LeftModuleSyntax with RightModuleSyntax
+
+trait VectorSpaceSyntax extends CModuleSyntax with FieldSyntax {
   implicit def vectorSpaceOps[V](v:V): VectorSpaceOps[V] = new VectorSpaceOps[V](v)
 }
 
@@ -186,7 +193,7 @@ trait IntervalSyntax {
 }
 
 trait UnboundSyntax {
-  implicit def moduleUnboundOps[F](f: F)(implicit ev: Module[_, F]): ModuleUnboundOps[F] =
+  implicit def moduleUnboundOps[F](f: F)(implicit ev: CModule[_, F]): ModuleUnboundOps[F] =
     new ModuleUnboundOps(f)
 
   implicit def vectorSpaceUnboundOps[F](f: F)(implicit ev: VectorSpace[_, F]): VectorSpaceUnboundOps[F] =
@@ -279,7 +286,9 @@ trait AllSyntax extends
     NRootSyntax with
     TrigSyntax with
     IntervalSyntax with
-    ModuleSyntax with
+    LeftModuleSyntax with
+    RightModuleSyntax with
+    CModuleSyntax with
     VectorSpaceSyntax with
     NormedVectorSpaceSyntax with
     InnerProductSpaceSyntax with

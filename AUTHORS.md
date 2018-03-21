@@ -27,6 +27,7 @@ possible.
 * Christopher Hodapp: documentation fixes
 * Lars Hupel: core maintainer, law-checking, release support
 * Ben Hutchison: bug reports and design suggestions
+* Stephen Lazaro: definition of left and right modules
 * Sung-Ho Lee: bug fixes
 * Kamushin: bug fixes
 * Rüdiger Klaehn: core maintainer, rational improvements, testing
