@@ -6,6 +6,7 @@ import spire.algebra._
 import spire.algebra.free._
 import spire.algebra.lattice._
 import spire.laws.arb._
+import spire.laws.shadows.{Shadow, Shadowing}
 import spire.math._
 import spire.optional.partialIterable._
 import spire.optional.mapIntIntPermutation._
@@ -32,6 +33,26 @@ class LawTests extends FunSuite with Discipline {
     }
   }
 
+  // shadowed types with limited range
+
+  implicit val shadowingUByte: Shadowing[UByte, BigInt] = Shadowing.bigInt[UByte](s => UByte(s.toInt))
+  implicit val shadowingUShort: Shadowing[UShort, BigInt] = Shadowing.bigInt[UShort](s => UShort(s.toInt))
+  implicit val shadowingUInt: Shadowing[UInt, BigInt] = Shadowing.bigInt[UInt](s => UInt(s.toLong))
+  implicit val shadowingULong: Shadowing[ULong, BigInt] = Shadowing.bigInt[ULong](s => ULong.fromBigInt(s))
+  checkAll("UByte",      RingLaws[UByte].cRig)
+  checkAll("UByte",      CombinationLaws[Shadow[UByte, BigInt]].signedAdditiveCMonoid)
+  checkAll("UByte",      OrderLaws[Shadow[UByte, BigInt]].signed)
+  checkAll("UShort",     RingLaws[UShort].cRig)
+  checkAll("UShort",     CombinationLaws[Shadow[UShort, BigInt]].signedAdditiveCMonoid)
+  checkAll("UShort",     OrderLaws[Shadow[UShort, BigInt]].signed)
+  checkAll("UInt",       RingLaws[UInt].cRig)
+  checkAll("UInt",       CombinationLaws[Shadow[UInt, BigInt]].signedAdditiveCMonoid)
+  checkAll("UInt",       OrderLaws[Shadow[UInt, BigInt]].signed)
+  checkAll("ULong",      RingLaws[ULong].cRig)
+  checkAll("ULong",      CombinationLaws[Shadow[ULong, BigInt]].signedAdditiveCMonoid)
+  checkAll("ULong",      OrderLaws[Shadow[ULong, BigInt]].signed)
+
+
   // Float and Double fail these tests
   checkAll("Int",        RingLaws[Int].cRing)
   checkAll("Int",        BaseLaws[Int].uniqueFactorizationDomain)
@@ -49,10 +70,6 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Rational",   CombinationLaws[Rational].signedGCDRing)
   checkAll("Rational",   OrderLaws[Rational].truncatedDivision)
   checkAll("Real",       RingLaws[Real].field)
-  checkAll("UByte",      RingLaws[UByte].cRig)
-  checkAll("UShort",     RingLaws[UShort].cRig)
-  checkAll("UInt",       RingLaws[UInt].cRig)
-  checkAll("ULong",      RingLaws[ULong].cRig)
   checkAll("Natural",    RingLaws[Natural].cRig)
   checkAll("Natural",    CombinationLaws[Natural].signedAdditiveCMonoid)
   checkAll("SafeLong",   RingLaws[SafeLong].euclideanRing)

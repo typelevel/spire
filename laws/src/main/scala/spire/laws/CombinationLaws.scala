@@ -26,10 +26,10 @@ trait CombinationLaws[A] extends BaseLaws[A] {
     name = "signedAdditiveCMonoid",
     parent = None,
     "ordered group" → forAll { (x: A, y: A, z: A) =>
-      (x <= y) ==> (x + z <= y + z)
+      checkTrue(!(x <= y) || (x + z <= y + z)) // replaces ==>
     },
     "triangle inequality" → forAll { (x: A, y: A) =>
-      (x + y).abs <= x.abs + y.abs
+      checkTrue((x + y).abs <= x.abs + y.abs)
     }
   )
 
@@ -37,7 +37,7 @@ trait CombinationLaws[A] extends BaseLaws[A] {
     name = "signedAdditiveAbGroup",
     parent = Some(signedAdditiveCMonoid),
     "abs(x) equals abs(-x)" → forAll { (x: A) =>
-      x.abs === (-x).abs
+      x.abs <=> (-x).abs
     }
   )
 
@@ -48,10 +48,10 @@ trait CombinationLaws[A] extends BaseLaws[A] {
     name = "signedGCDRing",
     parent = Some(signedAdditiveAbGroup),
     "gcd(x, y) >= 0" → forAll { (x: A, y: A) =>
-      x.gcd(y).signum >= 0
+      checkTrue(x.gcd(y).signum >= 0)
     },
     "gcd(x, 0) === abs(x)" → forAll { (x: A) =>
-      x.gcd(Ring[A].zero) === Signed[A].abs(x)
+      x.gcd(Ring[A].zero) <=> Signed[A].abs(x)
     }
   )
 

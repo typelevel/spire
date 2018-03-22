@@ -27,13 +27,13 @@ trait GroupLaws[A] extends Laws {
     name = "semigroup",
     parent = None,
     "associative" → forAll((x: A, y: A, z: A) =>
-      ((x |+| y) |+| z) === (x |+| (y |+| z))
+      ((x |+| y) |+| z) <=> (x |+| (y |+| z))
     ),
     "combinen(a, 1) === a" → forAll((a: A) =>
-      A.combineN(a, 1) === a
+      A.combineN(a, 1) <=> a
     ),
     "combinen(a, 2) === a |+| a" → forAll((a: A) =>
-      A.combineN(a, 2) === (a |+| a)
+      A.combineN(a, 2) <=> (a |+| a)
     )
   )
 
@@ -41,19 +41,19 @@ trait GroupLaws[A] extends Laws {
     name = "monoid",
     parent = Some(semigroup),
     "left identity" → forAll((x: A) =>
-      (A.empty |+| x) === x
+      (A.empty |+| x) <=> x
     ),
     "right identity" → forAll((x: A) =>
-      (x |+| A.empty) === x
+      (x |+| A.empty) <=> x
     ),
     "combineN(a, 0) === id" → forAll((a: A) =>
-      A.combineN(a, 0) === A.empty
+      A.combineN(a, 0) <=> A.empty
     ),
     "combineAll(Nil) === id" → forAll((a: A) =>
-      A.combineAll(Nil) === A.empty
+      A.combineAll(Nil) <=> A.empty
     ),
     "isId" → forAll((x: A) =>
-      (x === A.empty) === (x.isEmpty)
+      (x === A.empty) <=> (x.isEmpty)
     )
   )
 
@@ -61,7 +61,7 @@ trait GroupLaws[A] extends Laws {
     name = "commutative monoid",
     parent = Some(monoid),
     "commutative" → forAll((x: A, y: A) =>
-      (x |+| y) === (y |+| x)
+      (x |+| y) <=> (y |+| x)
     )
   )
 
@@ -69,10 +69,10 @@ trait GroupLaws[A] extends Laws {
     name = "group",
     parent = Some(monoid),
     "left inverse" → forAll((x: A) =>
-      A.empty === (x.inverse |+| x)
+      A.empty <=> (x.inverse |+| x)
     ),
     "right inverse" → forAll((x: A) =>
-      A.empty === (x |+| x.inverse)
+      A.empty <=> (x |+| x.inverse)
     )
   )
 
@@ -80,7 +80,7 @@ trait GroupLaws[A] extends Laws {
     name = "abelian group",
     parent = Some(group),
     "commutative" → forAll((x: A, y: A) =>
-      (x |+| y) === (y |+| x)
+      (x |+| y) <=> (y |+| x)
     )
   )
 
@@ -91,10 +91,10 @@ trait GroupLaws[A] extends Laws {
     base = semigroup(A.additive),
     parent = None,
     "sumN(a, 1) === a" → forAll((a: A) =>
-      A.sumN(a, 1) === a
+      A.sumN(a, 1) <=> a
     ),
     "sumN(a, 2) === a + a" → forAll((a: A) =>
-      A.sumN(a, 2) === (a + a)
+      A.sumN(a, 2) <=> (a + a)
     )
   )
 
@@ -102,13 +102,13 @@ trait GroupLaws[A] extends Laws {
     base = monoid(A.additive),
     parent = Some(additiveSemigroup),
     "sumN(a, 0) === zero" → forAll((a: A) =>
-      A.sumN(a, 0) === A.zero
+      A.sumN(a, 0) <=> A.zero
     ),
     "sum(Nil) === zero" → forAll((a: A) =>
-      A.sum(Nil) === A.zero
+      A.sum(Nil) <=> A.zero
     ),
     "isZero" → forAll((a: A) =>
-      a.isZero === (a === A.zero)
+      a.isZero <=> (a === A.zero)
     )
   )
 
@@ -122,7 +122,7 @@ trait GroupLaws[A] extends Laws {
     base = group(A.additive),
     parent = Some(additiveMonoid),
     "minus consistent" → forAll((x: A, y: A) =>
-      (x - y) === (x + (-y))
+      (x - y) <=> (x + (-y))
     )
   )
 
