@@ -68,7 +68,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Byte",       BaseLaws[Byte].uniqueFactorizationDomain)
 
   checkAll("Short",      RingLaws[Short].cRing)
-  // checkAll("Short",      RingLaws[Shadow[Short, BigInt]].euclideanRing(shadows.Shadow.euclideanRing)) TODO: restore later
+  checkAll("Short",      RingLaws[Shadow[Short, BigInt]].euclideanRing(shadows.Shadow.euclideanRing))
   checkAll("Short",      CombinationLaws[Shadow[Short, BigInt]].signedAdditiveCMonoid)
   checkAll("Short",      BaseLaws[Short].uniqueFactorizationDomain)
   
