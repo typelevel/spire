@@ -9,6 +9,8 @@ import org.typelevel.discipline.{Laws, Predicate}
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
+import InvalidTestException._
+
 object VectorSpaceLaws {
   def apply[V: Eq: Arbitrary, A: Eq: Arbitrary: Predicate] = new VectorSpaceLaws[V, A] {
     val scalarLaws = RingLaws[A]
@@ -33,16 +35,16 @@ trait VectorSpaceLaws[V, A] extends Laws {
     sl = _.ring(V.scalar),
     vl = _.abGroup(V.additive),
     parents = Seq.empty,
-    "left scalar distributes" -> forAll((r: A, v: V, w: V) =>
+    "left scalar distributes" -> forAllSafe((r: A, v: V, w: V) =>
       r *: (v + w) === (r *: v) + (r *: w)
     ),
-    "left vector distributes" -> forAll((r: A, s: A, v: V) =>
+    "left vector distributes" -> forAllSafe((r: A, s: A, v: V) =>
       (r + s) *: v === (r *: v) + (s *: v)
     ),
-    "left associative scalar" -> forAll((r: A, s: A, v: V) =>
+    "left associative scalar" -> forAllSafe((r: A, s: A, v: V) =>
       (r * s) *: v === r *: (s *: v)
     ),
-    "left identity" -> forAll((v: V) =>
+    "left identity" -> forAllSafe((v: V) =>
       V.scalar.one *: v === v
     )
   )
@@ -52,16 +54,16 @@ trait VectorSpaceLaws[V, A] extends Laws {
     sl = _.ring(V.scalar),
     vl = _.abGroup(V.additive),
     parents = Seq.empty,
-    "right scalar distributes" -> forAll((v: V, w: V, r: A) =>
+    "right scalar distributes" -> forAllSafe((v: V, w: V, r: A) =>
       (v + w) :* r === (v :* r) + (w :* r)
     ),
-    "right vector distributes" -> forAll((v: V, r: A, s: A) =>
+    "right vector distributes" -> forAllSafe((v: V, r: A, s: A) =>
       v :* (r + s) === (v :* r) + (v :* s)
     ),
-    "right associative scalar" -> forAll((v: V, r: A, s: A) =>
+    "right associative scalar" -> forAllSafe((v: V, r: A, s: A) =>
       v :* (r * s) === (v :* r) :* s
     ),
-    "right identity" -> forAll((v: V) =>
+    "right identity" -> forAllSafe((v: V) =>
        v :* V.scalar.one === v
     )
   )
@@ -71,7 +73,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     sl = _.cRing(V.scalar),
     vl = _.abGroup(V.additive),
     parents = Seq(leftModule, rightModule),
-    "left and right multiplication are compatible" -> forAll((r: A, v: V, s: A) =>
+    "left and right multiplication are compatible" -> forAllSafe((r: A, v: V, s: A) =>
     r *: (v :* s) === (r *: v) :* s
     )
   )
@@ -88,14 +90,14 @@ trait VectorSpaceLaws[V, A] extends Laws {
     sl = _.emptyRuleSet,
     vl = _.emptyRuleSet,
     parents = Seq.empty,
-    "identity" → forAll((x: V, y: V) =>
+    "identity" → forAllSafe((x: V, y: V) =>
       if (x === y) V.distance(x, y) === A.zero
       else V.distance(x, y) =!= A.zero
     ),
-    "symmetric" → forAll((x: V, y: V) =>
+    "symmetric" → forAllSafe((x: V, y: V) =>
       V.distance(x, y) === V.distance(y, x)
     ),
-    "triangle inequality" → forAll((x: V, y: V, z: V) =>
+    "triangle inequality" → forAllSafe((x: V, y: V, z: V) =>
       V.distance(x, z) <= (V.distance(x, y) + V.distance(y, z))
     )
   )
@@ -106,10 +108,10 @@ trait VectorSpaceLaws[V, A] extends Laws {
     vl = _.abGroup(V.additive),
     parents = Seq(vectorSpace, metricSpace),
 
-    "scalable" → forAll((a: A, v: V) =>
+    "scalable" → forAllSafe((a: A, v: V) =>
       a.abs * v.norm === (a.abs *: v).norm
     ),
-    "only 1 zero" → forAll((v: V) => // This is covered by metricSpace...
+    "only 1 zero" → forAllSafe((v: V) => // This is covered by metricSpace...
       if (v === V.zero)
         v.norm === Rng[A].zero
       else
@@ -120,10 +122,10 @@ trait VectorSpaceLaws[V, A] extends Laws {
   def linearity(f: V => A)(implicit V: CModule[V, A]): SimpleRuleSet = new SimpleRuleSet(
     name = "linearity",
 
-    "homogeneity" → forAll((r: A, v: V) =>
+    "homogeneity" → forAllSafe((r: A, v: V) =>
       f(r *: v) === r * f(v)
     ),
-    "additivity" → forAll((v: V, w: V) =>
+    "additivity" → forAllSafe((v: V, w: V) =>
       f(v + w) === f(v) + f(w)
     )
   )
@@ -133,10 +135,10 @@ trait VectorSpaceLaws[V, A] extends Laws {
     name = "inner-product space",
     parent = vectorSpace,
 
-    "symmetry" → forAll((v: V, w: V) =>
+    "symmetry" → forAllSafe((v: V, w: V) =>
       (v ⋅ w).abs === (w ⋅ v).abs
     ),
-    "linearity of partial inner product" → forAll((w: V) =>
+    "linearity of partial inner product" → forAllSafe((w: V) =>
       // TODO this probably requires some thought -- should `linearity` be a full `RuleSet`?
       propertiesToProp(linearity(_ ⋅ w).all)
     )

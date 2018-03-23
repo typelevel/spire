@@ -9,6 +9,8 @@ import org.typelevel.discipline.Laws
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
+import InvalidTestException._
+
 object OrderLaws {
   def apply[A : Eq : Arbitrary] = new OrderLaws[A] {
     def Equ = Eq[A]
@@ -24,112 +26,112 @@ trait OrderLaws[A] extends Laws {
   def partialOrder(implicit A: PartialOrder[A]) = new OrderProperties(
     name = "partialOrder",
     parent = None,
-    "reflexitivity" → forAll((x: A) =>
-      checkTrue(x <= x)
+    "reflexitivity" → forAllSafe((x: A) =>
+      x <= x
     ),
-    "antisymmetry" → forAll((x: A, y: A) =>
-      checkTrue((x <= y && y <= x) imp (x === y))
+    "antisymmetry" → forAllSafe((x: A, y: A) =>
+      (x <= y && y <= x) imp (x === y)
     ),
-    "transitivity" → forAll((x: A, y: A, z: A) =>
-      checkTrue((x <= y && y <= z) imp (x <= z))
+    "transitivity" → forAllSafe((x: A, y: A, z: A) =>
+      (x <= y && y <= z) imp (x <= z)
     ),
-    "gteqv" → forAll((x: A, y: A) =>
-      (x <= y) <=> (y >= x)
+    "gteqv" → forAllSafe((x: A, y: A) =>
+      (x <= y) === (y >= x)
     ),
-    "lt" → forAll((x: A, y: A) =>
-      (x < y) <=> (x <= y && x =!= y)
+    "lt" → forAllSafe((x: A, y: A) =>
+      (x < y) === (x <= y && x =!= y)
     ),
-    "gt" → forAll((x: A, y: A) =>
-      (x < y) <=> (y > x)
+    "gt" → forAllSafe((x: A, y: A) =>
+      (x < y) === (y > x)
     )
   )
 
   def order(implicit A: Order[A]) = new OrderProperties(
     name = "order",
     parent = Some(partialOrder),
-    "totality" → forAll((x: A, y: A) =>
-      checkTrue(x <= y || y <= x)
+    "totality" → forAllSafe((x: A, y: A) =>
+      x <= y || y <= x
     )
   )
 
   def signed(implicit A: Signed[A]) = new OrderProperties(
     name = "signed",
     parent = Some(order),
-    "abs non-negative" → forAll((x: A) =>
-      checkTrue(x.abs.sign != Sign.Negative)
+    "abs non-negative" → forAllSafe((x: A) =>
+      x.abs.sign != Sign.Negative
     ),
-    "signum returns -1/0/1" → forAll((x: A) =>
-      checkTrue(x.signum.abs <= 1)
+    "signum returns -1/0/1" → forAllSafe((x: A) =>
+      x.signum.abs <= 1
     ),
-    "signum is sign.toInt" → forAll((x: A) =>
-      checkTrue(x.signum == x.sign.toInt)
+    "signum is sign.toInt" → forAllSafe((x: A) =>
+      x.signum == x.sign.toInt
     )
   )
 
   def truncatedDivision(implicit cRingA: CRing[A], truncatedDivisionA: TruncatedDivision[A]) = new DefaultRuleSet(
     name = "truncatedDivision",
     parent = Some(signed),
-    "division rule (tquotmod)" → forAll { (x: A, y: A) =>
-      checkTrue(y.isZero || {
+    "division rule (tquotmod)" → forAllSafe { (x: A, y: A) =>
+      y.isZero || {
         val (q, r) = x tquotmod y
         x === y * q + r
-      })
+      }
     },
-    "division rule (fquotmod)" → forAll { (x: A, y: A) =>
-      checkTrue(y.isZero || {
+    "division rule (fquotmod)" → forAllSafe { (x: A, y: A) =>
+      y.isZero || {
         val (q, r) = x fquotmod y
         x == y * q + r
-      })
+      }
     },
-    "quotient is integer (tquot)" → forAll { (x: A, y: A) =>
-      checkTrue(y.isZero || (x tquot y).toBigIntOpt.nonEmpty)
+    "quotient is integer (tquot)" → forAllSafe { (x: A, y: A) =>
+      y.isZero || (x tquot y).toBigIntOpt.nonEmpty
     },
-    "quotient is integer (fquot)" → forAll { (x: A, y: A) =>
-      checkTrue(y.isZero || (x fquot y).toBigIntOpt.nonEmpty)
+    "quotient is integer (fquot)" → forAllSafe { (x: A, y: A) =>
+      y.isZero || (x fquot y).toBigIntOpt.nonEmpty
     },
-    "|r| < |y| (tmod)" → forAll { (x: A, y: A) =>
-      checkTrue(y.isZero || {
+    "|r| < |y| (tmod)" → forAllSafe { (x: A, y: A) =>
+      y.isZero || {
         val r = x tmod y
         r.abs < y.abs
-      })
+      }
     },
-    "|r| < |y| (fmod)" → forAll { (x: A, y: A) =>
-      checkTrue(y.isZero || {
+    "|r| < |y| (fmod)" → forAllSafe { (x: A, y: A) =>
+      y.isZero || {
         val r = x fmod y
         r.abs < y.abs
-      })
+      }
     },
-    "r = 0 or sign(r) = sign(x) (tmod)" → forAll { (x: A, y: A) =>
-      checkTrue(y.isZero || {
+    "r = 0 or sign(r) = sign(x) (tmod)" → forAllSafe { (x: A, y: A) =>
+      y.isZero || {
         val r = x tmod y
         r.isZero || (r.sign === x.sign)
-      })
+      }
     },
-    "r = 0 or sign(r) = sign(y) (fmod)" → forAll { (x: A, y: A) =>
-      checkTrue(y.isZero || {
+    "r = 0 or sign(r) = sign(y) (fmod)" → forAllSafe { (x: A, y: A) =>
+      y.isZero || {
         val r = x fmod y
         r.isZero || (r.sign === y.sign)
-      })
+      }
     },
-    "tquot" → forAll { (x: A, y: A) =>
-      checkTrue(y.isZero || {
+    "tquot" → forAllSafe { (x: A, y: A) =>
+      y.isZero || {
         (x tquotmod y)._1 === (x tquot y)
-      })
+      }
     },
-    "tmod" → forAll { (x: A, y: A) =>
-      checkTrue(y.isZero || {
+    "tmod" → forAllSafe { (x: A, y: A) =>
+      y.isZero || {
         (x tquotmod y)._2 === (x tmod y)
-      })
+      }
     },
-    "fquot" → forAll { (x: A, y: A) =>
-      checkTrue(y.isZero || {
+    "fquot" → forAllSafe { (x: A, y: A) =>
+      y.isZero || {
         (x fquotmod y)._1 === (x fquot y)
-      })
+      }
     },
-    "fmod" → forAll { (x: A, y: A) =>
-      checkTrue(y.isZero || {
+    "fmod" → forAllSafe { (x: A, y: A) =>
+      y.isZero || {
         (x fquotmod y)._2 === (x fmod y)
-      })
+      }
     }
     
   )
