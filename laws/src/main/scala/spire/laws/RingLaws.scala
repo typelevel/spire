@@ -176,33 +176,33 @@ trait RingLaws[A] extends GroupLaws[A] {
     parent = gcdRing,
     "euclidean division rule" → forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
-      pred(y) ==> {
+      !pred(y) || {
         val (q, r) = x equotmod y
         x === (y * q + r)
       }
     },
     "equot" → forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
-      pred(y) ==> {
+      !pred(y) || {
         (x equotmod y)._1 === (x equot y)
       }
     },
     "emod" → forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
-      pred(y) ==> {
+      !pred(y) || {
         (x equotmod y)._2 === (x emod y)
       }
     },
     "euclidean function" → forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
-      pred(y) ==> {
+      !pred(y) || {
         val (q, r) = x equotmod y
         r.isZero || (r.euclideanFunction < y.euclideanFunction)
       }
     },
     "submultiplicative function" → forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
-      (pred(x) && pred(y)) ==> {
+      !(pred(x) && pred(y)) || {
         x.euclideanFunction <= (x * y).euclideanFunction
       }
     }

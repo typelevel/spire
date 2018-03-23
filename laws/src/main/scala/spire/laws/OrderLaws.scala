@@ -68,7 +68,7 @@ trait OrderLaws[A] extends Laws {
     )
   )
 
-  def truncatedDivision(implicit cRingA: CRing[A], truncatedDivisionA: TruncatedDivision[A]) = new DefaultRuleSet(
+  def truncatedDivision(implicit cRigA: CRig[A], truncatedDivisionA: TruncatedDivision[A]) = new DefaultRuleSet(
     name = "truncatedDivision",
     parent = Some(signed),
     "division rule (tquotmod)" → forAllSafe { (x: A, y: A) =>

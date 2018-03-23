@@ -41,7 +41,7 @@ trait TruncatedDivision[@sp(Byte, Short, Int, Long, Float, Double) A] extends An
 
   def fquot(x: A, y: A): A
   def fmod(x: A, y: A): A
-  def fquotmod(x: A, y: A): (A, A)
+  def fquotmod(x: A, y: A): (A, A) = (fquot(x, y), fmod(x, y))
 }
 
 trait TruncatedDivisionCRing[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with TruncatedDivision[A] with CRing[A] { self =>
@@ -56,7 +56,7 @@ trait TruncatedDivisionCRing[@sp(Byte, Short, Int, Long, Float, Double) A] exten
     if (signum(tm) == -signum(y)) minus(tq, one) else tq
   }
 
-  def fquotmod(x: A, y: A): (A, A) = {
+  override def fquotmod(x: A, y: A): (A, A) = {
     val (tq, tm) = tquotmod(x, y)
     TruncatedDivision.fquotmodFromTquotmod(x, y, tq, tm)(self, self)
   }

@@ -1,7 +1,8 @@
 package spire
 package math
 
-import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid}
+import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid, TruncatedDivision}
+import spire.util.Opt
 
 object ULong extends ULongInstances {
   @inline final def apply(n: Long): ULong = new ULong(n)
@@ -160,6 +161,14 @@ private[math] trait ULongSigned extends SignedAdditiveCMonoid[ULong] {
   def abs(x: ULong): ULong = x
 }
 
+private[math] trait ULongTruncatedDivision extends TruncatedDivision[ULong] with ULongSigned {
+   def toBigIntOpt(x: ULong): Opt[BigInt] = Opt(x.toBigInt)
+   def tquot(x: ULong, y: ULong): ULong = x / y
+   def tmod(x: ULong, y: ULong): ULong = x % y
+   def fquot(x: ULong, y: ULong): ULong = x/ y
+   def fmod(x: ULong, y: ULong): ULong = x % y
+}
+
 @SerialVersionUID(0L)
 private[math] class ULongBitString extends BitString[ULong] with Serializable {
   def one: ULong = ULong(-1L)
@@ -186,7 +195,7 @@ private[math] class ULongBitString extends BitString[ULong] with Serializable {
   def rotateRight(n: ULong, i: Int): ULong = ULong(java.lang.Long.rotateRight(n.signed, i))
 }
 
-private[math] trait ULongIsReal extends IsIntegral[ULong] with ULongSigned {
+private[math] trait ULongIsReal extends IsIntegral[ULong] with ULongTruncatedDivision {
   def toDouble(n: ULong): Double = n.toDouble
   def toBigInt(n: ULong): BigInt = n.toBigInt
 }

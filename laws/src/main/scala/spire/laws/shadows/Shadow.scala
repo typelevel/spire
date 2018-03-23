@@ -4,7 +4,7 @@ import spire.algebra._
 import org.scalacheck.Arbitrary
 
 /** Represents a primitive value `a: A` along with its shadow `s: S`.
-  * 
+  *
   * The shadow is a type S isomorphic to the primitive type A
   * in the range where A is defined.
   */
@@ -117,6 +117,14 @@ abstract class ShadowInstances4 extends ShadowInstances3 {
       def eqA = implicitly
       def eqS = implicitly
     }
+
+  implicit def truncatedDivision[A:TruncatedDivision, S:TruncatedDivision](implicit ev: Shadowing[A, S]): TruncatedDivision[Shadow[A, S]] =
+    new ShadowTruncatedDivision[A, S] {
+      val shadowing = ev
+      def A = implicitly
+      def S = implicitly
+    }
+
 }
 
 abstract class ShadowInstances5 extends ShadowInstances4 {
