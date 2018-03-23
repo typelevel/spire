@@ -78,7 +78,7 @@ trait RingLaws[A] extends GroupLaws[A] {
     base = _.group(A.multiplicative),
     parent = Some(multiplicativeMonoid),
     "reciprocal consistent" → forAllSafe((x: A) =>
-      pred(x) ==> ((A.one / x) === x.reciprocal)
+      !pred(x) || ((A.one / x) === x.reciprocal)
     )
   )
 

@@ -46,15 +46,15 @@ class LawTests extends FunSuite with Discipline {
   implicit val shadowingLong: Shadowing[Long, BigInt] = Shadowing.bigInt[Long](s => s.toLong)
 
   checkAll("UByte",      RingLaws[UByte].cRig)
-  checkAll("UByte",      OrderLaws[Shadow[UByte, BigInt]].signed)
+  checkAll("UByte",      OrderLaws[Shadow[UByte, BigInt]].signed) // TODO: TruncatedDivision
   checkAll("UByte",      CombinationLaws[Shadow[UByte, BigInt]].signedAdditiveCMonoid)
 
   checkAll("UShort",     RingLaws[UShort].cRig)
-  checkAll("UShort",     OrderLaws[Shadow[UShort, BigInt]].signed)
+  checkAll("UShort",     OrderLaws[Shadow[UShort, BigInt]].signed) // TODO: TruncatedDivision
   checkAll("UShort",     CombinationLaws[Shadow[UShort, BigInt]].signedAdditiveCMonoid)
 
   checkAll("UInt",       RingLaws[UInt].cRig)
-  checkAll("UInt",       OrderLaws[Shadow[UInt, BigInt]].signed)
+  checkAll("UInt",       OrderLaws[Shadow[UInt, BigInt]].signed) // TODO: TruncatedDivision
   checkAll("UInt",       CombinationLaws[Shadow[UInt, BigInt]].signedAdditiveCMonoid)
 
   checkAll("ULong",      RingLaws[ULong].cRig)
@@ -68,7 +68,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Byte",       BaseLaws[Byte].uniqueFactorizationDomain)
 
   checkAll("Short",      RingLaws[Short].cRing)
-  checkAll("Short",      RingLaws[Shadow[Short, BigInt]].euclideanRing(shadows.Shadow.euclideanRing))
+  // checkAll("Short",      RingLaws[Shadow[Short, BigInt]].euclideanRing(shadows.Shadow.euclideanRing)) TODO: restore later
   checkAll("Short",      CombinationLaws[Shadow[Short, BigInt]].signedAdditiveCMonoid)
   checkAll("Short",      BaseLaws[Short].uniqueFactorizationDomain)
   
