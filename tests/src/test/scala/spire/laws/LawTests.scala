@@ -46,15 +46,15 @@ class LawTests extends FunSuite with Discipline {
   implicit val shadowingLong: Shadowing[Long, BigInt] = Shadowing.bigInt[Long](s => s.toLong)
 
   checkAll("UByte",      RingLaws[UByte].cRig)
-  checkAll("UByte",      OrderLaws[Shadow[UByte, BigInt]].signed) // TODO: TruncatedDivision
+  checkAll("UByte",      OrderLaws[Shadow[UByte, BigInt]].truncatedDivision(shadows.Shadow.cRig, shadows.Shadow.truncatedDivision))
   checkAll("UByte",      CombinationLaws[Shadow[UByte, BigInt]].signedAdditiveCMonoid)
 
   checkAll("UShort",     RingLaws[UShort].cRig)
-  checkAll("UShort",     OrderLaws[Shadow[UShort, BigInt]].signed) // TODO: TruncatedDivision
+  checkAll("UShort",      OrderLaws[Shadow[UShort, BigInt]].truncatedDivision(shadows.Shadow.cRig, shadows.Shadow.truncatedDivision))
   checkAll("UShort",     CombinationLaws[Shadow[UShort, BigInt]].signedAdditiveCMonoid)
 
   checkAll("UInt",       RingLaws[UInt].cRig)
-  checkAll("UInt",       OrderLaws[Shadow[UInt, BigInt]].signed) // TODO: TruncatedDivision
+  checkAll("UInt",      OrderLaws[Shadow[UInt, BigInt]].truncatedDivision(shadows.Shadow.cRig, shadows.Shadow.truncatedDivision))
   checkAll("UInt",       CombinationLaws[Shadow[UInt, BigInt]].signedAdditiveCMonoid)
 
   checkAll("ULong",      RingLaws[ULong].cRig)

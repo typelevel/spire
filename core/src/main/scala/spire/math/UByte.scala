@@ -1,7 +1,8 @@
 package spire
 package math
 
-import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid}
+import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid, TruncatedDivision}
+import spire.util.Opt
 
 object UByte extends UByteInstances {
   @inline final def apply(n: Byte): UByte = new UByte(n)
@@ -100,6 +101,14 @@ private[math] trait UByteSigned extends SignedAdditiveCMonoid[UByte] {
   def abs(x: UByte): UByte = x
 }
 
+private[math] trait UByteTruncatedDivision extends TruncatedDivision[UByte] with UByteSigned {
+  def toBigIntOpt(x: UByte): Opt[BigInt] = Opt(x.toBigInt)
+  def tquot(x: UByte, y: UByte): UByte = x / y
+  def tmod(x: UByte, y: UByte): UByte = x % y
+  def fquot(x: UByte, y: UByte): UByte = x/ y
+  def fmod(x: UByte, y: UByte): UByte = x % y
+}
+
 @SerialVersionUID(0L)
 private[math] class UByteBitString extends BitString[UByte] with Serializable {
   def one: UByte = UByte(-1: Byte)
@@ -132,7 +141,7 @@ private[math] class UByteBitString extends BitString[UByte] with Serializable {
   }
 }
 
-private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteSigned {
+private[math] trait UByteIsReal extends IsIntegral[UByte] with UByteTruncatedDivision {
   def toDouble(n: UByte): Double = n.toDouble
   def toBigInt(n: UByte): BigInt = n.toBigInt
 }
