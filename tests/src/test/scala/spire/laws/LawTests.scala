@@ -61,6 +61,10 @@ class LawTests extends FunSuite with Discipline {
   checkAll("ULong",      OrderLaws[Shadow[ULong, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("ULong",      CombinationLaws[Shadow[ULong, BigInt]].signedAdditiveCMonoid)
 
+  checkAll("Natural",    RingLaws[Natural].cRig)
+  checkAll("Natural",    CombinationLaws[Natural].signedAdditiveCMonoid)
+  checkAll("Natural",    OrderLaws[Natural].truncatedDivision)
+
   // Float and Double fail these tests
   checkAll("Byte",       RingLaws[Byte].cRing)
   checkAll("Byte",       RingLaws[Shadow[Byte, BigInt]].euclideanRing(Shadow.euclideanRing))
