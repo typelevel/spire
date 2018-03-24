@@ -50,11 +50,11 @@ class LawTests extends FunSuite with Discipline {
   checkAll("UByte",      CombinationLaws[Shadow[UByte, BigInt]].signedAdditiveCMonoid)
 
   checkAll("UShort",     RingLaws[UShort].cRig)
-  checkAll("UShort",      OrderLaws[Shadow[UShort, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll("UShort",     OrderLaws[Shadow[UShort, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("UShort",     CombinationLaws[Shadow[UShort, BigInt]].signedAdditiveCMonoid)
 
   checkAll("UInt",       RingLaws[UInt].cRig)
-  checkAll("UInt",      OrderLaws[Shadow[UInt, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll("UInt",       OrderLaws[Shadow[UInt, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("UInt",       CombinationLaws[Shadow[UInt, BigInt]].signedAdditiveCMonoid)
 
   checkAll("ULong",      RingLaws[ULong].cRig)
@@ -71,13 +71,13 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Short",      RingLaws[Short].cRing)
   checkAll("Short",      RingLaws[Shadow[Short, BigInt]].euclideanRing(Shadow.euclideanRing))
   checkAll("Short",      CombinationLaws[Shadow[Short, BigInt]].signedAdditiveCMonoid)
-  checkAll("Short",       OrderLaws[Shadow[Short, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll("Short",      OrderLaws[Shadow[Short, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("Short",      BaseLaws[Short].uniqueFactorizationDomain)
   
   checkAll("Int",        RingLaws[Int].cRing)
   checkAll("Int",        RingLaws[Shadow[Int, BigInt]].euclideanRing(Shadow.euclideanRing))
   checkAll("Int",        BaseLaws[Int].uniqueFactorizationDomain)
-  checkAll("Int",       OrderLaws[Shadow[Int, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll("Int",        OrderLaws[Shadow[Int, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("Int",        CombinationLaws[Shadow[Int, BigInt]].signedAdditiveCMonoid)
 
   checkAll("Long",       RingLaws[Long].cRing)
