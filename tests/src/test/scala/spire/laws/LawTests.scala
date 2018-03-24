@@ -46,41 +46,45 @@ class LawTests extends FunSuite with Discipline {
   implicit val shadowingLong: Shadowing[Long, BigInt] = Shadowing.bigInt[Long](s => s.toLong)
 
   checkAll("UByte",      RingLaws[UByte].cRig)
-  checkAll("UByte",      OrderLaws[Shadow[UByte, BigInt]].truncatedDivision(shadows.Shadow.cRig, shadows.Shadow.truncatedDivision))
+  checkAll("UByte",      OrderLaws[Shadow[UByte, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("UByte",      CombinationLaws[Shadow[UByte, BigInt]].signedAdditiveCMonoid)
 
   checkAll("UShort",     RingLaws[UShort].cRig)
-  checkAll("UShort",      OrderLaws[Shadow[UShort, BigInt]].truncatedDivision(shadows.Shadow.cRig, shadows.Shadow.truncatedDivision))
+  checkAll("UShort",      OrderLaws[Shadow[UShort, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("UShort",     CombinationLaws[Shadow[UShort, BigInt]].signedAdditiveCMonoid)
 
   checkAll("UInt",       RingLaws[UInt].cRig)
-  checkAll("UInt",      OrderLaws[Shadow[UInt, BigInt]].truncatedDivision(shadows.Shadow.cRig, shadows.Shadow.truncatedDivision))
+  checkAll("UInt",      OrderLaws[Shadow[UInt, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("UInt",       CombinationLaws[Shadow[UInt, BigInt]].signedAdditiveCMonoid)
 
   checkAll("ULong",      RingLaws[ULong].cRig)
-  checkAll("ULong",      OrderLaws[Shadow[ULong, BigInt]].truncatedDivision(shadows.Shadow.cRig, shadows.Shadow.truncatedDivision))
+  checkAll("ULong",      OrderLaws[Shadow[ULong, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("ULong",      CombinationLaws[Shadow[ULong, BigInt]].signedAdditiveCMonoid)
 
   // Float and Double fail these tests
   checkAll("Byte",       RingLaws[Byte].cRing)
-  checkAll("Byte",       RingLaws[Shadow[Byte, BigInt]].euclideanRing(shadows.Shadow.euclideanRing))
+  checkAll("Byte",       RingLaws[Shadow[Byte, BigInt]].euclideanRing(Shadow.euclideanRing))
   checkAll("Byte",       CombinationLaws[Shadow[Byte, BigInt]].signedAdditiveCMonoid)
+  checkAll("Byte",       OrderLaws[Shadow[Byte, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("Byte",       BaseLaws[Byte].uniqueFactorizationDomain)
 
   checkAll("Short",      RingLaws[Short].cRing)
-  checkAll("Short",      RingLaws[Shadow[Short, BigInt]].euclideanRing(shadows.Shadow.euclideanRing))
+  checkAll("Short",      RingLaws[Shadow[Short, BigInt]].euclideanRing(Shadow.euclideanRing))
   checkAll("Short",      CombinationLaws[Shadow[Short, BigInt]].signedAdditiveCMonoid)
+  checkAll("Short",       OrderLaws[Shadow[Short, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("Short",      BaseLaws[Short].uniqueFactorizationDomain)
   
   checkAll("Int",        RingLaws[Int].cRing)
-  checkAll("Int",        RingLaws[Shadow[Int, BigInt]].euclideanRing(shadows.Shadow.euclideanRing))
-  checkAll("Int",        CombinationLaws[Shadow[Int, BigInt]].signedAdditiveCMonoid)
+  checkAll("Int",        RingLaws[Shadow[Int, BigInt]].euclideanRing(Shadow.euclideanRing))
   checkAll("Int",        BaseLaws[Int].uniqueFactorizationDomain)
+  checkAll("Int",       OrderLaws[Shadow[Int, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll("Int",        CombinationLaws[Shadow[Int, BigInt]].signedAdditiveCMonoid)
 
   checkAll("Long",       RingLaws[Long].cRing)
-  checkAll("Long",       RingLaws[Shadow[Long, BigInt]].euclideanRing(shadows.Shadow.euclideanRing))
-  checkAll("Long",       CombinationLaws[Shadow[Long, BigInt]].signedAdditiveCMonoid)
+  checkAll("Long",       RingLaws[Shadow[Long, BigInt]].euclideanRing(Shadow.euclideanRing))
   checkAll("Long",       BaseLaws[Long].uniqueFactorizationDomain)
+  checkAll("Long",       OrderLaws[Shadow[Long, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll("Long",       CombinationLaws[Shadow[Long, BigInt]].signedAdditiveCMonoid)
 
   checkAll("BigInt",     RingLaws[BigInt].euclideanRing)
   checkAll("BigInt",     CombinationLaws[BigInt].signedGCDRing)
