@@ -10,7 +10,7 @@ trait ShortIsEuclideanRing extends EuclideanRing[Short] {
   def negate(a:Short): Short = (-a).toShort
   def one: Short = 1.toShort
   def plus(a:Short, b:Short): Short = (a + b).toShort
-  override def pow(a: Short, b:Int): Short = Math.pow(a, b).toShort
+  // override def pow(a: Short, b:Int): Short = Math.pow(a, b).toShort TODO: does not obey laws
   override def times(a:Short, b:Short): Short = (a * b).toShort
   def zero: Short = 0.toShort
 

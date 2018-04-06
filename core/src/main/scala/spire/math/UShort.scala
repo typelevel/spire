@@ -1,7 +1,8 @@
 package spire
 package math
 
-import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid}
+import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid, TruncatedDivision}
+import spire.util.Opt
 
 object UShort extends UShortInstances {
   @inline final def apply(n: Char): UShort = new UShort(n)
@@ -91,6 +92,14 @@ private[math] trait UShortSigned extends SignedAdditiveCMonoid[UShort] {
   def abs(x: UShort): UShort = x
 }
 
+private[math] trait UShortTruncatedDivision extends TruncatedDivision[UShort] with UShortSigned {
+  def toBigIntOpt(x: UShort): Opt[BigInt] = Opt(x.toBigInt)
+  def tquot(x: UShort, y: UShort): UShort = x / y
+  def tmod(x: UShort, y: UShort): UShort = x % y
+  def fquot(x: UShort, y: UShort): UShort = x/ y
+  def fmod(x: UShort, y: UShort): UShort = x % y
+}
+
 @SerialVersionUID(0L)
 private[math] class UShortBitString extends BitString[UShort] with Serializable {
   def one: UShort = UShort(-1: Short)
@@ -123,7 +132,7 @@ private[math] class UShortBitString extends BitString[UShort] with Serializable 
   }
 }
 
-private[math] trait UShortIsReal extends IsIntegral[UShort] with UShortSigned {
+private[math] trait UShortIsReal extends IsIntegral[UShort] with UShortTruncatedDivision {
   def toDouble(n: UShort): Double = n.toDouble
   def toBigInt(n: UShort): BigInt = n.toBigInt
 }

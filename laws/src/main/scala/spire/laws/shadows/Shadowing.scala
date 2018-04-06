@@ -1,6 +1,7 @@
 package spire.laws.shadows
 
 import spire.algebra.IsIntegral
+import spire.laws.InvalidTestException
 import spire.math.NumberTag
 
 object Shadowing {

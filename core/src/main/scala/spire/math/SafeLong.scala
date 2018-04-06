@@ -582,7 +582,7 @@ private[math] trait SafeLongTruncatedDivision extends TruncatedDivision[SafeLong
   def tmod(x: SafeLong, y: SafeLong): SafeLong = x % y
   override def tquotmod(x: SafeLong, y: SafeLong): (SafeLong, SafeLong) = x /% y
 
-  def fquotmod(lhs: SafeLong, rhs: SafeLong): (SafeLong, SafeLong) = {
+  override def fquotmod(lhs: SafeLong, rhs: SafeLong): (SafeLong, SafeLong) = {
     val (tq, tm) = lhs /% rhs
     val signsDiffer = (tm.signum == -rhs.signum)
     val fq = if (signsDiffer) tq - 1 else tq

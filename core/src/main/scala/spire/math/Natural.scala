@@ -2,10 +2,9 @@ package spire
 package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
-
-import spire.algebra.{CRig, IsIntegral, Order, SignedAdditiveCMonoid}
-
+import spire.algebra._
 import Natural._
+import spire.util.Opt
 
 // NOTE: this class works, but is only optimal for a relatively narrow
 // set of problems. for really big numbers you're probably better off
@@ -729,6 +728,14 @@ private[math] trait NaturalSigned extends NaturalOrder with SignedAdditiveCMonoi
   def abs(x: Natural): Natural = x
 }
 
+private[math] trait NaturalTruncatedDivision extends NaturalSigned with TruncatedDivision[Natural] {
+  def toBigIntOpt(x: Natural): Opt[BigInt] = Opt(x.toBigInt)
+  def tquot(x: Natural, y: Natural): Natural = x / y
+  def tmod(x: Natural, y: Natural): Natural = x % y
+  def fquot(x: Natural, y: Natural): Natural = x / y
+  def fmod(x: Natural, y: Natural): Natural = x % y
+}
+
 private[math] trait NaturalIsReal extends IsIntegral[Natural]
 with NaturalOrder {
   def toDouble(n: Natural): Double = n.toDouble
@@ -736,4 +743,4 @@ with NaturalOrder {
 }
 
 @SerialVersionUID(0L)
-class NaturalAlgebra extends NaturalIsCRig with NaturalSigned with Serializable
+class NaturalAlgebra extends NaturalIsCRig with NaturalTruncatedDivision with Serializable

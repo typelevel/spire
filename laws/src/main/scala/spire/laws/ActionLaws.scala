@@ -9,6 +9,8 @@ import org.typelevel.discipline.Laws
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
+import InvalidTestException._
+
 object ActionLaws {
   def apply[G: Eq: Arbitrary, A: Eq: Arbitrary] = new ActionLaws[G, A] {
     val scalarLaws = GroupLaws[G]
@@ -31,7 +33,7 @@ trait ActionLaws[G, A] extends Laws {
     sl = _.semigroup(G0),
     parents = Seq.empty,
 
-    "left compatibility" → forAll { (g: G, h: G, a: A) =>
+    "left compatibility" → forAllSafe { (g: G, h: G, a: A) =>
       ((g |+| h) |+|> a) === (g |+|> (h |+|> a))
     }
   )
@@ -41,7 +43,7 @@ trait ActionLaws[G, A] extends Laws {
     sl = _.semigroup(G0),
     parents = Seq.empty,
 
-    "right compatibility" → forAll { (a: A, g: G, h: G) =>
+    "right compatibility" → forAllSafe { (a: A, g: G, h: G) =>
       (a <|+| (g |+| h)) === ((a <|+| g) <|+| h)
     }
   )
@@ -57,7 +59,7 @@ trait ActionLaws[G, A] extends Laws {
     sl = _.monoid(G0),
     parents = Seq(leftSemigroupAction),
 
-    "left identity" → forAll { (a: A) =>
+    "left identity" → forAllSafe { (a: A) =>
       (G0.empty |+|> a) === a
     }
   )
@@ -67,7 +69,7 @@ trait ActionLaws[G, A] extends Laws {
     sl = _.monoid(G0),
     parents = Seq(rightSemigroupAction),
 
-    "right identity" → forAll { (a: A) =>
+    "right identity" → forAllSafe { (a: A) =>
       (a <|+| G0.empty) === a
     }
   )
@@ -83,7 +85,7 @@ trait ActionLaws[G, A] extends Laws {
     sl = _.group(G0),
     parents = Seq(monoidAction),
 
-    "left and right action compatibility" → forAll { (a: A, g: G) =>
+    "left and right action compatibility" → forAllSafe { (a: A, g: G) =>
       (a <|+| g) === (g.inverse |+|> a)
     }
   )

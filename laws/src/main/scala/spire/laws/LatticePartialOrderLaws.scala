@@ -10,6 +10,8 @@ import org.typelevel.discipline.Laws
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
+import InvalidTestException._
+
 object LatticePartialOrderLaws {
   def apply[A : Eq : Arbitrary] = new LatticePartialOrderLaws[A] {
     def Equ = Eq[A]
@@ -26,7 +28,7 @@ trait LatticePartialOrderLaws[A] extends Laws {
     name = "joinSemilatticePartialOrder",
     parents = Seq.empty,
     bases = Seq("order" → OrderLaws[A].partialOrder, "lattice" → LatticeLaws[A].joinSemilattice),
-    "join.lteqv" → forAll((x: A, y: A) =>
+    "join.lteqv" → forAllSafe((x: A, y: A) =>
       (x <= y) === (y === (x join y))
     )
   )
@@ -35,7 +37,7 @@ trait LatticePartialOrderLaws[A] extends Laws {
     name = "meetSemilatticePartialOrder",
     parents = Seq.empty,
     bases = Seq("order" → OrderLaws[A].partialOrder, "lattice" → LatticeLaws[A].meetSemilattice),
-    "meet.lteqv" → forAll((x: A, y: A) =>
+    "meet.lteqv" → forAllSafe((x: A, y: A) =>
       (x <= y) === (x === (x meet y))
     )
   )
@@ -50,7 +52,7 @@ trait LatticePartialOrderLaws[A] extends Laws {
     name = "boundedJoinSemilatticePartialOrder",
     parents = Seq(joinSemilatticePartialOrder),
     bases = Seq("lattice" → LatticeLaws[A].boundedJoinSemilattice),
-    "lteqv.zero" → forAll((x: A) =>
+    "lteqv.zero" → forAllSafe((x: A) =>
       A.zero <= x
     )
   )
@@ -59,7 +61,7 @@ trait LatticePartialOrderLaws[A] extends Laws {
     name = "boundedMeetSemilatticePartialOrder",
     parents = Seq(meetSemilatticePartialOrder),
     bases = Seq("lattice" → LatticeLaws[A].boundedMeetSemilattice),
-    "lteqv.one" → forAll((x: A) =>
+    "lteqv.one" → forAllSafe((x: A) =>
       x <= A.one
     )
   )
