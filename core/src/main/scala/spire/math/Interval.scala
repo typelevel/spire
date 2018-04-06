@@ -51,7 +51,7 @@ import java.lang.Double.isNaN
  * not an easy platform to perform robust arithmetic, as the
  * IEEE 754 rounding modes cannot be set.
  */
-sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable { lhs =>
+sealed abstract class Interval[A] extends Serializable { lhs =>
 
   @inline protected[this] final def isClosed(flags: Int): Boolean = flags == 0
   @inline protected[this] final def isClosedLower(flags: Int): Boolean = (flags & 1) == 0
@@ -74,10 +74,10 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
   @inline protected[this] final def swapFlags(flags: Int): Int =
     ((flags & 1) << 1) | ((flags & 2) >>> 1)
 
-  protected[this] def lowerPairBelow(lower1: A, flags1: Int, lower2: A, flags2: Int): Boolean =
+  protected[this] def lowerPairBelow(lower1: A, flags1: Int, lower2: A, flags2: Int)(implicit o: Order[A]): Boolean =
     lower1 < lower2 || lower1 === lower2 && (isClosedLower(flags1) || isOpenLower(flags2))
 
-  protected[this] def upperPairAbove(upper1: A, flags1: Int, upper2: A, flags2: Int): Boolean =
+  protected[this] def upperPairAbove(upper1: A, flags1: Int, upper2: A, flags2: Int)(implicit o: Order[A]): Boolean =
     upper1 > upper2 || upper1 === upper2 && (isClosedUpper(flags1) || isOpenUpper(flags2))
 
   def isEmpty: Boolean =
@@ -89,16 +89,16 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
   def isPoint: Boolean =
     this.isInstanceOf[Point[_]]
 
-  def contains(t: A): Boolean =
+  def contains(t: A)(implicit o: Order[A]): Boolean =
     hasAtOrBelow(t) && hasAtOrAbove(t)
 
-  def doesNotContain(t: A): Boolean =
+  def doesNotContain(t: A)(implicit o: Order[A]): Boolean =
     !hasAtOrBelow(t) || !hasAtOrAbove(t)
 
-  def crosses(t: A): Boolean =
+  def crosses(t: A)(implicit o: Order[A]): Boolean =
     hasBelow(t) && hasAbove(t)
 
-  def crossesZero(implicit ev: AdditiveMonoid[A]): Boolean =
+  def crossesZero(implicit o: Order[A], ev: AdditiveMonoid[A]): Boolean =
     hasBelow(ev.zero) && hasAbove(ev.zero)
 
   def isBounded: Boolean =
@@ -117,7 +117,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
   def fold[B](f: (Bound[A], Bound[A]) => B): B =
     f(lowerBound, upperBound)
 
-  def isSupersetOf(rhs: Interval[A]): Boolean = (lhs, rhs) match {
+  def isSupersetOf(rhs: Interval[A])(implicit o: Order[A]): Boolean = (lhs, rhs) match {
     // deal with All, Empty and Point on either left or right side
 
     case (All(), _) => true
@@ -149,20 +149,20 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
 
     case (Bounded(lower1, upper1, flags1), Bounded(lower2, upper2, flags2)) =>
       lowerPairBelow(lower1, flags1, lower2, flags2) &&
-      upperPairAbove(upper1, flags1, upper2, flags2)
+        upperPairAbove(upper1, flags1, upper2, flags2)
   }
 
-  def isProperSupersetOf(rhs: Interval[A]): Boolean =
+  def isProperSupersetOf(rhs: Interval[A])(implicit o: Order[A]): Boolean =
     lhs != rhs && (lhs isSupersetOf rhs)
 
-  def isSubsetOf(rhs: Interval[A]): Boolean =
+  def isSubsetOf(rhs: Interval[A])(implicit o: Order[A]): Boolean =
     rhs isSupersetOf lhs
 
-  def isProperSubsetOf(rhs: Interval[A]): Boolean =
+  def isProperSubsetOf(rhs: Interval[A])(implicit o: Order[A]): Boolean =
     rhs isProperSupersetOf lhs
 
   // Does this interval contain any points above t ?
-  def hasAbove(t: A): Boolean = this match {
+  def hasAbove(t: A)(implicit o: Order[A]): Boolean = this match {
     case Empty() => false
     case Point(p) => p > t
     case Below(upper, _) => upper > t
@@ -172,7 +172,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
   }
 
   // Does this interval contain any points below t ?
-  def hasBelow(t: A): Boolean = this match {
+  def hasBelow(t: A)(implicit o: Order[A]): Boolean = this match {
     case Empty() => false
     case Point(p) => p < t
     case Above(lower, _) => lower < t
@@ -182,7 +182,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
   }
 
   // Does this interval contains any points at or above t ?
-  def hasAtOrAbove(t: A): Boolean = this match {
+  def hasAtOrAbove(t: A)(implicit o: Order[A]): Boolean = this match {
     case _: Empty[_] => false
     case Point(p) => p >= t
     case Below(upper, flags) =>
@@ -194,7 +194,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
   }
 
   // Does this interval contains any points at or below t ?
-  def hasAtOrBelow(t: A): Boolean = this match {
+  def hasAtOrBelow(t: A)(implicit o: Order[A]): Boolean = this match {
     case _: Empty[_] => false
     case Point(p) => p <= t
     case Above(lower, flags) =>
@@ -205,22 +205,22 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
     case _: All[_] => true
   }
 
-  def isAt(t: A): Boolean = this match {
+  def isAt(t: A)(implicit o: Eq[A]): Boolean = this match {
     case Point(p) => t === p
     case _ => false
   }
 
-  def intersects(rhs: Interval[A]): Boolean =
+  def intersects(rhs: Interval[A])(implicit o: Order[A]): Boolean =
     !(lhs intersect rhs).isEmpty
 
-  def &(rhs: Interval[A]): Interval[A] =
+  def &(rhs: Interval[A])(implicit o: Order[A]): Interval[A] =
     lhs intersect rhs
 
-  def intersect(rhs: Interval[A]): Interval[A] =
+  def intersect(rhs: Interval[A])(implicit o: Order[A]): Interval[A] =
     Interval.fromBounds(maxLower(lhs.lowerBound, rhs.lowerBound, true),
       minUpper(lhs.upperBound, rhs.upperBound, true))
 
-  def unary_~(): List[Interval[A]] =
+  def unary_~(implicit o: Order[A]): List[Interval[A]] =
     this match {
       case All() =>
         Nil
@@ -238,28 +238,28 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
         List(Below(lower, lx), Above(upper, ux))
     }
 
-  def --(rhs: Interval[A]): List[Interval[A]] =
+  def --(rhs: Interval[A])(implicit o: Order[A]): List[Interval[A]] =
     if (lhs intersects rhs) {
       (~rhs).map(lhs & _).filter(_.nonEmpty)
     } else {
       if (lhs.isEmpty) Nil else List(lhs)
     }
 
-  def split(t: A): (Interval[A], Interval[A]) =
+  def split(t: A)(implicit o: Order[A]): (Interval[A], Interval[A]) =
     (this intersect Interval.below(t), this intersect Interval.above(t))
 
-  def splitAtZero(implicit ev: AdditiveMonoid[A]): (Interval[A], Interval[A]) =
+  def splitAtZero(implicit o: Order[A], ev: AdditiveMonoid[A]): (Interval[A], Interval[A]) =
     split(ev.zero)
 
-  def mapAroundZero[B](f: Interval[A] => B)(implicit ev: AdditiveMonoid[A]): (B, B) =
+  def mapAroundZero[B](f: Interval[A] => B)(implicit o: Order[A], ev: AdditiveMonoid[A]): (B, B) =
     splitAtZero match {
       case (a, b) => (f(a), f(b))
     }
 
-  def |(rhs: Interval[A]): Interval[A] =
+  def |(rhs: Interval[A])(implicit o: Order[A]): Interval[A] =
     lhs union rhs
 
-  def union(rhs: Interval[A]): Interval[A] =
+  def union(rhs: Interval[A])(implicit o: Order[A]): Interval[A] =
     Interval.fromBounds(minLower(lhs.lowerBound, rhs.lowerBound, false),
       maxUpper(lhs.upperBound, rhs.upperBound, false))
 
@@ -280,7 +280,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
       s"$s1, $s2"
   }
 
-  def abs(implicit m: AdditiveGroup[A]): Interval[A] =
+  def abs(implicit o: Order[A], m: AdditiveGroup[A]): Interval[A] =
     if (crossesZero) { // only Bounded, Above or Below can cross zero
       this match {
         case Bounded(lower, upper, fs) =>
@@ -298,29 +298,29 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
     }
 
   // for all a in A, and all b in B, (A vmin B) is the interval that contains all (a min b)
-  def vmin(rhs: Interval[A])(implicit m: AdditiveMonoid[A]): Interval[A] =
+  def vmin(rhs: Interval[A])(implicit o: Order[A], m: AdditiveMonoid[A]): Interval[A] =
     Interval.fromBounds(minLower(lhs.lowerBound, rhs.lowerBound, true),
       minUpper(lhs.upperBound, rhs.upperBound, true))
 
   // for all a in A, and all b in B, (A vmax B) is the interval that contains all (a max b)
-  def vmax(rhs: Interval[A])(implicit m: AdditiveMonoid[A]): Interval[A] =
+  def vmax(rhs: Interval[A])(implicit o: Order[A], m: AdditiveMonoid[A]): Interval[A] =
     Interval.fromBounds(maxLower(lhs.lowerBound, rhs.lowerBound, true),
       maxUpper(lhs.upperBound, rhs.upperBound, true))
 
-  def combine(rhs: Interval[A])(f: (A, A) => A): Interval[A] = {
+  def combine(rhs: Interval[A])(f: (A, A) => A)(implicit o: Order[A]): Interval[A] = {
     val lb = lhs.lowerBound.combine(rhs.lowerBound)(f)
     val ub = lhs.upperBound.combine(rhs.upperBound)(f)
     Interval.fromBounds(lb, ub)
   }
 
-  def +(rhs: Interval[A])(implicit ev: AdditiveSemigroup[A]): Interval[A] =
+  def +(rhs: Interval[A])(implicit o: Order[A], ev: AdditiveSemigroup[A]): Interval[A] =
     combine(rhs)(_ + _)
 
-  def -(rhs: Interval[A])(implicit ev: AdditiveGroup[A]): Interval[A] =
+  def -(rhs: Interval[A])(implicit o: Order[A], ev: AdditiveGroup[A]): Interval[A] =
     lhs + (-rhs)
 
   // scalastyle:off method.length
-  def *(rhs: Interval[A])(implicit ev: Semiring[A]): Interval[A] = {
+  def *(rhs: Interval[A])(implicit o: Order[A], ev: Semiring[A]): Interval[A] = {
     val z = ev.zero
 
     def aboveAbove(lower1: A, lf1: Int, lower2: A, lf2: Int): Interval[A] = {
@@ -347,7 +347,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
     def aboveBelow(lower1: A, lf1: Int, upper2: A, uf2: Int): Interval[A] = {
       val lower1s = lower1.compare(z)
       val upper2s = upper2.compare(z)
-      if (lower1s < 0 || upper2s > 0) All () else {
+      if (lower1s < 0 || upper2s > 0) All() else {
         val strongZero = (lower1s == 0 && isClosedLower(lf1)) || (upper2s == 0 && isClosedUpper(uf2))
         val flags = if (strongZero) 0 else lowerFlagToUpper(lf1) | uf2
         Below(lower1 * upper2, flags)
@@ -462,7 +462,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
     }
   }
 
-  def reciprocal(implicit ev: Field[A]): Interval[A] = {
+  def reciprocal(implicit o: Order[A], ev: Field[A]): Interval[A] = {
     val z = ev.zero
     def error: Nothing = throw new java.lang.ArithmeticException("/ by zero")
 
@@ -501,14 +501,14 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
   }
   // scalastyle:on method.length
 
-  def /(rhs: Interval[A])(implicit ev: Field[A]): Interval[A] =
+  def /(rhs: Interval[A])(implicit o: Order[A], ev: Field[A]): Interval[A] =
     (lhs, rhs) match {
       case (Point(lv), _) => rhs.reciprocal * lv
-      case (_, Point(rv)) => lhs * (rv.reciprocal)
+      case (_, Point(rv)) => lhs * rv.reciprocal
       case (_, _) => lhs * rhs.reciprocal
     }
 
-  def /(rhs: A)(implicit ev: Field[A]): Interval[A] =
+  def /(rhs: A)(implicit o: Order[A], ev: Field[A]): Interval[A] =
     lhs * rhs.reciprocal
 
   def +(rhs: A)(implicit ev: AdditiveSemigroup[A]): Interval[A] =
@@ -532,7 +532,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
       case All() | Empty() => this
     }
 
-  def *(rhs: A)(implicit ev: Semiring[A]): Interval[A] =
+  def *(rhs: A)(implicit o: Order[A], ev: Semiring[A]): Interval[A] =
     if (rhs < ev.zero) {
       this match {
         case Point(v) => Point(v * rhs)
@@ -553,7 +553,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
       }
     }
 
-  def pow(k: Int)(implicit r: Ring[A]): Interval[A] = {
+  def pow(k: Int)(implicit o: Order[A], r: Ring[A]): Interval[A] = {
     def loop(b: Interval[A], k: Int, extra: Interval[A]): Interval[A] =
       if (k == 1)
         b * extra
@@ -574,7 +574,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
     }
   }
 
-  def nroot(k: Int)(implicit r: Ring[A], n: NRoot[A]): Interval[A] = {
+  def nroot(k: Int)(implicit o: Order[A], r: Ring[A], n: NRoot[A]): Interval[A] = {
     if (k == 1) {
       this
     } else if ((k & 1) == 0 && hasBelow(r.zero)) {
@@ -590,7 +590,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
     }
   }
 
-  def sqrt(implicit r: Ring[A], n: NRoot[A]): Interval[A] = nroot(2)
+  def sqrt(implicit o: Order[A], r: Ring[A], n: NRoot[A]): Interval[A] = nroot(2)
 
   def top(epsilon: A)(implicit r: AdditiveGroup[A]): Option[A] =
     this match {
@@ -631,7 +631,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
    *     result = { p(x) | x ∈ interval }
    *
    */
-  def translate(p: Polynomial[A])(implicit ev: Field[A]): Interval[A] = {
+  def translate(p: Polynomial[A])(implicit o: Order[A], ev: Field[A]): Interval[A] = {
     val terms2 = p.terms.map { case Term(c, e) => Term(Interval.point(c), e) }
     val p2 = Polynomial(terms2)
     p2(this)
@@ -639,21 +639,21 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
 
   // optional unicode operators
 
-  def ∋(rhs: A): Boolean = lhs contains rhs
-  def ∌(rhs: A): Boolean = !(lhs contains rhs)
+  def ∋(rhs: A)(implicit o: Order[A]): Boolean = lhs contains rhs
+  def ∌(rhs: A)(implicit o: Order[A]): Boolean = !(lhs contains rhs)
 
-  def ∈:(a: A): Boolean = lhs contains a
-  def ∉:(a: A): Boolean = !(lhs contains a)
+  def ∈:(a: A)(implicit o: Order[A]): Boolean = lhs contains a
+  def ∉:(a: A)(implicit o: Order[A]): Boolean = !(lhs contains a)
 
-  def ∩(rhs: Interval[A]): Interval[A] = lhs intersect rhs
-  def ∪(rhs: Interval[A]): Interval[A] = lhs union rhs
-  def \(rhs: Interval[A]): List[Interval[A]] = lhs -- rhs
+  def ∩(rhs: Interval[A])(implicit o: Order[A]): Interval[A] = lhs intersect rhs
+  def ∪(rhs: Interval[A])(implicit o: Order[A]): Interval[A] = lhs union rhs
+  def \(rhs: Interval[A])(implicit o: Order[A]): List[Interval[A]] = lhs -- rhs
 
-  def ⊂(rhs: Interval[A]): Boolean = lhs isProperSubsetOf rhs
-  def ⊃(rhs: Interval[A]): Boolean = lhs isProperSupersetOf rhs
+  def ⊂(rhs: Interval[A])(implicit o: Order[A]): Boolean = lhs isProperSubsetOf rhs
+  def ⊃(rhs: Interval[A])(implicit o: Order[A]): Boolean = lhs isProperSupersetOf rhs
 
-  def ⊆(rhs: Interval[A]): Boolean = lhs isSubsetOf rhs
-  def ⊇(rhs: Interval[A]): Boolean = lhs isSupersetOf rhs
+  def ⊆(rhs: Interval[A])(implicit o: Order[A]): Boolean = lhs isSubsetOf rhs
+  def ⊇(rhs: Interval[A])(implicit o: Order[A]): Boolean = lhs isSupersetOf rhs
 
   // xyz
 
@@ -696,7 +696,7 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
    * This method provides some of the same functionality as Scala's
    * NumericRange class.
    */
-  def iterator(step: A)(implicit ev: AdditiveMonoid[A], nt: NumberTag[A]): Iterator[A] = {
+  def iterator(step: A)(implicit o: Order[A], ev: AdditiveMonoid[A], nt: NumberTag[A]): Iterator[A] = {
 
     // build an iterator, using start, step, and continue.
     // this can be used in cases where we don't have to worry about
@@ -762,10 +762,10 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
     }
   }
 
-  def loop(step: A)(f: A => Unit)(implicit ev: AdditiveMonoid[A], nt: NumberTag[A]): Unit =
+  def loop(step: A)(f: A => Unit)(implicit o: Order[A], ev: AdditiveMonoid[A], nt: NumberTag[A]): Unit =
     iterator(step).foreach(f)
 
-  def foldOver[B](init: B, step: A)(f: (B, A) => B)(implicit ev: AdditiveMonoid[A], nt: NumberTag[A]): B =
+  def foldOver[B](init: B, step: A)(f: (B, A) => B)(implicit o: Order[A], ev: AdditiveMonoid[A], nt: NumberTag[A]): B =
     iterator(step).foldLeft(init)(f)
 
   /**
@@ -788,38 +788,36 @@ sealed abstract class Interval[A](implicit order: Order[A]) extends Serializable
     * a.overlap(b)
     * }
     */
-  def overlap(rhs: Interval[A]): Overlap[A] = Overlap(lhs, rhs)
+  def overlap(rhs: Interval[A])(implicit o: Order[A]): Overlap[A] = Overlap(lhs, rhs)
 }
 
-case class All[A: Order] private[spire] () extends Interval[A] {
+case class All[A] private[spire]() extends Interval[A] {
   def lowerBound: Unbound[A] = Unbound()
   def upperBound: Unbound[A] = Unbound()
 }
 
-case class Above[A: Order] private[spire] (lower: A, flags: Int) extends Interval[A] {
+case class Above[A] private[spire](lower: A, flags: Int) extends Interval[A] {
   def lowerBound: ValueBound[A] = if (isOpenLower(flags)) Open(lower) else Closed(lower)
   def upperBound: Unbound[A] = Unbound()
 }
 
-case class Below[A: Order] private[spire] (upper: A, flags: Int) extends Interval[A] {
+case class Below[A] private[spire](upper: A, flags: Int) extends Interval[A] {
   def lowerBound: Unbound[A] = Unbound()
   def upperBound: ValueBound[A] = if (isOpenUpper(flags)) Open(upper) else Closed(upper)
 }
 
 // Bounded, non-empty interval with lower < upper
-case class Bounded[A: Order] private[spire] (lower: A, upper: A, flags: Int) extends Interval[A] {
-  require(lower < upper) // TODO: remove after refactoring
-
+case class Bounded[A] private[spire](lower: A, upper: A, flags: Int) extends Interval[A] {
   def lowerBound: ValueBound[A] = if (isOpenLower(flags)) Open(lower) else Closed(lower)
   def upperBound: ValueBound[A] = if (isOpenUpper(flags)) Open(upper) else Closed(upper)
 }
 
-case class Point[A: Order] private[spire] (value: A) extends Interval[A] {
+case class Point[A] private[spire](value: A) extends Interval[A] {
   def lowerBound: Closed[A] = Closed(value)
   def upperBound: Closed[A] = Closed(value)
 }
 
-case class Empty[A: Order] private[spire] () extends Interval[A] {
+case class Empty[A] private[spire]() extends Interval[A] {
   def lowerBound: EmptyBound[A] = EmptyBound()
   def upperBound: EmptyBound[A] = EmptyBound()
 }
