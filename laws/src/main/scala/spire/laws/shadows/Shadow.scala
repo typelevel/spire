@@ -32,7 +32,7 @@ abstract class ShadowInstances0 {
       def S = implicitly
     }
 
-  implicit def conjugationInstance[A:Conjugation, S:Conjugation](implicit ev: Shadowing[A, S]): Conjugation[Shadow[A, S]] =
+  implicit def conjugation[A:Conjugation, S:Conjugation](implicit ev: Shadowing[A, S]): Conjugation[Shadow[A, S]] =
     new ShadowConjugation[A, S] {
       def A: Conjugation[A] = implicitly
       def S: Conjugation[S] = implicitly

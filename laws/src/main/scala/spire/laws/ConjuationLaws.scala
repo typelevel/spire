@@ -25,16 +25,16 @@ trait ConjugationLaws[A] extends Laws {
     "involution" -> forAllSafe( (x: A) => A.conjugate(A.conjugate(x)) === x )
   )
 
-  def conjugationMultiplicativeMonoid(implicit A: Conjugation[A], mm: MultiplicativeMonoid[A]) =  new DefaultRuleSet(
+  def conjugationMultiplicativeCMonoid(implicit A: Conjugation[A], mm: MultiplicativeMonoid[A]) =  new DefaultRuleSet(
     name = "conjugationMultiplicativeMonoid",
     parent = Some(conjugation),
     "preserves one" -> (A.conjugate(mm.one) === mm.one),
     "antiautomorphism" -> forAllSafe( (x: A, y: A) => A.conjugate(mm.times(x, y)) === mm.times(A.conjugate(y), A.conjugate(x)))
   )
 
-  def conjugationRing(implicit A: Conjugation[A], ringA: Ring[A]) = new DefaultRuleSet(
+  def conjugationCRing(implicit A: Conjugation[A], ringA: Ring[A]) = new DefaultRuleSet(
     name = "conjugationRing",
-    parent = Some(conjugationMultiplicativeMonoid),
+    parent = Some(conjugationMultiplicativeCMonoid),
     "compatible with addition" -> forAllSafe( (x: A, y: A) => A.conjugate(ringA.plus(x, y)) === ringA.plus(A.conjugate(x), A.conjugate(y)))
   )
 }
