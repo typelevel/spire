@@ -35,6 +35,6 @@ trait ConjugationLaws[A] extends Laws {
   def conjugationRing(implicit A: Conjugation[A], ringA: Ring[A]) = new DefaultRuleSet(
     name = "conjugationRing",
     parent = Some(conjugationMultiplicativeMonoid),
-    "compatible with addition" -> forAllSafe( (x: A, y: A) => A.conjugate(ringA.plus(x, y)) === ringA.plus(A.conjugate(x), A.conjugate(y))),
+    "compatible with addition" -> forAllSafe( (x: A, y: A) => A.conjugate(ringA.plus(x, y)) === ringA.plus(A.conjugate(x), A.conjugate(y)))
   )
 }
