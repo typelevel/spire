@@ -35,6 +35,10 @@ trait TruncatedDivisionSyntax extends SignedSyntax {
   implicit def literalDoubleTruncatedDivisionOps(lhs:Double): LiteralDoubleTruncatedDivisionOps = new LiteralDoubleTruncatedDivisionOps(lhs)
 }
 
+trait ConjugationSyntax {
+  implicit def conjugationOps[A:Conjugation](lhs: A): ConjugationOps[A] = new ConjugationOps(lhs)
+}
+
 trait IsRealSyntax extends SignedSyntax {
   implicit def isRealOps[A:IsReal](a:A): IsRealOps[A] = new IsRealOps(a)
 }
@@ -263,6 +267,7 @@ trait AllSyntax extends
     OrderSyntax with
     SignedSyntax with
     TruncatedDivisionSyntax with
+    ConjugationSyntax with
     IsRealSyntax with
     ConvertableFromSyntax with
     SemigroupoidSyntax with

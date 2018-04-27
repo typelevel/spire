@@ -103,6 +103,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Rational",   RingLaws[Rational].field)
   checkAll("Rational",   CombinationLaws[Rational].signedGCDRing)
   checkAll("Rational",   OrderLaws[Rational].truncatedDivision)
+  checkAll("Rational",   ConjugationLaws[Rational].conjugationRing)
 
   checkAll("Real",       RingLaws[Real].field)
 
@@ -113,9 +114,14 @@ class LawTests extends FunSuite with Discipline {
 
   checkAll("Order[Unit]",OrderLaws[Unit].order)
 
+  // complex
   checkAll("Complex[Rational]", RingLaws[Complex[Rational]].field)
+  checkAll("Complex[Rational]",   ConjugationLaws[Complex[Rational]].conjugationRing)
+  checkAll("Complex[SafeLong]",   RingLaws[Complex[SafeLong]].cRing)
+  checkAll("Complex[SafeLong]",   ConjugationLaws[Complex[SafeLong]].conjugationRing)
 
   checkAll("Quaternion[Rational]", RingLaws[Quaternion[Rational]].divisionRing)
+  checkAll("Quaternion[Rational]", ConjugationLaws[Quaternion[Rational]].conjugationRing)
 
   checkAll("Levenshtein distance", BaseLaws[String].metricSpace)
 

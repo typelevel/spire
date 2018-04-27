@@ -3,11 +3,10 @@ package laws
 
 import spire.algebra._
 import spire.implicits._
-
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
-
 import InvalidTestException._
+import org.typelevel.discipline.Laws
 
 object CombinationLaws {
   def apply[A : Eq : Arbitrary] = new CombinationLaws[A] {
@@ -19,7 +18,7 @@ object CombinationLaws {
 /** Contains laws that are obeying by combination of types, for example
   * various kinds of signed rings. 
   */
-trait CombinationLaws[A] extends BaseLaws[A] {
+trait CombinationLaws[A] extends Laws {
 
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
