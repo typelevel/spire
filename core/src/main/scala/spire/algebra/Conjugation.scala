@@ -1,4 +1,5 @@
-package spire.algebra
+package spire
+package algebra
 
 /** Describes a conjugation, which is an antihomomorphism. It obeys:
   *
@@ -7,7 +8,7 @@ package spire.algebra
   * iii. conjugate(x*y) = conjugate(y)*conjugate(x)
   *
   */
-trait Conjugation[A] {
+trait Conjugation[@sp(Int, Long, Float, Double) A] {
   def conjugate(a: A): A
 }
 
@@ -15,10 +16,12 @@ object Conjugation {
 
   def apply[A](implicit ev: Conjugation[A]): Conjugation[A] = ev
 
-  def selfConjugate[A]: Conjugation[A] = new Conjugation[A] {
+  final class SelfConjugate[@sp(Int, Long, Float, Double) A] extends Conjugation[A] {
     def conjugate(a: A): A = a
   }
 
-  implicit def fromIsReal[A:IsReal]: Conjugation[A] = selfConjugate[A]
+  def selfConjugate[@sp(Int, Long, Float, Double) A]: Conjugation[A] = new SelfConjugate[A]
+
+  implicit def fromIsReal[@sp(Int, Long, Float, Double) A:IsReal]: Conjugation[A] = selfConjugate[A]
 
 }
