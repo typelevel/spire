@@ -31,6 +31,13 @@ abstract class ShadowInstances0 {
       def A = implicitly
       def S = implicitly
     }
+
+  implicit def involution[A:Involution, S:Involution](implicit ev: Shadowing[A, S]): Involution[Shadow[A, S]] =
+    new ShadowInvolution[A, S] {
+      def A: Involution[A] = implicitly
+      def S: Involution[S] = implicitly
+      val shadowing: Shadowing[A, S] = ev
+    }
 }
 
 

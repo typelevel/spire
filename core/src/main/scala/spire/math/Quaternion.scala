@@ -8,26 +8,26 @@ import spire.syntax.isReal._
 import spire.syntax.nroot._
 
 object Quaternion extends QuaternionInstances {
-  def i[@sp(Float, Double) A](implicit f: Rig[A]): Quaternion[A] =
+  def i[@sp(Float, Double) A](implicit f: CRing[A]): Quaternion[A] =
     Quaternion(f.zero, f.one, f.zero, f.zero)
-  def j[@sp(Float, Double) A](implicit f: Rig[A]): Quaternion[A] =
+  def j[@sp(Float, Double) A](implicit f: CRing[A]): Quaternion[A] =
     Quaternion(f.zero, f.zero, f.one, f.zero)
-  def k[@sp(Float, Double) A](implicit f: Rig[A]): Quaternion[A] =
+  def k[@sp(Float, Double) A](implicit f: CRing[A]): Quaternion[A] =
     Quaternion(f.zero, f.zero, f.zero, f.one)
 
-  def zero[@sp(Float, Double) A](implicit f: Semiring[A]): Quaternion[A] =
+  def zero[@sp(Float, Double) A](implicit f: CRing[A]): Quaternion[A] =
     Quaternion(f.zero, f.zero, f.zero, f.zero)
-  def one[@sp(Float, Double) A](implicit f: Rig[A]): Quaternion[A] =
+  def one[@sp(Float, Double) A](implicit f: CRing[A]): Quaternion[A] =
     Quaternion(f.one, f.zero, f.zero, f.zero)
 
-  def apply[@sp(Float, Double) A](a: A)(implicit f: Semiring[A]): Quaternion[A] =
+  def apply[@sp(Float, Double) A](a: A)(implicit f: CRing[A]): Quaternion[A] =
     Quaternion(a, f.zero, f.zero, f.zero)
-  def apply[@sp(Float, Double) A](c: Complex[A])(implicit f: Semiring[A]): Quaternion[A] =
+  def apply[@sp(Float, Double) A](c: Complex[A])(implicit f: CRing[A]): Quaternion[A] =
     Quaternion(c.real, c.imag, f.zero, f.zero)
 }
 
 /** Quaternion algebra over an ordered field. */
-private[math] trait QuaternionOverField[A] extends Eq[Quaternion[A]] with DivisionRing[Quaternion[A]] with FieldAssociativeAlgebra[Quaternion[A], A] {
+private[math] trait QuaternionOverField[A] extends Eq[Quaternion[A]] with DivisionRing[Quaternion[A]] with FieldAssociativeAlgebra[Quaternion[A], A] with Involution[Quaternion[A]] {
 
   implicit def o: Order[A]
   implicit def s: Signed[A]
@@ -48,6 +48,7 @@ private[math] trait QuaternionOverField[A] extends Eq[Quaternion[A]] with Divisi
   def timesl(a: A, q: Quaternion[A]): Quaternion[A] = q * a
   def dot(x: Quaternion[A], y: Quaternion[A]): A = x.dot(y)
 
+  def adjoint(a: Quaternion[A]): Quaternion[A] = a.conjugate
 }
 
 private[math] trait QuaternionOverRichField[A] extends QuaternionOverField[A]
@@ -87,6 +88,7 @@ trait QuaternionInstances extends QuaternionInstances1 {
 
 }
 
+/** Quaternions defined over a subset A of the real numbers. */
 final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
     extends ScalaNumber with ScalaNumericConversions with Serializable { lhs =>
 
@@ -133,8 +135,8 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
   def isReal(implicit s: Signed[A]): Boolean = i.isSignZero && j.isSignZero && k.isSignZero
   def isPure(implicit s: Signed[A]): Boolean = r.isSignZero
 
-  def real(implicit s: Semiring[A]): Quaternion[A] = Quaternion(r)
-  def pure(implicit s: Semiring[A]): Quaternion[A] = Quaternion(s.zero, i, j, k)
+  def real(implicit s: CRing[A]): Quaternion[A] = Quaternion(r)
+  def pure(implicit s: CRing[A]): Quaternion[A] = Quaternion(s.zero, i, j, k)
 
   def abs(implicit f: Field[A], n: NRoot[A], s: Signed[A]): A =
     (r.pow(2) + i.pow(2) + j.pow(2) + k.pow(2)).sqrt
@@ -169,10 +171,10 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
   def pureSignum(implicit f: Field[A], n: NRoot[A], s: Signed[A]): Quaternion[A] =
     if (isReal) Quaternion.zero[A] else (pure / pureAbs)
 
-  def unary_-(implicit s: Rng[A]): Quaternion[A] =
+  def unary_-(implicit s: CRing[A]): Quaternion[A] =
     Quaternion(-r, -i, -j, -k)
 
-  def conjugate(implicit s: Rng[A]): Quaternion[A] =
+  def conjugate(implicit s: CRing[A]): Quaternion[A] =
     Quaternion(r, -i, -j, -k)
 
   def reciprocal(implicit f: Field[A]): Quaternion[A] =
@@ -210,30 +212,30 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
   def unit(implicit f: Field[A], n: NRoot[A], s: Signed[A]): Quaternion[A] =
     Quaternion(r.pow(2), i.pow(2), j.pow(2), k.pow(2)) / abs
 
-  def +(rhs: A)(implicit s: Semiring[A]): Quaternion[A] =
+  def +(rhs: A)(implicit s: CRing[A]): Quaternion[A] =
     Quaternion(r + rhs, i, j, k)
-  def +(rhs: Complex[A])(implicit s: Semiring[A]): Quaternion[A] =
+  def +(rhs: Complex[A])(implicit s: CRing[A]): Quaternion[A] =
     Quaternion(r + rhs.real, i + rhs.imag, j, k)
-  def +(rhs: Quaternion[A])(implicit s: Semiring[A]): Quaternion[A] =
+  def +(rhs: Quaternion[A])(implicit s: CRing[A]): Quaternion[A] =
     Quaternion(lhs.r + rhs.r, lhs.i + rhs.i, lhs.j + rhs.j, lhs.k + rhs.k)
 
-  def -(rhs: A)(implicit s: Rng[A]): Quaternion[A] =
+  def -(rhs: A)(implicit s: CRing[A]): Quaternion[A] =
     Quaternion(r - rhs, i, j, k)
-  def -(rhs: Complex[A])(implicit s: Rng[A]): Quaternion[A] =
+  def -(rhs: Complex[A])(implicit s: CRing[A]): Quaternion[A] =
     Quaternion(r - rhs.real, i - rhs.imag, j, k)
-  def -(rhs: Quaternion[A])(implicit s: Rng[A]): Quaternion[A] =
+  def -(rhs: Quaternion[A])(implicit s: CRing[A]): Quaternion[A] =
     Quaternion(lhs.r - rhs.r, lhs.i - rhs.i, lhs.j - rhs.j, lhs.k - rhs.k)
 
-  def *(rhs: A)(implicit s: Semiring[A]): Quaternion[A] =
+  def *(rhs: A)(implicit s: CRing[A]): Quaternion[A] =
     Quaternion(r * rhs, i * rhs, j * rhs, k * rhs)
-  def *(rhs: Complex[A])(implicit s: Rng[A]): Quaternion[A] =
+  def *(rhs: Complex[A])(implicit s: CRing[A]): Quaternion[A] =
     Quaternion(
       (r * rhs.real) - (i * rhs.imag),
       (r * rhs.imag) + (i * rhs.real),
       (j * rhs.real) + (k * rhs.imag),
       (j * rhs.imag) + (k * rhs.real)
     )
-  def *(rhs: Quaternion[A])(implicit s: Rng[A]): Quaternion[A] = Quaternion(
+  def *(rhs: Quaternion[A])(implicit s: CRing[A]): Quaternion[A] = Quaternion(
     (lhs.r * rhs.r) - (lhs.i * rhs.i) - (lhs.j * rhs.j) - (lhs.k * rhs.k),
     (lhs.r * rhs.i) + (lhs.i * rhs.r) + (lhs.j * rhs.k) - (lhs.k * rhs.j),
     (lhs.r * rhs.j) - (lhs.i * rhs.k) + (lhs.j * rhs.r) + (lhs.k * rhs.i),
@@ -247,7 +249,7 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
   def /(rhs: Quaternion[A])(implicit f: Field[A]): Quaternion[A] =
     lhs * rhs.reciprocal
 
-  def pow(k: Int)(implicit s: Ring[A]): Quaternion[A] = {
+  def pow(k: Int)(implicit s: CRing[A]): Quaternion[A] = {
     @tailrec def loop(p: Quaternion[A], b: Quaternion[A], e: Int): Quaternion[A] =
       if (e == 0) p
       else if ((e & 1) == 1) loop(p * b, b * b, e >>> 1)
@@ -257,7 +259,7 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
     else throw new IllegalArgumentException(s"illegal exponent: $k")
   }
 
-  def **(k: Int)(implicit s: Ring[A]): Quaternion[A] = pow(k)
+  def **(k: Int)(implicit s: CRing[A]): Quaternion[A] = pow(k)
 
   def fpow(k0: A)(implicit f: Field[A], nr: NRoot[A], o: Order[A], si: Signed[A], tr: Trig[A]): Quaternion[A] =
     if (k0.signum < 0) {

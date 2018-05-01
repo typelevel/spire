@@ -116,6 +116,10 @@ final class TruncatedDivisionOps[A:TruncatedDivision](lhs: A) {
   def fquotmod(rhs: A): (A, A) = macro Ops.binop[A, (A, A)]
 }
 
+final class InvolutionOps[A:Involution](lhs: A) {
+  def adjoint(): A = macro Ops.unop[A]
+}
+
 final class LiteralIntTruncatedDivisionOps(val lhs: Int) extends AnyVal {
   def tquot[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromInt(lhs), rhs)
   def tmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromInt(lhs), rhs)

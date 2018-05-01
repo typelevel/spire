@@ -10,6 +10,7 @@ package object syntax {
   object signed extends SignedSyntax
   object truncatedDivision extends TruncatedDivisionSyntax
 
+  object involution extends InvolutionSyntax
   object isReal extends IsRealSyntax
   object convertableFrom extends ConvertableFromSyntax
 
