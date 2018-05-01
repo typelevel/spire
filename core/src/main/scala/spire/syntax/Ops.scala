@@ -116,8 +116,8 @@ final class TruncatedDivisionOps[A:TruncatedDivision](lhs: A) {
   def fquotmod(rhs: A): (A, A) = macro Ops.binop[A, (A, A)]
 }
 
-final class ConjugationOps[A:Conjugation](lhs: A) {
-  def conjugate(): A = macro Ops.unop[A]
+final class InvolutionOps[A:Involution](lhs: A) {
+  def adjoint(): A = macro Ops.unop[A]
 }
 
 final class LiteralIntTruncatedDivisionOps(val lhs: Int) extends AnyVal {

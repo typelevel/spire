@@ -359,21 +359,21 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
 
 
 trait ComplexInstances0 {
-  implicit def ComplexCRing[A: CRing: Signed]: CRing[Complex[A]] with Conjugation[Complex[A]] = new ComplexIsCRingImpl[A]
+  implicit def ComplexCRing[A: CRing: Signed]: CRing[Complex[A]] with Involution[Complex[A]] = new ComplexIsCRingImpl[A]
 }
 
 trait ComplexInstances1 extends ComplexInstances0 {
-  implicit def ComplexField[A: Field: Signed]: Field[Complex[A]] with Conjugation[Complex[A]] = new ComplexIsFieldImpl[A]
+  implicit def ComplexField[A: Field: Signed]: Field[Complex[A]] with Involution[Complex[A]] = new ComplexIsFieldImpl[A]
 }
 
 trait ComplexInstances extends ComplexInstances1 {
-  implicit def ComplexAlgebra[@sp(Float, Double) A: Fractional: Trig: Signed]: ComplexAlgebra[A] with Conjugation[Complex[A]] =
+  implicit def ComplexAlgebra[@sp(Float, Double) A: Fractional: Trig: Signed]: ComplexAlgebra[A] with Involution[Complex[A]] =
     new ComplexAlgebra[A]
 
   implicit def ComplexEq[A: Eq]: Eq[Complex[A]] = new ComplexEq[A]
 }
 
-private[math] trait ComplexIsCRing[@sp(Float, Double) A] extends CRing[Complex[A]] with Conjugation[Complex[A]] {
+private[math] trait ComplexIsCRing[@sp(Float, Double) A] extends CRing[Complex[A]] with Involution[Complex[A]] {
   implicit def algebra: CRing[A]
 
   override def minus(a: Complex[A], b: Complex[A]): Complex[A] = a - b
@@ -383,7 +383,7 @@ private[math] trait ComplexIsCRing[@sp(Float, Double) A] extends CRing[Complex[A
   override def times(a: Complex[A], b: Complex[A]): Complex[A] = a * b
   def zero: Complex[A] = Complex.zero
 
-  def conjugate(a: Complex[A]): Complex[A] = a.conjugate
+  def adjoint(a: Complex[A]): Complex[A] = a.conjugate
 
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
 }

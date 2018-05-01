@@ -153,10 +153,10 @@ trait BaseSyntaxTest {
     ((a fquotmod b) === TruncatedDivision[A].fquotmod(a, b))
   }
 
-  def testConjugationSyntax[A: Conjugation: Eq](a: A) = {
-    import spire.syntax.conjugation._
+  def testConjugationSyntax[A: Involution: Eq](a: A) = {
+    import spire.syntax.involution._
     import spire.syntax.eq._
-    a.conjugate === Conjugation[A].conjugate(a)
+    a.adjoint === Involution[A].adjoint(a)
   }
 
   def testIsRealSyntax[A: IsReal](a: A) = {

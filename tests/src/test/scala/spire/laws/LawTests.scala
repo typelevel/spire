@@ -91,7 +91,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Long",       CombinationLaws[Shadow[Long, BigInt]].signedAdditiveCMonoid)
 
   // to test ShadowConjugation
-  checkAll("Long",       ConjugationLaws[Shadow[Long, BigInt]].conjugationCRing(Shadow.conjugation, Shadow.cRing))
+  checkAll("Long",       InvolutionLaws[Shadow[Long, BigInt]].conjugationCRing(Shadow.conjugation, Shadow.cRing))
 
   checkAll("BigInt",     RingLaws[BigInt].euclideanRing)
   checkAll("BigInt",     CombinationLaws[BigInt].signedGCDRing)
@@ -106,7 +106,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Rational",   RingLaws[Rational].field)
   checkAll("Rational",   CombinationLaws[Rational].signedGCDRing)
   checkAll("Rational",   OrderLaws[Rational].truncatedDivision)
-  checkAll("Rational",   ConjugationLaws[Rational].conjugationCRing)
+  checkAll("Rational",   InvolutionLaws[Rational].conjugationCRing)
 
   checkAll("Real",       RingLaws[Real].field)
 
@@ -119,12 +119,12 @@ class LawTests extends FunSuite with Discipline {
 
   // complex
   checkAll("Complex[Rational]",   RingLaws[Complex[Rational]].field)
-  checkAll("Complex[Rational]",   ConjugationLaws[Complex[Rational]].conjugationCRing)
+  checkAll("Complex[Rational]",   InvolutionLaws[Complex[Rational]].involutionAlgebra[Rational])
   checkAll("Complex[SafeLong]",   RingLaws[Complex[SafeLong]].cRing)
-  checkAll("Complex[SafeLong]",   ConjugationLaws[Complex[SafeLong]].conjugationCRing)
+  checkAll("Complex[SafeLong]",   InvolutionLaws[Complex[SafeLong]].involutionRing)
 
   checkAll("Quaternion[Rational]", RingLaws[Quaternion[Rational]].divisionRing)
-  checkAll("Quaternion[Rational]", ConjugationLaws[Quaternion[Rational]].conjugationCRing)
+  checkAll("Quaternion[Rational]", InvolutionLaws[Quaternion[Rational]].involutionAlgebra[Rational])
 
   checkAll("Levenshtein distance", BaseLaws[String].metricSpace)
 

@@ -27,7 +27,7 @@ object Quaternion extends QuaternionInstances {
 }
 
 /** Quaternion algebra over an ordered field. */
-private[math] trait QuaternionOverField[A] extends Eq[Quaternion[A]] with DivisionRing[Quaternion[A]] with FieldAssociativeAlgebra[Quaternion[A], A] with Conjugation[Quaternion[A]] {
+private[math] trait QuaternionOverField[A] extends Eq[Quaternion[A]] with DivisionRing[Quaternion[A]] with FieldAssociativeAlgebra[Quaternion[A], A] with Involution[Quaternion[A]] {
 
   implicit def o: Order[A]
   implicit def s: Signed[A]
@@ -48,7 +48,7 @@ private[math] trait QuaternionOverField[A] extends Eq[Quaternion[A]] with Divisi
   def timesl(a: A, q: Quaternion[A]): Quaternion[A] = q * a
   def dot(x: Quaternion[A], y: Quaternion[A]): A = x.dot(y)
 
-  def conjugate(a: Quaternion[A]): Quaternion[A] = a.conjugate
+  def adjoint(a: Quaternion[A]): Quaternion[A] = a.conjugate
 }
 
 private[math] trait QuaternionOverRichField[A] extends QuaternionOverField[A]
