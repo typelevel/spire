@@ -117,11 +117,9 @@ class LawTests extends FunSuite with Discipline {
 
   checkAll("Order[Unit]",OrderLaws[Unit].order)
 
-  implicit def rationalAlgebra = Complex.ComplexOnTrig[Rational]
-
   // complex
   checkAll("Complex[Rational]",   RingLaws[Complex[Rational]].field)
-  checkAll("Complex[Rational]",   InvolutionLaws[Complex[Rational]].involutionAlgebra[Rational]())
+  checkAll("Complex[Rational]",   InvolutionLaws[Complex[Rational]].involutionAlgebra[Rational])
   checkAll("Complex[SafeLong]",   RingLaws[Complex[SafeLong]].cRing)
   checkAll("Complex[SafeLong]",   InvolutionLaws[Complex[SafeLong]].involutionRing)
 

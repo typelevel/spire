@@ -47,7 +47,7 @@ trait InvolutionLaws[A] extends Laws {
   def involutionAlgebra[R:Arbitrary](implicit A: Involution[A], R: Involution[R], algebra: RingAssociativeAlgebra[A, R]) = new DefaultRuleSet(
     name = "involutionAlgebra",
     parent = Some(involutionRing),
-    "conjugate linear" -> forAllSafe( (x: A, y: A, r: R) => ( r *: x + y ) === (r.adjoint *: x.adjoint + y.adjoint) )
+    "conjugate linear" -> forAllSafe( (x: A, y: A, r: R) => ( r *: x + y ).adjoint === (r.adjoint *: x.adjoint + y.adjoint) )
   )
 
 }

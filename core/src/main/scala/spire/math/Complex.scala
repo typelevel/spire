@@ -359,11 +359,11 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
 
 
 trait ComplexInstances0 {
-  implicit def ComplexOnCRing[A: CRing: Signed]: CRing[Complex[A]] with Involution[Complex[A]] = new ComplexOnCRingImpl[A]
+  implicit def ComplexOnCRing[A: CRing: Signed]: ComplexOnCRing[A] = new ComplexOnCRingImpl[A]
 }
 
 trait ComplexInstances1 extends ComplexInstances0 {
-  implicit def ComplexOnField[A: Field: Signed]: Field[Complex[A]] with Involution[Complex[A]] = new ComplexOnFieldImpl[A]
+  implicit def ComplexOnField[A: Field: Signed]: ComplexOnField[A] = new ComplexOnFieldImpl[A]
 }
 
 trait ComplexInstances extends ComplexInstances1 {
