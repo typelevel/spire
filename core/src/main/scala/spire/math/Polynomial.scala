@@ -121,7 +121,7 @@ object Polynomial extends PolynomialInstances {
     if (vs.size > 1) throw new IllegalArgumentException("only univariate polynomials supported")
 
     // we're done!
-    (Polynomial.zero[Rational] /: ts)((a, t) => a + Polynomial(t.c, t.e))
+    ts.foldLeft(Polynomial.zero[Rational])((a, t) => a + Polynomial(t.c, t.e))
   }
 
   private final def split[@sp(Double) C: ClassTag](poly: Polynomial[C]): (Array[Int], Array[C]) = {

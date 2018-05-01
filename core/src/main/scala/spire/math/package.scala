@@ -426,7 +426,7 @@ package object math {
     if (ceil == 0) {
       0
     } else {
-      (0 /: ((ceil - 1) to 0 by -1)) { (x, i) =>
+      ((ceil - 1) to 0 by -1).foldLeft(0) { (x, i) =>
         val y = x | (1 << i)
         if (f(y)) y else x
       }
@@ -457,7 +457,7 @@ package object math {
 
   /** Converts a list of digits in base `r` to a `BigInt`. */
   private def undigitize(digits: Seq[Int], r: Int): BigInt =
-    (BigInt(0) /: digits)(_ * r + _)
+    digits.foldLeft(BigInt(0))(_ * r + _)
 
 
   // 1 billion: because it's the largest positive Int power of 10.
