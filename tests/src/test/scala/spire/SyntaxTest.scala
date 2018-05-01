@@ -53,7 +53,7 @@ class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   test("Order syntax")(check(forAll { (a: Int, b: Int) => testOrderSyntax(a, b) }))
   test("Signed syntax")(check(forAll { (a: Int) => testSignedSyntax(a) }))
   test("TruncatedDivision syntax")(check(forAll { (a: Int, b: NonZero[Int]) => testTruncatedDivisionSyntax(a, b.x) }))
-  test("Conjugation syntax")(check(forAll { (a: Int) => testConjugationSyntax(a) }))
+  test("Involution syntax")(check(forAll { (a: Int) => testInvolutionSyntax(a) }))
   test("IsReal syntax")(check(forAll { (a: Double) => testIsRealSyntax(a) }))
   test("Semigroup syntax")(check(forAll { (a: String, b: String) => testSemigroupSyntax(a, b) }))
   test("Monoid syntax")(check(forAll { (a: String, b: String) => testMonoidSyntax(a, b) }))
@@ -153,7 +153,7 @@ trait BaseSyntaxTest {
     ((a fquotmod b) === TruncatedDivision[A].fquotmod(a, b))
   }
 
-  def testConjugationSyntax[A: Involution: Eq](a: A) = {
+  def testInvolutionSyntax[A: Involution: Eq](a: A) = {
     import spire.syntax.involution._
     import spire.syntax.eq._
     a.adjoint === Involution[A].adjoint(a)
