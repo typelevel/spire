@@ -5,7 +5,6 @@ import org.typelevel.discipline.Laws
 import spire.algebra._
 import spire.syntax.eq._
 import spire.syntax.vectorSpace._
-import spire.syntax.ring._
 import spire.syntax.involution._
 import InvalidTestException._
 
@@ -45,7 +44,7 @@ trait InvolutionLaws[A] extends Laws {
     "compatible with addition" -> forAllSafe( (x: A, y: A) => (x + y).adjoint === x.adjoint + y.adjoint)
   )
 
-  def involutionAlgebra[R:Arbitrary](implicit A: Involution[A], R: Involution[R], algebra: FieldAssociativeAlgebra[A, R]) = new DefaultRuleSet(
+  def involutionAlgebra[R:Arbitrary](implicit A: Involution[A], R: Involution[R], algebra: RingAssociativeAlgebra[A, R]) = new DefaultRuleSet(
     name = "involutionAlgebra",
     parent = Some(involutionRing),
     "conjugate linear" -> forAllSafe( (x: A, y: A, r: R) => ( r *: x + y ) === (r.adjoint *: x.adjoint + y.adjoint) )
