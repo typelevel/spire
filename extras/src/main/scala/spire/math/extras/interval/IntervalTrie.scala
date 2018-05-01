@@ -244,7 +244,7 @@ object IntervalTrie {
     def intervalToIntervalSet(i:Interval[Long]) : IntervalTrie[Long] = apply(i)
     val intervals = text.split(';').map(Interval.apply).map(_.mapBounds(rationalToLong)(la))
     val simpleSets = intervals.map(intervalToIntervalSet)
-    (empty[Long] /: simpleSets)(_ | _)
+    simpleSets.foldLeft(empty[Long])(_ | _)
   }
 
   private final def foreachInterval[T:Element, U](a0:Boolean, a:Tree)(f:Interval[T] => U): Unit = {
