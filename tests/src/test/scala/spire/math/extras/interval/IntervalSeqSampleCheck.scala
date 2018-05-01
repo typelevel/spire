@@ -63,7 +63,7 @@ object IntervalSeqSampleCheck extends Properties("IntervalSeq.Sample") {
   property("toStringParse") = forAll { a0: IntervalSeq[Int] =>
     // first convert the interval of long to an interval of rationals, since that is what parse returns
     val rationalIntervals = a0.intervals.map(_.mapBounds(Rational.apply))
-    val a : IntervalSeq[Rational] = (IntervalSeq.empty[Rational] /: rationalIntervals)(_ | IntervalSeq(_))
+    val a : IntervalSeq[Rational] = rationalIntervals.foldLeft(IntervalSeq.empty[Rational])(_ | IntervalSeq(_))
     // then do the roundtrip test like with IntervalSet
     val aText = a.toString
     val b = IntervalSeq(aText)

@@ -14,7 +14,7 @@ object IntervalSeqArbitrary {
       case 2 => IntervalSeq.atOrAbove(x)
     }
     val r = IntervalSeq[Int](initial)
-    (r /: (support zip kind)) {
+    (support zip kind).foldLeft(r) {
       case (current, (x,k)) => current ^ fromKind(x,k)
     }
   }

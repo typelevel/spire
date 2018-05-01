@@ -234,7 +234,7 @@ object IntervalSeq {
     val intervals = text.split(';').map(Interval.apply)
     def intervalToIntervalSet(i:Interval[Rational]) : IntervalSeq[Rational] = apply(i)
     val simpleSets = intervals.map(intervalToIntervalSet)
-    (empty[Rational] /: simpleSets)(_ | _)
+    simpleSets.foldLeft(empty[Rational])(_ | _)
   }
 
   implicit def booleanAlgebra[T:Order] = new Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] {

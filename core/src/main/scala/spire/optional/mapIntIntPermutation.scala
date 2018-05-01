@@ -20,7 +20,7 @@ final class MapIntIntGroup extends Group[Map[Int, Int]] {
   def combine(x: Map[Int, Int], y: Map[Int, Int]): Map[Int, Int] = {
     val preimages = x.keys ++ y.keys
 
-    (Map.empty[Int, Int] /: preimages) {
+    preimages.foldLeft(Map.empty[Int, Int]) {
       case (prevMap, preimage) =>
         val imageX = x.getOrElse(preimage, preimage)
         val image = y.getOrElse(imageX, imageX)

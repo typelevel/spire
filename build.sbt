@@ -1,7 +1,7 @@
 import ReleaseTransformations._
 
 lazy val scalaVersions: Map[String, String] =
-  Map("2.11" -> "2.11.12", "2.12" -> "2.12.4")
+  Map("2.11" -> "2.11.12", "2.12" -> "2.12.6")
 
 lazy val scalaCheckVersion = "1.13.5"
 lazy val scalaTestVersion = "3.0.5"
