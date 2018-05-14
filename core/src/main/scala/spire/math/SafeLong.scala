@@ -211,6 +211,7 @@ object SafeLong extends SafeLongInstances {
   final val one: SafeLong = SafeLongLong(1L)
   final val two: SafeLong = SafeLongLong(2L)
   final val three: SafeLong = SafeLongLong(3L)
+  final val four: SafeLong = SafeLongLong(4L)
   final val ten: SafeLong = SafeLongLong(10L)
 
   private[spire] final val big64: BigInteger = BigInteger.ONE.shiftLeft(63)
