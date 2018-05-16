@@ -402,6 +402,19 @@ sealed abstract class Extended[A] { lhs =>
         else Undef()
     }
 
+  def isFinite: Boolean =
+    this match {
+      case Extended.Finite(_) => true
+      case _ => false
+    }
+
+  def isInfinite: Boolean =
+    this match {
+      case Extended.PlusInf() => true
+      case Extended.MinusInf() => true
+      case _ => false
+    }
+
   /**
    * Display the extended value as a String.
    */

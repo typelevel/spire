@@ -38,15 +38,10 @@ object Eval {
       // that are exactly zero.
       if (i >= breakout || (e == 0 && f == 0 && g == 0 && h == 0)) return Infinity
 
-      def bnd(n: Z, d: Z): Double =
-        if (d.isZero) Double.PositiveInfinity
-        else n.toDouble / d.toDouble
+      def bnd(n: Z, d: Z): Extended[Z] =
+        if (d.isZero) Extended.inf(1) else Extended(n / d)
 
-      def flr(x: Double): Extended[Z] =
-        if (!java.lang.Double.isFinite(x)) Extended.inf(1) else Extended(Z(x.toLong))
-
-      val (b11, b01, b10, b00) = (bnd(a, e), bnd(c, g), bnd(b, f), bnd(d, h))
-      val (i11, i01, i10, i00) = (flr(b11), flr(b01), flr(b10), flr(b00))
+      val (i11, i01, i10, i00) = (bnd(a, e), bnd(c, g), bnd(b, f), bnd(d, h))
 
       if (i11 === i01 && i01 === i10 && i10 == i00) {
         val q = i00.getOrError()
@@ -56,13 +51,13 @@ object Eval {
           a - e * q, b - f * q, c - g * q, d - h * q)
       }
 
-      def diff(x: Double, y: Double): Double =
-        if (java.lang.Double.isInfinite(x)) Double.PositiveInfinity
-        else if (java.lang.Double.isInfinite(y)) Double.PositiveInfinity
-        else (x - y).abs
+      def diff(x: Extended[Z], y: Extended[Z]): Extended[Z] =
+        if (x.isInfinite) x
+        else if (y.isInfinite) y
+        else Extended.Finite(x.getOrError - y.getOrError)
 
-      val xw = diff(b11, b01) max diff(b10, b00)
-      val yw = diff(b11, b10) max diff(b01, b00)
+      val xw = diff(i11, i01) max diff(i10, i00)
+      val yw = diff(i11, i10) max diff(i01, i00)
       val takeLeft = doneRight || xw > yw || (xw == yw && !tookLeft)
 
       if (takeLeft) {

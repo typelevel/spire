@@ -1,7 +1,6 @@
 package spire.math
 
 import scala.annotation.tailrec
-import scala.collection.mutable.ListBuffer
 
 import spire.math.{SafeLong => Z}
 import spire.math.cf.{Eval, GCF}
@@ -54,16 +53,10 @@ import Z.{zero, one}
  */
 sealed trait CF { lhs =>
 
-  def fold[A](a: => A, f: (Z, () => CF) => A): A =
+  def transform(f: (Z, () => CF) => CF): CF =
     this match {
       case Term(n, g) => f(n, g)
-      case Infinity => a
-    }
-
-  def fold_(f: (Z, () => CF) => CF): CF =
-    this match {
-      case Term(n, g) => f(n, g)
-      case Infinity => this
+      case Infinity => Infinity
     }
 
   // TODO: use implicit parameter to specify approximation
@@ -71,7 +64,7 @@ sealed trait CF { lhs =>
     // FIXME: i is a similar hack to above, to support breaking out if
     // we somehow have a stream of zeros.
     @tailrec def loop(i: Int, cf: CF): Int =
-      if (i > 20) 0 else cf match {
+      if (i > CF.Breakout) 0 else cf match {
         case Term(n, f) => if (n.isZero) loop(i + 1, f()) else n.signum
         case _ => 0
       }
@@ -94,10 +87,10 @@ sealed trait CF { lhs =>
   //   (lhs compare rhs) == 0
 
   def unary_- : CF =
-    fold_((n, f) => -n ~: -f())
+    transform((n, f) => -n ~: -f())
 
   def abs: CF =
-    fold_((n, f) => n.abs ~: f().abs)
+    transform((n, f) => n.abs ~: f().abs)
 
   def +(rhs: Long): CF =
     this + Z(rhs)
@@ -111,7 +104,7 @@ sealed trait CF { lhs =>
   }
 
   def +(rhs: CF): CF =
-    Eval.eval8(1000, false, false, lhs, rhs,
+    Eval.eval8(CF.Breakout, false, false, lhs, rhs,
       zero, one, one, zero,
       zero, zero, zero, one)
 
@@ -127,7 +120,7 @@ sealed trait CF { lhs =>
   }
 
   def -(rhs: CF): CF =
-    Eval.eval8(1000, false, false, lhs, rhs,
+    Eval.eval8(CF.Breakout, false, false, lhs, rhs,
       zero, one, -one, zero,
       zero, zero, zero, one)
 
@@ -141,7 +134,7 @@ sealed trait CF { lhs =>
     Eval.eval4(rhs.numerator, zero, zero, rhs.denominator, this)
 
   def *(rhs: CF): CF =
-    Eval.eval8(1000, false, false, lhs, rhs,
+    Eval.eval8(CF.Breakout, false, false, lhs, rhs,
       one, zero, zero, zero,
       zero, zero, zero, one)
 
@@ -152,18 +145,21 @@ sealed trait CF { lhs =>
     Eval.eval4(rhs.numerator, zero, zero, rhs.denominator, this)
 
   def /(rhs: CF): CF =
-    Eval.eval8(1000, false, false, lhs, rhs,
+    Eval.eval8(CF.Breakout, false, false, lhs, rhs,
       zero, one, zero, zero,
       zero, zero, one, zero)
 
   def /~(rhs: CF): CF =
-    (lhs / rhs).fold_((n, _) => CF(n))
+    (lhs / rhs).transform((n, _) => CF(n))
 
   def %(rhs: CF): CF =
-    (lhs / rhs).fold_((_, f) => zero ~: (f() * rhs))
+    (lhs / rhs).transform((_, f) => zero ~: (f() * rhs))
 
   def /%(rhs: CF): (CF, CF) =
-    (lhs / rhs).fold((Infinity, Infinity), (n, f) => (CF(n), zero ~: (f() * rhs)))
+    (lhs / rhs) match {
+      case Infinity => (Infinity, Infinity)
+      case Term(n, f) => (CF(n), zero ~: (f() * rhs))
+    }
 
   def reciprocal: CF =
     this match {
@@ -186,7 +182,10 @@ sealed trait CF { lhs =>
   }
 
   def toStream: Stream[Z] =
-    fold(Stream.empty, (n, f) => n #:: f().toStream)
+    this match {
+      case Term(n, f) => n #:: f().toStream
+      case Infinity => Stream.empty
+    }
 
   def getString(t: Int): String = {
     def terms(t: Int, cf: CF): Stream[String] =
@@ -283,21 +282,21 @@ object CF {
 
     // not tail-recursive, but it doesn't need to be (due to laziness)
     // as long as the code "consuming" the CF is stack-safe.
-    def loop(add: Z, denom: Z, buf: ListBuffer[Z]): CF = {
+    def loop(add: Z, denom: Z, terms: List[Z]): CF = {
       val x = (m + add) / denom
       val b = add - (x * denom)
       val denom2 = (n - b ** 2) / denom
-      buf += x
       if (denom2 == 1) {
-        buf += (m - b)
-        x ~: (m - b) ~: repeat(buf.toList.tail)
+        val ts = (m - b) :: x :: terms
+        x ~: (m - b) ~: repeat(ts.reverse.tail)
       } else {
-        x ~: loop(-b, denom2, buf)
+        val ts = x :: terms
+        x ~: loop(-b, denom2, ts)
       }
     }
 
     if (m2 == n) m ~: Infinity
-    else loop(Z(0), Z(1), ListBuffer.empty)
+    else loop(Z(0), Z(1), Nil)
   }
 
   def nrootOf(n: Z, k: Int): CF = {
@@ -313,7 +312,7 @@ object CF {
       val denom2 = (n - b ** k) / denom
       if (denom2 == 0) {
         val ts = (m - b) :: x :: terms
-        x ~: (m - b) ~: repeat(ts.reverse)
+        x ~: (m - b) ~: repeat(ts.reverse.tail)
       } else if (denom2 == 1) {
         val ts = (m - b) :: x :: terms
         x ~: (m - b) ~: repeat(ts.reverse)
@@ -326,4 +325,8 @@ object CF {
     if (mk == n) m ~: Infinity
     else loop(Z(0), Z(1), Nil)
   }
+
+  // iterations to try before "timing out" potentially-infinite
+  // operations.
+  final val Breakout = 10000
 }
