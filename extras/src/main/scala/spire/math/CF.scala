@@ -82,16 +82,16 @@ sealed trait CF { lhs =>
   def compare(rhs: CF): Int =
     (lhs - rhs).signum
 
-  // TODO: cooperative eq
-  override def equals(rhs: Any): Boolean =
-    rhs match {
-      case rhs: CF => lhs === rhs
-      case _ => false
-    }
+  // // TODO: cooperative eq
+  // override def equals(rhs: Any): Boolean =
+  //   rhs match {
+  //     case rhs: CF => lhs === rhs
+  //     case _ => false
+  //   }
 
-  // TODO: use implicit parameter to specify approximation
-  def ===(rhs: CF): Boolean =
-    (lhs compare rhs) == 0
+  // // TODO: use implicit parameter to specify approximation
+  // def ===(rhs: CF): Boolean =
+  //   (lhs compare rhs) == 0
 
   def unary_- : CF =
     fold_((n, f) => -n ~: -f())
@@ -111,7 +111,7 @@ sealed trait CF { lhs =>
   }
 
   def +(rhs: CF): CF =
-    Eval.eval8(100, false, false, lhs, rhs,
+    Eval.eval8(1000, false, false, lhs, rhs,
       zero, one, one, zero,
       zero, zero, zero, one)
 
@@ -127,7 +127,7 @@ sealed trait CF { lhs =>
   }
 
   def -(rhs: CF): CF =
-    Eval.eval8(100, false, false, lhs, rhs,
+    Eval.eval8(1000, false, false, lhs, rhs,
       zero, one, -one, zero,
       zero, zero, zero, one)
 
@@ -141,7 +141,7 @@ sealed trait CF { lhs =>
     Eval.eval4(rhs.numerator, zero, zero, rhs.denominator, this)
 
   def *(rhs: CF): CF =
-    Eval.eval8(100, false, false, lhs, rhs,
+    Eval.eval8(1000, false, false, lhs, rhs,
       one, zero, zero, zero,
       zero, zero, zero, one)
 
@@ -152,7 +152,7 @@ sealed trait CF { lhs =>
     Eval.eval4(rhs.numerator, zero, zero, rhs.denominator, this)
 
   def /(rhs: CF): CF =
-    Eval.eval8(100, false, false, lhs, rhs,
+    Eval.eval8(1000, false, false, lhs, rhs,
       zero, one, zero, zero,
       zero, zero, one, zero)
 
@@ -184,10 +184,6 @@ sealed trait CF { lhs =>
     else if (k == 1) this
     else loop(this, k - 1, this)
   }
-
-  //def sqrt: CF = ???
-
-  //def nroot(k: Int): CF = ???
 
   def toStream: Stream[Z] =
     fold(Stream.empty, (n, f) => n #:: f().toStream)
@@ -270,11 +266,15 @@ object CF {
   def repeat(digits: List[Z]): CF = {
     def loop(ns: List[Z]): CF =
       ns match {
-        case Nil => loop(digits)
         case n :: ns => n ~: loop(ns)
+        case Nil => seq
       }
-    if (digits.isEmpty) Infinity else loop(digits)
+    lazy val seq = if (digits.isEmpty) Infinity else loop(digits)
+    seq
   }
+
+  def sqrtOf(r: Rational): CF =
+    sqrtOf(r.numerator) / sqrtOf(r.denominator)
 
   def sqrtOf(n: Z): CF = {
     import spire.syntax.nroot._
@@ -298,5 +298,32 @@ object CF {
 
     if (m2 == n) m ~: Infinity
     else loop(Z(0), Z(1), ListBuffer.empty)
+  }
+
+  def nrootOf(n: Z, k: Int): CF = {
+    import spire.syntax.nroot._
+    val m = n.nroot(k)
+    val mk = m ** k
+
+    // not tail-recursive, but it doesn't need to be (due to laziness)
+    // as long as the code "consuming" the CF is stack-safe.
+    def loop(add: Z, denom: Z, terms: List[Z]): CF = {
+      val x = (m + add) / denom
+      val b = add - (x * denom)
+      val denom2 = (n - b ** k) / denom
+      if (denom2 == 0) {
+        val ts = (m - b) :: x :: terms
+        x ~: (m - b) ~: repeat(ts.reverse)
+      } else if (denom2 == 1) {
+        val ts = (m - b) :: x :: terms
+        x ~: (m - b) ~: repeat(ts.reverse)
+      } else {
+        val ts = x :: terms
+        x ~: loop(-b, denom2, ts)
+      }
+    }
+
+    if (mk == n) m ~: Infinity
+    else loop(Z(0), Z(1), Nil)
   }
 }

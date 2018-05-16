@@ -2,9 +2,11 @@ package spire.math
 package cf
 
 import spire.math.{SafeLong => Z}
-import Z.{zero, one, two, three, four}
+import SafeLong.{zero, one, two, three/*, four*/}
 
 object GCF {
+
+  val four = Z(4)
 
   type GCF = Stream[(Z, Z)]
 

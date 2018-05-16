@@ -31,57 +31,64 @@ object Eval {
     a: Z, b: Z, c: Z, d: Z, e: Z, f: Z, g: Z, h: Z): CF = {
 
     @tailrec def loop8(
-      i: Int, doneLeft: Boolean, doneRight: Boolean, lhs: CF, rhs: CF,
+      i: Int, doneLeft: Boolean, doneRight: Boolean, tookLeft: Boolean, lhs: CF, rhs: CF,
       a: Z, b: Z, c: Z, d: Z, e: Z, f: Z, g: Z, h: Z): CF = {
 
       // FIXME: breakout is a hack to support approximately results
       // that are exactly zero.
       if (i >= breakout || (e == 0 && f == 0 && g == 0 && h == 0)) return Infinity
 
-      val ae = Extended(a) /~ Extended(e)
-      val bf = Extended(b) /~ Extended(f)
-      val cg = Extended(c) /~ Extended(g)
-      val dh = Extended(d) /~ Extended(h)
+      def bnd(n: Z, d: Z): Double =
+        if (d.isZero) Double.PositiveInfinity
+        else n.toDouble / d.toDouble
 
-      if (ae === bf && bf === cg && cg == dh) {
-        val q = ae.getOrError()
+      def flr(x: Double): Extended[Z] =
+        if (!java.lang.Double.isFinite(x)) Extended.inf(1) else Extended(Z(x.toLong))
+
+      val (b11, b01, b10, b00) = (bnd(a, e), bnd(c, g), bnd(b, f), bnd(d, h))
+      val (i11, i01, i10, i00) = (flr(b11), flr(b01), flr(b10), flr(b00))
+
+      if (i11 === i01 && i01 === i10 && i10 == i00) {
+        val q = i00.getOrError()
         return q ~: eval8(
           breakout, doneLeft, doneRight, lhs, rhs,
           e, f, g, h,
           a - e * q, b - f * q, c - g * q, d - h * q)
       }
 
-      def diff(x: Extended[Z], y: Extended[Z]): Extended[Z] =
-        (x - y).abs.undefToZero
+      def diff(x: Double, y: Double): Double =
+        if (java.lang.Double.isInfinite(x)) Double.PositiveInfinity
+        else if (java.lang.Double.isInfinite(y)) Double.PositiveInfinity
+        else (x - y).abs
 
-      val xw = diff(ae, cg) max diff(bf, dh)
-      val yw = diff(ae, bf) max diff(cg, dh)
-      val takeLeft = doneRight || (!doneLeft && xw > yw)
+      val xw = diff(b11, b01) max diff(b10, b00)
+      val yw = diff(b11, b10) max diff(b01, b00)
+      val takeLeft = doneRight || xw > yw || (xw == yw && !tookLeft)
 
       if (takeLeft) {
         lhs match {
-          case Term(n, ff) =>
-            loop8(i + 1, doneLeft, doneRight, ff(), rhs,
+          case CF.Term(n, ff) =>
+            loop8(i + 1, doneLeft, doneRight, true, ff(), rhs,
               a * n + c, b * n + d, a, b,
               e * n + g, f * n + h, e, f)
-          case inf =>
-            loop8(i + 1, true, doneRight, inf, rhs,
+          case inf @ CF.Infinity =>
+            loop8(i + 1, true, doneRight, true, inf, rhs,
               a, b, a, b,
               e, f, e, f)
         }
       } else {
         rhs match {
-          case Term(n, ff) =>
-            loop8(i + 1, doneLeft, doneRight, lhs, ff(),
+          case CF.Term(n, ff) =>
+            loop8(i + 1, doneLeft, doneRight, false, lhs, ff(),
               a * n + b, a, c * n + d, c,
               e * n + f, e, g * n + h, g)
-          case inf =>
-            loop8(i + 1, doneLeft, true, lhs, inf,
+          case inf @ CF.Infinity =>
+            loop8(i + 1, doneLeft, true, false, lhs, inf,
               a, a, c, c,
               e, e, g, g)
         }
       }
     }
-    loop8(0, doneLeft, doneRight, lhs, rhs, a, b, c, d, e, f, g, h)
+    loop8(0, doneLeft, doneRight, false, lhs, rhs, a, b, c, d, e, f, g, h)
   }
 }
