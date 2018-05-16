@@ -170,40 +170,38 @@ class RealCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
     }
   }
 
-  // property("complex multiplication") {
-  //   // too slow to use irrational numbers to test here
-  //   forAll { (re0: Rational, im0: Rational) =>
-  //     val re = Real(re0)
-  //     val im = Real(im0)
-  //
-  //     val ma = (re.pow(2) + im.pow(2)).sqrt
-  //     val ph = Real.atan2(im, re)
-  //
-  //     val ma2 = ma.pow(2)
-  //     val ph2 = ph * Real(2)
-  //
-  //     ma2 * Real.cos(ph2) shouldBe re.pow(2) - im.pow(2)
-  //     ma2 * Real.sin(ph2) shouldBe re * im * Real(2)
-  //   }
-  // }
+  property("complex multiplication") {
+    forAll { (re0: Rational, im0: Rational) =>
+      val re = Real(re0)
+      val im = Real(im0)
 
-  // def sample1(name: String)(f: Real => Real) {
-  //   property(name) {
-  //     forAll { (x0: Rational, i0: Byte, j0: Byte) =>
-  //       val x = f(Real(x0.abs))
-  //       val i = (i0 & 0xff) % 250 + 1
-  //       val j = (j0 & 0xff) % 250 + 1
-  //       val (k1, k2) = if (i <= j) (i, j) else (j, i)
-  //       val v1 = x(k1)
-  //       val v2 = x(k2)
-  //       val v3 = Real.roundUp(Rational(v2, SafeLong(2).pow(k2 - k1)))
-  //       v1 shouldBe v3
-  //     }
-  //   }
-  // }
-  //
-  // sample1("sample1 id")(x => x)
-  // sample1("sample1 negate")(x => -x)
+      val ma = (re.pow(2) + im.pow(2)).sqrt
+      val ph = Real.atan2(im, re)
+
+      val ma2 = ma.pow(2)
+      val ph2 = ph * Real(2)
+
+      ma2 * Real.cos(ph2) shouldBe re.pow(2) - im.pow(2)
+      ma2 * Real.sin(ph2) shouldBe re * im * Real(2)
+    }
+  }
+
+  def sample1(name: String)(f: Real => Real): Unit =
+    property(name) {
+      forAll { (x0: Rational, i0: Byte, j0: Byte) =>
+        val x = f(Real(x0.abs))
+        val i = (i0 & 0x3f) + 1
+        val j = (j0 & 0x3f) + 1
+        val (k1, k2) = if (i <= j) (i, j) else (j, i)
+        val v1 = x(k1)
+        val v2 = x(k2)
+        val v3 = Real.roundUp(Rational(v2, SafeLong(2).pow(k2 - k1)))
+        v1 shouldBe v3
+      }
+    }
+
+  sample1("sample1 id")(x => x)
+  sample1("sample1 negate")(x => -x)
   // sample1("sample1 +")(x => x + x)
   // sample1("sample1 *")(x => x * x)
   // sample1("sample1 sqrt")(_.sqrt)
