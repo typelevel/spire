@@ -119,7 +119,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
         val s = findNonzero(0)
         val n = Real.twoPow(2 * p + 2 * s + 2)
         val d = x(p + 2 * s + 2)
-        Real.roundUp(Rational(n, d))
+        Real.round(Rational(n, d))
       }
     }
   }
@@ -128,7 +128,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     case (Exact(nx), Exact(ny)) => Exact(nx + ny)
     case (Exact(Rational.zero), _) => y
     case (_, Exact(Rational.zero)) => x
-    case _ => Real(p => Real.roundUp(Rational(x(p + 2) + y(p + 2), 4)))
+    case _ => Real(p => Real.round(Rational(x(p + 2) + y(p + 2), 4)))
   }
 
   def -(y: Real): Real = x + (-y)
@@ -146,7 +146,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
       val sy = Real.sizeInBase2(y0) + 3
       val n = x(p + sy) * y(p + sx)
       val d = Real.twoPow(p + sx + sy)
-      Real.roundUp(Rational(n, d))
+      Real.round(Rational(n, d))
     })
   }
 
@@ -295,7 +295,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   def getString(d: Int): String = {
     val b = Real.digitsToBits(d)
     val r = Rational(x(b) * Z.ten.pow(d), Real.twoPow(b))
-    val m = Real.roundUp(r)
+    val m = Real.round(r)
     val (sign, str) = m.signum match {
       case -1 => ("-", m.abs.toString)
       case 0 => ("", "0")
@@ -361,7 +361,7 @@ object Real extends RealInstances with RealLowPriority {
 
   def sin(x: Real): Real = {
     val z = x / piBy4
-    val s = Real.roundUp(Rational(z(2), 4))
+    val s = Real.round(Rational(z(2), 4))
     val y = x - piBy4 * Real(s)
     val m = (s % 8).toInt
     val n = if (m < 0) m + 8 else m
@@ -379,7 +379,7 @@ object Real extends RealInstances with RealLowPriority {
 
   def cos(x: Real): Real = {
     val z = x / piBy4
-    val s = Real.roundUp(Rational(z(2), 4))
+    val s = Real.round(Rational(z(2), 4))
     val y = x - piBy4 * Real(s)
     val m = (s % 8).toInt
     val n = if (m < 0) m + 8 else m
@@ -496,12 +496,14 @@ object Real extends RealInstances with RealLowPriority {
 
   def twoPow(k: Int): Z = Z.one << k
 
-  def roundUp(r: Rational): Z = Z(r.round.toBigInt)
+  def round(r: Rational): Z = Z(r.round.toBigInt)
+  def ceil(r: Rational): Z = Z(r.ceil.toBigInt)
+  def floor(r: Rational): Z = Z(r.floor.toBigInt)
 
   def div2n(x: Real, n: Int): Real =
     Real { p =>
       if (p >= n) x(p - n)
-      else Real.roundUp(Rational(x(0), Real.twoPow(n - p)))
+      else Real.round(Rational(x(0), Real.twoPow(n - p)))
     }
 
   def mul2n(x: Real, n: Int): Real =
@@ -520,7 +522,7 @@ object Real extends RealInstances with RealLowPriority {
       case (_, Stream.Empty) => total
       case (Stream.Empty, _) => sys.error("nooooo")
       case (x #:: xs, c #:: cs) =>
-        val t = Real.roundUp(c * Rational(x))
+        val t = Real.round(c * Rational(x))
         if (t == 0) total else accumulate(total + t, xs, cs)
     }
   }
@@ -533,10 +535,10 @@ object Real extends RealInstances with RealLowPriority {
       val xr = x(p2)
       val xn = Real.twoPow(p2)
       if (xn == 0) sys.error("oh no")
-      def g(yn: Z): Z = Real.roundUp(Rational(yn * xr, xn))
+      def g(yn: Z): Z = Real.round(Rational(yn * xr, xn))
       val num = accumulate(Z.zero, Stream.iterate(xn)(g), ps.take(t))
       val denom = Real.twoPow(l2t)
-      Real.roundUp(Rational(num, denom))
+      Real.round(Rational(num, denom))
     })
   }
 
@@ -574,7 +576,7 @@ object Real extends RealInstances with RealLowPriority {
     powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ * 2, x)
 
   case class Exact(n: Rational) extends Real {
-    def apply(p: Int): Z = Real.roundUp(Rational(2).pow(p) * n)
+    def apply(p: Int): Z = Real.round(Rational(2).pow(p) * n)
   }
 
   case class Inexact(f: Int => Z, bits: Int) extends Real {
@@ -582,7 +584,7 @@ object Real extends RealInstances with RealLowPriority {
 
     def apply(p: Int): Z = memo match {
       case Some((bits, value)) if bits >= p =>
-        Real.roundUp(Rational(value, Real.twoPow(bits - p)))
+        Real.round(Rational(value, Real.twoPow(bits - p)))
       case _ =>
         val result = f(p)
         memo = Some((p, result))
