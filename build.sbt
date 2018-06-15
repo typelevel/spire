@@ -311,10 +311,6 @@ lazy val publishSettings = Seq(
   homepage := Some(url("http://spire-math.org")),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   pomExtra := (
-    <scm>
-      <url>git@github.com:non/spire.git</url>
-      <connection>scm:git:git@github.com:non/spire.git</connection>
-    </scm>
     <developers>
       <developer>
         <id>d_m</id>
