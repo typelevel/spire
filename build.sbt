@@ -1,5 +1,7 @@
 import ReleaseTransformations._
 
+import sbtcrossproject.{CrossType, crossProject}
+
 lazy val scalaVersions: Map[String, String] =
   Map("2.11" -> "2.11.12", "2.12" -> "2.12.6")
 
@@ -45,7 +47,7 @@ lazy val spireJS = project.in(file(".spireJS"))
   .dependsOn(macrosJS, coreJS, dataJS, extrasJS, lawsJS, legacyJS, platformJS, testsJS, utilJS)
   .enablePlugins(ScalaJSPlugin)
 
-lazy val platform = crossProject
+lazy val platform = crossProject(JSPlatform, JVMPlatform)
   .settings(moduleName := "spire-platform")
   .settings(spireSettings:_*)
   .settings(crossVersionSharedSources:_*)
@@ -57,7 +59,7 @@ lazy val platform = crossProject
 lazy val platformJVM = platform.jvm
 lazy val platformJS = platform.js
 
-lazy val macros = crossProject.crossType(CrossType.Pure)
+lazy val macros = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-macros")
   .settings(spireSettings:_*)
   .settings(scalaCheckSettings:_*)
@@ -69,7 +71,7 @@ lazy val macros = crossProject.crossType(CrossType.Pure)
 lazy val macrosJVM = macros.jvm
 lazy val macrosJS = macros.js
 
-lazy val data = crossProject.crossType(CrossType.Pure)
+lazy val data = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-data")
   .settings(spireSettings:_*)
   .settings(crossVersionSharedSources:_*)
@@ -80,7 +82,7 @@ lazy val data = crossProject.crossType(CrossType.Pure)
 lazy val dataJVM = data.jvm
 lazy val dataJS = data.js
 
-lazy val legacy = crossProject.crossType(CrossType.Pure)
+lazy val legacy = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-legacy")
   .settings(spireSettings:_*)
   .settings(crossVersionSharedSources:_*)
@@ -91,7 +93,7 @@ lazy val legacy = crossProject.crossType(CrossType.Pure)
 lazy val legacyJVM = legacy.jvm
 lazy val legacyJS = legacy.js
 
-lazy val util = crossProject.crossType(CrossType.Pure)
+lazy val util = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-util")
   .settings(spireSettings:_*)
   .settings(crossVersionSharedSources:_*)
@@ -103,7 +105,7 @@ lazy val util = crossProject.crossType(CrossType.Pure)
 lazy val utilJVM = util.jvm
 lazy val utilJS = util.js
 
-lazy val core = crossProject.crossType(CrossType.Pure)
+lazy val core = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire")
   .settings(spireSettings:_*)
   .settings(coreSettings:_*)
@@ -116,7 +118,7 @@ lazy val core = crossProject.crossType(CrossType.Pure)
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 
-lazy val extras = crossProject.crossType(CrossType.Pure)
+lazy val extras = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-extras")
   .settings(spireSettings:_*)
   .settings(extrasSettings:_*)
@@ -149,7 +151,7 @@ lazy val examples = project
   .settings(commonJvmSettings)
   .dependsOn(coreJVM, extrasJVM)
 
-lazy val laws = crossProject.crossType(CrossType.Pure)
+lazy val laws = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-laws")
   .settings(spireSettings:_*)
   .settings(libraryDependencies ++= Seq(
@@ -234,7 +236,7 @@ lazy val jsTests = List(
 */
 )
 
-lazy val tests = crossProject.crossType(CrossType.Pure)
+lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-tests")
   .settings(spireSettings:_*)
   .settings(scalaTestSettings:_*)
