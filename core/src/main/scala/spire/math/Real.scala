@@ -3,7 +3,7 @@ package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
-import spire.algebra.{Field, Order, Trig, Signed, TruncatedDivisionCRing}
+import spire.algebra.{Field, Trig, TruncatedDivisionCRing}
 import spire.syntax.nroot._
 import spire.util.Opt
 

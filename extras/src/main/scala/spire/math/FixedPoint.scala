@@ -7,7 +7,7 @@ import spire.syntax.euclideanRing._
 import spire.syntax.convertableFrom._
 
 import java.math.MathContext
-import spire.algebra.{Field, Order, Signed, TruncatedDivisionCRing}
+import spire.algebra.{Field, TruncatedDivisionCRing}
 import spire.util.Opt
 
 class FixedPointOverflow(n: Long) extends Exception(n.toString)

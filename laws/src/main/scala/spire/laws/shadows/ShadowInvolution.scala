@@ -1,6 +1,6 @@
 package spire.laws.shadows
 
-import spire.algebra.{Involution, Eq, MultiplicativeCMonoid}
+import spire.algebra.Involution
 import spire.syntax.involution._
 
 trait ShadowInvolution[A, S] extends Involution[Shadow[A, S]] {

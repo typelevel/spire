@@ -6,7 +6,6 @@ import spire.algebra._
 import spire.syntax.field._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
-import spire.syntax.order._
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 

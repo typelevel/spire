@@ -7,7 +7,6 @@ import org.scalatest.Matchers
 import org.scalatest._
 import prop._
 
-import spire.algebra.Field
 
 class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
   type Q = Rational
