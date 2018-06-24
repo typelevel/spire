@@ -4,7 +4,6 @@ import spire.algebra._
 import spire.implicits._
 
 import org.scalacheck.{Prop, Properties}
-import org.scalacheck.util.Pretty
 
 import org.typelevel.discipline.Predicate
 
