@@ -284,7 +284,7 @@ lazy val commonDeps = Seq(libraryDependencies ++= Seq(
   "org.typelevel" %%% "algebra" % algebraVersion))
 
 lazy val commonSettings = Seq(
-  scalacOptions ++= commonScalacOptions.diff(Seq(
+  scalacOptions ++= commonScalacOptions.value.diff(Seq(
     "-Xfatal-warnings",
     "-language:existentials",
     "-Ywarn-dead-code",
@@ -432,22 +432,28 @@ lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
   libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided"
 )
 
-lazy val commonScalacOptions = Seq(
-  "-deprecation",
-  "-encoding", "UTF-8",
-  "-feature",
-  "-language:existentials",
-  "-language:higherKinds",
-  "-language:implicitConversions",
-  "-language:experimental.macros",
-  "-unchecked",
-  "-Xfatal-warnings",
-  "-Xlint",
-  "-Yno-adapted-args",
-  "-Ywarn-dead-code",
-  "-Ywarn-numeric-widen",
-  "-Ywarn-value-discard",
-  "-Xfuture"
+lazy val commonScalacOptions = Def.setting(
+  (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, v)) if v >= 13 =>
+      Seq()
+    case _ =>
+      Seq("-Yno-adapted-args")
+  }) ++ Seq(
+    "-deprecation",
+    "-encoding", "UTF-8",
+    "-feature",
+    "-language:existentials",
+    "-language:higherKinds",
+    "-language:implicitConversions",
+    "-language:experimental.macros",
+    "-unchecked",
+    "-Xfatal-warnings",
+    "-Xlint",
+    "-Ywarn-dead-code",
+    "-Ywarn-numeric-widen",
+    "-Ywarn-value-discard",
+    "-Xfuture"
+  )
 )
 
 lazy val sharedPublishSettings = Seq(
