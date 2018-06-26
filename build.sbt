@@ -5,10 +5,10 @@ import sbtcrossproject.{CrossType, crossProject}
 lazy val scalaVersions: Map[String, String] =
   Map("2.11" -> "2.11.12", "2.12" -> "2.12.6")
 
-lazy val scalaCheckVersion = "1.13.5"
-lazy val scalaTestVersion = "3.0.5"
+lazy val scalaCheckVersion = "1.14.0"
+lazy val scalaTestVersion = "3.0.6-SNAP1"
 lazy val shapelessVersion = "2.3.3"
-lazy val disciplineVersion = "0.8"
+lazy val disciplineVersion = "0.10.0"
 lazy val machinistVersion = "0.6.4"
 lazy val algebraVersion = "1.0.0"
 
@@ -386,7 +386,7 @@ lazy val extrasSettings = Seq(
 
 lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types", "Generates several type classes for Tuple2-22.")
 
-lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % "1.13.4" % "test")
+lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion % "test")
 
 lazy val scalaTestSettings = Seq(
   libraryDependencies += "org.scalatest" %%% "scalatest" % scalaTestVersion % "test",
