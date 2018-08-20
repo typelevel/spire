@@ -3,6 +3,7 @@ package math
 
 import org.scalatest._
 import spire.algebra.Order
+import spire.math.Sorting.{insertionSort, mergeSort, quickSort}
 import spire.std.int._
 
 class SortingTest extends FunSuite with Matchers {
@@ -12,23 +13,22 @@ class SortingTest extends FunSuite with Matchers {
     scala.util.Sorting.quickSort(goal)
 
     val merged = before.clone()
-    Sorting.mergeSort(merged)
+    mergeSort(merged)
 
     val quicked = before.clone()
-    Sorting.quickSort(quicked)
+    quickSort(quicked)
 
     // make sure our result is ok
     for (i <- 0 until before.length) assert(merged(i) === goal(i))
     for (i <- 0 until before.length) assert(quicked(i) === goal(i))
   }
 
-
-  test("sort empty array") {
-    testSort(Array[Int]())
+  test("The sort methods can handle empty arrays") {
+    checkAllSortMethods(Array[Int](), Array[Int]())
   }
 
-  test("sort singleton") {
-    testSort(Array[Int](1))
+  test("The sort methods can handle singleton arrays") {
+    checkAllSortMethods(Array("lonely"), Array("lonely"))
   }
 
   test("trivial sort") {
@@ -47,21 +47,26 @@ class SortingTest extends FunSuite with Matchers {
     testSort(Array(5, 4, 3, 2, 1))
   }
 
-  case class Point(x: Int, y: Int) {
+  test("Sort a list of strings") {
+    checkAllSortMethods(Array("There", "is", "a", "light", "that", "never", "goes", "out"),
+      Array("There", "a", "goes", "is", "light", "never", "out", "that"))
+  }
+
+  test("Merge and insertion sorts are stable") {
+    // This will fail for quickSort
+    checkStability(mergeSort)
+    checkStability(insertionSort)
+  }
+
+  private case class Point(x: Int, y: Int) {
     override def toString: String = s"($x, $y)"
   }
 
-  implicit object PointOrder extends Order[Point] {
+  private implicit object PointOrder extends Order[Point] {
     override def compare(a: Point, b: Point): Int = a.x.compareTo(b.x)
   }
 
-  private def arrayOfPoints(coordinates: (Int, Int)*) = (coordinates map {case (x, y) => Point(x, y)}).toArray
-
-  test("Merge and insertion sorts are stable") {
-    checkStability(Sorting.mergeSort[Point])
-    checkStability(Sorting.insertionSort[Point])
-  }
-
+  private def arrayOfPoints(coordinates: (Int, Int)*) = (coordinates map { case (x, y) => Point(x, y) }).toArray
 
   private def checkStability(sortMethod: Array[Point] => Unit) = {
     val toSort = arrayOfPoints((1, 2), (-1, 4), (1, -20), (3, 5), (1, -10), (4, 1),
@@ -72,8 +77,24 @@ class SortingTest extends FunSuite with Matchers {
       (1, -10), (1, -1), (2, 2), (3, 5), (3, 3), (4, 1), (4, 3), (4, -5),
       (4, 4), (5, 2), (6, 7), (7, 6), (10, 10), (23, -23))
 
-    sortMethod(toSort)
+    sortAndCheck(sortMethod, toSort, expectedAfter)
+  }
 
-    toSort should contain theSameElementsInOrderAs expectedAfter
+  private implicit object StringOrder extends Order[String] {
+    override def compare(x: String, y: String): Int = x.compareTo(y)
+  }
+
+  private def checkAllSortMethods[A: Order : ClassTag](toSort: => Array[A], expectedAfter: => Array[A]) = {
+    sortAndCheck(mergeSort[A], toSort, expectedAfter)
+    sortAndCheck(quickSort[A], toSort, expectedAfter)
+    sortAndCheck(insertionSort[A], toSort, expectedAfter)
+  }
+
+  private def sortAndCheck[A: Order : ClassTag](sortMethod: Array[A] => Unit, toSort: Array[A], expectedAfter: Array[A]) = {
+    val copyForSorting = toSort.clone() // To avoid interdependence between tests, it's important that we clone the input array.
+
+    sortMethod(copyForSorting)
+
+    copyForSorting should contain theSameElementsInOrderAs expectedAfter
   }
 }

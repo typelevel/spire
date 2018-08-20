@@ -162,5 +162,5 @@ object Sorting {
 
   final def insertionSort[@sp A:Order:ClassTag](data:Array[A]): Unit = InsertionSort.sort(data)
   final def mergeSort[@sp A:Order:ClassTag](data:Array[A]): Unit = MergeSort.sort(data)
-  final def quickSort[@sp K:Order:ClassTag](data:Array[K]): Unit = QuickSort.sort(data)
+  final def quickSort[@sp A:Order:ClassTag](data:Array[A]): Unit = QuickSort.sort(data)
 }
