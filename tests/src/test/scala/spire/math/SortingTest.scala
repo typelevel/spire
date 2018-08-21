@@ -71,21 +71,21 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("MergeSort.merge merges segments of the input and writes to the output") {
-    val outputArray = new Array[Int](9)
-    MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), outputArray, 1, 4, 7)
-    outputArray should contain theSameElementsInOrderAs Array(0, 2, 4, 3, 5, 13, 19, 0, 0)
+    checkSortMethod[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 1, 4, 7), new Array[Int](9)) {
+      _ should contain theSameElementsInOrderAs Array(0, 2, 4, 3, 5, 13, 19, 0, 0)
+    }
   }
 
   test("MergeSort.merge succeeds when start and end are the extreme allowed values") {
-    val outputArray = new Array[Int](9)
-    MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), outputArray, 0, 4, 9)
-    outputArray should contain theSameElementsInOrderAs Array(1, 2, 4, 3, 5, 13, 19, -2, 9)
+    checkSortMethod[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 0, 4, 9), new Array[Int](9)) {
+      _ should contain theSameElementsInOrderAs Array(1, 2, 4, 3, 5, 13, 19, -2, 9)
+    }
   }
 
   test("MergeSort.merge does nothing when start = mid = end") {
-    val outputArray = new Array[Int](9)
-    MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), outputArray, 4, 4, 4)
-    outputArray should contain theSameElementsInOrderAs Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
+    checkSortMethod[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 4, 4, 4), new Array[Int](9)) {
+      _ should contain theSameElementsInOrderAs Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
+    }
   }
 
 
@@ -130,6 +130,12 @@ class SortingTest extends FunSuite with Matchers {
   test("QuickSort: end cannot exceed the length of the input array") {
     val input = Array(7, 6, 4, 2, 1) ++ forceQuickSortPadding
     an [IllegalArgumentException] should be thrownBy QuickSort.qsort(input, 2, input.length + 1)
+  }
+
+  test("QuickSort: Partitioning an array") {
+    checkSortMethod[Int](QuickSort.partition(_, 2, 9, 5), Array(6, -1, 5, 11, 2, 7, 8, 1, 9, 2, 10)) {
+      _ should contain theSameElementsInOrderAs Array(6, -1, 5, 2, 1, 7, 8, 11, 9, 2, 10)
+    }
   }
 
   private val forceStrategySize = max(QuickSort.limit, MergeSort.startStep) * 2

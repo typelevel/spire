@@ -26,7 +26,7 @@ object InsertionSort extends Sort {
     * @param data the data to be sorted
     * @param start the index of the first element, inclusive, to be sorted
     * @param end the index of the last element, exclusive, to be sorted
-    * @tparam A a type belonging to the type class Order
+    * @tparam A a type belonging to the type class `Order`
     */
   final def sort[@sp A](data:Array[A], start:Int, end:Int)(implicit o:Order[A], ct:ClassTag[A]): Unit = {
     require(start <= end && start >= 0 && end <= data.length)
@@ -110,7 +110,7 @@ object MergeSort extends Sort {
     * @param start the start of the first input section (inclusive) as well as the start of the merged output
     * @param mid the end of the first input section (exclusive) and the beginning of the second input section (inclusive)
     * @param end the end of the second input section (exclusive)
-    * @tparam A a member of the type class Order
+    * @tparam A a member of the type class `Order`
     */
   @inline final def merge[@sp A](in:Array[A], out:Array[A], start:Int, mid:Int, end:Int)(implicit o:Order[A]): Unit = {
     require(start >= 0 && start <= mid && mid <= end && end <= in.length && end <= out.length)
@@ -138,6 +138,15 @@ object QuickSort {
 
   final def sort[@sp A:Order:ClassTag](data:Array[A]): Unit = qsort(data, 0, data.length)
 
+  /**
+    * Uses quick sort on `data` to sort the entries from the index `start`
+    * up to, but not including, the index `end`. Operates in place.
+    *
+    * @param data the input data
+    * @param start the index from which to start sorting (inclusive)
+    * @param end the index at which to stop sorting (exclusive)
+    * @tparam A a member of the type class `Order`
+    */
   final def qsort[@sp A](data:Array[A], start: Int, end: Int)(implicit o:Order[A], ct:ClassTag[A]): Unit = {
     require(start >= 0 && end <= data.length)
     if (end - start < limit) {
@@ -155,21 +164,22 @@ object QuickSort {
 
     val pivotValue = data(pivotIndex)
 
-    //swap(pivot, right)
-    var tmp = data(pivotIndex); data(pivotIndex) = data(right - 1); data(right - 1) = tmp
+    data(pivotIndex) = data(right - 1)
 
+    var temp = pivotValue
     var store = left
     var i = left
     while (i < right - 1) {
       if (o.lt(data(i), pivotValue)) {
         //swap(i, store)
-        tmp = data(i); data(i) = data(store); data(store) = tmp
+        temp = data(i); data(i) = data(store); data(store) = temp
         store += 1
       }
       i += 1
     }
-    //swap(store, right)
-    tmp = data(store); data(store) = data(right - 1); data(right - 1) = tmp
+
+    data(right - 1) = data(store)
+    data(store) = pivotValue
     store
   }
 }
