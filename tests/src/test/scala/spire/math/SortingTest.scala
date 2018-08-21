@@ -9,11 +9,11 @@ import spire.std.int._
 class SortingTest extends FunSuite with Matchers {
 
   test("The sort methods can handle empty arrays") {
-    checkAllSortMethods(Array[Int]()){sorted => sorted should contain theSameElementsInOrderAs Array[Int]()}
+    checkAllSortMethods(Array[Int]()){_ should contain theSameElementsInOrderAs Array[Int]()}
   }
 
   test("The sort methods can handle singleton arrays") {
-    checkAllSortMethods(Array("lonely")){sorted => sorted should contain theSameElementsInOrderAs Array("lonely")}
+    checkAllSortMethods(Array("lonely")){_ should contain theSameElementsInOrderAs Array("lonely")}
   }
 
   test("Sort randomly generated arrays of various sizes") {
@@ -27,16 +27,16 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("Sort a decreasing sequence") {
-    checkAllSortMethods(Array(5, 4, 3, 2, 1)){sorted => sorted should contain theSameElementsInOrderAs Array(1, 2, 3, 4, 5)}
+    checkAllSortMethods(Array.range(0, forceStrategySize).reverse){ _ should contain theSameElementsInOrderAs Array.range(0, forceStrategySize) }
   }
 
   test("Sort a constant sequence") {
-    checkAllSortMethods(Array.fill(20){7}) {sorted => sorted should contain theSameElementsInOrderAs Array.fill(20){7}}
+    checkAllSortMethods(Array.fill(20){7}) { _ should contain theSameElementsInOrderAs Array.fill(20){7}}
   }
 
   test("Sort a list of strings") {
     checkAllSortMethods(Array("There", "is", "a", "light", "that", "never", "goes", "out")){
-      sorted => sorted should contain theSameElementsInOrderAs Array("There", "a", "goes", "is", "light", "never", "out", "that")
+      _ should contain theSameElementsInOrderAs Array("There", "a", "goes", "is", "light", "never", "out", "that")
     }
   }
 
@@ -47,14 +47,14 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("Use InsertionSort to sort a specific range") {
-    checkSortMethod[Int](input => InsertionSort.sort(input, 2, 5), Array(5, 8, 7, 6, 4, 1, -1, 3)) {
-      sorted => sorted should contain theSameElementsInOrderAs Array(5, 8, 4, 6, 7, 1, -1, 3)
+    checkSortMethod[Int](InsertionSort.sort(_, 2, 5), Array(5, 8, 7, 6, 4, 1, -1, 3)) {
+      _ should contain theSameElementsInOrderAs Array(5, 8, 4, 6, 7, 1, -1, 3)
     }
   }
 
   test("Use InsertionSort to sort an empty range") {
-    checkSortMethod[Int](input => InsertionSort.sort(input, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3)) {
-      sorted => sorted should contain theSameElementsInOrderAs Array(5, 8, 7, 6, 4, 1, -1, 3)
+    checkSortMethod[Int](InsertionSort.sort(_, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3)) {
+      _ should contain theSameElementsInOrderAs Array(5, 8, 7, 6, 4, 1, -1, 3)
     }
   }
 
@@ -106,6 +106,35 @@ class SortingTest extends FunSuite with Matchers {
     an [IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9), new Array[Int](20), 1, 5, 3)
 
   }
+
+  test("Use QuickSort to sort a specific range: start is inclusive, end is exclusive") {
+    checkSortMethod[Int](QuickSort.qsort(_, 1, 7), Array(5, 8, 7, 6, 4, 1, -1, 3) ++ forceQuickSortPadding) {
+      _ should contain theSameElementsInOrderAs Array(5, -1, 1, 4, 6, 7, 8, 3) ++ forceQuickSortPadding
+    }
+  }
+
+  test("Use QuickSort to sort an empty range") {
+    checkSortMethod[Int](QuickSort.qsort(_, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3) ++ forceQuickSortPadding) {
+      _ should contain theSameElementsInOrderAs Array(5, 8, 7, 6, 4, 1, -1, 3) ++ forceQuickSortPadding
+    }
+  }
+
+  test("QuickSort: start must be less than or equal to end") {
+    an [IllegalArgumentException] should be thrownBy QuickSort.qsort(Array(7, 6, 4, 2, 1) ++ forceQuickSortPadding, 4, 3)
+  }
+
+  test("QuickSort: start must be nonnegative") {
+    an [IllegalArgumentException] should be thrownBy QuickSort.qsort(Array(7, 6, 4, 2, 1) ++ forceQuickSortPadding, -1, 16)
+  }
+
+  test("QuickSort: end cannot exceed the length of the input array") {
+    val input = Array(7, 6, 4, 2, 1) ++ forceQuickSortPadding
+    an [IllegalArgumentException] should be thrownBy QuickSort.qsort(input, 2, input.length + 1)
+  }
+
+  private val forceStrategySize = max(QuickSort.limit, MergeSort.startStep) * 2
+
+  private val forceQuickSortPadding = new Array[Int](forceStrategySize)
 
   private def isSorted(input: Array[Int]): Assertion = {
     assert(input.zip(input.tail).forall({case (p, q) => p <= q}))

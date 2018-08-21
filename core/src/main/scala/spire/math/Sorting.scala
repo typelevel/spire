@@ -136,32 +136,32 @@ object MergeSort extends Sort {
 object QuickSort {
   @inline final def limit: Int = 16
 
-  final def sort[@sp A:Order:ClassTag](data:Array[A]): Unit = qsort(data, 0, data.length - 1)
+  final def sort[@sp A:Order:ClassTag](data:Array[A]): Unit = qsort(data, 0, data.length)
 
-  final def qsort[@sp A](data:Array[A], left: Int, right: Int)(implicit o:Order[A], ct:ClassTag[A]): Unit = {
-
-    if (right - left < limit) {
-      InsertionSort.sort(data, left, right + 1)
+  final def qsort[@sp A](data:Array[A], start: Int, end: Int)(implicit o:Order[A], ct:ClassTag[A]): Unit = {
+    require(start >= 0 && end <= data.length)
+    if (end - start < limit) {
+      InsertionSort.sort(data, start, end)
       return
     }
 
-    val pivot = left + (right - left) / 2
-    val next = partition(data, left, right, pivot)
-    qsort(data, left, next - 1)
-    qsort(data, next + 1, right)
+    val pivot = start + (end - start) / 2
+    val next = partition(data, start, end, pivot)
+    qsort(data, start, next)
+    qsort(data, next + 1, end)
   }
 
-  final def partition[@sp A](data:Array[A], left:Int, right:Int, pivot:Int)(implicit o:Order[A], ct:ClassTag[A]): Int = {
+  final def partition[@sp A](data:Array[A], left:Int, right:Int, pivotIndex:Int)(implicit o:Order[A], ct:ClassTag[A]): Int = {
 
-    val value = data(pivot)
+    val pivotValue = data(pivotIndex)
 
     //swap(pivot, right)
-    var tmp = data(pivot); data(pivot) = data(right); data(right) = tmp
+    var tmp = data(pivotIndex); data(pivotIndex) = data(right - 1); data(right - 1) = tmp
 
     var store = left
     var i = left
-    while (i < right) {
-      if (o.lt(data(i), value)) {
+    while (i < right - 1) {
+      if (o.lt(data(i), pivotValue)) {
         //swap(i, store)
         tmp = data(i); data(i) = data(store); data(store) = tmp
         store += 1
@@ -169,7 +169,7 @@ object QuickSort {
       i += 1
     }
     //swap(store, right)
-    tmp = data(store); data(store) = data(right); data(right) = tmp
+    tmp = data(store); data(store) = data(right - 1); data(right - 1) = tmp
     store
   }
 }
