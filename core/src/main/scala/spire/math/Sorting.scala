@@ -154,22 +154,34 @@ object QuickSort {
       return
     }
 
-    val pivot = start + (end - start) / 2
-    val next = partition(data, start, end, pivot)
-    qsort(data, start, next)
-    qsort(data, next + 1, end)
+    val pivotIndex = start + (end - start) / 2
+    val nextPivotIndex = partition(data, start, end, pivotIndex)
+    qsort(data, start, nextPivotIndex)
+    qsort(data, nextPivotIndex + 1, end)
   }
 
-  final def partition[@sp A](data:Array[A], left:Int, right:Int, pivotIndex:Int)(implicit o:Order[A], ct:ClassTag[A]): Int = {
-
+  /**
+    * Helper method for the quick sort implementation. Partitions the segment of the input array from `start` to `end`
+    * according to the value at the given `pivotIndex`. Values less in the segment less than the pivot value will end up
+    * to the left of the pivot value, and values greater on the right.
+    *
+    * @param data the input array
+    * @param start the left endpoint (inclusive) of the interval to be partitioned
+    * @param end the right endpoint (exclusive) of the interval to be partitioned
+    * @param pivotIndex the index of the current pivot
+    * @tparam A a member of the type class Order
+    * @return the next pivot value
+    */
+  final def partition[@sp A](data:Array[A], start:Int, end:Int, pivotIndex:Int)(implicit o:Order[A], ct:ClassTag[A]): Int = {
+    require(start >= 0 && pivotIndex >= start && end > pivotIndex && end <= data.length)
     val pivotValue = data(pivotIndex)
 
-    data(pivotIndex) = data(right - 1)
+    data(pivotIndex) = data(end - 1)
 
     var temp = pivotValue
-    var store = left
-    var i = left
-    while (i < right - 1) {
+    var store = start
+    var i = start
+    while (i < end - 1) {
       if (o.lt(data(i), pivotValue)) {
         //swap(i, store)
         temp = data(i); data(i) = data(store); data(store) = temp
@@ -178,7 +190,7 @@ object QuickSort {
       i += 1
     }
 
-    data(right - 1) = data(store)
+    data(end - 1) = data(store)
     data(store) = pivotValue
     store
   }

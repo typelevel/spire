@@ -21,21 +21,26 @@ class SortingTest extends FunSuite with Matchers {
     val randomGen = new scala.util.Random()
 
     sizes.foreach { size =>
-      val input: Array[Int] = Array.tabulate(size){_ => randomGen.nextInt(Int.MaxValue)}
+      val input: Array[Int] = Array.tabulate(size) { _ => randomGen.nextInt(Int.MaxValue) }
       checkAllSortMethods(input)(isSorted)
     }
   }
 
   test("Sort a decreasing sequence") {
-    matchAgainstExpectedForEachSortMethod(Array.range(0, forceStrategySize).reverse, Array.range(0, forceStrategySize))
+    matchAgainstExpectedForEachSortMethod(Array.range(0, BIG).reverse, Array.range(0, BIG))
   }
 
   test("Sort a constant sequence") {
-    matchAgainstExpectedForEachSortMethod(Array.fill(20){7}, Array.fill(20){7})
+    matchAgainstExpectedForEachSortMethod(Array.fill(20) {
+      7
+    }, Array.fill(20) {
+      7
+    })
   }
 
   test("Sort a list of strings") {
-    matchAgainstExpectedForEachSortMethod(Array("There", "is", "a", "light", "that", "never", "goes", "out"), Array("There", "a", "goes", "is", "light", "never", "out", "that"))
+    matchAgainstExpectedForEachSortMethod(Array("There", "is", "a", "light", "that", "never", "goes", "out"),
+      Array("There", "a", "goes", "is", "light", "never", "out", "that"))
   }
 
   test("Merge and insertion sorts are stable") {
@@ -45,87 +50,107 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("Use InsertionSort to sort a specific range") {
-    matchAgainstExpected[Int](InsertionSort.sort(_, 2, 5), Array(5, 8, 7, 6, 4, 1, -1, 3), Array(5, 8, 4, 6, 7, 1, -1, 3))
+    matchAgainstExpected[Int](InsertionSort.sort(_, 2, 5), Array(5, 8, 7, 6, 4, 1, -1, 3),
+      Array(5, 8, 4, 6, 7, 1, -1, 3))
   }
 
   test("Use InsertionSort to sort an empty range") {
-    matchAgainstExpected[Int](InsertionSort.sort(_, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3), Array(5, 8, 7, 6, 4, 1, -1, 3))
+    matchAgainstExpected[Int](InsertionSort.sort(_, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3),
+      Array(5, 8, 7, 6, 4, 1, -1, 3))
   }
 
   test("InsertionSort: start must be less than or equal to end") {
-    an [IllegalArgumentException] should be thrownBy InsertionSort.sort(Array(7, 6, 4, 2, 1), 4, 3)
+    an[IllegalArgumentException] should be thrownBy InsertionSort.sort(Array(7, 6, 4, 2, 1), 4, 3)
   }
 
   test("InsertionSort: start must be nonnegative") {
-    an [IllegalArgumentException] should be thrownBy InsertionSort.sort(Array(7, 6, 4, 2, 1), -1, 3)
+    an[IllegalArgumentException] should be thrownBy InsertionSort.sort(Array(7, 6, 4, 2, 1), -1, 3)
   }
 
   test("InsertionSort: end cannot exceed the length of the input array") {
-    an [IllegalArgumentException] should be thrownBy InsertionSort.sort(Array(7, 6, 4, 2, 1), 2, 6)
+    an[IllegalArgumentException] should be thrownBy InsertionSort.sort(Array(7, 6, 4, 2, 1), 2, 6)
   }
 
   test("MergeSort.merge merges segments of the input and writes to the output") {
-    matchAgainstExpected[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 1, 4, 7), new Array[Int](9), Array(0, 2, 4, 3, 5, 13, 19, 0, 0))
+    matchAgainstExpected[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 1, 4, 7),
+      new Array[Int](9), Array(0, 2, 4, 3, 5, 13, 19, 0, 0))
   }
 
   test("MergeSort.merge succeeds when start and end are the extreme allowed values") {
-    matchAgainstExpected[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 0, 4, 9), new Array[Int](9), Array(1, 2, 4, 3, 5, 13, 19, -2, 9))
+    matchAgainstExpected[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 0, 4, 9),
+      new Array[Int](9), Array(1, 2, 4, 3, 5, 13, 19, -2, 9))
   }
 
   test("MergeSort.merge does nothing when start = mid = end") {
-    matchAgainstExpected[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 4, 4, 4), new Array[Int](9), Array(0, 0, 0, 0, 0, 0, 0, 0, 0))
-   }
+    matchAgainstExpected[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 4, 4, 4),
+      new Array[Int](9), Array(0, 0, 0, 0, 0, 0, 0, 0, 0))
+  }
 
 
   test("MergeSort.merge: end cannot exceed the size of the output array") {
-    an [IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9), new Array[Int](4), 3, 7, 8)
+    an[IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9),
+      new Array[Int](4), 3, 7, 8)
   }
 
   test("MergeSort.merge: end cannot exceed the size of the input array") {
-    an [IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9), new Array[Int](20), 3, 7, 12)
+    an[IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9),
+      new Array[Int](20), 3, 7, 12)
   }
 
   test("MergeSort.merge: start must be nonnegative") {
-    an [IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9), new Array[Int](20), -1, 2, 4)
+    an[IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9),
+      new Array[Int](20), -1, 2, 4)
   }
 
   test("MergeSort.merge: start <= mid <= end") {
-    an [IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9), new Array[Int](20), 3, 1, 5)
-    an [IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9), new Array[Int](20), 1, 5, 3)
+    an[IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9),
+      new Array[Int](20), 3, 1, 5)
+    an[IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9),
+      new Array[Int](20), 1, 5, 3)
 
   }
 
   test("Use QuickSort to sort a specific range: start is inclusive, end is exclusive") {
-    matchAgainstExpected[Int](QuickSort.qsort(_, 1, 7), Array(5, 8, 7, 6, 4, 1, -1, 3) ++ forceQuickSortPadding, Array(5, -1, 1, 4, 6, 7, 8, 3) ++ forceQuickSortPadding)
+    matchAgainstExpected[Int](QuickSort.qsort(_, 1, 7), Array(5, 8, 7, 6, 4, 1, -1, 3) ++ BIG_PADDING,
+      Array(5, -1, 1, 4, 6, 7, 8, 3) ++ BIG_PADDING)
   }
 
   test("Use QuickSort to sort an empty range") {
-    matchAgainstExpected[Int](QuickSort.qsort(_, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3) ++ forceQuickSortPadding, Array(5, 8, 7, 6, 4, 1, -1, 3) ++ forceQuickSortPadding)
+    matchAgainstExpected[Int](QuickSort.qsort(_, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3) ++ BIG_PADDING,
+      Array(5, 8, 7, 6, 4, 1, -1, 3) ++ BIG_PADDING)
   }
 
   test("QuickSort: start must be less than or equal to end") {
-    an [IllegalArgumentException] should be thrownBy QuickSort.qsort(Array(7, 6, 4, 2, 1) ++ forceQuickSortPadding, 4, 3)
+    an[IllegalArgumentException] should be thrownBy QuickSort.qsort(Array(7, 6, 4, 2, 1) ++ BIG_PADDING, 4, 3)
   }
 
   test("QuickSort: start must be nonnegative") {
-    an [IllegalArgumentException] should be thrownBy QuickSort.qsort(Array(7, 6, 4, 2, 1) ++ forceQuickSortPadding, -1, 16)
+    an[IllegalArgumentException] should be thrownBy QuickSort.qsort(Array(7, 6, 4, 2, 1) ++ BIG_PADDING, -1, 16)
   }
 
   test("QuickSort: end cannot exceed the length of the input array") {
-    val input = Array(7, 6, 4, 2, 1) ++ forceQuickSortPadding
-    an [IllegalArgumentException] should be thrownBy QuickSort.qsort(input, 2, input.length + 1)
+    val input = Array(7, 6, 4, 2, 1) ++ BIG_PADDING
+    an[IllegalArgumentException] should be thrownBy QuickSort.qsort(input, 2, input.length + 1)
   }
 
   test("QuickSort: Partitioning an array") {
-    matchAgainstExpected[Int](QuickSort.partition(_, 2, 9, 5), Array(6, -1, 5, 11, 2, 7, 8, 1, 9, 2, 10), Array(6, -1, 5, 2, 1, 7, 8, 11, 9, 2, 10))
+    matchAgainstExpected[Int](QuickSort.partition(_, 2, 9, 5), Array(6, -1, 5, 11, 2, 7, 8, 1, 9, 2, 10),
+      Array(6, -1, 5, 2, 1, 7, 8, 11, 9, 2, 10))
   }
 
-  private val forceStrategySize = max(QuickSort.limit, MergeSort.startStep) * 2
+  test("QuickSort.partition: 0 <= start <= pivot < end <= length of input") {
+    val input = Array(2, 3, 4, 6)
+    Array((-1, 2, 1), (0, 5, 2), (0, 4, 4), (2, 4, 1), (1, 3, 4)).foreach {
+      case (start, end, pivotIndex) => an [IllegalArgumentException] should be thrownBy QuickSort.partition(input, start, end, pivotIndex)
+    }
+  }
 
-  private val forceQuickSortPadding = new Array[Int](forceStrategySize)
+  private val BIG = max(QuickSort.limit, MergeSort.startStep) * 2
+
+  private val BIG_PADDING = new Array[Int](BIG)
 
   private def isSorted(input: Array[Int]): Assertion = {
-    assert(input.zip(input.tail).forall({case (p, q) => p <= q}))
+    assert(input.zip(input.tail).forall({ case (p, q) => p <= q }))
   }
 
   private case class Point(x: Int, y: Int) {
