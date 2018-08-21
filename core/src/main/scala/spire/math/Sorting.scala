@@ -17,6 +17,13 @@ trait Sort extends Any {
  * Works well for small arrays but due to quadratic complexity is not generally optimal.
  */
 object InsertionSort extends Sort {
+
+  /**
+    * Sorts `data` in place using insertion sort.
+    *
+    * @param data the array to be sorted
+    * @tparam A a member of the type class `Order`
+    */
   final def sort[@sp A:Order:ClassTag](data:Array[A]): Unit =
     sort(data, 0, data.length)
 
@@ -24,10 +31,10 @@ object InsertionSort extends Sort {
     * Uses insertion sort on `data` to sort the entries from the index `start`
     * up to, but not including, the index `end`. Operates in place.
     *
-    * @param data the data to be sorted
+    * @param data the array to be sorted
     * @param start the index of the first element, inclusive, to be sorted
     * @param end the index of the last element, exclusive, to be sorted
-    * @tparam A a type belonging to the type class `Order`
+    * @tparam A a member of the type class `Order`
     */
   final def sort[@sp A](data:Array[A], start:Int, end:Int)(implicit o:Order[A], ct:ClassTag[A]): Unit = {
     require(start <= end && start >= 0 && end <= data.length)
@@ -56,12 +63,12 @@ object MergeSort extends Sort {
   @inline final def startStep: Int = 16
 
   /**
-    * Uses merge sort to sort the input array in place.
+    * Uses merge sort to sort the array `data` in place.
     *
-    * If the size of the input array does not exceed the threshold `startStep`
+    * If the size of the input array does not exceed the threshold `startStep`,
     * uses insertion sort instead.
     *
-    * @param data the input array
+    * @param data the array to be sorted
     * @tparam A a member of the type class `Order`
     */
   final def sort[@sp A:Order:ClassTag](data:Array[A]): Unit = {
@@ -143,13 +150,12 @@ object QuickSort {
   @inline final def limit: Int = 16
 
   /**
-    * Uses quicksort on `data` to sort the entries from the index `start`
-    * up to, but not including, the index `end`. Operates in place.
+    * Uses quicksort on `data` to sort the entries. Operates in place.
     *
-    * If the size of the input array is less than the threshold `limit`
+    * If the size of the input array is less than the threshold `limit`,
     * uses insertion sort instead.
     *
-    * @param data the input data
+    * @param data the array to be sorted
     * @tparam A a member of the type class `Order`
     */
   final def sort[@sp A:Order:ClassTag](data:Array[A]): Unit = qsort(data, 0, data.length)
@@ -161,7 +167,7 @@ object QuickSort {
     * If the size of the segment to be sorted is less than the threshold `limit`
     * uses insertion sort instead.
     *
-    * @param data the input data
+    * @param data the array to be sorted
     * @param start the index from which to start sorting (inclusive)
     * @param end the index at which to stop sorting (exclusive)
     * @tparam A a member of the type class `Order`
@@ -180,11 +186,11 @@ object QuickSort {
   }
 
   /**
-    * Helper method for the quick sort implementation. Partitions the segment of the input array from `start` to `end`
-    * according to the value at the given `pivotIndex`. Values less in the segment less than the pivot value will end up
+    * Helper method for the quick sort implementation. Partitions the segment of the array `data` from `start` to `end`
+    * according to the value at the given `pivotIndex`. Values in the segment less than the pivot value will end up
     * to the left of the pivot value, and values greater on the right. Operates in place.
     *
-    * @param data the input array
+    * @param data the array to be partitioned
     * @param start the left endpoint (inclusive) of the interval to be partitioned
     * @param end the right endpoint (exclusive) of the interval to be partitioned
     * @param pivotIndex the index of the current pivot
@@ -227,9 +233,15 @@ object QuickSort {
  * insertionSort(), which is slow except for small arrays.
  */
 object Sorting {
+  /** Delegates to [[spire.math.QuickSort.sort]] */
   final def sort[@sp A:Order:ClassTag](data:Array[A]): Unit = QuickSort.sort(data)
 
+  /** Delegates to [[spire.math.InsertionSort.sort]] */
   final def insertionSort[@sp A:Order:ClassTag](data:Array[A]): Unit = InsertionSort.sort(data)
+
+  /** Delegates to [[spire.math.MergeSort.sort]] */
   final def mergeSort[@sp A:Order:ClassTag](data:Array[A]): Unit = MergeSort.sort(data)
+
+  /** Delegates to [[spire.math.QuickSort.sort]] */
   final def quickSort[@sp A:Order:ClassTag](data:Array[A]): Unit = QuickSort.sort(data)
 }
