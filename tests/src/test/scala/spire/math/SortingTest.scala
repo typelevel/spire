@@ -38,11 +38,7 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("Sort a constant sequence") {
-    matchAgainstExpectedForEachSortMethod(Array.fill(20) {
-      7
-    }, Array.fill(20) {
-      7
-    })
+    matchAgainstExpectedForEachSortMethod(Array.fill(20){7}, Array.fill(20){7})
   }
 
   test("Sort a list of strings") {
@@ -57,8 +53,12 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("Use InsertionSort to sort a specific range") {
-    matchAgainstExpected[Int](InsertionSort.sort(_, 2, 5), Array(5, 8, 7, 6, 4, 1, -1, 3),
-      Array(5, 8, 4, 6, 7, 1, -1, 3))
+    val rangeToSort = Array(7, 6, 4)
+    val expectedAfter = Array(4, 6, 7)
+
+    matchAgainstExpected[Int](InsertionSort.sort(_, 2, 5),
+      Array(5, 8) ++ rangeToSort ++ Array(1, -1, 3),
+      Array(5, 8) ++ expectedAfter ++ Array(1, -1, 3))
   }
 
   test("Use InsertionSort to sort an empty range") {
@@ -79,8 +79,12 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("MergeSort.merge merges segments of the input and writes to the output") {
-    matchAgainstExpected[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 1, 4, 7),
-      new Array[Int](9), Array(0, 2, 4, 3, 5, 13, 19, 0, 0))
+    val segment1 = Array(2, 5, 13)
+    val segment2 = Array(4, 3, 19)
+    val expectedAfterMerging = Array(2, 4, 3, 5, 13, 19)
+
+    matchAgainstExpected[Int](MergeSort.merge(Array(1) ++ segment1 ++ segment2 ++ Array(-2, 9), _, 1, 4, 7),
+      new Array[Int](9), Array(0) ++ expectedAfterMerging ++ Array(0, 0))
   }
 
   test("MergeSort.merge succeeds when start and end are the extreme allowed values") {
@@ -118,31 +122,42 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("Use QuickSort to sort a specific range: start is inclusive, end is exclusive") {
-    matchAgainstExpected[Int](QuickSort.qsort(_, 1, 7), Array(5, 8, 7, 6, 4, 1, -1, 3) ++ BIG_PADDING,
-      Array(5, -1, 1, 4, 6, 7, 8, 3) ++ BIG_PADDING)
+    val rangeToSort = Array(8, 7, 6, 4, 1, -1)
+    val expectedAfter = Array(-1, 1, 4, 6, 7, 8)
+
+    matchAgainstExpected[Int](QuickSort.qsort(_, 1, 7),
+      Array(5) ++ rangeToSort ++ Array(3) ++ ENOUGH_ZEROS,
+      Array(5) ++ expectedAfter ++ Array(3) ++ ENOUGH_ZEROS)
   }
 
   test("Use QuickSort to sort an empty range") {
-    matchAgainstExpected[Int](QuickSort.qsort(_, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3) ++ BIG_PADDING,
-      Array(5, 8, 7, 6, 4, 1, -1, 3) ++ BIG_PADDING)
+    matchAgainstExpected[Int](QuickSort.qsort(_, 2, 2),
+      Array(5, 8, 7, 6, 4, 1, -1, 3) ++ ENOUGH_ZEROS,
+      Array(5, 8, 7, 6, 4, 1, -1, 3) ++ ENOUGH_ZEROS)
   }
 
   test("QuickSort: start must be less than or equal to end") {
-    an[IllegalArgumentException] should be thrownBy QuickSort.qsort(Array(7, 6, 4, 2, 1) ++ BIG_PADDING, 4, 3)
+    an[IllegalArgumentException] should be thrownBy QuickSort.qsort(Array(7, 6, 4, 2, 1) ++ ENOUGH_ZEROS, 4, 3)
   }
 
   test("QuickSort: start must be nonnegative") {
-    an[IllegalArgumentException] should be thrownBy QuickSort.qsort(Array(7, 6, 4, 2, 1) ++ BIG_PADDING, -1, 16)
+    an[IllegalArgumentException] should be thrownBy QuickSort.qsort(Array(7, 6, 4, 2, 1) ++ ENOUGH_ZEROS, -1, 16)
   }
 
   test("QuickSort: end cannot exceed the length of the input array") {
-    val input = Array(7, 6, 4, 2, 1) ++ BIG_PADDING
+    val input = Array(7, 6, 4, 2, 1) ++ ENOUGH_ZEROS
     an[IllegalArgumentException] should be thrownBy QuickSort.qsort(input, 2, input.length + 1)
   }
 
   test("QuickSort: Partitioning an array") {
-    matchAgainstExpected[Int](QuickSort.partition(_, 2, 9, 5), Array(6, -1, 5, 11, 2, 7, 8, 1, 9, 2, 10),
-      Array(6, -1, 5, 2, 1, 7, 8, 11, 9, 2, 10))
+    val leftSegment = Array(5, 11, 2)
+    val rightSegment = Array(8, 1, 9)
+    val pivotValue = 7
+    val expectedAfterPartition = Array(5, 2, 1, 7, 8, 11, 9)
+
+    matchAgainstExpected[Int](QuickSort.partition(_, 2, 9, 5),
+      Array(6, -1) ++ leftSegment ++ Array(pivotValue) ++ rightSegment ++ Array(2, 10),
+      Array(6, -1) ++ expectedAfterPartition ++ Array(2, 10))
   }
 
   test("QuickSort.partition: 0 <= start <= pivot < end <= length of input") {
@@ -154,7 +169,7 @@ class SortingTest extends FunSuite with Matchers {
 
   private val BIG = max(QuickSort.limit, MergeSort.startStep) * 2
 
-  private val BIG_PADDING = new Array[Int](BIG)
+  private val ENOUGH_ZEROS = new Array[Int](BIG) // For forcing the quick sort and merge sort implementations to kick in
 
   private def isSorted(input: Array[Int]): Assertion = {
     assert(input.zip(input.tail).forall({ case (p, q) => p <= q }))

@@ -12,9 +12,9 @@ trait Sort extends Any {
 }
 
 /**
- * Simple implementation of insertion sort.
+ * An implementation of insertion sort.
  *
- * Works for small arrays but due to quadratic complexity is not generally good.
+ * Works well for small arrays but due to quadratic complexity is not generally optimal.
  */
 object InsertionSort extends Sort {
   final def sort[@sp A:Order:ClassTag](data:Array[A]): Unit =
@@ -23,6 +23,7 @@ object InsertionSort extends Sort {
   /**
     * Uses insertion sort on `data` to sort the entries from the index `start`
     * up to, but not including, the index `end`. Operates in place.
+    *
     * @param data the data to be sorted
     * @param start the index of the first element, inclusive, to be sorted
     * @param end the index of the last element, exclusive, to be sorted
@@ -54,6 +55,15 @@ object MergeSort extends Sort {
   @inline final def startWidth: Int = 8
   @inline final def startStep: Int = 16
 
+  /**
+    * Uses merge sort to sort the input array in place.
+    *
+    * If the size of the input array does not exceed the threshold `startStep`
+    * uses insertion sort instead.
+    *
+    * @param data the input array
+    * @tparam A a member of the type class `Order`
+    */
   final def sort[@sp A:Order:ClassTag](data:Array[A]): Unit = {
     val len = data.length
 
@@ -101,10 +111,6 @@ object MergeSort extends Sort {
     *
     * Writing to the output begins at `start` (inclusive).
     *
-    * The start, mid and end parameters denote the
-    * left and right ranges of the input to merge, as well as the area of the
-    * output to write to.
-    *
     * @param in the input array
     * @param out the output array
     * @param start the start of the first input section (inclusive) as well as the start of the merged output
@@ -136,11 +142,24 @@ object MergeSort extends Sort {
 object QuickSort {
   @inline final def limit: Int = 16
 
+  /**
+    * Uses quicksort on `data` to sort the entries from the index `start`
+    * up to, but not including, the index `end`. Operates in place.
+    *
+    * If the size of the input array is less than the threshold `limit`
+    * uses insertion sort instead.
+    *
+    * @param data the input data
+    * @tparam A a member of the type class `Order`
+    */
   final def sort[@sp A:Order:ClassTag](data:Array[A]): Unit = qsort(data, 0, data.length)
 
   /**
-    * Uses quick sort on `data` to sort the entries from the index `start`
+    * Uses quicksort on `data` to sort the entries from the index `start`
     * up to, but not including, the index `end`. Operates in place.
+    *
+    * If the size of the segment to be sorted is less than the threshold `limit`
+    * uses insertion sort instead.
     *
     * @param data the input data
     * @param start the index from which to start sorting (inclusive)
@@ -163,7 +182,7 @@ object QuickSort {
   /**
     * Helper method for the quick sort implementation. Partitions the segment of the input array from `start` to `end`
     * according to the value at the given `pivotIndex`. Values less in the segment less than the pivot value will end up
-    * to the left of the pivot value, and values greater on the right.
+    * to the left of the pivot value, and values greater on the right. Operates in place.
     *
     * @param data the input array
     * @param start the left endpoint (inclusive) of the interval to be partitioned
