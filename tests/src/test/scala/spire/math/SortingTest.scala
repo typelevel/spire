@@ -46,30 +46,66 @@ class SortingTest extends FunSuite with Matchers {
     checkStability(insertionSort)
   }
 
-  test("Use insertionSort to sort a specific range") {
+  test("Use InsertionSort to sort a specific range") {
     checkSortMethod[Int](input => InsertionSort.sort(input, 2, 5), Array(5, 8, 7, 6, 4, 1, -1, 3)) {
       sorted => sorted should contain theSameElementsInOrderAs Array(5, 8, 4, 6, 7, 1, -1, 3)
     }
   }
 
-  test("Use insertionSort to sort an empty range") {
+  test("Use InsertionSort to sort an empty range") {
     checkSortMethod[Int](input => InsertionSort.sort(input, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3)) {
       sorted => sorted should contain theSameElementsInOrderAs Array(5, 8, 7, 6, 4, 1, -1, 3)
     }
   }
 
-  test("insertionSort: start must be less than or equal to end") {
+  test("InsertionSort: start must be less than or equal to end") {
     an [IllegalArgumentException] should be thrownBy InsertionSort.sort(Array(7, 6, 4, 2, 1), 4, 3)
   }
 
-  test("insertionSort: start must be nonnegative") {
+  test("InsertionSort: start must be nonnegative") {
     an [IllegalArgumentException] should be thrownBy InsertionSort.sort(Array(7, 6, 4, 2, 1), -1, 3)
   }
 
-  test("insertionSort: end cannot exceed the length of the input array") {
+  test("InsertionSort: end cannot exceed the length of the input array") {
     an [IllegalArgumentException] should be thrownBy InsertionSort.sort(Array(7, 6, 4, 2, 1), 2, 6)
   }
 
+  test("MergeSort.merge merges segments of the input and writes to the output") {
+    val outputArray = new Array[Int](9)
+    MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), outputArray, 1, 4, 7)
+    outputArray should contain theSameElementsInOrderAs Array(0, 2, 4, 3, 5, 13, 19, 0, 0)
+  }
+
+  test("MergeSort.merge succeeds when start and end are the extreme allowed values") {
+    val outputArray = new Array[Int](9)
+    MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), outputArray, 0, 4, 9)
+    outputArray should contain theSameElementsInOrderAs Array(1, 2, 4, 3, 5, 13, 19, -2, 9)
+  }
+
+  test("MergeSort.merge does nothing when start = mid = end") {
+    val outputArray = new Array[Int](9)
+    MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), outputArray, 4, 4, 4)
+    outputArray should contain theSameElementsInOrderAs Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
+  }
+
+
+  test("MergeSort.merge: end cannot exceed the size of the output array") {
+    an [IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9), new Array[Int](4), 3, 7, 8)
+  }
+
+  test("MergeSort.merge: end cannot exceed the size of the input array") {
+    an [IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9), new Array[Int](20), 3, 7, 12)
+  }
+
+  test("MergeSort.merge: start must be nonnegative") {
+    an [IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9), new Array[Int](20), -1, 2, 4)
+  }
+
+  test("MergeSort.merge: start <= mid <= end") {
+    an [IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9), new Array[Int](20), 3, 1, 5)
+    an [IllegalArgumentException] should be thrownBy MergeSort.merge(Array(5, 3, 4, 7, 5, 8, 9), new Array[Int](20), 1, 5, 3)
+
+  }
 
   private def isSorted(input: Array[Int]): Assertion = {
     assert(input.zip(input.tail).forall({case (p, q) => p <= q}))

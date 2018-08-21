@@ -89,17 +89,31 @@ object MergeSort extends Sort {
       step *= 2
     }
 
-    if (buf1 != data) System.arraycopy(buf1, 0, data, 0, len)
+    if (!buf1.eq(data)) System.arraycopy(buf1, 0, data, 0, len)
   }
 
   /**
-   * Helper method for mergeSort, used to do a single "merge" between two
-   * sections of the input array. The start, mid and end parameters denote the
-   * left and right ranges of the input to merge, as well as the area of the
-   * ouput to write to.
-   */
+    * Helper method for mergeSort, used to do a single "merge" between two
+    * sections of the input array, and write the result to the output array.
+    *
+    * The first input section starts at `start` (inclusive) and ends at `mid` (exclusive).
+    * The second input section starts at `mid` (inclusive) and ends at `end` (exclusive).
+    *
+    * Writing to the output begins at `start` (inclusive).
+    *
+    * The start, mid and end parameters denote the
+    * left and right ranges of the input to merge, as well as the area of the
+    * output to write to.
+    *
+    * @param in the input array
+    * @param out the output array
+    * @param start the start of the first input section (inclusive) as well as the start of the merged output
+    * @param mid the end of the first input section (exclusive) and the beginning of the second input section (inclusive)
+    * @param end the end of the second input section (exclusive)
+    * @tparam A a member of the type class Order
+    */
   @inline final def merge[@sp A](in:Array[A], out:Array[A], start:Int, mid:Int, end:Int)(implicit o:Order[A]): Unit = {
-
+    require(start >= 0 && start <= mid && mid <= end && end <= in.length && end <= out.length)
     var ii = start
     var jj = mid
     var kk = start
