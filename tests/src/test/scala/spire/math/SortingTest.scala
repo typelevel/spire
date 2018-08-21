@@ -17,12 +17,19 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("Sort randomly generated arrays of various sizes") {
-    val sizes = Seq.range(1, 65) ++ Seq(256, 1024, 9121, 65539)
+    val smallSizes = Seq.range(1, 65)
     val randomGen = new scala.util.Random()
 
-    sizes.foreach { size =>
-      val input: Array[Int] = Array.tabulate(size) { _ => randomGen.nextInt(Int.MaxValue) }
+    smallSizes.foreach { size =>
+      val input: Array[Int] = Array.tabulate(size) { _ => randomGen.nextInt(10000) }
       checkAllSortMethods(input)(isSorted)
+    }
+
+    val largeSizes = Seq(256, 1024, 9121)
+    largeSizes.foreach { size =>
+      val input: Array[Int] = Array.tabulate(size) { _ => randomGen.nextInt(10000) }
+      checkMutation(mergeSort[Int], input)(isSorted)
+      checkMutation(quickSort[Int], input)(isSorted)
     }
   }
 
