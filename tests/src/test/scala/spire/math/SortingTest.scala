@@ -9,11 +9,11 @@ import spire.std.int._
 class SortingTest extends FunSuite with Matchers {
 
   test("The sort methods can handle empty arrays") {
-    checkAllSortMethods(Array[Int]()){_ should contain theSameElementsInOrderAs Array[Int]()}
+    matchAgainstExpectedForEachSortMethod(Array[Int](), Array[Int]())
   }
 
   test("The sort methods can handle singleton arrays") {
-    checkAllSortMethods(Array("lonely")){_ should contain theSameElementsInOrderAs Array("lonely")}
+    matchAgainstExpectedForEachSortMethod(Array("lonely"), Array("lonely"))
   }
 
   test("Sort randomly generated arrays of various sizes") {
@@ -27,17 +27,15 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("Sort a decreasing sequence") {
-    checkAllSortMethods(Array.range(0, forceStrategySize).reverse){ _ should contain theSameElementsInOrderAs Array.range(0, forceStrategySize) }
+    matchAgainstExpectedForEachSortMethod(Array.range(0, forceStrategySize).reverse, Array.range(0, forceStrategySize))
   }
 
   test("Sort a constant sequence") {
-    checkAllSortMethods(Array.fill(20){7}) { _ should contain theSameElementsInOrderAs Array.fill(20){7}}
+    matchAgainstExpectedForEachSortMethod(Array.fill(20){7}, Array.fill(20){7})
   }
 
   test("Sort a list of strings") {
-    checkAllSortMethods(Array("There", "is", "a", "light", "that", "never", "goes", "out")){
-      _ should contain theSameElementsInOrderAs Array("There", "a", "goes", "is", "light", "never", "out", "that")
-    }
+    matchAgainstExpectedForEachSortMethod(Array("There", "is", "a", "light", "that", "never", "goes", "out"), Array("There", "a", "goes", "is", "light", "never", "out", "that"))
   }
 
   test("Merge and insertion sorts are stable") {
@@ -47,15 +45,11 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("Use InsertionSort to sort a specific range") {
-    checkSortMethod[Int](InsertionSort.sort(_, 2, 5), Array(5, 8, 7, 6, 4, 1, -1, 3)) {
-      _ should contain theSameElementsInOrderAs Array(5, 8, 4, 6, 7, 1, -1, 3)
-    }
+    matchAgainstExpected[Int](InsertionSort.sort(_, 2, 5), Array(5, 8, 7, 6, 4, 1, -1, 3), Array(5, 8, 4, 6, 7, 1, -1, 3))
   }
 
   test("Use InsertionSort to sort an empty range") {
-    checkSortMethod[Int](InsertionSort.sort(_, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3)) {
-      _ should contain theSameElementsInOrderAs Array(5, 8, 7, 6, 4, 1, -1, 3)
-    }
+    matchAgainstExpected[Int](InsertionSort.sort(_, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3), Array(5, 8, 7, 6, 4, 1, -1, 3))
   }
 
   test("InsertionSort: start must be less than or equal to end") {
@@ -71,22 +65,16 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("MergeSort.merge merges segments of the input and writes to the output") {
-    checkSortMethod[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 1, 4, 7), new Array[Int](9)) {
-      _ should contain theSameElementsInOrderAs Array(0, 2, 4, 3, 5, 13, 19, 0, 0)
-    }
+    matchAgainstExpected[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 1, 4, 7), new Array[Int](9), Array(0, 2, 4, 3, 5, 13, 19, 0, 0))
   }
 
   test("MergeSort.merge succeeds when start and end are the extreme allowed values") {
-    checkSortMethod[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 0, 4, 9), new Array[Int](9)) {
-      _ should contain theSameElementsInOrderAs Array(1, 2, 4, 3, 5, 13, 19, -2, 9)
-    }
+    matchAgainstExpected[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 0, 4, 9), new Array[Int](9), Array(1, 2, 4, 3, 5, 13, 19, -2, 9))
   }
 
   test("MergeSort.merge does nothing when start = mid = end") {
-    checkSortMethod[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 4, 4, 4), new Array[Int](9)) {
-      _ should contain theSameElementsInOrderAs Array(0, 0, 0, 0, 0, 0, 0, 0, 0)
-    }
-  }
+    matchAgainstExpected[Int](MergeSort.merge(Array(1, 2, 5, 13, 4, 3, 19, -2, 9), _, 4, 4, 4), new Array[Int](9), Array(0, 0, 0, 0, 0, 0, 0, 0, 0))
+   }
 
 
   test("MergeSort.merge: end cannot exceed the size of the output array") {
@@ -108,15 +96,11 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("Use QuickSort to sort a specific range: start is inclusive, end is exclusive") {
-    checkSortMethod[Int](QuickSort.qsort(_, 1, 7), Array(5, 8, 7, 6, 4, 1, -1, 3) ++ forceQuickSortPadding) {
-      _ should contain theSameElementsInOrderAs Array(5, -1, 1, 4, 6, 7, 8, 3) ++ forceQuickSortPadding
-    }
+    matchAgainstExpected[Int](QuickSort.qsort(_, 1, 7), Array(5, 8, 7, 6, 4, 1, -1, 3) ++ forceQuickSortPadding, Array(5, -1, 1, 4, 6, 7, 8, 3) ++ forceQuickSortPadding)
   }
 
   test("Use QuickSort to sort an empty range") {
-    checkSortMethod[Int](QuickSort.qsort(_, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3) ++ forceQuickSortPadding) {
-      _ should contain theSameElementsInOrderAs Array(5, 8, 7, 6, 4, 1, -1, 3) ++ forceQuickSortPadding
-    }
+    matchAgainstExpected[Int](QuickSort.qsort(_, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3) ++ forceQuickSortPadding, Array(5, 8, 7, 6, 4, 1, -1, 3) ++ forceQuickSortPadding)
   }
 
   test("QuickSort: start must be less than or equal to end") {
@@ -133,9 +117,7 @@ class SortingTest extends FunSuite with Matchers {
   }
 
   test("QuickSort: Partitioning an array") {
-    checkSortMethod[Int](QuickSort.partition(_, 2, 9, 5), Array(6, -1, 5, 11, 2, 7, 8, 1, 9, 2, 10)) {
-      _ should contain theSameElementsInOrderAs Array(6, -1, 5, 2, 1, 7, 8, 11, 9, 2, 10)
-    }
+    matchAgainstExpected[Int](QuickSort.partition(_, 2, 9, 5), Array(6, -1, 5, 11, 2, 7, 8, 1, 9, 2, 10), Array(6, -1, 5, 2, 1, 7, 8, 11, 9, 2, 10))
   }
 
   private val forceStrategySize = max(QuickSort.limit, MergeSort.startStep) * 2
@@ -170,19 +152,32 @@ class SortingTest extends FunSuite with Matchers {
       (1, -10), (1, -1), (2, 2), (3, 5), (3, 3), (4, 1), (4, 3), (4, -5),
       (4, 4), (5, 2), (6, 7), (7, 6), (10, 10), (23, -23))
 
-    checkSortMethod(sortMethod, toSort){_ should contain theSameElementsInOrderAs expectedAfter}
+    matchAgainstExpected(sortMethod, toSort, expectedAfter)
   }
+
+  private def matchAgainstExpected[A: Order : ClassTag](mutation: Array[A] => Unit, toMutate: Array[A], expectedAfter: Array[A]) = {
+    checkMutation(mutation, toMutate) {
+      _ should contain theSameElementsInOrderAs expectedAfter
+    }
+  }
+
+  private def matchAgainstExpectedForEachSortMethod[A: Order : ClassTag](toMutate: Array[A], expected: Array[A]) = {
+    checkAllSortMethods(toMutate) {
+      _ should contain theSameElementsInOrderAs expected
+    }
+  }
+
   private def checkAllSortMethods[A: Order : ClassTag](toSort: => Array[A])(check: Array[A] => Assertion) = {
-    checkSortMethod(mergeSort[A], toSort)(check)
-    checkSortMethod(quickSort[A], toSort)(check)
-    checkSortMethod(insertionSort[A], toSort)(check)
+    checkMutation(mergeSort[A], toSort)(check)
+    checkMutation(quickSort[A], toSort)(check)
+    checkMutation(insertionSort[A], toSort)(check)
   }
 
-  private def checkSortMethod[A: Order : ClassTag](sortMethod: Array[A] => Unit, toSort: Array[A])(check: Array[A] => Assertion) = {
-    val copyForSorting = toSort.clone() // To avoid interdependence between tests, it's important that we clone the input array.
+  private def checkMutation[A: Order : ClassTag](mutation: Array[A] => Unit, toMutate: Array[A])(check: Array[A] => Assertion) = {
+    val copyForMutation = toMutate.clone() // To avoid interdependence between tests, it's important that we clone the input array.
 
-    sortMethod(copyForSorting)
+    mutation(copyForMutation)
 
-    check(copyForSorting)
+    check(copyForMutation)
   }
 }
