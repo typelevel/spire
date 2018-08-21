@@ -14,14 +14,22 @@ trait Sort extends Any {
 /**
  * Simple implementation of insertion sort.
  *
- * Works for small arrays but due to O(n^2) complexity is not generally good.
+ * Works for small arrays but due to quadratic complexity is not generally good.
  */
 object InsertionSort extends Sort {
   final def sort[@sp A:Order:ClassTag](data:Array[A]): Unit =
     sort(data, 0, data.length)
 
+  /**
+    * Uses insertion sort on `data` to sort the entries from the index `start`
+    * up to, but not including, the index `end`. Operates in place.
+    * @param data the data to be sorted
+    * @param start the index of the first element, inclusive, to be sorted
+    * @param end the index of the last element, exclusive, to be sorted
+    * @tparam A a type belonging to the type class Order
+    */
   final def sort[@sp A](data:Array[A], start:Int, end:Int)(implicit o:Order[A], ct:ClassTag[A]): Unit = {
-
+    require(start <= end && start >= 0 && end <= data.length)
     var i = start + 1
     while (i < end) {
       val item = data(i)
@@ -49,7 +57,10 @@ object MergeSort extends Sort {
   final def sort[@sp A:Order:ClassTag](data:Array[A]): Unit = {
     val len = data.length
 
-    if (len <= startStep) return InsertionSort.sort(data)
+    if (len <= startStep) {
+      InsertionSort.sort(data)
+      return
+    }
 
     var buf1:Array[A] = data
     var buf2:Array[A] = new Array[A](len)
@@ -115,7 +126,10 @@ object QuickSort {
 
   final def qsort[@sp A](data:Array[A], left: Int, right: Int)(implicit o:Order[A], ct:ClassTag[A]): Unit = {
 
-    if (right - left < limit) return InsertionSort.sort(data, left, right + 1)
+    if (right - left < limit) {
+      InsertionSort.sort(data, left, right + 1)
+      return
+    }
 
     val pivot = left + (right - left) / 2
     val next = partition(data, left, right, pivot)
@@ -153,7 +167,7 @@ object QuickSort {
  * Object providing in-place sorting capability for arrays.
  *
  * Sorting.sort() uses quickSort() by default (in-place, not stable, generally
- * fastest but might hit bad cases where it's O(n^2)). Also provides
+ * fastest but might hit bad cases where it is quadratic. Also provides
  * mergeSort() (in-place, stable, uses extra memory, still pretty fast) and
  * insertionSort(), which is slow except for small arrays.
  */

@@ -46,6 +46,31 @@ class SortingTest extends FunSuite with Matchers {
     checkStability(insertionSort)
   }
 
+  test("Use insertionSort to sort a specific range") {
+    checkSortMethod[Int](input => InsertionSort.sort(input, 2, 5), Array(5, 8, 7, 6, 4, 1, -1, 3)) {
+      sorted => sorted should contain theSameElementsInOrderAs Array(5, 8, 4, 6, 7, 1, -1, 3)
+    }
+  }
+
+  test("Use insertionSort to sort an empty range") {
+    checkSortMethod[Int](input => InsertionSort.sort(input, 2, 2), Array(5, 8, 7, 6, 4, 1, -1, 3)) {
+      sorted => sorted should contain theSameElementsInOrderAs Array(5, 8, 7, 6, 4, 1, -1, 3)
+    }
+  }
+
+  test("insertionSort: start must be less than or equal to end") {
+    an [IllegalArgumentException] should be thrownBy InsertionSort.sort(Array(7, 6, 4, 2, 1), 4, 3)
+  }
+
+  test("insertionSort: start must be nonnegative") {
+    an [IllegalArgumentException] should be thrownBy InsertionSort.sort(Array(7, 6, 4, 2, 1), -1, 3)
+  }
+
+  test("insertionSort: end cannot exceed the length of the input array") {
+    an [IllegalArgumentException] should be thrownBy InsertionSort.sort(Array(7, 6, 4, 2, 1), 2, 6)
+  }
+
+
   private def isSorted(input: Array[Int]): Assertion = {
     assert(input.zip(input.tail).forall({case (p, q) => p <= q}))
   }
@@ -64,7 +89,6 @@ class SortingTest extends FunSuite with Matchers {
   private implicit object StringOrder extends Order[String] {
     override def compare(x: String, y: String): Int = x.compareTo(y)
   }
-
 
   private def checkStability(sortMethod: Array[Point] => Unit) = {
     val toSort = arrayOfPoints((1, 2), (-1, 4), (1, -20), (3, 5), (1, -10), (4, 1),
