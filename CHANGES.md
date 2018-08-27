@@ -1,3 +1,7 @@
+## New version
+
+* The ranges provided to sorting algorithms are now consistent across methods, see https://github.com/non/spire/pull/738 : "All these strategies operate in place on segments of arrays that start and end at specified indices. In the QuickSort implementation, the end index was inclusive, while it was exclusive in MergeSort and InsertionSort. This has been fixed in this changeset to make the end index exclusive in all three implementations, following the convention in the Java Collections library."
+
 ## Version 0.14.1
 
 This version add laws for gcd/lcm operations, and fixes corner cases
