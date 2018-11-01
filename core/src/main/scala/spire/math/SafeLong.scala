@@ -317,7 +317,7 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
       val (q, r) = spire.math.equotmod(x, y)
       (SafeLongLong(q), SafeLongLong(r))
     }
-  def equot(y: Long): SafeLong = 
+  def equot(y: Long): SafeLong =
     if (x == Long.MinValue && y == -1L) SafeLong.safe64 else SafeLongLong(spire.math.equot(x, y))
   def emod(y: Long): SafeLong =
     if (x == Long.MinValue && y == -1L) SafeLong.zero else SafeLongLong(spire.math.emod(x, y))
