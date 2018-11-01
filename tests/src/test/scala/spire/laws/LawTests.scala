@@ -67,25 +67,25 @@ class LawTests extends FunSuite with Discipline {
 
   // Float and Double fail these tests
   checkAll("Byte",       RingLaws[Byte].cRing)
-  checkAll("Byte",       RingLaws[Shadow[Byte, BigInt]].euclideanRing(Shadow.euclideanRing))
+  checkAll("Byte",       RingLaws[Shadow[Byte, BigInt]].integerEuclideanRing(Shadow.euclideanRing, Shadow.signed))
   checkAll("Byte",       CombinationLaws[Shadow[Byte, BigInt]].signedAdditiveCMonoid)
   checkAll("Byte",       OrderLaws[Shadow[Byte, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("Byte",       BaseLaws[Byte].uniqueFactorizationDomain)
 
   checkAll("Short",      RingLaws[Short].cRing)
-  checkAll("Short",      RingLaws[Shadow[Short, BigInt]].euclideanRing(Shadow.euclideanRing))
+  checkAll("Short",      RingLaws[Shadow[Short, BigInt]].integerEuclideanRing(Shadow.euclideanRing, Shadow.signed))
   checkAll("Short",      CombinationLaws[Shadow[Short, BigInt]].signedAdditiveCMonoid)
   checkAll("Short",      OrderLaws[Shadow[Short, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("Short",      BaseLaws[Short].uniqueFactorizationDomain)
   
   checkAll("Int",        RingLaws[Int].cRing)
-  checkAll("Int",        RingLaws[Shadow[Int, BigInt]].euclideanRing(Shadow.euclideanRing))
+  checkAll("Int",        RingLaws[Shadow[Int, BigInt]].integerEuclideanRing(Shadow.euclideanRing, Shadow.signed))
   checkAll("Int",        BaseLaws[Int].uniqueFactorizationDomain)
   checkAll("Int",        OrderLaws[Shadow[Int, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("Int",        CombinationLaws[Shadow[Int, BigInt]].signedAdditiveCMonoid)
 
   checkAll("Long",       RingLaws[Long].cRing)
-  checkAll("Long",       RingLaws[Shadow[Long, BigInt]].euclideanRing(Shadow.euclideanRing))
+  checkAll("Long",       RingLaws[Shadow[Long, BigInt]].integerEuclideanRing(Shadow.euclideanRing, Shadow.signed))
   checkAll("Long",       BaseLaws[Long].uniqueFactorizationDomain)
   checkAll("Long",       OrderLaws[Shadow[Long, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("Long",       CombinationLaws[Shadow[Long, BigInt]].signedAdditiveCMonoid)
@@ -93,13 +93,13 @@ class LawTests extends FunSuite with Discipline {
   // to test ShadowInvolution
   checkAll("Long",       InvolutionLaws[Shadow[Long, BigInt]].involutionRing(Shadow.involution, Shadow.cRing))
 
-  checkAll("BigInt",     RingLaws[BigInt].euclideanRing)
+  checkAll("BigInt",     RingLaws[BigInt].integerEuclideanRing)
   checkAll("BigInt",     CombinationLaws[BigInt].signedGCDRing)
   checkAll("BigInt",     OrderLaws[BigInt].truncatedDivision)
   checkAll("BigInt",     BaseLaws[BigInt].metricSpace)
   // checkAll("BigInt",     BaseLaws[BigInt].uniqueFactorizationDomain) // TODO: fast enough
 
-  checkAll("BigInteger", RingLaws[BigInteger].euclideanRing)
+  checkAll("BigInteger", RingLaws[BigInteger].integerEuclideanRing)
   checkAll("BigInteger", CombinationLaws[BigInteger].signedGCDRing)
   checkAll("BigInteger", OrderLaws[BigInteger].truncatedDivision)
 
@@ -110,7 +110,7 @@ class LawTests extends FunSuite with Discipline {
 
   checkAll("Real",       RingLaws[Real].field)
 
-  checkAll("SafeLong",   RingLaws[SafeLong].euclideanRing)
+  checkAll("SafeLong",   RingLaws[SafeLong].integerEuclideanRing)
   checkAll("SafeLong",   CombinationLaws[SafeLong].signedGCDRing)
   checkAll("SafeLong",   OrderLaws[SafeLong].truncatedDivision)
   // checkAll("SafeLong",   BaseLaws[SafeLong].uniqueFactorizationDomain) // TODO: fast enough?
