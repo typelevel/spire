@@ -16,9 +16,9 @@ trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   override def fromInt(n: Int): BigInt = BigInt(n)
 
   def euclideanFunction(a:BigInt): BigInt = a.abs
-  def equot(a:BigInt, b:BigInt): BigInt = a / b
-  def emod(a:BigInt, b:BigInt): BigInt = a % b
-  override def equotmod(a:BigInt, b:BigInt): (BigInt, BigInt) = a /% b
+  override def equotmod(a: BigInt, b: BigInt): (BigInt, BigInt) = spire.math.equotmod(a, b)
+  def equot(a: BigInt, b: BigInt): BigInt = spire.math.equot(a, b)
+  def emod(a: BigInt, b: BigInt): BigInt = spire.math.emod(a, b)
 
   override def lcm(a:BigInt, b:BigInt)(implicit ev: Eq[BigInt]): BigInt = if (a.signum == 0 || b.signum == 0) zero else (a / a.gcd(b)) * b
   override def gcd(a:BigInt, b:BigInt)(implicit ev: Eq[BigInt]): BigInt = a.gcd(b)

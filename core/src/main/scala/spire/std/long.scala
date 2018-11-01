@@ -19,8 +19,9 @@ trait LongIsEuclideanRing extends EuclideanRing[Long] {
   override def fromInt(n: Int): Long = n
 
   def euclideanFunction(a:Long): BigInt = BigInt(a).abs
-  def equot(a:Long, b:Long): Long = a / b
-  def emod(a:Long, b:Long): Long = a % b
+  override def equotmod(a: Long, b: Long): (Long, Long) = spire.math.equotmod(a, b)
+  def equot(a: Long, b: Long): Long = spire.math.equot(a, b)
+  def emod(a: Long, b: Long): Long = spire.math.emod(a, b)
   def gcd(a:Long, b:Long)(implicit ev: Eq[Long]): Long = spire.math.gcd(a, b)
   def lcm(a:Long, b:Long)(implicit ev: Eq[Long]): Long = spire.math.lcm(a, b)
 }

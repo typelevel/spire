@@ -2,6 +2,7 @@ package spire
 
 import java.lang.Long.numberOfTrailingZeros
 import java.lang.Math
+import java.math.BigInteger
 import java.math.MathContext
 import java.math.RoundingMode
 
@@ -281,11 +282,11 @@ package object math {
     if (_y == 1L) return 1L
 
     var x = _x
-    var xz = numberOfTrailingZeros(x)
+    val xz = numberOfTrailingZeros(x)
     x = Math.abs(x >> xz)
 
     var y = _y
-    var yz = numberOfTrailingZeros(y)
+    val yz = numberOfTrailingZeros(y)
     y = Math.abs(y >> yz)
 
     while (x != y) {
@@ -315,6 +316,128 @@ package object math {
   final def lcm(x: Long, y: Long): Long = if (x == 0 || y == 0) 0 else (x / gcd(x, y)) * y
   final def lcm(a: BigInt, b: BigInt): BigInt = if (a.signum == 0 || b.signum == 0) 0 else (a / a.gcd(b)) * b
   final def lcm[A:Eq](x: A, y: A)(implicit ev: GCDRing[A]): A = ev.lcm(x, y)
+
+  /**
+   * Integer Euclidean division, equotmod, equot, emod
+    */
+  def equotmod(a: Byte, b: Byte): (Byte, Byte) = {
+    val qt = a / b // truncated quotient
+    val rt = a % b // truncated remainder
+    if (rt >= 0) (qt.toByte, rt.toByte)
+    else if (b > 0) ((qt - 1).toByte, (rt + b).toByte)
+    else ((qt + 1).toByte, (rt - b).toByte)
+  }
+  def equotmod(a: Short, b: Short): (Short, Short) = {
+    val qt = a / b // truncated quotient
+    val rt = a % b // truncated remainder
+    if (rt >= 0) (qt.toShort, rt.toShort)
+    else if (b > 0) ((qt - 1).toShort, (rt + b).toShort)
+    else ((qt + 1).toShort, (rt - b).toShort)
+  }
+  def equotmod(a: Int, b: Int): (Int, Int) = {
+    val qt = a / b // truncated quotient
+    val rt = a % b // truncated remainder
+    if (rt >= 0) (qt, rt)
+    else if (b > 0) (qt - 1, rt + b)
+    else (qt + 1, rt - b)
+  }
+  def equotmod(a: Long, b: Long): (Long, Long) = {
+    val qt = a / b // truncated quotient
+    val rt = a % b // truncated remainder
+    if (rt >= 0) (qt, rt)
+    else if (b > 0) (qt - 1, rt + b)
+    else (qt + 1, rt - b)
+  }
+  def equotmod(a: BigInt, b: BigInt): (BigInt, BigInt) = {
+    val (qt, rt) = a /% b // truncated quotient and remainder
+    if (rt.signum >= 0) (qt, rt)
+    else if (b.signum > 0) (qt - 1, rt + b)
+    else (qt + 1, rt - b)
+  }
+  def equotmod(a: BigInteger, b: BigInteger): (BigInteger, BigInteger) = {
+    val Array(qt, rt) = a.divideAndRemainder(b) // truncated quotient and remainder
+    if (rt.signum >= 0) (qt, rt)
+    else if (b.signum > 0) (qt.subtract(BigInteger.ONE), rt.add(b))
+    else (qt.add(BigInteger.ONE), rt.subtract(b))
+  }
+
+  def equot(a: Byte, b: Byte): Byte = {
+    val qt = a / b // truncated quotient
+    val rt = a % b // truncated remainder
+    if (rt >= 0) qt.toByte
+    else if (b > 0) (qt - 1).toByte
+    else (qt + 1).toByte
+  }
+  def equot(a: Short, b: Short): Short = {
+    val qt = a / b // truncated quotient
+    val rt = a % b // truncated remainder
+    if (rt >= 0) qt.toShort
+    else if (b > 0) (qt - 1).toShort
+    else (qt + 1).toShort
+  }
+  def equot(a: Int, b: Int): Int = {
+    val qt = a / b // truncated quotient
+    val rt = a % b // truncated remainder
+    if (rt >= 0) qt
+    else if (b > 0) qt - 1
+    else qt + 1
+  }
+  def equot(a: Long, b: Long): Long = {
+    val qt = a / b // truncated quotient
+    val rt = a % b // truncated remainder
+    if (rt >= 0) qt
+    else if (b > 0) qt - 1
+    else qt + 1
+  }
+  def equot(a: BigInt, b: BigInt): BigInt = {
+    val (qt, rt) = a /% b // truncated quotient and remainder
+    if (rt.signum >= 0) qt
+    else if (b.signum > 0) qt - 1
+    else qt + 1
+  }
+  def equot(a: BigInteger, b: BigInteger): BigInteger = {
+    val Array(qt, rt) = a.divideAndRemainder(b) // truncated quotient and remainder
+    if (rt.signum >= 0) qt
+    else if (b.signum > 0) qt.subtract(BigInteger.ONE)
+    else qt.add(BigInteger.ONE)
+  }
+
+  def emod(a: Byte, b: Byte): Byte = {
+    val rt = a % b // truncated remainder
+    if (rt >= 0) rt.toByte
+    else if (b > 0) (rt + b).toByte
+    else (rt - b).toByte
+  }
+  def emod(a: Short, b: Short): Short = {
+    val rt = a % b // truncated remainder
+    if (rt >= 0) rt.toShort
+    else if (b > 0) (rt + b).toShort
+    else (rt - b).toShort
+  }
+  def emod(a: Int, b: Int): Int = {
+    val rt = a % b // truncated remainder
+    if (rt >= 0) rt
+    else if (b > 0) rt + b
+    else rt - b
+  }
+  def emod(a: Long, b: Long): Long = {
+    val rt = a % b // truncated remainder
+    if (rt >= 0) rt
+    else if (b > 0) rt + b
+    else rt - b
+  }
+  def emod(a: BigInt, b: BigInt): BigInt = {
+    val rt = a % b // truncated remainder
+    if (rt.signum >= 0) rt
+    else if (b > 0) rt + b
+    else rt - b
+  }
+  def emod(a: BigInteger, b: BigInteger): BigInteger = {
+    val rt = a.remainder(b) // truncated remainder
+    if (rt.signum >= 0) rt
+    else if (b.signum > 0) rt.add(b)
+    else rt.subtract(b)
+  }
 
   /**
    * min

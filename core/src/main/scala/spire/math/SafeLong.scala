@@ -65,6 +65,24 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
       case SafeLongBigInteger(n) => lhs /% n
     }
 
+  final def equot(rhs: SafeLong): SafeLong =
+    rhs match {
+      case SafeLongLong(n) => lhs equot n
+      case SafeLongBigInteger(n) => lhs equot n
+    }
+
+  final def emod(rhs: SafeLong): SafeLong =
+    rhs match {
+      case SafeLongLong(n) => lhs emod n
+      case SafeLongBigInteger(n) => lhs emod n
+    }
+
+  final def equotmod(rhs: SafeLong): (SafeLong, SafeLong) =
+    rhs match {
+      case SafeLongLong(n) => lhs equotmod n
+      case SafeLongBigInteger(n) => lhs equotmod n
+    }
+
   final def &(rhs: SafeLong): SafeLong =
     rhs match {
       case SafeLongLong(n) => lhs & n
@@ -95,6 +113,9 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
   def /(rhs: Long): SafeLong
   def %(rhs: Long): SafeLong
   def /%(rhs: Long): (SafeLong, SafeLong)
+  def equot(rhs: Long): SafeLong
+  def emod(rhs: Long): SafeLong
+  def equotmod(rhs: Long): (SafeLong, SafeLong)
   def &(rhs: Long): SafeLong
   def |(rhs: Long): SafeLong
   def ^(rhs: Long): SafeLong
@@ -105,6 +126,9 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
   final def /(rhs: BigInt): SafeLong = this / rhs.bigInteger
   final def %(rhs: BigInt): SafeLong = this % rhs.bigInteger
   final def /%(rhs: BigInt): (SafeLong, SafeLong) =  this /% rhs.bigInteger
+  final def equot(rhs: BigInt): SafeLong = this equot rhs.bigInteger
+  final def emod(rhs: BigInt): SafeLong = this emod rhs.bigInteger
+  final def equotmod(rhs: BigInt): (SafeLong, SafeLong) = this equotmod rhs.bigInteger
   final def &(rhs: BigInt): SafeLong = this & rhs.bigInteger
   final def |(rhs: BigInt): SafeLong = this | rhs.bigInteger
   final def ^(rhs: BigInt): SafeLong = this ^ rhs.bigInteger
@@ -115,6 +139,9 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
   private[math] def /(rhs: BigInteger): SafeLong
   private[math] def %(rhs: BigInteger): SafeLong
   private[math] def /%(rhs: BigInteger): (SafeLong, SafeLong)
+  private[math] def equot(rhs: BigInteger): SafeLong
+  private[math] def emod(rhs: BigInteger): SafeLong
+  private[math] def equotmod(rhs: BigInteger): (SafeLong, SafeLong)
   private[math] def &(rhs: BigInteger): SafeLong
   private[math] def |(rhs: BigInteger): SafeLong
   private[math] def ^(rhs: BigInteger): SafeLong
@@ -274,17 +301,26 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
   def *(y: Long): SafeLong =
     Checked.tryOrReturn[SafeLong](SafeLongLong(x * y))(SafeLongBigInteger(BigInteger.valueOf(x) multiply BigInteger.valueOf(y)))
 
-  def /(y: Long): SafeLong =
-    Checked.tryOrReturn[SafeLong](SafeLongLong(x / y))(SafeLong.safe64)
+  def /(y: Long): SafeLong = if (x == Long.MinValue && y == -1L) SafeLong.safe64 else SafeLongLong(x / y)
 
-  def %(y: Long): SafeLong =
-    Checked.tryOrReturn[SafeLong](SafeLongLong(x % y))(SafeLong.zero)
+  def %(y: Long): SafeLong = if (x == Long.MinValue && y == -1L) SafeLong.zero else SafeLongLong(x % y)
 
   def /%(y: Long): (SafeLong, SafeLong) =
     if (x == Long.MinValue && y == -1L)
       (SafeLong.safe64, SafeLong.zero)
     else
       (SafeLongLong(x / y), SafeLongLong(x % y))
+
+  def equotmod(y: Long): (SafeLong, SafeLong) =
+    if (x == Long.MinValue && y == -1L) (SafeLong.safe64, SafeLong.zero)
+    else {
+      val (q, r) = spire.math.equotmod(x, y)
+      (SafeLongLong(q), SafeLongLong(r))
+    }
+  def equot(y: Long): SafeLong = 
+    if (x == Long.MinValue && y == -1L) SafeLong.safe64 else SafeLongLong(spire.math.equot(x, y))
+  def emod(y: Long): SafeLong =
+    if (x == Long.MinValue && y == -1L) SafeLong.zero else SafeLongLong(spire.math.emod(x, y))
 
   def &(y: Long): SafeLong = SafeLongLong(x & y)
   def |(y: Long): SafeLong = SafeLongLong(x | y)
@@ -316,6 +352,22 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
     if (y.bitLength <= 63) this /% y.longValue
     else if (x == Long.MinValue && (y equals SafeLong.big64)) (SafeLong.minusOne, SafeLong.zero)
     else (SafeLong.zero, this)
+
+  def equotmod(y: BigInteger): (SafeLong, SafeLong) =
+    if (y.bitLength <= 63) (this equotmod y.longValue) else {
+      val (q, r) = spire.math.equotmod(BigInteger.valueOf(x), y)
+      (SafeLong(q), SafeLong(r))
+    }
+  def equot(y: BigInteger): SafeLong =
+    if (y.bitLength <= 63) (this equot y.longValue) else {
+      val q = spire.math.equot(BigInteger.valueOf(x), y)
+      SafeLong(q)
+    }
+  def emod(y: BigInteger): SafeLong =
+    if (y.bitLength <= 63) (this emod y.longValue) else {
+      val r = spire.math.emod(BigInteger.valueOf(x), y)
+      SafeLong(r)
+    }
 
   def &(y: BigInteger): SafeLong = SafeLong(BigInteger.valueOf(x) and y)
   def |(y: BigInteger): SafeLong = SafeLong(BigInteger.valueOf(x) or y)
@@ -435,6 +487,10 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
     (SafeLong(q), SafeLong(r))
   }
 
+  def equotmod(y: Long): (SafeLong, SafeLong) = this equotmod(BigInteger.valueOf(y))
+  def equot(y: Long): SafeLong = this equot(BigInteger.valueOf(y))
+  def emod(y: Long): SafeLong = this emod(BigInteger.valueOf(y))
+
   def &(y: Long): SafeLong = SafeLong(x and BigInteger.valueOf(y))
   def |(y: Long): SafeLong = SafeLong(x or BigInteger.valueOf(y))
   def ^(y: Long): SafeLong = SafeLong(x xor BigInteger.valueOf(y))
@@ -455,6 +511,28 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
     val Array(q, r) = x divideAndRemainder y
     (SafeLong(q), SafeLong(r))
   }
+
+  def equotmod(y: BigInteger): (SafeLong, SafeLong) = {
+    val Array(qt, rt) = x.divideAndRemainder(y) // truncated quotient and remainder
+    if (rt.signum >= 0) (SafeLong(qt), SafeLong(rt))
+    else if (y.signum > 0) (SafeLong(qt.subtract(BigInteger.ONE)), SafeLong(rt.add(y)))
+    else (SafeLong(qt.add(BigInteger.ONE)), SafeLong(rt.subtract(y)))
+  }
+
+  def equot(y: BigInteger): SafeLong = {
+    val Array(qt, rt) = x.divideAndRemainder(y) // truncated quotient and remainder
+    if (rt.signum >= 0) SafeLong(qt)
+    else if (y.signum > 0) SafeLong(qt.subtract(BigInteger.ONE))
+    else SafeLong(qt.add(BigInteger.ONE))
+  }
+
+  def emod(y: BigInteger): SafeLong = {
+    val rt = x.remainder(y) // truncated quotient and remainder
+    if (rt.signum >= 0) SafeLong(rt)
+    else if (y.signum > 0) SafeLong(rt.add(y))
+    else SafeLong(rt.subtract(y))
+  }
+
 
   def &(y: BigInteger): SafeLong = SafeLong(x and y)
   def |(y: BigInteger): SafeLong = SafeLong(x or y)
@@ -542,9 +620,9 @@ private[math] trait SafeLongIsGCDRing extends GCDRing[SafeLong] with SafeLongIsC
 
 private[math] trait SafeLongIsEuclideanRing extends EuclideanRing[SafeLong] with SafeLongIsGCDRing {
   def euclideanFunction(a:SafeLong): BigInt = a.abs.toBigInt
-  def equot(a:SafeLong, b:SafeLong): SafeLong = a / b
-  def emod(a:SafeLong, b:SafeLong): SafeLong = a % b
-  override def equotmod(a:SafeLong, b:SafeLong): (SafeLong, SafeLong) = a /% b
+  def equot(a:SafeLong, b:SafeLong): SafeLong = a equot b
+  def emod(a:SafeLong, b:SafeLong): SafeLong = a emod b
+  override def equotmod(a:SafeLong, b:SafeLong): (SafeLong, SafeLong) = a equotmod b
   override def lcm(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a lcm b
   override def gcd(a:SafeLong, b:SafeLong)(implicit ev: Eq[SafeLong]): SafeLong = a gcd b
 }
