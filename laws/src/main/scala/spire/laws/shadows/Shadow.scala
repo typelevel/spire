@@ -70,7 +70,7 @@ abstract class ShadowInstances1 extends ShadowInstances0 {
 
 abstract class ShadowInstances2 extends ShadowInstances1 {
 
-  def additiveAbGroup[A:Eq:AdditiveAbGroup,S:Eq:AdditiveAbGroup](implicit ev: Shadowing[A, S]): AdditiveAbGroup[Shadow[A, S]] =
+  implicit def additiveAbGroup[A:Eq:AdditiveAbGroup,S:Eq:AdditiveAbGroup](implicit ev: Shadowing[A, S]): AdditiveAbGroup[Shadow[A, S]] =
     new ShadowAdditiveAbGroup[A, S] {
       val shadowing = ev
       def A = implicitly
@@ -88,7 +88,7 @@ abstract class ShadowInstances2 extends ShadowInstances1 {
 
 abstract class ShadowInstances3 extends ShadowInstances2 {
 
-  def cSemiring[A:Eq:CSemiring,S:Eq:CSemiring](implicit ev: Shadowing[A, S]): CSemiring[Shadow[A, S]] =
+  implicit def cSemiring[A:Eq:CSemiring,S:Eq:CSemiring](implicit ev: Shadowing[A, S]): CSemiring[Shadow[A, S]] =
     new ShadowCSemiring[A, S] {
       val shadowing = ev
       def A = implicitly
@@ -97,7 +97,7 @@ abstract class ShadowInstances3 extends ShadowInstances2 {
       def eqS = implicitly
     }
   
-  implicit def signedInstance[A:Signed, S:Signed](implicit ev: Shadowing[A, S]): Signed[Shadow[A, S]] =
+  implicit def signed[A:Signed, S:Signed](implicit ev: Shadowing[A, S]): Signed[Shadow[A, S]] =
     new ShadowSigned[A, S] {
       val shadowing = ev
       def A = implicitly
@@ -107,7 +107,7 @@ abstract class ShadowInstances3 extends ShadowInstances2 {
 
 abstract class ShadowInstances4 extends ShadowInstances3 {
 
-  def cRig[A:Eq:CRig,S:Eq:CRig](implicit ev: Shadowing[A, S]): CRig[Shadow[A, S]] =
+  implicit def cRig[A:Eq:CRig,S:Eq:CRig](implicit ev: Shadowing[A, S]): CRig[Shadow[A, S]] =
     new ShadowCRig[A, S] {
       val shadowing = ev
       def A = implicitly
@@ -116,7 +116,7 @@ abstract class ShadowInstances4 extends ShadowInstances3 {
       def eqS = implicitly
     }
 
-  def cRng[A:Eq:CRng,S:Eq:CRng](implicit ev: Shadowing[A, S]): CRng[Shadow[A, S]] =
+  implicit def cRng[A:Eq:CRng,S:Eq:CRng](implicit ev: Shadowing[A, S]): CRng[Shadow[A, S]] =
     new ShadowCRng[A, S] {
       val shadowing = ev
       def A = implicitly
@@ -136,7 +136,7 @@ abstract class ShadowInstances4 extends ShadowInstances3 {
 
 abstract class ShadowInstances5 extends ShadowInstances4 {
 
-  def cRing[A:Eq:CRing,S:Eq:CRing](implicit ev: Shadowing[A, S]): CRing[Shadow[A, S]] =
+  implicit def cRing[A:Eq:CRing,S:Eq:CRing](implicit ev: Shadowing[A, S]): CRing[Shadow[A, S]] =
     new ShadowCRing[A, S] {
       val shadowing = ev
       def A = implicitly
@@ -148,7 +148,7 @@ abstract class ShadowInstances5 extends ShadowInstances4 {
 
 abstract class ShadowInstances6 extends ShadowInstances5 {
 
-  def gcdRing[A:Eq:GCDRing,S:Eq:GCDRing](implicit ev: Shadowing[A, S]): GCDRing[Shadow[A, S]] =
+  implicit def gcdRing[A:Eq:GCDRing,S:Eq:GCDRing](implicit ev: Shadowing[A, S]): GCDRing[Shadow[A, S]] =
     new ShadowGCDRing[A, S] {
       val shadowing = ev
       def A = implicitly
@@ -160,7 +160,7 @@ abstract class ShadowInstances6 extends ShadowInstances5 {
 
 abstract class ShadowInstances7 extends ShadowInstances6 {
   
-  def euclideanRing[A:Eq:EuclideanRing,S:Eq:EuclideanRing](implicit ev: Shadowing[A, S]): EuclideanRing[Shadow[A, S]] =
+  implicit def euclideanRing[A:Eq:EuclideanRing,S:Eq:EuclideanRing](implicit ev: Shadowing[A, S]): EuclideanRing[Shadow[A, S]] =
     new ShadowEuclideanRing[A, S] {
       val shadowing = ev
       def A = implicitly

@@ -7,23 +7,20 @@ import spire.algebra.{Eq, EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, 
 import spire.util.Opt
 
 trait BigIntegerIsEuclideanRing extends EuclideanRing[BigInteger] {
-  override def minus(a:BigInteger, b:BigInteger): BigInteger = a subtract b
-  def negate(a:BigInteger): BigInteger = a.negate
+  override def minus(a: BigInteger, b: BigInteger): BigInteger = a subtract b
+  def negate(a: BigInteger): BigInteger = a.negate
   def one: BigInteger = BigInteger.ONE
-  def plus(a:BigInteger, b:BigInteger): BigInteger = a add b
-  override def pow(a:BigInteger, b:Int): BigInteger = a pow b
-  override def times(a:BigInteger, b:BigInteger): BigInteger = a multiply b
+  def plus(a: BigInteger, b: BigInteger): BigInteger = a add b
+  override def pow(a: BigInteger, b: Int): BigInteger = a pow b
+  override def times(a: BigInteger, b: BigInteger): BigInteger = a multiply b
   def zero: BigInteger = BigInteger.ZERO
 
   override def fromInt(n: Int): BigInteger = BigInteger.valueOf(n)
 
-  def euclideanFunction(a:BigInteger): BigInt = BigInt(a).abs
-  def equot(a:BigInteger, b:BigInteger): BigInteger = a divide b
-  def emod(a:BigInteger, b:BigInteger): BigInteger = a remainder b
-  override def equotmod(a:BigInteger, b:BigInteger): (BigInteger, BigInteger) = {
-    val Array(d, r) = a.divideAndRemainder(b)
-    (d, r)
-  }
+  def euclideanFunction(a: BigInteger): BigInt = BigInt(a).abs
+  override def equotmod(a: BigInteger, b: BigInteger): (BigInteger, BigInteger) = spire.math.equotmod(a, b)
+  def equot(a: BigInteger, b: BigInteger): BigInteger = spire.math.equot(a, b)
+  def emod(a: BigInteger, b: BigInteger): BigInteger = spire.math.emod(a, b)
   def gcd(a:BigInteger, b:BigInteger)(implicit ev: Eq[BigInteger]): BigInteger = a.gcd(b)
   def lcm(a:BigInteger, b:BigInteger)(implicit ev: Eq[BigInteger]): BigInteger =
     if (a.signum == 0 || b.signum == 0) zero else a.divide(a.gcd(b)).multiply(b)

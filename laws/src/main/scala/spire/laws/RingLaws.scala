@@ -208,6 +208,16 @@ trait RingLaws[A] extends GroupLaws[A] {
     }
   )
 
+  def integerEuclideanRing(implicit A: EuclideanRing[A], S: Signed[A]) = RingProperties.fromParent(
+    name = "integer euclidean ring",
+    parent = euclideanRing,
+    "remainder is nonnegative" → forAllSafe { (x: A, y: A) =>
+      import spire.syntax.euclideanRing._
+      import spire.syntax.signed._
+      !pred(y) || (x emod y).isSignNonNegative
+    }
+  )
+
   // Everything below fields (e.g. rings) does not require their multiplication
   // operation to be a group. Hence, we do not check for the existence of an
   // inverse. On the other hand, fields require their multiplication to be an

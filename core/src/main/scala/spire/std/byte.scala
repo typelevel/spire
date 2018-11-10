@@ -17,8 +17,9 @@ trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
   override def fromInt(n: Int): Byte = n.toByte
 
   def euclideanFunction(a:Byte): BigInt = BigInt(a).abs
-  def equot(a: Byte, b: Byte): Byte = (a / b).toByte
-  def emod(a: Byte, b: Byte): Byte = (a % b).toByte
+  override def equotmod(a: Byte, b: Byte): (Byte, Byte) = spire.math.equotmod(a, b)
+  def equot(a: Byte, b: Byte): Byte = spire.math.equot(a, b)
+  def emod(a: Byte, b: Byte): Byte = spire.math.emod(a, b)
   def gcd(a: Byte, b: Byte)(implicit ev: Eq[Byte]): Byte = spire.math.gcd(a, b).toByte
   def lcm(a: Byte, b: Byte)(implicit ev: Eq[Byte]): Byte = spire.math.lcm(a, b).toByte
 }
