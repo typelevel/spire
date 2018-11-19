@@ -126,22 +126,23 @@ case class PolySparse[@sp(Double) C] private [spire](val exp: Array[Int], val co
     sum
   }
 
-  def derivative(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] = {
-    val i0 = if (exp(0) == 0) 1 else 0
-    val es = new Array[Int](exp.length - i0)
-    val cs = new Array[C](es.length)
+  def derivative(implicit ring: Ring[C], eq: Eq[C]): Polynomial[C] =
+    if (exp.length == 0) this else {
+      val i0 = if (exp(0) == 0) 1 else 0
+      val es = new Array[Int](exp.length - i0)
+      val cs = new Array[C](es.length)
 
-    @tailrec
-    def loop(i: Int, j: Int): Unit = if (j < es.length) {
-      val e = exp(i)
-      es(j) = e - 1
-      cs(j) = e * coeff(i)
-      loop(i + 1, j + 1)
+      @tailrec
+      def loop(i: Int, j: Int): Unit = if (j < es.length) {
+        val e = exp(i)
+        es(j) = e - 1
+        cs(j) = e * coeff(i)
+        loop(i + 1, j + 1)
+      }
+
+      loop(i0, 0)
+      PolySparse.safe(es, cs)
     }
-
-    loop(i0, 0)
-    PolySparse.safe(es, cs)
-  }
 
   def integral(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = {
     val es = new Array[Int](exp.length)
