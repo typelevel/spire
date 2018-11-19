@@ -413,4 +413,11 @@ class PolynomialTest extends FunSuite {
       .foldLeft(Polynomial.zero[Rational])(_ + _)
     assert(Polynomial(terms) === expected)
   }
+
+  test("Derivative of constant zero polynomial is itself") {
+    val polynomial: Polynomial[Rational] = Polynomial.constant(Rational.zero)
+    val derivative = polynomial.derivative
+    assert(polynomial === derivative)
+  }
+
 }
