@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 import spire.implicits._
 import spire.math.Rational
 import spire.math.BinaryMerge
@@ -21,3 +21,4 @@ object MergeBenchmark extends App {
   val bi = (1000 until 1001).toArray
   th.pbenchOffWarm("binary merge vs. linear merge (Int)")(th.Warm(LinearMerge.merge(ai,bi)))(th.Warm(BinaryMerge.merge(ai,bi)))
 }
+*/

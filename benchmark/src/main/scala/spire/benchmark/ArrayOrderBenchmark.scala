@@ -1,7 +1,7 @@
 package spire
 package benchmark
 
-
+/*
 import scala.util.Random
 import Random._
 
@@ -74,3 +74,4 @@ class ArrayOrderBenchmarks extends MyBenchmark {
   def timeAddIndirect(reps: Int) = run(reps) { indirectAdd(a, b) }
   def timeAddDirect(reps: Int) = run(reps) { directAdd(a, b) }
 }
+*/

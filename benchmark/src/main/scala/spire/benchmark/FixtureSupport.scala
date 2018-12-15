@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 import spire.math.Complex
 
 
@@ -38,3 +38,4 @@ trait FixtureSupport {
   def nextComplex = Complex(nextDouble, nextDouble)
 
 }
+*/

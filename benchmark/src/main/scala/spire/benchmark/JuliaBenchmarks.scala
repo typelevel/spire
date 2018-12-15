@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 import spire.implicits._
 import spire.math._
 
@@ -94,3 +94,4 @@ class JuliaBenchmarks extends MyBenchmark {
     total
   }
 }
+*/

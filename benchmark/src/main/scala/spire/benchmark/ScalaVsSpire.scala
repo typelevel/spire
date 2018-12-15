@@ -8,7 +8,7 @@ import spire.algebra._
 import spire.std.any._
 
 import scala.math.{Numeric => ScalaN}
-
+/*
 import com.google.caliper.Param
 
 object ScalaVsSpireBenchmarks extends MyRunner(classOf[ScalaVsSpireBenchmarks])
@@ -229,3 +229,4 @@ class ScalaVsSpireBenchmarks extends MyBenchmark {
 //  @tailrec final def gcd[A: Integral](a: A, b: A): A =
 //    if (a % b == implicitly[Integra[A]].zero) b else gcd(b, a % b)
 //}
+*/

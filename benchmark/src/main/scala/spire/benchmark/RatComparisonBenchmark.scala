@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 import scala.util.Random
 import Random._
 
@@ -153,3 +153,4 @@ class RatComparisonBenchmarks extends MyBenchmark {
     total
   }
 }
+*/
