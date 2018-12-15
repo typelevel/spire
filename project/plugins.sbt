@@ -13,4 +13,10 @@ addSbtPlugin("org.scala-js"        % "sbt-scalajs"           % "0.6.23")
 addSbtPlugin("org.tpolecat"        % "tut-plugin"            % "0.6.3")
 addSbtPlugin("net.virtual-void"    % "sbt-dependency-graph"  % "0.9.0")
 addSbtPlugin("org.portable-scala"  % "sbt-scalajs-crossproject" % "0.5.0")
+addSbtPlugin("com.47deg"           % "sbt-microsites"        % "0.7.21")
 libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.7.12"
+
+
+addSbtPlugin("org.foundweekends" % "sbt-bintray" % "0.5.4")
+addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.8")
+addSbtPlugin("com.eed3si9n"      % "sbt-unidoc"  % "0.4.1")

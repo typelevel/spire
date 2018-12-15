@@ -132,9 +132,11 @@ lazy val extrasJVM = extras.jvm
 lazy val extrasJS = extras.js
 
 lazy val docs = project.in(file("docs"))
+  .enablePlugins(MicrositesPlugin)
   .dependsOn(macrosJVM, coreJVM, extrasJVM)
   .settings(moduleName := "spire-docs")
   .settings(spireSettings:_*)
+//  .settings(docSettings: _*)
   .settings(noPublishSettings)
   .enablePlugins(TutPlugin)
   .settings(commonJvmSettings:_*)
@@ -309,6 +311,73 @@ lazy val commonJvmSettings = Seq(
   testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF")
 )
 
+/*
+lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
+
+/**
+  * Remove 2.10 projects from doc generation, as the macros used in the projects
+  * cause problems generating the documentation on scala 2.10. As the APIs for 2.10
+ * and 2.11 are the same this has no effect on the resultant documentation, though
+  * it does mean that the scaladocs cannot be generated when the build is in 2.10 mode.
+  */
+def docsSourcesAndProjects(sv: String): (Boolean, Seq[ProjectReference]) =
+  CrossVersion.partialVersion(sv) match {
+    case Some((2, 10)) => (false, Nil)
+    case _ => (true, Seq(core, matlab, jOptimizer, mosek))
+  }
+
+lazy val docSettings = Seq(
+  micrositeName := "SymDPoly",
+  micrositeDescription := "Symmetry-adapted moment relaxations for noncommutative polynomial optimization",
+  micrositeAuthor := "Denis Rosset",
+  micrositeHighlightTheme := "atom-one-light",
+  micrositeHomepage := "http://denisrosset.github.io/symdpoly",
+  micrositeBaseUrl := "symdpoly",
+  micrositeDocumentationUrl := "/symdpoly/api/net/alasc/symdpoly/index.html",
+  micrositeDocumentationLabelDescription := "API Documentation",
+  micrositeGithubOwner := "denisrosset",
+  micrositeGithubRepo := "symdpoly",
+  micrositePalette := Map(
+    "brand-primary" -> "#5B5988",
+    "brand-secondary" -> "#292E53",
+    "brand-tertiary" -> "#222749",
+    "gray-dark" -> "#49494B",
+    "gray" -> "#7B7B7E",
+    "gray-light" -> "#E5E5E6",
+    "gray-lighter" -> "#F4F3F4",
+    "white-color" -> "#FFFFFF"),
+  micrositeConfigYaml := ConfigYml(
+    yamlCustomProperties = Map(
+      "symdpolyVersion"    -> version.value,
+      "spireVersion"    -> spireVersion,
+      "scalaVersion"  -> scalaVersion.value
+    )
+  ),
+  autoAPIMappings := true,
+  unidocProjectFilter in (ScalaUnidoc, unidoc) :=
+    inProjects(docsSourcesAndProjects(scalaVersion.value)._2:_*),
+  docsMappingsAPIDir := "api",
+  addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
+  ghpagesNoJekyll := false,
+  fork := true,
+  javaOptions += "-Xmx4G", // to have enough memory in forks
+//  fork in tut := true,
+//  fork in (ScalaUnidoc, unidoc) := true,
+  scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
+    "-Xfatal-warnings",
+    "-groups",
+    "-doc-source-url", scmInfo.value.get.browseUrl + "/tree/master€{FILE_PATH}.scala",
+    "-sourcepath", baseDirectory.in(LocalRootProject).value.getAbsolutePath,
+    "-diagrams"
+  ),
+  scalacOptions in Tut ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))),
+  git.remoteRepo := "git@github.com:denisrosset/symdpoly.git",
+  includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md" | "*.svg",
+  includeFilter in Jekyll := (includeFilter in makeSite).value
+)
+ */
+
+
 lazy val publishSettings = Seq(
   homepage := Some(url("http://spire-math.org")),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
@@ -354,7 +423,6 @@ lazy val benchmarkSettings = Seq(
     // caliper stuff
     "com.google.guava" % "guava" %  "18.0",
     "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" %  "2.1",
-    "com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" from "http://plastic-idolatry.com/jars/caliper-1.0-SNAPSHOT.jar",
     "com.google.code.gson" % "gson" % "1.7.2"
   ),
 
