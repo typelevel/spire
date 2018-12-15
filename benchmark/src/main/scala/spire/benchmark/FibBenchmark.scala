@@ -6,7 +6,7 @@ import spire.math._
 import spire.implicits._
 
 import java.math.BigInteger
-
+/*
 object BigIntegerIsRig extends Rig[BigInteger] {
   def zero: BigInteger = new BigInteger("0")
   def one: BigInteger = new BigInteger("1")
@@ -134,3 +134,4 @@ class FibBenchmarks extends MyBenchmark {
     loop(n, BigInt(0), BigInt(1))
   }
 }
+*/

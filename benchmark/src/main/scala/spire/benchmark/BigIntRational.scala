@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 object BigIntRational {
   val Zero = new BigIntRational(0, 1)
   val One = new BigIntRational(1, 1)
@@ -89,3 +89,4 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
 
   def signum: Int = n.signum
 }
+*/

@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 import spire.implicits._
 
 object LongRational {
@@ -97,3 +97,4 @@ final class LongRational private (val n: Long, val d: Long) {
 }
 
 
+*/

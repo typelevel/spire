@@ -1,7 +1,7 @@
 package spire
 package benchmark
 
-
+/*
 import scala.util.Random
 import Random._
 
@@ -42,3 +42,4 @@ class Mo5Benchmarks extends MyBenchmark {
     a.length
   }
 }
+*/

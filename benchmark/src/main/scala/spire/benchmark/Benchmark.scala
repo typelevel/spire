@@ -1,7 +1,7 @@
 package spire
 package benchmark
 
-
+/*
 import scala.util.Random
 import Random._
 
@@ -47,3 +47,4 @@ trait BenchmarkData extends MyBenchmark {
   lazy val complexes = init(size)(nextComplex)
   lazy val fcomplexes = init(size)(FastComplex(nextFloat(), nextFloat()))
 }
+*/

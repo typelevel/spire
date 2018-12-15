@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 import spire.macros.Checked
 import com.google.caliper.Param
 
@@ -59,3 +59,4 @@ class CheckedBenchmarks extends MyBenchmark {
     sum
   }
 }
+*/

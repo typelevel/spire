@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 import scala.util.Random
 import Random._
 
@@ -185,3 +185,4 @@ class PolynomialBenchmarks extends MyBenchmark {
   def timeQuotModSpireDoublePolysDense(reps: Int) = run(reps)(quotModSpireDoublePolynomials(spireDenseDoublePolys))
 
 }
+*/
