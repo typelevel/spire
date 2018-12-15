@@ -690,7 +690,7 @@ class IntervalSintaxyTest extends FunSuite{
   test( "a ∩ c is e"){assert((a ∩ c) === e)}
 
 
-  test( "a ∪ c is [-1.0, 6.0]"){assert((a ∪ c) === cc(-1.0, 6.0))}
+  test( "a ∪ c is [-1.0, 6.0)"){assert((a ∪ c) === co(-1.0, 6.0))}
   test( "a ∪ e is a"){assert((a ∪ e) === a)}
   test( "a ∪ all is all"){assert((a ∪ all) === all)}
 
@@ -705,7 +705,7 @@ class IntervalSintaxyTest extends FunSuite{
 
   test( "e ⊃ a is false"){assert((e ⊃ a) === false)}
   test( "d ⊃ a is false"){assert((d ⊃ a) === false)}
-  test( "b ⊃ a is true"){assert((b ⊃ a) === true)}
+  test( "b ⊃ a is false"){assert((b ⊃ a) === false)}
 
   test( "e ⊆ a is true"){assert((e ⊆ a) === true)}
   test( "d ⊆ a is true"){assert((d ⊆ a) === true)}
@@ -713,7 +713,7 @@ class IntervalSintaxyTest extends FunSuite{
 
   test( "e ⊇ a is false"){assert((e ⊇ a) === false)}
   test( "d ⊇ a is false"){assert((d ⊇ a) === false)}
-  test( "b ⊇ a is true"){assert((b ⊇ a) === true)}
+  test( "b ⊇ a is false"){assert((b ⊇ a) === false)}
 
 
 }
