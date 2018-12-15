@@ -771,10 +771,13 @@ supports roots and trigonometric functions. Furthermore, important
 trig identities are also preserved:
 
 ```tut
+import spire.implicits._
 import spire.math.Real
+
 import Real.{sin, cos}
-def circle(a: Real): Real = (cos(a).pow(2) + sin(a).pow(2)).sqrt
+
 // will return Real(1) no matter what value is provided
+def circle(a: Real): Real = (cos(a).pow(2) + sin(a).pow(2)).sqrt
 ```
 
 One interesting consequence of the design of computable real numbers
