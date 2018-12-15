@@ -347,15 +347,6 @@ lazy val benchmarkSettings = Seq(
     "org.apfloat" % "apfloat" % apfloatVersion,
     "org.jscience" % "jscience" % jscienceVersion,
     "org.apache.commons" % "commons-math3" % apacheCommonsMath3Version,
-
-    // thyme
-    "ichi.bench" % "thyme" %  "0.1.0" from "http://plastic-idolatry.com/jars/thyme-0.1.0.jar",
-
-    // caliper stuff
-    "com.google.guava" % "guava" %  "18.0",
-    "com.google.code.java-allocation-instrumenter" % "java-allocation-instrumenter" %  "2.1",
-    "com.google.code.caliper" % "caliper" % "1.0-SNAPSHOT" from "http://plastic-idolatry.com/jars/caliper-1.0-SNAPSHOT.jar",
-    "com.google.code.gson" % "gson" % "1.7.2"
   ),
 
   // enable forking in run

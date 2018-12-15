@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 import spire.implicits._
 
 object RandomBenchmarks extends MyRunner(classOf[RandomBenchmarks])
@@ -650,3 +650,4 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
     cfor(0)(_ < nextLen, _ + 1)(_ => rng.fillBytes(bytes))
   }
 }
+*/

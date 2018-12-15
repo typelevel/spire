@@ -1,7 +1,7 @@
 package spire
 package benchmark
 
-
+/*
 import spire.implicits._
 import spire.math._
 
@@ -100,3 +100,4 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
     ai(k)
   }
 }
+*/

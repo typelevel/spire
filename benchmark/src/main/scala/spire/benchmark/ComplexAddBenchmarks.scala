@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 import scala.util.Random
 import Random._
 
@@ -73,3 +73,4 @@ class ComplexAddBenchmarks extends MyBenchmark {
   def timeAddFloatComplexesBoxed(reps:Int) = run(reps)(addFloatComplexesBoxed(fcs))
   def timeAddFloatComplexesUnboxed(reps:Int) = run(reps)(addFloatComplexesUnboxed(longs))
 }
+*/

@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 
 import scala.util.Random
 import Random._
@@ -75,3 +75,4 @@ class PowBenchmarks extends MyBenchmark {
     t
   }
 }
+*/

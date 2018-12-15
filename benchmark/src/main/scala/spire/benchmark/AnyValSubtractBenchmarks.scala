@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 import scala.util.Random
 import Random._
 
@@ -100,3 +100,4 @@ class AnyValSubtractBenchmarks extends MyBenchmark {
   def timeSubtractDoublesDirect(reps:Int) = run(reps)(subtractDoublesDirect(doubles))
   def timeSubtractDoublesGeneric(reps:Int) = run(reps)(subtractGeneric(doubles))
 }
+*/

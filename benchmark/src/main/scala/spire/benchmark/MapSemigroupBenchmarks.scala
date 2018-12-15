@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 import spire.algebra._
 import spire.implicits._
 
@@ -123,3 +123,4 @@ class MapSemigroupBenchmarks extends MyBenchmark with BenchmarkData {
     }
   }
 }
+*/

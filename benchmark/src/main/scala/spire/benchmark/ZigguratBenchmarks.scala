@@ -16,7 +16,7 @@ package spire
 package benchmark
 
 import spire.implicits._
-
+/*
 /**
  * This is a benchmark comparing Marsaglias Polar Method implementation with the implementation of his Ziggurat algorithm.
  *
@@ -63,3 +63,4 @@ class ZigguratBenchmarks extends MyBenchmark with BenchmarkData {
     cfor(0)(_ < nextLen, _ + 1)(_ => t += spire.random.Ziggurat.rexp(rng))
   }
 }
+*/
