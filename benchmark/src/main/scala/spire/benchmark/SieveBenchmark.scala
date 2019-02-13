@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 import spire.math.prime._
 import scala.util.{Success, Try}
 
@@ -47,3 +47,4 @@ object SieveBenchmark {
     ns.foreach(n => timer("  sieve.nth (%s)" format n)(nth(n)))
   }
 }
+*/

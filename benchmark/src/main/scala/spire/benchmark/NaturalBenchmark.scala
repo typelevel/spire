@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 
 import scala.util.Random
 
@@ -58,3 +58,4 @@ class NaturalBenchmarks extends MyBenchmark {
   def timeBigIntMin(reps: Int) = run(reps)(bigints.qmin)
   def timeSafeLongMin(reps: Int) = run(reps)(safes.qmin)
 }
+*/

@@ -1,6 +1,6 @@
 package spire
 package benchmark
-
+/*
 import com.google.caliper.Param
 
 import java.math.MathContext.UNLIMITED
@@ -77,3 +77,4 @@ class FpFilterBenchmark extends MyBenchmark {
   def timeBigDecimal(reps: Int) = run(reps)(findSign(Orient2.slow))
   def timeFpFilter(reps: Int) = run(reps)(findSign(Orient2.fast))
 }
+*/

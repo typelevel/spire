@@ -1,7 +1,7 @@
 package spire
 package benchmark
 
-
+/*
 import scala.util.Random
 
 import spire.math._
@@ -119,3 +119,4 @@ class RationalBenchmarks extends MyBenchmark with BenchmarkData {
   def timeLongRationalSum(reps: Int) = run(reps)(longSum(longRats))
   def timeLongRationalProd(reps: Int) = run(reps)(longProd(longRats))
 }
+*/

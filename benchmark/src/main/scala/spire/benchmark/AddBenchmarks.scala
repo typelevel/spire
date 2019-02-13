@@ -4,7 +4,7 @@ package benchmark
 import spire.algebra._
 import spire.math._
 import spire.implicits._
-
+/*
 object AddBenchmarks extends MyRunner(classOf[AddBenchmarks])
 
 class AddBenchmarks extends MyBenchmark with BenchmarkData {
@@ -80,3 +80,4 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
   def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))
   def timeAddFastComplexes(reps:Int) = run(reps)(addFastComplexes(fcomplexes))
 }
+*/
