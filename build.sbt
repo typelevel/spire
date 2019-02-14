@@ -52,7 +52,6 @@ lazy val platform = crossProject(JSPlatform, JVMPlatform)
   .settings(moduleName := "spire-platform")
   .settings(spireSettings:_*)
   .settings(crossVersionSharedSources:_*)
-  .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
   .dependsOn(macros, util)
@@ -76,7 +75,6 @@ lazy val data = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-data")
   .settings(spireSettings:_*)
   .settings(crossVersionSharedSources:_*)
-  .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
 
@@ -87,7 +85,6 @@ lazy val legacy = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure
   .settings(moduleName := "spire-legacy")
   .settings(spireSettings:_*)
   .settings(crossVersionSharedSources:_*)
-  .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
 
@@ -98,7 +95,6 @@ lazy val util = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-util")
   .settings(spireSettings:_*)
   .settings(crossVersionSharedSources:_*)
-  .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
   .dependsOn(macros)
@@ -124,7 +120,6 @@ lazy val extras = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure
   .settings(spireSettings:_*)
   .settings(extrasSettings:_*)
   .settings(crossVersionSharedSources:_*)
-  .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
   .dependsOn(macros, platform, util, core, data)
@@ -134,8 +129,10 @@ lazy val extrasJS = extras.js
 
 lazy val docs = project.in(file("docs"))
   .enablePlugins(MicrositesPlugin)
+  .enablePlugins(ScalaUnidocPlugin)
   .dependsOn(macrosJVM, coreJVM, extrasJVM)
   .settings(moduleName := "spire-docs")
+  .settings(commonSettings:_*)
   .settings(spireSettings:_*)
   .settings(docSettings: _*)
   .settings(noPublishSettings)
@@ -312,18 +309,45 @@ lazy val commonJvmSettings = Seq(
   testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF")
 )
 
-// TODO: restore for UniDoc
-// lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
+lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
 
 lazy val docSettings = Seq(
+  scalacOptions in Tut := (scalacOptions in Tut).value.filterNot(Set("-Ywarn-unused-imports", "-Xlint").contains),
   micrositeName := "Spire",
   micrositeDescription := "Powerful new number types and numeric abstractions for Scala",
   micrositeAuthor := "Spire contributors",
   micrositeHighlightTheme := "atom-one-light",
   micrositeHomepage := "http://denisrosset.github.io/spire",
   micrositeBaseUrl := "spire",
-//  micrositeDocumentationUrl := "/symdpoly/api/net/alasc/symdpoly/index.html",
-//  micrositeDocumentationLabelDescription := "API Documentation",
+  micrositeDocumentationUrl := "/spire/api/spire/index.html",
+  micrositeDocumentationLabelDescription := "API Documentation",
+  micrositeExtraMdFiles := Map(
+    file("AUTHORS.md") -> ExtraMdFileConfig(
+      "authors.md",
+      "home",
+      Map("title" -> "Authors", "section" -> "Home", "position" -> "5")
+    ),
+    file("CHANGES.md") -> ExtraMdFileConfig(
+      "changes.md",
+      "home",
+      Map("title" -> "Changes", "section" -> "Home", "position" -> "2")
+    ),
+    file("CONTRIBUTING.md") -> ExtraMdFileConfig(
+      "contributing.md",
+      "home",
+      Map("title" -> "Contributing", "section" -> "Home", "position" -> "3")
+    ),
+    file("DESIGN.md") -> ExtraMdFileConfig(
+      "design.md",
+      "home",
+      Map("title" -> "Design notes", "section" -> "Home", "position" -> "4")
+    ),
+    file("FRIENDS.md") -> ExtraMdFileConfig(
+      "friends.md",
+      "home",
+      Map("title" -> "Friends of Spire", "section" -> "Home", "position" -> "6")
+    )
+  ),
   micrositeGithubOwner := "denisrosset",
   micrositeGithubRepo := "spire",
   micrositePalette := Map(
@@ -341,18 +365,17 @@ lazy val docSettings = Seq(
       "scalaVersion"  -> scalaVersion.value
     )
   ),
-//  autoAPIMappings := true,
-//  unidocProjectFilter in (ScalaUnidoc, unidoc) :=
-//    inProjects(docsSourcesAndProjects(scalaVersion.value)._2:_*),
-//  docsMappingsAPIDir := "api",
-//  addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
+  autoAPIMappings := true,
+  unidocProjectFilter in (ScalaUnidoc, unidoc) :=
+    inProjects(platformJVM, macrosJVM, dataJVM, legacyJVM, utilJVM, coreJVM, extrasJVM, lawsJVM),
+  docsMappingsAPIDir := "api",
+  addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
   ghpagesNoJekyll := false,
   fork := true,
   javaOptions += "-Xmx4G", // to have enough memory in forks
 //  fork in tut := true,
 //  fork in (ScalaUnidoc, unidoc) := true,
   scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
-    "-Xfatal-warnings",
     "-groups",
     "-doc-source-url", scmInfo.value.get.browseUrl + "/tree/master€{FILE_PATH}.scala",
     "-sourcepath", baseDirectory.in(LocalRootProject).value.getAbsolutePath,

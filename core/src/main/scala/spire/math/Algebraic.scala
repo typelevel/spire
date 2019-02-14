@@ -1281,16 +1281,18 @@ object Algebraic extends AlgebraicInstances {
   case object LiYap extends ZeroBoundFunction {
     import Expr._
 
+    /**
+      * @param lc      Bound on the leading coefficient.
+      * @param tc      Bound on the trailing coefficient.
+      * @param measure Bound on the measure.
+      * @param lb      Lower bound on the value.
+      * @param ub      Upper bound on the value.
+      */
     final case class Bound(
-      /** Bound on the leading coefficient. */
       lc: Long,
-      /** Bound on the trailing coefficient. */
       tc: Long,
-      /** Bound on the measure. */
       measure: Long,
-      /** Lower bound on the value. */
       lb: Long,
-      /** Upper bound on the value. */
       ub: Long
     ) {
       def getBitBound(degreeBound: Long): Long = checked {
