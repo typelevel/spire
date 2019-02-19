@@ -220,6 +220,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
     Interval.fromBounds(maxLower(lhs.lowerBound, rhs.lowerBound, true),
       minUpper(lhs.upperBound, rhs.upperBound, true))
 
+  /* Compute the set complementary to this interval. That set is return as a possibly empty list of non-empty intervals */
   def unary_~(implicit o: Order[A]): List[Interval[A]] =
     this match {
       case All() =>
@@ -238,6 +239,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
         List(Below(lower, lx), Above(upper, ux))
     }
 
+  /* Returns the list of disjoint non-empty intervals resulting from the exclusion of the interval with rhs */
   def --(rhs: Interval[A])(implicit o: Order[A]): List[Interval[A]] =
     if (lhs intersects rhs) {
       (~rhs).map(lhs & _).filter(_.nonEmpty)
@@ -639,20 +641,31 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
 
   // optional unicode operators
 
+  /* Indicates whether the interval contains rhs */
   def ∋(rhs: A)(implicit o: Order[A]): Boolean = lhs contains rhs
+  /* Indicates whether the interval doesn't contain rhs */
   def ∌(rhs: A)(implicit o: Order[A]): Boolean = !(lhs contains rhs)
 
+  /* Indicates whether a is contained in the interval */
   def ∈:(a: A)(implicit o: Order[A]): Boolean = lhs contains a
+  /* Indicates whether a is not contained in the interval */
   def ∉:(a: A)(implicit o: Order[A]): Boolean = !(lhs contains a)
 
+  /* Returns the intersection of the interval with rhs */
   def ∩(rhs: Interval[A])(implicit o: Order[A]): Interval[A] = lhs intersect rhs
+  /* Returns the union of the interval with rhs */
   def ∪(rhs: Interval[A])(implicit o: Order[A]): Interval[A] = lhs union rhs
+  /* Returns the list of disjoint non-empty intervals resulting from the exclusion of the interval with rhs */
   def \(rhs: Interval[A])(implicit o: Order[A]): List[Interval[A]] = lhs -- rhs
 
+  /* Indicates whether the interval is a strict subset of rhs */
   def ⊂(rhs: Interval[A])(implicit o: Order[A]): Boolean = lhs isProperSubsetOf rhs
+  /* Indicates whether rhs is a strict subset of the interval*/
   def ⊃(rhs: Interval[A])(implicit o: Order[A]): Boolean = lhs isProperSupersetOf rhs
 
+  /* Indicates whether rhs is a subset of the interval */
   def ⊆(rhs: Interval[A])(implicit o: Order[A]): Boolean = lhs isSubsetOf rhs
+  /* Indicates whether rhs is a subset of the interval */
   def ⊇(rhs: Interval[A])(implicit o: Order[A]): Boolean = lhs isSupersetOf rhs
 
   // xyz

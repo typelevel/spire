@@ -346,7 +346,7 @@ lazy val benchmarkSettings = Seq(
     // comparisons
     "org.apfloat" % "apfloat" % apfloatVersion,
     "org.jscience" % "jscience" % jscienceVersion,
-    "org.apache.commons" % "commons-math3" % apacheCommonsMath3Version,
+    "org.apache.commons" % "commons-math3" % apacheCommonsMath3Version
   ),
 
   // enable forking in run

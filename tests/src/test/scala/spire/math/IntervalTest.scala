@@ -649,3 +649,71 @@ class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPr
     }
   }
 }
+
+class IntervalSyntaxTest extends FunSuite{
+  def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)
+  def co(n1: Double, n2: Double) = Interval.openUpper(n1, n2)
+  def oc(n1: Double, n2: Double) = Interval.openLower(n1, n2)
+  def oo(n1: Double, n2: Double) = Interval.open(n1, n2)
+
+  val e = Interval.empty[Double]
+  val all = Interval.all[Double]
+
+  val a = cc(-1.0, 4)
+  test( "a ∋ 0.0 is true"){assert((a ∋ 0.0) === true)}
+  test( "a ∋ -1.0 is true"){assert((a ∋ -1.0) === true)}
+  test( "a ∋ 4.0 is true"){assert((a ∋ 4.0) === true)}
+  test( "a ∋ 5 is false"){assert((a ∋ 5.0) === false)}
+  test( "a ∋ -2 is false"){assert((a ∋ -2.0) === false)}
+
+  test( "a ∌ 0.0 is false"){assert((a ∌ 0.0) === false)}
+  test( "a ∌ -1.0 is false"){assert((a ∌ -1.0) === false)}
+  test( "a ∌ 4.0 is false"){assert((a ∌ 4.0) === false)}
+  test( "a ∌ 5 is true"){assert((a ∌ 5.0) === true)}
+  test( "a ∌ -2 is true"){assert((a ∌ -2.0) === true)}
+
+  test( "0.0 ∈: a is true"){assert((0.0 ∈: a) === true)}
+  test( "-1.0 ∈: a is true"){assert((-1.0 ∈: a) === true)}
+  test( "4.0 ∈: a is true"){assert((4.0 ∈: a) === true)}
+  test( "5 ∈: a is false"){assert((5.0 ∈: a) === false)}
+  test( "-2 ∈: a is false"){assert((-2.0 ∈: a) === false)}
+
+  test( "0.0 ∉: a is false"){assert((0.0 ∉: a) === false)}
+  test( "-1.0 ∉: a is false"){assert((-1.0 ∉: a) === false)}
+  test( "4.0 ∉: a is false"){assert((4.0 ∉: a) === false)}
+  test( "5 ∉: a is true"){assert((5.0 ∉: a) === true)}
+  test( "-2 ∉: a is true"){assert((-2.0 ∉: a) === true)}
+
+  val b = oc(2.0, 6.0)
+  val c = oo(4.0, 6.0)
+  test( "a ∩ b is (2.0, 4.0]"){assert((a ∩ b) === oc(2.0, 4.0))}
+  test( "a ∩ c is e"){assert((a ∩ c) === e)}
+
+
+  test( "a ∪ c is [-1.0, 6.0)"){assert((a ∪ c) === co(-1.0, 6.0))}
+  test( "a ∪ e is a"){assert((a ∪ e) === a)}
+  test( "a ∪ all is all"){assert((a ∪ all) === all)}
+
+  test( "a \\ all is e"){assert((a \ all) === List())}
+  test( "a \\ b is [-1.0, 2.0]"){assert((a \ b) === List(cc(-1.0, 2.0)))}
+  test( "a \\ c is a"){assert((a \ c) === List(a))}
+
+  val d = oo(0.0, 3.0)
+  test( "e ⊂ a is true"){assert((e ⊂ a) === true)}
+  test( "d ⊂ a is true"){assert((d ⊂ a) === true)}
+  test( "b ⊂ a is false"){assert((b ⊂ a) === false)}
+
+  test( "e ⊃ a is false"){assert((e ⊃ a) === false)}
+  test( "d ⊃ a is false"){assert((d ⊃ a) === false)}
+  test( "b ⊃ a is false"){assert((b ⊃ a) === false)}
+
+  test( "e ⊆ a is true"){assert((e ⊆ a) === true)}
+  test( "d ⊆ a is true"){assert((d ⊆ a) === true)}
+  test( "b ⊆ a is false"){assert((b ⊆ a) === false)}
+
+  test( "e ⊇ a is false"){assert((e ⊇ a) === false)}
+  test( "d ⊇ a is false"){assert((d ⊇ a) === false)}
+  test( "b ⊇ a is false"){assert((b ⊇ a) === false)}
+
+
+}
