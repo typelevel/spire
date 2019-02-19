@@ -317,7 +317,7 @@ lazy val docSettings = Seq(
   micrositeDescription := "Powerful new number types and numeric abstractions for Scala",
   micrositeAuthor := "Spire contributors",
   micrositeHighlightTheme := "atom-one-light",
-  micrositeHomepage := "http://denisrosset.github.io/spire",
+  micrositeHomepage := "http://non.github.io/spire",
   micrositeBaseUrl := "spire",
   micrositeDocumentationUrl := "/spire/api/spire/index.html",
   micrositeDocumentationLabelDescription := "API Documentation",
@@ -348,7 +348,7 @@ lazy val docSettings = Seq(
       Map("title" -> "Friends of Spire", "section" -> "Home", "position" -> "6")
     )
   ),
-  micrositeGithubOwner := "denisrosset",
+  micrositeGithubOwner := "non",
   micrositeGithubRepo := "spire",
   micrositePalette := Map(
     "brand-primary" -> "#5B5988",
@@ -382,7 +382,7 @@ lazy val docSettings = Seq(
     "-diagrams"
   ),
   scalacOptions in Tut ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))),
-  git.remoteRepo := "git@github.com:denisrosset/spire.git",
+  git.remoteRepo := "git@github.com:non/spire.git",
   includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md" | "*.svg",
   includeFilter in Jekyll := (includeFilter in makeSite).value
 )
