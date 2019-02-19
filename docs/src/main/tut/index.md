@@ -1,3 +1,10 @@
+---
+layout: home
+title:  "Readme"
+section: "Home"
+position: 0
+---
+
 [![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/non/spire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![codecov.io](http://codecov.io/github/non/spire/coverage.svg?branch=master)](http://codecov.io/github/non/spire?branch=master)
@@ -58,7 +65,7 @@ JVM and JS platforms.
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-libraryDependencies += "org.typelevel" %% "spire" % "0.16.0"
+libraryDependencies += "org.typelevel" %% "spire" % "0.14.1"
 ```
 
 (Previous to 0.14.0, Spire was published under *org.spire-math*
@@ -179,7 +186,7 @@ Detailed treatment of these type classes can be found in the
 Spire contains a lot of types, as well as other machinery to provide a nice
 user experience. The easiest way to use spire is via wildcard imports:
 
-```scala
+```tut
 import spire.algebra._   // provides algebraic type classes
 import spire.math._      // provides functions, types, and type classes
 import spire.implicits._ // provides infix operators, instances and conversions
@@ -351,7 +358,7 @@ encounter will occur at compile-time.
 
 For example:
 
-```scala
+```tut
 import spire.syntax.literals._
 
 // bytes and shorts
@@ -387,7 +394,7 @@ tail-recursive function, which will inline literal function arguments.
 The macro can be nested in itself and compares favorably with other looping
 constructs in Scala such as `for` and `while`:
 
-```scala
+```tut
 
 // print numbers 1 through 10
 cfor(0)(_ < 10, _ + 1) { i =>
@@ -466,7 +473,7 @@ the `spire.random.Dist[A]` type class. These instances represent a
 strategy for getting random values using a `Generator` instance. For
 instance:
 
-```scala
+```tut
 import spire.random.Dist
 
 val rng = spire.random.rng.Cmwc5()
