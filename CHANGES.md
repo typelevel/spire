@@ -1,3 +1,40 @@
+## Version 0.16.1-SNAPSHOT (not released)
+
+ * Disabled benchmarked depending on Caliper; waiting for migration to a modern benchmarking framework
+ * Fixes to polynomials
+ * Revised integer Eucidean division semantics: remainder is usually nonnegative (and that's important to define polynomial rings over integers)
+ * The ranges provided to sorting algorithms are now consistent across methods, see https://github.com/non/spire/pull/738 : "All these strategies operate in place on segments of arrays that start and end at specified indices. In the QuickSort implementation, the end index was inclusive, while it was exclusive in MergeSort and InsertionSort. This has been fixed in this changeset to make the end index exclusive in all three implementations, following the convention in the Java Collections library."
+ 
+## Version 0.16.0
+
+This version implements major changes; most importantly, Scala 2.10 has been dropped. The commutative ring tower has been precised: Euclidean division has better semantics, and unique factorization domains have been introduced, generalizing `spire.math.prime`. Some species of division with remainder are now described by `TruncatedDivision`. An involution typeclass abstracts over complex conjugation. We also revised the use of commutative vs. noncommtutative rings, mostly in the construction of complex numbers/quaternions, and in the definition of modules.
+
+Preliminary work has been done towards the modularization of Spire. A `platform` module abstracts over the JVM/JS differences, while `Opt` has been moved to the `util` module. Other modules are not used yet (`data`, `legacy`) but will be in the future.
+
+ * Removed support for Scala 2.10
+ * Upgraded SBT version to 1.1.5
+ * Upgraded to Scala 2.12.6
+ * Introduced the platform and util modules
+ * Added a few modules for future modularization: legacy, data
+ * Introduced unique factorization domains.
+ * Renamed quot/mod to equot/emod (Euclidean rings).
+ * Introduced principled truncated division semantics (see https://www.microsoft.com/en-us/research/wp-content/uploads/2016/02/divmodnote-letter.pdf ).
+ * Added return types to public methods
+ * Version upgrades for Scalacheck, Scalatest, Shapeless, Discipline, Machinist and Scala versions
+ * Added a docs project using tut, README is compiled under tut.
+ * Bug fixes to signum
+ * Fixes to Modules (i.e. generalizations of vector spaces) with respect to commutativity, introduced left and right modules
+ * Complex numbers and quaternions are now defined on a commutative ring
+ * Introduced limited range tests for primitive types,
+ * Involution typeclass
+ 
+## Version 0.15.0
+
+This version upgrades dependencies to algebra 1.0.0 which supports the cats 1.0 release.
+
+ * Upgraded to algebra 1.0.0
+ * Small bug fixes to intervals, sparse polynomials, complex numbers, big decimals
+
 ## Version 0.14.1
 
 This version add laws for gcd/lcm operations, and fixes corner cases

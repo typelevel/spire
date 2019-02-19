@@ -24,15 +24,19 @@ possible.
 * Suminda Dharmasena: feature requests and bug reports
 * Rob Emanuele: cfor macro bug reports and fixes, benchmarking
 * Siddhartha Gadgil: bug fixes
+* ghostroad: extensive fixes and added documentation to spire.math.Sorting
+* Markus Hauck: documentation fixes
 * Christopher Hodapp: documentation fixes
 * Lars Hupel: core maintainer, law-checking, release support
 * Ben Hutchison: bug reports and design suggestions
+* Luka Jacobowitz: bug fixes
 * Stephen Lazaro: definition of left and right modules
 * Sung-Ho Lee: bug fixes
 * Kamushin: bug fixes
 * Rüdiger Klaehn: core maintainer, rational improvements, testing
 * Rex Kerr: author of many of the PRNGs found in spire.random
 * Grzegorz Kossakowski: much build support, 2.11 upgrading help, bug reports
+* Jakub Kozłowski: documentation fixes
 * Christian Krause: suggestions around stats methods and spire.random.
 * Dušan Kysel: author of Ziggurat, MersenneTwister and WELL PRNGs
 * Josh Marcus: bug reports and benchmarking
@@ -40,6 +44,7 @@ possible.
 * Kevin Meredith: bug fixes, bug reports, and documentation
 * Simon Ochsenreither: bug reports and build contributions
 * Erik Osheim: core maintainer
+* Vladimir Pavkin: fixes to Interval
 * Adam Pingel: bug fixes
 * André L. F. Pinto: improve build configuration
 * Pablo Pita: documentation
@@ -57,6 +62,7 @@ possible.
 * Volth: bug reports and feedback around intervals
 * William Waites: bug fixes
 * Jed Wesley-Smith: bug fixes
+* Ryan Williams: bug fixes
 * Kenji Yoshida: bug fixes
 * Benito van der Zander: many bug reports, and much good testing
 * Alec Zorab: clean up and tests
