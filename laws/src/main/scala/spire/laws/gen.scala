@@ -97,7 +97,7 @@ object gen {
 
   def term[A: Arbitrary]: Gen[poly.Term[A]] =
     for {
-      e <- arbitrary[Short]
+      e <- Gen.chooseNum[Short](0, Short.MaxValue)
       c <- arbitrary[A]
     } yield poly.Term(c, e.toInt)
 
