@@ -1,0 +1,1107 @@
+<html><head><title>Spire: Guide</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Spire contributors" /><meta name="description" content="Powerful new number types and numeric abstractions for Scala" /><meta name="og:image" content="/spire/img/poster.png" /><meta name="og:title" content="Spire: Guide" /><meta name="og:site_name" content="Spire" /><meta name="og:url" content="http://non.github.io/spire" /><meta name="og:type" content="website" /><meta name="og:description" content="Powerful new number types and numeric abstractions for Scala" /><link rel="icon" type="image/png" href="/spire/img/favicon.png" /><meta name="twitter:title" content="Spire: Guide" /><meta name="twitter:image" content="http://non.github.io/spireimg/poster.png" /><meta name="twitter:description" content="Powerful new number types and numeric abstractions for Scala" /><meta name="twitter:card" content="summary_large_image" /><link rel="icon" type="image/png" sizes="16x16" href="/spire/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/spire/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/spire/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/spire/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/spire/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/spire/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/spire/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/spire/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/spire/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/spire/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/spire/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/spire/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/spire/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/spire/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/spire/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/spire/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/spire/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/spire/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/spire/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/spire/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/spire/highlight/styles/atom-one-light.css" /><link rel="stylesheet" href="/spire/css/style.css" /><link rel="stylesheet" href="/spire/css/palette.css" /><link rel="stylesheet" href="/spire/css/codemirror.css" /></head><body><header id="site-header"><div class="navbar-wrapper"><div class="container"><div class="row"><div class="col-xs-6"><a href="/spire/" class="brand"><div class="icon-wrapper"><span>Spire</span></div></a></div><div class="col-xs-6"><nav class="text-right"><ul class=""><li><a href="https://github.com/non/spire"><i class="fa fa-github"></i><span class="hidden-xs">GitHub</span></a></li><li><a href="/spire/api/spire/index.html"><i class="fa fa-file-text"></i><span class="hidden-xs">API Documentation</span></a></li></ul></nav></div></div></div></div><div class="jumbotron"><div class="container"><h1 class="text-center">Powerful new number types and numeric abstractions for Scala</h1><h2></h2><p class="text-center"><a href="https://github.com/non/spire" class="btn btn-outline-inverse">View on GitHub</a></p></div></div><div><ul class="horizontalNav">     <li><a class="" href="/spire/">Readme</a></li>  <li><a class=" active " href="/spire/guide.html">Guide</a></li>  <li><a class="" href="/spire/changes.html">Changes</a></li>  <li><a class="" href="/spire/contributing.html">Contributing</a></li>  <li><a class="" href="/spire/design.html">Design notes</a></li>  <li><a class="" href="/spire/authors.html">Authors</a></li>  <li><a class="" href="/spire/friends.html">Friends of Spire</a></li> </ul></div></header><main id="site-main"><section class="use"><div class="container"><div id="content"><h2 id="spire-users-guide">Spire User’s Guide</h2>
+
+<p>This guide explains the architecture, layout, and usage of Spire. Initially,
+we will explore some of the basic structures and patterns used by Spire. Then,
+we’ll look at many of the concrete types that Spire defines. Finally, we’ll
+peek at some of the advanced or tricky corners of the library.</p>
+
+<h3 id="type-classes">Type Classes</h3>
+
+<p>Like many Scala libraries, Spire uses type classes to define generic
+operations.</p>
+
+<p>These code examples all assume the following imports:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">spire.algebra._</span>   <span class="c1">// all type class defintions
+</span><span class="k">import</span> <span class="nn">spire.algebra._</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">spire.implicits._</span> <span class="c1">// all type class instances and syntax
+</span><span class="k">import</span> <span class="nn">spire.implicits._</span>
+</code></pre></div></div>
+
+<p>For example, <code class="highlighter-rouge">Ring[A]</code> is a type class that defines many basic operations,
+such as <code class="highlighter-rouge">+</code> and <code class="highlighter-rouge">*</code> on a type <code class="highlighter-rouge">A</code>. When using type classes it’s important to
+try to distinguish the following:</p>
+
+<ol>
+  <li>The type class itself (<code class="highlighter-rouge">Ring[A]</code>). This is often a trait.</li>
+  <li>Concrete instances of the type class, such as <code class="highlighter-rouge">Ring[Int]</code>.</li>
+  <li>Syntax implicits that use the type class to define operators.</li>
+</ol>
+
+<p>The methods in these type classes are always given text names (like
+<code class="highlighter-rouge">plus</code>). In some cases these names correspond to symbolic operators:
+in the case of <code class="highlighter-rouge">plus</code>, it corresponds with <code class="highlighter-rouge">+</code>. When using these type
+classes, users have the option of using the symbolic syntax on the
+values directly or calling the method on the type class instance:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">scala</span><span class="o">&gt;</span> <span class="k">def</span> <span class="n">usingSymbols</span><span class="o">[</span><span class="kt">A:</span> <span class="kt">Ring</span><span class="o">](</span><span class="n">x</span><span class="k">:</span> <span class="kt">A</span><span class="o">,</span> <span class="n">y</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+<span class="n">usingSymbols</span><span class="k">:</span> <span class="err">[</span><span class="kt">A</span><span class="err">]</span><span class="o">(</span><span class="kt">x:</span> <span class="kt">A</span><span class="o">,</span> <span class="kt">y:</span> <span class="kt">A</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">evidence$1</span><span class="k">:</span> <span class="kt">spire.algebra.Ring</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span><span class="n">A</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">def</span> <span class="n">usingNames</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">x</span><span class="k">:</span> <span class="kt">A</span><span class="o">,</span> <span class="n">y</span><span class="k">:</span> <span class="kt">A</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">r</span><span class="k">:</span> <span class="kt">Ring</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">plus</span><span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span>
+<span class="n">usingNames</span><span class="k">:</span> <span class="err">[</span><span class="kt">A</span><span class="err">]</span><span class="o">(</span><span class="kt">x:</span> <span class="kt">A</span><span class="o">,</span> <span class="kt">y:</span> <span class="kt">A</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">r</span><span class="k">:</span> <span class="kt">spire.algebra.Ring</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span><span class="n">A</span>
+</code></pre></div></div>
+
+<p>Some methods (e.g. <code class="highlighter-rouge">sqrt</code>) do not have corresponding symbols. In those
+cases, the method name itself can be used with the values:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">scala</span><span class="o">&gt;</span> <span class="k">def</span> <span class="n">sqrt</span><span class="o">[</span><span class="kt">A:</span> <span class="kt">NRoot</span><span class="o">](</span><span class="n">x</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">sqrt</span>
+<span class="n">sqrt</span><span class="k">:</span> <span class="err">[</span><span class="kt">A</span><span class="err">]</span><span class="o">(</span><span class="kt">x:</span> <span class="kt">A</span><span class="o">)(</span><span class="kt">implicit</span> <span class="kt">evidence$1:</span> <span class="kt">spire.algebra.NRoot</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span><span class="n">A</span>
+</code></pre></div></div>
+
+<h4 id="package-layout">Package Layout</h4>
+
+<p>In the case of <code class="highlighter-rouge">Ring[A]</code>, the type class itself is located in
+<code class="highlighter-rouge">spire.algebra</code>. Except for a few special cases, all of Spire’s type
+classes can be found in <code class="highlighter-rouge">spire.algebra</code>.</p>
+
+<p>Type class instances can be found in two different places. For types
+defined in Spire, or code that is aware of Spire, type class instances
+should be placed in the type’s companion object. For example, <code class="highlighter-rouge">UByte</code>
+(an unsigned byte type) has an instance of <code class="highlighter-rouge">Rig[UByte]</code> contained in
+its companion object.</p>
+
+<p>For types defined elsewhere that Spire supports directly (for example
+the built-in number types) Spire defines objects in <code class="highlighter-rouge">spire.std</code> which
+contain their instances. So to get all the instances for <code class="highlighter-rouge">Int</code> you’d
+import them from <code class="highlighter-rouge">spire.std.int._</code>. To get all these “standard
+instances” at one go, import <code class="highlighter-rouge">spire.std.any._</code>. This pattern should
+also be used when supporting other number types that are not
+Spire-aware.</p>
+
+<p>Finally, syntax implicits are imported from objects in
+<code class="highlighter-rouge">spire.syntax</code>. To get the syntax for <code class="highlighter-rouge">Ring[A]</code> you’d import
+<code class="highlighter-rouge">spire.syntax.ring._</code>. Again, there is a shortcut package: you can
+import <code class="highlighter-rouge">spire.syntax.all._</code> to get all syntax.</p>
+
+<p>These imports might seem a bit confusing, but they are very useful
+when you find a situation where Spire’s types or operators conflict
+with another library’s.  We provide an even more basic import
+(<code class="highlighter-rouge">spire.implicits._</code>) for when you want all instances and all
+operators. This is nice when working in the console or experimenting,
+and for when you’re sure there won’t be a conflict.</p>
+
+<h4 id="usage">Usage</h4>
+
+<p>Most of the time, you’ll be using type classes as context bounds. For
+instance:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">spire.algebra._</span>
+<span class="k">import</span> <span class="nn">spire.algebra._</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">spire.std.any._</span>
+<span class="k">import</span> <span class="nn">spire.std.any._</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">spire.syntax.ring._</span>
+<span class="k">import</span> <span class="nn">spire.syntax.ring._</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">object</span> <span class="nc">Demo</span> <span class="o">{</span>
+     <span class="o">|</span>   <span class="k">def</span> <span class="n">double</span><span class="o">[</span><span class="kt">A:</span> <span class="kt">Ring</span><span class="o">](</span><span class="n">x</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">x</span>
+     <span class="o">|</span>   <span class="k">def</span> <span class="n">triple</span><span class="o">[</span><span class="kt">A:</span> <span class="kt">Ring</span><span class="o">](</span><span class="n">x</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">3</span>
+     <span class="o">|</span>   <span class="n">println</span><span class="o">((</span><span class="n">double</span><span class="o">(</span><span class="mi">3</span><span class="o">),</span> <span class="n">triple</span><span class="o">(</span><span class="mi">4</span><span class="o">)))</span>
+     <span class="o">|</span> <span class="o">}</span>
+<span class="n">defined</span> <span class="k">object</span> <span class="nc">Demo</span>
+</code></pre></div></div>
+
+<p>This code ends up being equivalent to:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">scala</span><span class="o">&gt;</span> <span class="k">object</span> <span class="nc">Demo</span> <span class="o">{</span>
+     <span class="o">|</span>   <span class="k">def</span> <span class="n">double</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">x</span><span class="k">:</span> <span class="kt">A</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">ev</span><span class="k">:</span> <span class="kt">Ring</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">plus</span><span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">x</span><span class="o">)</span>
+     <span class="o">|</span>   <span class="k">def</span> <span class="n">triple</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">x</span><span class="k">:</span> <span class="kt">A</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">ev</span><span class="k">:</span> <span class="kt">Ring</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=</span> <span class="n">ev</span><span class="o">.</span><span class="n">times</span><span class="o">(</span><span class="n">x</span><span class="o">,</span> <span class="n">ev</span><span class="o">.</span><span class="n">fromInt</span><span class="o">(</span><span class="mi">3</span><span class="o">))</span>
+     <span class="o">|</span>   <span class="n">println</span><span class="o">((</span><span class="n">double</span><span class="o">(</span><span class="mi">3</span><span class="o">)(</span><span class="nc">IntAlgebra</span><span class="o">),</span> <span class="n">triple</span><span class="o">(</span><span class="mi">4</span><span class="o">)(</span><span class="nc">IntAlgebra</span><span class="o">)))</span>
+     <span class="o">|</span> <span class="o">}</span>
+<span class="n">defined</span> <span class="k">object</span> <span class="nc">Demo</span>
+</code></pre></div></div>
+
+<p>The <code class="highlighter-rouge">IntAlgebra</code> type extends <code class="highlighter-rouge">Ring[Int]</code> and has been imported via
+<code class="highlighter-rouge">spire.std.any._</code>. The implicits providing the binary operators <code class="highlighter-rouge">+</code>
+and <code class="highlighter-rouge">*</code> (and also the implicit to convert the integer literal into an
+<code class="highlighter-rouge">A</code>) were all imported form <code class="highlighter-rouge">spire.syntax.ring._</code>. And the <code class="highlighter-rouge">Ring</code>
+context bound is really just sugar for an implicit parameter (the type
+class instance).</p>
+
+<p>Hopefully this small example gives you an idea of the basic mechanics
+behind Spire’s generic math capabilities.</p>
+
+<h4 id="specialization">Specialization</h4>
+
+<p>To achieve speed on-par with direct (non-generic) code, you will need
+to use specialization. The good news is that most of Spire’s code is
+already specialized (and tested for proper performance). The bad news
+is that you’ll have to annotate all your generic code like so:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">spire.algebra._</span>
+<span class="k">import</span> <span class="nn">spire.algebra._</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">spire.std.any._</span>
+<span class="k">import</span> <span class="nn">spire.std.any._</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">spire.syntax.ring._</span>
+<span class="k">import</span> <span class="nn">spire.syntax.ring._</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">scala.</span><span class="o">{</span><span class="n">specialized</span> <span class="k">=&gt;</span> <span class="n">sp</span><span class="o">}</span>
+<span class="k">import</span> <span class="nn">scala.</span><span class="o">{</span><span class="n">specialized</span><span class="k">=&gt;</span><span class="n">sp</span><span class="o">}</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">object</span> <span class="nc">Demo</span> <span class="o">{</span>
+     <span class="o">|</span>   <span class="k">def</span> <span class="n">double</span><span class="o">[</span><span class="kt">@sp</span> <span class="kt">A:</span> <span class="kt">Ring</span><span class="o">](</span><span class="n">x</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">x</span>
+     <span class="o">|</span>   <span class="k">def</span> <span class="n">triple</span><span class="o">[</span><span class="kt">@sp</span> <span class="kt">A:</span> <span class="kt">Ring</span><span class="o">](</span><span class="n">x</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">3</span>
+     <span class="o">|</span>   <span class="n">println</span><span class="o">((</span><span class="n">double</span><span class="o">(</span><span class="mi">3</span><span class="o">),</span> <span class="n">triple</span><span class="o">(</span><span class="mi">4</span><span class="o">)))</span>
+     <span class="o">|</span> <span class="o">}</span>
+<span class="n">defined</span> <span class="k">object</span> <span class="nc">Demo</span>
+</code></pre></div></div>
+
+<p>There are too many gotchas with specialization to list here. But the
+(very) short guide to specialization is:</p>
+
+<ol>
+  <li>It’s much easier to specialize methods.</li>
+  <li>Calls from generic code into specialized code are not specialized.</li>
+  <li>Limit specialization to types you’ll use via <code class="highlighter-rouge">@sp(Int, Double)</code>.</li>
+  <li>Specialization will increase bytecode size by a factor of x2-10.</li>
+</ol>
+
+<p>If you have questions about specialization feel free to ask on the
+mailing list. You may notice that some code in Spire is structured in
+an unusual way, and often this is to make sure specialization works
+properly.</p>
+
+<p>You may find that it’s easy to develop generic code without using
+specialization first (to keep things simple) and then going back and
+adding annotations later if necessary. This helps keep things simple
+while you get your code working correctly, and it’s a (relatively)
+minor change to enable specialization later (as long as you are
+consistent).</p>
+
+<p>Of course, if your code is not generic, you can call into Spire’s
+specialized code without worrying about any of this (and the result
+will be unboxed and fast).</p>
+
+<h3 id="type-classes-1">Type Classes</h3>
+
+<h4 id="properties">Properties</h4>
+
+<p>Spire’s type classes are often described in terms of properties (or
+“laws”).  These properties must be true no matter what values are
+used.</p>
+
+<p>Here’s a brief description of some of the most common properties:</p>
+
+<ul>
+  <li><em>associativity</em>: <code class="highlighter-rouge">|+|</code> is associative if <code class="highlighter-rouge">(a |+| b) |+| c</code> = <code class="highlighter-rouge">a |+| (b |+| c)</code>.</li>
+  <li><em>identity</em>: <code class="highlighter-rouge">id</code> is an identity value for <code class="highlighter-rouge">|+|</code> if <code class="highlighter-rouge">a |+| id</code> = <code class="highlighter-rouge">a</code> = <code class="highlighter-rouge">id |+| a</code>.</li>
+  <li><em>inverse</em>: <code class="highlighter-rouge">|+|</code> has an <code class="highlighter-rouge">inverse</code> operation if <code class="highlighter-rouge">a |+| a.inverse</code> = <code class="highlighter-rouge">id</code> = <code class="highlighter-rouge">a.inverse |+| a</code>.</li>
+  <li><em>commutativity</em>: <code class="highlighter-rouge">|+|</code> is commutative if <code class="highlighter-rouge">a |+| b</code> = <code class="highlighter-rouge">b |+| a</code>.</li>
+</ul>
+
+<p>In some cases the operator names are different (e.g. <code class="highlighter-rouge">+</code>, <code class="highlighter-rouge">*</code>) but the
+properties themselves remain the same.</p>
+
+<h4 id="eq">Eq</h4>
+
+<p>Spire provides an <code class="highlighter-rouge">Eq[A]</code> type class to represent type-safe
+equality. This allows us to talk about types for which there isn’t a
+computationally useful notion of equality, and also to avoid
+programming errors caused by universal equality.</p>
+
+<p><code class="highlighter-rouge">Eq[A]</code> provides two operators</p>
+
+<ul>
+  <li><code class="highlighter-rouge">eqv</code> (<code class="highlighter-rouge">a === b</code>) equality operator.</li>
+  <li><code class="highlighter-rouge">neqv</code> (<code class="highlighter-rouge">a =!= b</code>) inequality operator (defaults to <code class="highlighter-rouge">!(a === b)</code>).</li>
+</ul>
+
+<p>Spire requires that <code class="highlighter-rouge">eqv</code> obey the laws of an equivalence relation, namely:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">a === a</code> (<em>reflexivity</em>)</li>
+  <li>if <code class="highlighter-rouge">a === b</code> then <code class="highlighter-rouge">b === a</code> (<em>symmetry</em>)</li>
+  <li>if <code class="highlighter-rouge">a === b</code> then <code class="highlighter-rouge">a</code> is <code class="highlighter-rouge">b</code> (<em>anti-symmetry</em>)</li>
+  <li>if <code class="highlighter-rouge">a === b</code> and <code class="highlighter-rouge">b === c</code> then <code class="highlighter-rouge">a === c</code> (<em>transitivity</em>)</li>
+</ul>
+
+<p>The anti-symmetry property may seem confusing. The idea is that if <code class="highlighter-rouge">a === b</code>
+then <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code> must be substitutable for each other, such that for any
+expression <code class="highlighter-rouge">f(x)</code>, <code class="highlighter-rouge">f(a) === f(b)</code>.</p>
+
+<h4 id="order">Order</h4>
+
+<p>Total orderings in Spire are supported by the <code class="highlighter-rouge">Order[A]</code> type
+class. Unlike other ordering type classes
+(e.g. <code class="highlighter-rouge">scala.math.Ordering</code>), this one is specialized to avoid boxing.
+<code class="highlighter-rouge">Order[A]</code> extends <code class="highlighter-rouge">Eq[A]</code> can be implemented via a single <code class="highlighter-rouge">compare</code>
+method, although it provides all of the following:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">eqv</code> (<code class="highlighter-rouge">a === b</code>)</li>
+  <li><code class="highlighter-rouge">neqv</code> (<code class="highlighter-rouge">a =!= b</code>)</li>
+  <li><code class="highlighter-rouge">lt</code> (<code class="highlighter-rouge">a &lt; b</code>)</li>
+  <li><code class="highlighter-rouge">gt</code> (<code class="highlighter-rouge">a &gt; b</code>)</li>
+  <li><code class="highlighter-rouge">lteqv</code> (<code class="highlighter-rouge">a &lt;= b</code>)</li>
+  <li><code class="highlighter-rouge">gteqv</code> (<code class="highlighter-rouge">a &gt;= b</code>)</li>
+  <li><code class="highlighter-rouge">compare</code> (<code class="highlighter-rouge">a compare b</code>)</li>
+  <li><code class="highlighter-rouge">min</code> (<code class="highlighter-rouge">a min b</code>)</li>
+  <li><code class="highlighter-rouge">max</code> (<code class="highlighter-rouge">a max b</code>)</li>
+</ul>
+
+<p>Instances of <code class="highlighter-rouge">Order[A]</code> are required to observe the following
+properties:</p>
+
+<ul>
+  <li>if <code class="highlighter-rouge">a &lt;= b</code> and <code class="highlighter-rouge">b &lt;= a</code> then <code class="highlighter-rouge">a === b</code> (<em>anti-symmetry</em>)</li>
+  <li>if <code class="highlighter-rouge">a &lt;= b</code> and <code class="highlighter-rouge">b &lt;= c</code> then <code class="highlighter-rouge">a &lt;= c</code> (<em>transitivity</em>)</li>
+  <li>either <code class="highlighter-rouge">a &lt;= b</code> or <code class="highlighter-rouge">b &lt;= a</code> (<em>totality</em>)</li>
+</ul>
+
+<p>Additionally, total orderings across fields should obey the following
+additional laws:</p>
+
+<ul>
+  <li>if <code class="highlighter-rouge">a &lt;= b</code> then <code class="highlighter-rouge">(a + c) &lt;= (b + c)</code> (<em>O1</em>)</li>
+  <li>if <code class="highlighter-rouge">zero &lt;= a</code> and <code class="highlighter-rouge">zero &lt;= b</code> then <code class="highlighter-rouge">zero &lt;= (a * b)</code> (<em>O2</em>)</li>
+</ul>
+
+<p>(These are laws are required by ordered fields.)</p>
+
+<p>In some cases users may need to use (or define) total orderings that
+do not follow all these laws, or may break laws required by other
+structures. An example would be the lexicographic ordering of complex
+numbers, which breaks <em>O2</em>.  In these cases, users will need to be
+aware of the risks and limit their use to situations where the
+particular law is not needed.</p>
+
+<h4 id="signed">Signed</h4>
+
+<p>Translation-invariant total orders are captured by the <code class="highlighter-rouge">Signed[A]</code> type class. In
+general, the type <code class="highlighter-rouge">A</code> is equipped with a commutative additive operation <code class="highlighter-rouge">+</code> and a
+zero element <code class="highlighter-rouge">0</code> (see the definition of commutative rings below). The following
+laws hold:</p>
+
+<ul>
+  <li>if <code class="highlighter-rouge">a &lt;= b</code> then <code class="highlighter-rouge">a + c &lt;= b + c</code> (linear order),</li>
+  <li><code class="highlighter-rouge">signum(x) = -1</code> if <code class="highlighter-rouge">x &lt; 0</code>, <code class="highlighter-rouge">signum(x) = 1</code> if <code class="highlighter-rouge">x &gt; 0</code>, <code class="highlighter-rouge">signum(x) = 0</code> otherwise.</li>
+</ul>
+
+<p>If the type <code class="highlighter-rouge">A</code> is equipped with negative elements <code class="highlighter-rouge">-x</code>, then we have:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">abs(x) = -x</code> if <code class="highlighter-rouge">x &lt; 0</code>, or <code class="highlighter-rouge">x</code> otherwise,</li>
+</ul>
+
+<p>The above laws imply:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">abs(a + b) &lt;= abs(a) + abs(b)</code></li>
+</ul>
+
+<h4 id="partialorder">PartialOrder</h4>
+
+<p>Partial orderings in Spire are supported by the <code class="highlighter-rouge">PartialOrder[A]</code> type class.
+Its implementation differs from <code class="highlighter-rouge">scala.math.PartialOrdering</code> in two features: <code class="highlighter-rouge">PartialOrder</code>
+is specialized to avoid boxing, and the <code class="highlighter-rouge">partialCompare</code> method returns a <code class="highlighter-rouge">Double</code> and
+avoids allocation of an <code class="highlighter-rouge">Option[Int]</code> instance. <code class="highlighter-rouge">PartialOrder[A]</code> extends <code class="highlighter-rouge">Eq[A]</code>, and can
+be implemented via a single <code class="highlighter-rouge">partialCompare</code> method, described below. <code class="highlighter-rouge">PartialOrder</code> provides:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">eqv</code> (<code class="highlighter-rouge">a === b</code>)</li>
+  <li><code class="highlighter-rouge">neqv</code> (<code class="highlighter-rouge">a =!= b</code>)</li>
+  <li><code class="highlighter-rouge">lt</code> (<code class="highlighter-rouge">a &lt; b</code>)</li>
+  <li><code class="highlighter-rouge">gt</code> (<code class="highlighter-rouge">a &gt; b</code>)</li>
+  <li><code class="highlighter-rouge">lteqv</code> (<code class="highlighter-rouge">a &lt;= b</code>)</li>
+  <li><code class="highlighter-rouge">gteqv</code> (<code class="highlighter-rouge">a &gt;= b</code>)</li>
+  <li><code class="highlighter-rouge">partialCompare</code> (<code class="highlighter-rouge">a partialCompare b</code>)</li>
+  <li><code class="highlighter-rouge">tryCompare</code> (<code class="highlighter-rouge">a tryCompare b</code>)</li>
+  <li><code class="highlighter-rouge">pmin</code> (<code class="highlighter-rouge">a pmin b</code>) – returns the least element if they can be compared</li>
+  <li><code class="highlighter-rouge">pmax</code> (<code class="highlighter-rouge">a pmax b</code>) – returns the greatest element if they can be compared</li>
+</ul>
+
+<p>A partial order is defined from a binary relation <code class="highlighter-rouge">&lt;=</code>, which satisfies the relations:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">a &lt;= a</code> (<em>reflexitivity</em>)</li>
+  <li>if <code class="highlighter-rouge">a &lt;= b</code> and <code class="highlighter-rouge">b &lt;= a</code>, then <code class="highlighter-rouge">a === c</code> (<em>anti-symmetry</em>)</li>
+  <li>if <code class="highlighter-rouge">a &lt;= b</code> and <code class="highlighter-rouge">b &lt;= c</code>, then <code class="highlighter-rouge">a &lt;= c</code> (<em>transitivity</em>)</li>
+</ul>
+
+<p>To compute both <code class="highlighter-rouge">&lt;=</code> and <code class="highlighter-rouge">&gt;=</code> at the same time, the method <code class="highlighter-rouge">partialCompare</code> uses
+a <code class="highlighter-rouge">Double</code> number to encode the result of both comparisons. The truth table is defined as follows:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center"><code class="highlighter-rouge">a &lt;= b</code></th>
+      <th style="text-align: center"><code class="highlighter-rouge">a &gt;= b</code></th>
+      <th style="text-align: center"><code class="highlighter-rouge">partialCompare(a, b)</code></th>
+      <th style="text-align: center">corresponds to</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center"><code class="highlighter-rouge">true</code></td>
+      <td style="text-align: center"><code class="highlighter-rouge">true</code></td>
+      <td style="text-align: center"><code class="highlighter-rouge">0</code></td>
+      <td style="text-align: center"><code class="highlighter-rouge">a === b</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="highlighter-rouge">false</code></td>
+      <td style="text-align: center"><code class="highlighter-rouge">false</code></td>
+      <td style="text-align: center"><code class="highlighter-rouge">NaN</code></td>
+      <td style="text-align: center"><code class="highlighter-rouge">a</code> incomparable with <code class="highlighter-rouge">b</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="highlighter-rouge">true</code></td>
+      <td style="text-align: center"><code class="highlighter-rouge">false</code></td>
+      <td style="text-align: center"><code class="highlighter-rouge">-1</code></td>
+      <td style="text-align: center"><code class="highlighter-rouge">a &lt; b</code></td>
+    </tr>
+    <tr>
+      <td style="text-align: center"><code class="highlighter-rouge">false</code></td>
+      <td style="text-align: center"><code class="highlighter-rouge">true</code></td>
+      <td style="text-align: center"><code class="highlighter-rouge">1</code></td>
+      <td style="text-align: center"><code class="highlighter-rouge">a &gt; b</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>The method <code class="highlighter-rouge">tryCompare</code> returns maps <code class="highlighter-rouge">-1.0</code>, <code class="highlighter-rouge">0.0</code>, <code class="highlighter-rouge">1.0</code> to <code class="highlighter-rouge">Some(-1)</code>, <code class="highlighter-rouge">Some(0)</code>, <code class="highlighter-rouge">Some(1)</code>,
+and <code class="highlighter-rouge">NaN</code> to <code class="highlighter-rouge">None</code>, allowing the use of <code class="highlighter-rouge">getOrElse</code> and higher-order methods, at the price of an
+<code class="highlighter-rouge">Option[Int]</code> allocation.</p>
+
+<p>Instances of <code class="highlighter-rouge">PartialOrder[A]</code> are required to observe the properties above.</p>
+
+<p>Note that <code class="highlighter-rouge">Order[A]</code> extends <code class="highlighter-rouge">PartialOrder[A]</code>, but for pedagogical purposes, <code class="highlighter-rouge">Order[A]</code> is presented first
+in this guide.</p>
+
+<h4 id="groups">Groups</h4>
+
+<p>The most basic algebraic type classes Spire supports involve a single
+associative binary operator (called <code class="highlighter-rouge">op</code> and represented as <code class="highlighter-rouge">|+|</code>):</p>
+
+<ul>
+  <li><code class="highlighter-rouge">Semigroup[A]</code> just the associative operator <code class="highlighter-rouge">|+|</code>, nothing more.</li>
+  <li><code class="highlighter-rouge">Monoid[A]</code> a semigroup that also has an identity element <code class="highlighter-rouge">id</code>.</li>
+  <li><code class="highlighter-rouge">Group[A]</code> a monoid that also has an inverse operation (<code class="highlighter-rouge">inverse</code> or <code class="highlighter-rouge">|-|</code>).</li>
+  <li><code class="highlighter-rouge">CSemigroup[A]</code> a semigroup that is commutative.</li>
+  <li><code class="highlighter-rouge">CMonoid[A]</code> a monoid that is commutative.</li>
+  <li><code class="highlighter-rouge">AbGroup[A]</code> an “abelian group”, a group that is commutative.</li>
+</ul>
+
+<p>Most types have many possible implementations of these types
+classes. In these cases Spire requires users to explicitly choose
+which implementation they want.</p>
+
+<p>Spire also defines two parallel group hierarchies for <em>additive</em> and
+<em>multiplicative</em> groups. These have the same properties but different
+names and symbols. The following list provides the generic, additive,
+and multiplicative variants:</p>
+
+<ul>
+  <li>operator method: <code class="highlighter-rouge">op</code>, <code class="highlighter-rouge">plus</code>, <code class="highlighter-rouge">times</code></li>
+  <li>operator symbol: <code class="highlighter-rouge">|+|</code>, <code class="highlighter-rouge">+</code>, <code class="highlighter-rouge">*</code></li>
+  <li>identity name: <code class="highlighter-rouge">id</code>, <code class="highlighter-rouge">zero</code>, <code class="highlighter-rouge">one</code></li>
+  <li>inverse method: <code class="highlighter-rouge">inverse</code>, <code class="highlighter-rouge">negate</code>, <code class="highlighter-rouge">reciprocal</code></li>
+  <li>inverse symbol: <code class="highlighter-rouge">inverse</code>, <code class="highlighter-rouge">-</code> (unary), <code class="highlighter-rouge">reciprocal</code></li>
+  <li>inverse binary operator: <code class="highlighter-rouge">|-|</code>, <code class="highlighter-rouge">-</code> (binary), <code class="highlighter-rouge">/</code></li>
+</ul>
+
+<h4 id="rings-and-fields">Rings and Fields</h4>
+
+<p>Rings are a set together with two binary operation (additive and
+multiplicative). Spire defines these by extending the appropriate
+additive and multiplicative group traits. The following list roughly
+describes the Ring-like type classes Spire provides:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">Semiring[A]</code> provides <code class="highlighter-rouge">+</code>, <code class="highlighter-rouge">zero</code>, and <code class="highlighter-rouge">*</code>.</li>
+  <li><code class="highlighter-rouge">Rig[A]</code> provides <code class="highlighter-rouge">+</code>, <code class="highlighter-rouge">zero</code>, <code class="highlighter-rouge">*</code>, and <code class="highlighter-rouge">one</code>.</li>
+  <li><code class="highlighter-rouge">Rng[A]</code> provides commutative <code class="highlighter-rouge">+</code>, <code class="highlighter-rouge">zero</code>, <code class="highlighter-rouge">-</code>, and <code class="highlighter-rouge">*</code>.</li>
+  <li><code class="highlighter-rouge">Ring[A]</code> provides commutative <code class="highlighter-rouge">+</code>, <code class="highlighter-rouge">zero</code>, <code class="highlighter-rouge">-</code>, <code class="highlighter-rouge">*</code>, and <code class="highlighter-rouge">one</code>.</li>
+  <li><code class="highlighter-rouge">CRing[A]</code> provides commutative <code class="highlighter-rouge">+</code>, <code class="highlighter-rouge">zero</code>, <code class="highlighter-rouge">-</code>, commutative <code class="highlighter-rouge">*</code>, and <code class="highlighter-rouge">one</code>.</li>
+</ul>
+
+<p>The following list makes clear how these type classes are defined via
+inheritance:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">Semiring[A]</code> extends <code class="highlighter-rouge">AdditiveMonoid[A]</code> with <code class="highlighter-rouge">MultiplicativeSemigroup[A]</code></li>
+  <li><code class="highlighter-rouge">Rig[A]</code> extends <code class="highlighter-rouge">Semiring[A]</code> with <code class="highlighter-rouge">MultiplicativeMonoid[A]</code></li>
+  <li><code class="highlighter-rouge">Rng[A]</code> extends <code class="highlighter-rouge">Semiring[A]</code> with <code class="highlighter-rouge">AdditiveAbGroup[A]</code></li>
+  <li><code class="highlighter-rouge">Ring[A]</code> extends <code class="highlighter-rouge">Rig[A]</code> with <code class="highlighter-rouge">Rng[A]</code></li>
+  <li><code class="highlighter-rouge">CRing[A]</code> extends <code class="highlighter-rouge">Ring[A]</code> with <code class="highlighter-rouge">MultiplicativeCMonoid[A]</code></li>
+</ul>
+
+<p>Rings also provide a <code class="highlighter-rouge">pow</code> method (<code class="highlighter-rouge">**</code>) for doing repeated multiplication.</p>
+
+<h4 id="commutative-ring-hierarchy">Commutative ring hierarchy</h4>
+
+<p>Commutative rings (also called domains in the literature) have a rich
+structure.</p>
+
+<p>Spire focuses on the structures relevant for computational algebra
+(GCD rings, Euclidean rings and fields).</p>
+
+<ul>
+  <li><code class="highlighter-rouge">GCDRing[A]</code> extends <code class="highlighter-rouge">CRing[A]</code></li>
+  <li><code class="highlighter-rouge">EuclideanRing[A]</code> extends <code class="highlighter-rouge">GCDRing[A]</code></li>
+  <li><code class="highlighter-rouge">spire.Field[A]</code> extends<code class="highlighter-rouge"> algebra.Field[A]</code> with <code class="highlighter-rouge">EuclideanRing[A]</code></li>
+</ul>
+
+<h4 id="gcdrings">GCDRings</h4>
+
+<p>GCDRings are commutative rings (<code class="highlighter-rouge">CRing[A]</code>) with existence of a
+greatest-common-divisor and least-common-multiple.</p>
+
+<p>Spire’s <code class="highlighter-rouge">GCDRing[A]</code> supports the following operations:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">gcd</code> (<code class="highlighter-rouge">a gcd b</code>) find the greatest common divisor of <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code>.</li>
+  <li><code class="highlighter-rouge">lcm</code> (<code class="highlighter-rouge">a lcm b</code>) find the lowest common multiple of <code class="highlighter-rouge">a</code> and <code class="highlighter-rouge">b</code>.</li>
+</ul>
+
+<p>obeying the following laws:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">d * m === a * b</code> for <code class="highlighter-rouge">d = gcd(a, b)</code> and <code class="highlighter-rouge">m = lcm(a, b)</code>,</li>
+  <li>gcd is associative and commutative,</li>
+  <li>lcm is associatvie and commutative.</li>
+</ul>
+
+<p>Note that the gcd is defined up to a divisible element (unit);
+in particular, its sign is a matter of convention.</p>
+
+<p>Spire requires these operations to be commutative. Note that fields
+have leeway to define the GCD operation. In practice, instances of
+<code class="highlighter-rouge">Field[A]</code> provide either a trivial implementation <code class="highlighter-rouge">gcd(x != 0 , y != 0) == 1</code>
+or a definition that extends the one used for the integer ring
+(<code class="highlighter-rouge">gcd(a/b, c/d) == gcd(a, c)/lcm(b, d)</code>).</p>
+
+<h4 id="euclideanrings">EuclideanRings</h4>
+
+<p>Spire supports euclidean domains (called <code class="highlighter-rouge">EuclideanRing[A]</code>). A
+euclidean domain is a GCD ring (<code class="highlighter-rouge">GCDRing[A]</code>) that also supports
+euclidean division (e.g. floor division or integer division). This
+structure generalizes many useful properties of the integers (for
+instance, quotients and remainders, and greatest common divisors).</p>
+
+<p>Formally, euclidean domains have a <em>euclidean function</em> f such that
+for any <code class="highlighter-rouge">x</code> and <code class="highlighter-rouge">y</code> in <code class="highlighter-rouge">A</code>, if <code class="highlighter-rouge">y</code> is nonzero, then there are <code class="highlighter-rouge">q</code> and
+<code class="highlighter-rouge">r</code> (quotient and remainder) such that <code class="highlighter-rouge">a = b*q + r</code> and <code class="highlighter-rouge">r = 0</code> or
+<code class="highlighter-rouge">f(r) &lt; f(b)</code>. For integers, <code class="highlighter-rouge">f</code> is usually the absolute value
+function.</p>
+
+<p>Spire’s <code class="highlighter-rouge">EuclideanRing[A]</code> supports the following operations:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">quot</code> (<code class="highlighter-rouge">a /~ b</code>) finding the quotient.</li>
+  <li><code class="highlighter-rouge">mod</code> (<code class="highlighter-rouge">a % b</code>) the remainder from the quotient operation.</li>
+  <li><code class="highlighter-rouge">quotmod</code> (<code class="highlighter-rouge">a /% b</code>) combines <code class="highlighter-rouge">quot</code> and <code class="highlighter-rouge">mod</code> into one operation.</li>
+</ul>
+
+<p>Spire requires that <code class="highlighter-rouge">b * (a /~ b) + (a % b)</code> is equivalent to <code class="highlighter-rouge">a</code>.</p>
+
+<p>On integers, Euclidean quotient and remainder corresponds to
+truncated division; however, the sign of the result is a matter
+of convention. On rational (or floating-point) numbers, <code class="highlighter-rouge">a /~ b = a / b</code>
+and <code class="highlighter-rouge">a % b = 0</code> by definition.</p>
+
+<h4 id="fields">Fields</h4>
+
+<p>Fields are commutative rings with commutative multiplication and
+multiplicative inverses for all non-zero elements. Fields generalize
+how most people think about rational numbers.</p>
+
+<p>Spire’s <code class="highlighter-rouge">Field[A]</code> supports the following operations:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">div</code> (<code class="highlighter-rouge">a / b</code>) divide <code class="highlighter-rouge">a</code> by <code class="highlighter-rouge">b</code>.</li>
+  <li><code class="highlighter-rouge">reciprocal</code> (<code class="highlighter-rouge">a.reciprocal</code>) the multiplicative inverse of <code class="highlighter-rouge">a</code>, i.e. <code class="highlighter-rouge">one/a</code>.</li>
+</ul>
+
+<p>Even though fields sit at the top of the ring hierarchy, there are
+many operations which are not provided by fields:</p>
+
+<ul>
+  <li>equality and ordering (provided by <code class="highlighter-rouge">Eq[A]</code> and <code class="highlighter-rouge">Order[A]</code>).</li>
+  <li>square root, and other roots (provided by <code class="highlighter-rouge">NRoot[A]</code>).</li>
+  <li>sine, cosine, and trigonometric functions (provided by <code class="highlighter-rouge">Trig[A]</code>).</li>
+</ul>
+
+<h4 id="irrational-and-transcendental-type-classes">Irrational and Transcendental type classes</h4>
+
+<p>Spire supports square roots and fractional powers via
+<code class="highlighter-rouge">NRoot[A]</code>. There are three basic methods available:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">sqrt</code> (<code class="highlighter-rouge">a.sqrt</code>) finds the square root of <code class="highlighter-rouge">a</code></li>
+  <li><code class="highlighter-rouge">nroot</code> (<code class="highlighter-rouge">(a nroot k)</code>) finds the kth root of <code class="highlighter-rouge">a</code></li>
+  <li><code class="highlighter-rouge">fpow</code> (<code class="highlighter-rouge">(a fpow b)</code>) takes <code class="highlighter-rouge">a</code> to the fractional power <code class="highlighter-rouge">b</code></li>
+</ul>
+
+<p>Spire does not have any fractional types that can represent irrational
+roots exactly. This means that many laws we might like to write about
+roots will be weaker than we would like:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">a.sqrt</code> = <code class="highlighter-rouge">(a nroot 2)</code> = <code class="highlighter-rouge">(a fpow 2.reciprocal)</code></li>
+  <li>if <code class="highlighter-rouge">A</code> can represent <code class="highlighter-rouge">1/k</code> exactly, then <code class="highlighter-rouge">(a nroot k)</code> = <code class="highlighter-rouge">(a fpow k.reciprocal)</code></li>
+  <li>if <code class="highlighter-rouge">(a nroot k)</code> is rational, then <code class="highlighter-rouge">(a nroot k).pow(k)</code> = <code class="highlighter-rouge">a</code></li>
+</ul>
+
+<p>Approximate types like <code class="highlighter-rouge">Double</code> and <code class="highlighter-rouge">BigDecimal</code> have a built-in
+precision to which Spire can find roots. Exact types like <code class="highlighter-rouge">Rational</code>
+do not have <code class="highlighter-rouge">NRoot</code> instances defined by default, but instances can be
+instantiated with user-provided precision.</p>
+
+<p>Similarly, Spire supports the Trigonometric functions via
+<code class="highlighter-rouge">Trig[A]</code>. The preceeding caveats about precision apply to these
+functions and values as well. The following methods are supported:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">e</code> Euler’s number</li>
+  <li>
+    <p><code class="highlighter-rouge">pi</code> Ratio of a circle’s diameter to its circumference.</p>
+  </li>
+  <li><code class="highlighter-rouge">exp(a)</code> Raise <code class="highlighter-rouge">e</code> to <code class="highlighter-rouge">a</code>-th power.</li>
+  <li><code class="highlighter-rouge">expm1(a)</code> Equivalent to <code class="highlighter-rouge">exp(a) - 1</code> with less error.</li>
+  <li><code class="highlighter-rouge">log(a)</code> Find the natural logarithm of <code class="highlighter-rouge">a</code> (<code class="highlighter-rouge">r</code> such that <code class="highlighter-rouge">expr(r)</code> = <code class="highlighter-rouge">a</code>)</li>
+  <li>
+    <p><code class="highlighter-rouge">log1p(a)</code> Equivalent to <code class="highlighter-rouge">log(1 + a)</code> but with less error.</p>
+  </li>
+  <li><code class="highlighter-rouge">sin(a)</code> Sine: the y-coordinate of the unit circle.</li>
+  <li><code class="highlighter-rouge">cos(a)</code> Cosine: the x-coordinate of the unit circle.</li>
+  <li>
+    <p><code class="highlighter-rouge">tan(a)</code> Tangent: equivalent to <code class="highlighter-rouge">sin(a) / cos(a)</code>.</p>
+  </li>
+  <li><code class="highlighter-rouge">asin(a)</code> inverse sine function, <code class="highlighter-rouge">asin(sin(a))</code> = <code class="highlighter-rouge">a</code>.</li>
+  <li><code class="highlighter-rouge">acos(a)</code> inverse cosine function, <code class="highlighter-rouge">acos(cos(a))</code> = <code class="highlighter-rouge">a</code>.</li>
+  <li><code class="highlighter-rouge">atan(a)</code> inverse tangent function, <code class="highlighter-rouge">atan(tan(a))</code> = <code class="highlighter-rouge">a</code>.</li>
+  <li>
+    <p><code class="highlighter-rouge">atan2(y, x)</code> like <code class="highlighter-rouge">atan</code> but returns results in <code class="highlighter-rouge">(-pi, pi]</code>.</p>
+  </li>
+  <li><code class="highlighter-rouge">sinh(x)</code> hyperbolic sine, y-coordinate of the unit hyperbola.</li>
+  <li><code class="highlighter-rouge">cosh(x)</code> hyperbolic cosine, x-coordinate of the unit hyperbola.</li>
+  <li>
+    <p><code class="highlighter-rouge">tanh(x)</code> hyperbolic tangent, <code class="highlighter-rouge">sinh(a) / cosh(a)</code>.</p>
+  </li>
+  <li><code class="highlighter-rouge">toRadians(a)</code> convert degrees (e.g. <code class="highlighter-rouge">180</code>) to pi-radians (e.g. <code class="highlighter-rouge">pi</code>)</li>
+  <li><code class="highlighter-rouge">toDegrees(a)</code> convert pi-radians (e.g. <code class="highlighter-rouge">pi/2</code>) to degrees (e.g. <code class="highlighter-rouge">90</code>).</li>
+</ul>
+
+<p>Spire is able to calculate trigonometric values (like pi) and
+functions (like sine) to arbitrary precision when using
+<code class="highlighter-rouge">BigDecimal</code>. Unlike with <code class="highlighter-rouge">NRoot</code>, there is no support for creating
+<code class="highlighter-rouge">Trig[Rational]</code> instances with arbitrary precision (although an
+instance with <code class="highlighter-rouge">Double</code> precision can be found in
+<code class="highlighter-rouge">spire.optional.rationalTrig</code>).</p>
+
+<h4 id="modules-vectorspaces-co">Modules, VectorSpaces, &amp;co</h4>
+
+<p>TODO</p>
+
+<h3 id="types">Types</h3>
+
+<p>This section attempts to chronicle the existing number types in terms of their
+capabilities and problems.</p>
+
+<h4 id="byte-short-int-and-long">Byte, Short, Int, and Long</h4>
+
+<p>These built-in integral types are all signed and have a fixed-width (8, 16,
+32, and 64 bits respectively). Division with these types is truncated, and
+overflow can silently occur when numbers to get too big (or too small).
+Division by zero will trigger an exception.</p>
+
+<p>It’s worth noting that the JVM does not support operating on <code class="highlighter-rouge">Byte</code> and
+<code class="highlighter-rouge">Short</code> directly: these operations will usually return <code class="highlighter-rouge">Int</code>. This can cause
+confusion when using type inference, and can also lead to differences between
+direct code (where adding bytes produces an int) and generic code (where
+adding bytes produces a byte).</p>
+
+<h4 id="float-and-double">Float and Double</h4>
+
+<p>These fractional types correspond to IEEE-754 floating point (32- and 64-bit
+respectively). They contain three sentinel values: positive and negative
+infinity and NaN. Large positive and negative quantities will overflow to
+their respective infinity value, and division by zero will silently go to
+infinity.</p>
+
+<p>Comparison and equality semantics for NaN are tricky (for example NaN == NaN
+is false). This also means that there is no total ordering for doubles that
+complies with IEEE comparisons. For an alternate <code class="highlighter-rouge">Ordering[Double]</code> that is
+total, see <code class="highlighter-rouge">spire.optional.totalfloat</code>.</p>
+
+<p>Since floating-point values are approximations of real values, loss of
+precision can occur when adding values of different magnitudes. Thus, many
+operations are not always associative. Spire assumes that users who work with
+<code class="highlighter-rouge">Float</code> and <code class="highlighter-rouge">Double</code> are aware of these problems, and provides instances like
+<code class="highlighter-rouge">Ring[Double]</code> even though it will fail to be associative in some cases.</p>
+
+<h4 id="bigint">BigInt</h4>
+
+<p>This integral type is unbounded–it will never overflow (although operations
+will get slower and slower as the value gets larger). This is probably one of
+the least difficult types to use correctly.</p>
+
+<h4 id="bigdecimal">BigDecimal</h4>
+
+<p>This fractional type is different than the previous floating point values. It
+contains a <code class="highlighter-rouge">MathContext</code> object which specifies a certain number of decimal
+digits of precision (34 by default). Results will be rounded to this level of
+precision, which also makes this type not associative in some cases (although
+with user-specified precision it is easier to avoid cases where this matters).</p>
+
+<p>The math context also defines how values should be rounded. Since this type is
+decimal, it can exactly represent any decimal number (unlike a floating point
+value) although its math context will need enough digits to do so.</p>
+
+<p>As with floating point, Spire makes a best effort to support this type even
+though there may be problems related to precision and rounding. Spire also
+provides capabilities which the underlying type lacks, including roots,
+fractional powers, and trigonometric methods.</p>
+
+<h4 id="rational">Rational</h4>
+
+<p>This fractional type represents a rational number, a fraction of two integers
+(<code class="highlighter-rouge">n/d</code>). It is an exact type, although as you might expect it can’t represent
+irrational numbers without approximating them as rationals. It is unbounded,
+although as the fraction becomes larger or more complex, operations will
+become slower. Rationals are always stored in simplest form to speed up future
+calculations.</p>
+
+<p>This is probably the easiest fractional type to use correctly.</p>
+
+<h4 id="safelong">SafeLong</h4>
+
+<p>This integral type is also unbounded, like <code class="highlighter-rouge">BigInt</code>. However, it is
+more efficient for small values, where it will use a <code class="highlighter-rouge">Long</code>
+instead. There is usually no reason to prefer using a <code class="highlighter-rouge">BigInt</code> over a
+<code class="highlighter-rouge">SafeLong</code> except to comply with an external API, or in cases where
+most values are expected to exceed a long’s storage capacity.</p>
+
+<h4 id="natural">Natural</h4>
+
+<p>This is a simple unbounded, unsigned integral type. It models natural
+numbers a as a cons list of digits (each “digit” being a 32-bit
+unsigned integer). For relatively small values (32-128 bits) it is
+often faster than <code class="highlighter-rouge">SafeLong</code> or <code class="highlighter-rouge">BigInt</code>. For larger values it becomes
+slower.</p>
+
+<p>The <code class="highlighter-rouge">Natural</code> type a bit of an odd-ball type at present. However the
+fact that it is guaranteed to be non-negative is useful.</p>
+
+<h4 id="ubyte-ushort-uint-and-ulong">UByte, UShort, UInt, and ULong</h4>
+
+<p>These unsigned integral types are provided by Spire. They have most of
+the same operations as their signed counterparts, although they use
+unsigned division which is a bit more involved.</p>
+
+<p>They are value classes, so in most cases there should be no extra
+overhead when compared with their primitive counterparts. The one
+exception is with arrays. <code class="highlighter-rouge">Array[UInt]</code> will be boxed whereas
+<code class="highlighter-rouge">Array[Int]</code> is not. Since conversions between <code class="highlighter-rouge">UInt</code> and <code class="highlighter-rouge">Int</code> only
+exit at compile-time, it’s easy to work around this issue by storing
+<code class="highlighter-rouge">UInt</code> instances in an <code class="highlighter-rouge">Array[Int]</code>.</p>
+
+<p>Writing literal unsigned values is slightly more cumbersome than their
+signed counterparts (consider <code class="highlighter-rouge">UInt(7)</code> versus <code class="highlighter-rouge">7</code>). Spire provides
+syntax imports which make these slightly easier to write:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">spire.syntax.literals._</span>
+<span class="k">import</span> <span class="nn">spire.syntax.literals._</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="n">ui</span><span class="s">"7"</span> <span class="c1">// equivalent to UInt(7)
+</span><span class="n">res0</span><span class="k">:</span> <span class="kt">spire.math.UInt</span> <span class="o">=</span> <span class="mi">7</span>
+</code></pre></div></div>
+
+<h4 id="fixedpoint">FixedPoint</h4>
+
+<p>This value class uses a <code class="highlighter-rouge">Long</code> with an implicit denominator. The type
+itself doesn’t contain information about the denominator. Instead, an
+implicit <code class="highlighter-rouge">FixedScale</code> instance is required to provide that context
+when necessary (for instance, during multiplication). Like the
+previous unsigned values, fixed point values will not be boxed in most
+cases.</p>
+
+<p>This type is designed to solve a specific type of problem and should
+only be used in situations where a large number of rational numbers
+with the same denominator are needed, and efficiency is very
+important.</p>
+
+<h4 id="complexa-and-quanterniona">Complex[A] and Quanternion[A]</h4>
+
+<p>These generic types represent complex numbers (<code class="highlighter-rouge">x + yi</code>) and
+quaternions (<code class="highlighter-rouge">w + xi + xj + zk</code>) respectively. They can be
+parameterized with any fractional type <code class="highlighter-rouge">A</code> which has a <code class="highlighter-rouge">Field[A]</code>,
+<code class="highlighter-rouge">NRoot[A]</code>, and <code class="highlighter-rouge">Trig[A]</code>. In general these values are as exact as
+their underlying <code class="highlighter-rouge">A</code> values are, although in some cases approximate
+results are necessarily returned (in cases where roots or trigonometry
+functions are used).</p>
+
+<p>These types are specialized, so most operations should be quite fast
+and not cause unnecessary boxing. However, these types use more memory
+than a non-generic complex number based on <code class="highlighter-rouge">Double</code> values would, and
+are a bit slower.</p>
+
+<h4 id="number">Number</h4>
+
+<p>This is a boxed number type that approximates the semantics of numbers
+in a dynamically-typed numeric tower (like Scheme or Python). There
+are four subtypes of <code class="highlighter-rouge">Number</code>, based on <code class="highlighter-rouge">SafeLong</code>, <code class="highlighter-rouge">Double</code>,
+<code class="highlighter-rouge">BigDecimal</code>, and <code class="highlighter-rouge">Rational</code>. Combining two numbers will always return
+a number of the highest precision.</p>
+
+<p><code class="highlighter-rouge">Number</code> is a good choice for users who want simple and correct
+numbers. The type keeps operations as safe as possible, while
+providing access to all operators and methods.</p>
+
+<h4 id="intervala">Interval[A]</h4>
+
+<p>Interval supports arithmetic across a range of possible <code class="highlighter-rouge">A</code>
+values. This can be thought of as representing uncertainty about a
+single, actual value, or as operating on the entire set of values
+simultaneously. Any type that has an <code class="highlighter-rouge">Order[A]</code> can be used in an
+interval, although most arithmetic operations will require additional
+type classes (ranging from <code class="highlighter-rouge">AdditiveSemigroup[A]</code> for <code class="highlighter-rouge">+</code> to
+<code class="highlighter-rouge">Field[A]</code> for <code class="highlighter-rouge">/</code>).</p>
+
+<p>Intervals may be unbounded on either side, and bounds can be open or
+closed.  (An interval includes closed boundaries, but not open
+boundaries). Here are some string representations of various
+intervals:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">[3, 6]</code> the set of values between 3 and 6 (including both).</li>
+  <li><code class="highlighter-rouge">(2, 4)</code> the set of values between 2 and 4 (excluding both).</li>
+  <li><code class="highlighter-rouge">(1, 2]</code> half-open set, including 1 but not 2.</li>
+  <li><code class="highlighter-rouge">(-∞, 5)</code> the set of values less than 5.</li>
+</ul>
+
+<p>Intervals model continuous spaces, even if the type A is discrete. So
+for instance when <code class="highlighter-rouge">(3, 4)</code> is an <code class="highlighter-rouge">Interval[Int]</code> it is not considered
+“empty” , even though there are no <code class="highlighter-rouge">Int</code> values between 3 and 4. This
+is because we can multiply the interval by 2 to get <code class="highlighter-rouge">(6, 8)</code> which is
+clearly not empty. The underlying continuous interval contains values
+which when multiplied by a scalar become valid <code class="highlighter-rouge">Int</code> values.</p>
+
+<h4 id="polynomialc">Polynomial[C]</h4>
+
+<p>Currently Spire supports univariate polynomials. These are polynomials
+with a single variable (e.g. <em>x</em>) with the following structure:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>c0 + (c1 * x^1) + (c2 * x^2) + ... + (cn * x^n)
+</code></pre></div></div>
+
+<p>The coefficients (<code class="highlighter-rouge">c0</code> through <code class="highlighter-rouge">cn</code>) are values of the type <code class="highlighter-rouge">C</code>, and
+the exponents (<code class="highlighter-rouge">1</code> through <code class="highlighter-rouge">n</code>) are <code class="highlighter-rouge">Int</code> values (this does mean that
+Spire’s implementation only supports polynomials whose exponents are
+less than 2147483648).</p>
+
+<p>Like interval, arithmetic on polynomials is accomplished using type
+classes for <code class="highlighter-rouge">C</code>, such as <code class="highlighter-rouge">Semiring[C]</code>. With the right type classes,
+polynomials can support all the arithmetic operations covered by
+euclidean rings, but not fields. Division and reciprocal operations
+are impossible because polynomials do not support fractional or
+negative exponents. Polynomials also support <code class="highlighter-rouge">interval</code>, <code class="highlighter-rouge">derivative</code>,
+and other operations.</p>
+
+<p>Spire does support a convenient syntax for literal polynomials. By
+importing <code class="highlighter-rouge">spire.syntax.literals._</code> (or just <code class="highlighter-rouge">spire.implicits._</code>) you
+can use the <code class="highlighter-rouge">poly</code> string interpolator to create
+<code class="highlighter-rouge">Polynomial[Rational]</code> instances:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">spire.syntax.literals._</span>
+<span class="k">import</span> <span class="nn">spire.syntax.literals._</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="n">poly</span><span class="s">"3x^2 - 5x + 1"</span>
+<span class="n">res1</span><span class="k">:</span> <span class="kt">spire.math.Polynomial</span><span class="o">[</span><span class="kt">spire.math.Rational</span><span class="o">]</span> <span class="k">=</span> <span class="o">(</span><span class="mi">3</span><span class="n">x</span><span class="err">²</span> <span class="o">-</span> <span class="mi">5</span><span class="n">x</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="n">poly</span><span class="s">"5/4x^6 - 7x - 2"</span>
+<span class="n">res2</span><span class="k">:</span> <span class="kt">spire.math.Polynomial</span><span class="o">[</span><span class="kt">spire.math.Rational</span><span class="o">]</span> <span class="k">=</span> <span class="o">(</span><span class="mi">5</span><span class="o">/</span><span class="mi">4</span><span class="n">x</span><span class="err">⁶</span> <span class="o">-</span> <span class="mi">7</span><span class="n">x</span> <span class="o">-</span> <span class="mi">2</span><span class="o">)</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="n">poly</span><span class="s">"1.2x^3 - 6.1x^2 + 9x - 3.33"</span>
+<span class="n">res3</span><span class="k">:</span> <span class="kt">spire.math.Polynomial</span><span class="o">[</span><span class="kt">spire.math.Rational</span><span class="o">]</span> <span class="k">=</span> <span class="o">(</span><span class="mi">6</span><span class="o">/</span><span class="mi">5</span><span class="n">x</span><span class="err">³</span> <span class="o">-</span> <span class="mi">61</span><span class="o">/</span><span class="mi">10</span><span class="n">x</span><span class="err">²</span> <span class="o">+</span> <span class="mi">9</span><span class="n">x</span> <span class="o">-</span> <span class="mi">333</span><span class="o">/</span><span class="mi">100</span><span class="o">)</span>
+</code></pre></div></div>
+
+<p>Spire actually supports two types of polynomials: dense and
+sparse. For most simple polynomials used in these examples, you’ll
+probably want dense polynomials. However, in cases where your
+polynomials have a few terms with very large exponents the sparse
+implementation will be more efficient. In any case, the underlying
+representation is an implementation detail and both types support the
+same operations (and can interoperate).</p>
+
+<h4 id="algebraic">Algebraic</h4>
+
+<p>The <code class="highlighter-rouge">Algebraic</code> type is an implementation of a number for “Exact
+Geometric Computation”. It represents algebraic numbers using an AST
+of the operations performed on it. <code class="highlighter-rouge">Algebraic</code> numbers can be compared
+accurately and exactly. This means that if we have two numbers <code class="highlighter-rouge">a</code> and
+<code class="highlighter-rouge">b</code>, then <code class="highlighter-rouge">a compare b</code> is always correct, regardless of whether they
+are irrational or incredibly close to each other. They are suitable
+for use in algorithms that use square- or n-roots and rely on sign
+tests and numeric comparison to work correctly.</p>
+
+<p>On top of exact comparisons/sign tests, <code class="highlighter-rouge">Algebraic</code> is able to
+approximate itself to any desired precision, after the fact. This
+works for both absolute approximations, such as <code class="highlighter-rouge">x +/- 0.00001</code>, or
+relative approximations, such as <code class="highlighter-rouge">x.toBigDecimal(new MathContext(10000))</code>.</p>
+
+<p>Because <code class="highlighter-rouge">Algebraic</code> can represent algebraic numbers (note: we are adding
+support for polynomial roots, not just n-roots), they have a wider range
+than <code class="highlighter-rouge">Rational</code>. However, whereas <code class="highlighter-rouge">Rational</code> represents numbers exactly,
+<code class="highlighter-rouge">Algebraic</code> can only compare exactly. They also sacrifice performance to
+achieve this, and so are not suitable for use where you need performance
+and can tolerate a certain amount of error.</p>
+
+<h4 id="real">Real</h4>
+
+<p><code class="highlighter-rouge">Real</code> stands for “computable real”. Spire’s <code class="highlighter-rouge">Real</code> implementation is
+based on ERA, written in Haskell by David Lester. Computable real
+numbers are those which can be computed (i.e. approximated) to any
+desired precision. Unlike <code class="highlighter-rouge">Double</code> and <code class="highlighter-rouge">BigDecimal</code>, <code class="highlighter-rouge">Real</code> values are
+not stored as approximations, but rather as a function from a desired
+precision to the closest approximate value.</p>
+
+<p>If we have an instance <code class="highlighter-rouge">x</code> of <code class="highlighter-rouge">Real</code> which approximates a real number
+<em>r</em>, this means that for any precision <em>p</em> (in bits), our instance
+will produce an <em>x</em> such that <em>x/2^p</em> is the closest rational value to
+<em>r</em>. Translated into Scala, this means that <code class="highlighter-rouge">x.apply(p)</code> returns a
+<code class="highlighter-rouge">SafeLong</code> value <code class="highlighter-rouge">x</code>, such that <code class="highlighter-rouge">Rational(x, SafeLong(2).pow(p))</code> is a
+best approximation for <em>r</em>.</p>
+
+<p>Spire represents two types of <code class="highlighter-rouge">Real</code> values: <code class="highlighter-rouge">Exact</code> and
+<code class="highlighter-rouge">Inexact</code>. The former are rational values for which we have an
+existing instance of <code class="highlighter-rouge">Rational</code>, and are inexpensive to work with. The
+latter are functions for approximating (potentially) irrational
+values, are lazily evaluated and memoized, and can potentially be very
+expensive to compute.</p>
+
+<p>As with <code class="highlighter-rouge">Rational</code> values, operations on <code class="highlighter-rouge">Real</code> values are able to
+obey the relevant algebraic identities. But unlike <code class="highlighter-rouge">Rational</code>, <code class="highlighter-rouge">Real</code>
+supports roots and trigonometric functions. Furthermore, important
+trig identities are also preserved:</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">spire.implicits._</span>
+<span class="k">import</span> <span class="nn">spire.implicits._</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">spire.math.Real</span>
+<span class="k">import</span> <span class="nn">spire.math.Real</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="k">import</span> <span class="nn">Real.</span><span class="o">{</span><span class="n">sin</span><span class="o">,</span> <span class="n">cos</span><span class="o">}</span>
+<span class="k">import</span> <span class="nn">Real.</span><span class="o">{</span><span class="n">sin</span><span class="o">,</span> <span class="n">cos</span><span class="o">}</span>
+
+<span class="n">scala</span><span class="o">&gt;</span> <span class="c1">// will return Real(1) no matter what value is provided
+</span>     <span class="o">|</span> <span class="k">def</span> <span class="n">circle</span><span class="o">(</span><span class="n">a</span><span class="k">:</span> <span class="kt">Real</span><span class="o">)</span><span class="k">:</span> <span class="kt">Real</span> <span class="o">=</span> <span class="o">(</span><span class="n">cos</span><span class="o">(</span><span class="n">a</span><span class="o">).</span><span class="n">pow</span><span class="o">(</span><span class="mi">2</span><span class="o">)</span> <span class="o">+</span> <span class="n">sin</span><span class="o">(</span><span class="n">a</span><span class="o">).</span><span class="n">pow</span><span class="o">(</span><span class="mi">2</span><span class="o">)).</span><span class="n">sqrt</span>
+<span class="n">circle</span><span class="k">:</span> <span class="o">(</span><span class="kt">a:</span> <span class="kt">spire.math.Real</span><span class="o">)</span><span class="kt">spire.math.Real</span>
+</code></pre></div></div>
+
+<p>One interesting consequence of the design of computable real numbers
+is non-continuous operations (such as sign tests, comparisons, and
+equality) cannot be performed exactly. If <code class="highlighter-rouge">x.apply(p)</code> returns <code class="highlighter-rouge">0</code>,
+there is no way to know whether the value is actually zero, or just a
+very small value (either positive or negative!) which is approximately
+zero at this precision. Similarly, it’s not possible to say that <code class="highlighter-rouge">x</code>
+is equal to <code class="highlighter-rouge">y</code>, but only that they are equivalent (or not) at a given
+precision.</p>
+
+<p>Spire currently bakes in a “default” precision to use with these kinds
+of methods. Furthermore, these methods will always work with <code class="highlighter-rouge">Exact</code>
+values: the issues only arise when using <code class="highlighter-rouge">Inexact</code> values. Given that
+the alternative to using <code class="highlighter-rouge">Real</code> is to use another approximate type,
+providing approximate comparisons and equality seems like a reasonable
+compromise.</p>
+
+<h3 id="which-number-types-should-i-use">Which number types should I use?</h3>
+
+<p>Spire provides many number types, and it is not always obvious what their
+relative merits are. This section explains the distinctions between them, and
+may help you decide which numeric representation(s) to use.</p>
+
+<p>There is usually a tension between numbers that have correctness caveats (like
+possible overflow or precision issues) and numbers that have performance
+caveats (like extra allocations and/or slower code). Spire provides a wide
+range of numeric types that should address most needs.</p>
+
+<h4 id="natural-numbers-unsigned-whole-value-numbers">Natural numbers (unsigned, whole-value numbers)</h4>
+
+<p>For non-negative numbers, the safe type to use is <code class="highlighter-rouge">Natural</code>. It is quite fast
+when representing small-ish numbers (128-bits or less), but has no upper bound
+on the values it can represent. However, its unique cons-structure means that
+for very large values <code class="highlighter-rouge">BigInt</code> and <code class="highlighter-rouge">SafeLong</code> may be faster. Since it only
+supports non-negative values, subtraction is non-total (and may throw an
+exception).</p>
+
+<p>If your values are guaranteed to be small (or you are prepared to detect
+truncation), you can use <code class="highlighter-rouge">UByte</code> (8-bit), <code class="highlighter-rouge">UShort</code> (16-bit), <code class="highlighter-rouge">UInt</code> (32-bit),
+or <code class="highlighter-rouge">ULong</code> (64-bit), depending on how much space you need. These types have
+the same unsigned semantics as unsigned types in languages like C. These types
+are not boxed, although care must be used with arrays (like any value class).</p>
+
+<h4 id="integer-numbers-signed-whole-value-numbers">Integer numbers (signed, whole-value numbers)</h4>
+
+<p>There are two safe types that can be used with integer values: <code class="highlighter-rouge">SafeLong</code> and
+<code class="highlighter-rouge">BigInt</code>. Both support arbitrarily large values, as well as the usual
+semantics for things like integer division (<code class="highlighter-rouge">quot</code>). The former (<code class="highlighter-rouge">SafeLong</code>)
+performs much better for values that can be represented with a <code class="highlighter-rouge">Long</code> (e.g.
+64-bit or less), and is a good default choice. When dealing with values that
+are mostly or entirely very large, <code class="highlighter-rouge">BigInt</code> may be a bit faster.</p>
+
+<p>Like the unsigned case, you can use <code class="highlighter-rouge">Byte</code> (8-bit), <code class="highlighter-rouge">Short</code> (16-bit), <code class="highlighter-rouge">Int</code>
+(32-bit), or <code class="highlighter-rouge">Long</code> (64-bit) to handle cases where your values are small, or
+where you want to avoid allocations and will handle truncation issues
+yourself. These types are provided by Scala (and ultimately the JVM) and will
+not cause object allocations.</p>
+
+<h4 id="fractional-numbers-numbers-that-can-be-divided">Fractional numbers (numbers that can be divided)</h4>
+
+<p>There are many different fractional flavors, which support various trade-offs
+between expressive power, precision, and performance.</p>
+
+<p>Fractional types come in two basic flavors: precise or imprecise. Imprecise
+types (like <code class="highlighter-rouge">Double</code>) will accumulate error and are not associative in some
+cases (meaning that <code class="highlighter-rouge">(x + y) + z</code> may produce different results than <code class="highlighter-rouge">x + (y +
+z)</code>). These types are often faster than precise types but can be risky to use.</p>
+
+<p>Precise numbers make stronger precision guarantees, but at the cost of
+performance or expressiveness. They are often a bit slower, and may restrict
+the operations they support (to preserve guarantees about precision).</p>
+
+<h5 id="precise-types">Precise types</h5>
+
+<p>The most powerful precise type is <code class="highlighter-rouge">Real</code>. It represents computable real
+numbers, and supports all the operations you would expect, including roots and
+trigonometry. However, irrational values (like <code class="highlighter-rouge">Real(2).sqrt</code> or <code class="highlighter-rouge">Real.pi</code>)
+are represented via functions from precision to approximations. This means
+that in some situations this type might be too slow, or use too much memory.
+Additionally, operations requiring comparison or equality tests can only be
+approximately computed. However, this type should never accumulate error, so
+your results will always be correctly approximated to whatever precision you
+need.</p>
+
+<p>The next precise type is <code class="highlighter-rouge">Algebraic</code>. This type supports all rational values
+as well as roots. However, it cannot represent transcendental values like “pi”,
+making its values a subset of <code class="highlighter-rouge">Real</code>’s. Unlike <code class="highlighter-rouge">Real</code>, this type is able to do
+exact sign tests (and thus, equality tests and comparisons). Due to the ASTs
+<code class="highlighter-rouge">Algebraic</code> uses to represent expressions, execution may be slow and involve
+lots of allocations.</p>
+
+<p>Finally there is <code class="highlighter-rouge">Rational</code>. This type represents values as irreducible
+fractions (e.g. <code class="highlighter-rouge">n/d</code>). <code class="highlighter-rouge">Rational</code> cannot represent irrational values (such as
+roots), but efficiently implements all operations on rational values. This
+type has the fewest performance “gotchas”, although obviously fractions with
+large numerators or denominators will take longer to operate on.</p>
+
+<h5 id="imprecise-types">Imprecise types</h5>
+
+<p>These types are more efficient than the precise types, but require care and
+analysis to ensure that results are correct and sufficiently accurate.</p>
+
+<p>The imprecise type with the most potential precision is <code class="highlighter-rouge">BigDecimal</code> which is
+provided by Scala. This number approximates real values to a number of decimal
+(base-10) digits (by default 34). Unlike floating point values, this type has
+an exact representation of values like <code class="highlighter-rouge">0.111110</code>, and the user can use
+<code class="highlighter-rouge">java.math.MathContext</code> to configure how much precision is used. Even so, the
+type is still subject to accumulated rounding error, and thus is not truly
+associative.</p>
+
+<p>Next come <code class="highlighter-rouge">Float</code> and <code class="highlighter-rouge">Double</code>, the built-in 32- and 64-bit floating-point
+implementations on the JVM. The pitfalls of using floating-point values are
+well-known (and documented elsewhere) but these types are very fast.</p>
+
+<p>Finally, Spire supports the experimental <code class="highlighter-rouge">FixedPoint</code> class. This value class
+uses unboxed <code class="highlighter-rouge">Long</code> values to represent fractions in terms of user-specified
+denominator (supplied via an implicit <code class="highlighter-rouge">FixedScale</code> instance). This is a very
+special-purpose type to be used in cases where floating-point approximations
+have problems and unboxed values are required. You should avoid this type
+unless your applications has a known, specific need for fixed-point
+arithmetic.</p>
+
+<h4 id="other-types">Other types</h4>
+
+<p>The other numeric and pseudo-numeric types (like <code class="highlighter-rouge">Polynomial</code>, <code class="highlighter-rouge">Interval</code>,
+<code class="highlighter-rouge">Complex</code>, and <code class="highlighter-rouge">Quaternion</code>) each implement specific functionality, so there
+should be less confusion about which type to use. The sections describing
+these types explain their properties and trade-offs.</p>
+
+<h3 id="pseudo-random-number-generators-distributions-etc">Pseudo-Random Number Generators, Distributions, etc</h3>
+
+<p>Since Spire tries to make number types more pluggable in Scala code, it only
+makes sense that we’d want to allow users to easily generate a wide variety of
+number types using pluggable PRNGs. The <code class="highlighter-rouge">spire.random</code> package contains random
+number generators appropriate to many different tasks, as well as a functional
+interface to creating uniform distributions of values.</p>
+
+<h4 id="pseudo-random-number-generators">Pseudo-Random Number Generators</h4>
+
+<p><strong>This section needs revising! Immutable generators have been replaced
+by the <code class="highlighter-rouge">Random[A]</code> monad, and the package structure has changed a bit!</strong></p>
+
+<p>Spire supports two types of PRNGs: mutable and immutable.</p>
+
+<p>The <code class="highlighter-rouge">mutable.Generator</code> trait represents a PRNG strategy. Using
+uniformly-generated <code class="highlighter-rouge">Int</code> or <code class="highlighter-rouge">Long</code> values it can generate random values,
+arrays of values, and so on. Defining a generator is relatively easy (for a
+very simple example see <code class="highlighter-rouge">Lcg64</code>).</p>
+
+<p>By default, generators are not threadsafe. A synchronized generator can be
+created from an unsynchronized one via the <code class="highlighter-rouge">sync</code> method. Generators can be
+copied, and their seeds can be saved and restored. This allows users to create
+deterministic streams of values by using the same seed. In general, it is
+preferred for users to create and use their own generators as opposed to
+relying on a single generator across threads.</p>
+
+<p>Although the <code class="highlighter-rouge">mutable.Generator</code> trait itself only provides low-level methods
+like <code class="highlighter-rouge">nextInt</code>, it can produce values of any type using the <code class="highlighter-rouge">Dist[A]</code> type
+class, which will be discussed in the next section.</p>
+
+<p>The <code class="highlighter-rouge">immutable.Generator</code> trait is similar to <code class="highlighter-rouge">mutable.Generator</code>, although
+the state it stores is immutable. Each time a number is generated a new
+generator is returned as well, which allows these generators to be used in a
+pure-functional context. The same <code class="highlighter-rouge">Dist[A]</code> instances that would be used with
+a mutable generator are also applicable here.</p>
+
+<h4 id="creation-random-values-with-dista">Creation random values with Dist[A]</h4>
+
+<p>The <code class="highlighter-rouge">Dist[A]</code> type class represents a strategy for generating a
+distribution of <code class="highlighter-rouge">A</code> values given a <code class="highlighter-rouge">Generator</code> instance. <code class="highlighter-rouge">Dist[A]</code>
+makes no guarantee as to how the <code class="highlighter-rouge">A</code> values are distributed (for
+instance, it may always return the same value). Users who are
+interested in particular distributions should use the <code class="highlighter-rouge">Uniform[A]</code>,
+<code class="highlighter-rouge">Gaussian[A]</code>, and <code class="highlighter-rouge">Exponential[A]</code> traits to generate <code class="highlighter-rouge">Dist[A]</code>
+instances that correspond to their needs.</p>
+
+<p>The <code class="highlighter-rouge">Dist[A]</code> objects themselves are immutable and are powered by
+generators (both mutable and immutable). They can be transformed via
+<code class="highlighter-rouge">map</code>, <code class="highlighter-rouge">flatMap</code>, and other combinators. Given the appropriate
+structure on <code class="highlighter-rouge">A</code>, <code class="highlighter-rouge">Dist[A]</code> instances can also be operated on as if
+they were value.</p>
+
+<h4 id="distributions">Distributions</h4>
+
+<p>Currently, <code class="highlighter-rouge">spire.random</code> provides <code class="highlighter-rouge">Uniform[A]</code>, <code class="highlighter-rouge">Gaussian[A]</code>, and
+<code class="highlighter-rouge">Exponential[A]</code> type classes which given appropriate parameters can
+produce <code class="highlighter-rouge">Dist[A]</code> instances. Since most types have a (approximately)
+infinite number of possible values, bounds and other constraints need
+to be put on these types before we can usefully talk about (or
+implement) probability distributions in Spire.</p>
+
+<ul>
+  <li>
+    <p>Given <code class="highlighter-rouge">min</code> and <code class="highlighter-rouge">max</code>, a <code class="highlighter-rouge">Uniform[A]</code> instance can produce a
+uniformly-distributed <code class="highlighter-rouge">Dist[A]</code> instance.</p>
+  </li>
+  <li>
+    <p>Given <code class="highlighter-rouge">mean</code> and <code class="highlighter-rouge">stdDev</code>, a <code class="highlighter-rouge">Gaussian[A]</code> instance can produce a
+<code class="highlighter-rouge">Dist[A]</code> whose values are distributed according to the desired
+gaussian distribution.</p>
+  </li>
+  <li>
+    <p>Given <code class="highlighter-rouge">rate</code>, a <code class="highlighter-rouge">Gaussian[A]</code> instance can produce a <code class="highlighter-rouge">Dist[A]</code>
+whose values are distributed according to the desired exponential
+distribution.</p>
+  </li>
+</ul>
+</div></div></section><section class="technologies"><div class="container"><div class="row"></div></div></section></main><footer id="site-footer"><div class="container"><div class="row"><div class="col-xs-6"><p>Spire is designed and developed by <a href="http://spire-math.org" target="_blank">Spire contributors</a></p></div><div class="col-xs-6"><p class="text-right"><a href="https://github.com/non/spire"><span class="fa fa-github"></span>View on GitHub</a></p></div></div><div class="row"><div class="col-xs-6"><p>Website built with <a href="https://47deg.github.io/sbt-microsites/" target="_blank">Sbt-microsites</a> - © 2016 <a href="https://www.47deg.com/" target="_blank">47 Degrees</a></p></div></div></div></footer><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/spire/highlight/highlight.pack.js"></script><script>hljs.configure({
+languages:['scala','java','bash']
+});
+hljs.initHighlighting();
+             </script><script>((window.gitter = {}).chat = {}).options = {
+room: 'non/spire'};</script><script src="https://sidecar.gitter.im/dist/sidecar.v1.js"></script></body></html>

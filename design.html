@@ -1,0 +1,94 @@
+<html><head><title>Spire: Design notes</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Spire contributors" /><meta name="description" content="Powerful new number types and numeric abstractions for Scala" /><meta name="og:image" content="/spire/img/poster.png" /><meta name="og:title" content="Spire: Design notes" /><meta name="og:site_name" content="Spire" /><meta name="og:url" content="http://non.github.io/spire" /><meta name="og:type" content="website" /><meta name="og:description" content="Powerful new number types and numeric abstractions for Scala" /><link rel="icon" type="image/png" href="/spire/img/favicon.png" /><meta name="twitter:title" content="Spire: Design notes" /><meta name="twitter:image" content="http://non.github.io/spireimg/poster.png" /><meta name="twitter:description" content="Powerful new number types and numeric abstractions for Scala" /><meta name="twitter:card" content="summary_large_image" /><link rel="icon" type="image/png" sizes="16x16" href="/spire/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/spire/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/spire/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/spire/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/spire/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/spire/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/spire/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/spire/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/spire/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/spire/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/spire/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/spire/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/spire/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/spire/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/spire/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/spire/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/spire/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/spire/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/spire/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/spire/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/spire/highlight/styles/atom-one-light.css" /><link rel="stylesheet" href="/spire/css/style.css" /><link rel="stylesheet" href="/spire/css/palette.css" /><link rel="stylesheet" href="/spire/css/codemirror.css" /></head><body><header id="site-header"><div class="navbar-wrapper"><div class="container"><div class="row"><div class="col-xs-6"><a href="/spire/" class="brand"><div class="icon-wrapper"><span>Spire</span></div></a></div><div class="col-xs-6"><nav class="text-right"><ul class=""><li><a href="https://github.com/non/spire"><i class="fa fa-github"></i><span class="hidden-xs">GitHub</span></a></li><li><a href="/spire/api/spire/index.html"><i class="fa fa-file-text"></i><span class="hidden-xs">API Documentation</span></a></li></ul></nav></div></div></div></div><div class="jumbotron"><div class="container"><h1 class="text-center">Powerful new number types and numeric abstractions for Scala</h1><h2></h2><p class="text-center"><a href="https://github.com/non/spire" class="btn btn-outline-inverse">View on GitHub</a></p></div></div><div><ul class="horizontalNav">     <li><a class="" href="/spire/">Readme</a></li>  <li><a class="" href="/spire/guide.html">Guide</a></li>  <li><a class="" href="/spire/changes.html">Changes</a></li>  <li><a class="" href="/spire/contributing.html">Contributing</a></li>  <li><a class=" active " href="/spire/design.html">Design notes</a></li>  <li><a class="" href="/spire/authors.html">Authors</a></li>  <li><a class="" href="/spire/friends.html">Friends of Spire</a></li> </ul></div></header><main id="site-main"><section class="use"><div class="container"><div id="content"><h2 id="design">Design</h2>
+
+<p>This document is intended to describe design goals, invariants and implementation notes for the various types</p>
+
+<h2 id="safelong">SafeLong</h2>
+
+<p>The design goal of SafeLong is to provide worry-free arbitrary precision integers that nevertheless have performance approaching boxed Longs for calculations that remain within the range of a 64bit signed integer.</p>
+
+<p>This is achieved by having two cases: <code class="highlighter-rouge">SafeLongLong(x: Long)</code> is used for numbers within the long range. <code class="highlighter-rouge">SafeLongBigInt(x: BigInt)</code> is used if this is not the case.</p>
+
+<h3 id="invariants">Invariants</h3>
+
+<ul>
+  <li>A number in the long range must <em>always</em> be represented as a <code class="highlighter-rouge">SafeLongLong</code>. This is used both within the SafeLong operations and from other classes in spire.math. Consequences of this invariant are
+    <ul>
+      <li><code class="highlighter-rouge">SafeLongBigInt</code> can never be zero</li>
+      <li>A <code class="highlighter-rouge">SafeLongBigInt</code> can never be equal to a <code class="highlighter-rouge">SafeLongLong</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="implementation-notes">Implementation notes</h3>
+
+<p>Operations of <code class="highlighter-rouge">SafeLongBigInt</code> use the underyling BigInt and create the appropriate kind of result depending on whether the result is a valid long.</p>
+
+<p>Operations on <code class="highlighter-rouge">SafeLongLong</code> use the Checked macro to perform operations using long integers, and only fall back to using <code class="highlighter-rouge">BigInt</code> in case of numeric overflow.</p>
+
+<h3 id="performance-tips">Performance tips</h3>
+
+<ul>
+  <li>comparison to zero is more efficient using signum than using compare</li>
+  <li>the <code class="highlighter-rouge">isValidLong</code> method can be used to check if a <code class="highlighter-rouge">SafeLong</code> can be losslessly converted to a long using <code class="highlighter-rouge">toLong</code></li>
+</ul>
+
+<h2 id="rational">Rational</h2>
+
+<p>The design goal of Rational is to provide good performance and low memory overhead in the very frequent case of rational numbers with small magnitude, while still being able to represent rational numbers of arbitrary size.</p>
+
+<p>To achieve this goal, there are two different cases. <code class="highlighter-rouge">LongRational(n: Long, d: Long)</code> is used to represent small
+rational numbers. <code class="highlighter-rouge">BigRational(n: BigInt, d: BigInt)</code> is used whenever either numerator or denominator are too large to be stored in a <code class="highlighter-rouge">LongRational</code>.</p>
+
+<h3 id="invariants-1">Invariants</h3>
+
+<p>Rationals are always stored in a normalized form so that there is an unique representation for each number:</p>
+
+<ul>
+  <li>Common factors of numerator and denominator are eliminated, so e.g. <code class="highlighter-rouge">3/9</code> is stored as <code class="highlighter-rouge">n = 1, d = 3</code></li>
+  <li>Negative rational numbers are always stored as a negative numerator. Therefore the denominator is always positive</li>
+  <li>A rational number with a zero denominator is invalid</li>
+  <li>Zero will always be stored as <code class="highlighter-rouge">n = 0, d = 1</code></li>
+</ul>
+
+<p>In addition to these invariants that are quite common in many rational implementations, there are additional invariants
+related to the usage of LongRational or BigRational:</p>
+
+<ul>
+  <li>Every rational number that can be stored in a LongRational given the invariants above will <em>always</em> be stored in a
+LongRational. Consequences of this are:
+    <ul>
+      <li>The valid range for the numerator is <code class="highlighter-rouge">[Long.MinValue, Long.MaxValue]</code> and for the denominator <code class="highlighter-rouge">[1, Long.MaxValue]</code>.</li>
+      <li>Since the denominator is always stored as a positive number, e.g. <code class="highlighter-rouge">Rational(1, Long.MinValue)</code> must be stored as a
+BigRational</li>
+      <li>A BigRational can never be equal to a LongRational</li>
+      <li>The numerator of a BigRational can never be zero, since zero is always represented as <code class="highlighter-rouge">LongRational(0, 1)</code></li>
+    </ul>
+  </li>
+</ul>
+
+<p>When implementing operations for Rationals, it is important to make sure that the invariants are not violated. E.g. when performing an operation with two <code class="highlighter-rouge">BigRational</code> that results in a small number that can be represented in a
+<code class="highlighter-rouge">LongRational</code>, the result <strong><em>must</em></strong> be a <code class="highlighter-rouge">LongRational</code>.</p>
+
+<h3 id="implementation-notes-1">Implementation notes</h3>
+
+<p>The implementation of BigRational is pretty straightforward. Usually, operations will be performed using <code class="highlighter-rouge">SafeLong</code>, and the result will be created using a builder method that takes a <code class="highlighter-rouge">SafeLong</code> for both numerator and denominator and produces the right kind of rational number given the invariants.</p>
+
+<p>LongRational operations are a bit more complex: Basic operations use the Checked macro to try to perform the operation with just long integers, and only fall back to using <code class="highlighter-rouge">SafeLong</code> when there is a numeric overflow. The advantage of this approach is that there are no unnecessary object allocations in the very common case that there is no overflow.</p>
+
+<h3 id="performance-tips-1">Performance tips</h3>
+
+<p>The performance characteristics of rational operations are a bit different to normal integer or floating point operations.</p>
+
+<ul>
+  <li>the basic operations +,-,*,/ have roughly the same cost</li>
+  <li>comparison is cheaper than the basic operations, and will not allocate any objects for small rational numbers</li>
+  <li>comparison to zero is more efficient using signum than using compare</li>
+  <li>comparison to one is best done with the compareToOne method instead of using compare</li>
+</ul>
+
+</div></div></section><section class="technologies"><div class="container"><div class="row"></div></div></section></main><footer id="site-footer"><div class="container"><div class="row"><div class="col-xs-6"><p>Spire is designed and developed by <a href="http://spire-math.org" target="_blank">Spire contributors</a></p></div><div class="col-xs-6"><p class="text-right"><a href="https://github.com/non/spire"><span class="fa fa-github"></span>View on GitHub</a></p></div></div><div class="row"><div class="col-xs-6"><p>Website built with <a href="https://47deg.github.io/sbt-microsites/" target="_blank">Sbt-microsites</a> - © 2016 <a href="https://www.47deg.com/" target="_blank">47 Degrees</a></p></div></div></div></footer><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/spire/highlight/highlight.pack.js"></script><script>hljs.configure({
+languages:['scala','java','bash']
+});
+hljs.initHighlighting();
+             </script><script>((window.gitter = {}).chat = {}).options = {
+room: 'non/spire'};</script><script src="https://sidecar.gitter.im/dist/sidecar.v1.js"></script></body></html>
