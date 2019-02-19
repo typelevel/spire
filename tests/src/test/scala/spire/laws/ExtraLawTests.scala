@@ -9,7 +9,7 @@ class ExtraLawTests extends FunSuite with Discipline {
   import IntervalSeqArbitrary._
   // import IntervalTrieArbitrary._
 
-//  checkAll("Bool[IntervalSeq[Int]]", LogicLaws[IntervalSeq[Int]].bool)
+  checkAll("Bool[IntervalSeq[Int]]", LogicLaws[IntervalSeq[Int]].bool)
   // TODO: restore the test
 //  checkAll("Bool[IntervalTrie[Long]]", LogicLaws[IntervalTrie[Long]].bool)
 }
