@@ -2,7 +2,7 @@
 
  * Disabled benchmarked depending on Caliper; waiting for migration to a modern benchmarking framework
  * Fixes to polynomials
- * Revised integer Eucidean division semantics: remainder is usually nonnegative (and that's important to define polynomial rings over integers)
+ * Revised integer Euclidean division semantics: remainder is usually nonnegative (and that's important to define polynomial rings over integers)
  * The ranges provided to sorting algorithms are now consistent across methods, see https://github.com/non/spire/pull/738 : "All these strategies operate in place on segments of arrays that start and end at specified indices. In the QuickSort implementation, the end index was inclusive, while it was exclusive in MergeSort and InsertionSort. This has been fixed in this changeset to make the end index exclusive in all three implementations, following the convention in the Java Collections library."
  
 ## Version 0.16.0
