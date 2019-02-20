@@ -9,7 +9,7 @@
 
 sbt_cmd="sbt ++${TRAVIS_SCALA_VERSION}!"
 scala_js="$sbt_cmd macrosJS/test && $sbt_cmd coreJS/test && $sbt_cmd extrasJS/test && $sbt_cmd lawsJS/test && $sbt_cmd testsJS/test"
-scala_jvm="$sbt_cmd clean coverage validateJVM coverageReport coverageOff docs/tut"
+scala_jvm="$sbt_cmd clean coverage validateJVM coverageReport coverageOff docs/makeMicrosite"
 run_cmd="$scala_js && $scala_jvm"
 
 eval $run_cmd
