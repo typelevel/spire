@@ -34,8 +34,8 @@ lazy val spireJVM = project.in(file(".spireJVM"))
   .settings(unidocSettings)
   .settings(noPublishSettings)
   .enablePlugins(ScalaUnidocPlugin)
-  .aggregate(macrosJVM, coreJVM, dataJVM, extrasJVM, examples, lawsJVM, legacyJVM, platformJVM, testsJVM, utilJVM, benchmark)
-  .dependsOn(macrosJVM, coreJVM, dataJVM, extrasJVM, examples, lawsJVM, legacyJVM, platformJVM, testsJVM, utilJVM, benchmark)
+  .aggregate(macrosJVM, coreJVM, dataJVM, extrasJVM, examples, lawsJVM, legacyJVM, platformJVM, testsJVM, utilJVM, benchmarkJmh)
+  .dependsOn(macrosJVM, coreJVM, dataJVM, extrasJVM, examples, lawsJVM, legacyJVM, platformJVM, testsJVM, utilJVM, benchmarkJmh)
 
 lazy val spireJS = project.in(file(".spireJS"))
   .settings(moduleName := "spire-aggregate")
@@ -249,21 +249,20 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
 lazy val testsJVM = tests.jvm
 lazy val testsJS = tests.js
 
-lazy val benchmark = project
-  .settings(moduleName := "spire-benchmark")
-  .settings(spireSettings)
-  .settings(benchmarkSettings)
-  .settings(noPublishSettings)
-  .settings(commonJvmSettings)
-  .dependsOn(coreJVM, extrasJVM)
-
 lazy val benchmarkJmh: Project = project.in(file("benchmark-jmh"))
   .settings(moduleName := "spire-benchmark-jmh")
   .settings(spireSettings)
   .settings(noPublishSettings)
   .settings(commonJvmSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.apfloat" % "apfloat" % apfloatVersion,
+      "org.jscience" % "jscience" % jscienceVersion,
+      "org.apache.commons" % "commons-math3" % apacheCommonsMath3Version
+    )
+  )
   .enablePlugins(JmhPlugin)
-  .dependsOn(coreJVM, extrasJVM, benchmark)
+  .dependsOn(coreJVM, extrasJVM)
 
 // General settings
 
@@ -335,24 +334,6 @@ lazy val scoverageSettings = Seq(
   coverageExcludedPackages := "spire\\.benchmark\\..*;spire\\.macros\\..*"
 )
 
-// Project's settings
-
-lazy val benchmarkSettings = Seq(
-  // raise memory limits here if necessary
-  // TODO: this doesn't seem to be working with caliper at the moment :(
-  javaOptions in run += "-Xmx4G",
-
-  libraryDependencies ++= Seq(
-    // comparisons
-    "org.apfloat" % "apfloat" % apfloatVersion,
-    "org.jscience" % "jscience" % jscienceVersion,
-    "org.apache.commons" % "commons-math3" % apacheCommonsMath3Version
-  ),
-
-  // enable forking in run
-  fork in run := true
-)
-
 lazy val coreSettings = Seq(
   buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
   buildInfoPackage := "spire",
@@ -387,7 +368,7 @@ lazy val scalaTestSettings = Seq(
 lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps ++ publishSettings ++ scoverageSettings
 
 lazy val unidocSettings = Seq(
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, testsJVM)
+  unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmarkJmh, testsJVM)
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

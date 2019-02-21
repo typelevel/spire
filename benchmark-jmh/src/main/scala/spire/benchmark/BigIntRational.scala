@@ -1,9 +1,9 @@
 package spire
 package benchmark
-/*
+
 object BigIntRational {
-  val Zero = new BigIntRational(0, 1)
-  val One = new BigIntRational(1, 1)
+  val zero = new BigIntRational(0, 1)
+  val one = new BigIntRational(1, 1)
 
   def apply(n: BigInt, d: BigInt): BigIntRational = {
     val gcd = n.gcd(d)
@@ -72,7 +72,7 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
   }
 
   def pow(exp: Int): BigIntRational = if (exp == 0) {
-    BigIntRational.One
+    BigIntRational.one
   } else if (exp < 0) {
     new BigIntRational(d pow exp.abs, n pow exp.abs)
   } else {
@@ -88,5 +88,5 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
   }
 
   def signum: Int = n.signum
+
 }
-*/

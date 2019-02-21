@@ -1,18 +1,22 @@
 package spire
 package benchmark
 
-/*
+import java.util.concurrent.TimeUnit
+
+import org.openjdk.jmh.annotations._
+
 import scala.util.Random
 import Random._
 
 import spire.algebra._
 import spire.implicits._
 
-import com.google.caliper.Param
+import Arrays.init
 
-object ArrayOrderBenchmarks extends MyRunner(classOf[ArrayOrderBenchmarks])
-
-class ArrayOrderBenchmarks extends MyBenchmark {
+@BenchmarkMode(Array(Mode.AverageTime))
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@State(Scope.Thread)
+class ArrayOrderBenchmarks {
   @Param(Array("6", "10", "14", "18"))
   var pow: Int = 0
 
@@ -23,9 +27,9 @@ class ArrayOrderBenchmarks extends MyBenchmark {
   var e: Array[Int] = null
   var f: Array[Int] = null
 
-  override protected def setUp(): Unit = {
+  @Setup
+  def setup(): Unit = {
     val size = spire.math.pow(2, pow).toInt
-
     a = init(size)(nextInt)
     b = a.clone
     c = a.clone; c(1) += 1
@@ -64,14 +68,25 @@ class ArrayOrderBenchmarks extends MyBenchmark {
     z
   }
 
-  // def timeEqGeneric(reps: Int) = run(reps) { a === b }
-  // def timeEqDirect(reps: Int) = run(reps) { directEq(a, b) }
+  @Benchmark
+  def timeEqGeneric: Boolean = { a === b }
 
-  // def timeCompareGeneric(reps: Int) = run(reps) { a compare b }
-  // def timeCompareDirect(reps: Int) = run(reps) { directCompare(a, b) }
+  @Benchmark
+  def timeEqDirect: Boolean = directEq(a, b)
 
-  def timeAddGeneric(reps: Int) = run(reps) { a + b }
-  def timeAddIndirect(reps: Int) = run(reps) { indirectAdd(a, b) }
-  def timeAddDirect(reps: Int) = run(reps) { directAdd(a, b) }
+  @Benchmark
+  def timeCompareGeneric: Int = spire.std.array.ArrayOrder[Int].compare(a, b)
+
+  @Benchmark
+  def timeCompareDirect: Int = directCompare(a, b)
+
+  @Benchmark
+  def timeAddGeneric: Array[Int] = { a + b }
+
+  @Benchmark
+  def timeAddIndirect: Array[Int] = { indirectAdd(a, b) }
+
+  @Benchmark
+  def timeAddDirect: Array[Int] = { directAdd(a, b) }
+
 }
-*/
