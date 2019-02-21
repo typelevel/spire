@@ -34,8 +34,8 @@ lazy val spireJVM = project.in(file(".spireJVM"))
   .settings(unidocSettings)
   .settings(noPublishSettings)
   .enablePlugins(ScalaUnidocPlugin)
-  .aggregate(macrosJVM, coreJVM, dataJVM, extrasJVM, examples, lawsJVM, legacyJVM, platformJVM, testsJVM, utilJVM, benchmarkJmh)
-  .dependsOn(macrosJVM, coreJVM, dataJVM, extrasJVM, examples, lawsJVM, legacyJVM, platformJVM, testsJVM, utilJVM, benchmarkJmh)
+  .aggregate(macrosJVM, coreJVM, dataJVM, extrasJVM, examples, lawsJVM, legacyJVM, platformJVM, testsJVM, utilJVM, benchmark)
+  .dependsOn(macrosJVM, coreJVM, dataJVM, extrasJVM, examples, lawsJVM, legacyJVM, platformJVM, testsJVM, utilJVM, benchmark)
 
 lazy val spireJS = project.in(file(".spireJS"))
   .settings(moduleName := "spire-aggregate")
@@ -249,8 +249,8 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
 lazy val testsJVM = tests.jvm
 lazy val testsJS = tests.js
 
-lazy val benchmarkJmh: Project = project.in(file("benchmark-jmh"))
-  .settings(moduleName := "spire-benchmark-jmh")
+lazy val benchmark: Project = project.in(file("benchmark"))
+  .settings(moduleName := "spire-benchmark")
   .settings(spireSettings)
   .settings(noPublishSettings)
   .settings(commonJvmSettings)
@@ -368,7 +368,7 @@ lazy val scalaTestSettings = Seq(
 lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps ++ publishSettings ++ scoverageSettings
 
 lazy val unidocSettings = Seq(
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmarkJmh, testsJVM)
+  unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, testsJVM)
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
