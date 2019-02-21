@@ -1,7 +1,6 @@
 package spire
 package benchmark
 
-/*
 import scala.util.Random
 import Random._
 
@@ -11,23 +10,36 @@ import java.lang.Math
 import java.math.BigInteger
 import java.lang.Long.numberOfTrailingZeros
 
-object GcdBenchmarks extends MyRunner(classOf[GcdBenchmarks])
+import java.util.concurrent.TimeUnit
 
-class GcdBenchmarks extends MyBenchmark {
+import org.openjdk.jmh.annotations._
+
+import Arrays.init
+
+@BenchmarkMode(Array(Mode.AverageTime))
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@State(Scope.Thread)
+class GcdBenchmarks {
 
   var longs: Array[Long] = null
   var bigs: Array[BigInteger] = null
 
-  override def setUp(): Unit = {
+  @Setup
+  def setup(): Unit = {
     longs = init(200000)(nextLong)
     bigs = init(200000)(new BigInteger(nextLong.toString))
   }
 
-  def timeXorEuclidGcdLong(reps:Int) = run(reps)(xorEuclidGcdLong(longs))
-  def timeXorBinaryGcdLong(reps:Int) = run(reps)(xorBinaryGcdLong(longs))
-  //def timeXorBuiltinGcdBigInteger(reps:Int) = run(reps)(xorBuiltinGcdBigInteger(bigs))
+  @Benchmark
+  def timeXorEuclidGcdLong: Long = xorEuclidGcdLong(longs)
 
-  def xorEuclidGcdLong(data:Array[Long]):Long = {
+  @Benchmark
+  def timeXorBinaryGcdLong: Long = xorBinaryGcdLong(longs)
+
+  @Benchmark
+  def timeXorBuiltinGcdBigInteger: BigInteger = xorBuiltinGcdBigInteger(bigs)
+
+  def xorEuclidGcdLong(data: Array[Long]): Long = {
     var t = 0L
     var i = 0
     val len = data.length - 1
@@ -38,7 +50,7 @@ class GcdBenchmarks extends MyBenchmark {
     t
   }
 
-  def xorBinaryGcdLong(data:Array[Long]):Long = {
+  def xorBinaryGcdLong(data: Array[Long]): Long = {
     var t = 0L
     var i = 0
     val len = data.length - 1
@@ -49,7 +61,7 @@ class GcdBenchmarks extends MyBenchmark {
     t
   }
 
-  def xorBuiltinGcdBigInteger(data:Array[BigInteger]):BigInteger = {
+  def xorBuiltinGcdBigInteger(data: Array[BigInteger]): BigInteger = {
     var t = BigInteger.ZERO
     var i = 0
     val len = data.length - 1
@@ -89,6 +101,5 @@ class GcdBenchmarks extends MyBenchmark {
 
     if (xz < yz) x << xz else x << yz
   }
-}
 
-*/
+}

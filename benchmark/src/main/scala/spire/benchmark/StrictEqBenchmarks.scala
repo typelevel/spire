@@ -1,5 +1,5 @@
 package spire
-package benchmark.jmh
+package benchmark
 
 import java.util.concurrent.TimeUnit
 

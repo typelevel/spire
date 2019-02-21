@@ -249,21 +249,20 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
 lazy val testsJVM = tests.jvm
 lazy val testsJS = tests.js
 
-lazy val benchmark = project
+lazy val benchmark: Project = project.in(file("benchmark"))
   .settings(moduleName := "spire-benchmark")
   .settings(spireSettings)
-  .settings(benchmarkSettings)
   .settings(noPublishSettings)
   .settings(commonJvmSettings)
-  .dependsOn(coreJVM, extrasJVM)
-
-lazy val benchmarkJmh: Project = project.in(file("benchmark-jmh"))
-  .settings(moduleName := "spire-benchmark-jmh")
-  .settings(spireSettings)
-  .settings(noPublishSettings)
-  .settings(commonJvmSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.apfloat" % "apfloat" % apfloatVersion,
+      "org.jscience" % "jscience" % jscienceVersion,
+      "org.apache.commons" % "commons-math3" % apacheCommonsMath3Version
+    )
+  )
   .enablePlugins(JmhPlugin)
-  .dependsOn(coreJVM, extrasJVM, benchmark)
+  .dependsOn(coreJVM, extrasJVM)
 
 // General settings
 
@@ -333,24 +332,6 @@ lazy val scoverageSettings = Seq(
   coverageFailOnMinimum := false,
   coverageHighlighting := true,
   coverageExcludedPackages := "spire\\.benchmark\\..*;spire\\.macros\\..*"
-)
-
-// Project's settings
-
-lazy val benchmarkSettings = Seq(
-  // raise memory limits here if necessary
-  // TODO: this doesn't seem to be working with caliper at the moment :(
-  javaOptions in run += "-Xmx4G",
-
-  libraryDependencies ++= Seq(
-    // comparisons
-    "org.apfloat" % "apfloat" % apfloatVersion,
-    "org.jscience" % "jscience" % jscienceVersion,
-    "org.apache.commons" % "commons-math3" % apacheCommonsMath3Version
-  ),
-
-  // enable forking in run
-  fork in run := true
 )
 
 lazy val coreSettings = Seq(
