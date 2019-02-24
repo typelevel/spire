@@ -178,7 +178,7 @@
           <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>A right partial action of a semigroupoid <code>G</code> on <code>P</code> is the implementation of
 a method <code>partialActr(p, g)</code>, or <code>p &lt;|+|? g</code> returning <code>Opt[P]</code>, such that:</p><p>1. for all <code>g</code>, <code>h</code> in <code>G</code>, <code>p</code> in <code>P</code> such that <code>g |+|? h</code> and <code>p &lt;|+|? g</code> are defined,</p><p>   <code>(p &lt;|+|? (g |+|? h).get).get === ((p &lt;|+|? g).get |+|? h).get</code>,
    and all operations are defined.</p><p>In addition, if <code>G</code> is a partial monoid, the following relation holds:</p><p>2. for all <code>g</code> in <code>G</code> and <code>p</code> in <code>P</code> such that <code>p &lt;|+|? g</code> is defined:</p><p><code>(p &lt;|+|? g.leftId).get === p</code>, the operation <code>&lt;|+|?</code> being defined.
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/non/spire/tree/master/core/src/main/scala/spire/algebra/partial/PartialAction.scala" target="_blank">PartialAction.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/typelevel/spire/tree/master/core/src/main/scala/spire/algebra/partial/PartialAction.scala" target="_blank">PartialAction.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>

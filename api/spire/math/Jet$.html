@@ -624,7 +624,7 @@ perturbations is zero:</p><pre>(a + u) * (b + v) = ab + av + bu + uv
                   = ab + (av + bu) + <span class="num">0</span></pre><p>which is what operator* implements below. Addition is simpler:</p><pre>(a + u) + (b + v) = (a + b) + (u + v).</pre><p>The only remaining question is how to evaluate the function of a jet, for
 which we use the chain rule:</p><pre>f(a + u) = f(a) + f<span class="lit">'(a) u</span></pre><p>where f'(a) is the (scalar) derivative of f at a.</p><p>By pushing these things through generics, we can write routines that at same time
 evaluate mathematical functions and compute their derivatives through automatic differentiation.
-</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/non/spire/tree/master/core/src/main/scala/spire/math/Jet.scala" target="_blank">Jet.scala</a></dd></dl><div class="toggleContainer block">
+</p></div><dl class="attributes block"> <dt>Source</dt><dd><a href="https://github.com/typelevel/spire/tree/master/core/src/main/scala/spire/math/Jet.scala" target="_blank">Jet.scala</a></dd></dl><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
