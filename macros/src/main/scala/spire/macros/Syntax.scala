@@ -168,7 +168,7 @@ object Syntax {
     val util = SyntaxUtil[c.type](c)
     val index = util.name("index")
 
-    /**
+    /*
      * If our arguments are all "clean" (anonymous functions or simple
      * identifiers) then we can go ahead and just inline them directly
      * into a while loop.
@@ -204,10 +204,10 @@ object Syntax {
       """
     }
 
-    /**
+    /*
      * Instead of just returning 'tree', we will go ahead and inline
      * anonymous functions which are immediately applied.
-v     */
+     */
     new InlineUtil[c.type](c).inlineAndReset[Unit](tree)
   }
 
