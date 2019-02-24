@@ -4,18 +4,18 @@ import ReleaseTransformations._
 import sbtcrossproject.{CrossType, crossProject}
 
 lazy val scalaVersions: Map[String, String] =
-  Map("2.11" -> "2.11.12", "2.12" -> "2.12.6")
+  Map("2.11" -> "2.11.12", "2.12" -> "2.12.8")
 
 lazy val scalaCheckVersion = "1.14.0"
-lazy val scalaTestVersion = "3.0.6-SNAP1"
+lazy val scalaTestVersion = "3.0.6-SNAP6"
 lazy val shapelessVersion = "2.3.3"
-lazy val disciplineVersion = "0.10.0"
-lazy val machinistVersion = "0.6.4"
-lazy val algebraVersion = "1.0.0"
+lazy val disciplineVersion = "0.11.0"
+lazy val machinistVersion = "0.6.6"
+lazy val algebraVersion = "1.0.1"
 
-lazy val apfloatVersion = "1.8.2"
+lazy val apfloatVersion = "1.8.3"
 lazy val jscienceVersion = "4.3.1"
-lazy val apacheCommonsMath3Version = "3.4.1"
+lazy val apacheCommonsMath3Version = "3.6.1"
 
 
 // Projects
