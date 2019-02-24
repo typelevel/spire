@@ -225,7 +225,7 @@ lazy val jsTests = List(
   "spire.math.UShortTest",
   "spire.math.prime.FactorHeapCheck",
   "spire.math.prime.FactorsCheck",
-  "spire.random.GaussianTest",      
+  "spire.random.GaussianTest",
   "spire.random.GeneratorTest",
   "spire.random.SamplingTest",
   "spire.random.ShufflingTest",
@@ -317,7 +317,7 @@ lazy val docSettings = Seq(
   micrositeDescription := "Powerful new number types and numeric abstractions for Scala",
   micrositeAuthor := "Spire contributors",
   micrositeHighlightTheme := "atom-one-light",
-  micrositeHomepage := "http://non.github.io/spire",
+  micrositeHomepage := "https://typelevel.org/spire",
   micrositeBaseUrl := "spire",
   micrositeDocumentationUrl := "/spire/api/spire/index.html",
   micrositeDocumentationLabelDescription := "API Documentation",
@@ -348,7 +348,7 @@ lazy val docSettings = Seq(
       Map("title" -> "Friends of Spire", "section" -> "Home", "position" -> "6")
     )
   ),
-  micrositeGithubOwner := "non",
+  micrositeGithubOwner := "typelevel",
   micrositeGithubRepo := "spire",
   micrositePalette := Map(
     "brand-primary" -> "#5B5988",
@@ -382,14 +382,14 @@ lazy val docSettings = Seq(
     "-diagrams"
   ),
   scalacOptions in Tut ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))),
-  git.remoteRepo := "git@github.com:non/spire.git",
+  git.remoteRepo := "git@github.com:typelevel/spire.git",
   includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md" | "*.svg",
   includeFilter in Jekyll := (includeFilter in makeSite).value
 )
 
 
 lazy val publishSettings = Seq(
-  homepage := Some(url("http://spire-math.org")),
+  homepage := Some(url("https://typelevel.org/spire/")),
   licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
   pomExtra := (
     <developers>
@@ -540,7 +540,7 @@ lazy val sharedPublishSettings = Seq(
       Some("Releases" at nexus + "service/local/staging/deploy/maven2")
   }
 )
- 
+
 lazy val sharedReleaseProcess = Seq(
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,
