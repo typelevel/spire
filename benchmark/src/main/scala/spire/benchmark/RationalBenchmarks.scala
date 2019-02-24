@@ -1,122 +1,148 @@
 package spire
 package benchmark
 
-/*
-import scala.util.Random
+import java.util.concurrent.TimeUnit
 
-import spire.math._
-import spire.implicits._
+import org.openjdk.jmh.annotations._
+import org.openjdk.jmh.infra.Blackhole
+import spire.math.Rational
+import RationalUtil._
 
-import com.google.caliper.Param
+object RationalUtil {
+  private def isBig(x: Rational) = x.getClass.getSimpleName.endsWith("BigRational")
 
-object RationalBenchmarks extends MyRunner(classOf[RationalBenchmarks])
+  def classify(a: Rational): String =
+    (if (isBig(a)) "b" else "l") + (if (a.isWhole) "i" else "f")
 
-class RationalBenchmarks extends MyBenchmark with BenchmarkData {
-  @Param(Array("8", "16", "24", "32", "40", "48", "56", "64",
-               "80", "96", "112", "128",
-               "160", "192", "224", "256"))
-  var bits: Int = 0
+  def classify(a: Rational, op_a: Rational): String =
+    classify(a) + "_" + classify(op_a)
 
-  private var rats: Array[Rational] = _
-  private var bigRats: Array[BigIntRational] = _
-  private var longRats: Array[LongRational] = _
+  def classify(a: Rational, b: Rational, a_op_b: Rational): String =
+    classify(a) + "_" + classify(b) + "_" + classify(a_op_b)
 
-  override protected def setUp(): Unit = {
-    rats = init(size)(Rational(BigInt(bits, Random), BigInt(bits, Random) + 1))
-    bigRats = init(size)(BigIntRational(BigInt(bits, Random), BigInt(bits, Random) + 1))
-    if (bits <= 32) {
-      longRats = init(size)(LongRational(BigInt(bits, Random).toLong, BigInt(bits, Random).toLong + 1L))
-    } else {
-      longRats = Array[LongRational]()
+  def check(cases: Map[String, (Rational, Rational)]): Unit = {
+    for ((kind, (a, b)) ← cases) {
+      val c = classify(a, b)
+      require(kind.startsWith(c), s"Unexpected class $c for case $kind")
     }
   }
 
-  def bigSum(rats: Array[BigIntRational]): Int = {
-    var sign = 1
-    var i = 0
-    var len = rats.length - 1
-
-    while (i < len) {
-      sign *= (rats(i) + rats(i + 1)).signum
-      i += 1
+  def check(cases: Map[String, (Rational, Rational)], op: (Rational, Rational) ⇒ Rational): Unit = {
+    for ((kind, (a, b)) ← cases) {
+      val c = classify(a, b, op(a, b))
+      require(kind.startsWith(c), s"Unexpected class $c for case $kind")
     }
-
-    sign
   }
-
-  def longSum(rats: Array[LongRational]): Int = {
-    var sign = 1
-    var i = 0
-    var len = rats.length - 1
-
-    while (i < len) {
-      sign *= (rats(i) + rats(i + 1)).signum
-      i += 1
-    }
-
-    sign
-  }
-
-  def sum(rats: Array[Rational]): Int = {
-    var sign = 1
-    var i = 0
-    var len = rats.length - 1
-
-    while (i < len) {
-      sign *= (rats(i) + rats(i + 1)).signum
-      i += 1
-    }
-
-    sign
-  }
-
-  def bigProd(rats: Array[BigIntRational]): Int = {
-    var sign = 1
-    var i = 0
-    var len = rats.length - 1
-
-    while (i < len) {
-      sign *= (rats(i) * rats(i + 1)).signum
-      i += 1
-    }
-
-    sign
-  }
-
-  def longProd(rats: Array[LongRational]): Int = {
-    var sign = 1
-    var i = 0
-    var len = rats.length - 1
-
-    while (i < len) {
-      sign *= (rats(i) * rats(i + 1)).signum
-      i += 1
-    }
-
-    sign
-  }
-
-  def prod(rats: Array[Rational]): Int = {
-    var sign = 1
-    var i = 0
-    var len = rats.length - 1
-
-    while (i < len) {
-      sign *= (rats(i) * rats(i + 1)).signum
-      i += 1
-    }
-
-    sign
-  }
-
-
-  def timeRationalSum(reps: Int) = run(reps)(sum(rats))
-  def timeRationalProd(reps: Int) = run(reps)(prod(rats))
-
-  def timeBigIntRationalSum(reps: Int) = run(reps)(bigSum(bigRats))
-  def timeBigIntRationalProd(reps: Int) = run(reps)(bigProd(bigRats))
-
-  def timeLongRationalSum(reps: Int) = run(reps)(longSum(longRats))
-  def timeLongRationalProd(reps: Int) = run(reps)(longProd(longRats))
 }
-*/
+
+@BenchmarkMode(Array(Mode.AverageTime))
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@State(Scope.Thread)
+class RationalMultiplyDivideBenchmark {
+
+  val pairs = Map(
+    "li_li_li" → ((Rational(12345), Rational(67890))),
+    "bi_bi_bi" → ((Rational(12345) + Long.MaxValue, Rational(67890) + Long.MaxValue)),
+    "lf_lf_lf" → ((Rational(12345, 67891), Rational(67890, 12347))),
+    "lf_lf_bf" → ((Rational(Long.MaxValue, Int.MaxValue - 1), Rational(Long.MaxValue, Int.MaxValue - 3))),
+    "bf_bf_bf" → ((Rational(Long.MaxValue) + Rational(1, 3), Rational(Long.MaxValue) + Rational(1, 5))))
+  check(pairs, _ * _)
+  check(pairs, _ / _.inverse)
+
+  @Param(Array("li_li_li", "bi_bi_bi", "lf_lf_lf", "lf_lf_bf", "bf_bf_bf"))
+  var kind: String = ""
+
+  var a: Rational = Rational.zero
+
+  var b: Rational = Rational.zero
+
+  var c: Rational = Rational.zero
+
+  @Setup
+  def setup(): Unit = {
+    val (a0, b0) = pairs(kind)
+    a = a0
+    b = b0
+    c = b0.inverse
+  }
+
+  @Benchmark
+  def product(x: Blackhole): Unit = {
+    x.consume(a * b)
+  }
+
+  @Benchmark
+  def quotient(x: Blackhole): Unit = {
+    x.consume(a / b)
+  }
+}
+
+@BenchmarkMode(Array(Mode.AverageTime))
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@State(Scope.Thread)
+class RationalAddSubtractBenchmark {
+
+  val pairs = Map(
+    "li_li_li" → ((Rational(12345), Rational(67890))),
+    "bi_bi_bi" → ((Rational(12345) + Long.MaxValue, Rational(67890) + Long.MaxValue)),
+    "lf_lf_lf" →  ((Rational(12345,67891), Rational(67890,12347))),
+    "lf_lf_bf" → ((Rational(Long.MaxValue,Int.MaxValue - 1), Rational(Long.MaxValue,Int.MaxValue - 3))),
+    "bf_bf_bf" → ((Rational(Long.MaxValue) + Rational(1,3), Rational(Long.MaxValue) + Rational(1,5))))
+  check(pairs, _ + _)
+  check(pairs, _ - -_)
+
+  @Param(Array("li_li_li", "bi_bi_bi", "lf_lf_lf", "lf_lf_bf", "bf_bf_bf"))
+  var kind: String = ""
+  var a: Rational = Rational.zero
+  var b: Rational = Rational.zero
+  var c: Rational = Rational.zero
+
+  @Setup
+  def setup(): Unit = {
+    val (a0, b0) = pairs(kind)
+    a = a0
+    b = b0
+    c = -b0
+  }
+
+  @Benchmark
+  def sum(x: Blackhole): Unit = {
+    x.consume(a + b)
+  }
+
+  @Benchmark
+  def difference(x: Blackhole): Unit = {
+    x.consume(a - b)
+  }
+}
+
+@BenchmarkMode(Array(Mode.AverageTime))
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
+@State(Scope.Thread)
+class RationalCompareBenchmark {
+  val pairs = Map(
+    "li_li" → ((Rational(12345), Rational(67890))),
+    "lf_lf" →  ((Rational(12345,67891), Rational(67890,12347))),
+    "lf_lf_intermediateBig" → ((Rational(Long.MaxValue,Int.MaxValue - 1), Rational(Long.MaxValue,Int.MaxValue - 3))),
+    "bf_bf" → ((Rational(Long.MaxValue) + Rational(1,3), Rational(Long.MaxValue) + Rational(1,5))))
+  check(pairs)
+
+  @Param(Array("li_li", "lf_lf", "lf_lf_intermediateBig", "bf_bf"))
+  var kind: String = ""
+
+  var a: Rational = Rational.zero
+
+  var b: Rational = Rational.zero
+
+  @Setup
+  def setup(): Unit = {
+    val (a0, b0) = pairs(kind)
+    a = a0
+    b = b0
+  }
+
+  @Benchmark
+  def compare(x: Blackhole): Unit = {
+    x.consume(a compare b)
+  }
+}
