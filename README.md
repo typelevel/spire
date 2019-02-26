@@ -8,4 +8,4 @@
 Spire is a numeric library for Scala which is intended to be generic, fast,
 and precise.
 
-See the [companion microsite](https://typelevel.github.io/spire/)
+See the [companion microsite](https://typelevel.org/spire/)

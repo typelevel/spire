@@ -4,18 +4,18 @@ import ReleaseTransformations._
 import sbtcrossproject.{CrossType, crossProject}
 
 lazy val scalaVersions: Map[String, String] =
-  Map("2.11" -> "2.11.12", "2.12" -> "2.12.6")
+  Map("2.11" -> "2.11.12", "2.12" -> "2.12.8")
 
 lazy val scalaCheckVersion = "1.14.0"
-lazy val scalaTestVersion = "3.0.6-SNAP1"
+lazy val scalaTestVersion = "3.0.6-SNAP6"
 lazy val shapelessVersion = "2.3.3"
-lazy val disciplineVersion = "0.10.0"
-lazy val machinistVersion = "0.6.4"
-lazy val algebraVersion = "1.0.0"
+lazy val disciplineVersion = "0.11.0"
+lazy val machinistVersion = "0.6.6"
+lazy val algebraVersion = "1.0.1"
 
-lazy val apfloatVersion = "1.8.2"
+lazy val apfloatVersion = "1.8.3"
 lazy val jscienceVersion = "4.3.1"
-lazy val apacheCommonsMath3Version = "3.4.1"
+lazy val apacheCommonsMath3Version = "3.6.1"
 
 
 // Projects
@@ -249,21 +249,20 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
 lazy val testsJVM = tests.jvm
 lazy val testsJS = tests.js
 
-lazy val benchmark = project
+lazy val benchmark: Project = project.in(file("benchmark"))
   .settings(moduleName := "spire-benchmark")
   .settings(spireSettings)
-  .settings(benchmarkSettings)
   .settings(noPublishSettings)
   .settings(commonJvmSettings)
-  .dependsOn(coreJVM, extrasJVM)
-
-lazy val benchmarkJmh: Project = project.in(file("benchmark-jmh"))
-  .settings(moduleName := "spire-benchmark-jmh")
-  .settings(spireSettings)
-  .settings(noPublishSettings)
-  .settings(commonJvmSettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      "org.apfloat" % "apfloat" % apfloatVersion,
+      "org.jscience" % "jscience" % jscienceVersion,
+      "org.apache.commons" % "commons-math3" % apacheCommonsMath3Version
+    )
+  )
   .enablePlugins(JmhPlugin)
-  .dependsOn(coreJVM, extrasJVM, benchmark)
+  .dependsOn(coreJVM, extrasJVM)
 
 // General settings
 
@@ -412,24 +411,6 @@ lazy val scoverageSettings = Seq(
   coverageFailOnMinimum := false,
   coverageHighlighting := true,
   coverageExcludedPackages := "spire\\.benchmark\\..*;spire\\.macros\\..*"
-)
-
-// Project's settings
-
-lazy val benchmarkSettings = Seq(
-  // raise memory limits here if necessary
-  // TODO: this doesn't seem to be working with caliper at the moment :(
-  javaOptions in run += "-Xmx4G",
-
-  libraryDependencies ++= Seq(
-    // comparisons
-    "org.apfloat" % "apfloat" % apfloatVersion,
-    "org.jscience" % "jscience" % jscienceVersion,
-    "org.apache.commons" % "commons-math3" % apacheCommonsMath3Version
-  ),
-
-  // enable forking in run
-  fork in run := true
 )
 
 lazy val coreSettings = Seq(

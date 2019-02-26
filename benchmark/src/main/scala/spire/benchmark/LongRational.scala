@@ -1,6 +1,6 @@
 package spire
 package benchmark
-/*
+
 import spire.implicits._
 
 object LongRational {
@@ -95,6 +95,3 @@ final class LongRational private (val n: Long, val d: Long) {
 
   def signum: Int = if (n < 0) -1 else if (n > 0) 1 else 0
 }
-
-
-*/

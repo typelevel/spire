@@ -1,7 +1,5 @@
 package spire
 package benchmark
-/*
-import com.google.caliper.Param
 
 import java.math.MathContext.UNLIMITED
 
@@ -10,7 +8,14 @@ import scala.util.Random
 import spire.math._
 import spire.std.bigDecimal._
 
+import java.util.concurrent.TimeUnit
+
+import org.openjdk.jmh.annotations._
+
+import Arrays.init
+
 case class Point2(x: Double, y: Double)
+
 trait Orient2 {
   def orient(p: Point2, q: Point2, r: Point2): Int
 }
@@ -50,15 +55,17 @@ object Orient2 {
   }
 }
 
-object FpFilterBenchmark extends MyRunner(classOf[FpFilterBenchmark])
-
-class FpFilterBenchmark extends MyBenchmark {
+@BenchmarkMode(Array(Mode.AverageTime))
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@State(Scope.Thread)
+class FpFilterBenchmark {
   @Param(Array("32", "128", "1024"))
   var size: Int = 0
 
   var points: Array[Point2] = _
 
-  override protected def setUp(): Unit = {
+  @Setup
+  def setup(): Unit = {
     points = init(size)(Point2(Random.nextDouble, Random.nextDouble))
   }
 
@@ -73,8 +80,13 @@ class FpFilterBenchmark extends MyBenchmark {
     sign
   }
 
-  def timeDouble(reps: Int) = run(reps)(findSign(Orient2.bad))
-  def timeBigDecimal(reps: Int) = run(reps)(findSign(Orient2.slow))
-  def timeFpFilter(reps: Int) = run(reps)(findSign(Orient2.fast))
+  @Benchmark
+  def timeDouble: Int = findSign(Orient2.bad)
+
+  @Benchmark
+  def timeBigDecimal: Int = findSign(Orient2.slow)
+
+  @Benchmark
+  def timeFpFilter: Int = findSign(Orient2.fast)
+
 }
-*/

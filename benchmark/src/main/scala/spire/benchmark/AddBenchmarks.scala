@@ -1,13 +1,18 @@
 package spire
 package benchmark
 
-import spire.algebra._
-import spire.math._
-import spire.implicits._
-/*
-object AddBenchmarks extends MyRunner(classOf[AddBenchmarks])
+import java.util.concurrent.TimeUnit
 
-class AddBenchmarks extends MyBenchmark with BenchmarkData {
+import org.openjdk.jmh.annotations._
+import spire.algebra._
+import spire.benchmark.Arrays._
+import spire.implicits._
+import spire.math._
+
+@BenchmarkMode(Array(Mode.AverageTime))
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+class AddBenchmarks {
+
   def addGeneric[@sp(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
     var total = Ring[A].zero
     var i = 0
@@ -16,47 +21,7 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
     total
   }
 
-  def addIntsDirect(data:Array[Int]):Int = {
-    var total = 0
-    var i = 0
-    val len = data.length
-    while (i < len) { total += data(i); i += 1 }
-    total
-  }
-
-  def addLongsDirect(data:Array[Long]):Long = {
-    var total = 0L
-    var i = 0
-    val len = data.length
-    while (i < len) { total += data(i); i += 1 }
-    total
-  }
-
-  def addFloatsDirect(data:Array[Float]):Float = {
-    var total = 0.0F
-    var i = 0
-    val len = data.length
-    while (i < len) { total += data(i); i += 1 }
-    total
-  }
-
-  def addDoublesDirect(data:Array[Double]):Double = {
-    var total = 0.0
-    var i = 0
-    val len = data.length
-    while (i < len) { total += data(i); i += 1 }
-    total
-  }
-
-  def addComplexesDirect(data:Array[Complex[Double]]):Complex[Double] = {
-    var total = Complex.zero[Double]
-    var i = 0
-    val len = data.length
-    while (i < len) { total += data(i); i += 1 }
-    total
-  }
-
-  def addFastComplexes(data:Array[Long]):Long = {
+  def addFastComplex(data: Array[Long]):Long = {
     var total = FastComplex(0.0F, 0.0F)
     var i = 0
     val len = data.length
@@ -64,20 +29,88 @@ class AddBenchmarks extends MyBenchmark with BenchmarkData {
     total
   }
 
-  def timeAddIntsDirect(reps:Int) = run(reps)(addIntsDirect(ints))
-  def timeAddIntsGeneric(reps:Int) = run(reps)(addGeneric(ints))
+  @Benchmark
+  def addIntDirect(state: IntState): Int = {
+    val data = state.values
+    var total = 0
+    var i = 0
+    val len = data.length
+    while (i < len) { total += data(i); i += 1 }
+    total
+  }
+  @Benchmark
+  def addIntGeneric(state: IntState): Int = addGeneric(state.values)
 
-  def timeAddLongsDirect(reps:Int) = run(reps)(addLongsDirect(longs))
-  def timeAddLongsGeneric(reps:Int) = run(reps)(addGeneric(longs))
+  @Benchmark
+  def addLongDirect(state: LongState): Long = {
+    val data = state.values
+    var total = 0L
+    var i = 0
+    val len = data.length
+    while (i < len) { total += data(i); i += 1 }
+    total
+  }
+  @Benchmark
+  def addLongGeneric(state: LongState): Long = addGeneric(state.values)
 
-  def timeAddFloatsDirect(reps:Int) = run(reps)(addFloatsDirect(floats))
-  def timeAddFloatsGeneric(reps:Int) = run(reps)(addGeneric(floats))
+  @Benchmark
+  def addFloatDirect(state: FloatState): Float = {
+    val data = state.values
+    var total = 0.0F
+    var i = 0
+    val len = data.length
+    while (i < len) { total += data(i); i += 1 }
+    total
 
-  def timeAddDoublesDirect(reps:Int) = run(reps)(addDoublesDirect(doubles))
-  def timeAddDoublesGeneric(reps:Int) = run(reps)(addGeneric(doubles))
+  }
+  @Benchmark
+  def addFloatGeneric(state: FloatState): Float = addGeneric(state.values)
 
-  def timeAddComplexesDirect(reps:Int) = run(reps)(addComplexesDirect(complexes))
-  def timeAddComplexesGeneric(reps:Int) = run(reps)(addGeneric(complexes))
-  def timeAddFastComplexes(reps:Int) = run(reps)(addFastComplexes(fcomplexes))
+  @Benchmark
+  def addDoubleDirect(state: DoubleState): Double = {
+    val data = state.values
+    var total = 0.0
+    var i = 0
+    val len = data.length
+    while (i < len) { total += data(i); i += 1 }
+    total
+  }
+  @Benchmark
+  def addDoublesGeneric(state: DoubleState): Double = addGeneric(state.values)
+
+  @Benchmark
+  def addComplexFloatStateDirect(state: ComplexFloatState): Complex[Float] = {
+    val data = state.values
+    var total = Complex.zero[Float]
+    var i = 0
+    val len = data.length
+    while (i < len) { total += data(i); i += 1 }
+    total
+  }
+  @Benchmark
+  def addComplexFloatStateGeneric(state: ComplexFloatState): Complex[Float] = addGeneric(state.values)
+
+  @Benchmark
+  def addFastComplexDirect(state: FastComplexState): Long = {
+    val data = state.values
+    var total = FastComplex(0.0F, 0.0F)
+    var i = 0
+    val len = data.length
+    while (i < len) { total = FastComplex.add(total, data(i)); i += 1 }
+    total
+  }
+
+  @Benchmark
+  def addComplexDoubleStateDirect(state: ComplexDoubleState): Complex[Double] = {
+    val data = state.values
+    var total = Complex.zero[Double]
+    var i = 0
+    val len = data.length
+    while (i < len) { total += data(i); i += 1 }
+    total
+  }
+  
+  @Benchmark
+  def addComplexDoubleStateGeneric(state: ComplexDoubleState): Complex[Double] = addGeneric(state.values)
+
 }
-*/
