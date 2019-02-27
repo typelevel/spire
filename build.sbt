@@ -549,8 +549,9 @@ lazy val warnUnusedImport = Seq(
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 10)) =>
         Seq()
-      case Some((2, n)) if n >= 11 =>
+      case Some((2, n)) if ((n >= 11) && (n <= 12)) =>
         Seq("-Ywarn-unused-import")
+      case _ => Seq()
     }
   },
   scalacOptions in (Compile, console) ~= {_.filterNot("-Ywarn-unused-import" == _)},
