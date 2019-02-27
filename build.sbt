@@ -275,7 +275,12 @@ addCommandAlias("validate", ";validateJVM;validateJS")
 lazy val buildSettings = Seq(
   organization := "org.typelevel",
   scalaVersion := scalaVersions("2.12"),
-  crossScalaVersions := Seq(scalaVersions("2.11"), scalaVersions("2.12"))
+  crossScalaVersions := Seq(scalaVersions("2.11"), scalaVersions("2.12")),
+  unmanagedSourceDirectories in Compile += {
+      val sharedSourceDir = (baseDirectory in ThisBuild).value / "compat/src/main"
+      if (scalaVersion.value.startsWith("2.13.")) sharedSourceDir / "scala-2.13"
+      else sharedSourceDir / "scala-pre-2.13"
+  }
 )
 
 lazy val commonDeps = Seq(libraryDependencies ++= Seq(
