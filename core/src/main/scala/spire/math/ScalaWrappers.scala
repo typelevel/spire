@@ -22,7 +22,7 @@ private[spire] trait ScalaPartialOrderingWrapper[A] extends scala.math.PartialOr
 }
 
 
-private[spire] trait ScalaOrderingWrapper[A] extends scala.math.Ordering[A] {
+private[spire] trait ScalaOrderingWrapper[A] extends spire.scalacompat.ScalaOrderingWrapperCompat[A] {
   def order: Order[A]
 
   def compare(x:A, y:A): Int = order.compare(x, y)
@@ -32,9 +32,6 @@ private[spire] trait ScalaOrderingWrapper[A] extends scala.math.Ordering[A] {
   override def gteq(x:A, y:A): Boolean = order.gteqv(x, y)
   override def lt(x:A, y:A): Boolean = order.lt(x, y)
   override def lteq(x:A, y:A): Boolean = order.lteqv(x, y)
-
-  override def min(x:A, y:A): A = order.min(x, y)
-  override def max(x:A, y:A): A = order.max(x, y)
 }
 
 private[spire] trait ScalaNumericWrapper[A] extends scala.math.Numeric[A] with ScalaOrderingWrapper[A] {
@@ -58,6 +55,9 @@ private[spire] trait ScalaNumericWrapper[A] extends scala.math.Numeric[A] with S
 
   override def signum(x:A): Int = signed.signum(x)
   override def abs(x: A): A = signed.abs(x)
+
+  // this is an abstract method starting in scala 2.13
+  def parseString(str: String): Option[A] = None
 }
 
 private[spire] trait ScalaFractionalWrapper[A] extends ScalaNumericWrapper[A] with scala.math.Fractional[A] {
