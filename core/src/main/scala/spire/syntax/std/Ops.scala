@@ -2,7 +2,7 @@ package spire
 package syntax
 package std
 
-import scala.collection.generic.CanBuildFrom
+import scala.collection.compat._
 import spire.algebra.{AdditiveMonoid, Field, Monoid, MultiplicativeMonoid, NRoot, Order, PartialOrder, Signed}
 import spire.math.{Natural, Number, QuickSort, SafeLong, Searching, ULong}
 import spire.syntax.cfor._
@@ -280,47 +280,47 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
 
   import spire.math.{Sorting, Selection}
 
-  protected[this] def fromArray(arr: Array[A])(implicit cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
-    val b = cbf(as)
+  protected[this] def fromArray(arr: Array[A])(implicit cbf: Factory[A, CC[A]]): CC[A] = {
+    val b = cbf.newBuilder
     b.sizeHint(arr.length)
     cfor(0)(_ < arr.length, _ + 1) { i => b += arr(i) }
     b.result
   }
 
-  protected[this] def fromSizeAndArray(size: Int, arr: Array[A])(implicit cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
-    val b = cbf(as)
+  protected[this] def fromSizeAndArray(size: Int, arr: Array[A])(implicit cbf: Factory[A, CC[A]]): CC[A] = {
+    val b = cbf.newBuilder
     b.sizeHint(size)
     cfor(0)(_ < size, _ + 1) { i => b += arr(i) }
     b.result
   }
 
-  def qsorted(implicit ev: Order[A], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+  def qsorted(implicit ev: Order[A], ct: ClassTag[A], cbf: Factory[A, CC[A]]): CC[A] = {
     val arr = as.toArray
     Sorting.sort(arr)
     fromArray(arr)
   }
 
-  def qsortedBy[@sp B](f: A => B)(implicit ev: Order[B], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+  def qsortedBy[@sp B](f: A => B)(implicit ev: Order[B], ct: ClassTag[A], cbf: Factory[A, CC[A]]): CC[A] = {
     implicit val ord: Order[A] = Order.by(f)
     val arr = as.toArray
     Sorting.sort(arr)
     fromArray(arr)
   }
 
-  def qsortedWith(f: (A, A) => Int)(implicit ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+  def qsortedWith(f: (A, A) => Int)(implicit ct: ClassTag[A], cbf: Factory[A, CC[A]]): CC[A] = {
     implicit val ord: Order[A] = Order.from(f)
     val arr = as.toArray
     Sorting.sort(arr)
     fromArray(arr)
   }
 
-  def qselected(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+  def qselected(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: Factory[A, CC[A]]): CC[A] = {
     val arr = as.toArray
     Selection.select(arr, k)
     fromArray(arr)
   }
 
-  def qselectk(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+  def qselectk(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: Factory[A, CC[A]]): CC[A] = {
     val arr = as.toArray
     if (arr.length <= k) {
       fromArray(arr)
@@ -330,7 +330,7 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
     }
   }
 
-  def qtopk(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+  def qtopk(k: Int)(implicit ev: Order[A], ct: ClassTag[A], cbf: Factory[A, CC[A]]): CC[A] = {
     val arr = as.toArray
     if (arr.length <= k) {
       Sorting.sort(arr)
@@ -344,13 +344,13 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
 
   import spire.random.Generator
 
-  def qshuffled(implicit gen: Generator, ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] = {
+  def qshuffled(implicit gen: Generator, ct: ClassTag[A], cbf: Factory[A, CC[A]]): CC[A] = {
     val arr = as.toArray
     gen.shuffle(arr)
     fromArray(arr)
   }
 
-  def qsampled(n: Int)(implicit gen: Generator, ct: ClassTag[A], cbf: CanBuildFrom[CC[A], A, CC[A]]): CC[A] =
+  def qsampled(n: Int)(implicit gen: Generator, ct: ClassTag[A], cbf: Factory[A, CC[A]]): CC[A] =
     fromArray(gen.sampleFromTraversable(as, n))
 
   def qchoose(implicit gen: Generator): A =

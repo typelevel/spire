@@ -3,8 +3,8 @@ package algebra
 
 import spire.std._
 
+import scala.collection.compat._
 import scala.collection.SeqLike
-import scala.collection.generic.CanBuildFrom
 
 /**
  * A normed vector space is a vector space equipped with a function
@@ -35,10 +35,10 @@ private[algebra] trait NormedVectorSpace0 {
 
 private[algebra] trait NormedVectorSpaceFunctions {
   def max[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A], order0: Order[A],
-      signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] =
+      signed0: Signed[A], cbf0: Factory[A, CC[A]]): NormedVectorSpace[CC[A], A] =
     new SeqMaxNormedVectorSpace[A, CC[A]]
 
   def Lp[A, CC[A] <: SeqLike[A, CC[A]]](p: Int)(implicit field0: Field[A], nroot0: NRoot[A],
-      signed0: Signed[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] =
+      signed0: Signed[A], cbf0: Factory[A, CC[A]]): NormedVectorSpace[CC[A], A] =
     new SeqLpNormedVectorSpace[A, CC[A]](p)
 }
