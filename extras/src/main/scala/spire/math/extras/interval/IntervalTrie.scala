@@ -468,8 +468,19 @@ object IntervalTrie {
 
     def isProperSupersetOf(rhs:IntervalTrie[T]) = isSupersetOf(rhs) && (rhs != lhs)
 
-    def intervals = new Traversable[Interval[T]] {
+    def intervals = new Iterable[Interval[T]] {
+      import scala.collection.mutable.ArrayBuffer
+
       override def foreach[U](f: Interval[T] => U): Unit = foreachInterval(belowAll, tree)(f)
+
+      def iterator: Iterator[Interval[T]] = {
+        var iseq: ArrayBuffer[Interval[T]] = ArrayBuffer.empty[Interval[T]]
+        def f(i: Interval[T]): Unit = {
+          iseq += i
+        }
+        foreachInterval(belowAll, tree)(f)
+        iseq.iterator
+      }
     }
 
     def intervalIterator = new IntervalIterator[T](lhs)

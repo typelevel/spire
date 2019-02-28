@@ -345,7 +345,7 @@ abstract class Generator {
     chosen
   }
 
-  def sampleFromTraversable[@sp A: ClassTag](as: Traversable[A], size: Int)(implicit gen: Generator): Array[A] = {
+  def sampleFromTraversable[@sp A: ClassTag](as: Iterable[A], size: Int)(implicit gen: Generator): Array[A] = {
     val chosen: Array[A] = new Array[A](size)
     var i: Int = 0
     as.foreach { a =>
