@@ -35,7 +35,7 @@ final class MapIntIntSeqPartialAction[A, SA <: SeqLike[A, SA]](implicit cbf: Fac
   def partialActl(perm: Map[Int, Int], sa: SA): Opt[SA] = {
     if (perm.isEmpty) return Opt(sa)
     if (perm.keys.max >= sa.size) return Opt.empty[SA]
-    val builder = cbf()
+    val builder = cbf.newBuilder
     cforRange(0 until sa.size) { k =>
       builder += sa(perm.getOrElse(k, k))
     }
