@@ -40,7 +40,7 @@ trait Dist[@sp A] extends Any { self =>
   def until(pred: A => Boolean): Dist[Seq[A]] = {
     @tailrec def loop(gen: Generator, a: A, buf: ArrayBuffer[A]): Seq[A] = {
       buf.append(a)
-      if (pred(a)) buf else loop(gen, self(gen), buf)
+      if (pred(a)) buf.toSeq else loop(gen, self(gen), buf)
     }
     new DistFromGen(g => loop(g, self(g), ArrayBuffer.empty[A]))
   }
@@ -72,7 +72,7 @@ trait Dist[@sp A] extends Any { self =>
   def repeat[CC[X] <: Seq[X]](n: Int)(implicit cbf: Factory[A, CC[A]]): Dist[CC[A]] =
     new Dist[CC[A]] {
       def apply(gen: Generator): CC[A] = {
-        val builder = cbf()
+        val builder = cbf.newBuilder
         builder.sizeHint(n)
         var i = 0
         while (i < n) {
@@ -106,7 +106,7 @@ trait Dist[@sp A] extends Any { self =>
     this(gen) #:: toStream(gen)
 
   def sample[CC[X] <: Iterable[X]](n: Int)(implicit gen: Generator, cbf: Factory[A, CC[A]]): CC[A] = {
-    val b = cbf()
+    val b = cbf.newBuilder
     b.sizeHint(n)
     var i = 0
     while (i < n) {
