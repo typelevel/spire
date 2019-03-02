@@ -2,7 +2,7 @@ package spire
 package optional
 
 import scala.collection.compat._
-import scala.collection.IterableLike
+import spire.scalacompat.IterableLike
 
 import spire.algebra.{Semigroup, Group}
 import spire.algebra.partial.{Semigroupoid, Groupoid}
