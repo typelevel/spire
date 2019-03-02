@@ -8,4 +8,6 @@ import scala.reflect.ClassTag
       ArrayBuilder.make[T]()
 
   type SeqLike[A, C] = scala.collection.SeqLike[A, C]
+
+  type IterableLike[A, C] = scala.collection.IterableLike[A, C]
 }
