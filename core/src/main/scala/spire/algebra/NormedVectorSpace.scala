@@ -4,7 +4,7 @@ package algebra
 import spire.std._
 
 import scala.collection.compat._
-import scala.collection.SeqLike
+import spire.scalacompat.SeqLike
 
 /**
  * A normed vector space is a vector space equipped with a function

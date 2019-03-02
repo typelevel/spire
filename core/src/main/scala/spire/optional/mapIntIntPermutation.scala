@@ -2,7 +2,7 @@ package spire
 package optional
 
 import scala.collection.compat._
-import scala.collection.SeqLike
+import spire.scalacompat.SeqLike
 
 import spire.algebra.{Action, Group}
 import spire.algebra.partial.PartialAction

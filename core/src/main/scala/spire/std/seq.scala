@@ -2,7 +2,7 @@ package spire
 package std
 
 import scala.collection.compat._
-import scala.collection.SeqLike
+import spire.scalacompat.SeqLike
 import scala.collection.mutable.Builder
 
 import spire.algebra._
