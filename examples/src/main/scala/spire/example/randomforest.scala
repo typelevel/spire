@@ -6,9 +6,9 @@ import spire.implicits._
 
 import scala.util.Random.nextInt
 
-
 import CrossValidation._
 
+import spire.scalacompat.parallelSeq
 
 /**
  * An example of constructing Random Forests for both regression and
@@ -227,7 +227,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
     // datasets, there is no reason not to parallelize the algorithm.
 
     if (opts.parallel) {
-      Forest((1 to opts.numTrees).toList.par.map({ _ =>
+      Forest(parallelSeq((1 to opts.numTrees).toList).map({ _ =>
         growTree(sample())
       }).toList)
     } else {
