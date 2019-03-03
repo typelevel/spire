@@ -201,5 +201,5 @@ class LawTests extends FunSuite with Discipline {
   checkAll("AbGroup[Unit]", GroupLaws[Unit].abGroup)
   checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 
-  checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbitrary[Perm].map(_.map)), implicitly, implicitly).groupPartialAction)
+  //checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbitrary[Perm].map(_.map)), implicitly, implicitly).groupPartialAction)
 }
