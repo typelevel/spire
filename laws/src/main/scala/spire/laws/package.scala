@@ -13,7 +13,7 @@ package object laws {
     def apply(a: A) = a =!= A.zero
   }
 
-  def propertiesToProp(properties: Properties) = Prop.all(properties.properties.map(_._2): _*)
+  def propertiesToProp(properties: Properties) = Prop.all(properties.properties.map(_._2).toSeq: _*)
 
 }
 
