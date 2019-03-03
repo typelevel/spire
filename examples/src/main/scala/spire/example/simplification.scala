@@ -1,12 +1,19 @@
 package spire
 package example
 
+object Simplification {
+
+  def main(args: Array[String]): Unit = {
+  }
+}
+
+/*
 import spire.implicits._
 import spire.math._
 
-import scala.collection.IterableLike
+import spire.scalacompat.IterableLike
+import spire.scalacompat.BuilderCompat
 import scala.collection.mutable.Builder
-import scala.collection.generic.CanBuildFrom
 
 /**
  * Some tools for simplifying decimal expressions, and playing around
@@ -153,9 +160,9 @@ object BigStream {
   }
 
   def newBuilder[A]: Builder[A, BigStream[A]] =
-    new Builder[A, BigStream[A]] {
+    new BuilderCompat[A, BigStream[A]] {
       private var elems: List[A] = Nil
-      def +=(a: A): this.type = {
+      def addOne(a: A): this.type = {
         elems = a :: elems
         this
       }
@@ -164,11 +171,13 @@ object BigStream {
         elems.foldLeft(BigStream.empty[A])((t, a) => new BigCons(a, t))
     }
 
+/*
   implicit def canBuildFrom[A]: CanBuildFrom[Iterable[A], A, BigStream[A]] =
     new CanBuildFrom[Iterable[A], A, BigStream[A]] {
       def apply(from: Iterable[A]) = newBuilder[A]
       def apply() = newBuilder[A]
     }
+*/
 }
 
 trait BigStream[A] extends Iterable[A] with IterableLike[A, BigStream[A]] { self =>
@@ -206,8 +215,10 @@ trait BigStream[A] extends Iterable[A] with IterableLike[A, BigStream[A]] { self
     loop(this)
   }
 
-  override def newBuilder: Builder[A, BigStream[A]] =
+/*
+  def newBuilder: Builder[A, BigStream[A]] =
     BigStream.newBuilder[A]
+*/
 }
 
 class BigCons[A](override val head: A, t: => BigStream[A]) extends BigStream[A] {
@@ -226,3 +237,4 @@ case class BigNil[A]() extends BigStream[A] {
   override def isEmpty = true
   override def toString: String = "BigStream()"
 }
+*/
