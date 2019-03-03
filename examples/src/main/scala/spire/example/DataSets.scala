@@ -6,6 +6,7 @@ import spire.math.Rational
 import spire.implicits._
 
 import scala.collection.compat._
+import spire.scalacompat.BuilderCompat
 
 import scala.collection.mutable.{ Builder, ListBuffer }
 
@@ -144,6 +145,8 @@ sealed trait Variable[+F] extends Factory[String, String => List[F]] {
   def varBuilder(): Builder[String, String => List[F]]
   def apply(): Builder[String, String => List[F]] = this.newBuilder
   def apply(from: Nothing): Builder[String, String => List[F]] = this.newBuilder
+  def newBuilder: Builder[String, String => List[F]] = this.varBuilder
+  def fromSpecific(it: IterableOnce[String]): String => List[F] = ((s: String) => Nil)
 
   def missing(sentinel: String): Variable[F] = Variable.Missing(this, sentinel)
 }
@@ -152,26 +155,26 @@ object Variable {
   protected val Unlabeled = "unnamed variable"
 
   case class Ignored(label: String = Unlabeled) extends Variable[Nothing] {
-    def varBuilder() = new Builder[String, String => List[Nothing]] {
-      def += (s: String) = this
+    def varBuilder() = new BuilderCompat[String, String => List[Nothing]] {
+      def addOne(s: String) = this
       def clear(): Unit = ()
       def result() = s => Nil
     }
   }
 
   case class Continuous[+F](label: String = Unlabeled, f: String => F) extends Variable[F] {
-    def varBuilder() = new Builder[String, String => List[F]] {
-      def += (s: String) = this
+    def varBuilder() = new BuilderCompat[String, String => List[F]] {
+      def addOne(s: String) = this
       def clear(): Unit = ()
       def result() = { s => f(s) :: Nil }
     }
   }
 
   case class Categorical[+F: Ring](label: String = Unlabeled) extends Variable[F] {
-    def varBuilder() = new Builder[String, String => List[F]] {
+    def varBuilder() = new BuilderCompat[String, String => List[F]] {
       var categories: Set[String] = Set.empty
 
-      def += (s: String) = {
+      def addOne(s: String) = {
         categories += s
         this
       }
@@ -187,11 +190,11 @@ object Variable {
   case class Missing[+F](default: Variable[F], sentinel: String) extends Variable[F] {
     def label = default.label
 
-    def varBuilder() = new Builder[String, String => List[F]] {
+    def varBuilder() = new BuilderCompat[String, String => List[F]] {
       val defaultBuilder = default.varBuilder()
       val values: ListBuffer[String] = new ListBuffer[String]
 
-      def += (s: String) = {
+      def addOne(s: String) = {
         if (s != sentinel) {
           defaultBuilder += s
           values += s
