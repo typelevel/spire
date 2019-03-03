@@ -5,7 +5,8 @@ import spire.algebra._
 import spire.math.Rational
 import spire.implicits._
 
-import scala.collection.generic.CanBuildFrom
+import scala.collection.compat._
+
 import scala.collection.mutable.{ Builder, ListBuffer }
 
 import java.io.{ BufferedReader, InputStreamReader }
@@ -54,10 +55,10 @@ object DataSet {
 
   protected def fromLines[CC[_], F, K](lines: List[List[String]],
       variables: List[Variable[F]], out: Output[K])(implicit
-      cbf: CanBuildFrom[Nothing, F, CC[F]]): (Int, List[(CC[F], K)]) = {
+      cbf: Factory[F, CC[F]]): (Int, List[(CC[F], K)]) = {
 
     // Perform our first pass, building the conversion functions.
-    val builders = variables map (_.apply())
+    val builders = variables map (_.varBuilder())
     lines foreach { fields =>
       builders zip fields foreach { case (b, s) =>
         b += s
@@ -68,7 +69,7 @@ object DataSet {
     val maps = builders map (_.result())
     val (dimensions, datar) = lines.foldLeft((Int.MaxValue, List.empty[(CC[F], K)])) {
       case ((dim, res), fields) =>
-        val bldr = cbf()
+        val bldr = cbf.newBuilder
         val vd = (maps zip fields).foldLeft(0) { case (acc, (f, s)) =>
           val vars = f(s)
           bldr ++= vars
@@ -83,7 +84,7 @@ object DataSet {
   def fromResource[CC[_], @sp(Double) F, @sp(Double) K](name: String, res: String, sep: Char,
       variables: List[Variable[F]], out: Output[K])(
       cs: Int => CoordinateSpace[CC[F], F])(implicit
-      cbf: CanBuildFrom[Nothing, F, CC[F]]): DataSet[CC[F], F, K] = {
+      cbf: Factory[F, CC[F]]): DataSet[CC[F], F, K] = {
 
     val lines = readDataSet(res)
     val (dimensions, data) = fromLines(lines map (_.split(sep).toList), variables, out)(cbf)
@@ -137,10 +138,12 @@ object DataSet {
     MpgVars, (0, _.toDouble))(CoordinateSpace.array)
 }
 
-sealed trait Variable[+F] extends CanBuildFrom[Nothing, String, String => List[F]] {
+sealed trait Variable[+F] extends Factory[String, String => List[F]] {
   def label: String
 
-  def apply(n: Nothing): Builder[String, String => List[F]] = apply()
+  def varBuilder(): Builder[String, String => List[F]]
+  def apply(): Builder[String, String => List[F]] = this.newBuilder
+  def apply(from: Nothing): Builder[String, String => List[F]] = this.newBuilder
 
   def missing(sentinel: String): Variable[F] = Variable.Missing(this, sentinel)
 }
@@ -149,7 +152,7 @@ object Variable {
   protected val Unlabeled = "unnamed variable"
 
   case class Ignored(label: String = Unlabeled) extends Variable[Nothing] {
-    def apply() = new Builder[String, String => List[Nothing]] {
+    def varBuilder() = new Builder[String, String => List[Nothing]] {
       def += (s: String) = this
       def clear(): Unit = ()
       def result() = s => Nil
@@ -157,7 +160,7 @@ object Variable {
   }
 
   case class Continuous[+F](label: String = Unlabeled, f: String => F) extends Variable[F] {
-    def apply() = new Builder[String, String => List[F]] {
+    def varBuilder() = new Builder[String, String => List[F]] {
       def += (s: String) = this
       def clear(): Unit = ()
       def result() = { s => f(s) :: Nil }
@@ -165,7 +168,7 @@ object Variable {
   }
 
   case class Categorical[+F: Ring](label: String = Unlabeled) extends Variable[F] {
-    def apply() = new Builder[String, String => List[F]] {
+    def varBuilder() = new Builder[String, String => List[F]] {
       var categories: Set[String] = Set.empty
 
       def += (s: String) = {
@@ -184,8 +187,8 @@ object Variable {
   case class Missing[+F](default: Variable[F], sentinel: String) extends Variable[F] {
     def label = default.label
 
-    def apply() = new Builder[String, String => List[F]] {
-      val defaultBuilder = default.apply()
+    def varBuilder() = new Builder[String, String => List[F]] {
+      val defaultBuilder = default.varBuilder()
       val values: ListBuffer[String] = new ListBuffer[String]
 
       def += (s: String) = {
