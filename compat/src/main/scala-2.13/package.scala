@@ -8,8 +8,7 @@ import scala.reflect.ClassTag
       ArrayBuilder.make[T]
 
   def parallelSeq[A](s: Seq[A]): Seq[A] = {
-    println("parallel sequences are currently disabled for scala 2.13 and higher")
-    s
+    throw new Exception("parallel sequences are currently disabled for scala 2.13 and higher")
   }
 
   type SeqLike[A, C] = scala.collection.SeqOps[A, Seq, C]
