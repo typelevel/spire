@@ -286,7 +286,7 @@ lazy val buildSettings = Seq(
 lazy val commonDeps = Seq(libraryDependencies ++= Seq(
   "org.typelevel" %%% "machinist" % machinistVersion,
   "org.typelevel" %%% "algebra" % algebraVersion,
-  "org.scala-lang.modules" %% "scala-collection-compat" % "0.3.0"))
+  "org.scala-lang.modules" %%% "scala-collection-compat" % "0.3.0"))
 
 lazy val commonSettings = Seq(
   scalacOptions ++= commonScalacOptions.value.diff(Seq(
