@@ -69,7 +69,7 @@ class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
     else
       logNear((x*x).sqrt, x)
   }
-/*
+/* intermittent infinite looping with 2.13
   complex1("x.nroot(2).pow(2) = x") { x: C ⇒
     implicit val threshold = BigDecimal(1e-14) // 532788694 + 329i has log-error-ratio 1.1e-15
     logNear(x.nroot(2).pow(2), x)
