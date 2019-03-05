@@ -17,7 +17,6 @@ lazy val apfloatVersion = "1.8.3"
 lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
-
 // Projects
 
 lazy val spire = project.in(file("."))
@@ -289,6 +288,8 @@ lazy val commonDeps = Seq(libraryDependencies ++= Seq(
   "org.scala-lang.modules" %%% "scala-collection-compat" % "0.3.0"))
 
 lazy val commonSettings = Seq(
+  logBuffered := false,
+  parallelExecution := false,
   scalacOptions ++= commonScalacOptions.value.diff(Seq(
     "-Xfatal-warnings",
     "-language:existentials",
