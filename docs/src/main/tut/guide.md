@@ -20,7 +20,7 @@ operations.
 These code examples all assume the following imports:
 
 ```tut
-import spire.algebra._   // all type class defintions
+import spire.algebra._   // all type class definitions
 import spire.implicits._ // all type class instances and syntax
 ```
 
@@ -285,7 +285,7 @@ be implemented via a single `partialCompare` method, described below. `PartialOr
 
 A partial order is defined from a binary relation `<=`, which satisfies the relations:
 
-* `a <= a` (*reflexitivity*)
+* `a <= a` (*reflexivity*)
 * if `a <= b` and `b <= a`, then `a === c` (*anti-symmetry*)
 * if `a <= b` and `b <= c`, then `a <= c` (*transitivity*)
 
@@ -386,7 +386,7 @@ Spire's `GCDRing[A]` supports the following operations:
  
  * `d * m === a * b` for `d = gcd(a, b)` and `m = lcm(a, b)`,
  * gcd is associative and commutative,
- * lcm is associatvie and commutative.
+ * lcm is associative and commutative.
  
 Note that the gcd is defined up to a divisible element (unit);
 in particular, its sign is a matter of convention. 
@@ -465,7 +465,7 @@ do not have `NRoot` instances defined by default, but instances can be
 instantiated with user-provided precision.
 
 Similarly, Spire supports the Trigonometric functions via
-`Trig[A]`. The preceeding caveats about precision apply to these
+`Trig[A]`. The preceding caveats about precision apply to these
 functions and values as well. The following methods are supported:
 
   * `e` Euler's number
@@ -630,7 +630,7 @@ only be used in situations where a large number of rational numbers
 with the same denominator are needed, and efficiency is very
 important.
 
-#### Complex[A] and Quanternion[A]
+#### Complex[A] and Quaternion[A]
 
 These generic types represent complex numbers (`x + yi`) and
 quaternions (`w + xi + xj + zk`) respectively. They can be
