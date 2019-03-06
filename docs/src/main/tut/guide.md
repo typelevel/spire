@@ -769,7 +769,7 @@ Spire represents two types of `Real` values: `Exact` and
 `Inexact`. The former are rational values for which we have an
 existing instance of `Rational`, and are inexpensive to work with. The
 latter are functions for approximating (potentially) irrational
-values, are lazily evaluated and memorized, and can potentially be very
+values, are lazily evaluated and memoized, and can potentially be very
 expensive to compute.
 
 As with `Rational` values, operations on `Real` values are able to
