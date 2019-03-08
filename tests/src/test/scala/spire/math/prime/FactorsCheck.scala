@@ -67,11 +67,10 @@ class FactorsCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
       (x.value, y.value) shouldBe SafeLong(n) /% SafeLong(m)
     }
   }
-/* Compile error with 2.13
+
   property("Factors(n).pow(k) = n.pow(k)") {
     forAll { (n: Long, k: Sized[Int, _1, _10]) =>
       Factors(n).pow(k.num).value shouldBe SafeLong(n).pow(k.num)
     }
   }
-*/
 }

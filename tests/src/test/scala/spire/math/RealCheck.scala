@@ -104,7 +104,7 @@ class RealCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
       x.pow(2) shouldBe x * x
     }
   }
-/* compile errors with 2.13
+
   property("x.pow(k).nroot(k) = x") {
     forAll { (x0: Real, k: Sized[Int, _1, _10]) =>
       val x = x0.abs
@@ -125,7 +125,6 @@ class RealCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCheck
       x.nroot(-k.num).pow(-k.num) shouldBe x
     }
   }
-*/
 
   property("pythagorean theorem") {
     forAll { (y: Real, x: Real) =>
