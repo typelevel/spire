@@ -31,20 +31,20 @@ object ArbitrarySupport {
   object Size {
     import Ordinal._
 
-    implicit object Size0 extends Size[_0](0)
-    implicit object Size1 extends Size[_1](1)
-    implicit object Size2 extends Size[_2](2)
-    implicit object Size3 extends Size[_3](3)
-    implicit object Size4 extends Size[_4](4)
-    implicit object Size5 extends Size[_5](5)
-    implicit object Size6 extends Size[_6](6)
-    implicit object Size7 extends Size[_3](7)
-    implicit object Size8 extends Size[_3](8)
-    implicit object Size9 extends Size[_3](9)
-    implicit object Size10 extends Size[_10](10)
-    implicit object Size20 extends Size[_20](20)
-    implicit object Size50 extends Size[_50](50)
-    implicit object Size100 extends Size[_100](100)
+    implicit object Size0SpireImplicit extends Size[_0](0)
+    implicit object Size1SpireImplicit extends Size[_1](1)
+    implicit object Size2SpireImplicit extends Size[_2](2)
+    implicit object Size3SpireImplicit extends Size[_3](3)
+    implicit object Size4SpireImplicit extends Size[_4](4)
+    implicit object Size5SpireImplicit extends Size[_5](5)
+    implicit object Size6SpireImplicit extends Size[_6](6)
+    implicit object Size7SpireImplicit extends Size[_3](7)
+    implicit object Size8SpireImplicit extends Size[_3](8)
+    implicit object Size9SpireImplicit extends Size[_3](9)
+    implicit object Size10SpireImplicit extends Size[_10](10)
+    implicit object Size20SpireImplicit extends Size[_20](20)
+    implicit object Size50SpireImplicit extends Size[_50](50)
+    implicit object Size100SpireImplicit extends Size[_100](100)
 
     def apply[A](implicit sz: Size[A]): Int = sz.value
   }
@@ -59,17 +59,17 @@ object ArbitrarySupport {
 
   import spire.syntax.all._
 
-  implicit def sized[A: EuclideanRing: Signed: Arbitrary, L: Size, U: Size]: Arbitrary[Sized[A, L, U]] =
+  implicit def sizedSpireImplicit[A: EuclideanRing: Signed: Arbitrary, L: Size, U: Size]: Arbitrary[Sized[A, L, U]] =
     Arbitrary(arbitrary[A].map(a => Sized((a emod (Size[U] - Size[L])).abs + Size[L])))
 
-  implicit def positive[A: Signed: Arbitrary]: Arbitrary[Positive[A]] =
+  implicit def positiveSpireImplicit[A: Signed: Arbitrary]: Arbitrary[Positive[A]] =
     Arbitrary(arbitrary[A].map(_.abs).filter(_.signum > 0).map(Positive(_)))
-  implicit def negative[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[Negative[A]] =
+  implicit def negativeSpireImplicit[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[Negative[A]] =
     Arbitrary(arbitrary[A].map(-_.abs).filter(_.signum < 0).map(Negative(_)))
-  implicit def nonZero[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[NonZero[A]] =
+  implicit def nonZeroSpireImplicit[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[NonZero[A]] =
     Arbitrary(arbitrary[A].filter(_.signum != 0).map(NonZero(_)))
-  implicit def nonPositive[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[NonPositive[A]] =
+  implicit def nonPositiveSpireImplicit[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[NonPositive[A]] =
     Arbitrary(arbitrary[A].map(-_.abs).filter(_.signum < 1).map(NonPositive(_)))
-  implicit def nonNegative[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[NonNegative[A]] =
+  implicit def nonNegativeSpireImplicit[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[NonNegative[A]] =
     Arbitrary(arbitrary[A].map(_.abs).filter(_.signum > -1).map(NonNegative(_)))
 }
