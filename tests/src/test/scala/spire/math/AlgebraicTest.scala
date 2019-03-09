@@ -81,7 +81,7 @@ class AlgebraicTest extends SpireProperties {
     val z = Algebraic(1)
     ((x + (y + z)) shouldBe (x + y + z))
   }
-/* intermittent infinite looping with 2.13
+
   // This generates rational Algebraic expressions along with their Rational
   // value, then tests that the 2 are equal.
   property("equality test of rational algebraic is correct") {
@@ -90,7 +90,7 @@ class AlgebraicTest extends SpireProperties {
       a == Algebraic(q)
     }
   }
-*/
+
   // This generates a Algebraic expression that we know if rational, along with
   // its actual Rational value. We then verify that the computed square root
   // using Algebraic is actually a good approximation to the real square root.
@@ -269,12 +269,23 @@ class AlgebraicTest extends SpireProperties {
       x <- arbitrary[Double]
     } yield RationalAlgebraic(Algebraic(x), Rational(x))
 
-    def genLeaf: Gen[RationalAlgebraic] = Gen.oneOf(
-      genRational.map { q => RationalAlgebraic(Algebraic(q), q) },
-      genBigDecimal,
-      genDouble,
-      genLong
-    )
+    def genLeaf: Gen[RationalAlgebraic] = {
+      if (spire.scalacompat.preScala2p13) {
+        Gen.oneOf(
+          genRational.map { q => RationalAlgebraic(Algebraic(q), q) },
+          genBigDecimal,
+          genDouble,
+          genLong
+        )
+      } else {
+        // Scala 2.13 has bugs around the construction of BigDecimal quantities
+        Gen.oneOf(
+          genRational.map { q => RationalAlgebraic(Algebraic(q), q) },
+          genDouble,
+          genLong
+        )
+      }
+    }
 
     def genAdd(depth: Int): Gen[RationalAlgebraic] = for {
       RationalAlgebraic(lhsA, lhsQ) <- genRationalAlgebraic(depth + 1)
