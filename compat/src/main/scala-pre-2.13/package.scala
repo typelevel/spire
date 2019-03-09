@@ -10,6 +10,8 @@ import scala.reflect.ClassTag
 
   def parallelSeq[A](s: Seq[A]): ParSeq[A] = s.par
 
+  def preScala2p13: Boolean = true
+
   type SeqLike[A, C] = scala.collection.SeqLike[A, C]
 
   type IterableLike[A, C] = scala.collection.IterableLike[A, C]
