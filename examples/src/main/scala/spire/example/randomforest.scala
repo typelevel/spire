@@ -117,7 +117,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
     require(opts.numAxesSample <= V.dimensions, "Cannot sample more dimension than exist in V.")
     require(data.length == outputs.length, "Number of dependent and independent variables must match.")
 
-    // Selects a set of `m` predictors to use as coordiante indices. The
+    // Selects a set of `m` predictors to use as coordinate indices. The
     // sampling is done using a variant of Knuth's shuffle.
 
     def predictors(): Array[Int] = {
