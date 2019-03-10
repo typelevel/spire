@@ -9,3 +9,5 @@ trait BuilderCompat[-A, +To] extends scala.collection.mutable.Builder[A, To] {
   def addOne(elem: A): this.type
   def +=(elem: A): this.type = addOne(elem)
 }
+
+trait IterableLikeCompat[A, Repr] extends spire.scalacompat.IterableLike[A, Repr]

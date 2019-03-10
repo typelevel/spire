@@ -6,3 +6,7 @@ trait ScalaOrderingWrapperCompat[A] extends scala.math.Ordering[A] {
 }
 
 trait BuilderCompat[-A, +To] extends scala.collection.mutable.Builder[A, To]
+
+trait IterableLikeCompat[A, Repr] extends spire.scalacompat.IterableLike[A, Repr] {
+  def newBuilder: scala.collection.mutable.Builder[A, Repr]
+}
