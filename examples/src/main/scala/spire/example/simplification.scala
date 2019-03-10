@@ -1,18 +1,11 @@
 package spire
 package example
 
-object Simplification {
-
-  def main(args: Array[String]): Unit = {
-  }
-}
-
-/*
 import spire.implicits._
 import spire.math._
 
-import spire.scalacompat.IterableLike
 import spire.scalacompat.BuilderCompat
+import spire.scalacompat.IterableLikeCompat
 import scala.collection.mutable.Builder
 
 /**
@@ -170,17 +163,9 @@ object BigStream {
       def result: BigStream[A] =
         elems.foldLeft(BigStream.empty[A])((t, a) => new BigCons(a, t))
     }
-
-/*
-  implicit def canBuildFrom[A]: CanBuildFrom[Iterable[A], A, BigStream[A]] =
-    new CanBuildFrom[Iterable[A], A, BigStream[A]] {
-      def apply(from: Iterable[A]) = newBuilder[A]
-      def apply() = newBuilder[A]
-    }
-*/
 }
 
-trait BigStream[A] extends Iterable[A] with IterableLike[A, BigStream[A]] { self =>
+trait BigStream[A] extends Iterable[A] with IterableLikeCompat[A, BigStream[A]] { self =>
 
   override def take(n: Int): BigStream[A] =
     if (isEmpty || n < 1) BigNil() else new BigCons(head, tail.take(n - 1))
@@ -215,10 +200,8 @@ trait BigStream[A] extends Iterable[A] with IterableLike[A, BigStream[A]] { self
     loop(this)
   }
 
-/*
-  def newBuilder: Builder[A, BigStream[A]] =
+  override def newBuilder: Builder[A, BigStream[A]] =
     BigStream.newBuilder[A]
-*/
 }
 
 class BigCons[A](override val head: A, t: => BigStream[A]) extends BigStream[A] {
@@ -237,4 +220,3 @@ case class BigNil[A]() extends BigStream[A] {
   override def isEmpty = true
   override def toString: String = "BigStream()"
 }
-*/
