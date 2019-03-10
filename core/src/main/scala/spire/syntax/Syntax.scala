@@ -157,7 +157,7 @@ trait InnerProductSpaceSyntax extends VectorSpaceSyntax {
 }
 
 trait CoordinateSpaceSyntax extends InnerProductSpaceSyntax {
-  implicit def coordianteSpaceOps[V](v:V): CoordinateSpaceOps[V] = new CoordinateSpaceOps[V](v)
+  implicit def coordinateSpaceOps[V](v:V): CoordinateSpaceOps[V] = new CoordinateSpaceOps[V](v)
 }
 
 trait TrigSyntax {
