@@ -288,8 +288,6 @@ lazy val commonDeps = Seq(libraryDependencies ++= Seq(
   "org.scala-lang.modules" %%% "scala-collection-compat" % "0.3.0"))
 
 lazy val commonSettings = Seq(
-  logBuffered := false,
-  parallelExecution := false,
   scalacOptions ++= commonScalacOptions.value.diff(Seq(
     "-Xfatal-warnings",
     "-language:existentials",
