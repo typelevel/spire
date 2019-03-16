@@ -1,7 +1,7 @@
 package spire
 package optional
 
-import scala.collection.SeqLike
+import spire.scalacompat.SeqLike
 import spire.algebra.{ Eq, CModule, Order }
 import spire.std.{ SeqVectorEq, SeqVectorOrder }
 import spire.std.{ ArrayVectorEq, ArrayVectorOrder }

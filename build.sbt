@@ -17,7 +17,6 @@ lazy val apfloatVersion = "1.8.3"
 lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
-
 // Projects
 
 lazy val spire = project.in(file("."))
@@ -275,12 +274,18 @@ addCommandAlias("validate", ";validateJVM;validateJS")
 lazy val buildSettings = Seq(
   organization := "org.typelevel",
   scalaVersion := scalaVersions("2.12"),
-  crossScalaVersions := Seq(scalaVersions("2.11"), scalaVersions("2.12"))
+  crossScalaVersions := Seq(scalaVersions("2.11"), scalaVersions("2.12")),
+  unmanagedSourceDirectories in Compile += {
+      val sharedSourceDir = (baseDirectory in ThisBuild).value / "compat/src/main"
+      if (scalaVersion.value.startsWith("2.13.")) sharedSourceDir / "scala-2.13"
+      else sharedSourceDir / "scala-pre-2.13"
+  }
 )
 
 lazy val commonDeps = Seq(libraryDependencies ++= Seq(
   "org.typelevel" %%% "machinist" % machinistVersion,
-  "org.typelevel" %%% "algebra" % algebraVersion))
+  "org.typelevel" %%% "algebra" % algebraVersion,
+  "org.scala-lang.modules" %%% "scala-collection-compat" % "0.3.0"))
 
 lazy val commonSettings = Seq(
   scalacOptions ++= commonScalacOptions.value.diff(Seq(
@@ -543,8 +548,9 @@ lazy val warnUnusedImport = Seq(
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, 10)) =>
         Seq()
-      case Some((2, n)) if n >= 11 =>
+      case Some((2, n)) if ((n >= 11) && (n <= 12)) =>
         Seq("-Ywarn-unused-import")
+      case _ => Seq()
     }
   },
   scalacOptions in (Compile, console) ~= {_.filterNot("-Ywarn-unused-import" == _)},

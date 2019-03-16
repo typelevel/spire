@@ -4,7 +4,7 @@ package example
 import spire.algebra._
 import spire.implicits._
 
-import scala.collection.generic.CanBuildFrom
+import scala.collection.compat._
 import scala.util.Random.{ nextInt, nextDouble, nextGaussian }
 
 /**
@@ -21,7 +21,7 @@ object KMeansExample extends App {
    */
   def kMeans[V, @sp(Double) A, CC[V] <: Iterable[V]](points0: CC[V], k: Int)(implicit
       vs: NormedVectorSpace[V, A], order: Order[A],
-      cbf: CanBuildFrom[Nothing, V, CC[V]], ct: ClassTag[V]): CC[V] = {
+      cbf: Factory[V, CC[V]], ct: ClassTag[V]): CC[V] = {
 
     val points = points0.toArray
 
@@ -81,7 +81,7 @@ object KMeansExample extends App {
     // We work with arrays above, but turn it into the collection type the user
     // wants before we return the clusters.
 
-    val bldr = cbf()
+    val bldr = cbf.newBuilder
     cfor(0)(_ < clusters.length, _ + 1) { i =>
       bldr += clusters(i)
     }
@@ -92,15 +92,15 @@ object KMeansExample extends App {
   // k centers in d-dimensions.
 
   def genPoints[CC[_], V, @sp(Double) A](d: Int, k: Int, n: Int)(f: Array[Double] => V)(implicit
-      vs: VectorSpace[V, A], cbf: CanBuildFrom[Nothing, V, CC[V]]): CC[V] = {
+      vs: VectorSpace[V, A], cbf: Factory[V, CC[V]]): CC[V] = {
 
-    def randPoint(gen: => Double): V = f((1 to d).map(_ => gen)(collection.breakOut))
+    def randPoint(gen: => Double): V = f((1 to d).map(_ => gen).toArray)
 
     val centers: Vector[V] = (1 to k).map({ _ =>
       randPoint(nextDouble() * 10)
-    })(collection.breakOut)
+    }).toVector
 
-    val bldr = cbf()
+    val bldr = cbf.newBuilder
     cfor(0)(_ < n, _ + 1) { _ =>
       bldr += centers(nextInt(k)) + randPoint(nextGaussian)
     }

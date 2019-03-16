@@ -1,7 +1,7 @@
 package spire
 package random
 
-import scala.collection.generic.CanBuildFrom
+import scala.collection.compat._
 
 sealed trait Op[+A] {
 
@@ -92,11 +92,11 @@ trait RandomCompanion[G <: Generator] { self =>
     char.foldLeftOfSize(n)(new StringBuilder) { (sb, c) => sb.append(c); sb }.map(_.toString)
 
   implicit class RandomOps[A](lhs: R[A]) {
-    def collection[CC[_]](size: Size)(implicit cbf: CanBuildFrom[CC[A], A, CC[A]]): Random[CC[A], G] =
+    def collection[CC[_]](size: Size)(implicit cbf: Factory[A, CC[A]]): Random[CC[A], G] =
       size.random(self).flatMap(collectionOfSize(_))
 
-    def collectionOfSize[CC[_]](n: Int)(implicit cbf: CanBuildFrom[CC[A], A, CC[A]]): Random[CC[A], G] =
-      foldLeftOfSize(n)(cbf()) { (b, a) => b += a; b }.map(_.result)
+    def collectionOfSize[CC[_]](n: Int)(implicit cbf: Factory[A, CC[A]]): Random[CC[A], G] =
+      foldLeftOfSize(n)(cbf.newBuilder) { (b, a) => b += a; b }.map(_.result)
 
     def foldLeftOfSize[B](n: Int)(init: => B)(f: (B, A) => B): Random[B, G] = {
       def loop(n: Int, ma: Op[A]): Op[B] =

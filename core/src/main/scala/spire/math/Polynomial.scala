@@ -1,7 +1,7 @@
 package spire
 package math
 
-import scala.collection.mutable.ArrayBuilder
+import spire.scalacompat.arrayBuilderMake
 
 import spire.algebra._
 import spire.math.poly._
@@ -125,8 +125,8 @@ object Polynomial extends PolynomialInstances {
   }
 
   private final def split[@sp(Double) C: ClassTag](poly: Polynomial[C]): (Array[Int], Array[C]) = {
-    val es = ArrayBuilder.make[Int]()
-    val cs = ArrayBuilder.make[C]()
+    val es = arrayBuilderMake[Int]()
+    val cs = arrayBuilderMake[C]()
     poly foreach { (e, c) =>
       es += e
       cs += c
@@ -204,11 +204,11 @@ trait Polynomial[@sp(Double) C] { lhs =>
 
   /** Returns a map from exponent to coefficient of this polynomial. */
   def data(implicit ring: Semiring[C], eq: Eq[C]): Map[Int, C] = {
-    val bldr = new scala.collection.mutable.MapBuilder[Int, C, Map[Int, C]](Map.empty[Int, C])
+    val bldr = scala.collection.mutable.Map.newBuilder[Int, C]
     foreachNonZero { (e, c) =>
       bldr += ((e, c))
     }
-    bldr.result()
+    bldr.result().toMap
   }
 
   /**
@@ -474,7 +474,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
     if (isZero) {
       "(0)"
     } else {
-      val bldr = ArrayBuilder.make[Term[C]]()
+      val bldr = arrayBuilderMake[Term[C]]()
       foreach { (e, c) => bldr += Term(c, e) }
 
       val ts = bldr.result()

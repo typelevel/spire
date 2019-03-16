@@ -172,10 +172,9 @@ sealed trait MathSet[A] extends Function1[A, Boolean] { lhs =>
   }
 
   private def xor(x: Set[A], y: Set[A]): Set[A] = {
-    val builder = new mutable.SetBuilder[A, Set[A]](Set.empty)
-    x.foreach(a => if (!y(a)) builder += a)
-    y.foreach(a => if (!x(a)) builder += a)
-    builder.result()
+    val xmy = x.diff(y)
+    val ymx = y.diff(x)
+    xmy.union(ymx)
   }
 
   def ^(rhs: MathSet[A]): MathSet[A] = (lhs, rhs) match {

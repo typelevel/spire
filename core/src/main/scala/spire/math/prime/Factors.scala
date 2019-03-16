@@ -103,7 +103,7 @@ case class Factors(elements: Map[SafeLong, Int], sign: Sign)
     val sign = (lhs.sign * rhs.sign).toInt
     val (nn, dd) = (lhs.elements - rhs.elements).filter(_._2 != 0).partition(_._2 > 0)
     val cc = lhs.elements.flatMap { case (p, le) =>
-      rhs.elements.get(p).map(re => (p, le min re))
+      rhs.elements.get(p).iterator.map(re => (p, le min re))
     }
     (sign, nn, dd.map { case (p, e) => (p, -e) }, cc)
   }

@@ -34,7 +34,7 @@ abstract class IntervalSet[T, S <: IntervalSet[T, _]] extends (T => Boolean) {
 
   def isProperSupersetOf(rhs: S): Boolean
 
-  def intervals: Traversable[Interval[T]]
+  def intervals: Iterable[Interval[T]]
 
   def edges: Iterable[T]
 

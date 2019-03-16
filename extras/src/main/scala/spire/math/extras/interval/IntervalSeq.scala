@@ -138,9 +138,19 @@ final class IntervalSeq[T] private (
     }
   }
 
-  // todo: switch to AbstractTraversable once we no longer need to support scala 2.10
-  def intervals: Traversable[Interval[T]] = new Traversable[Interval[T]] {
+  def intervals: Iterable[Interval[T]] = new Iterable[Interval[T]] {
+    import scala.collection.mutable.ArrayBuffer
+
     override def foreach[U](f: (Interval[T]) => U): Unit = foreachInterval(f)
+
+    def iterator: Iterator[Interval[T]] = {
+      var iseq: ArrayBuffer[Interval[T]] = ArrayBuffer.empty[Interval[T]]
+      def f(i: Interval[T]): Unit = {
+        iseq += i
+      }
+      foreachInterval(f)
+      iseq.iterator
+    }
   }
 
   def intervalIterator: Iterator[Interval[T]] = new IntervalIterator[T](lhs)

@@ -4,9 +4,9 @@ package example
 import spire.implicits._
 import spire.math._
 
-import scala.collection.IterableLike
+import spire.scalacompat.BuilderCompat
+import spire.scalacompat.IterableLikeCompat
 import scala.collection.mutable.Builder
-import scala.collection.generic.CanBuildFrom
 
 /**
  * Some tools for simplifying decimal expressions, and playing around
@@ -153,9 +153,9 @@ object BigStream {
   }
 
   def newBuilder[A]: Builder[A, BigStream[A]] =
-    new Builder[A, BigStream[A]] {
+    new BuilderCompat[A, BigStream[A]] {
       private var elems: List[A] = Nil
-      def +=(a: A): this.type = {
+      def addOne(a: A): this.type = {
         elems = a :: elems
         this
       }
@@ -163,15 +163,9 @@ object BigStream {
       def result: BigStream[A] =
         elems.foldLeft(BigStream.empty[A])((t, a) => new BigCons(a, t))
     }
-
-  implicit def canBuildFrom[A]: CanBuildFrom[Iterable[A], A, BigStream[A]] =
-    new CanBuildFrom[Iterable[A], A, BigStream[A]] {
-      def apply(from: Iterable[A]) = newBuilder[A]
-      def apply() = newBuilder[A]
-    }
 }
 
-trait BigStream[A] extends Iterable[A] with IterableLike[A, BigStream[A]] { self =>
+trait BigStream[A] extends Iterable[A] with IterableLikeCompat[A, BigStream[A]] { self =>
 
   override def take(n: Int): BigStream[A] =
     if (isEmpty || n < 1) BigNil() else new BigCons(head, tail.take(n - 1))

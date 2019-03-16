@@ -1,19 +1,19 @@
 package spire
 package std
 
-import scala.collection.SeqLike
+import scala.collection.compat._
+import spire.scalacompat.SeqLike
 import scala.collection.mutable.Builder
-import scala.collection.generic.CanBuildFrom
 
 import spire.algebra._
 import spire.NoImplicit
 
 @SerialVersionUID(0L)
-class SeqCModule[A, SA <: SeqLike[A, SA]](implicit val scalar: CRing[A], cbf: CanBuildFrom[SA,A,SA])
+class SeqCModule[A, SA <: SeqLike[A, SA]](implicit val scalar: CRing[A], cbf: Factory[A, SA])
   extends CModule[SA, A] with Serializable {
-  def zero: SA = cbf().result
+  def zero: SA = cbf.newBuilder.result
 
-  def negate(sa: SA): SA = sa map (scalar.negate)
+  def negate(sa: SA): SA = cbf.fromSpecific(sa map (scalar.negate))
 
   def plus(x: SA, y: SA): SA = {
     @tailrec
@@ -36,7 +36,7 @@ class SeqCModule[A, SA <: SeqLike[A, SA]](implicit val scalar: CRing[A], cbf: Ca
       }
     }
 
-    add2(x.toIterator, y.toIterator, cbf(x))
+    add2(x.toIterator, y.toIterator, cbf.newBuilder)
   }
 
   override def minus(x: SA, y: SA): SA = {
@@ -68,18 +68,18 @@ class SeqCModule[A, SA <: SeqLike[A, SA]](implicit val scalar: CRing[A], cbf: Ca
       }
     }
 
-    sub2(x.toIterator, y.toIterator, cbf(x))
+    sub2(x.toIterator, y.toIterator, cbf.newBuilder)
   }
 
-  def timesl(r: A, sa: SA): SA = sa map (scalar.times(r, _))
+  def timesl(r: A, sa: SA): SA = cbf.fromSpecific(sa map (scalar.times(r, _)))
 }
 
 @SerialVersionUID(0L)
-class SeqVectorSpace[A, SA <: SeqLike[A, SA]](implicit override val scalar: Field[A], cbf: CanBuildFrom[SA,A,SA])
+class SeqVectorSpace[A, SA <: SeqLike[A, SA]](implicit override val scalar: Field[A], cbf: Factory[A, SA])
   extends SeqCModule[A, SA] with VectorSpace[SA, A] with Serializable
 
 @SerialVersionUID(0L)
-class SeqInnerProductSpace[A: Field, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA])
+class SeqInnerProductSpace[A: Field, SA <: SeqLike[A, SA]](implicit cbf: Factory[A, SA])
   extends SeqVectorSpace[A, SA] with InnerProductSpace[SA, A] with Serializable {
   def dot(x: SA, y: SA): A = {
     @tailrec
@@ -96,14 +96,14 @@ class SeqInnerProductSpace[A: Field, SA <: SeqLike[A, SA]](implicit cbf: CanBuil
 }
 
 @SerialVersionUID(0L)
-class SeqCoordinateSpace[A: Field, SA <: SeqLike[A, SA]](val dimensions: Int)(implicit cbf: CanBuildFrom[SA,A,SA])
+class SeqCoordinateSpace[A: Field, SA <: SeqLike[A, SA]](val dimensions: Int)(implicit cbf: Factory[A, SA])
   extends SeqInnerProductSpace[A, SA] with CoordinateSpace[SA, A] with Serializable {
   def coord(v: SA, i: Int): A = v(i)
 
   override def dot(v: SA, w: SA): A = super[SeqInnerProductSpace].dot(v, w)
 
   def axis(i: Int): SA = {
-    val b = cbf()
+    val b = cbf.newBuilder
 
     @tailrec def loop(j: Int): SA = if (i < dimensions) {
       b += (if (i == j) scalar.one else scalar.zero)
@@ -121,7 +121,7 @@ class SeqCoordinateSpace[A: Field, SA <: SeqLike[A, SA]](val dimensions: Int)(im
   * `RealInnerProductSpace` instead.
   */
 @SerialVersionUID(0L)
-class SeqLpNormedVectorSpace[A: Field: NRoot: Signed, SA <: SeqLike[A, SA]](val p: Int)(implicit cbf: CanBuildFrom[SA,A,SA])
+class SeqLpNormedVectorSpace[A: Field: NRoot: Signed, SA <: SeqLike[A, SA]](val p: Int)(implicit cbf: Factory[A, SA])
   extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
   require(p > 0, "p must be > 0")
 
@@ -144,7 +144,7 @@ class SeqLpNormedVectorSpace[A: Field: NRoot: Signed, SA <: SeqLike[A, SA]](val 
   * norm).
   */
 @SerialVersionUID(0L)
-class SeqMaxNormedVectorSpace[A: Field: Order: Signed, SA <: SeqLike[A, SA]](implicit cbf: CanBuildFrom[SA,A,SA])
+class SeqMaxNormedVectorSpace[A: Field: Order: Signed, SA <: SeqLike[A, SA]](implicit cbf: Factory[A, SA])
   extends SeqVectorSpace[A, SA] with NormedVectorSpace[SA, A] with Serializable {
   def norm(v: SA): A = {
     @tailrec
@@ -246,13 +246,13 @@ class SeqVectorOrder[A: Order, SA <: SeqLike[A, SA]](implicit scalar: AdditiveMo
 
 trait SeqInstances0 {
   implicit def SeqCModule[A, CC[A] <: SeqLike[A, CC[A]]](implicit
-                                                         ring0: CRing[A], cbf0: CanBuildFrom[CC[A], A, CC[A]],
+                                                         ring0: CRing[A], cbf0: Factory[A, CC[A]],
                                                          ev: NoImplicit[VectorSpace[CC[A], A]]): SeqCModule[A, CC[A]] = new SeqCModule[A, CC[A]]
 }
 
 trait SeqInstances1 extends SeqInstances0 {
   implicit def SeqVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
-                                                             cbf0: CanBuildFrom[CC[A], A, CC[A]],
+                                                             cbf0: Factory[A, CC[A]],
                                                              ev: NoImplicit[NormedVectorSpace[CC[A], A]]): SeqVectorSpace[A, CC[A]] = new SeqVectorSpace[A, CC[A]]
 
   implicit def SeqEq[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Eq[A]): SeqEq[A, CC[A]] =
@@ -261,7 +261,7 @@ trait SeqInstances1 extends SeqInstances0 {
 
 trait SeqInstances2 extends SeqInstances1 {
   implicit def SeqInnerProductSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
-                                                                   cbf0: CanBuildFrom[CC[A], A, CC[A]]): SeqInnerProductSpace[A, CC[A]] = new SeqInnerProductSpace[A, CC[A]]
+                                                                   cbf0: Factory[A, CC[A]]): SeqInnerProductSpace[A, CC[A]] = new SeqInnerProductSpace[A, CC[A]]
 
   implicit def SeqOrder[A, CC[A] <: SeqLike[A, CC[A]]](implicit A0: Order[A]): SeqOrder[A, CC[A]] =
     new SeqOrder[A, CC[A]]
@@ -269,7 +269,7 @@ trait SeqInstances2 extends SeqInstances1 {
 
 trait SeqInstances3 extends SeqInstances2 {
   implicit def SeqNormedVectorSpace[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
-                                                                   nroot0: NRoot[A], cbf0: CanBuildFrom[CC[A], A, CC[A]]): NormedVectorSpace[CC[A], A] = SeqInnerProductSpace[A, CC].normed
+                                                                   nroot0: NRoot[A], cbf0: Factory[A, CC[A]]): NormedVectorSpace[CC[A], A] = SeqInnerProductSpace[A, CC].normed
 }
 
 trait SeqInstances extends SeqInstances3

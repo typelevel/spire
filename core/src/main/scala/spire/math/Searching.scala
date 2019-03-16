@@ -95,6 +95,6 @@ object Searching {
       if (!aIsNotMinimal)
         candidates += a
     }
-    Seq(candidates: _*)
+    candidates.toSeq
   }
 }
