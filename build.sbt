@@ -4,7 +4,7 @@ import ReleaseTransformations._
 import sbtcrossproject.{CrossType, crossProject}
 
 lazy val scalaVersions: Map[String, String] =
-  Map("2.11" -> "2.11.12", "2.12" -> "2.12.8")
+  Map("2.11" -> "2.11.12", "2.12" -> "2.12.8", "2.13" -> "2.13.0-M5")
 
 lazy val scalaCheckVersion = "1.14.0"
 lazy val scalaTestVersion = "3.0.6"
@@ -274,7 +274,7 @@ addCommandAlias("validate", ";validateJVM;validateJS")
 lazy val buildSettings = Seq(
   organization := "org.typelevel",
   scalaVersion := scalaVersions("2.12"),
-  crossScalaVersions := Seq(scalaVersions("2.11"), scalaVersions("2.12")),
+  crossScalaVersions := Seq(scalaVersions("2.11"), scalaVersions("2.12"), scalaVersions("2.13")),
   unmanagedSourceDirectories in Compile += {
       val sharedSourceDir = (baseDirectory in ThisBuild).value / "compat/src/main"
       if (scalaVersion.value.startsWith("2.13.")) sharedSourceDir / "scala-2.13"
