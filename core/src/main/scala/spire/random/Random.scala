@@ -71,7 +71,7 @@ trait RandomCompanion[G <: Generator] { self =>
 
   def constant[B](b: B): R[B] = spawn(Const(b))
 
-  def unit: R[Unit] = constant(Unit)
+  def unit: R[Unit] = constant(())
   def boolean: R[Boolean] = next(_.nextBoolean)
   def byte: R[Byte] = next(_.nextInt.toByte)
   def short: R[Short] = next(_.nextInt.toShort)
