@@ -1,7 +1,8 @@
 package spire
 package math
 
-import spire.algebra.lattice.Heyting
+import spire.algebra.Eq
+import algebra.lattice.DeMorgan
 
 /**
  * Implementation of three-valued logic.
@@ -162,13 +163,16 @@ object Trilean {
     }
 
   implicit val algebra = new TrileanAlgebra
+
+  implicit val trileanEq = new Eq[Trilean] {
+    def eqv(x: Trilean, y: Trilean): Boolean = x.value == y.value
+  }
 }
 
-class TrileanAlgebra extends Heyting[Trilean] {
+class TrileanAlgebra extends DeMorgan[Trilean] {
   def one: Trilean = Trilean.True
   def zero: Trilean = Trilean.False
-  def complement(a: Trilean): Trilean = !a
+  def not(a: Trilean): Trilean = !a
   def and(a: Trilean, b: Trilean): Trilean = a & b
   def or(a: Trilean, b: Trilean): Trilean = a | b
-  def imp(a: Trilean, b: Trilean): Trilean = a imp b
 }

@@ -2,8 +2,14 @@ package spire
 package algebra
 
 package object lattice {
+  type Logic[A] = _root_.algebra.lattice.Logic[A]
+  val Logic = _root_.algebra.lattice.Logic
+
   type Heyting[A] = _root_.algebra.lattice.Heyting[A]
   val Heyting = _root_.algebra.lattice.Heyting
+
+  type DeMorgan[A] = _root_.algebra.lattice.DeMorgan[A]
+  val DeMorgan = _root_.algebra.lattice.DeMorgan
 
   type Lattice[A] = _root_.algebra.lattice.Lattice[A]
   val Lattice = _root_.algebra.lattice.Lattice

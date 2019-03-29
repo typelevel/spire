@@ -50,6 +50,7 @@ package object syntax {
 
   object lattice extends LatticeSyntax
   object heyting extends HeytingSyntax
+  object logic extends LogicSyntax
   object bool extends BoolSyntax
 
   object bitString extends BitStringSyntax

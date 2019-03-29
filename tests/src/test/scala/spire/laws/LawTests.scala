@@ -192,7 +192,7 @@ class LawTests extends AnyFunSuite with FunSuiteDiscipline with Checkers {
 
   checkAll("Bool[Boolean]", LogicLaws[Boolean].bool)
   checkAll("Bool[Int]", LogicLaws[Int].bool)
-  checkAll("Heyting[Trilean]", LogicLaws[Int].heyting)
+  checkAll("DeMorgan[Trilean]", LogicLaws[Trilean].deMorgan)
 
   object intMinMaxLattice extends MinMaxLattice[Int] with BoundedLattice[Int] with spire.std.IntOrder {
     def zero = Int.MinValue

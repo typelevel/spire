@@ -173,6 +173,10 @@ trait HeytingSyntax {
   implicit def heytingOps[A: Heyting](a: A): HeytingOps[A] = new HeytingOps(a)
 }
 
+trait LogicSyntax {
+  implicit def logicOps[A: Logic](a: A): LogicOps[A] = new LogicOps(a)
+}
+
 trait BoolSyntax extends HeytingSyntax {
   implicit def boolOps[A: Bool](a: A): BoolOps[A] = new BoolOps(a)
 }
@@ -299,6 +303,7 @@ trait AllSyntax extends
     InnerProductSpaceSyntax with
     CoordinateSpaceSyntax with
     LatticeSyntax with
+    LogicSyntax with
     HeytingSyntax with
     BoolSyntax with
     BitStringSyntax with

@@ -381,6 +381,16 @@ final class HeytingOps[A: Heyting](lhs:A) {
   def |(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
 }
 
+final class LogicOps[A](lhs:A)(implicit logic: Logic[A]) {
+  def unary_!(): A = logic.not(lhs)
+
+  def &(rhs: A): A = macro Ops.binop[A, A]
+  def |(rhs: A): A = macro Ops.binop[A, A]
+
+  def &(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+  def |(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
+}
+
 final class BoolOps[A: Bool](lhs:A) {
   def ^(rhs: A): A = macro Ops.binop[A, A]
   def nand(rhs: A): A = macro Ops.binop[A, A]
