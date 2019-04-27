@@ -674,7 +674,7 @@ intervals:
 
  * `[3, 6]` the set of values between 3 and 6 (including both).
  * `(2, 4)` the set of values between 2 and 4 (excluding both).
- * `(1, 2]` half-open set, including 1 but not 2.
+ * `[1, 2)` half-open set, including 1 but not 2.
  * `(-∞, 5)` the set of values less than 5.
 
 Intervals model continuous spaces, even if the type A is discrete. So
