@@ -50,7 +50,7 @@ merging pull requests, and for helping to guide the direction of Spire:
  * Rüdiger Klaehn (*rklaehn@gmail.com*)
  * Denis Rosset (*physics@denisrosset.com*)
 
-People are expected to follow the [Typelevel Code of Conduct](http://typelevel.org/conduct.html)
+People are expected to follow the [Scala Code of Conduct](https://www.scala-lang.org/conduct/)
 when discussing Spire on the Github page, in Gitter, the IRC channel,
 mailing list, and other official venues.
 
