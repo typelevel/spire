@@ -8,6 +8,7 @@ import spire.algebra._
 import spire.algebra.free._
 import spire.math._
 import spire.math.interval.Bound
+import spire.optional.Perm
 
 import org.scalacheck.Arbitrary
 

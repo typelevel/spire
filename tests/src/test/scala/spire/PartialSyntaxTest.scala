@@ -3,9 +3,8 @@ package spire
 import spire.algebra._
 import spire.algebra.partial._
 import spire.laws.arb._
-import spire.laws.Perm
+import spire.optional.Perm
 import spire.optional.partialIterable._
-import spire.optional.mapIntIntPermutation._
 import spire.std.boolean._
 import spire.std.int._
 import spire.syntax.eq._
@@ -23,7 +22,7 @@ class PartialSyntaxTest extends FunSuite with Checkers with BaseSyntaxTest with 
 
   test("Semigroupoid syntax")(check(forAll { (a: Seq[Int], b: Seq[Int]) => testSemigroupoidSyntax(a, b) }))
   test("Groupoid syntax")(check(forAll { (a: Seq[Int], b: Seq[Int]) => testGroupoidSyntax(a, b) }))
-  test("Partial action syntax")(check(forAll { (seq: Seq[Int], perm: Perm) => testPartialActionSyntax(seq, perm.map) }))
+  test("Partial action syntax")(check(forAll { (seq: Seq[Int], perm: Perm) => testPartialActionSyntax(seq, perm) }))
 
   def testSemigroupoidSyntax[A: Semigroupoid: Eq](a: A, b: A) = {
     import spire.syntax.semigroupoid._
@@ -42,11 +41,11 @@ class PartialSyntaxTest extends FunSuite with Checkers with BaseSyntaxTest with 
     ((a |-|?? b) === Groupoid[A].opInverseIsDefined(a, b))
   }
 
-  def testPartialActionSyntax(seq: Seq[Int], perm: Map[Int, Int]) = {
+  def testPartialActionSyntax(seq: Seq[Int], perm: Perm) = {
     import spire.syntax.partialAction._
-    ((perm ?|+|> seq) === PartialAction[Seq[Int], Map[Int, Int]].partialActl(perm, seq)) &&
-    ((seq <|+|? perm) === PartialAction[Seq[Int], Map[Int, Int]].partialActr(seq, perm)) &&
-    ((perm ??|+|> seq) === PartialAction[Seq[Int], Map[Int, Int]].actlIsDefined(perm, seq)) &&
-    ((seq <|+|?? perm) === PartialAction[Seq[Int], Map[Int, Int]].actrIsDefined(seq, perm))
+    ((perm ?|+|> seq) === PartialAction[Seq[Int], Perm].partialActl(perm, seq)) &&
+    ((seq <|+|? perm) === PartialAction[Seq[Int], Perm].partialActr(seq, perm)) &&
+    ((perm ??|+|> seq) === PartialAction[Seq[Int], Perm].actlIsDefined(perm, seq)) &&
+    ((seq <|+|?? perm) === PartialAction[Seq[Int], Perm].actrIsDefined(seq, perm))
   }
 }

@@ -8,8 +8,8 @@ import spire.algebra.lattice._
 import spire.laws.arb._
 import spire.laws.shadows.{Shadow, Shadowing}
 import spire.math._
+import spire.optional.Perm
 import spire.optional.partialIterable._
-import spire.optional.mapIntIntPermutation._
 
 import spire.implicits.{
   SeqOrder => _, SeqEq => _,
@@ -20,7 +20,6 @@ import spire.implicits.{
 import org.typelevel.discipline.scalatest.Discipline
 
 import org.scalatest.FunSuite
-import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 
 class LawTests extends FunSuite with Discipline {
@@ -201,5 +200,7 @@ class LawTests extends FunSuite with Discipline {
   checkAll("AbGroup[Unit]", GroupLaws[Unit].abGroup)
   checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 
-  checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbitrary[Perm].map(_.map)), implicitly, implicitly).groupPartialAction)
+  checkAll("Perm", GroupLaws[Perm].group)
+  checkAll("Perm", ActionLaws[Perm, Int].groupAction)
+  checkAll("Perm", PartialActionLaws[Perm, Seq[Int]].groupPartialAction)
 }
