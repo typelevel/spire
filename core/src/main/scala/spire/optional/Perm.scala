@@ -25,6 +25,18 @@ class Perm private(val mapping: Map[Int, Int]) extends (Int => Int) {
       .map { case (k, v) => s"$k -> $v"}
       .mkString("Perm(", ", ", ")")
   }
+
+  def image: Set[Int] = mapping.keySet
+
+  def permute[A, SA](seq: SeqLike[A, SA])(implicit cbf: Factory[A, SA]): Opt[SA] = {
+    if (image.isEmpty) return Opt(cbf.fromSpecific(seq))
+    if (image.max >= seq.size) return Opt.empty[SA]
+    val builder = cbf.newBuilder
+    cforRange(0 until seq.size) { k =>
+      builder += seq(this(k))
+    }
+    Opt(builder.result())
+  }
 }
 
 object Perm {
@@ -56,7 +68,7 @@ final class PermIntAction extends Action[Int, Perm] {
 final class PermGroup extends Group[Perm] {
   def empty: Perm = Perm(Map.empty[Int, Int])
   def combine(x: Perm, y: Perm): Perm = Perm {
-    val preimages = x.mapping.keys ++ y.mapping.keys
+    val preimages = x.image | y.image
 
     preimages.foldLeft(Map.empty[Int, Int]) {
       case (prevMap, preimage) =>
@@ -68,15 +80,6 @@ final class PermGroup extends Group[Perm] {
 }
 
 final class PermSeqPartialAction[A, SA <: SeqLike[A, SA]](implicit cbf: Factory[A, SA]) extends PartialAction[SA, Perm] {
-  def partialActl(perm: Perm, sa: SA): Opt[SA] = {
-    if (perm.mapping.isEmpty) return Opt(sa)
-    if (perm.mapping.keys.max >= sa.size) return Opt.empty[SA]
-    val builder = cbf.newBuilder
-    cforRange(0 until sa.size) { k =>
-      builder += sa(perm(k))
-    }
-    Opt(builder.result())
-  }
-  def partialActr(sa: SA, perm: Perm): Opt[SA] =
-    partialActl(perm.inverse, sa)
+  def partialActl(perm: Perm, sa: SA): Opt[SA] = perm.permute[A, SA](sa)
+  def partialActr(sa: SA, perm: Perm): Opt[SA] = partialActl(perm.inverse, sa)
 }
