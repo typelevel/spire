@@ -7,14 +7,13 @@ import cats.kernel.Eq
 import spire.algebra.{Action, Group}
 import spire.algebra.partial.PartialAction
 import spire.syntax.cfor._
-import spire.syntax.group._
 import spire.util._
 
 /**
  * Represents a permutation encoded as a map from preimages to images, including
  * only pairs that are moved by the permutation (so the identity is Map.empty).
  */
-class Perm private(val mapping: Map[Int, Int]) extends (Int => Int) {
+class Perm private(private val mapping: Map[Int, Int]) extends (Int => Int) {
 
   override def apply(k: Int): Int = mapping.getOrElse(k, k)
 
@@ -25,6 +24,12 @@ class Perm private(val mapping: Map[Int, Int]) extends (Int => Int) {
       .map { case (k, v) => s"$k -> $v"}
       .mkString("Perm(", ", ", ")")
   }
+
+  private lazy val inverseMapping = mapping.map(_.swap)
+
+  def invert(k: Int): Int = inverseMapping.getOrElse(k, k)
+
+  def inverse: Perm = new Perm(inverseMapping)
 
   def image: Set[Int] = mapping.keySet
 
@@ -62,7 +67,7 @@ object Perm {
 
 final class PermIntAction extends Action[Int, Perm] {
   def actr(k: Int, perm: Perm): Int = perm(k)
-  def actl(perm: Perm, k: Int): Int = perm.mapping.find(_._2 == k).fold(k)(_._1)
+  def actl(perm: Perm, k: Int): Int = perm.invert(k)
 }
 
 final class PermGroup extends Group[Perm] {
@@ -76,7 +81,7 @@ final class PermGroup extends Group[Perm] {
         if (preimage != image) prevMap + ((preimage, image)) else prevMap
     }
   }
-  def inverse(a: Perm): Perm = Perm(a.mapping.map(_.swap))
+  def inverse(a: Perm): Perm = a.inverse
 }
 
 final class PermSeqPartialAction[A, SA <: SeqLike[A, SA]](implicit cbf: Factory[A, SA]) extends PartialAction[SA, Perm] {
