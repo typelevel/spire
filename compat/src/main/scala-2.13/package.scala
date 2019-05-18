@@ -17,6 +17,8 @@ import scala.reflect.ClassTag
 
   type IterableLike[A, C] = scala.collection.IterableOps[A, Iterable, C]
 
+  private[spire] type IterableOnce[+X] = scala.collection.IterableOnce[X]
+
   private[spire] type Factory[-A, +C] = scala.collection.Factory[A, C]
 
   private[spire] type FactoryCompatOps

@@ -17,6 +17,8 @@ import scala.reflect.ClassTag
 
   type IterableLike[A, C] = scala.collection.IterableLike[A, C]
 
+  private[spire] type IterableOnce[+X] = scala.collection.TraversableOnce[X]
+
   private[spire] type Factory[-A, +C] = CanBuildFrom[Nothing, A, C]
 
   private[spire] implicit class FactoryCompatOps[-A, +C](private val factory: Factory[A, C]) {
