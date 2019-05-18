@@ -1,8 +1,7 @@
 package spire
 package std
 
-import scala.collection.compat._
-import spire.scalacompat.SeqLike
+import spire.scalacompat.{Factory, FactoryCompatOps, SeqLike}
 import scala.collection.mutable.Builder
 
 import spire.algebra._

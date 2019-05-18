@@ -1,8 +1,7 @@
 package spire
 package optional
 
-import scala.collection.compat._
-import spire.scalacompat.SeqLike
+import spire.scalacompat.{Factory, FactoryCompatOps, SeqLike}
 
 import spire.algebra.{Action, Group}
 import spire.algebra.partial.PartialAction
