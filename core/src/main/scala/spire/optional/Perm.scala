@@ -17,7 +17,7 @@ class Perm private(private val mapping: Map[Int, Int]) extends (Int => Int) {
 
   override def apply(k: Int): Int = mapping.getOrElse(k, k)
 
-  def apply(n0: Int, n1: Int, ns: Int*): Perm = Group[Perm].combine(this, Perm(n0, n1, ns: _*))
+  def apply(n0: Int, n1: Int, ns: Int*): Perm = this.andThen(Perm(n0, n1, ns: _*))
 
   override def toString: String = {
     mapping.toSeq.sorted
@@ -42,6 +42,15 @@ class Perm private(private val mapping: Map[Int, Int]) extends (Int => Int) {
     }
     Opt(builder.result())
   }
+
+  def compose(that: Perm): Perm = new Perm(
+    (this.image | that.image)
+      .map(k => k -> this(that(k)))
+      .filter(Function.tupled(_ != _))
+      .toMap
+  )
+
+  def andThen(that: Perm): Perm = that.compose(this)
 }
 
 object Perm {
@@ -72,15 +81,7 @@ final class PermIntAction extends Action[Int, Perm] {
 
 final class PermGroup extends Group[Perm] {
   def empty: Perm = Perm(Map.empty[Int, Int])
-  def combine(x: Perm, y: Perm): Perm = Perm {
-    val preimages = x.image | y.image
-
-    preimages.foldLeft(Map.empty[Int, Int]) {
-      case (prevMap, preimage) =>
-        val image = y(x(preimage))
-        if (preimage != image) prevMap + ((preimage, image)) else prevMap
-    }
-  }
+  def combine(x: Perm, y: Perm): Perm = x.andThen(y)
   def inverse(a: Perm): Perm = a.inverse
 }
 
