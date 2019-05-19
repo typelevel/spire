@@ -1,12 +1,13 @@
 package spire
 package math
 
-import org.scalatest._
+import org.scalatest.{Assertion, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
 import spire.algebra.Order
 import spire.math.Sorting.{insertionSort, mergeSort, quickSort}
 import spire.std.int._
 
-class SortingTest extends FunSuite with Matchers {
+class SortingTest extends AnyFunSuite with Matchers {
 
   test("The sort methods can handle empty arrays") {
     matchAgainstExpectedForEachSortMethod(Array[Int](), Array[Int]())

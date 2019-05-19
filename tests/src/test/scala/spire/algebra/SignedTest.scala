@@ -3,13 +3,13 @@ package algebra
 
 
 // scalatest
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 // we need to disable our own === to avoid messing up ScalaTest.
 import spire.math.{Rational, Algebraic}
 import spire.implicits.{eqOps => _, _}
 
-class SignedTest extends FunSuite {
+class SignedTest extends AnyFunSuite {
   def runWith[@sp(Int, Long, Float, Double) A: Signed: ClassTag](neg: A, pos: A, zero: A): Unit = {
     val m = implicitly[ClassTag[A]]
 

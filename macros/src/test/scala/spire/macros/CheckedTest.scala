@@ -1,13 +1,13 @@
 package spire
 package macros
 
-import org.scalatest.FunSuite
 import org.scalatest.Matchers
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
 import org.scalacheck.Arbitrary
 
-class CheckedTest extends FunSuite with GeneratorDrivenPropertyChecks with Matchers {
+class CheckedTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with Matchers {
   import Checked.checked
   import Arbitrary.arbitrary
 

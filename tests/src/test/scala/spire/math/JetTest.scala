@@ -1,11 +1,12 @@
 package spire
 package math
 
-import org.scalatest._
+import org.scalatest.Matchers
+import org.scalatest.funsuite.AnyFunSuite
 import spire.algebra._
 import spire.implicits._
 
-class JetTest extends FunSuite with Matchers {
+class JetTest extends AnyFunSuite with Matchers {
 
   // Default test with 3-dimensional Jet's
   implicit val dim = JetDim(3)

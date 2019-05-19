@@ -1,13 +1,12 @@
 package spire
 package random
 
-import org.scalatest.Matchers
-import org.scalatest._
-import prop._
+import org.scalacheck.Gen
 
-import org.scalacheck._
+import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.check.ScalaCheckDrivenPropertyChecks
 
-class ShufflingTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class ShufflingTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   val rng = spire.random.rng.Lcg64.fromTime()
 
   val range = Gen.chooseNum(1, 1000)

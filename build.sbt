@@ -8,10 +8,11 @@ lazy val scalaVersions: Map[String, String] =
 
 lazy val scalaCheckVersion = "1.14.0"
 lazy val scalaTestVersion = "3.1.0-SNAP9"
+lazy val scalaTestPlusVersion = "1.0.0-SNAP4"
 lazy val shapelessVersion = "2.3.3"
 lazy val disciplineVersion = "0.11.2-M1"
 lazy val machinistVersion = "0.6.7"
-lazy val algebraVersion = "1.0.2-SNAPSHOT"
+lazy val algebraVersion = "2.0.0-M1"
 
 lazy val apfloatVersion = "1.8.3"
 lazy val jscienceVersion = "4.3.1"
@@ -445,6 +446,7 @@ lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "
 
 lazy val scalaTestSettings = Seq(
   libraryDependencies += "org.scalatest" %%% "scalatest" % scalaTestVersion % "test",
+  libraryDependencies += "org.scalatestplus" %%% "scalatestplus-scalacheck" % scalaTestPlusVersion % "test",
   libraryDependencies += "com.chuusai" %% "shapeless" % shapelessVersion % "test"
 )
 

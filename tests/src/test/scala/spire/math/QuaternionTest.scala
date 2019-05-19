@@ -1,9 +1,9 @@
 package spire.math
 
 import spire.algebra.DivisionRing
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class QuaternionTest extends FunSuite {
+class QuaternionTest extends AnyFunSuite {
 
   test("Quaternion[Double].fromDouble") {
     assert(DivisionRing[Quaternion[Rational]].fromDouble(0).isZero)

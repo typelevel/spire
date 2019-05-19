@@ -3,10 +3,10 @@ package math.prime
 
 import spire.implicits._
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import spire.math.SafeLong
 
-class PrimeTest extends FunSuite {
+class PrimeTest extends AnyFunSuite {
   val largePrime = SafeLong("393050634124102232869567034555427371542904833")
   val largeNonPrime = largePrime + 4
   val tenPrimes = IndexedSeq(2, 3, 5, 7, 11, 13, 17, 19, 23, 29).map(x ⇒ SafeLong(x))

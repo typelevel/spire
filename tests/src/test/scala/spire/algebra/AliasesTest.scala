@@ -1,9 +1,9 @@
 package spire
 package algebra
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class AliasesTest extends FunSuite {
+class AliasesTest extends AnyFunSuite {
 
   case class Cats(i: Int)
 

@@ -1,19 +1,16 @@
 package spire
 package math
 
-import org.scalatest.FunSuite
-
-import org.scalatest.Matchers
 import org.scalacheck.Arbitrary._
-import org.scalatest._
-import prop._
+import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
-class NumberPropertiesTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class NumberPropertiesTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   property("Number.apply(Long)") {
     forAll { (n: Long) => Number(n) shouldBe n }
     forAll { (n: Long) => Number(n) shouldBe SafeLong(n) }
     // we need to do (n - 1).abs to ensure we don't get a negative number
-    forAll { (n: Long) => Number((n - 1).abs) shouldBe Natural((n - 1).abs) }
   }
 
   property("Number.apply(BigInt)") {
@@ -72,7 +69,7 @@ class NumberPropertiesTest extends PropSpec with Matchers with GeneratorDrivenPr
 }
 
 // These tests are mostly about weird interplay between Long/Double/Number.
-class NumberTest extends FunSuite {
+class NumberTest extends AnyFunSuite {
   test("create numbers") {
     Number(3.toByte)
     Number(3.toShort)

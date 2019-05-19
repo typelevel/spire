@@ -1,11 +1,11 @@
 package spire
 package math
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import scala.util.Random
 
-class RationalTest extends FunSuite {
+class RationalTest extends AnyFunSuite {
 
   test("rational canonical construction") {
     val r = Rational(5,6)

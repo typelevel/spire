@@ -3,11 +3,12 @@ package algebra
 
 import spire.std.int._
 
-import org.scalatest.FunSuite
-import org.scalatest.prop.Checkers
-import org.scalacheck.Prop._
+import org.scalacheck.Prop.forAll
 
-class EqTests extends FunSuite with Checkers {
+import org.scalatest.check.Checkers
+import org.scalatest.funsuite.AnyFunSuite
+
+class EqTests extends AnyFunSuite with Checkers {
 
   test("Eq.by")(check {
     final case class A(asInt: Int)
