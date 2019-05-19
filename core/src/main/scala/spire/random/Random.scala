@@ -1,7 +1,7 @@
 package spire
 package random
 
-import scala.collection.compat._
+import spire.scalacompat.{Factory, FactoryCompatOps}
 
 sealed trait Op[+A] {
 

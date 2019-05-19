@@ -1,8 +1,7 @@
 package spire
 package optional
 
-import scala.collection.compat._
-import spire.scalacompat.IterableLike
+import spire.scalacompat.{Factory, FactoryCompatOps, IterableLike}
 
 import spire.algebra.{Semigroup, Group}
 import spire.algebra.partial.{Semigroupoid, Groupoid}

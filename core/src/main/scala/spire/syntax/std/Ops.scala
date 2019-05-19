@@ -2,9 +2,9 @@ package spire
 package syntax
 package std
 
-import scala.collection.compat._
 import spire.algebra.{AdditiveMonoid, Field, Monoid, MultiplicativeMonoid, NRoot, Order, PartialOrder, Signed}
 import spire.math.{Natural, Number, QuickSort, SafeLong, Searching, ULong}
+import spire.scalacompat.{Factory, FactoryCompatOps}
 import spire.syntax.cfor._
 import spire.syntax.monoid._
 import spire.syntax.field._

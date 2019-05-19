@@ -4,8 +4,8 @@ package random
 import spire.algebra._
 import spire.syntax.all._
 import spire.math.{Complex, Interval, Natural, Rational, SafeLong, UByte, UShort, UInt, ULong}
+import spire.scalacompat.{Factory, FactoryCompatOps}
 
-import scala.collection.compat._
 import scala.collection.mutable.ArrayBuffer
 
 trait Dist[@sp A] extends Any { self =>

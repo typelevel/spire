@@ -3,8 +3,8 @@ package example
 
 import spire.algebra._
 import spire.implicits._
+import spire.scalacompat.{Factory, FactoryCompatOps}
 
-import scala.collection.compat._
 import scala.util.Random.{ nextInt, nextDouble, nextGaussian }
 
 /**

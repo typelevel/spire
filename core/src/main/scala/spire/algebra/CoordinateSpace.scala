@@ -3,8 +3,7 @@ package algebra
 
 import spire.std._
 
-import scala.collection.compat._
-import spire.scalacompat.SeqLike
+import spire.scalacompat.{Factory, SeqLike}
 
 trait CoordinateSpace[V, @sp(Float, Double) F] extends Any with InnerProductSpace[V, F] {
   def dimensions: Int
