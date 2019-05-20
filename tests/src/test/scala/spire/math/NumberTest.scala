@@ -11,6 +11,7 @@ class NumberPropertiesTest extends PropSpec with Matchers with ScalaCheckDrivenP
     forAll { (n: Long) => Number(n) shouldBe n }
     forAll { (n: Long) => Number(n) shouldBe SafeLong(n) }
     // we need to do (n - 1).abs to ensure we don't get a negative number
+    forAll { (n: Long) => Number((n - 1).abs) shouldBe Natural((n - 1).abs) }
   }
 
   property("Number.apply(BigInt)") {
