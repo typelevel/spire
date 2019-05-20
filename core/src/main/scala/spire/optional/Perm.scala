@@ -24,9 +24,14 @@ class Perm private(private val mapping: Map[Int, Int]) extends (Int => Int) {
   /** A `Perm` constructed by cycling args so each n,,i,, maps to n,,i+1,,.
     *
     * This new cycle is composed with the current permutation to yield a new
-    * `Perm` with cycle applied last. See [[Perm$.apply(n0:Int*]].
+    * `Perm`. Cycles provided to this constructor must be disjoint.
+    * See [[Perm$.apply(n0:Int*]].
     */
-  def apply(n0: Int, n1: Int, ns: Int*): Perm = this.andThen(Perm(n0, n1, ns: _*))
+  def apply(n0: Int, n1: Int, ns: Int*): Perm = {
+    val cycle = n0 +: n1 +: ns
+    require(!(cycle.exists(image)), "Cycle must be disjoint.")
+    this.compose(Perm(n0, n1, ns: _*))
+  }
 
   override def toString: String = {
     mapping.toSeq.sorted
@@ -54,7 +59,7 @@ class Perm private(private val mapping: Map[Int, Int]) extends (Int => Int) {
     if (image.max >= seq.size) return Opt.empty[SA]
     val builder = cbf.newBuilder
     cforRange(0 until seq.size) { k =>
-      builder += seq(this(k))
+      builder += seq(invert(k))
     }
     Opt(builder.result())
   }
@@ -91,6 +96,8 @@ object Perm {
     * 2)`. At least two args are required in each parameter list.
     */
   def apply(n0: Int, n1: Int, ns: Int*): Perm = {
+    val cycles = n0 +: n1 +: ns
+    require(cycles.size == cycles.distinct.size, "Cycle must not repeat elements")
     apply((n0 +: n1 +: ns).zip(n1 +: ns :+ n0).toMap)
   }
 
@@ -103,13 +110,13 @@ object Perm {
 }
 
 final class PermIntAction extends Action[Int, Perm] {
-  def actr(k: Int, perm: Perm): Int = perm(k)
-  def actl(perm: Perm, k: Int): Int = perm.invert(k)
+  def actl(perm: Perm, k: Int): Int = perm(k)
+  def actr(k: Int, perm: Perm): Int = perm.invert(k)
 }
 
 final class PermGroup extends Group[Perm] {
   def empty: Perm = Perm(Map.empty[Int, Int])
-  def combine(x: Perm, y: Perm): Perm = x.andThen(y)
+  def combine(x: Perm, y: Perm): Perm = x.compose(y)
   def inverse(a: Perm): Perm = a.inverse
 }
 
