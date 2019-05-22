@@ -9,13 +9,13 @@ import spire.std.boolean._
 import spire.std.int._
 import spire.syntax.eq._
 
-import org.scalatest.{FunSuite, NonImplicitAssertions}
-import org.scalatest.prop.Checkers
+import org.scalacheck.Prop.forAll
 
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Prop._
+import org.scalatest.NonImplicitAssertions
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.check.Checkers
 
-class PartialSyntaxTest extends FunSuite with Checkers with BaseSyntaxTest with NonImplicitAssertions {
+class PartialSyntaxTest extends AnyFunSuite with Checkers with BaseSyntaxTest with NonImplicitAssertions {
 
   implicit val IntGroup: Group[Int] = implicitly[AdditiveGroup[Int]].additive
   implicit val SeqIntEq: Eq[Seq[Int]] = spire.optional.genericEq.generic[Seq[Int]]

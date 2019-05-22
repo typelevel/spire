@@ -1,9 +1,9 @@
 package spire
 package math
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class PackageTest extends FunSuite {
+class PackageTest extends AnyFunSuite {
   test("pow(Int, Int)") {
     assert(pow(2, 2) === 4)
   }

@@ -5,19 +5,16 @@ import spire.implicits._
 import spire.laws.arb.safeLong
 import spire.math.SafeLong
 
-import org.scalatest.Matchers
-import org.scalacheck.Arbitrary._
-import org.scalatest._
-import prop._
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary.arbitrary
 
-import org.scalacheck._
-import Gen._
-import Arbitrary.arbitrary
+import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.check.ScalaCheckDrivenPropertyChecks
 
 import spire.math.ArbitrarySupport._
 import Ordinal._
 
-class FactorsCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class FactorsCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   implicit val arbitraryFactors: Arbitrary[Factors] =
     Arbitrary(arbitrary[SafeLong].map(n => Factors(n)))

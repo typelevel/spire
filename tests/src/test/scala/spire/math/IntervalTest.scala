@@ -5,20 +5,17 @@ import spire.math.ArbitrarySupport.{Positive, NonNegative}
 
 import scala.util.Try
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import spire.implicits.{eqOps => _, _}
 import spire.laws.arb.{interval => interval_, rational}
 
-import org.scalatest.Matchers
-import org.scalacheck.Arbitrary._
-import org.scalatest._
-import prop._
+import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
+
 import interval.Overlap._
 
-import org.scalacheck._
-import Gen._
-
-class IntervalTest extends FunSuite {
+class IntervalTest extends AnyFunSuite {
   def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)
   def co(n1: Double, n2: Double) = Interval.openUpper(n1, n2)
   def oc(n1: Double, n2: Double) = Interval.openLower(n1, n2)
@@ -68,7 +65,7 @@ class IntervalTest extends FunSuite {
   test("[3, 6] -- [4, 5] = [3, 4), (5, 6]") { assert(cc(3D, 6D) -- cc(4D, 5D) === List(co(3D, 4D), oc(5D, 6D))) }
 }
 
-class RingIntervalTest extends FunSuite {
+class RingIntervalTest extends AnyFunSuite {
   def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)
 
   val a = cc(0.0, 4.0)
@@ -134,7 +131,7 @@ class RingIntervalTest extends FunSuite {
   }
 }
 
-class IntervalGeometricPartialOrderTest extends FunSuite {
+class IntervalGeometricPartialOrderTest extends AnyFunSuite {
   import spire.optional.intervalGeometricPartialOrder._
 
   import Interval.{openUpper, openLower, closed, open, point}
@@ -159,7 +156,7 @@ class IntervalGeometricPartialOrderTest extends FunSuite {
   }
 }
 
-class IntervalSubsetPartialOrderTest extends FunSuite {
+class IntervalSubsetPartialOrderTest extends AnyFunSuite {
   import spire.optional.intervalSubsetPartialOrder._
 
   import Interval.{closed, point}
@@ -173,7 +170,7 @@ class IntervalSubsetPartialOrderTest extends FunSuite {
 
 // TODO: this is just the tip of the iceberg... we also need to worry about
 // unbounded intervals, closed vs open bounds, etc.
-class ContinuousIntervalTest extends FunSuite {
+class ContinuousIntervalTest extends AnyFunSuite {
   def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)
 
   val a = 2.0
@@ -194,7 +191,7 @@ class ContinuousIntervalTest extends FunSuite {
   test("[-b,-a] / [c,d]") { assert(cc(-b, -a) / cc(c, d) === cc(-b / c, -a / d)) }
 }
 
-class IntervalReciprocalTest extends FunSuite {
+class IntervalReciprocalTest extends AnyFunSuite {
 
   def t(a: Interval[Rational], b: Interval[Rational]): Unit =
     test(s"[1]/$a = $b") { assert(a.reciprocal === b) }
@@ -258,7 +255,7 @@ class IntervalReciprocalTest extends FunSuite {
   t(Interval.atOrBelow(r"-2"), Interval.openUpper(r"-1/2", r"0")) //fixme
 }
 
-class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class IntervalCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
 
   property("x ⊆ x") {
@@ -462,7 +459,7 @@ class IntervalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyC
   }
 }
 
-class IntervalIteratorCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class IntervalIteratorCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   property("bounded intervals are ok") {
     forAll { (n1: Rational, n2: Rational, num0: Byte) =>
@@ -533,7 +530,7 @@ class IntervalIteratorCheck extends PropSpec with Matchers with GeneratorDrivenP
   }
 }
 
-class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class IntervalOverlapCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   property("(x overlap y) = (y overlap x)") {
     forAll() { (x: Interval[Rational], y: Interval[Rational]) =>
@@ -650,7 +647,7 @@ class IntervalOverlapCheck extends PropSpec with Matchers with GeneratorDrivenPr
   }
 }
 
-class IntervalSyntaxTest extends FunSuite{
+class IntervalSyntaxTest extends AnyFunSuite {
   def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)
   def co(n1: Double, n2: Double) = Interval.openUpper(n1, n2)
   def oc(n1: Double, n2: Double) = Interval.openLower(n1, n2)

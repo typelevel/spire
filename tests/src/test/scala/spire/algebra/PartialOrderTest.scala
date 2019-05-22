@@ -1,9 +1,9 @@
 package spire
 package algebra
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class PartialOrderTest extends FunSuite {
+class PartialOrderTest extends AnyFunSuite {
   import spire.optional.powerSetPartialOrder._
   import spire.implicits._
   implicit val po = PartialOrder[Set[Int]]

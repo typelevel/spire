@@ -4,14 +4,15 @@ import ReleaseTransformations._
 import sbtcrossproject.{CrossType, crossProject}
 
 lazy val scalaVersions: Map[String, String] =
-  Map("2.11" -> "2.11.12", "2.12" -> "2.12.8", "2.13" -> "2.13.0-M5")
+  Map("2.11" -> "2.11.12", "2.12" -> "2.12.8", "2.13" -> "2.13.0-RC1")
 
 lazy val scalaCheckVersion = "1.14.0"
-lazy val scalaTestVersion = "3.0.6"
+lazy val scalaTestVersion = "3.1.0-SNAP9"
+lazy val scalaTestPlusVersion = "1.0.0-SNAP4"
 lazy val shapelessVersion = "2.3.3"
-lazy val disciplineVersion = "0.11.0"
-lazy val machinistVersion = "0.6.6"
-lazy val algebraVersion = "1.0.1"
+lazy val disciplineVersion = "0.11.2-M1"
+lazy val machinistVersion = "0.6.7"
+lazy val algebraVersion = "2.0.0-M1"
 
 lazy val apfloatVersion = "1.8.3"
 lazy val jscienceVersion = "4.3.1"
@@ -441,11 +442,12 @@ lazy val extrasSettings = Seq(
 
 lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types", "Generates several type classes for Tuple2-22.")
 
-lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion % "test")
+lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion % Test)
 
 lazy val scalaTestSettings = Seq(
-  libraryDependencies += "org.scalatest" %%% "scalatest" % scalaTestVersion % "test",
-  libraryDependencies += "com.chuusai" %% "shapeless" % shapelessVersion % "test"
+  libraryDependencies += "org.scalatest" %%% "scalatest" % scalaTestVersion % Test,
+  libraryDependencies += "org.scalatestplus" %%% "scalatestplus-scalacheck" % scalaTestPlusVersion % Test,
+  libraryDependencies += "com.chuusai" %% "shapeless" % shapelessVersion % Test
 )
 
 lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps ++ publishSettings ++ scoverageSettings

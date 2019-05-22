@@ -1,12 +1,10 @@
 package spire
 package math
 
-import org.scalatest.Matchers
-import org.scalacheck.Arbitrary._
-import org.scalatest._
-import prop._
+import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.check.ScalaCheckDrivenPropertyChecks
 
-class PackageCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class PackageCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   fib(0) shouldBe 0
   fib(1) shouldBe 1
   property("fib(n + 2) = fib(n + 1) + fib(n)") {

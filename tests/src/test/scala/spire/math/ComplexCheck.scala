@@ -1,13 +1,13 @@
 package spire
 package math
 
-import org.scalacheck.Arbitrary._
-import org.scalatest._
-import org.scalatest.prop._
+import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+
 import spire.implicits._
 import spire.laws.arb.{ complex, real }
 
-class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class ComplexCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   type C = Complex[BigDecimal]
 
   scala.util.Random.setSeed(123)
@@ -79,7 +79,7 @@ class ComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyCh
   }
 }
 
-class ComplexCheck2 extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class ComplexCheck2 extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   type C = Complex[Real]
 
   val zero = Complex.zero[Real]
@@ -186,7 +186,7 @@ class ComplexCheck2 extends PropSpec with Matchers with GeneratorDrivenPropertyC
   // }
 }
 
-class FastComplexCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class FastComplexCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   property("encode/decode") {
     forAll { (re: Float, im: Float) =>
       val n: Long = FastComplex.encode(re, im)

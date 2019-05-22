@@ -1,11 +1,11 @@
 package spire
 package math
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import spire.algebra._
 import spire.util.Opt
 
-class SafeLongTest extends FunSuite {
+class SafeLongTest extends AnyFunSuite {
   test("===") {
     assert(SafeLong.one === SafeLong.one)
     assert(!(SafeLong.one =!= SafeLong.one))

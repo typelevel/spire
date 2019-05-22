@@ -1,10 +1,10 @@
 package spire
 package util
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import spire.algebra.Eq
 
-class OptCheck extends FunSuite {
+class OptCheck extends AnyFunSuite {
 
   def customToString[A](nullbox: Opt[A]): String = nullbox.toString
   def intToString(nullbox: Opt[Int]): String = nullbox.toString

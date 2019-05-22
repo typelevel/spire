@@ -5,13 +5,13 @@ import spire.algebra._
 import spire.math._
 import spire.implicits._
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 /**
  * Just some sanity tests to make sure that the type classes we expect to exist
  * actually do exist.
  */
-class TypeclassExistenceTest extends FunSuite {
+class TypeclassExistenceTest extends AnyFunSuite {
 
   def hasAbGroup[A](implicit g: AbGroup[A] = null, m: ClassTag[A]): Unit = {
     assert(g != null, "Expected implicit AbGroup[%s] instance, but it was not found." format m)

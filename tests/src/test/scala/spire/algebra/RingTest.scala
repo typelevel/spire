@@ -3,7 +3,7 @@ package algebra
 
 
 // scalatest
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 // we need to disable our own === to avoid messing up ScalaTest.
 import spire.math.{Rational, Complex, Jet, JetDim}
@@ -13,7 +13,7 @@ import spire.implicits.{eqOps => _, _}
 
 import java.math.MathContext
 
-class RingTest extends FunSuite {
+class RingTest extends AnyFunSuite {
 
   /**
    * We use this function to avoid duplicating our tests for all the different

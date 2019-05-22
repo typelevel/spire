@@ -3,12 +3,11 @@ package math
 
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalatest.Matchers
-import org.scalatest._
-import prop._
 
+import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.check.ScalaCheckDrivenPropertyChecks
 
-class RationalCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class RationalCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   type Q = Rational
 
   implicit val arbRational: Arbitrary[Rational] = Arbitrary(for {

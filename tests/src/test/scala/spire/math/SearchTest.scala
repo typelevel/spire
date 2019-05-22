@@ -3,9 +3,9 @@ package math
 
 import spire.implicits._
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class SearchTest extends FunSuite {
+class SearchTest extends AnyFunSuite {
   test("search when type provides a traditional comparison method") {
     assert(Searching.search(Array(1, 2, 3), 0) == -1)
     assert(Searching.search(Array(1, 2, 3), 2) == 1)

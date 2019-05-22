@@ -6,17 +6,13 @@ import spire.math.poly._
 import spire.std.bigDecimal._
 import spire.syntax.euclideanRing._
 
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary.arbitrary
 
-import org.scalatest.Matchers
-import org.scalacheck.Arbitrary._
-import org.scalatest._
-import prop._
+import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.check.ScalaCheckDrivenPropertyChecks
 
-import org.scalacheck._
-import Gen._
-import Arbitrary.arbitrary
-
-class PolynomialSamplingCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class PolynomialSamplingCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   import PolynomialSetup._
 

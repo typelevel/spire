@@ -1,13 +1,13 @@
 package spire.math.interval
 
-import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.check.ScalaCheckDrivenPropertyChecks
 import spire.laws.arb._
 import spire.math.{Interval, Rational}
 import spire.math.interval.Overlap._
 import spire.syntax.eq._
 
-class OverlapTest extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class OverlapTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   property("Overlap equality") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
