@@ -9,14 +9,12 @@ import spire.syntax.euclideanRing._
 import spire.syntax.literals._
 import spire.optional.rationalTrig._
 
-import org.scalatest.Matchers
-import org.scalacheck.Arbitrary._
-import org.scalatest._
-import prop._
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Arbitrary.arbitrary
 
-import org.scalacheck._
-import Gen._
-import Arbitrary.arbitrary
+import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatest.funsuite.AnyFunSuite
 
 object PolynomialSetup {
   implicit val arbitraryRational = Arbitrary(for {
@@ -50,7 +48,7 @@ object PolynomialSetup {
 }
 
 
-class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class PolynomialCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   import PolynomialSetup._
 
@@ -272,7 +270,7 @@ class PolynomialCheck extends PropSpec with Matchers with GeneratorDrivenPropert
   }
 }
 
-class PolynomialTest extends FunSuite {
+class PolynomialTest extends AnyFunSuite {
 
   test("Polynomial(List(Term(-1, 4), List(1, 4))).toSparse should be equal to Polynomial.zero") {
     val ts = Term(r"-1", 4) :: Term(r"1", 4) :: Nil

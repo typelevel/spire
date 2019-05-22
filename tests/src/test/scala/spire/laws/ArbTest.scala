@@ -4,11 +4,11 @@ package laws
 import scala.reflect.ClassTag
 import org.scalacheck.Gen
 import org.scalacheck.rng.Seed
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import spire.math.interval._
 import spire.math.{Interval, SafeLong, Rational}
 
-class ArbTest extends FunSuite {
+class ArbTest extends AnyFunSuite {
 
   // fixed random seed
   def seed: Seed = Seed(0xDEADBEEF)

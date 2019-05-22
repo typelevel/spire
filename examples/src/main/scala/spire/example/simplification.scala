@@ -4,9 +4,8 @@ package example
 import spire.implicits._
 import spire.math._
 
-import spire.scalacompat.BuilderCompat
-import spire.scalacompat.IterableLikeCompat
 import scala.collection.mutable.Builder
+import spire.scalacompat.BuilderCompat
 
 /**
  * Some tools for simplifying decimal expressions, and playing around
@@ -145,7 +144,7 @@ object Simplification {
  * where re-computing the stream is preferrable to trying to store
  * all the results in memory for next time.
  */
-object BigStream {
+object BigStream extends BigStreamCompanionCompat {
   def empty[A]: BigStream[A] = BigNil[A]()
 
   implicit class Wrapper[A](t: => BigStream[A]) {
@@ -165,7 +164,7 @@ object BigStream {
     }
 }
 
-trait BigStream[A] extends Iterable[A] with IterableLikeCompat[A, BigStream[A]] { self =>
+trait BigStream[A] extends Iterable[A] with BigStreamCompat[A] { self =>
 
   override def take(n: Int): BigStream[A] =
     if (isEmpty || n < 1) BigNil() else new BigCons(head, tail.take(n - 1))
@@ -199,9 +198,6 @@ trait BigStream[A] extends Iterable[A] with IterableLikeCompat[A, BigStream[A]] 
     }
     loop(this)
   }
-
-  override def newBuilder: Builder[A, BigStream[A]] =
-    BigStream.newBuilder[A]
 }
 
 class BigCons[A](override val head: A, t: => BigStream[A]) extends BigStream[A] {

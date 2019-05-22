@@ -3,7 +3,7 @@ package math
 
 
 // scalatest
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 // we need to disable our own === to avoid messing up ScalaTest.
 import spire.implicits.{eqOps => _, _}
@@ -12,7 +12,7 @@ import java.math.MathContext
 
 // nice alias
 
-class NumericTest extends FunSuite {
+class NumericTest extends AnyFunSuite {
 
   /**
    * We use this function to avoid duplicating our tests for all the different

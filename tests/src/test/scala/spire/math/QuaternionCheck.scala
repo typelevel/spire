@@ -4,15 +4,13 @@ package math
 import spire.implicits._
 import spire.laws.arb.{quaternion, real}
 
-import org.scalatest.Matchers
-import org.scalacheck.Arbitrary._
-import org.scalatest._
-import prop._
+import org.scalacheck.{Arbitrary, Gen}
+import org.scalacheck.Arbitrary.arbitrary
 
-import org.scalacheck._
-import Gen._
+import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.check.ScalaCheckDrivenPropertyChecks
 
-class QuaternionCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class QuaternionCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   type H = Quaternion[Real]
   val zero = Quaternion.zero[Real]

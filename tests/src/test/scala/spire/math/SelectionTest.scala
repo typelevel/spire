@@ -4,9 +4,9 @@ package math
 import spire.algebra._
 import spire.std.int._
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-trait SelectTest extends FunSuite /* with Checkers */ {
+trait SelectTest extends AnyFunSuite /* with Checkers */ {
   def selector: Select
 
   final def select[@sp A: Order: ClassTag](data: Array[A], k: Int) =

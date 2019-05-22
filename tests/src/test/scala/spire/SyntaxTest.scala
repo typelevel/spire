@@ -9,11 +9,11 @@ import spire.std.seq._
 import spire.std.string._
 import spire.tests.{SpireTests, SpireProperties}
 
-import org.scalatest.prop.Checkers
-
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
+
+import org.scalatest.check.Checkers
 
 class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   import spire.syntax.signed._

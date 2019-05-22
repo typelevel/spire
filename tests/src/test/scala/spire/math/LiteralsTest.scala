@@ -1,11 +1,11 @@
 package spire
 package math
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import spire.std.int._
 
-class LiteralsTest extends FunSuite {
+class LiteralsTest extends AnyFunSuite {
   test("byte literals") {
     import spire.syntax.literals._
     assert(b"-128" === (-128:Byte))

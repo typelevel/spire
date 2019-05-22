@@ -6,9 +6,9 @@ import spire.std.float._
 import spire.std.double._
 import spire.std.bigDecimal._
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class GaussianTest extends FunSuite {
+class GaussianTest extends AnyFunSuite {
   import AndersonDarlingTest._
 
   def checkGaussian[A: Field: Trig: NRoot: IsReal: ClassTag](nextGaussian: (A, A) => A): Unit = {

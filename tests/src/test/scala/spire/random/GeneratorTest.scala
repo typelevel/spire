@@ -4,9 +4,9 @@ package random
 import spire.random.rng._
 import spire.random.rng.extras._
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class GeneratorTest extends FunSuite {
+class GeneratorTest extends AnyFunSuite {
 
   /**
    * This is just a very basic sanity check.

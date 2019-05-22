@@ -4,10 +4,10 @@ package algebra
 import java.math.BigInteger
 
 import spire.implicits._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 
-class NRootTest extends FunSuite {
+class NRootTest extends AnyFunSuite {
   def testIntegralNRoot[A: Ring: NRoot: ClassTag]: Unit = {
     val cls = implicitly[ClassTag[A]].runtimeClass.getSimpleName
     test("Integral NRoot (%s)" format cls) {

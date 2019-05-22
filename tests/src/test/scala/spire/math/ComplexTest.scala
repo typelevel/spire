@@ -1,11 +1,11 @@
 package spire
 package math
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import spire.implicits.{eqOps => _, _}
 import java.math.MathContext
 
-class ComplexTest extends FunSuite {
+class ComplexTest extends AnyFunSuite {
   test("create Complex[Double]") {
     val (real, imag) = (3.0, 44.0)
     val c = Complex(real, imag)

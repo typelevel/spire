@@ -1,11 +1,11 @@
 package spire
 package algebra
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import spire.math._
 import spire.implicits.{eqOps => _, _}
 
-class TrigTest extends FunSuite {
+class TrigTest extends AnyFunSuite {
 
   val epsilon:Double = 1e-15
 

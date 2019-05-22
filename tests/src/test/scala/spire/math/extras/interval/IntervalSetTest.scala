@@ -1,9 +1,9 @@
 package spire.math.extras.interval
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import spire.implicits._
 
-class IntervalSetTest extends FunSuite {
+class IntervalSetTest extends AnyFunSuite {
 
   import IntervalSeq._
 

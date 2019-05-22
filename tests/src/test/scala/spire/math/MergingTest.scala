@@ -2,7 +2,7 @@ package spire
 package math
 
 import spire.implicits._
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 import spire.algebra.Order
 
 
@@ -16,7 +16,7 @@ class CountingOrder[T:Order] extends Order[T] {
   }
 }
 
-class MergingTest extends FunSuite {
+class MergingTest extends AnyFunSuite {
 
   test("binary merge") {
     val a = Array.range(0,100).map(_ * 2)

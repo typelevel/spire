@@ -6,16 +6,16 @@ import java.math.MathContext.UNLIMITED
 import spire.algebra._
 import spire.implicits._
 
-import org.scalatest.FunSuite
-import org.scalatest.prop.Checkers
-
 import org.scalacheck.{Arbitrary, Gen}
-import org.scalacheck.Arbitrary._
-import org.scalacheck.Prop._
+import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.Prop.forAll
+
+import org.scalatest.check.Checkers
+import org.scalatest.funsuite.AnyFunSuite
 
 case class Degenerate[A](value: A)
 
-class FpFilterTest extends FunSuite with Checkers {
+class FpFilterTest extends AnyFunSuite with Checkers {
   final class Evaluated extends java.lang.Exception
   private def evaluated = throw new Evaluated
 

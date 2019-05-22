@@ -2,17 +2,19 @@ package spire
 package math
 package extras
 
-import org.scalacheck.Arbitrary.{arbitrary, _}
-import org.scalacheck._
-import org.scalatest.{Matchers, _}
-import org.scalatest.prop._
+import org.scalacheck.Arbitrary
+import org.scalacheck.Arbitrary.arbitrary
+
+import org.scalatest.{Matchers, PropSpec}
+import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+
 import spire.implicits._
 import spire.laws.arb.rational
 import spire.math.Rational
 
 import scala.util.Try
 
-class FixedPointCheck extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+class FixedPointCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   implicit val arbFixedScale: Arbitrary[FixedScale] =
     Arbitrary(arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale))

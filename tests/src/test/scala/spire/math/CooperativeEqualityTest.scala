@@ -1,11 +1,11 @@
 package spire
 package math
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import spire.implicits._
 
-class CooperativeEqualityTest extends FunSuite {
+class CooperativeEqualityTest extends AnyFunSuite {
 
   def testEquals[A, B](a: A, aname: String, b: B, bname: String) =
     if (aname == bname) {
