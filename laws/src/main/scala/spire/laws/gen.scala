@@ -9,6 +9,7 @@ import spire.algebra._
 import spire.algebra.free._
 import spire.math._
 import spire.math.interval.{Bound, Closed, Open, Unbound}
+import spire.optional.Perm
 import spire.syntax.cfor.cforRange
 import spire.syntax.order._
 

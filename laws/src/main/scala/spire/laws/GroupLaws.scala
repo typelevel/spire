@@ -31,10 +31,10 @@ trait GroupLaws[A] extends Laws {
     "associative" → forAllSafe((x: A, y: A, z: A) =>
       ((x |+| y) |+| z) === (x |+| (y |+| z))
     ),
-    "combinen(a, 1) === a" → forAllSafe((a: A) =>
+    "combineN(a, 1) === a" → forAllSafe((a: A) =>
       A.combineN(a, 1) === a
     ),
-    "combinen(a, 2) === a |+| a" → forAllSafe((a: A) =>
+    "combineN(a, 2) === a |+| a" → forAllSafe((a: A) =>
       A.combineN(a, 2) === (a |+| a)
     )
   )

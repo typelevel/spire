@@ -8,8 +8,8 @@ import spire.algebra.lattice._
 import spire.laws.arb._
 import spire.laws.shadows.{Shadow, Shadowing}
 import spire.math._
+import spire.optional.Perm
 import spire.optional.partialIterable._
-import spire.optional.mapIntIntPermutation._
 
 import spire.implicits.{
   SeqOrder => _, SeqEq => _,
@@ -201,5 +201,7 @@ class LawTests extends AnyFunSuite with Discipline {
   checkAll("AbGroup[Unit]", GroupLaws[Unit].abGroup)
   checkAll("LatticePartialOrder[Int]", LatticePartialOrderLaws[Int].boundedLatticePartialOrder(intMinMaxLattice, implicitly[Order[Int]]))
 
-  checkAll("Map[Int, Int]", PartialActionLaws.apply[Map[Int, Int], Seq[Int]](implicitly, Arbitrary(arbitrary[Perm].map(_.map)), implicitly, implicitly).groupPartialAction)
+  checkAll("Perm", GroupLaws[Perm].group)
+  checkAll("Perm", ActionLaws[Perm, Int].groupAction)
+  checkAll("Perm", PartialActionLaws[Perm, Seq[Int]].groupPartialAction)
 }
