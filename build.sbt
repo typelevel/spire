@@ -171,6 +171,7 @@ lazy val laws = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(spireSettings:_*)
   .settings(libraryDependencies ++= Seq(
     "org.typelevel" %%% "discipline-scalatest" % disciplineScalaTestVersion,
+    "org.typelevel" %%% "algebra-laws" % algebraVersion,
     "org.scalacheck" %%% "scalacheck" % scalaCheckVersion
   ))
   .jvmSettings(commonJvmSettings:_*)

@@ -2,10 +2,9 @@ package spire
 package laws
 
 import spire.algebra.{Eq, Bool}
-import spire.algebra.lattice.{DeMorgan, Heyting}
+import spire.algebra.lattice.Heyting
 import spire.syntax.eq._
 import spire.syntax.bool._
-import spire.syntax.logic._
 
 import org.typelevel.discipline.Laws
 
@@ -82,35 +81,6 @@ trait LogicLaws[A] extends Laws {
       },
 
       "(0 -> x) = 1" -> forAllSafe { (x: A) => (A.zero imp x) === A.one }
-    )
-
-  def deMorgan(implicit A: DeMorgan[A]) =
-    new DefaultRuleSet(
-      name = "deMorgan",
-      parent = None,
-      "associative" -> forAllSafe { (x: A, y: A, z: A) =>
-        ((x & y) & z) === (x & (y & z)) && ((x | y) | z) === (x | (y | z))
-      },
-
-      "commutative" -> forAllSafe { (x: A, y: A) =>
-        (x & y) === (y & x) && (x | y) === (y | x)
-      },
-
-      "absorption" -> forAllSafe { (x: A, y: A) =>
-        (x & (x | y)) === x && (x | (x & y)) === x
-      },
-
-      "identity" -> forAllSafe { (x: A) =>
-        (x & A.one) === x && (x | A.zero) === x
-      },
-
-      "distributive" -> forAllSafe { (x: A, y: A, z: A) =>
-        (x & (y | z)) === ((x & y) | (x & z)) && (x | (y & z)) === ((x | y) & (x | z))
-      },
-
-      "involutive" -> forAllSafe { (x: A) => (!(!x)) === x },
-
-      "¬(x∧y) = (¬x∨¬y)" -> forAllSafe { (x: A, y: A) => !(x&y) === ((!x)|(!y)) },
     )
 
   def bool(implicit A: Bool[A]) =
