@@ -90,14 +90,14 @@ trait VectorSpaceLaws[V, A] extends Laws {
     sl = _.emptyRuleSet,
     vl = _.emptyRuleSet,
     parents = Seq.empty,
-    "identity" → forAllSafe((x: V, y: V) =>
+    "identity" -> forAllSafe((x: V, y: V) =>
       if (x === y) V.distance(x, y) === A.zero
       else V.distance(x, y) =!= A.zero
     ),
-    "symmetric" → forAllSafe((x: V, y: V) =>
+    "symmetric" -> forAllSafe((x: V, y: V) =>
       V.distance(x, y) === V.distance(y, x)
     ),
-    "triangle inequality" → forAllSafe((x: V, y: V, z: V) =>
+    "triangle inequality" -> forAllSafe((x: V, y: V, z: V) =>
       V.distance(x, z) <= (V.distance(x, y) + V.distance(y, z))
     )
   )
@@ -108,10 +108,10 @@ trait VectorSpaceLaws[V, A] extends Laws {
     vl = _.abGroup(V.additive),
     parents = Seq(vectorSpace, metricSpace),
 
-    "scalable" → forAllSafe((a: A, v: V) =>
+    "scalable" -> forAllSafe((a: A, v: V) =>
       a.abs * v.norm === (a.abs *: v).norm
     ),
-    "only 1 zero" → forAllSafe((v: V) => // This is covered by metricSpace...
+    "only 1 zero" -> forAllSafe((v: V) => // This is covered by metricSpace...
       if (v === V.zero)
         v.norm === Rng[A].zero
       else
@@ -122,10 +122,10 @@ trait VectorSpaceLaws[V, A] extends Laws {
   def linearity(f: V => A)(implicit V: CModule[V, A]): SimpleRuleSet = new SimpleRuleSet(
     name = "linearity",
 
-    "homogeneity" → forAllSafe((r: A, v: V) =>
+    "homogeneity" -> forAllSafe((r: A, v: V) =>
       f(r *: v) === r * f(v)
     ),
-    "additivity" → forAllSafe((v: V, w: V) =>
+    "additivity" -> forAllSafe((v: V, w: V) =>
       f(v + w) === f(v) + f(w)
     )
   )
@@ -135,10 +135,10 @@ trait VectorSpaceLaws[V, A] extends Laws {
     name = "inner-product space",
     parent = vectorSpace,
 
-    "symmetry" → forAllSafe((v: V, w: V) =>
+    "symmetry" -> forAllSafe((v: V, w: V) =>
       (v ⋅ w).abs === (w ⋅ v).abs
     ),
-    "linearity of partial inner product" → forAllSafe((w: V) =>
+    "linearity of partial inner product" -> forAllSafe((w: V) =>
       // TODO this probably requires some thought -- should `linearity` be a full `RuleSet`?
       propertiesToProp(linearity(_ ⋅ w).all)
     )
@@ -156,7 +156,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     val parents: Seq[SpaceProperties],
     val props: (String, Prop)*
   ) extends RuleSet {
-    val bases = Seq("scalar" → sl(scalarLaws), "vector" → vl(vectorLaws))
+    val bases = Seq("scalar" -> sl(scalarLaws), "vector" -> vl(vectorLaws))
   }
 
 }

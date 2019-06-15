@@ -44,9 +44,9 @@ object gen {
 
   lazy val safeLong: Gen[SafeLong] =
     Gen.frequency(
-      1 → SafeLong(BigInt("393050634124102232869567034555427371542904833")),
-      100 → arbitrary[Long].map(SafeLong(_)),
-      100 → arbitrary[BigInt].map(SafeLong(_)))
+      1 -> SafeLong(BigInt("393050634124102232869567034555427371542904833")),
+      100 -> arbitrary[Long].map(SafeLong(_)),
+      100 -> arbitrary[BigInt].map(SafeLong(_)))
 
   lazy val natural: Gen[Natural] =
     Gen.oneOf(
@@ -72,11 +72,11 @@ object gen {
     }
 
     Gen.frequency(
-      10 → rationalFromLongs, // we keep this to make long/long rationals more frequent
-      10 → arbitrary[Double].map(n => Rational(n)),
-      1 → rationalFromSafeLongs,
-      1 → bigRational, // a rational that is guaranteed to have a big denominator
-      1 → bigRational.map(x ⇒ if(x.isZero) Rational.one else x.inverse)
+      10 -> rationalFromLongs, // we keep this to make long/long rationals more frequent
+      10 -> arbitrary[Double].map(n => Rational(n)),
+      1 -> rationalFromSafeLongs,
+      1 -> bigRational, // a rational that is guaranteed to have a big denominator
+      1 -> bigRational.map(x => if(x.isZero) Rational.one else x.inverse)
     )
   }
 

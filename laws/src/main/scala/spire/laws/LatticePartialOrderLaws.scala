@@ -27,8 +27,8 @@ trait LatticePartialOrderLaws[A] extends Laws {
   def joinSemilatticePartialOrder(implicit A: JoinSemilattice[A], P: PartialOrder[A]) = new LatticePartialOrderProperties(
     name = "joinSemilatticePartialOrder",
     parents = Seq.empty,
-    bases = Seq("order" → OrderLaws[A].partialOrder, "lattice" → LatticeLaws[A].joinSemilattice),
-    "join.lteqv" → forAllSafe((x: A, y: A) =>
+    bases = Seq("order" -> OrderLaws[A].partialOrder, "lattice" -> LatticeLaws[A].joinSemilattice),
+    "join.lteqv" -> forAllSafe((x: A, y: A) =>
       (x <= y) === (y === (x join y))
     )
   )
@@ -36,8 +36,8 @@ trait LatticePartialOrderLaws[A] extends Laws {
   def meetSemilatticePartialOrder(implicit A: MeetSemilattice[A], P: PartialOrder[A]) = new LatticePartialOrderProperties(
     name = "meetSemilatticePartialOrder",
     parents = Seq.empty,
-    bases = Seq("order" → OrderLaws[A].partialOrder, "lattice" → LatticeLaws[A].meetSemilattice),
-    "meet.lteqv" → forAllSafe((x: A, y: A) =>
+    bases = Seq("order" -> OrderLaws[A].partialOrder, "lattice" -> LatticeLaws[A].meetSemilattice),
+    "meet.lteqv" -> forAllSafe((x: A, y: A) =>
       (x <= y) === (x === (x meet y))
     )
   )
@@ -51,8 +51,8 @@ trait LatticePartialOrderLaws[A] extends Laws {
   def boundedJoinSemilatticePartialOrder(implicit A: BoundedJoinSemilattice[A], P: PartialOrder[A]) = new LatticePartialOrderProperties(
     name = "boundedJoinSemilatticePartialOrder",
     parents = Seq(joinSemilatticePartialOrder),
-    bases = Seq("lattice" → LatticeLaws[A].boundedJoinSemilattice),
-    "lteqv.zero" → forAllSafe((x: A) =>
+    bases = Seq("lattice" -> LatticeLaws[A].boundedJoinSemilattice),
+    "lteqv.zero" -> forAllSafe((x: A) =>
       A.zero <= x
     )
   )
@@ -60,8 +60,8 @@ trait LatticePartialOrderLaws[A] extends Laws {
   def boundedMeetSemilatticePartialOrder(implicit A: BoundedMeetSemilattice[A], P: PartialOrder[A]) = new LatticePartialOrderProperties(
     name = "boundedMeetSemilatticePartialOrder",
     parents = Seq(meetSemilatticePartialOrder),
-    bases = Seq("lattice" → LatticeLaws[A].boundedMeetSemilattice),
-    "lteqv.one" → forAllSafe((x: A) =>
+    bases = Seq("lattice" -> LatticeLaws[A].boundedMeetSemilattice),
+    "lteqv.one" -> forAllSafe((x: A) =>
       x <= A.one
     )
   )
@@ -69,19 +69,19 @@ trait LatticePartialOrderLaws[A] extends Laws {
   def boundedBelowLatticePartialOrder(implicit A: Lattice[A] with BoundedJoinSemilattice[A], P: PartialOrder[A]) = new LatticePartialOrderProperties(
     name = "boundedBelowLatticePartialOrder",
     parents = Seq(boundedJoinSemilatticePartialOrder, latticePartialOrder),
-    bases = Seq("lattice" → LatticeLaws[A].boundedBelowLattice)
+    bases = Seq("lattice" -> LatticeLaws[A].boundedBelowLattice)
   )
 
   def boundedAboveLatticePartialOrder(implicit A: Lattice[A] with BoundedMeetSemilattice[A], P: PartialOrder[A]) = new LatticePartialOrderProperties(
     name = "boundedAboveLatticePartialOrder",
     parents = Seq(boundedMeetSemilatticePartialOrder, latticePartialOrder),
-    bases = Seq("lattice" → LatticeLaws[A].boundedAboveLattice)
+    bases = Seq("lattice" -> LatticeLaws[A].boundedAboveLattice)
   )
 
   def boundedLatticePartialOrder(implicit A: BoundedLattice[A], P: PartialOrder[A]) = new LatticePartialOrderProperties(
     name = "boundedLatticePartialOrder",
     parents = Seq(boundedJoinSemilatticePartialOrder, boundedMeetSemilatticePartialOrder),
-    bases = Seq("lattice" → LatticeLaws[A].boundedLattice)
+    bases = Seq("lattice" -> LatticeLaws[A].boundedLattice)
   )
 
   class LatticePartialOrderProperties(
