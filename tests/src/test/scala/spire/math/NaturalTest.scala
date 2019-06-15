@@ -3,7 +3,7 @@ package math
 
 import org.scalacheck.Arbitrary._
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import scala.util.Try
 

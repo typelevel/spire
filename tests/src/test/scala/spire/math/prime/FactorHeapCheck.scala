@@ -4,7 +4,7 @@ package math.prime
 import spire.math.SafeLong
 
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import spire.implicits._
 

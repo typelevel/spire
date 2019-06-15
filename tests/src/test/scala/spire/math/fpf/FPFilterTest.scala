@@ -10,7 +10,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Prop.forAll
 
-import org.scalatest.check.Checkers
+import org.scalatestplus.scalacheck.Checkers
 import org.scalatest.funsuite.AnyFunSuite
 
 case class Degenerate[A](value: A)

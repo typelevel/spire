@@ -8,7 +8,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.arbitrary
 
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 class QuaternionCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 

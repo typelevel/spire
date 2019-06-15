@@ -2,7 +2,7 @@ package spire
 package math
 
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 class PackageCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   fib(0) shouldBe 0

@@ -5,7 +5,7 @@ import spire.implicits._
 import spire.laws.arb.{rational, real}
 
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import ArbitrarySupport._
 import Ordinal._

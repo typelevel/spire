@@ -13,7 +13,7 @@ import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 
-import org.scalatest.check.Checkers
+import org.scalatestplus.scalacheck.Checkers
 
 class SyntaxTest extends SpireTests with Checkers with BaseSyntaxTest {
   import spire.syntax.signed._
