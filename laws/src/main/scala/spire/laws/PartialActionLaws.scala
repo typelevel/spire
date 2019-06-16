@@ -34,7 +34,7 @@ trait PartialActionLaws[G, A] extends Laws {
     sl = _.semigroupoid(G0),
     parents = Seq.empty,
 
-    "left compatibility" → forAllSafe { (g: G, h: G, a: A) =>
+    "left compatibility" -> forAllSafe { (g: G, h: G, a: A) =>
       ( (h ??|+|> a) && (g |+|?? h) ) ==>
         ((g |+|? h).get ??|+|> a) && ((g |+|? h).get ?|+|> a).get === (g ?|+|> (h ?|+|> a).get).get
     }
@@ -45,7 +45,7 @@ trait PartialActionLaws[G, A] extends Laws {
     sl = _.semigroupoid(G0),
     parents = Seq.empty,
 
-    "right compatibility" → forAllSafe { (g: G, h: G, a: A) =>
+    "right compatibility" -> forAllSafe { (g: G, h: G, a: A) =>
       ( (a <|+|?? g) && (g |+|?? h) ) ==>
       (a <|+|?? (g |+|? h).get) && ((a <|+|? (g |+|? h).get).get === ((a <|+|? g).get <|+|? h).get)
     }
@@ -62,18 +62,18 @@ trait PartialActionLaws[G, A] extends Laws {
     sl = _.groupoid(G0),
     parents = Seq(semigroupoidPartialAction),
 
-    "left action identity" → forAllSafe { (g: G, a: A) =>
+    "left action identity" -> forAllSafe { (g: G, a: A) =>
       (g ??|+|> a) ==>
       ((g.rightId ??|+|> a) && ((g.rightId ?|+|> a).get === a))
     },
 
-    "right action identity" → forAllSafe { (g: G, a: A) =>
+    "right action identity" -> forAllSafe { (g: G, a: A) =>
       (a <|+|?? g) ==>
       ((a <|+|?? g.leftId) && ((a <|+|? g.leftId).get === a))
     },
 
 
-    "left and right partial action compatibility" → forAllSafe { (a: A, g: G) =>
+    "left and right partial action compatibility" -> forAllSafe { (a: A, g: G) =>
       (a <|+|?? g) ==>
       ((g.inverse ??|+|> a) && ((a <|+|? g).get === (g.inverse ?|+|> a).get))
     }
@@ -84,7 +84,7 @@ trait PartialActionLaws[G, A] extends Laws {
     sl = _.semigroup(G0),
     parents = Seq.empty,
 
-    "left compatibility" → forAllSafe { (g: G, h: G, a: A) =>
+    "left compatibility" -> forAllSafe { (g: G, h: G, a: A) =>
       ( (h ??|+|> a) && ((g |+| h) ??|+|> a) ) ==>
       (((g |+| h) ?|+|> a).get === (g ?|+|> (h ?|+|> a).get).get)
     }
@@ -95,7 +95,7 @@ trait PartialActionLaws[G, A] extends Laws {
     sl = _.semigroup(G0),
     parents = Seq.empty,
 
-    "right compatibility" → forAllSafe { (a: A, g: G, h: G) =>
+    "right compatibility" -> forAllSafe { (a: A, g: G, h: G) =>
       ( (a <|+|?? g) && (a <|+|?? (g |+| h)) ) ==>
       ((a <|+|? (g |+| h)).get === ((a <|+|? g).get <|+|? h).get)
     }
@@ -112,7 +112,7 @@ trait PartialActionLaws[G, A] extends Laws {
     sl = _.monoid(G0),
     parents = Seq(leftSemigroupPartialAction),
 
-    "left identity" → forAllSafe { (a: A) =>
+    "left identity" -> forAllSafe { (a: A) =>
       (G0.empty ??|+|> a) && ((G0.empty ?|+|> a).get === a)
     }
   )
@@ -122,7 +122,7 @@ trait PartialActionLaws[G, A] extends Laws {
     sl = _.monoid(G0),
     parents = Seq(rightSemigroupPartialAction),
 
-    "right identity" → forAllSafe { (a: A) =>
+    "right identity" -> forAllSafe { (a: A) =>
       (a <|+|?? G0.empty) && ((a <|+|? G0.empty).get === a)
     }
   )
@@ -139,11 +139,11 @@ trait PartialActionLaws[G, A] extends Laws {
     sl = _.group(G0),
     parents = Seq(monoidPartialAction),
 
-    "right -> left action compatibility" → forAllSafe { (a: A, g: G) =>
+    "right -> left action compatibility" -> forAllSafe { (a: A, g: G) =>
       !(a <|+|?? g) || ((g ??|+|> a) && ((a <|+|? g).get === (g.inverse ?|+|> a).get))
     },
 
-    "left -> right action compatibility" → forAllSafe { (a: A, g: G) =>
+    "left -> right action compatibility" -> forAllSafe { (a: A, g: G) =>
       !(g ??|+|> a) || ((a <|+|?? g) && ((g ?|+|> a).get === (a <|+|? g.inverse).get))
     }
   )
@@ -154,6 +154,6 @@ trait PartialActionLaws[G, A] extends Laws {
     val parents: Seq[ActionProperties],
     val props: (String, Prop)*
   ) extends RuleSet {
-    val bases = Seq("scalar" → sl(scalarLaws))
+    val bases = Seq("scalar" -> sl(scalarLaws))
   }
 }

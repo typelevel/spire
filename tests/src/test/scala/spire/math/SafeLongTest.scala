@@ -51,13 +51,13 @@ class SafeLongTest extends AnyFunSuite {
     assert((SafeLong.minusOne << 1) == SafeLong(-1 << 1))
   }
   test("safeLongIsSigned") {
-    for(x ← Seq(SafeLong.one)) {
+    for(x <- Seq(SafeLong.one)) {
       assert(Signed[SafeLong].signum(x) == x.signum)
       assert(Signed[SafeLong].abs(x) == x.abs)
       assert(IsIntegral[SafeLong].toDouble(x) == x.toDouble)
       assert(IsIntegral[SafeLong].toBigInt(x) == x.toBigInt)
     }
-    for(a ← Seq(SafeLong.one, SafeLong.two); b ← Seq(SafeLong.one, SafeLong.two)) {
+    for(a <- Seq(SafeLong.one, SafeLong.two); b <- Seq(SafeLong.one, SafeLong.two)) {
       assert(Order[SafeLong].compare(a, b) == a.compare(b))
       assert(EuclideanRing[SafeLong].equot(a, b) == a / b)
       assert(EuclideanRing[SafeLong].emod(a, b) == a % b)

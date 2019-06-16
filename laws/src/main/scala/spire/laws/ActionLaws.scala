@@ -33,7 +33,7 @@ trait ActionLaws[G, A] extends Laws {
     sl = _.semigroup(G0),
     parents = Seq.empty,
 
-    "left compatibility" → forAllSafe { (g: G, h: G, a: A) =>
+    "left compatibility" -> forAllSafe { (g: G, h: G, a: A) =>
       ((g |+| h) |+|> a) === (g |+|> (h |+|> a))
     }
   )
@@ -43,7 +43,7 @@ trait ActionLaws[G, A] extends Laws {
     sl = _.semigroup(G0),
     parents = Seq.empty,
 
-    "right compatibility" → forAllSafe { (a: A, g: G, h: G) =>
+    "right compatibility" -> forAllSafe { (a: A, g: G, h: G) =>
       (a <|+| (g |+| h)) === ((a <|+| g) <|+| h)
     }
   )
@@ -59,7 +59,7 @@ trait ActionLaws[G, A] extends Laws {
     sl = _.monoid(G0),
     parents = Seq(leftSemigroupAction),
 
-    "left identity" → forAllSafe { (a: A) =>
+    "left identity" -> forAllSafe { (a: A) =>
       (G0.empty |+|> a) === a
     }
   )
@@ -69,7 +69,7 @@ trait ActionLaws[G, A] extends Laws {
     sl = _.monoid(G0),
     parents = Seq(rightSemigroupAction),
 
-    "right identity" → forAllSafe { (a: A) =>
+    "right identity" -> forAllSafe { (a: A) =>
       (a <|+| G0.empty) === a
     }
   )
@@ -85,7 +85,7 @@ trait ActionLaws[G, A] extends Laws {
     sl = _.group(G0),
     parents = Seq(monoidAction),
 
-    "left and right action compatibility" → forAllSafe { (a: A, g: G) =>
+    "left and right action compatibility" -> forAllSafe { (a: A, g: G) =>
       (a <|+| g) === (g.inverse |+|> a)
     }
   )
@@ -106,7 +106,7 @@ trait ActionLaws[G, A] extends Laws {
     val parents: Seq[ActionProperties],
     val props: (String, Prop)*
   ) extends RuleSet {
-    val bases = Seq("scalar" → sl(scalarLaws))
+    val bases = Seq("scalar" -> sl(scalarLaws))
   }
 
   class AdditiveProperties(
@@ -115,7 +115,7 @@ trait ActionLaws[G, A] extends Laws {
     val props: (String, Prop)*
   ) extends RuleSet with HasOneParent {
     val name = base.name
-    val bases = Seq("base" → base)
+    val bases = Seq("base" -> base)
   }
 
   class MultiplicativeProperties(
@@ -124,6 +124,6 @@ trait ActionLaws[G, A] extends Laws {
     val props: (String, Prop)*
   ) extends RuleSet with HasOneParent {
     val name = base.name
-    val bases = Seq("base" → base)
+    val bases = Seq("base" -> base)
   }
 }

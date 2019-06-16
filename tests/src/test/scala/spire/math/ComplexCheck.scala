@@ -53,14 +53,14 @@ class ComplexCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyC
   complex2("x + y - x == y") { (x: C, y: C) => near(x + y - x, y) }
   complex2("(x / y) * y == x") { (x: C, y: C) => if (y != zero) near((x / y) * y, x) }
 
-  complex1("x.sqrt.pow(2) = x") { x: C ⇒
+  complex1("x.sqrt.pow(2) = x") { x: C =>
     implicit val threshold = BigDecimal(2e-9)  // 28254913+1i gives a log-error-ratio of 2.02e-9
     logNear(x.sqrt.pow(2), x)
   }
 
   // use x*x instead of x.pow(2) because of rounding issues with the latter resulting in some brittleness about whether
   // a subsequent sqrt ends up in the first or fourth quadrants
-  complex1("(x*x).sqrt = x") { x: C ⇒
+  complex1("(x*x).sqrt = x") { x: C =>
     implicit val threshold = BigDecimal(3e-9)  // 1+110201870i has log-error-ratio 2.4e-9
     // Complex.sqrt returns the root with non-negative real value (and +i in the case of -1); adjust the "expected" RHS
     // accordingly
@@ -70,7 +70,7 @@ class ComplexCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyC
       logNear((x*x).sqrt, x)
   }
 
-  complex1("x.nroot(2).pow(2) = x") { x: C ⇒
+  complex1("x.nroot(2).pow(2) = x") { x: C =>
     if (spire.scalacompat.preScala2p13) {
       // this test inf-loops on scala 2.13
       implicit val threshold = BigDecimal(1e-14) // 532788694 + 329i has log-error-ratio 1.1e-15

@@ -28,13 +28,13 @@ trait GroupLaws[A] extends Laws {
   def semigroup(implicit A: Semigroup[A]) = new GroupProperties(
     name = "semigroup",
     parent = None,
-    "associative" → forAllSafe((x: A, y: A, z: A) =>
+    "associative" -> forAllSafe((x: A, y: A, z: A) =>
       ((x |+| y) |+| z) === (x |+| (y |+| z))
     ),
-    "combineN(a, 1) === a" → forAllSafe((a: A) =>
+    "combineN(a, 1) === a" -> forAllSafe((a: A) =>
       A.combineN(a, 1) === a
     ),
-    "combineN(a, 2) === a |+| a" → forAllSafe((a: A) =>
+    "combineN(a, 2) === a |+| a" -> forAllSafe((a: A) =>
       A.combineN(a, 2) === (a |+| a)
     )
   )
@@ -42,19 +42,19 @@ trait GroupLaws[A] extends Laws {
   def monoid(implicit A: Monoid[A]) = new GroupProperties(
     name = "monoid",
     parent = Some(semigroup),
-    "left identity" → forAllSafe((x: A) =>
+    "left identity" -> forAllSafe((x: A) =>
       (A.empty |+| x) === x
     ),
-    "right identity" → forAllSafe((x: A) =>
+    "right identity" -> forAllSafe((x: A) =>
       (x |+| A.empty) === x
     ),
-    "combineN(a, 0) === id" → forAllSafe((a: A) =>
+    "combineN(a, 0) === id" -> forAllSafe((a: A) =>
       A.combineN(a, 0) === A.empty
     ),
-    "combineAll(Nil) === id" → forAllSafe((a: A) =>
+    "combineAll(Nil) === id" -> forAllSafe((a: A) =>
       A.combineAll(Nil) === A.empty
     ),
-    "isId" → forAllSafe((x: A) =>
+    "isId" -> forAllSafe((x: A) =>
       (x === A.empty) === (x.isEmpty)
     )
   )
@@ -62,7 +62,7 @@ trait GroupLaws[A] extends Laws {
   def cMonoid(implicit A: CMonoid[A]) = new GroupProperties(
     name = "commutative monoid",
     parent = Some(monoid),
-    "commutative" → forAllSafe((x: A, y: A) =>
+    "commutative" -> forAllSafe((x: A, y: A) =>
       (x |+| y) === (y |+| x)
     )
   )
@@ -70,10 +70,10 @@ trait GroupLaws[A] extends Laws {
   def group(implicit A: Group[A]) = new GroupProperties(
     name = "group",
     parent = Some(monoid),
-    "left inverse" → forAllSafe((x: A) =>
+    "left inverse" -> forAllSafe((x: A) =>
       A.empty === (x.inverse |+| x)
     ),
-    "right inverse" → forAllSafe((x: A) =>
+    "right inverse" -> forAllSafe((x: A) =>
       A.empty === (x |+| x.inverse)
     )
   )
@@ -81,7 +81,7 @@ trait GroupLaws[A] extends Laws {
   def abGroup(implicit A: AbGroup[A]) = new GroupProperties(
     name = "abelian group",
     parent = Some(group),
-    "commutative" → forAllSafe((x: A, y: A) =>
+    "commutative" -> forAllSafe((x: A, y: A) =>
       (x |+| y) === (y |+| x)
     )
   )
@@ -92,10 +92,10 @@ trait GroupLaws[A] extends Laws {
   def additiveSemigroup(implicit A: AdditiveSemigroup[A]) = new AdditiveProperties(
     base = semigroup(A.additive),
     parent = None,
-    "sumN(a, 1) === a" → forAllSafe((a: A) =>
+    "sumN(a, 1) === a" -> forAllSafe((a: A) =>
       A.sumN(a, 1) === a
     ),
-    "sumN(a, 2) === a + a" → forAllSafe((a: A) =>
+    "sumN(a, 2) === a + a" -> forAllSafe((a: A) =>
       A.sumN(a, 2) === (a + a)
     )
   )
@@ -103,13 +103,13 @@ trait GroupLaws[A] extends Laws {
   def additiveMonoid(implicit A: AdditiveMonoid[A]) = new AdditiveProperties(
     base = monoid(A.additive),
     parent = Some(additiveSemigroup),
-    "sumN(a, 0) === zero" → forAllSafe((a: A) =>
+    "sumN(a, 0) === zero" -> forAllSafe((a: A) =>
       A.sumN(a, 0) === A.zero
     ),
-    "sum(Nil) === zero" → forAllSafe((a: A) =>
+    "sum(Nil) === zero" -> forAllSafe((a: A) =>
       A.sum(Nil) === A.zero
     ),
-    "isZero" → forAllSafe((a: A) =>
+    "isZero" -> forAllSafe((a: A) =>
       a.isZero === (a === A.zero)
     )
   )
@@ -123,7 +123,7 @@ trait GroupLaws[A] extends Laws {
   def additiveGroup(implicit A: AdditiveGroup[A]) = new AdditiveProperties(
     base = group(A.additive),
     parent = Some(additiveMonoid),
-    "minus consistent" → forAllSafe((x: A, y: A) =>
+    "minus consistent" -> forAllSafe((x: A, y: A) =>
       (x - y) === (x + (-y))
     )
   )
@@ -148,7 +148,7 @@ trait GroupLaws[A] extends Laws {
     val props: (String, Prop)*
   ) extends RuleSet with HasOneParent {
     val name = base.name
-    val bases = Seq("base" → base)
+    val bases = Seq("base" -> base)
   }
 
 }

@@ -16,7 +16,7 @@ object CombinationLaws {
 }
 
 /** Contains laws that are obeying by combination of types, for example
-  * various kinds of signed rings. 
+  * various kinds of signed rings.
   */
 trait CombinationLaws[A] extends Laws {
 
@@ -26,10 +26,10 @@ trait CombinationLaws[A] extends Laws {
   def signedAdditiveCMonoid(implicit signedA: Signed[A], additiveCMonoidA: AdditiveCMonoid[A]) = new DefaultRuleSet(
     name = "signedAdditiveCMonoid",
     parent = None,
-    "ordered group" → forAllSafe { (x: A, y: A, z: A) =>
+    "ordered group" -> forAllSafe { (x: A, y: A, z: A) =>
       !(x <= y) || (x + z <= y + z) // replaces (x <= y) ==> (x + z <= y + z)
     },
-    "triangle inequality" → forAllSafe { (x: A, y: A) =>
+    "triangle inequality" -> forAllSafe { (x: A, y: A) =>
       (x + y).abs <= x.abs + y.abs
     }
   )
@@ -37,7 +37,7 @@ trait CombinationLaws[A] extends Laws {
   def signedAdditiveAbGroup(implicit signedA: Signed[A], additiveAbGroupA: AdditiveAbGroup[A]) = new DefaultRuleSet(
     name = "signedAdditiveAbGroup",
     parent = Some(signedAdditiveCMonoid),
-    "abs(x) equals abs(-x)" → forAllSafe { (x: A) =>
+    "abs(x) equals abs(-x)" -> forAllSafe { (x: A) =>
       x.abs === (-x).abs
     }
   )
@@ -48,10 +48,10 @@ trait CombinationLaws[A] extends Laws {
   def signedGCDRing(implicit signedA: Signed[A], gcdRingA: GCDRing[A]) = new DefaultRuleSet(
     name = "signedGCDRing",
     parent = Some(signedAdditiveAbGroup),
-    "gcd(x, y) >= 0" → forAllSafe { (x: A, y: A) =>
+    "gcd(x, y) >= 0" -> forAllSafe { (x: A, y: A) =>
       x.gcd(y).signum >= 0
     },
-    "gcd(x, 0) === abs(x)" → forAllSafe { (x: A) =>
+    "gcd(x, 0) === abs(x)" -> forAllSafe { (x: A) =>
       x.gcd(Ring[A].zero) === Signed[A].abs(x)
     }
   )

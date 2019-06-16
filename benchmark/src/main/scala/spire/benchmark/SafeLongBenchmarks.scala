@@ -21,14 +21,14 @@ object SafeLongUtil {
     classify(a) + "_" + classify(b) + "_" + classify(a_op_b)
 
   def check(cases: Map[String, (SafeLong, SafeLong)]): Unit = {
-    for ((kind, (a, b)) ← cases) {
+    for ((kind, (a, b)) <- cases) {
       val c = classify(a, b)
       require(kind.startsWith(c), s"Unexpected class $c for case $kind")
     }
   }
 
-  def check(cases: Map[String, (SafeLong, SafeLong)], op: (SafeLong, SafeLong) ⇒ SafeLong): Unit = {
-    for ((kind, (a, b)) ← cases) {
+  def check(cases: Map[String, (SafeLong, SafeLong)], op: (SafeLong, SafeLong) => SafeLong): Unit = {
+    for ((kind, (a, b)) <- cases) {
       val c = classify(a, b, op(a, b))
       require(kind.startsWith(c), s"Unexpected class $c for case $kind")
     }
@@ -41,13 +41,13 @@ object SafeLongUtil {
 class SafeLongMultiplyBenchmark {
 
   val pairs: Map[String, (SafeLong, SafeLong)] = Map(
-    "l_l_l" → ((SafeLong.two, SafeLong.two)),
-    "l_l_b" → ((SafeLong.two, SafeLong.safe64 - 1)),
-    "l_b_l" → ((SafeLong.minusOne, SafeLong.safe64)),
-    "l_b_b" → ((SafeLong.two, SafeLong.safe64)),
-    "b_l_l" → ((SafeLong.safe64, SafeLong.minusOne)),
-    "b_l_b" → ((SafeLong.safe64, SafeLong.two)),
-    "b_b_b" → ((SafeLong.safe64, SafeLong.safe64))
+    "l_l_l" -> ((SafeLong.two, SafeLong.two)),
+    "l_l_b" -> ((SafeLong.two, SafeLong.safe64 - 1)),
+    "l_b_l" -> ((SafeLong.minusOne, SafeLong.safe64)),
+    "l_b_b" -> ((SafeLong.two, SafeLong.safe64)),
+    "b_l_l" -> ((SafeLong.safe64, SafeLong.minusOne)),
+    "b_l_b" -> ((SafeLong.safe64, SafeLong.two)),
+    "b_b_b" -> ((SafeLong.safe64, SafeLong.safe64))
   )
   check(pairs, _ * _)
 
@@ -80,14 +80,14 @@ class SafeLongMultiplyBenchmark {
 class SafeLongAddSubtractBenchmark {
 
   val pairs: Map[String, (SafeLong, SafeLong)] = Map(
-    "l_l_l" → ((SafeLong.one, SafeLong.one)),
-    "l_l_b" → ((SafeLong.one, SafeLong.safe64 - 1)),
-    "l_b_l" → ((SafeLong.minusOne, SafeLong.safe64)),
-    "l_b_b" → ((SafeLong.one, SafeLong.safe64)),
-    "b_l_l" → ((SafeLong.safe64, SafeLong.minusOne)),
-    "b_l_b" → ((SafeLong.safe64, SafeLong.one)),
-    "b_b_l" → ((SafeLong.safe64, -SafeLong.safe64 - 1)),
-    "b_b_b" → ((SafeLong.safe64, SafeLong.safe64))
+    "l_l_l" -> ((SafeLong.one, SafeLong.one)),
+    "l_l_b" -> ((SafeLong.one, SafeLong.safe64 - 1)),
+    "l_b_l" -> ((SafeLong.minusOne, SafeLong.safe64)),
+    "l_b_b" -> ((SafeLong.one, SafeLong.safe64)),
+    "b_l_l" -> ((SafeLong.safe64, SafeLong.minusOne)),
+    "b_l_b" -> ((SafeLong.safe64, SafeLong.one)),
+    "b_b_l" -> ((SafeLong.safe64, -SafeLong.safe64 - 1)),
+    "b_b_b" -> ((SafeLong.safe64, SafeLong.safe64))
   )
   check(pairs, _ + _)
   check(pairs, _ - -_)
@@ -124,8 +124,8 @@ class SafeLongAddSubtractBenchmark {
 class SafeLongCompareBenchmark {
 
   val pairs: Map[String, (SafeLong, SafeLong)] = Map(
-    "l_l" → ((SafeLong.one, SafeLong.one + 1)),
-    "b_b" → ((SafeLong.safe64, SafeLong.safe64 + 1))
+    "l_l" -> ((SafeLong.one, SafeLong.one + 1)),
+    "b_b" -> ((SafeLong.safe64, SafeLong.safe64 + 1))
   )
   check(pairs)
 

@@ -51,36 +51,36 @@ trait LogicLaws[A] extends Laws {
 
       "consistent" -> forAllSafe { (x: A) => (x & ~x) === A.zero },
 
-      "¬x = (x → 0)" -> forAllSafe { (x: A) => ~x === (x imp A.zero) },
+      "¬x = (x -> 0)" -> forAllSafe { (x: A) => ~x === (x imp A.zero) },
 
-      "x → x = 1" -> forAllSafe { (x: A) => (x imp x) === A.one },
+      "x -> x = 1" -> forAllSafe { (x: A) => (x imp x) === A.one },
 
-      "if x → y and y → x then x=y" -> forAllSafe { (x: A, y: A) =>
+      "if x -> y and y -> x then x=y" -> forAllSafe { (x: A, y: A) =>
         ((x imp y) =!= A.one) || ((y imp x) =!= A.one) || x === y
       },
 
-      "if (1 → x)=1 then x=1" -> forAllSafe { (x: A) =>
+      "if (1 -> x)=1 then x=1" -> forAllSafe { (x: A) =>
         ((A.one imp x) =!= A.one) || (x === A.one)
       },
 
-      "x → (y → x) = 1" -> forAllSafe { (x: A, y: A) => (x imp (y imp x)) === A.one },
+      "x -> (y -> x) = 1" -> forAllSafe { (x: A, y: A) => (x imp (y imp x)) === A.one },
 
-      "(x→(y→z)) → ((x→y)→(x→z)) = 1" -> forAllSafe { (x: A, y: A, z: A) =>
+      "(x->(y->z)) -> ((x->y)->(x->z)) = 1" -> forAllSafe { (x: A, y: A, z: A) =>
         ((x imp (y imp z)) imp ((x imp y) imp (x imp z))) === A.one
       },
 
-      "x∧y → x = 1" -> forAllSafe { (x: A, y: A) => ((x & y) imp x) === A.one },
-      "x∧y → y = 1" -> forAllSafe { (x: A, y: A) => ((x & y) imp y) === A.one },
-      "x → y → (x∧y) = 1" -> forAllSafe { (x: A, y: A) => (x imp (y imp (x & y))) === A.one },
+      "x∧y -> x = 1" -> forAllSafe { (x: A, y: A) => ((x & y) imp x) === A.one },
+      "x∧y -> y = 1" -> forAllSafe { (x: A, y: A) => ((x & y) imp y) === A.one },
+      "x -> y -> (x∧y) = 1" -> forAllSafe { (x: A, y: A) => (x imp (y imp (x & y))) === A.one },
 
-      "x → x∨y" -> forAllSafe { (x: A, y: A) => (x imp (x | y)) === A.one },
-      "y → x∨y" -> forAllSafe { (x: A, y: A) => (y imp (x | y)) === A.one },
+      "x -> x∨y" -> forAllSafe { (x: A, y: A) => (x imp (x | y)) === A.one },
+      "y -> x∨y" -> forAllSafe { (x: A, y: A) => (y imp (x | y)) === A.one },
 
-      "(x → z) → ((y → z) → ((x | y) → z)) = 1" -> forAllSafe { (x: A, y: A, z: A) =>
+      "(x -> z) -> ((y -> z) -> ((x | y) -> z)) = 1" -> forAllSafe { (x: A, y: A, z: A) =>
         ((x imp z) imp ((y imp z) imp ((x | y) imp z))) === A.one
       },
 
-      "(0 → x) = 1" -> forAllSafe { (x: A) => (A.zero imp x) === A.one }
+      "(0 -> x) = 1" -> forAllSafe { (x: A) => (A.zero imp x) === A.one }
     )
 
   def bool(implicit A: Bool[A]) =

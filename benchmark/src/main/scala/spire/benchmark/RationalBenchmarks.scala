@@ -21,14 +21,14 @@ object RationalUtil {
     classify(a) + "_" + classify(b) + "_" + classify(a_op_b)
 
   def check(cases: Map[String, (Rational, Rational)]): Unit = {
-    for ((kind, (a, b)) ← cases) {
+    for ((kind, (a, b)) <- cases) {
       val c = classify(a, b)
       require(kind.startsWith(c), s"Unexpected class $c for case $kind")
     }
   }
 
-  def check(cases: Map[String, (Rational, Rational)], op: (Rational, Rational) ⇒ Rational): Unit = {
-    for ((kind, (a, b)) ← cases) {
+  def check(cases: Map[String, (Rational, Rational)], op: (Rational, Rational) => Rational): Unit = {
+    for ((kind, (a, b)) <- cases) {
       val c = classify(a, b, op(a, b))
       require(kind.startsWith(c), s"Unexpected class $c for case $kind")
     }
@@ -41,11 +41,11 @@ object RationalUtil {
 class RationalMultiplyDivideBenchmark {
 
   val pairs = Map(
-    "li_li_li" → ((Rational(12345), Rational(67890))),
-    "bi_bi_bi" → ((Rational(12345) + Long.MaxValue, Rational(67890) + Long.MaxValue)),
-    "lf_lf_lf" → ((Rational(12345, 67891), Rational(67890, 12347))),
-    "lf_lf_bf" → ((Rational(Long.MaxValue, Int.MaxValue - 1), Rational(Long.MaxValue, Int.MaxValue - 3))),
-    "bf_bf_bf" → ((Rational(Long.MaxValue) + Rational(1, 3), Rational(Long.MaxValue) + Rational(1, 5))))
+    "li_li_li" -> ((Rational(12345), Rational(67890))),
+    "bi_bi_bi" -> ((Rational(12345) + Long.MaxValue, Rational(67890) + Long.MaxValue)),
+    "lf_lf_lf" -> ((Rational(12345, 67891), Rational(67890, 12347))),
+    "lf_lf_bf" -> ((Rational(Long.MaxValue, Int.MaxValue - 1), Rational(Long.MaxValue, Int.MaxValue - 3))),
+    "bf_bf_bf" -> ((Rational(Long.MaxValue) + Rational(1, 3), Rational(Long.MaxValue) + Rational(1, 5))))
   check(pairs, _ * _)
   check(pairs, _ / _.inverse)
 
@@ -83,11 +83,11 @@ class RationalMultiplyDivideBenchmark {
 class RationalAddSubtractBenchmark {
 
   val pairs = Map(
-    "li_li_li" → ((Rational(12345), Rational(67890))),
-    "bi_bi_bi" → ((Rational(12345) + Long.MaxValue, Rational(67890) + Long.MaxValue)),
-    "lf_lf_lf" →  ((Rational(12345,67891), Rational(67890,12347))),
-    "lf_lf_bf" → ((Rational(Long.MaxValue,Int.MaxValue - 1), Rational(Long.MaxValue,Int.MaxValue - 3))),
-    "bf_bf_bf" → ((Rational(Long.MaxValue) + Rational(1,3), Rational(Long.MaxValue) + Rational(1,5))))
+    "li_li_li" -> ((Rational(12345), Rational(67890))),
+    "bi_bi_bi" -> ((Rational(12345) + Long.MaxValue, Rational(67890) + Long.MaxValue)),
+    "lf_lf_lf" ->  ((Rational(12345,67891), Rational(67890,12347))),
+    "lf_lf_bf" -> ((Rational(Long.MaxValue,Int.MaxValue - 1), Rational(Long.MaxValue,Int.MaxValue - 3))),
+    "bf_bf_bf" -> ((Rational(Long.MaxValue) + Rational(1,3), Rational(Long.MaxValue) + Rational(1,5))))
   check(pairs, _ + _)
   check(pairs, _ - -_)
 
@@ -121,10 +121,10 @@ class RationalAddSubtractBenchmark {
 @State(Scope.Thread)
 class RationalCompareBenchmark {
   val pairs = Map(
-    "li_li" → ((Rational(12345), Rational(67890))),
-    "lf_lf" →  ((Rational(12345,67891), Rational(67890,12347))),
-    "lf_lf_intermediateBig" → ((Rational(Long.MaxValue,Int.MaxValue - 1), Rational(Long.MaxValue,Int.MaxValue - 3))),
-    "bf_bf" → ((Rational(Long.MaxValue) + Rational(1,3), Rational(Long.MaxValue) + Rational(1,5))))
+    "li_li" -> ((Rational(12345), Rational(67890))),
+    "lf_lf" ->  ((Rational(12345,67891), Rational(67890,12347))),
+    "lf_lf_intermediateBig" -> ((Rational(Long.MaxValue,Int.MaxValue - 1), Rational(Long.MaxValue,Int.MaxValue - 3))),
+    "bf_bf" -> ((Rational(Long.MaxValue) + Rational(1,3), Rational(Long.MaxValue) + Rational(1,5))))
   check(pairs)
 
   @Param(Array("li_li", "lf_lf", "lf_lf_intermediateBig", "bf_bf"))
