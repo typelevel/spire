@@ -2,7 +2,7 @@ package spire
 package tests
 
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalatest.funsuite.AnyFunSuite
 
 trait SpireProperties extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {

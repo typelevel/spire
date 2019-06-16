@@ -13,7 +13,7 @@ import org.scalacheck.Prop.forAll
 
 import org.scalatest.NonImplicitAssertions
 import org.scalatest.funsuite.AnyFunSuite
-import org.scalatest.check.Checkers
+import org.scalatestplus.scalacheck.Checkers
 
 class PartialSyntaxTest extends AnyFunSuite with Checkers with BaseSyntaxTest with NonImplicitAssertions {
 

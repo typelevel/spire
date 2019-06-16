@@ -1,7 +1,7 @@
 package spire.math.interval
 
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import spire.laws.arb._
 import spire.math.{Interval, Rational}
 import spire.math.interval.Overlap._

@@ -4,7 +4,7 @@ package math
 import java.math.BigInteger
 
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import spire.util.Opt
 
 class SafeLongCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
@@ -263,5 +263,5 @@ class SafeLongCheck extends PropSpec with Matchers with ScalaCheckDrivenProperty
       SafeLong(b * 2 + 1).isEven shouldBe false
     }
   }
-  
+
 }

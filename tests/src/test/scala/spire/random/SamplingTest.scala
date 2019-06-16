@@ -4,7 +4,7 @@ package random
 import org.scalacheck.Gen
 
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 class SamplingTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   val rng = spire.random.rng.Lcg64.fromTime()

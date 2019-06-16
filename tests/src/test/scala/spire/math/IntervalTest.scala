@@ -10,7 +10,7 @@ import spire.implicits.{eqOps => _, _}
 import spire.laws.arb.{interval => interval_, rational}
 
 import org.scalatest.{Matchers, PropSpec}
-import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalatest.funsuite.AnyFunSuite
 
 import interval.Overlap._

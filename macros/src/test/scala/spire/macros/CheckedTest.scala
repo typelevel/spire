@@ -2,7 +2,7 @@ package spire
 package macros
 
 import org.scalatest.Matchers
-import org.scalatest.check.ScalaCheckDrivenPropertyChecks
+import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalatest.funsuite.AnyFunSuite
 
 import org.scalacheck.Arbitrary

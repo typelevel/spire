@@ -5,7 +5,7 @@ import spire.std.int._
 
 import org.scalacheck.Prop.forAll
 
-import org.scalatest.check.Checkers
+import org.scalatestplus.scalacheck.Checkers
 import org.scalatest.funsuite.AnyFunSuite
 
 class EqTests extends AnyFunSuite with Checkers {
