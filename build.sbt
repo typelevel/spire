@@ -10,7 +10,7 @@ lazy val scalaCheckVersion = "1.14.0"
 lazy val scalaTestVersion = "3.1.0-SNAP13"
 lazy val scalaTestPlusVersion = "1.0.0-SNAP8"
 lazy val shapelessVersion = "2.3.3"
-lazy val disciplineVersion = "0.12.0-M3"
+lazy val disciplineScalaTestVersion = "1.0.0-M1"
 lazy val machinistVersion = "0.6.8"
 lazy val algebraVersion = "2.0.0-M2"
 
@@ -155,8 +155,7 @@ lazy val laws = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-laws")
   .settings(spireSettings:_*)
   .settings(libraryDependencies ++= Seq(
-    "org.typelevel" %%% "discipline-core" % disciplineVersion,
-    "org.typelevel" %%% "discipline-scalatest" % disciplineVersion,
+    "org.typelevel" %%% "discipline-scalatest" % disciplineScalaTestVersion,
     "org.scalacheck" %%% "scalacheck" % scalaCheckVersion
   ))
   .jvmSettings(commonJvmSettings:_*)
