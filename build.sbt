@@ -14,7 +14,7 @@ lazy val disciplineScalaTestVersion = "1.0.0-M1"
 lazy val machinistVersion = "0.6.8"
 lazy val algebraVersion = "2.0.0-M2"
 
-lazy val apfloatVersion = "1.9.0"
+lazy val apfloatVersion = "1.9.1"
 lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
