@@ -44,7 +44,22 @@ trait BigIntegerIsNRoot extends NRoot[BigInteger] {
         findNroot(b, i - 1)
     }
 
-    findNroot(BigInteger.ZERO, a.bitLength - 1)
+    if (k == 1)
+      a
+    else if (k > 1) {
+      /* The bit length l of b can be interpreted as pow(2, l - 1) <= b < pow(2, l).
+         We thus know that the k-th root of b will satisfy
+           nroot(pow(2, l - 1), k) <= nroot(b, k) < nroot(pow(2, l))
+         Since the k-th root is equivalent to the (1/k)-th power, we can rewrite this as
+           pow(pow(2, l - 1), 1 / k) <= nroot(b, k) < pow(pow(2, l), 1 / k)
+         which, by the power laws, is equivalent to
+           pow(2, (l - 1) / k) <= nroot(b, k) < pow(2, l / k)
+         Thus the k-th root of b will have a bit size of at most l / k.
+      */
+      findNroot(BigInteger.ZERO, a.bitLength / k)
+    }
+    else
+      throw new ArithmeticException("Cannot find non-positive %d-root of an integer number." format k)
   }
   def fpow(a:BigInteger, b:BigInteger): BigInteger = spire.math.pow(BigDecimal(a), BigDecimal(b)).bigDecimal.toBigInteger
 }
