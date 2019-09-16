@@ -1,10 +1,10 @@
 package spire
 package math
 
-import org.scalatest.Matchers
 import org.scalatest.funsuite.AnyFunSuite
 import spire.algebra._
 import spire.implicits._
+import org.scalatest.matchers.should.Matchers
 
 class JetTest extends AnyFunSuite with Matchers {
 

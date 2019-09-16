@@ -1,12 +1,13 @@
 package spire
 package math
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import spire.laws.arb.{ubyte, ushort, uint, ulong}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class ULongTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class ULongTest extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   val zero = ULong(0L)
   val one = ULong(1L)
@@ -121,7 +122,7 @@ class ULongTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChec
   }
 }
 
-class UIntTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class UIntTest extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   val zero = UInt(0)
   val one = UInt(1)
@@ -213,7 +214,7 @@ class UIntTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyCheck
   }
 }
 
-class UShortTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class UShortTest extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   val zero = UShort(0)
   val one = UShort(1)
@@ -305,7 +306,7 @@ class UShortTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChe
   }
 }
 
-class UByteTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class UByteTest extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   val zero = UByte(0)
   val one = UByte(1)

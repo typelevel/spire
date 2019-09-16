@@ -1,12 +1,13 @@
 package spire
 package math
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import spire.laws.arb._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class TrileanCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class TrileanCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   property("associativity") {
     forAll { (x: Trilean, y: Trilean, z: Trilean) =>

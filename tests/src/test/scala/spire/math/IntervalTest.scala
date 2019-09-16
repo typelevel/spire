@@ -9,11 +9,12 @@ import org.scalatest.funsuite.AnyFunSuite
 import spire.implicits.{eqOps => _, _}
 import spire.laws.arb.{interval => interval_, rational}
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalatest.funsuite.AnyFunSuite
 
 import interval.Overlap._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
 class IntervalTest extends AnyFunSuite {
   def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)
@@ -255,7 +256,7 @@ class IntervalReciprocalTest extends AnyFunSuite {
   t(Interval.atOrBelow(r"-2"), Interval.openUpper(r"-1/2", r"0")) //fixme
 }
 
-class IntervalCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class IntervalCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
 
   property("x ⊆ x") {
@@ -459,7 +460,7 @@ class IntervalCheck extends PropSpec with Matchers with ScalaCheckDrivenProperty
   }
 }
 
-class IntervalIteratorCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class IntervalIteratorCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   property("bounded intervals are ok") {
     forAll { (n1: Rational, n2: Rational, num0: Byte) =>
@@ -530,7 +531,7 @@ class IntervalIteratorCheck extends PropSpec with Matchers with ScalaCheckDriven
   }
 }
 
-class IntervalOverlapCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class IntervalOverlapCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   property("(x overlap y) = (y overlap x)") {
     forAll() { (x: Interval[Rational], y: Interval[Rational]) =>

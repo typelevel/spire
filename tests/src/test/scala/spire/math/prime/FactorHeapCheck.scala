@@ -3,12 +3,13 @@ package math.prime
 
 import spire.math.SafeLong
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import spire.implicits._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class FactorHeapCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class FactorHeapCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   import SieveUtil._
 

@@ -1,11 +1,11 @@
 package spire
 package macros
 
-import org.scalatest.Matchers
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalatest.funsuite.AnyFunSuite
 
 import org.scalacheck.Arbitrary
+import org.scalatest.matchers.should.Matchers
 
 class CheckedTest extends AnyFunSuite with ScalaCheckDrivenPropertyChecks with Matchers {
   import Checked.checked

@@ -2,12 +2,13 @@ package spire
 package math
 
 import org.scalacheck.Arbitrary._
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import scala.util.Try
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class NaturalTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class NaturalTest extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   import spire.std.bigInt._
   import ArbitrarySupport._
