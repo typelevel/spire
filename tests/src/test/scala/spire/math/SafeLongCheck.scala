@@ -3,11 +3,12 @@ package math
 
 import java.math.BigInteger
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import spire.util.Opt
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class SafeLongCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class SafeLongCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   import SafeLong.zero
 

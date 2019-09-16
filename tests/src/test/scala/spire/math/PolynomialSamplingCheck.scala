@@ -9,10 +9,11 @@ import spire.syntax.euclideanRing._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class PolynomialSamplingCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class PolynomialSamplingCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   import PolynomialSetup._
 

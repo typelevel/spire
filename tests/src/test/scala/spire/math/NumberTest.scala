@@ -2,11 +2,12 @@ package spire
 package math
 
 import org.scalacheck.Arbitrary._
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class NumberPropertiesTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class NumberPropertiesTest extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   property("Number.apply(Long)") {
     forAll { (n: Long) => Number(n) shouldBe n }
     forAll { (n: Long) => Number(n) shouldBe SafeLong(n) }
