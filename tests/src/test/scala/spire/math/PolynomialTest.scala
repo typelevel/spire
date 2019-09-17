@@ -12,9 +12,10 @@ import spire.optional.rationalTrig._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.arbitrary
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
 object PolynomialSetup {
   implicit val arbitraryRational = Arbitrary(for {
@@ -48,7 +49,7 @@ object PolynomialSetup {
 }
 
 
-class PolynomialCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class PolynomialCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   import PolynomialSetup._
 

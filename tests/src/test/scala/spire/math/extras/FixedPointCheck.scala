@@ -5,7 +5,6 @@ package extras
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import spire.implicits._
@@ -13,8 +12,10 @@ import spire.laws.arb.rational
 import spire.math.Rational
 
 import scala.util.Try
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class FixedPointCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class FixedPointCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   implicit val arbFixedScale: Arbitrary[FixedScale] =
     Arbitrary(arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale))

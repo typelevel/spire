@@ -1,12 +1,13 @@
 package spire
 package util
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import java.nio.ByteBuffer
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class PackCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class PackCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   import Pack.{intToByte, longToByte}
 
   property("int <=> bytes") {

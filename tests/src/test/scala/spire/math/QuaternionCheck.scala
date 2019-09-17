@@ -7,10 +7,11 @@ import spire.laws.arb.{quaternion, real}
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.arbitrary
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class QuaternionCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class QuaternionCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   type H = Quaternion[Real]
   val zero = Quaternion.zero[Real]

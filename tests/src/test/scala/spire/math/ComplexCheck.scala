@@ -1,13 +1,14 @@
 package spire
 package math
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import spire.implicits._
 import spire.laws.arb.{ complex, real }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class ComplexCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class ComplexCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   type C = Complex[BigDecimal]
 
   scala.util.Random.setSeed(123)
@@ -79,7 +80,7 @@ class ComplexCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyC
   }
 }
 
-class ComplexCheck2 extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class ComplexCheck2 extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   type C = Complex[Real]
 
   val zero = Complex.zero[Real]
@@ -186,7 +187,7 @@ class ComplexCheck2 extends PropSpec with Matchers with ScalaCheckDrivenProperty
   // }
 }
 
-class FastComplexCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class FastComplexCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   property("encode/decode") {
     forAll { (re: Float, im: Float) =>
       val n: Long = FastComplex.encode(re, im)
