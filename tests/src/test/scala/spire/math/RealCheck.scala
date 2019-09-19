@@ -4,13 +4,14 @@ package math
 import spire.implicits._
 import spire.laws.arb.{rational, real}
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import ArbitrarySupport._
 import Ordinal._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class RealCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class RealCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   val pi200 = "3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196"
 

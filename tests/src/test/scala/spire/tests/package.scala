@@ -1,11 +1,12 @@
 package spire
 package tests
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-trait SpireProperties extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+trait SpireProperties extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   // disable scalatest ===
   override def convertToEqualizer[T](left: T): Equalizer[T] = ???
 }

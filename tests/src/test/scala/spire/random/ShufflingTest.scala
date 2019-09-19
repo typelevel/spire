@@ -3,10 +3,11 @@ package random
 
 import org.scalacheck.Gen
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class ShufflingTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class ShufflingTest extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
   val rng = spire.random.rng.Lcg64.fromTime()
 
   val range = Gen.chooseNum(1, 1000)

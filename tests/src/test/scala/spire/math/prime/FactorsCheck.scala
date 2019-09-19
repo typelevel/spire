@@ -8,13 +8,14 @@ import spire.math.SafeLong
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 
 import spire.math.ArbitrarySupport._
 import Ordinal._
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class FactorsCheck extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class FactorsCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   implicit val arbitraryFactors: Arbitrary[Factors] =
     Arbitrary(arbitrary[SafeLong].map(n => Factors(n)))
