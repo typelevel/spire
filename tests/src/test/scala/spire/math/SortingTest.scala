@@ -1,11 +1,12 @@
 package spire
 package math
 
-import org.scalatest.{Assertion, Matchers}
+import org.scalatest.Assertion
 import org.scalatest.funsuite.AnyFunSuite
 import spire.algebra.Order
 import spire.math.Sorting.{insertionSort, mergeSort, quickSort}
 import spire.std.int._
+import org.scalatest.matchers.should.Matchers
 
 class SortingTest extends AnyFunSuite with Matchers {
 

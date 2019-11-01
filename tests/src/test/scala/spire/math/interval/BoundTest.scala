@@ -1,12 +1,13 @@
 package spire.math.interval
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import spire.laws.arb._
 import spire.syntax.eq._
 import spire.math.Rational
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 
-class BoundTest extends PropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
+class BoundTest extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyChecks {
 
   property("Bound equality") {
     forAll { (x: Rational, y: Rational) =>
