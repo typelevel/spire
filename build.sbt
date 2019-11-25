@@ -4,7 +4,7 @@ import ReleaseTransformations._
 import sbtcrossproject.{CrossType, crossProject}
 
 lazy val scalaVersions: Map[String, String] =
-  Map("2.11" -> "2.11.12", "2.12" -> "2.12.8", "2.13" -> "2.13.0")
+  Map("2.11" -> "2.11.12", "2.12" -> "2.12.8", "2.13" -> "2.13.1")
 
 lazy val scalaCheckVersion = "1.14.2"
 lazy val scalaTestVersion = "3.2.0-M1"
