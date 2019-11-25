@@ -63,7 +63,7 @@ object AndersonDarlingTest {
     0.5 * erfc((mean - x) / (Field[A].fromInt(2).sqrt * stdDev))
 
   // Approximation from: http://en.wikipedia.org/wiki/Error_function#Approximation_with_elementary_functions
-  // which listed Abramowitz and Stegun as teh source.
+  // which listed Abramowitz and Stegun as the source.
   def erfc[A: Field: Trig: IsReal](x: A): A = if (x.signum < 0) {
     2 - erfc(-x)
   } else {

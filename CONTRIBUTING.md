@@ -18,7 +18,7 @@ project.
 If you encounter anything that is broken, confusing, or could be
 better, you should
 [open an issue](https://github.com/non/spire/issues). You don't have
-to know *why* the error is occuring, or even that an error happens at
+to know *why* the error is occurring, or even that an error happens at
 all.
 
 If you are trying to do something with Spire, and are having a hard

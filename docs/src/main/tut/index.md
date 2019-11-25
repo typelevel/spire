@@ -38,7 +38,7 @@ Spire is provided to you as free software under the
 The [Spire mailing list](http://groups.google.com/group/typelevel/)
 is shared with other [Typelevel projects](http://typelevel.org).
 It is the place to go for announcements and discussions around Spire.
-When posting, place the word `[spire]` at the begining of your subject.
+When posting, place the word `[spire]` at the beginning of your subject.
 We also have a guide on [contributing to Spire](CONTRIBUTING.md) as well
 as a guide that provides information on [Spire's design](GUIDE.md).
 
@@ -437,9 +437,9 @@ Both `mergeSort` and `quickSort` delegate to `insertionSort` when dealing with
 arrays (or slices) below a certain length. So, it would be more accurate to
 describe them as hybrid sorts.
 
-Selection methods can be found in an analagous `spire.math.Selection` object.
+Selection methods can be found in an analogous `spire.math.Selection` object.
 Given an array and an index `k` these methods put the _kth_ largest element at
-position `k`, ensuring that all preceeding elements are less-than or equal-to,
+position `k`, ensuring that all preceding elements are less-than or equal-to,
 and all succeeding elements are greater-than or equal-to, the _kth_ element.
 
 There are two methods defined:
