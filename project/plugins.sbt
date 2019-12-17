@@ -14,4 +14,4 @@ addSbtPlugin("org.tpolecat"        % "tut-plugin"            % "0.6.13")
 addSbtPlugin("net.virtual-void"    % "sbt-dependency-graph"  % "0.9.2")
 addSbtPlugin("org.portable-scala"  % "sbt-scalajs-crossproject" % "0.6.1")
 addSbtPlugin("com.47deg"           % "sbt-microsites"        % "1.0.1")
-libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.7.29"
+libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.7.30"
