@@ -16,7 +16,7 @@ This is achieved by having two cases: `SafeLongLong(x: Long)` is used for number
 
 ### Implementation notes
 
-Operations of `SafeLongBigInt` use the underyling BigInt and create the appropriate kind of result depending on whether the result is a valid long.
+Operations of `SafeLongBigInt` use the underlying BigInt and create the appropriate kind of result depending on whether the result is a valid long.
 
 Operations on `SafeLongLong` use the Checked macro to perform operations using long integers, and only fall back to using `BigInt` in case of numeric overflow.
 

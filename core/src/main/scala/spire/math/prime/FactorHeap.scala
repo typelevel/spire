@@ -10,7 +10,7 @@ import SieveUtil._
  * more than this many prime factors.
  *
  * Note that "fast factors" don't end up in this heap, so the number
- * of primes we can sieve is actaully the max heap size + the number
+ * of primes we can sieve is actually the max heap size + the number
  * of fast factors.
  *
  * The sieve implementation itself uses a cutoff, so to test primality

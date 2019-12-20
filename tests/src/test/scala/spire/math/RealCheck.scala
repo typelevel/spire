@@ -133,7 +133,7 @@ class RealCheck extends AnyPropSpec with Matchers with ScalaCheckDrivenPropertyC
     }
   }
 
-  // since atan2 has branch cuts, we limit the magnitue of x and y
+  // since atan2 has branch cuts, we limit the magnitude of x and y
   property("sin(atan2(y, x)) = y/mag, cos(atan2(y, x)) = x/mag") {
     forAll { (yn: Long, yd: Long, xn: Long, xd: Long) =>
       if (xd != 0 && yd != 0 && (xn != 0 || yn != 0)) {

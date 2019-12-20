@@ -194,7 +194,7 @@ object FastComplex {
     }
   }
 
-  /* TODO: does it make sense? Should match the behvaior on Gaussian integers
+  /* TODO: does it make sense? Should match the behavior on Gaussian integers
    final def quot(a: Long, b: Long): Long =
     encode(Math.floor(real(divide(a, b))).toFloat, 0.0F)
 

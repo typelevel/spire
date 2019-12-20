@@ -153,7 +153,7 @@ object Polynomial extends PolynomialInstances {
 trait Polynomial[@sp(Double) C] { lhs =>
   implicit def ct: ClassTag[C]
 
-  /** Returns a polynmial that has a dense representation. */
+  /** Returns a polynomial that has a dense representation. */
   def toDense(implicit ring: Semiring[C], eq: Eq[C]): PolyDense[C]
 
   /** Returns a polynomial that has a sparse representation. */

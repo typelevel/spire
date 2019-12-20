@@ -19,7 +19,7 @@ object SieveUtil {
   }
 
   /**
-   * Reprsents a prime factor which we need to keep track of.
+   * Represents a prime factor which we need to keep track of.
    *
    * Similar to Factor, but in this case the prime is small enough that
    * it fits in an Int. This means that each of our sieve segments will

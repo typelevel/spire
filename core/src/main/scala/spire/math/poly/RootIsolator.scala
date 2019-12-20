@@ -8,7 +8,7 @@ import spire.std.bigInt._
 import spire.syntax.std.seq._
 
 /**
- * A type class for retreiving isolated roots.
+ * A type class for retrieving isolated roots.
  */
 sealed trait RootIsolator[A] {
 

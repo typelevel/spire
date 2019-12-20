@@ -272,5 +272,5 @@ class ScalaVsSpireBenchmarks {
 //
 //object Scala {
 //  @tailrec final def gcd[A: Integral](a: A, b: A): A =
-//    if (a % b == implicitly[Integra[A]].zero) b else gcd(b, a % b)
+//    if (a % b == implicitly[Integral[A]].zero) b else gcd(b, a % b)
 //}

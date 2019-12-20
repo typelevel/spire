@@ -21,7 +21,7 @@ class FpFilterTest extends AnyFunSuite with Checkers {
 
   // This will always error out for any operation. It can be used to ensure
   // operations are always performed with Doubles only and never fall back to
-  // the exact case, since it'll fail with an Evaluated excetion.
+  // the exact case, since it'll fail with an Evaluated exception.
   sealed trait Bad
   implicit object BadField extends Field[Bad] with IsReal[Bad] with NRoot[Bad] {
     def zero: Bad = evaluated

@@ -92,7 +92,7 @@ class NumberTest extends AnyFunSuite {
   test("operations") {
     assert(Number(3) + Number(4) === Number(7))
 
-    // since 30.0 can be repesented as a SafeLong, we get an IntNumber
+    // since 30.0 can be represented as a SafeLong, we get an IntNumber
     assert(Number(4) ** Number(30.0) === Number("1152921504606846976"))
 
     // since 30.5 can't, we get a DoubleNumber
