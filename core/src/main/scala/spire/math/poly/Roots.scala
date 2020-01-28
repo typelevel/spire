@@ -8,7 +8,7 @@ import spire.std.bigInt._
 import spire.std.bigDecimal._
 
 /**
- * A trait that can be used to retreive the (possibly approximated) real
+ * A trait that can be used to retrieve the (possibly approximated) real
  * roots of the polynomial `poly`.
  */
 trait Roots[A] extends Iterable[A] { self =>

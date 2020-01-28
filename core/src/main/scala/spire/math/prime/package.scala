@@ -85,7 +85,7 @@ package object prime {
   /**
    * Factor the given integer using trial division with a wheel.
    *
-   * This is slightly faster than basic trial divison (about 30% or
+   * This is slightly faster than basic trial division (about 30% or
    * so). It's still mostly appropriate for small-ish numbers.
    */
   def factorWheelDivision(n0: SafeLong): Factors = {

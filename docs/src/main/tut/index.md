@@ -5,9 +5,9 @@ section: "Home"
 position: 0
 ---
 
-[![Build Status](https://api.travis-ci.org/non/spire.png)](https://travis-ci.org/non/spire/)
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/non/spire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![codecov.io](http://codecov.io/github/non/spire/coverage.svg?branch=master)](http://codecov.io/github/non/spire?branch=master)
+[![Build Status](https://api.travis-ci.org/typelevel/spire.png)](https://travis-ci.org/non/spire/)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/typelevel/spire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![codecov.io](https://codecov.io/github/typelevel/spire/coverage.svg?branch=master)](http://codecov.io/github/typelevel/spire?branch=master)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.typelevel/spire_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.typelevel/spire_2.11)
 
 ## Spire
@@ -38,7 +38,7 @@ Spire is provided to you as free software under the
 The [Spire mailing list](http://groups.google.com/group/typelevel/)
 is shared with other [Typelevel projects](http://typelevel.org).
 It is the place to go for announcements and discussions around Spire.
-When posting, place the word `[spire]` at the begining of your subject.
+When posting, place the word `[spire]` at the beginning of your subject.
 We also have a guide on [contributing to Spire](CONTRIBUTING.md) as well
 as a guide that provides information on [Spire's design](GUIDE.md).
 
@@ -437,9 +437,9 @@ Both `mergeSort` and `quickSort` delegate to `insertionSort` when dealing with
 arrays (or slices) below a certain length. So, it would be more accurate to
 describe them as hybrid sorts.
 
-Selection methods can be found in an analagous `spire.math.Selection` object.
+Selection methods can be found in an analogous `spire.math.Selection` object.
 Given an array and an index `k` these methods put the _kth_ largest element at
-position `k`, ensuring that all preceeding elements are less-than or equal-to,
+position `k`, ensuring that all preceding elements are less-than or equal-to,
 and all succeeding elements are greater-than or equal-to, the _kth_ element.
 
 There are two methods defined:
