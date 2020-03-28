@@ -17,13 +17,14 @@ import spire.implicits.{
   MapEq => _, MapGroup => _,
   _ }
 
-import org.typelevel.discipline.scalatest.Discipline
+import org.scalatestplus.scalacheck.Checkers
+import org.typelevel.discipline.scalatest.FunSuiteDiscipline
 
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 
-class LawTests extends AnyFunSuite with Discipline {
+class LawTests extends AnyFunSuite with FunSuiteDiscipline with Checkers {
 
   def fuzzyEq[@sp(Float,Double) A: Ring: Signed: Order](eps: A): Eq[A] = new Eq[A] {
     def eqv(x: A, y: A): Boolean = {
