@@ -39,6 +39,22 @@ class OptCheck extends AnyFunSuite {
     assert(eq.neqv(Opt(true) ,Opt.empty))
   }
 
+  test("Regression test for #896"){
+    {
+      import spire.std.boolean._
+      val eq = Eq[Opt[Boolean]]
+      assert(eq.neqv(Opt(false), Opt.empty))
+    }
+    {
+      import spire.std.array._
+      import spire.std.unit._
+      val eq = Eq[Opt[Array[Unit]]]
+      assertResult(false){
+        eq.eqv(Opt(Array.ofDim(0)), Opt.empty)
+      }
+    }
+  }
+
   test("Opt(value)") {
     assert(Opt(1).nonEmpty)
     assert(Opt("abc").nonEmpty)
