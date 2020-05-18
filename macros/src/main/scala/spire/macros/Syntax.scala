@@ -3,7 +3,7 @@ package macros
 
 import spire.macros.compat.{termName, freshTermName, resetLocalAttrs, Context, setOrig}
 
-object Ops extends machinist.Ops {
+object Ops extends spire.macros.machinist.Ops {
 
   def uesc(c: Char): String = "$u%04X".format(c.toInt)
 

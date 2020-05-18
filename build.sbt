@@ -11,7 +11,6 @@ lazy val scalaTestVersion = "3.1.1"
 lazy val scalaTestPlusVersion = "3.1.1.1"
 lazy val shapelessVersion = "2.3.3"
 lazy val disciplineScalaTestVersion = "1.0.1"
-lazy val machinistVersion = "0.6.8"
 lazy val algebraVersion = "2.0.0"
 
 lazy val apfloatVersion = "1.9.1"
@@ -284,8 +283,8 @@ lazy val buildSettings = Seq(
 )
 
 lazy val commonDeps = Seq(libraryDependencies ++= Seq(
-  "org.typelevel" %%% "machinist" % machinistVersion,
-  "org.typelevel" %%% "algebra" % algebraVersion))
+  "org.typelevel" %%% "algebra" % algebraVersion)
+)
 
 lazy val commonSettings = Seq(
   scalacOptions ++= commonScalacOptions.value.diff(Seq(
