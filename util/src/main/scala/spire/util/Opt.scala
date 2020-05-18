@@ -16,7 +16,7 @@ object Opt {
 
   implicit def Eq[A](implicit ev: Eq[A]): Eq[Opt[A]] = new Eq[Opt[A]] {
     def eqv(x: Opt[A], y: Opt[A]): Boolean =
-      if (x.isEmpty) y.isEmpty else ev.eqv(x.ref, y.ref)
+      if (x.isEmpty) y.isEmpty else y.nonEmpty && ev.eqv(x.ref, y.ref)
   }
 }
 

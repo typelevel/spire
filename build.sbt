@@ -7,8 +7,9 @@ lazy val scalaVersions: Map[String, String] =
   Map("2.11" -> "2.11.12", "2.12" -> "2.12.11", "2.13" -> "2.13.1")
 
 lazy val scalaCheckVersion = "1.14.3"
-lazy val scalaTestVersion = "3.1.1"
+lazy val scalaTestVersion = "3.1.2"
 lazy val scalaTestPlusVersion = "3.1.2.0"
+
 lazy val shapelessVersion = "2.3.3"
 lazy val disciplineScalaTestVersion = "1.0.1"
 lazy val machinistVersion = "0.6.8"
