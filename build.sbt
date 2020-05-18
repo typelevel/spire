@@ -1,17 +1,26 @@
+import scala.language.existentials
+import sbt.io.Using
 import microsites._
 import ReleaseTransformations._
-
 import sbtcrossproject.{CrossType, crossProject}
+val crossScalaVersionsFromTravis = settingKey[Seq[String]]("Scala versions set in .travis.yml as scala_version_XXX")
 
-lazy val scalaVersions: Map[String, String] =
-  Map("2.11" -> "2.11.12", "2.12" -> "2.12.11", "2.13" -> "2.13.1")
+crossScalaVersionsFromTravis in Global := {
+  val manifest = (baseDirectory in ThisBuild).value / ".travis.yml"
+  import collection.JavaConverters._
+  Using.fileInputStream(manifest) { fis =>
+    new org.yaml.snakeyaml.Yaml().loadAs(fis, classOf[java.util.Map[_, _]]).asScala.toList.collect {
+      case (k: String, v: String) if k.contains("scala_version_") => v
+    }
+  }
+}
 
 lazy val scalaCheckVersion = "1.14.3"
 lazy val scalaTestVersion = "3.1.1"
 lazy val scalaTestPlusVersion = "3.1.1.1"
 lazy val shapelessVersion = "2.3.3"
 lazy val disciplineScalaTestVersion = "1.0.1"
-lazy val algebraVersion = "2.0.0"
+lazy val algebraVersion = "2.0.1"
 
 lazy val apfloatVersion = "1.9.1"
 lazy val jscienceVersion = "4.3.1"
@@ -273,8 +282,8 @@ addCommandAlias("validate", ";validateJVM;validateJS")
 
 lazy val buildSettings = Seq(
   organization := "org.typelevel",
-  scalaVersion := scalaVersions("2.12"),
-  crossScalaVersions := Seq(scalaVersions("2.11"), scalaVersions("2.12"), scalaVersions("2.13")),
+  crossScalaVersions := (crossScalaVersionsFromTravis in Global).value,
+  scalaVersion := crossScalaVersions.value.find(_.contains("2.12")).get,
   unmanagedSourceDirectories in Compile += {
       val sharedSourceDir = (baseDirectory in ThisBuild).value / "compat/src/main"
       if (scalaVersion.value.startsWith("2.13.")) sharedSourceDir / "scala-2.13"
