@@ -415,9 +415,9 @@ private[math] trait ComplexOnTrig[@sp(Float, Double) A] extends Trig[Complex[A]]
   def cos(a: Complex[A]): Complex[A] = a.cos
   def tan(a: Complex[A]): Complex[A] = a.tan
 
-  def asin(a: Complex[A]): Complex[A] = a.sin
-  def acos(a: Complex[A]): Complex[A] = a.cos
-  def atan(a: Complex[A]): Complex[A] = a.tan
+  def asin(a: Complex[A]): Complex[A] = a.asin
+  def acos(a: Complex[A]): Complex[A] = a.acos
+  def atan(a: Complex[A]): Complex[A] = a.atan
   def atan2(y: Complex[A], x: Complex[A]): Complex[A] =
     new Complex(x.real, y.imag).atan
 
