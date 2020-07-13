@@ -10,3 +10,6 @@ TAGS
 .history
 .*.swp
 .idea
+project/metals.sbt
+.metals/
+.bloop/

@@ -13,9 +13,9 @@ scala_js="$sbt_cmd macrosJS/test && $sbt_cmd coreJS/test && $sbt_cmd extrasJS/te
 if [[ "$TRAVIS_SCALA_VERSION" == 2.13* ]]; then
     # tut currently has issues with 2.13
     # see https://github.com/tpolecat/tut/issues/246
-    scala_jvm="$sbt_cmd clean coverage validateJVM coverageReport coverageOff"
+    scala_jvm="$sbt_cmd clean coverage validateJVM"
 else
-    scala_jvm="$sbt_cmd clean coverage validateJVM coverageReport coverageOff docs/tut"
+    scala_jvm="$sbt_cmd clean coverage validateJVM docs/tut"
 fi
 
 run_cmd="$scala_js && $scala_jvm"
