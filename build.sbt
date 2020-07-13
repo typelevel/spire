@@ -20,8 +20,9 @@ crossScalaVersionsFromTravis in Global := {
 }
 
 lazy val scalaCheckVersion = "1.14.3"
-lazy val scalaTestVersion = "3.1.1"
-lazy val scalaTestPlusVersion = "3.1.1.1"
+lazy val scalaTestVersion = "3.2.0"
+lazy val scalaTestPlusVersion = "3.1.2.0"
+
 lazy val shapelessVersion = "2.3.3"
 lazy val disciplineScalaTestVersion = "1.0.1"
 lazy val algebraVersion = "2.0.1"

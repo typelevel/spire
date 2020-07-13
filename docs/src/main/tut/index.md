@@ -509,38 +509,40 @@ In addition, Spire provides many other methods which are "missing" from
 ### Benchmarks
 
 In addition to unit tests, Spire comes with a relatively fleshed-out set of
-micro-benchmarks written against Caliper. To run the benchmarks from within
-SBT, change to the `benchmark` subproject and then `run` to see a list of
-benchmarks:
+[JMH](http://openjdk.java.net/projects/code-tools/jmh) micro-benchmarks. To
+run the benchmarks from within SBT, change to the `benchmark` subproject 
+and then `jmh:run -l` to see a list of benchmarks:
 
 ```
 $ sbt
-[info] Set current project to spire (in build file:/Users/erik/w/spire/)
 > project benchmark
-[info] Set current project to benchmark (in build file:/Users/erik/w/spire/)
-> run
+> jmh:run -l
 
-Multiple main classes detected, select one to run:
-
- [1] spire.benchmark.AnyValAddBenchmarks
- [2] spire.benchmark.AnyValSubtractBenchmarks
- [3] spire.benchmark.AddBenchmarks
- [4] spire.benchmark.GcdBenchmarks
- [5] spire.benchmark.RationalBenchmarks
- [6] spire.benchmark.JuliaBenchmarks
- [7] spire.benchmark.ComplexAddBenchmarks
- [8] spire.benchmark.CForBenchmarks
- [9] spire.benchmark.SelectionBenchmarks
- [10] spire.benchmark.Mo5Benchmarks
- [11] spire.benchmark.SortingBenchmarks
- [12] spire.benchmark.ScalaVsSpireBenchmarks
- [13] spire.benchmark.MaybeAddBenchmarks
+[info] Benchmarks:
+[info] spire.benchmark.AddBenchmarks.addComplexDoubleStateDirect
+[info] spire.benchmark.AddBenchmarks.addComplexDoubleStateGeneric
+[info] spire.benchmark.AddBenchmarks.addComplexFloatStateDirect
+...
 ```
 
-You can also run a particular benchmark with `run-main`, for instance:
-
+To run all available benchmarks:
 ```
-> run-main spire.benchmark.JuliaBenchmarks
+> jmh:run
+```
+
+To run a specific benchmark method:
+```
+> jmh:run spire.benchmark.AddBenchmarks.addComplexDoubleStateDirect
+```
+
+To run all benchmarks in a specific class:
+```
+> jmh:run spire.benchmark.AddBenchmarks
+```
+
+To see all available JMH usage options:
+```
+> jmh:run -h
 ```
 
 If you plan to contribute to Spire, please make sure to run the relevant
