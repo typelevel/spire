@@ -8,8 +8,8 @@ scala:
   - *scala_version_213
 
 env:
+  - SCALAJS_VERSION=1.1.1
   - SCALAJS_VERSION=0.6.32
-  - SCALAJS_VERSION=1.0.1
 
 jdk:
   - openjdk10
@@ -24,8 +24,8 @@ cache:
 script:
   - scripts/travis-publish.sh
 
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+#after_success:
+  #- bash <(curl -s https://codecov.io/bash)
 
 before_cache:
   - du -h -d 1 $HOME/.ivy2/cache

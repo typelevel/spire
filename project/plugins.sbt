@@ -1,7 +1,7 @@
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
 val scalaJSVersion =
-  Option(System.getenv("SCALAJS_VERSION")).getOrElse("0.6.33")
+  Option(System.getenv("SCALAJS_VERSION")).getOrElse("1.1.1")
 
 addSbtPlugin("com.jsuereth"        % "sbt-pgp"               % "2.0.1")
 addSbtPlugin("com.github.gseitz"   % "sbt-release"           % "1.0.13")
@@ -11,7 +11,7 @@ addSbtPlugin("pl.project13.scala"  % "sbt-jmh"               % "0.3.7")
 addSbtPlugin("org.scoverage"       % "sbt-scoverage"         % "1.6.1")
 addSbtPlugin("org.scalastyle"     %% "scalastyle-sbt-plugin" % "1.0.0")
 addSbtPlugin("com.typesafe.sbt"    % "sbt-git"               % "1.0.0")
-addSbtPlugin("org.xerial.sbt"      % "sbt-sonatype"          % "3.9.2")
+addSbtPlugin("org.xerial.sbt"      % "sbt-sonatype"          % "3.9.4")
 addSbtPlugin("org.scala-js"        % "sbt-scalajs"           % scalaJSVersion)
 addSbtPlugin("org.tpolecat"        % "tut-plugin"            % "0.6.13")
 addSbtPlugin("net.virtual-void"    % "sbt-dependency-graph"  % "0.9.2")

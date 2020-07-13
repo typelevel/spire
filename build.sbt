@@ -5,6 +5,10 @@ import ReleaseTransformations._
 import sbtcrossproject.{CrossType, crossProject}
 val crossScalaVersionsFromTravis = settingKey[Seq[String]]("Scala versions set in .travis.yml as scala_version_XXX")
 
+// This is true if there is SCALAJS_VERSION defined with a value of 0.6
+// If it doesn't exists or starts with 1.0 turns to false
+val customScalaJSVersion = Option(System.getenv("SCALAJS_VERSION")).exists(_.startsWith("0.6"))
+
 crossScalaVersionsFromTravis in Global := {
   val manifest = (baseDirectory in ThisBuild).value / ".travis.yml"
   import collection.JavaConverters._
@@ -318,6 +322,7 @@ lazy val commonJvmSettings = Seq(
     case Some((2, scalaMajor)) if scalaMajor <= 11 => Seq("-optimize")
     case _ => Seq.empty
   }),
+  skip.in(publish) := customScalaJSVersion, // Don't publish the jvm side if sjs 0.6 is in use
   testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF")
 )
 
