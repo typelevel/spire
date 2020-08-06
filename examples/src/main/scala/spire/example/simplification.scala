@@ -4,6 +4,7 @@ package example
 import spire.implicits._
 import spire.math._
 
+import scala.collection.compat.immutable.LazyList
 import scala.collection.mutable.Builder
 import spire.scalacompat.BuilderCompat
 
@@ -78,23 +79,23 @@ object Simplification {
   }
 
   /**
-   * Naive prime stream. For each odd number, this method tries
+   * Naive prime lazy list. For each odd number, this method tries
    * dividing by all previous primes <= sqrt(n).
    *
    * There are a lot of ways to improve this. For now it's a toy.
    * It can generate the millionth prime in ~9s on my computer.
    */
-  val primes: Stream[Int] = {
+  val primes: LazyList[Int] = {
     @tailrec
-    def next(n: Int, stream: Stream[Int]): Stream[Int] =
-      if (stream.isEmpty || (stream.head ** 2) > n)
+    def next(n: Int, ll: LazyList[Int]): LazyList[Int] =
+      if (ll.isEmpty || (ll.head ** 2) > n)
         n #:: loop(n + 2, primes)
-      else if (n % stream.head == 0)
+      else if (n % ll.head == 0)
         next(n + 2, primes)
       else
-        next(n, stream.tail)
+        next(n, ll.tail)
 
-    def loop(n: Int, stream: Stream[Int]): Stream[Int] = next(n, stream)
+    def loop(n: Int, ll: LazyList[Int]): LazyList[Int] = next(n, ll)
 
     2 #:: loop(3, primes)
   }

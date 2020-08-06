@@ -29,6 +29,10 @@ class PrimeTest extends AnyFunSuite {
     assert(fill(2, 2).toSeq == tenPrimes.slice(2, 4))
   }
 
+  test("lazyList") {
+    assert(lazyList.take(10).toSeq == tenPrimes)
+  }
+
   test("stream") {
     assert(stream.take(10).toSeq == tenPrimes)
   }

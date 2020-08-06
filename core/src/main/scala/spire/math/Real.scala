@@ -2,6 +2,8 @@ package spire
 package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
+import scala.collection.compat.immutable.LazyList
+import scala.collection.compat.immutable.LazyList.#::
 
 import spire.algebra.{Field, Trig, TruncatedDivisionCRing}
 import spire.syntax.nroot._
@@ -474,7 +476,19 @@ object Real extends RealInstances {
 
   lazy val sqrt1By2 = Real.two.reciprocal.sqrt
 
+  def accumulate(total: SafeLong, xs: LazyList[SafeLong], cs: LazyList[Rational]): SafeLong = {
+    (xs, cs) match {
+      case (_, Seq()) => total
+      case (Seq(), _) => sys.error("nooooo")
+      case (x #:: xs, c #:: cs) =>
+        val t = roundUp(c * Rational(x))
+        if (t == 0) total else accumulate(total + t, xs, cs)
+    }
+  }
+
+  @deprecated("prefer LazyList instead", "0.17.0")
   def accumulate(total: SafeLong, xs: Stream[SafeLong], cs: Stream[Rational]): SafeLong = {
+    import scala.#::
     (xs, cs) match {
       case (_, Stream.Empty) => total
       case (Stream.Empty, _) => sys.error("nooooo")
@@ -484,7 +498,7 @@ object Real extends RealInstances {
     }
   }
 
-  private[spire] def powerSeries(ps: Stream[Rational], terms: Int => Int, x: Real): Real = {
+  private[spire] def powerSeries(ps: LazyList[Rational], terms: Int => Int, x: Real): Real = {
     Real({p =>
       val t = terms(p)
       val l2t = 2 * sizeInBase(SafeLong(t) + 1, 2) + 6
@@ -493,14 +507,14 @@ object Real extends RealInstances {
       val xn = SafeLong.two.pow(p2)
       if (xn == 0) sys.error("oh no")
       def g(yn: SafeLong): SafeLong = roundUp(Rational(yn * xr, xn))
-      val num = accumulate(SafeLong.zero, Stream.iterate(xn)(g), ps.take(t))
+      val num = accumulate(SafeLong.zero, LazyList.iterate(xn)(g), ps.take(t))
       val denom = SafeLong.two.pow(l2t)
       roundUp(Rational(num, denom))
     })
   }
 
-  private[spire] def accSeq(f: (Rational, SafeLong) => Rational): Stream[Rational] = {
-    def loop(r: Rational, n: SafeLong): Stream[Rational] =
+  private[spire] def accSeq(f: (Rational, SafeLong) => Rational): LazyList[Rational] = {
+    def loop(r: Rational, n: SafeLong): LazyList[Rational] =
       r #:: loop(f(r, n), n + 1)
     loop(Rational.one, SafeLong.one)
   }
@@ -514,7 +528,7 @@ object Real extends RealInstances {
   }
 
   def logDrx(x: Real): Real = {
-    powerSeries(Stream.from(1).map(n => Rational(1, n)), _ + 1, x)
+    powerSeries(LazyList.from(1).map(n => Rational(1, n)), _ + 1, x)
   }
 
   def sinDr(x: Real): Real =

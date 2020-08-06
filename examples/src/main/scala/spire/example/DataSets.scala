@@ -7,6 +7,7 @@ import spire.implicits._
 
 import spire.scalacompat.{BuilderCompat, Factory, FactoryCompatOps, IterableOnce}
 
+import scala.collection.compat.immutable.LazyList
 import scala.collection.mutable.{ Builder, ListBuffer }
 
 import java.io.{ BufferedReader, InputStreamReader }
@@ -48,7 +49,7 @@ object DataSet {
   }
 
   private def readDataSet(path: String): List[String] = withResource(path) { reader =>
-    Stream.continually(reader.readLine()).takeWhile(_ != null).toList
+    LazyList.continually(reader.readLine()).takeWhile(_ != null).toList
   }
 
   type Output[+K] = (Int, String => K)

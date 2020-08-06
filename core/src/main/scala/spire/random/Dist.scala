@@ -3,9 +3,10 @@ package random
 
 import spire.algebra._
 import spire.syntax.all._
-import spire.math.{Complex, Interval, Natural, Rational, SafeLong, UByte, UShort, UInt, ULong}
+import spire.math.{Complex, Interval, Natural, Rational, SafeLong, UByte, UInt, ULong, UShort}
 import spire.scalacompat.{Factory, FactoryCompatOps}
 
+import scala.collection.compat.immutable.LazyList
 import scala.collection.mutable.ArrayBuffer
 
 trait Dist[@sp A] extends Any { self =>
@@ -102,8 +103,12 @@ trait Dist[@sp A] extends Any { self =>
   final def toIterator(gen: Generator): Iterator[A] =
     new DistIterator(this, gen)
 
+  final def toLazyList(gen: Generator): LazyList[A] =
+    LazyList.continually(this(gen))
+
+  @deprecated("prefer toLazyList instead", "0.17.0")
   final def toStream(gen: Generator): Stream[A] =
-    this(gen) #:: toStream(gen)
+    Stream.continually(this(gen))
 
   def sample[CC[X] <: Iterable[X]](n: Int)(implicit gen: Generator, cbf: Factory[A, CC[A]]): CC[A] = {
     val b = cbf.newBuilder
@@ -138,7 +143,7 @@ trait Dist[@sp A] extends Any { self =>
     rawHistogram(n).map { case (k, v) => (k, 1.0 * v / n) }
 
   def rawHistogram(n: Int)(implicit gen: Generator): Map[A, Int] =
-    toStream(gen).take(n).foldLeft(Map.empty[A, Int]) { case (h, a) =>
+    toLazyList(gen).take(n).foldLeft(Map.empty[A, Int]) { case (h, a) =>
       h.updated(a, h.getOrElse(a, 0) + 1)
     }
 }

@@ -4,14 +4,16 @@ package examples
 import spire.algebra._
 import spire.math.{Natural, UInt}
 
+import scala.collection.compat.immutable.LazyList
+import scala.collection.compat.immutable.LazyList.#::
 import scala.collection.mutable
 
 object SetUtil {
-  def powerStream[A](members: Stream[A]): Stream[Set[A]] = {
-    val done = Stream.empty[Set[A]]
+  def lazyPowers[A](members: LazyList[A]): LazyList[Set[A]] = {
+    val done = LazyList.empty[Set[A]]
 
-    def powerLoop(as: Stream[A], i: Int): Stream[Set[A]] = {
-      def nthLoop(as: Stream[A], i: Int): Stream[Set[A]] = as match {
+    def powerLoop(as: LazyList[A], i: Int): LazyList[Set[A]] = {
+      def nthLoop(as: LazyList[A], i: Int): LazyList[Set[A]] = as match {
         case a #:: tail =>
           if (i == 0) {
             Set(a) #:: done
@@ -75,8 +77,8 @@ case class PureSet[A](f: A => Boolean) extends Function1[A, Boolean] { lhs =>
   def cross[B](rhs: PureSet[B]): PureSet[(A, B)] =
     PureSet[(A, B)](t => lhs.f(t._1) && rhs.f(t._2))
 
-  def power(universe: Stream[A]): Stream[Set[A]] =
-    SetUtil.powerStream(universe.filter(f))
+  def power(universe: LazyList[A]): LazyList[Set[A]] =
+    SetUtil.lazyPowers(universe.filter(f))
 }
 
 object MathSet { self =>
@@ -184,6 +186,6 @@ sealed trait MathSet[A] extends Function1[A, Boolean] { lhs =>
     case (Inf(x), Inf(y)) => Fin(xor(x, y))
   }
 
-  def power(universe: Stream[A]): Stream[Set[A]] =
-    SetUtil.powerStream(universe.filter(this))
+  def power(universe: LazyList[A]): LazyList[Set[A]] =
+    SetUtil.lazyPowers(universe.filter(this))
 }
