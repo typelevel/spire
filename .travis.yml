@@ -7,10 +7,6 @@ scala:
   - *scala_version_212
   - *scala_version_213
 
-env:
-  - SCALAJS_VERSION=1.1.1
-  - SCALAJS_VERSION=0.6.32
-
 jdk:
   - openjdk10
 
