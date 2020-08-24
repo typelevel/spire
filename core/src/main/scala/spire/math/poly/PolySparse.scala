@@ -157,7 +157,7 @@ case class PolySparse[@sp(Double) C] private [spire](val exp: Array[Int], val co
     PolySparse.safe(es, cs)
   }
 
-  def unary_-()(implicit ring: Rng[C]): Polynomial[C] = {
+  def unary_-(implicit ring: Rng[C]): Polynomial[C] = {
     val cs = new Array[C](coeff.length)
     cfor(0)(_ < cs.length, _ + 1) { i => cs(i) = -coeff(i) }
     new PolySparse(exp, cs)

@@ -46,7 +46,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   def isZero: Boolean
   def isOne: Boolean
 
-  def unary_-(): Rational
+  def unary_- : Rational
 
   def +(rhs: Rational): Rational
   def -(rhs: Rational): Rational
@@ -454,7 +454,7 @@ object Rational extends RationalInstances {
 
     override def doubleValue: Double = Rational.toDouble(n, d)
 
-    override def unary_-(): Rational =
+    override def unary_- : Rational =
       if (n == Long.MinValue) bigRational(SafeLong.safe64, SafeLong(d))
       else longRational(-n, d)
 
@@ -740,7 +740,7 @@ object Rational extends RationalInstances {
 
     override def doubleValue: Double = Rational.toDouble(n, d)
 
-    override def unary_-(): Rational = Rational(-n, d)
+    override def unary_- : Rational = Rational(-n, d)
 
     def +(r: Rational): Rational = r match {
       case r: LongRational => r + this

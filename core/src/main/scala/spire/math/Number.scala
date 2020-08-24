@@ -71,7 +71,7 @@ sealed trait Number extends ScalaNumericConversions with Serializable {
   def canBeLong: Boolean
   def isExact: Boolean
 
-  def unary_-(): Number
+  def unary_- : Number
 
   def toBigInt: BigInt
   def toBigDecimal: BigDecimal

@@ -525,7 +525,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
   def -(rhs: A)(implicit ev: AdditiveGroup[A]): Interval[A] =
     this + (-rhs)
 
-  def unary_-()(implicit ev: AdditiveGroup[A]): Interval[A] =
+  def unary_-(implicit ev: AdditiveGroup[A]): Interval[A] =
     this match {
       case Point(v) => Point(-v)
       case Bounded(l, u, f) => Bounded(-u, -l, swapFlags(f))

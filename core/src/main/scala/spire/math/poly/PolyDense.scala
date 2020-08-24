@@ -117,7 +117,7 @@ class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])
     Polynomial.dense(cs)
   }
 
-  def unary_-()(implicit ring: Rng[C]): Polynomial[C] = {
+  def unary_-(implicit ring: Rng[C]): Polynomial[C] = {
     val negArray = new Array[C](coeffs.length)
     cfor(0)(_ < coeffs.length, _ + 1) { i => negArray(i) = -coeffs(i) }
     new PolyDense(negArray)

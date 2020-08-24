@@ -7,7 +7,7 @@ package algebra
 sealed abstract class Sign(val toInt: Int) {
   import Sign._
 
-  def unary_-(): Sign = this match {
+  def unary_- : Sign = this match {
     case Positive => Negative
     case Negative => Positive
     case Zero => Zero
