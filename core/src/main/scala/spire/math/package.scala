@@ -7,12 +7,12 @@ import java.math.MathContext
 import java.math.RoundingMode
 
 import scala.math.ScalaNumericConversions
-
-import BigDecimal.RoundingMode.{FLOOR, HALF_UP, CEILING}
-
+import BigDecimal.RoundingMode.{CEILING, FLOOR, HALF_UP}
 import spire.algebra.{Eq, Field, GCDRing, IsReal, NRoot, Order, Signed, Trig}
 import spire.std.bigDecimal._
 import spire.syntax.nroot._
+
+import scala.collection.compat.immutable.LazyList
 
 package object math {
 
@@ -561,15 +561,15 @@ package object math {
    * Returns the digits to the right of the decimal point of `x / y` in base
    * `r` if x < y.
    */
-  private def decDiv(x: BigInt, y: BigInt, r: Int): Stream[BigInt] = {
+  private def decDiv(x: BigInt, y: BigInt, r: Int): LazyList[BigInt] = {
     val expanded = x * r
     val quot = expanded / y
     val rem = expanded - (quot * y)
 
     if (rem == 0) {
-      Stream.cons(quot, Stream.empty)
+      quot #:: LazyList.empty
     } else {
-      Stream.cons(quot, decDiv(rem, y, r))
+      quot #:: decDiv(rem, y, r)
     }
   }
 
@@ -613,10 +613,10 @@ package object math {
       val scale = BigInt(10) pow a.scale
       val intPart = digitize(underlying / scale, radix)
       val fracPart = decDiv(underlying % scale, scale, radix) map (_.toInt)
-      val leader = if (intPart.size % k == 0) Stream.empty else {
-        Stream.fill(k - intPart.size % k)(0)
+      val leader = if (intPart.size % k == 0) LazyList.empty else {
+        LazyList.fill(k - intPart.size % k)(0)
       }
-      val digits = leader ++ intPart.toStream ++ fracPart ++ Stream.continually(0)
+      val digits = leader ++ LazyList.from(intPart) ++ fracPart ++ LazyList.continually(0)
       val radixPowK = BigInt(radix) pow k
 
       // Total # of digits to compute.
@@ -624,7 +624,7 @@ package object math {
       // it is `+ 2`.
       val maxSize = (ctxt.getPrecision + 8) / 9 + 2
 
-      def findRoot(digits: Stream[Int], y: BigInt, r: BigInt, i: Int): (Int, BigInt) = {
+      def findRoot(digits: LazyList[Int], y: BigInt, r: BigInt, i: Int): (Int, BigInt) = {
         val y_ = y * radix
         val a = undigitize(digits take k, radix)
         // Note: target grows quite fast (so I imagine (y_ + b) pow k does too).

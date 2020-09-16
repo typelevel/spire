@@ -5,8 +5,10 @@ import spire.math.SafeLong
 
 import SieveUtil._
 
+import scala.collection.compat.immutable.LazyList
+
 /**
- * Segmented Stream of Eratosthenes implementation
+ * Segmented Sieve of Eratosthenes implementation
  *
  * This section really needs some good comments.
  *
@@ -117,6 +119,12 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
     nn
   }
 
+  def lazyListAfter(p0: SafeLong): LazyList[SafeLong] = {
+    val p = nextAfter(p0)
+    p #:: lazyListAfter(p)
+  }
+
+  @deprecated("prefer LazyList and lazyListAfter instead", "0.17.0")
   def streamAfter(p0: SafeLong): Stream[SafeLong] = {
     val p = nextAfter(p0)
     p #:: streamAfter(p)

@@ -2,17 +2,17 @@ package spire
 package math
 package poly
 
+import scala.collection.compat.immutable.LazyList
 
 import spire.algebra.{Eq, Field, Ring}
-import spire.math.Polynomial
 import spire.syntax.field._
 
 object SpecialPolynomials {
 
-  // Horner scheme polynomial generator stream
+  // Horner scheme polynomial generator lazy list
   def hornerScheme[C: Ring: Eq: ClassTag](zero: Polynomial[C], one: Polynomial[C],
-                   fn: (Polynomial[C], Polynomial[C], Int) => Polynomial[C]): Stream[Polynomial[C]] = {
-    def loop(pnm1: Polynomial[C], pn: Polynomial[C], n: Int = 1): Stream[Polynomial[C]] = {
+                       fn: (Polynomial[C], Polynomial[C], Int) => Polynomial[C]): LazyList[Polynomial[C]] = {
+    def loop(pnm1: Polynomial[C], pn: Polynomial[C], n: Int = 1): LazyList[Polynomial[C]] = {
       pn #:: loop(pn, fn(pn, pnm1, n), n + 1)
     }
     zero #:: loop(zero, one)
@@ -47,26 +47,26 @@ object SpecialPolynomials {
     (pn: Polynomial[C], pnm1: Polynomial[C], n: Int) => Polynomial.twox[C] * pn - pn.derivative
 
   // Legendre polynomials of the first kind
-  def legendres[C: Field: Eq: ClassTag](num: Int): Stream[Polynomial[C]] =
+  def legendres[C: Field: Eq: ClassTag](num: Int): LazyList[Polynomial[C]] =
     hornerScheme(Polynomial.one[C], Polynomial.x[C], legendreFn[C]).take(num)
 
   // Laguerre polynomials
-  def laguerres[C: Eq: ClassTag](num: Int)(implicit f: Field[C]): Stream[Polynomial[C]] =
+  def laguerres[C: Eq: ClassTag](num: Int)(implicit f: Field[C]): LazyList[Polynomial[C]] =
     hornerScheme(Polynomial.one[C], Polynomial(Map((0, f.one), (1, -f.one))), laguerreFn[C]).take(num)
 
   // Chebyshev polynomials of the first kind
-  def chebyshevsFirstKind[C: Ring: Eq: ClassTag](num: Int): Stream[Polynomial[C]] =
+  def chebyshevsFirstKind[C: Ring: Eq: ClassTag](num: Int): LazyList[Polynomial[C]] =
     hornerScheme(Polynomial.one[C], Polynomial.x[C], chebyshevFn[C]).take(num)
 
   // Chebyshev polynomials of the second kind
-  def chebyshevsSecondKind[C: Ring: Eq: ClassTag](num: Int): Stream[Polynomial[C]] =
+  def chebyshevsSecondKind[C: Ring: Eq: ClassTag](num: Int): LazyList[Polynomial[C]] =
     hornerScheme(Polynomial.one[C], Polynomial.twox[C], chebyshevFn[C]).take(num)
 
   // Probability hermite polynomials
-  def probHermites[C: Ring: Eq: ClassTag](num: Int): Stream[Polynomial[C]] =
+  def probHermites[C: Ring: Eq: ClassTag](num: Int): LazyList[Polynomial[C]] =
     hornerScheme(Polynomial.one[C], Polynomial.x[C], hermiteFnProb[C]).take(num)
 
   // Physics hermite polynomials
-  def physHermites[C: Ring: Eq: ClassTag](num: Int): Stream[Polynomial[C]] =
+  def physHermites[C: Ring: Eq: ClassTag](num: Int): LazyList[Polynomial[C]] =
     hornerScheme(Polynomial.one[C], Polynomial.twox[C], hermiteFnPhys[C]).take(num)
 }

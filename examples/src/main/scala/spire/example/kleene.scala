@@ -7,6 +7,8 @@ import spire.algebra._
 import spire.std.BooleanIsRig
 import spire.implicits._
 
+import scala.collection.compat.immutable.LazyList
+
 
 /**
  * These examples are taken from http://r6.ca/blog/20110808T035622Z.html.
@@ -48,8 +50,8 @@ object KleeneDemo {
   implicit def listHasShow[A](implicit ev: Show[A]) = new Show[List[A]] {
     def show(a: List[A]) = a.map(ev.show).mkString("[", ",", "]")
   }
-  implicit def streamHasShow[A](implicit ev: Show[A]) = new Show[Stream[A]] {
-    def show(s: Stream[A]) =
+  implicit def lazyListHasShow[A](implicit ev: Show[A]) = new Show[LazyList[A]] {
+    def show(s: LazyList[A]) =
       if (s.isEmpty) "[]" else "[%s,...]" format ev.show(s.head)
   }
 
@@ -401,32 +403,32 @@ object KleeneDemo {
 
   /**
    * Language represents the set of every valid string in a regular
-   * language. Each W is a valid character, each Stream[W] is a (lazy)
-   * string, and SS[W] (e.g. Stream[Stream[W]]) is the complete set of
+   * language. Each W is a valid character, each LazyList[W] is a (lazy)
+   * string, and LL[W] (e.g. LazyList[LazyList[W]]) is the complete set of
    * all strings.
    */
-  case class Language[W](wss: SS[W]) {
+  case class Language[W](wss: LL[W]) {
     def someWord: Option[List[W]] = wss.headOption.map(_.toList)
   }
   object Language {
-    def letter[W](w: W): Language[W] = Language(Stream(Stream(w)))
+    def letter[W](w: W): Language[W] = Language(LazyList(LazyList(w)))
   }
 
   // handy type alias
-  type SS[W] = Stream[Stream[W]]
+  type LL[W] = LazyList[LazyList[W]]
 
   // type class instance for Show[Language[W]]
   implicit def languageHasShow[W: Show] = new Show[Language[W]] {
-    def show(l: Language[W]) = Show[SS[W]].show(l.wss)
+    def show(l: Language[W]) = Show[LL[W]].show(l.wss)
   }
 
   // type class instance for Kleene[Language[W]]
   implicit def languageHasKleene[W] = new Kleene[Language[W]] {
-    def zero: Language[W] = Language(Stream.empty[Stream[W]])
-    def one: Language[W] = Language(Stream(Stream.empty[W]))
+    def zero: Language[W] = Language(LazyList.empty[LazyList[W]])
+    def one: Language[W] = Language(LazyList(LazyList.empty[W]))
 
     def plus(x: Language[W], y: Language[W]): Language[W] = {
-      def interleave(ws1: SS[W], ws2: SS[W]): SS[W] =
+      def interleave(ws1: LL[W], ws2: LL[W]): LL[W] =
         if (ws1.isEmpty) ws2 else ws1.head #:: interleave(ws2, ws1.tail)
       Language(interleave(x.wss, y.wss))
     }
@@ -435,7 +437,7 @@ object KleeneDemo {
       Language(x.wss.flatMap(ws1 => y.wss.map(ws2 => ws1 #::: ws2)))
 
     override def kstar(x: Language[W]): Language[W] =
-      Language(Stream.empty #:: x.wss.flatMap(s => kstar(x).wss.map(s #::: _)))
+      Language(LazyList.empty #:: x.wss.flatMap(s => kstar(x).wss.map(s #::: _)))
   }
 
   /**
@@ -592,7 +594,7 @@ object KleeneDemo {
   }
 
   def languageExample(): Unit = {
-    val bit = Language(Stream(Stream('0'), Stream('1')))
+    val bit = Language(LazyList(LazyList('0'), LazyList('1')))
     val lang1 = bit.pow(4)
     val lang2 = bit.kstar
     println(lang1.wss.take(10).map(_.take(10).mkString + "...").toList)

@@ -6,6 +6,7 @@ import spire.algebra.Sign.Positive
 import spire.syntax.cfor._
 import spire.syntax.nroot._
 
+import scala.collection.compat.immutable.LazyList
 import scala.collection.mutable
 
 /**
@@ -248,9 +249,17 @@ package object prime {
       loop(1, three)
     }
 
+  def lazyList: LazyList[SafeLong] =
+    lazyList(SieveSize, SafeLong(1000000))
+
+  def lazyList(chunkSize: Int, cutoff: SafeLong): LazyList[SafeLong] =
+    two #:: three #:: prime.Siever(chunkSize, cutoff).lazyListAfter(three)
+
+  @deprecated("prefer lazyList instead", "0.17.0")
   def stream: Stream[SafeLong] =
     stream(SieveSize, SafeLong(1000000))
 
+  @deprecated("prefer lazyList instead", "0.17.0")
   def stream(chunkSize: Int, cutoff: SafeLong): Stream[SafeLong] =
     two #:: three #:: prime.Siever(chunkSize, cutoff).streamAfter(three)
 }

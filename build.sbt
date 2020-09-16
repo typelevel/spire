@@ -19,6 +19,8 @@ crossScalaVersionsFromTravis in Global := {
   }
 }
 
+lazy val scalaCollectionCompatVersion = "2.1.6"
+
 lazy val scalaCheckVersion = "1.14.3"
 lazy val scalaTestVersion = "3.2.2"
 lazy val scalaTestPlusVersion = "3.2.2.0"
@@ -296,8 +298,11 @@ lazy val buildSettings = Seq(
   }
 )
 
-lazy val commonDeps = Seq(libraryDependencies ++= Seq(
-  "org.typelevel" %%% "algebra" % algebraVersion)
+lazy val commonDeps = Seq(
+  libraryDependencies ++= Seq(
+    "org.scala-lang.modules" %%% "scala-collection-compat" % scalaCollectionCompatVersion,
+    "org.typelevel" %%% "algebra" % algebraVersion
+  )
 )
 
 lazy val commonSettings = Seq(
