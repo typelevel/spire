@@ -201,7 +201,7 @@ final class AdditiveMonoidOps[A](lhs: A)(implicit ev: AdditiveMonoid[A]) {
 }
 
 final class AdditiveGroupOps[A](lhs:A)(implicit ev:AdditiveGroup[A]) {
-  def unary_-(): A = macro Ops.unop[A]
+  def unary_- : A = macro Ops.unop0[A]
   def -(rhs:A): A = macro Ops.binop[A, A]
   def -(rhs:Int)(implicit ev1: Ring[A]): A =  macro Ops.binopWithLift[Int, Ring[A], A]
   def -(rhs:Double)(implicit ev1:Field[A]): A =  macro Ops.binopWithLift[Double, Field[A], A]
@@ -371,7 +371,7 @@ final class JoinOps[A: JoinSemilattice](lhs: A) {
 }
 
 final class HeytingOps[A: Heyting](lhs:A) {
-  def unary_~(): A = macro Ops.unop[A]
+  def unary_~ : A = macro Ops.unop0[A]
   def imp(rhs: A): A = macro Ops.binop[A, A]
 
   def &(rhs: A): A = macro Ops.binop[A, A]
@@ -407,7 +407,7 @@ final class RightModuleOps[V](x: V) {
 final class ModuleUnboundOps[F](lhs: F)(implicit ev: CModule[_, F]) {
   def +(rhs: F): F = macro Ops.binopWithScalar[F, F]
   def -(rhs: F): F = macro Ops.binopWithScalar[F, F]
-  def unary_-(): F = macro Ops.unopWithScalar[F]
+  def unary_- : F = macro Ops.unopWithScalar0[F]
 
   def *(rhs: F): F = macro Ops.binopWithScalar[F, F]
 
@@ -538,7 +538,7 @@ final class ActionUnboundOps[G](lhs: G)(implicit ev: Action[_, G]) {
 final class AdditiveActionUnboundOps[G](lhs: G)(implicit ev: AdditiveAction[_, G]) {
   def +(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def -(rhs: G): G = macro Ops.binopWithScalar[G, G]
-  def unary_-(): G = macro Ops.unopWithScalar[G]
+  def unary_- : G = macro Ops.unopWithScalar0[G]
 }
 
 final class MultiplicativeActionUnboundOps[G](lhs: G)(implicit ev: MultiplicativeAction[_, G]) {

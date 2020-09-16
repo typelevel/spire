@@ -86,7 +86,7 @@ case class Factors(elements: Map[SafeLong, Int], sign: Sign)
       fs.updated(p, fs.getOrElse(p, 0) max e)
     }, Positive)
 
-  def unary_-(): Factors = Factors(elements, -sign)
+  def unary_- : Factors = Factors(elements, -sign)
 
   def +(rhs: Factors): Factors = Factors(lhs.value + rhs.value)
   def +(rhs: SafeLong): Factors = Factors(lhs.value + rhs)

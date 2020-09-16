@@ -90,7 +90,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     case _ => x(Real.bits).signum
   }
 
-  def unary_-(): Real = this match {
+  def unary_- : Real = this match {
     case Exact(n) => Exact(-n)
     case _ => Real(p => -x(p))
   }

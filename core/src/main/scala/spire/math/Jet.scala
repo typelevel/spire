@@ -219,7 +219,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
     !(this eqv b)
   }
 
-  def unary_-()(implicit f: Field[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def unary_-(implicit f: Field[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     new Jet(-real, -infinitesimal)
   }
 

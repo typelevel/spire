@@ -192,7 +192,7 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
   def gcd(that: SafeLong): SafeLong
   def lcm(that: SafeLong): SafeLong = if (this.isZero || that.isZero) SafeLong.zero else (this / (this gcd that)) * that
 
-  def unary_-(): SafeLong
+  def unary_- : SafeLong
 
   def isValidLong: Boolean
   def getLong: Opt[Long]
@@ -373,7 +373,7 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
   def |(y: BigInteger): SafeLong = SafeLong(BigInteger.valueOf(x) or y)
   def ^(y: BigInteger): SafeLong = SafeLong(BigInteger.valueOf(x) xor y)
 
-  def unary_-(): SafeLong =
+  def unary_- : SafeLong =
     Checked.tryOrReturn[SafeLong](SafeLongLong(-x))(SafeLongBigInteger(BigInteger.valueOf(x).negate()))
 
   override def <(that: SafeLong): Boolean =
@@ -538,7 +538,7 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
   def |(y: BigInteger): SafeLong = SafeLong(x or y)
   def ^(y: BigInteger): SafeLong = SafeLong(x xor y)
 
-  def unary_-(): SafeLong = SafeLong(x.negate())
+  def unary_- : SafeLong = SafeLong(x.negate())
 
   def compare(that: SafeLong): Int =
     that match {

@@ -402,7 +402,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
     }
   }
 
-  def unary_-()(implicit ring: Rng[C]): Polynomial[C]
+  def unary_-(implicit ring: Rng[C]): Polynomial[C]
   def +(rhs: Polynomial[C])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C]
   def -(rhs: Polynomial[C])(implicit ring: Rng[C], eq: Eq[C]): Polynomial[C] = lhs + (-rhs)
   def *(rhs: Polynomial[C])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C]
