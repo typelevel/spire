@@ -9,6 +9,9 @@ import org.typelevel.discipline.Predicate
 
 package object laws {
 
+  type DeMorganLaws[A] = _root_.algebra.laws.DeMorganLaws[A]
+  val DeMorganLaws = _root_.algebra.laws.DeMorganLaws
+
   implicit def PredicateFromMonoid[A: Eq](implicit A: AdditiveMonoid[A]): Predicate[A] = new Predicate[A] {
     def apply(a: A) = a =!= A.zero
   }
