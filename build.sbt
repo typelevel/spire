@@ -19,7 +19,7 @@ crossScalaVersionsFromTravis in Global := {
   }
 }
 
-lazy val scalaCollectionCompatVersion = "2.1.6"
+lazy val scalaCollectionCompatVersion = "2.2.0"
 
 lazy val scalaCheckVersion = "1.14.3"
 lazy val scalaTestVersion = "3.2.2"
