@@ -12,7 +12,7 @@ lazy val scalaTestPlusVersion = "3.2.2.0"
 
 lazy val shapelessVersion = "2.3.3"
 lazy val disciplineScalaTestVersion = "2.1.1"
-lazy val algebraVersion = "2.1.0"
+lazy val algebraVersion = "2.1.1"
 
 lazy val apfloatVersion = "1.9.1"
 lazy val jscienceVersion = "4.3.1"
