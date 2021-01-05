@@ -13,3 +13,5 @@ TAGS
 project/metals.sbt
 .metals/
 .bloop/
+.bsp/
+project/project/

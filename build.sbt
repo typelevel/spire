@@ -7,11 +7,11 @@ import sbtcrossproject.{CrossType, crossProject}
 lazy val scalaCollectionCompatVersion = "2.3.2"
 
 lazy val scalaCheckVersion = "1.15.2"
-lazy val scalaTestVersion = "3.2.3"
-lazy val scalaTestPlusVersion = "3.2.2.0"
+
+lazy val munit = "0.7.20"
+lazy val munitDiscipline = "1.0.4"
 
 lazy val shapelessVersion = "2.3.3"
-lazy val disciplineScalaTestVersion = "2.1.1"
 lazy val algebraVersion = "2.1.1"
 
 lazy val apfloatVersion = "1.9.1"
@@ -27,7 +27,9 @@ ThisBuild / scalaVersion := Scala213
 ThisBuild / githubWorkflowArtifactUpload := false
 
 ThisBuild / githubWorkflowPublishTargetBranches := Seq()
+ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8", "adopt@1.11", "adopt@1.15")
 
+Global / onChangedBuildSource := ReloadOnSourceChanges
 // Projects
 
 lazy val spire = project.in(file("."))
@@ -73,7 +75,7 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure
   .settings(moduleName := "spire-macros")
   .settings(spireSettings:_*)
   .settings(scalaCheckSettings:_*)
-  .settings(scalaTestSettings:_*)
+  .settings(munitSettings: _*)
   .settings(crossVersionSharedSources:_*)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
@@ -165,7 +167,6 @@ lazy val laws = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-laws")
   .settings(spireSettings:_*)
   .settings(libraryDependencies ++= Seq(
-    "org.typelevel" %%% "discipline-scalatest" % disciplineScalaTestVersion,
     "org.typelevel" %%% "algebra-laws" % algebraVersion,
     "org.scalacheck" %%% "scalacheck" % scalaCheckVersion
   ))
@@ -176,84 +177,13 @@ lazy val laws = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
 lazy val lawsJVM = laws.jvm
 lazy val lawsJS = laws.js
 
-// Todo: As all tests in this list are commented out, no tests in testJS are run - but they are compiled.
-//       This list is TEMPORARY as tests are migrated to scala-js
-lazy val jsTests = List(
- /* "spire.PartialOrderSyntaxTest",
-  "spire.PartialSyntaxTest",
-  "spire.SyntaxTest",
-  //"spire.algebra.GCDTest",
-  "spire.algebra.NRootTest",
-  "spire.algebra.PartialOrderTest",
-  "spire.algebra.RingTest","*/
-  "spire.algebra.SignedTest"/*,
-  "spire.algebra.TrigTest",
-  "spire.laws.LawTests",
-  "spire.math.AlgebraicTest",
-  "spire.math.BinaryMergeCheck",
-  "spire.math.BitStringCheck",
-  "spire.math.BitStringTest",
-  "spire.math.ComplexCheck",
-  "spire.math.ComplexCheck2",
-  "spire.math.ComplexTest",
-  "spire.math.ContinuousIntervalTest",
-  "spire.math.CooperativeEqualityTest",
-  "spire.math.FastComplexCheck",
-  "spire.math.FixedPointCheck",
-  "spire.math.FpFilterTest",
-  "spire.math.IntervalCheck",
-  "spire.math.IntervalGeometricPartialOrderTest",
-  "spire.math.IntervalIteratorCheck",
-  "spire.math.IntervalReciprocalTest",
-  "spire.math.IntervalSubsetPartialOrderTest",
-  "spire.math.IntervalTest",
-  "spire.math.JetTest",
-  "spire.math.LinearSelectTest",
-  "spire.math.LiteralsTest",
-  "spire.math.MergingTest",
-  "spire.math.NaturalTest",
-  "spire.math.NumberPropertiesTest",
-  "spire.math.NumberTest",
-  "spire.math.NumericTest",
-  "spire.math.PackageCheck",
-  "spire.math.PackageTest",
-  "spire.math.PolynomialCheck",
-  "spire.math.PolynomialSamplingCheck",
-  "spire.math.PolynomialTest",
-  "spire.math.QuaternionCheck",
-  "spire.math.QuickSelectTest",
-  "spire.math.RationalCheck",
-  "spire.math.RationalTest",
-  "spire.math.RealCheck",
-  "spire.math.RingIntervalTest",
-  "spire.math.SafeLongTest",
-  "spire.math.SearchTest",
-  "spire.math.SortingTest",
-  "spire.math.TrileanCheck",
-  "spire.math.UByteTest",
-  "spire.math.UIntTest",
-  "spire.math.ULongTest",
-  "spire.math.UShortTest",
-  "spire.math.prime.FactorHeapCheck",
-  "spire.math.prime.FactorsCheck",
-  "spire.random.GaussianTest",
-  "spire.random.GeneratorTest",
-  "spire.random.SamplingTest",
-  "spire.random.ShufflingTest",
-  "spire.syntax.CforTest",
-  "spire.util.OptCheck",
-  "spire.util.PackCheck",
-  "test.scala.spire.math.TypeclassExistenceTest"
-*/
-)
-
-lazy val tests = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
+lazy val tests = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
   .settings(moduleName := "spire-tests")
   .settings(spireSettings:_*)
-  .settings(scalaTestSettings:_*)
+  .settings(munitSettings:_*)
   .settings(noPublishSettings:_*)
   .jvmSettings(commonJvmSettings:_*)
-  .jsSettings(testOptions in Test := Seq(Tests.Filter(s => jsTests.contains(s))))
   .jsSettings(commonJsSettings:_*)
   .dependsOn(core, data, legacy, extras, laws)
 
@@ -312,7 +242,8 @@ lazy val commonSettings = Seq(
 
 lazy val commonJsSettings = Seq(
   scalaJSStage in Global := FastOptStage,
-  parallelExecution in Test := false
+  parallelExecution in Test := false,
+  scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }
 )
 
 lazy val commonJvmSettings = Seq(
@@ -322,7 +253,6 @@ lazy val commonJvmSettings = Seq(
     case Some((2, scalaMajor)) if scalaMajor <= 11 => Seq("-optimize")
     case _ => Seq.empty
   }),
-  testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF")
 )
 
 lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
@@ -456,10 +386,12 @@ lazy val genProductTypes = TaskKey[Seq[File]]("gen-product-types", "Generates se
 
 lazy val scalaCheckSettings  = Seq(libraryDependencies += "org.scalacheck" %%% "scalacheck" % scalaCheckVersion % Test)
 
-lazy val scalaTestSettings = Seq(
-  libraryDependencies += "org.scalatest" %%% "scalatest" % scalaTestVersion % Test,
-  libraryDependencies += "org.scalatestplus" %%% "scalacheck-1-14" % scalaTestPlusVersion % Test,
-  libraryDependencies += "com.chuusai" %% "shapeless" % shapelessVersion % Test
+lazy val munitSettings = Seq(
+  libraryDependencies ++= Seq(
+    "org.scalameta"          %%% "munit"            % munit,
+    "org.typelevel"          %%% "discipline-munit" % munitDiscipline
+  ),
+  testFrameworks += new TestFramework("munit.Framework")
 )
 
 lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps ++ publishSettings ++ scoverageSettings
