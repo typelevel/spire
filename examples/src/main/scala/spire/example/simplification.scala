@@ -203,10 +203,10 @@ trait BigStream[A] extends Iterable[A] with BigStreamCompat[A] { self =>
 class BigCons[A](override val head: A, t: => BigStream[A]) extends BigStream[A] {
   override def tail: BigStream[A] = t
   override def isEmpty = false
-  override def toString: String = "BigStream(%s, ...)" format head.toString
+  override def toString: String = "BigStream(%s, ...)".format(head.toString)
   override def equals(rhs: Any): Boolean = rhs match {
     case s: BigStream[_] => !s.isEmpty && tail == s.tail
-    case _ => false
+    case _               => false
   }
 }
 

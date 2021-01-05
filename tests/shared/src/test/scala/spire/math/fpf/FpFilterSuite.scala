@@ -24,16 +24,16 @@ class FpFilterSuite extends munit.ScalaCheckSuite {
   implicit object BadField extends Field[Bad] with IsReal[Bad] with NRoot[Bad] {
     def zero: Bad = evaluated
     def one: Bad = evaluated
-    def negate(a:Bad): Bad = evaluated
-    def plus(a:Bad, b:Bad): Bad = evaluated
-    override def emod(a:Bad, b:Bad) = evaluated
-    override def equot(a:Bad, b:Bad) = evaluated
-    override def equotmod(a:Bad, b:Bad) = evaluated
-    override def gcd(a:Bad, b:Bad)(implicit ev: Eq[Bad]):Bad = evaluated
-    override def lcm(a:Bad, b:Bad)(implicit ev: Eq[Bad]):Bad = evaluated
+    def negate(a: Bad): Bad = evaluated
+    def plus(a: Bad, b: Bad): Bad = evaluated
+    override def emod(a: Bad, b: Bad) = evaluated
+    override def equot(a: Bad, b: Bad) = evaluated
+    override def equotmod(a: Bad, b: Bad) = evaluated
+    override def gcd(a: Bad, b: Bad)(implicit ev: Eq[Bad]): Bad = evaluated
+    override def lcm(a: Bad, b: Bad)(implicit ev: Eq[Bad]): Bad = evaluated
     override def fromDouble(n: Double): Bad = evaluated
-    def times(x:Bad, b:Bad): Bad = evaluated
-    def div(a:Bad, b:Bad): Bad = evaluated
+    def times(x: Bad, b: Bad): Bad = evaluated
+    def div(a: Bad, b: Bad): Bad = evaluated
     def nroot(a: Bad, k: Int): Bad = evaluated
     def fpow(a: Bad, b: Bad) = evaluated
     def compare(x: Bad, y: Bad) = evaluated
@@ -41,15 +41,15 @@ class FpFilterSuite extends munit.ScalaCheckSuite {
     override def abs(a: Bad): Bad = evaluated
     def toDouble(x: Bad): Double = evaluated
     def toReal(x: Bad): Real = evaluated
-    def ceil(a:Bad): Bad = evaluated
-    def floor(a:Bad): Bad = evaluated
-    def round(a:Bad): Bad = evaluated
-    def isWhole(a:Bad): Boolean = evaluated
+    def ceil(a: Bad): Bad = evaluated
+    def floor(a: Bad): Bad = evaluated
+    def round(a: Bad): Bad = evaluated
+    def isWhole(a: Bad): Boolean = evaluated
   }
 
   test("FpFilter doesn't evaluated for easy problems") {
-    val x = FpFilter.exact[Bad](1D)
-    val y = FpFilter.exact[Bad](1.2D)
+    val x = FpFilter.exact[Bad](1d)
+    val y = FpFilter.exact[Bad](1.2d)
     assert((x + y).signum == 1)
     assert((x - y).signum == -1)
     assert((x * y).signum == 1)
@@ -101,7 +101,7 @@ class FpFilterSuite extends munit.ScalaCheckSuite {
   } yield Point(x, y)
 
   def genEpsilon: Gen[Double] =
-    genSimpleDouble map (_ * FpFilter.Eps)
+    genSimpleDouble.map(_ * FpFilter.Eps)
 
   def genSimplex: Gen[Simplex] = for {
     p <- genPoint
@@ -147,7 +147,7 @@ class FpFilterSuite extends munit.ScalaCheckSuite {
     Arbitrary(genSimplex)
 
   implicit def arbDegenerateSimplex: Arbitrary[Degenerate[Simplex]] =
-    Arbitrary(genDegenerateSimplex map (new Degenerate(_)))
+    Arbitrary(genDegenerateSimplex.map(new Degenerate(_)))
 
   property("Orientation test for simple case")(forAll { (s: Simplex) =>
     Sign(signExact(s)) == Sign(signFpFilter(s))

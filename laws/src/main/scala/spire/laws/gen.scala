@@ -43,15 +43,13 @@ object gen {
     arbitrary[BigInt].map(_.bigInteger)
 
   lazy val safeLong: Gen[SafeLong] =
-    Gen.frequency(
-      1 -> SafeLong(BigInt("393050634124102232869567034555427371542904833")),
-      100 -> arbitrary[Long].map(SafeLong(_)),
-      100 -> arbitrary[BigInt].map(SafeLong(_)))
+    Gen.frequency(1 -> SafeLong(BigInt("393050634124102232869567034555427371542904833")),
+                  100 -> arbitrary[Long].map(SafeLong(_)),
+                  100 -> arbitrary[BigInt].map(SafeLong(_))
+    )
 
   lazy val natural: Gen[Natural] =
-    Gen.oneOf(
-      arbitrary[Long].map(n => Natural(n & Long.MaxValue)),
-      arbitrary[BigInt].map(n => Natural(n.abs)))
+    Gen.oneOf(arbitrary[Long].map(n => Natural(n & Long.MaxValue)), arbitrary[BigInt].map(n => Natural(n.abs)))
 
   lazy val rational: Gen[Rational] = {
     val rationalFromLongs: Gen[Rational] =
@@ -76,16 +74,16 @@ object gen {
       10 -> arbitrary[Double].map(n => Rational(n)),
       1 -> rationalFromSafeLongs,
       1 -> bigRational, // a rational that is guaranteed to have a big denominator
-      1 -> bigRational.map(x => if(x.isZero) Rational.one else x.inverse)
+      1 -> bigRational.map(x => if (x.isZero) Rational.one else x.inverse)
     )
   }
 
   lazy val number: Gen[Number] =
-    Gen.oneOf(
-      arbitrary[Long].map(Number(_)),
-      arbitrary[Double].map(Number(_)),
-      arbitrary[BigDecimal].map(Number(_)),
-      rational.map(Number(_)))
+    Gen.oneOf(arbitrary[Long].map(Number(_)),
+              arbitrary[Double].map(Number(_)),
+              arbitrary[BigDecimal].map(Number(_)),
+              rational.map(Number(_))
+    )
 
   lazy val algebraic: Gen[Algebraic] =
     arbitrary[Int].map(Algebraic(_))
@@ -135,10 +133,7 @@ object gen {
     } yield Quaternion(r, i, j, k)
 
   def bound[A: Arbitrary]: Gen[Bound[A]] =
-    Gen.oneOf(
-      arbitrary[A].map(Open(_)),
-      arbitrary[A].map(Closed(_)),
-      Gen.const(Unbound[A]()))
+    Gen.oneOf(arbitrary[A].map(Open(_)), arbitrary[A].map(Closed(_)), Gen.const(Unbound[A]()))
 
   def bounds[A: Arbitrary: Order]: Gen[(A, A)] =
     arbitrary[(A, A)].map { case (x, y) => if (x <= y) (x, y) else (y, x) }
@@ -159,11 +154,7 @@ object gen {
     makeBoundedInterval[A](Interval.closed(_, _))
 
   def boundedInterval[A: Arbitrary: Order]: Gen[Interval[A]] =
-    Gen.oneOf(
-      openInterval[A],
-      openLowerInterval[A],
-      openUpperInterval[A],
-      closedInterval[A])
+    Gen.oneOf(openInterval[A], openLowerInterval[A], openUpperInterval[A], closedInterval[A])
 
   def interval[A: Arbitrary: Order]: Gen[Interval[A]] =
     Gen.frequency[Interval[A]](
@@ -172,7 +163,8 @@ object gen {
       (1, arbitrary[A].map(Interval.atOrAbove(_))),
       (1, arbitrary[A].map(Interval.below(_))),
       (1, arbitrary[A].map(Interval.atOrBelow(_))),
-      (15, boundedInterval[A]))
+      (15, boundedInterval[A])
+    )
 
   def freeMonoid[A: Arbitrary]: Gen[FreeMonoid[A]] =
     for {
@@ -185,7 +177,7 @@ object gen {
     for {
       aas <- arbitrary[List[Either[A, A]]]
     } yield aas.foldLeft(FreeGroup.id[A]) {
-      case (acc, Left(a)) => acc |-| FreeGroup(a)
+      case (acc, Left(a))  => acc |-| FreeGroup(a)
       case (acc, Right(a)) => acc |+| FreeGroup(a)
     }
 
@@ -197,17 +189,19 @@ object gen {
     }
 
   val perm: Gen[Perm] =
-    Gen.parameterized { params =>
-      val domainSize = params.size / 10 + 1
-      Gen.containerOfN[Array, Int](domainSize, Gen.chooseNum(0, Int.MaxValue))
-    } flatMap { intArray =>
-      val domainSize = intArray.length
-      val images = new Array[Int](domainSize)
-      cforRange(0 until domainSize) { i =>
-        val j = intArray(i) % (i + 1) // uses the Fisher-Yates shuffle, inside out variant
-        images(i) = images(j)
-        images(j) = i
+    Gen
+      .parameterized { params =>
+        val domainSize = params.size / 10 + 1
+        Gen.containerOfN[Array, Int](domainSize, Gen.chooseNum(0, Int.MaxValue))
       }
-      Perm(images.zipWithIndex.filter { case (p, i) => p != i }.toMap)
-    }
+      .flatMap { intArray =>
+        val domainSize = intArray.length
+        val images = new Array[Int](domainSize)
+        cforRange(0 until domainSize) { i =>
+          val j = intArray(i) % (i + 1) // uses the Fisher-Yates shuffle, inside out variant
+          images(i) = images(j)
+          images(j) = i
+        }
+        Perm(images.zipWithIndex.filter { case (p, i) => p != i }.toMap)
+      }
 }

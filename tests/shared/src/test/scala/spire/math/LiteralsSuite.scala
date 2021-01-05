@@ -6,13 +6,13 @@ import spire.std.int._
 class LiteralsSuite extends munit.FunSuite {
   test("byte literals") {
     import spire.syntax.literals._
-    assertEquals(b"-128", (-128:Byte))
-    assertEquals(b"-100", (-100:Byte))
-    assertEquals(b"0", (0:Byte))
-    assertEquals(b"100", (100:Byte))
-    assertEquals(b"127", (127:Byte))
-    assertEquals(b"128", (-128:Byte))
-    assertEquals(b"255", (-1:Byte))
+    assertEquals(b"-128", (-128: Byte))
+    assertEquals(b"-100", (-100: Byte))
+    assertEquals(b"0", (0: Byte))
+    assertEquals(b"100", (100: Byte))
+    assertEquals(b"127", (127: Byte))
+    assertEquals(b"128", (-128: Byte))
+    assertEquals(b"255", (-1: Byte))
   }
 
   test("illegal byte literals") {
@@ -26,13 +26,13 @@ class LiteralsSuite extends munit.FunSuite {
 
   test("short literals") {
     import spire.syntax.literals._
-    assertEquals(h"-32768", (-32768:Short))
-    assertEquals(h"-10000", (-10000:Short))
-    assertEquals(h"0", (0:Short))
-    assertEquals(h"10012", (10012:Short))
-    assertEquals(h"32767", (32767:Short))
-    assertEquals(h"32768", (-32768:Short))
-    assertEquals(h"65535", (-1:Short))
+    assertEquals(h"-32768", (-32768: Short))
+    assertEquals(h"-10000", (-10000: Short))
+    assertEquals(h"0", (0: Short))
+    assertEquals(h"10012", (10012: Short))
+    assertEquals(h"32767", (32767: Short))
+    assertEquals(h"32768", (-32768: Short))
+    assertEquals(h"65535", (-1: Short))
   }
 
   test("int operators") {

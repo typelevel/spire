@@ -1,7 +1,6 @@
 package spire
 package algebra
 
-
 trait InnerProductSpace[V, @sp(Int, Long, Float, Double) F] extends Any with VectorSpace[V, F] { self =>
   def dot(v: V, w: V): F
 
@@ -12,7 +11,9 @@ trait InnerProductSpace[V, @sp(Int, Long, Float, Double) F] extends Any with Vec
 }
 
 object InnerProductSpace {
-  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: InnerProductSpace[V, R]): InnerProductSpace[V, R] = V
+  @inline final def apply[V, @sp(Int, Long, Float, Double) R](implicit
+    V: InnerProductSpace[V, R]
+  ): InnerProductSpace[V, R] = V
 }
 
 private[algebra] trait NormedInnerProductSpace[V, @sp(Float, Double) F] extends Any with NormedVectorSpace[V, F] {

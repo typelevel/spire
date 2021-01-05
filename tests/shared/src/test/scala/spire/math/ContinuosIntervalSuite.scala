@@ -25,4 +25,3 @@ class ContinuousIntervalSuite extends munit.FunSuite {
   test("[-b,-a] / [-d,-c]") { assertEquals(cc(-b, -a) / cc(-d, -c), cc(-a / -d, -b / -c)) }
   test("[-b,-a] / [c,d]") { assertEquals(cc(-b, -a) / cc(c, d), cc(-b / c, -a / d)) }
 }
-

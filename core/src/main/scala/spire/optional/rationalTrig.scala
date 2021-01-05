@@ -11,7 +11,7 @@ object rationalTrig {
     def acos(a: Rational): Rational = Rational(spire.math.acos(a.toDouble))
     def asin(a: Rational): Rational = Rational(spire.math.asin(a.toDouble))
     def atan(a: Rational): Rational = Rational(spire.math.atan(a.toDouble))
-    def atan2(y: Rational,x: Rational): Rational = Rational(spire.math.atan2(y.toDouble, x.toDouble))
+    def atan2(y: Rational, x: Rational): Rational = Rational(spire.math.atan2(y.toDouble, x.toDouble))
     def cos(a: Rational): Rational = Rational(spire.math.cos(a.toDouble))
     def cosh(x: Rational): Rational = Rational(spire.math.cosh(x.toDouble))
     val e: Rational = Rational(spire.math.e)

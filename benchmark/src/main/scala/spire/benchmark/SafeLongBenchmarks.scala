@@ -101,7 +101,6 @@ class SafeLongAddSubtractBenchmark {
   @Setup
   def setup(): Unit = {
 
-
     val (a0, b0) = pairs(kind)
     a = a0
     b = b0
@@ -137,7 +136,6 @@ class SafeLongCompareBenchmark {
   @Setup
   def setup(): Unit = {
 
-
     val (a0, b0) = pairs(kind)
     a = a0
     b = b0
@@ -145,6 +143,6 @@ class SafeLongCompareBenchmark {
 
   @Benchmark
   def compare(x: Blackhole): Unit = {
-    x.consume(a compare b)
+    x.consume(a.compare(b))
   }
 }

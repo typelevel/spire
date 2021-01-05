@@ -1,7 +1,6 @@
 package spire
 package random
 
-
 import spire.math.{UInt, ULong}
 
 abstract class Generator {
@@ -63,14 +62,14 @@ abstract class Generator {
     }
 
     if (n < 1)
-      throw new IllegalArgumentException("argument must be positive %d" format n)
+      throw new IllegalArgumentException("argument must be positive %d".format(n))
     else if ((n & -n) == n)
       ((n * ((nextInt() >>> 1).toLong)) >>> 31).toInt
     else
       loop(nextInt() >>> 1)
   }
 
-  private final def retryCap(width: UInt): UInt = {
+  final private def retryCap(width: UInt): UInt = {
     // Simulate 1 << 32 long division.
     val q = UInt(Int.MinValue) / width
     val r = UInt(Int.MinValue) % width
@@ -110,14 +109,14 @@ abstract class Generator {
     }
 
     if (n < 1)
-      throw new IllegalArgumentException("argument must be positive %d" format n)
+      throw new IllegalArgumentException("argument must be positive %d".format(n))
     else if ((n & -n) == n)
       nextLong() & (n - 1)
     else
       loop(nextLong() >>> 1)
   }
 
-  private final def retryCap(width: ULong): ULong = {
+  final private def retryCap(width: ULong): ULong = {
     // Simulate 1 << 32 long division.
     val q = ULong(Long.MinValue) / width
     val r = ULong(Long.MinValue) % width
@@ -323,7 +322,7 @@ abstract class Generator {
   def sampleFromArray[@sp A: ClassTag](as: Array[A], size: Int)(implicit gen: Generator): Array[A] = {
     val chosen: Array[A] = new Array[A](size)
     if (size < 1) {
-      throw new IllegalArgumentException("illegal sample size (%d)" format size)
+      throw new IllegalArgumentException("illegal sample size (%d)".format(size))
     } else if (size < as.length) {
       var i = 0
       while (i < as.length) {
@@ -526,7 +525,7 @@ object Generator {
 object GlobalRng extends LongBasedGenerator {
   private val rng = spire.random.rng.Cmwc5.fromTime().sync
 
-  override def sync: spire.random.rng.SyncGenerator  = rng
+  override def sync: spire.random.rng.SyncGenerator = rng
 
   def copyInit: Generator = rng.copyInit
 

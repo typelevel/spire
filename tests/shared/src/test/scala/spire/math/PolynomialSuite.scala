@@ -79,7 +79,7 @@ class PolynomialSuite extends munit.FunSuite {
     assert(Arrays.equals(p.coeffsArray.toArray[Object], Array[Object](r"1/2", r"2", r"1/4")))
     assertEquals(p.maxTerm, Term(r"1/4", 2))
     assertEquals(p.degree, 2)
-    assertEquals(p.maxOrderTermCoeff, Rational(1,4))
+    assertEquals(p.maxOrderTermCoeff, Rational(1, 4))
     assertEquals(p(r"2"), r"11/2")
     assertEquals(p.isZero, false)
     assertEquals(p.monic, Polynomial("x^2 + 8x + 2"))
@@ -89,7 +89,7 @@ class PolynomialSuite extends munit.FunSuite {
     assert(Arrays.equals(p.toDense.coeffs.toArray[Object], Array[Object](r"1/2", r"2/1", r"1/4")))
     assertEquals(p.toDense.maxTerm, Term(r"1/4", 2))
     assertEquals(p.toDense.degree, 2)
-    assertEquals(p.toDense.maxOrderTermCoeff, Rational(1,4))
+    assertEquals(p.toDense.maxOrderTermCoeff, Rational(1, 4))
     assertEquals(p.toDense.apply(r"2"), r"11/2")
     assertEquals(p.toDense.isZero, false)
     assertEquals(p.toDense.monic, Polynomial.dense(Array(r"2/1", r"8/1", r"1/1")))
@@ -107,15 +107,19 @@ class PolynomialSuite extends munit.FunSuite {
 
     assertEquals(p1 + p2, Polynomial("1/2x^2 + 5x + 1"))
     assertEquals(legSparse(2) * legSparse(3), Polynomial("15/4x^5 - 7/2x^3 + 3/4x"))
-    assertEquals((p1 emod p2), Polynomial("-x"))
-    assertEquals((p1 equot p2), Polynomial("1"))
+    assertEquals((p1.emod(p2)), Polynomial("-x"))
+    assertEquals((p1.equot(p2)), Polynomial("1"))
 
     val legDense = legSparse.map(_.toDense)
 
     assertEquals(p1 + p2, Polynomial.dense(Array(r"1/1", r"5/1", r"1/2")))
-    assert(Arrays.equals((legDense(2) * legDense(3)).coeffsArray.toArray[Object], Array[Object](r"0", r"3/4", r"0", r"-7/2", r"0", r"15/4")))
-    assertEquals((p1 emod p2), Polynomial("-x"))
-    assertEquals((p1 equot p2), Polynomial("1"))
+    assert(
+      Arrays.equals((legDense(2) * legDense(3)).coeffsArray.toArray[Object],
+                    Array[Object](r"0", r"3/4", r"0", r"-7/2", r"0", r"15/4")
+      )
+    )
+    assertEquals((p1.emod(p2)), Polynomial("-x"))
+    assertEquals((p1.equot(p2)), Polynomial("1"))
 
   }
 
@@ -149,14 +153,14 @@ class PolynomialSuite extends munit.FunSuite {
 
   test("GCD doesn't run out of memory for BigDecimals") {
     GCDRing[BigDecimal]
-    import Polynomial.{ linear, constant }
-    val a = linear(BigDecimal("2"))     // 2x
+    import Polynomial.{constant, linear}
+    val a = linear(BigDecimal("2")) // 2x
     val b = constant(BigDecimal("3.4")) // 3.4
-    val c = (a + b)                     // 2x + 3.4
-    val d = c * c                       // 4x² + 13.6x + 11.56
+    val c = a + b // 2x + 3.4
+    val d = c * c // 4x² + 13.6x + 11.56
     // assertEquals((a gcd c), constant(BigDecimal("0.2"))) TODO: does not work anymore
     // assertEquals((a gcd d), constant(BigDecimal("0.04")))
-    assertEquals((c gcd d), c)
+    assertEquals((c.gcd(d)), c)
   }
 
   test("Polynomial(terms...) sums terms") {
@@ -178,7 +182,8 @@ class PolynomialSuite extends munit.FunSuite {
       Term(Rational("-2/21"), 54),
       Term(Rational("34/79"), 47),
       Term(Rational("-56/55"), 49),
-      Term(Rational("19/44"), 0))
+      Term(Rational("19/44"), 0)
+    )
     val expected = terms
       .map { case Term(c, k) => Polynomial(Map(k -> c)) }
       .foldLeft(Polynomial.zero[Rational])(_ + _)

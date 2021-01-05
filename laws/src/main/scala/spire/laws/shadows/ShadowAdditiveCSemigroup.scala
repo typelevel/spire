@@ -16,12 +16,12 @@ trait ShadowAdditiveCSemigroup[A, S] extends AdditiveCSemigroup[Shadow[A, S]] {
 
   override def trySum(xs: IterableOnce[Shadow[A, S]]): Option[Shadow[A, S]] = {
     val seq = xs.iterator.toSeq
-    val aO = A.trySum( seq.map(_.a) )
-    val sO = S.trySum( seq.map(_.s) )
+    val aO = A.trySum(seq.map(_.a))
+    val sO = S.trySum(seq.map(_.s))
     (aO, sO) match {
       case (Some(a), Some(s)) => Some(Shadow(a, checked(s)))
-      case (None, None) => None
-      case _ => throw new IllegalArgumentException("Inconsistent results for trySum between primitive and shadow type")
+      case (None, None)       => None
+      case _                  => throw new IllegalArgumentException("Inconsistent results for trySum between primitive and shadow type")
     }
   }
 }

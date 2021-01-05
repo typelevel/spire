@@ -30,35 +30,35 @@ class UInt(val signed: Int) extends AnyVal {
 
   override def toString: String = toLong.toString
 
-  def == (that: UInt): Boolean = this.signed == that.signed
-  def != (that: UInt): Boolean = this.signed != that.signed
+  def ==(that: UInt): Boolean = this.signed == that.signed
+  def !=(that: UInt): Boolean = this.signed != that.signed
 
   def ===(that: UInt): Boolean = this.signed == that.signed
   def =!=(that: UInt): Boolean = this.signed != that.signed
 
-  def <= (that: UInt): Boolean = this.toLong <= that.toLong
-  def < (that: UInt): Boolean = this.toLong < that.toLong
-  def >= (that: UInt): Boolean = this.toLong >= that.toLong
-  def > (that: UInt): Boolean = this.toLong > that.toLong
+  def <=(that: UInt): Boolean = this.toLong <= that.toLong
+  def <(that: UInt): Boolean = this.toLong < that.toLong
+  def >=(that: UInt): Boolean = this.toLong >= that.toLong
+  def >(that: UInt): Boolean = this.toLong > that.toLong
 
   def unary_- : UInt = UInt(-this.signed)
 
-  def + (that: UInt): UInt = UInt(this.signed + that.signed)
-  def - (that: UInt): UInt = UInt(this.signed - that.signed)
-  def * (that: UInt): UInt = UInt(this.signed * that.signed)
-  def / (that: UInt): UInt = UInt(this.toLong / that.toLong)
-  def % (that: UInt): UInt = UInt(this.toLong % that.toLong)
+  def +(that: UInt): UInt = UInt(this.signed + that.signed)
+  def -(that: UInt): UInt = UInt(this.signed - that.signed)
+  def *(that: UInt): UInt = UInt(this.signed * that.signed)
+  def /(that: UInt): UInt = UInt(this.toLong / that.toLong)
+  def %(that: UInt): UInt = UInt(this.toLong % that.toLong)
 
   def unary_~ : UInt = UInt(~this.signed)
 
-  def << (shift: Int): UInt = UInt(signed << shift)
-  def >> (shift: Int): UInt = UInt(signed >>> shift)
-  def >>> (shift: Int): UInt = UInt(signed >>> shift)
-  def & (that: UInt): UInt = UInt(this.signed & that.signed)
-  def | (that: UInt): UInt = UInt(this.signed | that.signed)
-  def ^ (that: UInt): UInt = UInt(this.signed ^ that.signed)
+  def <<(shift: Int): UInt = UInt(signed << shift)
+  def >>(shift: Int): UInt = UInt(signed >>> shift)
+  def >>>(shift: Int): UInt = UInt(signed >>> shift)
+  def &(that: UInt): UInt = UInt(this.signed & that.signed)
+  def |(that: UInt): UInt = UInt(this.signed | that.signed)
+  def ^(that: UInt): UInt = UInt(this.signed ^ that.signed)
 
-  def ** (that: UInt): UInt = UInt(pow(this.toLong, that.toLong))
+  def **(that: UInt): UInt = UInt(pow(this.toLong, that.toLong))
 }
 
 trait UIntInstances {
@@ -70,19 +70,19 @@ trait UIntInstances {
 
 private[math] trait UIntIsCRig extends CRig[UInt] {
   def one: UInt = UInt(1)
-  def plus(a:UInt, b:UInt): UInt = a + b
-  override def pow(a:UInt, b:Int): UInt = {
+  def plus(a: UInt, b: UInt): UInt = a + b
+  override def pow(a: UInt, b: Int): UInt = {
     if (b < 0)
-      throw new IllegalArgumentException("negative exponent: %s" format b)
+      throw new IllegalArgumentException("negative exponent: %s".format(b))
     a ** UInt(b)
   }
-  override def times(a:UInt, b:UInt): UInt = a * b
+  override def times(a: UInt, b: UInt): UInt = a * b
   def zero: UInt = UInt(0)
 }
 
 private[math] trait UIntSigned extends SignedAdditiveCMonoid[UInt] {
-  override def eqv(x:UInt, y:UInt): Boolean = x == y
-  override def neqv(x:UInt, y:UInt): Boolean = x != y
+  override def eqv(x: UInt, y: UInt): Boolean = x == y
+  override def neqv(x: UInt, y: UInt): Boolean = x != y
   override def gt(x: UInt, y: UInt): Boolean = x > y
   override def gteqv(x: UInt, y: UInt): Boolean = x >= y
   override def lt(x: UInt, y: UInt): Boolean = x < y
@@ -95,7 +95,7 @@ private[math] trait UIntTruncatedDivision extends TruncatedDivision[UInt] with U
   def toBigIntOpt(x: UInt): Opt[BigInt] = Opt(x.toBigInt)
   def tquot(x: UInt, y: UInt): UInt = x / y
   def tmod(x: UInt, y: UInt): UInt = x % y
-  def fquot(x: UInt, y: UInt): UInt = x/ y
+  def fquot(x: UInt, y: UInt): UInt = x / y
   def fmod(x: UInt, y: UInt): UInt = x % y
 }
 

@@ -27,12 +27,13 @@ class ULongSuite extends munit.ScalaCheckSuite {
 
   property("n / 0 -> ArithmeticException") {
     forAll { (n: ULong) =>
-      val error = try {
-        n / zero
-        false
-      } catch {
-        case _: ArithmeticException => true
-      }
+      val error =
+        try {
+          n / zero
+          false
+        } catch {
+          case _: ArithmeticException => true
+        }
       error == true
     }
   }

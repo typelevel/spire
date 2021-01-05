@@ -4,6 +4,7 @@ package random
 import spire.math.{Rational, UInt, ULong}
 
 trait Uniform[@sp A] extends Any { self =>
+
   /**
    * Return an `A` that is uniformly distributed between `min` and `max` inclusive.
    */
@@ -85,10 +86,12 @@ object Uniform {
       def apply(min: BigDecimal, max: BigDecimal): Dist[BigDecimal] = {
         val precision = spire.math.max(min.mc.getPrecision, max.mc.getPrecision)
         if (precision == 0) {
-          throw new IllegalArgumentException("Both min and max provided to UniformBigDecimal have unlimited precision. Cannot produce uniform distributions with unlimited precision.")
+          throw new IllegalArgumentException(
+            "Both min and max provided to UniformBigDecimal have unlimited precision. Cannot produce uniform distributions with unlimited precision."
+          )
         }
         val range = max - min
-        val dist = UniformBigInt(0, BigInt(10) pow precision)
+        val dist = UniformBigInt(0, BigInt(10).pow(precision))
         new DistFromGen[BigDecimal]({ gen =>
           min + range * BigDecimal(dist(gen), precision)
         })

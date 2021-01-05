@@ -1,13 +1,13 @@
 package spire
 package algebra
 
-
-import spire.math.{ Real, Algebraic, Rational }
+import spire.math.{Algebraic, Rational, Real}
 
 /**
  * A simple type class for numeric types that are a subset of the reals.
  */
 trait IsReal[@sp A] extends Any with Signed[A] {
+
   /**
    * Rounds `a` the nearest integer that is greater than or equal to `a`.
    */

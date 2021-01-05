@@ -58,7 +58,7 @@ class FactorsScalaCheckSuite extends munit.ScalaCheckSuite {
   property("Factors(n) /% Factors(m) = n /% m") {
     forAll { (n: Long, nz: NonZero[Long]) =>
       val m = nz.num
-      val (x, y) = (Factors(n) /% Factors(m))
+      val (x, y) = Factors(n) /% Factors(m)
       (x.value, y.value) == SafeLong(n) /% SafeLong(m)
     }
   }

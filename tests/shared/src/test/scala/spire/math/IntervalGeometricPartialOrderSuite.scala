@@ -6,7 +6,7 @@ import spire.implicits.{eqOps => _, _}
 class IntervalGeometricPartialOrderSuite extends munit.FunSuite {
   import spire.optional.intervalGeometricPartialOrder._
 
-  import Interval.{openUpper, openLower, closed, open, point}
+  import Interval.{closed, open, openLower, openUpper, point}
   test("[2, 3) === [2, 3)") { assertEquals(openUpper(2, 3).partialCompare(openUpper(2, 3)), 0.0) }
   test("[2, 3) < [3, 4]") { assert(openUpper(2, 3) < closed(3, 4)) }
   test("[2, 3] < (3, 4]") { assert(closed(2, 3) < openLower(3, 4)) }
@@ -27,4 +27,3 @@ class IntervalGeometricPartialOrderSuite extends munit.FunSuite {
     assertEquals(intervals.pmax.toSet, Set(closed(2, 3), closed(2, 4)))
   }
 }
-

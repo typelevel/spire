@@ -31,35 +31,35 @@ class UShort(val signed: Char) extends AnyVal {
 
   override def toString: String = toInt.toString
 
-  def == (that: UShort): Boolean = this.signed == that.signed
-  def != (that: UShort): Boolean = this.signed != that.signed
+  def ==(that: UShort): Boolean = this.signed == that.signed
+  def !=(that: UShort): Boolean = this.signed != that.signed
 
   def ===(that: UShort): Boolean = this.signed == that.signed
   def =!=(that: UShort): Boolean = this.signed != that.signed
 
-  def <= (that: UShort): Boolean = this.signed <= that.signed
-  def < (that: UShort): Boolean = this.signed < that.signed
-  def >= (that: UShort): Boolean = this.signed >= that.signed
-  def > (that: UShort): Boolean = this.signed > that.signed
+  def <=(that: UShort): Boolean = this.signed <= that.signed
+  def <(that: UShort): Boolean = this.signed < that.signed
+  def >=(that: UShort): Boolean = this.signed >= that.signed
+  def >(that: UShort): Boolean = this.signed > that.signed
 
   def unary_- : UShort = UShort(-this.signed)
 
-  def + (that: UShort): UShort = UShort(this.signed + that.signed)
-  def - (that: UShort): UShort = UShort(this.signed - that.signed)
-  def * (that: UShort): UShort = UShort(this.signed * that.signed)
-  def / (that: UShort): UShort = UShort(this.signed / that.signed)
-  def % (that: UShort): UShort = UShort(this.signed % that.signed)
+  def +(that: UShort): UShort = UShort(this.signed + that.signed)
+  def -(that: UShort): UShort = UShort(this.signed - that.signed)
+  def *(that: UShort): UShort = UShort(this.signed * that.signed)
+  def /(that: UShort): UShort = UShort(this.signed / that.signed)
+  def %(that: UShort): UShort = UShort(this.signed % that.signed)
 
   def unary_~ : UShort = UShort(~this.signed)
 
-  def << (shift: Int): UShort = UShort((signed & 0xffff) << (shift & 15))
-  def >> (shift: Int): UShort = UShort((signed & 0xffff) >>> (shift & 15))
-  def >>> (shift: Int): UShort = UShort((signed & 0xffff) >>> (shift & 15))
-  def & (that: UShort): UShort = UShort(this.signed & that.signed)
-  def | (that: UShort): UShort = UShort(this.signed | that.signed)
-  def ^ (that: UShort): UShort = UShort(this.signed ^ that.signed)
+  def <<(shift: Int): UShort = UShort((signed & 0xffff) << (shift & 15))
+  def >>(shift: Int): UShort = UShort((signed & 0xffff) >>> (shift & 15))
+  def >>>(shift: Int): UShort = UShort((signed & 0xffff) >>> (shift & 15))
+  def &(that: UShort): UShort = UShort(this.signed & that.signed)
+  def |(that: UShort): UShort = UShort(this.signed | that.signed)
+  def ^(that: UShort): UShort = UShort(this.signed ^ that.signed)
 
-  def ** (that: UShort): UShort = UShort(pow(this.toLong, that.toLong).toChar)
+  def **(that: UShort): UShort = UShort(pow(this.toLong, that.toLong).toChar)
 }
 
 trait UShortInstances {
@@ -71,19 +71,19 @@ trait UShortInstances {
 
 private[math] trait UShortIsCRig extends CRig[UShort] {
   def one: UShort = UShort(1)
-  def plus(a:UShort, b:UShort): UShort = a + b
-  override def pow(a:UShort, b:Int): UShort = {
+  def plus(a: UShort, b: UShort): UShort = a + b
+  override def pow(a: UShort, b: Int): UShort = {
     if (b < 0)
-      throw new IllegalArgumentException("negative exponent: %s" format b)
+      throw new IllegalArgumentException("negative exponent: %s".format(b))
     a ** UShort(b)
   }
-  override def times(a:UShort, b:UShort): UShort = a * b
+  override def times(a: UShort, b: UShort): UShort = a * b
   def zero: UShort = UShort(0)
 }
 
 private[math] trait UShortSigned extends SignedAdditiveCMonoid[UShort] {
-  override def eqv(x:UShort, y:UShort): Boolean = x == y
-  override def neqv(x:UShort, y:UShort): Boolean = x != y
+  override def eqv(x: UShort, y: UShort): Boolean = x == y
+  override def neqv(x: UShort, y: UShort): Boolean = x != y
   override def gt(x: UShort, y: UShort): Boolean = x > y
   override def gteqv(x: UShort, y: UShort): Boolean = x >= y
   override def lt(x: UShort, y: UShort): Boolean = x < y
@@ -96,7 +96,7 @@ private[math] trait UShortTruncatedDivision extends TruncatedDivision[UShort] wi
   def toBigIntOpt(x: UShort): Opt[BigInt] = Opt(x.toBigInt)
   def tquot(x: UShort, y: UShort): UShort = x / y
   def tmod(x: UShort, y: UShort): UShort = x % y
-  def fquot(x: UShort, y: UShort): UShort = x/ y
+  def fquot(x: UShort, y: UShort): UShort = x / y
   def fmod(x: UShort, y: UShort): UShort = x % y
 }
 

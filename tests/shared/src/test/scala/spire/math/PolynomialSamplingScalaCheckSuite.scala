@@ -40,7 +40,9 @@ class PolynomialSamplingScalaCheckSuite extends munit.ScalaCheckSuite {
     runTest[A](s"$typ/sparse")
   }
 
-  def runTest[A: Eq: Field: ClassTag](name: String)(implicit arb: Arbitrary[Polynomial[A]], arb2: Arbitrary[A]): Unit = {
+  def runTest[A: Eq: Field: ClassTag](
+    name: String
+  )(implicit arb: Arbitrary[Polynomial[A]], arb2: Arbitrary[A]): Unit = {
     type P = Polynomial[A]
 
     def testUnop(f: P => P)(g: A => A): Unit = {
@@ -74,11 +76,11 @@ class PolynomialSamplingScalaCheckSuite extends munit.ScalaCheckSuite {
     property(s"$name binop -") { testBinop(_ - _)(_ - _) }
     property(s"$name binop *") { testBinop(_ * _)(_ * _) }
     property(s"$name binop /~ and %") {
-      testBinopNonzero({ (x, y) =>
-        (x equot y) * y + (x emod y)
-      })({ (a, b) =>
-        (a equot b) * b + (a emod b)
-      })
+      testBinopNonzero { (x, y) =>
+        (x.equot(y)) * y + (x.emod(y))
+      } { (a, b) =>
+        (a.equot(b)) * b + (a.emod(b))
+      }
     }
   }
 }

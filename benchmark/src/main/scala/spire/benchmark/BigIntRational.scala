@@ -34,7 +34,6 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
     }
   }
 
-
   def -(r: BigIntRational): BigIntRational = {
     val dgcd: BigInt = d.gcd(r.d)
     if (dgcd == 1) {
@@ -51,13 +50,11 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
     }
   }
 
-
   def *(r: BigIntRational): BigIntRational = {
     val a = n.gcd(r.d)
     val b = d.gcd(r.n)
     new BigIntRational((n / a) * (r.n / b), (d / b) * (r.d / a))
   }
-
 
   def /(r: BigIntRational): BigIntRational = {
     val a = n.gcd(r.n)
@@ -74,9 +71,9 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
   def pow(exp: Int): BigIntRational = if (exp == 0) {
     BigIntRational.one
   } else if (exp < 0) {
-    new BigIntRational(d pow exp.abs, n pow exp.abs)
+    new BigIntRational(d.pow(exp.abs), n.pow(exp.abs))
   } else {
-    new BigIntRational(n pow exp, d pow exp)
+    new BigIntRational(n.pow(exp), d.pow(exp))
   }
 
   def compare(r: BigIntRational): Int = {

@@ -50,13 +50,13 @@ class SafeLongSuite extends munit.FunSuite {
     assertEquals((SafeLong.minusOne << 1), SafeLong(-1 << 1))
   }
   test("safeLongIsSigned") {
-    for(x <- Seq(SafeLong.one)) {
+    for (x <- Seq(SafeLong.one)) {
       assertEquals(Signed[SafeLong].signum(x), x.signum)
       assertEquals(Signed[SafeLong].abs(x), x.abs)
       assertEquals(IsIntegral[SafeLong].toDouble(x), x.toDouble)
       assertEquals(IsIntegral[SafeLong].toBigInt(x), x.toBigInt)
     }
-    for(a <- Seq(SafeLong.one, SafeLong.two); b <- Seq(SafeLong.one, SafeLong.two)) {
+    for (a <- Seq(SafeLong.one, SafeLong.two); b <- Seq(SafeLong.one, SafeLong.two)) {
       assertEquals(Order[SafeLong].compare(a, b), a.compare(b))
       assertEquals(EuclideanRing[SafeLong].equot(a, b), a / b)
       assertEquals(EuclideanRing[SafeLong].emod(a, b), a % b)

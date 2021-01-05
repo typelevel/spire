@@ -650,4 +650,4 @@ class RandomBenchmarks extends MyBenchmark with BenchmarkData {
     cfor(0)(_ < nextLen, _ + 1)(_ => rng.fillBytes(bytes))
   }
 }
-*/
+ */

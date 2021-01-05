@@ -9,7 +9,9 @@ trait ShadowTruncatedDivision[A, S] extends TruncatedDivision[Shadow[A, S]] with
   implicit def A: TruncatedDivision[A]
   implicit def S: TruncatedDivision[S]
 
-  /** Returns the integer `a` such that `x = a * one`, if it exists. */
+  /**
+   * Returns the integer `a` such that `x = a * one`, if it exists.
+   */
   def toBigIntOpt(x: Shadow[A, S]): Opt[BigInt] = A.toBigIntOpt(x.a)
 
   def tquot(x: Shadow[A, S], y: Shadow[A, S]): Shadow[A, S] =

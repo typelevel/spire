@@ -45,7 +45,9 @@ class RationalScalaCheckSuite extends munit.ScalaCheckSuite {
     }
 
   property("Internal GCD implementation is similar to the field of fractions implementation") {
-    forAll { (x: Rational, y: Rational) => x.gcd(y) == Rational(x.numerator gcd y.numerator, x.denominator lcm y.denominator) }
+    forAll { (x: Rational, y: Rational) =>
+      x.gcd(y) == Rational(x.numerator.gcd(y.numerator), x.denominator.lcm(y.denominator))
+    }
   }
 
   rat1("x + 0 == x") { x: Q => x + Rational(0) == x }
@@ -96,13 +98,16 @@ class RationalScalaCheckSuite extends munit.ScalaCheckSuite {
     r.limitToInt == r
   }
 
-  property("Rational.numeratorIsValidLong") { forAll { (x: Q) =>
-    x.numeratorIsValidLong == x.numerator.isValidLong
-  }}
-
-  property("Rational.denominatorIsValidLong") { forAll { (x: Q) =>
-    x.denominatorIsValidLong == x.denominator.isValidLong
+  property("Rational.numeratorIsValidLong") {
+    forAll { (x: Q) =>
+      x.numeratorIsValidLong == x.numerator.isValidLong
+    }
   }
+
+  property("Rational.denominatorIsValidLong") {
+    forAll { (x: Q) =>
+      x.denominatorIsValidLong == x.denominator.isValidLong
+    }
   }
 
   property("limitTo(n) forces numerator and denominator to be less than n") {

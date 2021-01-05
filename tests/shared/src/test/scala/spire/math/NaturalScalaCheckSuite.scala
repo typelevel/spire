@@ -55,7 +55,7 @@ class NaturalScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("x compare y") {
     forAll { (x: N, y: N) =>
-      (Natural(x.num) compare Natural(y.num)) == (x.num compare y.num)
+      (Natural(x.num).compare(Natural(y.num))) == (x.num.compare(y.num))
     }
   }
 

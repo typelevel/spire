@@ -22,14 +22,14 @@ import Arrays.init
 @State(Scope.Thread)
 class RatComparisonBenchmarks {
   @Param(Array("100"))
-  var size:Int = 0
+  var size: Int = 0
 
-  var spires:Array[Rational] = null
-  var aps:Array[Aprational] = null
-  var jscis:Array[number.Rational] = null
+  var spires: Array[Rational] = null
+  var aps: Array[Aprational] = null
+  var jscis: Array[number.Rational] = null
 
-  var nums:Array[Int] = null
-  var denoms:Array[Int] = null
+  var nums: Array[Int] = null
+  var denoms: Array[Int] = null
 
   @Setup
   def setup(): Unit = {
@@ -52,12 +52,12 @@ class RatComparisonBenchmarks {
     if (false) assert(verify())
   }
 
-  def spireToAp(r:Rational): Aprational = new Aprational(
+  def spireToAp(r: Rational): Aprational = new Aprational(
     new Apint(r.numerator.toBigInt.bigInteger),
     new Apint(r.denominator.toBigInt.bigInteger)
   )
 
-  def spireToJsci(r:Rational): number.Rational = number.Rational.valueOf(
+  def spireToJsci(r: Rational): number.Rational = number.Rational.valueOf(
     number.LargeInteger.valueOf(r.numerator.toBigInt.bigInteger),
     number.LargeInteger.valueOf(r.denominator.toBigInt.bigInteger)
   )

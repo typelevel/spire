@@ -4,8 +4,8 @@ package std
 import spire.algebra.{AbGroup, Order}
 
 trait UnitOrder extends Order[Unit] with Serializable {
-  override def eqv(x:Unit, y:Unit): Boolean = true
-  override def neqv(x:Unit, y:Unit): Boolean = false
+  override def eqv(x: Unit, y: Unit): Boolean = true
+  override def neqv(x: Unit, y: Unit): Boolean = false
   override def gt(x: Unit, y: Unit): Boolean = false
   override def lt(x: Unit, y: Unit): Boolean = false
   override def gteqv(x: Unit, y: Unit): Boolean = true

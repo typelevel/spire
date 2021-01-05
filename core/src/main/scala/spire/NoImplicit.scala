@@ -14,4 +14,3 @@ object NoImplicit {
   @nowarn
   implicit def noImplicit1[A](implicit ev: A): NoImplicit[A] = new NoImplicit[A]
 }
-

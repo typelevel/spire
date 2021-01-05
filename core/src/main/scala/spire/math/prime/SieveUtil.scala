@@ -15,7 +15,7 @@ object SieveUtil {
    * factor with the smallest 'next' field will be the largest.
    */
   case class Factor(p: SafeLong, var next: SafeLong) extends Ordered[Factor] {
-    def compare(that: Factor): Int = -(this.next compare that.next)
+    def compare(that: Factor): Int = -this.next.compare(that.next)
   }
 
   /**

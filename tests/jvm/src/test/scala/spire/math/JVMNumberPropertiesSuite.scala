@@ -14,4 +14,3 @@ class JVMNumberPropertiesSuite extends munit.ScalaCheckSuite {
   }
 
 }
-

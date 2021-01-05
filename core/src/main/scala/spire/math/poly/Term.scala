@@ -23,7 +23,7 @@ case class Term[@sp(Float, Double) C](coeff: C, exp: Int) { lhs =>
   def toTuple: (Int, C) = (exp, coeff)
 
   def eval(x: C)(implicit r: Semiring[C]): C =
-    if (exp != 0) coeff * (x pow exp) else coeff
+    if (exp != 0) coeff * (x.pow(exp)) else coeff
 
   def isIndexZero: Boolean =
     exp == 0
@@ -50,27 +50,27 @@ case class Term[@sp(Float, Double) C](coeff: C, exp: Int) { lhs =>
     }
 
     def simpleCoeff: Option[String] = coeff match {
-      case 0 => Some("")
-      case 1 if exp == 0 => Some(s" + $coeff")
-      case 1 => Some(s" + $expString")
+      case 0              => Some("")
+      case 1 if exp == 0  => Some(s" + $coeff")
+      case 1              => Some(s" + $expString")
       case -1 if exp != 0 => Some(s" - $expString")
-      case _ => None
+      case _              => None
     }
 
     def stringCoeff: Option[String] = coeff.toString match {
-      case IsZero() => Some("")
+      case IsZero()                        => Some("")
       case IsNegative(posPart) if exp == 0 => Some(s" - $posPart")
-      case IsNegative(posPart) => Some(s" - $posPart$expString")
-      case _ => None
+      case IsNegative(posPart)             => Some(s" - $posPart$expString")
+      case _                               => None
     }
 
-    simpleCoeff orElse stringCoeff getOrElse s" + $coeff$expString"
+    simpleCoeff.orElse(stringCoeff).getOrElse(s" + $coeff$expString")
   }
 }
 
 object Term {
   implicit def ordering[C]: Order[Term[C]] = new Order[Term[C]] {
-    def compare(x: Term[C], y: Term[C]): Int = x.exp compare y.exp
+    def compare(x: Term[C], y: Term[C]): Int = x.exp.compare(y.exp)
   }
 
   def fromTuple[@sp(Float, Double) C](tpl: (Int, C)): Term[C] =
@@ -103,12 +103,14 @@ object Term {
   // call Regex constructor directly to get rid of compiler warning
   // replace with "".r once SI-6723 is fixed
   private val superscriptRegex =
-    new scala.util.matching.Regex("[\\u2070\\u2071\\u2072\\u2073\\u2074\\u2075\\u2076\\u2077\\u2078\\u2079\\u207B\\u00B9\\u00B2\\u00B3]+")
+    new scala.util.matching.Regex(
+      "[\\u2070\\u2071\\u2072\\u2073\\u2074\\u2075\\u2076\\u2077\\u2078\\u2079\\u207B\\u00B9\\u00B2\\u00B3]+"
+    )
 
   private[spire] def removeSuperscript(text: String): String =
     superscriptRegex.replaceAllIn(text, "^" + _.group(0).map(removeSuperscript))
 
-  private val superscript : (Char => Char) = Map(digitToSuperscript.toIndexedSeq:_*)
+  private val superscript: (Char => Char) = Map(digitToSuperscript.toIndexedSeq: _*)
 
-  private val removeSuperscript : (Char => Char) = Map(digitToSuperscript.map(_.swap).toIndexedSeq: _*)
+  private val removeSuperscript: (Char => Char) = Map(digitToSuperscript.map(_.swap).toIndexedSeq: _*)
 }

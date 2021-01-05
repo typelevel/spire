@@ -184,14 +184,11 @@ trait BigDecimalIsReal extends IsRational[BigDecimal] with BigDecimalTruncatedDi
   def floor(a: BigDecimal): BigDecimal = a.setScale(0, FLOOR)
   def round(a: BigDecimal): BigDecimal = a.setScale(0, HALF_UP)
   def isWhole(a: BigDecimal): Boolean = a % 1.0 == 0.0
-  def toRational(a:BigDecimal): Rational = Rational(a)
+  def toRational(a: BigDecimal): Rational = Rational(a)
 }
 
 @SerialVersionUID(0L)
-class BigDecimalAlgebra extends BigDecimalIsField
-    with BigDecimalIsNRoot
-    with BigDecimalIsReal
-    with Serializable
+class BigDecimalAlgebra extends BigDecimalIsField with BigDecimalIsNRoot with BigDecimalIsReal with Serializable
 
 trait BigDecimalInstances {
   import BigDecimal.defaultMathContext

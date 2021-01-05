@@ -14,4 +14,3 @@ class IntervalSubsetPartialOrderSuite extends munit.FunSuite {
     assertEquals(intervals.pmax.toSet, Set(closed(1, 3)))
   }
 }
-

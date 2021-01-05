@@ -4,8 +4,11 @@ package math
 import spire.algebra.{EuclideanRing, IsReal}
 import spire.std._
 
-/** Integral number types, where `/` is truncated division. */
-trait Integral[@sp(Int,Long) A] extends Any
+/**
+ * Integral number types, where `/` is truncated division.
+ */
+trait Integral[@sp(Int, Long) A]
+    extends Any
     with EuclideanRing[A]
     with ConvertableFrom[A]
     with ConvertableTo[A]
@@ -37,8 +40,13 @@ class IntegralOps[A](lhs: A)(implicit ev: Integral[A]) {
 }
 
 @SerialVersionUID(0L)
-private[math] class ByteIsIntegral extends Integral[Byte] with ByteIsEuclideanRing
-  with ConvertableFromByte with ConvertableToByte with ByteIsReal with Serializable {
+private[math] class ByteIsIntegral
+    extends Integral[Byte]
+    with ByteIsEuclideanRing
+    with ConvertableFromByte
+    with ConvertableToByte
+    with ByteIsReal
+    with Serializable {
   override def fromInt(n: Int): Byte = n.toByte
   override def fromBigInt(n: BigInt): Byte = n.toByte
   override def toDouble(n: Byte): Double = n.toDouble
@@ -49,8 +57,13 @@ private[math] class ByteIsIntegral extends Integral[Byte] with ByteIsEuclideanRi
 }
 
 @SerialVersionUID(0L)
-private[math] class ShortIsIntegral extends Integral[Short] with ShortIsEuclideanRing
-  with ConvertableFromShort with ConvertableToShort with ShortIsReal with Serializable {
+private[math] class ShortIsIntegral
+    extends Integral[Short]
+    with ShortIsEuclideanRing
+    with ConvertableFromShort
+    with ConvertableToShort
+    with ShortIsReal
+    with Serializable {
   override def fromInt(n: Int): Short = n.toShort
   override def fromBigInt(n: BigInt): Short = n.toShort
   override def toDouble(n: Short): Double = n.toDouble
@@ -61,8 +74,13 @@ private[math] class ShortIsIntegral extends Integral[Short] with ShortIsEuclidea
 }
 
 @SerialVersionUID(0L)
-private[math] class IntIsIntegral extends Integral[Int] with IntIsEuclideanRing
-with ConvertableFromInt with ConvertableToInt with IntIsReal with Serializable {
+private[math] class IntIsIntegral
+    extends Integral[Int]
+    with IntIsEuclideanRing
+    with ConvertableFromInt
+    with ConvertableToInt
+    with IntIsReal
+    with Serializable {
   override def fromInt(n: Int): Int = n
   override def fromBigInt(n: BigInt): Int = n.toInt
   override def toDouble(n: Int): Double = n.toDouble
@@ -73,8 +91,13 @@ with ConvertableFromInt with ConvertableToInt with IntIsReal with Serializable {
 }
 
 @SerialVersionUID(0L)
-private[math] class LongIsIntegral extends Integral[Long] with LongIsEuclideanRing
-with ConvertableFromLong with ConvertableToLong with LongIsReal with Serializable {
+private[math] class LongIsIntegral
+    extends Integral[Long]
+    with LongIsEuclideanRing
+    with ConvertableFromLong
+    with ConvertableToLong
+    with LongIsReal
+    with Serializable {
   override def fromInt(n: Int): Long = n.toLong
   override def fromBigInt(n: BigInt): Long = n.toLong
   override def toDouble(n: Long): Double = n.toDouble
@@ -85,8 +108,13 @@ with ConvertableFromLong with ConvertableToLong with LongIsReal with Serializabl
 }
 
 @SerialVersionUID(0L)
-private[math] class BigIntIsIntegral extends Integral[BigInt] with BigIntIsEuclideanRing
-with ConvertableFromBigInt with ConvertableToBigInt with BigIntIsReal with Serializable {
+private[math] class BigIntIsIntegral
+    extends Integral[BigInt]
+    with BigIntIsEuclideanRing
+    with ConvertableFromBigInt
+    with ConvertableToBigInt
+    with BigIntIsReal
+    with Serializable {
   override def fromInt(n: Int): BigInt = BigInt(n)
   override def fromBigInt(n: BigInt): BigInt = n
   override def toDouble(n: BigInt): Double = n.toDouble
@@ -97,8 +125,13 @@ with ConvertableFromBigInt with ConvertableToBigInt with BigIntIsReal with Seria
 }
 
 @SerialVersionUID(0L)
-private[math] class SafeLongIsIntegral extends Integral[SafeLong] with SafeLongIsEuclideanRing
-with ConvertableFromSafeLong with ConvertableToSafeLong with SafeLongIsReal with Serializable {
+private[math] class SafeLongIsIntegral
+    extends Integral[SafeLong]
+    with SafeLongIsEuclideanRing
+    with ConvertableFromSafeLong
+    with ConvertableToSafeLong
+    with SafeLongIsReal
+    with Serializable {
   override def fromInt(n: Int): SafeLong = SafeLong(n)
   override def fromBigInt(n: BigInt): SafeLong = SafeLong(n)
   override def toDouble(n: SafeLong): Double = n.toDouble

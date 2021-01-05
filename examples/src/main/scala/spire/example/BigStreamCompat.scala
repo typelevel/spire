@@ -1,9 +1,9 @@
 package spire.example
 
-import scala.collection.{IterableOps, IterableFactory, IterableFactoryDefaults}
+import scala.collection.{IterableFactory, IterableFactoryDefaults, IterableOps}
 
-trait BigStreamCompat[A] extends IterableOps[A, BigStream, BigStream[A]]
-  with IterableFactoryDefaults[A, BigStream] { this: BigStream[A] =>
+trait BigStreamCompat[A] extends IterableOps[A, BigStream, BigStream[A]] with IterableFactoryDefaults[A, BigStream] {
+  this: BigStream[A] =>
   override def iterableFactory: IterableFactory[BigStream] = BigStream
 }
 

@@ -544,7 +544,6 @@ private[math] trait ConvertableFromNatural extends ConvertableFrom[Natural] {
   def toString(a: Natural): String = a.toString
 }
 
-
 object ConvertableFrom {
   @inline final def apply[A](implicit ev: ConvertableFrom[A]): ConvertableFrom[A] = ev
 

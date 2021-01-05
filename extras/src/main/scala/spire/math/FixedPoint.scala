@@ -14,7 +14,7 @@ class FixedPointOverflow(n: Long) extends Exception(n.toString)
 
 case class FixedScale(denom: Int) {
   if (denom < 1)
-    throw new IllegalArgumentException("illegal denominator: %s" format denom)
+    throw new IllegalArgumentException("illegal denominator: %s".format(denom))
 }
 
 /**
@@ -40,11 +40,11 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     if (long != Long.MinValue) new FixedPoint(-long)
     else throw new FixedPointOverflow(long)
 
-  def === (rhs: FixedPoint): Boolean = lhs.long == rhs.long
+  def ===(rhs: FixedPoint): Boolean = lhs.long == rhs.long
 
-  def =!= (rhs: FixedPoint): Boolean = !(this === rhs)
+  def =!=(rhs: FixedPoint): Boolean = !(this === rhs)
 
-  def != (rhs: FixedPoint): Boolean = lhs.long != rhs.long
+  def !=(rhs: FixedPoint): Boolean = lhs.long != rhs.long
 
   def abs: FixedPoint =
     if (long >= 0L) this
@@ -108,16 +108,17 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     val q = lhs.long / d
     val r = lhs.long % d
     val qq = rhs * q
-    val rr = try {
-      (rhs * r) / d
-    } catch {
-      case _: FixedPointOverflow =>
-        val n = (SafeLong(rhs.long) * r) / d
-        if (n.isValidLong)
-          new FixedPoint(n.toLong)
-        else
-          throw new FixedPointOverflow(n.toLong)
-    }
+    val rr =
+      try {
+        (rhs * r) / d
+      } catch {
+        case _: FixedPointOverflow =>
+          val n = (SafeLong(rhs.long) * r) / d
+          if (n.isValidLong)
+            new FixedPoint(n.toLong)
+          else
+            throw new FixedPointOverflow(n.toLong)
+      }
     qq + rr
   }
 
@@ -162,10 +163,10 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
       lhs
   }
 
-  def tquot(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint = (lhs - lhs tquot rhs) / rhs
+  def tquot(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint = ((lhs - lhs).tquot(rhs)) / rhs
 
   def tquotmod(rhs: FixedPoint)(implicit scale: FixedScale): (FixedPoint, FixedPoint) = {
-    val rem = lhs tmod rhs
+    val rem = lhs.tmod(rhs)
     ((lhs - rem) / rhs, rem)
   }
 
@@ -187,7 +188,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     if (long % d == 0L) {
       this
     } else if (long > 0) {
-      val m = (long % d)
+      val m = long % d
       if (m >= (d - m)) FixedPoint(long / d + 1L) else FixedPoint(long / d)
     } else {
       val m = -(long % d)
@@ -221,7 +222,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
 
   def pow(k: Int)(implicit scale: FixedScale): FixedPoint = {
     if (k < 0)
-      throw new IllegalArgumentException("exponent %s not allowed" format k)
+      throw new IllegalArgumentException("exponent %s not allowed".format(k))
     k match {
       case 0 =>
         new FixedPoint(scale.denom)
@@ -251,8 +252,8 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def fpow(k: FixedPoint)(implicit scale: FixedScale): FixedPoint = {
     val r = this.toRational
     val g = spire.math.gcd(k.long, scale.denom)
-    val n = (k.long / g)
-    val d = (scale.denom / g)
+    val n = k.long / g
+    val d = scale.denom / g
     if (n.isValidInt && d.isValidInt) {
       FixedPoint(Real(r ** n.toInt).nroot(d.toInt).toRational)
     } else {
@@ -303,7 +304,7 @@ trait FixedPointInstances {
       override def signum(x: FixedPoint): Int = x.signum
 
       override def eqv(x: FixedPoint, y: FixedPoint): Boolean = x == y
-      def compare(x: FixedPoint, y: FixedPoint): Int = x compare y
+      def compare(x: FixedPoint, y: FixedPoint): Int = x.compare(y)
 
       def zero: FixedPoint = FixedPoint.zero
       def one: FixedPoint = FixedPoint.one
@@ -313,9 +314,9 @@ trait FixedPointInstances {
       def times(x: FixedPoint, y: FixedPoint): FixedPoint = x * y
 
       def toBigIntOpt(x: FixedPoint) = if (x.isWhole) Opt(x.toRational.toBigInt) else Opt.empty[BigInt]
-      def tquot(x: FixedPoint, y: FixedPoint): FixedPoint = x tquot y
-      def tmod(x: FixedPoint, y: FixedPoint): FixedPoint = x tmod y
-      override def tquotmod(x: FixedPoint, y: FixedPoint): (FixedPoint, FixedPoint) = x tquotmod y
+      def tquot(x: FixedPoint, y: FixedPoint): FixedPoint = x.tquot(y)
+      def tmod(x: FixedPoint, y: FixedPoint): FixedPoint = x.tmod(y)
+      override def tquotmod(x: FixedPoint, y: FixedPoint): (FixedPoint, FixedPoint) = x.tquotmod(y)
 
       override def reciprocal(x: FixedPoint): FixedPoint = one / x
       def div(x: FixedPoint, y: FixedPoint): FixedPoint = x / y
@@ -362,7 +363,11 @@ trait FixedPointInstances {
     }
 
   import NumberTag._
-  implicit final val FixedPointTag = new CustomTag[FixedPoint](
-    Approximate, Some(FixedPoint.zero),
-    Some(FixedPoint.MinValue), Some(FixedPoint.MaxValue), true, true)
+  implicit final val FixedPointTag = new CustomTag[FixedPoint](Approximate,
+                                                               Some(FixedPoint.zero),
+                                                               Some(FixedPoint.MinValue),
+                                                               Some(FixedPoint.MaxValue),
+                                                               true,
+                                                               true
+  )
 }

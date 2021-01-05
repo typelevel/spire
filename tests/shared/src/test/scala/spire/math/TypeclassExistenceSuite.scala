@@ -23,7 +23,7 @@ class TypeclassExistenceSuite extends munit.FunSuite {
   }
 
   def hasEuclideanRing[A](implicit e: EuclideanRing[A] = null, m: ClassTag[A]): Unit = {
-    assert(e!= null, "Expected implicit EuclideanRing[%s] instance, but it was not found.".format(m))
+    assert(e != null, "Expected implicit EuclideanRing[%s] instance, but it was not found.".format(m))
   }
 
   def hasField[A](implicit f: Field[A] = null, m: ClassTag[A]): Unit = {
@@ -59,7 +59,7 @@ class TypeclassExistenceSuite extends munit.FunSuite {
   }
 
   test("Numeric is ConvertableTo") {
-    def check[A: Numeric : ClassTag]: Unit = {
+    def check[A: Numeric: ClassTag]: Unit = {
       hasConvertableTo[A]
     }
 
@@ -67,7 +67,7 @@ class TypeclassExistenceSuite extends munit.FunSuite {
   }
 
   test("Numeric is ConvertableFrom") {
-    def check[A: Numeric : ClassTag]: Unit = {
+    def check[A: Numeric: ClassTag]: Unit = {
       hasConvertableFrom[A]
     }
 
@@ -239,5 +239,3 @@ class TypeclassExistenceSuite extends munit.FunSuite {
     check[Rational]
   }
 }
-
-

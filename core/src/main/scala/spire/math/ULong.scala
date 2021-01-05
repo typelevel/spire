@@ -21,20 +21,20 @@ object ULong extends ULongInstances {
   @inline final val MinValue = ULong(0L)
   @inline final val MaxValue = ULong(-1L)
 
-  @tailrec final private[math] def pow(t:Long, b:Long, e:Long): ULong = {
+  @tailrec final private[math] def pow(t: Long, b: Long, e: Long): ULong = {
     if (e == 0L) new ULong(t)
     else if ((e & 1L) == 1L) pow(t * b, b * b, e >>> 1L)
     else pow(t, b * b, e >>> 1L)
   }
 
-  @tailrec final private[math] def gcd(a:ULong, b:ULong): ULong = {
+  @tailrec final private[math] def gcd(a: ULong, b: ULong): ULong = {
     if (b == new ULong(0L)) a else gcd(b, a % b)
   }
 
-  private[spire] final val LimitAsDouble: Double =
+  final private[spire] val LimitAsDouble: Double =
     spire.math.pow(2.0, 64)
 
-  private[spire] final val LimitAsBigInt: BigInt =
+  final private[spire] val LimitAsBigInt: BigInt =
     BigInt(1) << 64
 }
 
@@ -60,37 +60,37 @@ class ULong(val signed: Long) extends AnyVal {
     else BigInt(signed)
 
   // FIXME: it would be nice to avoid converting to BigInt here
-  override final def toString: String =
+  final override def toString: String =
     if (signed >= 0L) signed.toString
     else (ULong.LimitAsBigInt + signed).toString
 
   // TODO: replace these with `===` and `=!=`? Don't we get `==` and `!=` for free with value classes?
-  final def == (that: ULong): Boolean = this.signed == that.signed
-  final def != (that: ULong): Boolean = this.signed != that.signed
+  final def ==(that: ULong): Boolean = this.signed == that.signed
+  final def !=(that: ULong): Boolean = this.signed != that.signed
 
-  final def === (that: ULong): Boolean = this.signed == that.signed
-  final def =!= (that: ULong): Boolean = this.signed != that.signed
+  final def ===(that: ULong): Boolean = this.signed == that.signed
+  final def =!=(that: ULong): Boolean = this.signed != that.signed
 
-  final def <= (that: ULong): Boolean = if (this.signed >= 0L)
+  final def <=(that: ULong): Boolean = if (this.signed >= 0L)
     this.signed <= that.signed || that.signed < 0L
   else
     that.signed >= this.signed && that.signed < 0L
 
-  final def < (that: ULong): Boolean = if (this.signed >= 0L)
+  final def <(that: ULong): Boolean = if (this.signed >= 0L)
     this.signed < that.signed || that.signed < 0L
   else
     that.signed > this.signed && that.signed < 0L
 
-  @inline final def >= (that: ULong): Boolean = that <= this
-  @inline final def > (that: ULong): Boolean = that < this
+  @inline final def >=(that: ULong): Boolean = that <= this
+  @inline final def >(that: ULong): Boolean = that < this
 
   final def unary_- : ULong = ULong(-this.signed)
 
-  final def + (that: ULong): ULong = ULong(this.signed + that.signed)
-  final def - (that: ULong): ULong = ULong(this.signed - that.signed)
-  final def * (that: ULong): ULong = ULong(this.signed * that.signed)
+  final def +(that: ULong): ULong = ULong(this.signed + that.signed)
+  final def -(that: ULong): ULong = ULong(this.signed - that.signed)
+  final def *(that: ULong): ULong = ULong(this.signed * that.signed)
 
-  final def / (that: ULong): ULong = {
+  final def /(that: ULong): ULong = {
     val n: Long = this.signed
     val d: Long = that.signed
 
@@ -110,25 +110,25 @@ class ULong(val signed: Long) extends AnyVal {
     }
   }
 
-  final def % (that: ULong): ULong = this - (this / that) * that
+  final def %(that: ULong): ULong = this - (this / that) * that
 
-  final def /% (that: ULong): (ULong, ULong) = {
+  final def /%(that: ULong): (ULong, ULong) = {
     val q = this / that
     (q, this - q * that)
   }
 
   final def unary_~ : ULong = ULong(~this.signed)
 
-  final def << (shift: Int): ULong = ULong(signed << shift)
-  final def >> (shift: Int): ULong = ULong(signed >>> shift)
-  final def >>> (shift: Int): ULong = ULong(signed >>> shift)
-  final def & (that: ULong): ULong = ULong(this.signed & that.signed)
-  final def | (that: ULong): ULong = ULong(this.signed | that.signed)
-  final def ^ (that: ULong): ULong = ULong(this.signed ^ that.signed)
+  final def <<(shift: Int): ULong = ULong(signed << shift)
+  final def >>(shift: Int): ULong = ULong(signed >>> shift)
+  final def >>>(shift: Int): ULong = ULong(signed >>> shift)
+  final def &(that: ULong): ULong = ULong(this.signed & that.signed)
+  final def |(that: ULong): ULong = ULong(this.signed | that.signed)
+  final def ^(that: ULong): ULong = ULong(this.signed ^ that.signed)
 
-  final def ** (that: ULong): ULong = ULong.pow(1L, this.signed, that.signed)
+  final def **(that: ULong): ULong = ULong.pow(1L, this.signed, that.signed)
 
-  final def gcd (that: ULong): ULong = ULong.gcd(this, that)
+  final def gcd(that: ULong): ULong = ULong.gcd(this, that)
 }
 
 trait ULongInstances {
@@ -140,19 +140,19 @@ trait ULongInstances {
 
 private[math] trait ULongIsCRig extends CRig[ULong] {
   def one: ULong = ULong(1)
-  def plus(a:ULong, b:ULong): ULong = a + b
-  override def pow(a:ULong, b:Int): ULong = {
+  def plus(a: ULong, b: ULong): ULong = a + b
+  override def pow(a: ULong, b: Int): ULong = {
     if (b < 0)
-      throw new IllegalArgumentException("negative exponent: %s" format b)
+      throw new IllegalArgumentException("negative exponent: %s".format(b))
     a ** ULong(b)
   }
-  override def times(a:ULong, b:ULong): ULong = a * b
+  override def times(a: ULong, b: ULong): ULong = a * b
   def zero: ULong = ULong(0)
 }
 
 private[math] trait ULongSigned extends SignedAdditiveCMonoid[ULong] {
-  override def eqv(x:ULong, y:ULong): Boolean = x == y
-  override def neqv(x:ULong, y:ULong): Boolean = x != y
+  override def eqv(x: ULong, y: ULong): Boolean = x == y
+  override def neqv(x: ULong, y: ULong): Boolean = x != y
   override def gt(x: ULong, y: ULong): Boolean = x > y
   override def gteqv(x: ULong, y: ULong): Boolean = x >= y
   override def lt(x: ULong, y: ULong): Boolean = x < y
@@ -162,11 +162,11 @@ private[math] trait ULongSigned extends SignedAdditiveCMonoid[ULong] {
 }
 
 private[math] trait ULongTruncatedDivision extends TruncatedDivision[ULong] with ULongSigned {
-   def toBigIntOpt(x: ULong): Opt[BigInt] = Opt(x.toBigInt)
-   def tquot(x: ULong, y: ULong): ULong = x / y
-   def tmod(x: ULong, y: ULong): ULong = x % y
-   def fquot(x: ULong, y: ULong): ULong = x/ y
-   def fmod(x: ULong, y: ULong): ULong = x % y
+  def toBigIntOpt(x: ULong): Opt[BigInt] = Opt(x.toBigInt)
+  def tquot(x: ULong, y: ULong): ULong = x / y
+  def tmod(x: ULong, y: ULong): ULong = x % y
+  def fquot(x: ULong, y: ULong): ULong = x / y
+  def fmod(x: ULong, y: ULong): ULong = x % y
 }
 
 @SerialVersionUID(0L)

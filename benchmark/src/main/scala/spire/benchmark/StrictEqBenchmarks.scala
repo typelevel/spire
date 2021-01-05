@@ -18,7 +18,7 @@ class LongEqualityCheckBenchmark {
 
   @Benchmark
   def compare(x: Blackhole): Unit = {
-    x.consume(a compare b)
+    x.consume(a.compare(b))
   }
 
   @Benchmark

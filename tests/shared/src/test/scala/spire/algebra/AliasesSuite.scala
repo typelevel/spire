@@ -7,7 +7,7 @@ class AliasesSuite extends munit.FunSuite {
 
   object Cats {
     implicit object equ extends cats.kernel.Eq[Cats] {
-      def eqv(x: Cats, y: Cats) = (x.i == y.i)
+      def eqv(x: Cats, y: Cats) = x.i == y.i
     }
   }
 
@@ -15,7 +15,7 @@ class AliasesSuite extends munit.FunSuite {
 
   object Algebra {
     implicit object equ extends _root_.algebra.Eq[Algebra] {
-      def eqv(x: Algebra, y: Algebra) = (x.i == y.i)
+      def eqv(x: Algebra, y: Algebra) = x.i == y.i
     }
   }
 
@@ -23,7 +23,7 @@ class AliasesSuite extends munit.FunSuite {
 
   object Spire {
     implicit object equ extends spire.algebra.Eq[Spire] {
-      def eqv(x: Spire, y: Spire) = (x.i == y.i)
+      def eqv(x: Spire, y: Spire) = x.i == y.i
     }
   }
 

@@ -43,7 +43,6 @@ class Opt[+A](val ref: A) extends AnyVal {
   def fold[B](b: => B)(f: A => B): B =
     if (ref == null) b else f(ref)
 
-
   def getOrElse[B >: A](default: => B): B = if (ref == null) default else ref
 
   def getOrElseFast[B >: A](default: B): B = if (ref == null) default else ref

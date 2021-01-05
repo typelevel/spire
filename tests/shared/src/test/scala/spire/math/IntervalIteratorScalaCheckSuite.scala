@@ -24,10 +24,10 @@ class IntervalIteratorScalaCheckSuite extends munit.ScalaCheckSuite {
         ns.size == (num - 1 + extra)
       }
 
-      val cc = Interval.closed(x, y)     // [x, y]
-      val oo = Interval.open(x, y)       // (x, y)
-      val oc = Interval.openLower(x, y)  // (x, y]
-      val co = Interval.openUpper(x, y)  // [x, y)
+      val cc = Interval.closed(x, y) // [x, y]
+      val oo = Interval.open(x, y) // (x, y)
+      val oc = Interval.openLower(x, y) // (x, y]
+      val co = Interval.openUpper(x, y) // [x, y)
 
       val step = (y - x) / num
 
@@ -39,7 +39,7 @@ class IntervalIteratorScalaCheckSuite extends munit.ScalaCheckSuite {
         val triples = List((cc, true, true), (oo, false, false), (oc, false, true), (co, true, false))
         triples.forall { case (interval, hasLower, hasUpper) =>
           testEndpoints(interval, step, hasLower, hasUpper) &&
-          testEndpoints(interval, -step, hasLower, hasUpper)
+            testEndpoints(interval, -step, hasLower, hasUpper)
         }
       }
     }
@@ -51,9 +51,9 @@ class IntervalIteratorScalaCheckSuite extends munit.ScalaCheckSuite {
       val step0 = s.abs
 
       val cu = Interval.atOrAbove(n) // [n, ∞)
-      val ou = Interval.above(n)     // (n, ∞)
+      val ou = Interval.above(n) // (n, ∞)
       val uc = Interval.atOrBelow(n) // (-∞, n]
-      val uo = Interval.below(n)     // (-∞, n)
+      val uo = Interval.below(n) // (-∞, n)
 
       if (step0.isZero) {
         List(cu, ou, uc, uo).forall { xs =>
@@ -78,5 +78,3 @@ class IntervalIteratorScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 }
-
-

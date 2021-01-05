@@ -9,15 +9,16 @@ import InvalidTestException._
 import org.typelevel.discipline.Laws
 
 object CombinationLaws {
-  def apply[A : Eq : Arbitrary] = new CombinationLaws[A] {
+  def apply[A: Eq: Arbitrary] = new CombinationLaws[A] {
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
   }
 }
 
-/** Contains laws that are obeying by combination of types, for example
-  * various kinds of signed rings.
-  */
+/**
+ * Contains laws that are obeying by combination of types, for example
+ * various kinds of signed rings.
+ */
 trait CombinationLaws[A] extends Laws {
 
   implicit def Equ: Eq[A]

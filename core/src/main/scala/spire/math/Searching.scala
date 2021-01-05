@@ -4,14 +4,17 @@ package math
 import spire.algebra.{Order, PartialOrder}
 import spire.syntax.order._
 
-
 object Searching {
 
-  /** Performs a binary search, returns an index using the same convention as java.util.Arrays.binarySearch. */
+  /**
+   * Performs a binary search, returns an index using the same convention as java.util.Arrays.binarySearch.
+   */
   final def search[@sp A: Order](as: Array[A], item: A): Int =
     search(as, item, 0, as.length - 1)
 
-  /** Performs a binary search, returns an index using the same convention as java.util.Arrays.binarySearch. */
+  /**
+   * Performs a binary search, returns an index using the same convention as java.util.Arrays.binarySearch.
+   */
   final def search[@sp A: Order](as: Array[A], item: A, lower: Int, upper: Int): Int = {
     var first = lower
     var last = upper
@@ -26,11 +29,15 @@ object Searching {
     -first - 1
   }
 
-  /** Performs a binary search, returns an index using the same convention as java.util.Arrays.binarySearch. */
+  /**
+   * Performs a binary search, returns an index using the same convention as java.util.Arrays.binarySearch.
+   */
   final def search[@sp A: Order](as: IndexedSeq[A], item: A): Int =
     search(as, item, 0, as.length - 1)
 
-  /** Performs a binary search, returns an index using the same convention as java.util.Arrays.binarySearch. */
+  /**
+   * Performs a binary search, returns an index using the same convention as java.util.Arrays.binarySearch.
+   */
   final def search[@sp A: Order](as: IndexedSeq[A], item: A, lower: Int, upper: Int): Int = {
     var first = lower
     var last = upper
@@ -45,16 +52,17 @@ object Searching {
     -first - 1
   }
 
-  /** Computes the minimal elements of a partially ordered set.
-    * If the poset contains multiple copies of a minimal element, the function
-    * will only return a single copy of it.
-    *
-    * Works by constructing the set of minimal elements for the first k elements
-    * of the poset, for k = 1 .. length.
-    *
-    * With n is the size of the poset and w <= n its width, the algorithm requires
-    * O(w) space and O(w*n) time.
-    */
+  /**
+   * Computes the minimal elements of a partially ordered set.
+   * If the poset contains multiple copies of a minimal element, the function
+   * will only return a single copy of it.
+   *
+   * Works by constructing the set of minimal elements for the first k elements
+   * of the poset, for k = 1 .. length.
+   *
+   * With n is the size of the poset and w <= n its width, the algorithm requires
+   * O(w) space and O(w*n) time.
+   */
   final def minimalElements[A](as: Iterable[A])(implicit ev: PartialOrder[A]): Seq[A] = {
     import scala.collection.mutable.ArrayBuffer
     // the minimal elements for the first elements of as

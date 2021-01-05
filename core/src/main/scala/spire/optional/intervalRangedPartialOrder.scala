@@ -8,7 +8,8 @@ import spire.syntax.order._
 
 object intervalValuePartialOrder {
 
-  /** Interval partial order defined as follows:
+  /**
+   * Interval partial order defined as follows:
    *
    * I <= J if I is a subset of J.
    */
@@ -16,7 +17,7 @@ object intervalValuePartialOrder {
     override def eqv(x: Interval[A], y: Interval[A]): Boolean =
       (x, y) match {
         case (Point(p1), Point(p2)) => p1 === p2
-        case _ => false
+        case _                      => false
       }
 
     override def lteqv(x: Interval[A], y: Interval[A]): Boolean =
@@ -24,7 +25,7 @@ object intervalValuePartialOrder {
         case v1: ValueBound[A] =>
           y.lowerBound match {
             case v2: ValueBound[A] => v1.a <= v2.a
-            case _ => false
+            case _                 => false
           }
         case _ =>
           false
@@ -35,13 +36,13 @@ object intervalValuePartialOrder {
         case Open(a1) =>
           y.lowerBound match {
             case v2: ValueBound[A] => a1 <= v2.a
-            case _ => false
+            case _                 => false
           }
         case Closed(a1) =>
           y.lowerBound match {
             case Closed(a2) => a1 < a2
-            case Open(a2) => a1 <= a2
-            case _ => false
+            case Open(a2)   => a1 <= a2
+            case _          => false
           }
         case _ => false
       }

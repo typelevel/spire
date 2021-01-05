@@ -6,17 +6,17 @@ import spire.math.BitString
 import spire.util.Opt
 
 trait ShortIsEuclideanRing extends EuclideanRing[Short] {
-  override def minus(a:Short, b:Short): Short = (a - b).toShort
-  def negate(a:Short): Short = (-a).toShort
+  override def minus(a: Short, b: Short): Short = (a - b).toShort
+  def negate(a: Short): Short = (-a).toShort
   def one: Short = 1.toShort
-  def plus(a:Short, b:Short): Short = (a + b).toShort
+  def plus(a: Short, b: Short): Short = (a + b).toShort
   // override def pow(a: Short, b:Int): Short = Math.pow(a, b).toShort TODO: does not obey laws
-  override def times(a:Short, b:Short): Short = (a * b).toShort
+  override def times(a: Short, b: Short): Short = (a * b).toShort
   def zero: Short = 0.toShort
 
   override def fromInt(n: Int): Short = n.toShort
 
-  def euclideanFunction(a:Short): BigInt = BigInt(a).abs
+  def euclideanFunction(a: Short): BigInt = BigInt(a).abs
   override def equotmod(a: Short, b: Short): (Short, Short) = spire.math.equotmod(a, b)
   def equot(a: Short, b: Short): Short = spire.math.equot(a, b)
   def emod(a: Short, b: Short): Short = spire.math.emod(a, b)
@@ -48,8 +48,8 @@ trait ShortIsNRoot extends NRoot[Short] {
 }
 
 trait ShortOrder extends Order[Short] {
-  override def eqv(x:Short, y:Short): Boolean = x == y
-  override def neqv(x:Short, y:Short): Boolean = x != y
+  override def eqv(x: Short, y: Short): Boolean = x == y
+  override def neqv(x: Short, y: Short): Boolean = x != y
   override def gt(x: Short, y: Short): Boolean = x > y
   override def gteqv(x: Short, y: Short): Boolean = x >= y
   override def lt(x: Short, y: Short): Boolean = x < y
@@ -75,8 +75,8 @@ trait ShortIsReal extends IsIntegral[Short] with ShortTruncatedDivision {
 
 @SerialVersionUID(0L)
 class ShortIsBitString extends BitString[Short] with Serializable {
-  def one: Short = (-1: Short)
-  def zero: Short = (0: Short)
+  def one: Short = -1: Short
+  def zero: Short = 0: Short
   def and(a: Short, b: Short): Short = (a & b).toShort
   def or(a: Short, b: Short): Short = (a | b).toShort
   def complement(a: Short): Short = (~a).toShort

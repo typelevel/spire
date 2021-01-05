@@ -24,7 +24,9 @@ object Pack {
     arr
   }
 
-  /** index must be 0 <= index < 4 */
+  /**
+   * index must be 0 <= index < 4
+   */
   def intToByte(n: Int)(index: Int): Byte = macro intToByteMacro
 
   def intsToBytes(ints: Array[Int]): Array[Byte] = {
@@ -88,7 +90,9 @@ object Pack {
     arr
   }
 
-  /** index must be 0 <= index < 8 */
+  /**
+   * index must be 0 <= index < 8
+   */
   def longToByte(n: Long)(index: Int): Byte = macro longToByteMacro
 
   def longsToBytes(longs: Array[Long]): Array[Byte] = {

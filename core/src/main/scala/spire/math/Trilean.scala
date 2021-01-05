@@ -42,7 +42,7 @@ import algebra.lattice.DeMorgan
  * only have the overhead of a single Int. However, in some situations
  * it will be boxed.
  */
-class Trilean (val value: Int) extends AnyVal { lhs =>
+class Trilean(val value: Int) extends AnyVal { lhs =>
   def isTrue: Boolean = value == -1
   def isFalse: Boolean = value == 0
   def isUnknown: Boolean = value == 1

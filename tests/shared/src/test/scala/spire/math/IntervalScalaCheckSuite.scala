@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.math.ArbitrarySupport.{Positive, NonNegative}
+import spire.math.ArbitrarySupport.{NonNegative, Positive}
 
 import spire.implicits.{eqOps => _, _}
 import spire.laws.arb.{interval => interval_, rational}
@@ -11,22 +11,22 @@ import org.scalacheck.Prop._
 class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("x ⊆ x") {
-    forAll { (x: Interval[Rational]) => (x isSupersetOf x) }
+    forAll { (x: Interval[Rational]) => x.isSupersetOf(x) }
   }
 
   property("x ⊆ (x | y) && y ⊆ (x | y)") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
       val z = x | y
-      (z isSupersetOf x) &&
-      (z isSupersetOf y)
+      (z.isSupersetOf(x)) &&
+      (z.isSupersetOf(y))
     }
   }
 
   property("(x & y) ⊆ x && (x & y) ⊆ y") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
       val z = x & y
-      (x isSupersetOf z) &&
-      (y isSupersetOf z)
+      (x.isSupersetOf(z)) &&
+      (y.isSupersetOf(z))
     }
   }
 
@@ -35,8 +35,8 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
   property("(x -- y) ⊆ x && (x -- y) & y = Ø") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
       (x -- y).foreach { zi =>
-        (zi isSubsetOf x) &&
-        (zi intersects y)
+        (zi.isSubsetOf(x)) &&
+        (zi.intersects(y))
       }
     }
   }
@@ -63,24 +63,30 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
 
   def sample(int: Interval[Rational], n: Int): Array[Rational] =
     if (int.isEmpty) {
-       Array.empty[Rational]
+      Array.empty[Rational]
     } else {
       import spire.math.interval.ValueBound
       val underlyingf: () => Rational = (int.lowerBound, int.upperBound) match {
-        case (ValueBound(x) , ValueBound(y)) => () => rng.nextInt(10) match {
-          case 0 => x
-          case 9 => y
-          case _ => x + Rational(rng.nextDouble()) * (y - x)
-        }
-        case (ValueBound(x) , _) => () => rng.nextInt(5) match {
-          case 0 => x
-          case _ => x + (Rational(rng.nextGaussian()).abs * Long.MaxValue)
-        }
-        case (_, ValueBound(y)) => () => rng.nextInt(5) match {
-          case 4 => y
-          case _ => y - (Rational(rng.nextGaussian()).abs * Long.MaxValue)
-        }
-        case (_ , _) => () => Rational(rng.nextGaussian()) * Long.MaxValue
+        case (ValueBound(x), ValueBound(y)) =>
+          () =>
+            rng.nextInt(10) match {
+              case 0 => x
+              case 9 => y
+              case _ => x + Rational(rng.nextDouble()) * (y - x)
+            }
+        case (ValueBound(x), _) =>
+          () =>
+            rng.nextInt(5) match {
+              case 0 => x
+              case _ => x + (Rational(rng.nextGaussian()).abs * Long.MaxValue)
+            }
+        case (_, ValueBound(y)) =>
+          () =>
+            rng.nextInt(5) match {
+              case 4 => y
+              case _ => y - (Rational(rng.nextGaussian()).abs * Long.MaxValue)
+            }
+        case (_, _) => () => Rational(rng.nextGaussian()) * Long.MaxValue
       }
 
       def nextf(): Rational = {
@@ -104,7 +110,9 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-  def testBinop(f: (Interval[Rational], Interval[Rational]) => Interval[Rational])(g: (Rational, Rational) => Rational): Unit = {
+  def testBinop(
+    f: (Interval[Rational], Interval[Rational]) => Interval[Rational]
+  )(g: (Rational, Rational) => Rational): Unit = {
     forAll { (a: Interval[Rational], b: Interval[Rational]) =>
       val c: Interval[Rational] = f(a, b)
       sample(a, tries).zip(sample(b, tries)).foreach { case (x, y) =>
@@ -141,14 +149,14 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
     forAll { (x: Rational, y: Rational) =>
       val a = Interval.point(x)
       val b = Interval.point(y)
-      val order = (PartialOrder[Interval[Rational]].tryCompare(a, b).get == Order[Rational].compare(x, y))
+      val order = PartialOrder[Interval[Rational]].tryCompare(a, b).get == Order[Rational].compare(x, y)
       val min = a.pmin(b) match {
         case Some(Point(vmin)) => vmin == x.min(y)
-        case _ => false
+        case _                 => false
       }
       val max = a.pmax(b) match {
         case Some(Point(vmax)) => vmax == x.max(y)
-        case _ => false
+        case _                 => false
       }
       order && min && max
     }
@@ -215,4 +223,3 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 }
-

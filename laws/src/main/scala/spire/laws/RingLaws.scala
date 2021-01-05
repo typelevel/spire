@@ -13,11 +13,11 @@ import org.scalacheck.Prop._
 import InvalidTestException._
 
 object RingLaws {
-  def apply[A : Eq : Arbitrary](implicit _pred: Predicate[A]) = new RingLaws[A] {
+  def apply[A: Eq: Arbitrary](implicit _pred: Predicate[A]) = new RingLaws[A] {
     def Arb = implicitly[Arbitrary[A]]
     def pred = _pred
     val nonZeroLaws = new GroupLaws[A] {
-      def Arb = Arbitrary(arbitrary[A] filter _pred)
+      def Arb = Arbitrary(arbitrary[A].filter(_pred))
       def Equ = Eq[A]
     }
   }
@@ -38,18 +38,13 @@ trait RingLaws[A] extends GroupLaws[A] {
   implicit def Arb: Arbitrary[A]
   implicit def Equ: Eq[A] = nonZeroLaws.Equ
 
-
   // multiplicative groups
 
   def multiplicativeSemigroup(implicit A: MultiplicativeSemigroup[A]) = new MultiplicativeProperties(
     base = _.semigroup(A.multiplicative),
     parent = None,
-    "pow(a, 1) === a" -> forAllSafe((a: A) =>
-      A.pow(a, 1) === a
-    ),
-    "pow(a, 2) === a * a" -> forAllSafe((a: A) =>
-      A.pow(a, 2) === (a * a)
-    ),
+    "pow(a, 1) === a" -> forAllSafe((a: A) => A.pow(a, 1) === a),
+    "pow(a, 2) === a * a" -> forAllSafe((a: A) => A.pow(a, 2) === (a * a)),
     "tryProduct" -> forAllSafe((a: A) =>
       (A.tryProduct(Seq.empty[A]) === Option.empty[A]) &&
         (A.tryProduct(Seq(a)) === Option(a)) &&
@@ -61,12 +56,8 @@ trait RingLaws[A] extends GroupLaws[A] {
   def multiplicativeMonoid(implicit A: MultiplicativeMonoid[A]) = new MultiplicativeProperties(
     base = _.monoid(A.multiplicative),
     parent = Some(multiplicativeSemigroup),
-    "pow(a, 0) === one" -> forAllSafe((a: A) =>
-      A.pow(a, 0) === A.one
-    ),
-    "product(Nil) === one" -> forAllSafe((a: A) =>
-      A.product(Nil) === A.one
-    )
+    "pow(a, 0) === one" -> forAllSafe((a: A) => A.pow(a, 0) === A.one),
+    "product(Nil) === one" -> forAllSafe((a: A) => A.product(Nil) === A.one)
   )
 
   def multiplicativeCMonoid(implicit A: MultiplicativeCMonoid[A]) = new MultiplicativeProperties(
@@ -77,16 +68,13 @@ trait RingLaws[A] extends GroupLaws[A] {
   def multiplicativeGroup(implicit A: MultiplicativeGroup[A]) = new MultiplicativeProperties(
     base = _.group(A.multiplicative),
     parent = Some(multiplicativeMonoid),
-    "reciprocal consistent" -> forAllSafe((x: A) =>
-      !pred(x) || ((A.one / x) === x.reciprocal)
-    )
+    "reciprocal consistent" -> forAllSafe((x: A) => !pred(x) || ((A.one / x) === x.reciprocal))
   )
 
   def multiplicativeAbGroup(implicit A: MultiplicativeAbGroup[A]) = new MultiplicativeProperties(
     base = _.abGroup(A.multiplicative),
     parent = Some(multiplicativeGroup)
   )
-
 
   // rings
 
@@ -98,9 +86,7 @@ trait RingLaws[A] extends GroupLaws[A] {
     "distributive" -> forAllSafe((x: A, y: A, z: A) =>
       (x * (y + z) === (x * y + x * z)) && (((x + y) * z) === (x * z + y * z))
     ),
-    "pow" -> forAllSafe((x: A) =>
-      ((x pow 1) === x) && ((x pow 2) === x * x) && ((x pow 3) === x * x * x)
-    )
+    "pow" -> forAllSafe((x: A) => ((x.pow(1)) === x) && ((x.pow(2)) === x * x) && ((x.pow(3)) === x * x * x))
   )
 
   def rng(implicit A: Rng[A]) = new RingProperties(
@@ -116,7 +102,6 @@ trait RingLaws[A] extends GroupLaws[A] {
     ml = multiplicativeMonoid,
     parents = Seq(semiring)
   )
-
 
   def cRig(implicit A: CRig[A]) = new RingProperties(
     name = "commutative rig",
@@ -154,21 +139,21 @@ trait RingLaws[A] extends GroupLaws[A] {
     parent = cRing,
     "gcd/lcm" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.gcdRing._
-      val d = x gcd y
-      val m = x lcm y
+      val d = x.gcd(y)
+      val m = x.lcm(y)
       x * y === d * m
     },
     "gcd is commutative" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.gcdRing._
-        (x gcd y) === (y gcd x)
+      (x.gcd(y)) === (y.gcd(x))
     },
     "lcm is commutative" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.gcdRing._
-      (x lcm y) === (y lcm x)
+      (x.lcm(y)) === (y.lcm(x))
     },
-    "gcd(0, 0)" -> ((A.zero gcd A.zero) === A.zero),
-    "lcm(0, 0) === 0" -> ((A.zero lcm A.zero) === A.zero),
-    "lcm(x, 0) === 0" -> forAllSafe { (x: A) => (x lcm A.zero) === A.zero }
+    "gcd(0, 0)" -> ((A.zero.gcd(A.zero)) === A.zero),
+    "lcm(0, 0) === 0" -> ((A.zero.lcm(A.zero)) === A.zero),
+    "lcm(x, 0) === 0" -> forAllSafe { (x: A) => (x.lcm(A.zero)) === A.zero }
   )
 
   def euclideanRing(implicit A: EuclideanRing[A]) = RingProperties.fromParent(
@@ -177,26 +162,26 @@ trait RingLaws[A] extends GroupLaws[A] {
     "euclidean division rule" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       !pred(y) || {
-        val (q, r) = x equotmod y
+        val (q, r) = x.equotmod(y)
         x === (y * q + r)
       }
     },
     "equot" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       !pred(y) || {
-        (x equotmod y)._1 === (x equot y)
+        x.equotmod(y)._1 === (x.equot(y))
       }
     },
     "emod" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       !pred(y) || {
-        (x equotmod y)._2 === (x emod y)
+        x.equotmod(y)._2 === (x.emod(y))
       }
     },
     "euclidean function" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       !pred(y) || {
-        val (q, r) = x equotmod y
+        val (q, r) = x.equotmod(y)
         r.isZero || (r.euclideanFunction < y.euclideanFunction)
       }
     },
@@ -214,7 +199,7 @@ trait RingLaws[A] extends GroupLaws[A] {
     "remainder is nonnegative" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       import spire.syntax.signed._
-      !pred(y) || (x emod y).isSignNonNegative
+      !pred(y) || x.emod(y).isSignNonNegative
     }
   )
 
@@ -237,14 +222,14 @@ trait RingLaws[A] extends GroupLaws[A] {
     override def nonZero = true
   }
 
-
   // property classes
 
   class MultiplicativeProperties(
     val base: GroupLaws[A] => GroupLaws[A]#GroupProperties,
     val parent: Option[MultiplicativeProperties],
     val props: (String, Prop)*
-  ) extends RuleSet with HasOneParent {
+  ) extends RuleSet
+      with HasOneParent {
     private val _base = base(RingLaws.this)
 
     val name = _base.name

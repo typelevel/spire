@@ -7,20 +7,19 @@ import spire.util.Opt
 
 import java.lang.Math
 
-
 trait DoubleIsField extends Field.WithDefaultGCD[Double] {
-  override def minus(a:Double, b:Double): Double = a - b
-  def negate(a:Double): Double = -a
+  override def minus(a: Double, b: Double): Double = a - b
+  def negate(a: Double): Double = -a
   def one: Double = 1.0
-  def plus(a:Double, b:Double): Double = a + b
-  override def pow(a:Double, b:Int): Double = Math.pow(a, b)
-  override def times(a:Double, b:Double): Double = a * b
+  def plus(a: Double, b: Double): Double = a + b
+  override def pow(a: Double, b: Int): Double = Math.pow(a, b)
+  override def times(a: Double, b: Double): Double = a * b
   def zero: Double = 0.0
 
   override def fromInt(n: Int): Double = n
 
   override def fromDouble(n: Double): Double = n
-  def div(a:Double, b:Double): Double = a / b
+  def div(a: Double, b: Double): Double = a / b
 }
 
 /* TODO: move to TruncatedDivision or remove
@@ -101,8 +100,8 @@ trait DoubleIsTrig extends Trig[Double] {
 }
 
 trait DoubleOrder extends Order[Double] {
-  override def eqv(x:Double, y:Double): Boolean = x == y
-  override def neqv(x:Double, y:Double): Boolean = x != y
+  override def eqv(x: Double, y: Double): Boolean = x == y
+  override def neqv(x: Double, y: Double): Boolean = x != y
   override def gt(x: Double, y: Double): Boolean = x > y
   override def gteqv(x: Double, y: Double): Boolean = x >= y
   override def lt(x: Double, y: Double): Boolean = x < y
@@ -125,11 +124,11 @@ trait DoubleTruncatedDivision extends TruncatedDivisionCRing[Double] with Double
 
 trait DoubleIsReal extends IsRational[Double] with DoubleTruncatedDivision {
   def toDouble(x: Double): Double = x
-  def ceil(a:Double): Double = Math.ceil(a)
-  def floor(a:Double): Double = Math.floor(a)
-  def round(a:Double): Double = spire.math.round(a)
-  def isWhole(a:Double): Boolean = a % 1.0 == 0.0
-  def toRational(a:Double): Rational = Rational(a)
+  def ceil(a: Double): Double = Math.ceil(a)
+  def floor(a: Double): Double = Math.floor(a)
+  def round(a: Double): Double = spire.math.round(a)
+  def isWhole(a: Double): Boolean = a % 1.0 == 0.0
+  def toRational(a: Double): Rational = Rational(a)
 }
 
 @SerialVersionUID(0L)
@@ -139,8 +138,8 @@ trait DoubleInstances {
   implicit final val DoubleAlgebra = new DoubleAlgebra
   import Double._
   import spire.math.NumberTag._
-  implicit final val DoubleTag = new BuiltinFloatTag(0D, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
+  implicit final val DoubleTag = new BuiltinFloatTag(0d, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
     def isInfinite(a: Double): Boolean = java.lang.Double.isInfinite(a)
-    def isNaN(a: Double): Boolean =  java.lang.Double.isNaN(a)
+    def isNaN(a: Double): Boolean = java.lang.Double.isNaN(a)
   }
 }

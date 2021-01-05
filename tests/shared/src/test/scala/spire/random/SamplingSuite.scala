@@ -8,7 +8,7 @@ class SamplingSuite extends munit.ScalaCheckSuite {
   val rng = spire.random.rng.Lcg64.fromTime()
 
   val Size = 100
-  val range = (1 to Size)
+  val range = 1 to Size
   val ns = range.toArray
   val gen = Gen.chooseNum(1, Size)
 

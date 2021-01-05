@@ -29,16 +29,16 @@ class OptSuite extends munit.FunSuite {
     intercept[NoSuchElementException] { Opt.empty[String].get }
   }
 
-  test("Opt Equality"){
+  test("Opt Equality") {
     import spire.std.boolean._
     val eq = Eq[Opt[Boolean]]
-    assert(eq.eqv(Opt(true) ,Opt(true)))
-    assert(eq.eqv(Opt.empty ,Opt.empty))
-    assert(eq.neqv(Opt.empty ,Opt(true)))
-    assert(eq.neqv(Opt(true) ,Opt.empty))
+    assert(eq.eqv(Opt(true), Opt(true)))
+    assert(eq.eqv(Opt.empty, Opt.empty))
+    assert(eq.neqv(Opt.empty, Opt(true)))
+    assert(eq.neqv(Opt(true), Opt.empty))
   }
 
-  test("Regression test for #896"){
+  test("Regression test for #896") {
     {
       import spire.std.boolean._
       val eq = Eq[Opt[Boolean]]
@@ -81,28 +81,29 @@ class OptSuite extends munit.FunSuite {
     val e = b.map(_ + 999)
 
     assertEquals(Opt(6029), {
-      for {
-        q <- Opt(0)
-        x <- d
-        y <- e
-        z <- c
-      } yield q + x + y * z
-    })
+                   for {
+                     q <- Opt(0)
+                     x <- d
+                     y <- e
+                     z <- c
+                   } yield q + x + y * z
+                 }
+    )
   }
 
   test("Name-based extractor") {
     assert(Opt(2) match {
       case Opt(x) => true
-      case _ => false
+      case _      => false
     })
     assert(Opt.empty[Int] match {
       case Opt(x) => false
-      case _ => true
+      case _      => true
     })
   }
 
   test("Opt.filter") {
-    def isEven(i: Int): Boolean = (i % 2 == 0)
+    def isEven(i: Int): Boolean = i % 2 == 0
     assert(Opt(1).filter(isEven).isEmpty)
     assertEquals(2, Opt(2).filter(isEven).get)
     assert(Opt.empty[Int].filter(_ % 2 == 0).isEmpty)
