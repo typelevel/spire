@@ -6,7 +6,6 @@ import spire.math.{Natural, UInt}
 
 import scala.collection.compat.immutable.LazyList
 import scala.collection.compat.immutable.LazyList.#::
-import scala.collection.mutable
 
 object SetUtil {
   def lazyPowers[A](members: LazyList[A]): LazyList[Set[A]] = {

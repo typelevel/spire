@@ -19,11 +19,11 @@ abstract class BurtleRot32(_a: Int, _b: Int, _c: Int, _d: Int) extends IntBasedG
   protected var c = _c
   protected var d = _d
 
-  def nextInt: Int = { advance(); d }
+  override def nextInt(): Int = { advance(); d }
 
   protected def advance(): Unit
 
-  def getSeedBytes: Array[Byte] = {
+  override def getSeedBytes(): Array[Byte] = {
     val bytes = new Array[Byte](16)
     val bb = ByteBuffer.wrap(bytes)
     bb.putInt(a)
@@ -47,7 +47,7 @@ abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, A
 
   protected def create(_a: Int, _b: Int, _c: Int, _d: Int): G
 
-  def randomSeed: Array[Int] = GlobalRng.generateInts(4)
+  override def randomSeed(): Array[Int] = GlobalRng.generateInts(4)
 
   def fromBytes(bytes: Array[Byte]): G = {
     val bs = if (bytes.length < 16) Arrays.copyOf(bytes, 16) else bytes

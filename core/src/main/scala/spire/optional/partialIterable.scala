@@ -16,7 +16,7 @@ final class IterableSemigroupoid[A, SA <: IterableLike[A, SA]](implicit cbf: Fac
       val builder = cbf.newBuilder
       while (xIt.nonEmpty) {
         assert(yIt.nonEmpty)
-        builder += A.combine(xIt.next, yIt.next)
+        builder += A.combine(xIt.next(), yIt.next())
       }
       builder.result()
     }) else Opt.empty[SA]
@@ -31,13 +31,13 @@ final class IterableGroupoid[A, SA <: IterableLike[A, SA]](implicit cbf: Factory
       val builder = cbf.newBuilder
       while (xIt.nonEmpty) {
         assert(yIt.nonEmpty)
-        builder += A.combine(xIt.next, yIt.next)
+        builder += A.combine(xIt.next(), yIt.next())
       }
       builder.result()
     }) else Opt.empty[SA]
-  def inverse(a: SA): SA = cbf.newBuilder.++=(a.map(A.inverse(_))).result
-  override def leftId(a: SA): SA = cbf.newBuilder.++=(a.map(x => A.empty)).result
-  override def rightId(a: SA): SA = cbf.newBuilder.++=(a.map(x => A.empty)).result
+  def inverse(a: SA): SA = cbf.newBuilder.++=(a.map(A.inverse(_))).result()
+  override def leftId(a: SA): SA = cbf.newBuilder.++=(a.map(x => A.empty)).result()
+  override def rightId(a: SA): SA = cbf.newBuilder.++=(a.map(x => A.empty)).result()
 }
 
 trait PartialIterable0 {

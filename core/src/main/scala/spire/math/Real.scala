@@ -69,7 +69,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   def compare(y: Real): Int = (x, y) match {
     case (Exact(nx), Exact(ny)) => nx compare ny
-    case _ => (x - y).signum
+    case _ => (x - y).signum()
   }
 
   def min(y: Real): Real = (x, y) match {
@@ -149,7 +149,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
         Exact(n.pow(k))
       case _ =>
         if (k < 0) {
-          reciprocal.pow(-k)
+          reciprocal().pow(-k)
         } else if (k == 0) {
           Real.one
         } else if (k == 1) {
@@ -160,14 +160,14 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     }
   }
 
-  def /(y: Real): Real = x * y.reciprocal
+  def /(y: Real): Real = x * y.reciprocal()
 
   def tmod(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx tmod ny)
     case _ => Real({ p =>
       val d = x / y
       val s = d(2)
-      val d2 = if (s >= 0) d.floor else d.ceil
+      val d2 = if (s >= 0) d.floor() else d.ceil()
         (x - d2 * y)(p)
     })
   }
@@ -177,7 +177,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     case _ => Real({ p =>
       val d = x / y
       val s = d(2)
-      val d2 = if (s >= 0) d.floor else d.ceil
+      val d2 = if (s >= 0) d.floor() else d.ceil()
       d2(p)
     })
   }
@@ -245,7 +245,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   def sqrt(): Real = Real(p => x(p * 2).sqrt)
   def nroot(k: Int): Real =
     if (k >= 0) Real(p => x(p * k).nroot(k))
-    else Real(p => x.reciprocal.nroot(math.abs(k))(p))
+    else Real(p => x.reciprocal().nroot(math.abs(k))(p))
 
   def fpow(r: Rational): Real =
     Real({ p =>
@@ -318,13 +318,13 @@ object Real extends RealInstances {
     exp(Real.one)
 
   lazy val phi: Real =
-    (Real.one + Real(5).sqrt) / Real.two
+    (Real.one + Real(5).sqrt()) / Real.two
 
   def log(x: Real): Real = {
     val t = x(2)
     val n = sizeInBase(t, 2) - 3
     if (t < 0) throw new ArithmeticException("log of negative number")
-    else if (t < 4) -log(x.reciprocal)
+    else if (t < 4) -log(x.reciprocal())
     else if (t < 8) logDr(x)
     else logDr(div2n(x, n)) + Real(n) * log2
   }
@@ -381,11 +381,11 @@ object Real extends RealInstances {
     val t = x(2)
     val xp1 = x + Real.one
     val xm1 = x - Real.one
-    if (t < -5) atanDr(-x.reciprocal) - piBy2
+    if (t < -5) atanDr(-x.reciprocal()) - piBy2
     else if (t == -4) -piBy4 - atanDr(xp1 / xm1)
     else if (t < 4) atanDr(x)
     else if (t == 4) piBy4 + atanDr(xm1 / xp1)
-    else piBy2 - atanDr(x.reciprocal)
+    else piBy2 - atanDr(x.reciprocal())
   }
 
   def atan2(y: Real, x: Real): Real = Real({ p =>
@@ -419,7 +419,7 @@ object Real extends RealInstances {
 
   def asin(x: Real): Real = {
     val x0 = x(0)
-    val s = (Real.one - x * x).sqrt
+    val s = (Real.one - x * x).sqrt()
     x0.signum match {
       case n if n > 0 => (Real.pi / Real.two) - atan(s / x)
       case 0 => atan(x / s)
@@ -431,22 +431,22 @@ object Real extends RealInstances {
 
   def sinh(x: Real): Real = {
     val y = exp(x)
-    (y - y.reciprocal) / Real.two
+    (y - y.reciprocal()) / Real.two
   }
 
   def cosh(x: Real): Real = {
     val y = exp(x)
-    (y + y.reciprocal) / Real.two
+    (y + y.reciprocal()) / Real.two
   }
 
   def tanh(x: Real): Real = {
     val y = exp(x);
-    val y2 = y.reciprocal
+    val y2 = y.reciprocal()
     (y - y2) / (y + y2)
   }
 
-  def asinh(x: Real): Real = log(x + (x * x + Real.one).sqrt)
-  def acosh(x: Real): Real = log(x + (x * x - Real.one).sqrt)
+  def asinh(x: Real): Real = log(x + (x * x + Real.one).sqrt())
+  def acosh(x: Real): Real = log(x + (x * x - Real.one).sqrt())
   def atanh(x: Real): Real = log((Real.one + x) / (Real.one - x)) / Real.two
 
   def digits: Int = 40
@@ -472,9 +472,9 @@ object Real extends RealInstances {
 
   lazy val piBy4 = div2n(pi, 2)
 
-  lazy val log2 = div2n(logDrx(Real.two.reciprocal), 1)
+  lazy val log2 = div2n(logDrx(Real.two.reciprocal()), 1)
 
-  lazy val sqrt1By2 = Real.two.reciprocal.sqrt
+  lazy val sqrt1By2 = Real.two.reciprocal().sqrt()
 
   def accumulate(total: SafeLong, xs: LazyList[SafeLong], cs: LazyList[Rational]): SafeLong = {
     (xs, cs) match {
@@ -483,6 +483,7 @@ object Real extends RealInstances {
       case (x #:: xs, c #:: cs) =>
         val t = roundUp(c * Rational(x))
         if (t == 0) total else accumulate(total + t, xs, cs)
+      case (_, _) => sys.error("nooooo")
     }
   }
 
@@ -495,6 +496,7 @@ object Real extends RealInstances {
       case (x #:: xs, c #:: cs) =>
         val t = roundUp(c * Rational(x))
         if (t == 0) total else accumulate(total + t, xs, cs)
+      case (_, _) => sys.error("nooooo")
     }
   }
 
@@ -574,8 +576,8 @@ trait RealInstances {
 class RealAlgebra extends RealIsFractional
 
 trait RealIsFractional extends Fractional[Real] with TruncatedDivisionCRing[Real] with Trig[Real] with Field.WithDefaultGCD[Real] {
-  override def abs(x: Real): Real = x.abs
-  override def signum(x: Real): Int = x.signum
+  override def abs(x: Real): Real = x.abs()
+  override def signum(x: Real): Int = x.signum()
 
   override def eqv(x: Real, y: Real): Boolean = x === y
   def compare(x: Real, y: Real): Int = x compare y
@@ -591,10 +593,10 @@ trait RealIsFractional extends Fractional[Real] with TruncatedDivisionCRing[Real
   def tquot(x: Real, y: Real): Real = x tquot y
   def tmod(x: Real, y: Real): Real = x tmod y
 
-  override def reciprocal(x: Real): Real = x.reciprocal
+  override def reciprocal(x: Real): Real = x.reciprocal()
   def div(x: Real, y: Real): Real = x / y
 
-  override def sqrt(x: Real): Real = x.sqrt
+  override def sqrt(x: Real): Real = x.sqrt()
   def nroot(x: Real, k: Int): Real = x.nroot(k)
   def fpow(x: Real, y: Real): Real = x fpow y
 
@@ -617,10 +619,10 @@ trait RealIsFractional extends Fractional[Real] with TruncatedDivisionCRing[Real
   def toDegrees(a: Real): Real = a / (Real.two * Real.pi) * Real(360)
   def toRadians(a: Real): Real = a / Real(360) * (Real.two * Real.pi)
 
-  def ceil(x: Real): Real = x.ceil
-  def floor(x: Real): Real = x.floor
+  def ceil(x: Real): Real = x.ceil()
+  def floor(x: Real): Real = x.floor()
   def isWhole(x: Real): Boolean = x.isWhole
-  def round(x: Real): Real = x.round
+  def round(x: Real): Real = x.round()
 
   def toByte(x: Real): Byte = x.toRational.toByte
   def toInt(x: Real): Int = x.toRational.toInt

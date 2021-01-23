@@ -145,7 +145,7 @@ sealed trait Variable[+F] extends Factory[String, String => List[F]] {
   def varBuilder(): Builder[String, String => List[F]]
   def apply(): Builder[String, String => List[F]] = this.newBuilder
   def apply(from: Nothing): Builder[String, String => List[F]] = this.newBuilder
-  def newBuilder: Builder[String, String => List[F]] = this.varBuilder
+  def newBuilder: Builder[String, String => List[F]] = this.varBuilder()
   def fromSpecific(it: IterableOnce[String]): String => List[F] = ((s: String) => Nil)
 
   def missing(sentinel: String): Variable[F] = Variable.Missing(this, sentinel)

@@ -33,7 +33,7 @@ private[algebra] trait NormedVectorSpace0 {
 }
 
 private[algebra] trait NormedVectorSpaceFunctions {
-  def max[A, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A], order0: Order[A],
+  def max[A: Order, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
       signed0: Signed[A], cbf0: Factory[A, CC[A]]): NormedVectorSpace[CC[A], A] =
     new SeqMaxNormedVectorSpace[A, CC[A]]
 

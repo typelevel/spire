@@ -1,8 +1,6 @@
 package spire
 package math
 
-import scala.language.experimental.macros
-
 import spire.algebra.{Field, IsReal, NRoot, Rng, Semiring, Signed}
 import spire.macros.compat.Context
 import spire.macros.fpf._

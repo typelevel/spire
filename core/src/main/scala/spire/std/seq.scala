@@ -10,7 +10,7 @@ import spire.NoImplicit
 @SerialVersionUID(0L)
 class SeqCModule[A, SA <: SeqLike[A, SA]](implicit val scalar: CRing[A], cbf: Factory[A, SA])
   extends CModule[SA, A] with Serializable {
-  def zero: SA = cbf.newBuilder.result
+  def zero: SA = cbf.newBuilder.result()
 
   def negate(sa: SA): SA = cbf.fromSpecific(sa map (scalar.negate))
 
@@ -20,7 +20,7 @@ class SeqCModule[A, SA <: SeqLike[A, SA]](implicit val scalar: CRing[A], cbf: Fa
       b += it.next()
       add1(it, b)
     } else {
-      b.result
+      b.result()
     }
 
     @tailrec
@@ -44,7 +44,7 @@ class SeqCModule[A, SA <: SeqLike[A, SA]](implicit val scalar: CRing[A], cbf: Fa
       b += it.next()
       subl(it, b)
     } else {
-      b.result
+      b.result()
     }
 
     @tailrec
@@ -52,7 +52,7 @@ class SeqCModule[A, SA <: SeqLike[A, SA]](implicit val scalar: CRing[A], cbf: Fa
       b += scalar.negate(it.next())
       subr(it, b)
     } else {
-      b.result
+      b.result()
     }
 
     @tailrec
@@ -107,7 +107,7 @@ class SeqCoordinateSpace[A: Field, SA <: SeqLike[A, SA]](val dimensions: Int)(im
     @tailrec def loop(j: Int): SA = if (i < dimensions) {
       b += (if (i == j) scalar.one else scalar.zero)
       loop(j + 1)
-    } else b.result
+    } else b.result()
 
     loop(0)
   }

@@ -56,7 +56,7 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
     if (n == 3) return SafeLong(2)
 
     var i = 3
-    var k = n - 1
+    // var k = n - 1
     var last = SafeLong(2)
     while (true) {
       val primes = sieve.primes
@@ -104,7 +104,7 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
     start += chunkSize
     limit += chunkSize
     val csq = cutoff ** 2
-    if (limit >= csq) sys.error("too big: %s > %s (%s)" format (limit, csq, cutoff))
+    if (limit >= csq) sys.error("too big: %s > %s (%s)".format(limit, csq, cutoff))
     arr.clear()
     sieve = SieveSegment(start, arr, cutoff)
     sieve.init(fastq, slowq)

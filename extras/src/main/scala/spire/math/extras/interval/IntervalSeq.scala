@@ -8,7 +8,6 @@ import spire.math.interval._
 import spire.math.{Searching, Interval, Rational}
 
 import scala.annotation.{switch, tailrec}
-import scala.language.implicitConversions
 
 final class IntervalSeq[T] private (
     val belowAll: Boolean,
@@ -144,7 +143,7 @@ final class IntervalSeq[T] private (
     override def foreach[U](f: (Interval[T]) => U): Unit = foreachInterval(f)
 
     def iterator: Iterator[Interval[T]] = {
-      var iseq: ArrayBuffer[Interval[T]] = ArrayBuffer.empty[Interval[T]]
+      val iseq: ArrayBuffer[Interval[T]] = ArrayBuffer.empty[Interval[T]]
       def f(i: Interval[T]): Unit = {
         iseq += i
       }
@@ -238,6 +237,7 @@ object IntervalSeq {
     case (Open(a),      Open(b))      => fromTo(a, K01, b, K00)
     case (Unbound(),    Unbound())    => all[T]
     case (EmptyBound(), EmptyBound()) => empty[T]
+    case _ => sys.error("no")
   }
 
   def apply(text:String): IntervalSeq[Rational] = {

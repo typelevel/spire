@@ -58,7 +58,7 @@ object Searching {
   final def minimalElements[A](as: Iterable[A])(implicit ev: PartialOrder[A]): Seq[A] = {
     import scala.collection.mutable.ArrayBuffer
     // the minimal elements for the first elements of as
-    var candidates = ArrayBuffer.empty[A]
+    val candidates = ArrayBuffer.empty[A]
     // removes the j-th element of candidates by swapping the last
     // element with it
     def fastRemove(j: Int): Unit = {

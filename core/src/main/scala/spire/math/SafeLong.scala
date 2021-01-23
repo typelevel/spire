@@ -451,7 +451,7 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
   def longValue: Long = x.toLong
   def intValue: Int = x.toInt
 
-  def underlying: java.lang.Long = new java.lang.Long(x)
+  def underlying: java.lang.Long = java.lang.Long.valueOf(x)
   def isValidLong: Boolean = true
   def getLong: Opt[Long] = Opt(x)
 
@@ -483,7 +483,10 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
   def %(y: Long): SafeLong = SafeLong(x remainder BigInteger.valueOf(y))
 
   def /%(y: Long): (SafeLong, SafeLong) = {
-    val Array(q, r) = x.divideAndRemainder(BigInteger.valueOf(y))
+    val a = x.divideAndRemainder(BigInteger.valueOf(y))
+    // a is always of length 2
+    val q = a(0)
+    val r = a(1)
     (SafeLong(q), SafeLong(r))
   }
 
@@ -508,19 +511,26 @@ private[math] final case class SafeLongBigInteger(x: BigInteger) extends SafeLon
   def %(y: BigInteger): SafeLong = SafeLong(x remainder y)
 
   def /%(y: BigInteger): (SafeLong, SafeLong) = {
-    val Array(q, r) = x divideAndRemainder y
+    val a = x divideAndRemainder y
+    // a is always of length 2
+    val q = a(0)
+    val r = a(1)
     (SafeLong(q), SafeLong(r))
   }
 
   def equotmod(y: BigInteger): (SafeLong, SafeLong) = {
-    val Array(qt, rt) = x.divideAndRemainder(y) // truncated quotient and remainder
+    val a = x.divideAndRemainder(y) // truncated quotient and remainder
+    val qt = a(0)
+    val rt = a(1)
     if (rt.signum >= 0) (SafeLong(qt), SafeLong(rt))
     else if (y.signum > 0) (SafeLong(qt.subtract(BigInteger.ONE)), SafeLong(rt.add(y)))
     else (SafeLong(qt.add(BigInteger.ONE)), SafeLong(rt.subtract(y)))
   }
 
   def equot(y: BigInteger): SafeLong = {
-    val Array(qt, rt) = x.divideAndRemainder(y) // truncated quotient and remainder
+    val a = x.divideAndRemainder(y) // truncated quotient and remainder
+    val qt = a(0)
+    val rt = a(1)
     if (rt.signum >= 0) SafeLong(qt)
     else if (y.signum > 0) SafeLong(qt.subtract(BigInteger.ONE))
     else SafeLong(qt.add(BigInteger.ONE))

@@ -28,7 +28,7 @@ object Simplification {
         case "nrat" =>
           val n = if (args.length == 1) 10 else args(1).toInt
           val r: Rational = rationals.drop(n - 1).head
-          println("rational %d is %s" format (n, r.toString))
+          println("rational %d is %s".format(n, r.toString))
         case "rats" =>
           val n = if (args.length == 1) 10 else args(1).toInt
           rationals.take(n).foreach(r => print(r.toString + ", "))
@@ -36,7 +36,7 @@ object Simplification {
         case "nprime" =>
           val n = if (args.length == 1) 10 else args(1).toInt
           val p: Int = primes.drop(n - 1).head
-          println("rational %d is %s" format (n, p.toString))
+          println("rational %d is %s".format(n, p.toString))
         case "primes" =>
           val n = if (args.length == 1) 10 else args(1).toInt
           primes.take(n).foreach(p => print(p.toString + ", "))
@@ -44,7 +44,7 @@ object Simplification {
         case "snap" =>
           val n = if (args.length == 1) 1.4142135623730951 else args(1).toDouble
           val (base, k, div) = snap(n)
-          println("%s =~ nroot(%s, %s) / %s" format (n, base, k, div))
+          println("%s =~ nroot(%s, %s) / %s".format(n, base, k, div))
       }
     }
   }
@@ -160,7 +160,7 @@ object BigStream extends BigStreamCompanionCompat {
         this
       }
       def clear(): Unit = elems = Nil
-      def result: BigStream[A] =
+      override def result(): BigStream[A] =
         elems.foldLeft(BigStream.empty[A])((t, a) => new BigCons(a, t))
     }
 }
@@ -182,7 +182,7 @@ trait BigStream[A] extends Iterable[A] with BigStreamCompat[A] { self =>
 
     def hasNext: Boolean = !stream.isEmpty
 
-    def next: A = if (stream.isEmpty) {
+    override def next(): A = if (stream.isEmpty) {
       throw new NoSuchElementException
     } else {
       val a = stream.head

@@ -26,10 +26,10 @@ class Literals(val s:StringContext) extends AnyVal {
     // if there are n interpolated values there will always be n+1
     // literal parts. we want to intersperse them in the order they
     // were seen.
-    sb.append(lits.next)
+    sb.append(lits.next())
     while(vars.hasNext) {
-      sb.append(vars.next)
-      sb.append(lits.next)
+      sb.append(vars.next())
+      sb.append(lits.next())
     }
     Polynomial(sb.toString)
   }

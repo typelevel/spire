@@ -142,8 +142,8 @@ package object math {
       return power(BigDecimal(1), part, whole.toBigInt)
     }
 
-    var precision = k.mc.getPrecision + 3
-    var leeway = 1000
+    // var precision = k.mc.getPrecision + 3
+    // var leeway = 1000
 
     @tailrec
     def doit(precision: Int, leeway: Int): BigDecimal = {
@@ -355,7 +355,9 @@ package object math {
     else (qt + 1, rt - b)
   }
   def equotmod(a: BigInteger, b: BigInteger): (BigInteger, BigInteger) = {
-    val Array(qt, rt) = a.divideAndRemainder(b) // truncated quotient and remainder
+    val arr = a.divideAndRemainder(b) // truncated quotient and remainder
+    val qt = arr(0)
+    val rt = arr(1)
     if (rt.signum >= 0) (qt, rt)
     else if (b.signum > 0) (qt.subtract(BigInteger.ONE), rt.add(b))
     else (qt.add(BigInteger.ONE), rt.subtract(b))
@@ -396,7 +398,9 @@ package object math {
     else qt + 1
   }
   def equot(a: BigInteger, b: BigInteger): BigInteger = {
-    val Array(qt, rt) = a.divideAndRemainder(b) // truncated quotient and remainder
+    val arr = a.divideAndRemainder(b) // truncated quotient and remainder
+    val qt = arr(0)
+    val rt = arr(1)
     if (rt.signum >= 0) qt
     else if (b.signum > 0) qt.subtract(BigInteger.ONE)
     else qt.add(BigInteger.ONE)

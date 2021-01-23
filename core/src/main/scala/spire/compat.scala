@@ -7,7 +7,7 @@ import spire.math.{ScalaIntegralWrapper, ScalaNumericWrapper, ScalaPartialOrderi
 private[spire] trait CompatPriority1 {
   implicit def numeric[A: Ring: ConvertableFrom: Signed: Order]: scala.math.Numeric[A] =
     new ScalaNumericWrapper[A] {
-      val partialOrder = PartialOrder[A]
+      // val partialOrder = PartialOrder[A]
       val order = Order[A]
       val structure = Ring[A]
       val conversions = ConvertableFrom[A]

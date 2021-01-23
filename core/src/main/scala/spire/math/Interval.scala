@@ -718,7 +718,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
       new Iterator[A] {
         var x: A = start
         def hasNext: Boolean = continue(x)
-        def next: A = {
+        override def next(): A = {
           val r = x
           x += step
           r
@@ -734,7 +734,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
         var x: A = start
         var ok: Boolean = true
         def hasNext: Boolean = ok && continue(x)
-        def next: A = {
+        override def next(): A = {
           val r = x
           val next = x + step
           if (test(x, next)) { x = next } else { ok = false }
@@ -846,11 +846,11 @@ object Interval {
     else
       Interval.empty[A]
 
-  def empty[A](implicit o: Order[A]): Interval[A] = Empty[A]
+  def empty[A: Order]: Interval[A] = Empty[A]()
 
   def point[A: Order](a: A): Interval[A] = Point(a)
 
-  def zero[A](implicit o: Order[A], r: Semiring[A]): Interval[A] = Point(r.zero)
+  def zero[A: Order](implicit r: Semiring[A]): Interval[A] = Point(r.zero)
 
   def all[A: Order]: Interval[A] = All[A]()
 

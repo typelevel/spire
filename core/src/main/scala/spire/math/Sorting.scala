@@ -36,7 +36,7 @@ object InsertionSort extends Sort {
     * @param end the index of the last element, exclusive, to be sorted
     * @tparam A a member of the type class `Order`
     */
-  final def sort[@sp A](data:Array[A], start:Int, end:Int)(implicit o:Order[A], ct:ClassTag[A]): Unit = {
+  final def sort[@sp A: ClassTag](data:Array[A], start:Int, end:Int)(implicit o:Order[A]): Unit = {
     require(start <= end && start >= 0 && end <= data.length)
     var i = start + 1
     while (i < end) {
@@ -197,7 +197,7 @@ object QuickSort {
     * @tparam A a member of the type class Order
     * @return the next pivot value
     */
-  final def partition[@sp A](data:Array[A], start:Int, end:Int, pivotIndex:Int)(implicit o:Order[A], ct:ClassTag[A]): Int = {
+  final def partition[@sp A: ClassTag](data:Array[A], start:Int, end:Int, pivotIndex:Int)(implicit o:Order[A]): Int = {
     require(start >= 0 && pivotIndex >= start && end > pivotIndex && end <= data.length)
     val pivotValue = data(pivotIndex)
 

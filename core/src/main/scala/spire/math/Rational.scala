@@ -690,7 +690,7 @@ object Rational extends RationalInstances {
 
     override def equals(that: Any): Boolean = that match {
       case that: LongRational => this.n == that.n && this.d == that.d
-      case _ => super.equals(that)
+      case that => super.equals(that)
     }
 
     override def hashCode: Int =

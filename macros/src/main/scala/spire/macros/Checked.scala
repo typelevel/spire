@@ -2,7 +2,6 @@ package spire
 package macros
 
 import scala.language.existentials
-import language.experimental.macros
 import spire.macros.compat.{resetLocalAttrs, termName, freshTermName, Context}
 
 class ArithmeticOverflowException() extends ArithmeticException("arithmetic overflow detected")

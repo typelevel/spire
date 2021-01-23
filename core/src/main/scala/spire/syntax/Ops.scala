@@ -8,12 +8,12 @@ import spire.macros.Ops
 import spire.math.{BitString, ConvertableTo, ConvertableFrom, Interval, Rational, Number}
 import spire.util.Opt
 
-final class EqOps[A](lhs:A)(implicit ev:Eq[A]) {
+final class EqOps[A: Eq](lhs:A) {
   def ===[B](rhs:B)(implicit ev: B =:= A): Boolean = macro Ops.eqv[A, B]
   def =!=[B](rhs:B)(implicit ev: B =:= A): Boolean = macro Ops.neqv[A, B]
 }
 
-final class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A]) {
+final class PartialOrderOps[A: PartialOrder](lhs: A) {
   def >(rhs: A): Boolean = macro Ops.binop[A, Boolean]
   def >=(rhs: A): Boolean = macro Ops.binop[A, Boolean]
   def <(rhs: A): Boolean = macro Ops.binop[A, Boolean]
@@ -40,7 +40,7 @@ final class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A]) {
   def <=(rhs:Number)(implicit c:ConvertableFrom[A]): Boolean = c.toNumber(lhs) <= rhs
 }
 
-final class OrderOps[A](lhs: A)(implicit ev: Order[A]) {
+final class OrderOps[A: Order](lhs: A) {
   def compare(rhs: A): Int = macro Ops.binop[A, Int]
   def min(rhs: A): A = macro Ops.binop[A, A]
   def max(rhs: A): A = macro Ops.binop[A, A]
@@ -147,7 +147,7 @@ final class LiteralDoubleTruncatedDivisionOps(val lhs: Double) extends AnyVal {
   def fquotmod[A](rhs: A)(implicit ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) = ev.fquotmod(c.fromDouble(lhs), rhs)
 }
 
-final class SemigroupoidOps[A](lhs:A)(implicit ev:Semigroupoid[A]) {
+final class SemigroupoidOps[A: Semigroupoid](lhs:A) {
   def |+|? (rhs: A): Opt[A] = macro Ops.binop[A, Opt[A]]
   def |+|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
 }
@@ -157,27 +157,27 @@ final class GroupoidCommonOps[A](lhs:A)(implicit ev:Groupoid[A]) {
   def isId(implicit ev1: Eq[A]): Boolean = ev.isId(lhs)(ev1)
 }
 
-final class GroupoidOps[A](lhs:A)(implicit ev:Groupoid[A]) {
+final class GroupoidOps[A: Groupoid](lhs:A) {
   def leftId(): A = macro Ops.unop[A]
   def rightId(): A = macro Ops.unop[A]
   def |-|? (rhs: A): Opt[A] = macro Ops.binop[A, Option[A]]
   def |-|?? (rhs: A): Boolean = macro Ops.binop[A, Boolean]
 }
 
-final class SemigroupOps[A](lhs:A)(implicit ev:Semigroup[A]) {
+final class SemigroupOps[A: Semigroup](lhs:A) {
   def |+|(rhs:A): A = macro Ops.binop[A, A]
 }
 
-final class MonoidOps[A](lhs:A)(implicit ev: Monoid[A]) {
+final class MonoidOps[A: Monoid](lhs:A) {
   def isEmpty(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
 }
 
-final class GroupOps[A](lhs:A)(implicit ev:Group[A]) {
+final class GroupOps[A: Group](lhs:A) {
   def inverse(): A = macro Ops.unop[A]
   def |-|(rhs:A): A = macro Ops.binop[A, A]
 }
 
-final class AdditiveSemigroupOps[A](lhs:A)(implicit ev:AdditiveSemigroup[A]) {
+final class AdditiveSemigroupOps[A: AdditiveSemigroup](lhs:A) {
   def +(rhs:A): A = macro Ops.binop[A, A]
   def +(rhs:Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
   def +(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
@@ -196,11 +196,11 @@ final class LiteralDoubleAdditiveSemigroupOps(val lhs: Double) extends AnyVal {
   def +[A](rhs:A)(implicit ev:Field[A]): A = ev.plus(ev.fromDouble(lhs), rhs)
 }
 
-final class AdditiveMonoidOps[A](lhs: A)(implicit ev: AdditiveMonoid[A]) {
+final class AdditiveMonoidOps[A: AdditiveMonoid](lhs: A) {
   def isZero(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
 }
 
-final class AdditiveGroupOps[A](lhs:A)(implicit ev:AdditiveGroup[A]) {
+final class AdditiveGroupOps[A: AdditiveGroup](lhs:A) {
   def unary_- : A = macro Ops.unop0[A]
   def -(rhs:A): A = macro Ops.binop[A, A]
   def -(rhs:Int)(implicit ev1: Ring[A]): A =  macro Ops.binopWithLift[Int, Ring[A], A]
@@ -220,7 +220,7 @@ final class LiteralDoubleAdditiveGroupOps(val lhs: Double) extends AnyVal {
   def -[A](rhs:A)(implicit ev:Field[A]): A = ev.minus(ev.fromDouble(lhs), rhs)
 }
 
-final class MultiplicativeSemigroupOps[A](lhs:A)(implicit ev:MultiplicativeSemigroup[A]) {
+final class MultiplicativeSemigroupOps[A: MultiplicativeSemigroup](lhs:A) {
   def *(rhs:A): A = macro Ops.binop[A, A]
   def *(rhs:Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
   def *(rhs:Double)(implicit ev1:Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
@@ -239,11 +239,11 @@ final class LiteralDoubleMultiplicativeSemigroupOps(val lhs: Double) extends Any
   def *[A](rhs:A)(implicit ev:Field[A]): A = ev.times(ev.fromDouble(lhs), rhs)
 }
 
-final class MultiplicativeMonoidOps[A](lhs: A)(implicit ev: MultiplicativeMonoid[A]) {
+final class MultiplicativeMonoidOps[A: MultiplicativeMonoid](lhs: A) {
   def isOne(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
 }
 
-final class MultiplicativeGroupOps[A](lhs:A)(implicit ev:MultiplicativeGroup[A]) {
+final class MultiplicativeGroupOps[A: MultiplicativeGroup](lhs:A) {
   def reciprocal(): A = macro Ops.unop[A]
   def /(rhs:A): A = macro Ops.binop[A, A]
   def /(rhs:Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
@@ -263,17 +263,17 @@ final class LiteralDoubleMultiplicativeGroupOps(val lhs: Double) extends AnyVal 
   def /[A](rhs:A)(implicit ev: Field[A]): A = ev.div(ev.fromDouble(lhs), rhs)
 }
 
-final class SemiringOps[A](lhs:A)(implicit ev:Semiring[A]) {
+final class SemiringOps[A: Semiring](lhs:A) {
   def pow(rhs:Int): A = macro Ops.binop[Int, A]
   def **(rhs:Int): A = macro Ops.binop[Int, A]
 }
 
-final class GCDRingOps[A](lhs:A)(implicit ev:GCDRing[A]) {
+final class GCDRingOps[A: GCDRing](lhs:A) {
   def gcd(rhs:A)(implicit ev1: Eq[A]): A = macro Ops.binopWithEv2[A, Eq[A], A]
   def lcm(rhs:A)(implicit ev1: Eq[A]): A = macro Ops.binopWithEv2[A, Eq[A], A]
 }
 
-final class EuclideanRingOps[A](lhs:A)(implicit ev:EuclideanRing[A]) {
+final class EuclideanRingOps[A: EuclideanRing](lhs:A) {
   def euclideanFunction(): BigInt = macro Ops.unop[BigInt]
   def equot(rhs:A): A = macro Ops.binop[A, A]
   def emod(rhs:A): A = macro Ops.binop[A, A]
@@ -313,7 +313,7 @@ final class LiteralDoubleEuclideanRingOps(val lhs: Double) extends AnyVal {
   def equotmod[A](rhs:A)(implicit ev: Field[A]): (A, A) = ev.equotmod(ev.fromDouble(lhs), rhs)
 }
 
-final class IsRealOps[A](lhs:A)(implicit ev:IsReal[A]) {
+final class IsRealOps[A: IsReal](lhs:A) {
   def isWhole(): Boolean = macro Ops.unop[Boolean]
   def ceil(): A = macro Ops.unop[A]
   def floor(): A = macro Ops.unop[A]
@@ -477,7 +477,7 @@ final class NormedVectorSpaceOps[V](lhs: V) {
     macro Ops.unopWithEv[NormedVectorSpace[V, F], V]
 }
 
-final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {
+final class ConvertableFromOps[A: ConvertableFrom](lhs:A) {
   override def toString(): String = macro Ops.unop[String]
   def toByte(): Byte = macro Ops.unop[Byte]
   def toShort(): Short = macro Ops.unop[Short]
@@ -490,7 +490,7 @@ final class ConvertableFromOps[A](lhs:A)(implicit ev:ConvertableFrom[A]) {
   def toRational(): Rational = macro Ops.unop[Rational]
 }
 
-final class BitStringOps[A](lhs: A)(implicit ev: BitString[A]) {
+final class BitStringOps[A: BitString](lhs: A) {
   def <<(rhs: Int): A = macro Ops.binop[Int, A]
   def >>(rhs: Int): A = macro Ops.binop[Int, A]
   def >>>(rhs: Int): A = macro Ops.binop[Int, A]

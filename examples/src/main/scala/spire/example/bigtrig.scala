@@ -95,7 +95,6 @@ object TrigTest {
     println(s"testing $name")
     while (i < limit) {
       if (verbose) println("  trying i=%s" format i)
-      implicit val mc = new MathContext(i)
       val seen = f(i)
       if (check) {
         val want = new Apfloat(s, i)

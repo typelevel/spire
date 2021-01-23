@@ -187,7 +187,6 @@ object Jet extends JetInstances {
   }
 
   implicit def bigDecimalToJet(n: BigDecimal)(implicit d: JetDim): Jet[BigDecimal] = {
-    implicit val mc = n.mc
     new Jet(n, Array.fill[BigDecimal](d.dimension)(0.0))
   }
 }
@@ -572,23 +571,23 @@ private[math] trait JetIsTrig[@sp(Float, Double) T] extends Trig[Jet[T]] {
   def e: Jet[T] = Jet(t.e)
   def pi: Jet[T] = Jet(t.pi)
 
-  def exp(a: Jet[T]): Jet[T] = a.exp
-  def expm1(a: Jet[T]): Jet[T] = a.exp - f.one
-  def log(a: Jet[T]): Jet[T] = a.log
-  def log1p(a: Jet[T]): Jet[T] = (a + f.one).log
+  def exp(a: Jet[T]): Jet[T] = a.exp()
+  def expm1(a: Jet[T]): Jet[T] = a.exp() - f.one
+  def log(a: Jet[T]): Jet[T] = a.log()
+  def log1p(a: Jet[T]): Jet[T] = (a + f.one).log()
 
-  def sin(a: Jet[T]): Jet[T] = a.sin
-  def cos(a: Jet[T]): Jet[T] = a.cos
-  def tan(a: Jet[T]): Jet[T] = a.tan
+  def sin(a: Jet[T]): Jet[T] = a.sin()
+  def cos(a: Jet[T]): Jet[T] = a.cos()
+  def tan(a: Jet[T]): Jet[T] = a.tan()
 
-  def asin(a: Jet[T]): Jet[T] = a.asin
-  def acos(a: Jet[T]): Jet[T] = a.acos
-  def atan(a: Jet[T]): Jet[T] = a.atan
+  def asin(a: Jet[T]): Jet[T] = a.asin()
+  def acos(a: Jet[T]): Jet[T] = a.acos()
+  def atan(a: Jet[T]): Jet[T] = a.atan()
   def atan2(y: Jet[T], x: Jet[T]): Jet[T] = y.atan2(x)
 
-  def sinh(x: Jet[T]): Jet[T] = x.sinh
-  def cosh(x: Jet[T]): Jet[T] = x.cosh
-  def tanh(x: Jet[T]): Jet[T] = x.tanh
+  def sinh(x: Jet[T]): Jet[T] = x.sinh()
+  def cosh(x: Jet[T]): Jet[T] = x.cosh()
+  def tanh(x: Jet[T]): Jet[T] = x.tanh()
 
   def toRadians(a: Jet[T]): Jet[T] = a
   def toDegrees(a: Jet[T]): Jet[T] = a
@@ -603,7 +602,7 @@ private[math] trait JetIsNRoot[T] extends NRoot[Jet[T]] {
   implicit def v: VectorSpace[Array[T], T]
 
   def nroot(a: Jet[T], k: Int): Jet[T] = a.nroot(k)
-  override def sqrt(a: Jet[T]): Jet[T] = a.sqrt
+  override def sqrt(a: Jet[T]): Jet[T] = a.sqrt()
   def fpow(a: Jet[T], b: Jet[T]): Jet[T] = a.pow(b)
   def fpow(a: T, b: Jet[T]): Jet[T] = b.powScalarToJet(a)
 }

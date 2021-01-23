@@ -44,7 +44,7 @@ class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])
       while (e < coeffs.length && coeffs(e) == 0) e += 1
     findNext()
     def hasNext: Boolean = e < coeffs.length
-    def next: Term[C] = {
+    override def next(): Term[C] = {
       val term = Term[C](coeffs(e), e)
       e += 1
       findNext()

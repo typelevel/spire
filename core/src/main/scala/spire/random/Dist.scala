@@ -118,7 +118,7 @@ trait Dist[@sp A] extends Any { self =>
       b += self(gen)
       i += 1
     }
-    b.result
+    b.result()
   }
 
   final def count(pred: A => Boolean, n: Int)(implicit gen: Generator): Int = {
@@ -294,24 +294,24 @@ object Dist extends DistInstances9 {
   }
 
   implicit val unit: Dist[Unit] = new DistFromGen[Unit](g => ())
-  implicit val boolean: Dist[Boolean] = new DistFromGen[Boolean](_.nextBoolean)
-  implicit val byte: Dist[Byte] = new DistFromGen[Byte](_.nextInt.toByte)
-  implicit val short: Dist[Short] = new DistFromGen[Short](_.nextInt.toShort)
-  implicit val char: Dist[Char] = new DistFromGen[Char](_.nextInt.toChar)
-  implicit val int: Dist[Int] = new DistFromGen[Int](_.nextInt)
-  implicit val float: Dist[Float] = new DistFromGen[Float](_.nextFloat)
-  implicit val long: Dist[Long] = new DistFromGen[Long](_.nextLong)
-  implicit val double: Dist[Double] = new DistFromGen[Double](_.nextDouble)
+  implicit val boolean: Dist[Boolean] = new DistFromGen[Boolean](_.nextBoolean())
+  implicit val byte: Dist[Byte] = new DistFromGen[Byte](_.nextInt().toByte)
+  implicit val short: Dist[Short] = new DistFromGen[Short](_.nextInt().toShort)
+  implicit val char: Dist[Char] = new DistFromGen[Char](_.nextInt().toChar)
+  implicit val int: Dist[Int] = new DistFromGen[Int](_.nextInt())
+  implicit val float: Dist[Float] = new DistFromGen[Float](_.nextFloat())
+  implicit val long: Dist[Long] = new DistFromGen[Long](_.nextLong())
+  implicit val double: Dist[Double] = new DistFromGen[Double](_.nextDouble())
 
-  implicit val ubyte: Dist[UByte] = new DistFromGen[UByte](g => UByte(g.nextInt))
-  implicit val ushort: Dist[UShort] = new DistFromGen[UShort](g => UShort(g.nextInt))
-  implicit val uint: Dist[UInt] = new DistFromGen[UInt](g => UInt(g.nextInt))
-  implicit val ulong: Dist[ULong] = new DistFromGen[ULong](g => ULong(g.nextLong))
+  implicit val ubyte: Dist[UByte] = new DistFromGen[UByte](g => UByte(g.nextInt()))
+  implicit val ushort: Dist[UShort] = new DistFromGen[UShort](g => UShort(g.nextInt()))
+  implicit val uint: Dist[UInt] = new DistFromGen[UInt](g => UInt(g.nextInt()))
+  implicit val ulong: Dist[ULong] = new DistFromGen[ULong](g => ULong(g.nextLong()))
 
   implicit def complex[A: Fractional: Trig: IsReal: Dist]: Dist[Complex[A]] =
     Dist(Complex(_: A, _: A))
 
-  implicit def interval[A](implicit na: Dist[A], order: Order[A], r: AdditiveMonoid[A]): Dist[Interval[A]] =
+  implicit def interval[A: AdditiveMonoid](implicit na: Dist[A], order: Order[A]): Dist[Interval[A]] =
     Dist((x: A, y: A) => if (order.lt(x, y)) Interval(x, y) else Interval(y, x))
 
   implicit def option[A](implicit no: Dist[Boolean], na: Dist[A]): Dist[Option[A]] =
@@ -341,9 +341,9 @@ object Dist extends DistInstances9 {
     throw new IllegalArgumentException("need positive maxBytes, got %s" format maxBytes)
   } else if (maxBytes < 8) {
     val n = (8 - maxBytes) * 8
-    new DistFromGen(g => SafeLong(g.nextLong >>> n))
+    new DistFromGen(g => SafeLong(g.nextLong() >>> n))
   } else if (maxBytes == 8) {
-    new DistFromGen(g => SafeLong(g.nextLong))
+    new DistFromGen(g => SafeLong(g.nextLong()))
   } else  {
     bigint(maxBytes).map(SafeLong(_))
   }
@@ -406,7 +406,7 @@ object Dist extends DistInstances9 {
     }
   }
 
-  def gaussianFromDouble[A: Field]: DistFromGen[A] = new DistFromGen[A](g => Field[A].fromDouble(g.nextGaussian))
+  def gaussianFromDouble[A: Field]: DistFromGen[A] = new DistFromGen[A](g => Field[A].fromDouble(g.nextGaussian()))
 }
 
 trait DistInstances0 {

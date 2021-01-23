@@ -243,7 +243,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   import spire.syntax.nroot._
 
   def sqrt(implicit scale: FixedScale): FixedPoint =
-    FixedPoint(toReal.sqrt.toRational)
+    FixedPoint(toReal.sqrt().toRational)
 
   def nroot(k: Int)(implicit scale: FixedScale): FixedPoint =
     FixedPoint(toReal.nroot(k).toRational)

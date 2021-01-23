@@ -216,8 +216,13 @@ object Syntax {
     import c.universe._
     val util = SyntaxUtil[c.type](c)
 
-    val List(range, index, end, limit, step) =
-      util.names("range", "index", "end", "limit", "step")
+    // names always contains 5 entries
+    val names = util.names("range", "index", "end", "limit", "step")
+    // val range = names(0)
+    val index = names(1)
+    val end = names(2)
+    val limit = names(3)
+    // val step = names(4)
 
     def isLiteral(t: Tree): Option[Int] = t match {
       case Literal(Constant(a)) => a match {
@@ -263,8 +268,6 @@ object Syntax {
         $index -= $stride
       }"""
 
-    val predef = spire.macros.compat.predef(c)
-
     val tree: Tree = r.tree match {
 
       case q"$predef.intWrapper($i).until($j)" =>
@@ -277,7 +280,7 @@ object Syntax {
         isLiteral(step) match {
           case Some(k) if k > 0 => strideUpUntil(i, j, k)
           case Some(k) if k < 0 => strideDownUntil(i, j, -k)
-          case Some(k) if k == 0 =>
+          case Some(k) =>
             c.error(c.enclosingPosition, "zero stride")
             q"()"
           case None =>
@@ -289,7 +292,7 @@ object Syntax {
         isLiteral(step) match {
           case Some(k) if k > 0 => strideUpTo(i, j, k)
           case Some(k) if k < 0 => strideDownTo(i, j, -k)
-          case Some(k) if k == 0 =>
+          case Some(k) =>
             c.error(c.enclosingPosition, "zero stride")
             q"()"
           case None =>

@@ -25,7 +25,7 @@ private[math] class FloatIsFractional extends Fractional[Float]
     with ConvertableToFloat
     with FloatIsReal
     with Serializable {
-  override def fromInt(n: Int): Float = n
+  override def fromInt(n: Int): Float = n.toFloat
   override def fromDouble(n: Double): Float = n.toFloat
   override def fromBigInt(n: BigInt): Float = n.toFloat
   override def toDouble(n: Float): Double = n.toDouble

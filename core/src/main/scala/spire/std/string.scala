@@ -11,7 +11,7 @@ class StringMonoid extends Monoid[String] with Serializable {
   override def combineAll(xs: TraversableOnce[String]): String = {
     val sb = new StringBuilder
     xs.foreach(sb ++= _)
-    sb.result
+    sb.result()
   }
 }
 
@@ -47,7 +47,7 @@ object LevenshteinDistance extends MetricSpace[String, Int] with Serializable {
         }
       }
 
-      var tmp = row0; row0 = row1; row1 = tmp
+      val tmp = row0; row0 = row1; row1 = tmp
     }
 
     row0(b.length)
