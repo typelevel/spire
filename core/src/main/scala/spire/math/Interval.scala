@@ -300,12 +300,12 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
     }
 
   // for all a in A, and all b in B, (A vmin B) is the interval that contains all (a min b)
-  def vmin(rhs: Interval[A])(implicit o: Order[A], m: AdditiveMonoid[A]): Interval[A] =
+  def vmin(rhs: Interval[A])(implicit o: Order[A]): Interval[A] =
     Interval.fromBounds(minLower(lhs.lowerBound, rhs.lowerBound, true),
       minUpper(lhs.upperBound, rhs.upperBound, true))
 
   // for all a in A, and all b in B, (A vmax B) is the interval that contains all (a max b)
-  def vmax(rhs: Interval[A])(implicit o: Order[A], m: AdditiveMonoid[A]): Interval[A] =
+  def vmax(rhs: Interval[A])(implicit o: Order[A]): Interval[A] =
     Interval.fromBounds(maxLower(lhs.lowerBound, rhs.lowerBound, true),
       maxUpper(lhs.upperBound, rhs.upperBound, true))
 

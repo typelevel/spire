@@ -443,8 +443,8 @@ trait DistInstances5 extends DistInstances4 {
 }
 
 trait DistInstances6 extends DistInstances5 {
-  implicit def module[V,K](implicit ev1: Eq[K], ev2: CModule[V,K]): CModule[Dist[V],Dist[K]] =
-    new DistCModule[V,K] { def alg = ev2; def eqK = ev1 }
+  implicit def module[V,K](implicit ev2: CModule[V,K]): CModule[Dist[V],Dist[K]] =
+    new DistCModule[V,K] { def alg = ev2 }
 }
 
 trait DistInstances7 extends DistInstances6 {

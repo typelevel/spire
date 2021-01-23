@@ -58,7 +58,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   override def equals(y: Any): Boolean = y match {
     case y: Real => this === y
-    case y => toRational.equals(y)
+    case y => toRational == y
   }
 
   def ===(y: Real): Boolean =

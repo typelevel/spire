@@ -68,7 +68,7 @@ final class IntervalSeq[T] private (
 
   def isProperSupersetOf(rhs: IntervalSeq[T]): Boolean = isSupersetOf(rhs) && (lhs != rhs)
 
-  private def copy(belowAll:Boolean = belowAll, values:Array[T] = values, kinds:Array[Byte] = kinds) =
+  private def copy(belowAll: Boolean, values:Array[T] = values, kinds: Array[Byte]) =
     new IntervalSeq[T](belowAll, values, kinds, order)
 
   override def toString: String = {

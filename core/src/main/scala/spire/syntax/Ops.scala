@@ -382,7 +382,7 @@ final class HeytingOps[A: Heyting](lhs:A) {
 }
 
 final class LogicOps[A](lhs:A)(implicit logic: Logic[A]) {
-  def unary_!(): A = logic.not(lhs)
+  def unary_! : A = logic.not(lhs)
 
   def &(rhs: A): A = macro Ops.binop[A, A]
   def |(rhs: A): A = macro Ops.binop[A, A]

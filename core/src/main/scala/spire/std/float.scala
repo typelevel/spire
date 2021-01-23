@@ -16,7 +16,7 @@ trait FloatIsField extends Field.WithDefaultGCD[Float] {
   override def times(a:Float, b:Float): Float = a * b
   def zero: Float = 0.0F
 
-  override def fromInt(n: Int): Float = n
+  override def fromInt(n: Int): Float = n.toFloat
 
   def div(a:Float, b:Float): Float = a / b
 

@@ -75,7 +75,7 @@ object RootIsolator {
         // inf), then compose the reciprocal with x+1 to shift (1, inf) to
         // (0, inf). The positive real roots of this polynomial correspond to
         // exactly those roots in (0, 1).
-        var l = p.reciprocal.shift(BigInt(1)).removeZeroRoots
+        val l = p.reciprocal.shift(BigInt(1)).removeZeroRoots
         val lRoots = TransformedPoly(l, b, a + b, d, c + d)
         lRoots :: rRoots :: Nil
       } else {
