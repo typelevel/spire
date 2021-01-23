@@ -8,7 +8,7 @@ lazy val scalaCollectionCompatVersion = "2.3.2"
 
 lazy val scalaCheckVersion = "1.15.2"
 
-lazy val munit = "0.7.20"
+lazy val munit = "0.7.21"
 lazy val munitDiscipline = "1.0.4"
 
 lazy val shapelessVersion = "2.3.3"
