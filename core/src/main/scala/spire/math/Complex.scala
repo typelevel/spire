@@ -119,9 +119,9 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   def asTuple: (T, T) = (real, imag)
   def asPolarTuple(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): (T, T) = (abs, arg)
 
-  def isZero(implicit s: Signed[T]): Boolean = real.isSignZero && imag.isSignZero
-  def isImaginary(implicit s: Signed[T]): Boolean = real.isSignZero
-  def isReal(implicit s: Signed[T]): Boolean = imag.isSignZero
+  def isZero(implicit s: Signed[T]): Boolean = real.isSignZero() && imag.isSignZero()
+  def isImaginary(implicit s: Signed[T]): Boolean = real.isSignZero()
+  def isReal(implicit s: Signed[T]): Boolean = imag.isSignZero()
 
   def eqv(b: Complex[T])(implicit o: Eq[T]): Boolean = real === b.real && imag === b.imag
   def neqv(b: Complex[T])(implicit o: Eq[T]): Boolean = real =!= b.real || imag =!= b.imag
@@ -136,7 +136,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   /* TODO: does it make sense? Should match the behavior on Gaussian integers.
   // TODO: instead of floor should be round-toward-zero
 
-  def /~(rhs: T)(implicit f: Field[T], o: IsReal[T]): Complex[T] = (this / rhs).floor
+  def /~(rhs: T)(implicit f: Field[T], o: IsReal[T]): Complex[T] = (this / rhs).floor()
   def %(rhs: T)(implicit f: Field[T], o: IsReal[T]): Complex[T] = this - (this /~ rhs) * rhs
   def /%(rhs: T)(implicit f: Field[T], o: IsReal[T]): (Complex[T], Complex[T]) = {
     val q = this /~ rhs
@@ -146,7 +146,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
 
   def **(e: T)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] = this.pow(e)
   def pow(e: T)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] =
-    if (e.isSignZero) {
+    if (e.isSignZero()) {
       Complex.one[T]
     } else if (this.isZero) {
       if (e < f.zero)
@@ -166,8 +166,8 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
     new Complex(real * b.real - imag * b.imag, imag * b.real + real * b.imag)
 
   def /(b: Complex[T])(implicit f: Field[T], s: Signed[T]): Complex[T] = {
-    val abs_breal = b.real.abs
-    val abs_bimag = b.imag.abs
+    val abs_breal = b.real.abs()
+    val abs_bimag = b.imag.abs()
 
     if (abs_breal >= abs_bimag) {
       if (abs_breal === f.zero) throw new Exception("/ by zero")
@@ -186,7 +186,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   /* TODO: does it make sense? Should match the behavior on Gaussian integers.
   def /~(b: Complex[T])(implicit f: Field[T], o: IsReal[T]): Complex[T] = {
     val d = this / b
-    new Complex(d.real.floor, d.imag.floor)
+    new Complex(d.real.floor(), d.imag.floor())
   }
 
   def %(b: Complex[T])(implicit f: Field[T], o: IsReal[T]): Complex[T] = this - (this /~ b) * b
@@ -200,7 +200,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   def **(b: Int)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] = pow(b)
 
   def nroot(k: Int)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] =
-    if (isZero) Complex.zero else pow(Complex(f.fromInt(k).reciprocal, f.zero))
+    if (isZero) Complex.zero else pow(Complex(f.fromInt(k).reciprocal(), f.zero))
 
   def pow(b: Int)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] =
     if (isZero) Complex.zero else Complex.polar(abs.pow(b), arg * b)
@@ -234,15 +234,15 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
       this
     } else if (imag.isSignZero()) {
       if (real.isSignNegative())
-        Complex(f.zero, real.abs.sqrt)
+        Complex(f.zero, real.abs().sqrt())
       else
-        Complex(real.abs.sqrt, f.zero)
+        Complex(real.abs().sqrt(), f.zero)
     } else {
       // https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Negative_or_complex_square
       val two = f.fromInt(2)
       val abs = this.abs
-      val a = ((abs + real) / two).sqrt
-      val b = ((abs - real) / two).sqrt
+      val a = ((abs + real) / two).sqrt()
+      val b = ((abs - real) / two).sqrt()
       if (imag.isSignNegative())
         Complex(a, -b)
       else
@@ -250,9 +250,9 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
     }
   }
 
-  def floor(implicit o: IsReal[T]): Complex[T] = new Complex(real.floor, imag.floor)
-  def ceil(implicit o: IsReal[T]): Complex[T] = new Complex(real.ceil, imag.ceil)
-  def round(implicit o: IsReal[T]): Complex[T] = new Complex(real.round, imag.round)
+  def floor(implicit o: IsReal[T]): Complex[T] = new Complex(real.floor(), imag.floor())
+  def ceil(implicit o: IsReal[T]): Complex[T] = new Complex(real.ceil(), imag.ceil())
+  def round(implicit o: IsReal[T]): Complex[T] = new Complex(real.round(), imag.round())
 
   // acos(z) = -i*(log(z + i*(sqrt(1 - z*z))))
   def acos(implicit f: Field[T], n: NRoot[T], t: Trig[T], s0: Signed[T]): Complex[T] = {

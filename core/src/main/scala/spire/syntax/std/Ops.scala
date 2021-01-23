@@ -93,13 +93,13 @@ final class ArrayOps[@sp A](arr: Array[A]) {
 
   def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A = {
     var result = ev.one
-    cfor(0)(_ < arr.length, _ + 1) { i => result += arr(i).abs.pow(p) }
+    cfor(0)(_ < arr.length, _ + 1) { i => result += arr(i).abs().pow(p) }
     result.nroot(p)
   }
 
   def qnormWith[@sp(Double) R](p: Int)(f: A => R)(implicit ev: Field[R], s: Signed[R], nr: NRoot[R]): R = {
     var result: R = ev.one
-    cfor(0)(_ < arr.length, _ + 1) { i => result += f(arr(i)).abs.pow(p) }
+    cfor(0)(_ < arr.length, _ + 1) { i => result += f(arr(i)).abs().pow(p) }
     result.nroot(p)
   }
 
@@ -219,10 +219,10 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
     as.foldLeft(ev.empty)(ev.combine)
 
   def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A =
-    as.foldLeft(ev.one)(_ + _.abs.pow(p)).nroot(p)
+    as.foldLeft(ev.one)(_ + _.abs().pow(p)).nroot(p)
 
   def qnormWith[R](p: Int)(f: A => R)(implicit ev: Field[R], s: Signed[R], nr: NRoot[R]): R =
-    as.foldLeft(ev.one)((t, a) => t + f(a).abs.pow(p)).nroot(p)
+    as.foldLeft(ev.one)((t, a) => t + f(a).abs().pow(p)).nroot(p)
 
   /**
    * Computes the minimal elements of a partially ordered set.

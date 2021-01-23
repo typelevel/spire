@@ -20,7 +20,7 @@ object Opt {
 
 }
 
-class Opt[+A](val ref: A) extends AnyVal {
+class Opt[+A](val ref: A) {
 
   def isDefined: Boolean = ref != null
   def nonEmpty: Boolean = ref != null

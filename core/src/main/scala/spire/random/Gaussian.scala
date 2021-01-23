@@ -60,7 +60,7 @@ final class MarsagliaGaussian[@sp(Float, Double) A: Field: NRoot: Trig: Order: U
         if (s >= Field[A].one || s === Field[A].zero) {
           loop()
         } else {
-          val scale = stdDev * (-2 * s.log / s).sqrt
+          val scale = stdDev * (-2 * s.log() / s).sqrt()
           x * scale + mean // Dropped: y * scale + mean
         }
       }

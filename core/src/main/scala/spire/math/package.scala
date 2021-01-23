@@ -199,7 +199,7 @@ package object math {
       throw new IllegalArgumentException("argument <= 0")
 
     @tailrec def rescale(x: BigDecimal, n: Int): (BigDecimal, Int) =
-      if (x < 64) (x, n) else rescale(x.sqrt, n + 1)
+      if (x < 64) (x, n) else rescale(x.sqrt(), n + 1)
 
     val (x, i) = rescale(n, 0)
 
@@ -526,13 +526,14 @@ package object math {
 
   final def hypot[@sp(Float, Double) A](x: A, y: A)(implicit f: Field[A], n: NRoot[A], s: Signed[A]): A = {
     import spire.implicits._
+
     def abs(n: A): A = if (n < f.zero) -n else n
     val ax = abs(x)
     val ay = abs(y)
     if (x == f.zero) ay
     else if (y == f.zero) ax
-    else if (ax > ay) ax * (1 + (y / x) ** 2).sqrt
-    else ay * (1 + (x / y) ** 2).sqrt
+    else if (ax > ay) ax * (1 + ((y / x): A) ** 2).sqrt()
+    else ay * (1 + (x / y) ** 2).sqrt()
   }
 
   // BigInt

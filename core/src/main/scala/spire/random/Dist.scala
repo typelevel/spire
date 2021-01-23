@@ -29,13 +29,14 @@ trait Dist[@sp A] extends Any { self =>
 
   final def filter(pred: A => Boolean): Dist[A] =
     new Dist[A] {
-      @tailrec final def apply(gen: Generator): A = {
+      /*@tailrec */
+      final def apply(gen: Generator): A = {
         val a = self(gen)
         if (pred(a)) a else apply(gen)
       }
     }
 
-  final def given(pred: A => Boolean): Dist[A] =
+  final def given_(pred: A => Boolean): Dist[A] =
     filter(pred)
 
   def until(pred: A => Boolean): Dist[Seq[A]] = {
@@ -148,9 +149,9 @@ trait Dist[@sp A] extends Any { self =>
     }
 }
 
-final class DistIterator[A](next: Dist[A], gen: Generator) extends Iterator[A] {
+final class DistIterator[A](nextD: Dist[A], gen: Generator) extends Iterator[A] {
   final def hasNext: Boolean = true
-  final def next(): A = next(gen)
+  final def next(): A = nextD(gen)
 }
 
 class DistFromGen[@sp A](f: Generator => A) extends Dist[A] {
@@ -218,7 +219,8 @@ trait DistCModule[V, K] extends CModule[Dist[V], Dist[K]] {
   def negate(x: Dist[V]): Dist[V] = new DistFromGen(g => -x(g))
   override def minus(x: Dist[V], y: Dist[V]): Dist[V] = new DistFromGen(g => x(g) - y(g))
   def timesl(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => k(g) *: v(g))
-  def timesr(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => v(g) :* k(g))
+  // def timesr(k: Dist[K], v: Dist[V]): Dist[V] = ??? //new DistFromGen(g => v(g) :* k(g))
+  // def timesr(v: V, r: R): V = timesl(r, v)
 }
 
 trait DistVectorSpace[V, K] extends DistCModule[V, K] with VectorSpace[Dist[V], Dist[K]] {

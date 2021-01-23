@@ -18,7 +18,8 @@ val Scala30 = "3.0.1"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / scalaVersion := Scala213
+ThisBuild / crossScalaVersions := Seq(Scala213, Scala30)
+ThisBuild / scalaVersion := Scala30
 ThisBuild / organization := "org.typelevel"
 
 ThisBuild / githubWorkflowArtifactUpload := false
@@ -388,7 +389,7 @@ lazy val coreSettings = Seq(
     IO.write(algebraFile, algebraSource)
 
     Seq[File](algebraFile)
-  }
+  },
 )
 
 lazy val extrasSettings = Seq(
@@ -459,8 +460,8 @@ lazy val commonScalacOptions = Def.setting(
   (CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, v)) if v >= 13 =>
       Seq(
-        "-Yno-adapted-args",
-        "-Xfuture"
+        // "-Yno-adapted-args",
+        // "-Xfuture"
       )
     case _ =>
       Seq(

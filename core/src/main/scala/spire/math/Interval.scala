@@ -473,7 +473,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
           case (x, _) if x < 0 => error // crosses zero
           case (0, true)       => error // contains zero
           case (0, false)      => this
-          case _               => Bounded(z, lower.reciprocal, 1 | lowerFlagToUpper(lf))
+          case _               => Bounded(z, lower.reciprocal(), 1 | lowerFlagToUpper(lf))
         }
 
       case Below(upper, uf) =>
@@ -481,19 +481,19 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
           case (x, _) if x > 0 => error // crosses zero
           case (0, true)       => error // contains zero
           case (0, false)      => this
-          case _               => Bounded(upper.reciprocal, z, 2 | upperFlagToLower(uf))
+          case _               => Bounded(upper.reciprocal(), z, 2 | upperFlagToLower(uf))
         }
 
-      case Point(v) => Point(v.reciprocal)
+      case Point(v) => Point(v.reciprocal())
 
       case Bounded(lower, upper, flags) =>
         (lower.compare(z), upper.compare(z), isClosedLower(flags), isClosedUpper(flags)) match {
           case (x, y, _, _) if x < 0 && y > 0 => error // crosses zero
           case (0, _, true, _)                => error // contains zero
           case (_, 0, _, true)                => error // contains zero
-          case (0, _, false, _)               => Above(upper.reciprocal, upperFlagToLower(flags))
-          case (_, 0, _, false)               => Below(lower.reciprocal, lowerFlagToUpper(flags))
-          case _                              => Bounded(upper.reciprocal, lower.reciprocal, swapFlags(flags))
+          case (0, _, false, _)               => Above(upper.reciprocal(), upperFlagToLower(flags))
+          case (_, 0, _, false)               => Below(lower.reciprocal(), lowerFlagToUpper(flags))
+          case _                              => Bounded(upper.reciprocal(), lower.reciprocal(), swapFlags(flags))
         }
     }
   }
@@ -502,12 +502,12 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
   def /(rhs: Interval[A])(implicit o: Order[A], ev: Field[A]): Interval[A] =
     (lhs, rhs) match {
       case (Point(lv), _) => rhs.reciprocal * lv
-      case (_, Point(rv)) => lhs * rv.reciprocal
+      case (_, Point(rv)) => lhs * rv.reciprocal()
       case (_, _)         => lhs * rhs.reciprocal
     }
 
   def /(rhs: A)(implicit o: Order[A], ev: Field[A]): Interval[A] =
-    lhs * rhs.reciprocal
+    lhs * rhs.reciprocal()
 
   def +(rhs: A)(implicit ev: AdditiveSemigroup[A]): Interval[A] =
     this match {

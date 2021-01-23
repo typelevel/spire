@@ -59,7 +59,7 @@ trait ByteOrder extends Order[Byte] {
 
 trait ByteSigned extends Signed[Byte] with ByteOrder {
   override def signum(a: Byte): Int = java.lang.Integer.signum(a)
-  override def abs(a: Byte): Byte = (if (a < 0) -a else a).toByte
+  override def abs(a: Byte): Byte = (if (a < 0) -a else a: Int).toByte
 }
 
 trait ByteTruncatedDivision extends TruncatedDivisionCRing[Byte] with ByteSigned {
@@ -113,7 +113,7 @@ trait ByteInstances {
   implicit final val ByteAlgebra
     : EuclideanRing[Byte] with IsIntegral[Byte] with TruncatedDivisionCRing[Byte] with Signed[Byte] with Order[Byte] =
     new ByteAlgebra
-  import spire.math.NumberTag
   import spire.math.NumberTag._
+  import spire.math.NumberTag
   implicit final val ByteTag: NumberTag[Byte] = new BuiltinIntTag[Byte](0, Byte.MinValue, Byte.MaxValue)
 }

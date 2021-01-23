@@ -75,4 +75,4 @@ class ComplexAddBenchmarks {
   def timeAddFloatComplexesBoxed(reps:Int) = run(reps)(addFloatComplexesBoxed(fcs))
   def timeAddFloatComplexesUnboxed(reps:Int) = run(reps)(addFloatComplexesUnboxed(longs))
 }
- */
+*/

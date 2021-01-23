@@ -148,18 +148,18 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
   def =!=(that: Quaternion[_]): Boolean =
     !(this === that)
 
-  def isZero(implicit s: Signed[A]): Boolean = r.isSignZero && i.isSignZero && j.isSignZero && k.isSignZero
-  def isReal(implicit s: Signed[A]): Boolean = i.isSignZero && j.isSignZero && k.isSignZero
-  def isPure(implicit s: Signed[A]): Boolean = r.isSignZero
+  def isZero(implicit s: Signed[A]): Boolean = r.isSignZero() && i.isSignZero() && j.isSignZero() && k.isSignZero()
+  def isReal(implicit s: Signed[A]): Boolean = i.isSignZero() && j.isSignZero() && k.isSignZero()
+  def isPure(implicit s: Signed[A]): Boolean = r.isSignZero()
 
   def real(implicit s: CRing[A]): Quaternion[A] = Quaternion(r)
   def pure(implicit s: CRing[A]): Quaternion[A] = Quaternion(s.zero, i, j, k)
 
   def abs(implicit f: Field[A], n: NRoot[A]): A =
-    (r.pow(2) + i.pow(2) + j.pow(2) + k.pow(2)).sqrt
+    (r.pow(2) + i.pow(2) + j.pow(2) + k.pow(2)).sqrt()
 
   def pureAbs(implicit f: Field[A], n: NRoot[A]): A =
-    (i.pow(2) + j.pow(2) + k.pow(2)).sqrt
+    (i.pow(2) + j.pow(2) + k.pow(2)).sqrt()
 
   def eqv(rhs: Quaternion[A])(implicit o: Eq[A]): Boolean =
     lhs.r === rhs.r && lhs.i === rhs.i && lhs.j === rhs.j && lhs.k === rhs.k
@@ -171,12 +171,12 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
 
   def toComplex: Complex[A] = Complex(r, i)
 
-  def signum(implicit s: Signed[A]): Int = r.signum match {
+  def signum(implicit s: Signed[A]): Int = r.signum() match {
     case 0 =>
-      i.signum match {
+      i.signum() match {
         case 0 =>
-          j.signum match {
-            case 0 => k.signum
+          j.signum() match {
+            case 0 => k.signum()
             case n => n
           }
         case n => n
@@ -201,12 +201,12 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
 
   def sqrt(implicit f: Field[A], nr: NRoot[A], s: Signed[A]): Quaternion[A] =
     if (!isReal) {
-      val n = (r + abs).sqrt
-      Quaternion(n, i / n, j / n, k / n) / f.fromInt(2).sqrt
-    } else if (r.signum >= 0) {
-      Quaternion(r.sqrt)
+      val n = (r + abs).sqrt()
+      Quaternion(n, i / n, j / n, k / n) / f.fromInt(2).sqrt()
+    } else if (r.signum() >= 0) {
+      Quaternion(r.sqrt())
     } else {
-      Quaternion(f.zero, r.abs.sqrt, f.zero, f.zero)
+      Quaternion(f.zero, r.abs().sqrt(), f.zero, f.zero)
     }
 
   def nroot(m: Int)(implicit f: Field[A], nr: NRoot[A], si: Signed[A], tr: Trig[A]): Quaternion[A] =
@@ -219,10 +219,10 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
       val n = abs
       val t = acos(r / n)
       val v = Quaternion(f.zero, i / s, j / s, k / s)
-      val e = if (sin(t).signum >= 0) v else -v
+      val e = if (sin(t).signum() >= 0) v else -v
       val tm = t / m
       (e * sin(tm) + cos(tm)) * n.nroot(m)
-    } else if (r.signum >= 0) {
+    } else if (r.signum() >= 0) {
       Quaternion(r.nroot(m))
     } else {
       Quaternion(Complex(r).nroot(m))
@@ -281,19 +281,19 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
   def **(k: Int)(implicit s: CRing[A]): Quaternion[A] = pow(k)
 
   def fpow(k0: A)(implicit f: Field[A], nr: NRoot[A], si: Signed[A], tr: Trig[A]): Quaternion[A] =
-    if (k0.signum < 0) {
+    if (k0.signum() < 0) {
       Quaternion.zero
     } else if (k0 == f.zero) {
       Quaternion.one
     } else if (k0 == f.one) {
       this
     } else if (!isReal) {
-      val s = (i ** 2 + j ** 2 + k ** 2).sqrt
+      val s = (i ** 2 + j ** 2 + k ** 2).sqrt()
       val v = Quaternion(f.zero, i / s, j / s, k / s)
       val n = abs
       val t = acos(r / n)
       (Quaternion(cos(t * k0)) + v * sin(t * k0)) * n.fpow(k0)
-    } else if (r.signum >= 0) {
+    } else if (r.signum() >= 0) {
       Quaternion(r.fpow(k0))
     } else {
       Quaternion(Complex(r).pow(Complex(k0)))

@@ -7,7 +7,7 @@ import spire.std.map._
 import spire.std.int._
 import spire.syntax.rng._
 
-final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs =>
+final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs: FreeAbGroup[A] =>
 
   /**
    * Maps the terms using `f` to type `B` and sums their results using the
@@ -88,7 +88,7 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
     split[Option[B]] { a => Some(f(a)) }
 
   def |+|(rhs: FreeAbGroup[A]): FreeAbGroup[A] =
-    new FreeAbGroup(lhs.terms + rhs.terms)
+    new FreeAbGroup(lhs.terms ^+ rhs.terms)
 
   def |-|(rhs: FreeAbGroup[A]): FreeAbGroup[A] =
     new FreeAbGroup(lhs.terms - rhs.terms)

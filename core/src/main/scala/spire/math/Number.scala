@@ -269,7 +269,7 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
     if (withinDouble)
       Number(Math.sqrt(n.toDouble))
     else
-      Number(n.toBigDecimal.sqrt)
+      Number(n.toBigDecimal.sqrt())
 
   def nroot(k: Int): Number =
     if (withinDouble)
@@ -520,11 +520,11 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
     Number(spire.math.pow(n, rhs.toBigDecimal))
   }
 
-  def sqrt: Number = Number(n.sqrt)
+  def sqrt: Number = Number(n.sqrt())
   def nroot(k: Int): Number = Number(n.nroot(k))
 
-  def floor: Number = Number(n.floor)
-  def ceil: Number = Number(n.ceil)
+  def floor: Number = Number(n.floor())
+  def ceil: Number = Number(n.ceil())
   def round: Number = Number(n.round())
 }
 

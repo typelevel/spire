@@ -377,7 +377,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
    * sqrt(a + du) ~= sqrt(a) + du / (2 sqrt(a))
    */
   def sqrt()(implicit f: Field[T], n: NRoot[T], v: VectorSpace[Array[T], T]): Jet[T] = {
-    val sa = real.sqrt
+    val sa = real.sqrt()
     val oneHalf = f.one / (f.one + f.one)
     new Jet(sa, (oneHalf / sa) *: infinitesimal)
   }

@@ -7,7 +7,7 @@ sealed trait Op[+A] {
 
   def flatMap[B](f: A => Op[B]): Op[B] =
     this match {
-      case FlatMap(a, g) => FlatMap(a, (x: Any) => g(x).flatMap(f))
+      case FlatMap(a, g) => FlatMap(a, x => g(x).flatMap(f))
       case o             => FlatMap(o, f)
     }
 
@@ -28,7 +28,7 @@ sealed trait Op[+A] {
           case Const(x)      => f(x).resume(gen)
           case More(k)       => Left(() => FlatMap(k(), f))
           case Next(g)       => f(g(gen)).resume(gen)
-          case FlatMap(b, g) => (FlatMap(b, (x: Any) => FlatMap(g(x), f)): Op[A]).resume(gen)
+          case FlatMap(b, g) => (FlatMap(b, x => FlatMap(g(x), f)): Op[A]).resume(gen)
         }
     }
 

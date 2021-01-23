@@ -457,7 +457,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
 
   def *:(k: C)(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C]
   def :*(k: C)(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] = k *: lhs
-  def :/(k: C)(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = this :* k.reciprocal
+  def :/(k: C)(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = this :* k.reciprocal()
 
   override def hashCode: Int = {
     val it = lhs.termsIterator

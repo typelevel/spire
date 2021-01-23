@@ -316,7 +316,8 @@ object BigDecimalRootRefinement {
       n: Int
     ): Approximation = {
       val dx = rx.subtract(lx)
-      val scale = max(getEps(lx), getEps(rx))
+      val scale: Int = spire.math.max(getEps(lx), getEps(rx))
+      // val scale = max(getEps(lx), getEps(rx))
       val eps = JBigDecimal.valueOf(1, scale)
       if (dx.compareTo(eps) <= 0) {
         Bounded(lx, ly, rx, ry, n)
@@ -327,20 +328,20 @@ object BigDecimalRootRefinement {
         val k = s.unscaledValue
         val x1 = lx.add(delta.multiply(new JBigDecimal(k))) // BAM!
         val y1 = evalExact(x1)
-        val s1 = y1.sign
-        if (s1 == ly.sign) {
+        val s1 = y1.sign()
+        if (s1 == ly.sign()) {
           val x2 = x1.add(delta)
           val y2 = evalExact(x2)
-          val s2 = y2.sign
+          val s2 = y2.sign()
           if (s2 == s1) loop0(lx, ly, rx, ry)
-          else if (s2 == ry.sign) loop(x1, y1, x2, y2, 2 * n)
+          else if (s2 == ry.sign()) loop(x1, y1, x2, y2, 2 * n)
           else ExactRoot(x2)
-        } else if (s1 == ry.sign) {
+        } else if (s1 == ry.sign()) {
           val x0 = x1.subtract(delta)
           val y0 = evalExact(x0)
-          val s0 = y0.sign
+          val s0 = y0.sign()
           if (s0 == s1) loop0(lx, ly, rx, ry)
-          else if (s0 == ly.sign) loop(x0, y0, x1, y1, 2 * n)
+          else if (s0 == ly.sign()) loop(x0, y0, x1, y1, 2 * n)
           else ExactRoot(x0)
         } else {
           ExactRoot(x1)
@@ -359,7 +360,7 @@ object BigDecimalRootRefinement {
       if (y0.signum == 0) ExactRoot(x0)
       else if (y1.signum == 0) ExactRoot(x1)
       else if (y2.signum == 0) ExactRoot(x2)
-      else if (y0.sign != y1.sign) loop(x0, y0, x1, y1, 1)
+      else if (y0.sign() != y1.sign()) loop(x0, y0, x1, y1, 1)
       else loop(x1, y1, x2, y2, 1)
     }
 
@@ -383,12 +384,12 @@ object BigDecimalRootRefinement {
 
       if (k < 5) {
         val (x2, y2) = eval(2)
-        if (y2.sign != y0.sign) {
+        if (y2.sign() != y0.sign()) {
           val (x1, y1) = eval(1)
           bisect(x0, y0, x1, y1, x2, y2)
         } else {
           val (x3, y3) = eval(3)
-          if (y3.sign == y5.sign) {
+          if (y3.sign() == y5.sign()) {
             loop(x2, y2, x3, y3, 1)
           } else {
             val (x4, y4) = eval(4)
@@ -397,12 +398,12 @@ object BigDecimalRootRefinement {
         }
       } else {
         val (x3, y3) = eval(3)
-        if (y3.sign != y5.sign) {
+        if (y3.sign() != y5.sign()) {
           val (x4, y4) = eval(4)
           bisect(x3, y3, x4, y4, x5, y5)
         } else {
           val (x2, y2) = eval(2)
-          if (y2.sign == y0.sign) {
+          if (y2.sign() == y0.sign()) {
             loop(x2, y2, x3, y3, 1)
           } else {
             val (x1, y1) = eval(1)
