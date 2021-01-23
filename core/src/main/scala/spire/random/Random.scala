@@ -1,7 +1,7 @@
 package spire
 package random
 
-import spire.scalacompat.{Factory, FactoryCompatOps}
+import scala.collection.Factory
 
 sealed trait Op[+A] {
 
@@ -96,7 +96,7 @@ trait RandomCompanion[G <: Generator] { self =>
       size.random(self).flatMap(collectionOfSize(_))
 
     def collectionOfSize[CC[_]](n: Int)(implicit cbf: Factory[A, CC[A]]): Random[CC[A], G] =
-      foldLeftOfSize(n)(cbf.newBuilder) { (b, a) => b += a; b }.map(_.result()) 
+      foldLeftOfSize(n)(cbf.newBuilder) { (b, a) => b += a; b }.map(_.result())
 
     def foldLeftOfSize[B](n: Int)(init: => B)(f: (B, A) => B): Random[B, G] = {
       def loop(n: Int, ma: Op[A]): Op[B] =

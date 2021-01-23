@@ -9,6 +9,7 @@ import spire.std.array._
 import spire.syntax.field._
 import spire.syntax.eq._
 import spire.syntax.std.seq._
+import scala.annotation.nowarn
 
 /**
   * Polynomial
@@ -41,7 +42,7 @@ object Polynomial extends PolynomialInstances {
   def apply[@sp(Double) C: Semiring: Eq: ClassTag](data: Map[Int, C]): PolySparse[C] =
     sparse(data)
 
-  def apply[@sp(Double) C: Semiring: Eq: ClassTag](terms: TraversableOnce[Term[C]]): PolySparse[C] =
+  def apply[@sp(Double) C: Semiring: Eq: ClassTag](terms: IterableOnce[Term[C]]): PolySparse[C] =
     PolySparse(terms)
 
   def apply[@sp(Double) C: Semiring: Eq: ClassTag](c: C, e: Int): PolySparse[C] =
@@ -242,6 +243,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
     * Returns the non-zero term of the minimum degree in this polynomial, unless
     * it is zero. If this polynomial is zero, then this returns a zero term.
     */
+  @nowarn
   def minTerm(implicit ring: Semiring[C], eq: Eq[C]): Term[C] = {
     foreachNonZero { (n, c) =>
       return Term(c, n)

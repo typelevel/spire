@@ -74,9 +74,9 @@ object FreeGroup { companion =>
     def inverse(a: FreeGroup[A]): FreeGroup[A] = a.inverse
     override def remove(a: FreeGroup[A], b: FreeGroup[A]): FreeGroup[A] = a |-| b
 
-    override def combineAll(as: TraversableOnce[FreeGroup[A]]): FreeGroup[A] = {
+    override def combineAll(as: IterableOnce[FreeGroup[A]]): FreeGroup[A] = {
       val bldr = Vector.newBuilder[Either[A, A]]
-      as.foreach(bldr ++= _.terms)
+      as.iterator.foreach(bldr ++= _.terms)
       new FreeGroup(bldr.result())
     }
   }

@@ -34,9 +34,9 @@ object FreeMonoid { companion =>
     def empty: FreeMonoid[A] = companion.empty
     def combine(a: FreeMonoid[A], b: FreeMonoid[A]): FreeMonoid[A] = a |+| b
 
-    override def combineAll(as: TraversableOnce[FreeMonoid[A]]): FreeMonoid[A] = {
+    override def combineAll(as: IterableOnce[FreeMonoid[A]]): FreeMonoid[A] = {
       val b = List.newBuilder[A]
-      as.foreach(b ++= _.terms)
+      as.iterator.foreach(b ++= _.terms)
       new FreeMonoid(b.result())
     }
   }

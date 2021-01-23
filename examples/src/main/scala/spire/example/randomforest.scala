@@ -8,8 +8,6 @@ import scala.util.Random.nextInt
 
 import CrossValidation._
 
-import spire.scalacompat.parallelSeq
-
 /**
  * An example of constructing Random Forests for both regression and
  * classification. This example shows off the utility of vector spaces (in this
@@ -107,8 +105,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
     numAxesSample: Int,
     numPointsSample: Int,
     numTrees: Int,
-    minSplitSize: Int,
-    parallel: Boolean)
+    minSplitSize: Int)
 
   /**
    * Construct a random forest.
@@ -225,14 +222,8 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
 
     // Random forests are embarassingly parallel. Except for very small
     // datasets, there is no reason not to parallelize the algorithm.
-
-    if (opts.parallel) {
-      Forest(parallelSeq((1 to opts.numTrees).toList).map({ _ =>
-        growTree(sample())
-      }).toList)
-    } else {
-      Forest(List.fill(opts.numTrees)(growTree(sample())))
-    }
+    // However parallel collections don't exist starting on scala 2.13
+    Forest(List.fill(opts.numTrees)(growTree(sample())))
   }
 
   protected def fromForest(forest: Forest): V => K
@@ -245,8 +236,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
       options.numAxesSample getOrElse defaults.numAxesSample,
       options.numPointsSample getOrElse defaults.numPointsSample,
       options.numTrees getOrElse defaults.numTrees,
-      options.minSplitSize getOrElse defaults.minSplitSize,
-      options.parallel)
+      options.minSplitSize getOrElse defaults.minSplitSize)
   }
 
   def apply(data: Array[V], out: Array[K], options: RandomForestOptions) = {
@@ -284,7 +274,7 @@ class RandomForestRegression[V, @sp(Double) F](implicit val V: CoordinateSpace[V
   protected def defaultOptions(size: Int): FixedOptions = {
     val axes = math.max(V.dimensions / 3, math.min(V.dimensions, 2))
     val sampleSize = math.max(size * 2 / 3, 1)
-    FixedOptions(axes, sampleSize, size, 5, true)
+    FixedOptions(axes, sampleSize, size, 5)
   }
 
   protected def fromForest(forest: Forest): V => F = { v =>
@@ -330,7 +320,7 @@ class RandomForestClassification[V, @sp(Double) F, K](implicit val V: Coordinate
   protected def defaultOptions(size: Int): FixedOptions = {
     val axes = math.max(math.sqrt(V.dimensions.toDouble).toInt, math.min(V.dimensions, 2))
     val sampleSize = math.max(size * 2 / 3, 1)
-    FixedOptions(axes, sampleSize, size, 5, true)
+    FixedOptions(axes, sampleSize, size, 5)
   }
 
   protected def fromForest(forest: Forest): V => K = { v =>

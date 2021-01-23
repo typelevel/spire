@@ -7,7 +7,7 @@ import spire.algebra._
 import spire.std.BooleanIsRig
 import spire.implicits._
 
-import scala.collection.compat.immutable.LazyList
+import scala.collection.immutable.LazyList
 
 
 /**

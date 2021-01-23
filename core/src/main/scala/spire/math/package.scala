@@ -12,7 +12,7 @@ import spire.algebra.{Eq, Field, GCDRing, IsReal, NRoot, Order, Signed, Trig}
 import spire.std.bigDecimal._
 import spire.syntax.nroot._
 
-import scala.collection.compat.immutable.LazyList
+import scala.collection.immutable.LazyList
 
 package object math {
 

@@ -223,7 +223,7 @@ object PolySparse {
     }
   }
 
-  final def apply[@sp(Double) C: Semiring: Eq: ClassTag](data: TraversableOnce[Term[C]]): PolySparse[C] = {
+  final def apply[@sp(Double) C: Semiring: Eq: ClassTag](data: IterableOnce[Term[C]]): PolySparse[C] = {
     import spire.scalacompat.arrayBuilderMake
 
     var expBldr = arrayBuilderMake[Int]()
@@ -233,7 +233,7 @@ object PolySparse {
     var inOrder = true
     var lastDeg = -1
 
-    data.foreach { case Term(c, i) =>
+    data.iterator.foreach { case Term(c, i) =>
       if (c =!= zero) {
         expBldr += i
         coeffBldr += c

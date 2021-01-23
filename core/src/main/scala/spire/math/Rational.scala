@@ -12,6 +12,7 @@ import spire.std.long.LongAlgebra
 import spire.std.double._
 import spire.syntax.nroot._
 import spire.util.Opt
+import scala.annotation.nowarn
 
 //scalastyle:off equals.hash.code
 sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions with Ordered[Rational] { lhs =>
@@ -688,6 +689,7 @@ object Rational extends RationalInstances {
       if(d == 1L) n
       else n / d
 
+    @nowarn
     override def equals(that: Any): Boolean = that match {
       case that: LongRational => this.n == that.n && this.d == that.d
       case _ => super.equals(that)
@@ -841,6 +843,7 @@ object Rational extends RationalInstances {
           ((r.d / dgcd) * n) compare ((d / dgcd) * r.n)
     }
 
+    @nowarn
     override def equals(that: Any): Boolean = that match {
       case that: BigRational => this.n == that.n && this.d == that.d
       case _ => super.equals(that)

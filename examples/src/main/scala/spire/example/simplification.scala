@@ -4,9 +4,8 @@ package example
 import spire.implicits._
 import spire.math._
 
-import scala.collection.compat.immutable.LazyList
+import scala.collection.immutable.LazyList
 import scala.collection.mutable.Builder
-import spire.scalacompat.BuilderCompat
 
 /**
  * Some tools for simplifying decimal expressions, and playing around
@@ -153,7 +152,7 @@ object BigStream extends BigStreamCompanionCompat {
   }
 
   def newBuilder[A]: Builder[A, BigStream[A]] =
-    new BuilderCompat[A, BigStream[A]] {
+    new Builder[A, BigStream[A]] {
       private var elems: List[A] = Nil
       def addOne(a: A): this.type = {
         elems = a :: elems

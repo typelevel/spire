@@ -9,5 +9,5 @@ trait BigStreamCompat[A] extends IterableOps[A, BigStream, BigStream[A]]
 
 trait BigStreamCompanionCompat extends IterableFactory[BigStream] {
   def from[A](source: IterableOnce[A]): BigStream[A] =
-    source.foldLeft(BigStream.empty[A])((t, a) => new BigCons(a, t))
+    source.iterator.foldLeft(BigStream.empty[A])((t, a) => new BigCons(a, t))
 }

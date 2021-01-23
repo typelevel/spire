@@ -3,7 +3,7 @@ package example
 
 import spire.algebra._
 import spire.implicits._
-import spire.scalacompat.{Factory, FactoryCompatOps}
+import scala.collection.Factory
 
 import scala.util.Random.{ nextInt, nextDouble, nextGaussian }
 

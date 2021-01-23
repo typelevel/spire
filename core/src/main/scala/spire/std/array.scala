@@ -4,6 +4,7 @@ package std
 
 import spire.algebra._
 import spire.NoImplicit
+import scala.annotation.nowarn
 
 object ArraySupport {
   import spire.syntax.order._
@@ -146,6 +147,7 @@ trait ArrayInstances extends ArrayInstances3 {
 }
 
 @SerialVersionUID(0L)
+@nowarn
 private final class ArrayCModule[@sp(Int,Long,Float,Double) A: ClassTag: CRing]
     (implicit nvs: NoImplicit[VectorSpace[Array[A], A]])
     extends CModule[Array[A], A] with Serializable {
@@ -158,6 +160,7 @@ private final class ArrayCModule[@sp(Int,Long,Float,Double) A: ClassTag: CRing]
 }
 
 @SerialVersionUID(0L)
+@nowarn
 private final class ArrayVectorSpace[@sp(Int,Float,Long,Double) A: ClassTag: Field]
     (implicit nnvs: NoImplicit[NormedVectorSpace[Array[A], A]])
     extends VectorSpace[Array[A], A] with Serializable {

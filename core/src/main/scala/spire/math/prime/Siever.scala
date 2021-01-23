@@ -5,7 +5,7 @@ import spire.math.SafeLong
 
 import SieveUtil._
 
-import scala.collection.compat.immutable.LazyList
+import scala.collection.immutable.LazyList
 
 /**
  * Segmented Sieve of Eratosthenes implementation

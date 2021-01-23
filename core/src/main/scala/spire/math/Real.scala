@@ -2,12 +2,13 @@ package spire
 package math
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
-import scala.collection.compat.immutable.LazyList
-import scala.collection.compat.immutable.LazyList.#::
+import scala.collection.immutable.LazyList
+import scala.collection.immutable.LazyList.#::
 
 import spire.algebra.{Field, Trig, TruncatedDivisionCRing}
 import spire.syntax.nroot._
 import spire.util.Opt
+import scala.annotation.nowarn
 
 sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
@@ -56,6 +57,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   override def hashCode(): Int = toRational.hashCode
 
+  @nowarn
   override def equals(y: Any): Boolean = y match {
     case y: Real => this === y
     case y => toRational.equals(y)

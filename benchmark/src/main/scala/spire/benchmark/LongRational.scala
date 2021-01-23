@@ -22,7 +22,7 @@ object LongRational {
 final class LongRational private (val n: Long, val d: Long) {
   import LongRational.gcd
 
-  def unary_-(): LongRational = new LongRational(-n, d)
+  def unary_- : LongRational = new LongRational(-n, d)
 
   def +(r: LongRational): LongRational = {
     val dgcd: Long = gcd(d, r.d)
@@ -88,9 +88,9 @@ final class LongRational private (val n: Long, val d: Long) {
   def compare(r: LongRational): Int = {
     val dgcd = gcd(d, r.d)
     if (dgcd == 1)
-      java.lang.Math.signum(n * r.d - r.n * d).toInt
+      java.lang.Math.signum(n * r.d.toFloat - r.n * d).toInt
     else
-      java.lang.Math.signum((r.d / dgcd) * n - (d / dgcd) * r.n).toInt
+      java.lang.Math.signum((r.d / dgcd) * n.toFloat - (d / dgcd) * r.n).toInt
   }
 
   def signum: Int = if (n < 0) -1 else if (n > 0) 1 else 0

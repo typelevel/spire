@@ -414,7 +414,7 @@ final class RightModuleOps[V](x: V) {
   def :*[F](rhs:Int)(implicit ev: RightModule[V, F], F: Ring[F]): V = ev.timesr(x, F.fromInt(rhs))
 }
 
-final class ModuleUnboundOps[F](lhs: F)(implicit ev: CModule[_, F]) {
+final class ModuleUnboundOps[F: ({ type F[A] = CModule[_, A] })#F](lhs: F) {
   def +(rhs: F): F = macro Ops.binopWithScalar[F, F]
   def -(rhs: F): F = macro Ops.binopWithScalar[F, F]
   def unary_- : F = macro Ops.unopWithScalar0[F]
@@ -435,7 +435,7 @@ final class VectorSpaceOps[V](x: V) {
   def :/[F](rhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.divr(x, ev.scalar.fromDouble(rhs))
 }
 
-final class VectorSpaceUnboundOps[F](lhs: F)(implicit ev: VectorSpace[_, F]) {
+final class VectorSpaceUnboundOps[F: ({ type F[A] = VectorSpace[_, A] })#F](lhs: F) {
   def /(rhs: F): F = macro Ops.binopWithScalar[F, F]
   def reciprocal(): F = macro Ops.unopWithScalar[F]
 }
@@ -539,19 +539,19 @@ final class RightActionOps[P](lhs: P) {
     macro Ops.binopWithEv[G, MultiplicativeAction[P, G], P]
 }
 
-final class ActionUnboundOps[G](lhs: G)(implicit ev: Action[_, G]) {
+final class ActionUnboundOps[G: ({ type F[A] = Action[_, A] })#F](lhs: G) {
   def |+|(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def |-|(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def inverse(): G = macro Ops.unopWithScalar[G]
 }
 
-final class AdditiveActionUnboundOps[G](lhs: G)(implicit ev: AdditiveAction[_, G]) {
+final class AdditiveActionUnboundOps[G: ({ type F[A] = AdditiveAction[_, A] })#F](lhs: G) {
   def +(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def -(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def unary_- : G = macro Ops.unopWithScalar0[G]
 }
 
-final class MultiplicativeActionUnboundOps[G](lhs: G)(implicit ev: MultiplicativeAction[_, G]) {
+final class MultiplicativeActionUnboundOps[G: ({ type F[A] = MultiplicativeAction[_, A] })#F](lhs: G) {
   def *(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def /(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def reciprocal(): G = macro Ops.unopWithScalar[G]

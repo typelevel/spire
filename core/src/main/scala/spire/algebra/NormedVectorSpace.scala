@@ -3,7 +3,9 @@ package algebra
 
 import spire.std._
 
-import spire.scalacompat.{Factory, SeqLike}
+import scala.collection.Factory
+import scala.collection.Seq
+import scala.collection.SeqOps
 
 /**
  * A normed vector space is a vector space equipped with a function
@@ -33,11 +35,11 @@ private[algebra] trait NormedVectorSpace0 {
 }
 
 private[algebra] trait NormedVectorSpaceFunctions {
-  def max[A: Order: Field: Signed, CC[A] <: SeqLike[A, CC[A]]](
+  def max[A: Order: Field: Signed, CC[A] <: SeqOps[A, Seq, CC[A]]](
       implicit cbf0: Factory[A, CC[A]]): NormedVectorSpace[CC[A], A] =
     new SeqMaxNormedVectorSpace[A, CC[A]]
 
-  def Lp[A: Field: NRoot: Signed, CC[A] <: SeqLike[A, CC[A]]](p: Int)(
+  def Lp[A: Field: NRoot: Signed, CC[A] <: SeqOps[A, Seq, CC[A]]](p: Int)(
       implicit cbf0: Factory[A, CC[A]]): NormedVectorSpace[CC[A], A] =
     new SeqLpNormedVectorSpace[A, CC[A]](p)
 }
