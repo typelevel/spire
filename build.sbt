@@ -4,7 +4,7 @@ import microsites._
 import ReleaseTransformations._
 import sbtcrossproject.{CrossType, crossProject}
 
-lazy val scalaCollectionCompatVersion = "2.3.2"
+lazy val scalaCollectionCompatVersion = "2.4.0"
 
 lazy val scalaCheckVersion = "1.15.2"
 
