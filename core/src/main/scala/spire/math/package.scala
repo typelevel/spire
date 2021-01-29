@@ -142,8 +142,6 @@ package object math {
       return power(BigDecimal(1), part, whole.toBigInt)
     }
 
-    // var precision = k.mc.getPrecision + 3
-    // var leeway = 1000
 
     @tailrec
     def doit(precision: Int, leeway: Int): BigDecimal = {

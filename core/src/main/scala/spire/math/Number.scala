@@ -492,7 +492,6 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
   def r_/(lhs: Number): Number = Number(lhs.toBigDecimal / n)
   def r_tquot(lhs: Number): Number = Number(lhs.toBigDecimal quot n)
   def r_tmod(lhs: Number): Number = Number(lhs.toBigDecimal % n)
-  // private def tuplize(t: (BigDecimal, BigDecimal)) = (DecimalNumber(t._1), DecimalNumber(t._2))
   def tquotmod(rhs: Number): (Number, Number) = {
     val t = n /% rhs.toBigDecimal
     (Number(t._1), Number(t._2))
@@ -574,8 +573,6 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
 
   def r_tquot(lhs: Number): Number = Number(lhs.toRational tquot n)
   def r_tmod(lhs: Number): Number = Number(lhs.toRational tmod n)
-
-  // private def tuplize(t: (Rational, Rational)) = (RationalNumber(t._1), RationalNumber(t._2))
 
   def tquotmod(rhs: Number): (Number, Number) = {
     val t = n tquotmod rhs.toRational

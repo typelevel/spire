@@ -48,8 +48,6 @@ object RootIsolator {
    * goes into greater detail.
    */
   private final def VAS(poly: Polynomial[BigInt]): Vector[Interval[Rational]] = {
-    // val x = Polynomial.x[BigInt]
-    // val one = Polynomial.one[BigInt]
 
     // As we go through the VAS algorithm, we transform the polynomial by
     // shifting it along the x-axis, flipping it about the y-axis, or inverting

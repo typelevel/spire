@@ -535,16 +535,14 @@ trait PolynomialOverField[@sp(Double) C] extends PolynomialOverRing[C]
   def emod(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = equotmod(x, y)._2
   override def equotmod(x: Polynomial[C], y: Polynomial[C]): (Polynomial[C], Polynomial[C]) = {
     require(!y.isZero, "Can't divide by polynomial of zero!")
-    x match {
+    (x: @unchecked) match {
       case xd: poly.PolyDense[C] => poly.PolyDense.quotmodDense(xd, y)
       case xs: poly.PolySparse[C] =>
-        val ys = y match {
+        val ys = (y: @unchecked) match {
           case yd: poly.PolyDense[C] => poly.PolySparse.dense2sparse(yd)
           case ys1: poly.PolySparse[C] => ys1
-          case _ => sys.error("no")
         }
         poly.PolySparse.quotmodSparse(xs, ys)
-      case _ => sys.error("no")
     }
   }
 }

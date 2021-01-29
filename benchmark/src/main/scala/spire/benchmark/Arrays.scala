@@ -49,56 +49,56 @@ object Arrays {
   class IntState {
     var values: Array[Int] = _
     @Setup
-    def setup(): Unit = values = init(size)(nextInt)
+    def setup(): Unit = values = init(size)(nextInt())
   }
 
   @State(Scope.Thread)
   class LongState {
     var values: Array[Long] = _
     @Setup
-    def setup(): Unit = values = init(size)(nextLong)
+    def setup(): Unit = values = init(size)(nextLong())
   }
 
   @State(Scope.Thread)
   class FloatState {
     var values: Array[Float] = _
     @Setup
-    def setup(): Unit = values = init(size)(nextFloat)
+    def setup(): Unit = values = init(size)(nextFloat())
   }
 
   @State(Scope.Thread)
   class DoubleState {
     var values: Array[Double] = _
     @Setup
-    def setup(): Unit = values = init(size)(nextDouble)
+    def setup(): Unit = values = init(size)(nextDouble())
   }
 
   @State(Scope.Thread)
   class FastComplexState {
     var values: Array[Long] = _
     @Setup
-    def setup(): Unit = values = init(size)(FastComplex(nextFloat, nextFloat))
+    def setup(): Unit = values = init(size)(FastComplex(nextFloat(), nextFloat()))
   }
 
   @State(Scope.Thread)
   class FloatComplexState {
     var values: Array[FloatComplex] = _
     @Setup
-    def setup(): Unit = values = init(size)(nextFloatComplex)
+    def setup(): Unit = values = init(size)(nextFloatComplex())
   }
 
   @State(Scope.Thread)
   class ComplexFloatState {
     var values: Array[Complex[Float]] = _
     @Setup
-    def setup(): Unit = values = init(size)(nextComplexFloat)
+    def setup(): Unit = values = init(size)(nextComplexFloat())
   }
 
   @State(Scope.Thread)
   class ComplexDoubleState {
     var values: Array[Complex[Double]] = _
     @Setup
-    def setup(): Unit = values = init(size)(nextComplexDouble)
+    def setup(): Unit = values = init(size)(nextComplexDouble())
   }
 
 }

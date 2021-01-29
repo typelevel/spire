@@ -56,7 +56,6 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
     if (n == 3) return SafeLong(2)
 
     var i = 3
-    // var k = n - 1
     var last = SafeLong(2)
     while (true) {
       val primes = sieve.primes

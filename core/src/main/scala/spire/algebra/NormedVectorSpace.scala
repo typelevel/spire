@@ -33,11 +33,11 @@ private[algebra] trait NormedVectorSpace0 {
 }
 
 private[algebra] trait NormedVectorSpaceFunctions {
-  def max[A: Order, CC[A] <: SeqLike[A, CC[A]]](implicit field0: Field[A],
-      signed0: Signed[A], cbf0: Factory[A, CC[A]]): NormedVectorSpace[CC[A], A] =
+  def max[A: Order: Field: Signed, CC[A] <: SeqLike[A, CC[A]]](
+      implicit cbf0: Factory[A, CC[A]]): NormedVectorSpace[CC[A], A] =
     new SeqMaxNormedVectorSpace[A, CC[A]]
 
-  def Lp[A, CC[A] <: SeqLike[A, CC[A]]](p: Int)(implicit field0: Field[A], nroot0: NRoot[A],
-      signed0: Signed[A], cbf0: Factory[A, CC[A]]): NormedVectorSpace[CC[A], A] =
+  def Lp[A: Field: NRoot: Signed, CC[A] <: SeqLike[A, CC[A]]](p: Int)(
+      implicit cbf0: Factory[A, CC[A]]): NormedVectorSpace[CC[A], A] =
     new SeqLpNormedVectorSpace[A, CC[A]](p)
 }

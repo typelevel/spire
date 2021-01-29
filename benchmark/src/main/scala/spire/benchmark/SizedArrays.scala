@@ -37,7 +37,7 @@ object SizedArrays {
     var size: Int = 0
     var values: Array[Int] = _
     @Setup
-    def setup(): Unit = values = init(size)(nextInt)
+    def setup(): Unit = values = init(size)(nextInt())
   }
 
   @State(Scope.Thread)
@@ -46,7 +46,7 @@ object SizedArrays {
     var size: Int = 0
     var values: Array[Long] = _
     @Setup
-    def setup(): Unit = values = init(size)(nextLong)
+    def setup(): Unit = values = init(size)(nextLong())
   }
 
   @State(Scope.Thread)
@@ -55,7 +55,7 @@ object SizedArrays {
     var size: Int = 0
     var values: Array[Float] = _
     @Setup
-    def setup(): Unit = values = init(size)(nextFloat)
+    def setup(): Unit = values = init(size)(nextFloat())
   }
 
   @State(Scope.Thread)
@@ -64,7 +64,7 @@ object SizedArrays {
     var size: Int = 0
     var values: Array[Double] = _
     @Setup
-    def setup(): Unit = values = init(size)(nextDouble)
+    def setup(): Unit = values = init(size)(nextDouble())
   }
 
   @State(Scope.Thread)

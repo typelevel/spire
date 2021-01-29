@@ -80,7 +80,6 @@ class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extend
 
 object Marsaglia32a6 extends GeneratorCompanion[Marsaglia32a6, Array[Int]] {
   def fromBytes(bytes: Array[Byte]): Marsaglia32a6 = {
-    // val bs = if (bytes.length < 24) Arrays.copyOf(bytes, 24) else bytes
     val bb = ByteBuffer.wrap(bytes)
     val x = bb.getInt()
     val y = bb.getInt()

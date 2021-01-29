@@ -218,11 +218,9 @@ object Syntax {
 
     // names always contains 5 entries
     val names = util.names("range", "index", "end", "limit", "step")
-    // val range = names(0)
     val index = names(1)
     val end = names(2)
     val limit = names(3)
-    // val step = names(4)
 
     def isLiteral(t: Tree): Option[Int] = t match {
       case Literal(Constant(a)) => a match {

@@ -58,7 +58,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   override def equals(y: Any): Boolean = y match {
     case y: Real => this === y
-    case y => toRational == y
+    case y => toRational.equals(y)
   }
 
   def ===(y: Real): Boolean =
@@ -477,26 +477,24 @@ object Real extends RealInstances {
   lazy val sqrt1By2 = Real.two.reciprocal().sqrt()
 
   def accumulate(total: SafeLong, xs: LazyList[SafeLong], cs: LazyList[Rational]): SafeLong = {
-    (xs, cs) match {
+    ((xs, cs): @unchecked) match {
       case (_, Seq()) => total
       case (Seq(), _) => sys.error("nooooo")
       case (x #:: xs, c #:: cs) =>
         val t = roundUp(c * Rational(x))
         if (t == 0) total else accumulate(total + t, xs, cs)
-      case (_, _) => sys.error("nooooo")
     }
   }
 
   @deprecated("prefer LazyList instead", "0.17.0")
   def accumulate(total: SafeLong, xs: Stream[SafeLong], cs: Stream[Rational]): SafeLong = {
     import scala.#::
-    (xs, cs) match {
+    ((xs, cs): @unchecked) match {
       case (_, Stream.Empty) => total
       case (Stream.Empty, _) => sys.error("nooooo")
       case (x #:: xs, c #:: cs) =>
         val t = roundUp(c * Rational(x))
         if (t == 0) total else accumulate(total + t, xs, cs)
-      case (_, _) => sys.error("nooooo")
     }
   }
 
