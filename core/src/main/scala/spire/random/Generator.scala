@@ -340,7 +340,7 @@ abstract class Generator {
       System.arraycopy(as, 0, chosen, 0, as.length)
       shuffle(chosen)
     } else {
-      throw new IllegalArgumentException("sample size (%d) exceeds input size (%d)" format (size, as.length))
+      throw new IllegalArgumentException("sample size (%d) exceeds input size (%d)".format(size, as.length))
     }
     chosen
   }
@@ -358,7 +358,7 @@ abstract class Generator {
       i += 1
     }
     if (i < size) {
-      throw new IllegalArgumentException("sample size (%d) exceeds input size (%d)" format (size, i))
+      throw new IllegalArgumentException("sample size (%d) exceeds input size (%d)".format(size, i))
     }
     chosen
   }
@@ -530,7 +530,7 @@ object GlobalRng extends LongBasedGenerator {
 
   def copyInit: Generator = rng.copyInit
 
-  def getSeedBytes: Array[Byte] = rng.getSeedBytes
+  override def getSeedBytes(): Array[Byte] = rng.getSeedBytes()
 
   def setSeedBytes(bytes: Array[Byte]): Unit = rng.setSeedBytes(bytes)
 

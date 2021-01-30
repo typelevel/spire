@@ -36,13 +36,13 @@ object InsertionSort extends Sort {
     * @param end the index of the last element, exclusive, to be sorted
     * @tparam A a member of the type class `Order`
     */
-  final def sort[@sp A](data:Array[A], start:Int, end:Int)(implicit o:Order[A], ct:ClassTag[A]): Unit = {
+  final def sort[@sp A: ClassTag: Order](data:Array[A], start:Int, end:Int): Unit = {
     require(start <= end && start >= 0 && end <= data.length)
     var i = start + 1
     while (i < end) {
       val item = data(i)
       var hole = i
-      while (hole > start && o.gt(data(hole - 1), item)) {
+      while (hole > start && Order[A].gt(data(hole - 1), item)) {
         data(hole) = data(hole - 1)
         hole -= 1
       }
@@ -197,7 +197,7 @@ object QuickSort {
     * @tparam A a member of the type class Order
     * @return the next pivot value
     */
-  final def partition[@sp A](data:Array[A], start:Int, end:Int, pivotIndex:Int)(implicit o:Order[A], ct:ClassTag[A]): Int = {
+  final def partition[@sp A: ClassTag: Order](data:Array[A], start:Int, end:Int, pivotIndex:Int): Int = {
     require(start >= 0 && pivotIndex >= start && end > pivotIndex && end <= data.length)
     val pivotValue = data(pivotIndex)
 
@@ -207,7 +207,7 @@ object QuickSort {
     var store = start
     var i = start
     while (i < end - 1) {
-      if (o.lt(data(i), pivotValue)) {
+      if (Order[A].lt(data(i), pivotValue)) {
         //swap(i, store)
         temp = data(i); data(i) = data(store); data(store) = temp
         store += 1

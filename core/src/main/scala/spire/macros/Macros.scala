@@ -100,7 +100,7 @@ object Macros {
   def formatDecimal(c: Context, sep: String, dec: String): String = {
     val esep = if (sep == ".") "\\." else sep
     val edec = if (dec == ".") "\\." else dec
-    val regex = "-?(0|[1-9][0-9]{0,2}(%s[0-9]{3})*)(%s[0-9]+)?" format (esep, edec)
+    val regex = "-?(0|[1-9][0-9]{0,2}(%s[0-9]{3})*)(%s[0-9]+)?".format(esep, edec)
     import c.universe._
     val Apply(_, List(Apply(_, List(Literal(Constant(s:String)))))) = c.prefix.tree
     if (!s.matches(regex)) c.error(c.enclosingPosition, "invalid decimal number")
@@ -131,7 +131,7 @@ object Macros {
     import c.universe._
     try {
       val s = formatWhole(c, sep)
-      val b = BigInt(s) // make sure it's ok
+      BigInt(s) // make sure it's ok
       c.Expr[BigInt](Apply(q"scala.math.BigInt.apply", List(Literal(Constant(s)))))
     } catch {
       case e: Exception =>
@@ -143,7 +143,7 @@ object Macros {
     import c.universe._
     try {
       val s = formatDecimal(c, sep, dec)
-      val b = BigDecimal(s) // make sure it's ok
+      BigDecimal(s) // make sure it's ok
       c.Expr[BigDecimal](Apply(q"scala.math.BigDecimal.apply", List(Literal(Constant(s)))))
     } catch {
       case e: Exception =>

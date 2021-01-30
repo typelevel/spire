@@ -87,7 +87,9 @@ trait BigIntegerTruncatedDivision extends TruncatedDivisionCRing[BigInteger] wit
   def tquot(a: BigInteger, b: BigInteger): BigInteger = a divide b
   def tmod(a: BigInteger, b: BigInteger): BigInteger = a remainder b
   override def tquotmod(a: BigInteger, b: BigInteger): (BigInteger, BigInteger) = {
-    val Array(d, r) = a.divideAndRemainder(b)
+    val arr = a.divideAndRemainder(b)
+    val d = arr(0)
+    val r = arr(1)
     (d, r)
   }
 }

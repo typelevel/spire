@@ -36,7 +36,7 @@ case class FixedScale(denom: Int) {
  * val c = new FixedPoint(12345L)          // "raw" repr
  */
 class FixedPoint(val long: Long) extends AnyVal { lhs =>
-  def unary_-(): FixedPoint =
+  def unary_- : FixedPoint =
     if (long != Long.MinValue) new FixedPoint(-long)
     else throw new FixedPointOverflow(long)
 
@@ -243,7 +243,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   import spire.syntax.nroot._
 
   def sqrt(implicit scale: FixedScale): FixedPoint =
-    FixedPoint(toReal.sqrt.toRational)
+    FixedPoint(toReal.sqrt().toRational)
 
   def nroot(k: Int)(implicit scale: FixedScale): FixedPoint =
     FixedPoint(toReal.nroot(k).toRational)

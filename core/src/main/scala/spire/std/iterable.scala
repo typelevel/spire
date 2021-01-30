@@ -8,12 +8,12 @@ import spire.algebra.Monoid
 @SerialVersionUID(0L)
 final class IterableMonoid[A, SA <: IterableLike[A, SA]](implicit cbf: Factory[A, SA])
 extends Monoid[SA] with Serializable {
-  def empty: SA = cbf.newBuilder.result
+  def empty: SA = cbf.newBuilder.result()
   def combine(x: SA, y: SA): SA = {
     val b = cbf.newBuilder
     b.++=(x)
     b.++=(y)
-    b.result
+    b.result()
   }
 
   override def combineAll(xs: TraversableOnce[SA]): SA = {

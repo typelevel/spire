@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference
 import scala.math.{ ScalaNumber, ScalaNumericConversions }
 
 import spire.Platform
-import spire.algebra.{Eq, Field, IsAlgebraic, NRoot, Order, Sign, TruncatedDivisionCRing}
+import spire.algebra.{Eq, Field, IsAlgebraic, NRoot, Sign, TruncatedDivisionCRing}
 import spire.macros.Checked.checked
 import spire.math.poly.{ Term, BigDecimalRootRefinement, RootFinder, Roots }
 import spire.std.bigInt._
@@ -1134,10 +1134,6 @@ object Algebraic extends AlgebraicInstances {
   final def nroot(value: JBigDecimal, n: Int, scale: Int, roundingMode: RoundingMode): JBigDecimal =
     nroot(value, n)(_ => scale + 1).setScale(scale, roundingMode)
 
-  private implicit val JBigDecimalOrder: Order[JBigDecimal] = new Order[JBigDecimal] {
-    def compare(x: JBigDecimal, y: JBigDecimal): Int = x compareTo y
-  }
-
   /**
    * Rounds an approximation (`approx`) to the `exact` Algebraic value using
    * the given `scale` and `RoundingMode` (`mode`). This will always be
@@ -1191,10 +1187,13 @@ object Algebraic extends AlgebraicInstances {
       roundPositive(exact, approx.setScale(scale + 18, RoundingMode.DOWN), scale, mode)
     } else {
       val unscale = spire.math.pow(10L, cutoff.toLong)
-      val Array(truncatedUnscaledValue, bigRemainder) =
+      // This is always a size 2 array
+      val arr = 
         approx
           .unscaledValue
           .divideAndRemainder(BigInteger.valueOf(unscale))
+      val truncatedUnscaledValue = arr(0)
+      val bigRemainder = arr(1)
       val truncated = new JBigDecimal(truncatedUnscaledValue, scale)
       def epsilon: JBigDecimal = new JBigDecimal(BigInteger.ONE, scale)
       val remainder = bigRemainder.longValue

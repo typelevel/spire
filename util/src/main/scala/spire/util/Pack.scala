@@ -2,7 +2,6 @@ package spire
 package util
 
 import java.nio.ByteBuffer
-import scala.language.experimental.macros
 
 import spire.macros.compat.Context
 

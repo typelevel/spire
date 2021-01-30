@@ -102,7 +102,7 @@ object KMeansExample extends App {
 
     val bldr = cbf.newBuilder
     cfor(0)(_ < n, _ + 1) { _ =>
-      bldr += centers(nextInt(k)) + randPoint(nextGaussian)
+      bldr += centers(nextInt(k)) + randPoint(nextGaussian())
     }
     bldr.result()
   }

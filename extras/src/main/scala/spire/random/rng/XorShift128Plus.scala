@@ -8,7 +8,7 @@ import spire.util.Pack
 class XorShift128Plus(private var s0: Long, private var s1: Long) extends LongBasedGenerator {
   def copyInit: XorShift128Plus = new XorShift128Plus(s0, s1)
 
-  def getSeedBytes: Array[Byte] = Pack.longsToBytes(Array(s0, s1))
+  override def getSeedBytes(): Array[Byte] = Pack.longsToBytes(Array(s0, s1))
 
   def setSeedBytes(bytes: Array[Byte]): Unit = {
     val seed = Pack.longsFromBytes(bytes, 2)

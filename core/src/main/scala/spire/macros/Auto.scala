@@ -1,8 +1,6 @@
 package spire
 package macros
 
-import language.experimental.macros
-
 import spire.algebra._
 import spire.macros.compat.{Context, termName}
 
@@ -86,7 +84,7 @@ abstract class AutoOps {
 
   def failedSearch(name: String, op: String): c.Expr[Nothing] =
     c.abort(c.enclosingPosition,
-      "Couldn't find matching method for op %s (%s)." format (name, op))
+      "Couldn't find matching method for op %s (%s).".format(name, op))
 }
 
 abstract class AutoAlgebra extends AutoOps { ops =>

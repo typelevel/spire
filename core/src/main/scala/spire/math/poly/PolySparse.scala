@@ -38,7 +38,7 @@ case class PolySparse[@sp(Double) C] private [spire](val exp: Array[Int], val co
       while (i < exp.length && coeff(i) == 0) i += 1
     findNext()
     def hasNext: Boolean = i < exp.length
-    def next: Term[C] = {
+    override def next(): Term[C] = {
       val term = Term[C](coeff(i), exp(i))
       i += 1
       findNext()

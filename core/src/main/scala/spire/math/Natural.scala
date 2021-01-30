@@ -136,7 +136,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
           if (q.isZero)
             r.digit.toLong.toString + s
           else
-            recur(q, "%09d%s" format (r.digit.toLong, s))
+            recur(q, "%09d%s".format(r.digit.toLong, s))
       }
     }
     recur(this, "")
@@ -331,7 +331,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
       }
     }
     if (lhs < rhs)
-      throw new ArithmeticException("negative subtraction: %s - %s" format (lhs, rhs))
+      throw new ArithmeticException("negative subtraction: %s - %s".format(lhs, rhs))
     else
       recur(lhs, rhs, 0L)
   }
@@ -442,7 +442,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
     var quo = Natural(0)
 
     var remBits: Int = rem.getNumBits
-    var denomBits: Int = denom.getNumBits
+    val denomBits: Int = denom.getNumBits
     var shift: Int = remBits - denomBits
 
     while (shift >= 0) {
@@ -671,7 +671,7 @@ object Natural extends NaturalInstances {
       if (t >= 0L)
         End(UInt(t.toInt))
       else
-        throw new IllegalArgumentException("illegal subtraction: %s %s" format (this, n))
+        throw new IllegalArgumentException("illegal subtraction: %s %s".format(this, n))
     }
 
     def *(n: UInt): Natural = if (n == UInt(0))

@@ -64,7 +64,6 @@ class MapVectorSpace[K, V](override implicit val scalar: Field[V]) extends MapCR
   override def times(x: Map[K, V], y: Map[K, V]): Map[K, V] = {
     var xx = x
     var yy = y
-    var f = scalar.times _
     if (x.size < y.size) { xx = y; yy = x }
     yy.foldLeft(zero) { (z, kv) =>
       (xx get kv._1).map(u => z.updated(kv._1, scalar.times(u, kv._2))).getOrElse(z)

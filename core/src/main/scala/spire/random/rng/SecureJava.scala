@@ -7,7 +7,7 @@ import java.security.SecureRandom
 class SecureJava(rand: SecureRandom) extends IntBasedGenerator {
   def copyInit: SecureJava = new SecureJava(rand)
 
-  def getSeedBytes: Array[Byte] =
+  override def getSeedBytes(): Array[Byte] =
     throw new UnsupportedOperationException("getSeedBytes")
 
   def setSeedBytes(bytes: Array[Byte]): Unit =

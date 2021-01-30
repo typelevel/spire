@@ -235,7 +235,7 @@ object KleeneDemo {
 
   // type class instance for Show[Edge]
   implicit object EdgeHasShow extends Show[Edge] {
-    def show(e: Edge) = "(%c%c)" format ('A' + e.from, 'A' + e.to)
+    def show(e: Edge) = "(%c%c)".format('A' + e.from, 'A' + e.to)
   }
 
 
@@ -377,7 +377,7 @@ object KleeneDemo {
 
   // type class instance for Show[ShortestPath[A, B]]
   implicit def spHasShow[A: Show, B: Show] = new Show[ShortestPath[A, B]] {
-    def show(p: ShortestPath[A, B]) = "%s[%s]" format (p.b.show, p.a.show)
+    def show(p: ShortestPath[A, B]) = "%s[%s]".format(p.b.show, p.a.show)
   }
 
   // type class instance for Kleene[ShortestPath[A, B]]
@@ -469,6 +469,7 @@ object KleeneDemo {
       case (CompactInf, _) => CompactInf
       case (_, CompactInf) => CompactInf
       case (CompactReal(a), CompactReal(b)) => Compact(a + b)
+      case _ => sys.error("no")
     }
     def times(x: Compact[A], y: Compact[A]): Compact[A] = (x, y) match {
       case (`zero`, _) => zero
@@ -476,11 +477,13 @@ object KleeneDemo {
       case (CompactInf, _) => CompactInf
       case (_, CompactInf) => CompactInf
       case (CompactReal(a), CompactReal(b)) => Compact(a * b)
+      case _ => sys.error("no")
     }
     override def kstar(x: Compact[A]): Compact[A] = x match {
       case `one` => CompactInf
       case CompactInf => CompactInf
       case CompactReal(a) => CompactReal((Field[A].one - a).reciprocal)
+      case _ => sys.error("no")
     }
   }
 

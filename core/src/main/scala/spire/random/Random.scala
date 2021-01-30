@@ -72,18 +72,18 @@ trait RandomCompanion[G <: Generator] { self =>
   def constant[B](b: B): R[B] = spawn(Const(b))
 
   def unit: R[Unit] = constant(())
-  def boolean: R[Boolean] = next(_.nextBoolean)
-  def byte: R[Byte] = next(_.nextInt.toByte)
-  def short: R[Short] = next(_.nextInt.toShort)
-  def char: R[Char] = next(_.nextInt.toChar)
+  def boolean: R[Boolean] = next(_.nextBoolean())
+  def byte: R[Byte] = next(_.nextInt().toByte)
+  def short: R[Short] = next(_.nextInt().toShort)
+  def char: R[Char] = next(_.nextInt().toChar)
 
-  def int: R[Int] = next(_.nextInt)
+  def int: R[Int] = next(_.nextInt())
   def int(n: Int): R[Int] = next(_.nextInt(n))
   def int(n1: Int, n2: Int): R[Int] = next(_.nextInt(n1, n2))
 
-  def float: R[Float] = next(_.nextFloat)
-  def long: R[Long] = next(_.nextLong)
-  def double: R[Double] = next(_.nextDouble)
+  def float: R[Float] = next(_.nextFloat())
+  def long: R[Long] = next(_.nextLong())
+  def double: R[Double] = next(_.nextDouble())
 
   def string(size: Size): R[String] =
     size.random(this).flatMap(stringOfSize)
@@ -96,7 +96,7 @@ trait RandomCompanion[G <: Generator] { self =>
       size.random(self).flatMap(collectionOfSize(_))
 
     def collectionOfSize[CC[_]](n: Int)(implicit cbf: Factory[A, CC[A]]): Random[CC[A], G] =
-      foldLeftOfSize(n)(cbf.newBuilder) { (b, a) => b += a; b }.map(_.result)
+      foldLeftOfSize(n)(cbf.newBuilder) { (b, a) => b += a; b }.map(_.result()) 
 
     def foldLeftOfSize[B](n: Int)(init: => B)(f: (B, A) => B): Random[B, G] = {
       def loop(n: Int, ma: Op[A]): Op[B] =
@@ -134,7 +134,7 @@ abstract class Random[+A, G <: Generator](val op: Op[A]) { self =>
     companion.spawn(op.flatMap(f(_).op))
 
   def run(): A =
-    op.run(companion.initGenerator) //IO
+    op.run(companion.initGenerator()) //IO
 
   def run(seed: Seed): A = { //IO
     val gen = companion.initGenerator()

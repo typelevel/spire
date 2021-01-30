@@ -284,14 +284,14 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
     val b = cbf.newBuilder
     b.sizeHint(arr.length)
     cfor(0)(_ < arr.length, _ + 1) { i => b += arr(i) }
-    b.result
+    b.result()
   }
 
   protected[this] def fromSizeAndArray(size: Int, arr: Array[A])(implicit cbf: Factory[A, CC[A]]): CC[A] = {
     val b = cbf.newBuilder
     b.sizeHint(size)
     cfor(0)(_ < size, _ + 1) { i => b += arr(i) }
-    b.result
+    b.result()
   }
 
   def qsorted(implicit ev: Order[A], ct: ClassTag[A], cbf: Factory[A, CC[A]]): CC[A] = {

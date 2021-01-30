@@ -13,10 +13,7 @@ private[spire] trait Fuser[C <: Context, A] {
   private def Epsilon: Tree = q"2.220446049250313E-16"
   private def PositiveInfinity: Tree = q"java.lang.Double.POSITIVE_INFINITY"
   private def NegativeInfinity: Tree = q"java.lang.Double.NEGATIVE_INFINITY"
-  private def isNaN(a: TermName): Tree = q"java.lang.Double.isNaN($a)"
-  private def isInfinite(a: TermName): Tree = q"java.lang.Double.isInfinite($a)"
   private def max(a: Tree, b: Tree): Tree = q"java.lang.Math.max($a, $b)"
-  private def min(a: Tree, b: Tree): Tree = q"java.lang.Math.min($a, $b)"
   private def abs(a: TermName): Tree = q"java.lang.Math.abs($a)"
   private def abs(a: Tree): Tree = q"java.lang.Math.abs($a)"
   private def sqrt(a: TermName): Tree = q"java.lang.Math.sqrt($a)"
@@ -158,7 +155,7 @@ private[spire] trait Fuser[C <: Context, A] {
 
   private def resign(sub: Tree)(f: (TermName, TermName) => (Tree, Tree)): Fused = {
     val fused = extract(sub)
-    val (apx, _, _, exact) = freshApproxNames
+    val (apx, _, _, exact) = freshApproxNames()
     val (apx0, exact0) = f(fused.apx, fused.exact)
     val stats = fused.stats :+ q"val $apx = $apx0" :+ q"def $exact = $exact0"
     fused.copy(stats = stats, apx = apx, exact = exact)
@@ -172,7 +169,7 @@ private[spire] trait Fuser[C <: Context, A] {
 
   def sqrt(tree: Tree)(ev: Tree): Fused = {
     val fused = extract(tree)
-    val (apx, mes, ind, exact) = freshApproxNames
+    val (apx, mes, ind, exact) = freshApproxNames()
     val indValDef = fused.ind.fold(n => q"val $ind = $n + 1" :: Nil, _ => Nil)
     val stats = List(
       q"val $apx = ${sqrt(fused.apx)}",

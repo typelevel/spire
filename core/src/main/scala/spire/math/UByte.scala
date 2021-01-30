@@ -22,14 +22,14 @@ class UByte(val signed: Byte) extends AnyVal with scala.math.ScalaNumericAnyConv
   override def toDouble: Double = toInt.toDouble
   def toBigInt: BigInt = BigInt(toInt)
 
-  def byteValue(): Byte = toByte
-  def shortValue(): Short = toShort
-  def intValue(): Int = toInt
-  def longValue(): Long = toLong
-  def floatValue(): Float = toFloat
-  def doubleValue(): Double = toDouble
+  override def byteValue: Byte = toByte
+  override def shortValue: Short = toShort
+  override def intValue: Int = toInt
+  override def longValue: Long = toLong
+  override def floatValue: Float = toFloat
+  override def doubleValue: Double = toDouble
 
-  def isWhole(): Boolean = true
+  override def isWhole: Boolean = true
   def underlying(): Any = signed
 
   override def isValidByte: Boolean = signed >= 0

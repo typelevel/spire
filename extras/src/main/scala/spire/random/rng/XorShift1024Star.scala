@@ -12,7 +12,7 @@ class XorShift1024Star(private val s: Array[Long], private var p: Int) extends L
 
   def copyInit: XorShift1024Star = new XorShift1024Star(s.clone, p)
 
-  def getSeedBytes: Array[Byte] = {
+  override def getSeedBytes(): Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
 

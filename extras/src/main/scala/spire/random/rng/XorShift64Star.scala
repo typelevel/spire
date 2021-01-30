@@ -8,7 +8,7 @@ import spire.util.Pack
 class XorShift64Star(private var seed: Long) extends LongBasedGenerator {
   def copyInit: XorShift64Star = new XorShift64Star(seed)
 
-  def getSeedBytes: Array[Byte] = Pack.longToBytes(seed)
+  override def getSeedBytes(): Array[Byte] = Pack.longToBytes(seed)
 
   def setSeedBytes(bytes: Array[Byte]): Unit = seed = Pack.longFromBytes(bytes)
 

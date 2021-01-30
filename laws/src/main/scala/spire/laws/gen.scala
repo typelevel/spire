@@ -138,7 +138,7 @@ object gen {
     Gen.oneOf(
       arbitrary[A].map(Open(_)),
       arbitrary[A].map(Closed(_)),
-      Gen.const(Unbound[A]))
+      Gen.const(Unbound[A]()))
 
   def bounds[A: Arbitrary: Order]: Gen[(A, A)] =
     arbitrary[(A, A)].map { case (x, y) => if (x <= y) (x, y) else (y, x) }

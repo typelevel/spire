@@ -300,12 +300,12 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
     }
 
   // for all a in A, and all b in B, (A vmin B) is the interval that contains all (a min b)
-  def vmin(rhs: Interval[A])(implicit o: Order[A], m: AdditiveMonoid[A]): Interval[A] =
+  def vmin(rhs: Interval[A])(implicit o: Order[A]): Interval[A] =
     Interval.fromBounds(minLower(lhs.lowerBound, rhs.lowerBound, true),
       minUpper(lhs.upperBound, rhs.upperBound, true))
 
   // for all a in A, and all b in B, (A vmax B) is the interval that contains all (a max b)
-  def vmax(rhs: Interval[A])(implicit o: Order[A], m: AdditiveMonoid[A]): Interval[A] =
+  def vmax(rhs: Interval[A])(implicit o: Order[A]): Interval[A] =
     Interval.fromBounds(maxLower(lhs.lowerBound, rhs.lowerBound, true),
       maxUpper(lhs.upperBound, rhs.upperBound, true))
 
@@ -718,7 +718,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
       new Iterator[A] {
         var x: A = start
         def hasNext: Boolean = continue(x)
-        def next: A = {
+        override def next(): A = {
           val r = x
           x += step
           r
@@ -734,7 +734,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
         var x: A = start
         var ok: Boolean = true
         def hasNext: Boolean = ok && continue(x)
-        def next: A = {
+        override def next(): A = {
           val r = x
           val next = x + step
           if (test(x, next)) { x = next } else { ok = false }
@@ -846,11 +846,11 @@ object Interval {
     else
       Interval.empty[A]
 
-  def empty[A](implicit o: Order[A]): Interval[A] = Empty[A]
+  def empty[A: Order]: Interval[A] = Empty[A]()
 
   def point[A: Order](a: A): Interval[A] = Point(a)
 
-  def zero[A](implicit o: Order[A], r: Semiring[A]): Interval[A] = Point(r.zero)
+  def zero[A: Order](implicit r: Semiring[A]): Interval[A] = Point(r.zero)
 
   def all[A: Order]: Interval[A] = All[A]()
 

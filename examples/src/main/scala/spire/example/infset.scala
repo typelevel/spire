@@ -6,7 +6,6 @@ import spire.math.{Natural, UInt}
 
 import scala.collection.compat.immutable.LazyList
 import scala.collection.compat.immutable.LazyList.#::
-import scala.collection.mutable
 
 object SetUtil {
   def lazyPowers[A](members: LazyList[A]): LazyList[Set[A]] = {
@@ -63,7 +62,7 @@ case class PureSet[A](f: A => Boolean) extends Function1[A, Boolean] { lhs =>
   def contramap[B](g: B => A): PureSet[B] =
     PureSet(b => f(g(b)))
 
-  def unary_~(): PureSet[A] =
+  def unary_~ : PureSet[A] =
     PureSet(a => !(f(a)))
   def |(rhs: PureSet[A]): PureSet[A] =
     PureSet(a => lhs.f(a) || rhs.f(a))
@@ -102,7 +101,7 @@ object MathSet { self =>
       Some(Natural(members.size))
 
     def map[B](f: A => B): MathSet[B] = Fin(members.map(f))
-    def unary_~(): MathSet[A] = Inf(members)
+    def unary_~ : MathSet[A] = Inf(members)
 
     override def toString: String =
       members.mkString("{", ", ", "}")
@@ -119,7 +118,7 @@ object MathSet { self =>
       usize.map(_ - UInt(outsiders.size))
 
     def map[B](f: A => B): MathSet[B] = Inf(outsiders.map(f))
-    def unary_~(): MathSet[A] = Fin(outsiders)
+    def unary_~ : MathSet[A] = Fin(outsiders)
 
     override def toString: String =
       if (outsiders.isEmpty) "(U)"
@@ -150,7 +149,7 @@ sealed trait MathSet[A] extends Function1[A, Boolean] { lhs =>
   def toFinite(universe: Set[A]): Fin[A] = Fin(toSet(universe))
 
   def map[B](f: A => B): MathSet[B]
-  def unary_~(): MathSet[A]
+  def unary_~ : MathSet[A]
 
   def |(rhs: MathSet[A]): MathSet[A] = (lhs, rhs) match {
     case (Fin(x), Fin(y)) => Fin(x | y)

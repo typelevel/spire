@@ -45,13 +45,13 @@ trait PartialGroupLaws[A] extends GroupLaws[A] {
     ),
 
     "product with inverse is always defined" -> forAllSafe((a: A) =>
-      (a |+|?? a.inverse) && (a.inverse |+|?? a)
+      (a |+|?? a.inverse()) && (a.inverse() |+|?? a)
     ),
 
     "product with inverse is a left and right identity" -> forAllSafe((a: A, b: A) =>
       !(a |+|?? b) || (
-        ((a |+|? b).get |+|? b.inverse).get === a &&
-          ((a.inverse |+|? a).get |+|? b).get === b
+        ((a |+|? b).get |+|? b.inverse()).get === a &&
+          ((a.inverse() |+|? a).get |+|? b).get === b
       )
     )
   )

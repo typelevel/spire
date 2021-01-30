@@ -6,7 +6,6 @@ import spire.math._
 import spire.math.interval._
 
 import scala.annotation.tailrec
-import scala.language.implicitConversions
 
 sealed abstract class IntervalTrie[T] extends IntervalSet[T, IntervalTrie[T]]
 
@@ -206,6 +205,7 @@ object IntervalTrie {
     case (Open(a),      Open(b))      => fromTo(Above(a), Below(b))
     case (Unbound(),    Unbound())    => all[T]
     case (EmptyBound(), EmptyBound()) => empty[T]
+    case _ => sys.error("no")
   }
 
   private object Below {
@@ -315,7 +315,7 @@ object IntervalTrie {
 
     def hasNext = hasNextLeaf
 
-    def next = element.fromLong(nextLeaf.key)
+    override def next() = element.fromLong(nextLeaf().key)
   }
 
   private final class IntervalIterator[T:Element](e:IntervalTrieImpl[T]) extends TreeIterator[Interval[T]](e.tree) {
@@ -415,6 +415,7 @@ object IntervalTrie {
         case Above(x) => Open(ise.fromLong(x))
         case Below(x) => Closed(ise.fromLong(x))
         case Both(x) => Closed(ise.fromLong(x))
+        case _ => sys.error("no")
       }
       @tailrec
       def upperBound(a:Tree) : Bound[T] = a match {
@@ -422,6 +423,7 @@ object IntervalTrie {
         case Both(x) => Closed(ise.fromLong(x))
         case Above(x) => Closed(ise.fromLong(x))
         case Below(x) => Open(ise.fromLong(x))
+        case _ => sys.error("no")
       }
       if(isEmpty) {
         Interval.empty[T]
@@ -474,7 +476,7 @@ object IntervalTrie {
       override def foreach[U](f: Interval[T] => U): Unit = foreachInterval(belowAll, tree)(f)
 
       def iterator: Iterator[Interval[T]] = {
-        var iseq: ArrayBuffer[Interval[T]] = ArrayBuffer.empty[Interval[T]]
+        val iseq: ArrayBuffer[Interval[T]] = ArrayBuffer.empty[Interval[T]]
         def f(i: Interval[T]): Unit = {
           iseq += i
         }

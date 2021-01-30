@@ -68,7 +68,6 @@ object Cmwc5 extends GeneratorCompanion[Cmwc5, Array[Long]] {
   def randomSeed(): Array[Long] = GlobalRng.generateLongs(5)
 
   def fromBytes(bytes: Array[Byte]): Cmwc5 = {
-    val bs = if (bytes.length < 40) Arrays.copyOf(bytes, 40) else bytes
     val bb = ByteBuffer.wrap(bytes)
     val x = bb.getLong()
     val y = bb.getLong()

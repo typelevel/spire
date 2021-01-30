@@ -8,7 +8,7 @@ class Device(f: File) extends Generator { self =>
   if (!f.canRead)
     throw new IllegalArgumentException("can't read %s" format f)
 
-  private var dis = new DataInputStream(new FileInputStream(f))
+  private val dis = new DataInputStream(new FileInputStream(f))
 
   def copyInit: Generator = new Device(f)
 

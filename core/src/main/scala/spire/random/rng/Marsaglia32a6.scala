@@ -43,7 +43,7 @@ class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extend
     d = zs(0)
   }
 
-  def getSeedBytes: Array[Byte] = {
+  override def getSeedBytes(): Array[Byte] = {
     val bytes = new Array[Byte](24)
     val bb = ByteBuffer.wrap(bytes)
     bb.putInt(x)
@@ -80,7 +80,6 @@ class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extend
 
 object Marsaglia32a6 extends GeneratorCompanion[Marsaglia32a6, Array[Int]] {
   def fromBytes(bytes: Array[Byte]): Marsaglia32a6 = {
-    val bs = if (bytes.length < 24) Arrays.copyOf(bytes, 24) else bytes
     val bb = ByteBuffer.wrap(bytes)
     val x = bb.getInt()
     val y = bb.getInt()
@@ -107,5 +106,5 @@ object Marsaglia32a6 extends GeneratorCompanion[Marsaglia32a6, Array[Int]] {
     new Marsaglia32a6(x, y, z, w, v, d)
   }
 
-  def randomSeed: Array[Int] = GlobalRng.generateInts(6)
+  override def randomSeed(): Array[Int] = GlobalRng.generateInts(6)
 }

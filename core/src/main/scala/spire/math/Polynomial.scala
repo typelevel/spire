@@ -268,7 +268,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
   /** Evaluate the polynomial at `x`. */
   def apply(x: C)(implicit r: Semiring[C]): C
 
-  def evalWith[A: Semiring: Eq: ClassTag](x: A)(f: C => A)(implicit ring: Semiring[C], eq: Eq[C]): A =
+  def evalWith[A: Semiring: Eq: ClassTag](x: A)(f: C => A): A =
     this.map(f).apply(x)
 
   /** Compose this polynomial with another. */
@@ -352,7 +352,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
     * polynomial. Given 2 consecutive terms (ignoring 0 terms), a sign variation
     * is indicated when the terms have differing signs.
     */
-  def signVariations(implicit ring: Semiring[C], eq: Eq[C], signed: Signed[C]): Int = {
+  def signVariations(implicit ring: Semiring[C], signed: Signed[C]): Int = {
     var prevSign: Sign = Sign.Zero
     var variations = 0
     foreachNonZero { (_, c) =>
@@ -373,10 +373,10 @@ trait Polynomial[@sp(Double) C] { lhs =>
     mapTerms { case Term(c, n) => Term(c, n - k) }
   }
 
-  def map[D: Semiring: Eq: ClassTag](f: C => D)(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[D] =
+  def map[D: Semiring: Eq: ClassTag](f: C => D): Polynomial[D] =
     mapTerms { case Term(c, n) => Term(f(c), n) }
 
-  def mapTerms[D: Semiring: Eq: ClassTag](f: Term[C] => Term[D])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[D] =
+  def mapTerms[D: Semiring: Eq: ClassTag](f: Term[C] => Term[D]): Polynomial[D] =
     Polynomial(termsIterator.map(f))
 
   /**
@@ -437,7 +437,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
     val it = lhs.termsIterator
     @tailrec def loop(n: Int): Int =
       if (it.hasNext) {
-        val term = it.next
+        val term = it.next()
         loop(n ^ (0xfeed1257 * term.exp ^ term.coeff.##))
       } else n
     loop(0)
@@ -451,7 +451,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
         val has1 = it1.hasNext
         val has2 = it2.hasNext
         if (has1 && has2) {
-          if (it1.next == it2.next) loop() else false
+          if (it1.next() == it2.next()) loop() else false
         } else has1 == has2
       }
       loop()
@@ -535,10 +535,10 @@ trait PolynomialOverField[@sp(Double) C] extends PolynomialOverRing[C]
   def emod(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = equotmod(x, y)._2
   override def equotmod(x: Polynomial[C], y: Polynomial[C]): (Polynomial[C], Polynomial[C]) = {
     require(!y.isZero, "Can't divide by polynomial of zero!")
-    x match {
+    (x: @unchecked) match {
       case xd: poly.PolyDense[C] => poly.PolyDense.quotmodDense(xd, y)
       case xs: poly.PolySparse[C] =>
-        val ys = y match {
+        val ys = (y: @unchecked) match {
           case yd: poly.PolyDense[C] => poly.PolySparse.dense2sparse(yd)
           case ys1: poly.PolySparse[C] => ys1
         }
