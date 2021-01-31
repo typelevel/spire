@@ -8,5 +8,4 @@ package object scalacompat {
   def arrayBuilderMake[T]()(implicit tag: ClassTag[T]): ArrayBuilder[T] =
       ArrayBuilder.make[T]
 
-
 }
