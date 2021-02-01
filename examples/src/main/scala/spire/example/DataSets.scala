@@ -5,9 +5,8 @@ import spire.algebra._
 import spire.math.Rational
 import spire.implicits._
 
-import spire.scalacompat.{BuilderCompat, Factory, FactoryCompatOps, IterableOnce}
-
-import scala.collection.compat.immutable.LazyList
+import scala.collection.Factory
+import scala.collection.immutable.LazyList
 import scala.collection.mutable.{ Builder, ListBuffer }
 
 import java.io.{ BufferedReader, InputStreamReader }
@@ -155,7 +154,7 @@ object Variable {
   protected val Unlabeled = "unnamed variable"
 
   case class Ignored(label: String = Unlabeled) extends Variable[Nothing] {
-    def varBuilder() = new BuilderCompat[String, String => List[Nothing]] {
+    def varBuilder() = new Builder[String, String => List[Nothing]] {
       def addOne(s: String) = this
       def clear(): Unit = ()
       def result() = s => Nil
@@ -163,7 +162,7 @@ object Variable {
   }
 
   case class Continuous[+F](label: String = Unlabeled, f: String => F) extends Variable[F] {
-    def varBuilder() = new BuilderCompat[String, String => List[F]] {
+    def varBuilder() = new Builder[String, String => List[F]] {
       def addOne(s: String) = this
       def clear(): Unit = ()
       def result() = { s => f(s) :: Nil }
@@ -171,7 +170,7 @@ object Variable {
   }
 
   case class Categorical[+F: Ring](label: String = Unlabeled) extends Variable[F] {
-    def varBuilder() = new BuilderCompat[String, String => List[F]] {
+    def varBuilder() = new Builder[String, String => List[F]] {
       var categories: Set[String] = Set.empty
 
       def addOne(s: String) = {
@@ -190,7 +189,7 @@ object Variable {
   case class Missing[+F](default: Variable[F], sentinel: String) extends Variable[F] {
     def label = default.label
 
-    def varBuilder() = new BuilderCompat[String, String => List[F]] {
+    def varBuilder() = new Builder[String, String => List[F]] {
       val defaultBuilder = default.varBuilder()
       val values: ListBuffer[String] = new ListBuffer[String]
 

@@ -181,7 +181,7 @@ object ValueBound {
 
   /** Returns the interval containing the two given bounds. */
   @inline def union2[A: Order](v1: ValueBound[A], v2: ValueBound[A]): Interval[A] =
-    v1.a.compare(v2.a).signum match {
+    v1.a.compare(v2.a).sign match {
       case -1 => // ?v1 < v2?
         Interval.fromOrderedBounds(v1, v2)
       case 1 => // ?v2 < v1?
@@ -231,7 +231,7 @@ object ValueBound {
     */
   @inline def union3_1approx2[A: Order](v1: ValueBound[A],
     v2: ValueBound[A], v3: ValueBound[A]): Interval[A] =
-    v2.a.compare(v3.a).signum match {
+    v2.a.compare(v3.a).sign match {
       case -1 => // v1 ~ v2 < v3
         union3_1approx2_2less3(v1, v2, v3)
       case 0 => // v1 ~ v2 ~ v3
@@ -246,11 +246,11 @@ object ValueBound {
     */
   @inline def union3_1less2[A: Order](v1: ValueBound[A],
     v2: ValueBound[A], v3: ValueBound[A]): Interval[A] =
-    v2.a.compare(v3.a).signum match {
+    v2.a.compare(v3.a).sign match {
       case -1 => // v1 < v2 < v3
         Interval.fromOrderedBounds(v1, v3)
       case 1 => // v1 < v2 and v3 < v2
-        v1.a.compare(v3.a).signum match {
+        v1.a.compare(v3.a).sign match {
           case -1 => // v1 < v3 < v2
             Interval.fromOrderedBounds(v1, v2)
           case 1 => // v3 < v1 < v2
@@ -265,7 +265,7 @@ object ValueBound {
   /** Returns the interval which contains all the given bounds. */
   @inline def union3[A: Order](v1: ValueBound[A],
     v2: ValueBound[A], v3: ValueBound[A]): Interval[A] =
-    v1.a.compare(v2.a).signum match {
+    v1.a.compare(v2.a).sign match {
       case -1 => // v1 < v2
         union3_1less2(v1, v2, v3)
       case 1 => // v1 > v2
@@ -324,7 +324,7 @@ object ValueBound {
     */
   @inline def union4_1less3_2less3_3approx4[A: Order](v1: ValueBound[A], v2: ValueBound[A],
     v3: ValueBound[A], v4: ValueBound[A]): Interval[A] =
-    v1.a.compare(v2.a).signum match {
+    v1.a.compare(v2.a).sign match {
       case -1 => // v1 < v2 < v3 ~ v4
         union3_1less2_2approx3(v1, v3, v4)
       case 0 => // v1 ~ v2 < v3 ~ v4
@@ -339,7 +339,7 @@ object ValueBound {
     */
   @inline def union4_1less2_2approx3[A: Order](v1: ValueBound[A], v2: ValueBound[A],
     v3: ValueBound[A], v4: ValueBound[A]): Interval[A] =
-    v3.a.compare(v4.a).signum match {
+    v3.a.compare(v4.a).sign match {
       case -1 => // v1 < v2 ~ v3 < v4
         Interval.fromOrderedBounds(v1, v4)
       case 0 => // v1 < v2 ~ v3 ~ v4
@@ -354,13 +354,13 @@ object ValueBound {
     */
   @inline def union4_1approx2_2less3[A: Order](v1: ValueBound[A], v2: ValueBound[A],
     v3: ValueBound[A], v4: ValueBound[A]): Interval[A] =
-    v3.a.compare(v4.a).signum match {
+    v3.a.compare(v4.a).sign match {
       case -1 => // v1 ~ v2 < v3 < v4
         union3_1approx2_2less3(v1, v2, v4)
       case 0 => // v1 ~ v2 < v3 ~ v4
         union4_1approx2_2less3_3approx4(v1, v2, v3, v4)
       case 1 => // v1 ~ v2 < v3 and v4 < v3
-        v1.a.compare(v4.a).signum match {
+        v1.a.compare(v4.a).sign match {
           case -1 => // v1 ~ v2 < v4 < v3
             union3_1approx2_2less3(v1, v2, v3)
           case 0 => // v1 ~ v2 ~ v4 < v3
@@ -387,7 +387,7 @@ object ValueBound {
     */
   @inline def union4_1approx2[A: Order](v1: ValueBound[A], v2: ValueBound[A],
     v3: ValueBound[A], v4: ValueBound[A]): Interval[A] =
-    v2.a.compare(v3.a).signum match {
+    v2.a.compare(v3.a).sign match {
       case -1 => // v1 ~ v2 < v3
         union4_1approx2_2less3(v1, v2, v3, v4)
       case 0 => // v1 ~ v2 ~ v3
@@ -402,7 +402,7 @@ object ValueBound {
     */
   @inline def union4_1less2_1less3[A: Order](v1: ValueBound[A], v2: ValueBound[A],
     v3: ValueBound[A], v4: ValueBound[A]): Interval[A] =
-    v2.a.compare(v3.a).signum match {
+    v2.a.compare(v3.a).sign match {
       case -1 => // v1 < v2 < v3
         union3_1less2(v1, v3, v4)
       case 0 => // v1 < v2 ~ v3
@@ -417,7 +417,7 @@ object ValueBound {
     */
   @inline def union4_1less3_2less3[A: Order](v1: ValueBound[A], v2: ValueBound[A],
     v3: ValueBound[A], v4: ValueBound[A]): Interval[A] =
-    v1.a.compare(v2.a).signum match {
+    v1.a.compare(v2.a).sign match {
       case -1 => // v1 < v2 < v3
         union3_1less2(v1, v3, v4)
       case 0 => // v1 ~ v2 < v3
@@ -432,7 +432,7 @@ object ValueBound {
     */
   @inline def union4_1less2[A: Order](v1: ValueBound[A], v2: ValueBound[A],
     v3: ValueBound[A], v4: ValueBound[A]): Interval[A] =
-    v2.a.compare(v3.a).signum match {
+    v2.a.compare(v3.a).sign match {
       case -1 => // v1 < v2 < v3
         union3_1less2(v1, v3, v4)
       case 0 => // v1 < v2 ~ v3
@@ -444,7 +444,7 @@ object ValueBound {
   /** Returns the interval which contains all the given bounds. */
   @inline def union4[A: Order](v1: ValueBound[A], v2: ValueBound[A],
     v3: ValueBound[A], v4: ValueBound[A]): Interval[A] =
-    v1.a.compare(v2.a).signum match {
+    v1.a.compare(v2.a).sign match {
       case -1 => // v1 < v2
         union4_1less2(v1, v2, v3, v4)
       case 1 => // v1 > v2

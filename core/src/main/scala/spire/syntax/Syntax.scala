@@ -8,6 +8,7 @@ import spire.algebra.partial._
 import spire.math._
 import spire.macros.Syntax
 import spire.syntax.std._
+import scala.annotation.nowarn
 
 trait EqSyntax {
   implicit def eqOps[A:Eq](a:A): EqOps[A] = new EqOps(a)
@@ -48,6 +49,7 @@ trait SemigroupoidSyntax {
 }
 
 trait GroupoidSyntax extends SemigroupoidSyntax {
+  @nowarn
   implicit def groupoidCommonOps[A](a:A)(implicit ev: Groupoid[A], ni: NoImplicit[Monoid[A]]): GroupoidCommonOps[A] = new GroupoidCommonOps[A](a)(ev)
   implicit def groupoidOps[A](a:A)(implicit ev: Groupoid[A]): GroupoidOps[A] = new GroupoidOps[A](a)
 }

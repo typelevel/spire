@@ -8,6 +8,7 @@ import org.typelevel.discipline.Laws
 
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
+import scala.annotation.nowarn
 
 import InvalidTestException._
 
@@ -23,6 +24,7 @@ trait BaseLaws[A] extends Laws {
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
 
+  @nowarn
   def metricSpace[R](implicit MSA: MetricSpace[A, R], SR: Signed[R], OR: Order[R], ASR: AdditiveSemigroup[R]) = new SimpleRuleSet(
     name = "metricSpace",
     "non-negative" -> forAllSafe((a1: A, a2: A) =>

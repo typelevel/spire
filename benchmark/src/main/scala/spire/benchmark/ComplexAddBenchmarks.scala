@@ -1,14 +1,14 @@
 package spire
 package benchmark.jmh
-import java.util.concurrent.TimeUnit
-
-import scala.util.Random
-import Random._
-import org.openjdk.jmh.annotations._
-import spire.algebra._
-import spire.math._
-import spire.implicits._
-import spire.benchmark.Arrays.init
+// import java.util.concurrent.TimeUnit
+//
+// import scala.util.Random
+// import Random._
+// import org.openjdk.jmh.annotations._
+// import spire.algebra._
+// import spire.math._
+// import spire.implicits._
+// import spire.benchmark.Arrays.init
 
 /*
 @BenchmarkMode(Array(Mode.AverageTime))

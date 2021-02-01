@@ -32,10 +32,6 @@ class PrimeSuite extends munit.FunSuite {
     assertEquals(lazyList.take(10).toList, tenPrimes.toList)
   }
 
-  test("stream") {
-    assertEquals(stream.take(10).toList, tenPrimes.toList)
-  }
-
   test("factor") {
     for(p <- tenPrimes) {
       assertEquals(factor(p), Factors(p))

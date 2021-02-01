@@ -4,7 +4,7 @@ package std
 
 import spire.algebra.{AdditiveMonoid, Field, Monoid, MultiplicativeMonoid, NRoot, Order, PartialOrder, Signed}
 import spire.math.{Natural, Number, QuickSort, SafeLong, Searching, ULong}
-import spire.scalacompat.{Factory, FactoryCompatOps}
+import scala.collection.Factory
 import spire.syntax.cfor._
 import spire.syntax.monoid._
 import spire.syntax.field._
@@ -210,19 +210,19 @@ final class IndexedSeqOps[@sp A, CC[A] <: IndexedSeq[A]](as: CC[A]) {
 
 final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
   def qsum(implicit ev: AdditiveMonoid[A]): A =
-    as.aggregate(ev.zero)(ev.plus, ev.plus)
+    as.foldLeft(ev.zero)(ev.plus)
 
   def qproduct(implicit ev: MultiplicativeMonoid[A]): A =
-    as.aggregate(ev.one)(ev.times, ev.times)
+    as.foldLeft(ev.one)(ev.times)
 
   def qcombine(implicit ev: Monoid[A]): A =
-    as.aggregate(ev.empty)(ev.combine, ev.combine)
+    as.foldLeft(ev.empty)(ev.combine)
 
   def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A =
-    as.aggregate(ev.one)(_ + _.abs.pow(p), _ + _).nroot(p)
+    as.foldLeft(ev.one)(_ + _.abs.pow(p)).nroot(p)
 
   def qnormWith[R](p: Int)(f: A => R)(implicit ev: Field[R], s: Signed[R], nr: NRoot[R]): R =
-    as.aggregate(ev.one)((t, a) => t + f(a).abs.pow(p), _ + _).nroot(p)
+    as.foldLeft(ev.one)((t, a) => t + f(a).abs.pow(p)).nroot(p)
 
   /** Computes the minimal elements of a partially ordered set.
    * If the poset contains multiple copies of a minimal element, the function
@@ -240,12 +240,12 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
 
   def qmin(implicit ev: Order[A]): A = {
     if (as.isEmpty) throw new UnsupportedOperationException("empty seq")
-    as.aggregate(as.head)(ev.min, ev.min)
+    as.foldLeft(as.head)(ev.min)
   }
 
   def qmax(implicit ev: Order[A]): A = {
     if (as.isEmpty) throw new UnsupportedOperationException("empty seq")
-    as.aggregate(as.head)(ev.max, ev.max)
+    as.foldLeft(as.head)(ev.max)
   }
 
   def qmean(implicit ev: Field[A]): A = {

@@ -2,7 +2,7 @@ package spire
 package math
 package poly
 
-import scala.collection.compat.immutable.LazyList
+import scala.collection.immutable.LazyList
 
 import spire.algebra.{Eq, Field, Ring}
 import spire.syntax.field._

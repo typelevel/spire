@@ -16,7 +16,7 @@ object BigIntRational {
 }
 
 final class BigIntRational private (val n: BigInt, val d: BigInt) {
-  def unary_-(): BigIntRational = new BigIntRational(-n, d)
+  def unary_- : BigIntRational = new BigIntRational(-n, d)
 
   def +(r: BigIntRational): BigIntRational = {
     val dgcd: BigInt = d.gcd(r.d)

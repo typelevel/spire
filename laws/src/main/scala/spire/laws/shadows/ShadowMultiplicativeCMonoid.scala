@@ -18,8 +18,8 @@ trait ShadowMultiplicativeCMonoid[A, S] extends MultiplicativeCMonoid[Shadow[A, 
     a
   }
 
-  override def product(xs: TraversableOnce[Shadow[A, S]]): Shadow[A, S] = {
-    val seq = xs.toSeq
+  override def product(xs: IterableOnce[Shadow[A, S]]): Shadow[A, S] = {
+    val seq = xs.iterator.toSeq
     val a = A.product(seq.map(_.a))
     val s = S.product(seq.map(_.s))
     Shadow(a, checked(s))

@@ -1,7 +1,9 @@
 package spire
 package optional
 
-import spire.scalacompat.{Factory, FactoryCompatOps, SeqLike}
+import scala.collection.Factory
+import scala.collection.Seq
+import scala.collection.SeqOps
 
 import cats.kernel.Eq
 import spire.algebra.{Action, Group}
@@ -54,7 +56,7 @@ class Perm private(private val mapping: Map[Int, Int]) extends (Int => Int) {
   def image: Set[Int] = mapping.keySet
 
   /** Permute a seq as long as all the moved points are valid indices. */
-  def permute[A, SA](seq: SeqLike[A, SA])(implicit cbf: Factory[A, SA]): Opt[SA] = {
+  def permute[A, SA](seq: SeqOps[A, Seq, SA])(implicit cbf: Factory[A, SA]): Opt[SA] = {
     if (image.isEmpty) return Opt(cbf.fromSpecific(seq))
     if (image.max >= seq.size) return Opt.empty[SA]
     val builder = cbf.newBuilder
@@ -106,7 +108,7 @@ object Perm {
   }
   implicit val PermIntAction: Action[Int, Perm] = new PermIntAction
   implicit val PermGroup: Group[Perm] = new PermGroup
-  implicit def PermSeqPartialAction[A, CC[A] <: SeqLike[A, CC[A]]](implicit cbf: Factory[A, CC[A]]): PartialAction[CC[A], Perm] = new PermSeqPartialAction[A, CC[A]]
+  implicit def PermSeqPartialAction[A, CC[A] <: SeqOps[A, Seq, CC[A]]](implicit cbf: Factory[A, CC[A]]): PartialAction[CC[A], Perm] = new PermSeqPartialAction[A, CC[A]]
 }
 
 final class PermIntAction extends Action[Int, Perm] {
@@ -120,7 +122,7 @@ final class PermGroup extends Group[Perm] {
   def inverse(a: Perm): Perm = a.inverse
 }
 
-final class PermSeqPartialAction[A, SA <: SeqLike[A, SA]](implicit cbf: Factory[A, SA]) extends PartialAction[SA, Perm] {
+final class PermSeqPartialAction[A, SA <: SeqOps[A, Seq, SA]](implicit cbf: Factory[A, SA]) extends PartialAction[SA, Perm] {
   def partialActl(perm: Perm, sa: SA): Opt[SA] = perm.permute[A, SA](sa)
   def partialActr(sa: SA, perm: Perm): Opt[SA] = partialActl(perm.inverse, sa)
 }

@@ -66,7 +66,7 @@ class FpFilterBenchmark {
 
   @Setup
   def setup(): Unit = {
-    points = init(size)(Point2(Random.nextDouble, Random.nextDouble))
+    points = init(size)(Point2(Random.nextDouble(), Random.nextDouble()))
   }
 
   def findSign(o: Orient2): Int = {

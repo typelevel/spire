@@ -26,8 +26,8 @@ class GcdBenchmarks {
 
   @Setup
   def setup(): Unit = {
-    longs = init(200000)(nextLong)
-    bigs = init(200000)(new BigInteger(nextLong.toString))
+    longs = init(200000)(nextLong())
+    bigs = init(200000)(new BigInteger(nextLong().toString))
   }
 
   @Benchmark
@@ -82,11 +82,11 @@ class GcdBenchmarks {
     if (_y == 0L) return _x
 
     var x = Math.abs(_x)
-    var xz = numberOfTrailingZeros(x)
+    val xz = numberOfTrailingZeros(x)
     x >>= xz
 
     var y = Math.abs(_y)
-    var yz = numberOfTrailingZeros(y)
+    val yz = numberOfTrailingZeros(y)
     y >>= yz
 
     while (x != y) {

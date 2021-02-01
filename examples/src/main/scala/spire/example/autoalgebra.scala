@@ -4,7 +4,7 @@ package example
 import org.apfloat._
 import org.jscience.mathematics.number.{ Rational => JRational }
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 import spire.macros.Auto
 import spire.algebra._

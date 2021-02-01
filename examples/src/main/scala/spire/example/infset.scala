@@ -4,8 +4,8 @@ package examples
 import spire.algebra._
 import spire.math.{Natural, UInt}
 
-import scala.collection.compat.immutable.LazyList
-import scala.collection.compat.immutable.LazyList.#::
+import scala.collection.immutable.LazyList
+import scala.collection.immutable.LazyList.#::
 
 object SetUtil {
   def lazyPowers[A](members: LazyList[A]): LazyList[Set[A]] = {

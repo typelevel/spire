@@ -26,7 +26,7 @@ class CForBenchmarks {
 
   @Setup
   def setup(): Unit = {
-    arr = init(size)(scala.math.abs(nextInt - 1).toInt + 1)
+    arr = init(size)(scala.math.abs(nextInt() - 1).toInt + 1)
   }
 
   @tailrec final def gcd(a: Long, b: Long): Long = if (a % b == 0) b else gcd(b, a % b)
@@ -140,7 +140,6 @@ class CForBenchmarks {
     }
     loop2(0)
 
-    val len3 = size / 3
     @tailrec def loop3(i: Int): Unit = {
       if (i < len2) { t = t ^ min(arr(i + 1), arr(i + 2)); loop3(i + 1) }
     }
@@ -164,7 +163,6 @@ class CForBenchmarks {
     }
     loop2(0)
 
-    val len3 = size / 3
     @tailrec def loop3(i: Int): Unit = {
       if (i < len2) { t = t ^ gcd(arr(i + 1), arr(i + 2)); loop3(i + 1) }
     }

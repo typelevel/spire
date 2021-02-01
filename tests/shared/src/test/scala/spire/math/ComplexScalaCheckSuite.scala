@@ -65,12 +65,5 @@ class ComplexScalaCheckSuite extends munit.ScalaCheckSuite {
       logNear((x * x).sqrt, x)
   }
 
-  complex1("x.nroot(2).pow(2) = x") { x: C =>
-    if (spire.scalacompat.preScala2p13) {
-      // this test inf-loops on scala 2.13
-      implicit val threshold = BigDecimal(1e-14) // 532788694 + 329i has log-error-ratio 1.1e-15
-      logNear(x.nroot(2).pow(2), x)
-    }
-  }
 }
 

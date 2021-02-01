@@ -14,8 +14,8 @@ trait ShadowAdditiveCSemigroup[A, S] extends AdditiveCSemigroup[Shadow[A, S]] {
   override def sumN(x: Shadow[A, S], n: Int): Shadow[A, S] =
     Shadow(A.sumN(x.a, n), checked(S.sumN(x.s, n)))
 
-  override def trySum(xs: TraversableOnce[Shadow[A, S]]): Option[Shadow[A, S]] = {
-    val seq = xs.toSeq
+  override def trySum(xs: IterableOnce[Shadow[A, S]]): Option[Shadow[A, S]] = {
+    val seq = xs.iterator.toSeq
     val aO = A.trySum( seq.map(_.a) )
     val sO = S.trySum( seq.map(_.s) )
     (aO, sO) match {

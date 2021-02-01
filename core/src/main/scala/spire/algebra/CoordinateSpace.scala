@@ -3,7 +3,9 @@ package algebra
 
 import spire.std._
 
-import spire.scalacompat.{Factory, SeqLike}
+import scala.collection.Factory
+import scala.collection.Seq
+import scala.collection.SeqOps
 
 trait CoordinateSpace[V, @sp(Float, Double) F] extends Any with InnerProductSpace[V, F] {
   def dimensions: Int
@@ -32,7 +34,7 @@ trait CoordinateSpace[V, @sp(Float, Double) F] extends Any with InnerProductSpac
 object CoordinateSpace {
   @inline final def apply[V, @sp(Float,Double) F](implicit V: CoordinateSpace[V, F]): CoordinateSpace[V, F] = V
 
-  def seq[A: Field, CC[A] <: SeqLike[A, CC[A]]](dimensions: Int)(implicit
+  def seq[A: Field, CC[A] <: SeqOps[A, Seq, CC[A]]](dimensions: Int)(implicit
       cbf0: Factory[A, CC[A]]): SeqCoordinateSpace[A, CC[A]] = new SeqCoordinateSpace[A, CC[A]](dimensions)
 
   def array[@sp(Float, Double) A: Field: ClassTag](dimensions: Int): CoordinateSpace[Array[A], A] =

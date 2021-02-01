@@ -8,6 +8,7 @@ import org.typelevel.discipline.{Laws, Predicate}
 
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
+import scala.annotation.nowarn
 
 import InvalidTestException._
 
@@ -20,7 +21,9 @@ object VectorSpaceLaws {
 
 trait VectorSpaceLaws[V, A] extends Laws {
 
+  @nowarn
   implicit def ringFromLeftModule(implicit V: LeftModule[V, A], ev: NoImplicit[CModule[V, A]]): Ring[A] = V.scalar
+  @nowarn
   implicit def ringFromRightModule(implicit V: RightModule[V, A], ev: NoImplicit[CModule[V, A]]): Ring[A] = V.scalar
   implicit def cRingFromCModule(implicit V: CModule[V, A]): CRing[A] = V.scalar
 
@@ -102,6 +105,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     )
   )
 
+  @nowarn
   def normedVectorSpace(implicit V: NormedVectorSpace[V, A], ev0: Order[A], ev1: Signed[A]): SpaceProperties = new SpaceProperties(
     name = "normed vector space",
     sl = _.field(V.scalar),
@@ -130,7 +134,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     )
   )
 
-
+  @nowarn
   def innerProductSpace(implicit V: InnerProductSpace[V, A], A: Order[A], A0: Signed[A]): SpaceProperties = SpaceProperties.fromParent(
     name = "inner-product space",
     parent = vectorSpace,

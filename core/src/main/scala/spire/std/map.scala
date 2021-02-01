@@ -22,7 +22,7 @@ class MapMonoid[K, V](implicit val scalar: Semigroup[V]) extends Monoid[Map[K, V
 @SerialVersionUID(0L)
 class MapGroup[K, V](implicit override val scalar: Group[V]) extends MapMonoid[K, V]
   with Group[Map[K, V]] with Serializable {
-  def inverse(x: Map[K, V]): Map[K, V] = x.mapValues(scalar.inverse).toMap
+  def inverse(x: Map[K, V]): Map[K, V] = x.view.mapValues(scalar.inverse).toMap
 }
 
 @SerialVersionUID(0L)
@@ -54,9 +54,9 @@ class MapCSemiring[K, V](implicit val scalar: CSemiring[V]) extends CSemiring[Ma
 class MapCRng[K, V](override implicit val scalar: CRing[V]) extends MapCSemiring[K, V] with CRng[Map[K, V]] with CModule[Map[K, V], V] with Serializable { self =>
   // TODO: in the experimental branch, it is no longer an algebra, because it lacks an identity
 
-  def negate(x: Map[K, V]): Map[K, V] = x.mapValues(scalar.negate(_)).toMap
+  def negate(x: Map[K, V]): Map[K, V] = x.view.mapValues(scalar.negate(_)).toMap
 
-  def timesl(r: V, v: Map[K, V]): Map[K, V] = v.mapValues(scalar.times(r, _)).toMap
+  def timesl(r: V, v: Map[K, V]): Map[K, V] = v.view.mapValues(scalar.times(r, _)).toMap
 }
 
 @SerialVersionUID(0L)
@@ -111,7 +111,7 @@ class MapVectorEq[K, V](implicit V: Eq[V], scalar: AdditiveMonoid[V]) extends Eq
       }
     }
 
-    loop(x, y.toIterator)
+    loop(x, y.iterator)
   }
 }
 

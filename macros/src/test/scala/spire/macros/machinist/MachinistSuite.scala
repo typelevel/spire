@@ -1,5 +1,7 @@
 package spire.macros.machinist
 
+import scala.annotation.nowarn
+
 trait Qux[A] {
   def plus(lhs: A, rhs: A): A
   def negate(lhs: A): A
@@ -31,6 +33,7 @@ object Qux {
 
   implicit class QuxOps1[A: Qux](x: A) {
     def +(rhs: A): A = macro DefaultOps.binop[A, A]
+    @nowarn
     def unary_-(): A = macro DefaultOps.unop[A]
     def ===(rhs: A): Boolean = macro DefaultOps.binop[A, Boolean]
     def *:(lhs: A): A = macro DefaultOps.rbinop[A, A]

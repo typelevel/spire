@@ -31,8 +31,8 @@ class ScalaVsSpireBenchmarks {
   @Setup
   def setup(): Unit = {
     size = spire.math.pow(2, pow).toInt
-    as = init(size)(scala.math.abs(nextInt) % 100000 + 1)
-    bs = init(size)(scala.math.abs(nextInt) % 100000 + 1)
+    as = init(size)(scala.math.abs(nextInt()) % 100000 + 1)
+    bs = init(size)(scala.math.abs(nextInt()) % 100000 + 1)
     cs = new Array(size)
   }
 

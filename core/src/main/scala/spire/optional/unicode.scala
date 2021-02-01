@@ -35,10 +35,10 @@ package object unicode {
   def ∜[A](a: A)(implicit ev: NRoot[A]): A = ev.nroot(a, 4)
 
   def Σ[A](as: Iterable[A])(implicit ev: AdditiveMonoid[A]): A =
-    as.aggregate(ev.zero)(ev.plus, ev.plus)
+    as.foldLeft(ev.zero)(ev.plus)
 
   def Π[A](as: Iterable[A])(implicit ev: MultiplicativeMonoid[A]): A =
-    as.aggregate(ev.one)(ev.times, ev.times)
+    as.foldLeft(ev.one)(ev.times)
 
   implicit class TimesOp[A](lhs: A)(implicit ev: MultiplicativeSemigroup[A]) {
     def ∙(rhs: A): A = ev.times(lhs, rhs)

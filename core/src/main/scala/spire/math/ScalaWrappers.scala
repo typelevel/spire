@@ -3,6 +3,11 @@ package math
 
 import spire.algebra.{Eq, EuclideanRing, Field, PartialOrder, Order, Ring, Signed}
 
+trait ScalaOrderingWrapperCompat[A] extends scala.math.Ordering[A] {
+  override def min[U <: A](x:U, y:U): U = if (lt(x, y)) x else y
+  override def max[U <: A](x:U, y:U): U = if (gt(x, y)) x else y
+}
+
 private[spire] trait ScalaEquivWrapper[A] extends scala.math.Equiv[A] {
   def eq: Eq[A]
 
@@ -22,7 +27,7 @@ private[spire] trait ScalaPartialOrderingWrapper[A] extends scala.math.PartialOr
 }
 
 
-private[spire] trait ScalaOrderingWrapper[A] extends spire.scalacompat.ScalaOrderingWrapperCompat[A] {
+private[spire] trait ScalaOrderingWrapper[A] extends ScalaOrderingWrapperCompat[A] {
   def order: Order[A]
 
   def compare(x:A, y:A): Int = order.compare(x, y)

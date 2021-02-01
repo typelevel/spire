@@ -16,6 +16,7 @@ import spire.std.bigDecimal._
 import spire.std.long._
 import spire.syntax.std.seq._
 import spire.util.Opt
+import scala.annotation.nowarn
 
 /**
  * Algebraic provides an exact number type for algebraic numbers. Algebraic
@@ -750,7 +751,7 @@ object Algebraic extends AlgebraicInstances {
         else if (value == Long.MinValue) new BitBound(64)
         else new BitBound(64 - numberOfLeadingZeros(abs(value) - 1))
 
-      def signum: Int = value.signum
+      def signum: Int = value.sign.toInt
 
       def toBigDecimal(digits: Int): JBigDecimal =
         new JBigDecimal(value).setScale(digits, RoundingMode.HALF_UP)
@@ -1299,6 +1300,7 @@ object Algebraic extends AlgebraicInstances {
       }
     }
 
+    @nowarn
     def apply(expr: Algebraic.Expr): Bound = checked {
       // Unfortunately, we must call degreeBound early, to avoid many redundant
       // traversals of the Expr tree. Getting this out of the way early on

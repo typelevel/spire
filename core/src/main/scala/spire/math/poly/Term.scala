@@ -108,7 +108,7 @@ object Term {
   private[spire] def removeSuperscript(text: String): String =
     superscriptRegex.replaceAllIn(text, "^" + _.group(0).map(removeSuperscript))
 
-  private val superscript : (Char => Char) = Map(digitToSuperscript:_*)
+  private val superscript : (Char => Char) = Map(digitToSuperscript.toIndexedSeq:_*)
 
-  private val removeSuperscript : (Char => Char) = Map(digitToSuperscript.map(_.swap):_*)
+  private val removeSuperscript : (Char => Char) = Map(digitToSuperscript.map(_.swap).toIndexedSeq: _*)
 }

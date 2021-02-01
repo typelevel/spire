@@ -275,21 +275,12 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
     } yield RationalAlgebraic(Algebraic(x), Rational(x))
 
     def genLeaf: Gen[RationalAlgebraic] = {
-      if (spire.scalacompat.preScala2p13) {
-        Gen.oneOf(
-          genRational.map { q => RationalAlgebraic(Algebraic(q), q) },
-          genBigDecimal,
-          genDouble,
-          genLong
-        )
-      } else {
-        // Scala 2.13 has bugs around the construction of BigDecimal quantities
-        Gen.oneOf(
-          genRational.map { q => RationalAlgebraic(Algebraic(q), q) },
-          genDouble,
-          genLong
-        )
-      }
+      // Scala 2.13 has bugs around the construction of BigDecimal quantities
+      Gen.oneOf(
+        genRational.map { q => RationalAlgebraic(Algebraic(q), q) },
+        genDouble,
+        genLong
+      )
     }
 
     def genAdd(depth: Int): Gen[RationalAlgebraic] = for {

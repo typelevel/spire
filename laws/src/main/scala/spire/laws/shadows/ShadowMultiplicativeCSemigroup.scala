@@ -14,8 +14,8 @@ trait ShadowMultiplicativeCSemigroup[A, S] extends MultiplicativeCSemigroup[Shad
   override def pow(x: Shadow[A, S], n: Int): Shadow[A, S] =
     Shadow(A.pow(x.a, n), checked(S.pow(x.s, n)))
 
-  override def tryProduct(xs: TraversableOnce[Shadow[A, S]]): Option[Shadow[A, S]] = {
-    val seq = xs.toSeq
+  override def tryProduct(xs: IterableOnce[Shadow[A, S]]): Option[Shadow[A, S]] = {
+    val seq = xs.iterator.toSeq
     val aO = A.tryProduct( seq.map(_.a) )
     val sO = S.tryProduct( seq.map(_.s) )
     (aO, sO) match {

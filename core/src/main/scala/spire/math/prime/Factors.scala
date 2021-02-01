@@ -68,7 +68,7 @@ case class Factors(elements: Map[SafeLong, Int], sign: Sign)
         while (it.hasNext && t <= rhs) { val (p, e) = it.next(); t *= (p ** e) }
         t compare rhs
       case Zero =>
-        rhs.signum
+        rhs.sign.toInt
       case Negative =>
         var t = -SafeLong.one
         val it = iterator

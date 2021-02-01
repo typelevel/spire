@@ -30,12 +30,12 @@ class ArrayOrderBenchmarks {
   @Setup
   def setup(): Unit = {
     val size = spire.math.pow(2, pow).toInt
-    a = init(size)(nextInt)
+    a = init(size)(nextInt())
     b = a.clone
     c = a.clone; c(1) += 1
     d = a.clone; d(size / 3) += 1
     e = a.clone; e(size - 7) += 1
-    f = init(size + 10)(nextInt); System.arraycopy(a, 0, f, 0, a.length)
+    f = init(size + 10)(nextInt()); System.arraycopy(a, 0, f, 0, a.length)
   }
 
   def directEq(x: Array[Int], y: Array[Int]): Boolean = {

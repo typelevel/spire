@@ -15,7 +15,6 @@
 package spire
 package benchmark
 
-import spire.implicits._
 /*
 /**
  * This is a benchmark comparing Marsaglias Polar Method implementation with the implementation of his Ziggurat algorithm.

@@ -4,8 +4,6 @@ import microsites._
 import ReleaseTransformations._
 import sbtcrossproject.{CrossType, crossProject}
 
-lazy val scalaCollectionCompatVersion = "2.4.1"
-
 lazy val scalaCheckVersion = "1.15.2"
 
 lazy val munit = "0.7.21"
@@ -18,11 +16,11 @@ lazy val apfloatVersion = "1.9.1"
 lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
-val Scala212 = "2.12.12"
 val Scala213 = "2.13.4"
 
-ThisBuild / crossScalaVersions := Seq(Scala212, Scala213)
+ThisBuild / crossScalaVersions := Seq(Scala213)
 ThisBuild / scalaVersion := Scala213
+ThisBuild / organization := "org.typelevel"
 
 ThisBuild / githubWorkflowArtifactUpload := false
 
@@ -47,8 +45,8 @@ lazy val spireJVM = project.in(file(".spireJVM"))
   .settings(unidocSettings)
   .settings(noPublishSettings)
   .enablePlugins(ScalaUnidocPlugin)
-  .aggregate(macrosJVM, coreJVM, dataJVM, extrasJVM, examples, lawsJVM, legacyJVM, platformJVM, testsJVM, utilJVM, benchmark)
-  .dependsOn(macrosJVM, coreJVM, dataJVM, extrasJVM, examples, lawsJVM, legacyJVM, platformJVM, testsJVM, utilJVM, benchmark)
+  .aggregate(macros.jvm, core.jvm, data.jvm, extras.jvm, examples, laws.jvm, legacy.jvm, platform.jvm, tests.jvm, util.jvm, benchmark)
+  .dependsOn(macros.jvm, core.jvm, data.jvm, extras.jvm, examples, laws.jvm, legacy.jvm, platform.jvm, tests.jvm, util.jvm, benchmark)
 
 lazy val spireJS = project.in(file(".spireJS"))
   .settings(moduleName := "spire-aggregate")
@@ -56,8 +54,8 @@ lazy val spireJS = project.in(file(".spireJS"))
   .settings(unidocSettings)
   .settings(noPublishSettings)
   .enablePlugins(ScalaUnidocPlugin)
-  .aggregate(macrosJS, coreJS, dataJS, extrasJS, lawsJS, legacyJS, platformJS, testsJS, utilJS)
-  .dependsOn(macrosJS, coreJS, dataJS, extrasJS, lawsJS, legacyJS, platformJS, testsJS, utilJS)
+  .aggregate(macros.js, core.js, data.js, extras.js, laws.js, legacy.js, platform.js, tests.js, util.js)
+  .dependsOn(macros.js, core.js, data.js, extras.js, laws.js, legacy.js, platform.js, tests.js, util.js)
   .enablePlugins(ScalaJSPlugin)
 
 lazy val platform = crossProject(JSPlatform, JVMPlatform)
@@ -68,9 +66,6 @@ lazy val platform = crossProject(JSPlatform, JVMPlatform)
   .jsSettings(commonJsSettings:_*)
   .dependsOn(macros, util)
 
-lazy val platformJVM = platform.jvm
-lazy val platformJS = platform.js
-
 lazy val macros = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-macros")
   .settings(spireSettings:_*)
@@ -80,18 +75,12 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
 
-lazy val macrosJVM = macros.jvm
-lazy val macrosJS = macros.js
-
 lazy val data = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-data")
   .settings(spireSettings:_*)
   .settings(crossVersionSharedSources:_*)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
-
-lazy val dataJVM = data.jvm
-lazy val dataJS = data.js
 
 lazy val legacy = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-legacy")
@@ -100,9 +89,6 @@ lazy val legacy = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
 
-lazy val legacyJVM = legacy.jvm
-lazy val legacyJS = legacy.js
-
 lazy val util = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-util")
   .settings(spireSettings:_*)
@@ -110,9 +96,6 @@ lazy val util = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
   .dependsOn(macros)
-
-lazy val utilJVM = util.jvm
-lazy val utilJS = util.js
 
 lazy val core = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire")
@@ -124,9 +107,6 @@ lazy val core = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .jsSettings(commonJsSettings:_*)
   .dependsOn(macros, platform, util)
 
-lazy val coreJVM = core.jvm
-lazy val coreJS = core.js
-
 lazy val extras = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-extras")
   .settings(spireSettings:_*)
@@ -136,13 +116,10 @@ lazy val extras = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure
   .jsSettings(commonJsSettings:_*)
   .dependsOn(macros, platform, util, core, data)
 
-lazy val extrasJVM = extras.jvm
-lazy val extrasJS = extras.js
-
 lazy val docs = project.in(file("docs"))
   .enablePlugins(MicrositesPlugin)
   .enablePlugins(ScalaUnidocPlugin)
-  .dependsOn(macrosJVM, coreJVM, extrasJVM)
+  .dependsOn(macros.jvm, core.jvm, extras.jvm)
   .settings(moduleName := "spire-docs")
   .settings(commonSettings:_*)
   .settings(spireSettings:_*)
@@ -161,7 +138,7 @@ lazy val examples = project
   ))
   .settings(noPublishSettings)
   .settings(commonJvmSettings)
-  .dependsOn(coreJVM, extrasJVM)
+  .dependsOn(core.jvm, extras.jvm)
 
 lazy val laws = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .settings(moduleName := "spire-laws")
@@ -174,9 +151,6 @@ lazy val laws = crossProject(JSPlatform, JVMPlatform).crossType(CrossType.Pure)
   .jsSettings(commonJsSettings:_*)
   .dependsOn(core, extras)
 
-lazy val lawsJVM = laws.jvm
-lazy val lawsJS = laws.js
-
 lazy val tests = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .settings(moduleName := "spire-tests")
@@ -186,9 +160,6 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform)
   .jvmSettings(commonJvmSettings:_*)
   .jsSettings(commonJsSettings:_*)
   .dependsOn(core, data, legacy, extras, laws)
-
-lazy val testsJVM = tests.jvm
-lazy val testsJS = tests.js
 
 lazy val benchmark: Project = project.in(file("benchmark"))
   .settings(moduleName := "spire-benchmark")
@@ -203,7 +174,7 @@ lazy val benchmark: Project = project.in(file("benchmark"))
     )
   )
   .enablePlugins(JmhPlugin)
-  .dependsOn(coreJVM, extrasJVM)
+  .dependsOn(core.jvm, extras.jvm)
 
 // General settings
 
@@ -213,18 +184,10 @@ addCommandAlias("validateJS", ";macrosJS/test;coreJS/test;extrasJS/test;lawsJS/t
 
 addCommandAlias("validate", ";validateJVM;validateJS")
 
-lazy val buildSettings = Seq(
-  organization := "org.typelevel",
-  unmanagedSourceDirectories in Compile += {
-      val sharedSourceDir = (baseDirectory in ThisBuild).value / "compat/src/main"
-      if (scalaVersion.value.startsWith("2.13.")) sharedSourceDir / "scala-2.13"
-      else sharedSourceDir / "scala-pre-2.13"
-  }
-)
+lazy val buildSettings = Seq()
 
 lazy val commonDeps = Seq(
   libraryDependencies ++= Seq(
-    "org.scala-lang.modules" %%% "scala-collection-compat" % scalaCollectionCompatVersion,
     "org.typelevel" %%% "algebra" % algebraVersion
   )
 )
@@ -246,14 +209,7 @@ lazy val commonJsSettings = Seq(
   scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }
 )
 
-lazy val commonJvmSettings = Seq(
-  // -optimize has no effect in scala-js other than slowing down the build
-  //  scalacOptions += "-optimize", // disabling for now
-  scalacOptions ++= (CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, scalaMajor)) if scalaMajor <= 11 => Seq("-optimize")
-    case _ => Seq.empty
-  }),
-)
+lazy val commonJvmSettings = Seq()
 
 lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
 
@@ -313,7 +269,7 @@ lazy val docSettings = Seq(
   ),
   autoAPIMappings := true,
   unidocProjectFilter in (ScalaUnidoc, unidoc) :=
-    inProjects(platformJVM, macrosJVM, dataJVM, legacyJVM, utilJVM, coreJVM, extrasJVM, lawsJVM),
+    inProjects(platform.jvm, macros.jvm, data.jvm, legacy.jvm, util.jvm, core.jvm, extras.jvm, laws.jvm),
   docsMappingsAPIDir := "api",
   addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
   ghpagesNoJekyll := false,
@@ -397,7 +353,7 @@ lazy val munitSettings = Seq(
 lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps ++ publishSettings ++ scoverageSettings
 
 lazy val unidocSettings = Seq(
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, testsJVM)
+  unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, tests.jvm)
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

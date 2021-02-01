@@ -18,8 +18,8 @@ trait ShadowAdditiveCMonoid[A, S] extends AdditiveCMonoid[Shadow[A, S]] with Sha
     a
   }
 
-  override def sum(xs: TraversableOnce[Shadow[A, S]]): Shadow[A, S] = {
-    val seq = xs.toSeq
+  override def sum(xs: IterableOnce[Shadow[A, S]]): Shadow[A, S] = {
+    val seq = xs.iterator.toSeq
     val a = A.sum(seq.map(_.a))
     val s = S.sum(seq.map(_.s))
     Shadow(a, checked(s))
