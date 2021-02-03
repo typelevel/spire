@@ -4,12 +4,14 @@ package optional
 import spire.algebra.PartialOrder
 
 object powerSetPartialOrder {
-  /** Set partial order defined as follows:
-    *
-    * S <= T if S is a subset of T.
-    */
+
+  /**
+   * Set partial order defined as follows:
+   *
+   * S <= T if S is a subset of T.
+   */
   class PowerSetPartialOrder[A] extends PartialOrder[Set[A]] {
-    override def eqv(x: Set[A], y: Set[A]): Boolean = (x == y)
+    override def eqv(x: Set[A], y: Set[A]): Boolean = x == y
     override def lteqv(x: Set[A], y: Set[A]): Boolean = x.subsetOf(y)
     override def lt(x: Set[A], y: Set[A]): Boolean = x.subsetOf(y) && x != y
     override def gteqv(x: Set[A], y: Set[A]): Boolean = y.subsetOf(x)

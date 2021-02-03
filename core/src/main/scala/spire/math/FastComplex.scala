@@ -19,13 +19,13 @@ object FloatComplex {
 }
 
 /**
-  * Value class which encodes two floating point values in a Long.
-  *
-  * We get (basically) unboxed complex numbers using this hack.
-  * The underlying implementation lives in the FastComplex object.
-  */
+ * Value class which encodes two floating point values in a Long.
+ *
+ * We get (basically) unboxed complex numbers using this hack.
+ * The underlying implementation lives in the FastComplex object.
+ */
 class FloatComplex(val u: Long) extends AnyVal {
-  override final def toString: String = "(%s+%si)".format(real, imag)
+  final override def toString: String = "(%s+%si)".format(real, imag)
 
   final def real: Float = FastComplex.real(u)
   final def imag: Float = FastComplex.imag(u)
@@ -55,39 +55,38 @@ final def /%(b: FloatComplex): (FloatComplex, FloatComplex) = FastComplex.quotmo
   final def pow(b: FloatComplex): FloatComplex = new FloatComplex(FastComplex.pow(u, b.u))
   final def **(b: FloatComplex): FloatComplex = pow(b)
 
-  final def pow(b: Int): FloatComplex = new FloatComplex(FastComplex.pow(u, FastComplex(b.toFloat, 0.0F)))
+  final def pow(b: Int): FloatComplex = new FloatComplex(FastComplex.pow(u, FastComplex(b.toFloat, 0.0f)))
   final def **(b: Int): FloatComplex = pow(b)
 }
 
-
 /**
-  * FastComplex is an ugly, beautiful hack.
-  *
-  * The basic idea is to encode two 32-bit Floats into a single 64-bit Long.
-  * The lower-32 bits are the "real" Float and the upper-32 are the "imaginary"
-  * Float.
-  *
-  * Since we're overloading the meaning of Long, all the operations have to be
-  * defined on the FastComplex object, meaning the syntax for using this is a
-  * bit ugly. To add to the ugly beauty of the whole thing I could imagine
-  * defining implicit operators on Long like +@, -@, *@, /@, etc.
-  *
-  * You might wonder why it's even worth doing this. The answer is that when
-  * you need to allocate an array of e.g. 10-20 million complex numbers, the GC
-  * overhead of using *any* object is HUGE. Since we can't build our own
-  * "pass-by-value" types on the JVM we are stuck doing an encoding like this.
-  *
-  * Here are some profiling numbers for summing an array of complex numbers,
-  * timed against a concrete case class implementation using Float (in ms):
-  *
-  *  size | encoded |  class
-  *    1M |     5.1 |    5.8
-  *    5M |    28.5 |   91.7
-  *   10M |    67.7 |  828.1
-  *   20M |   228.0 | 2687.0
-  *
-  * Not bad, eh?
-  */
+ * FastComplex is an ugly, beautiful hack.
+ *
+ * The basic idea is to encode two 32-bit Floats into a single 64-bit Long.
+ * The lower-32 bits are the "real" Float and the upper-32 are the "imaginary"
+ * Float.
+ *
+ * Since we're overloading the meaning of Long, all the operations have to be
+ * defined on the FastComplex object, meaning the syntax for using this is a
+ * bit ugly. To add to the ugly beauty of the whole thing I could imagine
+ * defining implicit operators on Long like +@, -@, *@, /@, etc.
+ *
+ * You might wonder why it's even worth doing this. The answer is that when
+ * you need to allocate an array of e.g. 10-20 million complex numbers, the GC
+ * overhead of using *any* object is HUGE. Since we can't build our own
+ * "pass-by-value" types on the JVM we are stuck doing an encoding like this.
+ *
+ * Here are some profiling numbers for summing an array of complex numbers,
+ * timed against a concrete case class implementation using Float (in ms):
+ *
+ *  size | encoded |  class
+ *    1M |     5.1 |    5.8
+ *    5M |    28.5 |   91.7
+ *   10M |    67.7 |  828.1
+ *   20M |   228.0 | 2687.0
+ *
+ * Not bad, eh?
+ */
 object FastComplex {
   import java.lang.Math.{atan2, cos, sin}
 
@@ -109,9 +108,9 @@ object FastComplex {
   @inline final def imag(d: Long): Float = bits((d >>> 32).toInt)
 
   // define some handy constants
-  final val i: Long = encode(0.0F, 1.0F)
-  final val one: Long = encode(1.0F, 0.0F)
-  final val zero: Long = encode(0.0F, 0.0F)
+  final val i: Long = encode(0.0f, 1.0f)
+  final val one: Long = encode(1.0f, 0.0f)
+  final val zero: Long = encode(0.0f, 0.0f)
 
   // encode two floats representing a complex number
   @inline final def encode(real: Float, imag: Float): Long =
@@ -141,15 +140,15 @@ object FastComplex {
   final def conjugate(d: Long): Long = encode(real(d), -imag(d))
 
   // see if the complex number is a whole value
-  final def isWhole(d: Long): Boolean = real(d) % 1.0F == 0.0F && imag(d) % 1.0F == 0.0F
+  final def isWhole(d: Long): Boolean = real(d) % 1.0f == 0.0f && imag(d) % 1.0f == 0.0f
 
   // get the sign of the complex number
-  final def signum(d: Long): Int = real(d) compare 0.0F
+  final def signum(d: Long): Int = real(d).compare(0.0f)
 
   // get the complex sign of the complex number
   final def complexSignum(d: Long): Long = {
     val m = abs(d)
-    if (m == 0.0F) zero else divide(d, encode(m, 0.0F))
+    if (m == 0.0f) zero else divide(d, encode(m, 0.0f))
   }
 
   // negation
@@ -181,13 +180,13 @@ object FastComplex {
     val abs_im_b = Math.abs(im_b)
 
     if (abs_re_b >= abs_im_b) {
-      if (abs_re_b == 0.0F) throw new ArithmeticException("/0")
+      if (abs_re_b == 0.0f) throw new ArithmeticException("/0")
       val ratio = im_b / re_b
       val denom = re_b + im_b * ratio
       encode((re_a + im_a * ratio) / denom, (im_a - re_a * ratio) / denom)
 
     } else {
-      if (abs_im_b == 0.0F) throw new ArithmeticException("/0")
+      if (abs_im_b == 0.0f) throw new ArithmeticException("/0")
       val ratio = re_b / im_b
       val denom = re_b * ratio + im_b
       encode((re_a * ratio + im_a) / denom, (im_a * ratio - re_a) / denom)
@@ -208,14 +207,14 @@ object FastComplex {
 
   // exponentiation
   final def pow(a: Long, b: Long): Long = if (b == zero) {
-    encode(1.0F, 0.0F)
+    encode(1.0f, 0.0f)
 
   } else if (a == zero) {
-    if (imag(b) != 0.0F || real(b) < 0.0F)
+    if (imag(b) != 0.0f || real(b) < 0.0f)
       throw new Exception("raising 0 to negative/complex power")
     zero
 
-  } else if (imag(b) != 0.0F) {
+  } else if (imag(b) != 0.0f) {
     val im_b = imag(b)
     val re_b = real(b)
     val len = (Math.pow(abs(a), re_b) / exp((angle(a) * im_b))).toFloat

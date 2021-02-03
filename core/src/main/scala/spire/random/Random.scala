@@ -8,7 +8,7 @@ sealed trait Op[+A] {
   def flatMap[B](f: A => Op[B]): Op[B] =
     this match {
       case FlatMap(a, g) => FlatMap(a, (x: Any) => g(x).flatMap(f))
-      case o => FlatMap(o, f)
+      case o             => FlatMap(o, f)
     }
 
   def map[B](f: A => B): Op[B] =
@@ -25,9 +25,9 @@ sealed trait Op[+A] {
         Right(f(gen))
       case FlatMap(a, f) =>
         a match {
-          case Const(x) => f(x).resume(gen)
-          case More(k) => Left(() => FlatMap(k(), f))
-          case Next(g) => f(g(gen)).resume(gen)
+          case Const(x)      => f(x).resume(gen)
+          case More(k)       => Left(() => FlatMap(k(), f))
+          case Next(g)       => f(g(gen)).resume(gen)
           case FlatMap(b, g) => (FlatMap(b, (x: Any) => FlatMap(g(x), f)): Op[A]).resume(gen)
         }
     }
@@ -35,7 +35,7 @@ sealed trait Op[+A] {
   def run(gen: Generator): A = {
     def loop(e: Either[() => Op[A], A]): A = e match {
       case Right(a) => a
-      case Left(k) => loop(k().resume(gen))
+      case Left(k)  => loop(k().resume(gen))
     }
     loop(resume(gen))
   }
@@ -107,16 +107,20 @@ trait RandomCompanion[G <: Generator] { self =>
 
     def unfold[B](init: B)(f: (B, A) => Option[B]): Random[B, G] = {
       def loop(mb: Op[B], ma: Op[A]): Op[B] =
-        mb.flatMap(b => ma.flatMap(a => f(b, a) match {
-          case Some(b2) => More(() => loop(Const(b2), ma))
-          case None => Const(b)
-        }))
+        mb.flatMap(b =>
+          ma.flatMap(a =>
+            f(b, a) match {
+              case Some(b2) => More(() => loop(Const(b2), ma))
+              case None     => Const(b)
+            }
+          )
+        )
       spawn(loop(Const(init), More(() => lhs.op)))
     }
   }
 
   def tuple2[A, B](r1: R[A], r2: R[B]): R[(A, B)] =
-    r1 and r2
+    r1.and(r2)
   def tuple3[A, B, C](r1: R[A], r2: R[B], r3: R[C]): R[(A, B, C)] =
     for { a <- r1; b <- r2; c <- r3 } yield (a, b, c)
   def tuple4[A, B, C, D](r1: R[A], r2: R[B], r3: R[C], r4: R[D]): R[(A, B, C, D)] =

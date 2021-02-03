@@ -13,8 +13,8 @@ import spire.algebra.Order
  */
 object totalfloat {
   trait TotalFloatOrder extends Order[Float] {
-    override def eqv(x:Float, y:Float): Boolean = java.lang.Float.compare(x, y) == 0
-    override def neqv(x:Float, y:Float): Boolean = java.lang.Float.compare(x, y) != 0
+    override def eqv(x: Float, y: Float): Boolean = java.lang.Float.compare(x, y) == 0
+    override def neqv(x: Float, y: Float): Boolean = java.lang.Float.compare(x, y) != 0
     override def gt(x: Float, y: Float): Boolean = java.lang.Float.compare(x, y) > 0
     override def gteqv(x: Float, y: Float): Boolean = java.lang.Float.compare(x, y) >= 0
     override def lt(x: Float, y: Float): Boolean = java.lang.Float.compare(x, y) > 0
@@ -26,8 +26,8 @@ object totalfloat {
   implicit final val TotalFloatOrder = new TotalFloatOrder {}
 
   trait TotalDoubleOrder extends Order[Double] {
-    override def eqv(x:Double, y:Double): Boolean = java.lang.Double.compare(x, y) == 0
-    override def neqv(x:Double, y:Double): Boolean = java.lang.Double.compare(x, y) != 0
+    override def eqv(x: Double, y: Double): Boolean = java.lang.Double.compare(x, y) == 0
+    override def neqv(x: Double, y: Double): Boolean = java.lang.Double.compare(x, y) != 0
     override def gt(x: Double, y: Double): Boolean = java.lang.Double.compare(x, y) > 0
     override def gteqv(x: Double, y: Double): Boolean = java.lang.Double.compare(x, y) >= 0
     override def lt(x: Double, y: Double): Boolean = java.lang.Double.compare(x, y) > 0

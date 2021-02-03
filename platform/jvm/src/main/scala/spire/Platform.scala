@@ -1,6 +1,6 @@
 package spire
 
-import  scala.collection._
+import scala.collection._
 
 object Platform {
   type TrieMap[K, V] = concurrent.TrieMap[K, V]

@@ -4,29 +4,29 @@ private[interval] object Tree {
 
   import java.lang.Long.numberOfLeadingZeros
 
-  @inline final def toPrefix(key:Long) : Long = key - Long.MinValue
+  @inline final def toPrefix(key: Long): Long = key - Long.MinValue
 
-  @inline final def fromPrefix(key:Long) : Long = key + Long.MinValue
+  @inline final def fromPrefix(key: Long): Long = key + Long.MinValue
 
   @inline final def unsigned_<(i: Long, j: Long) = (i < j) ^ (i < 0L) ^ (j < 0L)
 
-  @inline final def levelAbove(a:Long, b:Long) : Byte =
+  @inline final def levelAbove(a: Long, b: Long): Byte =
     (63 - numberOfLeadingZeros(a ^ b)).toByte
 
-  @inline final def maskAbove(prefix:Long, bit:Byte) = {
+  @inline final def maskAbove(prefix: Long, bit: Byte) = {
     // this is not the same as (-1L << (bit + 1)) due to the somewhat strange behavior of the java shift operator
     // -1L << 64 gives -1L, whereas (-1L << 63) << 1 gives 0L like we need
     prefix & ((-1L << bit) << 1)
   }
 
-  @inline final def zeroAt(value:Long, bit:Byte) =
+  @inline final def zeroAt(value: Long, bit: Byte) =
     (value & (1L << bit)) == 0L
 
   @inline final def hasMatchAt(key: Long, prefix: Long, level: Byte) =
     maskAbove(key, level) == prefix
 
-  def concat(t1 : Leaf, t2 : Leaf) : Tree = {
-    if(!unsigned_<(t1.prefix, t2.prefix))
+  def concat(t1: Leaf, t2: Leaf): Tree = {
+    if (!unsigned_<(t1.prefix, t2.prefix))
       throw new IllegalArgumentException("Arguments of concat must be ordered")
     val p1 = t1.prefix
     val p2 = t2.prefix
@@ -53,21 +53,21 @@ private[interval] object Tree {
    * @param r the right child
    * @return the result, can be null
    */
-  @inline private final def branch(p:Long, level:Byte, l:Tree, r:Tree) : Tree =
-    if(l eq null)
+  @inline final private def branch(p: Long, level: Byte, l: Tree, r: Tree): Tree =
+    if (l eq null)
       r
-    else if(r eq null)
+    else if (r eq null)
       l
     else
-      Branch(p,level,l,r)
+      Branch(p, level, l, r)
 
   // $COVERAGE-OFF$
-  private[extras] def unreachable : Nothing = throw new NotImplementedError("You should never get here")
+  private[extras] def unreachable: Nothing = throw new NotImplementedError("You should never get here")
   // $COVERAGE-ON$
 
   sealed abstract class BooleanBinaryOperator {
 
-    @inline private final def disjoint(a0:Boolean, a: Tree, b0:Boolean, b: Tree): Boolean = {
+    @inline final private def disjoint(a0: Boolean, a: Tree, b0: Boolean, b: Tree): Boolean = {
       val a_p = a.prefix
       val b_p = b.prefix
       val level = levelAbove(a_p, b_p)
@@ -82,7 +82,7 @@ private[interval] object Tree {
       }
     }
 
-    protected def op(a:Boolean, b:Boolean) : Boolean
+    protected def op(a: Boolean, b: Boolean): Boolean
 
     /**
      * This is called if two leaves collide (have the same prefix)
@@ -92,7 +92,7 @@ private[interval] object Tree {
      * @param b a leaf from the rhs
      * @return the result. Can be a leaf or null
      */
-    protected def collision(a0:Boolean, a:Leaf, b0:Boolean,b:Leaf) : Boolean
+    protected def collision(a0: Boolean, a: Leaf, b0: Boolean, b: Leaf): Boolean
 
     /**
      * This will be called when a is completely covered by a contiguous interval of b
@@ -101,7 +101,7 @@ private[interval] object Tree {
      * @param b0 the constant value of b in the complete interval of a
      * @return the result, can be null
      */
-    protected def overlapA(a0: Boolean, a:Tree, b0:Boolean) : Boolean
+    protected def overlapA(a0: Boolean, a: Tree, b0: Boolean): Boolean
 
     /**
      * This will be called when b is completely covered by a contiguous interval of a
@@ -110,7 +110,7 @@ private[interval] object Tree {
      * @param b a non-null tree (leaf or branch)
      * @return the result, can be null
      */
-    protected def overlapB(a0:Boolean, b0:Boolean, b:Tree) : Boolean
+    protected def overlapB(a0: Boolean, b0: Boolean, b: Tree): Boolean
 
     /**
      * Performs the binary operation for two arbitrary trees
@@ -120,7 +120,7 @@ private[interval] object Tree {
      * @param b a node (leaf or branch) from the rhs
      * @return the result, can be null
      */
-    private final def op(a0:Boolean, a: Tree, b0:Boolean, b: Tree): Boolean = {
+    final private def op(a0: Boolean, a: Tree, b0: Boolean, b: Tree): Boolean = {
       val a_l = a.level
       val a_p = a.prefix
       val b_l = b.level
@@ -131,39 +131,41 @@ private[interval] object Tree {
         if (!hasMatchAt(b_p, a_p, a_l)) {
           // the prefix of a and b is different. We don't care if a is a branch or a leaf
           disjoint(a0, a, b0, b)
-        } else a match {
-          case a: Branch =>
-            val am = a0 ^ a.left.sign
-            if (zeroAt(b_p, a_l)) {
-              // b fits into the left child of a
-              op(a0, a.left, b0, b) && overlapA(am, a.right, b0 ^ b.sign)
-            } else {
-              // b fits into the right child of a
-              overlapA(a0, a.left, b0) && op(am, a.right, b0, b)
-            }
-          // $COVERAGE-OFF$
-          case _ => unreachable
-          // $COVERAGE-ON$
-        }
+        } else
+          a match {
+            case a: Branch =>
+              val am = a0 ^ a.left.sign
+              if (zeroAt(b_p, a_l)) {
+                // b fits into the left child of a
+                op(a0, a.left, b0, b) && overlapA(am, a.right, b0 ^ b.sign)
+              } else {
+                // b fits into the right child of a
+                overlapA(a0, a.left, b0) && op(am, a.right, b0, b)
+              }
+            // $COVERAGE-OFF$
+            case _ => unreachable
+            // $COVERAGE-ON$
+          }
       } else if (b_l > a_l) {
         // b is larger => b must be a branch
         if (!hasMatchAt(a_p, b_p, b_l)) {
           // the prefix of a and b is different. We don't care if b is a branch or a leaf
           disjoint(a0, a, b0, b)
-        } else b match {
-          case b: Branch =>
-            val bm = b0 ^ b.left.sign
-            if (zeroAt(a_p, b_l)) {
-              // a fits into the left child of b
-              op(a0, a, b0, b.left) && overlapB(a0 ^ a.sign, bm, b.right)
-            } else {
-              // a fits into the right child of b
-              overlapB(a0, b0, b.left) && op(a0, a, bm, b.right)
-            }
-          // $COVERAGE-OFF$
-          case _ => unreachable
-          // $COVERAGE-ON$
-        }
+        } else
+          b match {
+            case b: Branch =>
+              val bm = b0 ^ b.left.sign
+              if (zeroAt(a_p, b_l)) {
+                // a fits into the left child of b
+                op(a0, a, b0, b.left) && overlapB(a0 ^ a.sign, bm, b.right)
+              } else {
+                // a fits into the right child of b
+                overlapB(a0, b0, b.left) && op(a0, a, bm, b.right)
+              }
+            // $COVERAGE-OFF$
+            case _ => unreachable
+            // $COVERAGE-ON$
+          }
       } else {
         // a_l == b_l, trees are the same size
         if (a_p == b_p) {
@@ -187,7 +189,7 @@ private[interval] object Tree {
       }
     }
 
-    final def apply(a0: Boolean, a: Tree, b0: Boolean, b: Tree) : Boolean = op(a0, b0) &&  {
+    final def apply(a0: Boolean, a: Tree, b0: Boolean, b: Tree): Boolean = op(a0, b0) && {
       if ((a eq null) && (b eq null))
         true
       else if (a eq null)
@@ -214,7 +216,7 @@ private[interval] object Tree {
      * @param b a node (leaf or branch) from the rhs
      * @return the result, can be null
      */
-    private final def join(a0:Boolean, a: Tree, b0:Boolean, b: Tree): Tree = {
+    final private def join(a0: Boolean, a: Tree, b0: Boolean, b: Tree): Tree = {
       val a_p = a.prefix
       val b_p = b.prefix
       val level = levelAbove(a_p, b_p)
@@ -244,7 +246,7 @@ private[interval] object Tree {
      * @param b a leaf from the rhs
      * @return the result. Can be a leaf or null
      */
-    protected def collision(a0:Boolean, a:Leaf, b0:Boolean,b:Leaf) : Tree
+    protected def collision(a0: Boolean, a: Leaf, b0: Boolean, b: Leaf): Tree
 
     /**
      * This will be called when a is completely covered by a contiguous interval of b
@@ -253,7 +255,7 @@ private[interval] object Tree {
      * @param b0 the constant value of b in the complete interval of a
      * @return the result, can be null
      */
-    protected def overlapA(a0: Boolean, a:Tree, b0:Boolean) : Tree
+    protected def overlapA(a0: Boolean, a: Tree, b0: Boolean): Tree
 
     /**
      * This will be called when b is completely covered by a contiguous interval of a
@@ -262,7 +264,7 @@ private[interval] object Tree {
      * @param b a non-null tree (leaf or branch)
      * @return the result, can be null
      */
-    protected def overlapB(a0:Boolean, b0:Boolean, b:Tree) : Tree
+    protected def overlapB(a0: Boolean, b0: Boolean, b: Tree): Tree
 
     /**
      * Performs the binary operation for two arbitrary trees
@@ -272,7 +274,7 @@ private[interval] object Tree {
      * @param b a node (leaf or branch) from the rhs
      * @return the result, can be null
      */
-    private final def op(a0:Boolean, a: Tree, b0:Boolean, b: Tree): Tree = {
+    final private def op(a0: Boolean, a: Tree, b0: Boolean, b: Tree): Tree = {
       val a_l = a.level
       val a_p = a.prefix
       val b_l = b.level
@@ -283,39 +285,41 @@ private[interval] object Tree {
         if (!hasMatchAt(b_p, a_p, a_l)) {
           // the prefix of a and b is different. We don't care if a is a branch or a leaf
           join(a0, a, b0, b)
-        } else a match {
-          case a: Branch =>
-            val am = a0 ^ a.left.sign
-            if (zeroAt(b_p, a_l)) {
-              // b fits into the left child of a
-              a.lr(op(a0, a.left, b0, b), overlapA(am, a.right, b0 ^ b.sign))
-            } else {
-              // b fits into the right child of a
-              a.lr(overlapA(a0, a.left, b0), op(am, a.right, b0, b))
-            }
-          // $COVERAGE-OFF$
-          case _ => unreachable
-          // $COVERAGE-ON$
-        }
+        } else
+          a match {
+            case a: Branch =>
+              val am = a0 ^ a.left.sign
+              if (zeroAt(b_p, a_l)) {
+                // b fits into the left child of a
+                a.lr(op(a0, a.left, b0, b), overlapA(am, a.right, b0 ^ b.sign))
+              } else {
+                // b fits into the right child of a
+                a.lr(overlapA(a0, a.left, b0), op(am, a.right, b0, b))
+              }
+            // $COVERAGE-OFF$
+            case _ => unreachable
+            // $COVERAGE-ON$
+          }
       } else if (b_l > a_l) {
         // b is larger => b must be a branch
         if (!hasMatchAt(a_p, b_p, b_l)) {
           // the prefix of a and b is different. We don't care if b is a branch or a leaf
           join(a0, a, b0, b)
-        } else b match {
-          case b: Branch =>
-            val bm = b0 ^ b.left.sign
-            if (zeroAt(a_p, b_l)) {
-              // a fits into the left child of b
-              b.lr(op(a0, a, b0, b.left), overlapB(a0 ^ a.sign, bm, b.right))
-            } else {
-              // a fits into the right child of b
-              b.lr(overlapB(a0, b0, b.left), op(a0, a, bm, b.right))
-            }
-          // $COVERAGE-OFF$
-          case _ => unreachable
-          // $COVERAGE-ON$
-        }
+        } else
+          b match {
+            case b: Branch =>
+              val bm = b0 ^ b.left.sign
+              if (zeroAt(a_p, b_l)) {
+                // a fits into the left child of b
+                b.lr(op(a0, a, b0, b.left), overlapB(a0 ^ a.sign, bm, b.right))
+              } else {
+                // a fits into the right child of b
+                b.lr(overlapB(a0, b0, b.left), op(a0, a, bm, b.right))
+              }
+            // $COVERAGE-OFF$
+            case _ => unreachable
+            // $COVERAGE-ON$
+          }
       } else {
         // a_l == b_l, trees are the same size
         if (a_p == b_p) {
@@ -383,21 +387,21 @@ private[interval] object Tree {
 
   object OrCalculator extends OrderedBinaryOperator {
 
-    protected def collision(a0:Boolean, a: Leaf, b0: Boolean, b:Leaf) = {
+    protected def collision(a0: Boolean, a: Leaf, b0: Boolean, b: Leaf) = {
       val below1 = a0 | b0
       val at1 = (a.at ^ a0) | (b.at ^ b0)
       val above1 = (a.above ^ a0) | (b.above ^ b0)
       leaf(below1 != at1, at1 != above1, a, b)
     }
 
-    protected def overlapA(a0:Boolean, a: Tree, b0: Boolean) =
-      if(b0)
+    protected def overlapA(a0: Boolean, a: Tree, b0: Boolean) =
+      if (b0)
         null
       else
         a
 
-    protected def overlapB(a0: Boolean, b0:Boolean, b: Tree) =
-      if(a0)
+    protected def overlapB(a0: Boolean, b0: Boolean, b: Tree) =
+      if (a0)
         null
       else
         b
@@ -405,35 +409,35 @@ private[interval] object Tree {
 
   object XorCalculator extends OrderedBinaryOperator {
 
-    protected def collision(a0:Boolean, a: Leaf, b0: Boolean, b:Leaf) = {
+    protected def collision(a0: Boolean, a: Leaf, b0: Boolean, b: Leaf) = {
       val below1 = a0 ^ b0
       val at1 = (a.at ^ a0) ^ (b.at ^ b0)
       val above1 = (a.above ^ a0) ^ (b.above ^ b0)
       leaf(below1 != at1, at1 != above1, a, b)
     }
 
-    protected def overlapA(a0:Boolean, a: Tree, b0: Boolean) = a
+    protected def overlapA(a0: Boolean, a: Tree, b0: Boolean) = a
 
-    protected def overlapB(a0: Boolean, b0:Boolean, b: Tree) = b
+    protected def overlapB(a0: Boolean, b0: Boolean, b: Tree) = b
   }
 
   object AndCalculator extends OrderedBinaryOperator {
 
-    protected def collision(a0:Boolean, a: Leaf, b0: Boolean, b:Leaf) = {
+    protected def collision(a0: Boolean, a: Leaf, b0: Boolean, b: Leaf) = {
       val below1 = a0 & b0
       val at1 = (a.at ^ a0) & (b.at ^ b0)
       val above1 = (a.above ^ a0) & (b.above ^ b0)
       leaf(below1 != at1, at1 != above1, a, b)
     }
 
-    protected def overlapA(a0:Boolean, a: Tree, b0: Boolean) =
-      if(b0)
+    protected def overlapA(a0: Boolean, a: Tree, b0: Boolean) =
+      if (b0)
         a
       else
         null
 
-    protected def overlapB(a0: Boolean, b0:Boolean, b: Tree) =
-      if(a0)
+    protected def overlapB(a0: Boolean, b0: Boolean, b: Tree) =
+      if (a0)
         b
       else
         null
@@ -444,7 +448,7 @@ private[interval] object Tree {
    */
   sealed abstract class Sampler {
 
-    def apply(a0:Boolean, a: Tree, value: Long) = op(a0, a, value)
+    def apply(a0: Boolean, a: Tree, value: Long) = op(a0, a, value)
 
     /**
      * Method that is invoked when a leaf is found. This allows to customize whether we want at, before or after
@@ -453,7 +457,7 @@ private[interval] object Tree {
      */
     protected def onLeaf(a0: Boolean, a: Leaf): Boolean
 
-    private final def op(a0: Boolean, a: Tree, value: Long): Boolean = a match {
+    final private def op(a0: Boolean, a: Tree, value: Long): Boolean = a match {
       case a: Branch =>
         val prefix = a.prefix
         val level = a.level
@@ -498,14 +502,14 @@ private[interval] object Tree {
     protected def onLeaf(a0: Boolean, a: Leaf): Boolean = a0 ^ a.above
   }
 
-  def leaf(changeBelow:Boolean, changeAbove:Boolean, a:Leaf, b:Leaf) = {
+  def leaf(changeBelow: Boolean, changeAbove: Boolean, a: Leaf, b: Leaf) = {
     val at = changeBelow
     val sign = changeBelow ^ changeAbove
-    if(!changeBelow && !changeAbove)
+    if (!changeBelow && !changeAbove)
       null
-    else if(at == a.at && sign == a.sign)
+    else if (at == a.at && sign == a.sign)
       a
-    else if(at == b.at && sign == b.sign)
+    else if (at == b.at && sign == b.sign)
       b
     else
       Leaf(a.prefix, at, sign)
@@ -515,7 +519,7 @@ private[interval] object Tree {
    * A leaf.
    * @param prefix the prefix, which in case of a leaf is identical to the key
    */
-  final case class Leaf(prefix: Long, at:Boolean, sign:Boolean) extends Tree {
+  final case class Leaf(prefix: Long, at: Boolean, sign: Boolean) extends Tree {
 
     /**
      * For a leaf, the prefix is the key
@@ -537,16 +541,16 @@ private[interval] object Tree {
    * @param left the left child
    * @param right the right child
    */
-  final case class Branch(prefix : Long, level : Byte, left : Tree, right : Tree) extends Tree {
+  final case class Branch(prefix: Long, level: Byte, left: Tree, right: Tree) extends Tree {
 
     val sign = left.sign ^ right.sign
 
-    def lr(left:Tree, right:Tree) : Tree = {
-      if(left eq null)
+    def lr(left: Tree, right: Tree): Tree = {
+      if (left eq null)
         right
-      else if(right eq null)
+      else if (right eq null)
         left
-      else if((left eq this.left) && (right eq this.right))
+      else if ((left eq this.left) && (right eq this.right))
         this
       else
         copy(left = left, right = right)
@@ -554,11 +558,11 @@ private[interval] object Tree {
   }
 }
 
-private[interval] sealed abstract class Tree {
+sealed abstract private[interval] class Tree {
 
-  def prefix : Long
+  def prefix: Long
 
-  def level : Byte
+  def level: Byte
 
   def sign: Boolean
 }

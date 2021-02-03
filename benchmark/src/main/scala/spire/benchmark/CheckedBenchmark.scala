@@ -59,4 +59,4 @@ class CheckedBenchmarks extends MyBenchmark {
     sum
   }
 }
-*/
+ */

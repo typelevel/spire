@@ -1,20 +1,20 @@
-/************************************************************************\
-** Project                                                              **
-**       ______  ______   __    ______    ____                          **
-**      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
-**     / /__   / /_/ /  / /   / /_/ /   / /_                            **
-**    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
-**   ____/ / / /      / /   / / | |   / /__                             **
-**  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
-**                                                                      **
-**      Redistribution and use permitted under the MIT license.         **
-**                                                                      **
-\************************************************************************/
-
+/**
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
 
 package spire
 package random
-
 
 /**
  * This is a Scala implementation of the Ziggurat algorithm for generating random variables from decreasing densities.
@@ -59,7 +59,7 @@ object Ziggurat {
     if (jz < ke(iz)) jz * we(iz) else efix(g, jz, iz)
   }
 
-  private def nfix(g: Generator, hza: Int, iza: Int) : Double = {
+  private def nfix(g: Generator, hza: Int, iza: Int): Double = {
 
     val r = 3.442619855899d
     val r1 = 1 / r
@@ -74,7 +74,7 @@ object Ziggurat {
         do {
           x = -log(g.nextDouble()) * r1
           y = -log(g.nextDouble())
-         } while (y + y < x * x)
+        } while (y + y < x * x)
         return if (hz > 0) r + x else -r - x
       }
 
@@ -90,7 +90,7 @@ object Ziggurat {
     loop()
   }
 
-  private def efix(g: Generator, jza: Long, iza: Int) : Double = {
+  private def efix(g: Generator, jza: Long, iza: Int): Double = {
 
     var jz = jza
     var iz = iza
@@ -112,18 +112,18 @@ object Ziggurat {
   }
 
   {
-    val m1 : Double = 2147483648d
-    val m2 : Double = 4294967296d
+    val m1: Double = 2147483648d
+    val m2: Double = 4294967296d
 
-    var dn : Double = 3.442619855899
-    var tn : Double = dn
-    var de : Double = 7.697117470131487
-    var te : Double = de
+    var dn: Double = 3.442619855899
+    var tn: Double = dn
+    var de: Double = 7.697117470131487
+    var te: Double = de
 
-    val vn : Double = 9.91256303526217e-3
-    val ve : Double = 3.949659822581572e-3
+    val vn: Double = 9.91256303526217e-3
+    val ve: Double = 3.949659822581572e-3
 
-    var q : Double = vn / exp(-.5 * dn * dn)
+    var q: Double = vn / exp(-.5 * dn * dn)
     kn(0) = ((dn / q) * m1).toLong
     kn(1) = 0
 
@@ -135,9 +135,9 @@ object Ziggurat {
 
     for (i <- 126 to 1 by -1) {
       dn = sqrt(-2 * log(vn / dn + exp(-.5 * dn * dn)))
-      kn(i+1) = ((dn / tn) * m1).toLong
+      kn(i + 1) = ((dn / tn) * m1).toLong
       tn = dn
-      fn (i) = exp(-.5 * dn * dn)
+      fn(i) = exp(-.5 * dn * dn)
       wn(i) = dn / m1
     }
 
@@ -153,9 +153,9 @@ object Ziggurat {
 
     for (i <- 254 to 1 by -1) {
       de = -log(ve / de + exp(-de))
-      ke(i+1) = ((de / te) * m2).toLong
+      ke(i + 1) = ((de / te) * m2).toLong
       te = de
-      fe (i) = exp(-de)
+      fe(i) = exp(-de)
       we(i) = de / m2
     }
   }

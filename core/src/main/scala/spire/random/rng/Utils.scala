@@ -1,16 +1,17 @@
-/************************************************************************\
-** Project                                                              **
-**       ______  ______   __    ______    ____                          **
-**      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
-**     / /__   / /_/ /  / /   / /_/ /   / /_                            **
-**    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
-**   ____/ / / /      / /   / / | |   / /__                             **
-**  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
-**                                                                      **
-**      Redistribution and use permitted under the MIT license.         **
-**                                                                      **
-\************************************************************************/
-
+/**
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
 
 package spire
 package random
@@ -49,15 +50,15 @@ object Utils {
       def apply(i: Int) = array(transform(i))
       def update(i: Int, v: Int) = array(transform(i)) = v
    }
-  */
+   */
 
   @volatile private var seedUniquifier = 8682522807148012L
 
-  def intFromTime(time: Long = System.nanoTime) : Int = {
+  def intFromTime(time: Long = System.nanoTime): Int = {
     longFromTime(time).toInt
   }
 
-  def longFromTime(time: Long = System.nanoTime) : Long = {
+  def longFromTime(time: Long = System.nanoTime): Long = {
     seedUniquifier += 1
     (seedUniquifier + time)
   }
@@ -79,8 +80,8 @@ object Utils {
     a(0) = seed
 
     cfor(1)(_ < length, _ + 1) { i =>
-        val x = a(i - 1)
-        a(i) = 6364136223846793005L * (x ^ (x >>> 62)) + i
+      val x = a(i - 1)
+      a(i) = 6364136223846793005L * (x ^ (x >>> 62)) + i
     }
 
     a

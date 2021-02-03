@@ -4,7 +4,6 @@ package math
 import spire.algebra.{AdditiveAbGroup, IsReal, MultiplicativeAbGroup, NRoot, Ring}
 import spire.std._
 
-
 /**
  * TODO
  * 3. LiteralOps? Literal conversions?
@@ -13,7 +12,8 @@ import spire.std._
  * 6. Start to worry about things like e.g. pow(BigInt, BigInt)
  */
 
-trait Numeric[@sp(Int,Long,Float,Double) A] extends Any
+trait Numeric[@sp(Int, Long, Float, Double) A]
+    extends Any
     with Ring[A]
     with AdditiveAbGroup[A]
     with MultiplicativeAbGroup[A]
@@ -38,11 +38,12 @@ object Numeric {
 
   // TODO implicit def complexIsNumeric[A: Fractional: Trig: IsReal]: ComplexIsNumeric[A] = new ComplexIsNumeric
 
-  @inline final def apply[A](implicit ev: Numeric[A]):Numeric[A] = ev
+  @inline final def apply[A](implicit ev: Numeric[A]): Numeric[A] = ev
 }
 
 @SerialVersionUID(0L)
-private[math] class ByteIsNumeric extends Numeric[Byte]
+private[math] class ByteIsNumeric
+    extends Numeric[Byte]
     with ByteIsEuclideanRing
     with ByteIsNRoot
     with ConvertableFromByte
@@ -57,11 +58,12 @@ private[math] class ByteIsNumeric extends Numeric[Byte]
   override def toAlgebraic(n: Byte): Algebraic = super[ByteIsReal].toAlgebraic(n)
   override def toReal(n: Byte): Real = super[ByteIsReal].toReal(n)
   override def toBigInt(n: Byte): BigInt = super[ByteIsReal].toBigInt(n)
-  def div(a:Byte, b:Byte): Byte = (a / b).toByte
+  def div(a: Byte, b: Byte): Byte = (a / b).toByte
 }
 
 @SerialVersionUID(0L)
-private[math] class ShortIsNumeric extends Numeric[Short]
+private[math] class ShortIsNumeric
+    extends Numeric[Short]
     with ShortIsEuclideanRing
     with ShortIsNRoot
     with ConvertableFromShort
@@ -76,11 +78,12 @@ private[math] class ShortIsNumeric extends Numeric[Short]
   override def toAlgebraic(n: Short): Algebraic = super[ShortIsReal].toAlgebraic(n)
   override def toReal(n: Short): Real = super[ShortIsReal].toReal(n)
   override def toBigInt(n: Short): BigInt = super[ShortIsReal].toBigInt(n)
-  def div(a:Short, b:Short): Short = (a / b).toShort
+  def div(a: Short, b: Short): Short = (a / b).toShort
 }
 
 @SerialVersionUID(0L)
-private[math] class IntIsNumeric extends Numeric[Int]
+private[math] class IntIsNumeric
+    extends Numeric[Int]
     with IntIsEuclideanRing
     with IntIsNRoot
     with ConvertableFromInt
@@ -99,7 +102,8 @@ private[math] class IntIsNumeric extends Numeric[Int]
 }
 
 @SerialVersionUID(0L)
-private[math] class LongIsNumeric extends Numeric[Long]
+private[math] class LongIsNumeric
+    extends Numeric[Long]
     with LongIsEuclideanRing
     with LongIsNRoot
     with ConvertableFromLong
@@ -118,7 +122,8 @@ private[math] class LongIsNumeric extends Numeric[Long]
 }
 
 @SerialVersionUID(0L)
-private[math] class BigIntIsNumeric extends Numeric[BigInt]
+private[math] class BigIntIsNumeric
+    extends Numeric[BigInt]
     with BigIntIsEuclideanRing
     with BigIntIsNRoot
     with ConvertableFromBigInt
@@ -137,7 +142,8 @@ private[math] class BigIntIsNumeric extends Numeric[BigInt]
 }
 
 @SerialVersionUID(0L)
-private[math] class FloatIsNumeric extends Numeric[Float]
+private[math] class FloatIsNumeric
+    extends Numeric[Float]
     with FloatIsField
     with FloatIsNRoot
     with ConvertableFromFloat
@@ -154,7 +160,8 @@ private[math] class FloatIsNumeric extends Numeric[Float]
 }
 
 @SerialVersionUID(0L)
-private[math] class DoubleIsNumeric extends Numeric[Double]
+private[math] class DoubleIsNumeric
+    extends Numeric[Double]
     with DoubleIsField
     with DoubleIsNRoot
     with ConvertableFromDouble
@@ -171,7 +178,8 @@ private[math] class DoubleIsNumeric extends Numeric[Double]
 }
 
 @SerialVersionUID(0L)
-private[math] class BigDecimalIsNumeric extends Numeric[BigDecimal]
+private[math] class BigDecimalIsNumeric
+    extends Numeric[BigDecimal]
     with BigDecimalIsField
     with BigDecimalIsNRoot
     with ConvertableFromBigDecimal
@@ -206,7 +214,8 @@ private[math] class RationalIsNumeric
 }
 
 @SerialVersionUID(1L)
-private[math] class AlgebraicIsNumeric extends Numeric[Algebraic]
+private[math] class AlgebraicIsNumeric
+    extends Numeric[Algebraic]
     with AlgebraicIsField
     with AlgebraicIsNRoot
     with ConvertableFromAlgebraic

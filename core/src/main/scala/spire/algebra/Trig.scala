@@ -7,7 +7,7 @@ trait Trig[@sp(Float, Double) A] extends Any {
 
   def exp(a: A): A
   def expm1(a: A): A
-  def log(a:A): A
+  def log(a: A): A
   def log1p(a: A): A
 
   def sin(a: A): A

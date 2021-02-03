@@ -73,4 +73,3 @@ class NumberPropertiesScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 }
-

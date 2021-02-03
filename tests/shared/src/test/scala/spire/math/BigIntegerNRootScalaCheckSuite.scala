@@ -22,4 +22,3 @@ class BigIntegerNRootScalaCheckSuite extends munit.ScalaCheckSuite {
   def testRootProperApproximation(x: BigInteger, k: Int, rootX: BigInteger): Boolean =
     rootX.pow(k) <= x && x < (1 + rootX).pow(k)
 }
-

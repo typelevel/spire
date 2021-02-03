@@ -5,23 +5,24 @@ import spire.algebra.{Eq, EuclideanRing, IsIntegral, MetricSpace, NRoot, Order, 
 import spire.util.Opt
 
 trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
-  override def minus(a:BigInt, b:BigInt): BigInt = a - b
-  def negate(a:BigInt): BigInt = -a
+  override def minus(a: BigInt, b: BigInt): BigInt = a - b
+  def negate(a: BigInt): BigInt = -a
   val one: BigInt = BigInt(1)
-  def plus(a:BigInt, b:BigInt): BigInt = a + b
-  override def pow(a:BigInt, b:Int): BigInt = a pow b
-  override def times(a:BigInt, b:BigInt): BigInt = a * b
+  def plus(a: BigInt, b: BigInt): BigInt = a + b
+  override def pow(a: BigInt, b: Int): BigInt = a.pow(b)
+  override def times(a: BigInt, b: BigInt): BigInt = a * b
   val zero: BigInt = BigInt(0)
 
   override def fromInt(n: Int): BigInt = BigInt(n)
 
-  def euclideanFunction(a:BigInt): BigInt = a.abs
+  def euclideanFunction(a: BigInt): BigInt = a.abs
   override def equotmod(a: BigInt, b: BigInt): (BigInt, BigInt) = spire.math.equotmod(a, b)
   def equot(a: BigInt, b: BigInt): BigInt = spire.math.equot(a, b)
   def emod(a: BigInt, b: BigInt): BigInt = spire.math.emod(a, b)
 
-  override def lcm(a:BigInt, b:BigInt)(implicit ev: Eq[BigInt]): BigInt = if (a.signum == 0 || b.signum == 0) zero else (a / a.gcd(b)) * b
-  override def gcd(a:BigInt, b:BigInt)(implicit ev: Eq[BigInt]): BigInt = a.gcd(b)
+  override def lcm(a: BigInt, b: BigInt)(implicit ev: Eq[BigInt]): BigInt =
+    if (a.signum == 0 || b.signum == 0) zero else (a / a.gcd(b)) * b
+  override def gcd(a: BigInt, b: BigInt)(implicit ev: Eq[BigInt]): BigInt = a.gcd(b)
 }
 
 // This is not included in the *Instances trait!
@@ -29,14 +30,14 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
   def nroot(a: BigInt, k: Int): BigInt = if (a < 0 && k % 2 == 1) {
     -nroot(-a, k)
   } else if (a < 0) {
-    throw new ArithmeticException("Cannot find %d-root of negative number." format k)
+    throw new ArithmeticException("Cannot find %d-root of negative number.".format(k))
   } else {
     def findNroot(b: BigInt, i: Int): BigInt = if (i < 0) {
       b
     } else {
-      val c = b setBit i
+      val c = b.setBit(i)
 
-      if ((c pow k) <= a)
+      if ((c.pow(k)) <= a)
         findNroot(c, i - 1)
       else
         findNroot(b, i - 1)
@@ -44,12 +45,12 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
 
     findNroot(0, a.bitLength - 1)
   }
-  def fpow(a:BigInt, b:BigInt): BigInt = spire.math.pow(BigDecimal(a), BigDecimal(b)).toBigInt
+  def fpow(a: BigInt, b: BigInt): BigInt = spire.math.pow(BigDecimal(a), BigDecimal(b)).toBigInt
 }
 
 trait BigIntOrder extends Order[BigInt] {
-  override def eqv(x:BigInt, y:BigInt): Boolean = x == y
-  override def neqv(x:BigInt, y:BigInt): Boolean = x != y
+  override def eqv(x: BigInt, y: BigInt): Boolean = x == y
+  override def neqv(x: BigInt, y: BigInt): Boolean = x != y
   override def gt(x: BigInt, y: BigInt): Boolean = x > y
   override def gteqv(x: BigInt, y: BigInt): Boolean = x >= y
   override def lt(x: BigInt, y: BigInt): Boolean = x < y
@@ -68,9 +69,9 @@ trait BigIntSigned extends Signed[BigInt] with BigIntOrder {
 
 trait BigIntTruncatedDivision extends TruncatedDivisionCRing[BigInt] with BigIntSigned {
   def toBigIntOpt(x: BigInt): Opt[BigInt] = Opt(x)
-  def tquot(a:BigInt, b:BigInt): BigInt = a / b
-  def tmod(a:BigInt, b:BigInt): BigInt = a % b
-  override def tquotmod(a:BigInt, b:BigInt): (BigInt, BigInt) = a /% b
+  def tquot(a: BigInt, b: BigInt): BigInt = a / b
+  def tmod(a: BigInt, b: BigInt): BigInt = a % b
+  override def tquotmod(a: BigInt, b: BigInt): (BigInt, BigInt) = a /% b
 }
 
 trait BigIntIsReal extends IsIntegral[BigInt] with BigIntTruncatedDivision with Serializable {
@@ -83,7 +84,12 @@ trait BigIntIsMetricSpace extends MetricSpace[BigInt, BigInt] {
 }
 
 @SerialVersionUID(0L)
-class BigIntAlgebra extends BigIntIsEuclideanRing with BigIntIsNRoot with BigIntIsMetricSpace with BigIntIsReal with Serializable
+class BigIntAlgebra
+    extends BigIntIsEuclideanRing
+    with BigIntIsNRoot
+    with BigIntIsMetricSpace
+    with BigIntIsReal
+    with Serializable
 
 trait BigIntInstances {
   implicit final val BigIntAlgebra = new BigIntAlgebra

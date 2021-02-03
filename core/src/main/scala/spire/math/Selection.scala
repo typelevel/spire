@@ -1,7 +1,6 @@
 package spire
 package math
 
-
 import spire.algebra.Order
 
 trait Select extends Any {
@@ -44,7 +43,7 @@ trait SelectLike extends Any with Select {
   }
 
   @tailrec
-  protected final def select[@sp A: Order](data: Array[A], left: Int, right: Int, stride: Int, k: Int): Unit = {
+  final protected def select[@sp A: Order](data: Array[A], left: Int, right: Int, stride: Int, k: Int): Unit = {
     val length = (right - left + stride - 1) / stride
     if (length < 10) {
       sort(data, left, right, stride)
@@ -76,9 +75,9 @@ trait SelectLike extends Any with Select {
   }
 
   final def partition[@sp A](data: Array[A], left: Int, right: Int, stride: Int)(m: A)(implicit o: Order[A]): Int = {
-    var i = left  // Iterator.
-    var j = left  // Pointer to first element > m.
-    var k = left  // Pointer to end of equal elements.
+    var i = left // Iterator.
+    var j = left // Pointer to first element > m.
+    var k = left // Pointer to end of equal elements.
     var t = m
 
     while (i < right) {
@@ -119,125 +118,125 @@ trait HighBranchingMedianOf5 {
     val ai4 = data(offset + 3 * stride)
     val ai5 = data(offset + 4 * stride)
 
-    val i = if (o.lt(ai1, ai2)) {            // i1 < i2
-      if (o.lt(ai3, ai4)) {          // i1 < i2, i3 < i4
-        if (o.lt(ai2, ai4)) {        // Drop i4
-          if (o.lt(ai3, ai5)) {      // i1 < i2, i3 < i5
-            if (o.lt(ai2, ai5)) {    // Drop i5
+    val i = if (o.lt(ai1, ai2)) { // i1 < i2
+      if (o.lt(ai3, ai4)) { // i1 < i2, i3 < i4
+        if (o.lt(ai2, ai4)) { // Drop i4
+          if (o.lt(ai3, ai5)) { // i1 < i2, i3 < i5
+            if (o.lt(ai2, ai5)) { // Drop i5
               if (o.lt(ai2, ai3)) (offset + 2 * stride) else (offset + 1 * stride)
-            } else {               // Drop i2
+            } else { // Drop i2
               if (o.lt(ai1, ai5)) (offset + 4 * stride) else (offset + 0 * stride)
             }
-          } else {                 // i1 < i2, i5 < i3
-            if (o.lt(ai2, ai3)) {    // Drop i3
+          } else { // i1 < i2, i5 < i3
+            if (o.lt(ai2, ai3)) { // Drop i3
               if (o.lt(ai2, ai5)) (offset + 4 * stride) else (offset + 1 * stride)
-            } else {               // Drop i2
+            } else { // Drop i2
               if (o.lt(ai1, ai3)) (offset + 2 * stride) else (offset + 0 * stride)
             }
           }
-        } else {                   // Drop i2
-          if (o.lt(ai1, ai5)) {      // i1 < i5, i3 < i4
-            if (o.lt(ai5, ai4)) {    // Drop i4
+        } else { // Drop i2
+          if (o.lt(ai1, ai5)) { // i1 < i5, i3 < i4
+            if (o.lt(ai5, ai4)) { // Drop i4
               if (o.lt(ai5, ai3)) (offset + 2 * stride) else (offset + 4 * stride)
-            } else {                // Drop i5
+            } else { // Drop i5
               if (o.lt(ai1, ai4)) (offset + 3 * stride) else (offset + 0 * stride)
             }
-          } else {                 // i5 < i1, i3 < i4
-            if (o.lt(ai1, ai4)) {    // Drop i4
+          } else { // i5 < i1, i3 < i4
+            if (o.lt(ai1, ai4)) { // Drop i4
               if (o.lt(ai1, ai3)) (offset + 2 * stride) else (offset + 0 * stride)
-            } else {                // Drop i1
+            } else { // Drop i1
               if (o.lt(ai5, ai4)) (offset + 3 * stride) else (offset + 4 * stride)
             }
           }
         }
-      } else {                     // i1 < i2, i4 < i3
-        if (o.lt(ai2, ai3)) {        // Drop i3
-          if (o.lt(ai4, ai5)) {      // i1 < i2, i4 < i5
-            if (o.lt(ai2, ai5)) {    // Drop i5
+      } else { // i1 < i2, i4 < i3
+        if (o.lt(ai2, ai3)) { // Drop i3
+          if (o.lt(ai4, ai5)) { // i1 < i2, i4 < i5
+            if (o.lt(ai2, ai5)) { // Drop i5
               if (o.lt(ai2, ai4)) (offset + 3 * stride) else (offset + 1 * stride)
-            } else {               // Drop i2
+            } else { // Drop i2
               if (o.lt(ai1, ai5)) (offset + 4 * stride) else (offset + 0 * stride)
             }
-          } else {                 // i1 < i2, i5 < i4
-            if (o.lt(ai2, ai4)) {    // Drop i4
+          } else { // i1 < i2, i5 < i4
+            if (o.lt(ai2, ai4)) { // Drop i4
               if (o.lt(ai2, ai5)) (offset + 4 * stride) else (offset + 1 * stride)
-            } else {               // Drop i2
+            } else { // Drop i2
               if (o.lt(ai1, ai4)) (offset + 3 * stride) else (offset + 0 * stride)
             }
           }
-        } else {                   // Drop i2
-          if (o.lt(ai1, ai5)) {      // i1 < i5, i4 < i3
-            if (o.lt(ai5, ai3)) {    // Drop i3
+        } else { // Drop i2
+          if (o.lt(ai1, ai5)) { // i1 < i5, i4 < i3
+            if (o.lt(ai5, ai3)) { // Drop i3
               if (o.lt(ai5, ai4)) (offset + 3 * stride) else (offset + 4 * stride)
-            } else {                // Drop i5
+            } else { // Drop i5
               if (o.lt(ai1, ai3)) (offset + 2 * stride) else (offset + 0 * stride)
             }
-          } else {                 // i5 < i1, i4 < i3
-            if (o.lt(ai1, ai3)) {    // Drop i3
+          } else { // i5 < i1, i4 < i3
+            if (o.lt(ai1, ai3)) { // Drop i3
               if (o.lt(ai1, ai4)) (offset + 3 * stride) else (offset + 0 * stride)
-            } else {               // Drop i1
+            } else { // Drop i1
               if (o.lt(ai5, ai3)) (offset + 2 * stride) else (offset + 4 * stride)
             }
           }
         }
       }
-    } else {                       // i2 < i1
-      if (o.lt(ai3, ai4)) {          // i2 < i1, i3 < i4
-        if (o.lt(ai1, ai4)) {        // Drop i4
-          if (o.lt(ai3, ai5)) {      // i2 < i1, i3 < i5
-            if (o.lt(ai1, ai5)) {    // Drop i5
+    } else { // i2 < i1
+      if (o.lt(ai3, ai4)) { // i2 < i1, i3 < i4
+        if (o.lt(ai1, ai4)) { // Drop i4
+          if (o.lt(ai3, ai5)) { // i2 < i1, i3 < i5
+            if (o.lt(ai1, ai5)) { // Drop i5
               if (o.lt(ai1, ai3)) (offset + 2 * stride) else (offset + 0 * stride)
-            } else {               // Drop i1
+            } else { // Drop i1
               if (o.lt(ai2, ai5)) (offset + 4 * stride) else (offset + 1 * stride)
             }
-          } else {                 // i2 < i1, i5 < i3
-            if (o.lt(ai1, ai3)) {    // Drop i3
+          } else { // i2 < i1, i5 < i3
+            if (o.lt(ai1, ai3)) { // Drop i3
               if (o.lt(ai1, ai5)) (offset + 4 * stride) else (offset + 0 * stride)
-            } else {               // Drop i1
+            } else { // Drop i1
               if (o.lt(ai2, ai3)) (offset + 2 * stride) else (offset + 1 * stride)
             }
           }
-        } else {                   // Drop i1
-          if (o.lt(ai2, ai5)) {      // i2 < i5, i3 < i4
-            if (o.lt(ai5, ai4)) {    // Drop i4
+        } else { // Drop i1
+          if (o.lt(ai2, ai5)) { // i2 < i5, i3 < i4
+            if (o.lt(ai5, ai4)) { // Drop i4
               if (o.lt(ai5, ai3)) (offset + 2 * stride) else (offset + 4 * stride)
-            } else {                // Drop i5
+            } else { // Drop i5
               if (o.lt(ai2, ai4)) (offset + 3 * stride) else (offset + 1 * stride)
             }
-          } else {                 // i5 < i2, i3 < i4
-            if (o.lt(ai2, ai4)) {    // Drop i4
+          } else { // i5 < i2, i3 < i4
+            if (o.lt(ai2, ai4)) { // Drop i4
               if (o.lt(ai2, ai3)) (offset + 2 * stride) else (offset + 1 * stride)
-            } else {               // Drop i2
+            } else { // Drop i2
               if (o.lt(ai5, ai4)) (offset + 3 * stride) else (offset + 4 * stride)
             }
           }
         }
-      } else {                     // i2 < i1, i4 < i3
-        if (o.lt(ai1, ai3)) {        // Drop i3
-          if (o.lt(ai4, ai5)) {      // i2 < i1, i4 < i5
-            if (o.lt(ai1, ai5)) {    // Drop i5
+      } else { // i2 < i1, i4 < i3
+        if (o.lt(ai1, ai3)) { // Drop i3
+          if (o.lt(ai4, ai5)) { // i2 < i1, i4 < i5
+            if (o.lt(ai1, ai5)) { // Drop i5
               if (o.lt(ai1, ai4)) (offset + 3 * stride) else (offset + 0 * stride)
-            } else {               // Drop i1
+            } else { // Drop i1
               if (o.lt(ai2, ai5)) (offset + 4 * stride) else (offset + 1 * stride)
             }
-          } else {                 // i2 < i1, i5 < i4
-            if (o.lt(ai1, ai4)) {    // Drop i4
+          } else { // i2 < i1, i5 < i4
+            if (o.lt(ai1, ai4)) { // Drop i4
               if (o.lt(ai1, ai5)) (offset + 4 * stride) else (offset + 0 * stride)
-            } else {                // Drop i1
+            } else { // Drop i1
               if (o.lt(ai2, ai4)) (offset + 3 * stride) else (offset + 1 * stride)
             }
           }
-        } else {                   // Drop i1
-          if (o.lt(ai2, ai5)) {      // i2 < i5, i4 < i3
-            if (o.lt(ai5, ai3)) {    // Drop i3
+        } else { // Drop i1
+          if (o.lt(ai2, ai5)) { // i2 < i5, i4 < i3
+            if (o.lt(ai5, ai3)) { // Drop i3
               if (o.lt(ai5, ai4)) (offset + 3 * stride) else (offset + 4 * stride)
-            } else {                // Drop i5
+            } else { // Drop i5
               if (o.lt(ai2, ai3)) (offset + 2 * stride) else (offset + 1 * stride)
             }
-          } else {                 // i5 < i2, i4 < i3
-            if (o.lt(ai2, ai3)) {    // Drop i3
+          } else { // i5 < i2, i4 < i3
+            if (o.lt(ai2, ai3)) { // Drop i3
               if (o.lt(ai2, ai4)) (offset + 3 * stride) else (offset + 1 * stride)
-            } else {               // Drop i2
+            } else { // Drop i2
               if (o.lt(ai5, ai3)) (offset + 2 * stride) else (offset + 4 * stride)
             }
           }

@@ -25,4 +25,3 @@ class SearchSuite extends munit.FunSuite {
   }
 
 }
-

@@ -1,16 +1,17 @@
-/************************************************************************\
-** Project                                                              **
-**       ______  ______   __    ______    ____                          **
-**      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
-**     / /__   / /_/ /  / /   / /_/ /   / /_                            **
-**    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
-**   ____/ / / /      / /   / / | |   / /__                             **
-**  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
-**                                                                      **
-**      Redistribution and use permitted under the MIT license.         **
-**                                                                      **
-\************************************************************************/
-
+/**
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
 
 package spire
 package random
@@ -36,11 +37,11 @@ import java.util
  * @see <a href="http://en.wikipedia.org/wiki/Well_Equidistributed_Long-period_Linear">WELL @ Wikipedia</a>
  * @author <a href="mailto:dusan.kysel@gmail.com">Dušan Kysel</a>
  */
-final class Well19937c protected[random](state: Array[Int], i0: Int) extends IntBasedGenerator {
+final class Well19937c protected[random] (state: Array[Int], i0: Int) extends IntBasedGenerator {
 
-  import Well19937c.{UpperMask, LowerMask, R, BYTES, mat0pos, mat0neg, mat1, mat3pos, TemperB, TemperC}
+  import Well19937c.{mat0neg, mat0pos, mat1, mat3pos, BYTES, LowerMask, R, TemperB, TemperC, UpperMask}
 
-  private var i : Int = i0
+  private var i: Int = i0
 
   def copyInit: Well19937c = new Well19937c(state.clone(), i)
 
@@ -84,17 +85,17 @@ final class Well19937c protected[random](state: Array[Int], i0: Int) extends Int
 
 object Well19937c extends GeneratorCompanion[Well19937c, (Array[Int], Int)] {
 
-  @inline private val UpperMask = 0x7FFFFFFF // = 0xFFFFFFFF ^ Int.MinValue
+  @inline private val UpperMask = 0x7fffffff // = 0xFFFFFFFF ^ Int.MinValue
   @inline private val LowerMask = 0x80000000 // = Int.MinValue
 
   @inline private val TemperB = 0xe46e1700
   @inline private val TemperC = 0x9b868000
 
   // Number of bits in the pool.
-  @inline private final val K : Int = 19937
+  @inline final private val K: Int = 19937
 
   // Length of the pool in ints.
-  @inline private final val R : Int = (K + 31) / 32
+  @inline final private val R: Int = (K + 31) / 32
 
   // Length of the pool in ints -1.
   // @inline private final val R_1 : Int = R - 1
@@ -103,7 +104,7 @@ object Well19937c extends GeneratorCompanion[Well19937c, (Array[Int], Int)] {
   // @inline private final val R_2 : Int = R - 2
 
   // Length of the pool and index in bytes
-  @inline private final val BYTES = R * 4 + 4
+  @inline final private val BYTES = R * 4 + 4
 
   // First parameter of the algorithm.
   // @inline private final val M1 : Int = 70
@@ -114,10 +115,10 @@ object Well19937c extends GeneratorCompanion[Well19937c, (Array[Int], Int)] {
   // Third parameter of the algorithm.
   // @inline private final val M3 : Int = 449
 
-  @inline private final def mat0pos(t: Int, v: Int) = v ^ (v >>> t)
-  @inline private final def mat0neg(t: Int, v: Int) = v ^ (v << -t)
-  @inline private final def mat1(v: Int)            = v
-  @inline private final def mat3pos(t: Int, v: Int) = v >>> t
+  @inline final private def mat0pos(t: Int, v: Int) = v ^ (v >>> t)
+  @inline final private def mat0neg(t: Int, v: Int) = v ^ (v << -t)
+  @inline final private def mat1(v: Int) = v
+  @inline final private def mat3pos(t: Int, v: Int) = v >>> t
 
   def randomSeed(): (Array[Int], Int) = (Utils.seedFromInt(R, Utils.intFromTime()), 0)
 

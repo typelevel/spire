@@ -24,7 +24,7 @@ object Complex extends ComplexInstances {
 
   implicit def intToComplex(n: Int): Complex[Double] = new Complex(n.toDouble, 0.0)
   implicit def longToComplex(n: Long): Complex[Double] = new Complex(n.toDouble, 0.0)
-  implicit def floatToComplex(n: Float): Complex[Float] = new Complex(n, 0.0F)
+  implicit def floatToComplex(n: Float): Complex[Float] = new Complex(n, 0.0f)
   implicit def doubleToComplex(n: Double): Complex[Double] = new Complex(n, 0.0)
 
   implicit def bigIntToComplex(n: BigInt): Complex[BigDecimal] =
@@ -68,9 +68,9 @@ object Complex extends ComplexInstances {
     while (x < last) {
       val c = x match {
         case `north` => i[T]
-        case `west` => -one[T]
+        case `west`  => -one[T]
         case `south` => -i[T]
-        case _ => polar(f.one, (t.pi * 2 * x) / n)
+        case _       => polar(f.one, (t.pi * 2 * x) / n)
       }
       roots(x) = c
       sum += c
@@ -82,15 +82,18 @@ object Complex extends ComplexInstances {
   }
 }
 
-/** Complex numbers. Depending on the underlying scalar T, can represent the Gaussian integers (T = BigInt/SafeLong),
-  * the Gaussian rationals (T = Rational) or the complex number field (T: Field).
-  *
-  * Note that we require T to be at least CRing, a commutative ring, so the implementation below is slightly
-  * less general than the Cayley-Dickson construction.
-  */
+/**
+ * Complex numbers. Depending on the underlying scalar T, can represent the Gaussian integers (T = BigInt/SafeLong),
+ * the Gaussian rationals (T = Rational) or the complex number field (T: Field).
+ *
+ * Note that we require T to be at least CRing, a commutative ring, so the implementation below is slightly
+ * less general than the Cayley-Dickson construction.
+ */
 @SerialVersionUID(0L)
 final case class Complex[@sp(Float, Double) T](real: T, imag: T)
-    extends ScalaNumber with ScalaNumericConversions with Serializable { lhs =>
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Serializable { lhs =>
 
   import spire.syntax.order._
 
@@ -104,7 +107,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
 
   def abs(implicit f: Field[T], n: NRoot[T], s: Signed[T]): T = hypot(real, imag)
 
-  def absSquare(implicit r: CRing[T]): T = real*real + imag*imag
+  def absSquare(implicit r: CRing[T]): T = real * real + imag * imag
 
   def arg(implicit f: Field[T], s: Signed[T], t: Trig[T]): T =
     if (isZero) f.zero else t.atan2(imag, real)
@@ -130,7 +133,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   def *(rhs: T)(implicit r: CRing[T]): Complex[T] = new Complex(real * rhs, imag * rhs)
   def /(rhs: T)(implicit r: Field[T]): Complex[T] = new Complex(real / rhs, imag / rhs)
 
-    /* TODO: does it make sense? Should match the behavior on Gaussian integers.
+  /* TODO: does it make sense? Should match the behavior on Gaussian integers.
   // TODO: instead of floor should be round-toward-zero
 
   def /~(rhs: T)(implicit f: Field[T], o: IsReal[T]): Complex[T] = (this / rhs).floor
@@ -139,9 +142,9 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
     val q = this /~ rhs
     (q, this - q * rhs)
   }
-     */
+   */
 
-  def **(e: T)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] = this pow e
+  def **(e: T)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] = this.pow(e)
   def pow(e: T)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] =
     if (e.isSignZero) {
       Complex.one[T]
@@ -150,7 +153,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
         throw new Exception("raising 0 to negative/complex power")
       Complex.zero[T]
     } else {
-      Complex.polar(abs fpow e, arg * e)
+      Complex.polar(abs.fpow(e), arg * e)
     }
 
   def +(b: Complex[T])(implicit r: CRing[T]): Complex[T] =
@@ -176,11 +179,11 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
       if (abs_bimag === f.zero) throw new Exception("/ by zero")
       val ratio = b.real / b.imag
       val denom = b.real * ratio + b.imag
-      new Complex((real * ratio + imag) / denom, (imag * ratio - real) /denom)
+      new Complex((real * ratio + imag) / denom, (imag * ratio - real) / denom)
     }
   }
 
-    /* TODO: does it make sense? Should match the behavior on Gaussian integers.
+  /* TODO: does it make sense? Should match the behavior on Gaussian integers.
   def /~(b: Complex[T])(implicit f: Field[T], o: IsReal[T]): Complex[T] = {
     val d = this / b
     new Complex(d.real.floor, d.imag.floor)
@@ -192,7 +195,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
     val q = this /~ b
     (q, this - q * b)
   }
-     */
+   */
 
   def **(b: Int)(implicit f: Field[T], n: NRoot[T], s: Signed[T], t: Trig[T]): Complex[T] = pow(b)
 
@@ -212,11 +215,11 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
         throw new Exception("raising 0 to negative/complex power")
       Complex.zero[T]
     } else if (b.imag =!= f.zero) {
-      val len = (abs fpow b.real) / t.exp(arg * b.imag)
+      val len = (abs.fpow(b.real)) / t.exp(arg * b.imag)
       val phase = arg * b.real + t.log(abs) * b.imag
       Complex.polar(len, phase)
     } else {
-      Complex.polar(abs fpow b.real, arg * b.real)
+      Complex.polar(abs.fpow(b.real), arg * b.real)
     }
 
   // we are going with the "principal value" definition of Log.
@@ -324,7 +327,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   def isWhole: Boolean =
     anyIsZero(imag) && anyIsWhole(real)
 
-  override final def isValidInt: Boolean =
+  final override def isValidInt: Boolean =
     anyIsZero(imag) && anyIsValidInt(real)
 
   // important to keep in sync with Quaternion[_]
@@ -334,7 +337,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
 
   // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
-    case that: Complex[_]    => this === that
+    case that: Complex[_] => this === that
     case that: Quaternion[_] =>
       real == that.r && imag == that.i && anyIsZero(that.j) && anyIsZero(that.k)
     case that =>
@@ -353,9 +356,6 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
     Quaternion(real, imag, ev.zero, ev.zero)
 }
 
-
-
-
 trait ComplexInstances0 {
   implicit def ComplexOnCRing[A: CRing: Signed]: ComplexOnCRing[A] = new ComplexOnCRingImpl[A]
 }
@@ -371,7 +371,10 @@ trait ComplexInstances extends ComplexInstances1 {
   implicit def ComplexEq[A: Eq]: Eq[Complex[A]] = new ComplexEq[A]
 }
 
-private[math] trait ComplexOnCRing[@sp(Float, Double) A] extends CRing[Complex[A]] with RingAssociativeAlgebra[Complex[A], A] with Involution[Complex[A]] {
+private[math] trait ComplexOnCRing[@sp(Float, Double) A]
+    extends CRing[Complex[A]]
+    with RingAssociativeAlgebra[Complex[A], A]
+    with Involution[Complex[A]] {
   implicit def scalar: CRing[A]
   override def minus(a: Complex[A], b: Complex[A]): Complex[A] = a - b
   def negate(a: Complex[A]): Complex[A] = -a
@@ -386,8 +389,10 @@ private[math] trait ComplexOnCRing[@sp(Float, Double) A] extends CRing[Complex[A
   override def fromInt(n: Int): Complex[A] = Complex.fromInt[A](n)
 }
 
-private[math] trait ComplexOnField[@sp(Float,Double) A] extends ComplexOnCRing[A] with Field.WithDefaultGCD[Complex[A]] with FieldAssociativeAlgebra[Complex[A], A]
-{
+private[math] trait ComplexOnField[@sp(Float, Double) A]
+    extends ComplexOnCRing[A]
+    with Field.WithDefaultGCD[Complex[A]]
+    with FieldAssociativeAlgebra[Complex[A], A] {
 
   implicit def scalar: Field[A]
   implicit def signed: Signed[A]
@@ -441,21 +446,27 @@ private[math] trait ComplexIsNRoot[A] extends NRoot[Complex[A]] {
 
 @SerialVersionUID(1L)
 private[math] class ComplexEq[A: Eq] extends Eq[Complex[A]] with Serializable {
-  def eqv(x: Complex[A], y: Complex[A]): Boolean = x eqv y
-  override def neqv(x: Complex[A], y: Complex[A]): Boolean = x neqv y
+  def eqv(x: Complex[A], y: Complex[A]): Boolean = x.eqv(y)
+  override def neqv(x: Complex[A], y: Complex[A]): Boolean = x.neqv(y)
 }
 
 @SerialVersionUID(1L)
-private[math] final class ComplexOnCRingImpl[@sp(Float,Double) A](implicit val scalar: CRing[A]) extends ComplexOnCRing[A] with Serializable
+final private[math] class ComplexOnCRingImpl[@sp(Float, Double) A](implicit val scalar: CRing[A])
+    extends ComplexOnCRing[A]
+    with Serializable
 
 @SerialVersionUID(1L)
-private[math] final class ComplexOnFieldImpl[@sp(Float,Double) A](implicit
-                                                                  val scalar: Field[A], val signed: Signed[A]) extends ComplexOnField[A] with Serializable
+final private[math] class ComplexOnFieldImpl[@sp(Float, Double) A](implicit val scalar: Field[A], val signed: Signed[A])
+    extends ComplexOnField[A]
+    with Serializable
 
 @SerialVersionUID(1L)
 private[math] class ComplexOnTrigImpl[@sp(Float, Double) A](implicit
-                                                            val scalar: Field[A], val nroot: NRoot[A], val trig: Trig[A], val signed: Signed[A])
-    extends ComplexOnField[A]
+  val scalar: Field[A],
+  val nroot: NRoot[A],
+  val trig: Trig[A],
+  val signed: Signed[A]
+) extends ComplexOnField[A]
     with ComplexOnTrig[A]
     with ComplexIsNRoot[A]
     with Serializable {

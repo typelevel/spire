@@ -4,8 +4,8 @@ package std
 import spire.algebra.Order
 
 trait CharOrder extends Order[Char] {
-  override def eqv(x:Char, y:Char): Boolean = x == y
-  override def neqv(x:Char, y:Char): Boolean = x != y
+  override def eqv(x: Char, y: Char): Boolean = x == y
+  override def neqv(x: Char, y: Char): Boolean = x != y
   override def gt(x: Char, y: Char): Boolean = x > y
   override def gteqv(x: Char, y: Char): Boolean = x >= y
   override def lt(x: Char, y: Char): Boolean = x < y

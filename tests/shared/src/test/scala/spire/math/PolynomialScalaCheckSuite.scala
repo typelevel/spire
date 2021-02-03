@@ -75,15 +75,15 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
     }
 
     property(s"$name p /~ 1 = p") {
-      forAll { (p: P) => (p equot one) == p }
+      forAll { (p: P) => (p.equot(one)) == p }
     }
 
     property(s"$name p /~ p = 1") {
-      forAll { (p: P) => if (!p.isZero) (p equot p) == one else true }
+      forAll { (p: P) => if (!p.isZero)(p.equot(p)) == one else true }
     }
 
     property(s"$name p % p = 0") {
-      forAll { (p: P) => if (!p.isZero) (p emod p) == zero else true}
+      forAll { (p: P) => if (!p.isZero)(p.emod(p)) == zero else true }
     }
 
     property(s"$name x + y = y + x") {
@@ -95,7 +95,7 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
     }
 
     property(s"$name (x /~ y) * y + (x % y) = x") {
-      forAll { (x: P, y: P) => if (!y.isZero) (x equot y) * y + (x emod y) == x else true }
+      forAll { (x: P, y: P) => if (!y.isZero)(x.equot(y)) * y + (x.emod(y)) == x else true }
     }
 
     property(s"$name p = p.reductum + p.maxTerm") {
@@ -111,7 +111,7 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
         Polynomial(rs.take(4).zipWithIndex.map { case (c, e) => Term(c, e) })
 
       val (p1, p2) = (xyz(rs1), xyz(rs2))
-      val p3 = p1 compose p2
+      val p3 = p1.compose(p2)
       p3(r) == p1(p2(r))
     }
   }
@@ -209,8 +209,8 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
     (!x.isZero || !y.isZero) ==> {
       val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
       if (!gcd.isZero) {
-        (x emod gcd) == 0 &&
-        (y emod gcd) == 0
+        (x.emod(gcd)) == 0 &&
+        (y.emod(gcd)) == 0
       }
     }
   }
@@ -224,9 +224,9 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
   property("x % gcd(x, y) == 0 && y % gcd(x, y) == 0") {
     implicit val arbPolynomial: Arbitrary[Polynomial[Rational]] = Arbitrary(for {
       ts <- Gen.listOf(for {
-          c <- arbitrary[Rational]
-          e <- arbitrary[Int] map { n => (n % 10).abs }
-        } yield (e, c))
+        c <- arbitrary[Rational]
+        e <- arbitrary[Int].map { n => (n % 10).abs }
+      } yield (e, c))
     } yield {
       Polynomial(ts.toMap).toDense
     })
@@ -236,4 +236,3 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 }
-

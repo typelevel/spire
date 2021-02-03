@@ -485,4 +485,3 @@ trait BaseSyntaxSuite {
     (~a === Bool[A].complement(a))
   }
 }
-

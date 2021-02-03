@@ -52,7 +52,7 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
   sieve.init(fastq, slowq)
 
   def largestBelow(n: SafeLong): SafeLong = {
-    if (n < 3) throw new IllegalArgumentException("invalid argument: %s" format n)
+    if (n < 3) throw new IllegalArgumentException("invalid argument: %s".format(n))
     if (n == 3) return SafeLong(2)
 
     var i = 3

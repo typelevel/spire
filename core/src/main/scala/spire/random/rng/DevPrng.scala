@@ -6,7 +6,7 @@ import java.io._
 
 class Device(f: File) extends Generator { self =>
   if (!f.canRead)
-    throw new IllegalArgumentException("can't read %s" format f)
+    throw new IllegalArgumentException("can't read %s".format(f))
 
   private val dis = new DataInputStream(new FileInputStream(f))
 
@@ -33,7 +33,7 @@ class CycledFile(f: File) extends Generator { self =>
   private var dis: DataInputStream = null
 
   if (!f.canRead)
-    throw new IllegalArgumentException("can't read %s" format f)
+    throw new IllegalArgumentException("can't read %s".format(f))
   else
     reinit()
 
@@ -41,7 +41,7 @@ class CycledFile(f: File) extends Generator { self =>
     nextLong()
   } catch {
     case e: EOFException =>
-      throw new IllegalArgumentException("%s contains less than 8 bytes" format f)
+      throw new IllegalArgumentException("%s contains less than 8 bytes".format(f))
   }
 
   def reinit(): Unit = {

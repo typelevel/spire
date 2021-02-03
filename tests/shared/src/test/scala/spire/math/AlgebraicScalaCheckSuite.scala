@@ -3,12 +3,12 @@ package math
 
 import spire.algebra.Sign
 
-import org.scalacheck.{ Arbitrary, Gen }
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.Prop._
 
-import java.math.{ MathContext, RoundingMode }
-import MathContext.{DECIMAL64, DECIMAL128}
+import java.math.{MathContext, RoundingMode}
+import MathContext.{DECIMAL128, DECIMAL64}
 
 class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
 
@@ -33,13 +33,13 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   test("relative approximation of addition is correct") {
-    val sum = Iterator.fill(29)(Algebraic(1) / 29) reduce (_ + _)
+    val sum = Iterator.fill(29)(Algebraic(1) / 29).reduce(_ + _)
     assertEquals(sum.toDouble, 1.0)
     assertEquals(sum.toBigDecimal(DECIMAL128), BigDecimal(1))
   }
 
   test("absolute approximation of subtraction is correct") {
-    val negSqrt2x98 = Iterator.fill(100)(Algebraic(2).sqrt) reduce (_ - _)
+    val negSqrt2x98 = Iterator.fill(100)(Algebraic(2).sqrt).reduce(_ - _)
     val dblNegSqrt2x98 = -math.sqrt(2) * 98
     approximation(negSqrt2x98, 4, BigDecimal(dblNegSqrt2x98))
   }
@@ -72,14 +72,14 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
     approximation(Algebraic(2).sqrt, 5, BigDecimal(1.4142135623730951))
 
     // give or take
-    approximation(Algebraic(-4) nroot 3, 5, BigDecimal(-1.5874010519681994))
+    approximation(Algebraic(-4).nroot(3), 5, BigDecimal(-1.5874010519681994))
   }
 
   test("associativity with large and small numbers") {
     val x = Algebraic(1e308)
     val y = Algebraic(-1e308)
     val z = Algebraic(1)
-    assertEquals(x + (y + z),  x + y + z)
+    assertEquals(x + (y + z), x + y + z)
   }
 
   // This generates rational Algebraic expressions along with their Rational
@@ -144,7 +144,7 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
     )
     val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
     val algebraicRoots = Algebraic.roots(poly)
-    (roots.sorted zip algebraicRoots).foreach { case (qRoot, aRoot) =>
+    roots.sorted.zip(algebraicRoots).foreach { case (qRoot, aRoot) =>
       assertEquals(aRoot, Algebraic(qRoot))
     }
   }
@@ -155,7 +155,7 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
   property("find all rational roots of rational polynomial") {
     import spire.implicits._
 
-    val nonEmptyListOf6 = for{
+    val nonEmptyListOf6 = for {
       first <- genRational
       length <- Gen.choose(1, 5)
       rest <- Gen.listOfN(length, genRational)
@@ -166,7 +166,7 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
     forAll(nonEmptyListOf6) { roots =>
       val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
       val algebraicRoots = Algebraic.roots(poly)
-      (roots.sorted zip algebraicRoots).forall { case (qRoot, aRoot) =>
+      roots.sorted.zip(algebraicRoots).forall { case (qRoot, aRoot) =>
         aRoot === Algebraic(qRoot)
       }
     }
@@ -181,7 +181,7 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
     )
     val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
     val algebraicRoots = Algebraic.roots(poly)
-    (roots.sorted zip algebraicRoots).foreach { case (qRoot, aRoot) =>
+    roots.sorted.zip(algebraicRoots).foreach { case (qRoot, aRoot) =>
       assertEquals(aRoot, Algebraic(qRoot))
     }
   }
@@ -198,7 +198,7 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
     )
     val poly = roots.map(x => Polynomial.linear(Rational.one, -x)).qproduct
     val algebraicRoots = Algebraic.roots(poly)
-    (roots.sorted zip algebraicRoots).foreach { case (qRoot, aRoot) =>
+    roots.sorted.zip(algebraicRoots).foreach { case (qRoot, aRoot) =>
       assertEquals(aRoot, Algebraic(qRoot))
     }
   }
@@ -226,13 +226,13 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
   def genRational: Gen[Rational] = for {
     n <- genBigInt
     d <- genBigInt
-    if (d.signum != 0)
+    if d.signum != 0
   } yield Rational(n, d)
 
   def genRationalPoly: Gen[Polynomial[Rational]] = for {
-      first <- genRational
-      length <- Gen.choose(1, 3)
-      coeffs <- Gen.listOfN(length, genRational)
+    first <- genRational
+    length <- Gen.choose(1, 3)
+    coeffs <- Gen.listOfN(length, genRational)
   } yield Polynomial.dense((first :: coeffs).toArray)
 
   /**
@@ -251,14 +251,16 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
 
     def genRationalAlgebraic(depth: Int): Gen[RationalAlgebraic] =
       if (depth >= MaxDepth) genLeaf
-      else Gen.frequency(
-        (1, genAdd(depth + 1)),
-        (1, genSub(depth + 1)),
-        (1, genMul(depth + 1)),
-        (1, genDiv(depth + 1)),
-        (1, genNeg(depth + 1)),
-        (1, genPow(depth + 1, arbitrary[Byte].map(_.toInt % 7))),
-        (7, genLeaf))
+      else
+        Gen.frequency(
+          (1, genAdd(depth + 1)),
+          (1, genSub(depth + 1)),
+          (1, genMul(depth + 1)),
+          (1, genDiv(depth + 1)),
+          (1, genNeg(depth + 1)),
+          (1, genPow(depth + 1, arbitrary[Byte].map(_.toInt % 7))),
+          (7, genLeaf)
+        )
 
     def genLong: Gen[RationalAlgebraic] = for {
       n <- arbitrary[Long]
@@ -301,7 +303,7 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
     def genDiv(depth: Int): Gen[RationalAlgebraic] = for {
       RationalAlgebraic(lhsA, lhsQ) <- genRationalAlgebraic(depth + 1)
       RationalAlgebraic(rhsA, rhsQ) <- genRationalAlgebraic(depth + 1)
-      if (rhsQ.signum != 0)
+      if rhsQ.signum != 0
     } yield RationalAlgebraic(lhsA / rhsA, lhsQ / rhsQ)
 
     def genNeg(depth: Int): Gen[RationalAlgebraic] = for {

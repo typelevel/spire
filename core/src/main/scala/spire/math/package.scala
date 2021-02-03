@@ -95,7 +95,7 @@ package object math {
    * round
    */
   final def round(a: Float): Float =
-    if (Math.abs(a) >= 16777216.0F) a else Math.round(a).toFloat
+    if (Math.abs(a) >= 16777216.0f) a else Math.round(a).toFloat
   final def round(a: Double): Double =
     if (Math.abs(a) >= 4503599627370496.0) a else Math.round(a).toDouble
   final def round(a: BigDecimal): BigDecimal =
@@ -141,7 +141,6 @@ package object math {
       val part = exp(BigDecimal(1) + (k - whole) / whole)
       return power(BigDecimal(1), part, whole.toBigInt)
     }
-
 
     @tailrec
     def doit(precision: Int, leeway: Int): BigDecimal = {
@@ -259,7 +258,7 @@ package object math {
       else longPow(t, b * b, e >> 1L)
 
     if (exponent < 0L) {
-      if(base == 0L) throw new ArithmeticException("zero can't be raised to negative power")
+      if (base == 0L) throw new ArithmeticException("zero can't be raised to negative power")
       else if (base == 1L) 1L
       else if (base == -1L) if ((exponent & 1L) == 0L) -1L else 1L
       else 0L
@@ -301,10 +300,10 @@ package object math {
   }
 
   final def gcd(a: BigInt, b: BigInt): BigInt = a.gcd(b)
-  final def gcd[A:Eq](x: A, y: A)(implicit ev: GCDRing[A]): A = ev.gcd(x, y)
-  final def gcd[A:Eq](xs: Seq[A])(implicit ev: GCDRing[A]): A =
+  final def gcd[A: Eq](x: A, y: A)(implicit ev: GCDRing[A]): A = ev.gcd(x, y)
+  final def gcd[A: Eq](xs: Seq[A])(implicit ev: GCDRing[A]): A =
     xs.reduceLeft(ev.gcd)
-  final def gcd[A:Eq](x: A, y: A, z: A, rest: A*)(implicit ev: GCDRing[A]): A =
+  final def gcd[A: Eq](x: A, y: A, z: A, rest: A*)(implicit ev: GCDRing[A]): A =
     if (rest.isEmpty) ev.gcd(ev.gcd(x, y), z)
     else ev.gcd(ev.gcd(ev.gcd(x, y), z), gcd(rest))
 
@@ -313,11 +312,11 @@ package object math {
    */
   final def lcm(x: Long, y: Long): Long = if (x == 0 || y == 0) 0 else (x / gcd(x, y)) * y
   final def lcm(a: BigInt, b: BigInt): BigInt = if (a.signum == 0 || b.signum == 0) 0 else (a / a.gcd(b)) * b
-  final def lcm[A:Eq](x: A, y: A)(implicit ev: GCDRing[A]): A = ev.lcm(x, y)
+  final def lcm[A: Eq](x: A, y: A)(implicit ev: GCDRing[A]): A = ev.lcm(x, y)
 
   /**
    * Integer Euclidean division, equotmod, equot, emod
-    */
+   */
   def equotmod(a: Byte, b: Byte): (Byte, Byte) = {
     val qt = a / b // truncated quotient
     val rt = a % b // truncated remainder
@@ -525,16 +524,15 @@ package object math {
   final def ulp(x: Double): Double = Math.ulp(x)
   final def ulp(x: Float): Double = Math.ulp(x)
 
-  final def hypot[@sp(Float, Double) A](x: A, y: A)
-    (implicit f: Field[A], n: NRoot[A], s: Signed[A]): A = {
+  final def hypot[@sp(Float, Double) A](x: A, y: A)(implicit f: Field[A], n: NRoot[A], s: Signed[A]): A = {
     import spire.implicits._
     def abs(n: A): A = if (n < f.zero) -n else n
     val ax = abs(x)
     val ay = abs(y)
     if (x == f.zero) ay
     else if (y == f.zero) ax
-    else if (ax > ay) ax * (1 + (y/x)**2).sqrt
-    else ay * (1 + (x/y)**2).sqrt
+    else if (ax > ay) ax * (1 + (y / x) ** 2).sqrt
+    else ay * (1 + (x / y) ** 2).sqrt
   }
 
   // BigInt
@@ -547,7 +545,7 @@ package object math {
    * `x * x < y < (x+1)*(x+1)`, by using `intSearch(x => x * x <= y)`.
    */
   private def intSearch(f: Int => Boolean): Int = {
-    val ceil = (0 until 32) find (i => !f(1 << i)) getOrElse 33
+    val ceil = (0 until 32).find(i => !f(1 << i)).getOrElse(33)
     if (ceil == 0) {
       0
     } else {
@@ -557,7 +555,6 @@ package object math {
       }
     }
   }
-
 
   /**
    * Returns the digits to the right of the decimal point of `x / y` in base
@@ -575,15 +572,17 @@ package object math {
     }
   }
 
-  /** Returns the digits of `x` in base `r`. */
+  /**
+   * Returns the digits of `x` in base `r`.
+   */
   private def digitize(x: BigInt, r: Int, prev: List[Int] = Nil): List[Int] =
     if (x == 0) prev else digitize(x / r, r, (x % r).toInt :: prev)
 
-
-  /** Converts a list of digits in base `r` to a `BigInt`. */
+  /**
+   * Converts a list of digits in base `r` to a `BigInt`.
+   */
   private def undigitize(digits: Seq[Int], r: Int): BigInt =
     digits.foldLeft(BigInt(0))(_ * r + _)
-
 
   // 1 billion: because it's the largest positive Int power of 10.
   private val radix = 1000000000
@@ -606,20 +605,22 @@ package object math {
       BigDecimal(1)
     } else if (a.signum < 0) {
       if (k % 2 == 0) {
-        throw new ArithmeticException("%d-root of negative number" format k)
+        throw new ArithmeticException("%d-root of negative number".format(k))
       } else {
         -nroot(-a, k, ctxt)
       }
     } else {
       val underlying = BigInt(a.bigDecimal.unscaledValue.toByteArray)
-      val scale = BigInt(10) pow a.scale
+      val scale = BigInt(10).pow(a.scale)
       val intPart = digitize(underlying / scale, radix)
-      val fracPart = decDiv(underlying % scale, scale, radix) map (_.toInt)
-      val leader = if (intPart.size % k == 0) LazyList.empty else {
-        LazyList.fill(k - intPart.size % k)(0)
-      }
+      val fracPart = decDiv(underlying % scale, scale, radix).map(_.toInt)
+      val leader =
+        if (intPart.size % k == 0) LazyList.empty
+        else {
+          LazyList.fill(k - intPart.size % k)(0)
+        }
       val digits = leader ++ LazyList.from(intPart) ++ fracPart ++ LazyList.continually(0)
-      val radixPowK = BigInt(radix) pow k
+      val radixPowK = BigInt(radix).pow(k)
 
       // Total # of digits to compute.
       // Note: I originally had `+ 1` here, but some edge cases were missed, so now
@@ -628,22 +629,22 @@ package object math {
 
       def findRoot(digits: LazyList[Int], y: BigInt, r: BigInt, i: Int): (Int, BigInt) = {
         val y_ = y * radix
-        val a = undigitize(digits take k, radix)
+        val a = undigitize(digits.take(k), radix)
         // Note: target grows quite fast (so I imagine (y_ + b) pow k does too).
-        val target = radixPowK * r + a + (y_ pow k)
-        val b = intSearch(b => ((y_ + b) pow k) <= target)
+        val target = radixPowK * r + a + (y_.pow(k))
+        val b = intSearch(b => ((y_ + b).pow(k)) <= target)
 
         val ny = y_ + b
 
         if (i == maxSize) {
           (i, ny)
         } else {
-          val nr = target - (ny pow k)
+          val nr = target - (ny.pow(k))
 
           // TODO: Add stopping condition for when nr == 0 and there are no more
           // digits. Tricky part is refactoring to know when digits end...
 
-          findRoot(digits drop k, ny, nr, i + 1)
+          findRoot(digits.drop(k), ny, nr, i + 1)
         }
       }
 
@@ -656,60 +657,60 @@ package object math {
 
   private[spire] def anyIsZero(n: Any): Boolean =
     n match {
-      case x if x == 0 => true
+      case x if x == 0                => true
       case c: ScalaNumericConversions => c.isValidInt && c.toInt == 0
-      case _ => false
+      case _                          => false
     }
 
   private[spire] def anyToDouble(n: Any): Double =
     n match {
-      case n: Byte => n.toDouble
-      case n: Short => n.toDouble
-      case n: Char => n.toDouble
-      case n: Int => n.toDouble
-      case n: Long => n.toDouble
-      case n: Float => n.toDouble
-      case n: Double => n
+      case n: Byte                    => n.toDouble
+      case n: Short                   => n.toDouble
+      case n: Char                    => n.toDouble
+      case n: Int                     => n.toDouble
+      case n: Long                    => n.toDouble
+      case n: Float                   => n.toDouble
+      case n: Double                  => n
       case c: ScalaNumericConversions => c.toDouble
-      case _ => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
+      case _                          => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
     }
 
   private[spire] def anyToLong(n: Any): Long =
     n match {
-      case n: Byte => n.toLong
-      case n: Short => n.toLong
-      case n: Char => n.toLong
-      case n: Int => n.toLong
-      case n: Long => n
-      case n: Float => n.toLong
-      case n: Double => n.toLong
+      case n: Byte                    => n.toLong
+      case n: Short                   => n.toLong
+      case n: Char                    => n.toLong
+      case n: Int                     => n.toLong
+      case n: Long                    => n
+      case n: Float                   => n.toLong
+      case n: Double                  => n.toLong
       case c: ScalaNumericConversions => c.toLong
-      case _ => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
+      case _                          => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
     }
 
   private[spire] def anyIsWhole(n: Any): Boolean =
     n match {
-      case _: Byte => true
-      case _: Short => true
-      case _: Char => true
-      case _: Int => true
-      case _: Long => true
-      case n: Float => n.isWhole
-      case n: Double => n.isWhole
+      case _: Byte                    => true
+      case _: Short                   => true
+      case _: Char                    => true
+      case _: Int                     => true
+      case _: Long                    => true
+      case n: Float                   => n.isWhole
+      case n: Double                  => n.isWhole
       case c: ScalaNumericConversions => c.isWhole
-      case _ => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
+      case _                          => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
     }
 
   private[spire] def anyIsValidInt(n: Any): Boolean =
     n match {
-      case _: Byte => true
-      case _: Short => true
-      case _: Char => true
-      case _: Int => true
-      case n: Long => n.isValidInt
-      case n: Float => n.isValidInt
-      case n: Double => n.isValidInt
+      case _: Byte                    => true
+      case _: Short                   => true
+      case _: Char                    => true
+      case _: Int                     => true
+      case n: Long                    => n.isValidInt
+      case n: Float                   => n.isValidInt
+      case n: Double                  => n.isValidInt
       case c: ScalaNumericConversions => c.isValidInt
-      case _ => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
+      case _                          => throw new UnsupportedOperationException(s"$n is not a ScalaNumber")
     }
 }

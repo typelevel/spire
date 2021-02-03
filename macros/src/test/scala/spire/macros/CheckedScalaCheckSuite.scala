@@ -9,8 +9,8 @@ class CheckedScalaCheckSuite extends munit.ScalaCheckSuite {
   import Arbitrary.arbitrary
 
   case class NotZero[A](value: A)
-  implicit def arbNotZeroLong = Arbitrary(arbitrary[Long] filter (_ != 0L) map (NotZero(_)))
-  implicit def arbNotZeroInt = Arbitrary(arbitrary[Int] filter (_ != 0L) map (NotZero(_)))
+  implicit def arbNotZeroLong = Arbitrary(arbitrary[Long].filter(_ != 0L).map(NotZero(_)))
+  implicit def arbNotZeroInt = Arbitrary(arbitrary[Int].filter(_ != 0L).map(NotZero(_)))
 
   def checkForLongOverflow(value: BigInt, check: => Long): Unit = {
     if (value.isValidLong) {
@@ -114,24 +114,28 @@ class CheckedScalaCheckSuite extends munit.ScalaCheckSuite {
 
   test("Int upgrades to Long for overflow checks when mixed in binary op") {
     assertEquals(Checked.option {
-      val x = 2L
-      val y = Int.MaxValue
-      x + y
-    }, Some(Int.MaxValue.toLong + 2))
+                   val x = 2L
+                   val y = Int.MaxValue
+                   x + y
+                 },
+                 Some(Int.MaxValue.toLong + 2)
+    )
 
     assertEquals(Checked.option {
-      val x = 2L
-      val y = Int.MaxValue
-      y + x
-    }, Some(Int.MaxValue.toLong + 2))
+                   val x = 2L
+                   val y = Int.MaxValue
+                   y + x
+                 },
+                 Some(Int.MaxValue.toLong + 2)
+    )
 
-    intercept[ArithmeticException] (checked {
+    intercept[ArithmeticException](checked {
       val x = Long.MaxValue
       val y = 2
       x * y
     })
 
-    intercept[ArithmeticException] (checked {
+    intercept[ArithmeticException](checked {
       val x = Long.MaxValue
       val y = 2
       y * x
@@ -139,27 +143,27 @@ class CheckedScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   test("Byte and Short upgrade to Int when mixed") {
-    intercept[ArithmeticException] (checked {
+    intercept[ArithmeticException](checked {
       val x = Int.MaxValue
-      val y = (2: Byte)
+      val y = 2: Byte
       x * y
     })
 
-    intercept[ArithmeticException] (checked {
+    intercept[ArithmeticException](checked {
       val x = Int.MaxValue
-      val y = (2: Byte)
+      val y = 2: Byte
       y * x
     })
 
-    intercept[ArithmeticException] (checked {
+    intercept[ArithmeticException](checked {
       val x = Int.MaxValue
-      val y = (2: Short)
+      val y = 2: Short
       x * y
     })
 
-    intercept[ArithmeticException] (checked {
+    intercept[ArithmeticException](checked {
       val x = Int.MaxValue
-      val y = (2: Short)
+      val y = 2: Short
       y * x
     })
   }

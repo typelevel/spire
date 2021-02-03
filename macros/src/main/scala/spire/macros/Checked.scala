@@ -2,7 +2,7 @@ package spire
 package macros
 
 import scala.language.existentials
-import spire.macros.compat.{resetLocalAttrs, termName, freshTermName, Context}
+import spire.macros.compat.{freshTermName, resetLocalAttrs, termName, Context}
 
 class ArithmeticOverflowException() extends ArithmeticException("arithmetic overflow detected")
 
@@ -48,7 +48,6 @@ object Checked {
    * of" in the case of an overflow.
    */
   def tryOrReturn[A](n: A)(orElse: A): A = macro tryOrReturnImpl[A]
-
 
   def tryOrElseImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A])(orElse: c.Expr[A]): c.Expr[A] = {
     val tree = CheckedRewriter[c.type](c).rewriteSafe[A](n.tree, orElse.tree)
@@ -96,8 +95,8 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
   def warnOnSimpleTree(tree: Tree): Unit =
     tree match {
       case Literal(_) => c.warning(tree.pos, "checked used with literal")
-      case Ident(_) => c.warning(tree.pos, "checked used with simple identifier")
-      case _ =>
+      case Ident(_)   => c.warning(tree.pos, "checked used with simple identifier")
+      case _          =>
     }
 
   def makeRewriter(fallback: TermName): Transformer = {
@@ -105,7 +104,7 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
     val IntRewriter = new Rewriter[Int](q"Int.MinValue", fallback)
 
     new Transformer {
-      val f = IntRewriter(transform _) orElse LongRewriter(transform _)
+      val f = IntRewriter(transform _).orElse(LongRewriter(transform _))
 
       override def transform(tree: Tree): Tree =
         if (f.isDefinedAt(tree)) f(tree) else super.transform(tree)
@@ -129,7 +128,7 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
       case Apply(Select(lhs, method), rhs :: Nil) =>
         val lt = lhs.tpe.widen
         val rt = rhs.tpe.widen
-        ((lt weak_<:< tpe) && (rt <:< tpe)) || ((lt <:< tpe) && (rt weak_<:< tpe))
+        ((lt.weak_<:<(tpe)) && (rt <:< tpe)) || ((lt <:< tpe) && (rt.weak_<:<(tpe)))
       case _ =>
         false
     }
@@ -137,11 +136,12 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
     def isSimple(tree: Tree): Boolean =
       tree match {
         case Literal(_) | Ident(_) => true
-        case _ => false
+        case _                     => false
       }
 
     def runWithX(rewrite: Tree => Tree, sub: Tree)(f: Tree => Tree): Tree =
-      if (isSimple(sub)) q"""{ ${f(sub)} }""" else {
+      if (isSimple(sub)) q"""{ ${f(sub)} }"""
+      else {
         val x = freshTermName(c)("x$")
         q"""{ val $x = ${rewrite(sub)}; ${f(q"$x")} }"""
       }

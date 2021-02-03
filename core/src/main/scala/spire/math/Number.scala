@@ -4,7 +4,7 @@ package math
 import scala.math.ScalaNumericConversions
 import java.lang.Math
 
-import spire.algebra.{Field, IsReal, IsRational, NRoot, Order, CRing, Signed, Trig, TruncatedDivisionCRing}
+import spire.algebra.{CRing, Field, IsRational, IsReal, NRoot, Order, Signed, Trig, TruncatedDivisionCRing}
 import spire.std.bigDecimal._
 import spire.syntax.isReal._
 import spire.syntax.nroot._
@@ -107,17 +107,16 @@ sealed trait Number extends ScalaNumericConversions with Serializable {
   final def >(rhs: Number): Boolean = compare(rhs) > 0
   final def >=(rhs: Number): Boolean = compare(rhs) >= 0
 
-  def &(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer" format this)
-  def |(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer" format this)
-  def ^(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer" format this)
-  def <<(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer" format this)
-  def >>(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer" format this)
+  def &(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer".format(this))
+  def |(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer".format(this))
+  def ^(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer".format(this))
+  def <<(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer".format(this))
+  def >>(rhs: Number): Number = throw new UnsupportedOperationException("%s not an integer".format(this))
 
   def floor: Number
   def ceil: Number
   def round: Number
 }
-
 
 /**
  * Number with an underlying Long representation.
@@ -154,112 +153,116 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
 
   def compare(rhs: Number): Int = rhs match {
     case IntNumber(m) => n.compare(m)
-    case t => -t.compare(lhs)
+    case t            => -t.compare(lhs)
   }
 
   override def equals(that: Any): Boolean =
     that match {
       case that: Number => this === that
-      case that => n == that
+      case that         => n == that
     }
 
   def ===(that: Number): Boolean =
     that match {
       case IntNumber(n2) => n == n2
-      case that => that === this
+      case that          => that === this
     }
 
   def unary_- : Number = Number(-n)
 
   def +(rhs: Number): Number = rhs match {
     case IntNumber(m) => IntNumber(n + m)
-    case t => t + lhs
+    case t            => t + lhs
   }
   def *(rhs: Number): Number = rhs match {
     case IntNumber(m) => IntNumber(n * m)
-    case t => t * lhs
+    case t            => t * lhs
   }
   def -(rhs: Number): Number = rhs match {
     case IntNumber(m) => IntNumber(n - m)
-    case t => t r_- lhs
+    case t            => t.r_-(lhs)
   }
   def /(rhs: Number): Number = rhs match {
-    case IntNumber(m) => n match {
-      case SafeLongLong(x) => m match {
-        case SafeLongLong(y) => Number(x.toDouble / y.toDouble)
-        case SafeLongBigInteger(y) => DecimalNumber(BigDecimal(x) / BigDecimal(y))
+    case IntNumber(m) =>
+      n match {
+        case SafeLongLong(x) =>
+          m match {
+            case SafeLongLong(y)       => Number(x.toDouble / y.toDouble)
+            case SafeLongBigInteger(y) => DecimalNumber(BigDecimal(x) / BigDecimal(y))
+          }
+        case SafeLongBigInteger(x) => Number(BigDecimal(x) / m.toBigDecimal)
       }
-      case SafeLongBigInteger(x) => Number(BigDecimal(x) / m.toBigDecimal)
-    }
-    case t => t r_/ lhs
+    case t => t.r_/(lhs)
   }
 
   def tquot(rhs: Number): Number = rhs match {
     case IntNumber(m) => IntNumber(n / m)
-    case t => t r_tquot lhs
+    case t            => t.r_tquot(lhs)
   }
   def tmod(rhs: Number): Number = rhs match {
     case IntNumber(m) => IntNumber(n % m)
-    case t => t r_tmod lhs
+    case t            => t.r_tmod(lhs)
   }
   def tquotmod(rhs: Number): (Number, Number) = rhs match {
     case IntNumber(m) => (IntNumber(n / m), IntNumber(n % m))
-    case t => t r_tquotmod lhs
+    case t            => t.r_tquotmod(lhs)
   }
 
   private[math] def r_-(lhs: Number): Number = lhs match {
     case IntNumber(m) => IntNumber(m - n)
-    case t => t - lhs
+    case t            => t - lhs
   }
   private[math] def r_/(lhs: Number): Number = lhs match {
-    case IntNumber(m) => n match {
-      case SafeLongLong(x) => m match {
-        case SafeLongLong(y) => Number(y.toDouble / x.toDouble)
-        case SafeLongBigInteger(y) => DecimalNumber(BigDecimal(y) / BigDecimal(x))
+    case IntNumber(m) =>
+      n match {
+        case SafeLongLong(x) =>
+          m match {
+            case SafeLongLong(y)       => Number(y.toDouble / x.toDouble)
+            case SafeLongBigInteger(y) => DecimalNumber(BigDecimal(y) / BigDecimal(x))
+          }
+        case SafeLongBigInteger(x) => Number(m.toBigDecimal / BigDecimal(x))
       }
-      case SafeLongBigInteger(x) => Number(m.toBigDecimal / BigDecimal(x))
-    }
     case t => t / lhs
   }
 
   private[math] def r_tquot(lhs: Number): Number = lhs match {
     case IntNumber(m) => IntNumber(m / n)
-    case t => t tquot lhs
+    case t            => t.tquot(lhs)
   }
   private[math] def r_tmod(lhs: Number): Number = lhs match {
     case IntNumber(m) => IntNumber(m % n)
-    case t => t tmod lhs
+    case t            => t.tmod(lhs)
   }
   private[math] def r_tquotmod(lhs: Number): (Number, Number) = lhs match {
     case IntNumber(m) => (IntNumber(m / n), IntNumber(m % n))
-    case t => t tquotmod lhs
+    case t            => t.tquotmod(lhs)
   }
 
   def pow(rhs: Number): Number = rhs match {
-    case _ if rhs.canBeInt => Number(n.pow(rhs.intValue))
-    case FloatNumber(m) if (withinDouble) => Number(spire.math.pow(doubleValue, m))
-    case _ => Number(spire.math.pow(lhs.toBigDecimal, rhs.toBigDecimal))
+    case _ if rhs.canBeInt              => Number(n.pow(rhs.intValue))
+    case FloatNumber(m) if withinDouble => Number(spire.math.pow(doubleValue, m))
+    case _                              => Number(spire.math.pow(lhs.toBigDecimal, rhs.toBigDecimal))
   }
 
   override def &(rhs: Number): Number = rhs match {
     case IntNumber(x) => IntNumber(n & x)
-    case _ => throw new IllegalArgumentException("%s not an integer" format rhs)
+    case _            => throw new IllegalArgumentException("%s not an integer".format(rhs))
   }
   override def |(rhs: Number): Number = rhs match {
     case IntNumber(x) => IntNumber(n | x)
-    case _ => throw new IllegalArgumentException("%s not an integer" format rhs)
+    case _            => throw new IllegalArgumentException("%s not an integer".format(rhs))
   }
   override def ^(rhs: Number): Number = rhs match {
     case IntNumber(x) => IntNumber(n ^ x)
-    case _ => throw new IllegalArgumentException("%s not an integer" format rhs)
+    case _            => throw new IllegalArgumentException("%s not an integer".format(rhs))
   }
   override def <<(rhs: Number): Number = rhs match {
     case IntNumber(x) => IntNumber(n << x.toInt)
-    case _ => throw new IllegalArgumentException("%s not an integer" format rhs)
+    case _            => throw new IllegalArgumentException("%s not an integer".format(rhs))
   }
   override def >>(rhs: Number): Number = rhs match {
     case IntNumber(x) => IntNumber(n >> x.toInt)
-    case _ => throw new IllegalArgumentException("%s not an integer" format rhs)
+    case _            => throw new IllegalArgumentException("%s not an integer".format(rhs))
   }
 
   def sqrt: Number =
@@ -306,126 +309,136 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   def toRational: Rational = Rational(n)
 
   def compare(rhs: Number): Int = rhs match {
-    case IntNumber(m) => BigDecimal(n) compare m.toBigDecimal
-    case FloatNumber(m) => n compare m
-    case t => -t.compare(lhs)
+    case IntNumber(m)   => BigDecimal(n).compare(m.toBigDecimal)
+    case FloatNumber(m) => n.compare(m)
+    case t              => -t.compare(lhs)
   }
 
   override def equals(that: Any): Boolean =
     that match {
       case that: Number => this === that
-      case that => n == that
+      case that         => n == that
     }
 
   def ===(that: Number): Boolean =
     that match {
       case FloatNumber(n2) => n == n2
-      case IntNumber(m) => m == m.toDouble.toLong && m == n
-      case _ => that == this
+      case IntNumber(m)    => m == m.toDouble.toLong && m == n
+      case _               => that == this
     }
 
   def unary_- : Number = Number(-n)
 
   def +(rhs: Number): Number = rhs match {
-    case IntNumber(m) => m match {
-      case SafeLongLong(x) => Number(n + x)
-      case SafeLongBigInteger(x) => Number(BigDecimal(x) + n)
-    }
+    case IntNumber(m) =>
+      m match {
+        case SafeLongLong(x)       => Number(n + x)
+        case SafeLongBigInteger(x) => Number(BigDecimal(x) + n)
+      }
     case FloatNumber(m) => Number(n + m)
-    case t => t + lhs
+    case t              => t + lhs
   }
 
   def *(rhs: Number): Number = rhs match {
-    case IntNumber(m) => m match {
-      case SafeLongLong(x) => Number(n * x)
-      case SafeLongBigInteger(x) => Number(BigDecimal(n) * BigDecimal(x))
-    }
+    case IntNumber(m) =>
+      m match {
+        case SafeLongLong(x)       => Number(n * x)
+        case SafeLongBigInteger(x) => Number(BigDecimal(n) * BigDecimal(x))
+      }
     case FloatNumber(m) => Number(n * m)
-    case t => t * lhs
+    case t              => t * lhs
   }
 
   def -(rhs: Number): Number = rhs match {
-    case IntNumber(m) => m match {
-      case SafeLongLong(x) => Number(n - x)
-      case SafeLongBigInteger(x) => Number(BigDecimal(n) + BigDecimal(x))
-    }
+    case IntNumber(m) =>
+      m match {
+        case SafeLongLong(x)       => Number(n - x)
+        case SafeLongBigInteger(x) => Number(BigDecimal(n) + BigDecimal(x))
+      }
     case FloatNumber(m) => Number(n - m)
-    case t => t r_- lhs
+    case t              => t.r_-(lhs)
   }
   private[math] def r_-(lhs: Number): Number = lhs match {
-    case IntNumber(m) => m match {
-      case SafeLongLong(x) => Number(x - n)
-      case SafeLongBigInteger(x) => Number(BigDecimal(x) - BigDecimal(n))
-    }
+    case IntNumber(m) =>
+      m match {
+        case SafeLongLong(x)       => Number(x - n)
+        case SafeLongBigInteger(x) => Number(BigDecimal(x) - BigDecimal(n))
+      }
     case FloatNumber(m) => Number(m - n)
-    case t => t - lhs
+    case t              => t - lhs
   }
 
   def /(rhs: Number): Number = rhs match {
-    case IntNumber(m) => m match {
-      case SafeLongLong(x) => Number(n / x)
-      case SafeLongBigInteger(x) => Number(BigDecimal(n) / BigDecimal(x))
-    }
+    case IntNumber(m) =>
+      m match {
+        case SafeLongLong(x)       => Number(n / x)
+        case SafeLongBigInteger(x) => Number(BigDecimal(n) / BigDecimal(x))
+      }
     case FloatNumber(m) => Number(n / m)
-    case t => t r_/ lhs
+    case t              => t.r_/(lhs)
   }
   private[math] def r_/(lhs: Number): Number = lhs match {
-    case IntNumber(m) => m match {
-      case SafeLongLong(x) => Number(x / n)
-      case SafeLongBigInteger(x) => Number(BigDecimal(x) / BigDecimal(n))
-    }
+    case IntNumber(m) =>
+      m match {
+        case SafeLongLong(x)       => Number(x / n)
+        case SafeLongBigInteger(x) => Number(BigDecimal(x) / BigDecimal(n))
+      }
     case FloatNumber(m) => Number(m / n)
-    case t => t / lhs
+    case t              => t / lhs
   }
 
   def tquot(rhs: Number): Number = rhs match {
-    case IntNumber(m) => m match {
-      case SafeLongLong(x) => Number(Math.floor(n / x))
-      case SafeLongBigInteger(x) => Number(BigDecimal(n) quot BigDecimal(x))
-    }
+    case IntNumber(m) =>
+      m match {
+        case SafeLongLong(x)       => Number(Math.floor(n / x))
+        case SafeLongBigInteger(x) => Number(BigDecimal(n).quot(BigDecimal(x)))
+      }
     case FloatNumber(m) => Number(Math.floor(n / m))
-    case t => t r_tquot lhs
+    case t              => t.r_tquot(lhs)
   }
   private[math] def r_tquot(lhs: Number): Number = lhs match {
-    case IntNumber(m) => m match {
-      case SafeLongLong(x) => Number(Math.floor(x / n))
-      case SafeLongBigInteger(x) => Number(BigDecimal(x) quot n)
-    }
+    case IntNumber(m) =>
+      m match {
+        case SafeLongLong(x)       => Number(Math.floor(x / n))
+        case SafeLongBigInteger(x) => Number(BigDecimal(x).quot(n))
+      }
     case FloatNumber(m) => Number(Math.floor(m / n))
-    case t => t tquot lhs
+    case t              => t.tquot(lhs)
   }
   def tmod(rhs: Number): Number = rhs match {
-    case IntNumber(m) => m match {
-      case SafeLongLong(x) => Number(n % x)
-      case SafeLongBigInteger(x) => Number(BigDecimal(n) % BigDecimal(x))
-    }
+    case IntNumber(m) =>
+      m match {
+        case SafeLongLong(x)       => Number(n % x)
+        case SafeLongBigInteger(x) => Number(BigDecimal(n) % BigDecimal(x))
+      }
     case FloatNumber(m) => Number(n % m)
-    case t => t.r_tmod(lhs)
+    case t              => t.r_tmod(lhs)
   }
   private[math] def r_tmod(lhs: Number): Number = lhs match {
-    case IntNumber(m) => m match {
-      case SafeLongLong(x) => Number(x % n)
-      case SafeLongBigInteger(x) => Number(BigDecimal(x) % n)
-    }
+    case IntNumber(m) =>
+      m match {
+        case SafeLongLong(x)       => Number(x % n)
+        case SafeLongBigInteger(x) => Number(BigDecimal(x) % n)
+      }
     case FloatNumber(m) => Number(m % n)
-    case t => t tmod lhs
+    case t              => t.tmod(lhs)
   }
 
   def tquotmod(rhs: Number): (Number, Number) = rhs match {
-    case IntNumber(m) => (Number(n / m.toDouble), Number(n % m.toDouble))
+    case IntNumber(m)   => (Number(n / m.toDouble), Number(n % m.toDouble))
     case FloatNumber(m) => (Number(n / m), Number(n % m))
-    case t => t r_tquotmod lhs
+    case t              => t.r_tquotmod(lhs)
   }
   private[math] def r_tquotmod(lhs: Number): (Number, Number) = lhs match {
-    case IntNumber(m) => (Number(m.toDouble / n), Number(m.toDouble % n))
+    case IntNumber(m)   => (Number(m.toDouble / n), Number(m.toDouble % n))
     case FloatNumber(m) => (Number(m / n), Number(m % n))
-    case t => t tquotmod lhs
+    case t              => t.tquotmod(lhs)
   }
 
   def pow(rhs: Number): Number = rhs match {
-    case FloatNumber(m) => Number(spire.math.pow(n, m))
+    case FloatNumber(m)        => Number(spire.math.pow(n, m))
     case _ if rhs.withinDouble => Number(spire.math.pow(n, rhs.doubleValue));
-    case _ => Number(spire.math.pow(BigDecimal(n), rhs.toBigDecimal))
+    case _                     => Number(spire.math.pow(BigDecimal(n), rhs.toBigDecimal))
   }
 
   def sqrt: Number = Number(Math.sqrt(n))
@@ -435,7 +448,6 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   def ceil: Number = Number(Math.ceil(n))
   def round: Number = Number(Math.round(n))
 }
-
 
 private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
 
@@ -463,19 +475,19 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
   def toBigDecimal: BigDecimal = n
   def toRational: Rational = Rational(n)
 
-  def compare(rhs: Number): Int = n compare rhs.toBigDecimal
+  def compare(rhs: Number): Int = n.compare(rhs.toBigDecimal)
 
   override def equals(that: Any): Boolean =
     that match {
       case that: Number => this === that
-      case that => that == n
+      case that         => that == n
     }
 
   def ===(that: Number): Boolean =
     that match {
       case DecimalNumber(n2) => n == n2
-      case IntNumber(m) => n == m.toBigDecimal
-      case FloatNumber(m) => n == m
+      case IntNumber(m)      => n == m.toBigDecimal
+      case FloatNumber(m)    => n == m
       case RationalNumber(m) => m == n
     }
 
@@ -486,11 +498,11 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
   def -(rhs: Number): Number = Number(n - rhs.toBigDecimal)
   def /(rhs: Number): Number = Number(n / rhs.toBigDecimal)
 
-  def tquot(rhs: Number): Number = Number(n quot rhs.toBigDecimal)
+  def tquot(rhs: Number): Number = Number(n.quot(rhs.toBigDecimal))
   def tmod(rhs: Number): Number = Number(n % rhs.toBigDecimal)
   def r_-(lhs: Number): Number = Number(lhs.toBigDecimal - n)
   def r_/(lhs: Number): Number = Number(lhs.toBigDecimal / n)
-  def r_tquot(lhs: Number): Number = Number(lhs.toBigDecimal quot n)
+  def r_tquot(lhs: Number): Number = Number(lhs.toBigDecimal.quot(n))
   def r_tmod(lhs: Number): Number = Number(lhs.toBigDecimal % n)
   def tquotmod(rhs: Number): (Number, Number) = {
     val t = n /% rhs.toBigDecimal
@@ -542,20 +554,20 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
   def toBigDecimal: BigDecimal = n.toBigDecimal(BigDecimal.defaultMathContext)
   def toRational: Rational = n
 
-  def compare(rhs: Number): Int = n compare rhs.toRational
+  def compare(rhs: Number): Int = n.compare(rhs.toRational)
 
   override def equals(that: Any): Boolean =
     that match {
       case that: Number => this === that
-      case that => n == that
+      case that         => n == that
     }
 
   def ===(that: Number): Boolean =
     that match {
       case RationalNumber(n2) => n == n2
-      case IntNumber(m) => n == m.toBigDecimal
-      case FloatNumber(m) => n == m
-      case DecimalNumber(m) => n == m
+      case IntNumber(m)       => n == m.toBigDecimal
+      case FloatNumber(m)     => n == m
+      case DecimalNumber(m)   => n == m
     }
 
   def unary_- : Number = Number(-n)
@@ -565,22 +577,22 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
   def -(rhs: Number): Number = Number(n - rhs.toRational)
   def /(rhs: Number): Number = Number(n / rhs.toRational)
 
-  def tquot(rhs: Number): Number = Number(n tquot rhs.toRational)
-  def tmod(rhs: Number): Number = Number(n tmod rhs.toRational)
+  def tquot(rhs: Number): Number = Number(n.tquot(rhs.toRational))
+  def tmod(rhs: Number): Number = Number(n.tmod(rhs.toRational))
 
   def r_-(lhs: Number): Number = Number(lhs.toRational - n)
   def r_/(lhs: Number): Number = Number(lhs.toRational / n)
 
-  def r_tquot(lhs: Number): Number = Number(lhs.toRational tquot n)
-  def r_tmod(lhs: Number): Number = Number(lhs.toRational tmod n)
+  def r_tquot(lhs: Number): Number = Number(lhs.toRational.tquot(n))
+  def r_tmod(lhs: Number): Number = Number(lhs.toRational.tmod(n))
 
   def tquotmod(rhs: Number): (Number, Number) = {
-    val t = n tquotmod rhs.toRational
+    val t = n.tquotmod(rhs.toRational)
     (Number(t._1), Number(t._2))
   }
 
   def r_tquotmod(lhs: Number): (Number, Number) = {
-    val t = lhs.toRational tquotmod n
+    val t = lhs.toRational.tquotmod(n)
     (Number(t._1), Number(t._2))
   }
 
@@ -601,12 +613,12 @@ trait NumberInstances {
 }
 
 private[math] trait NumberIsCRing extends CRing[Number] {
-  override def minus(a:Number, b:Number): Number = a - b
-  def negate(a:Number): Number = -a
+  override def minus(a: Number, b: Number): Number = a - b
+  def negate(a: Number): Number = -a
   def one: Number = Number.one
-  def plus(a:Number, b:Number): Number = a + b
-  override def pow(a:Number, b:Int): Number = a.pow(Number(b))
-  override def times(a:Number, b:Number): Number = a * b
+  def plus(a: Number, b: Number): Number = a + b
+  override def pow(a: Number, b: Int): Number = a.pow(Number(b))
+  override def times(a: Number, b: Number): Number = a * b
   def zero: Number = Number.zero
 
   override def fromInt(n: Int): Number = Number(n)
@@ -620,7 +632,7 @@ private[math] trait NumberIsGCDRing extends GCDRing[Number] with NumberIsCRing {
  */
 
 private[math] trait NumberIsField extends Field.WithDefaultGCD[Number] with NumberIsCRing {
-  def div(a:Number, b:Number): Number = a / b
+  def div(a: Number, b: Number): Number = a / b
   override def fromDouble(a: Double): Number = Number(a)
 }
 
@@ -673,24 +685,19 @@ private[math] trait NumberSigned extends Signed[Number] with NumberOrder {
 
 private[math] trait NumberTruncatedDivision extends TruncatedDivisionCRing[Number] with NumberSigned {
   def toBigIntOpt(a: Number): Opt[BigInt] = if (a.isWhole) Opt(a.toBigInt) else Opt.empty[BigInt]
-  def tquot(x: Number, y: Number): Number = x tquot y
-  def tmod(x: Number, y: Number): Number = x tmod y
-  override def tquotmod(x: Number, y: Number): (Number, Number) = x tquotmod y
+  def tquot(x: Number, y: Number): Number = x.tquot(y)
+  def tmod(x: Number, y: Number): Number = x.tmod(y)
+  override def tquotmod(x: Number, y: Number): (Number, Number) = x.tquotmod(y)
 }
 
 private[math] trait NumberIsReal extends IsRational[Number] with NumberTruncatedDivision {
   def toDouble(x: Number): Double = x.toDouble
-  def ceil(a:Number): Number = a.ceil
-  def floor(a:Number): Number = a.floor
-  def round(a:Number): Number = a.round
-  def isWhole(a:Number): Boolean = a.isWhole
-  def toRational(a:Number): Rational = a.toRational
+  def ceil(a: Number): Number = a.ceil
+  def floor(a: Number): Number = a.floor
+  def round(a: Number): Number = a.round
+  def isWhole(a: Number): Boolean = a.isWhole
+  def toRational(a: Number): Rational = a.toRational
 }
 
 @SerialVersionUID(0L)
-class NumberAlgebra
-    extends NumberIsField
-    with NumberIsNRoot
-    with NumberIsTrig
-    with NumberIsReal
-    with Serializable
+class NumberAlgebra extends NumberIsField with NumberIsNRoot with NumberIsTrig with NumberIsReal with Serializable

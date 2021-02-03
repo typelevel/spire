@@ -2,7 +2,9 @@ package spire.laws.shadows
 
 import spire.algebra.{Eq, MultiplicativeCMonoid}
 
-trait ShadowMultiplicativeCMonoid[A, S] extends MultiplicativeCMonoid[Shadow[A, S]] with ShadowMultiplicativeCSemigroup[A, S] {
+trait ShadowMultiplicativeCMonoid[A, S]
+    extends MultiplicativeCMonoid[Shadow[A, S]]
+    with ShadowMultiplicativeCSemigroup[A, S] {
   import shadowing._
   implicit def A: MultiplicativeCMonoid[A]
   implicit def S: MultiplicativeCMonoid[S]

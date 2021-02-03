@@ -1,12 +1,12 @@
 package spire
 package algebra
 
-trait DivisionRing[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Ring[A] with MultiplicativeGroup[A] { self =>
+trait DivisionRing[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Ring[A] with MultiplicativeGroup[A] {
+  self =>
 
   def fromDouble(a: Double): A = Ring.defaultFromDouble[A](a)(self, self)
 
 }
-
 
 object DivisionRing {
 

@@ -10,8 +10,10 @@ import spire.syntax.field._
 object SpecialPolynomials {
 
   // Horner scheme polynomial generator lazy list
-  def hornerScheme[C: Ring: Eq: ClassTag](zero: Polynomial[C], one: Polynomial[C],
-                       fn: (Polynomial[C], Polynomial[C], Int) => Polynomial[C]): LazyList[Polynomial[C]] = {
+  def hornerScheme[C: Ring: Eq: ClassTag](zero: Polynomial[C],
+                                          one: Polynomial[C],
+                                          fn: (Polynomial[C], Polynomial[C], Int) => Polynomial[C]
+  ): LazyList[Polynomial[C]] = {
     def loop(pnm1: Polynomial[C], pn: Polynomial[C], n: Int = 1): LazyList[Polynomial[C]] = {
       pn #:: loop(pn, fn(pn, pnm1, n), n + 1)
     }
@@ -19,7 +21,9 @@ object SpecialPolynomials {
   }
 
   // Legendre recurrence function
-  private[this] def legendreFn[C: Eq: ClassTag](implicit f: Field[C]): (Polynomial[C], Polynomial[C], Int) => Polynomial[C] =
+  private[this] def legendreFn[C: Eq: ClassTag](implicit
+    f: Field[C]
+  ): (Polynomial[C], Polynomial[C], Int) => Polynomial[C] =
     (pn: Polynomial[C], pnm1: Polynomial[C], n: Int) => {
       val a = Polynomial(Map((0, f.fromInt(1) / f.fromInt(n + 1))))
       val b = Polynomial(Map((1, f.fromInt(2 * n + 1))))
@@ -28,10 +32,12 @@ object SpecialPolynomials {
     }
 
   // Laguerre recurrence function
-  private[this] def laguerreFn[C: Eq: ClassTag](implicit f: Field[C]): (Polynomial[C], Polynomial[C], Int) => Polynomial[C] =
+  private[this] def laguerreFn[C: Eq: ClassTag](implicit
+    f: Field[C]
+  ): (Polynomial[C], Polynomial[C], Int) => Polynomial[C] =
     (pn: Polynomial[C], pnm1: Polynomial[C], n: Int) => {
       Polynomial(Map((0, f.one / f.fromInt(n + 1)))) *
-      (Polynomial(Map((0, f.fromInt(2 * n + 1)), (1, -f.one))) * pn - pnm1 * Polynomial(Map((0, f.fromInt(n)))))
+        (Polynomial(Map((0, f.fromInt(2 * n + 1)), (1, -f.one))) * pn - pnm1 * Polynomial(Map((0, f.fromInt(n)))))
     }
 
   // Chebyshev recurrence function

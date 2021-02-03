@@ -2,7 +2,7 @@ package spire
 package algebra
 
 // we need to disable our own === to avoid messing up ScalaTest.
-import spire.math.{Rational, Algebraic}
+import spire.math.{Algebraic, Rational}
 import spire.implicits.{eqOps => _, _}
 
 class SignedSuite extends munit.FunSuite {
@@ -19,7 +19,7 @@ class SignedSuite extends munit.FunSuite {
     val cls = m.runtimeClass.getName
 
     // test runner which constructs a unique name for each test we run.
-    def runTest(name:String)(f: => Unit) = test("%s:%s".format(cls, name))(f)
+    def runTest(name: String)(f: => Unit) = test("%s:%s".format(cls, name))(f)
 
     runTest("-neg.abs === pos")(assertEquals(neg.abs, pos))
     runTest("pos.abs === pos")(assertEquals(pos.abs, pos))

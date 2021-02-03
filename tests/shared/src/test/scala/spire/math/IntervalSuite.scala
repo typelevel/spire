@@ -46,10 +46,9 @@ class IntervalSuite extends munit.FunSuite {
   test("c.contains(0.0) is false") { assertEquals(c.contains(0.0), false) }
   test("c.crosses(0.0) is false") { assertEquals(c.crosses(0.0), false) }
 
-  test("[3, 6] -- [3, 6] = nil") { assertEquals(cc(3D, 6D) -- cc(3D, 6D), Nil) }
-  test("[3, 6] -- empty = [3, 6]") { assertEquals(cc(3D, 6D) -- e, List(cc(3D, 6D))) }
-  test("[3, 6] -- all = nil") { assertEquals(cc(3D, 6D) -- all, Nil) }
-  test("[3, 6] -- [4, 6] = [3, 4)") { assertEquals(cc(3D, 6D) -- cc(4D, 6D), List(co(3D, 4D))) }
-  test("[3, 6] -- [4, 5] = [3, 4), (5, 6]") { assertEquals(cc(3D, 6D) -- cc(4D, 5D), List(co(3D, 4D), oc(5D, 6D))) }
+  test("[3, 6] -- [3, 6] = nil") { assertEquals(cc(3d, 6d) -- cc(3d, 6d), Nil) }
+  test("[3, 6] -- empty = [3, 6]") { assertEquals(cc(3d, 6d) -- e, List(cc(3d, 6d))) }
+  test("[3, 6] -- all = nil") { assertEquals(cc(3d, 6d) -- all, Nil) }
+  test("[3, 6] -- [4, 6] = [3, 4)") { assertEquals(cc(3d, 6d) -- cc(4d, 6d), List(co(3d, 4d))) }
+  test("[3, 6] -- [4, 5] = [3, 4), (5, 6]") { assertEquals(cc(3d, 6d) -- cc(4d, 5d), List(co(3d, 4d), oc(5d, 6d))) }
 }
-

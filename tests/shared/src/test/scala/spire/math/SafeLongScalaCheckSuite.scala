@@ -88,7 +88,6 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-
   test("x /% y") {
     assertEquals((smin /% SafeLong(-1)), (-smin, zero))
     assertEquals((smin /% -1L), (-smin, zero))

@@ -10,17 +10,17 @@ object Shadowing {
     def fromShadow(s: S): Option[A] = g(s)
   }
 
-  def bigInt[A:IsIntegral:NumberTag](fromBigInt: BigInt => A): Shadowing[A, BigInt] =
+  def bigInt[A: IsIntegral: NumberTag](fromBigInt: BigInt => A): Shadowing[A, BigInt] =
     new Shadowing[A, BigInt] {
       def toShadow(a: A): BigInt = IsIntegral[A].toBigInt(a)
       def fromShadow(s: BigInt): Option[A] = {
         NumberTag[A].hasMinValue match {
           case Some(m) if s < IsIntegral[A].toBigInt(m) => return None
-          case _ =>
+          case _                                        =>
         }
         NumberTag[A].hasMaxValue match {
           case Some(m) if s > IsIntegral[A].toBigInt(m) => return None
-          case _ =>
+          case _                                        =>
         }
         Some(fromBigInt(s))
       }

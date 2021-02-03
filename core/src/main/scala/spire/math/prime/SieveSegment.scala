@@ -4,7 +4,7 @@ package math.prime
 import scala.collection.mutable.{ArrayBuffer}
 import System.arraycopy
 
-import spire.math.{SafeLong, min}
+import spire.math.{min, SafeLong}
 import spire.syntax.cfor._
 
 import SieveUtil._
@@ -110,10 +110,11 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
     val arr = fastq.arr
     var i = 0
 
-    val len: Long = if (start + primes.length < cutoff)
-      (cutoff - start).toLong
-    else
-      primes.length
+    val len: Long =
+      if (start + primes.length < cutoff)
+        (cutoff - start).toLong
+      else
+        primes.length
 
     while (i < arr.length) {
       val factor = arr(i)
@@ -172,8 +173,7 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
           while (k < lim) { k += pp; primes -= k }
           m = k.toLong + pp
         }
-        if (p < 7) {
-        } else if (m - primes.length < primes.length) {
+        if (p < 7) {} else if (m - primes.length < primes.length) {
           buf += FastFactor(p, SafeLong(m))
         } else if (cutoff > p) {
           slowq += Factor(SafeLong(p), SafeLong(m))
@@ -187,10 +187,11 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
   def initRest(slowq: FactorHeap): Unit = {
     if (start >= cutoff) return ()
 
-    val len: Long = if (start + primes.length >= cutoff)
-      (cutoff - start).toLong
-    else
-      primes.length
+    val len: Long =
+      if (start + primes.length >= cutoff)
+        (cutoff - start).toLong
+      else
+        primes.length
 
     var i = 1
     while (i < len) {

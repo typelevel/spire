@@ -6,12 +6,13 @@ import spire.math.Interval
 
 object intervalSubsetPartialOrder {
 
-  /** Interval partial order defined as follows:
+  /**
+   * Interval partial order defined as follows:
    *
    * I <= J if I is a subset of J.
    */
   class IntervalSubsetPartialOrder[A: Order] extends PartialOrder[Interval[A]] {
-    override def eqv(x: Interval[A], y: Interval[A]): Boolean = (x == y)
+    override def eqv(x: Interval[A], y: Interval[A]): Boolean = x == y
     override def lteqv(x: Interval[A], y: Interval[A]): Boolean = x.isSubsetOf(y)
     override def lt(x: Interval[A], y: Interval[A]): Boolean = x.isProperSubsetOf(y)
     override def gteqv(x: Interval[A], y: Interval[A]): Boolean = x.isSupersetOf(y)

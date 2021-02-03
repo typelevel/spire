@@ -8,17 +8,17 @@ import spire.util.Opt
 import java.lang.Math
 
 trait FloatIsField extends Field.WithDefaultGCD[Float] {
-  override def minus(a:Float, b:Float): Float = a - b
-  def negate(a:Float): Float = -a
-  def one: Float = 1.0F
-  def plus(a:Float, b:Float): Float = a + b
-  override def pow(a:Float, b:Int): Float = Math.pow(a, b).toFloat
-  override def times(a:Float, b:Float): Float = a * b
-  def zero: Float = 0.0F
+  override def minus(a: Float, b: Float): Float = a - b
+  def negate(a: Float): Float = -a
+  def one: Float = 1.0f
+  def plus(a: Float, b: Float): Float = a + b
+  override def pow(a: Float, b: Int): Float = Math.pow(a, b).toFloat
+  override def times(a: Float, b: Float): Float = a * b
+  def zero: Float = 0.0f
 
   override def fromInt(n: Int): Float = n.toFloat
 
-  def div(a:Float, b:Float): Float = a / b
+  def div(a: Float, b: Float): Float = a / b
 
   override def fromDouble(n: Double): Float = n.toFloat
 }
@@ -104,8 +104,8 @@ trait FloatIsTrig extends Trig[Float] {
 }
 
 trait FloatOrder extends Order[Float] {
-  override def eqv(x:Float, y:Float): Boolean = x == y
-  override def neqv(x:Float, y:Float): Boolean = x != y
+  override def eqv(x: Float, y: Float): Boolean = x == y
+  override def neqv(x: Float, y: Float): Boolean = x != y
   override def gt(x: Float, y: Float): Boolean = x > y
   override def gteqv(x: Float, y: Float): Boolean = x >= y
   override def lt(x: Float, y: Float): Boolean = x < y
@@ -128,27 +128,22 @@ trait FloatTruncatedDivision extends TruncatedDivisionCRing[Float] with FloatSig
 
 trait FloatIsReal extends IsRational[Float] with FloatTruncatedDivision {
   def toDouble(x: Float): Double = x.toDouble
-  def ceil(a:Float): Float = Math.ceil(a).toFloat
-  def floor(a:Float): Float = Math.floor(a).toFloat
-  def round(a:Float): Float = spire.math.round(a)
-  def isWhole(a:Float): Boolean = a % 1.0 == 0.0
-  def toRational(a:Float): Rational = Rational(a)
+  def ceil(a: Float): Float = Math.ceil(a).toFloat
+  def floor(a: Float): Float = Math.floor(a).toFloat
+  def round(a: Float): Float = spire.math.round(a)
+  def isWhole(a: Float): Boolean = a % 1.0 == 0.0
+  def toRational(a: Float): Rational = Rational(a)
 }
 
 @SerialVersionUID(0L)
-class FloatAlgebra
-    extends FloatIsField
-    with FloatIsNRoot
-    with FloatIsTrig
-    with FloatIsReal
-    with Serializable
+class FloatAlgebra extends FloatIsField with FloatIsNRoot with FloatIsTrig with FloatIsReal with Serializable
 
 trait FloatInstances {
   implicit final val FloatAlgebra = new FloatAlgebra
   import Float._
   import spire.math.NumberTag._
-  implicit final val FloatTag = new BuiltinFloatTag(0F, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
+  implicit final val FloatTag = new BuiltinFloatTag(0f, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
     def isInfinite(a: Float): Boolean = java.lang.Float.isInfinite(a)
-    def isNaN(a: Float): Boolean =  java.lang.Float.isNaN(a)
+    def isNaN(a: Float): Boolean = java.lang.Float.isNaN(a)
   }
 }

@@ -22,7 +22,7 @@ object Graphing {
       for (ix <- -10 to 10) {
         val x = genx(ix.toDouble +/- 0.5)
         val y = geny(iy.toDouble +/- 0.5)
-        val c = if (x intersects y) "#" else "."
+        val c = if (x.intersects(y)) "#" else "."
         print(c)
       }
       println("")

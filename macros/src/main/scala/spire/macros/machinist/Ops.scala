@@ -216,7 +216,8 @@ trait Ops {
   def binopWithScalar[A, R](c: Context)(rhs: c.Expr[A]): c.Expr[R] =
     handleBinopWithChild(c)(rhs)("scalar")
 
-  /** Provided to make defining things like [[binopWithScalar]] easier.
+  /**
+   * Provided to make defining things like [[binopWithScalar]] easier.
    *
    * @group macros
    */
@@ -397,8 +398,7 @@ trait Ops {
     import c.universe._
     c.prefix.tree match {
       case Apply(Apply(TypeApply(_, _), List(x)), List(ev)) => (ev, x)
-      case t => c.abort(c.enclosingPosition,
-        "Cannot extract subject of operator (tree = %s)" format t)
+      case t                                                => c.abort(c.enclosingPosition, "Cannot extract subject of operator (tree = %s)".format(t))
     }
   }
 
@@ -420,8 +420,7 @@ trait Ops {
     import c.universe._
     c.prefix.tree match {
       case Apply(TypeApply(_, _), List(lhs)) => lhs
-      case t => c.abort(c.enclosingPosition,
-        "Cannot extract subject of operator (tree = %s)" format t)
+      case t                                 => c.abort(c.enclosingPosition, "Cannot extract subject of operator (tree = %s)".format(t))
     }
   }
 
@@ -463,49 +462,40 @@ trait DefaultOperatorNames {
     // Eq (=== =!=)
     ("$eq$eq$eq", "eqv"),
     ("$eq$bang$eq", "neqv"),
-
     // PartialOrder (> >= < <=)
     ("$greater", "gt"),
     ("$greater$eq", "gteqv"),
     ("$less", "lt"),
     ("$less$eq", "lteqv"),
-
     // Semigroup (|+| |-|)
     ("$bar$plus$bar", "combine"),
     ("$bar$minus$bar", "remove"),
-
     // Ring (unary_- + - * **)
     ("unary_$minus", "negate"),
     ("$plus", "plus"),
     ("$minus", "minus"),
     ("$times", "times"),
     ("$times$times", "pow"),
-
     // EuclideanRing (/~ % /%)
     ("$div$tilde", "quot"),
     ("$percent", "mod"),
     ("$div$percent", "quotmod"),
-
     // Field (/)
     ("$div", "div"),
-
     // BooleanAlgebra (^ | & ~)
     ("$up", "xor"),
     ("$bar", "or"),
     ("$amp", "and"),
     ("unary_$tilde", "complement"),
-
     // BitString (<< >> >>>)
     ("$less$less", "leftShift"),
     ("$greater$greater$greater", "rightShift"),
     ("$greater$greater", "signedRightShift"),
-
     // VectorSpace (*: :* :/ ⋅)
     ("$times$colon", "timesl"),
     ("$colon$times", "timesr"),
     ("$colon$div", "divr"),
     ("$u22C5", "dot"),
-
     // GroupAction (|+|> <|+| +> <+ *> <*)
     ("$bar$plus$bar$greater", "actl"),
     ("$less$bar$plus$bar", "actr"),
@@ -513,7 +503,6 @@ trait DefaultOperatorNames {
     ("$less$plus", "gplusr"),
     ("$times$greater", "gtimesl"),
     ("$less$times", "gtimesr"),
-
     // Torsor (<|-|> <-> </>)
     ("$less$bar$minus$bar$greater", "pdiff"),
     ("$less$minus$greater", "pminus"),

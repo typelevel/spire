@@ -74,8 +74,8 @@ abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, A
  */
 final class BurtleRot2(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_a, _b, _c, _d) {
   protected def advance(): Unit = {
-    val e = a - rotateLeft(b,27)
-    a = b ^ rotateLeft(c,17)
+    val e = a - rotateLeft(b, 27)
+    a = b ^ rotateLeft(c, 17)
     b = c + d
     c = d + e
     d = e + a

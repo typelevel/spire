@@ -1,16 +1,17 @@
-/************************************************************************\
-** Project                                                              **
-**       ______  ______   __    ______    ____                          **
-**      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
-**     / /__   / /_/ /  / /   / /_/ /   / /_                            **
-**    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
-**   ____/ / / /      / /   / / | |   / /__                             **
-**  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
-**                                                                      **
-**      Redistribution and use permitted under the MIT license.         **
-**                                                                      **
-\************************************************************************/
-
+/**
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
 
 package spire
 package random
@@ -37,9 +38,9 @@ import java.util.Arrays
  * @see <a href="http://en.wikipedia.org/wiki/Mersenne_twister">Mersenne Twister @ Wikipedia</a>
  * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
  */
-final class MersenneTwister32 protected[random](mt: Array[Int], mti0: Int = 625) extends IntBasedGenerator { // N + 1 == 625
+final class MersenneTwister32 protected[random] (mt: Array[Int], mti0: Int = 625) extends IntBasedGenerator { // N + 1 == 625
 
-  import MersenneTwister32.{UpperMask, LowerMask, N, M, N_M, N_1, M_N, M_1, BYTES, mag01}
+  import MersenneTwister32.{mag01, BYTES, LowerMask, M, M_1, M_N, N, N_1, N_M, UpperMask}
 
   private var mti = mti0
 
@@ -76,7 +77,7 @@ final class MersenneTwister32 protected[random](mt: Array[Int], mti0: Int = 625)
 
       while (kk < N_1) {
         y = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
-        mt(kk) = mt(kk + (M_N)) ^ (y >>> 1) ^ mag01(y)
+        mt(kk) = mt(kk + M_N) ^ (y >>> 1) ^ mag01(y)
         kk += 1
       }
 
@@ -91,8 +92,8 @@ final class MersenneTwister32 protected[random](mt: Array[Int], mti0: Int = 625)
 
     // Tempering
     y ^= (y >>> 11)
-    y ^= (y <<   7) & 0x9D2C5680
-    y ^= (y <<  15) & 0xEFC60000
+    y ^= (y << 7) & 0x9d2c5680
+    y ^= (y << 15) & 0xefc60000
     y ^= (y >>> 18)
 
     y
@@ -102,7 +103,7 @@ final class MersenneTwister32 protected[random](mt: Array[Int], mti0: Int = 625)
 object MersenneTwister32 extends GeneratorCompanion[MersenneTwister32, (Array[Int], Int)] {
 
   @inline private val UpperMask = 0x80000000 // = Int.MinValue = 0xFFFFFFFF ^ Int.MaxValue
-  @inline private val LowerMask = 0x7FFFFFFF // = Int.MaxValue = 0xFFFFFFFF ^ Int.MinValue
+  @inline private val LowerMask = 0x7fffffff // = Int.MaxValue = 0xFFFFFFFF ^ Int.MinValue
 
   @inline private val N = 624
   @inline private val M = 397
@@ -115,7 +116,7 @@ object MersenneTwister32 extends GeneratorCompanion[MersenneTwister32, (Array[In
 
   @inline private val BYTES = N * 4 + 4
 
-  @inline private def mag01(x: Int) = if((x & 1) == 0) 0 else 0x9908B0DF
+  @inline private def mag01(x: Int) = if ((x & 1) == 0) 0 else 0x9908b0df
 
   def randomSeed(): (Array[Int], Int) = (Utils.seedFromInt(N, Utils.intFromTime()), N + 1)
 
@@ -132,6 +133,6 @@ object MersenneTwister32 extends GeneratorCompanion[MersenneTwister32, (Array[In
   def fromBytes(bytes: Array[Byte]): MersenneTwister32 =
     fromArray(Pack.intsFromBytes(bytes, bytes.length / 4))
 
-  def fromTime(time: Long = System.nanoTime) : MersenneTwister32 =
+  def fromTime(time: Long = System.nanoTime): MersenneTwister32 =
     fromSeed((Utils.seedFromInt(N, Utils.intFromTime(time)), N + 1))
 }

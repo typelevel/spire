@@ -29,12 +29,13 @@ class UIntSuite extends munit.ScalaCheckSuite {
 
   property("n / 0 -> ArithmeticException") {
     forAll { (n: UInt) =>
-      val error = try {
-        n / zero
-        false
-      } catch {
-        case _: ArithmeticException => true
-      }
+      val error =
+        try {
+          n / zero
+          false
+        } catch {
+          case _: ArithmeticException => true
+        }
       error == true
     }
   }
@@ -94,5 +95,3 @@ class UIntSuite extends munit.ScalaCheckSuite {
     forAll { (a: UInt, b: UInt) => a >= b == a.toLong >= b.toLong }
   }
 }
-
-

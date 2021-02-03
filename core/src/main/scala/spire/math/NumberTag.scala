@@ -78,9 +78,12 @@ object NumberTag {
   }
 
   class CustomTag[A](val resolution: Resolution,
-    val hasZero: Option[A], val hasMinValue: Option[A],
-    val hasMaxValue: Option[A], val overflows: Boolean,
-    val isSigned: Boolean) extends NumberTag[A] {
+                     val hasZero: Option[A],
+                     val hasMinValue: Option[A],
+                     val hasMaxValue: Option[A],
+                     val overflows: Boolean,
+                     val isSigned: Boolean
+  ) extends NumberTag[A] {
     def hasNaN: Option[A] = None
     def hasPositiveInfinity: Option[A] = None
     def hasNegativeInfinity: Option[A] = None

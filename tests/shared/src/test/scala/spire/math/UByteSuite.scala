@@ -29,12 +29,13 @@ class UByteSuite extends munit.ScalaCheckSuite {
 
   property("n / 0 -> ArithmeticException") {
     forAll { (n: UByte) =>
-      val error = try {
-        n / zero
-        false
-      } catch {
-        case _: ArithmeticException => true
-      }
+      val error =
+        try {
+          n / zero
+          false
+        } catch {
+          case _: ArithmeticException => true
+        }
       error == true
     }
   }

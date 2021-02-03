@@ -1,16 +1,17 @@
-/************************************************************************\
-** Project                                                              **
-**       ______  ______   __    ______    ____                          **
-**      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
-**     / /__   / /_/ /  / /   / /_/ /   / /_                            **
-**    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
-**   ____/ / / /      / /   / / | |   / /__                             **
-**  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
-**                                                                      **
-**      Redistribution and use permitted under the MIT license.         **
-**                                                                      **
-\************************************************************************/
-
+/**
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
 
 package spire
 package random
@@ -35,11 +36,10 @@ import java.util
  * @see <a href="http://www.iro.umontreal.ca/~panneton/WELLRNG.html">Well PRNG Home Page</a>
  * @see <a href="http://en.wikipedia.org/wiki/Well_Equidistributed_Long-period_Linear">WELL @ Wikipedia</a>
  * @author <a href="mailto:dusan.kysel@gmail.com">Dušan Kysel</a>
- *
  */
-final class Well1024a protected[random](state: Array[Int], i0: Int) extends IntBasedGenerator {
+final class Well1024a protected[random] (state: Array[Int], i0: Int) extends IntBasedGenerator {
 
-  import Well1024a.{R, R_1, BYTES, M1, M2, M3, mat0pos, mat0neg}
+  import Well1024a.{mat0neg, mat0pos, BYTES, M1, M2, M3, R, R_1}
 
   // @inline private final val v0   = new Utils.IntArrayWrapper(i => i, state)
   // @inline private final val vm1  = new Utils.IntArrayWrapper(i => (i + M1)  & R_1, state)
@@ -97,28 +97,28 @@ final class Well1024a protected[random](state: Array[Int], i0: Int) extends IntB
 object Well1024a extends GeneratorCompanion[Well1024a, (Array[Int], Int)] {
 
   // Number of bits in the pool.
-  @inline private final val K: Int = 1024
+  @inline final private val K: Int = 1024
 
   // Length of the pool in ints.
-  @inline private final val R: Int = K / 32
+  @inline final private val R: Int = K / 32
 
   // Length of the pool in ints -1.
-  @inline private final val R_1: Int = R - 1
+  @inline final private val R_1: Int = R - 1
 
   // Length of the pool and index in bytes.
-  @inline private final val BYTES: Int = R * 4 + 4
+  @inline final private val BYTES: Int = R * 4 + 4
 
   // First parameter of the algorithm.
-  @inline private final val M1: Int = 3
+  @inline final private val M1: Int = 3
 
   // Second parameter of the algorithm.
-  @inline private final val M2: Int = 24
+  @inline final private val M2: Int = 24
 
   // Third parameter of the algorithm.
-  @inline private final val M3: Int = 10
+  @inline final private val M3: Int = 10
 
-  @inline private final def mat0pos(t: Int, v: Int): Int = v ^ (v >>> t)
-  @inline private final def mat0neg(t: Int, v: Int): Int = v ^ (v << -t)
+  @inline final private def mat0pos(t: Int, v: Int): Int = v ^ (v >>> t)
+  @inline final private def mat0neg(t: Int, v: Int): Int = v ^ (v << -t)
 
   def randomSeed(): (Array[Int], Int) =
     (Utils.seedFromInt(R, Utils.intFromTime()), 0)

@@ -23,16 +23,15 @@ trait ActionLaws[G, A] extends Laws {
 
   val scalarLaws: GroupLaws[G]
 
-  import scalarLaws.{ Arb => ArG }
+  import scalarLaws.{Arb => ArG}
 
   implicit def EquA: Eq[A]
   implicit def ArbA: Arbitrary[A]
 
-    def leftSemigroupAction(implicit G: LeftAction[A, G], G0: Semigroup[G]) = new ActionProperties(
+  def leftSemigroupAction(implicit G: LeftAction[A, G], G0: Semigroup[G]) = new ActionProperties(
     name = "leftSemigroupAction",
     sl = _.semigroup(G0),
     parents = Seq.empty,
-
     "left compatibility" -> forAllSafe { (g: G, h: G, a: A) =>
       ((g |+| h) |+|> a) === (g |+|> (h |+|> a))
     }
@@ -42,7 +41,6 @@ trait ActionLaws[G, A] extends Laws {
     name = "rightSemigroupAction",
     sl = _.semigroup(G0),
     parents = Seq.empty,
-
     "right compatibility" -> forAllSafe { (a: A, g: G, h: G) =>
       (a <|+| (g |+| h)) === ((a <|+| g) <|+| h)
     }
@@ -58,7 +56,6 @@ trait ActionLaws[G, A] extends Laws {
     name = "leftMonoidAction",
     sl = _.monoid(G0),
     parents = Seq(leftSemigroupAction),
-
     "left identity" -> forAllSafe { (a: A) =>
       (G0.empty |+|> a) === a
     }
@@ -68,7 +65,6 @@ trait ActionLaws[G, A] extends Laws {
     name = "rightMonoidAction",
     sl = _.monoid(G0),
     parents = Seq(rightSemigroupAction),
-
     "right identity" -> forAllSafe { (a: A) =>
       (a <|+| G0.empty) === a
     }
@@ -84,7 +80,6 @@ trait ActionLaws[G, A] extends Laws {
     name = "groupAction",
     sl = _.group(G0),
     parents = Seq(monoidAction),
-
     "left and right action compatibility" -> forAllSafe { (a: A, g: G) =>
       (a <|+| g) === (g.inverse |+|> a)
     }
@@ -95,10 +90,11 @@ trait ActionLaws[G, A] extends Laws {
     parent = None
   )
 
-  def multiplicativeMonoidAction(implicit G: MultiplicativeAction[A, G], G0: MultiplicativeMonoid[G]) = new MultiplicativeProperties(
-    base = monoidAction(G.multiplicative, G0.multiplicative),
-    parent = None
-  )
+  def multiplicativeMonoidAction(implicit G: MultiplicativeAction[A, G], G0: MultiplicativeMonoid[G]) =
+    new MultiplicativeProperties(
+      base = monoidAction(G.multiplicative, G0.multiplicative),
+      parent = None
+    )
 
   class ActionProperties(
     val name: String,
@@ -113,7 +109,8 @@ trait ActionLaws[G, A] extends Laws {
     val base: ActionProperties,
     val parent: Option[AdditiveProperties],
     val props: (String, Prop)*
-  ) extends RuleSet with HasOneParent {
+  ) extends RuleSet
+      with HasOneParent {
     val name = base.name
     val bases = Seq("base" -> base)
   }
@@ -122,7 +119,8 @@ trait ActionLaws[G, A] extends Laws {
     val base: ActionProperties,
     val parent: Option[MultiplicativeProperties],
     val props: (String, Prop)*
-  ) extends RuleSet with HasOneParent {
+  ) extends RuleSet
+      with HasOneParent {
     val name = base.name
     val bases = Seq("base" -> base)
   }
