@@ -6,6 +6,7 @@ import java.math.MathContext
 import spire.algebra.{Field, NRoot, Order, Trig}
 
 trait Gaussian[@sp(Float, Double) A] extends Any {
+
   /**
    * Return an `A` that is normally distributed about `mean` with a standard
    * deviation of `stdDev`.
@@ -14,7 +15,7 @@ trait Gaussian[@sp(Float, Double) A] extends Any {
 }
 
 object Gaussian extends GaussianInstances {
-  @inline final def apply[@sp(Float,Double) A](implicit g: Gaussian[A]): Gaussian[A] = g
+  @inline final def apply[@sp(Float, Double) A](implicit g: Gaussian[A]): Gaussian[A] = g
 
   def apply[@sp A](mean: A, stdDev: A)(implicit g: Gaussian[A]): Dist[A] = g(mean, stdDev)
 }
@@ -48,7 +49,7 @@ final class MarsagliaGaussian[@sp(Float, Double) A: Field: NRoot: Trig: Order: U
   import spire.syntax.trig._
   import spire.syntax.order._
 
-  private final val u = Dist.uniform[A](-Field[A].one, Field[A].one)
+  final private val u = Dist.uniform[A](-Field[A].one, Field[A].one)
 
   def apply(mean: A, stdDev: A): Dist[A] = {
     new DistFromGen[A]({ gen =>

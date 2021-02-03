@@ -47,7 +47,7 @@ object RootIsolator {
    * Analysis of Algorithms in Algebraic Computation" by Vikram Sharma which
    * goes into greater detail.
    */
-  private final def VAS(poly: Polynomial[BigInt]): Vector[Interval[Rational]] = {
+  final private def VAS(poly: Polynomial[BigInt]): Vector[Interval[Rational]] = {
 
     // As we go through the VAS algorithm, we transform the polynomial by
     // shifting it along the x-axis, flipping it about the y-axis, or inverting
@@ -82,81 +82,82 @@ object RootIsolator {
     }
 
     // Isolate all positive roots in polynomial p.
-    def rec(polys: List[TransformedPoly], acc: Vector[Interval[Rational]] = Vector.empty): Vector[Interval[Rational]] = polys match {
-      case TransformedPoly(p, a, b, c, d) :: rest =>
-        if (p.nth(0).signum == 0) {
-          val p0 = p.mapTerms { case Term(coeff, exp) => Term(coeff, exp - 1) }
-          rec(TransformedPoly(p0, a, b, c, d) :: rest, acc :+ Interval.point(Rational(b, d)))
-        } else {
-          p.signVariations match {
-            case 0 => // No roots, the base case.
-              rec(rest, acc)
+    def rec(polys: List[TransformedPoly], acc: Vector[Interval[Rational]] = Vector.empty): Vector[Interval[Rational]] =
+      polys match {
+        case TransformedPoly(p, a, b, c, d) :: rest =>
+          if (p.nth(0).signum == 0) {
+            val p0 = p.mapTerms { case Term(coeff, exp) => Term(coeff, exp - 1) }
+            rec(TransformedPoly(p0, a, b, c, d) :: rest, acc :+ Interval.point(Rational(b, d)))
+          } else {
+            p.signVariations match {
+              case 0 => // No roots, the base case.
+                rec(rest, acc)
 
-            case 1 => // Isolated exactly 1 real, positive root.
-              // We found a single positive real root. We use the Mobius
-              // transform we've been maintaining to map the points 0 and
-              // infinity in the space of the transformed polynomial back to
-              // finite points in the space of the original polynomial. We use
-              // these points as the boundaries for the (open) interval
-              // containing the root.
-              //
-              // However, a problem is that one of the points may *actually* be
-              // infinity and we need finite points. In this case, we can just
-              // use an upper bound on the real roots of the polynomial
-              // instead. This let's us keep our interval bounded/finite.
-              def ub: Rational = {
-                // This is an upper bound for p, but not for the initial poly.
-                val exp = Roots.upperBound(p)
-                val ub0 =
-                  if (exp >= 0) Rational(BigInt(1) << exp)
-                  else Rational(1, BigInt(1) << -exp)
-                // We map the upper bound for p back to a bound for the initial
-                // polynomial using the Mobius transformation.
-                (Rational(a) * ub0 + Rational(b)) / (Rational(c) * ub0 + Rational(d))
-              }
-              val i0 = if (c == 0) ub else Rational(a, c) // The point at "inf"
-              val i1 = if (d == 0) ub else Rational(b, d) // The point at "0"
-              if (i0 < i1) rec(rest, acc :+ Interval.open(i0, i1))
-              else rec(rest, acc :+ Interval.open(i1, i0))
-
-            case _ => // Exists 0 or 2 or more roots.
-              // In this case we want to split the polynomial into 2 and
-              // recursively try both. We do this by splitting the polynomial
-              // at (0, 1) and (1, infinity) and recursing (split1). However,
-              // if the first root is at , say, x = 1234, then we'd like to
-              // avoid checking O(1234) root-less polynomials before we finally
-              // find the first root. Luckily, we can easily compute a rough
-              // lower bound on the positive real roots of the polynomial. If
-              // this is > 1, then we shift the polynomial to the left so the
-              // lower bound is now 0. Essentially, we take a shortcut and skip
-              // testing these fruitless polynomials.
-              //
-              // Additionally, since split1 is actually quite expensive, we
-              // also take some time to make sure that our lower-bound is
-              // pretty tight (see the recursive findFloor below). Turns out
-              // this gives us an ~2x perf improvement.
-
-              def findFloor(q: Polynomial[BigInt], floor: Option[BigInt]): List[TransformedPoly] = {
-                val lb = Roots.lowerBound(q)
-                if (lb < 0) {
-                  floor.fold(split1(q, a, b, c, d)) { h =>
-                    split1(q, a, b + a * h, c, d + c * h)
-                  }
-                } else {
-                  val h = BigInt(1) << lb
-                  val q0 = q.shift(h)
-                  if (q0.signVariations == 0) Nil
-                  else findFloor(q0, Some(floor.fold(h)(_ + h)))
+              case 1 => // Isolated exactly 1 real, positive root.
+                // We found a single positive real root. We use the Mobius
+                // transform we've been maintaining to map the points 0 and
+                // infinity in the space of the transformed polynomial back to
+                // finite points in the space of the original polynomial. We use
+                // these points as the boundaries for the (open) interval
+                // containing the root.
+                //
+                // However, a problem is that one of the points may *actually* be
+                // infinity and we need finite points. In this case, we can just
+                // use an upper bound on the real roots of the polynomial
+                // instead. This let's us keep our interval bounded/finite.
+                def ub: Rational = {
+                  // This is an upper bound for p, but not for the initial poly.
+                  val exp = Roots.upperBound(p)
+                  val ub0 =
+                    if (exp >= 0) Rational(BigInt(1) << exp)
+                    else Rational(1, BigInt(1) << -exp)
+                  // We map the upper bound for p back to a bound for the initial
+                  // polynomial using the Mobius transformation.
+                  (Rational(a) * ub0 + Rational(b)) / (Rational(c) * ub0 + Rational(d))
                 }
-              }
+                val i0 = if (c == 0) ub else Rational(a, c) // The point at "inf"
+                val i1 = if (d == 0) ub else Rational(b, d) // The point at "0"
+                if (i0 < i1) rec(rest, acc :+ Interval.open(i0, i1))
+                else rec(rest, acc :+ Interval.open(i1, i0))
 
-              rec(findFloor(p, None) reverse_::: rest, acc)
+              case _ => // Exists 0 or 2 or more roots.
+                // In this case we want to split the polynomial into 2 and
+                // recursively try both. We do this by splitting the polynomial
+                // at (0, 1) and (1, infinity) and recursing (split1). However,
+                // if the first root is at , say, x = 1234, then we'd like to
+                // avoid checking O(1234) root-less polynomials before we finally
+                // find the first root. Luckily, we can easily compute a rough
+                // lower bound on the positive real roots of the polynomial. If
+                // this is > 1, then we shift the polynomial to the left so the
+                // lower bound is now 0. Essentially, we take a shortcut and skip
+                // testing these fruitless polynomials.
+                //
+                // Additionally, since split1 is actually quite expensive, we
+                // also take some time to make sure that our lower-bound is
+                // pretty tight (see the recursive findFloor below). Turns out
+                // this gives us an ~2x perf improvement.
+
+                def findFloor(q: Polynomial[BigInt], floor: Option[BigInt]): List[TransformedPoly] = {
+                  val lb = Roots.lowerBound(q)
+                  if (lb < 0) {
+                    floor.fold(split1(q, a, b, c, d)) { h =>
+                      split1(q, a, b + a * h, c, d + c * h)
+                    }
+                  } else {
+                    val h = BigInt(1) << lb
+                    val q0 = q.shift(h)
+                    if (q0.signVariations == 0) Nil
+                    else findFloor(q0, Some(floor.fold(h)(_ + h)))
+                  }
+                }
+
+                rec(findFloor(p, None).reverse_:::(rest), acc)
+            }
           }
-        }
 
-      case Nil =>
-        acc
-    }
+        case Nil =>
+          acc
+      }
 
     if (poly.isConstant) {
       // A degenerate case we cannot handle.

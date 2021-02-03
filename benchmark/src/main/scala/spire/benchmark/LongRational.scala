@@ -40,7 +40,6 @@ final class LongRational private (val n: Long, val d: Long) {
     }
   }
 
-
   def -(r: LongRational): LongRational = {
     val dgcd: Long = gcd(d, r.d)
     if (dgcd == 1) {
@@ -57,13 +56,11 @@ final class LongRational private (val n: Long, val d: Long) {
     }
   }
 
-
   def *(r: LongRational): LongRational = {
     val a = gcd(n, r.d)
     val b = gcd(d, r.n)
     new LongRational((n / a) * (r.n / b), (d / b) * (r.d / a))
   }
-
 
   def /(r: LongRational): LongRational = {
     val a = gcd(n, r.n)
@@ -80,9 +77,9 @@ final class LongRational private (val n: Long, val d: Long) {
   def pow(exp: Int): LongRational = if (exp == 0) {
     LongRational.One
   } else if (exp < 0) {
-    new LongRational(d pow java.lang.Math.abs(exp), n pow java.lang.Math.abs(exp))
+    new LongRational(d.pow(java.lang.Math.abs(exp)), n.pow(java.lang.Math.abs(exp)))
   } else {
-    new LongRational(n pow exp, d pow exp)
+    new LongRational(n.pow(exp), d.pow(exp))
   }
 
   def compare(r: LongRational): Int = {

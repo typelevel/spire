@@ -6,14 +6,14 @@ import scala.util.Random
 class RationalSuite extends munit.FunSuite {
 
   test("rational canonical construction") {
-    val r = Rational(5,6)
+    val r = Rational(5, 6)
     assert(r.numerator == BigInt(5))
     assert(r.denominator == BigInt(6))
     intercept[IllegalArgumentException] {
-      Rational(1,0)
+      Rational(1, 0)
     }
     intercept[IllegalArgumentException] {
-      Rational(BigInt(1),0)
+      Rational(BigInt(1), 0)
     }
   }
   test("rational degenerate construction") {
@@ -29,11 +29,12 @@ class RationalSuite extends munit.FunSuite {
 
   test("RationalIsFractional implicit exists") {
     import spire.implicits._
-    def doStuff[NT:Fractional](a: NT, b: NT):NT = a / b
+    def doStuff[NT: Fractional](a: NT, b: NT): NT = a / b
 
     assertEquals(Rational(1, 2), {
-      doStuff(Rational(1), Rational(2))
-    })
+                   doStuff(Rational(1), Rational(2))
+                 }
+    )
   }
 
   test("equality of equivalent canonical and degenerate rationals") {
@@ -155,38 +156,38 @@ class RationalSuite extends munit.FunSuite {
 
   test("pow") {
     val a = Rational(1, 2)
-    assertEquals(Rational(1, BigInt("4294967296")), a pow 32)
-    assertEquals(Rational(2, 1), a pow -1)
+    assertEquals(Rational(1, BigInt("4294967296")), a.pow(32))
+    assertEquals(Rational(2, 1), a.pow(-1))
     val b = Rational(-3, 1)
-    assertEquals(Rational.one, b pow 0)
-    assertEquals(Rational(9, 1), b pow 2)
-    assertEquals(Rational(-27, 1), b pow 3)
+    assertEquals(Rational.one, b.pow(0))
+    assertEquals(Rational(9, 1), b.pow(2))
+    assertEquals(Rational(-27, 1), b.pow(3))
     val l = Rational(Long.MaxValue) * 2
-    assertEquals(Rational.one, l pow 0)
-    assertEquals(l.reciprocal, l pow -1)
+    assertEquals(Rational.one, l.pow(0))
+    assertEquals(l.reciprocal, l.pow(-1))
   }
 
-    test("longValue") { assertEquals(Rational("5000000000").toLong, 5000000000L) }
-    test("intValue") {
-        assertEquals(Rational(3).toInt, 3)
-        assertEquals(Rational(-5, 2).toInt, -2)
-    }
-    test("shortValue") {
-        assertEquals(Rational(65535).toShort, -1.toShort)
-        assertEquals(Rational(65536).toShort, 0.toShort)
-        assertEquals(Rational(-5).toShort, -5.toShort)
-    }
-    test("byteValue") {
-        assertEquals(Rational(-1).toByte, -1.toByte)
-        assertEquals(Rational(256).toByte, 0.toByte)
-    }
-    test("toDouble and tFloat") {
-        assertEquals(Rational(1, 2).toFloat, 0.5f)
-        val a = Rational("10000000000000002/10000000000000000")
-        assertEquals(a.toDouble, 1.0000000000000002)
-        assertEquals(a.toFloat, 1.0f)
+  test("longValue") { assertEquals(Rational("5000000000").toLong, 5000000000L) }
+  test("intValue") {
+    assertEquals(Rational(3).toInt, 3)
+    assertEquals(Rational(-5, 2).toInt, -2)
+  }
+  test("shortValue") {
+    assertEquals(Rational(65535).toShort, -1.toShort)
+    assertEquals(Rational(65536).toShort, 0.toShort)
+    assertEquals(Rational(-5).toShort, -5.toShort)
+  }
+  test("byteValue") {
+    assertEquals(Rational(-1).toByte, -1.toByte)
+    assertEquals(Rational(256).toByte, 0.toByte)
+  }
+  test("toDouble and tFloat") {
+    assertEquals(Rational(1, 2).toFloat, 0.5f)
+    val a = Rational("10000000000000002/10000000000000000")
+    assertEquals(a.toDouble, 1.0000000000000002)
+    assertEquals(a.toFloat, 1.0f)
     assertEquals(Rational(2, 3).toDouble, 2 / 3.0)
-    }
+  }
 
   test("toString") {
     assertEquals(Rational(1, 2).toString, "1/2")
@@ -229,10 +230,13 @@ class RationalSuite extends munit.FunSuite {
    * that was closest to `a`.
    */
   def bruteForceLimitDen(a: Rational, limit: Int): Rational =
-    (1 to limit) map (BigInt(_)) flatMap { d =>
-      val ln = (a * d).toBigInt
-      List(Rational(ln - 1, d), Rational(ln, d), Rational(ln + 1, d))
-    } minBy (b => (b - a).abs)
+    (1 to limit)
+      .map(BigInt(_))
+      .flatMap { d =>
+        val ln = (a * d).toBigInt
+        List(Rational(ln - 1, d), Rational(ln, d), Rational(ln + 1, d))
+      }
+      .minBy(b => (b - a).abs)
 
   // FIXME: for some reason the commented files seem to throw SBT/scalac into
   // some kind of continuous compilcation loop... YMMV :/
@@ -242,7 +246,7 @@ class RationalSuite extends munit.FunSuite {
 
     val rng = new Random(9281)
     val rationals = List.fill(100)(Rational(rng.nextInt(), rng.nextInt().abs + 1))
-    rationals foreach { a =>
+    rationals.foreach { a =>
       //assertEquals(a.limitDenominatorTo(255), bruteForceLimitDen(a, 255), {
       //    "%s != %s (original: %s)" format (
       //      a.limitDenominatorTo(255),
@@ -261,10 +265,11 @@ class RationalSuite extends munit.FunSuite {
   test("limitToInt makes rationals fit in Ints") {
     val rng = new Random(2919234)
     val rationals = List.fill(100)(Rational(BigInt(128, rng), BigInt(128, rng).abs + 1))
-    rationals foreach { a =>
+    rationals.foreach { a =>
       val b = a.limitToInt
       assert(b.numerator.isValidInt && b.denominator.isValidInt,
-        "%s (from %s) doesn't fit in Ints".format(b.toString, a.toString))
+             "%s (from %s) doesn't fit in Ints".format(b.toString, a.toString)
+      )
     }
   }
 
@@ -296,7 +301,7 @@ class RationalSuite extends munit.FunSuite {
   }*/
 
   test("Rational(0D) is Zero") {
-    assertEquals(Rational(0D), Rational.zero)
+    assertEquals(Rational(0d), Rational.zero)
   }
 
   test("compareToOne") {
@@ -311,8 +316,8 @@ class RationalSuite extends munit.FunSuite {
     assertEquals((Rational.one + d).limitToLong, Rational.one)
   }
   test("numeratorAndDenominatorAsLong") {
-    assertEquals(Rational(2,3).numeratorAsLong, 2L)
-    assertEquals(Rational(2,3).denominatorAsLong, 3L)
+    assertEquals(Rational(2, 3).numeratorAsLong, 2L)
+    assertEquals(Rational(2, 3).denominatorAsLong, 3L)
 
     assertEquals((Rational(1, Long.MaxValue) / 2).numeratorAsLong, 1L)
     assertEquals((Rational(Long.MaxValue) * 2).denominatorAsLong, 1L)
@@ -321,12 +326,20 @@ class RationalSuite extends munit.FunSuite {
     val a = Rational(31, 4)
     val b = Rational(7, 9)
     assertEquals(a, {
-      val (q, m) = Rational.RationalAlgebra.equotmod(a, b)
-      q * b + m
-    })
+                   val (q, m) = Rational.RationalAlgebra.equotmod(a, b)
+                   q * b + m
+                 }
+    )
   }
   test("isValidFlags") {
-    def check(x:Rational, whole:Boolean, char:Boolean, byte:Boolean, short:Boolean, int:Boolean, long:Boolean): Unit = {
+    def check(x: Rational,
+              whole: Boolean,
+              char: Boolean,
+              byte: Boolean,
+              short: Boolean,
+              int: Boolean,
+              long: Boolean
+    ): Unit = {
       assertEquals(x.isWhole, whole)
       assertEquals(x.isValidChar, char)
       assertEquals(x.isValidByte, byte)
@@ -336,7 +349,7 @@ class RationalSuite extends munit.FunSuite {
     }
 
     check(Rational.one, true, true, true, true, true, true)
-    check(Rational(1,2), false, false, false, false, false, false)
+    check(Rational(1, 2), false, false, false, false, false, false)
 
     check(Rational(Byte.MaxValue), true, true, true, true, true, true)
     check(Rational(Byte.MaxValue) + 1, true, true, false, true, true, true)
@@ -364,11 +377,11 @@ class RationalSuite extends munit.FunSuite {
     check(Rational(Long.MinValue) - 1, true, false, false, false, false, false)
   }
   test("applyNumber") {
-    def rationalFromNumber(x:Number) = Rational(x)
+    def rationalFromNumber(x: Number) = Rational(x)
     assert(rationalFromNumber(1) == 1)
     assert(rationalFromNumber(1.0) == 1)
     assert(rationalFromNumber(Rational.one) == 1)
-    assert(rationalFromNumber(1:BigDecimal) == 1)
+    assert(rationalFromNumber(1: BigDecimal) == 1)
   }
 
   test("Commutativity of gcd") {

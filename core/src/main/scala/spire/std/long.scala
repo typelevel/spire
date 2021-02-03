@@ -8,22 +8,22 @@ import spire.util.Opt
 import java.lang.Math
 
 trait LongIsEuclideanRing extends EuclideanRing[Long] {
-  override def minus(a:Long, b:Long): Long = a - b
-  def negate(a:Long): Long = -a
+  override def minus(a: Long, b: Long): Long = a - b
+  def negate(a: Long): Long = -a
   def one: Long = 1L
-  def plus(a:Long, b:Long): Long = a + b
-  override def pow(a: Long, b:Int): Long = spire.math.pow(a, b)
-  override def times(a:Long, b:Long): Long = a * b
+  def plus(a: Long, b: Long): Long = a + b
+  override def pow(a: Long, b: Int): Long = spire.math.pow(a, b)
+  override def times(a: Long, b: Long): Long = a * b
   def zero: Long = 0L
 
   override def fromInt(n: Int): Long = n
 
-  def euclideanFunction(a:Long): BigInt = BigInt(a).abs
+  def euclideanFunction(a: Long): BigInt = BigInt(a).abs
   override def equotmod(a: Long, b: Long): (Long, Long) = spire.math.equotmod(a, b)
   def equot(a: Long, b: Long): Long = spire.math.equot(a, b)
   def emod(a: Long, b: Long): Long = spire.math.emod(a, b)
-  def gcd(a:Long, b:Long)(implicit ev: Eq[Long]): Long = spire.math.gcd(a, b)
-  def lcm(a:Long, b:Long)(implicit ev: Eq[Long]): Long = spire.math.lcm(a, b)
+  def gcd(a: Long, b: Long)(implicit ev: Eq[Long]): Long = spire.math.gcd(a, b)
+  def lcm(a: Long, b: Long)(implicit ev: Eq[Long]): Long = spire.math.lcm(a, b)
 }
 
 // Not included in Instances trait!
@@ -46,13 +46,13 @@ trait LongIsNRoot extends NRoot[Long] {
     else if (n == 1) x
     else findnroot(0, 1L << ((65 - n) / n))
   }
-  def log(a:Long): Long = Math.log(a.toDouble).toLong
-  def fpow(a:Long, b:Long): Long = spire.math.pow(a, b) // xyz
+  def log(a: Long): Long = Math.log(a.toDouble).toLong
+  def fpow(a: Long, b: Long): Long = spire.math.pow(a, b) // xyz
 }
 
 trait LongOrder extends Order[Long] {
-  override def eqv(x:Long, y:Long): Boolean = x == y
-  override def neqv(x:Long, y:Long): Boolean = x != y
+  override def eqv(x: Long, y: Long): Boolean = x == y
+  override def neqv(x: Long, y: Long): Boolean = x != y
   override def gt(x: Long, y: Long): Boolean = x > y
   override def gteqv(x: Long, y: Long): Boolean = x >= y
   override def lt(x: Long, y: Long): Boolean = x < y

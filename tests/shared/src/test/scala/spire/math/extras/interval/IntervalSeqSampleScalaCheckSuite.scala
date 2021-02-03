@@ -11,7 +11,7 @@ class IntervalSeqSampleScalaCheckSuite extends munit.ScalaCheckSuite {
   import IntervalSeqArbitrary._
 
   // a test that works by sampling the result at all relevant places and checks consistency with the boolean operation
-  def unarySampleTest(a:IntervalSeq[Int], r:IntervalSeq[Int], op:Boolean => Boolean) = {
+  def unarySampleTest(a: IntervalSeq[Int], r: IntervalSeq[Int], op: Boolean => Boolean) = {
     val support = a.edges.toArray.sorted.distinct
     support.forall { value =>
       val sameBefore = r.below(value) === op(a.below(value))
@@ -22,7 +22,11 @@ class IntervalSeqSampleScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   // a test that works by sampling the result at all relevant places and checks consistency with the boolean operation
-  def binarySampleTest(a:IntervalSeq[Int], b:IntervalSeq[Int], r:IntervalSeq[Int], op:(Boolean, Boolean) => Boolean) = {
+  def binarySampleTest(a: IntervalSeq[Int],
+                       b: IntervalSeq[Int],
+                       r: IntervalSeq[Int],
+                       op: (Boolean, Boolean) => Boolean
+  ) = {
     val support = (a.edges ++ b.edges).toArray.sorted.distinct
     support.forall { value =>
       val sameBefore = r.below(value) === op(a.below(value), b.below(value))
@@ -33,7 +37,12 @@ class IntervalSeqSampleScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   // a test that works by sampling the result at all relevant places and checks consistency with the boolean operation
-  def trinarySampleTest(a:IntervalSeq[Int], b:IntervalSeq[Int], c:IntervalSeq[Int], r:IntervalTrie[Long], op:(Boolean, Boolean, Boolean) => Boolean) = {
+  def trinarySampleTest(a: IntervalSeq[Int],
+                        b: IntervalSeq[Int],
+                        c: IntervalSeq[Int],
+                        r: IntervalTrie[Long],
+                        op: (Boolean, Boolean, Boolean) => Boolean
+  ) = {
     val support = (a.edges ++ b.edges ++ c.edges).toArray.sorted.distinct
     support.forall { value =>
       val sameBefore = r.below(value) === op(a.below(value), b.below(value), c.below(value))
@@ -71,7 +80,7 @@ class IntervalSeqSampleScalaCheckSuite extends munit.ScalaCheckSuite {
     forAll { a0: IntervalSeq[Int] =>
       // first convert the interval of long to an interval of rationals, since that is what parse returns
       val rationalIntervals = a0.intervals.map(_.mapBounds(Rational.apply))
-      val a : IntervalSeq[Rational] = rationalIntervals.foldLeft(IntervalSeq.empty[Rational])(_ | IntervalSeq(_))
+      val a: IntervalSeq[Rational] = rationalIntervals.foldLeft(IntervalSeq.empty[Rational])(_ | IntervalSeq(_))
       // then do the roundtrip test like with IntervalSet
       val aText = a.toString
       val b = IntervalSeq(aText)
@@ -100,7 +109,7 @@ class IntervalSeqSampleScalaCheckSuite extends munit.ScalaCheckSuite {
    */
   property("intersects/intersection") {
     forAll { (a: IntervalSeq[Int], b: IntervalSeq[Int]) =>
-      val r1 = a intersects b
+      val r1 = a.intersects(b)
       val r2 = !(a & b).isEmpty
       r1 == r2
     }
@@ -111,7 +120,7 @@ class IntervalSeqSampleScalaCheckSuite extends munit.ScalaCheckSuite {
    */
   property("isSupersetOf/intersection") {
     forAll { (a: IntervalSeq[Int], b: IntervalSeq[Int]) =>
-      val r1 = a isSupersetOf b
+      val r1 = a.isSupersetOf(b)
       val r2 = (a & b) == b
       r1 == r2
     }
@@ -120,7 +129,7 @@ class IntervalSeqSampleScalaCheckSuite extends munit.ScalaCheckSuite {
   property("isSupersetOf") {
     forAll { (a: IntervalSeq[Int], x: Int) =>
       val b = a & IntervalSeq.atOrAbove(x)
-      a isSupersetOf b
+      a.isSupersetOf(b)
     }
   }
 
@@ -128,13 +137,13 @@ class IntervalSeqSampleScalaCheckSuite extends munit.ScalaCheckSuite {
     forAll { (s: IntervalSeq[Int], x: Int) =>
       val a = s & IntervalSeq.below(x)
       val b = s & IntervalSeq.atOrAbove(x)
-     !(a intersects b)
+      !a.intersects(b)
     }
   }
 
   property("equals/hashCode") {
     forAll { (a: IntervalSeq[Int], b: IntervalSeq[Int]) =>
-      if(a==b) a.hashCode == b.hashCode else true
+      if (a == b) a.hashCode == b.hashCode else true
     }
   }
 

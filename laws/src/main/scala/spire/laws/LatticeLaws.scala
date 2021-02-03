@@ -13,7 +13,7 @@ import org.scalacheck.Prop._
 import InvalidTestException._
 
 object LatticeLaws {
-  def apply[A : Eq : Arbitrary] = new LatticeLaws[A] {
+  def apply[A: Eq: Arbitrary] = new LatticeLaws[A] {
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
   }
@@ -24,58 +24,41 @@ trait LatticeLaws[A] extends Laws {
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
 
-
   def joinSemilattice(implicit A: JoinSemilattice[A]) = new LatticeProperties(
     name = "joinSemilattice",
     parents = Nil,
-    "join.associative" -> forAllSafe((x: A, y: A, z: A) =>
-      ((x join y) join z) === (x join (y join z))
-    ),
-    "join.commutative" -> forAllSafe((x: A, y: A) =>
-      (x join y) === (y join x)
-    ),
-    "join.idempotent" -> forAllSafe((x: A) =>
-      (x join x) === x
-    )
+    "join.associative" -> forAllSafe((x: A, y: A, z: A) => ((x.join(y)).join(z)) === (x.join(y.join(z)))),
+    "join.commutative" -> forAllSafe((x: A, y: A) => (x.join(y)) === (y.join(x))),
+    "join.idempotent" -> forAllSafe((x: A) => (x.join(x)) === x)
   )
 
   def meetSemilattice(implicit A: MeetSemilattice[A]) = new LatticeProperties(
     name = "meetSemilattice",
     parents = Nil,
-    "meet.associative" -> forAllSafe((x: A, y: A, z: A) =>
-      ((x meet y) meet z) === (x meet (y meet z))
-    ),
-    "meet.commutative" -> forAllSafe((x: A, y: A) =>
-      (x meet y) === (y meet x)
-    ),
-    "meet.idempotent" -> forAllSafe((x: A) =>
-      (x meet x) === x
-    )
+    "meet.associative" -> forAllSafe((x: A, y: A, z: A) => ((x.meet(y)).meet(z)) === (x.meet(y.meet(z)))),
+    "meet.commutative" -> forAllSafe((x: A, y: A) => (x.meet(y)) === (y.meet(x))),
+    "meet.idempotent" -> forAllSafe((x: A) => (x.meet(x)) === x)
   )
 
   def lattice(implicit A: Lattice[A]) = new LatticeProperties(
     name = "lattice",
     parents = Seq(joinSemilattice, meetSemilattice),
     "absorption" -> forAllSafe((x: A, y: A) =>
-      ((x join (x meet y)) === x) &&
-        ((x meet (x join y)) === x)
+      ((x.join(x.meet(y))) === x) &&
+        ((x.meet(x.join(y))) === x)
     )
   )
 
   def boundedJoinSemilattice(implicit A: BoundedJoinSemilattice[A]) = new LatticeProperties(
     name = "boundedJoinSemilattice",
     parents = Seq(joinSemilattice),
-    "join.identity" -> forAllSafe((x: A) =>
-      (x join A.zero) === x && (A.zero join x) === x
-    )
+    "join.identity" -> forAllSafe((x: A) => (x.join(A.zero)) === x && (A.zero.join(x)) === x)
   )
 
   def boundedMeetSemilattice(implicit A: BoundedMeetSemilattice[A]) = new LatticeProperties(
     name = "boundedMeetSemilattice",
     parents = Seq(meetSemilattice),
-      "meet.identity" -> forAllSafe((x: A) =>
-        (x meet A.one) === x && (A.one meet x) === x
-      )
+    "meet.identity" -> forAllSafe((x: A) => (x.meet(A.one)) === x && (A.one.meet(x)) === x)
   )
 
   def boundedBelowLattice(implicit A: Lattice[A] with BoundedJoinSemilattice[A]) = new LatticeProperties(

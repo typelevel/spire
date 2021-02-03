@@ -1,7 +1,7 @@
 package spire
 package macros
 
-import spire.macros.compat.{termName, freshTermName, resetLocalAttrs, Context, setOrig}
+import spire.macros.compat.{freshTermName, resetLocalAttrs, setOrig, termName, Context}
 
 object Ops extends spire.macros.machinist.Ops {
 
@@ -14,28 +14,23 @@ object Ops extends spire.macros.machinist.Ops {
       ("$bar$minus$bar$qmark$qmark", "opInverseIsDefined"),
       ("$bar$plus$bar$qmark", "partialOp"),
       ("$bar$minus$bar$qmark", "partialOpInverse"),
-
       // partial actions ?|+|> ??|+|> <|+|? <|+|??
       ("$qmark$bar$plus$bar$greater", "partialActl"),
       ("$qmark$qmark$bar$plus$bar$greater", "actlIsDefined"),
       ("$less$bar$plus$bar$qmark", "partialActr"),
       ("$less$bar$plus$bar$qmark$qmark", "actrIsDefined"),
-
       // square root
       (uesc('√'), "sqrt"),
-
       // equality, comparisons
       (uesc('≡'), "eqv"),
       (uesc('≠'), "neqv"),
       (uesc('≤'), "lteqv"),
       (uesc('≥'), "gteqv"),
-
       // lattices/heyting
       (uesc('∧'), "meet"),
       (uesc('∨'), "join"),
       (uesc('⊃'), "imp"),
       (uesc('¬'), "complement"),
-
       // bool
       (uesc('⊻'), "xor"),
       (uesc('⊼'), "nand"),
@@ -98,8 +93,8 @@ case class SyntaxUtil[C <: Context with Singleton](val c: C) {
     es.forall {
       _.tree match {
         case t @ Ident(_: TermName) if t.symbol.asTerm.isStable => true
-        case Function(_, _) => true
-        case _ => false
+        case Function(_, _)                                     => true
+        case _                                                  => false
       }
     }
 }
@@ -120,8 +115,7 @@ class InlineUtil[C <: Context with Singleton](val c: C) {
         case tree: Ident if tree.symbol == symbol =>
           if (tree.name == name) {
             value
-          }
-          else {
+          } else {
             super.transform(tree)
           }
 
@@ -159,10 +153,9 @@ class InlineUtil[C <: Context with Singleton](val c: C) {
 
 object Syntax {
 
-  def cforMacro[A](c: Context)(init: c.Expr[A])
-     (test: c.Expr[A => Boolean], next: c.Expr[A => A])
-     (body: c.Expr[A => Unit]): c.Expr[Unit] = {
-
+  def cforMacro[A](
+    c: Context
+  )(init: c.Expr[A])(test: c.Expr[A => Boolean], next: c.Expr[A => A])(body: c.Expr[A => Unit]): c.Expr[Unit] = {
 
     import c.universe._
     val util = SyntaxUtil[c.type](c)
@@ -223,10 +216,11 @@ object Syntax {
     val limit = names(3)
 
     def isLiteral(t: Tree): Option[Int] = t match {
-      case Literal(Constant(a)) => a match {
-        case n: Int => Some(n)
-        case _ => None
-      }
+      case Literal(Constant(a)) =>
+        a match {
+          case n: Int => Some(n)
+          case _      => None
+        }
       case _ => None
     }
 
@@ -306,8 +300,9 @@ object Syntax {
     new InlineUtil[c.type](c).inlineAndReset[Unit](tree)
   }
 
-  def cforRange2Macro(c: Context)(r1: c.Expr[Range], r2: c.Expr[Range])
-    (body: c.Expr[(Int, Int) => Unit]): c.Expr[Unit] = {
+  def cforRange2Macro(
+    c: Context
+  )(r1: c.Expr[Range], r2: c.Expr[Range])(body: c.Expr[(Int, Int) => Unit]): c.Expr[Unit] = {
 
     import c.universe._
     c.Expr[Unit](q"cforRange($r1)(i => cforRange($r2)(j => $body(i, j)))")

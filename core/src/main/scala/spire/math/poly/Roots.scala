@@ -2,7 +2,7 @@ package spire
 package math
 package poly
 
-import java.math.{ RoundingMode, MathContext }
+import java.math.{MathContext, RoundingMode}
 
 import spire.std.bigInt._
 import spire.std.bigDecimal._
@@ -13,10 +13,14 @@ import spire.std.bigDecimal._
  */
 trait Roots[A] extends Iterable[A] { self =>
 
-  /** The polynomial the roots belong to. */
+  /**
+   * The polynomial the roots belong to.
+   */
   def poly: Polynomial[A]
 
-  /** Returns the number of real roots of `poly`. */
+  /**
+   * Returns the number of real roots of `poly`.
+   */
   def count: Int
 
   /**
@@ -172,8 +176,11 @@ private[poly] class FixedRealRoots(
       case Point(value) =>
         Real(value)
       case Bounded(lb, ub, _) =>
-        Real(Algebraic.unsafeRoot(zpoly, i, lb, ub)
-          .toBigDecimal(new MathContext(Real.digits, RoundingMode.HALF_EVEN)))
+        Real(
+          Algebraic
+            .unsafeRoot(zpoly, i, lb, ub)
+            .toBigDecimal(new MathContext(Real.digits, RoundingMode.HALF_EVEN))
+        )
       case _ =>
         throw new RuntimeException("invalid isolated root interval")
     }

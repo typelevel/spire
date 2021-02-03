@@ -9,22 +9,22 @@ import java.lang.Math
 import java.lang.Integer
 
 trait IntIsEuclideanRing extends EuclideanRing[Int] {
-  override def minus(a:Int, b:Int): Int = a - b
-  def negate(a:Int): Int = -a
+  override def minus(a: Int, b: Int): Int = a - b
+  def negate(a: Int): Int = -a
   def one: Int = 1
-  def plus(a:Int, b:Int): Int = a + b
-  override def pow(a:Int, b:Int): Int = spire.math.pow(a, b).toInt
-  override def times(a:Int, b:Int): Int = a * b
+  def plus(a: Int, b: Int): Int = a + b
+  override def pow(a: Int, b: Int): Int = spire.math.pow(a, b).toInt
+  override def times(a: Int, b: Int): Int = a * b
   def zero: Int = 0
 
   override def fromInt(n: Int): Int = n
 
-  def euclideanFunction(a:Int): BigInt = BigInt(a).abs
+  def euclideanFunction(a: Int): BigInt = BigInt(a).abs
   override def equotmod(a: Int, b: Int): (Int, Int) = spire.math.equotmod(a, b)
   def equot(a: Int, b: Int): Int = spire.math.equot(a, b)
   def emod(a: Int, b: Int): Int = spire.math.emod(a, b)
-  def gcd(a:Int, b:Int)(implicit ev: Eq[Int]): Int = spire.math.gcd(a, b).toInt
-  def lcm(a:Int, b:Int)(implicit ev: Eq[Int]): Int = spire.math.lcm(a, b).toInt
+  def gcd(a: Int, b: Int)(implicit ev: Eq[Int]): Int = spire.math.gcd(a, b).toInt
+  def lcm(a: Int, b: Int)(implicit ev: Eq[Int]): Int = spire.math.lcm(a, b).toInt
 }
 
 // Not included in Instances trait.
@@ -46,8 +46,8 @@ trait IntIsNRoot extends NRoot[Int] {
     findnroot(0, 1 << ((33 - n) / n))
   }
 
-  def log(a:Int): Int = Math.log(a.toDouble).toInt
-  def fpow(a:Int, b:Int): Int = Math.pow(a, b).toInt
+  def log(a: Int): Int = Math.log(a.toDouble).toInt
+  def fpow(a: Int, b: Int): Int = Math.pow(a, b).toInt
 }
 
 trait IntOrder extends Order[Int] {

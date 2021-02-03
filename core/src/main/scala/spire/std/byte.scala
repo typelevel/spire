@@ -6,17 +6,17 @@ import spire.util.Opt
 import spire.math.BitString
 
 trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
-  override def minus(a:Byte, b:Byte): Byte = (a - b).toByte
-  def negate(a:Byte): Byte = (-a).toByte
+  override def minus(a: Byte, b: Byte): Byte = (a - b).toByte
+  def negate(a: Byte): Byte = (-a).toByte
   def one: Byte = 1.toByte
-  def plus(a:Byte, b:Byte): Byte = (a + b).toByte
-  override def pow(a: Byte, b:Int): Byte = Math.pow(a, b).toByte
-  override def times(a:Byte, b:Byte): Byte = (a * b).toByte
+  def plus(a: Byte, b: Byte): Byte = (a + b).toByte
+  override def pow(a: Byte, b: Int): Byte = Math.pow(a, b).toByte
+  override def times(a: Byte, b: Byte): Byte = (a * b).toByte
   def zero: Byte = 0.toByte
 
   override def fromInt(n: Int): Byte = n.toByte
 
-  def euclideanFunction(a:Byte): BigInt = BigInt(a).abs
+  def euclideanFunction(a: Byte): BigInt = BigInt(a).abs
   override def equotmod(a: Byte, b: Byte): (Byte, Byte) = spire.math.equotmod(a, b)
   def equot(a: Byte, b: Byte): Byte = spire.math.equot(a, b)
   def emod(a: Byte, b: Byte): Byte = spire.math.emod(a, b)
@@ -48,8 +48,8 @@ trait ByteIsNRoot extends NRoot[Byte] {
 }
 
 trait ByteOrder extends Order[Byte] {
-  override def eqv(x:Byte, y:Byte): Boolean = x == y
-  override def neqv(x:Byte, y:Byte): Boolean = x != y
+  override def eqv(x: Byte, y: Byte): Boolean = x == y
+  override def neqv(x: Byte, y: Byte): Boolean = x != y
   override def gt(x: Byte, y: Byte): Boolean = x > y
   override def gteqv(x: Byte, y: Byte): Boolean = x >= y
   override def lt(x: Byte, y: Byte): Boolean = x < y
@@ -75,8 +75,8 @@ trait ByteIsReal extends IsIntegral[Byte] with ByteTruncatedDivision with ByteSi
 
 @SerialVersionUID(0L)
 class ByteIsBitString extends BitString[Byte] with Serializable {
-  def one: Byte = (-1: Byte)
-  def zero: Byte = (0: Byte)
+  def one: Byte = -1: Byte
+  def zero: Byte = 0: Byte
   def and(a: Byte, b: Byte): Byte = (a & b).toByte
   def or(a: Byte, b: Byte): Byte = (a | b).toByte
   def complement(a: Byte): Byte = (~a).toByte

@@ -1,7 +1,6 @@
 package spire
 package algebra
 
-
 /**
  * A vector space is a group `V` that can be multiplied by scalars in `F` that
  * lie in a field. Scalar multiplication must distribute over vector addition
@@ -17,5 +16,5 @@ trait VectorSpace[V, @sp(Int, Long, Float, Double) F] extends Any with CModule[V
 }
 
 object VectorSpace {
-  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: VectorSpace[V, R]): VectorSpace[V, R] = V
+  @inline final def apply[V, @sp(Int, Long, Float, Double) R](implicit V: VectorSpace[V, R]): VectorSpace[V, R] = V
 }

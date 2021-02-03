@@ -26,8 +26,14 @@ object Quaternion extends QuaternionInstances {
     Quaternion(c.real, c.imag, f.zero, f.zero)
 }
 
-/** Quaternion algebra over an ordered field. */
-private[math] trait QuaternionOverField[A] extends Eq[Quaternion[A]] with DivisionRing[Quaternion[A]] with FieldAssociativeAlgebra[Quaternion[A], A] with Involution[Quaternion[A]] {
+/**
+ * Quaternion algebra over an ordered field.
+ */
+private[math] trait QuaternionOverField[A]
+    extends Eq[Quaternion[A]]
+    with DivisionRing[Quaternion[A]]
+    with FieldAssociativeAlgebra[Quaternion[A], A]
+    with Involution[Quaternion[A]] {
 
   implicit def o: Order[A]
   implicit def s: Signed[A]
@@ -51,9 +57,10 @@ private[math] trait QuaternionOverField[A] extends Eq[Quaternion[A]] with Divisi
   def adjoint(a: Quaternion[A]): Quaternion[A] = a.conjugate
 }
 
-private[math] trait QuaternionOverRichField[A] extends QuaternionOverField[A]
-  with NRoot[Quaternion[A]]
-  with InnerProductSpace[Quaternion[A], A] {
+private[math] trait QuaternionOverRichField[A]
+    extends QuaternionOverField[A]
+    with NRoot[Quaternion[A]]
+    with InnerProductSpace[Quaternion[A], A] {
 
   implicit def n: NRoot[A]
   implicit def t: Trig[A]
@@ -77,7 +84,13 @@ trait QuaternionInstances1 {
 
 trait QuaternionInstances extends QuaternionInstances1 {
 
-  implicit def QuaternionOverRichField[A](implicit f0: Field[A], n0: NRoot[A], o0: Order[A], s0: Signed[A], t0: Trig[A]): QuaternionOverRichField[A] =
+  implicit def QuaternionOverRichField[A](implicit
+    f0: Field[A],
+    n0: NRoot[A],
+    o0: Order[A],
+    s0: Signed[A],
+    t0: Trig[A]
+  ): QuaternionOverRichField[A] =
     new QuaternionOverRichField[A] {
       val scalar = f0
       val n = n0
@@ -88,9 +101,13 @@ trait QuaternionInstances extends QuaternionInstances1 {
 
 }
 
-/** Quaternions defined over a subset A of the real numbers. */
+/**
+ * Quaternions defined over a subset A of the real numbers.
+ */
 final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
-    extends ScalaNumber with ScalaNumericConversions with Serializable { lhs =>
+    extends ScalaNumber
+    with ScalaNumericConversions
+    with Serializable { lhs =>
 
   // junky ScalaNumber stuff
   override def byteValue: Byte = longValue.toByte
@@ -108,7 +125,7 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
   def isWhole: Boolean =
     sillyIsReal && anyIsWhole(r)
 
-  override final def isValidInt: Boolean =
+  final override def isValidInt: Boolean =
     sillyIsReal && anyIsValidInt(r)
 
   // important to keep in sync with Complex[_]
@@ -155,13 +172,15 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
   def toComplex: Complex[A] = Complex(r, i)
 
   def signum(implicit s: Signed[A]): Int = r.signum match {
-    case 0 => i.signum match {
-      case 0 => j.signum match {
-        case 0 => k.signum
+    case 0 =>
+      i.signum match {
+        case 0 =>
+          j.signum match {
+            case 0 => k.signum
+            case n => n
+          }
         case n => n
       }
-      case n => n
-    }
     case n => n
   }
 
@@ -279,7 +298,6 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
     } else {
       Quaternion(Complex(r).pow(Complex(k0)))
     }
-
 
   def dot(rhs: Quaternion[A])(implicit f: Field[A]): A =
     (lhs.conjugate * rhs + rhs.conjugate * lhs).r / f.fromInt(2)

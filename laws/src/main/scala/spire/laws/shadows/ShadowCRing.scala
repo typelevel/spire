@@ -2,8 +2,7 @@ package spire.laws.shadows
 
 import spire.algebra.CRing
 
-trait ShadowCRing[A, S] extends CRing[Shadow[A, S]]
-  with ShadowCRig[A, S] with ShadowCRng[A, S] {
+trait ShadowCRing[A, S] extends CRing[Shadow[A, S]] with ShadowCRig[A, S] with ShadowCRng[A, S] {
   import shadowing._
   implicit def A: CRing[A]
   implicit def S: CRing[S]

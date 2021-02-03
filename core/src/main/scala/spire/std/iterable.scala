@@ -8,7 +8,8 @@ import scala.collection.IterableOps
 
 @SerialVersionUID(0L)
 final class IterableMonoid[A, SA <: IterableOps[A, Iterable, SA]](implicit cbf: Factory[A, SA])
-extends Monoid[SA] with Serializable {
+    extends Monoid[SA]
+    with Serializable {
   def empty: SA = cbf.newBuilder.result()
   def combine(x: SA, y: SA): SA = {
     val b = cbf.newBuilder
@@ -26,5 +27,6 @@ extends Monoid[SA] with Serializable {
 
 trait IterableInstances {
   implicit def IterableMonoid[A, CC[A] <: IterableOps[A, Iterable, CC[A]]](implicit
-    cbf: Factory[A, CC[A]]): Monoid[CC[A]] = new IterableMonoid[A, CC[A]]
+    cbf: Factory[A, CC[A]]
+  ): Monoid[CC[A]] = new IterableMonoid[A, CC[A]]
 }

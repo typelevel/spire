@@ -10,23 +10,27 @@ import scala.util.Random.{nextDouble, nextFloat, nextInt, nextLong}
 
 object SizedArrays {
 
-  /** Sugar for building arrays using a per-cell init function. */
-  def init[A:ClassTag](size: Int)(f: => A): Array[A] = {
+  /**
+   * Sugar for building arrays using a per-cell init function.
+   */
+  def init[A: ClassTag](size: Int)(f: => A): Array[A] = {
     val data = Array.ofDim[A](size)
     for (i <- 0 until size) data(i) = f
     data
   }
 
-  /** Sugar for building arrays using a per-cell init function. */
-  def mkarray[A:ClassTag:Order](size: Int, layout: ArrayOrder)(f: => A): Array[A] = {
+  /**
+   * Sugar for building arrays using a per-cell init function.
+   */
+  def mkarray[A: ClassTag: Order](size: Int, layout: ArrayOrder)(f: => A): Array[A] = {
     val data = init(size)(f)
     val ct = implicitly[ClassTag[A]]
     val order = Order[A]
     layout match {
-      case ArrayOrder.Random =>
-      case ArrayOrder.Sorted => spire.math.Sorting.sort(data)(order, ct)
+      case ArrayOrder.Random   =>
+      case ArrayOrder.Sorted   => spire.math.Sorting.sort(data)(order, ct)
       case ArrayOrder.Reversed => spire.math.Sorting.sort(data)(Order.reverse(order), ct)
-      case _ => sys.error(s"unknown layout: $layout")
+      case _                   => sys.error(s"unknown layout: $layout")
     }
     data
   }

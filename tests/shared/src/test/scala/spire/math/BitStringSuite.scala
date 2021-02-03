@@ -125,4 +125,3 @@ class BitStringSuite extends munit.FunSuite {
     assertEquals(eval(b"-128")(srs), List(b"-128", b"-64", b"-16", b"-8", b"-1"))
   }
 }
-

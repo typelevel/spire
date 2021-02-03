@@ -1,7 +1,8 @@
 package spire
 package std
 
-trait AnyInstances extends BooleanInstances
+trait AnyInstances
+    extends BooleanInstances
     with CharInstances
     with ByteInstances
     with ShortInstances

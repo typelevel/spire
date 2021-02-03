@@ -14,11 +14,12 @@ object Fractional {
   implicit final val NumberIsFractional = new NumberIsFractional
   implicit final val RationalIsFractional = new RationalIsFractional
 
-  @inline final def apply[A](implicit ev:Fractional[A]): Fractional[A] = ev
+  @inline final def apply[A](implicit ev: Fractional[A]): Fractional[A] = ev
 }
 
 @SerialVersionUID(0L)
-private[math] class FloatIsFractional extends Fractional[Float]
+private[math] class FloatIsFractional
+    extends Fractional[Float]
     with FloatIsField
     with FloatIsNRoot
     with ConvertableFromFloat
@@ -35,7 +36,8 @@ private[math] class FloatIsFractional extends Fractional[Float]
 }
 
 @SerialVersionUID(0L)
-private[math] class DoubleIsFractional extends Fractional[Double]
+private[math] class DoubleIsFractional
+    extends Fractional[Double]
     with DoubleIsField
     with DoubleIsNRoot
     with ConvertableFromDouble
@@ -52,7 +54,8 @@ private[math] class DoubleIsFractional extends Fractional[Double]
 }
 
 @SerialVersionUID(0L)
-private[math] class BigDecimalIsFractional extends Fractional[BigDecimal]
+private[math] class BigDecimalIsFractional
+    extends Fractional[BigDecimal]
     with BigDecimalIsField
     with BigDecimalIsNRoot
     with ConvertableFromBigDecimal
@@ -69,7 +72,8 @@ private[math] class BigDecimalIsFractional extends Fractional[BigDecimal]
 }
 
 @SerialVersionUID(1L)
-private[math] class RationalIsFractional extends Fractional[Rational]
+private[math] class RationalIsFractional
+    extends Fractional[Rational]
     with RationalIsField
     with RationalApproximateNRoot
     with ConvertableFromRational
@@ -86,7 +90,8 @@ private[math] class RationalIsFractional extends Fractional[Rational]
 }
 
 @SerialVersionUID(1L)
-private[math] class AlgebraicIsFractional extends Fractional[Algebraic]
+private[math] class AlgebraicIsFractional
+    extends Fractional[Algebraic]
     with AlgebraicIsField
     with AlgebraicIsNRoot
     with ConvertableFromAlgebraic

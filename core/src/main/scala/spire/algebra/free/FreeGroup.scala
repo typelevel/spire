@@ -10,7 +10,7 @@ final class FreeGroup[A] private (val terms: Vector[Either[A, A]]) extends AnyVa
   def run[B](f: A => B)(implicit B: Group[B]): B =
     terms.foldLeft(B.empty) {
       case (sum, Right(a)) => B.combine(sum, f(a))
-      case (sum, Left(a)) => B.remove(sum, f(a))
+      case (sum, Left(a))  => B.remove(sum, f(a))
     }
 
   def |+|(rhs: FreeGroup[A]): FreeGroup[A] =
@@ -21,7 +21,7 @@ final class FreeGroup[A] private (val terms: Vector[Either[A, A]]) extends AnyVa
 
   def inverse: FreeGroup[A] = {
     val bldr = Vector.newBuilder[Either[A, A]]
-    terms.reverseIterator foreach { term =>
+    terms.reverseIterator.foreach { term =>
       bldr += term.swap
     }
     new FreeGroup(bldr.result())
@@ -31,7 +31,7 @@ final class FreeGroup[A] private (val terms: Vector[Either[A, A]]) extends AnyVa
     def annihilated(x: Either[A, A], y: Either[A, A]): Boolean = (x, y) match {
       case (Left(x0), Right(y0)) => x0 == y0
       case (Right(x0), Left(y0)) => x0 == y0
-      case _ => false
+      case _                     => false
     }
 
     def loop(acc: Vector[Either[A, A]]): Vector[Either[A, A]] =
@@ -51,11 +51,11 @@ final class FreeGroup[A] private (val terms: Vector[Either[A, A]]) extends AnyVa
     if (terms.isEmpty) "e"
     else {
       val init = terms.head match {
-        case Left(h) => s"($h).inverse"
+        case Left(h)  => s"($h).inverse"
         case Right(h) => h.toString
       }
       val tail = terms.tail.map {
-        case Left(x) => s" |-| $x"
+        case Left(x)  => s" |-| $x"
         case Right(x) => s" |+| $x"
       }
       init + tail.mkString

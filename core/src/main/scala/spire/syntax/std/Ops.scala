@@ -68,8 +68,8 @@ class LiteralBigIntOps(val lhs: BigInt) extends AnyVal {
   def -(rhs: Number): Number = Number(lhs) - rhs
   def /(rhs: Number): Number = Number(lhs) / rhs
   def /~(rhs: Number): Number = Number(lhs) / rhs
-  def %(rhs: Number): Number = Number(lhs) emod rhs
-  def /%(rhs: Number): (Number, Number) = Number(lhs) equotmod rhs
+  def %(rhs: Number): Number = Number(lhs).emod(rhs)
+  def /%(rhs: Number): (Number, Number) = Number(lhs).equotmod(rhs)
 }
 
 final class ArrayOps[@sp A](arr: Array[A]) {
@@ -107,7 +107,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
     if (arr.length == 0) throw new UnsupportedOperationException("empty array")
     var result = arr(0)
     cfor(1)(_ < arr.length, _ + 1) { i =>
-      result = result min arr(i)
+      result = result.min(arr(i))
     }
     result
   }
@@ -116,7 +116,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
     if (arr.length == 0) throw new UnsupportedOperationException("empty array")
     var result = arr(0)
     cfor(1)(_ < arr.length, _ + 1) { i =>
-      result = result max arr(i)
+      result = result.max(arr(i))
     }
     result
   }
@@ -139,7 +139,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
     result
   }
 
-  import spire.math.{Sorting, Selection, Searching}
+  import spire.math.{Searching, Selection, Sorting}
 
   def qsearch(a: A)(implicit ev: Order[A]): Int = {
     Searching.search(arr, a)
@@ -224,14 +224,16 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
   def qnormWith[R](p: Int)(f: A => R)(implicit ev: Field[R], s: Signed[R], nr: NRoot[R]): R =
     as.foldLeft(ev.one)((t, a) => t + f(a).abs.pow(p)).nroot(p)
 
-  /** Computes the minimal elements of a partially ordered set.
+  /**
+   * Computes the minimal elements of a partially ordered set.
    * If the poset contains multiple copies of a minimal element, the function
    * will only return a single copy of it.
    */
   def pmin(implicit ev: PartialOrder[A]): Seq[A] =
     Searching.minimalElements(as)(ev)
 
-  /** Computes the maximal elements of a partially ordered set.
+  /**
+   * Computes the maximal elements of a partially ordered set.
    * If the posset contains multiple copies of a maximal element, the function
    * will only return a single copy of it.
    */
@@ -278,7 +280,7 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
     mean
   }
 
-  import spire.math.{Sorting, Selection}
+  import spire.math.{Selection, Sorting}
 
   protected[this] def fromArray(arr: Array[A])(implicit cbf: Factory[A, CC[A]]): CC[A] = {
     val b = cbf.newBuilder

@@ -15,7 +15,6 @@ package algebra
  *
  *   quot(x, y) = q
  *   mod(x, y) = r
- *
  */
 trait EuclideanRing[@sp(Int, Long, Float, Double) A] extends Any with GCDRing[A] {
   def euclideanFunction(a: A): BigInt
@@ -39,7 +38,7 @@ object EuclideanRing extends EuclideanRingFunctions[EuclideanRing] {
 
   @inline final def apply[A](implicit e: EuclideanRing[A]): EuclideanRing[A] = e
 
-  @tailrec final def euclid[@sp(Int, Long, Float, Double) A:Eq:EuclideanRing](a: A, b: A): A = {
+  @tailrec final def euclid[@sp(Int, Long, Float, Double) A: Eq: EuclideanRing](a: A, b: A): A = {
     if (EuclideanRing[A].isZero(b)) a else euclid(b, EuclideanRing[A].emod(a, b))
   }
 

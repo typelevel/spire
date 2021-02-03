@@ -111,4 +111,3 @@ class ComplexScalaCheckSuite2 extends munit.ScalaCheckSuite {
   //   }
   // }
 }
-

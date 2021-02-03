@@ -23,16 +23,16 @@ trait InvolutionLaws[A] extends Laws {
   def involution(implicit A: Involution[A]) = new DefaultRuleSet(
     name = "involution",
     parent = None,
-    "involution" -> forAllSafe( (x: A) => x.adjoint.adjoint === x )
+    "involution" -> forAllSafe((x: A) => x.adjoint.adjoint === x)
   )
 
-  def involutionMultiplicativeSemigroup(implicit A: Involution[A], mm: MultiplicativeSemigroup[A]) =  new DefaultRuleSet(
+  def involutionMultiplicativeSemigroup(implicit A: Involution[A], mm: MultiplicativeSemigroup[A]) = new DefaultRuleSet(
     name = "involutionMultiplicativeSemigroup",
     parent = Some(involution),
-    "antiautomorphism" -> forAllSafe( (x: A, y: A) => (x * y).adjoint === y.adjoint * x.adjoint)
+    "antiautomorphism" -> forAllSafe((x: A, y: A) => (x * y).adjoint === y.adjoint * x.adjoint)
   )
 
-  def involutionMultiplicativeMonoid(implicit A: Involution[A], mm: MultiplicativeMonoid[A]) =  new DefaultRuleSet(
+  def involutionMultiplicativeMonoid(implicit A: Involution[A], mm: MultiplicativeMonoid[A]) = new DefaultRuleSet(
     name = "involutionMultiplicativeMonoid",
     parent = Some(involutionMultiplicativeSemigroup),
     "preserves one" -> (mm.one.adjoint === mm.one)
@@ -41,13 +41,19 @@ trait InvolutionLaws[A] extends Laws {
   def involutionRing(implicit A: Involution[A], ringA: Ring[A]) = new DefaultRuleSet(
     name = "involutionRing",
     parent = Some(involutionMultiplicativeMonoid),
-    "compatible with addition" -> forAllSafe( (x: A, y: A) => (x + y).adjoint === x.adjoint + y.adjoint)
+    "compatible with addition" -> forAllSafe((x: A, y: A) => (x + y).adjoint === x.adjoint + y.adjoint)
   )
 
-  def involutionAlgebra[R:Arbitrary](implicit A: Involution[A], R: Involution[R], algebra: RingAssociativeAlgebra[A, R]) = new DefaultRuleSet(
+  def involutionAlgebra[R: Arbitrary](implicit
+    A: Involution[A],
+    R: Involution[R],
+    algebra: RingAssociativeAlgebra[A, R]
+  ) = new DefaultRuleSet(
     name = "involutionAlgebra",
     parent = Some(involutionRing),
-    "conjugate linear" -> forAllSafe( (x: A, y: A, r: R) => ( r *: x + y ).adjoint === (r.adjoint *: x.adjoint + y.adjoint) )
+    "conjugate linear" -> forAllSafe((x: A, y: A, r: R) =>
+      (r *: x + y).adjoint === (r.adjoint *: x.adjoint + y.adjoint)
+    )
   )
 
 }

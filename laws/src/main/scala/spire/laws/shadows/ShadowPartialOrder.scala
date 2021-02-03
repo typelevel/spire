@@ -36,8 +36,8 @@ trait ShadowPartialOrder[A, S] extends ShadowEq[A, S] with PartialOrder[Shadow[A
     val s = S.pmin(x.s, y.s)
     (a, s) match {
       case (Some(a1), Some(s1)) => Some(Shadow(a1, s1))
-      case (None, None) => None
-      case _ => throw new IllegalArgumentException("Inconsistent shadowing")
+      case (None, None)         => None
+      case _                    => throw new IllegalArgumentException("Inconsistent shadowing")
     }
   }
 
@@ -46,8 +46,8 @@ trait ShadowPartialOrder[A, S] extends ShadowEq[A, S] with PartialOrder[Shadow[A
     val s = S.pmax(x.s, y.s)
     (a, s) match {
       case (Some(a1), Some(s1)) => Some(Shadow(a1, s1))
-      case (None, None) => None
-      case _ => throw new IllegalArgumentException("Inconsistent shadowing")
+      case (None, None)         => None
+      case _                    => throw new IllegalArgumentException("Inconsistent shadowing")
     }
   }
 

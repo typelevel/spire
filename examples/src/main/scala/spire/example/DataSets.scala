@@ -7,31 +7,33 @@ import spire.implicits._
 
 import scala.collection.Factory
 import scala.collection.immutable.LazyList
-import scala.collection.mutable.{ Builder, ListBuffer }
+import scala.collection.mutable.{Builder, ListBuffer}
 
-import java.io.{ BufferedReader, InputStreamReader }
+import java.io.{BufferedReader, InputStreamReader}
 
 import scala.util.Random.shuffle
 
-final class DataSet[V, @sp(Double) F, @sp(Double) K](
-    val name: String,
-    val variables: List[Variable[F]],
-    val space: CoordinateSpace[V, F],
-    val data: List[(V, K)]) {
+final class DataSet[V, @sp(Double) F, @sp(Double) K](val name: String,
+                                                     val variables: List[Variable[F]],
+                                                     val space: CoordinateSpace[V, F],
+                                                     val data: List[(V, K)]
+) {
 
   def describe: String = {
     import Variable._
 
     def varType(v: Variable[F]): String = v match {
-      case Ignored(_) => "ignored"
+      case Ignored(_)       => "ignored"
       case Continuous(_, _) => "continuous"
-      case Categorical(_) => "categorical"
-      case Missing(v0, _) => s"${varType(v0)} with missing values"
+      case Categorical(_)   => "categorical"
+      case Missing(v0, _)   => s"${varType(v0)} with missing values"
     }
 
-    val vars = variables.zipWithIndex map { case (v, i) =>
-      s"    %2d. ${v.label} (${varType(v)})" format (i + 1)
-    } mkString "\n"
+    val vars = variables.zipWithIndex
+      .map { case (v, i) =>
+        s"    %2d. ${v.label} (${varType(v)})".format(i + 1)
+      }
+      .mkString("\n")
 
     s"""$name - ${data.size} points with ${variables.size} variables (${space.dimensions} effective):
        |$vars""".stripMargin
@@ -53,41 +55,42 @@ object DataSet {
 
   type Output[+K] = (Int, String => K)
 
-  protected def fromLines[CC[_], F, K](lines: List[List[String]],
-      variables: List[Variable[F]], out: Output[K])(implicit
-      cbf: Factory[F, CC[F]]): (Int, List[(CC[F], K)]) = {
+  protected def fromLines[CC[_], F, K](lines: List[List[String]], variables: List[Variable[F]], out: Output[K])(implicit
+    cbf: Factory[F, CC[F]]
+  ): (Int, List[(CC[F], K)]) = {
 
     // Perform our first pass, building the conversion functions.
-    val builders = variables map (_.varBuilder())
-    lines foreach { fields =>
-      builders zip fields foreach { case (b, s) =>
+    val builders = variables.map(_.varBuilder())
+    lines.foreach { fields =>
+      builders.zip(fields).foreach { case (b, s) =>
         b += s
       }
     }
 
     // Perform our second pass, converting strings to variables.
-    val maps = builders map (_.result())
-    val (dimensions, datar) = lines.foldLeft((Int.MaxValue, List.empty[(CC[F], K)])) {
-      case ((dim, res), fields) =>
-        val bldr = cbf.newBuilder
-        val vd = (maps zip fields).foldLeft(0) { case (acc, (f, s)) =>
-          val vars = f(s)
-          bldr ++= vars
-          acc + vars.size
-        }
-        (math.min(dim, vd), (bldr.result(), out._2(fields(out._1))) :: res)
+    val maps = builders.map(_.result())
+    val (dimensions, datar) = lines.foldLeft((Int.MaxValue, List.empty[(CC[F], K)])) { case ((dim, res), fields) =>
+      val bldr = cbf.newBuilder
+      val vd = maps.zip(fields).foldLeft(0) { case (acc, (f, s)) =>
+        val vars = f(s)
+        bldr ++= vars
+        acc + vars.size
+      }
+      (math.min(dim, vd), (bldr.result(), out._2(fields(out._1))) :: res)
     }
 
     (dimensions, datar.reverse)
   }
 
-  def fromResource[CC[_], @sp(Double) F, @sp(Double) K](name: String, res: String, sep: Char,
-      variables: List[Variable[F]], out: Output[K])(
-      cs: Int => CoordinateSpace[CC[F], F])(implicit
-      cbf: Factory[F, CC[F]]): DataSet[CC[F], F, K] = {
+  def fromResource[CC[_], @sp(Double) F, @sp(Double) K](name: String,
+                                                        res: String,
+                                                        sep: Char,
+                                                        variables: List[Variable[F]],
+                                                        out: Output[K]
+  )(cs: Int => CoordinateSpace[CC[F], F])(implicit cbf: Factory[F, CC[F]]): DataSet[CC[F], F, K] = {
 
     val lines = readDataSet(res)
-    val (dimensions, data) = fromLines(lines map (_.split(sep).toList), variables, out)(cbf)
+    val (dimensions, data) = fromLines(lines.map(_.split(sep).toList), variables, out)(cbf)
     val space = cs(dimensions)
 
     new DataSet[CC[F], F, K](name, variables, space, data)
@@ -100,11 +103,12 @@ object DataSet {
     Continuous("Sepal Width", Rational(_)),
     Continuous("Petal Length", Rational(_)),
     Continuous("Petal Width", Rational(_)),
-    Ignored("Species"))
+    Ignored("Species")
+  )
 
-  def Iris = fromResource[Vector, Rational, String](
-    "Iris", "/datasets/iris.data", ',',
-    IrisVars, (4, identity))(CoordinateSpace.seq)
+  def Iris = fromResource[Vector, Rational, String]("Iris", "/datasets/iris.data", ',', IrisVars, (4, identity))(
+    CoordinateSpace.seq
+  )
 
   private val YeastVars = List[Variable[Double]](
     Ignored("Protein"),
@@ -116,11 +120,12 @@ object DataSet {
     Continuous("pox", _.toDouble),
     Continuous("vac", _.toDouble),
     Continuous("nuc", _.toDouble),
-    Ignored("Location"))
+    Ignored("Location")
+  )
 
-  def Yeast = fromResource[Array, Double, String](
-    "Yeast", "/datasets/yeast.data", ',',
-    YeastVars, (9, identity))(CoordinateSpace.array)
+  def Yeast = fromResource[Array, Double, String]("Yeast", "/datasets/yeast.data", ',', YeastVars, (9, identity))(
+    CoordinateSpace.array
+  )
 
   private val MpgVars = List[Variable[Double]](
     Ignored("MPG"),
@@ -131,11 +136,12 @@ object DataSet {
     Continuous("Acceleration", _.toDouble),
     Continuous("Model Year", _.toDouble),
     Categorical[Double]("Country of Origin"),
-    Ignored("Model Name"))
+    Ignored("Model Name")
+  )
 
-  def MPG = fromResource[Array, Double, Double](
-    "MPG", "/datasets/auto-mpg.data", ',',
-    MpgVars, (0, _.toDouble))(CoordinateSpace.array)
+  def MPG = fromResource[Array, Double, Double]("MPG", "/datasets/auto-mpg.data", ',', MpgVars, (0, _.toDouble))(
+    CoordinateSpace.array
+  )
 }
 
 sealed trait Variable[+F] extends Factory[String, String => List[F]] {
@@ -145,7 +151,7 @@ sealed trait Variable[+F] extends Factory[String, String => List[F]] {
   def apply(): Builder[String, String => List[F]] = this.newBuilder
   def apply(from: Nothing): Builder[String, String => List[F]] = this.newBuilder
   def newBuilder: Builder[String, String => List[F]] = this.varBuilder()
-  def fromSpecific(it: IterableOnce[String]): String => List[F] = ((s: String) => Nil)
+  def fromSpecific(it: IterableOnce[String]): String => List[F] = (s: String) => Nil
 
   def missing(sentinel: String): Variable[F] = Variable.Missing(this, sentinel)
 }
@@ -181,7 +187,7 @@ object Variable {
       def result() = {
         val orderedCategories = categories.toList
 
-        { s => orderedCategories map (cat => if (cat == s) Ring[F].one else Ring[F].zero) }
+        { s => orderedCategories.map(cat => if (cat == s) Ring[F].one else Ring[F].zero) }
       }
     }
   }
@@ -223,8 +229,8 @@ object CrossValidation {
    * predictor results.
    */
   def crossValidate[V, @sp(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
-      train: CoordinateSpace[V, F] => List[(V, K)] => (V => K))(
-      score: List[Result[V, K]] => F): F = {
+    train: CoordinateSpace[V, F] => List[(V, K)] => (V => K)
+  )(score: List[Result[V, K]] => F): F = {
     implicit val field = dataset.space.scalar
 
     @tailrec
@@ -235,7 +241,7 @@ object CrossValidation {
         val len = (right0.size + n - 1) / n
         val (removed, right) = right0.splitAt(len)
         val predict = train(dataset.space)(left ++ right)
-        val results = removed map { case (in, out) =>
+        val results = removed.map { case (in, out) =>
           Result(in, out, predict(in))
         }
         loop(left ++ removed, right, n - 1, sum + score(results))
@@ -250,7 +256,8 @@ object CrossValidation {
    * predictor.
    */
   def crossValidateClassification[V, @sp(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
-      train: CoordinateSpace[V, F] => List[(V, K)] => (V => K)): F = {
+    train: CoordinateSpace[V, F] => List[(V, K)] => (V => K)
+  ): F = {
     implicit val field = dataset.space.scalar
 
     def accuracy(results: List[Result[V, K]]): F = {
@@ -266,7 +273,8 @@ object CrossValidation {
    * For cross-validating regression, we use the R^2 to score the predictor.
    */
   def crossValidateRegression[V, @sp(Double) F](dataset: DataSet[V, F, F], k: Int = 10)(
-      train: CoordinateSpace[V, F] => List[(V, F)] => (V => F)): F = {
+    train: CoordinateSpace[V, F] => List[(V, F)] => (V => F)
+  ): F = {
     implicit val field = dataset.space.scalar
 
     def rSquared(results: List[Result[V, F]]): F = {

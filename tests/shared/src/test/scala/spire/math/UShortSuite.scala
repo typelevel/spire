@@ -29,12 +29,13 @@ class UShortSuite extends munit.ScalaCheckSuite {
 
   property("n / 0 -> ArithmeticException") {
     forAll { (n: UShort) =>
-      val error = try {
-        n / zero
-        false
-      } catch {
-        case _: ArithmeticException => true
-      }
+      val error =
+        try {
+          n / zero
+          false
+        } catch {
+          case _: ArithmeticException => true
+        }
       error == true
     }
   }
@@ -94,4 +95,3 @@ class UShortSuite extends munit.ScalaCheckSuite {
     forAll { (a: UShort, b: UShort) => a >= b == a.toLong >= b.toLong }
   }
 }
-

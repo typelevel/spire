@@ -141,4 +141,4 @@ class SortingBenchmarks extends MyBenchmark with BenchmarkData {
     }
   }
 }
-*/
+ */

@@ -43,7 +43,7 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
   def build(x: Long, y0: Long, z: Byte, noZero: Boolean): (Int, Int, FixedPoint, FixedPoint, Rational, Rational) = {
     val y = if (y0 == 0L && noZero) 1L else y0
     val d = z.toInt.abs % 11
-    val denom = 10 ** (d)
+    val denom = 10 ** d
     val (fx, fy) = (new FixedPoint(x), new FixedPoint(y))
     val (ax, ay) = (Rational(x, denom), Rational(y, denom))
     (d, denom, fx, fy, ax, ay)
@@ -77,12 +77,13 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
         val (_, denom, fx, fy, ax, ay) = build(x, y, z, noZero)
         val az = g(ax, ay)
 
-        val ofz = try {
-          implicit val scale = FixedScale(denom)
-          Some(f(fx, fy, scale))
-        } catch {
-          case _: FixedPointOverflow => None
-        }
+        val ofz =
+          try {
+            implicit val scale = FixedScale(denom)
+            Some(f(fx, fy, scale))
+          } catch {
+            case _: FixedPointOverflow => None
+          }
 
         ofz match {
           case Some(fz) =>
@@ -97,15 +98,15 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
 
   testBinop2("subtraction", false, (x, y, s) => x - y, _ - _)
 
-  testBinop2("multiplication", false, (x, y, s) => (x).*(y)(s), _ * _)
+  testBinop2("multiplication", false, (x, y, s) => x.*(y)(s), _ * _)
 
-  testBinop2("division", true, (x, y, s) => (x)./(y)(s), _ / _)
+  testBinop2("division", true, (x, y, s) => x./(y)(s), _ / _)
 
- // testBinop2("modulus", true, (x, y, s) => x % y, _ % _) // TODO: maybe test truncated division instead
+  // testBinop2("modulus", true, (x, y, s) => x % y, _ % _) // TODO: maybe test truncated division instead
 
   def buildHalf(x: Long, z: Byte): (Int, Int, FixedPoint, Rational) = {
     val d = z.toInt.abs % 11
-    val denom = 10 ** (d)
+    val denom = 10 ** d
     val fx = new FixedPoint(x)
     val ax = Rational(x, denom)
     (d, denom, fx, ax)
@@ -121,31 +122,32 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
         val (d, denom, fx, ax) = buildHalf(x, z)
         val az = g(ax, y)
 
-        val ofz = try {
-          implicit val scale = FixedScale(denom)
-          Some(f(fx, y, scale))
-        } catch {
-          case _: FixedPointOverflow => None
-        }
+        val ofz =
+          try {
+            implicit val scale = FixedScale(denom)
+            Some(f(fx, y, scale))
+          } catch {
+            case _: FixedPointOverflow => None
+          }
 
         ofz match {
           case Some(fz) =>
-          BigInt(fz.long) === (az * denom).toBigInt
+            BigInt(fz.long) === (az * denom).toBigInt
           case None =>
             az * denom < Long.MinValue || Long.MaxValue < az * denom
         }
       }
     }
 
-  testHalfop("h-addition", false, (x, y, s) => (x).+(y)(s), _ + _)
+  testHalfop("h-addition", false, (x, y, s) => x.+(y)(s), _ + _)
 
-  testHalfop("h-subtraction", false, (x, y, s) => (x).-(y)(s), _ - _)
+  testHalfop("h-subtraction", false, (x, y, s) => x.-(y)(s), _ - _)
 
   testHalfop("h-multiplication", false, (x, y, s) => x * y, _ * _)
 
   testHalfop("h-division", true, (x, y, s) => x / y, _ / _)
 
- //  testHalfop("h-modulus", true, (x, y, s) => (x).%(y)(s), _ % _) // TODO: maybe test truncated division instead
+  //  testHalfop("h-modulus", true, (x, y, s) => (x).%(y)(s), _ % _) // TODO: maybe test truncated division instead
 
   property("pow") {
     forAll { (x: Long, k0: Byte, d0: Byte) =>
@@ -154,12 +156,13 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
 
       val az = Rational(x, denom).pow(k)
 
-      val ofz = try {
-        implicit val scale = FixedScale(denom)
-        Some(new FixedPoint(x).pow(k))
-      } catch {
-        case _: FixedPointOverflow => None
-      }
+      val ofz =
+        try {
+          implicit val scale = FixedScale(denom)
+          Some(new FixedPoint(x).pow(k))
+        } catch {
+          case _: FixedPointOverflow => None
+        }
 
       ofz match {
         case Some(fz) =>

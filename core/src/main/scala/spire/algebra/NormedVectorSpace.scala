@@ -26,20 +26,26 @@ trait NormedVectorSpace[V, @sp(Int, Long, Float, Double) F] extends Any with Vec
 }
 
 object NormedVectorSpace extends NormedVectorSpace0 with NormedVectorSpaceFunctions {
-  @inline final def apply[V, @sp(Int,Long,Float,Double) R](implicit V: NormedVectorSpace[V, R]): NormedVectorSpace[V, R] = V
+  @inline final def apply[V, @sp(Int, Long, Float, Double) R](implicit
+    V: NormedVectorSpace[V, R]
+  ): NormedVectorSpace[V, R] = V
 }
 
 private[algebra] trait NormedVectorSpace0 {
   implicit def InnerProductSpaceIsNormedVectorSpace[V, @sp(Int, Long, Float, Double) F](implicit
-    space: InnerProductSpace[V, F], nroot: NRoot[F]): NormedVectorSpace[V, F] = space.normed
+    space: InnerProductSpace[V, F],
+    nroot: NRoot[F]
+  ): NormedVectorSpace[V, F] = space.normed
 }
 
 private[algebra] trait NormedVectorSpaceFunctions {
-  def max[A: Order: Field: Signed, CC[A] <: SeqOps[A, Seq, CC[A]]](
-      implicit cbf0: Factory[A, CC[A]]): NormedVectorSpace[CC[A], A] =
+  def max[A: Order: Field: Signed, CC[A] <: SeqOps[A, Seq, CC[A]]](implicit
+    cbf0: Factory[A, CC[A]]
+  ): NormedVectorSpace[CC[A], A] =
     new SeqMaxNormedVectorSpace[A, CC[A]]
 
-  def Lp[A: Field: NRoot: Signed, CC[A] <: SeqOps[A, Seq, CC[A]]](p: Int)(
-      implicit cbf0: Factory[A, CC[A]]): NormedVectorSpace[CC[A], A] =
+  def Lp[A: Field: NRoot: Signed, CC[A] <: SeqOps[A, Seq, CC[A]]](p: Int)(implicit
+    cbf0: Factory[A, CC[A]]
+  ): NormedVectorSpace[CC[A], A] =
     new SeqLpNormedVectorSpace[A, CC[A]](p)
 }

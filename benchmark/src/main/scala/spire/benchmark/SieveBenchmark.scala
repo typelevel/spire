@@ -47,4 +47,4 @@ object SieveBenchmark {
     ns.foreach(n => timer("  sieve.nth (%s)" format n)(nth(n)))
   }
 }
-*/
+ */

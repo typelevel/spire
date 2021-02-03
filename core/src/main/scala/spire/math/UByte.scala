@@ -40,35 +40,35 @@ class UByte(val signed: Byte) extends AnyVal with scala.math.ScalaNumericAnyConv
 
   override def toString: String = toInt.toString
 
-  def == (that: UByte): Boolean = this.signed == that.signed
-  def != (that: UByte): Boolean = this.signed != that.signed
+  def ==(that: UByte): Boolean = this.signed == that.signed
+  def !=(that: UByte): Boolean = this.signed != that.signed
 
   def ===(that: UByte): Boolean = this.signed == that.signed
   def =!=(that: UByte): Boolean = this.signed != that.signed
 
-  def <= (that: UByte): Boolean = this.toInt <= that.toInt
-  def < (that: UByte): Boolean = this.toInt < that.toInt
-  def >= (that: UByte): Boolean = this.toInt >= that.toInt
-  def > (that: UByte): Boolean = this.toInt > that.toInt
+  def <=(that: UByte): Boolean = this.toInt <= that.toInt
+  def <(that: UByte): Boolean = this.toInt < that.toInt
+  def >=(that: UByte): Boolean = this.toInt >= that.toInt
+  def >(that: UByte): Boolean = this.toInt > that.toInt
 
   def unary_- : UByte = UByte(-this.signed)
 
-  def + (that: UByte): UByte = UByte(this.signed + that.signed)
-  def - (that: UByte): UByte = UByte(this.signed - that.signed)
-  def * (that: UByte): UByte = UByte(this.signed * that.signed)
-  def / (that: UByte): UByte = UByte(this.toInt / that.toInt)
-  def % (that: UByte): UByte = UByte(this.toInt % that.toInt)
+  def +(that: UByte): UByte = UByte(this.signed + that.signed)
+  def -(that: UByte): UByte = UByte(this.signed - that.signed)
+  def *(that: UByte): UByte = UByte(this.signed * that.signed)
+  def /(that: UByte): UByte = UByte(this.toInt / that.toInt)
+  def %(that: UByte): UByte = UByte(this.toInt % that.toInt)
 
   def unary_~ : UByte = UByte(~this.signed)
 
-  def << (shift: Int): UByte = UByte((signed & 0xff) << (shift & 7))
-  def >> (shift: Int): UByte = UByte((signed & 0xff) >>> (shift & 7))
-  def >>> (shift: Int): UByte = UByte((signed & 0xff) >>> (shift & 7))
-  def & (that: UByte): UByte = UByte((this.signed & 0xff) & (that.signed & 0xff))
-  def | (that: UByte): UByte = UByte((this.signed & 0xff) | (that.signed & 0xff))
-  def ^ (that: UByte): UByte = UByte((this.signed & 0xff) ^ (that.signed & 0xff))
+  def <<(shift: Int): UByte = UByte((signed & 0xff) << (shift & 7))
+  def >>(shift: Int): UByte = UByte((signed & 0xff) >>> (shift & 7))
+  def >>>(shift: Int): UByte = UByte((signed & 0xff) >>> (shift & 7))
+  def &(that: UByte): UByte = UByte((this.signed & 0xff) & (that.signed & 0xff))
+  def |(that: UByte): UByte = UByte((this.signed & 0xff) | (that.signed & 0xff))
+  def ^(that: UByte): UByte = UByte((this.signed & 0xff) ^ (that.signed & 0xff))
 
-  def ** (that: UByte): UByte = UByte(pow(this.toLong, that.toLong).toInt)
+  def **(that: UByte): UByte = UByte(pow(this.toLong, that.toLong).toInt)
 }
 
 trait UByteInstances {
@@ -80,19 +80,19 @@ trait UByteInstances {
 
 private[math] trait UByteIsCRig extends CRig[UByte] {
   def one: UByte = UByte(1)
-  def plus(a:UByte, b:UByte): UByte = a + b
-  override def pow(a:UByte, b:Int): UByte = {
+  def plus(a: UByte, b: UByte): UByte = a + b
+  override def pow(a: UByte, b: Int): UByte = {
     if (b < 0)
-      throw new IllegalArgumentException("negative exponent: %s" format b)
+      throw new IllegalArgumentException("negative exponent: %s".format(b))
     a ** UByte(b)
   }
-  override def times(a:UByte, b:UByte): UByte = a * b
+  override def times(a: UByte, b: UByte): UByte = a * b
   def zero: UByte = UByte(0)
 }
 
 private[math] trait UByteSigned extends SignedAdditiveCMonoid[UByte] {
-  override def eqv(x:UByte, y:UByte): Boolean = x == y
-  override def neqv(x:UByte, y:UByte): Boolean = x != y
+  override def eqv(x: UByte, y: UByte): Boolean = x == y
+  override def neqv(x: UByte, y: UByte): Boolean = x != y
   override def gt(x: UByte, y: UByte): Boolean = x > y
   override def gteqv(x: UByte, y: UByte): Boolean = x >= y
   override def lt(x: UByte, y: UByte): Boolean = x < y
@@ -105,7 +105,7 @@ private[math] trait UByteTruncatedDivision extends TruncatedDivision[UByte] with
   def toBigIntOpt(x: UByte): Opt[BigInt] = Opt(x.toBigInt)
   def tquot(x: UByte, y: UByte): UByte = x / y
   def tmod(x: UByte, y: UByte): UByte = x % y
-  def fquot(x: UByte, y: UByte): UByte = x/ y
+  def fquot(x: UByte, y: UByte): UByte = x / y
   def fmod(x: UByte, y: UByte): UByte = x % y
 }
 

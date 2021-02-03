@@ -66,4 +66,3 @@ class IntervalReciprocalSuite extends munit.FunSuite {
   error(Interval.atOrBelow(r"0"))
   t(Interval.atOrBelow(r"-2"), Interval.openUpper(r"-1/2", r"0")) //fixme
 }
-

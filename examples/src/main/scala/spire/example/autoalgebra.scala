@@ -2,7 +2,7 @@ package spire
 package example
 
 import org.apfloat._
-import org.jscience.mathematics.number.{ Rational => JRational }
+import org.jscience.mathematics.number.{Rational => JRational}
 
 import scala.jdk.CollectionConverters._
 

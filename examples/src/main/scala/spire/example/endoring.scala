@@ -25,7 +25,7 @@ object EndoRingExample extends App {
       def combine(a: (Set[A], Set[A]), b: (Set[A], Set[A])): (Set[A], Set[A]) = {
         val (a1, a2) = a
         val (b1, b2) = b
-        ((a1 -- b2) union (b1 -- a2), (a2 -- b1) union (b2 -- a1))
+        ((a1 -- b2).union(b1 -- a2), (a2 -- b1).union(b2 -- a1))
       }
       def inverse(a: (Set[A], Set[A])): (Set[A], Set[A]) = (a._2, a._1)
       def empty: (Set[A], Set[A]) = (Set.empty, Set.empty)
@@ -43,7 +43,7 @@ object EndoRingExample extends App {
    * for an abelian group `ab`. This defines addition as group addition after
    * applying the endomorphism and multiplication as composition.
    */
-  class EndoRing[A:AbGroup] extends Ring[Endo[A]] {
+  class EndoRing[A: AbGroup] extends Ring[Endo[A]] {
     def plus(f: Endo[A], g: Endo[A]): Endo[A] = a => f(a) |+| g(a)
     def negate(f: Endo[A]): Endo[A] = a => f(a).inverse
     def times(f: Endo[A], g: Endo[A]): Endo[A] = a => f(g(a))
@@ -92,9 +92,9 @@ object EndoRingExample extends App {
 
   // We can define some simple endomorphisms.
   val id = pairedSetEndoRing.one
-  val double: Endo[PairedSet[Int]] = _ map (_ * 2)
-  val triple: Endo[PairedSet[Int]] = _ map (_ * 3)
-  val inc: Endo[PairedSet[Int]] = _ map (_ + 1)
+  val double: Endo[PairedSet[Int]] = _.map(_ * 2)
+  val triple: Endo[PairedSet[Int]] = _.map(_ * 3)
+  val inc: Endo[PairedSet[Int]] = _.map(_ + 1)
 
   // Let's generate the powers of 2 from 0 to n. The endomorphism
   // `double + id` means that we double the elements of a set, then union it
@@ -106,7 +106,7 @@ object EndoRingExample extends App {
   assert(range == Set(1, 2, 3, 4, 5, 11, 12, 13, 14, 15))
 
   // It's distributive.
-  val q = Set(1,2,3)
+  val q = Set(1, 2, 3)
   val e1 = (double + triple) * triple
   val e2 = (double * triple) + (triple * triple)
   assert(e1(q) == e2(q))

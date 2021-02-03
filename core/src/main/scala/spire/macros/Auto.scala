@@ -2,7 +2,7 @@ package spire
 package macros
 
 import spire.algebra._
-import spire.macros.compat.{Context, termName}
+import spire.macros.compat.{termName, Context}
 
 object Auto {
   object scala {
@@ -47,23 +47,21 @@ abstract class AutoOps {
     c.Expr[A](Select(Ident(termName(c)(x)), termName(c)(name)))
 
   def binop[A](name: String, x: String = "x", y: String = "y"): c.Expr[A] =
-    c.Expr[A](Apply(
-      Select(Ident(termName(c)(x)), termName(c)(name)),
-      List(Ident(termName(c)(y)))))
+    c.Expr[A](Apply(Select(Ident(termName(c)(x)), termName(c)(name)), List(Ident(termName(c)(y)))))
 
   def binopSearch[A: c.WeakTypeTag](names: List[String], x: String = "x", y: String = "y"): Option[c.Expr[A]] =
-    names find { name => hasMethod1[A, A, A](name) } map (binop[A](_, x, y))
+    names.find { name => hasMethod1[A, A, A](name) }.map(binop[A](_, x, y))
 
   def unopSearch[A: c.WeakTypeTag](names: List[String], x: String = "x"): Option[c.Expr[A]] =
-    names find { name => hasMethod0[A, A](name) } map (unop[A](_, x))
+    names.find { name => hasMethod0[A, A](name) }.map(unop[A](_, x))
 
   def hasMethod0[A: c.WeakTypeTag, B: c.WeakTypeTag](name: String): Boolean = {
     val tpeA = c.weakTypeTag[A].tpe
     val tpeB = c.weakTypeTag[B].tpe
-    tpeA.members exists { m =>
+    tpeA.members.exists { m =>
       m.isMethod && m.isPublic && m.name.encodedName.toString == name && (m.typeSignature match {
         case MethodType(Nil, ret) => ret =:= tpeB
-        case _ => false
+        case _                    => false
       })
     }
   }
@@ -72,7 +70,7 @@ abstract class AutoOps {
     val tpeA = c.weakTypeTag[A].tpe
     val tpeB = c.weakTypeTag[B].tpe
     val tpeC = c.weakTypeTag[C].tpe
-    tpeA.members exists { m =>
+    tpeA.members.exists { m =>
       m.isMethod && m.isPublic && m.name.encodedName.toString == name && (m.typeSignature match {
         case MethodType(List(param), ret) =>
           param.typeSignature =:= tpeB && ret =:= tpeC
@@ -83,8 +81,7 @@ abstract class AutoOps {
   }
 
   def failedSearch(name: String, op: String): c.Expr[Nothing] =
-    c.abort(c.enclosingPosition,
-      "Couldn't find matching method for op %s (%s).".format(name, op))
+    c.abort(c.enclosingPosition, "Couldn't find matching method for op %s (%s).".format(name, op))
 }
 
 abstract class AutoAlgebra extends AutoOps { ops =>
@@ -147,8 +144,7 @@ abstract class AutoAlgebra extends AutoOps { ops =>
 
   /* TODO: missing GCD ring. Any examples of types with .gcd and .lcm in Scala/Java ? */
 
-  def EuclideanRing[A: c.WeakTypeTag](z: c.Expr[A], o: c.Expr[A])
-      (ev: c.Expr[Eq[A]]): c.Expr[EuclideanRing[A]] = {
+  def EuclideanRing[A: c.WeakTypeTag](z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[EuclideanRing[A]] = {
     c.universe.reify {
       new EuclideanRing[A] { self =>
         // default implementations from EuclideanRing.WithEuclideanAlgorithm
@@ -172,13 +168,12 @@ abstract class AutoAlgebra extends AutoOps { ops =>
     }
   }
 
-  def Field[A: c.WeakTypeTag]
-      (z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[Field[A]] = {
+  def Field[A: c.WeakTypeTag](z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[Field[A]] = {
     c.universe.reify {
       new Field[A] {
         // default implementations from Field.WithDefaultGCD
         override def gcd(a: A, b: A)(implicit eqA: Eq[A]): A =
-              if (isZero(a) && isZero(b)) zero else one
+          if (isZero(a) && isZero(b)) zero else one
         override def lcm(a: A, b: A)(implicit eqA: Eq[A]): A = times(a, b)
 
         def zero: A = z.splice
@@ -227,7 +222,8 @@ case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
     import c.universe._
     c.Expr[BigInt](q"x.toBigInt.abs")
   }
-  def quot[A: c.WeakTypeTag]: c.Expr[A] = binopSearch[A]("quot" :: ("$" + "div") :: Nil) getOrElse failedSearch("quot", "/~")
+  def quot[A: c.WeakTypeTag]: c.Expr[A] =
+    binopSearch[A]("quot" :: ("$" + "div") :: Nil).getOrElse(failedSearch("quot", "/~"))
   def div[A: c.WeakTypeTag]: c.Expr[A] = binop[A]("$" + "div")
   def mod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] = binop[A]("$" + "percent")
   def equals: c.Expr[Boolean] = binop[Boolean]("$" + "eq" + "$" + "eq")
@@ -236,21 +232,19 @@ case class ScalaAlgebra[C <: Context](c: C) extends AutoAlgebra {
 
 case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
   def plus[A: c.WeakTypeTag]: c.Expr[A] =
-    binopSearch[A]("add" :: "plus" :: Nil) getOrElse failedSearch("plus", "+")
+    binopSearch[A]("add" :: "plus" :: Nil).getOrElse(failedSearch("plus", "+"))
   def minus[A: c.WeakTypeTag]: c.Expr[A] =
-    binopSearch[A]("subtract" :: "minus" :: Nil) getOrElse failedSearch("minus", "-")
+    binopSearch[A]("subtract" :: "minus" :: Nil).getOrElse(failedSearch("minus", "-"))
   def times[A: c.WeakTypeTag]: c.Expr[A] =
-    binopSearch[A]("multiply" :: "times" :: Nil) getOrElse failedSearch("times", "*")
+    binopSearch[A]("multiply" :: "times" :: Nil).getOrElse(failedSearch("times", "*"))
   def div[A: c.WeakTypeTag]: c.Expr[A] =
-    binopSearch[A]("divide" :: "div" :: Nil) getOrElse failedSearch("div", "/")
+    binopSearch[A]("divide" :: "div" :: Nil).getOrElse(failedSearch("div", "/"))
   def negate[A: c.WeakTypeTag]: c.Expr[A] =
-    unopSearch[A]("negate" :: "negative" :: Nil) getOrElse {
+    unopSearch[A]("negate" :: "negative" :: Nil).getOrElse {
       // We can implement negate interms of minus. This is actually required
       // for JScience's Rational :(
       import c.universe._
-      c.Expr[A](Apply(
-        Select(Ident(termName(c)("zero")), termName(c)("minus")),
-        List(Ident(termName(c)("x")))))
+      c.Expr[A](Apply(Select(Ident(termName(c)("zero")), termName(c)("minus")), List(Ident(termName(c)("x")))))
     }
   /* TODO: this is a bit careless, but works for our examples */
   def euclideanFunction[A: c.WeakTypeTag]: c.Expr[BigInt] = {
@@ -258,9 +252,9 @@ case class JavaAlgebra[C <: Context](c: C) extends AutoAlgebra {
     c.Expr[BigInt](q"_root_.scala.BigInt(x.toBigInteger).abs")
   }
   def quot[A: c.WeakTypeTag]: c.Expr[A] =
-    binopSearch[A]("quot" :: "divide" :: "div" :: Nil) getOrElse failedSearch("quot", "/~")
+    binopSearch[A]("quot" :: "divide" :: "div" :: Nil).getOrElse(failedSearch("quot", "/~"))
   def mod[A: c.WeakTypeTag](stub: => c.Expr[A]): c.Expr[A] =
-    binopSearch("mod" :: "remainder" :: Nil) getOrElse stub
+    binopSearch("mod" :: "remainder" :: Nil).getOrElse(stub)
   def equals: c.Expr[Boolean] = binop[Boolean]("equals")
   def compare: c.Expr[Int] = binop[Int]("compareTo")
 }
@@ -278,12 +272,12 @@ object ScalaAutoMacros {
   def ringImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A], o: c.Expr[A]): c.Expr[Ring[A]] =
     ScalaAlgebra[c.type](c).Ring[A](z, o)
 
-  def euclideanRingImpl[A: c.WeakTypeTag](c: Context)
-      (z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[EuclideanRing[A]] =
+  def euclideanRingImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A], o: c.Expr[A])(
+    ev: c.Expr[Eq[A]]
+  ): c.Expr[EuclideanRing[A]] =
     ScalaAlgebra[c.type](c).EuclideanRing[A](z, o)(ev)
 
-  def fieldImpl[A: c.WeakTypeTag](c: Context)
-      (z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[Field[A]] =
+  def fieldImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[Field[A]] =
     ScalaAlgebra[c.type](c).Field[A](z, o)(ev)
 
   def eqImpl[A: c.WeakTypeTag](c: Context): c.Expr[Eq[A]] =
@@ -325,12 +319,12 @@ object JavaAutoMacros {
   def ringImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A], o: c.Expr[A]): c.Expr[Ring[A]] =
     JavaAlgebra[c.type](c).Ring[A](z, o)
 
-  def euclideanRingImpl[A: c.WeakTypeTag](c: Context)
-      (z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[EuclideanRing[A]] =
+  def euclideanRingImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A], o: c.Expr[A])(
+    ev: c.Expr[Eq[A]]
+  ): c.Expr[EuclideanRing[A]] =
     JavaAlgebra[c.type](c).EuclideanRing[A](z, o)(ev)
 
-  def fieldImpl[A: c.WeakTypeTag](c: Context)
-      (z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[Field[A]] =
+  def fieldImpl[A: c.WeakTypeTag](c: Context)(z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[Field[A]] =
     JavaAlgebra[c.type](c).Field[A](z, o)(ev)
 
   def eqImpl[A: c.WeakTypeTag](c: Context): c.Expr[Eq[A]] =

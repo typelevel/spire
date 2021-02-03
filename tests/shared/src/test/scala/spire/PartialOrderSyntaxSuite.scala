@@ -57,4 +57,3 @@ class PartialOrderSyntaxSuite extends munit.ScalaCheckSuite {
     }
   }
 }
-

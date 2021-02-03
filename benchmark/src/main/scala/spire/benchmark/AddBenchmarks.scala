@@ -13,7 +13,7 @@ import spire.math._
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 class AddBenchmarks {
 
-  def addGeneric[@sp(Int, Long, Float, Double) A:Ring](data:Array[A]):A = {
+  def addGeneric[@sp(Int, Long, Float, Double) A: Ring](data: Array[A]): A = {
     var total = Ring[A].zero
     var i = 0
     val len = data.length
@@ -21,8 +21,8 @@ class AddBenchmarks {
     total
   }
 
-  def addFastComplex(data: Array[Long]):Long = {
-    var total = FastComplex(0.0F, 0.0F)
+  def addFastComplex(data: Array[Long]): Long = {
+    var total = FastComplex(0.0f, 0.0f)
     var i = 0
     val len = data.length
     while (i < len) { total = FastComplex.add(total, data(i)); i += 1 }
@@ -56,7 +56,7 @@ class AddBenchmarks {
   @Benchmark
   def addFloatDirect(state: FloatState): Float = {
     val data = state.values
-    var total = 0.0F
+    var total = 0.0f
     var i = 0
     val len = data.length
     while (i < len) { total += data(i); i += 1 }
@@ -93,7 +93,7 @@ class AddBenchmarks {
   @Benchmark
   def addFastComplexDirect(state: FastComplexState): Long = {
     val data = state.values
-    var total = FastComplex(0.0F, 0.0F)
+    var total = FastComplex(0.0f, 0.0f)
     var i = 0
     val len = data.length
     while (i < len) { total = FastComplex.add(total, data(i)); i += 1 }
@@ -109,7 +109,7 @@ class AddBenchmarks {
     while (i < len) { total += data(i); i += 1 }
     total
   }
-  
+
   @Benchmark
   def addComplexDoubleStateGeneric(state: ComplexDoubleState): Complex[Double] = addGeneric(state.values)
 

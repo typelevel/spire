@@ -12,14 +12,14 @@ class PrimeSuite extends munit.FunSuite {
   val nonPrimes = IndexedSeq(10L, 64L, 2L ** 32, 3L ** 10).map(x => SafeLong(x))
 
   test("nth") {
-    for(i <- tenPrimes.indices)
+    for (i <- tenPrimes.indices)
       assertEquals(nth(i + 1), tenPrimes(i))
   }
 
   test("isPrime") {
-    for(p <- tenPrimes)
+    for (p <- tenPrimes)
       assert(isPrime(p))
-    for(n <- nonPrimes)
+    for (n <- nonPrimes)
       assert(!isPrime(n))
   }
 
@@ -33,14 +33,14 @@ class PrimeSuite extends munit.FunSuite {
   }
 
   test("factor") {
-    for(p <- tenPrimes) {
+    for (p <- tenPrimes) {
       assertEquals(factor(p), Factors(p))
       assertEquals(factorPollardRho(p), Factors(p))
       assertEquals(factorTrialDivision(p), Factors(p))
       assertEquals(factorWheelDivision(p), Factors(p))
     }
     def terms(f: Factors): Int = f.map(_._2).sum
-    for(n <- nonPrimes) {
+    for (n <- nonPrimes) {
       assert(terms(factor(n)) > 1)
       assert(terms(factorPollardRho(n)) > 1)
       assert(terms(factorTrialDivision(n)) > 1)

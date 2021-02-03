@@ -1,7 +1,7 @@
 package spire
 package macros.fpf
 
-private[spire] sealed trait Cmp
+sealed private[spire] trait Cmp
 private[spire] object Cmp {
   case object Lt extends Cmp
   case object Gt extends Cmp

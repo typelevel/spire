@@ -60,7 +60,7 @@ object ArbitrarySupport {
   import spire.syntax.all._
 
   implicit def sizedSpireImplicit[A: EuclideanRing: Signed: Arbitrary, L: Size, U: Size]: Arbitrary[Sized[A, L, U]] =
-    Arbitrary(arbitrary[A].map(a => Sized((a emod (Size[U] - Size[L])).abs + Size[L])))
+    Arbitrary(arbitrary[A].map(a => Sized(a.emod(Size[U] - Size[L]).abs + Size[L])))
 
   implicit def positiveSpireImplicit[A: Signed: Arbitrary]: Arbitrary[Positive[A]] =
     Arbitrary(arbitrary[A].map(_.abs).filter(_.signum > 0).map(Positive(_)))

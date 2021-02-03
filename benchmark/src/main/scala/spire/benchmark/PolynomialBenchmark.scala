@@ -185,4 +185,4 @@ class PolynomialBenchmarks extends MyBenchmark {
   def timeQuotModSpireDoublePolysDense(reps: Int) = run(reps)(quotModSpireDoublePolynomials(spireDenseDoublePolys))
 
 }
-*/
+ */

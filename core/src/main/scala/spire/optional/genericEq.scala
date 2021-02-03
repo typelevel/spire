@@ -12,7 +12,7 @@ import spire.algebra.Eq
 object genericEq {
   @SerialVersionUID(0L)
   private class GenericEq[@sp A] extends Eq[A] with Serializable {
-    def eqv(x:A, y:A): Boolean = x == y
+    def eqv(x: A, y: A): Boolean = x == y
   }
 
   implicit def generic[@sp A]: Eq[A] = new GenericEq[A]

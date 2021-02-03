@@ -8,7 +8,7 @@ import spire.implicits._
 class NRootSuite extends munit.FunSuite {
   def testIntegralNRoot[A: Ring: NRoot: ClassTag]: Unit = {
     val cls = implicitly[ClassTag[A]].runtimeClass.getSimpleName
-    test("Integral NRoot (%s)" format cls) {
+    test("Integral NRoot (%s)".format(cls)) {
       assertEquals(NRoot[A].nroot(Rig[A].one, 2), Rig[A].one)
       assertEquals(NRoot[A].nroot(Ring[A].fromInt(1234), 2), Ring[A].fromInt(35))
       assertEquals(NRoot[A].nroot(Ring[A].fromInt(912384), 3), Ring[A].fromInt(96))
@@ -29,7 +29,7 @@ class NRootSuite extends munit.FunSuite {
   def checkNRoot(x: BigDecimal, n: Int): Unit = {
     import spire.implicits._
 
-    val y = x nroot n
+    val y = x.nroot(n)
     val e = eps(y)
 
     if (x > 0) {
@@ -53,13 +53,12 @@ class NRootSuite extends munit.FunSuite {
   val roots = Seq(2, 3, 6, 9, 23, 53)
 
   test("BigDecimal NRoot") {
-    bases foreach { x =>
-      roots foreach (checkNRoot(x, _))
+    bases.foreach { x =>
+      roots.foreach(checkNRoot(x, _))
     }
 
-    bases map (-_) foreach { x =>
-      roots filter (_ % 2 == 1) foreach (checkNRoot(x, _))
+    bases.map(-_).foreach { x =>
+      roots.filter(_ % 2 == 1).foreach(checkNRoot(x, _))
     }
   }
 }
-

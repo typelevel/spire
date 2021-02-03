@@ -15,14 +15,14 @@ class NumericSuite extends munit.FunSuite {
    *
    *   a=-3  b=3  c=9
    */
-  def runWith[@sp A:Numeric:ClassTag](cls:String)(a:A, b:A, c:A): Unit = {
+  def runWith[@sp A: Numeric: ClassTag](cls: String)(a: A, b: A, c: A): Unit = {
 
     // the name to use for this A
     //val cls = implicitly[ClassTag[A]].erasure.getSimpleName
     //val cls = implicitly[ClassTag[A]].runtimeClass.getName
 
     // test runner which constructs a unique name for each test we run.
-    def runTest(name:String)(f: => Unit) = test("%s:%s".format(cls, name))(f)
+    def runTest(name: String)(f: => Unit) = test("%s:%s".format(cls, name))(f)
 
     // Numeric[A]'s zero
     val z = Numeric[A].zero
@@ -63,7 +63,7 @@ class NumericSuite extends munit.FunSuite {
   runWith[BigDecimal]("BigDecimal")(-3, 3, -9)
   runWith[Rational]("Rational")(-3, 3, -9)
   //runWith[Complex[Double]](-3, 3, -9) // There seems to be a bug.
-/*  runWith[Complex[BigDecimal]]("Complex[BigDecimal]")( // Complex is no longer Numeric
+  /*  runWith[Complex[BigDecimal]]("Complex[BigDecimal]")( // Complex is no longer Numeric
     Complex(BigDecimal(-3), BigDecimal(0)),
     Complex(BigDecimal(3), BigDecimal(0)),
     Complex(BigDecimal(-9), BigDecimal(0))
@@ -71,11 +71,11 @@ class NumericSuite extends munit.FunSuite {
 
   def testImplicitNumeric[N](cls: String)(implicit numN: Numeric[N]): Unit = {
 
-    def runTest(name:String)(f: => Unit) = test("%s:%s".format(cls, name))(f)
+    def runTest(name: String)(f: => Unit) = test("%s:%s".format(cls, name))(f)
 
     val n1 = numN.one
 
-    runTest("toDouble(1)")(assertEquals(numN.toDouble(n1), 1D))
+    runTest("toDouble(1)")(assertEquals(numN.toDouble(n1), 1d))
     runTest("toRational(1)")(assertEquals(numN.toRational(n1), Rational(1)))
     runTest("toReal(1)")(assertEquals(numN.toReal(n1), Real(1)))
   }

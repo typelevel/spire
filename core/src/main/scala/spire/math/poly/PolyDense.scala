@@ -2,7 +2,6 @@ package spire
 package math
 package poly
 
-
 import spire.algebra.{Eq, Field, Ring, Rng, Semiring}
 import spire.math.Polynomial
 import spire.std.array._
@@ -11,8 +10,8 @@ import spire.syntax.eq._
 import spire.syntax.field._
 
 // Dense polynomials - Little Endian Coeffs e.g. x^0, x^1, ... x^n
-class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])
-    (implicit val ct: ClassTag[C]) extends Polynomial[C] { lhs =>
+class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])(implicit val ct: ClassTag[C])
+    extends Polynomial[C] { lhs =>
 
   def degree: Int = if (isZero) 0 else coeffs.length - 1
 
@@ -144,7 +143,7 @@ class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])
     Polynomial.dense(cs)
   }
 
-  def *: (k: C)(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] =
+  def *:(k: C)(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] =
     if (k === ring.zero) {
       Polynomial.dense(new Array[C](0))
     } else {
@@ -157,7 +156,7 @@ class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])
 }
 
 object PolyDense {
-  private final def plusDense[C: Semiring: Eq: ClassTag](lhs: Polynomial[C], rhs: Polynomial[C]): Polynomial[C] = {
+  final private def plusDense[C: Semiring: Eq: ClassTag](lhs: Polynomial[C], rhs: Polynomial[C]): Polynomial[C] = {
     val lcoeffs = lhs.coeffsArray
     val rcoeffs = rhs.coeffsArray
     if (lcoeffs.length < rcoeffs.length) {
@@ -174,8 +173,9 @@ object PolyDense {
     }
   }
 
-  private[math] final def quotmodDense[@sp(Double) C: Field: Eq: ClassTag]
-    (lhs: PolyDense[C], rhs: Polynomial[C]): (Polynomial[C], Polynomial[C]) = {
+  final private[math] def quotmodDense[@sp(Double) C: Field: Eq: ClassTag](lhs: PolyDense[C],
+                                                                           rhs: Polynomial[C]
+  ): (Polynomial[C], Polynomial[C]) = {
     def zipSum(lcs: Array[C], rcs: Array[C]): Array[C] =
       (lcs + rcs).tail
 

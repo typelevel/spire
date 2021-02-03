@@ -21,9 +21,9 @@ class MapSemigroupBenchmarks extends MyBenchmark with BenchmarkData {
   //}
 
   /**
-   * Original code from Algebird, though without the isNonZero stuff. That is
-   * not, in general, deciable.
-   */
+ * Original code from Algebird, though without the isNonZero stuff. That is
+ * not, in general, deciable.
+ */
   def algebirdAdd[K, V](x: Map[K, V], y: Map[K, V])(implicit
       semigroup: Semigroup[V], eq: Eq[V]): Map[K, V] = {
     val (big, small, bigOnLeft) = if(x.size > y.size) { (x,y,true) } else { (y,x,false) }
@@ -123,4 +123,4 @@ class MapSemigroupBenchmarks extends MyBenchmark with BenchmarkData {
     }
   }
 }
-*/
+ */

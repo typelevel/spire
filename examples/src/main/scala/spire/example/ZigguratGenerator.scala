@@ -1,16 +1,17 @@
-/************************************************************************\
-** Project                                                              **
-**       ______  ______   __    ______    ____                          **
-**      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
-**     / /__   / /_/ /  / /   / /_/ /   / /_                            **
-**    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
-**   ____/ / / /      / /   / / | |   / /__                             **
-**  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
-**                                                                      **
-**      Redistribution and use permitted under the MIT license.         **
-**                                                                      **
-\************************************************************************/
-
+/**
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
 
 package spire
 package example
@@ -33,7 +34,7 @@ object ZigguratGenerator {
 
     val g: spire.random.Generator = spire.random.rng.Well512a.fromTime()
     def samples = 200000
-    def generate(d : spire.random.Generator => Double, n : Int) = Array.tabulate(n)(x => d(g))
+    def generate(d: spire.random.Generator => Double, n: Int) = Array.tabulate(n)(x => d(g))
 
     val rnor = generate(spire.random.Ziggurat.rnor, samples)
     val rexp = generate(spire.random.Ziggurat.rexp, samples)
@@ -56,5 +57,5 @@ object ZigguratGenerator {
     fexp.println("hist(rexp,x)")
     fexp.println("dfittool(rexp)")
     fexp.close()
-   }
+  }
 }

@@ -6,6 +6,6 @@ package object scalacompat {
   import scala.reflect.ClassTag
 
   def arrayBuilderMake[T]()(implicit tag: ClassTag[T]): ArrayBuilder[T] =
-      ArrayBuilder.make[T]
+    ArrayBuilder.make[T]
 
 }

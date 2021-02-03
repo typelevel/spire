@@ -2,8 +2,7 @@ package spire
 package math
 package poly
 
-
-import java.math.{ BigDecimal => JBigDecimal, RoundingMode, MathContext }
+import java.math.{BigDecimal => JBigDecimal, RoundingMode, MathContext}
 
 import spire.algebra._
 import spire.std.bigDecimal._
@@ -16,13 +15,13 @@ case class BigDecimalRootRefinement(
   import BigDecimalRootRefinement._
 
   def approximateValue: JBigDecimal = {
-    import context.{ floor, ceil }
+    import context.{ceil, floor}
     approximation match {
-      case ExactRoot(root) => floor(root)
+      case ExactRoot(root)         => floor(root)
       case Bounded(lb, _, _, _, n) => ceil(lb)
-      case BoundedLeft(_, ub) => floor(ub)
-      case BoundedRight(lb, _) => ceil(lb)
-      case Unbounded(lb, ub) => ceil(lb)
+      case BoundedLeft(_, ub)      => floor(ub)
+      case BoundedRight(lb, _)     => ceil(lb)
+      case Unbounded(lb, ub)       => ceil(lb)
     }
   }
 
@@ -74,26 +73,39 @@ object BigDecimalRootRefinement {
     BigDecimalRootRefinement(AbsoluteContext(upoly), Unbounded(lowerBound, upperBound))
   }
 
-  def apply(poly: Polynomial[BigDecimal], lowerBound: Rational, upperBound: Rational, scale: Int): BigDecimalRootRefinement =
+  def apply(poly: Polynomial[BigDecimal],
+            lowerBound: Rational,
+            upperBound: Rational,
+            scale: Int
+  ): BigDecimalRootRefinement =
     apply(poly, lowerBound, upperBound).refine(scale)
 
-  def apply(poly: Polynomial[BigDecimal], lowerBound: Rational, upperBound: Rational, mc: MathContext): BigDecimalRootRefinement =
+  def apply(poly: Polynomial[BigDecimal],
+            lowerBound: Rational,
+            upperBound: Rational,
+            mc: MathContext
+  ): BigDecimalRootRefinement =
     apply(poly, lowerBound, upperBound).refine(mc)
 
-  private implicit val JBigDecimalOrder: Signed[JBigDecimal] = new SignedAdditiveAbGroup[JBigDecimal] {
+  implicit private val JBigDecimalOrder: Signed[JBigDecimal] = new SignedAdditiveAbGroup[JBigDecimal] {
     def negate(x: JBigDecimal) = x.negate
     def zero = JBigDecimal.ZERO
     def plus(x: JBigDecimal, y: JBigDecimal) = x.add(y)
     override def signum(a: JBigDecimal): Int = a.signum
     override def abs(a: JBigDecimal): JBigDecimal = a.abs
-    def compare(x: JBigDecimal, y: JBigDecimal): Int = x compareTo y
+    def compare(x: JBigDecimal, y: JBigDecimal): Int = x.compareTo(y)
   }
 
   private val bits2dec: Double = log(2, 10)
 
   sealed abstract class Approximation
   case class ExactRoot(root: JBigDecimal) extends Approximation
-  case class Bounded(lowerBound: JBigDecimal, lowerBoundValue: JBigDecimal, upperBound: JBigDecimal, upperBoundValue: JBigDecimal, n: Int) extends Approximation
+  case class Bounded(lowerBound: JBigDecimal,
+                     lowerBoundValue: JBigDecimal,
+                     upperBound: JBigDecimal,
+                     upperBoundValue: JBigDecimal,
+                     n: Int
+  ) extends Approximation
   case class BoundedLeft(lowerBound: Rational, upperBound: JBigDecimal) extends Approximation
   case class BoundedRight(lowerBound: JBigDecimal, upperBound: Rational) extends Approximation
   case class Unbounded(lowerBound: Rational, upperBound: Rational) extends Approximation
@@ -108,12 +120,12 @@ object BigDecimalRootRefinement {
     def ceil(x: JBigDecimal): JBigDecimal
   }
 
-  case class AbsoluteContext private[poly] (poly: Polynomial[BigDecimal], scale: Int = Int.MinValue) extends ApproximationContext {
+  case class AbsoluteContext private[poly] (poly: Polynomial[BigDecimal], scale: Int = Int.MinValue)
+      extends ApproximationContext {
     def getEps(x: JBigDecimal): Int = scale
 
     def evalExact(x: JBigDecimal): JBigDecimal =
-      poly(new BigDecimal(x, MathContext.UNLIMITED))
-        .bigDecimal
+      poly(new BigDecimal(x, MathContext.UNLIMITED)).bigDecimal
         .setScale(scale, RoundingMode.UP)
 
     def floor(x: Rational): JBigDecimal =
@@ -129,13 +141,13 @@ object BigDecimalRootRefinement {
       x.setScale(scale, RoundingMode.CEILING)
   }
 
-  case class RelativeContext private[poly] (poly: Polynomial[BigDecimal], mc: MathContext = new MathContext(0)) extends ApproximationContext {
+  case class RelativeContext private[poly] (poly: Polynomial[BigDecimal], mc: MathContext = new MathContext(0))
+      extends ApproximationContext {
     def getEps(x: JBigDecimal): Int =
       x.scale - spire.math.ceil(x.unscaledValue.bitLength * bits2dec).toInt + mc.getPrecision + 1
 
     def evalExact(x: JBigDecimal): JBigDecimal =
-      poly(new BigDecimal(x, MathContext.UNLIMITED))
-        .bigDecimal
+      poly(new BigDecimal(x, MathContext.UNLIMITED)).bigDecimal
         .round(mc)
 
     def floor(x: Rational): JBigDecimal =
@@ -176,7 +188,11 @@ object BigDecimalRootRefinement {
           val a = BigDecimal(h.denominator.toBigInteger.pow(n - k), MathContext.UNLIMITED)
           Term(coeff * a, k)
         }
-        .compose(Polynomial.linear[BigDecimal](BigDecimal(h.denominator.toBigInteger, MathContext.UNLIMITED), BigDecimal(h.numerator.toBigInteger, MathContext.UNLIMITED)))
+        .compose(
+          Polynomial.linear[BigDecimal](BigDecimal(h.denominator.toBigInteger, MathContext.UNLIMITED),
+                                        BigDecimal(h.numerator.toBigInteger, MathContext.UNLIMITED)
+          )
+        )
         .removeZeroRoots
     }
 
@@ -226,7 +242,11 @@ object BigDecimalRootRefinement {
     // to different, non-zero signs. However, we may find 1 or both of the
     // bounds to be 0, or to have "overshot" the root, so we have to either
     // find a good (lx, rx) or return an approximation early.
-    def adjust(lx: JBigDecimal, lyOpt: Option[JBigDecimal], rx: JBigDecimal, ryOpt: Option[JBigDecimal]): Approximation = {
+    def adjust(lx: JBigDecimal,
+               lyOpt: Option[JBigDecimal],
+               rx: JBigDecimal,
+               ryOpt: Option[JBigDecimal]
+    ): Approximation = {
       def qlx = Rational(new BigDecimal(lx, MathContext.UNLIMITED))
       def qrx = Rational(new BigDecimal(rx, MathContext.UNLIMITED))
 
@@ -279,8 +299,10 @@ object BigDecimalRootRefinement {
   // scalastyle:off method.length
   private def QIR(
     context: ApproximationContext,
-    lowerBound: JBigDecimal, lowerBoundValue: JBigDecimal,
-    upperBound: JBigDecimal, upperBoundValue: JBigDecimal,
+    lowerBound: JBigDecimal,
+    lowerBoundValue: JBigDecimal,
+    upperBound: JBigDecimal,
+    upperBoundValue: JBigDecimal,
     n0: Int = 0
   ): Approximation = {
     import context._

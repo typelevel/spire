@@ -85,7 +85,7 @@ trait Dist[@sp A] extends Any { self =>
     }
 
   def iterate(n: Int, f: A => Dist[A]): Dist[A] =
-    if (n == 0) this else flatMap(f).iterate(n - 1 ,f)
+    if (n == 0) this else flatMap(f).iterate(n - 1, f)
 
   def iterateUntil(pred: A => Boolean, f: A => Dist[A]): Dist[A] = new Dist[A] {
     @tailrec def loop(gen: Generator, a: A): A =
@@ -190,7 +190,8 @@ trait DistGCDRing[A] extends DistCRing[A] with GCDRing[Dist[A]] {
 
 trait DistEuclideanRing[A] extends DistGCDRing[A] with EuclideanRing[Dist[A]] {
   def alg: EuclideanRing[A]
-  override def euclideanFunction(x: Dist[A]): BigInt = sys.error("euclideanFunction is not defined, as Dist is a monad, and euclideanFunction should return Dist[BigInt]")
+  override def euclideanFunction(x: Dist[A]): BigInt =
+    sys.error("euclideanFunction is not defined, as Dist is a monad, and euclideanFunction should return Dist[BigInt]")
   def equot(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.equot(x(g), y(g)))
   def emod(x: Dist[A], y: Dist[A]): Dist[A] = new DistFromGen(g => alg.emod(x(g), y(g)))
   override def gcd(x: Dist[A], y: Dist[A])(implicit ev: Eq[Dist[A]]): Dist[A] = super[DistGCDRing].gcd(x, y)
@@ -204,7 +205,8 @@ trait DistField[A] extends DistEuclideanRing[A] with Field[Dist[A]] {
   override def emod(x: Dist[A], y: Dist[A]): Dist[A] = super[DistEuclideanRing].emod(x, y)
   override def equotmod(x: Dist[A], y: Dist[A]): (Dist[A], Dist[A]) = super[DistEuclideanRing].equotmod(x, y)
   override def reciprocal(x: Dist[A]): Dist[A] = new DistFromGen(g => alg.reciprocal(x(g)))
-  override def euclideanFunction(x: Dist[A]): BigInt = sys.error("euclideanFunction is not defined, as Dist is a monad, and euclideanFunction should return Dist[BigInt]")
+  override def euclideanFunction(x: Dist[A]): BigInt =
+    sys.error("euclideanFunction is not defined, as Dist is a monad, and euclideanFunction should return Dist[BigInt]")
 }
 
 trait DistCModule[V, K] extends CModule[Dist[V], Dist[K]] {
@@ -228,18 +230,16 @@ trait DistVectorSpace[V, K] extends DistCModule[V, K] with VectorSpace[Dist[V], 
   override def divr(v: Dist[V], k: Dist[K]): Dist[V] = new DistFromGen(g => v(g) :/ k(g))
 }
 
-trait DistNormedVectorSpace[V, K] extends DistVectorSpace[V, K]
-  with NormedVectorSpace[Dist[V], Dist[K]] {
+trait DistNormedVectorSpace[V, K] extends DistVectorSpace[V, K] with NormedVectorSpace[Dist[V], Dist[K]] {
   implicit def alg: NormedVectorSpace[V, K]
 
-  def norm(v: Dist[V]): Dist[K] = v map alg.norm
+  def norm(v: Dist[V]): Dist[K] = v.map(alg.norm)
 }
 
-trait DistInnerProductSpace[V, K] extends DistVectorSpace[V, K]
-  with InnerProductSpace[Dist[V], Dist[K]] {
+trait DistInnerProductSpace[V, K] extends DistVectorSpace[V, K] with InnerProductSpace[Dist[V], Dist[K]] {
   implicit def alg: InnerProductSpace[V, K]
 
-  def dot(v: Dist[V], w: Dist[V]): Dist[K] = new DistFromGen(g => v(g) dot w(g))
+  def dot(v: Dist[V], w: Dist[V]): Dist[K] = new DistFromGen(g => v(g).dot(w(g)))
 }
 
 object Dist extends DistInstances9 {
@@ -271,7 +271,7 @@ object Dist extends DistInstances9 {
     new DistFromGen(g => f(g.generateLongs(n)))
 
   def mix[A](ds: Dist[A]*): Dist[A] =
-    Dist.oneOf(ds:_*).flatMap(identity)
+    Dist.oneOf(ds: _*).flatMap(identity)
 
   def weightedMix[A](tpls: (Double, Dist[A])*): Dist[A] = {
     val ds = new Array[Dist[A]](tpls.length)
@@ -338,13 +338,13 @@ object Dist extends DistInstances9 {
   }
 
   def safelong(maxBytes: Int): Dist[SafeLong] = if (maxBytes <= 0) {
-    throw new IllegalArgumentException("need positive maxBytes, got %s" format maxBytes)
+    throw new IllegalArgumentException("need positive maxBytes, got %s".format(maxBytes))
   } else if (maxBytes < 8) {
     val n = (8 - maxBytes) * 8
     new DistFromGen(g => SafeLong(g.nextLong() >>> n))
   } else if (maxBytes == 8) {
     new DistFromGen(g => SafeLong(g.nextLong()))
-  } else  {
+  } else {
     bigint(maxBytes).map(SafeLong(_))
   }
 
@@ -429,7 +429,7 @@ trait DistInstances2 extends DistInstances1 {
 
 trait DistInstances3 extends DistInstances2 {
   implicit def gcdRing[A](implicit ev1: Eq[A], ev2: GCDRing[A]): GCDRing[Dist[A]] =
-    new DistGCDRing[A] { def alg = ev2; def eqA = ev1  }
+    new DistGCDRing[A] { def alg = ev2; def eqA = ev1 }
 }
 
 trait DistInstances4 extends DistInstances3 {
@@ -443,21 +443,27 @@ trait DistInstances5 extends DistInstances4 {
 }
 
 trait DistInstances6 extends DistInstances5 {
-  implicit def module[V,K](implicit ev2: CModule[V,K]): CModule[Dist[V],Dist[K]] =
-    new DistCModule[V,K] { def alg = ev2 }
+  implicit def module[V, K](implicit ev2: CModule[V, K]): CModule[Dist[V], Dist[K]] =
+    new DistCModule[V, K] { def alg = ev2 }
 }
 
 trait DistInstances7 extends DistInstances6 {
-  implicit def vectorSpace[V,K](implicit ev1: Eq[K], ev2: VectorSpace[V,K]): VectorSpace[Dist[V],Dist[K]] =
-    new DistVectorSpace[V,K] { def alg = ev2; def eqK = ev1 }
+  implicit def vectorSpace[V, K](implicit ev1: Eq[K], ev2: VectorSpace[V, K]): VectorSpace[Dist[V], Dist[K]] =
+    new DistVectorSpace[V, K] { def alg = ev2; def eqK = ev1 }
 }
 
 trait DistInstances8 extends DistInstances7 {
-  implicit def NormedVectorSpace[V,K](implicit ev1: Eq[K], ev2: NormedVectorSpace[V,K]): NormedVectorSpace[Dist[V],Dist[K]] =
-    new DistNormedVectorSpace[V,K] { def alg = ev2; def eqK = ev1 }
+  implicit def NormedVectorSpace[V, K](implicit
+    ev1: Eq[K],
+    ev2: NormedVectorSpace[V, K]
+  ): NormedVectorSpace[Dist[V], Dist[K]] =
+    new DistNormedVectorSpace[V, K] { def alg = ev2; def eqK = ev1 }
 }
 
 trait DistInstances9 extends DistInstances8 {
-  implicit def InnerProductSpace[V,K](implicit ev1: Eq[K], ev2: InnerProductSpace[V,K]): InnerProductSpace[Dist[V],Dist[K]] =
-    new DistInnerProductSpace[V,K] { def alg = ev2; def eqK = ev1 }
+  implicit def InnerProductSpace[V, K](implicit
+    ev1: Eq[K],
+    ev2: InnerProductSpace[V, K]
+  ): InnerProductSpace[Dist[V], Dist[K]] =
+    new DistInnerProductSpace[V, K] { def alg = ev2; def eqK = ev1 }
 }

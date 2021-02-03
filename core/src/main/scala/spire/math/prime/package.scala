@@ -147,12 +147,12 @@ package object prime {
         var ys = y
         while (r > k && g == 1) {
           ys = y
-          val limit = m min (r - k)
+          val limit = m.min(r - k)
           cfor(0)(limit > _, _ + 1) { _ =>
             y = f(y)
             q = (q * (x - y).abs) % n
           }
-          if (q == 0) g = n else g = n gcd q
+          if (q == 0) g = n else g = n.gcd(q)
           k = k + m
         }
 
@@ -161,7 +161,7 @@ package object prime {
 
       @tailrec def slowRho(x: SafeLong, ys: SafeLong): SafeLong = {
         val yys = f(ys)
-        val g = n gcd (x - yys).abs
+        val g = n.gcd((x - yys).abs)
         if (g == 1) slowRho(x, yys) else g
       }
 
@@ -219,7 +219,7 @@ package object prime {
   def nth(n: Long): SafeLong =
     sieverUpToNth(n).nth(n)
 
-  import SafeLong.{two, three}
+  import SafeLong.{three, two}
 
   def fill(n: Int): Array[SafeLong] = {
     if (n <= 0) throw new IllegalArgumentException(n.toString)
@@ -241,7 +241,8 @@ package object prime {
   }
 
   def fill(start: Int, limit: Int): Array[SafeLong] =
-    if (start == 0) fill(limit) else {
+    if (start == 0) fill(limit)
+    else {
       val siever = sieverUpToNth(start + limit)
       def loop(i: Int, p: SafeLong): Array[SafeLong] =
         if (i < start) loop(i + 1, siever.nextAfter(p))

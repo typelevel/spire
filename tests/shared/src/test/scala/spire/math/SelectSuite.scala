@@ -35,11 +35,11 @@ trait SelectSuite extends munit.FunSuite {
   }
 
   test("arbitrary selection") {
-    (1 to 10) foreach { len =>
+    (1 to 10).foreach { len =>
       val as = Array.range(0, len)
 
-      (0 until len) foreach { i =>
-        (1 to 5) foreach { _ =>
+      (0 until len).foreach { i =>
+        (1 to 5).foreach { _ =>
           val bs = shuffle(as)
           val orig = bs.clone()
           select(bs, i)
@@ -57,4 +57,3 @@ class LinearSelectSuite extends SelectSuite {
 class QuickSelectSuite extends SelectSuite {
   val selector = QuickSelect
 }
-
