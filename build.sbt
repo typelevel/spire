@@ -10,7 +10,7 @@ lazy val munit = "0.7.21"
 lazy val munitDiscipline = "1.0.5"
 
 lazy val shapelessVersion = "2.3.3"
-lazy val algebraVersion = "2.1.1"
+lazy val algebraVersion = "2.2.0"
 
 lazy val apfloatVersion = "1.9.1"
 lazy val jscienceVersion = "4.3.1"
