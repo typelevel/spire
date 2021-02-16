@@ -4,7 +4,7 @@ import microsites._
 import ReleaseTransformations._
 import sbtcrossproject.{crossProject, CrossType}
 
-lazy val scalaCheckVersion = "1.15.2"
+lazy val scalaCheckVersion = "1.15.3"
 
 lazy val munit = "0.7.21"
 lazy val munitDiscipline = "1.0.5"
