@@ -16,7 +16,7 @@ lazy val apfloatVersion = "1.9.1"
 lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
-val Scala213 = "2.13.4"
+val Scala213 = "2.13.5"
 
 ThisBuild / crossScalaVersions := Seq(Scala213)
 ThisBuild / scalaVersion := Scala213
