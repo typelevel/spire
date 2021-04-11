@@ -398,8 +398,7 @@ lazy val munitSettings = Seq(
   libraryDependencies ++= Seq(
     "org.scalameta" %%% "munit" % munit,
     "org.typelevel" %%% "discipline-munit" % munitDiscipline
-  ),
-  testFrameworks += new TestFramework("munit.Framework")
+  )
 )
 
 lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps ++ publishSettings ++ scoverageSettings
