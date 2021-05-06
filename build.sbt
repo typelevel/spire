@@ -9,7 +9,7 @@ lazy val scalaCheckVersion = "1.15.4"
 lazy val munit = "0.7.25"
 lazy val munitDiscipline = "1.0.8"
 
-lazy val shapelessVersion = "2.3.4"
+lazy val shapelessVersion = "2.3.5"
 lazy val algebraVersion = "2.2.2"
 
 lazy val apfloatVersion = "1.9.1"
