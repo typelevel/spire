@@ -7,7 +7,7 @@ import sbtcrossproject.{crossProject, CrossType}
 lazy val scalaCheckVersion = "1.15.4"
 
 lazy val munit = "0.7.26"
-lazy val munitDiscipline = "1.0.8"
+lazy val munitDiscipline = "1.0.9"
 
 lazy val shapelessVersion = "2.3.6"
 lazy val algebraVersion = "2.2.2"
