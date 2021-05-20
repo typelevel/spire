@@ -127,7 +127,7 @@ object TrigTest {
     println(s"testing $name")
     while (i < limit) {
       if (verbose) println("  trying i=%s".format(i))
-      implicit val mc = new MathContext(i)
+      implicit val mc: MathContext = new MathContext(i)
       val seen = f(mc)
       if (check) {
         val want = BigDecimal(s, mc)

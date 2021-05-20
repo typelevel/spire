@@ -23,7 +23,7 @@ object totalfloat {
     override def max(x: Float, y: Float): Float = Math.max(x, y)
     def compare(x: Float, y: Float): Int = java.lang.Float.compare(x, y)
   }
-  implicit final val TotalFloatOrder = new TotalFloatOrder {}
+  implicit final val TotalFloatOrder: Order[Float] = new TotalFloatOrder {}
 
   trait TotalDoubleOrder extends Order[Double] {
     override def eqv(x: Double, y: Double): Boolean = java.lang.Double.compare(x, y) == 0
@@ -36,5 +36,5 @@ object totalfloat {
     override def max(x: Double, y: Double): Double = Math.max(x, y)
     def compare(x: Double, y: Double): Int = java.lang.Double.compare(x, y)
   }
-  implicit final val TotalDoubleOrder = new TotalDoubleOrder {}
+  implicit final val TotalDoubleOrder: Order[Double] = new TotalDoubleOrder {}
 }

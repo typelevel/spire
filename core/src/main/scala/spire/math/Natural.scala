@@ -714,9 +714,11 @@ object Natural extends NaturalInstances {
 }
 
 trait NaturalInstances {
-  implicit final val NaturalAlgebra = new NaturalAlgebra
+  implicit final val NaturalAlgebra
+    : CRig[Natural] with Order[Natural] with SignedAdditiveCMonoid[Natural] with TruncatedDivision[Natural] =
+    new NaturalAlgebra
   import NumberTag._
-  implicit final val NaturalTag =
+  implicit final val NaturalTag: NumberTag[Natural] =
     new CustomTag[Natural](Integral, Some(Natural.zero), Some(Natural.zero), None, false, false)
 }
 

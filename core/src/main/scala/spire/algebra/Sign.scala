@@ -37,7 +37,7 @@ object Sign {
     def compare(x: Sign, y: Sign): Int = java.lang.Integer.signum(x.toInt - y.toInt)
   }
 
-  implicit final val SignAlgebra = new SignAlgebra
+  implicit final val SignAlgebra: CMonoid[Sign] with Signed[Sign] = new SignAlgebra
 
   implicit final val SignMultiplicativeGroup: MultiplicativeCMonoid[Sign] =
     Multiplicative(SignAlgebra)

@@ -26,5 +26,5 @@ trait UnitAbGroup extends AbGroup[Unit] {
 class UnitAlgebra extends UnitAbGroup with UnitOrder with Serializable
 
 trait UnitInstances {
-  implicit final val UnitAlgebra = new UnitAlgebra
+  implicit final val UnitAlgebra: AbGroup[Unit] with Order[Unit] = new UnitAlgebra
 }

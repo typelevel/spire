@@ -15,12 +15,12 @@ trait Integral[@sp(Int, Long) A]
     with IsReal[A]
 
 object Integral {
-  implicit final val ByteIsIntegral = new ByteIsIntegral
-  implicit final val ShortIsIntegral = new ShortIsIntegral
-  implicit final val IntIsIntegral = new IntIsIntegral
-  implicit final val LongIsIntegral = new LongIsIntegral
-  implicit final val BigIntIsIntegral = new BigIntIsIntegral
-  implicit final val SafeLongIsIntegral = new SafeLongIsIntegral
+  implicit final val ByteIsIntegral: Integral[Byte] = new ByteIsIntegral
+  implicit final val ShortIsIntegral: Integral[Short] = new ShortIsIntegral
+  implicit final val IntIsIntegral: Integral[Int] = new IntIsIntegral
+  implicit final val LongIsIntegral: Integral[Long] = new LongIsIntegral
+  implicit final val BigIntIsIntegral: Integral[BigInt] = new BigIntIsIntegral
+  implicit final val SafeLongIsIntegral: Integral[SafeLong] = new SafeLongIsIntegral
 
   @inline final def apply[A](implicit ev: Integral[A]): Integral[A] = ev
 }

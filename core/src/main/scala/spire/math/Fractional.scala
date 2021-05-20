@@ -7,12 +7,12 @@ import spire.std._
 trait Fractional[@sp(Float, Double) A] extends Any with Field[A] with NRoot[A] with Integral[A]
 
 object Fractional {
-  implicit final val FloatIsFractional = new FloatIsFractional
-  implicit final val DoubleIsFractional = new DoubleIsFractional
-  implicit final val BigDecimalIsFractional = new BigDecimalIsFractional
-  implicit final val AlgebraicIsFractional = new AlgebraicIsFractional
-  implicit final val NumberIsFractional = new NumberIsFractional
-  implicit final val RationalIsFractional = new RationalIsFractional
+  implicit final val FloatIsFractional: Fractional[Float] = new FloatIsFractional
+  implicit final val DoubleIsFractional: Fractional[Double] = new DoubleIsFractional
+  implicit final val BigDecimalIsFractional: Fractional[BigDecimal] = new BigDecimalIsFractional
+  implicit final val AlgebraicIsFractional: Fractional[Algebraic] = new AlgebraicIsFractional
+  implicit final val NumberIsFractional: Fractional[Number] = new NumberIsFractional
+  implicit final val RationalIsFractional: Fractional[Rational] = new RationalIsFractional
 
   @inline final def apply[A](implicit ev: Fractional[A]): Fractional[A] = ev
 }

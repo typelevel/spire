@@ -35,5 +35,5 @@ object IntervalSeqArbitrary {
     15 -> randomProfileXor(Int.MinValue, Int.MaxValue, size)
   )
 
-  implicit val arbIntervalSeq = Arbitrary[IntervalSeq[Int]](randomProfileGen(3))
+  implicit val arbIntervalSeq: Arbitrary[IntervalSeq[Int]] = Arbitrary[IntervalSeq[Int]](randomProfileGen(3))
 }

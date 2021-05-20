@@ -109,8 +109,11 @@ class ByteIsBitString extends BitString[Byte] with Serializable {
 class ByteAlgebra extends ByteIsEuclideanRing with ByteIsReal with Serializable
 
 trait ByteInstances {
-  implicit final val ByteBitString = new ByteIsBitString
-  implicit final val ByteAlgebra = new ByteAlgebra
+  implicit final val ByteBitString: BitString[Byte] = new ByteIsBitString
+  implicit final val ByteAlgebra
+    : EuclideanRing[Byte] with IsIntegral[Byte] with TruncatedDivisionCRing[Byte] with Signed[Byte] with Order[Byte] =
+    new ByteAlgebra
+  import spire.math.NumberTag
   import spire.math.NumberTag._
-  implicit final val ByteTag = new BuiltinIntTag[Byte](0, Byte.MinValue, Byte.MaxValue)
+  implicit final val ByteTag: NumberTag[Byte] = new BuiltinIntTag[Byte](0, Byte.MinValue, Byte.MaxValue)
 }

@@ -193,10 +193,16 @@ class BigDecimalAlgebra extends BigDecimalIsField with BigDecimalIsNRoot with Bi
 trait BigDecimalInstances {
   import BigDecimal.defaultMathContext
 
-  implicit final val BigDecimalAlgebra = new BigDecimalAlgebra
+  implicit final val BigDecimalAlgebra: Field.WithDefaultGCD[BigDecimal]
+    with NRoot[BigDecimal]
+    with IsRational[BigDecimal]
+    with TruncatedDivisionCRing[BigDecimal]
+    with Signed[BigDecimal]
+    with Order[BigDecimal] = new BigDecimalAlgebra
   implicit def BigDecimalIsTrig(implicit mc: MathContext = defaultMathContext): BigDecimalIsTrig =
     new BigDecimalIsTrig(mc)
 
+  import spire.math.NumberTag
   import spire.math.NumberTag._
-  implicit final val BigDecimalTag = new LargeTag[BigDecimal](Approximate, BigDecimal(0))
+  implicit final val BigDecimalTag: NumberTag[BigDecimal] = new LargeTag[BigDecimal](Approximate, BigDecimal(0))
 }

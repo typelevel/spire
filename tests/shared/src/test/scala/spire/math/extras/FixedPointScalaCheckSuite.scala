@@ -22,7 +22,7 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("FixedScale(r).toRational ~= r") {
     forAll { (s: FixedScale, r: Rational) =>
-      implicit val scale = s
+      implicit val scale: FixedScale = s
       val minV = FixedPoint.MinValue.toRational
       val maxV = FixedPoint.MaxValue.toRational
       if (r < minV || maxV < r) {
@@ -35,7 +35,7 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("new FixedScale(n).toRational = n/d") {
     forAll { (s: FixedScale, n: Long) =>
-      implicit val scale = s
+      implicit val scale: FixedScale = s
       new FixedPoint(n).toRational == Rational(n, s.denom)
     }
   }
@@ -56,7 +56,7 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
   def testBinop2(name: String, noZero: Boolean, f: S2[FixedPoint], g: F2[Rational]) =
     property(name) {
       forAll { (x: Long, y: Long, s: FixedScale) =>
-        implicit val scale = s
+        implicit val scale: FixedScale = s
         (!noZero || y != 0L) ==> {
           val (fx, fy) = (new FixedPoint(x), new FixedPoint(y))
           val (ax, ay) = (Rational(x, s.denom), Rational(y, s.denom))
@@ -79,7 +79,7 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
 
         val ofz =
           try {
-            implicit val scale = FixedScale(denom)
+            implicit val scale: FixedScale = FixedScale(denom)
             Some(f(fx, fy, scale))
           } catch {
             case _: FixedPointOverflow => None
@@ -102,8 +102,6 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
 
   testBinop2("division", true, (x, y, s) => x./(y)(s), _ / _)
 
-  // testBinop2("modulus", true, (x, y, s) => x % y, _ % _) // TODO: maybe test truncated division instead
-
   def buildHalf(x: Long, z: Byte): (Int, Int, FixedPoint, Rational) = {
     val d = z.toInt.abs % 11
     val denom = 10 ** d
@@ -124,7 +122,7 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
 
         val ofz =
           try {
-            implicit val scale = FixedScale(denom)
+            implicit val scale: FixedScale = FixedScale(denom)
             Some(f(fx, y, scale))
           } catch {
             case _: FixedPointOverflow => None
@@ -147,8 +145,6 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
 
   testHalfop("h-division", true, (x, y, s) => x / y, _ / _)
 
-  //  testHalfop("h-modulus", true, (x, y, s) => (x).%(y)(s), _ % _) // TODO: maybe test truncated division instead
-
   property("pow") {
     forAll { (x: Long, k0: Byte, d0: Byte) =>
       val k = k0.toInt.abs
@@ -158,7 +154,7 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
 
       val ofz =
         try {
-          implicit val scale = FixedScale(denom)
+          implicit val scale: FixedScale = FixedScale(denom)
           Some(new FixedPoint(x).pow(k))
         } catch {
           case _: FixedPointOverflow => None

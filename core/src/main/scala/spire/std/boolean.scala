@@ -46,5 +46,5 @@ class BooleanStructure extends BooleanIsBool with BooleanIsRig with BooleanOrder
 }
 
 trait BooleanInstances {
-  implicit final val BooleanStructure = new BooleanStructure
+  implicit final val BooleanStructure: Bool[Boolean] with CRig[Boolean] with Order[Boolean] = new BooleanStructure
 }

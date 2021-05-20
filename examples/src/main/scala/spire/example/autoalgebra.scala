@@ -88,16 +88,13 @@ object AutoAlgebraExample extends App {
   implicit val ushortOrder = Auto.scala.order[UShort]
   implicit val ushortRig = Auto.scala.rig[UShort](UShort(0), UShort(1))
 
-  implicit val intOrder = Auto.scala.order[Int]
   implicit val intEuclideanRing = Auto.scala.euclideanRing[Int](0, 1)
 
-  implicit val bigIntOrder = Auto.scala.order[BigInt]
   implicit val bigIntField = Auto.scala.euclideanRing[BigInt](BigInt(0), BigInt(1))
 
   implicit val rationalOrder = Auto.scala.order[Rational]
   implicit val rationalField = Auto.scala.field[Rational](Rational.zero, Rational.one)
 
-  implicit val doubleOrder = Auto.scala.order[Double]
   implicit val doubleField = Auto.scala.field[Double](0d, 1d)
 
   implicit def listMonoid[A] = Auto.scala.collection.monoid[List[A]](Nil)

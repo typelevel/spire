@@ -59,7 +59,7 @@ object EndoRingExample extends App {
     def apply[A: AbGroup] = new EndoRing[A]
   }
 
-  implicit val intEndoRing = EndoRing[Int]
+  implicit val intEndoRing: EndoRing[Int] = EndoRing[Int]
 
   // Now we can treat Int => Int functions as a Ring. It obeys all the rules
   // you expect from a Ring, like distributivity. Of course, the
@@ -86,7 +86,7 @@ object EndoRingExample extends App {
     assert(((five * two) + two)(i) == 12 * i)
   }
 
-  implicit val pairedSetEndoRing = EndoRing[(Set[Int], Set[Int])]
+  implicit val pairedSetEndoRing: EndoRing[(Set[Int], Set[Int])] = EndoRing[(Set[Int], Set[Int])]
 
   type PairedSet[A] = (Set[A], Set[A])
 

@@ -17,5 +17,5 @@ trait CharOrder extends Order[Char] {
 class CharAlgebra extends CharOrder with Serializable
 
 trait CharInstances {
-  implicit final val CharAlgebra = new CharAlgebra
+  implicit final val CharAlgebra: Order[Char] = new CharAlgebra
 }
