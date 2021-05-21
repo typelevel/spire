@@ -62,10 +62,11 @@ class UInt(val signed: Int) extends AnyVal {
 }
 
 trait UIntInstances {
-  implicit final val UIntAlgebra = new UIntAlgebra
-  implicit final val UIntBitString = new UIntBitString
+  implicit final val UIntAlgebra
+    : CRig[UInt] with IsIntegral[UInt] with TruncatedDivision[UInt] with SignedAdditiveCMonoid[UInt] = new UIntAlgebra
+  implicit final val UIntBitString: BitString[UInt] = new UIntBitString
   import spire.math.NumberTag._
-  implicit final val UIntTag = new UnsignedIntTag[UInt](UInt.MinValue, UInt.MaxValue)
+  implicit final val UIntTag: NumberTag[UInt] = new UnsignedIntTag[UInt](UInt.MinValue, UInt.MaxValue)
 }
 
 private[math] trait UIntIsCRig extends CRig[UInt] {

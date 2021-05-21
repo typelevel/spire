@@ -59,6 +59,6 @@ trait StringInstances0 {
 }
 
 trait StringInstances extends StringInstances0 {
-  implicit final val StringAlgebra = new StringMonoid
-  implicit final val StringOrder = new StringOrder
+  implicit final val StringAlgebra: Monoid[String] = new StringMonoid
+  implicit final val StringOrder: Order[String] = new StringOrder
 }

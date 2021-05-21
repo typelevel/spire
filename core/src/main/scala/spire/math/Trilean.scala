@@ -162,9 +162,9 @@ object Trilean {
       case _: Exception => Unknown
     }
 
-  implicit val algebra = new TrileanAlgebra
+  implicit val algebra: DeMorgan[Trilean] = new TrileanAlgebra
 
-  implicit val trileanEq = new Eq[Trilean] {
+  implicit val trileanEq: Eq[Trilean] = new Eq[Trilean] {
     def eqv(x: Trilean, y: Trilean): Boolean = x.value == y.value
   }
 }

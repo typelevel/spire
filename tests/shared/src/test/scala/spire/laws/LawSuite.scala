@@ -181,7 +181,7 @@ class LawSuite extends munit.DisciplineSuite {
 
   checkAll("Bool[Boolean]", LogicLaws[Boolean].bool)
   checkAll("Bool[Int]", LogicLaws[Int].bool)
-  implicit val latticeLawsTrilean = _root_.algebra.laws.LatticeLaws[Trilean]
+  implicit val latticeLawsTrilean: _root_.algebra.laws.LatticeLaws[Trilean] = _root_.algebra.laws.LatticeLaws[Trilean]
   checkAll("DeMorgan[Trilean]", DeMorganLaws[Trilean].deMorgan)
 
   object intMinMaxLattice extends MinMaxLattice[Int] with BoundedLattice[Int] with spire.std.IntOrder {

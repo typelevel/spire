@@ -5,7 +5,7 @@ import spire.algebra.Trig
 import spire.math.Rational
 
 object rationalTrig {
-  implicit val trigRational = new Trig[Rational] {
+  implicit val trigRational: Trig[Rational] = new Trig[Rational] {
     val r180 = Rational(180)
     import spire.std.double._
     def acos(a: Rational): Rational = Rational(spire.math.acos(a.toDouble))

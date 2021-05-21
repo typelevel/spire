@@ -1567,10 +1567,13 @@ object Algebraic extends AlgebraicInstances {
 }
 
 trait AlgebraicInstances {
-  implicit final val AlgebraicAlgebra = new AlgebraicAlgebra
+  implicit final val AlgebraicAlgebra: Field.WithDefaultGCD[Algebraic]
+    with NRoot[Algebraic]
+    with IsAlgebraic[Algebraic]
+    with TruncatedDivisionCRing[Algebraic] = new AlgebraicAlgebra
 
   import NumberTag._
-  implicit final val AlgebraicTag = new LargeTag[Algebraic](Exact, Algebraic(0))
+  implicit final val AlgebraicTag: NumberTag[Algebraic] = new LargeTag[Algebraic](Exact, Algebraic(0))
 }
 
 private[math] trait AlgebraicIsField extends Field.WithDefaultGCD[Algebraic] {

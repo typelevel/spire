@@ -59,7 +59,7 @@ class RingSuite extends munit.FunSuite {
   }
 
   implicit val mc: MathContext = MathContext.DECIMAL128
-  implicit val jetDim = JetDim(7)
+  implicit val jetDim: JetDim = JetDim(7)
 
   // here's where we actually run all the tests, for each type we care about.
   runWith[Int]("Int")(-3, 3, -9)

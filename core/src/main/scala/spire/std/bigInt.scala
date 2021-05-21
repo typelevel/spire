@@ -92,7 +92,14 @@ class BigIntAlgebra
     with Serializable
 
 trait BigIntInstances {
-  implicit final val BigIntAlgebra = new BigIntAlgebra
+  implicit final val BigIntAlgebra: EuclideanRing[BigInt]
+    with NRoot[BigInt]
+    with MetricSpace[BigInt, BigInt]
+    with IsIntegral[BigInt]
+    with TruncatedDivisionCRing[BigInt]
+    with Signed[BigInt]
+    with Order[BigInt] = new BigIntAlgebra
+  import spire.math.NumberTag
   import spire.math.NumberTag._
-  implicit final val BigIntTag = new LargeTag[BigInt](Integral, BigInt(0))
+  implicit final val BigIntTag: NumberTag[BigInt] = new LargeTag[BigInt](Integral, BigInt(0))
 }

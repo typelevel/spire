@@ -250,19 +250,19 @@ private[math] trait ConvertableToNatural extends ConvertableTo[Natural] {
 object ConvertableTo {
   @inline final def apply[A](implicit ev: ConvertableTo[A]): ConvertableTo[A] = ev
 
-  implicit final val ConvertableToByte = new ConvertableToByte {}
-  implicit final val ConvertableToShort = new ConvertableToShort {}
-  implicit final val ConvertableToInt = new ConvertableToInt {}
-  implicit final val ConvertableToLong = new ConvertableToLong {}
-  implicit final val ConvertableToBigInt = new ConvertableToBigInt {}
-  implicit final val ConvertableToFloat = new ConvertableToFloat {}
-  implicit final val ConvertableToDouble = new ConvertableToDouble {}
-  implicit final val ConvertableToBigDecimal = new ConvertableToBigDecimal {}
-  implicit final val ConvertableToRational = new ConvertableToRational {}
-  implicit final val ConvertableToAlgebraic = new ConvertableToAlgebraic {}
-  implicit final val ConvertableToSafeLong = new ConvertableToSafeLong {}
-  implicit final val ConvertableToNumber = new ConvertableToNumber {}
-  implicit final val ConvertableToNatural = new ConvertableToNatural {}
+  implicit final val ConvertableToByte: ConvertableTo[Byte] = new ConvertableToByte {}
+  implicit final val ConvertableToShort: ConvertableTo[Short] = new ConvertableToShort {}
+  implicit final val ConvertableToInt: ConvertableTo[Int] = new ConvertableToInt {}
+  implicit final val ConvertableToLong: ConvertableTo[Long] = new ConvertableToLong {}
+  implicit final val ConvertableToBigInt: ConvertableTo[BigInt] = new ConvertableToBigInt {}
+  implicit final val ConvertableToFloat: ConvertableTo[Float] = new ConvertableToFloat {}
+  implicit final val ConvertableToDouble: ConvertableTo[Double] = new ConvertableToDouble {}
+  implicit final val ConvertableToBigDecimal: ConvertableTo[BigDecimal] = new ConvertableToBigDecimal {}
+  implicit final val ConvertableToRational: ConvertableTo[Rational] = new ConvertableToRational {}
+  implicit final val ConvertableToAlgebraic: ConvertableTo[Algebraic] = new ConvertableToAlgebraic {}
+  implicit final val ConvertableToSafeLong: ConvertableTo[SafeLong] = new ConvertableToSafeLong {}
+  implicit final val ConvertableToNumber: ConvertableTo[Number] = new ConvertableToNumber {}
+  implicit final val ConvertableToNatural: ConvertableTo[Natural] = new ConvertableToNatural {}
 
   implicit def convertableToComplex[A: Integral]: ConvertableToComplex[A] =
     new ConvertableToComplex[A] { val algebra = Integral[A] }
@@ -547,19 +547,19 @@ private[math] trait ConvertableFromNatural extends ConvertableFrom[Natural] {
 object ConvertableFrom {
   @inline final def apply[A](implicit ev: ConvertableFrom[A]): ConvertableFrom[A] = ev
 
-  implicit final val ConvertableFromByte = new ConvertableFromByte {}
-  implicit final val ConvertableFromShort = new ConvertableFromShort {}
-  implicit final val ConvertableFromInt = new ConvertableFromInt {}
-  implicit final val ConvertableFromLong = new ConvertableFromLong {}
-  implicit final val ConvertableFromFloat = new ConvertableFromFloat {}
-  implicit final val ConvertableFromDouble = new ConvertableFromDouble {}
-  implicit final val ConvertableFromBigInt = new ConvertableFromBigInt {}
-  implicit final val ConvertableFromBigDecimal = new ConvertableFromBigDecimal {}
-  implicit final val ConvertableFromRational = new ConvertableFromRational {}
-  implicit final val ConvertableFromAlgebraic = new ConvertableFromAlgebraic {}
-  implicit final val ConvertableFromSafeLong = new ConvertableFromSafeLong {}
-  implicit final val ConvertableFromNumber = new ConvertableFromNumber {}
-  implicit final val ConvertableFromNatural = new ConvertableFromNatural {}
+  implicit final val ConvertableFromByte: ConvertableFrom[Byte] = new ConvertableFromByte {}
+  implicit final val ConvertableFromShort: ConvertableFrom[Short] = new ConvertableFromShort {}
+  implicit final val ConvertableFromInt: ConvertableFrom[Int] = new ConvertableFromInt {}
+  implicit final val ConvertableFromLong: ConvertableFrom[Long] = new ConvertableFromLong {}
+  implicit final val ConvertableFromFloat: ConvertableFrom[Float] = new ConvertableFromFloat {}
+  implicit final val ConvertableFromDouble: ConvertableFrom[Double] = new ConvertableFromDouble {}
+  implicit final val ConvertableFromBigInt: ConvertableFrom[BigInt] = new ConvertableFromBigInt {}
+  implicit final val ConvertableFromBigDecimal: ConvertableFrom[BigDecimal] = new ConvertableFromBigDecimal {}
+  implicit final val ConvertableFromRational: ConvertableFrom[Rational] = new ConvertableFromRational {}
+  implicit final val ConvertableFromAlgebraic: ConvertableFrom[Algebraic] = new ConvertableFromAlgebraic {}
+  implicit final val ConvertableFromSafeLong: ConvertableFrom[SafeLong] = new ConvertableFromSafeLong {}
+  implicit final val ConvertableFromNumber: ConvertableFrom[Number] = new ConvertableFromNumber {}
+  implicit final val ConvertableFromNatural: ConvertableFrom[Natural] = new ConvertableFromNatural {}
 
   implicit def convertableFromComplex[A: Integral]: ConvertableFromComplex[A] =
     new ConvertableFromComplex[A] { val algebra = Integral[A] }

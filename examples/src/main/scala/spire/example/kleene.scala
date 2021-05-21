@@ -484,7 +484,7 @@ object KleeneDemo {
    */
   def graphExample(): Unit = {
     // our example graph will be 5x5
-    implicit val dim = Dim(5)
+    implicit val dim: Dim = Dim(5)
 
     // edges for this example
     val edges = List(
@@ -514,7 +514,7 @@ object KleeneDemo {
 
   def pathExample(): Unit = {
     // our example graph will be 5x5
-    implicit val dim = Dim(6)
+    implicit val dim: Dim = Dim(6)
 
     val edges = List(
       (Edge(0, 1), 7),
@@ -581,7 +581,7 @@ object KleeneDemo {
 
   def solvingExample(): Unit = {
     // our example matrix is 2x2
-    implicit val dim = Dim(2)
+    implicit val dim: Dim = Dim(2)
 
     val m: Matrix[Compact[Double]] = ArrayMatrix(Array(2.0, 1.0, 0.0, 2.0)).map(n => Compact(n))
     println("2x2 matrix:\n" + m.show)

@@ -72,10 +72,12 @@ class UByte(val signed: Byte) extends AnyVal with scala.math.ScalaNumericAnyConv
 }
 
 trait UByteInstances {
-  implicit final val UByteAlgebra = new UByteAlgebra
-  implicit final val UByteBitString = new UByteBitString
+  implicit final val UByteAlgebra
+    : CRig[UByte] with IsIntegral[UByte] with TruncatedDivision[UByte] with SignedAdditiveCMonoid[UByte] =
+    new UByteAlgebra
+  implicit final val UByteBitString: BitString[UByte] = new UByteBitString
   import spire.math.NumberTag._
-  implicit final val UByteTag = new UnsignedIntTag[UByte](UByte.MinValue, UByte.MaxValue)
+  implicit final val UByteTag: NumberTag[UByte] = new UnsignedIntTag[UByte](UByte.MinValue, UByte.MaxValue)
 }
 
 private[math] trait UByteIsCRig extends CRig[UByte] {

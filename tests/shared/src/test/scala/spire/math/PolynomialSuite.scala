@@ -13,7 +13,7 @@ import org.scalacheck.Arbitrary.arbitrary
 import java.util.Arrays
 
 object PolynomialSetup {
-  implicit val arbitraryRational = Arbitrary(for {
+  implicit val arbitraryRational: Arbitrary[Rational] = Arbitrary(for {
     n0 <- arbitrary[Long]
     d0 <- arbitrary[Long]
   } yield {
@@ -22,7 +22,7 @@ object PolynomialSetup {
   })
 
   // default scalacheck bigdecimals are weird
-  implicit val arbitraryBigDecimal = Arbitrary(for {
+  implicit val arbitraryBigDecimal: Arbitrary[BigDecimal] = Arbitrary(for {
     r <- arbitrary[Int]
   } yield {
     BigDecimal(r)

@@ -106,8 +106,14 @@ class LongIsBitString extends BitString[Long] with Serializable {
 class LongAlgebra extends LongIsEuclideanRing with LongIsNRoot with LongIsReal with Serializable
 
 trait LongInstances {
-  implicit final val LongBitString = new LongIsBitString
-  implicit final val LongAlgebra = new LongAlgebra
+  implicit final val LongBitString: BitString[Long] = new LongIsBitString
+  implicit final val LongAlgebra: EuclideanRing[Long]
+    with NRoot[Long]
+    with IsIntegral[Long]
+    with TruncatedDivisionCRing[Long]
+    with Signed[Long]
+    with Order[Long] = new LongAlgebra
+  import spire.math.NumberTag
   import spire.math.NumberTag._
-  implicit final val LongTag = new BuiltinIntTag[Long](0L, Long.MinValue, Long.MaxValue)
+  implicit final val LongTag: NumberTag[Long] = new BuiltinIntTag[Long](0L, Long.MinValue, Long.MaxValue)
 }

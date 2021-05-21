@@ -609,7 +609,14 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
 }
 
 trait NumberInstances {
-  implicit final val NumberAlgebra = new NumberAlgebra
+  implicit final val NumberAlgebra: Field.WithDefaultGCD[Number]
+    with CRing[Number]
+    with NRoot[Number]
+    with Trig[Number]
+    with IsRational[Number]
+    with TruncatedDivisionCRing[Number]
+    with Signed[Number]
+    with Order[Number] = new NumberAlgebra
 }
 
 private[math] trait NumberIsCRing extends CRing[Number] {

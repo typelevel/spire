@@ -519,7 +519,7 @@ trait GeneratorCompanion[G, @sp(Int, Long) S] {
 }
 
 object Generator {
-  implicit val rng = GlobalRng
+  implicit val rng: Generator = GlobalRng
 }
 
 object GlobalRng extends LongBasedGenerator {

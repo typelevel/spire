@@ -105,8 +105,14 @@ class IntIsBitString extends BitString[Int] with Serializable {
 class IntAlgebra extends IntIsEuclideanRing with IntIsNRoot with IntIsReal with Serializable
 
 trait IntInstances {
-  implicit final val IntBitString = new IntIsBitString
-  implicit final val IntAlgebra = new IntAlgebra
+  implicit final val IntBitString: BitString[Int] = new IntIsBitString
+  implicit final val IntAlgebra: EuclideanRing[Int]
+    with NRoot[Int]
+    with IsIntegral[Int]
+    with TruncatedDivisionCRing[Int]
+    with Signed[Int]
+    with Order[Int] = new IntAlgebra
+  import spire.math.NumberTag
   import spire.math.NumberTag._
-  implicit final val IntTag = new BuiltinIntTag[Int](0, Int.MinValue, Int.MaxValue)
+  implicit final val IntTag: NumberTag[Int] = new BuiltinIntTag[Int](0, Int.MinValue, Int.MaxValue)
 }

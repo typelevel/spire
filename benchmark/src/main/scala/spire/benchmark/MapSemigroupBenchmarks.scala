@@ -92,7 +92,7 @@ class MapSemigroupBenchmarks extends MyBenchmark with BenchmarkData {
     }
   }
 
-  implicit val semigroup = new Semigroup[Int] {
+  implicit val semigroup: Semigroup[Int] = new Semigroup[Int] {
     def combine(x: Int, y: Int): Int = x + y
   }
 

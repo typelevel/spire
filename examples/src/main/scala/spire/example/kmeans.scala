@@ -108,7 +108,7 @@ object KMeansExample extends App {
     bldr.result()
   }
 
-  implicit val mc = java.math.MathContext.DECIMAL128
+  implicit val mc: java.math.MathContext = java.math.MathContext.DECIMAL128
 
   // We construct 3 sets of points, each using different VectorSpaces. We'll
   // cluster each one, using the same k-means algorithm.

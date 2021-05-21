@@ -8,7 +8,7 @@ import java.util.Arrays
 class JetSuite extends munit.FunSuite {
 
   // Default test with 3-dimensional Jet's
-  implicit val dim = JetDim(3)
+  implicit val dim: JetDim = JetDim(3)
   val maxError = 1.0e-12
 
   test("JetDim") {

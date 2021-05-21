@@ -109,8 +109,13 @@ class ShortIsBitString extends BitString[Short] with Serializable {
 class ShortAlgebra extends ShortIsEuclideanRing with ShortIsReal with Serializable
 
 trait ShortInstances {
-  implicit final val ShortBitString = new ShortIsBitString
-  implicit final val ShortAlgebra = new ShortAlgebra
+  implicit final val ShortBitString: BitString[Short] = new ShortIsBitString
+  implicit final val ShortAlgebra: EuclideanRing[Short]
+    with IsIntegral[Short]
+    with TruncatedDivisionCRing[Short]
+    with Signed[Short]
+    with Order[Short] = new ShortAlgebra
+  import spire.math.NumberTag
   import spire.math.NumberTag._
-  implicit final val ShortTag = new BuiltinIntTag[Short](0, Short.MinValue, Short.MaxValue)
+  implicit final val ShortTag: NumberTag[Short] = new BuiltinIntTag[Short](0, Short.MinValue, Short.MaxValue)
 }
