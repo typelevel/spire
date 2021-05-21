@@ -9,14 +9,14 @@ lazy val scalaCheckVersion = "1.15.4"
 lazy val munit = "0.7.26"
 lazy val munitDiscipline = "1.0.9"
 
-lazy val shapelessVersion = "2.3.6"
+lazy val shapelessVersion = "2.3.7"
 lazy val algebraVersion = "2.2.2"
 
-lazy val apfloatVersion = "1.9.1"
+lazy val apfloatVersion = "1.10.0"
 lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
-val Scala213 = "2.13.5"
+val Scala213 = "2.13.6"
 
 ThisBuild / crossScalaVersions := Seq(Scala213)
 ThisBuild / scalaVersion := Scala213
@@ -25,7 +25,7 @@ ThisBuild / organization := "org.typelevel"
 ThisBuild / githubWorkflowArtifactUpload := false
 
 ThisBuild / githubWorkflowPublishTargetBranches := Seq()
-ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8", "adopt@1.11", "adopt@1.15")
+ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8", "adopt@1.11", "adopt@1.16")
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep
     .Sbt(List("scalafmtCheckAll", "scalafmtSbtCheck"), name = Some("Check formatting")),
@@ -254,8 +254,8 @@ lazy val commonSettings = Seq(
 ) ++ scalaMacroDependencies ++ warnUnusedImport
 
 lazy val commonJsSettings = Seq(
-  scalaJSStage in Global := FastOptStage,
-  parallelExecution in Test := false,
+  Global / scalaJSStage := FastOptStage,
+  Test / parallelExecution := false,
   scalaJSLinkerConfig ~= { _.withModuleKind(ModuleKind.CommonJSModule) }
 )
 
@@ -264,7 +264,7 @@ lazy val commonJvmSettings = Seq()
 lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
 
 lazy val docSettings = Seq(
-  scalacOptions in Tut := (scalacOptions in Tut).value.filterNot(Set("-Ywarn-unused-imports", "-Xlint").contains),
+  Tut / scalacOptions := (Tut / scalacOptions).value.filterNot(Set("-Ywarn-unused-imports", "-Xlint").contains),
   micrositeName := "Spire",
   micrositeDescription := "Powerful new number types and numeric abstractions for Scala",
   micrositeAuthor := "Spire contributors",
@@ -319,27 +319,27 @@ lazy val docSettings = Seq(
     )
   ),
   autoAPIMappings := true,
-  unidocProjectFilter in (ScalaUnidoc, unidoc) :=
+  ScalaUnidoc / unidoc / unidocProjectFilter :=
     inProjects(platform.jvm, macros.jvm, data.jvm, legacy.jvm, util.jvm, core.jvm, extras.jvm, laws.jvm),
   docsMappingsAPIDir := "api",
-  addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
+  addMappingsToSiteDir(ScalaUnidoc / packageDoc / mappings, docsMappingsAPIDir),
   ghpagesNoJekyll := false,
   fork := true,
   javaOptions += "-Xmx4G", // to have enough memory in forks
 //  fork in tut := true,
 //  fork in (ScalaUnidoc, unidoc) := true,
-  scalacOptions in (ScalaUnidoc, unidoc) ++= Seq(
+  ScalaUnidoc / unidoc / scalacOptions ++= Seq(
     "-groups",
     "-doc-source-url",
     scmInfo.value.get.browseUrl + "/tree/master€{FILE_PATH}.scala",
     "-sourcepath",
-    baseDirectory.in(LocalRootProject).value.getAbsolutePath,
+    (LocalRootProject / baseDirectory).value.getAbsolutePath,
     "-diagrams"
   ),
-  scalacOptions in Tut ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))),
+  Tut / scalacOptions ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))),
   git.remoteRepo := "git@github.com:typelevel/spire.git",
-  includeFilter in makeSite := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md" | "*.svg",
-  includeFilter in Jekyll := (includeFilter in makeSite).value
+  makeSite / includeFilter := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md" | "*.svg",
+  Jekyll / includeFilter := (makeSite / includeFilter).value
 )
 
 lazy val publishSettings = Seq(
@@ -362,7 +362,7 @@ lazy val publishSettings = Seq(
 ) ++ credentialSettings ++ sharedPublishSettings ++ sharedReleaseProcess
 
 lazy val scoverageSettings = Seq(
-  coverageMinimum := 40,
+  coverageMinimumStmtTotal := 40,
   coverageFailOnMinimum := false,
   coverageHighlighting := true,
   coverageExcludedPackages := "spire\\.benchmark\\..*;spire\\.macros\\..*"
@@ -371,9 +371,9 @@ lazy val scoverageSettings = Seq(
 lazy val coreSettings = Seq(
   buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
   buildInfoPackage := "spire",
-  sourceGenerators in Compile += (genProductTypes in Compile).taskValue,
+  Compile / sourceGenerators += (Compile / genProductTypes).taskValue,
   genProductTypes := {
-    val scalaSource = (sourceManaged in Compile).value
+    val scalaSource = (Compile / sourceManaged).value
     val s = streams.value
     s.log.info("Generating spire/std/tuples.scala")
     val algebraSource = ProductTypes.algebraProductTypes
@@ -404,7 +404,7 @@ lazy val munitSettings = Seq(
 lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps ++ publishSettings ++ scoverageSettings
 
 lazy val unidocSettings = Seq(
-  unidocProjectFilter in (ScalaUnidoc, unidoc) := inAnyProject -- inProjects(examples, benchmark, tests.jvm)
+  ScalaUnidoc / unidoc / unidocProjectFilter := inAnyProject -- inProjects(examples, benchmark, tests.jvm)
 )
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -423,8 +423,8 @@ lazy val noPublishSettings = Seq(
 
 lazy val crossVersionSharedSources: Seq[Setting[_]] =
   Seq(Compile, Test).map { sc =>
-    (unmanagedSourceDirectories in sc) ++= {
-      (unmanagedSourceDirectories in sc).value.map { dir: File =>
+    (sc / unmanagedSourceDirectories) ++= {
+      (sc / unmanagedSourceDirectories).value.map { dir: File =>
         CrossVersion.partialVersion(scalaBinaryVersion.value) match {
           case Some((major, minor)) =>
             new File(s"${dir.getPath}_$major.$minor")
@@ -470,7 +470,7 @@ lazy val sharedPublishSettings = Seq(
   releaseCrossBuild := true,
   releasePublishArtifactsAction := PgpKeys.publishSigned.value,
   publishMavenStyle := true,
-  publishArtifact in Test := false,
+  Test / publishArtifact := false,
   pomIncludeRepository := Function.const(false),
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
@@ -508,8 +508,8 @@ lazy val warnUnusedImport = Seq(
       case _ => Seq()
     }
   },
-  scalacOptions in (Compile, console) ~= { _.filterNot("-Ywarn-unused-import" == _) },
-  scalacOptions in (Test, console) := (scalacOptions in (Compile, console)).value
+  Compile / console / scalacOptions ~= { _.filterNot("-Ywarn-unused-import" == _) },
+  Test / console / scalacOptions := (Compile / console / scalacOptions).value
 )
 
 // For Travis CI - see http://www.cakesolutions.net/teamblogs/publishing-artefacts-to-oss-sonatype-nexus-using-sbt-and-travis-ci
