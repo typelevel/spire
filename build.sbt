@@ -6,19 +6,20 @@ import sbtcrossproject.{crossProject, CrossType}
 
 lazy val scalaCheckVersion = "1.15.4"
 
-lazy val munit = "0.7.27"
+lazy val munit = "0.7.28"
 lazy val munitDiscipline = "1.0.9"
 
-lazy val shapelessVersion = "2.3.7"
 lazy val algebraVersion = "2.2.3"
 
-lazy val apfloatVersion = "1.10.0"
+lazy val apfloatVersion = "1.10.1"
 lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
 val Scala213 = "2.13.6"
+val Scala30 = "3.0.1"
 
-ThisBuild / crossScalaVersions := Seq(Scala213)
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
 ThisBuild / scalaVersion := Scala213
 ThisBuild / organization := "org.typelevel"
 
@@ -34,7 +35,6 @@ ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Sbt(List("doc"), name = Some("Build docs"))
 )
 
-Global / onChangedBuildSource := ReloadOnSourceChanges
 // Projects
 
 lazy val spire = project
@@ -91,7 +91,10 @@ lazy val spireJS = project
   .enablePlugins(ScalaJSPlugin)
 
 lazy val platform = crossProject(JSPlatform, JVMPlatform)
-  .settings(moduleName := "spire-platform")
+  .settings(
+    moduleName := "spire-platform",
+    crossScalaVersions := Seq(Scala213, Scala30)
+  )
   .settings(spireSettings: _*)
   .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
@@ -100,7 +103,10 @@ lazy val platform = crossProject(JSPlatform, JVMPlatform)
 
 lazy val macros = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
-  .settings(moduleName := "spire-macros")
+  .settings(
+    moduleName := "spire-macros",
+    crossScalaVersions := Seq(Scala213, Scala30)
+  )
   .settings(spireSettings: _*)
   .settings(scalaCheckSettings: _*)
   .settings(munitSettings: _*)
@@ -126,7 +132,10 @@ lazy val legacy = crossProject(JSPlatform, JVMPlatform)
 
 lazy val util = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
-  .settings(moduleName := "spire-util")
+  .settings(
+    moduleName := "spire-util",
+    crossScalaVersions := Seq(Scala213, Scala30)
+  )
   .settings(spireSettings: _*)
   .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
@@ -172,7 +181,6 @@ lazy val examples = project
   .settings(spireSettings)
   .settings(
     libraryDependencies ++= Seq(
-      "com.chuusai" %% "shapeless" % shapelessVersion,
       "org.apfloat" % "apfloat" % apfloatVersion,
       "org.jscience" % "jscience" % jscienceVersion
     )
@@ -225,10 +233,10 @@ lazy val benchmark: Project = project
 
 addCommandAlias(
   "validateJVM",
-  ";coreJVM/scalastyle;macrosJVM/test;coreJVM/test;extrasJVM/test;lawsJVM/test;testsJVM/test;examples/test;benchmark/test"
+  ";core.jvm/scalastyle;macros.jvm/test;core.jvm/test;extras.jvm/test;laws.jvm/test;tests.jvm/test;examples/test;benchmark/test"
 )
 
-addCommandAlias("validateJS", ";macrosJS/test;coreJS/test;extrasJS/test;lawsJS/test;testsJS/test")
+addCommandAlias("validateJS", ";macros.js/test;core.js/test;extras.js/test;laws.js/test;tests.js/test")
 
 addCommandAlias("validate", ";validateJVM;validateJS")
 
@@ -247,7 +255,8 @@ lazy val commonSettings = Seq(
       "-language:existentials",
       "-Ywarn-dead-code",
       "-Ywarn-numeric-widen",
-      "-Ywarn-value-discard"
+      "-Ywarn-value-discard",
+      "-Xcheck-macros"
     )
   ),
   resolvers += Resolver.sonatypeRepo("snapshots")
@@ -425,7 +434,7 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
   Seq(Compile, Test).map { sc =>
     (sc / unmanagedSourceDirectories) ++= {
       (sc / unmanagedSourceDirectories).value.map { dir: File =>
-        CrossVersion.partialVersion(scalaBinaryVersion.value) match {
+        CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((major, minor)) =>
             new File(s"${dir.getPath}_$major.$minor")
           case None =>
@@ -433,20 +442,29 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
         }
       }
     }
-  }
+  } ++ Seq(
+    Compile / unmanagedSourceDirectories ++= scalaVersionSpecificFolders("main",
+                                                                         baseDirectory.value,
+                                                                         scalaVersion.value
+    ),
+    Test / unmanagedSourceDirectories ++= scalaVersionSpecificFolders("test", baseDirectory.value, scalaVersion.value)
+  )
 
 lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
-  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided"
+  libraryDependencies ++= {
+    if (scalaVersion.value.startsWith("3.0")) Seq.empty
+    else Seq(scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided")
+  }
 )
 
 lazy val commonScalacOptions = Def.setting(
   (CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, v)) if v >= 13 =>
-      Seq()
+      Seq(
+        "-Xfuture"
+      )
     case _ =>
       Seq(
-        "-Yno-adapted-args",
-        "-Xfuture"
       )
   }) ++ Seq(
     "-deprecation",
@@ -459,10 +477,10 @@ lazy val commonScalacOptions = Def.setting(
     "-language:experimental.macros",
     "-unchecked",
     "-Xfatal-warnings",
-    "-Xlint",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
-    "-Ywarn-value-discard"
+    "-Ywarn-value-discard",
+    "-Xcheck-macros"
   )
 )
 
@@ -524,3 +542,14 @@ lazy val credentialSettings = Seq(
       .getOrElse(Path.userHome / ".ivy2" / ".credentials")
   )
 )
+
+def scalaVersionSpecificFolders(srcName: String, srcBaseDir: java.io.File, scalaVersion: String) = {
+  def extraDirs(suffix: String) =
+    List(CrossType.Pure, CrossType.Full)
+      .flatMap(_.sharedSrcDir(srcBaseDir, srcName).toList.map(f => file(f.getPath + suffix)))
+  CrossVersion.partialVersion(scalaVersion) match {
+    case Some((2, y))     => extraDirs("-2.x") ++ (if (y >= 13) extraDirs("-2.13+") else Nil)
+    case Some((0 | 3, _)) => extraDirs("-3.x")
+    case _                => Nil
+  }
+}
