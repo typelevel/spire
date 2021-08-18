@@ -170,8 +170,8 @@ final class GroupoidOps[A: Groupoid](lhs: A) {
   // def |-|??(rhs: A): Boolean = macro Ops.binop[A, Boolean]
 }
 
-final class SemigroupOps[A: Semigroup](lhs: A) {
-  def |+|(rhs: A): A = ??? //macro Ops.binop[A, A]
+final class SemigroupOps[A](lhs: A)(using ev: Semigroup[A]) {
+  def |+|(rhs: A): A = ev.combine(lhs, rhs)
 }
 
 final class MonoidOps[A: Monoid](lhs: A) {
@@ -456,8 +456,9 @@ final class MetricSpaceOps[V](lhs: V) {
 }
 
 final class NormedVectorSpaceOps[V](lhs: V) {
-  // def norm[F](implicit ev: NormedVectorSpace[V, F]): F =
-  //   macro Ops.unopWithEv[NormedVectorSpace[V, F], F]
+  def norm[F](implicit ev: NormedVectorSpace[V, F]): F =
+    ???
+    // macro Ops.unopWithEv[NormedVectorSpace[V, F], F]
   //
   // def normalize[F](implicit ev: NormedVectorSpace[V, F]): V =
   //   macro Ops.unopWithEv[NormedVectorSpace[V, F], V]

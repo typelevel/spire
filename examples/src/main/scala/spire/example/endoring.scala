@@ -21,7 +21,7 @@ object EndoRingExample extends App {
      * keeping track of the inclusions and exclusions separately. This let's
      * us ensure it is commutative and that we always have an inverse.
      */
-    implicit def PairedSetAbGroup[A] = new AbGroup[(Set[A], Set[A])] {
+    implicit def PairedSetAbGroup[A]: AbGroup[(Set[A], Set[A])] = new AbGroup[(Set[A], Set[A])] {
       def combine(a: (Set[A], Set[A]), b: (Set[A], Set[A])): (Set[A], Set[A]) = {
         val (a1, a2) = a
         val (b1, b2) = b
@@ -45,7 +45,7 @@ object EndoRingExample extends App {
    */
   class EndoRing[A: AbGroup] extends Ring[Endo[A]] {
     def plus(f: Endo[A], g: Endo[A]): Endo[A] = a => f(a) |+| g(a)
-    def negate(f: Endo[A]): Endo[A] = a => f(a).inverse
+    def negate(f: Endo[A]): Endo[A] = a => f(a).inverse()
     def times(f: Endo[A], g: Endo[A]): Endo[A] = a => f(g(a))
 
     // Identity endomorphism.
@@ -73,7 +73,7 @@ object EndoRingExample extends App {
   val a = (x2 + inv) * x3
   val b = (x2 * x3) + (inv * x3)
 
-  (0 until 10).foreach(i => assert(a(i) == b(i))) // EndoRing is distributive.
+  (0L until 10).foreach(i => assert(a(i.toInt) == b(i.toInt))) // EndoRing is distributive.
 
   // What's more, we can recreate an Int ring by applying the Endo[Int]
   // with the id (1).
@@ -81,9 +81,9 @@ object EndoRingExample extends App {
   val one = Ring[Int => Int].one
   val two = one + one
   val five = two * two + one
-  (0 until 10).foreach { i =>
-    assert(five(i) == 5 * i)
-    assert(((five * two) + two)(i) == 12 * i)
+  (0L until 10).foreach { i =>
+    assert(five(i.toInt) == 5 * i)
+    assert(((five * two) + two)(i.toInt) == 12 * i)
   }
 
   implicit val pairedSetEndoRing: EndoRing[(Set[Int], Set[Int])] = EndoRing[(Set[Int], Set[Int])]
@@ -92,9 +92,10 @@ object EndoRingExample extends App {
 
   // We can define some simple endomorphisms.
   val id = pairedSetEndoRing.one
-  val double: Endo[PairedSet[Int]] = _.map(_ * 2)
-  val triple: Endo[PairedSet[Int]] = _.map(_ * 3)
-  val inc: Endo[PairedSet[Int]] = _.map(_ + 1)
+  // TODO in spire2 paired2Set2set works implicitly
+  val double: Endo[PairedSet[Int]] = pairedSet2set(_).map(_ * 2)
+  val triple: Endo[PairedSet[Int]] = pairedSet2set(_).map(_ * 3)
+  val inc: Endo[PairedSet[Int]] = pairedSet2set(_).map(_ + 1)
 
   // Let's generate the powers of 2 from 0 to n. The endomorphism
   // `double + id` means that we double the elements of a set, then union it

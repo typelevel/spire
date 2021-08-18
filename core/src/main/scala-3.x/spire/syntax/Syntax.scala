@@ -139,9 +139,10 @@ trait GroupSyntax extends MonoidSyntax {
 }
 
 trait AdditiveSemigroupSyntax {
+  // implicit def additiveSemigroupOps[A: AdditiveSemigroup](a: A): AdditiveSemigroupOps[A] =
+  //   new AdditiveSemigroupOps(a)
   extension [A](lhs: A)(using as: AdditiveSemigroup[A])
     def +(rhs: A): A = as.plus(lhs, rhs)
-    @targetName("plus")
     def ^+(rhs: A): A = as.plus(lhs, rhs)
     def +(rhs: Int)(implicit ev1: Ring[A]): A = as.plus(lhs, ev1.fromInt(rhs))
     def +(rhs: Double)(implicit ev1: Field[A]): A = as.plus(lhs, ev1.fromDouble(rhs))
@@ -150,8 +151,8 @@ trait AdditiveSemigroupSyntax {
   extension(lhs: Int)
     def +[A](rhs: A)(using ev: Ring[A]): A = ev.plus(ev.fromInt(lhs), rhs)
 
-  // implicit def literalIntAdditiveSemigroupOps(lhs: Int): LiteralIntAdditiveSemigroupOps =
-  //   new LiteralIntAdditiveSemigroupOps(lhs)
+  implicit def literalIntAdditiveSemigroupOps(lhs: Int): LiteralIntAdditiveSemigroupOps =
+    new LiteralIntAdditiveSemigroupOps(lhs)
   implicit def literalLongAdditiveSemigroupOps(lhs: Long): LiteralLongAdditiveSemigroupOps =
     new LiteralLongAdditiveSemigroupOps(lhs)
   implicit def literalDoubleAdditiveSemigroupOps(lhs: Double): LiteralDoubleAdditiveSemigroupOps =

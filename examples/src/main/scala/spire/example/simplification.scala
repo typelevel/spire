@@ -18,122 +18,122 @@ import scala.collection.mutable.Builder
  * snap: given y, look for solutions to y = nroot(x, k) / d
  */
 object Simplification {
-
-  def main(args: Array[String]): Unit = {
-    if (args.isEmpty) {
-      println("usage: %s [nrat | rats | nprime | primes | snap] [number]")
-    } else {
-      args(0) match {
-        case "nrat" =>
-          val n = if (args.length == 1) 10 else args(1).toInt
-          val r: Rational = rationals.drop(n - 1).head
-          println("rational %d is %s".format(n, r.toString))
-        case "rats" =>
-          val n = if (args.length == 1) 10 else args(1).toInt
-          rationals.take(n).foreach(r => print(r.toString + ", "))
-          println("...")
-        case "nprime" =>
-          val n = if (args.length == 1) 10 else args(1).toInt
-          val p: Int = primes.drop(n - 1).head
-          println("rational %d is %s".format(n, p.toString))
-        case "primes" =>
-          val n = if (args.length == 1) 10 else args(1).toInt
-          primes.take(n).foreach(p => print(p.toString + ", "))
-          println("...")
-        case "snap" =>
-          val n = if (args.length == 1) 1.4142135623730951 else args(1).toDouble
-          val (base, k, div) = snap(n)
-          println("%s =~ nroot(%s, %s) / %s".format(n, base, k, div))
-      }
-    }
-  }
-
-  /**
-   * Using Cantor's diagonalization method, create an infinite stream
-   * of all rational numbers.
-   *
-   * This stream will only be able to generate the first
-   * 42,535,295,865,117,307,928,310,139,910,543,638,528 values, so it
-   * is not really infinite. Even so, it's unlikely that a user will
-   * be able to generate this many values.
-   */
-  val rationals: BigStream[Rational] = {
-    @tailrec
-    def next(i: Long, n: Long, d: Long): BigStream[Rational] = {
-      if (n == 0L) {
-        next(i + 1L, i, 1L)
-      } else {
-        val r = Rational(n, d)
-        if (n == r.numeratorAsLong) {
-          new BigCons(r, new BigCons(-r, loop(i, n - 1L, d + 1L)))
-        } else {
-          next(i, n - 1L, d + 1L)
-        }
-      }
-    }
-
-    def loop(i: Long, n: Long, d: Long): BigStream[Rational] = next(i, n, d)
-
-    Rational.zero #:: loop(2L, 1L, 1L)
-  }
-
-  /**
-   * Naive prime lazy list. For each odd number, this method tries
-   * dividing by all previous primes <= sqrt(n).
-   *
-   * There are a lot of ways to improve this. For now it's a toy.
-   * It can generate the millionth prime in ~9s on my computer.
-   */
-  val primes: LazyList[Int] = {
-    @tailrec
-    def next(n: Int, ll: LazyList[Int]): LazyList[Int] =
-      if (ll.isEmpty || (ll.head ** 2) > n)
-        n #:: loop(n + 2, primes)
-      else if (n % ll.head == 0)
-        next(n + 2, primes)
-      else
-        next(n, ll.tail)
-
-    def loop(n: Int, ll: LazyList[Int]): LazyList[Int] = next(n, ll)
-
-    2 #:: loop(3, primes)
-  }
-
-  /**
-   * Given a Double y, look for whole numbers x, k, and d such that:
-   *
-   *   y = nroot(x, k) / d
-   *
-   * The limit (default: 10) describes the largest root (and divisor)
-   * that will be checked. The epsilon (default: 0.00000000001)
-   * describes the maximum distance we can shift the value to find an
-   * "exact" match.
-   */
-  def snap(n: Double, limit: Int = 10, epsilon: Double = 0.00000000001): (Double, Int, Int) = {
-    @tailrec
-    def loop(i: Int, ex: Int, div: Int): (Double, Int, Int) = {
-      if (i >= limit) {
-        (n, 1, 1)
-      } else if (div < 1) {
-        loop(i + 1, 1, i + 1)
-      } else {
-        val x = math.pow(n * div, ex)
-        val m = x % 1.0
-        val d = if (m < 0.5) m else m - 1.0
-        if (math.abs(d) < epsilon) {
-          (x - m, ex, div)
-        } else {
-          loop(i, ex + 1, div - 1)
-        }
-      }
-    }
-    if (n < 0.0) {
-      val (x, k, div) = snap(-n, limit, epsilon)
-      (x, k, -div)
-    } else {
-      loop(1, 1, 1)
-    }
-  }
+  //
+  // def main(args: Array[String]): Unit = {
+  //   if (args.isEmpty) {
+  //     println("usage: %s [nrat | rats | nprime | primes | snap] [number]")
+  //   } else {
+  //     args(0) match {
+  //       case "nrat" =>
+  //         val n = if (args.length == 1) 10 else args(1).toInt
+  //         val r: Rational = rationals.drop(n - 1).head
+  //         println("rational %d is %s".format(n, r.toString))
+  //       case "rats" =>
+  //         val n = if (args.length == 1) 10 else args(1).toInt
+  //         rationals.take(n).foreach(r => print(r.toString + ", "))
+  //         println("...")
+  //       case "nprime" =>
+  //         val n = if (args.length == 1) 10 else args(1).toInt
+  //         val p: Int = primes.drop(n - 1).head
+  //         println("rational %d is %s".format(n, p.toString))
+  //       case "primes" =>
+  //         val n = if (args.length == 1) 10 else args(1).toInt
+  //         primes.take(n).foreach(p => print(p.toString + ", "))
+  //         println("...")
+  //       case "snap" =>
+  //         val n = if (args.length == 1) 1.4142135623730951 else args(1).toDouble
+  //         val (base, k, div) = snap(n)
+  //         println("%s =~ nroot(%s, %s) / %s".format(n, base, k, div))
+  //     }
+  //   }
+  // }
+  //
+  // /**
+  //  * Using Cantor's diagonalization method, create an infinite stream
+  //  * of all rational numbers.
+  //  *
+  //  * This stream will only be able to generate the first
+  //  * 42,535,295,865,117,307,928,310,139,910,543,638,528 values, so it
+  //  * is not really infinite. Even so, it's unlikely that a user will
+  //  * be able to generate this many values.
+  //  */
+  // val rationals: BigStream[Rational] = {
+  //   @tailrec
+  //   def next(i: Long, n: Long, d: Long): BigStream[Rational] = {
+  //     if (n == 0L) {
+  //       next(i + 1L, i, 1L)
+  //     } else {
+  //       val r = Rational(n, d)
+  //       if (n == r.numeratorAsLong) {
+  //         new BigCons(r, new BigCons(-r, loop(i, n - 1L, d + 1L)))
+  //       } else {
+  //         next(i, n - 1L, d + 1L)
+  //       }
+  //     }
+  //   }
+  //
+  //   def loop(i: Long, n: Long, d: Long): BigStream[Rational] = next(i, n, d)
+  //
+  //   Rational.zero #:: loop(2L, 1L, 1L)
+  // }
+  //
+  // /**
+  //  * Naive prime lazy list. For each odd number, this method tries
+  //  * dividing by all previous primes <= sqrt(n).
+  //  *
+  //  * There are a lot of ways to improve this. For now it's a toy.
+  //  * It can generate the millionth prime in ~9s on my computer.
+  //  */
+  // val primes: LazyList[Int] = {
+  //   @tailrec
+  //   def next(n: Int, ll: LazyList[Int]): LazyList[Int] =
+  //     if (ll.isEmpty || (ll.head ** 2) > n)
+  //       n #:: loop(n + 2, primes)
+  //     else if (n % ll.head == 0)
+  //       next(n + 2, primes)
+  //     else
+  //       next(n, ll.tail)
+  //
+  //   def loop(n: Int, ll: LazyList[Int]): LazyList[Int] = next(n, ll)
+  //
+  //   2 #:: loop(3, primes)
+  // }
+  //
+  // /**
+  //  * Given a Double y, look for whole numbers x, k, and d such that:
+  //  *
+  //  *   y = nroot(x, k) / d
+  //  *
+  //  * The limit (default: 10) describes the largest root (and divisor)
+  //  * that will be checked. The epsilon (default: 0.00000000001)
+  //  * describes the maximum distance we can shift the value to find an
+  //  * "exact" match.
+  //  */
+  // def snap(n: Double, limit: Int = 10, epsilon: Double = 0.00000000001): (Double, Int, Int) = {
+  //   @tailrec
+  //   def loop(i: Int, ex: Int, div: Int): (Double, Int, Int) = {
+  //     if (i >= limit) {
+  //       (n, 1, 1)
+  //     } else if (div < 1) {
+  //       loop(i + 1, 1, i + 1)
+  //     } else {
+  //       val x = math.pow(n * div, ex)
+  //       val m = x % 1.0
+  //       val d = if (m < 0.5) m else m - 1.0
+  //       if (math.abs(d) < epsilon) {
+  //         (x - m, ex, div)
+  //       } else {
+  //         loop(i, ex + 1, div - 1)
+  //       }
+  //     }
+  //   }
+  //   if (n < 0.0) {
+  //     val (x, k, div) = snap(-n, limit, epsilon)
+  //     (x, k, -div)
+  //   } else {
+  //     loop(1, 1, 1)
+  //   }
+  // }
 }
 
 /**

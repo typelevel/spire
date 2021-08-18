@@ -95,9 +95,9 @@ object KMeansExample extends App {
     f: Array[Double] => V
   )(implicit vs: VectorSpace[V, A], cbf: Factory[V, CC[V]]): CC[V] = {
 
-    def randPoint(gen: => Double): V = f((1 to d).map(_ => gen).toArray)
+    def randPoint(gen: => Double): V = f((1L to d).map(_ => gen).toArray)
 
-    val centers: Vector[V] = (1 to k).map { _ =>
+    val centers: Vector[V] = (1L to k).map { _ =>
       randPoint(nextDouble() * 10)
     }.toVector
 

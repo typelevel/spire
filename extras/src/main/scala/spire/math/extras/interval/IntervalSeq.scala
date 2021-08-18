@@ -249,7 +249,8 @@ object IntervalSeq {
     simpleSets.foldLeft(empty[Rational])(_ | _)
   }
 
-  implicit def booleanAlgebra[T: Order] = new Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] {
+  implicit def booleanAlgebra[T: Order]: Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] = new Bool[IntervalSeq[T]]
+    with Eq[IntervalSeq[T]] {
 
     def eqv(x: IntervalSeq[T], y: IntervalSeq[T]) = x == y
 
