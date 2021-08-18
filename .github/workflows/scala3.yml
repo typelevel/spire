@@ -1,0 +1,47 @@
+name: Temporal check on scala 3 compilation
+
+on:
+  pull_request:
+    branches: ['**']
+  push:
+    branches: ['**']
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build:
+    name: Build and Test
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        java: [adopt@1.8, adopt@1.11, adopt@1.16]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout current branch (full)
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java and Scala
+        uses: olafurpg/setup-scala@v12
+        with:
+          java-version: ${{ matrix.java }}
+
+      - name: Cache sbt
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.sbt
+            ~/.ivy2/cache
+            ~/.coursier/cache/v1
+            ~/.cache/coursier/v1
+            ~/AppData/Local/Coursier/Cache/v1
+            ~/Library/Caches/Coursier/v1
+          key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
+
+      - name: Compile across scala versions
+        run: sbt +test:compile
+
+      - name: Test across scala versions
+        run: sbt +test

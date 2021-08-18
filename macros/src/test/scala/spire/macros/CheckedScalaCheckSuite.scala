@@ -9,8 +9,8 @@ class CheckedScalaCheckSuite extends munit.ScalaCheckSuite {
   import Arbitrary.arbitrary
 
   case class NotZero[A](value: A)
-  implicit def arbNotZeroLong = Arbitrary(arbitrary[Long].filter(_ != 0L).map(NotZero(_)))
-  implicit def arbNotZeroInt = Arbitrary(arbitrary[Int].filter(_ != 0L).map(NotZero(_)))
+  implicit def arbNotZeroLong: Arbitrary[NotZero[Long]] = Arbitrary(arbitrary[Long].filter(_ != 0L).map(NotZero(_)))
+  implicit def arbNotZeroInt: Arbitrary[NotZero[Int]] = Arbitrary(arbitrary[Int].filter(_ != 0L).map(NotZero(_)))
 
   def checkForLongOverflow(value: BigInt, check: => Long): Unit = {
     if (value.isValidLong) {
@@ -69,6 +69,11 @@ class CheckedScalaCheckSuite extends munit.ScalaCheckSuite {
     forAll { (x: Int, y: Int) =>
       checkForIntOverflow(distSq(x, y), checked(x * x + y * y))
     }
+  }
+
+  test("Negate of Byte.MinValue overflows") {
+    val x = Byte.MinValue
+    assertEquals(-Byte.MinValue, checked(-x))
   }
 
   test("Negate of Long.MinValue overflows") {
