@@ -71,11 +71,11 @@ object Ziggurat {
       x = hz * wn(iz)
 
       if (iz == 0) {
-        while {
+        while ({
           x = -log(g.nextDouble()) * r1
           y = -log(g.nextDouble())
           (y + y < x * x)
-        } do ()
+        })()
         return if (hz > 0) r + x else -r - x
       }
 
