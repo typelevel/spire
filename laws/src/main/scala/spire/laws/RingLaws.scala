@@ -68,7 +68,7 @@ trait RingLaws[A] extends GroupLaws[A] {
   def multiplicativeGroup(implicit A: MultiplicativeGroup[A]) = new MultiplicativeProperties(
     base = _.group(A.multiplicative),
     parent = Some(multiplicativeMonoid),
-    "reciprocal consistent" -> forAllSafe((x: A) => !pred(x) || ((A.one / x) === x.reciprocal))
+    "reciprocal consistent" -> forAllSafe((x: A) => !pred(x) || ((A.one / x) === x.reciprocal()))
   )
 
   def multiplicativeAbGroup(implicit A: MultiplicativeAbGroup[A]) = new MultiplicativeProperties(
@@ -182,13 +182,13 @@ trait RingLaws[A] extends GroupLaws[A] {
       import spire.syntax.euclideanRing._
       !pred(y) || {
         val (q, r) = x.equotmod(y)
-        r.isZero || (r.euclideanFunction < y.euclideanFunction)
+        r.isZero || (r.euclideanFunction() < y.euclideanFunction())
       }
     },
     "submultiplicative function" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       !(pred(x) && pred(y)) || {
-        x.euclideanFunction <= (x * y).euclideanFunction
+        x.euclideanFunction() <= (x * y).euclideanFunction()
       }
     }
   )
@@ -199,7 +199,7 @@ trait RingLaws[A] extends GroupLaws[A] {
     "remainder is nonnegative" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       import spire.syntax.signed._
-      !pred(y) || x.emod(y).isSignNonNegative
+      !pred(y) || x.emod(y).isSignNonNegative()
     }
   )
 

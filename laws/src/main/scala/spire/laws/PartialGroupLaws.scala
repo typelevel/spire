@@ -34,8 +34,8 @@ trait PartialGroupLaws[A] extends GroupLaws[A] {
   def groupoid(implicit A: Groupoid[A]) = new GroupProperties(
     name = "groupoid",
     parent = Some(semigroupoid),
-    "left identity" -> forAllSafe((a: A) => (a.leftId |+|?? a) && ((a.leftId() |+|? a).get === a)),
-    "right identity" -> forAllSafe((a: A) => (a |+|?? a.rightId) && ((a |+|? a.rightId).get === a)),
+    "left identity" -> forAllSafe((a: A) => (a.leftId() |+|?? a) && ((a.leftId() |+|? a).get === a)),
+    "right identity" -> forAllSafe((a: A) => (a |+|?? a.rightId()) && ((a |+|? a.rightId()).get === a)),
     "product with inverse is always defined" -> forAllSafe((a: A) => (a |+|?? a.inverse()) && (a.inverse() |+|?? a)),
     "product with inverse is a left and right identity" -> forAllSafe((a: A, b: A) =>
       !(a |+|?? b) || (

@@ -31,7 +31,7 @@ trait CombinationLaws[A] extends Laws {
       !(x <= y) || (x + z <= y + z) // replaces (x <= y) ==> (x + z <= y + z)
     },
     "triangle inequality" -> forAllSafe { (x: A, y: A) =>
-      (x + y).abs <= x.abs + y.abs
+      (x + y).abs() <= x.abs() + y.abs()
     }
   )
 
@@ -39,7 +39,7 @@ trait CombinationLaws[A] extends Laws {
     name = "signedAdditiveAbGroup",
     parent = Some(signedAdditiveCMonoid),
     "abs(x) equals abs(-x)" -> forAllSafe { (x: A) =>
-      x.abs === (-x).abs
+      x.abs() === (-x).abs()
     }
   )
 
@@ -50,7 +50,7 @@ trait CombinationLaws[A] extends Laws {
     name = "signedGCDRing",
     parent = Some(signedAdditiveAbGroup),
     "gcd(x, y) >= 0" -> forAllSafe { (x: A, y: A) =>
-      x.gcd(y).signum >= 0
+      x.gcd(y).signum() >= 0
     },
     "gcd(x, 0) === abs(x)" -> forAllSafe { (x: A) =>
       x.gcd(Ring[A].zero) === Signed[A].abs(x)

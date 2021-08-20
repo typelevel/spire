@@ -43,9 +43,9 @@ trait OrderLaws[A] extends Laws {
   def signed(implicit A: Signed[A]) = new OrderProperties(
     name = "signed",
     parent = Some(order),
-    "abs non-negative" -> forAllSafe((x: A) => x.abs.sign != Sign.Negative),
-    "signum returns -1/0/1" -> forAllSafe((x: A) => x.signum.abs <= 1),
-    "signum is sign.toInt" -> forAllSafe((x: A) => x.signum == x.sign.toInt)
+    "abs non-negative" -> forAllSafe((x: A) => x.abs().sign() != Sign.Negative),
+    "signum returns -1/0/1" -> forAllSafe((x: A) => x.signum().abs() <= 1),
+    "signum is sign.toInt" -> forAllSafe((x: A) => x.signum() == x.sign().toInt)
   )
 
   def truncatedDivision(implicit cRigA: CRig[A], truncatedDivisionA: TruncatedDivision[A]) = new DefaultRuleSet(
@@ -64,33 +64,33 @@ trait OrderLaws[A] extends Laws {
       }
     },
     "quotient is integer (tquot)" -> forAllSafe { (x: A, y: A) =>
-      y.isZero || x.tquot(y).toBigIntOpt.nonEmpty
+      y.isZero || x.tquot(y).toBigIntOpt().nonEmpty
     },
     "quotient is integer (fquot)" -> forAllSafe { (x: A, y: A) =>
-      y.isZero || x.fquot(y).toBigIntOpt.nonEmpty
+      y.isZero || x.fquot(y).toBigIntOpt().nonEmpty
     },
     "|r| < |y| (tmod)" -> forAllSafe { (x: A, y: A) =>
       y.isZero || {
         val r = x.tmod(y)
-        r.abs < y.abs
+        r.abs() < y.abs()
       }
     },
     "|r| < |y| (fmod)" -> forAllSafe { (x: A, y: A) =>
       y.isZero || {
         val r = x.fmod(y)
-        r.abs < y.abs
+        r.abs() < y.abs()
       }
     },
     "r = 0 or sign(r) = sign(x) (tmod)" -> forAllSafe { (x: A, y: A) =>
       y.isZero || {
         val r = x.tmod(y)
-        r.isZero || (r.sign === x.sign)
+        r.isZero || (r.sign() === x.sign())
       }
     },
     "r = 0 or sign(r) = sign(y) (fmod)" -> forAllSafe { (x: A, y: A) =>
       y.isZero || {
         val r = x.fmod(y)
-        r.isZero || (r.sign === y.sign)
+        r.isZero || (r.sign() === y.sign())
       }
     },
     "tquot" -> forAllSafe { (x: A, y: A) =>

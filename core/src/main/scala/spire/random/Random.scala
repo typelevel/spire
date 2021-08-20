@@ -3,11 +3,24 @@ package random
 
 import scala.collection.Factory
 
+package test {
 sealed trait Op[+A] {
 
   def flatMap[B](f: A => Op[B]): Op[B] =
     this match {
-      case FlatMap(a, g) => FlatMap(a, (x: this.A) => g(x).flatMap(f))
+      case FlatMap(a, g) => FlatMap(a, x => g(x).flatMap(f))
+      case o             => FlatMap(o, f)
+    }
+
+}
+case class FlatMap[A, +B](sub: Op[A], k: A => Op[B]) extends Op[B]
+}
+
+sealed trait Op[+A] {
+
+  def flatMap[B](f: A => Op[B]): Op[B] =
+    this match {
+      case FlatMap(a, g) => FlatMap(a, x => g(x).flatMap(f))
       case o             => FlatMap(o, f)
     }
 
@@ -199,3 +212,5 @@ object Seed {
   def apply(n: Long): Seed = new Seed(spire.util.Pack.longToBytes(n))
   def apply(bytes: Array[Byte]): Seed = new Seed(bytes.clone)
 }
+
+

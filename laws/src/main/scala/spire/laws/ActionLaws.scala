@@ -81,7 +81,7 @@ trait ActionLaws[G, A] extends Laws {
     sl = _.group(G0),
     parents = Seq(monoidAction),
     "left and right action compatibility" -> forAllSafe { (a: A, g: G) =>
-      (a <|+| g) === (g.inverse |+|> a)
+      (a <|+| g) === (g.inverse() |+|> a)
     }
   )
 

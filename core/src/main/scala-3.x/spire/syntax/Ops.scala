@@ -105,7 +105,7 @@ final class LiteralDoubleOrderOps(val lhs: Double) extends AnyVal {
   // def isSignNonNegative(): Boolean = macro Ops.unop[Boolean]
 // }
 
-final class TruncatedDivisionOps[A: TruncatedDivision](lhs: A) {
+// final class TruncatedDivisionOps[A: TruncatedDivision](lhs: A) {
   // def toBigIntOpt(): Opt[BigInt] = macro Ops.unop[Opt[BigInt]]
   // def tquot(rhs: A): A = macro Ops.binop[A, A]
   // def tmod(rhs: A): A = macro Ops.binop[A, A]
@@ -114,7 +114,7 @@ final class TruncatedDivisionOps[A: TruncatedDivision](lhs: A) {
   // def fquot(rhs: A): A = macro Ops.binop[A, A]
   // def fmod(rhs: A): A = macro Ops.binop[A, A]
   // def fquotmod(rhs: A): (A, A) = macro Ops.binop[A, (A, A)]
-}
+// }
 
 final class InvolutionOps[A: Involution](lhs: A) {
   // def adjoint(): A = macro Ops.unop[A]
@@ -153,10 +153,10 @@ final class LiteralDoubleTruncatedDivisionOps(val lhs: Double) extends AnyVal {
     ev.fquotmod(c.fromDouble(lhs), rhs)
 }
 
-final class SemigroupoidOps[A: Semigroupoid](lhs: A) {
+// final class SemigroupoidOps[A: Semigroupoid](lhs: A) {
   // def |+|?(rhs: A): Opt[A] = macro Ops.binop[A, Opt[A]]
   // def |+|??(rhs: A): Boolean = macro Ops.binop[A, Boolean]
-}
+// }
 
 final class GroupoidCommonOps[A](lhs: A)(implicit ev: Groupoid[A]) {
   def inverse(): A = ev.inverse(lhs)
@@ -260,10 +260,10 @@ final class SemiringOps[A: Semiring](lhs: A) {
   def **(rhs: Int): A = pow(rhs) //macro Ops.binop[Int, A]
 }
 
-final class GCDRingOps[A: GCDRing](lhs: A) {
+// final class GCDRingOps[A: GCDRing](lhs: A) {
   // def gcd(rhs: A)(implicit ev1: Eq[A]): A = macro Ops.binopWithEv2[A, Eq[A], A]
   // def lcm(rhs: A)(implicit ev1: Eq[A]): A = macro Ops.binopWithEv2[A, Eq[A], A]
-}
+// }
 
 // final class EuclideanRingOps[A: EuclideanRing](lhs: A) {
 //   // def euclideanFunction(): BigInt = macro Ops.unop[BigInt]
@@ -363,7 +363,7 @@ final class JoinOps[A: JoinSemilattice](lhs: A) {
   // def ∨(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
 }
 
-final class HeytingOps[A: Heyting](lhs: A) {
+// final class HeytingOps[A: Heyting](lhs: A) {
   // def unary_~ : A = macro Ops.unop0[A]
   // def imp(rhs: A): A = macro Ops.binop[A, A]
   //
@@ -372,19 +372,19 @@ final class HeytingOps[A: Heyting](lhs: A) {
   //
   // def &(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
   // def |(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
-}
+// }
 
 final class LogicOps[A](lhs: A)(implicit logic: Logic[A]) {
   def unary_! : A = logic.not(lhs)
 
-  // def &(rhs: A): A = macro Ops.binop[A, A]
-  // def |(rhs: A): A = macro Ops.binop[A, A]
+  def &(rhs: A): A = ???
+  def |(rhs: A): A = ??? // macro Ops.binop[A, A]
   //
   // def &(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
   // def |(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
 }
 
-final class BoolOps[A: Bool](lhs: A) {
+// final class BoolOps[A: Bool](lhs: A) {
   // def ^(rhs: A): A = macro Ops.binop[A, A]
   // def nand(rhs: A): A = macro Ops.binop[A, A]
   // def nor(rhs: A): A = macro Ops.binop[A, A]
@@ -392,8 +392,8 @@ final class BoolOps[A: Bool](lhs: A) {
   //
   // def ^(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
 
-  def ^(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) ^ rhs
-}
+//   def ^(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) ^ rhs
+// }
 
 final class LeftModuleOps[V](x: V) {
   def *:[F](lhs: F)(implicit ev: LeftModule[V, F]): V = ev.timesl(lhs, x)
@@ -494,19 +494,19 @@ final class BitStringOps[A: BitString](lhs: A) {
   // def rotateRight(rhs: Int): A = macro Ops.binop[Int, A]
 }
 
-final class LeftPartialActionOps[G](lhs: G) {
+// final class LeftPartialActionOps[G](lhs: G) {
   // def ?|+|>[P](rhs: P)(implicit ev: LeftPartialAction[P, G]): Opt[P] =
   //   macro Ops.binopWithEv[P, LeftPartialAction[P, G], Opt[P]]
   // def ??|+|>[P](rhs: P)(implicit ev: LeftPartialAction[P, G]): Boolean =
   //   macro Ops.binopWithEv[P, LeftPartialAction[P, G], Boolean]
-}
+// }
 
-final class RightPartialActionOps[P](lhs: P) {
+// final class RightPartialActionOps[P](lhs: P) {
   // def <|+|?[G](rhs: G)(implicit ev: RightPartialAction[P, G]): Opt[P] =
   //   macro Ops.binopWithEv[G, RightPartialAction[P, G], Opt[P]]
   // def <|+|??[G](rhs: G)(implicit ev: RightPartialAction[P, G]): Boolean =
   //   macro Ops.binopWithEv[G, RightPartialAction[P, G], Boolean]
-}
+// }
 
 final class LeftActionOps[G](lhs: G) {
   // def |+|>[P](rhs: P)(implicit ev: LeftAction[P, G]): P =
@@ -529,7 +529,7 @@ final class RightActionOps[P](lhs: P) {
 final class ActionUnboundOps[G: ({ type F[A] = Action[_, A] })#F](lhs: G) {
   def |+|(rhs: G): G = ??? //macro Ops.binopWithScalar[G, G]
   // def |-|(rhs: G): G = macro Ops.binopWithScalar[G, G]
-  // def inverse(): G = macro Ops.unopWithScalar[G]
+  def inverse(): G = ???
 }
 
 final class AdditiveActionUnboundOps[G: ({ type F[A] = AdditiveAction[_, A] })#F](lhs: G) {
@@ -538,8 +538,9 @@ final class AdditiveActionUnboundOps[G: ({ type F[A] = AdditiveAction[_, A] })#F
   def unary_- : G = ??? //macro Ops.unopWithScalar0[G]
 }
 
-final class MultiplicativeActionUnboundOps[G: ({ type F[A] = MultiplicativeAction[_, A] })#F](lhs: G) {
-  def *(rhs: G): G = ??? // macro Ops.binopWithScalar[G, G]
+type MA[A] = MultiplicativeAction[_, A]
+final class MultiplicativeActionUnboundOps[G](lhs: G)(using ev: MA[_]) {
+  def *(rhs: G): G = ??? //ev.gtimesl(lhs, rhs) // macro Ops.binopWithScalar[G, G]
   def /(rhs: G): G = ??? //macro Ops.binopWithScalar[G, G]
   // def reciprocal(): G = macro Ops.unopWithScalar[G]
 }
