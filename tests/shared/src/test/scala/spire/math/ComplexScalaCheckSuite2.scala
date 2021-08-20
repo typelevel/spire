@@ -77,7 +77,7 @@ class ComplexScalaCheckSuite2 extends munit.ScalaCheckSuite {
 
   property("x^-1 = 1 / x") {
     forAll { (x: C) =>
-      (x != zero) ==> (x.reciprocal == one / x)
+      (x != zero) ==> (x.reciprocal() == one / x)
     }
   }
 

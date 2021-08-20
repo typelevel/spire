@@ -28,8 +28,8 @@ class NumericSuite extends munit.FunSuite {
     val z = Numeric[A].zero
 
     // abs
-    runTest("(-3).abs")(assertEquals(a.abs, b))
-    runTest("3.abs")(assertEquals(b.abs, b))
+    runTest("(-3).abs")(assertEquals(a.abs(), b))
+    runTest("3.abs")(assertEquals(b.abs(), b))
 
     // unary_-
     runTest("-(3)")(assertEquals(-b, a))
@@ -49,7 +49,7 @@ class NumericSuite extends munit.FunSuite {
     runTest("3 * (-3)")(assertEquals(b * a, c))
 
     // toInt
-    runTest("3.toInt")(assertEquals(b.toInt, 3))
+    runTest("3.toInt")(assertEquals(b.toInt(), 3))
   }
 
   implicit val mc: MathContext = MathContext.DECIMAL128

@@ -19,8 +19,8 @@ class LawSuite extends munit.DisciplineSuite {
 
   def fuzzyEq[@sp(Float, Double) A: Ring: Signed: Order](eps: A): Eq[A] = new Eq[A] {
     def eqv(x: A, y: A): Boolean = {
-      val delta = Order[A].max(x.abs, y.abs) * eps
-      (x - y).abs < delta
+      val delta = Order[A].max(x.abs(), y.abs()) * eps
+      (x - y).abs() < delta
     }
   }
 

@@ -52,15 +52,15 @@ trait OrderSyntax extends PartialOrderSyntax {
     def max(rhs: A): A = o.max(lhs, rhs)
 
     // def compare(rhs: Int)(implicit ev1: Ring[A]): Int = compare(ev1.fromInt(rhs))
-    def min(rhs: Int)(implicit ev1: Ring[A]): A = min(ev1.fromInt(rhs))
+    def min(rhs: Int)(using ev1: Ring[A]): A = min(ev1.fromInt(rhs))
     // def max(rhs: Int)(implicit ev1: Ring[A]): A = max(ev1.fromInt(rhs))
 
     // def compare(rhs: Double)(implicit ev1: Field[A]): Int = compare(ev1.fromDouble(rhs))
-    def min(rhs: Double)(implicit ev1: Field[A]): A = min(ev1.fromDouble(rhs))
+    def min(rhs: Double)(using ev1: Field[A]): A = min(ev1.fromDouble(rhs))
     // def max(rhs: Double)(implicit ev1: Field[A]): A = max(ev1.fromDouble(rhs))
 
     // def compare(rhs: Number)(implicit c: ConvertableFrom[A]): Int = c.toNumber(lhs).compare(rhs)
-    def min(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs).min(rhs)
+    def min(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs).min(rhs)
     // def max(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs).max(rhs)
 
   // extension (lhs: Int)
@@ -294,7 +294,7 @@ trait EuclideanRingSyntax extends GCDRingSyntax:
 
     // TODO: This is a bit
     // def equot(rhs: Int): A = er.equot(lhs, rhs)
-    // def emod(rhs: Int): A = macro Ops.binopWithSelfLift[Int, Ring[A], A]
+    def emod(rhs: Int): A = ???
     // def equotmod(rhs: Int): (A, A) = macro Ops.binopWithSelfLift[Int, Ring[A], (A, A)]
     //
     // def equot(rhs: Double)(implicit ev1: Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
@@ -422,9 +422,22 @@ trait BoolSyntax extends HeytingSyntax {
     def ^(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) ^ rhs
 }
 
-trait BitStringSyntax {
-  implicit def bitStringOps[A: BitString](a: A): BitStringOps[A] = new BitStringOps(a)
-}
+trait BitStringSyntax:
+  extension[A](lhs: A)(using ev: BitString[A])
+    def <<(rhs: Int): A = ???
+    def >>(rhs: Int): A = ???
+    def >>>(rhs: Int): A = ???
+
+    def bitCount(): Int = ???
+    def highestOneBit(): A = ???
+    def lowestOneBit(): A = ???
+    def numberOfLeadingZeros(): Int = ???
+    def numberOfTrailingZeros(): Int = ???
+
+    def toHexString(): String = ???
+
+    def rotateLeft(rhs: Int): A = ???
+    def rotateRight(rhs: Int): A = ???
 
 trait PartialActionSyntax:
   extension[G](lhs: G)
