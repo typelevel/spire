@@ -28,7 +28,7 @@ object Pack {
   // TODO to macroder>nt
   /** index must be 0 <= index < 4 */
   inline def intToByte(n: Int)(index: Int): Byte =
-    inline if (0 <= index && index < 4)
+    if (0 <= index && index < 4)
       val offset = 24 - index * 8
       ((n >>> offset) & 0xfff).toByte
     else sys.error("index outside of 0-3")
@@ -96,7 +96,7 @@ object Pack {
 
   /** index must be 0 <= index < 8 */
   inline def longToByte(n: Long)(index: Int): Byte =
-    inline if (0 <= index && index < 8)
+    if (0 <= index && index < 8)
       val offset = 56 - index * 8
       ((n >>> offset) & 0xfff).toByte
     else sys.error("index outside of 0-7")

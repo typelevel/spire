@@ -18,30 +18,30 @@ trait EqSyntax {
 
 trait PartialOrderSyntax extends EqSyntax {
   extension [A](lhs: A)(using po: PartialOrder[A])
-    infix def >(rhs: A): Boolean = lhs > rhs
-    infix def >=(rhs: A): Boolean = lhs >= rhs
-    infix def <(rhs: A): Boolean = lhs < rhs
-    infix def <=(rhs: A): Boolean = lhs <= rhs
+    infix def >(rhs: A): Boolean = po.gt(lhs, rhs)
+    infix def >=(rhs: A): Boolean = po.gteqv(lhs, rhs)
+    infix def <(rhs: A): Boolean = po.lt(lhs, rhs)
+    infix def <=(rhs: A): Boolean = po.lteqv(lhs, rhs)
 
     def partialCompare(rhs: A): Double = po.partialCompare(lhs, rhs)
     def tryCompare(rhs: A): Option[Int] = po.tryCompare(lhs, rhs)
     def pmin(rhs: A): Option[A] = po.pmin(lhs, rhs)
     def pmax(rhs: A): Option[A] = po.pmin(lhs, rhs)
 
-    infix def >(rhs: Int)(implicit ev1: Ring[A]): Boolean = lhs > ev1.fromInt(rhs)
-    infix def >=(rhs: Int)(implicit ev1: Ring[A]): Boolean = lhs >= ev1.fromInt(rhs)
-    infix def <(rhs: Int)(implicit ev1: Ring[A]): Boolean = lhs < ev1.fromInt(rhs)
-    infix def <=(rhs: Int)(implicit ev1: Ring[A]): Boolean = lhs <= ev1.fromInt(rhs)
+    infix def >(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.gt(lhs, ev1.fromInt(rhs))
+    infix def >=(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.gteqv(lhs, ev1.fromInt(rhs))
+    infix def <(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.lt(lhs, ev1.fromInt(rhs))
+    infix def <=(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.lteqv(lhs, ev1.fromInt(rhs))
 
-    infix def >(rhs: Double)(implicit ev1: Field[A]): Boolean = lhs > ev1.fromDouble(rhs)
-    infix def >=(rhs: Double)(implicit ev1: Field[A]): Boolean = lhs >= ev1.fromDouble(rhs)
-    infix def <(rhs: Double)(implicit ev1: Field[A]): Boolean = lhs < ev1.fromDouble(rhs)
-    infix def <=(rhs: Double)(implicit ev1: Field[A]): Boolean = lhs <= ev1.fromDouble(rhs)
+    infix def >(rhs: Double)(implicit ev1: Field[A]): Boolean = po.gt(lhs, ev1.fromDouble(rhs))
+    infix def >=(rhs: Double)(implicit ev1: Field[A]): Boolean = po.gteqv(lhs, ev1.fromDouble(rhs))
+    infix def <(rhs: Double)(implicit ev1: Field[A]): Boolean = po.lt(lhs, ev1.fromDouble(rhs))
+    infix def <=(rhs: Double)(implicit ev1: Field[A]): Boolean = po.lteqv(lhs, ev1.fromDouble(rhs))
 
-    infix def >(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) > rhs
-    infix def >=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) >= rhs
-    infix def <(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) < rhs
-    infix def <=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) <= rhs
+    // infix def >(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.gt(c.toNumber(lhs), rhs)
+    // infix def >=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.gteqv(c.toNumber(lhs), rhs)
+    // infix def <(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.lt(c.toNumber(lhs), rhs)
+    // infix def <=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.lteqv(c.toNumber(lhs), c.toNumber(rhs))
 }
 
 trait OrderSyntax extends PartialOrderSyntax {
