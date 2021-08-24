@@ -424,20 +424,20 @@ trait BoolSyntax extends HeytingSyntax {
 
 trait BitStringSyntax:
   extension[A](lhs: A)(using ev: BitString[A])
-    def <<(rhs: Int): A = ???
-    def >>(rhs: Int): A = ???
-    def >>>(rhs: Int): A = ???
+    def <<(rhs: Int): A = ev.leftShift(lhs, rhs)
+    def >>(rhs: Int): A = ev.signedRightShift(lhs, rhs)
+    def >>>(rhs: Int): A = ev.rightShift(lhs, rhs)
 
-    def bitCount(): Int = ???
-    def highestOneBit(): A = ???
-    def lowestOneBit(): A = ???
-    def numberOfLeadingZeros(): Int = ???
-    def numberOfTrailingZeros(): Int = ???
+    def bitCount(): Int = ev.bitCount(lhs)
+    def highestOneBit(): A = ev.highestOneBit(lhs)
+    def lowestOneBit(): A = ev.lowestOneBit(lhs)
+    def numberOfLeadingZeros(): Int = ev.numberOfLeadingZeros(lhs)
+    def numberOfTrailingZeros(): Int = ev.numberOfTrailingZeros(lhs)
 
-    def toHexString(): String = ???
+    def toHexString(): String = ev.toHexString(lhs)
 
-    def rotateLeft(rhs: Int): A = ???
-    def rotateRight(rhs: Int): A = ???
+    def rotateLeft(rhs: Int): A = ev.rotateLeft(lhs, rhs)
+    def rotateRight(rhs: Int): A = ev.rotateRight(lhs, rhs)
 
 trait PartialActionSyntax:
   extension[G](lhs: G)

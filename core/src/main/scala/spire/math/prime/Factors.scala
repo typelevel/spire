@@ -7,6 +7,7 @@ import spire.math.SafeLong
 import spire.std.int._
 import spire.std.map._
 import spire.syntax.rng._
+import spire.syntax.std._
 
 object Factors {
   val zero = Factors(Map.empty, Zero)

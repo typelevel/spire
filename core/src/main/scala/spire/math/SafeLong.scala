@@ -245,7 +245,7 @@ object SafeLong extends SafeLongInstances {
   final private[spire] val big64: BigInteger = BigInteger.ONE.shiftLeft(63)
   final private[spire] val safe64: SafeLong = SafeLong(big64)
 
-  implicit def apply(x: Int): SafeLong = SafeLongLong(x)
+  implicit def apply(x: Int): SafeLong = SafeLongLong(x.toLong)
 
   implicit def apply(x: Long): SafeLong = SafeLongLong(x)
 

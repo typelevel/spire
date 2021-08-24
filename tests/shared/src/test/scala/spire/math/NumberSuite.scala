@@ -21,20 +21,32 @@ class NumberSuite extends munit.FunSuite {
   }
 
   test("operations") {
-    assert(Number(3) + Number(4) === Number(7))
-
-    // since 30.0 can be repesented as a SafeLong, we get an IntNumber
-    assert(Number(4) ** Number(30.0) === Number("1152921504606846976"))
-
-    // since 30.5 can't, we get a DoubleNumber
-    assert(Number(4) ** Number(30.5) === FloatNumber(2.305843009213694e18))
-
-    assert(Number(100) ** Number(200.0) === Number(100) ** Number(200))
-    assert(
-      Number(100) ** Number(200) === Number(
+    // assert(Number(3) + Number(4) === Number(7))
+    //
+    // // since 30.0 can be repesented as a SafeLong, we get an IntNumber
+    // assert(Number(4) ** Number(30.0) === Number("1152921504606846976"))
+    //
+    // // since 30.5 can't, we get a DoubleNumber
+    // assert(Number(4) ** Number(30.5) === FloatNumber(2.305843009213694e18))
+    //
+    // assert(Number(100) ** Number(200.0) === Number(100) ** Number(200))
+    // println(Number(100))
+    // println(Number(200))
+    // println(Number(200.0))
+    // println(Number(100) ** Number(200.0))
+    println(Number(100) ** Number(200))
+    println(
+      Number(
         "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
       )
     )
+    fail("HT")
+    // TODO Enable
+    // assert(
+    //   Number(100) ** Number(200) === Number(
+    //     "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    //   )
+    // )
 
     // DecimalNumber is honest when its roots aren't perfect
     val z1 = Number("81") ** Number("0.5") - Number("9.0")
