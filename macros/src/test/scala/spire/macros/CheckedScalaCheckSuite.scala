@@ -79,7 +79,21 @@ class CheckedScalaCheckSuite extends munit.ScalaCheckSuite {
   test("Negate of Long.MinValue overflows") {
     val x = Long.MinValue
     intercept[ArithmeticException] { checked(-x) }
+    assert { Checked.option(-x).isEmpty }
+    assertEquals(-1L, Checked.tryOrElse(-x)(-1L))
+    assertEquals(-1L, odd(x))
+    assertEquals(0L, odd(0))
+    Checked.tryOrElse {
+      val i = 0
+      i
+    } {
+      val j = 0
+      j
+    }
   }
+
+  def odd(a: Long): Long =
+    Checked.tryOrReturn(-a)(-1L)
 
   property("Long negate overflow throws arithmetic exception") {
     forAll { (x: Long) =>

@@ -12,28 +12,16 @@ object Checked:
    * Performs overflow checking for Int/Long operations.
    *
    * If no errors are detected, the expected result will be
-   * returned. If there are errors, the 'orElse' block will be
-   * evaluated and returned.
-   */
-  inline def tryOrElse[A](n: Int)(orElse: Int): Int = tryOrReturn(n)(orElse)
-  inline def tryOrElse[A](n: Long)(orElse: Long): Long = tryOrReturn(n)(orElse)
-  inline def tryOrElse[A](n: A)(orElse: A): A = tryOrReturn(n)(orElse)
-
-
-
-  /**
-   * Performs overflow checking for Int/Long operations.
-   *
-   * If no errors are detected, the expected result will be
    * returned. If an error is detected, an ArithmeticOverflowException
    * will be thrown.
    */
   // NOTE I made three versions for each type to know that checkedImpl cannot be called with an arbitrary type
-  inline def checked(inline n: Int): Int =
-    ${ checkedImpl[Int]('{n}, '{throw new spire.macros.ArithmeticOverflowException()}) }
-  inline def checked(inline n: Long): Long =
-    ${ checkedImpl[Long]('{n}, '{throw new spire.macros.ArithmeticOverflowException()}) }
-  inline def checked[A](inline n: A): A = n
+  // inline def checked(inline n: Int): Int =
+  //   ${ checkedImpl[Int]('{n}, '{throw new spire.macros.ArithmeticOverflowException()}) }
+  // inline def checked(inline n: Long): Long =
+  //   ${ checkedImpl[Long]('{n}, '{throw new spire.macros.ArithmeticOverflowException()}) }
+  inline def checked[A](inline n: A): A =
+    ${ checkedImpl[A]('{n}, '{throw new spire.macros.ArithmeticOverflowException()}) }
 
   // Attempts to convert the expresion to Int
   private def toInt[A](n: Expr[A])(using Quotes): Expr[Int] =
@@ -67,6 +55,9 @@ object Checked:
   private def isIntType[A](n: Expr[A])(using Quotes): Boolean =
     n.isExprOf[Int] || n.isExprOf[Byte] || n.isExprOf[Short]
 
+  private def isLongType[A](n: Expr[A])(using Quotes): Boolean =
+    n.isExprOf[Long]
+
   // Build an expression with the correct limit for Int/Long
   private def isLongType[A](n: Expr[A])(using Quotes): Boolean =
     n.isExprOf[Long]
@@ -77,7 +68,7 @@ object Checked:
     else
       '{Long.MinValue}
 
-  private def checkedImpl[A](n: Expr[A], fallback: Expr[Nothing])(using Quotes, Type[A]): Expr[A] =
+  private def checkedImpl[A](n: Expr[A], fallback: Expr[Any])(using Quotes, Type[A]): Expr[A] =
     import quotes.reflect.*
 
     val tree: Term = n.asTerm
@@ -189,21 +180,34 @@ object Checked:
    * in a Some wrapper. If an error is detected, None will be
    * returned.
    */
-  inline def option(inline n: Long): Option[Long] =
-    // NOTE: We may be able to inline this to make the macro fallback to None
-    try
-      Some(checked(n))
-    catch
-      case a: ArithmeticOverflowException => None
-
-  inline def option(inline n: Int): Option[Int] =
-    try
-      Some(checked(n))
-    catch
-      case a: ArithmeticOverflowException => None
-
+  // inline def option(inline n: Long): Option[Long] =
+  //   // NOTE: We may be able to inline this to make the macro fallback to None
+  //   try
+  //     Some(checked(n))
+  //   catch
+  //     case a: ArithmeticOverflowException => None
+  //
+  // inline def option(inline n: Int): Option[Int] =
+  //   try
+  //     Some(checked(n))
+  //   catch
+  //     case a: ArithmeticOverflowException => None
+  //
   inline def option[A](inline n: A): Option[A] =
-    Some(n)
+    try
+      Some(checked(n))
+    catch
+      case a: ArithmeticOverflowException => None
+
+  /**
+   * Performs overflow checking for Int/Long operations.
+   *
+   * If no errors are detected, the expected result will be
+   * returned. If there are errors, the 'orElse' block will be
+   * evaluated and returned.
+   */
+  inline def tryOrElse[A](inline n: A)(inline orElse: => A): A =
+    ${ checkedImpl[A]('{n}, '{orElse}) }
 
   /**
    * Performs overflow checking for Int/Long operations.
@@ -217,8 +221,13 @@ object Checked:
    * called from within a method that you would like to "return out
    * of" in the case of an overflow.
    */
-  inline def tryOrReturn[A](n: Int)(orElse: Int): Int = option(n).getOrElse(orElse)
-  inline def tryOrReturn[A](n: Long)(orElse: Long): Long = option(n).getOrElse(orElse)
-  inline def tryOrReturn[A](n: A)(orElse: A): A = option(n).getOrElse(orElse)
+  // inline def tryOrReturn[A](n: Int)(orElse: Int): Int = option(n).getOrElse(orElse)
+  // inline def tryOrReturn[A](n: Long)(orElse: Long): Long = option(n).getOrElse(orElse)
+  inline def tryOrReturn[A](inline n: A)(inline orElse: => A): A =
+    ${ checkedImplF[A]('{n}, '{orElse}) }
+
+  private def checkedImplF[A](n: Expr[A], fallback: Expr[Any])(using Quotes, Type[A]): Expr[A] = {
+    checkedImpl(n, fallback)
+  }
 
 
