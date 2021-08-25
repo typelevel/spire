@@ -1,18 +1,16 @@
 import scala.language.existentials
-import sbt.io.Using
 import microsites._
 import ReleaseTransformations._
-import sbtcrossproject.{crossProject, CrossType}
 
 lazy val scalaCheckVersion = "1.15.4"
 
-lazy val munit = "0.7.26"
+lazy val munit = "0.7.28"
 lazy val munitDiscipline = "1.0.9"
 
 lazy val shapelessVersion = "2.3.7"
 lazy val algebraVersion = "2.2.3"
 
-lazy val apfloatVersion = "1.10.0"
+lazy val apfloatVersion = "1.10.1"
 lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
@@ -164,7 +162,10 @@ lazy val docs = project
   .settings(spireSettings: _*)
   .settings(docSettings: _*)
   .settings(noPublishSettings)
-  .enablePlugins(TutPlugin)
+  .enablePlugins(MdocPlugin)
+  .settings(
+    mdocIn := (Compile / sourceDirectory).value / "mdoc"
+  )
   .settings(commonJvmSettings: _*)
 
 lazy val examples = project
@@ -264,7 +265,6 @@ lazy val commonJvmSettings = Seq()
 lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
 
 lazy val docSettings = Seq(
-  Tut / scalacOptions := (Tut / scalacOptions).value.filterNot(Set("-Ywarn-unused-imports", "-Xlint").contains),
   micrositeName := "Spire",
   micrositeDescription := "Powerful new number types and numeric abstractions for Scala",
   micrositeAuthor := "Spire contributors",
@@ -326,7 +326,6 @@ lazy val docSettings = Seq(
   ghpagesNoJekyll := false,
   fork := true,
   javaOptions += "-Xmx4G", // to have enough memory in forks
-//  fork in tut := true,
 //  fork in (ScalaUnidoc, unidoc) := true,
   ScalaUnidoc / unidoc / scalacOptions ++= Seq(
     "-groups",
@@ -336,7 +335,6 @@ lazy val docSettings = Seq(
     (LocalRootProject / baseDirectory).value.getAbsolutePath,
     "-diagrams"
   ),
-  Tut / scalacOptions ~= (_.filterNot(Set("-Ywarn-unused-import", "-Ywarn-dead-code"))),
   git.remoteRepo := "git@github.com:typelevel/spire.git",
   makeSite / includeFilter := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md" | "*.svg",
   Jekyll / includeFilter := (makeSite / includeFilter).value
