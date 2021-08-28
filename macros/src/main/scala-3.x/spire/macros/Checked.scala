@@ -32,8 +32,10 @@ object Checked:
       '{${n.asExprOf[Byte]}.toInt}
     else if (n.isExprOf[Short])
       '{${n.asExprOf[Short]}.toInt}
+    // else if (n.isExprOf[Long])
+    //   '{${n.asExprOf[Long]}.toInt}
     else
-       report.error("Cannot lift value to int type")
+       report.error(s"Cannot lift value to int type ${Expr.betaReduce(n).show}")
        '{${n.asExprOf[Long]}.intValue}
 
   // Attempts to convert the expresion to Long
@@ -79,7 +81,7 @@ object Checked:
 
     val acc = new TreeMap:
       override def transformTerm(tree: Term)(owner: Symbol): Term =
-        report.info(s"term ${n.show} ${tree.tpe.show}")
+        // report.info(s"term ${n.show}")
         tree match
           case Select(x, "unary_-") =>
             val isInt = isIntType(n)
@@ -223,7 +225,7 @@ object Checked:
    */
   // inline def tryOrReturn[A](n: Int)(orElse: Int): Int = option(n).getOrElse(orElse)
   // inline def tryOrReturn[A](n: Long)(orElse: Long): Long = option(n).getOrElse(orElse)
-  inline def tryOrReturn[A](inline n: A)(inline orElse: => A): A =
+  inline def tryOrReturn[A](inline n: A)(orElse: => A): A =
     ${ checkedImplF[A]('{n}, '{orElse}) }
 
   private def checkedImplF[A](n: Expr[A], fallback: Expr[Any])(using Quotes, Type[A]): Expr[A] = {

@@ -28,162 +28,169 @@ class CheckedScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-  test("Negate of Int.MinValue overflows") {
-    val x = Int.MinValue
-    intercept[ArithmeticException] { checked(-x) }
-  }
+  // test("Negate of Int.MinValue overflows") {
+  //   val x = Int.MinValue
+  //   intercept[ArithmeticException] { checked(-x) }
+  // }
+  //
+  // property("Int negate overflow throws arithmetic exception") {
+  //   forAll { (x: Int) =>
+  //     checkForIntOverflow(-BigInt(x), checked(-x))
+  //   }
+  // }
+  //
+  // property("Int addition overflow throws arithmetic exception") {
+  //   forAll { (x: Int, y: Int) =>
+  //     checkForIntOverflow(BigInt(x) + BigInt(y), checked(x + y))
+  //   }
+  // }
+  //
+  // property("Int subtraction overflow throws arithmetic exception") {
+  //   forAll { (x: Int, y: Int) =>
+  //     checkForIntOverflow(BigInt(x) - BigInt(y), checked(x - y))
+  //   }
+  // }
+  //
+  // property("Int multiplication overflow throws arithmetic exception") {
+  //   forAll { (x: Int, y: Int) =>
+  //     checkForIntOverflow(BigInt(x) * BigInt(y), checked(x * y))
+  //   }
+  // }
+  //
+  // property("Int division overflow throws arithmetic exception") {
+  //   forAll { (x: Int, y: NotZero[Int]) =>
+  //     checkForIntOverflow(BigInt(x) / BigInt(y.value), checked(x / y.value))
+  //   }
+  // }
+  //
+  // def distSq(x: Long, y: Long): BigInt = BigInt(x) * BigInt(x) + BigInt(y) * BigInt(y)
+  //
+  // property("Int euclidean square distance overflow throws arithmetic exception") {
+  //   forAll { (x: Int, y: Int) =>
+  //     checkForIntOverflow(distSq(x, y), checked(x * x + y * y))
+  //   }
+  // }
+  //
+  // test("Negate of Byte.MinValue overflows") {
+  //   val x = Byte.MinValue
+  //   assertEquals(-Byte.MinValue, checked(-x))
+  // }
 
-  property("Int negate overflow throws arithmetic exception") {
-    forAll { (x: Int) =>
-      checkForIntOverflow(-BigInt(x), checked(-x))
-    }
-  }
-
-  property("Int addition overflow throws arithmetic exception") {
-    forAll { (x: Int, y: Int) =>
-      checkForIntOverflow(BigInt(x) + BigInt(y), checked(x + y))
-    }
-  }
-
-  property("Int subtraction overflow throws arithmetic exception") {
-    forAll { (x: Int, y: Int) =>
-      checkForIntOverflow(BigInt(x) - BigInt(y), checked(x - y))
-    }
-  }
-
-  property("Int multiplication overflow throws arithmetic exception") {
-    forAll { (x: Int, y: Int) =>
-      checkForIntOverflow(BigInt(x) * BigInt(y), checked(x * y))
-    }
-  }
-
-  property("Int division overflow throws arithmetic exception") {
-    forAll { (x: Int, y: NotZero[Int]) =>
-      checkForIntOverflow(BigInt(x) / BigInt(y.value), checked(x / y.value))
-    }
-  }
-
-  def distSq(x: Long, y: Long): BigInt = BigInt(x) * BigInt(x) + BigInt(y) * BigInt(y)
-
-  property("Int euclidean square distance overflow throws arithmetic exception") {
-    forAll { (x: Int, y: Int) =>
-      checkForIntOverflow(distSq(x, y), checked(x * x + y * y))
-    }
-  }
-
-  test("Negate of Byte.MinValue overflows") {
-    val x = Byte.MinValue
-    assertEquals(-Byte.MinValue, checked(-x))
-  }
-
+  case class A(p: Long)
+  def compare(p: Long): Int = 0
   test("Negate of Long.MinValue overflows") {
-    val x = Long.MinValue
-    intercept[ArithmeticException] { checked(-x) }
-    assert { Checked.option(-x).isEmpty }
-    assertEquals(-1L, Checked.tryOrElse(-x)(-1L))
-    assertEquals(-1L, odd(x))
-    assertEquals(0L, odd(0))
+    // val x = Long.MinValue
+    // intercept[ArithmeticException] { checked(-x) }
+    // assert { Checked.option(-x).isEmpty }
+    // assertEquals(-1L, Checked.tryOrElse(-x)(-1L))
+    // assertEquals(-1L, odd(x))
+    // assertEquals(0L, odd(0))
+    val a = A(1L)
+    val p = 1L
+    val n: Long = 3
+    val m: Int = 3
     Checked.tryOrElse {
-      val i = 0
+      val i = compare(p * n)
       i
     } {
-      val j = 0
+      val j = 0L
       j
     }
   }
 
-  def odd(a: Long): Long =
-    Checked.tryOrReturn(-a)(-1L)
-
-  property("Long negate overflow throws arithmetic exception") {
-    forAll { (x: Long) =>
-      checkForLongOverflow(-BigInt(x), checked(-x))
-    }
-  }
-
-  property("Long addition overflow throws arithmetic exception") {
-    forAll { (x: Long, y: Long) =>
-      checkForLongOverflow(BigInt(x) + BigInt(y), checked(x + y))
-    }
-  }
-
-  property("Long subtraction overflow throws arithmetic exception") {
-    forAll { (x: Long, y: Long) =>
-      checkForLongOverflow(BigInt(x) - BigInt(y), checked(x - y))
-    }
-  }
-
-  property("Long multiplication overflow throws arithmetic exception") {
-    forAll { (x: Long, y: Long) =>
-      checkForLongOverflow(BigInt(x) * BigInt(y), checked(x * y))
-    }
-  }
-
-  property("Long division overflow throws arithmetic exception") {
-    forAll { (x: Long, y: NotZero[Long]) =>
-      checkForLongOverflow(BigInt(x) / BigInt(y.value), checked(x / y.value))
-    }
-  }
-
-  property("Long euclidean square distance overflow throws arithmetic exception") {
-    forAll { (x: Long, y: Long) =>
-      checkForLongOverflow(distSq(x, y), checked(x * x + y * y))
-    }
-  }
-
-  test("Int upgrades to Long for overflow checks when mixed in binary op") {
-    assertEquals(Checked.option {
-                   val x = 2L
-                   val y = Int.MaxValue
-                   x + y
-                 },
-                 Some(Int.MaxValue.toLong + 2)
-    )
-
-    assertEquals(Checked.option {
-                   val x = 2L
-                   val y = Int.MaxValue
-                   y + x
-                 },
-                 Some(Int.MaxValue.toLong + 2)
-    )
-
-    intercept[ArithmeticException](checked {
-      val x = Long.MaxValue
-      val y = 2
-      x * y
-    })
-
-    intercept[ArithmeticException](checked {
-      val x = Long.MaxValue
-      val y = 2
-      y * x
-    })
-  }
-
-  test("Byte and Short upgrade to Int when mixed") {
-    intercept[ArithmeticException](checked {
-      val x = Int.MaxValue
-      val y = 2: Byte
-      x * y
-    })
-
-    intercept[ArithmeticException](checked {
-      val x = Int.MaxValue
-      val y = 2: Byte
-      y * x
-    })
-
-    intercept[ArithmeticException](checked {
-      val x = Int.MaxValue
-      val y = 2: Short
-      x * y
-    })
-
-    intercept[ArithmeticException](checked {
-      val x = Int.MaxValue
-      val y = 2: Short
-      y * x
-    })
-  }
+//   def odd(a: Long): Long =
+//     Checked.tryOrReturn(-a)(-1L)
+//
+//   property("Long negate overflow throws arithmetic exception") {
+//     forAll { (x: Long) =>
+//       checkForLongOverflow(-BigInt(x), checked(-x))
+//     }
+//   }
+//
+//   property("Long addition overflow throws arithmetic exception") {
+//     forAll { (x: Long, y: Long) =>
+//       checkForLongOverflow(BigInt(x) + BigInt(y), checked(x + y))
+//     }
+//   }
+//
+//   property("Long subtraction overflow throws arithmetic exception") {
+//     forAll { (x: Long, y: Long) =>
+//       checkForLongOverflow(BigInt(x) - BigInt(y), checked(x - y))
+//     }
+//   }
+//
+//   property("Long multiplication overflow throws arithmetic exception") {
+//     forAll { (x: Long, y: Long) =>
+//       checkForLongOverflow(BigInt(x) * BigInt(y), checked(x * y))
+//     }
+//   }
+//
+//   property("Long division overflow throws arithmetic exception") {
+//     forAll { (x: Long, y: NotZero[Long]) =>
+//       checkForLongOverflow(BigInt(x) / BigInt(y.value), checked(x / y.value))
+//     }
+//   }
+//
+//   property("Long euclidean square distance overflow throws arithmetic exception") {
+//     forAll { (x: Long, y: Long) =>
+//       checkForLongOverflow(distSq(x, y), checked(x * x + y * y))
+//     }
+//   }
+//
+//   test("Int upgrades to Long for overflow checks when mixed in binary op") {
+//     assertEquals(Checked.option {
+//                    val x = 2L
+//                    val y = Int.MaxValue
+//                    x + y
+//                  },
+//                  Some(Int.MaxValue.toLong + 2)
+//     )
+//
+//     assertEquals(Checked.option {
+//                    val x = 2L
+//                    val y = Int.MaxValue
+//                    y + x
+//                  },
+//                  Some(Int.MaxValue.toLong + 2)
+//     )
+//
+//     intercept[ArithmeticException](checked {
+//       val x = Long.MaxValue
+//       val y = 2
+//       x * y
+//     })
+//
+//     intercept[ArithmeticException](checked {
+//       val x = Long.MaxValue
+//       val y = 2
+//       y * x
+//     })
+//   }
+//
+//   test("Byte and Short upgrade to Int when mixed") {
+//     intercept[ArithmeticException](checked {
+//       val x = Int.MaxValue
+//       val y = 2: Byte
+//       x * y
+//     })
+//
+//     intercept[ArithmeticException](checked {
+//       val x = Int.MaxValue
+//       val y = 2: Byte
+//       y * x
+//     })
+//
+//     intercept[ArithmeticException](checked {
+//       val x = Int.MaxValue
+//       val y = 2: Short
+//       x * y
+//     })
+//
+//     intercept[ArithmeticException](checked {
+//       val x = Int.MaxValue
+//       val y = 2: Short
+//       y * x
+//     })
+//   }
+//
 }

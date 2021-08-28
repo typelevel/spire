@@ -54,6 +54,11 @@ object Checked {
     val resetTree = resetLocalAttrs(c)(tree) // See SI-6711
     c.Expr[A](resetTree)
   }
+  def tryOrReturnImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A])(orElse: c.Expr[A]): c.Expr[A] = {
+    val tree = CheckedRewriter[c.type](c).rewriteFast[A](n.tree, orElse.tree)
+    val resetTree = resetLocalAttrs(c)(tree) // See SI-6711
+    c.Expr[A](resetTree)
+  }
 
   def checkedImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A]): c.Expr[A] = {
     import c.universe._
@@ -65,11 +70,6 @@ object Checked {
     tryOrElseImpl[Option[A]](c)(c.Expr[Option[A]](q"Option(${n.tree})"))(c.Expr[Option[A]](q"None"))
   }
 
-  def tryOrReturnImpl[A: c.WeakTypeTag](c: Context)(n: c.Expr[A])(orElse: c.Expr[A]): c.Expr[A] = {
-    val tree = CheckedRewriter[c.type](c).rewriteFast[A](n.tree, orElse.tree)
-    val resetTree = resetLocalAttrs(c)(tree) // See SI-6711
-    c.Expr[A](resetTree)
-  }
 }
 
 private[macros] case class CheckedRewriter[C <: Context](c: C) {

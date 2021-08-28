@@ -22,7 +22,10 @@ object Number extends NumberInstances {
   final val zero: Number = Number(0)
   final val one: Number = Number(1)
 
-  implicit def apply(n: Int): Number = IntNumber(SafeLong(n))
+  implicit def apply(n: Int): Number = {
+    println("Int: " + n)
+    IntNumber(SafeLong(n))
+  }
   implicit def apply(n: Long): Number = IntNumber(SafeLong(n))
   implicit def apply(n: BigInt): Number = IntNumber(SafeLong(n))
   implicit def apply(n: SafeLong): Number = IntNumber(n)
@@ -239,9 +242,22 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
   }
 
   def pow(rhs: Number): Number = rhs match {
-    case _ if rhs.canBeInt              => Number(n.pow(rhs.intValue))
-    case FloatNumber(m) if withinDouble => Number(spire.math.pow(doubleValue, m))
-    case _                              => Number(spire.math.pow(lhs.toBigDecimal, rhs.toBigDecimal))
+    case _ if rhs.canBeInt =>
+      println("A")
+      println(rhs)
+      println(rhs.intValue)
+      println(n)
+      println(n.pow(rhs.intValue))
+      println("--")
+      Number(n.pow(rhs.intValue))
+    case FloatNumber(m) if withinDouble =>
+      println("B")
+      Number(spire.math.pow(doubleValue, m))
+    case _ =>
+      println("C")
+      println(lhs.toBigDecimal)
+      println(rhs.toBigDecimal)
+      Number(spire.math.pow(lhs.toBigDecimal, rhs.toBigDecimal))
   }
 
   override def &(rhs: Number): Number = rhs match {

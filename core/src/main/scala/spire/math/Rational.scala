@@ -347,7 +347,7 @@ object Rational extends RationalInstances {
   def apply(n: SafeLong, d: SafeLong): Rational = {
     if (d.isZero) throw new IllegalArgumentException("0 denominator")
     else if (n.isValidLong && d.isValidLong) apply(n.toLong, d.toLong)
-    else if (d.signum < 0) return apply(-n, -d)
+    else if (d.signum < 0) return { println(s"$d ${d.signum} ${-d}"); apply(-n, -d) }
     else {
       val g = n.gcd(d)
       n / g match {
