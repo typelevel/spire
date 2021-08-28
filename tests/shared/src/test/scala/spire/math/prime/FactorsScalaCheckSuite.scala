@@ -13,17 +13,19 @@ import Ordinal._
 import org.scalacheck.Prop._
 
 class FactorsScalaCheckSuite extends munit.ScalaCheckSuite {
-  //
-  // implicit val arbitraryFactors: Arbitrary[Factors] =
-  //   Arbitrary(arbitrary[SafeLong].map(n => Factors(n)))
-  //
+
+  implicit val arbitraryFactors: Arbitrary[Factors] =
+    Arbitrary(arbitrary[SafeLong].map(Factors.apply))
+
   // property("Factors(n).value = n") {
   //   forAll { (n: Long) =>
-  //     Factors(n).value == n
+  //     println(n)
+  //     Factors(n)//).value == n
+  //     true
   //   }
   // }
   //
-  // property("Factors(n) + Factors(m) = n + m") {
+  // // property("Factors(n) + Factors(m) = n + m") {
   //   forAll { (n: Long, m: Long) =>
   //     (Factors(n) + Factors(m)).value == SafeLong(n) + SafeLong(m)
   //   }

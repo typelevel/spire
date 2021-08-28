@@ -305,24 +305,24 @@ final class EuclideanRingOps[A: EuclideanRing](lhs: A) {
    */
 }
 
-final class LiteralIntEuclideanRingOps(val lhs: Int) extends AnyVal {
-  def equot[A](rhs: A)(implicit ev: EuclideanRing[A]): A = ev.equot(ev.fromInt(lhs), rhs)
-  def emod[A](rhs: A)(implicit ev: EuclideanRing[A]): A = ev.emod(ev.fromInt(lhs), rhs)
-  def equotmod[A](rhs: A)(implicit ev: EuclideanRing[A]): (A, A) = ev.equotmod(ev.fromInt(lhs), rhs)
-}
-
-final class LiteralLongEuclideanRingOps(val lhs: Long) extends AnyVal {
-  def equot[A](rhs: A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.equot(c.fromLong(lhs), rhs)
-  def emod[A](rhs: A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.emod(c.fromLong(lhs), rhs)
-  def equotmod[A](rhs: A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): (A, A) =
-    ev.equotmod(c.fromLong(lhs), rhs)
-}
-
-final class LiteralDoubleEuclideanRingOps(val lhs: Double) extends AnyVal {
-  def equot[A](rhs: A)(implicit ev: Field[A]): A = ev.equot(ev.fromDouble(lhs), rhs)
-  def emod[A](rhs: A)(implicit ev: Field[A]): A = ev.emod(ev.fromDouble(lhs), rhs)
-  def equotmod[A](rhs: A)(implicit ev: Field[A]): (A, A) = ev.equotmod(ev.fromDouble(lhs), rhs)
-}
+// final class LiteralIntEuclideanRingOps(val lhs: Int) extends AnyVal {
+//   def equot[A](rhs: A)(implicit ev: EuclideanRing[A]): A = ev.equot(ev.fromInt(lhs), rhs)
+//   def emod[A](rhs: A)(implicit ev: EuclideanRing[A]): A = ev.emod(ev.fromInt(lhs), rhs)
+//   def equotmod[A](rhs: A)(implicit ev: EuclideanRing[A]): (A, A) = ev.equotmod(ev.fromInt(lhs), rhs)
+// }
+//
+// final class LiteralLongEuclideanRingOps(val lhs: Long) extends AnyVal {
+//   def equot[A](rhs: A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.equot(c.fromLong(lhs), rhs)
+//   def emod[A](rhs: A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.emod(c.fromLong(lhs), rhs)
+//   def equotmod[A](rhs: A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): (A, A) =
+//     ev.equotmod(c.fromLong(lhs), rhs)
+// }
+//
+// final class LiteralDoubleEuclideanRingOps(val lhs: Double) extends AnyVal {
+//   def equot[A](rhs: A)(implicit ev: Field[A]): A = ev.equot(ev.fromDouble(lhs), rhs)
+//   def emod[A](rhs: A)(implicit ev: Field[A]): A = ev.emod(ev.fromDouble(lhs), rhs)
+//   def equotmod[A](rhs: A)(implicit ev: Field[A]): (A, A) = ev.equotmod(ev.fromDouble(lhs), rhs)
+// }
 
 final class IsRealOps[A: IsReal](lhs: A) {
   def isWhole(): Boolean = macro Ops.unop[Boolean]
@@ -446,34 +446,34 @@ final class VectorSpaceOps[V](x: V) {
   def :/[F](rhs: Double)(implicit ev: VectorSpace[V, F]): V = ev.divr(x, ev.scalar.fromDouble(rhs))
 }
 
-final class VectorSpaceUnboundOps[F: ({ type F[A] = VectorSpace[_, A] })#F](lhs: F) {
-  def /(rhs: F): F = macro Ops.binopWithScalar[F, F]
-  def reciprocal(): F = macro Ops.unopWithScalar[F]
-}
+// final class VectorSpaceUnboundOps[F: ({ type F[A] = VectorSpace[_, A] })#F](lhs: F) {
+//   def /(rhs: F): F = macro Ops.binopWithScalar[F, F]
+//   def reciprocal(): F = macro Ops.unopWithScalar[F]
+// }
+//
+// final class InnerProductSpaceOps[V](lhs: V) {
+//   def dot[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
+//     macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
+//   def ⋅[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
+//     macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
+// }
 
-final class InnerProductSpaceOps[V](lhs: V) {
-  def dot[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
-    macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
-  def ⋅[F](rhs: V)(implicit ev: InnerProductSpace[V, F]): F =
-    macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
-}
-
-final class CoordinateSpaceOps[V](v: V) {
-  def _x[F](implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], F]
-
-  def _y[F](implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], F]
-
-  def _z[F](implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], F]
-
-  def coord[F](rhs: Int)(implicit ev: CoordinateSpace[V, F]): F =
-    macro Ops.binopWithEv[Int, CoordinateSpace[V, F], F]
-
-  def dimensions[F](implicit ev: CoordinateSpace[V, F]): Int =
-    macro Ops.unopWithEv[CoordinateSpace[V, F], Int]
-}
+// final class CoordinateSpaceOps[V](v: V) {
+//   def _x[F](implicit ev: CoordinateSpace[V, F]): F =
+//     macro Ops.unopWithEv[CoordinateSpace[V, F], F]
+//
+//   def _y[F](implicit ev: CoordinateSpace[V, F]): F =
+//     macro Ops.unopWithEv[CoordinateSpace[V, F], F]
+//
+//   def _z[F](implicit ev: CoordinateSpace[V, F]): F =
+//     macro Ops.unopWithEv[CoordinateSpace[V, F], F]
+//
+//   def coord[F](rhs: Int)(implicit ev: CoordinateSpace[V, F]): F =
+//     macro Ops.binopWithEv[Int, CoordinateSpace[V, F], F]
+//
+//   def dimensions[F](implicit ev: CoordinateSpace[V, F]): Int =
+//     macro Ops.unopWithEv[CoordinateSpace[V, F], Int]
+// }
 
 final class MetricSpaceOps[V](lhs: V) {
   def distance[F](rhs: V)(implicit ev: MetricSpace[V, F]): F =

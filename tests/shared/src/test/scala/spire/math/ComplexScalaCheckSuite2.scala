@@ -6,18 +6,18 @@ import spire.laws.arb.{complex, real}
 import org.scalacheck.Prop._
 
 class ComplexScalaCheckSuite2 extends munit.ScalaCheckSuite {
-  // type C = Complex[Real]
-  //
-  // val zero = Complex.zero[Real]
-  // val one = Complex.one[Real]
-  //
-  // property("x + 0 = 0 + x = x") {
-  //   forAll { (x: C) =>
-  //     x + zero == x
-  //     zero + x == x
-  //   }
-  // }
-  //
+  type C = Complex[Real]
+
+  val zero = Complex.zero[Real]
+  val one = Complex.one[Real]
+
+  property("x + 0 = 0 + x = x") {
+    forAll { (x: C) =>
+      x + zero == x
+      zero + x == x
+    }
+  }
+
   // property("x + y = y + x") {
   //   forAll { (x: C, y: C) =>
   //     x + y == y + x

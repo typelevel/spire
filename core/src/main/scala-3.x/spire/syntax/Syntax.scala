@@ -25,7 +25,7 @@ trait PartialOrderSyntax extends EqSyntax:
     def partialCompare(rhs: A): Double = po.partialCompare(lhs, rhs)
     def tryCompare(rhs: A): Option[Int] = po.tryCompare(lhs, rhs)
     def pmin(rhs: A): Option[A] = po.pmin(lhs, rhs)
-    def pmax(rhs: A): Option[A] = po.pmin(lhs, rhs)
+    def pmax(rhs: A): Option[A] = po.pmax(lhs, rhs)
 
     infix def >(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.gt(lhs, ev1.fromInt(rhs))
     infix def >=(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.gteqv(lhs, ev1.fromInt(rhs))
@@ -116,11 +116,11 @@ trait InvolutionSyntax:
 
 trait IsRealSyntax extends SignedSyntax:
   extension [A](lhs: A)(using is: IsReal[A])
-  // def isWhole(): Boolean = macro Ops.unop[Boolean]
+    def isWhole(): Boolean = is.isWhole(lhs)
     def ceil(): A = is.ceil(lhs)
     def floor(): A = is.floor(lhs)
     def round(): A = is.round(lhs)
-  // //def toDouble(): Double = macro Ops.unop[Double]
+    // def toDouble(): Double = is.toDouble(lhs)
 
 trait SemigroupoidSyntax:
   extension[A](lhs: A)(using ev: Semigroupoid[A])
@@ -131,7 +131,7 @@ trait GroupoidSyntax extends SemigroupoidSyntax:
   @nowarn
   implicit def groupoidCommonOps[A](a: A)(using ev: Groupoid[A], ni: NoImplicit[Monoid[A]]): GroupoidCommonOps[A] =
     new GroupoidCommonOps[A](a)(ev)
-  implicit def groupoidOps[A](a: A)(using ev: Groupoid[A]): GroupoidOps[A] = new GroupoidOps[A](a)
+  // implicit def groupoidOps[A](a: A)(using ev: Groupoid[A]): GroupoidOps[A] = new GroupoidOps[A](a)
   extension[A](lhs: A)(using ev: Groupoid[A])
     def leftId(): A = ev.leftId(lhs)
     def rightId(): A = ev.rightId(lhs)
@@ -148,9 +148,11 @@ trait MonoidSyntax extends SemigroupSyntax:
 
   // implicit def monoidOps[A](a: A)(implicit ev: Monoid[A]): MonoidOps[A] = new MonoidOps(a)
 
-trait GroupSyntax extends MonoidSyntax {
-  implicit def groupOps[A: Group](a: A): GroupOps[A] = new GroupOps(a)
-}
+trait GroupSyntax extends MonoidSyntax:
+  // implicit def groupOps[A: Group](a: A): GroupOps[A] = new GroupOps(a)
+  extension[A](lhs: A)(using ev: Group[A])
+    def inverse(): A = ev.inverse(lhs)
+    def |-|(rhs: A): A = ev.remove(lhs, rhs)
 
 trait AdditiveSemigroupSyntax:
   // implicit def additiveSemigroupOps[A: AdditiveSemigroup](a: A): AdditiveSemigroupOps[A] =
@@ -186,19 +188,27 @@ trait AdditiveMonoidSyntax extends AdditiveSemigroupSyntax {
 }
 
 trait AdditiveGroupSyntax extends AdditiveMonoidSyntax {
-  extension [A](lhs: A)(using ag: AdditiveGroup[A])
-    def unary_- : A = ag.negate(lhs)
-    def -(rhs: A): A = ag.minus(lhs, rhs)
-    // def -(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
-    // def -(rhs: Double)(implicit ev1: Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
-    def -(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) - rhs
+  extension [A](lhs: A)(using ev: AdditiveGroup[A])
+    def unary_- : A = ev.negate(lhs)
+    def -(rhs: A): A = ev.minus(lhs, rhs)
+    def -(rhs: Int)(using ev1: Ring[A]): A = ev.minus(lhs, ev1.fromInt(rhs))
+    def -(rhs: Double)(using ev1: Field[A]): A = ev.minus(lhs, ev1.fromDouble(rhs))
+    def -(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs) - rhs
 
-  implicit def literalIntAdditiveGroupOps(lhs: Int): LiteralIntAdditiveGroupOps = new LiteralIntAdditiveGroupOps(lhs)
-  implicit def literalLongAdditiveGroupOps(lhs: Long): LiteralLongAdditiveGroupOps = new LiteralLongAdditiveGroupOps(
-    lhs
-  )
-  implicit def literalDoubleAdditiveGroupOps(lhs: Double): LiteralDoubleAdditiveGroupOps =
-    new LiteralDoubleAdditiveGroupOps(lhs)
+  extension(lhs: Int)
+    def -[A](rhs: A)(using ev: Ring[A]): A = ev.minus(ev.fromInt(lhs), rhs)
+
+  extension(lhs: Long)
+    def -[A](rhs: A)(using ev: Ring[A], c: ConvertableTo[A]): A = ev.minus(c.fromLong(lhs), rhs)
+
+  extension(lhs: Double)
+    def -[A](rhs: A)(using ev: Field[A]): A = ev.minus(ev.fromDouble(lhs), rhs)
+  // implicit def literalIntAdditiveGroupOps(lhs: Int): LiteralIntAdditiveGroupOps = new LiteralIntAdditiveGroupOps(lhs)
+  // implicit def literalLongAdditiveGroupOps(lhs: Long): LiteralLongAdditiveGroupOps = new LiteralLongAdditiveGroupOps(
+  //   lhs
+  // )
+  // implicit def literalDoubleAdditiveGroupOps(lhs: Double): LiteralDoubleAdditiveGroupOps =
+  //   new LiteralDoubleAdditiveGroupOps(lhs)
 }
 
 
@@ -307,27 +317,40 @@ trait EuclideanRingSyntax extends GCDRingSyntax:
     def equot(rhs: A): A = er.equot(lhs, rhs)
     def emod(rhs: A): A = er.emod(lhs, rhs)
     def equotmod(rhs: A): (A, A) = er.equotmod(lhs, rhs)
-
-    // TODO: This is a bit
-    // def equot(rhs: Int): A = er.equot(lhs, rhs)
-    def emod(rhs: Int): A = ???
-    // def equotmod(rhs: Int): (A, A) = macro Ops.binopWithSelfLift[Int, Ring[A], (A, A)]
+    // Added typeclasses
+    def equot(rhs: Int)(using ev1: Ring[A]): A = er.equot(lhs, ev1.fromInt(rhs))
+    def emod(rhs: Int)(using ev1: Ring[A]): A = er.emod(lhs, ev1.fromInt(rhs))
+    def equotmod(rhs: Int)(using ev1: Ring[A]): (A, A) = er.equotmod(lhs, ev1.fromInt(rhs))
     //
-    // def equot(rhs: Double)(implicit ev1: Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
-    // def emod(rhs: Double)(implicit ev1: Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
-    // def equotmod(rhs: Double)(implicit ev1: Field[A]): (A, A) = macro Ops.binopWithLift[Double, Field[A], (A, A)]
+    def equot(rhs: Double)(using ev1: Field[A]): A = er.equot(lhs, ev1.fromDouble(rhs))
+    def emod(rhs: Double)(implicit ev1: Field[A]): A = er.emod(lhs, ev1.fromDouble(rhs))
+    def equotmod(rhs: Double)(implicit ev1: Field[A]): (A, A) = er.equotmod(lhs, ev1.fromDouble(rhs))
 
     /* TODO: move to TruncatedDivision
     def /~(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) /~ rhs
     def %(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) % rhs
     def /%(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = c.toNumber(lhs) /% rhs
     */
-  implicit def literalIntEuclideanRingOps(lhs: Int): LiteralIntEuclideanRingOps = new LiteralIntEuclideanRingOps(lhs)
-  implicit def literalLongEuclideanRingOps(lhs: Long): LiteralLongEuclideanRingOps = new LiteralLongEuclideanRingOps(
-    lhs
-  )
-  implicit def literalDoubleEuclideanRingOps(lhs: Double): LiteralDoubleEuclideanRingOps =
-    new LiteralDoubleEuclideanRingOps(lhs)
+  // implicit def literalIntEuclideanRingOps(lhs: Int): LiteralIntEuclideanRingOps = new LiteralIntEuclideanRingOps(lhs)
+  extension(lhs: Int)
+    def equot[A](rhs: A)(using ev: EuclideanRing[A]): A = ev.equot(ev.fromInt(lhs), rhs)
+    def emod[A](rhs: A)(using ev: EuclideanRing[A]): A = ev.emod(ev.fromInt(lhs), rhs)
+    def equotmod[A](rhs: A)(using ev: EuclideanRing[A]): (A, A) = ev.equotmod(ev.fromInt(lhs), rhs)
+
+  extension(lhs: Long)
+    def equot[A](rhs: A)(using ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.equot(c.fromLong(lhs), rhs)
+    def emod[A](rhs: A)(using ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.emod(c.fromLong(lhs), rhs)
+    def equotmod[A](rhs: A)(using ev: EuclideanRing[A], c: ConvertableTo[A]): (A, A) =
+      ev.equotmod(c.fromLong(lhs), rhs)
+  // implicit def literalLongEuclideanRingOps(lhs: Long): LiteralLongEuclideanRingOps = new LiteralLongEuclideanRingOps(
+  //   lhs
+  // )
+  extension(lhs: Double)
+    def equot[A](rhs: A)(implicit ev: Field[A]): A = ev.equot(ev.fromDouble(lhs), rhs)
+    def emod[A](rhs: A)(implicit ev: Field[A]): A = ev.emod(ev.fromDouble(lhs), rhs)
+    def equotmod[A](rhs: A)(implicit ev: Field[A]): (A, A) = ev.equotmod(ev.fromDouble(lhs), rhs)
+  // implicit def literalDoubleEuclideanRingOps(lhs: Double): LiteralDoubleEuclideanRingOps =
+  //   new LiteralDoubleEuclideanRingOps(lhs)
 
 trait FieldSyntax extends EuclideanRingSyntax with MultiplicativeGroupSyntax
 
@@ -364,11 +387,16 @@ trait MetricSpaceSyntax extends VectorSpaceSyntax {
   implicit def metricSpaceOps[V](v: V): MetricSpaceOps[V] = new MetricSpaceOps[V](v)
 }
 
-trait NormedVectorSpaceSyntax extends MetricSpaceSyntax {
-  implicit def normedVectorSpaceOps[V](v: V): NormedVectorSpaceOps[V] = new NormedVectorSpaceOps[V](v)
-}
+trait NormedVectorSpaceSyntax extends MetricSpaceSyntax:
+  extension[V](lhs: V)
+    def norm[F](using ev: NormedVectorSpace[V, F]): F =
+      ev.norm(lhs)
 
-trait InnerProductSpaceSyntax extends VectorSpaceSyntax {
+    def normalize[F](using ev: NormedVectorSpace[V, F]): V =
+      ev.normalize(lhs)
+  // implicit def normedVectorSpaceOps[V](v: V): NormedVectorSpaceOps[V] = new NormedVectorSpaceOps[V](v)
+
+trait InnerProductSpaceSyntax extends VectorSpaceSyntax:
   // implicit def innerProductSpaceOps[V](v: V): InnerProductSpaceOps[V] = new InnerProductSpaceOps[V](v)
   extension [V](lhs: V)
     def dot[F](rhs: V)(using ev: InnerProductSpace[V, F]): F =
@@ -376,11 +404,24 @@ trait InnerProductSpaceSyntax extends VectorSpaceSyntax {
     def ⋅[F](rhs: V)(using ev: InnerProductSpace[V, F]): F =
       ev.dot(lhs, rhs)
     //   macro Ops.binopWithEv[V, InnerProductSpace[V, F], F]
-}
 
-trait CoordinateSpaceSyntax extends InnerProductSpaceSyntax {
-  implicit def coordinateSpaceOps[V](v: V): CoordinateSpaceOps[V] = new CoordinateSpaceOps[V](v)
-}
+trait CoordinateSpaceSyntax extends InnerProductSpaceSyntax:
+  extension[V](v: V)
+    def _x[F](using ev: CoordinateSpace[V, F]): F =
+      ev._x(v)
+
+    def _y[F](using ev: CoordinateSpace[V, F]): F =
+      ev._y(v)
+
+    def _z[F](using ev: CoordinateSpace[V, F]): F =
+      ev._z(v)
+
+    def coord[F](rhs: Int)(using ev: CoordinateSpace[V, F]): F =
+      ev.coord(v, rhs)
+
+    def dimensions[F](using ev: CoordinateSpace[V, F]): Int =
+      ev.dimensions
+  // implicit def coordinateSpaceOps[V](v: V): CoordinateSpaceOps[V] = new CoordinateSpaceOps[V](v)
 
 trait TrigSyntax {
   implicit def trigOps[A: Trig](a: A): TrigOps[A] = new TrigOps(a)

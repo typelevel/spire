@@ -163,12 +163,12 @@ final class GroupoidCommonOps[A](lhs: A)(implicit ev: Groupoid[A]) {
   def isId(implicit ev1: Eq[A]): Boolean = ev.isId(lhs)(ev1)
 }
 
-final class GroupoidOps[A: Groupoid](lhs: A) {
+// final class GroupoidOps[A: Groupoid](lhs: A) {
   // def leftId(): A = macro Ops.unop[A]
   // def rightId(): A = macro Ops.unop[A]
   // def |-|?(rhs: A): Opt[A] = macro Ops.binop[A, Option[A]]
   // def |-|??(rhs: A): Boolean = macro Ops.binop[A, Boolean]
-}
+// }
 
 final class SemigroupOps[A](lhs: A)(using ev: Semigroup[A]) {
   def |+|(rhs: A): A = ev.combine(lhs, rhs)
@@ -199,17 +199,17 @@ final class LiteralDoubleAdditiveSemigroupOps(val lhs: Double) extends AnyVal {
 //   // def isZero(implicit ev1: Eq[A]): Boolean = macro Ops.unopWithEv2[Eq[A], Boolean]
 // }
 
-final class LiteralIntAdditiveGroupOps(val lhs: Int) extends AnyVal {
-  def -[A](rhs: A)(implicit ev: Ring[A]): A = ev.minus(ev.fromInt(lhs), rhs)
-}
+// final class LiteralIntAdditiveGroupOps(val lhs: Int) extends AnyVal {
+//   def -[A](rhs: A)(implicit ev: Ring[A]): A = ev.minus(ev.fromInt(lhs), rhs)
+// }
 
-final class LiteralLongAdditiveGroupOps(val lhs: Long) extends AnyVal {
-  def -[A](rhs: A)(implicit ev: Ring[A], c: ConvertableTo[A]): A = ev.minus(c.fromLong(lhs), rhs)
-}
-
-final class LiteralDoubleAdditiveGroupOps(val lhs: Double) extends AnyVal {
-  def -[A](rhs: A)(implicit ev: Field[A]): A = ev.minus(ev.fromDouble(lhs), rhs)
-}
+// final class LiteralLongAdditiveGroupOps(val lhs: Long) extends AnyVal {
+//   def -[A](rhs: A)(implicit ev: Ring[A], c: ConvertableTo[A]): A = ev.minus(c.fromLong(lhs), rhs)
+// }
+//
+// final class LiteralDoubleAdditiveGroupOps(val lhs: Double) extends AnyVal {
+//   def -[A](rhs: A)(implicit ev: Field[A]): A = ev.minus(ev.fromDouble(lhs), rhs)
+// }
 
 
 // final class MultiplicativeSemigroupOps[A](lhs: A)(using ms: MultiplicativeSemigroup[A]) {
