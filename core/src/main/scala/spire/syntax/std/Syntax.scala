@@ -6,7 +6,7 @@ import spire.math.ConvertableTo
 
 trait IntSyntax {
   implicit def literalIntOps(n: Int): LiteralIntOps = new LiteralIntOps(n)
-  implicit def intToA[A](n: Int)(implicit c: ConvertableTo[A]): A = c.fromInt(n)
+  // implicit def intToA[A](n: Int)(implicit c: ConvertableTo[A]): A = c.fromInt(n)
 }
 
 trait LongSyntax {
