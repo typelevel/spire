@@ -44,11 +44,11 @@ object Checked:
     if (n.isExprOf[Int])
       '{${n.asExprOf[Int]}.toLong}
     else if (n.isExprOf[Byte])
-     '{${n.asExprOf[Byte]}.toLong}
+      '{${n.asExprOf[Byte]}.toLong}
     else if (n.isExprOf[Short])
-     '{${n.asExprOf[Short]}.toLong}
+      '{${n.asExprOf[Short]}.toLong}
     else if (n.isExprOf[Long])
-     n.asExprOf[Long]
+      n.asExprOf[Long]
     else
       report.error(s"Cannot lift value ${n.show} to long type")
       '{${n.asExprOf[Long]}.longValue}
@@ -81,7 +81,7 @@ object Checked:
 
     val acc = new TreeMap:
       override def transformTerm(tree: Term)(owner: Symbol): Term =
-        // report.info(s"term ${n.show}")
+        report.info(s"term ${n.show} ${tree.tpe.show}")
         tree match
           case Select(x, "unary_-") =>
             val isInt = isIntType(n)
@@ -208,7 +208,7 @@ object Checked:
    * returned. If there are errors, the 'orElse' block will be
    * evaluated and returned.
    */
-  inline def tryOrElse[A](inline n: A)(inline orElse: => A): A =
+  inline def tryOrElse[A](inline n: A)(orElse: => A): A =
     ${ checkedImpl[A]('{n}, '{orElse}) }
 
   /**
@@ -225,7 +225,7 @@ object Checked:
    */
   // inline def tryOrReturn[A](n: Int)(orElse: Int): Int = option(n).getOrElse(orElse)
   // inline def tryOrReturn[A](n: Long)(orElse: Long): Long = option(n).getOrElse(orElse)
-  inline def tryOrReturn[A](inline n: A)(orElse: => A): A =
+  inline def tryOrReturn[A](inline n: A)(inline orElse: => A): A =
     ${ checkedImplF[A]('{n}, '{orElse}) }
 
   private def checkedImplF[A](n: Expr[A], fallback: Expr[Any])(using Quotes, Type[A]): Expr[A] = {

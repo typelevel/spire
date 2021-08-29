@@ -79,16 +79,20 @@ class CheckedScalaCheckSuite extends munit.ScalaCheckSuite {
   case class A(p: Long)
   def compare(p: Long): Int = 0
   test("Negate of Long.MinValue overflows") {
-    // val x = Long.MinValue
-    // intercept[ArithmeticException] { checked(-x) }
-    // assert { Checked.option(-x).isEmpty }
-    // assertEquals(-1L, Checked.tryOrElse(-x)(-1L))
-    // assertEquals(-1L, odd(x))
-    // assertEquals(0L, odd(0))
+    val x = Long.MinValue
+    intercept[ArithmeticException] { checked(-x) }
+    assert { Checked.option(-x).isEmpty }
+    assertEquals(-1L, Checked.tryOrElse(-x)(-1L))
+    assertEquals(-1L, odd(x))
+    assertEquals(0L, odd(0))
+    assertEquals(Long.MaxValue - 1, add(-1))
+    assertEquals(Long.MaxValue, add(0))
+    assertEquals(-1L, add(1))
     val a = A(1L)
     val p = 1L
     val n: Long = 3
     val m: Int = 3
+    val i = compare(p * n)
     Checked.tryOrElse {
       val i = compare(p * n)
       i
@@ -98,9 +102,37 @@ class CheckedScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-//   def odd(a: Long): Long =
-//     Checked.tryOrReturn(-a)(-1L)
-//
+  // sealed trait Rational
+  // case class SafeLong(n: Long)
+  //   def compare(r: Rational): Int = r match {
+  //     case r: LongRational =>
+  //       val n: Int = Checked.tryOrElse {
+  //         LongAlgebra.compare(n * r.d, r.n * d)
+  //       } {
+  //         val dgcd = spire.math.gcd(d, r.d)
+  //         val u: Int =
+  //           if (dgcd == 1L)
+  //             (SafeLong(n) * r.d).compare(SafeLong(r.n) * d)
+  //           else
+  //             (SafeLong(n) * (r.d / dgcd)).compare(SafeLong(r.n) * (d / dgcd))
+  //         u
+  //       }
+  //       n
+  //
+  //     case r: BigRational =>
+  //       ???
+  //     // val dgcd = spire.math.gcd(d, (r.d % d).toLong)
+  //     // if (dgcd == 1L)
+  //     //   (SafeLong(n) * r.d).compare(r.n * d)
+  //     // else
+  //     //   (SafeLong(n) * (r.d / dgcd)).compare(r.n * (d / dgcd))
+  //   }
+  //
+  def odd(a: Long): Long =
+    Checked.tryOrReturn(-a)(-1L)
+
+  def add(a: Long): Long =
+    Checked.tryOrReturn(Long.MaxValue + a)(-1L)
 //   property("Long negate overflow throws arithmetic exception") {
 //     forAll { (x: Long) =>
 //       checkForLongOverflow(-BigInt(x), checked(-x))
