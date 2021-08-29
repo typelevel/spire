@@ -339,13 +339,13 @@ final class LiteralDoubleNRootOps(val lhs: Double) extends AnyVal {
   def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromDouble(lhs), rhs)
 }
 
-final class TrigOps[A](lhs: A)(implicit ev: Trig[A]) {
-  // def exp(): A = macro Ops.unop[A]
-  def log(): A = ??? // macro Ops.unop[A]
-
-  def log(base: Int)(implicit f: Field[A]): A =
-    f.div(ev.log(lhs), ev.log(f.fromInt(base)))
-}
+// final class TrigOps[A](lhs: A)(implicit ev: Trig[A]) {
+//   // def exp(): A = macro Ops.unop[A]
+//   def log(): A = ??? // macro Ops.unop[A]
+//
+//   def log(base: Int)(implicit f: Field[A]): A =
+//     f.div(ev.log(lhs), ev.log(f.fromInt(base)))
+// }
 
 // final class MeetOps[A: MeetSemilattice](lhs: A) {
   // def meet(rhs: A): A = macro Ops.binop[A, A]

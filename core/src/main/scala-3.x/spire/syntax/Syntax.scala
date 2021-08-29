@@ -424,7 +424,13 @@ trait CoordinateSpaceSyntax extends InnerProductSpaceSyntax:
   // implicit def coordinateSpaceOps[V](v: V): CoordinateSpaceOps[V] = new CoordinateSpaceOps[V](v)
 
 trait TrigSyntax {
-  implicit def trigOps[A: Trig](a: A): TrigOps[A] = new TrigOps(a)
+  extension[A](lhs: A)(using ev: Trig[A])
+    def exp(): A = ev.exp(lhs)
+    def log(): A = ev.log(lhs)
+
+    def log(base: Int)(implicit f: Field[A]): A =
+      f.div(ev.log(lhs), ev.log(f.fromInt(base)))
+  // implicit def trigOps[A: Trig](a: A): TrigOps[A] = new TrigOps(a)
 }
 
 trait LatticeSyntax {

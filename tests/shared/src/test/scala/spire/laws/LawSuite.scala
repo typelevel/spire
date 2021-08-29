@@ -38,29 +38,29 @@ class LawSuite extends munit.DisciplineSuite {
 
   // checkAll("UByte", RingLaws[UByte].cRig)
   // checkAll("UByte", RingLaws[UByte].cRig)
-//   checkAll("UByte", OrderLaws[Shadow[UByte, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
-//   checkAll("UByte", CombinationLaws[Shadow[UByte, BigInt]].signedAdditiveCMonoid)
+  // checkAll("UByte", OrderLaws[Shadow[UByte, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll("UByte", CombinationLaws[Shadow[UByte, BigInt]].signedAdditiveCMonoid)
 //
 //   checkAll("UShort", RingLaws[UShort].cRig)
 //   checkAll("UShort", OrderLaws[Shadow[UShort, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
-//   checkAll("UShort", CombinationLaws[Shadow[UShort, BigInt]].signedAdditiveCMonoid)
-//
+  checkAll("UShort", CombinationLaws[Shadow[UShort, BigInt]].signedAdditiveCMonoid)
+
 //   checkAll("UInt", RingLaws[UInt].cRig)
 //   checkAll("UInt", OrderLaws[Shadow[UInt, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
-//   checkAll("UInt", CombinationLaws[Shadow[UInt, BigInt]].signedAdditiveCMonoid)
+  checkAll("UInt", CombinationLaws[Shadow[UInt, BigInt]].signedAdditiveCMonoid)
 //
 //   checkAll("ULong", RingLaws[ULong].cRig)
 //   checkAll("ULong", OrderLaws[Shadow[ULong, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
-//   checkAll("ULong", CombinationLaws[Shadow[ULong, BigInt]].signedAdditiveCMonoid)
-//
+  checkAll("ULong", CombinationLaws[Shadow[ULong, BigInt]].signedAdditiveCMonoid)
+
 //   checkAll("Natural", RingLaws[Natural].cRig)
-//   checkAll("Natural", CombinationLaws[Natural].signedAdditiveCMonoid)
+  checkAll("Natural", CombinationLaws[Natural].signedAdditiveCMonoid)
 //   checkAll("Natural", OrderLaws[Natural].truncatedDivision)
 //
-//   // Float and Double fail these tests
+  // Float and Double fail these tests
 //   checkAll("Byte", RingLaws[Byte].cRing)
 //   checkAll("Byte", RingLaws[Shadow[Byte, BigInt]].integerEuclideanRing(Shadow.euclideanRing, Shadow.signed))
-//   checkAll("Byte", CombinationLaws[Shadow[Byte, BigInt]].signedAdditiveCMonoid)
+  checkAll("Byte", CombinationLaws[Shadow[Byte, BigInt]].signedAdditiveCMonoid)
 //   checkAll("Byte", OrderLaws[Shadow[Byte, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
 //   checkAll("Byte", BaseLaws[Byte].uniqueFactorizationDomain)
 //
@@ -82,9 +82,9 @@ class LawSuite extends munit.DisciplineSuite {
 //   checkAll("Long", OrderLaws[Shadow[Long, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
 //   checkAll("Long", CombinationLaws[Shadow[Long, BigInt]].signedAdditiveCMonoid)
 //
-//   // to test ShadowInvolution
-//   checkAll("Long", InvolutionLaws[Shadow[Long, BigInt]].involutionRing(Shadow.involution, Shadow.cRing))
-//
+  // to test ShadowInvolution
+  checkAll("Long", InvolutionLaws[Shadow[Long, BigInt]].involutionRing(Shadow.involution, Shadow.cRing))
+
 //   checkAll("BigInt", RingLaws[BigInt].integerEuclideanRing)
 //   checkAll("BigInt", CombinationLaws[BigInt].signedGCDRing)
 //   checkAll("BigInt", OrderLaws[BigInt].truncatedDivision)
