@@ -68,6 +68,9 @@ object Checked:
     n.isExprOf[Int] || n.isExprOf[Byte] || n.isExprOf[Short]
 
   // Build an expression with the correct limit for Int/Long
+  private def isLongType[A](n: Expr[A])(using Quotes): Boolean =
+    n.isExprOf[Long]
+
   private def limit[A](n: Expr[A])(using Quotes): Expr[Long] =
     if (isIntType[A](n))
       '{Int.MinValue.toLong} // toLong avoids boxing
@@ -80,72 +83,100 @@ object Checked:
     val tree: Term = n.asTerm
     val numLimit = limit[A](n)
     val isInt = isIntType(n)
+    val isLong = isLongType(n)
+    // report.info(s"${n.show} $isInt $isLong")
 
     val acc = new TreeMap:
       override def transformTerm(tree: Term)(owner: Symbol): Term =
+        report.info(s"term ${n.show} ${tree.tpe.show}")
         tree match
           case Select(x, "unary_-") =>
-            '{
-                val z = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
-                if (z == ${numLimit}) $fallback else { (-z).asInstanceOf[A] }
-            }.asTerm
+            val isInt = isIntType(n)
+            val isLong = isLongType(n)
+            if (isInt)
+              '{
+                  val z = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
+                  if (z == ${numLimit}) $fallback else { (-z).asInstanceOf[A] }
+              }.asTerm
+            else if (isLong)
+              '{
+                  val z = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
+                  if (z == ${numLimit}) $fallback else { (-z).asInstanceOf[A] }
+              }.asTerm
+            else super.transformTerm(tree)(owner)
           // NOTE I couldn't find a way to unify the long and int branches. Suggestions are welcome
-          case Apply(Select(x, "*"), List(y)) if isInt =>
-            '{
-              val xt = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
-              val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
-              val z = xt * yt
-              if (xt == 0  || (yt == z / xt && !(xt == -1 && yt == $numLimit))) z else $fallback
-            }.asTerm
           case Apply(Select(x, "*"), List(y)) =>
-            '{
-              val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
-              val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
-              val z = xt * yt
-              if (xt == 0  || (yt == z / xt && !(xt == -1 && yt == $numLimit))) z else $fallback
-            }.asTerm
-          case Apply(Select(x, "+"), List(y)) if isInt =>
-            '{
-              val xt = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
-              val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
-              val z = xt + yt
-              if ((~(xt ^ yt) & (xt ^ z)) < 0) $fallback else z
-            }.asTerm
+            val isInt = isIntType(n)
+            val isLong = isLongType(n)
+            if (isInt)
+              '{
+                val xt = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
+                val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
+                val z = xt * yt
+                if (xt == 0  || (yt == z / xt && !(xt == -1 && yt == $numLimit))) z else $fallback
+              }.asTerm
+            else if (isLong)
+              '{
+                val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
+                val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
+                val z = xt * yt
+                if (xt == 0  || (yt == z / xt && !(xt == -1 && yt == $numLimit))) z else $fallback
+              }.asTerm
+            else super.transformTerm(tree)(owner)
           case Apply(Select(x, "+"), List(y)) =>
-            '{
-              val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
-              val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
-              val z = xt + yt
-              if ((~(xt ^ yt) & (xt ^ z)) < 0) $fallback else z
-            }.asTerm
-          case Apply(Select(x, "-"), List(y)) if isInt =>
-            '{
-              val xt = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
-              val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
-              val z = xt - yt
-              if (((xt ^ yt) & (xt ^ z)) < 0) $fallback else z
-            }.asTerm
+            val isInt = isIntType(n)
+            val isLong = isLongType(n)
+            if (isInt)
+              '{
+                val xt = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
+                val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
+                val z = xt + yt
+                if ((~(xt ^ yt) & (xt ^ z)) < 0) $fallback else z
+              }.asTerm
+            else if (isLong)
+              '{
+                val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
+                val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
+                val z = xt + yt
+                if ((~(xt ^ yt) & (xt ^ z)) < 0) $fallback else z
+              }.asTerm
+            else super.transformTerm(tree)(owner)
           case Apply(Select(x, "-"), List(y)) =>
-            '{
-              val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
-              val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
-              val z = xt - yt
-              if (((xt ^ yt) & (xt ^ z)) < 0) $fallback else z
-            }.asTerm
-          case Apply(Select(x, "/"), List(y)) if isInt =>
-            '{
-              val xt = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
-              val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
-              val z = xt / yt
-              if (yt == -1 && xt == $numLimit) $fallback else z
-            }.asTerm
+            val isInt = isIntType(n)
+            val isLong = isLongType(n)
+            if (isInt)
+              '{
+                val xt = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
+                val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
+                val z = xt - yt
+                if (((xt ^ yt) & (xt ^ z)) < 0) $fallback else z
+              }.asTerm
+            else if (isLong)
+              '{
+                val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
+                val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
+                val z = xt - yt
+                if (((xt ^ yt) & (xt ^ z)) < 0) $fallback else z
+              }.asTerm
+            else super.transformTerm(tree)(owner)
           case Apply(Select(x, "/"), List(y)) =>
-            '{
-              val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
-              val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
-              val z = xt / yt
-              if (yt == -1 && xt == $numLimit) $fallback else z
-            }.asTerm
+            val isInt = isIntType(n)
+            val isLong = isLongType(n)
+            if (isInt)
+              '{
+                val xt = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
+                val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
+                val z = xt / yt
+                if (yt == -1 && xt == $numLimit) $fallback else z
+              }.asTerm
+            else if (isLong)
+              '{
+                val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
+                val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
+                val z = xt / yt
+                if (yt == -1 && xt == $numLimit) $fallback else z
+              }.asTerm
+            else super.transformTerm(tree)(owner)
           case _ =>
             super.transformTerm(tree)(owner)
 
