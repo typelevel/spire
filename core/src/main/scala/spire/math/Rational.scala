@@ -335,10 +335,12 @@ object Rational extends RationalInstances {
   private[math] def buildWithDiv(num: Long, ngcd: Long, rd: Long, lden: Long): Rational = {
     val n = num / ngcd
     val d = rd / ngcd
-    Checked.tryOrReturn {
-      apply(n, lden * d)
-    } {
-      Rational(SafeLong(n), SafeLong(lden) * d)
+    try {
+      Checked.checked {
+        apply(n, lden * d)
+      }
+    } catch {
+      case _ => Rational(SafeLong(n), SafeLong(lden) * d)
     }
   }
 
@@ -466,34 +468,39 @@ object Rational extends RationalInstances {
       case r: LongRational =>
         val dgcd: Long = spire.math.gcd(d, r.d)
         if (dgcd == 1L) {
-          Checked.tryOrReturn[Rational] {
-            Rational(n * r.d + r.n * d, d * r.d)
-          } {
-            Rational(SafeLong(n) * r.d + SafeLong(r.n) * d, SafeLong(d) * r.d)
+          try {
+            Checked.checked {
+              Rational(n * r.d + r.n * d, d * r.d)
+            }
+          } catch {
+            case _ => return Rational(SafeLong(n) * r.d + SafeLong(r.n) * d, SafeLong(d) * r.d)
           }
 
         } else {
 
           val lden: Long = d / dgcd
           val rden: Long = r.d / dgcd
-          Checked.tryOrReturn {
-            val num: Long = n * rden + r.n * lden
+          try {
+            Checked.checked {
+              val num: Long = n * rden + r.n * lden
 
-            val ngcd: Long = spire.math.gcd(num, dgcd)
+              val ngcd: Long = spire.math.gcd(num, dgcd)
 
-            if (ngcd == 1L)
-              Rational(num, lden * r.d)
-            else
-              Rational.buildWithDiv(num, ngcd, r.d, lden)
-          } {
-            val num: SafeLong = SafeLong(n) * rden + SafeLong(r.n) * lden
+              if (ngcd == 1L)
+                Rational(num, lden * r.d)
+              else
+                Rational.buildWithDiv(num, ngcd, r.d, lden)
+            }
+          } catch {
+            case _ =>
+              val num: SafeLong = SafeLong(n) * rden + SafeLong(r.n) * lden
 
-            val ngcd: Long = spire.math.gcd(dgcd, (num % dgcd).toLong)
+              val ngcd: Long = spire.math.gcd(dgcd, (num % dgcd).toLong)
 
-            if (ngcd == 1L)
-              Rational(num, SafeLong(lden) * r.d)
-            else
-              Rational(num / ngcd, SafeLong(lden) * (r.d / ngcd))
+              if (ngcd == 1L)
+                Rational(num, SafeLong(lden) * r.d)
+              else
+                Rational(num / ngcd, SafeLong(lden) * (r.d / ngcd))
           }
         }
       case r: BigRational =>
@@ -526,17 +533,21 @@ object Rational extends RationalInstances {
       case r: LongRational =>
         val dgcd: Long = spire.math.gcd(d, r.d)
         if (dgcd == 1L) {
-          Checked.tryOrReturn[Rational] {
-            Rational(n * r.d - r.n * d, d * r.d)
-          } {
-            Rational(SafeLong(n) * r.d - SafeLong(r.n) * d, SafeLong(d) * r.d)
+          try {
+            Checked.checked {
+              Rational(n * r.d - r.n * d, d * r.d)
+            }
+          } catch {
+            case _ =>
+              return Rational(SafeLong(n) * r.d - SafeLong(r.n) * d, SafeLong(d) * r.d)
           }
 
         } else {
 
           val lden: Long = d / dgcd
           val rden: Long = r.d / dgcd
-          Checked.tryOrReturn {
+          try {
+          Checked.checked {
             val num: Long = n * rden - r.n * lden
 
             val ngcd: Long = spire.math.gcd(num, dgcd)
@@ -545,7 +556,8 @@ object Rational extends RationalInstances {
               Rational(num, lden * r.d)
             else
               Rational.buildWithDiv(num, ngcd, r.d, lden)
-          } {
+          }
+        } catch { case _ =>
             val num: SafeLong = SafeLong(n) * rden - SafeLong(r.n) * lden
 
             val ngcd: Long = spire.math.gcd(dgcd, (num % dgcd).toLong)
@@ -593,9 +605,11 @@ object Rational extends RationalInstances {
           val n2 = r.n / b
           val d1 = d / b
           val d2 = r.d / a
-          Checked.tryOrReturn[Rational] {
+          try {
+          Checked.checked {
             longRational(n1 * n2, d1 * d2)
-          } {
+          }
+        } catch { case _ =>
             // we know that the result does not fit into a LongRational, and also that the denominators are positive.
             // so we can just call BigRational.apply directly
             bigRational(SafeLong(n1) * n2, SafeLong(d1) * d2)
@@ -624,9 +638,10 @@ object Rational extends RationalInstances {
           d1 = -d1
           d2 = -d2
         }
-        Checked.tryOrReturn[Rational] {
+        try {
+        Checked.checked {
           longRational(n1 * d2, d1 * n2)
-        } {
+        } } catch { _ =>
           // we know that the result does not fit into a LongRational, and we have made sure that the product of d1
           // and n2 is positive. So we can just call BigRational.apply directly
           bigRational(SafeLong(n1) * d2, SafeLong(d1) * n2)
@@ -847,7 +862,7 @@ object Rational extends RationalInstances {
     @nowarn
     override def equals(that: Any): Boolean = that match {
       case that: BigRational => this.n == that.n && this.d == that.d
-      case _ => super.equals(that)
+      case _                 => super.equals(that)
     }
 
     override def hashCode: Int =
