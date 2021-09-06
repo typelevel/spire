@@ -69,28 +69,28 @@ final class EqOps[A](lhs: A)(implicit eq: Eq[A]) {
 //   def max[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromInt(lhs), rhs)
 // }
 
-final class LiteralLongOrderOps(val lhs: Long) extends AnyVal {
-  def <[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromLong(lhs), rhs)
-  def <=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromLong(lhs), rhs)
-  def >[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromLong(lhs), rhs)
-  def >=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromLong(lhs), rhs)
-
-  def cmp[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromLong(lhs), rhs)
-  def min[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromLong(lhs), rhs)
-  def max[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromLong(lhs), rhs)
-}
-
-final class LiteralDoubleOrderOps(val lhs: Double) extends AnyVal {
-  def <[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromDouble(lhs), rhs)
-  def <=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromDouble(lhs), rhs)
-  def >[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromDouble(lhs), rhs)
-  def >=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromDouble(lhs), rhs)
-
-  def cmp[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromDouble(lhs), rhs)
-  def min[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromDouble(lhs), rhs)
-  def max[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromDouble(lhs), rhs)
-}
-
+// final class LiteralLongOrderOps(val lhs: Long) extends AnyVal {
+//   def <[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromLong(lhs), rhs)
+//   def <=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromLong(lhs), rhs)
+//   def >[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromLong(lhs), rhs)
+//   def >=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromLong(lhs), rhs)
+//
+//   def cmp[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromLong(lhs), rhs)
+//   def min[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromLong(lhs), rhs)
+//   def max[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromLong(lhs), rhs)
+// }
+//
+// final class LiteralDoubleOrderOps(val lhs: Double) extends AnyVal {
+//   def <[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromDouble(lhs), rhs)
+//   def <=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromDouble(lhs), rhs)
+//   def >[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromDouble(lhs), rhs)
+//   def >=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromDouble(lhs), rhs)
+//
+//   def cmp[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromDouble(lhs), rhs)
+//   def min[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromDouble(lhs), rhs)
+//   def max[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromDouble(lhs), rhs)
+// }
+//
 // final class SignedOps[A: Signed](lhs: A) {
   // def abs(): A = macro Ops.unop[A]
   // def sign(): Sign = macro Ops.unop[Sign]
@@ -314,31 +314,31 @@ final class LiteralDoubleEuclideanRingOps(val lhs: Double) extends AnyVal {
   // //def toDouble(): Double = macro Ops.unop[Double]
 // }
 
-final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
-  def nroot(rhs: Int): A = ev.nroot(lhs, rhs)
-  def sqrt(): A = ev.sqrt(lhs)
-  def fpow(rhs: A): A = ev.fpow(lhs, rhs)
-
-  // TODO: should be macros
-  def pow(rhs: Double)(implicit c: Field[A]): A = ev.fpow(lhs, c.fromDouble(rhs))
-  def **(rhs: Double)(implicit c: Field[A]): A = ev.fpow(lhs, c.fromDouble(rhs))
-
-  def pow(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs).pow(rhs)
-  def **(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) ** rhs
-}
-
-final class LiteralIntNRootOps(val lhs: Int) extends AnyVal {
-  def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromLong(lhs), rhs)
-}
-
-final class LiteralLongNRootOps(val lhs: Long) extends AnyVal {
-  def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromLong(lhs), rhs)
-}
-
-final class LiteralDoubleNRootOps(val lhs: Double) extends AnyVal {
-  def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromDouble(lhs), rhs)
-}
-
+// final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
+//   def nroot(rhs: Int): A = ev.nroot(lhs, rhs)
+//   def sqrt(): A = ev.sqrt(lhs)
+//   def fpow(rhs: A): A = ev.fpow(lhs, rhs)
+//
+//   // TODO: should be macros
+//   def pow(rhs: Double)(implicit c: Field[A]): A = ev.fpow(lhs, c.fromDouble(rhs))
+//   def **(rhs: Double)(implicit c: Field[A]): A = ev.fpow(lhs, c.fromDouble(rhs))
+//
+//   def pow(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs).pow(rhs)
+//   def **(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) ** rhs
+// }
+//
+// final class LiteralIntNRootOps(val lhs: Int) extends AnyVal {
+//   def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromLong(lhs), rhs)
+// }
+//
+// final class LiteralLongNRootOps(val lhs: Long) extends AnyVal {
+//   def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromLong(lhs), rhs)
+// }
+//
+// final class LiteralDoubleNRootOps(val lhs: Double) extends AnyVal {
+//   def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromDouble(lhs), rhs)
+// }
+//
 // final class TrigOps[A](lhs: A)(implicit ev: Trig[A]) {
 //   // def exp(): A = macro Ops.unop[A]
 //   def log(): A = ??? // macro Ops.unop[A]

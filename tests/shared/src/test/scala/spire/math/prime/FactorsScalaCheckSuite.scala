@@ -19,13 +19,11 @@ class FactorsScalaCheckSuite extends munit.ScalaCheckSuite {
 
   // property("Factors(n).value = n") {
   //   forAll { (n: Long) =>
-  //     println(n)
-  //     Factors(n)//).value == n
-  //     true
+  //     Factors(n).value == n
   //   }
   // }
-  //
-  // // property("Factors(n) + Factors(m) = n + m") {
+
+  // property("Factors(n) + Factors(m) = n + m") {
   //   forAll { (n: Long, m: Long) =>
   //     (Factors(n) + Factors(m)).value == SafeLong(n) + SafeLong(m)
   //   }

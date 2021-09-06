@@ -17,29 +17,29 @@ trait EqSyntax:
 
 trait PartialOrderSyntax extends EqSyntax:
   extension [A](lhs: A)(using po: PartialOrder[A])
-    infix def >(rhs: A): Boolean = po.gt(lhs, rhs)
-    infix def >=(rhs: A): Boolean = po.gteqv(lhs, rhs)
-    infix def <(rhs: A): Boolean = po.lt(lhs, rhs)
-    infix def <=(rhs: A): Boolean = po.lteqv(lhs, rhs)
+    def >(rhs: A): Boolean = po.gt(lhs, rhs)
+    def >=(rhs: A): Boolean = po.gteqv(lhs, rhs)
+    def <(rhs: A): Boolean = po.lt(lhs, rhs)
+    def <=(rhs: A): Boolean = po.lteqv(lhs, rhs)
 
     def partialCompare(rhs: A): Double = po.partialCompare(lhs, rhs)
     def tryCompare(rhs: A): Option[Int] = po.tryCompare(lhs, rhs)
     def pmin(rhs: A): Option[A] = po.pmin(lhs, rhs)
     def pmax(rhs: A): Option[A] = po.pmax(lhs, rhs)
 
-    infix def >(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.gt(lhs, ev1.fromInt(rhs))
-    infix def >=(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.gteqv(lhs, ev1.fromInt(rhs))
-    infix def <(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.lt(lhs, ev1.fromInt(rhs))
-    infix def <=(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.lteqv(lhs, ev1.fromInt(rhs))
+    def >(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.gt(lhs, ev1.fromInt(rhs))
+    def >=(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.gteqv(lhs, ev1.fromInt(rhs))
+    def <(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.lt(lhs, ev1.fromInt(rhs))
+    def <=(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.lteqv(lhs, ev1.fromInt(rhs))
 
-    infix def >(rhs: Double)(implicit ev1: Field[A]): Boolean = po.gt(lhs, ev1.fromDouble(rhs))
-    infix def >=(rhs: Double)(implicit ev1: Field[A]): Boolean = po.gteqv(lhs, ev1.fromDouble(rhs))
-    infix def <(rhs: Double)(implicit ev1: Field[A]): Boolean = po.lt(lhs, ev1.fromDouble(rhs))
-    infix def <=(rhs: Double)(implicit ev1: Field[A]): Boolean = po.lteqv(lhs, ev1.fromDouble(rhs))
+    def >(rhs: Double)(implicit ev1: Field[A]): Boolean = po.gt(lhs, ev1.fromDouble(rhs))
+    def >=(rhs: Double)(implicit ev1: Field[A]): Boolean = po.gteqv(lhs, ev1.fromDouble(rhs))
+    def <(rhs: Double)(implicit ev1: Field[A]): Boolean = po.lt(lhs, ev1.fromDouble(rhs))
+    def <=(rhs: Double)(implicit ev1: Field[A]): Boolean = po.lteqv(lhs, ev1.fromDouble(rhs))
 
     // infix def >(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.gt(c.toNumber(lhs), rhs)
     // infix def >=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.gteqv(c.toNumber(lhs), rhs)
-    // infix def <(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.lt(c.toNumber(lhs), rhs)
+    // infix def <(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = ???//po.lt(c.toNumber(lhs), rhs)
     // infix def <=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.lteqv(c.toNumber(lhs), c.toNumber(rhs))
 
 trait OrderSyntax extends PartialOrderSyntax {
@@ -61,16 +61,36 @@ trait OrderSyntax extends PartialOrderSyntax {
     def min(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs).min(rhs)
     // def max(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs).max(rhs)
 
-  // extension (lhs: Int)
-  //   def <[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromInt(lhs), rhs)
-  //   def <=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromInt(lhs), rhs)
-  //   def >[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromInt(lhs), rhs)
-  //   def >=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromInt(lhs), rhs)
-  //
-  //   def cmp[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromInt(lhs), rhs)
-  //   def min[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromInt(lhs), rhs)
-  //   def max[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromInt(lhs), rhs)
-    //
+  extension (lhs: Int)
+    def <[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromInt(lhs), rhs)
+    def <=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromInt(lhs), rhs)
+    def >[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromInt(lhs), rhs)
+    def >=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromInt(lhs), rhs)
+
+    def cmp[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromInt(lhs), rhs)
+    def min[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromInt(lhs), rhs)
+    def max[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromInt(lhs), rhs)
+
+  extension(lhs: Long)
+    def <[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromLong(lhs), rhs)
+    def <=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromLong(lhs), rhs)
+    def >[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromLong(lhs), rhs)
+    def >=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromLong(lhs), rhs)
+
+    def cmp[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromLong(lhs), rhs)
+    def min[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromLong(lhs), rhs)
+    def max[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromLong(lhs), rhs)
+
+  extension(lhs: Double)
+    def <[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromDouble(lhs), rhs)
+    def <=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromDouble(lhs), rhs)
+    def >[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromDouble(lhs), rhs)
+    def >=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromDouble(lhs), rhs)
+
+    def cmp[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromDouble(lhs), rhs)
+    def min[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromDouble(lhs), rhs)
+    def max[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromDouble(lhs), rhs)
+
   // implicit def literalIntOrderOps(lhs: Int): LiteralIntOrderOps = new LiteralIntOrderOps(lhs)
   // implicit def literalLongOrderOps(lhs: Long): LiteralLongOrderOps = new LiteralLongOrderOps(lhs)
   // implicit def literalDoubleOrderOps(lhs: Double): LiteralDoubleOrderOps = new LiteralDoubleOrderOps(lhs)
@@ -367,6 +387,15 @@ trait NRootSyntax {
 
     def pow(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs).pow(rhs)
     def **(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs) ** rhs
+
+  extension(lhs: Int)
+    def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromInt(lhs), rhs)
+
+  extension(lhs: Long)
+    def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromLong(lhs), rhs)
+
+  extension(lhs: Double)
+    def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromDouble(lhs), rhs)
 }
 
 trait LeftModuleSyntax extends RingSyntax {
