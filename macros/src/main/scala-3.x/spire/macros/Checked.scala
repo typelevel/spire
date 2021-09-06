@@ -81,7 +81,7 @@ object Checked:
 
     val acc = new TreeMap:
       override def transformTerm(tree: Term)(owner: Symbol): Term =
-        report.info(s"term ${n.show} ${tree.tpe.show}")
+        // report.info(s"term ${n.show} ${tree.tpe.show}")
         tree match
           case Select(x, "unary_-") =>
             val isInt = isIntType(n)
@@ -173,7 +173,9 @@ object Checked:
           case _ =>
             super.transformTerm(tree)(owner)
 
-    acc.transformTerm(tree)(tree.symbol).asExprOf[A]
+    val result = acc.transformTerm(tree)(tree.symbol).asExprOf[A]
+    // report.info(result.show)
+    result
 
   /**
    * Performs overflow checking for Int/Long operations.
@@ -225,11 +227,11 @@ object Checked:
    */
   // inline def tryOrReturn[A](n: Int)(orElse: Int): Int = option(n).getOrElse(orElse)
   // inline def tryOrReturn[A](n: Long)(orElse: Long): Long = option(n).getOrElse(orElse)
-  inline def tryOrReturn[A](inline n: A)(inline orElse: => A): A =
-    ${ checkedImplF[A]('{n}, '{orElse}) }
-
-  private def checkedImplF[A](n: Expr[A], fallback: Expr[Any])(using Quotes, Type[A]): Expr[A] = {
-    checkedImpl(n, fallback)
-  }
+  // inline def tryOrReturn[A](inline n: A)(inline orElse: => A): A =
+  //   ${ checkedImplF[A]('{n}, '{orElse}) }
+  //
+  // private def checkedImplF[A](n: Expr[A], fallback: Expr[Any])(using Quotes, Type[A]): Expr[A] = {
+  //   checkedImpl(n, fallback)
+  // }
 
 

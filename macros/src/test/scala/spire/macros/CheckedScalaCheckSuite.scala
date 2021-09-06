@@ -28,56 +28,62 @@ class CheckedScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-  // test("Negate of Int.MinValue overflows") {
-  //   val x = Int.MinValue
-  //   intercept[ArithmeticException] { checked(-x) }
-  // }
-  //
-  // property("Int negate overflow throws arithmetic exception") {
-  //   forAll { (x: Int) =>
-  //     checkForIntOverflow(-BigInt(x), checked(-x))
-  //   }
-  // }
-  //
-  // property("Int addition overflow throws arithmetic exception") {
-  //   forAll { (x: Int, y: Int) =>
-  //     checkForIntOverflow(BigInt(x) + BigInt(y), checked(x + y))
-  //   }
-  // }
-  //
-  // property("Int subtraction overflow throws arithmetic exception") {
-  //   forAll { (x: Int, y: Int) =>
-  //     checkForIntOverflow(BigInt(x) - BigInt(y), checked(x - y))
-  //   }
-  // }
-  //
-  // property("Int multiplication overflow throws arithmetic exception") {
-  //   forAll { (x: Int, y: Int) =>
-  //     checkForIntOverflow(BigInt(x) * BigInt(y), checked(x * y))
-  //   }
-  // }
-  //
-  // property("Int division overflow throws arithmetic exception") {
-  //   forAll { (x: Int, y: NotZero[Int]) =>
-  //     checkForIntOverflow(BigInt(x) / BigInt(y.value), checked(x / y.value))
-  //   }
-  // }
-  //
-  // def distSq(x: Long, y: Long): BigInt = BigInt(x) * BigInt(x) + BigInt(y) * BigInt(y)
-  //
-  // property("Int euclidean square distance overflow throws arithmetic exception") {
-  //   forAll { (x: Int, y: Int) =>
-  //     checkForIntOverflow(distSq(x, y), checked(x * x + y * y))
-  //   }
-  // }
-  //
-  // test("Negate of Byte.MinValue overflows") {
-  //   val x = Byte.MinValue
-  //   assertEquals(-Byte.MinValue, checked(-x))
-  // }
+  test("Negate of Int.MinValue overflows") {
+    val x = Int.MinValue
+    intercept[ArithmeticException] { checked(-x) }
+  }
 
-  case class A(p: Long)
-  def compare(p: Long): Int = 0
+  property("Int negate overflow throws arithmetic exception") {
+    forAll { (x: Int) =>
+      checkForIntOverflow(-BigInt(x), checked(-x))
+    }
+  }
+
+  property("Int addition overflow throws arithmetic exception") {
+    forAll { (x: Int, y: Int) =>
+      checkForIntOverflow(BigInt(x) + BigInt(y), checked(x + y))
+    }
+  }
+
+  property("Int subtraction overflow throws arithmetic exception") {
+    forAll { (x: Int, y: Int) =>
+      checkForIntOverflow(BigInt(x) - BigInt(y), checked(x - y))
+    }
+  }
+
+  property("Int multiplication overflow throws arithmetic exception") {
+    forAll { (x: Int, y: Int) =>
+      checkForIntOverflow(BigInt(x) * BigInt(y), checked(x * y))
+    }
+  }
+
+  property("Int division overflow throws arithmetic exception") {
+    forAll { (x: Int, y: NotZero[Int]) =>
+      checkForIntOverflow(BigInt(x) / BigInt(y.value), checked(x / y.value))
+    }
+  }
+
+  def distSq(x: Long, y: Long): BigInt = BigInt(x) * BigInt(x) + BigInt(y) * BigInt(y)
+
+  property("Int euclidean square distance overflow throws arithmetic exception") {
+    forAll { (x: Int, y: Int) =>
+      checkForIntOverflow(distSq(x, y), checked(x * x + y * y))
+    }
+  }
+
+  test("Negate of Byte.MinValue overflows") {
+    val x = Byte.MinValue
+    assertEquals(-Byte.MinValue, checked(-x))
+  }
+
+  case class A(p: Long, r: Long) {
+    def plus(a: A): A = Checked.tryOrReturn {
+      A(this.p + a.p, this.r + a.r)
+    } {
+      A(0, 0)
+    }
+  }
+  def compare(p: Long): Int = p.toInt
   test("Negate of Long.MinValue overflows") {
     val x = Long.MinValue
     intercept[ArithmeticException] { checked(-x) }
@@ -88,18 +94,77 @@ class CheckedScalaCheckSuite extends munit.ScalaCheckSuite {
     assertEquals(Long.MaxValue - 1, add(-1))
     assertEquals(Long.MaxValue, add(0))
     assertEquals(-1L, add(1))
-    val a = A(1L)
+    val a = A(1L, 1L)
     val p = 1L
     val n: Long = 3
     val m: Int = 3
     val i = compare(p * n)
-    Checked.tryOrElse {
-      val i = compare(p * n)
+    // Long * Long
+    val c1: Long = Checked.tryOrElse {
+      val i: Long = compare(p * n)
       i
     } {
       val j = 0L
       j
     }
+    assertEquals(3L, c1)
+    // Long * Int
+    val c2: Long = Checked.tryOrElse {
+      val i: Long = compare(p * m)
+      i
+    } {
+      val j = 0L
+      j
+    }
+    assertEquals(3L, c2)
+    // Int * Int
+    val c3: Int = Checked.tryOrElse {
+      val i: Int = compare(m * l)
+      i
+    } {
+      val j = 0
+      j
+    }
+    assertEquals(18, c3)
+    // Long * Long
+    val c4: Long = Checked.tryOrElse {
+      val i: Long = compare(p * n + 1)
+      i
+    } {
+      val j = 0L
+      j
+    }
+    assertEquals(4L, c4)
+    // Long * Int
+    val c5: Long = Checked.tryOrElse {
+      val i: Long = compare(p * m)
+      i
+    } {
+      val j = 0L
+      j
+    }
+    assertEquals(3L, c5)
+    val c6: A = { //Checked.tryOrElse {
+      val a = A(Long.MaxValue, Long.MaxValue)
+      val i = A(1, 5L)
+      a.plus(i)
+    }
+    println(c6)
+    // // Int * Int
+    // val c3: Int = Checked.tryOrElse {
+    //   val i: Int = compare(m * l)
+    //   i
+    // } {
+    //   val j = 0
+    //   j
+    // }
+    // Checked.tryOrElse {
+    //   val i = compare(p * n + 1)
+    //   i
+    // } {
+    //   val j = 0L
+    //   j
+    // }
   }
 
   // sealed trait Rational

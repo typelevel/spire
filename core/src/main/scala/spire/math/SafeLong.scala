@@ -299,19 +299,23 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def signum: Int = java.lang.Long.signum(x)
 
   def +(y: Long): SafeLong =
-    Checked.tryOrReturn[SafeLong](SafeLongLong(x + y))(
-      SafeLongBigInteger(BigInteger.valueOf(x).add(BigInteger.valueOf(y)))
-    )
+    try {
+      Checked.checked(SafeLongLong(x + y))
+    } catch { _ => SafeLongBigInteger(BigInteger.valueOf(x).add(BigInteger.valueOf(y))) }
 
   def -(y: Long): SafeLong =
-    Checked.tryOrReturn[SafeLong](SafeLongLong(x - y))(
+    try {
+      Checked.checked(SafeLongLong(x - y))
+    } catch {_ =>
       SafeLongBigInteger(BigInteger.valueOf(x).subtract(BigInteger.valueOf(y)))
-    )
+    }
 
   def *(y: Long): SafeLong =
-    Checked.tryOrReturn[SafeLong](SafeLongLong(x * y))(
+    try {
+      Checked.checked(SafeLongLong(x * y))
+    } catch { _ =>
       SafeLongBigInteger(BigInteger.valueOf(x).multiply(BigInteger.valueOf(y)))
-    )
+    }
 
   def /(y: Long): SafeLong = if (x == Long.MinValue && y == -1L) SafeLong.safe64 else SafeLongLong(x / y)
 
@@ -389,7 +393,9 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def ^(y: BigInteger): SafeLong = SafeLong(BigInteger.valueOf(x).xor(y))
 
   def unary_- : SafeLong =
-    Checked.tryOrReturn[SafeLong](SafeLongLong(-x)) {
+    try {
+      Checked.checked(SafeLongLong(-x))
+    } catch { _ =>
       println("DEF")
       println(SafeLongBigInteger(BigInteger.valueOf(x).negate()))
       SafeLongBigInteger(BigInteger.valueOf(x).negate())

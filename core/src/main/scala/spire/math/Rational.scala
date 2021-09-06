@@ -94,13 +94,15 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
         val dengcd = spire.math.gcd(ld, rd)
         val tmp = ld / dengcd // fits in Long
         // Checked does not like Opt.unapply, so we use isEmpty/get
-        Checked.tryOrElse {
+        try {
+        Checked.checked {
           val newDenAsLong = tmp * rd
           if (newNumAsSafeLong.isEmpty)
             Rational(newNumAsLong, newDenAsLong)
           else
             Rational(newNumAsSafeLong.get, SafeLong(newDenAsLong))
-        } {
+        }
+      } catch { _ =>
           val newDenAsSafeLong = SafeLong(tmp) * rd
           // Checked does not like Opt.unapply
           if (newNumAsSafeLong.isEmpty)
