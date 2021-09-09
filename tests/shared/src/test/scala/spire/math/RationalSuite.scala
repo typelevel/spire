@@ -305,6 +305,10 @@ class RationalSuite extends munit.FunSuite {
   }
 
   test("compareToOne") {
+    // val maxV = Rational(9223372036854775807L, 216560131L)
+    // val r = Rational(8485535141125407655L, 2553066100668986744L)
+    // assert(maxV < r)
+    // assert(Rational(9223372036854775807L, 216560131L) < Rational(8485535141125407655L, 2553066100668986744L))
     val d = Rational(1, Long.MaxValue)
     assertEquals(Rational.one.compareToOne, 0)
     assertEquals((Rational.one + d).compareToOne, 1)

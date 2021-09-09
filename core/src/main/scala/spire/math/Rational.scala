@@ -670,8 +670,10 @@ object Rational extends RationalInstances {
     def round: Rational =
       if (n >= 0) {
         val m = n % d
-        if (m >= (d - m)) Rational(n / d + 1) else Rational(n / d)
+        println(s"R1 $m $n $d")
+        if (m >= (d - m)) {println("c");Rational(n / d + 1)} else Rational(n / d)
       } else {
+        println("R2")
         val m = -(n % d)
         if (m >= (d - m)) Rational(n / d - 1) else Rational(n / d)
       }
@@ -687,21 +689,31 @@ object Rational extends RationalInstances {
 
     def compare(r: Rational): Int = r match {
       case r: LongRational =>
-        val alt1: Int = {
+        println("Com.are")
+        // Checked.tryOrElse {
+        //   LongAlgebra.compare(n * r.d, r.n * d)
+        // } {
+        //   val dgcd = spire.math.gcd(d, r.d)
+        //   if (dgcd == 1L)
+        //     (SafeLong(n) * r.d).compare(SafeLong(r.n) * d)
+        //   else
+        //     (SafeLong(n) * (r.d / dgcd)).compare(SafeLong(r.n) * (d / dgcd))
+        // }
+        try {
+          Checked.checked(LongAlgebra.compare(n * r.d, r.n * d))
+        } catch { _ =>
           val dgcd = spire.math.gcd(d, r.d)
+          println(s"Caught $dgcd ${dgcd == 1L}")
           if (dgcd == 1L) {
+            println(r.d.getClass)
+            println((SafeLong(n) ).getClass)
+            println((SafeLong(n) * r.d).getClass)
+            println((SafeLong(n) * r.d).compare(SafeLong(r.n) * d))
             (SafeLong(n) * r.d).compare(SafeLong(r.n) * d)
           } else {
             (SafeLong(n) * (r.d / dgcd)).compare(SafeLong(r.n) * (d / dgcd))
           }
         }
-        Checked
-          .option {
-            LongAlgebra.compare(n * r.d, r.n * d): Int
-          }
-          .getOrElse {
-            alt1
-          }
 
       case r: BigRational =>
         val dgcd = spire.math.gcd(d, (r.d % d).toLong)
@@ -923,9 +935,9 @@ private[math] trait RationalIsReal extends IsRational[Rational] with TruncatedDi
   override def neqv(x: Rational, y: Rational): Boolean = x != y
   override def gt(x: Rational, y: Rational): Boolean = x > y
   override def gteqv(x: Rational, y: Rational): Boolean = x >= y
-  override def lt(x: Rational, y: Rational): Boolean = x < y
+  override def lt(x: Rational, y: Rational): Boolean = {println("lt");x < y}
   override def lteqv(x: Rational, y: Rational): Boolean = x <= y
-  def compare(x: Rational, y: Rational): Int = x.compare(y)
+  def compare(x: Rational, y: Rational): Int = {println("comp");x.compare(y)}
 
   override def sign(a: Rational): Sign = a.sign
   override def signum(a: Rational): Int = a.signum

@@ -56,7 +56,6 @@ class IntervalSetSuite extends munit.FunSuite {
       val it = all.intervalIterator
       it.next()
     }
-    assert(true)
   }
 
   test("illegalStateHull1") {
@@ -65,7 +64,6 @@ class IntervalSetSuite extends munit.FunSuite {
       t.kindsAccessor(0) = 9
       t.hull
     }
-    assert(true)
   }
 
   test("illegalStateHull2") {
@@ -74,7 +72,6 @@ class IntervalSetSuite extends munit.FunSuite {
       t.kindsAccessor(0) = 9
       t.hull
     }
-    assert(true)
   }
 
   test("illegalStateIterator1") {
@@ -83,7 +80,6 @@ class IntervalSetSuite extends munit.FunSuite {
       t.kindsAccessor(0) = 9
       t.intervalIterator.next()
     }
-    assert(true)
   }
 
   test("illegalStateIterator2") {
@@ -92,6 +88,5 @@ class IntervalSetSuite extends munit.FunSuite {
       t.kindsAccessor(0) = 9
       t.intervalIterator.next()
     }
-    assert(true)
   }
 }

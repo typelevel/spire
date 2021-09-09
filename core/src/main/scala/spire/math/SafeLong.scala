@@ -306,15 +306,16 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def -(y: Long): SafeLong =
     try {
       Checked.checked(SafeLongLong(x - y))
-    } catch {_ =>
-      SafeLongBigInteger(BigInteger.valueOf(x).subtract(BigInteger.valueOf(y)))
-    }
+    } catch { _ => SafeLongBigInteger(BigInteger.valueOf(x).subtract(BigInteger.valueOf(y))) }
 
   def *(y: Long): SafeLong =
     try {
+      println(s"Times $x $y")
       Checked.checked(SafeLongLong(x * y))
-    } catch { _ =>
-      SafeLongBigInteger(BigInteger.valueOf(x).multiply(BigInteger.valueOf(y)))
+    } catch {
+      case _ =>
+        println("fal")
+        SafeLongBigInteger(BigInteger.valueOf(x).multiply(BigInteger.valueOf(y)))
     }
 
   def /(y: Long): SafeLong = if (x == Long.MinValue && y == -1L) SafeLong.safe64 else SafeLongLong(x / y)
@@ -395,11 +396,7 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def unary_- : SafeLong =
     try {
       Checked.checked(SafeLongLong(-x))
-    } catch { _ =>
-      println("DEF")
-      println(SafeLongBigInteger(BigInteger.valueOf(x).negate()))
-      SafeLongBigInteger(BigInteger.valueOf(x).negate())
-    }
+    } catch { _ => SafeLongBigInteger(BigInteger.valueOf(x).negate()) }
 
   override def <(that: SafeLong): Boolean =
     that match {
@@ -428,6 +425,7 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def compare(that: SafeLong): Int =
     that match {
       case SafeLongLong(y) =>
+        println(s"SLL $x y ${x.compare(y)}")
         x.compare(y)
       case SafeLongBigInteger(y) =>
         -y.signum
