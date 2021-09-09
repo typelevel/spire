@@ -55,7 +55,7 @@ jobs:
         run: sbt ++${{ matrix.scala }} scalafmtCheckAll scalafmtSbtCheck
 
       - name: Compile
-        run: 'sbt ++${{ matrix.scala }} test:compile'
+        run: sbt ++${{ matrix.scala }} Test/compile
 
       - name: Run tests
         run: sbt ++${{ matrix.scala }} test
