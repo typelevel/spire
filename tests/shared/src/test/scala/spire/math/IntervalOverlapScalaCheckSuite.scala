@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.implicits.{eqOps => _, _}
+import spire.implicits._
 import spire.laws.arb.{interval => interval_, rational}
 
 import interval.Overlap._
@@ -16,7 +16,7 @@ class IntervalOverlapScalaCheckSuite extends munit.ScalaCheckSuite {
   // }
   //
   // property("x overlap x = Equal(x, x)") {
-  //   forAll { x: Interval[Rational] =>
+  //   forAll { (x: Interval[Rational]) =>
   //     x.overlap(x) == Equal[Rational]()
   //   }
   // }

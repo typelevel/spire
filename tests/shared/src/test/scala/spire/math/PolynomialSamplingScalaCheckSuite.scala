@@ -48,7 +48,8 @@ class PolynomialSamplingScalaCheckSuite extends munit.ScalaCheckSuite {
   //   def testUnop(f: P => P)(g: A => A): Unit = {
   //     forAll { (x: P, a: A) =>
   //       val z = f(x)
-  //       g(x(a)) == z(a)
+  //       println("uno")
+  //       assertEquals(g(x(a)), z(a))
   //     }
   //   }
   //
@@ -69,18 +70,18 @@ class PolynomialSamplingScalaCheckSuite extends munit.ScalaCheckSuite {
   //   }
   //
   //   property(s"$name unop -") { testUnop(-_)(-_) }
-  //   property(s"$name unop pow(2)") { testUnop(_.pow(2))(_.pow(2)) }
-  //   property(s"$name unop pow(3)") { testUnop(_.pow(3))(_.pow(3)) }
-  //
-  //   property(s"$name binop +") { testBinop(_ + _)(_ + _) }
-  //   property(s"$name binop -") { testBinop(_ - _)(_ - _) }
-  //   property(s"$name binop *") { testBinop(_ * _)(_ * _) }
-  //   property(s"$name binop /~ and %") {
-  //     testBinopNonzero { (x, y) =>
-  //       (x.equot(y)) * y + (x.emod(y))
-  //     } { (a, b) =>
-  //       (a.equot(b)) * b + (a.emod(b))
-  //     }
-  //   }
+  //   // property(s"$name unop pow(2)") { testUnop(_.pow(2))(_.pow(2)) }
+  //   // property(s"$name unop pow(3)") { testUnop(_.pow(3))(_.pow(3)) }
+  //   //
+  //   // property(s"$name binop +") { testBinop(_ + _)(_ + _) }
+  //   // property(s"$name binop -") { testBinop(_ - _)(_ - _) }
+  //   // property(s"$name binop *") { testBinop(_ * _)(_ * _) }
+  //   // property(s"$name binop /~ and %") {
+  //   //   testBinopNonzero { (x, y) =>
+  //   //     (x.equot(y)) * y + (x.emod(y))
+  //   //   } { (a, b) =>
+  //   //     (a.equot(b)) * b + (a.emod(b))
+  //   //   }
+  //   // }
   // }
 }

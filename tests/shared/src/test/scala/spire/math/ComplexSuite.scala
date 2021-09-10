@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.implicits.{eqOps => _, _}
+import spire.implicits._
 import java.util.Arrays
 
 class ComplexSuite extends munit.FunSuite {

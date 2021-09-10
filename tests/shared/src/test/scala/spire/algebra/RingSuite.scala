@@ -1,9 +1,8 @@
 package spire
 package algebra
 
-// we need to disable our own === to avoid messing up ScalaTest.
 import spire.math.{Complex, Jet, JetDim, Rational}
-import spire.implicits.{eqOps => _, _}
+import spire.implicits._
 
 // nice alias
 

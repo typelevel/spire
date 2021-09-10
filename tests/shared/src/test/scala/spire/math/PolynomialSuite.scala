@@ -13,34 +13,34 @@ import org.scalacheck.Arbitrary.arbitrary
 import java.util.Arrays
 
 object PolynomialSetup {
-  // implicit val arbitraryRational: Arbitrary[Rational] = Arbitrary(for {
-  //   n0 <- arbitrary[Long]
-  //   d0 <- arbitrary[Long]
-  // } yield {
-  //   val (n, d) = (n0 % 100, d0 % 100)
-  //   if (d == 0L) Rational(n, 1L) else Rational(n, d)
-  // })
-  //
-  // // default scalacheck bigdecimals are weird
-  // implicit val arbitraryBigDecimal: Arbitrary[BigDecimal] = Arbitrary(for {
-  //   r <- arbitrary[Int]
-  // } yield {
-  //   BigDecimal(r)
-  // })
-  //
-  // implicit def arbitraryComplex[A: Arbitrary: Fractional: Trig] = Arbitrary(for {
-  //   re <- arbitrary[A]
-  //   im <- arbitrary[A]
-  // } yield {
-  //   Complex(re, im)
-  // })
-  //
-  // implicit def arbitraryTerm[A: Arbitrary: Ring: Eq: ClassTag] = Arbitrary(for {
-  //   c <- arbitrary[A]
-  //   e0 <- arbitrary[Int]
-  // } yield {
-  //   Term(c, (e0 % 100).abs)
-  // })
+  implicit val arbitraryRational: Arbitrary[Rational] = Arbitrary(for {
+    n0 <- arbitrary[Long]
+    d0 <- arbitrary[Long]
+  } yield {
+    val (n, d) = (n0 % 100, d0 % 100)
+    if (d == 0L) Rational(n, 1L) else Rational(n, d)
+  })
+
+  // default scalacheck bigdecimals are weird
+  implicit val arbitraryBigDecimal: Arbitrary[BigDecimal] = Arbitrary(for {
+    r <- arbitrary[Int]
+  } yield {
+    BigDecimal(r)
+  })
+
+  implicit def arbitraryComplex[A: Arbitrary: Fractional: Trig]: Arbitrary[Complex[A]] = Arbitrary(for {
+    re <- arbitrary[A]
+    im <- arbitrary[A]
+  } yield {
+    Complex(re, im)
+  })
+
+  implicit def arbitraryTerm[A: Arbitrary: Ring: Eq: ClassTag]: Arbitrary[Term[A]] = Arbitrary(for {
+    c <- arbitrary[A]
+    e0 <- arbitrary[Int]
+  } yield {
+    Term(c, (e0 % 100).abs)
+  })
 }
 
 class PolynomialSuite extends munit.FunSuite {

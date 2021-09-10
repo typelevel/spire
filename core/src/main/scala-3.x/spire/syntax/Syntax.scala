@@ -13,31 +13,37 @@ import scala.annotation.targetName
 import spire.util.Opt
 
 trait EqSyntax:
-  implicit def eqOps[A: Eq](a: A): EqOps[A] = new EqOps(a)
+  extension[A](lhs: A)(using ev: Eq[A])
+    def ===[B](rhs: B)(using ev1: B =:= A): Boolean = ev.eqv(lhs, ev1(rhs))
+    def =!=[B](rhs: B)(using ev1: B =:= A): Boolean = ev.neqv(lhs, ev1(rhs))
 
 trait PartialOrderSyntax extends EqSyntax:
-  extension [A](lhs: A)(using po: PartialOrder[A])
-    def >(rhs: A): Boolean = po.gt(lhs, rhs)
-    def >=(rhs: A): Boolean = po.gteqv(lhs, rhs)
-    def <(rhs: A): Boolean = po.lt(lhs, rhs)
-    def <=(rhs: A): Boolean = po.lteqv(lhs, rhs)
+  extension[A](lhs: A)(using ev: PartialOrder[A])
+    def >(rhs: A): Boolean = ev.gt(lhs, rhs)
+    def >=(rhs: A): Boolean = ev.gteqv(lhs, rhs)
+    def <(rhs: A): Boolean = ev.lt(lhs, rhs)
+    def <=(rhs: A): Boolean = ev.lteqv(lhs, rhs)
 
-    def partialCompare(rhs: A): Double = po.partialCompare(lhs, rhs)
-    def tryCompare(rhs: A): Option[Int] = po.tryCompare(lhs, rhs)
-    def pmin(rhs: A): Option[A] = po.pmin(lhs, rhs)
-    def pmax(rhs: A): Option[A] = po.pmax(lhs, rhs)
+    def partialCompare(rhs: A): Double = {println(ev);ev.partialCompare(lhs, rhs)}
+    def tryCompare(rhs: A): Option[Int] = ev.tryCompare(lhs, rhs)
+    def pmin(rhs: A): Option[A] = ev.pmin(lhs, rhs)
+    def pmax(rhs: A): Option[A] = ev.pmax(lhs, rhs)
 
-    def >(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.gt(lhs, ev1.fromInt(rhs))
-    def >=(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.gteqv(lhs, ev1.fromInt(rhs))
-    def <(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.lt(lhs, ev1.fromInt(rhs))
-    def <=(rhs: Int)(implicit ev1: Ring[A]): Boolean = po.lteqv(lhs, ev1.fromInt(rhs))
+    def >(rhs: Int)(implicit ev1: Ring[A]): Boolean = ev.gt(lhs, ev1.fromInt(rhs))
+    def >=(rhs: Int)(implicit ev1: Ring[A]): Boolean = ev.gteqv(lhs, ev1.fromInt(rhs))
+    def <(rhs: Int)(implicit ev1: Ring[A]): Boolean = ev.lt(lhs, ev1.fromInt(rhs))
+    def <=(rhs: Int)(implicit ev1: Ring[A]): Boolean = ev.lteqv(lhs, ev1.fromInt(rhs))
 
-    def >(rhs: Double)(implicit ev1: Field[A]): Boolean = po.gt(lhs, ev1.fromDouble(rhs))
-    def >=(rhs: Double)(implicit ev1: Field[A]): Boolean = po.gteqv(lhs, ev1.fromDouble(rhs))
-    def <(rhs: Double)(implicit ev1: Field[A]): Boolean = po.lt(lhs, ev1.fromDouble(rhs))
-    def <=(rhs: Double)(implicit ev1: Field[A]): Boolean = po.lteqv(lhs, ev1.fromDouble(rhs))
+    def >(rhs: Double)(implicit ev1: Field[A]): Boolean = ev.gt(lhs, ev1.fromDouble(rhs))
+    def >=(rhs: Double)(implicit ev1: Field[A]): Boolean = ev.gteqv(lhs, ev1.fromDouble(rhs))
+    def <(rhs: Double)(implicit ev1: Field[A]): Boolean = ev.lt(lhs, ev1.fromDouble(rhs))
+    def <=(rhs: Double)(implicit ev1: Field[A]): Boolean = ev.lteqv(lhs, ev1.fromDouble(rhs))
 
-    // infix def >(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.gt(c.toNumber(lhs), rhs)
+    def >(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) > rhs
+    def >=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) >= rhs
+    def <(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) < rhs
+    def <=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) <= rhs
+      // infix def >(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.gt(c.toNumber(lhs), rhs)
     // infix def >=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.gteqv(c.toNumber(lhs), rhs)
     // infix def <(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = ???//po.lt(c.toNumber(lhs), rhs)
     // infix def <=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.lteqv(c.toNumber(lhs), c.toNumber(rhs))
@@ -381,7 +387,6 @@ trait NRootSyntax {
     def sqrt(): A = ev.sqrt(lhs)
     def fpow(rhs: A): A = ev.fpow(lhs, rhs)
 
-    // TODO: should be macros
     def pow(rhs: Double)(using c: Field[A]): A = ev.fpow(lhs, c.fromDouble(rhs))
     def **(rhs: Double)(using c: Field[A]): A = ev.fpow(lhs, c.fromDouble(rhs))
 
@@ -389,13 +394,13 @@ trait NRootSyntax {
     def **(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs) ** rhs
 
   extension(lhs: Int)
-    def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromInt(lhs), rhs)
+    def **[A](rhs: A)(using ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromInt(lhs), rhs)
 
   extension(lhs: Long)
-    def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromLong(lhs), rhs)
+    def **[A](rhs: A)(using ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromLong(lhs), rhs)
 
   extension(lhs: Double)
-    def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromDouble(lhs), rhs)
+    def **[A](rhs: A)(using ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromDouble(lhs), rhs)
 }
 
 trait LeftModuleSyntax extends RingSyntax {

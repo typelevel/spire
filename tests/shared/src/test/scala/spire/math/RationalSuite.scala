@@ -229,16 +229,16 @@ class RationalSuite extends munit.FunSuite {
    * tries every denominator between 1 and `limit` and returns the `Rational`
    * that was closest to `a`.
    */
-  // def bruteForceLimitDen(a: Rational, limit: Int): Rational =
-  //   (1 to limit)
-  //     .map(BigInt(_))
-  //     .flatMap { d =>
-  //       val ln = (a * d).toBigInt
-  //       List(Rational(ln - 1, d), Rational(ln, d), Rational(ln + 1, d))
-  //     }
-  //     .minBy(b => (b - a).abs)
-  //
-  // // FIXME: for some reason the commented files seem to throw SBT/scalac into
+  def bruteForceLimitDen(a: Rational, limit: Int): Rational =
+    (1 to limit)
+      .map(BigInt(_))
+      .flatMap { d =>
+        val ln = (a * d).toBigInt
+        List(Rational(ln - 1, d), Rational(ln, d), Rational(ln + 1, d))
+      }
+      .minBy(b => (b - a).abs)
+
+  // FIXME: for some reason the commented files seem to throw SBT/scalac into
   // some kind of continuous compilcation loop... YMMV :/
   test("limitDenominatorTo valid number returns correct result") {
     assertEquals(Rational(6, 5), Rational(23, 19).limitDenominatorTo(10))
@@ -305,10 +305,6 @@ class RationalSuite extends munit.FunSuite {
   }
 
   test("compareToOne") {
-    // val maxV = Rational(9223372036854775807L, 216560131L)
-    // val r = Rational(8485535141125407655L, 2553066100668986744L)
-    // assert(maxV < r)
-    // assert(Rational(9223372036854775807L, 216560131L) < Rational(8485535141125407655L, 2553066100668986744L))
     val d = Rational(1, Long.MaxValue)
     assertEquals(Rational.one.compareToOne, 0)
     assertEquals((Rational.one + d).compareToOne, 1)

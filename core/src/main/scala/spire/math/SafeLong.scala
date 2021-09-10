@@ -165,10 +165,10 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
 
   final def pow(k: Int): SafeLong = {
     if (k < 0) throw new IllegalArgumentException(s"negative exponent: $k")
-    println(s"SL pow $k")
+    // println(s"SL pow $k")
 
     @tailrec def loop(total: SafeLong, base: SafeLong, exp: Int): SafeLong = {
-      println(s"looP $total")
+      // println(s"looP $total")
       if (exp == 0) total
       else if ((exp & 1) == 1) loop(total * base, base * base, exp >> 1)
       else loop(total, base * base, exp >> 1)
@@ -310,11 +310,11 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
 
   def *(y: Long): SafeLong =
     try {
-      println(s"Times $x $y")
+      // println(s"Times $x $y")
       Checked.checked(SafeLongLong(x * y))
     } catch {
       case _ =>
-        println("fal")
+        // println("fal")
         SafeLongBigInteger(BigInteger.valueOf(x).multiply(BigInteger.valueOf(y)))
     }
 
@@ -425,7 +425,7 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def compare(that: SafeLong): Int =
     that match {
       case SafeLongLong(y) =>
-        println(s"SLL $x y ${x.compare(y)}")
+        // println(s"SLL $x y ${x.compare(y)}")
         x.compare(y)
       case SafeLongBigInteger(y) =>
         -y.signum
