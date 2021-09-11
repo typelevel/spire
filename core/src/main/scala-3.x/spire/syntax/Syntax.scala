@@ -622,15 +622,34 @@ trait ConvertableFromSyntax {
     def toRational(): Rational = cf.toRational(lhs)
 }
 
-// trait LiteralsSyntax {
-//   implicit def literals(s: StringContext): Literals = new Literals(s)
-//
-//   object radix { implicit def radix(s: StringContext): Radix = new Radix(s) }
-//   object si { implicit def siLiterals(s: StringContext): SiLiterals = new SiLiterals(s) }
-//   object us { implicit def usLiterals(s: StringContext): UsLiterals = new UsLiterals(s) }
-//   object eu { implicit def euLiterals(s: StringContext): EuLiterals = new EuLiterals(s) }
-// }
-//
+trait LiteralsSyntax {
+  import spire.syntax.macros._
+
+  extension (inline ctx: StringContext)
+    inline def b(inline parts: Any*): Byte =
+      ${ byte('{ctx}) }
+
+    inline def h(inline parts: Any*): Short =
+      ${ short('{ctx}) }
+
+    inline def ub(inline parts: Any*): UByte =
+      ${ ubyte('{ctx}) }
+
+    inline def us(inline parts: Any*): UShort =
+      ${ ushort('{ctx}) }
+
+    inline def ui(inline parts: Any*): UInt =
+      ${ uint('{ctx}) }
+
+    inline def ul(inline parts: Any*): ULong =
+      ${ ulong('{ctx}) }
+      //
+  // object radix { implicit def radix(s: StringContext): Radix = new Radix(s) }
+  // object si { implicit def siLiterals(s: StringContext): SiLiterals = new SiLiterals(s) }
+  // object us { implicit def usLiterals(s: StringContext): UsLiterals = new UsLiterals(s) }
+  // object eu { implicit def euLiterals(s: StringContext): EuLiterals = new EuLiterals(s) }
+}
+
 trait AllSyntax
     // extends LiteralsSyntax
     extends CforSyntax

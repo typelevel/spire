@@ -4,17 +4,18 @@ package math
 import spire.std.int._
 
 class LiteralsSuite extends munit.FunSuite {
-  // test("byte literals") {
-  //   import spire.syntax.literals._
-  //   assertEquals(b"-128", (-128: Byte))
-  //   assertEquals(b"-100", (-100: Byte))
-  //   assertEquals(b"0", (0: Byte))
-  //   assertEquals(b"100", (100: Byte))
-  //   assertEquals(b"127", (127: Byte))
-  //   assertEquals(b"128", (-128: Byte))
-  //   assertEquals(b"255", (-1: Byte))
-  // }
-  //
+  test("byte literals") {
+    import spire.syntax.literals._
+    assertEquals(b"-128", (-128: Byte))
+    assertEquals(b"-100", (-100: Byte))
+    assertEquals(b"0", (0: Byte))
+    assertEquals(b"100", (100: Byte))
+    assertEquals(b"127", (127: Byte))
+    assertEquals(b"128", (-128: Byte))
+    assertEquals(b"255", (-1: Byte))
+    assertEquals(compileErrors("""b"155""""), "")
+  }
+
   // test("illegal byte literals") {
   //   import spire.macros._
   //   def tryit(s: String) = Macros.parseNumber(s, BigInt(-128), BigInt(255))
@@ -23,40 +24,63 @@ class LiteralsSuite extends munit.FunSuite {
   //   assertEquals(tryit("10000"), Left("illegal constant: 10000"))
   //   assertEquals(tryit("abc"), Left("illegal constant: abc"))
   // }
-  //
-  // test("short literals") {
-  //   import spire.syntax.literals._
-  //   assertEquals(h"-32768", (-32768: Short))
-  //   assertEquals(h"-10000", (-10000: Short))
-  //   assertEquals(h"0", (0: Short))
-  //   assertEquals(h"10012", (10012: Short))
-  //   assertEquals(h"32767", (32767: Short))
-  //   assertEquals(h"32768", (-32768: Short))
-  //   assertEquals(h"65535", (-1: Short))
-  // }
-  //
-  // test("int operators") {
-  //   import spire.syntax.std.int._
-  //   import spire.syntax.nroot._
-  //   assertEquals((5 ** 2), 25)
-  //   assertEquals((5 /~ 2), 2)
-  //   assertEquals((5 /% 2), ((2, 1)))
-  //   assertEquals(25.sqrt, 5)
-  // }
-  //
-  // test("inter-type operators") {
-  //   import spire.std.double._
-  //   val c = Complex(2.0, 3.0)
-  //   val q = Rational(4, 5)
-  //   val r = Algebraic(3.0)
-  //
-  //   assertEquals(c + 1, Complex(3.0, 3.0))
-  //   assertEquals(1 + c, Complex(3.0, 3.0))
-  //
-  //   assertEquals(q + 1, Rational(9, 5))
-  //   assertEquals(1 + q, Rational(9, 5))
-  //
-  //   assertEquals(r + 1, Algebraic(4.0))
-  //   assertEquals(1 + r, Algebraic(4.0))
-  // }
+
+  test("short literals") {
+    import spire.syntax.literals._
+    assertEquals(h"-32768", (-32768: Short))
+    assertEquals(h"-10000", (-10000: Short))
+    assertEquals(h"0", (0: Short))
+    assertEquals(h"10012", (10012: Short))
+    assertEquals(h"32767", (32767: Short))
+    assertEquals(h"32768", (-32768: Short))
+    assertEquals(h"65535", (-1: Short))
+  }
+
+  test("int operators") {
+    import spire.syntax.std.int._
+    import spire.syntax.nroot._
+    assertEquals((5 ** 2), 25)
+    assertEquals((5 /~ 2), 2)
+    assertEquals((5 /% 2), ((2, 1)))
+    assertEquals(25.sqrt(), 5)
+  }
+
+  test("inter-type operators") {
+    import spire.std.double._
+    val c = Complex(2.0, 3.0)
+    val q = Rational(4, 5)
+    val r = Algebraic(3.0)
+
+    assertEquals(c + 1, Complex(3.0, 3.0))
+    assertEquals(1 + c, Complex(3.0, 3.0))
+
+    assertEquals(q + 1, Rational(9, 5))
+    assertEquals(1 + q, Rational(9, 5))
+
+    assertEquals(r + 1, Algebraic(4.0))
+    assertEquals(1 + r, Algebraic(4.0))
+  }
+
+  test("unsigned literals") {
+    import spire.syntax.literals._
+    assertEquals(ub"1", UByte(1))
+    assertEquals(ub"255", UByte(-1))
+    assertEquals(ub"120", UByte(120))
+    assertEquals(compileErrors("""ub"256""""), "")
+
+    assertEquals(us"1", UShort(1))
+    assertEquals(us"65535", UShort(65535))
+    assertEquals(us"120", UShort(120))
+    assertEquals(compileErrors("""us"65536""""), "")
+
+    assertEquals(ui"1", UInt(1))
+    assertEquals(ui"65535", UInt(65535))
+    assertEquals(ui"120", UInt(120))
+    assertEquals(compileErrors("""ui"-1""""), "")
+
+    assertEquals(ul"1", ULong(1))
+    assertEquals(ul"65535", ULong(65535))
+    assertEquals(ul"120", ULong(120))
+    assertEquals(compileErrors("""ul"-1""""), "")
+  }
 }
