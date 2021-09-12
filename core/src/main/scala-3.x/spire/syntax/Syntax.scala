@@ -643,9 +643,32 @@ trait LiteralsSyntax {
 
     inline def ul(inline parts: Any*): ULong =
       ${ ulong('{ctx}) }
-      //
+
+    inline def r(inline parts: Any*): Rational =
+      ${ rational('{ctx}) }
+
+    // def poly(args: Any*): Polynomial[Rational] =
+    //   val sb = new StringBuilder
+    //   val lits = ctx.parts.iterator
+    //   val vars = args.map(_.toString).iterator
+    //
+    //   // if there are n interpolated values there will always be n+1
+    //   // literal parts. we want to intersperse them in the order they
+    //   // were seen.
+    //   sb.append(lits.next())
+    //   while (vars.hasNext)
+    //     sb.append(vars.next())
+    //     sb.append(lits.next())
+    //   Polynomial(sb.toString)
+
   // object radix { implicit def radix(s: StringContext): Radix = new Radix(s) }
-  // object si { implicit def siLiterals(s: StringContext): SiLiterals = new SiLiterals(s) }
+  object si:
+    extension (inline ctx: StringContext)
+      inline def i(inline parts: Any*): Int =
+        ${ siInt('{ctx}) }
+
+      inline def j(inline parts: Any*): Long =
+        ${ siLong('{ctx}) }
   // object us { implicit def usLiterals(s: StringContext): UsLiterals = new UsLiterals(s) }
   // object eu { implicit def euLiterals(s: StringContext): EuLiterals = new EuLiterals(s) }
 }

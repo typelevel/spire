@@ -3,64 +3,15 @@ package spire.syntax.macros
 
 import quoted._
 
-import spire.algebra.{Field, CRing}
-import spire.math.UByte
-import spire.math.UShort
-import spire.math.UInt
-import spire.math.ULong
-
-def fromRingImpl[A: Type](digits: Expr[String], radix: Expr[Int], A: Expr[CRing[A]])(using quotes: Quotes): Expr[A] =
-  import quotes._
-  import quotes.reflect._
-
-  ((digits -> radix): @unchecked) match
-    case Literal(StringConstant(ds)) -> Literal(IntConstant(r)) => fromBigIntImpl(BigInt(ds, r), A)
-    case _                     => '{ $A.fromBigInt(BigInt($digits, $radix)) }
-
-def fromFieldImpl[A: Type](digits: Expr[String], A: Expr[Field[A]])(using quatos: Quotes): Expr[A] =
-  import quotes._
-  import quotes.reflect._
-  digits match
-    case Literal(StringConstant(ds)) =>
-      if floating.matches(ds) then
-        val bigdec = BigDecimal(ds)
-        if bigdec.isDecimalDouble || bigdec.isBinaryDouble || bigdec.isExactDouble then bigdec.toDouble match
-          case 0.0 => '{ $A.zero                     }
-          case 1.0 => '{ $A.one                      }
-          case n   => '{ $A.fromDouble(${ Expr(n) }) }
-        else
-          '{ $A.zero                     }
-          // '{ $A.fromBigDecimal(${ Expr(bigdec) }) }
-      else
-        fromBigIntImpl(BigInt(ds), A)
-
-    // case _ => '{ $A.fromBigDecimal(BigDecimal($digits)) }
-
-private def fromBigIntImpl[A: Type](bigint: BigInt, A: Expr[CRing[A]])(using Quotes): Expr[A] =
-  if bigint.isValidInt then bigint.toInt match
-    case 0 => '{ $A.zero                  }
-    case 1 => '{ $A.one                   }
-    case n => '{ $A.fromInt(${ Expr(n) }) }
-  else '{ $A.fromBigInt(${ Expr(bigint) }) }
-
-private val floating = """.*[.eE].*""".r
-
-// private case class LiteralUtil(c: Context) {
-//
-//   def getString: String = {
-//     val Apply(_, List(Apply(_, List(Literal(Constant(s: String)))))) = c.prefix.tree: @unchecked
-//     s
-//   }
-// }
+import spire.math.*
 
 def parseNumber(s: Seq[String], lower: BigInt, upper: BigInt): Either[String, BigInt] =
   s.headOption.map { s =>
-    try {
+    try
       val n = BigInt(s)
       if (n < lower || n > upper) Left(s"illegal constant: $s") else Right(n)
-    } catch {
+    catch
       case _: Exception => Left(s"illegal constant: %s")
-    }
   }.getOrElse(Left("Unsupported parcialized strings"))
 
 
@@ -123,3 +74,66 @@ def ulong(digits: Expr[StringContext])(using Quotes): Expr[ULong] =
     case Left(b) =>
       report.info(b)
       '{ULong(0)}
+
+def rational(digits: Expr[StringContext])(using Quotes): Expr[Rational] =
+  import quotes._
+  import quotes.reflect._
+
+  digits.valueOrError.parts.headOption.map { s =>
+    val r = Rational(s)
+    val (n, d) = (r.numerator, r.denominator)
+    if (n.isValidLong && d.isValidLong)
+      '{Rational(${Expr(n.toLong)}, ${Expr(d.toLong)})}
+    else
+      '{Rational(BigInt(${Expr(n.toString)}), BigInt(${Expr(d.toLong)}))}
+  }.getOrElse {
+    report.info("Not a valid rational")
+    '{Rational(0)}
+  }
+
+def formatWhole(s: String, sep: String)(using Quotes): String =
+  import quotes.reflect._
+  val esep = if (sep == ".") "\\." else sep
+  val regex = "(0|-?[1-9][0-9]{0,2}(%s[0-9]{3})*)".format(esep)
+  if (!s.matches(regex)) report.error("invalid whole number")
+  s.replace(sep, "")
+
+def formatDecimal(s: String, sep: String, dec: String)(using Quotes): String =
+  import quotes.reflect._
+  val esep = if (sep == ".") "\\." else sep
+  val edec = if (dec == ".") "\\." else dec
+  val regex = "-?(0|[1-9][0-9]{0,2}(%s[0-9]{3})*)(%s[0-9]+)?".format(esep, edec)
+  if (!s.matches(regex)) report.error("invalid whole number")
+  s.replace(sep, "").replace(dec, ".")
+
+def handleInt(s: Seq[String], name: String, sep: String)(using Quotes): Expr[Int] =
+  import quotes.reflect._
+  s.headOption.map { s =>
+    try
+      Expr(formatWhole(s, sep).toInt)
+    catch
+      case e: Exception =>
+        throw new NumberFormatException("illegal %s Int constant".format(name))
+  }.getOrElse {
+    report.error("Unsupported parcialized strings")
+    '{0}
+  }
+
+def handleLong(s: Seq[String], name: String, sep: String)(using Quotes): Expr[Long] =
+  import quotes.reflect._
+  s.headOption.map { s =>
+    try
+      Expr(formatWhole(s, sep).toLong)
+    catch
+      case e: Exception =>
+        throw new NumberFormatException("illegal %s Long constant".format(name))
+  }.getOrElse {
+    report.error("Unsupported parcialized strings")
+    '{0}
+  }
+
+def siInt(digits: Expr[StringContext])(using Quotes): Expr[Int] =
+  handleInt(digits.valueOrError.parts, "SI", " ")
+
+def siLong(digits: Expr[StringContext])(using Quotes): Expr[Long] =
+  handleLong(digits.valueOrError.parts, "SI", " ")
