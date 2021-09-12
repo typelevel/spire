@@ -199,5 +199,3 @@ object Seed {
   def apply(n: Long): Seed = new Seed(spire.util.Pack.longToBytes(n))
   def apply(bytes: Array[Byte]): Seed = new Seed(bytes.clone)
 }
-
-

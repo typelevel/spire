@@ -1,8 +1,6 @@
 package spire
 package util
 
-import scala.compiletime.error
-
 trait PackMacros:
   inline private[util] def ism(n: Int, shift: Int): Byte =
     ((n >>> shift) & 0xff).toByte
@@ -12,15 +10,15 @@ trait PackMacros:
 
   /** index must be 0 <= index < 4 */
   inline def intToByte(n: Int)(index: Int): Byte =
-    inline if (0 <= index && index < 4)
+    if (0 <= index && index < 4)
       val offset = 24 - index * 8
       ((n >>> offset) & 0xfff).toByte
-    else error("index outside of 0-3")
+    else sys.error(s"index outside of 0-3")
 
   /** index must be 0 <= index < 8 */
   inline def longToByte(n: Long)(index: Int): Byte =
-    inline if (0 <= index && index < 8)
+    if (0 <= index && index < 8)
       val offset = 56 - index * 8
       ((n >>> offset) & 0xfff).toByte
-    else error("index outside of 0-7")
+    else sys.error("index outside of 0-7")
 

@@ -90,10 +90,7 @@ lazy val spireJS = project
   .enablePlugins(ScalaJSPlugin)
 
 lazy val platform = crossProject(JSPlatform, JVMPlatform)
-  .settings(
-    moduleName := "spire-platform",
-    crossScalaVersions := Seq(Scala213, Scala30)
-  )
+  .settings(moduleName := "spire-platform")
   .settings(spireSettings: _*)
   .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
@@ -102,10 +99,7 @@ lazy val platform = crossProject(JSPlatform, JVMPlatform)
 
 lazy val macros = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
-  .settings(
-    moduleName := "spire-macros",
-    crossScalaVersions := Seq(Scala213, Scala30)
-  )
+  .settings(moduleName := "spire-macros")
   .settings(spireSettings: _*)
   .settings(scalaCheckSettings: _*)
   .settings(munitSettings: _*)
@@ -131,10 +125,7 @@ lazy val legacy = crossProject(JSPlatform, JVMPlatform)
 
 lazy val util = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
-  .settings(
-    moduleName := "spire-util",
-    crossScalaVersions := Seq(Scala213, Scala30)
-  )
+  .settings(moduleName := "spire-util")
   .settings(spireSettings: _*)
   .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
@@ -258,7 +249,7 @@ lazy val commonSettings = Seq(
       "-Ywarn-dead-code",
       "-Ywarn-numeric-widen",
       "-Ywarn-value-discard",
-      "-Xcheck-macros",
+      "-Xcheck-macros"
     )
   ),
   resolvers += Resolver.sonatypeRepo("snapshots")
@@ -389,7 +380,7 @@ lazy val coreSettings = Seq(
     IO.write(algebraFile, algebraSource)
 
     Seq[File](algebraFile)
-  },
+  }
 )
 
 lazy val extrasSettings = Seq(
@@ -468,7 +459,8 @@ lazy val commonScalacOptions = Def.setting(
       )
   }) ++ Seq(
     "-deprecation",
-    "-encoding", "UTF-8",
+    "-encoding",
+    "UTF-8",
     "-feature",
     "-language:existentials",
     "-language:higherKinds",
@@ -479,7 +471,7 @@ lazy val commonScalacOptions = Def.setting(
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard",
-    "-Xcheck-macros",
+    "-Xcheck-macros"
   )
 )
 
