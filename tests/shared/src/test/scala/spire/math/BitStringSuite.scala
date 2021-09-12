@@ -21,36 +21,36 @@ class BitStringSuite extends munit.FunSuite {
       assertEquals(found, expected)
     }
 
-  // test("BitString[Byte]") {
-  //   import spire.syntax.literals._
-  //   testCases(
-  //     I(b"0", 0, b"0", b"0", 8, 8) ::
-  //       I(b"7", 3, b"4", b"1", 5, 0) ::
-  //       I(b"62", 5, b"32", b"2", 2, 1) ::
-  //       I(b"127", 7, b"64", b"1", 1, 0) ::
-  //       I(b"-128", 1, b"-128", b"-128", 0, 7) ::
-  //       I(b"-1", 8, b"-128", b"1", 0, 0) ::
-  //       Nil
-  //   )
-  // }
-  //
-  // test("BitString[Short]") {
-  //   import spire.syntax.literals._
-  //   testCases(
-  //     I(h"0", 0, h"0", h"0", 16, 16) ::
-  //       I(h"7", 3, h"4", h"1", 13, 0) ::
-  //       I(h"62", 5, h"32", h"2", 10, 1) ::
-  //       I(h"127", 7, h"64", h"1", 9, 0) ::
-  //       I(h"128", 1, h"128", h"128", 8, 7) ::
-  //       I(h"255", 8, h"128", h"1", 8, 0) ::
-  //       I(h"256", 1, h"256", h"256", 7, 8) ::
-  //       I(h"23985", 9, h"16384", h"1", 1, 0) ::
-  //       I(h"32767", 15, h"16384", h"1", 1, 0) ::
-  //       I(h"-32768", 1, h"-32768", h"-32768", 0, 15) ::
-  //       I(h"-1", 16, h"32768", h"1", 0, 0) ::
-  //       Nil
-  //   )
-  // }
+  test("BitString[Byte]") {
+    import spire.syntax.literals._
+    testCases(
+      I(b"0", 0, b"0", b"0", 8, 8) ::
+        I(b"7", 3, b"4", b"1", 5, 0) ::
+        I(b"62", 5, b"32", b"2", 2, 1) ::
+        I(b"127", 7, b"64", b"1", 1, 0) ::
+        I(b"-128", 1, b"-128", b"-128", 0, 7) ::
+        I(b"-1", 8, b"-128", b"1", 0, 0) ::
+        Nil
+    )
+  }
+
+  test("BitString[Short]") {
+    import spire.syntax.literals._
+    testCases(
+      I(h"0", 0, h"0", h"0", 16, 16) ::
+        I(h"7", 3, h"4", h"1", 13, 0) ::
+        I(h"62", 5, h"32", h"2", 10, 1) ::
+        I(h"127", 7, h"64", h"1", 9, 0) ::
+        I(h"128", 1, h"128", h"128", 8, 7) ::
+        I(h"255", 8, h"128", h"1", 8, 0) ::
+        I(h"256", 1, h"256", h"256", 7, 8) ::
+        I(h"23985", 9, h"16384", h"1", 1, 0) ::
+        I(h"32767", 15, h"16384", h"1", 1, 0) ::
+        I(h"-32768", 1, h"-32768", h"-32768", 0, 15) ::
+        I(h"-1", 16, h"32768", h"1", 0, 0) ::
+        Nil
+    )
+  }
 
   test("BitString[Int]") {
     testCases(
@@ -101,27 +101,27 @@ class BitStringSuite extends munit.FunSuite {
   def eval[A](n: A)(f: (A, Int) => A): List[A] =
     List(f(n, 0), f(n, 1), f(n, 3), f(n, 4), f(n, 7))
 
-  // test("byte shifting") {
-  //   import spire.syntax.literals._
-  //
-  //   assertEquals(eval(b"1")(ls), List(b"1", b"2", b"8", b"16", b"-128"))
-  //   assertEquals(eval(b"1")(rs), List(b"1", b"0", b"0", b"0", b"0"))
-  //   assertEquals(eval(b"1")(srs), List(b"1", b"0", b"0", b"0", b"0"))
-  //
-  //   assertEquals(eval(b"7")(ls), List(b"7", b"14", b"56", b"112", b"-128"))
-  //   assertEquals(eval(b"7")(rs), List(b"7", b"3", b"0", b"0", b"0"))
-  //   assertEquals(eval(b"7")(srs), List(b"7", b"3", b"0", b"0", b"0"))
-  //
-  //   assertEquals(eval(b"127")(ls), List(b"127", b"-2", b"-8", b"-16", b"-128"))
-  //   assertEquals(eval(b"127")(rs), List(b"127", b"63", b"15", b"7", b"0"))
-  //   assertEquals(eval(b"127")(srs), List(b"127", b"63", b"15", b"7", b"0"))
-  //
-  //   assertEquals(eval(b"-1")(ls), List(b"-1", b"-2", b"-8", b"-16", b"-128"))
-  //   assertEquals(eval(b"-1")(rs), List(b"-1", b"127", b"31", b"15", b"1"))
-  //   assertEquals(eval(b"-1")(srs), List(b"-1", b"-1", b"-1", b"-1", b"-1"))
-  //
-  //   assertEquals(eval(b"-128")(ls), List(b"-128", b"0", b"0", b"0", b"0"))
-  //   assertEquals(eval(b"-128")(rs), List(b"-128", b"64", b"16", b"8", b"1"))
-  //   assertEquals(eval(b"-128")(srs), List(b"-128", b"-64", b"-16", b"-8", b"-1"))
-  // }
+  test("byte shifting") {
+    import spire.syntax.literals._
+
+    assertEquals(eval(b"1")(ls), List(b"1", b"2", b"8", b"16", b"-128"))
+    assertEquals(eval(b"1")(rs), List(b"1", b"0", b"0", b"0", b"0"))
+    assertEquals(eval(b"1")(srs), List(b"1", b"0", b"0", b"0", b"0"))
+
+    assertEquals(eval(b"7")(ls), List(b"7", b"14", b"56", b"112", b"-128"))
+    assertEquals(eval(b"7")(rs), List(b"7", b"3", b"0", b"0", b"0"))
+    assertEquals(eval(b"7")(srs), List(b"7", b"3", b"0", b"0", b"0"))
+
+    assertEquals(eval(b"127")(ls), List(b"127", b"-2", b"-8", b"-16", b"-128"))
+    assertEquals(eval(b"127")(rs), List(b"127", b"63", b"15", b"7", b"0"))
+    assertEquals(eval(b"127")(srs), List(b"127", b"63", b"15", b"7", b"0"))
+
+    assertEquals(eval(b"-1")(ls), List(b"-1", b"-2", b"-8", b"-16", b"-128"))
+    assertEquals(eval(b"-1")(rs), List(b"-1", b"127", b"31", b"15", b"1"))
+    assertEquals(eval(b"-1")(srs), List(b"-1", b"-1", b"-1", b"-1", b"-1"))
+
+    assertEquals(eval(b"-128")(ls), List(b"-128", b"0", b"0", b"0", b"0"))
+    assertEquals(eval(b"-128")(rs), List(b"-128", b"64", b"16", b"8", b"1"))
+    assertEquals(eval(b"-128")(srs), List(b"-128", b"-64", b"-16", b"-8", b"-1"))
+  }
 }

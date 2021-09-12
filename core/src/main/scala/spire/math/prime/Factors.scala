@@ -102,7 +102,7 @@ case class Factors(elements: Map[SafeLong, Int], sign: Sign)
   def -(rhs: SafeLong): Factors = Factors(lhs.value - rhs)
 
   def *(rhs: Factors): Factors =
-    Factors(lhs.elements ^+ rhs.elements, lhs.sign * rhs.sign)
+    Factors(lhs.elements + rhs.elements, lhs.sign * rhs.sign)
   def *(rhs: SafeLong): Factors =
     lhs * Factors(rhs)
 

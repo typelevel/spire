@@ -44,7 +44,7 @@ trait OrderLaws[A] extends Laws {
     name = "signed",
     parent = Some(order),
     "abs non-negative" -> forAllSafe((x: A) => x.abs().sign() != Sign.Negative),
-    "signum returns -1/0/1" -> forAllSafe((x: A) => x.signum().abs() <= 1),
+    "signum returns -1/0/1" -> forAllSafe((x: A) => x.signum().abs <= 1),
     "signum is sign.toInt" -> forAllSafe((x: A) => x.signum() == x.sign().toInt)
   )
 

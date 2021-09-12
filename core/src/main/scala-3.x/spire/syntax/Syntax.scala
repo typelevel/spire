@@ -24,7 +24,7 @@ trait PartialOrderSyntax extends EqSyntax:
     def <(rhs: A): Boolean = ev.lt(lhs, rhs)
     def <=(rhs: A): Boolean = ev.lteqv(lhs, rhs)
 
-    def partialCompare(rhs: A): Double = {println(ev);ev.partialCompare(lhs, rhs)}
+    def partialCompare(rhs: A): Double = ev.partialCompare(lhs, rhs)
     def tryCompare(rhs: A): Option[Int] = ev.tryCompare(lhs, rhs)
     def pmin(rhs: A): Option[A] = ev.pmin(lhs, rhs)
     def pmax(rhs: A): Option[A] = ev.pmax(lhs, rhs)
@@ -185,7 +185,6 @@ trait AdditiveSemigroupSyntax:
   //   new AdditiveSemigroupOps(a)
   extension [A](lhs: A)(using as: AdditiveSemigroup[A])
     def +(rhs: A): A = as.plus(lhs, rhs)
-    def ^+(rhs: A): A = as.plus(lhs, rhs)
     def +(rhs: Int)(implicit ev1: Ring[A]): A = as.plus(lhs, ev1.fromInt(rhs))
     def +(rhs: Double)(implicit ev1: Field[A]): A = as.plus(lhs, ev1.fromDouble(rhs))
     def +(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs) + rhs
@@ -462,7 +461,7 @@ trait TrigSyntax {
     def exp(): A = ev.exp(lhs)
     def log(): A = ev.log(lhs)
 
-    def log(base: Int)(implicit f: Field[A]): A =
+    def log(base: Int)(using f: Field[A]): A =
       f.div(ev.log(lhs), ev.log(f.fromInt(base)))
   // implicit def trigOps[A: Trig](a: A): TrigOps[A] = new TrigOps(a)
 }
@@ -647,19 +646,20 @@ trait LiteralsSyntax {
     inline def r(inline parts: Any*): Rational =
       ${ rational('{ctx}) }
 
-    // def poly(args: Any*): Polynomial[Rational] =
-    //   val sb = new StringBuilder
-    //   val lits = ctx.parts.iterator
-    //   val vars = args.map(_.toString).iterator
-    //
-    //   // if there are n interpolated values there will always be n+1
-    //   // literal parts. we want to intersperse them in the order they
-    //   // were seen.
-    //   sb.append(lits.next())
-    //   while (vars.hasNext)
-    //     sb.append(vars.next())
-    //     sb.append(lits.next())
-    //   Polynomial(sb.toString)
+  extension(ctx: StringContext)
+    def poly(args: Any*): Polynomial[Rational] =
+      val sb = new StringBuilder
+      val lits = ctx.parts.iterator
+      val vars = args.map(_.toString).iterator
+
+      // if there are n interpolated values there will always be n+1
+      // literal parts. we want to intersperse them in the order they
+      // were seen.
+      sb.append(lits.next())
+      while (vars.hasNext)
+        sb.append(vars.next())
+        sb.append(lits.next())
+      Polynomial(sb.toString)
 
   // object radix { implicit def radix(s: StringContext): Radix = new Radix(s) }
   object si:
@@ -674,8 +674,8 @@ trait LiteralsSyntax {
 }
 
 trait AllSyntax
-    // extends LiteralsSyntax
-    extends CforSyntax
+    extends LiteralsSyntax
+    with CforSyntax
     with EqSyntax
     with PartialOrderSyntax
     with OrderSyntax

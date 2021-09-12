@@ -936,9 +936,9 @@ private[math] trait RationalIsReal extends IsRational[Rational] with TruncatedDi
   override def neqv(x: Rational, y: Rational): Boolean = x != y
   override def gt(x: Rational, y: Rational): Boolean = x > y
   override def gteqv(x: Rational, y: Rational): Boolean = x >= y
-  override def lt(x: Rational, y: Rational): Boolean = {println("lt");x < y}
+  override def lt(x: Rational, y: Rational): Boolean = x < y
   override def lteqv(x: Rational, y: Rational): Boolean = x <= y
-  def compare(x: Rational, y: Rational): Int = {println("comp");x.compare(y)}
+  def compare(x: Rational, y: Rational): Int = x.compare(y)
 
   override def sign(a: Rational): Sign = a.sign
   override def signum(a: Rational): Int = a.signum
