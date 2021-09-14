@@ -204,7 +204,7 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
   // sample1("sample1 pow(2)")(_.pow(2))
 
   def arcSample(f: Rational => Rational)(g: Double => Double, h: Real => Real): String =
-    (-8L to 8).map { i =>
+    (-8 to 8).map { i =>
       val x = Real(f(Rational(i)))
       if ((g(x.toDouble) - h(x).toDouble).abs < 0.00001) "." else "!"
     }.mkString

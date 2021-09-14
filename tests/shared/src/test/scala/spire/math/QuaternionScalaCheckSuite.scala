@@ -141,14 +141,14 @@ class QuaternionScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-  // property("q.nroot(k).pow(k) = q") {
-  //   forAll { (a: Short, b: Short, c: Short, d: Short, k0: Int) =>
-  //     val q = Quaternion(Real(a), Real(b), Real(c), Real(d))
-  //     val k = (k0 % 5L).abs + 1
-  //     val r = q.nroot(k).pow(k)
-  //     inexactEq(q, r)
-  //   }
-  // }
+  property("q.nroot(k).pow(k) = q") {
+    forAll { (a: Short, b: Short, c: Short, d: Short, k0: Int) =>
+      val q = Quaternion(Real(a), Real(b), Real(c), Real(d))
+      val k = (k0 % 5).abs + 1
+      val r = q.nroot(k).pow(k)
+      inexactEq(q, r)
+    }
+  }
 
   // property("q.fpow(1/k) = q.nroot(k)") {
   //   forAll { (q: H, k0: Int) =>

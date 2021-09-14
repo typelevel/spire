@@ -26,14 +26,9 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
       implicit val scale: FixedScale = s
       val minV = FixedPoint.MinValue.toRational
       val maxV = FixedPoint.MaxValue.toRational
-      println(s"T $scale $maxV ")
-      println(s"B $r $maxV ${maxV < r}")
-      println(s"B ${maxV < r}")
       if (r < minV || maxV < r) {
-        println(Try(FixedPoint(r)))
         !Try(FixedPoint(r)).isSuccess
       } else {
-        println("A1")
         FixedPoint(r).toRational == r.roundTo(s.denom)
       }
     }

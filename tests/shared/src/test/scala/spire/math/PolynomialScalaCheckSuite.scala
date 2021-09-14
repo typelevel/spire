@@ -191,13 +191,12 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-  // property("apply(r, 0) = r") {
-  //   forAll { (r: Rational) =>
-  //     val p = Polynomial(r, 0)
-  //     p == r &&
-  //     p.## == r.##
-  //   }
-  // }
+  property("apply(r, 0) = r") {
+    forAll { (r: Rational) =>
+      val p = Polynomial(r, 0)
+      p.equals(r) && p.## == r.##
+    }
+  }
 
   property(s"p.shift(h) = p.compose(x + h)") {
     forAll { (p: Polynomial[BigInt], h: BigInt) =>
@@ -205,34 +204,31 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-  // def gcdTest(x: Polynomial[Rational], y: Polynomial[Rational]): Prop = {
-  //   (!x.isZero || !y.isZero) ==> {
-  //     val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
-  //     if (!gcd.isZero) {
-  //       (x.emod(gcd)) == 0 &&
-  //       (y.emod(gcd)) == 0
-  //     }
-  //   }
-  // }
-  //
-  // property("test gcd regression") {
-  //   val x = poly"(3/37x^9 - 85x^7 - 71/4x^6 + 27/25x)"
-  //   val y = poly"(17/9x^8 - 1/78x^6)"
-  //   gcdTest(x.toDense, y.toDense)
-  // }
-  //
-  // property("x % gcd(x, y) == 0 && y % gcd(x, y) == 0") {
-  //   implicit val arbPolynomial: Arbitrary[Polynomial[Rational]] = Arbitrary(for {
-  //     ts <- Gen.listOf(for {
-  //       c <- arbitrary[Rational]
-  //       e <- arbitrary[Int].map { n => (n % 10).abs }
-  //     } yield (e, c))
-  //   } yield {
-  //     Polynomial(ts.toMap).toDense
-  //   })
-  //
-  //   forAll { (x: Polynomial[Rational], y: Polynomial[Rational]) =>
-  //     gcdTest(x, y)
-  //   }
-  // }
+  def gcdTest(x: Polynomial[Rational], y: Polynomial[Rational]) = {
+    (!x.isZero || !y.isZero) ==> {
+      val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
+      !gcd.isZero && ((x.emod(gcd)).equals(0) && (y.emod(gcd)).equals(0))
+    }
+  }
+
+  property("test gcd regression") {
+    val x = poly"(3/37x^9 - 85x^7 - 71/4x^6 + 27/25x)"
+    val y = poly"(17/9x^8 - 1/78x^6)"
+    gcdTest(x.toDense, y.toDense)
+  }
+
+  property("x % gcd(x, y) == 0 && y % gcd(x, y) == 0") {
+    implicit val arbPolynomial: Arbitrary[Polynomial[Rational]] = Arbitrary(for {
+      ts <- Gen.listOf(for {
+        c <- arbitrary[Rational]
+        e <- arbitrary[Int].map { n => (n % 10).abs }
+      } yield (e, c))
+    } yield {
+      Polynomial(ts.toMap).toDense
+    })
+
+    forAll { (x: Polynomial[Rational], y: Polynomial[Rational]) =>
+      gcdTest(x, y)
+    }
+  }
 }

@@ -31,7 +31,7 @@ class GaussianSuite extends munit.FunSuite {
 
   test("MarsagliaGaussian[Float] is normal")(checkMarsagliaGaussian[Float])
   test("MarsagliaGaussian[Double] is normal")(checkMarsagliaGaussian[Double])
-  // test("MarsagliaGaussian[BigDecimal] is normal")(checkMarsagliaGaussian[BigDecimal])
+  test("MarsagliaGaussian[BigDecimal] is normal")(checkMarsagliaGaussian[BigDecimal])
 }
 
 object AndersonDarlingTest {

@@ -317,12 +317,15 @@ trait MultiplicativeGroupSyntax extends MultiplicativeMonoidSyntax {
 //     new LiteralDoubleMultiplicativeGroupOps(lhs)
 // }
 
-trait SemiringSyntax extends AdditiveSemigroupSyntax with MultiplicativeSemigroupSyntax {
+trait SemiringSyntax extends AdditiveSemigroupSyntax with MultiplicativeSemigroupSyntax:
+  final class SemiringOps[A](lhs: A)(using ev: Semiring[A]):
+    def pow(rhs: Int): A = ev.pow(lhs, rhs)
+    def **(rhs: Int): A = pow(rhs)
   implicit def semiringOps[A: Semiring](a: A): SemiringOps[A] = new SemiringOps(a)
-  // extension [A](lhs: A)(using sg: Semiring[A])
-  //   def pow(rhs: Int): A = sg.pow(lhs, rhs)
-  // def **(rhs: Int): A = macro Ops.binop[Int, A]
-}
+  // TODO Convert to extension style. It produces clashes with NRoot
+  // extension [A](lhs: A)(using ev: Semiring[A])
+  //   def pow(rhs: Int): A = ev.pow(lhs, rhs)
+  //   def **(rhs: Int): A = pow(rhs)
 
 trait RigSyntax extends SemiringSyntax
 
