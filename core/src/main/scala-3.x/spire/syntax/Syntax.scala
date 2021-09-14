@@ -634,7 +634,7 @@ trait LiteralsSyntax {
     inline def ub(inline parts: Any*): UByte =
       ${ ubyte('{ctx}) }
 
-    inline def us(inline parts: Any*): UShort =
+    inline def uh(inline parts: Any*): UShort =
       ${ ushort('{ctx}) }
 
     inline def ui(inline parts: Any*): UInt =
@@ -669,8 +669,41 @@ trait LiteralsSyntax {
 
       inline def j(inline parts: Any*): Long =
         ${ siLong('{ctx}) }
-  // object us { implicit def usLiterals(s: StringContext): UsLiterals = new UsLiterals(s) }
-  // object eu { implicit def euLiterals(s: StringContext): EuLiterals = new EuLiterals(s) }
+
+      inline def big(inline parts: Any*): BigInt =
+        ${ siBigInt('{ctx}) }
+
+      inline def dec(inline parts: Any*): BigDecimal =
+        ${ siBigDecimal('{ctx}) }
+
+  object us:
+    extension (inline ctx: StringContext)
+      inline def i(inline parts: Any*): Int =
+        ${ usInt('{ctx}) }
+
+      inline def j(inline parts: Any*): Long =
+        ${ usLong('{ctx}) }
+
+      inline def big(inline parts: Any*): BigInt =
+        ${ usBigInt('{ctx}) }
+
+      inline def dec(inline parts: Any*): BigDecimal =
+        ${ usBigDecimal('{ctx}) }
+
+  object eu:
+    extension (inline ctx: StringContext)
+      inline def i(inline parts: Any*): Int =
+        ${ euInt('{ctx}) }
+
+      inline def j(inline parts: Any*): Long =
+        ${ euLong('{ctx}) }
+
+      inline def big(inline parts: Any*): BigInt =
+        ${ euBigInt('{ctx}) }
+
+      inline def dec(inline parts: Any*): BigDecimal =
+        ${ euBigDecimal('{ctx}) }
+
 }
 
 trait AllSyntax

@@ -13,7 +13,7 @@ class LiteralsSuite extends munit.FunSuite {
     assertEquals(b"127", (127: Byte))
     assertEquals(b"128", (-128: Byte))
     assertEquals(b"255", (-1: Byte))
-    assertEquals(compileErrors("""b"155""""), "")
+    assert(compileErrors("""b"256"""").contains("illegal constant: 256"))
   }
 
   // test("illegal byte literals") {
@@ -34,6 +34,7 @@ class LiteralsSuite extends munit.FunSuite {
     assertEquals(h"32767", (32767: Short))
     assertEquals(h"32768", (-32768: Short))
     assertEquals(h"65535", (-1: Short))
+    assert(compileErrors("""h"65536"""").contains("illegal constant: 65536"))
   }
 
   test("int operators") {
@@ -66,21 +67,21 @@ class LiteralsSuite extends munit.FunSuite {
     assertEquals(ub"1", UByte(1))
     assertEquals(ub"255", UByte(-1))
     assertEquals(ub"120", UByte(120))
-    // assertEquals(compileErrors("""ub"256""""), "")
+    assert(compileErrors("""ub"256"""").contains("illegal constant: 256"))
 
-    // assertEquals(us"1", UShort(1))
-    // assertEquals(us"65535", UShort(65535))
-    // assertEquals(us"120", UShort(120))
-    // assertEquals(compileErrors("""us"65536""""), "")
+    assertEquals(uh"1", UShort(1))
+    assertEquals(uh"65535", UShort(65535))
+    assertEquals(uh"120", UShort(120))
+    assert(compileErrors("""uh"65536"""").contains("illegal constant: 65536"))
 
     assertEquals(ui"1", UInt(1))
     assertEquals(ui"65535", UInt(65535))
     assertEquals(ui"120", UInt(120))
-    // assertEquals(compileErrors("""ui"-1""""), "")
+    assert(compileErrors("""ui"-1"""").contains("illegal constant: -1"))
 
     assertEquals(ul"1", ULong(1))
     assertEquals(ul"65535", ULong(65535))
     assertEquals(ul"120", ULong(120))
-    // assertEquals(compileErrors("""ul"-1""""), "")
+    assert(compileErrors("""ul"-1"""").contains("illegal constant: -1"))
   }
 }
