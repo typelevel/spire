@@ -29,43 +29,43 @@ trait PartialOrderSyntax extends EqSyntax:
     def pmin(rhs: A): Option[A] = ev.pmin(lhs, rhs)
     def pmax(rhs: A): Option[A] = ev.pmax(lhs, rhs)
 
-    def >(rhs: Int)(implicit ev1: Ring[A]): Boolean = ev.gt(lhs, ev1.fromInt(rhs))
-    def >=(rhs: Int)(implicit ev1: Ring[A]): Boolean = ev.gteqv(lhs, ev1.fromInt(rhs))
-    def <(rhs: Int)(implicit ev1: Ring[A]): Boolean = ev.lt(lhs, ev1.fromInt(rhs))
-    def <=(rhs: Int)(implicit ev1: Ring[A]): Boolean = ev.lteqv(lhs, ev1.fromInt(rhs))
+    def >(rhs: Int)(using ev1: Ring[A]): Boolean = ev.gt(lhs, ev1.fromInt(rhs))
+    def >=(rhs: Int)(using ev1: Ring[A]): Boolean = ev.gteqv(lhs, ev1.fromInt(rhs))
+    def <(rhs: Int)(using ev1: Ring[A]): Boolean = ev.lt(lhs, ev1.fromInt(rhs))
+    def <=(rhs: Int)(using ev1: Ring[A]): Boolean = ev.lteqv(lhs, ev1.fromInt(rhs))
 
-    def >(rhs: Double)(implicit ev1: Field[A]): Boolean = ev.gt(lhs, ev1.fromDouble(rhs))
-    def >=(rhs: Double)(implicit ev1: Field[A]): Boolean = ev.gteqv(lhs, ev1.fromDouble(rhs))
-    def <(rhs: Double)(implicit ev1: Field[A]): Boolean = ev.lt(lhs, ev1.fromDouble(rhs))
-    def <=(rhs: Double)(implicit ev1: Field[A]): Boolean = ev.lteqv(lhs, ev1.fromDouble(rhs))
+    def >(rhs: Double)(using ev1: Field[A]): Boolean = ev.gt(lhs, ev1.fromDouble(rhs))
+    def >=(rhs: Double)(using ev1: Field[A]): Boolean = ev.gteqv(lhs, ev1.fromDouble(rhs))
+    def <(rhs: Double)(using ev1: Field[A]): Boolean = ev.lt(lhs, ev1.fromDouble(rhs))
+    def <=(rhs: Double)(using ev1: Field[A]): Boolean = ev.lteqv(lhs, ev1.fromDouble(rhs))
 
-    def >(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) > rhs
-    def >=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) >= rhs
-    def <(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) < rhs
-    def <=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) <= rhs
-      // infix def >(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.gt(c.toNumber(lhs), rhs)
-    // infix def >=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.gteqv(c.toNumber(lhs), rhs)
-    // infix def <(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = ???//po.lt(c.toNumber(lhs), rhs)
-    // infix def <=(rhs: Number)(implicit c: ConvertableFrom[A]): Boolean = po.lteqv(c.toNumber(lhs), c.toNumber(rhs))
+    def >(rhs: Number)(using c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) > rhs
+    def >=(rhs: Number)(using c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) >= rhs
+    def <(rhs: Number)(using c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) < rhs
+    def <=(rhs: Number)(using c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) <= rhs
+      // infix def >(rhs: Number)(using c: ConvertableFrom[A]): Boolean = po.gt(c.toNumber(lhs), rhs)
+    // infix def >=(rhs: Number)(using c: ConvertableFrom[A]): Boolean = po.gteqv(c.toNumber(lhs), rhs)
+    // infix def <(rhs: Number)(using c: ConvertableFrom[A]): Boolean = ???//po.lt(c.toNumber(lhs), rhs)
+    // infix def <=(rhs: Number)(using c: ConvertableFrom[A]): Boolean = po.lteqv(c.toNumber(lhs), c.toNumber(rhs))
 
 trait OrderSyntax extends PartialOrderSyntax {
-  // implicit def orderOps[A: Order](a: A): OrderOps[A] = new OrderOps(a)
+  // using def orderOps[A: Order](a: A): OrderOps[A] = new OrderOps(a)
   extension [A](lhs: A)(using o: Order[A])
     def compare(rhs: A): Int = o.compare(lhs, rhs)
     def min(rhs: A): A = o.min(lhs, rhs)
     def max(rhs: A): A = o.max(lhs, rhs)
 
-    // def compare(rhs: Int)(implicit ev1: Ring[A]): Int = compare(ev1.fromInt(rhs))
-    def min(rhs: Int)(using ev1: Ring[A]): A = min(ev1.fromInt(rhs))
-    // def max(rhs: Int)(implicit ev1: Ring[A]): A = max(ev1.fromInt(rhs))
+    def compare(rhs: Int)(using ev1: Ring[A]): Int = o.compare(lhs, ev1.fromInt(rhs))
+    def min(rhs: Int)(using ev1: Ring[A]): A = o.min(lhs, ev1.fromInt(rhs))
+    def max(rhs: Int)(using ev1: Ring[A]): A = o.max(lhs, ev1.fromInt(rhs))
 
-    // def compare(rhs: Double)(implicit ev1: Field[A]): Int = compare(ev1.fromDouble(rhs))
-    def min(rhs: Double)(using ev1: Field[A]): A = min(ev1.fromDouble(rhs))
-    // def max(rhs: Double)(implicit ev1: Field[A]): A = max(ev1.fromDouble(rhs))
+    def compare(rhs: Double)(using ev1: Field[A]): Int = o.compare(lhs, ev1.fromDouble(rhs))
+    def min(rhs: Double)(using ev1: Field[A]): A = o.min(lhs, ev1.fromDouble(rhs))
+    def max(rhs: Double)(using ev1: Field[A]): A = o.max(lhs, ev1.fromDouble(rhs))
 
-    // def compare(rhs: Number)(implicit c: ConvertableFrom[A]): Int = c.toNumber(lhs).compare(rhs)
+    def compare(rhs: Number)(using c: ConvertableFrom[A]): Int = c.toNumber(lhs).compare(rhs)
     def min(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs).min(rhs)
-    // def max(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs).max(rhs)
+    def max(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs).max(rhs)
 
   extension (lhs: Int)
     def <[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromInt(lhs), rhs)
@@ -78,14 +78,14 @@ trait OrderSyntax extends PartialOrderSyntax {
     def max[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromInt(lhs), rhs)
 
   extension(lhs: Long)
-    def <[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromLong(lhs), rhs)
-    def <=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromLong(lhs), rhs)
-    def >[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromLong(lhs), rhs)
-    def >=[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromLong(lhs), rhs)
+    def <[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromLong(lhs), rhs)
+    def <=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromLong(lhs), rhs)
+    def >[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromLong(lhs), rhs)
+    def >=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromLong(lhs), rhs)
 
-    def cmp[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromLong(lhs), rhs)
-    def min[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromLong(lhs), rhs)
-    def max[A](rhs: A)(implicit ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromLong(lhs), rhs)
+    def cmp[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromLong(lhs), rhs)
+    def min[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromLong(lhs), rhs)
+    def max[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromLong(lhs), rhs)
 
   extension(lhs: Double)
     def <[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromDouble(lhs), rhs)
@@ -183,10 +183,10 @@ trait GroupSyntax extends MonoidSyntax:
 trait AdditiveSemigroupSyntax:
   // implicit def additiveSemigroupOps[A: AdditiveSemigroup](a: A): AdditiveSemigroupOps[A] =
   //   new AdditiveSemigroupOps(a)
-  extension [A](lhs: A)(using as: AdditiveSemigroup[A])
+  extension[A](lhs: A)(using as: AdditiveSemigroup[A])
     def +(rhs: A): A = as.plus(lhs, rhs)
-    def +(rhs: Int)(implicit ev1: Ring[A]): A = as.plus(lhs, ev1.fromInt(rhs))
-    def +(rhs: Double)(implicit ev1: Field[A]): A = as.plus(lhs, ev1.fromDouble(rhs))
+    def +(rhs: Int)(using ev1: Ring[A]): A = as.plus(lhs, ev1.fromInt(rhs))
+    def +(rhs: Double)(using ev1: Field[A]): A = as.plus(lhs, ev1.fromDouble(rhs))
     def +(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs) + rhs
 
   extension(lhs: Int)
@@ -204,15 +204,14 @@ trait AdditiveSemigroupSyntax:
   // implicit def literalDoubleAdditiveSemigroupOps(lhs: Double): LiteralDoubleAdditiveSemigroupOps =
   //   new LiteralDoubleAdditiveSemigroupOps(lhs)
 
-trait AdditiveMonoidSyntax extends AdditiveSemigroupSyntax {
+trait AdditiveMonoidSyntax extends AdditiveSemigroupSyntax:
   // implicit def additiveMonoidOps[A](a: A)(implicit ev: AdditiveMonoid[A]): AdditiveMonoidOps[A] = new AdditiveMonoidOps(
   //   a
   // )
   extension [A](lhs: A)(using am: AdditiveMonoid[A])
     def isZero(implicit ev1: Eq[A]): Boolean = am.isZero(lhs)
-}
 
-trait AdditiveGroupSyntax extends AdditiveMonoidSyntax {
+trait AdditiveGroupSyntax extends AdditiveMonoidSyntax:
   extension [A](lhs: A)(using ev: AdditiveGroup[A])
     def unary_- : A = ev.negate(lhs)
     def -(rhs: A): A = ev.minus(lhs, rhs)
@@ -234,7 +233,6 @@ trait AdditiveGroupSyntax extends AdditiveMonoidSyntax {
   // )
   // implicit def literalDoubleAdditiveGroupOps(lhs: Double): LiteralDoubleAdditiveGroupOps =
   //   new LiteralDoubleAdditiveGroupOps(lhs)
-}
 
 
 trait MultiplicativeSemigroupSyntax:
@@ -554,19 +552,20 @@ trait ActionSyntax:
   extension[G](lhs: G)
     // Left action ops
     def |+|>[P](rhs: P)(using ev: LeftAction[P, G]): P =
-      ???
+      ev.actl(lhs, rhs)
     def +>[P](rhs: P)(using ev: AdditiveAction[P, G]): P =
-      ???
+      ev.gplusl(lhs ,rhs)
     def *>[P](rhs: P)(using ev: MultiplicativeAction[P, G]): P =
-      ???
+      ev.gtimesl(lhs, rhs)
+
   extension[P](lhs: P)
     // Right action ops
     def <|+|[G](rhs: G)(using ev: RightAction[P, G]): P =
-      ???
+      ev.actr(lhs, rhs)
     def <+[G](rhs: G)(using ev: AdditiveAction[P, G]): P =
-      ???
+      ev.gplusr(lhs ,rhs)
     def <*[G](rhs: G)(using ev: MultiplicativeAction[P, G]): P =
-      ???
+      ev.gtimesr(lhs, rhs)
   // implicit def leftActionOps[G](g: G): LeftActionOps[G] = new LeftActionOps(g)
   // implicit def rightActionOps[P](p: P): RightActionOps[P] = new RightActionOps(p)
 

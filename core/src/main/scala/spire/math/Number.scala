@@ -323,7 +323,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
 
   def compare(rhs: Number): Int = rhs match {
     case IntNumber(m)   => BigDecimal(n).compare(m.toBigDecimal)
-    case FloatNumber(m) => n.compare(m)
+    case FloatNumber(m) => Order[Double].compare(n, m)
     case t              => -t.compare(lhs)
   }
 

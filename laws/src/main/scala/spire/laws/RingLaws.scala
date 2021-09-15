@@ -13,12 +13,12 @@ import org.scalacheck.Prop._
 import InvalidTestException._
 
 object RingLaws {
-  def apply[A: Eq: Arbitrary](implicit _pred: Predicate[A]) = new RingLaws[A] {
+  def apply[A: Arbitrary](implicit _eq: Eq[A], _pred: Predicate[A]) = new RingLaws[A] {
     def Arb = implicitly[Arbitrary[A]]
     def pred = _pred
-    override val nonZeroLaws = new GroupLaws[A] {
+    val nonZeroLaws = new GroupLaws[A] {
       def Arb = Arbitrary(arbitrary[A].filter(_pred))
-      def Equ = implicitly[Eq[A]]
+      def Equ: Eq[A] = _eq
     }
   }
 }
@@ -30,8 +30,8 @@ trait RingLaws[A] extends GroupLaws[A] {
   def pred: Predicate[A]
 
   def withPred(_pred: Predicate[A], replace: Boolean = true): RingLaws[A] = RingLaws[A](
-    Equ,
     Arb,
+    Equ,
     if (replace) _pred else pred && _pred
   )
 

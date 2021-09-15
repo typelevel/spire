@@ -115,7 +115,7 @@ class CooperativeEqualitySuite extends munit.FunSuite {
   def testQuaternion[A: ConvertableFrom](a: A, name: String): Unit = {
     testEquals(a, name, Quaternion(a.toFloat()), "Quaternion[Float]")
     testEquals(a, name, Quaternion(a.toDouble()), "Quaternion[Double]")
-    // testEquals(a, name, Quaternion(a.toBigDecimal), "Quaternion[BigDecimal]")
+    // testEquals(a, name, Quaternion(a.toBigDecimal()), "Quaternion[BigDecimal]")
     testEquals(a, name, Quaternion(Real(a.toRational())), "Quaternion[Real]")
   }
 

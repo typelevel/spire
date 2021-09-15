@@ -185,7 +185,6 @@ final class GroupOps[A: Group](lhs: A) {
 
 final class AdditiveSemigroupOps[A: AdditiveSemigroup](lhs: A) {
   def +(rhs: A): A = macro Ops.binop[A, A]
-  def ^+(rhs: A): A = macro Ops.binop[A, A]
   def +(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
   def +(rhs: Double)(implicit ev1: Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
   def +(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) + rhs
@@ -193,17 +192,14 @@ final class AdditiveSemigroupOps[A: AdditiveSemigroup](lhs: A) {
 
 final class LiteralIntAdditiveSemigroupOps(val lhs: Int) extends AnyVal {
   def +[A](rhs: A)(implicit ev: Ring[A]): A = ev.plus(ev.fromInt(lhs), rhs)
-  def ^+[A](rhs: A)(implicit ev: Ring[A]): A = ev.plus(ev.fromInt(lhs), rhs)
 }
 
 final class LiteralLongAdditiveSemigroupOps(val lhs: Long) extends AnyVal {
   def +[A](rhs: A)(implicit ev: Ring[A], c: ConvertableTo[A]): A = ev.plus(c.fromLong(lhs), rhs)
-  def ^+[A](rhs: A)(implicit ev: Ring[A], c: ConvertableTo[A]): A = ev.plus(c.fromLong(lhs), rhs)
 }
 
 final class LiteralDoubleAdditiveSemigroupOps(val lhs: Double) extends AnyVal {
   def +[A](rhs: A)(implicit ev: Field[A]): A = ev.plus(ev.fromDouble(lhs), rhs)
-  def ^+[A](rhs: A)(implicit ev: Field[A]): A = ev.plus(ev.fromDouble(lhs), rhs)
 }
 
 final class AdditiveMonoidOps[A: AdditiveMonoid](lhs: A) {

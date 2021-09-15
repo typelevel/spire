@@ -99,7 +99,7 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
 
   val tries = 100
 
-  def testUnop(f: Interval[Rational] => Interval[Rational])(g: Rational => Rational): Unit = {
+  def testUnop(f: Interval[Rational] => Interval[Rational])(g: Rational => Rational) = {
     forAll { (a: Interval[Rational]) =>
       val c: Interval[Rational] = f(a)
       sample(a, tries).foreach { x =>
@@ -112,7 +112,7 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
 
   def testBinop(
     f: (Interval[Rational], Interval[Rational]) => Interval[Rational]
-  )(g: (Rational, Rational) => Rational): Unit = {
+  )(g: (Rational, Rational) => Rational) = {
     forAll { (a: Interval[Rational], b: Interval[Rational]) =>
       val c: Interval[Rational] = f(a, b)
       sample(a, tries).zip(sample(b, tries)).foreach { case (x, y) =>
@@ -125,16 +125,16 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-  // test("sampled unop abs()") { testUnop(_.abs())(_.abs()) }
-  test("sampled unop -") { testUnop(-_)(-_) }
-  test("sampled unop pow(2)") { testUnop(_.pow(2))(_.pow(2)) }
-  test("sampled unop pow(3)") { testUnop(_.pow(3))(_.pow(3)) }
+  property("sampled unop abs()") { testUnop(_.abs)(_.abs()) }
+  property("sampled unop -") { testUnop(-_)(-_) }
+  property("sampled unop pow(2)") { testUnop(_.pow(2))(_.pow(2)) }
+  property("sampled unop pow(3)") { testUnop(_.pow(3))(_.pow(3)) }
 
-  test("sampled binop +") { testBinop(_ + _)(_ + _) }
-  test("sampled binop -") { testBinop(_ - _)(_ - _) }
-  test("sampled binop *") { testBinop(_ * _)(_ * _) }
-  test("sampled binop vmin") { testBinop(_ vmin _)(_ min _) }
-  test("sampled binop vmax") { testBinop(_ vmax _)(_ max _) }
+  property("sampled binop +") { testBinop(_ + _)(_ + _) }
+  property("sampled binop -") { testBinop(_ - _)(_ - _) }
+  property("sampled binop *") { testBinop(_ * _)(_ * _) }
+  property("sampled binop vmin") { testBinop(_ vmin _)(_ min _) }
+  property("sampled binop vmax") { testBinop(_ vmax _)(_ max _) }
 
   property("toString/apply") {
     forAll { (x: Interval[Rational]) =>
