@@ -165,10 +165,8 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
 
   final def pow(k: Int): SafeLong = {
     if (k < 0) throw new IllegalArgumentException(s"negative exponent: $k")
-    // println(s"SL pow $k")
 
     @tailrec def loop(total: SafeLong, base: SafeLong, exp: Int): SafeLong = {
-      // println(s"looP $total")
       if (exp == 0) total
       else if ((exp & 1) == 1) loop(total * base, base * base, exp >> 1)
       else loop(total, base * base, exp >> 1)
@@ -247,6 +245,7 @@ object SafeLong extends SafeLongInstances {
   final private[spire] val big64: BigInteger = BigInteger.ONE.shiftLeft(63)
   final private[spire] val safe64: SafeLong = SafeLong(big64)
 
+  // scala 3 would rely on Int to Long conversions but they are no longe automatic
   implicit def apply(x: Int): SafeLong = SafeLongLong(x.toLong)
 
   implicit def apply(x: Long): SafeLong = SafeLongLong(x)
@@ -301,20 +300,22 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def +(y: Long): SafeLong =
     try {
       Checked.checked(SafeLongLong(x + y))
-    } catch { _ => SafeLongBigInteger(BigInteger.valueOf(x).add(BigInteger.valueOf(y))) }
+    } catch { 
+      case _: ArithmeticException => SafeLongBigInteger(BigInteger.valueOf(x).add(BigInteger.valueOf(y)))
+    }
 
   def -(y: Long): SafeLong =
     try {
       Checked.checked(SafeLongLong(x - y))
-    } catch { _ => SafeLongBigInteger(BigInteger.valueOf(x).subtract(BigInteger.valueOf(y))) }
+    } catch {
+      case _: ArithmeticException => SafeLongBigInteger(BigInteger.valueOf(x).subtract(BigInteger.valueOf(y)))
+    }
 
   def *(y: Long): SafeLong =
     try {
-      // println(s"Times $x $y")
       Checked.checked(SafeLongLong(x * y))
     } catch {
-      case _ =>
-        // println("fal")
+      case _: ArithmeticException =>
         SafeLongBigInteger(BigInteger.valueOf(x).multiply(BigInteger.valueOf(y)))
     }
 
@@ -396,7 +397,9 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def unary_- : SafeLong =
     try {
       Checked.checked(SafeLongLong(-x))
-    } catch { _ => SafeLongBigInteger(BigInteger.valueOf(x).negate()) }
+    } catch { 
+      case _: ArithmeticException => SafeLongBigInteger(BigInteger.valueOf(x).negate())
+    }
 
   override def <(that: SafeLong): Boolean =
     that match {

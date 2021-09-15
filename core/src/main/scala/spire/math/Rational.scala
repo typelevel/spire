@@ -350,7 +350,6 @@ object Rational extends RationalInstances {
   def apply(n: SafeLong, d: SafeLong): Rational = {
     if (d.isZero) throw new IllegalArgumentException("0 denominator")
     else if (n.isValidLong && d.isValidLong) apply(n.toLong, d.toLong)
-    // else if (d.signum < 0) return { println(s"$d ${d.signum} ${-d}"); apply(-n, -d) }
     else if (d.signum < 0) apply(-n, -d)
     else {
       val g = n.gcd(d)
@@ -678,10 +677,8 @@ object Rational extends RationalInstances {
     def round: Rational =
       if (n >= 0) {
         val m = n % d
-        // println(s"R1 $m $n $d")
         if (m >= (d - m)) Rational(n / d + 1) else Rational(n / d)
       } else {
-        // println("R2")
         val m = -(n % d)
         if (m >= (d - m)) Rational(n / d - 1) else Rational(n / d)
       }
@@ -697,27 +694,12 @@ object Rational extends RationalInstances {
 
     def compare(r: Rational): Int = r match {
       case r: LongRational =>
-        // println("Com.are")
-        // Checked.tryOrElse {
-        //   LongAlgebra.compare(n * r.d, r.n * d)
-        // } {
-        //   val dgcd = spire.math.gcd(d, r.d)
-        //   if (dgcd == 1L)
-        //     (SafeLong(n) * r.d).compare(SafeLong(r.n) * d)
-        //   else
-        //     (SafeLong(n) * (r.d / dgcd)).compare(SafeLong(r.n) * (d / dgcd))
-        // }
         try {
           Checked.checked(LongAlgebra.compare(n * r.d, r.n * d))
         } catch {
           case (_: ArithmeticException) =>
             val dgcd = spire.math.gcd(d, r.d)
-            // println(s"Caught $dgcd ${dgcd == 1L}")
             if (dgcd == 1L) {
-              // println(r.d.getClass)
-              // println((SafeLong(n) ).getClass)
-              // println((SafeLong(n) * r.d).getClass)
-              // println((SafeLong(n) * r.d).compare(SafeLong(r.n) * d))
               (SafeLong(n) * r.d).compare(SafeLong(r.n) * d)
             } else {
               (SafeLong(n) * (r.d / dgcd)).compare(SafeLong(r.n) * (d / dgcd))

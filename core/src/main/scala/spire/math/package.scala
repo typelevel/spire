@@ -532,7 +532,7 @@ package object math {
     val ay = abs(y)
     if (x == f.zero) ay
     else if (y == f.zero) ax
-    else if (ax > ay) ax * (1 + ((y / x): A) ** 2).sqrt()
+    else if (ax > ay) ax * (1 + (y / x) ** 2).sqrt()
     else ay * (1 + (x / y) ** 2).sqrt()
   }
 
