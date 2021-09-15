@@ -2,7 +2,11 @@ package spire
 package laws
 
 import spire.algebra._
-import spire.implicits._
+import spire.syntax.heyting._
+import spire.syntax.multiplicativeSemigroup._
+import spire.syntax.additiveMonoid._
+import spire.syntax.truncatedDivision._
+import spire.std.boolean._
 
 import org.typelevel.discipline.Laws
 

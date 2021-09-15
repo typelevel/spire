@@ -70,7 +70,7 @@ object RightModule {
 trait CModule[V, @sp(Int, Long, Float, Double) R] extends Any with LeftModule[V, R] with RightModule[V, R] {
   implicit def scalar: CRing[R]
 
-  def timesr(v: V, r: R): V = timesl(r, v)
+  override def timesr(v: V, r: R): V = timesl(r, v)
 }
 
 object CModule {

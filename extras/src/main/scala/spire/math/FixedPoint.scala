@@ -280,8 +280,6 @@ object FixedPoint extends FixedPointInstances {
 
   def apply(n: Rational)(implicit scale: FixedScale): FixedPoint = {
     val x = (n * scale.denom).round
-    // println(s"PR ${(n * scale.denom).getClass}")
-    // println(s"R $x ${x.toLong} ${x.getClass} ${x < Long.MinValue} ${x > Long.MaxValue}")
     if (x < Long.MinValue || x > Long.MaxValue)
       throw new FixedPointOverflow(x.toLong)
     new FixedPoint(x.toLong)

@@ -5,8 +5,6 @@ import spire.algebra._
 import spire.algebra.lattice._
 import spire.math._
 
-// import spire.macros.Ops
-
 package object unicode {
 
   type ℍ = Quaternion[Real]
@@ -49,28 +47,30 @@ package object unicode {
     def ≠(rhs: A): Boolean = ev.neqv(lhs, rhs)
   }
 
-  // implicit class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A]) {
-  //   def ≤(rhs: A): Boolean = macro Ops.binop[A, A]
-  //   def ≥(rhs: A): Boolean = macro Ops.binop[A, A]
-  // }
+  implicit class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A]) {
+    def ≤(rhs: A): Boolean = ev.lteqv(lhs, rhs)
+    def ≥(rhs: A): Boolean = ev.gteqv(lhs, rhs)
+  }
 
   implicit class MeetSemilatticeOps[A](lhs: A)(implicit ev: MeetSemilattice[A]) {
     def ∧(rhs: A): A = ev.meet(lhs, rhs)
   }
 
   implicit class JoinSemilatticeOps[A](lhs: A)(implicit ev: JoinSemilattice[A]) {
-    def ∨(rhs: A): A = ev.join(lhs, rhs) //macro Ops.binop[A, A]
+    def ∨(rhs: A): A = ev.join(lhs, rhs)
   }
 
-  // implicit class HeytingOps[A](lhs: A)(implicit ev: Heyting[A]) {
-  //   def ⊃(rhs: A): A = macro Ops.binop[A, A]
-  // }
-  //
-  // implicit class BoolOps[A](lhs: A)(implicit ev: Bool[A]) {
-  //   def ⊻(rhs: A): A = macro Ops.binop[A, A]
-  //   def ⊼(rhs: A): A = macro Ops.binop[A, A]
-  //   def ⊽(rhs: A): A = macro Ops.binop[A, A]
-  // }
+  implicit class HeytingOps[A](lhs: A)(implicit ev: Heyting[A]) {
+    // TODO verify imp is correct for the unicode character
+    def ⊃(rhs: A): A = ev.imp(lhs, rhs)
+  }
+
+  implicit class BoolOps[A](lhs: A)(implicit ev: Bool[A]) {
+    // TODO verify the calls are correct for the unicode character
+    def ⊻(rhs: A): A = ev.nor(lhs, rhs)
+    def ⊼(rhs: A): A = ev.nand(lhs, rhs)
+    def ⊽(rhs: A): A = ev.nxor(lhs, rhs)
+  }
 
   implicit class SymbolicSetOps[A](val lhs: Set[A]) extends AnyVal {
     def ∋(a: A): Boolean = lhs(a)

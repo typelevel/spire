@@ -91,12 +91,12 @@ class SyntaxScalaCheckSuite extends munit.ScalaCheckSuite with BaseSyntaxSuite {
   property("NormedVectorSpace syntax")(forAll { (v: Vector[Double], w: Vector[Double], a: NonZero[Double]) =>
     testNormedVectorSpaceSyntax(v, w, a.x)
   })
-  // property("InnerProductSpace syntax")(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
-  //   testInnerProductSpaceSyntax(v, w, a.x)
-  // })
-  // property("CoordinateSpace syntax")(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
-  //   testCoordinateSpaceSyntax(v, w, a.x)(CoordinateSpace.seq[Rational, Vector](3), implicitly, implicitly)
-  // })
+  property("InnerProductSpace syntax")(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
+    testInnerProductSpaceSyntax(v, w, a.x)
+  })
+  property("CoordinateSpace syntax")(forAll { (v: Vector[Rational], w: Vector[Rational], a: NonZero[Rational]) =>
+    testCoordinateSpaceSyntax(v, w, a.x)(CoordinateSpace.seq[Rational, Vector](3), implicitly, implicitly)
+  })
   property("Bool syntax")(forAll { (a: Int, b: Int) => testBoolSyntax(a, b) })
 }
 
