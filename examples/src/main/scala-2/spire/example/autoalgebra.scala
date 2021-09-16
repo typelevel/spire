@@ -64,7 +64,7 @@ object AutoAlgebraExample extends App {
 
   assert(-JRational.valueOf(2L, 1L) === JRational.valueOf(-2L, 1L))
 
-  // On top of that, Auto also has some basic support for J\ffava collections.
+  // On top of that, Auto also has some basic support for Java collections.
   // Do you really love `java.util._`? Probably not, but let's say you still
   // need to work with Java Lists, so you want to create a monoid for it.
 

@@ -7,8 +7,6 @@ import interval.Overlap._
 import org.scalacheck.Prop._
 
 class IntervalOverlapScalaCheckSuite extends munit.ScalaCheckSuite {
-  implicitly[cats.kernel.Order[Rational]]
-  implicitly[cats.kernel.Order[Rational]]
 
   property("(x overlap y) = (y overlap x)") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>

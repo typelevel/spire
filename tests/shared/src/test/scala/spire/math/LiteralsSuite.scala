@@ -16,15 +16,6 @@ class LiteralsSuite extends munit.FunSuite {
     assert(compileErrors("""b"256"""").contains("illegal constant: 256"))
   }
 
-  // test("illegal byte literals") {
-  //   import spire.macros._
-  //   def tryit(s: String) = Macros.parseNumber(s, BigInt(-128), BigInt(255))
-  //   assertEquals(tryit("-129"), Left("illegal constant: -129"))
-  //   assertEquals(tryit("256"), Left("illegal constant: 256"))
-  //   assertEquals(tryit("10000"), Left("illegal constant: 10000"))
-  //   assertEquals(tryit("abc"), Left("illegal constant: abc"))
-  // }
-
   test("short literals") {
     import spire.syntax.literals._
     assertEquals(h"-32768", (-32768: Short))

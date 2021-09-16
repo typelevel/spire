@@ -249,24 +249,6 @@ object IntervalSeq {
     simpleSets.foldLeft(empty[Rational])(_ | _)
   }
 
-  // implicit def booleanAlgebra[T: Order]: Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] = new Bool[IntervalSeq[T]]
-  //   with Eq[IntervalSeq[T]] {
-  //
-  //   def eqv(x: IntervalSeq[T], y: IntervalSeq[T]) = x == y
-  //
-  //   def zero = IntervalSeq.empty[T]
-  //
-  //   def one = IntervalSeq.all[T]
-  //
-  //   def complement(a: IntervalSeq[T]) = ~a
-  //
-  //   def or(a: IntervalSeq[T], b: IntervalSeq[T]) = a | b
-  //
-  //   def and(a: IntervalSeq[T], b: IntervalSeq[T]) = a & b
-  //
-  //   override def xor(a: IntervalSeq[T], b: IntervalSeq[T]) = a ^ b
-  // }
-
   private def fromTo[T: Order](a: T, ak: Byte, b: T, bk: Byte) =
     new IntervalSeq[T](false, Array(a, b)(classTag), Array(ak, bk), implicitly[Order[T]])
 

@@ -13,7 +13,6 @@ import scala.util.Try
 import org.scalacheck.Prop._
 
 class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
-  override val scalaCheckInitialSeed = "dh5ox6lA1dlPi4yZJFOMk7qe_CPWAX4Ft2WDOuZ7nyN="
 
   implicit val arbFixedScale: Arbitrary[FixedScale] =
     Arbitrary(arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale.apply))
