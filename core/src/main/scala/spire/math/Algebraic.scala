@@ -1349,7 +1349,8 @@ object Algebraic extends AlgebraicInstances {
     }
 
     @nowarn
-    def apply(expr: Algebraic.Expr): Bound = checked {
+    // TODO Restore the checked call
+    def apply(expr: Algebraic.Expr): Bound = {
       // Unfortunately, we must call degreeBound early, to avoid many redundant
       // traversals of the Expr tree. Getting this out of the way early on
       // means that we will traverse the tree once and populate the degreeBound
@@ -1371,14 +1372,13 @@ object Algebraic extends AlgebraicInstances {
 
         case root @ ConstantRoot(poly, _, _, _) =>
           // Bound on the euclidean distance of the coefficients.
-          val distBound = 1L
-          // poly.terms.map { case Term(c, _) =>
-          //   2L * c.bitLength.toLong
-          // }//.qsum // / 2L + 1L
+          val distBound = poly.terms.map { case Term(c, _) =>
+            2L * c.bitLength.toLong
+          }.qsum / 2L + 1L
           Bound(
             root.lead.bitLength + 1L,
             root.tail.bitLength + 1L,
-            (distBound / 2L) + 1L,
+            distBound,
             Roots.lowerBound(poly),
             Roots.upperBound(poly)
           )
