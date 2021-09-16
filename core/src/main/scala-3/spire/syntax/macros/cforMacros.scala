@@ -6,14 +6,11 @@ import collection.immutable.NumericRange
 
 import spire.syntax.cfor.{RangeLike, RangeElem}
 
-inline def cforInline[R](init: R, test: R => Boolean, next: R => R, body: R => Unit): Unit = {
+inline def cforInline[R](init: R, test: R => Boolean, next: R => R, body: R => Unit): Unit =
   var index = init
-  // val body0 = body
-  while (test(index)) {
+  while (test(index))
     body(index)
     index = next(index)
-  }
-}
 
 def cforRangeMacroGen[R <: RangeLike : Type](r: Expr[R], body: Expr[RangeElem[R] => Unit])(using quotes: Quotes): Expr[Unit] =
   import quotes._
@@ -24,7 +21,7 @@ def cforRangeMacroGen[R <: RangeLike : Type](r: Expr[R], body: Expr[RangeElem[R]
   (r, body) match
     case '{$r: Range             } -> '{$body: (Int => Unit) } => cforRangeMacro(r, body)
     case '{$r: NumericRange[Long]} -> '{$body: (Long => Unit)} => cforRangeMacroLong(r, body)
-    case '{$r}                 -> _                        => report.error(s"Uneligable Range type ", r); '{}
+    case '{$r}                     -> _                        => report.error(s"Uneligable Range type ", r); '{}
 
 end cforRangeMacroGen
 
@@ -32,7 +29,7 @@ def cforRangeMacroLong(r: Expr[NumericRange[Long]], body: Expr[Long => Unit])(us
   import quotes._
   import quotes.reflect.*
 
-  def strideUpUntil(fromExpr: Expr[Long], untilExpr: Expr[Long], stride: Expr[Long]): Expr[Unit] = {
+  def strideUpUntil(fromExpr: Expr[Long], untilExpr: Expr[Long], stride: Expr[Long]): Expr[Unit] =
 
     '{
     var index = $fromExpr
@@ -42,7 +39,6 @@ def cforRangeMacroLong(r: Expr[NumericRange[Long]], body: Expr[Long => Unit])(us
       ${ Expr.betaReduce(body) }(index)
       index += $stride
     }
-  }
 
   def strideUpTo(fromExpr: Expr[Long], untilExpr: Expr[Long], stride: Expr[Long]): Expr[Unit] = '{
     var index = $fromExpr
@@ -117,28 +113,25 @@ def cforRangeMacro(r: Expr[Range], body: Expr[Int => Unit])(using quotes: Quotes
   def strideUpTo(fromExpr: Expr[Int], untilExpr: Expr[Int], stride: Expr[Int]): Expr[Unit] = '{
     var index = $fromExpr
     val end   = $untilExpr
-    while (index <= end) {
+    while (index <= end)
       ${ Expr.betaReduce(body) }(index)
       index += $stride
-    }
   }
 
   def strideDownTo(fromExpr: Expr[Int], untilExpr: Expr[Int], stride: Expr[Int]): Expr[Unit] = '{
     var index = $fromExpr
     val end   = $untilExpr
-    while (index >= end) {
+    while (index >= end)
       ${ Expr.betaReduce(body) }(index)
       index -= $stride
-    }
   }
 
   def strideDownUntil(fromExpr: Expr[Int], untilExpr: Expr[Int], stride: Expr[Int]): Expr[Unit] = '{
     var index = $fromExpr
     val limit = $untilExpr
-    while (index > limit) {
+    while (index > limit)
       ${ Expr.betaReduce(body) }(index)
       index -= $stride
-    }
   }
 
   r match

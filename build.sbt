@@ -92,7 +92,6 @@ lazy val spireJS = project
 lazy val platform = crossProject(JSPlatform, JVMPlatform)
   .settings(moduleName := "spire-platform")
   .settings(spireSettings: _*)
-  .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
   .dependsOn(macros, util)
@@ -103,7 +102,6 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
   .settings(spireSettings: _*)
   .settings(scalaCheckSettings: _*)
   .settings(munitSettings: _*)
-  .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
 
@@ -111,7 +109,6 @@ lazy val data = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .settings(moduleName := "spire-data")
   .settings(spireSettings: _*)
-  .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
 
@@ -119,7 +116,6 @@ lazy val legacy = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .settings(moduleName := "spire-legacy")
   .settings(spireSettings: _*)
-  .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
 
@@ -127,7 +123,6 @@ lazy val util = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .settings(moduleName := "spire-util")
   .settings(spireSettings: _*)
-  .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
   .dependsOn(macros)
@@ -137,7 +132,6 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(moduleName := "spire")
   .settings(spireSettings: _*)
   .settings(coreSettings: _*)
-  .settings(crossVersionSharedSources: _*)
   .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
@@ -202,7 +196,6 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform)
   .settings(moduleName := "spire-tests")
   .settings(spireSettings: _*)
   .settings(munitSettings: _*)
-  .settings(crossVersionSharedSources: _*)
   .settings(noPublishSettings: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
@@ -452,13 +445,9 @@ lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
 lazy val commonScalacOptions = Def.setting(
   (CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, v)) if v >= 13 =>
-      Seq(
-        // "-Yno-adapted-args",
-        // "-Xfuture"
-      )
+      Seq()
     case _ =>
-      Seq(
-      )
+      Seq()
   }) ++ Seq(
     "-deprecation",
     "-encoding",
