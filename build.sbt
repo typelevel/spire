@@ -172,6 +172,7 @@ lazy val docs = project
 lazy val examples = project
   .settings(moduleName := "spire-examples")
   .settings(spireSettings)
+  .settings(crossVersionSharedSources: _*)
   .settings(
     libraryDependencies ++= Seq(
       "org.apfloat" % "apfloat" % apfloatVersion,

@@ -45,4 +45,3 @@ case class Const[+A](a: A) extends Op[A]
 case class More[+A](k: () => Op[A]) extends Op[A]
 case class Next[+A](f: Generator => A) extends Op[A]
 case class FlatMap[A, +B](sub: Op[A], k: A => Op[B]) extends Op[B]
-

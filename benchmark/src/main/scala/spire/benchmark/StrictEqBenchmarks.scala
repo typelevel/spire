@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit
 
 import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
-import spire.implicits._
+import spire.syntax.eq._
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -28,7 +28,6 @@ class LongEqualityCheckBenchmark {
 
   @Benchmark
   def eqeqeq(x: Blackhole): Unit = {
-    import spire.implicits._
     x.consume(a === b)
   }
 }

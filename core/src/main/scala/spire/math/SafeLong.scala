@@ -300,7 +300,7 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def +(y: Long): SafeLong =
     try {
       Checked.checked(SafeLongLong(x + y))
-    } catch { 
+    } catch {
       case _: ArithmeticException => SafeLongBigInteger(BigInteger.valueOf(x).add(BigInteger.valueOf(y)))
     }
 
@@ -397,7 +397,7 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def unary_- : SafeLong =
     try {
       Checked.checked(SafeLongLong(-x))
-    } catch { 
+    } catch {
       case _: ArithmeticException => SafeLongBigInteger(BigInteger.valueOf(x).negate())
     }
 

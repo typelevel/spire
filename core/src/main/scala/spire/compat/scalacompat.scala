@@ -6,4 +6,3 @@ trait ScalaOrderingWrapperCompat[A] extends scala.math.Ordering[A] {
 }
 
 trait BuilderCompat[-A, +To] extends scala.collection.mutable.Builder[A, To]
-
