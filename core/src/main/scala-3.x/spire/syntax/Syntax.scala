@@ -120,12 +120,35 @@ trait TruncatedDivisionSyntax extends SignedSyntax:
     def fmod(rhs: A): A = ev.fmod(lhs, rhs)
     def fquotmod(rhs: A): (A, A) = ev.fquotmod(lhs, rhs)
 
-  implicit def literalIntTruncatedDivisionOps(lhs: Int): LiteralIntTruncatedDivisionOps =
-    new LiteralIntTruncatedDivisionOps(lhs)
-  implicit def literalLongTruncatedDivisionOps(lhs: Long): LiteralLongTruncatedDivisionOps =
-    new LiteralLongTruncatedDivisionOps(lhs)
-  implicit def literalDoubleTruncatedDivisionOps(lhs: Double): LiteralDoubleTruncatedDivisionOps =
-    new LiteralDoubleTruncatedDivisionOps(lhs)
+  extension(lhs: Int)
+    def tquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromInt(lhs), rhs)
+    def tmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromInt(lhs), rhs)
+    def tquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
+      ev.tquotmod(c.fromInt(lhs), rhs)
+    def fquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromInt(lhs), rhs)
+    def fmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromInt(lhs), rhs)
+    def fquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
+      ev.fquotmod(c.fromInt(lhs), rhs)
+
+  extension(lhs: Long)
+    def tquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromLong(lhs), rhs)
+    def tmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromLong(lhs), rhs)
+    def tquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
+      ev.tquotmod(c.fromLong(lhs), rhs)
+    def fquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromLong(lhs), rhs)
+    def fmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromLong(lhs), rhs)
+    def fquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
+      ev.fquotmod(c.fromLong(lhs), rhs)
+
+  extension(lhs: Double)
+    def tquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromDouble(lhs), rhs)
+    def tmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromDouble(lhs), rhs)
+    def tquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
+      ev.tquotmod(c.fromDouble(lhs), rhs)
+    def fquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromDouble(lhs), rhs)
+    def fmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromDouble(lhs), rhs)
+    def fquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
+      ev.fquotmod(c.fromDouble(lhs), rhs)
 end TruncatedDivisionSyntax
 
 trait InvolutionSyntax:
@@ -151,7 +174,11 @@ end SemigroupoidSyntax
 trait GroupoidSyntax extends SemigroupoidSyntax:
   @nowarn
   implicit def groupoidCommonOps[A](a: A)(using ev: Groupoid[A], ni: NoImplicit[Monoid[A]]): GroupoidCommonOps[A] =
-    new GroupoidCommonOps[A](a)(ev)
+    new GroupoidCommonOps[A](a)
+  // TODO use an extension heere
+  // extension[A](lhs: A)(using ev: Groupoid[A], ni: NoImplicit[Monoid[A]])
+  //   def inverse(): A = ev.inverse(lhs)
+    // def isId(implicit ev1: Eq[A]): Boolean = ev.isId(lhs)(ev1)
   extension[A](lhs: A)(using ev: Groupoid[A])
     def leftId(): A = ev.leftId(lhs)
     def rightId(): A = ev.rightId(lhs)
@@ -160,14 +187,14 @@ trait GroupoidSyntax extends SemigroupoidSyntax:
 end GroupoidSyntax
 
 trait SemigroupSyntax:
-  implicit def semigroupOps[A: Semigroup](a: A): SemigroupOps[A] = new SemigroupOps(a)
+  extension[A](lhs: A)(using ev: Semigroup[A])
+    def |+|(rhs: A): A = ev.combine(lhs, rhs)
 end SemigroupSyntax
 
 trait MonoidSyntax extends SemigroupSyntax:
   extension[A](lhs: A)(using ev: Monoid[A])
     def isEmpty(using ev1: Eq[A]): Boolean = ev.isEmpty(lhs)
 end MonoidSyntax
-
 
 trait GroupSyntax extends MonoidSyntax:
   extension[A](lhs: A)(using ev: Group[A])
@@ -194,7 +221,7 @@ end AdditiveSemigroupSyntax
 
 trait AdditiveMonoidSyntax extends AdditiveSemigroupSyntax:
   extension [A](lhs: A)(using am: AdditiveMonoid[A])
-    def isZero(implicit ev1: Eq[A]): Boolean = am.isZero(lhs)
+    def isZero(using ev1: Eq[A]): Boolean = am.isZero(lhs)
 end AdditiveMonoidSyntax
 
 trait AdditiveGroupSyntax extends AdditiveMonoidSyntax:
@@ -218,8 +245,8 @@ end AdditiveGroupSyntax
 trait MultiplicativeSemigroupSyntax:
   extension[A](lhs: A)(using ms: MultiplicativeSemigroup[A])
     def *(rhs: A): A = ms.times(lhs, rhs)
-    def *(rhs: Int)(using ev1: Ring[A]): A = ms.times(lhs, ev1.fromInt(rhs)) //macro Ops.binopWithLift[Int, Ring[A], A]
-    def *(rhs: Double)(using ev1: Field[A]): A = ms.times(lhs, ev1.fromDouble(rhs)) //macro Ops.binopWithLift[Double, Field[A], A]
+    def *(rhs: Int)(using ev1: Ring[A]): A = ms.times(lhs, ev1.fromInt(rhs)) 
+    def *(rhs: Double)(using ev1: Field[A]): A = ms.times(lhs, ev1.fromDouble(rhs))
     def *(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs) * rhs
 
   extension(lhs: Long)
@@ -233,37 +260,27 @@ trait MultiplicativeSemigroupSyntax:
 end MultiplicativeSemigroupSyntax
 
 trait MultiplicativeMonoidSyntax extends MultiplicativeSemigroupSyntax:
-  implicit def multiplicativeMonoidOps[A](a: A)(implicit ev: MultiplicativeMonoid[A]): MultiplicativeMonoidOps[A] =
-    new MultiplicativeMonoidOps(a)
+  extension[A](a: A)(using ev: MultiplicativeMonoid[A])
+    def isOne(using ev1: Eq[A]): Boolean = ev.isOne(a)
 end MultiplicativeMonoidSyntax
 
-trait MultiplicativeGroupSyntax extends MultiplicativeMonoidSyntax {
-  implicit def multiplicativeGroupOps[A: MultiplicativeGroup](a: A): MultiplicativeGroupOps[A] =
-    new MultiplicativeGroupOps(a)
-  implicit def literalIntMultiplicativeGroupOps(lhs: Int): LiteralIntMultiplicativeGroupOps =
-    new LiteralIntMultiplicativeGroupOps(lhs)
-  implicit def literalLongMultiplicativeGroupOps(lhs: Long): LiteralLongMultiplicativeGroupOps =
-    new LiteralLongMultiplicativeGroupOps(lhs)
-  implicit def literalDoubleMultiplicativeGroupOps(lhs: Double): LiteralDoubleMultiplicativeGroupOps =
-    new LiteralDoubleMultiplicativeGroupOps(lhs)
-}
+trait MultiplicativeGroupSyntax extends MultiplicativeMonoidSyntax:
+  extension [A ](lhs: A)(using mg: MultiplicativeGroup[A])
+    def reciprocal(): A = mg.reciprocal(lhs)
+    def /(rhs: A): A = mg.div(lhs, rhs)
+    def /(rhs: Int)(using ev1: Ring[A]): A = mg.div(lhs, ev1.fromInt(rhs))
+    def /(rhs: Double)(using ev1: Field[A]): A = mg.div(lhs, ev1.fromDouble(rhs))
+    def /(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs) / rhs
+  extension(lhs: Int)
+    def /[A](rhs: A)(using ev: Field[A]): A = ev.div(ev.fromInt(lhs), rhs)
 
-// trait MultiplicativeGroupSyntax extends MultiplicativeMonoidSyntax {
-//
-//   extension [A ](lhs: A)(using mg: MultiplicativeGroup[A])
-//     def reciprocal(): A = mg.reciprocal(lhs)
-//     infix def /(rhs: A): A = mg.div(lhs, rhs)
-//     infix def /(rhs: Int)(implicit ev1: Ring[A]): A = mg.div(lhs, ev1.fromInt(rhs)) //macro Ops.binopWithLift[Int, Ring[A], A]
-//     infix def /(rhs: Double)(implicit ev1: Field[A]): A = mg.div(lhs, ev1.fromDouble(rhs)) //macro Ops.binopWithLift[Double, Field[A], A]
-//     infix def /(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) / rhs
-//
-//   implicit def literalIntMultiplicativeGroupOps(lhs: Int): LiteralIntMultiplicativeGroupOps =
-//     new LiteralIntMultiplicativeGroupOps(lhs)
-//   implicit def literalLongMultiplicativeGroupOps(lhs: Long): LiteralLongMultiplicativeGroupOps =
-//     new LiteralLongMultiplicativeGroupOps(lhs)
-//   implicit def literalDoubleMultiplicativeGroupOps(lhs: Double): LiteralDoubleMultiplicativeGroupOps =
-//     new LiteralDoubleMultiplicativeGroupOps(lhs)
-// }
+  extension(lhs: Long)
+    def /[A](rhs: A)(using ev: Field[A], c: ConvertableTo[A]): A = ev.div(c.fromLong(lhs), rhs)
+
+  extension(lhs: Double)
+    def /[A](rhs: A)(using ev: Field[A]): A = ev.div(ev.fromDouble(lhs), rhs)
+end MultiplicativeGroupSyntax
+
 
 trait SemiringSyntax extends AdditiveSemigroupSyntax with MultiplicativeSemigroupSyntax:
   final class SemiringOps[A](lhs: A)(using ev: Semiring[A]):
@@ -298,13 +315,13 @@ trait EuclideanRingSyntax extends GCDRingSyntax:
     def equotmod(rhs: Int)(using ev1: Ring[A]): (A, A) = er.equotmod(lhs, ev1.fromInt(rhs))
     //
     def equot(rhs: Double)(using ev1: Field[A]): A = er.equot(lhs, ev1.fromDouble(rhs))
-    def emod(rhs: Double)(implicit ev1: Field[A]): A = er.emod(lhs, ev1.fromDouble(rhs))
-    def equotmod(rhs: Double)(implicit ev1: Field[A]): (A, A) = er.equotmod(lhs, ev1.fromDouble(rhs))
+    def emod(rhs: Double)(using ev1: Field[A]): A = er.emod(lhs, ev1.fromDouble(rhs))
+    def equotmod(rhs: Double)(using ev1: Field[A]): (A, A) = er.equotmod(lhs, ev1.fromDouble(rhs))
 
     /* TODO: move to TruncatedDivision
-    def /~(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) /~ rhs
-    def %(rhs:Number)(implicit c:ConvertableFrom[A]): Number = c.toNumber(lhs) % rhs
-    def /%(rhs:Number)(implicit c:ConvertableFrom[A]): (Number, Number) = c.toNumber(lhs) /% rhs
+    def /~(rhs:Number)(using c:ConvertableFrom[A]): Number = c.toNumber(lhs) /~ rhs
+    def %(rhs:Number)(using c:ConvertableFrom[A]): Number = c.toNumber(lhs) % rhs
+    def /%(rhs:Number)(using c:ConvertableFrom[A]): (Number, Number) = c.toNumber(lhs) /% rhs
     */
   extension(lhs: Int)
     def equot[A](rhs: A)(using ev: EuclideanRing[A]): A = ev.equot(ev.fromInt(lhs), rhs)
@@ -318,9 +335,9 @@ trait EuclideanRingSyntax extends GCDRingSyntax:
       ev.equotmod(c.fromLong(lhs), rhs)
 
   extension(lhs: Double)
-    def equot[A](rhs: A)(implicit ev: Field[A]): A = ev.equot(ev.fromDouble(lhs), rhs)
-    def emod[A](rhs: A)(implicit ev: Field[A]): A = ev.emod(ev.fromDouble(lhs), rhs)
-    def equotmod[A](rhs: A)(implicit ev: Field[A]): (A, A) = ev.equotmod(ev.fromDouble(lhs), rhs)
+    def equot[A](rhs: A)(using ev: Field[A]): A = ev.equot(ev.fromDouble(lhs), rhs)
+    def emod[A](rhs: A)(using ev: Field[A]): A = ev.emod(ev.fromDouble(lhs), rhs)
+    def equotmod[A](rhs: A)(using ev: Field[A]): (A, A) = ev.equotmod(ev.fromDouble(lhs), rhs)
 
 trait FieldSyntax extends EuclideanRingSyntax with MultiplicativeGroupSyntax
 
@@ -346,23 +363,40 @@ trait NRootSyntax {
     def **[A](rhs: A)(using ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromDouble(lhs), rhs)
 }
 
-trait LeftModuleSyntax extends RingSyntax {
-  implicit def leftModuleOps[V](v: V): LeftModuleOps[V] = new LeftModuleOps[V](v)
-}
+trait LeftModuleSyntax extends RingSyntax:
+  implicit def lms[V](v: V): LeftModuleOps[V] = new LeftModuleOps[V](v)
+  // Left module
+  // extension[V](x: V)
+  //   def *:[F](lhs: F)(using ev: LeftModule[V, F]): V = ev.timesl(lhs, x)
+    // def *:[F](lhs: Int)(using ev: LeftModule[V, F], F: Ring[F]): V = ev.timesl(F.fromInt(lhs), x)
+end LeftModuleSyntax
 
-trait RightModuleSyntax extends RingSyntax {
-  implicit def rightModuleOps[V](v: V): RightModuleOps[V] = new RightModuleOps[V](v)
-}
+trait RightModuleSyntax extends RingSyntax:
+  implicit def rms[V](v: V): RightModuleOps[V] = new RightModuleOps[V](v)
+  // Right module
+  // extension[V](x: V)
+  //   def :*[F](rhs: F)(using ev: RightModule[V, F]): V = ev.timesr(x, rhs)
+  //   def :*[F](rhs: Int)(using ev: RightModule[V, F], F: Ring[F]): V = ev.timesr(x, F.fromInt(rhs))
+end RightModuleSyntax
 
 trait CModuleSyntax extends LeftModuleSyntax with RightModuleSyntax
 
 trait VectorSpaceSyntax extends CModuleSyntax with FieldSyntax {
-  implicit def vectorSpaceOps[V](v: V): VectorSpaceOps[V] = new VectorSpaceOps[V](v)
+  extension[V](x: V)
+    def :/[F](rhs: F)(using ev: VectorSpace[V, F]): V = ev.divr(x, rhs)
+
+    //def *:[F](lhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesl(ev.scalar.fromDouble(lhs), x)
+    //def :*[F](rhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesr(x, ev.scalar.fromDouble(rhs))
+
+    def :/[F](rhs: Int)(using ev: VectorSpace[V, F]): V = ev.divr(x, ev.scalar.fromInt(rhs))
+    def :/[F](rhs: Double)(using ev: VectorSpace[V, F]): V = ev.divr(x, ev.scalar.fromDouble(rhs))
 }
 
-trait MetricSpaceSyntax extends VectorSpaceSyntax {
-  implicit def metricSpaceOps[V](v: V): MetricSpaceOps[V] = new MetricSpaceOps[V](v)
-}
+trait MetricSpaceSyntax extends VectorSpaceSyntax:
+  extension[V](lhs: V)
+    def distance[F](rhs: V)(using ev: MetricSpace[V, F]): F =
+      ev.distance(lhs, rhs)
+end MetricSpaceSyntax
 
 trait NormedVectorSpaceSyntax extends MetricSpaceSyntax:
   extension[V](lhs: V)
@@ -371,6 +405,7 @@ trait NormedVectorSpaceSyntax extends MetricSpaceSyntax:
 
     def normalize[F](using ev: NormedVectorSpace[V, F]): V =
       ev.normalize(lhs)
+end NormedVectorSpaceSyntax
 
 trait InnerProductSpaceSyntax extends VectorSpaceSyntax:
   extension [V](lhs: V)
@@ -378,6 +413,7 @@ trait InnerProductSpaceSyntax extends VectorSpaceSyntax:
       ev.dot(lhs, rhs)
     def ⋅[F](rhs: V)(using ev: InnerProductSpace[V, F]): F =
       ev.dot(lhs, rhs)
+end InnerProductSpaceSyntax
 
 trait CoordinateSpaceSyntax extends InnerProductSpaceSyntax:
   extension[V](v: V)
@@ -395,30 +431,31 @@ trait CoordinateSpaceSyntax extends InnerProductSpaceSyntax:
 
     def dimensions[F](using ev: CoordinateSpace[V, F]): Int =
       ev.dimensions
+end CoordinateSpaceSyntax
 
-trait TrigSyntax {
+trait TrigSyntax:
   extension[A](lhs: A)(using ev: Trig[A])
     def exp(): A = ev.exp(lhs)
     def log(): A = ev.log(lhs)
 
     def log(base: Int)(using f: Field[A]): A =
       f.div(ev.log(lhs), ev.log(f.fromInt(base)))
-}
+end TrigSyntax
 
 trait LatticeSyntax:
   extension[A](lhs: A)(using ev: MeetSemilattice[A])
     def meet(rhs: A): A = ev.meet(lhs, rhs)
     def ∧(rhs: A): A = ev.meet(lhs, rhs)
 
-    def meet(rhs: Int)(implicit ev1: Ring[A]): A = ev.meet(lhs, ev1.fromInt(rhs))
-    def ∧(rhs: Int)(implicit ev1: Ring[A]): A = ev.meet(lhs, ev1.fromInt(rhs))
+    def meet(rhs: Int)(using ev1: Ring[A]): A = ev.meet(lhs, ev1.fromInt(rhs))
+    def ∧(rhs: Int)(using ev1: Ring[A]): A = ev.meet(lhs, ev1.fromInt(rhs))
 
   extension[A](lhs: A)(using ev: JoinSemilattice[A])
     def join(rhs: A): A = ev.join(lhs, rhs)
     def ∨(rhs: A): A = ev.join(lhs, rhs)
 
-    def join(rhs: Int)(implicit ev1: Ring[A]): A = ev.join(lhs, ev1.fromInt(rhs))
-    def ∨(rhs: Int)(implicit ev1: Ring[A]): A = ev.join(lhs, ev1.fromInt(rhs))
+    def join(rhs: Int)(using ev1: Ring[A]): A = ev.join(lhs, ev1.fromInt(rhs))
+    def ∨(rhs: Int)(using ev1: Ring[A]): A = ev.join(lhs, ev1.fromInt(rhs))
 
 trait HeytingSyntax:
   extension[A](lhs: A)(using ev: Heyting[A])
@@ -428,8 +465,9 @@ trait HeytingSyntax:
     def &(rhs: A): A = ev.and(lhs, rhs)
     def |(rhs: A): A = ev.or(lhs, rhs)
 
-    def &(rhs: Int)(implicit ev1: Ring[A]): A = ev.and(lhs, ev1.fromInt(rhs))
-    def |(rhs: Int)(implicit ev1: Ring[A]): A = ev.or(lhs, ev1.fromInt(rhs))
+    def &(rhs: Int)(using ev1: Ring[A]): A = ev.and(lhs, ev1.fromInt(rhs))
+    def |(rhs: Int)(using ev1: Ring[A]): A = ev.or(lhs, ev1.fromInt(rhs))
+end HeytingSyntax
 
 trait LogicSyntax:
   extension[A](lhs: A)(using ev: Logic[A])
@@ -438,19 +476,20 @@ trait LogicSyntax:
     def &(rhs: A): A = ev.and(lhs, rhs)
     def |(rhs: A): A = ev.or(lhs, rhs)
 
-    def &(rhs: Int)(implicit ev1: Ring[A]): A = ev.and(lhs, ev1.fromInt(rhs))
-    def |(rhs: Int)(implicit ev1: Ring[A]): A = ev.or(lhs, ev1.fromInt(rhs))
+    def &(rhs: Int)(using ev1: Ring[A]): A = ev.and(lhs, ev1.fromInt(rhs))
+    def |(rhs: Int)(using ev1: Ring[A]): A = ev.or(lhs, ev1.fromInt(rhs))
+end LogicSyntax
 
-trait BoolSyntax extends HeytingSyntax {
+trait BoolSyntax extends HeytingSyntax:
   extension[A](lhs: A)(using ev: Bool[A])
     def ^(rhs: A): A = ev.xor(lhs, rhs)
     def nand(rhs: A): A = ev.nand(lhs, rhs)
     def nor(rhs: A): A = ev.nor(lhs, rhs)
     def nxor(rhs: A): A = ev.nxor(lhs, rhs)
 
-    def ^(rhs: Int)(implicit ev1: Ring[A]): A = lhs ^ ev1.fromInt(rhs)
-    def ^(rhs: Number)(implicit c: ConvertableFrom[A]): Number = c.toNumber(lhs) ^ rhs
-}
+    def ^(rhs: Int)(using ev1: Ring[A]): A = lhs ^ ev1.fromInt(rhs)
+    def ^(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs) ^ rhs
+end BoolSyntax
 
 trait BitStringSyntax:
   extension[A](lhs: A)(using ev: BitString[A])
@@ -468,6 +507,7 @@ trait BitStringSyntax:
 
     def rotateLeft(rhs: Int): A = ev.rotateLeft(lhs, rhs)
     def rotateRight(rhs: Int): A = ev.rotateRight(lhs, rhs)
+end BitStringSyntax
 
 trait PartialActionSyntax:
   extension[G](lhs: G)
@@ -480,6 +520,7 @@ trait PartialActionSyntax:
       ev.partialActr(lhs, rhs)
     def <|+|??[G](rhs: G)(using ev: RightPartialAction[P, G]): Boolean =
       ev.actrIsDefined(lhs, rhs)
+end PartialActionSyntax
 
 trait ActionSyntax:
   extension[G](lhs: G)
@@ -500,35 +541,28 @@ trait ActionSyntax:
     def <*[G](rhs: G)(using ev: MultiplicativeAction[P, G]): P =
       ev.gtimesr(lhs, rhs)
 
-trait IntervalSyntax {
-  implicit def groupActionGroupOps[A: Order: AdditiveGroup](a: A): IntervalPointOps[A] =
-    new IntervalPointOps(a)
-}
+trait IntervalSyntax:
+  extension[A](lhs: A)(using o: Order[A], ev: AdditiveGroup[A])
+    def ±(rhs: A): Interval[A] =
+      Interval(ev.minus(lhs, rhs), ev.plus(lhs, rhs))
+    def +/-(rhs: A): Interval[A] =
+      Interval(ev.minus(lhs, rhs), ev.plus(lhs, rhs))
+end IntervalSyntax
 
-trait UnboundSyntax {
-  implicit def moduleUnboundOps[F](f: F)(implicit ev: CModule[_, F]): ModuleUnboundOps[F] =
-    new ModuleUnboundOps(f)
+@deprecated
+trait UnboundSyntax
 
-  implicit def vectorSpaceUnboundOps[F](f: F)(implicit ev: VectorSpace[_, F]): VectorSpaceUnboundOps[F] =
-    new VectorSpaceUnboundOps(f)
+trait TorsorSyntax:
+  extension[P](lhs: P)
+    def <->[G](rhs: P)(using ev: AdditiveTorsor[P, G]): G =
+      ev.pminus(lhs, rhs)
+    def </>[G](rhs: P)(using ev: MultiplicativeTorsor[P, G]): G =
+      ev.pdiv(lhs, rhs)
+end TorsorSyntax
 
-  implicit def groupActionUnboundOps[G](g: G)(implicit ev: Action[_, G]): ActionUnboundOps[G] =
-    new ActionUnboundOps(g)
-  implicit def additiveActionUnboundOps[G](g: G)(implicit ev: AdditiveAction[_, G]): AdditiveActionUnboundOps[G] =
-    new AdditiveActionUnboundOps(g)
-  implicit def multiplicativeActionUnboundOps[G](g: G)(implicit
-    ev: MultiplicativeAction[_, G]
-  ): MultiplicativeActionUnboundOps[G] =
-    new MultiplicativeActionUnboundOps(g)
-}
-
-trait TorsorSyntax {
-  implicit def torsorPointOps[P](p: P): TorsorPointOps[P] = new TorsorPointOps(p)
-}
-
-trait IntegralSyntax extends EuclideanRingSyntax with ConvertableFromSyntax with OrderSyntax with SignedSyntax {
+trait IntegralSyntax extends EuclideanRingSyntax with ConvertableFromSyntax with OrderSyntax with SignedSyntax:
   implicit def integralOps[A: Integral](a: A): IntegralOps[A] = new IntegralOps(a)
-}
+end IntegralSyntax
 
 trait FractionalSyntax
     extends FieldSyntax
