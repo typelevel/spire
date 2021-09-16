@@ -101,72 +101,72 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
 
   testBinop2("multiplication", false, (x, y, s) => x.*(y)(s), _ * _)
 
-  // testBinop2("division", true, (x, y, s) => x./(y)(s), _ / _)
+  testBinop2("division", true, (x, y, s) => x./(y)(s), _ / _)
 
-  // def buildHalf(x: Long, z: Byte): (Int, Int, FixedPoint, Rational) = {
-  //   val d = z.toInt.abs % 11
-  //   val denom = 10 ** d
-  //   val fx = new FixedPoint(x)
-  //   val ax = Rational(x, denom)
-  //   (d, denom, fx, ax)
-  // }
-  //
-  // type SH2[A] = (A, Long, FixedScale) => A
-  // type FH2[A] = (A, Long) => A
-  //
-  // def testHalfop(name: String, noZero: Boolean, f: SH2[FixedPoint], g: FH2[Rational]) =
-  //   property(name) {
-  //     forAll { (x: Long, y0: Long, z: Byte) =>
-  //       val y = if (noZero && y0 == 0) 1L else y0
-  //       val (d, denom, fx, ax) = buildHalf(x, z)
-  //       val az = g(ax, y)
-  //
-  //       val ofz =
-  //         try {
-  //           implicit val scale: FixedScale = FixedScale(denom)
-  //           Some(f(fx, y, scale))
-  //         } catch {
-  //           case _: FixedPointOverflow => None
-  //         }
-  //
-  //       ofz match {
-  //         case Some(fz) =>
-  //           BigInt(fz.long) === (az * denom).toBigInt
-  //         case None =>
-  //           az * denom < Long.MinValue || Long.MaxValue < az * denom
-  //       }
-  //     }
-  //   }
-  //
-  // testHalfop("h-addition", false, (x, y, s) => x.+(y)(s), _ + _)
-  //
-//   testHalfop("h-subtraction", false, (x, y, s) => x.-(y)(s), _ - _)
-//
-//   testHalfop("h-multiplication", false, (x, y, s) => x * y, _ * _)
-//
-//   testHalfop("h-division", true, (x, y, s) => x / y, _ / _)
-//
-//   property("pow") {
-//     forAll { (x: Long, k0: Byte, d0: Byte) =>
-//       val k = k0.toInt.abs
-//       val denom = 10 ** (d0.toInt.abs % 11)
-//
-//       val az = Rational(x, denom).pow(k)
-//
-//       val ofz =
-//         try {
-//           implicit val scale: FixedScale = FixedScale(denom)
-//           Some(new FixedPoint(x).pow(k))
-//         } catch {
-//           case _: FixedPointOverflow => None
-//         }
-//
-//       ofz match {
-//         case Some(fz) =>
-//           BigInt(fz.long) === (az * denom).toBigInt
-//         case None =>
-//           az * denom < Long.MinValue || Long.MaxValue < az * denom
-//       }
-//     }
-//   }
+  def buildHalf(x: Long, z: Byte): (Int, Int, FixedPoint, Rational) = {
+    val d = z.toInt.abs % 11
+    val denom = 10 ** d
+    val fx = new FixedPoint(x)
+    val ax = Rational(x, denom)
+    (d, denom, fx, ax)
+  }
+
+  type SH2[A] = (A, Long, FixedScale) => A
+  type FH2[A] = (A, Long) => A
+
+  def testHalfop(name: String, noZero: Boolean, f: SH2[FixedPoint], g: FH2[Rational]) =
+    property(name) {
+      forAll { (x: Long, y0: Long, z: Byte) =>
+        val y = if (noZero && y0 == 0) 1L else y0
+        val (d, denom, fx, ax) = buildHalf(x, z)
+        val az = g(ax, y)
+
+        val ofz =
+          try {
+            implicit val scale: FixedScale = FixedScale(denom)
+            Some(f(fx, y, scale))
+          } catch {
+            case _: FixedPointOverflow => None
+          }
+
+        ofz match {
+          case Some(fz) =>
+            BigInt(fz.long) === (az * denom).toBigInt
+          case None =>
+            az * denom < Long.MinValue || Long.MaxValue < az * denom
+        }
+      }
+    }
+
+  testHalfop("h-addition", false, (x, y, s) => x.+(y)(s), _ + _)
+
+  testHalfop("h-subtraction", false, (x, y, s) => x.-(y)(s), _ - _)
+
+  testHalfop("h-multiplication", false, (x, y, s) => x * y, _ * _)
+
+  testHalfop("h-division", true, (x, y, s) => x / y, _ / _)
+
+  property("pow") {
+    forAll { (x: Long, k0: Byte, d0: Byte) =>
+      val k = k0.toInt.abs
+      val denom = 10 ** (d0.toInt.abs % 11)
+
+      val az = Rational(x, denom).pow(k)
+
+      val ofz =
+        try {
+          implicit val scale: FixedScale = FixedScale(denom)
+          Some(new FixedPoint(x).pow(k))
+        } catch {
+          case _: FixedPointOverflow => None
+        }
+
+      ofz match {
+        case Some(fz) =>
+          BigInt(fz.long) === (az * denom).toBigInt
+        case None =>
+          az * denom < Long.MinValue || Long.MaxValue < az * denom
+      }
+    }
+  }
 }

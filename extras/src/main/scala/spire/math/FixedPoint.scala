@@ -76,7 +76,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
       lhs + new FixedPoint(p)
 
     val n = SafeLong(rhs) * d + lhs.long
-    if (n < Long.MinValue || Long.MaxValue < n.toLong)
+    if (n < Long.MinValue || Long.MaxValue < n)
       throw new FixedPointOverflow(n.toLong)
 
     new FixedPoint(n.toLong)
@@ -96,7 +96,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
       return lhs - new FixedPoint(p)
 
     val n = SafeLong(lhs.long) - (SafeLong(rhs) * d)
-    if (n < Long.MinValue || Long.MaxValue < n.toLong)
+    if (n < Long.MinValue || Long.MaxValue < n)
       throw new FixedPointOverflow(n.toLong)
 
     new FixedPoint(n.toLong)
@@ -139,7 +139,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
         // lightweight, but this is the least error-prone thing to
         // do right now.
         val n = SafeLong(lhs.long) * scale.denom / rhs.long
-        if (n < Long.MinValue || Long.MaxValue < n.toLong)
+        if (n < Long.MinValue || Long.MaxValue < n)
           throw new FixedPointOverflow(n.toLong)
 
         new FixedPoint(n.toLong)
