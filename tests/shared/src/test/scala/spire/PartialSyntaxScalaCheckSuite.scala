@@ -29,8 +29,8 @@ class PartialSyntaxScalaCheckSuite extends munit.ScalaCheckSuite {
   def testGroupoidSyntax[A: Groupoid: Eq](a: A, b: A) = {
     import spire.syntax.groupoid._
     (a.isId === Groupoid[A].isId(a)) &&
-    (a.leftId() === Groupoid[A].leftId(a)) &&
-    (a.rightId() === Groupoid[A].rightId(a)) &&
+    (a.leftId === Groupoid[A].leftId(a)) &&
+    (a.rightId === Groupoid[A].rightId(a)) &&
     ((a |+|? b) === Groupoid[A].partialOp(a, b)) &&
     ((a |+|?? b) === Groupoid[A].opIsDefined(a, b))
     ((a |-|? b) === Groupoid[A].partialOpInverse(a, b)) &&

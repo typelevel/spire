@@ -92,21 +92,21 @@ final class LiteralDoubleOrderOps(val lhs: Double) extends AnyVal {
 }
 
 final class SignedOps[A: Signed](lhs: A) {
-  def abs(): A = macro Ops.unop[A]
-  def sign(): Sign = macro Ops.unop[Sign]
-  def signum(): Int = macro Ops.unop[Int]
+  def abs: A = macro Ops.unop[A]
+  def sign: Sign = macro Ops.unop[Sign]
+  def signum: Int = macro Ops.unop[Int]
 
-  def isSignZero(): Boolean = macro Ops.unop[Boolean]
-  def isSignPositive(): Boolean = macro Ops.unop[Boolean]
-  def isSignNegative(): Boolean = macro Ops.unop[Boolean]
+  def isSignZero: Boolean = macro Ops.unop[Boolean]
+  def isSignPositive: Boolean = macro Ops.unop[Boolean]
+  def isSignNegative: Boolean = macro Ops.unop[Boolean]
 
-  def isSignNonZero(): Boolean = macro Ops.unop[Boolean]
-  def isSignNonPositive(): Boolean = macro Ops.unop[Boolean]
-  def isSignNonNegative(): Boolean = macro Ops.unop[Boolean]
+  def isSignNonZero: Boolean = macro Ops.unop[Boolean]
+  def isSignNonPositive: Boolean = macro Ops.unop[Boolean]
+  def isSignNonNegative: Boolean = macro Ops.unop[Boolean]
 }
 
 final class TruncatedDivisionOps[A: TruncatedDivision](lhs: A) {
-  def toBigIntOpt(): Opt[BigInt] = macro Ops.unop[Opt[BigInt]]
+  def toBigIntOpt: Opt[BigInt] = macro Ops.unop[Opt[BigInt]]
   def tquot(rhs: A): A = macro Ops.binop[A, A]
   def tmod(rhs: A): A = macro Ops.binop[A, A]
   def tquotmod(rhs: A): (A, A) = macro Ops.binop[A, (A, A)]
@@ -117,7 +117,7 @@ final class TruncatedDivisionOps[A: TruncatedDivision](lhs: A) {
 }
 
 final class InvolutionOps[A: Involution](lhs: A) {
-  def adjoint(): A = macro Ops.unop[A]
+  def adjoint: A = macro Ops.unop[A]
 }
 
 final class LiteralIntTruncatedDivisionOps(val lhs: Int) extends AnyVal {
@@ -159,13 +159,13 @@ final class SemigroupoidOps[A: Semigroupoid](lhs: A) {
 }
 
 final class GroupoidCommonOps[A](lhs: A)(implicit ev: Groupoid[A]) {
-  def inverse(): A = ev.inverse(lhs)
+  def inverse: A = ev.inverse(lhs)
   def isId(implicit ev1: Eq[A]): Boolean = ev.isId(lhs)(ev1)
 }
 
 final class GroupoidOps[A: Groupoid](lhs: A) {
-  def leftId(): A = macro Ops.unop[A]
-  def rightId(): A = macro Ops.unop[A]
+  def leftId: A = macro Ops.unop[A]
+  def rightId: A = macro Ops.unop[A]
   def |-|?(rhs: A): Opt[A] = macro Ops.binop[A, Option[A]]
   def |-|??(rhs: A): Boolean = macro Ops.binop[A, Boolean]
 }
@@ -179,7 +179,7 @@ final class MonoidOps[A: Monoid](lhs: A) {
 }
 
 final class GroupOps[A: Group](lhs: A) {
-  def inverse(): A = macro Ops.unop[A]
+  def inverse: A = macro Ops.unop[A]
   def |-|(rhs: A): A = macro Ops.binop[A, A]
 }
 
@@ -250,7 +250,7 @@ final class MultiplicativeMonoidOps[A: MultiplicativeMonoid](lhs: A) {
 }
 
 final class MultiplicativeGroupOps[A: MultiplicativeGroup](lhs: A) {
-  def reciprocal(): A = macro Ops.unop[A]
+  def reciprocal: A = macro Ops.unop[A]
   def /(rhs: A): A = macro Ops.binop[A, A]
   def /(rhs: Int)(implicit ev1: Ring[A]): A = macro Ops.binopWithLift[Int, Ring[A], A]
   def /(rhs: Double)(implicit ev1: Field[A]): A = macro Ops.binopWithLift[Double, Field[A], A]
@@ -280,7 +280,7 @@ final class GCDRingOps[A: GCDRing](lhs: A) {
 }
 
 final class EuclideanRingOps[A: EuclideanRing](lhs: A) {
-  def euclideanFunction(): BigInt = macro Ops.unop[BigInt]
+  def euclideanFunction: BigInt = macro Ops.unop[BigInt]
   def equot(rhs: A): A = macro Ops.binop[A, A]
   def emod(rhs: A): A = macro Ops.binop[A, A]
   def equotmod(rhs: A): (A, A) = macro Ops.binop[A, (A, A)]
@@ -321,16 +321,16 @@ final class LiteralDoubleEuclideanRingOps(val lhs: Double) extends AnyVal {
 }
 
 final class IsRealOps[A: IsReal](lhs: A) {
-  def isWhole(): Boolean = macro Ops.unop[Boolean]
-  def ceil(): A = macro Ops.unop[A]
-  def floor(): A = macro Ops.unop[A]
-  def round(): A = macro Ops.unop[A]
+  def isWhole: Boolean = macro Ops.unop[Boolean]
+  def ceil: A = macro Ops.unop[A]
+  def floor: A = macro Ops.unop[A]
+  def round: A = macro Ops.unop[A]
   //def toDouble(): Double = macro Ops.unop[Double]
 }
 
 final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
   def nroot(rhs: Int): A = macro Ops.binop[Int, A]
-  def sqrt(): A = macro Ops.unop[A]
+  def sqrt: A = macro Ops.unop[A]
   def fpow(rhs: A): A = macro Ops.binop[A, A]
 
   // TODO: should be macros
@@ -354,8 +354,8 @@ final class LiteralDoubleNRootOps(val lhs: Double) extends AnyVal {
 }
 
 final class TrigOps[A](lhs: A)(implicit ev: Trig[A]) {
-  def exp(): A = macro Ops.unop[A]
-  def log(): A = macro Ops.unop[A]
+  def exp: A = macro Ops.unop[A]
+  def log: A = macro Ops.unop[A]
 
   def log(base: Int)(implicit f: Field[A]): A =
     f.div(ev.log(lhs), ev.log(f.fromInt(base)))
@@ -487,16 +487,16 @@ final class NormedVectorSpaceOps[V](lhs: V) {
 }
 
 final class ConvertableFromOps[A: ConvertableFrom](lhs: A) {
-  override def toString(): String = macro Ops.unop[String]
-  def toByte(): Byte = macro Ops.unop[Byte]
-  def toShort(): Short = macro Ops.unop[Short]
-  def toInt(): Int = macro Ops.unop[Int]
-  def toLong(): Long = macro Ops.unop[Long]
-  def toFloat(): Float = macro Ops.unop[Float]
-  def toDouble(): Double = macro Ops.unop[Double]
-  def toBigInt(): BigInt = macro Ops.unop[BigInt]
-  def toBigDecimal(): BigDecimal = macro Ops.unop[BigDecimal]
-  def toRational(): Rational = macro Ops.unop[Rational]
+  override def toString: String = macro Ops.unop[String]
+  def toByte: Byte = macro Ops.unop[Byte]
+  def toShort: Short = macro Ops.unop[Short]
+  def toInt: Int = macro Ops.unop[Int]
+  def toLong: Long = macro Ops.unop[Long]
+  def toFloat: Float = macro Ops.unop[Float]
+  def toDouble: Double = macro Ops.unop[Double]
+  def toBigInt: BigInt = macro Ops.unop[BigInt]
+  def toBigDecimal: BigDecimal = macro Ops.unop[BigDecimal]
+  def toRational: Rational = macro Ops.unop[Rational]
 }
 
 final class BitStringOps[A: BitString](lhs: A) {
@@ -504,13 +504,13 @@ final class BitStringOps[A: BitString](lhs: A) {
   def >>(rhs: Int): A = macro Ops.binop[Int, A]
   def >>>(rhs: Int): A = macro Ops.binop[Int, A]
 
-  def bitCount(): Int = macro Ops.unop[Int]
-  def highestOneBit(): A = macro Ops.unop[A]
-  def lowestOneBit(): A = macro Ops.unop[A]
-  def numberOfLeadingZeros(): Int = macro Ops.unop[Int]
-  def numberOfTrailingZeros(): Int = macro Ops.unop[Int]
+  def bitCount: Int = macro Ops.unop[Int]
+  def highestOneBit: A = macro Ops.unop[A]
+  def lowestOneBit: A = macro Ops.unop[A]
+  def numberOfLeadingZeros: Int = macro Ops.unop[Int]
+  def numberOfTrailingZeros: Int = macro Ops.unop[Int]
 
-  def toHexString(): String = macro Ops.unop[String]
+  def toHexString: String = macro Ops.unop[String]
 
   def rotateLeft(rhs: Int): A = macro Ops.binop[Int, A]
   def rotateRight(rhs: Int): A = macro Ops.binop[Int, A]

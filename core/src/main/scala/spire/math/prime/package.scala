@@ -70,13 +70,13 @@ package object prime {
       x = x1
     }
 
-    var limit = x.sqrt()
+    var limit = x.sqrt
     cfor(SafeLong(3))(_ <= limit && x > 1, _ + 2) { b =>
       val (x2, e2) = findPowers(x, b)
       if (e2 > 0) {
         facts(b) = e2
         x = x2
-        limit = x.sqrt()
+        limit = x.sqrt
       }
     }
     if (x > 1) facts(x) = 1
@@ -112,7 +112,7 @@ package object prime {
       }
     }
 
-    var limit = x.sqrt()
+    var limit = x.sqrt
     var b = SafeLong(31)
     var i = 0
     val offsets = Array(2, 2, 2, 4, 2, 4, 2, 4, 6, 2)
@@ -121,7 +121,7 @@ package object prime {
       if (e2 > 0) {
         facts(b) = e2
         x = x2
-        limit = x.sqrt()
+        limit = x.sqrt
       }
       b += offsets(i)
       i = (i + 1) % 10

@@ -52,8 +52,8 @@ trait GroupLaws[A] extends Laws {
   def group(implicit A: Group[A]) = new GroupProperties(
     name = "group",
     parent = Some(monoid),
-    "left inverse" -> forAllSafe((x: A) => A.empty === (x.inverse() |+| x)),
-    "right inverse" -> forAllSafe((x: A) => A.empty === (x |+| x.inverse()))
+    "left inverse" -> forAllSafe((x: A) => A.empty === (x.inverse |+| x)),
+    "right inverse" -> forAllSafe((x: A) => A.empty === (x |+| x.inverse))
   )
 
   def abGroup(implicit A: AbGroup[A]) = new GroupProperties(

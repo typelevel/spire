@@ -244,7 +244,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   import spire.syntax.nroot._
 
   def sqrt(implicit scale: FixedScale): FixedPoint =
-    FixedPoint(toReal.sqrt().toRational)
+    FixedPoint(toReal.sqrt.toRational)
 
   def nroot(k: Int)(implicit scale: FixedScale): FixedPoint =
     FixedPoint(toReal.nroot(k).toRational)
@@ -291,8 +291,8 @@ object FixedPoint extends FixedPointInstances {
   def apply[@sp(Float, Double) A](a: A)(implicit scale: FixedScale, fr: Fractional[A]): FixedPoint = {
     val x = a * scale.denom
     if (x < fr.fromLong(Long.MinValue) || fr.fromLong(Long.MaxValue) < x)
-      throw new FixedPointOverflow(x.toLong())
-    new FixedPoint(x.toLong())
+      throw new FixedPointOverflow(x.toLong)
+    new FixedPoint(x.toLong)
   }
 }
 

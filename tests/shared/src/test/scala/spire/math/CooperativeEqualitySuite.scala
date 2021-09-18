@@ -14,8 +14,8 @@ class CooperativeEqualitySuite extends munit.FunSuite {
     }
 
   // test Natural
-  testEquals(3.toByte(), "Byte", Natural(3), "Natural")
-  testEquals(3.toShort(), "Short", Natural(3), "Natural")
+  testEquals(3.toByte, "Byte", Natural(3), "Natural")
+  testEquals(3.toShort, "Short", Natural(3), "Natural")
   testEquals(3, "Int", Natural(3), "Natural")
   testEquals(3L, "Long", Natural(3), "Natural")
   testEquals(3f, "Float", Natural(3), "Natural")
@@ -24,8 +24,8 @@ class CooperativeEqualitySuite extends munit.FunSuite {
   testEquals(Natural(3), "Natural", Natural(3), "Natural")
 
   // test SafeLong
-  testEquals(3.toByte(), "Byte", SafeLong(3), "SafeLong")
-  testEquals(3.toShort(), "Short", SafeLong(3), "SafeLong")
+  testEquals(3.toByte, "Byte", SafeLong(3), "SafeLong")
+  testEquals(3.toShort, "Short", SafeLong(3), "SafeLong")
   testEquals(3, "Int", SafeLong(3), "SafeLong")
   testEquals(3L, "Long", SafeLong(3), "SafeLong")
   testEquals(3f, "Float", SafeLong(3), "SafeLong")
@@ -35,8 +35,8 @@ class CooperativeEqualitySuite extends munit.FunSuite {
   testEquals(SafeLong(3), "SafeLong", SafeLong(3), "SafeLong")
 
   // test Rational
-  testEquals(3.toByte(), "Byte", Rational(3), "Rational")
-  testEquals(3.toShort(), "Short", Rational(3), "Rational")
+  testEquals(3.toByte, "Byte", Rational(3), "Rational")
+  testEquals(3.toShort, "Short", Rational(3), "Rational")
   testEquals(3, "Int", Rational(3), "Rational")
   testEquals(3L, "Long", Rational(3), "Rational")
   testEquals(3f, "Float", Rational(3), "Rational")
@@ -48,8 +48,8 @@ class CooperativeEqualitySuite extends munit.FunSuite {
   testEquals(Rational(3), "Rational", Rational(3), "Rational")
 
   // test Number
-  testEquals(3.toByte(), "Byte", Number(3), "Number")
-  testEquals(3.toShort(), "Short", Number(3), "Number")
+  testEquals(3.toByte, "Byte", Number(3), "Number")
+  testEquals(3.toShort, "Short", Number(3), "Number")
   testEquals(3, "Int", Number(3), "Number")
   testEquals(3L, "Long", Number(3), "Number")
   testEquals(3f, "Float", Number(3), "Number")
@@ -62,8 +62,8 @@ class CooperativeEqualitySuite extends munit.FunSuite {
   testEquals(Number(3), "Number", Number(3), "Number")
 
   // test Algebraic
-  testEquals(3.toByte(), "Byte", Algebraic(3), "Algebraic")
-  testEquals(3.toShort(), "Short", Algebraic(3), "Algebraic")
+  testEquals(3.toByte, "Byte", Algebraic(3), "Algebraic")
+  testEquals(3.toShort, "Short", Algebraic(3), "Algebraic")
   testEquals(3, "Int", Algebraic(3), "Algebraic")
   testEquals(3L, "Long", Algebraic(3), "Algebraic")
   testEquals(3f, "Float", Algebraic(3), "Algebraic")
@@ -77,8 +77,8 @@ class CooperativeEqualitySuite extends munit.FunSuite {
   testEquals(Algebraic(3), "Algebraic", Algebraic(3), "Algebraic")
 
   // test Real
-  testEquals(3.toByte(), "Byte", Real(3), "Real")
-  testEquals(3.toShort(), "Short", Real(3), "Real")
+  testEquals(3.toByte, "Byte", Real(3), "Real")
+  testEquals(3.toShort, "Short", Real(3), "Real")
   testEquals(3, "Int", Real(3), "Real")
   testEquals(3L, "Long", Real(3), "Real")
   testEquals(3f, "Float", Real(3), "Real")
@@ -93,14 +93,14 @@ class CooperativeEqualitySuite extends munit.FunSuite {
   testEquals(Real(3), "Real", Real(3), "Real")
 
   def testComplex[A: ConvertableFrom](a: A, name: String): Unit = {
-    testEquals(a, name, Complex(a.toFloat()), "Complex[Float]")
-    testEquals(a, name, Complex(a.toDouble()), "Complex[Double]")
+    testEquals(a, name, Complex(a.toFloat), "Complex[Float]")
+    testEquals(a, name, Complex(a.toDouble), "Complex[Double]")
     // testEquals(a, name, Complex(a.toBigDecimal), "Complex[BigDecimal]")
-    testEquals(a, name, Complex(Real(a.toRational())), "Complex[Real]")
+    testEquals(a, name, Complex(Real(a.toRational)), "Complex[Real]")
   }
 
-  testComplex(3.toByte(), "Byte")
-  testComplex(3.toShort(), "Short")
+  testComplex(3.toByte, "Byte")
+  testComplex(3.toShort, "Short")
   testComplex(3, "Int")
   testComplex(3L, "Long")
   testComplex(3f, "Float")
@@ -113,14 +113,14 @@ class CooperativeEqualitySuite extends munit.FunSuite {
   testComplex(Real(3), "Real")
 
   def testQuaternion[A: ConvertableFrom](a: A, name: String): Unit = {
-    testEquals(a, name, Quaternion(a.toFloat()), "Quaternion[Float]")
-    testEquals(a, name, Quaternion(a.toDouble()), "Quaternion[Double]")
-    // testEquals(a, name, Quaternion(a.toBigDecimal()), "Quaternion[BigDecimal]")
-    testEquals(a, name, Quaternion(Real(a.toRational())), "Quaternion[Real]")
+    testEquals(a, name, Quaternion(a.toFloat), "Quaternion[Float]")
+    testEquals(a, name, Quaternion(a.toDouble), "Quaternion[Double]")
+    // testEquals(a, name, Quaternion(a.toBigDecimal), "Quaternion[BigDecimal]")
+    testEquals(a, name, Quaternion(Real(a.toRational)), "Quaternion[Real]")
   }
 
-  testQuaternion(3.toByte(), "Byte")
-  testQuaternion(3.toShort(), "Short")
+  testQuaternion(3.toByte, "Byte")
+  testQuaternion(3.toShort, "Short")
   testQuaternion(3, "Int")
   testQuaternion(3L, "Long")
   testQuaternion(3f, "Float")

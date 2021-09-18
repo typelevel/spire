@@ -203,7 +203,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   /**
    * This is consistent with abs
    */
-  def signum()(implicit r: Signed[T]): Int = real.signum()
+  def signum()(implicit r: Signed[T]): Int = real.signum
 
   def asTuple: (T, Array[T]) = (real, infinitesimal)
 
@@ -260,7 +260,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
 
   def /~(b: Jet[T])(implicit c: ClassTag[T], f: Field[T], r: IsReal[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val q = this / b
-    new Jet[T](q.real.floor(), q.infinitesimal.map(r.floor))
+    new Jet[T](q.real.floor, q.infinitesimal.map(r.floor))
   }
 
   def %(b: Jet[T])(implicit c: ClassTag[T], f: Field[T], r: IsReal[T], v: VectorSpace[Array[T], T]): Jet[T] = {
@@ -277,7 +277,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   def **(b: Int)(implicit f: Field[T], v: VectorSpace[Array[T], T]): Jet[T] = pow(b)
 
   def nroot(k: Int)(implicit f: Field[T], s: Signed[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
-    pow(f.fromInt(k).reciprocal())
+    pow(f.fromInt(k).reciprocal)
   }
 
   def **(
@@ -286,16 +286,16 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
     pow(b)
   }
 
-  def floor()(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
-    new Jet(real.floor(), infinitesimal.map(r.floor))
+  def floor(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
+    new Jet(real.floor, infinitesimal.map(r.floor))
   }
 
-  def ceil()(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
-    new Jet(real.ceil(), infinitesimal.map(r.ceil))
+  def ceil(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
+    new Jet(real.ceil, infinitesimal.map(r.ceil))
   }
 
-  def round()(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
-    new Jet(real.round(), infinitesimal.map(r.round))
+  def round(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
+    new Jet(real.round, infinitesimal.map(r.round))
   }
 
   // Elementary math functions
@@ -376,8 +376,8 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   /**
    * sqrt(a + du) ~= sqrt(a) + du / (2 sqrt(a))
    */
-  def sqrt()(implicit f: Field[T], n: NRoot[T], v: VectorSpace[Array[T], T]): Jet[T] = {
-    val sa = real.sqrt()
+  def sqrt(implicit f: Field[T], n: NRoot[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+    val sa = real.sqrt
     val oneHalf = f.one / (f.one + f.one)
     new Jet(sa, (oneHalf / sa) *: infinitesimal)
   }
@@ -609,7 +609,7 @@ private[math] trait JetIsNRoot[T] extends NRoot[Jet[T]] {
   implicit def v: VectorSpace[Array[T], T]
 
   def nroot(a: Jet[T], k: Int): Jet[T] = a.nroot(k)
-  override def sqrt(a: Jet[T]): Jet[T] = a.sqrt()
+  override def sqrt(a: Jet[T]): Jet[T] = a.sqrt
   def fpow(a: Jet[T], b: Jet[T]): Jet[T] = a.pow(b)
   def fpow(a: T, b: Jet[T]): Jet[T] = b.powScalarToJet(a)
 }

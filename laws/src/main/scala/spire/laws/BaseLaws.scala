@@ -28,12 +28,12 @@ trait BaseLaws[A] extends Laws {
   def metricSpace[R](implicit MSA: MetricSpace[A, R], SR: Signed[R], OR: Order[R], ASR: AdditiveSemigroup[R]) =
     new SimpleRuleSet(
       name = "metricSpace",
-      "non-negative" -> forAllSafe((a1: A, a2: A) => MSA.distance(a1, a2).sign() != Sign.Negative),
-      "identity" -> forAllSafe((a: A) => MSA.distance(a, a).sign() == Sign.Zero),
+      "non-negative" -> forAllSafe((a1: A, a2: A) => MSA.distance(a1, a2).sign != Sign.Negative),
+      "identity" -> forAllSafe((a: A) => MSA.distance(a, a).sign == Sign.Zero),
       "equality" -> forAllSafe((a1: A, a2: A) =>
         // generating equal values is hard, and Scalacheck will give up if it can't
         // hence, not using `==>` here
-        a1 =!= a2 || MSA.distance(a1, a2).sign() == Sign.Zero
+        a1 =!= a2 || MSA.distance(a1, a2).sign == Sign.Zero
       ),
       "symmetry" -> forAllSafe((a1: A, a2: A) => MSA.distance(a1, a2) === MSA.distance(a2, a1)),
       "triangleInequality" -> forAllSafe((a1: A, a2: A, a3: A) =>

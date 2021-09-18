@@ -46,7 +46,7 @@ object AndersonDarlingTest {
     @tailrec def loop(sum: A, i: Int, a: A, b: A): A = if (i < xs.length) {
       // val y = cdf((xs(i) - mean) / stdDev, mean, stdDev)
       val y = cdf(xs(i), mean, stdDev)
-      val k = a * y.log() + b * (1 - y).log()
+      val k = a * y.log + b * (1 - y).log
       loop(sum + k, i + 1, a + 2, b - 2)
     } else sum
 
@@ -58,15 +58,15 @@ object AndersonDarlingTest {
   }
 
   def cdf[A: Field: Trig: NRoot: IsReal](x: A, mean: A, stdDev: A): A =
-    0.5 * erfc((mean - x) / (Field[A].fromInt(2).sqrt() * stdDev))
+    0.5 * erfc((mean - x) / (Field[A].fromInt(2).sqrt * stdDev))
 
   // Approximation from: http://en.wikipedia.org/wiki/Error_function#Approximation_with_elementary_functions
   // which listed Abramowitz and Stegun as the source.
-  def erfc[A: Field: Trig: IsReal](x: A): A = if (x.signum() < 0) {
+  def erfc[A: Field: Trig: IsReal](x: A): A = if (x.signum < 0) {
     2 - erfc(-x)
   } else {
     val t = 1 / (1 + 0.3275911 * x)
     val y = t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429))))
-    (-x * x).exp() * y
+    (-x * x).exp * y
   }
 }

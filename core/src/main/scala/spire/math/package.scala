@@ -199,7 +199,7 @@ package object math {
       throw new IllegalArgumentException("argument <= 0")
 
     @tailrec def rescale(x: BigDecimal, n: Int): (BigDecimal, Int) =
-      if (x < 64) (x, n) else rescale(x.sqrt(), n + 1)
+      if (x < 64) (x, n) else rescale(x.sqrt, n + 1)
 
     val (x, i) = rescale(n, 0)
 
@@ -532,8 +532,8 @@ package object math {
     val ay = abs(y)
     if (x == f.zero) ay
     else if (y == f.zero) ax
-    else if (ax > ay) ax * (1 + (y / x) ** 2).sqrt()
-    else ay * (1 + (x / y) ** 2).sqrt()
+    else if (ax > ay) ax * (1 + (y / x) ** 2).sqrt
+    else ay * (1 + (x / y) ** 2).sqrt
   }
 
   // BigInt

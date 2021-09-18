@@ -40,9 +40,9 @@ class SyntaxScalaCheckSuite extends munit.ScalaCheckSuite with BaseSyntaxSuite {
     Arbitrary(
       arbitrary[A]
         .map { a =>
-          if (a === Ring[A].zero) Ring[A].one else a.abs()
+          if (a === Ring[A].zero) Ring[A].one else a.abs
         }
-        .filter(_.sign() == Sign.Positive)
+        .filter(_.sign == Sign.Positive)
         .map(Positive(_))
     )
   }
@@ -137,21 +137,21 @@ trait BaseSyntaxSuite {
 
   def testSignedSyntax[A: Signed: Eq](a: A) = {
     import spire.syntax.signed._
-    (a.sign() == Signed[A].sign(a)) &&
-    (a.signum() == Signed[A].signum(a)) &&
-    (a.abs() === Signed[A].abs(a)) &&
-    (a.isSignZero() == Signed[A].isSignZero(a)) &&
-    (a.isSignPositive() == Signed[A].isSignPositive(a)) &&
-    (a.isSignNegative() == Signed[A].isSignNegative(a)) &&
-    (a.isSignNonZero() == Signed[A].isSignNonZero(a)) &&
-    (a.isSignNonPositive() == Signed[A].isSignNonPositive(a)) &&
-    (a.isSignNonNegative() == Signed[A].isSignNonNegative(a))
+    (a.sign == Signed[A].sign(a)) &&
+    (a.signum == Signed[A].signum(a)) &&
+    (a.abs === Signed[A].abs(a)) &&
+    (a.isSignZero == Signed[A].isSignZero(a)) &&
+    (a.isSignPositive == Signed[A].isSignPositive(a)) &&
+    (a.isSignNegative == Signed[A].isSignNegative(a)) &&
+    (a.isSignNonZero == Signed[A].isSignNonZero(a)) &&
+    (a.isSignNonPositive == Signed[A].isSignNonPositive(a)) &&
+    (a.isSignNonNegative == Signed[A].isSignNonNegative(a))
   }
 
   def testTruncatedDivisionSyntax[A: TruncatedDivision](a: A, b: A) = {
     import spire.syntax.truncatedDivision._
     import spire.std.tuples._
-    (a.toBigIntOpt() === TruncatedDivision[A].toBigIntOpt(a)) &&
+    (a.toBigIntOpt === TruncatedDivision[A].toBigIntOpt(a)) &&
     ((a.tquot(b)) === TruncatedDivision[A].tquot(a, b)) &&
     ((a.tmod(b)) === TruncatedDivision[A].tmod(a, b)) &&
     ((a.tquotmod(b)) === TruncatedDivision[A].tquotmod(a, b)) &&
@@ -163,15 +163,15 @@ trait BaseSyntaxSuite {
   def testInvolutionSyntax[A: Involution: Eq](a: A) = {
     import spire.syntax.involution._
     import spire.syntax.eq._
-    a.adjoint() === Involution[A].adjoint(a)
+    a.adjoint === Involution[A].adjoint(a)
   }
 
   def testIsRealSyntax[A: IsReal](a: A) = {
     import spire.syntax.isReal._
-    (a.ceil() === IsReal[A].ceil(a)) &&
-    (a.floor() === IsReal[A].floor(a)) &&
-    (a.round() === IsReal[A].round(a)) &&
-    (a.isWhole() == IsReal[A].isWhole(a))
+    (a.ceil === IsReal[A].ceil(a)) &&
+    (a.floor === IsReal[A].floor(a)) &&
+    (a.round === IsReal[A].round(a)) &&
+    (a.isWhole == IsReal[A].isWhole(a))
   }
 
   def testSemigroupSyntax[A: Semigroup: Eq](a: A, b: A) = {
@@ -191,7 +191,7 @@ trait BaseSyntaxSuite {
     import spire.syntax.group._
     ((a |+| b) === Group[A].combine(a, b)) &&
     ((a |-| b) === Group[A].remove(a, b)) &&
-    (a.inverse() === Group[A].inverse(a))
+    (a.inverse === Group[A].inverse(a))
   }
 
   def testAdditiveSemigroupSyntax[A: AdditiveSemigroup: Eq](a: A, b: A) = {
@@ -231,7 +231,7 @@ trait BaseSyntaxSuite {
     import spire.syntax.multiplicativeGroup._
     ((a * b) === implicitly[MultiplicativeGroup[A]].times(a, b)) &&
     ((a / b) === implicitly[MultiplicativeGroup[A]].div(a, b)) &&
-    (a.reciprocal() === implicitly[MultiplicativeGroup[A]].reciprocal(a))
+    (a.reciprocal === implicitly[MultiplicativeGroup[A]].reciprocal(a))
   }
 
   def testSemiringSyntax[A: Semiring: Eq](a: A, b: A) = {
@@ -292,7 +292,7 @@ trait BaseSyntaxSuite {
     ((a - b) === Ring[A].minus(a, b)) &&
     (-a === Ring[A].negate(a)) &&
     ((a * b) === Ring[A].times(a, b)) &&
-    ((a.euclideanFunction()) === EuclideanRing[A].euclideanFunction(a)) &&
+    ((a.euclideanFunction) === EuclideanRing[A].euclideanFunction(a)) &&
     ((a.equot(b)) === EuclideanRing[A].equot(a, b)) &&
     ((a.emod(b)) === EuclideanRing[A].emod(a, b)) &&
     ((a.equotmod(b)) === EuclideanRing[A].equotmod(a, b)) &&
@@ -357,7 +357,7 @@ trait BaseSyntaxSuite {
     import spire.syntax.eq._
     import spire.syntax.nroot._
     val half = Field[A].fromDouble(0.5)
-    (a.sqrt() === NRoot[A].sqrt(a)) &&
+    (a.sqrt === NRoot[A].sqrt(a)) &&
     ((a.nroot(5)) === NRoot[A].nroot(a, 5)) &&
     ((a.fpow(half)) === NRoot[A].fpow(a, half)) &&
     ((a ** 0.5) === NRoot[A].fpow(a, half))

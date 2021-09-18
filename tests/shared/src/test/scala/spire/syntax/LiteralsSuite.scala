@@ -35,7 +35,7 @@ class LiteralsSuite extends munit.FunSuite {
     assertEquals((5 ** 2), 25)
     assertEquals((5 /~ 2), 2)
     assertEquals((5 /% 2), ((2, 1)))
-    assertEquals(25.sqrt(), 5)
+    assertEquals(25.sqrt, 5)
   }
 
   test("inter-type operators") {

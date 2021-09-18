@@ -26,8 +26,8 @@ sealed trait Bound[A] { lhs =>
 
   def unary_-(implicit ev: AdditiveGroup[A]): Bound[A] =
     lhs.map(-_)
-  def reciprocal()(implicit ev: MultiplicativeGroup[A]): Bound[A] =
-    lhs.map(_.reciprocal())
+  def reciprocal(implicit ev: MultiplicativeGroup[A]): Bound[A] =
+    lhs.map(_.reciprocal)
 
   def +(a: A)(implicit ev: AdditiveSemigroup[A]): Bound[A] = map(_ + a)
   def -(a: A)(implicit ev: AdditiveGroup[A]): Bound[A] = map(_ - a)
@@ -130,8 +130,8 @@ sealed trait ValueBound[A] extends Bound[A] { lhs =>
   override def unary_-(implicit ev: AdditiveGroup[A]): ValueBound[A] =
     if (isClosed) Closed(-a) else Open(-a)
 
-  override def reciprocal()(implicit ev: MultiplicativeGroup[A]): ValueBound[A] =
-    if (isClosed) Closed(a.reciprocal()) else Open(a.reciprocal())
+  override def reciprocal(implicit ev: MultiplicativeGroup[A]): ValueBound[A] =
+    if (isClosed) Closed(a.reciprocal) else Open(a.reciprocal)
 
   def +~(rhs: ValueBound[A])(implicit ev: AdditiveSemigroup[A]): ValueBound[A] = {
     val m = lhs.a + rhs.a

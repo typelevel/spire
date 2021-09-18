@@ -12,11 +12,11 @@ class BitStringSuite extends munit.FunSuite {
       val b = expected.b
       val found = I(
         b,
-        b.bitCount(),
-        b.highestOneBit(),
-        b.lowestOneBit(),
-        b.numberOfLeadingZeros(),
-        b.numberOfTrailingZeros()
+        b.bitCount,
+        b.highestOneBit,
+        b.lowestOneBit,
+        b.numberOfLeadingZeros,
+        b.numberOfTrailingZeros
       )
       assertEquals(found, expected)
     }

@@ -5,7 +5,7 @@ import spire.algebra._
 import spire.algebra.partial._
 
 final class GroupoidCommonOps[A](lhs: A)(implicit ev: Groupoid[A]):
-  def inverse(): A = ev.inverse(lhs)
+  def inverse: A = ev.inverse(lhs)
   def isId(implicit ev1: Eq[A]): Boolean = ev.isId(lhs)(ev1)
 
 final class LeftModuleOps[V](x: V) extends AnyVal:

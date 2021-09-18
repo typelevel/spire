@@ -60,16 +60,16 @@ object ArbitrarySupport {
   import spire.syntax.all._
 
   implicit def sizedSpireImplicit[A: EuclideanRing: Signed: Arbitrary, L: Size, U: Size]: Arbitrary[Sized[A, L, U]] =
-    Arbitrary(arbitrary[A].map(a => Sized(a.emod(Size[U] - Size[L]).abs() + Size[L])))
+    Arbitrary(arbitrary[A].map(a => Sized(a.emod(Size[U] - Size[L]).abs + Size[L])))
 
   implicit def positiveSpireImplicit[A: Signed: Arbitrary]: Arbitrary[Positive[A]] =
-    Arbitrary(arbitrary[A].map(_.abs()).filter(_.signum() > 0).map(Positive(_)))
+    Arbitrary(arbitrary[A].map(_.abs).filter(_.signum > 0).map(Positive(_)))
   implicit def negativeSpireImplicit[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[Negative[A]] =
-    Arbitrary(arbitrary[A].map(-_.abs()).filter(_.signum() < 0).map(Negative(_)))
+    Arbitrary(arbitrary[A].map(-_.abs).filter(_.signum < 0).map(Negative(_)))
   implicit def nonZeroSpireImplicit[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[NonZero[A]] =
-    Arbitrary(arbitrary[A].filter(_.signum() != 0).map(NonZero(_)))
+    Arbitrary(arbitrary[A].filter(_.signum != 0).map(NonZero(_)))
   implicit def nonPositiveSpireImplicit[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[NonPositive[A]] =
-    Arbitrary(arbitrary[A].map(-_.abs()).filter(_.signum() < 1).map(NonPositive(_)))
+    Arbitrary(arbitrary[A].map(-_.abs).filter(_.signum < 1).map(NonPositive(_)))
   implicit def nonNegativeSpireImplicit[A: Signed: AdditiveGroup: Arbitrary]: Arbitrary[NonNegative[A]] =
-    Arbitrary(arbitrary[A].map(_.abs()).filter(_.signum() > -1).map(NonNegative(_)))
+    Arbitrary(arbitrary[A].map(_.abs).filter(_.signum > -1).map(NonNegative(_)))
 }

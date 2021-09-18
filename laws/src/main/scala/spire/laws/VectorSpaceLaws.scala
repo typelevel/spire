@@ -93,7 +93,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
       sl = _.field(V.scalar),
       vl = _.abGroup(V.additive),
       parents = Seq(vectorSpace, metricSpace),
-      "scalable" -> forAllSafe((a: A, v: V) => a.abs() * v.norm === (a.abs() *: v).norm),
+      "scalable" -> forAllSafe((a: A, v: V) => a.abs * v.norm === (a.abs *: v).norm),
       "only 1 zero" -> forAllSafe((v: V) => // This is covered by metricSpace...
         if (v === V.zero)
           v.norm === Rng[A].zero
@@ -113,7 +113,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     SpaceProperties.fromParent(
       name = "inner-product space",
       parent = vectorSpace,
-      "symmetry" -> forAllSafe((v: V, w: V) => (v ⋅ w).abs() === (w ⋅ v).abs()),
+      "symmetry" -> forAllSafe((v: V, w: V) => (v ⋅ w).abs === (w ⋅ v).abs),
       "linearity of partial inner product" -> forAllSafe((w: V) =>
         // TODO this probably requires some thought -- should `linearity` be a full `RuleSet`?
         propertiesToProp(linearity(_ ⋅ w).all)

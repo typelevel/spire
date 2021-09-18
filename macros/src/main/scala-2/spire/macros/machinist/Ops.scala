@@ -39,7 +39,7 @@ trait Ops {
    *
    * @group macros
    */
-  def unop[R](c: Context)(): c.Expr[R] = {
+  def unop[R](c: Context): c.Expr[R] = {
     import c.universe._
     val (ev, lhs) = unpack(c)
     c.Expr[R](Apply(Select(ev, findMethodName(c)), List(lhs)))

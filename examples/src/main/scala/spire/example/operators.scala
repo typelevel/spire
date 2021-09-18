@@ -14,6 +14,6 @@ object Gcd {
 }
 
 object Pythagoras {
-  def distance0[A: Fractional](x: A, y: A): A = (x * x + y * y).sqrt()
-  def distance1[A: Field: NRoot](x: A, y: A): A = (x * x + y * y).sqrt()
+  def distance0[A: Fractional](x: A, y: A): A = (x * x + y * y).sqrt
+  def distance1[A: Field: NRoot](x: A, y: A): A = (x * x + y * y).sqrt
 }

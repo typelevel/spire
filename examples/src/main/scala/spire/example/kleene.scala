@@ -482,7 +482,7 @@ object KleeneDemo {
     override def kstar(x: Compact[A]): Compact[A] = x match {
       case `one`          => CompactInf
       case CompactInf     => CompactInf
-      case CompactReal(a) => CompactReal((Field[A].one - a).reciprocal())
+      case CompactReal(a) => CompactReal((Field[A].one - a).reciprocal)
       case _              => sys.error("no")
     }
   }

@@ -45,7 +45,7 @@ object EndoRingExample extends App {
    */
   class EndoRing[A: AbGroup] extends Ring[Endo[A]] {
     def plus(f: Endo[A], g: Endo[A]): Endo[A] = a => f(a) |+| g(a)
-    def negate(f: Endo[A]): Endo[A] = a => f(a).inverse()
+    def negate(f: Endo[A]): Endo[A] = a => f(a).inverse
     def times(f: Endo[A], g: Endo[A]): Endo[A] = a => f(g(a))
 
     // Identity endomorphism.

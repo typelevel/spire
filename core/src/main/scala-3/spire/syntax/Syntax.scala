@@ -96,22 +96,22 @@ end OrderSyntax
 
 trait SignedSyntax extends OrderSyntax:
   extension [A](a: A)(using s: Signed[A])
-    def abs(): A = s.abs(a)
-    def sign(): Sign = s.sign(a)
-    def signum(): Int = s.signum(a)
+    def abs: A = s.abs(a)
+    def sign: Sign = s.sign(a)
+    def signum: Int = s.signum(a)
 
-    def isSignZero(): Boolean = s.isSignZero(a)
-    def isSignPositive(): Boolean = s.isSignPositive(a)
-    def isSignNegative(): Boolean = s.isSignNegative(a)
+    def isSignZero: Boolean = s.isSignZero(a)
+    def isSignPositive: Boolean = s.isSignPositive(a)
+    def isSignNegative: Boolean = s.isSignNegative(a)
 
-    def isSignNonZero(): Boolean = s.isSignNonZero(a)
-    def isSignNonPositive(): Boolean = s.isSignNonPositive(a)
-    def isSignNonNegative(): Boolean = s.isSignNonNegative(a)
+    def isSignNonZero: Boolean = s.isSignNonZero(a)
+    def isSignNonPositive: Boolean = s.isSignNonPositive(a)
+    def isSignNonNegative: Boolean = s.isSignNonNegative(a)
 end SignedSyntax
 
 trait TruncatedDivisionSyntax extends SignedSyntax:
   extension[A](lhs: A)(using ev: TruncatedDivision[A])
-    def toBigIntOpt(): Opt[BigInt] = ev.toBigIntOpt(lhs)
+    def toBigIntOpt: Opt[BigInt] = ev.toBigIntOpt(lhs)
     def tquot(rhs: A): A = ev.tquot(lhs, rhs)
     def tmod(rhs: A): A = ev.tmod(lhs, rhs)
     def tquotmod(rhs: A): (A, A) = ev.tquotmod(lhs, rhs)
@@ -153,16 +153,16 @@ end TruncatedDivisionSyntax
 
 trait InvolutionSyntax:
   extension[A](lhs: A)(using ev: Involution[A])
-    def adjoint(): A = ev.adjoint(lhs)
+    def adjoint: A = ev.adjoint(lhs)
 end InvolutionSyntax
 
 trait IsRealSyntax extends SignedSyntax:
   extension [A](lhs: A)(using is: IsReal[A])
-    def isWhole(): Boolean = is.isWhole(lhs)
-    def ceil(): A = is.ceil(lhs)
-    def floor(): A = is.floor(lhs)
-    def round(): A = is.round(lhs)
-    // def toDouble(): Double = is.toDouble(lhs)
+    def isWhole: Boolean = is.isWhole(lhs)
+    def ceil: A = is.ceil(lhs)
+    def floor: A = is.floor(lhs)
+    def round: A = is.round(lhs)
+    // def toDouble: Double = is.toDouble(lhs)
 end IsRealSyntax
 
 trait SemigroupoidSyntax:
@@ -177,11 +177,11 @@ trait GroupoidSyntax extends SemigroupoidSyntax:
     new GroupoidCommonOps[A](a)
   // TODO use an extension heere
   // extension[A](lhs: A)(using ev: Groupoid[A], ni: NoImplicit[Monoid[A]])
-  //   def inverse(): A = ev.inverse(lhs)
+  //   def inverse: A = ev.inverse(lhs)
     // def isId(implicit ev1: Eq[A]): Boolean = ev.isId(lhs)(ev1)
   extension[A](lhs: A)(using ev: Groupoid[A])
-    def leftId(): A = ev.leftId(lhs)
-    def rightId(): A = ev.rightId(lhs)
+    def leftId: A = ev.leftId(lhs)
+    def rightId: A = ev.rightId(lhs)
     def |-|?(rhs: A): Opt[A] = ev.partialOpInverse(lhs, rhs)
     def |-|??(rhs: A): Boolean = ev.opInverseIsDefined(lhs, rhs)
 end GroupoidSyntax
@@ -198,7 +198,7 @@ end MonoidSyntax
 
 trait GroupSyntax extends MonoidSyntax:
   extension[A](lhs: A)(using ev: Group[A])
-    def inverse(): A = ev.inverse(lhs)
+    def inverse: A = ev.inverse(lhs)
     def |-|(rhs: A): A = ev.remove(lhs, rhs)
 end GroupSyntax
 
@@ -245,7 +245,7 @@ end AdditiveGroupSyntax
 trait MultiplicativeSemigroupSyntax:
   extension[A](lhs: A)(using ms: MultiplicativeSemigroup[A])
     def *(rhs: A): A = ms.times(lhs, rhs)
-    def *(rhs: Int)(using ev1: Ring[A]): A = ms.times(lhs, ev1.fromInt(rhs)) 
+    def *(rhs: Int)(using ev1: Ring[A]): A = ms.times(lhs, ev1.fromInt(rhs))
     def *(rhs: Double)(using ev1: Field[A]): A = ms.times(lhs, ev1.fromDouble(rhs))
     def *(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs) * rhs
 
@@ -266,7 +266,7 @@ end MultiplicativeMonoidSyntax
 
 trait MultiplicativeGroupSyntax extends MultiplicativeMonoidSyntax:
   extension [A ](lhs: A)(using mg: MultiplicativeGroup[A])
-    def reciprocal(): A = mg.reciprocal(lhs)
+    def reciprocal: A = mg.reciprocal(lhs)
     def /(rhs: A): A = mg.div(lhs, rhs)
     def /(rhs: Int)(using ev1: Ring[A]): A = mg.div(lhs, ev1.fromInt(rhs))
     def /(rhs: Double)(using ev1: Field[A]): A = mg.div(lhs, ev1.fromDouble(rhs))
@@ -305,7 +305,7 @@ trait GCDRingSyntax extends RingSyntax:
 
 trait EuclideanRingSyntax extends GCDRingSyntax:
   extension [A](lhs: A)(using er: EuclideanRing[A])
-    def euclideanFunction(): BigInt = er.euclideanFunction(lhs)
+    def euclideanFunction: BigInt = er.euclideanFunction(lhs)
     def equot(rhs: A): A = er.equot(lhs, rhs)
     def emod(rhs: A): A = er.emod(lhs, rhs)
     def equotmod(rhs: A): (A, A) = er.equotmod(lhs, rhs)
@@ -344,7 +344,7 @@ trait FieldSyntax extends EuclideanRingSyntax with MultiplicativeGroupSyntax
 trait NRootSyntax {
   extension [A](lhs: A)(using ev: NRoot[A])
     def nroot(rhs: Int): A = ev.nroot(lhs, rhs)
-    def sqrt(): A = ev.sqrt(lhs)
+    def sqrt: A = ev.sqrt(lhs)
     def fpow(rhs: A): A = ev.fpow(lhs, rhs)
 
     def pow(rhs: Double)(using c: Field[A]): A = ev.fpow(lhs, c.fromDouble(rhs))
@@ -435,8 +435,8 @@ end CoordinateSpaceSyntax
 
 trait TrigSyntax:
   extension[A](lhs: A)(using ev: Trig[A])
-    def exp(): A = ev.exp(lhs)
-    def log(): A = ev.log(lhs)
+    def exp: A = ev.exp(lhs)
+    def log: A = ev.log(lhs)
 
     def log(base: Int)(using f: Field[A]): A =
       f.div(ev.log(lhs), ev.log(f.fromInt(base)))
@@ -497,13 +497,13 @@ trait BitStringSyntax:
     def >>(rhs: Int): A = ev.signedRightShift(lhs, rhs)
     def >>>(rhs: Int): A = ev.rightShift(lhs, rhs)
 
-    def bitCount(): Int = ev.bitCount(lhs)
-    def highestOneBit(): A = ev.highestOneBit(lhs)
-    def lowestOneBit(): A = ev.lowestOneBit(lhs)
-    def numberOfLeadingZeros(): Int = ev.numberOfLeadingZeros(lhs)
-    def numberOfTrailingZeros(): Int = ev.numberOfTrailingZeros(lhs)
+    def bitCount: Int = ev.bitCount(lhs)
+    def highestOneBit: A = ev.highestOneBit(lhs)
+    def lowestOneBit: A = ev.lowestOneBit(lhs)
+    def numberOfLeadingZeros: Int = ev.numberOfLeadingZeros(lhs)
+    def numberOfTrailingZeros: Int = ev.numberOfTrailingZeros(lhs)
 
-    def toHexString(): String = ev.toHexString(lhs)
+    def toHexString: String = ev.toHexString(lhs)
 
     def rotateLeft(rhs: Int): A = ev.rotateLeft(lhs, rhs)
     def rotateRight(rhs: Int): A = ev.rotateRight(lhs, rhs)
@@ -575,16 +575,16 @@ trait NumericSyntax extends FieldSyntax with NRootSyntax with ConvertableFromSyn
 
 trait ConvertableFromSyntax:
   extension [A](lhs: A)(using cf: ConvertableFrom[A])
-    def toString(): String = cf.toString(lhs)
-    def toByte(): Byte = cf.toByte(lhs)
-    def toShort(): Short = cf.toShort(lhs)
-    def toInt(): Int = cf.toInt(lhs)
-    def toLong(): Long = cf.toLong(lhs)
-    def toFloat(): Float = cf.toFloat(lhs)
-    def toDouble(): Double = cf.toDouble(lhs)
-    def toBigInt(): BigInt = cf.toBigInt(lhs)
-    def toBigDecimal(): BigDecimal = cf.toBigDecimal(lhs)
-    def toRational(): Rational = cf.toRational(lhs)
+    def toString: String = cf.toString(lhs)
+    def toByte: Byte = cf.toByte(lhs)
+    def toShort: Short = cf.toShort(lhs)
+    def toInt: Int = cf.toInt(lhs)
+    def toLong: Long = cf.toLong(lhs)
+    def toFloat: Float = cf.toFloat(lhs)
+    def toDouble: Double = cf.toDouble(lhs)
+    def toBigInt: BigInt = cf.toBigInt(lhs)
+    def toBigDecimal: BigDecimal = cf.toBigDecimal(lhs)
+    def toRational: Rational = cf.toRational(lhs)
 end ConvertableFromSyntax
 
 trait LiteralsSyntax {

@@ -78,13 +78,13 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
           () =>
             rng.nextInt(5) match {
               case 0 => x
-              case _ => x + (Rational(rng.nextGaussian()).abs() * Long.MaxValue)
+              case _ => x + (Rational(rng.nextGaussian()).abs * Long.MaxValue)
             }
         case (_, ValueBound(y)) =>
           () =>
             rng.nextInt(5) match {
               case 4 => y
-              case _ => y - (Rational(rng.nextGaussian()).abs() * Long.MaxValue)
+              case _ => y - (Rational(rng.nextGaussian()).abs * Long.MaxValue)
             }
         case (_, _) => () => Rational(rng.nextGaussian()) * Long.MaxValue
       }
@@ -125,7 +125,7 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-  property("sampled unop abs()") { testUnop(_.abs)(_.abs()) }
+  property("sampled unop abs") { testUnop(_.abs)(_.abs) }
   property("sampled unop -") { testUnop(-_)(-_) }
   property("sampled unop pow(2)") { testUnop(_.pow(2))(_.pow(2)) }
   property("sampled unop pow(3)") { testUnop(_.pow(3))(_.pow(3)) }

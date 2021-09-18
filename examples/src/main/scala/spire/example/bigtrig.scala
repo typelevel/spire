@@ -81,7 +81,7 @@ object TrigTest {
     aptest("cos(1)", i => ApfloatMath.cos(new Apfloat(1, i)), sin1String)
 
   def testSqrt2(): Unit =
-    test("sqrt(2)", mc => BigDecimal(2, mc).sqrt(), sqrt2String)
+    test("sqrt(2)", mc => BigDecimal(2, mc).sqrt, sqrt2String)
   def testPi(): Unit =
     test("pi", mc => new spire.std.BigDecimalIsTrig(mc).pi, piString)
   def testE(): Unit =
