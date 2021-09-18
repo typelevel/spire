@@ -27,7 +27,7 @@ private[spire] trait Fuser[C <: Context, A] {
     }
 
     def fused(stats0: List[Tree]): Fused = {
-      val (apx0, mes0, ind0, exact0) = freshApproxNames()
+      val (apx0, mes0, ind0, exact0) = freshApproxNames
       val indValDef = ind.fold(t => q"val $ind0 = $t" :: Nil, _ => Nil)
       val stats1 = List(q"val $apx0 = $apx", q"val $mes0 = $mes", q"def $exact0 = $exact") ++ indValDef
       Fused(stats0 ++ stats1, apx0, mes0, ind.left.map(_ => ind0), exact0)
@@ -133,7 +133,7 @@ private[spire] trait Fuser[C <: Context, A] {
     }
   }
 
-  private def freshApproxNames(): (TermName, TermName, TermName, TermName) = {
+  private def freshApproxNames: (TermName, TermName, TermName, TermName) = {
     val apx = freshTermName(c)("fpf$apx$")
     val mes = freshTermName(c)("fpf$mes$")
     val ind = freshTermName(c)("fpf$ind$")
@@ -160,7 +160,7 @@ private[spire] trait Fuser[C <: Context, A] {
 
   private def resign(sub: Tree)(f: (TermName, TermName) => (Tree, Tree)): Fused = {
     val fused = extract(sub)
-    val (apx, _, _, exact) = freshApproxNames()
+    val (apx, _, _, exact) = freshApproxNames
     val (apx0, exact0) = f(fused.apx, fused.exact)
     val stats = fused.stats :+ q"val $apx = $apx0" :+ q"def $exact = $exact0"
     fused.copy(stats = stats, apx = apx, exact = exact)
@@ -174,7 +174,7 @@ private[spire] trait Fuser[C <: Context, A] {
 
   def sqrt(tree: Tree)(ev: Tree): Fused = {
     val fused = extract(tree)
-    val (apx, mes, ind, exact) = freshApproxNames()
+    val (apx, mes, ind, exact) = freshApproxNames
     val indValDef = fused.ind.fold(n => q"val $ind = $n + 1" :: Nil, _ => Nil)
     val stats = List(
       q"val $apx = ${sqrt(fused.apx)}",

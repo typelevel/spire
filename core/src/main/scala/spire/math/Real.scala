@@ -24,11 +24,11 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   def toRational: Rational = toRational(Real.bits)
 
   // ugh scala.math
-  def doubleValue(): Double = toRational.toDouble
-  def floatValue(): Float = toRational.toFloat
-  def intValue(): Int = toRational.toInt
-  def longValue(): Long = toRational.toLong
-  def underlying(): Object = this
+  override def doubleValue: Double = toRational.toDouble
+  override def floatValue: Float = toRational.toFloat
+  override def intValue: Int = toRational.toInt
+  override def longValue: Long = toRational.toLong
+  override def underlying: Object = this
 
   override def isValidChar: Boolean = {
     val r = toRational
@@ -99,7 +99,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     case _        => Real(p => -x(p))
   }
 
-  def reciprocal(): Real = {
+  def reciprocal: Real = {
     def findNonzero(i: Int): Int =
       if (SafeLong.three <= x(i).abs) i else findNonzero(i + 1)
 
@@ -153,7 +153,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
         Exact(n.pow(k))
       case _ =>
         if (k < 0) {
-          reciprocal().pow(-k)
+          reciprocal.pow(-k)
         } else if (k == 0) {
           Real.one
         } else if (k == 1) {
@@ -164,7 +164,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     }
   }
 
-  def /(y: Real): Real = x * y.reciprocal()
+  def /(y: Real): Real = x * y.reciprocal
 
   def tmod(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx.tmod(ny))
@@ -242,7 +242,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
       }
   }
 
-  def isWhole(): Boolean = x match {
+  def isWhole: Boolean = x match {
     case Exact(n) =>
       n.isWhole
     case _ =>
@@ -254,7 +254,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   def sqrt: Real = Real(p => x(p * 2).sqrt)
   def nroot(k: Int): Real =
     if (k >= 0) Real(p => x(p * k).nroot(k))
-    else Real(p => x.reciprocal().nroot(math.abs(k))(p))
+    else Real(p => x.reciprocal.nroot(math.abs(k))(p))
 
   def fpow(r: Rational): Real =
     Real { p =>
@@ -334,7 +334,7 @@ object Real extends RealInstances {
     val t = x(2)
     val n = sizeInBase(t, 2) - 3
     if (t < 0) throw new ArithmeticException("log of negative number")
-    else if (t < 4) -log(x.reciprocal())
+    else if (t < 4) -log(x.reciprocal)
     else if (t < 8) logDr(x)
     else logDr(div2n(x, n)) + Real(n) * log2
   }
@@ -391,11 +391,11 @@ object Real extends RealInstances {
     val t = x(2)
     val xp1 = x + Real.one
     val xm1 = x - Real.one
-    if (t < -5) atanDr(-x.reciprocal()) - piBy2
+    if (t < -5) atanDr(-x.reciprocal) - piBy2
     else if (t == -4) -piBy4 - atanDr(xp1 / xm1)
     else if (t < 4) atanDr(x)
     else if (t == 4) piBy4 + atanDr(xm1 / xp1)
-    else piBy2 - atanDr(x.reciprocal())
+    else piBy2 - atanDr(x.reciprocal)
   }
 
   def atan2(y: Real, x: Real): Real = Real { p =>
@@ -441,17 +441,17 @@ object Real extends RealInstances {
 
   def sinh(x: Real): Real = {
     val y = exp(x)
-    (y - y.reciprocal()) / Real.two
+    (y - y.reciprocal) / Real.two
   }
 
   def cosh(x: Real): Real = {
     val y = exp(x)
-    (y + y.reciprocal()) / Real.two
+    (y + y.reciprocal) / Real.two
   }
 
   def tanh(x: Real): Real = {
     val y = exp(x);
-    val y2 = y.reciprocal()
+    val y2 = y.reciprocal
     (y - y2) / (y + y2)
   }
 
@@ -482,9 +482,9 @@ object Real extends RealInstances {
 
   lazy val piBy4 = div2n(pi, 2)
 
-  lazy val log2 = div2n(logDrx(Real.two.reciprocal()), 1)
+  lazy val log2 = div2n(logDrx(Real.two.reciprocal), 1)
 
-  lazy val sqrt1By2 = Real.two.reciprocal().sqrt
+  lazy val sqrt1By2 = Real.two.reciprocal.sqrt
 
   def accumulate(total: SafeLong, xs: LazyList[SafeLong], cs: LazyList[Rational]): SafeLong = {
     ((xs, cs): @unchecked) match {
@@ -607,7 +607,7 @@ trait RealIsFractional
   def tquot(x: Real, y: Real): Real = x.tquot(y)
   def tmod(x: Real, y: Real): Real = x.tmod(y)
 
-  override def reciprocal(x: Real): Real = x.reciprocal()
+  override def reciprocal(x: Real): Real = x.reciprocal
   def div(x: Real, y: Real): Real = x / y
 
   override def sqrt(x: Real): Real = x.sqrt

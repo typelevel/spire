@@ -446,7 +446,7 @@ final class VectorSpaceOps[V](x: V) {
 @deprecated("Unbound syntax will be removed", "spire 0.18.0")
 final class VectorSpaceUnboundOps[F: ({ type F[A] = VectorSpace[_, A] })#F](lhs: F) {
   def /(rhs: F): F = macro Ops.binopWithScalar[F, F]
-  def reciprocal(): F = macro Ops.unopWithScalar[F]
+  def reciprocal: F = macro Ops.unopWithScalar[F]
 }
 
 final class InnerProductSpaceOps[V](lhs: V) {
@@ -552,7 +552,7 @@ final class RightActionOps[P](lhs: P) {
 final class ActionUnboundOps[G: ({ type F[A] = Action[_, A] })#F](lhs: G) {
   def |+|(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def |-|(rhs: G): G = macro Ops.binopWithScalar[G, G]
-  def inverse(): G = macro Ops.unopWithScalar[G]
+  def inverse: G = macro Ops.unopWithScalar[G]
 }
 
 @deprecated("Unbound syntax will be removed", "spire 0.18.0")
@@ -566,7 +566,7 @@ final class AdditiveActionUnboundOps[G: ({ type F[A] = AdditiveAction[_, A] })#F
 final class MultiplicativeActionUnboundOps[G: ({ type F[A] = MultiplicativeAction[_, A] })#F](lhs: G) {
   def *(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def /(rhs: G): G = macro Ops.binopWithScalar[G, G]
-  def reciprocal(): G = macro Ops.unopWithScalar[G]
+  def reciprocal: G = macro Ops.unopWithScalar[G]
 }
 
 final class TorsorPointOps[P](lhs: P) {

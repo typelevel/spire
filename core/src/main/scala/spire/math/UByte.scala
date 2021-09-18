@@ -30,7 +30,7 @@ class UByte(val signed: Byte) extends AnyVal with scala.math.ScalaNumericAnyConv
   override def doubleValue: Double = toDouble
 
   override def isWhole: Boolean = true
-  def underlying(): Any = signed
+  def underlying: Any = signed
 
   override def isValidByte: Boolean = signed >= 0
   override def isValidShort: Boolean = true

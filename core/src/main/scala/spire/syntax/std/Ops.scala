@@ -16,7 +16,7 @@ final class LiteralIntOps(val lhs: Int) extends AnyVal {
   def /%(rhs: Int): (Int, Int) = (lhs / rhs, lhs % rhs)
   def pow(rhs: Int): Int = Math.pow(lhs, rhs).toInt
   def **(rhs: Int): Int = Math.pow(lhs, rhs).toInt
-  def !(): BigInt = spire.math.fact(lhs)
+  def unary_! : BigInt = spire.math.fact(lhs)
   def choose(rhs: Int): BigInt = spire.math.choose(lhs, rhs)
 }
 
@@ -25,7 +25,7 @@ final class LiteralLongOps(val lhs: Long) extends AnyVal {
   def /%(rhs: Long): (Long, Long) = (lhs / rhs, lhs % rhs)
   def pow(rhs: Long): Long = spire.math.pow(lhs, rhs)
   def **(rhs: Long): Long = spire.math.pow(lhs, rhs)
-  def !(): BigInt = spire.math.fact(lhs)
+  def unary_! : BigInt = spire.math.fact(lhs)
   def choose(rhs: Long): BigInt = spire.math.choose(lhs, rhs)
 }
 
@@ -191,7 +191,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
 
   import spire.random.Generator
 
-  def qshuffle()(implicit gen: Generator): Unit = gen.shuffle(arr)
+  def qshuffle(implicit gen: Generator): Unit = gen.shuffle(arr)
 
   def qshuffled(implicit gen: Generator): Array[A] = {
     val arr2 = arr.clone

@@ -620,9 +620,9 @@ object Algebraic extends AlgebraicInstances {
     @volatile
     private var cachedDegreeBound: Long = 0L
 
-    private def radicalNodes(): Set[KRoot] = {
+    private def radicalNodes: Set[KRoot] = {
       val childRadicals = children.foldLeft(Set.empty[KRoot]) { (acc, child) =>
-        acc ++ child.radicalNodes()
+        acc ++ child.radicalNodes
       }
       val radicals = this match {
         case expr @ KRoot(sub, k) =>
@@ -643,7 +643,7 @@ object Algebraic extends AlgebraicInstances {
      */
     def degreeBound: Long = {
       if (cachedDegreeBound == 0L)
-        radicalNodes()
+        radicalNodes
       cachedDegreeBound
     }
 

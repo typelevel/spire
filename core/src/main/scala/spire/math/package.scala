@@ -515,7 +515,7 @@ package object math {
   final def nextAfter(x: Float, y: Float): Float = Math.nextAfter(x, y)
   final def nextUp(x: Double): Double = Math.nextUp(x)
   final def nextUp(x: Float): Float = Math.nextUp(x)
-  final def random(): Double = Math.random()
+  final def random: Double = Math.random()
   final def rint(x: Double): Double = Math.rint(x)
   final def scalb(d: Double, s: Int): Double = Math.scalb(d, s)
   final def scalb(d: Float, s: Int): Float = Math.scalb(d, s)
