@@ -50,9 +50,9 @@ final class Well512a protected[random] (state: Array[Int], i0: Int) extends IntB
 
   private var i: Int = i0
 
-  def copyInit: Well512a = new Well512a(state.clone(), i)
+  def copyInit: Well512a = new Well512a(state.clone, i)
 
-  def getSeedBytes(): Array[Byte] = {
+  def getSeedBytes: Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
 
@@ -69,7 +69,7 @@ final class Well512a protected[random] (state: Array[Int], i0: Int) extends IntB
     i = bb.getInt
   }
 
-  def nextInt(): Int = {
+  def nextInt: Int = {
 
     @inline def map(r: Int) = (i + r) & R_1
 
@@ -121,7 +121,7 @@ object Well512a extends GeneratorCompanion[Well512a, (Array[Int], Int)] {
   @inline final private def mat3neg(t: Int, v: Int) = v << -t
   @inline final private def mat4neg(t: Int, b: Int, v: Int) = v ^ ((v << -t) & b)
 
-  def randomSeed(): (Array[Int], Int) =
+  def randomSeed: (Array[Int], Int) =
     (Utils.seedFromInt(R, Utils.intFromTime()), 0)
 
   def fromSeed(seed: (Array[Int], Int)): Well512a =

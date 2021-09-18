@@ -19,11 +19,11 @@ abstract class BurtleRot32(_a: Int, _b: Int, _c: Int, _d: Int) extends IntBasedG
   protected var c = _c
   protected var d = _d
 
-  override def nextInt(): Int = { advance(); d }
+  override def nextInt: Int = { advance; d }
 
-  protected def advance(): Unit
+  protected def advance: Unit
 
-  override def getSeedBytes(): Array[Byte] = {
+  override def getSeedBytes: Array[Byte] = {
     val bytes = new Array[Byte](16)
     val bb = ByteBuffer.wrap(bytes)
     bb.putInt(a)
@@ -36,10 +36,10 @@ abstract class BurtleRot32(_a: Int, _b: Int, _c: Int, _d: Int) extends IntBasedG
   def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < 16) Arrays.copyOf(bytes, 16) else bytes
     val bb = ByteBuffer.wrap(bs)
-    a = bb.getInt()
-    b = bb.getInt()
-    c = bb.getInt()
-    d = bb.getInt()
+    a = bb.getInt
+    b = bb.getInt
+    c = bb.getInt
+    d = bb.getInt
   }
 }
 
@@ -47,12 +47,12 @@ abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, A
 
   protected def create(_a: Int, _b: Int, _c: Int, _d: Int): G
 
-  override def randomSeed(): Array[Int] = GlobalRng.generateInts(4)
+  override def randomSeed: Array[Int] = GlobalRng.generateInts(4)
 
   def fromBytes(bytes: Array[Byte]): G = {
     val bs = if (bytes.length < 16) Arrays.copyOf(bytes, 16) else bytes
     val bb = ByteBuffer.wrap(bs)
-    create(bb.getInt(), bb.getInt(), bb.getInt(), bb.getInt())
+    create(bb.getInt, bb.getInt, bb.getInt, bb.getInt)
   }
 
   def fromSeed(ints: Array[Int]): G = {
@@ -62,7 +62,7 @@ abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, A
 
   def fromTime(time: Long = System.nanoTime): G = {
     val lcg = Lcg64.fromTime(time)
-    create(lcg.nextInt(), lcg.nextInt(), lcg.nextInt(), lcg.nextInt())
+    create(lcg.nextInt, lcg.nextInt, lcg.nextInt, lcg.nextInt)
   }
 }
 
@@ -73,7 +73,7 @@ abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, A
  * from [[http://burtleburtle.net/bob/rand/]]
  */
 final class BurtleRot2(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_a, _b, _c, _d) {
-  protected def advance(): Unit = {
+  protected def advance: Unit = {
     val e = a - rotateLeft(b, 27)
     a = b ^ rotateLeft(c, 17)
     b = c + d
@@ -95,7 +95,7 @@ object BurtleRot2 extends BurtleCompanion[BurtleRot2] {
  * Algorithm from [[http://burtleburtle.net/bob/rand/]]
  */
 final class BurtleRot3(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_a, _b, _c, _d) {
-  protected def advance(): Unit = {
+  protected def advance: Unit = {
     val e = a - rotateLeft(b, 23)
     a = b ^ rotateLeft(c, 16)
     b = c + rotateLeft(d, 11)

@@ -46,7 +46,7 @@ case class Next[+A](f: Generator => A) extends Op[A]
 case class FlatMap[A, +B](sub: Op[A], k: A => Op[B]) extends Op[B]
 
 object Random extends RandomCompanion[rng.Cmwc5] {
-  def initGenerator(): spire.random.rng.Cmwc5 = rng.Cmwc5.fromTime()
+  def initGenerator: spire.random.rng.Cmwc5 = rng.Cmwc5.fromTime()
 
   def spawn[B](op: Op[B]): RandomCmwc5[B] = new RandomCmwc5(op)
 }
@@ -54,10 +54,10 @@ object Random extends RandomCompanion[rng.Cmwc5] {
 trait RandomCompanion[G <: Generator] { self =>
   type R[X] = Random[X, G]
 
-  def initGenerator(): G //IO
+  def initGenerator: G //IO
 
   def generatorFromSeed(seed: Seed): G = {
-    val gen = initGenerator()
+    val gen = initGenerator
     gen.setSeedBytes(seed.bytes)
     gen
   }
@@ -71,18 +71,18 @@ trait RandomCompanion[G <: Generator] { self =>
   def constant[B](b: B): R[B] = spawn(Const(b))
 
   def unit: R[Unit] = constant(())
-  def boolean: R[Boolean] = next(_.nextBoolean())
-  def byte: R[Byte] = next(_.nextInt().toByte)
-  def short: R[Short] = next(_.nextInt().toShort)
-  def char: R[Char] = next(_.nextInt().toChar)
+  def boolean: R[Boolean] = next(_.nextBoolean)
+  def byte: R[Byte] = next(_.nextInt.toByte)
+  def short: R[Short] = next(_.nextInt.toShort)
+  def char: R[Char] = next(_.nextInt.toChar)
 
-  def int: R[Int] = next(_.nextInt())
+  def int: R[Int] = next(_.nextInt)
   def int(n: Int): R[Int] = next(_.nextInt(n))
   def int(n1: Int, n2: Int): R[Int] = next(_.nextInt(n1, n2))
 
-  def float: R[Float] = next(_.nextFloat())
-  def long: R[Long] = next(_.nextLong())
-  def double: R[Double] = next(_.nextDouble())
+  def float: R[Float] = next(_.nextFloat)
+  def long: R[Long] = next(_.nextLong)
+  def double: R[Double] = next(_.nextDouble)
 
   def string(size: Size): R[String] =
     size.random(this).flatMap(stringOfSize)
@@ -136,11 +136,11 @@ abstract class Random[+A, G <: Generator](val op: Op[A]) { self =>
   def flatMap[B](f: A => Random[B, G]): Random[B, G] =
     companion.spawn(op.flatMap(f(_).op))
 
-  def run(): A =
-    op.run(companion.initGenerator()) //IO
+  def run: A =
+    op.run(companion.initGenerator) //IO
 
   def run(seed: Seed): A = { //IO
-    val gen = companion.initGenerator()
+    val gen = companion.initGenerator
     gen.setSeedBytes(seed.bytes)
     op.run(gen)
   }

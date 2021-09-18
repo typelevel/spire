@@ -43,9 +43,9 @@ final class Well44497b protected[random] (state: Array[Int], i0: Int) extends In
 
   private var i: Int = i0
 
-  def copyInit: Well44497b = new Well44497b(state.clone(), i)
+  def copyInit: Well44497b = new Well44497b(state.clone, i)
 
-  def getSeedBytes(): Array[Byte] = {
+  def getSeedBytes: Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
 
@@ -62,7 +62,7 @@ final class Well44497b protected[random] (state: Array[Int], i0: Int) extends In
     i = bb.getInt
   }
 
-  def nextInt(): Int = {
+  def nextInt: Int = {
 
     import Well44497abIndexCache._
 
@@ -131,7 +131,7 @@ object Well44497b extends GeneratorCompanion[Well44497b, (Array[Int], Int)] {
     }
   }
 
-  def randomSeed(): (Array[Int], Int) =
+  def randomSeed: (Array[Int], Int) =
     (Utils.seedFromInt(R, Utils.intFromTime()), 0)
 
   def fromSeed(seed: (Array[Int], Int)): Well44497b =

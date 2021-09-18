@@ -12,7 +12,7 @@ class XorShift1024Star(private val s: Array[Long], private var p: Int) extends L
 
   def copyInit: XorShift1024Star = new XorShift1024Star(s.clone, p)
 
-  override def getSeedBytes(): Array[Byte] = {
+  override def getSeedBytes: Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
 
@@ -24,11 +24,11 @@ class XorShift1024Star(private val s: Array[Long], private var p: Int) extends L
   def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
-    cfor(0)(_ < N, _ + 1) { i => s(i) = bb.getLong() }
+    cfor(0)(_ < N, _ + 1) { i => s(i) = bb.getLong }
     p = bb.getInt
   }
 
-  def nextLong(): Long = {
+  def nextLong: Long = {
     val s0 = s(p)
     p = (p + 1) & 15
     var s1 = s(p)
@@ -42,7 +42,7 @@ object XorShift1024Star extends GeneratorCompanion[XorShift1024Star, (Array[Long
   @inline private val N = 16
   @inline private val BYTES = N * 8 + 4
 
-  def randomSeed(): (Array[Long], Int) = (Utils.seedFromLong(N, Utils.longFromTime()), 0)
+  def randomSeed: (Array[Long], Int) = (Utils.seedFromLong(N, Utils.longFromTime()), 0)
 
   def fromSeed(seed: (Array[Long], Int)): XorShift1024Star =
     seed match {
@@ -56,7 +56,7 @@ object XorShift1024Star extends GeneratorCompanion[XorShift1024Star, (Array[Long
     val bb = ByteBuffer.wrap(bs)
     val s = new Array[Long](N)
 
-    cfor(0)(_ < N, _ + 1) { i => s(i) = bb.getLong() }
+    cfor(0)(_ < N, _ + 1) { i => s(i) = bb.getLong }
     val p = bb.getInt
 
     fromSeed((s, p))

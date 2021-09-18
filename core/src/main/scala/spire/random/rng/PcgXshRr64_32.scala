@@ -20,7 +20,7 @@ import spire.util.Pack
 class PcgXshRr64_32 private (private var state: Long, private var inc: Long) extends IntBasedGenerator {
   protected[this] def copyInit = new PcgXshRr64_32(state, inc)
 
-  def nextInt(): Int = {
+  def nextInt: Int = {
     val oldState = state
 
     state = oldState * 6364136223846793005L + inc
@@ -32,14 +32,14 @@ class PcgXshRr64_32 private (private var state: Long, private var inc: Long) ext
   def seed(initState: Long, initSeq: Long): Unit = {
     state = 0L
     inc = (initSeq << 1) | 1L
-    nextInt()
+    nextInt
     state += initState
-    nextInt()
+    nextInt
   }
 
   def seed(seed: PcgSeed64): Unit = this.seed(seed.initState, seed.initSeq)
 
-  override def getSeedBytes(): Array[Byte] =
+  override def getSeedBytes: Array[Byte] =
     Pack.longsToBytes(Array(state, inc))
 
   override def setSeedBytes(bytes: Array[Byte]): Unit = {
@@ -50,11 +50,11 @@ class PcgXshRr64_32 private (private var state: Long, private var inc: Long) ext
 }
 
 object PcgXshRr64_32 extends GeneratorCompanion[PcgXshRr64_32, PcgSeed64] {
-  override def randomSeed(): PcgSeed64 =
-    PcgSeed64(System.nanoTime(), nextStreamId())
+  override def randomSeed: PcgSeed64 =
+    PcgSeed64(System.nanoTime, nextStreamId)
 
-  override def fromTime(time: Long = System.nanoTime()): PcgXshRr64_32 =
-    fromSeed(PcgSeed64(time, nextStreamId()))
+  override def fromTime(time: Long = System.nanoTime): PcgXshRr64_32 =
+    fromSeed(PcgSeed64(time, nextStreamId))
 
   override def fromSeed(seed: PcgSeed64): PcgXshRr64_32 = {
     val gen = new PcgXshRr64_32(0L, 0L)
@@ -70,13 +70,13 @@ object PcgXshRr64_32 extends GeneratorCompanion[PcgXshRr64_32, PcgSeed64] {
   private[this] val streamUniquifier = new AtomicLong(System.identityHashCode(PcgXshRr64_32))
 
   @tailrec
-  private[this] def nextStreamId(): Long = {
-    val current = streamUniquifier.get()
+  private[this] def nextStreamId: Long = {
+    val current = streamUniquifier.get
     val next = current * 181783497276652981L
     if (streamUniquifier.compareAndSet(current, next)) {
       next
     } else {
-      nextStreamId()
+      nextStreamId
     }
   }
 }

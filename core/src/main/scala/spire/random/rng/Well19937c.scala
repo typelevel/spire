@@ -43,9 +43,9 @@ final class Well19937c protected[random] (state: Array[Int], i0: Int) extends In
 
   private var i: Int = i0
 
-  def copyInit: Well19937c = new Well19937c(state.clone(), i)
+  def copyInit: Well19937c = new Well19937c(state.clone, i)
 
-  def getSeedBytes(): Array[Byte] = {
+  def getSeedBytes: Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
 
@@ -62,7 +62,7 @@ final class Well19937c protected[random] (state: Array[Int], i0: Int) extends In
     i = bb.getInt
   }
 
-  def nextInt(): Int = {
+  def nextInt: Int = {
 
     import Well19937acIndexCache._
 
@@ -120,7 +120,7 @@ object Well19937c extends GeneratorCompanion[Well19937c, (Array[Int], Int)] {
   @inline final private def mat1(v: Int) = v
   @inline final private def mat3pos(t: Int, v: Int) = v >>> t
 
-  def randomSeed(): (Array[Int], Int) = (Utils.seedFromInt(R, Utils.intFromTime()), 0)
+  def randomSeed: (Array[Int], Int) = (Utils.seedFromInt(R, Utils.intFromTime()), 0)
 
   def fromSeed(seed: (Array[Int], Int)): Well19937c =
     seed match {
