@@ -18,8 +18,8 @@ val Scala3 = "3.0.2"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / crossScalaVersions := Seq(Scala213, Scala30)
-ThisBuild / scalaVersion := Scala30
+ThisBuild / crossScalaVersions := Seq(Scala213, Scala3)
+ThisBuild / scalaVersion := Scala3
 ThisBuild / organization := "org.typelevel"
 
 ThisBuild / githubWorkflowArtifactUpload := false
