@@ -428,7 +428,6 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def compare(that: SafeLong): Int =
     that match {
       case SafeLongLong(y) =>
-        // println(s"SLL $x y ${x.compare(y)}")
         x.compare(y)
       case SafeLongBigInteger(y) =>
         -y.signum

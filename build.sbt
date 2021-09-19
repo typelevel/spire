@@ -14,7 +14,7 @@ lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
 val Scala213 = "2.13.6"
-val Scala30 = "3.0.2"
+val Scala3 = "3.0.2"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -437,7 +437,7 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
 
 lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
   libraryDependencies ++= {
-    if (scalaVersion.value.startsWith("3.0")) Seq.empty
+    if (scalaVersion.value.startsWith("3")) Seq.empty
     else Seq(scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided")
   }
 )

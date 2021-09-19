@@ -21,7 +21,7 @@ def cforRangeMacroGen[R <: RangeLike : Type](r: Expr[R], body: Expr[RangeElem[R]
   (r, body) match
     case '{$r: Range             } -> '{$body: (Int => Unit) } => cforRangeMacro(r, body)
     case '{$r: NumericRange[Long]} -> '{$body: (Long => Unit)} => cforRangeMacroLong(r, body)
-    case '{$r}                     -> _                        => report.error(s"Uneligable Range type ", r); '{}
+    case '{$r}                     -> _                        => report.error(s"Ineligible Range type ", r); '{}
 
 end cforRangeMacroGen
 
