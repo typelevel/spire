@@ -12,194 +12,216 @@ import scala.annotation.targetName
 import spire.util.Opt
 
 trait EqSyntax:
-  extension[A](lhs: A)(using ev: Eq[A])
-    def ===[B](rhs: B)(using ev1: B =:= A): Boolean = ev.eqv(lhs, ev1(rhs))
-    def =!=[B](rhs: B)(using ev1: B =:= A): Boolean = ev.neqv(lhs, ev1(rhs))
+  implicit def eqOps[A: Eq](a: A): EqOps[A] = new EqOps(a)
+  // extension[A](lhs: A)(using ev: Eq[A])
+  //   def ===[B](rhs: B)(using ev1: B =:= A): Boolean = ev.eqv(lhs, ev1(rhs))
+  //   def =!=[B](rhs: B)(using ev1: B =:= A): Boolean = ev.neqv(lhs, ev1(rhs))
 end EqSyntax
 
 trait PartialOrderSyntax extends EqSyntax:
-  extension[A](lhs: A)(using ev: PartialOrder[A])
-    def >(rhs: A): Boolean = ev.gt(lhs, rhs)
-    def >=(rhs: A): Boolean = ev.gteqv(lhs, rhs)
-    def <(rhs: A): Boolean = ev.lt(lhs, rhs)
-    def <=(rhs: A): Boolean = ev.lteqv(lhs, rhs)
-
-    def partialCompare(rhs: A): Double = ev.partialCompare(lhs, rhs)
-    def tryCompare(rhs: A): Option[Int] = ev.tryCompare(lhs, rhs)
-    def pmin(rhs: A): Option[A] = ev.pmin(lhs, rhs)
-    def pmax(rhs: A): Option[A] = ev.pmax(lhs, rhs)
-
-    def >(rhs: Int)(using ev1: Ring[A]): Boolean = ev.gt(lhs, ev1.fromInt(rhs))
-    def >=(rhs: Int)(using ev1: Ring[A]): Boolean = ev.gteqv(lhs, ev1.fromInt(rhs))
-    def <(rhs: Int)(using ev1: Ring[A]): Boolean = ev.lt(lhs, ev1.fromInt(rhs))
-    def <=(rhs: Int)(using ev1: Ring[A]): Boolean = ev.lteqv(lhs, ev1.fromInt(rhs))
-
-    def >(rhs: Double)(using ev1: Field[A]): Boolean = ev.gt(lhs, ev1.fromDouble(rhs))
-    def >=(rhs: Double)(using ev1: Field[A]): Boolean = ev.gteqv(lhs, ev1.fromDouble(rhs))
-    def <(rhs: Double)(using ev1: Field[A]): Boolean = ev.lt(lhs, ev1.fromDouble(rhs))
-    def <=(rhs: Double)(using ev1: Field[A]): Boolean = ev.lteqv(lhs, ev1.fromDouble(rhs))
-
-    def >(rhs: Number)(using c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) > rhs
-    def >=(rhs: Number)(using c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) >= rhs
-    def <(rhs: Number)(using c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) < rhs
-    def <=(rhs: Number)(using c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) <= rhs
+  implicit def partialOrderOps[A: PartialOrder](a: A): PartialOrderOps[A] = new PartialOrderOps(a)
+  // extension[A](lhs: A)(using ev: PartialOrder[A])
+  //   def >(rhs: A): Boolean = ev.gt(lhs, rhs)
+  //   def >=(rhs: A): Boolean = ev.gteqv(lhs, rhs)
+  //   def <(rhs: A): Boolean = ev.lt(lhs, rhs)
+  //   def <=(rhs: A): Boolean = ev.lteqv(lhs, rhs)
+  //
+  //   def partialCompare(rhs: A): Double = ev.partialCompare(lhs, rhs)
+  //   def tryCompare(rhs: A): Option[Int] = ev.tryCompare(lhs, rhs)
+  //   def pmin(rhs: A): Option[A] = ev.pmin(lhs, rhs)
+  //   def pmax(rhs: A): Option[A] = ev.pmax(lhs, rhs)
+  //
+  //   def >(rhs: Int)(using ev1: Ring[A]): Boolean = ev.gt(lhs, ev1.fromInt(rhs))
+  //   def >=(rhs: Int)(using ev1: Ring[A]): Boolean = ev.gteqv(lhs, ev1.fromInt(rhs))
+  //   def <(rhs: Int)(using ev1: Ring[A]): Boolean = ev.lt(lhs, ev1.fromInt(rhs))
+  //   def <=(rhs: Int)(using ev1: Ring[A]): Boolean = ev.lteqv(lhs, ev1.fromInt(rhs))
+  //
+  //   def >(rhs: Double)(using ev1: Field[A]): Boolean = ev.gt(lhs, ev1.fromDouble(rhs))
+  //   def >=(rhs: Double)(using ev1: Field[A]): Boolean = ev.gteqv(lhs, ev1.fromDouble(rhs))
+  //   def <(rhs: Double)(using ev1: Field[A]): Boolean = ev.lt(lhs, ev1.fromDouble(rhs))
+  //   def <=(rhs: Double)(using ev1: Field[A]): Boolean = ev.lteqv(lhs, ev1.fromDouble(rhs))
+  //
+  //   def >(rhs: Number)(using c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) > rhs
+  //   def >=(rhs: Number)(using c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) >= rhs
+  //   def <(rhs: Number)(using c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) < rhs
+  //   def <=(rhs: Number)(using c: ConvertableFrom[A]): Boolean = c.toNumber(lhs) <= rhs
 end PartialOrderSyntax
 
 trait OrderSyntax extends PartialOrderSyntax:
-  extension [A](lhs: A)(using o: Order[A])
-    def compare(rhs: A): Int = o.compare(lhs, rhs)
-    def min(rhs: A): A = o.min(lhs, rhs)
-    def max(rhs: A): A = o.max(lhs, rhs)
+  implicit def orderOps[A: Order](a: A): OrderOps[A] = new OrderOps(a)
+  implicit def literalIntOrderOps(lhs: Int): LiteralIntOrderOps = new LiteralIntOrderOps(lhs)
+  implicit def literalLongOrderOps(lhs: Long): LiteralLongOrderOps = new LiteralLongOrderOps(lhs)
+  implicit def literalDoubleOrderOps(lhs: Double): LiteralDoubleOrderOps = new LiteralDoubleOrderOps(lhs)
+  // extension [A](lhs: A)(using o: Order[A])
+  //   def compare(rhs: A): Int = o.compare(lhs, rhs)
+  //   def min(rhs: A): A = o.min(lhs, rhs)
+  //   def max(rhs: A): A = o.max(lhs, rhs)
+  //
+  //   def compare(rhs: Int)(using ev1: Ring[A]): Int = o.compare(lhs, ev1.fromInt(rhs))
+  //   def min(rhs: Int)(using ev1: Ring[A]): A = o.min(lhs, ev1.fromInt(rhs))
+  //   def max(rhs: Int)(using ev1: Ring[A]): A = o.max(lhs, ev1.fromInt(rhs))
+  //
+  //   def compare(rhs: Double)(using ev1: Field[A]): Int = o.compare(lhs, ev1.fromDouble(rhs))
+  //   def min(rhs: Double)(using ev1: Field[A]): A = o.min(lhs, ev1.fromDouble(rhs))
+  //   def max(rhs: Double)(using ev1: Field[A]): A = o.max(lhs, ev1.fromDouble(rhs))
+  //
+  //   def compare(rhs: Number)(using c: ConvertableFrom[A]): Int = c.toNumber(lhs).compare(rhs)
+  //   def min(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs).min(rhs)
+  //   def max(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs).max(rhs)
 
-    def compare(rhs: Int)(using ev1: Ring[A]): Int = o.compare(lhs, ev1.fromInt(rhs))
-    def min(rhs: Int)(using ev1: Ring[A]): A = o.min(lhs, ev1.fromInt(rhs))
-    def max(rhs: Int)(using ev1: Ring[A]): A = o.max(lhs, ev1.fromInt(rhs))
-
-    def compare(rhs: Double)(using ev1: Field[A]): Int = o.compare(lhs, ev1.fromDouble(rhs))
-    def min(rhs: Double)(using ev1: Field[A]): A = o.min(lhs, ev1.fromDouble(rhs))
-    def max(rhs: Double)(using ev1: Field[A]): A = o.max(lhs, ev1.fromDouble(rhs))
-
-    def compare(rhs: Number)(using c: ConvertableFrom[A]): Int = c.toNumber(lhs).compare(rhs)
-    def min(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs).min(rhs)
-    def max(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs).max(rhs)
-
-  extension (lhs: Int)
-    def <[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromInt(lhs), rhs)
-    def <=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromInt(lhs), rhs)
-    def >[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromInt(lhs), rhs)
-    def >=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromInt(lhs), rhs)
-
-    def cmp[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromInt(lhs), rhs)
-    def min[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromInt(lhs), rhs)
-    def max[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromInt(lhs), rhs)
-
-  extension(lhs: Long)
-    def <[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromLong(lhs), rhs)
-    def <=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromLong(lhs), rhs)
-    def >[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromLong(lhs), rhs)
-    def >=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromLong(lhs), rhs)
-
-    def cmp[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromLong(lhs), rhs)
-    def min[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromLong(lhs), rhs)
-    def max[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromLong(lhs), rhs)
-
-  extension(lhs: Double)
-    def <[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromDouble(lhs), rhs)
-    def <=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromDouble(lhs), rhs)
-    def >[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromDouble(lhs), rhs)
-    def >=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromDouble(lhs), rhs)
-
-    def cmp[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromDouble(lhs), rhs)
-    def min[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromDouble(lhs), rhs)
-    def max[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromDouble(lhs), rhs)
+  // extension (lhs: Int)
+  //   def <[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromInt(lhs), rhs)
+  //   def <=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromInt(lhs), rhs)
+  //   def >[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromInt(lhs), rhs)
+  //   def >=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromInt(lhs), rhs)
+  //
+  //   def cmp[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromInt(lhs), rhs)
+  //   def min[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromInt(lhs), rhs)
+  //   def max[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromInt(lhs), rhs)
+  //
+  // extension(lhs: Long)
+  //   def <[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromLong(lhs), rhs)
+  //   def <=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromLong(lhs), rhs)
+  //   def >[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromLong(lhs), rhs)
+  //   def >=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromLong(lhs), rhs)
+  //
+  //   def cmp[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromLong(lhs), rhs)
+  //   def min[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromLong(lhs), rhs)
+  //   def max[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromLong(lhs), rhs)
+  //
+  // extension(lhs: Double)
+  //   def <[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lt(c.fromDouble(lhs), rhs)
+  //   def <=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.lteqv(c.fromDouble(lhs), rhs)
+  //   def >[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gt(c.fromDouble(lhs), rhs)
+  //   def >=[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Boolean = ev.gteqv(c.fromDouble(lhs), rhs)
+  //
+  //   def cmp[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): Int = ev.compare(c.fromDouble(lhs), rhs)
+  //   def min[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.min(c.fromDouble(lhs), rhs)
+  //   def max[A](rhs: A)(using ev: Order[A], c: ConvertableTo[A]): A = ev.max(c.fromDouble(lhs), rhs)
 end OrderSyntax
 
 trait SignedSyntax extends OrderSyntax:
-  extension [A](a: A)(using s: Signed[A])
-    def abs: A = s.abs(a)
-    def sign: Sign = s.sign(a)
-    def signum: Int = s.signum(a)
-
-    def isSignZero: Boolean = s.isSignZero(a)
-    def isSignPositive: Boolean = s.isSignPositive(a)
-    def isSignNegative: Boolean = s.isSignNegative(a)
-
-    def isSignNonZero: Boolean = s.isSignNonZero(a)
-    def isSignNonPositive: Boolean = s.isSignNonPositive(a)
-    def isSignNonNegative: Boolean = s.isSignNonNegative(a)
+  implicit def signedOps[A: Signed](a: A): SignedOps[A] = new SignedOps(a)
+  // extension [A](a: A)(using s: Signed[A])
+  //   def abs: A = s.abs(a)
+  //   def sign: Sign = s.sign(a)
+  //   def signum: Int = s.signum(a)
+  //
+  //   def isSignZero: Boolean = s.isSignZero(a)
+  //   def isSignPositive: Boolean = s.isSignPositive(a)
+  //   def isSignNegative: Boolean = s.isSignNegative(a)
+  //
+  //   def isSignNonZero: Boolean = s.isSignNonZero(a)
+  //   def isSignNonPositive: Boolean = s.isSignNonPositive(a)
+  //   def isSignNonNegative: Boolean = s.isSignNonNegative(a)
 end SignedSyntax
 
 trait TruncatedDivisionSyntax extends SignedSyntax:
-  extension[A](lhs: A)(using ev: TruncatedDivision[A])
-    def toBigIntOpt: Opt[BigInt] = ev.toBigIntOpt(lhs)
-    def tquot(rhs: A): A = ev.tquot(lhs, rhs)
-    def tmod(rhs: A): A = ev.tmod(lhs, rhs)
-    def tquotmod(rhs: A): (A, A) = ev.tquotmod(lhs, rhs)
-
-    def fquot(rhs: A): A = ev.fquot(lhs, rhs)
-    def fmod(rhs: A): A = ev.fmod(lhs, rhs)
-    def fquotmod(rhs: A): (A, A) = ev.fquotmod(lhs, rhs)
-
-  extension(lhs: Int)
-    def tquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromInt(lhs), rhs)
-    def tmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromInt(lhs), rhs)
-    def tquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
-      ev.tquotmod(c.fromInt(lhs), rhs)
-    def fquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromInt(lhs), rhs)
-    def fmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromInt(lhs), rhs)
-    def fquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
-      ev.fquotmod(c.fromInt(lhs), rhs)
-
-  extension(lhs: Long)
-    def tquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromLong(lhs), rhs)
-    def tmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromLong(lhs), rhs)
-    def tquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
-      ev.tquotmod(c.fromLong(lhs), rhs)
-    def fquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromLong(lhs), rhs)
-    def fmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromLong(lhs), rhs)
-    def fquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
-      ev.fquotmod(c.fromLong(lhs), rhs)
-
-  extension(lhs: Double)
-    def tquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromDouble(lhs), rhs)
-    def tmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromDouble(lhs), rhs)
-    def tquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
-      ev.tquotmod(c.fromDouble(lhs), rhs)
-    def fquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromDouble(lhs), rhs)
-    def fmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromDouble(lhs), rhs)
-    def fquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
-      ev.fquotmod(c.fromDouble(lhs), rhs)
+  implicit def truncatedDivisionOps[A: TruncatedDivision](a: A): TruncatedDivisionOps[A] = new TruncatedDivisionOps(a)
+  implicit def literalIntTruncatedDivisionOps(lhs: Int): LiteralIntTruncatedDivisionOps =
+    new LiteralIntTruncatedDivisionOps(lhs)
+  implicit def literalLongTruncatedDivisionOps(lhs: Long): LiteralLongTruncatedDivisionOps =
+    new LiteralLongTruncatedDivisionOps(lhs)
+  implicit def literalDoubleTruncatedDivisionOps(lhs: Double): LiteralDoubleTruncatedDivisionOps =
+    new LiteralDoubleTruncatedDivisionOps(lhs)
+  // extension[A](lhs: A)(using ev: TruncatedDivision[A])
+  //   def toBigIntOpt: Opt[BigInt] = ev.toBigIntOpt(lhs)
+  //   def tquot(rhs: A): A = ev.tquot(lhs, rhs)
+  //   def tmod(rhs: A): A = ev.tmod(lhs, rhs)
+  //   def tquotmod(rhs: A): (A, A) = ev.tquotmod(lhs, rhs)
+  //
+  //   def fquot(rhs: A): A = ev.fquot(lhs, rhs)
+  //   def fmod(rhs: A): A = ev.fmod(lhs, rhs)
+  //   def fquotmod(rhs: A): (A, A) = ev.fquotmod(lhs, rhs)
+  //
+  // extension(lhs: Int)
+  //   def tquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromInt(lhs), rhs)
+  //   def tmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromInt(lhs), rhs)
+  //   def tquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
+  //     ev.tquotmod(c.fromInt(lhs), rhs)
+  //   def fquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromInt(lhs), rhs)
+  //   def fmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromInt(lhs), rhs)
+  //   def fquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
+  //     ev.fquotmod(c.fromInt(lhs), rhs)
+  //
+  // extension(lhs: Long)
+  //   def tquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromLong(lhs), rhs)
+  //   def tmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromLong(lhs), rhs)
+  //   def tquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
+  //     ev.tquotmod(c.fromLong(lhs), rhs)
+  //   def fquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromLong(lhs), rhs)
+  //   def fmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromLong(lhs), rhs)
+  //   def fquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
+  //     ev.fquotmod(c.fromLong(lhs), rhs)
+  //
+  // extension(lhs: Double)
+  //   def tquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tquot(c.fromDouble(lhs), rhs)
+  //   def tmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.tmod(c.fromDouble(lhs), rhs)
+  //   def tquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
+  //     ev.tquotmod(c.fromDouble(lhs), rhs)
+  //   def fquot[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fquot(c.fromDouble(lhs), rhs)
+  //   def fmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): A = ev.fmod(c.fromDouble(lhs), rhs)
+  //   def fquotmod[A](rhs: A)(using ev: TruncatedDivision[A], c: ConvertableTo[A]): (A, A) =
+  //     ev.fquotmod(c.fromDouble(lhs), rhs)
 end TruncatedDivisionSyntax
 
 trait InvolutionSyntax:
-  extension[A](lhs: A)(using ev: Involution[A])
-    def adjoint: A = ev.adjoint(lhs)
+  implicit def involutionOps[A: Involution](lhs: A): InvolutionOps[A] = new InvolutionOps(lhs)
+  // extension[A](lhs: A)(using ev: Involution[A])
+  //   def adjoint: A = ev.adjoint(lhs)
 end InvolutionSyntax
 
 trait IsRealSyntax extends SignedSyntax:
-  extension [A](lhs: A)(using is: IsReal[A])
-    def isWhole: Boolean = is.isWhole(lhs)
-    def ceil: A = is.ceil(lhs)
-    def floor: A = is.floor(lhs)
-    def round: A = is.round(lhs)
-    // def toDouble: Double = is.toDouble(lhs)
+  implicit def isRealOps[A: IsReal](a: A): IsRealOps[A] = new IsRealOps(a)
+  // extension [A](lhs: A)(using is: IsReal[A])
+  //   def isWhole: Boolean = is.isWhole(lhs)
+  //   def ceil: A = is.ceil(lhs)
+  //   def floor: A = is.floor(lhs)
+  //   def round: A = is.round(lhs)
+  //   // def toDouble: Double = is.toDouble(lhs)
 end IsRealSyntax
 
 trait SemigroupoidSyntax:
-  extension[A](lhs: A)(using ev: Semigroupoid[A])
-    def |+|?(rhs: A): Opt[A] = ev.partialOp(lhs, rhs)
-    def |+|??(rhs: A): Boolean = ev.opIsDefined(lhs, rhs)
+  implicit def semigroupoidOps[A: Semigroupoid](a: A): SemigroupoidOps[A] = new SemigroupoidOps[A](a)
+  // extension[A](lhs: A)(using ev: Semigroupoid[A])
+  //   def |+|?(rhs: A): Opt[A] = ev.partialOp(lhs, rhs)
+  //   def |+|??(rhs: A): Boolean = ev.opIsDefined(lhs, rhs)
 end SemigroupoidSyntax
 
 trait GroupoidSyntax extends SemigroupoidSyntax:
-  @nowarn
+  // @nowarn
   implicit def groupoidCommonOps[A](a: A)(using ev: Groupoid[A], ni: NoImplicit[Monoid[A]]): GroupoidCommonOps[A] =
     new GroupoidCommonOps[A](a)
   // TODO use an extension heere
   // extension[A](lhs: A)(using ev: Groupoid[A], ni: NoImplicit[Monoid[A]])
   //   def inverse: A = ev.inverse(lhs)
     // def isId(implicit ev1: Eq[A]): Boolean = ev.isId(lhs)(ev1)
-  extension[A](lhs: A)(using ev: Groupoid[A])
-    def leftId: A = ev.leftId(lhs)
-    def rightId: A = ev.rightId(lhs)
-    def |-|?(rhs: A): Opt[A] = ev.partialOpInverse(lhs, rhs)
-    def |-|??(rhs: A): Boolean = ev.opInverseIsDefined(lhs, rhs)
+  // extension[A](lhs: A)(using ev: Groupoid[A])
+  //   def leftId: A = ev.leftId(lhs)
+  //   def rightId: A = ev.rightId(lhs)
+  //   def |-|?(rhs: A): Opt[A] = ev.partialOpInverse(lhs, rhs)
+  //   def |-|??(rhs: A): Boolean = ev.opInverseIsDefined(lhs, rhs)
+  implicit def groupoidOps[A](a: A)(implicit ev: Groupoid[A]): GroupoidOps[A] = new GroupoidOps[A](a)
 end GroupoidSyntax
 
 trait SemigroupSyntax:
-  extension[A](lhs: A)(using ev: Semigroup[A])
-    def |+|(rhs: A): A = ev.combine(lhs, rhs)
+  implicit def semigroupOps[A: Semigroup](a: A): SemigroupOps[A] = new SemigroupOps(a)
+  // extension[A](lhs: A)(using ev: Semigroup[A])
+  //   def |+|(rhs: A): A = ev.combine(lhs, rhs)
 end SemigroupSyntax
 
 trait MonoidSyntax extends SemigroupSyntax:
-  extension[A](lhs: A)(using ev: Monoid[A])
-    def isEmpty(using ev1: Eq[A]): Boolean = ev.isEmpty(lhs)
+  implicit def monoidOps[A](a: A)(implicit ev: Monoid[A]): MonoidOps[A] = new MonoidOps(a)
+  // extension[A](lhs: A)(using ev: Monoid[A])
+  //   def isEmpty(using ev1: Eq[A]): Boolean = ev.isEmpty(lhs)
 end MonoidSyntax
 
 trait GroupSyntax extends MonoidSyntax:
-  extension[A](lhs: A)(using ev: Group[A])
-    def inverse: A = ev.inverse(lhs)
-    def |-|(rhs: A): A = ev.remove(lhs, rhs)
+  given groupOps[A: Group]: Conversion[A, GroupOps[A]] = new GroupOps(_)
+  // implicit def groupOps[A: Group](a: A): GroupOps[A] = new GroupOps(a)
+  // extension[A](lhs: A)(using ev: Group[A])
+  //   def inverse: A = ev.inverse(lhs)
+  //   def |-|(rhs: A): A = ev.remove(lhs, rhs)
 end GroupSyntax
 
 trait AdditiveSemigroupSyntax:

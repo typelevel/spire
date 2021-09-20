@@ -7,7 +7,8 @@ import spire.std.double._
 import spire.std.int._
 import spire.std.seq._
 import spire.std.string._
-import spire.syntax.signed._
+// import spire.syntax.signed._
+import spire.syntax.all._
 import spire.laws.arb.rational
 
 import org.scalacheck.Arbitrary
