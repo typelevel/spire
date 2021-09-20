@@ -1,7 +1,8 @@
 package spire
-package math
+package syntax
 
 import spire.std.int._
+import spire.math._
 
 class LiteralsSuite extends munit.FunSuite {
   test("byte literals") {

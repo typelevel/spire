@@ -59,7 +59,7 @@ trait ByteOrder extends Order[Byte] {
 
 trait ByteSigned extends Signed[Byte] with ByteOrder {
   override def signum(a: Byte): Int = java.lang.Integer.signum(a)
-  override def abs(a: Byte): Byte = (if (a < 0) -a else a: Int).toByte
+  override def abs(a: Byte): Byte = (if (a < 0) -a else a.toInt).toByte
 }
 
 trait ByteTruncatedDivision extends TruncatedDivisionCRing[Byte] with ByteSigned {

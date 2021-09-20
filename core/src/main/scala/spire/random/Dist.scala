@@ -29,15 +29,18 @@ trait Dist[@sp A] extends Any { self =>
 
   final def filter(pred: A => Boolean): Dist[A] =
     new Dist[A] {
-      // Scala3 gives an error: Cannot rewrite recursive call: it targets a supertype
-      // @tailrec
       final def apply(gen: Generator): A = {
-        val a = self(gen)
-        if (pred(a)) a else apply(gen)
+        @tailrec
+        def loop: A = {
+          val a = self(gen)
+          if (pred(a)) a else loop
+        }
+
+        loop
       }
     }
 
-  final def given_(pred: A => Boolean): Dist[A] =
+  final def `given`(pred: A => Boolean): Dist[A] =
     filter(pred)
 
   def until(pred: A => Boolean): Dist[Seq[A]] = {

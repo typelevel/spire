@@ -65,7 +65,7 @@ package object syntax {
 
   object all extends AllSyntax
 
-  @deprecated
+  @deprecated("Unbound syntax will be removed", "spire 0.18.0")
   object unbound extends UnboundSyntax
 
   object interval extends IntervalSyntax

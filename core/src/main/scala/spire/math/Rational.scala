@@ -93,23 +93,19 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
         val rd = rhs.denominatorAsLong
         val dengcd = spire.math.gcd(ld, rd)
         val tmp = ld / dengcd // fits in Long
-        // Checked does not like Opt.unapply, so we use isEmpty/get
-        try {
-          Checked.checked {
-            val newDenAsLong = tmp * rd
-            if (newNumAsSafeLong.isEmpty)
-              Rational(newNumAsLong, newDenAsLong)
-            else
-              Rational(newNumAsSafeLong.get, SafeLong(newDenAsLong))
-          }
-        } catch {
-          case (_: ArithmeticException) =>
-            val newDenAsSafeLong = SafeLong(tmp) * rd
-            // Checked does not like Opt.unapply
-            if (newNumAsSafeLong.isEmpty)
-              Rational(SafeLong(newNumAsLong), newDenAsSafeLong)
-            else
-              Rational(newNumAsSafeLong.get, newDenAsSafeLong)
+        Checked.tryOrElse {
+          val newDenAsLong = tmp * rd
+          if (newNumAsSafeLong.isEmpty)
+            Rational(newNumAsLong, newDenAsLong)
+          else
+            Rational(newNumAsSafeLong.get, SafeLong(newDenAsLong))
+        } {
+          val newDenAsSafeLong = SafeLong(tmp) * rd
+          // Checked does not like Opt.unapply
+          if (newNumAsSafeLong.isEmpty)
+            Rational(SafeLong(newNumAsLong), newDenAsSafeLong)
+          else
+            Rational(newNumAsSafeLong.get, newDenAsSafeLong)
         }
       } else {
         val newDenAsSafeLong = lhs.denominator.lcm(rhs.denominator)

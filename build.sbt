@@ -427,13 +427,7 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
         }
       }
     }
-  } ++ Seq(
-    Compile / unmanagedSourceDirectories ++= scalaVersionSpecificFolders("main",
-                                                                         baseDirectory.value,
-                                                                         scalaVersion.value
-    ),
-    Test / unmanagedSourceDirectories ++= scalaVersionSpecificFolders("test", baseDirectory.value, scalaVersion.value)
-  )
+  }
 
 lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
   libraryDependencies ++= {
@@ -443,12 +437,7 @@ lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
 )
 
 lazy val commonScalacOptions = Def.setting(
-  (CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, v)) if v >= 13 =>
-      Seq()
-    case _ =>
-      Seq()
-  }) ++ Seq(
+  Seq(
     "-deprecation",
     "-encoding",
     "UTF-8",
@@ -524,14 +513,3 @@ lazy val credentialSettings = Seq(
       .getOrElse(Path.userHome / ".ivy2" / ".credentials")
   )
 )
-
-def scalaVersionSpecificFolders(srcName: String, srcBaseDir: java.io.File, scalaVersion: String) = {
-  def extraDirs(suffix: String) =
-    List(CrossType.Pure, CrossType.Full)
-      .flatMap(_.sharedSrcDir(srcBaseDir, srcName).toList.map(f => file(f.getPath + suffix)))
-  CrossVersion.partialVersion(scalaVersion) match {
-    case Some((2, y))     => extraDirs("-2.x") ++ (if (y >= 13) extraDirs("-2.13+") else Nil)
-    case Some((0 | 3, _)) => extraDirs("-3.x")
-    case _                => Nil
-  }
-}

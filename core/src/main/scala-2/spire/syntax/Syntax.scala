@@ -223,7 +223,7 @@ trait IntervalSyntax {
     new IntervalPointOps(a)
 }
 
-@deprecated
+@deprecated("Unbound syntax will be removed", "spire 0.18.0")
 trait UnboundSyntax {
   implicit def moduleUnboundOps[F](f: F)(implicit ev: CModule[_, F]): ModuleUnboundOps[F] =
     new ModuleUnboundOps(f)

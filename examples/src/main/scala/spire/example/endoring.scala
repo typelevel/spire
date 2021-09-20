@@ -92,7 +92,6 @@ object EndoRingExample extends App {
 
   // We can define some simple endomorphisms.
   val id = pairedSetEndoRing.one
-  // TODO in spire2 paired2Set2set works implicitly
   val double: Endo[PairedSet[Int]] = _.map(_ * 2)
   val triple: Endo[PairedSet[Int]] = _.map(_ * 3)
   val inc: Endo[PairedSet[Int]] = _.map(_ + 1)

@@ -59,7 +59,7 @@ trait ShortOrder extends Order[Short] {
 
 trait ShortSigned extends Signed[Short] with ShortOrder {
   override def signum(a: Short): Int = java.lang.Integer.signum(a)
-  override def abs(a: Short): Short = (if (a < 0) -a else a: Int).toShort
+  override def abs(a: Short): Short = (if (a < 0) -a else a.toInt).toShort
 }
 
 trait ShortTruncatedDivision extends TruncatedDivisionCRing[Short] with ShortSigned {

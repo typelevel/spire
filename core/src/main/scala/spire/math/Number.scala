@@ -239,12 +239,9 @@ private[math] case class IntNumber(n: SafeLong) extends Number { lhs =>
   }
 
   def pow(rhs: Number): Number = rhs match {
-    case _ if rhs.canBeInt =>
-      Number(n.pow(rhs.intValue))
-    case FloatNumber(m) if withinDouble =>
-      Number(spire.math.pow(doubleValue, m))
-    case _ =>
-      Number(spire.math.pow(lhs.toBigDecimal, rhs.toBigDecimal))
+    case _ if rhs.canBeInt              => Number(n.pow(rhs.intValue))
+    case FloatNumber(m) if withinDouble => Number(spire.math.pow(doubleValue, m))
+    case _                              => Number(spire.math.pow(lhs.toBigDecimal, rhs.toBigDecimal))
   }
 
   override def &(rhs: Number): Number = rhs match {

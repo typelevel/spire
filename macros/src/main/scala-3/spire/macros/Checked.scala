@@ -185,7 +185,10 @@ object Checked:
    * evaluated and returned.
    */
   inline def tryOrElse[A](inline n: A)(orElse: => A): A =
-    ${ checkedImpl[A]('{n}, '{orElse}) }
+    try
+      checked(n)
+    catch
+      case a: ArithmeticOverflowException => orElse
 
   /**
    * Performs overflow checking for Int/Long operations.
