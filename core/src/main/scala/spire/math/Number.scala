@@ -525,7 +525,7 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
 
   def floor: Number = Number(n.floor)
   def ceil: Number = Number(n.ceil)
-  def round: Number = ??? //Number(n.round)
+  def round: Number = Number(isRealOps(n).round)
 }
 
 private[math] case class RationalNumber(n: Rational) extends Number { lhs =>

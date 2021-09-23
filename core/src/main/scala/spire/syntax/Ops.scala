@@ -76,3 +76,81 @@ final class GroupoidCommonOps[A](lhs: A)(implicit ev: Groupoid[A]) {
   def isId(implicit ev1: Eq[A]): Boolean = ev.isId(lhs)(ev1)
 }
 
+final class LiteralIntAdditiveSemigroupOps(val lhs: Int) extends AnyVal {
+  def +[A](rhs: A)(implicit ev: Ring[A]): A = ev.plus(ev.fromInt(lhs), rhs)
+}
+
+final class LiteralLongAdditiveSemigroupOps(val lhs: Long) extends AnyVal {
+  def +[A](rhs: A)(implicit ev: Ring[A], c: ConvertableTo[A]): A = ev.plus(c.fromLong(lhs), rhs)
+}
+
+final class LiteralDoubleAdditiveSemigroupOps(val lhs: Double) extends AnyVal {
+  def +[A](rhs: A)(implicit ev: Field[A]): A = ev.plus(ev.fromDouble(lhs), rhs)
+}
+
+final class LiteralIntAdditiveGroupOps(val lhs: Int) extends AnyVal {
+  def -[A](rhs: A)(implicit ev: Ring[A]): A = ev.minus(ev.fromInt(lhs), rhs)
+}
+
+final class LiteralLongAdditiveGroupOps(val lhs: Long) extends AnyVal {
+  def -[A](rhs: A)(implicit ev: Ring[A], c: ConvertableTo[A]): A = ev.minus(c.fromLong(lhs), rhs)
+}
+
+final class LiteralDoubleAdditiveGroupOps(val lhs: Double) extends AnyVal {
+  def -[A](rhs: A)(implicit ev: Field[A]): A = ev.minus(ev.fromDouble(lhs), rhs)
+}
+
+final class LiteralIntMultiplicativeSemigroupOps(val lhs: Int) extends AnyVal {
+  def *[A](rhs: A)(implicit ev: Ring[A]): A = ev.times(ev.fromInt(lhs), rhs)
+}
+
+final class LiteralLongMultiplicativeSemigroupOps(val lhs: Long) extends AnyVal {
+  def *[A](rhs: A)(implicit ev: Ring[A], c: ConvertableTo[A]): A = ev.times(c.fromLong(lhs), rhs)
+}
+
+final class LiteralDoubleMultiplicativeSemigroupOps(val lhs: Double) extends AnyVal {
+  def *[A](rhs: A)(implicit ev: Field[A]): A = ev.times(ev.fromDouble(lhs), rhs)
+}
+
+final class LiteralIntMultiplicativeGroupOps(val lhs: Int) extends AnyVal {
+  def /[A](rhs: A)(implicit ev: Field[A]): A = ev.div(ev.fromInt(lhs), rhs)
+}
+
+final class LiteralLongMultiplicativeGroupOps(val lhs: Long) extends AnyVal {
+  def /[A](rhs: A)(implicit ev: Field[A], c: ConvertableTo[A]): A = ev.div(c.fromLong(lhs), rhs)
+}
+
+final class LiteralDoubleMultiplicativeGroupOps(val lhs: Double) extends AnyVal {
+  def /[A](rhs: A)(implicit ev: Field[A]): A = ev.div(ev.fromDouble(lhs), rhs)
+}
+
+final class LiteralIntEuclideanRingOps(val lhs: Int) extends AnyVal {
+  def equot[A](rhs: A)(implicit ev: EuclideanRing[A]): A = ev.equot(ev.fromInt(lhs), rhs)
+  def emod[A](rhs: A)(implicit ev: EuclideanRing[A]): A = ev.emod(ev.fromInt(lhs), rhs)
+  def equotmod[A](rhs: A)(implicit ev: EuclideanRing[A]): (A, A) = ev.equotmod(ev.fromInt(lhs), rhs)
+}
+
+final class LiteralLongEuclideanRingOps(val lhs: Long) extends AnyVal {
+  def equot[A](rhs: A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.equot(c.fromLong(lhs), rhs)
+  def emod[A](rhs: A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): A = ev.emod(c.fromLong(lhs), rhs)
+  def equotmod[A](rhs: A)(implicit ev: EuclideanRing[A], c: ConvertableTo[A]): (A, A) =
+    ev.equotmod(c.fromLong(lhs), rhs)
+}
+
+final class LiteralDoubleEuclideanRingOps(val lhs: Double) extends AnyVal {
+  def equot[A](rhs: A)(implicit ev: Field[A]): A = ev.equot(ev.fromDouble(lhs), rhs)
+  def emod[A](rhs: A)(implicit ev: Field[A]): A = ev.emod(ev.fromDouble(lhs), rhs)
+  def equotmod[A](rhs: A)(implicit ev: Field[A]): (A, A) = ev.equotmod(ev.fromDouble(lhs), rhs)
+}
+
+final class LiteralIntNRootOps(val lhs: Int) extends AnyVal {
+  def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromLong(lhs), rhs)
+}
+
+final class LiteralLongNRootOps(val lhs: Long) extends AnyVal {
+  def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromLong(lhs), rhs)
+}
+
+final class LiteralDoubleNRootOps(val lhs: Double) extends AnyVal {
+  def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromDouble(lhs), rhs)
+}

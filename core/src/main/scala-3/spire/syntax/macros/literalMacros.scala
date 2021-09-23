@@ -14,7 +14,6 @@ def parseNumber(s: Seq[String], lower: BigInt, upper: BigInt): Either[String, Bi
       case _: Exception => Left(s"illegal constant: %s")
   }.getOrElse(Left("Unsupported parcialized strings"))
 
-
 def byte(digits: Expr[StringContext])(using Quotes): Expr[Byte] =
   import quotes.reflect._
 

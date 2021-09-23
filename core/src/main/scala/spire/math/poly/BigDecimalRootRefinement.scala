@@ -316,8 +316,7 @@ object BigDecimalRootRefinement {
       n: Int
     ): Approximation = {
       val dx = rx.subtract(lx)
-      val scale: Int = spire.math.max(getEps(lx), getEps(rx))
-      // val scale = max(getEps(lx), getEps(rx))
+      val scale = max(getEps(lx), getEps(rx))
       val eps = JBigDecimal.valueOf(1, scale)
       if (dx.compareTo(eps) <= 0) {
         Bounded(lx, ly, rx, ry, n)

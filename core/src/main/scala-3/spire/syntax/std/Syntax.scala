@@ -1,0 +1,38 @@
+package spire
+package syntax
+package std
+
+import spire.math.ConvertableTo
+
+trait IntSyntax {
+  implicit def literalIntOps(n: Int): LiteralIntOps = new LiteralIntOps(n)
+  // implicit def intToA[A](n: Int)(implicit c: ConvertableTo[A]): A = c.fromInt(n)
+}
+
+trait LongSyntax:
+  extension(lhs: Long)
+    def /~(rhs: Long): Long = lhs / rhs
+    def /%(rhs: Long): (Long, Long) = (lhs / rhs, lhs % rhs)
+    def pow(rhs: Long): Long = spire.math.pow(lhs, rhs)
+    def **(rhs: Long): Long = spire.math.pow(lhs, rhs)
+    def unary_! : BigInt = spire.math.fact(lhs)
+    def choose(rhs: Long): BigInt = spire.math.choose(lhs, rhs)
+end LongSyntax
+
+trait DoubleSyntax {
+  implicit def literalDoubleOps(n: Double): LiteralDoubleOps = new LiteralDoubleOps(n)
+}
+
+trait BigIntSyntax {
+  implicit def literalBigIntOps(b: BigInt): LiteralBigIntOps = new LiteralBigIntOps(b)
+}
+
+trait ArraySyntax {
+  implicit def arrayOps[@sp A](lhs: Array[A]): ArrayOps[A] = new ArrayOps(lhs)
+}
+
+trait SeqSyntax {
+  implicit def seqOps[@sp A, CC[A] <: Iterable[A]](lhs: CC[A]): SeqOps[A, CC] = new SeqOps[A, CC](lhs)
+  implicit def indexedSeqOps[@sp A, CC[A] <: IndexedSeq[A]](lhs: CC[A]): IndexedSeqOps[A, CC] =
+    new IndexedSeqOps[A, CC](lhs)
+}
