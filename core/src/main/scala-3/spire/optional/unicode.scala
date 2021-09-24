@@ -61,15 +61,13 @@ package object unicode {
   }
 
   implicit class HeytingOps[A](lhs: A)(implicit ev: Heyting[A]) {
-    // TODO verify imp is correct for the unicode character
     def ⊃(rhs: A): A = ev.imp(lhs, rhs)
   }
 
   implicit class BoolOps[A](lhs: A)(implicit ev: Bool[A]) {
-    // TODO verify the calls are correct for the unicode character
-    def ⊻(rhs: A): A = ev.nor(lhs, rhs)
+    def ⊻(rhs: A): A = ev.xor(lhs, rhs)
     def ⊼(rhs: A): A = ev.nand(lhs, rhs)
-    def ⊽(rhs: A): A = ev.nxor(lhs, rhs)
+    def ⊽(rhs: A): A = ev.nor(lhs, rhs)
   }
 
   implicit class SymbolicSetOps[A](val lhs: Set[A]) extends AnyVal {
