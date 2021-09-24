@@ -151,10 +151,6 @@ trait FieldSyntax extends EuclideanRingSyntax with MultiplicativeGroupSyntax
 
 trait NRootSyntax {
   implicit def nrootOps[A: NRoot](a: A): NRootOps[A] = new NRootOps(a)
-
-  // implicit def literalIntNRootOps(lhs: Int): LiteralIntNRootOps = new LiteralIntNRootOps(lhs)
-  // implicit def literalLongNRootOps(lhs: Long): LiteralLongNRootOps = new LiteralLongNRootOps(lhs)
-  // implicit def literalDoubleNRootOps(lhs: Double): LiteralDoubleNRootOps = new LiteralDoubleNRootOps(lhs)
 }
 
 trait LeftModuleSyntax extends RingSyntax {

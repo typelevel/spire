@@ -142,15 +142,3 @@ final class LiteralDoubleEuclideanRingOps(val lhs: Double) extends AnyVal {
   def emod[A](rhs: A)(implicit ev: Field[A]): A = ev.emod(ev.fromDouble(lhs), rhs)
   def equotmod[A](rhs: A)(implicit ev: Field[A]): (A, A) = ev.equotmod(ev.fromDouble(lhs), rhs)
 }
-
-final class LiteralIntNRootOps(val lhs: Int) extends AnyVal {
-  def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromLong(lhs), rhs)
-}
-
-final class LiteralLongNRootOps(val lhs: Long) extends AnyVal {
-  def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromLong(lhs), rhs)
-}
-
-final class LiteralDoubleNRootOps(val lhs: Double) extends AnyVal {
-  def **[A](rhs: A)(implicit ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromDouble(lhs), rhs)
-}

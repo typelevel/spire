@@ -71,4 +71,3 @@ class LiteralBigIntOps(val lhs: BigInt) extends AnyVal {
   def %(rhs: Number): Number = Number(lhs).emod(rhs)
   def /%(rhs: Number): (Number, Number) = Number(lhs).equotmod(rhs)
 }
-
