@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.std.any._
+import spire.implicits._
 import org.scalacheck.Prop._
 
 class ComplexScalaCheckSuite extends munit.ScalaCheckSuite {

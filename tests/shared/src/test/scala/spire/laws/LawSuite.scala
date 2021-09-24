@@ -37,7 +37,6 @@ class LawSuite extends munit.DisciplineSuite {
   implicit val shadowingLong: Shadowing[Long, BigInt] = Shadowing.bigInt[Long](s => s.toLong)
 
   checkAll("UByte", RingLaws[UByte].cRig)
-  checkAll("UByte", RingLaws[UByte].cRig)
   checkAll("UByte", OrderLaws[Shadow[UByte, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
   checkAll("UByte", CombinationLaws[Shadow[UByte, BigInt]].signedAdditiveCMonoid)
 

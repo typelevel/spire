@@ -1,7 +1,6 @@
 package spire.math
 
-import spire.implicits.BigDecimalAlgebra
-import spire.syntax.all._
+import spire.implicits._
 
 class BigDecimalSuite extends munit.FunSuite {
   test("sqrt") {

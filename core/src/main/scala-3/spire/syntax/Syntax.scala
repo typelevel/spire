@@ -178,7 +178,7 @@ trait IsRealSyntax extends SignedSyntax:
   //   def isWhole: Boolean = is.isWhole(lhs)
   //   def ceil: A = is.ceil(lhs)
   //   def floor: A = is.floor(lhs)
-  //   def round: A = is.round(lhs)
+    // def round: A = is.round(lhs)
   //   // def toDouble: Double = is.toDouble(lhs)
 end IsRealSyntax
 
@@ -419,15 +419,15 @@ trait NRootSyntax:
     def pow(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs).pow(rhs)
     def **(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs) ** rhs
 
-  extension(lhs: Int)
-    def **[A](rhs: A)(using ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromInt(lhs), rhs)
-
-  extension(lhs: Long)
-    def **[A](rhs: A)(using ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromLong(lhs), rhs)
-
-  extension(lhs: Double)
-    def **[A](rhs: A)(using ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromDouble(lhs), rhs)
-
+  // extension(lhs: Int)
+  //   def **[A](rhs: A)(using ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromInt(lhs), rhs)
+  //
+  // extension(lhs: Long)
+  //   def **[A](rhs: A)(using ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromLong(lhs), rhs)
+  //
+  // extension(lhs: Double)
+  //   def **[A](rhs: A)(using ev: NRoot[A], c: ConvertableTo[A]): A = ev.fpow(c.fromDouble(lhs), rhs)
+  //
 trait LeftModuleSyntax extends RingSyntax:
   implicit def lms[V](v: V): LeftModuleOps[V] = new LeftModuleOps[V](v)
   // Left module

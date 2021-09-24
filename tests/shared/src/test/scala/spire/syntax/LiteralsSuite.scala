@@ -1,5 +1,5 @@
 package spire
-package syntax
+package math
 
 import spire.std.int._
 import spire.math._
@@ -30,8 +30,7 @@ class LiteralsSuite extends munit.FunSuite {
   }
 
   test("int operators") {
-    import spire.syntax.std.int._
-    import spire.syntax.nroot._
+    import spire.syntax.all._
     assertEquals((5 ** 2), 25)
     assertEquals((5 /~ 2), 2)
     assertEquals((5 /% 2), ((2, 1)))

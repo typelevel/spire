@@ -1,6 +1,7 @@
 package spire
 package math
 
+import spire.implicits._
 import spire.laws.arb.{interval => interval_, rational}
 
 import interval.Overlap._
@@ -61,8 +62,6 @@ class IntervalOverlapScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("[a, c] overlap [b, d] = PartialOverlap if a < b <= c < d") {
     forAll { (x: Rational, y: Rational, m: Rational, n: Rational) =>
-
-      import spire.algebra.Order.catsKernelOrderingForOrder
 
       val sorted = List(x, y, m, n).sorted
       (sorted.distinct.size >= 3 && sorted(0) != sorted(1) && sorted(2) != sorted(3)) ==> {

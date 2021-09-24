@@ -6,18 +6,12 @@ import spire.math.ConvertableTo
 
 trait IntSyntax {
   implicit def literalIntOps(n: Int): LiteralIntOps = new LiteralIntOps(n)
-  // implicit def intToA[A](n: Int)(implicit c: ConvertableTo[A]): A = c.fromInt(n)
+  implicit def intToA[A](n: Int)(implicit c: ConvertableTo[A]): A = c.fromInt(n)
 }
 
-trait LongSyntax:
-  extension(lhs: Long)
-    def /~(rhs: Long): Long = lhs / rhs
-    def /%(rhs: Long): (Long, Long) = (lhs / rhs, lhs % rhs)
-    def pow(rhs: Long): Long = spire.math.pow(lhs, rhs)
-    def **(rhs: Long): Long = spire.math.pow(lhs, rhs)
-    def unary_! : BigInt = spire.math.fact(lhs)
-    def choose(rhs: Long): BigInt = spire.math.choose(lhs, rhs)
-end LongSyntax
+trait LongSyntax {
+  implicit def literalLongOps(n: Long): LiteralLongOps = new LiteralLongOps(n)
+}
 
 trait DoubleSyntax {
   implicit def literalDoubleOps(n: Double): LiteralDoubleOps = new LiteralDoubleOps(n)

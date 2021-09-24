@@ -2,7 +2,7 @@ package spire
 package example
 
 import spire.implicits._
-import spire.math.Complex
+import spire.math._
 
 object MandelbrotDemo {
 
@@ -56,7 +56,7 @@ object Xterm {
 
   // given things like rgb(0xffcc99) produce things like color(6, 5, 4)
   def rgb(n: Int) = color(scale(n & 0xff0000), scale(n & 0xff00), scale(n & 0xff))
-  private def scale(n: Int) = spire.math.round((n * 6.0) / 255).toInt
+  private def scale(n: Int) = round((n * 6.0) / 255).toInt
 
   // 0-25 are colors, 26+ is clear
   def rainbow(n: Int) =

@@ -5,6 +5,7 @@ import spire.algebra.Sign
 import spire.algebra.Sign.Positive
 import spire.syntax.cfor._
 import spire.syntax.nroot._
+import spire.math._
 
 import scala.collection.immutable.LazyList
 import scala.collection.mutable

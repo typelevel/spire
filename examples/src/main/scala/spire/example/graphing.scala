@@ -1,10 +1,7 @@
 package spire
 package example
 
-import spire.std.any._
-import spire.syntax.nroot._
-import spire.syntax.numeric._
-import spire.syntax.interval._
+import spire.implicits._
 import spire.math._
 
 object Graphing {

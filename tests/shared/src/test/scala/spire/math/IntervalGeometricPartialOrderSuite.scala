@@ -1,8 +1,7 @@
 package spire
 package math
 
-import spire.syntax.partialOrder._
-import spire.syntax.std.seq._
+import spire.implicits._
 
 class IntervalGeometricPartialOrderSuite extends munit.FunSuite {
   import spire.optional.intervalGeometricPartialOrder._
@@ -24,8 +23,7 @@ class IntervalGeometricPartialOrderSuite extends munit.FunSuite {
   test("[2, 3] cannot be compared to empty") { assert(closed(2, 3).partialCompare(open(2, 2)).isNaN) }
   test("Minimal and maximal elements of {[1], [2, 3], [2, 4]}") {
     val intervals = Seq[Interval[Int]](point(1), closed(2, 3), closed(2, 4))
-    // Scala 3 doesn't pick seqops automatically
-    assertEquals(seqOps(intervals).pmin.toSet, Set(point(1)))
-    assertEquals(seqOps(intervals).pmax.toSet, Set(closed(2, 3), closed(2, 4)))
+    assertEquals(intervals.pmin.toSet, Set(point(1)))
+    assertEquals(intervals.pmax.toSet, Set(closed(2, 3), closed(2, 4)))
   }
 }
