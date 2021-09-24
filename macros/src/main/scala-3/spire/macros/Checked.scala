@@ -190,19 +190,5 @@ object Checked:
     catch
       case a: ArithmeticOverflowException => orElse
 
-  /**
-   * Performs overflow checking for Int/Long operations.
-   *
-   * If no errors are detected, the expected result will be
-   * returned. If there are errors, the 'orElse' block will be
-   * evaluated and returned.
-   *
-   * In the error case, this macro will actually evaluate a return
-   * statement in the outer method context. Thus, it should only be
-   * called from within a method that you would like to "return out
-   * of" in the case of an overflow.
-   */
-  // inline def tryOrReturn[A](inline n: A)(inline orElse: => A): A =
-  //   ${ checkedImpl[A]('{n}, '{return orElse}) }
 end Checked
 

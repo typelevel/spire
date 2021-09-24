@@ -150,16 +150,6 @@ class CheckedScalaCheckSuite extends munit.ScalaCheckSuite {
     // }
   }
 
-  // assertEquals(-1L, odd(x))
-  // assertEquals(0L, odd(0))
-  // assertEquals(Long.MaxValue - 1, add(-1))
-  // assertEquals(Long.MaxValue, add(0))
-  // assertEquals(-1L, add(1))
-  // def odd(a: Long): Long =
-  //   Checked.tryOrReturn(-a)(-1L)
-  //
-  // def add(a: Long): Long =
-  //   Checked.tryOrReturn(Long.MaxValue + a)(-1L)
   property("Long negate overflow throws arithmetic exception") {
     forAll { (x: Long) =>
       checkForLongOverflow(-BigInt(x), checked(-x))
