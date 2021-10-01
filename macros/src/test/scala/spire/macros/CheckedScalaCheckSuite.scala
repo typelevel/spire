@@ -144,7 +144,8 @@ class CheckedScalaCheckSuite extends munit.ScalaCheckSuite {
     val ag = A(Long.MaxValue, Long.MaxValue)
     intercept[ArithmeticException] { checked(ag.p * 2L) }
     // Border case failing in earlier versions of the scala 3 macro
-    intercept[ArithmeticException] { checked(List(1L, 2L).map{ k =>
+    intercept[ArithmeticException] {
+      checked(List(1L, 2L).map { k =>
         ag.p * k
       })
     }
