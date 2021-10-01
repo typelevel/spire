@@ -3,7 +3,7 @@ package math
 
 import spire.algebra.Sign
 import spire.algebra.Sign.Positive
-import spire.syntax.cfor._
+import spire.syntax.fastFor._
 import spire.syntax.nroot._
 import spire.math._
 
@@ -72,7 +72,7 @@ package object prime {
     }
 
     var limit = x.sqrt
-    cfor(SafeLong(3))(_ <= limit && x > 1, _ + 2) { b =>
+    fastFor(SafeLong(3))(_ <= limit && x > 1, _ + 2) { b =>
       val (x2, e2) = findPowers(x, b)
       if (e2 > 0) {
         facts(b) = e2
@@ -105,7 +105,7 @@ package object prime {
       x = x1
     }
 
-    cfor(SafeLong(3))(_ < 30 && x > 1, _ + 2) { b =>
+    fastFor(SafeLong(3))(_ < 30 && x > 1, _ + 2) { b =>
       val (x2, e2) = findPowers(x, b)
       if (e2 > 0) {
         facts(b) = e2
@@ -141,7 +141,7 @@ package object prime {
       @tailrec def fastRho(x: SafeLong, q0: SafeLong, r: SafeLong, m: SafeLong): SafeLong = {
         var y = x
         var q = q0
-        cfor(0)(r > _, _ + 1)(_ => y = f(y))
+        fastFor(0)(r > _, _ + 1)(_ => y = f(y))
 
         var g = SafeLong.one
         var k = SafeLong.zero
@@ -149,7 +149,7 @@ package object prime {
         while (r > k && g == 1) {
           ys = y
           val limit = m.min(r - k)
-          cfor(0)(limit > _, _ + 1) { _ =>
+          fastFor(0)(limit > _, _ + 1) { _ =>
             y = f(y)
             q = (q * (x - y).abs) % n
           }

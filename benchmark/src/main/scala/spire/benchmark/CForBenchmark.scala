@@ -8,7 +8,7 @@ import org.openjdk.jmh.annotations._
 import scala.util.Random
 import Random._
 
-import spire.syntax.cfor._
+import spire.syntax.fastFor._
 
 import Arrays.init
 
@@ -302,13 +302,13 @@ class CForBenchmarks {
   def doCForOr: Long = {
     var t: Long = 0L
     val len = size - 1
-    cfor(0)(_ < len, _ + 1) { i => t = t ^ or(arr(i), arr(i + 1)) }
+    fastFor(0)(_ < len, _ + 1) { i => t = t ^ or(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    cfor(0)(_ < len2, _ + 1) { i => t = t ^ or(arr(i + 3), arr(i + 2)) }
+    fastFor(0)(_ < len2, _ + 1) { i => t = t ^ or(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    cfor(0)(_ < len3, _ + 1) { i => t = t ^ or(arr(i + 1), arr(i + 2)) }
+    fastFor(0)(_ < len3, _ + 1) { i => t = t ^ or(arr(i + 1), arr(i + 2)) }
 
     t
   }
@@ -317,13 +317,13 @@ class CForBenchmarks {
   def doCForMin: Long = {
     var t: Long = 0L
     val len = size - 1
-    cfor(0)(_ < len, _ + 1) { i => t = t ^ min(arr(i), arr(i + 1)) }
+    fastFor(0)(_ < len, _ + 1) { i => t = t ^ min(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    cfor(0)(_ < len2, _ + 1) { i => t = t ^ min(arr(i + 3), arr(i + 2)) }
+    fastFor(0)(_ < len2, _ + 1) { i => t = t ^ min(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    cfor(0)(_ < len3, _ + 1) { i => t = t ^ min(arr(i + 1), arr(i + 2)) }
+    fastFor(0)(_ < len3, _ + 1) { i => t = t ^ min(arr(i + 1), arr(i + 2)) }
 
     t
   }
@@ -332,13 +332,13 @@ class CForBenchmarks {
   def doCForGcd: Long = {
     var t: Long = 0L
     val len = size - 1
-    cfor(0)(_ < len, _ + 1) { i => t = t ^ gcd(arr(i), arr(i + 1)) }
+    fastFor(0)(_ < len, _ + 1) { i => t = t ^ gcd(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    cfor(0)(_ < len2, _ + 1) { i => t = t ^ gcd(arr(i + 3), arr(i + 2)) }
+    fastFor(0)(_ < len2, _ + 1) { i => t = t ^ gcd(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    cfor(0)(_ < len3, _ + 1) { i => t = t ^ gcd(arr(i + 1), arr(i + 2)) }
+    fastFor(0)(_ < len3, _ + 1) { i => t = t ^ gcd(arr(i + 1), arr(i + 2)) }
 
     t
   }
@@ -347,7 +347,7 @@ class CForBenchmarks {
   def doCForIntArrayMultiply: Array[Long] = {
     val arr2 = arr.clone
     val len = size
-    cfor(0)(_ < len, _ + 1) { i =>
+    fastFor(0)(_ < len, _ + 1) { i =>
       {
         val value = arr2(i)
         arr2(i) = value * 2

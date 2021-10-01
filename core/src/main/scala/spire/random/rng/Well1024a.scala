@@ -17,7 +17,7 @@ package spire
 package random
 package rng
 
-import spire.syntax.cfor._
+import spire.syntax.fastFor._
 import spire.util.Pack
 import java.nio.ByteBuffer
 import java.util
@@ -57,7 +57,7 @@ final class Well1024a protected[random] (state: Array[Int], i0: Int) extends Int
     val bytes: Array[Byte] = new Array[Byte](BYTES)
     val bb: ByteBuffer = ByteBuffer.wrap(bytes)
 
-    cfor(0)(_ < R, _ + 1) { i => bb.putInt(state(i)) }
+    fastFor(0)(_ < R, _ + 1) { i => bb.putInt(state(i)) }
     bb.putInt(i)
     bytes
   }
@@ -66,7 +66,7 @@ final class Well1024a protected[random] (state: Array[Int], i0: Int) extends Int
     val bs: Array[Byte] = if (bytes.length < BYTES) util.Arrays.copyOf(bytes, BYTES) else bytes
     val bb: ByteBuffer = ByteBuffer.wrap(bs)
 
-    cfor(0)(_ < R, _ + 1) { i => state(i) = bb.getInt }
+    fastFor(0)(_ < R, _ + 1) { i => state(i) = bb.getInt }
     i = bb.getInt
   }
 

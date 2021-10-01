@@ -153,7 +153,7 @@ class InlineUtil[C <: Context with Singleton](val c: C) {
 
 object Syntax {
 
-  def cforMacro[A](
+  def fastForMacro[A](
     c: Context
   )(init: c.Expr[A])(test: c.Expr[A => Boolean], next: c.Expr[A => A])(body: c.Expr[A => Unit]): c.Expr[Unit] = {
 
@@ -204,7 +204,7 @@ object Syntax {
     new InlineUtil[c.type](c).inlineAndReset[Unit](tree)
   }
 
-  def cforRangeMacro(c: Context)(r: c.Expr[Range])(body: c.Expr[Int => Unit]): c.Expr[Unit] = {
+  def fastForRangeMacro(c: Context)(r: c.Expr[Range])(body: c.Expr[Int => Unit]): c.Expr[Unit] = {
 
     import c.universe._
     val util = SyntaxUtil[c.type](c)
@@ -300,11 +300,11 @@ object Syntax {
     new InlineUtil[c.type](c).inlineAndReset[Unit](tree)
   }
 
-  def cforRange2Macro(
+  def fastForRange2Macro(
     c: Context
   )(r1: c.Expr[Range], r2: c.Expr[Range])(body: c.Expr[(Int, Int) => Unit]): c.Expr[Unit] = {
 
     import c.universe._
-    c.Expr[Unit](q"cforRange($r1)(i => cforRange($r2)(j => $body(i, j)))")
+    c.Expr[Unit](q"fastForRange($r1)(i => fastForRange($r2)(j => $body(i, j)))")
   }
 }

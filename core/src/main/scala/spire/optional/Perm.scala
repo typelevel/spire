@@ -8,7 +8,7 @@ import scala.collection.SeqOps
 import cats.kernel.Eq
 import spire.algebra.{Action, Group}
 import spire.algebra.partial.PartialAction
-import spire.syntax.cfor._
+import spire.syntax.fastFor._
 import spire.util._
 
 /**
@@ -71,7 +71,7 @@ class Perm private (private val mapping: Map[Int, Int]) extends (Int => Int) {
     if (image.isEmpty) return Opt(cbf.fromSpecific(seq))
     if (image.max >= seq.size) return Opt.empty[SA]
     val builder = cbf.newBuilder
-    cforRange(0 until seq.size) { k =>
+    fastForRange(0 until seq.size) { k =>
       builder += seq(invert(k))
     }
     Opt(builder.result())

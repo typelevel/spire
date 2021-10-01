@@ -17,7 +17,7 @@ package spire
 package random
 package rng
 
-import spire.syntax.cfor._
+import spire.syntax.fastFor._
 import spire.math.max
 
 /**
@@ -67,7 +67,7 @@ object Utils {
     val a = new Array[Int](length)
     a(0) = seed
 
-    cfor(1)(_ < length, _ + 1) { i =>
+    fastFor(1)(_ < length, _ + 1) { i =>
       val x = a(i - 1)
       a(i) = 1812433253 * (x ^ (x >>> 30)) + i
     }
@@ -79,7 +79,7 @@ object Utils {
     val a = new Array[Long](length)
     a(0) = seed
 
-    cfor(1)(_ < length, _ + 1) { i =>
+    fastFor(1)(_ < length, _ + 1) { i =>
       val x = a(i - 1)
       a(i) = 6364136223846793005L * (x ^ (x >>> 62)) + i
     }

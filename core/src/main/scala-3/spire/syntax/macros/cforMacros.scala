@@ -4,28 +4,28 @@ package spire.syntax.macros
 import quoted._
 import collection.immutable.NumericRange
 
-import spire.syntax.cfor.{RangeLike, RangeElem}
+import spire.syntax.FastForSyntax.{RangeLike, RangeElem}
 
-inline def cforInline[R](init: R, test: R => Boolean, next: R => R, body: R => Unit): Unit =
+inline def fastForInline[R](init: R, test: R => Boolean, next: R => R, body: R => Unit): Unit =
   var index = init
   while (test(index))
     body(index)
     index = next(index)
 
-def cforRangeMacroGen[R <: RangeLike : Type](r: Expr[R], body: Expr[RangeElem[R] => Unit])(using quotes: Quotes): Expr[Unit] =
+def fastForRangeMacroGen[R <: RangeLike : Type](r: Expr[R], body: Expr[RangeElem[R] => Unit])(using quotes: Quotes): Expr[Unit] =
   import quotes._
   import quotes.reflect._
 
   type RangeL = NumericRange[Long]
 
   (r, body) match
-    case '{$r: Range             } -> '{$body: (Int => Unit) } => cforRangeMacro(r, body)
-    case '{$r: NumericRange[Long]} -> '{$body: (Long => Unit)} => cforRangeMacroLong(r, body)
+    case '{$r: Range             } -> '{$body: (Int => Unit) } => fastForRangeMacro(r, body)
+    case '{$r: NumericRange[Long]} -> '{$body: (Long => Unit)} => fastForRangeMacroLong(r, body)
     case '{$r}                     -> _                        => report.error(s"Ineligible Range type ", r); '{}
 
-end cforRangeMacroGen
+end fastForRangeMacroGen
 
-def cforRangeMacroLong(r: Expr[NumericRange[Long]], body: Expr[Long => Unit])(using quotes: Quotes): Expr[Unit] =
+def fastForRangeMacroLong(r: Expr[NumericRange[Long]], body: Expr[Long => Unit])(using quotes: Quotes): Expr[Unit] =
   import quotes._
   import quotes.reflect.*
 
@@ -94,9 +94,9 @@ def cforRangeMacroLong(r: Expr[NumericRange[Long]], body: Expr[Long => Unit])(us
       report.warning(s"defaulting to foreach, can not optimise range expression", r)
       '{ val b = $body; $r.foreach(b) }
 
-end cforRangeMacroLong
+end fastForRangeMacroLong
 
-def cforRangeMacro(r: Expr[Range], body: Expr[Int => Unit])(using quotes: Quotes): Expr[Unit] =
+def fastForRangeMacro(r: Expr[Range], body: Expr[Int => Unit])(using quotes: Quotes): Expr[Unit] =
   import quotes._
   import quotes.reflect._
 
@@ -164,4 +164,4 @@ def cforRangeMacro(r: Expr[Range], body: Expr[Int => Unit])(using quotes: Quotes
       report.warning(s"defaulting to foreach, can not optimise range expression", r)
       '{ val b = $body; $r.foreach(b) }
 
-end cforRangeMacro
+end fastForRangeMacro

@@ -1,7 +1,7 @@
 package spire
 package math.prime
 
-import spire.syntax.cfor._
+import spire.syntax.fastFor._
 
 /**
  * Fast BitSet implementation.
@@ -38,5 +38,5 @@ case class BitSet(length: Int, array: Array[Int]) {
     ((array(n >>> 5) >>> (n & 31)) & 1) == 1
 
   def clear(): Unit =
-    cfor(0)(_ < array.length, _ + 1)(array(_) = 0)
+    fastFor(0)(_ < array.length, _ + 1)(array(_) = 0)
 }
