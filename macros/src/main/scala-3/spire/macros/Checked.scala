@@ -66,6 +66,8 @@ object Checked:
     val tree: Term = n.asTerm
     val numLimit = limit[A](n)
 
+    // This discussion helped to select the proper owner of the expr
+    // https://github.com/lampepfl/dotty/discussions/13571
     val acc = new TreeMap:
       override def transformTerm(tree: Term)(owner: Symbol): Term =
         tree match
