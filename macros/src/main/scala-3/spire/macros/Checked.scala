@@ -76,12 +76,12 @@ object Checked:
               '{
                   val z = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
                   if (z == ${numLimit}) $fallback else -z
-              }.asExprOf[A].asTerm
+              }.asExprOf[A].asTerm.changeOwner(owner)
             else if (isLong)
               '{
                   val z = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
                   if (z == ${numLimit}) $fallback else -z
-              }.asTerm
+              }.asTerm.changeOwner(owner)
             else super.transformTerm(tree)(owner)
             // NOTE I couldn't find a way to unify the long and int branches. Suggestions are welcome
           case Apply(Select(x, "*"), List(y)) =>
@@ -93,14 +93,14 @@ object Checked:
               val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
               val z = xt * yt
               if (xt == 0  || (yt == z / xt && !(xt == -1 && yt == $numLimit))) z else $fallback
-            }.asTerm
+            }.asTerm.changeOwner(owner)
             } else if (isLong) {
             '{
               val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
               val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
               val z = xt * yt
               if (xt == 0  || (yt == z / xt && !(xt == -1 && yt == $numLimit))) z else $fallback
-            }.asTerm
+            }.asTerm.changeOwner(owner)
             } else
             super.transformTerm(tree)(owner)
           case Apply(Select(x, "+"), List(y)) =>
@@ -112,14 +112,14 @@ object Checked:
                 val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
                 val z = xt + yt
                 if ((~(xt ^ yt) & (xt ^ z)) < 0) $fallback else z
-              }.asTerm
+              }.asTerm.changeOwner(owner)
             else if (isLong)
               '{
                 val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
                 val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
                 val z = xt + yt
                 if ((~(xt ^ yt) & (xt ^ z)) < 0) $fallback else z
-              }.asTerm
+              }.asTerm.changeOwner(owner)
             else super.transformTerm(tree)(owner)
           case Apply(Select(x, "-"), List(y)) =>
             val isInt = isIntType(x.asExpr) && isIntType(y.asExpr)
@@ -130,14 +130,14 @@ object Checked:
                 val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
                 val z = xt - yt
                 if (((xt ^ yt) & (xt ^ z)) < 0) $fallback else z
-              }.asTerm
+              }.asTerm.changeOwner(owner)
             else if (isLong)
               '{
                 val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
                 val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
                 val z = xt - yt
                 if (((xt ^ yt) & (xt ^ z)) < 0) $fallback else z
-              }.asTerm
+              }.asTerm.changeOwner(owner)
             else super.transformTerm(tree)(owner)
           case Apply(Select(x, "/"), List(y)) =>
             val isInt = isIntType(x.asExpr) && isIntType(y.asExpr)
@@ -148,19 +148,19 @@ object Checked:
                 val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
                 val z = xt / yt
                 if (yt == -1 && xt == $numLimit) $fallback else z
-              }.asTerm
+              }.asTerm.changeOwner(owner)
             else if (isLong)
               '{
                 val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
                 val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
                 val z = xt / yt
                 if (yt == -1 && xt == $numLimit) $fallback else z
-              }.asTerm
+              }.asTerm.changeOwner(owner)
             else super.transformTerm(tree)(owner)
           case _ =>
             super.transformTerm(tree)(owner)
 
-    val result = acc.transformTerm(tree)(tree.symbol).asExprOf[A]
+    val result = acc.transformTerm(tree)(Symbol.spliceOwner).asExprOf[A]
     // report.info(result.show)
     result
 
