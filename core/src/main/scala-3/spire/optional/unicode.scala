@@ -1,6 +1,6 @@
 package spire
 package optional
-package unicodde
+package unicode
 
 import spire.algebra._
 import spire.algebra.lattice._
