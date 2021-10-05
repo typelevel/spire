@@ -1,4 +1,3 @@
-
 package spire.optional.unicode
 
 import spire.implicits._
