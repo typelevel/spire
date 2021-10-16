@@ -122,8 +122,8 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
 
     def predictors(): Array[Int] = {
       val indices = new Array[Int](opts.numAxesSample)
-      fastFor(0)(_ < indices.length, _ + 1) { i => indices(i) = i }
-      fastFor(V.dimensions - 1)(_ >= indices.length, _ - 1) { i =>
+      cfor(0)(_ < indices.length, _ + 1) { i => indices(i) = i }
+      cfor(V.dimensions - 1)(_ >= indices.length, _ - 1) { i =>
         val j = nextInt(i + 1)
         if (j < indices.length)
           indices(j) = i
@@ -136,7 +136,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
 
     def sample(): Array[Int] = {
       val sample = new Array[Int](opts.numPointsSample)
-      fastFor(0)(_ < sample.length, _ + 1) { i =>
+      cfor(0)(_ < sample.length, _ + 1) { i =>
         sample(i) = nextInt(data.length)
       }
       sample
@@ -147,7 +147,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
 
     def region(members: Array[Int]): Region = {
       var d = Region.empty
-      fastFor(0)(_ < members.length, _ + 1) { i =>
+      cfor(0)(_ < members.length, _ + 1) { i =>
         d += outputs(members(i))
       }
       d
@@ -167,7 +167,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
         var minVar = -1
         var minIdx = -1
 
-        fastFor(0)(_ < vars.length, _ + 1) { i =>
+        cfor(0)(_ < vars.length, _ + 1) { i =>
           val axis = vars(i)
           var leftRegion = Region.empty
           var rightRegion = region0
@@ -179,7 +179,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
 
           members.qsortBy(data(_).coord(axis))
 
-          fastFor(0)(_ < (members.length - 1), _ + 1) { j =>
+          cfor(0)(_ < (members.length - 1), _ + 1) { j =>
             // We move point j from the right region to the left and see if our
             // error is reduced.
 

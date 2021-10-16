@@ -318,7 +318,7 @@ trait LiteralsSyntax {
 
 trait AllSyntax
     extends LiteralsSyntax
-    with FastForSyntax
+    with CforSyntax
     with EqSyntax
     with PartialOrderSyntax
     with OrderSyntax

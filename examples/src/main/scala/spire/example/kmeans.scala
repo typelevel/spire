@@ -30,10 +30,10 @@ object KMeansExample extends App {
 
     def assign(clusters: Array[V]): Array[Int] = {
       val assignments = new Array[Int](points.length)
-      fastFor(0)(_ < points.length, _ + 1) { i =>
+      cfor(0)(_ < points.length, _ + 1) { i =>
         var min = (points(i) - clusters(0)).norm
         var idx = 0
-        fastFor(1)(_ < clusters.length, _ + 1) { j =>
+        cfor(1)(_ < clusters.length, _ + 1) { j =>
           val dist = (points(i) - clusters(j)).norm
           if (dist < min) {
             min = dist
@@ -60,12 +60,12 @@ object KMeansExample extends App {
       } else {
         val clusters = Array.fill[V](clusters0.length)(vs.zero)
         val counts = new Array[Int](clusters0.length)
-        fastFor(0)(_ < points.length, _ + 1) { i =>
+        cfor(0)(_ < points.length, _ + 1) { i =>
           val idx = assignments(i)
           clusters(idx) = clusters(idx) + points(i)
           counts(idx) += 1
         }
-        fastFor(0)(_ < clusters.length, _ + 1) { j =>
+        cfor(0)(_ < clusters.length, _ + 1) { j =>
           clusters(j) = clusters(j) :/ vs.scalar.fromInt(counts(j))
         }
         loop(assignments, clusters)
@@ -82,7 +82,7 @@ object KMeansExample extends App {
     // wants before we return the clusters.
 
     val bldr = cbf.newBuilder
-    fastFor(0)(_ < clusters.length, _ + 1) { i =>
+    cfor(0)(_ < clusters.length, _ + 1) { i =>
       bldr += clusters(i)
     }
     bldr.result()
@@ -102,7 +102,7 @@ object KMeansExample extends App {
     }.toVector
 
     val bldr = cbf.newBuilder
-    fastFor(0)(_ < n, _ + 1) { _ =>
+    cfor(0)(_ < n, _ + 1) { _ =>
       bldr += centers(nextInt(k)) + randPoint(nextGaussian())
     }
     bldr.result()

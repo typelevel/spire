@@ -10,7 +10,7 @@ import spire.algebra.free._
 import spire.math._
 import spire.math.interval.{Bound, Closed, Open, Unbound}
 import spire.optional.Perm
-import spire.syntax.fastFor.fastForRange
+import spire.syntax.cfor.cforRange
 import spire.syntax.order._
 
 import org.scalacheck.{Arbitrary, Gen}
@@ -197,7 +197,7 @@ object gen {
       .flatMap { intArray =>
         val domainSize = intArray.length
         val images = new Array[Int](domainSize)
-        fastForRange(0 until domainSize) { i =>
+        cforRange(0 until domainSize) { i =>
           val j = intArray(i) % (i + 1) // uses the Fisher-Yates shuffle, inside out variant
           images(i) = images(j)
           images(j) = i

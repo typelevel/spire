@@ -262,23 +262,13 @@ trait ConvertableFromSyntax {
   implicit def convertableOps[A: ConvertableFrom](a: A): ConvertableFromOps[A] = new ConvertableFromOps(a)
 }
 
-@deprecated("Switch to fastFor", "0.18.0")
 trait CforSyntax {
   def cfor[A](init: A)(test: A => Boolean, next: A => A)(body: A => Unit): Unit =
-    macro Syntax.fastForMacro[A]
+    macro Syntax.cforMacro[A]
   def cforRange(r: Range)(body: Int => Unit): Unit =
-    macro Syntax.fastForRangeMacro
+    macro Syntax.cforRangeMacro
   def cforRange2(r1: Range, r2: Range)(body: (Int, Int) => Unit): Unit =
-    macro Syntax.fastForRange2Macro
-}
-
-trait FastForSyntax {
-  def fastFor[A](init: A)(test: A => Boolean, next: A => A)(body: A => Unit): Unit =
-    macro Syntax.fastForMacro[A]
-  def fastForRange(r: Range)(body: Int => Unit): Unit =
-    macro Syntax.fastForRangeMacro
-  def fastForRange2(r1: Range, r2: Range)(body: (Int, Int) => Unit): Unit =
-    macro Syntax.fastForRange2Macro
+    macro Syntax.cforRange2Macro
 }
 
 trait LiteralsSyntax {
@@ -293,7 +283,6 @@ trait LiteralsSyntax {
 trait AllSyntax
     extends LiteralsSyntax
     with CforSyntax
-    with FastForSyntax
     with EqSyntax
     with PartialOrderSyntax
     with OrderSyntax
