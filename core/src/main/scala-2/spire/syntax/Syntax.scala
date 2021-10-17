@@ -287,8 +287,13 @@ trait FastForSyntax {
    * with semantics matching the Scala 3 macro.
    * If you are on Scala 2 and concerned about performance you should continue using `cfor`.
    */
-  def fastFor[A](init: A)(test: A => Boolean, next: A => A)(body: A => Unit): Unit =
-    Iterator.iterate(init)(next).takeWhile(test).foreach(body)
+  @inline final def fastFor[A](init: A)(test: A => Boolean, next: A => A)(body: A => Unit): Unit = {
+    var a = init
+    while (test(a)) {
+      body(a)
+      a = next(a)
+    }
+  }
 
   /**
    * The `fastForRange` macro will replace the `cforRange` macro in Scala 3.
@@ -300,7 +305,7 @@ trait FastForSyntax {
    * with semantics matching the Scala 3 macro.
    * If you are on Scala 2 and concerned about performance you should continue using `cforRange`.
    */
-  def fastForRange(r: Range)(body: Int => Unit): Unit =
+  @inline final def fastForRange(r: Range)(body: Int => Unit): Unit =
     r.foreach(body)
 
   /**
@@ -313,7 +318,7 @@ trait FastForSyntax {
    * with semantics matching the Scala 3 macro.
    * If you are on Scala 2 and concerned about performance you should continue using `cforRange2`.
    */
-  def fastForRange2(r1: Range, r2: Range)(body: (Int, Int) => Unit): Unit =
+  @inline final def fastForRange2(r1: Range, r2: Range)(body: (Int, Int) => Unit): Unit =
     r1.foreach(i => r2.foreach(j => body(i, j)))
 }
 
