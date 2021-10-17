@@ -17,7 +17,7 @@ package spire
 package random
 package rng
 
-import spire.syntax.fastFor._
+import spire.syntax.cfor._
 import spire.util.Pack
 import java.nio.ByteBuffer
 import java.util.Arrays
@@ -50,7 +50,7 @@ final class MersenneTwister64 protected[random] (mt: Array[Long], mti0: Int = 31
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
 
-    fastFor(0)(_ < N, _ + 1) { i => bb.putLong(mt(i)) }
+    cfor(0)(_ < N, _ + 1) { i => bb.putLong(mt(i)) }
     bb.putInt(mti)
     bytes
   }
@@ -58,7 +58,7 @@ final class MersenneTwister64 protected[random] (mt: Array[Long], mti0: Int = 31
   def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
-    fastFor(0)(_ < N, _ + 1) { i => mt(i) = bb.getLong }
+    cfor(0)(_ < N, _ + 1) { i => mt(i) = bb.getLong }
     mti = bb.getInt
   }
 

@@ -5,7 +5,7 @@ import scala.collection.mutable.{ArrayBuffer}
 import System.arraycopy
 
 import spire.math.{min, SafeLong}
-import spire.syntax.fastFor._
+import spire.syntax.cfor._
 
 import SieveUtil._
 
@@ -56,7 +56,7 @@ object SieveSegment {
     b |= (1 << 29)
     val n: Long = b | (b << 30L)
     val arr = new Array[Int](15)
-    fastFor(0)(_ < 15, _ + 1) { i =>
+    cfor(0)(_ < 15, _ + 1) { i =>
       arr(i) = ((n >>> (i * 2)) & 0xffffffffL).toInt
     }
     arr
@@ -97,7 +97,7 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
     assert(arr.length % 15 == 0)
     val limit = arr.length
     val wheel = SieveSegment.wheel30
-    fastFor(0)(_ < limit, _ + 15)(i => arraycopy(wheel, 0, arr, i, 15))
+    cfor(0)(_ < limit, _ + 15)(i => arraycopy(wheel, 0, arr, i, 15))
     if (start == 0L) {
       primes -= 1
       primes += 2

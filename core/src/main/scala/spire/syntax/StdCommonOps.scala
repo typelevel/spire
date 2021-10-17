@@ -5,7 +5,7 @@ package std
 import spire.algebra.{AdditiveMonoid, Field, Monoid, MultiplicativeMonoid, NRoot, Order, PartialOrder, Signed}
 import spire.math.{Natural, Number, QuickSort, SafeLong, Searching, ULong}
 import scala.collection.Factory
-import spire.syntax.fastFor._
+import spire.syntax.cfor._
 import spire.syntax.monoid._
 import spire.syntax.field._
 import spire.syntax.nroot._
@@ -14,38 +14,38 @@ import spire.syntax.signed._
 final class ArrayOps[@sp A](arr: Array[A]) {
   def qsum(implicit ev: AdditiveMonoid[A]): A = {
     var result = ev.zero
-    fastFor(0)(_ < arr.length, _ + 1) { i => result += arr(i) }
+    cfor(0)(_ < arr.length, _ + 1) { i => result += arr(i) }
     result
   }
 
   def qproduct(implicit ev: MultiplicativeMonoid[A]): A = {
     var result = ev.one
-    fastFor(0)(_ < arr.length, _ + 1) { i => result *= arr(i) }
+    cfor(0)(_ < arr.length, _ + 1) { i => result *= arr(i) }
     result
   }
 
   def qcombine(implicit ev: Monoid[A]): A = {
     var result = ev.empty
-    fastFor(0)(_ < arr.length, _ + 1) { i => result |+|= arr(i) }
+    cfor(0)(_ < arr.length, _ + 1) { i => result |+|= arr(i) }
     result
   }
 
   def qnorm(p: Int)(implicit ev: Field[A], s: Signed[A], nr: NRoot[A]): A = {
     var result = ev.one
-    fastFor(0)(_ < arr.length, _ + 1) { i => result += arr(i).abs.pow(p) }
+    cfor(0)(_ < arr.length, _ + 1) { i => result += arr(i).abs.pow(p) }
     result.nroot(p)
   }
 
   def qnormWith[@sp(Double) R](p: Int)(f: A => R)(implicit ev: Field[R], s: Signed[R], nr: NRoot[R]): R = {
     var result: R = ev.one
-    fastFor(0)(_ < arr.length, _ + 1) { i => result += f(arr(i)).abs.pow(p) }
+    cfor(0)(_ < arr.length, _ + 1) { i => result += f(arr(i)).abs.pow(p) }
     result.nroot(p)
   }
 
   def qmin(implicit ev: Order[A]): A = {
     if (arr.length == 0) throw new UnsupportedOperationException("empty array")
     var result = arr(0)
-    fastFor(1)(_ < arr.length, _ + 1) { i =>
+    cfor(1)(_ < arr.length, _ + 1) { i =>
       result = result.min(arr(i))
     }
     result
@@ -54,7 +54,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
   def qmax(implicit ev: Order[A]): A = {
     if (arr.length == 0) throw new UnsupportedOperationException("empty array")
     var result = arr(0)
-    fastFor(1)(_ < arr.length, _ + 1) { i =>
+    cfor(1)(_ < arr.length, _ + 1) { i =>
       result = result.max(arr(i))
     }
     result
@@ -63,7 +63,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
   def qmean(implicit ev: Field[A]): A = {
     if (arr.length == 0) throw new UnsupportedOperationException("empty array")
     var result = ev.zero
-    fastFor(0)(_ < arr.length, _ + 1) { i =>
+    cfor(0)(_ < arr.length, _ + 1) { i =>
       result = (result * i / (i + 1)) + (arr(i) / (i + 1))
     }
     result
@@ -72,7 +72,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
   def qmeanWith[@sp(Double) R](f: A => R)(implicit ev: Field[R]): R = {
     if (arr.length == 0) throw new UnsupportedOperationException("empty array")
     var result: R = ev.zero
-    fastFor(0)(_ < arr.length, _ + 1) { i =>
+    cfor(0)(_ < arr.length, _ + 1) { i =>
       result = (result * i / (i + 1)) + (f(arr(i)) / (i + 1))
     }
     result
@@ -224,14 +224,14 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
   protected[this] def fromArray(arr: Array[A])(implicit cbf: Factory[A, CC[A]]): CC[A] = {
     val b = cbf.newBuilder
     b.sizeHint(arr.length)
-    fastFor(0)(_ < arr.length, _ + 1) { i => b += arr(i) }
+    cfor(0)(_ < arr.length, _ + 1) { i => b += arr(i) }
     b.result()
   }
 
   protected[this] def fromSizeAndArray(size: Int, arr: Array[A])(implicit cbf: Factory[A, CC[A]]): CC[A] = {
     val b = cbf.newBuilder
     b.sizeHint(size)
-    fastFor(0)(_ < size, _ + 1) { i => b += arr(i) }
+    cfor(0)(_ < size, _ + 1) { i => b += arr(i) }
     b.result()
   }
 

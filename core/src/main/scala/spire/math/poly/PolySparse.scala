@@ -9,7 +9,7 @@ import spire.math.Polynomial
 import spire.std.int._
 import spire.syntax.field._
 import spire.syntax.eq._
-import spire.syntax.fastFor._
+import spire.syntax.cfor._
 import spire.syntax.std.array._
 
 case class PolySparse[@sp(Double) C] private[spire] (val exp: Array[Int], val coeff: Array[C])(implicit
@@ -22,7 +22,7 @@ case class PolySparse[@sp(Double) C] private[spire] (val exp: Array[Int], val co
   def toSparse(implicit ring: Semiring[C], eq: Eq[C]): PolySparse[C] = lhs
 
   def foreach[U](f: (Int, C) => U): Unit =
-    fastFor(0)(_ < exp.length, _ + 1) { i => f(exp(i), coeff(i)) }
+    cfor(0)(_ < exp.length, _ + 1) { i => f(exp(i), coeff(i)) }
 
   override def foreachNonZero[U](f: (Int, C) => U)(implicit ring: Semiring[C], eq: Eq[C]): Unit =
     foreach(f)
@@ -50,8 +50,8 @@ case class PolySparse[@sp(Double) C] private[spire] (val exp: Array[Int], val co
     new Array[C](0)
   } else {
     val cs = new Array[C](degree + 1)
-    fastFor(0)(_ < cs.length, _ + 1) { i => cs(i) = ring.zero }
-    fastFor(0)(_ < exp.length, _ + 1) { i =>
+    cfor(0)(_ < cs.length, _ + 1) { i => cs(i) = ring.zero }
+    cfor(0)(_ < exp.length, _ + 1) { i =>
       cs(exp(i)) = coeff(i)
     }
     cs
@@ -86,7 +86,7 @@ case class PolySparse[@sp(Double) C] private[spire] (val exp: Array[Int], val co
     // we use pow(2) here for the benefit of Interval[_], where
     // x.pow(2) has better error bounds than than (x * x).
     if (bits.length > 1) bits(1) = x.pow(2)
-    fastFor(2)(_ < bits.length, _ + 1) { i =>
+    cfor(2)(_ < bits.length, _ + 1) { i =>
       val prev = bits(i - 1)
       bits(i) = prev * prev
     }
@@ -121,7 +121,7 @@ case class PolySparse[@sp(Double) C] private[spire] (val exp: Array[Int], val co
     val e0 = exp(0)
     val c0 = coeff(0)
     var sum = if (e0 == 0) c0 else c0 * fastExp(bits, e0)
-    fastFor(1)(_ < exp.length, _ + 1) { i =>
+    cfor(1)(_ < exp.length, _ + 1) { i =>
       sum += coeff(i) * fastExp(bits, exp(i))
     }
     sum
@@ -150,7 +150,7 @@ case class PolySparse[@sp(Double) C] private[spire] (val exp: Array[Int], val co
     val es = new Array[Int](exp.length)
     val cs = new Array[C](es.length)
 
-    fastFor(0)(_ < es.length, _ + 1) { i =>
+    cfor(0)(_ < es.length, _ + 1) { i =>
       val e = exp(i) + 1
       es(i) = e
       cs(i) = coeff(i) / field.fromInt(e)
@@ -161,7 +161,7 @@ case class PolySparse[@sp(Double) C] private[spire] (val exp: Array[Int], val co
 
   def unary_-(implicit ring: Rng[C]): Polynomial[C] = {
     val cs = new Array[C](coeff.length)
-    fastFor(0)(_ < cs.length, _ + 1) { i => cs(i) = -coeff(i) }
+    cfor(0)(_ < cs.length, _ + 1) { i => cs(i) = -coeff(i) }
     new PolySparse(exp, cs)
   }
 
@@ -180,7 +180,7 @@ case class PolySparse[@sp(Double) C] private[spire] (val exp: Array[Int], val co
       PolySparse.zero[C]
     } else {
       val cs = new Array[C](coeff.length)
-      fastFor(0)(_ < cs.length, _ + 1) { i =>
+      cfor(0)(_ < cs.length, _ + 1) { i =>
         cs(i) = k * coeff(i)
       }
       new PolySparse(exp, cs)
@@ -192,7 +192,7 @@ object PolySparse {
   final private[math] def dense2sparse[@sp(Double) C: Semiring: Eq: ClassTag](poly: PolyDense[C]): PolySparse[C] = {
     val cs = poly.coeffs
     val es = new Array[Int](cs.length)
-    fastFor(0)(_ < es.length, _ + 1) { i => es(i) = i }
+    cfor(0)(_ < es.length, _ + 1) { i => es(i) = i }
     PolySparse.safe(es, cs)
   }
 
@@ -200,7 +200,7 @@ object PolySparse {
                                                                       coeff: Array[C]
   ): PolySparse[C] = {
     var len = 0
-    fastFor(0)(_ < coeff.length, _ + 1) { i =>
+    cfor(0)(_ < coeff.length, _ + 1) { i =>
       if (coeff(i) =!= Semiring[C].zero)
         len += 1
     }
@@ -304,7 +304,7 @@ object PolySparse {
     data0.qsortBy(_._1)
     val es = new Array[Int](data0.length)
     val cs = new Array[C](data0.length)
-    fastFor(0)(_ < data0.length, _ + 1) { i =>
+    cfor(0)(_ < data0.length, _ + 1) { i =>
       val (e, c) = data0(i)
       es(i) = e
       cs(i) = c
@@ -346,7 +346,7 @@ object PolySparse {
     val coeff = poly.coeff
     val cs = new Array[C](coeff.length)
     val es = new Array[Int](exp.length)
-    fastFor(0)(_ < coeff.length, _ + 1) { i =>
+    cfor(0)(_ < coeff.length, _ + 1) { i =>
       cs(i) = c * coeff(i)
       es(i) = exp(i) + e
     }
@@ -359,7 +359,7 @@ object PolySparse {
     val lexp = lhs.exp
     val lcoeff = lhs.coeff
     var sum = new PolySparse(new Array[Int](0), new Array[C](0))
-    fastFor(0)(_ < lexp.length, _ + 1) { i =>
+    cfor(0)(_ < lexp.length, _ + 1) { i =>
       sum = addSparse(sum, multiplyTerm(rhs, lcoeff(i), lexp(i)))
     }
     sum
@@ -415,12 +415,12 @@ object PolySparse {
         }
       } else {
         var k0 = k
-        fastFor(i)(_ < lexp.length, _ + 1) { i0 =>
+        cfor(i)(_ < lexp.length, _ + 1) { i0 =>
           es(k0) = lexp(i0)
           cs(k0) = lcoeff(i0)
           k0 += 1
         }
-        fastFor(j)(_ < rexp.length, _ + 1) { j0 =>
+        cfor(j)(_ < rexp.length, _ + 1) { j0 =>
           es(k0) = rexp(j0)
           cs(k0) = rcoeff(j0)
           k0 += 1
@@ -459,12 +459,12 @@ object PolySparse {
         }
       } else {
         var k0 = k
-        fastFor(i)(_ < lexp.length, _ + 1) { i0 =>
+        cfor(i)(_ < lexp.length, _ + 1) { i0 =>
           es(k0) = lexp(i0)
           cs(k0) = lcoeff(i0)
           k0 += 1
         }
-        fastFor(j)(_ < rexp.length, _ + 1) { j0 =>
+        cfor(j)(_ < rexp.length, _ + 1) { j0 =>
           es(k0) = rexp(j0) + e
           cs(k0) = -c * rcoeff(j0)
           k0 += 1
