@@ -5,7 +5,7 @@ package poly
 import spire.algebra.{Eq, Field, Ring, Rng, Semiring}
 import spire.math.Polynomial
 import spire.std.array._
-import spire.syntax.cfor._
+import spire.syntax.fastFor._
 import spire.syntax.eq._
 import spire.syntax.field._
 
@@ -21,13 +21,13 @@ class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])(implicit va
   def toDense(implicit ring: Semiring[C], eq: Eq[C]): PolyDense[C] = lhs
 
   def foreach[U](f: (Int, C) => U): Unit = {
-    cfor(0)(_ < coeffs.length, _ + 1) { e =>
+    fastFor(0)(_ < coeffs.length, _ + 1) { e =>
       f(e, coeffs(e))
     }
   }
 
   override def foreachNonZero[U](f: (Int, C) => U)(implicit ring: Semiring[C], eq: Eq[C]): Unit = {
-    cfor(0)(_ < coeffs.length, _ + 1) { e =>
+    fastFor(0)(_ < coeffs.length, _ + 1) { e =>
       val c = coeffs(e)
       if (c =!= ring.zero)
         f(e, c)
@@ -83,13 +83,13 @@ class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])(implicit va
 
     var c0 = coeffs(even)
     val x2 = x.pow(2)
-    cfor(even - 2)(_ >= 0, _ - 2) { i =>
+    fastFor(even - 2)(_ >= 0, _ - 2) { i =>
       c0 = coeffs(i) + c0 * x2
     }
 
     if (odd >= 1) {
       var c1 = coeffs(odd)
-      cfor(odd - 2)(_ >= 1, _ - 2) { i =>
+      fastFor(odd - 2)(_ >= 1, _ - 2) { i =>
         c1 = coeffs(i) + c1 * x2
       }
       c0 + c1 * x
@@ -102,7 +102,7 @@ class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])(implicit va
     if (isZero) return this
     val cs = new Array[C](degree)
     var j = coeffs.length - 1
-    cfor(cs.length - 1)(_ >= 0, _ - 1) { i =>
+    fastFor(cs.length - 1)(_ >= 0, _ - 1) { i =>
       cs(i) = ring.fromInt(j) * coeffs(j)
       j -= 1
     }
@@ -112,13 +112,13 @@ class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])(implicit va
   def integral(implicit field: Field[C], eq: Eq[C]): Polynomial[C] = {
     val cs = new Array[C](coeffs.length + 1)
     cs(0) = field.zero
-    cfor(0)(_ < coeffs.length, _ + 1) { i => cs(i + 1) = coeffs(i) / field.fromInt(i + 1) }
+    fastFor(0)(_ < coeffs.length, _ + 1) { i => cs(i + 1) = coeffs(i) / field.fromInt(i + 1) }
     Polynomial.dense(cs)
   }
 
   def unary_-(implicit ring: Rng[C]): Polynomial[C] = {
     val negArray = new Array[C](coeffs.length)
-    cfor(0)(_ < coeffs.length, _ + 1) { i => negArray(i) = -coeffs(i) }
+    fastFor(0)(_ < coeffs.length, _ + 1) { i => negArray(i) = -coeffs(i) }
     new PolyDense(negArray)
   }
 
@@ -131,11 +131,11 @@ class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])(implicit va
     val lcs = lhs.coeffsArray
     val rcs = rhs.coeffsArray
     val cs = new Array[C](lcs.length + rcs.length - 1)
-    cfor(0)(_ < cs.length, _ + 1) { i => cs(i) = ring.zero }
-    cfor(0)(_ < lcs.length, _ + 1) { i =>
+    fastFor(0)(_ < cs.length, _ + 1) { i => cs(i) = ring.zero }
+    fastFor(0)(_ < lcs.length, _ + 1) { i =>
       val c = lcs(i)
       var k = i
-      cfor(0)(_ < rcs.length, _ + 1) { j =>
+      fastFor(0)(_ < rcs.length, _ + 1) { j =>
         cs(k) += c * rcs(j)
         k += 1
       }
@@ -148,7 +148,7 @@ class PolyDense[@sp(Double) C] private[spire] (val coeffs: Array[C])(implicit va
       Polynomial.dense(new Array[C](0))
     } else {
       val cs = new Array[C](coeffs.length)
-      cfor(0)(_ < cs.length, _ + 1) { i =>
+      fastFor(0)(_ < cs.length, _ + 1) { i =>
         cs(i) = k * coeffs(i)
       }
       Polynomial.dense(cs)
@@ -163,10 +163,10 @@ object PolyDense {
       plusDense(rhs, lhs)
     } else {
       val cs = new Array[C](lcoeffs.length)
-      cfor(0)(_ < rcoeffs.length, _ + 1) { i =>
+      fastFor(0)(_ < rcoeffs.length, _ + 1) { i =>
         cs(i) = lcoeffs(i) + rcoeffs(i)
       }
-      cfor(rcoeffs.length)(_ < lcoeffs.length, _ + 1) { i =>
+      fastFor(rcoeffs.length)(_ < lcoeffs.length, _ + 1) { i =>
         cs(i) = lcoeffs(i)
       }
       Polynomial.dense(cs)

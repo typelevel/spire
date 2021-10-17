@@ -271,6 +271,15 @@ trait CforSyntax {
     macro Syntax.cforRange2Macro
 }
 
+trait FastForSyntax {
+  def fastFor[A](init: A)(test: A => Boolean, next: A => A)(body: A => Unit): Unit =
+    Iterator.iterate(init)(next).takeWhile(test).foreach(body)
+  def fastForRange(r: Range)(body: Int => Unit): Unit =
+    r.foreach(body)
+  def fastForRange2(r1: Range, r2: Range)(body: (Int, Int) => Unit): Unit =
+    r1.foreach(i => r2.foreach(j => body(i, j)))
+}
+
 trait LiteralsSyntax {
   implicit def literals(s: StringContext): Literals = new Literals(s)
 
