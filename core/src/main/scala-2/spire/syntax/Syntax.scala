@@ -262,20 +262,57 @@ trait ConvertableFromSyntax {
   implicit def convertableOps[A: ConvertableFrom](a: A): ConvertableFromOps[A] = new ConvertableFromOps(a)
 }
 
+@deprecated("Replaced by fastFor, *please* read fastFor scaladocs for details", "0.18.0")
 trait CforSyntax {
+  @deprecated("Replaced by fastFor, *please* read fastFor scaladocs for details", "0.18.0")
   def cfor[A](init: A)(test: A => Boolean, next: A => A)(body: A => Unit): Unit =
     macro Syntax.cforMacro[A]
+  @deprecated("Replaced by fastForRange, *please* read fastForRange scaladocs for details", "0.18.0")
   def cforRange(r: Range)(body: Int => Unit): Unit =
     macro Syntax.cforRangeMacro
+  @deprecated("Replaced by fastForRange2, *please* read fastForRange2 scaladocs for details", "0.18.0")
   def cforRange2(r1: Range, r2: Range)(body: (Int, Int) => Unit): Unit =
     macro Syntax.cforRange2Macro
 }
 
 trait FastForSyntax {
+
+  /**
+   * The `fastFor` macro will replace the `cfor` macro in Scala 3.
+   * Note that `fastFor` has simpler semantics than `cfor` and in general is _not_ equivalent
+   * to inlining a while-loop, particularly with respect to closures.
+   * This change is unlikely to affect typical use-cases, however.
+   *
+   * The implementation of `fastFor` provided for Scala 2 is _not_ a macro but is a "reference" implementation
+   * with semantics matching the Scala 3 macro.
+   * If you are on Scala 2 and concerned about performance you should continue using `cfor`.
+   */
   def fastFor[A](init: A)(test: A => Boolean, next: A => A)(body: A => Unit): Unit =
     Iterator.iterate(init)(next).takeWhile(test).foreach(body)
+
+  /**
+   * The `fastForRange` macro will replace the `cforRange` macro in Scala 3.
+   * Note that `fastForRange` has simpler semantics than `cforRange` and in general is _not_ equivalent
+   * to inlining a while-loop, particularly with respect to closures.
+   * This change is unlikely to affect typical use-cases, however.
+   *
+   * The implementation of `fastForRange` provided for Scala 2 is _not_ a macro but is a "reference" implementation
+   * with semantics matching the Scala 3 macro.
+   * If you are on Scala 2 and concerned about performance you should continue using `cforRange`.
+   */
   def fastForRange(r: Range)(body: Int => Unit): Unit =
     r.foreach(body)
+
+  /**
+   * The `fastForRange2` macro will replace the `cforRange2` macro in Scala 3.
+   * Note that `fastForRange2` has simpler semantics than `cforRange2` and in general is _not_ equivalent
+   * to inlining a while-loop, particularly with respect to closures.
+   * This change is unlikely to affect typical use-cases, however.
+   *
+   * The implementation of `fastForRange2` provided for Scala 2 is _not_ a macro but is a "reference" implementation
+   * with semantics matching the Scala 3 macro.
+   * If you are on Scala 2 and concerned about performance you should continue using `cforRange2`.
+   */
   def fastForRange2(r1: Range, r2: Range)(body: (Int, Int) => Unit): Unit =
     r1.foreach(i => r2.foreach(j => body(i, j)))
 }
