@@ -84,20 +84,19 @@ class CforSuite extends munit.FunSuite {
     assertEquals(b.toList, List(0, 1, 2))
   }
 
-  // test("capture value in closure") {
-  //   val b1 = collection.mutable.ArrayBuffer.empty[() => Int]
-  //   cfor(0)(_ < 3, _ + 1) { x =>
-  //     b1 += (() => x)
-  //   // println(b1)
-  //   }
-  //   val b2 = collection.mutable.ArrayBuffer[() => Int]()
-  //   var i = 0
-  //   while (i < 3) {
-  //     b2 += (() => i)
-  //     i += 1
-  //   }
-  //   assertEquals(b1.map(_.apply()).toList, b2.map(_.apply()).toList)
-  // }
+  test("capture value in closure") {
+    val b1 = collection.mutable.ArrayBuffer.empty[() => Int]
+    cfor(0)(_ < 3, _ + 1) { x =>
+      b1 += (() => x)
+    }
+    val b2 = collection.mutable.ArrayBuffer[() => Int]()
+    var i = 0
+    while (i < 3) {
+      b2 += (() => i)
+      i += 1
+    }
+    assertEquals(b1.map(_.apply()).toList, b2.map(_.apply()).toList)
+  }
 
   test("capture value in inner class") {
     val b = collection.mutable.ArrayBuffer[Int]()
