@@ -302,6 +302,8 @@ lazy val docSettings = Seq(
   ),
   micrositeGithubOwner := "typelevel",
   micrositeGithubRepo := "spire",
+  micrositeTheme := "pattern",
+  ghpagesBranch := "main",
   micrositePalette := Map(
     "brand-primary" -> "#5B5988",
     "brand-secondary" -> "#292E53",
