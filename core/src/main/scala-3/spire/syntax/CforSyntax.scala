@@ -2,7 +2,7 @@ package spire.syntax
 
 // For internal use only, to help with cross-compilation
 @deprecated
-trait CforSyntax:
+private[spire] trait CforSyntax:
   @deprecated
   private[spire] inline def cfor[A](inline init: A)(inline test: A => Boolean, inline next: A => A)(inline body: A => Unit): Unit =
     fastFor.fastFor(init)(test, next)(body)
