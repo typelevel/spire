@@ -3,32 +3,32 @@ package syntax
 
 import scala.collection.mutable
 
-class FastForSuite extends munit.FunSuite {
+class CforSuite extends munit.FunSuite {
 
-  import spire.syntax.fastFor._
+  import spire.syntax.cfor._
 
-  test("simple fastFor") {
+  test("simple cfor") {
     val l = mutable.ListBuffer[Int]()
-    fastFor(0)(_ < 5, _ + 1) { x =>
+    cfor(0)(_ < 5, _ + 1) { x =>
       l.append(x)
     }
     assertEquals(l.toList, List(0, 1, 2, 3, 4))
   }
 
-  test("nested fastFor") {
+  test("nested cfor") {
     val s = mutable.Set.empty[Int]
-    fastFor(0)(_ < 10, _ + 1) { x =>
-      fastFor(10)(_ < 100, _ + 10) { y =>
+    cfor(0)(_ < 10, _ + 1) { x =>
+      cfor(10)(_ < 100, _ + 10) { y =>
         s.add(x + y)
       }
     }
     assertEquals(s.toSet, (10 to 99).toSet)
   }
 
-  test("symbol collision fastFor") {
+  test("symbol collision cfor") {
     val b = mutable.ArrayBuffer.empty[Int]
-    fastFor(0)(_ < 3, _ + 1) { x =>
-      fastFor(0)(_ < 2, _ + 1) { y =>
+    cfor(0)(_ < 3, _ + 1) { x =>
+      cfor(0)(_ < 2, _ + 1) { y =>
         val x = y
         b += x
       }
@@ -36,10 +36,10 @@ class FastForSuite extends munit.FunSuite {
     assertEquals(b.toList, List(0, 1, 0, 1, 0, 1))
   }
 
-  test("functions with side effects in fastFor") {
+  test("functions with side effects in cfor") {
     val b = mutable.ArrayBuffer.empty[Int]
     var v = 0
-    fastFor(0)({ v += 1; _ < 3 }, { v += 10; _ + 1 }) {
+    cfor(0)({ v += 1; _ < 3 }, { v += 10; _ + 1 }) {
       v += 100
       x => {
         b += x
@@ -49,7 +49,7 @@ class FastForSuite extends munit.FunSuite {
     assertEquals(b.toList, List(0, 1, 2))
   }
 
-  test("functions with side effects function values in fastFor") {
+  test("functions with side effects function values in cfor") {
     val b = mutable.ArrayBuffer.empty[Int]
     var v = 0
     def test: Int => Boolean = { v += 1; _ < 3 }
@@ -60,16 +60,16 @@ class FastForSuite extends munit.FunSuite {
         b += x
       }
     }
-    fastFor(0)(test, incr)(body)
+    cfor(0)(test, incr)(body)
     assertEquals(v, 111)
     assertEquals(b.toList, List(0, 1, 2))
   }
 
-  test("functions with side effects function by-value params in fastFor") {
+  test("functions with side effects function by-value params in cfor") {
     val b = mutable.ArrayBuffer.empty[Int]
     var v = 0
     def run(test: => (Int => Boolean), incr: => (Int => Int), body: => (Int => Unit)): Unit = {
-      fastFor(0)(test, incr)(body)
+      cfor(0)(test, incr)(body)
     }
     run(
       { v += 1; _ < 3 },
@@ -84,22 +84,23 @@ class FastForSuite extends munit.FunSuite {
     assertEquals(b.toList, List(0, 1, 2))
   }
 
-  // This test distinguishes fastFor from cfor
-  test("doesn't capture value in closure") {
+  test("capture value in closure") {
     val b1 = collection.mutable.ArrayBuffer.empty[() => Int]
-    fastFor(0)(_ < 3, _ + 1) { x =>
+    cfor(0)(_ < 3, _ + 1) { x =>
       b1 += (() => x)
     }
     val b2 = collection.mutable.ArrayBuffer[() => Int]()
-    (0 until 3).foreach { x =>
-      b2 += (() => x)
+    var i = 0
+    while (i < 3) {
+      b2 += (() => i)
+      i += 1
     }
     assertEquals(b1.map(_.apply()).toList, b2.map(_.apply()).toList)
   }
 
   test("capture value in inner class") {
     val b = collection.mutable.ArrayBuffer[Int]()
-    fastFor(0)(_ < 3, _ + 1) { x =>
+    cfor(0)(_ < 3, _ + 1) { x =>
       {
         class A { def f = x }
         b += (new A().f)
@@ -111,7 +112,7 @@ class FastForSuite extends munit.FunSuite {
   test("type tree bug fixed") {
     val arr = Array((1, 2), (2, 3), (4, 5))
     var t = 0
-    fastFor(0)(_ < arr.length, _ + 1) { i =>
+    cfor(0)(_ < arr.length, _ + 1) { i =>
       val (a, b) = arr(i)
       t += a + 2 * b
     }
@@ -120,39 +121,39 @@ class FastForSuite extends munit.FunSuite {
 
   test("destructure tuples") {
     var t = 0
-    fastFor((0, 0))(_._1 < 3, t => (t._1 + 1, t._2 + 2)) { case (a, b) =>
+    cfor((0, 0))(_._1 < 3, t => (t._1 + 1, t._2 + 2)) { case (a, b) =>
       t += 3 * a + b
     }
     assertEquals(t, 15)
   }
 
-  test("fastForRange(1 until 4)") {
+  test("cforRange(1 until 4)") {
     var t = 0
-    fastForRange(1 until 4) { x =>
+    cforRange(1 until 4) { x =>
       t += x
     }
     assertEquals(t, 6)
   }
 
-  test("fastForRange(0 to 10 by 2)") {
+  test("cforRange(0 to 10 by 2)") {
     var t = 0
-    fastForRange(0 to 10 by 2) { x =>
+    cforRange(0 to 10 by 2) { x =>
       t += x
     }
     assertEquals(t, 30)
   }
 
-  test("fastForRange(3 to 1 by -1)") {
+  test("cforRange(3 to 1 by -1)") {
     var t = 0
-    fastForRange(3 to 1 by -1) { x =>
+    cforRange(3 to 1 by -1) { x =>
       t += x
     }
     assertEquals(t, 6)
   }
 
-  test("fastForRange(0 to 0 by -1)") {
+  test("cforRange(0 to 0 by -1)") {
     var t = 0
-    fastForRange(0 to 0 by -1) { x =>
+    cforRange(0 to 0 by -1) { x =>
       t += 1
     }
     assertEquals(t, 1)

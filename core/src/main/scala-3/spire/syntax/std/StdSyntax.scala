@@ -5,7 +5,6 @@ package std
 import spire.algebra.{AdditiveMonoid, Field, Monoid, MultiplicativeMonoid, NRoot, Order, PartialOrder, Signed}
 import spire.math.{Natural, Number, QuickSort, SafeLong, Searching, ULong}
 import scala.collection.Factory
-import spire.syntax.fastFor._
 import spire.syntax.monoid._
 import spire.syntax.field._
 import spire.syntax.nroot._

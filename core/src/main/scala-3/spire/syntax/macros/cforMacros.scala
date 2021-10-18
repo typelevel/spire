@@ -4,7 +4,7 @@ package spire.syntax.macros
 import quoted._
 import collection.immutable.NumericRange
 
-import spire.syntax.FastForSyntax.{RangeLike, RangeElem}
+import spire.syntax.fastFor.{RangeLike, RangeElem}
 
 inline def fastForInline[R](init: R, test: R => Boolean, next: R => R, body: R => Unit): Unit =
   var index = init
