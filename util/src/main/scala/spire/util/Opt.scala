@@ -17,7 +17,6 @@ object Opt {
   implicit def EqOpt[A](implicit ev: Eq[A]): Eq[Opt[A]] = Eq.instance { case (x, y) =>
     if (x.isEmpty) y.isEmpty else y.nonEmpty && ev.eqv(x.ref, y.ref)
   }
-
 }
 
 class Opt[+A](val ref: A) extends AnyVal {

@@ -1,4 +1,5 @@
 package spire
+
 package object scalacompat {
 
   import scala.collection.mutable.ArrayBuilder

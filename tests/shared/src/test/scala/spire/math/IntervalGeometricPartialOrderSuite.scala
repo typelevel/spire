@@ -22,7 +22,7 @@ class IntervalGeometricPartialOrderSuite extends munit.FunSuite {
   test("empty cannot be compared to [2, 3]") { assert(open(2, 2).partialCompare(closed(2, 3)).isNaN) }
   test("[2, 3] cannot be compared to empty") { assert(closed(2, 3).partialCompare(open(2, 2)).isNaN) }
   test("Minimal and maximal elements of {[1], [2, 3], [2, 4]}") {
-    val intervals = Seq[Interval[Int]](point(1), closed(2, 3), closed(2, 4))
+    val intervals = Seq(point(1), closed(2, 3), closed(2, 4))
     assertEquals(intervals.pmin.toSet, Set(point(1)))
     assertEquals(intervals.pmax.toSet, Set(closed(2, 3), closed(2, 4)))
   }

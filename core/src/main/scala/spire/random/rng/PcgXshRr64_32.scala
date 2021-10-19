@@ -20,7 +20,7 @@ import spire.util.Pack
 class PcgXshRr64_32 private (private var state: Long, private var inc: Long) extends IntBasedGenerator {
   protected[this] def copyInit = new PcgXshRr64_32(state, inc)
 
-  def nextInt: Int = {
+  def nextInt(): Int = {
     val oldState = state
 
     state = oldState * 6364136223846793005L + inc
@@ -32,9 +32,9 @@ class PcgXshRr64_32 private (private var state: Long, private var inc: Long) ext
   def seed(initState: Long, initSeq: Long): Unit = {
     state = 0L
     inc = (initSeq << 1) | 1L
-    nextInt
+    nextInt()
     state += initState
-    nextInt
+    nextInt()
   }
 
   def seed(seed: PcgSeed64): Unit = this.seed(seed.initState, seed.initSeq)
@@ -50,7 +50,7 @@ class PcgXshRr64_32 private (private var state: Long, private var inc: Long) ext
 }
 
 object PcgXshRr64_32 extends GeneratorCompanion[PcgXshRr64_32, PcgSeed64] {
-  override def randomSeed: PcgSeed64 =
+  override def randomSeed(): PcgSeed64 =
     PcgSeed64(System.nanoTime, nextStreamId)
 
   override def fromTime(time: Long = System.nanoTime): PcgXshRr64_32 =

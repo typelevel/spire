@@ -66,7 +66,7 @@ class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extend
     d = bb.getInt
   }
 
-  def nextInt: Int = {
+  def nextInt(): Int = {
     val t = x ^ (x >>> 2)
     x = y
     y = z
@@ -97,14 +97,14 @@ object Marsaglia32a6 extends GeneratorCompanion[Marsaglia32a6, Array[Int]] {
 
   def fromTime(time: Long = System.nanoTime): Marsaglia32a6 = {
     val lcg = Lcg64.fromTime(time)
-    val x = lcg.nextInt
-    val y = lcg.nextInt
-    val z = lcg.nextInt
-    val w = lcg.nextInt
-    val v = lcg.nextInt
-    val d = lcg.nextInt
+    val x = lcg.nextInt()
+    val y = lcg.nextInt()
+    val z = lcg.nextInt()
+    val w = lcg.nextInt()
+    val v = lcg.nextInt()
+    val d = lcg.nextInt()
     new Marsaglia32a6(x, y, z, w, v, d)
   }
 
-  override def randomSeed: Array[Int] = GlobalRng.generateInts(6)
+  override def randomSeed(): Array[Int] = GlobalRng.generateInts(6)
 }

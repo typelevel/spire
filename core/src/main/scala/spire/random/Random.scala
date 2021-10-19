@@ -14,6 +14,7 @@ sealed trait Op[+A] {
   def map[B](f: A => B): Op[B] =
     flatMap(a => Const(f(a)))
 
+  @tailrec
   final def resume(gen: Generator): Either[() => Op[A], A] =
     this match {
       case Const(a) =>
@@ -71,18 +72,18 @@ trait RandomCompanion[G <: Generator] { self =>
   def constant[B](b: B): R[B] = spawn(Const(b))
 
   def unit: R[Unit] = constant(())
-  def boolean: R[Boolean] = next(_.nextBoolean)
-  def byte: R[Byte] = next(_.nextInt.toByte)
-  def short: R[Short] = next(_.nextInt.toShort)
-  def char: R[Char] = next(_.nextInt.toChar)
+  def boolean: R[Boolean] = next(_.nextBoolean())
+  def byte: R[Byte] = next(_.nextInt().toByte)
+  def short: R[Short] = next(_.nextInt().toShort)
+  def char: R[Char] = next(_.nextInt().toChar)
 
-  def int: R[Int] = next(_.nextInt)
+  def int: R[Int] = next(_.nextInt())
   def int(n: Int): R[Int] = next(_.nextInt(n))
   def int(n1: Int, n2: Int): R[Int] = next(_.nextInt(n1, n2))
 
-  def float: R[Float] = next(_.nextFloat)
-  def long: R[Long] = next(_.nextLong)
-  def double: R[Double] = next(_.nextDouble)
+  def float: R[Float] = next(_.nextFloat())
+  def long: R[Long] = next(_.nextLong())
+  def double: R[Double] = next(_.nextDouble())
 
   def string(size: Size): R[String] =
     size.random(this).flatMap(stringOfSize)

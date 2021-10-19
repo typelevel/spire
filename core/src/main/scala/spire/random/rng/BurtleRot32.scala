@@ -19,7 +19,7 @@ abstract class BurtleRot32(_a: Int, _b: Int, _c: Int, _d: Int) extends IntBasedG
   protected var c = _c
   protected var d = _d
 
-  override def nextInt: Int = { advance; d }
+  override def nextInt(): Int = { advance; d }
 
   protected def advance: Unit
 
@@ -47,7 +47,7 @@ abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, A
 
   protected def create(_a: Int, _b: Int, _c: Int, _d: Int): G
 
-  override def randomSeed: Array[Int] = GlobalRng.generateInts(4)
+  override def randomSeed(): Array[Int] = GlobalRng.generateInts(4)
 
   def fromBytes(bytes: Array[Byte]): G = {
     val bs = if (bytes.length < 16) Arrays.copyOf(bytes, 16) else bytes
@@ -62,7 +62,7 @@ abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, A
 
   def fromTime(time: Long = System.nanoTime): G = {
     val lcg = Lcg64.fromTime(time)
-    create(lcg.nextInt, lcg.nextInt, lcg.nextInt, lcg.nextInt)
+    create(lcg.nextInt(), lcg.nextInt(), lcg.nextInt(), lcg.nextInt())
   }
 }
 

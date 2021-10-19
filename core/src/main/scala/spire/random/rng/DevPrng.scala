@@ -18,9 +18,9 @@ class Device(f: File) extends Generator { self =>
   def setSeedBytes(bytes: Array[Byte]): Unit =
     throw new UnsupportedOperationException("setSeedBytes")
 
-  def nextInt: Int = dis.readInt
+  def nextInt(): Int = dis.readInt
 
-  def nextLong: Long = dis.readLong
+  def nextLong(): Long = dis.readLong
 }
 
 object Device {
@@ -38,7 +38,7 @@ class CycledFile(f: File) extends Generator { self =>
     reinit
 
   try {
-    nextLong
+    nextLong()
   } catch {
     case e: EOFException =>
       throw new IllegalArgumentException("%s contains less than 8 bytes".format(f))
@@ -57,7 +57,7 @@ class CycledFile(f: File) extends Generator { self =>
   def setSeedBytes(bytes: Array[Byte]): Unit =
     throw new UnsupportedOperationException("setSeedBytes")
 
-  def nextInt: Int = try {
+  def nextInt(): Int = try {
     dis.readInt
   } catch {
     case e: EOFException =>
@@ -65,7 +65,7 @@ class CycledFile(f: File) extends Generator { self =>
       dis.readInt
   }
 
-  def nextLong: Long = try {
+  def nextLong(): Long = try {
     dis.readLong
   } catch {
     case e: EOFException =>

@@ -28,7 +28,7 @@ class XorShift1024Star(private val s: Array[Long], private var p: Int) extends L
     p = bb.getInt
   }
 
-  def nextLong: Long = {
+  def nextLong(): Long = {
     val s0 = s(p)
     p = (p + 1) & 15
     var s1 = s(p)
@@ -42,7 +42,7 @@ object XorShift1024Star extends GeneratorCompanion[XorShift1024Star, (Array[Long
   @inline private val N = 16
   @inline private val BYTES = N * 8 + 4
 
-  def randomSeed: (Array[Long], Int) = (Utils.seedFromLong(N, Utils.longFromTime()), 0)
+  def randomSeed(): (Array[Long], Int) = (Utils.seedFromLong(N, Utils.longFromTime()), 0)
 
   def fromSeed(seed: (Array[Long], Int)): XorShift1024Star =
     seed match {

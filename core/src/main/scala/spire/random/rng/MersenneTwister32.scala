@@ -63,7 +63,7 @@ final class MersenneTwister32 protected[random] (mt: Array[Int], mti0: Int = 625
   }
 
   // Generates the next random integer in the sequence
-  def nextInt: Int = {
+  def nextInt(): Int = {
     var y = 0
 
     if (mti >= N) {
@@ -118,7 +118,7 @@ object MersenneTwister32 extends GeneratorCompanion[MersenneTwister32, (Array[In
 
   @inline private def mag01(x: Int) = if ((x & 1) == 0) 0 else 0x9908b0df
 
-  def randomSeed: (Array[Int], Int) = (Utils.seedFromInt(N, Utils.intFromTime()), N + 1)
+  def randomSeed(): (Array[Int], Int) = (Utils.seedFromInt(N, Utils.intFromTime()), N + 1)
 
   def fromSeed(seed: (Array[Int], Int)): MersenneTwister32 =
     seed match {

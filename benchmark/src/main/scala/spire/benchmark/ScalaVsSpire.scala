@@ -9,7 +9,7 @@ import scala.util.Random
 import Random._
 
 import spire.algebra._
-import spire.std.any._
+import spire.implicits._
 
 import scala.math.{Numeric => ScalaN}
 import Arrays.init
@@ -234,9 +234,8 @@ class ScalaVsSpireBenchmarks {
     while (i < len) { cs(i) = gcdGeneric(as(i), bs(i)); i += 1 }
   }
 
-  @tailrec final def gcdSpire[@sp(Int) A](a: A, c: A)(implicit ev1: EuclideanRing[A], ev2: Eq[A]): A = {
-    import spire.implicits._
-    if ((a.emod(c)) === ev1.zero) c else gcdSpire(c, a.emod(c))
+  @tailrec final def gcdSpire[@sp(Int) A](a: A, b: A)(implicit ev1: EuclideanRing[A], ev2: Eq[A]): A = {
+    if ((a.emod(b)) === ev1.zero) b else gcdSpire(b, a.emod(b))
   }
 
   def doGcdSpire[@sp(Int) A: EuclideanRing: Eq](as: Array[A], bs: Array[A], cs: Array[A]): Unit = {
