@@ -482,8 +482,6 @@ private[interval] object Tree {
           a0 ^ a.sign
         else
           a0
-      case _ =>
-        a0
     }
   }
 

@@ -28,14 +28,14 @@ object PolynomialSetup {
     BigDecimal(r)
   })
 
-  implicit def arbitraryComplex[A: Arbitrary: Fractional: Trig] = Arbitrary(for {
+  implicit def arbitraryComplex[A: Arbitrary: Fractional: Trig]: Arbitrary[Complex[A]] = Arbitrary(for {
     re <- arbitrary[A]
     im <- arbitrary[A]
   } yield {
     Complex(re, im)
   })
 
-  implicit def arbitraryTerm[A: Arbitrary: Ring: Eq: ClassTag] = Arbitrary(for {
+  implicit def arbitraryTerm[A: Arbitrary: Ring: Eq: ClassTag]: Arbitrary[Term[A]] = Arbitrary(for {
     c <- arbitrary[A]
     e0 <- arbitrary[Int]
   } yield {

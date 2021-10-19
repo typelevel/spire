@@ -3,7 +3,7 @@ package math
 
 import scala.util.Try
 
-import spire.implicits.{eqOps => _, _}
+import spire.implicits._
 import spire.laws.arb.rational
 
 import org.scalacheck.Prop._

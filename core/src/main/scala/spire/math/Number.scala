@@ -310,7 +310,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
 
   def compare(rhs: Number): Int = rhs match {
     case IntNumber(m)   => BigDecimal(n).compare(m.toBigDecimal)
-    case FloatNumber(m) => n.compare(m)
+    case FloatNumber(m) => Order[Double].compare(n, m)
     case t              => -t.compare(lhs)
   }
 
@@ -525,7 +525,7 @@ private[math] case class DecimalNumber(n: BigDecimal) extends Number { lhs =>
 
   def floor: Number = Number(n.floor)
   def ceil: Number = Number(n.ceil)
-  def round: Number = Number(n.round())
+  def round: Number = Number(isRealOps(n).round)
 }
 
 private[math] case class RationalNumber(n: Rational) extends Number { lhs =>

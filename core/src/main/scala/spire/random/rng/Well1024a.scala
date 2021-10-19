@@ -51,9 +51,9 @@ final class Well1024a protected[random] (state: Array[Int], i0: Int) extends Int
 
   private var i: Int = i0
 
-  def copyInit: Well1024a = new Well1024a(state.clone(), i)
+  def copyInit: Well1024a = new Well1024a(state.clone, i)
 
-  def getSeedBytes(): Array[Byte] = {
+  def getSeedBytes: Array[Byte] = {
     val bytes: Array[Byte] = new Array[Byte](BYTES)
     val bb: ByteBuffer = ByteBuffer.wrap(bytes)
 

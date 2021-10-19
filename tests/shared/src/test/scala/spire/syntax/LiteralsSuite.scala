@@ -2,6 +2,7 @@ package spire
 package math
 
 import spire.std.int._
+import spire.math._
 
 class LiteralsSuite extends munit.FunSuite {
   test("byte literals") {
@@ -13,15 +14,7 @@ class LiteralsSuite extends munit.FunSuite {
     assertEquals(b"127", (127: Byte))
     assertEquals(b"128", (-128: Byte))
     assertEquals(b"255", (-1: Byte))
-  }
-
-  test("illegal byte literals") {
-    import spire.macros._
-    def tryit(s: String) = Macros.parseNumber(s, BigInt(-128), BigInt(255))
-    assertEquals(tryit("-129"), Left("illegal constant: -129"))
-    assertEquals(tryit("256"), Left("illegal constant: 256"))
-    assertEquals(tryit("10000"), Left("illegal constant: 10000"))
-    assertEquals(tryit("abc"), Left("illegal constant: abc"))
+    assert(compileErrors("""b"256"""").contains("illegal constant: 256"))
   }
 
   test("short literals") {
@@ -33,11 +26,11 @@ class LiteralsSuite extends munit.FunSuite {
     assertEquals(h"32767", (32767: Short))
     assertEquals(h"32768", (-32768: Short))
     assertEquals(h"65535", (-1: Short))
+    assert(compileErrors("""h"65536"""").contains("illegal constant: 65536"))
   }
 
   test("int operators") {
-    import spire.syntax.std.int._
-    import spire.syntax.nroot._
+    import spire.syntax.all._
     assertEquals((5 ** 2), 25)
     assertEquals((5 /~ 2), 2)
     assertEquals((5 /% 2), ((2, 1)))
@@ -58,5 +51,28 @@ class LiteralsSuite extends munit.FunSuite {
 
     assertEquals(r + 1, Algebraic(4.0))
     assertEquals(1 + r, Algebraic(4.0))
+  }
+
+  test("unsigned literals") {
+    import spire.syntax.literals._
+    assertEquals(ub"1", UByte(1))
+    assertEquals(ub"255", UByte(-1))
+    assertEquals(ub"120", UByte(120))
+    assert(compileErrors("""ub"256"""").contains("illegal constant: 256"))
+
+    assertEquals(uh"1", UShort(1))
+    assertEquals(uh"65535", UShort(65535))
+    assertEquals(uh"120", UShort(120))
+    assert(compileErrors("""uh"65536"""").contains("illegal constant: 65536"))
+
+    assertEquals(ui"1", UInt(1))
+    assertEquals(ui"65535", UInt(65535))
+    assertEquals(ui"120", UInt(120))
+    assert(compileErrors("""ui"-1"""").contains("illegal constant: -1"))
+
+    assertEquals(ul"1", ULong(1))
+    assertEquals(ul"65535", ULong(65535))
+    assertEquals(ul"120", ULong(120))
+    assert(compileErrors("""ul"-1"""").contains("illegal constant: -1"))
   }
 }

@@ -232,8 +232,8 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   def sqrt(implicit f: Field[T], n0: NRoot[T], s: Signed[T]): Complex[T] = {
     if (isZero) {
       this
-    } else if (imag.isSignZero()) {
-      if (real.isSignNegative())
+    } else if (imag.isSignZero) {
+      if (real.isSignNegative)
         Complex(f.zero, real.abs.sqrt)
       else
         Complex(real.abs.sqrt, f.zero)
@@ -243,7 +243,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
       val abs = this.abs
       val a = ((abs + real) / two).sqrt
       val b = ((abs - real) / two).sqrt
-      if (imag.isSignNegative())
+      if (imag.isSignNegative)
         Complex(a, -b)
       else
         Complex(a, b)

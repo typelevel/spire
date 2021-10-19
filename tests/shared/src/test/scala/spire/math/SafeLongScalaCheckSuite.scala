@@ -16,7 +16,7 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
   def invariant(z: SafeLong): SafeLong = {
     z match {
       case SafeLongLong(_)       => ()
-      case SafeLongBigInteger(n) => assertEquals(BigInt(n).isValidLong, false)
+      case SafeLongBigInteger(n) => assert(!BigInt(n).isValidLong)
     }
     z
   }
@@ -195,7 +195,7 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
     val firstBig = smax + 1
 
     // equality
-    SafeLong(0) != (BigInt(1) << 64)
+    assert(SafeLong(0) != (BigInt(1) << 64))
 
     // quotient
     assertEquals(smin / (-smin), SafeLong.minusOne)
@@ -232,14 +232,14 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   property("isOdd") {
-    forAll { b: BigInt =>
+    forAll { (b: BigInt) =>
       !SafeLong(b * 2).isOdd &&
       SafeLong(b * 2 + 1).isOdd
     }
   }
 
   property("isEven") {
-    forAll { b: BigInt =>
+    forAll { (b: BigInt) =>
       SafeLong(b * 2).isEven &&
       !SafeLong(b * 2 + 1).isEven
     }

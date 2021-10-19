@@ -69,7 +69,7 @@ trait PartialActionLaws[G, A] extends Laws {
     },
     "left and right partial action compatibility" -> forAllSafe { (a: A, g: G) =>
       (a <|+|?? g) ==>
-        ((g.inverse() ??|+|> a) && ((a <|+|? g).get === (g.inverse() ?|+|> a).get))
+        ((g.inverse ??|+|> a) && ((a <|+|? g).get === (g.inverse ?|+|> a).get))
     }
   )
 

@@ -140,7 +140,7 @@ case class JetDim(dimension: Int) {
  */
 object Jet extends JetInstances {
   // No-arg c.tor makes a zero Jet
-  def apply[@sp(Float, Double) T]()(implicit c: ClassTag[T], d: JetDim, s: Semiring[T]): Jet[T] = Jet(s.zero)
+  def apply[@sp(Float, Double) T](implicit c: ClassTag[T], d: JetDim, s: Semiring[T]): Jet[T] = Jet(s.zero)
 
   // From real.
   def apply[@sp(Float, Double) T](real: T)(implicit c: ClassTag[T], d: JetDim, s: Semiring[T]): Jet[T] =
@@ -203,7 +203,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   /**
    * This is consistent with abs
    */
-  def signum()(implicit r: Signed[T]): Int = real.signum()
+  def signum(implicit r: Signed[T]): Int = real.signum
 
   def asTuple: (T, Array[T]) = (real, infinitesimal)
 
@@ -260,7 +260,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
 
   def /~(b: Jet[T])(implicit c: ClassTag[T], f: Field[T], r: IsReal[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val q = this / b
-    new Jet[T](q.real.floor(), q.infinitesimal.map(r.floor))
+    new Jet[T](q.real.floor, q.infinitesimal.map(r.floor))
   }
 
   def %(b: Jet[T])(implicit c: ClassTag[T], f: Field[T], r: IsReal[T], v: VectorSpace[Array[T], T]): Jet[T] = {
@@ -277,7 +277,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   def **(b: Int)(implicit f: Field[T], v: VectorSpace[Array[T], T]): Jet[T] = pow(b)
 
   def nroot(k: Int)(implicit f: Field[T], s: Signed[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
-    pow(f.fromInt(k).reciprocal())
+    pow(f.fromInt(k).reciprocal)
   }
 
   def **(
@@ -286,16 +286,16 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
     pow(b)
   }
 
-  def floor()(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
-    new Jet(real.floor(), infinitesimal.map(r.floor))
+  def floor(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
+    new Jet(real.floor, infinitesimal.map(r.floor))
   }
 
-  def ceil()(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
-    new Jet(real.ceil(), infinitesimal.map(r.ceil))
+  def ceil(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
+    new Jet(real.ceil, infinitesimal.map(r.ceil))
   }
 
-  def round()(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
-    new Jet(real.round(), infinitesimal.map(r.round))
+  def round(implicit c: ClassTag[T], r: IsReal[T]): Jet[T] = {
+    new Jet(real.round, infinitesimal.map(r.round))
   }
 
   // Elementary math functions
@@ -304,7 +304,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   /**
    * abs(x + du) ~= x + du or -(x + du)
    */
-  def abs()(implicit f: Field[T], s: Signed[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def abs(implicit f: Field[T], s: Signed[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     if (real < f.zero) new Jet(-real, -infinitesimal)
     else this
   }
@@ -369,14 +369,14 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   /**
    * log(a + du) ~= log(a) + du / a
    */
-  def log()(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def log(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     new Jet(spire.math.log(real), (f.one / real) *: infinitesimal)
   }
 
   /**
    * sqrt(a + du) ~= sqrt(a) + du / (2 sqrt(a))
    */
-  def sqrt()(implicit f: Field[T], n: NRoot[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def sqrt(implicit f: Field[T], n: NRoot[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val sa = real.sqrt
     val oneHalf = f.one / (f.one + f.one)
     new Jet(sa, (oneHalf / sa) *: infinitesimal)
@@ -385,7 +385,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   /**
    * acos(a + du) ~= acos(a) - 1 / sqrt(1 - a**2) du
    */
-  def acos()(implicit f: Field[T], n: NRoot[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def acos(implicit f: Field[T], n: NRoot[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val tmp = -f.one / spire.math.sqrt(f.one - real * real)
     new Jet(spire.math.acos(real), tmp *: infinitesimal)
   }
@@ -393,7 +393,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   /**
    * asin(a + du) ~= asin(a) - 1 / sqrt(1 - a**2) du
    */
-  def asin()(implicit f: Field[T], n: NRoot[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def asin(implicit f: Field[T], n: NRoot[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val tmp = f.one / spire.math.sqrt(f.one - real * real)
     new Jet(spire.math.asin(real), tmp *: infinitesimal)
   }
@@ -401,7 +401,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   /**
    * atan(a + du) ~= atan(a) + 1 / (1 + a**2) du
    */
-  def atan()(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def atan(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val tmp = f.one / (f.one + real * real)
     new Jet(spire.math.atan(real), tmp *: infinitesimal)
   }
@@ -418,7 +418,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   /**
    * exp(a + du) ~= exp(a) + exp(a) du
    */
-  def exp()(implicit t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def exp(implicit t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val ea = spire.math.exp(real)
     new Jet[T](ea, ea *: infinitesimal)
   }
@@ -426,35 +426,35 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   /**
    * sin(a + du) ~= sin(a) + cos(a) du
    */
-  def sin()(implicit t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def sin(implicit t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     new Jet(spire.math.sin(real), spire.math.cos(real) *: infinitesimal)
   }
 
   /**
    * sinh(a + du) ~= sinh(a) + cosh(a) du
    */
-  def sinh()(implicit t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def sinh(implicit t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     new Jet(spire.math.sinh(real), spire.math.cosh(real) *: infinitesimal)
   }
 
   /**
    * cos(a + du) ~= cos(a) - sin(a) du
    */
-  def cos()(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def cos(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     new Jet(spire.math.cos(real), -spire.math.sin(real) *: infinitesimal)
   }
 
   /**
    * cosh(a + du) ~= cosh(a) + sinh(a) du
    */
-  def cosh()(implicit t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def cosh(implicit t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     new Jet(spire.math.cosh(real), spire.math.sinh(real) *: infinitesimal)
   }
 
   /**
    * tan(a + du) ~= tan(a) + (1 + tan(a)**2) du
    */
-  def tan()(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def tan(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val tan_a = spire.math.tan(real)
     val tmp = f.one + tan_a * tan_a
     new Jet(tan_a, tmp *: infinitesimal)
@@ -463,7 +463,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   /**
    * tanh(a + du) ~= tanh(a) + (1 - tanh(a)**2) du
    */
-  def tanh()(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
+  def tanh(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val tanh_a = spire.math.tanh(real)
     val tmp = f.one - tanh_a * tanh_a
     new Jet(tanh_a, tmp *: infinitesimal)
@@ -561,7 +561,7 @@ private[math] trait JetIsEuclideanRing[@sp(Float, Double) T] extends JetIsGCDRin
 /* TODO: Jet[T] is probably not a genuine Field */
 private[math] trait JetIsField[@sp(Float, Double) T] extends JetIsEuclideanRing[T] with Field.WithDefaultGCD[Jet[T]] {
   /* TODO: what are exactly the laws of Jet with respect to EuclideanRing ? */
-  // duplicating methods because super[..].call() does not work on 2.10 and 2.11
+  // duplicating methods because super[..].call does not work on 2.10 and 2.11
   override def fromDouble(n: Double): Jet[T] = Jet(f.fromDouble(n))
   def div(a: Jet[T], b: Jet[T]): Jet[T] = a / b
 }
@@ -578,23 +578,23 @@ private[math] trait JetIsTrig[@sp(Float, Double) T] extends Trig[Jet[T]] {
   def e: Jet[T] = Jet(t.e)
   def pi: Jet[T] = Jet(t.pi)
 
-  def exp(a: Jet[T]): Jet[T] = a.exp()
-  def expm1(a: Jet[T]): Jet[T] = a.exp() - f.one
-  def log(a: Jet[T]): Jet[T] = a.log()
-  def log1p(a: Jet[T]): Jet[T] = (a + f.one).log()
+  def exp(a: Jet[T]): Jet[T] = a.exp
+  def expm1(a: Jet[T]): Jet[T] = a.exp - f.one
+  def log(a: Jet[T]): Jet[T] = a.log
+  def log1p(a: Jet[T]): Jet[T] = (a + f.one).log
 
-  def sin(a: Jet[T]): Jet[T] = a.sin()
-  def cos(a: Jet[T]): Jet[T] = a.cos()
-  def tan(a: Jet[T]): Jet[T] = a.tan()
+  def sin(a: Jet[T]): Jet[T] = a.sin
+  def cos(a: Jet[T]): Jet[T] = a.cos
+  def tan(a: Jet[T]): Jet[T] = a.tan
 
-  def asin(a: Jet[T]): Jet[T] = a.asin()
-  def acos(a: Jet[T]): Jet[T] = a.acos()
-  def atan(a: Jet[T]): Jet[T] = a.atan()
+  def asin(a: Jet[T]): Jet[T] = a.asin
+  def acos(a: Jet[T]): Jet[T] = a.acos
+  def atan(a: Jet[T]): Jet[T] = a.atan
   def atan2(y: Jet[T], x: Jet[T]): Jet[T] = y.atan2(x)
 
-  def sinh(x: Jet[T]): Jet[T] = x.sinh()
-  def cosh(x: Jet[T]): Jet[T] = x.cosh()
-  def tanh(x: Jet[T]): Jet[T] = x.tanh()
+  def sinh(x: Jet[T]): Jet[T] = x.sinh
+  def cosh(x: Jet[T]): Jet[T] = x.cosh
+  def tanh(x: Jet[T]): Jet[T] = x.tanh
 
   def toRadians(a: Jet[T]): Jet[T] = a
   def toDegrees(a: Jet[T]): Jet[T] = a
@@ -609,7 +609,7 @@ private[math] trait JetIsNRoot[T] extends NRoot[Jet[T]] {
   implicit def v: VectorSpace[Array[T], T]
 
   def nroot(a: Jet[T], k: Int): Jet[T] = a.nroot(k)
-  override def sqrt(a: Jet[T]): Jet[T] = a.sqrt()
+  override def sqrt(a: Jet[T]): Jet[T] = a.sqrt
   def fpow(a: Jet[T], b: Jet[T]): Jet[T] = a.pow(b)
   def fpow(a: T, b: Jet[T]): Jet[T] = b.powScalarToJet(a)
 }

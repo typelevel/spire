@@ -3,6 +3,7 @@ package math
 
 import spire.algebra.Sign
 import spire.algebra.Sign.Positive
+import spire.std.double._
 import spire.syntax.cfor._
 import spire.syntax.nroot._
 

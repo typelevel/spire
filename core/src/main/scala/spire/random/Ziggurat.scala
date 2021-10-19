@@ -67,15 +67,16 @@ object Ziggurat {
     var hz = hza
     var iz = iza
 
-    @tailrec def loop(): Double = {
+    @tailrec def loop: Double = {
       x = hz * wn(iz)
 
       if (iz == 0) {
-        do {
+        while ({
           x = -log(g.nextDouble()) * r1
           y = -log(g.nextDouble())
-        } while (y + y < x * x)
-        return if (hz > 0) r + x else -r - x
+          (y + y < x * x)
+        })
+          return if (hz > 0) r + x else -r - x
       }
 
       if (fn(iz) + g.nextDouble() * (fn(iz - 1) - fn(iz)) < exp(-.5 * x * x)) return x
@@ -84,10 +85,10 @@ object Ziggurat {
       iz = hz & 127
       if (abs(hz) < kn(iz)) return hz * wn(iz)
 
-      loop()
+      loop
     }
 
-    loop()
+    loop
   }
 
   private def efix(g: Generator, jza: Long, iza: Int): Double = {
@@ -95,7 +96,7 @@ object Ziggurat {
     var jz = jza
     var iz = iza
 
-    @tailrec def loop(): Double = {
+    @tailrec def loop: Double = {
       if (iz == 0) return 7.697117470131487 - log(g.nextDouble())
       val x = jz * we(iz)
 
@@ -105,10 +106,10 @@ object Ziggurat {
       iz = (jz & 255).toInt
       if (jz < ke(iz)) return jz * we(iz)
 
-      loop()
+      loop
     }
 
-    loop()
+    loop
   }
 
   {

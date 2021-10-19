@@ -60,19 +60,19 @@ class NaturalScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   property("x.toString") {
-    forAll { x: N =>
+    forAll { (x: N) =>
       Natural(x.num).toString == x.num.toString
     }
   }
 
   property("x.toBigInt") {
-    forAll { x: N =>
+    forAll { (x: N) =>
       Natural(x.num).toBigInt == x.num
     }
   }
 
   property("x.toLong") {
-    forAll { x: N =>
+    forAll { (x: N) =>
       Natural(x.num).toLong == x.num.toLong
     }
   }

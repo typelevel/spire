@@ -2,12 +2,7 @@ package spire
 
 import spire.algebra._
 import spire.math.Rational
-import spire.std.bigInt._
-import spire.std.double._
-import spire.std.int._
-import spire.std.seq._
-import spire.std.string._
-import spire.syntax.signed._
+import spire.implicits._
 import spire.laws.arb.rational
 
 import org.scalacheck.Arbitrary

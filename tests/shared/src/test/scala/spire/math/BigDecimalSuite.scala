@@ -1,6 +1,6 @@
 package spire.math
 
-import spire.implicits.{nrootOps, BigDecimalAlgebra}
+import spire.implicits._
 
 class BigDecimalSuite extends munit.FunSuite {
   test("sqrt") {

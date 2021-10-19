@@ -245,6 +245,9 @@ object SafeLong extends SafeLongInstances {
   final private[spire] val big64: BigInteger = BigInteger.ONE.shiftLeft(63)
   final private[spire] val safe64: SafeLong = SafeLong(big64)
 
+  // scala 3 would rely on Int to Long conversions but they are no longer automatic
+  implicit def apply(x: Int): SafeLong = SafeLongLong(x.toLong)
+
   implicit def apply(x: Long): SafeLong = SafeLongLong(x)
 
   implicit def apply(x: BigInt): SafeLong =
@@ -295,19 +298,26 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def signum: Int = java.lang.Long.signum(x)
 
   def +(y: Long): SafeLong =
-    Checked.tryOrReturn[SafeLong](SafeLongLong(x + y))(
-      SafeLongBigInteger(BigInteger.valueOf(x).add(BigInteger.valueOf(y)))
-    )
+    try {
+      Checked.checked(SafeLongLong(x + y))
+    } catch {
+      case _: ArithmeticException => SafeLongBigInteger(BigInteger.valueOf(x).add(BigInteger.valueOf(y)))
+    }
 
   def -(y: Long): SafeLong =
-    Checked.tryOrReturn[SafeLong](SafeLongLong(x - y))(
-      SafeLongBigInteger(BigInteger.valueOf(x).subtract(BigInteger.valueOf(y)))
-    )
+    try {
+      Checked.checked(SafeLongLong(x - y))
+    } catch {
+      case _: ArithmeticException => SafeLongBigInteger(BigInteger.valueOf(x).subtract(BigInteger.valueOf(y)))
+    }
 
   def *(y: Long): SafeLong =
-    Checked.tryOrReturn[SafeLong](SafeLongLong(x * y))(
-      SafeLongBigInteger(BigInteger.valueOf(x).multiply(BigInteger.valueOf(y)))
-    )
+    try {
+      Checked.checked(SafeLongLong(x * y))
+    } catch {
+      case _: ArithmeticException =>
+        SafeLongBigInteger(BigInteger.valueOf(x).multiply(BigInteger.valueOf(y)))
+    }
 
   def /(y: Long): SafeLong = if (x == Long.MinValue && y == -1L) SafeLong.safe64 else SafeLongLong(x / y)
 
@@ -385,7 +395,11 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   def ^(y: BigInteger): SafeLong = SafeLong(BigInteger.valueOf(x).xor(y))
 
   def unary_- : SafeLong =
-    Checked.tryOrReturn[SafeLong](SafeLongLong(-x))(SafeLongBigInteger(BigInteger.valueOf(x).negate()))
+    try {
+      Checked.checked(SafeLongLong(-x))
+    } catch {
+      case _: ArithmeticException => SafeLongBigInteger(BigInteger.valueOf(x).negate())
+    }
 
   override def <(that: SafeLong): Boolean =
     that match {

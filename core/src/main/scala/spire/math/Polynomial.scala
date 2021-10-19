@@ -126,8 +126,8 @@ object Polynomial extends PolynomialInstances {
   }
 
   final private def split[@sp(Double) C: ClassTag](poly: Polynomial[C]): (Array[Int], Array[C]) = {
-    val es = arrayBuilderMake[Int]()
-    val cs = arrayBuilderMake[C]()
+    val es = arrayBuilderMake[Int]
+    val cs = arrayBuilderMake[C]
     poly.foreach { (e, c) =>
       es += e
       cs += c
@@ -500,7 +500,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
     if (isZero) {
       "(0)"
     } else {
-      val bldr = arrayBuilderMake[Term[C]]()
+      val bldr = arrayBuilderMake[Term[C]]
       foreach { (e, c) => bldr += Term(c, e) }
 
       val ts = bldr.result()

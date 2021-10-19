@@ -18,7 +18,7 @@ abstract class Generator {
 
   def sync: rng.SyncGenerator = new rng.SyncGenerator(copy)
 
-  def getSeedBytes(): Array[Byte]
+  def getSeedBytes: Array[Byte]
 
   def setSeedBytes(bytes: Array[Byte]): Unit
 
@@ -90,11 +90,11 @@ abstract class Generator {
         val x = UInt(nextInt())
         from + (x % width).signed
       } else {
-        @tailrec def loop(): Int = {
+        @tailrec def loop: Int = {
           val x = UInt(nextInt())
-          if (x <= cap) (x % width).signed + from else loop()
+          if (x <= cap) (x % width).signed + from else loop
         }
-        loop()
+        loop
       }
     }
   }
@@ -137,11 +137,11 @@ abstract class Generator {
         val x = ULong(nextLong())
         from + (x % width).signed
       } else {
-        @tailrec def loop(): Long = {
+        @tailrec def loop: Long = {
           val x = ULong(nextLong())
-          if (x <= cap) (x % width).signed + from else loop()
+          if (x <= cap) (x % width).signed + from else loop
         }
-        loop()
+        loop
       }
     }
   }
@@ -373,7 +373,7 @@ abstract class Generator {
     }
   }
 
-  def nextGaussian(): Double = if (extra) {
+  def nextGaussian: Double = if (extra) {
     extra = false
     value
   } else {
@@ -392,7 +392,7 @@ abstract class Generator {
   }
 
   def nextGaussian(mean: Double, stddev: Double): Double =
-    nextGaussian() * stddev + mean
+    nextGaussian * stddev + mean
 
   def fillGaussians(arr: Array[Double]): Unit =
     fillGaussians(arr, 0.0, 1.0)
@@ -417,7 +417,7 @@ abstract class Generator {
       i += 2
     }
 
-    if (len < arr.length) arr(len) = nextGaussian() * stddev + mean
+    if (len < arr.length) arr(len) = nextGaussian * stddev + mean
   }
 
   def generateGaussians(n: Int): Array[Double] = {
@@ -529,7 +529,7 @@ object GlobalRng extends LongBasedGenerator {
 
   def copyInit: Generator = rng.copyInit
 
-  override def getSeedBytes(): Array[Byte] = rng.getSeedBytes()
+  override def getSeedBytes: Array[Byte] = rng.getSeedBytes
 
   def setSeedBytes(bytes: Array[Byte]): Unit = rng.setSeedBytes(bytes)
 

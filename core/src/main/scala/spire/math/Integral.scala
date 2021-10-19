@@ -25,6 +25,7 @@ object Integral {
   @inline final def apply[A](implicit ev: Integral[A]): Integral[A] = ev
 }
 
+// TODO Move to syntax
 class IntegralOps[A](lhs: A)(implicit ev: Integral[A]) {
   def toSafeLong: SafeLong = SafeLong(ev.toBigInt(lhs))
 

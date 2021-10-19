@@ -7,7 +7,6 @@ lazy val scalaCheckVersion = "1.15.4"
 lazy val munit = "0.7.28"
 lazy val munitDiscipline = "1.0.9"
 
-lazy val shapelessVersion = "2.3.7"
 lazy val algebraVersion = "2.2.3"
 
 lazy val apfloatVersion = "1.10.1"
@@ -15,9 +14,12 @@ lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
 val Scala213 = "2.13.6"
+val Scala3 = "3.1.0"
 
-ThisBuild / crossScalaVersions := Seq(Scala213)
-ThisBuild / scalaVersion := Scala213
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
+ThisBuild / crossScalaVersions := Seq(Scala213, Scala3)
+ThisBuild / scalaVersion := Scala3
 ThisBuild / organization := "org.typelevel"
 
 ThisBuild / githubWorkflowArtifactUpload := false
@@ -32,7 +34,6 @@ ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Sbt(List("doc"), name = Some("Build docs"))
 )
 
-Global / onChangedBuildSource := ReloadOnSourceChanges
 // Projects
 
 lazy val spire = project
@@ -91,7 +92,6 @@ lazy val spireJS = project
 lazy val platform = crossProject(JSPlatform, JVMPlatform)
   .settings(moduleName := "spire-platform")
   .settings(spireSettings: _*)
-  .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
   .dependsOn(macros, util)
@@ -102,7 +102,6 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
   .settings(spireSettings: _*)
   .settings(scalaCheckSettings: _*)
   .settings(munitSettings: _*)
-  .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
 
@@ -110,7 +109,6 @@ lazy val data = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .settings(moduleName := "spire-data")
   .settings(spireSettings: _*)
-  .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
 
@@ -118,7 +116,6 @@ lazy val legacy = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .settings(moduleName := "spire-legacy")
   .settings(spireSettings: _*)
-  .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
 
@@ -126,7 +123,6 @@ lazy val util = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Pure)
   .settings(moduleName := "spire-util")
   .settings(spireSettings: _*)
-  .settings(crossVersionSharedSources: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
   .dependsOn(macros)
@@ -136,7 +132,6 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(moduleName := "spire")
   .settings(spireSettings: _*)
   .settings(coreSettings: _*)
-  .settings(crossVersionSharedSources: _*)
   .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
@@ -171,9 +166,9 @@ lazy val docs = project
 lazy val examples = project
   .settings(moduleName := "spire-examples")
   .settings(spireSettings)
+  .settings(crossVersionSharedSources: _*)
   .settings(
     libraryDependencies ++= Seq(
-      "com.chuusai" %% "shapeless" % shapelessVersion,
       "org.apfloat" % "apfloat" % apfloatVersion,
       "org.jscience" % "jscience" % jscienceVersion
     )
@@ -248,7 +243,8 @@ lazy val commonSettings = Seq(
       "-language:existentials",
       "-Ywarn-dead-code",
       "-Ywarn-numeric-widen",
-      "-Ywarn-value-discard"
+      "-Ywarn-value-discard",
+      "-Xcheck-macros"
     )
   ),
   resolvers += Resolver.sonatypeRepo("snapshots")
@@ -423,7 +419,7 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
   Seq(Compile, Test).map { sc =>
     (sc / unmanagedSourceDirectories) ++= {
       (sc / unmanagedSourceDirectories).value.map { dir: File =>
-        CrossVersion.partialVersion(scalaBinaryVersion.value) match {
+        CrossVersion.partialVersion(scalaVersion.value) match {
           case Some((major, minor)) =>
             new File(s"${dir.getPath}_$major.$minor")
           case None =>
@@ -434,19 +430,14 @@ lazy val crossVersionSharedSources: Seq[Setting[_]] =
   }
 
 lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
-  libraryDependencies += scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided"
+  libraryDependencies ++= {
+    if (scalaVersion.value.startsWith("3")) Seq.empty
+    else Seq(scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided")
+  }
 )
 
 lazy val commonScalacOptions = Def.setting(
-  (CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, v)) if v >= 13 =>
-      Seq()
-    case _ =>
-      Seq(
-        "-Yno-adapted-args",
-        "-Xfuture"
-      )
-  }) ++ Seq(
+  Seq(
     "-deprecation",
     "-encoding",
     "UTF-8",
@@ -457,10 +448,10 @@ lazy val commonScalacOptions = Def.setting(
     "-language:experimental.macros",
     "-unchecked",
     "-Xfatal-warnings",
-    "-Xlint",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
-    "-Ywarn-value-discard"
+    "-Ywarn-value-discard",
+    "-Xcheck-macros"
   )
 )
 

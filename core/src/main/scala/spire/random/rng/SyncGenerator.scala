@@ -7,7 +7,7 @@ final class SyncGenerator(gen: Generator) extends Generator {
 
   override def sync: SyncGenerator = this
 
-  def getSeedBytes(): Array[Byte] = gen.getSeedBytes()
+  def getSeedBytes: Array[Byte] = gen.getSeedBytes
 
   def setSeedBytes(bytes: Array[Byte]): Unit = gen.setSeedBytes(bytes)
 

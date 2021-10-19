@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.implicits.{eqOps => _, _}
+import spire.implicits._
 
 class IntervalReciprocalSuite extends munit.FunSuite {
 

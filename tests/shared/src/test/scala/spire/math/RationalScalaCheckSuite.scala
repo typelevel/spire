@@ -50,19 +50,19 @@ class RationalScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-  rat1("x + 0 == x") { x: Q => x + Rational(0) == x }
-  rat1("x * 1 == x") { x: Q => x * Rational(1) == x }
-  rat1("x * 0 == 0") { x: Q => x * Rational(0) == Rational(0) }
+  rat1("x + 0 == x") { (x: Q) => x + Rational(0) == x }
+  rat1("x * 1 == x") { (x: Q) => x * Rational(1) == x }
+  rat1("x * 0 == 0") { (x: Q) => x * Rational(0) == Rational(0) }
 
-  rat1("x.floor <= x.round <= x.ceil") { x: Q =>
+  rat1("x.floor <= x.round <= x.ceil") { (x: Q) =>
     x.floor <= x.round && x.round <= x.ceil
   }
 
-  rat1("x + x == 2x") { x: Q => (x + x) == 2 * x }
-  rat1("x - x == 0") { x: Q => x - x == Rational(0) }
-  rat1("x * x == x^2") { x: Q => (x * x) == x.pow(2) }
-  rat1("(x^-1)^3 == x^-3") { x: Q => if (x != 0) x.reciprocal.pow(3) == x.pow(-3) }
-  rat1("x / x == 1") { x: Q => if (x != 0) x / x == Rational(1) }
+  rat1("x + x == 2x") { (x: Q) => (x + x) == 2 * x }
+  rat1("x - x == 0") { (x: Q) => x - x == Rational(0) }
+  rat1("x * x == x^2") { (x: Q) => (x * x) == x.pow(2) }
+  rat1("(x^-1)^3 == x^-3") { (x: Q) => if (x != 0) x.reciprocal.pow(3) == x.pow(-3) }
+  rat1("x / x == 1") { (x: Q) => if (x != 0) x / x == Rational(1) }
 
   rat2("x + y == y + x") { (x: Q, y: Q) => x + y == y + x }
   rat2("x - y == -y + x") { (x: Q, y: Q) => x - y == -y + x }

@@ -244,7 +244,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   import spire.syntax.nroot._
 
   def sqrt(implicit scale: FixedScale): FixedPoint =
-    FixedPoint(toReal.sqrt().toRational)
+    FixedPoint(toReal.sqrt.toRational)
 
   def nroot(k: Int)(implicit scale: FixedScale): FixedPoint =
     FixedPoint(toReal.nroot(k).toRational)
@@ -363,11 +363,11 @@ trait FixedPointInstances {
     }
 
   import NumberTag._
-  implicit final val FixedPointTag = new CustomTag[FixedPoint](Approximate,
-                                                               Some(FixedPoint.zero),
-                                                               Some(FixedPoint.MinValue),
-                                                               Some(FixedPoint.MaxValue),
-                                                               true,
-                                                               true
+  implicit final val FixedPointTag: CustomTag[FixedPoint] = new CustomTag[FixedPoint](Approximate,
+                                                                                      Some(FixedPoint.zero),
+                                                                                      Some(FixedPoint.MinValue),
+                                                                                      Some(FixedPoint.MaxValue),
+                                                                                      true,
+                                                                                      true
   )
 }

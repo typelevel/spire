@@ -28,7 +28,6 @@ class LongEqualityCheckBenchmark {
 
   @Benchmark
   def eqeqeq(x: Blackhole): Unit = {
-    import spire.implicits._
     x.consume(a === b)
   }
 }

@@ -39,7 +39,7 @@ trait Ops {
    *
    * @group macros
    */
-  def unop[R](c: Context)(): c.Expr[R] = {
+  def unop[R](c: Context): c.Expr[R] = {
     import c.universe._
     val (ev, lhs) = unpack(c)
     c.Expr[R](Apply(Select(ev, findMethodName(c)), List(lhs)))
@@ -177,7 +177,7 @@ trait Ops {
     c.Expr[R](Apply(Select(ev, findMethodName(c)), List(lhs.tree, rhs)))
   }
 
-  def unopWithScalar[R](c: Context)(): c.Expr[R] =
+  def unopWithScalar[R](c: Context): c.Expr[R] =
     handleUnopWithChild[R](c)("scalar")
 
   def unopWithScalar0[R](c: Context): c.Expr[R] =

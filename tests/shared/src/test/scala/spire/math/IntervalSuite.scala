@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.implicits.{eqOps => _, _}
+import spire.implicits._
 
 class IntervalSuite extends munit.FunSuite {
   def cc(n1: Double, n2: Double) = Interval.closed(n1, n2)

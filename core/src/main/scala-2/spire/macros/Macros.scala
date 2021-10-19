@@ -147,7 +147,7 @@ object Macros {
       c.Expr[BigDecimal](Apply(q"scala.math.BigDecimal.apply", List(Literal(Constant(s)))))
     } catch {
       case e: Exception =>
-        throw new NumberFormatException("illegal %s BigInt constant".format(name))
+        throw new NumberFormatException("illegal %s BigDecimal constant".format(name))
     }
   }
 

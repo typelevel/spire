@@ -3,7 +3,7 @@ package math
 
 import spire.math.ArbitrarySupport.{NonNegative, Positive}
 
-import spire.implicits.{eqOps => _, _}
+import spire.implicits._
 import spire.laws.arb.{interval => interval_, rational}
 
 import org.scalacheck.Prop._
@@ -78,15 +78,15 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
           () =>
             rng.nextInt(5) match {
               case 0 => x
-              case _ => x + (Rational(rng.nextGaussian()).abs * Long.MaxValue)
+              case _ => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
             }
         case (_, ValueBound(y)) =>
           () =>
             rng.nextInt(5) match {
               case 4 => y
-              case _ => y - (Rational(rng.nextGaussian()).abs * Long.MaxValue)
+              case _ => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
             }
-        case (_, _) => () => Rational(rng.nextGaussian()) * Long.MaxValue
+        case (_, _) => () => Rational(rng.nextGaussian) * Long.MaxValue
       }
 
       def nextf(): Rational = {
@@ -99,7 +99,7 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
 
   val tries = 100
 
-  def testUnop(f: Interval[Rational] => Interval[Rational])(g: Rational => Rational): Unit = {
+  def testUnop(f: Interval[Rational] => Interval[Rational])(g: Rational => Rational) = {
     forAll { (a: Interval[Rational]) =>
       val c: Interval[Rational] = f(a)
       sample(a, tries).foreach { x =>
@@ -112,7 +112,7 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
 
   def testBinop(
     f: (Interval[Rational], Interval[Rational]) => Interval[Rational]
-  )(g: (Rational, Rational) => Rational): Unit = {
+  )(g: (Rational, Rational) => Rational) = {
     forAll { (a: Interval[Rational], b: Interval[Rational]) =>
       val c: Interval[Rational] = f(a, b)
       sample(a, tries).zip(sample(b, tries)).foreach { case (x, y) =>

@@ -45,21 +45,21 @@ class PolynomialSamplingScalaCheckSuite extends munit.ScalaCheckSuite {
   )(implicit arb: Arbitrary[Polynomial[A]], arb2: Arbitrary[A]): Unit = {
     type P = Polynomial[A]
 
-    def testUnop(f: P => P)(g: A => A): Unit = {
+    def testUnop(f: P => P)(g: A => A) = {
       forAll { (x: P, a: A) =>
         val z = f(x)
         g(x(a)) == z(a)
       }
     }
 
-    def testBinop(f: (P, P) => P)(g: (A, A) => A): Unit = {
+    def testBinop(f: (P, P) => P)(g: (A, A) => A) = {
       forAll { (x: P, y: P, a: A) =>
         val z = f(x, y)
         g(x(a), y(a)) == z(a)
       }
     }
 
-    def testBinopNonzero(f: (P, P) => P)(g: (A, A) => A): Unit = {
+    def testBinopNonzero(f: (P, P) => P)(g: (A, A) => A) = {
       forAll { (x: P, y: P, a: A) =>
         if (!y.isZero && y(a) != Field[A].zero) {
           val z = f(x, y)

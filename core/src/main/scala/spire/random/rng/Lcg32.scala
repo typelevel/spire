@@ -12,7 +12,7 @@ class Lcg32(seed0: Int) extends IntBasedGenerator {
 
   def copyInit: Lcg32 = new Lcg32(seed)
 
-  def getSeedBytes(): Array[Byte] = Pack.intToBytes(seed)
+  def getSeedBytes: Array[Byte] = Pack.intToBytes(seed)
 
   def setSeedBytes(bytes: Array[Byte]): Unit = seed = Pack.intFromBytes(bytes)
 

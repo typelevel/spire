@@ -1,7 +1,7 @@
 package spire
 package math
 
-import spire.implicits.{eqOps => _, _}
+import spire.implicits._
 
 // TODO: this is just the tip of the iceberg... we also need to worry about
 // unbounded intervals, closed vs open bounds, etc.

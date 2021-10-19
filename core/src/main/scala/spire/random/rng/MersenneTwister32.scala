@@ -46,7 +46,7 @@ final class MersenneTwister32 protected[random] (mt: Array[Int], mti0: Int = 625
 
   def copyInit: MersenneTwister32 = new MersenneTwister32(mt.clone, mti)
 
-  def getSeedBytes(): Array[Byte] = {
+  def getSeedBytes: Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
 
@@ -58,7 +58,7 @@ final class MersenneTwister32 protected[random] (mt: Array[Int], mti0: Int = 625
   def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
-    cfor(0)(_ < N, _ + 1) { i => mt(i) = bb.getInt() }
+    cfor(0)(_ < N, _ + 1) { i => mt(i) = bb.getInt }
     mti = bb.getInt
   }
 

@@ -13,7 +13,7 @@ final class Lcg64(_seed: Long) extends LongBasedGenerator {
 
   def setSeed(n: Long): Unit = seed = n
 
-  override def getSeedBytes(): Array[Byte] = Pack.longToBytes(seed)
+  override def getSeedBytes: Array[Byte] = Pack.longToBytes(seed)
 
   def setSeedBytes(bytes: Array[Byte]): Unit = seed = Pack.longFromBytes(bytes)
 
@@ -24,11 +24,11 @@ final class Lcg64(_seed: Long) extends LongBasedGenerator {
 }
 
 object Lcg64 extends GeneratorCompanion[Lcg64, Long] {
-  def randomSeed(): Long = System.nanoTime()
+  def randomSeed(): Long = System.nanoTime
 
   def fromBytes(bytes: Array[Byte]): Lcg64 = new Lcg64(Pack.longFromBytes(bytes))
   def fromSeed(seed: Long): Lcg64 = new Lcg64(seed)
-  def fromTime(time: Long = System.nanoTime()): Lcg64 = new Lcg64(time)
+  def fromTime(time: Long = System.nanoTime): Lcg64 = new Lcg64(time)
 
   def step(n: Long): Long = 6364136223846793005L * n + 1442695040888963407L
 }

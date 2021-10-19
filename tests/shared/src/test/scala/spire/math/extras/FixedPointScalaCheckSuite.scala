@@ -15,7 +15,7 @@ import org.scalacheck.Prop._
 class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
 
   implicit val arbFixedScale: Arbitrary[FixedScale] =
-    Arbitrary(arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale))
+    Arbitrary(arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale.apply))
 
   implicit val arbFixedPoint: Arbitrary[FixedPoint] =
     Arbitrary(arbitrary[Long].map(new FixedPoint(_)))

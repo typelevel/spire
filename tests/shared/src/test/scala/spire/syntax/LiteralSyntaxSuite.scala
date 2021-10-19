@@ -1,4 +1,5 @@
 package spire
+package syntax
 
 import spire.math.Rational
 

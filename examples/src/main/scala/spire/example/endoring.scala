@@ -21,7 +21,7 @@ object EndoRingExample extends App {
      * keeping track of the inclusions and exclusions separately. This let's
      * us ensure it is commutative and that we always have an inverse.
      */
-    implicit def PairedSetAbGroup[A] = new AbGroup[(Set[A], Set[A])] {
+    implicit def PairedSetAbGroup[A]: AbGroup[(Set[A], Set[A])] = new AbGroup[(Set[A], Set[A])] {
       def combine(a: (Set[A], Set[A]), b: (Set[A], Set[A])): (Set[A], Set[A]) = {
         val (a1, a2) = a
         val (b1, b2) = b
