@@ -7,9 +7,9 @@ import spire.syntax.fastFor.{RangeElem, RangeLike}
 
 inline def fastForInline[R](init: R, test: R => Boolean, next: R => R, body: R => Unit): Unit =
   var index = init
-  while (test(index))
+  while test(index) do
     body(index)
-  index = next(index)
+    index = next(index)
 
 def fastForRangeMacroGen[R <: RangeLike: Type](r: Expr[R], body: Expr[RangeElem[R] => Unit])(using
   quotes: Quotes
@@ -107,25 +107,25 @@ def fastForRangeMacro(r: Expr[Range], body: Expr[Int => Unit])(using quotes: Quo
   def strideUpTo(fromExpr: Expr[Int], untilExpr: Expr[Int], stride: Expr[Int]): Expr[Unit] = '{
     var index = $fromExpr
     val end = $untilExpr
-    while (index <= end)
-    ${ Expr.betaReduce(body) }(index)
-    index += $stride
+    while index <= end do
+      ${ Expr.betaReduce(body) }(index)
+      index += $stride
   }
 
   def strideDownTo(fromExpr: Expr[Int], untilExpr: Expr[Int], stride: Expr[Int]): Expr[Unit] = '{
     var index = $fromExpr
     val end = $untilExpr
-    while (index >= end)
-    ${ Expr.betaReduce(body) }(index)
-    index -= $stride
+    while index >= end do
+      ${ Expr.betaReduce(body) }(index)
+      index -= $stride
   }
 
   def strideDownUntil(fromExpr: Expr[Int], untilExpr: Expr[Int], stride: Expr[Int]): Expr[Unit] = '{
     var index = $fromExpr
     val limit = $untilExpr
-    while (index > limit)
-    ${ Expr.betaReduce(body) }(index)
-    index -= $stride
+    while index > limit do
+      ${ Expr.betaReduce(body) }(index)
+      index -= $stride
   }
 
   r match
