@@ -50,8 +50,8 @@ object Ops extends spire.macros.machinist.Ops {
   }
 
   /**
-   * Like [[binop]] and [[binopWithEv]], but there is ev provided by the implicit
-   * constructor, and ev1 provided by the method.
+   * Like [[binop]] and [[binopWithEv]], but there is ev provided by the implicit constructor, and ev1 provided by the
+   * method.
    *
    * If we see code like:
    *
