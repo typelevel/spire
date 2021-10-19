@@ -19,6 +19,7 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 ThisBuild / crossScalaVersions := Seq(Scala213, Scala3)
 ThisBuild / scalaVersion := Scala3
+ThisBuild / versionScheme := Some("early-semver")
 
 ThisBuild / githubWorkflowArtifactUpload := false
 
