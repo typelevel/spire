@@ -1,6 +1,5 @@
 import scala.language.existentials
 import microsites._
-import ReleaseTransformations._
 
 lazy val scalaCheckVersion = "1.15.4"
 
@@ -20,11 +19,9 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 ThisBuild / crossScalaVersions := Seq(Scala213, Scala3)
 ThisBuild / scalaVersion := Scala3
-ThisBuild / organization := "org.typelevel"
 
 ThisBuild / githubWorkflowArtifactUpload := false
 
-ThisBuild / githubWorkflowPublishTargetBranches := Seq()
 ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8", "adopt@1.11", "adopt@1.16")
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep
@@ -34,6 +31,42 @@ ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Sbt(List("doc"), name = Some("Build docs"))
 )
 
+inThisBuild(
+  List(
+    organization := "org.typelevel",
+    homepage := Some(url("https://typelevel.org/spire/")),
+    licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
+    developers := List(
+      Developer(
+        "id_m",
+        "Erik Osheim",
+        "",
+        url("http://github.com/non/")
+      ),
+      Developer(
+        "tixxit",
+        "Tom Switzer",
+        "",
+        url("http://github.com/tixxit/")
+      )
+    )
+  )
+)
+
+ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
+ThisBuild / githubWorkflowPublishTargetBranches +=
+  RefPredicate.StartsWith(Ref.Tag("v"))
+ThisBuild / githubWorkflowPublish := Seq(
+  WorkflowStep.Sbt(
+    List("ci-release"),
+    env = Map(
+      "PGP_PASSPHRASE" -> "${{ secrets.PGP_PASSPHRASE }}",
+      "PGP_SECRET" -> "${{ secrets.PGP_SECRET }}",
+      "SONATYPE_PASSWORD" -> "${{ secrets.SONATYPE_PASSWORD }}",
+      "SONATYPE_USERNAME" -> "${{ secrets.SONATYPE_USERNAME }}"
+    )
+  )
+)
 // Projects
 
 lazy val spire = project
@@ -336,25 +369,6 @@ lazy val docSettings = Seq(
   Jekyll / includeFilter := (makeSite / includeFilter).value
 )
 
-lazy val publishSettings = Seq(
-  homepage := Some(url("https://typelevel.org/spire/")),
-  licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-  pomExtra := (
-    <developers>
-      <developer>
-        <id>d_m</id>
-        <name>Erik Osheim</name>
-        <url>http://github.com/non/</url>
-      </developer>
-      <developer>
-        <id>tixxit</id>
-        <name>Tom Switzer</name>
-        <url>http://github.com/tixxit/</url>
-      </developer>
-    </developers>
-  )
-) ++ credentialSettings ++ sharedPublishSettings ++ sharedReleaseProcess
-
 lazy val scoverageSettings = Seq(
   coverageMinimumStmtTotal := 40,
   coverageFailOnMinimum := false,
@@ -395,7 +409,7 @@ lazy val munitSettings = Seq(
   )
 )
 
-lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps ++ publishSettings ++ scoverageSettings
+lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps ++ scoverageSettings
 
 lazy val unidocSettings = Seq(
   ScalaUnidoc / unidoc / unidocProjectFilter := inAnyProject -- inProjects(examples, benchmark, tests.jvm)
@@ -455,38 +469,6 @@ lazy val commonScalacOptions = Def.setting(
   )
 )
 
-lazy val sharedPublishSettings = Seq(
-  releaseCrossBuild := true,
-  releasePublishArtifactsAction := PgpKeys.publishSigned.value,
-  publishMavenStyle := true,
-  Test / publishArtifact := false,
-  pomIncludeRepository := Function.const(false),
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (isSnapshot.value)
-      Some("Snapshots".at(nexus + "content/repositories/snapshots"))
-    else
-      Some("Releases".at(nexus + "service/local/staging/deploy/maven2"))
-  }
-)
-
-lazy val sharedReleaseProcess = Seq(
-  releaseProcess := Seq[ReleaseStep](
-    checkSnapshotDependencies,
-    inquireVersions,
-    runClean,
-    runTest,
-    setReleaseVersion,
-    commitReleaseVersion,
-    tagRelease,
-    publishArtifacts,
-    setNextVersion,
-    commitNextVersion,
-    releaseStepCommand("sonatypeReleaseAll"),
-    pushChanges
-  )
-)
-
 lazy val warnUnusedImport = Seq(
   scalacOptions ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
@@ -499,17 +481,4 @@ lazy val warnUnusedImport = Seq(
   },
   Compile / console / scalacOptions ~= { _.filterNot("-Ywarn-unused-import" == _) },
   Test / console / scalacOptions := (Compile / console / scalacOptions).value
-)
-
-// For Travis CI - see http://www.cakesolutions.net/teamblogs/publishing-artefacts-to-oss-sonatype-nexus-using-sbt-and-travis-ci
-lazy val credentialSettings = Seq(
-  credentials ++= (for {
-    username <- Option(System.getenv().get("SONATYPE_USERNAME"))
-    password <- Option(System.getenv().get("SONATYPE_PASSWORD"))
-  } yield Credentials("Sonatype Nexus Repository Manager", "oss.sonatype.org", username, password)).toSeq,
-  credentials += Credentials(
-    Option(System.getProperty("build.publish.credentials"))
-      .map(new File(_))
-      .getOrElse(Path.userHome / ".ivy2" / ".credentials")
-  )
 )
