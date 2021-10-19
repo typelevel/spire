@@ -17,7 +17,7 @@ def parseNumber(s: Seq[String], lower: BigInt, upper: BigInt): Either[String, Bi
 def byte(digits: Expr[StringContext])(using Quotes): Expr[Byte] =
   import quotes.reflect._
 
-  parseNumber(digits.valueOrError.parts, BigInt(-128), BigInt(255)) match
+  parseNumber(digits.valueOrAbort.parts, BigInt(-128), BigInt(255)) match
     case Right(a) => Expr(a.toByte)
     case Left(b) =>
       report.error(b)
@@ -26,7 +26,7 @@ def byte(digits: Expr[StringContext])(using Quotes): Expr[Byte] =
 def short(digits: Expr[StringContext])(using Quotes): Expr[Short] =
   import quotes.reflect._
 
-  parseNumber(digits.valueOrError.parts, BigInt(-32768), BigInt(65535)) match
+  parseNumber(digits.valueOrAbort.parts, BigInt(-32768), BigInt(65535)) match
     case Right(a) => Expr(a.toShort)
     case Left(b) =>
       report.error(b)
@@ -35,7 +35,7 @@ def short(digits: Expr[StringContext])(using Quotes): Expr[Short] =
 def ubyte(digits: Expr[StringContext])(using Quotes): Expr[UByte] =
   import quotes.reflect._
 
-  parseNumber(digits.valueOrError.parts, BigInt(0), BigInt(255)) match
+  parseNumber(digits.valueOrAbort.parts, BigInt(0), BigInt(255)) match
     case Right(a) => '{UByte(${Expr(a.toByte)})}
     case Left(b) =>
       report.error(b)
@@ -44,7 +44,7 @@ def ubyte(digits: Expr[StringContext])(using Quotes): Expr[UByte] =
 def ushort(digits: Expr[StringContext])(using Quotes): Expr[UShort] =
   import quotes.reflect._
 
-  parseNumber(digits.valueOrError.parts, BigInt(0), BigInt(65535)) match
+  parseNumber(digits.valueOrAbort.parts, BigInt(0), BigInt(65535)) match
     case Right(a) => '{UShort(${Expr(a.toShort)})}
     case Left(b) =>
       report.error(b)
@@ -53,7 +53,7 @@ def ushort(digits: Expr[StringContext])(using Quotes): Expr[UShort] =
 def uint(digits: Expr[StringContext])(using Quotes): Expr[UInt] =
   import quotes.reflect._
 
-  parseNumber(digits.valueOrError.parts, BigInt(0), BigInt(4294967295L)) match
+  parseNumber(digits.valueOrAbort.parts, BigInt(0), BigInt(4294967295L)) match
     case Right(a) => '{UInt(${Expr(a.toInt)})}
     case Left(b) =>
       report.error(b)
@@ -62,7 +62,7 @@ def uint(digits: Expr[StringContext])(using Quotes): Expr[UInt] =
 def ulong(digits: Expr[StringContext])(using Quotes): Expr[ULong] =
   import quotes.reflect._
 
-  parseNumber(digits.valueOrError.parts, BigInt(0), BigInt("18446744073709551615")) match
+  parseNumber(digits.valueOrAbort.parts, BigInt(0), BigInt("18446744073709551615")) match
     case Right(a) => '{ULong(${Expr(a.toLong)})}
     case Left(b) =>
       report.error(b)
@@ -71,7 +71,7 @@ def ulong(digits: Expr[StringContext])(using Quotes): Expr[ULong] =
 def rational(digits: Expr[StringContext])(using Quotes): Expr[Rational] =
   import quotes.reflect._
 
-  digits.valueOrError.parts.headOption.map { s =>
+  digits.valueOrAbort.parts.headOption.map { s =>
     val r = Rational(s)
     val (n, d) = (r.numerator, r.denominator)
     if (n.isValidLong && d.isValidLong)
@@ -155,37 +155,37 @@ def handleBigDecimal(s: Seq[String], name: String, sep: String, dec: String)(usi
   }
 
 def siInt(digits: Expr[StringContext])(using Quotes): Expr[Int] =
-  handleInt(digits.valueOrError.parts, "SI", " ")
+  handleInt(digits.valueOrAbort.parts, "SI", " ")
 
 def siLong(digits: Expr[StringContext])(using Quotes): Expr[Long] =
-  handleLong(digits.valueOrError.parts, "SI", " ")
+  handleLong(digits.valueOrAbort.parts, "SI", " ")
 
 def siBigInt(digits: Expr[StringContext])(using Quotes): Expr[BigInt] =
-  handleBigInt(digits.valueOrError.parts, "SI", " ")
+  handleBigInt(digits.valueOrAbort.parts, "SI", " ")
 
 def siBigDecimal(digits: Expr[StringContext])(using Quotes): Expr[BigDecimal] =
-  handleBigDecimal(digits.valueOrError.parts, "SI", " ", "\\.")
+  handleBigDecimal(digits.valueOrAbort.parts, "SI", " ", "\\.")
 
 def usInt(digits: Expr[StringContext])(using Quotes): Expr[Int] =
-  handleInt(digits.valueOrError.parts, "US", ",")
+  handleInt(digits.valueOrAbort.parts, "US", ",")
 
 def usLong(digits: Expr[StringContext])(using Quotes): Expr[Long] =
-  handleLong(digits.valueOrError.parts, "US", ",")
+  handleLong(digits.valueOrAbort.parts, "US", ",")
 
 def usBigInt(digits: Expr[StringContext])(using Quotes): Expr[BigInt] =
-  handleBigInt(digits.valueOrError.parts, "US", ",")
+  handleBigInt(digits.valueOrAbort.parts, "US", ",")
 
 def usBigDecimal(digits: Expr[StringContext])(using Quotes): Expr[BigDecimal] =
-  handleBigDecimal(digits.valueOrError.parts, "US", ",", "\\.")
+  handleBigDecimal(digits.valueOrAbort.parts, "US", ",", "\\.")
 
 def euInt(digits: Expr[StringContext])(using Quotes): Expr[Int] =
-  handleInt(digits.valueOrError.parts, "EU", ".")
+  handleInt(digits.valueOrAbort.parts, "EU", ".")
 
 def euLong(digits: Expr[StringContext])(using Quotes): Expr[Long] =
-  handleLong(digits.valueOrError.parts, "EU", ".")
+  handleLong(digits.valueOrAbort.parts, "EU", ".")
 
 def euBigInt(digits: Expr[StringContext])(using Quotes): Expr[BigInt] =
-  handleBigInt(digits.valueOrError.parts, "EU", ".")
+  handleBigInt(digits.valueOrAbort.parts, "EU", ".")
 
 def euBigDecimal(digits: Expr[StringContext])(using Quotes): Expr[BigDecimal] =
-  handleBigDecimal(digits.valueOrError.parts, "EU", ".", ",")
+  handleBigDecimal(digits.valueOrAbort.parts, "EU", ".", ",")
