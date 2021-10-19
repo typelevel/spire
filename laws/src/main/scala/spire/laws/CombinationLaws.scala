@@ -16,8 +16,7 @@ object CombinationLaws {
 }
 
 /**
- * Contains laws that are obeying by combination of types, for example
- * various kinds of signed rings.
+ * Contains laws that are obeying by combination of types, for example various kinds of signed rings.
  */
 trait CombinationLaws[A] extends Laws {
 

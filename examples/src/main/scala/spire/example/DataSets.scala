@@ -225,8 +225,7 @@ object CrossValidation {
   case class Result[V, K](input: V, output: K, predicted: K)
 
   /**
-   * Generic cross-validator that can be provided an arbitrary method to score
-   * predictor results.
+   * Generic cross-validator that can be provided an arbitrary method to score predictor results.
    */
   def crossValidate[V, @sp(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
     train: CoordinateSpace[V, F] => List[(V, K)] => (V => K)
@@ -252,8 +251,7 @@ object CrossValidation {
   }
 
   /**
-   * For cross-validating classification, we use the accuracy to score the
-   * predictor.
+   * For cross-validating classification, we use the accuracy to score the predictor.
    */
   def crossValidateClassification[V, @sp(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
     train: CoordinateSpace[V, F] => List[(V, K)] => (V => K)

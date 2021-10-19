@@ -1,15 +1,8 @@
 /**
- * **********************************************************************\
- * * Project                                                              **
- * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
- * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
- * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
- * *   ____/ / / /      / /   / / | |   / /__                             **
- * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
- * *                                                                      **
- * *      Redistribution and use permitted under the MIT license.         **
- * *                                                                      **
+ * **********************************************************************\ * Project ** * ______ ______ __ ______ ____
+ * ** * / ____/ / __ / / / / __ / / __/ (c) 2011-2014 ** * / /__ / /_/ / / / / /_/ / / /_ ** * /___ / / ____/ / / / __ /
+ * / __/ Erik Osheim, Tom Switzer ** * ____/ / / / / / / / | | / /__ ** * /_____/ /_/ /_/ /_/ |_| /____/ All rights
+ * reserved. ** * ** * Redistribution and use permitted under the MIT license. ** * **
  * \***********************************************************************
  */
 
@@ -27,15 +20,18 @@ import java.util
  *
  * <p>The acronym WELL stands for Well Equidistributed Long-period Linear.
  *
- * <p><b>Reference: </b>
- * François Panneton, Pierre L'Ecuyer and Makoto Matsumoto:
- * "Improved Long-Period Generators Based on Linear Recurrences Modulo 2",
- * <i>ACM Transactions on Mathematical Software,</i> Vol. 32, No. 1, January 2006, pp 1--16.
+ * <p><b>Reference: </b> François Panneton, Pierre L'Ecuyer and Makoto Matsumoto: "Improved Long-Period Generators Based
+ * on Linear Recurrences Modulo 2", <i>ACM Transactions on Mathematical Software,</i> Vol. 32, No. 1, January 2006, pp
+ * 1--16.
  *
- * @see <a href="http://www.iro.umontreal.ca/~panneton/well/WELL1024a.c">WELL1024a.c</a>
- * @see <a href="http://www.iro.umontreal.ca/~panneton/WELLRNG.html">Well PRNG Home Page</a>
- * @see <a href="http://en.wikipedia.org/wiki/Well_Equidistributed_Long-period_Linear">WELL @ Wikipedia</a>
- * @author <a href="mailto:dusan.kysel@gmail.com">Dušan Kysel</a>
+ * @see
+ *   <a href="http://www.iro.umontreal.ca/~panneton/well/WELL1024a.c">WELL1024a.c</a>
+ * @see
+ *   <a href="http://www.iro.umontreal.ca/~panneton/WELLRNG.html">Well PRNG Home Page</a>
+ * @see
+ *   <a href="http://en.wikipedia.org/wiki/Well_Equidistributed_Long-period_Linear">WELL @ Wikipedia</a>
+ * @author
+ *   <a href="mailto:dusan.kysel@gmail.com">Dušan Kysel</a>
  */
 final class Well1024a protected[random] (state: Array[Int], i0: Int) extends IntBasedGenerator {
 

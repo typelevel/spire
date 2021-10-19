@@ -18,22 +18,18 @@ case class FixedScale(denom: Int) {
 }
 
 /**
- * FixedPoint is a value class that provides fixed point arithmetic
- * operations (using an implicit denominator) to unboxed Long values.
+ * FixedPoint is a value class that provides fixed point arithmetic operations (using an implicit denominator) to
+ * unboxed Long values.
  *
- * Working with FixedPoint values is similar to other fractional
- * types, except that most operations require an implicit FixedScale
- * instance (which provides the denominator).
+ * Working with FixedPoint values is similar to other fractional types, except that most operations require an implicit
+ * FixedScale instance (which provides the denominator).
  *
  * For example:
  *
- * // interpret FixedPoint(n) as n/1000
- * implicit val scale = FixedScale(1000)
+ * // interpret FixedPoint(n) as n/1000 implicit val scale = FixedScale(1000)
  *
- * // these three values are equivalent
- * val a = FixedPoint("12.345")            // decimal repr
- * val b = FixedPoint(Rational(2469, 200)) // fraction repr
- * val c = new FixedPoint(12345L)          // "raw" repr
+ * // these three values are equivalent val a = FixedPoint("12.345") // decimal repr val b = FixedPoint(Rational(2469,
+ * 200)) // fraction repr val c = new FixedPoint(12345L) // "raw" repr
  */
 class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def unary_- : FixedPoint =

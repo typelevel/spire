@@ -2,11 +2,9 @@ package spire
 package algebra
 
 /**
- * A vector space is a group `V` that can be multiplied by scalars in `F` that
- * lie in a field. Scalar multiplication must distribute over vector addition
- * (`x *: (v + w) === x *: v + x *: w`) and scalar addition
- * (`(x + y) *: v === x *: v + y *: v`). Scalar multiplication by 1 in `F`
- * is an identity function (`1 *: v === v`). Scalar multiplication is
+ * A vector space is a group `V` that can be multiplied by scalars in `F` that lie in a field. Scalar multiplication
+ * must distribute over vector addition (`x *: (v + w) === x *: v + x *: w`) and scalar addition (`(x + y) *: v === x *:
+ * v + y *: v`). Scalar multiplication by 1 in `F` is an identity function (`1 *: v === v`). Scalar multiplication is
  * "associative" (`x *: y *: v === (x * y) *: v`).
  */
 trait VectorSpace[V, @sp(Int, Long, Float, Double) F] extends Any with CModule[V, F] {

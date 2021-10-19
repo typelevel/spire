@@ -2,8 +2,8 @@ package spire
 package algebra
 
 /**
- * This type class models a metric space `V`. The distance between 2 points in
- * `V` is measured in `R`, which should be real (ie. `IsReal[R]` exists).
+ * This type class models a metric space `V`. The distance between 2 points in `V` is measured in `R`, which should be
+ * real (ie. `IsReal[R]` exists).
  */
 trait MetricSpace[V, @sp(Int, Long, Float, Double) R] extends Any {
   def distance(v: V, w: V): R
@@ -16,8 +16,7 @@ object MetricSpace extends MetricSpace0 {
     metric.distance(v, w)
 
   /**
-   * Returns `true` iff the distance between `x` and `y` is less than or equal
-   * to `tolerance`.
+   * Returns `true` iff the distance between `x` and `y` is less than or equal to `tolerance`.
    */
   def closeTo[V, @sp(Int, Long, Float, Double) R](x: V, y: V, tolerance: Double)(implicit
     R: IsReal[R],

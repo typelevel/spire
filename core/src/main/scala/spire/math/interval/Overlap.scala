@@ -20,29 +20,26 @@ sealed abstract class Overlap[A] extends Product with Serializable {
 object Overlap {
 
   /**
-   * Intervals are nonEmpty and don't intersect
-   * [[lower.upperBound]] is strictly less than [[upper.lowerBound]].
+   * Intervals are nonEmpty and don't intersect [[lower.upperBound]] is strictly less than [[upper.lowerBound]].
    */
   case class Disjoint[A] private[spire] (lower: Interval[A], upper: Interval[A]) extends Overlap[A] {
 
     /**
-     * An interval that joins [[lower]] and [[upper]] in a continuous interval without intersecting any of them.
-     * For example for (-5, 1] and (4, 6), a join is (1,4]
+     * An interval that joins [[lower]] and [[upper]] in a continuous interval without intersecting any of them. For
+     * example for (-5, 1] and (4, 6), a join is (1,4]
      */
     def join(implicit o: Order[A]): Interval[A] = (~lower).last.intersect((~upper).head)
   }
 
   /**
-   * Non empty intervals, for which holds:
-   * [[upper]] ∋ [[lower.upperBound]] && [[upper]] ∌ [[lower.lowerBound]]
-   * For example: (-2, 10] and [5, 13)
+   * Non empty intervals, for which holds: [[upper]] ∋ [[lower.upperBound]] && [[upper]] ∌ [[lower.lowerBound]] For
+   * example: (-2, 10] and [5, 13)
    */
   case class PartialOverlap[A] private[spire] (lower: Interval[A], upper: Interval[A]) extends Overlap[A]
 
   /**
-   * [[inner]] is a subset of [[outer]].
-   * Empty interval is always a subset of any other, so all overlaps on empty intervals go here,
-   * except `(Ø).overlap(Ø)`, that results in equality.
+   * [[inner]] is a subset of [[outer]]. Empty interval is always a subset of any other, so all overlaps on empty
+   * intervals go here, except `(Ø).overlap(Ø)`, that results in equality.
    *
    * For example [1,4) and [1, 5]
    */

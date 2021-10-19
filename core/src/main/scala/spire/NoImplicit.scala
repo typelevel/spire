@@ -3,9 +3,8 @@ package spire
 import scala.annotation.nowarn
 
 /**
- * `NoImplicit` provides a way to ensure that a particular implicit doesn't
- * exist. It is often useful to work-around annoying ambiguous implicit
- * problems.
+ * `NoImplicit` provides a way to ensure that a particular implicit doesn't exist. It is often useful to work-around
+ * annoying ambiguous implicit problems.
  */
 final class NoImplicit[A]
 

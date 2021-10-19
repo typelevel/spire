@@ -30,8 +30,8 @@ trait VectorSpaceLaws[V, A] extends Laws {
   val scalarLaws: RingLaws[A]
   val vectorLaws: GroupLaws[V]
 
-  import scalarLaws.{Equ => EqA, Arb => ArA}
-  import vectorLaws.{Equ => EqV, Arb => ArV}
+  import scalarLaws.{Arb => ArA, Equ => EqA}
+  import vectorLaws.{Arb => ArV, Equ => EqV}
 
   def leftModule(implicit V: LeftModule[V, A]) = new SpaceProperties(
     name = "leftModule",

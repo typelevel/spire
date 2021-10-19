@@ -1,15 +1,8 @@
 /**
- * **********************************************************************\
- * * Project                                                              **
- * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
- * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
- * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
- * *   ____/ / / /      / /   / / | |   / /__                             **
- * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
- * *                                                                      **
- * *      Redistribution and use permitted under the MIT license.         **
- * *                                                                      **
+ * **********************************************************************\ * Project ** * ______ ______ __ ______ ____
+ * ** * / ____/ / __ / / / / __ / / __/ (c) 2011-2014 ** * / /__ / /_/ / / / / /_/ / / /_ ** * /___ / / ____/ / / / __ /
+ * / __/ Erik Osheim, Tom Switzer ** * ____/ / / / / / / / | | / /__ ** * /_____/ /_/ /_/ /_/ |_| /____/ All rights
+ * reserved. ** * ** * Redistribution and use permitted under the MIT license. ** * **
  * \***********************************************************************
  */
 
@@ -19,14 +12,15 @@ package example
 /**
  * This is a Ziggurat generator of MATLAB files for data analysis via histogram and Distribution Fitting App (dfittool).
  *
- * <p><b>Reference: </b>
- * George Marsaglia, Wai Wan Tsang:
- * "The Ziggurat Method for Generating Random Variables"
+ * <p><b>Reference: </b> George Marsaglia, Wai Wan Tsang: "The Ziggurat Method for Generating Random Variables"
  * <i>Journal of Statistical Software,</i> Vol. 5, Issue 8, October 2000.
  *
- * @see <a href="http://www.jstatsoft.org/v05/i08">Ziggurat Paper</a>
- * @see <a href="http://en.wikipedia.org/wiki/Ziggurat_algorithm">Ziggurat algorithm @ Wikipedia</a>
- * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
+ * @see
+ *   <a href="http://www.jstatsoft.org/v05/i08">Ziggurat Paper</a>
+ * @see
+ *   <a href="http://en.wikipedia.org/wiki/Ziggurat_algorithm">Ziggurat algorithm @ Wikipedia</a>
+ * @author
+ *   <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
  */
 object ZigguratGenerator {
 

@@ -35,9 +35,8 @@ abstract class Generator {
   /**
    * Generate a random value using a Dist[A] type class instance.
    *
-   * Implicit Dist[A] instances are provided for the AnyVal types as well as
-   * UByte through ULong. More complex Dist instances can be created from
-   * these.
+   * Implicit Dist[A] instances are provided for the AnyVal types as well as UByte through ULong. More complex Dist
+   * instances can be created from these.
    */
   def next[A](implicit next: Dist[A]): A = next(this)
 

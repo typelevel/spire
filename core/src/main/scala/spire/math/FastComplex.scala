@@ -2,7 +2,7 @@ package spire
 package math
 
 object FloatComplex {
-  import FastComplex.{encode}
+  import FastComplex.encode
 
   final def apply(real: Float, imag: Float): FloatComplex =
     new FloatComplex(encode(real, imag))
@@ -21,8 +21,8 @@ object FloatComplex {
 /**
  * Value class which encodes two floating point values in a Long.
  *
- * We get (basically) unboxed complex numbers using this hack.
- * The underlying implementation lives in the FastComplex object.
+ * We get (basically) unboxed complex numbers using this hack. The underlying implementation lives in the FastComplex
+ * object.
  */
 class FloatComplex(val u: Long) extends AnyVal {
   final override def toString: String = "(%s+%si)".format(real, imag)
@@ -62,28 +62,21 @@ final def /%(b: FloatComplex): (FloatComplex, FloatComplex) = FastComplex.quotmo
 /**
  * FastComplex is an ugly, beautiful hack.
  *
- * The basic idea is to encode two 32-bit Floats into a single 64-bit Long.
- * The lower-32 bits are the "real" Float and the upper-32 are the "imaginary"
- * Float.
+ * The basic idea is to encode two 32-bit Floats into a single 64-bit Long. The lower-32 bits are the "real" Float and
+ * the upper-32 are the "imaginary" Float.
  *
- * Since we're overloading the meaning of Long, all the operations have to be
- * defined on the FastComplex object, meaning the syntax for using this is a
- * bit ugly. To add to the ugly beauty of the whole thing I could imagine
- * defining implicit operators on Long like +@, -@, *@, /@, etc.
+ * Since we're overloading the meaning of Long, all the operations have to be defined on the FastComplex object, meaning
+ * the syntax for using this is a bit ugly. To add to the ugly beauty of the whole thing I could imagine defining
+ * implicit operators on Long like +@, -@, *@, /@, etc.
  *
- * You might wonder why it's even worth doing this. The answer is that when
- * you need to allocate an array of e.g. 10-20 million complex numbers, the GC
- * overhead of using *any* object is HUGE. Since we can't build our own
- * "pass-by-value" types on the JVM we are stuck doing an encoding like this.
+ * You might wonder why it's even worth doing this. The answer is that when you need to allocate an array of e.g. 10-20
+ * million complex numbers, the GC overhead of using *any* object is HUGE. Since we can't build our own "pass-by-value"
+ * types on the JVM we are stuck doing an encoding like this.
  *
- * Here are some profiling numbers for summing an array of complex numbers,
- * timed against a concrete case class implementation using Float (in ms):
+ * Here are some profiling numbers for summing an array of complex numbers, timed against a concrete case class
+ * implementation using Float (in ms):
  *
- *  size | encoded |  class
- *    1M |     5.1 |    5.8
- *    5M |    28.5 |   91.7
- *   10M |    67.7 |  828.1
- *   20M |   228.0 | 2687.0
+ * size | encoded | class 1M | 5.1 | 5.8 5M | 28.5 | 91.7 10M | 67.7 | 828.1 20M | 228.0 | 2687.0
  *
  * Not bad, eh?
  */

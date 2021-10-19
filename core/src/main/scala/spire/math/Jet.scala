@@ -11,7 +11,8 @@ import spire.syntax.vectorSpace._
 
 /**
  * Used to implicitly define the dimensionality of the Jet space.
- * @param dimension the number of dimensions.
+ * @param dimension
+ *   the number of dimensions.
  */
 case class JetDim(dimension: Int) {
   require(dimension > 0)
@@ -20,31 +21,25 @@ case class JetDim(dimension: Int) {
 // scalastyle:off regex
 /**
  * ==Overview==
- * A simple implementation of N-dimensional dual numbers, for automatically
- * computing exact derivatives of functions. This code (and documentation) closely follow
- * the one in Google's "Ceres" library of non-linear least-squares solvers
+ * A simple implementation of N-dimensional dual numbers, for automatically computing exact derivatives of functions.
+ * This code (and documentation) closely follow the one in Google's "Ceres" library of non-linear least-squares solvers
  * (see <a href="http://code.google.com/p/ceres-solver">Sameer Agarwal, Keir Mierle, and others: Ceres Solver.</a>)
  *
- * While a complete treatment of the mechanics of automatic differentiation is
- * beyond the scope of this header (see
- * http://en.wikipedia.org/wiki/Automatic_differentiation for details), the
- * basic idea is to extend normal arithmetic with an extra element "h" such
- * that h != 0, but h^2^ = 0.
- * Dual numbers are extensions of the real numbers analogous to complex numbers:
- * whereas complex numbers augment the reals by introducing an imaginary unit i
- * such that i^2^ = -1, dual numbers introduce an "infinitesimal" unit h such
- * that h^2^ = 0.
- * Analogously to a complex number c = x + y*i, a dual number d = x * y*h has
- * two components: the "real" component x, and an "infinitesimal" component y.
- * Surprisingly, this leads to a convenient method for computing exact
- * derivatives without needing to manipulate complicated symbolic expressions.
+ * While a complete treatment of the mechanics of automatic differentiation is beyond the scope of this header (see
+ * http://en.wikipedia.org/wiki/Automatic_differentiation for details), the basic idea is to extend normal arithmetic
+ * with an extra element "h" such that h != 0, but h^2^ = 0. Dual numbers are extensions of the real numbers analogous
+ * to complex numbers: whereas complex numbers augment the reals by introducing an imaginary unit i such that i^2^ = -1,
+ * dual numbers introduce an "infinitesimal" unit h such that h^2^ = 0. Analogously to a complex number c = x + y*i, a
+ * dual number d = x * y*h has two components: the "real" component x, and an "infinitesimal" component y. Surprisingly,
+ * this leads to a convenient method for computing exact derivatives without needing to manipulate complicated symbolic
+ * expressions.
  *
  * For example, consider the function
  * {{{
  *   f(x) = x * x ,
  * }}}
- * evaluated at 10. Using normal arithmetic, f(10) = 100, and df/dx(10) = 20.
- * Next, augment 10 with an infinitesimal h to get:
+ * evaluated at 10. Using normal arithmetic, f(10) = 100, and df/dx(10) = 20. Next, augment 10 with an infinitesimal h
+ * to get:
  * {{{
  *   f(10 + h) = (10 + h) * (10 + h)
  *             = 100 + 2 * 10 * h + h * h
@@ -54,22 +49,18 @@ case class JetDim(dimension: Int) {
  *                     |
  *                     +----------------- This is df/dx
  * }}}
- * Note that the derivative of f with respect to x is simply the infinitesimal
- * component of the value of f(x + h). So, in order to take the derivative of
- * any function, it is only necessary to replace the numeric "object" used in
- * the function with one extended with infinitesimals. The class Jet, defined in
- * this header, is one such example of this, where substitution is done with
- * generics.
+ * Note that the derivative of f with respect to x is simply the infinitesimal component of the value of f(x + h). So,
+ * in order to take the derivative of any function, it is only necessary to replace the numeric "object" used in the
+ * function with one extended with infinitesimals. The class Jet, defined in this header, is one such example of this,
+ * where substitution is done with generics.
  *
- * To handle derivatives of functions taking multiple arguments, different
- * infinitesimals are used, one for each variable to take the derivative of. For
- * example, consider a scalar function of two scalar parameters x and y:
+ * To handle derivatives of functions taking multiple arguments, different infinitesimals are used, one for each
+ * variable to take the derivative of. For example, consider a scalar function of two scalar parameters x and y:
  * {{{
  *   f(x, y) = x * x + x * y
  * }}}
- * Following the technique above, to compute the derivatives df/dx and df/dy for
- * f(1, 3) involves doing two evaluations of f, the first time replacing x with
- * x + h, the second time replacing y with y + h.
+ * Following the technique above, to compute the derivatives df/dx and df/dy for f(1, 3) involves doing two evaluations
+ * of f, the first time replacing x with x + h, the second time replacing y with y + h.
  *
  * For df/dx:
  * {{{
@@ -87,11 +78,9 @@ case class JetDim(dimension: Int) {
  *
  *   Therefore df/dy = 1
  * }}}
- * To take the gradient of f with the implementation of dual numbers ("jets") in
- * this file, it is necessary to create a single jet type which has components
- * for the derivative in x and y, and pass them to a routine computing function f.
- * It is convenient to use a generic version of f, that can be called also with non-jet numbers
- * for standard evaluation:
+ * To take the gradient of f with the implementation of dual numbers ("jets") in this file, it is necessary to create a
+ * single jet type which has components for the derivative in x and y, and pass them to a routine computing function f.
+ * It is convenient to use a generic version of f, that can be called also with non-jet numbers for standard evaluation:
  * {{{
  *   def f[@specialized(Double) T : Field](x: T, y: T): T = x * x + x * y
  *
@@ -107,19 +96,18 @@ case class JetDim(dimension: Int) {
  *   println("df/dx = " + z.infinitesimal(0) + ", df/dy = " + z.infinitesimal(1));
  * }}}
  *
- * For the more mathematically inclined, this file implements first-order
- * "jets". A 1st order jet is an element of the ring
+ * For the more mathematically inclined, this file implements first-order "jets". A 1st order jet is an element of the
+ * ring
  * {{{
  *   T[N] = T[t_1, ..., t_N] / (t_1, ..., t_N)^2
  * }}}
- * which essentially means that each jet consists of a "scalar" value 'a' from T
- * and a 1st order perturbation vector 'v' of length N:
+ * which essentially means that each jet consists of a "scalar" value 'a' from T and a 1st order perturbation vector 'v'
+ * of length N:
  * {{{
  *   x = a + \sum_i v[i] t_i
  * }}}
- * A shorthand is to write an element as x = a + u, where u is the perturbation.
- * Then, the main point about the arithmetic of jets is that the product of
- * perturbations is zero:
+ * A shorthand is to write an element as x = a + u, where u is the perturbation. Then, the main point about the
+ * arithmetic of jets is that the product of perturbations is zero:
  * {{{
  *   (a + u) * (b + v) = ab + av + bu + uv
  *                     = ab + (av + bu) + 0
@@ -128,15 +116,14 @@ case class JetDim(dimension: Int) {
  * {{{
  *   (a + u) + (b + v) = (a + b) + (u + v).
  * }}}
- * The only remaining question is how to evaluate the function of a jet, for
- * which we use the chain rule:
+ * The only remaining question is how to evaluate the function of a jet, for which we use the chain rule:
  * {{{
  *   f(a + u) = f(a) + f'(a) u
  * }}}
  * where f'(a) is the (scalar) derivative of f at a.
  *
- * By pushing these things through generics, we can write routines that at same time
- * evaluate mathematical functions and compute their derivatives through automatic differentiation.
+ * By pushing these things through generics, we can write routines that at same time evaluate mathematical functions and
+ * compute their derivatives through automatic differentiation.
  */
 object Jet extends JetInstances {
   // No-arg c.tor makes a zero Jet
@@ -335,8 +322,8 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   }
 
   /**
-   * pow -- base (this) is a differentiable function, exponent is a constant.
-   * pow(a + du, p) ~= pow(a, p) + p * pow(a, p-1) du
+   * pow -- base (this) is a differentiable function, exponent is a constant. pow(a + du, p) ~= pow(a, p) + p * pow(a,
+   * p-1) du
    */
   def pow(p: T)(implicit f: Field[T], s: Signed[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val tmp: T = p * powScalarToScalar(real, p - f.one)
@@ -350,8 +337,8 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   }
 
   /**
-   * pow -- both base (this) and exponent are differentiable functions.
-   * (a + du)^(b + dv) ~= a^b + b * a^(b-1) du + a^b log(a) dv
+   * pow -- both base (this) and exponent are differentiable functions. (a + du)^(b + dv) ~= a^b + b * a^(b-1) du + a^b
+   * log(a) dv
    */
   def pow(
     b: Jet[T]
@@ -407,8 +394,8 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   }
 
   /**
-   * Defined with "this" as the y coordinate: this.atan2(a) == atan2(this, a) == atan(this / a)
-   * atan2(b + dv, a + du) ~= atan2(b, a) + (- b du + a dv) / (a^2 + b^2)
+   * Defined with "this" as the y coordinate: this.atan2(a) == atan2(this, a) == atan(this / a) atan2(b + dv, a + du) ~=
+   * atan2(b, a) + (- b du + a dv) / (a^2 + b^2)
    */
   def atan2(a: Jet[T])(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val tmp = f.one / (a.real * a.real + real * real)

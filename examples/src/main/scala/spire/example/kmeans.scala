@@ -8,16 +8,14 @@ import scala.collection.Factory
 import scala.util.Random.{nextDouble, nextGaussian, nextInt}
 
 /**
- * An example using `NormedVectorSpace`s to create a generic k-Means
- * implementation. We also abstract over the collection type for the fun of it.
- * We implement Lloyd's algorithm, which has problems of its own, but performs
- * well enough.
+ * An example using `NormedVectorSpace`s to create a generic k-Means implementation. We also abstract over the
+ * collection type for the fun of it. We implement Lloyd's algorithm, which has problems of its own, but performs well
+ * enough.
  */
 object KMeansExample extends App {
 
   /**
-   * Returns a collection of k points which are the centers of k clusters of
-   * `points0`.
+   * Returns a collection of k points which are the centers of k clusters of `points0`.
    */
   def kMeans[V, @sp(Double) A, CC[V] <: Iterable[V]](points0: CC[V],
                                                      k: Int

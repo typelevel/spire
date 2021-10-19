@@ -178,7 +178,7 @@ class SortingSuite extends munit.FunSuite {
   private val ENOUGH_ZEROS = new Array[Int](BIG) // For forcing the quick sort and merge sort implementations to kick in
 
   private def isSorted(input: Array[Int]): Unit = {
-    assert(input.zip(input.tail).forall({ case (p, q) => p <= q }))
+    assert(input.zip(input.tail).forall { case (p, q) => p <= q })
   }
 
   private case class Point(x: Int, y: Int) {

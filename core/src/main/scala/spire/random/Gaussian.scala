@@ -8,8 +8,7 @@ import spire.algebra.{Field, NRoot, Order, Trig}
 trait Gaussian[@sp(Float, Double) A] extends Any {
 
   /**
-   * Return an `A` that is normally distributed about `mean` with a standard
-   * deviation of `stdDev`.
+   * Return an `A` that is normally distributed about `mean` with a standard deviation of `stdDev`.
    */
   def apply(mean: A, stdDev: A): Dist[A]
 }
