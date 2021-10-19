@@ -39,7 +39,7 @@ abstract class BinaryMerge {
    * @param bi
    *   an index into the second sequence
    * @return
-   *   -1 if a(ai) &lt; b(bi), 0 if a(ai) == b(bi), 1 if a(ai) &gt; b(bi)
+   * -1 if a(ai) &lt; b(bi), 0 if a(ai) == b(bi), 1 if a(ai) &gt; b(bi)
    */
   def compare(ai: Int, bi: Int): Int
 
