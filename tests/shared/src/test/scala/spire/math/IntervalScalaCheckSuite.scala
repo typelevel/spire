@@ -72,7 +72,7 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
             rng.nextInt(10) match {
               case 0 => x
               case 9 => y
-              case _ => x + Rational(rng.nextDouble) * (y - x)
+              case _ => x + Rational(rng.nextDouble()) * (y - x)
             }
         case (ValueBound(x), _) =>
           () =>

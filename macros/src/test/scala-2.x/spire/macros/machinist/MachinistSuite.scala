@@ -15,7 +15,7 @@ trait Dux[A] {
 }
 
 object Qux {
-  implicit val quxint: Qux[Int] = new Qux[Int] {
+  implicit val quxint = new Qux[Int] {
     def plus(lhs: Int, rhs: Int): Int = lhs + rhs
     def negate(lhs: Int): Int = -lhs
     def eqv(lhs: Int, rhs: Int): Boolean = lhs == rhs
@@ -23,7 +23,7 @@ object Qux {
     def fromInt(n: Int): Int = n
   }
 
-  implicit val duxint: Dux[Int] = new Dux[Int] {
+  implicit val duxint = new Dux[Int] {
     val scalar = quxint
   }
 

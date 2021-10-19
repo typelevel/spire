@@ -8,8 +8,8 @@ import spire.math.SafeLong
 class PrimeSuite extends munit.FunSuite {
   val largePrime = SafeLong("393050634124102232869567034555427371542904833")
   val largeNonPrime = largePrime + 4
-  val tenPrimes = IndexedSeq[Int](2, 3, 5, 7, 11, 13, 17, 19, 23, 29).map(x => SafeLong(x))
-  val nonPrimes = IndexedSeq[Long](10L, 64L, 2L ** 32, 3L ** 10).map(x => SafeLong(x))
+  val tenPrimes = IndexedSeq(2, 3, 5, 7, 11, 13, 17, 19, 23, 29).map(x => SafeLong(x))
+  val nonPrimes = IndexedSeq(10L, 64L, 2L ** 32, 3L ** 10).map(x => SafeLong(x))
 
   test("nth") {
     for (i <- tenPrimes.indices)

@@ -1349,7 +1349,6 @@ object Algebraic extends AlgebraicInstances {
     }
 
     @nowarn
-    // TODO Restore the checked call
     def apply(expr: Algebraic.Expr): Bound = checked {
       // Unfortunately, we must call degreeBound early, to avoid many redundant
       // traversals of the Expr tree. Getting this out of the way early on

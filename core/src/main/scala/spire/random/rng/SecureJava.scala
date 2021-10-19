@@ -13,7 +13,7 @@ class SecureJava(rand: SecureRandom) extends IntBasedGenerator {
   def setSeedBytes(bytes: Array[Byte]): Unit =
     throw new UnsupportedOperationException("setSeedBytes")
 
-  def nextInt: Int = rand.nextInt
+  def nextInt(): Int = rand.nextInt
 }
 
 object SecureJava {

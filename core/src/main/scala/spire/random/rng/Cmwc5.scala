@@ -53,7 +53,7 @@ final class Cmwc5(_x: Long, _y: Long, _z: Long, _w: Long, _v: Long) extends Long
     v = bb.getLong
   }
 
-  def nextLong: Long = {
+  def nextLong(): Long = {
     val t: Long = x ^ (x >>> 7)
     x = y
     y = z
@@ -65,7 +65,7 @@ final class Cmwc5(_x: Long, _y: Long, _z: Long, _w: Long, _v: Long) extends Long
 }
 
 object Cmwc5 extends GeneratorCompanion[Cmwc5, Array[Long]] {
-  def randomSeed: Array[Long] = GlobalRng.generateLongs(5)
+  def randomSeed(): Array[Long] = GlobalRng.generateLongs(5)
 
   def fromBytes(bytes: Array[Byte]): Cmwc5 = {
     val bb = ByteBuffer.wrap(bytes)
@@ -84,6 +84,6 @@ object Cmwc5 extends GeneratorCompanion[Cmwc5, Array[Long]] {
 
   def fromTime(time: Long = System.nanoTime): Cmwc5 = {
     val lcg = Lcg64.fromTime(time)
-    new Cmwc5(lcg.nextLong, lcg.nextLong, lcg.nextLong, lcg.nextLong, lcg.nextLong)
+    new Cmwc5(lcg.nextLong(), lcg.nextLong(), lcg.nextLong(), lcg.nextLong(), lcg.nextLong())
   }
 }

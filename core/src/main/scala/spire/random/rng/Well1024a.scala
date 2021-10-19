@@ -70,7 +70,7 @@ final class Well1024a protected[random] (state: Array[Int], i0: Int) extends Int
     i = bb.getInt
   }
 
-  def nextInt: Int = {
+  def nextInt(): Int = {
 
     @inline def map(r: Int): Int = (i + r) & R_1
 
@@ -120,7 +120,7 @@ object Well1024a extends GeneratorCompanion[Well1024a, (Array[Int], Int)] {
   @inline final private def mat0pos(t: Int, v: Int): Int = v ^ (v >>> t)
   @inline final private def mat0neg(t: Int, v: Int): Int = v ^ (v << -t)
 
-  def randomSeed: (Array[Int], Int) =
+  def randomSeed(): (Array[Int], Int) =
     (Utils.seedFromInt(R, Utils.intFromTime()), 0)
 
   def fromSeed(seed: (Array[Int], Int)): Well1024a =

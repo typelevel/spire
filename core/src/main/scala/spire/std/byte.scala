@@ -113,7 +113,7 @@ trait ByteInstances {
   implicit final val ByteAlgebra
     : EuclideanRing[Byte] with IsIntegral[Byte] with TruncatedDivisionCRing[Byte] with Signed[Byte] with Order[Byte] =
     new ByteAlgebra
-  import spire.math.NumberTag._
   import spire.math.NumberTag
+  import spire.math.NumberTag._
   implicit final val ByteTag: NumberTag[Byte] = new BuiltinIntTag[Byte](0, Byte.MinValue, Byte.MaxValue)
 }

@@ -45,7 +45,7 @@ object Ziggurat {
 
   def rnor(g: Generator): Double = {
 
-    val hz = g.nextInt
+    val hz = g.nextInt()
     val iz = hz & 127
 
     if (abs(hz) < kn(iz)) hz * wn(iz) else nfix(g, hz, iz)
@@ -53,7 +53,7 @@ object Ziggurat {
 
   def rexp(g: Generator): Double = {
 
-    val jz = g.nextInt & 0xffffffffL
+    val jz = g.nextInt() & 0xffffffffL
     val iz = (jz & 255).toInt
 
     if (jz < ke(iz)) jz * we(iz) else efix(g, jz, iz)
@@ -72,16 +72,16 @@ object Ziggurat {
 
       if (iz == 0) {
         while ({
-          x = -log(g.nextDouble) * r1
-          y = -log(g.nextDouble)
+          x = -log(g.nextDouble()) * r1
+          y = -log(g.nextDouble())
           (y + y < x * x)
         })
           return if (hz > 0) r + x else -r - x
       }
 
-      if (fn(iz) + g.nextDouble * (fn(iz - 1) - fn(iz)) < exp(-.5 * x * x)) return x
+      if (fn(iz) + g.nextDouble() * (fn(iz - 1) - fn(iz)) < exp(-.5 * x * x)) return x
 
-      hz = g.nextInt
+      hz = g.nextInt()
       iz = hz & 127
       if (abs(hz) < kn(iz)) return hz * wn(iz)
 
@@ -97,12 +97,12 @@ object Ziggurat {
     var iz = iza
 
     @tailrec def loop: Double = {
-      if (iz == 0) return 7.697117470131487 - log(g.nextDouble)
+      if (iz == 0) return 7.697117470131487 - log(g.nextDouble())
       val x = jz * we(iz)
 
-      if (fe(iz) + g.nextDouble * (fe(iz - 1) - fe(iz)) < exp(-x)) return x
+      if (fe(iz) + g.nextDouble() * (fe(iz - 1) - fe(iz)) < exp(-x)) return x
 
-      jz = g.nextInt & 0xffffffffL
+      jz = g.nextInt() & 0xffffffffL
       iz = (jz & 255).toInt
       if (jz < ke(iz)) return jz * we(iz)
 

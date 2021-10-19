@@ -11,9 +11,9 @@ final class SyncGenerator(gen: Generator) extends Generator {
 
   def setSeedBytes(bytes: Array[Byte]): Unit = gen.setSeedBytes(bytes)
 
-  def nextInt: Int = this.synchronized { gen.nextInt }
+  def nextInt(): Int = this.synchronized { gen.nextInt() }
 
-  def nextLong: Long = this.synchronized { gen.nextLong }
+  def nextLong(): Long = this.synchronized { gen.nextLong() }
 }
 
 object SyncGenerator {

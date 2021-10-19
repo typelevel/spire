@@ -16,14 +16,14 @@ class Lcg32(seed0: Int) extends IntBasedGenerator {
 
   def setSeedBytes(bytes: Array[Byte]): Unit = seed = Pack.intFromBytes(bytes)
 
-  def nextInt: Int = {
+  def nextInt(): Int = {
     seed = 1664525 * seed + 1013904223
     seed
   }
 }
 
 object Lcg32 extends GeneratorCompanion[Lcg32, Int] {
-  def randomSeed: Int = System.nanoTime.toInt
+  def randomSeed(): Int = System.nanoTime.toInt
 
   def fromBytes(bytes: Array[Byte]): Lcg32 = new Lcg32(Pack.intFromBytes(bytes))
   def fromSeed(seed: Int): Lcg32 = new Lcg32(seed)

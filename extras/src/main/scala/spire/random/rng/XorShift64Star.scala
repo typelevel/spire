@@ -12,7 +12,7 @@ class XorShift64Star(private var seed: Long) extends LongBasedGenerator {
 
   def setSeedBytes(bytes: Array[Byte]): Unit = seed = Pack.longFromBytes(bytes)
 
-  def nextLong: Long = {
+  def nextLong(): Long = {
     seed ^= seed >>> 12
     seed ^= seed << 25
     seed ^= seed >>> 27
@@ -21,7 +21,7 @@ class XorShift64Star(private var seed: Long) extends LongBasedGenerator {
 }
 
 object XorShift64Star extends GeneratorCompanion[XorShift64Star, Long] {
-  def randomSeed: Long = System.nanoTime
+  def randomSeed(): Long = System.nanoTime
 
   def fromSeed(seed: Long): XorShift64Star = {
     assert(seed != 0)

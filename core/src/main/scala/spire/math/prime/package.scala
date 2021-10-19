@@ -3,9 +3,9 @@ package math
 
 import spire.algebra.Sign
 import spire.algebra.Sign.Positive
+import spire.std.double._
 import spire.syntax.cfor._
 import spire.syntax.nroot._
-import spire.math._
 
 import scala.collection.immutable.LazyList
 import scala.collection.mutable
@@ -213,7 +213,7 @@ package object prime {
 
   def sieverUpToNth(n: Long): Siever = {
     val upper = n * log(n.toDouble) + n * log(log(n - 0.9385))
-    val cutoff = max(1000L, (spire.math.sqrt(upper) + 512L).toLong)
+    val cutoff = max(1000L, (sqrt(upper) + 512L).toLong)
     prime.Siever(SieveSize, cutoff)
   }
 

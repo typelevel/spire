@@ -16,7 +16,7 @@ class XorShift128Plus(private var s0: Long, private var s1: Long) extends LongBa
     s1 = seed(1)
   }
 
-  def nextLong: Long = {
+  def nextLong(): Long = {
     var x = s0
     val y = s1
     s0 = y
@@ -27,7 +27,7 @@ class XorShift128Plus(private var s0: Long, private var s1: Long) extends LongBa
 }
 
 object XorShift128Plus extends GeneratorCompanion[XorShift128Plus, (Long, Long)] {
-  def randomSeed: (Long, Long) = (System.nanoTime, System.nanoTime)
+  def randomSeed(): (Long, Long) = (System.nanoTime, System.nanoTime)
 
   def fromSeed(seed: (Long, Long)): XorShift128Plus = {
     val (s0, s1) = seed

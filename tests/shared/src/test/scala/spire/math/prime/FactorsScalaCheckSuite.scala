@@ -15,7 +15,7 @@ import org.scalacheck.Prop._
 class FactorsScalaCheckSuite extends munit.ScalaCheckSuite {
 
   implicit val arbitraryFactors: Arbitrary[Factors] =
-    Arbitrary(arbitrary[SafeLong].map(Factors.apply))
+    Arbitrary(arbitrary[SafeLong].map(n => Factors(n)))
 
   property("Factors(n).value = n") {
     forAll { (n: Long) =>

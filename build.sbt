@@ -14,7 +14,7 @@ lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
 val Scala213 = "2.13.6"
-val Scala3 = "3.0.2"
+val Scala3 = "3.1.0"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
@@ -221,10 +221,10 @@ lazy val benchmark: Project = project
 
 addCommandAlias(
   "validateJVM",
-  ";core.jvm/scalastyle;macros.jvm/test;core.jvm/test;extras.jvm/test;laws.jvm/test;tests.jvm/test;examples/test;benchmark/test"
+   ";coreJVM/scalastyle;macrosJVM/test;coreJVM/test;extrasJVM/test;lawsJVM/test;testsJVM/test;examples/test;benchmark/test"
 )
 
-addCommandAlias("validateJS", ";macros.js/test;core.js/test;extras.js/test;laws.js/test;tests.js/test")
+addCommandAlias("validateJS", ";macrosJS/test;coreJS/test;extrasJS/test;lawsJS/test;testsJS/test")
 
 addCommandAlias("validate", ";validateJVM;validateJS")
 

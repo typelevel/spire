@@ -25,12 +25,12 @@ abstract class Generator {
   /**
    * Generate an equally-distributed random Int.
    */
-  def nextInt: Int
+  def nextInt(): Int
 
   /**
    * Generates a random long. All 64-bit long values are equally likely.
    */
-  def nextLong: Long
+  def nextLong(): Long
 
   /**
    * Generate a random value using a Dist[A] type class instance.
@@ -50,7 +50,7 @@ abstract class Generator {
   /**
    * Generates a random integer using n bits of state (0 <= n <= 32).
    */
-  def nextBits(n: Int): Int = nextInt >>> (32 - n)
+  def nextBits(n: Int): Int = nextInt() >>> (32 - n)
 
   /**
    * Generates a random int between 0 (inclusive) and n (exclusive).
@@ -58,15 +58,15 @@ abstract class Generator {
   def nextInt(n: Int): Int = {
     @tailrec def loop(b: Int): Int = {
       val v = b % n
-      if (b - v + (n - 1) < 0) loop(nextInt >>> 1) else v
+      if (b - v + (n - 1) < 0) loop(nextInt() >>> 1) else v
     }
 
     if (n < 1)
       throw new IllegalArgumentException("argument must be positive %d".format(n))
     else if ((n & -n) == n)
-      ((n * ((nextInt >>> 1).toLong)) >>> 31).toInt
+      ((n * ((nextInt() >>> 1).toLong)) >>> 31).toInt
     else
-      loop(nextInt >>> 1)
+      loop(nextInt() >>> 1)
   }
 
   final private def retryCap(width: UInt): UInt = {
@@ -83,15 +83,15 @@ abstract class Generator {
   def nextInt(from: Int, to: Int): Int = {
     val width = UInt(to - from + 1)
     if (width == UInt(0)) {
-      nextInt
+      nextInt()
     } else {
       val cap = if (width > UInt(Int.MinValue)) width else retryCap(width)
       if (cap == UInt(0)) {
-        val x = UInt(nextInt)
+        val x = UInt(nextInt())
         from + (x % width).signed
       } else {
         @tailrec def loop: Int = {
-          val x = UInt(nextInt)
+          val x = UInt(nextInt())
           if (x <= cap) (x % width).signed + from else loop
         }
         loop
@@ -105,15 +105,15 @@ abstract class Generator {
   def nextLong(n: Long): Long = {
     @tailrec def loop(b: Long): Long = {
       val v = b % n
-      if (b - v + (n - 1) < 0) loop(nextLong >>> 1) else v
+      if (b - v + (n - 1) < 0) loop(nextLong() >>> 1) else v
     }
 
     if (n < 1)
       throw new IllegalArgumentException("argument must be positive %d".format(n))
     else if ((n & -n) == n)
-      nextLong & (n - 1)
+      nextLong() & (n - 1)
     else
-      loop(nextLong >>> 1)
+      loop(nextLong() >>> 1)
   }
 
   final private def retryCap(width: ULong): ULong = {
@@ -130,15 +130,15 @@ abstract class Generator {
   def nextLong(from: Long, to: Long): Long = {
     val width = ULong(to - from + 1)
     if (width == ULong(0)) {
-      nextLong
+      nextLong()
     } else {
       val cap = if (width > ULong(Long.MinValue)) width else retryCap(width)
       if (cap == ULong(0)) {
-        val x = ULong(nextLong)
+        val x = ULong(nextLong())
         from + (x % width).signed
       } else {
         @tailrec def loop: Long = {
-          val x = ULong(nextLong)
+          val x = ULong(nextLong())
           if (x <= cap) (x % width).signed + from else loop
         }
         loop
@@ -149,40 +149,40 @@ abstract class Generator {
   /**
    * Generates a random Boolean.
    */
-  def nextBoolean: Boolean = (nextInt & 1) != 0
+  def nextBoolean(): Boolean = (nextInt() & 1) != 0
 
   /**
    * Generates a random float in [0.0, 1.0).
    */
-  def nextFloat: Float = (nextInt >>> 8) * 5.9604645e-8f
+  def nextFloat(): Float = (nextInt() >>> 8) * 5.9604645e-8f
 
   /**
    * Generates a random float in [0.0, n).
    */
-  def nextFloat(n: Float): Float = nextFloat * n
+  def nextFloat(n: Float): Float = nextFloat() * n
 
   /**
    * Generates a random float in [from, until).
    */
   def nextFloat(from: Float, until: Float): Float =
-    from + (until - from) * nextFloat
+    from + (until - from) * nextFloat()
 
   /**
    * Generates a random double in [0.0, 1.0).
    */
-  def nextDouble: Double =
-    (nextLong >>> 11) * 1.1102230246251565e-16
+  def nextDouble(): Double =
+    (nextLong() >>> 11) * 1.1102230246251565e-16
 
   /**
    * Generates a random double in [0.0, n).
    */
-  def nextDouble(n: Double): Double = nextDouble * n
+  def nextDouble(n: Double): Double = nextDouble() * n
 
   /**
    * Generates a random double in [from, until).
    */
   def nextDouble(from: Double, until: Double): Double =
-    from + (until - from) * nextDouble
+    from + (until - from) * nextDouble()
 
   /**
    * Generate an array of n random Longs.
@@ -200,7 +200,7 @@ abstract class Generator {
     var i = 0
     val len = arr.length
     while (i < len) {
-      arr(i) = nextLong
+      arr(i) = nextLong()
       i += 1
     }
   }
@@ -221,7 +221,7 @@ abstract class Generator {
     var i = 0
     val len = arr.length
     while (i < len) {
-      arr(i) = nextInt
+      arr(i) = nextInt()
       i += 1
     }
   }
@@ -243,13 +243,13 @@ abstract class Generator {
     val len = arr.length
     val llen = len & 0xfffffffe
     while (i < llen) {
-      val n = nextInt
+      val n = nextInt()
       arr(i) = (n & 0xffff).toShort
       arr(i + 1) = ((n >>> 16) & 0xffff).toShort
       i += 2
     }
 
-    if (len != llen) arr(i) = (nextInt & 0xffff).toShort
+    if (len != llen) arr(i) = (nextInt() & 0xffff).toShort
   }
 
   /**
@@ -269,7 +269,7 @@ abstract class Generator {
     val len = arr.length
     val llen = len & 0xfffffffc
     while (i < llen) {
-      val n = nextInt
+      val n = nextInt()
       arr(i) = (n & 0xff).toByte
       arr(i + 1) = ((n >>> 8) & 0xff).toByte
       arr(i + 2) = ((n >>> 16) & 0xff).toByte
@@ -278,7 +278,7 @@ abstract class Generator {
     }
 
     if (i < len) {
-      var n = nextInt
+      var n = nextInt()
       while (i < len) {
         arr(i) = (n & 0xff).toByte
         n = n >>> 8
@@ -380,7 +380,7 @@ abstract class Generator {
     @tailrec def loop(x: Double, y: Double): Double = {
       val s = x * x + y * y
       if (s >= 1.0 || s == 0.0) {
-        loop(nextDouble * 2 - 1, nextDouble * 2 - 1)
+        loop(nextDouble() * 2 - 1, nextDouble() * 2 - 1)
       } else {
         val scale = Math.sqrt(-2.0 * Math.log(s) / s)
         extra = true
@@ -388,7 +388,7 @@ abstract class Generator {
         x * scale
       }
     }
-    loop(nextDouble * 2 - 1, nextDouble * 2 - 1)
+    loop(nextDouble() * 2 - 1, nextDouble() * 2 - 1)
   }
 
   def nextGaussian(mean: Double, stddev: Double): Double =
@@ -404,7 +404,7 @@ abstract class Generator {
     @tailrec def loop(i: Int, x: Double, y: Double): Unit = {
       val s = x * x + y * y
       if (s >= 1.0 || s == 0.0) {
-        loop(i, nextDouble * 2 - 1, nextDouble * 2 - 1)
+        loop(i, nextDouble() * 2 - 1, nextDouble() * 2 - 1)
       } else {
         val scale = Math.sqrt(-2.0 * Math.log(s) / s)
         arr(i) = x * scale * stddev + mean
@@ -413,7 +413,7 @@ abstract class Generator {
     }
 
     while (i < len) {
-      loop(i, nextDouble * 2 - 1, nextDouble * 2 - 1)
+      loop(i, nextDouble() * 2 - 1, nextDouble() * 2 - 1)
       i += 2
     }
 
@@ -434,26 +434,26 @@ abstract class Generator {
 }
 
 abstract class IntBasedGenerator extends Generator { self =>
-  def nextLong: Long =
-    ((nextInt & 0xffffffffL) << 32) | (nextInt & 0xffffffffL)
+  def nextLong(): Long =
+    ((nextInt() & 0xffffffffL) << 32) | (nextInt() & 0xffffffffL)
 }
 
 abstract class LongBasedGenerator extends Generator { self =>
-  def nextInt: Int =
-    (nextLong >>> 32).toInt
+  def nextInt(): Int =
+    (nextLong() >>> 32).toInt
 
   override def fillInts(arr: Array[Int]): Unit = {
     var i = 0
     val len = arr.length
     val llen = len & 0xfffffffe
     while (i < llen) {
-      val n = nextLong
+      val n = nextLong()
       arr(i) = (n & 0xffffffff).toInt
       arr(i + 1) = ((n >>> 32) & 0xffffffff).toInt
       i += 2
     }
 
-    if (len != llen) arr(i) = nextInt
+    if (len != llen) arr(i) = nextInt()
   }
 
   override def fillShorts(arr: Array[Short]): Unit = {
@@ -461,7 +461,7 @@ abstract class LongBasedGenerator extends Generator { self =>
     val len = arr.length
     val llen = len & 0xfffffffc
     while (i < llen) {
-      val n = nextLong
+      val n = nextLong()
       arr(i) = (n & 0xffff).toShort
       arr(i + 1) = ((n >>> 16) & 0xffff).toShort
       arr(i + 2) = ((n >>> 32) & 0xffff).toShort
@@ -470,7 +470,7 @@ abstract class LongBasedGenerator extends Generator { self =>
     }
 
     if (i < len) {
-      var n = nextLong
+      var n = nextLong()
       while (i < len) {
         arr(i) = (n & 0xffff).toShort
         n = n >>> 16
@@ -484,7 +484,7 @@ abstract class LongBasedGenerator extends Generator { self =>
     val len = arr.length
     val llen = len & 0xfffffff8
     while (i < llen) {
-      val n = nextLong
+      val n = nextLong()
       arr(i) = (n & 0xff).toByte
       arr(i + 1) = ((n >>> 8) & 0xff).toByte
       arr(i + 2) = ((n >>> 16) & 0xff).toByte
@@ -497,7 +497,7 @@ abstract class LongBasedGenerator extends Generator { self =>
     }
 
     if (i < len) {
-      var n = nextLong
+      var n = nextLong()
       while (i < len) {
         arr(i) = (n & 0xff).toByte
         n = n >>> 8
@@ -508,7 +508,7 @@ abstract class LongBasedGenerator extends Generator { self =>
 }
 
 trait GeneratorCompanion[G, @sp(Int, Long) S] {
-  def randomSeed: S
+  def randomSeed(): S
 
   def fromBytes(bytes: Array[Byte]): G
   def fromSeed(seed: S): G
@@ -533,5 +533,5 @@ object GlobalRng extends LongBasedGenerator {
 
   def setSeedBytes(bytes: Array[Byte]): Unit = rng.setSeedBytes(bytes)
 
-  def nextLong: Long = rng.nextLong
+  def nextLong(): Long = rng.nextLong()
 }

@@ -298,34 +298,34 @@ object Dist extends DistInstances9 {
     })
   }
 
-  implicit val unitDist: Dist[Unit] = new DistFromGen[Unit](g => ())
-  implicit val booleanDist: Dist[Boolean] = new DistFromGen[Boolean](_.nextBoolean)
-  implicit val byteDist: Dist[Byte] = new DistFromGen[Byte](_.nextInt.toByte)
-  implicit val shortDist: Dist[Short] = new DistFromGen[Short](_.nextInt.toShort)
-  implicit val charDist: Dist[Char] = new DistFromGen[Char](_.nextInt.toChar)
-  implicit val intDist: Dist[Int] = new DistFromGen[Int](_.nextInt)
-  implicit val floatDist: Dist[Float] = new DistFromGen[Float](_.nextFloat)
-  implicit val longDist: Dist[Long] = new DistFromGen[Long](_.nextLong)
-  implicit val doubleDist: Dist[Double] = new DistFromGen[Double](_.nextDouble)
+  implicit val unit: Dist[Unit] = new DistFromGen[Unit](g => ())
+  implicit val boolean: Dist[Boolean] = new DistFromGen[Boolean](_.nextBoolean())
+  implicit val byte: Dist[Byte] = new DistFromGen[Byte](_.nextInt().toByte)
+  implicit val short: Dist[Short] = new DistFromGen[Short](_.nextInt().toShort)
+  implicit val char: Dist[Char] = new DistFromGen[Char](_.nextInt().toChar)
+  implicit val int: Dist[Int] = new DistFromGen[Int](_.nextInt())
+  implicit val float: Dist[Float] = new DistFromGen[Float](_.nextFloat())
+  implicit val long: Dist[Long] = new DistFromGen[Long](_.nextLong())
+  implicit val double: Dist[Double] = new DistFromGen[Double](_.nextDouble())
 
-  implicit val ubyteDist: Dist[UByte] = new DistFromGen[UByte](g => UByte(g.nextInt))
-  implicit val ushortDist: Dist[UShort] = new DistFromGen[UShort](g => UShort(g.nextInt))
-  implicit val uintDist: Dist[UInt] = new DistFromGen[UInt](g => UInt(g.nextInt))
-  implicit val ulongDist: Dist[ULong] = new DistFromGen[ULong](g => ULong(g.nextLong))
+  implicit val ubyte: Dist[UByte] = new DistFromGen[UByte](g => UByte(g.nextInt()))
+  implicit val ushort: Dist[UShort] = new DistFromGen[UShort](g => UShort(g.nextInt()))
+  implicit val uint: Dist[UInt] = new DistFromGen[UInt](g => UInt(g.nextInt()))
+  implicit val ulong: Dist[ULong] = new DistFromGen[ULong](g => ULong(g.nextLong()))
 
-  implicit def complexDist[A: Fractional: Trig: IsReal: Dist]: Dist[Complex[A]] =
+  implicit def complex[A: Fractional: Trig: IsReal: Dist]: Dist[Complex[A]] =
     Dist(Complex(_: A, _: A))
 
-  implicit def intervalDist[A: AdditiveMonoid: Dist: Order]: Dist[Interval[A]] =
+  implicit def interval[A: AdditiveMonoid: Dist: Order]: Dist[Interval[A]] =
     Dist((x: A, y: A) => if (Order[A].lt(x, y)) Interval(x, y) else Interval(y, x))
 
-  implicit def optionDist[A](implicit no: Dist[Boolean], na: Dist[A]): Dist[Option[A]] =
+  implicit def option[A](implicit no: Dist[Boolean], na: Dist[A]): Dist[Option[A]] =
     new DistFromGen(g => if (no(g)) Some(na(g)) else None)
 
-  implicit def eitherDist[A, B](implicit no: Dist[Boolean], na: Dist[A], nb: Dist[B]): Dist[Either[A, B]] =
+  implicit def either[A, B](implicit no: Dist[Boolean], na: Dist[A], nb: Dist[B]): Dist[Either[A, B]] =
     new DistFromGen[Either[A, B]](g => if (no(g)) Right(nb(g)) else Left(na(g)))
 
-  implicit def tuple2Dist[A: Dist, B: Dist]: Dist[(A, B)] =
+  implicit def tuple2[A: Dist, B: Dist]: Dist[(A, B)] =
     Dist((_: A, _: B))
 
   def intrange(from: Int, to: Int): Dist[Int] = {
@@ -346,9 +346,9 @@ object Dist extends DistInstances9 {
     throw new IllegalArgumentException("need positive maxBytes, got %s".format(maxBytes))
   } else if (maxBytes < 8) {
     val n = (8 - maxBytes) * 8
-    new DistFromGen(g => SafeLong(g.nextLong >>> n))
+    new DistFromGen(g => SafeLong(g.nextLong() >>> n))
   } else if (maxBytes == 8) {
-    new DistFromGen(g => SafeLong(g.nextLong))
+    new DistFromGen(g => SafeLong(g.nextLong()))
   } else {
     bigint(maxBytes).map(SafeLong(_))
   }
