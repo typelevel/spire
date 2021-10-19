@@ -31,25 +31,27 @@ ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep.Sbt(List("doc"), name = Some("Build docs"))
 )
 
-inThisBuild(List(
-  organization := "org.typelevel",
-  homepage := Some(url("https://typelevel.org/spire/")),
-  licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
-  developers := List(
-    Developer(
-      "id_m",
-      "Erik Osheim",
-      "",
-      url("http://github.com/non/")
-    ),
-    Developer(
-      "tixxit",
-      "Tom Switzer",
-      "",
-      url("http://github.com/tixxit/")
+inThisBuild(
+  List(
+    organization := "org.typelevel",
+    homepage := Some(url("https://typelevel.org/spire/")),
+    licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
+    developers := List(
+      Developer(
+        "id_m",
+        "Erik Osheim",
+        "",
+        url("http://github.com/non/")
+      ),
+      Developer(
+        "tixxit",
+        "Tom Switzer",
+        "",
+        url("http://github.com/tixxit/")
+      )
     )
   )
-))
+)
 
 ThisBuild / githubWorkflowTargetTags ++= Seq("v*")
 ThisBuild / githubWorkflowPublishTargetBranches +=
@@ -467,7 +469,6 @@ lazy val commonScalacOptions = Def.setting(
   )
 )
 
-
 lazy val warnUnusedImport = Seq(
   scalacOptions ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
@@ -481,4 +482,3 @@ lazy val warnUnusedImport = Seq(
   Compile / console / scalacOptions ~= { _.filterNot("-Ywarn-unused-import" == _) },
   Test / console / scalacOptions := (Compile / console / scalacOptions).value
 )
-
