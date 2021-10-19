@@ -12,11 +12,9 @@ import scala.collection.immutable.LazyList
 /**
  * These examples are taken from http://r6.ca/blog/20110808T035622Z.html.
  *
- * The goal is to try to do as direct a translation as possible from the
- * Haskell, to see how well we can do with Spire.
+ * The goal is to try to do as direct a translation as possible from the Haskell, to see how well we can do with Spire.
  *
- * The original example is in literate Haskell with good comments, so consult
- * the link for more information.
+ * The original example is in literate Haskell with good comments, so consult the link for more information.
  */
 object KleeneDemo {
 
@@ -58,7 +56,7 @@ object KleeneDemo {
    * StarRig[A] is a Rig[A] that also has an asteration operator: kstar.
    *
    * Laws:
-   * 1. a.star = 1 + a * a.star = 1 + a.star * a
+   *   1. a.star = 1 + a * a.star = 1 + a.star * a
    */
   trait StarRig[A] extends Rig[A] {
     // one of these must be overridden in any type class instance
@@ -96,9 +94,7 @@ object KleeneDemo {
    * A Kleene is a StarRig which obeys some additional laws.
    *
    * Laws:
-   * 1. a + a = a
-   * 2. a * x + x = x  ==> a.kstar * x + x = x
-   * 3. x * a + x = x  ==>  x * a.kstar + x = x
+   *   1. a + a = a 2. a * x + x = x ==> a.kstar * x + x = x 3. x * a + x = x ==> x * a.kstar + x = x
    */
   trait Kleene[A] extends StarRig[A]
   object Kleene {
@@ -114,8 +110,8 @@ object KleeneDemo {
   /**
    * Dim is a cute little class that let's us have implicit size information.
    *
-   * This is to work around the fact that we don't currently have
-   * implementations of Bounded[A] or Ix[A] like Haskell does.
+   * This is to work around the fact that we don't currently have implementations of Bounded[A] or Ix[A] like Haskell
+   * does.
    *
    * Dim is probably not robust enough for real world use.
    */
@@ -135,8 +131,8 @@ object KleeneDemo {
   object Matrix {
 
     /**
-     * Builds a Matrix[A] given a function (Int, Int) => A and an implicit Dim
-     * to provide the dimensions over which to run the function.
+     * Builds a Matrix[A] given a function (Int, Int) => A and an implicit Dim to provide the dimensions over which to
+     * run the function.
      */
     def apply[A: ClassTag](f: (Int, Int) => A)(implicit dim: Dim): Matrix[A] = {
       val n = dim.n
@@ -165,11 +161,11 @@ object KleeneDemo {
   /**
    * Mutable ArrayMatrix implementation.
    *
-   * The mutability should only be used to initialize a matrix. Once it's built
-   * it will be typed as Matrix[A] with no interface for further mutation.
+   * The mutability should only be used to initialize a matrix. Once it's built it will be typed as Matrix[A] with no
+   * interface for further mutation.
    *
-   * The matrix also has naive implementations of addition and multiplication.
-   * These are not optimized--do not use this class in the wild!
+   * The matrix also has naive implementations of addition and multiplication. These are not optimized--do not use this
+   * class in the wild!
    */
   case class ArrayMatrix[A](arr: Array[A])(implicit val dim: Dim, ct: ClassTag[A]) extends Matrix[A] { lhs =>
     def apply(x: Int, y: Int): A = arr(y * dim.n + x)
@@ -257,12 +253,10 @@ object KleeneDemo {
    * Expr[A] implements an AST for regular expressions.
    *
    * Basic regular consist of the following:
-   *  1. the empty set (Nul)        -- a set with no strings
-   *  2. the empty string (Empty)   -- set containing the empty string
-   *  3. literal strings (Var(a))   -- set containing a
-   *  4. concatenation (Then(a, b)) -- set of all xy, for x in a, y in b
-   *  5. alternation (Or(a, b))     -- union set of a and b
-   *  6. kleene star (Star(a))      -- set produced by 0+ concatenations from a
+   *   1. the empty set (Nul) -- a set with no strings 2. the empty string (Empty) -- set containing the empty string 3.
+   *      literal strings (Var(a)) -- set containing a 4. concatenation (Then(a, b)) -- set of all xy, for x in a, y in
+   *      b 5. alternation (Or(a, b)) -- union set of a and b 6. kleene star (Star(a)) -- set produced by 0+
+   *      concatenations from a
    *
    * For example, (a|bc)* includes "", "a", "bc", "abcaaaabc" but not "bc".
    */
@@ -364,9 +358,7 @@ object KleeneDemo {
 
   /**
    * ShortestPath is a data structure which will track two things:
-   *  1. the path's cost, as Tropical[A]
-   *  2. the path itself, as B
-   * Any impossible path will have Infinity as its cost.
+   *   1. the path's cost, as Tropical[A] 2. the path itself, as B Any impossible path will have Infinity as its cost.
    */
   case class ShortestPath[A, B](a: Tropical[A], b: B) {
     def map[C](f: B => C) = ShortestPath[A, C](a, f(b))
@@ -402,10 +394,8 @@ object KleeneDemo {
     }
 
   /**
-   * Language represents the set of every valid string in a regular
-   * language. Each W is a valid character, each LazyList[W] is a (lazy)
-   * string, and LL[W] (e.g. LazyList[LazyList[W]]) is the complete set of
-   * all strings.
+   * Language represents the set of every valid string in a regular language. Each W is a valid character, each
+   * LazyList[W] is a (lazy) string, and LL[W] (e.g. LazyList[LazyList[W]]) is the complete set of all strings.
    */
   case class Language[W](wss: LL[W]) {
     def someWord: Option[List[W]] = wss.headOption.map(_.toList)

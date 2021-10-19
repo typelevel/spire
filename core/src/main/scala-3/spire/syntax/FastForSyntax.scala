@@ -17,6 +17,8 @@ trait FastForSyntax:
   inline def fastForRange[R <: RangeLike](inline r: R)(inline body: RangeElem[R] => Unit): Unit =
     ${ fastForRangeMacroGen('r, 'body) }
 
-  inline def fastForRange2[R <: RangeLike](inline r1: R, inline r2: R)(inline body: (RangeElem[R], RangeElem[R]) => Unit): Unit =
+  inline def fastForRange2[R <: RangeLike](inline r1: R, inline r2: R)(
+    inline body: (RangeElem[R], RangeElem[R]) => Unit
+  ): Unit =
     fastForRange(r1) { x => fastForRange(r2) { y => body(x, y) } }
 end FastForSyntax

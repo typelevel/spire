@@ -14,10 +14,9 @@ import spire.implicits._
 /**
  * An example showing how to use the Auto macros.
  *
- * The Auto macros let you auto-generate Spire type classes for Scala and Java
- * types that follow common conventions in those languages. For instance, in
- * Scala, people will usually use the `+` method to denote addition, whereas in
- * Java, they use `add`.
+ * The Auto macros let you auto-generate Spire type classes for Scala and Java types that follow common conventions in
+ * those languages. For instance, in Scala, people will usually use the `+` method to denote addition, whereas in Java,
+ * they use `add`.
  */
 object AutoAlgebraExample extends App {
 

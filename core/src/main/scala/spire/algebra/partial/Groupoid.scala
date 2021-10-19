@@ -6,14 +6,12 @@ import spire.util.Opt
 import spire.syntax.eq._
 
 /**
- * A groupoid is a semigroupoid where inverse are defined for all elements,
- * and thus left and right identity elements such that:
+ * A groupoid is a semigroupoid where inverse are defined for all elements, and thus left and right identity elements
+ * such that:
  *
- *   (i) (leftId(g) |+|? g).get === g
- *  (ii) (g |+|? rightId(g)).get === g
- * (iii) `a.inverse |+|? a` and `a |+|? a.inverse` are always defined
- *  (iv) if `a |+|? b`, then `((a |+|? b).get |+|? b.inverse).get === a` and
- *       `((a.inverse |+|? a).get |+|? b) === b`
+ * (i) (leftId(g) |+|? g).get === g (ii) (g |+|? rightId(g)).get === g (iii) `a.inverse |+|? a` and `a |+|? a.inverse`
+ * are always defined (iv) if `a |+|? b`, then `((a |+|? b).get |+|? b.inverse).get === a` and `((a.inverse |+|? a).get
+ * |+|? b) === b`
  */
 trait Groupoid[A] extends Any with Semigroupoid[A] {
 

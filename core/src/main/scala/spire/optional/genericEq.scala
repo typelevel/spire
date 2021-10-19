@@ -4,9 +4,8 @@ package optional
 import spire.algebra.Eq
 
 /**
- * This provides an implicit `Eq[A]` for any type `A` using Scala's (Java's)
- * `==` (`equals`). This is generally considered a bad idea, since it means you
- * lose all type safety -- for instance, any 2 types can always be compared as
+ * This provides an implicit `Eq[A]` for any type `A` using Scala's (Java's) `==` (`equals`). This is generally
+ * considered a bad idea, since it means you lose all type safety -- for instance, any 2 types can always be compared as
  * `Eq[Any]`.
  */
 object genericEq {

@@ -25,10 +25,9 @@ trait VectorOrderLow {
 }
 
 /**
- * This object provides implicit instances of Eq and Order for Seq-likes
- * that will behave like infinite vectors. Essentially all this means is that
- * `Seq(0, 0, 0) === Seq()`, since both are infinite vectors of zeros. Any
- * element not explicitly set is implied to be 0.
+ * This object provides implicit instances of Eq and Order for Seq-likes that will behave like infinite vectors.
+ * Essentially all this means is that `Seq(0, 0, 0) === Seq()`, since both are infinite vectors of zeros. Any element
+ * not explicitly set is implied to be 0.
  */
 object vectorOrder extends VectorOrderLow {
   implicit def seqOrder[A, CC[A] <: SeqOps[A, Seq, CC[A]]](implicit

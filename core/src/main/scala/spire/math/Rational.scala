@@ -170,12 +170,12 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     else limitTo(Rational.Two63m1)
 
   /**
-   * Returns a `Rational` whose denominator and numerator are no larger than
-   * `max` and whose value is close to the original. This applies, even if, for
-   * example, this `Rational` is greater than `max`. In that case,
-   * `Rational(max, 1)` is returned.
+   * Returns a `Rational` whose denominator and numerator are no larger than `max` and whose value is close to the
+   * original. This applies, even if, for example, this `Rational` is greater than `max`. In that case, `Rational(max,
+   * 1)` is returned.
    *
-   * @param max A positive integer.
+   * @param max
+   *   A positive integer.
    */
   def limitTo(max: SafeLong): Rational = if (this.signum < 0) {
     -((-this).limitTo(max))
@@ -204,8 +204,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   }
 
   /**
-   * Finds the closest `Rational` to this `Rational` whose denominator is no
-   * larger than `limit`.
+   * Finds the closest `Rational` to this `Rational` whose denominator is no larger than `limit`.
    *
    * See [[http://en.wikipedia.org/wiki/Stern%E2%80%93Brocot_tree#Mediants_and_binary_search]]
    */
@@ -889,8 +888,7 @@ trait RationalInstances {
 }
 
 /**
- * Used for Fractional[Rational] and Numeric[Rational] to provide
- * approximate sqrt and nroot implementations.
+ * Used for Fractional[Rational] and Numeric[Rational] to provide approximate sqrt and nroot implementations.
  *
  * These operations occur at Double precision.
  */

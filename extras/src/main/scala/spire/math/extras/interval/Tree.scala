@@ -45,13 +45,18 @@ private[interval] object Tree {
   //  }
 
   /**
-   * Creates a branch from two possibly null children. In case one of the children is null, the other child will
-   * be returned. So if both children are null, this operation can return null.
-   * @param p the prefix to be used for a new branch
-   * @param level the level to be used for a new branch
-   * @param l the left child
-   * @param r the right child
-   * @return the result, can be null
+   * Creates a branch from two possibly null children. In case one of the children is null, the other child will be
+   * returned. So if both children are null, this operation can return null.
+   * @param p
+   *   the prefix to be used for a new branch
+   * @param level
+   *   the level to be used for a new branch
+   * @param l
+   *   the left child
+   * @param r
+   *   the right child
+   * @return
+   *   the result, can be null
    */
   @inline final private def branch(p: Long, level: Byte, l: Tree, r: Tree): Tree =
     if (l eq null)
@@ -86,39 +91,55 @@ private[interval] object Tree {
 
     /**
      * This is called if two leaves collide (have the same prefix)
-     * @param a0 the value before a
-     * @param a a leaf from the lhs
-     * @param b0 the value before b
-     * @param b a leaf from the rhs
-     * @return the result. Can be a leaf or null
+     * @param a0
+     *   the value before a
+     * @param a
+     *   a leaf from the lhs
+     * @param b0
+     *   the value before b
+     * @param b
+     *   a leaf from the rhs
+     * @return
+     *   the result. Can be a leaf or null
      */
     protected def collision(a0: Boolean, a: Leaf, b0: Boolean, b: Leaf): Boolean
 
     /**
      * This will be called when a is completely covered by a contiguous interval of b
      * @param a0
-     * @param a a non-null tree (leaf or branch)
-     * @param b0 the constant value of b in the complete interval of a
-     * @return the result, can be null
+     * @param a
+     *   a non-null tree (leaf or branch)
+     * @param b0
+     *   the constant value of b in the complete interval of a
+     * @return
+     *   the result, can be null
      */
     protected def overlapA(a0: Boolean, a: Tree, b0: Boolean): Boolean
 
     /**
      * This will be called when b is completely covered by a contiguous interval of a
-     * @param a0 the constant value of a in the complete interval of b
+     * @param a0
+     *   the constant value of a in the complete interval of b
      * @param b0
-     * @param b a non-null tree (leaf or branch)
-     * @return the result, can be null
+     * @param b
+     *   a non-null tree (leaf or branch)
+     * @return
+     *   the result, can be null
      */
     protected def overlapB(a0: Boolean, b0: Boolean, b: Tree): Boolean
 
     /**
      * Performs the binary operation for two arbitrary trees
-     * @param a0 the value before a
-     * @param a a node (leaf or branch) from the lhs
-     * @param b0 the value before b
-     * @param b a node (leaf or branch) from the rhs
-     * @return the result, can be null
+     * @param a0
+     *   the value before a
+     * @param a
+     *   a node (leaf or branch) from the lhs
+     * @param b0
+     *   the value before b
+     * @param b
+     *   a node (leaf or branch) from the rhs
+     * @return
+     *   the result, can be null
      */
     final private def op(a0: Boolean, a: Tree, b0: Boolean, b: Tree): Boolean = {
       val a_l = a.level
@@ -203,18 +224,23 @@ private[interval] object Tree {
 
   /**
    * A binary calculator that preserves the order of operands. This is the most generic case. It is used even for
-   * symmetric operations. There might be some performance benefit in doing an operator for symmetric operations, but
-   * I doubt that it is worth it. And in any case I am too lazy right now.
+   * symmetric operations. There might be some performance benefit in doing an operator for symmetric operations, but I
+   * doubt that it is worth it. And in any case I am too lazy right now.
    */
   sealed abstract class OrderedBinaryOperator {
 
     /**
      * Joins two non-overlapping leaves
-     * @param a0 the value before a
-     * @param a a node (leaf or branch) from the lhs
-     * @param b0 the value before b
-     * @param b a node (leaf or branch) from the rhs
-     * @return the result, can be null
+     * @param a0
+     *   the value before a
+     * @param a
+     *   a node (leaf or branch) from the lhs
+     * @param b0
+     *   the value before b
+     * @param b
+     *   a node (leaf or branch) from the rhs
+     * @return
+     *   the result, can be null
      */
     final private def join(a0: Boolean, a: Tree, b0: Boolean, b: Tree): Tree = {
       val a_p = a.prefix
@@ -240,39 +266,55 @@ private[interval] object Tree {
 
     /**
      * This is called if two leaves collide (have the same prefix)
-     * @param a0 the value before a
-     * @param a a leaf from the lhs
-     * @param b0 the value before b
-     * @param b a leaf from the rhs
-     * @return the result. Can be a leaf or null
+     * @param a0
+     *   the value before a
+     * @param a
+     *   a leaf from the lhs
+     * @param b0
+     *   the value before b
+     * @param b
+     *   a leaf from the rhs
+     * @return
+     *   the result. Can be a leaf or null
      */
     protected def collision(a0: Boolean, a: Leaf, b0: Boolean, b: Leaf): Tree
 
     /**
      * This will be called when a is completely covered by a contiguous interval of b
      * @param a0
-     * @param a a non-null tree (leaf or branch)
-     * @param b0 the constant value of b in the complete interval of a
-     * @return the result, can be null
+     * @param a
+     *   a non-null tree (leaf or branch)
+     * @param b0
+     *   the constant value of b in the complete interval of a
+     * @return
+     *   the result, can be null
      */
     protected def overlapA(a0: Boolean, a: Tree, b0: Boolean): Tree
 
     /**
      * This will be called when b is completely covered by a contiguous interval of a
-     * @param a0 the constant value of a in the complete interval of b
+     * @param a0
+     *   the constant value of a in the complete interval of b
      * @param b0
-     * @param b a non-null tree (leaf or branch)
-     * @return the result, can be null
+     * @param b
+     *   a non-null tree (leaf or branch)
+     * @return
+     *   the result, can be null
      */
     protected def overlapB(a0: Boolean, b0: Boolean, b: Tree): Tree
 
     /**
      * Performs the binary operation for two arbitrary trees
-     * @param a0 the value before a
-     * @param a a node (leaf or branch) from the lhs
-     * @param b0 the value before b
-     * @param b a node (leaf or branch) from the rhs
-     * @return the result, can be null
+     * @param a0
+     *   the value before a
+     * @param a
+     *   a node (leaf or branch) from the lhs
+     * @param b0
+     *   the value before b
+     * @param b
+     *   a node (leaf or branch) from the rhs
+     * @return
+     *   the result, can be null
      */
     final private def op(a0: Boolean, a: Tree, b0: Boolean, b: Tree): Tree = {
       val a_l = a.level
@@ -452,8 +494,10 @@ private[interval] object Tree {
 
     /**
      * Method that is invoked when a leaf is found. This allows to customize whether we want at, before or after
-     * @param a0 the value before the leaf
-     * @param a the leaf
+     * @param a0
+     *   the value before the leaf
+     * @param a
+     *   the leaf
      */
     protected def onLeaf(a0: Boolean, a: Leaf): Boolean
 
@@ -515,7 +559,8 @@ private[interval] object Tree {
 
   /**
    * A leaf.
-   * @param prefix the prefix, which in case of a leaf is identical to the key
+   * @param prefix
+   *   the prefix, which in case of a leaf is identical to the key
    */
   final case class Leaf(prefix: Long, at: Boolean, sign: Boolean) extends Tree {
 
@@ -534,10 +579,14 @@ private[interval] object Tree {
 
   /**
    * A branch
-   * @param prefix the common prefix of both children
-   * @param level the level of the node. 0..63 for branches. Higher means bigger
-   * @param left the left child
-   * @param right the right child
+   * @param prefix
+   *   the common prefix of both children
+   * @param level
+   *   the level of the node. 0..63 for branches. Higher means bigger
+   * @param left
+   *   the left child
+   * @param right
+   *   the right child
    */
   final case class Branch(prefix: Long, level: Byte, left: Tree, right: Tree) extends Tree {
 

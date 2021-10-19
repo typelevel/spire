@@ -7,8 +7,7 @@ import spire.math._
 object MandelbrotDemo {
 
   /**
-   * Compute whether the complex number c stays contained within a radius-2
-   * circle after 'limit' iterations.
+   * Compute whether the complex number c stays contained within a radius-2 circle after 'limit' iterations.
    */
   def mandelbrot(c: Complex[Double], limit: Int): Int = {
     @tailrec def loop(z: Complex[Double], n: Int): Int =

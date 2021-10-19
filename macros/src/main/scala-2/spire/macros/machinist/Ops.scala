@@ -3,21 +3,19 @@ package spire.macros.machinist
 import scala.reflect.macros.blackbox.Context
 
 /**
- * This trait has some nice methods for working with implicit `Ops`
- * classes. It is used to rewrite implicit conversions which "enrich"
- * a type with operators into code that does not allocate an implicit
- * instance.
+ * This trait has some nice methods for working with implicit `Ops` classes. It is used to rewrite implicit conversions
+ * which "enrich" a type with operators into code that does not allocate an implicit instance.
  *
- * @groupname macros Macros
- * @groupdesc macros Macro transformations for operators
+ * @groupname macros
+ *   Macros
+ * @groupdesc macros
+ *   Macro transformations for operators
  */
 trait Ops {
 
   /**
-   * Given context, this method rewrites the tree to call the desired
-   * method with the lhs parameter. We find the symbol which is
-   * applying the macro and use its name to determine what method to
-   * call.
+   * Given context, this method rewrites the tree to call the desired method with the lhs parameter. We find the symbol
+   * which is applying the macro and use its name to determine what method to call.
    *
    * If we see code like:
    *
@@ -57,8 +55,7 @@ trait Ops {
   }
 
   /**
-   * Like [[unop]], but with ev provided to the method instead of to the
-   * implicit constructor.
+   * Like [[unop]], but with ev provided to the method instead of to the implicit constructor.
    *
    * If we see code like:
    *
@@ -87,8 +84,8 @@ trait Ops {
   }
 
   /**
-   * Like [[unop]] and [[unopWithEv]], but there is ev provided by the implicit
-   * constructor, and ev1 provided by the method.
+   * Like [[unop]] and [[unopWithEv]], but there is ev provided by the implicit constructor, and ev1 provided by the
+   * method.
    *
    * If we see code like:
    *
@@ -117,10 +114,8 @@ trait Ops {
   }
 
   /**
-   * Given context and an expression, this method rewrites the tree to
-   * call the "desired" method with the lhs and rhs parameters. We
-   * find the symbol which is applying the macro and use its name to
-   * determine what method to call.
+   * Given context and an expression, this method rewrites the tree to call the "desired" method with the lhs and rhs
+   * parameters. We find the symbol which is applying the macro and use its name to determine what method to call.
    *
    * If we see code like:
    *
@@ -229,8 +224,7 @@ trait Ops {
   }
 
   /**
-   * Like [[binop]], but with ev provided to the method instead of to the
-   * implicit constructor.
+   * Like [[binop]], but with ev provided to the method instead of to the implicit constructor.
    *
    * If we see code like:
    *
@@ -259,8 +253,7 @@ trait Ops {
   }
 
   /**
-   * Like [[rbinop]], but with ev provided to the method instead of to the
-   * implicit constructor.
+   * Like [[rbinop]], but with ev provided to the method instead of to the implicit constructor.
    *
    * If we see code like:
    *
@@ -309,10 +302,8 @@ trait Ops {
    *   ev0.plus(lhs, ev1.fromInt(1))
    * }}}
    *
-   * In Spire, this lets us use `Ring`'s fromInt method and
-   * `ConvertableTo`'s `fromDouble` (etc.) before applying an
-   * op. Eventually, we should generalize the way we choose the
-   * lifting method.
+   * In Spire, this lets us use `Ring`'s fromInt method and `ConvertableTo`'s `fromDouble` (etc.) before applying an op.
+   * Eventually, we should generalize the way we choose the lifting method.
    *
    * @group macros
    */
@@ -325,8 +316,7 @@ trait Ops {
   }
 
   /**
-   * This is like [[binopWithLift]], but we use the same evidence
-   * parameter to make the method call and do the lifting.
+   * This is like [[binopWithLift]], but we use the same evidence parameter to make the method call and do the lifting.
    *
    * If we see code like:
    *
@@ -357,8 +347,8 @@ trait Ops {
   }
 
   /**
-   * Similar to [[binop]], but for situations where there is no evidence
-   * parameter, and we just want to call a method on the rhs.
+   * Similar to [[binop]], but for situations where there is no evidence parameter, and we just want to call a method on
+   * the rhs.
    *
    * After typing and implicit resolution, we get trees like:
    *
@@ -381,8 +371,7 @@ trait Ops {
   }
 
   /**
-   * Given context, this method pulls the 'ev' and 'lhs' values out of
-   * instantiations of implicit -`Ops` classes.
+   * Given context, this method pulls the 'ev' and 'lhs' values out of instantiations of implicit -`Ops` classes.
    *
    * For instance, given a tree like:
    *
@@ -398,13 +387,12 @@ trait Ops {
     import c.universe._
     c.prefix.tree match {
       case Apply(Apply(TypeApply(_, _), List(x)), List(ev)) => (ev, x)
-      case t                                                => c.abort(c.enclosingPosition, "Cannot extract subject of operator (tree = %s)".format(t))
+      case t => c.abort(c.enclosingPosition, "Cannot extract subject of operator (tree = %s)".format(t))
     }
   }
 
   /**
-   * Given context, this method pulls the 'lhs' value out of
-   * instantiations of implicit -`Ops` classes.
+   * Given context, this method pulls the 'lhs' value out of instantiations of implicit -`Ops` classes.
    *
    * For instance, given a tree like:
    *
@@ -420,23 +408,20 @@ trait Ops {
     import c.universe._
     c.prefix.tree match {
       case Apply(TypeApply(_, _), List(lhs)) => lhs
-      case t                                 => c.abort(c.enclosingPosition, "Cannot extract subject of operator (tree = %s)".format(t))
+      case t => c.abort(c.enclosingPosition, "Cannot extract subject of operator (tree = %s)".format(t))
     }
   }
 
   /**
-   * Provide a canonical mapping between "operator names" used in `Ops`
-   * classes and the actual method names used for type classes.
+   * Provide a canonical mapping between "operator names" used in `Ops` classes and the actual method names used for
+   * type classes.
    *
-   * It's worth noting that a particular instance of `Ops` must always
-   * map a given symbol a single method name. If you want to be able
-   * to map the same symbol to different names in different contexts,
-   * you'll need to create multiple `Ops` instances and configure them
-   * appropriately.
+   * It's worth noting that a particular instance of `Ops` must always map a given symbol a single method name. If you
+   * want to be able to map the same symbol to different names in different contexts, you'll need to create multiple
+   * `Ops` instances and configure them appropriately.
    *
-   * In general "textual" method names should just pass through to the
-   * typeclass--it is probably not wise to provide mappings for them
-   * here.
+   * In general "textual" method names should just pass through to the typeclass--it is probably not wise to provide
+   * mappings for them here.
    */
   def findMethodName(c: Context) = {
     import c.universe._
@@ -447,11 +432,10 @@ trait Ops {
   /**
    * Map of symbolic -> textual name conversions.
    *
-   * If this map is empty, the macros will not do any special
-   * rewriting and all names will be passed through.
+   * If this map is empty, the macros will not do any special rewriting and all names will be passed through.
    *
-   * Symbolic names should be written as Scala would represent them
-   * internally. For example, `+` should be written as `\$plus`.
+   * Symbolic names should be written as Scala would represent them internally. For example, `+` should be written as
+   * `\$plus`.
    */
   def operatorNames: Map[String, String]
 }

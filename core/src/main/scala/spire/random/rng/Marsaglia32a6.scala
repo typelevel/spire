@@ -8,9 +8,8 @@ import java.util.Arrays
 // Contributed by Rex Kerr
 
 /**
- * Marsaglia "Weyl sequence" RNG with cycle length of 2^192^ - 2^32^
- * from [[http://www.jstatsoft.org/v08/i14/paper]]. Quite fast and
- * quite random; requires 24 bytes of state.
+ * Marsaglia "Weyl sequence" RNG with cycle length of 2^192^ - 2^32^ from [[http://www.jstatsoft.org/v08/i14/paper]].
+ * Quite fast and quite random; requires 24 bytes of state.
  */
 class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extends IntBasedGenerator {
   private[this] var x: Int = _x

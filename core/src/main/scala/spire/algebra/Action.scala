@@ -2,10 +2,10 @@ package spire
 package algebra
 
 /**
- * A (left) semigroup/monoid/group action of `G` on `P` is simply the implementation of
- * a method `actl(g, p)`, or `g |+|> p`, such that:
+ * A (left) semigroup/monoid/group action of `G` on `P` is simply the implementation of a method `actl(g, p)`, or `g
+ * |+|> p`, such that:
  *
- * 1. `(g |+| h) |+|> p === g |+|> (h |+|> p)` for all `g`, `h` in `G` and `p` in `P`.
+ *   1. `(g |+| h) |+|> p === g |+|> (h |+|> p)` for all `g`, `h` in `G` and `p` in `P`.
  *
  * 2. `id |+|> p === p` for all `p` in `P` (if `id` is defined)
  */
@@ -18,10 +18,10 @@ object LeftAction {
 }
 
 /**
- * A (right) semigroup/monoid/group action of `G` on `P` is simply the implementation of
- * a method `actr(p, g)`, or `p <|+| g`, such that:
+ * A (right) semigroup/monoid/group action of `G` on `P` is simply the implementation of a method `actr(p, g)`, or `p
+ * <|+| g`, such that:
  *
- * 1. `p <|+| (g |+| h) === (p <|+| g) <|+| h` for all `g`, `h` in `G` and `p` in `P`.
+ *   1. `p <|+| (g |+| h) === (p <|+| g) <|+| h` for all `g`, `h` in `G` and `p` in `P`.
  *
  * 2. `p <|+| id === p` for all `p` in `P` (if `id` is defined)
  */
@@ -34,12 +34,11 @@ object RightAction {
 }
 
 /**
- * A semigroup/monoid/group action of `G` on `P` is the combination of compatible
- * left and right actions, providing:
+ * A semigroup/monoid/group action of `G` on `P` is the combination of compatible left and right actions, providing:
  *
- *  - the implementation of a method `actl(g, p)`, or `g |+|> p`, such that:
+ *   - the implementation of a method `actl(g, p)`, or `g |+|> p`, such that:
  *
- * 1. `(g |+| h) |+|> p === g |+|> (h |+|> p)` for all `g`, `h` in `G` and `p` in `P`.
+ *   1. `(g |+| h) |+|> p === g |+|> (h |+|> p)` for all `g`, `h` in `G` and `p` in `P`.
  *
  * 2. `id |+|> p === p` for all `p` in `P` (if `id` is defined)
  *

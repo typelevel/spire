@@ -4,15 +4,14 @@ package algebra
 import spire.math.{Integral, SafeLong}
 
 /**
- * A unique factorization domain is a commutative ring in which each element can be written
- * as a product of prime elements and a unit.
+ * A unique factorization domain is a commutative ring in which each element can be written as a product of prime
+ * elements and a unit.
  *
- * Unique factorization domains are GCD rings (or domains), but not necessarily Euclidean
- * domains.
+ * Unique factorization domains are GCD rings (or domains), but not necessarily Euclidean domains.
  *
- * This trait is outside the commutative ring hierarchy, because the factorization algorithms
- * are costly. Another reason: in some cases, a deliberate choice should be made by the user,
- * for example to use probabilistic algorithms with a specified probability of failure.
+ * This trait is outside the commutative ring hierarchy, because the factorization algorithms are costly. Another
+ * reason: in some cases, a deliberate choice should be made by the user, for example to use probabilistic algorithms
+ * with a specified probability of failure.
  */
 trait UniqueFactorizationDomain[@sp(Byte, Short, Int, Long) A] extends Any {
 

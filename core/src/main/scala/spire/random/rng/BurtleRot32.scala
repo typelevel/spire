@@ -9,9 +9,8 @@ import java.lang.Integer.rotateLeft
 // Contributed by Rex Kerr
 
 /**
- * Bit-mixing random number generator based on rotations from Bob
- * Burtle.  Maintains 16 bytes of state information.  Algorithm from
- * [[http://burtleburtle.net/bob/rand/]]
+ * Bit-mixing random number generator based on rotations from Bob Burtle. Maintains 16 bytes of state information.
+ * Algorithm from [[http://burtleburtle.net/bob/rand/]]
  */
 abstract class BurtleRot32(_a: Int, _b: Int, _c: Int, _d: Int) extends IntBasedGenerator {
   protected var a = _a
@@ -67,10 +66,8 @@ abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, A
 }
 
 /**
- * Bit-mixing random number generator based on rotations from Bob
- * Burtle.  Maintains 16 bytes of state information.  Good speed and
- * randomness (see `Burtle3rot` for better randomness).  Algorithm
- * from [[http://burtleburtle.net/bob/rand/]]
+ * Bit-mixing random number generator based on rotations from Bob Burtle. Maintains 16 bytes of state information. Good
+ * speed and randomness (see `Burtle3rot` for better randomness). Algorithm from [[http://burtleburtle.net/bob/rand/]]
  */
 final class BurtleRot2(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_a, _b, _c, _d) {
   protected def advance: Unit = {
@@ -89,10 +86,9 @@ object BurtleRot2 extends BurtleCompanion[BurtleRot2] {
 }
 
 /**
- * Bit-mixing random number generator based on rotations from Bob
- * Burtle.  Maintains 16 bytes of state information.  Decent speed and
- * very good randomness (see `Burtle2rot` for better speed).
- * Algorithm from [[http://burtleburtle.net/bob/rand/]]
+ * Bit-mixing random number generator based on rotations from Bob Burtle. Maintains 16 bytes of state information.
+ * Decent speed and very good randomness (see `Burtle2rot` for better speed). Algorithm from
+ * [[http://burtleburtle.net/bob/rand/]]
  */
 final class BurtleRot3(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_a, _b, _c, _d) {
   protected def advance: Unit = {

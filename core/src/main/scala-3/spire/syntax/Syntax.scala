@@ -71,7 +71,9 @@ trait AdditiveSemigroupSyntax:
     new LiteralDoubleAdditiveSemigroupOps(lhs)
 
 trait AdditiveMonoidSyntax extends AdditiveSemigroupSyntax:
-  implicit def additiveMonoidOps[A](a: A)(implicit ev: AdditiveMonoid[A]): AdditiveMonoidOps[A] = new AdditiveMonoidOps(a)
+  implicit def additiveMonoidOps[A](a: A)(implicit ev: AdditiveMonoid[A]): AdditiveMonoidOps[A] = new AdditiveMonoidOps(
+    a
+  )
 
 trait AdditiveGroupSyntax extends AdditiveMonoidSyntax:
   implicit def additiveGroupOps[A: AdditiveGroup](a: A): AdditiveGroupOps[A] = new AdditiveGroupOps(a)
@@ -237,27 +239,27 @@ trait LiteralsSyntax {
 
   extension (inline ctx: StringContext)
     inline def b(inline parts: Any*): Byte =
-      ${ byte('{ctx}) }
+      ${ byte('{ ctx }) }
 
     inline def h(inline parts: Any*): Short =
-      ${ short('{ctx}) }
+      ${ short('{ ctx }) }
 
     inline def ub(inline parts: Any*): UByte =
-      ${ ubyte('{ctx}) }
+      ${ ubyte('{ ctx }) }
 
     inline def uh(inline parts: Any*): UShort =
-      ${ ushort('{ctx}) }
+      ${ ushort('{ ctx }) }
 
     inline def ui(inline parts: Any*): UInt =
-      ${ uint('{ctx}) }
+      ${ uint('{ ctx }) }
 
     inline def ul(inline parts: Any*): ULong =
-      ${ ulong('{ctx}) }
+      ${ ulong('{ ctx }) }
 
     inline def r(inline parts: Any*): Rational =
-      ${ rational('{ctx}) }
+      ${ rational('{ ctx }) }
 
-  extension(ctx: StringContext)
+  extension (ctx: StringContext)
     def poly(args: Any*): Polynomial[Rational] =
       val sb = new StringBuilder
       val lits = ctx.parts.iterator
@@ -267,7 +269,7 @@ trait LiteralsSyntax {
       // literal parts. we want to intersperse them in the order they
       // were seen.
       sb.append(lits.next())
-      while (vars.hasNext)
+      while vars.hasNext do
         sb.append(vars.next())
         sb.append(lits.next())
       Polynomial(sb.toString)
@@ -275,44 +277,44 @@ trait LiteralsSyntax {
   object si:
     extension (inline ctx: StringContext)
       inline def i(inline parts: Any*): Int =
-        ${ siInt('{ctx}) }
+        ${ siInt('{ ctx }) }
 
       inline def j(inline parts: Any*): Long =
-        ${ siLong('{ctx}) }
+        ${ siLong('{ ctx }) }
 
       inline def big(inline parts: Any*): BigInt =
-        ${ siBigInt('{ctx}) }
+        ${ siBigInt('{ ctx }) }
 
       inline def dec(inline parts: Any*): BigDecimal =
-        ${ siBigDecimal('{ctx}) }
+        ${ siBigDecimal('{ ctx }) }
 
   object us:
     extension (inline ctx: StringContext)
       inline def i(inline parts: Any*): Int =
-        ${ usInt('{ctx}) }
+        ${ usInt('{ ctx }) }
 
       inline def j(inline parts: Any*): Long =
-        ${ usLong('{ctx}) }
+        ${ usLong('{ ctx }) }
 
       inline def big(inline parts: Any*): BigInt =
-        ${ usBigInt('{ctx}) }
+        ${ usBigInt('{ ctx }) }
 
       inline def dec(inline parts: Any*): BigDecimal =
-        ${ usBigDecimal('{ctx}) }
+        ${ usBigDecimal('{ ctx }) }
 
   object eu:
     extension (inline ctx: StringContext)
       inline def i(inline parts: Any*): Int =
-        ${ euInt('{ctx}) }
+        ${ euInt('{ ctx }) }
 
       inline def j(inline parts: Any*): Long =
-        ${ euLong('{ctx}) }
+        ${ euLong('{ ctx }) }
 
       inline def big(inline parts: Any*): BigInt =
-        ${ euBigInt('{ctx}) }
+        ${ euBigInt('{ ctx }) }
 
       inline def dec(inline parts: Any*): BigDecimal =
-        ${ euBigDecimal('{ctx}) }
+        ${ euBigDecimal('{ ctx }) }
 
 }
 

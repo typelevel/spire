@@ -223,11 +223,9 @@ class RationalSuite extends munit.FunSuite {
   }
 
   /**
-   * Finds the closest `Rational` to `a` whose denominator is no greater than
-   * `limit` by brute-force. This is used to compare with the version used by
-   * `Rational` which is a little harder to reason about. This just literally
-   * tries every denominator between 1 and `limit` and returns the `Rational`
-   * that was closest to `a`.
+   * Finds the closest `Rational` to `a` whose denominator is no greater than `limit` by brute-force. This is used to
+   * compare with the version used by `Rational` which is a little harder to reason about. This just literally tries
+   * every denominator between 1 and `limit` and returns the `Rational` that was closest to `a`.
    */
   def bruteForceLimitDen(a: Rational, limit: Int): Rational =
     (1 to limit)

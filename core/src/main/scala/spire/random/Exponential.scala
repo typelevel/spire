@@ -4,8 +4,7 @@ package random
 trait Exponential[@sp(Float, Double) A] extends Any {
 
   /**
-   * Return an `A` that has an exponential distribution from 0, with
-   * the given `rate` parameter.
+   * Return an `A` that has an exponential distribution from 0, with the given `rate` parameter.
    */
   def apply(rate: A): Dist[A]
 }

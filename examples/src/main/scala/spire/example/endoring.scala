@@ -17,9 +17,8 @@ object EndoRingExample extends App {
     }
 
     /**
-     * This turns the group of Sets under union into an abelian group by
-     * keeping track of the inclusions and exclusions separately. This let's
-     * us ensure it is commutative and that we always have an inverse.
+     * This turns the group of Sets under union into an abelian group by keeping track of the inclusions and exclusions
+     * separately. This let's us ensure it is commutative and that we always have an inverse.
      */
     implicit def PairedSetAbGroup[A]: AbGroup[(Set[A], Set[A])] = new AbGroup[(Set[A], Set[A])] {
       def combine(a: (Set[A], Set[A]), b: (Set[A], Set[A])): (Set[A], Set[A]) = {
@@ -39,9 +38,8 @@ object EndoRingExample extends App {
   type Endo[A] = A => A
 
   /**
-   * Toy example of a non-numeric Ring. This constructs the endomorphism ring
-   * for an abelian group `ab`. This defines addition as group addition after
-   * applying the endomorphism and multiplication as composition.
+   * Toy example of a non-numeric Ring. This constructs the endomorphism ring for an abelian group `ab`. This defines
+   * addition as group addition after applying the endomorphism and multiplication as composition.
    */
   class EndoRing[A: AbGroup] extends Ring[Endo[A]] {
     def plus(f: Endo[A], g: Endo[A]): Endo[A] = a => f(a) |+| g(a)

@@ -6,10 +6,9 @@ import java.lang.Math
 import spire.algebra.Order
 
 /**
- * This provides orderings (Order and Eq) for Float and Double that have
- * a total order. Specifically, this will order NaN's consistently, rather
- * than having their order be undefined. However, this won't be as fast as
- * the default ordering.
+ * This provides orderings (Order and Eq) for Float and Double that have a total order. Specifically, this will order
+ * NaN's consistently, rather than having their order be undefined. However, this won't be as fast as the default
+ * ordering.
  */
 object totalfloat {
   trait TotalFloatOrder extends Order[Float] {

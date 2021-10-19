@@ -2,22 +2,21 @@ package spire
 package algebra
 
 /**
- * A left module is a generalization of a vector space over a field, where
- * the scalars are the elements of a ring (not necessarily commutative).
+ * A left module is a generalization of a vector space over a field, where the scalars are the elements of a ring (not
+ * necessarily commutative).
  *
- * A left module has left multiplication by scalars. Let V be an abelian group
- * (with additive notation) and R the scalar ring, we have the following laws
- * for x, y in V and r, s in R:
+ * A left module has left multiplication by scalars. Let V be an abelian group (with additive notation) and R the scalar
+ * ring, we have the following laws for x, y in V and r, s in R:
  *
- * 1. r *: (x + y) = r *: x + r *: y
- * 2. (r + s) *: x = r *: x + s *: x
- * 3. (r * s) *: x = r *: (s *: x)
- * 4. R.one * x = x
+ *   1. r *: (x + y) = r *: x + r *: y 2. (r + s) *: x = r *: x + s *: x 3. (r * s) *: x = r *: (s *: x) 4. R.one * x =
+ *      x
  *
  * (see https://en.wikipedia.org/wiki/Module_(mathematics) )
  *
- * @tparam V Abelian group type
- * @tparam R Scalar type
+ * @tparam V
+ *   Abelian group type
+ * @tparam R
+ *   Scalar type
  */
 trait LeftModule[V, @sp(Int, Long, Float, Double) R] extends Any with AdditiveAbGroup[V] {
   implicit def scalar: Ring[R] // note: we require a ring with identity (see https://arxiv.org/pdf/1404.0135.pdf)
@@ -30,20 +29,19 @@ object LeftModule {
 }
 
 /**
- * A right module is a generalization of a vector space over a field, where
- * the scalars are the elements of a ring (not necessarily commutative).
+ * A right module is a generalization of a vector space over a field, where the scalars are the elements of a ring (not
+ * necessarily commutative).
  *
- * A right module has right multiplication by scalars. Let V be an abelian group
- * (with additive notation) and R the scalar ring, we have the following laws
- * for x, y in V and r, s in R:
+ * A right module has right multiplication by scalars. Let V be an abelian group (with additive notation) and R the
+ * scalar ring, we have the following laws for x, y in V and r, s in R:
  *
- * 1. (x + y) :* r = x :* r + y :* r
- * 2. x :* (r + s) = x :* r + x :* s
- * 3. x :* (r * s) = (x :* r) :* s
- * 4. x :* R.one = x
+ *   1. (x + y) :* r = x :* r + y :* r 2. x :* (r + s) = x :* r + x :* s 3. x :* (r * s) = (x :* r) :* s 4. x :* R.one =
+ *      x
  *
- * @tparam V Abelian group type
- * @tparam R Scalar type
+ * @tparam V
+ *   Abelian group type
+ * @tparam R
+ *   Scalar type
  */
 trait RightModule[V, @sp(Int, Long, Float, Double) R] extends Any with AdditiveAbGroup[V] {
   implicit def scalar: Ring[R] // note: we require a ring with identity (see https://arxiv.org/pdf/1404.0135.pdf)
@@ -64,8 +62,10 @@ object RightModule {
  *
  * 6. (r *: x) :* s = r *: (x :* s)
  *
- * @tparam V Abelian group type
- * @tparam R Scalar type
+ * @tparam V
+ *   Abelian group type
+ * @tparam R
+ *   Scalar type
  */
 trait CModule[V, @sp(Int, Long, Float, Double) R] extends Any with LeftModule[V, R] with RightModule[V, R] {
   implicit def scalar: CRing[R]

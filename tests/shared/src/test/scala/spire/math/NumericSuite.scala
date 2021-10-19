@@ -9,10 +9,10 @@ import java.math.MathContext
 class NumericSuite extends munit.FunSuite {
 
   /**
-   * We use this function to avoid duplicating our tests for all the different
-   * A's that we want to test. We expect the actual values to be:
+   * We use this function to avoid duplicating our tests for all the different A's that we want to test. We expect the
+   * actual values to be:
    *
-   *   a=-3  b=3  c=9
+   * a=-3 b=3 c=9
    */
   def runWith[@sp A: Numeric: ClassTag](cls: String)(a: A, b: A, c: A): Unit = {
 

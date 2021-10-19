@@ -6,8 +6,7 @@ import org.scalacheck.Arbitrary
 /**
  * Represents a primitive value `a: A` along with its shadow `s: S`.
  *
- * The shadow is a type S isomorphic to the primitive type A
- * in the range where A is defined.
+ * The shadow is a type S isomorphic to the primitive type A in the range where A is defined.
  */
 case class Shadow[A, S](a: A, s: S)
 

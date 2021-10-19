@@ -13,11 +13,9 @@ import spire.syntax.std.seq._
 sealed trait RootIsolator[A] {
 
   /**
-   * Isolates the roots of the [[Rational]] polynomial `poly`. This returns a
-   * sequence of intervals that each contain a single root of `poly`. A root
-   * will appear in the sequence as many times as its multiplicity in the
-   * polynomial. Other than this, all root intervals are disjoint and are
-   * either open on both ends or is a single point.
+   * Isolates the roots of the [[Rational]] polynomial `poly`. This returns a sequence of intervals that each contain a
+   * single root of `poly`. A root will appear in the sequence as many times as its multiplicity in the polynomial.
+   * Other than this, all root intervals are disjoint and are either open on both ends or is a single point.
    */
   def isolateRoots(poly: Polynomial[A]): Vector[Interval[Rational]]
 }
@@ -42,10 +40,9 @@ object RootIsolator {
   /**
    * An implementation of the VAS real root isolation algorithm.
    *
-   * See "A Comparative Study of Two Real Root Isolation Methods" for the paper
-   * that originally presented the method implemented here, and "Complexity
-   * Analysis of Algorithms in Algebraic Computation" by Vikram Sharma which
-   * goes into greater detail.
+   * See "A Comparative Study of Two Real Root Isolation Methods" for the paper that originally presented the method
+   * implemented here, and "Complexity Analysis of Algorithms in Algebraic Computation" by Vikram Sharma which goes into
+   * greater detail.
    */
   final private def VAS(poly: Polynomial[BigInt]): Vector[Interval[Rational]] = {
 

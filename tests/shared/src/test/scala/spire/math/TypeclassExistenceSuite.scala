@@ -5,8 +5,7 @@ import spire.algebra._
 import spire.implicits._
 
 /**
- * Just some sanity tests to make sure that the type classes we expect to exist
- * actually do exist.
+ * Just some sanity tests to make sure that the type classes we expect to exist actually do exist.
  */
 class TypeclassExistenceSuite extends munit.FunSuite {
 

@@ -11,7 +11,7 @@ import spire.math._
 import spire.optional.Perm
 import spire.optional.partialIterable._
 
-import spire.implicits.{SeqOrder => _, SeqEq => _, ArrayOrder => _, ArrayEq => _, MapEq => _, MapGroup => _, _}
+import spire.implicits.{ArrayEq => _, ArrayOrder => _, MapEq => _, MapGroup => _, SeqEq => _, SeqOrder => _, _}
 
 import org.scalacheck.Arbitrary._
 

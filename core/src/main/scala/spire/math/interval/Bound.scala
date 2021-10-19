@@ -163,13 +163,12 @@ case class Closed[A](a: A) extends ValueBound[A] {
 }
 
 /**
- * Companion object for open/closed bounds, used to construct intervals from
- * a set of bounds.
+ * Companion object for open/closed bounds, used to construct intervals from a set of bounds.
  *
  * In the comments, we write
  *
- * - [v, (v or ?v when the bound is interpreted as a lower bound,
- * - v], v), v? when the bound is interpreted as an upper bound.
+ *   - [v, (v or ?v when the bound is interpreted as a lower bound,
+ *   - v], v), v? when the bound is interpreted as an upper bound.
  *
  * The symbols [], (), ? correspond to closed, open or unknown bounds.
  */
@@ -470,9 +469,7 @@ object ValueBound {
     }
 
   /**
-   * Returns the interval which contains all the given bounds.
-   * *
-   * Assumption: v1.a < v2.a.
+   * Returns the interval which contains all the given bounds. * Assumption: v1.a < v2.a.
    */
   @inline def union4_1less2[A: Order](v1: ValueBound[A],
                                       v2: ValueBound[A],
