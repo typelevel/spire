@@ -39,7 +39,7 @@ ThisBuild / githubWorkflowArtifactUpload := false
 ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8", "adopt@1.11", "adopt@1.16")
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep
-    .Sbt(List("scalafmtCheckAll", "scalafmtSbtCheck"), name = Some("Check formatting")),
+    .Sbt(List("headerCheckAll", "scalafmtCheckAll", "scalafmtSbtCheck"), name = Some("Check headers+formatting")),
   WorkflowStep.Sbt(List("Test/compile"), name = Some("Compile")),
   WorkflowStep.Sbt(List("test"), name = Some("Run tests")),
   WorkflowStep.Sbt(List("doc"), name = Some("Build docs"))
