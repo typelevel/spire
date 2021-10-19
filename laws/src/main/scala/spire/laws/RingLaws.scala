@@ -16,9 +16,10 @@ object RingLaws {
   def apply[A: Eq: Arbitrary](implicit _pred: Predicate[A]) = new RingLaws[A] {
     def Arb = implicitly[Arbitrary[A]]
     def pred = _pred
+    override def Equ = super.Equ // To remove the implicit modifier
     val nonZeroLaws = new GroupLaws[A] {
       def Arb = Arbitrary(arbitrary[A].filter(_pred))
-      def Equ: Eq[A] = Eq[A]
+      def Equ: Eq[A] = implicitly[Eq[A]]
     }
   }
 }
