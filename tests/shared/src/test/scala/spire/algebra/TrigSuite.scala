@@ -2,7 +2,7 @@ package spire
 package algebra
 
 import spire.math._
-import spire.implicits.DoubleAlgebra
+import spire.implicits._
 
 class TrigSuite extends munit.FunSuite {
 

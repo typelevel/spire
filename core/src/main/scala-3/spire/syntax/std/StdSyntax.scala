@@ -10,7 +10,6 @@ import spire.syntax.field._
 import spire.syntax.nroot._
 import spire.syntax.signed._
 
-
 trait IntSyntax:
   extension(lhs: Int)
     def /~(rhs: Int): Int = lhs / rhs
@@ -76,12 +75,10 @@ trait BigIntSyntax:
     def /%(rhs: Number): (Number, Number) = Number(lhs).equotmod(rhs)
 end BigIntSyntax
 
-trait ArraySyntax {
+trait ArraySyntax:
   implicit def arrayOps[@sp A](lhs: Array[A]): ArrayOps[A] = new ArrayOps(lhs)
-}
 
-trait SeqSyntax {
+trait SeqSyntax:
   implicit def seqOps[@sp A, CC[A] <: Iterable[A]](lhs: CC[A]): SeqOps[A, CC] = new SeqOps[A, CC](lhs)
   implicit def indexedSeqOps[@sp A, CC[A] <: IndexedSeq[A]](lhs: CC[A]): IndexedSeqOps[A, CC] =
     new IndexedSeqOps[A, CC](lhs)
-}

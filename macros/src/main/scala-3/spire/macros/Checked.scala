@@ -85,7 +85,6 @@ object Checked:
                   if (z == ${numLimit}) $fallback else -z
               }.asTerm.changeOwner(owner)
             else super.transformTerm(tree)(owner)
-            // NOTE I couldn't find a way to unify the long and int branches. Suggestions are welcome
           case Apply(Select(x, "*"), List(y)) =>
             val isInt = isIntType(x.asExpr) && isIntType(y.asExpr)
             val isLong = isLongType(x.asExpr) || isLongType(y.asExpr)

@@ -1,7 +1,7 @@
 package spire
 package benchmark
 
-import spire.syntax.std.long._
+import spire.implicits._
 
 object LongRational {
   val Zero = new LongRational(0, 1)

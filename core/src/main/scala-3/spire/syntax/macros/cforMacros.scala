@@ -1,4 +1,3 @@
-
 package spire.syntax.macros
 
 import quoted._
@@ -29,9 +28,7 @@ def fastForRangeMacroLong(r: Expr[NumericRange[Long]], body: Expr[Long => Unit])
   import quotes._
   import quotes.reflect.*
 
-  def strideUpUntil(fromExpr: Expr[Long], untilExpr: Expr[Long], stride: Expr[Long]): Expr[Unit] =
-
-    '{
+  def strideUpUntil(fromExpr: Expr[Long], untilExpr: Expr[Long], stride: Expr[Long]): Expr[Unit] = '{
     var index = $fromExpr
     val limit = $untilExpr
     val body0 = $body
@@ -67,24 +64,20 @@ def fastForRangeMacroLong(r: Expr[NumericRange[Long]], body: Expr[Long => Unit])
   r match
     case '{ ($i: Long) until $j } => strideUpUntil(i,j,Expr(1L))
     case '{ ($i: Long) to $j }    => strideUpTo(i,j,Expr(1L))
-
     case '{ ($i: Long) until $j by $step } =>
       step.asTerm match {
         case Literal(LongConstant(k)) if k  > 0 => strideUpUntil(i,j,Expr(k))
         case Literal(LongConstant(k)) if k  < 0 => strideDownUntil(i,j,Expr(-k))
         case Literal(LongConstant(k)) if k == 0 => report.error("zero stride", step); '{}
-
         case _ =>
           report.warning(s"defaulting to foreach, can not optimise non-constant step", step)
           '{ val b = $body; $r.foreach(b) }
       }
-
     case '{ ($i: Long) to $j by $step } =>
       step.asTerm match {
         case Literal(LongConstant(k)) if k  > 0 => strideUpTo(i,j,Expr(k))
         case Literal(LongConstant(k)) if k  < 0 => strideDownTo(i,j,Expr(-k))
         case Literal(LongConstant(k)) if k == 0 => report.error("zero stride", step); '{}
-
         case _ =>
           report.warning(s"defaulting to foreach, can not optimise non-constant step", step)
           '{ val b = $body; $r.foreach(b) }
@@ -100,8 +93,7 @@ def fastForRangeMacro(r: Expr[Range], body: Expr[Int => Unit])(using quotes: Quo
   import quotes._
   import quotes.reflect._
 
-  def strideUpUntil(fromExpr: Expr[Int], untilExpr: Expr[Int], stride: Expr[Int]): Expr[Unit] =
-    '{
+  def strideUpUntil(fromExpr: Expr[Int], untilExpr: Expr[Int], stride: Expr[Int]): Expr[Unit] = '{
       var index = $fromExpr
       val limit = $untilExpr
       while (index < limit) {
@@ -137,29 +129,24 @@ def fastForRangeMacro(r: Expr[Range], body: Expr[Int => Unit])(using quotes: Quo
   r match
     case '{ ($i: Int) until $j } => strideUpUntil(i,j,Expr(1))
     case '{ ($i: Int) to $j }    => strideUpTo(i,j,Expr(1))
-
     case '{ ($i: Int) until $j by $step } =>
       step.asTerm match {
         case Literal(IntConstant(k)) if k  > 0 => strideUpUntil(i,j,Expr(k))
         case Literal(IntConstant(k)) if k  < 0 => strideDownUntil(i,j,Expr(-k))
         case Literal(IntConstant(k)) if k == 0 => report.error("zero stride", step); '{}
-
         case _ =>
           report.warning(s"defaulting to foreach, can not optimise non-constant step", step)
           '{ val b = $body; $r.foreach(b) }
       }
-
     case '{ ($i: Int) to $j by $step } =>
       step.asTerm match {
         case Literal(IntConstant(k)) if k  > 0 => strideUpTo(i,j,Expr(k))
         case Literal(IntConstant(k)) if k  < 0 => strideDownTo(i,j,Expr(-k))
         case Literal(IntConstant(k)) if k == 0 => report.error("zero stride", step); '{}
-
         case _ =>
           report.warning(s"defaulting to foreach, can not optimise non-constant step", step)
           '{ val b = $body; $r.foreach(b) }
       }
-
     case _ =>
       report.warning(s"defaulting to foreach, can not optimise range expression", r)
       '{ val b = $body; $r.foreach(b) }

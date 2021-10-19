@@ -200,7 +200,7 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
   // sample1("sample1 negate")(x => -x)
   // sample1("sample1 +")(x => x + x)
   // sample1("sample1 *")(x => x * x)
-  // sample1("sample1 sqrt")(_.sqrt)
+  // sample1("sample1 sqrt")(_.sqrt())
   // sample1("sample1 pow(2)")(_.pow(2))
 
   def arcSample(f: Rational => Rational)(g: Double => Double, h: Real => Real): String =

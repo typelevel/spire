@@ -234,10 +234,9 @@ class ScalaVsSpireBenchmarks {
     while (i < len) { cs(i) = gcdGeneric(as(i), bs(i)); i += 1 }
   }
 
-  @tailrec final def gcdSpire[@sp(Int) A](a: A, b: A)(implicit ev1: EuclideanRing[A], ev2: Eq[A]): A = {
-    import spire.syntax.euclideanRing._
-    import spire.syntax.eq._
-    if ((a.emod(b)) === ev1.zero) b else gcdSpire(b, a.emod(b))
+  @tailrec final def gcdSpire[@sp(Int) A](a: A, c: A)(implicit ev1: EuclideanRing[A], ev2: Eq[A]): A = {
+    import spire.implicits._
+    if ((a.emod(c)) === ev1.zero) c else gcdSpire(c, a.emod(c))
   }
 
   def doGcdSpire[@sp(Int) A: EuclideanRing: Eq](as: Array[A], bs: Array[A], cs: Array[A]): Unit = {

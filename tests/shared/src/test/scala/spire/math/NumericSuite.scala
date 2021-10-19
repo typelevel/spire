@@ -1,7 +1,6 @@
 package spire
 package math
 
-// we need to disable our own === to avoid messing up ScalaTest.
 import spire.implicits._
 
 import java.math.MathContext
