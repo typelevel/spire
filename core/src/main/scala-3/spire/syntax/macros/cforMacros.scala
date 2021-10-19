@@ -8,7 +8,7 @@ import spire.syntax.fastFor.{RangeElem, RangeLike}
 inline def fastForInline[R](init: R, test: R => Boolean, next: R => R, body: R => Unit): Unit =
   var index = init
   while (test(index))
-  body(index)
+    body(index)
   index = next(index)
 
 def fastForRangeMacroGen[R <: RangeLike: Type](r: Expr[R], body: Expr[RangeElem[R] => Unit])(using
