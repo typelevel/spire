@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math.prime
 
@@ -6,21 +21,16 @@ import SieveUtil._
 /**
  * Simple heap implementation for storing Factors.
  *
- * The heap can hold at most ~2B items, which means we can't store
- * more than this many prime factors.
+ * The heap can hold at most ~2B items, which means we can't store more than this many prime factors.
  *
- * Note that "fast factors" don't end up in this heap, so the number
- * of primes we can sieve is actaully the max heap size + the number
- * of fast factors.
+ * Note that "fast factors" don't end up in this heap, so the number of primes we can sieve is actaully the max heap
+ * size + the number of fast factors.
  *
- * The sieve implementation itself uses a cutoff, so to test primality
- * of numbers <= K, we need to be able to store prime factors up to
- * sqrt(K) in our heap. Since our heap can hold ~2B prime factors,
- * this means the theoretical upper bound on our segmented sieve is
- * (~2Bth prime)^2.
+ * The sieve implementation itself uses a cutoff, so to test primality of numbers <= K, we need to be able to store
+ * prime factors up to sqrt(K) in our heap. Since our heap can hold ~2B prime factors, this means the theoretical upper
+ * bound on our segmented sieve is (~2Bth prime)^2.
  *
- * In practice the sieve will slow down to the point of not being
- * useful far before we could reach this limit.
+ * In practice the sieve will slow down to the point of not being useful far before we could reach this limit.
  */
 class FactorHeap {
 

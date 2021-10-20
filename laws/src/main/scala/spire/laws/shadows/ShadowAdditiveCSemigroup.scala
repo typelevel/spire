@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire.laws.shadows
 
 import spire.algebra.{AdditiveCSemigroup, AdditiveSemigroup}
@@ -21,7 +36,7 @@ trait ShadowAdditiveCSemigroup[A, S] extends AdditiveCSemigroup[Shadow[A, S]] {
     (aO, sO) match {
       case (Some(a), Some(s)) => Some(Shadow(a, checked(s)))
       case (None, None)       => None
-      case _                  => throw new IllegalArgumentException("Inconsistent results for trySum between primitive and shadow type")
+      case _ => throw new IllegalArgumentException("Inconsistent results for trySum between primitive and shadow type")
     }
   }
 }

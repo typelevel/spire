@@ -1,8 +1,8 @@
-/**
+/*
  * **********************************************************************\
  * * Project                                                              **
  * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
  * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
  * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
  * *   ____/ / / /      / /   / / | |   / /__                             **
@@ -19,14 +19,15 @@ package random
 /**
  * This is a Scala implementation of the Ziggurat algorithm for generating random variables from decreasing densities.
  *
- * <p><b>Reference: </b>
- * George Marsaglia, Wai Wan Tsang:
- * "The Ziggurat Method for Generating Random Variables"
+ * <p><b>Reference: </b> George Marsaglia, Wai Wan Tsang: "The Ziggurat Method for Generating Random Variables"
  * <i>Journal of Statistical Software,</i> Vol. 5, Issue 8, October 2000.
  *
- * @see <a href="http://www.jstatsoft.org/v05/i08">Ziggurat Paper</a>
- * @see <a href="http://en.wikipedia.org/wiki/Ziggurat_algorithm">Ziggurat algorithm @ Wikipedia</a>
- * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
+ * @see
+ *   <a href="http://www.jstatsoft.org/v05/i08">Ziggurat Paper</a>
+ * @see
+ *   <a href="http://en.wikipedia.org/wiki/Ziggurat_algorithm">Ziggurat algorithm @ Wikipedia</a>
+ * @author
+ *   <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
  */
 object Ziggurat {
 
@@ -67,15 +68,16 @@ object Ziggurat {
     var hz = hza
     var iz = iza
 
-    @tailrec def loop(): Double = {
+    @tailrec def loop: Double = {
       x = hz * wn(iz)
 
       if (iz == 0) {
-        do {
+        while ({
           x = -log(g.nextDouble()) * r1
           y = -log(g.nextDouble())
-        } while (y + y < x * x)
-        return if (hz > 0) r + x else -r - x
+          (y + y < x * x)
+        })
+          return if (hz > 0) r + x else -r - x
       }
 
       if (fn(iz) + g.nextDouble() * (fn(iz - 1) - fn(iz)) < exp(-.5 * x * x)) return x
@@ -84,10 +86,10 @@ object Ziggurat {
       iz = hz & 127
       if (abs(hz) < kn(iz)) return hz * wn(iz)
 
-      loop()
+      loop
     }
 
-    loop()
+    loop
   }
 
   private def efix(g: Generator, jza: Long, iza: Int): Double = {
@@ -95,7 +97,7 @@ object Ziggurat {
     var jz = jza
     var iz = iza
 
-    @tailrec def loop(): Double = {
+    @tailrec def loop: Double = {
       if (iz == 0) return 7.697117470131487 - log(g.nextDouble())
       val x = jz * we(iz)
 
@@ -105,10 +107,10 @@ object Ziggurat {
       iz = (jz & 255).toInt
       if (jz < ke(iz)) return jz * we(iz)
 
-      loop()
+      loop
     }
 
-    loop()
+    loop
   }
 
   {

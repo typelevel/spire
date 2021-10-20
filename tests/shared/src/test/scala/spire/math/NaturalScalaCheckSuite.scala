@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -60,19 +75,19 @@ class NaturalScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   property("x.toString") {
-    forAll { x: N =>
+    forAll { (x: N) =>
       Natural(x.num).toString == x.num.toString
     }
   }
 
   property("x.toBigInt") {
-    forAll { x: N =>
+    forAll { (x: N) =>
       Natural(x.num).toBigInt == x.num
     }
   }
 
   property("x.toLong") {
-    forAll { x: N =>
+    forAll { (x: N) =>
       Natural(x.num).toLong == x.num.toLong
     }
   }

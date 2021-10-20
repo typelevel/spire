@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -21,7 +36,7 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("pi") { Real.pi.getString(200) == pi200 }
   property("e") { Real.e.getString(200) == e200 }
-  property("sqrt(2)") { Real(2).sqrt().getString(200) == sqrtTwo200 }
+  property("sqrt(2)") { Real(2).sqrt.getString(200) == sqrtTwo200 }
 
   property("Rational(n) = Real(n).toRational") {
     forAll { (n: BigInt) =>
@@ -103,29 +118,29 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("x.pow(k).nroot(k) = x") {
     forAll { (x0: Real, k: Sized[Int, _1, _10]) =>
-      val x = x0.abs()
+      val x = x0.abs
       x.pow(k.num).nroot(k.num) == x
     }
   }
 
   property("x.nroot(k).pow(k) = x") {
     forAll { (x0: Real, k: Sized[Int, _1, _10]) =>
-      val x = x0.abs()
+      val x = x0.abs
       x.nroot(k.num).pow(k.num) == x
     }
   }
 
   property("x.nroot(-k).pow(-k) = x") {
     forAll { (x0: NonZero[Real], k: Sized[Int, _1, _10]) =>
-      val x = x0.num.abs()
+      val x = x0.num.abs
       x.nroot(-k.num).pow(-k.num) == x
     }
   }
 
   property("pythagorean theorem") {
     forAll { (y: Real, x: Real) =>
-      (x.signum() != 0 || y.signum() != 0) ==> {
-        val mag = (x.pow(2) + y.pow(2)).sqrt()
+      (x.signum != 0 || y.signum != 0) ==> {
+        val mag = (x.pow(2) + y.pow(2)).sqrt
         val x0 = x / mag
         val y0 = y / mag
         x0.pow(2) + y0.pow(2) == Real(1)
@@ -139,7 +154,7 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
       (xd != 0 && yd != 0 && (xn != 0 || yn != 0)) ==> {
         val x = Real(Rational(xn, xd))
         val y = Real(Rational(yn, yd))
-        val mag = (x ** 2 + y ** 2).sqrt()
+        val mag = (x ** 2 + y ** 2).sqrt
         Real.sin(Real.atan2(y, x)) == (y / mag) &&
         Real.cos(Real.atan2(y, x)) == (x / mag)
       }
@@ -149,18 +164,18 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
   property("x.round = (((x * 2).floor + 1) / 2).floor") {
     forAll { (x0: Rational) =>
       val x = Real(x0)
-      if (x.signum() >= 0) {
-        x.round() == (((x * 2).floor() + 1) / 2).floor()
+      if (x.signum >= 0) {
+        x.round == (((x * 2).floor + 1) / 2).floor
       } else {
-        x.round() == (((x * 2).ceil() - 1) / 2).ceil()
+        x.round == (((x * 2).ceil - 1) / 2).ceil
       }
     }
   }
 
   property("x.floor <= x.round <= x.ceil") {
     forAll { (x: Real) =>
-      x.floor() <= x.round() &&
-      x.round() <= x.ceil()
+      x.floor <= x.round &&
+      x.round <= x.ceil
     }
   }
 
@@ -170,7 +185,7 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
       val re = Real(re0)
       val im = Real(im0)
 
-      val ma = (re.pow(2) + im.pow(2)).sqrt()
+      val ma = (re.pow(2) + im.pow(2)).sqrt
       val ph = Real.atan2(im, re)
 
       val ma2 = ma.pow(2)

@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math.extras.interval
 
@@ -247,23 +262,6 @@ object IntervalSeq {
     def intervalToIntervalSet(i: Interval[Rational]): IntervalSeq[Rational] = apply(i)
     val simpleSets = intervals.map(intervalToIntervalSet)
     simpleSets.foldLeft(empty[Rational])(_ | _)
-  }
-
-  implicit def booleanAlgebra[T: Order] = new Bool[IntervalSeq[T]] with Eq[IntervalSeq[T]] {
-
-    def eqv(x: IntervalSeq[T], y: IntervalSeq[T]) = x == y
-
-    def zero = IntervalSeq.empty[T]
-
-    def one = IntervalSeq.all[T]
-
-    def complement(a: IntervalSeq[T]) = ~a
-
-    def or(a: IntervalSeq[T], b: IntervalSeq[T]) = a | b
-
-    def and(a: IntervalSeq[T], b: IntervalSeq[T]) = a & b
-
-    override def xor(a: IntervalSeq[T], b: IntervalSeq[T]) = a ^ b
   }
 
   private def fromTo[T: Order](a: T, ak: Byte, b: T, bk: Byte) =

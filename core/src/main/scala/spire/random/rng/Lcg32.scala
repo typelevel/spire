@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package random
 package rng
@@ -12,7 +27,7 @@ class Lcg32(seed0: Int) extends IntBasedGenerator {
 
   def copyInit: Lcg32 = new Lcg32(seed)
 
-  def getSeedBytes(): Array[Byte] = Pack.intToBytes(seed)
+  def getSeedBytes: Array[Byte] = Pack.intToBytes(seed)
 
   def setSeedBytes(bytes: Array[Byte]): Unit = seed = Pack.intFromBytes(bytes)
 

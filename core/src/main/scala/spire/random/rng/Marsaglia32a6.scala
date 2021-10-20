@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package random
 package rng
@@ -8,9 +23,8 @@ import java.util.Arrays
 // Contributed by Rex Kerr
 
 /**
- * Marsaglia "Weyl sequence" RNG with cycle length of 2^192^ - 2^32^
- * from [[http://www.jstatsoft.org/v08/i14/paper]]. Quite fast and
- * quite random; requires 24 bytes of state.
+ * Marsaglia "Weyl sequence" RNG with cycle length of 2^192^ - 2^32^ from [[http://www.jstatsoft.org/v08/i14/paper]].
+ * Quite fast and quite random; requires 24 bytes of state.
  */
 class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extends IntBasedGenerator {
   private[this] var x: Int = _x
@@ -43,7 +57,7 @@ class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extend
     d = zs(0)
   }
 
-  override def getSeedBytes(): Array[Byte] = {
+  override def getSeedBytes: Array[Byte] = {
     val bytes = new Array[Byte](24)
     val bb = ByteBuffer.wrap(bytes)
     bb.putInt(x)
@@ -58,12 +72,12 @@ class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extend
   def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < 24) Arrays.copyOf(bytes, 24) else bytes
     val bb = ByteBuffer.wrap(bs)
-    x = bb.getInt()
-    y = bb.getInt()
-    z = bb.getInt()
-    w = bb.getInt()
-    v = bb.getInt()
-    d = bb.getInt()
+    x = bb.getInt
+    y = bb.getInt
+    z = bb.getInt
+    w = bb.getInt
+    v = bb.getInt
+    d = bb.getInt
   }
 
   def nextInt(): Int = {
@@ -81,12 +95,12 @@ class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extend
 object Marsaglia32a6 extends GeneratorCompanion[Marsaglia32a6, Array[Int]] {
   def fromBytes(bytes: Array[Byte]): Marsaglia32a6 = {
     val bb = ByteBuffer.wrap(bytes)
-    val x = bb.getInt()
-    val y = bb.getInt()
-    val z = bb.getInt()
-    val w = bb.getInt()
-    val v = bb.getInt()
-    val d = bb.getInt()
+    val x = bb.getInt
+    val y = bb.getInt
+    val z = bb.getInt
+    val w = bb.getInt
+    val v = bb.getInt
+    val d = bb.getInt
     new Marsaglia32a6(x, y, z, w, v, d)
   }
 

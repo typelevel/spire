@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package example
 
@@ -225,8 +240,7 @@ object CrossValidation {
   case class Result[V, K](input: V, output: K, predicted: K)
 
   /**
-   * Generic cross-validator that can be provided an arbitrary method to score
-   * predictor results.
+   * Generic cross-validator that can be provided an arbitrary method to score predictor results.
    */
   def crossValidate[V, @sp(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
     train: CoordinateSpace[V, F] => List[(V, K)] => (V => K)
@@ -252,8 +266,7 @@ object CrossValidation {
   }
 
   /**
-   * For cross-validating classification, we use the accuracy to score the
-   * predictor.
+   * For cross-validating classification, we use the accuracy to score the predictor.
    */
   def crossValidateClassification[V, @sp(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
     train: CoordinateSpace[V, F] => List[(V, K)] => (V => K)

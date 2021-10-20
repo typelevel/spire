@@ -1,7 +1,22 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
-import spire.implicits.{eqOps => _, _}
+import spire.implicits._
 import spire.laws.arb.{interval => interval_, rational}
 
 import interval.Overlap._
@@ -16,13 +31,13 @@ class IntervalOverlapScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   property("x overlap x = Equal(x, x)") {
-    forAll { x: Interval[Rational] =>
+    forAll { (x: Interval[Rational]) =>
       x.overlap(x) == Equal[Rational]()
     }
   }
 
   property("(x overlap Ø) = Subset(Ø, x) id x != Ø") {
-    forAll { x: Interval[Rational] =>
+    forAll { (x: Interval[Rational]) =>
       (x.nonEmpty) ==> {
         val empty = Interval.empty[Rational]
         x.overlap(empty) == Subset(empty, x)
@@ -63,8 +78,6 @@ class IntervalOverlapScalaCheckSuite extends munit.ScalaCheckSuite {
   property("[a, c] overlap [b, d] = PartialOverlap if a < b <= c < d") {
     forAll { (x: Rational, y: Rational, m: Rational, n: Rational) =>
 
-      import spire.algebra.Order.catsKernelOrderingForOrder
-
       val sorted = List(x, y, m, n).sorted
       (sorted.distinct.size >= 3 && sorted(0) != sorted(1) && sorted(2) != sorted(3)) ==> {
         Interval.closed(sorted(0), sorted(2)).overlap(Interval.closed(sorted(1), sorted(3))) match {
@@ -78,6 +91,7 @@ class IntervalOverlapScalaCheckSuite extends munit.ScalaCheckSuite {
   property("(-inf, a) overlap (b, +inf) = PartialOverlap if a > b") {
     forAll { (x: Rational, y: Rational) =>
       (x != y) ==> {
+        import spire.algebra.Order.catsKernelOrderingForOrder
         Interval.below(max(x, y)).overlap(Interval.above(min(x, y))) match {
           case _: PartialOverlap[_] => true
           case _                    => false

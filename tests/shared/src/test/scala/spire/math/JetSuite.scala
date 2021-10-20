@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -24,8 +39,8 @@ class JetSuite extends munit.FunSuite {
     assertEquals(j.real, 8.9)
     assert(Arrays.equals(j.infinitesimal.toArray, a.toArray))
   }
-  test("Jet() constructor yields a zero jet") {
-    val jz = Jet[Double]()
+  test("Jet constructor yields a zero jet") {
+    val jz = Jet[Double]
     assertEquals(jz.real, 0.0)
     assert(jz.isReal)
     assertEquals(jz.infinitesimal.size, dim.dimension)
@@ -139,8 +154,8 @@ class JetSuite extends munit.FunSuite {
     assertEquals(tj._2, j.infinitesimal)
   }
   test("Signed") {
-    assertEquals(Jet(9.1).signum(), 1)
-    assertEquals(Jet(-3.1, Array(1.0, 2.1, 3.3)).signum(), -1)
+    assertEquals(Jet(9.1).signum, 1)
+    assertEquals(Jet(-3.1, Array(1.0, 2.1, 3.3)).signum, -1)
   }
   test("isWhole iff real and integer") {
     assert(Jet(4.0f).isWhole)

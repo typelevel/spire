@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package std
 
@@ -59,7 +74,7 @@ trait ByteOrder extends Order[Byte] {
 
 trait ByteSigned extends Signed[Byte] with ByteOrder {
   override def signum(a: Byte): Int = java.lang.Integer.signum(a)
-  override def abs(a: Byte): Byte = (if (a < 0) -a else a).toByte
+  override def abs(a: Byte): Byte = if (a < 0) (-a).toByte else a
 }
 
 trait ByteTruncatedDivision extends TruncatedDivisionCRing[Byte] with ByteSigned {

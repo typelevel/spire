@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 package poly
@@ -228,8 +243,8 @@ object PolySparse {
   final def apply[@sp(Double) C: Semiring: Eq: ClassTag](data: IterableOnce[Term[C]]): PolySparse[C] = {
     import spire.scalacompat.arrayBuilderMake
 
-    var expBldr = arrayBuilderMake[Int]()
-    var coeffBldr = arrayBuilderMake[C]()
+    var expBldr = arrayBuilderMake[Int]
+    var coeffBldr = arrayBuilderMake[C]
     val zero = Semiring[C].zero
     var inReverseOrder = true
     var inOrder = true
@@ -255,8 +270,8 @@ object PolySparse {
     } else {
       val indices = Array.range(0, exp.length)
       indices.qsortBy(exp(_))
-      expBldr = arrayBuilderMake[Int]()
-      coeffBldr = arrayBuilderMake[C]()
+      expBldr = arrayBuilderMake[Int]
+      coeffBldr = arrayBuilderMake[C]
       var i = 1
       var j = indices(0)
       var e = exp(j)

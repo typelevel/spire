@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package std
 
@@ -59,7 +74,7 @@ trait ShortOrder extends Order[Short] {
 
 trait ShortSigned extends Signed[Short] with ShortOrder {
   override def signum(a: Short): Int = java.lang.Integer.signum(a)
-  override def abs(a: Short): Short = (if (a < 0) -a else a).toShort
+  override def abs(a: Short): Short = if (a < 0) (-a).toShort else a.toShort
 }
 
 trait ShortTruncatedDivision extends TruncatedDivisionCRing[Short] with ShortSigned {

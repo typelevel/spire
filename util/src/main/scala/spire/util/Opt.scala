@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package util
 
@@ -14,9 +29,8 @@ object Opt {
   // https://hseeberger.wordpress.com/2013/10/04/name-based-extractors-in-scala-2-11/
   def unapply[A](n: Opt[A]): Opt[A] = n
 
-  implicit def Eq[A](implicit ev: Eq[A]): Eq[Opt[A]] = new Eq[Opt[A]] {
-    def eqv(x: Opt[A], y: Opt[A]): Boolean =
-      if (x.isEmpty) y.isEmpty else y.nonEmpty && ev.eqv(x.ref, y.ref)
+  implicit def EqOpt[A](implicit ev: Eq[A]): Eq[Opt[A]] = Eq.instance { case (x, y) =>
+    if (x.isEmpty) y.isEmpty else y.nonEmpty && ev.eqv(x.ref, y.ref)
   }
 }
 

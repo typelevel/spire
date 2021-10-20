@@ -1,20 +1,36 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package algebra
 
 /**
  * EuclideanRing implements a Euclidean domain.
  *
- * The formal definition says that every euclidean domain A has (at
- * least one) euclidean function f: A -> N (the natural numbers) where:
+ * The formal definition says that every euclidean domain A has (at least one) euclidean function f: A -> N (the natural
+ * numbers) where:
  *
- *   (for every x and non-zero y) x = yq + r, and r = 0 or f(r) < f(y).
+ * (for every x and non-zero y) x = yq + r, and r = 0 or f(r) < f(y).
  *
- * This generalizes the Euclidean division of integers, where f represents
- * a measure of length (or absolute value), and the previous equation
- * represents finding the quotient and remainder of x and y. So:
+ * This generalizes the Euclidean division of integers, where f represents a measure of length (or absolute value), and
+ * the previous equation represents finding the quotient and remainder of x and y. So:
  *
+ * {{{
  *   quot(x, y) = q
  *   mod(x, y) = r
+ * }}}
  */
 trait EuclideanRing[@sp(Int, Long, Float, Double) A] extends Any with GCDRing[A] {
   def euclideanFunction(a: A): BigInt

@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -30,7 +45,7 @@ class UByte(val signed: Byte) extends AnyVal with scala.math.ScalaNumericAnyConv
   override def doubleValue: Double = toDouble
 
   override def isWhole: Boolean = true
-  def underlying(): Any = signed
+  def underlying: Any = signed
 
   override def isValidByte: Boolean = signed >= 0
   override def isValidShort: Boolean = true

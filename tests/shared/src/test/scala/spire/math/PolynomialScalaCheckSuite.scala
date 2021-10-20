@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -194,8 +209,7 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
   property("apply(r, 0) = r") {
     forAll { (r: Rational) =>
       val p = Polynomial(r, 0)
-      p == r &&
-      p.## == r.##
+      p.equals(r) && p.## == r.##
     }
   }
 
@@ -208,10 +222,7 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
   def gcdTest(x: Polynomial[Rational], y: Polynomial[Rational]): Prop = {
     (!x.isZero || !y.isZero) ==> {
       val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
-      if (!gcd.isZero) {
-        (x.emod(gcd)) == 0 &&
-        (y.emod(gcd)) == 0
-      }
+      !gcd.isZero && ((x.emod(gcd)).equals(0) && (y.emod(gcd)).equals(0))
     }
   }
 

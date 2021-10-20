@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 package extras
@@ -15,7 +30,7 @@ import org.scalacheck.Prop._
 class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
 
   implicit val arbFixedScale: Arbitrary[FixedScale] =
-    Arbitrary(arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale))
+    Arbitrary(arbitrary[Int].map(_.abs).filter(_ > 0).map(FixedScale.apply))
 
   implicit val arbFixedPoint: Arbitrary[FixedPoint] =
     Arbitrary(arbitrary[Long].map(new FixedPoint(_)))

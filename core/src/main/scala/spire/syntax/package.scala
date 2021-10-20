@@ -1,7 +1,24 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 
 package object syntax {
+  @deprecated("Replaced by fastFor, *please* read fastFor scaladocs for details", "0.18.0")
   object cfor extends CforSyntax
+  object fastFor extends FastForSyntax
   object literals extends LiteralsSyntax
 
   object eq extends EqSyntax
@@ -65,6 +82,7 @@ package object syntax {
 
   object all extends AllSyntax
 
+  @deprecated("Unbound syntax will be removed", "spire 0.18.0")
   object unbound extends UnboundSyntax
 
   object interval extends IntervalSyntax

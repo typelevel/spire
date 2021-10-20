@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package algebra
 package partial
@@ -5,15 +20,16 @@ package partial
 import spire.util.Opt
 
 /**
- * A semigroupoid is any set `A` with a partial binary associative operation (`partialOp`),
- * which is associative in the following sense: if f,g,h are elements of the semigroupoid
- * such that either:
- *   (i) f |+|? g is defined and g |+|? h is defined
- *  (ii) f |+|? g is defined and (f |+|? g).get |+|? h is defined
+ * A semigroupoid is any set `A` with a partial binary associative operation (`partialOp`), which is associative in the
+ * following sense: if f,g,h are elements of the semigroupoid such that either:
+ * {{{
+ * (i) f |+|? g is defined and g |+|? h is defined
+ * (ii) f |+|? g is defined and (f |+|? g).get |+|? h is defined
  * (iii) g |+|? h is defined and f |+|? (g |+|? h).get is defined
  *
- * then all of f |+|? g, g |+|? h, (f |+|? g).get |+|? h, f |+|? (g |+|? h).get
- * are defined and ((f |+|? g).get |+|? h).get = (f |+|? (g |+|? h).get).get
+ * then all of f |+|? g, g |+|? h, (f |+|? g).get |+|? h, f |+|? (g |+|? h).get are defined and
+ * ((f |+|? g).get |+|?  h).get = (f |+|? (g |+|? h).get).get
+ * }}}
  */
 trait Semigroupoid[A] extends Any {
   def opIsDefined(x: A, y: A): Boolean = partialOp(x, y).nonEmpty

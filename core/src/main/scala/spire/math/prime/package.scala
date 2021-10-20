@@ -1,8 +1,24 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
 import spire.algebra.Sign
 import spire.algebra.Sign.Positive
+import spire.std.double._
 import spire.syntax.cfor._
 import spire.syntax.nroot._
 
@@ -12,35 +28,28 @@ import scala.collection.mutable
 /**
  * Basic tools for prime factorization.
  *
- * This package is intended to provide tools for factoring numbers,
- * checking primality, generating prime numbers, etc. For now, its
- * main contributions are a method for factoring integers
- * (spire.math.prime.factor) and a type for representing prime factors
- * and their exponents (spire.math.prime.Factors).
+ * This package is intended to provide tools for factoring numbers, checking primality, generating prime numbers, etc.
+ * For now, its main contributions are a method for factoring integers (spire.math.prime.factor) and a type for
+ * representing prime factors and their exponents (spire.math.prime.Factors).
  *
- * The factorization currently happens via an implementation of
- * Pollard-Rho with Brent's optimization. This technique works very
- * well for composites with small prime factors (up to 10 decimal
- * digits or so) and can support semiprimes (products of two
- * similarly-sized primes) of 20-40 digits.
+ * The factorization currently happens via an implementation of Pollard-Rho with Brent's optimization. This technique
+ * works very well for composites with small prime factors (up to 10 decimal digits or so) and can support semiprimes
+ * (products of two similarly-sized primes) of 20-40 digits.
  *
- * The implementation does cheat, using BigInteger.isProbablePrime(40)
- * to test basic primality. This has a roughly 1-in-1,000,000,000,000
- * chance of being wrong.
+ * The implementation does cheat, using BigInteger.isProbablePrime(40) to test basic primality. This has a roughly
+ * 1-in-1,000,000,000,000 chance of being wrong.
  *
- * Since Pollard-Rho uses random primes, its performance is somewhat
- * non-deterministic. On this machine, factoring 20-digit semiprimes
- * seem to average about 1.5s and factoring 30-digit semiprimes seem
- * to average about 20s. Much larger numbers can be factored provided
- * they are either prime or composites with smallish factors.
+ * Since Pollard-Rho uses random primes, its performance is somewhat non-deterministic. On this machine, factoring
+ * 20-digit semiprimes seem to average about 1.5s and factoring 30-digit semiprimes seem to average about 20s. Much
+ * larger numbers can be factored provided they are either prime or composites with smallish factors.
  */
 package object prime {
 
   /**
    * Determine if the given integer is prime.
    *
-   * Currently this is using a strong pseudo-primality test (so there
-   * is a 1-in-1,000,000,000,000 chance of being wrong).
+   * Currently this is using a strong pseudo-primality test (so there is a 1-in-1,000,000,000,000 chance of being
+   * wrong).
    */
   def isPrime(n: SafeLong): Boolean = n.isProbablePrime(40)
 
@@ -52,8 +61,7 @@ package object prime {
   /**
    * Factor the given integer using trial division.
    *
-   * This is the slowest method, but is still reasonable for numbers
-   * up to about 14 decimal digits or so.
+   * This is the slowest method, but is still reasonable for numbers up to about 14 decimal digits or so.
    */
   def factorTrialDivision(n0: SafeLong): Factors = {
     if (n0 == 0) return Factors.zero
@@ -86,8 +94,8 @@ package object prime {
   /**
    * Factor the given integer using trial division with a wheel.
    *
-   * This is slightly faster than basic trial division (about 30% or
-   * so). It's still mostly appropriate for small-ish numbers.
+   * This is slightly faster than basic trial division (about 30% or so). It's still mostly appropriate for small-ish
+   * numbers.
    */
   def factorWheelDivision(n0: SafeLong): Factors = {
     if (n0 == 0) return Factors.zero

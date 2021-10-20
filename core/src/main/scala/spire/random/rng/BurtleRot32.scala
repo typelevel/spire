@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package random
 package rng
@@ -9,9 +24,8 @@ import java.lang.Integer.rotateLeft
 // Contributed by Rex Kerr
 
 /**
- * Bit-mixing random number generator based on rotations from Bob
- * Burtle.  Maintains 16 bytes of state information.  Algorithm from
- * [[http://burtleburtle.net/bob/rand/]]
+ * Bit-mixing random number generator based on rotations from Bob Burtle. Maintains 16 bytes of state information.
+ * Algorithm from [[http://burtleburtle.net/bob/rand/]]
  */
 abstract class BurtleRot32(_a: Int, _b: Int, _c: Int, _d: Int) extends IntBasedGenerator {
   protected var a = _a
@@ -19,11 +33,11 @@ abstract class BurtleRot32(_a: Int, _b: Int, _c: Int, _d: Int) extends IntBasedG
   protected var c = _c
   protected var d = _d
 
-  override def nextInt(): Int = { advance(); d }
+  override def nextInt(): Int = { advance; d }
 
-  protected def advance(): Unit
+  protected def advance: Unit
 
-  override def getSeedBytes(): Array[Byte] = {
+  override def getSeedBytes: Array[Byte] = {
     val bytes = new Array[Byte](16)
     val bb = ByteBuffer.wrap(bytes)
     bb.putInt(a)
@@ -36,10 +50,10 @@ abstract class BurtleRot32(_a: Int, _b: Int, _c: Int, _d: Int) extends IntBasedG
   def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < 16) Arrays.copyOf(bytes, 16) else bytes
     val bb = ByteBuffer.wrap(bs)
-    a = bb.getInt()
-    b = bb.getInt()
-    c = bb.getInt()
-    d = bb.getInt()
+    a = bb.getInt
+    b = bb.getInt
+    c = bb.getInt
+    d = bb.getInt
   }
 }
 
@@ -52,7 +66,7 @@ abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, A
   def fromBytes(bytes: Array[Byte]): G = {
     val bs = if (bytes.length < 16) Arrays.copyOf(bytes, 16) else bytes
     val bb = ByteBuffer.wrap(bs)
-    create(bb.getInt(), bb.getInt(), bb.getInt(), bb.getInt())
+    create(bb.getInt, bb.getInt, bb.getInt, bb.getInt)
   }
 
   def fromSeed(ints: Array[Int]): G = {
@@ -67,13 +81,11 @@ abstract class BurtleCompanion[G <: BurtleRot32] extends GeneratorCompanion[G, A
 }
 
 /**
- * Bit-mixing random number generator based on rotations from Bob
- * Burtle.  Maintains 16 bytes of state information.  Good speed and
- * randomness (see `Burtle3rot` for better randomness).  Algorithm
- * from [[http://burtleburtle.net/bob/rand/]]
+ * Bit-mixing random number generator based on rotations from Bob Burtle. Maintains 16 bytes of state information. Good
+ * speed and randomness (see `Burtle3rot` for better randomness). Algorithm from [[http://burtleburtle.net/bob/rand/]]
  */
 final class BurtleRot2(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_a, _b, _c, _d) {
-  protected def advance(): Unit = {
+  protected def advance: Unit = {
     val e = a - rotateLeft(b, 27)
     a = b ^ rotateLeft(c, 17)
     b = c + d
@@ -89,13 +101,12 @@ object BurtleRot2 extends BurtleCompanion[BurtleRot2] {
 }
 
 /**
- * Bit-mixing random number generator based on rotations from Bob
- * Burtle.  Maintains 16 bytes of state information.  Decent speed and
- * very good randomness (see `Burtle2rot` for better speed).
- * Algorithm from [[http://burtleburtle.net/bob/rand/]]
+ * Bit-mixing random number generator based on rotations from Bob Burtle. Maintains 16 bytes of state information.
+ * Decent speed and very good randomness (see `Burtle2rot` for better speed). Algorithm from
+ * [[http://burtleburtle.net/bob/rand/]]
  */
 final class BurtleRot3(_a: Int, _b: Int, _c: Int, _d: Int) extends BurtleRot32(_a, _b, _c, _d) {
-  protected def advance(): Unit = {
+  protected def advance: Unit = {
     val e = a - rotateLeft(b, 23)
     a = b ^ rotateLeft(c, 16)
     b = c + rotateLeft(d, 11)

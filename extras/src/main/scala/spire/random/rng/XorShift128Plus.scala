@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package random
 package rng
@@ -8,7 +23,7 @@ import spire.util.Pack
 class XorShift128Plus(private var s0: Long, private var s1: Long) extends LongBasedGenerator {
   def copyInit: XorShift128Plus = new XorShift128Plus(s0, s1)
 
-  override def getSeedBytes(): Array[Byte] = Pack.longsToBytes(Array(s0, s1))
+  override def getSeedBytes: Array[Byte] = Pack.longsToBytes(Array(s0, s1))
 
   def setSeedBytes(bytes: Array[Byte]): Unit = {
     val seed = Pack.longsFromBytes(bytes, 2)
@@ -27,7 +42,7 @@ class XorShift128Plus(private var s0: Long, private var s1: Long) extends LongBa
 }
 
 object XorShift128Plus extends GeneratorCompanion[XorShift128Plus, (Long, Long)] {
-  def randomSeed(): (Long, Long) = (System.nanoTime(), System.nanoTime())
+  def randomSeed(): (Long, Long) = (System.nanoTime, System.nanoTime)
 
   def fromSeed(seed: (Long, Long)): XorShift128Plus = {
     val (s0, s1) = seed
@@ -40,5 +55,5 @@ object XorShift128Plus extends GeneratorCompanion[XorShift128Plus, (Long, Long)]
     fromSeed((seed(0), seed(1)))
   }
 
-  def fromTime(time: Long = System.nanoTime()): XorShift128Plus = fromSeed((time, time))
+  def fromTime(time: Long = System.nanoTime): XorShift128Plus = fromSeed((time, time))
 }

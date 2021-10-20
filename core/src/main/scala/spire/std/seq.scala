@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package std
 
@@ -124,9 +139,8 @@ class SeqCoordinateSpace[A: Field, SA <: SeqOps[A, Seq, SA]](val dimensions: Int
 }
 
 /**
- * The L_p norm is equal to the `p`-th root of the sum of each element to the
- * power `p`. For instance, if `p = 1` we have the Manhattan distance. If you'd
- * like the Euclidean norm (`p = 2`), then you'd probably be best to use an
+ * The L_p norm is equal to the `p`-th root of the sum of each element to the power `p`. For instance, if `p = 1` we
+ * have the Manhattan distance. If you'd like the Euclidean norm (`p = 2`), then you'd probably be best to use an
  * `RealInnerProductSpace` instead.
  */
 @SerialVersionUID(0L)
@@ -152,8 +166,7 @@ class SeqLpNormedVectorSpace[A: Field: NRoot: Signed, SA <: SeqOps[A, Seq, SA]](
 }
 
 /**
- * The norm here uses the absolute maximum of the coordinates (ie. the L_inf
- * norm).
+ * The norm here uses the absolute maximum of the coordinates (ie. the L_inf norm).
  */
 @SerialVersionUID(0L)
 class SeqMaxNormedVectorSpace[A: Field: Order: Signed, SA <: SeqOps[A, Seq, SA]](implicit cbf: Factory[A, SA])

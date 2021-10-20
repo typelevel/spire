@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package random
 package rng
@@ -12,7 +27,7 @@ class XorShift1024Star(private val s: Array[Long], private var p: Int) extends L
 
   def copyInit: XorShift1024Star = new XorShift1024Star(s.clone, p)
 
-  override def getSeedBytes(): Array[Byte] = {
+  override def getSeedBytes: Array[Byte] = {
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
 
@@ -24,7 +39,7 @@ class XorShift1024Star(private val s: Array[Long], private var p: Int) extends L
   def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
-    cfor(0)(_ < N, _ + 1) { i => s(i) = bb.getLong() }
+    cfor(0)(_ < N, _ + 1) { i => s(i) = bb.getLong }
     p = bb.getInt
   }
 
@@ -56,7 +71,7 @@ object XorShift1024Star extends GeneratorCompanion[XorShift1024Star, (Array[Long
     val bb = ByteBuffer.wrap(bs)
     val s = new Array[Long](N)
 
-    cfor(0)(_ < N, _ + 1) { i => s(i) = bb.getLong() }
+    cfor(0)(_ < N, _ + 1) { i => s(i) = bb.getLong }
     val p = bb.getInt
 
     fromSeed((s, p))

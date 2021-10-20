@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 
 import java.lang.Long.numberOfTrailingZeros
@@ -248,8 +263,7 @@ package object math {
   /**
    * Exponentiation function, e.g. x^y
    *
-   * If base^ex doesn't fit in a Long, the result will overflow (unlike
-   * Math.pow which will return +/- Infinity).
+   * If base^ex doesn't fit in a Long, the result will overflow (unlike Math.pow which will return +/- Infinity).
    */
   final def pow(base: Long, exponent: Long): Long = {
     @tailrec def longPow(t: Long, b: Long, e: Long): Long =
@@ -515,7 +529,7 @@ package object math {
   final def nextAfter(x: Float, y: Float): Float = Math.nextAfter(x, y)
   final def nextUp(x: Double): Double = Math.nextUp(x)
   final def nextUp(x: Float): Float = Math.nextUp(x)
-  final def random(): Double = Math.random()
+  final def random: Double = Math.random()
   final def rint(x: Double): Double = Math.rint(x)
   final def scalb(d: Double, s: Int): Double = Math.scalb(d, s)
   final def scalb(d: Float, s: Int): Float = Math.scalb(d, s)
@@ -537,12 +551,11 @@ package object math {
 
   // BigInt
   /**
-   * This will return the largest integer that meets some criteria. Specifically,
-   * if we're looking for some integer `x` and `f(x')` is guaranteed to return
-   * `true` iff `x' <= x`, then this will return `x`.
+   * This will return the largest integer that meets some criteria. Specifically, if we're looking for some integer `x`
+   * and `f(x')` is guaranteed to return `true` iff `x' <= x`, then this will return `x`.
    *
-   * This can be used, for example, to find an integer `x` s.t.
-   * `x * x < y < (x+1)*(x+1)`, by using `intSearch(x => x * x <= y)`.
+   * This can be used, for example, to find an integer `x` s.t. `x * x < y < (x+1)*(x+1)`, by using `intSearch(x => x *
+   * x <= y)`.
    */
   private def intSearch(f: Int => Boolean): Int = {
     val ceil = (0 until 32).find(i => !f(1 << i)).getOrElse(33)
@@ -557,8 +570,7 @@ package object math {
   }
 
   /**
-   * Returns the digits to the right of the decimal point of `x / y` in base
-   * `r` if x < y.
+   * Returns the digits to the right of the decimal point of `x / y` in base `r` if x < y.
    */
   private def decDiv(x: BigInt, y: BigInt, r: Int): LazyList[BigInt] = {
     val expanded = x * r
@@ -588,15 +600,17 @@ package object math {
   private val radix = 1000000000
 
   /**
-   * An implementation of the shifting n-th root algorithm for BigDecimal. For
-   * the BigDecimal a, this is guaranteed to be accurate up to the precision
-   * specified in ctxt.
+   * An implementation of the shifting n-th root algorithm for BigDecimal. For the BigDecimal a, this is guaranteed to
+   * be accurate up to the precision specified in ctxt.
    *
    * See http://en.wikipedia.org/wiki/Shifting_nth_root_algorithm
    *
-   * @param a A (positive if k % 2 == 0) `BigDecimal`.
-   * @param k A positive `Int` greater than 1.
-   * @param ctxt The `MathContext` to bound the precision of the result.
+   * @param a
+   *   A (positive if k % 2 == 0) `BigDecimal`.
+   * @param k
+   *   A positive `Int` greater than 1.
+   * @param ctxt
+   *   The `MathContext` to bound the precision of the result.
    *
    * returns A `BigDecimal` approximation to the `k`-th root of `a`.
    */

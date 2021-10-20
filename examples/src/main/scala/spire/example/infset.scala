@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package examples
 
@@ -35,12 +50,12 @@ object PureSet { self =>
   def empty[A]: PureSet[A] = PureSet[A](a => false)
   def infinite[A]: PureSet[A] = PureSet[A](a => true)
 
-  implicit def monoid[A] = new Monoid[PureSet[A]] {
+  implicit def monoid[A]: Monoid[PureSet[A]] = new Monoid[PureSet[A]] {
     def empty: PureSet[A] = self.empty[A]
     def combine(x: PureSet[A], y: PureSet[A]): PureSet[A] = x | y
   }
 
-  implicit def bool[A] = new Bool[PureSet[A]] {
+  implicit def bool[A]: Bool[PureSet[A]] = new Bool[PureSet[A]] {
     def one: PureSet[A] = infinite
     def zero: PureSet[A] = empty
     def complement(a: PureSet[A]): PureSet[A] = ~a
@@ -125,12 +140,12 @@ object MathSet { self =>
       else outsiders.mkString("(U -- {", ", ", "})")
   }
 
-  implicit def monoid[A] = new Monoid[MathSet[A]] {
+  implicit def monoid[A]: Monoid[MathSet[A]] = new Monoid[MathSet[A]] {
     def empty: MathSet[A] = self.empty
     def combine(x: MathSet[A], y: MathSet[A]): MathSet[A] = x | y
   }
 
-  implicit def bool[A] = new Bool[MathSet[A]] {
+  implicit def bool[A]: Bool[MathSet[A]] = new Bool[MathSet[A]] {
     def one: MathSet[A] = infinite
     def zero: MathSet[A] = empty
     def complement(a: MathSet[A]): MathSet[A] = ~a
