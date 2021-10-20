@@ -2,7 +2,7 @@
  * **********************************************************************\
  * * Project                                                              **
  * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
  * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
  * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
  * *   ____/ / / /      / /   / / | |   / /__                             **
@@ -86,9 +86,8 @@ trait AdditiveSemigroupSyntax:
     new LiteralDoubleAdditiveSemigroupOps(lhs)
 
 trait AdditiveMonoidSyntax extends AdditiveSemigroupSyntax:
-  implicit def additiveMonoidOps[A](a: A)(implicit ev: AdditiveMonoid[A]): AdditiveMonoidOps[A] = new AdditiveMonoidOps(
-    a
-  )
+  implicit def additiveMonoidOps[A](a: A)(implicit ev: AdditiveMonoid[A]): AdditiveMonoidOps[A] =
+    new AdditiveMonoidOps(a)
 
 trait AdditiveGroupSyntax extends AdditiveMonoidSyntax:
   implicit def additiveGroupOps[A: AdditiveGroup](a: A): AdditiveGroupOps[A] = new AdditiveGroupOps(a)

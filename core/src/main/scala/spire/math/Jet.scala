@@ -2,7 +2,7 @@
  * **********************************************************************\
  * * Project                                                              **
  * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
  * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
  * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
  * *   ____/ / / /      / /   / / | |   / /__                             **
@@ -53,8 +53,11 @@ case class JetDim(dimension: Int) {
  * {{{
  *   f(x) = x * x ,
  * }}}
- * evaluated at 10. Using normal arithmetic, f(10) = 100, and df/dx(10) = 20. Next, augment 10 with an infinitesimal h
- * to get:
+ * evaluated at 10. Using normal arithmetic,
+ * {{{
+ * f(10) = 100, and df/dx(10) = 20.
+ * }}}
+ * Next, augment 10 with an infinitesimal h to get:
  * {{{
  *   f(10 + h) = (10 + h) * (10 + h)
  *             = 100 + 2 * 10 * h + h * h
@@ -337,8 +340,10 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   }
 
   /**
-   * pow -- base (this) is a differentiable function, exponent is a constant. pow(a + du, p) ~= pow(a, p) + p * pow(a,
-   * p-1) du
+   * pow -- base (this) is a differentiable function, exponent is a constant.
+   * {{{
+   * pow(a + du, p) ~= pow(a, p) + p * pow(a, p-1) du
+   * }}}
    */
   def pow(p: T)(implicit f: Field[T], s: Signed[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val tmp: T = p * powScalarToScalar(real, p - f.one)
@@ -352,8 +357,10 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   }
 
   /**
-   * pow -- both base (this) and exponent are differentiable functions. (a + du)^(b + dv) ~= a^b + b * a^(b-1) du + a^b
-   * log(a) dv
+   * pow -- both base (this) and exponent are differentiable functions.
+   * {{{
+   * (a + du)^(b + dv) ~= a^b + b * a^(b-1) du + a^b log(a) dv
+   * }}}
    */
   def pow(
     b: Jet[T]
@@ -409,8 +416,10 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   }
 
   /**
-   * Defined with "this" as the y coordinate: this.atan2(a) == atan2(this, a) == atan(this / a) atan2(b + dv, a + du) ~=
-   * atan2(b, a) + (- b du + a dv) / (a^2 + b^2)
+   * Defined with "this" as the y coordinate:
+   * {{{
+   * this.atan2(a) == atan2(this, a) == atan(this / a) atan2(b + dv, a + du) ~= atan2(b, a) + (- b du + a dv) / (a^2 + b^2)
+   * }}}
    */
   def atan2(a: Jet[T])(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val tmp = f.one / (a.real * a.real + real * real)

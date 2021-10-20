@@ -2,7 +2,7 @@
  * **********************************************************************\
  * * Project                                                              **
  * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
  * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
  * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
  * *   ____/ / / /      / /   / / | |   / /__                             **
@@ -694,7 +694,10 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
    * Users who want to avoid using arithmetic error should consider starting with an Interval[Rational], calling
    * iterator with the exact step desired, then mapping to the original type (e.g. Double). For example:
    *
-   * val ns = Interval.closed(Rational(0), Rational(5)) val it = ns.iterator(Rational(1, 7)).map(_.toDouble)
+   * {{{
+   *   val ns = Interval.closed(Rational(0), Rational(5))
+   *   val it = ns.iterator(Rational(1, 7)).map(_.toDouble)
+   * }}}
    *
    * This method provides some of the same functionality as Scala's NumericRange class.
    */
@@ -781,10 +784,16 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
    * Except for [[Equal]], both original intervals are bound to respective result fields, allowing to determine exact
    * overlap type.
    *
-   * For example (pseudo-code): { val a = [5, 6] val b = (0, 1)
+   * For example (pseudo-code):
+   * {{{
+   * {
+   *     val a = [5, 6]
+   *     val b = (0, 1)
    *
-   * // this returns Disjoint(b, a). Note a and b placement here, it means that b is strictly less then a.
-   * a.overlap(b) }
+   *     // this returns Disjoint(b, a). Note a and b placement here, it means that b is strictly less then a.
+   *     a.overlap(b)
+   * }
+   * }}}
    */
   def overlap(rhs: Interval[A])(implicit o: Order[A]): Overlap[A] = Overlap(lhs, rhs)
 }
@@ -850,8 +859,11 @@ object Interval {
    *
    * There are three Double values that return "special" intervals:
    *
-   * Infinity => Interval.above(Double.MaxValue)
-   * -Infinity => Interval.below(Double.MinValue) NaN => Interval.empty
+   * {{{
+   *   Infinity => Interval.above(Double.MaxValue)
+   * -Infinity => Interval.below(Double.MinValue)
+   *       NaN => Interval.empty
+   * }}}
    */
   def errorBounds(d: Double): Interval[Rational] =
     if (d == Double.PositiveInfinity) {

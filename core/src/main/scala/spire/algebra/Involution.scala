@@ -2,7 +2,7 @@
  * **********************************************************************\
  * * Project                                                              **
  * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
  * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
  * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
  * *   ____/ / / /      / /   / / | |   / /__                             **
@@ -25,14 +25,19 @@ package algebra
  * If a ring is available, it should be compatible with addition (rule iv), and then defines a *-ring (see
  * https://en.wikipedia.org/wiki/%2A-algebra ).
  *
- *   i. adjoint(adjoint(x)) = x ii. adjoint(x*y) = adjoint(y)*adjoint(x) (with an underlying multiplicative semigroup)
- *      iii. adjoint(1) = 1 (with an underlying multiplicative monoid) iv. adjoint(x+y) = adjoint(x)+adjoint(y) (with an
- *      underlying ring)
+ * {{{
+ *     i. adjoint(adjoint(x)) = x
+ *     ii. adjoint(x*y) = adjoint(y)*adjoint(x) (with an underlying multiplicative semigroup)
+ *   iii. adjoint(1) = 1 (with an underlying multiplicative monoid)
+ *     iv. adjoint(x+y) = adjoint(x)+adjoint(y) (with an underlying ring)
+ * }}}
  *
  * A *-algebra is an associative algebra A over a commutative *-ring R, where A has an involution as well. It satisfies,
  * for x: A, y: A and r: R
  *
- * v. adjoint(r * x + y) = adjoint(r)*adjoint(x) + adjoint(y)
+ * {{{
+ *     v. adjoint(r * x + y) = adjoint(r)*adjoint(x) + adjoint(y)
+ * }}}
  */
 trait Involution[@sp(Int, Long, Float, Double) A] {
 

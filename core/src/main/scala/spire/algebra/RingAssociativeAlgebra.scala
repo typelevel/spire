@@ -2,7 +2,7 @@
  * **********************************************************************\
  * * Project                                                              **
  * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
  * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
  * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
  * *   ____/ / / /      / /   / / | |   / /__                             **
@@ -22,7 +22,9 @@ package algebra
  *
  * The scalar multiplication satisfies, for r in R, and x, y in V:
  *
+ * {{{
  *   1. r *: (x * y) = (r *: x) * y = x * (r *: y)
+ * }}}
  *
  * TODO: verify the definition, in particular the requirements for Ring[V] (and not Rng[V])
  */

@@ -2,7 +2,7 @@
  * **********************************************************************\
  * * Project                                                              **
  * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
  * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
  * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
  * *   ____/ / / /      / /   / / | |   / /__                             **
@@ -23,8 +23,12 @@ package algebra
  * A left module has left multiplication by scalars. Let V be an abelian group (with additive notation) and R the scalar
  * ring, we have the following laws for x, y in V and r, s in R:
  *
- *   1. r *: (x + y) = r *: x + r *: y 2. (r + s) *: x = r *: x + s *: x 3. (r * s) *: x = r *: (s *: x) 4. R.one * x =
- *      x
+ * {{{
+ *   1. r *: (x + y) = r *: x + r *: y
+ *   2. (r + s) *: x = r *: x + s *: x
+ *   3. (r * s) *: x = r *: (s *: x)
+ *   4. R.one * x = x
+ * }}}
  *
  * (see https://en.wikipedia.org/wiki/Module_(mathematics) )
  *
@@ -50,8 +54,12 @@ object LeftModule {
  * A right module has right multiplication by scalars. Let V be an abelian group (with additive notation) and R the
  * scalar ring, we have the following laws for x, y in V and r, s in R:
  *
- *   1. (x + y) :* r = x :* r + y :* r 2. x :* (r + s) = x :* r + x :* s 3. x :* (r * s) = (x :* r) :* s 4. x :* R.one =
- *      x
+ * {{{
+ *   1. (x + y) :* r = x :* r + y :* r
+ *   2. x :* (r + s) = x :* r + x :* s
+ *   3. x :* (r * s) = (x :* r) :* s
+ *   4. x :* R.one = x
+ * }}}
  *
  * @tparam V
  *   Abelian group type
@@ -75,7 +83,9 @@ object RightModule {
  *
  * In addition to the laws above 1-5 left and 1-5 right, we have:
  *
+ * {{{
  * 6. (r *: x) :* s = r *: (x :* s)
+ * }}}
  *
  * @tparam V
  *   Abelian group type

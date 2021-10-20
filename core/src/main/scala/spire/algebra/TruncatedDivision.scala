@@ -2,7 +2,7 @@
  * **********************************************************************\
  * * Project                                                              **
  * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
  * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
  * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
  * *   ____/ / / /      / /   / / | |   / /__                             **
@@ -25,18 +25,29 @@ import spire.util.Opt
  * For two numbers x (dividend) and y (divisor) on an ordered ring with y != 0, there exists a pair of numbers q
  * (quotient) and r (remainder) such that these laws are satisfied:
  *
- * (1) q is an integer (2) x = y * q + r (division rule) (3) |r| < |y|, (4t) r = 0 or sign(r) = sign(x), (4f) r = 0 or
- * sign(r) = sign(y).
+ * {{{
+ * (1) q is an integer
+ * (2) x = y * q + r (division rule)
+ * (3) |r| < |y|
+ * (4t) r = 0 or sign(r) = sign(x)
+ * (4f) r = 0 or sign(r) = sign(y).
+ * }}}
  *
  * where sign is the sign function, and the absolute value function |x| is defined as |x| = x if x >=0, and |x| = -x
  * otherwise.
  *
- * We define functions tmod and tquot such that: q = tquot(x, y) and r = tmod(x, y) obey rule (4t), (which truncates
- * effectively towards zero) and functions fmod and fquot such that: q = fquot(x, y) and r = fmod(x, y) obey rule (4f)
+ * We define functions tmod and tquot such that:
+ * {{{
+ * q = tquot(x, y) and r = tmod(x, y) obey rule (4t),
+ * (whichtruncates effectively towards zero) and functions fmod and fquot such that:
+ * q = fquot(x, y) and r = fmod(x, y) obey rule (4f)
  * (which floors the quotient and effectively rounds towards negative infinity).
+ * }}}
  *
- * Law (4t) corresponds to ISO C99 and Haskell's quot/rem. Law (4f) is described by Knuth and used by Haskell, and fmod
- * corresponds to the REM function of the IEEE floating-point standard.
+ * Law (4t) corresponds to ISO C99 and Haskell's quot/rem.
+ *
+ * Law (4f) is described by Knuth and used by Haskell, and fmod corresponds to the REM function of the IEEE
+ * floating-point standard.
  */
 trait TruncatedDivision[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Signed[A] {
 

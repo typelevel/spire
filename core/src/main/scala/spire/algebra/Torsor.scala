@@ -2,7 +2,7 @@
  * **********************************************************************\
  * * Project                                                              **
  * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
  * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
  * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
  * *   ____/ / / /      / /   / / | |   / /__                             **
@@ -20,13 +20,15 @@ package algebra
  * A Torsor[V, R] requires an AbGroup[R] and provides Action[V, R], plus a `diff` operator, `<->` in additive notation,
  * such that:
  *
- *   1. `(g <-> g) === scalar.id` for all `g` in `G`.
+ * {{{
+ * 1. `(g <-> g) === scalar.id` for all `g` in `G`.
  *
  * 2. `(g <-> h) +> h === g` for all `g`, `h` in `G`.
  *
  * 3. `(g <-> h) +> i === (i <-> h) +> g` for all `g`, `h` in `G`.
  *
  * 4. `(g <-> h) === -(h <-> g)` for all `g`, `h` in `G`.
+ * }}}
  */
 trait Torsor[V, @sp(Int, Long, Float, Double) R] extends Any with Action[V, R] { self =>
   def diff(v: V, w: V): R

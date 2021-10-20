@@ -1,7 +1,7 @@
 val header = """|**********************************************************************\
                 |* Project                                                              **
                 |*       ______  ______   __    ______    ____                          **
-                |*      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+                |*      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
                 |*     / /__   / /_/ /  / /   / /_/ /   / /_                            **
                 |*    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
                 |*   ____/ / / /      / /   / / | |   / /__                             **
@@ -33,6 +33,7 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 ThisBuild / crossScalaVersions := Seq(Scala213, Scala3)
 ThisBuild / scalaVersion := Scala3
+ThisBuild / versionScheme := Some("early-semver")
 
 ThisBuild / githubWorkflowArtifactUpload := false
 

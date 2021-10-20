@@ -2,7 +2,7 @@
  * **********************************************************************\
  * * Project                                                              **
  * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
  * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
  * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
  * *   ____/ / / /      / /   / / | |   / /__                             **
@@ -91,7 +91,13 @@ final def /%(b: FloatComplex): (FloatComplex, FloatComplex) = FastComplex.quotmo
  * Here are some profiling numbers for summing an array of complex numbers, timed against a concrete case class
  * implementation using Float (in ms):
  *
- * size | encoded | class 1M | 5.1 | 5.8 5M | 28.5 | 91.7 10M | 67.7 | 828.1 20M | 228.0 | 2687.0
+ * {{{
+ * size | encoded |  class
+ *   1M |     5.1 |    5.8
+ *   5M |    28.5 |   91.7
+ *   10M |    67.7 |  828.1
+ *   20M |   228.0 | 2687.0
+ * }}}
  *
  * Not bad, eh?
  */
