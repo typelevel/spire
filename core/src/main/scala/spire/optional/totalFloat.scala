@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package optional
 
@@ -6,10 +21,9 @@ import java.lang.Math
 import spire.algebra.Order
 
 /**
- * This provides orderings (Order and Eq) for Float and Double that have
- * a total order. Specifically, this will order NaN's consistently, rather
- * than having their order be undefined. However, this won't be as fast as
- * the default ordering.
+ * This provides orderings (Order and Eq) for Float and Double that have a total order. Specifically, this will order
+ * NaN's consistently, rather than having their order be undefined. However, this won't be as fast as the default
+ * ordering.
  */
 object totalfloat {
   trait TotalFloatOrder extends Order[Float] {

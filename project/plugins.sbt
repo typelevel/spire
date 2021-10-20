@@ -13,5 +13,6 @@ addSbtPlugin("com.47deg" % "sbt-microsites" % "1.3.3")
 addSbtPlugin("com.codecommit" % "sbt-github-actions" % "0.13.0")
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.3")
 addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.10")
+addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.6.0")
 
 libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.7.32"

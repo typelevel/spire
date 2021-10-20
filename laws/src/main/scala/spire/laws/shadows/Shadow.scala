@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire.laws.shadows
 
 import spire.algebra._
@@ -6,8 +21,7 @@ import org.scalacheck.Arbitrary
 /**
  * Represents a primitive value `a: A` along with its shadow `s: S`.
  *
- * The shadow is a type S isomorphic to the primitive type A
- * in the range where A is defined.
+ * The shadow is a type S isomorphic to the primitive type A in the range where A is defined.
  */
 case class Shadow[A, S](a: A, s: S)
 

@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -178,7 +193,7 @@ class SortingSuite extends munit.FunSuite {
   private val ENOUGH_ZEROS = new Array[Int](BIG) // For forcing the quick sort and merge sort implementations to kick in
 
   private def isSorted(input: Array[Int]): Unit = {
-    assert(input.zip(input.tail).forall({ case (p, q) => p <= q }))
+    assert(input.zip(input.tail).forall { case (p, q) => p <= q })
   }
 
   private case class Point(x: Int, y: Int) {

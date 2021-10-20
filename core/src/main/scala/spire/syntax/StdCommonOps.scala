@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package syntax
 package std
@@ -164,17 +179,15 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
     as.foldLeft(ev.one)((t, a) => t + f(a).abs.pow(p)).nroot(p)
 
   /**
-   * Computes the minimal elements of a partially ordered set.
-   * If the poset contains multiple copies of a minimal element, the function
-   * will only return a single copy of it.
+   * Computes the minimal elements of a partially ordered set. If the poset contains multiple copies of a minimal
+   * element, the function will only return a single copy of it.
    */
   def pmin(implicit ev: PartialOrder[A]): Seq[A] =
     Searching.minimalElements(as)(ev)
 
   /**
-   * Computes the maximal elements of a partially ordered set.
-   * If the posset contains multiple copies of a maximal element, the function
-   * will only return a single copy of it.
+   * Computes the maximal elements of a partially ordered set. If the posset contains multiple copies of a maximal
+   * element, the function will only return a single copy of it.
    */
   def pmax(implicit ev: PartialOrder[A]): Seq[A] =
     Searching.minimalElements(as)(PartialOrder.reverse(ev))

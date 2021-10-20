@@ -1,8 +1,8 @@
-/**
+/*
  * **********************************************************************\
  * * Project                                                              **
  * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
  * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
  * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
  * *   ____/ / / /      / /   / / | |   / /__                             **
@@ -25,18 +25,21 @@ import java.util.Arrays
 /**
  * This is a 32-bit Scala implementation of MersenneTwister based on MT19937.c.
  *
- * <p>MersenneTwister is a fast, 623-dimensionally equidistributed pseudo random number generator
- * with a <tt>2<sup>19937</sup>&nbsp;-&nbsp;1</tt> long period.
+ * <p>MersenneTwister is a fast, 623-dimensionally equidistributed pseudo random number generator with a
+ * <tt>2<sup>19937</sup>&nbsp;-&nbsp;1</tt> long period.
  *
- * <p><b>Reference: </b>
- * Makoto Matsumoto and Takuji Nishimura:
- * "Mersenne Twister: A 623-Dimensionally Equidistributed Uniform Pseudo-Random Number Generator",
- * <i>ACM Transactions on Modeling and Computer Simulation,</i> Vol. 8, No. 1, January 1998, pp 3--30.
+ * <p><b>Reference: </b> Makoto Matsumoto and Takuji Nishimura: "Mersenne Twister: A 623-Dimensionally Equidistributed
+ * Uniform Pseudo-Random Number Generator", <i>ACM Transactions on Modeling and Computer Simulation,</i> Vol. 8, No. 1,
+ * January 1998, pp 3--30.
  *
- * @see <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c">MT19937.c</a>
- * @see <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html">Mersenne Twister Home Page</a>
- * @see <a href="http://en.wikipedia.org/wiki/Mersenne_twister">Mersenne Twister @ Wikipedia</a>
- * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
+ * @see
+ *   <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c">MT19937.c</a>
+ * @see
+ *   <a href="http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/emt.html">Mersenne Twister Home Page</a>
+ * @see
+ *   <a href="http://en.wikipedia.org/wiki/Mersenne_twister">Mersenne Twister @ Wikipedia</a>
+ * @author
+ *   <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
  */
 final class MersenneTwister32 protected[random] (mt: Array[Int], mti0: Int = 625) extends IntBasedGenerator { // N + 1 == 625
 

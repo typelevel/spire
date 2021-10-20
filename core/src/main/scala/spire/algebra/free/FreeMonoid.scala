@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package algebra
 package free
@@ -5,8 +20,8 @@ package free
 final class FreeMonoid[A] private (val terms: List[A]) extends AnyVal { lhs =>
 
   /**
-   * Map each term to type `B` and sum them using `B`'s [[Semigroup]],
-   * as long as there is at least 1 term. Otherwise, return `None`.
+   * Map each term to type `B` and sum them using `B`'s [[Semigroup]], as long as there is at least 1 term. Otherwise,
+   * return `None`.
    */
   def runSemigroup[B](f: A => B)(implicit B: Semigroup[B]): Option[B] =
     B.combineAllOption(terms.iterator.map(f))

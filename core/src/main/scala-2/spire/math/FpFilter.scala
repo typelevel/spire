@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -6,29 +21,23 @@ import spire.macros.compat.Context
 import spire.macros.fpf._
 
 /**
- * A Floating-point Filter [1] provides a `Numeric` type that wraps another
- * `Numeric` type, but defers its computation, instead providing a floating
- * point (`Double`) approximation. For some operations, like `signum`,
- * comparisons, equality checks, toFloat, etc, the `Double` approximation may
- * be used to compute the result, rather than having to compute the exact value.
+ * A Floating-point Filter [1] provides a `Numeric` type that wraps another `Numeric` type, but defers its computation,
+ * instead providing a floating point (`Double`) approximation. For some operations, like `signum`, comparisons,
+ * equality checks, toFloat, etc, the `Double` approximation may be used to compute the result, rather than having to
+ * compute the exact value.
  *
- * An `FpFilter` can generally be used with any [[Ring]] numeric type (also
- * supports [[EuclideanRing]], [[Field]], and [[NRoot]]). However, it should be
- * kept in mind that `FpFilter` knows nothing about the type its wrapping and
- * assumes that, generally, it is more accurate than it is. When an `FpFilter`
- * cannot determine an answer to some predicate exactly, it will defer to the
- * wrapped value, so it probably doesn't make sense to wrap `Int`s, when an
- * `Int` will overflow before a `Double`!
+ * An `FpFilter` can generally be used with any [[Ring]] numeric type (also supports [[EuclideanRing]], [[Field]], and
+ * [[NRoot]]). However, it should be kept in mind that `FpFilter` knows nothing about the type its wrapping and assumes
+ * that, generally, it is more accurate than it is. When an `FpFilter` cannot determine an answer to some predicate
+ * exactly, it will defer to the wrapped value, so it probably doesn't make sense to wrap `Int`s, when an `Int` will
+ * overflow before a `Double`!
  *
- * Good candidates to wrap in `FpFilter` are [[BigInt]]s, [[Rational]]s,
- * [[BigDecimal]]s, and [[Algebraic]]. Note that while [[Algebraic]] has an
- * internal floating-point filter, this still provides benefits. Namely, the
- * operator-fusion and allocation removal provided by the macros can make for
- * much faster hot paths.
+ * Good candidates to wrap in `FpFilter` are [[BigInt]]s, [[Rational]]s, [[BigDecimal]]s, and [[Algebraic]]. Note that
+ * while [[Algebraic]] has an internal floating-point filter, this still provides benefits. Namely, the operator-fusion
+ * and allocation removal provided by the macros can make for much faster hot paths.
  *
- * Note: Both equals and hashCode will generally force the exact computation.
- *       They should be avoided (prefer `===` for equals)... otherwise why use
- *       bother?
+ * Note: Both equals and hashCode will generally force the exact computation. They should be avoided (prefer `===` for
+ * equals)... otherwise why use bother?
  *
  * [1] Burnikel, Funke, Seel. Exact Geometric Computation Using Cascading. SoCG 1998.
  */

@@ -1,8 +1,23 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 package poly
 
-import java.math.{BigDecimal => JBigDecimal, RoundingMode, MathContext}
+import java.math.{BigDecimal => JBigDecimal, MathContext, RoundingMode}
 
 import spire.algebra._
 import spire.std.bigDecimal._
@@ -164,8 +179,7 @@ object BigDecimalRootRefinement {
   }
 
   /**
-   * An implementation of "Quadratic Interval Refinement for Real Roots" by
-   * John Abbot for `BigDecimal`.
+   * An implementation of "Quadratic Interval Refinement for Real Roots" by John Abbot for `BigDecimal`.
    */
   private def QIR(
     context: ApproximationContext,
@@ -293,8 +307,7 @@ object BigDecimalRootRefinement {
   }
 
   /**
-   * An implementation of "Quadratic Interval Refinement for Real Roots" by
-   * John Abbot for `BigDecimal`.
+   * An implementation of "Quadratic Interval Refinement for Real Roots" by John Abbot for `BigDecimal`.
    */
   // scalastyle:off method.length
   private def QIR(

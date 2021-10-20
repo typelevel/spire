@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -8,20 +23,17 @@ trait Select extends Any {
 }
 
 /**
- * Given a function for finding approximate medians, this will create an exact
- * median finder.
+ * Given a function for finding approximate medians, this will create an exact median finder.
  */
 trait SelectLike extends Any with Select {
 
   def approxMedian[@sp A: Order](data: Array[A], left: Int, right: Int, stride: Int): A
 
   /**
-   * Puts the k-th element of data, according to some Order, in the k-th
-   * position. All values before k are less than or equal to data(k) and all
-   * values above k are greater than or equal to data(k).
+   * Puts the k-th element of data, according to some Order, in the k-th position. All values before k are less than or
+   * equal to data(k) and all values above k are greater than or equal to data(k).
    *
-   * This is an in-place algorithm and is not stable and it WILL mess up the
-   * order of equal elements.
+   * This is an in-place algorithm and is not stable and it WILL mess up the order of equal elements.
    */
   final def select[@sp A: Order: ClassTag](data: Array[A], k: Int): Unit = {
     select(data, 0, data.length, 1, k)

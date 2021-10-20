@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package random
 
@@ -35,9 +50,8 @@ abstract class Generator {
   /**
    * Generate a random value using a Dist[A] type class instance.
    *
-   * Implicit Dist[A] instances are provided for the AnyVal types as well as
-   * UByte through ULong. More complex Dist instances can be created from
-   * these.
+   * Implicit Dist[A] instances are provided for the AnyVal types as well as UByte through ULong. More complex Dist
+   * instances can be created from these.
    */
   def next[A](implicit next: Dist[A]): A = next(this)
 

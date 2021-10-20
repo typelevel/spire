@@ -1,21 +1,42 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package algebra
 
 /**
  * A trait for linearly ordered additive commutative monoid. The following laws holds:
  *
+ * {{{
  * (1) if `a <= b` then `a + c <= b + c` (linear order),
  * (2) `signum(x) = -1` if `x < 0`, `signum(x) = 1` if `x > 0`, `signum(x) = 0` otherwise,
+ * }}}
  *
  * Negative elements only appear when `scalar` is a additive abelian group, and then
+ * {{{
  * (3) `abs(x) = -x` if `x < 0`, or `x` otherwise,
+ * }}}
  *
  * Laws (1) and (2) lead to the triange inequality:
  *
+ * {{{
  * (4) `abs(a + b) <= abs(a) + abs(b)`
+ * }}}
  *
- * Signed should never be extended in implementations, rather the AdditiveCMonoid and AdditiveAbGroup subtraits.
- * We cannot use self-types to express the constraint `self: AdditiveCMonoid =>` (interaction with specialization?).
+ * Signed should never be extended in implementations, rather the AdditiveCMonoid and AdditiveAbGroup subtraits. We
+ * cannot use self-types to express the constraint `self: AdditiveCMonoid =>` (interaction with specialization?).
  */
 trait Signed[@sp(Byte, Short, Int, Long, Float, Double) A] extends Any with Order[A] {
 

@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 package interval
@@ -163,13 +178,12 @@ case class Closed[A](a: A) extends ValueBound[A] {
 }
 
 /**
- * Companion object for open/closed bounds, used to construct intervals from
- * a set of bounds.
+ * Companion object for open/closed bounds, used to construct intervals from a set of bounds.
  *
  * In the comments, we write
  *
- * - [v, (v or ?v when the bound is interpreted as a lower bound,
- * - v], v), v? when the bound is interpreted as an upper bound.
+ *   - [v, (v or ?v when the bound is interpreted as a lower bound,
+ *   - v], v), v? when the bound is interpreted as an upper bound.
  *
  * The symbols [], (), ? correspond to closed, open or unknown bounds.
  */
@@ -470,9 +484,7 @@ object ValueBound {
     }
 
   /**
-   * Returns the interval which contains all the given bounds.
-   * *
-   * Assumption: v1.a < v2.a.
+   * Returns the interval which contains all the given bounds. * Assumption: v1.a < v2.a.
    */
   @inline def union4_1less2[A: Order](v1: ValueBound[A],
                                       v2: ValueBound[A],

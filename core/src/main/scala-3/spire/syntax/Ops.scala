@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package syntax
 
@@ -252,7 +267,7 @@ final class LeftActionOps[G](lhs: G) extends AnyVal:
   def |+|>[P](rhs: P)(using ev: LeftAction[P, G]): P =
     ev.actl(lhs, rhs)
   def +>[P](rhs: P)(using ev: AdditiveAction[P, G]): P =
-    ev.gplusl(lhs ,rhs)
+    ev.gplusl(lhs, rhs)
   def *>[P](rhs: P)(using ev: MultiplicativeAction[P, G]): P =
     ev.gtimesl(lhs, rhs)
 
@@ -260,7 +275,7 @@ final class RightActionOps[P](lhs: P) extends AnyVal:
   def <|+|[G](rhs: G)(using ev: RightAction[P, G]): P =
     ev.actr(lhs, rhs)
   def <+[G](rhs: G)(using ev: AdditiveAction[P, G]): P =
-    ev.gplusr(lhs ,rhs)
+    ev.gplusr(lhs, rhs)
   def <*[G](rhs: G)(using ev: MultiplicativeAction[P, G]): P =
     ev.gtimesr(lhs, rhs)
 

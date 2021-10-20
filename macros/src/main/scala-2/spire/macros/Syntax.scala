@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package macros
 
@@ -50,8 +65,8 @@ object Ops extends spire.macros.machinist.Ops {
   }
 
   /**
-   * Like [[binop]] and [[binopWithEv]], but there is ev provided by the implicit
-   * constructor, and ev1 provided by the method.
+   * Like [[binop]] and [[binopWithEv]], but there is ev provided by the implicit constructor, and ev1 provided by the
+   * method.
    *
    * If we see code like:
    *

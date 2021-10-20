@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package macros
 
@@ -11,40 +26,32 @@ object Checked:
   /**
    * Performs overflow checking for Int/Long operations.
    *
-   * If no errors are detected, the expected result will be
-   * returned. If an error is detected, an ArithmeticOverflowException
-   * will be thrown.
+   * If no errors are detected, the expected result will be returned. If an error is detected, an
+   * ArithmeticOverflowException will be thrown.
    */
   inline def checked[A](inline n: A): A =
-    ${ checkedImpl[A]('{n}, '{throw new spire.macros.ArithmeticOverflowException()}) }
+    ${ checkedImpl[A]('{ n }, '{ throw new spire.macros.ArithmeticOverflowException() }) }
 
   // Attempts to convert the expresion to Int
   private def toInt[A](n: Expr[A])(using Quotes, Type[A]): Expr[Int] =
     import quotes.reflect.*
-    if (n.isExprOf[Int])
-      n.asExprOf[Int]
-    else if (n.isExprOf[Byte])
-      '{${n.asExprOf[Byte]}.toInt}
-    else if (n.isExprOf[Short])
-      '{${n.asExprOf[Short]}.toInt}
+    if (n.isExprOf[Int]) n.asExprOf[Int]
+    else if (n.isExprOf[Byte]) '{ ${ n.asExprOf[Byte] }.toInt }
+    else if (n.isExprOf[Short]) '{ ${ n.asExprOf[Short] }.toInt }
     else
-       report.error(s"Cannot lift value to int type ${Expr.betaReduce(n).show}")
-       '{${n.asExprOf[Long]}.intValue}
+      report.error(s"Cannot lift value to int type ${Expr.betaReduce(n).show}")
+      '{ ${ n.asExprOf[Long] }.intValue }
 
   // Attempts to convert the expresion to Long
   private def toLong[A](n: Expr[A])(using Quotes, Type[A]): Expr[Long] =
     import quotes.reflect.*
-    if (n.isExprOf[Int])
-      '{${n.asExprOf[Int]}.toLong}
-    else if (n.isExprOf[Byte])
-      '{${n.asExprOf[Byte]}.toLong}
-    else if (n.isExprOf[Short])
-      '{${n.asExprOf[Short]}.toLong}
-    else if (n.isExprOf[Long])
-      n.asExprOf[Long]
+    if (n.isExprOf[Int]) '{ ${ n.asExprOf[Int] }.toLong }
+    else if (n.isExprOf[Byte]) '{ ${ n.asExprOf[Byte] }.toLong }
+    else if (n.isExprOf[Short]) '{ ${ n.asExprOf[Short] }.toLong }
+    else if (n.isExprOf[Long]) n.asExprOf[Long]
     else
       report.error(s"Cannot lift value ${n.show} to long type")
-      '{${n.asExprOf[Long]}.longValue}
+      '{ ${ n.asExprOf[Long] }.longValue }
 
   // Determines if the expression is int like
   private def isIntType[A](n: Expr[A])(using Quotes, Type[A]): Boolean =
@@ -56,9 +63,9 @@ object Checked:
 
   private def limit[A](n: Expr[A])(using Quotes, Type[A]): Expr[Long] =
     if (isIntType[A](n))
-      '{Int.MinValue.toLong} // toLong avoids boxing
+      '{ Int.MinValue.toLong } // toLong avoids boxing
     else
-      '{Long.MinValue}
+      '{ Long.MinValue }
 
   private def checkedImpl[A](n: Expr[A], fallback: Expr[Any])(using Quotes, Type[A]): Expr[A] =
     import quotes.reflect.*
@@ -76,48 +83,48 @@ object Checked:
             val isLong = isLongType(x.asExpr)
             if (isInt)
               '{
-                  val z = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
-                  if (z == ${numLimit}) $fallback else -z
+                val z = ${ toInt(checkedImpl(x.asExprOf[Any], fallback)) }
+                if (z == ${ numLimit }) $fallback else -z
               }.asExprOf[A].asTerm.changeOwner(owner)
             else if (isLong)
               '{
-                  val z = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
-                  if (z == ${numLimit}) $fallback else -z
+                val z = ${ toLong(checkedImpl(x.asExprOf[Any], fallback)) }
+                if (z == ${ numLimit }) $fallback else -z
               }.asTerm.changeOwner(owner)
             else super.transformTerm(tree)(owner)
           case Apply(Select(x, "*"), List(y)) =>
             val isInt = isIntType(x.asExpr) && isIntType(y.asExpr)
             val isLong = isLongType(x.asExpr) || isLongType(y.asExpr)
             if (isInt) {
-            '{
-              val xt = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
-              val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
-              val z = xt * yt
-              if (xt == 0  || (yt == z / xt && !(xt == -1 && yt == $numLimit))) z else $fallback
-            }.asTerm.changeOwner(owner)
+              '{
+                val xt = ${ toInt(checkedImpl(x.asExprOf[Any], fallback)) }
+                val yt = ${ toInt(checkedImpl(y.asExprOf[Any], fallback)) }
+                val z = xt * yt
+                if (xt == 0 || (yt == z / xt && !(xt == -1 && yt == $numLimit))) z else $fallback
+              }.asTerm.changeOwner(owner)
             } else if (isLong) {
-            '{
-              val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
-              val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
-              val z = xt * yt
-              if (xt == 0  || (yt == z / xt && !(xt == -1 && yt == $numLimit))) z else $fallback
-            }.asTerm.changeOwner(owner)
+              '{
+                val xt = ${ toLong(checkedImpl(x.asExprOf[Any], fallback)) }
+                val yt = ${ toLong(checkedImpl(y.asExprOf[Any], fallback)) }
+                val z = xt * yt
+                if (xt == 0 || (yt == z / xt && !(xt == -1 && yt == $numLimit))) z else $fallback
+              }.asTerm.changeOwner(owner)
             } else
-            super.transformTerm(tree)(owner)
+              super.transformTerm(tree)(owner)
           case Apply(Select(x, "+"), List(y)) =>
             val isInt = isIntType(x.asExpr) && isIntType(y.asExpr)
             val isLong = isLongType(x.asExpr) || isLongType(y.asExpr)
             if (isInt)
               '{
-                val xt = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
-                val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
+                val xt = ${ toInt(checkedImpl(x.asExprOf[Any], fallback)) }
+                val yt = ${ toInt(checkedImpl(y.asExprOf[Any], fallback)) }
                 val z = xt + yt
                 if ((~(xt ^ yt) & (xt ^ z)) < 0) $fallback else z
               }.asTerm.changeOwner(owner)
             else if (isLong)
               '{
-                val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
-                val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
+                val xt = ${ toLong(checkedImpl(x.asExprOf[Any], fallback)) }
+                val yt = ${ toLong(checkedImpl(y.asExprOf[Any], fallback)) }
                 val z = xt + yt
                 if ((~(xt ^ yt) & (xt ^ z)) < 0) $fallback else z
               }.asTerm.changeOwner(owner)
@@ -127,15 +134,15 @@ object Checked:
             val isLong = isLongType(x.asExpr) || isLongType(y.asExpr)
             if (isInt)
               '{
-                val xt = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
-                val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
+                val xt = ${ toInt(checkedImpl(x.asExprOf[Any], fallback)) }
+                val yt = ${ toInt(checkedImpl(y.asExprOf[Any], fallback)) }
                 val z = xt - yt
                 if (((xt ^ yt) & (xt ^ z)) < 0) $fallback else z
               }.asTerm.changeOwner(owner)
             else if (isLong)
               '{
-                val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
-                val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
+                val xt = ${ toLong(checkedImpl(x.asExprOf[Any], fallback)) }
+                val yt = ${ toLong(checkedImpl(y.asExprOf[Any], fallback)) }
                 val z = xt - yt
                 if (((xt ^ yt) & (xt ^ z)) < 0) $fallback else z
               }.asTerm.changeOwner(owner)
@@ -145,15 +152,15 @@ object Checked:
             val isLong = isLongType(x.asExpr) || isLongType(y.asExpr)
             if (isInt)
               '{
-                val xt = ${toInt(checkedImpl(x.asExprOf[Any], fallback))}
-                val yt = ${toInt(checkedImpl(y.asExprOf[Any], fallback))}
+                val xt = ${ toInt(checkedImpl(x.asExprOf[Any], fallback)) }
+                val yt = ${ toInt(checkedImpl(y.asExprOf[Any], fallback)) }
                 val z = xt / yt
                 if (yt == -1 && xt == $numLimit) $fallback else z
               }.asTerm.changeOwner(owner)
             else if (isLong)
               '{
-                val xt = ${toLong(checkedImpl(x.asExprOf[Any], fallback))}
-                val yt = ${toLong(checkedImpl(y.asExprOf[Any], fallback))}
+                val xt = ${ toLong(checkedImpl(x.asExprOf[Any], fallback)) }
+                val yt = ${ toLong(checkedImpl(y.asExprOf[Any], fallback)) }
                 val z = xt / yt
                 if (yt == -1 && xt == $numLimit) $fallback else z
               }.asTerm.changeOwner(owner)
@@ -167,29 +174,22 @@ object Checked:
 
   /**
    * Performs overflow checking for Int/Long operations.
- *
-   * If no errors are detected, the expected result will be returned
-   * in a Some wrapper. If an error is detected, None will be
-   * returned.
+   *
+   * If no errors are detected, the expected result will be returned in a Some wrapper. If an error is detected, None
+   * will be returned.
    */
   inline def option[A](inline n: A): Option[A] =
-    try
-      Some(checked(n))
-    catch
-      case a: ArithmeticOverflowException => None
+    try Some(checked(n))
+    catch case a: ArithmeticOverflowException => None
 
   /**
    * Performs overflow checking for Int/Long operations.
    *
-   * If no errors are detected, the expected result will be
-   * returned. If there are errors, the 'orElse' block will be
+   * If no errors are detected, the expected result will be returned. If there are errors, the 'orElse' block will be
    * evaluated and returned.
    */
   inline def tryOrElse[A](inline n: A)(orElse: => A): A =
-    try
-      checked(n)
-    catch
-      case a: ArithmeticOverflowException => orElse
+    try checked(n)
+    catch case a: ArithmeticOverflowException => orElse
 
 end Checked
-

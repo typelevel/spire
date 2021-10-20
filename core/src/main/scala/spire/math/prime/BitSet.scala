@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math.prime
 
@@ -6,13 +21,11 @@ import spire.syntax.cfor._
 /**
  * Fast BitSet implementation.
  *
- * This bitset is just intended to be a little bit faster than
- * Scala's, and to support accessing its internals, which we do in
- * some cases.
+ * This bitset is just intended to be a little bit faster than Scala's, and to support accessing its internals, which we
+ * do in some cases.
  *
- * The max length (~2B) is a current limit to how big individual sieve
- * segments can get. Until our sieving is more efficient, we don't
- * want segments that big anyway, so this is OK.
+ * The max length (~2B) is a current limit to how big individual sieve segments can get. Until our sieving is more
+ * efficient, we don't want segments that big anyway, so this is OK.
  */
 object BitSet {
   def alloc(length: Int): BitSet =

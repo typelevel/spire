@@ -1,13 +1,30 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package algebra
 
 /**
- * A `RingAssociativeAlgebra` is a R-module that is also a `Ring`. An example is the Gaussian
- * numbers, the quaternions, etc...
+ * A `RingAssociativeAlgebra` is a R-module that is also a `Ring`. An example is the Gaussian numbers, the quaternions,
+ * etc...
  *
  * The scalar multiplication satisfies, for r in R, and x, y in V:
  *
- * 1. r *: (x * y) = (r *: x) * y = x * (r *: y)
+ * {{{
+ *   1. r *: (x * y) = (r *: x) * y = x * (r *: y)
+ * }}}
  *
  * TODO: verify the definition, in particular the requirements for Ring[V] (and not Rng[V])
  */
@@ -18,8 +35,8 @@ object RingAssociativeAlgebra {
 }
 
 /**
- * Given any `Ring[A]` we can construct a `RingAlgebra[A, Int]`. This is
- * possible since we can define `fromInt` on `Ring` generally.
+ * Given any `Ring[A]` we can construct a `RingAlgebra[A, Int]`. This is possible since we can define `fromInt` on
+ * `Ring` generally.
  */
 trait ZAlgebra[V] extends Any with RingAssociativeAlgebra[V, Int] with Ring[V] {
   implicit def vector: Ring[V]
@@ -45,8 +62,7 @@ object ZAlgebra {
 }
 
 /**
- * A `FieldAlgebra` is a vector space that is also a `Ring`. An example is the
- * complex numbers.
+ * A `FieldAlgebra` is a vector space that is also a `Ring`. An example is the complex numbers.
  */
 trait FieldAssociativeAlgebra[V, @sp(Float, Double) F]
     extends Any

@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -223,11 +238,9 @@ class RationalSuite extends munit.FunSuite {
   }
 
   /**
-   * Finds the closest `Rational` to `a` whose denominator is no greater than
-   * `limit` by brute-force. This is used to compare with the version used by
-   * `Rational` which is a little harder to reason about. This just literally
-   * tries every denominator between 1 and `limit` and returns the `Rational`
-   * that was closest to `a`.
+   * Finds the closest `Rational` to `a` whose denominator is no greater than `limit` by brute-force. This is used to
+   * compare with the version used by `Rational` which is a little harder to reason about. This just literally tries
+   * every denominator between 1 and `limit` and returns the `Rational` that was closest to `a`.
    */
   def bruteForceLimitDen(a: Rational, limit: Int): Rational =
     (1 to limit)

@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package macros
 
@@ -11,8 +26,7 @@ object Checked {
   /**
    * Performs overflow checking for Int/Long operations.
    *
-   * If no errors are detected, the expected result will be
-   * returned. If there are errors, the 'orElse' block will be
+   * If no errors are detected, the expected result will be returned. If there are errors, the 'orElse' block will be
    * evaluated and returned.
    */
   def tryOrElse[A](n: A)(orElse: A): A = macro tryOrElseImpl[A]
@@ -20,32 +34,27 @@ object Checked {
   /**
    * Performs overflow checking for Int/Long operations.
    *
-   * If no errors are detected, the expected result will be
-   * returned. If an error is detected, an ArithmeticOverflowException
-   * will be thrown.
+   * If no errors are detected, the expected result will be returned. If an error is detected, an
+   * ArithmeticOverflowException will be thrown.
    */
   def checked[A](n: A): A = macro checkedImpl[A]
 
   /**
    * Performs overflow checking for Int/Long operations.
    *
-   * If no errors are detected, the expected result will be returned
-   * in a Some wrapper. If an error is detected, None will be
-   * returned.
+   * If no errors are detected, the expected result will be returned in a Some wrapper. If an error is detected, None
+   * will be returned.
    */
   def option[A](n: A): Option[A] = macro optionImpl[A]
 
   /**
    * Performs overflow checking for Int/Long operations.
    *
-   * If no errors are detected, the expected result will be
-   * returned. If there are errors, the 'orElse' block will be
+   * If no errors are detected, the expected result will be returned. If there are errors, the 'orElse' block will be
    * evaluated and returned.
    *
-   * In the error case, this macro will actually evaluate a return
-   * statement in the outer method context. Thus, it should only be
-   * called from within a method that you would like to "return out
-   * of" in the case of an overflow.
+   * In the error case, this macro will actually evaluate a return statement in the outer method context. Thus, it
+   * should only be called from within a method that you would like to "return out of" in the case of an overflow.
    */
   def tryOrReturn[A](n: A)(orElse: A): A = macro tryOrReturnImpl[A]
 

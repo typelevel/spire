@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package random
 
@@ -9,22 +24,17 @@ class GeneratorSuite extends munit.FunSuite {
   /**
    * This is just a very basic sanity check.
    *
-   * The idea is that for a large enough sample size (in this case
-   * 10M) we expect the results of nextInt(mod) to be distributed
-   * "evenly enough" across the 'mod' values.
+   * The idea is that for a large enough sample size (in this case 10M) we expect the results of nextInt(mod) to be
+   * distributed "evenly enough" across the 'mod' values.
    *
-   * So, we build a histogram, fill it with 10M random values [0,
-   * mod-1], then see how much each bucket's count deviates from the
-   * expected count (which is 10M/mod).
+   * So, we build a histogram, fill it with 10M random values [0, mod-1], then see how much each bucket's count deviates
+   * from the expected count (which is 10M/mod).
    *
-   * Since we're hardcoding the time (13572468L) to seed with, this
-   * test doesn't cover all possible RNG states. You can uncomment the
-   * line that uses a different seed each time to get better coverage,
-   * but this may result in non-deterministic test failures (which
-   * won't always even indicate a problem).
+   * Since we're hardcoding the time (13572468L) to seed with, this test doesn't cover all possible RNG states. You can
+   * uncomment the line that uses a different seed each time to get better coverage, but this may result in
+   * non-deterministic test failures (which won't always even indicate a problem).
    *
-   * For "real" RNG testing, a suite like DIEHARD is much more
-   * appropriate than this file.
+   * For "real" RNG testing, a suite like DIEHARD is much more appropriate than this file.
    */
 
   def getName(g: GeneratorCompanion[_, _]): String =

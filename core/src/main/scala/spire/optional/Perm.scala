@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package optional
 
@@ -12,12 +27,11 @@ import spire.syntax.cfor._
 import spire.util._
 
 /**
- * Represents a permutation encoded as a map from preimages to images, including
- * only pairs that are moved by the permutation (so the identity is Map.empty).
+ * Represents a permutation encoded as a map from preimages to images, including only pairs that are moved by the
+ * permutation (so the identity is Map.empty).
  *
- * Note that although the preimage and image contain only moved points, the
- * domain and range of a Perm is all integers. This acts as the identity for
- * integers not in the image.
+ * Note that although the preimage and image contain only moved points, the domain and range of a Perm is all integers.
+ * This acts as the identity for integers not in the image.
  */
 class Perm private (private val mapping: Map[Int, Int]) extends (Int => Int) {
 
@@ -29,9 +43,8 @@ class Perm private (private val mapping: Map[Int, Int]) extends (Int => Int) {
   /**
    * A `Perm` constructed by cycling args so each n,,i,, maps to n,,i+1,,.
    *
-   * This new cycle is composed with the current permutation to yield a new
-   * `Perm`. Cycles provided to this constructor must be disjoint.
-   * See [[Perm$.apply(n0:Int*]].
+   * This new cycle is composed with the current permutation to yield a new `Perm`. Cycles provided to this constructor
+   * must be disjoint. See [[Perm$.apply(n0:Int*]].
    */
   def apply(n0: Int, n1: Int, ns: Int*): Perm = {
     val cycle = n0 +: n1 +: ns
@@ -53,9 +66,8 @@ class Perm private (private val mapping: Map[Int, Int]) extends (Int => Int) {
   def invert(k: Int): Int = inverseMapping.getOrElse(k, k)
 
   /**
-   * The inverse permutation, which composes with this to yield the identity.
-   * Note that this uses a lazy inverse map, so the first call may be O(n)
-   * rather than O(1).
+   * The inverse permutation, which composes with this to yield the identity. Note that this uses a lazy inverse map, so
+   * the first call may be O(n) rather than O(1).
    */
   def inverse: Perm = new Perm(inverseMapping)
 
@@ -112,11 +124,10 @@ object Perm {
   /**
    * A `Perm` constructed by cycling args so each n,,i,, maps to n,,i+1,,.
    *
-   * [[Perm#apply(n0:Int*]] can be called subsequently to express any `Perm` as
-   * the product of cycles rather than explicit preimage/image pairs. This is
-   * provided as a convenience for constructing permutations. eg.,
-   * `Perm(1,3)(2,4)` is shorthand for `Perm(1 -> 3, 2 -> 4, 3 -> 1, 4 ->
-   * 2)`. At least two args are required in each parameter list.
+   * [[Perm#apply(n0:Int*]] can be called subsequently to express any `Perm` as the product of cycles rather than
+   * explicit preimage/image pairs. This is provided as a convenience for constructing permutations. eg.,
+   * `Perm(1,3)(2,4)` is shorthand for `Perm(1 -> 3, 2 -> 4, 3 -> 1, 4 -> 2)`. At least two args are required in each
+   * parameter list.
    */
   def apply(n0: Int, n1: Int, ns: Int*): Perm = {
     val cycles = n0 +: n1 +: ns

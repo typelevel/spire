@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package syntax
 
@@ -17,6 +32,8 @@ trait FastForSyntax:
   inline def fastForRange[R <: RangeLike](inline r: R)(inline body: RangeElem[R] => Unit): Unit =
     ${ fastForRangeMacroGen('r, 'body) }
 
-  inline def fastForRange2[R <: RangeLike](inline r1: R, inline r2: R)(inline body: (RangeElem[R], RangeElem[R]) => Unit): Unit =
+  inline def fastForRange2[R <: RangeLike](inline r1: R, inline r2: R)(
+    inline body: (RangeElem[R], RangeElem[R]) => Unit
+  ): Unit =
     fastForRange(r1) { x => fastForRange(r2) { y => body(x, y) } }
 end FastForSyntax

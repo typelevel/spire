@@ -1,9 +1,24 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 import spire.algebra.Order
 
 /**
- *  Interface for a merging strategy object.
+ * Interface for a merging strategy object.
  */
 trait Merge extends Any {
   def merge[@sp A: Order: ClassTag](a: Array[A], b: Array[A]): Array[A]
@@ -34,9 +49,12 @@ abstract class BinaryMerge {
 
   /**
    * Compare element ai of the first sequence with element bi of the second sequence
-   * @param ai an index into the first sequence
-   * @param bi an index into the second sequence
-   * @return -1 if a(ai) &lt; b(bi), 0 if a(ai) == b(bi), 1 if a(ai) &gt; b(bi)
+   * @param ai
+   *   an index into the first sequence
+   * @param bi
+   *   an index into the second sequence
+   * @return
+   * -1 if a(ai) &lt; b(bi), 0 if a(ai) == b(bi), 1 if a(ai) &gt; b(bi)
    */
   def compare(ai: Int, bi: Int): Int
 
@@ -89,11 +107,11 @@ abstract class BinaryMerge {
 }
 
 /**
- *  Merge that uses binary search to reduce the number of comparisons
+ * Merge that uses binary search to reduce the number of comparisons
  *
- *  This can be orders of magnitude quicker than a linear merge for types that have a relatively expensive comparison
- *  operation (e.g. Rational, BigInt, tuples) and will not be much slower than linear merge even in the worst case for
- *  types that have a very fast comparison (e.g. Int)
+ * This can be orders of magnitude quicker than a linear merge for types that have a relatively expensive comparison
+ * operation (e.g. Rational, BigInt, tuples) and will not be much slower than linear merge even in the worst case for
+ * types that have a very fast comparison (e.g. Int)
  */
 object BinaryMerge extends Merge {
 
@@ -143,7 +161,7 @@ object BinaryMerge extends Merge {
 }
 
 /**
- *  Simple linear merge
+ * Simple linear merge
  */
 object LinearMerge extends Merge {
 

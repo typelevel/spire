@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package syntax
 package std
@@ -11,7 +26,7 @@ import spire.syntax.nroot._
 import spire.syntax.signed._
 
 trait IntSyntax:
-  extension(lhs: Int)
+  extension (lhs: Int)
     def /~(rhs: Int): Int = lhs / rhs
     def /%(rhs: Int): (Int, Int) = (lhs / rhs, lhs % rhs)
     def pow(rhs: Int): Int = Math.pow(lhs, rhs).toInt
@@ -21,7 +36,7 @@ trait IntSyntax:
 end IntSyntax
 
 trait LongSyntax:
-  extension(lhs: Long)
+  extension (lhs: Long)
     def /~(rhs: Long): Long = lhs / rhs
     def /%(rhs: Long): (Long, Long) = (lhs / rhs, lhs % rhs)
     def pow(rhs: Long): Long = spire.math.pow(lhs, rhs)
@@ -30,14 +45,14 @@ trait LongSyntax:
     def choose(rhs: Long): BigInt = spire.math.choose(lhs, rhs)
 end LongSyntax
 
-trait DoubleSyntax: 
-  extension(lhs: Double)
+trait DoubleSyntax:
+  extension (lhs: Double)
     def pow(rhs: Double): Double = spire.math.pow(lhs, rhs)
     def **(rhs: Double): Double = spire.math.pow(lhs, rhs)
 end DoubleSyntax
 
 trait BigIntSyntax:
-  extension(lhs: BigInt)
+  extension (lhs: BigInt)
     def /~(rhs: BigInt): BigInt = lhs / rhs
     def pow(rhs: BigInt): BigInt = spire.math.pow(lhs, rhs)
     def **(rhs: BigInt): BigInt = spire.math.pow(lhs, rhs)

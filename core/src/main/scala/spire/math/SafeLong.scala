@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -14,9 +29,8 @@ import spire.std.bigInteger._
 
 //scalastyle:off equals.hash.code
 /**
- * Provides a type to do safe long arithmetic. This type will never overflow,
- * but rather convert the underlying long to a BigInteger as need and back down
- * to a Long when possible.
+ * Provides a type to do safe long arithmetic. This type will never overflow, but rather convert the underlying long to
+ * a BigInteger as need and back down to a Long when possible.
  */
 sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] { lhs =>
 
@@ -158,8 +172,8 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
   /**
    * Exponentiation function, e.g. x ** y
    *
-   * If base ** exponent doesn't fit in a Long, the result will overflow (unlike
-   * scala.math.pow which will return +/- Infinity).
+   * If base ** exponent doesn't fit in a Long, the result will overflow (unlike scala.math.pow which will return +/-
+   * Infinity).
    */
   final def **(k: Int): SafeLong = pow(k)
 
@@ -222,10 +236,11 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
   def factor: prime.Factors = prime.factor(this)
 
   /**
-   * Returns true if this SafeLong is probably prime, false if it's definitely composite. If certainty is ≤ 0, true is returned.
-   * @param certainty a measure of the uncertainty that the caller is willing to tolerate:
-   *                  if the call returns true the probability that this BigInteger is
-   *                  prime exceeds (1 - 1/2^certainty).
+   * Returns true if this SafeLong is probably prime, false if it's definitely composite. If certainty is ≤ 0, true is
+   * returned.
+   * @param certainty
+   *   a measure of the uncertainty that the caller is willing to tolerate: if the call returns true the probability
+   *   that this BigInteger is prime exceeds (1 - 1/2^certainty).
    */
   final def isProbablePrime(certainty: Int): Boolean =
     toBigInteger.isProbablePrime(certainty)
