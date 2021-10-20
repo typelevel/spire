@@ -151,7 +151,6 @@ lazy val extras = crossProject(JSPlatform, JVMPlatform)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
   .dependsOn(macros, platform, util, core, data)
-
 lazy val docs = project
   .in(file("docs"))
   .enablePlugins(MicrositesPlugin)
@@ -164,7 +163,12 @@ lazy val docs = project
   .settings(noPublishSettings)
   .enablePlugins(MdocPlugin)
   .settings(
-    mdocIn := (Compile / sourceDirectory).value / "mdoc"
+    mdocIn := (Compile / sourceDirectory).value / "mdoc",
+    mdocVariables := Map(
+      "VERSION" -> version.value,
+    ),
+    // NOTE: disable link hygine to supress dead link warnings because mdoc does not go well with Jekyll
+    mdocExtraArguments ++= Seq("--no-link-hygiene")
   )
   .settings(commonJvmSettings: _*)
 
@@ -303,7 +307,6 @@ lazy val docSettings = Seq(
   micrositeGithubOwner := "typelevel",
   micrositeGithubRepo := "spire",
   micrositeTheme := "pattern",
-  ghpagesBranch := "main",
   micrositePalette := Map(
     "brand-primary" -> "#5B5988",
     "brand-secondary" -> "#292E53",
@@ -350,12 +353,12 @@ lazy val publishSettings = Seq(
       <developer>
         <id>d_m</id>
         <name>Erik Osheim</name>
-        <url>http://github.com/non/</url>
+        <url>https://github.com/non/</url>
       </developer>
       <developer>
         <id>tixxit</id>
         <name>Tom Switzer</name>
-        <url>http://github.com/tixxit/</url>
+        <url>https://github.com/tixxit/</url>
       </developer>
     </developers>
   )
