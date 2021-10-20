@@ -52,8 +52,8 @@ jobs:
       - name: Check that workflows are up to date
         run: sbt ++${{ matrix.scala }} githubWorkflowCheck
 
-      - name: Check formatting
-        run: sbt ++${{ matrix.scala }} scalafmtCheckAll scalafmtSbtCheck
+      - name: Check headers+formatting
+        run: sbt ++${{ matrix.scala }} headerCheckAll scalafmtCheckAll scalafmtSbtCheck
 
       - name: Compile
         run: sbt ++${{ matrix.scala }} Test/compile
