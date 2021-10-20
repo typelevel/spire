@@ -271,7 +271,7 @@ lazy val docSettings = Seq(
   micrositeHighlightTheme := "atom-one-light",
   micrositeHomepage := "https://typelevel.org/spire",
   micrositeBaseUrl := "spire",
-  micrositeDocumentationUrl := "/spire/api/spire/index.html",
+  micrositeDocumentationUrl := "https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html",
   micrositeDocumentationLabelDescription := "API Documentation",
   micrositeExtraMdFiles := Map(
     file("AUTHORS.md") -> ExtraMdFileConfig(
