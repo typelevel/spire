@@ -50,19 +50,19 @@ inThisBuild(
   List(
     organization := "org.typelevel",
     homepage := Some(url("https://typelevel.org/spire/")),
-    licenses += ("MIT", url("http://opensource.org/licenses/MIT")),
+    licenses += ("MIT", url("https://opensource.org/licenses/MIT")),
     developers := List(
       Developer(
         "id_m",
         "Erik Osheim",
         "",
-        url("http://github.com/non/")
+        url("https://github.com/non/")
       ),
       Developer(
         "tixxit",
         "Tom Switzer",
         "",
-        url("http://github.com/tixxit/")
+        url("https://github.com/tixxit/")
       )
     )
   )
