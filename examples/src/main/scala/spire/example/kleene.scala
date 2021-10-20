@@ -109,7 +109,11 @@ object KleeneDemo {
    * A Kleene is a StarRig which obeys some additional laws.
    *
    * Laws:
-   *   1. a + a = a 2. a * x + x = x ==> a.kstar * x + x = x 3. x * a + x = x ==> x * a.kstar + x = x
+   * {{{
+   *   1. a + a = a
+   *   2. a * x + x = x ==> a.kstar * x + x = x
+   *   3. x * a + x = x ==> x * a.kstar + x = x
+   * }}}
    */
   trait Kleene[A] extends StarRig[A]
   object Kleene {
@@ -268,10 +272,14 @@ object KleeneDemo {
    * Expr[A] implements an AST for regular expressions.
    *
    * Basic regular consist of the following:
-   *   1. the empty set (Nul) -- a set with no strings 2. the empty string (Empty) -- set containing the empty string 3.
-   *      literal strings (Var(a)) -- set containing a 4. concatenation (Then(a, b)) -- set of all xy, for x in a, y in
-   *      b 5. alternation (Or(a, b)) -- union set of a and b 6. kleene star (Star(a)) -- set produced by 0+
-   *      concatenations from a
+   * {{{
+   *   1. the empty set (Nul) -- a set with no strings
+   *   2. the empty string (Empty) -- set containing the empty string
+   *   3. literal strings (Var(a)) -- set containing a
+   *   4. concatenation (Then(a, b)) -- set of all xy, for x in a, y in b
+   *   5. alternation (Or(a, b)) -- union set of a and b
+   *   6. kleene star (Star(a)) -- set produced by 0+ concatenations from a
+   * }}}
    *
    * For example, (a|bc)* includes "", "a", "bc", "abcaaaabc" but not "bc".
    */
@@ -373,7 +381,10 @@ object KleeneDemo {
 
   /**
    * ShortestPath is a data structure which will track two things:
-   *   1. the path's cost, as Tropical[A] 2. the path itself, as B Any impossible path will have Infinity as its cost.
+   * {{{
+   *   1. the path's cost, as Tropical[A]
+   *   2. the path itself, as B Any impossible path will have Infinity as its cost.
+   * }}}
    */
   case class ShortestPath[A, B](a: Tropical[A], b: B) {
     def map[C](f: B => C) = ShortestPath[A, C](a, f(b))

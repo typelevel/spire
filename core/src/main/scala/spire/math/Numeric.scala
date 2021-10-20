@@ -20,8 +20,13 @@ import spire.algebra.{AdditiveAbGroup, IsReal, MultiplicativeAbGroup, NRoot, Rin
 import spire.std._
 
 /**
- * TODO 3. LiteralOps? Literal conversions? 4. Review operator symbols? 5. Support for more operators? 6. Start to worry
- * about things like e.g. pow(BigInt, BigInt)
+ * TODO
+ * {{{
+ * 3. LiteralOps? Literal conversions?
+ * 4. Review operator symbols?
+ * 5. Support for more operators?
+ * 6. Start to worry about things like e.g. pow(BigInt, BigInt)
+ * }}}
  */
 
 trait Numeric[@sp(Int, Long, Float, Double) A]

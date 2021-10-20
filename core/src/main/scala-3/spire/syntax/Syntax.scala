@@ -86,9 +86,8 @@ trait AdditiveSemigroupSyntax:
     new LiteralDoubleAdditiveSemigroupOps(lhs)
 
 trait AdditiveMonoidSyntax extends AdditiveSemigroupSyntax:
-  implicit def additiveMonoidOps[A](a: A)(implicit ev: AdditiveMonoid[A]): AdditiveMonoidOps[A] = new AdditiveMonoidOps(
-    a
-  )
+  implicit def additiveMonoidOps[A](a: A)(implicit ev: AdditiveMonoid[A]): AdditiveMonoidOps[A] =
+    new AdditiveMonoidOps(a)
 
 trait AdditiveGroupSyntax extends AdditiveMonoidSyntax:
   implicit def additiveGroupOps[A: AdditiveGroup](a: A): AdditiveGroupOps[A] = new AdditiveGroupOps(a)

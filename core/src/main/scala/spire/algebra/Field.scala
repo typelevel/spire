@@ -39,7 +39,10 @@ object Field extends _root_.algebra.ring.FieldFunctions[Field] with EuclideanRin
   @inline def apply[A](implicit ev: Field[A]): Field[A] = ev
 
   /**
-   * Field with simple default GCD/LCM implementations: gcd(a, b) = 1 (except gcd(0, 0) = 0) while lcm(a, b) = a * b.
+   * Field with simple default GCD/LCM implementations:
+   * {{{
+   * gcd(a, b) = 1 (except gcd(0, 0) = 0) while lcm(a, b) = a * b.
+   * }}}
    */
   trait WithDefaultGCD[@sp(Int, Long, Float, Double) A] extends Any with Field[A] {
     override def gcd(a: A, b: A)(implicit eqA: Eq[A]): A =
@@ -49,10 +52,13 @@ object Field extends _root_.algebra.ring.FieldFunctions[Field] with EuclideanRin
 
   /**
    * Field defined as a field of fractions with a default implementation of GCD/LCM such that
+   * {{{
    *   - gcd(a/b, c/d) = gcd(a, c) / lcm(b, d)
-   *   - lcm(a/b, c/d) = lcm(a, c) / gcd(b, d) which corresponds to the convention of the GCD domains of SageMath; on
-   *     rational numbers, it "yields the unique extension of gcd from integers to rationals presuming the natural
-   *     extension of the divisibility relation from integers to rationals", see http://math.stackexchange.com/a/151431
+   *   - lcm(a/b, c/d) = lcm(a, c) / gcd(b, d)
+   * }}}
+   * which corresponds to the convention of the GCD domains of SageMath; on rational numbers, it "yields the unique
+   * extension of gcd from integers to rationals presuming the natural extension of the divisibility relation from
+   * integers to rationals", see http://math.stackexchange.com/a/151431
    */
   trait FieldOfFractionsGCD[A, R] extends Any with Field[A] {
     implicit def ringR: GCDRing[R]

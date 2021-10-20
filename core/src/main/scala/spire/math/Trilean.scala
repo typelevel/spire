@@ -32,15 +32,30 @@ import algebra.lattice.DeMorgan
  * be the same. However, the truth tables have to be extended to work with unknown:
  *
  * not:
- * -+- T|F U|U F|T
+ * {{{
+ * -+-
+ * T|F
+ * U|U
+ * F|T
+ * }}}
  *
  * and:
- * |T U F
- * -+----- T|T U F U|U U F F|F F F
+ * {{{
+ *   |T U F
+ * -+-----
+ * T|T U F
+ * U|U U F
+ * F|F F F
+ * }}}
  *
  * or:
- * |T U F
- * -+----- T|T T T U|T U U F|T U F
+ * {{{
+ *   |T U F
+ * -+-----
+ * T|T T T
+ * U|T U U
+ * F|T U F
+ * }}}
  *
  * Trilean is implemented as a value type, so in most cases it will only have the overhead of a single Int. However, in
  * some situations it will be boxed.

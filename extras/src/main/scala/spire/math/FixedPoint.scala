@@ -41,10 +41,17 @@ case class FixedScale(denom: Int) {
  *
  * For example:
  *
- * // interpret FixedPoint(n) as n/1000 implicit val scale = FixedScale(1000)
+ * {{{
+ * // interpret FixedPoint(n) as n/1000
+ * implicit val scale = FixedScale(1000)
+ * }}}
  *
- * // these three values are equivalent val a = FixedPoint("12.345") // decimal repr val b = FixedPoint(Rational(2469,
- * 200)) // fraction repr val c = new FixedPoint(12345L) // "raw" repr
+ * {{{
+ * // these three values are equivalent
+ * val a = FixedPoint("12.345") // decimal repr
+ * val b = FixedPoint(Rational(2469, 200)) // fraction repr
+ * val c = new FixedPoint(12345L) // "raw" repr
+ * }}}
  */
 class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def unary_- : FixedPoint =
