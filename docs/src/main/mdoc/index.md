@@ -39,8 +39,8 @@ The [Spire mailing list](http://groups.google.com/group/typelevel/)
 is shared with other [Typelevel projects](http://typelevel.org).
 It is the place to go for announcements and discussions around Spire.
 When posting, place the word `[spire]` at the beginning of your subject.
-We also have a guide on [contributing to Spire](CONTRIBUTING.md) as well
-as a guide that provides information on [Spire's design](GUIDE.md).
+We also have a guide on [contributing to Spire](./extra_md/contributing.html) as well
+as a guide that provides information on [Spire's design](./guide.html).
 
 Spire has maintainers who are responsible for signing-off on and
 merging pull requests, and for helping to guide the direction of Spire:
@@ -65,7 +65,7 @@ JVM and JS platforms.
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-libraryDependencies += "org.typelevel" %% "spire" % "0.17.0"
+libraryDependencies += "org.typelevel" %% "spire" % "@VERSION@"
 ```
 
 (Previous to 0.14.0, Spire was published under *org.spire-math*
@@ -129,7 +129,7 @@ introduces several new ones, all of which can be found in `spire.math`:
  * `Trilean` value class supporting three-valued logic
  * `FixedPoint` fractions with `Long` numerator and implicit denominator (in *extras*)
 
-Detailed treatment of these types can be found in the [guide](GUIDE.md).
+Detailed treatment of these types can be found in the [guide](./guide.html).
 
 ### Type Classes
 
@@ -179,7 +179,7 @@ implicits which provide unary and infix operators for the type classes. The
 easiest way to use these is via a wildcard import of `spire.implicits._`.
 
 Detailed treatment of these type classes can be found in the
-[guide](GUIDE.md).
+[guide](./guide.md).
 
 ### Getting Started
 
@@ -565,6 +565,6 @@ criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
 Copyright 2011-2017 Erik Osheim, Tom Switzer
 
-A full list of contributors can be found in [AUTHORS.md](AUTHORS.md).
+A full list of contributors can be found in [AUTHORS.md](./extra_md/authors.html).
 
-The MIT software license is attached in the [COPYING](COPYING) file.
+The MIT software license is attached in the [COPYING](./extra_md/copying) file.

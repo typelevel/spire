@@ -165,7 +165,7 @@ lazy val docs = project
   .settings(
     mdocIn := (Compile / sourceDirectory).value / "mdoc",
     mdocVariables := Map(
-      "VERSION" -> version.value,
+      "VERSION" -> version.value
     ),
     // NOTE: disable link hygine to supress dead link warnings because mdoc does not go well with Jekyll
     mdocExtraArguments ++= Seq("--no-link-hygiene")
