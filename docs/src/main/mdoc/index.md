@@ -371,6 +371,9 @@ object LiteralsDemo {
   val n1 = r"1/3"
   val n2 = r"1599/115866" // simplified at compile-time to 13/942
 }
+```
+
+```scala
 
 object RadixDemo {
   // support different radix literals
@@ -400,20 +403,21 @@ tail-recursive function, which will inline literal function arguments.
 The macro can be nested in itself and compares favorably with other looping
 constructs in Scala such as `for` and `while`:
 
-```scala mdoc:silent
+```scala mdoc:silent:nest
+import spire.syntax.fastFor._
 
 // print numbers 1 through 10
-cfor(0)(_ < 10, _ + 1) { i =>
+fastFor(0)(_ < 10, _ + 1) { i =>
   println(i)
 }
 
 // naive sorting algorithm
 def selectionSort(ns: Array[Int]) = {
   val limit = ns.length -1
-  cfor(0)(_ < limit, _ + 1) { i =>
+  fastFor(0)(_ < limit, _ + 1) { i =>
     var k = i
     val n = ns(i)
-    cfor(i + 1)(_ <= limit, _ + 1) { j =>
+    fastFor(i + 1)(_ <= limit, _ + 1) { j =>
       if (ns(j) < ns(k)) k = j
     }
     ns(i) = ns(k)
@@ -486,7 +490,7 @@ object DistDemo {
   val rng = spire.random.rng.Cmwc5()
   
   // produces a map with ~10-20 entries
-  implicit val nextmap = Dist.map[Int, Complex[Double]](10, 20)
+  implicit val nextmap:Dist[Map[Int, Complex[Double]]] = Dist.map[Int, Complex[Double]](10, 20)
   val m = rng.next[Map[Int, Complex[Double]]]
 
   // produces a double in [0.0, 1.0)
