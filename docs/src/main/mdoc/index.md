@@ -490,7 +490,7 @@ object DistDemo {
   val rng = spire.random.rng.Cmwc5()
   
   // produces a map with ~10-20 entries
-  implicit val nextmap:Dist[Map[Int, Complex[Double]]] = Dist.map[Int, Complex[Double]](10, 20)
+  implicit val nextmap: Dist[Map[Int, Complex[Double]]] = Dist.map[Int, Complex[Double]](10, 20)
   val m = rng.next[Map[Int, Complex[Double]]]
 
   // produces a double in [0.0, 1.0)
