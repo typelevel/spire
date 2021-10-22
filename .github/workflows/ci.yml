@@ -62,7 +62,7 @@ jobs:
         run: sbt ++${{ matrix.scala }} test
 
       - name: Build docs
-        run: sbt ++${{ matrix.scala }} doc
+        run: sbt ++${{ matrix.scala }} doc docs/mdoc
 
   publish:
     name: Publish Artifacts
