@@ -1,8 +1,23 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
 import java.lang.Long.numberOfLeadingZeros
-import java.math.{MathContext, RoundingMode, BigInteger, BigDecimal => JBigDecimal}
+import java.math.{BigDecimal => JBigDecimal, BigInteger, MathContext, RoundingMode}
 import java.util.concurrent.atomic.AtomicReference
 
 import scala.math.{ScalaNumber, ScalaNumericConversions}
@@ -19,24 +34,20 @@ import spire.util.Opt
 import scala.annotation.nowarn
 
 /**
- * Algebraic provides an exact number type for algebraic numbers. Algebraic
- * numbers are roots of polynomials with rational coefficients. With it, we can
- * represent expressions involving addition, multiplication, division, n-roots
- * (eg. `sqrt` or `cbrt`), and roots of rational polynomials. So, it is similar
- * [[Rational]], but adds roots as a valid, exact operation. The cost is that
- * this will not be as fast as [[Rational]] for many operations.
+ * Algebraic provides an exact number type for algebraic numbers. Algebraic numbers are roots of polynomials with
+ * rational coefficients. With it, we can represent expressions involving addition, multiplication, division, n-roots
+ * (eg. `sqrt` or `cbrt`), and roots of rational polynomials. So, it is similar [[Rational]], but adds roots as a valid,
+ * exact operation. The cost is that this will not be as fast as [[Rational]] for many operations.
  *
- * In general, you can assume all operations on this number type are exact,
- * except for those that explicitly construct approximations to an Algebraic
- * number, such as `toBigDecimal`.
+ * In general, you can assume all operations on this number type are exact, except for those that explicitly construct
+ * approximations to an Algebraic number, such as `toBigDecimal`.
  *
- * For an overview of the ideas, algorithms, and proofs of this number type,
- * you can read the following papers:
+ * For an overview of the ideas, algorithms, and proofs of this number type, you can read the following papers:
  *
- *  - "On Guaranteed Accuracy Computation." C. K. Yap.
- *  - "Recent Progress in Exact Geometric Computation." C. Li, S. Pion, and C. K. Yap.
- *  - "A New Constructive Root Bound for Algebraic Expressions" by C. Li & C. K. Yap.
- *  - "A Separation Bound for Real Algebraic Expressions." C. Burnikel, et al.
+ *   - "On Guaranteed Accuracy Computation." C. K. Yap.
+ *   - "Recent Progress in Exact Geometric Computation." C. Li, S. Pion, and C. K. Yap.
+ *   - "A New Constructive Root Bound for Algebraic Expressions" by C. Li & C. K. Yap.
+ *   - "A Separation Bound for Real Algebraic Expressions." C. Burnikel, et al.
  */
 @SerialVersionUID(1L)
 final class Algebraic private (val expr: Algebraic.Expr)
@@ -46,14 +57,14 @@ final class Algebraic private (val expr: Algebraic.Expr)
   import Algebraic.{roundExact, Expr, MaxIntValue, MaxLongValue, MinIntValue, MinLongValue, One}
 
   /**
-   * Returns an `Int` with the same sign as this algebraic number. Algebraic
-   * numbers support exact sign tests, so this is guaranteed to be accurate.
+   * Returns an `Int` with the same sign as this algebraic number. Algebraic numbers support exact sign tests, so this
+   * is guaranteed to be accurate.
    */
   def signum: Int = expr.signum
 
   /**
-   * Returns the sign of this Algebraic number. Algebraic numbers support exact
-   * sign tests, so this is guaranteed to be accurate.
+   * Returns the sign of this Algebraic number. Algebraic numbers support exact sign tests, so this is guaranteed to be
+   * accurate.
    */
   def sign: Sign = Sign(signum)
 
@@ -79,15 +90,14 @@ final class Algebraic private (val expr: Algebraic.Expr)
     new Algebraic(Expr.Div(this.expr, that.expr))
 
   /**
-   * Returns an `Algebraic` whose value is just the integer part of
-   * `this / that`. This operation is exact.
+   * Returns an `Algebraic` whose value is just the integer part of `this / that`. This operation is exact.
    */
   def tquot(that: Algebraic): Algebraic =
     Algebraic((this / that).toBigInt)
 
   /**
-   * Returns an `Algebraic` whose value is the difference between `this` and
-   * `(this /~ that) * that` -- the remainder of truncated division.
+   * Returns an `Algebraic` whose value is the difference between `this` and `(this /~ that) * that` -- the remainder of
+   * truncated division.
    */
   def tmod(that: Algebraic): Algebraic =
     this - (this.tquot(that)) * that
@@ -139,9 +149,8 @@ final class Algebraic private (val expr: Algebraic.Expr)
   def >=(that: Algebraic): Boolean = compare(that) >= 0
 
   /**
-   * Returns an integer with the same sign as `this - that`. Specifically, if
-   * `this &lt; that`, then the sign is negative, if `this &gt; that`, then the
-   * sign is positive, otherwise `this == that` and this returns 0.
+   * Returns an integer with the same sign as `this - that`. Specifically, if `this &lt; that`, then the sign is
+   * negative, if `this &gt; that`, then the sign is positive, otherwise `this == that` and this returns 0.
    */
   def compare(that: Algebraic): Int = (this - that).signum
 
@@ -219,13 +228,11 @@ final class Algebraic private (val expr: Algebraic.Expr)
   }
 
   /**
-   * Returns the nearest, valid `Int` value to this Algebraic, without going
-   * further away from 0 (eg. truncation).
+   * Returns the nearest, valid `Int` value to this Algebraic, without going further away from 0 (eg. truncation).
    *
-   * If this `Algebraic` represented 1.2, then this would return 1. If this
-   * represented -3.3, then this would return -3. If this value is greater than
-   * `Int.MaxValue`, then `Int.MaxValue` is returned. If this value is less
-   * than `Int.MinValue`, then `Int.MinValue` is returned.
+   * If this `Algebraic` represented 1.2, then this would return 1. If this represented -3.3, then this would return -3.
+   * If this value is greater than `Int.MaxValue`, then `Int.MaxValue` is returned. If this value is less than
+   * `Int.MinValue`, then `Int.MinValue` is returned.
    */
   def intValue: Int = {
     val n = toBigInt
@@ -235,13 +242,11 @@ final class Algebraic private (val expr: Algebraic.Expr)
   }
 
   /**
-   * Returns the nearest, valid `Long` value to this Algebraic, without going
-   * further away from 0 (eg. truncation).
+   * Returns the nearest, valid `Long` value to this Algebraic, without going further away from 0 (eg. truncation).
    *
-   * If this `Algebraic` represented 1.2, then this would return 1. If this
-   * represented -3.3, then this would return -3. If this value is greater than
-   * `Long.MaxValue`, then `Long.MaxValue` is returned. If this value is less
-   * than `Long.MinValue`, then `Long.MinValue` is returned.
+   * If this `Algebraic` represented 1.2, then this would return 1. If this represented -3.3, then this would return -3.
+   * If this value is greater than `Long.MaxValue`, then `Long.MaxValue` is returned. If this value is less than
+   * `Long.MinValue`, then `Long.MinValue` is returned.
    */
   def longValue: Long = {
     val n = toBigInt
@@ -251,44 +256,40 @@ final class Algebraic private (val expr: Algebraic.Expr)
   }
 
   /**
-   * Returns a `Float` that approximates this value. If the exponent is too
-   * large to fit in a float, the `Float.PositiveInfinity` or
-   * `Float.NegativeInfinity` is returned.
+   * Returns a `Float` that approximates this value. If the exponent is too large to fit in a float, the
+   * `Float.PositiveInfinity` or `Float.NegativeInfinity` is returned.
    */
   def floatValue: Float = toBigDecimal(MathContext.DECIMAL32).toFloat
 
   /**
-   * Returns a `Double` that approximates this value. If the exponent is too
-   * large to fit in a double, the `Double.PositiveInfinity` or
-   * `Double.NegativeInfinity` is returned.
+   * Returns a `Double` that approximates this value. If the exponent is too large to fit in a double, the
+   * `Double.PositiveInfinity` or `Double.NegativeInfinity` is returned.
    */
   def doubleValue: Double = toBigDecimal(MathContext.DECIMAL64).toDouble
 
   /**
-   * Returns the nearest, valid `BigInt` value to this Algebraic, without going
-   * further away from 0 (eg. truncation).
+   * Returns the nearest, valid `BigInt` value to this Algebraic, without going further away from 0 (eg. truncation).
    *
-   * If this `Algebraic` represented 1.2, then this would return 1. If this
-   * represented -3.3, then this would return -3.
+   * If this `Algebraic` represented 1.2, then this would return 1. If this represented -3.3, then this would return -3.
    */
   def toBigInt: BigInt =
     toBigDecimal(0, RoundingMode.DOWN).toBigInt
 
   /**
-   * Absolute approximation to `scale` decimal places with the given rounding
-   * mode. Rounding is always exact.
+   * Absolute approximation to `scale` decimal places with the given rounding mode. Rounding is always exact.
    */
   def toBigDecimal(scale: Int, roundingMode: RoundingMode): BigDecimal =
     new BigDecimal(roundExact(this, expr.toBigDecimal(scale + 2), scale, roundingMode), MathContext.UNLIMITED)
 
   /**
-   * Relative approximation to the precision specified in `mc` with the given
-   * rounding mode. Rounding is always exact. The sign is always correct; the
-   * sign of the returned `BigDecimal` matches the sign of the exact value this
+   * Relative approximation to the precision specified in `mc` with the given rounding mode. Rounding is always exact.
+   * The sign is always correct; the sign of the returned `BigDecimal` matches the sign of the exact value this
    * `Algebraic` represents.
    *
-   * @param mc the precision and rounding mode of the final result
-   * @return an approximation to the value of this algebraic number
+   * @param mc
+   *   the precision and rounding mode of the final result
+   * @return
+   *   an approximation to the value of this algebraic number
    */
   def toBigDecimal(mc: MathContext): BigDecimal = {
     import Expr._
@@ -360,9 +361,8 @@ final class Algebraic private (val expr: Algebraic.Expr)
   def isWhole: Boolean = this == Algebraic(toBigInt)
 
   /**
-   * Returns `true` if this Algebraic number is a whole number (no fractional
-   * part) and fits within the bounds of an `Int`. That is, if `x.isValidInt`,
-   * then `Algebraic(x.toInt) == x`.
+   * Returns `true` if this Algebraic number is a whole number (no fractional part) and fits within the bounds of an
+   * `Int`. That is, if `x.isValidInt`, then `Algebraic(x.toInt) == x`.
    */
   override def isValidInt: Boolean = {
     val n = toBigInt
@@ -372,9 +372,8 @@ final class Algebraic private (val expr: Algebraic.Expr)
   }
 
   /**
-   * Returns `true` if this Algebraic number is a whole number (no fractional
-   * part) and fits within the bounds of an `Long`. That is, if `x.isValidLong`,
-   * then `Algebraic(x.toLong) == x`.
+   * Returns `true` if this Algebraic number is a whole number (no fractional part) and fits within the bounds of an
+   * `Long`. That is, if `x.isValidLong`, then `Algebraic(x.toLong) == x`.
    */
   def isValidLong: Boolean = {
     val n = toBigInt
@@ -384,15 +383,14 @@ final class Algebraic private (val expr: Algebraic.Expr)
   }
 
   /**
-   * Returns `true` iff this is a rational expression (ie contains no n-root
-   * expressions). Otherwise it is a radical expression and returns false.
+   * Returns `true` iff this is a rational expression (ie contains no n-root expressions). Otherwise it is a radical
+   * expression and returns false.
    */
   def isRational: Boolean = expr.flags.isRational
 
   /**
-   * If this is a rational expressions, then it returns the exact value as a
-   * [[Rational]]. Otherwise, this is a radical expression and `None` is
-   * returned.
+   * If this is a rational expressions, then it returns the exact value as a [[Rational]]. Otherwise, this is a radical
+   * expression and `None` is returned.
    */
   def toRational: Option[Rational] =
     if (expr.flags.isRational) {
@@ -410,11 +408,10 @@ final class Algebraic private (val expr: Algebraic.Expr)
     }
 
   /**
-   * Evaluates this algebraic expression with a different number type. All
-   * `Algebraic` numbers store the entire expression tree, so we can use this
-   * to *replay* the stored expression using a different type. This will
-   * accumulate errors as if the number type had been used from the beginning
-   * and is only really suitable for more exact number types, like [[Real]].
+   * Evaluates this algebraic expression with a different number type. All `Algebraic` numbers store the entire
+   * expression tree, so we can use this to *replay* the stored expression using a different type. This will accumulate
+   * errors as if the number type had been used from the beginning and is only really suitable for more exact number
+   * types, like [[Real]].
    *
    * TODO: Eq/ClassTag come from poly.map - would love to get rid of them.
    */
@@ -476,17 +473,15 @@ object Algebraic extends AlgebraicInstances {
     new Algebraic(Expr.ConstantLong(n))
 
   /**
-   * Returns an Algebraic expression equivalent to `n`, if `n` is finite. If
-   * `n` is either infinite or `NaN`, then an `IllegalArgumentException` is
-   * thrown.
+   * Returns an Algebraic expression equivalent to `n`, if `n` is finite. If `n` is either infinite or `NaN`, then an
+   * `IllegalArgumentException` is thrown.
    */
   def apply(n: Float): Algebraic =
     Algebraic(n.toDouble)
 
   /**
-   * Returns an Algebraic expression equivalent to `n`, if `n` is finite. If
-   * `n` is either infinite or `NaN`, then an `IllegalArgumentException` is
-   * thrown.
+   * Returns an Algebraic expression equivalent to `n`, if `n` is finite. If `n` is either infinite or `NaN`, then an
+   * `IllegalArgumentException` is thrown.
    */
   implicit def apply(n: Double): Algebraic =
     if (java.lang.Double.isInfinite(n)) {
@@ -516,16 +511,17 @@ object Algebraic extends AlgebraicInstances {
     new Algebraic(Expr.ConstantRational(n))
 
   /**
-   * Returns an Algebraic expression whose value is equivalent to the `i`-th
-   * real root of the [[Polynomial]] `poly`. If `i` is negative or does not an
-   * index a real root (eg the value is greater than or equal to the number of
-   * real roots) then an `ArithmeticException` is thrown. Roots are indexed
-   * starting at 0.  So if there are 3 roots, then they are indexed as 0, 1,
-   * and 2.
+   * Returns an Algebraic expression whose value is equivalent to the `i`-th real root of the [[Polynomial]] `poly`. If
+   * `i` is negative or does not an index a real root (eg the value is greater than or equal to the number of real
+   * roots) then an `ArithmeticException` is thrown. Roots are indexed starting at 0. So if there are 3 roots, then they
+   * are indexed as 0, 1, and 2.
    *
-   * @param poly the polynomial containing at least i real roots
-   * @param i    the index (0-based) of the root
-   * @return an algebraic whose value is the i-th root of the polynomial
+   * @param poly
+   *   the polynomial containing at least i real roots
+   * @param i
+   *   the index (0-based) of the root
+   * @return
+   *   an algebraic whose value is the i-th root of the polynomial
    */
   def root(poly: Polynomial[Rational], i: Int): Algebraic = {
     if (i < 0) {
@@ -548,11 +544,12 @@ object Algebraic extends AlgebraicInstances {
   }
 
   /**
-   * Returns all of the real roots of the given polynomial, in order from
-   * smallest to largest.
+   * Returns all of the real roots of the given polynomial, in order from smallest to largest.
    *
-   * @param poly the polynomial to return the real roots of
-   * @return all the real roots of `poly`
+   * @param poly
+   *   the polynomial to return the real roots of
+   * @return
+   *   all the real roots of `poly`
    */
   def roots(poly: Polynomial[Rational]): Vector[Algebraic] = {
     val zpoly = Roots.removeFractions(poly)
@@ -568,33 +565,34 @@ object Algebraic extends AlgebraicInstances {
   }
 
   /**
-   * Returns an Algebraic whose value is the real root within (lb, ub). This is
-   * potentially unsafe, as we assume that exactly 1 real root lies within the
-   * interval, otherwise the results are undetermined.
+   * Returns an Algebraic whose value is the real root within (lb, ub). This is potentially unsafe, as we assume that
+   * exactly 1 real root lies within the interval, otherwise the results are undetermined.
    *
-   * @param poly a polynomial with a real root within (lb, ub)
-   * @param i    the index of the root in the polynomial
-   * @param lb   the lower bound of the open interval containing the root
-   * @param ub   the upper bound of the open interval containing the root
+   * @param poly
+   *   a polynomial with a real root within (lb, ub)
+   * @param i
+   *   the index of the root in the polynomial
+   * @param lb
+   *   the lower bound of the open interval containing the root
+   * @param ub
+   *   the upper bound of the open interval containing the root
    */
   def unsafeRoot(poly: Polynomial[BigInt], i: Int, lb: Rational, ub: Rational): Algebraic =
     new Algebraic(Expr.ConstantRoot(poly, i, lb, ub))
 
   /**
-   * Returns an Algebraic expression equivalent to `BigDecimal(n)`. If `n` is
-   * not parseable as a `BigDecimal` then an exception is thrown.
+   * Returns an Algebraic expression equivalent to `BigDecimal(n)`. If `n` is not parseable as a `BigDecimal` then an
+   * exception is thrown.
    */
   def apply(n: String): Algebraic =
     Algebraic(BigDecimal(new JBigDecimal(n)))
 
   /**
-   * The [[Algebraic]] expression AST. `Algebraic` simply stores an expression
-   * tree representing all operations performed on it. We then use this tree to
-   * deduce certain properties about the algebraic expression and use them to
+   * The [[Algebraic]] expression AST. `Algebraic` simply stores an expression tree representing all operations
+   * performed on it. We then use this tree to deduce certain properties about the algebraic expression and use them to
    * perform exact sign tests, compute approximations, etc.
    *
-   * Generally, this should be regarded as an internal implementation detail of
-   * `Algebraic`.
+   * Generally, this should be regarded as an internal implementation detail of `Algebraic`.
    */
   sealed abstract class Expr extends Serializable {
     import Expr._
@@ -604,8 +602,8 @@ object Algebraic extends AlgebraicInstances {
     /**
      * A set of flags we can quickly compute for an [[Algebraic]] expression.
      *
-     * @note we have to do this round-about trip between flagsBits and flags
-     * because of
+     * @note
+     *   we have to do this round-about trip between flagsBits and flags because of
      */
     def flags: Flags = new Flags(flagBits)
 
@@ -620,9 +618,9 @@ object Algebraic extends AlgebraicInstances {
     @volatile
     private var cachedDegreeBound: Long = 0L
 
-    private def radicalNodes(): Set[KRoot] = {
+    private def radicalNodes: Set[KRoot] = {
       val childRadicals = children.foldLeft(Set.empty[KRoot]) { (acc, child) =>
-        acc ++ child.radicalNodes()
+        acc ++ child.radicalNodes
       }
       val radicals = this match {
         case expr @ KRoot(sub, k) =>
@@ -643,7 +641,7 @@ object Algebraic extends AlgebraicInstances {
      */
     def degreeBound: Long = {
       if (cachedDegreeBound == 0L)
-        radicalNodes()
+        radicalNodes
       cachedDegreeBound
     }
 
@@ -660,31 +658,26 @@ object Algebraic extends AlgebraicInstances {
       new BitBound(getBound(LiYap).getBitBound(degreeBound))
 
     /**
-     * Returns a separation bound for this expression as a bit bound. A
-     * separation bound is a lower-bound on the value of this expression that
-     * is only valid if this expression is not 0. This bound can thus be used
-     * to determine if this value is actually 0 and, if not, the sign, by
-     * simply approximating the expression with enough accuracy that it falls
-     * on one side or the other of the separation bound.
+     * Returns a separation bound for this expression as a bit bound. A separation bound is a lower-bound on the value
+     * of this expression that is only valid if this expression is not 0. This bound can thus be used to determine if
+     * this value is actually 0 and, if not, the sign, by simply approximating the expression with enough accuracy that
+     * it falls on one side or the other of the separation bound.
      */
     def separationBound: BitBound =
       bfmssBound.min(liYapBound)
 
     /**
-     * Returns an asbolute approximation to this expression as a BigDecimal
-     * that is accurate up to +/- 10^-digits.
+     * Returns an asbolute approximation to this expression as a BigDecimal that is accurate up to +/- 10^-digits.
      */
     def toBigDecimal(digits: Int): JBigDecimal
 
     /**
-     * Returns an upper bound on the absolute value of this expression as a
-     * bit bound.
+     * Returns an upper bound on the absolute value of this expression as a bit bound.
      */
     def upperBound: BitBound
 
     /**
-     * Returns a lower bound on the absolute value of this expression as a
-     * bit bound.
+     * Returns a lower bound on the absolute value of this expression as a bit bound.
      *
      * TODO: We could do better here wrt to addition (need a fastSignum: Option[Int])
      */
@@ -696,11 +689,9 @@ object Algebraic extends AlgebraicInstances {
     def signum: Int
 
     /**
-     * Returns a list of the children of this expression. A child is a
-     * sub-expression required by this expression. For instance, `Add` has 2
-     * children, the left-hand and right-hand side sub-expressions. A numeric
-     * literal expression, such as `ConstantDouble` or `ConstantRational` has
-     * no children.
+     * Returns a list of the children of this expression. A child is a sub-expression required by this expression. For
+     * instance, `Add` has 2 children, the left-hand and right-hand side sub-expressions. A numeric literal expression,
+     * such as `ConstantDouble` or `ConstantRational` has no children.
      */
     def children: List[Expr]
   }
@@ -708,9 +699,8 @@ object Algebraic extends AlgebraicInstances {
   object Expr {
 
     /**
-     * A set of flags for algebraic expressions, so we can quickly determine
-     * some properties, like whether the expression is rational, radical, what
-     * types of leaf nodes it has, etc. This is used to help guide algorithmic
+     * A set of flags for algebraic expressions, so we can quickly determine some properties, like whether the
+     * expression is rational, radical, what types of leaf nodes it has, etc. This is used to help guide algorithmic
      * choices, such as what separation bound to use.
      */
     final class Flags(val bits: Int) extends AnyVal {
@@ -1050,16 +1040,14 @@ object Algebraic extends AlgebraicInstances {
   }
 
   /**
-   * A bit bound represents either an upper or lower bound as some
-   * power of 2. Specifically, the bound is typically either `2^bitBound` or
-   * `2^-bitBound`.
+   * A bit bound represents either an upper or lower bound as some power of 2. Specifically, the bound is typically
+   * either `2^bitBound` or `2^-bitBound`.
    */
   final class BitBound(val bitBound: Long) extends AnyVal {
     import BitBound.bitsToDecimalDigits
 
     /**
-     * Returns the minimum number of absolute decimal digits required to
-     * represent this separation bound.
+     * Returns the minimum number of absolute decimal digits required to represent this separation bound.
      */
     def decimalDigits: Long = bitsToDecimalDigits(bitBound)
 
@@ -1095,10 +1083,8 @@ object Algebraic extends AlgebraicInstances {
   }
 
   /**
-   * Returns a number that is approximately equal to `x.pow(1/n)`. This number
-   * is useful as initial values in converging n-root algorithms, but not as a
-   * general purpose n-root algorithm. There are no guarantees about the
-   * accuracy here.
+   * Returns a number that is approximately equal to `x.pow(1/n)`. This number is useful as initial values in converging
+   * n-root algorithms, but not as a general purpose n-root algorithm. There are no guarantees about the accuracy here.
    */
   final def nrootApprox(x: JBigDecimal, n: Int): JBigDecimal = {
     // Essentially, we'd like to just find `x.doubleValue.pow(1D / n)`, but x
@@ -1125,14 +1111,11 @@ object Algebraic extends AlgebraicInstances {
   }
 
   /**
-   * Approximates the n-th root using the Newton's method. Rather than using a
-   * fixed epsilon, it may use an adaptive epsilon, provided by `getEps`. This
-   * function takes the previous approximation, and returns the epsilon as
-   * `pow(10, -getEps(prev))`. This allows us to use the same algorithm for
-   * both absolute and relative precision approximations. Absolute
-   * approximations just returns a fixed epsilon from `getEps`, where as a
-   * relative approximation returns an adaptive one, that uses the previous
-   * value to guide the required epsilon.
+   * Approximates the n-th root using the Newton's method. Rather than using a fixed epsilon, it may use an adaptive
+   * epsilon, provided by `getEps`. This function takes the previous approximation, and returns the epsilon as `pow(10,
+   * -getEps(prev))`. This allows us to use the same algorithm for both absolute and relative precision approximations.
+   * Absolute approximations just returns a fixed epsilon from `getEps`, where as a relative approximation returns an
+   * adaptive one, that uses the previous value to guide the required epsilon.
    */
   final private def nroot(signedValue: JBigDecimal, k: Int)(getEps: JBigDecimal => Int): JBigDecimal = {
     if (signedValue.compareTo(JBigDecimal.ZERO) == 0)
@@ -1161,10 +1144,8 @@ object Algebraic extends AlgebraicInstances {
   private val bits2dec: Double = log(2, 10)
 
   /**
-   * Returns a relative approximation of the n-th root of `value`, up to
-   * the number of digits specified by `mc`. This only uses the rounding mode
-   * to chop-off the few remaining digits after the approximation, so may be
-   * inaccurate.
+   * Returns a relative approximation of the n-th root of `value`, up to the number of digits specified by `mc`. This
+   * only uses the rounding mode to chop-off the few remaining digits after the approximation, so may be inaccurate.
    */
   final def nroot(value: JBigDecimal, n: Int, mc: MathContext): JBigDecimal = {
     val result = nroot(value, n) { x =>
@@ -1174,25 +1155,25 @@ object Algebraic extends AlgebraicInstances {
   }
 
   /**
-   * Returns an absolute approximation of the n-th root of `value`, up to
-   * `scale` digits past the decimal point. This only uses the rounding mode
-   * to chop-off the few remaining digits after the approximation, so may be
-   * inaccurate.
+   * Returns an absolute approximation of the n-th root of `value`, up to `scale` digits past the decimal point. This
+   * only uses the rounding mode to chop-off the few remaining digits after the approximation, so may be inaccurate.
    */
   final def nroot(value: JBigDecimal, n: Int, scale: Int, roundingMode: RoundingMode): JBigDecimal =
     nroot(value, n)(_ => scale + 1).setScale(scale, roundingMode)
 
   /**
-   * Rounds an approximation (`approx`) to the `exact` Algebraic value using
-   * the given `scale` and `RoundingMode` (`mode`). This will always be
-   * accurate for any algebraic number. So, if `exact` represents 0.15 and the
-   * rounding mode is set to `HALF_UP` with a scale of 1, then this is
-   * guaranteed to round up to 0.2.
+   * Rounds an approximation (`approx`) to the `exact` Algebraic value using the given `scale` and `RoundingMode`
+   * (`mode`). This will always be accurate for any algebraic number. So, if `exact` represents 0.15 and the rounding
+   * mode is set to `HALF_UP` with a scale of 1, then this is guaranteed to round up to 0.2.
    *
-   * @param exact  the exact value to use a reference for tricky cases
-   * @param approx the approximate value to round
-   * @param scale  the final scale of the result
-   * @param mode   the rounding mode to use
+   * @param exact
+   *   the exact value to use a reference for tricky cases
+   * @param approx
+   *   the approximate value to round
+   * @param scale
+   *   the final scale of the result
+   * @param mode
+   *   the rounding mode to use
    */
   private def roundExact(exact: Algebraic, approx: JBigDecimal, scale: Int, mode: RoundingMode): JBigDecimal = {
     import RoundingMode.{CEILING, FLOOR, UP}
@@ -1313,8 +1294,8 @@ object Algebraic extends AlgebraicInstances {
   sealed abstract class ZeroBoundFunction {
 
     /**
-     * Some state that is computed for each node in the expression tree. This
-     * state is typically memoized, to avoid recomputation.
+     * Some state that is computed for each node in the expression tree. This state is typically memoized, to avoid
+     * recomputation.
      */
     type Bound
 
@@ -1322,19 +1303,23 @@ object Algebraic extends AlgebraicInstances {
   }
 
   /**
-   * An implementation of "A New Constructive Root Bound for Algebraic
-   * Expressions" by Chen Li & Chee Yap.
+   * An implementation of "A New Constructive Root Bound for Algebraic Expressions" by Chen Li & Chee Yap.
    */
   @SerialVersionUID(0L)
   case object LiYap extends ZeroBoundFunction {
     import Expr._
 
     /**
-     * @param lc      Bound on the leading coefficient.
-     * @param tc      Bound on the trailing coefficient.
-     * @param measure Bound on the measure.
-     * @param lb      Lower bound on the value.
-     * @param ub      Upper bound on the value.
+     * @param lc
+     *   Bound on the leading coefficient.
+     * @param tc
+     *   Bound on the trailing coefficient.
+     * @param measure
+     *   Bound on the measure.
+     * @param lb
+     *   Lower bound on the value.
+     * @param ub
+     *   Upper bound on the value.
      */
     final case class Bound(
       lc: Long,
@@ -1446,16 +1431,13 @@ object Algebraic extends AlgebraicInstances {
   }
 
   /**
-   * An implementation of "A Separation Bound for Real Algebraic Expressions",
-   * by Burnikel, Funke, Mehlhorn, Schirra, and Schmitt. This provides a good
-   * [[ZeroBoundFunction]] for use in sign tests.
+   * An implementation of "A Separation Bound for Real Algebraic Expressions", by Burnikel, Funke, Mehlhorn, Schirra,
+   * and Schmitt. This provides a good [[ZeroBoundFunction]] for use in sign tests.
    *
-   * Unlike the paper, we use log-arithmetic instead of working with exact,
-   * big integer values. This means our bound isn't technically as good as it
-   * could be, but we save the cost of working with arithmetic. We also perform
-   * all log arithmetic using `Long`s and check for overflow (throwing
-   * `ArithmeticException`s when detected). In practice we shouldn't hit this
-   * limit, but in case we do, we prefer to throw over failing silently.
+   * Unlike the paper, we use log-arithmetic instead of working with exact, big integer values. This means our bound
+   * isn't technically as good as it could be, but we save the cost of working with arithmetic. We also perform all log
+   * arithmetic using `Long`s and check for overflow (throwing `ArithmeticException`s when detected). In practice we
+   * shouldn't hit this limit, but in case we do, we prefer to throw over failing silently.
    */
   @SerialVersionUID(0L)
   case object BFMSS extends ZeroBoundFunction {

@@ -1,9 +1,23 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package algebra
 
-// we need to disable our own === to avoid messing up ScalaTest.
 import spire.math.{Complex, Jet, JetDim, Rational}
-import spire.implicits.{eqOps => _, _}
+import spire.implicits._
 
 // nice alias
 
@@ -12,10 +26,10 @@ import java.math.MathContext
 class RingSuite extends munit.FunSuite {
 
   /**
-   * We use this function to avoid duplicating our tests for all the different
-   * A's that we want to test. We expect the actual values to be:
+   * We use this function to avoid duplicating our tests for all the different A's that we want to test. We expect the
+   * actual values to be:
    *
-   *   a=-3  b=3  c=-9
+   * a=-3 b=3 c=-9
    */
   def runWith[@sp A: Ring: ClassTag](cls: String)(a: A, b: A, c: A): Unit = {
 
@@ -75,23 +89,24 @@ class RingSuite extends munit.FunSuite {
                                                       Complex(BigDecimal(3), BigDecimal(0)),
                                                       Complex(BigDecimal(-9), BigDecimal(0))
   )
+
+  class XRing extends Ring[String] {
+    def toX(n: Int) = if (n > 0) "x" * n else "-" + "x" * -n
+    def fromX(s: String) = if (s.startsWith("-")) -(s.length - 1) else s.length
+
+    private def unop(s: String)(f: Int => Int): String = toX(f(fromX(s)))
+    private def binop(s1: String, s2: String)(f: (Int, Int) => Int): String = toX(f(fromX(s1), fromX(s2)))
+
+    def negate(a: String) = unop(a)(-_)
+    def one = "x"
+    def plus(a: String, b: String) = binop(a, b)(_ + _)
+    def times(a: String, b: String) = binop(a, b)(_ * _)
+    def zero = ""
+  }
+
   runWith[Jet[Double]]("Jet[Double]")(Jet(-3), Jet(3), Jet(-9))
 
   {
-    class XRing extends Ring[String] {
-      def toX(n: Int) = if (n > 0) "x" * n else "-" + "x" * -n
-      def fromX(s: String) = if (s.startsWith("-")) -(s.length - 1) else s.length
-
-      private def unop(s: String)(f: Int => Int): String = toX(f(fromX(s)))
-      private def binop(s1: String, s2: String)(f: (Int, Int) => Int): String = toX(f(fromX(s1), fromX(s2)))
-
-      def negate(a: String) = unop(a)(-_)
-      def one = "x"
-      def plus(a: String, b: String) = binop(a, b)(_ + _)
-      def times(a: String, b: String) = binop(a, b)(_ * _)
-      def zero = ""
-    }
-
     def x(n: Int) = xIsRing.fromInt(n)
 
     implicit object xIsRing extends XRing

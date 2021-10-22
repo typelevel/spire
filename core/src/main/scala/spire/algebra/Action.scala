@@ -1,13 +1,30 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package algebra
 
 /**
- * A (left) semigroup/monoid/group action of `G` on `P` is simply the implementation of
- * a method `actl(g, p)`, or `g |+|> p`, such that:
+ * A (left) semigroup/monoid/group action of `G` on `P` is simply the implementation of a method `actl(g, p)`, or `g
+ * |+|> p`, such that:
  *
+ * {{{
  * 1. `(g |+| h) |+|> p === g |+|> (h |+|> p)` for all `g`, `h` in `G` and `p` in `P`.
  *
  * 2. `id |+|> p === p` for all `p` in `P` (if `id` is defined)
+ * }}}
  */
 trait LeftAction[@sp(Int) P, G] extends Any {
   def actl(g: G, p: P): P
@@ -18,12 +35,14 @@ object LeftAction {
 }
 
 /**
- * A (right) semigroup/monoid/group action of `G` on `P` is simply the implementation of
- * a method `actr(p, g)`, or `p <|+| g`, such that:
+ * A (right) semigroup/monoid/group action of `G` on `P` is simply the implementation of a method `actr(p, g)`, or `p
+ * <|+| g`, such that:
  *
+ * {{{
  * 1. `p <|+| (g |+| h) === (p <|+| g) <|+| h` for all `g`, `h` in `G` and `p` in `P`.
  *
  * 2. `p <|+| id === p` for all `p` in `P` (if `id` is defined)
+ * }}}
  */
 trait RightAction[@sp(Int) P, G] extends Any {
   def actr(p: P, g: G): P
@@ -34,10 +53,10 @@ object RightAction {
 }
 
 /**
- * A semigroup/monoid/group action of `G` on `P` is the combination of compatible
- * left and right actions, providing:
+ * A semigroup/monoid/group action of `G` on `P` is the combination of compatible left and right actions, providing:
  *
- *  - the implementation of a method `actl(g, p)`, or `g |+|> p`, such that:
+ * {{{
+ *   - the implementation of a method `actl(g, p)`, or `g |+|> p`, such that:
  *
  * 1. `(g |+| h) |+|> p === g |+|> (h |+|> p)` for all `g`, `h` in `G` and `p` in `P`.
  *
@@ -52,6 +71,7 @@ object RightAction {
  * In addition, if `G` is a group, left and right actions are compatible:
  *
  * 5. `g |+|> p === p <|+| g.inverse`.
+ * }}}
  */
 trait Action[@sp(Int) P, G] extends Any with LeftAction[P, G] with RightAction[P, G]
 

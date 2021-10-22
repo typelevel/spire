@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -102,19 +117,19 @@ class QuaternionScalaCheckSuite extends munit.ScalaCheckSuite {
     val (br, bi, bj, bk) = (base.r, base.i, base.j, base.k)
     if (br != gr)
       println(
-        s"  r: ${br.repr} != ${gr.repr} (${br.toRational} and ${gr.toRational}) [${(br - gr).signum()}] <${br - gr}>"
+        s"  r: ${br.repr} != ${gr.repr} (${br.toRational} and ${gr.toRational}) [${(br - gr).signum}] <${br - gr}>"
       )
     if (bi != gi)
       println(
-        s"  i: ${bi.repr} != ${gi.repr} (${bi.toRational} and ${gi.toRational}) [${(bi - gi).signum()}] <${bi - gi}>"
+        s"  i: ${bi.repr} != ${gi.repr} (${bi.toRational} and ${gi.toRational}) [${(bi - gi).signum}] <${bi - gi}>"
       )
     if (bj != gj)
       println(
-        s"  j: ${bj.repr} != ${gj.repr} (${bj.toRational} and ${gj.toRational}) [${(bj - gj).signum()}] <${bj - gj}>"
+        s"  j: ${bj.repr} != ${gj.repr} (${bj.toRational} and ${gj.toRational}) [${(bj - gj).signum}] <${bj - gj}>"
       )
     if (bk != gk)
       println(
-        s"  k: ${bk.repr} != ${gk.repr} (${bk.toRational} and ${gk.toRational}) [${(bk - gk).signum()}] <${bk - gk}>"
+        s"  k: ${bk.repr} != ${gk.repr} (${bk.toRational} and ${gk.toRational}) [${(bk - gk).signum}] <${bk - gk}>"
       )
   }
 

@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package random
 package rng
@@ -32,7 +47,7 @@ final class Cmwc5(_x: Long, _y: Long, _z: Long, _w: Long, _v: Long) extends Long
     v = longs(4)
   }
 
-  def getSeedBytes(): Array[Byte] = {
+  def getSeedBytes: Array[Byte] = {
     val bytes = new Array[Byte](40)
     val bb = ByteBuffer.wrap(bytes)
     bb.putLong(x)
@@ -46,11 +61,11 @@ final class Cmwc5(_x: Long, _y: Long, _z: Long, _w: Long, _v: Long) extends Long
   def setSeedBytes(bytes: Array[Byte]): Unit = {
     val bs = if (bytes.length < 40) Arrays.copyOf(bytes, 40) else bytes
     val bb = ByteBuffer.wrap(bs)
-    x = bb.getLong()
-    y = bb.getLong()
-    z = bb.getLong()
-    w = bb.getLong()
-    v = bb.getLong()
+    x = bb.getLong
+    y = bb.getLong
+    z = bb.getLong
+    w = bb.getLong
+    v = bb.getLong
   }
 
   def nextLong(): Long = {
@@ -69,11 +84,11 @@ object Cmwc5 extends GeneratorCompanion[Cmwc5, Array[Long]] {
 
   def fromBytes(bytes: Array[Byte]): Cmwc5 = {
     val bb = ByteBuffer.wrap(bytes)
-    val x = bb.getLong()
-    val y = bb.getLong()
-    val z = bb.getLong()
-    val w = bb.getLong()
-    val v = bb.getLong()
+    val x = bb.getLong
+    val y = bb.getLong
+    val z = bb.getLong
+    val w = bb.getLong
+    val v = bb.getLong
     new Cmwc5(x, y, z, w, v)
   }
 
@@ -82,7 +97,7 @@ object Cmwc5 extends GeneratorCompanion[Cmwc5, Array[Long]] {
     new Cmwc5(zs(0), zs(1), zs(2), zs(3), zs(4))
   }
 
-  def fromTime(time: Long = System.nanoTime()): Cmwc5 = {
+  def fromTime(time: Long = System.nanoTime): Cmwc5 = {
     val lcg = Lcg64.fromTime(time)
     new Cmwc5(lcg.nextLong(), lcg.nextLong(), lcg.nextLong(), lcg.nextLong(), lcg.nextLong())
   }

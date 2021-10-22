@@ -1,13 +1,23 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 
 import spire.algebra._
 import spire.math.Rational
-import spire.std.bigInt._
-import spire.std.double._
-import spire.std.int._
-import spire.std.seq._
-import spire.std.string._
-import spire.syntax.signed._
+import spire.implicits._
 import spire.laws.arb.rational
 
 import org.scalacheck.Arbitrary

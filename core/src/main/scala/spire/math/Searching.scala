@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -53,15 +68,12 @@ object Searching {
   }
 
   /**
-   * Computes the minimal elements of a partially ordered set.
-   * If the poset contains multiple copies of a minimal element, the function
-   * will only return a single copy of it.
+   * Computes the minimal elements of a partially ordered set. If the poset contains multiple copies of a minimal
+   * element, the function will only return a single copy of it.
    *
-   * Works by constructing the set of minimal elements for the first k elements
-   * of the poset, for k = 1 .. length.
+   * Works by constructing the set of minimal elements for the first k elements of the poset, for k = 1 .. length.
    *
-   * With n is the size of the poset and w <= n its width, the algorithm requires
-   * O(w) space and O(w*n) time.
+   * With n is the size of the poset and w <= n its width, the algorithm requires O(w) space and O(w*n) time.
    */
   final def minimalElements[A](as: Iterable[A])(implicit ev: PartialOrder[A]): Seq[A] = {
     import scala.collection.mutable.ArrayBuffer

@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 package extras
@@ -18,22 +33,25 @@ case class FixedScale(denom: Int) {
 }
 
 /**
- * FixedPoint is a value class that provides fixed point arithmetic
- * operations (using an implicit denominator) to unboxed Long values.
+ * FixedPoint is a value class that provides fixed point arithmetic operations (using an implicit denominator) to
+ * unboxed Long values.
  *
- * Working with FixedPoint values is similar to other fractional
- * types, except that most operations require an implicit FixedScale
- * instance (which provides the denominator).
+ * Working with FixedPoint values is similar to other fractional types, except that most operations require an implicit
+ * FixedScale instance (which provides the denominator).
  *
  * For example:
  *
+ * {{{
  * // interpret FixedPoint(n) as n/1000
  * implicit val scale = FixedScale(1000)
+ * }}}
  *
+ * {{{
  * // these three values are equivalent
- * val a = FixedPoint("12.345")            // decimal repr
+ * val a = FixedPoint("12.345") // decimal repr
  * val b = FixedPoint(Rational(2469, 200)) // fraction repr
- * val c = new FixedPoint(12345L)          // "raw" repr
+ * val c = new FixedPoint(12345L) // "raw" repr
+ * }}}
  */
 class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def unary_- : FixedPoint =
@@ -244,7 +262,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   import spire.syntax.nroot._
 
   def sqrt(implicit scale: FixedScale): FixedPoint =
-    FixedPoint(toReal.sqrt().toRational)
+    FixedPoint(toReal.sqrt.toRational)
 
   def nroot(k: Int)(implicit scale: FixedScale): FixedPoint =
     FixedPoint(toReal.nroot(k).toRational)
@@ -363,11 +381,11 @@ trait FixedPointInstances {
     }
 
   import NumberTag._
-  implicit final val FixedPointTag = new CustomTag[FixedPoint](Approximate,
-                                                               Some(FixedPoint.zero),
-                                                               Some(FixedPoint.MinValue),
-                                                               Some(FixedPoint.MaxValue),
-                                                               true,
-                                                               true
+  implicit final val FixedPointTag: CustomTag[FixedPoint] = new CustomTag[FixedPoint](Approximate,
+                                                                                      Some(FixedPoint.zero),
+                                                                                      Some(FixedPoint.MinValue),
+                                                                                      Some(FixedPoint.MaxValue),
+                                                                                      true,
+                                                                                      true
   )
 }

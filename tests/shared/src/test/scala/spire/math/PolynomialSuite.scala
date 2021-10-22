@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -28,14 +43,14 @@ object PolynomialSetup {
     BigDecimal(r)
   })
 
-  implicit def arbitraryComplex[A: Arbitrary: Fractional: Trig] = Arbitrary(for {
+  implicit def arbitraryComplex[A: Arbitrary: Fractional: Trig]: Arbitrary[Complex[A]] = Arbitrary(for {
     re <- arbitrary[A]
     im <- arbitrary[A]
   } yield {
     Complex(re, im)
   })
 
-  implicit def arbitraryTerm[A: Arbitrary: Ring: Eq: ClassTag] = Arbitrary(for {
+  implicit def arbitraryTerm[A: Arbitrary: Ring: Eq: ClassTag]: Arbitrary[Term[A]] = Arbitrary(for {
     c <- arbitrary[A]
     e0 <- arbitrary[Int]
   } yield {

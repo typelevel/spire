@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package example
 
@@ -9,9 +24,8 @@ import scala.util.Random.nextInt
 import CrossValidation._
 
 /**
- * An example of constructing Random Forests for both regression and
- * classification. This example shows off the utility of vector spaces (in this
- * case `CoordinateSpace`), fields, and orders to create random forests.
+ * An example of constructing Random Forests for both regression and classification. This example shows off the utility
+ * of vector spaces (in this case `CoordinateSpace`), fields, and orders to create random forests.
  */
 object RandomForestExample extends App {
 
@@ -58,8 +72,7 @@ object RandomForestExample extends App {
 }
 
 /**
- * Random forests have a lot of knobs, so they are all stored in this class
- * for ease-of-use.
+ * Random forests have a lot of knobs, so they are all stored in this class for ease-of-use.
  */
 case class RandomForestOptions(numAxesSample: Option[Int] = None, // # of variables sampled each split.
                                numPointsSample: Option[Int] = None, // # of points sampled per tree.
@@ -69,11 +82,9 @@ case class RandomForestOptions(numAxesSample: Option[Int] = None, // # of variab
 ) // Build trees in parallel.
 
 /**
- * The common bits between regression and classification random forests. The
- * only real difference is how we determine the "disparity" or "error" in a
- * region of the tree. So, our outputs all belong to some type we don't really
- * care about. We then have a way of determining the error of some subset of
- * these outputs using the `Region`.
+ * The common bits between regression and classification random forests. The only real difference is how we determine
+ * the "disparity" or "error" in a region of the tree. So, our outputs all belong to some type we don't really care
+ * about. We then have a way of determining the error of some subset of these outputs using the `Region`.
  */
 trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
   implicit def V: CoordinateSpace[V, F]
@@ -122,8 +133,8 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
 
     def predictors(): Array[Int] = {
       val indices = new Array[Int](opts.numAxesSample)
-      cfor(0)(_ < indices.length, _ + 1) { i => indices(i) = i }
-      cfor(V.dimensions - 1)(_ >= indices.length, _ - 1) { i =>
+      fastFor(0)(_ < indices.length, _ + 1) { i => indices(i) = i }
+      fastFor(V.dimensions - 1)(_ >= indices.length, _ - 1) { i =>
         val j = nextInt(i + 1)
         if (j < indices.length)
           indices(j) = i
@@ -136,7 +147,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
 
     def sample(): Array[Int] = {
       val sample = new Array[Int](opts.numPointsSample)
-      cfor(0)(_ < sample.length, _ + 1) { i =>
+      fastFor(0)(_ < sample.length, _ + 1) { i =>
         sample(i) = nextInt(data.length)
       }
       sample
@@ -147,7 +158,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
 
     def region(members: Array[Int]): Region = {
       var d = Region.empty
-      cfor(0)(_ < members.length, _ + 1) { i =>
+      fastFor(0)(_ < members.length, _ + 1) { i =>
         d += outputs(members(i))
       }
       d
@@ -167,7 +178,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
         var minVar = -1
         var minIdx = -1
 
-        cfor(0)(_ < vars.length, _ + 1) { i =>
+        fastFor(0)(_ < vars.length, _ + 1) { i =>
           val axis = vars(i)
           var leftRegion = Region.empty
           var rightRegion = region0
@@ -179,7 +190,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
 
           members.qsortBy(data(_).coord(axis))
 
-          cfor(0)(_ < (members.length - 1), _ + 1) { j =>
+          fastFor(0)(_ < (members.length - 1), _ + 1) { j =>
             // We move point j from the right region to the left and see if our
             // error is reduced.
 
@@ -248,10 +259,9 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
 }
 
 /**
- * A `RandomForest` implementation for regression. In regression, the output
- * type is assumed to lie in the same field as the input vectors scalars. The
- * final predicted output is the average of the individual tress output (which
- * itself is just the mean of all outputs in the region the point lands in.
+ * A `RandomForest` implementation for regression. In regression, the output type is assumed to lie in the same field as
+ * the input vectors scalars. The final predicted output is the average of the individual tress output (which itself is
+ * just the mean of all outputs in the region the point lands in.
  */
 class RandomForestRegression[V, @sp(Double) F](implicit
   val V: CoordinateSpace[V, F],
@@ -288,14 +298,12 @@ class RandomForestRegression[V, @sp(Double) F](implicit
 }
 
 /**
- * A `RandomForest` implementation for classification. In this case, the
- * outputs (dependent variable) belongs to some type `K`. This type needs to be
- * a well behaved Java object as its `equals` and `hashCode` will be used to
- * determine equality of classes. This implementation uses a majority vote
- * method to determine classification. Each region in a tree is associated with
- * the most popular class in that region. Ties are broken randomly (not really).
- * Within a forest, each tree casts its vote for classification of a point and
- * the majority wins. Again, ties are broken randomly (again, not really).
+ * A `RandomForest` implementation for classification. In this case, the outputs (dependent variable) belongs to some
+ * type `K`. This type needs to be a well behaved Java object as its `equals` and `hashCode` will be used to determine
+ * equality of classes. This implementation uses a majority vote method to determine classification. Each region in a
+ * tree is associated with the most popular class in that region. Ties are broken randomly (not really). Within a
+ * forest, each tree casts its vote for classification of a point and the majority wins. Again, ties are broken randomly
+ * (again, not really).
  */
 class RandomForestClassification[V, @sp(Double) F, K](implicit
   val V: CoordinateSpace[V, F],
@@ -391,11 +399,9 @@ object RandomForest {
 }
 
 /**
- * A simple decision tree. Each internal node is assigned an axis aligned
- * boundary which divides the space in 2 (left and right). To determine the
- * value of an input point, we simple determine which side of the boundary line
- * the input lies on, then recurse on that side. When we reach a leaf node, we
- * output its value.
+ * A simple decision tree. Each internal node is assigned an axis aligned boundary which divides the space in 2 (left
+ * and right). To determine the value of an input point, we simple determine which side of the boundary line the input
+ * lies on, then recurse on that side. When we reach a leaf node, we output its value.
  */
 sealed trait DecisionTree[V, F, K] {
   def apply(v: V)(implicit V: CoordinateSpace[V, F], F: Order[F]): K = {

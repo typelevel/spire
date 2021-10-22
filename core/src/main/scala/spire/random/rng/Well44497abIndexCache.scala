@@ -1,8 +1,8 @@
-/**
+/*
  * **********************************************************************\
  * * Project                                                              **
  * *       ______  ______   __    ______    ____                          **
- * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2014        **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
  * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
  * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
  * *   ____/ / / /      / /   / / | |   / /__                             **
@@ -22,15 +22,18 @@ package rng
  *
  * <p>The acronym WELL stands for Well Equidistributed Long-period Linear.
  *
- * <p><b>Reference: </b>
- * François Panneton, Pierre L'Ecuyer and Makoto Matsumoto:
- * "Improved Long-Period Generators Based on Linear Recurrences Modulo 2",
- * <i>ACM Transactions on Mathematical Software,</i> Vol. 32, No. 1, January 2006, pp 1--16.
+ * <p><b>Reference: </b> François Panneton, Pierre L'Ecuyer and Makoto Matsumoto: "Improved Long-Period Generators Based
+ * on Linear Recurrences Modulo 2", <i>ACM Transactions on Mathematical Software,</i> Vol. 32, No. 1, January 2006, pp
+ * 1--16.
  *
- * @see <a href="http://www.iro.umontreal.ca/~panneton/well/WELL44497a.c">WELL44497a.c</a>
- * @see <a href="http://www.iro.umontreal.ca/~panneton/WELLRNG.html">Well PRNG Home Page</a>
- * @see <a href="http://en.wikipedia.org/wiki/Well_Equidistributed_Long-period_Linear">WELL @ Wikipedia</a>
- * @author <a href="mailto:dusan.kysel@gmail.com">Dušan Kysel</a>
+ * @see
+ *   <a href="http://www.iro.umontreal.ca/~panneton/well/WELL44497a.c">WELL44497a.c</a>
+ * @see
+ *   <a href="http://www.iro.umontreal.ca/~panneton/WELLRNG.html">Well PRNG Home Page</a>
+ * @see
+ *   <a href="http://en.wikipedia.org/wiki/Well_Equidistributed_Long-period_Linear">WELL @ Wikipedia</a>
+ * @author
+ *   <a href="mailto:dusan.kysel@gmail.com">Dušan Kysel</a>
  */
 private[random] object Well44497abIndexCache {
 

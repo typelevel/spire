@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire.math.extras.interval
 
 import org.scalacheck.Prop._
@@ -53,7 +68,7 @@ class IntervalSeqSampleScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   property("sample_not") {
-    forAll { a: IntervalSeq[Int] =>
+    forAll { (a: IntervalSeq[Int]) =>
       unarySampleTest(a, ~a, ~_)
     }
   }
@@ -77,7 +92,7 @@ class IntervalSeqSampleScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   property("toStringParse") {
-    forAll { a0: IntervalSeq[Int] =>
+    forAll { (a0: IntervalSeq[Int]) =>
       // first convert the interval of long to an interval of rationals, since that is what parse returns
       val rationalIntervals = a0.intervals.map(_.mapBounds(Rational.apply))
       val a: IntervalSeq[Rational] = rationalIntervals.foldLeft(IntervalSeq.empty[Rational])(_ | IntervalSeq(_))
@@ -89,13 +104,13 @@ class IntervalSeqSampleScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   property("isContiguous") {
-    forAll { a: IntervalSeq[Int] =>
+    forAll { (a: IntervalSeq[Int]) =>
       a.isContiguous == (a.intervals.size <= 1)
     }
   }
 
   property("hull") {
-    forAll { a: IntervalSeq[Int] =>
+    forAll { (a: IntervalSeq[Int]) =>
       val hullSet = IntervalSeq(a.hull)
       val outside = ~hullSet
       val nothingOutside = (a & outside) == IntervalSeq.empty[Int]
@@ -148,7 +163,7 @@ class IntervalSeqSampleScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   property("iterator") {
-    forAll { a: IntervalSeq[Int] =>
+    forAll { (a: IntervalSeq[Int]) =>
       a.intervalIterator.toIndexedSeq == a.intervals.toIndexedSeq
     }
   }

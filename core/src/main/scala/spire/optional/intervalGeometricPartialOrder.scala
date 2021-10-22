@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package optional
 
@@ -13,15 +28,19 @@ object intervalGeometricPartialOrder {
    *
    * Involving empty intervals:
    *
-   * - if I and J are empty, then I === J.
-   * - if I (resp. J) is empty and J (resp. I) is non-empty,
-   *   the ordering is undefined (preserving antisymmetry).
+   * {{{
+   *   - if I and J are empty, then I === J
+   *   - if I (resp. J) is empty and J (resp. I) is non-empty,
+   *     the ordering is undefined (preserving antisymmetry).
+   * }}}
    *
    * For non-empty intervals:
    *
-   * - I === J is standard Eq semantics (I, J are intersubstituable)
-   * - I < J if all x \in I, y \in J have x < y
-   * - I > J if all x \in I, y \in J have x > y
+   * {{{
+   *   - I === J is standard Eq semantics (I, J are intersubstituable)
+   *   - I < J if all x \in I, y \in J have x < y
+   *   - I > J if all x \in I, y \in J have x > y
+   * }}}
    */
   class IntervalGeometricPartialOrder[A: Order] extends PartialOrder[Interval[A]] {
     override def eqv(x: Interval[A], y: Interval[A]): Boolean = x == y

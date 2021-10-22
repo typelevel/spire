@@ -1,11 +1,25 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package random
 
 trait Exponential[@sp(Float, Double) A] extends Any {
 
   /**
-   * Return an `A` that has an exponential distribution from 0, with
-   * the given `rate` parameter.
+   * Return an `A` that has an exponential distribution from 0, with the given `rate` parameter.
    */
   def apply(rate: A): Dist[A]
 }

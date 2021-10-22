@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package laws
 
@@ -16,9 +31,10 @@ object RingLaws {
   def apply[A: Eq: Arbitrary](implicit _pred: Predicate[A]) = new RingLaws[A] {
     def Arb = implicitly[Arbitrary[A]]
     def pred = _pred
+    override def Equ = super.Equ // To remove the implicit modifier
     val nonZeroLaws = new GroupLaws[A] {
       def Arb = Arbitrary(arbitrary[A].filter(_pred))
-      def Equ = Eq[A]
+      def Equ: Eq[A] = implicitly[Eq[A]]
     }
   }
 }

@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package benchmark
 
@@ -9,7 +24,7 @@ import scala.util.Random
 import Random._
 
 import spire.algebra._
-import spire.std.any._
+import spire.implicits._
 
 import scala.math.{Numeric => ScalaN}
 import Arrays.init
@@ -235,7 +250,6 @@ class ScalaVsSpireBenchmarks {
   }
 
   @tailrec final def gcdSpire[@sp(Int) A](a: A, b: A)(implicit ev1: EuclideanRing[A], ev2: Eq[A]): A = {
-    import spire.implicits._
     if ((a.emod(b)) === ev1.zero) b else gcdSpire(b, a.emod(b))
   }
 

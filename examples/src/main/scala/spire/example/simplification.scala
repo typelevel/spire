@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package example
 
@@ -8,14 +23,12 @@ import scala.collection.immutable.LazyList
 import scala.collection.mutable.Builder
 
 /**
- * Some tools for simplifying decimal expressions, and playing around
- * with numbers.
+ * Some tools for simplifying decimal expressions, and playing around with numbers.
  *
  * There are three modes:
  *
- * nth: print the nth rational, according to diagonalization
- * all: print the first n rationals, according to diagonalization
- * snap: given y, look for solutions to y = nroot(x, k) / d
+ * nth: print the nth rational, according to diagonalization all: print the first n rationals, according to
+ * diagonalization snap: given y, look for solutions to y = nroot(x, k) / d
  */
 object Simplification {
 
@@ -49,13 +62,10 @@ object Simplification {
   }
 
   /**
-   * Using Cantor's diagonalization method, create an infinite stream
-   * of all rational numbers.
+   * Using Cantor's diagonalization method, create an infinite stream of all rational numbers.
    *
-   * This stream will only be able to generate the first
-   * 42,535,295,865,117,307,928,310,139,910,543,638,528 values, so it
-   * is not really infinite. Even so, it's unlikely that a user will
-   * be able to generate this many values.
+   * This stream will only be able to generate the first 42,535,295,865,117,307,928,310,139,910,543,638,528 values, so
+   * it is not really infinite. Even so, it's unlikely that a user will be able to generate this many values.
    */
   val rationals: BigStream[Rational] = {
     @tailrec
@@ -78,11 +88,10 @@ object Simplification {
   }
 
   /**
-   * Naive prime lazy list. For each odd number, this method tries
-   * dividing by all previous primes <= sqrt(n).
+   * Naive prime lazy list. For each odd number, this method tries dividing by all previous primes <= sqrt(n).
    *
-   * There are a lot of ways to improve this. For now it's a toy.
-   * It can generate the millionth prime in ~9s on my computer.
+   * There are a lot of ways to improve this. For now it's a toy. It can generate the millionth prime in ~9s on my
+   * computer.
    */
   val primes: LazyList[Int] = {
     @tailrec
@@ -102,12 +111,10 @@ object Simplification {
   /**
    * Given a Double y, look for whole numbers x, k, and d such that:
    *
-   *   y = nroot(x, k) / d
+   * y = nroot(x, k) / d
    *
-   * The limit (default: 10) describes the largest root (and divisor)
-   * that will be checked. The epsilon (default: 0.00000000001)
-   * describes the maximum distance we can shift the value to find an
-   * "exact" match.
+   * The limit (default: 10) describes the largest root (and divisor) that will be checked. The epsilon (default:
+   * 0.00000000001) describes the maximum distance we can shift the value to find an "exact" match.
    */
   def snap(n: Double, limit: Int = 10, epsilon: Double = 0.00000000001): (Double, Int, Int) = {
     @tailrec
@@ -139,10 +146,9 @@ object Simplification {
 /**
  * BigStream is a non-memoizing stream.
  *
- * It's similar to Scala's Stream[A] except that it won't exhaust your
- * memory for very large streams. This makes it useful for situations
- * where re-computing the stream is preferrable to trying to store
- * all the results in memory for next time.
+ * It's similar to Scala's Stream[A] except that it won't exhaust your memory for very large streams. This makes it
+ * useful for situations where re-computing the stream is preferrable to trying to store all the results in memory for
+ * next time.
  */
 object BigStream extends BigStreamCompanionCompat {
   def empty[A]: BigStream[A] = BigNil[A]()

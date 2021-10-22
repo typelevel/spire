@@ -1,8 +1,23 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package algebra
 
 import spire.math._
-import spire.implicits.{eqOps => _, _}
+import spire.implicits._
 
 class TrigSuite extends munit.FunSuite {
 
@@ -15,7 +30,7 @@ class TrigSuite extends munit.FunSuite {
       assert(ok)
     }
   }
-  implicit def relativeOps(lhs: Double) = new RelativeOps(lhs)
+  implicit def relativeOps(lhs: Double): RelativeOps = new RelativeOps(lhs)
 
   test("Trig[Double]") {
     val t = implicitly[Trig[Double]]

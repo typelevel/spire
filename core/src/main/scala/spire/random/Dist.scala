@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package random
 
@@ -29,13 +44,18 @@ trait Dist[@sp A] extends Any { self =>
 
   final def filter(pred: A => Boolean): Dist[A] =
     new Dist[A] {
-      @tailrec final def apply(gen: Generator): A = {
-        val a = self(gen)
-        if (pred(a)) a else apply(gen)
+      final def apply(gen: Generator): A = {
+        @tailrec
+        def loop: A = {
+          val a = self(gen)
+          if (pred(a)) a else loop
+        }
+
+        loop
       }
     }
 
-  final def given(pred: A => Boolean): Dist[A] =
+  final def `given`(pred: A => Boolean): Dist[A] =
     filter(pred)
 
   def until(pred: A => Boolean): Dist[Seq[A]] = {
@@ -148,9 +168,9 @@ trait Dist[@sp A] extends Any { self =>
     }
 }
 
-final class DistIterator[A](next: Dist[A], gen: Generator) extends Iterator[A] {
+final class DistIterator[A](_next: Dist[A], gen: Generator) extends Iterator[A] {
   final def hasNext: Boolean = true
-  final def next(): A = next(gen)
+  final def next(): A = _next(gen)
 }
 
 class DistFromGen[@sp A](f: Generator => A) extends Dist[A] {
@@ -218,7 +238,7 @@ trait DistCModule[V, K] extends CModule[Dist[V], Dist[K]] {
   def negate(x: Dist[V]): Dist[V] = new DistFromGen(g => -x(g))
   override def minus(x: Dist[V], y: Dist[V]): Dist[V] = new DistFromGen(g => x(g) - y(g))
   def timesl(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => k(g) *: v(g))
-  def timesr(k: Dist[K], v: Dist[V]): Dist[V] = new DistFromGen(g => v(g) :* k(g))
+  override def timesr(v: Dist[V], k: Dist[K]): Dist[V] = new DistFromGen(g => v(g) :* k(g))
 }
 
 trait DistVectorSpace[V, K] extends DistCModule[V, K] with VectorSpace[Dist[V], Dist[K]] {
@@ -406,7 +426,7 @@ object Dist extends DistInstances9 {
     }
   }
 
-  def gaussianFromDouble[A: Field]: DistFromGen[A] = new DistFromGen[A](g => Field[A].fromDouble(g.nextGaussian()))
+  def gaussianFromDouble[A: Field]: DistFromGen[A] = new DistFromGen[A](g => Field[A].fromDouble(g.nextGaussian))
 }
 
 trait DistInstances0 {

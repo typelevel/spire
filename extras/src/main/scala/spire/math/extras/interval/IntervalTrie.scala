@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math.extras.interval
 
@@ -82,9 +97,9 @@ object IntervalTrie {
       if (java.lang.Float.isNaN(value))
         throw new IllegalArgumentException("NaN")
       // sign and magnitude signed integer
-      val signAndMagnitude = java.lang.Float.floatToIntBits(value)
+      val signAndMagnitude: Int = java.lang.Float.floatToIntBits(value)
       // two's complement signed integer: if the sign bit is set, negate everything except the sign bit
-      val twosComplement = if (signAndMagnitude >= 0) signAndMagnitude else (-signAndMagnitude | (1L << 63))
+      val twosComplement: Long = if (signAndMagnitude >= 0) signAndMagnitude else (-signAndMagnitude | (1L << 63))
       twosComplement
     }
 
@@ -165,7 +180,7 @@ object IntervalTrie {
 
   import Tree._
 
-  implicit private def tIsLong[T](value: T)(implicit tl: Element[T]) = tl.toLong(value)
+  implicit private def tIsLong[T](value: T)(implicit tl: Element[T]): Long = tl.toLong(value)
 
   private[interval] def fromKind[T: Element](value: T, kind: Int) = {
     val bound = kind match {
@@ -305,9 +320,6 @@ object IntervalTrie {
         push(b.left)
         nextLeaf()
       case l: Leaf => l
-      // $COVERAGE-OFF$
-      case _ => unreachable
-      // $COVERAGE-ON$
     }
   }
 

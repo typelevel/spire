@@ -1,11 +1,25 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 
 import scala.annotation.nowarn
 
 /**
- * `NoImplicit` provides a way to ensure that a particular implicit doesn't
- * exist. It is often useful to work-around annoying ambiguous implicit
- * problems.
+ * `NoImplicit` provides a way to ensure that a particular implicit doesn't exist. It is often useful to work-around
+ * annoying ambiguous implicit problems.
  */
 final class NoImplicit[A]
 

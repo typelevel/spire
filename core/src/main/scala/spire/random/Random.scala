@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package random
 
@@ -7,8 +22,8 @@ sealed trait Op[+A] {
 
   def flatMap[B](f: A => Op[B]): Op[B] =
     this match {
-      case FlatMap(a, g) => FlatMap(a, (x: Any) => g(x).flatMap(f))
-      case o             => FlatMap(o, f)
+      case fm: FlatMap[a, _] => FlatMap(fm.sub, (x: a) => fm.k(x).flatMap(f))
+      case o                 => FlatMap(o, f)
     }
 
   def map[B](f: A => B): Op[B] =
@@ -25,10 +40,10 @@ sealed trait Op[+A] {
         Right(f(gen))
       case FlatMap(a, f) =>
         a match {
-          case Const(x)      => f(x).resume(gen)
-          case More(k)       => Left(() => FlatMap(k(), f))
-          case Next(g)       => f(g(gen)).resume(gen)
-          case FlatMap(b, g) => (FlatMap(b, (x: Any) => FlatMap(g(x), f)): Op[A]).resume(gen)
+          case Const(x)          => f(x).resume(gen)
+          case More(k)           => Left(() => FlatMap(k(), f))
+          case Next(g)           => f(g(gen)).resume(gen)
+          case fm: FlatMap[b, _] => (FlatMap(fm.sub, (x: b) => fm.k(x).flatMap(f)): Op[A]).resume(gen)
         }
     }
 
@@ -47,7 +62,7 @@ case class Next[+A](f: Generator => A) extends Op[A]
 case class FlatMap[A, +B](sub: Op[A], k: A => Op[B]) extends Op[B]
 
 object Random extends RandomCompanion[rng.Cmwc5] {
-  def initGenerator(): spire.random.rng.Cmwc5 = rng.Cmwc5.fromTime()
+  def initGenerator: spire.random.rng.Cmwc5 = rng.Cmwc5.fromTime()
 
   def spawn[B](op: Op[B]): RandomCmwc5[B] = new RandomCmwc5(op)
 }
@@ -55,10 +70,10 @@ object Random extends RandomCompanion[rng.Cmwc5] {
 trait RandomCompanion[G <: Generator] { self =>
   type R[X] = Random[X, G]
 
-  def initGenerator(): G //IO
+  def initGenerator: G //IO
 
   def generatorFromSeed(seed: Seed): G = {
-    val gen = initGenerator()
+    val gen = initGenerator
     gen.setSeedBytes(seed.bytes)
     gen
   }
@@ -137,11 +152,11 @@ abstract class Random[+A, G <: Generator](val op: Op[A]) { self =>
   def flatMap[B](f: A => Random[B, G]): Random[B, G] =
     companion.spawn(op.flatMap(f(_).op))
 
-  def run(): A =
-    op.run(companion.initGenerator()) //IO
+  def run: A =
+    op.run(companion.initGenerator) //IO
 
   def run(seed: Seed): A = { //IO
-    val gen = companion.initGenerator()
+    val gen = companion.initGenerator
     gen.setSeedBytes(seed.bytes)
     op.run(gen)
   }

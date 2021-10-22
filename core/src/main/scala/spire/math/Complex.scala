@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -83,11 +98,11 @@ object Complex extends ComplexInstances {
 }
 
 /**
- * Complex numbers. Depending on the underlying scalar T, can represent the Gaussian integers (T = BigInt/SafeLong),
- * the Gaussian rationals (T = Rational) or the complex number field (T: Field).
+ * Complex numbers. Depending on the underlying scalar T, can represent the Gaussian integers (T = BigInt/SafeLong), the
+ * Gaussian rationals (T = Rational) or the complex number field (T: Field).
  *
- * Note that we require T to be at least CRing, a commutative ring, so the implementation below is slightly
- * less general than the Cayley-Dickson construction.
+ * Note that we require T to be at least CRing, a commutative ring, so the implementation below is slightly less general
+ * than the Cayley-Dickson construction.
  */
 @SerialVersionUID(0L)
 final case class Complex[@sp(Float, Double) T](real: T, imag: T)
@@ -232,8 +247,8 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   def sqrt(implicit f: Field[T], n0: NRoot[T], s: Signed[T]): Complex[T] = {
     if (isZero) {
       this
-    } else if (imag.isSignZero()) {
-      if (real.isSignNegative())
+    } else if (imag.isSignZero) {
+      if (real.isSignNegative)
         Complex(f.zero, real.abs.sqrt)
       else
         Complex(real.abs.sqrt, f.zero)
@@ -243,7 +258,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
       val abs = this.abs
       val a = ((abs + real) / two).sqrt
       val b = ((abs - real) / two).sqrt
-      if (imag.isSignNegative())
+      if (imag.isSignNegative)
         Complex(a, -b)
       else
         Complex(a, b)

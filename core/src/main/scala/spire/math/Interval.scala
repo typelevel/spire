@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 
@@ -16,40 +31,29 @@ import java.lang.Double.isNaN
 /**
  * Interval represents a set of values, usually numbers.
  *
- * Intervals have upper and lower bounds. Each bound can be one of
- * four kinds:
+ * Intervals have upper and lower bounds. Each bound can be one of four kinds:
  *
- *  * Closed: The boundary value is included in the interval.
- *  * Open: The boundary value is excluded from the interval.
- *  * Unbound: There is no boundary value.
- *  * Empty: The interval itself is empty.
+ * * Closed: The boundary value is included in the interval. * Open: The boundary value is excluded from the interval. *
+ * Unbound: There is no boundary value. * Empty: The interval itself is empty.
  *
- * When the underlying type of the interval supports it, intervals may
- * be used in arithmetic. There are several possible interpretations
- * of interval arithmetic: the interval can represent uncertainty
- * about a single value (for instance, a quantity +/- tolerance in
- * engineering) or it can represent all values in the interval
- * simultaneously. In this implementation we have chosen to use the
- * probabillistic interpretation.
+ * When the underlying type of the interval supports it, intervals may be used in arithmetic. There are several possible
+ * interpretations of interval arithmetic: the interval can represent uncertainty about a single value (for instance, a
+ * quantity +/- tolerance in engineering) or it can represent all values in the interval simultaneously. In this
+ * implementation we have chosen to use the probabillistic interpretation.
  *
- * One common pitfall with interval arithmetic is that many familiar
- * algebraic relations do not hold. For instance, given two intervals
- * a and b:
+ * One common pitfall with interval arithmetic is that many familiar algebraic relations do not hold. For instance,
+ * given two intervals a and b:
  *
- *   a == b does not imply a * a == a * b
+ * a == b does not imply a * a == a * b
  *
- * Consider a = b = [-1, 1]. Since any number times itself is
- * non-negative, a * a = [0, 1]. However, a * b = [-1, 1], since we
- * may actually have a=1 and b=-1.
+ * Consider a = b = [-1, 1]. Since any number times itself is non-negative, a * a = [0, 1]. However, a * b = [-1, 1],
+ * since we may actually have a=1 and b=-1.
  *
- * These situations will result in loss of precision (in the form of
- * wider intervals). The result is not wrong per se, but less
- * accurate than it could be.
+ * These situations will result in loss of precision (in the form of wider intervals). The result is not wrong per se,
+ * but less accurate than it could be.
  *
- * These intervals should not be used with floating point bounds,
- * as proper rounding is not implemented. Generally, the JVM is
- * not an easy platform to perform robust arithmetic, as the
- * IEEE 754 rounding modes cannot be set.
+ * These intervals should not be used with floating point bounds, as proper rounding is not implemented. Generally, the
+ * JVM is not an easy platform to perform robust arithmetic, as the IEEE 754 rounding modes cannot be set.
  */
 sealed abstract class Interval[A] extends Serializable { lhs =>
 
@@ -622,11 +626,10 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
   /**
    * Apply the given polynomial to the interval.
    *
-   * For every point contained in the interval, this method maps that
-   * point through the given polynomial. The resulting interval is the
-   * set of all the translated points. I.e.
+   * For every point contained in the interval, this method maps that point through the given polynomial. The resulting
+   * interval is the set of all the translated points. I.e.
    *
-   *     result = { p(x) | x ∈ interval }
+   * result = { p(x) | x ∈ interval }
    */
   def translate(p: Polynomial[A])(implicit o: Order[A], ev: Field[A]): Interval[A] = {
     val terms2 = p.terms.map { case Term(c, e) => Term(Interval.point(c), e) }
@@ -678,31 +681,25 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
     }
 
   /**
-   * Build an Iterator[A] from an Interval[A] and a (step: A)
-   * parameter.
+   * Build an Iterator[A] from an Interval[A] and a (step: A) parameter.
    *
-   * A positive 'step' means we are proceeding from the lower bound
-   * up, and a negative 'step' means we are proceeding from the upper
-   * bound down. In each case, the interval must be bounded on the
-   * side we are starting with (though it may be unbound on the
-   * opposite side). A zero 'step' is not allowed.
+   * A positive 'step' means we are proceeding from the lower bound up, and a negative 'step' means we are proceeding
+   * from the upper bound down. In each case, the interval must be bounded on the side we are starting with (though it
+   * may be unbound on the opposite side). A zero 'step' is not allowed.
    *
-   * The step is repeatedly added to the starting parameter as long as
-   * the sum remains within the interval. This means that arithmetic
-   * error can accumulate (e.g. with doubles). However, this method
-   * does overflow checking to ensure that Intervals parameterized on
-   * integer types will behave correctly.
+   * The step is repeatedly added to the starting parameter as long as the sum remains within the interval. This means
+   * that arithmetic error can accumulate (e.g. with doubles). However, this method does overflow checking to ensure
+   * that Intervals parameterized on integer types will behave correctly.
    *
-   * Users who want to avoid using arithmetic error should consider
-   * starting with an Interval[Rational], calling iterator with the
-   * exact step desired, then mapping to the original type
-   * (e.g. Double). For example:
+   * Users who want to avoid using arithmetic error should consider starting with an Interval[Rational], calling
+   * iterator with the exact step desired, then mapping to the original type (e.g. Double). For example:
    *
-   *     val ns = Interval.closed(Rational(0), Rational(5))
-   *     val it = ns.iterator(Rational(1, 7)).map(_.toDouble)
+   * {{{
+   *   val ns = Interval.closed(Rational(0), Rational(5))
+   *   val it = ns.iterator(Rational(1, 7)).map(_.toDouble)
+   * }}}
    *
-   * This method provides some of the same functionality as Scala's
-   * NumericRange class.
+   * This method provides some of the same functionality as Scala's NumericRange class.
    */
   def iterator(step: A)(implicit o: Order[A], ev: AdditiveMonoid[A], nt: NumberTag[A]): Iterator[A] = {
 
@@ -778,24 +775,25 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
     iterator(step).foldLeft(init)(f)
 
   /**
-   * Result of overlapping this interval with another one.
-   * Can be one of the following:
-   * - [[Equal]] if intervals are equal
-   * - [[Disjoint]] if intervals are notEmpty don't intersect
-   * - [[PartialOverlap]] if intervals intersect and neither is a subset of another
-   * - [[Subset]] if one interval (possibly empty) is a subset of another
+   * Result of overlapping this interval with another one. Can be one of the following:
+   *   - [[Equal]] if intervals are equal
+   *   - [[Disjoint]] if intervals are notEmpty don't intersect
+   *   - [[PartialOverlap]] if intervals intersect and neither is a subset of another
+   *   - [[Subset]] if one interval (possibly empty) is a subset of another
    *
-   * Except for [[Equal]], both original intervals are bound to respective result fields,
-   * allowing to determine exact overlap type.
+   * Except for [[Equal]], both original intervals are bound to respective result fields, allowing to determine exact
+   * overlap type.
    *
    * For example (pseudo-code):
+   * {{{
    * {
-   * val a = [5, 6]
-   * val b = (0, 1)
+   *     val a = [5, 6]
+   *     val b = (0, 1)
    *
-   * // this returns Disjoint(b, a). Note a and b placement here, it means that b is strictly less then a.
-   * a.overlap(b)
+   *     // this returns Disjoint(b, a). Note a and b placement here, it means that b is strictly less then a.
+   *     a.overlap(b)
    * }
+   * }}}
    */
   def overlap(rhs: Interval[A])(implicit o: Order[A]): Overlap[A] = Overlap(lhs, rhs)
 }
@@ -853,19 +851,19 @@ object Interval {
   def apply[A: Order](lower: A, upper: A): Interval[A] = closed(lower, upper)
 
   /**
-   * Return an Interval[Rational] that corresponds to the error bounds
-   * for the given Double value.
+   * Return an Interval[Rational] that corresponds to the error bounds for the given Double value.
    *
-   * The error bounds are represented as a closed interval, whose
-   * lower point is midway between d and the adjacent Double value
-   * below it. Similarly, the upper bound is the point midway between
-   * d and the adjacent Double value above it.
+   * The error bounds are represented as a closed interval, whose lower point is midway between d and the adjacent
+   * Double value below it. Similarly, the upper bound is the point midway between d and the adjacent Double value above
+   * it.
    *
    * There are three Double values that return "special" intervals:
    *
-   *    Infinity => Interval.above(Double.MaxValue)
-   *   -Infinity => Interval.below(Double.MinValue)
-   *         NaN => Interval.empty
+   * {{{
+   *   Infinity => Interval.above(Double.MaxValue)
+   * -Infinity => Interval.below(Double.MinValue)
+   *       NaN => Interval.empty
+   * }}}
    */
   def errorBounds(d: Double): Interval[Rational] =
     if (d == Double.PositiveInfinity) {
@@ -891,15 +889,14 @@ object Interval {
    *
    * This method assumes that lower < upper to avoid comparisons.
    *
-   * - When one of the arguments is Unbound, the result will be All,
-   *   Above(x, _), or Below(y, _).
+   *   - When one of the arguments is Unbound, the result will be All, Above(x, _), or Below(y, _).
    *
-   * - When both arguments are Open/Closed (e.g. Open(x), Open(y)),
-   *   then x < y and the result will be a Bounded interval.
+   *   - When both arguments are Open/Closed (e.g. Open(x), Open(y)), then x < y and the result will be a Bounded
+   *     interval.
    *
-   * - If both arguments are EmptyBound, the result is Empty.
+   *   - If both arguments are EmptyBound, the result is Empty.
    *
-   * - Any other arguments are invalid.
+   *   - Any other arguments are invalid.
    *
    * This method cannot construct Point intervals.
    */

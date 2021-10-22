@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package example
 
@@ -8,16 +23,14 @@ import scala.collection.Factory
 import scala.util.Random.{nextDouble, nextGaussian, nextInt}
 
 /**
- * An example using `NormedVectorSpace`s to create a generic k-Means
- * implementation. We also abstract over the collection type for the fun of it.
- * We implement Lloyd's algorithm, which has problems of its own, but performs
- * well enough.
+ * An example using `NormedVectorSpace`s to create a generic k-Means implementation. We also abstract over the
+ * collection type for the fun of it. We implement Lloyd's algorithm, which has problems of its own, but performs well
+ * enough.
  */
 object KMeansExample extends App {
 
   /**
-   * Returns a collection of k points which are the centers of k clusters of
-   * `points0`.
+   * Returns a collection of k points which are the centers of k clusters of `points0`.
    */
   def kMeans[V, @sp(Double) A, CC[V] <: Iterable[V]](points0: CC[V],
                                                      k: Int
@@ -30,10 +43,10 @@ object KMeansExample extends App {
 
     def assign(clusters: Array[V]): Array[Int] = {
       val assignments = new Array[Int](points.length)
-      cfor(0)(_ < points.length, _ + 1) { i =>
+      fastFor(0)(_ < points.length, _ + 1) { i =>
         var min = (points(i) - clusters(0)).norm
         var idx = 0
-        cfor(1)(_ < clusters.length, _ + 1) { j =>
+        fastFor(1)(_ < clusters.length, _ + 1) { j =>
           val dist = (points(i) - clusters(j)).norm
           if (dist < min) {
             min = dist
@@ -60,12 +73,12 @@ object KMeansExample extends App {
       } else {
         val clusters = Array.fill[V](clusters0.length)(vs.zero)
         val counts = new Array[Int](clusters0.length)
-        cfor(0)(_ < points.length, _ + 1) { i =>
+        fastFor(0)(_ < points.length, _ + 1) { i =>
           val idx = assignments(i)
           clusters(idx) = clusters(idx) + points(i)
           counts(idx) += 1
         }
-        cfor(0)(_ < clusters.length, _ + 1) { j =>
+        fastFor(0)(_ < clusters.length, _ + 1) { j =>
           clusters(j) = clusters(j) :/ vs.scalar.fromInt(counts(j))
         }
         loop(assignments, clusters)
@@ -82,7 +95,7 @@ object KMeansExample extends App {
     // wants before we return the clusters.
 
     val bldr = cbf.newBuilder
-    cfor(0)(_ < clusters.length, _ + 1) { i =>
+    fastFor(0)(_ < clusters.length, _ + 1) { i =>
       bldr += clusters(i)
     }
     bldr.result()
@@ -102,7 +115,7 @@ object KMeansExample extends App {
     }.toVector
 
     val bldr = cbf.newBuilder
-    cfor(0)(_ < n, _ + 1) { _ =>
+    fastFor(0)(_ < n, _ + 1) { _ =>
       bldr += centers(nextInt(k)) + randPoint(nextGaussian())
     }
     bldr.result()

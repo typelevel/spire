@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package algebra
 package partial
@@ -5,19 +20,18 @@ package partial
 import spire.util.Opt
 
 /**
- * A left partial action of a semigroupoid `G` on `P` is the implementation of
- * a method `partialActl(g, p)`, or `g ?|+|> p` returning `Opt[P]`, such that:
+ * A left partial action of a semigroupoid `G` on `P` is the implementation of a method `partialActl(g, p)`, or `g ?|+|>
+ * p` returning `Opt[P]`, such that:
  *
+ * {{{
  * 1. for all `g`, `h` in `G`, `p` in `P` such that `g |+|? h` and `h ?|+|> p` are defined,
- *
- *    `((g |+|? h).get ?|+|> p).get === (g ?|+|> (h ?|+|> p).get).get` with all operations
- *    defined.
+ *     `((g |+|? h).get ?|+|> p).get === (g ?|+|> (h ?|+|> p).get).get` with all operations defined.
  *
  * In addition, if `G` is a partial monoid, the following relation holds:
  *
  * 2. for all `g` in `G` and `p` in `P` such that `g ?|+|> p` is defined:
- *
- * `(g.rightId ?|+|> p).get === p`, the operation `?|+|>` being defined.
+ *     `(g.rightId ?|+|> p).get === p`, the operation `?|+|>` being defined.
+ * }}}
  */
 trait LeftPartialAction[P, G] extends Any {
   def actlIsDefined(g: G, p: P): Boolean = partialActl(g, p).nonEmpty
@@ -35,19 +49,18 @@ object LeftPartialAction {
 }
 
 /**
- * A right partial action of a semigroupoid `G` on `P` is the implementation of
- * a method `partialActr(p, g)`, or `p <|+|? g` returning `Opt[P]`, such that:
+ * A right partial action of a semigroupoid `G` on `P` is the implementation of a method `partialActr(p, g)`, or `p
+ * <|+|? g` returning `Opt[P]`, such that:
  *
+ * {{{
  * 1. for all `g`, `h` in `G`, `p` in `P` such that `g |+|? h` and `p <|+|? g` are defined,
- *
- *    `(p <|+|? (g |+|? h).get).get === ((p <|+|? g).get |+|? h).get`,
- *    and all operations are defined.
+ *   `(p <|+|? (g |+|? h).get).get === ((p <|+|? g).get |+|? h).get`, and all operations are defined.
  *
  * In addition, if `G` is a partial monoid, the following relation holds:
  *
  * 2. for all `g` in `G` and `p` in `P` such that `p <|+|? g` is defined:
- *
- * `(p <|+|? g.leftId).get === p`, the operation `<|+|?` being defined.
+ *   `(p <|+|? g.leftId).get === p`, the operation `<|+|?` being defined.
+ * }}}
  */
 
 trait RightPartialAction[P, G] extends Any {
@@ -68,19 +81,18 @@ object RightPartialAction {
 /**
  * A partial action is the combination of left and right partial actions, providing:
  *
+ * {{{
  * - a method `partialActl(g, p)`, or `g ?|+|> p` returning `Opt[P]`, such that:
  *
  * 1. for all `g`, `h` in `G`, `p` in `P` such that `g |+|? h` and `h ?|+|> p` are defined,
  *
- *    `((g |+|? h).get ?|+|> p).get === (g ?|+|> (h ?|+|> p).get).get` with all operations
- *    defined.
+ * `((g |+|? h).get ?|+|> p).get === (g ?|+|> (h ?|+|> p).get).get` with all operations defined.
  *
- *  - a method `partialActr(p, g)`, or `p <|+|? g` returning `Opt[P]`, such that:
+ * - a method `partialActr(p, g)`, or `p <|+|? g` returning `Opt[P]`, such that:
  *
  * 2. for all `g`, `h` in `G`, `p` in `P` such that `g |+|? h` and `p <|+|? g` are defined,
  *
- *    `(p <|+|? (g |+|? h).get).get === ((p <|+|? g).get |+|? h).get`,
- *    and all operations are defined.
+ * `(p <|+|? (g |+|? h).get).get === ((p <|+|? g).get |+|? h).get`, and all operations are defined.
  *
  * In addition, if `G` is a groupoid, the following relations holds:
  *
@@ -95,6 +107,7 @@ object RightPartialAction {
  * 5. for all `g` in `G` and `p` in `P` such that `g ?|+|> p` is defined:
  *
  * `(g ?|+|> p).get === (p <|+|? g.inverse).get`
+ * }}}
  */
 trait PartialAction[P, G] extends Any with LeftPartialAction[P, G] with RightPartialAction[P, G]
 

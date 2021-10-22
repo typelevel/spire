@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package algebra
 package free
@@ -10,8 +25,7 @@ import spire.syntax.rng._
 final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs =>
 
   /**
-   * Maps the terms using `f` to type `B` and sums their results using the
-   * [[AbGroup]] for `B`.
+   * Maps the terms using `f` to type `B` and sums their results using the [[AbGroup]] for `B`.
    */
   def run[B](f: A => B)(implicit B: AbGroup[B]): B =
     terms.foldLeft(B.empty) { case (total, (a, n)) =>
@@ -19,9 +33,8 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
     }
 
   /**
-   * As long as there are no negative terms, this maps the terms using `f`,
-   * then sums the results using the [[CMonoid]] for `B`. If there is a
-   * negative term, then `None` is returned.
+   * As long as there are no negative terms, this maps the terms using `f`, then sums the results using the [[CMonoid]]
+   * for `B`. If there is a negative term, then `None` is returned.
    */
   def runMonoid[B](f: A => B)(implicit B: CMonoid[B]): Option[B] = {
     val it = terms.iterator
@@ -37,10 +50,9 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
   }
 
   /**
-   * As long as there are no negative terms and at least 1 positive term,
-   * this maps the terms using `f`, then sums the results using the
-   * [[CSemigroup]] for `B`. If there is a negative term, or if there are
-   * no terms at all, then `None` is returned.
+   * As long as there are no negative terms and at least 1 positive term, this maps the terms using `f`, then sums the
+   * results using the [[CSemigroup]] for `B`. If there is a negative term, or if there are no terms at all, then `None`
+   * is returned.
    */
   def runSemigroup[B](f: A => B)(implicit B: CSemigroup[B]): Option[B] = {
     val it = terms.iterator
@@ -65,10 +77,9 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
   }
 
   /**
-   * Sums up the results of the negative and positive terms separately, using
-   * `f` to map the terms to type `B` and using its [[CMonoid]]. This returns
-   * a tuple with the sum of the negative terms on the left and the sum of the
-   * positive terms on the right.
+   * Sums up the results of the negative and positive terms separately, using `f` to map the terms to type `B` and using
+   * its [[CMonoid]]. This returns a tuple with the sum of the negative terms on the left and the sum of the positive
+   * terms on the right.
    */
   def split[B](f: A => B)(implicit B: CMonoid[B]): (B, B) =
     terms.foldLeft((B.empty, B.empty)) { case ((ltotal, rtotal), (a, n)) =>
@@ -78,11 +89,9 @@ final class FreeAbGroup[A] private (val terms: Map[A, Int]) extends AnyVal { lhs
     }
 
   /**
-   * Sums up the results of the negative and positive terms separately, using
-   * `f` to map the terms to type `B` and using its [[CSemigroup]]. This returns
-   * a tuple with the sum of the negative terms on the left and the sum of the
-   * positive terms on the right. If either side has no terms at all, then that
-   * side is `None`.
+   * Sums up the results of the negative and positive terms separately, using `f` to map the terms to type `B` and using
+   * its [[CSemigroup]]. This returns a tuple with the sum of the negative terms on the left and the sum of the positive
+   * terms on the right. If either side has no terms at all, then that side is `None`.
    */
   def splitSemigroup[B](f: A => B)(implicit B: CSemigroup[B]): (Option[B], Option[B]) =
     split[Option[B]] { a => Some(f(a)) }

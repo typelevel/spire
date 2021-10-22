@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package random
 package rng
@@ -12,15 +27,15 @@ class Device(f: File) extends Generator { self =>
 
   def copyInit: Generator = new Device(f)
 
-  def getSeedBytes(): Array[Byte] =
+  def getSeedBytes: Array[Byte] =
     throw new UnsupportedOperationException("getSeedBytes")
 
   def setSeedBytes(bytes: Array[Byte]): Unit =
     throw new UnsupportedOperationException("setSeedBytes")
 
-  def nextInt(): Int = dis.readInt()
+  def nextInt(): Int = dis.readInt
 
-  def nextLong(): Long = dis.readLong()
+  def nextLong(): Long = dis.readLong
 }
 
 object Device {
@@ -35,7 +50,7 @@ class CycledFile(f: File) extends Generator { self =>
   if (!f.canRead)
     throw new IllegalArgumentException("can't read %s".format(f))
   else
-    reinit()
+    reinit
 
   try {
     nextLong()
@@ -44,33 +59,33 @@ class CycledFile(f: File) extends Generator { self =>
       throw new IllegalArgumentException("%s contains less than 8 bytes".format(f))
   }
 
-  def reinit(): Unit = {
-    if (dis != null) dis.close()
+  def reinit: Unit = {
+    if (dis != null) dis.close
     dis = new DataInputStream(new FileInputStream(f))
   }
 
   def copyInit: Generator = new CycledFile(f)
 
-  def getSeedBytes(): Array[Byte] =
+  def getSeedBytes: Array[Byte] =
     throw new UnsupportedOperationException("getSeedBytes")
 
   def setSeedBytes(bytes: Array[Byte]): Unit =
     throw new UnsupportedOperationException("setSeedBytes")
 
   def nextInt(): Int = try {
-    dis.readInt()
+    dis.readInt
   } catch {
     case e: EOFException =>
-      reinit()
-      dis.readInt()
+      reinit
+      dis.readInt
   }
 
   def nextLong(): Long = try {
-    dis.readLong()
+    dis.readLong
   } catch {
     case e: EOFException =>
-      reinit()
-      dis.readInt()
+      reinit
+      dis.readInt
   }
 }
 

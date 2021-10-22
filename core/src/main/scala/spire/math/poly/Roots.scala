@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package math
 package poly
@@ -8,8 +23,7 @@ import spire.std.bigInt._
 import spire.std.bigDecimal._
 
 /**
- * A trait that can be used to retrieve the (possibly approximated) real
- * roots of the polynomial `poly`.
+ * A trait that can be used to retrieve the (possibly approximated) real roots of the polynomial `poly`.
  */
 trait Roots[A] extends Iterable[A] { self =>
 
@@ -24,8 +38,7 @@ trait Roots[A] extends Iterable[A] { self =>
   def count: Int
 
   /**
-   * Returns the `i`-th real root of `poly`, or throws an
-   * `IndexOutOfBoundsException` if there is no `i`-th real root.
+   * Returns the `i`-th real root of `poly`, or throws an `IndexOutOfBoundsException` if there is no `i`-th real root.
    */
   def get(i: Int): A
 

@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package laws
 
@@ -69,7 +84,7 @@ trait PartialActionLaws[G, A] extends Laws {
     },
     "left and right partial action compatibility" -> forAllSafe { (a: A, g: G) =>
       (a <|+|?? g) ==>
-        ((g.inverse() ??|+|> a) && ((a <|+|? g).get === (g.inverse() ?|+|> a).get))
+        ((g.inverse ??|+|> a) && ((a <|+|? g).get === (g.inverse ?|+|> a).get))
     }
   )
 

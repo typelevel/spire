@@ -1,3 +1,18 @@
+/*
+ * **********************************************************************\
+ * * Project                                                              **
+ * *       ______  ______   __    ______    ____                          **
+ * *      / ____/ / __  /  / /   / __  /   / __/     (c) 2011-2021        **
+ * *     / /__   / /_/ /  / /   / /_/ /   / /_                            **
+ * *    /___  / / ____/  / /   / __  /   / __/   Erik Osheim, Tom Switzer **
+ * *   ____/ / / /      / /   / / | |   / /__                             **
+ * *  /_____/ /_/      /_/   /_/  |_|  /____/     All rights reserved.    **
+ * *                                                                      **
+ * *      Redistribution and use permitted under the MIT license.         **
+ * *                                                                      **
+ * \***********************************************************************
+ */
+
 package spire
 package algebra
 package partial
@@ -6,14 +21,16 @@ import spire.util.Opt
 import spire.syntax.eq._
 
 /**
- * A groupoid is a semigroupoid where inverse are defined for all elements,
- * and thus left and right identity elements such that:
+ * A groupoid is a semigroupoid where inverse are defined for all elements, and thus left and right identity elements
+ * such that:
  *
+ * {{{
  *   (i) (leftId(g) |+|? g).get === g
- *  (ii) (g |+|? rightId(g)).get === g
+ *   (ii) (g |+|? rightId(g)).get === g
  * (iii) `a.inverse |+|? a` and `a |+|? a.inverse` are always defined
- *  (iv) if `a |+|? b`, then `((a |+|? b).get |+|? b.inverse).get === a` and
+ *   (iv) if `a |+|? b`, then `((a |+|? b).get |+|? b.inverse).get === a` and
  *       `((a.inverse |+|? a).get |+|? b) === b`
+ * }}}
  */
 trait Groupoid[A] extends Any with Semigroupoid[A] {
 
