@@ -65,12 +65,7 @@ JVM and JS platforms.
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-libraryDependencies += "org.typelevel" %% "spire" % "@STABLE_VERSION@"
-```
-
-If you want to try out the latest version, add the following to your `build.sbt` file.
-```
-libraryDependencies += "org.typelevel" %% "spire" % "@LATEST_VERSION@"
+libraryDependencies += "org.typelevel" %% "spire" % "@VERSION@"
 ```
 
 (Previous to 0.14.0, Spire was published under *org.spire-math*
