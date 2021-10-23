@@ -34,12 +34,7 @@ object VectorSpaceLaws {
   }
 }
 
-trait VectorSpaceLaws[V, A] extends Laws {
-
-  @nowarn
-  implicit def ringFromLeftModule(implicit V: LeftModule[V, A], ev: NoImplicit[CModule[V, A]]): Ring[A] = V.scalar
-  @nowarn
-  implicit def ringFromRightModule(implicit V: RightModule[V, A], ev: NoImplicit[CModule[V, A]]): Ring[A] = V.scalar
+trait VectorSpaceLaws[V, A] extends Laws with ModuleToRing[V, A] {
   implicit def cRingFromCModule(implicit V: CModule[V, A]): CRing[A] = V.scalar
 
   val scalarLaws: RingLaws[A]
