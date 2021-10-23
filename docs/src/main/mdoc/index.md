@@ -65,14 +65,25 @@ JVM and JS platforms.
 To get started with SBT, simply add the following to your `build.sbt` file:
 
 ```
-libraryDependencies += "org.typelevel" %% "spire" % "@VERSION@"
+libraryDependencies += "org.typelevel" %% "spire" % "@STABLE_VERSION@"
+```
+
+If you want to try out the latest version, add the following to your `build.sbt` file.
+```
+libraryDependencies += "org.typelevel" %% "spire" % "@LATEST_VERSION@"
 ```
 
 (Previous to 0.14.0, Spire was published under *org.spire-math*
 instead of *org.typelevel*.)
 
-For Maven instructions, and to download the jars directly, visit the
-[Central Maven repository](http://search.maven.org/#artifactdetails%7Corg.typelevel%7Cspire_2.11%7C0.14.1%7Cjar).
+For Maven instructions, and to download the jars directly, visit the Central Maven repository.
+
+|Scala version| Maven Repo|
+|---|---|
+| 2.11.x|https://search.maven.org/artifact/org.typelevel/spire_2.11|
+| 2.12.x|https://search.maven.org/artifact/org.typelevel/spire_2.12|
+| 2.13.x|https://search.maven.org/artifact/org.typelevel/spire_2.13|
+| 3.x|https://search.maven.org/artifact/org.typelevel/spire_3|
 
 Here is a list of all of Spire's modules:
 
@@ -567,7 +578,7 @@ measure relative as well as absolute performance.
 Code is offered as-is, with no implied warranty of any kind. Comments,
 criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
-Copyright 2011-2017 Erik Osheim, Tom Switzer
+Copyright 2011-@COPYRIGHT_TO@ @AUTHORS@
 
 A full list of contributors can be found in [AUTHORS.md](./extra_md/authors.html).
 
