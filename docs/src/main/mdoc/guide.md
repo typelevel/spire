@@ -784,7 +784,7 @@ import spire.math.Real
 import Real.{sin, cos}
 
 // will return Real(1) no matter what value is provided
-def circle(a: Real): Real = (cos(a).pow(2) + sin(a).pow(2)).sqrt()
+def circle(a: Real): Real = sqrt(cos(a).pow(2) + sin(a).pow(2))
 ```
 
 One interesting consequence of the design of computable real numbers
