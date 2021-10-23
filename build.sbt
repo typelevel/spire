@@ -208,7 +208,10 @@ lazy val docs = project
   .settings(
     mdocIn := (Compile / sourceDirectory).value / "mdoc",
     mdocVariables := Map(
-      "VERSION" -> version.value
+      "VERSION" -> (if (isSnapshot.value)
+                      previousStableVersion.value.getOrElse(version.value)
+                    else
+                      version.value)
     ),
     // NOTE: disable link hygine to supress dead link warnings because mdoc does not go well with Jekyll
     mdocExtraArguments ++= Seq("--no-link-hygiene")
