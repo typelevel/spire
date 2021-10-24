@@ -93,6 +93,40 @@ and uses this project to interoperate with [Cats](https://github.com/typelevel/c
 
 ### Playing Around
 
+If you are new to Scala, or does not have Scala (or sbt) locally, try spire at [scastie](https://scastie.scala-lang.org/LVRAHaJAS7qoVbUyoDgKNA) on browser. 
+
+<script src="https://scastie.scala-lang.org/LVRAHaJAS7qoVbUyoDgKNA.js"></script>
+
+#### With Ammonite Repl
+If you have [ammonite](https://ammonite.io/), enter `amm` in your terminal to launch ammonite REPL.
+
+```scala
+Welcome to the Ammonite Repl 2.x.x
+@ import $ivy.`org.typelevel::spire:@VERSION@`
+@ import spire._
+@ import spire.math._
+@ import sipre.implicits._
+@ Complex(3.0,5.0).sin
+res: Complex[Double] = Complex(real = 10.472508533940392, imag = -73.46062169567367)
+```
+
+
+#### with `*.worksheet.sc`
+You can also play around with IntelliJ or VS Code & Metals.
+
+For example, create `spire.worksheet.sc` and copy-paste the following code snippet.
+
+Then, open `spire.worksheet.sc` with IntelliJ or CS Code (needs [metals VS Code extension](https://scalameta.org/metals/docs/editors/vscode/)).
+
+```scala
+import $ivy.`org.typelevel::spire:@VERSION@`
+import spire._
+import spire.math._
+import spire.implicits._
+Complex(3.0,5.0).sin
+res: Complex[Double] = Complex(real = 10.472508533940392, imag = -73.46062169567367)
+```
+#### with git and sbt
 If you clone the Spire repo, you can get a taste of what Spire can do using
 SBT's console. Launch `sbt` and at the prompt, type `coreJVM/console`:
 
