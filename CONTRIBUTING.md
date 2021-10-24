@@ -13,6 +13,23 @@ We also gladly accept patches for documentation. Anything from fixing
 a typo to writing a full tutorial is a great way to help the
 project.
 
+#### Quick guide for documentation
+You can directly edit documents at https://github.com/typelevel/spire/tree/main/docs/src/main/mdoc, but it is better to use git to manage diffs.
+
+
+First, visit https://github.com/typelevel/spire and fork the repository.
+
+Second, clone the forked repository and make new branch.
+
+Third, run `sbt docs/makeMicrosite` to build document website, change directory to `docs/target/site` and run `jekyll serve -b /spire`.
+
+You can preview website at http://localhost:4000/spire by default.
+
+Note: `makeMicrosite` depends on jekyll 4.x. Make sure that you have [jekyll(4+)](https://jekyllrb.com/docs/installation/) in your environment.
+
+Finally, commit your changes and create PR at typelevel/spire repository.
+
+
 ### Reporting bugs, issues, or unexpected behavior
 
 If you encounter anything that is broken, confusing, or could be
@@ -71,7 +88,7 @@ not to get merged to main as quickly. For this kind of work, you
 should submit a pull request from your branch, but we will probably
 leave the PR open for awhile while commenting on it.
 
-You can always email the list, or visit the `#spire-math` IRC channel
+You can always ask questions at [Typelevel Discord](https://discord.com/invite/XF3CXcMzqD) or [Spire gitter](https://gitter.im/typelevel/spire), email the list, or visit the `#spire-math` IRC channel
 to get a second opinion on your idea or design.
 
 ### Ask questions and make suggestions
