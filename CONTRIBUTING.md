@@ -31,13 +31,13 @@ time, it could be any of the following issues:
 
 Feel free to open a bug before you're sure which of these is
 happening.  You can also ask questions on the
-[mailing list](http://groups.google.com/group/spire-math/) to get
+[mailing list](https://groups.google.com/group/spire-math/) to get
 other people's opinions.
 
 ### Creating or improving tests
 
-Spire uses [ScalaTest](www.scalatest.org) and
-[ScalaCheck](http://scalacheck.org/) to test our code. The tests
+Spire uses [ScalaTest](https://www.scalatest.org) and
+[ScalaCheck](https://scalacheck.org/) to test our code. The tests
 fulfill a number of important functions:
 
  * ensure our algorithms return correct results

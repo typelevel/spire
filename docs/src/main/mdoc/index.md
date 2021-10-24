@@ -7,7 +7,7 @@ position: 0
 
 [![Continuous Integration](https://github.com/typelevel/spire/actions/workflows/ci.yml/badge.svg)](https://github.com/typelevel/spire/actions/workflows/ci.yml)
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/typelevel/spire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![codecov.io](https://codecov.io/github/typelevel/spire/coverage.svg?branch=main)](http://codecov.io/github/typelevel/spire?branch=main)
+[![codecov.io](https://codecov.io/github/typelevel/spire/coverage.svg?branch=main)](https://codecov.io/github/typelevel/spire?branch=main)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.typelevel/spire_2.11/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.typelevel/spire_2.11)
 
 ## Spire
@@ -65,7 +65,7 @@ when discussing Spire on the Github page, in Gitter, the IRC channel,
 mailing list, and other official venues.
 
 Concerns or issues can be sent to any of Spire's maintainers, or to the
-[Typelevel](http://typelevel.org/about.html) organization.
+[Typelevel](https://typelevel.org/about.html) organization.
 
 ### Set up
 
@@ -571,7 +571,7 @@ In addition, Spire provides many other methods which are "missing" from
 ### Benchmarks
 
 In addition to unit tests, Spire comes with a relatively fleshed-out set of
-[JMH](http://openjdk.java.net/projects/code-tools/jmh) micro-benchmarks. To
+[JMH](https://openjdk.java.net/projects/code-tools/jmh) micro-benchmarks. To
 run the benchmarks from within SBT, change to the `benchmark` subproject 
 and then `jmh:run -l` to see a list of benchmarks:
 
