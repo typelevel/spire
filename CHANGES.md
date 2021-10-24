@@ -1,4 +1,4 @@
-## Version 0.16.1-SNAPSHOT (not released)
+## Version 0.16.1-SNAPSHOT
 
  * Disabled benchmarked depending on Caliper; waiting for migration to a modern benchmarking framework
  * Fixes to polynomials
