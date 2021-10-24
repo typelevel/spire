@@ -123,7 +123,11 @@ behind Spire's generic math capabilities.
 #### Specialization
 
 To achieve speed on-par with direct (non-generic) code, you will need
-to use specialization. The good news is that most of Spire's code is
+to use specialization. 
+
+About specialization, visit [scalac.io blog: Avoiding Unnecessary Object Instantiation with Specialized Generics](https://scalac.io/blog/specialized-generics-object-instantiation/)
+
+The good news is that most of Spire's code is
 already specialized (and tested for proper performance). The bad news
 is that you'll have to annotate all your generic code like so:
 
@@ -150,7 +154,7 @@ There are too many gotchas with specialization to list here. But the
  4. Specialization will increase bytecode size by a factor of x2-10.
 
 If you have questions about specialization feel free to ask on the
-mailing list. You may notice that some code in Spire is structured in
+mailing list or [gitter channel](https://gitter.im/typelevel/spire). You may notice that some code in Spire is structured in
 an unusual way, and often this is to make sure specialization works
 properly.
 
@@ -186,9 +190,11 @@ properties themselves remain the same.
 #### Eq
 
 Spire provides an `Eq[A]` type class to represent type-safe
-equality. This allows us to talk about types for which there isn't a
+equality.  This allows us to talk about types for which there isn't a
 computationally useful notion of equality, and also to avoid
 programming errors caused by universal equality.
+
+It means that comparing two values of incomparable types with `===` operator raises **compile error**, while Scala's standard `==` operator usually raises error at runtime.
 
 `Eq[A]` provides two operators
 
@@ -201,6 +207,7 @@ Spire requires that `eqv` obey the laws of an equivalence relation, namely:
  * if `a === b` then `b === a` (*symmetry*)
  * if `a === b` then `a` is `b` (*anti-symmetry*)
  * if `a === b` and `b === c` then `a === c` (*transitivity*)
+
 
 The anti-symmetry property may seem confusing. The idea is that if `a === b`
 then `a` and `b` must be substitutable for each other, such that for any

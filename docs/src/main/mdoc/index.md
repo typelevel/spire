@@ -24,21 +24,31 @@ code without having to "bake in" particular numeric representations. In most
 cases, generic implementations using Spire's specialized type classes perform
 identically to corresponding direct implementations.
 
-### Scaladoc
-[![Core](http://javadoc-badge.appspot.com/org.typelevel/spire_2.11.svg?label=core)](http://javadoc-badge.appspot.com/org.typelevel/spire_2.11/index.html#spire.package)
-[![Extras](http://javadoc-badge.appspot.com/org.typelevel/spire-extras_2.11.svg?label=extras)](http://javadoc-badge.appspot.com/org.typelevel/spire-extras_2.11)
-[![Laws](http://javadoc-badge.appspot.com/org.typelevel/spire-laws_2.11.svg?label=laws)](http://javadoc-badge.appspot.com/org.typelevel/spire-laws_2.11/index.html#spire.laws.package)
-[![Macros](http://javadoc-badge.appspot.com/org.typelevel/spire-macros_2.11.svg?label=macros)](http://javadoc-badge.appspot.com/org.typelevel/spire-macros_2.11/index.html#spire.macros.package)
+### Javadocs
+
+|library|link|
+|---|---|
+|spire|https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html|
+|spire-extras|https://www.javadoc.io/doc/org.typelevel/spire-extras_2.13/latest/spire/index.html|
+|spire-laws|https://www.javadoc.io/doc/org.typelevel/spire-laws_2.13/latest/spire/index.html|
+|spire-macros|https://www.javadoc.io/doc/org.typelevel/spire-macros_2.13/latest/spire/index.html|
+
 
 Spire is provided to you as free software under the
 [MIT license](COPYING).
 
 ### Organization
 
-The [Spire mailing list](http://groups.google.com/group/typelevel/)
-is shared with other [Typelevel projects](http://typelevel.org).
-It is the place to go for announcements and discussions around Spire.
+We spire (and typelevel) have [dicord](https://discord.com/invite/XF3CXcMzqD), [gitter chat](https://gitter.im/typelevel/spire) and [mailing list](https://groups.google.com/group/typelevel/).
+
+- [typelevel dicord](https://discord.com/invite/XF3CXcMzqD):  ???
+- [spire gitter](https://gitter.im/typelevel/spire) : place to go for announcements and discussions around Spire.
+- [mailng list](https://groups.google.com/group/typelevel/): place to go for announcements and discussions around [Typelevel projects](https://typelevel.org).
+
+
+
 When posting, place the word `[spire]` at the beginning of your subject.
+
 We also have a guide on [contributing to Spire](./extra_md/contributing.html) as well
 as a guide that provides information on [Spire's design](./guide.html).
 
@@ -609,6 +619,6 @@ criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
 Copyright 2011-@COPYRIGHT_TO@ @AUTHORS@
 
-A full list of contributors can be found in [AUTHORS.md](./extra_md/authors.html).
+A full list of contributors can be found in [AUTHORS.md](./authors.html).
 
 The MIT software license is attached in the [COPYING](./extra_md/copying) file.
