@@ -1,7 +1,3 @@
-import java.time.LocalDate
-
-val copyrightYear = LocalDate.now().getYear()
-val authors = Seq("Erik Osheim", "Tom Switzer")
 
 val header = """|**********************************************************************\
                 |* Project                                                              **
@@ -217,8 +213,8 @@ lazy val docs = project
                       previousStableVersion.value.getOrElse(version.value)
                     else
                       version.value),
-      "COPYRIGHT_TO" -> copyrightYear.toString(),
-      "AUTHORS" -> authors.mkString(", ")
+      "COPYRIGHT_TO" ->  java.time.LocalDate.now().getYear().toString(),
+      "AUTHORS" -> "Erik Osheim, Tom Switzer"
     ),
     // NOTE: disable link hygine to supress dead link warnings because mdoc does not go well with Jekyll
     mdocExtraArguments ++= Seq("--no-link-hygiene")
@@ -333,11 +329,6 @@ lazy val docSettings = Seq(
   micrositeDocumentationUrl := "https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html",
   micrositeDocumentationLabelDescription := "API Documentation",
   micrositeExtraMdFiles := Map(
-    file("AUTHORS.md") -> ExtraMdFileConfig(
-      "authors.md",
-      "home",
-      Map("title" -> "Authors", "section" -> "Home", "position" -> "5")
-    ),
     file("CHANGES.md") -> ExtraMdFileConfig(
       "changes.md",
       "home",
