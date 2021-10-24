@@ -1,4 +1,3 @@
-
 val header = """|**********************************************************************\
                 |* Project                                                              **
                 |*       ______  ______   __    ______    ____                          **
@@ -213,7 +212,7 @@ lazy val docs = project
                       previousStableVersion.value.getOrElse(version.value)
                     else
                       version.value),
-      "COPYRIGHT_TO" ->  java.time.LocalDate.now().getYear().toString(),
+      "COPYRIGHT_TO" -> java.time.LocalDate.now().getYear().toString(),
       "AUTHORS" -> "Erik Osheim, Tom Switzer"
     ),
     // NOTE: disable link hygine to supress dead link warnings because mdoc does not go well with Jekyll
@@ -329,12 +328,12 @@ lazy val docSettings = Seq(
   micrositeDocumentationUrl := "https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html",
   micrositeDocumentationLabelDescription := "API Documentation",
   micrositeExtraMdFiles := Map(
-    // Note: CONTRIBUTING.md, CODE_OF_CONDUCT.md and COPYING is placed in pproject root directory so that github can detect it. 
+    // Note: CONTRIBUTING.md, CODE_OF_CONDUCT.md and COPYING is placed in pproject root directory so that github can detect it.
     file("CONTRIBUTING.md") -> ExtraMdFileConfig(
       "contributing.md",
       "home",
       Map("title" -> "Contributing", "section" -> "Home", "position" -> "3")
-    ),
+    )
   ),
   micrositeGithubOwner := "typelevel",
   micrositeGithubRepo := "spire",
