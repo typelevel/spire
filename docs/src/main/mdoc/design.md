@@ -1,3 +1,9 @@
+---
+layout: home
+title:  "Design notes"
+section: "Home"
+position: 4
+---
 ## Design
 
 This document is intended to describe design goals, invariants and implementation notes for the various types

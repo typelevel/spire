@@ -339,16 +339,6 @@ lazy val docSettings = Seq(
       "home",
       Map("title" -> "Contributing", "section" -> "Home", "position" -> "3")
     ),
-    file("DESIGN.md") -> ExtraMdFileConfig(
-      "design.md",
-      "home",
-      Map("title" -> "Design notes", "section" -> "Home", "position" -> "4")
-    ),
-    file("FRIENDS.md") -> ExtraMdFileConfig(
-      "friends.md",
-      "home",
-      Map("title" -> "Friends of Spire", "section" -> "Home", "position" -> "6")
-    )
   ),
   micrositeGithubOwner := "typelevel",
   micrositeGithubRepo := "spire",

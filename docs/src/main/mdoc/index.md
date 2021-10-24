@@ -28,10 +28,10 @@ identically to corresponding direct implementations.
 
 |library|link|
 |---|---|
-|spire|https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html|
-|spire-extras|https://www.javadoc.io/doc/org.typelevel/spire-extras_2.13/latest/spire/index.html|
-|spire-laws|https://www.javadoc.io/doc/org.typelevel/spire-laws_2.13/latest/spire/index.html|
-|spire-macros|https://www.javadoc.io/doc/org.typelevel/spire-macros_2.13/latest/spire/index.html|
+|spire| https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html |
+|spire-extras| https://www.javadoc.io/doc/org.typelevel/spire-extras_2.13/latest/spire/index.html |
+|spire-laws| https://www.javadoc.io/doc/org.typelevel/spire-laws_2.13/latest/spire/index.html |
+|spire-macros| https://www.javadoc.io/doc/org.typelevel/spire-macros_2.13/latest/spire/index.html |
 
 
 Spire is provided to you as free software under the
@@ -50,7 +50,7 @@ We spire (and typelevel) have [dicord](https://discord.com/invite/XF3CXcMzqD), [
 When posting, place the word `[spire]` at the beginning of your subject.
 
 We also have a guide on [contributing to Spire](./extra_md/contributing.html) as well
-as a guide that provides information on [Spire's design](./guide.html).
+as a guide that provides information on [Spire's guide](./guide.html) and [design notes](./design.html).
 
 Spire has maintainers who are responsible for signing-off on and
 merging pull requests, and for helping to guide the direction of Spire:

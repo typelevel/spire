@@ -1,4 +1,12 @@
-Friends of Spire
+---
+layout: home
+title:  "Friends of Spire"
+section: "Home"
+position: 6
+---
+
+
+## Friends of Spire
 ================
 
 Here is a list of libraries that are based on Spire, or have Spire compatibility.
