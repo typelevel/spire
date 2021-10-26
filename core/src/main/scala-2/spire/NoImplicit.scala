@@ -19,7 +19,8 @@ import scala.annotation.nowarn
 
 /**
  * `NotGiven` provides a way to ensure that a particular implicit doesn't exist. It is often useful to work-around
- * annoying ambiguous implicit problems. Only for scala-2, for scala-3 use scala.util.NotGiven
+ * annoying ambiguous implicit problems. Only for Scala 2. On Scala 3 `spire.NotGiven` is an alias for
+ * `scala.util.NotGiven`.
  */
 final class NotGiven[A]
 
