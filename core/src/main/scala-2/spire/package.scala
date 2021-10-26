@@ -18,6 +18,6 @@ package object spire {
   type tailrec = scala.annotation.tailrec
   type ClassTag[A] = scala.reflect.ClassTag[A]
   val ClassTag = scala.reflect.ClassTag
-  @deprecated("Replaced by spire.NotGiven[A]")
+  @deprecated("Replaced by spire.NotGiven[A]", "0.18.0")
   type NoImplicit[A] = spire.NotGiven[A]
 }
