@@ -18,13 +18,14 @@ package spire
 import scala.annotation.nowarn
 
 /**
- * `NoImplicit` provides a way to ensure that a particular implicit doesn't exist. It is often useful to work-around
+ * `NotGiven` provides a way to ensure that a particular implicit doesn't exist. It is often useful to work-around
  * annoying ambiguous implicit problems.
+ * Only for scala-2, for scala-3 use scala.util.NotGiven
  */
-final class NoImplicit[A]
+final class NotGiven[A]
 
-object NoImplicit {
-  implicit def noImplicit0[A]: NoImplicit[A] = new NoImplicit[A]
+object NotGiven {
+  implicit def noImplicit0[A]: NotGiven[A] = new NotGiven[A]
   @nowarn
-  implicit def noImplicit1[A](implicit ev: A): NoImplicit[A] = new NoImplicit[A]
+  implicit def noImplicit1[A](implicit ev: A): NotGiven[A] = new NotGiven[A]
 }
