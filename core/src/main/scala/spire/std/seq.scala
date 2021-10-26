@@ -22,7 +22,7 @@ import scala.collection.Seq
 import scala.collection.SeqOps
 
 import spire.algebra._
-import spire.NoImplicit
+import spire.NotGiven
 import scala.annotation.nowarn
 
 @SerialVersionUID(0L)
@@ -280,7 +280,7 @@ trait SeqInstances0 {
   implicit def SeqCModule[A, CC[A] <: SeqOps[A, Seq, CC[A]]](implicit
     ring0: CRing[A],
     cbf0: Factory[A, CC[A]],
-    ev: NoImplicit[VectorSpace[CC[A], A]]
+    ev: NotGiven[VectorSpace[CC[A], A]]
   ): SeqCModule[A, CC[A]] = new SeqCModule[A, CC[A]]
 }
 
@@ -289,7 +289,7 @@ trait SeqInstances1 extends SeqInstances0 {
   implicit def SeqVectorSpace[A, CC[A] <: SeqOps[A, Seq, CC[A]]](implicit
     field0: Field[A],
     cbf0: Factory[A, CC[A]],
-    ev: NoImplicit[NormedVectorSpace[CC[A], A]]
+    ev: NotGiven[NormedVectorSpace[CC[A], A]]
   ): SeqVectorSpace[A, CC[A]] = new SeqVectorSpace[A, CC[A]]
 
   implicit def SeqEq[A, CC[A] <: SeqOps[A, Seq, CC[A]]](implicit A0: Eq[A]): SeqEq[A, CC[A]] =

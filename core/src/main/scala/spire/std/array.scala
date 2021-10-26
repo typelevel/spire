@@ -17,7 +17,7 @@ package spire
 package std
 
 import spire.algebra._
-import spire.NoImplicit
+import spire.NotGiven
 import scala.annotation.nowarn
 
 object ArraySupport {
@@ -126,14 +126,14 @@ object ArraySupport {
 }
 
 trait ArrayInstances0 {
-  type NI0[A] = NoImplicit[VectorSpace[Array[A], A]]
+  type NI0[A] = NotGiven[VectorSpace[Array[A], A]]
 
   implicit def ArrayCModule[@sp(Int, Long, Float, Double) A: NI0: ClassTag: CRing]: CModule[Array[A], A] =
     new ArrayCModule[A]
 }
 
 trait ArrayInstances1 extends ArrayInstances0 {
-  type NI1[A] = NoImplicit[NormedVectorSpace[Array[A], A]]
+  type NI1[A] = NotGiven[NormedVectorSpace[Array[A], A]]
 
   implicit def ArrayVectorSpace[@sp(Int, Long, Float, Double) A: NI1: ClassTag: Field]: VectorSpace[Array[A], A] =
     new ArrayVectorSpace[A]
@@ -163,7 +163,7 @@ trait ArrayInstances extends ArrayInstances3 {
 @SerialVersionUID(0L)
 @nowarn
 final private class ArrayCModule[@sp(Int, Long, Float, Double) A: ClassTag: CRing](implicit
-  nvs: NoImplicit[VectorSpace[Array[A], A]]
+  nvs: NotGiven[VectorSpace[Array[A], A]]
 ) extends CModule[Array[A], A]
     with Serializable {
   def scalar: CRing[A] = CRing[A]
@@ -177,7 +177,7 @@ final private class ArrayCModule[@sp(Int, Long, Float, Double) A: ClassTag: CRin
 @SerialVersionUID(0L)
 @nowarn
 final private class ArrayVectorSpace[@sp(Int, Float, Long, Double) A: ClassTag: Field](implicit
-  nnvs: NoImplicit[NormedVectorSpace[Array[A], A]]
+  nnvs: NotGiven[NormedVectorSpace[Array[A], A]]
 ) extends VectorSpace[Array[A], A]
     with Serializable {
   def scalar: Field[A] = Field[A]
