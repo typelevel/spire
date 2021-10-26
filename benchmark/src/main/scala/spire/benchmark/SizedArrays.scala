@@ -45,7 +45,6 @@ object SizedArrays {
       case ArrayOrder.Random   =>
       case ArrayOrder.Sorted   => spire.math.Sorting.sort(data)(order, ct)
       case ArrayOrder.Reversed => spire.math.Sorting.sort(data)(Order.reverse(order), ct)
-      case _                   => sys.error(s"unknown layout: $layout")
     }
     data
   }
