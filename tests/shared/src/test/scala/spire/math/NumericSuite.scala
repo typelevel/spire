@@ -32,8 +32,8 @@ class NumericSuite extends munit.FunSuite {
   def runWith[@sp A: Numeric: ClassTag](cls: String)(a: A, b: A, c: A): Unit = {
 
     // the name to use for this A
-    //val cls = implicitly[ClassTag[A]].erasure.getSimpleName
-    //val cls = implicitly[ClassTag[A]].runtimeClass.getName
+    // val cls = implicitly[ClassTag[A]].erasure.getSimpleName
+    // val cls = implicitly[ClassTag[A]].runtimeClass.getName
 
     // test runner which constructs a unique name for each test we run.
     def runTest(name: String)(f: => Unit) = test("%s:%s".format(cls, name))(f)
@@ -76,7 +76,7 @@ class NumericSuite extends munit.FunSuite {
   runWith[BigInt]("BigInt")(-3, 3, -9)
   runWith[BigDecimal]("BigDecimal")(-3, 3, -9)
   runWith[Rational]("Rational")(-3, 3, -9)
-  //runWith[Complex[Double]](-3, 3, -9) // There seems to be a bug.
+  // runWith[Complex[Double]](-3, 3, -9) // There seems to be a bug.
   /*  runWith[Complex[BigDecimal]]("Complex[BigDecimal]")( // Complex is no longer Numeric
     Complex(BigDecimal(-3), BigDecimal(0)),
     Complex(BigDecimal(3), BigDecimal(0)),

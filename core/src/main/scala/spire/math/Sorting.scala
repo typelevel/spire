@@ -245,7 +245,7 @@ object QuickSort {
     var i = start
     while (i < end - 1) {
       if (Order[A].lt(data(i), pivotValue)) {
-        //swap(i, store)
+        // swap(i, store)
         temp = data(i); data(i) = data(store); data(store) = temp
         store += 1
       }

@@ -568,7 +568,7 @@ object Real extends RealInstances {
   }
 
   def atanDrx(x: Real): Real =
-    //powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ + 1, x)
+    // powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ + 1, x)
     powerSeries(accSeq((r, n) => r * (Rational(2 * n, 2 * n + 1))), _ * 2, x)
 
   case class Exact(n: Rational) extends Real {
@@ -662,7 +662,7 @@ trait RealIsFractional
   def toBigInt(x: Real): BigInt = x.toRational.toBigInt
   def toBigDecimal(x: Real): BigDecimal = x.toRational.toBigDecimal(java.math.MathContext.DECIMAL64)
   def toRational(x: Real): Rational = x.toRational
-  def toAlgebraic(x: Real): Algebraic = Algebraic(x.toRational) //FIXME
+  def toAlgebraic(x: Real): Algebraic = Algebraic(x.toRational) // FIXME
   def toReal(x: Real): Real = x
   def toNumber(x: Real): Number = Number(x.toRational)
   def toString(x: Real): String = x.toString

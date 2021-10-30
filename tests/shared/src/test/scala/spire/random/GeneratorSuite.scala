@@ -43,7 +43,7 @@ class GeneratorSuite extends munit.FunSuite {
   val size: Int = 10000000
   val threshold: Double = 0.0038
 
-  //val bases: List[Int] = List(3, 5, 7, 11, 13, 17)
+  // val bases: List[Int] = List(3, 5, 7, 11, 13, 17)
   val bases: List[Int] = Nil
 
   List(
@@ -72,7 +72,7 @@ class GeneratorSuite extends munit.FunSuite {
       bases.foreach { mod =>
         test("%s nextInt(%d) distributed within %.2f%%".format(name, mod, threshold * 100)) {
           val histogram = new Array[Int](mod)
-          //val rng = gen.fromTime()
+          // val rng = gen.fromTime()
           val rng = gen.fromTime(13572468L)
           for (i <- 0 until size) {
             val n: Int = rng.nextInt(mod)

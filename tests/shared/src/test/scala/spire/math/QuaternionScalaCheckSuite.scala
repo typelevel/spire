@@ -135,7 +135,7 @@ class QuaternionScalaCheckSuite extends munit.ScalaCheckSuite {
 
   def inexactEq(x: H, y: H): Unit =
     if (x != y) {
-      //dumpDiff("ouch", x, y)
+      // dumpDiff("ouch", x, y)
       (x - y).abs < tolerance // sadface
     } else {
       x == y

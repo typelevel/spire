@@ -32,8 +32,8 @@ import Arrays.init
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(Scope.Thread)
 class CForBenchmarks {
-  //@Param(Array("10", "15", "20", "25"))
-  //@Param(Array("1000", "10000", "100000", "1000000"))
+  // @Param(Array("10", "15", "20", "25"))
+  // @Param(Array("1000", "10000", "100000", "1000000"))
   @Param(Array("1000000"))
   var size: Int = 0
 

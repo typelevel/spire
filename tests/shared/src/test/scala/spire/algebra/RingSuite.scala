@@ -33,14 +33,14 @@ class RingSuite extends munit.FunSuite {
    */
   def runWith[@sp A: Ring: ClassTag](cls: String)(a: A, b: A, c: A): Unit = {
 
-    //// the name to use for this A
-    //val cls = m.typeArguments match {
+    // // the name to use for this A
+    // val cls = m.typeArguments match {
     //  case Nil => m.erasure.getSimpleName
     //  case args => "%s[%s]" format (m.erasure.getSimpleName, args.mkString(","))
-    //}
+    // }
 
     // the name to use for this A
-    //val cls = m.runtimeClass.getName
+    // val cls = m.runtimeClass.getName
 
     // test runner which constructs a unique name for each test we run.
     def runTest(name: String)(f: => Unit) = test("%s:%s".format(cls, name))(f)
@@ -57,8 +57,8 @@ class RingSuite extends munit.FunSuite {
     runTest("3 + (-3)")(assertEquals(b + a, z))
 
     // -
-    //implicit def fooby[B:Ring](b:B) = new AdditiveGroupOps[B](b)
-    //runTest("3 - 0")(assertEquals(additiveGroupOps(b).-(z), b))
+    // implicit def fooby[B:Ring](b:B) = new AdditiveGroupOps[B](b)
+    // runTest("3 - 0")(assertEquals(additiveGroupOps(b).-(z), b))
     runTest("3 - 0")(assertEquals(b - z, b))
     runTest("3 - 3)")(assertEquals(b - b, z))
     runTest("0 - 3)")(assertEquals(z - b, a))

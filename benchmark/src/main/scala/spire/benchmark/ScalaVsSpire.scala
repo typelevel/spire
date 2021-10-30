@@ -33,7 +33,7 @@ import Arrays.init
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(Scope.Thread)
 class ScalaVsSpireBenchmarks {
-  //@Param(Array("10", "15", "20", "25"))
+  // @Param(Array("10", "15", "20", "25"))
   @Param(Array("20"))
   var pow: Int = 0
 

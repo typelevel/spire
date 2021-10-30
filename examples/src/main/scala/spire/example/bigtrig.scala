@@ -61,21 +61,21 @@ object TrigTest {
 
   def main(args: Array[String]): Unit = {
     testSqrt2()
-    //apfloatSqrt2()
+    // apfloatSqrt2()
 
     testPi()
-    //apfloatPi()
+    // apfloatPi()
 
     testE()
 
     testExp1()
-    //apfloatExp1()
+    // apfloatExp1()
 
     testSin1()
-    //apfloatSin1()
+    // apfloatSin1()
 
     testCos1()
-    //apfloatCos1()
+    // apfloatCos1()
   }
 
   val verbose: Boolean = false

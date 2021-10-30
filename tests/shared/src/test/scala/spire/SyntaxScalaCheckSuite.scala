@@ -456,8 +456,8 @@ trait BaseSyntaxSuite {
     ((v :* a) === V.timesr(v, a)) &&
     ((2 *: v) == V.timesl(A.fromInt(2), v)) &&
     ((v :* 2) == V.timesr(v, A.fromInt(2))) &&
-    //((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
-    //((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
+    // ((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
+    // ((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
     ((v :/ 2) == V.divr(v, A.fromInt(2))) &&
     ((v.dot(w)) === V.dot(v, w)) &&
     ((v ⋅ w) === V.dot(v, w))
