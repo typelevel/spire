@@ -218,7 +218,7 @@ class RationalSuite extends munit.FunSuite {
 
   test("reverse primitive equality") {
     assert(1 == Rational.one)
-    //assertEquals(-23L, Rational(-23L, 1L))
+    // assertEquals(-23L, Rational(-23L, 1L))
   }
 
   test("limiting 0 to any number returns 0") {
@@ -255,18 +255,18 @@ class RationalSuite extends munit.FunSuite {
   // some kind of continuous compilcation loop... YMMV :/
   test("limitDenominatorTo valid number returns correct result") {
     assertEquals(Rational(6, 5), Rational(23, 19).limitDenominatorTo(10))
-    //assertEquals(Rational(-6, 5), Rational(-23, 19).limitDenominatorTo(10))
+    // assertEquals(Rational(-6, 5), Rational(-23, 19).limitDenominatorTo(10))
 
     val rng = new Random(9281)
     val rationals = List.fill(100)(Rational(rng.nextInt(), rng.nextInt().abs + 1))
     rationals.foreach { a =>
-      //assertEquals(a.limitDenominatorTo(255), bruteForceLimitDen(a, 255), {
+      // assertEquals(a.limitDenominatorTo(255), bruteForceLimitDen(a, 255), {
       //    "%s != %s (original: %s)" format (
       //      a.limitDenominatorTo(255),
       //      bruteForceLimitDen(a, 255),
       //      a
       //    )
-      //})
+      // })
     }
   }
 

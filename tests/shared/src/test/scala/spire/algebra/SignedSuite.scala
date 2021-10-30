@@ -23,11 +23,11 @@ class SignedSuite extends munit.FunSuite {
   def runWith[@sp(Int, Long, Float, Double) A: Signed: ClassTag](neg: A, pos: A, zero: A): Unit = {
     val m = implicitly[ClassTag[A]]
 
-    //// the name to use for this A
-    //val cls = m.typeArguments match {
+    // // the name to use for this A
+    // val cls = m.typeArguments match {
     //  case Nil => m.erasure.getSimpleName
     //  case args => "%s[%s]" format (m.erasure.getSimpleName, args.mkString(","))
-    //}
+    // }
 
     // the name to use for this A
     val cls = m.runtimeClass.getName

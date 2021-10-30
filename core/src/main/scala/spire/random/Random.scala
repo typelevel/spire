@@ -70,7 +70,7 @@ object Random extends RandomCompanion[rng.Cmwc5] {
 trait RandomCompanion[G <: Generator] { self =>
   type R[X] = Random[X, G]
 
-  def initGenerator: G //IO
+  def initGenerator: G // IO
 
   def generatorFromSeed(seed: Seed): G = {
     val gen = initGenerator
@@ -153,9 +153,9 @@ abstract class Random[+A, G <: Generator](val op: Op[A]) { self =>
     companion.spawn(op.flatMap(f(_).op))
 
   def run: A =
-    op.run(companion.initGenerator) //IO
+    op.run(companion.initGenerator) // IO
 
-  def run(seed: Seed): A = { //IO
+  def run(seed: Seed): A = { // IO
     val gen = companion.initGenerator
     gen.setSeedBytes(seed.bytes)
     op.run(gen)

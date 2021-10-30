@@ -202,7 +202,7 @@ final class IsRealOps[A: IsReal](lhs: A) {
   def ceil: A = macro Ops.unop[A]
   def floor: A = macro Ops.unop[A]
   def round: A = macro Ops.unop[A]
-  //def toDouble(): Double = macro Ops.unop[Double]
+  // def toDouble(): Double = macro Ops.unop[Double]
 }
 
 final class NRootOps[A](lhs: A)(implicit ev: NRoot[A]) {
@@ -301,8 +301,8 @@ final class ModuleUnboundOps[F: ({ type F[A] = CModule[_, A] })#F](lhs: F) {
 final class VectorSpaceOps[V](x: V) {
   def :/[F](rhs: F)(implicit ev: VectorSpace[V, F]): V = macro Ops.binopWithEv[F, VectorSpace[V, F], V]
 
-  //def *:[F](lhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesl(ev.scalar.fromDouble(lhs), x)
-  //def :*[F](rhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesr(x, ev.scalar.fromDouble(rhs))
+  // def *:[F](lhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesl(ev.scalar.fromDouble(lhs), x)
+  // def :*[F](rhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesr(x, ev.scalar.fromDouble(rhs))
 
   def :/[F](rhs: Int)(implicit ev: VectorSpace[V, F]): V = ev.divr(x, ev.scalar.fromInt(rhs))
   def :/[F](rhs: Double)(implicit ev: VectorSpace[V, F]): V = ev.divr(x, ev.scalar.fromDouble(rhs))

@@ -82,7 +82,7 @@ private[math] trait QuaternionOverRichField[A]
 
   def nroot(a: Quaternion[A], k: Int): Quaternion[A] = a.nroot(k)
   override def sqrt(a: Quaternion[A]): Quaternion[A] = a.sqrt
-  def fpow(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a.fpow(b.r) //FIXME
+  def fpow(a: Quaternion[A], b: Quaternion[A]): Quaternion[A] = a.fpow(b.r) // FIXME
 
 }
 
