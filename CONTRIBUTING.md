@@ -17,11 +17,11 @@ project.
 You can directly edit documents at https://github.com/typelevel/spire/tree/main/docs/src/main/mdoc, but it is better to use git to manage diffs.
 
 
-First, visit https://github.com/typelevel/spire and fork the repository.
+1. Visit https://github.com/typelevel/spire and fork the repository.
 
-Second, clone the forked repository and make new branch.
+2. Clone the forked repository and make new branch.
 
-Third, run `sbt docs/makeMicrosite` to build document website, change directory to `docs/target/site` and run `jekyll serve -b /spire`.
+3. Run `sbt docs/makeMicrosite` to build document website, change directory to `docs/target/site` and run `jekyll serve -b /spire`.
 
 You can preview website at http://localhost:4000/spire by default.
 
