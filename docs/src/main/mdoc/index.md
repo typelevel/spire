@@ -624,6 +624,6 @@ criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
 Copyright 2011-@COPYRIGHT_TO@ @AUTHORS@
 
-A full list of contributors can be found in [AUTHORS.md](./authors.html).
+A full list of contributors can be found in [AUTHORS.md](./extra_md/authors.html).
 
 The MIT software license is attached in the [COPYING](https://github.com/typelevel/spire/blob/main/COPYING) file.

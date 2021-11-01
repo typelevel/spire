@@ -333,10 +333,19 @@ lazy val docSettings = Seq(
   micrositeDocumentationLabelDescription := "API Documentation",
   micrositeExtraMdFiles := Map(
     // Note: CONTRIBUTING.md, CODE_OF_CONDUCT.md and COPYING is placed in pproject root directory so that github can detect it.
-    file("CONTRIBUTING.md") -> ExtraMdFileConfig(
-      "contributing.md",
+    file("CONTRIBUTING.md") -> ExtraMdFileConfig("contributing.md",
+                                                 "home",
+                                                 Map("title" -> "Contributing", "section" -> "Home", "position" -> "3")
+    ),
+    file("AUTHORS.md") -> ExtraMdFileConfig(
+      "authors.md",
       "home",
-      Map("title" -> "Contributing", "section" -> "Home", "position" -> "3")
+      Map("title" -> "Authors", "section" -> "Home", "position" -> "5")
+    ),
+    file("CHANGES.md") -> ExtraMdFileConfig(
+      "changes.md",
+      "home",
+      Map("title" -> "Changes", "section" -> "Home", "position" -> "2")
     )
   ),
   micrositeGithubOwner := "typelevel",
