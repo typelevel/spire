@@ -1,11 +1,11 @@
 ---
 layout: home
-title:  "scala 3 migration"
+title:  "migration guide"
 section: "Home"
 position: 7
 ---
 
-## Scala 3 Migraion Guide
+## v0.18.0 Migraion Guide
 
 Spire supports Scala 3 since version 0.18.0!
 
@@ -25,9 +25,9 @@ If your code uses following APIs, you need to modify them.
 - `Checked.tryOrReturn` was removed.
 - Use of `Machinist` was removed.
 - `PackMacro` is available both Scala 2 and 3.
-- `cFor` was deprecated and renamed to `fastFor`. Available both Scala 2 and 3.
+- `cFor` was deprecated and renamed to `fastFor`. Available both Scala 2 and 3. Performance-sensitive code should continue using `cfor` on Scala 2.
 - `Checked` was partly ported.
-- Most `Literal`s macros are ported. **radix literals are not tested and not yet ported**.
+- All `Literal`s macros except `radix` are ported.
 - `Auto` is NOT yet supported in Scala 3.
 - `Fpf` is NOT yet ported to Scala 3.
 
@@ -44,6 +44,9 @@ In general, these changes do not affect library users, but may have effect on so
 
 ### Performance
 
-As of Nov 2021, Scala 3 support can cause slight performance degration compared to Scala 2 mainly because of lack of `specialization`. Some quick benchmarking shows no important difference for code not using `specialization`. This is mentioned in [#1067](https://github.com/typelevel/spire/pull/1067#issue-998607764) too.
+As of Nov 2021, Scala 3 support can cause performance degration compared to Scala 2 mainly because of lack of `specialization`. Some quick benchmarking shows no important difference for code not using `specialization`. On the other hand, code relying on this feature takes a severe performance hit. This is mentioned in [v0.18.0-M1 release](https://github.com/typelevel/spire/releases/tag/v0.18.0-M1) and [#1067](https://github.com/typelevel/spire/pull/1067#issue-998607764) too.
 
-However, if you find any serious performance issue, don't hesitate to open issue!
+The complete benchmark suite run for 2.13 vs 3 is available here: [#1067 (comment)](https://github.com/typelevel/spire/pull/1067#issuecomment-939369626).
+
+
+Latest information is available at [release](https://github.com/typelevel/spire/releases) page.
