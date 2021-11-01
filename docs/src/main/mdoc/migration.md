@@ -20,7 +20,7 @@ If your code uses following APIs, you need to modify them.
 - because the method `Dist.given` clashes with the `given` keyword, it was renamed to `given_`
 - the class `DistIterator` has a `next` member that clashes with a `next` method. The field has renamed to `_next`
 - `UnboundSyntax` seems to be bogus and it is not used anywhere in `spire`. It was marked as deprecated in scala 2 and removed in scala 3
-
+- parentheses: these are now omitted for 0-arity (empty-parens) methods with no side-effects.
 ### Macro
 - `Checked.tryOrReturn` was removed.
 - Use of `Machinist` was removed.
