@@ -1,9 +1,3 @@
----
-layout: home
-title:  "Authors"
-section: "Home"
-position: 5
----
 ## Authors
 
 A successful open-source project relies upon the community to:

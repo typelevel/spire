@@ -1,9 +1,3 @@
----
-layout: home
-title:  "Changes"
-section: "Home"
-position: 2
----
 ## Version 0.16.1-SNAPSHOT
 
  * Disabled benchmarked depending on Caliper; waiting for migration to a modern benchmarking framework

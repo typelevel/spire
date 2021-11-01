@@ -35,7 +35,7 @@ identically to corresponding direct implementations.
 
 
 Spire is provided to you as free software under the
-[MIT license](COPYING).
+[MIT license](https://github.com/typelevel/spire/blob/main/COPYING).
 
 ### Organization
 
@@ -74,7 +74,7 @@ JVM and JS platforms.
 
 **Since v0.18.0, spire is available for Scala 3!**. 
 
-If you have already used spire of older version, check [migration guide](./migration.md) because there are some breaking changes.
+If you have already used spire of older version, check [migration guide](./migration.html) because there are some breaking changes.
 
 
 To get started with SBT, simply add the following to your `build.sbt` file:
@@ -234,7 +234,7 @@ implicits which provide unary and infix operators for the type classes. The
 easiest way to use these is via a wildcard import of `spire.implicits._`.
 
 Detailed treatment of these type classes can be found in the
-[guide](./guide.md).
+[guide](./guide.html).
 
 ### Getting Started
 

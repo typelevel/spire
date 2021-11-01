@@ -332,6 +332,11 @@ lazy val docSettings = Seq(
   micrositeDocumentationUrl := "https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html",
   micrositeDocumentationLabelDescription := "API Documentation",
   micrositeExtraMdFiles := Map(
+    file("CHANGES.md") -> ExtraMdFileConfig(
+      "changes.md",
+      "home",
+      Map("title" -> "Changes", "section" -> "Home", "position" -> "2")
+    ),
     // Note: CONTRIBUTING.md, CODE_OF_CONDUCT.md and COPYING is placed in pproject root directory so that github can detect it.
     file("CONTRIBUTING.md") -> ExtraMdFileConfig("contributing.md",
                                                  "home",
@@ -341,11 +346,6 @@ lazy val docSettings = Seq(
       "authors.md",
       "home",
       Map("title" -> "Authors", "section" -> "Home", "position" -> "5")
-    ),
-    file("CHANGES.md") -> ExtraMdFileConfig(
-      "changes.md",
-      "home",
-      Map("title" -> "Changes", "section" -> "Home", "position" -> "2")
     )
   ),
   micrositeGithubOwner := "typelevel",
