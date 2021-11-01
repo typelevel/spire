@@ -41,13 +41,11 @@ Spire is provided to you as free software under the
 
 We spire (and typelevel) have [dicord](https://discord.com/invite/XF3CXcMzqD), [gitter chat](https://gitter.im/typelevel/spire) and [mailing list](https://groups.google.com/group/typelevel/).
 
-- [typelevel dicord](https://discord.com/invite/XF3CXcMzqD):  ???
+- [typelevel dicord](https://discord.com/invite/XF3CXcMzqD):  community for all typelevel-stack contributers and users.
 - [spire gitter](https://gitter.im/typelevel/spire) : place to go for announcements and discussions around Spire.
 - [mailng list](https://groups.google.com/group/typelevel/): place to go for announcements and discussions around [Typelevel projects](https://typelevel.org).
 
 
-
-When posting, place the word `[spire]` at the beginning of your subject.
 
 We also have a guide on [contributing to Spire](./extra_md/contributing.html) as well
 as a guide that provides information on [Spire's guide](./guide.html) and [design notes](./design.html).
@@ -72,7 +70,12 @@ Concerns or issues can be sent to any of Spire's maintainers, or to the
 ### Set up
 
 Spire is currently available for Scala 2.11, 2.12 and 2.13, for the
-JVM and JS platforms.
+JVM and JS platforms. 
+
+**Since v0.18.0, spire is available for Scala 3!**. 
+
+If you have already used spire of older version, check [migration guide](./migration.md) because there are some breaking changes.
+
 
 To get started with SBT, simply add the following to your `build.sbt` file:
 
