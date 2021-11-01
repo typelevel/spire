@@ -15,6 +15,7 @@ on:
     tags: [v*]
 
 env:
+  JABBA_INDEX: 'https://github.com/typelevel/jdk-index/raw/main/index.json'
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
@@ -24,7 +25,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         scala: [2.13.6, 3.1.0]
-        java: [adopt@1.8, adopt@1.11, adopt@1.16]
+        java: [adoptium@8, adoptium@11, adoptium@17]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)
@@ -72,7 +73,7 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         scala: [3.1.0]
-        java: [adopt@1.8]
+        java: [adoptium@8]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout current branch (full)

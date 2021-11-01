@@ -56,7 +56,7 @@ class NumberSuite extends munit.FunSuite {
     val z1 = Number("81") ** Number("0.5") - Number("9.0")
     assert(z1 != 0)
     assert(z1.abs < 0.00000000000001)
-    //assert(Number("81").sqrt - Number("9") == Number(0))
+    // assert(Number("81").sqrt - Number("9") == Number(0))
 
     // FloatNumber lies like a fox
     val z2 = Number(81.0) ** Number(0.5) - Number(9.0)

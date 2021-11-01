@@ -190,7 +190,7 @@ private[math] trait ConvertableToAlgebraic extends ConvertableTo[Algebraic] {
   def fromBigDecimal(a: BigDecimal): Algebraic = Algebraic(a)
   def fromRational(a: Rational): Algebraic = Algebraic(a)
   def fromAlgebraic(a: Algebraic): Algebraic = a
-  def fromReal(a: Real): Algebraic = Algebraic(a.toRational) //FIXME
+  def fromReal(a: Real): Algebraic = Algebraic(a.toRational) // FIXME
 
   def fromType[B: ConvertableFrom](b: B): Algebraic = ConvertableFrom[B].toAlgebraic(b)
 }

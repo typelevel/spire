@@ -37,13 +37,17 @@ ThisBuild / versionScheme := Some("early-semver")
 
 ThisBuild / githubWorkflowArtifactUpload := false
 
-ThisBuild / githubWorkflowJavaVersions := Seq("adopt@1.8", "adopt@1.11", "adopt@1.16")
+ThisBuild / githubWorkflowJavaVersions := Seq("adoptium@8", "adoptium@11", "adoptium@17")
 ThisBuild / githubWorkflowBuild := Seq(
   WorkflowStep
     .Sbt(List("headerCheckAll", "scalafmtCheckAll", "scalafmtSbtCheck"), name = Some("Check headers+formatting")),
   WorkflowStep.Sbt(List("Test/compile"), name = Some("Compile")),
   WorkflowStep.Sbt(List("test"), name = Some("Run tests")),
   WorkflowStep.Sbt(List("doc", "docs/mdoc"), name = Some("Build docs"))
+)
+ThisBuild / githubWorkflowEnv := Map(
+  "JABBA_INDEX" -> "https://github.com/typelevel/jdk-index/raw/main/index.json",
+  "GITHUB_TOKEN" -> "${{ secrets.GITHUB_TOKEN }}"
 )
 
 inThisBuild(

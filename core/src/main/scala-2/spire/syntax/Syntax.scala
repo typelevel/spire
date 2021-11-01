@@ -16,7 +16,7 @@
 package spire
 package syntax
 
-import spire.NoImplicit
+import spire.NotGiven
 import spire.algebra._
 import spire.algebra.lattice._
 import spire.algebra.partial._
@@ -68,7 +68,7 @@ trait SemigroupoidSyntax {
 
 trait GroupoidSyntax extends SemigroupoidSyntax {
   @nowarn
-  implicit def groupoidCommonOps[A](a: A)(implicit ev: Groupoid[A], ni: NoImplicit[Monoid[A]]): GroupoidCommonOps[A] =
+  implicit def groupoidCommonOps[A](a: A)(implicit ev: Groupoid[A], ni: NotGiven[Monoid[A]]): GroupoidCommonOps[A] =
     new GroupoidCommonOps[A](a)(ev)
   implicit def groupoidOps[A](a: A)(implicit ev: Groupoid[A]): GroupoidOps[A] = new GroupoidOps[A](a)
 }

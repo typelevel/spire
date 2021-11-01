@@ -16,7 +16,6 @@
 package spire
 package syntax
 
-import spire.NoImplicit
 import spire.algebra._
 import spire.algebra.lattice._
 import spire.algebra.partial._

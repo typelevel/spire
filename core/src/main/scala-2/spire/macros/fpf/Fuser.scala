@@ -207,7 +207,7 @@ private[spire] trait Fuser[C <: Context, A] {
     result
   }
 
-  //private def mix(a: Either[Tree, Int], b: Either[Tree, Int]): Either[(Tree, Tree), (Int, Int)] = {
+  // private def mix(a: Either[Tree, Int], b: Either[Tree, Int]): Either[(Tree, Tree), (Int, Int)] = {
   def plus(lhs: Tree, rhs: Tree)(ev: Tree): Fused = fuse2(lhs, rhs) {
     case (Approx(lapx, lmes, lind, lexact), Approx(rapx, rmes, rind, rexact)) =>
       val ind = zipInd(lind, rind)((l, r) => q"${max(l, r)} + 1", (l, r) => spire.math.max(l, r) + 1)

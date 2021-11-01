@@ -135,7 +135,7 @@ class InlineUtil[C <: Context with Singleton](val c: C) {
           }
 
         case tt: TypeTree if tt.original != null =>
-          //super.transform(TypeTree().setOriginal(transform(tt.original)))
+          // super.transform(TypeTree().setOriginal(transform(tt.original)))
           super.transform(setOrig(c)(TypeTree(), transform(tt.original)))
         case _ =>
           super.transform(tree)

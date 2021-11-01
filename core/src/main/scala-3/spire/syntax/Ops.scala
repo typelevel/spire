@@ -290,8 +290,8 @@ final class RightModuleOps[V](x: V) extends AnyVal:
 final class VectorSpaceOps[V](x: V) extends AnyVal:
   def :/[F](rhs: F)(using ev: VectorSpace[V, F]): V = ev.divr(x, rhs)
 
-  //def *:[F](lhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesl(ev.scalar.fromDouble(lhs), x)
-  //def :*[F](rhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesr(x, ev.scalar.fromDouble(rhs))
+  // def *:[F](lhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesl(ev.scalar.fromDouble(lhs), x)
+  // def :*[F](rhs:Double)(implicit ev: VectorSpace[V, F]): V = ev.timesr(x, ev.scalar.fromDouble(rhs))
 
   def :/[F](rhs: Int)(using ev: VectorSpace[V, F]): V = ev.divr(x, ev.scalar.fromInt(rhs))
   def :/[F](rhs: Double)(using ev: VectorSpace[V, F]): V = ev.divr(x, ev.scalar.fromDouble(rhs))
