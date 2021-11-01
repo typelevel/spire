@@ -25,7 +25,7 @@ If your code uses following APIs, you need to modify them.
 - `Checked.tryOrReturn` was removed.
 - Use of `Machinist` was removed.
 - `PackMacro` is available both Scala 2 and 3.
-- `cFor` was deprecated and renamed to `fastFor`. Available both Scala 2 and 3. Performance-sensitive code should continue using `cfor` on Scala 2.
+- `cFor` was deprecated and renamed to `fastFor`. Available both Scala 2 (as `cFor`) and 3(as `fastFor`). Performance-sensitive code should continue using `cfor` on Scala 2.
 - `Checked` was partly ported.
 - All `Literal`s macros except `radix` are ported.
 - `Auto` is NOT yet supported in Scala 3.
