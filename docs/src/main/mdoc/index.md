@@ -74,7 +74,7 @@ JVM and JS platforms.
 
 **Since v0.18.0, spire is available for Scala 3!**. 
 
-If you have already used spire of older version, check [migration guide](./migration.html) because there are some breaking changes.
+If you have already used spire of older version, check [migration guide](./extra_md/changes.html#version-0180-m1) because there are some breaking changes.
 
 
 To get started with SBT, simply add the following to your `build.sbt` file:
