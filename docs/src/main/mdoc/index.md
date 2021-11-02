@@ -451,7 +451,7 @@ object SIDemo {
 }
 ```
 
-Spire also provides a loop macro called `cfor` whose syntax bears a slight
+Spire also provides a loop macro called `cfor`(renamed to `fastFor` in v0.18.0) whose syntax bears a slight
 resemblance to a traditional for-loop from C or Java. This macro expands to a
 tail-recursive function, which will inline literal function arguments.
 
