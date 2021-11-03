@@ -13,6 +13,14 @@ specific issue for that.</p>
 a typo to writing a full tutorial is a great way to help the
 project.</p>
 
+<p>The documentation lives in the <a href="https://github.com/typelevel/spire/tree/main/docs/src/main/mdoc"><code class="language-plaintext highlighter-rouge">docs/src/main/mdoc</code></a> directory in the repository. To preview the website locally:</p>
+
+<ol>
+  <li><a href="https://jekyllrb.com/docs/installation/">Install Jekyll v4</a>.</li>
+  <li>Run <code class="language-plaintext highlighter-rouge">sbt docs/makeMicrosite</code>. Change directory to <code class="language-plaintext highlighter-rouge">docs/target/site</code> and run <code class="language-plaintext highlighter-rouge">jekyll serve -b /spire</code>.</li>
+  <li>Preview website at http://localhost:4000/spire.</li>
+</ol>
+
 <h3 id="reporting-bugs-issues-or-unexpected-behavior">Reporting bugs, issues, or unexpected behavior</h3>
 
 <p>If you encounter anything that is broken, confusing, or could be
@@ -33,13 +41,13 @@ time, it could be any of the following issues:</p>
 
 <p>Feel free to open a bug before you’re sure which of these is
 happening.  You can also ask questions on the
-<a href="http://groups.google.com/group/spire-math/">mailing list</a> to get
+<code class="language-plaintext highlighter-rouge">#spire</code> channel on the <a href="https://discord.com/invite/XF3CXcMzqD">Typelevel Discord</a> to get
 other people’s opinions.</p>
 
 <h3 id="creating-or-improving-tests">Creating or improving tests</h3>
 
-<p>Spire uses <a href="www.scalatest.org">ScalaTest</a> and
-<a href="http://scalacheck.org/">ScalaCheck</a> to test our code. The tests
+<p>Spire uses <a href="https://scalameta.org/munit/">munit</a> and
+<a href="https://scalacheck.org/">ScalaCheck</a> to test our code. The tests
 fulfill a number of important functions:</p>
 
 <ul>
@@ -75,7 +83,7 @@ not to get merged to main as quickly. For this kind of work, you
 should submit a pull request from your branch, but we will probably
 leave the PR open for awhile while commenting on it.</p>
 
-<p>You can always email the list, or visit the <code class="language-plaintext highlighter-rouge">#spire-math</code> IRC channel
+<p>You can always message the <code class="language-plaintext highlighter-rouge">#spire</code> channel on the <a href="https://discord.com/invite/XF3CXcMzqD">Typelevel Discord</a>
 to get a second opinion on your idea or design.</p>
 
 <h3 id="ask-questions-and-make-suggestions">Ask questions and make suggestions</h3>

@@ -1,7 +1,7 @@
 <!DOCTYPE html><html><head><title>Spire: Readme</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Spire contributors" /><meta name="description" content="Powerful new number types and numeric abstractions for Scala" /><meta name="og:image" content="/spire/img/poster.png" /><meta name="image" property="og:image" content="/spire/img/poster.png" /><meta name="og:title" content="Spire: Readme" /><meta name="title" property="og:title" content="Spire: Readme" /><meta name="og:site_name" content="Spire" /><meta name="og:url" content="https://typelevel.org/spire" /><meta name="og:type" content="website" /><meta name="og:description" content="Powerful new number types and numeric abstractions for Scala" /><link rel="icon" type="image/png" href="/spire/img/favicon.png" /><meta name="twitter:title" content="Spire: Readme" /><meta name="twitter:image" content="/spire/img/poster.png" /><meta name="twitter:description" content="Powerful new number types and numeric abstractions for Scala" /><meta name="twitter:card" content="summary_large_image" /><link rel="icon" type="image/png" sizes="16x16" href="/spire/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/spire/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/spire/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/spire/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/spire/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/spire/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/spire/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/spire/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/spire/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/spire/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/spire/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/spire/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/spire/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/spire/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/spire/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/spire/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/spire/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/spire/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/spire/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/spire/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/spire/highlight/styles/atom-one-light.css" /><link rel="stylesheet" href="/spire/css/pattern-style.css" /></head><body><header id="site-header"><div class="navbar-wrapper"><div class="container"><div class="row"><div class="col-xs-3"><a href="/spire/" class="brand"><div class="icon-wrapper"><span>Spire</span></div></a></div><div class="col-xs-9"><nav class="text-right"><ul class=""><li class="search-nav hidden-xs"><div id="search-dropdown"><label><i class="fa fa-search"></i>Search</label><input id="search-bar" type="text" placeholder="Enter keywords here..." onclick="displayToggleSearch(event)" /><ul id="search-dropdown-content" class="dropdown dropdown-content"></ul></div></li><li><a class="transparent-on-hover" href="https://github.com/typelevel/spire" target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i><span class="hidden-sm hidden-xs">GitHub</span></a></li><li><a class="transparent-on-hover" href="https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html"><i class="fa fa-file-text"></i><span class="hidden-sm hidden-xs">API Documentation</span></a></li></ul></nav></div></div></div></div><div class="jumbotron"><div class="container"><h1 class="text-center">Powerful new number types and numeric abstractions for Scala</h1><h2></h2><p class="text-center"><a href="https://github.com/typelevel/spire" target="_blank" rel="noopener noreferrer" class="btn btn-outline-inverse">View on GitHub</a></p></div></div><div id="horizontal-menu"><ul class="horizontal-nav"><li><a class=" active " href="/spire/">Readme</a></li><li><a class="" href="/spire/guide.html">Guide</a></li><li><a class="" href="/spire/extra_md/changes.html">Changes</a></li><li><a class="" href="/spire/extra_md/contributing.html">Contributing</a></li><li><a class="" href="/spire/extra_md/design.html">Design notes</a></li><li><a class="" href="/spire/extra_md/authors.html">Authors</a></li><li><a class="" href="/spire/extra_md/friends.html">Friends of Spire</a></li></ul></div></header><main id="site-main"><section class="use"><div class="container"><div id="content"><p><a href="https://github.com/typelevel/spire/actions/workflows/ci.yml"><img src="https://github.com/typelevel/spire/actions/workflows/ci.yml/badge.svg" alt="Continuous Integration" /></a>
-<a href="https://gitter.im/typelevel/spire?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/Join%20Chat.svg" alt="Gitter" /></a>
-<a href="http://codecov.io/github/typelevel/spire?branch=main"><img src="https://codecov.io/github/typelevel/spire/coverage.svg?branch=main" alt="codecov.io" /></a>
-<a href="https://maven-badges.herokuapp.com/maven-central/org.typelevel/spire_2.11"><img src="https://maven-badges.herokuapp.com/maven-central/org.typelevel/spire_2.11/badge.svg" alt="Maven Central" /></a></p>
+<a href="https://discord.gg/QNnHKHq5Ts"><img src="https://img.shields.io/discord/632277896739946517.svg?label=&amp;logo=discord&amp;logoColor=ffffff&amp;color=404244&amp;labelColor=6A7EC2" alt="Discord" /></a>
+<a href="https://codecov.io/github/typelevel/spire?branch=main"><img src="https://codecov.io/github/typelevel/spire/coverage.svg?branch=main" alt="codecov.io" /></a>
+<a href="https://index.scala-lang.org/typelevel/spire/spire"><img src="https://index.scala-lang.org/typelevel/spire/spire/latest-by-scala-version.svg" alt="spire Scala version support" /></a></p>
 
 <h2 id="spire">Spire</h2>
 
@@ -18,21 +18,20 @@ cases, generic implementations using Spire’s specialized type classes perform
 identically to corresponding direct implementations.</p>
 
 <h3 id="scaladoc">Scaladoc</h3>
-<p><a href="http://javadoc-badge.appspot.com/org.typelevel/spire_2.11/index.html#spire.package"><img src="http://javadoc-badge.appspot.com/org.typelevel/spire_2.11.svg?label=core" alt="Core" /></a>
-<a href="http://javadoc-badge.appspot.com/org.typelevel/spire-extras_2.11"><img src="http://javadoc-badge.appspot.com/org.typelevel/spire-extras_2.11.svg?label=extras" alt="Extras" /></a>
-<a href="http://javadoc-badge.appspot.com/org.typelevel/spire-laws_2.11/index.html#spire.laws.package"><img src="http://javadoc-badge.appspot.com/org.typelevel/spire-laws_2.11.svg?label=laws" alt="Laws" /></a>
-<a href="http://javadoc-badge.appspot.com/org.typelevel/spire-macros_2.11/index.html#spire.macros.package"><img src="http://javadoc-badge.appspot.com/org.typelevel/spire-macros_2.11.svg?label=macros" alt="Macros" /></a></p>
+<p><a href="https://javadoc.io/doc/org.typelevel/spire_2.13"><img src="https://javadoc.io/badge2/org.typelevel/spire_2.13/core.svg" alt="Core" /></a>
+<a href="https://javadoc.io/doc/org.typelevel/spire-extras_2.13"><img src="https://javadoc.io/badge2/org.typelevel/spire-extras_2.13/extras.svg" alt="Extras" /></a>
+<a href="https://javadoc.io/doc/org.typelevel/spire-laws_2.13"><img src="https://javadoc.io/badge2/org.typelevel/spire-laws_2.13/laws.svg" alt="Laws" /></a>
+<a href="https://javadoc.io/doc/org.typelevel/spire-macros_2.13"><img src="https://javadoc.io/badge2/org.typelevel/spire-macros_2.13/macros.svg" alt="Macros" /></a></p>
 
 <p>Spire is provided to you as free software under the
-<a href="COPYING">MIT license</a>.</p>
+<a href="https://github.com/typelevel/spire/blob/main/COPYING">MIT license</a>.</p>
 
 <h3 id="organization">Organization</h3>
 
-<p>The <a href="http://groups.google.com/group/typelevel/">Spire mailing list</a>
-is shared with other <a href="http://typelevel.org">Typelevel projects</a>.
-It is the place to go for announcements and discussions around Spire.
-When posting, place the word <code class="language-plaintext highlighter-rouge">[spire]</code> at the beginning of your subject.
-We also have a guide on <a href="./extra_md/contributing.html">contributing to Spire</a> as well
+<p>There is a <code class="language-plaintext highlighter-rouge">#spire</code> channel on the <a href="https://discord.com/invite/XF3CXcMzqD">Typelevel Discord</a>.
+It is the place to go for announcements and discussions around Spire.</p>
+
+<p>We also have a guide on <a href="./extra_md/contributing.html">contributing to Spire</a> as well
 as a guide that provides information on <a href="./guide.html">Spire’s design</a>.</p>
 
 <p>Spire has maintainers who are responsible for signing-off on and
@@ -45,16 +44,18 @@ merging pull requests, and for helping to guide the direction of Spire:</p>
   <li>Denis Rosset (<em>physics@denisrosset.com</em>)</li>
 </ul>
 
-<p>People are expected to follow the <a href="https://www.scala-lang.org/conduct/">Scala Code of Conduct</a>
-when discussing Spire on the Github page, in Gitter, the IRC channel,
+<h3 id="code-of-conduct">Code of Conduct</h3>
+
+<p>People are expected to follow the <a href="https://typelevel.org/code-of-conduct.html">Typelevel Code of Conduct</a>
+when discussing Spire on the Github page, in Discord, Gitter, the IRC channel,
 mailing list, and other official venues.</p>
 
-<p>Concerns or issues can be sent to any of Spire’s maintainers, or to the
-<a href="http://typelevel.org/about.html">Typelevel</a> organization.</p>
+<p>Concerns or issues can be sent to any of Spire’s maintainers, or to any of the
+<a href="https://typelevel.org/code-of-conduct.html">designated CoC contacts</a> for Typelevel.</p>
 
 <h3 id="set-up">Set up</h3>
 
-<p>Spire is currently available for Scala 2.11, 2.12 and 2.13, for the
+<p>Spire is currently available for Scala 2.13 and 3.1+, for the
 JVM and JS platforms.</p>
 
 <p>To get started with SBT, simply add the following to your <code class="language-plaintext highlighter-rouge">build.sbt</code> file:</p>
@@ -65,8 +66,8 @@ JVM and JS platforms.</p>
 <p>(Previous to 0.14.0, Spire was published under <em>org.spire-math</em>
 instead of <em>org.typelevel</em>.)</p>
 
-<p>For Maven instructions, and to download the jars directly, visit the
-<a href="http://search.maven.org/#artifactdetails%7Corg.typelevel%7Cspire_2.11%7C0.14.1%7Cjar">Central Maven repository</a>.</p>
+<p>For information on all the available versions, visit the
+<a href="https://index.scala-lang.org/typelevel/spire">Scaladex entry</a>.</p>
 
 <p>Here is a list of all of Spire’s modules:</p>
 
@@ -83,6 +84,38 @@ and uses this project to interoperate with <a href="https://github.com/typelevel
 
 <h3 id="playing-around">Playing Around</h3>
 
+<p>The quickest way to try spire is in the browser with <a href="https://scastie.scala-lang.org/LVRAHaJAS7qoVbUyoDgKNA">Scastie</a>.</p>
+
+<script src="https://scastie.scala-lang.org/LVRAHaJAS7qoVbUyoDgKNA.js"></script>
+
+<h4 id="with-ammonite-repl">With Ammonite REPL</h4>
+
+<p>If you have <a href="https://ammonite.io/">Ammonite</a>, you can use an interactive REPL session.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">Welcome</span> <span class="n">to</span> <span class="n">the</span> <span class="nc">Ammonite</span> <span class="nc">Repl</span> <span class="mf">2.</span><span class="nv">x</span><span class="o">.</span><span class="py">x</span>
+<span class="k">@</span> <span class="k">import</span> <span class="nn">$ivy.</span><span class="n">`org.typelevel::spire:0.18.0-M1`</span>
+<span class="k">@</span> <span class="k">import</span> <span class="nn">spire._</span>
+<span class="k">@</span> <span class="k">import</span> <span class="nn">spire.math._</span>
+<span class="k">@</span> <span class="k">import</span> <span class="nn">sipre.implicits._</span>
+<span class="k">@</span> <span class="nc">Complex</span><span class="o">(</span><span class="mf">3.0</span><span class="o">,</span><span class="mf">5.0</span><span class="o">).</span><span class="py">sin</span>
+<span class="n">res</span><span class="k">:</span> <span class="kt">Complex</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Complex</span><span class="o">(</span><span class="n">real</span> <span class="k">=</span> <span class="mf">10.472508533940392</span><span class="o">,</span> <span class="n">imag</span> <span class="k">=</span> <span class="o">-</span><span class="mf">73.46062169567367</span><span class="o">)</span>
+</code></pre></div></div>
+
+<h4 id="with-an-ide">With an IDE</h4>
+
+<p>You can also play around with <a href="https://www.jetbrains.com/help/idea/discover-intellij-idea-for-scala.html">IntelliJ</a> or <a href="https://scalameta.org/metals/docs/editors/vscode/">VS Code and Metals</a>.</p>
+
+<p>Create a <a href="https://scalameta.org/metals/docs/editors/vscode/#worksheets">worksheet</a> file <code class="language-plaintext highlighter-rouge">spire.worksheet.sc</code> in your IDE and copy-paste the following code snippet.</p>
+
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">$ivy.</span><span class="n">`org.typelevel::spire:0.18.0-M1`</span>
+<span class="k">import</span> <span class="nn">spire._</span>
+<span class="k">import</span> <span class="nn">spire.math._</span>
+<span class="k">import</span> <span class="nn">spire.implicits._</span>
+<span class="nc">Complex</span><span class="o">(</span><span class="mf">3.0</span><span class="o">,</span><span class="mf">5.0</span><span class="o">).</span><span class="py">sin</span>
+<span class="n">res</span><span class="k">:</span> <span class="kt">Complex</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Complex</span><span class="o">(</span><span class="n">real</span> <span class="k">=</span> <span class="mf">10.472508533940392</span><span class="o">,</span> <span class="n">imag</span> <span class="k">=</span> <span class="o">-</span><span class="mf">73.46062169567367</span><span class="o">)</span>
+</code></pre></div></div>
+
+<h4 id="with-git-and-sbt">With git and sbt</h4>
 <p>If you clone the Spire repo, you can get a taste of what Spire can do using
 SBT’s console. Launch <code class="language-plaintext highlighter-rouge">sbt</code> and at the prompt, type <code class="language-plaintext highlighter-rouge">coreJVM/console</code>:</p>
 
@@ -180,7 +213,7 @@ implicits which provide unary and infix operators for the type classes. The
 easiest way to use these is via a wildcard import of <code class="language-plaintext highlighter-rouge">spire.implicits._</code>.</p>
 
 <p>Detailed treatment of these type classes can be found in the
-<a href="./guide.md">guide</a>.</p>
+<a href="./guide.html">guide</a>.</p>
 
 <h3 id="getting-started">Getting Started</h3>
 
@@ -465,7 +498,7 @@ encounter will occur at compile-time.</p>
 <span class="o">}</span>
 </code></pre></div></div>
 
-<p>Spire also provides a loop macro called <code class="language-plaintext highlighter-rouge">cfor</code> whose syntax bears a slight
+<p>Spire also provides a loop macro called <code class="language-plaintext highlighter-rouge">fastFor</code> (previously known as <code class="language-plaintext highlighter-rouge">cfor</code>) whose syntax bears a slight
 resemblance to a traditional for-loop from C or Java. This macro expands to a
 tail-recursive function, which will inline literal function arguments.</p>
 
@@ -596,7 +629,7 @@ user-defined types.</p>
 <h3 id="benchmarks">Benchmarks</h3>
 
 <p>In addition to unit tests, Spire comes with a relatively fleshed-out set of
-<a href="http://openjdk.java.net/projects/code-tools/jmh">JMH</a> micro-benchmarks. To
+<a href="https://openjdk.java.net/projects/code-tools/jmh">JMH</a> micro-benchmarks. To
 run the benchmarks from within SBT, change to the <code class="language-plaintext highlighter-rouge">benchmark</code> subproject 
 and then <code class="language-plaintext highlighter-rouge">jmh:run -l</code> to see a list of benchmarks:</p>
 
@@ -641,7 +674,7 @@ criticisms, and/or praise are welcome, especially from numerical analysts! ;)</p
 
 <p>A full list of contributors can be found in <a href="./extra_md/authors.html">AUTHORS.md</a>.</p>
 
-<p>The MIT software license is attached in the <a href="./extra_md/copying">COPYING</a> file.</p>
+<p>The MIT software license is attached in the <a href="https://github.com/typelevel/spire/blob/main/COPYING">COPYING</a> file.</p>
 </div></div></section><section class="technologies"><div class="container"><div class="row"></div></div></section></main><footer id="site-footer"><div class="container"><div class="row"><div class="col-xs-6"><p>Spire is designed and developed by <a href="https://typelevel.org/spire/" target="_blank" rel="noopener noreferrer">Spire contributors</a></p></div><div class="col-xs-6"><p class="text-right"><a href="https://github.com/typelevel/spire" target="_blank" rel="noopener noreferrer"><span class="fa fa-github"></span>View on GitHub</a></p></div></div><div class="row"><div class="col-xs-6"><p>Website built with <a href="https://47degrees.github.io/sbt-microsites/" target="_blank" rel="noopener noreferrer">sbt-microsites</a> - © 2019 <a href="https://www.47deg.com/" target="_blank" rel="noopener noreferrer">47 Degrees</a></p></div></div></div></footer><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/spire/highlight/highlight.pack.js"></script><script src="/spire/lunr/lunr.js"></script><script>
 // For all code blocks, copy the language from the containing div
 // to the inner code tag (where hljs expects it to be)
