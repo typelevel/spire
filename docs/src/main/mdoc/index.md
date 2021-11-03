@@ -92,9 +92,9 @@ The quickest way to try spire is in the browser with [Scastie](https://scastie.s
 
 <script src="https://scastie.scala-lang.org/LVRAHaJAS7qoVbUyoDgKNA.js"></script>
 
-#### With Ammonite Repl
+#### With Ammonite REPL
 
-If you have [ammonite](https://ammonite.io/), you can use an interactive REPL session.
+If you have [Ammonite](https://ammonite.io/), you can use an interactive REPL session.
 
 ```scala
 Welcome to the Ammonite Repl 2.x.x
