@@ -13,6 +13,12 @@ We also gladly accept patches for documentation. Anything from fixing
 a typo to writing a full tutorial is a great way to help the
 project.
 
+The documentation lives in the [`docs/src/main/mdoc`](https://github.com/typelevel/spire/tree/main/docs/src/main/mdoc) directory in the repository. To preview the website locally:
+
+1. [Install Jekyll v4](https://jekyllrb.com/docs/installation/).
+2. Run `sbt docs/makeMicrosite`. Change directory to `docs/target/site` and run `jekyll serve -b /spire`.
+3. Preview website at http://localhost:4000/spire.
+
 ### Reporting bugs, issues, or unexpected behavior
 
 If you encounter anything that is broken, confusing, or could be
@@ -31,13 +37,13 @@ time, it could be any of the following issues:
 
 Feel free to open a bug before you're sure which of these is
 happening.  You can also ask questions on the
-[mailing list](http://groups.google.com/group/spire-math/) to get
+`#spire` channel on the [Typelevel Discord](https://discord.com/invite/XF3CXcMzqD) to get
 other people's opinions.
 
 ### Creating or improving tests
 
-Spire uses [ScalaTest](www.scalatest.org) and
-[ScalaCheck](http://scalacheck.org/) to test our code. The tests
+Spire uses [munit](https://scalameta.org/munit/) and
+[ScalaCheck](https://scalacheck.org/) to test our code. The tests
 fulfill a number of important functions:
 
  * ensure our algorithms return correct results
@@ -71,7 +77,7 @@ not to get merged to main as quickly. For this kind of work, you
 should submit a pull request from your branch, but we will probably
 leave the PR open for awhile while commenting on it.
 
-You can always email the list, or visit the `#spire-math` IRC channel
+You can always message the `#spire` channel on the [Typelevel Discord](https://discord.com/invite/XF3CXcMzqD)
 to get a second opinion on your idea or design.
 
 ### Ask questions and make suggestions

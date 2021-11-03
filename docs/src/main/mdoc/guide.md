@@ -123,9 +123,11 @@ behind Spire's generic math capabilities.
 #### Specialization
 
 To achieve speed on-par with direct (non-generic) code, you will need
-to use specialization. The good news is that most of Spire's code is
+to use [specialization][specialization]. The good news is that most of Spire's code is
 already specialized (and tested for proper performance). The bad news
 is that you'll have to annotate all your generic code like so:
+
+[specialization]: https://www.scala-lang.org/old/sites/default/files/sids/dragos/Thu,%202010-05-06,%2017:56/sid-spec.pdf
 
 ```scala mdoc
 object Demo3 {
@@ -150,7 +152,8 @@ There are too many gotchas with specialization to list here. But the
  4. Specialization will increase bytecode size by a factor of x2-10.
 
 If you have questions about specialization feel free to ask on the
-mailing list. You may notice that some code in Spire is structured in
+`#spire` channel on the [Typelevel Discord](https://discord.com/invite/XF3CXcMzqD).
+You may notice that some code in Spire is structured in
 an unusual way, and often this is to make sure specialization works
 properly.
 
