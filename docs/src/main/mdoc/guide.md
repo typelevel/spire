@@ -123,7 +123,7 @@ behind Spire's generic math capabilities.
 #### Specialization
 
 To achieve speed on-par with direct (non-generic) code, you will need
-to use [specialization](specialization). The good news is that most of Spire's code is
+to use [specialization][specialization]. The good news is that most of Spire's code is
 already specialized (and tested for proper performance). The bad news
 is that you'll have to annotate all your generic code like so:
 

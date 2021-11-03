@@ -37,7 +37,7 @@ time, it could be any of the following issues:
 
 Feel free to open a bug before you're sure which of these is
 happening.  You can also ask questions on the
-[mailing list](https://groups.google.com/group/spire-math/) to get
+`#spire` channel on the [Typelevel Discord](https://discord.com/invite/XF3CXcMzqD) to get
 other people's opinions.
 
 ### Creating or improving tests
@@ -77,10 +77,8 @@ not to get merged to main as quickly. For this kind of work, you
 should submit a pull request from your branch, but we will probably
 leave the PR open for awhile while commenting on it.
 
-You can always message the `#spire` channel on the [Typelevel Discord](typelevel-discord)
+You can always message the `#spire` channel on the [Typelevel Discord](https://discord.com/invite/XF3CXcMzqD)
 to get a second opinion on your idea or design.
-
-[typelevel-discord]: https://discord.com/invite/XF3CXcMzqD
 
 ### Ask questions and make suggestions
 
