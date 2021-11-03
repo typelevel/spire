@@ -61,7 +61,7 @@ Concerns or issues can be sent to any of Spire's maintainers, or to any of the
 ### Set up
 
 Spire is currently available for Scala 2.13 and 3.1+, for the
-JVM and JS platforms. 
+JVM and JS platforms.
 
 To get started with SBT, simply add the following to your `build.sbt` file:
 
