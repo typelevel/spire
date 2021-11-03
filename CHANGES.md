@@ -1,8 +1,5 @@
+Release notes are now [published on GitHub](https://github.com/typelevel/spire/releases).
 
-## [Version 0.18.0-M1](https://github.com/typelevel/spire/releases/tag/v0.18.0-M1)
-Spire will support Scala 3 since `v0.18.0` and `v0.18.0-M1` is a pre-release including breaking changes toward 0.18.0. For more detail, visit [Release Note](https://github.com/typelevel/spire/releases/tag/v0.18.0-M1).
-
-Since v0.18.0, we track changes in [github releases page](https://github.com/typelevel/spire/releases).
 ## Version 0.16.1-SNAPSHOT
 
  * Disabled benchmarked depending on Caliper; waiting for migration to a modern benchmarking framework

@@ -24,28 +24,19 @@ code without having to "bake in" particular numeric representations. In most
 cases, generic implementations using Spire's specialized type classes perform
 identically to corresponding direct implementations.
 
-### Javadocs
-
-|library|link|
-|---|---|
-|spire| https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html |
-|spire-extras| https://www.javadoc.io/doc/org.typelevel/spire-extras_2.13/latest/spire/index.html |
-|spire-laws| https://www.javadoc.io/doc/org.typelevel/spire-laws_2.13/latest/spire/index.html |
-|spire-macros| https://www.javadoc.io/doc/org.typelevel/spire-macros_2.13/latest/spire/index.html |
-
+### Scaladoc
+[![Core](https://javadoc.io/badge2/org.typelevel/spire_2.13/javadoc.svg)](https://javadoc.io/doc/org.typelevel/spire_2.13)
+[![Extras](https://javadoc.io/badge2/org.typelevel/spire-extras_2.13/javadoc.svg)](https://javadoc.io/doc/org.typelevel/spire-extras_2.13)
+[![Laws](https://javadoc.io/badge2/org.typelevel/spire-laws_2.13/javadoc.svg)](https://javadoc.io/doc/org.typelevel/spire-laws_2.13)
+[![Macros](https://javadoc.io/badge2/org.typelevel/spire-macros_2.13/javadoc.svg)](https://javadoc.io/doc/org.typelevel/spire-macros_2.13)
 
 Spire is provided to you as free software under the
 [MIT license](https://github.com/typelevel/spire/blob/main/COPYING).
 
 ### Organization
 
-We spire (and typelevel) have [dicord](https://discord.com/invite/XF3CXcMzqD), [gitter chat](https://gitter.im/typelevel/spire) and [mailing list](https://groups.google.com/group/typelevel/).
-
-- [typelevel dicord](https://discord.com/invite/XF3CXcMzqD):  community for all typelevel-stack contributers and users.
-- [spire gitter](https://gitter.im/typelevel/spire) : place to go for announcements and discussions around Spire.
-- [mailng list](https://groups.google.com/group/typelevel/): place to go for announcements and discussions around [Typelevel projects](https://typelevel.org).
-
-
+There is `#spire` channel on the [Typelevel Discord](https://discord.com/invite/XF3CXcMzqD).
+It is the place to go for announcements and discussions around Spire.
 
 We also have a guide on [contributing to Spire](./extra_md/contributing.html) as well
 as a guide that provides information on [Spire's guide](./guide.html) and [design notes](./extra_md/design.html).
@@ -58,24 +49,19 @@ merging pull requests, and for helping to guide the direction of Spire:
  * Rüdiger Klaehn (*rklaehn@gmail.com*)
  * Denis Rosset (*physics@denisrosset.com*)
 
-#### Code of Conduct
+### Code of Conduct
 
-People are expected to follow the [Scala Code of Conduct](https://www.scala-lang.org/conduct/)
-when discussing Spire on the Github page, in Gitter, the IRC channel,
+People are expected to follow the [Typelevel Code of Conduct](https://typelevel.org/code-of-conduct.html)
+when discussing Spire on the Github page, in Discord, Gitter, the IRC channel,
 mailing list, and other official venues.
 
-Concerns or issues can be sent to any of Spire's maintainers, or to the
-[Typelevel](https://typelevel.org/about.html) organization.
+Concerns or issues can be sent to any of Spire's maintainers, or to any of the
+[designated CoC contacts](https://typelevel.org/code-of-conduct.html) for Typelevel.
 
 ### Set up
 
-Spire is currently available for Scala 2.11, 2.12 and 2.13, for the
+Spire is currently available for Scala 2.13 and 3.1+, for the
 JVM and JS platforms. 
-
-**Since v0.18.0, spire is available for Scala 3!**. 
-
-If you have already used spire of older version, check [migration guide](./extra_md/changes.html#version-0180-m1) because there are some breaking changes.
-
 
 To get started with SBT, simply add the following to your `build.sbt` file:
 
@@ -86,14 +72,8 @@ libraryDependencies += "org.typelevel" %% "spire" % "@VERSION@"
 (Previous to 0.14.0, Spire was published under *org.spire-math*
 instead of *org.typelevel*.)
 
-For Maven instructions, and to download the jars directly, visit the Central Maven repository.
-
-|Scala version| Maven Repo|
-|---|---|
-| 2.11.x|https://search.maven.org/artifact/org.typelevel/spire_2.11|
-| 2.12.x|https://search.maven.org/artifact/org.typelevel/spire_2.12|
-| 2.13.x|https://search.maven.org/artifact/org.typelevel/spire_2.13|
-| 3.x|https://search.maven.org/artifact/org.typelevel/spire_3|
+For information on all the available versions, visit the
+[Scaladex entry](https://index.scala-lang.org/typelevel/spire).
 
 Here is a list of all of Spire's modules:
 
@@ -108,12 +88,13 @@ and uses this project to interoperate with [Cats](https://github.com/typelevel/c
 
 ### Playing Around
 
-If you are new to Scala, or does not have Scala (or sbt) locally, try spire at [scastie](https://scastie.scala-lang.org/LVRAHaJAS7qoVbUyoDgKNA) on browser. 
+The quickest way to try spire is in the browser with [Scastie](https://scastie.scala-lang.org/LVRAHaJAS7qoVbUyoDgKNA). 
 
 <script src="https://scastie.scala-lang.org/LVRAHaJAS7qoVbUyoDgKNA.js"></script>
 
 #### With Ammonite Repl
-If you have [ammonite](https://ammonite.io/), enter `amm` in your terminal to launch ammonite REPL.
+
+If you have [ammonite](https://ammonite.io/), you can use an interactive REPL session.
 
 ```scala
 Welcome to the Ammonite Repl 2.x.x
@@ -125,13 +106,11 @@ Welcome to the Ammonite Repl 2.x.x
 res: Complex[Double] = Complex(real = 10.472508533940392, imag = -73.46062169567367)
 ```
 
+#### With an IDE
 
-#### with `*.worksheet.sc`
-You can also play around with IntelliJ or VS Code & Metals.
+You can also play around with [IntelliJ](https://www.jetbrains.com/help/idea/discover-intellij-idea-for-scala.html) or [VS Code and Metals](https://scalameta.org/metals/docs/editors/vscode/).
 
-For example, create `spire.worksheet.sc` and copy-paste the following code snippet.
-
-Then, open `spire.worksheet.sc` with IntelliJ or CS Code (needs [metals VS Code extension](https://scalameta.org/metals/docs/editors/vscode/)).
+Create a [worksheet](https://scalameta.org/metals/docs/editors/vscode/#worksheets) file `spire.worksheet.sc` in your IDE and copy-paste the following code snippet.
 
 ```scala
 import $ivy.`org.typelevel::spire:@VERSION@`
@@ -141,7 +120,8 @@ import spire.implicits._
 Complex(3.0,5.0).sin
 res: Complex[Double] = Complex(real = 10.472508533940392, imag = -73.46062169567367)
 ```
-#### with git and sbt
+
+#### With git and sbt
 If you clone the Spire repo, you can get a taste of what Spire can do using
 SBT's console. Launch `sbt` and at the prompt, type `coreJVM/console`:
 
@@ -451,7 +431,7 @@ object SIDemo {
 }
 ```
 
-Spire also provides a loop macro called `cfor`(renamed to `fastFor` in v0.18.0) whose syntax bears a slight
+Spire also provides a loop macro called `fastFor` (previously known as `cfor`) whose syntax bears a slight
 resemblance to a traditional for-loop from C or Java. This macro expands to a
 tail-recursive function, which will inline literal function arguments.
 
@@ -622,7 +602,7 @@ measure relative as well as absolute performance.
 Code is offered as-is, with no implied warranty of any kind. Comments,
 criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
-Copyright 2011-@COPYRIGHT_TO@ @AUTHORS@
+Copyright 2011-2017 Erik Osheim, Tom Switzer
 
 A full list of contributors can be found in [AUTHORS.md](./extra_md/authors.html).
 

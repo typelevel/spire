@@ -215,9 +215,7 @@ lazy val docs = project
       "VERSION" -> (if (isSnapshot.value)
                       previousStableVersion.value.getOrElse(version.value)
                     else
-                      version.value),
-      "COPYRIGHT_TO" -> java.time.LocalDate.now().getYear().toString(),
-      "AUTHORS" -> "Erik Osheim, Tom Switzer"
+                      version.value)
     ),
     // NOTE: disable link hygine to supress dead link warnings because mdoc does not go well with Jekyll
     mdocExtraArguments ++= Seq("--no-link-hygiene")
@@ -332,25 +330,25 @@ lazy val docSettings = Seq(
   micrositeDocumentationUrl := "https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html",
   micrositeDocumentationLabelDescription := "API Documentation",
   micrositeExtraMdFiles := Map(
+    file("AUTHORS.md") -> ExtraMdFileConfig(
+      "authors.md",
+      "home",
+      Map("title" -> "Authors", "section" -> "Home", "position" -> "5")
+    ),
     file("CHANGES.md") -> ExtraMdFileConfig(
       "changes.md",
       "home",
       Map("title" -> "Changes", "section" -> "Home", "position" -> "2")
     ),
-    // Note: CONTRIBUTING.md, CODE_OF_CONDUCT.md and COPYING is placed in pproject root directory so that github can detect it.
-    file("CONTRIBUTING.md") -> ExtraMdFileConfig("contributing.md",
-                                                 "home",
-                                                 Map("title" -> "Contributing", "section" -> "Home", "position" -> "3")
+    file("CONTRIBUTING.md") -> ExtraMdFileConfig(
+      "contributing.md",
+      "home",
+      Map("title" -> "Contributing", "section" -> "Home", "position" -> "3")
     ),
     file("DESIGN.md") -> ExtraMdFileConfig(
       "design.md",
       "home",
       Map("title" -> "Design notes", "section" -> "Home", "position" -> "4")
-    ),
-    file("AUTHORS.md") -> ExtraMdFileConfig(
-      "authors.md",
-      "home",
-      Map("title" -> "Authors", "section" -> "Home", "position" -> "5")
     ),
     file("FRIENDS.md") -> ExtraMdFileConfig(
       "friends.md",
