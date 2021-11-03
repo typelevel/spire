@@ -1,6 +1,6 @@
 Release notes are now [published on GitHub](https://github.com/typelevel/spire/releases).
 
-## Version 0.16.1-SNAPSHOT
+## Version 0.16.1-SNAPSHOT (not released)
 
  * Disabled benchmarked depending on Caliper; waiting for migration to a modern benchmarking framework
  * Fixes to polynomials
