@@ -39,7 +39,7 @@ There is `#spire` channel on the [Typelevel Discord](https://discord.com/invite/
 It is the place to go for announcements and discussions around Spire.
 
 We also have a guide on [contributing to Spire](./extra_md/contributing.html) as well
-as a guide that provides information on [Spire's guide](./guide.html) and [design notes](./extra_md/design.html).
+as a guide that provides information on [Spire's design](./guide.html).
 
 Spire has maintainers who are responsible for signing-off on and
 merging pull requests, and for helping to guide the direction of Spire:

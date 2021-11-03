@@ -188,7 +188,7 @@ properties themselves remain the same.
 
 #### Eq
 
-Spire uses an `Eq[A]` type class to represent type-safe
+Spire provides an `Eq[A]` type class to represent type-safe
 equality. This allows us to talk about types for which there isn't a
 computationally useful notion of equality, and also to avoid
 programming errors caused by universal equality.
