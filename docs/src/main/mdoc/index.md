@@ -35,7 +35,7 @@ Spire is provided to you as free software under the
 
 ### Organization
 
-There is `#spire` channel on the [Typelevel Discord](https://discord.com/invite/XF3CXcMzqD).
+There is a `#spire` channel on the [Typelevel Discord](https://discord.com/invite/XF3CXcMzqD).
 It is the place to go for announcements and discussions around Spire.
 
 We also have a guide on [contributing to Spire](./extra_md/contributing.html) as well
