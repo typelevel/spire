@@ -152,7 +152,8 @@ There are too many gotchas with specialization to list here. But the
  4. Specialization will increase bytecode size by a factor of x2-10.
 
 If you have questions about specialization feel free to ask on the
-`#spire` channel on the [Typelevel Discord](https://discord.com/invite/XF3CXcMzqD). You may notice that some code in Spire is structured inan unusual way, and often this is to make sure specialization works
+`#spire` channel on the [Typelevel Discord](https://discord.com/invite/XF3CXcMzqD). You may notice that some code in Spire is structured in
+an unusual way, and often this is to make sure specialization works
 properly.
 
 You may find that it's easy to develop generic code without using
