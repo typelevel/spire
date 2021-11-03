@@ -25,10 +25,10 @@ cases, generic implementations using Spire's specialized type classes perform
 identically to corresponding direct implementations.
 
 ### Scaladoc
-[![Core](https://javadoc.io/badge2/org.typelevel/spire_2.13/javadoc.svg)](https://javadoc.io/doc/org.typelevel/spire_2.13)
-[![Extras](https://javadoc.io/badge2/org.typelevel/spire-extras_2.13/javadoc.svg)](https://javadoc.io/doc/org.typelevel/spire-extras_2.13)
-[![Laws](https://javadoc.io/badge2/org.typelevel/spire-laws_2.13/javadoc.svg)](https://javadoc.io/doc/org.typelevel/spire-laws_2.13)
-[![Macros](https://javadoc.io/badge2/org.typelevel/spire-macros_2.13/javadoc.svg)](https://javadoc.io/doc/org.typelevel/spire-macros_2.13)
+[![Core](https://javadoc.io/badge2/org.typelevel/spire_2.13/core.svg)](https://javadoc.io/doc/org.typelevel/spire_2.13)
+[![Extras](https://javadoc.io/badge2/org.typelevel/spire-extras_2.13/extras.svg)](https://javadoc.io/doc/org.typelevel/spire-extras_2.13)
+[![Laws](https://javadoc.io/badge2/org.typelevel/spire-laws_2.13/laws.svg)](https://javadoc.io/doc/org.typelevel/spire-laws_2.13)
+[![Macros](https://javadoc.io/badge2/org.typelevel/spire-macros_2.13/macros.svg)](https://javadoc.io/doc/org.typelevel/spire-macros_2.13)
 
 Spire is provided to you as free software under the
 [MIT license](https://github.com/typelevel/spire/blob/main/COPYING).
