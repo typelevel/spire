@@ -18,7 +18,7 @@ package syntax
 package std
 
 import spire.algebra.{AdditiveMonoid, Field, Monoid, MultiplicativeMonoid, NRoot, Order, PartialOrder, Signed}
-import spire.math.{QuickSort, Searching }
+import spire.math.{QuickSort, Searching}
 import scala.collection.Factory
 import spire.syntax.cfor._
 import spire.syntax.monoid._

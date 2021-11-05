@@ -358,7 +358,7 @@ abstract class Generator {
     chosen
   }
 
-  def sampleFromIterable[@sp A:ClassTag](as:Iterable[A],size: Int)(implicit gen:Generator):Array[A] = {
+  def sampleFromIterable[@sp A: ClassTag](as: Iterable[A], size: Int)(implicit gen: Generator): Array[A] = {
     val chosen: Array[A] = new Array[A](size)
     var i: Int = 0
     as.foreach { a =>
@@ -376,10 +376,9 @@ abstract class Generator {
     chosen
   }
 
-  @deprecated("use sampleFromIterable instead",since="0.18.0")
+  @deprecated("use sampleFromIterable instead", since = "0.18.0")
   def sampleFromTraversable[@sp A: ClassTag](as: Iterable[A], size: Int)(implicit gen: Generator): Array[A] =
-    sampleFromIterable(as,size)
-  
+    sampleFromIterable(as, size)
 
   def shuffle[@sp A](as: Array[A])(implicit gen: Generator): Unit = {
     var i: Int = as.length - 1
