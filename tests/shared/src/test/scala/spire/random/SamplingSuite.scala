@@ -35,7 +35,7 @@ class SamplingSuite extends munit.ScalaCheckSuite {
     forAll(gen)((n: Int) => verify(rng.sampleFromArray(ns, n), n))
   }
 
-  property("sampleTraversable(ns, [1, n])") {
+  property("sampleFromIterable(ns, [1, n])") {
     forAll(gen)((n: Int) => verify(rng.sampleFromTraversable(ns, n), n))
   }
 }
