@@ -18,7 +18,7 @@ package syntax
 package std
 
 import spire.algebra.{AdditiveMonoid, Field, Monoid, MultiplicativeMonoid, NRoot, Order, PartialOrder, Signed}
-import spire.math.{Natural, Number, QuickSort, SafeLong, Searching, ULong}
+import spire.math.{QuickSort, Searching}
 import scala.collection.Factory
 import spire.syntax.cfor._
 import spire.syntax.monoid._
@@ -305,7 +305,7 @@ final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
   }
 
   def qsampled(n: Int)(implicit gen: Generator, ct: ClassTag[A], cbf: Factory[A, CC[A]]): CC[A] =
-    fromArray(gen.sampleFromTraversable(as, n))
+    fromArray(gen.sampleFromIterable(as, n))
 
   def qchoose(implicit gen: Generator): A =
     gen.chooseFromIterable(as)
