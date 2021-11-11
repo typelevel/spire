@@ -37,7 +37,7 @@ object compat {
 
   def predef[C <: Context](c: C): c.Tree = {
     import c.universe._
-    q"scala.Predef"
+    q"_root_.scala.Predef"
   }
 
 }
