@@ -26,19 +26,19 @@ private[spire] trait Fuser[C <: Context, A] {
   import c.universe._
 
   private def Epsilon: Tree = q"2.220446049250313E-16"
-  private def PositiveInfinity: Tree = q"java.lang.Double.POSITIVE_INFINITY"
-  private def NegativeInfinity: Tree = q"java.lang.Double.NEGATIVE_INFINITY"
-  private def max(a: Tree, b: Tree): Tree = q"java.lang.Math.max($a, $b)"
-  private def abs(a: TermName): Tree = q"java.lang.Math.abs($a)"
-  private def abs(a: Tree): Tree = q"java.lang.Math.abs($a)"
-  private def sqrt(a: TermName): Tree = q"java.lang.Math.sqrt($a)"
+  private def PositiveInfinity: Tree = q"_root_.java.lang.Double.POSITIVE_INFINITY"
+  private def NegativeInfinity: Tree = q"_root_.java.lang.Double.NEGATIVE_INFINITY"
+  private def max(a: Tree, b: Tree): Tree = q"_root_.java.lang.Math.max($a, $b)"
+  private def abs(a: TermName): Tree = q"_root_.java.lang.Math.abs($a)"
+  private def abs(a: Tree): Tree = q"_root_.java.lang.Math.abs($a)"
+  private def sqrt(a: TermName): Tree = q"_root_.java.lang.Math.sqrt($a)"
 
   def intLit(n: Int): Tree = q"$n"
 
   case class Approx(apx: Tree, mes: Tree, ind: Either[Tree, Int], exact: Tree) {
     def expr: Tree = {
       val ind0: Tree = ind.fold(t => t, intLit)
-      q"spire.math.FpFilter[$A]($apx, $mes, $ind0, $exact)"
+      q"_root_.spire.math.FpFilter[$A]($apx, $mes, $ind0, $exact)"
     }
 
     def fused(stats0: List[Tree]): Fused = {
@@ -60,7 +60,7 @@ private[spire] trait Fuser[C <: Context, A] {
       q"$tmp",
       abs(tmp),
       Right(0),
-      q"spire.algebra.Field[$A].fromDouble($tmp)"
+      q"_root_.spire.algebra.Field[$A].fromDouble($tmp)"
     ).fused(q"val $tmp = $exact.value" :: Nil)
   }
 
@@ -71,7 +71,7 @@ private[spire] trait Fuser[C <: Context, A] {
       abs(tmp),
       Right(1),
       q"$approx.exact"
-    ).fused(q"val $tmp = spire.algebra.IsReal[$A].toDouble($approx.exact)" :: Nil)
+    ).fused(q"val $tmp = _root_.spire.algebra.IsReal[$A].toDouble($approx.exact)" :: Nil)
   }
 
   private def extract(tree: Tree): Fused = resetLocalAttrs(c)(tree) match {

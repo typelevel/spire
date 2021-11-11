@@ -53,7 +53,7 @@ object Macros {
   def ubyte(c: Context)(): c.Expr[UByte] = {
     import c.universe._
     parseContext(c, BigInt(0), BigInt(255)) match {
-      case Right(n) => c.Expr(q"spire.math.UByte(${n.toByte})")
+      case Right(n) => c.Expr(q"_root_.spire.math.UByte(${n.toByte})")
       case Left(s)  => throw new NumberFormatException(s)
     }
   }
@@ -69,7 +69,7 @@ object Macros {
   def ushort(c: Context)(): c.Expr[UShort] = {
     import c.universe._
     parseContext(c, BigInt(0), BigInt(65535)) match {
-      case Right(n) => c.Expr(q"spire.math.UShort(${n.toShort})")
+      case Right(n) => c.Expr(q"_root_.spire.math.UShort(${n.toShort})")
       case Left(s)  => throw new NumberFormatException(s)
     }
   }
@@ -77,7 +77,7 @@ object Macros {
   def uint(c: Context)(): c.Expr[UInt] = {
     import c.universe._
     parseContext(c, BigInt(0), BigInt(4294967295L)) match {
-      case Right(n) => c.Expr(q"spire.math.UInt(${n.toInt})")
+      case Right(n) => c.Expr(q"_root_.spire.math.UInt(${n.toInt})")
       case Left(s)  => throw new NumberFormatException(s)
     }
   }
@@ -85,7 +85,7 @@ object Macros {
   def ulong(c: Context)(): c.Expr[ULong] = {
     import c.universe._
     parseContext(c, BigInt(0), BigInt("18446744073709551615")) match {
-      case Right(n) => c.Expr(q"spire.math.ULong(${n.toLong})")
+      case Right(n) => c.Expr(q"_root_.spire.math.ULong(${n.toLong})")
       case Left(s)  => throw new NumberFormatException(s)
     }
   }
@@ -98,9 +98,9 @@ object Macros {
 
     val (n, d) = (r.numerator, r.denominator)
     if (n.isValidLong && d.isValidLong)
-      c.Expr(q"spire.math.Rational(${n.toLong}, ${d.toLong})")
+      c.Expr(q"_root_.spire.math.Rational(${n.toLong}, ${d.toLong})")
     else
-      c.Expr(q"spire.math.Rational(BigInt(${n.toString}), BigInt(${d.toString}))")
+      c.Expr(q"_root_.spire.math.Rational(BigInt(${n.toString}), BigInt(${d.toString}))")
   }
 
   def formatWhole(c: Context, sep: String): String = {
@@ -147,7 +147,7 @@ object Macros {
     try {
       val s = formatWhole(c, sep)
       BigInt(s) // make sure it's ok
-      c.Expr[BigInt](Apply(q"scala.math.BigInt.apply", List(Literal(Constant(s)))))
+      c.Expr[BigInt](Apply(q"_root_.scala.math.BigInt.apply", List(Literal(Constant(s)))))
     } catch {
       case e: Exception =>
         throw new NumberFormatException("illegal %s BigInt constant".format(name))
@@ -159,7 +159,7 @@ object Macros {
     try {
       val s = formatDecimal(c, sep, dec)
       BigDecimal(s) // make sure it's ok
-      c.Expr[BigDecimal](Apply(q"scala.math.BigDecimal.apply", List(Literal(Constant(s)))))
+      c.Expr[BigDecimal](Apply(q"_root_.scala.math.BigDecimal.apply", List(Literal(Constant(s)))))
     } catch {
       case e: Exception =>
         throw new NumberFormatException("illegal %s BigDecimal constant".format(name))
