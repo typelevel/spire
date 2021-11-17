@@ -60,7 +60,7 @@ class FastForSuite extends munit.FunSuite {
         b += x
       }
     }
-    assertEquals(v, 111)
+    assertEquals(v, 334) // 4 * `test`, 3 * `next`, 3 * `body`
     assertEquals(b.toList, List(0, 1, 2))
   }
 
@@ -76,7 +76,7 @@ class FastForSuite extends munit.FunSuite {
       }
     }
     fastFor(0)(test, incr)(body)
-    assertEquals(v, 111)
+    assertEquals(v, 334) // 4 * `test`, 3 * `next`, 3 * `body`
     assertEquals(b.toList, List(0, 1, 2))
   }
 
@@ -95,21 +95,22 @@ class FastForSuite extends munit.FunSuite {
         }
       }
     )
-    assertEquals(v, 111)
+    assertEquals(v, 334) // 4 * `test`, 3 * `next`, 3 * `body`
     assertEquals(b.toList, List(0, 1, 2))
   }
 
   // This test distinguishes fastFor from cfor
-  test("doesn't capture value in closure") {
+  test("captures variable in closure") {
     val b1 = collection.mutable.ArrayBuffer.empty[() => Int]
     fastFor(0)(_ < 3, _ + 1) { x =>
-      b1 += (() => x)
+      b1 += (() => x) // x inlined to a variable and captured by the closure
     }
     val b2 = collection.mutable.ArrayBuffer[() => Int]()
     (0 until 3).foreach { x =>
       b2 += (() => x)
     }
-    assertEquals(b1.map(_.apply()).toList, b2.map(_.apply()).toList)
+    assertEquals(b1.map(_.apply()).toList, List(3, 3, 3))
+    assertEquals(b2.map(_.apply()).toList, List(0, 1, 2))
   }
 
   test("capture value in inner class") {

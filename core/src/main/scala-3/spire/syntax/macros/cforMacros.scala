@@ -20,7 +20,11 @@ import collection.immutable.NumericRange
 
 import spire.syntax.fastFor.{RangeElem, RangeLike}
 
-inline def fastForInline[R](init: R, test: R => Boolean, next: R => R, body: R => Unit): Unit =
+inline def fastForInline[R](inline init: R,
+                            inline test: R => Boolean,
+                            inline next: R => R,
+                            inline body: R => Unit
+): Unit =
   var index = init
   while test(index) do
     body(index)
