@@ -107,7 +107,7 @@ object gen {
     rational.map(Real(_))
 
   lazy val sign: Gen[Sign] =
-    Gen.oneOf(Sign.Positive, Sign.Zero, Sign.Negative)
+    Gen.oneOf(Signed.Positive, Signed.Zero, Signed.Negative)
 
   def term[A: Arbitrary]: Gen[poly.Term[A]] =
     for {

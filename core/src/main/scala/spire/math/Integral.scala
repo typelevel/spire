@@ -16,7 +16,7 @@
 package spire
 package math
 
-import spire.algebra.{EuclideanRing, IsReal}
+import spire.algebra.{EuclideanRing, IsReal, Order}
 import spire.std._
 
 /**
@@ -28,6 +28,7 @@ trait Integral[@sp(Int, Long) A]
     with ConvertableFrom[A]
     with ConvertableTo[A]
     with IsReal[A]
+    with Order[A]
 
 object Integral {
   implicit final val ByteIsIntegral: Integral[Byte] = new ByteIsIntegral

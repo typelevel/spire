@@ -121,11 +121,15 @@ abstract class ShadowInstances3 extends ShadowInstances2 {
       def eqS = implicitly
     }
 
-  implicit def signed[A: Signed, S: Signed](implicit ev: Shadowing[A, S]): Signed[Shadow[A, S]] =
+  implicit def signed[A: AdditiveCMonoid: Order: Signed, S: AdditiveCMonoid: Order: Signed](implicit
+    ev: Shadowing[A, S]
+  ): Signed[Shadow[A, S]] =
     new ShadowSigned[A, S] {
       val shadowing = ev
       def A = implicitly
       def S = implicitly
+      def order = implicitly
+      def additiveCommutativeMonoid = implicitly
     }
 }
 
@@ -149,13 +153,17 @@ abstract class ShadowInstances4 extends ShadowInstances3 {
       def eqS = implicitly
     }
 
-  implicit def truncatedDivision[A: TruncatedDivision, S: TruncatedDivision](implicit
+  implicit def truncatedDivision[A: AdditiveCMonoid: Order: TruncatedDivision,
+                                 S: AdditiveCMonoid: Order: TruncatedDivision
+  ](implicit
     ev: Shadowing[A, S]
   ): TruncatedDivision[Shadow[A, S]] =
     new ShadowTruncatedDivision[A, S] {
       val shadowing = ev
       def A = implicitly
       def S = implicitly
+      def order = implicitly
+      def additiveCommutativeMonoid = implicitly
     }
 
 }
