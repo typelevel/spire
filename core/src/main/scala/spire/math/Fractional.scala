@@ -16,10 +16,10 @@
 package spire
 package math
 
-import spire.algebra.{Field, NRoot}
+import spire.algebra.{Field, NRoot, Order}
 import spire.std._
 
-trait Fractional[@sp(Float, Double) A] extends Any with Field[A] with NRoot[A] with Integral[A]
+trait Fractional[@sp(Float, Double) A] extends Any with Field[A] with NRoot[A] with Integral[A] with Order[A]
 
 object Fractional {
   implicit final val FloatIsFractional: Fractional[Float] = new FloatIsFractional

@@ -155,7 +155,8 @@ trait FloatIsReal extends IsRational[Float] with FloatTruncatedDivision {
 class FloatAlgebra extends FloatIsField with FloatIsNRoot with FloatIsTrig with FloatIsReal with Serializable
 
 trait FloatInstances {
-  implicit final val FloatAlgebra: Field[Float] with NRoot[Float] with Trig[Float] with IsRational[Float] =
+  implicit final val FloatAlgebra
+    : Field[Float] with NRoot[Float] with Trig[Float] with IsRational[Float] with Order[Float] =
     new FloatAlgebra
   import Float._
   import spire.math.NumberTag

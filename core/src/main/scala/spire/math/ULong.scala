@@ -147,8 +147,11 @@ class ULong(val signed: Long) extends AnyVal {
 }
 
 trait ULongInstances {
-  implicit final val ULongAlgebra
-    : CRig[ULong] with IsIntegral[ULong] with TruncatedDivision[ULong] with SignedAdditiveCMonoid[ULong] =
+  implicit final val ULongAlgebra: CRig[ULong]
+    with IsIntegral[ULong]
+    with TruncatedDivision[ULong]
+    with SignedAdditiveCMonoid[ULong]
+    with Order[ULong] =
     new ULongAlgebra
   implicit final val ULongBitString: BitString[ULong] = new ULongBitString
   import spire.math.NumberTag._

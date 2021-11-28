@@ -22,7 +22,7 @@ import spire.syntax.euclideanRing._
 import spire.syntax.convertableFrom._
 
 import java.math.MathContext
-import spire.algebra.{Field, TruncatedDivisionCRing}
+import spire.algebra.{Field, Order, TruncatedDivisionCRing}
 import spire.util.Opt
 
 class FixedPointOverflow(n: Long) extends Exception(n.toString)
@@ -316,8 +316,13 @@ object FixedPoint extends FixedPointInstances {
 
 trait FixedPointInstances {
 
-  implicit def algebra(implicit scale: FixedScale): Fractional[FixedPoint] with TruncatedDivisionCRing[FixedPoint] =
-    new Fractional[FixedPoint] with TruncatedDivisionCRing[FixedPoint] with Field[FixedPoint] { self =>
+  implicit def algebra(implicit
+    scale: FixedScale
+  ): Fractional[FixedPoint] with Order[FixedPoint] with TruncatedDivisionCRing[FixedPoint] =
+    new Fractional[FixedPoint] with TruncatedDivisionCRing[FixedPoint] with Field[FixedPoint] with Order[FixedPoint] {
+      self =>
+      def order = this
+
       override def abs(x: FixedPoint): FixedPoint = x.abs
       override def signum(x: FixedPoint): Int = x.signum
 

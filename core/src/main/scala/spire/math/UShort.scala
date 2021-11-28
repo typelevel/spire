@@ -78,8 +78,11 @@ class UShort(val signed: Char) extends AnyVal {
 }
 
 trait UShortInstances {
-  implicit final val UShortAlgebra
-    : CRig[UShort] with IsIntegral[UShort] with TruncatedDivision[UShort] with SignedAdditiveCMonoid[UShort] =
+  implicit final val UShortAlgebra: CRig[UShort]
+    with IsIntegral[UShort]
+    with TruncatedDivision[UShort]
+    with SignedAdditiveCMonoid[UShort]
+    with Order[UShort] =
     new UShortAlgebra
   implicit final val UShortBitString: BitString[UShort] = new UShortBitString
   import spire.math.NumberTag._
