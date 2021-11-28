@@ -17,7 +17,7 @@ package spire
 package math.prime
 
 import spire.algebra.{Sign, UniqueFactorizationDomain}
-import spire.algebra.Sign.{Negative, Positive, Zero}
+import spire.algebra.Signed.{Negative, Positive, Zero}
 import spire.math.SafeLong
 import spire.std.int._
 import spire.std.map._

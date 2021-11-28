@@ -162,7 +162,7 @@ abstract class AutoAlgebra extends AutoOps { ops =>
   def EuclideanRing[A: c.WeakTypeTag](z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[EuclideanRing[A]] = {
     c.universe.reify {
       new EuclideanRing[A] { self =>
-        // default implementations from EuclideanRing.WithEuclideanAlgorithm
+        // default implementations from EuclideanRing
         @tailrec final def euclid(a: A, b: A)(implicit ev: Eq[A]): A =
           if (isZero(b)) a else euclid(b, emod(a, b))
         def gcd(a: A, b: A)(implicit ev: Eq[A]): A =
@@ -186,7 +186,7 @@ abstract class AutoAlgebra extends AutoOps { ops =>
   def Field[A: c.WeakTypeTag](z: c.Expr[A], o: c.Expr[A])(ev: c.Expr[Eq[A]]): c.Expr[Field[A]] = {
     c.universe.reify {
       new Field[A] {
-        // default implementations from Field.WithDefaultGCD
+        // default implementations from Field
         override def gcd(a: A, b: A)(implicit eqA: Eq[A]): A =
           if (isZero(a) && isZero(b)) zero else one
         override def lcm(a: A, b: A)(implicit eqA: Eq[A]): A = times(a, b)

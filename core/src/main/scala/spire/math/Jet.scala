@@ -570,7 +570,7 @@ private[math] trait JetIsEuclideanRing[@sp(Float, Double) T] extends JetIsGCDRin
 }
 
 /* TODO: Jet[T] is probably not a genuine Field */
-private[math] trait JetIsField[@sp(Float, Double) T] extends JetIsEuclideanRing[T] with Field.WithDefaultGCD[Jet[T]] {
+private[math] trait JetIsField[@sp(Float, Double) T] extends JetIsEuclideanRing[T] with Field[Jet[T]] {
   /* TODO: what are exactly the laws of Jet with respect to EuclideanRing ? */
   // duplicating methods because super[..].call does not work on 2.10 and 2.11
   override def fromDouble(n: Double): Jet[T] = Jet(f.fromDouble(n))

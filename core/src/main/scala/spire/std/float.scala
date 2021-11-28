@@ -22,7 +22,7 @@ import spire.util.Opt
 
 import java.lang.Math
 
-trait FloatIsField extends Field.WithDefaultGCD[Float] {
+trait FloatIsField extends Field[Float] {
   override def minus(a: Float, b: Float): Float = a - b
   def negate(a: Float): Float = -a
   def one: Float = 1.0f
@@ -154,8 +154,8 @@ trait FloatIsReal extends IsRational[Float] with FloatTruncatedDivision {
 class FloatAlgebra extends FloatIsField with FloatIsNRoot with FloatIsTrig with FloatIsReal with Serializable
 
 trait FloatInstances {
-  implicit final val FloatAlgebra
-    : Field.WithDefaultGCD[Float] with NRoot[Float] with Trig[Float] with IsRational[Float] = new FloatAlgebra
+  implicit final val FloatAlgebra: Field[Float] with NRoot[Float] with Trig[Float] with IsRational[Float] =
+    new FloatAlgebra
   import Float._
   import spire.math.NumberTag
   import spire.math.NumberTag._

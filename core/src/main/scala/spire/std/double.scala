@@ -22,7 +22,7 @@ import spire.util.Opt
 
 import java.lang.Math
 
-trait DoubleIsField extends Field.WithDefaultGCD[Double] {
+trait DoubleIsField extends Field[Double] {
   override def minus(a: Double, b: Double): Double = a - b
   def negate(a: Double): Double = -a
   def one: Double = 1.0
@@ -150,7 +150,7 @@ trait DoubleIsReal extends IsRational[Double] with DoubleTruncatedDivision {
 class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable
 
 trait DoubleInstances {
-  implicit final val DoubleAlgebra: Field.WithDefaultGCD[Double]
+  implicit final val DoubleAlgebra: Field[Double]
     with NRoot[Double]
     with Trig[Double]
     with IsRational[Double]

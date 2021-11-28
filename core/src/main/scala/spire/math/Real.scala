@@ -590,8 +590,7 @@ object Real extends RealInstances {
 }
 
 trait RealInstances {
-  implicit final val algebra
-    : Fractional[Real] with TruncatedDivisionCRing[Real] with Trig[Real] with Field.WithDefaultGCD[Real] =
+  implicit final val algebra: Fractional[Real] with TruncatedDivisionCRing[Real] with Trig[Real] with Field[Real] =
     new RealAlgebra
   import NumberTag._
   implicit final val RealTag: NumberTag[Real] = new LargeTag[Real](Exact, Real.zero)
@@ -600,11 +599,7 @@ trait RealInstances {
 @SerialVersionUID(0L)
 class RealAlgebra extends RealIsFractional
 
-trait RealIsFractional
-    extends Fractional[Real]
-    with TruncatedDivisionCRing[Real]
-    with Trig[Real]
-    with Field.WithDefaultGCD[Real] {
+trait RealIsFractional extends Fractional[Real] with TruncatedDivisionCRing[Real] with Trig[Real] with Field[Real] {
   override def abs(x: Real): Real = x.abs
   override def signum(x: Real): Int = x.signum
 

@@ -406,7 +406,7 @@ private[math] trait ComplexOnCRing[@sp(Float, Double) A]
 
 private[math] trait ComplexOnField[@sp(Float, Double) A]
     extends ComplexOnCRing[A]
-    with Field.WithDefaultGCD[Complex[A]]
+    with Field[Complex[A]]
     with FieldAssociativeAlgebra[Complex[A], A] {
 
   implicit def scalar: Field[A]

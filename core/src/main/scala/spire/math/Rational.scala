@@ -21,7 +21,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 import java.math.{BigDecimal => JBigDecimal, BigInteger, MathContext, RoundingMode}
 
 import spire.algebra.{Eq, Field, IsRational, NRoot, Sign, TruncatedDivisionCRing}
-import spire.algebra.Sign.{Negative, Positive, Zero}
+import spire.algebra.Signed.{Negative, Positive, Zero}
 import spire.macros.Checked
 import spire.std.long.LongAlgebra
 import spire.std.double._

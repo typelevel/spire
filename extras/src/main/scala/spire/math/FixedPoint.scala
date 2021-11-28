@@ -317,7 +317,7 @@ object FixedPoint extends FixedPointInstances {
 trait FixedPointInstances {
 
   implicit def algebra(implicit scale: FixedScale): Fractional[FixedPoint] with TruncatedDivisionCRing[FixedPoint] =
-    new Fractional[FixedPoint] with TruncatedDivisionCRing[FixedPoint] with Field.WithDefaultGCD[FixedPoint] { self =>
+    new Fractional[FixedPoint] with TruncatedDivisionCRing[FixedPoint] with Field[FixedPoint] { self =>
       override def abs(x: FixedPoint): FixedPoint = x.abs
       override def signum(x: FixedPoint): Int = x.signum
 

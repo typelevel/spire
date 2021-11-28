@@ -52,9 +52,9 @@ object UniqueFactorizationDomain {
 
   case class WrapDecomposition[A: CRing](safeLongFactors: spire.math.prime.Factors) extends Decomposition[A] {
     def unit: A = safeLongFactors.sign match {
-      case Sign.Negative => CRing[A].negate(CRing[A].one)
-      case Sign.Positive => CRing[A].one
-      case _             => throw new ArithmeticException("Factorization of zero is undefined.")
+      case Signed.Negative => CRing[A].negate(CRing[A].one)
+      case Signed.Positive => CRing[A].one
+      case _               => throw new ArithmeticException("Factorization of zero is undefined.")
     }
     override def elements: Map[A, Int] = safeLongFactors.elements.map { case (f, exp) =>
       ((CRing[A].fromBigInt(f.toBigInt), exp))
