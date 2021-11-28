@@ -224,7 +224,7 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
       Quaternion(f.zero, r.abs.sqrt, f.zero, f.zero)
     }
 
-  def nroot(m: Int)(implicit f: Field[A], nr: NRoot[A], si: Signed[A], tr: Trig[A]): Quaternion[A] =
+  def nroot(m: Int)(implicit f: Field[A], nr: NRoot[A], or: Order[A], si: Signed[A], tr: Trig[A]): Quaternion[A] =
     if (m <= 0) {
       throw new IllegalArgumentException(s"illegal root: $m")
     } else if (m == 1) {
@@ -295,7 +295,7 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
 
   def **(k: Int)(implicit s: CRing[A]): Quaternion[A] = pow(k)
 
-  def fpow(k0: A)(implicit f: Field[A], nr: NRoot[A], si: Signed[A], tr: Trig[A]): Quaternion[A] =
+  def fpow(k0: A)(implicit f: Field[A], nr: NRoot[A], or: Order[A], si: Signed[A], tr: Trig[A]): Quaternion[A] =
     if (k0.signum < 0) {
       Quaternion.zero
     } else if (k0 == f.zero) {

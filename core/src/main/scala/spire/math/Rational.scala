@@ -20,7 +20,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import java.math.{BigDecimal => JBigDecimal, BigInteger, MathContext, RoundingMode}
 
-import spire.algebra.{Eq, Field, IsRational, NRoot, Sign, TruncatedDivisionCRing}
+import spire.algebra.{Eq, Field, IsRational, NRoot, Order, Sign, TruncatedDivisionCRing}
 import spire.algebra.Signed.{Negative, Positive, Zero}
 import spire.macros.Checked
 import spire.std.long.LongAlgebra
@@ -895,7 +895,8 @@ object Rational extends RationalInstances {
 }
 
 trait RationalInstances {
-  implicit final val RationalAlgebra: Field[Rational] with IsRational[Rational] with TruncatedDivisionCRing[Rational] =
+  implicit final val RationalAlgebra
+    : Field[Rational] with IsRational[Rational] with TruncatedDivisionCRing[Rational] with Order[Rational] =
     new RationalAlgebra
   import NumberTag._
   implicit final val RationalTag: NumberTag[Rational] = new LargeTag[Rational](Exact, Rational.zero)
@@ -930,7 +931,10 @@ private[math] trait RationalIsField extends Field[Rational] {
   def div(a: Rational, b: Rational): Rational = a / b
 }
 
-private[math] trait RationalIsReal extends IsRational[Rational] with TruncatedDivisionCRing[Rational] {
+private[math] trait RationalIsReal
+    extends IsRational[Rational]
+    with Order[Rational]
+    with TruncatedDivisionCRing[Rational] {
   override def eqv(x: Rational, y: Rational): Boolean = x == y
   override def neqv(x: Rational, y: Rational): Boolean = x != y
   override def gt(x: Rational, y: Rational): Boolean = x > y

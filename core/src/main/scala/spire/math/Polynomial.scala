@@ -380,7 +380,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
    * Returns the number of sign variations in the coefficients of this polynomial. Given 2 consecutive terms (ignoring 0
    * terms), a sign variation is indicated when the terms have differing signs.
    */
-  def signVariations(implicit ring: Semiring[C], signed: Signed[C]): Int = {
+  def signVariations(implicit ring: Semiring[C], order: Order[C], signed: Signed[C]): Int = {
     var prevSign: Sign = Signed.Zero
     var variations = 0
     foreachNonZero { (_, c) =>
