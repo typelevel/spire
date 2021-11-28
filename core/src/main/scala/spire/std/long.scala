@@ -37,8 +37,8 @@ trait LongIsEuclideanRing extends EuclideanRing[Long] {
   override def equotmod(a: Long, b: Long): (Long, Long) = spire.math.equotmod(a, b)
   def equot(a: Long, b: Long): Long = spire.math.equot(a, b)
   def emod(a: Long, b: Long): Long = spire.math.emod(a, b)
-  def gcd(a: Long, b: Long)(implicit ev: Eq[Long]): Long = spire.math.gcd(a, b)
-  def lcm(a: Long, b: Long)(implicit ev: Eq[Long]): Long = spire.math.lcm(a, b)
+  override def gcd(a: Long, b: Long)(implicit ev: Eq[Long]): Long = spire.math.gcd(a, b)
+  override def lcm(a: Long, b: Long)(implicit ev: Eq[Long]): Long = spire.math.lcm(a, b)
 }
 
 // Not included in Instances trait!
@@ -76,6 +76,7 @@ trait LongOrder extends Order[Long] {
 }
 
 trait LongSigned extends Signed[Long] with LongOrder {
+  def order = this
   override def signum(a: Long): Int = java.lang.Long.signum(a)
   override def abs(a: Long): Long = if (a < 0L) -a else a
 }

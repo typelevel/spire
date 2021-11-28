@@ -701,6 +701,7 @@ private[math] trait NumberOrder extends Order[Number] {
 }
 
 private[math] trait NumberSigned extends Signed[Number] with NumberOrder {
+  def order = this
   override def signum(a: Number): Int = a.signum
   override def abs(a: Number): Number = a.abs
 }

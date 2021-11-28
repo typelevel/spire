@@ -606,6 +606,8 @@ trait RealIsFractional
     with Trig[Real]
     with Field[Real]
     with Order[Real] {
+  def order = this
+
   override def abs(x: Real): Real = x.abs
   override def signum(x: Real): Int = x.signum
 

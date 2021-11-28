@@ -127,6 +127,7 @@ trait DoubleOrder extends Order[Double] {
 }
 
 trait DoubleSigned extends Signed[Double] with DoubleOrder {
+  def order = this
   override def signum(a: Double): Int = Math.signum(a).toInt
   override def abs(a: Double): Double = if (a < 0.0) -a else a
 }

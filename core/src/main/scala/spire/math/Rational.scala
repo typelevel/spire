@@ -935,6 +935,7 @@ private[math] trait RationalIsReal
     extends IsRational[Rational]
     with Order[Rational]
     with TruncatedDivisionCRing[Rational] {
+  def order = this
   override def eqv(x: Rational, y: Rational): Boolean = x == y
   override def neqv(x: Rational, y: Rational): Boolean = x != y
   override def gt(x: Rational, y: Rational): Boolean = x > y

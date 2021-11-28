@@ -16,7 +16,7 @@
 package spire
 package math
 
-import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid, TruncatedDivision}
+import spire.algebra.{CRig, IsIntegral, Order, SignedAdditiveCMonoid, TruncatedDivision}
 import spire.util.Opt
 
 object ULong extends ULongInstances {
@@ -167,7 +167,8 @@ private[math] trait ULongIsCRig extends CRig[ULong] {
   def zero: ULong = ULong(0)
 }
 
-private[math] trait ULongSigned extends SignedAdditiveCMonoid[ULong] {
+private[math] trait ULongSigned extends Order[ULong] with SignedAdditiveCMonoid[ULong] {
+  def order = this
   override def eqv(x: ULong, y: ULong): Boolean = x == y
   override def neqv(x: ULong, y: ULong): Boolean = x != y
   override def gt(x: ULong, y: ULong): Boolean = x > y

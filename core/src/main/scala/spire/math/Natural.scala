@@ -760,6 +760,7 @@ private[math] trait NaturalOrder extends Order[Natural] {
 }
 
 private[math] trait NaturalSigned extends NaturalOrder with SignedAdditiveCMonoid[Natural] {
+  def order = this
   def abs(x: Natural): Natural = x
 }
 

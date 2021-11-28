@@ -376,11 +376,11 @@ trait ComplexInstances0 {
 }
 
 trait ComplexInstances1 extends ComplexInstances0 {
-  implicit def ComplexOnField[A: Field: Signed]: ComplexOnField[A] = new ComplexOnFieldImpl[A]
+  implicit def ComplexOnField[A: Field: Order: Signed]: ComplexOnField[A] = new ComplexOnFieldImpl[A]
 }
 
 trait ComplexInstances extends ComplexInstances1 {
-  implicit def ComplexOnTrig[@sp(Float, Double) A: Fractional: Trig: Signed]: ComplexOnTrigImpl[A] =
+  implicit def ComplexOnTrig[@sp(Float, Double) A: Fractional: Order: Trig: Signed]: ComplexOnTrigImpl[A] =
     new ComplexOnTrigImpl[A]
 
   implicit def ComplexEq[A: Eq]: Eq[Complex[A]] = new ComplexEq[A]
@@ -474,14 +474,18 @@ final private[math] class ComplexOnCRingImpl[@sp(Float, Double) A](implicit val 
     with Serializable
 
 @SerialVersionUID(1L)
-final private[math] class ComplexOnFieldImpl[@sp(Float, Double) A](implicit val scalar: Field[A], val signed: Signed[A])
-    extends ComplexOnField[A]
+final private[math] class ComplexOnFieldImpl[@sp(Float, Double) A](implicit
+  val scalar: Field[A],
+  val order: Order[A],
+  val signed: Signed[A]
+) extends ComplexOnField[A]
     with Serializable
 
 @SerialVersionUID(1L)
 private[math] class ComplexOnTrigImpl[@sp(Float, Double) A](implicit
   val scalar: Field[A],
   val nroot: NRoot[A],
+  val order: Order[A],
   val trig: Trig[A],
   val signed: Signed[A]
 ) extends ComplexOnField[A]

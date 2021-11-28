@@ -102,7 +102,9 @@ object BigDecimalRootRefinement {
   ): BigDecimalRootRefinement =
     apply(poly, lowerBound, upperBound).refine(mc)
 
-  implicit private val JBigDecimalOrder: Signed[JBigDecimal] = new Signed.forAdditiveCommutativeGroup[JBigDecimal] {
+  implicit private val JBigDecimalOrder: Order[JBigDecimal] with Signed[JBigDecimal] = new Order[JBigDecimal]
+    with Signed.forAdditiveCommutativeGroup[JBigDecimal] {
+    def order = this
     def negate(x: JBigDecimal) = x.negate
     def zero = JBigDecimal.ZERO
     def plus(x: JBigDecimal, y: JBigDecimal) = x.add(y)

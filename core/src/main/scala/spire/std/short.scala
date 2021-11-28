@@ -35,8 +35,8 @@ trait ShortIsEuclideanRing extends EuclideanRing[Short] {
   override def equotmod(a: Short, b: Short): (Short, Short) = spire.math.equotmod(a, b)
   def equot(a: Short, b: Short): Short = spire.math.equot(a, b)
   def emod(a: Short, b: Short): Short = spire.math.emod(a, b)
-  def gcd(a: Short, b: Short)(implicit ev: Eq[Short]): Short = spire.math.gcd(a, b).toShort
-  def lcm(a: Short, b: Short)(implicit ev: Eq[Short]): Short = spire.math.lcm(a, b).toShort
+  override def gcd(a: Short, b: Short)(implicit ev: Eq[Short]): Short = spire.math.gcd(a, b).toShort
+  override def lcm(a: Short, b: Short)(implicit ev: Eq[Short]): Short = spire.math.lcm(a, b).toShort
 }
 
 // Not included in Instances trait.
@@ -73,6 +73,7 @@ trait ShortOrder extends Order[Short] {
 }
 
 trait ShortSigned extends Signed[Short] with ShortOrder {
+  def order = this
   override def signum(a: Short): Int = java.lang.Integer.signum(a)
   override def abs(a: Short): Short = if (a < 0) (-a).toShort else a.toShort
 }

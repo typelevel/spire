@@ -136,6 +136,7 @@ trait FloatSigned extends Signed[Float] with FloatOrder {
 }
 
 trait FloatTruncatedDivision extends TruncatedDivisionCRing[Float] with FloatSigned {
+  def order = this
   def toBigIntOpt(a: Float): Opt[BigInt] = if (a.isWhole) Opt(BigDecimal(a.toDouble).toBigInt) else Opt.empty[BigInt]
   def tquot(a: Float, b: Float): Float = (a - (a % b)) / b
   def tmod(a: Float, b: Float): Float = a % b

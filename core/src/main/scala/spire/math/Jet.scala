@@ -662,6 +662,7 @@ private[math] class JetAlgebra[@sp(Float, Double) T](implicit
   val eq: Eq[T],
   val f: Field[T],
   val n: NRoot[T],
+  val o: Order[T],
   val t: Trig[T],
   val s: Signed[T],
   val v: VectorSpace[Array[T], T]

@@ -182,6 +182,7 @@ trait BigDecimalOrder extends Order[BigDecimal] {
 }
 
 trait BigDecimalSigned extends Signed[BigDecimal] with BigDecimalOrder {
+  def order = this
   override def signum(a: BigDecimal): Int = a.signum
   override def abs(a: BigDecimal): BigDecimal = a.abs
 }

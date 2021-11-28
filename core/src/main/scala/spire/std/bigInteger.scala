@@ -36,8 +36,8 @@ trait BigIntegerIsEuclideanRing extends EuclideanRing[BigInteger] {
   override def equotmod(a: BigInteger, b: BigInteger): (BigInteger, BigInteger) = spire.math.equotmod(a, b)
   def equot(a: BigInteger, b: BigInteger): BigInteger = spire.math.equot(a, b)
   def emod(a: BigInteger, b: BigInteger): BigInteger = spire.math.emod(a, b)
-  def gcd(a: BigInteger, b: BigInteger)(implicit ev: Eq[BigInteger]): BigInteger = a.gcd(b)
-  def lcm(a: BigInteger, b: BigInteger)(implicit ev: Eq[BigInteger]): BigInteger =
+  override def gcd(a: BigInteger, b: BigInteger)(implicit ev: Eq[BigInteger]): BigInteger = a.gcd(b)
+  override def lcm(a: BigInteger, b: BigInteger)(implicit ev: Eq[BigInteger]): BigInteger =
     if (a.signum == 0 || b.signum == 0) zero else a.divide(a.gcd(b)).multiply(b)
 }
 
@@ -92,6 +92,7 @@ trait BigIntegerOrder extends Order[BigInteger] {
 }
 
 trait BigIntegerSigned extends Signed[BigInteger] with BigIntegerOrder {
+  def order = this
   override def signum(a: BigInteger): Int = a.signum
   override def abs(a: BigInteger): BigInteger = a.abs
 }

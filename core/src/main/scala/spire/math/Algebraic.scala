@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import spire.Platform
-import spire.algebra.{Eq, Field, IsAlgebraic, NRoot, Sign, TruncatedDivisionCRing}
+import spire.algebra.{Eq, Field, IsAlgebraic, NRoot, Order, Sign, TruncatedDivisionCRing}
 import spire.macros.Checked.checked
 import spire.math.poly.{BigDecimalRootRefinement, RootFinder, Roots, Term}
 import spire.std.bigInt._
@@ -1578,7 +1578,11 @@ private[math] trait AlgebraicIsField extends Field[Algebraic] {
 
 private[math] trait AlgebraicIsNRoot extends NRoot[Algebraic]
 
-private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] with TruncatedDivisionCRing[Algebraic] {
+private[math] trait AlgebraicIsReal
+    extends IsAlgebraic[Algebraic]
+    with TruncatedDivisionCRing[Algebraic]
+    with Order[Algebraic] {
+  def order = this
   def toDouble(x: Algebraic): Double = x.toDouble
   def toAlgebraic(x: Algebraic): Algebraic = x
   def ceil(a: Algebraic): Algebraic = Algebraic(a.toBigDecimal(0, RoundingMode.CEILING))
