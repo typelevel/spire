@@ -185,6 +185,7 @@ package object algebra {
   val Signed = _root_.algebra.ring.Signed
 
   type SignedAdditiveCMonoid[A] = _root_.algebra.ring.Signed.forAdditiveCommutativeMonoid[A]
+  type SignedAdditiveAbGroup[A] = _root_.algebra.ring.Signed.forAdditiveCommutativeGroup[A]
 
   type TruncatedDivision[A] = _root_.algebra.ring.TruncatedDivision[A]
   val TruncatedDivision = _root_.algebra.ring.TruncatedDivision
