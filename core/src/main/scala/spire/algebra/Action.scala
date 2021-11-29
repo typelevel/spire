@@ -100,3 +100,15 @@ trait MultiplicativeAction[@sp(Int) P, G] extends Any { self =>
   def gtimesl(g: G, p: P): P
   def gtimesr(p: P, g: G): P
 }
+
+object MultiplicativeAction {
+  implicit def SignAction[A](implicit A: AdditiveGroup[A]): MultiplicativeAction[A, Sign] =
+    new MultiplicativeAction[A, Sign] {
+      def gtimesl(s: Sign, a: A): A = s match {
+        case Signed.Positive => a
+        case Signed.Negative => A.negate(a)
+        case Signed.Zero     => A.zero
+      }
+      def gtimesr(a: A, s: Sign): A = gtimesl(s, a)
+    }
+}
