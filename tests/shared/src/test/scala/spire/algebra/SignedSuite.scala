@@ -37,9 +37,9 @@ class SignedSuite extends munit.FunSuite {
 
     runTest("-neg.abs === pos")(assertEquals(neg.abs, pos))
     runTest("pos.abs === pos")(assertEquals(pos.abs, pos))
-    runTest("neg.sign == Negative")(assertEquals(neg.sign, Sign.Negative))
-    runTest("pos.sign == Positive")(assertEquals(pos.sign, Sign.Positive))
-    runTest("zero.sign == Zero")(assertEquals(zero.sign, Sign.Zero))
+    runTest("neg.sign == Negative")(assertEquals(neg.sign, Signed.Negative))
+    runTest("pos.sign == Positive")(assertEquals(pos.sign, Signed.Positive))
+    runTest("zero.sign == Zero")(assertEquals(zero.sign, Signed.Zero))
     runTest("neg.signum < 0")(assert(neg.signum < 0))
     runTest("pos.signum > 0")(assert(pos.signum > 0))
     runTest("zero.signum == 0")(assertEquals(zero.signum, 0))

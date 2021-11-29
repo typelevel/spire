@@ -16,7 +16,7 @@
 package spire
 package math
 
-import spire.algebra.Sign
+import spire.algebra.Signed
 
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.arbitrary
@@ -136,7 +136,7 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
 
   // This is just a simpler special case of the property test above.
   test("sign of tricky zero is Zero") {
-    assertEquals(trickyZero.sign, Sign.Zero)
+    assertEquals(trickyZero.sign, Signed.Zero)
   }
 
   test("relative approximation of zero is zero") {
