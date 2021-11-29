@@ -165,9 +165,9 @@ abstract class AutoAlgebra extends AutoOps { ops =>
         // default implementations from EuclideanRing
         @tailrec final def euclid(a: A, b: A)(implicit ev: Eq[A]): A =
           if (isZero(b)) a else euclid(b, emod(a, b))
-        def gcd(a: A, b: A)(implicit ev: Eq[A]): A =
+        override def gcd(a: A, b: A)(implicit ev: Eq[A]): A =
           euclid(a, b)(ev)
-        def lcm(a: A, b: A)(implicit ev: Eq[A]): A =
+        override def lcm(a: A, b: A)(implicit ev: Eq[A]): A =
           if (isZero(a) || isZero(b)) zero else times(equot(a, gcd(a, b)), b)
 
         def zero: A = z.splice
