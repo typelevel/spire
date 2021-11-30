@@ -35,8 +35,8 @@ trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
   override def equotmod(a: Byte, b: Byte): (Byte, Byte) = spire.math.equotmod(a, b)
   def equot(a: Byte, b: Byte): Byte = spire.math.equot(a, b)
   def emod(a: Byte, b: Byte): Byte = spire.math.emod(a, b)
-  def gcd(a: Byte, b: Byte)(implicit ev: Eq[Byte]): Byte = spire.math.gcd(a, b).toByte
-  def lcm(a: Byte, b: Byte)(implicit ev: Eq[Byte]): Byte = spire.math.lcm(a, b).toByte
+  override def gcd(a: Byte, b: Byte)(implicit ev: Eq[Byte]): Byte = spire.math.gcd(a, b).toByte
+  override def lcm(a: Byte, b: Byte)(implicit ev: Eq[Byte]): Byte = spire.math.lcm(a, b).toByte
 }
 
 // Not included in Instances trait.
@@ -73,6 +73,7 @@ trait ByteOrder extends Order[Byte] {
 }
 
 trait ByteSigned extends Signed[Byte] with ByteOrder {
+  def order = this
   override def signum(a: Byte): Int = java.lang.Integer.signum(a)
   override def abs(a: Byte): Byte = if (a < 0) (-a).toByte else a
 }

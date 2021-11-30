@@ -704,6 +704,8 @@ private[math] trait SafeLongOrder extends Order[SafeLong] {
 }
 
 private[math] trait SafeLongSigned extends Signed[SafeLong] with SafeLongOrder {
+  def order = this
+  def additiveCommutativeMonoid = SafeLong.SafeLongAlgebra
   override def signum(a: SafeLong): Int = a.signum
   override def abs(a: SafeLong): SafeLong = a.abs
 }

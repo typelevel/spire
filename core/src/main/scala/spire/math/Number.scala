@@ -624,7 +624,7 @@ private[math] case class RationalNumber(n: Rational) extends Number { lhs =>
 }
 
 trait NumberInstances {
-  implicit final val NumberAlgebra: Field.WithDefaultGCD[Number]
+  implicit final val NumberAlgebra: Field[Number]
     with CRing[Number]
     with NRoot[Number]
     with Trig[Number]
@@ -653,7 +653,7 @@ private[math] trait NumberIsGCDRing extends GCDRing[Number] with NumberIsCRing {
 }
  */
 
-private[math] trait NumberIsField extends Field.WithDefaultGCD[Number] with NumberIsCRing {
+private[math] trait NumberIsField extends Field[Number] with NumberIsCRing {
   def div(a: Number, b: Number): Number = a / b
   override def fromDouble(a: Double): Number = Number(a)
 }
@@ -701,6 +701,7 @@ private[math] trait NumberOrder extends Order[Number] {
 }
 
 private[math] trait NumberSigned extends Signed[Number] with NumberOrder {
+  def order = this
   override def signum(a: Number): Int = a.signum
   override def abs(a: Number): Number = a.abs
 }

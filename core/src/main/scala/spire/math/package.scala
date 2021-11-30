@@ -538,7 +538,7 @@ package object math {
   final def ulp(x: Double): Double = Math.ulp(x)
   final def ulp(x: Float): Double = Math.ulp(x)
 
-  final def hypot[@sp(Float, Double) A](x: A, y: A)(implicit f: Field[A], n: NRoot[A], s: Signed[A]): A = {
+  final def hypot[@sp(Float, Double) A](x: A, y: A)(implicit f: Field[A], n: NRoot[A], o: Order[A], s: Signed[A]): A = {
     import spire.implicits._
     def abs(n: A): A = if (n < f.zero) -n else n
     val ax = abs(x)

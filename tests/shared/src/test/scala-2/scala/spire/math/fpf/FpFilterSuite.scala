@@ -37,6 +37,8 @@ class FpFilterSuite extends munit.ScalaCheckSuite {
   // the exact case, since it'll fail with an Evaluated excetion.
   sealed trait Bad
   implicit object BadField extends Field[Bad] with IsReal[Bad] with NRoot[Bad] {
+    def order = this
+    def additiveCommutativeMonoid = this
     def zero: Bad = evaluated
     def one: Bad = evaluated
     def negate(a: Bad): Bad = evaluated

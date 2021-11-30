@@ -16,7 +16,7 @@
 package spire
 package math
 
-import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid, TruncatedDivision}
+import spire.algebra.{CRig, IsIntegral, Order, SignedAdditiveCMonoid, TruncatedDivision}
 import spire.util.Opt
 
 object UInt extends UIntInstances {
@@ -78,7 +78,8 @@ class UInt(val signed: Int) extends AnyVal {
 
 trait UIntInstances {
   implicit final val UIntAlgebra
-    : CRig[UInt] with IsIntegral[UInt] with TruncatedDivision[UInt] with SignedAdditiveCMonoid[UInt] = new UIntAlgebra
+    : CRig[UInt] with IsIntegral[UInt] with TruncatedDivision[UInt] with SignedAdditiveCMonoid[UInt] with Order[UInt] =
+    new UIntAlgebra
   implicit final val UIntBitString: BitString[UInt] = new UIntBitString
   import spire.math.NumberTag._
   implicit final val UIntTag: NumberTag[UInt] = new UnsignedIntTag[UInt](UInt.MinValue, UInt.MaxValue)
@@ -96,7 +97,8 @@ private[math] trait UIntIsCRig extends CRig[UInt] {
   def zero: UInt = UInt(0)
 }
 
-private[math] trait UIntSigned extends SignedAdditiveCMonoid[UInt] {
+private[math] trait UIntSigned extends Order[UInt] with SignedAdditiveCMonoid[UInt] {
+  def order = this
   override def eqv(x: UInt, y: UInt): Boolean = x == y
   override def neqv(x: UInt, y: UInt): Boolean = x != y
   override def gt(x: UInt, y: UInt): Boolean = x > y

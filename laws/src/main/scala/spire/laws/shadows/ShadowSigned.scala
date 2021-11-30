@@ -17,7 +17,7 @@ package spire.laws.shadows
 
 import spire.algebra.{Sign, Signed}
 
-trait ShadowSigned[A, S] extends ShadowOrder[A, S] with Signed[Shadow[A, S]] {
+trait ShadowSigned[A, S] extends Signed[Shadow[A, S]] {
   implicit val shadowing: Shadowing[A, S]
   import shadowing._
   implicit def A: Signed[A]

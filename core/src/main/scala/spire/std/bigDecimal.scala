@@ -25,7 +25,7 @@ import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig, TruncatedDi
 import spire.math.Rational
 import spire.util.Opt
 
-trait BigDecimalIsField extends Field.WithDefaultGCD[BigDecimal] {
+trait BigDecimalIsField extends Field[BigDecimal] {
   override def minus(a: BigDecimal, b: BigDecimal): BigDecimal = a - b
   def negate(a: BigDecimal): BigDecimal = -a
   val one: BigDecimal = BigDecimal(1.0)
@@ -182,6 +182,7 @@ trait BigDecimalOrder extends Order[BigDecimal] {
 }
 
 trait BigDecimalSigned extends Signed[BigDecimal] with BigDecimalOrder {
+  def order = this
   override def signum(a: BigDecimal): Int = a.signum
   override def abs(a: BigDecimal): BigDecimal = a.abs
 }
@@ -208,7 +209,7 @@ class BigDecimalAlgebra extends BigDecimalIsField with BigDecimalIsNRoot with Bi
 trait BigDecimalInstances {
   import BigDecimal.defaultMathContext
 
-  implicit final val BigDecimalAlgebra: Field.WithDefaultGCD[BigDecimal]
+  implicit final val BigDecimalAlgebra: Field[BigDecimal]
     with NRoot[BigDecimal]
     with IsRational[BigDecimal]
     with TruncatedDivisionCRing[BigDecimal]

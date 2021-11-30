@@ -78,6 +78,7 @@ trait BigIntOrder extends Order[BigInt] {
 }
 
 trait BigIntSigned extends Signed[BigInt] with BigIntOrder {
+  def order = this
   override def signum(a: BigInt): Int = a.signum
   override def abs(a: BigInt): BigInt = a.abs
 }

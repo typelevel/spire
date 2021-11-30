@@ -38,8 +38,8 @@ trait IntIsEuclideanRing extends EuclideanRing[Int] {
   override def equotmod(a: Int, b: Int): (Int, Int) = spire.math.equotmod(a, b)
   def equot(a: Int, b: Int): Int = spire.math.equot(a, b)
   def emod(a: Int, b: Int): Int = spire.math.emod(a, b)
-  def gcd(a: Int, b: Int)(implicit ev: Eq[Int]): Int = spire.math.gcd(a, b).toInt
-  def lcm(a: Int, b: Int)(implicit ev: Eq[Int]): Int = spire.math.lcm(a, b).toInt
+  override def gcd(a: Int, b: Int)(implicit ev: Eq[Int]): Int = spire.math.gcd(a, b).toInt
+  override def lcm(a: Int, b: Int)(implicit ev: Eq[Int]): Int = spire.math.lcm(a, b).toInt
 }
 
 // Not included in Instances trait.
@@ -87,6 +87,7 @@ trait IntTruncatedDivision extends TruncatedDivisionCRing[Int] with IntSigned {
 }
 
 trait IntIsReal extends IsIntegral[Int] with IntTruncatedDivision {
+  def order = this
   def toDouble(n: Int): Double = n.toDouble
   def toBigInt(n: Int): BigInt = BigInt(n)
 }

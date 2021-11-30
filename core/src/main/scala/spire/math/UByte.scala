@@ -16,7 +16,7 @@
 package spire
 package math
 
-import spire.algebra.{CRig, IsIntegral, SignedAdditiveCMonoid, TruncatedDivision}
+import spire.algebra.{CRig, IsIntegral, Order, SignedAdditiveCMonoid, TruncatedDivision}
 import spire.util.Opt
 
 object UByte extends UByteInstances {
@@ -87,8 +87,11 @@ class UByte(val signed: Byte) extends AnyVal with scala.math.ScalaNumericAnyConv
 }
 
 trait UByteInstances {
-  implicit final val UByteAlgebra
-    : CRig[UByte] with IsIntegral[UByte] with TruncatedDivision[UByte] with SignedAdditiveCMonoid[UByte] =
+  implicit final val UByteAlgebra: CRig[UByte]
+    with IsIntegral[UByte]
+    with TruncatedDivision[UByte]
+    with SignedAdditiveCMonoid[UByte]
+    with Order[UByte] =
     new UByteAlgebra
   implicit final val UByteBitString: BitString[UByte] = new UByteBitString
   import spire.math.NumberTag._
@@ -107,7 +110,8 @@ private[math] trait UByteIsCRig extends CRig[UByte] {
   def zero: UByte = UByte(0)
 }
 
-private[math] trait UByteSigned extends SignedAdditiveCMonoid[UByte] {
+private[math] trait UByteSigned extends Order[UByte] with SignedAdditiveCMonoid[UByte] {
+  def order = this
   override def eqv(x: UByte, y: UByte): Boolean = x == y
   override def neqv(x: UByte, y: UByte): Boolean = x != y
   override def gt(x: UByte, y: UByte): Boolean = x > y

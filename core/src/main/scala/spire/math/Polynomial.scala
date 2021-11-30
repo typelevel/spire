@@ -380,12 +380,12 @@ trait Polynomial[@sp(Double) C] { lhs =>
    * Returns the number of sign variations in the coefficients of this polynomial. Given 2 consecutive terms (ignoring 0
    * terms), a sign variation is indicated when the terms have differing signs.
    */
-  def signVariations(implicit ring: Semiring[C], signed: Signed[C]): Int = {
-    var prevSign: Sign = Sign.Zero
+  def signVariations(implicit ring: Semiring[C], order: Order[C], signed: Signed[C]): Int = {
+    var prevSign: Sign = Signed.Zero
     var variations = 0
     foreachNonZero { (_, c) =>
       val sign = signed.sign(c)
-      if (Sign.Zero != prevSign && sign != prevSign) {
+      if (Signed.Zero != prevSign && sign != prevSign) {
         variations += 1
       }
       prevSign = sign
@@ -553,7 +553,7 @@ trait PolynomialOverCRing[@sp(Double) C]
 
 trait PolynomialOverField[@sp(Double) C]
     extends PolynomialOverRing[C]
-    with EuclideanRing.WithEuclideanAlgorithm[Polynomial[C]]
+    with EuclideanRing[Polynomial[C]]
     with VectorSpace[Polynomial[C], C]
     with FieldAssociativeAlgebra[Polynomial[C], C] { self =>
   implicit override val scalar: Field[C]

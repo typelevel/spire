@@ -20,7 +20,7 @@ import scala.math.{ScalaNumber, ScalaNumericConversions}
 import scala.collection.immutable.LazyList
 import scala.collection.immutable.LazyList.#::
 
-import spire.algebra.{Field, Trig, TruncatedDivisionCRing}
+import spire.algebra.{Field, Order, Trig, TruncatedDivisionCRing}
 import spire.syntax.nroot._
 import spire.util.Opt
 import scala.annotation.nowarn
@@ -591,7 +591,7 @@ object Real extends RealInstances {
 
 trait RealInstances {
   implicit final val algebra
-    : Fractional[Real] with TruncatedDivisionCRing[Real] with Trig[Real] with Field.WithDefaultGCD[Real] =
+    : Fractional[Real] with TruncatedDivisionCRing[Real] with Trig[Real] with Field[Real] with Order[Real] =
     new RealAlgebra
   import NumberTag._
   implicit final val RealTag: NumberTag[Real] = new LargeTag[Real](Exact, Real.zero)
@@ -604,7 +604,10 @@ trait RealIsFractional
     extends Fractional[Real]
     with TruncatedDivisionCRing[Real]
     with Trig[Real]
-    with Field.WithDefaultGCD[Real] {
+    with Field[Real]
+    with Order[Real] {
+  def order = this
+
   override def abs(x: Real): Real = x.abs
   override def signum(x: Real): Int = x.signum
 

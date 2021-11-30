@@ -172,8 +172,31 @@ package object algebra {
   type CRing[A] = _root_.algebra.ring.CommutativeRing[A]
   val CRing = _root_.algebra.ring.CommutativeRing
 
-  type AlgebraField[A] = _root_.algebra.ring.Field[A]
-  val AlgebraField = _root_.algebra.ring.Field
+  type GCDRing[A] = _root_.algebra.ring.GCDRing[A]
+  val GCDRing = _root_.algebra.ring.GCDRing
+
+  type EuclideanRing[A] = _root_.algebra.ring.EuclideanRing[A]
+  val EuclideanRing = _root_.algebra.ring.EuclideanRing
+
+  type Sign = _root_.algebra.ring.Signed.Sign
+  val Sign = _root_.algebra.ring.Signed.Sign
+
+  type Signed[A] = _root_.algebra.ring.Signed[A]
+  val Signed = _root_.algebra.ring.Signed
+
+  type SignedAdditiveCMonoid[A] = _root_.algebra.ring.Signed.forAdditiveCommutativeMonoid[A]
+  type SignedAdditiveAbGroup[A] = _root_.algebra.ring.Signed.forAdditiveCommutativeGroup[A]
+
+  type TruncatedDivision[A] = _root_.algebra.ring.TruncatedDivision[A]
+  val TruncatedDivision = _root_.algebra.ring.TruncatedDivision
+
+  type TruncatedDivisionCRing[A] = _root_.algebra.ring.TruncatedDivision.forCommutativeRing[A]
+
+  type DivisionRing[A] = _root_.algebra.ring.DivisionRing[A]
+  val DivisionRing = _root_.algebra.ring.DivisionRing
+
+  type Field[A] = _root_.algebra.ring.Field[A]
+  val Field = _root_.algebra.ring.Field
 
   type Bool[A] = _root_.algebra.lattice.Bool[A]
   val Bool = _root_.algebra.lattice.Bool

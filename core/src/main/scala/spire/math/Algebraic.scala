@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference
 import scala.math.{ScalaNumber, ScalaNumericConversions}
 
 import spire.Platform
-import spire.algebra.{Eq, Field, IsAlgebraic, NRoot, Sign, TruncatedDivisionCRing}
+import spire.algebra.{Eq, Field, IsAlgebraic, NRoot, Order, Sign, TruncatedDivisionCRing}
 import spire.macros.Checked.checked
 import spire.math.poly.{BigDecimalRootRefinement, RootFinder, Roots, Term}
 import spire.std.bigInt._
@@ -1549,16 +1549,15 @@ object Algebraic extends AlgebraicInstances {
 }
 
 trait AlgebraicInstances {
-  implicit final val AlgebraicAlgebra: Field.WithDefaultGCD[Algebraic]
-    with NRoot[Algebraic]
-    with IsAlgebraic[Algebraic]
-    with TruncatedDivisionCRing[Algebraic] = new AlgebraicAlgebra
+  implicit final val AlgebraicAlgebra
+    : Field[Algebraic] with NRoot[Algebraic] with IsAlgebraic[Algebraic] with TruncatedDivisionCRing[Algebraic] =
+    new AlgebraicAlgebra
 
   import NumberTag._
   implicit final val AlgebraicTag: NumberTag[Algebraic] = new LargeTag[Algebraic](Exact, Algebraic(0))
 }
 
-private[math] trait AlgebraicIsField extends Field.WithDefaultGCD[Algebraic] {
+private[math] trait AlgebraicIsField extends Field[Algebraic] {
   def zero: Algebraic = Algebraic.Zero
   def one: Algebraic = Algebraic.One
   def plus(a: Algebraic, b: Algebraic): Algebraic = a + b
@@ -1579,7 +1578,11 @@ private[math] trait AlgebraicIsField extends Field.WithDefaultGCD[Algebraic] {
 
 private[math] trait AlgebraicIsNRoot extends NRoot[Algebraic]
 
-private[math] trait AlgebraicIsReal extends IsAlgebraic[Algebraic] with TruncatedDivisionCRing[Algebraic] {
+private[math] trait AlgebraicIsReal
+    extends IsAlgebraic[Algebraic]
+    with TruncatedDivisionCRing[Algebraic]
+    with Order[Algebraic] {
+  def order = this
   def toDouble(x: Algebraic): Double = x.toDouble
   def toAlgebraic(x: Algebraic): Algebraic = x
   def ceil(a: Algebraic): Algebraic = Algebraic(a.toBigDecimal(0, RoundingMode.CEILING))

@@ -83,7 +83,7 @@ final class SignedOps[A](a: A)(using s: Signed[A]):
   def isSignNonNegative: Boolean = s.isSignNonNegative(a)
 
 final class TruncatedDivisionOps[A](lhs: A)(using ev: TruncatedDivision[A]):
-  def toBigIntOpt: Opt[BigInt] = ev.toBigIntOpt(lhs)
+  // def toBigIntOpt: Opt[BigInt] = ev.toBigIntOpt(lhs) // TODO port to algebra?
   def tquot(rhs: A): A = ev.tquot(lhs, rhs)
   def tmod(rhs: A): A = ev.tmod(lhs, rhs)
   def tquotmod(rhs: A): (A, A) = ev.tquotmod(lhs, rhs)

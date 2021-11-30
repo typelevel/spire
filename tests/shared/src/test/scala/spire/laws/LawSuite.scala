@@ -52,19 +52,31 @@ class LawSuite extends munit.DisciplineSuite {
   implicit val shadowingLong: Shadowing[Long, BigInt] = Shadowing.bigInt[Long](s => s.toLong)
 
   checkAll("UByte", RingLaws[UByte].cRig)
-  checkAll("UByte", OrderLaws[Shadow[UByte, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll(
+    "UByte",
+    OrderLaws[Shadow[UByte, BigInt]].truncatedDivision(Shadow.cRig, Shadow.orderInstance, Shadow.truncatedDivision)
+  )
   checkAll("UByte", CombinationLaws[Shadow[UByte, BigInt]].signedAdditiveCMonoid)
 
   checkAll("UShort", RingLaws[UShort].cRig)
-  checkAll("UShort", OrderLaws[Shadow[UShort, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll(
+    "UShort",
+    OrderLaws[Shadow[UShort, BigInt]].truncatedDivision(Shadow.cRig, Shadow.orderInstance, Shadow.truncatedDivision)
+  )
   checkAll("UShort", CombinationLaws[Shadow[UShort, BigInt]].signedAdditiveCMonoid)
 
   checkAll("UInt", RingLaws[UInt].cRig)
-  checkAll("UInt", OrderLaws[Shadow[UInt, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll(
+    "UInt",
+    OrderLaws[Shadow[UInt, BigInt]].truncatedDivision(Shadow.cRig, Shadow.orderInstance, Shadow.truncatedDivision)
+  )
   checkAll("UInt", CombinationLaws[Shadow[UInt, BigInt]].signedAdditiveCMonoid)
 
   checkAll("ULong", RingLaws[ULong].cRig)
-  checkAll("ULong", OrderLaws[Shadow[ULong, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll(
+    "ULong",
+    OrderLaws[Shadow[ULong, BigInt]].truncatedDivision(Shadow.cRig, Shadow.orderInstance, Shadow.truncatedDivision)
+  )
   checkAll("ULong", CombinationLaws[Shadow[ULong, BigInt]].signedAdditiveCMonoid)
 
   checkAll("Natural", RingLaws[Natural].cRig)
@@ -75,25 +87,36 @@ class LawSuite extends munit.DisciplineSuite {
   checkAll("Byte", RingLaws[Byte].cRing)
   checkAll("Byte", RingLaws[Shadow[Byte, BigInt]].integerEuclideanRing(Shadow.euclideanRing, Shadow.signed))
   checkAll("Byte", CombinationLaws[Shadow[Byte, BigInt]].signedAdditiveCMonoid)
-  checkAll("Byte", OrderLaws[Shadow[Byte, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll(
+    "Byte",
+    OrderLaws[Shadow[Byte, BigInt]].truncatedDivision(Shadow.cRig, Shadow.orderInstance, Shadow.truncatedDivision)
+  )
   checkAll("Byte", BaseLaws[Byte].uniqueFactorizationDomain)
 
   checkAll("Short", RingLaws[Short].cRing)
   checkAll("Short", RingLaws[Shadow[Short, BigInt]].integerEuclideanRing(Shadow.euclideanRing, Shadow.signed))
   checkAll("Short", CombinationLaws[Shadow[Short, BigInt]].signedAdditiveCMonoid)
-  checkAll("Short", OrderLaws[Shadow[Short, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll(
+    "Short",
+    OrderLaws[Shadow[Short, BigInt]].truncatedDivision(Shadow.cRig, Shadow.orderInstance, Shadow.truncatedDivision)
+  )
   checkAll("Short", BaseLaws[Short].uniqueFactorizationDomain)
 
   checkAll("Int", RingLaws[Int].cRing)
   checkAll("Int", RingLaws[Shadow[Int, BigInt]].integerEuclideanRing(Shadow.euclideanRing, Shadow.signed))
   checkAll("Int", BaseLaws[Int].uniqueFactorizationDomain)
-  checkAll("Int", OrderLaws[Shadow[Int, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll("Int",
+           OrderLaws[Shadow[Int, BigInt]].truncatedDivision(Shadow.cRig, Shadow.orderInstance, Shadow.truncatedDivision)
+  )
   checkAll("Int", CombinationLaws[Shadow[Int, BigInt]].signedAdditiveCMonoid)
 
   checkAll("Long", RingLaws[Long].cRing)
   checkAll("Long", RingLaws[Shadow[Long, BigInt]].integerEuclideanRing(Shadow.euclideanRing, Shadow.signed))
   checkAll("Long", BaseLaws[Long].uniqueFactorizationDomain)
-  checkAll("Long", OrderLaws[Shadow[Long, BigInt]].truncatedDivision(Shadow.cRig, Shadow.truncatedDivision))
+  checkAll(
+    "Long",
+    OrderLaws[Shadow[Long, BigInt]].truncatedDivision(Shadow.cRig, Shadow.orderInstance, Shadow.truncatedDivision)
+  )
   checkAll("Long", CombinationLaws[Shadow[Long, BigInt]].signedAdditiveCMonoid)
 
   // to test ShadowInvolution

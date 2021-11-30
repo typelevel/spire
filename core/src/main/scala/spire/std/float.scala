@@ -22,7 +22,7 @@ import spire.util.Opt
 
 import java.lang.Math
 
-trait FloatIsField extends Field.WithDefaultGCD[Float] {
+trait FloatIsField extends Field[Float] {
   override def minus(a: Float, b: Float): Float = a - b
   def negate(a: Float): Float = -a
   def one: Float = 1.0f
@@ -136,6 +136,7 @@ trait FloatSigned extends Signed[Float] with FloatOrder {
 }
 
 trait FloatTruncatedDivision extends TruncatedDivisionCRing[Float] with FloatSigned {
+  def order = this
   def toBigIntOpt(a: Float): Opt[BigInt] = if (a.isWhole) Opt(BigDecimal(a.toDouble).toBigInt) else Opt.empty[BigInt]
   def tquot(a: Float, b: Float): Float = (a - (a % b)) / b
   def tmod(a: Float, b: Float): Float = a % b
@@ -155,7 +156,8 @@ class FloatAlgebra extends FloatIsField with FloatIsNRoot with FloatIsTrig with 
 
 trait FloatInstances {
   implicit final val FloatAlgebra
-    : Field.WithDefaultGCD[Float] with NRoot[Float] with Trig[Float] with IsRational[Float] = new FloatAlgebra
+    : Field[Float] with NRoot[Float] with Trig[Float] with IsRational[Float] with Order[Float] =
+    new FloatAlgebra
   import Float._
   import spire.math.NumberTag
   import spire.math.NumberTag._
