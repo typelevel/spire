@@ -15,62 +15,72 @@
 
 package spire
 package benchmark
-/*
 
-import scala.util.Random
-
-import spire.math._
+import org.openjdk.jmh.annotations._
 import spire.implicits._
-
-import com.google.caliper.Param
+import spire.math._
 
 import java.lang.Math
+import java.util.concurrent.TimeUnit
+import scala.util.Random
 
-object NaturalBenchmarks extends MyRunner(classOf[NaturalBenchmarks])
+import Arrays.init
 
-class NaturalBenchmarks extends MyBenchmark {
-  import spire.math.SafeLong.SafeLongAlgebra
-
-  //@Param(Array("8", "16", "32", "64", "96", "128", "192", "256"))
-  //@Param(Array("8"))
+@BenchmarkMode(Array(Mode.AverageTime))
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@State(Scope.Thread)
+class NaturalBenchmarks {
   @Param(Array("8", "16", "32", "64", "128"))
   var bits: Int = 0
 
-  //@Param(Array("10", "15", "20"))
+  // @Param(Array("10", "15", "20"))
   @Param(Array("10"))
   var pow: Int = 0
 
-  var size: Int = 0
+  var nats: Array[Natural] = null
+  var bigints: Array[BigInt] = null
+  var safes: Array[SafeLong] = null
 
-  var nats: Array[Natural] = _
-  var bigints: Array[BigInt] = _
-  var safes: Array[SafeLong] = _
-
-  override def setUp(): Unit = {
-    size = Math.pow(2, pow).toInt
+  @Setup
+  def setUp(): Unit = {
+    val size = Math.pow(2, pow).toInt
     bigints = init(size)(BigInt(bits, Random))
     nats = bigints.map(Natural(_))
     safes = bigints.map(SafeLong(_))
   }
 
-  def timeNaturalSum(reps: Int) = run(reps)(nats.qsum)
-  def timeBigIntSum(reps: Int) = run(reps)(bigints.qsum)
-  def timeSafeLongSums(reps: Int) = run(reps)(safes.qsum)
+  @Benchmark
+  def timeNaturalSum() = nats.qsum
 
-  def timeNaturalSumDoubles(reps: Int) = run(reps)(nats.map(n => n << 1).qsum)
-  def timeBigIntSumDoubles(reps: Int) = run(reps)(bigints.map(n => n << 1).qsum)
-  def timeSafeLongSumDoubles(reps: Int) = run(reps)(safes.map(n => n * 2).qsum)
+  @Benchmark
+  def timeBigIntSum() = bigints.qsum
+  @Benchmark
+  def timeSafeLongSums() = safes.qsum
 
-  def timeNaturalSumSquares(reps: Int) = run(reps)(nats.map(n => n * n).qsum)
-  def timeBigIntSumSquares(reps: Int) = run(reps)(bigints.map(n => n * n).qsum)
-  def timeSafeLongSumSquares(reps: Int) = run(reps)(safes.map(n => n * n).qsum)
+  @Benchmark
+  def timeNaturalSumDoubles() = nats.map(n => n << 1).qsum
 
-  def timeNaturalSumNormalized(reps: Int) = run(reps)(nats.map(n => n / UInt(10)).qsum)
-  def timeBigIntSumNormalized(reps: Int) = run(reps)(bigints.map(n => n / 10).qsum)
-  def timeSafeLongSumNormalized(reps: Int) = run(reps)(safes.map(n => n / 10).qsum)
+  @Benchmark
+  def timeBigIntSumDoubles() = bigints.map(n => n << 1).qsum
+  @Benchmark
+  def timeSafeLongSumDoubles() = safes.map(n => n * 2).qsum
+  @Benchmark
+  def timeNaturalSumSquares() = nats.map(n => n * n).qsum
+  @Benchmark
+  def timeBigIntSumSquares() = bigints.map(n => n * n).qsum
+  @Benchmark
+  def timeSafeLongSumSquares() = safes.map(n => n * n).qsum
 
-  def timeNaturalMin(reps: Int) = run(reps)(nats.qmin)
-  def timeBigIntMin(reps: Int) = run(reps)(bigints.qmin)
-  def timeSafeLongMin(reps: Int) = run(reps)(safes.qmin)
+  @Benchmark
+  def timeNaturalSumNormalized() = nats.map(n => n / UInt(10)).qsum
+  @Benchmark
+  def timeBigIntSumNormalized() = bigints.map(n => n / 10).qsum
+  @Benchmark
+  def timeSafeLongSumNormalized() = safes.map(n => n / 10).qsum
+  @Benchmark
+  def timeNaturalMin() = nats.qmin
+  @Benchmark
+  def timeBigIntMin() = bigints.qmin
+  @Benchmark
+  def timeSafeLongMin() = safes.qmin
 }
- */
