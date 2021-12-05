@@ -15,26 +15,34 @@
 
 package spire
 package benchmark
-/*
 
 import scala.util.Random
 import Random._
+import org.openjdk.jmh.annotations._
+import java.util.concurrent.TimeUnit
+import Arrays.init
 
 import spire.implicits._
 
-object PowBenchmarks extends MyRunner(classOf[PowBenchmarks])
-
-class PowBenchmarks extends MyBenchmark {
+@BenchmarkMode(Array(Mode.AverageTime))
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@State(Scope.Thread)
+class PowBenchmarks {
 
   var longs: Array[Long] = null
   var ints: Array[Int] = null
+  var doubles: Array[Double] = null
 
-  override def setUp(): Unit = {
-    ints = init(200000)(nextInt)
-    longs = init(200000)(nextLong)
+  @Setup
+  def setUp(): Unit = {
+    val l = 200000
+    ints = init(l)(nextInt)
+    longs = init(l)(nextLong)
+    doubles = init(l)(nextDouble)
   }
 
-  def timeLongPowForInt(reps:Int) = run(reps) {
+  @Benchmark
+  def timeLongPowForInt(): Int = {
     var t = 0
     ints.foreach { n =>
       t += spire.math.pow(n.toLong, 2.toLong).toInt
@@ -42,7 +50,8 @@ class PowBenchmarks extends MyBenchmark {
     t
   }
 
-  def timeDoublePowForInt(reps:Int) = run(reps) {
+  @Benchmark
+  def timeDoublePowForInt(): Int = {
     var t = 0
     ints.foreach { n =>
       t += spire.math.pow(n.toDouble, 2.0).toInt
@@ -50,15 +59,17 @@ class PowBenchmarks extends MyBenchmark {
     t
   }
 
-  def timeBigIntPowForInt(reps:Int) = run(reps) {
+  @Benchmark
+  def timeBigIntPowForInt(): Int = {
     var t = 0
     ints.foreach { n =>
-      t += (BigInt(n) pow 2).toInt
+      t += BigInt(n).pow(2).toInt
     }
     t
   }
 
-  def timeLongPowForLong(reps:Int) = run(reps) {
+  @Benchmark
+  def timeLongPowForLong(): Long = {
     var t = 0L
     longs.foreach { n =>
       t += spire.math.pow(n, 2L)
@@ -66,7 +77,8 @@ class PowBenchmarks extends MyBenchmark {
     t
   }
 
-  def timeDoublePowForLong(reps:Int) = run(reps) {
+  @Benchmark
+  def timeDoublePowForLong(): Long = {
     var t = 0L
     longs.foreach { n =>
       t += spire.math.pow(n.toDouble, 2.0).toLong
@@ -74,20 +86,21 @@ class PowBenchmarks extends MyBenchmark {
     t
   }
 
-  def timeBigIntPowForLong(reps:Int) = run(reps) {
+  @Benchmark
+  def timeBigIntPowForLong(): Long = {
     var t = 0L
     longs.foreach { n =>
-      t += (BigInt(n) pow 2).toLong
+      t += BigInt(n).pow(2).toLong
     }
     t
   }
 
-  def timeDoublePowForDouble(reps:Int) = run(reps) {
+  @Benchmark
+  def timeDoublePowForDouble(): Double = {
     var t = 0.0
-    longs.foreach { n =>
+    doubles.foreach { n =>
       t += spire.math.pow(n, 2.0)
     }
     t
   }
 }
- */

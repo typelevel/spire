@@ -15,31 +15,36 @@
 
 package spire
 package benchmark
-
-/*
 import spire.implicits._
 import spire.math._
-
+import spire.benchmark.ArrayOrder
+import Arrays.mkarray
 import scala.util.Random._
-import com.google.caliper.Param
+import org.openjdk.jmh.annotations._
+import java.util.concurrent.TimeUnit
 
-object RexBenchmarks extends MyRunner(classOf[RexBenchmarks])
-
-class RexBenchmarks extends MyBenchmark with BenchmarkData {
+@BenchmarkMode(Array(Mode.AverageTime))
+@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@State(Scope.Thread)
+class RexBenchmarks {
   @Param(Array("10", "12", "14", "16", "18"))
   var pow: Int = 0
 
   var fs: Array[Float] = null
   var ds: Array[Double] = null
 
-  override protected def setUp(): Unit = {
+  @Setup
+  def setUp(): Unit = {
     val size = spire.math.pow(2, pow).toInt
-    fs = mkarray(size, "random")(nextGaussian.toFloat)
-    ds = mkarray(size, "random")(nextGaussian)
+    fs = mkarray(size, ArrayOrder.Random)(nextGaussian.toFloat)
+    ds = mkarray(size, ArrayOrder.Random)(nextGaussian)
   }
 
-  def timeDirect(reps:Int): Unit = run(reps)(runDirect(fs, ds, 20))
-  def timeGeneric(reps:Int): Unit = run(reps)(runGeneric(fs, ds, 20))
+  @Benchmark
+  def timeDirect(): Unit = runDirect(fs, ds, 20)
+
+  @Benchmark
+  def timeGeneric(): Unit = runGeneric(fs, ds, 20)
 
   def runDirect(a: Array[Float], b: Array[Double], n: Int): Double = {
     (for (i <- 2 to n by 2) yield nearlyMaxF(a, n) + nearlyMaxD(b, n)).sum
@@ -115,4 +120,3 @@ class RexBenchmarks extends MyBenchmark with BenchmarkData {
     ai(k)
   }
 }
- */
