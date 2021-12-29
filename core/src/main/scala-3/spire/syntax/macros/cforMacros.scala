@@ -20,15 +20,35 @@ import collection.immutable.NumericRange
 
 import spire.syntax.fastFor.{RangeElem, RangeLike}
 
-inline def fastForInline[R](inline init: R,
-                            inline test: R => Boolean,
-                            inline next: R => R,
-                            inline body: R => Unit
-): Unit =
-  var index = init
-  while test(index) do
-    body(index)
-    index = next(index)
+def fastForImpl[R: Type](init: Expr[R], test: Expr[R => Boolean], next: Expr[R => R], body: Expr[R => Unit])(using
+  Quotes
+): Expr[Unit] =
+
+  def fastCode =
+    for
+      testOpt <- Util.tryOpt(test)
+      nextOpt <- Util.tryOpt(next)
+      bodyOpt <- Util.tryOpt(body)
+    yield
+      '{
+        var index = $init
+        while $testOpt(index) do
+          $bodyOpt(index)
+          index = $nextOpt(index)
+      }
+
+  def slowCode = '{
+    val testSlow = $test
+    val nextSlow = $next
+    val bodySlow = $body
+    var index = $init
+    while testSlow(index) do
+      bodySlow(index)
+      index = nextSlow(index)
+  }
+
+  fastCode.getOrElse(slowCode)
+end fastForImpl
 
 def fastForRangeMacroGen[R <: RangeLike: Type](r: Expr[R], body: Expr[RangeElem[R] => Unit])(using
   quotes: Quotes
@@ -173,3 +193,10 @@ def fastForRangeMacro(r: Expr[Range], body: Expr[Int => Unit])(using quotes: Quo
       '{ val b = $body; $r.foreach(b) }
 
 end fastForRangeMacro
+
+private object Util:
+  def tryOpt[A: Type, B: Type](f: Expr[A => B])(using Quotes): Option[Expr[A => B]] =
+    import quotes.reflect.*
+    f.asTerm.underlyingArgument match
+      case x: Closure => Some(Expr.betaReduce(f))
+      case _ => None

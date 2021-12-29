@@ -27,7 +27,7 @@ trait FastForSyntax:
     case NumericRange[Long] => Long
 
   inline def fastFor[A](inline init: A)(inline test: A => Boolean, inline next: A => A)(inline body: A => Unit): Unit =
-    fastForInline(init, test, next, body)
+    ${ fastForImpl('init, 'test, 'next, 'body) }
 
   inline def fastForRange[R <: RangeLike](inline r: R)(inline body: RangeElem[R] => Unit): Unit =
     ${ fastForRangeMacroGen('r, 'body) }
