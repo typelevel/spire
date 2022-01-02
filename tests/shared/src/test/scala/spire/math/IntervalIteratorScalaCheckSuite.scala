@@ -54,7 +54,7 @@ class IntervalIteratorScalaCheckSuite extends munit.ScalaCheckSuite {
         val triples = List((cc, true, true), (oo, false, false), (oc, false, true), (co, true, false))
         triples.forall { case (interval, hasLower, hasUpper) =>
           testEndpoints(interval, step, hasLower, hasUpper) &&
-            testEndpoints(interval, -step, hasLower, hasUpper)
+          testEndpoints(interval, -step, hasLower, hasUpper)
         }
       }
     }

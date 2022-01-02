@@ -115,14 +115,14 @@ private[spire] trait Fuser[C <: Context, A] {
   private def isExactLift(tree: Tree): Boolean = tree match {
     case q"$lift($exact)($ev)" =>
       (typeCheck(c)(tree).tpe <:< c.weakTypeOf[FpFilter[A]]) &&
-        (typeCheck(c)(exact).tpe <:< c.weakTypeOf[FpFilterExact[A]])
+      (typeCheck(c)(exact).tpe <:< c.weakTypeOf[FpFilterExact[A]])
     case _ => false
   }
 
   private def isApproxLift(tree: Tree): Boolean = tree match {
     case q"$lift($approx)($ev)" =>
       (typeCheck(c)(tree).tpe <:< c.weakTypeOf[FpFilter[A]]) &&
-        (typeCheck(c)(approx).tpe <:< c.weakTypeOf[FpFilterApprox[A]])
+      (typeCheck(c)(approx).tpe <:< c.weakTypeOf[FpFilterApprox[A]])
     case _ => false
   }
 
