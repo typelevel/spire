@@ -17,6 +17,7 @@ package spire.syntax.macros
 
 import scala.quoted.*
 import scala.collection.immutable.NumericRange
+import scala.PartialFunction.cond
 
 import spire.syntax.fastFor.{RangeElem, RangeLike}
 
@@ -114,18 +115,25 @@ private object RangeForImpl:
 
 end RangeForImpl
 
+/**
+ * Equivalent to `'{ val name: A => B = $rhs; ${in('name)} }`, except when `rhs` is a function literal, then equivalent
+ * to `in(rhs)`.
+ *
+ * This allows inlined function arguments to perform side-effects only once before their first evaluation, while still
+ * avoiding the creation of closures for function literal arguments.
+ */
 private def letFunc[A, B, C](using Quotes)(name: String, rhs: Expr[A => B])(in: Expr[A => B] => Expr[C]): Expr[C] =
   import quotes.reflect.*
 
   extension (t: Term) def unsafeAsExpr[A] = t.asExpr.asInstanceOf[Expr[A]] // cast without `quoted.Type[A]`
 
-  def isFunctionLiteral[A, B](f: Expr[A => B]): Boolean =
-    f.asTerm.underlyingArgument match
-      case Block(List(ddef), Closure(ref, _)) => ref.symbol == ddef.symbol
-      case _                                  => false
+  def isFunctionLiteral[A, B](f: Expr[A => B]): Boolean = cond(f.asTerm.underlyingArgument) { case Lambda(_, _) =>
+    true
+  }
 
-  def let[A, B](name: String, f: Expr[A])(in: Expr[A] => Expr[B]): Expr[B] =
-    ValDef.let(Symbol.spliceOwner, name, f.asTerm)(ref => in(ref.unsafeAsExpr[A]).asTerm).unsafeAsExpr[B]
+  def let[A, B](name: String, rhs: Expr[A])(in: Expr[A] => Expr[B])(using Quotes): Expr[B] =
+    // Equivalent to `'{ val name = $rhs; ${in('name)} }`
+    ValDef.let(Symbol.spliceOwner, name, rhs.asTerm)(ref => in(ref.unsafeAsExpr[A]).asTerm).unsafeAsExpr[B]
 
   if isFunctionLiteral(rhs) then in(Expr.betaReduce(rhs))
   else let(name, rhs)(in)
