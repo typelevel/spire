@@ -23,14 +23,14 @@ import org.openjdk.jmh.annotations._
 import scala.util.Random
 import Random._
 
-import spire.syntax.fastFor._
+import spire.syntax.cfor._
 
 import Arrays.init
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @State(Scope.Thread)
-class FastForBenchmarks {
+class CForBenchmarks {
   // @Param(Array("10", "15", "20", "25"))
   // @Param(Array("1000", "10000", "100000", "1000000"))
   @Param(Array("1000000"))
@@ -314,55 +314,55 @@ class FastForBenchmarks {
   }
 
   @Benchmark
-  def doFastForOr: Long = {
+  def doCForOr: Long = {
     var t: Long = 0L
     val len = size - 1
-    fastFor(0)(_ < len, _ + 1) { i => t = t ^ or(arr(i), arr(i + 1)) }
+    cfor(0)(_ < len, _ + 1) { i => t = t ^ or(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    fastFor(0)(_ < len2, _ + 1) { i => t = t ^ or(arr(i + 3), arr(i + 2)) }
+    cfor(0)(_ < len2, _ + 1) { i => t = t ^ or(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    fastFor(0)(_ < len3, _ + 1) { i => t = t ^ or(arr(i + 1), arr(i + 2)) }
+    cfor(0)(_ < len3, _ + 1) { i => t = t ^ or(arr(i + 1), arr(i + 2)) }
 
     t
   }
 
   @Benchmark
-  def doFastForMin: Long = {
+  def doCForMin: Long = {
     var t: Long = 0L
     val len = size - 1
-    fastFor(0)(_ < len, _ + 1) { i => t = t ^ min(arr(i), arr(i + 1)) }
+    cfor(0)(_ < len, _ + 1) { i => t = t ^ min(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    fastFor(0)(_ < len2, _ + 1) { i => t = t ^ min(arr(i + 3), arr(i + 2)) }
+    cfor(0)(_ < len2, _ + 1) { i => t = t ^ min(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    fastFor(0)(_ < len3, _ + 1) { i => t = t ^ min(arr(i + 1), arr(i + 2)) }
+    cfor(0)(_ < len3, _ + 1) { i => t = t ^ min(arr(i + 1), arr(i + 2)) }
 
     t
   }
 
   @Benchmark
-  def doFastForGcd: Long = {
+  def doCForGcd: Long = {
     var t: Long = 0L
     val len = size - 1
-    fastFor(0)(_ < len, _ + 1) { i => t = t ^ gcd(arr(i), arr(i + 1)) }
+    cfor(0)(_ < len, _ + 1) { i => t = t ^ gcd(arr(i), arr(i + 1)) }
 
     val len2 = size / 2
-    fastFor(0)(_ < len2, _ + 1) { i => t = t ^ gcd(arr(i + 3), arr(i + 2)) }
+    cfor(0)(_ < len2, _ + 1) { i => t = t ^ gcd(arr(i + 3), arr(i + 2)) }
 
     val len3 = size / 3
-    fastFor(0)(_ < len3, _ + 1) { i => t = t ^ gcd(arr(i + 1), arr(i + 2)) }
+    cfor(0)(_ < len3, _ + 1) { i => t = t ^ gcd(arr(i + 1), arr(i + 2)) }
 
     t
   }
 
   @Benchmark
-  def doFastForIntArrayMultiply: Array[Long] = {
+  def doCForIntArrayMultiply: Array[Long] = {
     val arr2 = arr.clone
     val len = size
-    fastFor(0)(_ < len, _ + 1) { i =>
+    cfor(0)(_ < len, _ + 1) { i =>
       {
         val value = arr2(i)
         arr2(i) = value * 2

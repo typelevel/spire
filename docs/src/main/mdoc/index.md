@@ -431,7 +431,7 @@ object SIDemo {
 }
 ```
 
-Spire also provides a loop macro called `fastFor` (previously known as `cfor`) whose syntax bears a slight
+Spire also provides a loop macro called `cfor` (previously known as `cfor`) whose syntax bears a slight
 resemblance to a traditional for-loop from C or Java. This macro expands to a
 tail-recursive function, which will inline literal function arguments.
 
@@ -439,20 +439,20 @@ The macro can be nested in itself and compares favorably with other looping
 constructs in Scala such as `for` and `while`:
 
 ```scala mdoc:silent:nest
-import spire.syntax.fastFor._
+import spire.syntax.cfor._
 
 // print numbers 1 through 10
-fastFor(0)(_ < 10, _ + 1) { i =>
+cfor(0)(_ < 10, _ + 1) { i =>
   println(i)
 }
 
 // naive sorting algorithm
 def selectionSort(ns: Array[Int]) = {
   val limit = ns.length -1
-  fastFor(0)(_ < limit, _ + 1) { i =>
+  cfor(0)(_ < limit, _ + 1) { i =>
     var k = i
     val n = ns(i)
-    fastFor(i + 1)(_ <= limit, _ + 1) { j =>
+    cfor(i + 1)(_ <= limit, _ + 1) { j =>
       if (ns(j) < ns(k)) k = j
     }
     ns(i) = ns(k)

@@ -13,21 +13,27 @@
  * \***********************************************************************
  */
 
-package spire.syntax
+package spire
+package syntax
 
-// For internal use only, to help with cross-compilation
-@deprecated
-private[spire] trait CforSyntax:
-  @deprecated
-  private[spire] inline def cfor[A](inline init: A)(inline test: A => Boolean, inline next: A => A)(
-    inline body: A => Unit
+trait CforSyntax:
+  import macros._
+  import collection.immutable.NumericRange
+
+  final type RangeLike = Range | NumericRange[Long]
+
+  final type RangeElem[X <: RangeLike] = X match
+    case Range              => Int
+    case NumericRange[Long] => Long
+
+  inline def cfor[A](inline init: A)(inline test: A => Boolean, inline next: A => A)(inline body: A => Unit): Unit =
+    ${ cforImpl('init, 'test, 'next, 'body) }
+
+  inline def cforRange[R <: RangeLike](inline r: R)(inline body: RangeElem[R] => Unit): Unit =
+    ${ cforRangeMacroGen('r, 'body) }
+
+  inline def cforRange2[R <: RangeLike](inline r1: R, inline r2: R)(
+    inline body: (RangeElem[R], RangeElem[R]) => Unit
   ): Unit =
-    fastFor.fastFor(init)(test, next)(body)
-
-  @deprecated
-  private[spire] inline def cforRange(inline r: Range)(inline body: Int => Unit): Unit =
-    fastFor.fastForRange(r)(body)
-
-  @deprecated
-  private[spire] inline def cforRange2(inline r1: Range, inline r2: Range)(inline body: (Int, Int) => Unit): Unit =
-    fastFor.fastForRange2(r1, r2)(body)
+    cforRange(r1) { x => cforRange(r2) { y => body(x, y) } }
+end CforSyntax

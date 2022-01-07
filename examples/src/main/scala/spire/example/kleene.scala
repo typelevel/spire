@@ -156,8 +156,8 @@ object KleeneDemo {
     def apply[A: ClassTag](f: (Int, Int) => A)(implicit dim: Dim): Matrix[A] = {
       val n = dim.n
       val arr = new Array[A](n * n)
-      fastFor(0)(_ < n, _ + 1) { y =>
-        fastFor(0)(_ < n, _ + 1) { x =>
+      cfor(0)(_ < n, _ + 1) { y =>
+        cfor(0)(_ < n, _ + 1) { x =>
           arr(y * n + x) = f(x, y)
         }
       }
@@ -200,7 +200,7 @@ object KleeneDemo {
     def *(rhs: Matrix[A])(implicit rig: Rig[A]): Matrix[A] =
       Matrix { (x, y) =>
         var total = rig.zero
-        fastFor(0)(_ < dim.n, _ + 1)(j => total += lhs(j, y) * rhs(x, j))
+        cfor(0)(_ < dim.n, _ + 1)(j => total += lhs(j, y) * rhs(x, j))
         total
       }
   }
@@ -211,10 +211,10 @@ object KleeneDemo {
       val s = Show[A]
       val n = m.dim.n
       val lines = Array.fill(n)("")
-      fastFor(0)(_ < n, _ + 1) { x =>
-        fastFor(0)(_ < n, _ + 1)(y => lines(y) += s.show(m(x, y)) + " ")
+      cfor(0)(_ < n, _ + 1) { x =>
+        cfor(0)(_ < n, _ + 1)(y => lines(y) += s.show(m(x, y)) + " ")
         val len = lines.foldLeft(0)(_ max _.length)
-        fastFor(0)(_ < n, _ + 1)(y => lines(y) += " " * (len - lines(y).length))
+        cfor(0)(_ < n, _ + 1)(y => lines(y) += " " * (len - lines(y).length))
       }
       lines.mkString("\n") + "\n"
     }
