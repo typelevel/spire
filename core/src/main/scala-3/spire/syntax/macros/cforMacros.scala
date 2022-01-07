@@ -19,9 +19,9 @@ import scala.quoted.*
 import scala.collection.immutable.NumericRange
 import scala.PartialFunction.cond
 
-import spire.syntax.fastFor.{RangeElem, RangeLike}
+import spire.syntax.cfor.{RangeElem, RangeLike}
 
-def fastForImpl[R: Type](init: Expr[R], test: Expr[R => Boolean], next: Expr[R => R], body: Expr[R => Unit])(using
+def cforImpl[R: Type](init: Expr[R], test: Expr[R => Boolean], next: Expr[R => R], body: Expr[R => Unit])(using
   Quotes
 ): Expr[Unit] =
   import quotes.reflect.*
@@ -34,9 +34,9 @@ def fastForImpl[R: Type](init: Expr[R], test: Expr[R => Boolean], next: Expr[R =
   }
 
   letFunc("test", test)(t => letFunc("next", next)(n => letFunc("body", body)(b => code(t, n, b))))
-end fastForImpl
+end cforImpl
 
-def fastForRangeMacroGen[R <: RangeLike: Type](r: Expr[R], body: Expr[RangeElem[R] => Unit])(using
+def cforRangeMacroGen[R <: RangeLike: Type](r: Expr[R], body: Expr[RangeElem[R] => Unit])(using
   quotes: Quotes
 ): Expr[Unit] =
   import quotes.reflect.*
@@ -46,7 +46,7 @@ def fastForRangeMacroGen[R <: RangeLike: Type](r: Expr[R], body: Expr[RangeElem[
     case '{ $r: NumericRange[Long] } => RangeForImpl.ofLong(r, body.asExprOf[Long => Unit])
     case '{ $r }                     => report.error(s"Ineligible Range type ", r); '{}
 
-end fastForRangeMacroGen
+end cforRangeMacroGen
 
 private object RangeForImpl:
   type Code[T] = Expr[T => Unit] => Expr[Unit]
