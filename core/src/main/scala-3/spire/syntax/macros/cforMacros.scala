@@ -15,157 +15,125 @@
 
 package spire.syntax.macros
 
-import quoted._
-import collection.immutable.NumericRange
+import scala.quoted.*
+import scala.collection.immutable.NumericRange
+import scala.PartialFunction.cond
 
 import spire.syntax.fastFor.{RangeElem, RangeLike}
 
-inline def fastForInline[R](init: R, test: R => Boolean, next: R => R, body: R => Unit): Unit =
-  var index = init
-  while test(index) do
-    body(index)
-    index = next(index)
+def fastForImpl[R: Type](init: Expr[R], test: Expr[R => Boolean], next: Expr[R => R], body: Expr[R => Unit])(using
+  Quotes
+): Expr[Unit] =
+  import quotes.reflect.*
+
+  def code(testRef: Expr[R => Boolean], nextRef: Expr[R => R], bodyRef: Expr[R => Unit]): Expr[Unit] = '{
+    var index = $init
+    while $testRef(index) do
+      $bodyRef(index)
+      index = $nextRef(index)
+  }
+
+  letFunc("test", test)(t => letFunc("next", next)(n => letFunc("body", body)(b => code(t, n, b))))
+end fastForImpl
 
 def fastForRangeMacroGen[R <: RangeLike: Type](r: Expr[R], body: Expr[RangeElem[R] => Unit])(using
   quotes: Quotes
 ): Expr[Unit] =
-  import quotes._
-  import quotes.reflect._
+  import quotes.reflect.*
 
-  type RangeL = NumericRange[Long]
-
-  (r, body) match
-    case '{ $r: Range } -> '{ $body: (Int => Unit) }               => fastForRangeMacro(r, body)
-    case '{ $r: NumericRange[Long] } -> '{ $body: (Long => Unit) } => fastForRangeMacroLong(r, body)
-    case '{ $r } -> _                                              => report.error(s"Ineligible Range type ", r); '{}
+  r match
+    case '{ $r: Range }              => RangeForImpl.ofInt(r, body.asExprOf[Int => Unit])
+    case '{ $r: NumericRange[Long] } => RangeForImpl.ofLong(r, body.asExprOf[Long => Unit])
+    case '{ $r }                     => report.error(s"Ineligible Range type ", r); '{}
 
 end fastForRangeMacroGen
 
-def fastForRangeMacroLong(r: Expr[NumericRange[Long]], body: Expr[Long => Unit])(using quotes: Quotes): Expr[Unit] =
-  import quotes._
+private object RangeForImpl:
+  type Code[T] = Expr[T => Unit] => Expr[Unit]
+  type Test[T] = (Expr[T], Expr[T]) => Expr[Boolean]
+
+  def ofInt(r: Expr[Range], body: Expr[Int => Unit])(using Quotes): Expr[Unit] =
+    val code: Code[Int] = r match
+      case '{ ($i: Int) to $j }                              => loopCode(i, j, 1, (x, y) => '{ $x <= $y })
+      case '{ ($i: Int) to $j by ${ Expr(k) } } if k > 0     => loopCode(i, j, k, (x, y) => '{ $x <= $y })
+      case '{ ($i: Int) to $j by ${ Expr(k) } } if k < 0     => loopCode(i, j, k, (x, y) => '{ $x >= $y })
+      case '{ ($i: Int) to $j by ${ Expr(k) } } if k == 0    => zeroStride(r)
+      case '{ ($i: Int) until $j }                           => loopCode(i, j, 1, (x, y) => '{ $x < $y })
+      case '{ ($i: Int) until $j by ${ Expr(k) } } if k > 0  => loopCode(i, j, k, (x, y) => '{ $x < $y })
+      case '{ ($i: Int) until $j by ${ Expr(k) } } if k < 0  => loopCode(i, j, k, (x, y) => '{ $x > $y })
+      case '{ ($i: Int) until $j by ${ Expr(k) } } if k == 0 => zeroStride(r)
+      case _                                                 => deOpt(r, '{ $r.foreach($body) })
+
+    letFunc("body", body)(code)
+  end ofInt
+
+  def ofLong(r: Expr[NumericRange[Long]], body: Expr[Long => Unit])(using quotes: Quotes): Expr[Unit] =
+    val code: Code[Long] = r match
+      case '{ ($i: Long) to $j }                              => loopCode(i, j, 1L, (x, y) => '{ $x <= $y })
+      case '{ ($i: Long) to $j by ${ Expr(k) } } if k > 0     => loopCode(i, j, k, (x, y) => '{ $x <= $y })
+      case '{ ($i: Long) to $j by ${ Expr(k) } } if k < 0     => loopCode(i, j, k, (x, y) => '{ $x >= $y })
+      case '{ ($i: Long) to $j by ${ Expr(k) } } if k == 0    => zeroStride(r)
+      case '{ ($i: Long) until $j }                           => loopCode(i, j, 1L, (x, y) => '{ $x < $y })
+      case '{ ($i: Long) until $j by ${ Expr(k) } } if k > 0  => loopCode(i, j, k, (x, y) => '{ $x < $y })
+      case '{ ($i: Long) until $j by ${ Expr(k) } } if k < 0  => loopCode(i, j, k, (x, y) => '{ $x > $y })
+      case '{ ($i: Long) until $j by ${ Expr(k) } } if k == 0 => zeroStride(r)
+      case _                                                  => deOpt(r, '{ $r.foreach($body) })
+
+    letFunc("body", body)(code)
+
+  end ofLong
+
+  def loopCode[T: Type: ToExpr: CanLoop](i: Expr[T], j: Expr[T], s: T, test: Test[T])(using Quotes): Code[T] =
+    body =>
+      '{
+        var index = $i
+        val limit = $j
+        while ${ test('index, 'limit) } do
+          $body(index)
+          index = ${ 'index.stepBy(Expr(s)) }
+      }
+
+  def zeroStride[T, R](orig: Expr[R])(using Quotes): Code[T] = _ =>
+    import quotes.reflect.*
+    report.error("zero stride", orig)
+    '{}
+
+  def deOpt[T, R](orig: Expr[R], foreach: Expr[Unit])(using Quotes): Code[T] = _ =>
+    import quotes.reflect.*
+    report.warning(s"defaulting to foreach, can not optimise range expression", orig)
+    foreach
+
+  trait CanLoop[T]:
+    extension (x: Expr[T]) def stepBy(y: Expr[T])(using Quotes): Expr[T]
+
+  object CanLoop:
+    given CanLoop[Int] with
+      extension (x: Expr[Int]) def stepBy(y: Expr[Int])(using Quotes): Expr[Int] = '{ $x + $y }
+
+    given CanLoop[Long] with
+      extension (x: Expr[Long]) def stepBy(y: Expr[Long])(using Quotes): Expr[Long] = '{ $x + $y }
+
+end RangeForImpl
+
+/**
+ * Equivalent to `'{ val name: A => B = $rhs; ${in('name)} }`, except when `rhs` is a function literal, then equivalent
+ * to `in(rhs)`.
+ *
+ * This allows inlined function arguments to perform side-effects only once before their first evaluation, while still
+ * avoiding the creation of closures for function literal arguments.
+ */
+private def letFunc[A, B, C](using Quotes)(name: String, rhs: Expr[A => B])(in: Expr[A => B] => Expr[C]): Expr[C] =
   import quotes.reflect.*
 
-  def strideUpUntil(fromExpr: Expr[Long], untilExpr: Expr[Long], stride: Expr[Long]): Expr[Unit] = '{
-    var index = $fromExpr
-    val limit = $untilExpr
-    val body0 = $body
-    while index < limit do
-      ${ Expr.betaReduce(body) }(index)
-      index += $stride
+  extension (t: Term) def unsafeAsExpr[A] = t.asExpr.asInstanceOf[Expr[A]] // cast without `quoted.Type[A]`
+
+  def isFunctionLiteral[A, B](f: Expr[A => B]): Boolean = cond(f.asTerm.underlyingArgument) { case Lambda(_, _) =>
+    true
   }
 
-  def strideUpTo(fromExpr: Expr[Long], untilExpr: Expr[Long], stride: Expr[Long]): Expr[Unit] = '{
-    var index = $fromExpr
-    val end = $untilExpr
-    while index <= end do
-      ${ Expr.betaReduce(body) }(index)
-      index += $stride
-  }
+  def let[A, B](name: String, rhs: Expr[A])(in: Expr[A] => Expr[B])(using Quotes): Expr[B] =
+    // Equivalent to `'{ val name = $rhs; ${in('name)} }`
+    ValDef.let(Symbol.spliceOwner, name, rhs.asTerm)(ref => in(ref.unsafeAsExpr[A]).asTerm).unsafeAsExpr[B]
 
-  def strideDownTo(fromExpr: Expr[Long], untilExpr: Expr[Long], stride: Expr[Long]): Expr[Unit] = '{
-    var index = $fromExpr
-    val end = $untilExpr
-    while index >= end do
-      ${ Expr.betaReduce(body) }(index)
-      index -= $stride
-  }
-
-  def strideDownUntil(fromExpr: Expr[Long], untilExpr: Expr[Long], stride: Expr[Long]): Expr[Unit] = '{
-    var index = $fromExpr
-    val limit = $untilExpr
-    while index > limit do
-      ${ Expr.betaReduce(body) }(index)
-      index -= $stride
-  }
-
-  r match
-    case '{ ($i: Long) until $j } => strideUpUntil(i, j, Expr(1L))
-    case '{ ($i: Long) to $j }    => strideUpTo(i, j, Expr(1L))
-    case '{ ($i: Long) until $j by $step } =>
-      step.asTerm match {
-        case Literal(LongConstant(k)) if k > 0  => strideUpUntil(i, j, Expr(k))
-        case Literal(LongConstant(k)) if k < 0  => strideDownUntil(i, j, Expr(-k))
-        case Literal(LongConstant(k)) if k == 0 => report.error("zero stride", step); '{}
-        case _ =>
-          report.warning(s"defaulting to foreach, can not optimise non-constant step", step)
-          '{ val b = $body; $r.foreach(b) }
-      }
-    case '{ ($i: Long) to $j by $step } =>
-      step.asTerm match {
-        case Literal(LongConstant(k)) if k > 0  => strideUpTo(i, j, Expr(k))
-        case Literal(LongConstant(k)) if k < 0  => strideDownTo(i, j, Expr(-k))
-        case Literal(LongConstant(k)) if k == 0 => report.error("zero stride", step); '{}
-        case _ =>
-          report.warning(s"defaulting to foreach, can not optimise non-constant step", step)
-          '{ val b = $body; $r.foreach(b) }
-      }
-
-    case _ =>
-      report.warning(s"defaulting to foreach, can not optimise range expression", r)
-      '{ val b = $body; $r.foreach(b) }
-
-end fastForRangeMacroLong
-
-def fastForRangeMacro(r: Expr[Range], body: Expr[Int => Unit])(using quotes: Quotes): Expr[Unit] =
-  import quotes._
-  import quotes.reflect._
-
-  def strideUpUntil(fromExpr: Expr[Int], untilExpr: Expr[Int], stride: Expr[Int]): Expr[Unit] = '{
-    var index = $fromExpr
-    val limit = $untilExpr
-    while (index < limit) {
-      ${ Expr.betaReduce(body) }(index)
-      index += $stride
-    }
-  }
-
-  def strideUpTo(fromExpr: Expr[Int], untilExpr: Expr[Int], stride: Expr[Int]): Expr[Unit] = '{
-    var index = $fromExpr
-    val end = $untilExpr
-    while index <= end do
-      ${ Expr.betaReduce(body) }(index)
-      index += $stride
-  }
-
-  def strideDownTo(fromExpr: Expr[Int], untilExpr: Expr[Int], stride: Expr[Int]): Expr[Unit] = '{
-    var index = $fromExpr
-    val end = $untilExpr
-    while index >= end do
-      ${ Expr.betaReduce(body) }(index)
-      index -= $stride
-  }
-
-  def strideDownUntil(fromExpr: Expr[Int], untilExpr: Expr[Int], stride: Expr[Int]): Expr[Unit] = '{
-    var index = $fromExpr
-    val limit = $untilExpr
-    while index > limit do
-      ${ Expr.betaReduce(body) }(index)
-      index -= $stride
-  }
-
-  r match
-    case '{ ($i: Int) until $j } => strideUpUntil(i, j, Expr(1))
-    case '{ ($i: Int) to $j }    => strideUpTo(i, j, Expr(1))
-    case '{ ($i: Int) until $j by $step } =>
-      step.asTerm match {
-        case Literal(IntConstant(k)) if k > 0  => strideUpUntil(i, j, Expr(k))
-        case Literal(IntConstant(k)) if k < 0  => strideDownUntil(i, j, Expr(-k))
-        case Literal(IntConstant(k)) if k == 0 => report.error("zero stride", step); '{}
-        case _ =>
-          report.warning(s"defaulting to foreach, can not optimise non-constant step", step)
-          '{ val b = $body; $r.foreach(b) }
-      }
-    case '{ ($i: Int) to $j by $step } =>
-      step.asTerm match {
-        case Literal(IntConstant(k)) if k > 0  => strideUpTo(i, j, Expr(k))
-        case Literal(IntConstant(k)) if k < 0  => strideDownTo(i, j, Expr(-k))
-        case Literal(IntConstant(k)) if k == 0 => report.error("zero stride", step); '{}
-        case _ =>
-          report.warning(s"defaulting to foreach, can not optimise non-constant step", step)
-          '{ val b = $body; $r.foreach(b) }
-      }
-    case _ =>
-      report.warning(s"defaulting to foreach, can not optimise range expression", r)
-      '{ val b = $body; $r.foreach(b) }
-
-end fastForRangeMacro
+  if isFunctionLiteral(rhs) then in(Expr.betaReduce(rhs))
+  else let(name, rhs)(in)
