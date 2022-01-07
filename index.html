@@ -498,27 +498,27 @@ encounter will occur at compile-time.</p>
 <span class="o">}</span>
 </code></pre></div></div>
 
-<p>Spire also provides a loop macro called <code class="language-plaintext highlighter-rouge">fastFor</code> (previously known as <code class="language-plaintext highlighter-rouge">cfor</code>) whose syntax bears a slight
+<p>Spire also provides a loop macro called <code class="language-plaintext highlighter-rouge">cfor</code> (previously known as <code class="language-plaintext highlighter-rouge">cfor</code>) whose syntax bears a slight
 resemblance to a traditional for-loop from C or Java. This macro expands to a
 tail-recursive function, which will inline literal function arguments.</p>
 
 <p>The macro can be nested in itself and compares favorably with other looping
 constructs in Scala such as <code class="language-plaintext highlighter-rouge">for</code> and <code class="language-plaintext highlighter-rouge">while</code>:</p>
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">spire.syntax.fastFor._</span>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">spire.syntax.cfor._</span>
 
 <span class="c1">// print numbers 1 through 10</span>
-<span class="nf">fastFor</span><span class="o">(</span><span class="mi">0</span><span class="o">)(</span><span class="k">_</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">,</span> <span class="k">_</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span> <span class="n">i</span> <span class="k">=&gt;</span>
+<span class="nf">cfor</span><span class="o">(</span><span class="mi">0</span><span class="o">)(</span><span class="k">_</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">,</span> <span class="k">_</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span> <span class="n">i</span> <span class="k">=&gt;</span>
   <span class="nf">println</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
 <span class="o">}</span>
 
 <span class="c1">// naive sorting algorithm</span>
 <span class="k">def</span> <span class="nf">selectionSort</span><span class="o">(</span><span class="n">ns</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Int</span><span class="o">])</span> <span class="k">=</span> <span class="o">{</span>
   <span class="k">val</span> <span class="nv">limit</span> <span class="k">=</span> <span class="nv">ns</span><span class="o">.</span><span class="py">length</span> <span class="o">-</span><span class="mi">1</span>
-  <span class="nf">fastFor</span><span class="o">(</span><span class="mi">0</span><span class="o">)(</span><span class="k">_</span> <span class="o">&lt;</span> <span class="n">limit</span><span class="o">,</span> <span class="k">_</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span> <span class="n">i</span> <span class="k">=&gt;</span>
+  <span class="nf">cfor</span><span class="o">(</span><span class="mi">0</span><span class="o">)(</span><span class="k">_</span> <span class="o">&lt;</span> <span class="n">limit</span><span class="o">,</span> <span class="k">_</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span> <span class="n">i</span> <span class="k">=&gt;</span>
     <span class="k">var</span> <span class="n">k</span> <span class="k">=</span> <span class="n">i</span>
     <span class="k">val</span> <span class="nv">n</span> <span class="k">=</span> <span class="nf">ns</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
-    <span class="nf">fastFor</span><span class="o">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)(</span><span class="k">_</span> <span class="o">&lt;=</span> <span class="n">limit</span><span class="o">,</span> <span class="k">_</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span> <span class="n">j</span> <span class="k">=&gt;</span>
+    <span class="nf">cfor</span><span class="o">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)(</span><span class="k">_</span> <span class="o">&lt;=</span> <span class="n">limit</span><span class="o">,</span> <span class="k">_</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span> <span class="n">j</span> <span class="k">=&gt;</span>
       <span class="nf">if</span> <span class="o">(</span><span class="nf">ns</span><span class="o">(</span><span class="n">j</span><span class="o">)</span> <span class="o">&lt;</span> <span class="nf">ns</span><span class="o">(</span><span class="n">k</span><span class="o">))</span> <span class="n">k</span> <span class="k">=</span> <span class="n">j</span>
     <span class="o">}</span>
     <span class="nf">ns</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="k">=</span> <span class="nf">ns</span><span class="o">(</span><span class="n">k</span><span class="o">)</span>
