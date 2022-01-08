@@ -85,7 +85,7 @@ jobs:
       - run: sbt ++${{ matrix.scala }} '${{ matrix.ci }}'
 
       - name: Build docs
-        if: matrix.ci == 'ciJS'
+        if: matrix.ci == 'ciJVM'
         run: sbt ++${{ matrix.scala }} doc docs/mdoc
 
       - name: Make target directories
