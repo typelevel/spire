@@ -205,7 +205,14 @@ lazy val benchmark: Project = project
   .enablePlugins(JmhPlugin)
   .dependsOn(core.jvm, extras.jvm)
 
-lazy val buildSettings = Seq()
+lazy val buildSettings = Seq(
+  scalacOptions := {
+    if (tlIsScala3.value)
+      scalacOptions.value.filterNot(Set("-source:3.0-migration"))
+    else
+      scalacOptions.value
+  }
+)
 
 lazy val commonDeps = Seq(
   libraryDependencies ++= Seq(
