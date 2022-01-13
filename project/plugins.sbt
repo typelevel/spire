@@ -15,4 +15,4 @@ addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.6")
 addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.10")
 addSbtPlugin("de.heikoseeberger" % "sbt-header" % "5.6.0")
 
-libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.7.32"
+libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.7.33"
