@@ -36,7 +36,7 @@ ThisBuild / tlBaseVersion := "0.18"
 ThisBuild / crossScalaVersions := Seq(Scala213, Scala3)
 ThisBuild / githubWorkflowJavaVersions := Seq("8", "11", "17").map(JavaSpec.temurin(_))
 ThisBuild / githubWorkflowBuild +=
-  WorkflowStep.Sbt(List("doc", "docs/mdoc"), name = Some("Build docs"), cond = Some("matrix.ci == 'ciJVM'"))
+  WorkflowStep.Sbt(List("doc", "docs/mdoc"), name = Some("Build docs"), cond = Some("matrix.project == 'rootJVM'"))
 
 ThisBuild / homepage := Some(url("https://typelevel.org/spire/"))
 ThisBuild / licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
