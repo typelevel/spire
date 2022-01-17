@@ -55,8 +55,6 @@ ThisBuild / developers := List(
   )
 )
 
-enablePlugins(TypelevelCiReleasePlugin)
-ThisBuild / tlCiReleaseBranches := Seq("main")
 ThisBuild / tlFatalWarningsInCi := false
 
 // Projects
