@@ -12,4 +12,4 @@ addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.2.24")
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.9.2")
 addSbtPlugin("com.47deg" % "sbt-microsites" % "1.3.3")
 
-libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.7.32"
+libraryDependencies += "org.slf4j" % "slf4j-nop" % "1.7.33"
