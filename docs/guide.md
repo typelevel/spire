@@ -1,10 +1,3 @@
----
-layout: home
-title:  "Guide"
-section: "Home"
-position: 1
----
-
 ## Spire User's Guide
 
 This guide explains the architecture, layout, and usage of Spire. Initially,
