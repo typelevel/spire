@@ -1,6 +1,6 @@
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
-addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.4.0-M4")
+addSbtPlugin("org.typelevel" % "sbt-typelevel" % "0.4.0")
 
 addSbtPlugin("com.github.sbt" % "sbt-unidoc" % "0.5.0")
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.10.0")
