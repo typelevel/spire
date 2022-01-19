@@ -1,125 +1,224 @@
-<!DOCTYPE html><html><head><title>Spire: Readme</title><meta charset="utf-8" /><meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Spire contributors" /><meta name="description" content="Powerful new number types and numeric abstractions for Scala" /><meta name="og:image" content="/spire/img/poster.png" /><meta name="image" property="og:image" content="/spire/img/poster.png" /><meta name="og:title" content="Spire: Readme" /><meta name="title" property="og:title" content="Spire: Readme" /><meta name="og:site_name" content="Spire" /><meta name="og:url" content="https://typelevel.org/spire" /><meta name="og:type" content="website" /><meta name="og:description" content="Powerful new number types and numeric abstractions for Scala" /><link rel="icon" type="image/png" href="/spire/img/favicon.png" /><meta name="twitter:title" content="Spire: Readme" /><meta name="twitter:image" content="/spire/img/poster.png" /><meta name="twitter:description" content="Powerful new number types and numeric abstractions for Scala" /><meta name="twitter:card" content="summary_large_image" /><link rel="icon" type="image/png" sizes="16x16" href="/spire/img/favicon16x16.png" /><link rel="icon" type="image/png" sizes="24x24" href="/spire/img/favicon24x24.png" /><link rel="icon" type="image/png" sizes="32x32" href="/spire/img/favicon32x32.png" /><link rel="icon" type="image/png" sizes="48x48" href="/spire/img/favicon48x48.png" /><link rel="icon" type="image/png" sizes="57x57" href="/spire/img/favicon57x57.png" /><link rel="icon" type="image/png" sizes="60x60" href="/spire/img/favicon60x60.png" /><link rel="icon" type="image/png" sizes="64x64" href="/spire/img/favicon64x64.png" /><link rel="icon" type="image/png" sizes="70x70" href="/spire/img/favicon70x70.png" /><link rel="icon" type="image/png" sizes="72x72" href="/spire/img/favicon72x72.png" /><link rel="icon" type="image/png" sizes="76x76" href="/spire/img/favicon76x76.png" /><link rel="icon" type="image/png" sizes="96x96" href="/spire/img/favicon96x96.png" /><link rel="icon" type="image/png" sizes="114x114" href="/spire/img/favicon114x114.png" /><link rel="icon" type="image/png" sizes="120x120" href="/spire/img/favicon120x120.png" /><link rel="icon" type="image/png" sizes="128x128" href="/spire/img/favicon128x128.png" /><link rel="icon" type="image/png" sizes="144x144" href="/spire/img/favicon144x144.png" /><link rel="icon" type="image/png" sizes="150x150" href="/spire/img/favicon150x150.png" /><link rel="icon" type="image/png" sizes="152x152" href="/spire/img/favicon152x152.png" /><link rel="icon" type="image/png" sizes="196x196" href="/spire/img/favicon196x196.png" /><link rel="icon" type="image/png" sizes="310x310" href="/spire/img/favicon310x310.png" /><link rel="icon" type="image/png" sizes="310x150" href="/spire/img/favicon310x150.png" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" /><link rel="stylesheet" href="/spire/highlight/styles/atom-one-light.css" /><link rel="stylesheet" href="/spire/css/pattern-style.css" /></head><body><header id="site-header"><div class="navbar-wrapper"><div class="container"><div class="row"><div class="col-xs-3"><a href="/spire/" class="brand"><div class="icon-wrapper"><span>Spire</span></div></a></div><div class="col-xs-9"><nav class="text-right"><ul class=""><li class="search-nav hidden-xs"><div id="search-dropdown"><label><i class="fa fa-search"></i>Search</label><input id="search-bar" type="text" placeholder="Enter keywords here..." onclick="displayToggleSearch(event)" /><ul id="search-dropdown-content" class="dropdown dropdown-content"></ul></div></li><li><a class="transparent-on-hover" href="https://github.com/typelevel/spire" target="_blank" rel="noopener noreferrer"><i class="fa fa-github"></i><span class="hidden-sm hidden-xs">GitHub</span></a></li><li><a class="transparent-on-hover" href="https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html"><i class="fa fa-file-text"></i><span class="hidden-sm hidden-xs">API Documentation</span></a></li></ul></nav></div></div></div></div><div class="jumbotron"><div class="container"><h1 class="text-center">Powerful new number types and numeric abstractions for Scala</h1><h2></h2><p class="text-center"><a href="https://github.com/typelevel/spire" target="_blank" rel="noopener noreferrer" class="btn btn-outline-inverse">View on GitHub</a></p></div></div><div id="horizontal-menu"><ul class="horizontal-nav"><li><a class=" active " href="/spire/">Readme</a></li><li><a class="" href="/spire/guide.html">Guide</a></li><li><a class="" href="/spire/extra_md/changes.html">Changes</a></li><li><a class="" href="/spire/extra_md/contributing.html">Contributing</a></li><li><a class="" href="/spire/extra_md/design.html">Design notes</a></li><li><a class="" href="/spire/extra_md/authors.html">Authors</a></li><li><a class="" href="/spire/extra_md/friends.html">Friends of Spire</a></li></ul></div></header><main id="site-main"><section class="use"><div class="container"><div id="content"><p><a href="https://github.com/typelevel/spire/actions/workflows/ci.yml"><img src="https://github.com/typelevel/spire/actions/workflows/ci.yml/badge.svg" alt="Continuous Integration" /></a>
-<a href="https://discord.gg/QNnHKHq5Ts"><img src="https://img.shields.io/discord/632277896739946517.svg?label=&amp;logo=discord&amp;logoColor=ffffff&amp;color=404244&amp;labelColor=6A7EC2" alt="Discord" /></a>
-<a href="https://codecov.io/github/typelevel/spire?branch=main"><img src="https://codecov.io/github/typelevel/spire/coverage.svg?branch=main" alt="codecov.io" /></a>
-<a href="https://index.scala-lang.org/typelevel/spire/spire"><img src="https://index.scala-lang.org/typelevel/spire/spire/latest-by-scala-version.svg" alt="spire Scala version support" /></a></p>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="Laika 0.18.1 + Helium Theme" />
+    <title>Spire</title>
+    
+    
+      <meta name="description" content="docs"/>
+    
+    
+    
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700">
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/tonsky/FiraCode@1.207/distr/fira_code.css">
+    
+    <link rel="stylesheet" type="text/css" href="helium/icofont.min.css" />
+    <link rel="stylesheet" type="text/css" href="helium/laika-helium.css" />
+    <script src="helium/laika-helium.js"></script>
+    
+    
+    <script> /* for avoiding page load transitions */ </script>
+  </head>
 
-<h2 id="spire">Spire</h2>
+  <body>
 
-<h3 id="overview">Overview</h3>
+    <header id="top-bar">
 
-<p>Spire is a numeric library for Scala which is intended to be generic, fast,
-and precise.</p>
+      <div class="row">
+        <a id="nav-icon">
+          <i class="icofont-laika" title="Navigation">&#xefa2;</i>
+        </a>
+        
+      </div>
+  
+      <a class="image-link" href="https://typelevel.org"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KCjxzdmcKICAgIHdpZHRoPSIxMjBweCIKICAgIGhlaWdodD0iNDBweCIKICAgIHZpZXdCb3g9IjAgMCAxMDU0IDM0OCIKICAgIHZlcnNpb249IjEuMSIKICAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIKICAgIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4KCiAgICA8ZGVmcz4KICAgICAgICA8bGluZWFyR3JhZGllbnQgeDE9IjAlIiB5MT0iNjElIiB4Mj0iMTAwJSIgeTI9IjM3JSIgaWQ9ImJhY2tncm91bmQtZ3JhZGllbnQiPgogICAgICAgICAgICA8c3RvcCBzdG9wLWNvbG9yPSIjRkY0QzYxIiBvZmZzZXQ9IjAlIj48L3N0b3A+CiAgICAgICAgICAgIDxzdG9wIHN0b3AtY29sb3I9IiNGNTFDMkIiIG9mZnNldD0iMTAwJSI+PC9zdG9wPgogICAgICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgICA8L2RlZnM+CgogICAgPGc+CiAgICAgICAgPHBhdGggZD0iTTQxOS43NjU3MTQsNTUuMTEwNjM4MyBMNDE5Ljc2NTcxNCwxMzMuMTI3NjYgTDM5OC41MjU3MTQsMTMzLjEyNzY2IEwzOTguNTI1NzE0LDU1LjExMDYzODMgTDM4MS4wNzg1NzEsNTUuMTEwNjM4MyBMMzgxLjA3ODU3MSwzNi45MzE5MTQ5IEw0MzcuOTcxNDI5LDM2LjkzMTkxNDkgTDQzNy45NzE0MjksNTUuMTEwNjM4MyBMNDE5Ljc2NTcxNCw1NS4xMTA2MzgzIEw0MTkuNzY1NzE0LDU1LjExMDYzODMgWiBNNDk1LjYyMjg1Nyw5OC4yODUxMDY0IEw0OTUuNjIyODU3LDEzMy4xMjc2NiBMNDc0LjM4Mjg1NywxMzMuMTI3NjYgTDQ3NC4zODI4NTcsOTguMjg1MTA2NCBMNDUwLjEwODU3MSwzNi4xNzQ0NjgxIEw0NzMuNjI0Mjg2LDM2LjE3NDQ2ODEgTDQ4NS4wMDI4NTcsNzYuMzE5MTQ4OSBMNDk2LjM4MTQyOSwzNi4xNzQ0NjgxIEw1MTkuODk3MTQzLDM2LjE3NDQ2ODEgTDQ5NS42MjI4NTcsOTguMjg1MTA2NCBMNDk1LjYyMjg1Nyw5OC4yODUxMDY0IFogTTYwMC4zMDU3MTQsNjcuMjI5Nzg3MiBDNjAwLjMwNTcxNCw3Mi41MzE5MTQ5IDU5OS41NDcxNDMsNzcuMDc2NTk1NyA1OTguMDMsODAuODYzODI5OCBDNTk2LjUxMjg1Nyw4NC42NTEwNjM4IDU5NC4yMzcxNDMsODcuNjgwODUxMSA1OTEuMjAyODU3LDkwLjcxMDYzODMgQzU4OC4xNjg1NzEsOTMuNzQwNDI1NSA1ODUuMTM0Mjg2LDk1LjI1NTMxOTEgNTgyLjEsOTYuMDEyNzY2IEM1NzkuMDY1NzE0LDk2Ljc3MDIxMjggNTc1LjI3Mjg1Nyw5Ny41Mjc2NTk2IDU3MS40OCw5Ny41Mjc2NTk2IEw1NjIuMzc3MTQzLDk3LjUyNzY1OTYgTDU2Mi4zNzcxNDMsMTMyLjM3MDIxMyBMNTQxLjEzNzE0MywxMzIuMzcwMjEzIEw1NDEuMTM3MTQzLDM2LjkzMTkxNDkgTDU3MS40OCwzNi45MzE5MTQ5IEM1NzUuMjcyODU3LDM2LjkzMTkxNDkgNTc4LjMwNzE0MywzNy42ODkzNjE3IDU4Mi4xLDM4LjQ0NjgwODUgQzU4NS44OTI4NTcsMzkuMjA0MjU1MyA1ODguOTI3MTQzLDQxLjQ3NjU5NTcgNTkxLjk2MTQyOSw0My43NDg5MzYyIEM1OTQuOTk1NzE0LDQ2LjAyMTI3NjYgNTk3LjI3MTQyOSw0OS4wNTEwNjM4IDU5OC43ODg1NzEsNTIuODM4Mjk3OSBDNTk5LjU0NzE0Myw1Ni42MjU1MzE5IDYwMC4zMDU3MTQsNjEuMTcwMjEyOCA2MDAuMzA1NzE0LDY3LjIyOTc4NzIgTDYwMC4zMDU3MTQsNjcuMjI5Nzg3MiBaIE01NzkuODI0Mjg2LDY3LjIyOTc4NzIgQzU3OS44MjQyODYsNjIuNjg1MTA2NCA1NzkuMDY1NzE0LDU5LjY1NTMxOTEgNTc2Ljc5LDU4LjE0MDQyNTUgQzU3NC41MTQyODYsNTUuODY4MDg1MSA1NzIuMjM4NTcxLDU1LjExMDYzODMgNTY5LjIwNDI4Niw1NS4xMTA2MzgzIEw1NjIuMzc3MTQzLDU1LjExMDYzODMgTDU2Mi4zNzcxNDMsODAuMTA2MzgzIEw1NjkuMjA0Mjg2LDgwLjEwNjM4MyBDNTcyLjIzODU3MSw4MC4xMDYzODMgNTc0LjUxNDI4Niw3OS4zNDg5MzYyIDU3Ni43OSw3Ny4wNzY1OTU3IEM1NzkuMDY1NzE0LDc0LjgwNDI1NTMgNTc5LjgyNDI4Niw3MS43NzQ0NjgxIDU3OS44MjQyODYsNjcuMjI5Nzg3MiBMNTc5LjgyNDI4Niw2Ny4yMjk3ODcyIFogTTYyMi4zMDQyODYsMTMzLjEyNzY2IEw2MjIuMzA0Mjg2LDM2LjkzMTkxNDkgTDY2OS4zMzU3MTQsMzYuOTMxOTE0OSBMNjY5LjMzNTcxNCw1NS44NjgwODUxIEw2NDIuNzg1NzE0LDU1Ljg2ODA4NTEgTDY0Mi43ODU3MTQsNzQuODA0MjU1MyBMNjY2LjMwMTQyOSw3NC44MDQyNTUzIEw2NjYuMzAxNDI5LDkyLjk4Mjk3ODcgTDY0Mi43ODU3MTQsOTIuOTgyOTc4NyBMNjQyLjc4NTcxNCwxMTMuNDM0MDQzIEw2NzAuMDk0Mjg2LDExMy40MzQwNDMgTDY3MC4wOTQyODYsMTMzLjEyNzY2IEw2MjIuMzA0Mjg2LDEzMy4xMjc2NiBMNjIyLjMwNDI4NiwxMzMuMTI3NjYgWiBNNjk2LjY0NDI4NiwxMzMuMTI3NjYgTDY5Ni42NDQyODYsMzYuOTMxOTE0OSBMNzE4LjY0Mjg1NywzNi45MzE5MTQ5IEw3MTguNjQyODU3LDExMy40MzQwNDMgTDc0NC40MzQyODYsMTEzLjQzNDA0MyBMNzQ0LjQzNDI4NiwxMzMuODg1MTA2IEw2OTYuNjQ0Mjg2LDEzMy44ODUxMDYgTDY5Ni42NDQyODYsMTMzLjEyNzY2IFogTTc2Ny45NSwxMzMuMTI3NjYgTDc2Ny45NSwzNi45MzE5MTQ5IEw4MTQuOTgxNDI5LDM2LjkzMTkxNDkgTDgxNC45ODE0MjksNTUuODY4MDg1MSBMNzg5LjE5LDU1Ljg2ODA4NTEgTDc4OS4xOSw3NC44MDQyNTUzIEw4MTIuNzA1NzE0LDc0LjgwNDI1NTMgTDgxMi43MDU3MTQsOTIuOTgyOTc4NyBMNzg5LjE5LDkyLjk4Mjk3ODcgTDc4OS4xOSwxMTMuNDM0MDQzIEw4MTYuNDk4NTcxLDExMy40MzQwNDMgTDgxNi40OTg1NzEsMTMzLjEyNzY2IEw3NjcuOTUsMTMzLjEyNzY2IEw3NjcuOTUsMTMzLjEyNzY2IFogTTg4NS41Mjg1NzEsMTMzLjEyNzY2IEw4NTcuNDYxNDI5LDEzMy4xMjc2NiBMODMzLjk0NTcxNCwzNi45MzE5MTQ5IEw4NTguOTc4NTcxLDM2LjkzMTkxNDkgTDg3MS44NzQyODYsMTA3LjM3NDQ2OCBMODg0Ljc3LDM2LjkzMTkxNDkgTDkwOC4yODU3MTQsMzYuOTMxOTE0OSBMODg1LjUyODU3MSwxMzMuMTI3NjYgTDg4NS41Mjg1NzEsMTMzLjEyNzY2IFogTTkzMS4wNDI4NTcsMTMzLjEyNzY2IEw5MzEuMDQyODU3LDM2LjkzMTkxNDkgTDk3OC4wNzQyODYsMzYuOTMxOTE0OSBMOTc4LjA3NDI4Niw1NS44NjgwODUxIEw5NTIuMjgyODU3LDU1Ljg2ODA4NTEgTDk1Mi4yODI4NTcsNzQuODA0MjU1MyBMOTc1Ljc5ODU3MSw3NC44MDQyNTUzIEw5NzUuNzk4NTcxLDkyLjk4Mjk3ODcgTDk1Mi4yODI4NTcsOTIuOTgyOTc4NyBMOTUyLjI4Mjg1NywxMTMuNDM0MDQzIEw5NzkuNTkxNDI5LDExMy40MzQwNDMgTDk3OS41OTE0MjksMTMzLjEyNzY2IEw5MzEuMDQyODU3LDEzMy4xMjc2NiBMOTMxLjA0Mjg1NywxMzMuMTI3NjYgWiBNMTAwNi4xNDE0MywxMzMuMTI3NjYgTDEwMDYuMTQxNDMsMzYuOTMxOTE0OSBMMTAyOC4xNCwzNi45MzE5MTQ5IEwxMDI4LjE0LDExMy40MzQwNDMgTDEwNTMuOTMxNDMsMTEzLjQzNDA0MyBMMTA1My45MzE0MywxMzMuODg1MTA2IEwxMDA2LjE0MTQzLDEzMy44ODUxMDYgTDEwMDYuMTQxNDMsMTMzLjEyNzY2IFogTTQyOS42MjcxNDMsMjMzLjg2ODA4NSBDNDI4LjExLDIzMS41OTU3NDUgNDI1LjgzNDI4NiwyMzAuODM4Mjk4IDQyMy41NTg1NzEsMjI5LjMyMzQwNCBDNDIxLjI4Mjg1NywyMjguNTY1OTU3IDQxOS4wMDcxNDMsMjI3LjgwODUxMSA0MTYuNzMxNDI5LDIyNy44MDg1MTEgQzQxNC40NTU3MTQsMjI3LjgwODUxMSA0MTIuMTgsMjI4LjU2NTk1NyA0MDkuOTA0Mjg2LDIzMC4wODA4NTEgQzQwNy42Mjg1NzEsMjMxLjU5NTc0NSA0MDYuODcsMjMzLjg2ODA4NSA0MDYuODcsMjM3LjY1NTMxOSBDNDA2Ljg3LDI0MC42ODUxMDYgNDA3LjYyODU3MSwyNDIuOTU3NDQ3IDQwOS45MDQyODYsMjQ0LjQ3MjM0IEM0MTIuMTgsMjQ1Ljk4NzIzNCA0MTUuMjE0Mjg2LDI0OC4yNTk1NzQgNDE5LjAwNzE0MywyNDkuNzc0NDY4IEM0MjEuMjgyODU3LDI1MC41MzE5MTUgNDIzLjU1ODU3MSwyNTIuMDQ2ODA5IDQyNS44MzQyODYsMjUzLjU2MTcwMiBDNDI4LjExLDI1NS4wNzY1OTYgNDMwLjM4NTcxNCwyNTYuNTkxNDg5IDQzMi42NjE0MjksMjU4Ljg2MzgzIEM0MzQuOTM3MTQzLDI2MS4xMzYxNyA0MzYuNDU0Mjg2LDI2My40MDg1MTEgNDM3Ljk3MTQyOSwyNjYuNDM4Mjk4IEM0MzkuNDg4NTcxLDI2OS40NjgwODUgNDQwLjI0NzE0MywyNzMuMjU1MzE5IDQ0MC4yNDcxNDMsMjc3LjA0MjU1MyBDNDQwLjI0NzE0MywyODIuMzQ0NjgxIDQzOS40ODg1NzEsMjg2Ljg4OTM2MiA0MzcuOTcxNDI5LDI5MC42NzY1OTYgQzQzNi40NTQyODYsMjk0LjQ2MzgzIDQzNC4xNzg1NzEsMjk4LjI1MTA2NCA0MzEuMTQ0Mjg2LDMwMC41MjM0MDQgQzQyOC4xMSwzMDIuNzk1NzQ1IDQyNS4wNzU3MTQsMzA1LjA2ODA4NSA0MjEuMjgyODU3LDMwNi41ODI5NzkgQzQxNy40OSwzMDguMDk3ODcyIDQxMy42OTcxNDMsMzA4Ljg1NTMxOSA0MDkuOTA0Mjg2LDMwOC44NTUzMTkgQzQwMy44MzU3MTQsMzA4Ljg1NTMxOSAzOTguNTI1NzE0LDMwOC4wOTc4NzIgMzkzLjk3NDI4NiwzMDUuODI1NTMyIEMzODkuNDIyODU3LDMwMy41NTMxOTEgMzg1LjYzLDMwMS4yODA4NTEgMzgyLjU5NTcxNCwyOTguMjUxMDY0IEwzOTMuOTc0Mjg2LDI4MS41ODcyMzQgQzM5Ni4yNSwyODMuODU5NTc0IDM5OC41MjU3MTQsMjg1LjM3NDQ2OCA0MDEuNTYsMjg2Ljg4OTM2MiBDNDA0LjU5NDI4NiwyODguNDA0MjU1IDQwNi44NywyODkuMTYxNzAyIDQwOS45MDQyODYsMjg5LjE2MTcwMiBDNDEyLjE4LDI4OS4xNjE3MDIgNDE0LjQ1NTcxNCwyODguNDA0MjU1IDQxNi43MzE0MjksMjg2Ljg4OTM2MiBDNDE4LjI0ODU3MSwyODUuMzc0NDY4IDQxOS43NjU3MTQsMjgzLjEwMjEyOCA0MTkuNzY1NzE0LDI3OS4zMTQ4OTQgQzQxOS43NjU3MTQsMjc2LjI4NTEwNiA0MTkuMDA3MTQzLDI3My4yNTUzMTkgNDE2LjczMTQyOSwyNzEuNzQwNDI2IEM0MTQuNDU1NzE0LDI3MC4yMjU1MzIgNDExLjQyMTQyOSwyNjcuOTUzMTkxIDQwNi44NywyNjUuNjgwODUxIEwzOTkuMjg0Mjg2LDI2MS4xMzYxNyBDMzk3LjAwODU3MSwyNTkuNjIxMjc3IDM5NC43MzI4NTcsMjU4LjEwNjM4MyAzOTMuMjE1NzE0LDI1NS44MzQwNDMgQzM5MS42OTg1NzEsMjUzLjU2MTcwMiAzOTAuMTgxNDI5LDI1MS4yODkzNjIgMzg5LjQyMjg1NywyNDguMjU5NTc0IEMzODguNjY0Mjg2LDI0NS4yMjk3ODcgMzg3LjkwNTcxNCwyNDIuMiAzODcuOTA1NzE0LDIzNy42NTUzMTkgQzM4Ny45MDU3MTQsMjMyLjM1MzE5MSAzODguNjY0Mjg2LDIyNy44MDg1MTEgMzkwLjk0LDIyNC4wMjEyNzcgQzM5Mi40NTcxNDMsMjIwLjIzNDA0MyAzOTQuNzMyODU3LDIxNy4yMDQyNTUgMzk3Ljc2NzE0MywyMTQuMTc0NDY4IEM0MDAuODAxNDI5LDIxMS45MDIxMjggNDAzLjgzNTcxNCwyMDkuNjI5Nzg3IDQwNy42Mjg1NzEsMjA4Ljg3MjM0IEM0MTEuNDIxNDI5LDIwNy4zNTc0NDcgNDE0LjQ1NTcxNCwyMDcuMzU3NDQ3IDQxOC4yNDg1NzEsMjA3LjM1NzQ0NyBDNDIzLjU1ODU3MSwyMDcuMzU3NDQ3IDQyOC4xMSwyMDguMTE0ODk0IDQzMi42NjE0MjksMjA5LjYyOTc4NyBDNDM3LjIxMjg1NywyMTEuMTQ0NjgxIDQ0MC4yNDcxNDMsMjEzLjQxNzAyMSA0NDMuMjgxNDI5LDIxNi40NDY4MDkgTDQyOS42MjcxNDMsMjMzLjg2ODA4NSBMNDI5LjYyNzE0MywyMzMuODY4MDg1IFogTTUxMS41NTI4NTcsMzA1LjgyNTUzMiBDNTA3LjAwMTQyOSwzMDguMDk3ODcyIDUwMS42OTE0MjksMzA5LjYxMjc2NiA0OTQuODY0Mjg2LDMwOS42MTI3NjYgQzQ4OS41NTQyODYsMzA5LjYxMjc2NiA0ODQuMjQ0Mjg2LDMwOC4wOTc4NzIgNDc5LjY5Mjg1NywzMDUuODI1NTMyIEM0NzUuMTQxNDI5LDMwMy41NTMxOTEgNDcxLjM0ODU3MSwyOTkuNzY1OTU3IDQ2Ny41NTU3MTQsMjk1LjIyMTI3NyBDNDYzLjc2Mjg1NywyOTAuNjc2NTk2IDQ2MS40ODcxNDMsMjg1LjM3NDQ2OCA0NTkuOTcsMjc5LjMxNDg5NCBDNDU4LjQ1Mjg1NywyNzMuMjU1MzE5IDQ1Ni45MzU3MTQsMjY2LjQzODI5OCA0NTYuOTM1NzE0LDI1OC44NjM4MyBDNDU2LjkzNTcxNCwyNTEuMjg5MzYyIDQ1Ny42OTQyODYsMjQ0LjQ3MjM0IDQ1OS45NywyMzguNDEyNzY2IEM0NjEuNDg3MTQzLDIzMi4zNTMxOTEgNDY0LjUyMTQyOSwyMjcuMDUxMDY0IDQ2Ny41NTU3MTQsMjIyLjUwNjM4MyBDNDcwLjU5LDIxNy45NjE3MDIgNDc1LjE0MTQyOSwyMTQuOTMxOTE1IDQ3OS42OTI4NTcsMjExLjkwMjEyOCBDNDg0LjI0NDI4NiwyMDkuNjI5Nzg3IDQ4OS41NTQyODYsMjA4LjExNDg5NCA0OTQuODY0Mjg2LDIwOC4xMTQ4OTQgQzUwMS42OTE0MjksMjA4LjExNDg5NCA1MDcuMDAxNDI5LDIwOS42Mjk3ODcgNTEwLjc5NDI4NiwyMTEuOTAyMTI4IEM1MTQuNTg3MTQzLDIxNC4xNzQ0NjggNTE4LjM4LDIxNy4yMDQyNTUgNTIxLjQxNDI4NiwyMjAuMjM0MDQzIEw1MTAuMDM1NzE0LDIzNi4xNDA0MjYgQzUwOC41MTg1NzEsMjMzLjg2ODA4NSA1MDYuMjQyODU3LDIzMi4zNTMxOTEgNTA0LjcyNTcxNCwyMzAuODM4Mjk4IEM1MDMuMjA4NTcxLDIyOS4zMjM0MDQgNTAwLjE3NDI4NiwyMjguNTY1OTU3IDQ5Ny4xNCwyMjguNTY1OTU3IEM0OTQuMTA1NzE0LDIyOC41NjU5NTcgNDkxLjgzLDIyOS4zMjM0MDQgNDg5LjU1NDI4NiwyMzAuODM4Mjk4IEM0ODcuMjc4NTcxLDIzMi4zNTMxOTEgNDg1Ljc2MTQyOSwyMzQuNjI1NTMyIDQ4NC4yNDQyODYsMjM2Ljg5Nzg3MiBDNDgyLjcyNzE0MywyMzkuOTI3NjYgNDgxLjk2ODU3MSwyNDIuOTU3NDQ3IDQ4MS4yMSwyNDYuNzQ0NjgxIEM0ODAuNDUxNDI5LDI1MC41MzE5MTUgNDgwLjQ1MTQyOSwyNTQuMzE5MTQ5IDQ4MC40NTE0MjksMjU4Ljg2MzgzIEM0ODAuNDUxNDI5LDI2My40MDg1MTEgNDgwLjQ1MTQyOSwyNjcuMTk1NzQ1IDQ4MS4yMSwyNzAuMjI1NTMyIEM0ODEuOTY4NTcxLDI3NC4wMTI3NjYgNDgyLjcyNzE0MywyNzcuMDQyNTUzIDQ4NC4yNDQyODYsMjgwLjA3MjM0IEM0ODUuNzYxNDI5LDI4My4xMDIxMjggNDg3LjI3ODU3MSwyODQuNjE3MDIxIDQ4OS41NTQyODYsMjg2LjEzMTkxNSBDNDkxLjgzLDI4Ny42NDY4MDkgNDk0LjEwNTcxNCwyODguNDA0MjU1IDQ5Ny4xNCwyODguNDA0MjU1IEM1MDAuMTc0Mjg2LDI4OC40MDQyNTUgNTAyLjQ1LDI4Ny42NDY4MDkgNTA0LjcyNTcxNCwyODYuMTMxOTE1IEM1MDcuMDAxNDI5LDI4NC42MTcwMjEgNTA4LjUxODU3MSwyODMuMTAyMTI4IDUxMC4wMzU3MTQsMjgwLjgyOTc4NyBMNTIyLjE3Mjg1NywyOTUuOTc4NzIzIEM1MTkuODk3MTQzLDMwMC41MjM0MDQgNTE2LjEwNDI4NiwzMDMuNTUzMTkxIDUxMS41NTI4NTcsMzA1LjgyNTUzMiBMNTExLjU1Mjg1NywzMDUuODI1NTMyIFogTTU4NS44OTI4NTcsMzA3LjM0MDQyNiBMNTgyLjEsMjg5LjkxOTE0OSBMNTYwLjEwMTQyOSwyODkuOTE5MTQ5IEw1NTYuMzA4NTcxLDMwNy4zNDA0MjYgTDUzNC4zMSwzMDcuMzQwNDI2IEw1NTcuODI1NzE0LDIxMS4xNDQ2ODEgTDU4NS4xMzQyODYsMjExLjE0NDY4MSBMNjA4LjY1LDMwNy4zNDA0MjYgTDU4NS44OTI4NTcsMzA3LjM0MDQyNiBMNTg1Ljg5Mjg1NywzMDcuMzQwNDI2IFogTTU3MS40OCwyMzEuNTk1NzQ1IEw1NjIuMzc3MTQzLDI3Mi40OTc4NzIgTDU3OS4wNjU3MTQsMjcyLjQ5Nzg3MiBMNTcxLjQ4LDIzMS41OTU3NDUgTDU3MS40OCwyMzEuNTk1NzQ1IFogTTYzMC42NDg1NzEsMzA3LjM0MDQyNiBMNjMwLjY0ODU3MSwyMTEuMTQ0NjgxIEw2NTIuNjQ3MTQzLDIxMS4xNDQ2ODEgTDY1Mi42NDcxNDMsMjg3LjY0NjgwOSBMNjc4LjQzODU3MSwyODcuNjQ2ODA5IEw2NzguNDM4NTcxLDMwOC4wOTc4NzIgTDYzMC42NDg1NzEsMzA4LjA5Nzg3MiBMNjMwLjY0ODU3MSwzMDcuMzQwNDI2IFogTTc0NS4xOTI4NTcsMzA3LjM0MDQyNiBMNzQxLjQsMjg5LjkxOTE0OSBMNzE5LjQwMTQyOSwyODkuOTE5MTQ5IEw3MTUuNjA4NTcxLDMwNy4zNDA0MjYgTDY5My42MSwzMDcuMzQwNDI2IEw3MTcuMTI1NzE0LDIxMS4xNDQ2ODEgTDc0NC40MzQyODYsMjExLjE0NDY4MSBMNzY3Ljk1LDMwNy4zNDA0MjYgTDc0NS4xOTI4NTcsMzA3LjM0MDQyNiBMNzQ1LjE5Mjg1NywzMDcuMzQwNDI2IFogTTczMC4wMjE0MjksMjMxLjU5NTc0NSBMNzIwLjkxODU3MSwyNzIuNDk3ODcyIEw3MzcuNjA3MTQzLDI3Mi40OTc4NzIgTDczMC4wMjE0MjksMjMxLjU5NTc0NSBMNzMwLjAyMTQyOSwyMzEuNTk1NzQ1IFoiIGZpbGw9IiMyMTMwM0YiIC8+CgogICAgICAgIDxnIGlkPSJsb2dvIj4KICAgICAgICAgICAgPHBvbHlnb24gZmlsbD0idXJsKCNiYWNrZ3JvdW5kLWdyYWRpZW50KSIgcG9pbnRzPSIxNTEgMzQ4IDAgMjYwIDAgODggMTUxIDAgMzAyIDg4IDMwMiAyNjAiIC8+CiAgICAgICAgICAgIDxwb2x5Z29uIGZpbGw9IiNGRjYxNjkiIHBvaW50cz0iOTkgMjE0IDk5IDI1NCAxOTMgMTk5IDE5MyAxNTkiIC8+CiAgICAgICAgICAgIDxwb2x5Z29uIGZpbGw9IiNGRjYxNjkiIHBvaW50cz0iMTM0IDE5NCA5OSAxNzQgMTkzIDExOSAyMjggMTM5IiAvPgogICAgICAgICAgICA8cG9seWdvbiBmaWxsPSIjRkY2MTY5IiBwb2ludHM9Ijk5IDEzNCA2NCAxMTQgMTU4IDU5IDE5MyA3OSIgLz4KICAgICAgICAgICAgPHBvbHlnb24gZmlsbD0iI0ZGQjRCNSIgcG9pbnRzPSIxMzQgMTk0IDEzNCAyMzQgMjI4IDE3OSAyMjggMTM5IiAvPgogICAgICAgICAgICA8cG9seWdvbiBmaWxsPSIjRkZCNEI1IiBwb2ludHM9Ijk5IDEzNCA5OSAxNzQgMTkzIDExOSAxOTMgNzkiIC8+CiAgICAgICAgICAgIDxwb2x5Z29uIGZpbGw9IiNGRkZGRkYiIHBvaW50cz0iNjQgMjM0IDk5IDI1NCA5OSAyMTQgMTM0IDIzNCAxMzQgMTk0IDk5IDE3NCA5OSAxMzQgNjQgMTE0IiAvPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+Cg=="></a>
+      
+      <span class="row links"><a class="icon-link svg-link" href="https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html"><span title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <g class="svg-shape">
+    <path d="M75,47.5c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm-50,-0c13.246,-0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,-0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm2.705,16.735l7.239,0l0.622,-4.904l-21.833,0l-0,4.904l7.589,0l0,22.067l6.383,0l-0,-22.067Zm58.076,7.265c-0,-8.757 -3.698,-14.166 -10.781,-14.166c-7.083,-0 -10.781,5.604 -10.781,14.166c0,8.757 3.698,14.166 10.781,14.166c7.083,0 10.781,-5.604 10.781,-14.166Zm-6.539,0c0,6.538 -1.128,9.496 -4.242,9.496c-2.997,0 -4.242,-2.88 -4.242,-9.496c-0,-6.616 1.206,-9.496 4.242,-9.496c3.036,-0 4.242,2.88 4.242,9.496Zm-29.242,-67c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm0.512,9.834c-7.122,-0 -12.609,5.098 -12.609,14.127c-0,9.263 5.215,14.205 12.532,14.205c4.164,0 7.083,-1.634 9.068,-3.658l-2.88,-3.697c-1.518,1.206 -3.153,2.413 -5.838,2.413c-3.697,-0 -6.266,-2.763 -6.266,-9.263c-0,-6.616 2.724,-9.379 6.149,-9.379c2.102,-0 3.892,0.778 5.371,1.984l3.113,-3.775c-2.257,-1.868 -4.748,-2.957 -8.64,-2.957Z"/>
+  </g>
+</svg></span></a><a class="icon-link svg-link" href="https://github.com/typelevel/spire"><span title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <g class="svg-shape">
+    <path d="M49.995,1c-27.609,-0 -49.995,22.386 -49.995,50.002c-0,22.09 14.325,40.83 34.194,47.444c2.501,0.458 3.413,-1.086 3.413,-2.412c0,-1.185 -0.043,-4.331 -0.067,-8.503c-13.908,3.021 -16.843,-6.704 -16.843,-6.704c-2.274,-5.773 -5.552,-7.311 -5.552,-7.311c-4.54,-3.103 0.344,-3.042 0.344,-3.042c5.018,0.356 7.658,5.154 7.658,5.154c4.46,7.64 11.704,5.433 14.552,4.156c0.454,-3.232 1.744,-5.436 3.174,-6.685c-11.102,-1.262 -22.775,-5.553 -22.775,-24.713c-0,-5.457 1.949,-9.92 5.147,-13.416c-0.516,-1.265 -2.231,-6.348 0.488,-13.233c0,0 4.199,-1.344 13.751,5.126c3.988,-1.108 8.266,-1.663 12.518,-1.682c4.245,0.019 8.523,0.574 12.517,1.682c9.546,-6.47 13.736,-5.126 13.736,-5.126c2.728,6.885 1.013,11.968 0.497,13.233c3.204,3.496 5.141,7.959 5.141,13.416c0,19.209 -11.691,23.436 -22.83,24.673c1.795,1.544 3.394,4.595 3.394,9.26c0,6.682 -0.061,12.076 -0.061,13.715c0,1.338 0.899,2.894 3.438,2.406c19.853,-6.627 34.166,-25.354 34.166,-47.438c-0,-27.616 -22.389,-50.002 -50.005,-50.002"/>
+  </g>
+</svg></span></a><a class="icon-link" href="https://discord.gg/XF3CXcMzqD"><i class="icofont-laika" title="Chat">&#xeed5;</i></a><a class="icon-link" href="https://twitter.com/typelevel"><i class="icofont-laika" title="Twitter">&#xed7a;</i></a></span>
+      
+    </header>
 
-<p>Using features such as specialization, macros, type classes, and implicits,
-Spire works hard to defy conventional wisdom around performance and precision
-trade-offs. A major goal is to allow developers to write efficient numeric
-code without having to “bake in” particular numeric representations. In most
-cases, generic implementations using Spire’s specialized type classes perform
-identically to corresponding direct implementations.</p>
+    <nav id="sidebar">
 
-<h3 id="scaladoc">Scaladoc</h3>
-<p><a href="https://javadoc.io/doc/org.typelevel/spire_2.13"><img src="https://javadoc.io/badge2/org.typelevel/spire_2.13/core.svg" alt="Core" /></a>
-<a href="https://javadoc.io/doc/org.typelevel/spire-extras_2.13"><img src="https://javadoc.io/badge2/org.typelevel/spire-extras_2.13/extras.svg" alt="Extras" /></a>
-<a href="https://javadoc.io/doc/org.typelevel/spire-laws_2.13"><img src="https://javadoc.io/badge2/org.typelevel/spire-laws_2.13/laws.svg" alt="Laws" /></a>
-<a href="https://javadoc.io/doc/org.typelevel/spire-macros_2.13"><img src="https://javadoc.io/badge2/org.typelevel/spire-macros_2.13/macros.svg" alt="Macros" /></a></p>
+      <div class="row">
+        <a class="icon-link svg-link" href="https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html"><span title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <g class="svg-shape">
+    <path d="M75,47.5c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm-50,-0c13.246,-0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,-0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm2.705,16.735l7.239,0l0.622,-4.904l-21.833,0l-0,4.904l7.589,0l0,22.067l6.383,0l-0,-22.067Zm58.076,7.265c-0,-8.757 -3.698,-14.166 -10.781,-14.166c-7.083,-0 -10.781,5.604 -10.781,14.166c0,8.757 3.698,14.166 10.781,14.166c7.083,0 10.781,-5.604 10.781,-14.166Zm-6.539,0c0,6.538 -1.128,9.496 -4.242,9.496c-2.997,0 -4.242,-2.88 -4.242,-9.496c-0,-6.616 1.206,-9.496 4.242,-9.496c3.036,-0 4.242,2.88 4.242,9.496Zm-29.242,-67c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm0.512,9.834c-7.122,-0 -12.609,5.098 -12.609,14.127c-0,9.263 5.215,14.205 12.532,14.205c4.164,0 7.083,-1.634 9.068,-3.658l-2.88,-3.697c-1.518,1.206 -3.153,2.413 -5.838,2.413c-3.697,-0 -6.266,-2.763 -6.266,-9.263c-0,-6.616 2.724,-9.379 6.149,-9.379c2.102,-0 3.892,0.778 5.371,1.984l3.113,-3.775c-2.257,-1.868 -4.748,-2.957 -8.64,-2.957Z"/>
+  </g>
+</svg></span></a><a class="icon-link svg-link" href="https://github.com/typelevel/spire"><span title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <g class="svg-shape">
+    <path d="M49.995,1c-27.609,-0 -49.995,22.386 -49.995,50.002c-0,22.09 14.325,40.83 34.194,47.444c2.501,0.458 3.413,-1.086 3.413,-2.412c0,-1.185 -0.043,-4.331 -0.067,-8.503c-13.908,3.021 -16.843,-6.704 -16.843,-6.704c-2.274,-5.773 -5.552,-7.311 -5.552,-7.311c-4.54,-3.103 0.344,-3.042 0.344,-3.042c5.018,0.356 7.658,5.154 7.658,5.154c4.46,7.64 11.704,5.433 14.552,4.156c0.454,-3.232 1.744,-5.436 3.174,-6.685c-11.102,-1.262 -22.775,-5.553 -22.775,-24.713c-0,-5.457 1.949,-9.92 5.147,-13.416c-0.516,-1.265 -2.231,-6.348 0.488,-13.233c0,0 4.199,-1.344 13.751,5.126c3.988,-1.108 8.266,-1.663 12.518,-1.682c4.245,0.019 8.523,0.574 12.517,1.682c9.546,-6.47 13.736,-5.126 13.736,-5.126c2.728,6.885 1.013,11.968 0.497,13.233c3.204,3.496 5.141,7.959 5.141,13.416c0,19.209 -11.691,23.436 -22.83,24.673c1.795,1.544 3.394,4.595 3.394,9.26c0,6.682 -0.061,12.076 -0.061,13.715c0,1.338 0.899,2.894 3.438,2.406c19.853,-6.627 34.166,-25.354 34.166,-47.438c-0,-27.616 -22.389,-50.002 -50.005,-50.002"/>
+  </g>
+</svg></span></a><a class="icon-link" href="https://discord.gg/XF3CXcMzqD"><i class="icofont-laika" title="Chat">&#xeed5;</i></a><a class="icon-link" href="https://twitter.com/typelevel"><i class="icofont-laika" title="Twitter">&#xed7a;</i></a>
+      </div>
+      
+      <ul class="nav-list">
+        <li class="level1 active"><a href="#">Spire</a></li>
+        <li class="level1"><a href="guide.html">Spire User&#39;s Guide</a></li>
+        <li class="level1"><a href="CHANGES.html">Changes</a></li>
+        <li class="level1"><a href="CONTRIBUTING.html">Contributing to Spire</a></li>
+        <li class="level1"><a href="DESIGN.html">Design</a></li>
+        <li class="level1"><a href="AUTHORS.html">Authors</a></li>
+        <li class="level1"><a href="FRIENDS.html">Friends of Spire</a></li>
+      </ul>
+      
+    </nav>
 
-<p>Spire is provided to you as free software under the
-<a href="https://github.com/typelevel/spire/blob/main/COPYING">MIT license</a>.</p>
+    <div id="container">
 
-<h3 id="organization">Organization</h3>
+      <nav id="page-nav">
+        <p class="header"><a href="#">Spire</a></p>
+        
+        <ul class="nav-list">
+          <li class="level1"><a href="#overview">Overview</a></li>
+          <li class="level1"><a href="#scaladoc">Scaladoc</a></li>
+          <li class="level1"><a href="#organization">Organization</a></li>
+          <li class="level1"><a href="#code-of-conduct">Code of Conduct</a></li>
+          <li class="level1"><a href="#set-up">Set up</a></li>
+          <li class="level1"><a href="#playing-around">Playing Around</a></li>
+          <li class="level2"><a href="#with-ammonite-repl">With Ammonite REPL</a></li>
+          <li class="level2"><a href="#with-an-ide">With an IDE</a></li>
+          <li class="level2"><a href="#with-git-and-sbt">With git and sbt</a></li>
+          <li class="level1"><a href="#number-types">Number Types</a></li>
+          <li class="level1"><a href="#type-classes">Type Classes</a></li>
+          <li class="level1"><a href="#getting-started">Getting Started</a></li>
+          <li class="level1"><a href="#operators-by-type-class">Operators by Type Class</a></li>
+          <li class="level2"><a href="#eq-order-and-partialorder">Eq, Order and PartialOrder</a></li>
+          <li class="level2"><a href="#semigroup-monoid-and-group">Semigroup, Monoid, and Group</a></li>
+          <li class="level2"><a href="#rings-co">Rings &amp;co</a></li>
+          <li class="level2"><a href="#vectorspaces-co">VectorSpaces &amp;co</a></li>
+          <li class="level2"><a href="#numeric-integral-and-fractional">Numeric, Integral, and Fractional</a></li>
+          <li class="level2"><a href="#bool">Bool</a></li>
+          <li class="level2"><a href="#trig">Trig</a></li>
+          <li class="level1"><a href="#syntax">Syntax</a></li>
+          <li class="level1"><a href="#sorting-selection-and-searching">Sorting, Selection, and Searching</a></li>
+          <li class="level1"><a href="#pseudo-random-number-generators">Pseudo-Random Number Generators</a></li>
+          <li class="level1"><a href="#miscellany">Miscellany</a></li>
+          <li class="level1"><a href="#benchmarks">Benchmarks</a></li>
+          <li class="level1"><a href="#caveats">Caveats</a></li>
+        </ul>
+        
+        <p class="footer"></p>
+      </nav>
 
-<p>There is a <code class="language-plaintext highlighter-rouge">#spire</code> channel on the <a href="https://discord.com/invite/XF3CXcMzqD">Typelevel Discord</a>.
-It is the place to go for announcements and discussions around Spire.</p>
+      <main class="content">
 
-<p>We also have a guide on <a href="./extra_md/contributing.html">contributing to Spire</a> as well
-as a guide that provides information on <a href="./guide.html">Spire’s design</a>.</p>
-
-<p>Spire has maintainers who are responsible for signing-off on and
-merging pull requests, and for helping to guide the direction of Spire:</p>
-
-<ul>
-  <li>Erik Osheim (<em>erik@osheim.org</em>)</li>
-  <li>Tom Switzer (<em>thomas.switzer@gmail.com</em>)</li>
-  <li>Rüdiger Klaehn (<em>rklaehn@gmail.com</em>)</li>
-  <li>Denis Rosset (<em>physics@denisrosset.com</em>)</li>
-</ul>
-
-<h3 id="code-of-conduct">Code of Conduct</h3>
-
-<p>People are expected to follow the <a href="https://typelevel.org/code-of-conduct.html">Typelevel Code of Conduct</a>
-when discussing Spire on the Github page, in Discord, Gitter, the IRC channel,
-mailing list, and other official venues.</p>
-
-<p>Concerns or issues can be sent to any of Spire’s maintainers, or to any of the
-<a href="https://typelevel.org/code-of-conduct.html">designated CoC contacts</a> for Typelevel.</p>
-
-<h3 id="set-up">Set up</h3>
-
-<p>Spire is currently available for Scala 2.13 and 3.1+, for the
-JVM and JS platforms.</p>
-
-<p>To get started with SBT, simply add the following to your <code class="language-plaintext highlighter-rouge">build.sbt</code> file:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>libraryDependencies += "org.typelevel" %% "spire" % "0.18.0-M3"
-</code></pre></div></div>
-
-<p>(Previous to 0.14.0, Spire was published under <em>org.spire-math</em>
-instead of <em>org.typelevel</em>.)</p>
-
-<p>For information on all the available versions, visit the
-<a href="https://index.scala-lang.org/typelevel/spire">Scaladex entry</a>.</p>
-
-<p>Here is a list of all of Spire’s modules:</p>
-
-<ul>
-  <li><code class="language-plaintext highlighter-rouge">spire-macros</code>: macros and compile-time code (required by <code class="language-plaintext highlighter-rouge">spire</code>)</li>
-  <li><code class="language-plaintext highlighter-rouge">spire</code>: the core Spire library, the types and type classes</li>
-  <li><code class="language-plaintext highlighter-rouge">spire-laws</code>: optional support for law-checking and testing</li>
-  <li><code class="language-plaintext highlighter-rouge">spire-extras</code>: extra types which are more specific or esoteric</li>
-</ul>
-
-<p>Spire depends on <a href="https://github.com/typelevel/algebra">typelevel/algebra</a>
-and uses this project to interoperate with <a href="https://github.com/typelevel/cats">Cats</a> and
-<a href="https://github.com/twitter/algebird">Algebird</a>.</p>
-
-<h3 id="playing-around">Playing Around</h3>
-
-<p>The quickest way to try spire is in the browser with <a href="https://scastie.scala-lang.org/LVRAHaJAS7qoVbUyoDgKNA">Scastie</a>.</p>
-
-<script src="https://scastie.scala-lang.org/LVRAHaJAS7qoVbUyoDgKNA.js"></script>
-
-<h4 id="with-ammonite-repl">With Ammonite REPL</h4>
-
-<p>If you have <a href="https://ammonite.io/">Ammonite</a>, you can use an interactive REPL session.</p>
-
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">Welcome</span> <span class="n">to</span> <span class="n">the</span> <span class="nc">Ammonite</span> <span class="nc">Repl</span> <span class="mf">2.</span><span class="nv">x</span><span class="o">.</span><span class="py">x</span>
-<span class="k">@</span> <span class="k">import</span> <span class="nn">$ivy.</span><span class="n">`org.typelevel::spire:0.18.0-M3`</span>
-<span class="k">@</span> <span class="k">import</span> <span class="nn">spire._</span>
-<span class="k">@</span> <span class="k">import</span> <span class="nn">spire.math._</span>
-<span class="k">@</span> <span class="k">import</span> <span class="nn">sipre.implicits._</span>
-<span class="k">@</span> <span class="nc">Complex</span><span class="o">(</span><span class="mf">3.0</span><span class="o">,</span><span class="mf">5.0</span><span class="o">).</span><span class="py">sin</span>
-<span class="n">res</span><span class="k">:</span> <span class="kt">Complex</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Complex</span><span class="o">(</span><span class="n">real</span> <span class="k">=</span> <span class="mf">10.472508533940392</span><span class="o">,</span> <span class="n">imag</span> <span class="k">=</span> <span class="o">-</span><span class="mf">73.46062169567367</span><span class="o">)</span>
-</code></pre></div></div>
-
-<h4 id="with-an-ide">With an IDE</h4>
-
-<p>You can also play around with <a href="https://www.jetbrains.com/help/idea/discover-intellij-idea-for-scala.html">IntelliJ</a> or <a href="https://scalameta.org/metals/docs/editors/vscode/">VS Code and Metals</a>.</p>
-
-<p>Create a <a href="https://scalameta.org/metals/docs/editors/vscode/#worksheets">worksheet</a> file <code class="language-plaintext highlighter-rouge">spire.worksheet.sc</code> in your IDE and copy-paste the following code snippet.</p>
-
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">$ivy.</span><span class="n">`org.typelevel::spire:0.18.0-M3`</span>
-<span class="k">import</span> <span class="nn">spire._</span>
-<span class="k">import</span> <span class="nn">spire.math._</span>
-<span class="k">import</span> <span class="nn">spire.implicits._</span>
-<span class="nc">Complex</span><span class="o">(</span><span class="mf">3.0</span><span class="o">,</span><span class="mf">5.0</span><span class="o">).</span><span class="py">sin</span>
-<span class="n">res</span><span class="k">:</span> <span class="kt">Complex</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Complex</span><span class="o">(</span><span class="n">real</span> <span class="k">=</span> <span class="mf">10.472508533940392</span><span class="o">,</span> <span class="n">imag</span> <span class="k">=</span> <span class="o">-</span><span class="mf">73.46062169567367</span><span class="o">)</span>
-</code></pre></div></div>
-
-<h4 id="with-git-and-sbt">With git and sbt</h4>
-<p>If you clone the Spire repo, you can get a taste of what Spire can do using
-SBT’s console. Launch <code class="language-plaintext highlighter-rouge">sbt</code> and at the prompt, type <code class="language-plaintext highlighter-rouge">coreJVM/console</code>:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; coreJVM/console
+        <h1 id="spire" class="title">Spire</h1>
+        <p><a href="https://github.com/typelevel/spire/actions/workflows/ci.yml"><img src="https://github.com/typelevel/spire/actions/workflows/ci.yml/badge.svg" alt="Continuous Integration"></a>
+        <a href="https://discord.gg/QNnHKHq5Ts"><img src="https://img.shields.io/discord/632277896739946517.svg?label=&logo=discord&logoColor=ffffff&color=404244&labelColor=6A7EC2" alt="Discord"></a>
+        <a href="https://codecov.io/github/typelevel/spire?branch=main"><img src="https://codecov.io/github/typelevel/spire/coverage.svg?branch=main" alt="codecov.io"></a>
+        <a href="https://index.scala-lang.org/typelevel/spire/spire"><img src="https://index.scala-lang.org/typelevel/spire/spire/latest-by-scala-version.svg" alt="spire Scala version support"></a></p>
+        
+        <h3 id="overview" class="section">Overview<a class="anchor-link right" href="#overview"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>Spire is a numeric library for Scala which is intended to be generic, fast,
+        and precise.</p>
+        <p>Using features such as specialization, macros, type classes, and implicits,
+        Spire works hard to defy conventional wisdom around performance and precision
+        trade-offs. A major goal is to allow developers to write efficient numeric
+        code without having to &quot;bake in&quot; particular numeric representations. In most
+        cases, generic implementations using Spire&#39;s specialized type classes perform
+        identically to corresponding direct implementations.</p>
+        
+        <h3 id="scaladoc" class="section">Scaladoc<a class="anchor-link right" href="#scaladoc"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p><a href="https://javadoc.io/doc/org.typelevel/spire_2.13"><img src="https://javadoc.io/badge2/org.typelevel/spire_2.13/core.svg" alt="Core"></a>
+        <a href="https://javadoc.io/doc/org.typelevel/spire-extras_2.13"><img src="https://javadoc.io/badge2/org.typelevel/spire-extras_2.13/extras.svg" alt="Extras"></a>
+        <a href="https://javadoc.io/doc/org.typelevel/spire-laws_2.13"><img src="https://javadoc.io/badge2/org.typelevel/spire-laws_2.13/laws.svg" alt="Laws"></a>
+        <a href="https://javadoc.io/doc/org.typelevel/spire-macros_2.13"><img src="https://javadoc.io/badge2/org.typelevel/spire-macros_2.13/macros.svg" alt="Macros"></a></p>
+        <p>Spire is provided to you as free software under the
+        <a href="https://github.com/typelevel/spire/blob/main/COPYING">MIT license</a>.</p>
+        
+        <h3 id="organization" class="section">Organization<a class="anchor-link right" href="#organization"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>There is a <code>#spire</code> channel on the <a href="https://discord.com/invite/XF3CXcMzqD">Typelevel Discord</a>.
+        It is the place to go for announcements and discussions around Spire.</p>
+        <p>We also have a guide on <a href="CONTRIBUTING.html">contributing to Spire</a> as well
+        as a guide that provides information on <a href="guide.html">Spire&#39;s design</a>.</p>
+        <p>Spire has maintainers who are responsible for signing-off on and
+        merging pull requests, and for helping to guide the direction of Spire:</p>
+        <ul>
+          <li>Erik Osheim (<em><a href="mailto:erik@osheim.org">erik@osheim.org</a></em>)</li>
+        </ul>
+        <ul>
+          <li>Tom Switzer (<em><a href="mailto:thomas.switzer@gmail.com">thomas.switzer@gmail.com</a></em>)</li>
+        </ul>
+        <ul>
+          <li>Rüdiger Klaehn (<em><a href="mailto:rklaehn@gmail.com">rklaehn@gmail.com</a></em>)</li>
+        </ul>
+        <ul>
+          <li>Denis Rosset (<em><a href="mailto:physics@denisrosset.com">physics@denisrosset.com</a></em>)</li>
+        </ul>
+        
+        <h3 id="code-of-conduct" class="section">Code of Conduct<a class="anchor-link right" href="#code-of-conduct"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>People are expected to follow the <a href="https://typelevel.org/code-of-conduct.html">Typelevel Code of Conduct</a>
+        when discussing Spire on the Github page, in Discord, Gitter, the IRC channel,
+        mailing list, and other official venues.</p>
+        <p>Concerns or issues can be sent to any of Spire&#39;s maintainers, or to any of the
+        <a href="https://typelevel.org/code-of-conduct.html">designated CoC contacts</a> for Typelevel.</p>
+        
+        <h3 id="set-up" class="section">Set up<a class="anchor-link right" href="#set-up"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>Spire is currently available for Scala 2.13 and 3.1+, for the
+        JVM and JS platforms.</p>
+        <p>To get started with SBT, simply add the following to your <code>build.sbt</code> file:</p>
+        <pre><code>libraryDependencies += &quot;org.typelevel&quot; %% &quot;spire&quot; % &quot;0.17.0&quot;</code></pre>
+        <p>(Previous to 0.14.0, Spire was published under <em>org.spire-math</em>
+        instead of <em>org.typelevel</em>.)</p>
+        <p>For information on all the available versions, visit the
+        <a href="https://index.scala-lang.org/typelevel/spire">Scaladex entry</a>.</p>
+        <p>Here is a list of all of Spire&#39;s modules:</p>
+        <ul>
+          <li><code>spire-macros</code>: macros and compile-time code (required by <code>spire</code>)</li>
+        </ul>
+        <ul>
+          <li><code>spire</code>: the core Spire library, the types and type classes</li>
+        </ul>
+        <ul>
+          <li><code>spire-laws</code>: optional support for law-checking and testing</li>
+        </ul>
+        <ul>
+          <li><code>spire-extras</code>: extra types which are more specific or esoteric</li>
+        </ul>
+        <p>Spire depends on <a href="https://github.com/typelevel/algebra">typelevel/algebra</a>
+        and uses this project to interoperate with <a href="https://github.com/typelevel/cats">Cats</a> and
+        <a href="https://github.com/twitter/algebird">Algebird</a>.</p>
+        
+        <h3 id="playing-around" class="section">Playing Around<a class="anchor-link right" href="#playing-around"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>The quickest way to try spire is in the browser with <a href="https://scastie.scala-lang.org/LVRAHaJAS7qoVbUyoDgKNA">Scastie</a>. </p>
+        <p><script src="https://scastie.scala-lang.org/LVRAHaJAS7qoVbUyoDgKNA.js"></script></p>
+        
+        <h4 id="with-ammonite-repl" class="section">With Ammonite REPL<a class="anchor-link right" href="#with-ammonite-repl"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <p>If you have <a href="https://ammonite.io/">Ammonite</a>, you can use an interactive REPL session.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="type-name">Welcome</span><span> </span><span class="identifier">to</span><span> </span><span class="identifier">the</span><span> </span><span class="type-name">Ammonite</span><span> </span><span class="type-name">Repl</span><span> </span><span class="number-literal">2</span><span>.</span><span class="identifier">x</span><span>.</span><span class="identifier">x</span><span>
+@ </span><span class="keyword">import</span><span> </span><span class="identifier">$ivy</span><span>.</span><span class="identifier">`org.typelevel::spire:0.17.0`</span><span>
+@ </span><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">_</span><span>
+@ </span><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">math</span><span>.</span><span class="identifier">_</span><span>
+@ </span><span class="keyword">import</span><span> </span><span class="identifier">sipre</span><span>.</span><span class="identifier">implicits</span><span>.</span><span class="identifier">_</span><span>
+@ </span><span class="type-name">Complex</span><span>(</span><span class="number-literal">3.0</span><span>,</span><span class="number-literal">5.0</span><span>).</span><span class="identifier">sin</span><span>
+</span><span class="identifier">res</span><span>: </span><span class="type-name">Complex</span><span>[</span><span class="type-name">Double</span><span>] = </span><span class="type-name">Complex</span><span>(</span><span class="identifier">real</span><span> = </span><span class="number-literal">10.472508533940392</span><span>, </span><span class="identifier">imag</span><span> = -</span><span class="number-literal">73.46062169567367</span><span>)</span></code></pre>
+        
+        <h4 id="with-an-ide" class="section">With an IDE<a class="anchor-link right" href="#with-an-ide"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <p>You can also play around with <a href="https://www.jetbrains.com/help/idea/discover-intellij-idea-for-scala.html">IntelliJ</a> or <a href="https://scalameta.org/metals/docs/editors/vscode/">VS Code and Metals</a>.</p>
+        <p>Create a <a href="https://scalameta.org/metals/docs/editors/vscode/#worksheets">worksheet</a> file <code>spire.worksheet.sc</code> in your IDE and copy-paste the following code snippet.</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">$ivy</span><span>.</span><span class="identifier">`org.typelevel::spire:0.17.0`</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">_</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">math</span><span>.</span><span class="identifier">_</span><span>
+</span><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">implicits</span><span>.</span><span class="identifier">_</span><span>
+</span><span class="type-name">Complex</span><span>(</span><span class="number-literal">3.0</span><span>,</span><span class="number-literal">5.0</span><span>).</span><span class="identifier">sin</span><span>
+</span><span class="identifier">res</span><span>: </span><span class="type-name">Complex</span><span>[</span><span class="type-name">Double</span><span>] = </span><span class="type-name">Complex</span><span>(</span><span class="identifier">real</span><span> = </span><span class="number-literal">10.472508533940392</span><span>, </span><span class="identifier">imag</span><span> = -</span><span class="number-literal">73.46062169567367</span><span>)</span></code></pre>
+        
+        <h4 id="with-git-and-sbt" class="section">With git and sbt<a class="anchor-link right" href="#with-git-and-sbt"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <p>If you clone the Spire repo, you can get a taste of what Spire can do using
+        SBT&#39;s console. Launch <code>sbt</code> and at the prompt, type <code>coreJVM/console</code>:</p>
+        <pre><code>&gt; coreJVM/console
 [info] Generating spire/std/tuples.scala
 [info] Starting scala interpreter...
 [info]
@@ -134,506 +233,643 @@ scala&gt; import spire.math._
 import spire.math._
 
 scala&gt; Complex(3.0, 5.0).sin
-res0: spire.math.Complex[Double] = (10.472508533940392 + -73.46062169567367i)
-</code></pre></div></div>
-
-<h3 id="number-types">Number Types</h3>
-
-<p>In addition to supporting all of Scala’s built-in number types, Spire
-introduces several new ones, all of which can be found in <code class="language-plaintext highlighter-rouge">spire.math</code>:</p>
-
-<ul>
-  <li><code class="language-plaintext highlighter-rouge">Natural</code> unsigned, immutable, arbitrary precision integer</li>
-  <li><code class="language-plaintext highlighter-rouge">Rational</code> fractions of integers with perfect precision</li>
-  <li><code class="language-plaintext highlighter-rouge">Algebraic</code> lazily-computed, arbitrary precision algebraic numbers</li>
-  <li><code class="language-plaintext highlighter-rouge">Real</code> computable real number implementation</li>
-  <li><code class="language-plaintext highlighter-rouge">Complex[A]</code> complex numbers, points on the complex plane</li>
-  <li><code class="language-plaintext highlighter-rouge">Jet[A]</code> N-dimensional dual numbers, for automatic differentiation</li>
-  <li><code class="language-plaintext highlighter-rouge">Quaternion[A]</code> extension of complex numbers into 4D space</li>
-  <li><code class="language-plaintext highlighter-rouge">UByte</code> through <code class="language-plaintext highlighter-rouge">ULong</code> value classes supporting unsigned operations</li>
-  <li><code class="language-plaintext highlighter-rouge">SafeLong</code> fast, overflow-proof integer type</li>
-  <li><code class="language-plaintext highlighter-rouge">Number</code> boxed type supporting a traditional numeric tower</li>
-  <li><code class="language-plaintext highlighter-rouge">Interval[A]</code> arithmetic on open, closed, and unbound intervals</li>
-  <li><code class="language-plaintext highlighter-rouge">Polynomial[A]</code> univariate (single-variable) polynomial expressions</li>
-  <li><code class="language-plaintext highlighter-rouge">Trilean</code> value class supporting three-valued logic</li>
-  <li><code class="language-plaintext highlighter-rouge">FixedPoint</code> fractions with <code class="language-plaintext highlighter-rouge">Long</code> numerator and implicit denominator (in <em>extras</em>)</li>
-</ul>
-
-<p>Detailed treatment of these types can be found in the <a href="./guide.html">guide</a>.</p>
-
-<h3 id="type-classes">Type Classes</h3>
-
-<p>Spire provides type classes to support a wide range of unary and binary
-operations on numbers. The type classes are specialized, do no boxing, and use
-implicits to provide convenient infix syntax.</p>
-
-<p>The general-purpose type classes can be found in <code class="language-plaintext highlighter-rouge">spire.math</code> and consist of:</p>
-
-<ul>
-  <li><code class="language-plaintext highlighter-rouge">Numeric[A]</code> all number types, makes “best effort” to support operators</li>
-  <li><code class="language-plaintext highlighter-rouge">Fractional[A]</code> fractional number types, where <code class="language-plaintext highlighter-rouge">/</code> is true division</li>
-  <li><code class="language-plaintext highlighter-rouge">Integral[A]</code> integral number types, where <code class="language-plaintext highlighter-rouge">/</code> is floor division</li>
-</ul>
-
-<p>Some of the general-purpose type classes are built in terms of a set of more
-fundamental type classes defined in <code class="language-plaintext highlighter-rouge">spire.algebra</code>. Many of these correspond
-to concepts from abstract algebra:</p>
-
-<ul>
-  <li><code class="language-plaintext highlighter-rouge">Eq[A]</code> types that can be compared for equality</li>
-  <li><code class="language-plaintext highlighter-rouge">Order[A]</code> types that can be compared and ordered</li>
-  <li><code class="language-plaintext highlighter-rouge">PartialOrder[A]</code> types that can be compared for equality, and for which certain pairs are ordered</li>
-  <li><code class="language-plaintext highlighter-rouge">Semigroup[A]</code> types with an associative binary operator <code class="language-plaintext highlighter-rouge">|+|</code></li>
-  <li><code class="language-plaintext highlighter-rouge">Monoid[A]</code> semigroups that have an identity element</li>
-  <li><code class="language-plaintext highlighter-rouge">Group[A]</code> monoids that have an inverse operator</li>
-  <li><code class="language-plaintext highlighter-rouge">(Left/Right/)Action[P, G]</code> left/right/ actions of semigroups/monoids/groups</li>
-  <li><code class="language-plaintext highlighter-rouge">Semiring[A]</code> types that form semigroups under <code class="language-plaintext highlighter-rouge">+</code> and <code class="language-plaintext highlighter-rouge">*</code></li>
-  <li><code class="language-plaintext highlighter-rouge">Rng[A]</code> types that form a group under <code class="language-plaintext highlighter-rouge">+</code> and a semigroup under <code class="language-plaintext highlighter-rouge">*</code></li>
-  <li><code class="language-plaintext highlighter-rouge">Rig[A]</code> types that form monoids under <code class="language-plaintext highlighter-rouge">+</code> and <code class="language-plaintext highlighter-rouge">*</code></li>
-  <li><code class="language-plaintext highlighter-rouge">Ring[A]</code> types that form a group under <code class="language-plaintext highlighter-rouge">+</code> and a monoid under <code class="language-plaintext highlighter-rouge">*</code></li>
-  <li><code class="language-plaintext highlighter-rouge">EuclideanRing[A]</code> rings with quotients and remainders (euclidean division)</li>
-  <li><code class="language-plaintext highlighter-rouge">Field[A]</code> euclidean rings with multiplicative inverses (reciprocals)</li>
-  <li><code class="language-plaintext highlighter-rouge">Signed[A]</code> types that have a sign (negative, zero, positive)</li>
-  <li><code class="language-plaintext highlighter-rouge">NRoot[A]</code> types that support k-roots, logs, and fractional powers</li>
-  <li><code class="language-plaintext highlighter-rouge">Module[V,R]</code> types that form a left R-module</li>
-  <li><code class="language-plaintext highlighter-rouge">VectorSpace[V,F]</code> types that form a vector space</li>
-  <li><code class="language-plaintext highlighter-rouge">NormedVectorSpace[V,F]</code> types with an associated norm</li>
-  <li><code class="language-plaintext highlighter-rouge">InnerProductSpace[V,F]</code> types with an inner product</li>
-  <li><code class="language-plaintext highlighter-rouge">MetricSpace[V,R]</code> types with an associated metric</li>
-  <li><code class="language-plaintext highlighter-rouge">Trig[A]</code> types that support trigonometric functions</li>
-  <li><code class="language-plaintext highlighter-rouge">Bool[A]</code> types that form a Boolean algebra</li>
-  <li><code class="language-plaintext highlighter-rouge">Heyting[A]</code> types that form a Heyting algebra</li>
-</ul>
-
-<p>Variants of Semigroup/Monoid/Group/Action with partial operations are
-defined in the <code class="language-plaintext highlighter-rouge">spire.algebra.partial</code> subpackage.</p>
-
-<p>In addition to the type classes themselves, <code class="language-plaintext highlighter-rouge">spire.implicits</code> defines many
-implicits which provide unary and infix operators for the type classes. The
-easiest way to use these is via a wildcard import of <code class="language-plaintext highlighter-rouge">spire.implicits._</code>.</p>
-
-<p>Detailed treatment of these type classes can be found in the
-<a href="./guide.html">guide</a>.</p>
-
-<h3 id="getting-started">Getting Started</h3>
-
-<p>Spire contains a lot of types, as well as other machinery to provide a nice
-user experience. The easiest way to use spire is via wildcard imports:</p>
-
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">spire.algebra._</span>   <span class="c1">// provides algebraic type classes</span>
-<span class="k">import</span> <span class="nn">spire.math._</span>      <span class="c1">// provides functions, types, and type classes</span>
-<span class="k">import</span> <span class="nn">spire.implicits._</span> <span class="c1">// provides infix operators, instances and conversions</span>
-</code></pre></div></div>
-
-<p>Of course, you can still productively use Spire without wildcard imports, but
-it may require a bit more work to figure out which functionality you want and
-where it’s coming from.</p>
-
-<h3 id="operators-by-type-class">Operators by Type Class</h3>
-
-<p>The following is an outline in more detail of the type classes provided by
-Spire, as well as the operators that they use. While Spire avoids introducing
-novel operators when possible, in a few cases it was unavoidable.</p>
-
-<h4 id="eq-order-and-partialorder">Eq, Order and PartialOrder</h4>
-
-<p>The type classes provide type-safe equivalence and comparison functions. Orderings
-can be total (<code class="language-plaintext highlighter-rouge">Order</code>) or partial (<code class="language-plaintext highlighter-rouge">PartialOrder</code>); although undefined elements like
-<code class="language-plaintext highlighter-rouge">NaN</code> or <code class="language-plaintext highlighter-rouge">null</code> will cause problems in the default implementations [1].</p>
-
-<ul>
-  <li><em>Eq</em>
-    <ul>
-      <li>eqv (<code class="language-plaintext highlighter-rouge">===</code>): equivalence</li>
-      <li>neqv (<code class="language-plaintext highlighter-rouge">=!=</code>): non-equivalence</li>
-    </ul>
-  </li>
-  <li><em>Order</em>
-    <ul>
-      <li>compare: less-than (-1), equivalent (0), or greater-than (1)</li>
-      <li>gt (<code class="language-plaintext highlighter-rouge">&gt;</code>): greater-than</li>
-      <li>gteqv (<code class="language-plaintext highlighter-rouge">&gt;=</code>): greater-than-or-equivalent</li>
-      <li>lt (<code class="language-plaintext highlighter-rouge">&lt;</code>): less-than</li>
-      <li>lteqv (<code class="language-plaintext highlighter-rouge">&lt;=</code>): less-than-or-equivalent</li>
-      <li>min: find least value</li>
-      <li>max: find greatest value</li>
-    </ul>
-  </li>
-  <li><em>PartialOrder</em>
-    <ul>
-      <li>partialCompare: less-than (<code class="language-plaintext highlighter-rouge">-1.0</code>), equivalent (<code class="language-plaintext highlighter-rouge">0.0</code>), greater-than (<code class="language-plaintext highlighter-rouge">1.0</code>) or incomparable (<code class="language-plaintext highlighter-rouge">NaN</code>)</li>
-      <li>tryCompare: less-than (<code class="language-plaintext highlighter-rouge">Some(-1)</code>), equivalent (<code class="language-plaintext highlighter-rouge">Some(0)</code>), greater-than (<code class="language-plaintext highlighter-rouge">Some(1)</code>) or incomparable (<code class="language-plaintext highlighter-rouge">None</code>)</li>
-      <li>pmin: find the least value if the elements are comparable; returns an <code class="language-plaintext highlighter-rouge">Option</code></li>
-      <li>pmax: find the greated value if the elements are comparable; returns an <code class="language-plaintext highlighter-rouge">Option</code></li>
-      <li>gt (<code class="language-plaintext highlighter-rouge">&gt;</code>), gteqv (<code class="language-plaintext highlighter-rouge">&gt;=</code>), lt (<code class="language-plaintext highlighter-rouge">&lt;</code>) and lteqv (<code class="language-plaintext highlighter-rouge">&lt;=</code>) return false if the elements are incomparable, or the result of their comparison</li>
-    </ul>
-  </li>
-</ul>
-
-<p>[1] For floating-point numbers, alternate implementations that take <code class="language-plaintext highlighter-rouge">NaN</code> into
-account can be imported from <code class="language-plaintext highlighter-rouge">spire.optional.totalfloat._</code>.</p>
-
-<h4 id="semigroup-monoid-and-group">Semigroup, Monoid, and Group</h4>
-
-<p>These general type classes constitute very general operations. The operations
-range from addition and multiplication to concatenating strings or lists, and
-beyond!</p>
-
-<ul>
-  <li><em>Semigroup</em>
-    <ul>
-      <li>op (<code class="language-plaintext highlighter-rouge">|+|</code>): associative binary operator</li>
-    </ul>
-  </li>
-  <li><em>Monoid</em>
-    <ul>
-      <li>id: an identity element</li>
-      <li>isId: checks (together with Eq) for identity</li>
-    </ul>
-  </li>
-  <li><em>Group</em>
-    <ul>
-      <li>inverse: an unary operator</li>
-    </ul>
-  </li>
-</ul>
-
-<p>There are Additive and Multiplicative refinements of these general type
-classes, which are used in the Ring-family of type classes.</p>
-
-<h4 id="rings-co">Rings &amp;co</h4>
-
-<p>The Ring family of type classes provides the typical arithmetic operations
-most users will expect.</p>
-
-<ul>
-  <li><em>Semiring</em>
-    <ul>
-      <li>plus (<code class="language-plaintext highlighter-rouge">+</code>): addition</li>
-      <li>times (<code class="language-plaintext highlighter-rouge">*</code>): multiplication</li>
-      <li>pow (<code class="language-plaintext highlighter-rouge">**</code>): exponentiation (integral exponent)</li>
-    </ul>
-  </li>
-  <li><em>Rng</em>
-    <ul>
-      <li>negate (<code class="language-plaintext highlighter-rouge">-</code>): additive inverse</li>
-      <li>minus (<code class="language-plaintext highlighter-rouge">-</code>): subtraction</li>
-      <li>zero: additive identity</li>
-    </ul>
-  </li>
-  <li><em>Rig</em>
-    <ul>
-      <li>zero: additive identity</li>
-      <li>one: multiplicative identity</li>
-    </ul>
-  </li>
-  <li><em>Ring</em> (Rng + Rig)</li>
-  <li><em>GCDRing</em>
-    <ul>
-      <li>gcd: greatest-common-divisor</li>
-      <li>lcm: least-common-multiple</li>
-    </ul>
-  </li>
-  <li><em>EuclideanRing</em>
-    <ul>
-      <li>quot (<code class="language-plaintext highlighter-rouge">/~</code>): quotient (Euclidean division)</li>
-      <li>mod (<code class="language-plaintext highlighter-rouge">%</code>): remainder</li>
-      <li>quotmod (<code class="language-plaintext highlighter-rouge">/%</code>): quotient and mod</li>
-    </ul>
-  </li>
-  <li><em>Field</em>
-    <ul>
-      <li>reciprocal: multiplicative inverse</li>
-      <li>div (<code class="language-plaintext highlighter-rouge">/</code>): division</li>
-      <li>ceil: round up</li>
-      <li>floor: round down</li>
-      <li>round: round to nearest</li>
-    </ul>
-  </li>
-  <li><em>NRoot</em>
-    <ul>
-      <li>nroot: k-roots (k: Int)</li>
-      <li>sqrt: square root</li>
-      <li>log: natural logarithm</li>
-      <li>fpow (<code class="language-plaintext highlighter-rouge">**</code>): exponentiation (fractional exponent)</li>
-    </ul>
-  </li>
-</ul>
-
-<h4 id="vectorspaces-co">VectorSpaces &amp;co</h4>
-
-<p>The vector space family of type classes provide basic vector operations. They
-are parameterized on 2 types: the vector type and the scalar type.</p>
-
-<ul>
-  <li><em>Module</em>
-    <ul>
-      <li>plus (<code class="language-plaintext highlighter-rouge">+</code>): vector addition</li>
-      <li>minus (<code class="language-plaintext highlighter-rouge">-</code>): vector subtraction</li>
-      <li>timesl (<code class="language-plaintext highlighter-rouge">*:</code>): scalar multiplication</li>
-    </ul>
-  </li>
-  <li><em>VectorSpace</em>
-    <ul>
-      <li>divr (<code class="language-plaintext highlighter-rouge">:/</code>): scalar division</li>
-    </ul>
-  </li>
-  <li><em>NormedVectorSpace</em>
-    <ul>
-      <li>norm: vector norm</li>
-      <li>normalize: normalizes vector (so norm is 1)</li>
-    </ul>
-  </li>
-  <li><em>InnerProductSpace</em>
-    <ul>
-      <li>dot (<code class="language-plaintext highlighter-rouge">⋅</code>, <code class="language-plaintext highlighter-rouge">dot</code>): vector inner product</li>
-    </ul>
-  </li>
-</ul>
-
-<h4 id="numeric-integral-and-fractional">Numeric, Integral, and Fractional</h4>
-
-<p>These high-level type classes will pull in all of the relevant algebraic type
-classes. Users who aren’t concerned with algebraic properties directly, or who
-wish for more permissiveness, should prefer these type classes.</p>
-
-<ul>
-  <li><em>Integral</em>: whole number types (e.g. <code class="language-plaintext highlighter-rouge">Int</code>, <code class="language-plaintext highlighter-rouge">BigInt</code>)</li>
-  <li><em>Fractional</em>: fractional/decimal types (e.g. <code class="language-plaintext highlighter-rouge">Double</code>, <code class="language-plaintext highlighter-rouge">Rational</code>)</li>
-  <li><em>Numeric</em>: any number type, making “best effort” to support ops</li>
-</ul>
-
-<p>The <code class="language-plaintext highlighter-rouge">Numeric</code> type class is unique in that it provides the same functionality
-as <code class="language-plaintext highlighter-rouge">Fractional</code> for all number types. Each type will attempt to “do the right
-thing” as far as possible, and throw errors otherwise. Users who are leery of
-this behavior are encouraged to use more precise type classes.</p>
-
-<h4 id="bool">Bool</h4>
-
-<p>Bool supports Boolean algebras, an abstraction of the familiar bitwise
-boolean operators.</p>
-
-<ul>
-  <li><em>Bool</em>
-    <ul>
-      <li>complement (unary <code class="language-plaintext highlighter-rouge">~</code>): logical negation</li>
-      <li>and (<code class="language-plaintext highlighter-rouge">&amp;</code>): conjunction</li>
-      <li>or (<code class="language-plaintext highlighter-rouge">|</code>): disjunction</li>
-      <li>xor (<code class="language-plaintext highlighter-rouge">^</code>): exclusive-disjunction</li>
-      <li>imp: implicitation, equivalent to <code class="language-plaintext highlighter-rouge">~a | b</code></li>
-      <li>nand: “not-and,” equivalent to <code class="language-plaintext highlighter-rouge">~(a &amp; b)</code></li>
-      <li>nor: “not-or,” equivalent to <code class="language-plaintext highlighter-rouge">~(a | b)</code></li>
-      <li>nxor: “not-xor,” equivalent to <code class="language-plaintext highlighter-rouge">~(a ^ b)</code></li>
-    </ul>
-  </li>
-</ul>
-
-<p>Bool instances exist not just for <code class="language-plaintext highlighter-rouge">Boolean</code>, but also for <code class="language-plaintext highlighter-rouge">Byte</code>,
-<code class="language-plaintext highlighter-rouge">Short</code>, <code class="language-plaintext highlighter-rouge">Int</code>, <code class="language-plaintext highlighter-rouge">Long</code>, <code class="language-plaintext highlighter-rouge">UByte</code>, <code class="language-plaintext highlighter-rouge">UShort</code>, <code class="language-plaintext highlighter-rouge">UInt</code>, and <code class="language-plaintext highlighter-rouge">ULong</code>.</p>
-
-<h4 id="trig">Trig</h4>
-
-<p>Trig provides an abstraction for any type which defines trigonometric
-functions. To do this, types should be able to reasonably approximate real
-values.</p>
-
-<ul>
-  <li><em>Trig</em>
-    <ul>
-      <li>e: Euler’s number, <code class="language-plaintext highlighter-rouge">2.71828...</code></li>
-      <li>pi: Ratio of circle’s circumference to diameter, <code class="language-plaintext highlighter-rouge">3.14159...</code></li>
-      <li>exp: exponential function, <code class="language-plaintext highlighter-rouge">e^x</code></li>
-      <li>expm1: <code class="language-plaintext highlighter-rouge">e^x - 1</code></li>
-      <li>log: natural logarithm</li>
-      <li>log1p: <code class="language-plaintext highlighter-rouge">log(x + 1)</code></li>
-      <li>sin, cos, tan: sine, cosine, and tangent, the standard functions of angles</li>
-      <li>asin, acos, atan, atan2: inverse functions</li>
-      <li>sinh, cosh, tanh: hyperbolic functions</li>
-      <li>toRadians, toDegrees: convert between angle units</li>
-    </ul>
-  </li>
-</ul>
-
-<h3 id="syntax">Syntax</h3>
-
-<p>Using string interpolation and macros, Spire provides convenient syntax for
-number types. These macros are evaluated at compile-time, and any errors they
-encounter will occur at compile-time.</p>
-
-<p>For example:</p>
-
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">object</span> <span class="nc">LiteralsDemo</span> <span class="o">{</span>
-  <span class="k">import</span> <span class="nn">spire.syntax.literals._</span>
+res0: spire.math.Complex[Double] = (10.472508533940392 + -73.46062169567367i)</code></pre>
+        
+        <h3 id="number-types" class="section">Number Types<a class="anchor-link right" href="#number-types"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>In addition to supporting all of Scala&#39;s built-in number types, Spire
+        introduces several new ones, all of which can be found in <code>spire.math</code>:</p>
+        <ul>
+          <li><code>Natural</code> unsigned, immutable, arbitrary precision integer</li>
+        </ul>
+        <ul>
+          <li><code>Rational</code> fractions of integers with perfect precision</li>
+        </ul>
+        <ul>
+          <li><code>Algebraic</code> lazily-computed, arbitrary precision algebraic numbers</li>
+        </ul>
+        <ul>
+          <li><code>Real</code> computable real number implementation</li>
+        </ul>
+        <ul>
+          <li><code>Complex[A]</code> complex numbers, points on the complex plane</li>
+        </ul>
+        <ul>
+          <li><code>Jet[A]</code> N-dimensional dual numbers, for automatic differentiation</li>
+        </ul>
+        <ul>
+          <li><code>Quaternion[A]</code> extension of complex numbers into 4D space</li>
+        </ul>
+        <ul>
+          <li><code>UByte</code> through <code>ULong</code> value classes supporting unsigned operations</li>
+        </ul>
+        <ul>
+          <li><code>SafeLong</code> fast, overflow-proof integer type</li>
+        </ul>
+        <ul>
+          <li><code>Number</code> boxed type supporting a traditional numeric tower</li>
+        </ul>
+        <ul>
+          <li><code>Interval[A]</code> arithmetic on open, closed, and unbound intervals</li>
+        </ul>
+        <ul>
+          <li><code>Polynomial[A]</code> univariate (single-variable) polynomial expressions</li>
+        </ul>
+        <ul>
+          <li><code>Trilean</code> value class supporting three-valued logic</li>
+        </ul>
+        <ul>
+          <li><code>FixedPoint</code> fractions with <code>Long</code> numerator and implicit denominator (in <em>extras</em>)</li>
+        </ul>
+        <p>Detailed treatment of these types can be found in the <a href="guide.html">guide</a>.</p>
+        
+        <h3 id="type-classes" class="section">Type Classes<a class="anchor-link right" href="#type-classes"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>Spire provides type classes to support a wide range of unary and binary
+        operations on numbers. The type classes are specialized, do no boxing, and use
+        implicits to provide convenient infix syntax.</p>
+        <p>The general-purpose type classes can be found in <code>spire.math</code> and consist of:</p>
+        <ul>
+          <li><code>Numeric[A]</code> all number types, makes &quot;best effort&quot; to support operators</li>
+        </ul>
+        <ul>
+          <li><code>Fractional[A]</code> fractional number types, where <code>/</code> is true division</li>
+        </ul>
+        <ul>
+          <li><code>Integral[A]</code> integral number types, where <code>/</code> is floor division</li>
+        </ul>
+        <p>Some of the general-purpose type classes are built in terms of a set of more
+        fundamental type classes defined in <code>spire.algebra</code>. Many of these correspond
+        to concepts from abstract algebra:</p>
+        <ul>
+          <li><code>Eq[A]</code> types that can be compared for equality</li>
+        </ul>
+        <ul>
+          <li><code>Order[A]</code> types that can be compared and ordered</li>
+        </ul>
+        <ul>
+          <li><code>PartialOrder[A]</code> types that can be compared for equality, and for which certain pairs are ordered</li>
+        </ul>
+        <ul>
+          <li><code>Semigroup[A]</code> types with an associative binary operator <code>|+|</code></li>
+        </ul>
+        <ul>
+          <li><code>Monoid[A]</code> semigroups that have an identity element</li>
+        </ul>
+        <ul>
+          <li><code>Group[A]</code> monoids that have an inverse operator</li>
+        </ul>
+        <ul>
+          <li><code>(Left/Right/)Action[P, G]</code> left/right/ actions of semigroups/monoids/groups</li>
+        </ul>
+        <ul>
+          <li><code>Semiring[A]</code> types that form semigroups under <code>+</code> and <code>*</code></li>
+        </ul>
+        <ul>
+          <li><code>Rng[A]</code> types that form a group under <code>+</code> and a semigroup under <code>*</code></li>
+        </ul>
+        <ul>
+          <li><code>Rig[A]</code> types that form monoids under <code>+</code> and <code>*</code></li>
+        </ul>
+        <ul>
+          <li><code>Ring[A]</code> types that form a group under <code>+</code> and a monoid under <code>*</code></li>
+        </ul>
+        <ul>
+          <li><code>EuclideanRing[A]</code> rings with quotients and remainders (euclidean division)</li>
+        </ul>
+        <ul>
+          <li><code>Field[A]</code> euclidean rings with multiplicative inverses (reciprocals)</li>
+        </ul>
+        <ul>
+          <li><code>Signed[A]</code> types that have a sign (negative, zero, positive)</li>
+        </ul>
+        <ul>
+          <li><code>NRoot[A]</code> types that support k-roots, logs, and fractional powers</li>
+        </ul>
+        <ul>
+          <li><code>Module[V,R]</code> types that form a left R-module</li>
+        </ul>
+        <ul>
+          <li><code>VectorSpace[V,F]</code> types that form a vector space</li>
+        </ul>
+        <ul>
+          <li><code>NormedVectorSpace[V,F]</code> types with an associated norm</li>
+        </ul>
+        <ul>
+          <li><code>InnerProductSpace[V,F]</code> types with an inner product</li>
+        </ul>
+        <ul>
+          <li><code>MetricSpace[V,R]</code> types with an associated metric</li>
+        </ul>
+        <ul>
+          <li><code>Trig[A]</code> types that support trigonometric functions</li>
+        </ul>
+        <ul>
+          <li><code>Bool[A]</code> types that form a Boolean algebra</li>
+        </ul>
+        <ul>
+          <li><code>Heyting[A]</code> types that form a Heyting algebra</li>
+        </ul>
+        <p>Variants of Semigroup/Monoid/Group/Action with partial operations are
+        defined in the <code>spire.algebra.partial</code> subpackage.</p>
+        <p>In addition to the type classes themselves, <code>spire.implicits</code> defines many
+        implicits which provide unary and infix operators for the type classes. The
+        easiest way to use these is via a wildcard import of <code>spire.implicits._</code>.</p>
+        <p>Detailed treatment of these type classes can be found in the
+        <a href="guide.html">guide</a>.</p>
+        
+        <h3 id="getting-started" class="section">Getting Started<a class="anchor-link right" href="#getting-started"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>Spire contains a lot of types, as well as other machinery to provide a nice
+        user experience. The easiest way to use spire is via wildcard imports:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">algebra</span><span>.</span><span class="identifier">_</span><span>   </span><span class="comment">// provides algebraic type classes
+</span><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">math</span><span>.</span><span class="identifier">_</span><span>      </span><span class="comment">// provides functions, types, and type classes
+</span><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">implicits</span><span>.</span><span class="identifier">_</span><span> </span><span class="comment">// provides infix operators, instances and conversions</span></code></pre>
+        <p>Of course, you can still productively use Spire without wildcard imports, but
+        it may require a bit more work to figure out which functionality you want and
+        where it&#39;s coming from.</p>
+        
+        <h3 id="operators-by-type-class" class="section">Operators by Type Class<a class="anchor-link right" href="#operators-by-type-class"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>The following is an outline in more detail of the type classes provided by
+        Spire, as well as the operators that they use. While Spire avoids introducing
+        novel operators when possible, in a few cases it was unavoidable.</p>
+        
+        <h4 id="eq-order-and-partialorder" class="section">Eq, Order and PartialOrder<a class="anchor-link right" href="#eq-order-and-partialorder"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <p>The type classes provide type-safe equivalence and comparison functions. Orderings
+        can be total (<code>Order</code>) or partial (<code>PartialOrder</code>); although undefined elements like
+        <code>NaN</code> or <code>null</code> will cause problems in the default implementations
+        (for floating-point numbers, alternate implementations that take <code>NaN</code> into
+        account can be imported from <code>spire.optional.totalfloat._</code>).</p>
+        <ul>
+          <li><em>Eq</em></li>
+        </ul>
+        <ul>
+          <li>eqv (<code>===</code>): equivalence</li>
+        </ul>
+        <ul>
+          <li>neqv (<code>=!=</code>): non-equivalence</li>
+        </ul>
+        <ul>
+          <li><em>Order</em></li>
+        </ul>
+        <ul>
+          <li>compare: less-than (-1), equivalent (0), or greater-than (1)</li>
+        </ul>
+        <ul>
+          <li>gt (<code>&gt;</code>): greater-than</li>
+        </ul>
+        <ul>
+          <li>gteqv (<code>&gt;=</code>): greater-than-or-equivalent</li>
+        </ul>
+        <ul>
+          <li>lt (<code>&lt;</code>): less-than</li>
+        </ul>
+        <ul>
+          <li>lteqv (<code>&lt;=</code>): less-than-or-equivalent</li>
+        </ul>
+        <ul>
+          <li>min: find least value</li>
+        </ul>
+        <ul>
+          <li>max: find greatest value</li>
+        </ul>
+        <ul>
+          <li><em>PartialOrder</em></li>
+        </ul>
+        <ul>
+          <li>partialCompare: less-than (<code>-1.0</code>), equivalent (<code>0.0</code>), greater-than (<code>1.0</code>) or incomparable (<code>NaN</code>)</li>
+        </ul>
+        <ul>
+          <li>tryCompare: less-than (<code>Some(-1)</code>), equivalent (<code>Some(0)</code>), greater-than (<code>Some(1)</code>) or incomparable (<code>None</code>)</li>
+        </ul>
+        <ul>
+          <li>pmin: find the least value if the elements are comparable; returns an <code>Option</code></li>
+        </ul>
+        <ul>
+          <li>pmax: find the greated value if the elements are comparable; returns an <code>Option</code></li>
+        </ul>
+        <ul>
+          <li>gt (<code>&gt;</code>), gteqv (<code>&gt;=</code>), lt (<code>&lt;</code>) and lteqv (<code>&lt;=</code>) return false if the elements are incomparable, or the result of their comparison</li>
+        </ul>
+        
+        <h4 id="semigroup-monoid-and-group" class="section">Semigroup, Monoid, and Group<a class="anchor-link right" href="#semigroup-monoid-and-group"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <p>These general type classes constitute very general operations. The operations
+        range from addition and multiplication to concatenating strings or lists, and
+        beyond!</p>
+        <ul>
+          <li><em>Semigroup</em></li>
+        </ul>
+        <ul>
+          <li>op (<code>|+|</code>): associative binary operator</li>
+        </ul>
+        <ul>
+          <li><em>Monoid</em></li>
+        </ul>
+        <ul>
+          <li>id: an identity element</li>
+        </ul>
+        <ul>
+          <li>isId: checks (together with Eq) for identity</li>
+        </ul>
+        <ul>
+          <li><em>Group</em></li>
+        </ul>
+        <ul>
+          <li>inverse: an unary operator</li>
+        </ul>
+        <p>There are Additive and Multiplicative refinements of these general type
+        classes, which are used in the Ring-family of type classes.</p>
+        
+        <h4 id="rings-co" class="section">Rings &amp;co<a class="anchor-link right" href="#rings-co"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <p>The Ring family of type classes provides the typical arithmetic operations
+        most users will expect.</p>
+        <ul>
+          <li><em>Semiring</em></li>
+        </ul>
+        <ul>
+          <li>plus (<code>+</code>): addition</li>
+        </ul>
+        <ul>
+          <li>times (<code>*</code>): multiplication</li>
+        </ul>
+        <ul>
+          <li>pow (<code>**</code>): exponentiation (integral exponent)</li>
+        </ul>
+        <ul>
+          <li><em>Rng</em></li>
+        </ul>
+        <ul>
+          <li>negate (<code>-</code>): additive inverse</li>
+        </ul>
+        <ul>
+          <li>minus (<code>-</code>): subtraction</li>
+        </ul>
+        <ul>
+          <li>zero: additive identity</li>
+        </ul>
+        <ul>
+          <li><em>Rig</em></li>
+        </ul>
+        <ul>
+          <li>zero: additive identity</li>
+        </ul>
+        <ul>
+          <li>one: multiplicative identity</li>
+        </ul>
+        <ul>
+          <li><em>Ring</em> (Rng + Rig)</li>
+        </ul>
+        <ul>
+          <li><em>GCDRing</em></li>
+        </ul>
+        <ul>
+          <li>gcd: greatest-common-divisor</li>
+        </ul>
+        <ul>
+          <li>lcm: least-common-multiple</li>
+        </ul>
+        <ul>
+          <li><em>EuclideanRing</em></li>
+        </ul>
+        <ul>
+          <li>quot (<code>/~</code>): quotient (Euclidean division)</li>
+        </ul>
+        <ul>
+          <li>mod (<code>%</code>): remainder</li>
+        </ul>
+        <ul>
+          <li>quotmod (<code>/%</code>): quotient and mod</li>
+        </ul>
+        <ul>
+          <li><em>Field</em></li>
+        </ul>
+        <ul>
+          <li>reciprocal: multiplicative inverse</li>
+        </ul>
+        <ul>
+          <li>div (<code>/</code>): division</li>
+        </ul>
+        <ul>
+          <li>ceil: round up</li>
+        </ul>
+        <ul>
+          <li>floor: round down</li>
+        </ul>
+        <ul>
+          <li>round: round to nearest</li>
+        </ul>
+        <ul>
+          <li><em>NRoot</em></li>
+        </ul>
+        <ul>
+          <li>nroot: k-roots (k: Int)</li>
+        </ul>
+        <ul>
+          <li>sqrt: square root</li>
+        </ul>
+        <ul>
+          <li>log: natural logarithm</li>
+        </ul>
+        <ul>
+          <li>fpow (<code>**</code>): exponentiation (fractional exponent)</li>
+        </ul>
+        
+        <h4 id="vectorspaces-co" class="section">VectorSpaces &amp;co<a class="anchor-link right" href="#vectorspaces-co"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <p>The vector space family of type classes provide basic vector operations. They
+        are parameterized on 2 types: the vector type and the scalar type.</p>
+        <ul>
+          <li><em>Module</em></li>
+        </ul>
+        <ul>
+          <li>plus (<code>+</code>): vector addition</li>
+        </ul>
+        <ul>
+          <li>minus (<code>-</code>): vector subtraction</li>
+        </ul>
+        <ul>
+          <li>timesl (<code>*:</code>): scalar multiplication</li>
+        </ul>
+        <ul>
+          <li><em>VectorSpace</em></li>
+        </ul>
+        <ul>
+          <li>divr (<code>:/</code>): scalar division</li>
+        </ul>
+        <ul>
+          <li><em>NormedVectorSpace</em></li>
+        </ul>
+        <ul>
+          <li>norm: vector norm</li>
+        </ul>
+        <ul>
+          <li>normalize: normalizes vector (so norm is 1)</li>
+        </ul>
+        <ul>
+          <li><em>InnerProductSpace</em></li>
+        </ul>
+        <ul>
+          <li>dot (<code>⋅</code>, <code>dot</code>): vector inner product</li>
+        </ul>
+        
+        <h4 id="numeric-integral-and-fractional" class="section">Numeric, Integral, and Fractional<a class="anchor-link right" href="#numeric-integral-and-fractional"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <p>These high-level type classes will pull in all of the relevant algebraic type
+        classes. Users who aren&#39;t concerned with algebraic properties directly, or who
+        wish for more permissiveness, should prefer these type classes.</p>
+        <ul>
+          <li><em>Integral</em>: whole number types (e.g. <code>Int</code>, <code>BigInt</code>)</li>
+        </ul>
+        <ul>
+          <li><em>Fractional</em>: fractional/decimal types (e.g. <code>Double</code>, <code>Rational</code>)</li>
+        </ul>
+        <ul>
+          <li><em>Numeric</em>: any number type, making &quot;best effort&quot; to support ops</li>
+        </ul>
+        <p>The <code>Numeric</code> type class is unique in that it provides the same functionality
+        as <code>Fractional</code> for all number types. Each type will attempt to &quot;do the right
+        thing&quot; as far as possible, and throw errors otherwise. Users who are leery of
+        this behavior are encouraged to use more precise type classes.</p>
+        
+        <h4 id="bool" class="section">Bool<a class="anchor-link right" href="#bool"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <p>Bool supports Boolean algebras, an abstraction of the familiar bitwise
+        boolean operators.</p>
+        <ul>
+          <li><em>Bool</em></li>
+        </ul>
+        <ul>
+          <li>complement (unary <code>~</code>): logical negation</li>
+        </ul>
+        <ul>
+          <li>and (<code>&amp;</code>): conjunction</li>
+        </ul>
+        <ul>
+          <li>or (<code>|</code>): disjunction</li>
+        </ul>
+        <ul>
+          <li>xor (<code>^</code>): exclusive-disjunction</li>
+        </ul>
+        <ul>
+          <li>imp: implicitation, equivalent to <code>~a | b</code></li>
+        </ul>
+        <ul>
+          <li>nand: &quot;not-and,&quot; equivalent to <code>~(a &amp; b)</code></li>
+        </ul>
+        <ul>
+          <li>nor: &quot;not-or,&quot; equivalent to <code>~(a | b)</code></li>
+        </ul>
+        <ul>
+          <li>nxor: &quot;not-xor,&quot; equivalent to <code>~(a ^ b)</code></li>
+        </ul>
+        <p>Bool instances exist not just for <code>Boolean</code>, but also for <code>Byte</code>,
+        <code>Short</code>, <code>Int</code>, <code>Long</code>, <code>UByte</code>, <code>UShort</code>, <code>UInt</code>, and <code>ULong</code>.</p>
+        
+        <h4 id="trig" class="section">Trig<a class="anchor-link right" href="#trig"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <p>Trig provides an abstraction for any type which defines trigonometric
+        functions. To do this, types should be able to reasonably approximate real
+        values.</p>
+        <ul>
+          <li><em>Trig</em></li>
+        </ul>
+        <ul>
+          <li>e: Euler&#39;s number, <code>2.71828...</code></li>
+        </ul>
+        <ul>
+          <li>pi: Ratio of circle&#39;s circumference to diameter, <code>3.14159...</code></li>
+        </ul>
+        <ul>
+          <li>exp: exponential function, <code>e^x</code></li>
+        </ul>
+        <ul>
+          <li>expm1: <code>e^x - 1</code></li>
+        </ul>
+        <ul>
+          <li>log: natural logarithm</li>
+        </ul>
+        <ul>
+          <li>log1p: <code>log(x + 1)</code></li>
+        </ul>
+        <ul>
+          <li>sin, cos, tan: sine, cosine, and tangent, the standard functions of angles</li>
+        </ul>
+        <ul>
+          <li>asin, acos, atan, atan2: inverse functions</li>
+        </ul>
+        <ul>
+          <li>sinh, cosh, tanh: hyperbolic functions</li>
+        </ul>
+        <ul>
+          <li>toRadians, toDegrees: convert between angle units</li>
+        </ul>
+        
+        <h3 id="syntax" class="section">Syntax<a class="anchor-link right" href="#syntax"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>Using string interpolation and macros, Spire provides convenient syntax for
+        number types. These macros are evaluated at compile-time, and any errors they
+        encounter will occur at compile-time.</p>
+        <p>For example:</p>
+        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">object</span><span> </span><span class="type-name">LiteralsDemo</span><span> {
+  </span><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">syntax</span><span>.</span><span class="identifier">literals</span><span>.</span><span class="identifier">_</span><span>
   
-  <span class="c1">// bytes and shorts</span>
-  <span class="k">val</span> <span class="nv">x</span> <span class="k">=</span> <span class="n">b</span><span class="s">"100"</span> <span class="c1">// without type annotation!</span>
-  <span class="k">val</span> <span class="nv">y</span> <span class="k">=</span> <span class="n">h</span><span class="s">"999"</span>
-  <span class="k">val</span> <span class="nv">mask</span> <span class="k">=</span> <span class="n">b</span><span class="s">"255"</span> <span class="c1">// unsigned constant converted to signed (-1)</span>
+  </span><span class="comment">// bytes and shorts
+</span><span>  </span><span class="keyword">val</span><span> </span><span class="identifier">x</span><span> = </span><span class="string-literal">b&quot;100&quot;</span><span> </span><span class="comment">// without type annotation!
+</span><span>  </span><span class="keyword">val</span><span> </span><span class="identifier">y</span><span> = </span><span class="string-literal">h&quot;999&quot;</span><span>
+  </span><span class="keyword">val</span><span> </span><span class="identifier">mask</span><span> = </span><span class="string-literal">b&quot;255&quot;</span><span> </span><span class="comment">// unsigned constant converted to signed (-1)
+</span><span>  
+  </span><span class="comment">// rationals
+</span><span>  </span><span class="keyword">val</span><span> </span><span class="identifier">n1</span><span> = </span><span class="string-literal">r&quot;1/3&quot;</span><span>
+  </span><span class="keyword">val</span><span> </span><span class="identifier">n2</span><span> = </span><span class="string-literal">r&quot;1599/115866&quot;</span><span> </span><span class="comment">// simplified at compile-time to 13/942
+</span><span>}</span></code></pre>
+        <pre><code class="nohighlight"><span>
+</span><span class="keyword">object</span><span> </span><span class="type-name">RadixDemo</span><span> {
+  </span><span class="comment">// support different radix literals
+</span><span>  </span><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">syntax</span><span>.</span><span class="identifier">literals</span><span>.</span><span class="identifier">radix</span><span>.</span><span class="identifier">_</span><span>
   
-  <span class="c1">// rationals</span>
-  <span class="k">val</span> <span class="nv">n1</span> <span class="k">=</span> <span class="n">r</span><span class="s">"1/3"</span>
-  <span class="k">val</span> <span class="nv">n2</span> <span class="k">=</span> <span class="n">r</span><span class="s">"1599/115866"</span> <span class="c1">// simplified at compile-time to 13/942</span>
-<span class="o">}</span>
-</code></pre></div></div>
+  </span><span class="comment">// representations of the number 23
+</span><span>  </span><span class="keyword">val</span><span> </span><span class="identifier">a</span><span> = </span><span class="identifier">x2</span><span class="string-literal">&quot;10111&quot;</span><span> </span><span class="comment">// binary
+</span><span>  </span><span class="keyword">val</span><span> </span><span class="identifier">b</span><span> = </span><span class="identifier">x8</span><span class="string-literal">&quot;27&quot;</span><span> </span><span class="comment">// octal
+</span><span>  </span><span class="keyword">val</span><span> </span><span class="identifier">c</span><span> = </span><span class="identifier">x16</span><span class="string-literal">&quot;17&quot;</span><span> </span><span class="comment">// hex
+</span><span>}
 
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-<span class="k">object</span> <span class="nc">RadixDemo</span> <span class="o">{</span>
-  <span class="c1">// support different radix literals</span>
-  <span class="k">import</span> <span class="nn">spire.syntax.literals.radix._</span>
+</span><span class="keyword">object</span><span> </span><span class="type-name">SIDemo</span><span> {
+  </span><span class="comment">// SI notation for large numbers
+</span><span>  </span><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">syntax</span><span>.</span><span class="identifier">literals</span><span>.</span><span class="identifier">si</span><span>.</span><span class="identifier">_</span><span> </span><span class="comment">// .us and .eu also available
+</span><span>  
+  </span><span class="keyword">val</span><span> </span><span class="identifier">w</span><span> = </span><span class="string-literal">i&quot;1 944 234 123&quot;</span><span> </span><span class="comment">// Int
+</span><span>  </span><span class="keyword">val</span><span> </span><span class="identifier">x</span><span> = </span><span class="string-literal">j&quot;89 234 614 123 234 772&quot;</span><span> </span><span class="comment">// Long
+</span><span>  </span><span class="keyword">val</span><span> </span><span class="identifier">y</span><span> = </span><span class="string-literal">big&quot;123 234 435 456 567 678 234 123 112 234 345&quot;</span><span> </span><span class="comment">// BigInt
+</span><span>  </span><span class="keyword">val</span><span> </span><span class="identifier">z</span><span> = </span><span class="string-literal">dec&quot;1 234 456 789.123456789098765&quot;</span><span> </span><span class="comment">// BigDecimal
+</span><span>}</span></code></pre>
+        <p>Spire also provides a loop macro called <code>cfor</code> (previously known as <code>cfor</code>) whose syntax bears a slight
+        resemblance to a traditional for-loop from C or Java. This macro expands to a
+        tail-recursive function, which will inline literal function arguments.</p>
+        <p>The macro can be nested in itself and compares favorably with other looping
+        constructs in Scala such as <code>for</code> and <code>while</code>:</p>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">syntax</span><span>.</span><span class="identifier">cfor</span><span>.</span><span class="identifier">_</span><span>
+
+</span><span class="comment">// print numbers 1 through 10
+</span><span class="identifier">cfor</span><span>(</span><span class="number-literal">0</span><span>)(</span><span class="identifier">_</span><span> &lt; </span><span class="number-literal">10</span><span>, </span><span class="identifier">_</span><span> + </span><span class="number-literal">1</span><span>) { </span><span class="identifier">i</span><span> =&gt;
+  </span><span class="identifier">println</span><span>(</span><span class="identifier">i</span><span>)
+}
+
+</span><span class="comment">// naive sorting algorithm
+</span><span class="keyword">def</span><span> </span><span class="declaration-name">selectionSort</span><span>(</span><span class="identifier">ns</span><span>: </span><span class="type-name">Array</span><span>[</span><span class="type-name">Int</span><span>]) = {
+  </span><span class="keyword">val</span><span> </span><span class="identifier">limit</span><span> = </span><span class="identifier">ns</span><span>.</span><span class="identifier">length</span><span> -</span><span class="number-literal">1</span><span>
+  </span><span class="identifier">cfor</span><span>(</span><span class="number-literal">0</span><span>)(</span><span class="identifier">_</span><span> &lt; </span><span class="identifier">limit</span><span>, </span><span class="identifier">_</span><span> + </span><span class="number-literal">1</span><span>) { </span><span class="identifier">i</span><span> =&gt;
+    </span><span class="keyword">var</span><span> </span><span class="identifier">k</span><span> = </span><span class="identifier">i</span><span>
+    </span><span class="keyword">val</span><span> </span><span class="identifier">n</span><span> = </span><span class="identifier">ns</span><span>(</span><span class="identifier">i</span><span>)
+    </span><span class="identifier">cfor</span><span>(</span><span class="identifier">i</span><span> + </span><span class="number-literal">1</span><span>)(</span><span class="identifier">_</span><span> &lt;= </span><span class="identifier">limit</span><span>, </span><span class="identifier">_</span><span> + </span><span class="number-literal">1</span><span>) { </span><span class="identifier">j</span><span> =&gt;
+      </span><span class="keyword">if</span><span> (</span><span class="identifier">ns</span><span>(</span><span class="identifier">j</span><span>) &lt; </span><span class="identifier">ns</span><span>(</span><span class="identifier">k</span><span>)) </span><span class="identifier">k</span><span> = </span><span class="identifier">j</span><span>
+    }
+    </span><span class="identifier">ns</span><span>(</span><span class="identifier">i</span><span>) = </span><span class="identifier">ns</span><span>(</span><span class="identifier">k</span><span>)
+    </span><span class="identifier">ns</span><span>(</span><span class="identifier">k</span><span>) = </span><span class="identifier">n</span><span>
+  }
+}</span></code></pre>
+        
+        <h3 id="sorting-selection-and-searching" class="section">Sorting, Selection, and Searching<a class="anchor-link right" href="#sorting-selection-and-searching"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>Since Spire provides a specialized ordering type class, it makes sense
+        that it also provides its own methods for doing operations based on
+        order. These methods are defined on arrays and occur in-place,
+        mutating the array. Other collections can take advantage of sorting by
+        converting to an array, sorting, and converting back (which is what
+        the Scala collections framework already does in most cases). Thus,
+        Spire supports both mutable arrays and immutable collections.</p>
+        <p>Sorting methods can be found in the <code>spire.math.Sorting</code> object. They are:</p>
+        <ul>
+          <li><code>quickSort</code> fastest, nlog(n), not stable with potential n^2 worst-case</li>
+        </ul>
+        <ul>
+          <li><code>mergeSort</code> also fast, nlog(n), stable but allocates extra temporary space</li>
+        </ul>
+        <ul>
+          <li><code>insertionSort</code> n^2 but stable and fast for small arrays</li>
+        </ul>
+        <ul>
+          <li><code>sort</code> alias for <code>quickSort</code></li>
+        </ul>
+        <p>Both <code>mergeSort</code> and <code>quickSort</code> delegate to <code>insertionSort</code> when dealing with
+        arrays (or slices) below a certain length. So, it would be more accurate to
+        describe them as hybrid sorts.</p>
+        <p>Selection methods can be found in an analogous <code>spire.math.Selection</code> object.
+        Given an array and an index <code>k</code> these methods put the <em>kth</em> largest element at
+        position <code>k</code>, ensuring that all preceding elements are less-than or equal-to,
+        and all succeeding elements are greater-than or equal-to, the <em>kth</em> element.</p>
+        <p>There are two methods defined:</p>
+        <ul>
+          <li><code>quickSelect</code> usually faster, not stable, potentially bad worst-case</li>
+        </ul>
+        <ul>
+          <li><code>linearSelect</code> usually slower, but with guaranteed linear complexity</li>
+        </ul>
+        <ul>
+          <li><code>select</code> alias for <code>quickSelect</code></li>
+        </ul>
+        <p>Searching methods are located in the <code>spire.math.Searching</code>
+        object. Given a sorted array (or indexed sequence), these methods
+        will locate the index of the desired element (or return -1 if it is
+        not found).</p>
+        <ul>
+          <li><code>search(array, item)</code> finds the index of <code>item</code> in <code>array</code></li>
+        </ul>
+        <ul>
+          <li><code>search(array, item, lower, upper)</code> only searches between <code>lower</code> and <code>upper</code>.</li>
+        </ul>
+        <p>Searching also supports a more esoteric method:
+        <code>minimalElements</code>. This method returns the minimal elements of a
+        partially-ordered set.</p>
+        
+        <h3 id="pseudo-random-number-generators" class="section">Pseudo-Random Number Generators<a class="anchor-link right" href="#pseudo-random-number-generators"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>Spire comes with many different PRNG implementations, which extends
+        the <code>spire.random.Generator</code> interface. Generators are mutable RNGs
+        that support basic operations like <code>nextInt</code>. Unlike Java, generators
+        are not threadsafe by default; synchronous instances can be attained
+        by calling the <code>.sync</code> method.</p>
+        <p>Spire supports generating random instances of arbitrary types using
+        the <code>spire.random.Dist[A]</code> type class. These instances represent a
+        strategy for getting random values using a <code>Generator</code> instance. For
+        instance:</p>
+        <pre><code class="nohighlight"><span class="keyword">object</span><span> </span><span class="type-name">DistDemo</span><span> {
+  </span><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">random</span><span>.</span><span class="type-name">Dist</span><span>
   
-  <span class="c1">// representations of the number 23</span>
-  <span class="k">val</span> <span class="nv">a</span> <span class="k">=</span> <span class="n">x2</span><span class="s">"10111"</span> <span class="c1">// binary</span>
-  <span class="k">val</span> <span class="nv">b</span> <span class="k">=</span> <span class="n">x8</span><span class="s">"27"</span> <span class="c1">// octal</span>
-  <span class="k">val</span> <span class="nv">c</span> <span class="k">=</span> <span class="n">x16</span><span class="s">"17"</span> <span class="c1">// hex</span>
-<span class="o">}</span>
-
-<span class="k">object</span> <span class="nc">SIDemo</span> <span class="o">{</span>
-  <span class="c1">// SI notation for large numbers</span>
-  <span class="k">import</span> <span class="nn">spire.syntax.literals.si._</span> <span class="c1">// .us and .eu also available</span>
+  </span><span class="keyword">val</span><span> </span><span class="identifier">rng</span><span> = </span><span class="identifier">spire</span><span>.</span><span class="identifier">random</span><span>.</span><span class="identifier">rng</span><span>.</span><span class="type-name">Cmwc5</span><span>()
   
-  <span class="k">val</span> <span class="nv">w</span> <span class="k">=</span> <span class="n">i</span><span class="s">"1 944 234 123"</span> <span class="c1">// Int</span>
-  <span class="k">val</span> <span class="nv">x</span> <span class="k">=</span> <span class="n">j</span><span class="s">"89 234 614 123 234 772"</span> <span class="c1">// Long</span>
-  <span class="k">val</span> <span class="nv">y</span> <span class="k">=</span> <span class="n">big</span><span class="s">"123 234 435 456 567 678 234 123 112 234 345"</span> <span class="c1">// BigInt</span>
-  <span class="k">val</span> <span class="nv">z</span> <span class="k">=</span> <span class="n">dec</span><span class="s">"1 234 456 789.123456789098765"</span> <span class="c1">// BigDecimal</span>
-<span class="o">}</span>
-</code></pre></div></div>
+  </span><span class="comment">// produces a map with ~10-20 entries
+</span><span>  </span><span class="keyword">implicit</span><span> </span><span class="keyword">val</span><span> </span><span class="identifier">nextmap</span><span>: </span><span class="type-name">Dist</span><span>[</span><span class="type-name">Map</span><span>[</span><span class="type-name">Int</span><span>, </span><span class="type-name">Complex</span><span>[</span><span class="type-name">Double</span><span>]]] = </span><span class="type-name">Dist</span><span>.</span><span class="identifier">map</span><span>[</span><span class="type-name">Int</span><span>, </span><span class="type-name">Complex</span><span>[</span><span class="type-name">Double</span><span>]](</span><span class="number-literal">10</span><span>, </span><span class="number-literal">20</span><span>)
+  </span><span class="keyword">val</span><span> </span><span class="identifier">m</span><span> = </span><span class="identifier">rng</span><span>.</span><span class="identifier">next</span><span>[</span><span class="type-name">Map</span><span>[</span><span class="type-name">Int</span><span>, </span><span class="type-name">Complex</span><span>[</span><span class="type-name">Double</span><span>]]]
 
-<p>Spire also provides a loop macro called <code class="language-plaintext highlighter-rouge">cfor</code> (previously known as <code class="language-plaintext highlighter-rouge">cfor</code>) whose syntax bears a slight
-resemblance to a traditional for-loop from C or Java. This macro expands to a
-tail-recursive function, which will inline literal function arguments.</p>
-
-<p>The macro can be nested in itself and compares favorably with other looping
-constructs in Scala such as <code class="language-plaintext highlighter-rouge">for</code> and <code class="language-plaintext highlighter-rouge">while</code>:</p>
-
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="nn">spire.syntax.cfor._</span>
-
-<span class="c1">// print numbers 1 through 10</span>
-<span class="nf">cfor</span><span class="o">(</span><span class="mi">0</span><span class="o">)(</span><span class="k">_</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">,</span> <span class="k">_</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span> <span class="n">i</span> <span class="k">=&gt;</span>
-  <span class="nf">println</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
-<span class="o">}</span>
-
-<span class="c1">// naive sorting algorithm</span>
-<span class="k">def</span> <span class="nf">selectionSort</span><span class="o">(</span><span class="n">ns</span><span class="k">:</span> <span class="kt">Array</span><span class="o">[</span><span class="kt">Int</span><span class="o">])</span> <span class="k">=</span> <span class="o">{</span>
-  <span class="k">val</span> <span class="nv">limit</span> <span class="k">=</span> <span class="nv">ns</span><span class="o">.</span><span class="py">length</span> <span class="o">-</span><span class="mi">1</span>
-  <span class="nf">cfor</span><span class="o">(</span><span class="mi">0</span><span class="o">)(</span><span class="k">_</span> <span class="o">&lt;</span> <span class="n">limit</span><span class="o">,</span> <span class="k">_</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span> <span class="n">i</span> <span class="k">=&gt;</span>
-    <span class="k">var</span> <span class="n">k</span> <span class="k">=</span> <span class="n">i</span>
-    <span class="k">val</span> <span class="nv">n</span> <span class="k">=</span> <span class="nf">ns</span><span class="o">(</span><span class="n">i</span><span class="o">)</span>
-    <span class="nf">cfor</span><span class="o">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)(</span><span class="k">_</span> <span class="o">&lt;=</span> <span class="n">limit</span><span class="o">,</span> <span class="k">_</span> <span class="o">+</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span> <span class="n">j</span> <span class="k">=&gt;</span>
-      <span class="nf">if</span> <span class="o">(</span><span class="nf">ns</span><span class="o">(</span><span class="n">j</span><span class="o">)</span> <span class="o">&lt;</span> <span class="nf">ns</span><span class="o">(</span><span class="n">k</span><span class="o">))</span> <span class="n">k</span> <span class="k">=</span> <span class="n">j</span>
-    <span class="o">}</span>
-    <span class="nf">ns</span><span class="o">(</span><span class="n">i</span><span class="o">)</span> <span class="k">=</span> <span class="nf">ns</span><span class="o">(</span><span class="n">k</span><span class="o">)</span>
-    <span class="nf">ns</span><span class="o">(</span><span class="n">k</span><span class="o">)</span> <span class="k">=</span> <span class="n">n</span>
-  <span class="o">}</span>
-<span class="o">}</span>
-</code></pre></div></div>
-
-<h3 id="sorting-selection-and-searching">Sorting, Selection, and Searching</h3>
-
-<p>Since Spire provides a specialized ordering type class, it makes sense
-that it also provides its own methods for doing operations based on
-order. These methods are defined on arrays and occur in-place,
-mutating the array. Other collections can take advantage of sorting by
-converting to an array, sorting, and converting back (which is what
-the Scala collections framework already does in most cases). Thus,
-Spire supports both mutable arrays and immutable collections.</p>
-
-<p>Sorting methods can be found in the <code class="language-plaintext highlighter-rouge">spire.math.Sorting</code> object. They are:</p>
-
-<ul>
-  <li><code class="language-plaintext highlighter-rouge">quickSort</code> fastest, nlog(n), not stable with potential n^2 worst-case</li>
-  <li><code class="language-plaintext highlighter-rouge">mergeSort</code> also fast, nlog(n), stable but allocates extra temporary space</li>
-  <li><code class="language-plaintext highlighter-rouge">insertionSort</code> n^2 but stable and fast for small arrays</li>
-  <li><code class="language-plaintext highlighter-rouge">sort</code> alias for <code class="language-plaintext highlighter-rouge">quickSort</code></li>
-</ul>
-
-<p>Both <code class="language-plaintext highlighter-rouge">mergeSort</code> and <code class="language-plaintext highlighter-rouge">quickSort</code> delegate to <code class="language-plaintext highlighter-rouge">insertionSort</code> when dealing with
-arrays (or slices) below a certain length. So, it would be more accurate to
-describe them as hybrid sorts.</p>
-
-<p>Selection methods can be found in an analogous <code class="language-plaintext highlighter-rouge">spire.math.Selection</code> object.
-Given an array and an index <code class="language-plaintext highlighter-rouge">k</code> these methods put the <em>kth</em> largest element at
-position <code class="language-plaintext highlighter-rouge">k</code>, ensuring that all preceding elements are less-than or equal-to,
-and all succeeding elements are greater-than or equal-to, the <em>kth</em> element.</p>
-
-<p>There are two methods defined:</p>
-
-<ul>
-  <li><code class="language-plaintext highlighter-rouge">quickSelect</code> usually faster, not stable, potentially bad worst-case</li>
-  <li><code class="language-plaintext highlighter-rouge">linearSelect</code> usually slower, but with guaranteed linear complexity</li>
-  <li><code class="language-plaintext highlighter-rouge">select</code> alias for <code class="language-plaintext highlighter-rouge">quickSelect</code></li>
-</ul>
-
-<p>Searching methods are located in the <code class="language-plaintext highlighter-rouge">spire.math.Searching</code>
-object. Given a sorted array (or indexed sequence), these methods
-will locate the index of the desired element (or return -1 if it is
-not found).</p>
-
-<ul>
-  <li><code class="language-plaintext highlighter-rouge">search(array, item)</code> finds the index of <code class="language-plaintext highlighter-rouge">item</code> in <code class="language-plaintext highlighter-rouge">array</code></li>
-  <li><code class="language-plaintext highlighter-rouge">search(array, item, lower, upper)</code> only searches between <code class="language-plaintext highlighter-rouge">lower</code> and <code class="language-plaintext highlighter-rouge">upper</code>.</li>
-</ul>
-
-<p>Searching also supports a more esoteric method:
-<code class="language-plaintext highlighter-rouge">minimalElements</code>. This method returns the minimal elements of a
-partially-ordered set.</p>
-
-<h3 id="pseudo-random-number-generators">Pseudo-Random Number Generators</h3>
-
-<p>Spire comes with many different PRNG implementations, which extends
-the <code class="language-plaintext highlighter-rouge">spire.random.Generator</code> interface. Generators are mutable RNGs
-that support basic operations like <code class="language-plaintext highlighter-rouge">nextInt</code>. Unlike Java, generators
-are not threadsafe by default; synchronous instances can be attained
-by calling the <code class="language-plaintext highlighter-rouge">.sync</code> method.</p>
-
-<p>Spire supports generating random instances of arbitrary types using
-the <code class="language-plaintext highlighter-rouge">spire.random.Dist[A]</code> type class. These instances represent a
-strategy for getting random values using a <code class="language-plaintext highlighter-rouge">Generator</code> instance. For
-instance:</p>
-
-<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">object</span> <span class="nc">DistDemo</span> <span class="o">{</span>
-  <span class="k">import</span> <span class="nn">spire.random.Dist</span>
+  </span><span class="comment">// produces a double in [0.0, 1.0)
+</span><span>  </span><span class="keyword">val</span><span> </span><span class="identifier">n</span><span> = </span><span class="identifier">rng</span><span>.</span><span class="identifier">next</span><span>[</span><span class="type-name">Double</span><span>]
   
-  <span class="k">val</span> <span class="nv">rng</span> <span class="k">=</span> <span class="nv">spire</span><span class="o">.</span><span class="py">random</span><span class="o">.</span><span class="py">rng</span><span class="o">.</span><span class="py">Cmwc5</span><span class="o">()</span>
-  
-  <span class="c1">// produces a map with ~10-20 entries</span>
-  <span class="k">implicit</span> <span class="k">val</span> <span class="nv">nextmap</span><span class="k">:</span> <span class="kt">Dist</span><span class="o">[</span><span class="kt">Map</span><span class="o">[</span><span class="kt">Int</span>, <span class="kt">Complex</span><span class="o">[</span><span class="kt">Double</span><span class="o">]]]</span> <span class="k">=</span> <span class="nv">Dist</span><span class="o">.</span><span class="py">map</span><span class="o">[</span><span class="kt">Int</span>, <span class="kt">Complex</span><span class="o">[</span><span class="kt">Double</span><span class="o">]](</span><span class="mi">10</span><span class="o">,</span> <span class="mi">20</span><span class="o">)</span>
-  <span class="k">val</span> <span class="nv">m</span> <span class="k">=</span> <span class="nv">rng</span><span class="o">.</span><span class="py">next</span><span class="o">[</span><span class="kt">Map</span><span class="o">[</span><span class="kt">Int</span>, <span class="kt">Complex</span><span class="o">[</span><span class="kt">Double</span><span class="o">]]]</span>
-
-  <span class="c1">// produces a double in [0.0, 1.0)</span>
-  <span class="k">val</span> <span class="nv">n</span> <span class="k">=</span> <span class="nv">rng</span><span class="o">.</span><span class="py">next</span><span class="o">[</span><span class="kt">Double</span><span class="o">]</span>
-  
-  <span class="c1">// produces a complex number, with real and imaginary parts in [0.0, 1.0)</span>
-  <span class="k">val</span> <span class="nv">q</span> <span class="k">=</span> <span class="nv">rng</span><span class="o">.</span><span class="py">next</span><span class="o">[</span><span class="kt">Complex</span><span class="o">[</span><span class="kt">Double</span><span class="o">]]</span>
-<span class="o">}</span>
-</code></pre></div></div>
-
-<p>Unlike generators, <code class="language-plaintext highlighter-rouge">Dist[A]</code> instances are immutable and composable,
-supporting operations like <code class="language-plaintext highlighter-rouge">map</code>, <code class="language-plaintext highlighter-rouge">flatMap</code>, and <code class="language-plaintext highlighter-rouge">filter</code>. Many default
-instances are provided, and it’s easy to create custom instances for
-user-defined types.</p>
-
-<h3 id="miscellany">Miscellany</h3>
-
-<p>In addition, Spire provides many other methods which are “missing” from
-<code class="language-plaintext highlighter-rouge">java.Math</code> (and <code class="language-plaintext highlighter-rouge">scala.math</code>), such as:</p>
-
-<ul>
-  <li><code class="language-plaintext highlighter-rouge">log(BigDecimal): BigDecimal</code></li>
-  <li><code class="language-plaintext highlighter-rouge">exp(BigDecimal): BigDecimal</code></li>
-  <li><code class="language-plaintext highlighter-rouge">pow(BigDecimal): BigDecimal</code></li>
-  <li><code class="language-plaintext highlighter-rouge">pow(Long): Long</code></li>
-  <li><code class="language-plaintext highlighter-rouge">gcd(Long, Long): Long</code></li>
-  <li><em>and so on…</em></li>
-</ul>
-
-<h3 id="benchmarks">Benchmarks</h3>
-
-<p>In addition to unit tests, Spire comes with a relatively fleshed-out set of
-<a href="https://openjdk.java.net/projects/code-tools/jmh">JMH</a> micro-benchmarks. To
-run the benchmarks from within SBT, change to the <code class="language-plaintext highlighter-rouge">benchmark</code> subproject 
-and then <code class="language-plaintext highlighter-rouge">jmh:run -l</code> to see a list of benchmarks:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sbt
+  </span><span class="comment">// produces a complex number, with real and imaginary parts in [0.0, 1.0)
+</span><span>  </span><span class="keyword">val</span><span> </span><span class="identifier">q</span><span> = </span><span class="identifier">rng</span><span>.</span><span class="identifier">next</span><span>[</span><span class="type-name">Complex</span><span>[</span><span class="type-name">Double</span><span>]]
+}</span></code></pre>
+        <p>Unlike generators, <code>Dist[A]</code> instances are immutable and composable,
+        supporting operations like <code>map</code>, <code>flatMap</code>, and <code>filter</code>. Many default
+        instances are provided, and it&#39;s easy to create custom instances for
+        user-defined types.</p>
+        
+        <h3 id="miscellany" class="section">Miscellany<a class="anchor-link right" href="#miscellany"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>In addition, Spire provides many other methods which are &quot;missing&quot; from
+        <code>java.Math</code> (and <code>scala.math</code>), such as:</p>
+        <ul>
+          <li><code>log(BigDecimal): BigDecimal</code></li>
+        </ul>
+        <ul>
+          <li><code>exp(BigDecimal): BigDecimal</code></li>
+        </ul>
+        <ul>
+          <li><code>pow(BigDecimal): BigDecimal</code></li>
+        </ul>
+        <ul>
+          <li><code>pow(Long): Long</code></li>
+        </ul>
+        <ul>
+          <li><code>gcd(Long, Long): Long</code></li>
+        </ul>
+        <ul>
+          <li><em>and so on...</em></li>
+        </ul>
+        
+        <h3 id="benchmarks" class="section">Benchmarks<a class="anchor-link right" href="#benchmarks"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>In addition to unit tests, Spire comes with a relatively fleshed-out set of
+        <a href="https://openjdk.java.net/projects/code-tools/jmh">JMH</a> micro-benchmarks. To
+        run the benchmarks from within SBT, change to the <code>benchmark</code> subproject 
+        and then <code>jmh:run -l</code> to see a list of benchmarks:</p>
+        <pre><code>$ sbt
 &gt; project benchmark
 &gt; jmh:run -l
 
@@ -641,56 +877,30 @@ and then <code class="language-plaintext highlighter-rouge">jmh:run -l</code> to
 [info] spire.benchmark.AddBenchmarks.addComplexDoubleStateDirect
 [info] spire.benchmark.AddBenchmarks.addComplexDoubleStateGeneric
 [info] spire.benchmark.AddBenchmarks.addComplexFloatStateDirect
-...
-</code></pre></div></div>
+...</code></pre>
+        <p>To run all available benchmarks:</p>
+        <pre><code>&gt; jmh:run</code></pre>
+        <p>To run a specific benchmark method:</p>
+        <pre><code>&gt; jmh:run spire.benchmark.AddBenchmarks.addComplexDoubleStateDirect</code></pre>
+        <p>To run all benchmarks in a specific class:</p>
+        <pre><code>&gt; jmh:run spire.benchmark.AddBenchmarks</code></pre>
+        <p>To see all available JMH usage options:</p>
+        <pre><code>&gt; jmh:run -h</code></pre>
+        <p>If you plan to contribute to Spire, please make sure to run the relevant
+        benchmarks to be sure that your changes don&#39;t impact performance. Benchmarks
+        usually include comparisons against equivalent Scala or Java classes to try to
+        measure relative as well as absolute performance.</p>
+        
+        <h3 id="caveats" class="section">Caveats<a class="anchor-link right" href="#caveats"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <p>Code is offered as-is, with no implied warranty of any kind. Comments,
+        criticisms, and/or praise are welcome, especially from numerical analysts! ;)</p>
+        <p>Copyright 2011-2017 Erik Osheim, Tom Switzer</p>
+        <p>A full list of contributors can be found in <a href="AUTHORS.html">AUTHORS.md</a>.</p>
+        <p>The MIT software license is attached in the <a href="https://github.com/typelevel/spire/blob/main/COPYING">COPYING</a> file.</p>
 
-<p>To run all available benchmarks:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; jmh:run
-</code></pre></div></div>
+      </main>
 
-<p>To run a specific benchmark method:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; jmh:run spire.benchmark.AddBenchmarks.addComplexDoubleStateDirect
-</code></pre></div></div>
+    </div>
 
-<p>To run all benchmarks in a specific class:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; jmh:run spire.benchmark.AddBenchmarks
-</code></pre></div></div>
-
-<p>To see all available JMH usage options:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; jmh:run -h
-</code></pre></div></div>
-
-<p>If you plan to contribute to Spire, please make sure to run the relevant
-benchmarks to be sure that your changes don’t impact performance. Benchmarks
-usually include comparisons against equivalent Scala or Java classes to try to
-measure relative as well as absolute performance.</p>
-
-<h3 id="caveats">Caveats</h3>
-
-<p>Code is offered as-is, with no implied warranty of any kind. Comments,
-criticisms, and/or praise are welcome, especially from numerical analysts! ;)</p>
-
-<p>Copyright 2011-2017 Erik Osheim, Tom Switzer</p>
-
-<p>A full list of contributors can be found in <a href="./extra_md/authors.html">AUTHORS.md</a>.</p>
-
-<p>The MIT software license is attached in the <a href="https://github.com/typelevel/spire/blob/main/COPYING">COPYING</a> file.</p>
-</div></div></section><section class="technologies"><div class="container"><div class="row"></div></div></section></main><footer id="site-footer"><div class="container"><div class="row"><div class="col-xs-6"><p>Spire is designed and developed by <a href="https://typelevel.org/spire/" target="_blank" rel="noopener noreferrer">Spire contributors</a></p></div><div class="col-xs-6"><p class="text-right"><a href="https://github.com/typelevel/spire" target="_blank" rel="noopener noreferrer"><span class="fa fa-github"></span>View on GitHub</a></p></div></div><div class="row"><div class="col-xs-6"><p>Website built with <a href="https://47degrees.github.io/sbt-microsites/" target="_blank" rel="noopener noreferrer">sbt-microsites</a> - © 2019 <a href="https://www.47deg.com/" target="_blank" rel="noopener noreferrer">47 Degrees</a></p></div></div></div></footer><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/spire/highlight/highlight.pack.js"></script><script src="/spire/lunr/lunr.js"></script><script>
-// For all code blocks, copy the language from the containing div
-// to the inner code tag (where hljs expects it to be)
-const langPrefix = 'language-';
-document.querySelectorAll(`div[class^='${langPrefix}']`).forEach(function(div) {
-  div.classList.forEach(function(cssClass) {
-    if (cssClass.startsWith(langPrefix)) {
-      const lang = cssClass.substring(langPrefix.length);
-      div.querySelectorAll('pre code').forEach(function(code) {
-        code.classList.add(lang);
-      });
-    }
-  });
-});
-
-hljs.configure({languages:['scala','java','bash']});
-hljs.initHighlightingOnLoad();
-      </script><script>console.info('\x57\x65\x62\x73\x69\x74\x65\x20\x62\x75\x69\x6c\x74\x20\x77\x69\x74\x68\x3a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x5f\x5f\x20\x20\x20\x20\x5f\x5f\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x5f\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x5f\x20\x5f\x5f\x0a\x20\x20\x20\x5f\x5f\x5f\x5f\x5f\x2f\x20\x2f\x5f\x20\x20\x2f\x20\x2f\x5f\x20\x20\x20\x20\x20\x20\x5f\x5f\x5f\x5f\x20\x5f\x5f\x5f\x20\x20\x28\x5f\x29\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x5f\x20\x20\x5f\x5f\x5f\x5f\x5f\x28\x5f\x29\x20\x2f\x5f\x5f\x5f\x5f\x20\x20\x5f\x5f\x5f\x5f\x5f\x0a\x20\x20\x2f\x20\x5f\x5f\x5f\x2f\x20\x5f\x5f\x20\x5c\x2f\x20\x5f\x5f\x2f\x5f\x5f\x5f\x5f\x5f\x2f\x20\x5f\x5f\x20\x60\x5f\x5f\x20\x5c\x2f\x20\x2f\x20\x5f\x5f\x5f\x2f\x20\x5f\x5f\x5f\x2f\x20\x5f\x5f\x20\x5c\x2f\x20\x5f\x5f\x5f\x2f\x20\x2f\x20\x5f\x5f\x2f\x20\x5f\x20\x5c\x2f\x20\x5f\x5f\x5f\x2f\x0a\x20\x28\x5f\x5f\x20\x20\x29\x20\x2f\x5f\x2f\x20\x2f\x20\x2f\x5f\x2f\x5f\x5f\x5f\x5f\x5f\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x20\x2f\x5f\x5f\x2f\x20\x2f\x20\x20\x2f\x20\x2f\x5f\x2f\x20\x28\x5f\x5f\x20\x20\x29\x20\x2f\x20\x2f\x5f\x2f\x20\x20\x5f\x5f\x28\x5f\x5f\x20\x20\x29\x0a\x2f\x5f\x5f\x5f\x5f\x2f\x5f\x2e\x5f\x5f\x5f\x2f\x5c\x5f\x5f\x2f\x20\x20\x20\x20\x20\x2f\x5f\x2f\x20\x2f\x5f\x2f\x20\x2f\x5f\x2f\x5f\x2f\x5c\x5f\x5f\x5f\x2f\x5f\x2f\x20\x20\x20\x5c\x5f\x5f\x5f\x5f\x2f\x5f\x5f\x5f\x5f\x2f\x5f\x2f\x5c\x5f\x5f\x2f\x5c\x5f\x5f\x5f\x2f\x5f\x5f\x5f\x5f\x2f\x0a\x0a\x68\x74\x74\x70\x73\x3a\x2f\x2f\x34\x37\x64\x65\x67\x2e\x67\x69\x74\x68\x75\x62\x2e\x69\x6f\x2f\x73\x62\x74\x2d\x6d\x69\x63\x72\x6f\x73\x69\x74\x65\x73')</script><script>((window.gitter = {}).chat = {}).options = {
-room: 'typelevel/spire'};</script><script src="https://sidecar.gitter.im/dist/sidecar.v1.js"></script><script src="/spire/js/version-selector.js"></script><script src="/spire/js/search.js"></script></body></html>
+  </body>
+</html>
