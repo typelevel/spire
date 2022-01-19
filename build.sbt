@@ -119,7 +119,6 @@ lazy val extras = crossProject(JSPlatform, JVMPlatform)
   .jsSettings(commonJsSettings: _*)
   .dependsOn(macros, platform, util, core, data)
 
-ThisBuild / tlSitePublishBranch := Some("topic/sbt-typelevel-site")
 lazy val docs = project
   .in(file("site"))
   .enablePlugins(TypelevelSitePlugin, ScalaUnidocPlugin)
