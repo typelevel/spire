@@ -13,7 +13,6 @@ val header = """|***************************************************************
                 |""".stripMargin
 
 import scala.language.existentials
-import microsites._
 
 lazy val scalaCheckVersion = "1.15.4"
 
@@ -35,8 +34,6 @@ ThisBuild / tlBaseVersion := "0.18"
 
 ThisBuild / crossScalaVersions := Seq(Scala213, Scala3)
 ThisBuild / githubWorkflowJavaVersions := Seq("8", "11", "17").map(JavaSpec.temurin(_))
-ThisBuild / githubWorkflowBuild +=
-  WorkflowStep.Sbt(List("doc", "docs/mdoc"), name = Some("Build docs"), cond = Some("matrix.project == 'rootJVM'"))
 
 ThisBuild / homepage := Some(url("https://typelevel.org/spire/"))
 ThisBuild / licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
@@ -123,31 +120,12 @@ lazy val extras = crossProject(JSPlatform, JVMPlatform)
   .dependsOn(macros, platform, util, core, data)
 
 lazy val docs = project
-  .in(file("docs"))
-  .enablePlugins(MicrositesPlugin)
-  .enablePlugins(ScalaUnidocPlugin)
+  .in(file("site"))
+  .enablePlugins(TypelevelSitePlugin, ScalaUnidocPlugin)
+  .settings(laikaConfig ~= { _.withRawContent })
   .dependsOn(macros.jvm, core.jvm, extras.jvm)
-  .settings(moduleName := "spire-docs")
   .settings(commonSettings: _*)
   .settings(spireSettings: _*)
-  .settings(docSettings: _*)
-  .enablePlugins(NoPublishPlugin)
-  .enablePlugins(MdocPlugin)
-  .settings(
-    mdocIn := (Compile / sourceDirectory).value / "mdoc",
-    mdocVariables := {
-      import sys.process._
-      val currentRelease =
-        "git tag --list --sort=-v:refname".!!.split("\n").headOption
-          .map(_.trim)
-          .filter(_.startsWith("v"))
-          .map(_.tail)
-          .getOrElse(version.value)
-      Map("VERSION" -> currentRelease)
-    },
-    // NOTE: disable link hygine to supress dead link warnings because mdoc does not go well with Jekyll
-    mdocExtraArguments ++= Seq("--no-link-hygiene")
-  )
   .settings(commonJvmSettings: _*)
 
 lazy val examples = project
@@ -227,84 +205,7 @@ lazy val commonJsSettings = Seq()
 
 lazy val commonJvmSettings = Seq()
 
-lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
-
-lazy val docSettings = Seq(
-  micrositeName := "Spire",
-  micrositeDescription := "Powerful new number types and numeric abstractions for Scala",
-  micrositeAuthor := "Spire contributors",
-  micrositeHighlightTheme := "atom-one-light",
-  micrositeHomepage := "https://typelevel.org/spire",
-  micrositeBaseUrl := "spire",
-  micrositeDocumentationUrl := "https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html",
-  micrositeDocumentationLabelDescription := "API Documentation",
-  micrositeExtraMdFiles := Map(
-    file("AUTHORS.md") -> ExtraMdFileConfig(
-      "authors.md",
-      "home",
-      Map("title" -> "Authors", "section" -> "Home", "position" -> "5")
-    ),
-    file("CHANGES.md") -> ExtraMdFileConfig(
-      "changes.md",
-      "home",
-      Map("title" -> "Changes", "section" -> "Home", "position" -> "2")
-    ),
-    file("CONTRIBUTING.md") -> ExtraMdFileConfig(
-      "contributing.md",
-      "home",
-      Map("title" -> "Contributing", "section" -> "Home", "position" -> "3")
-    ),
-    file("DESIGN.md") -> ExtraMdFileConfig(
-      "design.md",
-      "home",
-      Map("title" -> "Design notes", "section" -> "Home", "position" -> "4")
-    ),
-    file("FRIENDS.md") -> ExtraMdFileConfig(
-      "friends.md",
-      "home",
-      Map("title" -> "Friends of Spire", "section" -> "Home", "position" -> "6")
-    )
-  ),
-  micrositeGithubOwner := "typelevel",
-  micrositeGithubRepo := "spire",
-  micrositeTheme := "pattern",
-  micrositePalette := Map(
-    "brand-primary" -> "#5B5988",
-    "brand-secondary" -> "#292E53",
-    "brand-tertiary" -> "#222749",
-    "gray-dark" -> "#49494B",
-    "gray" -> "#7B7B7E",
-    "gray-light" -> "#E5E5E6",
-    "gray-lighter" -> "#F4F3F4",
-    "white-color" -> "#FFFFFF"
-  ),
-  micrositeConfigYaml := ConfigYml(
-    yamlCustomProperties = Map(
-      "spireVersion" -> version.value,
-      "scalaVersion" -> scalaVersion.value
-    )
-  ),
-  autoAPIMappings := true,
-  ScalaUnidoc / unidoc / unidocProjectFilter :=
-    inProjects(platform.jvm, macros.jvm, data.jvm, legacy.jvm, util.jvm, core.jvm, extras.jvm, laws.jvm),
-  docsMappingsAPIDir := "api",
-  addMappingsToSiteDir(ScalaUnidoc / packageDoc / mappings, docsMappingsAPIDir),
-  ghpagesNoJekyll := false,
-  fork := true,
-  javaOptions += "-Xmx4G", // to have enough memory in forks
-//  fork in (ScalaUnidoc, unidoc) := true,
-  ScalaUnidoc / unidoc / scalacOptions ++= Seq(
-    "-groups",
-    "-doc-source-url",
-    scmInfo.value.get.browseUrl + "/tree/main€{FILE_PATH}.scala",
-    "-sourcepath",
-    (LocalRootProject / baseDirectory).value.getAbsolutePath,
-    "-diagrams"
-  ),
-  git.remoteRepo := "git@github.com:typelevel/spire.git",
-  makeSite / includeFilter := "*.html" | "*.css" | "*.png" | "*.jpg" | "*.gif" | "*.js" | "*.swf" | "*.yml" | "*.md" | "*.svg",
-  Jekyll / includeFilter := (makeSite / includeFilter).value
-)
+ThisBuild / tlSiteApiUrl := Some(url("https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html"))
 
 lazy val scoverageSettings = Seq(
   coverageMinimumStmtTotal := 40,

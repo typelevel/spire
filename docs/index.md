@@ -1,16 +1,9 @@
----
-layout: home
-title:  "Readme"
-section: "Home"
-position: 0
----
+## Spire
 
 [![Continuous Integration](https://github.com/typelevel/spire/actions/workflows/ci.yml/badge.svg)](https://github.com/typelevel/spire/actions/workflows/ci.yml)
 [![Discord](https://img.shields.io/discord/632277896739946517.svg?label=&logo=discord&logoColor=ffffff&color=404244&labelColor=6A7EC2)](https://discord.gg/QNnHKHq5Ts)
 [![codecov.io](https://codecov.io/github/typelevel/spire/coverage.svg?branch=main)](https://codecov.io/github/typelevel/spire?branch=main)
 [![spire Scala version support](https://index.scala-lang.org/typelevel/spire/spire/latest-by-scala-version.svg)](https://index.scala-lang.org/typelevel/spire/spire)
-
-## Spire
 
 ### Overview
 
@@ -38,8 +31,8 @@ Spire is provided to you as free software under the
 There is a `#spire` channel on the [Typelevel Discord](https://discord.com/invite/XF3CXcMzqD).
 It is the place to go for announcements and discussions around Spire.
 
-We also have a guide on [contributing to Spire](./extra_md/contributing.html) as well
-as a guide that provides information on [Spire's design](./guide.html).
+We also have a guide on [contributing to Spire](CONTRIBUTING.md) as well
+as a guide that provides information on [Spire's design](guide.md).
 
 Spire has maintainers who are responsible for signing-off on and
 merging pull requests, and for helping to guide the direction of Spire:
@@ -164,7 +157,7 @@ introduces several new ones, all of which can be found in `spire.math`:
  * `Trilean` value class supporting three-valued logic
  * `FixedPoint` fractions with `Long` numerator and implicit denominator (in *extras*)
 
-Detailed treatment of these types can be found in the [guide](./guide.html).
+Detailed treatment of these types can be found in the [guide](guide.md).
 
 ### Type Classes
 
@@ -214,7 +207,7 @@ implicits which provide unary and infix operators for the type classes. The
 easiest way to use these is via a wildcard import of `spire.implicits._`.
 
 Detailed treatment of these type classes can be found in the
-[guide](./guide.html).
+[guide](guide.md).
 
 ### Getting Started
 
@@ -241,7 +234,9 @@ novel operators when possible, in a few cases it was unavoidable.
 
 The type classes provide type-safe equivalence and comparison functions. Orderings
 can be total (`Order`) or partial (`PartialOrder`); although undefined elements like
-`NaN` or `null` will cause problems in the default implementations [1].
+`NaN` or `null` will cause problems in the default implementations
+(for floating-point numbers, alternate implementations that take `NaN` into
+account can be imported from `spire.optional.totalfloat._`).
 
  * *Eq*
    + eqv (`===`): equivalence
@@ -260,9 +255,6 @@ can be total (`Order`) or partial (`PartialOrder`); although undefined elements 
    + pmin: find the least value if the elements are comparable; returns an `Option`
    + pmax: find the greated value if the elements are comparable; returns an `Option`
    + gt (`>`), gteqv (`>=`), lt (`<`) and lteqv (`<=`) return false if the elements are incomparable, or the result of their comparison
-
-[1] For floating-point numbers, alternate implementations that take `NaN` into
-account can be imported from `spire.optional.totalfloat._`.
 
 #### Semigroup, Monoid, and Group
 
@@ -604,6 +596,6 @@ criticisms, and/or praise are welcome, especially from numerical analysts! ;)
 
 Copyright 2011-2017 Erik Osheim, Tom Switzer
 
-A full list of contributors can be found in [AUTHORS.md](./extra_md/authors.html).
+A full list of contributors can be found in [AUTHORS.md](AUTHORS.md).
 
 The MIT software license is attached in the [COPYING](https://github.com/typelevel/spire/blob/main/COPYING) file.

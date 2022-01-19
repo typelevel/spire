@@ -98,15 +98,11 @@ jobs:
       - name: Generate API documentation
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' doc
 
-      - name: Build docs
-        if: matrix.project == 'rootJVM'
-        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' doc docs/mdoc
-
       - name: Make target directories
-        run: mkdir -p data/.jvm/target legacy/.jvm/target extras/.js/target examples/target target platform/js/target macros/.jvm/target .js/target docs/target core/.js/target macros/.js/target laws/.js/target legacy/.js/target core/.jvm/target tests/js/target .jvm/target .native/target platform/jvm/target util/.js/target data/.js/target util/.jvm/target laws/.jvm/target tests/jvm/target extras/.jvm/target benchmark/target project/target
+        run: mkdir -p data/.jvm/target legacy/.jvm/target extras/.js/target examples/target target platform/js/target macros/.jvm/target .js/target site/target core/.js/target macros/.js/target laws/.js/target legacy/.js/target core/.jvm/target tests/js/target .jvm/target .native/target platform/jvm/target util/.js/target data/.js/target util/.jvm/target laws/.jvm/target tests/jvm/target extras/.jvm/target benchmark/target project/target
 
       - name: Compress target directories
-        run: tar cf targets.tar data/.jvm/target legacy/.jvm/target extras/.js/target examples/target target platform/js/target macros/.jvm/target .js/target docs/target core/.js/target macros/.js/target laws/.js/target legacy/.js/target core/.jvm/target tests/js/target .jvm/target .native/target platform/jvm/target util/.js/target data/.js/target util/.jvm/target laws/.jvm/target tests/jvm/target extras/.jvm/target benchmark/target project/target
+        run: tar cf targets.tar data/.jvm/target legacy/.jvm/target extras/.js/target examples/target target platform/js/target macros/.jvm/target .js/target site/target core/.js/target macros/.js/target laws/.js/target legacy/.js/target core/.jvm/target tests/js/target .jvm/target .native/target platform/jvm/target util/.js/target data/.js/target util/.jvm/target laws/.jvm/target tests/jvm/target extras/.jvm/target benchmark/target project/target
 
       - name: Upload target directories
         uses: actions/upload-artifact@v2
@@ -196,3 +192,61 @@ jobs:
 
       - name: Publish
         run: sbt '++${{ matrix.scala }}' tlRelease
+
+  site:
+    name: Generate Site
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        scala: [3.1.0]
+        java: [temurin@8]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout current branch (full)
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java (temurin@8)
+        if: matrix.java == 'temurin@8'
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 8
+
+      - name: Setup Java (temurin@11)
+        if: matrix.java == 'temurin@11'
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - name: Setup Java (temurin@17)
+        if: matrix.java == 'temurin@17'
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Cache sbt
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.sbt
+            ~/.ivy2/cache
+            ~/.coursier/cache/v1
+            ~/.cache/coursier/v1
+            ~/AppData/Local/Coursier/Cache/v1
+            ~/Library/Caches/Coursier/v1
+          key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
+
+      - name: Generate site
+        run: sbt '++${{ matrix.scala }}' tlSite
+
+      - name: Publish site
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: site/target/docs/site
+          publish_branch: gh-pages

@@ -1,3 +1,5 @@
+# Changes
+
 Release notes are now [published on GitHub](https://github.com/typelevel/spire/releases).
 
 ## Version 0.16.1-SNAPSHOT (not released)
@@ -85,13 +87,13 @@ Changes:
 
 Fixes:
  * Instances for Complex and Quaternion are more precise
- * Numeric[Complex[A]] is no longer provided
+ * `Numeric[Complex[A]]` is no longer provided
  * Many bug fixes
 
 ## Version 0.13.0
 
 Additions:
- * Added Eq[Bound[A]] instance
+ * Added `Eq[Bound[A]]` instance
  * Added Interval#overlap and supporting machinery
 
 Changes:
@@ -183,7 +185,7 @@ Fixes:
  * Efficiency improvements for Rational (Rüdiger Klaehn)
  * Improve and document NumberTag (Tom Switzer)
  * Add support and tests for partial actions (Denis Rosset)
- * Add Opt[_] type for unboxed optional values (Denis Rosset)
+ * Add `Opt[_]` type for unboxed optional values (Denis Rosset)
  * Add Gitter chat room to README (Erik Osheim)
  * Fix bug with root-finding for Long values (Erik Osheim)
 
@@ -198,8 +200,8 @@ Additions:
  * Added and reworked group actions (Denis Rosset)
  * Add Lattices and Heyting algebras (Erik Osheim)
  * More useful symbolic operators (Erik Osheim)
- * Introduce Exponential[A] distribution (Erik Osheim)
- * Introduce NumberTag[A] type class (Erik Osheim)
+ * Introduce `Exponential[A]` distribution (Erik Osheim)
+ * Introduce `NumberTag[A]` type class (Erik Osheim)
 
 Fixes:
 
@@ -217,7 +219,7 @@ Fixes:
 Changes:
 
  * Major interval improvements and bug fixes (Denis Rosset)
- * Improve Gaussian[A] distribution using Ziggurat (Erik Osheim)
+ * Improve `Gaussian[A]` distribution using Ziggurat (Erik Osheim)
  * Use aggreate instead of fold to enable parallelism (Adam Pingel)
  * Clarified and improved partial orders (Denis Rosset)
  * Improve Checked arithmetic macros (Tom Switzer & Erik Osheim)
