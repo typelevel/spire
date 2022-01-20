@@ -18,7 +18,7 @@ package algebra
 
 /**
  * A (left) semigroup/monoid/group action of `G` on `P` is simply the implementation of a method `actl(g, p)`, or `g
- * |+|> p`, such that:
+ * \|+|> p`, such that:
  *
  * {{{
  * 1. `(g |+| h) |+|> p === g |+|> (h |+|> p)` for all `g`, `h` in `G` and `p` in `P`.

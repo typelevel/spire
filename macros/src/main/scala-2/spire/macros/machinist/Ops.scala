@@ -22,7 +22,7 @@ import scala.reflect.macros.blackbox.Context
  * which "enrich" a type with operators into code that does not allocate an implicit instance.
  *
  * @groupname macros
- *   Macros
+ * Macros
  * @groupdesc macros
  *   Macro transformations for operators
  */
