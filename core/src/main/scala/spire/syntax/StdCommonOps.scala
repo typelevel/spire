@@ -162,7 +162,7 @@ final class IndexedSeqOps[@sp A, CC[A] <: IndexedSeq[A]](as: CC[A]) {
     Searching.search(as, a)
 }
 
-final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { //fixme
+final class SeqOps[@sp A, CC[A] <: Iterable[A]](as: CC[A]) { // fixme
   def qsum(implicit ev: AdditiveMonoid[A]): A =
     as.foldLeft(ev.zero)(ev.plus)
 

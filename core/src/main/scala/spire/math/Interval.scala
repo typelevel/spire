@@ -153,7 +153,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
 
     case (Bounded(lower1, upper1, flags1), Bounded(lower2, upper2, flags2)) =>
       lowerPairBelow(lower1, flags1, lower2, flags2) &&
-        upperPairAbove(upper1, flags1, upper2, flags2)
+      upperPairAbove(upper1, flags1, upper2, flags2)
   }
 
   def isProperSupersetOf(rhs: Interval[A])(implicit o: Order[A]): Boolean =
