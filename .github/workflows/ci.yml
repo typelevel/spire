@@ -27,7 +27,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [2.13.8, 3.1.0]
+        scala: [2.13.8, 3.1.1]
         java: [temurin@8, temurin@11, temurin@17]
         project: [rootJS, rootJVM]
         exclude:
@@ -123,7 +123,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [3.1.0]
+        scala: [3.1.1]
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
@@ -185,22 +185,22 @@ jobs:
           tar xf targets.tar
           rm targets.tar
 
-      - name: Download target directories (3.1.0, rootJS)
+      - name: Download target directories (3.1.1, rootJS)
         uses: actions/download-artifact@v2
         with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-3.1.0-rootJS
+          name: target-${{ matrix.os }}-${{ matrix.java }}-3.1.1-rootJS
 
-      - name: Inflate target directories (3.1.0, rootJS)
+      - name: Inflate target directories (3.1.1, rootJS)
         run: |
           tar xf targets.tar
           rm targets.tar
 
-      - name: Download target directories (3.1.0, rootJVM)
+      - name: Download target directories (3.1.1, rootJVM)
         uses: actions/download-artifact@v2
         with:
-          name: target-${{ matrix.os }}-${{ matrix.java }}-3.1.0-rootJVM
+          name: target-${{ matrix.os }}-${{ matrix.java }}-3.1.1-rootJVM
 
-      - name: Inflate target directories (3.1.0, rootJVM)
+      - name: Inflate target directories (3.1.1, rootJVM)
         run: |
           tar xf targets.tar
           rm targets.tar
@@ -224,7 +224,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        scala: [3.1.0]
+        scala: [3.1.1]
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
