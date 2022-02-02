@@ -99,7 +99,7 @@ class SortingBenchmarks {
 
   @Benchmark
   def timeJavaSortComplex() = {
-    java.util.Arrays.sort(cs.clone.asInstanceOf[Array[Object]])
+    java.util.Arrays.sort(cs2.clone.asInstanceOf[Array[Object]])
   }
 
   @Benchmark
