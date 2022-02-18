@@ -214,8 +214,6 @@ lazy val scoverageSettings = Seq(
 )
 
 lazy val coreSettings = Seq(
-  // buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
-  // buildInfoPackage := "spire",
   Compile / sourceGenerators += (Compile / genProductTypes).taskValue,
   genProductTypes := {
     val scalaSource = (Compile / sourceManaged).value
