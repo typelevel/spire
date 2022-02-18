@@ -105,7 +105,6 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .settings(moduleName := "spire")
   .settings(spireSettings: _*)
   .settings(coreSettings: _*)
-  .enablePlugins(BuildInfoPlugin)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
   .dependsOn(macros, platform, util)
@@ -215,8 +214,8 @@ lazy val scoverageSettings = Seq(
 )
 
 lazy val coreSettings = Seq(
-  buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
-  buildInfoPackage := "spire",
+  // buildInfoKeys := Seq[BuildInfoKey](version, scalaVersion),
+  // buildInfoPackage := "spire",
   Compile / sourceGenerators += (Compile / genProductTypes).taskValue,
   genProductTypes := {
     val scalaSource = (Compile / sourceManaged).value
