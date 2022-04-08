@@ -14,7 +14,7 @@ val header = """|***************************************************************
 
 import scala.language.existentials
 
-lazy val scalaCheckVersion = "1.15.4"
+lazy val scalaCheckVersion = "1.16.0"
 
 lazy val munit = "0.7.29"
 lazy val munitDiscipline = "1.0.9"
