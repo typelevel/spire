@@ -114,7 +114,7 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("x.pow(3) = x * x * x") {
     forAll { (x: Real) =>
-      x.pow(2) == x * x
+      x.pow(3) == x * x * x
     }
   }
 
