@@ -63,7 +63,7 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
       if (x == y)
         y
       else {
-        val y2 = ((n / y) + y) / two
+        val y2 = (n / y + y) / two
         if (y2 <= y)
           y
         else

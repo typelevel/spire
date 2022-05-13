@@ -39,7 +39,7 @@ object rationalTrig {
     def sinh(x: Rational): Rational = Rational(spire.math.sinh(x.toDouble))
     def tan(a: Rational): Rational = Rational(spire.math.tan(a.toDouble))
     def tanh(x: Rational): Rational = Rational(spire.math.tanh(x.toDouble))
-    def toDegrees(a: Rational): Rational = (a * r180) / pi
-    def toRadians(a: Rational): Rational = (a / r180) * pi
+    def toDegrees(a: Rational): Rational = a * r180 / pi
+    def toRadians(a: Rational): Rational = a / r180 * pi
   }
 }

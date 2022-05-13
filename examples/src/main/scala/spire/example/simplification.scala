@@ -96,7 +96,7 @@ object Simplification {
   val primes: LazyList[Int] = {
     @tailrec
     def next(n: Int, ll: LazyList[Int]): LazyList[Int] =
-      if (ll.isEmpty || (ll.head ** 2) > n)
+      if (ll.isEmpty || ll.head ** 2 > n)
         n #:: loop(n + 2, primes)
       else if (n % ll.head == 0)
         next(n + 2, primes)

@@ -32,7 +32,7 @@ class SortingSuite extends munit.FunSuite {
 
   test("Sort randomly generated arrays of various sizes") {
     val smallSizes = Seq.range(1, 65)
-    val randomGen = new scala.util.Random()
+    val randomGen = new scala.util.Random
 
     smallSizes.foreach { size =>
       val input: Array[Int] = Array.tabulate(size) { _ => randomGen.nextInt(10000) }

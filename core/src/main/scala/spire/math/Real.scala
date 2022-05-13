@@ -79,7 +79,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   }
 
   def ===(y: Real): Boolean =
-    (x.compare(y)) == 0
+    x.compare(y) == 0
 
   def =!=(y: Real): Boolean =
     !(this === y)
@@ -135,7 +135,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     case _                         => Real(p => roundUp(Rational(x(p + 2) + y(p + 2), 4)))
   }
 
-  def -(y: Real): Real = x + (-y)
+  def -(y: Real): Real = x + -y
 
   def *(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny))    => Exact(nx * ny)
@@ -188,7 +188,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
         val d = x / y
         val s = d(2)
         val d2 = if (s >= 0) d.floor else d.ceil
-        (x - d2 * y)(p)
+        x - d2 * y (p)
       }
   }
 
@@ -263,7 +263,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     case _ =>
       val n = x(Real.bits)
       val t = SafeLong.two.pow(Real.bits)
-      (n % t) == 0
+      n % t == 0
   }
 
   def sqrt: Real = Real(p => x(p * 2).sqrt)
@@ -311,7 +311,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     val s = if (i > 0) {
       sign + str.substring(0, i) + "." + str.substring(i)
     } else {
-      sign + "0." + ("0" * -i) + str
+      sign + "0." + "0" * -i + str
     }
     s.replaceAll("0+$", "").replaceAll("\\.$", "")
   }
@@ -427,13 +427,13 @@ object Real extends RealInstances {
     if (sx > 0) {
       atan(y / x)(p)
     } else if (sy >= 0 && sx < 0) {
-      (atan(y / x) + Real.pi)(p)
+      atan(y / x) + Real.pi(p)
     } else if (sy < 0 && sx < 0) {
-      (atan(y / x) - Real.pi)(p)
+      atan(y / x) - Real.pi(p)
     } else if (sy > 0) {
-      (Real.pi / Real.two)(p)
+      Real.pi / Real.two(p)
     } else if (sy < 0) {
-      (-Real.pi / Real.two)(p)
+      -Real.pi / Real.two(p)
     } else {
       throw new IllegalArgumentException("atan2(0, 0) is undefined")
       // // ugh
@@ -446,13 +446,13 @@ object Real extends RealInstances {
     val x0 = x(0)
     val s = (Real.one - x * x).sqrt
     x0.signum match {
-      case n if n > 0 => (Real.pi / Real.two) - atan(s / x)
+      case n if n > 0 => Real.pi / Real.two - atan(s / x)
       case 0          => atan(x / s)
-      case _          => (-Real.pi / Real.two) - atan(s / x)
+      case _          => -Real.pi / Real.two - atan(s / x)
     }
   }
 
-  def acos(x: Real): Real = (Real.pi / Real.two) - asin(x)
+  def acos(x: Real): Real = Real.pi / Real.two - asin(x)
 
   def sinh(x: Real): Real = {
     val y = exp(x)
@@ -564,12 +564,12 @@ object Real extends RealInstances {
 
   def atanDr(x: Real): Real = {
     val y = x * x + Real(1)
-    (x / y) * atanDrx((x * x) / y)
+    x / y * atanDrx(x * x / y)
   }
 
   def atanDrx(x: Real): Real =
     // powerSeries(accSeq((r, n) => r * (Rational(2*n, 2*n + 1))), _ + 1, x)
-    powerSeries(accSeq((r, n) => r * (Rational(2 * n, 2 * n + 1))), _ * 2, x)
+    powerSeries(accSeq((r, n) => r * Rational(2 * n, 2 * n + 1)), _ * 2, x)
 
   case class Exact(n: Rational) extends Real {
     def apply(p: Int): SafeLong = Real.roundUp(Rational(2).pow(p) * n)
@@ -579,7 +579,7 @@ object Real extends RealInstances {
     @volatile private[spire] var memo: Option[(Int, SafeLong)] = None
 
     def apply(p: Int): SafeLong = memo match {
-      case Some((bits, value)) if bits >= p =>
+      case Some(bits, value) if bits >= p =>
         Real.roundUp(Rational(value, SafeLong(2).pow(bits - p)))
       case _ =>
         val result = f(p)

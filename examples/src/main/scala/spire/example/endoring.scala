@@ -84,7 +84,7 @@ object EndoRingExample extends App {
   val inv: Int => Int = -_
 
   val a = (x2 + inv) * x3
-  val b = (x2 * x3) + (inv * x3)
+  val b = x2 * x3 + inv * x3
 
   (0 until 10).foreach(i => assert(a(i) == b(i))) // EndoRing is distributive.
 
@@ -96,7 +96,7 @@ object EndoRingExample extends App {
   val five = two * two + one
   (0 until 10).foreach { i =>
     assert(five(i) == 5 * i)
-    assert(((five * two) + two)(i) == 12 * i)
+    assert(five * two + two (i) == 12 * i)
   }
 
   implicit val pairedSetEndoRing: EndoRing[(Set[Int], Set[Int])] = EndoRing[(Set[Int], Set[Int])]
@@ -112,15 +112,15 @@ object EndoRingExample extends App {
   // Let's generate the powers of 2 from 0 to n. The endomorphism
   // `double + id` means that we double the elements of a set, then union it
   // with the original.
-  val powers: Set[Int] = ((double + id) ** 3)(Set(1))
+  val powers: Set[Int] = (double + id) ** 3 (Set(1))
   assert(powers == Set(1, 2, 4, 8))
 
-  val range: Set[Int] = ((inc + id) ** 4)(Set(1, 11))
+  val range: Set[Int] = (inc + id) ** 4 (Set(1, 11))
   assert(range == Set(1, 2, 3, 4, 5, 11, 12, 13, 14, 15))
 
   // It's distributive.
   val q = Set(1, 2, 3)
   val e1 = (double + triple) * triple
-  val e2 = (double * triple) + (triple * triple)
+  val e2 = double * triple + triple * triple
   assert(e1(q) == e2(q))
 }

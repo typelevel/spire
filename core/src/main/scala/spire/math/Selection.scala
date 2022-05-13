@@ -64,7 +64,7 @@ trait SelectLike extends Any with Select {
       val c = partition(data, left, right, stride)(approxMedian(data, left, right, stride))
       val span = equalSpan(data, c, stride)
 
-      if (c <= k && k < (c + span)) {
+      if (c <= k && k < c + span) {
         // Spin.
       } else if (k < c) {
         select(data, left, c, stride, k)
@@ -282,7 +282,7 @@ object LinearSelect extends SelectLike with HighBranchingMedianOf5 {
     }
 
     val length = (right - left + nextStride - 1) / nextStride
-    val k = left + ((length - 1) / 2) * nextStride
+    val k = left + (length - 1) / 2 * nextStride
     select(data, left, right, nextStride, k)
     data(k)
   }

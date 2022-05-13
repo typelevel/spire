@@ -82,14 +82,14 @@ case class Factors(elements: Map[SafeLong, Int], sign: Sign)
       case Positive =>
         var t = SafeLong.one
         val it = iterator
-        while (it.hasNext && t <= rhs) { val (p, e) = it.next(); t *= (p ** e) }
+        while (it.hasNext && t <= rhs) { val (p, e) = it.next(); t *= p ** e }
         t.compare(rhs)
       case Zero =>
         rhs.sign.toInt
       case Negative =>
         var t = -SafeLong.one
         val it = iterator
-        while (it.hasNext && t >= rhs) { val (p, e) = it.next(); t *= (p ** e) }
+        while (it.hasNext && t >= rhs) { val (p, e) = it.next(); t *= p ** e }
         t.compare(rhs)
     }
 
@@ -131,7 +131,7 @@ case class Factors(elements: Map[SafeLong, Int], sign: Sign)
 
   def /(rhs: Factors): Factors = {
     val (sign, nn, dd, cc) = qm(rhs)
-    if (dd.isEmpty) Factors(nn, Sign(sign)) else Factors((prod(nn) * sign) / prod(dd))
+    if (dd.isEmpty) Factors(nn, Sign(sign)) else Factors(prod(nn) * sign / prod(dd))
   }
 
   def /(rhs: SafeLong): Factors =
@@ -148,7 +148,7 @@ case class Factors(elements: Map[SafeLong, Int], sign: Sign)
   def %(rhs: Factors): Factors = {
     val (_, nn, dd, cc) = qm(rhs)
     if (dd.isEmpty) Factors.zero
-    else Factors(((prod(nn) * lhs.signum) % prod(dd)) * prod(cc))
+    else Factors(prod(nn) * lhs.signum % prod(dd) * prod(cc))
   }
 
   def %(rhs: SafeLong): Factors =

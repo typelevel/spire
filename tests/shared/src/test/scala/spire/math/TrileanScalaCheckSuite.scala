@@ -23,8 +23,8 @@ class TrileanScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("associativity") {
     forAll { (x: Trilean, y: Trilean, z: Trilean) =>
-      ((x & y) & z) == (x & (y & z)) &&
-      ((x | y) | z) == (x | (y | z))
+      (x & y & z) == (x & (y & z)) &&
+      (x | y | z) == (x | (y | z))
     }
   }
 
@@ -38,7 +38,7 @@ class TrileanScalaCheckSuite extends munit.ScalaCheckSuite {
   property("absorption") {
     forAll { (x: Trilean, y: Trilean) =>
       (x & (x | y)) == x &&
-      (x | (x & y)) == x
+      (x | x & y) == x
     }
   }
 
@@ -51,8 +51,8 @@ class TrileanScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("distributivity") {
     forAll { (x: Trilean, y: Trilean, z: Trilean) =>
-      (x & (y | z)) == ((x & y) | (x & z)) &&
-      (x | (y & z)) == ((x | y) & (x | z))
+      (x & (y | z)) == (x & y | x & z) &&
+      (x | y & z) == ((x | y) & (x | z))
     }
   }
 

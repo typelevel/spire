@@ -105,7 +105,7 @@ class IntervalSeqSampleScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("isContiguous") {
     forAll { (a: IntervalSeq[Int]) =>
-      a.isContiguous == (a.intervals.size <= 1)
+      a.isContiguous == a.intervals.size <= 1
     }
   }
 

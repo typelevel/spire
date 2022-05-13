@@ -110,8 +110,8 @@ trait DoubleIsTrig extends Trig[Double] {
   def cosh(x: Double): Double = Math.cosh(x)
   def tanh(x: Double): Double = Math.tanh(x)
 
-  def toRadians(a: Double): Double = (a * 2 * pi) / 360
-  def toDegrees(a: Double): Double = (a * 360) / (2 * pi)
+  def toRadians(a: Double): Double = a * 2 * pi / 360
+  def toDegrees(a: Double): Double = a * 360 / (2 * pi)
 }
 
 trait DoubleOrder extends Order[Double] {
@@ -134,7 +134,7 @@ trait DoubleSigned extends Signed[Double] with DoubleOrder {
 
 trait DoubleTruncatedDivision extends TruncatedDivisionCRing[Double] with DoubleSigned {
   def toBigIntOpt(a: Double): Opt[BigInt] = if (a.isWhole) Opt(BigDecimal(a).toBigInt) else Opt.empty[BigInt]
-  def tquot(a: Double, b: Double): Double = (a - (a % b)) / b
+  def tquot(a: Double, b: Double): Double = (a - a % b) / b
   def tmod(a: Double, b: Double): Double = a % b
 }
 

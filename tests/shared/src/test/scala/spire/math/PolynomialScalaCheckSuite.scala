@@ -78,7 +78,7 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
     }
 
     property(s"$name p + (-p) = 0") {
-      forAll { (p: P) => p + (-p) == zero }
+      forAll { (p: P) => p + -p == zero }
     }
 
     property(s"$name p * 0 = 0") {
@@ -90,15 +90,15 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
     }
 
     property(s"$name p /~ 1 = p") {
-      forAll { (p: P) => (p.equot(one)) == p }
+      forAll { (p: P) => p.equot(one) == p }
     }
 
     property(s"$name p /~ p = 1") {
-      forAll { (p: P) => if (!p.isZero)(p.equot(p)) == one else true }
+      forAll { (p: P) => if (!p.isZero) p.equot(p) == one else true }
     }
 
     property(s"$name p % p = 0") {
-      forAll { (p: P) => if (!p.isZero)(p.emod(p)) == zero else true }
+      forAll { (p: P) => if (!p.isZero) p.emod(p) == zero else true }
     }
 
     property(s"$name x + y = y + x") {
@@ -110,7 +110,7 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
     }
 
     property(s"$name (x /~ y) * y + (x % y) = x") {
-      forAll { (x: P, y: P) => if (!y.isZero)(x.equot(y)) * y + (x.emod(y)) == x else true }
+      forAll { (x: P, y: P) => if (!y.isZero) x.equot(y) * y + x.emod(y) == x else true }
     }
 
     property(s"$name p = p.reductum + p.maxTerm") {
@@ -222,7 +222,7 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
   def gcdTest(x: Polynomial[Rational], y: Polynomial[Rational]): Prop = {
     (!x.isZero || !y.isZero) ==> {
       val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
-      !gcd.isZero && ((x.emod(gcd)).equals(0) && (y.emod(gcd)).equals(0))
+      !gcd.isZero && (x.emod(gcd).equals(0) && y.emod(gcd).equals(0))
     }
   }
 

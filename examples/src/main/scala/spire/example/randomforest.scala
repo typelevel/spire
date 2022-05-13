@@ -190,7 +190,7 @@ trait RandomForest[V, @sp(Double) F, @sp(Double) K] {
 
           members.qsortBy(data(_).coord(axis))
 
-          cfor(0)(_ < (members.length - 1), _ + 1) { j =>
+          cfor(0)(_ < members.length - 1, _ + 1) { j =>
             // We move point j from the right region to the left and see if our
             // error is reduced.
 
@@ -275,9 +275,9 @@ class RandomForestRegression[V, @sp(Double) F](implicit
   // [1]: http://nfs-uxsup.csx.cam.ac.uk/~fanf2/hermes/doc/antiforgery/stats.pdf
 
   final protected class SquaredError(sum: F, sumSq: F, count: Int) extends RegionLike {
-    def +(k: F) = new SquaredError(sum + k, sumSq + (k * k), count + 1)
-    def -(k: F) = new SquaredError(sum - k, sumSq - (k * k), count - 1)
-    def error: F = sumSq / count - (sum / count) ** 2 // Error = variance.
+    def +(k: F) = new SquaredError(sum + k, sumSq + k * k, count + 1)
+    def -(k: F) = new SquaredError(sum - k, sumSq - k * k, count - 1)
+    def error: F = sumSq / count - sum / count ** 2 // Error = variance.
     def value: F = sum / count
   }
 
@@ -321,7 +321,7 @@ class RandomForestClassification[V, @sp(Double) F, K](implicit
     def error: F = {
       val n = F.fromInt(m.foldLeft(0)(_ + _._2))
       m.foldLeft(F.zero) { case (idx, (k, cnt)) =>
-        idx + (F.fromInt(cnt) / n)
+        idx + F.fromInt(cnt) / n
       }
     }
     def value: K = m.maxBy(_._2)._1

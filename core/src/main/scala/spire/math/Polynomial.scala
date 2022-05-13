@@ -36,7 +36,7 @@ object Polynomial extends PolynomialInstances {
 
   def dense[@sp(Double) C: Semiring: Eq: ClassTag](coeffs: Array[C]): PolyDense[C] = {
     var i = coeffs.length
-    while (i > 0 && (coeffs(i - 1) === Semiring[C].zero)) i -= 1
+    while (i > 0 && coeffs(i - 1) === Semiring[C].zero) i -= 1
     if (i == coeffs.length) {
       new PolyDense(coeffs)
     } else {
@@ -151,7 +151,7 @@ object Polynomial extends PolynomialInstances {
       pts match {
         case Nil =>
           p
-        case (x, y) :: tail =>
+        case x, y :: tail =>
           val c = Polynomial.constant((y - p(x)) / xs.map(x - _).qproduct)
           val prod = xs.foldLeft(Polynomial.one[C]) { (prod, xn) =>
             prod * (Polynomial.x[C] - constant(xn))
@@ -358,7 +358,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
         // for performance, but also required for us to only ask for a Ring,
         // rather than a EuclideanRing. We always know that m * (d + 1) is
         // divisible by i, so this is exact.
-        m = (m * (d + 1)) / i
+        m = m * (d + 1) / i
         k *= h
         coeffs(d) = coeffs(d) + fromSafeLong(m) * k
         d -= 1
@@ -433,7 +433,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
 
   def unary_-(implicit ring: Rng[C]): Polynomial[C]
   def +(rhs: Polynomial[C])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C]
-  def -(rhs: Polynomial[C])(implicit ring: Rng[C], eq: Eq[C]): Polynomial[C] = lhs + (-rhs)
+  def -(rhs: Polynomial[C])(implicit ring: Rng[C], eq: Eq[C]): Polynomial[C] = lhs + -rhs
   def *(rhs: Polynomial[C])(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C]
 
   def **(k: Int)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = pow(k)

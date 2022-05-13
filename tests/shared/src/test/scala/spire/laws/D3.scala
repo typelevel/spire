@@ -37,14 +37,14 @@ object D3 {
       val m = y.n % 2
 
       if (x.n % 2 == 0) {
-        new D3(((n0 + n1) % 3) * 2 + m)
+        new D3((n0 + n1) % 3 * 2 + m)
       } else {
-        new D3(((n0 + 3 - n1) % 3) * 2 + (m ^ 1))
+        new D3((n0 + 3 - n1) % 3 * 2 + (m ^ 1))
       }
     }
 
     def inverse(x: D3): D3 =
-      if (x.n % 2 == 1) x else new D3(((3 - x.n / 2) % 3) * 2)
+      if (x.n % 2 == 1) x else new D3((3 - x.n / 2) % 3 * 2)
 
     def eqv(x: D3, y: D3): Boolean = x.n == y.n
   }

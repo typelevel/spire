@@ -63,7 +63,7 @@ object Overlap {
   /**
    * Intervals are equal
    */
-  case class Equal[A] private[spire] () extends Overlap[A]
+  case class Equal[A] private[spire] extends Overlap[A]
 
   def apply[A: Order](lhs: Interval[A], rhs: Interval[A]): Overlap[A] = {
 

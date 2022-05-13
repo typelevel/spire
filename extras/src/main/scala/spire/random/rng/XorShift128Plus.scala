@@ -36,7 +36,7 @@ class XorShift128Plus(private var s0: Long, private var s1: Long) extends LongBa
     val y = s1
     s0 = y
     x ^= x << 23
-    s1 = x ^ y ^ (x >>> 17) ^ (y >>> 26)
+    s1 = x ^ y ^ x >>> 17 ^ y >>> 26
     s1 + y
   }
 }

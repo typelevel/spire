@@ -34,7 +34,7 @@ object Searching {
     var first = lower
     var last = upper
     while (first <= last) {
-      val middle = (first + last) >>> 1
+      val middle = first + last >>> 1
 
       val compare = as(middle).compare(item)
       if (compare < 0) first = middle + 1
@@ -57,7 +57,7 @@ object Searching {
     var first = lower
     var last = upper
     while (first <= last) {
-      val middle = (first + last) >>> 1
+      val middle = first + last >>> 1
 
       val compare = as(middle).compare(item)
       if (compare < 0) first = middle + 1

@@ -73,19 +73,19 @@ final class MersenneTwister32 protected[random] (mt: Array[Int], mti0: Int = 625
       var kk = 0
 
       while (kk < N_M) {
-        y = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
-        mt(kk) = mt(kk + M) ^ (y >>> 1) ^ mag01(y)
+        y = mt(kk) & UpperMask | mt(kk + 1) & LowerMask
+        mt(kk) = mt(kk + M) ^ y >>> 1 ^ mag01(y)
         kk += 1
       }
 
       while (kk < N_1) {
-        y = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
-        mt(kk) = mt(kk + M_N) ^ (y >>> 1) ^ mag01(y)
+        y = mt(kk) & UpperMask | mt(kk + 1) & LowerMask
+        mt(kk) = mt(kk + M_N) ^ y >>> 1 ^ mag01(y)
         kk += 1
       }
 
-      y = (mt(N_1) & UpperMask) | (mt(0) & LowerMask)
-      mt(N_1) = mt(M_1) ^ (y >>> 1) ^ mag01(y)
+      y = mt(N_1) & UpperMask | mt(0) & LowerMask
+      mt(N_1) = mt(M_1) ^ y >>> 1 ^ mag01(y)
 
       mti = 0
     }
@@ -94,10 +94,10 @@ final class MersenneTwister32 protected[random] (mt: Array[Int], mti0: Int = 625
     mti += 1
 
     // Tempering
-    y ^= (y >>> 11)
-    y ^= (y << 7) & 0x9d2c5680
-    y ^= (y << 15) & 0xefc60000
-    y ^= (y >>> 18)
+    y ^= y >>> 11
+    y ^= y << 7 & 0x9d2c5680
+    y ^= y << 15 & 0xefc60000
+    y ^= y >>> 18
 
     y
   }

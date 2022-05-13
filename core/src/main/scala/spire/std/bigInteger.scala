@@ -53,7 +53,7 @@ trait BigIntegerIsNRoot extends NRoot[BigInteger] {
     } else {
       val c = b.setBit(i)
 
-      if (((c.pow(k)).compareTo(a)) <= 0)
+      if (c.pow(k).compareTo(a) <= 0)
         findNroot(c, i - 1)
       else
         findNroot(b, i - 1)
@@ -82,10 +82,10 @@ trait BigIntegerIsNRoot extends NRoot[BigInteger] {
 trait BigIntegerOrder extends Order[BigInteger] {
   override def eqv(x: BigInteger, y: BigInteger): Boolean = x.equals(y)
   override def neqv(x: BigInteger, y: BigInteger): Boolean = !x.equals(y)
-  override def gt(x: BigInteger, y: BigInteger): Boolean = (x.compareTo(y)) > 0
-  override def gteqv(x: BigInteger, y: BigInteger): Boolean = (x.compareTo(y)) >= 0
-  override def lt(x: BigInteger, y: BigInteger): Boolean = (x.compareTo(y)) < 0
-  override def lteqv(x: BigInteger, y: BigInteger): Boolean = (x.compareTo(y)) <= 0
+  override def gt(x: BigInteger, y: BigInteger): Boolean = x.compareTo(y) > 0
+  override def gteqv(x: BigInteger, y: BigInteger): Boolean = x.compareTo(y) >= 0
+  override def lt(x: BigInteger, y: BigInteger): Boolean = x.compareTo(y) < 0
+  override def lteqv(x: BigInteger, y: BigInteger): Boolean = x.compareTo(y) <= 0
   override def min(x: BigInteger, y: BigInteger): BigInteger = x.min(y)
   override def max(x: BigInteger, y: BigInteger): BigInteger = x.max(y)
   def compare(x: BigInteger, y: BigInteger): Int = x.compareTo(y)

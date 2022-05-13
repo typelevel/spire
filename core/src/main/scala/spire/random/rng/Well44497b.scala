@@ -69,7 +69,7 @@ final class Well44497b protected[random] (state: Array[Int], i0: Int) extends In
 
     import Well44497abIndexCache._
 
-    val z0: Int = (state(vrm1(i)) & LowerMask) | (state(vrm2(i)) & UpperMask)
+    val z0: Int = state(vrm1(i)) & LowerMask | state(vrm2(i)) & UpperMask
     val z1: Int = mat0neg(-24, state(i)) ^ mat0pos(30, state(vm1(i)))
     val z2: Int = mat0neg(-10, state(vm2(i))) ^ mat3neg(-26, state(vm3(i)))
 
@@ -79,8 +79,8 @@ final class Well44497b protected[random] (state: Array[Int], i0: Int) extends In
 
     // Matsumoto-Kurita tempering to get a ME (maximally equidistributed) generator
     val t0 = state(i)
-    val t1 = t0 ^ ((t0 << 7) & TemperB)
-    val t2 = t1 ^ ((t1 << 15) & TemperC)
+    val t1 = t0 ^ t0 << 7 & TemperB
+    val t2 = t1 ^ t1 << 15 & TemperC
 
     t2
   }
@@ -118,8 +118,8 @@ object Well44497b extends GeneratorCompanion[Well44497b, (Array[Int], Int)] {
   // Third parameter of the algorithm.
   // @inline private final val M3 : Int = 229
 
-  @inline final private def mat0pos(t: Int, v: Int) = v ^ (v >>> t)
-  @inline final private def mat0neg(t: Int, v: Int) = v ^ (v << -t)
+  @inline final private def mat0pos(t: Int, v: Int) = v ^ v >>> t
+  @inline final private def mat0neg(t: Int, v: Int) = v ^ v << -t
   @inline final private def mat1(v: Int) = v
   // @inline private final def mat2(a: Int, v: Int)            = if ((v & 1) != 0) (v >>> 1) ^ a else v >>> 1
   // @inline private final def mat3pos(t: Int, v: Int)         = v >>> t
@@ -128,9 +128,9 @@ object Well44497b extends GeneratorCompanion[Well44497b, (Array[Int], Int)] {
   // @inline private final def mat4neg(t: Int, b: Int, v: Int) = v ^ ((v << -t) & b)
   @inline final private def mat5(r: Int, a: Int, ds: Int, dt: Int, v: Int) = {
     if ((v & dt) != 0) {
-      (((v << r) ^ (v >>> (32 - r))) & ds) ^ a
+      (v << r ^ v >>> 32 - r) & ds ^ a
     } else {
-      ((v << r) ^ (v >>> (32 - r))) & ds
+      (v << r ^ v >>> 32 - r) & ds
     }
   }
 

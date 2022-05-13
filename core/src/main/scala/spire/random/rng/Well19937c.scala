@@ -69,7 +69,7 @@ final class Well19937c protected[random] (state: Array[Int], i0: Int) extends In
 
     import Well19937acIndexCache._
 
-    val z0: Int = (state(vrm1(i)) & LowerMask) | (state(vrm2(i)) & UpperMask)
+    val z0: Int = state(vrm1(i)) & LowerMask | state(vrm2(i)) & UpperMask
     val z1: Int = mat0neg(-25, state(i)) ^ mat0pos(27, state(vm1(i)))
     val z2: Int = mat3pos(9, state(vm2(i))) ^ mat0pos(1, state(vm3(i)))
 
@@ -79,8 +79,8 @@ final class Well19937c protected[random] (state: Array[Int], i0: Int) extends In
 
     // Matsumoto-Kurita tempering to get a ME (maximally equidistributed) generator
     val t0 = state(i)
-    val t1 = t0 ^ ((t0 << 7) & TemperB)
-    val t2 = t1 ^ ((t1 << 15) & TemperC)
+    val t1 = t0 ^ t0 << 7 & TemperB
+    val t2 = t1 ^ t1 << 15 & TemperC
 
     t2
   }
@@ -118,8 +118,8 @@ object Well19937c extends GeneratorCompanion[Well19937c, (Array[Int], Int)] {
   // Third parameter of the algorithm.
   // @inline private final val M3 : Int = 449
 
-  @inline final private def mat0pos(t: Int, v: Int) = v ^ (v >>> t)
-  @inline final private def mat0neg(t: Int, v: Int) = v ^ (v << -t)
+  @inline final private def mat0pos(t: Int, v: Int) = v ^ v >>> t
+  @inline final private def mat0neg(t: Int, v: Int) = v ^ v << -t
   @inline final private def mat1(v: Int) = v
   @inline final private def mat3pos(t: Int, v: Int) = v >>> t
 

@@ -129,7 +129,7 @@ case class PolySparse[@sp(Double) C] private[spire] (val exp: Array[Int], val co
   def apply(x: C)(implicit ring: Semiring[C]): C = if (isZero) {
     ring.zero
   } else if (exp.length == 1) {
-    if (exp(0) != 0) coeff(0) * (x.pow(exp(0))) else coeff(0)
+    if (exp(0) != 0) coeff(0) * x.pow(exp(0)) else coeff(0)
   } else {
     // TODO: Rewrite this to be more like PolyDense.
     val bits = expBits(x)
@@ -254,8 +254,8 @@ object PolySparse {
       if (c =!= zero) {
         expBldr += i
         coeffBldr += c
-        inOrder &&= (lastDeg < i)
-        inReverseOrder &&= (lastDeg < 0 || lastDeg > i)
+        inOrder &&= lastDeg < i
+        inReverseOrder &&= lastDeg < 0 || lastDeg > i
         lastDeg = i
       }
     }

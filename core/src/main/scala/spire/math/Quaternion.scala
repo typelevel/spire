@@ -146,7 +146,7 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
   // important to keep in sync with Complex[_]
   override def hashCode: Int =
     if (sillyIsReal) r.##
-    else (19 * r.##) + (41 * i.##) + (13 * j.##) + (77 * k.##) + 97
+    else 19 * r.## + 41 * i.## + 13 * j.## + 77 * k.## + 97
 
   // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
@@ -264,16 +264,16 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
     Quaternion(r * rhs, i * rhs, j * rhs, k * rhs)
   def *(rhs: Complex[A])(implicit s: CRing[A]): Quaternion[A] =
     Quaternion(
-      (r * rhs.real) - (i * rhs.imag),
-      (r * rhs.imag) + (i * rhs.real),
-      (j * rhs.real) + (k * rhs.imag),
-      (j * rhs.imag) + (k * rhs.real)
+      r * rhs.real - i * rhs.imag,
+      r * rhs.imag + i * rhs.real,
+      j * rhs.real + k * rhs.imag,
+      j * rhs.imag + k * rhs.real
     )
   def *(rhs: Quaternion[A])(implicit s: CRing[A]): Quaternion[A] = Quaternion(
-    (lhs.r * rhs.r) - (lhs.i * rhs.i) - (lhs.j * rhs.j) - (lhs.k * rhs.k),
-    (lhs.r * rhs.i) + (lhs.i * rhs.r) + (lhs.j * rhs.k) - (lhs.k * rhs.j),
-    (lhs.r * rhs.j) - (lhs.i * rhs.k) + (lhs.j * rhs.r) + (lhs.k * rhs.i),
-    (lhs.r * rhs.k) + (lhs.i * rhs.j) - (lhs.j * rhs.i) + (lhs.k * rhs.r)
+    lhs.r * rhs.r - lhs.i * rhs.i - lhs.j * rhs.j - lhs.k * rhs.k,
+    lhs.r * rhs.i + lhs.i * rhs.r + lhs.j * rhs.k - lhs.k * rhs.j,
+    lhs.r * rhs.j - lhs.i * rhs.k + lhs.j * rhs.r + lhs.k * rhs.i,
+    lhs.r * rhs.k + lhs.i * rhs.j - lhs.j * rhs.i + lhs.k * rhs.r
   )
 
   def /(rhs: A)(implicit f: Field[A]): Quaternion[A] =

@@ -35,7 +35,7 @@ abstract class BinaryMerge {
     @tailrec
     def binarySearch0(low: Int, high: Int): Int =
       if (low <= high) {
-        val mid = (low + high) >>> 1
+        val mid = low + high >>> 1
         val c = compare(ai, mid)
         if (c > 0)
           binarySearch0(mid + 1, high)

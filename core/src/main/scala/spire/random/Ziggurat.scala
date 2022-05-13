@@ -126,7 +126,7 @@ object Ziggurat {
     val ve: Double = 3.949659822581572e-3
 
     var q: Double = vn / exp(-.5 * dn * dn)
-    kn(0) = ((dn / q) * m1).toLong
+    kn(0) = (dn / q * m1).toLong
     kn(1) = 0
 
     wn(0) = q / m1
@@ -137,14 +137,14 @@ object Ziggurat {
 
     for (i <- 126 to 1 by -1) {
       dn = sqrt(-2 * log(vn / dn + exp(-.5 * dn * dn)))
-      kn(i + 1) = ((dn / tn) * m1).toLong
+      kn(i + 1) = (dn / tn * m1).toLong
       tn = dn
       fn(i) = exp(-.5 * dn * dn)
       wn(i) = dn / m1
     }
 
     q = ve / exp(-de)
-    ke(0) = ((de / q) * m2).toLong
+    ke(0) = (de / q * m2).toLong
     ke(1) = 0
 
     we(0) = q / m2
@@ -155,7 +155,7 @@ object Ziggurat {
 
     for (i <- 254 to 1 by -1) {
       de = -log(ve / de + exp(-de))
-      ke(i + 1) = ((de / te) * m2).toLong
+      ke(i + 1) = (de / te * m2).toLong
       te = de
       fe(i) = exp(-de)
       we(i) = de / m2

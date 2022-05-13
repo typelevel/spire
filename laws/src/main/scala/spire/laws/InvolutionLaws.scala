@@ -66,9 +66,7 @@ trait InvolutionLaws[A] extends Laws {
   ) = new DefaultRuleSet(
     name = "involutionAlgebra",
     parent = Some(involutionRing),
-    "conjugate linear" -> forAllSafe((x: A, y: A, r: R) =>
-      (r *: x + y).adjoint === (r.adjoint *: x.adjoint + y.adjoint)
-    )
+    "conjugate linear" -> forAllSafe((x: A, y: A, r: R) => (r *: x + y).adjoint === r.adjoint *: x.adjoint + y.adjoint)
   )
 
 }

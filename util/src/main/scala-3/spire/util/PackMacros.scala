@@ -18,10 +18,10 @@ package util
 
 trait PackMacros:
   private[util] inline def ism(n: Int, shift: Int): Byte =
-    ((n >>> shift) & 0xff).toByte
+    (n >>> shift & 0xff).toByte
 
   private[util] inline def lsm(n: Long, shift: Int): Byte =
-    ((n >>> shift) & 0xffL).toByte
+    (n >>> shift & 0xffL).toByte
 
   /**
    * index must be 0 <= index < 4
@@ -29,7 +29,7 @@ trait PackMacros:
   inline def intToByte(n: Int)(index: Int): Byte =
     if (0 <= index && index < 4)
       val offset = 24 - index * 8
-      ((n >>> offset) & 0xfff).toByte
+      (n >>> offset & 0xfff).toByte
     else sys.error(s"index outside of 0-3")
 
   /**
@@ -38,5 +38,5 @@ trait PackMacros:
   inline def longToByte(n: Long)(index: Int): Byte =
     if (0 <= index && index < 8)
       val offset = 56 - index * 8
-      ((n >>> offset) & 0xfff).toByte
+      (n >>> offset & 0xfff).toByte
     else sys.error("index outside of 0-7")

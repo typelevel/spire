@@ -58,7 +58,7 @@ trait IntIsNRoot extends NRoot[Int] {
       }
     }
 
-    findnroot(0, 1 << ((33 - n) / n))
+    findnroot(0, 1 << (33 - n) / n)
   }
 
   def log(a: Int): Int = Math.log(a.toDouble).toInt

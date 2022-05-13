@@ -22,11 +22,11 @@ object GenProductTypes {
   def beginTrait: Block = { tpe =>
     import tpe._
 
-    val parents = ("%s[(%s)]".format(structure, types)) + (parentStructure
+    val parents = "%s[(%s)]".format(structure, types) + parentStructure
       .map { p =>
         " with %sProduct%d[%s]".format(p, arity, types)
       }
-      .getOrElse(""))
+      .getOrElse("")
 
     "private[spire] trait %s[%s] extends %s {".format(name, specTypes, parents)
   }
@@ -148,11 +148,11 @@ object GenProductTypes {
                              |""".stripMargin
 
   def unifiedTrait(defns: Seq[Definition], start: Int, end: Int): String = {
-    "trait ProductInstances extends " + (defns
+    "trait ProductInstances extends " + defns
       .map { defn =>
         defn.structure + "ProductInstances"
       }
-      .mkString(" with "))
+      .mkString(" with ")
   }
 
   def renderAll(pkg: String, imports: List[String], start: Int = 2, end: Int = 22): Seq[Definition] => String = {

@@ -76,13 +76,13 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("x + (-x) = 0") {
     forAll { (x: Real) =>
-      x + (-x) == Real.zero
+      x + -x == Real.zero
     }
   }
 
   property("x / x = 1") {
     forAll { (x: Real) =>
-      (x != 0) ==> { x / x == Real.one }
+      x != 0 ==> { x / x == Real.one }
     }
   }
 
@@ -155,8 +155,8 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
         val x = Real(Rational(xn, xd))
         val y = Real(Rational(yn, yd))
         val mag = (x ** 2 + y ** 2).sqrt
-        Real.sin(Real.atan2(y, x)) == (y / mag) &&
-        Real.cos(Real.atan2(y, x)) == (x / mag)
+        Real.sin(Real.atan2(y, x)) == y / mag &&
+        Real.cos(Real.atan2(y, x)) == x / mag
       }
     }
   }
@@ -241,7 +241,7 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
   // even computable reals introduce when computing 1/3.
   property("x.pow(j).nroot(k) = x.fpow(j/k)") {
     forAll { (x0: Int, j0: Byte, k0: Byte) =>
-      (x0 > 0) ==> {
+      x0 > 0 ==> {
         val x = Real(x0)
         val j = (j0 & 0xff) % 10 + 1
         val k = (k0 & 0xff) % 10 + 1

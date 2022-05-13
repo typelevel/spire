@@ -25,7 +25,7 @@ class OverlapScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("Overlap equality") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
-      (x =!= y) ==> {
+      x =!= y ==> {
         import spire.algebra.Eq
 
         val eq = Eq[Overlap[Rational]]

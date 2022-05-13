@@ -63,7 +63,7 @@ package object math {
       if (lo > hi) prod
       else loop(lo + 1L, hi - 1L, BigInt(lo) * BigInt(hi) * prod)
 
-    if (((n - k) & 1) == 1)
+    if ((n - k & 1) == 1)
       loop(k + 1, n - 1L, BigInt(n)) / fact(n - k)
     else
       loop(k + 1, n, BigInt(1)) / fact(n - k)
@@ -88,11 +88,11 @@ package object math {
   def fib(n: Long): BigInt = {
     if (n < 0) throw new IllegalArgumentException(n.toString)
     var i = 63
-    while (((n >>> i) & 1) == 0 && i >= 0) i -= 1
+    while ((n >>> i & 1) == 0 && i >= 0) i -= 1
     @tailrec def loop(a: BigInt, b: BigInt, i: Int): BigInt = {
       val c = a + b
       if (i < 0) b
-      else if (((n >>> i) & 1) == 1) loop((a + c) * b, b * b + c * c, i - 1)
+      else if ((n >>> i & 1) == 1) loop((a + c) * b, b * b + c * c, i - 1)
       else loop(a * a + b * b, (a + c) * b, i - 1)
     }
     loop(BigInt(1), BigInt(0), i)
@@ -324,8 +324,8 @@ package object math {
   /**
    * lcm
    */
-  final def lcm(x: Long, y: Long): Long = if (x == 0 || y == 0) 0 else (x / gcd(x, y)) * y
-  final def lcm(a: BigInt, b: BigInt): BigInt = if (a.signum == 0 || b.signum == 0) 0 else (a / a.gcd(b)) * b
+  final def lcm(x: Long, y: Long): Long = if (x == 0 || y == 0) 0 else x / gcd(x, y) * y
+  final def lcm(a: BigInt, b: BigInt): BigInt = if (a.signum == 0 || b.signum == 0) 0 else a / a.gcd(b) * b
   final def lcm[A: Eq](x: A, y: A)(implicit ev: GCDRing[A]): A = ev.lcm(x, y)
 
   /**
@@ -545,8 +545,8 @@ package object math {
     val ay = abs(y)
     if (x == f.zero) ay
     else if (y == f.zero) ax
-    else if (ax > ay) ax * (1 + (y / x) ** 2).sqrt
-    else ay * (1 + (x / y) ** 2).sqrt
+    else if (ax > ay) ax * (1 + y / x ** 2).sqrt
+    else ay * (1 + x / y ** 2).sqrt
   }
 
   // BigInt
@@ -562,8 +562,8 @@ package object math {
     if (ceil == 0) {
       0
     } else {
-      ((ceil - 1) to 0 by -1).foldLeft(0) { (x, i) =>
-        val y = x | (1 << i)
+      (ceil - 1 to 0 by -1).foldLeft(0) { (x, i) =>
+        val y = x | 1 << i
         if (f(y)) y else x
       }
     }
@@ -575,7 +575,7 @@ package object math {
   private def decDiv(x: BigInt, y: BigInt, r: Int): LazyList[BigInt] = {
     val expanded = x * r
     val quot = expanded / y
-    val rem = expanded - (quot * y)
+    val rem = expanded - quot * y
 
     if (rem == 0) {
       quot #:: LazyList.empty
@@ -645,15 +645,15 @@ package object math {
         val y_ = y * radix
         val a = undigitize(digits.take(k), radix)
         // Note: target grows quite fast (so I imagine (y_ + b) pow k does too).
-        val target = radixPowK * r + a + (y_.pow(k))
-        val b = intSearch(b => ((y_ + b).pow(k)) <= target)
+        val target = radixPowK * r + a + y_.pow(k)
+        val b = intSearch(b => (y_ + b).pow(k) <= target)
 
         val ny = y_ + b
 
         if (i == maxSize) {
           (i, ny)
         } else {
-          val nr = target - (ny.pow(k))
+          val nr = target - ny.pow(k)
 
           // TODO: Add stopping condition for when nr == 0 and there are no more
           // digits. Tricky part is refactoring to know when digits end...

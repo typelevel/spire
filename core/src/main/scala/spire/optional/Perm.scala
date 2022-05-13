@@ -33,7 +33,7 @@ import spire.util._
  * Note that although the preimage and image contain only moved points, the domain and range of a Perm is all integers.
  * This acts as the identity for integers not in the image.
  */
-class Perm private (private val mapping: Map[Int, Int]) extends (Int => Int) {
+class Perm private (private val mapping: Map[Int, Int]) extends Int => Int {
 
   /**
    * Apply this permutation to an `Int`.
@@ -48,7 +48,7 @@ class Perm private (private val mapping: Map[Int, Int]) extends (Int => Int) {
    */
   def apply(n0: Int, n1: Int, ns: Int*): Perm = {
     val cycle = n0 +: n1 +: ns
-    require(!(cycle.exists(image)), "Cycle must be disjoint.")
+    require(!cycle.exists(image), "Cycle must be disjoint.")
     this.compose(Perm(n0, n1, ns: _*))
   }
 

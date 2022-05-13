@@ -39,7 +39,7 @@ class UIntSuite extends munit.ScalaCheckSuite {
   }
 
   property("(a + b) - b == a") {
-    forAll { (a: UInt, b: UInt) => (a + b) - b == a }
+    forAll { (a: UInt, b: UInt) => a + b - b == a }
   }
 
   property("n / 0 -> ArithmeticException") {
@@ -64,7 +64,7 @@ class UIntSuite extends munit.ScalaCheckSuite {
 
   property("(n / d) * d + (n % d) == n") {
     forAll { (n: UInt, d: UInt) =>
-      (d != zero) ==> {
+      d != zero ==> {
         val q = n / d
         val r = n % d
         q * d + r == n
@@ -74,24 +74,24 @@ class UIntSuite extends munit.ScalaCheckSuite {
 
   property("n / d <= n") {
     forAll { (n: UInt, d: UInt) =>
-      (d != zero) ==> { n / d <= n == true }
+      d != zero ==> { n / d <= n == true }
     }
   }
 
   property("n % d < d") {
     forAll { (n: UInt, d: UInt) =>
-      (d != zero) ==> { n % d < d == true }
+      d != zero ==> { n % d < d == true }
     }
   }
 
   property("n + 1 > n") {
     forAll { (n: UInt) =>
-      (n != UInt.MaxValue) ==> { n + one > n == true }
+      n != UInt.MaxValue ==> { n + one > n == true }
     }
   }
 
   property("n + (-n) == 0") {
-    forAll { (n: UInt) => n + (-n) == zero }
+    forAll { (n: UInt) => n + -n == zero }
   }
 
   property("a < b") {

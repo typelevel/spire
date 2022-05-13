@@ -76,7 +76,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
   final protected[this] def upperFlagToLower(flags: Int): Int = (flags & 2) >>> 1
 
   @inline final protected[this] def swapFlags(flags: Int): Int =
-    ((flags & 1) << 1) | ((flags & 2) >>> 1)
+    (flags & 1) << 1 | (flags & 2) >>> 1
 
   protected[this] def lowerPairBelow(lower1: A, flags1: Int, lower2: A, flags2: Int)(implicit o: Order[A]): Boolean =
     lower1 < lower2 || lower1 === lower2 && (isClosedLower(flags1) || isOpenLower(flags2))
@@ -157,7 +157,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
   }
 
   def isProperSupersetOf(rhs: Interval[A])(implicit o: Order[A]): Boolean =
-    lhs != rhs && (lhs.isSupersetOf(rhs))
+    lhs != rhs && lhs.isSupersetOf(rhs)
 
   def isSubsetOf(rhs: Interval[A])(implicit o: Order[A]): Boolean =
     rhs.isSupersetOf(lhs)
@@ -321,7 +321,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
     combine(rhs)(_ + _)
 
   def -(rhs: Interval[A])(implicit o: Order[A], ev: AdditiveGroup[A]): Interval[A] =
-    lhs + (-rhs)
+    lhs + -rhs
 
   // scalastyle:off method.length
   def *(rhs: Interval[A])(implicit o: Order[A], ev: Semiring[A]): Interval[A] = {
@@ -333,7 +333,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
 
       if (lower1s < 0 || lower2s < 0) All()
       else {
-        val strongZero = (lower1s == 0 && isClosedLower(lf1)) || (lower2s == 0 && isClosedLower(lf2))
+        val strongZero = lower1s == 0 && isClosedLower(lf1) || lower2s == 0 && isClosedLower(lf2)
         val flags = if (strongZero) 0 else lf1 | lf2
         Above(lower1 * lower2, flags)
       }
@@ -344,7 +344,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
       val upper2s = upper2.compare(z)
       if (upper1s > 0 || upper2s > 0) All()
       else {
-        val strongZero = (upper1s == 0 && isClosedUpper(uf1)) || (upper2s == 0 && isClosedUpper(uf2))
+        val strongZero = upper1s == 0 && isClosedUpper(uf1) || upper2s == 0 && isClosedUpper(uf2)
         val flags = if (strongZero) 0 else upperFlagToLower(uf1) | upperFlagToLower(uf2)
         Above(upper1 * upper2, flags)
       }
@@ -355,7 +355,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
       val upper2s = upper2.compare(z)
       if (lower1s < 0 || upper2s > 0) All()
       else {
-        val strongZero = (lower1s == 0 && isClosedLower(lf1)) || (upper2s == 0 && isClosedUpper(uf2))
+        val strongZero = lower1s == 0 && isClosedLower(lf1) || upper2s == 0 && isClosedUpper(uf2)
         val flags = if (strongZero) 0 else lowerFlagToUpper(lf1) | uf2
         Below(lower1 * upper2, flags)
       }
@@ -373,18 +373,18 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
         if (hasBelowZero1) // the minimal point is lower1(-) * upper2(+)
           Above(lower1 * upper2, lf1 | upperFlagToLower(flags2))
         else { // the minimal point is lower1(+) * lower2(+)
-          val strongZero = (lower1s == 0 && isClosedLower(lf1)) || (lower2s == 0 && isClosedLower(flags2))
+          val strongZero = lower1s == 0 && isClosedLower(lf1) || lower2s == 0 && isClosedLower(flags2)
           val flags = if (strongZero) 0 else lf1 | lowerFlag(flags2)
           Above(lower1 * lower2, flags)
         }
       } else { // bounded interval is fully below zero
         assert(hasBelowZero2)
         if (hasBelowZero1) { // the maximal point is lower1(-) * lower2(-)
-          val strongZero = (lower1s == 0 && isClosedLower(lf1)) || (lower2s == 0 && isClosedLower(flags2))
+          val strongZero = lower1s == 0 && isClosedLower(lf1) || lower2s == 0 && isClosedLower(flags2)
           val flags = if (strongZero) 0 else lowerFlagToUpper(lf1) | lowerFlagToUpper(flags2)
           Below(lower1 * lower2, flags)
         } else { // the maximal point is lower1(+) * upper2(-)
-          val strongZero = (lower1s == 0 && isClosedLower(lf1)) || (upper2s == 0 && isClosedUpper(flags2))
+          val strongZero = lower1s == 0 && isClosedLower(lf1) || upper2s == 0 && isClosedUpper(flags2)
           val flags = if (strongZero) 0 else lowerFlagToUpper(lf1) | upperFlag(flags2)
           Below(lower1 * upper2, flags)
         }
@@ -403,7 +403,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
         if (hasAboveZero1) // the maximal point is upper1(+) * upper2(+)
           Below(upper1 * upper2, uf1 | upperFlag(flags2))
         else { // the maximal point is upper1(+) * lower2(-)
-          val strongZero = (upper1s == 0 && isClosedUpper(uf1)) || (lower2s == 0 && isClosedLower(flags2))
+          val strongZero = upper1s == 0 && isClosedUpper(uf1) || lower2s == 0 && isClosedLower(flags2)
           val flags = if (strongZero) 0 else uf1 | lowerFlagToUpper(flags2)
           Below(upper1 * lower2, flags)
         }
@@ -413,7 +413,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
           val flags = if (strongZero) 0 else upperFlagToLower(uf1) | lowerFlag(flags2)
           Above(upper1 * lower2, flags)
         } else { // the minimal point is upper1(-) * upper2(-)
-          val strongZero = (upper1s == 0 && isClosedUpper(uf1)) || (upper2s == 0 && isClosedUpper(flags2))
+          val strongZero = upper1s == 0 && isClosedUpper(uf1) || upper2s == 0 && isClosedUpper(flags2)
           val flags = if (strongZero) 0 else upperFlagToLower(uf1) | upperFlagToLower(flags2)
           Above(upper1 * upper2, flags)
         }
@@ -523,7 +523,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
     }
 
   def -(rhs: A)(implicit ev: AdditiveGroup[A]): Interval[A] =
-    this + (-rhs)
+    this + -rhs
 
   def unary_-(implicit ev: AdditiveGroup[A]): Interval[A] =
     this match {
@@ -798,7 +798,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
   def overlap(rhs: Interval[A])(implicit o: Order[A]): Overlap[A] = Overlap(lhs, rhs)
 }
 
-case class All[A] private[spire] () extends Interval[A] {
+case class All[A] private[spire] extends Interval[A] {
   def lowerBound: Unbound[A] = Unbound()
   def upperBound: Unbound[A] = Unbound()
 }
@@ -824,7 +824,7 @@ case class Point[A] private[spire] (value: A) extends Interval[A] {
   def upperBound: Closed[A] = Closed(value)
 }
 
-case class Empty[A] private[spire] () extends Interval[A] {
+case class Empty[A] private[spire] extends Interval[A] {
   def lowerBound: EmptyBound[A] = EmptyBound()
   def upperBound: EmptyBound[A] = EmptyBound()
 }

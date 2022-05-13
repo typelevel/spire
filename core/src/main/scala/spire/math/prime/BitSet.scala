@@ -36,7 +36,7 @@ case class BitSet(length: Int, array: Array[Int]) {
 
   def +=(n: Int): Unit = {
     val q = n >>> 5
-    array(q) = array(q) | (1 << (n & 31))
+    array(q) = array(q) | 1 << (n & 31)
   }
 
   def -=(n: Int): Unit = {
@@ -48,7 +48,7 @@ case class BitSet(length: Int, array: Array[Int]) {
     if (b) this += n else this -= n
 
   def apply(n: Int): Boolean =
-    ((array(n >>> 5) >>> (n & 31)) & 1) == 1
+    (array(n >>> 5) >>> (n & 31) & 1) == 1
 
   def clear(): Unit =
     cfor(0)(_ < array.length, _ + 1)(array(_) = 0)

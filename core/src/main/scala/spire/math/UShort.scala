@@ -145,11 +145,11 @@ private[math] class UShortBitString extends BitString[UShort] with Serializable 
   def signedRightShift(n: UShort, i: Int): UShort = n >>> i
   def rotateLeft(n: UShort, i: Int): UShort = {
     val j = i & 15
-    (n << j) | (n >>> (16 - j))
+    n << j | n >>> 16 - j
   }
   def rotateRight(n: UShort, i: Int): UShort = {
     val j = i & 15
-    (n >>> j) | (n << (16 - j))
+    n >>> j | n << 16 - j
   }
 }
 

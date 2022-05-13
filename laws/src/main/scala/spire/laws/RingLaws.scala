@@ -60,12 +60,12 @@ trait RingLaws[A] extends GroupLaws[A] {
     base = _.semigroup(A.multiplicative),
     parent = None,
     "pow(a, 1) === a" -> forAllSafe((a: A) => A.pow(a, 1) === a),
-    "pow(a, 2) === a * a" -> forAllSafe((a: A) => A.pow(a, 2) === (a * a)),
+    "pow(a, 2) === a * a" -> forAllSafe((a: A) => A.pow(a, 2) === a * a),
     "tryProduct" -> forAllSafe((a: A) =>
-      (A.tryProduct(Seq.empty[A]) === Option.empty[A]) &&
-        (A.tryProduct(Seq(a)) === Option(a)) &&
-        (A.tryProduct(Seq(a, a)) === Option(a * a)) &&
-        (A.tryProduct(Seq(a, a, a)) === Option(a * a * a))
+      A.tryProduct(Seq.empty[A]) === Option.empty[A] &&
+        A.tryProduct(Seq(a)) === Option(a) &&
+        A.tryProduct(Seq(a, a)) === Option(a * a) &&
+        A.tryProduct(Seq(a, a, a)) === Option(a * a * a)
     )
   )
 
@@ -84,7 +84,7 @@ trait RingLaws[A] extends GroupLaws[A] {
   def multiplicativeGroup(implicit A: MultiplicativeGroup[A]) = new MultiplicativeProperties(
     base = _.group(A.multiplicative),
     parent = Some(multiplicativeMonoid),
-    "reciprocal consistent" -> forAllSafe((x: A) => !pred(x) || ((A.one / x) === x.reciprocal))
+    "reciprocal consistent" -> forAllSafe((x: A) => !pred(x) || A.one / x === x.reciprocal)
   )
 
   def multiplicativeAbGroup(implicit A: MultiplicativeAbGroup[A]) = new MultiplicativeProperties(
@@ -99,10 +99,8 @@ trait RingLaws[A] extends GroupLaws[A] {
     al = additiveSemigroup,
     ml = multiplicativeSemigroup,
     parents = Seq.empty,
-    "distributive" -> forAllSafe((x: A, y: A, z: A) =>
-      (x * (y + z) === (x * y + x * z)) && (((x + y) * z) === (x * z + y * z))
-    ),
-    "pow" -> forAllSafe((x: A) => ((x.pow(1)) === x) && ((x.pow(2)) === x * x) && ((x.pow(3)) === x * x * x))
+    "distributive" -> forAllSafe((x: A, y: A, z: A) => x * (y + z) === x * y + x * z && (x + y) * z === x * z + y * z),
+    "pow" -> forAllSafe((x: A) => x.pow(1) === x && x.pow(2) === x * x && x.pow(3) === x * x * x)
   )
 
   def rng(implicit A: Rng[A]) = new RingProperties(
@@ -161,15 +159,15 @@ trait RingLaws[A] extends GroupLaws[A] {
     },
     "gcd is commutative" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.gcdRing._
-      (x.gcd(y)) === (y.gcd(x))
+      x.gcd(y) === y.gcd(x)
     },
     "lcm is commutative" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.gcdRing._
-      (x.lcm(y)) === (y.lcm(x))
+      x.lcm(y) === y.lcm(x)
     },
-    "gcd(0, 0)" -> ((A.zero.gcd(A.zero)) === A.zero),
-    "lcm(0, 0) === 0" -> ((A.zero.lcm(A.zero)) === A.zero),
-    "lcm(x, 0) === 0" -> forAllSafe { (x: A) => (x.lcm(A.zero)) === A.zero }
+    "gcd(0, 0)" -> (A.zero.gcd(A.zero) === A.zero),
+    "lcm(0, 0) === 0" -> (A.zero.lcm(A.zero) === A.zero),
+    "lcm(x, 0) === 0" -> forAllSafe { (x: A) => x.lcm(A.zero) === A.zero }
   )
 
   def euclideanRing(implicit A: EuclideanRing[A]) = RingProperties.fromParent(
@@ -179,26 +177,26 @@ trait RingLaws[A] extends GroupLaws[A] {
       import spire.syntax.euclideanRing._
       !pred(y) || {
         val (q, r) = x.equotmod(y)
-        x === (y * q + r)
+        x === y * q + r
       }
     },
     "equot" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       !pred(y) || {
-        x.equotmod(y)._1 === (x.equot(y))
+        x.equotmod(y)._1 === x.equot(y)
       }
     },
     "emod" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       !pred(y) || {
-        x.equotmod(y)._2 === (x.emod(y))
+        x.equotmod(y)._2 === x.emod(y)
       }
     },
     "euclidean function" -> forAllSafe { (x: A, y: A) =>
       import spire.syntax.euclideanRing._
       !pred(y) || {
         val (q, r) = x.equotmod(y)
-        r.isZero || (r.euclideanFunction < y.euclideanFunction)
+        r.isZero || r.euclideanFunction < y.euclideanFunction
       }
     },
     "submultiplicative function" -> forAllSafe { (x: A, y: A) =>

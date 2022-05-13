@@ -104,7 +104,7 @@ object Roots {
         val i = n - k
         // Note: This corresponds to nroot(abs(a_i / a_n), n - 1) + 1, but we
         // add 2 bits to account for the floor division and the +1 at the end.
-        val bound = ((coeff.abs.bitLength - lgLastCoeff + 1) / i) + 2
+        val bound = (coeff.abs.bitLength - lgLastCoeff + 1) / i + 2
         maxBound = max(maxBound, bound.toDouble)
       }
     }

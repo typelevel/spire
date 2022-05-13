@@ -194,8 +194,8 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
 
     @tailrec def loop(total: SafeLong, base: SafeLong, k: Int, mod: SafeLong): SafeLong = {
       if (k == 0) total
-      else if ((k & 1) == 1) loop((total * base) % mod, (base * base) % mod, k >> 1, mod)
-      else loop(total, (base * base) % mod, k >> 1, mod)
+      else if ((k & 1) == 1) loop(total * base % mod, base * base % mod, k >> 1, mod)
+      else loop(total, base * base % mod, k >> 1, mod)
     }
 
     loop(SafeLong.one % mod, this, k, mod)
@@ -205,7 +205,7 @@ sealed abstract class SafeLong extends ScalaNumber with ScalaNumericConversions 
 
   def gcd(that: SafeLong): SafeLong
   def lcm(that: SafeLong): SafeLong =
-    if (this.isZero || that.isZero) SafeLong.zero else (this / (this.gcd(that))) * that
+    if (this.isZero || that.isZero) SafeLong.zero else this / this.gcd(that) * that
 
   def unary_- : SafeLong
 
@@ -373,17 +373,17 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
 
   def /(y: BigInteger): SafeLong =
     if (y.bitLength <= 63) this / y.longValue
-    else if (x == Long.MinValue && (y.equals(SafeLong.big64))) SafeLong.minusOne
+    else if (x == Long.MinValue && y.equals(SafeLong.big64)) SafeLong.minusOne
     else SafeLong.zero
 
   def %(y: BigInteger): SafeLong =
     if (y.bitLength <= 63) this % y.longValue
-    else if (x == Long.MinValue && (y.equals(SafeLong.big64))) SafeLong.zero
+    else if (x == Long.MinValue && y.equals(SafeLong.big64)) SafeLong.zero
     else this
 
   def /%(y: BigInteger): (SafeLong, SafeLong) =
     if (y.bitLength <= 63) this /% y.longValue
-    else if (x == Long.MinValue && (y.equals(SafeLong.big64))) (SafeLong.minusOne, SafeLong.zero)
+    else if (x == Long.MinValue && y.equals(SafeLong.big64)) (SafeLong.minusOne, SafeLong.zero)
     else (SafeLong.zero, this)
 
   def equotmod(y: BigInteger): (SafeLong, SafeLong) =

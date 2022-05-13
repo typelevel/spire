@@ -118,7 +118,7 @@ class CforSuite extends munit.FunSuite {
     cfor(0)(_ < 3, _ + 1) { x =>
       {
         class A { def f = x }
-        b += (new A().f)
+        b += new A.f
       }
     }
     assertEquals(b.toList, List(0, 1, 2))

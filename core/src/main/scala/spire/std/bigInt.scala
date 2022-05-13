@@ -36,7 +36,7 @@ trait BigIntIsEuclideanRing extends EuclideanRing[BigInt] {
   def emod(a: BigInt, b: BigInt): BigInt = spire.math.emod(a, b)
 
   override def lcm(a: BigInt, b: BigInt)(implicit ev: Eq[BigInt]): BigInt =
-    if (a.signum == 0 || b.signum == 0) zero else (a / a.gcd(b)) * b
+    if (a.signum == 0 || b.signum == 0) zero else a / a.gcd(b) * b
   override def gcd(a: BigInt, b: BigInt)(implicit ev: Eq[BigInt]): BigInt = a.gcd(b)
 }
 
@@ -52,7 +52,7 @@ trait BigIntIsNRoot extends NRoot[BigInt] {
     } else {
       val c = b.setBit(i)
 
-      if ((c.pow(k)) <= a)
+      if (c.pow(k) <= a)
         findNroot(c, i - 1)
       else
         findNroot(b, i - 1)

@@ -81,12 +81,12 @@ class Marsaglia32a6(_x: Int, _y: Int, _z: Int, _w: Int, _v: Int, _d: Int) extend
   }
 
   def nextInt(): Int = {
-    val t = x ^ (x >>> 2)
+    val t = x ^ x >>> 2
     x = y
     y = z
     z = w
     w = v
-    v = v ^ (v << 4) ^ (t ^ (t << 1))
+    v = v ^ v << 4 ^ (t ^ t << 1)
     d += 362437
     d + v
   }

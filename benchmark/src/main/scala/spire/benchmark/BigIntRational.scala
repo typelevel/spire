@@ -45,7 +45,7 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
       if (ngcd == 1)
         new BigIntRational(num, lden * r.d)
       else
-        new BigIntRational(num / ngcd, (r.d / ngcd) * lden)
+        new BigIntRational(num / ngcd, r.d / ngcd * lden)
     }
   }
 
@@ -61,21 +61,21 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
       if (ngcd == 1)
         new BigIntRational(num, lden * r.d)
       else
-        new BigIntRational(num / ngcd, (r.d / ngcd) * lden)
+        new BigIntRational(num / ngcd, r.d / ngcd * lden)
     }
   }
 
   def *(r: BigIntRational): BigIntRational = {
     val a = n.gcd(r.d)
     val b = d.gcd(r.n)
-    new BigIntRational((n / a) * (r.n / b), (d / b) * (r.d / a))
+    new BigIntRational(n / a * (r.n / b), d / b * (r.d / a))
   }
 
   def /(r: BigIntRational): BigIntRational = {
     val a = n.gcd(r.n)
     val b = d.gcd(r.d)
-    val num = (n / a) * (r.d / b)
-    val den = (d / b) * (r.n / a)
+    val num = n / a * (r.d / b)
+    val den = d / b * (r.n / a)
     if (den < BigInt(0)) {
       new BigIntRational(-num, -den)
     } else {
@@ -96,7 +96,7 @@ final class BigIntRational private (val n: BigInt, val d: BigInt) {
     if (dgcd == 1)
       (n * r.d - r.n * d).signum
     else
-      ((r.d / dgcd) * n - (d / dgcd) * r.n).signum
+      (r.d / dgcd * n - d / dgcd * r.n).signum
   }
 
   def signum: Int = n.signum

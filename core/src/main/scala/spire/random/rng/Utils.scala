@@ -74,7 +74,7 @@ object Utils {
 
     cfor(1)(_ < length, _ + 1) { i =>
       val x = a(i - 1)
-      a(i) = 1812433253 * (x ^ (x >>> 30)) + i
+      a(i) = 1812433253 * (x ^ x >>> 30) + i
     }
 
     a
@@ -86,7 +86,7 @@ object Utils {
 
     cfor(1)(_ < length, _ + 1) { i =>
       val x = a(i - 1)
-      a(i) = 6364136223846793005L * (x ^ (x >>> 62)) + i
+      a(i) = 6364136223846793005L * (x ^ x >>> 62) + i
     }
 
     a
@@ -102,7 +102,7 @@ object Utils {
 
     while (k != 0) {
       val x = a(i - 1)
-      a(i) = a(i) ^ ((x ^ (x >>> 30)) * 1664525) + seed(j) + j
+      a(i) = a(i) ^ (x ^ x >>> 30) * 1664525 + seed(j) + j
       i += 1
       j += 1
 
@@ -120,7 +120,7 @@ object Utils {
     k = length_1
     while (k != 0) {
       val x = a(i - 1)
-      a(i) = a(i) ^ ((x ^ (x >>> 30)) * 1566083941) - i
+      a(i) = a(i) ^ (x ^ x >>> 30) * 1566083941 - i
       i += 1
 
       if (i >= length) {
@@ -145,7 +145,7 @@ object Utils {
 
     while (k != 0) {
       val x = a(i - 1)
-      a(i) = a(i) ^ ((x ^ (x >>> 62)) * 3935559000370003845L) + seed(j) + j
+      a(i) = a(i) ^ (x ^ x >>> 62) * 3935559000370003845L + seed(j) + j
       i += 1
       j += 1
 
@@ -163,7 +163,7 @@ object Utils {
     k = length - 1
     while (k != 0) {
       val x = a(i - 1)
-      a(i) = a(i) ^ ((x ^ (x >>> 62)) * 2862933555777941757L) - i
+      a(i) = a(i) ^ (x ^ x >>> 62) * 2862933555777941757L - i
       i += 1
 
       if (i >= length) {

@@ -61,7 +61,7 @@ class ComplexScalaCheckSuite extends munit.ScalaCheckSuite {
 
   complex2("x + y == y + x") { (x: C, y: C) => near(x + y, y + x) }
   complex2("x + y - x == y") { (x: C, y: C) => near(x + y - x, y) }
-  complex2("(x / y) * y == x") { (x: C, y: C) => if (y != zero) near((x / y) * y, x) }
+  complex2("(x / y) * y == x") { (x: C, y: C) => if (y != zero) near(x / y * y, x) }
 
   complex1("x.sqrt.pow(2) = x") { (x: C) =>
     implicit val threshold: BigDecimal = BigDecimal(2e-9) // 28254913+1i gives a log-error-ratio of 2.02e-9
@@ -74,7 +74,7 @@ class ComplexScalaCheckSuite extends munit.ScalaCheckSuite {
     implicit val threshold: BigDecimal = BigDecimal(3e-9) // 1+110201870i has log-error-ratio 2.4e-9
     // Complex.sqrt returns the root with non-negative real value (and +i in the case of -1); adjust the "expected" RHS
     // accordingly
-    if (x.real.signum < 0 || (x.real.signum == 0 && x.imag.signum < 0))
+    if (x.real.signum < 0 || x.real.signum == 0 && x.imag.signum < 0)
       logNear((x * x).sqrt, -x)
     else
       logNear((x * x).sqrt, x)

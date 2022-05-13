@@ -84,7 +84,7 @@ object AutoAlgebraExample extends App {
 
   implicit def javaListEq[A] = Auto.java.eq[java.util.List[A]]
   implicit def javaListMonoid[A] =
-    Auto.java.collection.monoid[java.util.List[A]](new java.util.ArrayList[A]())
+    Auto.java.collection.monoid[java.util.List[A]](new java.util.ArrayList[A])
 
   // The Auto.java.collection's use addAll and the identity collection to
   // implement concatention. This means Java's collecitons behave well.
@@ -92,7 +92,7 @@ object AutoAlgebraExample extends App {
   val xs = List(1, 2).asJava
   val ys = List(3, 4).asJava
   val zs = List(5, 6).asJava
-  assert(((xs |+| ys) |+| zs) === (xs |+| (ys |+| zs)))
+  assert((xs |+| ys |+| zs) === (xs |+| (ys |+| zs)))
   assert((xs |+| Monoid[java.util.List[Int]].empty) === xs)
   assert((Monoid[java.util.List[Int]].empty |+| xs) === xs)
 

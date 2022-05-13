@@ -64,7 +64,7 @@ class MachinistSuite extends munit.FunSuite {
   test("Binary operators, typeclass provided by the syntax class") {
     import Qux.QuxOps1
     def foo[A: Qux](a: A, b: A, c: A, res: A): Boolean =
-      ((-(a + b) *: c) + 1000) === res
+      (-(a + b) *: c) + 1000 === res
 
     assert(foo(1, 2, 3, 991))
   }

@@ -38,34 +38,34 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("x + y") {
     forAll { (x: BigInt, y: BigInt) =>
-      (invariant(SafeLong(x) + SafeLong(y)) === x + y) &&
-      (invariant(SafeLong(x) + y) === x + y) &&
-      (invariant(SafeLong(x) + y.toLong) === x + y.toLong)
+      invariant(SafeLong(x) + SafeLong(y)) === x + y &&
+      invariant(SafeLong(x) + y) === x + y &&
+      invariant(SafeLong(x) + y.toLong) === x + y.toLong
     }
   }
 
   property("x - y") {
     forAll { (x: BigInt, y: BigInt) =>
-      (invariant(SafeLong(x) - SafeLong(y)) === x - y) &&
-      (invariant(SafeLong(x) - y) === x - y) &&
-      (invariant(SafeLong(x) - y.toLong) === x - y.toLong)
+      invariant(SafeLong(x) - SafeLong(y)) === x - y &&
+      invariant(SafeLong(x) - y) === x - y &&
+      invariant(SafeLong(x) - y.toLong) === x - y.toLong
     }
   }
 
   property("x * y") {
     forAll { (x: BigInt, y: BigInt) =>
-      (invariant(SafeLong(x) * SafeLong(y)) === x * y) &&
-      (invariant(SafeLong(x) * y) === x * y) &&
-      (invariant(SafeLong(x) * y.toLong) === x * y.toLong)
+      invariant(SafeLong(x) * SafeLong(y)) === x * y &&
+      invariant(SafeLong(x) * y) === x * y &&
+      invariant(SafeLong(x) * y.toLong) === x * y.toLong
     }
   }
 
   property("x / y") {
     forAll { (x: BigInt, y: BigInt) =>
-      (y != 0) ==> {
-        (invariant(SafeLong(x) /~ SafeLong(y)) === x / y) &&
-        (invariant(SafeLong(x) / SafeLong(y)) === x / y) &&
-        (invariant(SafeLong(x) / y) === x / y)
+      y != 0 ==> {
+        invariant(SafeLong(x) /~ SafeLong(y)) === x / y &&
+        invariant(SafeLong(x) / SafeLong(y)) === x / y &&
+        invariant(SafeLong(x) / y) === x / y
       }
     }
   }
@@ -78,9 +78,9 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("x % y") {
     forAll { (x: BigInt, y: BigInt) =>
-      (y != 0) ==> {
-        (invariant(SafeLong(x) % SafeLong(y)) === x % y) &&
-        (invariant(SafeLong(x) % y) === x % y)
+      y != 0 ==> {
+        invariant(SafeLong(x) % SafeLong(y)) === x % y &&
+        invariant(SafeLong(x) % y) === x % y
       }
     }
   }
@@ -93,12 +93,12 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("x /% y") {
     forAll { (x: BigInt, y: BigInt) =>
-      (y != 0) ==> {
+      y != 0 ==> {
         val sx = SafeLong(x)
         val sy = SafeLong(y)
-        (sx /% sy == x /% y) &&
-        ((sx /% y) == (x /% y)) &&
-        ((sx /% sy) == ((invariant(sx / sy), invariant(sx % sy))))
+        sx /% sy == x /% y &&
+        sx /% y == x /% y &&
+        sx /% sy == ((invariant(sx / sy), invariant(sx % sy)))
       }
     }
   }
@@ -116,8 +116,8 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
         intercept[RuntimeException] { sx.pow(k) }
         true
       } else {
-        (invariant(sx ** k) == x.pow(k)) &&
-        (invariant(sx.pow(k)) == x.pow(k))
+        invariant(sx ** k) == x.pow(k) &&
+        invariant(sx.pow(k)) == x.pow(k)
       }
     }
   }
@@ -126,7 +126,7 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
     forAll { (x: BigInt, k: Byte, m: BigInt) =>
       val sx = SafeLong(x)
       val sm = SafeLong(m)
-      (!sm.isZero) ==> {
+      !sm.isZero ==> {
         if (k < 0) {
           intercept[RuntimeException] { sx.modPow(k, sm) }
           true
@@ -141,11 +141,11 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
     forAll { (x: BigInt, y: BigInt) =>
       val sx = SafeLong(x)
       val sy = SafeLong(y)
-      (invariant(sx.min(sy)) == x.min(y)) &&
-      (invariant(sx.max(sy)) == x.max(y)) &&
-      (sx.compare(sy) == x.compare(y)) &&
-      (sx.signum == sx.compare(zero)) &&
-      (sx.isZero == (sx == zero))
+      invariant(sx.min(sy)) == x.min(y) &&
+      invariant(sx.max(sy)) == x.max(y) &&
+      sx.compare(sy) == x.compare(y) &&
+      sx.signum == sx.compare(zero) &&
+      sx.isZero == (sx == zero)
     }
   }
 
@@ -168,12 +168,12 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
 
       intercept[RuntimeException] { sx.pow(-1) }
 
-      (sx.toLong == x) &&
-      (sx.getLong == Opt(x)) &&
+      sx.toLong == x &&
+      sx.getLong == Opt(x) &&
       sx.isWhole &&
       sx.isValidInt == x.isValidInt &&
       sx.isValidLong &&
-      (x == Long.MinValue || (-sx).isValidLong)
+      (x == Long.MinValue || -sx.isValidLong)
     }
   }
 
@@ -198,11 +198,11 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
       val sx = ex.fold(SafeLong(_), SafeLong(_))
       val sy = ey.fold(SafeLong(_), SafeLong(_))
 
-      (sx > sy == x > y) &&
-      (sx >= sy == x >= y) &&
-      (sx == sy) == (x == y) &&
-      (sx <= sy) == (x <= y) &&
-      (sx < sy == x < y)
+      sx > sy == x > y &&
+      sx >= sy == x >= y &&
+      sx == sy == (x == y) &&
+      sx <= sy == x <= y &&
+      sx < sy == x < y
     }
   }
 
@@ -210,16 +210,16 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
     val firstBig = smax + 1
 
     // equality
-    assert(SafeLong(0) != (BigInt(1) << 64))
+    assert(SafeLong(0) != BigInt(1) << 64)
 
     // quotient
-    assertEquals(smin / (-smin), SafeLong.minusOne)
+    assertEquals(smin / -smin, SafeLong.minusOne)
 
     // mod
-    assertEquals(smin % (-smin), zero)
+    assertEquals(smin % -smin, zero)
 
     // quotmod
-    assertEquals(smin /% (-smin), (SafeLong.minusOne, zero))
+    assertEquals(smin /% -smin, (SafeLong.minusOne, zero))
 
     // gcd
     assertEquals(smin.gcd(smin), firstBig)

@@ -54,14 +54,14 @@ object Pack extends PackMacros {
     intFromByteBuffer(ByteBuffer.wrap(bytes))
 
   def intFromBytes(b1: Byte, b2: Byte, b3: Byte, b4: Byte): Int =
-    (b1 & 0xff) << 24 | (b2 & 0xff) << 16 | (b3 & 0xff) << 8 | (b4 & 0xff)
+    (b1 & 0xff) << 24 | (b2 & 0xff) << 16 | (b3 & 0xff) << 8 | b4 & 0xff
 
   def intFromByteBuffer(bb: ByteBuffer): Int =
     if (bb.remaining >= 4) {
       bb.getInt()
     } else {
       var n = 0
-      while (bb.remaining > 0) n = (n << 8) | bb.get
+      while (bb.remaining > 0) n = n << 8 | bb.get
       n
     }
 
@@ -118,14 +118,14 @@ object Pack extends PackMacros {
   def longFromBytes(b1: Byte, b2: Byte, b3: Byte, b4: Byte, b5: Byte, b6: Byte, b7: Byte, b8: Byte): Long =
     (b1 & 0xffL) << 56 | (b2 & 0xffL) << 48 | (b3 & 0xffL) << 40 |
       (b4 & 0xffL) << 32 | (b5 & 0xffL) << 24 | (b6 & 0xffL) << 16 |
-      (b7 & 0xffL) << 8 | (b8 & 0xffL)
+      (b7 & 0xffL) << 8 | b8 & 0xffL
 
   def longFromByteBuffer(bb: ByteBuffer): Long =
     if (bb.remaining >= 8) {
       bb.getLong()
     } else {
       var n = 0L
-      while (bb.remaining > 0) n = (n << 8) | bb.get
+      while (bb.remaining > 0) n = n << 8 | bb.get
       n
     }
 
@@ -161,14 +161,14 @@ object Pack extends PackMacros {
 
   def intToByteRuntime(n: Int)(index: Int): Byte =
     if (0 <= index && index < 4) {
-      ((n >>> (24 - index * 8)) & 0xff).toByte
+      (n >>> 24 - index * 8 & 0xff).toByte
     } else {
       throw new IllegalArgumentException(s"$index outside of 0-3")
     }
 
   def longToByteRuntime(n: Long)(index: Int): Byte =
     if (0 <= index && index < 8) {
-      ((n >>> (56 - index * 8)) & 0xff).toByte
+      (n >>> 56 - index * 8 & 0xff).toByte
     } else {
       throw new IllegalArgumentException(s"$index outside of 0-7")
     }

@@ -30,8 +30,8 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
   def approximation(approx0: Algebraic, scale: Int, actual: BigDecimal): Unit = {
     val error = BigDecimal(10).pow(-scale)
     val approx = approx0.toBigDecimal(scale, RoundingMode.HALF_EVEN)
-    assert((approx - error) <= actual)
-    assert(actual <= (approx + error))
+    assert(approx - error <= actual)
+    assert(actual <= approx + error)
   }
 
   test("root isolation failure") {

@@ -55,7 +55,7 @@ trait ByteIsNRoot extends NRoot[Byte] {
       }
     }
 
-    findnroot(0, 1 << ((33 - n) / n))
+    findnroot(0, 1 << (33 - n) / n)
   }
 
   def log(a: Byte): Byte = Math.log(a.toDouble).toByte
@@ -108,16 +108,16 @@ class ByteIsBitString extends BitString[Byte] with Serializable {
   def numberOfLeadingZeros(n: Byte): Int = Integer.numberOfLeadingZeros(n & 0xff) - 24
   def numberOfTrailingZeros(n: Byte): Int = if (n == 0) 8 else Integer.numberOfTrailingZeros(n & 0xff)
 
-  def leftShift(n: Byte, i: Int): Byte = (((n & 0xff) << (i & 7)) & 0xff).toByte
-  def rightShift(n: Byte, i: Int): Byte = (((n & 0xff) >>> (i & 7)) & 0xff).toByte
-  def signedRightShift(n: Byte, i: Int): Byte = ((n >> (i & 7)) & 0xff).toByte
+  def leftShift(n: Byte, i: Int): Byte = ((n & 0xff) << (i & 7) & 0xff).toByte
+  def rightShift(n: Byte, i: Int): Byte = ((n & 0xff) >>> (i & 7) & 0xff).toByte
+  def signedRightShift(n: Byte, i: Int): Byte = (n >> (i & 7) & 0xff).toByte
   def rotateLeft(n: Byte, i: Int): Byte = {
     val j = i & 7
-    ((((n & 0xff) << j) | ((n & 0xff) >>> (8 - j))) & 0xff).toByte
+    (((n & 0xff) << j | (n & 0xff) >>> 8 - j) & 0xff).toByte
   }
   def rotateRight(n: Byte, i: Int): Byte = {
     val j = i & 7
-    ((((n & 0xff) >>> j) | ((n & 0xff) << (8 - j))) & 0xff).toByte
+    (((n & 0xff) >>> j | (n & 0xff) << 8 - j) & 0xff).toByte
   }
 }
 

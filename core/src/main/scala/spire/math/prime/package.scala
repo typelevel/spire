@@ -143,7 +143,7 @@ package object prime {
 
     def rho(n: SafeLong, c: SafeLong): SafeLong = {
 
-      @inline def f(x: SafeLong): SafeLong = ((x * x) % n + c) % n
+      @inline def f(x: SafeLong): SafeLong = (x * x % n + c) % n
 
       @tailrec def fastRho(x: SafeLong, q0: SafeLong, r: SafeLong, m: SafeLong): SafeLong = {
         var y = x
@@ -158,7 +158,7 @@ package object prime {
           val limit = m.min(r - k)
           cfor(0)(limit > _, _ + 1) { _ =>
             y = f(y)
-            q = (q * (x - y).abs) % n
+            q = q * (x - y).abs % n
           }
           if (q == 0) g = n else g = n.gcd(q)
           k = k + m

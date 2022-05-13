@@ -113,61 +113,61 @@ class SyntaxScalaCheckSuite extends munit.ScalaCheckSuite with BaseSyntaxSuite {
 trait BaseSyntaxSuite {
   def testEqSyntax[A: Eq](a: A, b: A) = {
     import spire.syntax.eq._
-    ((a === b) == Eq[A].eqv(a, b)) &&
-    ((a =!= b) == Eq[A].neqv(a, b))
+    a === b == Eq[A].eqv(a, b) &&
+    a =!= b == Eq[A].neqv(a, b)
   }
 
   def testPartialOrderSyntax[A: PartialOrder](a: A, b: A) = {
     import spire.std.option._
     import spire.syntax.order._
-    ((a === b) == PartialOrder[A].eqv(a, b)) &&
-    ((a =!= b) == PartialOrder[A].neqv(a, b)) &&
-    ((a < b) == PartialOrder[A].lt(a, b)) &&
-    ((a > b) == PartialOrder[A].gt(a, b)) &&
-    ((a <= b) == PartialOrder[A].lteqv(a, b)) &&
-    ((a >= b) == PartialOrder[A].gteqv(a, b)) &&
-    ((a.pmin(b)) === PartialOrder[A].pmin(a, b)) &&
-    ((a.pmax(b)) === PartialOrder[A].pmax(a, b)) &&
-    ((a.partialCompare(b)) == PartialOrder[A].partialCompare(a, b)) &&
-    ((a.tryCompare(b)) == PartialOrder[A].tryCompare(a, b))
+    a === b == PartialOrder[A].eqv(a, b) &&
+    a =!= b == PartialOrder[A].neqv(a, b) &&
+    a < b == PartialOrder[A].lt(a, b) &&
+    a > b == PartialOrder[A].gt(a, b) &&
+    a <= b == PartialOrder[A].lteqv(a, b) &&
+    a >= b == PartialOrder[A].gteqv(a, b) &&
+    a.pmin(b) === PartialOrder[A].pmin(a, b) &&
+    a.pmax(b) === PartialOrder[A].pmax(a, b) &&
+    a.partialCompare(b) == PartialOrder[A].partialCompare(a, b) &&
+    a.tryCompare(b) == PartialOrder[A].tryCompare(a, b)
   }
 
   def testOrderSyntax[A: Order](a: A, b: A) = {
     import spire.syntax.order._
-    ((a === b) == Order[A].eqv(a, b)) &&
-    ((a =!= b) == Order[A].neqv(a, b)) &&
-    ((a < b) == Order[A].lt(a, b)) &&
-    ((a > b) == Order[A].gt(a, b)) &&
-    ((a <= b) == Order[A].lteqv(a, b)) &&
-    ((a >= b) == Order[A].gteqv(a, b)) &&
-    ((a.min(b)) === Order[A].min(a, b)) &&
-    ((a.max(b)) === Order[A].max(a, b)) &&
-    ((a.compare(b)) == Order[A].compare(a, b))
+    a === b == Order[A].eqv(a, b) &&
+    a =!= b == Order[A].neqv(a, b) &&
+    a < b == Order[A].lt(a, b) &&
+    a > b == Order[A].gt(a, b) &&
+    a <= b == Order[A].lteqv(a, b) &&
+    a >= b == Order[A].gteqv(a, b) &&
+    a.min(b) === Order[A].min(a, b) &&
+    a.max(b) === Order[A].max(a, b) &&
+    a.compare(b) == Order[A].compare(a, b)
   }
 
   def testSignedSyntax[A: Signed: Eq](a: A) = {
     import spire.syntax.signed._
-    (a.sign == Signed[A].sign(a)) &&
-    (a.signum == Signed[A].signum(a)) &&
-    (a.abs === Signed[A].abs(a)) &&
-    (a.isSignZero == Signed[A].isSignZero(a)) &&
-    (a.isSignPositive == Signed[A].isSignPositive(a)) &&
-    (a.isSignNegative == Signed[A].isSignNegative(a)) &&
-    (a.isSignNonZero == Signed[A].isSignNonZero(a)) &&
-    (a.isSignNonPositive == Signed[A].isSignNonPositive(a)) &&
-    (a.isSignNonNegative == Signed[A].isSignNonNegative(a))
+    a.sign == Signed[A].sign(a) &&
+    a.signum == Signed[A].signum(a) &&
+    a.abs === Signed[A].abs(a) &&
+    a.isSignZero == Signed[A].isSignZero(a) &&
+    a.isSignPositive == Signed[A].isSignPositive(a) &&
+    a.isSignNegative == Signed[A].isSignNegative(a) &&
+    a.isSignNonZero == Signed[A].isSignNonZero(a) &&
+    a.isSignNonPositive == Signed[A].isSignNonPositive(a) &&
+    a.isSignNonNegative == Signed[A].isSignNonNegative(a)
   }
 
   def testTruncatedDivisionSyntax[A: TruncatedDivision: Eq](a: A, b: A) = {
     import spire.syntax.truncatedDivision._
     import spire.std.tuples._
     // (a.toBigIntOpt === TruncatedDivision[A].toBigIntOpt(a)) &&
-    ((a.tquot(b)) === TruncatedDivision[A].tquot(a, b)) &&
-    ((a.tmod(b)) === TruncatedDivision[A].tmod(a, b)) &&
-    ((a.tquotmod(b)) === TruncatedDivision[A].tquotmod(a, b)) &&
-    ((a.fquot(b)) === TruncatedDivision[A].fquot(a, b)) &&
-    ((a.fmod(b)) === TruncatedDivision[A].fmod(a, b)) &&
-    ((a.fquotmod(b)) === TruncatedDivision[A].fquotmod(a, b))
+    a.tquot(b) === TruncatedDivision[A].tquot(a, b) &&
+    a.tmod(b) === TruncatedDivision[A].tmod(a, b) &&
+    a.tquotmod(b) === TruncatedDivision[A].tquotmod(a, b) &&
+    a.fquot(b) === TruncatedDivision[A].fquot(a, b) &&
+    a.fmod(b) === TruncatedDivision[A].fmod(a, b) &&
+    a.fquotmod(b) === TruncatedDivision[A].fquotmod(a, b)
   }
 
   def testInvolutionSyntax[A: Involution: Eq](a: A) = {
@@ -178,10 +178,10 @@ trait BaseSyntaxSuite {
 
   def testIsRealSyntax[A: IsReal](a: A) = {
     import spire.syntax.isReal._
-    (a.ceil === IsReal[A].ceil(a)) &&
-    (a.floor === IsReal[A].floor(a)) &&
-    (a.round === IsReal[A].round(a)) &&
-    (a.isWhole == IsReal[A].isWhole(a))
+    a.ceil === IsReal[A].ceil(a) &&
+    a.floor === IsReal[A].floor(a) &&
+    a.round === IsReal[A].round(a) &&
+    a.isWhole == IsReal[A].isWhole(a)
   }
 
   def testSemigroupSyntax[A: Semigroup: Eq](a: A, b: A) = {
@@ -199,127 +199,127 @@ trait BaseSyntaxSuite {
   def testGroupSyntax[A: Group: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.group._
-    ((a |+| b) === Group[A].combine(a, b)) &&
-    ((a |-| b) === Group[A].remove(a, b)) &&
-    (a.inverse === Group[A].inverse(a))
+    (a |+| b) === Group[A].combine(a, b) &&
+    (a |-| b) === Group[A].remove(a, b) &&
+    a.inverse === Group[A].inverse(a)
   }
 
   def testAdditiveSemigroupSyntax[A: AdditiveSemigroup: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.additiveSemigroup._
-    ((a + b) === implicitly[AdditiveSemigroup[A]].plus(a, b))
+    (a + b === implicitly[AdditiveSemigroup[A]].plus(a, b))
   }
 
   def testAdditiveMonoidSyntax[A: AdditiveMonoid: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.additiveMonoid._
-    ((a + b) === implicitly[AdditiveMonoid[A]].plus(a, b))
+    (a + b === implicitly[AdditiveMonoid[A]].plus(a, b))
   }
 
   def testAdditiveGroupSyntax[A: AdditiveGroup: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.additiveGroup._
-    ((a + b) === implicitly[AdditiveGroup[A]].plus(a, b)) &&
-    ((a - b) === implicitly[AdditiveGroup[A]].minus(a, b)) &&
-    (-a === implicitly[AdditiveGroup[A]].negate(a))
+    a + b === implicitly[AdditiveGroup[A]].plus(a, b) &&
+    a - b === implicitly[AdditiveGroup[A]].minus(a, b) &&
+    -a === implicitly[AdditiveGroup[A]].negate(a)
   }
 
   def testMultiplicativeSemigroupSyntax[A: MultiplicativeSemigroup: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.multiplicativeSemigroup._
-    ((a * b) === implicitly[MultiplicativeSemigroup[A]].times(a, b))
+    (a * b === implicitly[MultiplicativeSemigroup[A]].times(a, b))
   }
 
   def testMultiplicativeMonoidSyntax[A: MultiplicativeMonoid: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.multiplicativeMonoid._
-    ((a * b) === implicitly[MultiplicativeMonoid[A]].times(a, b))
+    (a * b === implicitly[MultiplicativeMonoid[A]].times(a, b))
   }
 
   def testMultiplicativeGroupSyntax[A: MultiplicativeGroup: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.multiplicativeGroup._
-    ((a * b) === implicitly[MultiplicativeGroup[A]].times(a, b)) &&
-    ((a / b) === implicitly[MultiplicativeGroup[A]].div(a, b)) &&
-    (a.reciprocal === implicitly[MultiplicativeGroup[A]].reciprocal(a))
+    a * b === implicitly[MultiplicativeGroup[A]].times(a, b) &&
+    a / b === implicitly[MultiplicativeGroup[A]].div(a, b) &&
+    a.reciprocal === implicitly[MultiplicativeGroup[A]].reciprocal(a)
   }
 
   def testSemiringSyntax[A: Semiring: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.semiring._
-    ((a + b) === Semiring[A].plus(a, b)) &&
-    ((a * b) === Semiring[A].times(a, b)) &&
-    ((a ** 2) === Semiring[A].pow(a, 2)) &&
-    ((a.pow(2)) === Semiring[A].pow(a, 2))
+    a + b === Semiring[A].plus(a, b) &&
+    a * b === Semiring[A].times(a, b) &&
+    a ** 2 === Semiring[A].pow(a, 2) &&
+    a.pow(2) === Semiring[A].pow(a, 2)
   }
 
   def testRigSyntax[A: Rig: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.rig._
-    ((a + b) === Rig[A].plus(a, b)) &&
-    ((a * b) === Rig[A].times(a, b)) &&
-    ((a ** 2) === Rig[A].pow(a, 2)) &&
-    ((a.pow(2)) === Rig[A].pow(a, 2))
+    a + b === Rig[A].plus(a, b) &&
+    a * b === Rig[A].times(a, b) &&
+    a ** 2 === Rig[A].pow(a, 2) &&
+    a.pow(2) === Rig[A].pow(a, 2)
   }
 
   def testRngSyntax[A: Rng: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.rng._
-    ((a + b) === Rng[A].plus(a, b)) &&
-    ((a - b) === Rng[A].minus(a, b)) &&
-    (-a === Rng[A].negate(a)) &&
-    ((a * b) === Rng[A].times(a, b)) &&
-    ((a ** 2) === Rng[A].pow(a, 2)) &&
-    ((a.pow(2)) === Rng[A].pow(a, 2))
+    a + b === Rng[A].plus(a, b) &&
+    a - b === Rng[A].minus(a, b) &&
+    -a === Rng[A].negate(a) &&
+    a * b === Rng[A].times(a, b) &&
+    a ** 2 === Rng[A].pow(a, 2) &&
+    a.pow(2) === Rng[A].pow(a, 2)
   }
 
   def testRingSyntax[A: Ring: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.ring._
-    val litInt1: Boolean = (42 + a) === Ring[A].plus(Ring[A].fromInt(42), a)
-    val litInt2: Boolean = (42 - a) === Ring[A].minus(Ring[A].fromInt(42), a)
-    ((a + b) === Ring[A].plus(a, b)) &&
-    ((a - b) === Ring[A].minus(a, b)) &&
-    (-a === Ring[A].negate(a)) &&
-    ((a * b) === Ring[A].times(a, b)) &&
-    ((a ** 2) === Ring[A].pow(a, 2)) &&
-    ((a.pow(2)) === Ring[A].pow(a, 2)) &&
-    ((a + 42) === Ring[A].plus(a, Ring[A].fromInt(42))) &&
+    val litInt1: Boolean = 42 + a === Ring[A].plus(Ring[A].fromInt(42), a)
+    val litInt2: Boolean = 42 - a === Ring[A].minus(Ring[A].fromInt(42), a)
+    a + b === Ring[A].plus(a, b) &&
+    a - b === Ring[A].minus(a, b) &&
+    -a === Ring[A].negate(a) &&
+    a * b === Ring[A].times(a, b) &&
+    a ** 2 === Ring[A].pow(a, 2) &&
+    a.pow(2) === Ring[A].pow(a, 2) &&
+    a + 42 === Ring[A].plus(a, Ring[A].fromInt(42)) &&
     litInt1 &&
-    ((a - 42) === Ring[A].minus(a, Ring[A].fromInt(42))) &&
+    a - 42 === Ring[A].minus(a, Ring[A].fromInt(42)) &&
     litInt2 &&
-    ((a * 42) === Ring[A].times(a, Ring[A].fromInt(42))) &&
-    ((42 * a) === Ring[A].times(Ring[A].fromInt(42), a))
+    a * 42 === Ring[A].times(a, Ring[A].fromInt(42)) &&
+    42 * a === Ring[A].times(Ring[A].fromInt(42), a)
   }
 
   def testEuclideanRingSyntax[A: EuclideanRing: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.euclideanRing._
     import spire.std.tuples._
-    val litInt1: Boolean = (42 + a) === Ring[A].plus(Ring[A].fromInt(42), a)
-    val litInt2: Boolean = (42 - a) === Ring[A].minus(Ring[A].fromInt(42), a)
-    ((a + b) === Ring[A].plus(a, b)) &&
-    ((a - b) === Ring[A].minus(a, b)) &&
-    (-a === Ring[A].negate(a)) &&
-    ((a * b) === Ring[A].times(a, b)) &&
-    ((a.euclideanFunction) === EuclideanRing[A].euclideanFunction(a)) &&
-    ((a.equot(b)) === EuclideanRing[A].equot(a, b)) &&
-    ((a.emod(b)) === EuclideanRing[A].emod(a, b)) &&
-    ((a.equotmod(b)) === EuclideanRing[A].equotmod(a, b)) &&
-    ((a ** 2) === Ring[A].pow(a, 2)) &&
-    ((a.pow(2)) === Ring[A].pow(a, 2)) &&
-    ((a.gcd(b)) === EuclideanRing[A].gcd(a, b)) &&
-    ((a.lcm(b)) === EuclideanRing[A].lcm(a, b)) &&
-    ((a + 42) === Ring[A].plus(a, Ring[A].fromInt(42))) &&
+    val litInt1: Boolean = 42 + a === Ring[A].plus(Ring[A].fromInt(42), a)
+    val litInt2: Boolean = 42 - a === Ring[A].minus(Ring[A].fromInt(42), a)
+    a + b === Ring[A].plus(a, b) &&
+    a - b === Ring[A].minus(a, b) &&
+    -a === Ring[A].negate(a) &&
+    a * b === Ring[A].times(a, b) &&
+    a.euclideanFunction === EuclideanRing[A].euclideanFunction(a) &&
+    a.equot(b) === EuclideanRing[A].equot(a, b) &&
+    a.emod(b) === EuclideanRing[A].emod(a, b) &&
+    a.equotmod(b) === EuclideanRing[A].equotmod(a, b) &&
+    a ** 2 === Ring[A].pow(a, 2) &&
+    a.pow(2) === Ring[A].pow(a, 2) &&
+    a.gcd(b) === EuclideanRing[A].gcd(a, b) &&
+    a.lcm(b) === EuclideanRing[A].lcm(a, b) &&
+    a + 42 === Ring[A].plus(a, Ring[A].fromInt(42)) &&
     litInt1 &&
-    ((a - 42) === Ring[A].minus(a, Ring[A].fromInt(42))) &&
+    a - 42 === Ring[A].minus(a, Ring[A].fromInt(42)) &&
     litInt2 &&
-    ((a * 42) === Ring[A].times(a, Ring[A].fromInt(42))) &&
-    ((42 * a) === Ring[A].times(Ring[A].fromInt(42), a)) &&
-    ((a.equot(42)) === EuclideanRing[A].equot(a, Ring[A].fromInt(42))) &&
-    ((42.equot(b)) === EuclideanRing[A].equot(Ring[A].fromInt(42), b)) &&
-    ((a.emod(42)) === EuclideanRing[A].emod(a, Ring[A].fromInt(42))) &&
-    ((42.emod(b)) === EuclideanRing[A].emod(Ring[A].fromInt(42), b))
+    a * 42 === Ring[A].times(a, Ring[A].fromInt(42)) &&
+    42 * a === Ring[A].times(Ring[A].fromInt(42), a) &&
+    a.equot(42) === EuclideanRing[A].equot(a, Ring[A].fromInt(42)) &&
+    42.equot(b) === EuclideanRing[A].equot(Ring[A].fromInt(42), b) &&
+    a.emod(42) === EuclideanRing[A].emod(a, Ring[A].fromInt(42)) &&
+    42.emod(b) === EuclideanRing[A].emod(Ring[A].fromInt(42), b)
   }
 
   def testFieldSyntax[A: Field: Eq](a: A, b: A) = {
@@ -327,96 +327,96 @@ trait BaseSyntaxSuite {
     import spire.syntax.field._
     import spire.std.tuples._
 
-    ((42 + a) === Ring[A].plus(Ring[A].fromInt(42), a)) &&
-    ((42 - a) === Ring[A].minus(Ring[A].fromInt(42), a)) &&
-    ((3.14 + b) === Ring[A].plus(Field[A].fromDouble(3.14), b)) &&
-    ((3.14 - b) === Ring[A].minus(Field[A].fromDouble(3.14), b)) &&
-    ((a + b) === Ring[A].plus(a, b)) &&
-    ((a - b) === Ring[A].minus(a, b)) &&
-    (-a === Ring[A].negate(a)) &&
-    ((a * b) === Ring[A].times(a, b)) &&
-    ((a.equot(b)) === EuclideanRing[A].equot(a, b)) &&
-    ((a.emod(b)) === EuclideanRing[A].emod(a, b)) &&
-    ((a.equotmod(b)) === EuclideanRing[A].equotmod(a, b)) &&
-    ((a / b) === Field[A].div(a, b)) &&
-    ((a ** 2) === Ring[A].pow(a, 2)) &&
-    ((a.pow(2)) === Ring[A].pow(a, 2)) &&
-    ((a.gcd(b)) === EuclideanRing[A].gcd(a, b)) &&
-    ((a.lcm(b)) === EuclideanRing[A].lcm(a, b)) &&
-    ((a + 42) === Ring[A].plus(a, Ring[A].fromInt(42))) &&
-    ((a - 42) === Ring[A].minus(a, Ring[A].fromInt(42))) &&
-    ((a * 42) === Ring[A].times(a, Ring[A].fromInt(42))) &&
-    ((42 * a) === Ring[A].times(Ring[A].fromInt(42), a)) &&
-    ((a.equot(42)) === EuclideanRing[A].equot(a, Ring[A].fromInt(42))) &&
-    ((42.equot(b)) === EuclideanRing[A].equot(Ring[A].fromInt(42), b)) &&
-    ((a.emod(42)) === EuclideanRing[A].emod(a, Ring[A].fromInt(42))) &&
-    ((42.emod(b)) === EuclideanRing[A].emod(Ring[A].fromInt(42), b)) &&
-    ((a + 3.14) === Ring[A].plus(a, Field[A].fromDouble(3.14))) &&
-    ((a - 3.14) === Ring[A].minus(a, Field[A].fromDouble(3.14))) &&
-    ((a * 3.14) === Ring[A].times(a, Field[A].fromDouble(3.14))) &&
-    ((3.14 * b) === Ring[A].times(Field[A].fromDouble(3.14), b)) &&
-    ((a / 3.14) === Field[A].div(a, Field[A].fromDouble(3.14))) &&
-    ((3.14 / b) === Field[A].div(Field[A].fromDouble(3.14), b)) &&
-    ((a.equot(42)) === EuclideanRing[A].equot(a, Ring[A].fromInt(42))) &&
-    ((42.equot(b)) === EuclideanRing[A].equot(Ring[A].fromInt(42), b)) &&
-    ((a.emod(42)) === EuclideanRing[A].emod(a, Ring[A].fromInt(42))) &&
-    ((42.emod(b)) === EuclideanRing[A].emod(Ring[A].fromInt(42), b))
+    42 + a === Ring[A].plus(Ring[A].fromInt(42), a) &&
+    42 - a === Ring[A].minus(Ring[A].fromInt(42), a) &&
+    3.14 + b === Ring[A].plus(Field[A].fromDouble(3.14), b) &&
+    3.14 - b === Ring[A].minus(Field[A].fromDouble(3.14), b) &&
+    a + b === Ring[A].plus(a, b) &&
+    a - b === Ring[A].minus(a, b) &&
+    -a === Ring[A].negate(a) &&
+    a * b === Ring[A].times(a, b) &&
+    a.equot(b) === EuclideanRing[A].equot(a, b) &&
+    a.emod(b) === EuclideanRing[A].emod(a, b) &&
+    a.equotmod(b) === EuclideanRing[A].equotmod(a, b) &&
+    a / b === Field[A].div(a, b) &&
+    a ** 2 === Ring[A].pow(a, 2) &&
+    a.pow(2) === Ring[A].pow(a, 2) &&
+    a.gcd(b) === EuclideanRing[A].gcd(a, b) &&
+    a.lcm(b) === EuclideanRing[A].lcm(a, b) &&
+    a + 42 === Ring[A].plus(a, Ring[A].fromInt(42)) &&
+    a - 42 === Ring[A].minus(a, Ring[A].fromInt(42)) &&
+    a * 42 === Ring[A].times(a, Ring[A].fromInt(42)) &&
+    42 * a === Ring[A].times(Ring[A].fromInt(42), a) &&
+    a.equot(42) === EuclideanRing[A].equot(a, Ring[A].fromInt(42)) &&
+    42.equot(b) === EuclideanRing[A].equot(Ring[A].fromInt(42), b) &&
+    a.emod(42) === EuclideanRing[A].emod(a, Ring[A].fromInt(42)) &&
+    42.emod(b) === EuclideanRing[A].emod(Ring[A].fromInt(42), b) &&
+    a + 3.14 === Ring[A].plus(a, Field[A].fromDouble(3.14)) &&
+    a - 3.14 === Ring[A].minus(a, Field[A].fromDouble(3.14)) &&
+    a * 3.14 === Ring[A].times(a, Field[A].fromDouble(3.14)) &&
+    3.14 * b === Ring[A].times(Field[A].fromDouble(3.14), b) &&
+    a / 3.14 === Field[A].div(a, Field[A].fromDouble(3.14)) &&
+    3.14 / b === Field[A].div(Field[A].fromDouble(3.14), b) &&
+    a.equot(42) === EuclideanRing[A].equot(a, Ring[A].fromInt(42)) &&
+    42.equot(b) === EuclideanRing[A].equot(Ring[A].fromInt(42), b) &&
+    a.emod(42) === EuclideanRing[A].emod(a, Ring[A].fromInt(42)) &&
+    42.emod(b) === EuclideanRing[A].emod(Ring[A].fromInt(42), b)
   }
 
   def testNRootSyntax[A: NRoot: Field: Eq](a: A) = {
     import spire.syntax.eq._
     import spire.syntax.nroot._
     val half = Field[A].fromDouble(0.5)
-    (a.sqrt === NRoot[A].sqrt(a)) &&
-    ((a.nroot(5)) === NRoot[A].nroot(a, 5)) &&
-    ((a.fpow(half)) === NRoot[A].fpow(a, half)) &&
-    ((a ** 0.5) === NRoot[A].fpow(a, half))
+    a.sqrt === NRoot[A].sqrt(a) &&
+    a.nroot(5) === NRoot[A].nroot(a, 5) &&
+    a.fpow(half) === NRoot[A].fpow(a, half) &&
+    a ** 0.5 === NRoot[A].fpow(a, half)
   }
 
   def testLeftModuleSyntax[V: Eq, A: Ring](v: V, w: V, a: A)(implicit V: LeftModule[V, A]) = {
     import spire.syntax.eq._
     import spire.syntax.leftModule._
-    ((v + w) === V.plus(v, w)) &&
-    ((v - w) === V.minus(v, w)) &&
-    (-v === V.negate(v)) &&
-    ((a *: v) === V.timesl(a, v))
+    v + w === V.plus(v, w) &&
+    v - w === V.minus(v, w) &&
+    -v === V.negate(v) &&
+    (a *: v) === V.timesl(a, v)
   }
 
   def testRightModuleSyntax[V: Eq, A](v: V, w: V, a: A)(implicit V: RightModule[V, A], A: Ring[A]) = {
     import spire.syntax.eq._
     import spire.syntax.rightModule._
-    ((v + w) === V.plus(v, w)) &&
-    ((v - w) === V.minus(v, w)) &&
-    (-v === V.negate(v)) &&
-    ((v :* a) === V.timesr(v, a)) &&
-    ((v :* 2) === V.timesr(v, A.fromInt(2)))
+    v + w === V.plus(v, w) &&
+    v - w === V.minus(v, w) &&
+    -v === V.negate(v) &&
+    v :* a === V.timesr(v, a) &&
+    v :* 2 === V.timesr(v, A.fromInt(2))
   }
 
   def testCModuleSyntax[V: Eq, A](v: V, w: V, a: A)(implicit V: CModule[V, A], A: CRing[A]) = {
     import spire.syntax.eq._
     import spire.syntax.cModule._
-    ((v + w) === V.plus(v, w)) &&
-    ((v - w) === V.minus(v, w)) &&
-    (-v === V.negate(v)) &&
-    ((a *: v) === V.timesl(a, v)) &&
-    ((v :* a) === V.timesr(v, a)) &&
-    ((v :* 2) === V.timesr(v, A.fromInt(2)))
+    v + w === V.plus(v, w) &&
+    v - w === V.minus(v, w) &&
+    -v === V.negate(v) &&
+    (a *: v) === V.timesl(a, v) &&
+    v :* a === V.timesr(v, a) &&
+    v :* 2 === V.timesr(v, A.fromInt(2))
   }
 
   def testVectorSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: VectorSpace[V, A], eqV: Eq[V]) = {
     import spire.syntax.partialOrder._
     import spire.syntax.vectorSpace._
     implicit val A: Field[A] = V.scalar
-    ((v + w) === V.plus(v, w)) &&
-    ((v - w) === V.minus(v, w)) &&
-    (-v === V.negate(v)) &&
-    ((a *: v) === V.timesl(a, v)) &&
-    ((v :* a) === V.timesr(v, a)) &&
-    ((2 *: v) == V.timesl(A.fromInt(2), v)) &&
-    ((v :* 2) == V.timesr(v, A.fromInt(2))) &&
+    v + w === V.plus(v, w) &&
+    v - w === V.minus(v, w) &&
+    -v === V.negate(v) &&
+    (a *: v) === V.timesl(a, v) &&
+    v :* a === V.timesr(v, a) &&
+    (2 *: v) == V.timesl(A.fromInt(2), v) &&
+    v :* 2 == V.timesr(v, A.fromInt(2)) &&
     // ((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
     // ((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
-    ((v :/ 2) == V.divr(v, A.fromInt(2)))
+    v :/ 2 == V.divr(v, A.fromInt(2))
   }
 
   def testNormedVectorSpaceSyntax[V, A](v: V, w: V, a: A)(implicit
@@ -427,18 +427,18 @@ trait BaseSyntaxSuite {
     import spire.syntax.eq._
     import spire.syntax.normedVectorSpace._
     implicit val A: Field[A] = V.scalar
-    ((v + w) === V.plus(v, w)) &&
-    ((v - w) === V.minus(v, w)) &&
-    (-v == V.negate(v)) &&
-    ((a *: v) === V.timesl(a, v)) &&
-    ((v :* a) === V.timesr(v, a)) &&
-    ((2 *: v) == V.timesl(A.fromInt(2), v)) &&
-    ((v :* 2) == V.timesr(v, A.fromInt(2))) &&
+    v + w === V.plus(v, w) &&
+    v - w === V.minus(v, w) &&
+    -v == V.negate(v) &&
+    (a *: v) === V.timesl(a, v) &&
+    v :* a === V.timesr(v, a) &&
+    (2 *: v) == V.timesl(A.fromInt(2), v) &&
+    v :* 2 == V.timesr(v, A.fromInt(2)) &&
     // ((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
     // ((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
-    ((v :/ 2) == V.divr(v, A.fromInt(2))) &&
-    (v.norm === V.norm(v)) &&
-    ((V.norm(v) === A.zero) || (v.normalize === V.normalize(v)))
+    v :/ 2 == V.divr(v, A.fromInt(2)) &&
+    v.norm === V.norm(v) &&
+    (V.norm(v) === A.zero || v.normalize === V.normalize(v))
   }
 
   def testInnerProductSpaceSyntax[V, A](v: V, w: V, a: A)(implicit
@@ -449,49 +449,49 @@ trait BaseSyntaxSuite {
     import spire.syntax.eq._
     import spire.syntax.innerProductSpace._
     implicit val A: Field[A] = V.scalar
-    ((v + w) === V.plus(v, w)) &&
-    ((v - w) === V.minus(v, w)) &&
-    (-v === V.negate(v)) &&
-    ((a *: v) === V.timesl(a, v)) &&
-    ((v :* a) === V.timesr(v, a)) &&
-    ((2 *: v) == V.timesl(A.fromInt(2), v)) &&
-    ((v :* 2) == V.timesr(v, A.fromInt(2))) &&
+    v + w === V.plus(v, w) &&
+    v - w === V.minus(v, w) &&
+    -v === V.negate(v) &&
+    (a *: v) === V.timesl(a, v) &&
+    v :* a === V.timesr(v, a) &&
+    (2 *: v) == V.timesl(A.fromInt(2), v) &&
+    v :* 2 == V.timesr(v, A.fromInt(2)) &&
     // ((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
     // ((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
-    ((v :/ 2) == V.divr(v, A.fromInt(2))) &&
-    ((v.dot(w)) === V.dot(v, w)) &&
-    ((v ⋅ w) === V.dot(v, w))
+    v :/ 2 == V.divr(v, A.fromInt(2)) &&
+    v.dot(w) === V.dot(v, w) &&
+    v ⋅ w === V.dot(v, w)
   }
 
   def testCoordinateSpaceSyntax[V, A](v: V, w: V, a: A)(implicit V: CoordinateSpace[V, A], eqV: Eq[V], eqA: Eq[A]) = {
     import spire.syntax.eq._
     import spire.syntax.coordinateSpace._
     implicit val A: Field[A] = V.scalar
-    ((v + w) === V.plus(v, w)) &&
-    ((v - w) === V.minus(v, w)) &&
-    (-v === V.negate(v)) &&
-    ((a *: v) === V.timesl(a, v)) &&
-    ((v :* a) === V.timesr(v, a)) &&
-    ((2 *: v) == V.timesl(A.fromInt(2), v)) &&
-    ((v :* 2) == V.timesr(v, A.fromInt(2))) &&
+    v + w === V.plus(v, w) &&
+    v - w === V.minus(v, w) &&
+    -v === V.negate(v) &&
+    (a *: v) === V.timesl(a, v) &&
+    v :* a === V.timesr(v, a) &&
+    (2 *: v) == V.timesl(A.fromInt(2), v) &&
+    v :* 2 == V.timesr(v, A.fromInt(2)) &&
     // ((0.5 *: v) == V.timesl(A.fromDouble(0.5), v)) &&
     // ((v :* 0.5) == V.timesr(v, A.fromDouble(0.5))) &&
-    ((v :/ 2) == V.divr(v, A.fromInt(2))) &&
-    ((v.dot(w)) === V.dot(v, w)) &&
-    ((v ⋅ w) === V.dot(v, w)) &&
-    (v._x === V._x(v)) &&
-    (v._y === V._y(v)) &&
-    (v._z === V._z(v)) &&
-    (v.coord(0) === V.coord(v, 0)) &&
-    (v.coord(1) === V.coord(v, 1))
+    v :/ 2 == V.divr(v, A.fromInt(2)) &&
+    v.dot(w) === V.dot(v, w) &&
+    v ⋅ w === V.dot(v, w) &&
+    v._x === V._x(v) &&
+    v._y === V._y(v) &&
+    v._z === V._z(v) &&
+    v.coord(0) === V.coord(v, 0) &&
+    v.coord(1) === V.coord(v, 1)
   }
 
   def testBoolSyntax[A: Bool: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.bool._
-    ((a & b) === Bool[A].and(a, b)) &&
-    ((a | b) === Bool[A].or(a, b)) &&
-    ((a ^ b) === Bool[A].xor(a, b)) &&
-    (~a === Bool[A].complement(a))
+    (a & b) === Bool[A].and(a, b) &&
+    (a | b) === Bool[A].or(a, b) &&
+    (a ^ b) === Bool[A].xor(a, b) &&
+    ~a === Bool[A].complement(a)
   }
 }

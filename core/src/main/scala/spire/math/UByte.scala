@@ -79,9 +79,9 @@ class UByte(val signed: Byte) extends AnyVal with scala.math.ScalaNumericAnyConv
   def <<(shift: Int): UByte = UByte((signed & 0xff) << (shift & 7))
   def >>(shift: Int): UByte = UByte((signed & 0xff) >>> (shift & 7))
   def >>>(shift: Int): UByte = UByte((signed & 0xff) >>> (shift & 7))
-  def &(that: UByte): UByte = UByte((this.signed & 0xff) & (that.signed & 0xff))
-  def |(that: UByte): UByte = UByte((this.signed & 0xff) | (that.signed & 0xff))
-  def ^(that: UByte): UByte = UByte((this.signed & 0xff) ^ (that.signed & 0xff))
+  def &(that: UByte): UByte = UByte(this.signed & 0xff & (that.signed & 0xff))
+  def |(that: UByte): UByte = UByte(this.signed & 0xff | that.signed & 0xff)
+  def ^(that: UByte): UByte = UByte(this.signed & 0xff ^ that.signed & 0xff)
 
   def **(that: UByte): UByte = UByte(pow(this.toLong, that.toLong).toInt)
 }
@@ -154,11 +154,11 @@ private[math] class UByteBitString extends BitString[UByte] with Serializable {
   def signedRightShift(n: UByte, i: Int): UByte = n >>> i
   def rotateLeft(n: UByte, i: Int): UByte = {
     val j = i & 7
-    (n << j) | (n >>> (8 - j))
+    n << j | n >>> 8 - j
   }
   def rotateRight(n: UByte, i: Int): UByte = {
     val j = i & 7
-    (n >>> j) | (n << (8 - j))
+    n >>> j | n << 8 - j
   }
 }
 

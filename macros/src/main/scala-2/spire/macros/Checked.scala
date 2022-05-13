@@ -137,7 +137,7 @@ private[macros] case class CheckedRewriter[C <: Context](c: C) {
       case Apply(Select(lhs, method), rhs :: Nil) =>
         val lt = lhs.tpe.widen
         val rt = rhs.tpe.widen
-        ((lt.weak_<:<(tpe)) && (rt <:< tpe)) || ((lt <:< tpe) && (rt.weak_<:<(tpe)))
+        lt.weak_<:<(tpe) && rt <:< tpe || lt <:< tpe && rt.weak_<:<(tpe)
       case _ =>
         false
     }

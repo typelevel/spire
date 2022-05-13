@@ -79,7 +79,7 @@ class GeneratorSuite extends munit.FunSuite {
             histogram(n) += 1
           }
           val ratio = 1.0 * size / mod
-          val deviation = histogram.toList.map(n => (1.0 - (n / ratio)).abs)
+          val deviation = histogram.toList.map(n => (1.0 - n / ratio).abs)
           assert(deviation.filter(_ > threshold).isEmpty)
         }
       }

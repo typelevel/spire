@@ -118,7 +118,7 @@ object FpFilterExact {
 }
 
 object FpFilter {
-  final val Eps = java.lang.Double.longBitsToDouble((1023L - 52) << 52)
+  final val Eps = java.lang.Double.longBitsToDouble(1023L - 52 << 52)
 
   @inline final def exact[A](value: Double): FpFilterExact[A] = new FpFilterExact[A](value)
 

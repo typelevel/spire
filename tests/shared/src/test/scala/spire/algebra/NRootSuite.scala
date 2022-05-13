@@ -48,11 +48,11 @@ class NRootSuite extends munit.FunSuite {
     val e = eps(y)
 
     if (x > 0) {
-      assert(((y - e) ** n) < x, "expected %s ** %d < %s".format(y - e, n, x))
-      assert(((y + e) ** n) > x, "expected %s ** %d > %s".format(y + e, n, x))
+      assert((y - e) ** n < x, "expected %s ** %d < %s".format(y - e, n, x))
+      assert((y + e) ** n > x, "expected %s ** %d > %s".format(y + e, n, x))
     } else {
-      assert(((y + e) ** n) < x, "expected %s ** %d < %s".format(y + e, n, x))
-      assert(((y - e) ** n) > x, "expected %s ** %d > %s".format(y - e, n, x))
+      assert((y + e) ** n < x, "expected %s ** %d < %s".format(y + e, n, x))
+      assert((y - e) ** n > x, "expected %s ** %d > %s".format(y - e, n, x))
     }
   }
 

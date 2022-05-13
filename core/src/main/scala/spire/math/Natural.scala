@@ -185,7 +185,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
       if ((n.signed & -n.signed) != n.signed) return -1
       // TODO: this could be better/faster
       var i = 1
-      while (i < 32 && (n >>> i) != UInt(0)) i += 1
+      while (i < 32 && n >>> i != UInt(0)) i += 1
       i - 1
     }
 
@@ -239,7 +239,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
 
   final override def equals(rhs: Any): Boolean = rhs match {
     case rhs: Natural       => this === rhs
-    case rhs: UInt          => (lhs.compare(rhs)) == 0
+    case rhs: UInt          => lhs.compare(rhs) == 0
     case rhs: BigInt        => lhs.toBigInt == rhs
     case rhs: SafeLong      => SafeLong(lhs.toBigInt) == rhs
     case rhs: BigDecimal    => rhs.isWhole && lhs.toBigInt == rhs
@@ -253,24 +253,24 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
   }
 
   def ===(rhs: Natural): Boolean =
-    (lhs.compare(rhs)) == 0
+    lhs.compare(rhs) == 0
 
   def =!=(rhs: Natural): Boolean =
     !(this === rhs)
 
-  def <(rhs: Natural): Boolean = (lhs.compare(rhs)) < 0
-  def <=(rhs: Natural): Boolean = (lhs.compare(rhs)) <= 0
-  def >(rhs: Natural): Boolean = (lhs.compare(rhs)) > 0
-  def >=(rhs: Natural): Boolean = (lhs.compare(rhs)) >= 0
+  def <(rhs: Natural): Boolean = lhs.compare(rhs) < 0
+  def <=(rhs: Natural): Boolean = lhs.compare(rhs) <= 0
+  def >(rhs: Natural): Boolean = lhs.compare(rhs) > 0
+  def >=(rhs: Natural): Boolean = lhs.compare(rhs) >= 0
 
-  def <(r: UInt): Boolean = (lhs.compare(r)) < 0
-  def <=(r: UInt): Boolean = (lhs.compare(r)) <= 0
-  def >(r: UInt): Boolean = (lhs.compare(r)) > 0
-  def >=(r: UInt): Boolean = (lhs.compare(r)) >= 0
-  def <(r: BigInt): Boolean = (lhs.toBigInt.compare(r)) < 0
-  def <=(r: BigInt): Boolean = (lhs.toBigInt.compare(r)) <= 0
-  def >(r: BigInt): Boolean = (lhs.toBigInt.compare(r)) > 0
-  def >=(r: BigInt): Boolean = (lhs.toBigInt.compare(r)) >= 0
+  def <(r: UInt): Boolean = lhs.compare(r) < 0
+  def <=(r: UInt): Boolean = lhs.compare(r) <= 0
+  def >(r: UInt): Boolean = lhs.compare(r) > 0
+  def >=(r: UInt): Boolean = lhs.compare(r) >= 0
+  def <(r: BigInt): Boolean = lhs.toBigInt.compare(r) < 0
+  def <=(r: BigInt): Boolean = lhs.toBigInt.compare(r) <= 0
+  def >(r: BigInt): Boolean = lhs.toBigInt.compare(r) > 0
+  def >=(r: BigInt): Boolean = lhs.toBigInt.compare(r) >= 0
 
   // implemented in Digit and End
   def +(rd: UInt): Natural
@@ -431,7 +431,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
               case 1 =>
                 val p = rhs.powerOfTwo
                 if (p >= 0)
-                  lhs & ((Natural(1) << p) - UInt(1))
+                  lhs & (Natural(1) << p) - UInt(1)
                 else
                   longdiv(lhs, rhs)._2
             }
@@ -491,9 +491,9 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
     val m: Int = n & 0x1f
     def recur(next: Natural, carry: Long): Natural = next match {
       case End(d) =>
-        Natural((d.toLong << m) | carry)
+        Natural(d.toLong << m | carry)
       case Digit(d, tail) =>
-        val t = (d.toLong << m) | carry
+        val t = d.toLong << m | carry
         Digit(UInt(t), recur(tail, t >> 32))
     }
     val num = recur(this, 0L)
@@ -516,9 +516,9 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
     val m: Int = n & 0x1f
     def recur(next: Natural, carry: Long): Natural = next match {
       case End(d) =>
-        Natural((d.toLong >> m) | carry)
+        Natural(d.toLong >> m | carry)
       case Digit(d, tail) =>
-        val t = (d.toLong | carry) << (32 - m)
+        val t = (d.toLong | carry) << 32 - m
         Digit(UInt(t >> 32), recur(tail, t & 0xffffffffL))
     }
     recur(chop(n / 32).reversed, 0L).reversed

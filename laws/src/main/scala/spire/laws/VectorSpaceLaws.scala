@@ -55,7 +55,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
     parents = Seq.empty,
     "left scalar distributes" -> forAllSafe((r: A, v: V, w: V) => r *: (v + w) === (r *: v) + (r *: w)),
     "left vector distributes" -> forAllSafe((r: A, s: A, v: V) => (r + s) *: v === (r *: v) + (s *: v)),
-    "left associative scalar" -> forAllSafe((r: A, s: A, v: V) => (r * s) *: v === r *: (s *: v)),
+    "left associative scalar" -> forAllSafe((r: A, s: A, v: V) => (r * s) *: v === r *: s *: v),
     "left identity" -> forAllSafe((v: V) => V.scalar.one *: v === v)
   )
 
@@ -64,9 +64,9 @@ trait VectorSpaceLaws[V, A] extends Laws {
     sl = _.ring(V.scalar),
     vl = _.abGroup(V.additive),
     parents = Seq.empty,
-    "right scalar distributes" -> forAllSafe((v: V, w: V, r: A) => (v + w) :* r === (v :* r) + (w :* r)),
-    "right vector distributes" -> forAllSafe((v: V, r: A, s: A) => v :* (r + s) === (v :* r) + (v :* s)),
-    "right associative scalar" -> forAllSafe((v: V, r: A, s: A) => v :* (r * s) === (v :* r) :* s),
+    "right scalar distributes" -> forAllSafe((v: V, w: V, r: A) => v + w :* r === (v :* r) + (w :* r)),
+    "right vector distributes" -> forAllSafe((v: V, r: A, s: A) => v :* r + s === (v :* r) + (v :* s)),
+    "right associative scalar" -> forAllSafe((v: V, r: A, s: A) => v :* r * s === v :* r :* s),
     "right identity" -> forAllSafe((v: V) => v :* V.scalar.one === v)
   )
 
@@ -96,9 +96,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
         else V.distance(x, y) =!= A.zero
       ),
       "symmetric" -> forAllSafe((x: V, y: V) => V.distance(x, y) === V.distance(y, x)),
-      "triangle inequality" -> forAllSafe((x: V, y: V, z: V) =>
-        V.distance(x, z) <= (V.distance(x, y) + V.distance(y, z))
-      )
+      "triangle inequality" -> forAllSafe((x: V, y: V, z: V) => V.distance(x, z) <= V.distance(x, y) + V.distance(y, z))
     )
 
   @nowarn

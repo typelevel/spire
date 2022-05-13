@@ -41,20 +41,20 @@ class ComplexScalaCheckSuite2 extends munit.ScalaCheckSuite {
 
   property("x + (y + z) = (x + y) + z") {
     forAll { (x: C, y: C, z: C) =>
-      x + (y + z) == (x + y) + z
+      x + (y + z) == x + y + z
     }
   }
 
   property("x + (-x) = x - x = 0") {
     forAll { (x: C) =>
-      x + (-x) == zero
+      x + -x == zero
       x - x == zero
     }
   }
 
   property("x * (y + z) = (x * y) + (x * z)") {
     forAll { (x: C, y: C, z: C) =>
-      x * (y + z) == (x * y) + (x * z)
+      x * (y + z) == x * y + x * z
     }
   }
 
@@ -74,7 +74,7 @@ class ComplexScalaCheckSuite2 extends munit.ScalaCheckSuite {
 
   property("x * (y * z) = (x * y) * z") {
     forAll { (x: C, y: C, z: C) =>
-      x * (y * z) == (x * y) * z
+      x * (y * z) == x * y * z
     }
   }
 
@@ -86,13 +86,13 @@ class ComplexScalaCheckSuite2 extends munit.ScalaCheckSuite {
 
   property("x / x = 1") {
     forAll { (x: C) =>
-      (x != zero) ==> (x / x == one)
+      x != zero ==> (x / x == one)
     }
   }
 
   property("x^-1 = 1 / x") {
     forAll { (x: C) =>
-      (x != zero) ==> (x.reciprocal == one / x)
+      x != zero ==> (x.reciprocal == one / x)
     }
   }
 

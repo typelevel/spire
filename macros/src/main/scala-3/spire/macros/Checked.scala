@@ -30,7 +30,7 @@ object Checked:
    * ArithmeticOverflowException will be thrown.
    */
   inline def checked[A](inline n: A): A =
-    ${ checkedImpl[A]('{ n }, '{ throw new spire.macros.ArithmeticOverflowException() }) }
+    ${ checkedImpl[A]('{ n }, '{ throw new spire.macros.ArithmeticOverflowException }) }
 
   // Attempts to convert the expresion to Int
   private def toInt[A](n: Expr[A])(using Quotes, Type[A]): Expr[Int] =
@@ -100,14 +100,14 @@ object Checked:
                 val xt = ${ toInt(checkedImpl(x.asExprOf[Any], fallback)) }
                 val yt = ${ toInt(checkedImpl(y.asExprOf[Any], fallback)) }
                 val z = xt * yt
-                if (xt == 0 || (yt == z / xt && !(xt == -1 && yt == $numLimit))) z else $fallback
+                if (xt == 0 || yt == z / xt && !(xt == -1 && yt == $numLimit)) z else $fallback
               }.asTerm.changeOwner(owner)
             } else if (isLong) {
               '{
                 val xt = ${ toLong(checkedImpl(x.asExprOf[Any], fallback)) }
                 val yt = ${ toLong(checkedImpl(y.asExprOf[Any], fallback)) }
                 val z = xt * yt
-                if (xt == 0 || (yt == z / xt && !(xt == -1 && yt == $numLimit))) z else $fallback
+                if (xt == 0 || yt == z / xt && !(xt == -1 && yt == $numLimit)) z else $fallback
               }.asTerm.changeOwner(owner)
             } else
               super.transformTerm(tree)(owner)

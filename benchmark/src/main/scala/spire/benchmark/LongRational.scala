@@ -51,7 +51,7 @@ final class LongRational private (val n: Long, val d: Long) {
       if (ngcd == 1)
         new LongRational(num, lden * r.d)
       else
-        new LongRational(num / ngcd, (r.d / ngcd) * lden)
+        new LongRational(num / ngcd, r.d / ngcd * lden)
     }
   }
 
@@ -67,21 +67,21 @@ final class LongRational private (val n: Long, val d: Long) {
       if (ngcd == 1)
         new LongRational(num, lden * r.d)
       else
-        new LongRational(num / ngcd, (r.d / ngcd) * lden)
+        new LongRational(num / ngcd, r.d / ngcd * lden)
     }
   }
 
   def *(r: LongRational): LongRational = {
     val a = gcd(n, r.d)
     val b = gcd(d, r.n)
-    new LongRational((n / a) * (r.n / b), (d / b) * (r.d / a))
+    new LongRational(n / a * (r.n / b), d / b * (r.d / a))
   }
 
   def /(r: LongRational): LongRational = {
     val a = gcd(n, r.n)
     val b = gcd(d, r.d)
-    val num = (n / a) * (r.d / b)
-    val den = (d / b) * (r.n / a)
+    val num = n / a * (r.d / b)
+    val den = d / b * (r.n / a)
     if (den < 0L) {
       new LongRational(-num, -den)
     } else {
@@ -102,7 +102,7 @@ final class LongRational private (val n: Long, val d: Long) {
     if (dgcd == 1)
       java.lang.Math.signum(n * r.d.toFloat - r.n * d).toInt
     else
-      java.lang.Math.signum((r.d / dgcd) * n.toFloat - (d / dgcd) * r.n).toInt
+      java.lang.Math.signum(r.d / dgcd * n.toFloat - d / dgcd * r.n).toInt
   }
 
   def signum: Int = if (n < 0) -1 else if (n > 0) 1 else 0

@@ -69,12 +69,12 @@ final class Cmwc5(_x: Long, _y: Long, _z: Long, _w: Long, _v: Long) extends Long
   }
 
   def nextLong(): Long = {
-    val t: Long = x ^ (x >>> 7)
+    val t: Long = x ^ x >>> 7
     x = y
     y = z
     z = w
     w = v
-    v = (v ^ (v << 6)) ^ (t ^ (t << 13))
+    v = v ^ v << 6 ^ (t ^ t << 13)
     (y + y + 1) * v
   }
 }

@@ -269,14 +269,14 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
   }
 
   def %(b: Jet[T])(implicit c: ClassTag[T], f: Field[T], r: IsReal[T], v: VectorSpace[Array[T], T]): Jet[T] = {
-    this - ((this /~ b) * b)
+    this - this /~ b * b
   }
 
   def /%(
     b: Jet[T]
   )(implicit c: ClassTag[T], f: Field[T], r: IsReal[T], v: VectorSpace[Array[T], T]): (Jet[T], Jet[T]) = {
     val q = this /~ b
-    (q, this - (q * b))
+    (q, this - q * b)
   }
 
   def **(b: Int)(implicit f: Field[T], v: VectorSpace[Array[T], T]): Jet[T] = pow(b)
@@ -432,7 +432,7 @@ final case class Jet[@sp(Float, Double) T](real: T, infinitesimal: Array[T])
    */
   def atan2(a: Jet[T])(implicit f: Field[T], t: Trig[T], v: VectorSpace[Array[T], T]): Jet[T] = {
     val tmp = f.one / (a.real * a.real + real * real)
-    new Jet(spire.math.atan2(real, a.real), ((tmp * (-real)) *: a.infinitesimal) + ((tmp * a.real) *: infinitesimal))
+    new Jet(spire.math.atan2(real, a.real), ((tmp * -real) *: a.infinitesimal) + ((tmp * a.real) *: infinitesimal))
   }
 
   /**

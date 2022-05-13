@@ -44,9 +44,9 @@ trait OrderLaws[A] extends Laws {
     "reflexitivity" -> forAllSafe((x: A) => x <= x),
     "antisymmetry" -> forAllSafe((x: A, y: A) => (x <= y && y <= x).imp(x === y)),
     "transitivity" -> forAllSafe((x: A, y: A, z: A) => (x <= y && y <= z).imp(x <= z)),
-    "gteqv" -> forAllSafe((x: A, y: A) => (x <= y) === (y >= x)),
-    "lt" -> forAllSafe((x: A, y: A) => (x < y) === (x <= y && x =!= y)),
-    "gt" -> forAllSafe((x: A, y: A) => (x < y) === (y > x))
+    "gteqv" -> forAllSafe((x: A, y: A) => x <= y === y >= x),
+    "lt" -> forAllSafe((x: A, y: A) => x < y === (x <= y && x =!= y)),
+    "gt" -> forAllSafe((x: A, y: A) => x < y === y > x)
   )
 
   def order(implicit A: Order[A]) = new OrderProperties(
@@ -101,33 +101,33 @@ trait OrderLaws[A] extends Laws {
       "r = 0 or sign(r) = sign(x) (tmod)" -> forAllSafe { (x: A, y: A) =>
         y.isZero || {
           val r = x.tmod(y)
-          r.isZero || (r.sign === x.sign)
+          r.isZero || r.sign === x.sign
         }
       },
       "r = 0 or sign(r) = sign(y) (fmod)" -> forAllSafe { (x: A, y: A) =>
         y.isZero || {
           val r = x.fmod(y)
-          r.isZero || (r.sign === y.sign)
+          r.isZero || r.sign === y.sign
         }
       },
       "tquot" -> forAllSafe { (x: A, y: A) =>
         y.isZero || {
-          x.tquotmod(y)._1 === (x.tquot(y))
+          x.tquotmod(y)._1 === x.tquot(y)
         }
       },
       "tmod" -> forAllSafe { (x: A, y: A) =>
         y.isZero || {
-          x.tquotmod(y)._2 === (x.tmod(y))
+          x.tquotmod(y)._2 === x.tmod(y)
         }
       },
       "fquot" -> forAllSafe { (x: A, y: A) =>
         y.isZero || {
-          x.fquotmod(y)._1 === (x.fquot(y))
+          x.fquotmod(y)._1 === x.fquot(y)
         }
       },
       "fmod" -> forAllSafe { (x: A, y: A) =>
         y.isZero || {
-          x.fquotmod(y)._2 === (x.fmod(y))
+          x.fquotmod(y)._2 === x.fmod(y)
         }
       }
     )

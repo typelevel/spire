@@ -29,14 +29,14 @@ class IntervalIteratorScalaCheckSuite extends munit.ScalaCheckSuite {
     forAll { (n1: Rational, n2: Rational, num0: Byte) =>
       val (x, y) = if (n1 <= n2) (n1, n2) else (n2, n1)
 
-      val num = ((num0 & 255) % 13) + 1
+      val num = (num0 & 255) % 13 + 1
 
       def testEndpoints(interval: Interval[Rational], step: Rational, hasLower: Boolean, hasUpper: Boolean): Boolean = {
         val ns = interval.iterator(step).toSet
         val extra = if (hasLower && hasUpper) 2 else if (hasLower || hasUpper) 1 else 0
         ns(x) == hasLower &&
         ns(y) == hasUpper &&
-        ns.size == (num - 1 + extra)
+        ns.size == num - 1 + extra
       }
 
       val cc = Interval.closed(x, y) // [x, y]

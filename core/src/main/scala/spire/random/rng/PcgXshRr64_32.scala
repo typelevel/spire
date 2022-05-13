@@ -41,14 +41,14 @@ class PcgXshRr64_32 private (private var state: Long, private var inc: Long) ext
     val oldState = state
 
     state = oldState * 6364136223846793005L + inc
-    val xorShifted = (((oldState >>> 18) ^ oldState) >>> 27).toInt
+    val xorShifted = ((oldState >>> 18 ^ oldState) >>> 27).toInt
     val rot = (oldState >>> 59).toInt
     Integer.rotateRight(xorShifted, rot)
   }
 
   def seed(initState: Long, initSeq: Long): Unit = {
     state = 0L
-    inc = (initSeq << 1) | 1L
+    inc = initSeq << 1 | 1L
     nextInt()
     state += initState
     nextInt()

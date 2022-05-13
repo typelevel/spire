@@ -23,7 +23,7 @@ private[interval] object Tree {
 
   @inline final def fromPrefix(key: Long): Long = key + Long.MinValue
 
-  @inline final def unsigned_<(i: Long, j: Long) = (i < j) ^ (i < 0L) ^ (j < 0L)
+  @inline final def unsigned_<(i: Long, j: Long) = i < j ^ i < 0L ^ j < 0L
 
   @inline final def levelAbove(a: Long, b: Long): Byte =
     (63 - numberOfLeadingZeros(a ^ b)).toByte
@@ -31,11 +31,11 @@ private[interval] object Tree {
   @inline final def maskAbove(prefix: Long, bit: Byte) = {
     // this is not the same as (-1L << (bit + 1)) due to the somewhat strange behavior of the java shift operator
     // -1L << 64 gives -1L, whereas (-1L << 63) << 1 gives 0L like we need
-    prefix & ((-1L << bit) << 1)
+    prefix & -1L << bit << 1
   }
 
   @inline final def zeroAt(value: Long, bit: Byte) =
-    (value & (1L << bit)) == 0L
+    (value & 1L << bit) == 0L
 
   @inline final def hasMatchAt(key: Long, prefix: Long, level: Byte) =
     maskAbove(key, level) == prefix
@@ -436,8 +436,8 @@ private[interval] object Tree {
     override protected def overlapA(a0: Boolean, a: Tree, b0: Boolean): Boolean = !b0
 
     override protected def collision(a0: Boolean, a: Leaf, b0: Boolean, b: Leaf): Boolean = {
-      val at1 = (a.at ^ a0) | !(b.at ^ b0)
-      val above1 = (a.above ^ a0) | !(b.above ^ b0)
+      val at1 = a.at ^ a0 | !(b.at ^ b0)
+      val above1 = a.above ^ a0 | !(b.above ^ b0)
       at1 && above1
     }
   }
@@ -446,8 +446,8 @@ private[interval] object Tree {
 
     protected def collision(a0: Boolean, a: Leaf, b0: Boolean, b: Leaf) = {
       val below1 = a0 | b0
-      val at1 = (a.at ^ a0) | (b.at ^ b0)
-      val above1 = (a.above ^ a0) | (b.above ^ b0)
+      val at1 = a.at ^ a0 | b.at ^ b0
+      val above1 = a.above ^ a0 | b.above ^ b0
       leaf(below1 != at1, at1 != above1, a, b)
     }
 
@@ -468,8 +468,8 @@ private[interval] object Tree {
 
     protected def collision(a0: Boolean, a: Leaf, b0: Boolean, b: Leaf) = {
       val below1 = a0 ^ b0
-      val at1 = (a.at ^ a0) ^ (b.at ^ b0)
-      val above1 = (a.above ^ a0) ^ (b.above ^ b0)
+      val at1 = a.at ^ a0 ^ (b.at ^ b0)
+      val above1 = a.above ^ a0 ^ (b.above ^ b0)
       leaf(below1 != at1, at1 != above1, a, b)
     }
 

@@ -100,7 +100,7 @@ final class Algebraic private (val expr: Algebraic.Expr)
    * truncated division.
    */
   def tmod(that: Algebraic): Algebraic =
-    this - (this.tquot(that)) * that
+    this - this.tquot(that) * that
 
   /**
    * Returns the square root of this number.
@@ -366,9 +366,9 @@ final class Algebraic private (val expr: Algebraic.Expr)
    */
   override def isValidInt: Boolean = {
     val n = toBigInt
-    (n <= MaxIntValue) &&
-    (n >= MinIntValue) &&
-    (this == Algebraic(n))
+    n <= MaxIntValue &&
+    n >= MinIntValue &&
+    this == Algebraic(n)
   }
 
   /**
@@ -377,9 +377,9 @@ final class Algebraic private (val expr: Algebraic.Expr)
    */
   def isValidLong: Boolean = {
     val n = toBigInt
-    (n <= MaxLongValue) &&
-    (n >= MinLongValue) &&
-    (this == Algebraic(n))
+    n <= MaxLongValue &&
+    n >= MinLongValue &&
+    this == Algebraic(n)
   }
 
   /**
@@ -1230,7 +1230,7 @@ object Algebraic extends AlgebraicInstances {
           truncated
 
         case HALF_DOWN | HALF_UP | HALF_EVEN =>
-          val dangerZoneStart = (unscale / 2) - 1
+          val dangerZoneStart = unscale / 2 - 1
           val dangerZoneStop = dangerZoneStart + 2
           if (remainder >= dangerZoneStart && remainder <= dangerZoneStop) {
             val splitter = BigDecimal(
@@ -1267,7 +1267,7 @@ object Algebraic extends AlgebraicInstances {
             } else {
               truncated
             }
-          } else if (remainder >= (unscale - 1)) {
+          } else if (remainder >= unscale - 1) {
             val roundedUp = truncated.add(epsilon)
             if (exact >= Algebraic(BigDecimal(roundedUp))) {
               roundedUp
@@ -1407,7 +1407,7 @@ object Algebraic extends AlgebraicInstances {
           val lb = sub.lb / k
           val ub =
             if (sub.ub % k == 0) (sub.ub / k)
-            else ((sub.ub / k) + 1)
+            else (sub.ub / k + 1)
           Bound(sub.lc, sub.tc, sub.measure, lb, ub)
 
         case Pow(subExpr, k) =>
@@ -1516,7 +1516,7 @@ object Algebraic extends AlgebraicInstances {
       } else {
         Bound(
           sub.l,
-          (sub.u * (k - 1) * sub.l) / k
+          sub.u * (k - 1) * sub.l / k
         )
       }
     }

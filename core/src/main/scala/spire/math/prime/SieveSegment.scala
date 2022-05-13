@@ -51,18 +51,18 @@ import SieveUtil._
 object SieveSegment {
   val wheel30: Array[Int] = {
     var b: Long = 0L
-    b |= (1 << 1)
-    b |= (1 << 7)
-    b |= (1 << 11)
-    b |= (1 << 13)
-    b |= (1 << 17)
-    b |= (1 << 19)
-    b |= (1 << 23)
-    b |= (1 << 29)
-    val n: Long = b | (b << 30L)
+    b |= 1 << 1
+    b |= 1 << 7
+    b |= 1 << 11
+    b |= 1 << 13
+    b |= 1 << 17
+    b |= 1 << 19
+    b |= 1 << 23
+    b |= 1 << 29
+    val n: Long = b | b << 30L
     val arr = new Array[Int](15)
     cfor(0)(_ < 15, _ + 1) { i =>
-      arr(i) = ((n >>> (i * 2)) & 0xffffffffL).toInt
+      arr(i) = (n >>> i * 2 & 0xffffffffL).toInt
     }
     arr
   }

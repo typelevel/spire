@@ -45,7 +45,7 @@ trait CombinationLaws[A] extends Laws {
       name = "signedAdditiveCMonoid",
       parent = None,
       "ordered group" -> forAllSafe { (x: A, y: A, z: A) =>
-        !(x <= y) || (x + z <= y + z) // replaces (x <= y) ==> (x + z <= y + z)
+        !(x <= y) || x + z <= y + z // replaces (x <= y) ==> (x + z <= y + z)
       },
       "triangle inequality" -> forAllSafe { (x: A, y: A) =>
         (x + y).abs <= x.abs + y.abs
@@ -57,7 +57,7 @@ trait CombinationLaws[A] extends Laws {
       name = "signedAdditiveAbGroup",
       parent = Some(signedAdditiveCMonoid),
       "abs(x) equals abs(-x)" -> forAllSafe { (x: A) =>
-        x.abs === (-x).abs
+        x.abs === -x.abs
       }
     )
 

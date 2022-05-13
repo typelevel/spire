@@ -73,19 +73,19 @@ final class MersenneTwister64 protected[random] (mt: Array[Long], mti0: Int = 31
       var kk = 0
 
       while (kk < N_M) {
-        x = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
-        mt(kk) = mt(kk + M) ^ (x >>> 1) ^ mag01(x)
+        x = mt(kk) & UpperMask | mt(kk + 1) & LowerMask
+        mt(kk) = mt(kk + M) ^ x >>> 1 ^ mag01(x)
         kk += 1
       }
 
       while (kk < N_1) {
-        x = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
-        mt(kk) = mt(kk + M_N) ^ (x >>> 1) ^ mag01(x)
+        x = mt(kk) & UpperMask | mt(kk + 1) & LowerMask
+        mt(kk) = mt(kk + M_N) ^ x >>> 1 ^ mag01(x)
         kk += 1
       }
 
-      x = (mt(N_1) & UpperMask) | (mt(0) & LowerMask)
-      mt(N_1) = mt(M_1) ^ (x >>> 1) ^ mag01(x)
+      x = mt(N_1) & UpperMask | mt(0) & LowerMask
+      mt(N_1) = mt(M_1) ^ x >>> 1 ^ mag01(x)
 
       mti = 0
     }
@@ -94,10 +94,10 @@ final class MersenneTwister64 protected[random] (mt: Array[Long], mti0: Int = 31
     mti += 1
 
     // Tempering
-    x ^= (x >>> 29) & 0x5555555555555555L
-    x ^= (x << 17) & 0x71d67fffeda60000L
-    x ^= (x << 37) & 0xfff7eee000000000L
-    x ^= (x >>> 43)
+    x ^= x >>> 29 & 0x5555555555555555L
+    x ^= x << 17 & 0x71d67fffeda60000L
+    x ^= x << 37 & 0xfff7eee000000000L
+    x ^= x >>> 43
 
     x
   }

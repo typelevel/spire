@@ -79,7 +79,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
     if (arr.length == 0) throw new UnsupportedOperationException("empty array")
     var result = ev.zero
     cfor(0)(_ < arr.length, _ + 1) { i =>
-      result = (result * i / (i + 1)) + (arr(i) / (i + 1))
+      result = result * i / (i + 1) + arr(i) / (i + 1)
     }
     result
   }
@@ -88,7 +88,7 @@ final class ArrayOps[@sp A](arr: Array[A]) {
     if (arr.length == 0) throw new UnsupportedOperationException("empty array")
     var result: R = ev.zero
     cfor(0)(_ < arr.length, _ + 1) { i =>
-      result = (result * i / (i + 1)) + (f(arr(i)) / (i + 1))
+      result = result * i / (i + 1) + f(arr(i)) / (i + 1)
     }
     result
   }

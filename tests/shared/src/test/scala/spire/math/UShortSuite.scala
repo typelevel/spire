@@ -39,7 +39,7 @@ class UShortSuite extends munit.ScalaCheckSuite {
   }
 
   property("(a + b) - b == a") {
-    forAll { (a: UShort, b: UShort) => (a + b) - b == a }
+    forAll { (a: UShort, b: UShort) => a + b - b == a }
   }
 
   property("n / 0 -> ArithmeticException") {
@@ -64,7 +64,7 @@ class UShortSuite extends munit.ScalaCheckSuite {
 
   property("(n / d) * d + (n % d) == n") {
     forAll { (n: UShort, d: UShort) =>
-      (d != zero) ==> {
+      d != zero ==> {
         val q = n / d
         val r = n % d
         q * d + r == n
@@ -74,24 +74,24 @@ class UShortSuite extends munit.ScalaCheckSuite {
 
   property("n / d <= n") {
     forAll { (n: UShort, d: UShort) =>
-      (d != zero) ==> { n / d <= n == true }
+      d != zero ==> { n / d <= n == true }
     }
   }
 
   property("n % d < d") {
     forAll { (n: UShort, d: UShort) =>
-      (d != zero) ==> { n % d < d == true }
+      d != zero ==> { n % d < d == true }
     }
   }
 
   property("n + 1 > n") {
     forAll { (n: UShort) =>
-      (n != UShort.MaxValue) ==> { n + one > n == true }
+      n != UShort.MaxValue ==> { n + one > n == true }
     }
   }
 
   property("n + (-n) == 0") {
-    forAll { (n: UShort) => n + (-n) == zero }
+    forAll { (n: UShort) => n + -n == zero }
   }
 
   property("a < b") {

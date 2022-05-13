@@ -81,7 +81,7 @@ final class IntervalSeq[T] private (val belowAll: Boolean,
 
   def isSupersetOf(rhs: IntervalSeq[T]): Boolean = new IsSupersetOf[T](lhs, rhs).result
 
-  def isProperSupersetOf(rhs: IntervalSeq[T]): Boolean = isSupersetOf(rhs) && (lhs != rhs)
+  def isProperSupersetOf(rhs: IntervalSeq[T]): Boolean = isSupersetOf(rhs) && lhs != rhs
 
   private def copy(belowAll: Boolean, values: Array[T] = values, kinds: Array[Byte]) =
     new IntervalSeq[T](belowAll, values, kinds, order)
@@ -282,7 +282,7 @@ object IntervalSeq {
 
   private def classTag[T] = ClassTag.AnyRef.asInstanceOf[ClassTag[T]]
 
-  private def negateKind(kind: Byte) = ((~kind) & 3).toByte
+  private def negateKind(kind: Byte) = (~kind & 3).toByte
 
   private def valueAt(kind: Byte): Boolean = (kind & 1) != 0
 
@@ -365,7 +365,7 @@ object IntervalSeq {
     def collision(ai: Int, bi: Int): Unit = {
       val kind = op(ak(ai), bk(bi)).toByte
       val below = rBelow
-      if ((below && kind != K11) || (!below && kind != K00)) {
+      if (below && kind != K11 || !below && kind != K00) {
         rk(ri) = kind
         r(ri) = a(ai)
         ri += 1
@@ -619,7 +619,7 @@ object IntervalSeq {
       result
     }
 
-    def hasNext = (i < kinds.length) || (lower ne null)
+    def hasNext = i < kinds.length || (lower ne null)
 
     @tailrec
     override def next(): Interval[T] = {

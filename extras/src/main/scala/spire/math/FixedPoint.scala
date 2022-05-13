@@ -90,7 +90,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def +(rhs: Long)(implicit scale: FixedScale): FixedPoint = {
     val d = scale.denom
     val p = rhs * d
-    if (rhs == 0 || d == 0 || (rhs == p / d && ((rhs ^ d ^ p) & Long.MinValue) == 0))
+    if (rhs == 0 || d == 0 || rhs == p / d && ((rhs ^ d ^ p) & Long.MinValue) == 0)
       lhs + new FixedPoint(p)
 
     val n = SafeLong(rhs) * d + lhs.long
@@ -110,10 +110,10 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def -(rhs: Long)(implicit scale: FixedScale): FixedPoint = {
     val d = scale.denom
     val p = rhs * d
-    if (rhs == 0 || d == 0 || (rhs == p / d && ((rhs ^ d ^ p) & Long.MinValue) == 0))
+    if (rhs == 0 || d == 0 || rhs == p / d && ((rhs ^ d ^ p) & Long.MinValue) == 0)
       return lhs - new FixedPoint(p)
 
-    val n = SafeLong(lhs.long) - (SafeLong(rhs) * d)
+    val n = SafeLong(lhs.long) - SafeLong(rhs) * d
     if (n < Long.MinValue || Long.MaxValue < n)
       throw new FixedPointOverflow(n.toLong)
 
@@ -128,10 +128,10 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     val qq = rhs * q
     val rr =
       try {
-        (rhs * r) / d
+        rhs * r / d
       } catch {
         case _: FixedPointOverflow =>
-          val n = (SafeLong(rhs.long) * r) / d
+          val n = SafeLong(rhs.long) * r / d
           if (n.isValidLong)
             new FixedPoint(n.toLong)
           else
@@ -142,7 +142,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
 
   def *(rhs: Long): FixedPoint = {
     val n = lhs.long * rhs
-    if (lhs.long == 0 || rhs == 0 || (rhs == n / lhs.long && ((lhs.long ^ rhs ^ n) & Long.MinValue) == 0))
+    if (lhs.long == 0 || rhs == 0 || rhs == n / lhs.long && ((lhs.long ^ rhs ^ n) & Long.MinValue) == 0)
       new FixedPoint(n)
     else
       throw new FixedPointOverflow(n)
@@ -150,7 +150,7 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
 
   def /(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint =
     try {
-      (lhs * scale.denom) / rhs.long
+      lhs * scale.denom / rhs.long
     } catch {
       case _: FixedPointOverflow =>
         // TODO: it might be nice to use something a little more
@@ -175,13 +175,13 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def tmod(rhs: Long)(implicit scale: FixedScale): FixedPoint = {
     val d = scale.denom
     val p = rhs * d
-    if (rhs == 0 || d == 0 || (d == p / rhs && (((rhs ^ d ^ p) & Long.MinValue) == 0)))
+    if (rhs == 0 || d == 0 || d == p / rhs && ((rhs ^ d ^ p) & Long.MinValue) == 0)
       new FixedPoint(lhs.long % p)
     else
       lhs
   }
 
-  def tquot(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint = ((lhs - lhs).tquot(rhs)) / rhs
+  def tquot(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint = (lhs - lhs).tquot(rhs) / rhs
 
   def tquotmod(rhs: FixedPoint)(implicit scale: FixedScale): (FixedPoint, FixedPoint) = {
     val rem = lhs.tmod(rhs)
@@ -207,10 +207,10 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
       this
     } else if (long > 0) {
       val m = long % d
-      if (m >= (d - m)) FixedPoint(long / d + 1L) else FixedPoint(long / d)
+      if (m >= d - m) FixedPoint(long / d + 1L) else FixedPoint(long / d)
     } else {
       val m = -(long % d)
-      if (m >= (d - m)) FixedPoint(long / d - 1L) else FixedPoint(long / d)
+      if (m >= d - m) FixedPoint(long / d - 1L) else FixedPoint(long / d)
     }
   }
 

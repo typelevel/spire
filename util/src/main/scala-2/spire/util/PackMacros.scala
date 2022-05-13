@@ -21,10 +21,10 @@ import spire.macros.compat.Context
 
 trait PackMacros {
   @inline private[util] def ism(n: Int, shift: Int): Byte =
-    ((n >>> shift) & 0xff).toByte
+    (n >>> shift & 0xff).toByte
 
   @inline private[util] def lsm(n: Long, shift: Int): Byte =
-    ((n >>> shift) & 0xffL).toByte
+    (n >>> shift & 0xffL).toByte
 
   /**
    * index must be 0 <= index < 4
@@ -45,7 +45,7 @@ object PackMacros {
       case Literal(Constant(i: Int)) =>
         if (0 <= i && i < 4) {
           val offset = c.Expr[Int](Literal(Constant(24 - i * 8)))
-          reify { ((n.splice >>> offset.splice) & 0xff).toByte }
+          reify { (n.splice >>> offset.splice & 0xff).toByte }
         } else {
           c.abort(c.enclosingPosition, "index outside of 0-3")
         }
@@ -60,7 +60,7 @@ object PackMacros {
       case Literal(Constant(i: Int)) =>
         if (0 <= i && i < 8) {
           val offset = c.Expr[Int](Literal(Constant(56 - i * 8)))
-          reify { ((n.splice >>> offset.splice) & 0xff).toByte }
+          reify { (n.splice >>> offset.splice & 0xff).toByte }
         } else {
           c.abort(c.enclosingPosition, "index outside of 0-7")
         }

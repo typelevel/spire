@@ -64,7 +64,7 @@ abstract class Generator {
   /**
    * Generates a random integer using n bits of state (0 <= n <= 32).
    */
-  def nextBits(n: Int): Int = nextInt() >>> (32 - n)
+  def nextBits(n: Int): Int = nextInt() >>> 32 - n
 
   /**
    * Generates a random int between 0 (inclusive) and n (exclusive).
@@ -78,7 +78,7 @@ abstract class Generator {
     if (n < 1)
       throw new IllegalArgumentException("argument must be positive %d".format(n))
     else if ((n & -n) == n)
-      ((n * ((nextInt() >>> 1).toLong)) >>> 31).toInt
+      (n * (nextInt() >>> 1).toLong >>> 31).toInt
     else
       loop(nextInt() >>> 1)
   }
@@ -125,7 +125,7 @@ abstract class Generator {
     if (n < 1)
       throw new IllegalArgumentException("argument must be positive %d".format(n))
     else if ((n & -n) == n)
-      nextLong() & (n - 1)
+      nextLong() & n - 1
     else
       loop(nextLong() >>> 1)
   }
@@ -259,7 +259,7 @@ abstract class Generator {
     while (i < llen) {
       val n = nextInt()
       arr(i) = (n & 0xffff).toShort
-      arr(i + 1) = ((n >>> 16) & 0xffff).toShort
+      arr(i + 1) = (n >>> 16 & 0xffff).toShort
       i += 2
     }
 
@@ -285,9 +285,9 @@ abstract class Generator {
     while (i < llen) {
       val n = nextInt()
       arr(i) = (n & 0xff).toByte
-      arr(i + 1) = ((n >>> 8) & 0xff).toByte
-      arr(i + 2) = ((n >>> 16) & 0xff).toByte
-      arr(i + 3) = ((n >>> 24) & 0xff).toByte
+      arr(i + 1) = (n >>> 8 & 0xff).toByte
+      arr(i + 2) = (n >>> 16 & 0xff).toByte
+      arr(i + 3) = (n >>> 24 & 0xff).toByte
       i += 4
     }
 
@@ -453,7 +453,7 @@ abstract class Generator {
 
 abstract class IntBasedGenerator extends Generator { self =>
   def nextLong(): Long =
-    ((nextInt() & 0xffffffffL) << 32) | (nextInt() & 0xffffffffL)
+    (nextInt() & 0xffffffffL) << 32 | nextInt() & 0xffffffffL
 }
 
 abstract class LongBasedGenerator extends Generator { self =>
@@ -467,7 +467,7 @@ abstract class LongBasedGenerator extends Generator { self =>
     while (i < llen) {
       val n = nextLong()
       arr(i) = (n & 0xffffffff).toInt
-      arr(i + 1) = ((n >>> 32) & 0xffffffff).toInt
+      arr(i + 1) = (n >>> 32 & 0xffffffff).toInt
       i += 2
     }
 
@@ -481,9 +481,9 @@ abstract class LongBasedGenerator extends Generator { self =>
     while (i < llen) {
       val n = nextLong()
       arr(i) = (n & 0xffff).toShort
-      arr(i + 1) = ((n >>> 16) & 0xffff).toShort
-      arr(i + 2) = ((n >>> 32) & 0xffff).toShort
-      arr(i + 3) = ((n >>> 48) & 0xffff).toShort
+      arr(i + 1) = (n >>> 16 & 0xffff).toShort
+      arr(i + 2) = (n >>> 32 & 0xffff).toShort
+      arr(i + 3) = (n >>> 48 & 0xffff).toShort
       i += 4
     }
 
@@ -504,13 +504,13 @@ abstract class LongBasedGenerator extends Generator { self =>
     while (i < llen) {
       val n = nextLong()
       arr(i) = (n & 0xff).toByte
-      arr(i + 1) = ((n >>> 8) & 0xff).toByte
-      arr(i + 2) = ((n >>> 16) & 0xff).toByte
-      arr(i + 3) = ((n >>> 24) & 0xff).toByte
-      arr(i + 4) = ((n >>> 32) & 0xff).toByte
-      arr(i + 5) = ((n >>> 40) & 0xff).toByte
-      arr(i + 6) = ((n >>> 48) & 0xff).toByte
-      arr(i + 7) = ((n >>> 56) & 0xff).toByte
+      arr(i + 1) = (n >>> 8 & 0xff).toByte
+      arr(i + 2) = (n >>> 16 & 0xff).toByte
+      arr(i + 3) = (n >>> 24 & 0xff).toByte
+      arr(i + 4) = (n >>> 32 & 0xff).toByte
+      arr(i + 5) = (n >>> 40 & 0xff).toByte
+      arr(i + 6) = (n >>> 48 & 0xff).toByte
+      arr(i + 7) = (n >>> 56 & 0xff).toByte
       i += 8
     }
 

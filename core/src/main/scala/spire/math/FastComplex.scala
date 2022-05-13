@@ -128,7 +128,7 @@ object FastComplex {
 
   // encode two floats representing a complex number
   @inline final def encode(real: Float, imag: Float): Long =
-    (bits(real) & 0xffffffffL) | ((bits(imag) & 0xffffffffL) << 32)
+    bits(real) & 0xffffffffL | (bits(imag) & 0xffffffffL) << 32
 
   // encode two floats representing a complex number in polar form
   @inline final def polar(magnitude: Float, angle: Float): Long =
@@ -231,7 +231,7 @@ object FastComplex {
   } else if (imag(b) != 0.0f) {
     val im_b = imag(b)
     val re_b = real(b)
-    val len = (Math.pow(abs(a), re_b) / exp((angle(a) * im_b))).toFloat
+    val len = (Math.pow(abs(a), re_b) / exp(angle(a) * im_b)).toFloat
     val phase = (angle(a) * re_b + log(abs(a)) * im_b).toFloat
     polar(len, phase)
 

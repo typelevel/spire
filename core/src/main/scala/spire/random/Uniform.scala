@@ -78,7 +78,7 @@ object Uniform {
             min + BigInt(gen.nextLong(0, range0))
           })
         } else {
-          val mask0 = (1 << (width % 8)) - 1
+          val mask0 = (1 << width % 8) - 1
           val mask = if (mask0 == 0) 255 else mask0
           new DistFromGen[BigInt]({ gen =>
             val bytes = new Array[Byte]((width + 7) / 8)

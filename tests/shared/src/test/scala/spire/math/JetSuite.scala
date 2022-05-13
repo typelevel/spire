@@ -347,7 +347,7 @@ class JetSuite extends munit.FunSuite {
 
     def da(x: Double) = 4.0 * x - 3.14
     def db(x: Double) = 3.14 * 2.0 * x - (1.0 + scala.math.tan(x) * scala.math.tan(x))
-    def dc(x: Double) = 1.0 + (-1.0 / scala.math.sqrt(1.0 - x * x)) * scala.math.sin(x) +
+    def dc(x: Double) = 1.0 + -1.0 / scala.math.sqrt(1.0 - x * x) * scala.math.sin(x) +
       scala.math.acos(x) * scala.math.cos(x)
     def dabc(x: Double) = da(b(c(x))) * db(c(x)) * dc(x)
 

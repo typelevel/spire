@@ -66,7 +66,7 @@ object Complex extends ComplexInstances {
       }
     }
 
-    polar(f.one, (t.pi * 2 * x) / n)
+    polar(f.one, t.pi * 2 * x / n)
   }
 
   def rootsOfUnity[@sp(Float, Double) T](n: Int)(implicit f: Field[T], t: Trig[T]): Array[Complex[T]] = {
@@ -85,7 +85,7 @@ object Complex extends ComplexInstances {
         case `north` => i[T]
         case `west`  => -one[T]
         case `south` => -i[T]
-        case _       => polar(f.one, (t.pi * 2 * x) / n)
+        case _       => polar(f.one, t.pi * 2 * x / n)
       }
       roots(x) = c
       sum += c
@@ -230,7 +230,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
         throw new Exception("raising 0 to negative/complex power")
       Complex.zero[T]
     } else if (b.imag =!= f.zero) {
-      val len = (abs.fpow(b.real)) / t.exp(arg * b.imag)
+      val len = abs.fpow(b.real) / t.exp(arg * b.imag)
       val phase = arg * b.real + t.log(abs) * b.imag
       Complex.polar(len, phase)
     } else {
@@ -348,7 +348,7 @@ final case class Complex[@sp(Float, Double) T](real: T, imag: T)
   // important to keep in sync with Quaternion[_]
   override def hashCode: Int =
     if (anyIsZero(imag)) real.##
-    else (19 * real.##) + (41 * imag.##) + 97
+    else 19 * real.## + 41 * imag.## + 97
 
   // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {

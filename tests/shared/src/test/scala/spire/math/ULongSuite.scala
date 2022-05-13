@@ -37,7 +37,7 @@ class ULongSuite extends munit.ScalaCheckSuite {
   }
 
   property("(a + b) - b == a") {
-    forAll { (a: ULong, b: ULong) => (a + b) - b == a }
+    forAll { (a: ULong, b: ULong) => a + b - b == a }
   }
 
   property("n / 0 -> ArithmeticException") {
@@ -62,7 +62,7 @@ class ULongSuite extends munit.ScalaCheckSuite {
 
   property("(n / d) * d + (n % d) == n") {
     forAll { (n: ULong, d: ULong) =>
-      (d != zero) ==> {
+      d != zero ==> {
         val q = n / d
         val r = n % d
         q * d + r == n
@@ -72,7 +72,7 @@ class ULongSuite extends munit.ScalaCheckSuite {
 
   property("n / d <= n") {
     forAll { (n: ULong, d: ULong) =>
-      (d != zero) ==> {
+      d != zero ==> {
         n / d <= n == true
       }
     }
@@ -80,7 +80,7 @@ class ULongSuite extends munit.ScalaCheckSuite {
 
   property("n % d < d") {
     forAll { (n: ULong, d: ULong) =>
-      (d != zero) ==> {
+      d != zero ==> {
         n % d < d == true
       }
     }
@@ -88,14 +88,14 @@ class ULongSuite extends munit.ScalaCheckSuite {
 
   property("n + 1 > n") {
     forAll { (n: ULong) =>
-      (n != ULong.MaxValue) ==> {
+      n != ULong.MaxValue ==> {
         n + one > n == true
       }
     }
   }
 
   property("n + (-n) == 0") {
-    forAll { (n: ULong) => n + (-n) == zero }
+    forAll { (n: ULong) => n + -n == zero }
   }
 
   property("a < b") {

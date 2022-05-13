@@ -45,10 +45,10 @@ class XorShift1024Star(private val s: Array[Long], private var p: Int) extends L
 
   def nextLong(): Long = {
     val s0 = s(p)
-    p = (p + 1) & 15
+    p = p + 1 & 15
     var s1 = s(p)
     s1 ^= s1 << 31
-    s(p) = s1 ^ s0 ^ (s1 >>> 11) ^ (s0 >>> 30)
+    s(p) = s1 ^ s0 ^ s1 >>> 11 ^ s0 >>> 30
     s(p) * 1181783497276652981L
   }
 }

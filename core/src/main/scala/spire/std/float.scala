@@ -114,8 +114,8 @@ trait FloatIsTrig extends Trig[Float] {
   def cosh(x: Float): Float = Math.cosh(x.toDouble).toFloat
   def tanh(x: Float): Float = Math.tanh(x.toDouble).toFloat
 
-  def toRadians(a: Float): Float = (a * 2 * pi) / 360
-  def toDegrees(a: Float): Float = (a * 360) / (2 * pi)
+  def toRadians(a: Float): Float = a * 2 * pi / 360
+  def toDegrees(a: Float): Float = a * 360 / (2 * pi)
 }
 
 trait FloatOrder extends Order[Float] {
@@ -138,7 +138,7 @@ trait FloatSigned extends Signed[Float] with FloatOrder {
 trait FloatTruncatedDivision extends TruncatedDivisionCRing[Float] with FloatSigned {
   def order = this
   def toBigIntOpt(a: Float): Opt[BigInt] = if (a.isWhole) Opt(BigDecimal(a.toDouble).toBigInt) else Opt.empty[BigInt]
-  def tquot(a: Float, b: Float): Float = (a - (a % b)) / b
+  def tquot(a: Float, b: Float): Float = (a - a % b) / b
   def tmod(a: Float, b: Float): Float = a % b
 }
 

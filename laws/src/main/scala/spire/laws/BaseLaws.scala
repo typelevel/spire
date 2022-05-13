@@ -52,7 +52,7 @@ trait BaseLaws[A] extends Laws {
       ),
       "symmetry" -> forAllSafe((a1: A, a2: A) => MSA.distance(a1, a2) === MSA.distance(a2, a1)),
       "triangleInequality" -> forAllSafe((a1: A, a2: A, a3: A) =>
-        (MSA.distance(a1, a2) + MSA.distance(a2, a3)) >= MSA.distance(a1, a3)
+        MSA.distance(a1, a2) + MSA.distance(a2, a3) >= MSA.distance(a1, a3)
       )
     )
 

@@ -38,7 +38,7 @@ case class Term[@sp(Float, Double) C](coeff: C, exp: Int) { lhs =>
   def toTuple: (Int, C) = (exp, coeff)
 
   def eval(x: C)(implicit r: Semiring[C]): C =
-    if (exp != 0) coeff * (x.pow(exp)) else coeff
+    if (exp != 0) coeff * x.pow(exp) else coeff
 
   def isIndexZero: Boolean =
     exp == 0

@@ -120,12 +120,12 @@ class ULong(val signed: Long) extends AnyVal {
       if (half < d) {
         ULong(1L)
       } else {
-        ULong(((half / d) << 1) + (((half % d) << 1) + (n & 1)) / d)
+        ULong((half / d << 1) + ((half % d << 1) + (n & 1)) / d)
       }
     }
   }
 
-  final def %(that: ULong): ULong = this - (this / that) * that
+  final def %(that: ULong): ULong = this - this / that * that
 
   final def /%(that: ULong): (ULong, ULong) = {
     val q = this / that

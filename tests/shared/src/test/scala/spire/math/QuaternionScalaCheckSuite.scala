@@ -36,13 +36,13 @@ class QuaternionScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("q + -q = 0") {
     forAll { (q: H) =>
-      q + (-q) == zero
+      q + -q == zero
     }
   }
 
   property("q1 + -q2 = q1 - q2") {
     forAll { (q1: H, q2: H) =>
-      q1 + (-q2) == q1 - q2
+      q1 + -q2 == q1 - q2
     }
   }
 
@@ -54,7 +54,7 @@ class QuaternionScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("(q1 + q2) + a3 = q1 + (q2 + q3)") {
     forAll { (q1: H, q2: H, q3: H) =>
-      (q1 + q2) + q3 == q1 + (q2 + q3)
+      q1 + q2 + q3 == q1 + (q2 + q3)
     }
   }
 
@@ -86,19 +86,19 @@ class QuaternionScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("(q1 * q2) * a3 = q1 * (q2 * q3)") {
     forAll { (q1: H, q2: H, q3: H) =>
-      (q1 * q2) * q3 == q1 * (q2 * q3)
+      q1 * q2 * q3 == q1 * (q2 * q3)
     }
   }
 
   property("q * q.reciprocal = 1") {
     forAll { (q: H) =>
-      (q != zero) ==> ((q * q.reciprocal) == one)
+      q != zero ==> (q * q.reciprocal == one)
     }
   }
 
   property("1 / q = 1.reciprocal") {
     forAll { (q: H) =>
-      (q != zero) ==> ((one / q) == q.reciprocal)
+      q != zero ==> (one / q == q.reciprocal)
     }
   }
 

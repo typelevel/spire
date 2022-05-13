@@ -40,10 +40,10 @@ class RingIntervalSuite extends munit.FunSuite {
     assertEquals(-Interval.fromBounds(Unbound(), Closed(c)), Interval.fromBounds(Closed(-c), Unbound()))
   }
   test("(c, ∞) * (-c) =  (-∞, -c * c), c > 0") {
-    assertEquals(Interval.fromBounds(Open(c), Unbound()) * (-c), Interval.fromBounds(Unbound(), Open(-c * c)))
+    assertEquals(Interval.fromBounds(Open(c), Unbound()) * -c, Interval.fromBounds(Unbound(), Open(-c * c)))
   }
   test("(-∞, c] * (-c) =  [-c * c, ∞), c > 0") {
-    assertEquals(Interval.fromBounds(Unbound(), Closed(c)) * (-c), Interval.fromBounds(Closed(-c * c), Unbound()))
+    assertEquals(Interval.fromBounds(Unbound(), Closed(c)) * -c, Interval.fromBounds(Closed(-c * c), Unbound()))
   }
   test("Interval multiplication bug #372") {
     val a = Interval(-1, 1)

@@ -127,7 +127,7 @@ class Trilean(val value: Int) extends AnyVal { lhs =>
   // U T U U
   // F T T T
   def imp(rhs: Trilean): Trilean =
-    (!lhs) | rhs
+    !lhs | rhs
 
   def nand(rhs: Trilean): Trilean =
     !(lhs & rhs)

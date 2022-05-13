@@ -243,7 +243,7 @@ object CrossValidation {
    * Generic cross-validator that can be provided an arbitrary method to score predictor results.
    */
   def crossValidate[V, @sp(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
-    train: CoordinateSpace[V, F] => List[(V, K)] => (V => K)
+    train: CoordinateSpace[V, F] => List[(V, K)] => V => K
   )(score: List[Result[V, K]] => F): F = {
     implicit val field = dataset.space.scalar
 
@@ -269,7 +269,7 @@ object CrossValidation {
    * For cross-validating classification, we use the accuracy to score the predictor.
    */
   def crossValidateClassification[V, @sp(Double) F, K](dataset: DataSet[V, F, K], k: Int = 10)(
-    train: CoordinateSpace[V, F] => List[(V, K)] => (V => K)
+    train: CoordinateSpace[V, F] => List[(V, K)] => V => K
   ): F = {
     implicit val field = dataset.space.scalar
 
@@ -286,7 +286,7 @@ object CrossValidation {
    * For cross-validating regression, we use the R^2 to score the predictor.
    */
   def crossValidateRegression[V, @sp(Double) F](dataset: DataSet[V, F, F], k: Int = 10)(
-    train: CoordinateSpace[V, F] => List[(V, F)] => (V => F)
+    train: CoordinateSpace[V, F] => List[(V, F)] => V => F
   ): F = {
     implicit val field = dataset.space.scalar
 

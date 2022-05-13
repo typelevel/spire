@@ -313,7 +313,7 @@ private[math] case class FloatNumber(n: Double) extends Number { lhs =>
   def isExact: Boolean = false
 
   def underlying: java.lang.Double = java.lang.Double.valueOf(n)
-  def isWhole: Boolean = (n % 1) == 0.0
+  def isWhole: Boolean = n % 1 == 0.0
   def doubleValue: Double = n
   def floatValue: Float = n.toFloat
   def longValue: Long = n.toLong
@@ -686,8 +686,8 @@ private[math] trait NumberIsTrig extends Trig[Number] {
   def cosh(x: Number): Number = Math.cosh(x.toDouble)
   def tanh(x: Number): Number = Math.tanh(x.toDouble)
 
-  def toRadians(a: Number): Number = (a * 2 * pi) / 360
-  def toDegrees(a: Number): Number = (a * 360) / (2 * pi)
+  def toRadians(a: Number): Number = a * 2 * pi / 360
+  def toDegrees(a: Number): Number = a * 360 / (2 * pi)
 }
 
 private[math] trait NumberOrder extends Order[Number] {

@@ -250,7 +250,7 @@ class ScalaVsSpireBenchmarks {
   }
 
   @tailrec final def gcdSpire[@sp(Int) A](a: A, b: A)(implicit ev1: EuclideanRing[A], ev2: Eq[A]): A = {
-    if ((a.emod(b)) === ev1.zero) b else gcdSpire(b, a.emod(b))
+    if (a.emod(b) === ev1.zero) b else gcdSpire(b, a.emod(b))
   }
 
   def doGcdSpire[@sp(Int) A: EuclideanRing: Eq](as: Array[A], bs: Array[A], cs: Array[A]): Unit = {

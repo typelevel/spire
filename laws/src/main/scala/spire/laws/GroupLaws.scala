@@ -43,7 +43,7 @@ trait GroupLaws[A] extends Laws {
   def semigroup(implicit A: Semigroup[A]) = new GroupProperties(
     name = "semigroup",
     parent = None,
-    "associative" -> forAllSafe((x: A, y: A, z: A) => ((x |+| y) |+| z) === (x |+| (y |+| z))),
+    "associative" -> forAllSafe((x: A, y: A, z: A) => (x |+| y |+| z) === (x |+| (y |+| z))),
     "combineN(a, 1) === a" -> forAllSafe((a: A) => A.combineN(a, 1) === a),
     "combineN(a, 2) === a |+| a" -> forAllSafe((a: A) => A.combineN(a, 2) === (a |+| a))
   )
@@ -55,7 +55,7 @@ trait GroupLaws[A] extends Laws {
     "right identity" -> forAllSafe((x: A) => (x |+| A.empty) === x),
     "combineN(a, 0) === id" -> forAllSafe((a: A) => A.combineN(a, 0) === A.empty),
     "combineAll(Nil) === id" -> forAllSafe((a: A) => A.combineAll(Nil) === A.empty),
-    "isId" -> forAllSafe((x: A) => (x === A.empty) === (x.isEmpty))
+    "isId" -> forAllSafe((x: A) => x === A.empty === x.isEmpty)
   )
 
   def cMonoid(implicit A: CMonoid[A]) = new GroupProperties(
@@ -83,7 +83,7 @@ trait GroupLaws[A] extends Laws {
     base = semigroup(A.additive),
     parent = None,
     "sumN(a, 1) === a" -> forAllSafe((a: A) => A.sumN(a, 1) === a),
-    "sumN(a, 2) === a + a" -> forAllSafe((a: A) => A.sumN(a, 2) === (a + a))
+    "sumN(a, 2) === a + a" -> forAllSafe((a: A) => A.sumN(a, 2) === a + a)
   )
 
   def additiveMonoid(implicit A: AdditiveMonoid[A]) = new AdditiveProperties(
@@ -102,7 +102,7 @@ trait GroupLaws[A] extends Laws {
   def additiveGroup(implicit A: AdditiveGroup[A]) = new AdditiveProperties(
     base = group(A.additive),
     parent = Some(additiveMonoid),
-    "minus consistent" -> forAllSafe((x: A, y: A) => (x - y) === (x + (-y)))
+    "minus consistent" -> forAllSafe((x: A, y: A) => x - y === x + -y)
   )
 
   def additiveAbGroup(implicit A: AdditiveAbGroup[A]) = new AdditiveProperties(

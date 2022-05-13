@@ -73,15 +73,15 @@ class RationalScalaCheckSuite extends munit.ScalaCheckSuite {
     x.floor <= x.round && x.round <= x.ceil
   }
 
-  rat1("x + x == 2x") { (x: Q) => (x + x) == 2 * x }
+  rat1("x + x == 2x") { (x: Q) => x + x == 2 * x }
   rat1("x - x == 0") { (x: Q) => x - x == Rational(0) }
-  rat1("x * x == x^2") { (x: Q) => (x * x) == x.pow(2) }
+  rat1("x * x == x^2") { (x: Q) => x * x == x.pow(2) }
   rat1("(x^-1)^3 == x^-3") { (x: Q) => if (x != 0) x.reciprocal.pow(3) == x.pow(-3) }
   rat1("x / x == 1") { (x: Q) => if (x != 0) x / x == Rational(1) }
 
   rat2("x + y == y + x") { (x: Q, y: Q) => x + y == y + x }
   rat2("x - y == -y + x") { (x: Q, y: Q) => x - y == -y + x }
-  rat2("x + y - x == y") { (x: Q, y: Q) => (x + y) - x == y }
+  rat2("x + y - x == y") { (x: Q, y: Q) => x + y - x == y }
   rat2("x / y == x * (y^-1)") { (x: Q, y: Q) => if (y != 0) x / y == x * y.reciprocal }
 
   rat3("(x + y) * z == x * z + y * z") { (x: Q, y: Q, z: Q) => (x + y) * z == x * z + y * z }
@@ -131,8 +131,8 @@ class RationalScalaCheckSuite extends munit.ScalaCheckSuite {
 
     forAll { (x: Rational, n: SafeLong) =>
       val y = x.limitTo(n.abs)
-      (y.numerator <= n) == true &&
-      (y.denominator <= n) == true
+      y.numerator <= n == true &&
+      y.denominator <= n == true
     }
   }
 }

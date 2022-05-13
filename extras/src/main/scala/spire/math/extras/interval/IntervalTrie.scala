@@ -99,13 +99,13 @@ object IntervalTrie {
       // sign and magnitude signed integer
       val signAndMagnitude: Int = java.lang.Float.floatToIntBits(value)
       // two's complement signed integer: if the sign bit is set, negate everything except the sign bit
-      val twosComplement: Long = if (signAndMagnitude >= 0) signAndMagnitude else (-signAndMagnitude | (1L << 63))
+      val twosComplement: Long = if (signAndMagnitude >= 0) signAndMagnitude else (-signAndMagnitude | 1L << 63)
       twosComplement
     }
 
     def fromLong(twosComplement: Long): Float = {
       // sign and magnitude signed integer: if the sign bit is set, negate everything except the sign bit
-      val signAndMagnitude = if (twosComplement >= 0) twosComplement else (-twosComplement | (1L << 63))
+      val signAndMagnitude = if (twosComplement >= 0) twosComplement else (-twosComplement | 1L << 63)
       // double from sign and magnitude signed integer
       java.lang.Float.intBitsToFloat(signAndMagnitude.toInt)
     }
@@ -130,13 +130,13 @@ object IntervalTrie {
       // sign and magnitude signed integer
       val signAndMagnitude = java.lang.Double.doubleToLongBits(value)
       // two's complement signed integer: if the sign bit is set, negate everything except the sign bit
-      val twosComplement = if (signAndMagnitude >= 0) signAndMagnitude else (-signAndMagnitude | (1L << 63))
+      val twosComplement = if (signAndMagnitude >= 0) signAndMagnitude else (-signAndMagnitude | 1L << 63)
       twosComplement
     }
 
     def fromLong(twosComplement: Long): Double = {
       // sign and magnitude signed integer: if the sign bit is set, negate everything except the sign bit
-      val signAndMagnitude = if (twosComplement >= 0) twosComplement else (-twosComplement | (1L << 63))
+      val signAndMagnitude = if (twosComplement >= 0) twosComplement else (-twosComplement | 1L << 63)
       // double from sign and magnitude signed integer
       java.lang.Double.longBitsToDouble(signAndMagnitude)
     }
@@ -290,7 +290,7 @@ object IntervalTrie {
         Unbound()
     }
     val last = op(Unbound(), a0, a)
-    if (a0 ^ ((a ne null) && a.sign))
+    if (a0 ^ (a ne null) && a.sign)
       f(Interval.fromBounds(last, Unbound()))
   }
 
@@ -485,7 +485,7 @@ object IntervalTrie {
         !DisjointCalculator(lhs.belowAll, lhs.tree, rhs.belowAll, rhs.tree)
     }
 
-    def isProperSupersetOf(rhs: IntervalTrie[T]) = isSupersetOf(rhs) && (rhs != lhs)
+    def isProperSupersetOf(rhs: IntervalTrie[T]) = isSupersetOf(rhs) && rhs != lhs
 
     def intervals = new Iterable[Interval[T]] {
       import scala.collection.mutable.ArrayBuffer

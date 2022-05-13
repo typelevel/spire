@@ -92,9 +92,9 @@ class PolynomialSamplingScalaCheckSuite extends munit.ScalaCheckSuite {
     property(s"$name binop *") { testBinop(_ * _)(_ * _) }
     property(s"$name binop /~ and %") {
       testBinopNonzero { (x, y) =>
-        (x.equot(y)) * y + (x.emod(y))
+        x.equot(y) * y + x.emod(y)
       } { (a, b) =>
-        (a.equot(b)) * b + (a.emod(b))
+        a.equot(b) * b + a.emod(b)
       }
     }
   }

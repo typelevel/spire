@@ -75,7 +75,7 @@ final class Well1024a protected[random] (state: Array[Int], i0: Int) extends Int
 
   def nextInt(): Int = {
 
-    @inline def map(r: Int): Int = (i + r) & R_1
+    @inline def map(r: Int): Int = i + r & R_1
 
     val z0: Int = state(map(R_1))
     val z1: Int = state(i) ^ mat0pos(8, state(map(M1)))
@@ -120,8 +120,8 @@ object Well1024a extends GeneratorCompanion[Well1024a, (Array[Int], Int)] {
   // Third parameter of the algorithm.
   @inline final private val M3: Int = 10
 
-  @inline final private def mat0pos(t: Int, v: Int): Int = v ^ (v >>> t)
-  @inline final private def mat0neg(t: Int, v: Int): Int = v ^ (v << -t)
+  @inline final private def mat0pos(t: Int, v: Int): Int = v ^ v >>> t
+  @inline final private def mat0neg(t: Int, v: Int): Int = v ^ v << -t
 
   def randomSeed(): (Array[Int], Int) =
     (Utils.seedFromInt(R, Utils.intFromTime()), 0)

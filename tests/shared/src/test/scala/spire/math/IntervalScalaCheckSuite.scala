@@ -32,16 +32,16 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
   property("x ⊆ (x | y) && y ⊆ (x | y)") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
       val z = x | y
-      (z.isSupersetOf(x)) &&
-      (z.isSupersetOf(y))
+      z.isSupersetOf(x) &&
+      z.isSupersetOf(y)
     }
   }
 
   property("(x & y) ⊆ x && (x & y) ⊆ y") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
       val z = x & y
-      (x.isSupersetOf(z)) &&
-      (y.isSupersetOf(z))
+      x.isSupersetOf(z) &&
+      y.isSupersetOf(z)
     }
   }
 
@@ -50,8 +50,8 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
   property("(x -- y) ⊆ x && (x -- y) & y = Ø") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
       (x -- y).foreach { zi =>
-        (zi.isSubsetOf(x)) &&
-        (zi.intersects(y))
+        zi.isSubsetOf(x) &&
+        zi.intersects(y)
       }
     }
   }
@@ -59,20 +59,20 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
   property("(x -- Ø) = x") {
     forAll { (x: Interval[Rational]) =>
       if (x.nonEmpty) {
-        (x -- Interval.empty[Rational]) == List(x)
+        x -- Interval.empty[Rational] == List(x)
       } else true
     }
   }
 
   property("(x -- x) = Ø") {
     forAll { (x: Interval[Rational]) =>
-      (x -- x) == Nil
+      x -- x == Nil
     }
   }
 
   property("(x -- (-∞, ∞)) = Ø") {
     forAll { (x: Interval[Rational]) =>
-      (x -- Interval.all[Rational]) == Nil
+      x -- Interval.all[Rational] == Nil
     }
   }
 
@@ -93,13 +93,13 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
           () =>
             rng.nextInt(5) match {
               case 0 => x
-              case _ => x + (Rational(rng.nextGaussian).abs * Long.MaxValue)
+              case _ => x + Rational(rng.nextGaussian).abs * Long.MaxValue
             }
         case (_, ValueBound(y)) =>
           () =>
             rng.nextInt(5) match {
               case 4 => y
-              case _ => y - (Rational(rng.nextGaussian).abs * Long.MaxValue)
+              case _ => y - Rational(rng.nextGaussian).abs * Long.MaxValue
             }
         case (_, _) => () => Rational(rng.nextGaussian) * Long.MaxValue
       }
@@ -185,9 +185,9 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
       // a < b
       val i = Interval.atOrBelow(a)
       val j = Interval.atOrAbove(b)
-      (i < j) &&
+      i < j &&
       !(i >= j) &&
-      (j > i) &&
+      j > i &&
       !(j <= i)
     }
   }
