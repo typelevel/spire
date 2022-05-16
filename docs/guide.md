@@ -782,6 +782,9 @@ import Real.{sin, cos}
 // will return Real(1) no matter what value is provided
 def circle(a: Real): Real = sqrt(cos(a).pow(2) + sin(a).pow(2))
 ```
+Keep in mind that precision of roots is not perfectly accurate. See
+[Irrational and Transcendental type classes](#irrational-and-transcendental-type classes)
+for more information.
 
 One interesting consequence of the design of computable real numbers
 is non-continuous operations (such as sign tests, comparisons, and
