@@ -18,7 +18,6 @@ package math
 
 import spire.implicits._
 import spire.laws.arb.{rational, real}
-import spire.laws.gen.realFromLongs
 
 import ArbitrarySupport._
 import Ordinal._
@@ -115,30 +114,6 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
   property("x.pow(3) = x * x * x") {
     forAll { (x: Real) =>
       x.pow(3) == x * x * x
-    }
-  }
-
-  property("x.pow(k).nroot(k) = x") {
-    implicit val realArb: Arbitrary[Real] = Arbitrary(realFromLongs)
-    forAll { (x0: Real, k: Sized[Int, _1, _10]) =>
-      val x = x0.abs
-      x.pow(k.num).nroot(k.num) == x
-    }
-  }
-
-  property("x.nroot(k).pow(k) = x") {
-    implicit val realArb: Arbitrary[Real] = Arbitrary(realFromLongs)
-    forAll { (x0: Real, k: Sized[Int, _1, _10]) =>
-      val x = x0.abs
-      x.nroot(k.num).pow(k.num) == x
-    }
-  }
-
-  property("x.nroot(-k).pow(-k) = x") {
-    implicit val realArb: Arbitrary[Real] = Arbitrary(realFromLongs)
-    forAll { (x0: NonZero[Real], k: Sized[Int, _1, _10]) =>
-      val x = x0.num.abs
-      x.nroot(-k.num).pow(-k.num) == x
     }
   }
 
