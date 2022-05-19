@@ -122,24 +122,23 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
     Arbitrary.arbTuple2(Arbitrary(realFromLongs), Arbitrary(Arbitrary.arbitrary[Sized[Int, _1, _10]]))
 
   property("x.pow(k).nroot(k) = x") {
-    forAll(realSizedArb.arbitrary){ (x0: Real, k: Sized[Int, _1, _10]) =>
+    forAll(realSizedArb.arbitrary) { (x0: Real, k: Sized[Int, _1, _10]) =>
       val x = x0.abs
       x.pow(k.num).nroot(k.num) == x
     }
   }
 
   property("x.nroot(k).pow(k) = x") {
-    forAll(realSizedArb.arbitrary){ (x0: Real, k: Sized[Int, _1, _10]) =>
+    forAll(realSizedArb.arbitrary) { (x0: Real, k: Sized[Int, _1, _10]) =>
       val x = x0.abs
       x.nroot(k.num).pow(k.num) == x
     }
   }
 
   property("x.nroot(-k).pow(-k) = x") {
-    forAll(
-      nonZeroSpireImplicit[Real](implicitly, implicitly, Arbitrary(realFromLongs)).arbitrary,
-      Arbitrary.arbitrary[Sized[Int, _1, _10]]){
-      (x0: NonZero[Real], k: Sized[Int, _1, _10]) =>
+    forAll(nonZeroSpireImplicit[Real](implicitly, implicitly, Arbitrary(realFromLongs)).arbitrary,
+           Arbitrary.arbitrary[Sized[Int, _1, _10]]
+    ) { (x0: NonZero[Real], k: Sized[Int, _1, _10]) =>
       val x = x0.num.abs
       x.nroot(-k.num).pow(-k.num) == x
     }
