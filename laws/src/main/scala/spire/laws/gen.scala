@@ -66,13 +66,13 @@ object gen {
   lazy val natural: Gen[Natural] =
     Gen.oneOf(arbitrary[Long].map(n => Natural(n & Long.MaxValue)), arbitrary[BigInt].map(n => Natural(n.abs)))
 
-  lazy val rational: Gen[Rational] = {
-    val rationalFromLongs: Gen[Rational] =
-      for {
-        n <- arbitrary[Long]
-        d <- arbitrary[Long].map(n => if (n == 0) 1L else n)
-      } yield Rational(n, d)
+  lazy val rationalFromLongs: Gen[Rational] =
+    for {
+      n <- arbitrary[Long]
+      d <- arbitrary[Long].map(n => if (n == 0) 1L else n)
+    } yield Rational(n, d)
 
+  lazy val rational: Gen[Rational] = {
     val rationalFromSafeLongs: Gen[Rational] =
       for {
         n <- safeLong
@@ -105,6 +105,9 @@ object gen {
 
   lazy val real: Gen[Real] =
     rational.map(Real(_))
+
+  lazy val realFromLongs: Gen[Real] =
+    rationalFromLongs.map(Real(_))
 
   lazy val sign: Gen[Sign] =
     Gen.oneOf(Signed.Positive, Signed.Zero, Signed.Negative)

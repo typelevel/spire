@@ -18,9 +18,11 @@ package math
 
 import spire.implicits._
 import spire.laws.arb.{rational, real}
+import spire.laws.gen.realFromLongs
 
 import ArbitrarySupport._
 import Ordinal._
+import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
 
 class RealScalaCheckSuite extends munit.ScalaCheckSuite {
@@ -112,26 +114,28 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
 
   property("x.pow(3) = x * x * x") {
     forAll { (x: Real) =>
-      x.pow(2) == x * x
+      x.pow(3) == x * x * x
     }
   }
 
   property("x.pow(k).nroot(k) = x") {
-    forAll { (x0: Real, k: Sized[Int, _1, _10]) =>
+    forAll(realFromLongs, Arbitrary.arbitrary[Sized[Int, _1, _10]]) { (x0: Real, k: Sized[Int, _1, _10]) =>
       val x = x0.abs
       x.pow(k.num).nroot(k.num) == x
     }
   }
 
   property("x.nroot(k).pow(k) = x") {
-    forAll { (x0: Real, k: Sized[Int, _1, _10]) =>
+    forAll(realFromLongs, Arbitrary.arbitrary[Sized[Int, _1, _10]]) { (x0: Real, k: Sized[Int, _1, _10]) =>
       val x = x0.abs
       x.nroot(k.num).pow(k.num) == x
     }
   }
 
   property("x.nroot(-k).pow(-k) = x") {
-    forAll { (x0: NonZero[Real], k: Sized[Int, _1, _10]) =>
+    forAll(nonZeroSpireImplicit[Real](implicitly, implicitly, Arbitrary(realFromLongs)).arbitrary,
+           Arbitrary.arbitrary[Sized[Int, _1, _10]]
+    ) { (x0: NonZero[Real], k: Sized[Int, _1, _10]) =>
       val x = x0.num.abs
       x.nroot(-k.num).pow(-k.num) == x
     }
@@ -195,28 +199,6 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
       ma2 * Real.sin(ph2) == re * im * Real(2)
     }
   }
-
-  // def sample1(name: String)(f: Real => Real): Unit = {
-  //   property(name) {
-  //     forAll { (x0: Rational, i0: Byte, j0: Byte) =>
-  //       val x = f(Real(x0.abs))
-  //       val i = (i0 & 0xff) % 250 + 1
-  //       val j = (j0 & 0xff) % 250 + 1
-  //       val (k1, k2) = if (i <= j) (i, j) else (j, i)
-  //       val v1 = x(k1)
-  //       val v2 = x(k2)
-  //       val v3 = Real.roundUp(Rational(v2, SafeLong(2).pow(k2 - k1)))
-  //       v1 == v3
-  //     }
-  //   }
-  // }
-
-  // sample1("sample1 id")(x => x)
-  // sample1("sample1 negate")(x => -x)
-  // sample1("sample1 +")(x => x + x)
-  // sample1("sample1 *")(x => x * x)
-  // sample1("sample1 sqrt")(_.sqrt())
-  // sample1("sample1 pow(2)")(_.pow(2))
 
   def arcSample(f: Rational => Rational)(g: Double => Double, h: Real => Real): String =
     (-8 to 8).map { i =>
