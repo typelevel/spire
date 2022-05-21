@@ -1009,6 +1009,9 @@
 
 </span><span class="comment">// will return Real(1) no matter what value is provided
 </span><span class="keyword">def</span><span> </span><span class="declaration-name">circle</span><span>(</span><span class="identifier">a</span><span>: </span><span class="type-name">Real</span><span>): </span><span class="type-name">Real</span><span> = </span><span class="identifier">sqrt</span><span>(</span><span class="identifier">cos</span><span>(</span><span class="identifier">a</span><span>).</span><span class="identifier">pow</span><span>(</span><span class="number-literal">2</span><span>) + </span><span class="identifier">sin</span><span>(</span><span class="identifier">a</span><span>).</span><span class="identifier">pow</span><span>(</span><span class="number-literal">2</span><span>))</span></code></pre>
+        <p>Keep in mind that precision of roots is not perfectly accurate. See
+        <a href="#irrational-and-transcendental-type-classes">Irrational and Transcendental type classes</a>
+        for more information.</p>
         <p>One interesting consequence of the design of computable real numbers
         is non-continuous operations (such as sign tests, comparisons, and
         equality) cannot be performed exactly. If <code>x.apply(p)</code> returns <code>0</code>,
