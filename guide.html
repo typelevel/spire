@@ -123,7 +123,10 @@
           <li class="level2"><a href="#natural">Natural</a></li>
           <li class="level2"><a href="#ubyte-ushort-uint-and-ulong">UByte, UShort, UInt, and ULong</a></li>
           <li class="level2"><a href="#fixedpoint">FixedPoint</a></li>
+          <li class="level2"><a href="#complex-a-and-quaternion-a">Complex[A] and Quaternion[A]</a></li>
           <li class="level2"><a href="#number">Number</a></li>
+          <li class="level2"><a href="#interval-a">Interval[A]</a></li>
+          <li class="level2"><a href="#polynomial-c">Polynomial[C]</a></li>
           <li class="level2"><a href="#algebraic">Algebraic</a></li>
           <li class="level2"><a href="#real">Real</a></li>
           <li class="level1"><a href="#which-number-types-should-i-use">Which number types should I use?</a></li>
@@ -133,6 +136,7 @@
           <li class="level2"><a href="#other-types">Other types</a></li>
           <li class="level1"><a href="#pseudo-random-number-generators-distributions-etc">Pseudo-Random Number Generators, Distributions, etc</a></li>
           <li class="level2"><a href="#pseudo-random-number-generators">Pseudo-Random Number Generators</a></li>
+          <li class="level2"><a href="#creation-random-values-with-dist-a">Creation random values with Dist[A]</a></li>
           <li class="level2"><a href="#distributions">Distributions</a></li>
         </ul>
 
@@ -873,6 +877,8 @@
         only be used in situations where a large number of rational numbers
         with the same denominator are needed, and efficiency is very
         important.</p>
+        
+        <h4 id="complex-a-and-quaternion-a" class="section">Complex[A] and Quaternion[A]<a class="anchor-link right" href="#complex-a-and-quaternion-a"><i class="icofont-laika">&#xef71;</i></a></h4>
         <p>These generic types represent complex numbers (<code>x + yi</code>) and
         quaternions (<code>w + xi + xj + zk</code>) respectively. They can be
         parameterized with any fractional type <code>A</code> which has a <code>Field[A]</code>,
@@ -894,6 +900,8 @@
         <p><code>Number</code> is a good choice for users who want simple and correct
         numbers. The type keeps operations as safe as possible, while
         providing access to all operators and methods.</p>
+        
+        <h4 id="interval-a" class="section">Interval[A]<a class="anchor-link right" href="#interval-a"><i class="icofont-laika">&#xef71;</i></a></h4>
         <p>Interval supports arithmetic across a range of possible <code>A</code>
         values. This can be thought of as representing uncertainty about a
         single, actual value, or as operating on the entire set of values
@@ -923,6 +931,8 @@
         is because we can multiply the interval by 2 to get <code>(6, 8)</code> which is
         clearly not empty. The underlying continuous interval contains values
         which when multiplied by a scalar become valid <code>Int</code> values.</p>
+        
+        <h4 id="polynomial-c" class="section">Polynomial[C]<a class="anchor-link right" href="#polynomial-c"><i class="icofont-laika">&#xef71;</i></a></h4>
         <p>Currently Spire supports univariate polynomials. These are polynomials
         with a single variable (e.g. <em>x</em>) with the following structure:</p>
         <pre><code>c0 + (c1 * x^1) + (c2 * x^2) + ... + (cn * x^n)</code></pre>
@@ -1151,6 +1161,8 @@ z)</code>). These types are often faster than precise types but can be risky to 
         generator is returned as well, which allows these generators to be used in a
         pure-functional context. The same <code>Dist[A]</code> instances that would be used with
         a mutable generator are also applicable here.</p>
+        
+        <h4 id="creation-random-values-with-dist-a" class="section">Creation random values with Dist[A]<a class="anchor-link right" href="#creation-random-values-with-dist-a"><i class="icofont-laika">&#xef71;</i></a></h4>
         <p>The <code>Dist[A]</code> type class represents a strategy for generating a
         distribution of <code>A</code> values given a <code>Generator</code> instance. <code>Dist[A]</code>
         makes no guarantee as to how the <code>A</code> values are distributed (for
