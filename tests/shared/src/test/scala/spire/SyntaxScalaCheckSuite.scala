@@ -187,13 +187,13 @@ trait BaseSyntaxSuite {
   def testSemigroupSyntax[A: Semigroup: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.semigroup._
-    ((a |+| b) === Semigroup[A].combine(a, b))
+    (a |+| b) === Semigroup[A].combine(a, b)
   }
 
   def testMonoidSyntax[A: Monoid: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.monoid._
-    ((a |+| b) === Monoid[A].combine(a, b))
+    (a |+| b) === Monoid[A].combine(a, b)
   }
 
   def testGroupSyntax[A: Group: Eq](a: A, b: A) = {
@@ -207,13 +207,13 @@ trait BaseSyntaxSuite {
   def testAdditiveSemigroupSyntax[A: AdditiveSemigroup: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.additiveSemigroup._
-    ((a + b) === implicitly[AdditiveSemigroup[A]].plus(a, b))
+    (a + b) === implicitly[AdditiveSemigroup[A]].plus(a, b)
   }
 
   def testAdditiveMonoidSyntax[A: AdditiveMonoid: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.additiveMonoid._
-    ((a + b) === implicitly[AdditiveMonoid[A]].plus(a, b))
+    (a + b) === implicitly[AdditiveMonoid[A]].plus(a, b)
   }
 
   def testAdditiveGroupSyntax[A: AdditiveGroup: Eq](a: A, b: A) = {
@@ -227,13 +227,13 @@ trait BaseSyntaxSuite {
   def testMultiplicativeSemigroupSyntax[A: MultiplicativeSemigroup: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.multiplicativeSemigroup._
-    ((a * b) === implicitly[MultiplicativeSemigroup[A]].times(a, b))
+    (a * b) === implicitly[MultiplicativeSemigroup[A]].times(a, b)
   }
 
   def testMultiplicativeMonoidSyntax[A: MultiplicativeMonoid: Eq](a: A, b: A) = {
     import spire.syntax.eq._
     import spire.syntax.multiplicativeMonoid._
-    ((a * b) === implicitly[MultiplicativeMonoid[A]].times(a, b))
+    (a * b) === implicitly[MultiplicativeMonoid[A]].times(a, b)
   }
 
   def testMultiplicativeGroupSyntax[A: MultiplicativeGroup: Eq](a: A, b: A) = {

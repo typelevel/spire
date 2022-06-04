@@ -122,8 +122,8 @@ class PolynomialSuite extends munit.FunSuite {
 
     assertEquals(p1 + p2, Polynomial("1/2x^2 + 5x + 1"))
     assertEquals(legSparse(2) * legSparse(3), Polynomial("15/4x^5 - 7/2x^3 + 3/4x"))
-    assertEquals((p1.emod(p2)), Polynomial("-x"))
-    assertEquals((p1.equot(p2)), Polynomial("1"))
+    assertEquals(p1.emod(p2), Polynomial("-x"))
+    assertEquals(p1.equot(p2), Polynomial("1"))
 
     val legDense = legSparse.map(_.toDense)
 
@@ -133,8 +133,8 @@ class PolynomialSuite extends munit.FunSuite {
                     Array[Object](r"0", r"3/4", r"0", r"-7/2", r"0", r"15/4")
       )
     )
-    assertEquals((p1.emod(p2)), Polynomial("-x"))
-    assertEquals((p1.equot(p2)), Polynomial("1"))
+    assertEquals(p1.emod(p2), Polynomial("-x"))
+    assertEquals(p1.equot(p2), Polynomial("1"))
 
   }
 
@@ -175,7 +175,7 @@ class PolynomialSuite extends munit.FunSuite {
     val d = c * c // 4x² + 13.6x + 11.56
     // assertEquals((a gcd c), constant(BigDecimal("0.2"))) TODO: does not work anymore
     // assertEquals((a gcd d), constant(BigDecimal("0.04")))
-    assertEquals((c.gcd(d)), c)
+    assertEquals(c.gcd(d), c)
   }
 
   test("Polynomial(terms...) sums terms") {

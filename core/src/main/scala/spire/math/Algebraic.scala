@@ -1406,8 +1406,8 @@ object Algebraic extends AlgebraicInstances {
           val sub = subExpr.getBound(this)
           val lb = sub.lb / k
           val ub =
-            if (sub.ub % k == 0) (sub.ub / k)
-            else ((sub.ub / k) + 1)
+            if (sub.ub % k == 0) sub.ub / k
+            else (sub.ub / k) + 1
           Bound(sub.lc, sub.tc, sub.measure, lb, ub)
 
         case Pow(subExpr, k) =>

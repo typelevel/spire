@@ -80,7 +80,7 @@ class FixedPointScalaCheckSuite extends munit.ScalaCheckSuite {
             case Success(fz) =>
               BigInt(fz.long) == (az * s.denom).toBigInt
             case _ =>
-              (az * s.denom < Long.MinValue || Long.MaxValue < az * s.denom)
+              az * s.denom < Long.MinValue || Long.MaxValue < az * s.denom
           }
         }
       }

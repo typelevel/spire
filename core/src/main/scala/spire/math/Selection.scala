@@ -135,29 +135,29 @@ trait HighBranchingMedianOf5 {
         if (o.lt(ai2, ai4)) { // Drop i4
           if (o.lt(ai3, ai5)) { // i1 < i2, i3 < i5
             if (o.lt(ai2, ai5)) { // Drop i5
-              if (o.lt(ai2, ai3)) (offset + 2 * stride) else (offset + 1 * stride)
+              if (o.lt(ai2, ai3)) offset + 2 * stride else offset + 1 * stride
             } else { // Drop i2
-              if (o.lt(ai1, ai5)) (offset + 4 * stride) else (offset + 0 * stride)
+              if (o.lt(ai1, ai5)) offset + 4 * stride else offset + 0 * stride
             }
           } else { // i1 < i2, i5 < i3
             if (o.lt(ai2, ai3)) { // Drop i3
-              if (o.lt(ai2, ai5)) (offset + 4 * stride) else (offset + 1 * stride)
+              if (o.lt(ai2, ai5)) offset + 4 * stride else offset + 1 * stride
             } else { // Drop i2
-              if (o.lt(ai1, ai3)) (offset + 2 * stride) else (offset + 0 * stride)
+              if (o.lt(ai1, ai3)) offset + 2 * stride else offset + 0 * stride
             }
           }
         } else { // Drop i2
           if (o.lt(ai1, ai5)) { // i1 < i5, i3 < i4
             if (o.lt(ai5, ai4)) { // Drop i4
-              if (o.lt(ai5, ai3)) (offset + 2 * stride) else (offset + 4 * stride)
+              if (o.lt(ai5, ai3)) offset + 2 * stride else offset + 4 * stride
             } else { // Drop i5
-              if (o.lt(ai1, ai4)) (offset + 3 * stride) else (offset + 0 * stride)
+              if (o.lt(ai1, ai4)) offset + 3 * stride else offset + 0 * stride
             }
           } else { // i5 < i1, i3 < i4
             if (o.lt(ai1, ai4)) { // Drop i4
-              if (o.lt(ai1, ai3)) (offset + 2 * stride) else (offset + 0 * stride)
+              if (o.lt(ai1, ai3)) offset + 2 * stride else offset + 0 * stride
             } else { // Drop i1
-              if (o.lt(ai5, ai4)) (offset + 3 * stride) else (offset + 4 * stride)
+              if (o.lt(ai5, ai4)) offset + 3 * stride else offset + 4 * stride
             }
           }
         }
@@ -165,29 +165,29 @@ trait HighBranchingMedianOf5 {
         if (o.lt(ai2, ai3)) { // Drop i3
           if (o.lt(ai4, ai5)) { // i1 < i2, i4 < i5
             if (o.lt(ai2, ai5)) { // Drop i5
-              if (o.lt(ai2, ai4)) (offset + 3 * stride) else (offset + 1 * stride)
+              if (o.lt(ai2, ai4)) offset + 3 * stride else offset + 1 * stride
             } else { // Drop i2
-              if (o.lt(ai1, ai5)) (offset + 4 * stride) else (offset + 0 * stride)
+              if (o.lt(ai1, ai5)) offset + 4 * stride else offset + 0 * stride
             }
           } else { // i1 < i2, i5 < i4
             if (o.lt(ai2, ai4)) { // Drop i4
-              if (o.lt(ai2, ai5)) (offset + 4 * stride) else (offset + 1 * stride)
+              if (o.lt(ai2, ai5)) offset + 4 * stride else offset + 1 * stride
             } else { // Drop i2
-              if (o.lt(ai1, ai4)) (offset + 3 * stride) else (offset + 0 * stride)
+              if (o.lt(ai1, ai4)) offset + 3 * stride else offset + 0 * stride
             }
           }
         } else { // Drop i2
           if (o.lt(ai1, ai5)) { // i1 < i5, i4 < i3
             if (o.lt(ai5, ai3)) { // Drop i3
-              if (o.lt(ai5, ai4)) (offset + 3 * stride) else (offset + 4 * stride)
+              if (o.lt(ai5, ai4)) offset + 3 * stride else offset + 4 * stride
             } else { // Drop i5
-              if (o.lt(ai1, ai3)) (offset + 2 * stride) else (offset + 0 * stride)
+              if (o.lt(ai1, ai3)) offset + 2 * stride else offset + 0 * stride
             }
           } else { // i5 < i1, i4 < i3
             if (o.lt(ai1, ai3)) { // Drop i3
-              if (o.lt(ai1, ai4)) (offset + 3 * stride) else (offset + 0 * stride)
+              if (o.lt(ai1, ai4)) offset + 3 * stride else offset + 0 * stride
             } else { // Drop i1
-              if (o.lt(ai5, ai3)) (offset + 2 * stride) else (offset + 4 * stride)
+              if (o.lt(ai5, ai3)) offset + 2 * stride else offset + 4 * stride
             }
           }
         }
@@ -197,29 +197,29 @@ trait HighBranchingMedianOf5 {
         if (o.lt(ai1, ai4)) { // Drop i4
           if (o.lt(ai3, ai5)) { // i2 < i1, i3 < i5
             if (o.lt(ai1, ai5)) { // Drop i5
-              if (o.lt(ai1, ai3)) (offset + 2 * stride) else (offset + 0 * stride)
+              if (o.lt(ai1, ai3)) offset + 2 * stride else offset + 0 * stride
             } else { // Drop i1
-              if (o.lt(ai2, ai5)) (offset + 4 * stride) else (offset + 1 * stride)
+              if (o.lt(ai2, ai5)) offset + 4 * stride else offset + 1 * stride
             }
           } else { // i2 < i1, i5 < i3
             if (o.lt(ai1, ai3)) { // Drop i3
-              if (o.lt(ai1, ai5)) (offset + 4 * stride) else (offset + 0 * stride)
+              if (o.lt(ai1, ai5)) offset + 4 * stride else offset + 0 * stride
             } else { // Drop i1
-              if (o.lt(ai2, ai3)) (offset + 2 * stride) else (offset + 1 * stride)
+              if (o.lt(ai2, ai3)) offset + 2 * stride else offset + 1 * stride
             }
           }
         } else { // Drop i1
           if (o.lt(ai2, ai5)) { // i2 < i5, i3 < i4
             if (o.lt(ai5, ai4)) { // Drop i4
-              if (o.lt(ai5, ai3)) (offset + 2 * stride) else (offset + 4 * stride)
+              if (o.lt(ai5, ai3)) offset + 2 * stride else offset + 4 * stride
             } else { // Drop i5
-              if (o.lt(ai2, ai4)) (offset + 3 * stride) else (offset + 1 * stride)
+              if (o.lt(ai2, ai4)) offset + 3 * stride else offset + 1 * stride
             }
           } else { // i5 < i2, i3 < i4
             if (o.lt(ai2, ai4)) { // Drop i4
-              if (o.lt(ai2, ai3)) (offset + 2 * stride) else (offset + 1 * stride)
+              if (o.lt(ai2, ai3)) offset + 2 * stride else offset + 1 * stride
             } else { // Drop i2
-              if (o.lt(ai5, ai4)) (offset + 3 * stride) else (offset + 4 * stride)
+              if (o.lt(ai5, ai4)) offset + 3 * stride else offset + 4 * stride
             }
           }
         }
@@ -227,29 +227,29 @@ trait HighBranchingMedianOf5 {
         if (o.lt(ai1, ai3)) { // Drop i3
           if (o.lt(ai4, ai5)) { // i2 < i1, i4 < i5
             if (o.lt(ai1, ai5)) { // Drop i5
-              if (o.lt(ai1, ai4)) (offset + 3 * stride) else (offset + 0 * stride)
+              if (o.lt(ai1, ai4)) offset + 3 * stride else offset + 0 * stride
             } else { // Drop i1
-              if (o.lt(ai2, ai5)) (offset + 4 * stride) else (offset + 1 * stride)
+              if (o.lt(ai2, ai5)) offset + 4 * stride else offset + 1 * stride
             }
           } else { // i2 < i1, i5 < i4
             if (o.lt(ai1, ai4)) { // Drop i4
-              if (o.lt(ai1, ai5)) (offset + 4 * stride) else (offset + 0 * stride)
+              if (o.lt(ai1, ai5)) offset + 4 * stride else offset + 0 * stride
             } else { // Drop i1
-              if (o.lt(ai2, ai4)) (offset + 3 * stride) else (offset + 1 * stride)
+              if (o.lt(ai2, ai4)) offset + 3 * stride else offset + 1 * stride
             }
           }
         } else { // Drop i1
           if (o.lt(ai2, ai5)) { // i2 < i5, i4 < i3
             if (o.lt(ai5, ai3)) { // Drop i3
-              if (o.lt(ai5, ai4)) (offset + 3 * stride) else (offset + 4 * stride)
+              if (o.lt(ai5, ai4)) offset + 3 * stride else offset + 4 * stride
             } else { // Drop i5
-              if (o.lt(ai2, ai3)) (offset + 2 * stride) else (offset + 1 * stride)
+              if (o.lt(ai2, ai3)) offset + 2 * stride else offset + 1 * stride
             }
           } else { // i5 < i2, i4 < i3
             if (o.lt(ai2, ai3)) { // Drop i3
-              if (o.lt(ai2, ai4)) (offset + 3 * stride) else (offset + 1 * stride)
+              if (o.lt(ai2, ai4)) offset + 3 * stride else offset + 1 * stride
             } else { // Drop i2
-              if (o.lt(ai5, ai3)) (offset + 2 * stride) else (offset + 4 * stride)
+              if (o.lt(ai5, ai3)) offset + 2 * stride else offset + 4 * stride
             }
           }
         }

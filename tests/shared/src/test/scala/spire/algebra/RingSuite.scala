@@ -69,7 +69,7 @@ class RingSuite extends munit.FunSuite {
 
     runTest("fromInt(3)")(assert(Ring[A].fromInt(3) == b))
 
-    runTest("3 pow 2")(assertEquals((b.pow(2)), -c))
+    runTest("3 pow 2")(assertEquals(b.pow(2), -c))
   }
 
   implicit val mc: MathContext = MathContext.DECIMAL128

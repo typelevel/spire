@@ -430,10 +430,10 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
       val ub1sz = ub1.a === z && ub1.isClosed
       val ub2sz = ub2.a === z && ub2.isClosed
 
-      val ll = if (lb1sz || lb2sz) interval.Closed(z) else (lb1 *~ lb2)
-      val lu = if (lb1sz || ub2sz) interval.Closed(z) else (lb1 *~ ub2)
-      val ul = if (ub1sz || lb2sz) interval.Closed(z) else (ub1 *~ lb2)
-      val uu = if (ub1sz || ub2sz) interval.Closed(z) else (ub1 *~ ub2)
+      val ll = if (lb1sz || lb2sz) interval.Closed(z) else lb1 *~ lb2
+      val lu = if (lb1sz || ub2sz) interval.Closed(z) else lb1 *~ ub2
+      val ul = if (ub1sz || lb2sz) interval.Closed(z) else ub1 *~ lb2
+      val uu = if (ub1sz || ub2sz) interval.Closed(z) else ub1 *~ ub2
       ValueBound.union4(ll, lu, ul, uu)
     }
 
