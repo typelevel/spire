@@ -16,10 +16,10 @@ import scala.language.existentials
 
 lazy val scalaCheckVersion = "1.16.0"
 
-lazy val munit = "0.7.29"
-lazy val munitDiscipline = "1.0.9"
+lazy val munit = "1.0.0-M5"
+lazy val munitDiscipline = "2.0.0-M2"
 
-lazy val algebraVersion = "2.7.0"
+lazy val algebraVersion = "2.8-e070e7e-SNAPSHOT"
 
 lazy val apfloatVersion = "1.10.1"
 lazy val jscienceVersion = "4.3.1"
@@ -62,14 +62,14 @@ lazy val root = tlCrossRootProject
   .settings(unidocSettings)
   .enablePlugins(ScalaUnidocPlugin)
 
-lazy val platform = crossProject(JSPlatform, JVMPlatform)
+lazy val platform = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .settings(moduleName := "spire-platform")
   .settings(spireSettings: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
   .dependsOn(macros, util)
 
-lazy val macros = crossProject(JSPlatform, JVMPlatform)
+lazy val macros = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .settings(moduleName := "spire-macros")
   .settings(spireSettings: _*)
@@ -78,21 +78,21 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
 
-lazy val data = crossProject(JSPlatform, JVMPlatform)
+lazy val data = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .settings(moduleName := "spire-data")
   .settings(spireSettings: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
 
-lazy val legacy = crossProject(JSPlatform, JVMPlatform)
+lazy val legacy = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .settings(moduleName := "spire-legacy")
   .settings(spireSettings: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
 
-lazy val util = crossProject(JSPlatform, JVMPlatform)
+lazy val util = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .settings(moduleName := "spire-util")
   .settings(spireSettings: _*)
@@ -100,7 +100,7 @@ lazy val util = crossProject(JSPlatform, JVMPlatform)
   .jsSettings(commonJsSettings: _*)
   .dependsOn(macros)
 
-lazy val core = crossProject(JSPlatform, JVMPlatform)
+lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .settings(moduleName := "spire")
   .settings(spireSettings: _*)
@@ -109,7 +109,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform)
   .jsSettings(commonJsSettings: _*)
   .dependsOn(macros, platform, util)
 
-lazy val extras = crossProject(JSPlatform, JVMPlatform)
+lazy val extras = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .settings(moduleName := "spire-extras")
   .settings(spireSettings: _*)
@@ -140,7 +140,7 @@ lazy val examples = project
   .settings(commonJvmSettings)
   .dependsOn(core.jvm, extras.jvm)
 
-lazy val laws = crossProject(JSPlatform, JVMPlatform)
+lazy val laws = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Pure)
   .settings(moduleName := "spire-laws")
   .settings(spireSettings: _*)
@@ -154,7 +154,7 @@ lazy val laws = crossProject(JSPlatform, JVMPlatform)
   .jsSettings(commonJsSettings: _*)
   .dependsOn(core, extras)
 
-lazy val tests = crossProject(JSPlatform, JVMPlatform)
+lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Full)
   .settings(moduleName := "spire-tests")
   .settings(spireSettings: _*)
@@ -196,7 +196,7 @@ lazy val commonDeps = Seq(
 )
 
 lazy val commonSettings = Seq(
-  resolvers += Resolver.sonatypeRepo("snapshots"),
+  resolvers += "s01".at("https://s01.oss.sonatype.org/content/repositories/snapshots/"),
   headerLicense := Some(HeaderLicense.Custom(header))
 ) ++ scalaMacroDependencies
 
