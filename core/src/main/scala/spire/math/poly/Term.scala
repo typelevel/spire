@@ -118,37 +118,14 @@ object Term {
   // call Regex constructor directly to get rid of compiler warning
   // replace with "".r once SI-6723 is fixed
   private val superscriptRegex =
-    if (Platform.isNative) null
-    else
-      new scala.util.matching.Regex(
-        "[\\u2070\\u2071\\u2072\\u2073\\u2074\\u2075\\u2076\\u2077\\u2078\\u2079\\u207B\\u00B9\\u00B2\\u00B3]+"
-      )
+    new scala.util.matching.Regex(
+      "[\\u2070\\u2071\\u2072\\u2073\\u2074\\u2075\\u2076\\u2077\\u2078\\u2079\\u207B\\u00B9\\u00B2\\u00B3]+"
+    )
 
   private[spire] def removeSuperscript(text: String): String =
-    if (Platform.isNative) {
-      var i = 0
-      val n = text.length
-      var sup = false
-      val sb = new scala.collection.mutable.StringBuilder(text.length + text.length / 2)
-      while (i < n) {
-        val c = text(i)
-        removeSuperscript
-          .get(c)
-          .fold {
-            sup = false
-            sb += c
-          } { d =>
-            if (!sup) sb += '^'
-            sup = true
-            sb += d
-          }
-        i += 1
-      }
-      if (sb.length() != n) sb.result() else text
-    } else
-      superscriptRegex.replaceAllIn(text, "^" + _.group(0).map(removeSuperscript))
+    superscriptRegex.replaceAllIn(text, "^" + _.group(0).map(removeSuperscript))
 
   private val superscript: (Char => Char) = Map(digitToSuperscript.toIndexedSeq: _*)
 
-  private val removeSuperscript = Map(digitToSuperscript.map(_.swap).toIndexedSeq: _*)
+  private val removeSuperscript: (Char => Char) = Map(digitToSuperscript.map(_.swap).toIndexedSeq: _*)
 }

@@ -18,8 +18,6 @@ package spire
 import scala.collection._
 
 object Platform {
-  final val isNative = false
-
   type TrieMap[K, V] = concurrent.TrieMap[K, V]
 
   @inline
