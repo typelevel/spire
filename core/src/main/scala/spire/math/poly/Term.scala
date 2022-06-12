@@ -125,9 +125,26 @@ object Term {
       )
 
   private[spire] def removeSuperscript(text: String): String =
-    if (Platform.isNative)
-      text.flatMap(c => removeSuperscript.get(c).fold(c.toString)("^" + _))
-    else
+    if (Platform.isNative) {
+      var i = 0
+      val n = text.length
+      var sup = false
+      val sb = new scala.collection.mutable.StringBuilder(text.length + text.length / 2)
+      while (i < n) {
+        val c = text(i)
+        removeSuperscript
+          .get(c)
+          .fold {
+            sup = false
+            sb += c
+          } { d =>
+            if (!sup) sb += '^'
+            sup = true
+            sb += d
+          }
+      }
+      if (sb.length() != n) sb.result() else text
+    } else
       superscriptRegex.replaceAllIn(text, "^" + _.group(0).map(removeSuperscript))
 
   private val superscript: (Char => Char) = Map(digitToSuperscript.toIndexedSeq: _*)
