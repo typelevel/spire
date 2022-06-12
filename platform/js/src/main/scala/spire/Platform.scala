@@ -18,6 +18,8 @@ package spire
 import scala.collection._
 
 object Platform {
+  final val isNative = false
+
   type TrieMap[K, V] = mutable.Map[K, V]
 
   @inline

@@ -18,10 +18,10 @@ package spire
 import scala.collection._
 
 object Platform {
-  final val isNative = false
+  final val isNative = true
 
-  type TrieMap[K, V] = concurrent.TrieMap[K, V]
+  type TrieMap[K, V] = mutable.Map[K, V]
 
   @inline
-  def TrieMap[K, V](): TrieMap[K, V] = new concurrent.TrieMap()
+  def TrieMap[K, V](): TrieMap[K, V] = mutable.Map()
 }
