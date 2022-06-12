@@ -155,12 +155,13 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-  property("x >> k") {
-    forAll { (x: BigInt, k: Byte) =>
-      intercept[RuntimeException] { SafeLong(x) >> Int.MinValue }
-      invariant(SafeLong(x) >> k) == SafeLong(x >> k)
+  if (!sys.props.get("java.vm.name").contains("Scala Native"))
+    property("x >> k") {
+      forAll { (x: BigInt, k: Byte) =>
+        intercept[RuntimeException] { SafeLong(x) >> Int.MinValue }
+        invariant(SafeLong(x) >> k) == SafeLong(x >> k)
+      }
     }
-  }
 
   property("long safelongs") {
     forAll { (x: Long) =>
