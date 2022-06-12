@@ -142,6 +142,7 @@ object Term {
             sup = true
             sb += d
           }
+        i += 1
       }
       if (sb.length() != n) sb.result() else text
     } else
