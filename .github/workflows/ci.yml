@@ -30,7 +30,7 @@ jobs:
         os: [ubuntu-latest]
         scala: [2.13.8, 3.1.2]
         java: [temurin@8, temurin@11, temurin@17]
-        project: [rootJS, rootJVM]
+        project: [rootJS, rootJVM, rootNative]
         exclude:
           - scala: 2.13.8
             java: temurin@11
@@ -39,6 +39,10 @@ jobs:
           - project: rootJS
             java: temurin@11
           - project: rootJS
+            java: temurin@17
+          - project: rootNative
+            java: temurin@11
+          - project: rootNative
             java: temurin@17
     runs-on: ${{ matrix.os }}
     steps:
@@ -118,6 +122,10 @@ jobs:
         if: matrix.project == 'rootJS'
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' Test/scalaJSLinkerResult
 
+      - name: nativeLink
+        if: matrix.project == 'rootNative'
+        run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' Test/nativeLink
+
       - name: Test
         run: sbt 'project ${{ matrix.project }}' '++${{ matrix.scala }}' test
 
@@ -131,11 +139,11 @@ jobs:
 
       - name: Make target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-        run: mkdir -p data/.jvm/target legacy/.jvm/target extras/.js/target examples/target target platform/js/target macros/.jvm/target .js/target site/target core/.js/target macros/.js/target laws/.js/target legacy/.js/target core/.jvm/target tests/js/target .jvm/target .native/target platform/jvm/target util/.js/target data/.js/target util/.jvm/target laws/.jvm/target tests/jvm/target extras/.jvm/target benchmark/target project/target
+        run: mkdir -p data/.jvm/target legacy/.jvm/target extras/.js/target examples/target util/.native/target extras/.native/target target platform/js/target macros/.jvm/target legacy/.native/target .js/target core/.native/target site/target macros/.native/target laws/.native/target core/.js/target macros/.js/target laws/.js/target legacy/.js/target core/.jvm/target tests/js/target .jvm/target .native/target platform/jvm/target util/.js/target platform/native/target data/.js/target util/.jvm/target laws/.jvm/target tests/jvm/target extras/.jvm/target data/.native/target benchmark/target tests/native/target project/target
 
       - name: Compress target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
-        run: tar cf targets.tar data/.jvm/target legacy/.jvm/target extras/.js/target examples/target target platform/js/target macros/.jvm/target .js/target site/target core/.js/target macros/.js/target laws/.js/target legacy/.js/target core/.jvm/target tests/js/target .jvm/target .native/target platform/jvm/target util/.js/target data/.js/target util/.jvm/target laws/.jvm/target tests/jvm/target extras/.jvm/target benchmark/target project/target
+        run: tar cf targets.tar data/.jvm/target legacy/.jvm/target extras/.js/target examples/target util/.native/target extras/.native/target target platform/js/target macros/.jvm/target legacy/.native/target .js/target core/.native/target site/target macros/.native/target laws/.native/target core/.js/target macros/.js/target laws/.js/target legacy/.js/target core/.jvm/target tests/js/target .jvm/target .native/target platform/jvm/target util/.js/target platform/native/target data/.js/target util/.jvm/target laws/.jvm/target tests/jvm/target extras/.jvm/target data/.native/target benchmark/target tests/native/target project/target
 
       - name: Upload target directories
         if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
@@ -240,6 +248,16 @@ jobs:
           tar xf targets.tar
           rm targets.tar
 
+      - name: Download target directories (2.13.8, rootNative)
+        uses: actions/download-artifact@v2
+        with:
+          name: target-${{ matrix.os }}-${{ matrix.java }}-2.13.8-rootNative
+
+      - name: Inflate target directories (2.13.8, rootNative)
+        run: |
+          tar xf targets.tar
+          rm targets.tar
+
       - name: Download target directories (3.1.2, rootJS)
         uses: actions/download-artifact@v2
         with:
@@ -256,6 +274,16 @@ jobs:
           name: target-${{ matrix.os }}-${{ matrix.java }}-3.1.2-rootJVM
 
       - name: Inflate target directories (3.1.2, rootJVM)
+        run: |
+          tar xf targets.tar
+          rm targets.tar
+
+      - name: Download target directories (3.1.2, rootNative)
+        uses: actions/download-artifact@v2
+        with:
+          name: target-${{ matrix.os }}-${{ matrix.java }}-3.1.2-rootNative
+
+      - name: Inflate target directories (3.1.2, rootNative)
         run: |
           tar xf targets.tar
           rm targets.tar
