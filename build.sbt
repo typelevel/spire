@@ -19,7 +19,7 @@ lazy val scalaCheckVersion = "1.16.0"
 lazy val munit = "1.0.0-M5"
 lazy val munitDiscipline = "2.0.0-M2"
 
-lazy val algebraVersion = "2.8-e070e7e-SNAPSHOT"
+lazy val algebraVersion = "2.8.0"
 
 lazy val apfloatVersion = "1.10.1"
 lazy val jscienceVersion = "4.3.1"
@@ -196,7 +196,6 @@ lazy val commonDeps = Seq(
 )
 
 lazy val commonSettings = Seq(
-  resolvers += "s01".at("https://s01.oss.sonatype.org/content/repositories/snapshots/"),
   headerLicense := Some(HeaderLicense.Custom(header))
 ) ++ scalaMacroDependencies
 
