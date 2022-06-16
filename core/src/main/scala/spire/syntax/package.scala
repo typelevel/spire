@@ -79,6 +79,7 @@ package object syntax {
   object numeric extends NumericSyntax
 
   object all extends AllSyntax
+  object allButCats extends AllButCatsSyntax
 
   @deprecated("Unbound syntax will be removed", "spire 0.18.0")
   object unbound extends UnboundSyntax
