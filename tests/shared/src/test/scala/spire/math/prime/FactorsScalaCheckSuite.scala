@@ -29,6 +29,12 @@ import org.scalacheck.Prop._
 
 class FactorsScalaCheckSuite extends munit.ScalaCheckSuite {
 
+  override def scalaCheckTestParameters =
+    if (sys.props.get("java.vm.name").contains("Scala Native"))
+      // Native is stupidly slow for this suite
+      super.scalaCheckTestParameters.withMinSuccessfulTests(5)
+    else super.scalaCheckTestParameters
+
   implicit val arbitraryFactors: Arbitrary[Factors] =
     Arbitrary(arbitrary[SafeLong].map(n => Factors(n)))
 
