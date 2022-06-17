@@ -295,12 +295,9 @@ trait LiteralsSyntax {
   object eu { implicit def euLiterals(s: StringContext): EuLiterals = new EuLiterals(s) }
 }
 
-trait AllSyntax
+trait AllButCatsSyntax
     extends LiteralsSyntax
     with CforSyntax
-    with EqSyntax
-    with PartialOrderSyntax
-    with OrderSyntax
     with SignedSyntax
     with TruncatedDivisionSyntax
     with InvolutionSyntax
@@ -308,9 +305,6 @@ trait AllSyntax
     with ConvertableFromSyntax
     with SemigroupoidSyntax
     with GroupoidSyntax
-    with SemigroupSyntax
-    with MonoidSyntax
-    with GroupSyntax
     with AdditiveSemigroupSyntax
     with AdditiveMonoidSyntax
     with AdditiveGroupSyntax
@@ -351,3 +345,12 @@ trait AllSyntax
     with BigIntSyntax
     with ArraySyntax
     with SeqSyntax
+
+trait AllSyntax
+    extends AllButCatsSyntax
+    with EqSyntax
+    with PartialOrderSyntax
+    with OrderSyntax
+    with SemigroupSyntax
+    with MonoidSyntax
+    with GroupSyntax
