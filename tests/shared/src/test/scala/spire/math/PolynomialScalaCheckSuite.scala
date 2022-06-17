@@ -32,6 +32,12 @@ import org.scalacheck.Prop
 
 class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
 
+  override def scalaCheckTestParameters =
+    if (sys.props.get("java.vm.name").contains("Scala Native"))
+      // Native is stupidly slow for this suite
+      super.scalaCheckTestParameters.withMinSuccessfulTests(5)
+    else super.scalaCheckTestParameters
+
   import PolynomialSetup._
 
   val ebd = Eq[BigDecimal]

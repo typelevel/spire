@@ -23,6 +23,12 @@ import org.scalacheck.Prop._
 
 class QuaternionScalaCheckSuite extends munit.ScalaCheckSuite {
 
+  override def scalaCheckTestParameters =
+    if (sys.props.get("java.vm.name").contains("Scala Native"))
+      // Native is stupidly slow for this suite
+      super.scalaCheckTestParameters.withMinSuccessfulTests(5)
+    else super.scalaCheckTestParameters
+
   type H = Quaternion[Real]
   val zero = Quaternion.zero[Real]
   val one = Quaternion.one[Real]

@@ -27,6 +27,12 @@ import MathContext.{DECIMAL128, DECIMAL64}
 
 class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
 
+  override def scalaCheckTestParameters =
+    if (sys.props.get("java.vm.name").contains("Scala Native"))
+      // Native is stupidly slow for this suite
+      super.scalaCheckTestParameters.withMinSuccessfulTests(5)
+    else super.scalaCheckTestParameters
+
   def approximation(approx0: Algebraic, scale: Int, actual: BigDecimal): Unit = {
     val error = BigDecimal(10).pow(-scale)
     val approx = approx0.toBigDecimal(scale, RoundingMode.HALF_EVEN)
