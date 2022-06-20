@@ -18,6 +18,8 @@ package math
 
 import scala.util.Random
 
+import java.math.{BigDecimal => JBigDecimal}
+
 class RationalSuite extends munit.FunSuite {
 
   test("rational canonical construction") {
@@ -35,6 +37,10 @@ class RationalSuite extends munit.FunSuite {
     val r = Rational(30, 345)
     assert(r.numerator == BigInt(2))
     assert(r.denominator == BigInt(23))
+  }
+  test("rational from BigDecimal construction") {
+    val x = new JBigDecimal("445.558519191316565975917190302800469922038")
+    assertEquals(x, Rational(x).toBigDecimal(java.math.MathContext.UNLIMITED).bigDecimal)
   }
   test("rational parse") {
     intercept[NumberFormatException] {
