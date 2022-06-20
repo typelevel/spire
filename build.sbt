@@ -57,7 +57,7 @@ ThisBuild / tlFatalWarningsInCi := false
 // Projects
 
 lazy val root = tlCrossRootProject
-  .aggregate(macros, core, data, extras, examples, laws, legacy, platform, tests, util, benchmark)
+  .aggregate(macros, core, extras, examples, laws, platform, tests, util, benchmark)
   .settings(spireSettings)
   .settings(unidocSettings)
   .enablePlugins(ScalaUnidocPlugin)
@@ -75,20 +75,6 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .settings(spireSettings: _*)
   .settings(scalaCheckSettings: _*)
   .settings(munitSettings: _*)
-  .jvmSettings(commonJvmSettings: _*)
-  .jsSettings(commonJsSettings: _*)
-
-lazy val data = crossProject(JSPlatform, JVMPlatform, NativePlatform)
-  .crossType(CrossType.Pure)
-  .settings(moduleName := "spire-data")
-  .settings(spireSettings: _*)
-  .jvmSettings(commonJvmSettings: _*)
-  .jsSettings(commonJsSettings: _*)
-
-lazy val legacy = crossProject(JSPlatform, JVMPlatform, NativePlatform)
-  .crossType(CrossType.Pure)
-  .settings(moduleName := "spire-legacy")
-  .settings(spireSettings: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
 
@@ -116,7 +102,7 @@ lazy val extras = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .settings(extrasSettings: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
-  .dependsOn(macros, platform, util, core, data)
+  .dependsOn(macros, platform, util, core)
 
 lazy val docs = project
   .in(file("site"))
@@ -162,7 +148,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .enablePlugins(NoPublishPlugin)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
-  .dependsOn(core, data, legacy, extras, laws)
+  .dependsOn(core, extras, laws)
 
 lazy val benchmark: Project = project
   .in(file("benchmark"))
