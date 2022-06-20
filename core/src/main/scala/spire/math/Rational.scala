@@ -403,8 +403,9 @@ object Rational extends RationalInstances {
     if (x.ulp >= 1) {
       apply(x.toBigInt, 1)
     } else {
-      val n = (x / x.ulp).toBigInt
-      val d = (BigDecimal(1.0) / x.ulp).toBigInt
+      val ulp = x.bigDecimal.ulp()
+      val n = BigInt(x.bigDecimal.divide(ulp).toBigIntegerExact)
+      val d = BigInt(JBigDecimal.ONE.divide(ulp).toBigIntegerExact)
       apply(n, d)
     }
   }
