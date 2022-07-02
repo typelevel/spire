@@ -78,7 +78,7 @@ case class PureSet[A](f: A => Boolean) extends Function1[A, Boolean] { lhs =>
     PureSet(b => f(g(b)))
 
   def unary_~ : PureSet[A] =
-    PureSet(a => !(f(a)))
+    PureSet(a => !f(a))
   def |(rhs: PureSet[A]): PureSet[A] =
     PureSet(a => lhs.f(a) || rhs.f(a))
   def &(rhs: PureSet[A]): PureSet[A] =

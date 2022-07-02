@@ -75,7 +75,7 @@ object Ziggurat {
         while ({
           x = -log(g.nextDouble()) * r1
           y = -log(g.nextDouble())
-          (y + y < x * x)
+          y + y < x * x
         })
           return if (hz > 0) r + x else -r - x
       }

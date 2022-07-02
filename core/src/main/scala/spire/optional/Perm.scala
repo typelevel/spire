@@ -48,7 +48,7 @@ class Perm private (private val mapping: Map[Int, Int]) extends (Int => Int) {
    */
   def apply(n0: Int, n1: Int, ns: Int*): Perm = {
     val cycle = n0 +: n1 +: ns
-    require(!(cycle.exists(image)), "Cycle must be disjoint.")
+    require(!cycle.exists(image), "Cycle must be disjoint.")
     this.compose(Perm(n0, n1, ns: _*))
   }
 

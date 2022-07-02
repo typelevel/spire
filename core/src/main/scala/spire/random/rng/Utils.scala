@@ -65,7 +65,7 @@ object Utils {
 
   def longFromTime(time: Long = System.nanoTime): Long = {
     seedUniquifier += 1
-    (seedUniquifier + time)
+    seedUniquifier + time
   }
 
   def seedFromInt(length: Int, seed: Int = 5489): Array[Int] = {

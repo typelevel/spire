@@ -56,13 +56,13 @@ class SafeLongSuite extends munit.FunSuite {
     assert(SafeLong.one.isValidChar)
   }
   test("|") {
-    assertEquals((SafeLong.one | SafeLong.one.toBigInt), SafeLong.one)
+    assertEquals(SafeLong.one | SafeLong.one.toBigInt, SafeLong.one)
   }
   test("^") {
-    assertEquals((SafeLong.one ^ SafeLong.one.toBigInt), SafeLong.zero)
+    assertEquals(SafeLong.one ^ SafeLong.one.toBigInt, SafeLong.zero)
   }
   test("<<") {
-    assertEquals((SafeLong.minusOne << 1), SafeLong(-1 << 1))
+    assertEquals(SafeLong.minusOne << 1, SafeLong(-1 << 1))
   }
   test("safeLongIsSigned") {
     for (x <- Seq(SafeLong.one)) {

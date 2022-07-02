@@ -219,18 +219,18 @@ class JetSuite extends munit.FunSuite {
     val i = Array(1.0f, 2.0f, 3.0f)
     val a = Jet(r, i)
     val b = 97.0f
-    assertEquals((a + b), a.copy(real = r + b))
-    assertEquals((a - b), a.copy(real = r - b))
-    assertEquals((a * b), a.copy(real = r * b, infinitesimal = i :* b))
-    assertEquals((a / b), a.copy(real = r / b, infinitesimal = i :/ b))
+    assertEquals(a + b, a.copy(real = r + b))
+    assertEquals(a - b, a.copy(real = r - b))
+    assertEquals(a * b, a.copy(real = r * b, infinitesimal = i :* b))
+    assertEquals(a / b, a.copy(real = r / b, infinitesimal = i :/ b))
   }
   test("Arithmetic combinations with scalar and non-scalar Jets") {
     val a = Jet(1.0, Array(2.0, 3.0, 4.0))
     val b = Jet(2.0)
-    assertEquals((a + b), Jet(a.real + b.real, a.infinitesimal))
-    assertEquals((a - b), Jet(a.real - b.real, a.infinitesimal))
-    assertEquals((a * b), Jet(a.real * b.real, a.infinitesimal :* b.real))
-    assertEquals((a / b), Jet(a.real / b.real, a.infinitesimal :/ b.real))
+    assertEquals(a + b, Jet(a.real + b.real, a.infinitesimal))
+    assertEquals(a - b, Jet(a.real - b.real, a.infinitesimal))
+    assertEquals(a * b, Jet(a.real * b.real, a.infinitesimal :* b.real))
+    assertEquals(a / b, Jet(a.real / b.real, a.infinitesimal :/ b.real))
   }
   test("Evaluation and differentiation of arithmetic operations") {
     def a[@sp(Double) T: Field: Trig](x: T): T = 2.0 * x + spire.math.cos[T](x)

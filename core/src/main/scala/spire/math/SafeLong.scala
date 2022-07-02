@@ -462,7 +462,7 @@ final private[math] case class SafeLongLong(x: Long) extends SafeLong {
   }
 
   def >>(n: Int): SafeLong =
-    if (n >= 64) (if (x >= 0) SafeLong.zero else SafeLong.minusOne)
+    if (n >= 64) if (x >= 0) SafeLong.zero else SafeLong.minusOne
     else if (n >= 0) SafeLongLong(x >> n)
     else if (n == Int.MinValue) throw new ArithmeticException(">> MinValue not supported")
     else this << -n

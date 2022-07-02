@@ -231,7 +231,7 @@ object FastComplex {
   } else if (imag(b) != 0.0f) {
     val im_b = imag(b)
     val re_b = real(b)
-    val len = (Math.pow(abs(a), re_b) / exp((angle(a) * im_b))).toFloat
+    val len = (Math.pow(abs(a), re_b) / exp(angle(a) * im_b)).toFloat
     val phase = (angle(a) * re_b + log(abs(a)) * im_b).toFloat
     polar(len, phase)
 
