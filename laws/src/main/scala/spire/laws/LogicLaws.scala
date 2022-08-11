@@ -84,13 +84,14 @@ trait LogicLaws[A] extends Laws {
     )
 
   def bool(implicit A: Bool[A]) =
-    new DefaultRuleSet(name = "bool",
-                       parent = Some(heyting),
-                       "excluded middle" -> forAllSafe { (x: A) => (x | ~x) === A.one },
-                       "xor" -> forAllSafe { (a: A, b: A) => (a ^ b) === ((a & ~b) | (~a & b)) },
-                       "nxor" -> forAllSafe { (a: A, b: A) => (a.nxor(b)) === ((a | ~b) & (~a | b)) },
-                       "imp" -> forAllSafe { (a: A, b: A) => (a.imp(b)) === (~a | b) },
-                       "nand" -> forAllSafe { (a: A, b: A) => (a.nand(b)) === ~(a & b) },
-                       "nor" -> forAllSafe { (a: A, b: A) => (a.nor(b)) === ~(a | b) }
+    new DefaultRuleSet(
+      name = "bool",
+      parent = Some(heyting),
+      "excluded middle" -> forAllSafe { (x: A) => (x | ~x) === A.one },
+      "xor" -> forAllSafe { (a: A, b: A) => (a ^ b) === ((a & ~b) | (~a & b)) },
+      "nxor" -> forAllSafe { (a: A, b: A) => (a.nxor(b)) === ((a | ~b) & (~a | b)) },
+      "imp" -> forAllSafe { (a: A, b: A) => (a.imp(b)) === (~a | b) },
+      "nand" -> forAllSafe { (a: A, b: A) => (a.nand(b)) === ~(a & b) },
+      "nor" -> forAllSafe { (a: A, b: A) => (a.nor(b)) === ~(a | b) }
     )
 }
