@@ -53,7 +53,7 @@ trait BigIntegerIsNRoot extends NRoot[BigInteger] {
     } else {
       val c = b.setBit(i)
 
-      if (((c.pow(k)).compareTo(a)) <= 0)
+      if ((c.pow(k).compareTo(a)) <= 0)
         findNroot(c, i - 1)
       else
         findNroot(b, i - 1)

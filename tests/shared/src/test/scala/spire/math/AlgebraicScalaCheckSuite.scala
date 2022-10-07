@@ -146,7 +146,7 @@ class AlgebraicScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   test("relative approximation of zero is zero") {
-    assertEquals((Algebraic(0).toBigDecimal(DECIMAL128)), BigDecimal(0))
+    assertEquals(Algebraic(0).toBigDecimal(DECIMAL128), BigDecimal(0))
     assertEquals(trickyZero.toDouble, 0.0)
   }
 

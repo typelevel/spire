@@ -70,7 +70,7 @@ trait LogicLaws[A] extends Laws {
       },
       "x -> (y -> x) = 1" -> forAllSafe { (x: A, y: A) => (x.imp(y.imp(x))) === A.one },
       "(x->(y->z)) -> ((x->y)->(x->z)) = 1" -> forAllSafe { (x: A, y: A, z: A) =>
-        ((x.imp(y.imp(z))).imp((x.imp(y)).imp(x.imp(z)))) === A.one
+        (x.imp(y.imp(z)).imp(x.imp(y).imp(x.imp(z)))) === A.one
       },
       "x∧y -> x = 1" -> forAllSafe { (x: A, y: A) => ((x & y).imp(x)) === A.one },
       "x∧y -> y = 1" -> forAllSafe { (x: A, y: A) => ((x & y).imp(y)) === A.one },
@@ -78,19 +78,20 @@ trait LogicLaws[A] extends Laws {
       "x -> x∨y" -> forAllSafe { (x: A, y: A) => (x.imp(x | y)) === A.one },
       "y -> x∨y" -> forAllSafe { (x: A, y: A) => (y.imp(x | y)) === A.one },
       "(x -> z) -> ((y -> z) -> ((x | y) -> z)) = 1" -> forAllSafe { (x: A, y: A, z: A) =>
-        ((x.imp(z)).imp((y.imp(z)).imp((x | y).imp(z)))) === A.one
+        (x.imp(z).imp(y.imp(z).imp((x | y).imp(z)))) === A.one
       },
       "(0 -> x) = 1" -> forAllSafe { (x: A) => (A.zero.imp(x)) === A.one }
     )
 
   def bool(implicit A: Bool[A]) =
-    new DefaultRuleSet(name = "bool",
-                       parent = Some(heyting),
-                       "excluded middle" -> forAllSafe { (x: A) => (x | ~x) === A.one },
-                       "xor" -> forAllSafe { (a: A, b: A) => (a ^ b) === ((a & ~b) | (~a & b)) },
-                       "nxor" -> forAllSafe { (a: A, b: A) => (a.nxor(b)) === ((a | ~b) & (~a | b)) },
-                       "imp" -> forAllSafe { (a: A, b: A) => (a.imp(b)) === (~a | b) },
-                       "nand" -> forAllSafe { (a: A, b: A) => (a.nand(b)) === ~(a & b) },
-                       "nor" -> forAllSafe { (a: A, b: A) => (a.nor(b)) === ~(a | b) }
+    new DefaultRuleSet(
+      name = "bool",
+      parent = Some(heyting),
+      "excluded middle" -> forAllSafe { (x: A) => (x | ~x) === A.one },
+      "xor" -> forAllSafe { (a: A, b: A) => (a ^ b) === ((a & ~b) | (~a & b)) },
+      "nxor" -> forAllSafe { (a: A, b: A) => (a.nxor(b)) === ((a | ~b) & (~a | b)) },
+      "imp" -> forAllSafe { (a: A, b: A) => (a.imp(b)) === (~a | b) },
+      "nand" -> forAllSafe { (a: A, b: A) => (a.nand(b)) === ~(a & b) },
+      "nor" -> forAllSafe { (a: A, b: A) => (a.nor(b)) === ~(a | b) }
     )
 }

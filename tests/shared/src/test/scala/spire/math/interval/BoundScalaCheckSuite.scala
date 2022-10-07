@@ -32,9 +32,9 @@ class BoundScalaCheckSuite extends munit.ScalaCheckSuite {
         eq.eqv(EmptyBound(), EmptyBound()) &&
         eq.eqv(Unbound(), Unbound()) &&
         eq.eqv(Open(x), Open(x)) &&
-        !(eq.eqv(Open(x), Open(y))) &&
+        !eq.eqv(Open(x), Open(y)) &&
         eq.eqv(Closed(x), Closed(x)) &&
-        !(eq.eqv(Closed(x), Closed(y)))
+        !eq.eqv(Closed(x), Closed(y))
       }
     }
   }

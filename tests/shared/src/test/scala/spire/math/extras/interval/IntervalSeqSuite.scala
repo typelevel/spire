@@ -26,15 +26,15 @@ class IntervalSeqSuite extends munit.FunSuite {
     val b = atOrAbove(1)
     val c = point(1)
     val d = hole(1)
-    assertEquals(atOrAbove(1), (a | b))
-    assertEquals(above(1), (a & b))
-    assertEquals(point(1), (a ^ b))
-    assertEquals(atOrAbove(1), (a | c))
-    assertEquals(empty[Int], (a & c))
-    assertEquals(atOrAbove(1), (a ^ c))
-    assertEquals(hole(1), (a | d))
-    assertEquals(above(1), (a & d))
-    assertEquals(below(1), (a ^ d))
+    assertEquals(atOrAbove(1), a | b)
+    assertEquals(above(1), a & b)
+    assertEquals(point(1), a ^ b)
+    assertEquals(atOrAbove(1), a | c)
+    assertEquals(empty[Int], a & c)
+    assertEquals(atOrAbove(1), a ^ c)
+    assertEquals(hole(1), a | d)
+    assertEquals(above(1), a & d)
+    assertEquals(below(1), a ^ d)
   }
 
   test("atIsSameAsApply") {
@@ -62,7 +62,7 @@ class IntervalSeqSuite extends munit.FunSuite {
     val algebra = IntervalSeq.algebra[Int]
     val a = IntervalSeq.above(1)
     val b = IntervalSeq.below(1)
-    assertEquals((a ^ b), algebra.xor(a, b))
+    assertEquals(a ^ b, algebra.xor(a, b))
   }
 
   test("coverage") {

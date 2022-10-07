@@ -14,10 +14,10 @@ val header = """|***************************************************************
 
 import scala.language.existentials
 
-lazy val scalaCheckVersion = "1.16.0"
+lazy val scalaCheckVersion = "1.17.0"
 
-lazy val munit = "1.0.0-M5"
-lazy val munitDiscipline = "2.0.0-M2"
+lazy val munit = "1.0.0-M6"
+lazy val munitDiscipline = "2.0.0-M3"
 
 lazy val algebraVersion = "2.8.0"
 
@@ -25,7 +25,7 @@ lazy val apfloatVersion = "1.10.1"
 lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
-val Scala213 = "2.13.8"
+val Scala213 = "2.13.9"
 val Scala3 = "3.1.3"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges

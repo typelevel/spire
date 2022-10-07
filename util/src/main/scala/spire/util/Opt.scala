@@ -63,7 +63,7 @@ class Opt[+A](val ref: A) extends AnyVal {
 
   def toOption: Option[A] = if (ref == null) None else Some(ref)
 
-  def toList: List[A] = if (ref == null) Nil else (ref :: Nil)
+  def toList: List[A] = if (ref == null) Nil else ref :: Nil
 
   def contains[A1 >: A](elem: A1): Boolean = if (ref == null) false else ref == elem
 

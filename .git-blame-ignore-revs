@@ -1,0 +1,16 @@
+# #982 setup scalafmt
+f7b7e4a1b7324537f0721fa88338be7a1fb3204d
+
+# #1084 Update scalafmt to 3.0.6
+2a9ef8e7f407765e7ca7fe2120e03efa5f022187
+e7a1e171586b3f493b0f2f1fcc96ded103054c79
+635ff5855b26c97334bbe620eef8dff27a9e5e6d
+e93fe9bcf5ff0c314ca676bf9f3b9c8148574786
+
+# steward commits
+91a10ef01d46d67aae9be2577a74c507b6d5d773
+2eef959d80fff836e4a490ceb360ecbefca43c9a
+32fb2b7188c28474b7cc2b6a5743ddeccb1fdda6
+
+# Scala Steward: Reformat with scalafmt 3.5.9
+01f01fd107bffe8babb43adfe2768c5e815215e6

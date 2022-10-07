@@ -104,9 +104,9 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   test("x /% y") {
-    assertEquals((smin /% SafeLong(-1)), (-smin, zero))
-    assertEquals((smin /% -1L), (-smin, zero))
-    assertEquals((smin /% BigInt(-1)), (-smin, zero))
+    assertEquals(smin /% SafeLong(-1), (-smin, zero))
+    assertEquals(smin /% -1L, (-smin, zero))
+    assertEquals(smin /% BigInt(-1), (-smin, zero))
   }
 
   property("x ** y") {
@@ -232,11 +232,11 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
     assertEquals(smin.gcd(SafeLongBigInteger(BigInteger.ZERO)), firstBig)
     assertEquals(SafeLong.minusOne.gcd(SafeLongBigInteger(BigInteger.ZERO)), SafeLong.one)
 
-    assertEquals((SafeLong(0).gcd(SafeLong(-13))), SafeLong(13))
-    assertEquals((SafeLong(0).gcd(smin)), firstBig)
+    assertEquals(SafeLong(0).gcd(SafeLong(-13)), SafeLong(13))
+    assertEquals(SafeLong(0).gcd(smin), firstBig)
 
-    assertEquals((SafeLong(-13).gcd(SafeLong(0))), SafeLong(13))
-    assertEquals((smin.gcd(SafeLong(0))), firstBig)
+    assertEquals(SafeLong(-13).gcd(SafeLong(0)), SafeLong(13))
+    assertEquals(smin.gcd(SafeLong(0)), firstBig)
   }
 
   test("regressions") {

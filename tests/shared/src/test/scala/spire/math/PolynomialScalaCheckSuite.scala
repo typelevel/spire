@@ -228,7 +228,7 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
   def gcdTest(x: Polynomial[Rational], y: Polynomial[Rational]): Prop = {
     (!x.isZero || !y.isZero) ==> {
       val gcd = spire.math.gcd[Polynomial[Rational]](x, y)
-      !gcd.isZero && ((x.emod(gcd)).equals(0) && (y.emod(gcd)).equals(0))
+      !gcd.isZero && (x.emod(gcd).equals(0) && y.emod(gcd).equals(0))
     }
   }
 
