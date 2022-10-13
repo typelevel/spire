@@ -25,7 +25,7 @@ lazy val apfloatVersion = "1.10.1"
 lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
-val Scala213 = "2.13.9"
+val Scala213 = "2.13.10"
 val Scala3 = "3.1.3"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
@@ -191,13 +191,6 @@ lazy val commonJvmSettings = Seq()
 
 ThisBuild / tlSiteApiUrl := Some(url("https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html"))
 
-lazy val scoverageSettings = Seq(
-  coverageMinimumStmtTotal := 40,
-  coverageFailOnMinimum := false,
-  coverageHighlighting := true,
-  coverageExcludedPackages := "spire\\.benchmark\\..*;spire\\.macros\\..*"
-)
-
 lazy val coreSettings = Seq(
   Compile / sourceGenerators += (Compile / genProductTypes).taskValue,
   genProductTypes := {
@@ -225,7 +218,7 @@ lazy val munitSettings = Seq(
   )
 )
 
-lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps ++ scoverageSettings
+lazy val spireSettings = buildSettings ++ commonSettings ++ commonDeps
 
 lazy val unidocSettings = Seq(
   ScalaUnidoc / unidoc / unidocProjectFilter := inAnyProject -- inProjects(examples, benchmark, tests.jvm)
