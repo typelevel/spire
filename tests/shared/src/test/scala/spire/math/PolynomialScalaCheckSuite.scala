@@ -100,11 +100,11 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
     }
 
     property(s"$name p /~ p = 1") {
-      forAll { (p: P) => if (!p.isZero)(p.equot(p)) == one else true }
+      forAll { (p: P) => if (!p.isZero) (p.equot(p)) == one else true }
     }
 
     property(s"$name p % p = 0") {
-      forAll { (p: P) => if (!p.isZero)(p.emod(p)) == zero else true }
+      forAll { (p: P) => if (!p.isZero) (p.emod(p)) == zero else true }
     }
 
     property(s"$name x + y = y + x") {
@@ -116,7 +116,7 @@ class PolynomialScalaCheckSuite extends munit.ScalaCheckSuite {
     }
 
     property(s"$name (x /~ y) * y + (x % y) = x") {
-      forAll { (x: P, y: P) => if (!y.isZero)(x.equot(y)) * y + (x.emod(y)) == x else true }
+      forAll { (x: P, y: P) => if (!y.isZero) (x.equot(y)) * y + (x.emod(y)) == x else true }
     }
 
     property(s"$name p = p.reductum + p.maxTerm") {
