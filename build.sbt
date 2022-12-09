@@ -19,7 +19,7 @@ lazy val scalaCheckVersion = "1.17.0"
 lazy val munit = "1.0.0-M6"
 lazy val munitDiscipline = "2.0.0-M3"
 
-lazy val algebraVersion = "2.8.0"
+lazy val algebraVersion = "2.9.0"
 
 lazy val apfloatVersion = "1.10.1"
 lazy val jscienceVersion = "4.3.1"
