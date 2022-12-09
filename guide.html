@@ -864,7 +864,7 @@
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">syntax</span><span>.</span><span class="identifier">literals</span><span>.</span><span class="identifier">_</span><span>
 
 </span><span class="string-literal">ui&quot;7&quot;</span><span> </span><span class="comment">// equivalent to UInt(7)
-// res0: UInt = 7</span></code></pre>
+// res0: spire.math.UInt = 7</span></code></pre>
         
         <h4 id="fixedpoint" class="section">FixedPoint<a class="anchor-link right" href="#fixedpoint"><i class="icofont-laika">&#xef71;</i></a></h4>
         <p>This value class uses a <code>Long</code> with an implicit denominator. The type
@@ -951,16 +951,22 @@
         importing <code>spire.syntax.literals._</code> (or just <code>spire.implicits._</code>) you
         can use the <code>poly</code> string interpolator to create
         <code>Polynomial[Rational]</code> instances:</p>
-        <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">syntax</span><span>.</span><span class="identifier">literals</span><span>.</span><span class="identifier">_</span><span>
+        <pre><code class="nohighlight"><span class="keyword">import</span><span> </span><span class="identifier">spire</span><span>.</span><span class="identifier">syntax</span><span>.</span><span class="identifier">literals</span><span>.</span><span class="identifier">_</span><span>
 
 </span><span class="string-literal">poly&quot;3x^2 - 5x + 1&quot;</span><span>
-</span><span class="comment">// res1: Polynomial[Rational] = PolySparse(Array(0, 1, 2), Array(1, -5, 3))
+</span><span class="comment">// res1: spire.math.Polynomial[spire.math.Rational] = PolySparse(
+//   exp = Array(0, 1, 2),
+//   coeff = Array(1, -5, 3)
+// )
 </span><span class="string-literal">poly&quot;5/4x^6 - 7x - 2&quot;</span><span>
-</span><span class="comment">// res2: Polynomial[Rational] = PolySparse(Array(0, 1, 6), Array(-2, -7, 5/4))
+</span><span class="comment">// res2: spire.math.Polynomial[spire.math.Rational] = PolySparse(
+//   exp = Array(0, 1, 6),
+//   coeff = Array(-2, -7, 5/4)
+// )
 </span><span class="string-literal">poly&quot;1.2x^3 - 6.1x^2 + 9x - 3.33&quot;</span><span>
-</span><span class="comment">// res3: Polynomial[Rational] = PolySparse(
-//   Array(0, 1, 2, 3),
-//   Array(-333/100, 9, -61/10, 6/5)
+</span><span class="comment">// res3: spire.math.Polynomial[spire.math.Rational] = PolySparse(
+//   exp = Array(0, 1, 2, 3),
+//   coeff = Array(-333/100, 9, -61/10, 6/5)
 // )</span></code></pre>
         <p>Spire actually supports two types of polynomials: dense and
         sparse. For most simple polynomials used in these examples, you&#39;ll
