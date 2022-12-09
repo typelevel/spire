@@ -26,12 +26,13 @@ lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
 val Scala213 = "2.13.10"
-val Scala3 = "3.1.3"
+val Scala3 = "3.2.1"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 ThisBuild / tlBaseVersion := "0.18"
 
+ThisBuild / scalaVersion := Scala213
 ThisBuild / crossScalaVersions := Seq(Scala213, Scala3)
 ThisBuild / githubWorkflowJavaVersions := Seq("8", "11", "17").map(JavaSpec.temurin(_))
 
