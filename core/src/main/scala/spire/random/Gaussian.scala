@@ -66,7 +66,7 @@ final class MarsagliaGaussian[@sp(Float, Double) A: Field: NRoot: Trig: Order: U
   final private val u = Dist.uniform[A](-Field[A].one, Field[A].one)
 
   def apply(mean: A, stdDev: A): Dist[A] = {
-    new DistFromGen[A]({ gen =>
+    new DistFromGen[A] { gen =>
       @tailrec def loop(): A = {
         val x = u(gen)
         val y = u(gen)
@@ -79,6 +79,6 @@ final class MarsagliaGaussian[@sp(Float, Double) A: Field: NRoot: Trig: Order: U
         }
       }
       loop()
-    })
+    }
   }
 }

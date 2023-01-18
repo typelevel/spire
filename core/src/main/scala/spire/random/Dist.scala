@@ -305,12 +305,12 @@ object Dist extends DistInstances9 {
       i += 1
     }
 
-    new DistFromGen({ g =>
+    new DistFromGen { g =>
       val w = g.nextDouble(total)
       var i = 0
       while (ws(i) < w) i += 1
       ds(i).apply(g)
-    })
+    }
   }
 
   implicit val unit: Dist[Unit] = new DistFromGen[Unit](g => ())
