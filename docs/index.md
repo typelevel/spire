@@ -94,7 +94,7 @@ Welcome to the Ammonite Repl 2.x.x
 @ import $ivy.`org.typelevel::spire:@VERSION@`
 @ import spire._
 @ import spire.math._
-@ import sipre.implicits._
+@ import spire.implicits._
 @ Complex(3.0,5.0).sin
 res: Complex[Double] = Complex(real = 10.472508533940392, imag = -73.46062169567367)
 ```
