@@ -21,6 +21,16 @@ import spire.implicits._
 
 object EndoRingExample extends App {
 
+  case class PairedSet[A](incl: Set[A], excl: Set[A] = Set.empty[A]) {
+    def toSet: Set[A] = incl -- excl
+    def map[B](f: A => B): PairedSet[B] =
+      PairedSet[B](toSet.map(f))
+  }
+  object PairedSet {
+    def apply[A](elems: A*) =
+      new PairedSet(elems.toSet)
+  }
+
   // An abelian group is a commutative monoid with an inverse.
   trait AbGroup[A] extends Group[A]
 
@@ -35,19 +45,13 @@ object EndoRingExample extends App {
      * This turns the group of Sets under union into an abelian group by keeping track of the inclusions and exclusions
      * separately. This let's us ensure it is commutative and that we always have an inverse.
      */
-    implicit def PairedSetAbGroup[A]: AbGroup[(Set[A], Set[A])] = new AbGroup[(Set[A], Set[A])] {
-      def combine(a: (Set[A], Set[A]), b: (Set[A], Set[A])): (Set[A], Set[A]) = {
-        val (a1, a2) = a
-        val (b1, b2) = b
-        ((a1 -- b2).union(b1 -- a2), (a2 -- b1).union(b2 -- a1))
-      }
-      def inverse(a: (Set[A], Set[A])): (Set[A], Set[A]) = (a._2, a._1)
-      def empty: (Set[A], Set[A]) = (Set.empty, Set.empty)
+    implicit def PairedSetAbGroup[A]: AbGroup[PairedSet[A]] = new AbGroup[PairedSet[A]] {
+      def combine(a: PairedSet[A], b: PairedSet[A]): PairedSet[A] =
+        PairedSet((a.incl -- b.excl).union(b.incl -- a.excl), (a.excl -- b.incl).union(b.excl -- a.incl))
+      def inverse(a: PairedSet[A]): PairedSet[A] = PairedSet(a.excl, a.incl)
+      def empty: PairedSet[A] = PairedSet()
     }
   }
-
-  implicit def set2pairedSet[A](a: Set[A]): (Set[A], Set[A]) = (a, Set.empty)
-  implicit def pairedSet2set[A](a: (Set[A], Set[A])): Set[A] = a._1 -- a._2
 
   // A (not very strict) endomorphism.
   type Endo[A] = A => A
@@ -99,9 +103,7 @@ object EndoRingExample extends App {
     assert(((five * two) + two)(i) == 12 * i)
   }
 
-  implicit val pairedSetEndoRing: EndoRing[(Set[Int], Set[Int])] = EndoRing[(Set[Int], Set[Int])]
-
-  type PairedSet[A] = (Set[A], Set[A])
+  implicit val pairedSetEndoRing: EndoRing[PairedSet[Int]] = EndoRing[PairedSet[Int]]
 
   // We can define some simple endomorphisms.
   val id = pairedSetEndoRing.one
@@ -112,14 +114,14 @@ object EndoRingExample extends App {
   // Let's generate the powers of 2 from 0 to n. The endomorphism
   // `double + id` means that we double the elements of a set, then union it
   // with the original.
-  val powers: Set[Int] = ((double + id) ** 3)(Set(1))
+  val powers: Set[Int] = ((double + id) ** 3)(PairedSet(1)).toSet
   assert(powers == Set(1, 2, 4, 8))
 
-  val range: Set[Int] = ((inc + id) ** 4)(Set(1, 11))
+  val range: Set[Int] = ((inc + id) ** 4)(PairedSet(1, 11)).toSet
   assert(range == Set(1, 2, 3, 4, 5, 11, 12, 13, 14, 15))
 
   // It's distributive.
-  val q = Set(1, 2, 3)
+  val q = PairedSet(1, 2, 3)
   val e1 = (double + triple) * triple
   val e2 = (double * triple) + (triple * triple)
   assert(e1(q) == e2(q))
