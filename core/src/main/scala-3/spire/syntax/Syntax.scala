@@ -148,16 +148,15 @@ trait NRootSyntax:
   // Likely a change on the precedence of implicits causes a collision between semiringOps and nrootOps in scala-3
   // implicit def nrootOps[A: NRoot](a: A): NRootOps[A] = new NRootOps(a)
 
-  extension [A](lhs: A)(using ev: NRoot[A])
-    def nroot(rhs: Int): A = ev.nroot(lhs, rhs)
-    def sqrt: A = ev.sqrt(lhs)
-    def fpow(rhs: A): A = ev.fpow(lhs, rhs)
+  extension [A](lhs: A)(using ev: NRoot[A]) def nroot(rhs: Int): A = ev.nroot(lhs, rhs)
+  def sqrt: A = ev.sqrt(lhs)
+  def fpow(rhs: A): A = ev.fpow(lhs, rhs)
 
-    def pow(rhs: Double)(using c: Field[A]): A = ev.fpow(lhs, c.fromDouble(rhs))
-    def **(rhs: Double)(using c: Field[A]): A = ev.fpow(lhs, c.fromDouble(rhs))
+  def pow(rhs: Double)(using c: Field[A]): A = ev.fpow(lhs, c.fromDouble(rhs))
+  def **(rhs: Double)(using c: Field[A]): A = ev.fpow(lhs, c.fromDouble(rhs))
 
-    def pow(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs).pow(rhs)
-    def **(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs) ** rhs
+  def pow(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs).pow(rhs)
+  def **(rhs: Number)(using c: ConvertableFrom[A]): Number = c.toNumber(lhs) ** rhs
 
 trait LeftModuleSyntax extends RingSyntax:
   implicit def lms[V](v: V): LeftModuleOps[V] = new LeftModuleOps[V](v)
@@ -234,17 +233,16 @@ trait FractionalSyntax
 trait NumericSyntax extends FieldSyntax with NRootSyntax with ConvertableFromSyntax with OrderSyntax with SignedSyntax
 
 trait ConvertableFromSyntax:
-  extension [A](lhs: A)(using cf: ConvertableFrom[A])
-    def toString: String = cf.toString(lhs)
-    def toByte: Byte = cf.toByte(lhs)
-    def toShort: Short = cf.toShort(lhs)
-    def toInt: Int = cf.toInt(lhs)
-    def toLong: Long = cf.toLong(lhs)
-    def toFloat: Float = cf.toFloat(lhs)
-    def toDouble: Double = cf.toDouble(lhs)
-    def toBigInt: BigInt = cf.toBigInt(lhs)
-    def toBigDecimal: BigDecimal = cf.toBigDecimal(lhs)
-    def toRational: Rational = cf.toRational(lhs)
+  extension [A](lhs: A)(using cf: ConvertableFrom[A]) def toString: String = cf.toString(lhs)
+  def toByte: Byte = cf.toByte(lhs)
+  def toShort: Short = cf.toShort(lhs)
+  def toInt: Int = cf.toInt(lhs)
+  def toLong: Long = cf.toLong(lhs)
+  def toFloat: Float = cf.toFloat(lhs)
+  def toDouble: Double = cf.toDouble(lhs)
+  def toBigInt: BigInt = cf.toBigInt(lhs)
+  def toBigDecimal: BigDecimal = cf.toBigDecimal(lhs)
+  def toRational: Rational = cf.toRational(lhs)
 end ConvertableFromSyntax
 
 trait LiteralsSyntax {
@@ -292,42 +290,42 @@ trait LiteralsSyntax {
       inline def i(inline parts: Any*): Int =
         ${ siInt('{ ctx }) }
 
-      inline def j(inline parts: Any*): Long =
-        ${ siLong('{ ctx }) }
+    inline def j(inline parts: Any*): Long =
+      ${ siLong('{ ctx }) }
 
-      inline def big(inline parts: Any*): BigInt =
-        ${ siBigInt('{ ctx }) }
+    inline def big(inline parts: Any*): BigInt =
+      ${ siBigInt('{ ctx }) }
 
-      inline def dec(inline parts: Any*): BigDecimal =
-        ${ siBigDecimal('{ ctx }) }
+    inline def dec(inline parts: Any*): BigDecimal =
+      ${ siBigDecimal('{ ctx }) }
 
   object us:
     extension (inline ctx: StringContext)
       inline def i(inline parts: Any*): Int =
         ${ usInt('{ ctx }) }
 
-      inline def j(inline parts: Any*): Long =
-        ${ usLong('{ ctx }) }
+    inline def j(inline parts: Any*): Long =
+      ${ usLong('{ ctx }) }
 
-      inline def big(inline parts: Any*): BigInt =
-        ${ usBigInt('{ ctx }) }
+    inline def big(inline parts: Any*): BigInt =
+      ${ usBigInt('{ ctx }) }
 
-      inline def dec(inline parts: Any*): BigDecimal =
-        ${ usBigDecimal('{ ctx }) }
+    inline def dec(inline parts: Any*): BigDecimal =
+      ${ usBigDecimal('{ ctx }) }
 
   object eu:
     extension (inline ctx: StringContext)
       inline def i(inline parts: Any*): Int =
         ${ euInt('{ ctx }) }
 
-      inline def j(inline parts: Any*): Long =
-        ${ euLong('{ ctx }) }
+    inline def j(inline parts: Any*): Long =
+      ${ euLong('{ ctx }) }
 
-      inline def big(inline parts: Any*): BigInt =
-        ${ euBigInt('{ ctx }) }
+    inline def big(inline parts: Any*): BigInt =
+      ${ euBigInt('{ ctx }) }
 
-      inline def dec(inline parts: Any*): BigDecimal =
-        ${ euBigDecimal('{ ctx }) }
+    inline def dec(inline parts: Any*): BigDecimal =
+      ${ euBigDecimal('{ ctx }) }
 
 }
 
