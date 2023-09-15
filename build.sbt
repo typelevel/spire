@@ -16,7 +16,7 @@ import scala.language.existentials
 
 lazy val scalaCheckVersion = "1.17.0"
 
-lazy val munit = "1.0.0-M7"
+lazy val munit = "1.0.0-M10"
 lazy val munitDiscipline = "2.0.0-M3"
 
 lazy val algebraVersion = "2.9.0"
