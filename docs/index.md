@@ -550,12 +550,12 @@ In addition, Spire provides many other methods which are "missing" from
 In addition to unit tests, Spire comes with a relatively fleshed-out set of
 [JMH](https://openjdk.java.net/projects/code-tools/jmh) micro-benchmarks. To
 run the benchmarks from within SBT, change to the `benchmark` subproject 
-and then `jmh:run -l` to see a list of benchmarks:
+and then `Jmh / run -l` to see a list of benchmarks:
 
 ```
 $ sbt
 > project benchmark
-> jmh:run -l
+> Jmh / run -l
 
 [info] Benchmarks:
 [info] spire.benchmark.AddBenchmarks.addComplexDoubleStateDirect
@@ -566,22 +566,22 @@ $ sbt
 
 To run all available benchmarks:
 ```
-> jmh:run
+> Jmh / run
 ```
 
 To run a specific benchmark method:
 ```
-> jmh:run spire.benchmark.AddBenchmarks.addComplexDoubleStateDirect
+> Jmh / run spire.benchmark.AddBenchmarks.addComplexDoubleStateDirect
 ```
 
 To run all benchmarks in a specific class:
 ```
-> jmh:run spire.benchmark.AddBenchmarks
+> Jmh / run spire.benchmark.AddBenchmarks
 ```
 
 To see all available JMH usage options:
 ```
-> jmh:run -h
+> Jmh / run -h
 ```
 
 If you plan to contribute to Spire, please make sure to run the relevant
