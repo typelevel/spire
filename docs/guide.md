@@ -282,7 +282,7 @@ be implemented via a single `partialCompare` method, described below. `PartialOr
 A partial order is defined from a binary relation `<=`, which satisfies the relations:
 
 * `a <= a` (*reflexivity*)
-* if `a <= b` and `b <= a`, then `a === c` (*anti-symmetry*)
+* if `a <= b` and `b <= a`, then `a === b` (*anti-symmetry*)
 * if `a <= b` and `b <= c`, then `a <= c` (*transitivity*)
 
 To compute both `<=` and `>=` at the same time, the method `partialCompare` uses
