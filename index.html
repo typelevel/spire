@@ -892,10 +892,10 @@ res0: spire.math.Complex[Double] = (10.472508533940392 + -73.46062169567367i)</c
         <p>In addition to unit tests, Spire comes with a relatively fleshed-out set of
         <a href="https://openjdk.java.net/projects/code-tools/jmh">JMH</a> micro-benchmarks. To
         run the benchmarks from within SBT, change to the <code>benchmark</code> subproject 
-        and then <code>jmh:run -l</code> to see a list of benchmarks:</p>
+        and then <code>Jmh / run -l</code> to see a list of benchmarks:</p>
         <pre><code>$ sbt
 &gt; project benchmark
-&gt; jmh:run -l
+&gt; Jmh / run -l
 
 [info] Benchmarks:
 [info] spire.benchmark.AddBenchmarks.addComplexDoubleStateDirect
@@ -903,13 +903,13 @@ res0: spire.math.Complex[Double] = (10.472508533940392 + -73.46062169567367i)</c
 [info] spire.benchmark.AddBenchmarks.addComplexFloatStateDirect
 ...</code></pre>
         <p>To run all available benchmarks:</p>
-        <pre><code>&gt; jmh:run</code></pre>
+        <pre><code>&gt; Jmh / run</code></pre>
         <p>To run a specific benchmark method:</p>
-        <pre><code>&gt; jmh:run spire.benchmark.AddBenchmarks.addComplexDoubleStateDirect</code></pre>
+        <pre><code>&gt; Jmh / run spire.benchmark.AddBenchmarks.addComplexDoubleStateDirect</code></pre>
         <p>To run all benchmarks in a specific class:</p>
-        <pre><code>&gt; jmh:run spire.benchmark.AddBenchmarks</code></pre>
+        <pre><code>&gt; Jmh / run spire.benchmark.AddBenchmarks</code></pre>
         <p>To see all available JMH usage options:</p>
-        <pre><code>&gt; jmh:run -h</code></pre>
+        <pre><code>&gt; Jmh / run -h</code></pre>
         <p>If you plan to contribute to Spire, please make sure to run the relevant
         benchmarks to be sure that your changes don&#39;t impact performance. Benchmarks
         usually include comparisons against equivalent Scala or Java classes to try to
