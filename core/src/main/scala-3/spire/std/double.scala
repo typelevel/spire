@@ -31,9 +31,9 @@ trait DoubleIsField extends Field[Double] {
   override inline def times(a: Double, b: Double): Double = a * b
   inline def zero: Double = 0.0
 
-  override inline def fromInt(n: Int): Double = n.toDouble
+  override def fromInt(n: Int): Double = n
 
-  override inline def fromDouble(n: Double): Double = n
+  override def fromDouble(n: Double): Double = n
   inline def div(a: Double, b: Double): Double = a / b
 }
 
