@@ -146,24 +146,3 @@ trait DoubleIsReal extends IsRational[Double] with DoubleTruncatedDivision {
   def isWhole(a: Double): Boolean = a % 1.0 == 0.0
   def toRational(a: Double): Rational = Rational(a)
 }
-
-@SerialVersionUID(0L)
-class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable
-
-trait DoubleInstances {
-  implicit final val DoubleAlgebra: Field[Double]
-    with NRoot[Double]
-    with Trig[Double]
-    with IsRational[Double]
-    with TruncatedDivisionCRing[Double]
-    with Signed[Double]
-    with Order[Double] = new DoubleAlgebra
-  import Double._
-  import spire.math.NumberTag
-  import spire.math.NumberTag._
-  implicit final val DoubleTag: NumberTag[Double] =
-    new BuiltinFloatTag(0d, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
-      def isInfinite(a: Double): Boolean = java.lang.Double.isInfinite(a)
-      def isNaN(a: Double): Boolean = java.lang.Double.isNaN(a)
-    }
-}

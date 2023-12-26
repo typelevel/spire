@@ -30,58 +30,12 @@ trait DoubleIsField extends Field[Double] {
   override inline def pow(a: Double, b: Int): Double = Math.pow(a, b)
   override inline def times(a: Double, b: Double): Double = a * b
   inline def zero: Double = 0.0
+  inline def div(a: Double, b: Double): Double = a / b
 
   override def fromInt(n: Int): Double = n
-
   override def fromDouble(n: Double): Double = n
-  inline def div(a: Double, b: Double): Double = a / b
 }
 
-/* TODO: move to TruncatedDivision or remove
-trait DoubleIsGcd extends Gcd[Double] {
-  def lcm(a:Double, b:Double):Double = (a / gcd(a, b)) * b
-
-  def gcd(a:Double, b:Double):Double = {
-    def value(bits: Long): Long = bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L
-
-    def exp(bits: Long): Int = ((bits >> 52) & 0x7FF).toInt
-
-    // Computes the GCD of 2 fp values. Here, we are guaranteed that exp0 < exp1.
-    def gcd0(val0: Long, exp0: Int, val1: Long, exp1: Int): Double = {
-      val tz0 = numberOfTrailingZeros(val0)
-      val tz1 = numberOfTrailingZeros(val1)
-      val tzShared = spire.math.min(tz0, tz1 + exp1 - exp0)
-      // We trim of the power of 2s, then add back the shared portion.
-      val n = spire.math.gcd(val0 >>> tz0, val1 >>> tz1) << tzShared
-      // Number of bits to move the leading 1 to bit position 23.
-      val shift = numberOfLeadingZeros(n) - 11 // Number of bits to move 1 to bit 52
-      val exp = (exp0 - shift).toLong
-      // If exp is 0, then the value is actually just the mantissa * 2^−126,
-      // so we need to adjust the *shift* accordingly.
-      val shift0 = if (exp == 0) shift - 1 else shift
-      val mantissa = (n << shift0) & 0x000FFFFFFFFFFFFFL
-      // If exp < 0, then we have underflowed; not much we can do but return 0.
-      if (exp < 0) 0.0
-      else longBitsToDouble((exp << 52) | mantissa)
-    }
-
-    if (a == 0D) b
-    else if (b == 0D) a
-    else {
-      val aBits = doubleToLongBits(a)
-      val aVal = value(aBits)
-      val aExp = exp(aBits)
-
-      val bBits = doubleToLongBits(b)
-      val bVal = value(bBits)
-      val bExp = exp(bBits)
-
-      if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp)
-      else gcd0(bVal, bExp, aVal, aExp)
-    }
-  }
-}
- */
 trait DoubleIsNRoot extends NRoot[Double] {
   inline def nroot(a: Double, k: Int): Double = Math.pow(a, 1 / k.toDouble)
   override inline def sqrt(a: Double): Double = Math.sqrt(a)
@@ -115,15 +69,15 @@ trait DoubleIsTrig extends Trig[Double] {
 }
 
 trait DoubleOrder extends Order[Double] {
-  override def eqv(x: Double, y: Double): Boolean = x == y
-  override def neqv(x: Double, y: Double): Boolean = x != y
-  override def gt(x: Double, y: Double): Boolean = x > y
-  override def gteqv(x: Double, y: Double): Boolean = x >= y
-  override def lt(x: Double, y: Double): Boolean = x < y
-  override def lteqv(x: Double, y: Double): Boolean = x <= y
-  override def min(x: Double, y: Double): Double = Math.min(x, y)
-  override def max(x: Double, y: Double): Double = Math.max(x, y)
-  def compare(x: Double, y: Double): Int = java.lang.Double.compare(x, y)
+  override inline def eqv(x: Double, y: Double): Boolean = x == y
+  override inline def neqv(x: Double, y: Double): Boolean = x != y
+  override inline def gt(x: Double, y: Double): Boolean = x > y
+  override inline def gteqv(x: Double, y: Double): Boolean = x >= y
+  override inline def lt(x: Double, y: Double): Boolean = x < y
+  override inline def lteqv(x: Double, y: Double): Boolean = x <= y
+  override inline def min(x: Double, y: Double): Double = Math.min(x, y)
+  override inline def max(x: Double, y: Double): Double = Math.max(x, y)
+  inline def compare(x: Double, y: Double): Int = java.lang.Double.compare(x, y)
 }
 
 trait DoubleSigned extends Signed[Double] with DoubleOrder {
@@ -145,25 +99,4 @@ trait DoubleIsReal extends IsRational[Double] with DoubleTruncatedDivision {
   inline def round(a: Double): Double = spire.math.round(a)
   inline def isWhole(a: Double): Boolean = a % 1.0 == 0.0
   def toRational(a: Double): Rational = Rational(a)
-}
-
-@SerialVersionUID(0L)
-class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable
-
-trait DoubleInstances {
-  implicit final val DoubleAlgebra: Field[Double]
-    with NRoot[Double]
-    with Trig[Double]
-    with IsRational[Double]
-    with TruncatedDivisionCRing[Double]
-    with Signed[Double]
-    with Order[Double] = new DoubleAlgebra
-  import Double._
-  import spire.math.NumberTag
-  import spire.math.NumberTag._
-  implicit final val DoubleTag: NumberTag[Double] =
-    new BuiltinFloatTag(0d, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
-      def isInfinite(a: Double): Boolean = java.lang.Double.isInfinite(a)
-      def isNaN(a: Double): Boolean = java.lang.Double.isNaN(a)
-    }
 }
