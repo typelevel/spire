@@ -59,8 +59,6 @@ private[math] class DoubleIsFractional
     with ConvertableToDouble
     with DoubleIsReal
     with Serializable {
-  override def fromInt(n: Int): Double = n
-  override def fromDouble(n: Double): Double = n
   override def fromBigInt(n: BigInt): Double = n.toDouble
   override def toDouble(n: Double): Double = n.toDouble
   override def toRational(n: Double): Rational = super[DoubleIsReal].toRational(n)
