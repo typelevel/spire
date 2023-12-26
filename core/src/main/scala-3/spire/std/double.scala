@@ -83,35 +83,35 @@ trait DoubleIsGcd extends Gcd[Double] {
 }
  */
 trait DoubleIsNRoot extends NRoot[Double] {
-  def nroot(a: Double, k: Int): Double = Math.pow(a, 1 / k.toDouble)
-  override def sqrt(a: Double): Double = Math.sqrt(a)
-  def fpow(a: Double, b: Double): Double = Math.pow(a, b)
+  inline def nroot(a: Double, k: Int): Double = Math.pow(a, 1 / k.toDouble)
+  override inline def sqrt(a: Double): Double = Math.sqrt(a)
+  inline def fpow(a: Double, b: Double): Double = Math.pow(a, b)
 }
 
 trait DoubleIsTrig extends Trig[Double] {
-  def e: Double = Math.E
-  def pi: Double = Math.PI
+  inline def e: Double = Math.E
+  inline def pi: Double = Math.PI
 
-  def exp(a: Double): Double = Math.exp(a)
-  def expm1(a: Double): Double = Math.expm1(a)
-  def log(a: Double): Double = Math.log(a)
-  def log1p(a: Double): Double = Math.log1p(a)
+  inline def exp(a: Double): Double = Math.exp(a)
+  inline def expm1(a: Double): Double = Math.expm1(a)
+  inline def log(a: Double): Double = Math.log(a)
+  inline def log1p(a: Double): Double = Math.log1p(a)
 
-  def sin(a: Double): Double = Math.sin(a)
-  def cos(a: Double): Double = Math.cos(a)
-  def tan(a: Double): Double = Math.tan(a)
+  inline def sin(a: Double): Double = Math.sin(a)
+  inline def cos(a: Double): Double = Math.cos(a)
+  inline def tan(a: Double): Double = Math.tan(a)
 
-  def asin(a: Double): Double = Math.asin(a)
-  def acos(a: Double): Double = Math.acos(a)
-  def atan(a: Double): Double = Math.atan(a)
-  def atan2(y: Double, x: Double): Double = Math.atan2(y, x)
+  inline def asin(a: Double): Double = Math.asin(a)
+  inline def acos(a: Double): Double = Math.acos(a)
+  inline def atan(a: Double): Double = Math.atan(a)
+  inline def atan2(y: Double, x: Double): Double = Math.atan2(y, x)
 
-  def sinh(x: Double): Double = Math.sinh(x)
-  def cosh(x: Double): Double = Math.cosh(x)
-  def tanh(x: Double): Double = Math.tanh(x)
+  inline def sinh(x: Double): Double = Math.sinh(x)
+  inline def cosh(x: Double): Double = Math.cosh(x)
+  inline def tanh(x: Double): Double = Math.tanh(x)
 
-  def toRadians(a: Double): Double = (a * 2 * pi) / 360
-  def toDegrees(a: Double): Double = (a * 360) / (2 * pi)
+  inline def toRadians(a: Double): Double = (a * 2 * pi) / 360
+  inline def toDegrees(a: Double): Double = (a * 360) / (2 * pi)
 }
 
 trait DoubleOrder extends Order[Double] {
@@ -127,23 +127,23 @@ trait DoubleOrder extends Order[Double] {
 }
 
 trait DoubleSigned extends Signed[Double] with DoubleOrder {
-  def order = this
-  override def signum(a: Double): Int = Math.signum(a).toInt
-  override def abs(a: Double): Double = if (a < 0.0) -a else a
+  inline def order = this
+  override inline def signum(a: Double): Int = Math.signum(a).toInt
+  override inline def abs(a: Double): Double = if (a < 0.0) -a else a
 }
 
 trait DoubleTruncatedDivision extends TruncatedDivisionCRing[Double] with DoubleSigned {
   def toBigIntOpt(a: Double): Opt[BigInt] = if (a.isWhole) Opt(BigDecimal(a).toBigInt) else Opt.empty[BigInt]
-  def tquot(a: Double, b: Double): Double = (a - (a % b)) / b
-  def tmod(a: Double, b: Double): Double = a % b
+  inline def tquot(a: Double, b: Double): Double = (a - (a % b)) / b
+  inline def tmod(a: Double, b: Double): Double = a % b
 }
 
 trait DoubleIsReal extends IsRational[Double] with DoubleTruncatedDivision {
   def toDouble(x: Double): Double = x
-  def ceil(a: Double): Double = Math.ceil(a)
-  def floor(a: Double): Double = Math.floor(a)
-  def round(a: Double): Double = spire.math.round(a)
-  def isWhole(a: Double): Boolean = a % 1.0 == 0.0
+  inline def ceil(a: Double): Double = Math.ceil(a)
+  inline def floor(a: Double): Double = Math.floor(a)
+  inline def round(a: Double): Double = spire.math.round(a)
+  inline def isWhole(a: Double): Boolean = a % 1.0 == 0.0
   def toRational(a: Double): Rational = Rational(a)
 }
 
