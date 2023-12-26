@@ -25,11 +25,11 @@ import java.lang.Math
 trait DoubleIsField extends Field[Double] {
   override inline def minus(a: Double, b: Double): Double = a - b
   inline def negate(a: Double): Double = -a
-  inline val one: Double = 1.0
+  inline def one: Double = 1.0
   inline def plus(a: Double, b: Double): Double = a + b
   override inline def pow(a: Double, b: Int): Double = Math.pow(a, b)
   override inline def times(a: Double, b: Double): Double = a * b
-  inline val zero: Double = 0.0
+  inline def zero: Double = 0.0
 
   override inline def fromInt(n: Int): Double = n.toDouble
 
