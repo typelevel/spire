@@ -23,18 +23,18 @@ import spire.util.Opt
 import java.lang.Math
 
 trait DoubleIsField extends Field[Double] {
-  override def minus(a: Double, b: Double): Double = a - b
-  def negate(a: Double): Double = -a
-  def one: Double = 1.0
-  def plus(a: Double, b: Double): Double = a + b
-  override def pow(a: Double, b: Int): Double = Math.pow(a, b)
-  override def times(a: Double, b: Double): Double = a * b
-  def zero: Double = 0.0
+  override inline def minus(a: Double, b: Double): Double = a - b
+  inline def negate(a: Double): Double = -a
+  inline val one: Double = 1.0
+  inline def plus(a: Double, b: Double): Double = a + b
+  override inline def pow(a: Double, b: Int): Double = Math.pow(a, b)
+  override inline def times(a: Double, b: Double): Double = a * b
+  inline val zero: Double = 0.0
 
-  override def fromInt(n: Int): Double = n
+  override inline def fromInt(n: Int): Double = n.toDouble
 
-  override def fromDouble(n: Double): Double = n
-  def div(a: Double, b: Double): Double = a / b
+  override inline def fromDouble(n: Double): Double = n
+  inline def div(a: Double, b: Double): Double = a / b
 }
 
 /* TODO: move to TruncatedDivision or remove
