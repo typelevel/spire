@@ -39,5 +39,5 @@ trait DoubleInstances {
     }
 
   implicit final def ImplicitDoubleAlgebra: DoubleAlgebra =
-      this.DoubleAlgebra.asInstanceOf[DoubleAlgebra]
+    this.DoubleAlgebra.asInstanceOf[DoubleAlgebra]
 }
