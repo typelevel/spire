@@ -22,12 +22,9 @@ import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig, TruncatedDi
 class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable
 
 trait DoubleInstances {
-  implicit final val DoubleAlgebra: DoubleIsField
-    with DoubleIsNRoot
-    with DoubleIsTrig
-    with DoubleIsReal
-    with DoubleSigned
-    with Serializable = new DoubleAlgebra
+  implicit final val DoubleAlgebra
+    : DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with DoubleSigned with Serializable =
+    new DoubleAlgebra
   import Double._
   import spire.math.NumberTag
   import spire.math.NumberTag._
