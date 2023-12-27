@@ -22,9 +22,13 @@ import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig, TruncatedDi
 class DoubleAlgebra extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with Serializable
 
 trait DoubleInstances {
-  implicit final val DoubleAlgebra
-    : DoubleIsField with DoubleIsNRoot with DoubleIsTrig with DoubleIsReal with DoubleSigned with Serializable =
-    new DoubleAlgebra
+  final val DoubleAlgebra: Field[Double]
+    with NRoot[Double]
+    with Trig[Double]
+    with IsRational[Double]
+    with TruncatedDivisionCRing[Double]
+    with Signed[Double]
+    with Order[Double] = new DoubleAlgebra
   import Double._
   import spire.math.NumberTag
   import spire.math.NumberTag._
@@ -33,4 +37,7 @@ trait DoubleInstances {
       def isInfinite(a: Double): Boolean = java.lang.Double.isInfinite(a)
       def isNaN(a: Double): Boolean = java.lang.Double.isNaN(a)
     }
+
+  implicit final def ImplicitDoubleAlgebra: DoubleAlgebra =
+      this.DoubleAlgebra.asInstanceOf[DoubleAlgebra]
 }
