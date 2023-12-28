@@ -100,6 +100,3 @@ trait FloatIsReal extends IsRational[Float] with FloatTruncatedDivision {
   def isWhole(a: Float): Boolean = a % 1.0 == 0.0
   def toRational(a: Float): Rational = Rational(a)
 }
-
-
-
