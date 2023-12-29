@@ -62,7 +62,7 @@ trait IntIsNRoot extends NRoot[Int] {
   }
 
   def log(a: Int): Int = Math.log(a.toDouble).toInt
-  def fpow(a: Int, b: Int): Int = Math.pow(a, b).toInt
+  inline def fpow(a: Int, b: Int): Int = Math.pow(a, b).toInt
 }
 
 trait IntOrder extends Order[Int] {
