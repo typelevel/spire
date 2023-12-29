@@ -24,6 +24,10 @@ class FloatAlgebra extends FloatIsField with FloatIsNRoot with FloatIsTrig with 
 trait FloatInstances {
   final val FloatAlgebra: Field[Float] with NRoot[Float] with Trig[Float] with IsRational[Float] with Order[Float] =
     new FloatAlgebra
+
+  implicit final def ImplicitFloatAlgebra: FloatAlgebra =
+    this.FloatAlgebra.asInstanceOf[FloatAlgebra]
+
   import Float._
   import spire.math.NumberTag
   import spire.math.NumberTag._
@@ -32,7 +36,4 @@ trait FloatInstances {
       def isInfinite(a: Float): Boolean = java.lang.Float.isInfinite(a)
       def isNaN(a: Float): Boolean = java.lang.Float.isNaN(a)
     }
-
-  implicit final def ImplicitFloatAlgebra: FloatAlgebra =
-    this.FloatAlgebra.asInstanceOf[FloatAlgebra]
 }

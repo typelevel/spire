@@ -23,17 +23,22 @@ import spire.math.BitString
 class IntAlgebra extends IntIsEuclideanRing with IntIsNRoot with IntIsReal with Serializable
 
 trait IntInstances {
-  implicit final val IntBitString: BitString[Int] = new IntIsBitString
+  final val IntBitString: BitString[Int] = new IntIsBitString
+
+  implicit final def ImplicitIntBitString: IntIsBitString =
+    this.IntBitString.asInstanceOf[IntIsBitString]
+
   final val IntAlgebra: EuclideanRing[Int]
     with NRoot[Int]
     with IsIntegral[Int]
     with TruncatedDivisionCRing[Int]
     with Signed[Int]
     with Order[Int] = new IntAlgebra
-  import spire.math.NumberTag
-  import spire.math.NumberTag._
-  implicit final val IntTag: NumberTag[Int] = new BuiltinIntTag[Int](0, Int.MinValue, Int.MaxValue)
 
   implicit final def ImplicitIntAlgebra: IntAlgebra =
     this.IntAlgebra.asInstanceOf[IntAlgebra]
+
+  import spire.math.NumberTag
+  import spire.math.NumberTag._
+  implicit final val IntTag: NumberTag[Int] = new BuiltinIntTag[Int](0, Int.MinValue, Int.MaxValue)
 }

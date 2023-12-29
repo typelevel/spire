@@ -29,6 +29,10 @@ trait DoubleInstances {
     with TruncatedDivisionCRing[Double]
     with Signed[Double]
     with Order[Double] = new DoubleAlgebra
+
+  implicit final def ImplicitDoubleAlgebra: DoubleAlgebra =
+    this.DoubleAlgebra.asInstanceOf[DoubleAlgebra]
+
   import Double._
   import spire.math.NumberTag
   import spire.math.NumberTag._
@@ -37,7 +41,4 @@ trait DoubleInstances {
       def isInfinite(a: Double): Boolean = java.lang.Double.isInfinite(a)
       def isNaN(a: Double): Boolean = java.lang.Double.isNaN(a)
     }
-
-  implicit final def ImplicitDoubleAlgebra: DoubleAlgebra =
-    this.DoubleAlgebra.asInstanceOf[DoubleAlgebra]
 }
