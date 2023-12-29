@@ -116,4 +116,3 @@ class IntIsBitString extends BitString[Int] with Serializable {
   inline def rotateLeft(n: Int, i: Int): Int = Integer.rotateLeft(n, i)
   inline def rotateRight(n: Int, i: Int): Int = Integer.rotateRight(n, i)
 }
-

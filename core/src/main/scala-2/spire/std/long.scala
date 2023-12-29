@@ -117,5 +117,3 @@ class LongIsBitString extends BitString[Long] with Serializable {
   def rotateLeft(n: Long, i: Int): Long = java.lang.Long.rotateLeft(n, i)
   def rotateRight(n: Long, i: Int): Long = java.lang.Long.rotateRight(n, i)
 }
-
-
