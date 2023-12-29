@@ -61,8 +61,8 @@ trait LongIsNRoot extends NRoot[Long] {
     else if (n == 1) x
     else findnroot(0, 1L << ((65 - n) / n))
   }
-  inline def log(a: Long): Long = Math.log(a.toDouble).toLong
-  inline def fpow(a: Long, b: Long): Long = spire.math.pow(a, b) // xyz
+  def log(a: Long): Long = Math.log(a.toDouble).toLong
+  def fpow(a: Long, b: Long): Long = spire.math.pow(a, b) // xyz
 }
 
 trait LongOrder extends Order[Long] {

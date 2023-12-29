@@ -61,8 +61,8 @@ trait IntIsNRoot extends NRoot[Int] {
     findnroot(0, 1 << ((33 - n) / n))
   }
 
-  inline def log(a: Int): Int = Math.log(a.toDouble).toInt
-  inline def fpow(a: Int, b: Int): Int = Math.pow(a, b).toInt
+  def log(a: Int): Int = Math.log(a.toDouble).toInt
+  def fpow(a: Int, b: Int): Int = Math.pow(a, b).toInt
 }
 
 trait IntOrder extends Order[Int] {
