@@ -85,13 +85,13 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
     upper1 > upper2 || upper1 === upper2 && (isClosedUpper(flags1) || isOpenUpper(flags2))
 
   def isEmpty: Boolean =
-    this.isInstanceOf[Empty[_]]
+    this.isInstanceOf[Empty[?]]
 
   def nonEmpty: Boolean =
     !isEmpty
 
   def isPoint: Boolean =
-    this.isInstanceOf[Point[_]]
+    this.isInstanceOf[Point[?]]
 
   def contains(t: A)(implicit o: Order[A]): Boolean =
     hasAtOrBelow(t) && hasAtOrAbove(t)
@@ -187,26 +187,26 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
 
   // Does this interval contains any points at or above t ?
   def hasAtOrAbove(t: A)(implicit o: Order[A]): Boolean = this match {
-    case _: Empty[_] => false
+    case _: Empty[?] => false
     case Point(p)    => p >= t
     case Below(upper, flags) =>
       upper > t || isClosedUpper(flags) && upper === t
     case Bounded(lower, upper, flags) =>
       upper > t || isClosedUpper(flags) && upper === t
-    case _: Above[_] => true
-    case _: All[_]   => true
+    case _: Above[?] => true
+    case _: All[?]   => true
   }
 
   // Does this interval contains any points at or below t ?
   def hasAtOrBelow(t: A)(implicit o: Order[A]): Boolean = this match {
-    case _: Empty[_] => false
+    case _: Empty[?] => false
     case Point(p)    => p <= t
     case Above(lower, flags) =>
       lower < t || isClosedLower(flags) && lower === t
     case Bounded(lower, upper, flags) =>
       lower < t || isClosedLower(flags) && lower === t
-    case _: Below[_] => true
-    case _: All[_]   => true
+    case _: Below[?] => true
+    case _: All[?]   => true
   }
 
   def isAt(t: A)(implicit o: Eq[A]): Boolean = this match {

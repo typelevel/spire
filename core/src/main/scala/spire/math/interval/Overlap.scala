@@ -24,12 +24,12 @@ import spire.syntax.eq._
  * An ADT that represents overlapping result for any two intervals.
  */
 sealed abstract class Overlap[A] extends Product with Serializable {
-  def isDisjoint: Boolean = this.isInstanceOf[Disjoint[_]]
+  def isDisjoint: Boolean = this.isInstanceOf[Disjoint[?]]
   def isSubset: Boolean = this match {
     case Subset(_, _) | Equal() => true
     case _                      => false
   }
-  def isEqual: Boolean = this.isInstanceOf[Equal[_]]
+  def isEqual: Boolean = this.isInstanceOf[Equal[?]]
 }
 
 object Overlap {

@@ -98,7 +98,7 @@ final class IntervalSeq[T] private (val belowAll: Boolean,
   }
 
   override def equals(rhs: Any): Boolean = rhs match {
-    case rhs: IntervalSeq[_] =>
+    case rhs: IntervalSeq[?] =>
       lhs.belowAll == rhs.belowAll &&
       Arrays.equals(lhs.kinds, rhs.kinds) &&
       Arrays.equals(values.asInstanceOf[Array[AnyRef]], rhs.values.asInstanceOf[Array[AnyRef]])

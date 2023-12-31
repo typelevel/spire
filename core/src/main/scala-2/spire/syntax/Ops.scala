@@ -287,7 +287,7 @@ final class RightModuleOps[V](x: V) {
 }
 
 @deprecated("Unbound syntax will be removed", "spire 0.18.0")
-final class ModuleUnboundOps[F: ({ type F[A] = CModule[_, A] })#F](lhs: F) {
+final class ModuleUnboundOps[F: ({ type F[A] = CModule[?, A] })#F](lhs: F) {
   def +(rhs: F): F = macro Ops.binopWithScalar[F, F]
   def -(rhs: F): F = macro Ops.binopWithScalar[F, F]
   def unary_- : F = macro Ops.unopWithScalar0[F]
@@ -309,7 +309,7 @@ final class VectorSpaceOps[V](x: V) {
 }
 
 @deprecated("Unbound syntax will be removed", "spire 0.18.0")
-final class VectorSpaceUnboundOps[F: ({ type F[A] = VectorSpace[_, A] })#F](lhs: F) {
+final class VectorSpaceUnboundOps[F: ({ type F[A] = VectorSpace[?, A] })#F](lhs: F) {
   def /(rhs: F): F = macro Ops.binopWithScalar[F, F]
   def reciprocal: F = macro Ops.unopWithScalar[F]
 }
@@ -414,21 +414,21 @@ final class RightActionOps[P](lhs: P) {
 }
 
 @deprecated("Unbound syntax will be removed", "spire 0.18.0")
-final class ActionUnboundOps[G: ({ type F[A] = Action[_, A] })#F](lhs: G) {
+final class ActionUnboundOps[G: ({ type F[A] = Action[?, A] })#F](lhs: G) {
   def |+|(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def |-|(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def inverse: G = macro Ops.unopWithScalar[G]
 }
 
 @deprecated("Unbound syntax will be removed", "spire 0.18.0")
-final class AdditiveActionUnboundOps[G: ({ type F[A] = AdditiveAction[_, A] })#F](lhs: G) {
+final class AdditiveActionUnboundOps[G: ({ type F[A] = AdditiveAction[?, A] })#F](lhs: G) {
   def +(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def -(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def unary_- : G = macro Ops.unopWithScalar0[G]
 }
 
 @deprecated("Unbound syntax will be removed", "spire 0.18.0")
-final class MultiplicativeActionUnboundOps[G: ({ type F[A] = MultiplicativeAction[_, A] })#F](lhs: G) {
+final class MultiplicativeActionUnboundOps[G: ({ type F[A] = MultiplicativeAction[?, A] })#F](lhs: G) {
   def *(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def /(rhs: G): G = macro Ops.binopWithScalar[G, G]
   def reciprocal: G = macro Ops.unopWithScalar[G]
