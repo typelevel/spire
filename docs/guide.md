@@ -666,12 +666,20 @@ type classes (ranging from `AdditiveSemigroup[A]` for `+` to
 Intervals may be unbounded on either side, and bounds can be open or
 closed.  (An interval includes closed boundaries, but not open
 boundaries). Here are some string representations of various
-intervals:
+intervals, and how to create their equivalents in `spire`:
 
- * `[3, 6]` the set of values between 3 and 6 (including both).
- * `(2, 4)` the set of values between 2 and 4 (excluding both).
- * `[1, 2)` half-open set, including 1 but not 2.
- * `(-∞, 5)` the set of values less than 5.
+ * `[3, 6]` the set of values between 3 and 6 (including both) - `Interval.fromBounds(Closed(3), Closed(6))`
+ * `(2, 4)` the set of values between 2 and 4 (excluding both) - `Interval.fromBounds(Open(2), Open(4))`
+ * `[1, 2)` half-open set, including 1 but not 2 - `Interval.fromBounds(Closed(1), Open(2))`
+ * `(-∞, 5)` the set of values less than 5 - `Below.below(5)`
+ * `[1, ∞]` the set of values greater than or equal to 1 - `Above.atOrAbove(1)`
+ * `Ø` the empty set - `Empty()`
+ * `(-∞, ∞)` the set of all values - `All()`
+
+Note that `Interval` may be used in place of `Below`/`Above`/
+`Empty`/`All`, though these methods share a return value of the 
+`Interval` supertype from which lower/upper bound values which are
+known can't be extracted.
 
 Intervals model continuous spaces, even if the type A is discrete. So
 for instance when `(3, 4)` is an `Interval[Int]` it is not considered

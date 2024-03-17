@@ -798,7 +798,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
   def overlap(rhs: Interval[A])(implicit o: Order[A]): Overlap[A] = Overlap(lhs, rhs)
 }
 
-case class All[A] private[spire] () extends Interval[A] {
+case class All[A]() extends Interval[A] {
   def lowerBound: Unbound[A] = Unbound()
   def upperBound: Unbound[A] = Unbound()
 }
@@ -808,9 +808,19 @@ case class Above[A] private[spire] (lower: A, flags: Int) extends Interval[A] {
   def upperBound: Unbound[A] = Unbound()
 }
 
+object Above {
+  def above[A: Order](a: A): Above[A] = Above(a, 1)
+  def atOrAbove[A: Order](a: A): Above[A] = Above(a, 0)
+}
+
 case class Below[A] private[spire] (upper: A, flags: Int) extends Interval[A] {
   def lowerBound: Unbound[A] = Unbound()
   def upperBound: ValueBound[A] = if (isOpenUpper(flags)) Open(upper) else Closed(upper)
+}
+
+object Below {
+  def below[A: Order](a: A): Below[A] = Below(a, 2)
+  def atOrBelow[A: Order](a: A): Below[A] = Below(a, 0)
 }
 
 // Bounded, non-empty interval with lower < upper
@@ -819,12 +829,12 @@ case class Bounded[A] private[spire] (lower: A, upper: A, flags: Int) extends In
   def upperBound: ValueBound[A] = if (isOpenUpper(flags)) Open(upper) else Closed(upper)
 }
 
-case class Point[A] private[spire] (value: A) extends Interval[A] {
+case class Point[A](value: A) extends Interval[A] {
   def lowerBound: Closed[A] = Closed(value)
   def upperBound: Closed[A] = Closed(value)
 }
 
-case class Empty[A] private[spire] () extends Interval[A] {
+case class Empty[A]() extends Interval[A] {
   def lowerBound: EmptyBound[A] = EmptyBound()
   def upperBound: EmptyBound[A] = EmptyBound()
 }
@@ -944,10 +954,10 @@ object Interval {
     if (lower < upper) Bounded(lower, upper, 1) else Interval.empty[A]
   def openUpper[A: Order](lower: A, upper: A): Interval[A] =
     if (lower < upper) Bounded(lower, upper, 2) else Interval.empty[A]
-  def above[A: Order](a: A): Interval[A] = Above(a, 1)
-  def below[A: Order](a: A): Interval[A] = Below(a, 2)
-  def atOrAbove[A: Order](a: A): Interval[A] = Above(a, 0)
-  def atOrBelow[A: Order](a: A): Interval[A] = Below(a, 0)
+  def above[A: Order](a: A): Interval[A] = Above.above(a)
+  def below[A: Order](a: A): Interval[A] = Below.below(a)
+  def atOrAbove[A: Order](a: A): Interval[A] = Above.atOrAbove(a)
+  def atOrBelow[A: Order](a: A): Interval[A] = Below.atOrBelow(a)
 
   private val NullRe = "^ *\\( *Ø *\\) *$".r
   private val SingleRe = "^ *\\[ *([^,]+) *\\] *$".r
