@@ -247,8 +247,8 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
     case rhs: Algebraic     => rhs == lhs
     case rhs: Real          => lhs == rhs.toRational
     case rhs: Number        => Number(lhs.toBigInt) == rhs
-    case rhs: Complex[_]    => rhs == lhs
-    case rhs: Quaternion[_] => rhs == lhs
+    case rhs: Complex[?]    => rhs == lhs
+    case rhs: Quaternion[?] => rhs == lhs
     case that               => unifiedPrimitiveEquals(that)
   }
 

@@ -54,7 +54,7 @@ class IntervalOverlapScalaCheckSuite extends munit.ScalaCheckSuite {
   property("(-inf, a] overlap [a, +inf) = PartialOverlap") {
     forAll { (x: Rational) =>
       Interval.atOrBelow(x).overlap(Interval.atOrAbove(x)) match {
-        case _: PartialOverlap[_] => true
+        case _: PartialOverlap[?] => true
         case _                    => false
       }
     }
@@ -68,7 +68,7 @@ class IntervalOverlapScalaCheckSuite extends munit.ScalaCheckSuite {
       val sorted = List(x, y, m, n).sorted
       (sorted.distinct == sorted) ==> {
         Interval.openUpper(sorted(0), sorted(2)).overlap(Interval.openLower(sorted(1), sorted(3))) match {
-          case _: PartialOverlap[_] => true
+          case _: PartialOverlap[?] => true
           case _                    => false
         }
       }
@@ -81,7 +81,7 @@ class IntervalOverlapScalaCheckSuite extends munit.ScalaCheckSuite {
       val sorted = List(x, y, m, n).sorted
       (sorted.distinct.size >= 3 && sorted(0) != sorted(1) && sorted(2) != sorted(3)) ==> {
         Interval.closed(sorted(0), sorted(2)).overlap(Interval.closed(sorted(1), sorted(3))) match {
-          case _: PartialOverlap[_] => true
+          case _: PartialOverlap[?] => true
           case _                    => false
         }
       }
@@ -93,7 +93,7 @@ class IntervalOverlapScalaCheckSuite extends munit.ScalaCheckSuite {
       (x != y) ==> {
         import spire.algebra.Order.catsKernelOrderingForOrder
         Interval.below(max(x, y)).overlap(Interval.above(min(x, y))) match {
-          case _: PartialOverlap[_] => true
+          case _: PartialOverlap[?] => true
           case _                    => false
         }
       }
@@ -145,7 +145,7 @@ class IntervalOverlapScalaCheckSuite extends munit.ScalaCheckSuite {
   property("x overlap [a] is never a PartialOverlap") {
     forAll { (x: Interval[Rational], b: Rational) =>
       x.overlap(Interval.point(b)) match {
-        case _: PartialOverlap[_] => false
+        case _: PartialOverlap[?] => false
         case _                    => true
       }
     }
