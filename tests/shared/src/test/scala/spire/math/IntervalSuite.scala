@@ -45,7 +45,7 @@ class IntervalSuite extends munit.FunSuite {
   test("Interval.closed(0, 5).isBounded is true") { assert(Interval.closed(0, 5).isBounded) }
 
   test("Interval.point(2).toString == [2]") { assertEquals(Interval.point(2).toString, "[2]") }
-  test("Interval.empty.toString == (Ø)") { assertEquals(Interval.empty[Int].toString, "(Ø)") }
+  test("Interval.empty.toString == (∅)") { assertEquals(Interval.empty[Int].toString, "(∅)") }
 
   val a = cc(0.0, 4.0)
   test("a.contains(0.0) is true") { assertEquals(a.contains(0.0), true) }

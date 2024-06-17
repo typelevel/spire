@@ -36,7 +36,7 @@ class IntervalOverlapScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-  property("(x overlap Ø) = Subset(Ø, x) id x != Ø") {
+  property("(x overlap ∅) = Subset(∅, x) id x != ∅") {
     forAll { (x: Interval[Rational]) =>
       (x.nonEmpty) ==> {
         val empty = Interval.empty[Rational]

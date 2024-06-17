@@ -54,7 +54,7 @@ object Overlap {
 
   /**
    * [[inner]] is a subset of [[outer]]. Empty interval is always a subset of any other, so all overlaps on empty
-   * intervals go here, except `(Ø).overlap(Ø)`, that results in equality.
+   * intervals go here, except `(∅).overlap(∅)`, that results in equality.
    *
    * For example [1,4) and [1, 5]
    */
