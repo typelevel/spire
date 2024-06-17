@@ -273,7 +273,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
     case All() =>
       "(-∞, ∞)"
     case Empty() =>
-      "(Ø)"
+      "(∅)"
     case Above(lower, flags) =>
       if (isClosedLower(flags)) s"[$lower, ∞)" else s"($lower, ∞)"
     case Below(upper, flags) =>
@@ -949,7 +949,7 @@ object Interval {
   def atOrAbove[A: Order](a: A): Interval[A] = Above(a, 0)
   def atOrBelow[A: Order](a: A): Interval[A] = Below(a, 0)
 
-  private val NullRe = "^ *\\( *Ø *\\) *$".r
+  private val NullRe = "^ *\\( *∅ *\\) *$".r
   private val SingleRe = "^ *\\[ *([^,]+) *\\] *$".r
   private val PairRe = "^ *(\\[|\\() *(.+?) *, *(.+?) *(\\]|\\)) *$".r
 

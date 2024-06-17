@@ -47,7 +47,7 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
 
   val rng = spire.random.GlobalRng
 
-  property("(x -- y) ⊆ x && (x -- y) & y = Ø") {
+  property("(x -- y) ⊆ x && (x -- y) & y = ∅") {
     forAll { (x: Interval[Rational], y: Interval[Rational]) =>
       (x -- y).foreach { zi =>
         (zi.isSubsetOf(x)) &&
@@ -56,7 +56,7 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-  property("(x -- Ø) = x") {
+  property("(x -- ∅) = x") {
     forAll { (x: Interval[Rational]) =>
       if (x.nonEmpty) {
         (x -- Interval.empty[Rational]) == List(x)
@@ -64,13 +64,13 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
     }
   }
 
-  property("(x -- x) = Ø") {
+  property("(x -- x) = ∅") {
     forAll { (x: Interval[Rational]) =>
       (x -- x) == Nil
     }
   }
 
-  property("(x -- (-∞, ∞)) = Ø") {
+  property("(x -- (-∞, ∞)) = ∅") {
     forAll { (x: Interval[Rational]) =>
       (x -- Interval.all[Rational]) == Nil
     }
