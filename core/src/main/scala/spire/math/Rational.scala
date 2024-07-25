@@ -174,14 +174,14 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
    * Returns a `Rational` whose numerator and denominator both fit in an `Int`.
    */
   def limitToInt: Rational =
-    if (signum < 0) -(-this).limitTo(Rational.Two31m0)
+    if (signum < 0) - -this.limitTo(Rational.Two31m0)
     else limitTo(Rational.Two31m1)
 
   /**
    * Returns a `Rational` whose numerator and denominator both fit in a `Long`.
    */
   def limitToLong: Rational =
-    if (signum < 0) -(-this).limitTo(Rational.Two63m0)
+    if (signum < 0) - -this.limitTo(Rational.Two63m0)
     else limitTo(Rational.Two63m1)
 
   /**
@@ -193,7 +193,7 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
    *   A positive integer.
    */
   def limitTo(max: SafeLong): Rational = if (this.signum < 0) {
-    -(-this).limitTo(max)
+    - -this.limitTo(max)
   } else {
     require(max.signum > 0, "Limit must be a positive integer.")
 

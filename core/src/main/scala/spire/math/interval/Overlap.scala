@@ -43,7 +43,7 @@ object Overlap {
      * An interval that joins [[lower]] and [[upper]] in a continuous interval without intersecting any of them. For
      * example for (-5, 1] and (4, 6), a join is (1,4]
      */
-    def join(implicit o: Order[A]): Interval[A] = (~lower).last.intersect((~upper).head)
+    def join(implicit o: Order[A]): Interval[A] = ~lower.last.intersect(~upper.head)
   }
 
   /**

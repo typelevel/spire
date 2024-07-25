@@ -174,7 +174,7 @@ class SafeLongScalaCheckSuite extends munit.ScalaCheckSuite {
       sx.isWhole &&
       sx.isValidInt == x.isValidInt &&
       sx.isValidLong &&
-      (x == Long.MinValue || (-sx).isValidLong)
+      (x == Long.MinValue || -sx.isValidLong)
     }
   }
 
