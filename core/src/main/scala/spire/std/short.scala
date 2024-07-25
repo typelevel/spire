@@ -22,7 +22,7 @@ import spire.util.Opt
 
 trait ShortIsEuclideanRing extends EuclideanRing[Short] {
   override def minus(a: Short, b: Short): Short = (a - b).toShort
-  def negate(a: Short): Short = (-a).toShort
+  def negate(a: Short): Short = -a.toShort
   def one: Short = 1.toShort
   def plus(a: Short, b: Short): Short = (a + b).toShort
   // override def pow(a: Short, b:Int): Short = Math.pow(a, b).toShort TODO: does not obey laws
@@ -75,7 +75,7 @@ trait ShortOrder extends Order[Short] {
 trait ShortSigned extends Signed[Short] with ShortOrder {
   def order = this
   override def signum(a: Short): Int = java.lang.Integer.signum(a)
-  override def abs(a: Short): Short = if (a < 0) (-a).toShort else a.toShort
+  override def abs(a: Short): Short = if (a < 0) -a.toShort else a.toShort
 }
 
 trait ShortTruncatedDivision extends TruncatedDivisionCRing[Short] with ShortSigned {
@@ -95,7 +95,7 @@ class ShortIsBitString extends BitString[Short] with Serializable {
   def zero: Short = 0: Short
   def and(a: Short, b: Short): Short = (a & b).toShort
   def or(a: Short, b: Short): Short = (a | b).toShort
-  def complement(a: Short): Short = (~a).toShort
+  def complement(a: Short): Short = ~a.toShort
   override def xor(a: Short, b: Short): Short = (a ^ b).toShort
 
   def signed: Boolean = true

@@ -57,7 +57,7 @@ trait CombinationLaws[A] extends Laws {
       name = "signedAdditiveAbGroup",
       parent = Some(signedAdditiveCMonoid),
       "abs(x) equals abs(-x)" -> forAllSafe { (x: A) =>
-        x.abs === (-x).abs
+        x.abs === -x.abs
       }
     )
 

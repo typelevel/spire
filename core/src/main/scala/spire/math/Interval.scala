@@ -245,7 +245,7 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
   /* Returns the list of disjoint non-empty intervals resulting from the exclusion of the interval with rhs */
   def --(rhs: Interval[A])(implicit o: Order[A]): List[Interval[A]] =
     if (lhs.intersects(rhs)) {
-      (~rhs).map(lhs & _).filter(_.nonEmpty)
+      ~rhs.map(lhs & _).filter(_.nonEmpty)
     } else {
       if (lhs.isEmpty) Nil else List(lhs)
     }

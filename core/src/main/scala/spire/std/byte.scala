@@ -22,7 +22,7 @@ import spire.math.BitString
 
 trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
   override def minus(a: Byte, b: Byte): Byte = (a - b).toByte
-  def negate(a: Byte): Byte = (-a).toByte
+  def negate(a: Byte): Byte = -a.toByte
   def one: Byte = 1.toByte
   def plus(a: Byte, b: Byte): Byte = (a + b).toByte
   override def pow(a: Byte, b: Int): Byte = Math.pow(a, b).toByte
@@ -75,7 +75,7 @@ trait ByteOrder extends Order[Byte] {
 trait ByteSigned extends Signed[Byte] with ByteOrder {
   def order = this
   override def signum(a: Byte): Int = java.lang.Integer.signum(a)
-  override def abs(a: Byte): Byte = if (a < 0) (-a).toByte else a
+  override def abs(a: Byte): Byte = if (a < 0) -a.toByte else a
 }
 
 trait ByteTruncatedDivision extends TruncatedDivisionCRing[Byte] with ByteSigned {
@@ -95,7 +95,7 @@ class ByteIsBitString extends BitString[Byte] with Serializable {
   def zero: Byte = 0: Byte
   def and(a: Byte, b: Byte): Byte = (a & b).toByte
   def or(a: Byte, b: Byte): Byte = (a | b).toByte
-  def complement(a: Byte): Byte = (~a).toByte
+  def complement(a: Byte): Byte = ~a.toByte
   override def xor(a: Byte, b: Byte): Byte = (a ^ b).toByte
 
   def signed: Boolean = true

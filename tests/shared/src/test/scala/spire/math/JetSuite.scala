@@ -212,7 +212,7 @@ class JetSuite extends munit.FunSuite {
     val i = Array(1.0f, 2.0f, 3.0f)
     val a = Jet(r, i)
     assertEquals(-a, new Jet(-r, -i))
-    assertEquals(-(-a), a)
+    assertEquals(- -a, a)
   }
   test("Arithmetic combinations with scalars") {
     val r = 13.0f
