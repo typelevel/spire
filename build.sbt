@@ -53,7 +53,7 @@ ThisBuild / developers := List(
   )
 )
 
-ThisBuild / tlFatalWarningsInCi := false
+ThisBuild / tlFatalWarnings := false
 
 // Projects
 
