@@ -1,157 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
+  
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="Laika 0.18.1 + Helium Theme" />
-    <title>Spire User&#39;s Guide</title>
-    
-      <meta name="author" content="Erik Osheim"/>
-    
-      <meta name="author" content="Tom Switzer"/>
-    
-    
-      <meta name="description" content="docs"/>
-    
-    
-      <link rel="icon" sizes="32x32" type="image/png" href="https://typelevel.org/img/favicon.png"/>
-    
-    
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700">
-    
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:500">
-    
-    <link rel="stylesheet" type="text/css" href="helium/icofont.min.css" />
-    <link rel="stylesheet" type="text/css" href="helium/laika-helium.css" />
-    <link rel="stylesheet" type="text/css" href="site/styles.css" />
-    <script src="helium/laika-helium.js"></script>
-    
-    
-    <script> /* for avoiding page load transitions */ </script>
-  </head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="Typelevel Laika + Helium Theme" />
+  <title>Spire User's Guide</title>
+  
+  <meta name="author" content="Erik Osheim"/>
+  
+  <meta name="author" content="Tom Switzer"/>
+  
+  
+  <meta name="description" content="docs"/>
+  
+  
+  
+  <link rel="icon" sizes="32x32" type="image/png" href="https://typelevel.org/img/favicon.png"/>
+  
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700">
+  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Mono:500">
+  
+  <link rel="stylesheet" type="text/css" href="helium/site/icofont.min.css" />
+    <link rel="stylesheet" type="text/css" href="helium/site/laika-helium.css" />
+  <script src="helium/site/laika-helium.js"></script>
+  
+  
+  <script> /* for avoiding page load transitions */ </script>
+</head>
 
   <body>
 
-    <header id="top-bar">
+    <header id="top-bar" class="light-default dark-default">
 
-      <div class="row">
-        <a id="nav-icon">
-          <i class="icofont-laika" title="Navigation">&#xefa2;</i>
-        </a>
-        
-      </div>
+  <div class="row">
+    <a id="nav-icon">
+      <i class="icofont-laika navigationMenu" title="Navigation">&#xefa2;</i>
+    </a>
+    
+    
+  </div>
 
-      <a class="image-link" href="https://typelevel.org"><img src="https://typelevel.org/img/logo.svg"></a>
+  <a class="image-link" href="https://typelevel.org"><img src="https://typelevel.org/img/logo.svg"></a>
 
-      <span class="row links"><a class="icon-link svg-link" href="https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html"><span title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <div class="row links">
+    
+    <a class="icon-link svg-link" href="https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html"><span class="api" title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
   <g class="svg-shape">
     <path d="M75,47.5c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm-50,-0c13.246,-0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,-0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm2.705,16.735l7.239,0l0.622,-4.904l-21.833,0l-0,4.904l7.589,0l0,22.067l6.383,0l-0,-22.067Zm58.076,7.265c-0,-8.757 -3.698,-14.166 -10.781,-14.166c-7.083,-0 -10.781,5.604 -10.781,14.166c0,8.757 3.698,14.166 10.781,14.166c7.083,0 10.781,-5.604 10.781,-14.166Zm-6.539,0c0,6.538 -1.128,9.496 -4.242,9.496c-2.997,0 -4.242,-2.88 -4.242,-9.496c-0,-6.616 1.206,-9.496 4.242,-9.496c3.036,-0 4.242,2.88 4.242,9.496Zm-29.242,-67c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm0.512,9.834c-7.122,-0 -12.609,5.098 -12.609,14.127c-0,9.263 5.215,14.205 12.532,14.205c4.164,0 7.083,-1.634 9.068,-3.658l-2.88,-3.697c-1.518,1.206 -3.153,2.413 -5.838,2.413c-3.697,-0 -6.266,-2.763 -6.266,-9.263c-0,-6.616 2.724,-9.379 6.149,-9.379c2.102,-0 3.892,0.778 5.371,1.984l3.113,-3.775c-2.257,-1.868 -4.748,-2.957 -8.64,-2.957Z"/>
   </g>
-</svg></span></a><a class="icon-link svg-link" href="https://github.com/typelevel/spire"><span title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+</svg></span></a>
+    
+    <a class="icon-link svg-link" href="https://github.com/typelevel/spire"><span class="github" title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
   <g class="svg-shape">
     <path d="M49.995,1c-27.609,-0 -49.995,22.386 -49.995,50.002c-0,22.09 14.325,40.83 34.194,47.444c2.501,0.458 3.413,-1.086 3.413,-2.412c0,-1.185 -0.043,-4.331 -0.067,-8.503c-13.908,3.021 -16.843,-6.704 -16.843,-6.704c-2.274,-5.773 -5.552,-7.311 -5.552,-7.311c-4.54,-3.103 0.344,-3.042 0.344,-3.042c5.018,0.356 7.658,5.154 7.658,5.154c4.46,7.64 11.704,5.433 14.552,4.156c0.454,-3.232 1.744,-5.436 3.174,-6.685c-11.102,-1.262 -22.775,-5.553 -22.775,-24.713c-0,-5.457 1.949,-9.92 5.147,-13.416c-0.516,-1.265 -2.231,-6.348 0.488,-13.233c0,0 4.199,-1.344 13.751,5.126c3.988,-1.108 8.266,-1.663 12.518,-1.682c4.245,0.019 8.523,0.574 12.517,1.682c9.546,-6.47 13.736,-5.126 13.736,-5.126c2.728,6.885 1.013,11.968 0.497,13.233c3.204,3.496 5.141,7.959 5.141,13.416c0,19.209 -11.691,23.436 -22.83,24.673c1.795,1.544 3.394,4.595 3.394,9.26c0,6.682 -0.061,12.076 -0.061,13.715c0,1.338 0.899,2.894 3.438,2.406c19.853,-6.627 34.166,-25.354 34.166,-47.438c-0,-27.616 -22.389,-50.002 -50.005,-50.002"/>
   </g>
-</svg></span></a><a class="icon-link" href="https://discord.gg/XF3CXcMzqD"><i class="icofont-laika" title="Chat">&#xeed5;</i></a><a class="icon-link" href="https://fosstodon.org/@typelevel"><span class="mastodon" title="Mastodon"><svg class="svg-icon svg-link" width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+</svg></span></a>
+    
+    <a class="icon-link glyph-link" href="https://discord.gg/XF3CXcMzqD"><i class="icofont-laika chat" title="Chat">&#xeed5;</i></a>
+    
+    <a class="icon-link svg-link" href="https://fosstodon.org/@typelevel"><span class="mastodon" title="Mastodon"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg">
   <g class="svg-shape">
     <path d="M11.19 12.195c2.016-.24 3.77-1.475 3.99-2.603.348-1.778.32-4.339.32-4.339 0-3.47-2.286-4.488-2.286-4.488C12.062.238 10.083.017 8.027 0h-.05C5.92.017 3.942.238 2.79.765c0 0-2.285 1.017-2.285 4.488l-.002.662c-.004.64-.007 1.35.011 2.091.083 3.394.626 6.74 3.78 7.57 1.454.383 2.703.463 3.709.408 1.823-.1 2.847-.647 2.847-.647l-.06-1.317s-1.303.41-2.767.36c-1.45-.05-2.98-.156-3.215-1.928a3.614 3.614 0 0 1-.033-.496s1.424.346 3.228.428c1.103.05 2.137-.064 3.188-.189zm1.613-2.47H11.13v-4.08c0-.859-.364-1.295-1.091-1.295-.804 0-1.207.517-1.207 1.541v2.233H7.168V5.89c0-1.024-.403-1.541-1.207-1.541-.727 0-1.091.436-1.091 1.296v4.079H3.197V5.522c0-.859.22-1.541.66-2.046.456-.505 1.052-.764 1.793-.764.856 0 1.504.328 1.933.983L8 4.39l.417-.695c.429-.655 1.077-.983 1.934-.983.74 0 1.336.259 1.791.764.442.505.661 1.187.661 2.046v4.203z"/>
   </g>
-</svg>
-</span></a></span>
+</svg></span></a>
+    
+  </div>  
 
-    </header>
-
+</header>
+    
     <nav id="sidebar">
 
-      <div class="row">
-        <a class="icon-link svg-link" href="https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html"><span title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+  <div class="row">
+    
+    <a class="icon-link svg-link" href="https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html"><span class="api" title="API"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
   <g class="svg-shape">
     <path d="M75,47.5c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm-50,-0c13.246,-0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,-0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm2.705,16.735l7.239,0l0.622,-4.904l-21.833,0l-0,4.904l7.589,0l0,22.067l6.383,0l-0,-22.067Zm58.076,7.265c-0,-8.757 -3.698,-14.166 -10.781,-14.166c-7.083,-0 -10.781,5.604 -10.781,14.166c0,8.757 3.698,14.166 10.781,14.166c7.083,0 10.781,-5.604 10.781,-14.166Zm-6.539,0c0,6.538 -1.128,9.496 -4.242,9.496c-2.997,0 -4.242,-2.88 -4.242,-9.496c-0,-6.616 1.206,-9.496 4.242,-9.496c3.036,-0 4.242,2.88 4.242,9.496Zm-29.242,-67c13.246,0 24,10.754 24,24c0,13.246 -10.754,24 -24,24c-13.246,0 -24,-10.754 -24,-24c0,-13.246 10.754,-24 24,-24Zm0.512,9.834c-7.122,-0 -12.609,5.098 -12.609,14.127c-0,9.263 5.215,14.205 12.532,14.205c4.164,0 7.083,-1.634 9.068,-3.658l-2.88,-3.697c-1.518,1.206 -3.153,2.413 -5.838,2.413c-3.697,-0 -6.266,-2.763 -6.266,-9.263c-0,-6.616 2.724,-9.379 6.149,-9.379c2.102,-0 3.892,0.778 5.371,1.984l3.113,-3.775c-2.257,-1.868 -4.748,-2.957 -8.64,-2.957Z"/>
   </g>
-</svg></span></a><a class="icon-link svg-link" href="https://github.com/typelevel/spire"><span title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+</svg></span></a>
+    
+    <a class="icon-link svg-link" href="https://github.com/typelevel/spire"><span class="github" title="Source Code"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
   <g class="svg-shape">
     <path d="M49.995,1c-27.609,-0 -49.995,22.386 -49.995,50.002c-0,22.09 14.325,40.83 34.194,47.444c2.501,0.458 3.413,-1.086 3.413,-2.412c0,-1.185 -0.043,-4.331 -0.067,-8.503c-13.908,3.021 -16.843,-6.704 -16.843,-6.704c-2.274,-5.773 -5.552,-7.311 -5.552,-7.311c-4.54,-3.103 0.344,-3.042 0.344,-3.042c5.018,0.356 7.658,5.154 7.658,5.154c4.46,7.64 11.704,5.433 14.552,4.156c0.454,-3.232 1.744,-5.436 3.174,-6.685c-11.102,-1.262 -22.775,-5.553 -22.775,-24.713c-0,-5.457 1.949,-9.92 5.147,-13.416c-0.516,-1.265 -2.231,-6.348 0.488,-13.233c0,0 4.199,-1.344 13.751,5.126c3.988,-1.108 8.266,-1.663 12.518,-1.682c4.245,0.019 8.523,0.574 12.517,1.682c9.546,-6.47 13.736,-5.126 13.736,-5.126c2.728,6.885 1.013,11.968 0.497,13.233c3.204,3.496 5.141,7.959 5.141,13.416c0,19.209 -11.691,23.436 -22.83,24.673c1.795,1.544 3.394,4.595 3.394,9.26c0,6.682 -0.061,12.076 -0.061,13.715c0,1.338 0.899,2.894 3.438,2.406c19.853,-6.627 34.166,-25.354 34.166,-47.438c-0,-27.616 -22.389,-50.002 -50.005,-50.002"/>
   </g>
-</svg></span></a><a class="icon-link" href="https://discord.gg/XF3CXcMzqD"><i class="icofont-laika" title="Chat">&#xeed5;</i></a><a class="icon-link" href="https://fosstodon.org/@typelevel"><span class="mastodon" title="Mastodon"><svg class="svg-icon svg-link" width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+</svg></span></a>
+    
+    <a class="icon-link glyph-link" href="https://discord.gg/XF3CXcMzqD"><i class="icofont-laika chat" title="Chat">&#xeed5;</i></a>
+    
+    <a class="icon-link svg-link" href="https://fosstodon.org/@typelevel"><span class="mastodon" title="Mastodon"><svg class="svg-icon" width="100%" height="100%" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg">
   <g class="svg-shape">
     <path d="M11.19 12.195c2.016-.24 3.77-1.475 3.99-2.603.348-1.778.32-4.339.32-4.339 0-3.47-2.286-4.488-2.286-4.488C12.062.238 10.083.017 8.027 0h-.05C5.92.017 3.942.238 2.79.765c0 0-2.285 1.017-2.285 4.488l-.002.662c-.004.64-.007 1.35.011 2.091.083 3.394.626 6.74 3.78 7.57 1.454.383 2.703.463 3.709.408 1.823-.1 2.847-.647 2.847-.647l-.06-1.317s-1.303.41-2.767.36c-1.45-.05-2.98-.156-3.215-1.928a3.614 3.614 0 0 1-.033-.496s1.424.346 3.228.428c1.103.05 2.137-.064 3.188-.189zm1.613-2.47H11.13v-4.08c0-.859-.364-1.295-1.091-1.295-.804 0-1.207.517-1.207 1.541v2.233H7.168V5.89c0-1.024-.403-1.541-1.207-1.541-.727 0-1.091.436-1.091 1.296v4.079H3.197V5.522c0-.859.22-1.541.66-2.046.456-.505 1.052-.764 1.793-.764.856 0 1.504.328 1.933.983L8 4.39l.417-.695c.429-.655 1.077-.983 1.934-.983.74 0 1.336.259 1.791.764.442.505.661 1.187.661 2.046v4.203z"/>
   </g>
-</svg>
-</span></a>
-      </div>
+</svg></span></a>
+    
+  </div>
 
-      <ul class="nav-list">
-        <li class="level1"><a href="index.html">Spire</a></li>
-        <li class="level1 active"><a href="#">Spire User&#39;s Guide</a></li>
-        <li class="level1"><a href="CHANGES.html">Changes</a></li>
-        <li class="level1"><a href="CONTRIBUTING.html">Contributing to Spire</a></li>
-        <li class="level1"><a href="DESIGN.html">Design</a></li>
-        <li class="level1"><a href="AUTHORS.html">Authors</a></li>
-        <li class="level1"><a href="FRIENDS.html">Friends of Spire</a></li>
-      </ul>
+  <ul class="nav-list">
+    <li class="level1 nav-leaf"><a href="index.html">Spire</a></li>
+    <li class="level1 active nav-leaf"><a href="#">Spire User&#39;s Guide</a></li>
+    <li class="level1 nav-leaf"><a href="CHANGES.html">Changes</a></li>
+    <li class="level1 nav-leaf"><a href="CONTRIBUTING.html">Contributing to Spire</a></li>
+    <li class="level1 nav-leaf"><a href="DESIGN.html">Design</a></li>
+    <li class="level1 nav-leaf"><a href="AUTHORS.html">Authors</a></li>
+    <li class="level1 nav-leaf"><a href="FRIENDS.html">Friends of Spire</a></li>
+  </ul>
 
-      <ul class="nav-list">
-        <li class="level1 nav-header">Related Projects</li>
-        
-          <li class="level2"><a href="https://typelevel.org/cats/">cats</a></li>
-        
-      </ul>
-
-    </nav>
+</nav>
 
     <div id="container">
 
-      <nav id="page-nav">
-        <p class="header"><a href="#">Spire User&#39;s Guide</a></p>
+      
+<nav id="page-nav">
+  <p class="header"><a href="#">Spire User&#39;s Guide</a></p>
 
-        <ul class="nav-list">
-          <li class="level1"><a href="#type-classes-1">Type Classes</a></li>
-          <li class="level2"><a href="#package-layout">Package Layout</a></li>
-          <li class="level2"><a href="#usage">Usage</a></li>
-          <li class="level2"><a href="#specialization">Specialization</a></li>
-          <li class="level1"><a href="#type-classes-2">Type Classes</a></li>
-          <li class="level2"><a href="#properties">Properties</a></li>
-          <li class="level2"><a href="#eq">Eq</a></li>
-          <li class="level2"><a href="#order">Order</a></li>
-          <li class="level2"><a href="#signed">Signed</a></li>
-          <li class="level2"><a href="#partialorder">PartialOrder</a></li>
-          <li class="level2"><a href="#groups">Groups</a></li>
-          <li class="level2"><a href="#rings-and-fields">Rings and Fields</a></li>
-          <li class="level2"><a href="#commutative-ring-hierarchy">Commutative ring hierarchy</a></li>
-          <li class="level2"><a href="#gcdrings">GCDRings</a></li>
-          <li class="level2"><a href="#euclideanrings">EuclideanRings</a></li>
-          <li class="level2"><a href="#fields">Fields</a></li>
-          <li class="level2"><a href="#irrational-and-transcendental-type-classes">Irrational and Transcendental type classes</a></li>
-          <li class="level2"><a href="#modules-vectorspaces-co">Modules, VectorSpaces, &amp;co</a></li>
-          <li class="level1"><a href="#types">Types</a></li>
-          <li class="level2"><a href="#byte-short-int-and-long">Byte, Short, Int, and Long</a></li>
-          <li class="level2"><a href="#float-and-double">Float and Double</a></li>
-          <li class="level2"><a href="#bigint">BigInt</a></li>
-          <li class="level2"><a href="#bigdecimal">BigDecimal</a></li>
-          <li class="level2"><a href="#rational">Rational</a></li>
-          <li class="level2"><a href="#safelong">SafeLong</a></li>
-          <li class="level2"><a href="#natural">Natural</a></li>
-          <li class="level2"><a href="#ubyte-ushort-uint-and-ulong">UByte, UShort, UInt, and ULong</a></li>
-          <li class="level2"><a href="#fixedpoint">FixedPoint</a></li>
-          <li class="level2"><a href="#complex-a-and-quaternion-a">Complex[A] and Quaternion[A]</a></li>
-          <li class="level2"><a href="#number">Number</a></li>
-          <li class="level2"><a href="#interval-a">Interval[A]</a></li>
-          <li class="level2"><a href="#polynomial-c">Polynomial[C]</a></li>
-          <li class="level2"><a href="#algebraic">Algebraic</a></li>
-          <li class="level2"><a href="#real">Real</a></li>
-          <li class="level1"><a href="#which-number-types-should-i-use">Which number types should I use?</a></li>
-          <li class="level2"><a href="#natural-numbers-unsigned-whole-value-numbers">Natural numbers (unsigned, whole-value numbers)</a></li>
-          <li class="level2"><a href="#integer-numbers-signed-whole-value-numbers">Integer numbers (signed, whole-value numbers)</a></li>
-          <li class="level2"><a href="#fractional-numbers-numbers-that-can-be-divided">Fractional numbers (numbers that can be divided)</a></li>
-          <li class="level2"><a href="#other-types">Other types</a></li>
-          <li class="level1"><a href="#pseudo-random-number-generators-distributions-etc">Pseudo-Random Number Generators, Distributions, etc</a></li>
-          <li class="level2"><a href="#pseudo-random-number-generators">Pseudo-Random Number Generators</a></li>
-          <li class="level2"><a href="#creation-random-values-with-dist-a">Creation random values with Dist[A]</a></li>
-          <li class="level2"><a href="#distributions">Distributions</a></li>
-        </ul>
+  <ul class="nav-list">
+    <li class="level1 nav-node"><a href="#type-classes-1">Type Classes</a></li>
+    <li class="level2 nav-leaf"><a href="#package-layout">Package Layout</a></li>
+    <li class="level2 nav-leaf"><a href="#usage">Usage</a></li>
+    <li class="level2 nav-leaf"><a href="#specialization">Specialization</a></li>
+    <li class="level1 nav-node"><a href="#type-classes-2">Type Classes</a></li>
+    <li class="level2 nav-leaf"><a href="#properties">Properties</a></li>
+    <li class="level2 nav-leaf"><a href="#eq">Eq</a></li>
+    <li class="level2 nav-leaf"><a href="#order">Order</a></li>
+    <li class="level2 nav-leaf"><a href="#signed">Signed</a></li>
+    <li class="level2 nav-leaf"><a href="#partialorder">PartialOrder</a></li>
+    <li class="level2 nav-leaf"><a href="#groups">Groups</a></li>
+    <li class="level2 nav-leaf"><a href="#rings-and-fields">Rings and Fields</a></li>
+    <li class="level2 nav-leaf"><a href="#commutative-ring-hierarchy">Commutative ring hierarchy</a></li>
+    <li class="level2 nav-leaf"><a href="#gcdrings">GCDRings</a></li>
+    <li class="level2 nav-leaf"><a href="#euclideanrings">EuclideanRings</a></li>
+    <li class="level2 nav-leaf"><a href="#fields">Fields</a></li>
+    <li class="level2 nav-leaf"><a href="#irrational-and-transcendental-type-classes">Irrational and Transcendental type classes</a></li>
+    <li class="level2 nav-leaf"><a href="#modules-vectorspaces-co">Modules, VectorSpaces, &amp;co</a></li>
+    <li class="level1 nav-node"><a href="#types">Types</a></li>
+    <li class="level2 nav-leaf"><a href="#byte-short-int-and-long">Byte, Short, Int, and Long</a></li>
+    <li class="level2 nav-leaf"><a href="#float-and-double">Float and Double</a></li>
+    <li class="level2 nav-leaf"><a href="#bigint">BigInt</a></li>
+    <li class="level2 nav-leaf"><a href="#bigdecimal">BigDecimal</a></li>
+    <li class="level2 nav-leaf"><a href="#rational">Rational</a></li>
+    <li class="level2 nav-leaf"><a href="#safelong">SafeLong</a></li>
+    <li class="level2 nav-leaf"><a href="#natural">Natural</a></li>
+    <li class="level2 nav-leaf"><a href="#ubyte-ushort-uint-and-ulong">UByte, UShort, UInt, and ULong</a></li>
+    <li class="level2 nav-leaf"><a href="#fixedpoint">FixedPoint</a></li>
+    <li class="level2 nav-leaf"><a href="#complex-a-and-quaternion-a">Complex[A] and Quaternion[A]</a></li>
+    <li class="level2 nav-leaf"><a href="#number">Number</a></li>
+    <li class="level2 nav-leaf"><a href="#interval-a">Interval[A]</a></li>
+    <li class="level2 nav-leaf"><a href="#polynomial-c">Polynomial[C]</a></li>
+    <li class="level2 nav-leaf"><a href="#algebraic">Algebraic</a></li>
+    <li class="level2 nav-leaf"><a href="#real">Real</a></li>
+    <li class="level1 nav-node"><a href="#which-number-types-should-i-use">Which number types should I use?</a></li>
+    <li class="level2 nav-leaf"><a href="#natural-numbers-unsigned-whole-value-numbers">Natural numbers (unsigned, whole-value numbers)</a></li>
+    <li class="level2 nav-leaf"><a href="#integer-numbers-signed-whole-value-numbers">Integer numbers (signed, whole-value numbers)</a></li>
+    <li class="level2 nav-leaf"><a href="#fractional-numbers-numbers-that-can-be-divided">Fractional numbers (numbers that can be divided)</a></li>
+    <li class="level2 nav-leaf"><a href="#other-types">Other types</a></li>
+    <li class="level1 nav-node"><a href="#pseudo-random-number-generators-distributions-etc">Pseudo-Random Number Generators, Distributions, etc</a></li>
+    <li class="level2 nav-leaf"><a href="#pseudo-random-number-generators">Pseudo-Random Number Generators</a></li>
+    <li class="level2 nav-leaf"><a href="#creation-random-values-with-dist-a">Creation random values with Dist[A]</a></li>
+    <li class="level2 nav-leaf"><a href="#distributions">Distributions</a></li>
+  </ul>
 
-        <p class="footer"></p>
-      </nav>
+  <p class="footer"></p>
+</nav>
+
 
       <main class="content">
 
@@ -161,7 +174,7 @@
         we&#39;ll look at many of the concrete types that Spire defines. Finally, we&#39;ll
         peek at some of the advanced or tricky corners of the library.</p>
         
-        <h3 id="type-classes-1" class="section">Type Classes<a class="anchor-link right" href="#type-classes-1"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <h3 id="type-classes-1" class="section"><a class="anchor-link left" href="#type-classes-1"><i class="icofont-laika link">&#xef71;</i></a>Type Classes</h3>
         <p>Like many Scala libraries, Spire uses type classes to define generic
         operations.</p>
         <p>These code examples all assume the following imports:</p>
@@ -190,7 +203,7 @@
         cases, the method name itself can be used with the values:</p>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">def</span><span> </span><span class="declaration-name">sqrt</span><span>[</span><span class="type-name">A</span><span>: </span><span class="type-name">NRoot</span><span>](</span><span class="identifier">x</span><span>: </span><span class="type-name">A</span><span>): </span><span class="type-name">A</span><span> = </span><span class="identifier">x</span><span>.</span><span class="identifier">sqrt</span></code></pre>
         
-        <h4 id="package-layout" class="section">Package Layout<a class="anchor-link right" href="#package-layout"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="package-layout" class="section"><a class="anchor-link left" href="#package-layout"><i class="icofont-laika link">&#xef71;</i></a>Package Layout</h4>
         <p>In the case of <code>Ring[A]</code>, the type class itself is located in
         <code>spire.algebra</code>. Except for a few special cases, all of Spire&#39;s type
         classes can be found in <code>spire.algebra</code>.</p>
@@ -217,7 +230,7 @@
         operators. This is nice when working in the console or experimenting,
         and for when you&#39;re sure there won&#39;t be a conflict.</p>
         
-        <h4 id="usage" class="section">Usage<a class="anchor-link right" href="#usage"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="usage" class="section"><a class="anchor-link left" href="#usage"><i class="icofont-laika link">&#xef71;</i></a>Usage</h4>
         <p>Most of the time, you&#39;ll be using type classes as context bounds. For
         instance:</p>
         <pre class="keep-together pdf epub"><code class="nohighlight"><span class="keyword">object</span><span> </span><span class="type-name">Demo</span><span> {
@@ -244,7 +257,7 @@
         <p>Hopefully this small example gives you an idea of the basic mechanics
         behind Spire&#39;s generic math capabilities.</p>
         
-        <h4 id="specialization" class="section">Specialization<a class="anchor-link right" href="#specialization"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="specialization" class="section"><a class="anchor-link left" href="#specialization"><i class="icofont-laika link">&#xef71;</i></a>Specialization</h4>
         <p>To achieve speed on-par with direct (non-generic) code, you will need
         to use <a href="https://www.scala-lang.org/old/sites/default/files/sids/dragos/Thu,%202010-05-06,%2017:56/sid-spec.pdf">specialization</a>. The good news is that most of Spire&#39;s code is
         already specialized (and tested for proper performance). The bad news
@@ -289,9 +302,9 @@
         specialized code without worrying about any of this (and the result
         will be unboxed and fast).</p>
         
-        <h3 id="type-classes-2" class="section">Type Classes<a class="anchor-link right" href="#type-classes-2"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <h3 id="type-classes-2" class="section"><a class="anchor-link left" href="#type-classes-2"><i class="icofont-laika link">&#xef71;</i></a>Type Classes</h3>
         
-        <h4 id="properties" class="section">Properties<a class="anchor-link right" href="#properties"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="properties" class="section"><a class="anchor-link left" href="#properties"><i class="icofont-laika link">&#xef71;</i></a>Properties</h4>
         <p>Spire&#39;s type classes are often described in terms of properties (or
         &quot;laws&quot;).  These properties must be true no matter what values are
         used.</p>
@@ -311,7 +324,7 @@
         <p>In some cases the operator names are different (e.g. <code>+</code>, <code>*</code>) but the
         properties themselves remain the same.</p>
         
-        <h4 id="eq" class="section">Eq<a class="anchor-link right" href="#eq"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="eq" class="section"><a class="anchor-link left" href="#eq"><i class="icofont-laika link">&#xef71;</i></a>Eq</h4>
         <p>Spire provides an <code>Eq[A]</code> type class to represent type-safe
         equality. This allows us to talk about types for which there isn&#39;t a
         computationally useful notion of equality, and also to avoid
@@ -340,7 +353,7 @@
         then <code>a</code> and <code>b</code> must be substitutable for each other, such that for any
         expression <code>f(x)</code>, <code>f(a) === f(b)</code>.</p>
         
-        <h4 id="order" class="section">Order<a class="anchor-link right" href="#order"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="order" class="section"><a class="anchor-link left" href="#order"><i class="icofont-laika link">&#xef71;</i></a>Order</h4>
         <p>Total orderings in Spire are supported by the <code>Order[A]</code> type
         class. Unlike other ordering type classes
         (e.g. <code>scala.math.Ordering</code>), this one is specialized to avoid boxing.
@@ -400,7 +413,7 @@
         aware of the risks and limit their use to situations where the
         particular law is not needed.</p>
         
-        <h4 id="signed" class="section">Signed<a class="anchor-link right" href="#signed"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="signed" class="section"><a class="anchor-link left" href="#signed"><i class="icofont-laika link">&#xef71;</i></a>Signed</h4>
         <p>Translation-invariant total orders are captured by the <code>Signed[A]</code> type class. In
         general, the type <code>A</code> is equipped with a commutative additive operation <code>+</code> and a
         zero element <code>0</code> (see the definition of commutative rings below). The following
@@ -420,7 +433,7 @@
           <li><code>abs(a + b) &lt;= abs(a) + abs(b)</code></li>
         </ul>
         
-        <h4 id="partialorder" class="section">PartialOrder<a class="anchor-link right" href="#partialorder"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="partialorder" class="section"><a class="anchor-link left" href="#partialorder"><i class="icofont-laika link">&#xef71;</i></a>PartialOrder</h4>
         <p>Partial orderings in Spire are supported by the <code>PartialOrder[A]</code> type class.
         Its implementation differs from <code>scala.math.PartialOrdering</code> in two features: <code>PartialOrder</code>
         is specialized to avoid boxing, and the <code>partialCompare</code> method returns a <code>Double</code> and
@@ -467,36 +480,36 @@
         <table>
           <thead>
             <tr>
-              <th class="align-center"><code>a &lt;= b</code></th>
-              <th class="align-center"><code>a &gt;= b</code></th>
-              <th class="align-center"><code>partialCompare(a, b)</code></th>
-              <th class="align-center">corresponds to</th>
+              <th><code>a &lt;= b</code></th>
+              <th><code>a &gt;= b</code></th>
+              <th><code>partialCompare(a, b)</code></th>
+              <th>corresponds to</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td class="align-center"><code>true</code></td>
-              <td class="align-center"><code>true</code></td>
-              <td class="align-center"><code>0</code></td>
-              <td class="align-center"><code>a === b</code></td>
+              <td><code>true</code></td>
+              <td><code>true</code></td>
+              <td><code>0</code></td>
+              <td><code>a === b</code></td>
             </tr>
             <tr>
-              <td class="align-center"><code>false</code></td>
-              <td class="align-center"><code>false</code></td>
-              <td class="align-center"><code>NaN</code></td>
-              <td class="align-center"><code>a</code> incomparable with <code>b</code></td>
+              <td><code>false</code></td>
+              <td><code>false</code></td>
+              <td><code>NaN</code></td>
+              <td><code>a</code> incomparable with <code>b</code></td>
             </tr>
             <tr>
-              <td class="align-center"><code>true</code></td>
-              <td class="align-center"><code>false</code></td>
-              <td class="align-center"><code>-1</code></td>
-              <td class="align-center"><code>a &lt; b</code></td>
+              <td><code>true</code></td>
+              <td><code>false</code></td>
+              <td><code>-1</code></td>
+              <td><code>a &lt; b</code></td>
             </tr>
             <tr>
-              <td class="align-center"><code>false</code></td>
-              <td class="align-center"><code>true</code></td>
-              <td class="align-center"><code>1</code></td>
-              <td class="align-center"><code>a &gt; b</code></td>
+              <td><code>false</code></td>
+              <td><code>true</code></td>
+              <td><code>1</code></td>
+              <td><code>a &gt; b</code></td>
             </tr>
           </tbody>
         </table>
@@ -507,7 +520,7 @@
         <p>Note that <code>Order[A]</code> extends <code>PartialOrder[A]</code>, but for pedagogical purposes, <code>Order[A]</code> is presented first
         in this guide.</p>
         
-        <h4 id="groups" class="section">Groups<a class="anchor-link right" href="#groups"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="groups" class="section"><a class="anchor-link left" href="#groups"><i class="icofont-laika link">&#xef71;</i></a>Groups</h4>
         <p>The most basic algebraic type classes Spire supports involve a single
         associative binary operator (called <code>op</code> and represented as <code>|+|</code>):</p>
         <ul>
@@ -554,7 +567,7 @@
           <li>inverse binary operator: <code>|-|</code>, <code>-</code> (binary), <code>/</code></li>
         </ul>
         
-        <h4 id="rings-and-fields" class="section">Rings and Fields<a class="anchor-link right" href="#rings-and-fields"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="rings-and-fields" class="section"><a class="anchor-link left" href="#rings-and-fields"><i class="icofont-laika link">&#xef71;</i></a>Rings and Fields</h4>
         <p>Rings are a set together with two binary operation (additive and
         multiplicative). Spire defines these by extending the appropriate
         additive and multiplicative group traits. The following list roughly
@@ -593,7 +606,7 @@
         </ul>
         <p>Rings also provide a <code>pow</code> method (<code>**</code>) for doing repeated multiplication.</p>
         
-        <h4 id="commutative-ring-hierarchy" class="section">Commutative ring hierarchy<a class="anchor-link right" href="#commutative-ring-hierarchy"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="commutative-ring-hierarchy" class="section"><a class="anchor-link left" href="#commutative-ring-hierarchy"><i class="icofont-laika link">&#xef71;</i></a>Commutative ring hierarchy</h4>
         <p>Commutative rings (also called domains in the literature) have a rich
         structure.</p>
         <p>Spire focuses on the structures relevant for computational algebra
@@ -608,7 +621,7 @@
           <li><code>spire.Field[A]</code> extends<code>algebra.Field[A]</code> with <code>EuclideanRing[A]</code></li>
         </ul>
         
-        <h4 id="gcdrings" class="section">GCDRings<a class="anchor-link right" href="#gcdrings"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="gcdrings" class="section"><a class="anchor-link left" href="#gcdrings"><i class="icofont-laika link">&#xef71;</i></a>GCDRings</h4>
         <p>GCDRings are commutative rings (<code>CRing[A]</code>) with existence of a
         greatest-common-divisor and least-common-multiple.</p>
         <p>Spire&#39;s <code>GCDRing[A]</code> supports the following operations:</p>
@@ -638,7 +651,7 @@
         or a definition that extends the one used for the integer ring
         (<code>gcd(a/b, c/d) == gcd(a, c)/lcm(b, d)</code>).</p>
         
-        <h4 id="euclideanrings" class="section">EuclideanRings<a class="anchor-link right" href="#euclideanrings"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="euclideanrings" class="section"><a class="anchor-link left" href="#euclideanrings"><i class="icofont-laika link">&#xef71;</i></a>EuclideanRings</h4>
         <p>Spire supports euclidean domains (called <code>EuclideanRing[A]</code>). A
         euclidean domain is a GCD ring (<code>GCDRing[A]</code>) that also supports
         euclidean division (e.g. floor division or integer division). This
@@ -665,7 +678,7 @@
         of convention. On rational (or floating-point) numbers, <code>a /~ b = a / b</code>
         and <code>a % b = 0</code> by definition.</p>
         
-        <h4 id="fields" class="section">Fields<a class="anchor-link right" href="#fields"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="fields" class="section"><a class="anchor-link left" href="#fields"><i class="icofont-laika link">&#xef71;</i></a>Fields</h4>
         <p>Fields are commutative rings with commutative multiplication and
         multiplicative inverses for all non-zero elements. Fields generalize
         how most people think about rational numbers.</p>
@@ -688,7 +701,7 @@
           <li>sine, cosine, and trigonometric functions (provided by <code>Trig[A]</code>).</li>
         </ul>
         
-        <h4 id="irrational-and-transcendental-type-classes" class="section">Irrational and Transcendental type classes<a class="anchor-link right" href="#irrational-and-transcendental-type-classes"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="irrational-and-transcendental-type-classes" class="section"><a class="anchor-link left" href="#irrational-and-transcendental-type-classes"><i class="icofont-laika link">&#xef71;</i></a>Irrational and Transcendental type classes</h4>
         <p>Spire supports square roots and fractional powers via
         <code>NRoot[A]</code>. There are three basic methods available:</p>
         <ul>
@@ -780,14 +793,14 @@
         instance with <code>Double</code> precision can be found in
         <code>spire.optional.rationalTrig</code>).</p>
         
-        <h4 id="modules-vectorspaces-co" class="section">Modules, VectorSpaces, &amp;co<a class="anchor-link right" href="#modules-vectorspaces-co"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="modules-vectorspaces-co" class="section"><a class="anchor-link left" href="#modules-vectorspaces-co"><i class="icofont-laika link">&#xef71;</i></a>Modules, VectorSpaces, &amp;co</h4>
         <p>TODO</p>
         
-        <h3 id="types" class="section">Types<a class="anchor-link right" href="#types"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <h3 id="types" class="section"><a class="anchor-link left" href="#types"><i class="icofont-laika link">&#xef71;</i></a>Types</h3>
         <p>This section attempts to chronicle the existing number types in terms of their
         capabilities and problems.</p>
         
-        <h4 id="byte-short-int-and-long" class="section">Byte, Short, Int, and Long<a class="anchor-link right" href="#byte-short-int-and-long"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="byte-short-int-and-long" class="section"><a class="anchor-link left" href="#byte-short-int-and-long"><i class="icofont-laika link">&#xef71;</i></a>Byte, Short, Int, and Long</h4>
         <p>These built-in integral types are all signed and have a fixed-width (8, 16,
         32, and 64 bits respectively). Division with these types is truncated, and
         overflow can silently occur when numbers to get too big (or too small).
@@ -798,7 +811,7 @@
         direct code (where adding bytes produces an int) and generic code (where
         adding bytes produces a byte).</p>
         
-        <h4 id="float-and-double" class="section">Float and Double<a class="anchor-link right" href="#float-and-double"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="float-and-double" class="section"><a class="anchor-link left" href="#float-and-double"><i class="icofont-laika link">&#xef71;</i></a>Float and Double</h4>
         <p>These fractional types correspond to IEEE-754 floating point (32- and 64-bit
         respectively). They contain three sentinel values: positive and negative
         infinity and NaN. Large positive and negative quantities will overflow to
@@ -814,12 +827,12 @@
         <code>Float</code> and <code>Double</code> are aware of these problems, and provides instances like
         <code>Ring[Double]</code> even though it will fail to be associative in some cases.</p>
         
-        <h4 id="bigint" class="section">BigInt<a class="anchor-link right" href="#bigint"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="bigint" class="section"><a class="anchor-link left" href="#bigint"><i class="icofont-laika link">&#xef71;</i></a>BigInt</h4>
         <p>This integral type is unbounded--it will never overflow (although operations
         will get slower and slower as the value gets larger). This is probably one of
         the least difficult types to use correctly.</p>
         
-        <h4 id="bigdecimal" class="section">BigDecimal<a class="anchor-link right" href="#bigdecimal"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="bigdecimal" class="section"><a class="anchor-link left" href="#bigdecimal"><i class="icofont-laika link">&#xef71;</i></a>BigDecimal</h4>
         <p>This fractional type is different than the previous floating point values. It
         contains a <code>MathContext</code> object which specifies a certain number of decimal
         digits of precision (34 by default). Results will be rounded to this level of
@@ -833,7 +846,7 @@
         provides capabilities which the underlying type lacks, including roots,
         fractional powers, and trigonometric methods.</p>
         
-        <h4 id="rational" class="section">Rational<a class="anchor-link right" href="#rational"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="rational" class="section"><a class="anchor-link left" href="#rational"><i class="icofont-laika link">&#xef71;</i></a>Rational</h4>
         <p>This fractional type represents a rational number, a fraction of two integers
         (<code>n/d</code>). It is an exact type, although as you might expect it can&#39;t represent
         irrational numbers without approximating them as rationals. It is unbounded,
@@ -842,14 +855,14 @@
         calculations.</p>
         <p>This is probably the easiest fractional type to use correctly.</p>
         
-        <h4 id="safelong" class="section">SafeLong<a class="anchor-link right" href="#safelong"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="safelong" class="section"><a class="anchor-link left" href="#safelong"><i class="icofont-laika link">&#xef71;</i></a>SafeLong</h4>
         <p>This integral type is also unbounded, like <code>BigInt</code>. However, it is
         more efficient for small values, where it will use a <code>Long</code>
         instead. There is usually no reason to prefer using a <code>BigInt</code> over a
         <code>SafeLong</code> except to comply with an external API, or in cases where
         most values are expected to exceed a long&#39;s storage capacity.</p>
         
-        <h4 id="natural" class="section">Natural<a class="anchor-link right" href="#natural"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="natural" class="section"><a class="anchor-link left" href="#natural"><i class="icofont-laika link">&#xef71;</i></a>Natural</h4>
         <p>This is a simple unbounded, unsigned integral type. It models natural
         numbers a as a cons list of digits (each &quot;digit&quot; being a 32-bit
         unsigned integer). For relatively small values (32-128 bits) it is
@@ -858,7 +871,7 @@
         <p>The <code>Natural</code> type a bit of an odd-ball type at present. However the
         fact that it is guaranteed to be non-negative is useful.</p>
         
-        <h4 id="ubyte-ushort-uint-and-ulong" class="section">UByte, UShort, UInt, and ULong<a class="anchor-link right" href="#ubyte-ushort-uint-and-ulong"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="ubyte-ushort-uint-and-ulong" class="section"><a class="anchor-link left" href="#ubyte-ushort-uint-and-ulong"><i class="icofont-laika link">&#xef71;</i></a>UByte, UShort, UInt, and ULong</h4>
         <p>These unsigned integral types are provided by Spire. They have most of
         the same operations as their signed counterparts, although they use
         unsigned division which is a bit more involved.</p>
@@ -876,7 +889,7 @@
 </span><span class="string-literal">ui&quot;7&quot;</span><span> </span><span class="comment">// equivalent to UInt(7)
 // res0: spire.math.UInt = 7</span></code></pre>
         
-        <h4 id="fixedpoint" class="section">FixedPoint<a class="anchor-link right" href="#fixedpoint"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="fixedpoint" class="section"><a class="anchor-link left" href="#fixedpoint"><i class="icofont-laika link">&#xef71;</i></a>FixedPoint</h4>
         <p>This value class uses a <code>Long</code> with an implicit denominator. The type
         itself doesn&#39;t contain information about the denominator. Instead, an
         implicit <code>FixedScale</code> instance is required to provide that context
@@ -888,7 +901,7 @@
         with the same denominator are needed, and efficiency is very
         important.</p>
         
-        <h4 id="complex-a-and-quaternion-a" class="section">Complex[A] and Quaternion[A]<a class="anchor-link right" href="#complex-a-and-quaternion-a"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="complex-a-and-quaternion-a" class="section"><a class="anchor-link left" href="#complex-a-and-quaternion-a"><i class="icofont-laika link">&#xef71;</i></a>Complex[A] and Quaternion[A]</h4>
         <p>These generic types represent complex numbers (<code>x + yi</code>) and
         quaternions (<code>w + xi + xj + zk</code>) respectively. They can be
         parameterized with any fractional type <code>A</code> which has a <code>Field[A]</code>,
@@ -901,7 +914,7 @@
         than a non-generic complex number based on <code>Double</code> values would, and
         are a bit slower.</p>
         
-        <h4 id="number" class="section">Number<a class="anchor-link right" href="#number"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="number" class="section"><a class="anchor-link left" href="#number"><i class="icofont-laika link">&#xef71;</i></a>Number</h4>
         <p>This is a boxed number type that approximates the semantics of numbers
         in a dynamically-typed numeric tower (like Scheme or Python). There
         are four subtypes of <code>Number</code>, based on <code>SafeLong</code>, <code>Double</code>,
@@ -911,7 +924,7 @@
         numbers. The type keeps operations as safe as possible, while
         providing access to all operators and methods.</p>
         
-        <h4 id="interval-a" class="section">Interval[A]<a class="anchor-link right" href="#interval-a"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="interval-a" class="section"><a class="anchor-link left" href="#interval-a"><i class="icofont-laika link">&#xef71;</i></a>Interval[A]</h4>
         <p>Interval supports arithmetic across a range of possible <code>A</code>
         values. This can be thought of as representing uncertainty about a
         single, actual value, or as operating on the entire set of values
@@ -942,7 +955,7 @@
         clearly not empty. The underlying continuous interval contains values
         which when multiplied by a scalar become valid <code>Int</code> values.</p>
         
-        <h4 id="polynomial-c" class="section">Polynomial[C]<a class="anchor-link right" href="#polynomial-c"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="polynomial-c" class="section"><a class="anchor-link left" href="#polynomial-c"><i class="icofont-laika link">&#xef71;</i></a>Polynomial[C]</h4>
         <p>Currently Spire supports univariate polynomials. These are polynomials
         with a single variable (e.g. <em>x</em>) with the following structure:</p>
         <pre><code>c0 + (c1 * x^1) + (c2 * x^2) + ... + (cn * x^n)</code></pre>
@@ -986,7 +999,7 @@
         representation is an implementation detail and both types support the
         same operations (and can interoperate).</p>
         
-        <h4 id="algebraic" class="section">Algebraic<a class="anchor-link right" href="#algebraic"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="algebraic" class="section"><a class="anchor-link left" href="#algebraic"><i class="icofont-laika link">&#xef71;</i></a>Algebraic</h4>
         <p>The <code>Algebraic</code> type is an implementation of a number for &quot;Exact
         Geometric Computation&quot;. It represents algebraic numbers using an AST
         of the operations performed on it. <code>Algebraic</code> numbers can be compared
@@ -1006,7 +1019,7 @@
         achieve this, and so are not suitable for use where you need performance
         and can tolerate a certain amount of error.</p>
         
-        <h4 id="real" class="section">Real<a class="anchor-link right" href="#real"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="real" class="section"><a class="anchor-link left" href="#real"><i class="icofont-laika link">&#xef71;</i></a>Real</h4>
         <p><code>Real</code> stands for &quot;computable real&quot;. Spire&#39;s <code>Real</code> implementation is
         based on ERA, written in Haskell by David Lester. Computable real
         numbers are those which can be computed (i.e. approximated) to any
@@ -1053,7 +1066,7 @@
         providing approximate comparisons and equality seems like a reasonable
         compromise.</p>
         
-        <h3 id="which-number-types-should-i-use" class="section">Which number types should I use?<a class="anchor-link right" href="#which-number-types-should-i-use"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <h3 id="which-number-types-should-i-use" class="section"><a class="anchor-link left" href="#which-number-types-should-i-use"><i class="icofont-laika link">&#xef71;</i></a>Which number types should I use?</h3>
         <p>Spire provides many number types, and it is not always obvious what their
         relative merits are. This section explains the distinctions between them, and
         may help you decide which numeric representation(s) to use.</p>
@@ -1062,7 +1075,7 @@
         caveats (like extra allocations and/or slower code). Spire provides a wide
         range of numeric types that should address most needs.</p>
         
-        <h4 id="natural-numbers-unsigned-whole-value-numbers" class="section">Natural numbers (unsigned, whole-value numbers)<a class="anchor-link right" href="#natural-numbers-unsigned-whole-value-numbers"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="natural-numbers-unsigned-whole-value-numbers" class="section"><a class="anchor-link left" href="#natural-numbers-unsigned-whole-value-numbers"><i class="icofont-laika link">&#xef71;</i></a>Natural numbers (unsigned, whole-value numbers)</h4>
         <p>For non-negative numbers, the safe type to use is <code>Natural</code>. It is quite fast
         when representing small-ish numbers (128-bits or less), but has no upper bound
         on the values it can represent. However, its unique cons-structure means that
@@ -1075,7 +1088,7 @@
         the same unsigned semantics as unsigned types in languages like C. These types
         are not boxed, although care must be used with arrays (like any value class).</p>
         
-        <h4 id="integer-numbers-signed-whole-value-numbers" class="section">Integer numbers (signed, whole-value numbers)<a class="anchor-link right" href="#integer-numbers-signed-whole-value-numbers"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="integer-numbers-signed-whole-value-numbers" class="section"><a class="anchor-link left" href="#integer-numbers-signed-whole-value-numbers"><i class="icofont-laika link">&#xef71;</i></a>Integer numbers (signed, whole-value numbers)</h4>
         <p>There are two safe types that can be used with integer values: <code>SafeLong</code> and
         <code>BigInt</code>. Both support arbitrarily large values, as well as the usual
         semantics for things like integer division (<code>quot</code>). The former (<code>SafeLong</code>)
@@ -1088,7 +1101,7 @@
         yourself. These types are provided by Scala (and ultimately the JVM) and will
         not cause object allocations.</p>
         
-        <h4 id="fractional-numbers-numbers-that-can-be-divided" class="section">Fractional numbers (numbers that can be divided)<a class="anchor-link right" href="#fractional-numbers-numbers-that-can-be-divided"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="fractional-numbers-numbers-that-can-be-divided" class="section"><a class="anchor-link left" href="#fractional-numbers-numbers-that-can-be-divided"><i class="icofont-laika link">&#xef71;</i></a>Fractional numbers (numbers that can be divided)</h4>
         <p>There are many different fractional flavors, which support various trade-offs
         between expressive power, precision, and performance.</p>
         <p>Fractional types come in two basic flavors: precise or imprecise. Imprecise
@@ -1099,7 +1112,7 @@ z)</code>). These types are often faster than precise types but can be risky to 
         performance or expressiveness. They are often a bit slower, and may restrict
         the operations they support (to preserve guarantees about precision).</p>
         
-        <h5 id="precise-types" class="section">Precise types<a class="anchor-link right" href="#precise-types"><i class="icofont-laika">&#xef71;</i></a></h5>
+        <h5 id="precise-types" class="section"><a class="anchor-link left" href="#precise-types"><i class="icofont-laika link">&#xef71;</i></a>Precise types</h5>
         <p>The most powerful precise type is <code>Real</code>. It represents computable real
         numbers, and supports all the operations you would expect, including roots and
         trigonometry. However, irrational values (like <code>Real(2).sqrt</code> or <code>Real.pi</code>)
@@ -1121,7 +1134,7 @@ z)</code>). These types are often faster than precise types but can be risky to 
         type has the fewest performance &quot;gotchas&quot;, although obviously fractions with
         large numerators or denominators will take longer to operate on.</p>
         
-        <h5 id="imprecise-types" class="section">Imprecise types<a class="anchor-link right" href="#imprecise-types"><i class="icofont-laika">&#xef71;</i></a></h5>
+        <h5 id="imprecise-types" class="section"><a class="anchor-link left" href="#imprecise-types"><i class="icofont-laika link">&#xef71;</i></a>Imprecise types</h5>
         <p>These types are more efficient than the precise types, but require care and
         analysis to ensure that results are correct and sufficiently accurate.</p>
         <p>The imprecise type with the most potential precision is <code>BigDecimal</code> which is
@@ -1142,20 +1155,20 @@ z)</code>). These types are often faster than precise types but can be risky to 
         unless your applications has a known, specific need for fixed-point
         arithmetic.</p>
         
-        <h4 id="other-types" class="section">Other types<a class="anchor-link right" href="#other-types"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="other-types" class="section"><a class="anchor-link left" href="#other-types"><i class="icofont-laika link">&#xef71;</i></a>Other types</h4>
         <p>The other numeric and pseudo-numeric types (like <code>Polynomial</code>, <code>Interval</code>,
         <code>Complex</code>, and <code>Quaternion</code>) each implement specific functionality, so there
         should be less confusion about which type to use. The sections describing
         these types explain their properties and trade-offs.</p>
         
-        <h3 id="pseudo-random-number-generators-distributions-etc" class="section">Pseudo-Random Number Generators, Distributions, etc<a class="anchor-link right" href="#pseudo-random-number-generators-distributions-etc"><i class="icofont-laika">&#xef71;</i></a></h3>
+        <h3 id="pseudo-random-number-generators-distributions-etc" class="section"><a class="anchor-link left" href="#pseudo-random-number-generators-distributions-etc"><i class="icofont-laika link">&#xef71;</i></a>Pseudo-Random Number Generators, Distributions, etc</h3>
         <p>Since Spire tries to make number types more pluggable in Scala code, it only
         makes sense that we&#39;d want to allow users to easily generate a wide variety of
         number types using pluggable PRNGs. The <code>spire.random</code> package contains random
         number generators appropriate to many different tasks, as well as a functional
         interface to creating uniform distributions of values.</p>
         
-        <h4 id="pseudo-random-number-generators" class="section">Pseudo-Random Number Generators<a class="anchor-link right" href="#pseudo-random-number-generators"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="pseudo-random-number-generators" class="section"><a class="anchor-link left" href="#pseudo-random-number-generators"><i class="icofont-laika link">&#xef71;</i></a>Pseudo-Random Number Generators</h4>
         <p><strong>This section needs revising! Immutable generators have been replaced
         by the <code>Random[A]</code> monad, and the package structure has changed a bit!</strong></p>
         <p>Spire supports two types of PRNGs: mutable and immutable.</p>
@@ -1178,7 +1191,7 @@ z)</code>). These types are often faster than precise types but can be risky to 
         pure-functional context. The same <code>Dist[A]</code> instances that would be used with
         a mutable generator are also applicable here.</p>
         
-        <h4 id="creation-random-values-with-dist-a" class="section">Creation random values with Dist[A]<a class="anchor-link right" href="#creation-random-values-with-dist-a"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="creation-random-values-with-dist-a" class="section"><a class="anchor-link left" href="#creation-random-values-with-dist-a"><i class="icofont-laika link">&#xef71;</i></a>Creation random values with Dist[A]</h4>
         <p>The <code>Dist[A]</code> type class represents a strategy for generating a
         distribution of <code>A</code> values given a <code>Generator</code> instance. <code>Dist[A]</code>
         makes no guarantee as to how the <code>A</code> values are distributed (for
@@ -1192,7 +1205,7 @@ z)</code>). These types are often faster than precise types but can be risky to 
         structure on <code>A</code>, <code>Dist[A]</code> instances can also be operated on as if
         they were value.</p>
         
-        <h4 id="distributions" class="section">Distributions<a class="anchor-link right" href="#distributions"><i class="icofont-laika">&#xef71;</i></a></h4>
+        <h4 id="distributions" class="section"><a class="anchor-link left" href="#distributions"><i class="icofont-laika link">&#xef71;</i></a>Distributions</h4>
         <p>Currently, <code>spire.random</code> provides <code>Uniform[A]</code>, <code>Gaussian[A]</code>, and
         <code>Exponential[A]</code> type classes which given appropriate parameters can
         produce <code>Dist[A]</code> instances. Since most types have a (approximately)
@@ -1214,14 +1227,17 @@ z)</code>). These types are often faster than precise types but can be risky to 
           distribution.</li>
         </ul>
 
-        <hr style="margin-top: 30px"/>
-        <footer style="font-size: 90%; text-align: center">
-          spire is a <a href="https://typelevel.org/">Typelevel</a> project distributed under the <a href="https://opensource.org/licenses/MIT">MIT</a> license.
-        </footer>
+        
+<hr class="footer-rule"/>
+<footer>
+  spire is a <a href="https://typelevel.org/">Typelevel</a> project distributed under the <a href="https://opensource.org/licenses/MIT">MIT</a> license.
+</footer>
+
 
       </main>
 
     </div>
 
   </body>
+
 </html>
