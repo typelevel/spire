@@ -61,8 +61,7 @@ class OptSuite extends munit.FunSuite {
     }
     {
       import spire.std.array._
-      import spire.std.unit._
-      val eq = Eq[Opt[Array[Unit]]]
+      val eq = Eq[Opt[Array[Boolean]]]
       assert(!eq.eqv(Opt(Array.ofDim(0)), Opt.empty))
     }
   }
