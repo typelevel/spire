@@ -60,7 +60,7 @@ final class FpFilter[A](val apx: Double, val mes: Double, val ind: Int, exact0: 
 
   // Avoid using this.
   override def equals(that: Any): Boolean = that match {
-    case that: FpFilter[_] =>
+    case that: FpFilter[?] =>
       if (this.error == 0 && that.error == 0) this.apx == that.apx
       else this.exact == that.exact
     case _ =>

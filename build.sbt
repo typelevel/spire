@@ -225,7 +225,7 @@ lazy val unidocSettings = Seq(
   ScalaUnidoc / unidoc / unidocProjectFilter := inAnyProject -- inProjects(examples, benchmark, tests.jvm)
 )
 
-lazy val scalaMacroDependencies: Seq[Setting[_]] = Seq(
+lazy val scalaMacroDependencies: Seq[Setting[?]] = Seq(
   libraryDependencies ++= {
     if (scalaVersion.value.startsWith("3")) Seq.empty
     else Seq(scalaOrganization.value % "scala-reflect" % scalaVersion.value % "provided")

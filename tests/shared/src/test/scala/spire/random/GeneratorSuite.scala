@@ -37,7 +37,7 @@ class GeneratorSuite extends munit.FunSuite {
    * For "real" RNG testing, a suite like DIEHARD is much more appropriate than this file.
    */
 
-  def getName(g: GeneratorCompanion[_, _]): String =
+  def getName(g: GeneratorCompanion[?, ?]): String =
     g.getClass.getSimpleName.replace("$", "")
 
   val size: Int = 10000000

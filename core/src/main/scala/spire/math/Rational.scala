@@ -282,8 +282,8 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
     case that: SafeLong      => SafeLong(toBigInt) == that
     case that: Number        => Number(this) == that
     case that: Natural       => isWhole && this == Rational(that.toBigInt)
-    case that: Complex[_]    => that == this
-    case that: Quaternion[_] => that == this
+    case that: Complex[?]    => that == this
+    case that: Quaternion[?] => that == this
     case that: Long          => isValidLong && toLong == that
     case that                => unifiedPrimitiveEquals(that)
   }
