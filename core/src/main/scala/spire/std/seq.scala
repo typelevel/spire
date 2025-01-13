@@ -139,7 +139,7 @@ class SeqCoordinateSpace[A: Field, SA <: SeqOps[A, Seq, SA]](val dimensions: Int
 }
 
 /**
- * The L_p norm is equal to the `p`-th root of the sum of each element to the power `p`. For instance, if `p = 1` we
+ * The L_p norm is equal to the `p` -th root of the sum of each element to the power `p`. For instance, if `p = 1` we
  * have the Manhattan distance. If you'd like the Euclidean norm (`p = 2`), then you'd probably be best to use an
  * `RealInnerProductSpace` instead.
  */

@@ -113,7 +113,7 @@ final class Algebraic private (val expr: Algebraic.Expr)
   def cbrt: Algebraic = nroot(3)
 
   /**
-   * Returns the `k`-th root of this number.
+   * Returns the `k` -th root of this number.
    */
   def nroot(k: Int): Algebraic = if (k < 0) {
     new Algebraic(Expr.Div(Expr.ConstantLong(1), Expr.KRoot(this.expr, -k)))
@@ -124,7 +124,7 @@ final class Algebraic private (val expr: Algebraic.Expr)
   }
 
   /**
-   * Raise this number to the `k`-th power.
+   * Raise this number to the `k` -th power.
    */
   def pow(k: Int): Algebraic =
     if (k == Int.MinValue) {
@@ -511,7 +511,7 @@ object Algebraic extends AlgebraicInstances {
     new Algebraic(Expr.ConstantRational(n))
 
   /**
-   * Returns an Algebraic expression whose value is equivalent to the `i`-th real root of the [[Polynomial]] `poly`. If
+   * Returns an Algebraic expression whose value is equivalent to the `i` -th real root of the [[Polynomial]] `poly`. If
    * `i` is negative or does not an index a real root (eg the value is greater than or equal to the number of real
    * roots) then an `ArithmeticException` is thrown. Roots are indexed starting at 0. So if there are 3 roots, then they
    * are indexed as 0, 1, and 2.
@@ -1436,7 +1436,7 @@ object Algebraic extends AlgebraicInstances {
    *
    * Unlike the paper, we use log-arithmetic instead of working with exact, big integer values. This means our bound
    * isn't technically as good as it could be, but we save the cost of working with arithmetic. We also perform all log
-   * arithmetic using `Long`s and check for overflow (throwing `ArithmeticException`s when detected). In practice we
+   * arithmetic using `Long` s and check for overflow (throwing `ArithmeticException` s when detected). In practice we
    * shouldn't hit this limit, but in case we do, we prefer to throw over failing silently.
    */
   @SerialVersionUID(0L)

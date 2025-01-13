@@ -317,8 +317,8 @@ trait Ops {
    *   ev0.plus(lhs, ev1.fromInt(1))
    * }}}
    *
-   * In Spire, this lets us use `Ring`'s fromInt method and `ConvertableTo`'s `fromDouble` (etc.) before applying an op.
-   * Eventually, we should generalize the way we choose the lifting method.
+   * In Spire, this lets us use `Ring` 's fromInt method and `ConvertableTo` 's `fromDouble` (etc.) before applying an
+   * op. Eventually, we should generalize the way we choose the lifting method.
    *
    * @group macros
    */

@@ -29,7 +29,7 @@ import spire.macros.fpf._
  * An `FpFilter` can generally be used with any [[Ring]] numeric type (also supports [[EuclideanRing]], [[Field]], and
  * [[NRoot]]). However, it should be kept in mind that `FpFilter` knows nothing about the type its wrapping and assumes
  * that, generally, it is more accurate than it is. When an `FpFilter` cannot determine an answer to some predicate
- * exactly, it will defer to the wrapped value, so it probably doesn't make sense to wrap `Int`s, when an `Int` will
+ * exactly, it will defer to the wrapped value, so it probably doesn't make sense to wrap `Int` s, when an `Int` will
  * overflow before a `Double`!
  *
  * Good candidates to wrap in `FpFilter` are [[BigInt]]s, [[Rational]]s, [[BigDecimal]]s, and [[Algebraic]]. Note that

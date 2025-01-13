@@ -20,14 +20,14 @@ package free
 final class FreeMonoid[A] private (val terms: List[A]) extends AnyVal { lhs =>
 
   /**
-   * Map each term to type `B` and sum them using `B`'s [[Semigroup]], as long as there is at least 1 term. Otherwise,
+   * Map each term to type `B` and sum them using `B` 's [[Semigroup]], as long as there is at least 1 term. Otherwise,
    * return `None`.
    */
   def runSemigroup[B](f: A => B)(implicit B: Semigroup[B]): Option[B] =
     B.combineAllOption(terms.iterator.map(f))
 
   /**
-   * Map each term to type `B` and sum them using `B`'s [[Monoid]].
+   * Map each term to type `B` and sum them using `B` 's [[Monoid]].
    */
   def run[B](f: A => B)(implicit B: Monoid[B]): B =
     B.combineAll(terms.iterator.map(f))

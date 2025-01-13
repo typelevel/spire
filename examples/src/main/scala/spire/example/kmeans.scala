@@ -23,7 +23,7 @@ import scala.collection.Factory
 import scala.util.Random.{nextDouble, nextGaussian, nextInt}
 
 /**
- * An example using `NormedVectorSpace`s to create a generic k-Means implementation. We also abstract over the
+ * An example using `NormedVectorSpace` s to create a generic k-Means implementation. We also abstract over the
  * collection type for the fun of it. We implement Lloyd's algorithm, which has problems of its own, but performs well
  * enough.
  */

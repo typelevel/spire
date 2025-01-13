@@ -230,7 +230,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
    *
    * Depending on `C`, the `finder` argument may need to be passed "explicitly" via an implicit conversion. This is
    * because some types (eg `BigDecimal`, `Rational`, etc) require an error bound, and so provide implicit conversions
-   * to `RootFinder`s from the error type. For instance, `BigDecimal` requires either a scale or MathContext. So, we'd
+   * to `RootFinder` s from the error type. For instance, `BigDecimal` requires either a scale or MathContext. So, we'd
    * call this method with `poly.roots(MathContext.DECIMAL128)`, which would return a `Roots[BigDecimal` whose roots are
    * approximated to the precision specified in `DECIMAL128` and rounded appropriately.
    *

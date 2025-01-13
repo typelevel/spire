@@ -20,7 +20,7 @@ package free
 final class FreeGroup[A] private (val terms: Vector[Either[A, A]]) extends AnyVal { lhs =>
 
   /**
-   * Map each term to type `B` and sum them using `B`'s [[Group]].
+   * Map each term to type `B` and sum them using `B` 's [[Group]].
    */
   def run[B](f: A => B)(implicit B: Group[B]): B =
     terms.foldLeft(B.empty) {

@@ -38,7 +38,7 @@ trait Roots[A] extends Iterable[A] { self =>
   def count: Int
 
   /**
-   * Returns the `i`-th real root of `poly`, or throws an `IndexOutOfBoundsException` if there is no `i`-th real root.
+   * Returns the `i` -th real root of `poly`, or throws an `IndexOutOfBoundsException` if there is no `i` -th real root.
    */
   def get(i: Int): A
 
