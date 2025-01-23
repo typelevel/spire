@@ -41,7 +41,8 @@ import java.util.Arrays
  * @author
  *   <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
  */
-final class MersenneTwister64 protected[random] (mt: Array[Long], mti0: Int = 313) extends LongBasedGenerator { // N + 1 = 313
+final class MersenneTwister64 protected[random] (mt: Array[Long], mti0: Int = 313)
+    extends LongBasedGenerator { // N + 1 = 313
 
   import MersenneTwister64.{mag01, BYTES, LowerMask, M, M_1, M_N, N, N_1, N_M, UpperMask}
 
