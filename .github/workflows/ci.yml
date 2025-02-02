@@ -24,36 +24,43 @@ concurrency:
 
 jobs:
   build:
-    name: Build and Test
+    name: Test
     strategy:
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         scala: [2.13, 3]
-        java: [temurin@8, temurin@11, temurin@17]
+        java: [temurin@8, temurin@11, temurin@17, temurin@21]
         project: [rootJS, rootJVM, rootNative]
         exclude:
           - scala: 3
             java: temurin@11
           - scala: 3
             java: temurin@17
+          - scala: 3
+            java: temurin@21
           - project: rootJS
             java: temurin@11
           - project: rootJS
             java: temurin@17
+          - project: rootJS
+            java: temurin@21
           - project: rootNative
             java: temurin@11
           - project: rootNative
             java: temurin@17
+          - project: rootNative
+            java: temurin@21
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
     steps:
-      - name: Install sbt
-        uses: sbt/setup-sbt@v1
-
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
 
       - name: Setup Java (temurin@8)
         id: setup-java-temurin-8
@@ -94,11 +101,24 @@ jobs:
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         run: sbt +update
 
+      - name: Setup Java (temurin@21)
+        id: setup-java-temurin-21
+        if: matrix.java == 'temurin@21'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'temurin@21' && steps.setup-java-temurin-21.outputs.cache-hit == 'false'
+        run: sbt +update
+
       - name: Check that workflows are up to date
         run: sbt githubWorkflowCheck
 
       - name: Check headers and formatting
-        if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-latest'
+        if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' headerCheckAll scalafmtCheckAll 'project /' scalafmtSbtCheck
 
       - name: scalaJSLink
@@ -113,11 +133,11 @@ jobs:
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' test
 
       - name: Check binary compatibility
-        if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-latest'
+        if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' mimaReportBinaryIssues
 
       - name: Generate API documentation
-        if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-latest'
+        if: matrix.java == 'temurin@8' && matrix.os == 'ubuntu-22.04'
         run: sbt 'project ${{ matrix.project }}' '++ ${{ matrix.scala }}' doc
 
       - name: Make target directories
@@ -141,17 +161,17 @@ jobs:
     if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main')
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Install sbt
-        uses: sbt/setup-sbt@v1
-
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
 
       - name: Setup Java (temurin@8)
         id: setup-java-temurin-8
@@ -190,6 +210,19 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
+        run: sbt +update
+
+      - name: Setup Java (temurin@21)
+        id: setup-java-temurin-21
+        if: matrix.java == 'temurin@21'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'temurin@21' && steps.setup-java-temurin-21.outputs.cache-hit == 'false'
         run: sbt +update
 
       - name: Download target directories (2.13, rootJS)
@@ -281,17 +314,17 @@ jobs:
     if: github.event.repository.fork == false && github.event_name != 'pull_request'
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         java: [temurin@8]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Install sbt
-        uses: sbt/setup-sbt@v1
-
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
 
       - name: Setup Java (temurin@8)
         id: setup-java-temurin-8
@@ -332,27 +365,40 @@ jobs:
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
         run: sbt +update
 
+      - name: Setup Java (temurin@21)
+        id: setup-java-temurin-21
+        if: matrix.java == 'temurin@21'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'temurin@21' && steps.setup-java-temurin-21.outputs.cache-hit == 'false'
+        run: sbt +update
+
       - name: Submit Dependencies
         uses: scalacenter/sbt-dependency-submission@v2
         with:
-          modules-ignore: spire-examples_2.13 spire-examples_3 rootjs_2.13 rootjs_3 docs_2.13 docs_3 spire-tests_sjs1_2.13 spire-tests_sjs1_3 rootjvm_2.13 rootjvm_3 rootnative_2.13 rootnative_3 spire-tests_2.13 spire-tests_3 spire-benchmark_2.13 spire-benchmark_3 spire-tests_native0.4_2.13 spire-tests_native0.4_3
+          modules-ignore: spire-examples_2.13 spire-examples_3 rootjs_2.13 rootjs_3 docs_2.13 docs_3 spire-tests_sjs1_2.13 spire-tests_sjs1_3 rootjvm_2.13 rootjvm_3 rootnative_2.13 rootnative_3 spire-tests_2.13 spire-tests_3 spire-benchmark_2.13 spire-benchmark_3 spire-tests_native0.5_2.13 spire-tests_native0.5_3
           configs-ignore: test scala-tool scala-doc-tool test-internal
 
   site:
     name: Generate Site
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-22.04]
         java: [temurin@11]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Install sbt
-        uses: sbt/setup-sbt@v1
-
       - name: Checkout current branch (full)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Setup sbt
+        uses: sbt/setup-sbt@v1
 
       - name: Setup Java (temurin@8)
         id: setup-java-temurin-8
@@ -391,6 +437,19 @@ jobs:
 
       - name: sbt update
         if: matrix.java == 'temurin@17' && steps.setup-java-temurin-17.outputs.cache-hit == 'false'
+        run: sbt +update
+
+      - name: Setup Java (temurin@21)
+        id: setup-java-temurin-21
+        if: matrix.java == 'temurin@21'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: sbt
+
+      - name: sbt update
+        if: matrix.java == 'temurin@21' && steps.setup-java-temurin-21.outputs.cache-hit == 'false'
         run: sbt +update
 
       - name: Generate site

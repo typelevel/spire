@@ -34,7 +34,8 @@ ThisBuild / tlBaseVersion := "0.18"
 
 ThisBuild / scalaVersion := Scala213
 ThisBuild / crossScalaVersions := Seq(Scala213, Scala3)
-ThisBuild / githubWorkflowJavaVersions := Seq("8", "11", "17").map(JavaSpec.temurin(_))
+ThisBuild / githubWorkflowJavaVersions := Seq("8", "11", "17", "21").map(JavaSpec.temurin)
+ThisBuild / githubWorkflowBuildMatrixFailFast := Some(false)
 
 ThisBuild / homepage := Some(url("https://typelevel.org/spire/"))
 ThisBuild / licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
@@ -178,7 +179,7 @@ lazy val buildSettings = Seq(
 
 lazy val commonDeps = Seq(
   libraryDependencies ++= Seq(
-    "org.typelevel" %%% "algebra" % catsVersion,
+    "org.typelevel" %%% "algebra" % catsVersion
   )
 )
 
