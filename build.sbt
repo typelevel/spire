@@ -69,6 +69,7 @@ lazy val platform = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .settings(spireSettings: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
+  .nativeSettings(commonNativeSettings*)
   .dependsOn(macros, util)
 
 lazy val macros = crossProject(JSPlatform, JVMPlatform, NativePlatform)
@@ -79,6 +80,7 @@ lazy val macros = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .settings(munitSettings: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
+  .nativeSettings(commonNativeSettings*)
 
 lazy val util = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .crossType(CrossType.Pure)
@@ -86,6 +88,7 @@ lazy val util = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .settings(spireSettings: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
+  .nativeSettings(commonNativeSettings*)
   .dependsOn(macros)
 
 lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
@@ -95,6 +98,7 @@ lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .settings(coreSettings: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
+  .nativeSettings(commonNativeSettings*)
   .dependsOn(macros, platform, util)
 
 lazy val extras = crossProject(JSPlatform, JVMPlatform, NativePlatform)
@@ -104,6 +108,7 @@ lazy val extras = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .settings(extrasSettings: _*)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
+  .nativeSettings(commonNativeSettings*)
   .dependsOn(macros, platform, util, core)
 
 lazy val docs = project
@@ -140,6 +145,7 @@ lazy val laws = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   )
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
+  .nativeSettings(commonNativeSettings*)
   .dependsOn(core, extras)
 
 lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform)
@@ -150,6 +156,7 @@ lazy val tests = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .enablePlugins(NoPublishPlugin)
   .jvmSettings(commonJvmSettings: _*)
   .jsSettings(commonJsSettings: _*)
+  .nativeSettings(commonNativeSettings*)
   .dependsOn(core, extras, laws)
 
 lazy val benchmark: Project = project
@@ -190,6 +197,13 @@ lazy val commonSettings = Seq(
 lazy val commonJsSettings = Seq()
 
 lazy val commonJvmSettings = Seq()
+
+lazy val commonNativeSettings = Seq(
+  tlVersionIntroduced := Map(
+    "2.13" -> "0.19.0", // Next release with Scala Native 0.5.x is 0.19
+    "3" -> "0.19.0" // Set 0.19.0 as the new baseline and Ignore previous releases
+  )
+)
 
 ThisBuild / tlSiteApiUrl := Some(url("https://www.javadoc.io/doc/org.typelevel/spire_2.13/latest/spire/index.html"))
 
