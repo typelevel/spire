@@ -14,12 +14,12 @@ val header = """|***************************************************************
 
 import scala.language.existentials
 
-lazy val scalaCheckVersion = "1.17.0"
+lazy val scalaCheckVersion = "1.18.1"
 
-lazy val munit = "1.0.0-M7"
-lazy val munitDiscipline = "2.0.0-M3"
+lazy val munit = "1.1.0"
+lazy val munitDiscipline = "2.0.0"
 
-lazy val algebraVersion = "2.9.0"
+lazy val catsVersion = "2.13.0"
 
 lazy val apfloatVersion = "1.10.1"
 lazy val jscienceVersion = "4.3.1"
@@ -133,7 +133,7 @@ lazy val laws = crossProject(JSPlatform, JVMPlatform, NativePlatform)
   .settings(spireSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      "org.typelevel" %%% "algebra-laws" % algebraVersion,
+      "org.typelevel" %%% "algebra-laws" % catsVersion,
       "org.scalacheck" %%% "scalacheck" % scalaCheckVersion
     )
   )
@@ -178,7 +178,7 @@ lazy val buildSettings = Seq(
 
 lazy val commonDeps = Seq(
   libraryDependencies ++= Seq(
-    "org.typelevel" %%% "algebra" % algebraVersion
+    "org.typelevel" %%% "algebra" % catsVersion,
   )
 )
 
