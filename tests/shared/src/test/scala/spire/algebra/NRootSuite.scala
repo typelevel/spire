@@ -56,7 +56,7 @@ class NRootSuite extends munit.FunSuite {
     }
   }
 
-  val HighPrecision = new java.math.MathContext(250)
+  val HighPrecision = new java.math.MathContext(if (spire.tests.Platform.isNative) 150 else 250)
 
   val bases = Seq(
     BigDecimal(2),

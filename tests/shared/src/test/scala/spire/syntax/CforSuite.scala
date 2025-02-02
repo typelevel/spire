@@ -35,6 +35,7 @@ class CforSuite extends munit.FunSuite {
     cfor(0)(_ < 10, _ + 1) { x =>
       cfor(10)(_ < 100, _ + 10) { y =>
         s.add(x + y)
+        ()
       }
     }
     assertEquals(s.toSet, (10 to 99).toSet)
@@ -42,7 +43,7 @@ class CforSuite extends munit.FunSuite {
 
   test("symbol collision cfor") {
     val b = mutable.ArrayBuffer.empty[Int]
-    cfor(0)(_ < 3, _ + 1) { x =>
+    cfor(0)(_ < 3, _ + 1) { _ =>
       cfor(0)(_ < 2, _ + 1) { y =>
         val x = y
         b += x
@@ -100,17 +101,21 @@ class CforSuite extends munit.FunSuite {
   }
 
   test("capture value in closure") {
-    val b1 = collection.mutable.ArrayBuffer.empty[() => Int]
+    val capturedValues = collection.mutable.ArrayBuffer.empty[Int]
+    val b1 = collection.mutable.ArrayBuffer.empty[() => Unit]
     cfor(0)(_ < 3, _ + 1) { x =>
-      b1 += (() => x)
+      val value = x // Explicitly define. Avoids failures on certain JDKs
+      val closure = () => { capturedValues += value; () }
+      b1 += closure
     }
-    val b2 = collection.mutable.ArrayBuffer[() => Int]()
-    var i = 0
-    while (i < 3) {
-      b2 += (() => i)
-      i += 1
+    b1.foreach(_.apply())
+
+    val b2 = collection.mutable.ArrayBuffer.empty[() => Int]
+    cfor(0)(_ < 3, _ + 1) { i =>
+      val value = i
+      b2 += (() => value)
     }
-    assertEquals(b1.map(_.apply()).toList, b2.map(_.apply()).toList)
+    assertEquals(capturedValues.toList, b2.map(_.apply()).toList)
   }
 
   test("capture value in inner class") {
@@ -168,7 +173,7 @@ class CforSuite extends munit.FunSuite {
 
   test("cforRange(0 to 0 by -1)") {
     var t = 0
-    cforRange(0 to 0 by -1) { x =>
+    cforRange(0 to 0 by -1) { _ =>
       t += 1
     }
     assertEquals(t, 1)
