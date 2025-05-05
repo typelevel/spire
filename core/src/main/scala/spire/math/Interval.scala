@@ -890,12 +890,9 @@ object Interval {
    * This method assumes that lower < upper to avoid comparisons.
    *
    *   - When one of the arguments is Unbound, the result will be All, Above(x, _), or Below(y, _).
-   *
    *   - When both arguments are Open/Closed (e.g. Open(x), Open(y)), then x < y and the result will be a Bounded
    *     interval.
-   *
    *   - If both arguments are EmptyBound, the result is Empty.
-   *
    *   - Any other arguments are invalid.
    *
    * This method cannot construct Point intervals.
