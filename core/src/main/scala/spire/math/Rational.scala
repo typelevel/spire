@@ -273,9 +273,9 @@ sealed abstract class Rational extends ScalaNumber with ScalaNumericConversions 
   }
 
   override def equals(that: Any): Boolean = that match {
-    case that: Real      => this == that.toRational
-    case that: Algebraic => that == this
-    case that: BigInt    => isWhole && toBigInt == that
+    case that: Real       => this == that.toRational
+    case that: Algebraic  => that == this
+    case that: BigInt     => isWhole && toBigInt == that
     case that: BigDecimal =>
       try { toBigDecimal(that.mc) == that }
       catch { case ae: ArithmeticException => false }
@@ -413,7 +413,7 @@ object Rational extends RationalInstances {
   def apply(r: String): Rational = r match {
     case RationalString(n, d) => Rational(SafeLong(n), SafeLong(d))
     case IntegerString(n)     => Rational(SafeLong(n))
-    case s =>
+    case s                    =>
       try {
         Rational(BigDecimal(s))
       } catch {
@@ -786,7 +786,7 @@ object Rational extends RationalInstances {
 
     def +(r: Rational): Rational = r match {
       case r: LongRational => r + this
-      case r: BigRational =>
+      case r: BigRational  =>
         val dgcd: SafeLong = d.gcd(r.d)
         if (dgcd.isOne) {
           Rational(r.d * n + r.n * d, r.d * d)
@@ -804,7 +804,7 @@ object Rational extends RationalInstances {
 
     def -(r: Rational): Rational = r match {
       case r: LongRational => (-r) + this
-      case r: BigRational =>
+      case r: BigRational  =>
         val dgcd: SafeLong = d.gcd(r.d)
         if (dgcd.isOne) {
           Rational(r.d * n - r.n * d, r.d * d)
@@ -822,7 +822,7 @@ object Rational extends RationalInstances {
 
     def *(r: Rational): Rational = r match {
       case r: LongRational => r * this
-      case r: BigRational =>
+      case r: BigRational  =>
         val a = n.gcd(r.d)
         val b = d.gcd(r.n)
         Rational((n / a) * (r.n / b), (d / b) * (r.d / a))
@@ -830,7 +830,7 @@ object Rational extends RationalInstances {
 
     def /(r: Rational): Rational = r match {
       case r: LongRational => r.inverse * this
-      case r: BigRational =>
+      case r: BigRational  =>
         val a = n.gcd(r.n)
         val b = d.gcd(r.d)
         val num = (n / a) * (r.d / b)

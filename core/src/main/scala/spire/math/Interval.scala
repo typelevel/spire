@@ -187,8 +187,8 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
 
   // Does this interval contains any points at or above t ?
   def hasAtOrAbove(t: A)(implicit o: Order[A]): Boolean = this match {
-    case _: Empty[_] => false
-    case Point(p)    => p >= t
+    case _: Empty[_]         => false
+    case Point(p)            => p >= t
     case Below(upper, flags) =>
       upper > t || isClosedUpper(flags) && upper === t
     case Bounded(lower, upper, flags) =>
@@ -199,8 +199,8 @@ sealed abstract class Interval[A] extends Serializable { lhs =>
 
   // Does this interval contains any points at or below t ?
   def hasAtOrBelow(t: A)(implicit o: Order[A]): Boolean = this match {
-    case _: Empty[_] => false
-    case Point(p)    => p <= t
+    case _: Empty[_]         => false
+    case Point(p)            => p <= t
     case Above(lower, flags) =>
       lower < t || isClosedLower(flags) && lower === t
     case Bounded(lower, upper, flags) =>
@@ -890,44 +890,41 @@ object Interval {
    * This method assumes that lower < upper to avoid comparisons.
    *
    *   - When one of the arguments is Unbound, the result will be All, Above(x, _), or Below(y, _).
-   *
    *   - When both arguments are Open/Closed (e.g. Open(x), Open(y)), then x < y and the result will be a Bounded
    *     interval.
-   *
    *   - If both arguments are EmptyBound, the result is Empty.
-   *
    *   - Any other arguments are invalid.
    *
    * This method cannot construct Point intervals.
    */
   private[spire] def fromOrderedBounds[A: Order](lower: Bound[A], upper: Bound[A]): Interval[A] =
     (lower, upper) match {
-      case (EmptyBound(), EmptyBound()) => empty
-      case (Closed(x), Closed(y))       => Bounded(x, y, closedLowerFlags | closedUpperFlags)
-      case (Open(x), Open(y))           => Bounded(x, y, openLowerFlags | openUpperFlags)
-      case (Unbound(), Open(y))         => below(y)
-      case (Open(x), Unbound())         => above(x)
-      case (Unbound(), Closed(y))       => atOrBelow(y)
-      case (Closed(x), Unbound())       => atOrAbove(x)
-      case (Closed(x), Open(y))         => Bounded(x, y, closedLowerFlags | openUpperFlags)
-      case (Open(x), Closed(y))         => Bounded(x, y, openLowerFlags | closedUpperFlags)
-      case (Unbound(), Unbound())       => all
+      case (EmptyBound(), EmptyBound())          => empty
+      case (Closed(x), Closed(y))                => Bounded(x, y, closedLowerFlags | closedUpperFlags)
+      case (Open(x), Open(y))                    => Bounded(x, y, openLowerFlags | openUpperFlags)
+      case (Unbound(), Open(y))                  => below(y)
+      case (Open(x), Unbound())                  => above(x)
+      case (Unbound(), Closed(y))                => atOrBelow(y)
+      case (Closed(x), Unbound())                => atOrAbove(x)
+      case (Closed(x), Open(y))                  => Bounded(x, y, closedLowerFlags | openUpperFlags)
+      case (Open(x), Closed(y))                  => Bounded(x, y, openLowerFlags | closedUpperFlags)
+      case (Unbound(), Unbound())                => all
       case (EmptyBound(), _) | (_, EmptyBound()) =>
         throw new IllegalArgumentException("invalid empty bound")
     }
 
   def fromBounds[A: Order](lower: Bound[A], upper: Bound[A]): Interval[A] =
     (lower, upper) match {
-      case (EmptyBound(), EmptyBound()) => empty
-      case (Closed(x), Closed(y))       => closed(x, y)
-      case (Open(x), Open(y))           => open(x, y)
-      case (Unbound(), Open(y))         => below(y)
-      case (Open(x), Unbound())         => above(x)
-      case (Unbound(), Closed(y))       => atOrBelow(y)
-      case (Closed(x), Unbound())       => atOrAbove(x)
-      case (Closed(x), Open(y))         => openUpper(x, y)
-      case (Open(x), Closed(y))         => openLower(x, y)
-      case (Unbound(), Unbound())       => all
+      case (EmptyBound(), EmptyBound())          => empty
+      case (Closed(x), Closed(y))                => closed(x, y)
+      case (Open(x), Open(y))                    => open(x, y)
+      case (Unbound(), Open(y))                  => below(y)
+      case (Open(x), Unbound())                  => above(x)
+      case (Unbound(), Closed(y))                => atOrBelow(y)
+      case (Closed(x), Unbound())                => atOrAbove(x)
+      case (Closed(x), Open(y))                  => openUpper(x, y)
+      case (Open(x), Closed(y))                  => openLower(x, y)
+      case (Unbound(), Unbound())                => all
       case (EmptyBound(), _) | (_, EmptyBound()) =>
         throw new IllegalArgumentException("invalid empty bound")
     }
@@ -955,8 +952,8 @@ object Interval {
 
   def apply(s: String): Interval[Rational] =
     s match {
-      case NullRe()    => Interval.empty[Rational]
-      case SingleRe(x) => Interval.point(Rational(x))
+      case NullRe()                  => Interval.empty[Rational]
+      case SingleRe(x)               => Interval.point(Rational(x))
       case PairRe(left, x, y, right) =>
         (left, x, y, right) match {
           case ("(", "-∞", "∞", ")") => Interval.all[Rational]

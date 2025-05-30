@@ -151,7 +151,7 @@ final case class Quaternion[@sp(Float, Double) A](r: A, i: A, j: A, k: A)
   // not typesafe, so this is the best we can do :(
   override def equals(that: Any): Boolean = that match {
     case that: Quaternion[_] => this === that
-    case that: Complex[_] =>
+    case that: Complex[_]    =>
       r == that.real && i == that.imag && anyIsZero(j) && anyIsZero(k)
     case that =>
       sillyIsReal && r == that
