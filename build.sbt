@@ -25,7 +25,7 @@ lazy val apfloatVersion = "1.10.1"
 lazy val jscienceVersion = "4.3.1"
 lazy val apacheCommonsMath3Version = "3.6.1"
 
-val Scala213 = "2.13.15"
+val Scala213 = "2.13.16"
 val Scala3 = "3.2.2"
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
