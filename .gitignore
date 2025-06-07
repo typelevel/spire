@@ -15,3 +15,4 @@ project/metals.sbt
 .bloop/
 .bsp/
 project/project/
+.vscode
