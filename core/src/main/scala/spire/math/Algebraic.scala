@@ -167,8 +167,8 @@ final class Algebraic private (val expr: Algebraic.Expr)
     case (that: BigInt)        => isWhole && toBigInt == that
     case (that: Natural)       => isWhole && signum >= 0 && that == toBigInt
     case (that: SafeLong)      => isWhole && that == this
-    case (that: Complex[_])    => that == this
-    case (that: Quaternion[_]) => that == this
+    case (that: Complex[?])    => that == this
+    case (that: Quaternion[?]) => that == this
     case (that: BigDecimal) =>
       try {
         toBigDecimal(that.mc) == that

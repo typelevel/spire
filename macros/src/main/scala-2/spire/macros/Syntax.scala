@@ -104,7 +104,7 @@ case class SyntaxUtil[C <: Context with Singleton](val c: C) {
 
   def names(bs: String*) = bs.toList.map(name)
 
-  def isClean(es: c.Expr[_]*): Boolean =
+  def isClean(es: c.Expr[?]*): Boolean =
     es.forall {
       _.tree match {
         case t @ Ident(_: TermName) if t.symbol.asTerm.isStable => true

@@ -473,7 +473,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
   }
 
   override def equals(that: Any): Boolean = that match {
-    case rhs: Polynomial[_] if lhs.degree == rhs.degree =>
+    case rhs: Polynomial[?] if lhs.degree == rhs.degree =>
       val it1 = lhs.termsIterator
       val it2 = rhs.termsIterator
       @tailrec def loop(): Boolean = {
@@ -485,7 +485,7 @@ trait Polynomial[@sp(Double) C] { lhs =>
       }
       loop()
 
-    case rhs: Polynomial[_] =>
+    case rhs: Polynomial[?] =>
       false
 
     case n if lhs.isZero =>

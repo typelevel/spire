@@ -240,18 +240,18 @@ trait IntervalSyntax {
 
 @deprecated("Unbound syntax will be removed", "spire 0.18.0")
 trait UnboundSyntax {
-  implicit def moduleUnboundOps[F](f: F)(implicit ev: CModule[_, F]): ModuleUnboundOps[F] =
+  implicit def moduleUnboundOps[F](f: F)(implicit ev: CModule[?, F]): ModuleUnboundOps[F] =
     new ModuleUnboundOps(f)
 
-  implicit def vectorSpaceUnboundOps[F](f: F)(implicit ev: VectorSpace[_, F]): VectorSpaceUnboundOps[F] =
+  implicit def vectorSpaceUnboundOps[F](f: F)(implicit ev: VectorSpace[?, F]): VectorSpaceUnboundOps[F] =
     new VectorSpaceUnboundOps(f)
 
-  implicit def groupActionUnboundOps[G](g: G)(implicit ev: Action[_, G]): ActionUnboundOps[G] =
+  implicit def groupActionUnboundOps[G](g: G)(implicit ev: Action[?, G]): ActionUnboundOps[G] =
     new ActionUnboundOps(g)
-  implicit def additiveActionUnboundOps[G](g: G)(implicit ev: AdditiveAction[_, G]): AdditiveActionUnboundOps[G] =
+  implicit def additiveActionUnboundOps[G](g: G)(implicit ev: AdditiveAction[?, G]): AdditiveActionUnboundOps[G] =
     new AdditiveActionUnboundOps(g)
   implicit def multiplicativeActionUnboundOps[G](g: G)(implicit
-    ev: MultiplicativeAction[_, G]
+    ev: MultiplicativeAction[?, G]
   ): MultiplicativeActionUnboundOps[G] =
     new MultiplicativeActionUnboundOps(g)
 }
