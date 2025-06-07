@@ -162,8 +162,8 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
 
     import spire.algebra.{Order, PartialOrder}
     forAll { (x: Rational, y: Rational) =>
-      val a = Interval.point(x)
-      val b = Interval.point(y)
+      val a: Interval[Rational] = Interval.point(x)
+      val b: Interval[Rational] = Interval.point(y)
       val order = PartialOrder[Interval[Rational]].tryCompare(a, b).get == Order[Rational].compare(x, y)
       val min = a.pmin(b) match {
         case Some(Point(vmin)) => vmin == x.min(y)
@@ -183,8 +183,8 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
     forAll { (a: Rational, w: Positive[Rational]) =>
       val b = a + w.num
       // a < b
-      val i = Interval.atOrBelow(a)
-      val j = Interval.atOrAbove(b)
+      val i: Interval[Rational] = Interval.atOrBelow(a)
+      val j: Interval[Rational] = Interval.atOrAbove(b)
       (i < j) &&
       !(i >= j) &&
       (j > i) &&
@@ -197,8 +197,8 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
     forAll { (a: Rational, w: NonNegative[Rational]) =>
       val b = a - w.num
       // a >= b
-      val i = Interval.atOrBelow(a)
-      val j = Interval.atOrAbove(b)
+      val i: Interval[Rational] = Interval.atOrBelow(a)
+      val j: Interval[Rational] = Interval.atOrAbove(b)
       i.partialCompare(j).isNaN &&
       j.partialCompare(i).isNaN
     }
@@ -207,8 +207,8 @@ class IntervalScalaCheckSuite extends munit.ScalaCheckSuite {
   property("(-inf, inf) does not compare with [a, b]") {
     import spire.optional.intervalGeometricPartialOrder._
     forAll { (a: Rational, b: Rational) =>
-      val i = Interval.all[Rational]
-      val j = Interval.closed(a, b)
+      val i: Interval[Rational] = Interval.all[Rational]
+      val j: Interval[Rational] = Interval.closed(a, b)
       i.partialCompare(j).isNaN &&
       j.partialCompare(i).isNaN
     }
