@@ -169,7 +169,7 @@ final class Algebraic private (val expr: Algebraic.Expr)
     case (that: SafeLong)      => isWhole && that == this
     case (that: Complex[_])    => that == this
     case (that: Quaternion[_]) => that == this
-    case (that: BigDecimal) =>
+    case (that: BigDecimal)    =>
       try {
         toBigDecimal(that.mc) == that
       } catch {
@@ -421,10 +421,10 @@ final class Algebraic private (val expr: Algebraic.Expr)
     import Expr._
 
     def eval(e: Expr): A = e match {
-      case ConstantLong(n)       => conv.fromLong(n)
-      case ConstantDouble(n)     => conv.fromDouble(n)
-      case ConstantBigDecimal(n) => conv.fromBigDecimal(n)
-      case ConstantRational(n)   => conv.fromRational(n)
+      case ConstantLong(n)             => conv.fromLong(n)
+      case ConstantDouble(n)           => conv.fromDouble(n)
+      case ConstantBigDecimal(n)       => conv.fromBigDecimal(n)
+      case ConstantRational(n)         => conv.fromRational(n)
       case ConstantRoot(poly, i, _, _) =>
         RootFinder[A].findRoots(poly.map(conv.fromBigInt)).get(i)
       case Neg(n)      => -eval(n)
@@ -1453,10 +1453,10 @@ object Algebraic extends AlgebraicInstances {
     }
 
     def apply(expr: Algebraic.Expr): Bound = expr match {
-      case ConstantLong(n)       => integer(n)
-      case ConstantDouble(n)     => rational(n)
-      case ConstantBigDecimal(n) => rational(n)
-      case ConstantRational(n)   => rational(n)
+      case ConstantLong(n)                    => integer(n)
+      case ConstantDouble(n)                  => rational(n)
+      case ConstantBigDecimal(n)              => rational(n)
+      case ConstantRational(n)                => rational(n)
       case root @ ConstantRoot(poly, _, _, _) =>
         Bound(root.lead.bitLength + 1, Roots.upperBound(poly))
       case Neg(sub)      => sub.getBound(this)

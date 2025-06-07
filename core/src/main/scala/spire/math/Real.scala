@@ -120,7 +120,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
     this match {
       case Exact(n) => Exact(n.reciprocal)
-      case _ =>
+      case _        =>
         Real { p =>
           val s = findNonzero(0)
           roundUp(Rational(SafeLong.two.pow(2 * p + 2 * s + 2), x(p + 2 * s + 2)))
@@ -143,7 +143,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
     case (_, Exact(Rational.zero)) => Real.zero
     case (Exact(Rational.one), _)  => y
     case (_, Exact(Rational.one))  => x
-    case _ =>
+    case _                         =>
       Real { p =>
         val x0 = x(0).abs + 2
         val y0 = y(0).abs + 2
@@ -183,7 +183,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   def tmod(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx.tmod(ny))
-    case _ =>
+    case _                      =>
       Real { p =>
         val d = x / y
         val s = d(2)
@@ -194,7 +194,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   def tquot(y: Real): Real = (x, y) match {
     case (Exact(nx), Exact(ny)) => Exact(nx.tquot(ny))
-    case _ =>
+    case _                      =>
       Real { p =>
         val d = x / y
         val s = d(2)
@@ -223,7 +223,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   def ceil: Real = x match {
     case Exact(n) => Exact(n.ceil)
-    case _ =>
+    case _        =>
       Real { p =>
         val n = x(p)
         val t = SafeLong.two.pow(p)
@@ -236,7 +236,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   def floor: Real = x match {
     case Exact(n) => Exact(n.floor)
-    case _ =>
+    case _        =>
       Real { p =>
         val n = x(p)
         val t = SafeLong.two.pow(p)
@@ -247,7 +247,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
 
   def round: Real = x match {
     case Exact(n) => Exact(n.round)
-    case _ =>
+    case _        =>
       Real { p =>
         val n = x(p)
         val t = SafeLong.two.pow(p)
@@ -282,7 +282,7 @@ sealed trait Real extends ScalaNumber with ScalaNumericConversions { x =>
   // a bit hand-wavy
   def fpow(y: Real): Real = y match {
     case Exact(n) => x.fpow(n)
-    case _ =>
+    case _        =>
       Real { p =>
         x.fpow(Rational(y(p), SafeLong.two.pow(p)))(p)
       }
@@ -503,8 +503,8 @@ object Real extends RealInstances {
 
   def accumulate(total: SafeLong, xs: LazyList[SafeLong], cs: LazyList[Rational]): SafeLong = {
     ((xs, cs): @unchecked) match {
-      case (_, Seq()) => total
-      case (Seq(), _) => sys.error("nooooo")
+      case (_, Seq())           => total
+      case (Seq(), _)           => sys.error("nooooo")
       case (x #:: xs, c #:: cs) =>
         val t = roundUp(c * Rational(x))
         if (t == 0) total else accumulate(total + t, xs, cs)
@@ -515,8 +515,8 @@ object Real extends RealInstances {
   def accumulate(total: SafeLong, xs: Stream[SafeLong], cs: Stream[Rational]): SafeLong = {
     import scala.#::
     ((xs, cs): @unchecked) match {
-      case (_, Stream.Empty) => total
-      case (Stream.Empty, _) => sys.error("nooooo")
+      case (_, Stream.Empty)    => total
+      case (Stream.Empty, _)    => sys.error("nooooo")
       case (x #:: xs, c #:: cs) =>
         val t = roundUp(c * Rational(x))
         if (t == 0) total else accumulate(total + t, xs, cs)

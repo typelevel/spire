@@ -78,7 +78,7 @@ object Overlap {
         // only possible cases left are disjoint or partial overlap
         case i: Bounded[A] => lessAndOverlaps(i.lowerBound)
         case i: Point[A]   => lessAndOverlaps(i.lowerBound)
-        case Empty() =>
+        case Empty()       =>
           if (Interval.fromBounds(lhs.lowerBound, rhs.upperBound).isEmpty) Disjoint(rhs, lhs)
           else Disjoint(lhs, rhs)
         case _ => throw new Exception("impossible")

@@ -566,7 +566,7 @@ trait PolynomialOverField[@sp(Double) C]
   override def equotmod(x: Polynomial[C], y: Polynomial[C]): (Polynomial[C], Polynomial[C]) = {
     require(!y.isZero, "Can't divide by polynomial of zero!")
     (x: @unchecked) match {
-      case xd: poly.PolyDense[C] => poly.PolyDense.quotmodDense(xd, y)
+      case xd: poly.PolyDense[C]  => poly.PolyDense.quotmodDense(xd, y)
       case xs: poly.PolySparse[C] =>
         val ys = (y: @unchecked) match {
           case yd: poly.PolyDense[C]   => poly.PolySparse.dense2sparse(yd)
