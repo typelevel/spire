@@ -185,7 +185,7 @@ private[math] class DoubleIsNumeric
     with ConvertableToDouble
     with DoubleIsReal
     with Serializable {
-  override def fromInt(n: Int): Double = n.toDouble
+  override def fromInt(n: Int): Double = n
   override def fromDouble(n: Double): Double = n
   override def fromBigInt(n: BigInt): Double = n.toDouble
   override def toDouble(n: Double): Double = n.toDouble
