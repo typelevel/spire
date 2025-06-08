@@ -44,6 +44,14 @@ class GaussianSuite extends munit.FunSuite {
     }
   }
 
+  test("spire.random.Gaussian does not crash Ziggurat (regression)") {
+    try {
+      spire.random.Gaussian(0.0, 1.0).histogram(975)(rng.Lcg64.fromTime(42L))
+    } catch {
+      case e: Throwable => fail(f"crashed with $e")
+    }
+  }
+
   test("MarsagliaGaussian[Float] is normal")(checkMarsagliaGaussian[Float])
   test("MarsagliaGaussian[Double] is normal")(checkMarsagliaGaussian[Double])
   test("MarsagliaGaussian[BigDecimal] is normal")(checkMarsagliaGaussian[BigDecimal])
