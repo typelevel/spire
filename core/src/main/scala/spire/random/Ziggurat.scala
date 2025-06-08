@@ -76,8 +76,8 @@ object Ziggurat {
           x = -log(g.nextDouble()) * r1
           y = -log(g.nextDouble())
           y + y < x * x
-        })
-          return if (hz > 0) r + x else -r - x
+        }) ()
+        return if (hz > 0) r + x else -r - x
       }
 
       if (fn(iz) + g.nextDouble() * (fn(iz - 1) - fn(iz)) < exp(-.5 * x * x)) return x
