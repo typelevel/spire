@@ -64,6 +64,6 @@ object UniqueFactorizationDomain {
   implicit def uniqueFactorizationDomainFromIntegral[A](implicit A: Integral[A]): UniqueFactorizationDomain[A] =
     new UniqueFactorizationDomain[A] {
       def isPrime(a: A): Boolean = SafeLong(A.toBigInt(a)).isPrime
-      def factor(a: A): Decomposition[A] = WrapDecomposition[A](SafeLong(A.toBigInt(a)).factor)(A)
+      def factor(a: A): Decomposition[A] = WrapDecomposition[A](SafeLong(A.toBigInt(a)).factor)(using A)
     }
 }

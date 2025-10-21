@@ -73,7 +73,7 @@ class SyntaxScalaCheckSuite extends munit.ScalaCheckSuite with BaseSyntaxSuite {
   property("Semigroup syntax")(forAll { (a: String, b: String) => testSemigroupSyntax(a, b) })
   property("Monoid syntax")(forAll { (a: String, b: String) => testMonoidSyntax(a, b) })
   property("Group syntax")(forAll { (a: Int, b: Int) =>
-    testMonoidSyntax(a, b)(AdditiveGroup[Int].additive, implicitly)
+    testMonoidSyntax(a, b)(using AdditiveGroup[Int].additive, implicitly)
   })
   property("AdditiveSemigroup syntax")(forAll { (a: Int, b: Int) => testAdditiveSemigroupSyntax(a, b) })
   property("AdditiveMonoid syntax")(forAll { (a: Int, b: Int) => testAdditiveMonoidSyntax(a, b) })
@@ -89,7 +89,7 @@ class SyntaxScalaCheckSuite extends munit.ScalaCheckSuite with BaseSyntaxSuite {
   property("Ring syntax")(forAll { (a: Int, b: Int) => testRingSyntax(a, b) })
   property("EuclideanRing syntax")(forAll { (a: Int, b: NonZero[Int]) => testEuclideanRingSyntax(a, b.x) })
   property("Field syntax")(forAll { (a: Double, b: NonZero[Double]) =>
-    testFieldSyntax(a, b.x)(implicitly, spire.optional.totalfloat.TotalDoubleOrder)
+    testFieldSyntax(a, b.x)(using implicitly, spire.optional.totalfloat.TotalDoubleOrder)
   })
   property("NRoot syntax")(forAll { (a: Positive[Double]) => testNRootSyntax(a.x) })
   property("LeftModule syntax")(forAll { (v: Vector[Int], w: Vector[Int], a: Int) => testLeftModuleSyntax(v, w, a) })

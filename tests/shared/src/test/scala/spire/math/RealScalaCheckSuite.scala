@@ -133,7 +133,7 @@ class RealScalaCheckSuite extends munit.ScalaCheckSuite {
   }
 
   property("x.nroot(-k).pow(-k) = x") {
-    forAll(nonZeroSpireImplicit[Real](implicitly, implicitly, Arbitrary(realFromLongs)).arbitrary,
+    forAll(nonZeroSpireImplicit[Real](using implicitly, implicitly, Arbitrary(realFromLongs)).arbitrary,
            Arbitrary.arbitrary[Sized[Int, _1, _10]]
     ) { (x0: NonZero[Real], k: Sized[Int, _1, _10]) =>
       val x = x0.num.abs

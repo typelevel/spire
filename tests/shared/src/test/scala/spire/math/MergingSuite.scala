@@ -35,7 +35,7 @@ class MergingSuite extends munit.FunSuite {
     val a = Array.range(0, 100).map(_ * 2)
     val b = Array.range(1, 100).map(_ * 2)
     val o = new CountingOrder[Int]
-    val r = BinaryMerge.merge(a, b)(o, ClassTag.Int)
+    val r = BinaryMerge.merge(a, b)(using o, ClassTag.Int)
     assert(r.sorted.corresponds(r)(_ == _))
     assert(o.count < 200)
   }
@@ -44,8 +44,8 @@ class MergingSuite extends munit.FunSuite {
     val a = Array.range(0, 100).map(_ * 2)
     val b = Array.range(1, 100).map(_ * 3)
     val o = new CountingOrder[Int]
-    val r1 = LinearMerge.merge(a, b)(o, ClassTag.Int)
-    val r2 = LinearMerge.merge(b, a)(o, ClassTag.Int)
+    val r1 = LinearMerge.merge(a, b)(using o, ClassTag.Int)
+    val r2 = LinearMerge.merge(b, a)(using o, ClassTag.Int)
     assert(r1.sorted.corresponds(r1)(_ == _))
     assert(r2.sorted.corresponds(r2)(_ == _))
   }
