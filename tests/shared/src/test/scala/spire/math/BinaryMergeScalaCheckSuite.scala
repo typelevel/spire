@@ -30,7 +30,7 @@ class BinaryMergeScalaCheckSuite extends munit.ScalaCheckSuite {
       Arrays.sort(b)
       Arrays.sort(r)
       val order = new CountingOrder[Int]
-      val r1 = BinaryMerge.merge(a, b)(order, ClassTag.Int)
+      val r1 = BinaryMerge.merge(a, b)(using order, ClassTag.Int)
       r1.corresponds(r)(_ == _)
     }
   }
@@ -42,9 +42,9 @@ class BinaryMergeScalaCheckSuite extends munit.ScalaCheckSuite {
       Arrays.sort(b)
       Arrays.sort(r)
       val o1 = new CountingOrder[Int]
-      val r1 = BinaryMerge.merge(a, b)(o1, ClassTag.Int)
+      val r1 = BinaryMerge.merge(a, b)(using o1, ClassTag.Int)
       val o2 = new CountingOrder[Int]
-      val r2 = BinaryMerge.merge(b, a)(o2, ClassTag.Int)
+      val r2 = BinaryMerge.merge(b, a)(using o2, ClassTag.Int)
       r1.corresponds(r2)(_ == _)
     }
   }

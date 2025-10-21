@@ -50,8 +50,8 @@ object Arrays {
     val order = Order[A]
     layout match {
       case ArrayOrder.Random   =>
-      case ArrayOrder.Sorted   => spire.math.Sorting.sort(data)(order, ct)
-      case ArrayOrder.Reversed => spire.math.Sorting.sort(data)(Order.reverse(order), ct)
+      case ArrayOrder.Sorted   => spire.math.Sorting.sort(data)(using order, ct)
+      case ArrayOrder.Reversed => spire.math.Sorting.sort(data)(using Order.reverse(order), ct)
     }
     data
   }
