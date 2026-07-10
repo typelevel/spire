@@ -178,7 +178,8 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
           while (k < lim) { k += pp; primes -= k }
           m = k.toLong + pp
         }
-        if (p < 7) {} else if (m - primes.length < primes.length) {
+        if (p < 7) {}
+        else if (m - primes.length < primes.length) {
           buf += FastFactor(p, SafeLong(m))
         } else if (cutoff > p) {
           slowq += Factor(SafeLong(p), SafeLong(m))
