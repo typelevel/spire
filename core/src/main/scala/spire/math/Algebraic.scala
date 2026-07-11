@@ -160,16 +160,16 @@ final class Algebraic private (val expr: Algebraic.Expr)
   def isZero: Boolean = signum == 0
 
   override def equals(that: Any): Boolean = that match {
-    case (that: Algebraic)     => this === that
-    case (that: Real)          => this.toReal == that
-    case (that: Number)        => this.compare(Algebraic(that.toBigDecimal)) == 0
-    case (that: Rational)      => this.compare(Algebraic(that)) == 0
-    case (that: BigInt)        => isWhole && toBigInt == that
-    case (that: Natural)       => isWhole && signum >= 0 && that == toBigInt
-    case (that: SafeLong)      => isWhole && that == this
-    case (that: Complex[_])    => that == this
-    case (that: Quaternion[_]) => that == this
-    case (that: BigDecimal) =>
+    case that: Algebraic     => this === that
+    case that: Real          => this.toReal == that
+    case that: Number        => this.compare(Algebraic(that.toBigDecimal)) == 0
+    case that: Rational      => this.compare(Algebraic(that)) == 0
+    case that: BigInt        => isWhole && toBigInt == that
+    case that: Natural       => isWhole && signum >= 0 && that == toBigInt
+    case that: SafeLong      => isWhole && that == this
+    case that: Complex[_]    => that == this
+    case that: Quaternion[_] => that == this
+    case that: BigDecimal    =>
       try {
         toBigDecimal(that.mc) == that
       } catch {
@@ -421,10 +421,10 @@ final class Algebraic private (val expr: Algebraic.Expr)
     import Expr._
 
     def eval(e: Expr): A = e match {
-      case ConstantLong(n)       => conv.fromLong(n)
-      case ConstantDouble(n)     => conv.fromDouble(n)
-      case ConstantBigDecimal(n) => conv.fromBigDecimal(n)
-      case ConstantRational(n)   => conv.fromRational(n)
+      case ConstantLong(n)             => conv.fromLong(n)
+      case ConstantDouble(n)           => conv.fromDouble(n)
+      case ConstantBigDecimal(n)       => conv.fromBigDecimal(n)
+      case ConstantRational(n)         => conv.fromRational(n)
       case ConstantRoot(poly, i, _, _) =>
         RootFinder[A].findRoots(poly.map(conv.fromBigInt)).get(i)
       case Neg(n)      => -eval(n)
@@ -919,8 +919,8 @@ object Algebraic extends AlgebraicInstances {
         val lValue = lhs.toBigDecimal(digits + 1)
         val rValue = rhs.toBigDecimal(digits + 1)
         val sum = this match {
-          case (_: Add) => lValue.add(rValue)
-          case (_: Sub) => lValue.subtract(rValue)
+          case _: Add => lValue.add(rValue)
+          case _: Sub => lValue.subtract(rValue)
         }
         val result = sum.setScale(digits, RoundingMode.DOWN)
         result
@@ -1453,10 +1453,10 @@ object Algebraic extends AlgebraicInstances {
     }
 
     def apply(expr: Algebraic.Expr): Bound = expr match {
-      case ConstantLong(n)       => integer(n)
-      case ConstantDouble(n)     => rational(n)
-      case ConstantBigDecimal(n) => rational(n)
-      case ConstantRational(n)   => rational(n)
+      case ConstantLong(n)                    => integer(n)
+      case ConstantDouble(n)                  => rational(n)
+      case ConstantBigDecimal(n)              => rational(n)
+      case ConstantRational(n)                => rational(n)
       case root @ ConstantRoot(poly, _, _, _) =>
         Bound(root.lead.bitLength + 1, Roots.upperBound(poly))
       case Neg(sub)      => sub.getBound(this)

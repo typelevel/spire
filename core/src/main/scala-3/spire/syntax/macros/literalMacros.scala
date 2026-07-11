@@ -34,7 +34,7 @@ def byte(digits: Expr[StringContext])(using Quotes): Expr[Byte] =
 
   parseNumber(digits.valueOrAbort.parts, BigInt(-128), BigInt(255)) match
     case Right(a) => Expr(a.toByte)
-    case Left(b) =>
+    case Left(b)  =>
       report.error(b)
       '{ 0.toByte }
 
@@ -43,7 +43,7 @@ def short(digits: Expr[StringContext])(using Quotes): Expr[Short] =
 
   parseNumber(digits.valueOrAbort.parts, BigInt(-32768), BigInt(65535)) match
     case Right(a) => Expr(a.toShort)
-    case Left(b) =>
+    case Left(b)  =>
       report.error(b)
       '{ 0.toShort }
 
@@ -52,7 +52,7 @@ def ubyte(digits: Expr[StringContext])(using Quotes): Expr[UByte] =
 
   parseNumber(digits.valueOrAbort.parts, BigInt(0), BigInt(255)) match
     case Right(a) => '{ UByte(${ Expr(a.toByte) }) }
-    case Left(b) =>
+    case Left(b)  =>
       report.error(b)
       '{ UByte(0) }
 
@@ -61,7 +61,7 @@ def ushort(digits: Expr[StringContext])(using Quotes): Expr[UShort] =
 
   parseNumber(digits.valueOrAbort.parts, BigInt(0), BigInt(65535)) match
     case Right(a) => '{ UShort(${ Expr(a.toShort) }) }
-    case Left(b) =>
+    case Left(b)  =>
       report.error(b)
       '{ UShort(0) }
 
@@ -70,7 +70,7 @@ def uint(digits: Expr[StringContext])(using Quotes): Expr[UInt] =
 
   parseNumber(digits.valueOrAbort.parts, BigInt(0), BigInt(4294967295L)) match
     case Right(a) => '{ UInt(${ Expr(a.toInt) }) }
-    case Left(b) =>
+    case Left(b)  =>
       report.error(b)
       '{ UInt(0) }
 
@@ -79,7 +79,7 @@ def ulong(digits: Expr[StringContext])(using Quotes): Expr[ULong] =
 
   parseNumber(digits.valueOrAbort.parts, BigInt(0), BigInt("18446744073709551615")) match
     case Right(a) => '{ ULong(${ Expr(a.toLong) }) }
-    case Left(b) =>
+    case Left(b)  =>
       report.error(b)
       '{ ULong(0) }
 

@@ -287,7 +287,7 @@ object Syntax {
         isLiteral(step) match {
           case Some(k) if k > 0 => strideUpUntil(i, j, k)
           case Some(k) if k < 0 => strideDownUntil(i, j, -k)
-          case Some(k) =>
+          case Some(k)          =>
             c.error(c.enclosingPosition, "zero stride")
             q"()"
           case None =>
@@ -299,7 +299,7 @@ object Syntax {
         isLiteral(step) match {
           case Some(k) if k > 0 => strideUpTo(i, j, k)
           case Some(k) if k < 0 => strideDownTo(i, j, -k)
-          case Some(k) =>
+          case Some(k)          =>
             c.error(c.enclosingPosition, "zero stride")
             q"()"
           case None =>

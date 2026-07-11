@@ -175,9 +175,10 @@ class SortingSuite extends munit.FunSuite {
     val pivotValue = 7
     val expectedAfterPartition = Array(5, 2, 1, 7, 8, 11, 9)
 
-    matchAgainstExpected[Int](QuickSort.partition(_, 2, 9, 5),
-                              Array(6, -1) ++ leftSegment ++ Array(pivotValue) ++ rightSegment ++ Array(2, 10),
-                              Array(6, -1) ++ expectedAfterPartition ++ Array(2, 10)
+    matchAgainstExpected[Int](
+      QuickSort.partition(_, 2, 9, 5),
+      Array(6, -1) ++ leftSegment ++ Array(pivotValue) ++ rightSegment ++ Array(2, 10),
+      Array(6, -1) ++ expectedAfterPartition ++ Array(2, 10)
     )
   }
 
