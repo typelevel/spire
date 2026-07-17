@@ -357,10 +357,10 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
   }
 
   def *(rhs: Natural): Natural = lhs match {
-    case End(ld) => rhs * ld
+    case End(ld)          => rhs * ld
     case Digit(ld, ltail) =>
       rhs match {
-        case End(rd) => lhs * rd
+        case End(rd)          => lhs * rd
         case Digit(rd, rtail) =>
           Digit(UInt(0), Digit(UInt(0), ltail * rtail)) +
             Digit(UInt(0), ltail * rd) +
@@ -402,7 +402,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
           case Digit(ld, ltail) =>
             rhs.compare(UInt(1)) match {
               case -1 => throw new IllegalArgumentException("/ by zero")
-              case 0 =>
+              case 0  =>
                 lhs
               case 1 =>
                 val p = rhs.powerOfTwo
@@ -428,7 +428,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
             rhs.compare(UInt(1)) match {
               case -1 => throw new IllegalArgumentException("/ by zero")
               case 0  => End(UInt(0))
-              case 1 =>
+              case 1  =>
                 val p = rhs.powerOfTwo
                 if (p >= 0)
                   lhs & ((Natural(1) << p) - UInt(1))
@@ -451,7 +451,7 @@ sealed abstract class Natural extends ScalaNumber with ScalaNumericConversions w
             rhs.compare(UInt(1)) match {
               case -1 => throw new IllegalArgumentException("/ by zero")
               case 0  => (lhs, Natural(0))
-              case 1 =>
+              case 1  =>
                 val p = rhs.powerOfTwo
                 if (p >= 0) {
                   val mask = (Natural(1) << p) - UInt(1)
