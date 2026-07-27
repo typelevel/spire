@@ -48,7 +48,7 @@ class LiteralsSuite extends munit.FunSuite {
     import spire.syntax.all._
     assertEquals(5 ** 2, 25)
     assertEquals(5 /~ 2, 2)
-    assertEquals(5 /% 2, ((2, 1)))
+    assertEquals(5 /% 2, (2, 1))
     assertEquals(25.sqrt, 5)
   }
 
