@@ -129,7 +129,7 @@ class SeqCoordinateSpace[A: Field, SA <: SeqOps[A, Seq, SA]](val dimensions: Int
   def axis(i: Int): SA = {
     val b = cbf.newBuilder
 
-    @tailrec def loop(j: Int): SA = if (i < dimensions) {
+    @tailrec def loop(j: Int): SA = if (j < dimensions) {
       b += (if (i == j) scalar.one else scalar.zero)
       loop(j + 1)
     } else b.result()
